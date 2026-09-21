@@ -58,6 +58,13 @@ const exceptionList = [
 	'webgpu_morphtargets_face',
 	'webgpu_shadowmap_progressive',
 	'webgpu_postprocessing_ssr_denoise',
+	'webgpu_vxgi',
+	'webgpu_vxgi_sponza',
+
+	// Incremental light probe baking
+	'webgl_lightprobes_sponza',
+	'webgpu_generator_city', // Sub-pixel coverage of thin high-contrast geometry edges differs across rasterizers #33817
+	'webgpu_lightprobes_sponza',
 
 	// Video hangs the CI?
 	'css3d_youtube',
@@ -70,10 +77,7 @@ const exceptionList = [
 
 	// Webcam
 	'webgl_materials_video_webcam',
-	'webgl_morphtargets_webcam',
-
-	// Sub-pixel coverage of thin high-contrast geometry edges differs across rasterizers #33817
-	'webgpu_generator_city'
+	'webgl_morphtargets_webcam'
 
 ];
 
@@ -227,13 +231,14 @@ async function main() {
 
 	/* Prepare injections */
 
-	const buildInjection = ( code ) => code
+	const cleanPage = await fs.readFile( 'test/e2e/clean-page.js', 'utf8' );
+	const injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );
+
+	// Workers do not receive evaluateOnNewDocument scripts.
+	const buildInjection = ( code ) => injection + '\n' + code
 		.replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' )
 		// Disables WebGPU timestamp queries to prevent Inspector/Profiler from crashing in E2E software mode
 		.replace( /this\.trackTimestamp\s*=\s*\(\s*parameters\.trackTimestamp\s*===\s*true\s*\);/g, 'Object.defineProperty(this, \'trackTimestamp\', { get: () => false, set: () => {} });' );
-
-	const cleanPage = await fs.readFile( 'test/e2e/clean-page.js', 'utf8' );
-	const injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );
 
 	const builds = {
 		'three.core.js': buildInjection( await fs.readFile( 'build/three.core.js', 'utf8' ) ),
@@ -316,8 +321,18 @@ async function main() {
 
 async function preparePage( page, injection, builds, errorMessages ) {
 
+	// Ignore ambient input from the browser window; scripted DOM clicks still work.
+	const client = await page.createCDPSession();
+	await client.send( 'Input.setIgnoreInputEvents', { ignore: true } );
+
 	await page.evaluateOnNewDocument( injection );
 	await page.setRequestInterception( true );
+
+	page.on( 'pageerror', error => {
+
+		if ( page.file !== undefined ) page.error = `${ page.file }: ${ error.message }`;
+
+	} );
 
 	page.on( 'console', async msg => {
 
@@ -462,6 +477,11 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 				idleTime: idleTime * 1000
 			} );
 
+			await page.waitForFunction( () => window._videosReady(), {
+				polling: 100,
+				timeout: renderTimeout * 1000
+			} );
+
 			await page.evaluate( async ( renderTimeout, parseTime ) => {
 
 				await new Promise( resolve => setTimeout( resolve, parseTime ) );
@@ -498,7 +518,7 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 
 		} catch ( e ) {
 
-			if ( e.includes && e.includes( 'Render timeout exceeded' ) === false ) {
+			if ( e !== 'Render timeout exceeded' ) {
 
 				throw new Error( `Error happened while rendering file ${ file }: ${ e }` );
 

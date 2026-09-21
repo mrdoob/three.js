@@ -6,7 +6,7 @@ This node provides a collection of screen related metrics. Depending on [ScreenN
 
 ## Constructor
 
-### new ScreenNode( scope : 'coordinate' | 'viewport' | 'size' | 'uv' | 'dpr' )
+### new ScreenNode( scope : 'coordinate' | 'viewport' | 'size' | 'uv' )
 
 Constructs a new screen node.
 
@@ -22,7 +22,7 @@ This flag can be used for type testing.
 
 Default is `true`.
 
-### .scope : 'coordinate' | 'viewport' | 'size' | 'uv' | 'dpr'
+### .scope : 'coordinate' | 'viewport' | 'size' | 'uv'
 
 The node represents different metric depending on which scope is selected.
 
@@ -30,25 +30,16 @@ The node represents different metric depending on which scope is selected.
 *   `ScreenNode.VIEWPORT`: The current viewport defined as a four-dimensional vector.
 *   `ScreenNode.SIZE`: The dimensions of the current bound framebuffer.
 *   `ScreenNode.UV`: Normalized coordinates.
-*   `ScreenNode.DPR`: Device pixel ratio.
 
 ## Methods
 
-### .generateNodeType() : 'float' | 'vec2' | 'vec4'
+### .generateNodeType() : 'vec2' | 'vec4'
 
 This method is overwritten since the node type depends on the selected scope.
 
 **Overrides:** [Node#generateNodeType](Node.html#generateNodeType)
 
 **Returns:** The node type.
-
-### .getUpdateType() : NodeUpdateType
-
-This method is overwritten since the node's update type depends on the selected scope.
-
-**Overrides:** [Node#getUpdateType](Node.html#getUpdateType)
-
-**Returns:** The update type.
 
 ### .update( frame : NodeFrame )
 

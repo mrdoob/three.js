@@ -25,6 +25,7 @@ export * from './math/BitcountNode.js';
 export * from './math/Hash.js';
 export * from './math/MathUtils.js';
 export * from './math/PackFloatNode.js';
+export * from './math/Packed4x8IntegerNode.js';
 export * from './math/UnpackFloatNode.js';
 export * from './math/TriNoise3D.js';
 
@@ -161,6 +162,7 @@ export * from './shapes/Shapes.js';
 export * from './materialx/MaterialXNodes.js';
 
 // functions
+export { default as BRDF_EON, EON_DirectionalAlbedo } from './functions/BSDF/BRDF_EON.js';
 export { default as BRDF_GGX } from './functions/BSDF/BRDF_GGX.js';
 export { default as BRDF_Lambert } from './functions/BSDF/BRDF_Lambert.js';
 export { default as BRDF_Sheen } from './functions/BSDF/BRDF_Sheen.js';
@@ -172,6 +174,7 @@ export { default as F_Schlick } from './functions/BSDF/F_Schlick.js';
 export { default as Schlick_to_F0 } from './functions/BSDF/Schlick_to_F0.js';
 export { default as V_GGX_SmithCorrelated } from './functions/BSDF/V_GGX_SmithCorrelated.js';
 export { default as V_GGX_SmithCorrelated_Anisotropic } from './functions/BSDF/V_GGX_SmithCorrelated_Anisotropic.js';
+export { LTC_Evaluate, LTC_Evaluate_Volume, LTC_Uv } from './functions/BSDF/LTC.js';
 
 export * from './lighting/LightUtils.js';
 

@@ -36,6 +36,30 @@ Options for the internal render target.
 
 ## Properties
 
+### .autoClear : boolean
+
+Whether the renderer should automatically clear before rendering the pass.
+
+Default is `true`.
+
+### .autoClearColor : boolean
+
+Whether the color buffer should be cleared.
+
+Default is `true`.
+
+### .autoClearDepth : boolean
+
+Whether the depth buffer should be cleared.
+
+Default is `true`.
+
+### .autoClearStencil : boolean
+
+Whether the stencil buffer should be cleared.
+
+Default is `true`.
+
 ### .camera : Camera
 
 A reference to the camera.

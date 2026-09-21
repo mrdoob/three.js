@@ -48,7 +48,7 @@ const data = await exporter.parseAsync( scene, options );
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">GLTFExporter</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<p><span translate="no">GLTFExporter</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -167,7 +167,7 @@ to the exporter.</p>
 						<div class="description">
 							<p>Sets the texture utils for this exporter. Only relevant when compressed textures have to be exported.</p>
 <p>Depending on whether you use <a href="WebGLRenderer.html">WebGLRenderer</a> or <a href="WebGPURenderer.html">WebGPURenderer</a>, you must inject the
-corresponding texture utils <a href="WebGLTextureUtils.html">WebGLTextureUtils</a> or <a href="WebGPUTextureUtils.html">WebGPUTextureUtils</a>.</p>
+corresponding texture utils <a href="module-WebGLTextureUtils.html">module:WebGLTextureUtils</a> or <a href="module-WebGPUTextureUtils.html">module:WebGPUTextureUtils</a>.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -317,6 +317,17 @@ When exporting an array of multiple scenes, this must be a nested array with one
 			<td class="description last">
 				<p>Export custom glTF extensions defined on an object's <code>userData.gltfExtensions</code> property.</p>
 						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>copyright</strong>
+						<br>
+<span class="param-type">string</span>
+				</td>
+			<td class="description last">
+				<p>Export with a copyright notice embedded in the glTF.</p>
+						<p>Default is <code>null</code>.</p>
 			</td>
 		</tr>
 	</tbody>

@@ -7,28 +7,10 @@ const CONTAINER_ELEMENTS = new Set( [ 'nodegraph' ] );
 
 const LIBRARY_FALLBACK_OUTPUT = 'out';
 
-function formatInputElement( inputNodeX ) {
+function formatElement( nodeX, attrNames, tagName = nodeX.element ) {
 
 	const attrs = [];
-	for ( const name of [ 'name', 'type', 'nodename', 'nodegraph', 'interfacename', 'output', 'value' ] ) {
-
-		const value = inputNodeX.getAttribute( name );
-		if ( value !== null && value !== '' ) {
-
-			attrs.push( `${name}="${value}"` );
-
-		}
-
-	}
-
-	return `<input ${attrs.join( ' ' )}>`;
-
-}
-
-function formatNodeElement( nodeX ) {
-
-	const attrs = [];
-	for ( const name of [ 'name', 'type', 'nodedef' ] ) {
+	for ( const name of attrNames ) {
 
 		const value = nodeX.getAttribute( name );
 		if ( value !== null && value !== '' ) {
@@ -39,7 +21,19 @@ function formatNodeElement( nodeX ) {
 
 	}
 
-	return `<${nodeX.element} ${attrs.join( ' ' )}>`;
+	return `<${tagName} ${attrs.join( ' ' )}>`;
+
+}
+
+function formatInputElement( inputNodeX ) {
+
+	return formatElement( inputNodeX, [ 'name', 'type', 'nodename', 'nodegraph', 'interfacename', 'output', 'value' ], 'input' );
+
+}
+
+function formatNodeElement( nodeX ) {
+
+	return formatElement( nodeX, [ 'name', 'type', 'nodedef' ] );
 
 }
 

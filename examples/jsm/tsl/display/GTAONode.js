@@ -1,4 +1,4 @@
-import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
+import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, Node, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
 import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand, context } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -43,10 +43,10 @@ let _rendererState;
  *
  * Reference: [Practical Real-Time Strategies for Accurate Indirect Occlusion](https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%20VERSION_COLOR.pdf).
  *
- * @augments TempNode
+ * @augments Node
  * @three_import import { ao } from 'three/addons/tsl/display/GTAONode.js';
  */
-class GTAONode extends TempNode {
+class GTAONode extends Node {
 
 	static get type() {
 
@@ -181,12 +181,20 @@ class GTAONode extends TempNode {
 		this._resolution = uniform( new Vector2() );
 
 		/**
+		 * The internal noise texture used by the AO.
+		 *
+		 * @private
+		 * @type {DataTexture}
+		 */
+		this._noiseTexture = generateMagicSquareNoise();
+
+		/**
 		 * The node represents the internal noise texture used by the AO.
 		 *
 		 * @private
 		 * @type {TextureNode}
 		 */
-		this._noiseNode = texture( generateMagicSquareNoise() );
+		this._noiseNode = texture( this._noiseTexture );
 
 		/**
 		 * Represents the projection matrix of the scene's camera.
@@ -588,7 +596,11 @@ class GTAONode extends TempNode {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this._aoRenderTarget.dispose();
+
+		this._noiseTexture.dispose();
 
 		this._material.dispose();
 

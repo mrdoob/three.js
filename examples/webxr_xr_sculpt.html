@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js xr - sculpt</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> xr - sculpt<br/>
+			Trigger to sculpt. Squeeze to toggle negative. Thumbstick to cycle tools.
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { XRButton } from 'three/addons/webxr/XRButton.js';
+			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
+			import { Sculptor } from 'three/addons/misc/Sculptor.js';
+
+			let renderer, scene, camera, controls;
+			let controller1, controller2, controllerGrip1, controllerGrip2;
+			let sculptor, mesh;
+			let cursor1, cursor2;
+			let activeController = null;
+
+			const tools = [ 'clay', 'brush', 'inflate', 'smooth', 'flatten', 'pinch', 'crease' ];
+			let toolIndex = 0;
+			const brushRadius = 0.06;
+			const strokeInterval = 1000 / 90;
+			const maxStrokesPerFrame = 4;
+
+			const _ray = new THREE.Ray();
+
+			init();
+
+			function init() {
+
+				// Renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.xr.enabled = true;
+				document.body.appendChild( renderer.domElement );
+
+				document.body.appendChild( XRButton.createButton( renderer ) );
+
+				// Scene
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x222222 );
+
+				// Camera
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 50 );
+				camera.position.set( 0, 1.6, 3 );
+
+				// Controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 1.2, - 0.8 );
+				controls.update();
+
+				// Lights
+
+				scene.add( new THREE.HemisphereLight( 0x888877, 0x777788, 3 ) );
+
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 3 );
+				dirLight.position.set( 1, 3, 2 );
+				scene.add( dirLight );
+
+				// Grid
+
+				const grid = new THREE.GridHelper( 4, 1, 0x111111, 0x111111 );
+				scene.add( grid );
+
+				// Mesh
+
+				const geometry = new THREE.IcosahedronGeometry( 0.3, 24 );
+				const material = new THREE.MeshStandardMaterial( {
+					color: 0xcc6644,
+					roughness: 0.4,
+					metalness: 0.1
+				} );
+				mesh = new THREE.Mesh( geometry, material );
+				mesh.position.set( 0, 1.2, - 0.8 );
+				scene.add( mesh );
+
+				// Sculptor
+
+				sculptor = new Sculptor( mesh, camera )
+					.setTool( tools[ toolIndex ] );
+
+				// Controllers
+
+				const controllerModelFactory = new XRControllerModelFactory();
+
+				function onSelectStart() {
+
+					if ( activeController !== null ) return;
+
+					activeController = this;
+					this.userData.nextStrokeTime = null;
+					sculptor.beginStroke();
+
+				}
+
+				function onSelectEnd() {
+
+					if ( activeController !== this ) return;
+
+					activeController = null;
+					sculptor.endStroke();
+
+				}
+
+				function onSqueezeStart() {
+
+					if ( activeController !== null ) return;
+
+					sculptor.setNegative( ! sculptor.getNegative() );
+
+				}
+
+				function onConnected( event ) {
+
+					this.userData.inputSource = event.data;
+					this.userData.thumbMoved = false;
+
+				}
+
+				function onDisconnected() {
+
+					this.userData.inputSource = null;
+					this.userData.thumbMoved = false;
+
+					onSelectEnd.call( this );
+
+				}
+
+				controller1 = renderer.xr.getController( 0 );
+				controller1.addEventListener( 'connected', onConnected );
+				controller1.addEventListener( 'disconnected', onDisconnected );
+				controller1.addEventListener( 'selectstart', onSelectStart );
+				controller1.addEventListener( 'selectend', onSelectEnd );
+				controller1.addEventListener( 'squeezestart', onSqueezeStart );
+				scene.add( controller1 );
+
+				controller2 = renderer.xr.getController( 1 );
+				controller2.addEventListener( 'connected', onConnected );
+				controller2.addEventListener( 'disconnected', onDisconnected );
+				controller2.addEventListener( 'selectstart', onSelectStart );
+				controller2.addEventListener( 'selectend', onSelectEnd );
+				controller2.addEventListener( 'squeezestart', onSqueezeStart );
+				scene.add( controller2 );
+
+				renderer.xr.addEventListener( 'sessionend', function () {
+
+					activeController = null;
+					sculptor.endStroke();
+					cursor1.visible = cursor2.visible = false;
+
+				} );
+
+				controllerGrip1 = renderer.xr.getControllerGrip( 0 );
+				controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
+				scene.add( controllerGrip1 );
+
+				controllerGrip2 = renderer.xr.getControllerGrip( 1 );
+				controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
+				scene.add( controllerGrip2 );
+
+				// Controller rays
+
+				const lineGeometry = new THREE.BufferGeometry().setFromPoints( [
+					new THREE.Vector3( 0, 0, 0 ),
+					new THREE.Vector3( 0, 0, - 5 )
+				] );
+				const lineMaterial = new THREE.LineBasicMaterial( { color: 0xffffff, transparent: true, opacity: 0.25 } );
+
+				controller1.add( new THREE.Line( lineGeometry, lineMaterial ) );
+				controller2.add( new THREE.Line( lineGeometry, lineMaterial ) );
+
+				// Brush cursors
+
+				const cursorGeo = new THREE.SphereGeometry( 1, 16, 12 );
+				const cursorMat = new THREE.MeshBasicMaterial( {
+					color: 0xffffff,
+					transparent: true,
+					opacity: 0.15,
+					depthWrite: false
+				} );
+
+				cursor1 = new THREE.Mesh( cursorGeo, cursorMat );
+				cursor1.visible = false;
+				scene.add( cursor1 );
+
+				cursor2 = new THREE.Mesh( cursorGeo, cursorMat.clone() );
+				cursor2.visible = false;
+				scene.add( cursor2 );
+
+				// Resize
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function handleController( controller, cursor, time ) {
+
+				const inputSource = controller.userData.inputSource;
+
+				// Pause while tracking is lost; the controller retains its last pose.
+				if ( ! inputSource || controller.visible === false ) {
+
+					cursor.visible = false;
+					controller.userData.nextStrokeTime = null;
+					return;
+
+				}
+
+				controller.updateMatrixWorld( true );
+
+				_ray.origin.setFromMatrixPosition( controller.matrixWorld );
+				_ray.direction.set( 0, 0, - 1 ).transformDirection( controller.matrixWorld );
+
+				let hit = false;
+				let strokes = 0;
+
+				if ( controller === activeController ) {
+
+					if ( controller.userData.nextStrokeTime === null ) controller.userData.nextStrokeTime = time;
+
+					// Stamp at a fixed rate, independent of the headset refresh rate.
+					while ( time >= controller.userData.nextStrokeTime && strokes < maxStrokesPerFrame ) {
+
+						hit = sculptor.strokeFromRay( _ray, brushRadius );
+						controller.userData.nextStrokeTime += strokeInterval;
+						strokes ++;
+
+					}
+
+					// Bound catch-up work after long frames.
+					if ( time >= controller.userData.nextStrokeTime ) controller.userData.nextStrokeTime = time + strokeInterval;
+
+				}
+
+				if ( strokes === 0 ) hit = sculptor.pickFromRay( _ray, brushRadius );
+
+				if ( hit ) {
+
+					sculptor.getHitPoint( cursor.position ).applyMatrix4( mesh.matrixWorld );
+					cursor.scale.setScalar( brushRadius );
+					cursor.visible = true;
+
+				} else {
+
+					cursor.visible = false;
+
+				}
+
+				// Latch thumbstick input until it returns to center.
+				if ( inputSource.gamepad ) {
+
+					const axes = inputSource.gamepad.axes;
+					if ( axes.length >= 4 ) {
+
+						const thumbX = axes[ 2 ];
+						if ( ! controller.userData.thumbMoved && Math.abs( thumbX ) > 0.8 ) {
+
+							controller.userData.thumbMoved = true;
+
+							if ( activeController === null ) {
+
+								toolIndex = ( toolIndex + ( thumbX > 0 ? 1 : tools.length - 1 ) ) % tools.length;
+								sculptor.setTool( tools[ toolIndex ] );
+
+							}
+
+						} else if ( Math.abs( thumbX ) < 0.3 ) {
+
+							controller.userData.thumbMoved = false;
+
+						}
+
+					}
+
+				}
+
+			}
+
+			function animate( time ) {
+
+				handleController( controller1, cursor1, time );
+				handleController( controller2, cursor2, time );
+
+				controls.update();
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

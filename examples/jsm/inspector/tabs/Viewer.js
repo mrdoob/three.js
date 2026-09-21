@@ -2,7 +2,7 @@ import { Tab } from '../ui/Tab.js';
 import { List } from '../ui/List.js';
 import { Item } from '../ui/Item.js';
 import { splitPath, splitCamelCase } from '../ui/utils.js';
-import { getItem, setItem } from '../Inspector.js';
+import { getItem, setItem } from '../Storage.js';
 
 import { RendererUtils, NoToneMapping, LinearSRGBColorSpace, QuadMesh, NodeMaterial, CanvasTarget, Vector2, Color } from 'three/webgpu';
 import { renderOutput, vec2, vec3, vec4, Fn, screenUV, step, OnMaterialUpdate, uniform, float } from 'three/tsl';
@@ -675,6 +675,7 @@ class Viewer extends Tab {
 				const onPointerDown = ( e ) => {
 
 					isDragging = true;
+					line.classList.add( 'active' );
 					e.preventDefault();
 
 				};
@@ -700,6 +701,7 @@ class Viewer extends Tab {
 				const onPointerUp = () => {
 
 					isDragging = false;
+					line.classList.remove( 'active' );
 
 				};
 
@@ -946,6 +948,13 @@ class Viewer extends Tab {
 
 			const mainCanvas = renderer.domElement;
 			const rect = mainCanvas.getBoundingClientRect();
+
+			if ( rect.width <= 0 || rect.height <= 0 ) {
+
+				return;
+
+			}
+
 			const targetParent = document.fullscreenElement || this.profiler.domElement;
 			const parentRect = targetParent.getBoundingClientRect();
 			const localLeft = rect.left - parentRect.left;
@@ -1019,7 +1028,7 @@ class Viewer extends Tab {
 
 			if ( ! renderer.backend.isWebGPUBackend ) {
 
-				inspector.resolveConsoleOnce( 'warn', 'Inspector: Viewer is only available with WebGPU.' );
+				// Viewer is only available with WebGPU.
 
 				return;
 
@@ -1310,6 +1319,53 @@ class Viewer extends Tab {
 			}
 
 		}
+
+	}
+
+	dispose() {
+
+		if ( this.splitActive ) {
+
+			this.stopSplitMode();
+
+		}
+
+		if ( this.splitCanvas ) {
+
+			if ( this.splitCanvas.parentElement ) {
+
+				this.splitCanvas.parentElement.removeChild( this.splitCanvas );
+
+			}
+
+			this.splitCanvas = null;
+
+		}
+
+		if ( this.splitCanvasTarget ) {
+
+			this.splitCanvasTarget.dispose();
+			this.splitCanvasTarget = null;
+
+		}
+
+		if ( this.splitMaterial ) {
+
+			this.splitMaterial.dispose();
+			this.splitMaterial = null;
+
+		}
+
+		for ( const canvasData of this.canvasNodes.values() ) {
+
+			canvasData.canvasTarget.dispose();
+			canvasData.material.dispose();
+
+		}
+
+		this.canvasNodes.clear();
+
+		super.dispose();
 
 	}
 

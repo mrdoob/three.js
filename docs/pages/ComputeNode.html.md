@@ -56,9 +56,9 @@ A callback executed when the compute node finishes initialization.
 
 ### .updateBeforeType : string
 
-The `updateBeforeType` is set to `NodeUpdateType.OBJECT` since [ComputeNode#updateBefore](ComputeNode.html#updateBefore) is executed once per object by default.
+The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node computes once per frame.
 
-Default is `'object'`.
+Default is `'frame'`.
 
 **Overrides:** [Node#updateBeforeType](Node.html#updateBeforeType)
 
@@ -76,11 +76,17 @@ Default is `[ 64 ]`.
 
 ## Methods
 
-### .dispose()
+### .getUpdateBeforeType( frame : NodeFrame ) : NodeUpdateType
 
-Executes the `dispose` event for this node.
+Returns the update type of [Node#updateBefore](Node.html#updateBefore).
 
-**Overrides:** [Node#dispose](Node.html#dispose)
+**frame**
+
+The current node frame.
+
+**Overrides:** [Node#getUpdateBeforeType](Node.html#getUpdateBeforeType)
+
+**Returns:** The update type.
 
 ### .label( name : string ) : ComputeNode
 

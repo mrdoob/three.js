@@ -16,7 +16,7 @@ scene.add( mesh );
 
 ## Import
 
-HTMLMesh is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+HTMLMesh is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { HTMLMesh } from 'three/addons/interactive/HTMLMesh.js';
@@ -37,6 +37,8 @@ The DOM element to display as a plane mesh.
 ### .dispose()
 
 Frees the GPU-related resources allocated by this instance and removes all event listeners. Call this method whenever this instance is no longer used in your app.
+
+**Overrides:** [Mesh#dispose](Mesh.html#dispose)
 
 ## Source
 

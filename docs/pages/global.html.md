@@ -160,7 +160,7 @@ Expects a custom implementation by modifying shader code of the material's fragm
 
 ### .DATA (constant)
 
-Precomputed DFG LUT for Image-Based Lighting Resolution: 16x16 Samples: 4096 per texel Format: RG16F (2 half floats per texel: scale, bias)
+Precomputed DFG LUT for physically based specular lighting, used by both image-based lighting and direct-light multi-scattering energy compensation Resolution: 16x16 Samples: 4096 per texel Format: RG16F (2 half floats per texel: scale, bias)
 
 ### .DecrementStencilOp : number (constant)
 
@@ -616,6 +616,18 @@ Will return true if the stencil reference value is not equal to the current sten
 
 Normal information is relative to the object orientation.
 
+### .OnAfterObjectUpdate (constant)
+
+Creates an event that triggers a function every time an object (Mesh|Sprite) has been rendered.
+
+The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
+
+### .OnAfterRenderPipeline (constant)
+
+Creates an event that triggers a function after the render pipeline is rendered.
+
+The node must be part of a node chain that is used as the output of a `RenderPipeline`, otherwise the event is ignored.
+
 ### .OnBeforeFrameUpdate (constant)
 
 Creates an event that triggers a function before every frame.
@@ -633,6 +645,12 @@ The event will be bound to the declared TSL function `Fn()`; it must be declared
 Creates an event that triggers a function before an object (Mesh|Sprite) is updated.
 
 The event will be bound to the declared TSL function `Fn()`; it must be declared within a `Fn()` or the JS function call must be inherited from one.
+
+### .OnBeforeRenderPipeline (constant)
+
+Creates an event that triggers a function before the render pipeline is rendered.
+
+The node must be part of a node chain that is used as the output of a `RenderPipeline`, otherwise the event is ignored.
 
 ### .OnFrameUpdate (constant)
 
@@ -687,6 +705,8 @@ Filters shadow maps using the Percentage-Closer Filtering (PCF) algorithm.
 ### .PCFSoftShadowMap : number (constant)
 
 Filters shadow maps using the Percentage-Closer Filtering (PCF) algorithm with better soft shadows especially when using low-resolution shadow maps.
+
+**Deprecated:** since r186. Use \`PCFShadowMap\` instead.
 
 ### .R11_EAC_Format : number (constant)
 
@@ -864,6 +884,10 @@ Discards the green, blue and alpha components and reads just the red component. 
 
 Reinhard tone mapping.
 
+### .RenderObjectRefreshType : ConstantsRenderObjectRefreshType (constant)
+
+Represents the refresh types of render objects.
+
 ### .RepeatWrapping : number (constant)
 
 The texture will simply repeat to infinity.
@@ -965,6 +989,10 @@ Represents subtractive blending.
 
 Represents touch interaction types in context of controls.
 
+### .TRIANGLE_STRIDE (constant)
+
+Number of floats per triangle record: three positions (vec4 each, w unused), albedo (rgb + side flag) and emissive (rgb + unused).
+
 ### .TangentSpaceNormalMap : number (constant)
 
 Normal information is relative to the underlying surface.
@@ -1065,6 +1093,10 @@ Sets the stencil buffer value to `0`.
 
 TSL object representing a varying property for the batching color vector.
 
+### .batchIndirectIndex : VaryingNode.<uint> (constant)
+
+TSL object representing a varying property for the batch indirect index (instance ID).
+
 ### .buildingPalette (constant)
 
 The NYC masonry palette every tower is dressed from ( hex colours ): limestone-dominant with terracotta accents. Shared by the single-tower example and [CityGenerator](CityGenerator.html)'s building material so both stay in sync.
@@ -1076,10 +1108,6 @@ Calculates the closest points on two 3D lines. Used for perspective-correct line
 ### .depthAwareBlend (constant)
 
 Performs a depth-aware blend between a base scene and a secondary effect (like godrays). This function uses a Poisson disk sampling pattern to detect depth discontinuities in the neighborhood of the current pixel. If an edge is detected, it shifts the sampling coordinate for the blend node away from the edge to prevent light leaking/haloing.
-
-### .disposeShadowMaterial (constant)
-
-Disposes the shadow material for the given light source.
 
 ### .equirectUvToDir (constant)
 
@@ -1141,10 +1169,6 @@ A node representing the total specular light.
 
 Trims the line segment to avoid rendering behind the camera near plane. Computes an interpolation factor (alpha) to clamp the segment's coordinate.
 
-### .viewportResolution (constant)
-
-**Deprecated:** since r169. Use [screenSize](TSL.html#screenSize) instead.
-
 ### .worldEnd : VaryingNode.<vec3> (constant)
 
 Varying node representing the world position of the segment end in view space. Used for distance and coordinate calculations across the fragment shader.
@@ -1182,28 +1206,6 @@ The shadow coordinates.
 A shadow filtering function performing PCF filtering with Vogel disk sampling and IGN.
 
 Uses 5 samples distributed via Vogel disk pattern, rotated per-pixel using Interleaved Gradient Noise (IGN) to break up banding artifacts. Combined with hardware PCF (4-tap filtering per sample), this effectively provides 20 filtered taps with better distribution.
-
-**inputs**
-
-The input parameter object.
-
-**depthTexture**
-
-A reference to the shadow map's texture data.
-
-**shadowCoord**
-
-The shadow coordinates.
-
-**shadow**
-
-The light shadow.
-
-**Returns:** The filtering result.
-
-### .PCFSoftShadowFilter( inputs : Object ) : Node.<float>
-
-A shadow filtering function performing PCF soft filtering.
 
 **inputs**
 
@@ -1281,7 +1283,7 @@ The shadow coordinates.
 
 ### .addArcade()
 
-The base storey: a wall pierced by tall pointed-arch openings, extruded with thickness so the openings read as deep recesses.
+The base storey: a wall pierced by tall pointed-arch openings, built as a flat front face and the openings' reveals so they read as deep recesses.
 
 ### .addCornice()
 
@@ -1294,6 +1296,10 @@ A low parapet wall capping the crown.
 ### .addSpandrelBands()
 
 Horizontal terracotta bands at every floor line. Together with the projecting piers they form the facade grid; the gaps between them are the window openings, with glass set behind.
+
+### .addStorefront()
+
+The street-level retail front: glazed shopfronts on a low bulkhead, under a signboard fascia, framed by the building's ground-floor piers and split by slim mullions, with a projecting awning over some shops. Reads as a row of NYC storefronts. All pieces are pushed into the caller's `parts` accumulators.
 
 ### .bakeGroups()
 
@@ -1355,6 +1361,22 @@ A VOX chunk loaded via [VOXLoader](VOXLoader.html).
 
 **Returns:** The generated mesh.
 
+### .buildingColorNode( layout : Object, seed : number | Node.<uint> ) : Node.<vec3>
+
+The per-tower flat masonry colour: one palette entry per lot, picked by hashing the lot's grid cell from world position. Keyed off `positionWorld`, so it colours anything standing on the city grid identically, the towers and their [CityGenerator#buildProxy](CityGenerator.html#buildProxy) boxes alike.
+
+**layout**
+
+The city layout.
+
+**seed**
+
+The city seed or a shared seed node.
+
+Default is `0`.
+
+**Returns:** The tower colour.
+
 ### .ceilPowerOfTwo( value : number ) : number
 
 Returns the smallest power of two that is greater than or equal to the given number.
@@ -1382,6 +1404,66 @@ The min value.
 The max value.
 
 **Returns:** The clamped value.
+
+### .collectSceneTriangles( scene : Scene, options : Object ) : Object
+
+Collects the triangles of all meshes in the scene as flat, world-space records suitable for GPU voxelization. Per-triangle albedo and emissive colors are resolved on the CPU (material color multiplied with a texture lookup at the triangle's centroid). Large triangles are subdivided so every record covers a bounded number of voxels.
+
+**scene**
+
+The scene.
+
+**options**
+
+Options.
+
+**bounds**
+
+Triangles outside these bounds are skipped.
+
+**layers**
+
+Objects must pass this layer test.
+
+**exclude**
+
+Objects to skip.
+
+**subVoxelSize**
+
+Size of a sub-voxel in world units.
+
+**maxEdge**
+
+Maximum triangle edge length in sub-voxels before subdivision.
+
+**minOpacity**
+
+Triangles with lower opacity are skipped.
+
+**Returns:** The triangle records and triangle count.
+
+### .computeSceneBounds( scene : Scene, layers : Layers, exclude : Set.<Object3D>, target : Box3 ) : Box3
+
+Computes the world-space bounding box of all voxelizable meshes.
+
+**scene**
+
+The scene.
+
+**layers**
+
+Only objects that pass the layer test are considered.
+
+**exclude**
+
+Objects to skip.
+
+**target**
+
+The target box.
+
+**Returns:** The bounding box.
 
 ### .contain( texture : Texture, aspect : number ) : Texture
 
@@ -1425,9 +1507,35 @@ The texture's aspect ratio.
 
 **Returns:** The updated texture.
 
-### .createBuildingMaterial()
+### .createBatchingMatrixNode( matricesTexture : Texture, id : Node.<uint> ) : Node.<mat4>
 
-The shared material every tower in a [CityGenerator](CityGenerator.html) is dressed with: one flat masonry colour per lot, picked from a palette by hashing the lot's grid cell.
+Creates the node that reads a batching matrix from the given matrices texture.
+
+**matricesTexture**
+
+The matrices texture.
+
+**id**
+
+The indirect instance ID.
+
+**Returns:** The matrix node.
+
+### .createBuildingMaterial( layout : Object, seed : number | Node.<uint> ) : MeshStandardNodeMaterial
+
+The shared material every tower in a [CityGenerator](CityGenerator.html) is dressed with: the per-lot [buildingColorNode](global.html#buildingColorNode) resolved once per vertex on a skyscraper material.
+
+**layout**
+
+The city layout.
+
+**seed**
+
+A fixed seed, or [CityGenerator#seedNode](CityGenerator.html#seedNode) for a changing city.
+
+Default is `0`.
+
+**Returns:** The building material.
 
 ### .createCanvasElement() : HTMLCanvasElement
 
@@ -1436,6 +1544,42 @@ Creates a canvas element configured for block display.
 This is a convenience function that creates a canvas element with display style set to 'block', which is commonly used in three.js rendering contexts to avoid inline element spacing issues.
 
 **Returns:** A canvas element with display set to 'block'.
+
+### .createConeTracer( volume : VXGIVolume, options : Object ) : function
+
+Creates a cone tracing function for a [VXGIVolume](VXGIVolume.html). The returned function emits TSL code that marches a cone through the volume's opacity/radiance mip chain and returns the gathered radiance, the accumulated occlusion and a distance-weighted occlusion for AO.
+
+Implements the approximate voxel cone tracing of Crassin et al. 2011: the cone is sampled at the mip level matching its current diameter with quadrilinear interpolation, samples are composited front-to-back with the emission-absorption model, the opacity of a sample is corrected for the step size and the anisotropic opacity (and, if given, the directional radiance) is interpolated from the three directional values closest to the cone direction. Cones leaving the volume gather nothing.
+
+**volume**
+
+The volume to trace.
+
+**options**
+
+Options.
+
+Default is `{}`.
+
+**radianceNode**
+
+The radiance texture node to gather from. If `null`, only occlusion is computed.
+
+Default is `null`.
+
+**directionalNode**
+
+The directional radiance texture node of the coarser levels, see [VXGIVolume#directionalRadiance](VXGIVolume.html#directionalRadiance). If `null`, the coarser levels are gathered from the radiance node's mips.
+
+Default is `null`.
+
+**maxSteps**
+
+Upper bound of steps per cone.
+
+Default is `128`.
+
+**Returns:** A function `( origin, direction, tanHalfAngle, maxDistance, aoDistance = null ) => { color, alpha, ao }`. AO is only computed if `aoDistance` is given.
 
 ### .createEvent( type : string, callback : function ) : EventNode
 
@@ -1461,7 +1605,31 @@ distance within which every tree is drawn.
 
 distance past which no tree is drawn.
 
-### .createInstanceMatrixNode( builder : NodeBuilder, instanceMatrix : InstancedBufferAttribute | StorageInstancedBufferAttribute, count : number ) : Node
+### .createGaussianSplatGeometry( centers : Float32Array, covariances : Float32Array, colors : Uint8Array | Uint8ClampedArray, sphericalHarmonics : Object ) : BufferGeometry
+
+Creates Gaussian splat geometry from packed attribute arrays. Higher-order spherical harmonics must be supplied as packed `Uint32Array` words (`SH_BAND_WORDS[ degree ]` words per splat, four clamped-byte coefficients per word using `( value - 128 ) / 128`).
+
+**centers**
+
+Splat centers.
+
+**covariances**
+
+Splat covariance matrices.
+
+**colors**
+
+RGBA colors.
+
+**sphericalHarmonics**
+
+Optional packed SH band arrays.
+
+Default is `{}`.
+
+**Returns:** The Gaussian splat geometry.
+
+### .createInstanceMatrixNode( builder : NodeBuilder, instanceMatrix : InstancedBufferAttribute | StorageInstancedBufferAttribute ) : Node
 
 Creates the appropriate node for instanced matrix transformations. Depending on buffer limits and storage capability, returns either a storage, buffer, or instanced interleaved attribute node.
 
@@ -1472,10 +1640,6 @@ The current node builder.
 **instanceMatrix**
 
 The matrix buffer attribute.
-
-**count**
-
-The instance count.
 
 **Returns:** The matrix node.
 
@@ -1493,7 +1657,7 @@ A simple bark material for a [TreeGenerator](TreeGenerator.html) mesh: a low-sat
 
 **parameters**
 
-`barkColor` ( a hex, THREE.Color or TSL node ).
+`barkColor` ( a hex, THREE.Color or TSL node ) and `barkScale` ( a THREE.Vector3 ).
 
 ### .damp( x : number, y : number, lambda : number, dt : number ) : number
 
@@ -1661,6 +1825,30 @@ Generate a [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier) (
 
 **Returns:** The UUID.
 
+### .getBoneMatricesNode( builder : NodeBuilder, skeleton : Skeleton ) : Object
+
+Creates the bone matrices node. Skeletons that fit within the uniform buffer limit use a uniform buffer, larger skeletons fall back to a bone texture.
+
+**builder**
+
+The current node builder.
+
+**skeleton**
+
+The skeleton.
+
+**Returns:** The bone matrices node.
+
+### .getBoneTextureMatrices( boneTexture : TextureNode ) : Object
+
+Creates an accessor for bone matrices stored in a bone texture.
+
+**boneTexture**
+
+The bone texture node.
+
+**Returns:** An accessor with the same `element()` interface as a buffer node.
+
 ### .getByteLength( width : number, height : number, format : number, type : number ) : number
 
 Determines how many bytes must be used to represent the texture.
@@ -1783,7 +1971,7 @@ An object where keys are member names and values are either types (as strings) o
 
 **Returns:** An array of member layouts.
 
-### .getPreviousInstance( instancedMesh : InstancedMesh, instanceMatrix : InstancedBufferAttribute | StorageInstancedBufferAttribute, builder : NodeBuilder, count : number ) : Node
+### .getPreviousInstance( instancedMesh : InstancedMesh, instanceMatrix : InstancedBufferAttribute | StorageInstancedBufferAttribute, builder : NodeBuilder ) : Node
 
 Retrieves or initializes the previous frame instance matrix node for motion vectors. Uses a WeakMap to cache previous frame instance matrices and their TSL nodes.
 
@@ -1799,15 +1987,29 @@ The current matrix buffer attribute.
 
 The current node builder.
 
-**count**
-
-The instance count.
-
 **Returns:** The previous frame instance matrix node.
 
-### .getPreviousSkinnedPosition( skinnedMesh : SkinnedMesh, bindMatrixNode : Node.<mat4>, bindMatrixInverseNode : Node.<mat4>, skinIndexNode : Node.<uvec4>, skinWeightNode : Node.<vec4> ) : Node.<vec3>
+### .getPreviousNode( batchMesh : BatchedMesh, id : Node.<uint> ) : Node.<mat4>
+
+Retrieves or initializes the previous frame batching matrix node for motion vectors. Uses a WeakMap to cache previous frame matrices textures and their TSL nodes.
+
+**batchMesh**
+
+The batched mesh.
+
+**id**
+
+The indirect instance ID.
+
+**Returns:** The previous frame batching matrix node.
+
+### .getPreviousSkinnedPosition( builder : NodeBuilder, skinnedMesh : SkinnedMesh, bindMatrixNode : Node.<mat4>, bindMatrixInverseNode : Node.<mat4>, skinIndexNode : Node.<uvec4>, skinWeightNode : Node.<vec4> ) : Node.<vec3>
 
 Retrieves or initializes the previous frame skinned position node for motion vectors. Uses a WeakMap to cache previous frame bone matrix arrays and their TSL buffer nodes.
+
+**builder**
+
+The current node builder.
 
 **skinnedMesh**
 
@@ -1957,6 +2159,34 @@ The current node builder.
 
 **Returns:** The viewZ node.
 
+### .hasTangents( settings : Object ) : boolean
+
+Returns `true` if the given keyframe track settings hold Bezier tangent data.
+
+**settings**
+
+The settings of a keyframe track.
+
+**Returns:** Whether both tangent arrays are defined or not.
+
+### .intersectVolume( volume : VXGIVolume, origin : Node.<vec3>, direction : Node.<vec3> ) : Object
+
+Emits the intersection of a ray with the bounds of the given volume.
+
+**volume**
+
+The volume.
+
+**origin**
+
+The ray origin.
+
+**direction**
+
+The normalized ray direction.
+
+**Returns:** The entry and exit distances. The ray misses the volume if `tExit <= tEnter`.
+
 ### .inverseLerp( x : number, y : number, value : number ) : number
 
 Returns the percentage in the closed interval `[0, 1]` of the given value between the start and end point.
@@ -1975,15 +2205,25 @@ A value between start and end.
 
 **Returns:** The interpolation factor.
 
+### .isOITCapable( material : Material ) : boolean
+
+Returns `true` if the given material qualifies for OIT.
+
+**material**
+
+The material to check.
+
+**Returns:** Whether the material qualifies for OIT or not.
+
 ### .isPowerOfTwo( value : number ) : boolean
 
-Returns `true` if the given number is a power of two.
+Returns `true` if the given integer is a power of two.
 
 **value**
 
 The value to check.
 
-**Returns:** Whether the given number is a power of two or not.
+**Returns:** Whether the given integer is a power of two or not.
 
 ### .isTypedArray( array : any ) : boolean
 
@@ -2159,6 +2399,28 @@ The upper value boundary
 
 **Returns:** A random integer.
 
+### .replaceSunLights( scene : Scene ) : Array.<Object>
+
+Replaces every visible, shadow-casting `SunLight` in the scene with a directional light fitted to the shadow casters. SunLight shadow cascades are fitted to the active camera every render, which the frozen shadow maps of a bake cannot provide.
+
+**scene**
+
+The scene to bake.
+
+**Returns:** The replacements to pass to [restoreSunLights](global.html#restoreSunLights), or `null` if the scene has no such lights.
+
+### .restoreSunLights( scene : Scene, replacements : Array.<Object> )
+
+Restores the sun lights replaced by [replaceSunLights](global.html#replaceSunLights).
+
+**scene**
+
+The baked scene.
+
+**replacements**
+
+The replacements to undo.
+
 ### .rgbToYCoCg( c : Node.<vec3> ) : Node.<vec3>
 
 **c**
@@ -2178,6 +2440,32 @@ The UV node to be used in the texture sampling.
 Default is `null`.
 
 **Returns:** The created SampleNode instance wrapped as a node object.
+
+### .sampleDirectional( volume : VXGIVolume, directionalNode : Texture3DNode, uvw : Node.<vec3>, level : Node.<float>, direction : Node.<vec3> ) : Node.<vec4>
+
+Emits a directional radiance lookup: for each axis the direction block facing the ray is sampled from the directional texture and the three samples are blended with the squared direction components. The block is selected arithmetically, so the lookup does not branch.
+
+**volume**
+
+The volume.
+
+**directionalNode**
+
+The directional radiance texture node.
+
+**uvw**
+
+The texture coordinates within the volume.
+
+**level**
+
+The mip level of the directional texture.
+
+**direction**
+
+The normalized ray direction.
+
+**Returns:** The premultiplied radiance and its weight.
 
 ### .seededRandom( s : number ) : number
 
@@ -2256,38 +2544,6 @@ A function that returns a new renderer with a WebGL backend.
 **onFallback**
 
 A function that installs the new renderer in the app.
-
-### .shadowRenderObjectFunction( object : Object3D, scene : Scene, _camera : Camera, geometry : BufferGeometry, material : Material, group : Group, …params : any )
-
-Shadow Render Object Function.
-
-**object**
-
-The 3D object to render.
-
-**scene**
-
-The scene containing the object.
-
-**\_camera**
-
-The camera used for rendering.
-
-**geometry**
-
-The geometry of the object.
-
-**material**
-
-The material of the object.
-
-**group**
-
-The group the object belongs to.
-
-**params**
-
-Additional parameters for rendering.
 
 ### .slab()
 
@@ -2527,6 +2783,25 @@ number
 
 A pan interaction.
 
+### .ConstantsRenderObjectRefreshType
+
+Represents the refresh types of render objects.
+
+**NONE**  
+number
+
+No refresh required.
+
+**SHARED**  
+number
+
+Only shared uniform buffers require an update.
+
+**FULL**  
+number
+
+The render object requires a full refresh.
+
 ### .ConstantsTimestampQuery
 
 This type represents the different timestamp query types.
@@ -2573,6 +2848,23 @@ Debug configuration.
 boolean
 
 Whether shader errors should be checked or not.
+
+**diagnostics**  
+Object
+
+Diagnostics configuration for the shader generation.
+
+###### Properties
+
+**keywords**  
+boolean
+
+Whether declaration names that collide with reserved keywords should be renamed or not.
+
+**onNodeBuilderCreated**  
+function
+
+A callback function that is executed after a node builder has been created and before it is built.
 
 **onShaderError**  
 function
@@ -2754,6 +3046,14 @@ XR configuration.
 boolean
 
 Whether to globally enable XR or not.
+
+### .loopBodyCallback( inputs : Object.<string, Node> )
+
+The loop body.
+
+**inputs**
+
+The loop variables of the current `Loop()` call, keyed by their name.
 
 ### .onAnimationCallback( time : DOMHighResTimeStamp, frame : XRFrame )
 

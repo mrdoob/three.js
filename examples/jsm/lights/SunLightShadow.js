@@ -4,7 +4,8 @@ import {
 	Matrix4,
 	OrthographicCamera,
 	Vector3,
-	Vector4
+	Vector4,
+	WebGPUCoordinateSystem
 } from 'three';
 
 const _lightOrientationMatrix = /*@__PURE__*/ new Matrix4();
@@ -199,7 +200,7 @@ class SunLightShadow extends LightShadow {
 		// view frustum corners in light space; the rotation preserves distances,
 		// so the cascades can be fitted and snapped directly in this space
 
-		const zNear = viewCamera.reversedDepth ? 1 : - 1;
+		const zNear = viewCamera.reversedDepth ? 1 : ( viewCamera.coordinateSystem === WebGPUCoordinateSystem ? 0 : - 1 );
 		const inverseProjectionMatrix = viewCamera.projectionMatrixInverse;
 
 		let globalMaxZ = - Infinity;

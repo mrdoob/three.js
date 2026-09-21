@@ -21,7 +21,7 @@ scene.add( lineSegments );
 
 ## Import
 
-LineSegments2 is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+LineSegments2 is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { LineSegments2 } from 'three/addons/lines/LineSegments2.js';

@@ -13,7 +13,7 @@ composer.addPass( renderPass );
 
 ## Import
 
-RenderPass is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+RenderPass is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';

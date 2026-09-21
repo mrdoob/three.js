@@ -200,7 +200,7 @@
 						scene.environment = texture;
 
 						prefab = ( await new GLTFLoader().loadAsync( './models/gltf/ShaderBall.glb' ) ).scene;
-						await computePrefabTangents();
+						computePrefabTangents();
 
 						for ( const sample of samples ) {
 
@@ -222,9 +222,7 @@
 
 			}
 
-			async function computePrefabTangents() {
-
-				await MikkTSpace.ready;
+			function computePrefabTangents() {
 
 				prefab.traverse( function ( node ) {
 
@@ -295,8 +293,6 @@
 
 				models.push( model );
 
-				scene.add( model );
-
 				updateModelsAlign();
 
 				//
@@ -324,7 +320,14 @@
 
 				}
 
-				await renderer.compileAsync( model, camera, scene );
+				// Skip double-pass materials until compileAsync() preserves each pass's side.
+				if ( ! ( material.transparent && material.side === THREE.DoubleSide && material.forceSinglePass === false ) ) {
+
+					await renderer.compileAsync( model, camera, scene );
+
+				}
+
+				scene.add( model );
 
 			}
 

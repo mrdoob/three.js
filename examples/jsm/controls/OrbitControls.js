@@ -511,6 +511,8 @@ class OrbitControls extends Controls {
 
 	disconnect() {
 
+		this.state = _STATE.NONE;
+
 		this.domElement.removeEventListener( 'pointerdown', this._onPointerDown );
 		this.domElement.ownerDocument.removeEventListener( 'pointermove', this._onPointerMove );
 		this.domElement.ownerDocument.removeEventListener( 'pointerup', this._onPointerUp );
@@ -523,8 +525,15 @@ class OrbitControls extends Controls {
 
 		const document = this.domElement.getRootNode(); // offscreen canvas compatibility
 		document.removeEventListener( 'keydown', this._interceptControlDown, { capture: true } );
+		document.removeEventListener( 'keyup', this._interceptControlUp, { capture: true } );
+
+		this._controlActive = false;
+
+		this._pointers.length = 0;
+		this._pointerPositions = {};
 
 		this.domElement.style.touchAction = ''; // Restore touch scroll
+		this.domElement.style.cursor = 'auto';
 
 	}
 

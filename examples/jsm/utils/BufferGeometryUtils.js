@@ -30,7 +30,7 @@ import {
  *
  * @param {BufferGeometry} geometry - The geometry to compute tangents for.
  * @param {Object} MikkTSpace - Instance of `examples/jsm/libs/mikktspace.module.js`, or `mikktspace` npm package.
- * Await `MikkTSpace.ready` before use.
+ * The bundled JavaScript implementation is ready immediately. Await `MikkTSpace.ready` before using a WebAssembly implementation.
  * @param {boolean} [negateSign=true] - Whether to negate the sign component (.w) of each tangent.
  * Required for normal map conventions in some formats, including glTF.
  * @return {BufferGeometry} The updated geometry.
@@ -150,6 +150,7 @@ function mergeGeometries( geometries, useGroups = false ) {
 
 		const geometry = geometries[ i ];
 		let attributesCount = 0;
+		let morphAttributesCount = 0;
 
 		// ensure that all geometries are indexed, or none
 
@@ -206,9 +207,27 @@ function mergeGeometries( geometries, useGroups = false ) {
 
 			}
 
+			if ( geometry.morphAttributes[ name ].length !== geometries[ 0 ].morphAttributes[ name ].length ) {
+
+				console.error( 'THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index ' + i + '. All geometries must have the same number of morph targets for the "' + name + '" morph attribute.' );
+				return null;
+
+			}
+
 			if ( morphAttributes[ name ] === undefined ) morphAttributes[ name ] = [];
 
 			morphAttributes[ name ].push( geometry.morphAttributes[ name ] );
+
+			morphAttributesCount ++;
+
+		}
+
+		// ensure geometries have the same number of morph attributes
+
+		if ( morphAttributesCount !== morphAttributesUsed.size ) {
+
+			console.error( 'THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index ' + i + '. Make sure all geometries have the same number of morph attributes.' );
+			return null;
 
 		}
 
@@ -709,8 +728,8 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 			for ( let k = 0; k < itemSize; k ++ ) {
 
-				// double tilde truncates the decimal value
-				hash += `${ ~ ~ ( attribute[ getters[ k ] ]( index ) * hashMultiplier + hashAdditive ) },`;
+				// Math.trunc() preserves the full Number range, ~~ would wrap to int32
+				hash += `${ Math.trunc( attribute[ getters[ k ] ]( index ) * hashMultiplier + hashAdditive ) },`;
 
 			}
 
@@ -1371,7 +1390,7 @@ function toCreasedNormals( geometry, creaseAngle = Math.PI / 3 /* 60 degrees */ 
 	// assign an id to each vertex, sharing the id between vertices with the same
 	// quantized position via an open-addressed hash table (slots hold id + 1, 0 means empty)
 	const vertexIds = new Int32Array( vertexCount );
-	const quantized = new Int32Array( vertexCount * 3 );
+	const quantized = new Float64Array( vertexCount * 3 );
 
 	let tableSize = 1;
 	while ( tableSize < vertexCount * 2 ) tableSize <<= 1;
@@ -1382,9 +1401,9 @@ function toCreasedNormals( geometry, creaseAngle = Math.PI / 3 /* 60 degrees */ 
 	for ( let i = 0; i < vertexCount; i ++ ) {
 
 		const i3 = 3 * i;
-		const qx = ~ ~ ( positions[ i3 + 0 ] * hashMultiplier );
-		const qy = ~ ~ ( positions[ i3 + 1 ] * hashMultiplier );
-		const qz = ~ ~ ( positions[ i3 + 2 ] * hashMultiplier );
+		const qx = Math.trunc( positions[ i3 + 0 ] * hashMultiplier );
+		const qy = Math.trunc( positions[ i3 + 1 ] * hashMultiplier );
+		const qz = Math.trunc( positions[ i3 + 2 ] * hashMultiplier );
 
 		let slot = ( Math.imul( qx, 73856093 ) ^ Math.imul( qy, 19349663 ) ^ Math.imul( qz, 83492791 ) ) & tableMask;
 

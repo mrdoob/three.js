@@ -387,17 +387,35 @@ class UnrealBloomPass extends Pass {
 
 		}
 
+		// merge adjacent taps into single bilinear fetches (linear sampling)
+
+		const offsets = [];
+		const weights = [];
+
+		for ( let i = 1; i < kernelRadius; i += 2 ) {
+
+			const wa = coefficients[ i ];
+			const wb = ( i + 1 < kernelRadius ) ? coefficients[ i + 1 ] : 0;
+			const w = wa + wb;
+
+			offsets.push( ( i * wa + ( i + 1 ) * wb ) / w );
+			weights.push( w );
+
+		}
+
 		return new ShaderMaterial( {
 
 			defines: {
-				'KERNEL_RADIUS': kernelRadius
+				'KERNEL_PAIRS': offsets.length
 			},
 
 			uniforms: {
 				'colorTexture': { value: null },
 				'invSize': { value: new Vector2( 0.5, 0.5 ) }, // inverse texture size
 				'direction': { value: new Vector2( 0.5, 0.5 ) },
-				'gaussianCoefficients': { value: coefficients } // precomputed Gaussian coefficients
+				'centerWeight': { value: coefficients[ 0 ] },
+				'gaussianOffsets': { value: offsets },
+				'gaussianWeights': { value: weights }
 			},
 
 			vertexShader: /* glsl */`
@@ -420,21 +438,20 @@ class UnrealBloomPass extends Pass {
 				uniform sampler2D colorTexture;
 				uniform vec2 invSize;
 				uniform vec2 direction;
-				uniform float gaussianCoefficients[KERNEL_RADIUS];
+				uniform float centerWeight;
+				uniform float gaussianOffsets[KERNEL_PAIRS];
+				uniform float gaussianWeights[KERNEL_PAIRS];
 
 				void main() {
 
-					float weightSum = gaussianCoefficients[0];
-					vec3 diffuseSum = texture2D( colorTexture, vUv ).rgb * weightSum;
+					vec3 diffuseSum = texture2D( colorTexture, vUv ).rgb * centerWeight;
 
-					for ( int i = 1; i < KERNEL_RADIUS; i ++ ) {
+					for ( int i = 0; i < KERNEL_PAIRS; i ++ ) {
 
-						float x = float( i );
-						float w = gaussianCoefficients[i];
-						vec2 uvOffset = direction * invSize * x;
+						vec2 uvOffset = direction * invSize * gaussianOffsets[ i ];
 						vec3 sample1 = texture2D( colorTexture, vUv + uvOffset ).rgb;
 						vec3 sample2 = texture2D( colorTexture, vUv - uvOffset ).rgb;
-						diffuseSum += ( sample1 + sample2 ) * w;
+						diffuseSum += ( sample1 + sample2 ) * gaussianWeights[ i ];
 
 					}
 

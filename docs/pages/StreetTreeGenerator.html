@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>StreetTreeGenerator - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">StreetTreeGenerator</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A young street tree set in a curbside pit: a flared bark trunk rising through a
+cast-iron pit grate, branching into a canopy of vertex-jittered leaf clumps. The
+clump normals are blended toward a shared crown sphere so the clumps shade as one
+irregular crown rather than separate balls, and the material adds interior
+self-shadowing and patchy colour so the foliage reads as leaf mass. Built once
+and instanced across a list of placements, dressed with one cheap material that
+branches on a baked <code>partId</code>.</p>
+<p>The canopy is near rotationally symmetric, so the canonical model stands on
+<code>y = 0</code>, centred in X / Z, with its slight lean toward <code>+Z</code> matching the other
+pieces of street furniture.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const trees = new StreetTreeGenerator();
+scene.add( trees.build( placements ) ); // placements: Matrix4[]
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="StreetTreeGenerator" translate="no">new <a href="#StreetTreeGenerator">StreetTreeGenerator</a><span class="signature">()</span> </h3>
+					<div class="method">
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/generators/city/StreetTreeGenerator.js" translate="no" target="_blank" rel="noopener">examples/jsm/generators/city/StreetTreeGenerator.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

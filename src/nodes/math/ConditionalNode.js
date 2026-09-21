@@ -59,6 +59,12 @@ class ConditionalNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * This method is overwritten since the node type is inferred from the if/else
 	 * nodes.

@@ -31,7 +31,7 @@ scene.environment = texture;
 
 ## Import
 
-UltraHDRLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+UltraHDRLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
