@@ -1,4 +1,4 @@
-import { warn } from '../../../utils.js';
+import { warn, warnOnce } from '../../../utils.js';
 
 /**
  * The purpose of a node library is to assign node implementations
@@ -14,13 +14,6 @@ class NodeLibrary {
 	 * Constructs a new node library.
 	 */
 	constructor() {
-
-		/**
-		 * A weak map that maps lights to light nodes.
-		 *
-		 * @type {WeakMap<Light.constructor,AnalyticLightNode.constructor>}
-		 */
-		this.lightNodes = new WeakMap();
 
 		/**
 		 * A map that maps materials to node materials.
@@ -124,24 +117,30 @@ class NodeLibrary {
 	/**
 	 * Returns a light node class definition for a light class definition.
 	 *
-	 * @param {Light.constructor} light - The light class definition.
+	 * @deprecated since r186. Read the light node class from `Light.prototype.lightNode` instead.
+	 * @param {Light.constructor} lightClass - The light class definition.
 	 * @return {?AnalyticLightNode.constructor} The light node class definition. Returns `null` if no light node is found.
 	 */
-	getLightNodeClass( light ) {
+	getLightNodeClass( lightClass ) {
 
-		return this.lightNodes.get( light ) || null;
+		warnOnce( 'NodeLibrary: "getLightNodeClass()" has been deprecated. Read the light node class from the light\'s "lightNode" property instead.' ); // @deprecated r186
+
+		return lightClass.prototype.lightNode || null;
 
 	}
 
 	/**
 	 * Adds a light node class definition for a given light class definition.
 	 *
+	 * @deprecated since r186. Assign the light node class to `Light.prototype.lightNode` instead.
 	 * @param {AnalyticLightNode.constructor} lightNodeClass - The light node class definition.
 	 * @param {Light.constructor} lightClass - The light class definition.
 	 */
 	addLight( lightNodeClass, lightClass ) {
 
-		this.addClass( lightNodeClass, lightClass, this.lightNodes );
+		warnOnce( 'NodeLibrary: "addLight()" has been deprecated. Assign the light node class to the light\'s "lightNode" property instead.' ); // @deprecated r186
+
+		lightClass.prototype.lightNode = lightNodeClass;
 
 	}
 
@@ -165,29 +164,6 @@ class NodeLibrary {
 		if ( typeof type === 'function' || typeof type === 'object' ) throw new Error( `THREE.NodeLibrary: Base class ${ type } is not a class.` );
 
 		library.set( type, nodeClass );
-
-	}
-
-	/**
-	 * Adds a node class definition for the given class definition to the provided type library.
-	 *
-	 * @param {Node.constructor} nodeClass - The node class definition.
-	 * @param {Node.constructor} baseClass - The class definition.
-	 * @param {WeakMap<Node.constructor, Node.constructor>} library - The type library.
-	 */
-	addClass( nodeClass, baseClass, library ) {
-
-		if ( library.has( baseClass ) ) {
-
-			warn( `Redefinition of node ${ baseClass.name }` );
-			return;
-
-		}
-
-		if ( typeof nodeClass !== 'function' ) throw new Error( `THREE.NodeLibrary: Node class ${ nodeClass.name } is not a class.` );
-		if ( typeof baseClass !== 'function' ) throw new Error( `THREE.NodeLibrary: Base class ${ baseClass.name } is not a class.` );
-
-		library.set( baseClass, nodeClass );
 
 	}
 
