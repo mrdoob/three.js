@@ -5,6 +5,7 @@ import {
 	Color,
 	UniformsLib,
 	UniformsUtils,
+	PMREMGenerator,
 } from 'three';
 import {
 	context,
@@ -24,6 +25,7 @@ import {
 	GLSLNodeBuilder,
 	BasicNodeLibrary,
 	WebGLCapabilities,
+	PMREMNode,
 } from 'three/webgpu';
 
 // Limitations
@@ -60,7 +62,7 @@ function generateUniformsList( program, uniforms ) {
 
 }
 
-// overrides shadow nodes to use the built in shadow textures
+// Adapts nodes to use WebGLRenderer resources.
 class WebGLNodeBuilder extends GLSLNodeBuilder {
 
 	addNode( node ) {
@@ -78,6 +80,10 @@ class WebGLNodeBuilder extends GLSLNodeBuilder {
 				// no need to rerender shadows since WebGLRenderer is handling it
 
 			};
+
+		} else if ( node instanceof PMREMNode && node._generator === null ) {
+
+			node._generator = new PMREMGenerator( this.renderer._renderer );
 
 		}
 
@@ -253,36 +259,6 @@ class RendererProxy {
 	getCacheKey() {
 
 		return this.toneMapping + this.outputColorSpace;
-
-	}
-
-	setRenderTarget( renderTarget, activeCubeFace = 0, activeMipmapLevel = 0 ) {
-
-		if ( renderTarget !== null && activeMipmapLevel !== 0 ) {
-
-			// Renderer scales the viewport and scissor to the mip level; WebGLRenderer does not.
-			const viewport = renderTarget.viewport;
-			const scissor = renderTarget.scissor;
-			const width = viewport.z, height = viewport.w;
-			const scissorWidth = scissor.z, scissorHeight = scissor.w;
-
-			viewport.z >>= activeMipmapLevel;
-			viewport.w >>= activeMipmapLevel;
-			scissor.z >>= activeMipmapLevel;
-			scissor.w >>= activeMipmapLevel;
-
-			this._renderer.setRenderTarget( renderTarget, activeCubeFace, activeMipmapLevel );
-
-			viewport.z = width;
-			viewport.w = height;
-			scissor.z = scissorWidth;
-			scissor.w = scissorHeight;
-
-		} else {
-
-			this._renderer.setRenderTarget( renderTarget, activeCubeFace, activeMipmapLevel );
-
-		}
 
 	}
 

@@ -33,15 +33,6 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 		 */
 		this.isWebGLCubeRenderTarget = true;
 
-		/**
-		 * This flag can be used for type testing.
-		 *
-		 * @type {boolean}
-		 * @readonly
-		 * @default true
-		 */
-		this.isCubeRenderTarget = true;
-
 		const image = { width: size, height: size, depth: 1 };
 		const images = [ image, image, image, image, image, image ];
 
