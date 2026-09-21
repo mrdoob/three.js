@@ -16,10 +16,12 @@ The port retains attribute welding, connected orientation groups, angular subgro
 
 ## Compatibility
 
-This port intentionally corrects an edge-pairing defect in `BuildNeighborsFast()` in the reference revision linked above. Its two secondary sorting loops omit their final buckets. This can leave identical edges separated or use a different face order when pairing nonmanifold edges. The JavaScript implementation pairs all edges in face order, matching the reference with both final bucket sorts added.
+This port intentionally corrects an edge-pairing defect in `BuildNeighborsFast()` in the upstream C revision linked above. Its two secondary sorting loops omit their final buckets. This can leave identical edges separated or use a different face order when pairing nonmanifold edges. The JavaScript implementation pairs all edges in face order.
+
+This correction is part of the JavaScript port and is absent from the linked upstream C revision. For comparison, a local copy of that C revision was patched to add both missing final bucket sorts. The JavaScript output matches that locally patched copy on the tested inputs.
 
 The bundled WASM implementation also contains this defect. Consequently, the new implementation can produce different tangents on affected meshes. For `ShaderBall.glb`, the preview mesh is identical; the calibration mesh changes at 129 corners, with a maximum angular difference of approximately 0.353 degrees and no handedness changes.
 
-Completely collapsed triangles with no usable neighbor return the reference default `(1, 0, 0, -1)`. The previous WASM implementation could throw on these inputs. Empty input returns an empty array.
+Completely collapsed triangles with no usable neighbor return the default `(1, 0, 0, -1)` already provided by the unmodified C reference. The previous WASM implementation could throw on these inputs. Empty input returns an empty array.
 
 The original license is preserved in `mikktspace.module.js`, which is explicitly marked as an altered JavaScript port.
