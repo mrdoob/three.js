@@ -250,26 +250,13 @@ function resolveIncludes( string ) {
 
 }
 
-const shaderChunkMap = new Map();
-
 function includeReplacer( match, include ) {
 
-	let string = ShaderChunk[ include ];
+	const string = ShaderChunk[ include ];
 
 	if ( string === undefined ) {
 
-		const newInclude = shaderChunkMap.get( include );
-
-		if ( newInclude !== undefined ) {
-
-			string = ShaderChunk[ newInclude ];
-			warn( 'WebGLRenderer: Shader chunk "%s" has been deprecated. Use "%s" instead.', include, newInclude );
-
-		} else {
-
-			throw new Error( 'THREE.WebGLProgram: Can not resolve #include <' + include + '>' );
-
-		}
+		throw new Error( 'THREE.WebGLProgram: Can not resolve #include <' + include + '>' );
 
 	}
 
