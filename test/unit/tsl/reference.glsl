@@ -51,6 +51,13 @@ vec4( vec2( 1.0, 2.0 ), float( 3 ), float( 4u ) )
 
 vec4( vec3( 1.0, 2.0, 3.0 ).xy, 0.0, 1.0 )
 
+// conversion cache
+
+vec3 nodeVar0;
+nodeVar0 = vec3( ( nodeUniform0 * 0.5 ) );
+
+vec4( ( nodeVar0 + nodeVar0 ), 1.0 )
+
 // boolean conversion
 
 vec2( float( true ), float( false ) )
