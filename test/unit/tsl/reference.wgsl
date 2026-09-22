@@ -54,6 +54,14 @@ vec4<f32>( vec2<f32>( 1.0, 2.0 ), f32( 3 ), f32( 4u ) )
 
 vec4<f32>( vec3<f32>( 1.0, 2.0, 3.0 ).xy, 0.0, 1.0 )
 
+// conversion cache
+
+var nodeVar0 : vec3<f32>;
+
+nodeVar0 = vec3<f32>( ( render.nodeUniform0 * 0.5 ) );
+
+vec4<f32>( ( nodeVar0 + nodeVar0 ), 1.0 )
+
 // boolean conversion
 
 vec2<f32>( f32( true ), f32( false ) )

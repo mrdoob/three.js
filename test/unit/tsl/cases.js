@@ -1,4 +1,4 @@
-import { Break, Continue, Fn, If, Loop, Switch, array, bool, float, int, inverse, ivec3, mat3, mat4, mix, mul, select, uint, uv, vec2, vec3, vec4 } from '../../../src/Three.TSL.js';
+import { Break, Continue, Fn, If, Loop, Switch, array, bool, float, int, inverse, ivec3, mat3, mat4, mix, mul, select, time, uint, uv, vec2, vec3, vec4 } from '../../../src/Three.TSL.js';
 
 // Create a fresh graph for every test and backend.
 export const cases = {
@@ -25,6 +25,13 @@ export const cases = {
 	vectorComposition: () => vec4( vec2( 1, 2 ), int( 3 ), uint( 4 ) ),
 
 	vectorResize: () => vec4( vec2( vec3( 1, 2, 3 ) ), 0, 1 ),
+
+	conversionCache: () => {
+
+		const value = vec3( time.mul( 0.5 ) );
+		return vec4( value.add( value ), 1 );
+
+	},
 
 	booleanConversion: () => vec2( float( bool( true ) ), float( bool( false ) ) ),
 
