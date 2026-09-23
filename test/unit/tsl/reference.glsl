@@ -71,18 +71,15 @@ vec4( nodeVar0, 1.0 )
 
 // indexed mutable cache
 
-float nodeVar1;
 mat4 nodeVar0 = ( mat4( 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ) * mat4( 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ) );
-nodeVar1 = ( nodeVar0[ 0u ][ 0u ] + nodeVar0[ 1u ][ 1u ] );
 nodeVar0[ 0u ][ 0u ] = 3.0;
 nodeVar0[ 1u ].xy = vec2( 4.0, 5.0 );
 
-( nodeVar0 * vec4( nodeVar1 ) )
+( nodeVar0 * vec4( ( nodeVar0[ 0u ][ 0u ] + nodeVar0[ 1u ][ 1u ] ) ) )
 
 // loop local cache
 
-float nodeVar0;
-nodeVar0 = 0.0;
+float nodeVar0 = 0.0;
 
 if ( true ) {
 

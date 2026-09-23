@@ -74,23 +74,19 @@ vec4<f32>( nodeVar0, 1.0 )
 
 // indexed mutable cache
 
-var nodeVar1 : f32;
-var nodeVar2 : vec2<f32>;
+var nodeVar1 : vec2<f32>;
 
 var nodeVar0 : mat4x4<f32> = ( mat4x4<f32>( 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ) * mat4x4<f32>( 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ) );
-nodeVar1 = ( nodeVar0[ 0u ][ 0u ] + nodeVar0[ 1u ][ 1u ] );
 nodeVar0[ 0u ][ 0u ] = 3.0;
-nodeVar2 = vec2<f32>( 4.0, 5.0 );
-nodeVar0[ 1u ].x = nodeVar2[ 0 ];
-nodeVar0[ 1u ].y = nodeVar2[ 1 ];
+nodeVar1 = vec2<f32>( 4.0, 5.0 );
+nodeVar0[ 1u ].x = nodeVar1[ 0 ];
+nodeVar0[ 1u ].y = nodeVar1[ 1 ];
 
-( nodeVar0 * vec4<f32>( nodeVar1 ) )
+( nodeVar0 * vec4<f32>( ( nodeVar0[ 0u ][ 0u ] + nodeVar0[ 1u ][ 1u ] ) ) )
 
 // loop local cache
 
-var nodeVar0 : f32;
-
-nodeVar0 = 0.0;
+var nodeVar0 : f32 = 0.0;
 
 if ( true ) {
 

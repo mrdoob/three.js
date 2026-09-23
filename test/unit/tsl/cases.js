@@ -53,7 +53,7 @@ export const cases = {
 	indexedMutableCache: () => Fn( () => {
 
 		const matrix = mat4( 1 ).mul( mat4( 2 ) );
-		const before = matrix[ 0 ][ 0 ].add( matrix[ 1 ][ 1 ] ).toVar();
+		const before = matrix[ 0 ][ 0 ].add( matrix[ 1 ][ 1 ] );
 
 		matrix[ 0 ][ 0 ] = 3;
 		matrix[ 1 ].xy = vec2( 4, 5 );
@@ -66,7 +66,7 @@ export const cases = {
 
 		const value = float( 2 ).add( 3 );
 		const matrix = mat4( vec4( value, 0, 0, 0 ), vec4( 0, value, 0, 0 ), vec4( 0, 0, 1, 0 ), vec4( 0, 0, 0, 1 ) );
-		const sum = float( 0 ).toVar();
+		const sum = float( 0 );
 
 		If( bool( true ), () => {
 
