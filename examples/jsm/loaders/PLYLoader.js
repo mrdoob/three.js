@@ -659,23 +659,23 @@ class PLYLoader extends Loader {
 
 				const vertex_indices = element.vertex_indices || element.vertex_index; // issue #9338
 				const texcoord = element.texcoord;
+				const hasTexcoords = texcoord !== undefined && texcoord.length === vertex_indices.length * 2;
 
-				if ( vertex_indices.length === 3 ) {
+				// triangulate the polygon as a fan around its last vertex
 
-					buffer.indices.push( vertex_indices[ 0 ], vertex_indices[ 1 ], vertex_indices[ 2 ] );
+				const last = vertex_indices.length - 1;
 
-					if ( texcoord && texcoord.length === 6 ) {
+				for ( let i = 0; i < last - 1; i ++ ) {
 
-						buffer.faceVertexUvs.push( texcoord[ 0 ], texcoord[ 1 ] );
-						buffer.faceVertexUvs.push( texcoord[ 2 ], texcoord[ 3 ] );
-						buffer.faceVertexUvs.push( texcoord[ 4 ], texcoord[ 5 ] );
+					buffer.indices.push( vertex_indices[ i ], vertex_indices[ i + 1 ], vertex_indices[ last ] );
+
+					if ( hasTexcoords ) {
+
+						buffer.faceVertexUvs.push( texcoord[ i * 2 ], texcoord[ i * 2 + 1 ] );
+						buffer.faceVertexUvs.push( texcoord[ i * 2 + 2 ], texcoord[ i * 2 + 3 ] );
+						buffer.faceVertexUvs.push( texcoord[ last * 2 ], texcoord[ last * 2 + 1 ] );
 
 					}
-
-				} else if ( vertex_indices.length === 4 ) {
-
-					buffer.indices.push( vertex_indices[ 0 ], vertex_indices[ 1 ], vertex_indices[ 3 ] );
-					buffer.indices.push( vertex_indices[ 1 ], vertex_indices[ 2 ], vertex_indices[ 3 ] );
 
 				}
 
@@ -704,9 +704,13 @@ class PLYLoader extends Loader {
 					const g = _color.g * invScale;
 					const b = _color.b * invScale;
 
-					buffer.faceVertexColors.push( r, g, b );
-					buffer.faceVertexColors.push( r, g, b );
-					buffer.faceVertexColors.push( r, g, b );
+					for ( let i = 0; i < last - 1; i ++ ) {
+
+						buffer.faceVertexColors.push( r, g, b );
+						buffer.faceVertexColors.push( r, g, b );
+						buffer.faceVertexColors.push( r, g, b );
+
+					}
 
 				}
 
