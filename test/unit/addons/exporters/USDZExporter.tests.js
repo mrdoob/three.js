@@ -12,6 +12,18 @@ function isValidUSDA( usda ) {
 
 }
 
+// Some CI images have no functional GPU backend at all -- confirmed in this
+// exact codebase's own gpu-test-utils.js, where even WebGPURenderer's WebGL2
+// fallback (forceWebGL: true) comes back null in that environment. Detect
+// availability at runtime and soft-skip rather than fail, the same
+// convention gpu-test-utils.js already uses for its own GPU-backed tests.
+function isWebGL2Available() {
+
+	const gl = new OffscreenCanvas( 1, 1 ).getContext( 'webgl2' );
+	return gl !== null;
+
+}
+
 export default QUnit.module( 'Addons', () => {
 
 	QUnit.module( 'Exporters', () => {
@@ -245,6 +257,13 @@ export default QUnit.module( 'Addons', () => {
 
 			QUnit.test( 'preserves RGB color data for fully-transparent pixels in exported PNG textures', async ( assert ) => {
 
+				if ( ! isWebGL2Available() ) {
+
+					assert.ok( true, 'SKIPPED: WebGL2 is not available in this environment.' );
+					return;
+
+				}
+
 				// A 2x1 PNG, hand-encoded, with pixel 0 = opaque-looking red
 				// color but alpha === 0, and pixel 1 = opaque green (control).
 				// This is the exact shape of https://github.com/mrdoob/three.js/issues/30040:
@@ -345,6 +364,13 @@ export default QUnit.module( 'Addons', () => {
 			} );
 
 			QUnit.test( 'exporting many textures does not exhaust the host application\'s WebGL context', async ( assert ) => {
+
+				if ( ! isWebGL2Available() ) {
+
+					assert.ok( true, 'SKIPPED: WebGL2 is not available in this environment.' );
+					return;
+
+				}
 
 				const sentinel = document.createElement( 'canvas' ).getContext( 'webgl2' );
 
