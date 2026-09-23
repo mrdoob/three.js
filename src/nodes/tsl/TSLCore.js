@@ -691,6 +691,12 @@ class ShaderCallNodeInternal extends Node {
 
 			result = properties[ subBuildOutput ];
 
+			if ( previousFnCall && this.shaderNode.getLayout() === null && builder.getDataFromNode( this ).hasLoop ) {
+
+				builder.getDataFromNode( previousFnCall ).hasLoop = true;
+
+			}
+
 		} else if ( buildStage === 'analyze' ) {
 
 			outputNode.build( builder, output );

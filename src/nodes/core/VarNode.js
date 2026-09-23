@@ -128,7 +128,14 @@ class VarNode extends Node {
 
 		const data = builder.getDataFromNode( this );
 
-		if ( data.forceDeclaration === true ) return false;
+		// Calls containing loops must be evaluated in their original stack.
+		if ( this.intent && data.stack && this.node.isShaderCallNodeInternal ) {
+
+			const callData = builder.getDataFromNode( this.node );
+
+			if ( callData.hasLoop && this.node.getNodeType( builder ) !== 'void' ) return false;
+
+		}
 
 		return this.intent;
 
@@ -193,30 +200,9 @@ class VarNode extends Node {
 
 			if ( builder.context.nodeLoop || builder.context.nodeBlock ) {
 
-				let addBefore = false;
-
-				if ( this.node.isShaderCallNodeInternal && this.node.shaderNode.getLayout() === null ) {
-
-					if ( builder.fnCall && builder.fnCall.shaderNode ) {
-
-						const shaderNodeData = builder.getDataFromNode( this.node.shaderNode );
-
-						if ( shaderNodeData.hasLoop ) {
-
-							const data = builder.getDataFromNode( this );
-							data.forceDeclaration = true;
-
-							addBefore = true;
-
-						}
-
-					}
-
-				}
-
 				const baseStack = builder.getBaseStack();
 
-				if ( addBefore ) {
+				if ( this.node.isShaderCallNodeInternal && this.node.shaderNode.getLayout() === null ) {
 
 					baseStack.addToStackBefore( this );
 
@@ -225,6 +211,8 @@ class VarNode extends Node {
 					baseStack.addToStack( this );
 
 				}
+
+				builder.getDataFromNode( this ).stack = baseStack;
 
 			}
 
