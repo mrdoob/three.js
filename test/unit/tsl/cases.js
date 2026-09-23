@@ -463,6 +463,143 @@ export const cases = {
 
 	} )(),
 
+	functionWithLoopInsideLoop: () => Fn( () => {
+
+		const sumValues = Fn( ( [ value ] ) => {
+
+			const sum = float( 0 );
+
+			Loop( { end: 3, name: 'j' }, () => {
+
+				sum.addAssign( value );
+
+			} );
+
+			return sum;
+
+		} );
+
+		const total = float( 0 );
+
+		Loop( 4, ( { i } ) => {
+
+			total.addAssign( sumValues( i ) );
+
+		} );
+
+		return total;
+
+	} )(),
+
+	functionOutsideConditional: () => Fn( () => {
+
+		const sumValues = Fn( () => {
+
+			const sum = float( 0 );
+
+			Loop( 3, ( { i } ) => {
+
+				sum.addAssign( i );
+
+			} );
+
+			return sum;
+
+		} );
+
+		const value = sumValues();
+		const total = float( 0 );
+
+		If( uv().x.greaterThan( 0.5 ), () => {
+
+			total.assign( value );
+
+		} );
+
+		return total;
+
+	} )(),
+
+	functionWithLoopWithoutStack: () => {
+
+		const value = Fn( () => {
+
+			const sum = float( 0 );
+			Loop( 3, ( { i } ) => {
+
+				sum.addAssign( i );
+
+			} );
+			return sum;
+
+		} )();
+
+		return Fn( () => {
+
+			const total = float( 0 );
+			Loop( 4, () => {
+
+				total.addAssign( value );
+
+			} );
+			return total;
+
+		} )();
+
+	},
+
+	wrappedFunctionOutsideLoop: () => Fn( () => {
+
+		const sumValues = Fn( () => {
+
+			const sum = float( 0 );
+			Loop( 3, ( { i } ) => {
+
+				sum.addAssign( i );
+
+			} );
+			return sum;
+
+		} );
+		const wrapped = Fn( () => sumValues() );
+		const value = wrapped();
+		const total = float( 0 );
+
+		Loop( 4, () => {
+
+			total.addAssign( value );
+
+		} );
+		return total;
+
+	} )(),
+
+	functionLoopDefaultParameter: () => Fn( () => {
+
+		const sumValues = Fn( ( [ count = float( 5 ) ] ) => {
+
+			const sum = float( 0 );
+			Loop( count, ( { i } ) => {
+
+				sum.addAssign( i );
+
+			} );
+			return sum;
+
+		} );
+		const explicitCount = sumValues( int( 3 ) );
+		const defaultCount = sumValues();
+		const total = float( 0 );
+
+		Loop( 4, () => {
+
+			total.addAssign( explicitCount.add( defaultCount ) );
+
+		} );
+		return total;
+
+	} )(),
+
 	function: () => {
 
 		const square = Fn( ( { value } ) => value.mul( value ), { value: 'float', return: 'float' } );

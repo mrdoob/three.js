@@ -508,6 +508,69 @@ nodeVar0
 
 var nodeVar0 : f32 = 0.0;
 
+for ( var i : i32 = 0; i < 3; i ++ ) {
+
+	nodeVar0 = ( nodeVar0 + f32( i ) );
+
+}
+
+var nodeVar1 : f32 = nodeVar0;
+var nodeVar2 : f32 = 0.0;
+
+for ( var i : i32 = 0; i < 4; i ++ ) {
+
+	nodeVar2 = ( nodeVar2 + nodeVar1 );
+
+}
+
+nodeVar2
+
+// function with loop inside loop
+
+var nodeVar0 : f32 = 0.0;
+
+for ( var i : i32 = 0; i < 4; i ++ ) {
+
+	var nodeVar1 : f32 = 0.0;
+
+	for ( var j : i32 = 0; j < 3; j ++ ) {
+
+		nodeVar1 = ( nodeVar1 + f32( i ) );
+
+	}
+
+	var nodeVar2 : f32 = nodeVar1;
+	nodeVar0 = ( nodeVar0 + nodeVar2 );
+
+}
+
+nodeVar0
+
+// function outside conditional
+
+var nodeVar0 : f32 = 0.0;
+
+for ( var i : i32 = 0; i < 3; i ++ ) {
+
+	nodeVar0 = ( nodeVar0 + f32( i ) );
+
+}
+
+var nodeVar1 : f32 = nodeVar0;
+var nodeVar2 : f32 = 0.0;
+
+if ( ( nodeVarying0.x > 0.5 ) ) {
+
+	nodeVar2 = nodeVar1;
+
+}
+
+nodeVar2
+
+// function with loop without stack
+
+var nodeVar0 : f32 = 0.0;
+
 for ( var i : i32 = 0; i < 4; i ++ ) {
 
 	var nodeVar1 : f32 = 0.0;
@@ -518,11 +581,64 @@ for ( var i : i32 = 0; i < 4; i ++ ) {
 
 	}
 
-	nodeVar0 = ( nodeVar0 + nodeVar1 );
+	var nodeVar2 : f32 = nodeVar1;
+	nodeVar0 = ( nodeVar0 + nodeVar2 );
 
 }
 
 nodeVar0
+
+// wrapped function outside loop
+
+var nodeVar0 : f32 = 0.0;
+
+for ( var i : i32 = 0; i < 3; i ++ ) {
+
+	nodeVar0 = ( nodeVar0 + f32( i ) );
+
+}
+
+var nodeVar1 : f32 = nodeVar0;
+var nodeVar2 : f32 = nodeVar1;
+var nodeVar3 : f32 = 0.0;
+
+for ( var i : i32 = 0; i < 4; i ++ ) {
+
+	nodeVar3 = ( nodeVar3 + nodeVar2 );
+
+}
+
+nodeVar3
+
+// function loop default parameter
+
+var nodeVar0 : f32 = 0.0;
+
+for ( var i : i32 = 0; i < 3; i ++ ) {
+
+	nodeVar0 = ( nodeVar0 + f32( i ) );
+
+}
+
+var nodeVar1 : f32 = nodeVar0;
+var nodeVar2 : f32 = 0.0;
+
+for ( var i : i32 = 0; i < 5; i ++ ) {
+
+	nodeVar2 = ( nodeVar2 + f32( i ) );
+
+}
+
+var nodeVar3 : f32 = nodeVar2;
+var nodeVar4 : f32 = 0.0;
+
+for ( var i : i32 = 0; i < 4; i ++ ) {
+
+	nodeVar4 = ( nodeVar4 + ( nodeVar1 + nodeVar3 ) );
+
+}
+
+nodeVar4
 
 // function
 

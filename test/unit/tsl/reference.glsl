@@ -451,6 +451,69 @@ nodeVar0
 
 float nodeVar0 = 0.0;
 
+for ( int i = 0; i < 3; i ++ ) {
+
+	nodeVar0 = ( nodeVar0 + float( i ) );
+
+}
+
+float nodeVar1 = nodeVar0;
+float nodeVar2 = 0.0;
+
+for ( int i = 0; i < 4; i ++ ) {
+
+	nodeVar2 = ( nodeVar2 + nodeVar1 );
+
+}
+
+nodeVar2
+
+// function with loop inside loop
+
+float nodeVar0 = 0.0;
+
+for ( int i = 0; i < 4; i ++ ) {
+
+	float nodeVar1 = 0.0;
+
+	for ( int j = 0; j < 3; j ++ ) {
+
+		nodeVar1 = ( nodeVar1 + float( i ) );
+
+	}
+
+	float nodeVar2 = nodeVar1;
+	nodeVar0 = ( nodeVar0 + nodeVar2 );
+
+}
+
+nodeVar0
+
+// function outside conditional
+
+float nodeVar0 = 0.0;
+
+for ( int i = 0; i < 3; i ++ ) {
+
+	nodeVar0 = ( nodeVar0 + float( i ) );
+
+}
+
+float nodeVar1 = nodeVar0;
+float nodeVar2 = 0.0;
+
+if ( ( nodeVarying0.x > 0.5 ) ) {
+
+	nodeVar2 = nodeVar1;
+
+}
+
+nodeVar2
+
+// function with loop without stack
+
+float nodeVar0 = 0.0;
+
 for ( int i = 0; i < 4; i ++ ) {
 
 	float nodeVar1 = 0.0;
@@ -461,11 +524,64 @@ for ( int i = 0; i < 4; i ++ ) {
 
 	}
 
-	nodeVar0 = ( nodeVar0 + nodeVar1 );
+	float nodeVar2 = nodeVar1;
+	nodeVar0 = ( nodeVar0 + nodeVar2 );
 
 }
 
 nodeVar0
+
+// wrapped function outside loop
+
+float nodeVar0 = 0.0;
+
+for ( int i = 0; i < 3; i ++ ) {
+
+	nodeVar0 = ( nodeVar0 + float( i ) );
+
+}
+
+float nodeVar1 = nodeVar0;
+float nodeVar2 = nodeVar1;
+float nodeVar3 = 0.0;
+
+for ( int i = 0; i < 4; i ++ ) {
+
+	nodeVar3 = ( nodeVar3 + nodeVar2 );
+
+}
+
+nodeVar3
+
+// function loop default parameter
+
+float nodeVar0 = 0.0;
+
+for ( int i = 0; i < 3; i ++ ) {
+
+	nodeVar0 = ( nodeVar0 + float( i ) );
+
+}
+
+float nodeVar1 = nodeVar0;
+float nodeVar2 = 0.0;
+
+for ( int i = 0; i < 5; i ++ ) {
+
+	nodeVar2 = ( nodeVar2 + float( i ) );
+
+}
+
+float nodeVar3 = nodeVar2;
+float nodeVar4 = 0.0;
+
+for ( int i = 0; i < 4; i ++ ) {
+
+	nodeVar4 = ( nodeVar4 + ( nodeVar1 + nodeVar3 ) );
+
+}
+
+nodeVar4
 
 // function
 
