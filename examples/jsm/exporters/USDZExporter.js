@@ -539,6 +539,83 @@ function pngChunk( type, data ) {
 //
 // Uses fflate's zlibSync (already vendored in this directory) for the
 // IDAT chunk's compression -- no new dependency.
+function paethPredictor( a, b, c ) {
+
+	const p = a + b - c;
+	const pa = Math.abs( p - a );
+	const pb = Math.abs( p - b );
+	const pc = Math.abs( p - c );
+
+	if ( pa <= pb && pa <= pc ) return a;
+	if ( pb <= pc ) return b;
+	return c;
+
+}
+
+// Picks, per scanline, whichever of PNG's 5 standard filter types (None,
+// Sub, Up, Average, Paeth) minimizes the sum of each filtered byte's
+// magnitude when read as signed 8-bit -- the standard reference-encoder
+// heuristic. Unconditional filter-None compresses dramatically worse on
+// real texture content (gradients especially), and since this exporter's
+// ZIP entries are stored uncompressed, PNG's own compression is the only
+// compression the final .usdz gets.
+function filterScanline( data, y, width, bytesPerPixel ) {
+
+	const stride = width * bytesPerPixel;
+	const currOffset = y * stride;
+	const prevOffset = ( y - 1 ) * stride;
+	const hasPrev = y > 0;
+
+	const candidates = [
+		new Uint8Array( stride ),
+		new Uint8Array( stride ),
+		new Uint8Array( stride ),
+		new Uint8Array( stride ),
+		new Uint8Array( stride ),
+	];
+
+	for ( let x = 0; x < stride; x ++ ) {
+
+		const curr = data[ currOffset + x ];
+		const left = x >= bytesPerPixel ? data[ currOffset + x - bytesPerPixel ] : 0;
+		const up = hasPrev ? data[ prevOffset + x ] : 0;
+		const upLeft = ( hasPrev && x >= bytesPerPixel ) ? data[ prevOffset + x - bytesPerPixel ] : 0;
+
+		candidates[ 0 ][ x ] = curr;
+		candidates[ 1 ][ x ] = ( curr - left ) & 0xff;
+		candidates[ 2 ][ x ] = ( curr - up ) & 0xff;
+		candidates[ 3 ][ x ] = ( curr - Math.floor( ( left + up ) / 2 ) ) & 0xff;
+		candidates[ 4 ][ x ] = ( curr - paethPredictor( left, up, upLeft ) ) & 0xff;
+
+	}
+
+	let bestFilterType = 0;
+	let bestSum = Infinity;
+
+	for ( let filterType = 0; filterType < candidates.length; filterType ++ ) {
+
+		let sum = 0;
+
+		for ( let x = 0; x < stride; x ++ ) {
+
+			const value = candidates[ filterType ][ x ];
+			sum += value < 128 ? value : 256 - value;
+
+		}
+
+		if ( sum < bestSum ) {
+
+			bestSum = sum;
+			bestFilterType = filterType;
+
+		}
+
+	}
+
+	return { filterType: bestFilterType, bytes: candidates[ bestFilterType ] };
+
+}
+
 function encodePNG( data, width, height ) {
 
 	const SIGNATURE = new Uint8Array( [ 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a ] );
@@ -556,10 +633,10 @@ function encodePNG( data, width, height ) {
 
 	for ( let y = 0; y < height; y ++ ) {
 
-		const srcOffset = y * stride;
+		const { filterType, bytes } = filterScanline( data, y, width, bytesPerPixel );
 		const dstOffset = y * ( stride + 1 );
-		raw[ dstOffset ] = 0; // filter type: None
-		raw.set( data.subarray( srcOffset, srcOffset + stride ), dstOffset + 1 );
+		raw[ dstOffset ] = filterType;
+		raw.set( bytes, dstOffset + 1 );
 
 	}
 
@@ -576,6 +653,20 @@ function encodePNG( data, width, height ) {
 // 2D canvas. gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL disabled preserves RGB
 // data for alpha === 0 pixels; Canvas2D's drawImage()/putImageData()
 // cannot (verified on Chrome -- see encodePNG's comment above).
+let _rgbaGLContext = null;
+
+function getRGBAContext() {
+
+	if ( _rgbaGLContext === null || _rgbaGLContext.isContextLost() ) {
+
+		_rgbaGLContext = new OffscreenCanvas( 1, 1 ).getContext( 'webgl2' );
+
+	}
+
+	return _rgbaGLContext;
+
+}
+
 function imageToRGBA( image, flipY, maxTextureSize ) {
 
 	if (
@@ -593,7 +684,28 @@ function imageToRGBA( image, flipY, maxTextureSize ) {
 
 	}
 
-	const gl = new OffscreenCanvas( 1, 1 ).getContext( 'webgl2' );
+	const gl = getRGBAContext();
+
+	if ( gl === null ) {
+
+		throw new Error(
+			'THREE.USDZExporter: WebGL2 is not available. Unable to process texture.'
+		);
+
+	}
+
+	const width = image.naturalWidth || image.width;
+	const height = image.naturalHeight || image.height;
+
+	const maxGLTextureSize = gl.getParameter( gl.MAX_TEXTURE_SIZE );
+
+	if ( width > maxGLTextureSize || height > maxGLTextureSize ) {
+
+		throw new Error(
+			`THREE.USDZExporter: Texture size ${width}x${height} exceeds this GPU's maximum texture size (${maxGLTextureSize}). Reduce the texture's resolution before exporting.`
+		);
+
+	}
 
 	const texture = gl.createTexture();
 	gl.bindTexture( gl.TEXTURE_2D, texture );
@@ -605,8 +717,17 @@ function imageToRGBA( image, flipY, maxTextureSize ) {
 	gl.bindFramebuffer( gl.FRAMEBUFFER, framebuffer );
 	gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0 );
 
-	const width = image.width;
-	const height = image.height;
+	if ( gl.checkFramebufferStatus( gl.FRAMEBUFFER ) !== gl.FRAMEBUFFER_COMPLETE ) {
+
+		gl.deleteFramebuffer( framebuffer );
+		gl.deleteTexture( texture );
+
+		throw new Error(
+			'THREE.USDZExporter: Unable to read texture data from the GPU (incomplete framebuffer).'
+		);
+
+	}
+
 	const data = new Uint8Array( width * height * 4 );
 	gl.readPixels( 0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, data );
 
@@ -617,7 +738,10 @@ function imageToRGBA( image, flipY, maxTextureSize ) {
 
 	if ( scale < 1 ) {
 
-		return resizeRGBA( data, width, height, Math.round( width * scale ), Math.round( height * scale ) );
+		const newWidth = Math.max( 1, Math.round( width * scale ) );
+		const newHeight = Math.max( 1, Math.round( height * scale ) );
+
+		return resizeRGBA( data, width, height, newWidth, newHeight );
 
 	}
 
@@ -625,29 +749,68 @@ function imageToRGBA( image, flipY, maxTextureSize ) {
 
 }
 
-// Simple nearest-neighbor downscale on a raw RGBA8 buffer. Deliberately
-// not bilinear: correctness (preserving RGB at alpha === 0, which the
-// previous canvas-based scale via drawImage cannot do regardless of
-// filtering quality) is what this exists for, not filter quality.
+// Box-filter downscale on a raw RGBA8 buffer: each destination pixel is
+// the unweighted average of the source pixels it covers.
+//
+// Each channel (including alpha) is averaged independently -- RGB is
+// NEVER weighted by alpha here. Weighting RGB by alpha during averaging
+// would give a fully-transparent source pixel's color zero contribution,
+// silently reintroducing the exact data loss this file exists to fix,
+// just moved from the encode step to this resize step instead.
 function resizeRGBA( data, width, height, newWidth, newHeight ) {
 
 	const resized = new Uint8Array( newWidth * newHeight * 4 );
 
+	const scaleX = width / newWidth;
+	const scaleY = height / newHeight;
+
 	for ( let y = 0; y < newHeight; y ++ ) {
 
-		const srcY = Math.min( height - 1, Math.floor( y * height / newHeight ) );
+		const srcYStart = Math.floor( y * scaleY );
+		const srcYEnd = Math.max( srcYStart + 1, Math.floor( ( y + 1 ) * scaleY ) );
 
 		for ( let x = 0; x < newWidth; x ++ ) {
 
-			const srcX = Math.min( width - 1, Math.floor( x * width / newWidth ) );
+			const srcXStart = Math.floor( x * scaleX );
+			const srcXEnd = Math.max( srcXStart + 1, Math.floor( ( x + 1 ) * scaleX ) );
 
-			const srcIndex = ( srcY * width + srcX ) * 4;
+			let r = 0, g = 0, b = 0, a = 0, count = 0;
+
+			for ( let sy = srcYStart; sy < Math.min( srcYEnd, height ); sy ++ ) {
+
+				for ( let sx = srcXStart; sx < Math.min( srcXEnd, width ); sx ++ ) {
+
+					const srcIndex = ( sy * width + sx ) * 4;
+					r += data[ srcIndex ];
+					g += data[ srcIndex + 1 ];
+					b += data[ srcIndex + 2 ];
+					a += data[ srcIndex + 3 ];
+					count ++;
+
+				}
+
+			}
+
 			const dstIndex = ( y * newWidth + x ) * 4;
 
-			resized[ dstIndex ] = data[ srcIndex ];
-			resized[ dstIndex + 1 ] = data[ srcIndex + 1 ];
-			resized[ dstIndex + 2 ] = data[ srcIndex + 2 ];
-			resized[ dstIndex + 3 ] = data[ srcIndex + 3 ];
+			if ( count === 0 ) {
+
+				// Defensive fallback; the clamping above should make this
+				// unreachable, but never emit uninitialized/wrong data.
+				const srcIndex = ( Math.min( height - 1, srcYStart ) * width + Math.min( width - 1, srcXStart ) ) * 4;
+				resized[ dstIndex ] = data[ srcIndex ];
+				resized[ dstIndex + 1 ] = data[ srcIndex + 1 ];
+				resized[ dstIndex + 2 ] = data[ srcIndex + 2 ];
+				resized[ dstIndex + 3 ] = data[ srcIndex + 3 ];
+
+			} else {
+
+				resized[ dstIndex ] = Math.round( r / count );
+				resized[ dstIndex + 1 ] = Math.round( g / count );
+				resized[ dstIndex + 2 ] = Math.round( b / count );
+				resized[ dstIndex + 3 ] = Math.round( a / count );
+
+			}
 
 		}
 

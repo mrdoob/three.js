@@ -340,6 +340,49 @@ export default QUnit.module( 'Addons', () => {
 					'The opaque control pixel survived export correctly'
 				);
 
+				gl.getExtension( 'WEBGL_lose_context' )?.loseContext();
+
+			} );
+
+			QUnit.test( 'exporting many textures does not exhaust the host application\'s WebGL context', async ( assert ) => {
+
+				const sentinel = document.createElement( 'canvas' ).getContext( 'webgl2' );
+
+				assert.ok( sentinel, 'Sentinel WebGL2 context created' );
+
+				const scene = new Scene();
+				const testImageDataUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAEElEQVR4nGP4zwAE/xn+AwAL/QL+6O7ISQAAAABJRU5ErkJggg==';
+
+				for ( let i = 0; i < 20; i ++ ) {
+
+					const image = new Image();
+					await new Promise( ( resolve, reject ) => {
+
+						image.onload = resolve;
+						image.onerror = reject;
+						image.src = testImageDataUrl;
+
+					} );
+
+					const texture = new Texture( image );
+					texture.needsUpdate = true;
+
+					const geometry = new PlaneGeometry( 1, 1 );
+					const material = new MeshBasicMaterial( { map: texture, transparent: true } );
+					const mesh = new Mesh( geometry, material );
+					mesh.name = `plane${i}`;
+					mesh.position.x = i;
+					scene.add( mesh );
+
+				}
+
+				const exporter = new USDZExporter();
+				await exporter.parseAsync( scene );
+
+				assert.notOk( sentinel.isContextLost(), 'Host application\'s WebGL context survives exporting many textures' );
+
+				sentinel.getExtension( 'WEBGL_lose_context' )?.loseContext();
+
 			} );
 
 		} );
