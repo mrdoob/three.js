@@ -86,18 +86,18 @@ export const cases = {
 
 	sharedLocalAcrossBlocks: () => Fn( () => {
 
-		const sum = float( 0 ).toVar();
-		let shared;
+		const sum = float( 0 );
+		const shared = float( 2 ).add( 3 );
 
 		If( bool( true ), () => {
 
-			shared = float( 2 ).add( 3 ).toVar();
 			sum.addAssign( shared );
 
 		} );
 
 		If( bool( true ), () => {
 
+			shared.addAssign( 1 );
 			sum.addAssign( shared.add( shared ) );
 
 			If( bool( true ), () => {
@@ -118,7 +118,7 @@ export const cases = {
 
 		return Fn( () => {
 
-			const sum = float( 0 ).toVar();
+			const sum = float( 0 );
 
 			Loop( 0, () => {
 
@@ -141,7 +141,7 @@ export const cases = {
 	variableIntentScope: () => Fn( () => {
 
 		const explicit = float( 1 ).toVar( 'explicitGlobal' );
-		const inferred = float( 2 ).toVarIntent();
+		const inferred = float( 2 );
 
 		inferred.addAssign( explicit );
 		explicit.addAssign( inferred );

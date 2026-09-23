@@ -112,21 +112,18 @@ nodeVar0
 
 // shared local across blocks
 
-var nodeVar0 : f32;
-var nodeVar1 : f32;
-
-nodeVar0 = 0.0;
+var nodeVar0 : f32 = 0.0;
+var nodeVar1 : f32 = ( 2.0 + 3.0 );
 
 if ( true ) {
 
-	nodeVar1 = ( 2.0 + 3.0 );
 	nodeVar0 = ( nodeVar0 + nodeVar1 );
 
 }
 
 if ( true ) {
 
-	nodeVar1 = ( 2.0 + 3.0 );
+	nodeVar1 = ( nodeVar1 + 1.0 );
 	nodeVar0 = ( nodeVar0 + ( nodeVar1 + nodeVar1 ) );
 
 	if ( true ) {
@@ -141,10 +138,9 @@ nodeVar0
 
 // external variable in loop
 
-var nodeVar0 : f32;
 var externalValue : f32;
 
-nodeVar0 = 0.0;
+var nodeVar0 : f32 = 0.0;
 
 for ( var i : i32 = 0; i < 0; i ++ ) {
 

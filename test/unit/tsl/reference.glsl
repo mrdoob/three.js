@@ -104,20 +104,18 @@ nodeVar0
 
 // shared local across blocks
 
-float nodeVar0;
-float nodeVar1;
-nodeVar0 = 0.0;
+float nodeVar0 = 0.0;
+float nodeVar1 = ( 2.0 + 3.0 );
 
 if ( true ) {
 
-	nodeVar1 = ( 2.0 + 3.0 );
 	nodeVar0 = ( nodeVar0 + nodeVar1 );
 
 }
 
 if ( true ) {
 
-	nodeVar1 = ( 2.0 + 3.0 );
+	nodeVar1 = ( nodeVar1 + 1.0 );
 	nodeVar0 = ( nodeVar0 + ( nodeVar1 + nodeVar1 ) );
 
 	if ( true ) {
@@ -132,9 +130,8 @@ nodeVar0
 
 // external variable in loop
 
-float nodeVar0;
 float externalValue;
-nodeVar0 = 0.0;
+float nodeVar0 = 0.0;
 
 for ( int i = 0; i < 0; i ++ ) {
 
