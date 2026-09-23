@@ -70,7 +70,8 @@ const refreshUniforms = [
 	'steps',
 	'thickness',
 	'transmission',
-	'transmissionMap'
+	'transmissionMap',
+	'wireframe'
 ];
 
 
