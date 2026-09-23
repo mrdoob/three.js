@@ -8,6 +8,7 @@ import {
 import {
 	strToU8,
 	zipSync,
+	zlibSync,
 } from '../libs/fflate.module.js';
 
 class USDNode {
@@ -297,21 +298,37 @@ class USDZExporter {
 
 			}
 
-			const canvas = imageToCanvas(
-				texture.image,
-				texture.flipY,
-				options.maxTextureSize
-			);
-
 			const mimeType = ( texture.userData.mimeType === 'image/jpeg' ) ? 'image/jpeg' : 'image/png';
 
-			const blob = await new Promise( ( resolve ) =>
-				canvas.toBlob( resolve, mimeType )
-			);
+			let fileData;
 
-			files[ `textures/Texture_${id}.${getTextureExtension( texture )}` ] = new Uint8Array(
-				await blob.arrayBuffer()
-			);
+			if ( mimeType === 'image/jpeg' ) {
+
+				const canvas = imageToCanvas(
+					texture.image,
+					texture.flipY,
+					options.maxTextureSize
+				);
+
+				const blob = await new Promise( ( resolve ) =>
+					canvas.toBlob( resolve, mimeType )
+				);
+
+				fileData = new Uint8Array( await blob.arrayBuffer() );
+
+			} else {
+
+				const { data, width, height } = imageToRGBA(
+					texture.image,
+					texture.flipY,
+					options.maxTextureSize
+				);
+
+				fileData = encodePNG( data, width, height );
+
+			}
+
+			files[ `textures/Texture_${id}.${getTextureExtension( texture )}` ] = fileData;
 
 		}
 
@@ -430,6 +447,213 @@ function imageToCanvas( image, flipY, maxTextureSize ) {
 		);
 
 	}
+
+}
+
+const CRC_TABLE = ( () => {
+
+	const table = new Uint32Array( 256 );
+
+	for ( let n = 0; n < 256; n ++ ) {
+
+		let c = n;
+
+		for ( let k = 0; k < 8; k ++ ) {
+
+			c = ( c & 1 ) ? ( 0xedb88320 ^ ( c >>> 1 ) ) : ( c >>> 1 );
+
+		}
+
+		table[ n ] = c >>> 0;
+
+	}
+
+	return table;
+
+} )();
+
+function crc32( bytes ) {
+
+	let c = 0xffffffff;
+
+	for ( let i = 0; i < bytes.length; i ++ ) {
+
+		c = CRC_TABLE[ ( c ^ bytes[ i ] ) & 0xff ] ^ ( c >>> 8 );
+
+	}
+
+	return ( c ^ 0xffffffff ) >>> 0;
+
+}
+
+function u32be( value ) {
+
+	return new Uint8Array( [
+		( value >>> 24 ) & 0xff,
+		( value >>> 16 ) & 0xff,
+		( value >>> 8 ) & 0xff,
+		value & 0xff,
+	] );
+
+}
+
+function concatBytes( arrays ) {
+
+	let total = 0;
+	for ( const array of arrays ) total += array.length;
+
+	const out = new Uint8Array( total );
+	let offset = 0;
+
+	for ( const array of arrays ) {
+
+		out.set( array, offset );
+		offset += array.length;
+
+	}
+
+	return out;
+
+}
+
+function pngChunk( type, data ) {
+
+	const typeBytes = new Uint8Array( type.split( '' ).map( ( c ) => c.charCodeAt( 0 ) ) );
+	const typeAndData = concatBytes( [ typeBytes, data ] );
+	const crc = crc32( typeAndData );
+
+	return concatBytes( [ u32be( data.length ), typeAndData, u32be( crc ) ] );
+
+}
+
+// Encodes a raw RGBA8 pixel buffer directly to PNG bytes, bypassing the
+// browser's native canvas.toBlob()/toDataURL() PNG encoders entirely.
+//
+// This exists because Canvas2D cannot hold correct color data for pixels
+// with alpha === 0: even a bare putImageData()/getImageData() round trip
+// on an otherwise-untouched canvas zeroes the RGB channels for such
+// pixels (verified on Chrome). Any PNG produced via canvas.toBlob() has
+// therefore already lost that data before encoding even starts. Writing
+// the PNG bytes directly from the raw pixel buffer sidesteps canvas
+// storage altogether, so alpha === 0 pixels keep their real color.
+//
+// Uses fflate's zlibSync (already vendored in this directory) for the
+// IDAT chunk's compression -- no new dependency.
+function encodePNG( data, width, height ) {
+
+	const SIGNATURE = new Uint8Array( [ 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a ] );
+
+	const ihdrData = concatBytes( [
+		u32be( width ),
+		u32be( height ),
+		new Uint8Array( [ 8, 6, 0, 0, 0 ] ), // bit depth 8, color type 6 (RGBA), compression/filter/interlace 0
+	] );
+	const ihdr = pngChunk( 'IHDR', ihdrData );
+
+	const bytesPerPixel = 4;
+	const stride = width * bytesPerPixel;
+	const raw = new Uint8Array( height * ( stride + 1 ) );
+
+	for ( let y = 0; y < height; y ++ ) {
+
+		const srcOffset = y * stride;
+		const dstOffset = y * ( stride + 1 );
+		raw[ dstOffset ] = 0; // filter type: None
+		raw.set( data.subarray( srcOffset, srcOffset + stride ), dstOffset + 1 );
+
+	}
+
+	const compressed = zlibSync( raw, { level: 6 } );
+	const idat = pngChunk( 'IDAT', compressed );
+
+	const iend = pngChunk( 'IEND', new Uint8Array( 0 ) );
+
+	return concatBytes( [ SIGNATURE, ihdr, idat, iend ] );
+
+}
+
+// Extracts a texture's pixels as raw RGBA8 via WebGL2, instead of via a
+// 2D canvas. gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL disabled preserves RGB
+// data for alpha === 0 pixels; Canvas2D's drawImage()/putImageData()
+// cannot (verified on Chrome -- see encodePNG's comment above).
+function imageToRGBA( image, flipY, maxTextureSize ) {
+
+	if (
+		! (
+			( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
+			( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
+			( typeof OffscreenCanvas !== 'undefined' && image instanceof OffscreenCanvas ) ||
+			( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap )
+		)
+	) {
+
+		throw new Error(
+			'THREE.USDZExporter: No valid image data found. Unable to process texture.'
+		);
+
+	}
+
+	const gl = new OffscreenCanvas( 1, 1 ).getContext( 'webgl2' );
+
+	const texture = gl.createTexture();
+	gl.bindTexture( gl.TEXTURE_2D, texture );
+	gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false );
+	gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, flipY === true );
+	gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image );
+
+	const framebuffer = gl.createFramebuffer();
+	gl.bindFramebuffer( gl.FRAMEBUFFER, framebuffer );
+	gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0 );
+
+	const width = image.width;
+	const height = image.height;
+	const data = new Uint8Array( width * height * 4 );
+	gl.readPixels( 0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, data );
+
+	gl.deleteFramebuffer( framebuffer );
+	gl.deleteTexture( texture );
+
+	const scale = maxTextureSize / Math.max( width, height );
+
+	if ( scale < 1 ) {
+
+		return resizeRGBA( data, width, height, Math.round( width * scale ), Math.round( height * scale ) );
+
+	}
+
+	return { data, width, height };
+
+}
+
+// Simple nearest-neighbor downscale on a raw RGBA8 buffer. Deliberately
+// not bilinear: correctness (preserving RGB at alpha === 0, which the
+// previous canvas-based scale via drawImage cannot do regardless of
+// filtering quality) is what this exists for, not filter quality.
+function resizeRGBA( data, width, height, newWidth, newHeight ) {
+
+	const resized = new Uint8Array( newWidth * newHeight * 4 );
+
+	for ( let y = 0; y < newHeight; y ++ ) {
+
+		const srcY = Math.min( height - 1, Math.floor( y * height / newHeight ) );
+
+		for ( let x = 0; x < newWidth; x ++ ) {
+
+			const srcX = Math.min( width - 1, Math.floor( x * width / newWidth ) );
+
+			const srcIndex = ( srcY * width + srcX ) * 4;
+			const dstIndex = ( y * newWidth + x ) * 4;
+
+			resized[ dstIndex ] = data[ srcIndex ];
+			resized[ dstIndex + 1 ] = data[ srcIndex + 1 ];
+			resized[ dstIndex + 2 ] = data[ srcIndex + 2 ];
+			resized[ dstIndex + 3 ] = data[ srcIndex + 3 ];
+
+		}
+
+	}
+
+	return { data: resized, width: newWidth, height: newHeight };
 
 }
 
