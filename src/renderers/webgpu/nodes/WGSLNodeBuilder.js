@@ -2056,7 +2056,21 @@ ${ flowData.code }
 	 * @param {?number} [count=null] - The array length.
 	 * @return {string} The WGSL snippet that defines a variable.
 	 */
-	generateVarStatement( type, name/*, count = null*/ ) {
+	generateVarStatement( type, name, count = null ) {
+
+		return this.getVar( type, name, count );
+
+	}
+
+	/**
+	 * Returns a runtime read-only variable statement as a WGSL string.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The WGSL snippet that defines a let variable.
+	 */
+	generateLetStatement( type, name/*, count = null*/ ) {
 
 		return `let ${ name }`;
 
