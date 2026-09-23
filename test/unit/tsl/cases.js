@@ -35,6 +35,121 @@ export const cases = {
 
 	booleanConversion: () => vec2( float( bool( true ) ), float( bool( false ) ) ),
 
+	localMutableCache: () => {
+
+		const scaledTime = vec3( time.mul( 0.5 ) );
+		const testValue = scaledTime.add( scaledTime );
+
+		return vec4( Fn( () => {
+
+			testValue.mulAssign( 0.001 );
+
+			return testValue;
+
+		} )(), 1 );
+
+	},
+
+	indexedMutableCache: () => Fn( () => {
+
+		const matrix = mat4( 1 ).mul( mat4( 2 ) );
+		const before = matrix[ 0 ][ 0 ].add( matrix[ 1 ][ 1 ] );
+
+		matrix[ 0 ][ 0 ] = 3;
+		matrix[ 1 ].xy = vec2( 4, 5 );
+
+		return matrix.mul( vec4( before ) );
+
+	} )(),
+
+	loopLocalCache: () => Fn( () => {
+
+		const value = float( 2 ).add( 3 );
+		const matrix = mat4( vec4( value, 0, 0, 0 ), vec4( 0, value, 0, 0 ), vec4( 0, 0, 1, 0 ), vec4( 0, 0, 0, 1 ) );
+		const sum = float( 0 );
+
+		If( bool( true ), () => {
+
+			Loop( 2, () => {
+
+				sum.addAssign( matrix[ 0 ][ 0 ].add( matrix[ 1 ][ 1 ] ) );
+
+			} );
+
+			sum.addAssign( matrix[ 0 ][ 0 ].add( matrix[ 1 ][ 1 ] ) );
+
+		} );
+
+		return sum;
+
+	} )(),
+
+	sharedLocalAcrossBlocks: () => Fn( () => {
+
+		const sum = float( 0 );
+		const shared = float( 2 ).add( 3 );
+
+		If( bool( true ), () => {
+
+			sum.addAssign( shared );
+
+		} );
+
+		If( bool( true ), () => {
+
+			shared.addAssign( 1 );
+			sum.addAssign( shared.add( shared ) );
+
+			If( bool( true ), () => {
+
+				sum.addAssign( shared );
+
+			} );
+
+		} );
+
+		return sum;
+
+	} )(),
+
+	externalVariableInLoop: () => {
+
+		const value = float( 2 ).add( 3 ).toVar( 'externalValue' );
+
+		return Fn( () => {
+
+			const sum = float( 0 );
+
+			Loop( 0, () => {
+
+				sum.addAssign( value );
+
+			} );
+
+			Loop( 2, () => {
+
+				sum.addAssign( value );
+
+			} );
+
+			return sum.add( value );
+
+		} )();
+
+	},
+
+	variableIntentScope: () => Fn( () => {
+
+		const explicit = float( 1 ).toVar( 'explicitGlobal' );
+		const inferred = float( 2 );
+
+		inferred.addAssign( explicit );
+		explicit.addAssign( inferred );
+
+		return explicit.add( inferred );
+
+	} )(),
+
 	comparisonAndLogic: () => int( 3 ).greaterThan( 1 ).and( float( 0.5 ).lessThanEqual( 1 ) ).or( bool( false ).not() ),
 
 	vectorComparison: () => vec3( 1, 2, 3 ).greaterThan( 1 ).all(),

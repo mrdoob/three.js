@@ -267,7 +267,7 @@ class VarNode extends Node {
 		const vectorType = builder.getVectorType( nodeType );
 		const snippet = node.build( builder, vectorType );
 
-		const nodeVar = builder.getVarFromNode( this, name, vectorType, undefined, readOnly );
+		const nodeVar = builder.getVarFromNode( this, name, vectorType, undefined, readOnly, this.intent );
 
 		const propertyName = builder.getPropertyName( nodeVar );
 
@@ -279,7 +279,11 @@ class VarNode extends Node {
 
 			declarationPrefix = builder.isDeterministic( node )
 				? builder.generateConstStatement( nodeVar.type, propertyName, count )
-				: builder.generateVarStatement( nodeVar.type, propertyName, count );
+				: builder.generateLetStatement( nodeVar.type, propertyName, count );
+
+		} else if ( nodeVar.local ) {
+
+			declarationPrefix = builder.generateVarStatement( nodeVar.type, propertyName, nodeVar.count );
 
 		}
 

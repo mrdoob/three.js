@@ -56,15 +56,113 @@ vec4<f32>( vec3<f32>( 1.0, 2.0, 3.0 ).xy, 0.0, 1.0 )
 
 // conversion cache
 
-var nodeVar0 : vec3<f32>;
+let nodeConst0 = vec3<f32>( ( render.nodeUniform0 * 0.5 ) );
 
-nodeVar0 = vec3<f32>( ( render.nodeUniform0 * 0.5 ) );
-
-vec4<f32>( ( nodeVar0 + nodeVar0 ), 1.0 )
+vec4<f32>( ( nodeConst0 + nodeConst0 ), 1.0 )
 
 // boolean conversion
 
 vec2<f32>( f32( true ), f32( false ) )
+
+// local mutable cache
+
+let nodeConst0 = vec3<f32>( ( render.nodeUniform0 * 0.5 ) );
+var nodeVar0 : vec3<f32> = ( nodeConst0 + nodeConst0 );
+nodeVar0 = ( nodeVar0 * vec3<f32>( 0.001 ) );
+
+vec4<f32>( nodeVar0, 1.0 )
+
+// indexed mutable cache
+
+var nodeVar1 : vec2<f32>;
+
+var nodeVar0 : mat4x4<f32> = ( mat4x4<f32>( 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ) * mat4x4<f32>( 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ) );
+nodeVar0[ 0u ][ 0u ] = 3.0;
+nodeVar1 = vec2<f32>( 4.0, 5.0 );
+nodeVar0[ 1u ].x = nodeVar1[ 0 ];
+nodeVar0[ 1u ].y = nodeVar1[ 1 ];
+
+( nodeVar0 * vec4<f32>( ( nodeVar0[ 0u ][ 0u ] + nodeVar0[ 1u ][ 1u ] ) ) )
+
+// loop local cache
+
+var nodeVar0 : f32 = 0.0;
+
+if ( true ) {
+
+	for ( var i : i32 = 0; i < 2; i ++ ) {
+
+		let nodeConst0 = ( 2.0 + 3.0 );
+		let nodeConst1 = mat4x4<f32>( vec4<f32>( nodeConst0, 0.0, 0.0, 0.0 ), vec4<f32>( 0.0, nodeConst0, 0.0, 0.0 ), vec4<f32>( 0.0, 0.0, 1.0, 0.0 ), vec4<f32>( 0.0, 0.0, 0.0, 1.0 ) );
+		nodeVar0 = ( nodeVar0 + ( nodeConst1[ 0u ][ 0u ] + nodeConst1[ 1u ][ 1u ] ) );
+
+	}
+
+	let nodeConst2 = ( 2.0 + 3.0 );
+	let nodeConst3 = mat4x4<f32>( vec4<f32>( nodeConst2, 0.0, 0.0, 0.0 ), vec4<f32>( 0.0, nodeConst2, 0.0, 0.0 ), vec4<f32>( 0.0, 0.0, 1.0, 0.0 ), vec4<f32>( 0.0, 0.0, 0.0, 1.0 ) );
+	nodeVar0 = ( nodeVar0 + ( nodeConst3[ 0u ][ 0u ] + nodeConst3[ 1u ][ 1u ] ) );
+
+}
+
+nodeVar0
+
+// shared local across blocks
+
+var nodeVar0 : f32 = 0.0;
+var nodeVar1 : f32 = ( 2.0 + 3.0 );
+
+if ( true ) {
+
+	nodeVar0 = ( nodeVar0 + nodeVar1 );
+
+}
+
+if ( true ) {
+
+	nodeVar1 = ( nodeVar1 + 1.0 );
+	nodeVar0 = ( nodeVar0 + ( nodeVar1 + nodeVar1 ) );
+
+	if ( true ) {
+
+		nodeVar0 = ( nodeVar0 + nodeVar1 );
+
+	}
+
+}
+
+nodeVar0
+
+// external variable in loop
+
+var externalValue : f32;
+
+var nodeVar0 : f32 = 0.0;
+
+for ( var i : i32 = 0; i < 0; i ++ ) {
+
+	externalValue = ( 2.0 + 3.0 );
+	nodeVar0 = ( nodeVar0 + externalValue );
+
+}
+
+for ( var i : i32 = 0; i < 2; i ++ ) {
+
+	nodeVar0 = ( nodeVar0 + externalValue );
+
+}
+
+( nodeVar0 + externalValue )
+
+// variable intent scope
+
+var explicitGlobal : f32;
+
+explicitGlobal = 1.0;
+var nodeVar0 : f32 = 2.0;
+nodeVar0 = ( nodeVar0 + explicitGlobal );
+explicitGlobal = ( explicitGlobal + nodeVar0 );
+
+( explicitGlobal + nodeVar0 )
 
 // comparison and logic
 
@@ -112,9 +210,7 @@ dot( normalize( vec3<f32>( 1.0, 2.0, 3.0 ) ), cross( vec3<f32>( 0.0, 1.0, 0.0 ),
 
 // auto convert assignment
 
-var nodeVar0 : f32;
-
-nodeVar0 = 0.0;
+var nodeVar0 : f32 = 0.0;
 nodeVar0 = 3.0;
 nodeVar0 = ( nodeVar0 + 2.0 );
 
@@ -122,9 +218,7 @@ nodeVar0
 
 // auto convert vector assignment
 
-var nodeVar0 : vec3<f32>;
-
-nodeVar0 = vec3<f32>( 0.0, 0.0, 0.0 );
+var nodeVar0 : vec3<f32> = vec3<f32>( 0.0, 0.0, 0.0 );
 nodeVar0 = vec3<f32>( f32( 2 ) );
 nodeVar0 = ( nodeVar0 + vec3<f32>( vec3<i32>( 1, 2, 3 ) ) );
 
@@ -132,10 +226,9 @@ nodeVar0
 
 // swizzle assignment
 
-var nodeVar0 : vec3<f32>;
 var nodeVar1 : vec2<f32>;
 
-nodeVar0 = vec3<f32>( 1.0, 2.0, 3.0 );
+var nodeVar0 : vec3<f32> = vec3<f32>( 1.0, 2.0, 3.0 );
 nodeVar1 = nodeVar0.yx;
 nodeVar0.x = nodeVar1[ 0 ];
 nodeVar0.y = nodeVar1[ 1 ];
@@ -149,9 +242,7 @@ array< f32, 3 >( 1.0, 2.0, 3.0 )[ 1 ]
 
 // array loop
 
-var nodeVar0 : f32;
-
-nodeVar0 = 0.0;
+var nodeVar0 : f32 = 0.0;
 
 for ( var i : i32 = 0; i < 3; i ++ ) {
 
@@ -163,9 +254,7 @@ nodeVar0
 
 // else if
 
-var nodeVar0 : f32;
-
-nodeVar0 = 0.5;
+var nodeVar0 : f32 = 0.5;
 
 if ( ( nodeVar0 < 0.0 ) ) {
 
@@ -189,9 +278,7 @@ nodeVar0
 
 // switch case
 
-var nodeVar0 : f32;
-
-nodeVar0 = 0.0;
+var nodeVar0 : f32 = 0.0;
 
 if ( ( 2.0 == 0.0 ) ) {
 
@@ -215,9 +302,7 @@ nodeVar0
 
 // loop break continue
 
-var nodeVar0 : f32;
-
-nodeVar0 = 0.0;
+var nodeVar0 : f32 = 0.0;
 
 for ( var i : i32 = 0; i < 8; i ++ ) {
 
@@ -241,9 +326,7 @@ nodeVar0
 
 // loop descending
 
-var nodeVar0 : f32;
-
-nodeVar0 = 0.0;
+var nodeVar0 : f32 = 0.0;
 
 for ( var i : i32 = 6; i > 0; i -= 2 ) {
 
@@ -255,9 +338,7 @@ nodeVar0
 
 // loop nested
 
-var nodeVar0 : f32;
-
-nodeVar0 = 0.0;
+var nodeVar0 : f32 = 0.0;
 
 for ( var i : i32 = 0; i < 3; i ++ ) {
 
@@ -273,9 +354,7 @@ nodeVar0
 
 // loop while
 
-var nodeVar0 : i32;
-
-nodeVar0 = 0;
+var nodeVar0 : i32 = 0;
 
 while ( ( f32( nodeVar0 ) < 3.0 ) ) {
 
@@ -287,17 +366,13 @@ nodeVar0
 
 // function inline reuse
 
-var nodeVar0 : f32;
+let nodeConst0 = ( 3.0 * 3.0 );
 
-nodeVar0 = ( 3.0 * 3.0 );
-
-( nodeVar0 + nodeVar0 )
+( nodeConst0 + nodeConst0 )
 
 // function inside loop
 
-var nodeVar0 : f32;
-
-nodeVar0 = 0.0;
+var nodeVar0 : f32 = 0.0;
 
 for ( var i : i32 = 0; i < 4; i ++ ) {
 
@@ -360,10 +435,7 @@ fn tsl_inverse_mat4( m : mat4x4<f32> ) -> mat4x4<f32> {
 
 }
 
-var nodeVar0 : vec4<f32>;
-var nodeVar1 : mat4x4<f32>;
-
-nodeVar0 = vec4<f32>( 0.0, 0.0, 0.0, 1.0 );
+var nodeVar0 : vec4<f32> = vec4<f32>( 0.0, 0.0, 0.0, 1.0 );
 
 if ( ( nodeVarying0.x < 0.33 ) ) {
 
@@ -377,22 +449,22 @@ if ( ( nodeVarying0.x < 0.33 ) ) {
 
 	} else {
 
-		nodeVar1 = ( mat4x4<f32>( 1.0, 0.5, 0.0, 3.0, 0.0, 1.0, 0.25, -2.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0 ) * tsl_inverse_mat4( mat4x4<f32>( 1.0, 0.5, 0.0, 3.0, 0.0, 1.0, 0.25, -2.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0 ) ) );
-		nodeVar0 = vec4<f32>( nodeVar1[ 2u ].xyz, 1.0 );
+		let nodeConst0 = ( mat4x4<f32>( 1.0, 0.5, 0.0, 3.0, 0.0, 1.0, 0.25, -2.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0 ) * tsl_inverse_mat4( mat4x4<f32>( 1.0, 0.5, 0.0, 3.0, 0.0, 1.0, 0.25, -2.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0 ) ) );
+		nodeVar0 = vec4<f32>( nodeConst0[ 2u ].xyz, 1.0 );
 
 		if ( ( nodeVarying0.x < 0.33 ) ) {
 
-			nodeVar0 = vec4<f32>( nodeVar1[ 0u ].xyz, 1.0 );
+			nodeVar0 = vec4<f32>( nodeConst0[ 0u ].xyz, 1.0 );
 
 		} else {
 
 			if ( ( nodeVarying0.x < 0.66 ) ) {
 
-				nodeVar0 = vec4<f32>( nodeVar1[ 1u ].xyz, 1.0 );
+				nodeVar0 = vec4<f32>( nodeConst0[ 1u ].xyz, 1.0 );
 
 			} else {
 
-				nodeVar0 = vec4<f32>( nodeVar1[ 2u ].xyz, 1.0 );
+				nodeVar0 = vec4<f32>( nodeConst0[ 2u ].xyz, 1.0 );
 
 			}
 
@@ -406,9 +478,7 @@ nodeVar0
 
 // conditional
 
-var nodeVar0 : f32;
-
-nodeVar0 = 0.5;
+var nodeVar0 : f32 = 0.5;
 
 if ( ( nodeVar0 > 0.0 ) ) {
 
@@ -424,9 +494,7 @@ nodeVar0
 
 // loop
 
-var nodeVar0 : f32;
-
-nodeVar0 = 0.0;
+var nodeVar0 : f32 = 0.0;
 
 for ( var i : i32 = 0; i < 4; i ++ ) {
 
@@ -438,14 +506,11 @@ nodeVar0
 
 // function outside loop
 
-var nodeVar0 : f32;
-var nodeVar1 : f32;
-
-nodeVar0 = 0.0;
+var nodeVar0 : f32 = 0.0;
 
 for ( var i : i32 = 0; i < 4; i ++ ) {
 
-	nodeVar1 = 0.0;
+	var nodeVar1 : f32 = 0.0;
 
 	for ( var i : i32 = 0; i < 3; i ++ ) {
 
