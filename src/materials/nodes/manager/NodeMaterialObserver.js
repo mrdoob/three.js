@@ -230,6 +230,7 @@ class NodeMaterialObserver {
 				geometryId: geometry.id,
 				geometryVersion: this.getGeometryData( geometry )._version,
 				materialVersion: this.getMaterialData( renderObject.material )._version,
+				wireframe: renderObject.material.wireframe,
 				worldMatrix: object.matrixWorld.clone()
 			};
 
@@ -588,6 +589,14 @@ class NodeMaterialObserver {
 		if ( renderObjectData.materialVersion !== materialData._version ) {
 
 			renderObjectData.materialVersion = materialData._version;
+
+			return false;
+
+		}
+
+		if ( renderObjectData.wireframe !== material.wireframe ) {
+
+			renderObjectData.wireframe = material.wireframe;
 
 			return false;
 
