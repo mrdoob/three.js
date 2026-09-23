@@ -1,4 +1,4 @@
-import { BoxGeometry, Mesh, MeshStandardMaterial, Scene, SphereGeometry } from 'three';
+import { BoxGeometry, Mesh, MeshBasicMaterial, MeshStandardMaterial, PlaneGeometry, Scene, SphereGeometry, Texture } from 'three';
 import { USDZExporter } from '../../../../examples/jsm/exporters/USDZExporter.js';
 import { USDLoader } from '../../../../examples/jsm/loaders/USDLoader.js';
 import { unzipSync, strFromU8 } from '../../../../examples/jsm/libs/fflate.module.js';
@@ -240,6 +240,105 @@ export default QUnit.module( 'Addons', () => {
 					assert.closeTo( importedMesh.material.metalness, mesh.material.metalness, tolerance, 'Material metalness matches' );
 
 				}
+
+			} );
+
+			QUnit.test( 'preserves RGB color data for fully-transparent pixels in exported PNG textures', async ( assert ) => {
+
+				// A 2x1 PNG, hand-encoded, with pixel 0 = opaque-looking red
+				// color but alpha === 0, and pixel 1 = opaque green (control).
+				// This is the exact shape of https://github.com/mrdoob/three.js/issues/30040:
+				// a texture with real color data underneath a fully-transparent pixel.
+				const testImageDataUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAEElEQVR4nGP4zwAE/xn+AwAL/QL+6O7ISQAAAABJRU5ErkJggg==';
+
+				const image = new Image();
+				await new Promise( ( resolve, reject ) => {
+
+					image.onload = resolve;
+					image.onerror = reject;
+					image.src = testImageDataUrl;
+
+				} );
+
+				const texture = new Texture( image );
+				texture.needsUpdate = true;
+
+				const scene = new Scene();
+				const geometry = new PlaneGeometry( 1, 1 );
+				const material = new MeshBasicMaterial( { map: texture, transparent: true } );
+				const mesh = new Mesh( geometry, material );
+				mesh.name = 'plane';
+				scene.add( mesh );
+
+				const exporter = new USDZExporter();
+				const exportResult = await exporter.parseAsync( scene );
+
+				const unzipped = unzipSync( exportResult );
+				const textureFileName = Object.keys( unzipped ).find(
+					( name ) => name.startsWith( 'textures/' ) && name.endsWith( '.png' )
+				);
+
+				assert.ok( textureFileName, 'Exported archive contains a PNG texture file' );
+
+				const pngBytes = unzipped[ textureFileName ];
+				const blob = new Blob( [ pngBytes ], { type: 'image/png' } );
+
+				// Decode via the non-lossy path: createImageBitmap with
+				// premultiplyAlpha disabled, then WebGL2 texImage2D/readPixels.
+				// Do NOT decode via ctx.drawImage() here -- that operation
+				// itself destroys RGB data at alpha === 0 (this is the exact
+				// bug being tested for), so using it to verify the fix would
+				// make this test pass or fail for the wrong reason regardless
+				// of whether the exporter's own output is correct.
+				const bitmap = await createImageBitmap( blob, { premultiplyAlpha: 'none' } );
+
+				const gl = new OffscreenCanvas( 1, 1 ).getContext( 'webgl2' );
+				const glTexture = gl.createTexture();
+				gl.bindTexture( gl.TEXTURE_2D, glTexture );
+				gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false );
+				gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, false );
+				gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmap );
+
+				const framebuffer = gl.createFramebuffer();
+				gl.bindFramebuffer( gl.FRAMEBUFFER, framebuffer );
+				gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glTexture, 0 );
+
+				const pixels = new Uint8Array( bitmap.width * bitmap.height * 4 );
+				gl.readPixels( 0, 0, bitmap.width, bitmap.height, gl.RGBA, gl.UNSIGNED_BYTE, pixels );
+
+				// Find the transparent-red pixel among the decoded output
+				// (don't assume a specific X position -- flipY/scale
+				// handling in the exporter is allowed to reorder pixels
+				// spatially as long as color data for each is preserved).
+				let foundTransparentRedWithColor = false;
+				let foundOpaqueGreen = false;
+
+				for ( let i = 0; i < pixels.length; i += 4 ) {
+
+					const [ r, g, b, a ] = pixels.slice( i, i + 4 );
+
+					if ( a === 0 && r > 200 && g < 50 && b < 50 ) {
+
+						foundTransparentRedWithColor = true;
+
+					}
+
+					if ( a === 255 && g > 200 && r < 50 && b < 50 ) {
+
+						foundOpaqueGreen = true;
+
+					}
+
+				}
+
+				assert.ok(
+					foundTransparentRedWithColor,
+					'A fully-transparent pixel in the exported PNG still has its original red color data (not zeroed)'
+				);
+				assert.ok(
+					foundOpaqueGreen,
+					'The opaque control pixel survived export correctly'
+				);
 
 			} );
 
