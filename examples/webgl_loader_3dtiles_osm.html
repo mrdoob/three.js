@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js loader - 3d tiles - openstreetmap globe</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js loader - 3d tiles - openstreetmap globe">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_loader_3dtiles_osm.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_loader_3dtiles_osm.jpg">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				background-color: #000;
+				color: #eee;
+			}
+
+			a {
+				color: #b3e5fc;
+				text-decoration: underline;
+				pointer-events: all;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
+			<a href="https://github.com/NASA-AMMOS/3DTilesRendererJS" target="_blank" rel="noopener">3d-tiles-renderer</a> - globe with raster map tiles<br/>
+			Map data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors. No API key required.
+		</div>
+
+		<!-- "three/examples/" import map entry required by 3d-tiles-renderer -->
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/",
+					"three/examples/": "./",
+					"3d-tiles-renderer": "https://cdn.jsdelivr.net/npm/3d-tiles-renderer@0.5.2/build/index.js",
+					"3d-tiles-renderer/three/plugins": "https://cdn.jsdelivr.net/npm/3d-tiles-renderer@0.5.2/build/index.three-plugins.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { TilesRenderer, GlobeControls, CAMERA_FRAME } from '3d-tiles-renderer';
+			import { GeneratedSurfacePlugin, XYZTilesOverlay, TilesFadePlugin, UpdateOnChangePlugin } from '3d-tiles-renderer/three/plugins';
+
+			let camera, scene, renderer;
+			let tiles, controls;
+
+			init();
+
+			function init() {
+
+				// camera
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 100, 1e8 );
+
+				// scene
+				scene = new THREE.Scene();
+
+				// renderer
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				const DEG2RAD = Math.PI / 180;
+
+				// tiles surface generated on the WGS84 ellipsoid, textured with
+				// standard XYZ raster tiles fetched live from OpenStreetMap
+				tiles = new TilesRenderer();
+				tiles.registerPlugin( new GeneratedSurfacePlugin( {
+					overlay: new XYZTilesOverlay( { url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png' } ),
+					shape: 'ellipsoid',
+					applyOverlayTexture: true,
+				} ) );
+				tiles.registerPlugin( new TilesFadePlugin() );
+				tiles.registerPlugin( new UpdateOnChangePlugin() );
+				tiles.setCamera( camera );
+				tiles.setResolutionFromRenderer( camera, renderer );
+
+				scene.add( tiles.group );
+
+				// position the camera above Paris
+				tiles.ellipsoid.getObjectFrame(
+					48.8566 * DEG2RAD, 2.3522 * DEG2RAD, 1.2e7,
+					0, - 90 * DEG2RAD, 0,
+					camera.matrix, CAMERA_FRAME
+				);
+				camera.matrix.decompose( camera.position, camera.quaternion, camera.scale );
+
+
+				// controls
+				controls = new GlobeControls( scene, camera, renderer.domElement );
+				controls.setEllipsoid( tiles.ellipsoid, tiles.group );
+				controls.enableDamping = true;
+
+				// start rendering
+				renderer.setAnimationLoop( animate );
+
+				window.addEventListener( 'resize', onWindowResize );
+				onWindowResize();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				tiles.setResolutionFromRenderer( camera, renderer );
+
+			}
+
+			function animate() {
+
+				controls.update();
+				tiles.update();
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

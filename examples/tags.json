@@ -42,6 +42,7 @@
 	"webgl_lights_hemisphere": [ "directional" ],
 	"webgl_loader_3dm": [ "rhino", "community" ],
 	"webgl_loader_3dtiles": [ "community", "3d-tiles", "maps", "globe", "earth", "cesium" ],
+	"webgl_loader_3dtiles_osm": [ "community", "3d-tiles", "maps", "globe", "earth", "osm", "openstreetmap", "raster" ],
 	"webgl_loader_gltf_animation_pointer": [ "community" ],
 	"webgl_loader_gltf_dispersion": [ "transmission" ],
 	"webgl_loader_gltf_progressive_lod": [ "community", "level", "details" ],
