@@ -196,7 +196,7 @@ float D_GGX( const in float alpha, const in float dotNH ) {
 
 		vec3 f0 = material.clearcoatF0;
 		float f90 = material.clearcoatF90;
-		float roughness = max( material.clearcoatRoughness, 0.0525 ); // punctual lights need a minimum roughness to show a highlight
+		float roughness = max( material.clearcoatRoughness, 0.045 ); // punctual lights need a minimum roughness to show a highlight
 
 		float alpha = pow2( roughness ); // UE4's roughness
 
@@ -223,7 +223,7 @@ vec3 BRDF_GGX( const in vec3 lightDir, const in vec3 viewDir, const in vec3 norm
 
 	vec3 f0 = material.specularColorBlended;
 	float f90 = material.specularF90;
-	float roughness = max( material.roughness, 0.0525 ); // punctual lights need a minimum roughness to show a highlight
+	float roughness = max( material.roughness, 0.045 ); // punctual lights need a minimum roughness to show a highlight
 
 	float alpha = pow2( roughness ); // UE4's roughness
 

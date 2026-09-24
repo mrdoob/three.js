@@ -7,10 +7,13 @@ const getRoughness = /*@__PURE__*/ Fn( ( inputs ) => {
 
 	const geometryRoughness = getGeometryRoughness();
 
-	// GGX width scales with roughness squared; large normal variation needs a linear floor.
-	const roughnessFloor = geometryRoughness.sqrt().mul( 0.4 ).max( geometryRoughness );
+	// Minimum roughness, so even a perfect mirror samples a prefiltered level of the environment map.
+	// Matches Filament's desktop MIN_PERCEPTUAL_ROUGHNESS: https://github.com/google/filament/blob/main/shaders/src/surface_material.fs
+	let roughnessFactor = roughness.max( 0.045 );
+	roughnessFactor = roughnessFactor.add( geometryRoughness );
+	roughnessFactor = roughnessFactor.min( 1.0 );
 
-	return roughness.max( roughnessFloor ).min( 1.0 );
+	return roughnessFactor;
 
 } );
 
