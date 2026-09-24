@@ -82,9 +82,9 @@ if ( true ) {
 
 	}
 
-	float nodeConst2 = ( 2.0 + 3.0 );
-	mat4 nodeConst3 = mat4( vec4( nodeConst2, 0.0, 0.0, 0.0 ), vec4( 0.0, nodeConst2, 0.0, 0.0 ), vec4( 0.0, 0.0, 1.0, 0.0 ), vec4( 0.0, 0.0, 0.0, 1.0 ) );
-	nodeVar0 = ( nodeVar0 + ( nodeConst3[ 0u ][ 0u ] + nodeConst3[ 1u ][ 1u ] ) );
+	float nodeConst0 = ( 2.0 + 3.0 );
+	mat4 nodeConst1 = mat4( vec4( nodeConst0, 0.0, 0.0, 0.0 ), vec4( 0.0, nodeConst0, 0.0, 0.0 ), vec4( 0.0, 0.0, 1.0, 0.0 ), vec4( 0.0, 0.0, 0.0, 1.0 ) );
+	nodeVar0 = ( nodeVar0 + ( nodeConst1[ 0u ][ 0u ] + nodeConst1[ 1u ][ 1u ] ) );
 
 }
 
@@ -127,6 +127,8 @@ for ( int i = 0; i < 0; i ++ ) {
 	nodeVar0 = ( nodeVar0 + externalValue );
 
 }
+
+externalValue = ( 2.0 + 3.0 );
 
 for ( int i = 0; i < 2; i ++ ) {
 
@@ -370,13 +372,15 @@ vec4 nodeVar0 = vec4( 0.0, 0.0, 0.0, 1.0 );
 
 if ( ( nodeVarying0.x < 0.33 ) ) {
 
-	nodeVar0 = vec4( ( mat4( 1.0, 0.5, 0.0, 3.0, 0.0, 1.0, 0.25, -2.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0 ) * inverse( mat4( 1.0, 0.5, 0.0, 3.0, 0.0, 1.0, 0.25, -2.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0 ) ) )[ 0u ].xyz, 1.0 );
+	mat4 nodeConst0 = ( mat4( 1.0, 0.5, 0.0, 3.0, 0.0, 1.0, 0.25, -2.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0 ) * inverse( mat4( 1.0, 0.5, 0.0, 3.0, 0.0, 1.0, 0.25, -2.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0 ) ) );
+	nodeVar0 = vec4( nodeConst0[ 0u ].xyz, 1.0 );
 
 } else {
 
 	if ( ( nodeVarying0.x < 0.66 ) ) {
 
-		nodeVar0 = vec4( ( mat4( 1.0, 0.5, 0.0, 3.0, 0.0, 1.0, 0.25, -2.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0 ) * inverse( mat4( 1.0, 0.5, 0.0, 3.0, 0.0, 1.0, 0.25, -2.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0 ) ) )[ 1u ].xyz, 1.0 );
+		mat4 nodeConst0 = ( mat4( 1.0, 0.5, 0.0, 3.0, 0.0, 1.0, 0.25, -2.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0 ) * inverse( mat4( 1.0, 0.5, 0.0, 3.0, 0.0, 1.0, 0.25, -2.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0 ) ) );
+		nodeVar0 = vec4( nodeConst0[ 1u ].xyz, 1.0 );
 
 	} else {
 
@@ -437,23 +441,18 @@ nodeVar0
 
 // cached flip after loop
 
-vec2 nodeVar1;
-vec2 nodeVar3;
-vec2 nodeVar0 = vec2( 0.0, 0.0 );
+vec2 nodeVar0;
+nodeVar0 = nodeVarying0;
+vec2 nodeConst0 = vec2( 1.0 - nodeVar0.x, nodeVar0.y );
+vec2 nodeVar1 = vec2( 0.0, 0.0 );
 
 for ( int i = 0; i < 2; i ++ ) {
 
-	nodeVar1 = nodeVarying0;
-	vec2 nodeConst0 = vec2( 1.0 - nodeVar1.x, nodeVar1.y );
-	nodeVar0 = ( nodeVar0 + nodeConst0 );
+	nodeVar1 = ( nodeVar1 + nodeConst0 );
 
 }
 
-vec2 nodeVar2 = nodeVar0;
-nodeVar3 = nodeVarying0;
-vec2 nodeConst1 = vec2( 1.0 - nodeVar3.x, nodeVar3.y );
-
-vec4( nodeConst1, nodeVar2 )
+vec4( nodeConst0, nodeVar1 )
 
 // cached expression after loop
 
@@ -466,7 +465,9 @@ for ( int i = 0; i < 2; i ++ ) {
 
 }
 
-vec2( ( nodeVarying0.x + 1.0 ), nodeVar0 )
+float nodeConst0 = ( nodeVarying0.x + 1.0 );
+
+vec2( nodeConst0, nodeVar0 )
 
 // cached expression before loop
 
@@ -489,14 +490,16 @@ float nodeVar1 = 0.0;
 for ( int i = 0; i < 2; i ++ ) {
 
 	float nodeConst0 = ( nodeVarying0.x + 1.0 );
-	nodeVar0 = ( nodeVar0 + ( nodeConst0 * nodeConst0 ) );
+	float nodeConst1 = ( nodeConst0 * nodeConst0 );
+	nodeVar0 = ( nodeVar0 + nodeConst1 );
 
 }
 
 for ( int i = 0; i < 3; i ++ ) {
 
-	float nodeConst1 = ( nodeVarying0.x + 1.0 );
-	nodeVar1 = ( nodeVar1 + ( nodeConst1 * nodeConst1 ) );
+	float nodeConst0 = ( nodeVarying0.x + 1.0 );
+	float nodeConst1 = ( nodeConst0 * nodeConst0 );
+	nodeVar1 = ( nodeVar1 + nodeConst1 );
 
 }
 
@@ -505,7 +508,6 @@ vec2( nodeVar0, nodeVar1 )
 // cached boolean uniform after loop
 
 bool nodeVar1;
-bool nodeVar2;
 float nodeVar0 = 0.0;
 
 for ( int i = 0; i < 0; i ++ ) {
@@ -515,9 +517,9 @@ for ( int i = 0; i < 0; i ++ ) {
 
 }
 
-nodeVar2 = bool( nodeUniform0 );
+nodeVar1 = bool( nodeUniform0 );
 
-vec2( float( nodeVar2 ), nodeVar0 )
+vec2( float( nodeVar1 ), nodeVar0 )
 
 // cached conditional after loop
 
@@ -615,8 +617,7 @@ for ( int i = 0; i < 4; i ++ ) {
 
 	}
 
-	float nodeVar2 = nodeVar1;
-	nodeVar0 = ( nodeVar0 + nodeVar2 );
+	nodeVar0 = ( nodeVar0 + nodeVar1 );
 
 }
 
@@ -626,22 +627,21 @@ nodeVar0
 
 float nodeVar0 = 0.0;
 
-for ( int i = 0; i < 3; i ++ ) {
-
-	nodeVar0 = ( nodeVar0 + float( i ) );
-
-}
-
-float nodeVar1 = nodeVar0;
-float nodeVar2 = 0.0;
-
 if ( ( nodeVarying0.x > 0.5 ) ) {
 
-	nodeVar2 = nodeVar1;
+	float nodeVar1 = 0.0;
+
+	for ( int i = 0; i < 3; i ++ ) {
+
+		nodeVar1 = ( nodeVar1 + float( i ) );
+
+	}
+
+	nodeVar0 = nodeVar1;
 
 }
 
-nodeVar2
+nodeVar0
 
 // function without stack single conditional use
 
@@ -670,23 +670,32 @@ vec3( nodeVar0 )
 // function without stack shared conditional use
 
 float nodeVar0 = 0.0;
-float nodeVar1 = 2.0;
-
-for ( int i = 0; i < 1; i ++ ) {
-
-	nodeVar1 = ( nodeVar1 + 1.0 );
-
-}
-
-float nodeVar2 = ( nodeVar1 + 2.0 );
 
 if ( bool( nodeVar0 ) ) {
 
-	nodeVar0 = nodeVar2;
+	float nodeVar1 = 2.0;
+
+	for ( int i = 0; i < 1; i ++ ) {
+
+		nodeVar1 = ( nodeVar1 + 1.0 );
+
+	}
+
+	float nodeConst0 = ( nodeVar1 + 2.0 );
+	nodeVar0 = nodeConst0;
 
 } else {
 
-	nodeVar0 = nodeVar2;
+	float nodeVar1 = 2.0;
+
+	for ( int i = 0; i < 1; i ++ ) {
+
+		nodeVar1 = ( nodeVar1 + 1.0 );
+
+	}
+
+	float nodeConst0 = ( nodeVar1 + 2.0 );
+	nodeVar0 = nodeConst0;
 
 }
 
@@ -695,19 +704,18 @@ vec3( nodeVar0 )
 // function with loop without stack
 
 float nodeVar0 = 0.0;
-float nodeVar1 = 0.0;
-
-for ( int i = 0; i < 3; i ++ ) {
-
-	nodeVar1 = ( nodeVar1 + float( i ) );
-
-}
-
-float nodeVar2 = nodeVar1;
 
 for ( int i = 0; i < 4; i ++ ) {
 
-	nodeVar0 = ( nodeVar0 + nodeVar2 );
+	float nodeVar1 = 0.0;
+
+	for ( int i = 0; i < 3; i ++ ) {
+
+		nodeVar1 = ( nodeVar1 + float( i ) );
+
+	}
+
+	nodeVar0 = ( nodeVar0 + nodeVar1 );
 
 }
 
@@ -724,16 +732,15 @@ for ( int i = 0; i < 3; i ++ ) {
 }
 
 float nodeVar1 = nodeVar0;
-float nodeVar2 = nodeVar1;
-float nodeVar3 = 0.0;
+float nodeVar2 = 0.0;
 
 for ( int i = 0; i < 4; i ++ ) {
 
-	nodeVar3 = ( nodeVar3 + nodeVar2 );
+	nodeVar2 = ( nodeVar2 + nodeVar1 );
 
 }
 
-nodeVar3
+nodeVar2
 
 // function loop default parameter
 
@@ -764,6 +771,57 @@ for ( int i = 0; i < 4; i ++ ) {
 }
 
 nodeVar4
+
+// cached value after function loop
+
+vec2 nodeVar1;
+vec2 nodeVar0 = vec2( 0.0, 0.0 );
+
+for ( int i = 0; i < 2; i ++ ) {
+
+	nodeVar1 = nodeVarying0;
+	vec2 nodeConst0 = vec2( 1.0 - nodeVar1.x, nodeVar1.y );
+	nodeVar0 = ( nodeVar0 + ( nodeConst0 * nodeConst0 ) );
+
+}
+
+vec2 nodeVar2 = nodeVar0;
+vec2 nodeVar3 = vec2( 0.0, 0.0 );
+
+for ( int i = 0; i < 3; i ++ ) {
+
+	nodeVar3 = ( nodeVar3 + nodeVar2 );
+
+}
+
+nodeVar1 = nodeVarying0;
+vec2 nodeConst0 = vec2( 1.0 - nodeVar1.x, nodeVar1.y );
+
+vec4( nodeConst0, nodeVar3 )
+
+// cached value after function conditional
+
+float nodeVar0 = 0.0;
+
+if ( ( nodeVarying0.y > 0.5 ) ) {
+
+	float nodeConst0 = ( nodeVarying0.x + 1.0 );
+	nodeVar0 = ( nodeConst0 * nodeConst0 );
+
+}
+
+float nodeVar1 = nodeVar0;
+float nodeVar2 = 0.0;
+
+for ( int i = 0; i < 3; i ++ ) {
+
+	nodeVar2 = ( nodeVar2 + nodeVar1 );
+
+}
+
+float nodeConst0 = ( nodeVarying0.x + 1.0 );
+
+vec2( ( nodeConst0 * nodeConst0 ), nodeVar2 )
 
 // function assign outside loop
 
@@ -797,11 +855,12 @@ if ( ( nodeVarying0.x > 0.5 ) ) {
 
 }
 
+float nodeVar0 = result;
 total = 0.0;
 
 for ( int i = 0; i < 4; i ++ ) {
 
-	total = ( total + result );
+	total = ( total + nodeVar0 );
 
 }
 
@@ -812,8 +871,8 @@ vec2( counter, total )
 float x;
 float doubled;
 x = 1.0;
-doubled = ( x * 2.0 );
 x = 100.0;
+doubled = ( x * 2.0 );
 
 doubled
 

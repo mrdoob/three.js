@@ -809,6 +809,66 @@ export const cases = {
 
 	} )(),
 
+	cachedValueAfterFunctionLoop: () => Fn( () => {
+
+		const flipped = uv().flipX();
+		const accumulate = Fn( () => {
+
+			const sum = vec2( 0 );
+
+			Loop( 2, () => {
+
+				sum.addAssign( flipped.mul( flipped ) );
+
+			} );
+
+			return sum;
+
+		} );
+
+		const value = accumulate();
+		const total = vec2( 0 );
+
+		Loop( 3, () => {
+
+			total.addAssign( value );
+
+		} );
+
+		return vec4( flipped, total );
+
+	} )(),
+
+	cachedValueAfterFunctionConditional: () => Fn( () => {
+
+		const value = uv().x.add( 1 );
+		const square = Fn( () => {
+
+			const result = float( 0 );
+
+			If( uv().y.greaterThan( 0.5 ), () => {
+
+				result.assign( value.mul( value ) );
+
+			} );
+
+			return result;
+
+		} );
+
+		const squared = square();
+		const total = float( 0 );
+
+		Loop( 3, () => {
+
+			total.addAssign( squared );
+
+		} );
+
+		return vec2( value.mul( value ), total );
+
+	} )(),
+
 	functionAssignOutsideLoop: () => Fn( () => {
 
 		const counter = float( 0 ).toVar( 'counter' );
