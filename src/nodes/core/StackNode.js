@@ -122,6 +122,27 @@ class StackNode extends Node {
 	}
 
 	/**
+	 * Whether this stack contains statements. Variable intents only count
+	 * if they wrap a function call which contains statements.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {boolean} Whether this stack contains statements.
+	 */
+	hasStatements( builder ) {
+
+		for ( const node of this.nodes ) {
+
+			if ( node.isVarNode !== true || node.intent !== true ) return true;
+
+			if ( node.node.isShaderCallNodeInternal === true && node.node.hasStatements( builder ) ) return true;
+
+		}
+
+		return false;
+
+	}
+
+	/**
 	 * Adds a node to this stack.
 	 *
 	 * @param {Node} node - The node to add.

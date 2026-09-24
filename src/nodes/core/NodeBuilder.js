@@ -2210,14 +2210,14 @@ class NodeBuilder {
 	 * @param {('vertex'|'fragment'|'compute'|'any')} [shaderStage=this.shaderStage] - The shader stage.
 	 * @param {boolean} [readOnly=false] - Whether the variable is read-only or not.
 	 * @param {boolean} [local=false] - Whether the variable is declared locally in the flow instead of the variable section.
+	 * @param {string} [property='variable'] - The node data property that holds the variable. Allows a node to own more than one variable.
 	 *
 	 * @return {NodeVar} The node variable.
 	 */
-	getVarFromNode( node, name = null, type = node.getNodeType( this ), shaderStage = this.shaderStage, readOnly = false, local = false ) {
+	getVarFromNode( node, name = null, type = node.getNodeType( this ), shaderStage = this.shaderStage, readOnly = false, local = false, property = 'variable' ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
-		const variable = local ? 'localVariable' : 'variable';
-		const subBuildVariable = this.getSubBuildProperty( variable, nodeData.subBuilds );
+		const subBuildVariable = this.getSubBuildProperty( property, nodeData.subBuilds );
 
 		let nodeVar = nodeData[ subBuildVariable ];
 
@@ -2238,7 +2238,7 @@ class NodeBuilder {
 
 			//
 
-			if ( subBuildVariable !== variable ) {
+			if ( subBuildVariable !== property ) {
 
 				name = this.getSubBuildProperty( name, nodeData.subBuilds );
 

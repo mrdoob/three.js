@@ -640,6 +640,19 @@ class ShaderCallNodeInternal extends Node {
 
 	}
 
+	/**
+	 * Whether the body of this call contains statements, e.g. variables, assignments,
+	 * conditionals or loops. Only valid after the call has been set up.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {boolean} Whether the call contains statements.
+	 */
+	hasStatements( builder ) {
+
+		return builder.getDataFromNode( this, 'any', builder.globalCache ).hasStatements === true;
+
+	}
+
 	build( builder, output = null ) {
 
 		let result = null;
@@ -664,6 +677,11 @@ class ShaderCallNodeInternal extends Node {
 
 				properties[ subBuildOutput ] = this.getOutputNode( builder );
 				properties[ subBuildOutput ].build( builder );
+
+				// The call may be set up in an isolated cache (e.g. a loop body), but where it
+				// is placed is decided from its original stack, so keep this in the global cache.
+				const callData = builder.getDataFromNode( this, 'any', builder.globalCache );
+				callData.hasStatements = callData.hasStatements === true || properties[ subBuildOutput ].hasStatements( builder );
 
 				// If the shaderNode has subBuilds, add them to the chaining nodes
 				// so they can be built later in the build process.
@@ -690,12 +708,6 @@ class ShaderCallNodeInternal extends Node {
 			}
 
 			result = properties[ subBuildOutput ];
-
-			if ( previousFnCall && this.shaderNode.getLayout() === null && builder.getDataFromNode( this, builder.shaderStage, builder.globalCache ).hasLoop ) {
-
-				builder.getDataFromNode( previousFnCall, builder.shaderStage, builder.globalCache ).hasLoop = true;
-
-			}
 
 		} else if ( buildStage === 'analyze' ) {
 

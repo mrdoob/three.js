@@ -151,14 +151,6 @@ class LoopNode extends Node {
 
 		this.getProperties( builder );
 
-		if ( builder.fnCall ) {
-
-			// Keep loop metadata visible outside isolated conditional caches.
-			const callData = builder.getDataFromNode( builder.fnCall, builder.shaderStage, builder.globalCache );
-			callData.hasLoop = true;
-
-		}
-
 	}
 
 	generate( builder ) {

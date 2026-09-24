@@ -1050,7 +1050,8 @@ class Node extends EventDispatcher {
 				if ( cacheResult ) {
 
 					const readOnly = nodeData.assign !== true;
-					const nodeVar = builder.getVarFromNode( this, null, type, undefined, readOnly, true );
+					// Use a dedicated property, the node may already own a variable.
+					const nodeVar = builder.getVarFromNode( this, null, type, undefined, readOnly, true, 'cacheVariable' );
 					const propertyName = builder.getPropertyName( nodeVar );
 					const count = this.getArrayCount( builder );
 					const declarationPrefix = readOnly
