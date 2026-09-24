@@ -1997,32 +1997,55 @@ class NodeBuilder {
 		cache = cache === null ? ( node.isGlobal( this ) ? this.globalCache : this.cache ) : cache;
 
 		let nodeData = cache.getData( node );
+		const isolate = this.buildStage === 'generate';
 
-		if ( nodeData === undefined ) {
+		if ( nodeData === undefined || ( isolate && ! cache.nodesData.has( node ) ) ) {
 
-			nodeData = {};
+			// Inherit existing data, but keep generated values in the current scope.
+			nodeData = Object.create( nodeData || null );
 
 			cache.setData( node, nodeData );
 
 		}
 
-		if ( nodeData[ shaderStage ] === undefined ) nodeData[ shaderStage ] = {};
+		if ( nodeData[ shaderStage ] === undefined || ( isolate && ! Object.hasOwn( nodeData, shaderStage ) ) ) {
+
+			nodeData[ shaderStage ] = Object.create( nodeData[ shaderStage ] || null );
+
+		}
 
 		//
 
 		let data = nodeData[ shaderStage ];
 
-		if ( this.subBuildLayers.length === 0 ) return data;
-
 		const subBuilds = nodeData.any ? nodeData.any.subBuilds : null;
-		const subBuild = this.getClosestSubBuild( subBuilds );
+		const subBuild = this.subBuildLayers.length > 0 ? this.getClosestSubBuild( subBuilds ) : null;
 
 		if ( subBuild ) {
 
-			if ( data.subBuildsCache === undefined ) data.subBuildsCache = {};
+			if ( data.subBuildsCache === undefined || ( isolate && ! Object.hasOwn( data, 'subBuildsCache' ) ) ) {
 
-			data = data.subBuildsCache[ subBuild ] || ( data.subBuildsCache[ subBuild ] = {} );
+				data.subBuildsCache = Object.create( data.subBuildsCache || null );
+
+			}
+
+			if ( data.subBuildsCache[ subBuild ] === undefined || ( isolate && ! Object.hasOwn( data.subBuildsCache, subBuild ) ) ) {
+
+				data.subBuildsCache[ subBuild ] = Object.create( data.subBuildsCache[ subBuild ] || null );
+
+			}
+
+			data = data.subBuildsCache[ subBuild ];
 			data.subBuilds = subBuilds;
+
+		}
+
+		if ( isolate && cache.parent !== null ) {
+
+			// Setup may have created local data before the parent scope was visited.
+			const parentData = this.getDataFromNode( node, shaderStage, cache.parent );
+
+			if ( Object.getPrototypeOf( data ) !== parentData ) Object.setPrototypeOf( data, parentData );
 
 		}
 
@@ -2198,7 +2221,8 @@ class NodeBuilder {
 	getVarFromNode( node, name = null, type = node.getNodeType( this ), shaderStage = this.shaderStage, readOnly = false, local = false ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
-		const subBuildVariable = this.getSubBuildProperty( 'variable', nodeData.subBuilds );
+		const variable = local ? 'localVariable' : 'variable';
+		const subBuildVariable = this.getSubBuildProperty( variable, nodeData.subBuilds );
 
 		let nodeVar = nodeData[ subBuildVariable ];
 
@@ -2219,7 +2243,7 @@ class NodeBuilder {
 
 			//
 
-			if ( subBuildVariable !== 'variable' ) {
+			if ( subBuildVariable !== variable ) {
 
 				name = this.getSubBuildProperty( name, nodeData.subBuilds );
 

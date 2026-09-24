@@ -111,7 +111,7 @@ class LoopNode extends Node {
 
 		const fnCall = params[ params.length - 1 ]( inputs );
 
-		// Keep values first generated in the loop body out of the parent cache.
+		// Share setup and analysis data, but keep generated values inside the loop scope.
 		properties.returnsNode = fnCall.isolate().context( { nodeLoop: fnCall } );
 		properties.stackNode = stack;
 
