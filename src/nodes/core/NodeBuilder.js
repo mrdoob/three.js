@@ -1997,57 +1997,52 @@ class NodeBuilder {
 		cache = cache === null ? ( node.isGlobal( this ) ? this.globalCache : this.cache ) : cache;
 
 		let nodeData = cache.getData( node );
-		const isolate = this.buildStage === 'generate';
 
-		if ( nodeData === undefined || ( isolate && ! cache.nodesData.has( node ) ) ) {
+		if ( nodeData === undefined ) {
 
-			// Inherit existing data, but keep generated values in the current scope.
-			nodeData = Object.create( nodeData || null );
+			nodeData = Object.create( null );
 
 			cache.setData( node, nodeData );
 
 		}
 
-		if ( nodeData[ shaderStage ] === undefined || ( isolate && ! Object.hasOwn( nodeData, shaderStage ) ) ) {
-
-			nodeData[ shaderStage ] = Object.create( nodeData[ shaderStage ] || null );
-
-		}
-
-		//
-
-		let data = nodeData[ shaderStage ];
-
 		const subBuilds = nodeData.any ? nodeData.any.subBuilds : null;
 		const subBuild = this.subBuildLayers.length > 0 ? this.getClosestSubBuild( subBuilds ) : null;
+		const path = subBuild ? [ shaderStage, 'subBuildsCache', subBuild ] : [ shaderStage ];
 
-		if ( subBuild ) {
+		let parentData = null;
 
-			if ( data.subBuildsCache === undefined || ( isolate && ! Object.hasOwn( data, 'subBuildsCache' ) ) ) {
+		if ( this.buildStage === 'generate' && cache.parent !== null ) {
 
-				data.subBuildsCache = Object.create( data.subBuildsCache || null );
+			// Inherit parent values, but keep generation writes in the current scope.
+			parentData = this.getDataFromNode( node, shaderStage, cache.parent );
+
+			if ( ! cache.nodesData.has( node ) ) {
+
+				nodeData = Object.create( nodeData );
+				cache.setData( node, nodeData );
 
 			}
 
-			if ( data.subBuildsCache[ subBuild ] === undefined || ( isolate && ! Object.hasOwn( data.subBuildsCache, subBuild ) ) ) {
+		}
 
-				data.subBuildsCache[ subBuild ] = Object.create( data.subBuildsCache[ subBuild ] || null );
+		let data = nodeData;
+
+		for ( const key of path ) {
+
+			if ( data[ key ] === undefined || ( parentData !== null && ! Object.hasOwn( data, key ) ) ) {
+
+				data[ key ] = Object.create( data[ key ] || null );
 
 			}
 
-			data = data.subBuildsCache[ subBuild ];
-			data.subBuilds = subBuilds;
+			data = data[ key ];
 
 		}
 
-		if ( isolate && cache.parent !== null ) {
+		if ( parentData !== null && Object.getPrototypeOf( data ) !== parentData ) Object.setPrototypeOf( data, parentData );
 
-			// Setup may have created local data before the parent scope was visited.
-			const parentData = this.getDataFromNode( node, shaderStage, cache.parent );
-
-			if ( Object.getPrototypeOf( data ) !== parentData ) Object.setPrototypeOf( data, parentData );
-
-		}
+		if ( subBuild ) data.subBuilds = subBuilds;
 
 		return data;
 
