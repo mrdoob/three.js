@@ -763,7 +763,15 @@ function getProxyParameters( params ) {
 
 			} else {
 
-				if ( params.length > 0 ) {
+				// Numeric index reads must match the iterator (Babel's _slicedToArray
+				// short-circuits on Array.isArray(proxy) and then reads proxy[0]).
+				const isIndex = typeof property === 'string' && /^(0|[1-9]\d*)$/.test( property );
+
+				if ( isIndex ) {
+
+					value = Reflect.get( params, property, receiver );
+
+				} else if ( params.length > 0 ) {
 
 					if ( Object.getPrototypeOf( params[ 0 ] ) === Object.prototype ) {
 
@@ -790,6 +798,10 @@ function getProxyParameters( params ) {
 							value = Reflect.get( params, property, receiver );
 
 						}
+
+					} else {
+
+						value = Reflect.get( params, property, receiver );
 
 					}
 
