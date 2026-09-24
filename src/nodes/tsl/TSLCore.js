@@ -691,9 +691,9 @@ class ShaderCallNodeInternal extends Node {
 
 			result = properties[ subBuildOutput ];
 
-			if ( previousFnCall && this.shaderNode.getLayout() === null && builder.getDataFromNode( this ).hasLoop ) {
+			if ( previousFnCall && this.shaderNode.getLayout() === null && builder.getDataFromNode( this, builder.shaderStage, builder.globalCache ).hasLoop ) {
 
-				builder.getDataFromNode( previousFnCall ).hasLoop = true;
+				builder.getDataFromNode( previousFnCall, builder.shaderStage, builder.globalCache ).hasLoop = true;
 
 			}
 

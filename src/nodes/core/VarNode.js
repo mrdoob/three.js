@@ -131,7 +131,10 @@ class VarNode extends Node {
 		// Calls containing loops must be evaluated in their original stack.
 		if ( this.intent && data.stack && this.node.isShaderCallNodeInternal ) {
 
-			const callData = builder.getDataFromNode( this.node );
+			// A call without an original stack can stay in its only conditional branch.
+			if ( data.stackNodeBlock && builder.context.nodeBlock === undefined && ! ( data.usageCount > 1 ) ) return true;
+
+			const callData = builder.getDataFromNode( this.node, builder.shaderStage, builder.globalCache );
 
 			if ( callData.hasLoop && this.node.getNodeType( builder ) !== 'void' ) return false;
 
@@ -212,7 +215,9 @@ class VarNode extends Node {
 
 				}
 
-				builder.getDataFromNode( this ).stack = baseStack;
+				const data = builder.getDataFromNode( this );
+				data.stack = baseStack;
+				data.stackNodeBlock = builder.context.nodeLoop ? undefined : builder.context.nodeBlock;
 
 			}
 
