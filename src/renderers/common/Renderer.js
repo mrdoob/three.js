@@ -48,6 +48,7 @@ const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _vector4 = /*@__PURE__*/ new Vector4();
 
 const _shadowSide = { [ FrontSide ]: BackSide, [ BackSide ]: FrontSide, [ DoubleSide ]: DoubleSide };
+const _shadowPassIds = { [ FrontSide ]: 'shadowSideFront', [ BackSide ]: 'shadowSideBack', [ DoubleSide ]: 'shadowSideDouble' };
 
 /**
  * Base class for renderers.
@@ -3820,6 +3821,9 @@ class Renderer {
 					overrideMaterial.side = ( material.shadowSide !== null ) ? material.shadowSide : _shadowSide[ material.side ];
 
 				}
+
+				// Keep shadow pipelines for different material sides cached independently.
+				if ( passId === null ) passId = _shadowPassIds[ overrideMaterial.side ];
 
 				if ( colorNode !== null ) overrideMaterial.colorNode = colorNode;
 				if ( depthNode !== null ) overrideMaterial.depthNode = depthNode;
