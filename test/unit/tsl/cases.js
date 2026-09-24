@@ -10,11 +10,11 @@ export const cases = {
 	swizzle: () => vec3( 1, 2, 3 ).zyx.mul( 0.5 ),
 
 	// Operand order matters: scalar operators infer their type from the left operand.
-	autoConvertIntToFloat: () => Fn( () => float( 0.5 ).add( int( 2 ).toVar() ) )(),
+	autoConvertIntToFloat: () => Fn( () => float( 0.5 ).add( int( 2 ) ) )(),
 
-	autoConvertFloatToInt: () => Fn( () => int( 2 ).add( float( 0.5 ).toVar() ) )(),
+	autoConvertFloatToInt: () => Fn( () => int( 2 ).add( float( 0.5 ) ) )(),
 
-	autoConvertUintToFloat: () => Fn( () => float( 0.5 ).mul( uint( 3 ).toVar() ) )(),
+	autoConvertUintToFloat: () => Fn( () => float( 0.5 ).mul( uint( 3 ) ) )(),
 
 	autoConvertScalarToVector: () => vec3( 1, 2, 3 ).add( 0.5 ),
 
@@ -351,7 +351,7 @@ export const cases = {
 
 	functionResultConversion: () => Fn( () => {
 
-		const integerResult = Fn( () => int( 3 ).toVar() );
+		const integerResult = Fn( () => int( 3 ) );
 
 		return float( 0.5 ).add( integerResult() );
 
@@ -463,6 +463,41 @@ export const cases = {
 
 	} )(),
 
+	functionOutsideSequentialLoops: () => Fn( () => {
+
+		const accumulate = Fn( () => {
+
+			const value = vec3( 0 );
+
+			Loop( 10000, () => {
+
+				value.addAssign( 0.0001 );
+
+			} );
+
+			return value;
+
+		} );
+
+		const sharedValue = accumulate();
+		const total = vec3( 0 );
+
+		Loop( 10, () => {
+
+			total.addAssign( sharedValue );
+
+		} );
+
+		Loop( 10, () => {
+
+			total.addAssign( sharedValue );
+
+		} );
+
+		return total;
+
+	} )(),
+
 	functionWithLoopInsideLoop: () => Fn( () => {
 
 		const sumValues = Fn( ( [ value ] ) => {
@@ -519,6 +554,78 @@ export const cases = {
 		return total;
 
 	} )(),
+
+	functionWithoutStackSingleConditionalUse: () => {
+
+		const value = Fn( () => {
+
+			const n = float( 2 );
+
+			Loop( 1, () => {
+
+				n.addAssign( 1 );
+
+			} );
+
+			return n.add( 2 );
+
+		} )();
+
+		return Fn( () => {
+
+			const result = float( 0 );
+
+			If( result, () => {
+
+				result.assign( value );
+
+			} ).Else( () => {
+
+				result.assign( 1 );
+
+			} );
+
+			return vec3( result );
+
+		} )();
+
+	},
+
+	functionWithoutStackSharedConditionalUse: () => {
+
+		const value = Fn( () => {
+
+			const n = float( 2 );
+
+			Loop( 1, () => {
+
+				n.addAssign( 1 );
+
+			} );
+
+			return n.add( 2 );
+
+		} )();
+
+		return Fn( () => {
+
+			const result = float( 0 );
+
+			If( result, () => {
+
+				result.assign( value );
+
+			} ).Else( () => {
+
+				result.assign( value );
+
+			} );
+
+			return vec3( result );
+
+		} )();
+
+	},
 
 	functionWithLoopWithoutStack: () => {
 

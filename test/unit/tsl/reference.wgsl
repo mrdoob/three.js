@@ -12,27 +12,15 @@ vec4<f32>( vec3<f32>( 1.0, 0.5, 0.0 ), 1.0 )
 
 // auto convert int to float
 
-var nodeVar0 : i32;
-
-nodeVar0 = 2;
-
-( 0.5 + f32( nodeVar0 ) )
+( 0.5 + 2.0 )
 
 // auto convert float to int
 
-var nodeVar0 : f32;
-
-nodeVar0 = 0.5;
-
-( 2 + i32( nodeVar0 ) )
+( 2 + 1 )
 
 // auto convert uint to float
 
-var nodeVar0 : u32;
-
-nodeVar0 = 3u;
-
-( 0.5 * f32( nodeVar0 ) )
+( 0.5 * 3.0 )
 
 // auto convert scalar to vector
 
@@ -384,11 +372,7 @@ nodeVar0
 
 // function result conversion
 
-var nodeVar0 : i32;
-
-nodeVar0 = 3;
-
-( 0.5 + f32( nodeVar0 ) )
+( 0.5 + 3.0 )
 
 // complex matrix conditional
 
@@ -525,6 +509,33 @@ for ( var i : i32 = 0; i < 4; i ++ ) {
 
 nodeVar2
 
+// function outside sequential loops
+
+var nodeVar0 : vec3<f32> = vec3<f32>( 0.0, 0.0, 0.0 );
+
+for ( var i : i32 = 0; i < 10000; i ++ ) {
+
+	nodeVar0 = ( nodeVar0 + vec3<f32>( 0.0001 ) );
+
+}
+
+var nodeVar1 : vec3<f32> = nodeVar0;
+var nodeVar2 : vec3<f32> = vec3<f32>( 0.0, 0.0, 0.0 );
+
+for ( var i : i32 = 0; i < 10; i ++ ) {
+
+	nodeVar2 = ( nodeVar2 + nodeVar1 );
+
+}
+
+for ( var i : i32 = 0; i < 10; i ++ ) {
+
+	nodeVar2 = ( nodeVar2 + nodeVar1 );
+
+}
+
+nodeVar2
+
 // function with loop inside loop
 
 var nodeVar0 : f32 = 0.0;
@@ -567,21 +578,71 @@ if ( ( nodeVarying0.x > 0.5 ) ) {
 
 nodeVar2
 
-// function with loop without stack
+// function without stack single conditional use
 
 var nodeVar0 : f32 = 0.0;
 
-for ( var i : i32 = 0; i < 4; i ++ ) {
+if ( bool( nodeVar0 ) ) {
 
-	var nodeVar1 : f32 = 0.0;
+	var nodeVar1 : f32 = 2.0;
 
-	for ( var i : i32 = 0; i < 3; i ++ ) {
+	for ( var i : i32 = 0; i < 1; i ++ ) {
 
-		nodeVar1 = ( nodeVar1 + f32( i ) );
+		nodeVar1 = ( nodeVar1 + 1.0 );
 
 	}
 
-	var nodeVar2 : f32 = nodeVar1;
+	var nodeVar2 : f32 = ( nodeVar1 + 2.0 );
+	nodeVar0 = nodeVar2;
+
+} else {
+
+	nodeVar0 = 1.0;
+
+}
+
+vec3<f32>( nodeVar0 )
+
+// function without stack shared conditional use
+
+var nodeVar0 : f32 = 0.0;
+
+for ( var i : i32 = 0; i < 1; i ++ ) {
+
+	var nodeVar1 : f32 = 2.0;
+	nodeVar1 = ( nodeVar1 + 1.0 );
+
+}
+
+var nodeVar2 : f32 = ( nodeVar1 + 2.0 );
+
+if ( bool( nodeVar0 ) ) {
+
+	nodeVar0 = nodeVar2;
+
+} else {
+
+	nodeVar0 = nodeVar2;
+
+}
+
+vec3<f32>( nodeVar0 )
+
+// function with loop without stack
+
+var nodeVar0 : f32 = 0.0;
+var nodeVar1 : f32 = 0.0;
+
+for ( var i : i32 = 0; i < 3; i ++ ) {
+
+	nodeVar1 = ( nodeVar1 + f32( i ) );
+
+}
+
+var nodeVar2 : f32 = nodeVar1;
+
+for ( var i : i32 = 0; i < 4; i ++ ) {
+
 	nodeVar0 = ( nodeVar0 + nodeVar2 );
 
 }

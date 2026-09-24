@@ -12,24 +12,15 @@ vec4( vec3( 1.0, 0.5, 0.0 ), 1.0 )
 
 // auto convert int to float
 
-int nodeVar0;
-nodeVar0 = 2;
-
-( 0.5 + float( nodeVar0 ) )
+( 0.5 + 2.0 )
 
 // auto convert float to int
 
-float nodeVar0;
-nodeVar0 = 0.5;
-
-( 2 + int( nodeVar0 ) )
+( 2 + 1 )
 
 // auto convert uint to float
 
-uint nodeVar0;
-nodeVar0 = 3u;
-
-( 0.5 * float( nodeVar0 ) )
+( 0.5 * 3.0 )
 
 // auto convert scalar to vector
 
@@ -371,10 +362,7 @@ nodeVar0
 
 // function result conversion
 
-int nodeVar0;
-nodeVar0 = 3;
-
-( 0.5 + float( nodeVar0 ) )
+( 0.5 + 3.0 )
 
 // complex matrix conditional
 
@@ -468,6 +456,33 @@ for ( int i = 0; i < 4; i ++ ) {
 
 nodeVar2
 
+// function outside sequential loops
+
+vec3 nodeVar0 = vec3( 0.0, 0.0, 0.0 );
+
+for ( int i = 0; i < 10000; i ++ ) {
+
+	nodeVar0 = ( nodeVar0 + vec3( 0.0001 ) );
+
+}
+
+vec3 nodeVar1 = nodeVar0;
+vec3 nodeVar2 = vec3( 0.0, 0.0, 0.0 );
+
+for ( int i = 0; i < 10; i ++ ) {
+
+	nodeVar2 = ( nodeVar2 + nodeVar1 );
+
+}
+
+for ( int i = 0; i < 10; i ++ ) {
+
+	nodeVar2 = ( nodeVar2 + nodeVar1 );
+
+}
+
+nodeVar2
+
 // function with loop inside loop
 
 float nodeVar0 = 0.0;
@@ -510,21 +525,71 @@ if ( ( nodeVarying0.x > 0.5 ) ) {
 
 nodeVar2
 
-// function with loop without stack
+// function without stack single conditional use
 
 float nodeVar0 = 0.0;
 
-for ( int i = 0; i < 4; i ++ ) {
+if ( bool( nodeVar0 ) ) {
 
-	float nodeVar1 = 0.0;
+	float nodeVar1 = 2.0;
 
-	for ( int i = 0; i < 3; i ++ ) {
+	for ( int i = 0; i < 1; i ++ ) {
 
-		nodeVar1 = ( nodeVar1 + float( i ) );
+		nodeVar1 = ( nodeVar1 + 1.0 );
 
 	}
 
-	float nodeVar2 = nodeVar1;
+	float nodeVar2 = ( nodeVar1 + 2.0 );
+	nodeVar0 = nodeVar2;
+
+} else {
+
+	nodeVar0 = 1.0;
+
+}
+
+vec3( nodeVar0 )
+
+// function without stack shared conditional use
+
+float nodeVar0 = 0.0;
+
+for ( int i = 0; i < 1; i ++ ) {
+
+	float nodeVar1 = 2.0;
+	nodeVar1 = ( nodeVar1 + 1.0 );
+
+}
+
+float nodeVar2 = ( nodeVar1 + 2.0 );
+
+if ( bool( nodeVar0 ) ) {
+
+	nodeVar0 = nodeVar2;
+
+} else {
+
+	nodeVar0 = nodeVar2;
+
+}
+
+vec3( nodeVar0 )
+
+// function with loop without stack
+
+float nodeVar0 = 0.0;
+float nodeVar1 = 0.0;
+
+for ( int i = 0; i < 3; i ++ ) {
+
+	nodeVar1 = ( nodeVar1 + float( i ) );
+
+}
+
+float nodeVar2 = nodeVar1;
+
+for ( int i = 0; i < 4; i ++ ) {
+
 	nodeVar0 = ( nodeVar0 + nodeVar2 );
 
 }
