@@ -199,6 +199,42 @@ def Xform "Root"
 
 			} );
 
+			QUnit.test( 'interprets USD color3f material inputs as linear', ( assert ) => {
+
+				const usda = `#usda 1.0
+(
+	defaultPrim = "Root"
+)
+
+def Xform "Root"
+{
+	def Material "Material"
+	{
+		token outputs:surface.connect = </Root/Material/PreviewSurface.outputs:surface>
+
+		def Shader "PreviewSurface"
+		{
+			uniform token info:id = "UsdPreviewSurface"
+			color3f inputs:diffuseColor = (0.18, 0.18, 0.18)
+			color3f inputs:emissiveColor = (0.18, 0.18, 0.18)
+			token outputs:surface
+		}
+	}
+
+	def Cube "Mesh"
+	{
+		rel material:binding = </Root/Material>
+	}
+}`;
+
+				const scene = new USDLoader().parse( usda );
+				const mesh = scene.getObjectByName( 'Mesh' );
+
+				assert.closeTo( mesh.material.color.r, 0.18, 0.000001, 'Diffuse color is kept in linear Rec.709.' );
+				assert.closeTo( mesh.material.emissive.r, 0.18, 0.000001, 'Emissive color is kept in linear Rec.709.' );
+
+			} );
+
 			QUnit.test( 'uses timeCodesPerSecond for USDA animation timing', ( assert ) => {
 
 				const usda = `#usda 1.0
