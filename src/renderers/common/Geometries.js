@@ -242,6 +242,8 @@ class Geometries extends DataMap {
 			this._tracked.delete( geometryData.ref );
 			this._registry.unregister( geometryData.ref );
 
+			this.delete( geometry );
+
 		};
 
 		geometry.addEventListener( 'dispose', geometryData.onDispose );
