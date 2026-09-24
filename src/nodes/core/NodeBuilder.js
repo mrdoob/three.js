@@ -504,6 +504,15 @@ class NodeBuilder {
 		 */
 		this.fnCall = null;
 
+		/**
+		 * The block of generated code the builder is in, e.g. a loop body or a conditional branch.
+		 * Every generated block is a new object linked to its parent, `null` outside of any block.
+		 *
+		 * @type {?{parent: ?Object}}
+		 * @default null
+		 */
+		this.flowBlock = null;
+
 		Object.defineProperty( this, 'id', { value: _id ++ } );
 
 	}
@@ -2000,49 +2009,31 @@ class NodeBuilder {
 
 		if ( nodeData === undefined ) {
 
-			nodeData = Object.create( null );
+			nodeData = {};
 
 			cache.setData( node, nodeData );
 
 		}
 
+		if ( nodeData[ shaderStage ] === undefined ) nodeData[ shaderStage ] = {};
+
+		//
+
+		let data = nodeData[ shaderStage ];
+
+		if ( this.subBuildLayers.length === 0 ) return data;
+
 		const subBuilds = nodeData.any ? nodeData.any.subBuilds : null;
-		const subBuild = this.subBuildLayers.length > 0 ? this.getClosestSubBuild( subBuilds ) : null;
-		const path = subBuild ? [ shaderStage, 'subBuildsCache', subBuild ] : [ shaderStage ];
+		const subBuild = this.getClosestSubBuild( subBuilds );
 
-		let parentData = null;
+		if ( subBuild ) {
 
-		if ( this.buildStage === 'generate' && cache.parent !== null ) {
+			if ( data.subBuildsCache === undefined ) data.subBuildsCache = {};
 
-			// Inherit parent values, but keep generation writes in the current scope.
-			parentData = this.getDataFromNode( node, shaderStage, cache.parent );
-
-			if ( ! cache.nodesData.has( node ) ) {
-
-				nodeData = Object.create( nodeData );
-				cache.setData( node, nodeData );
-
-			}
+			data = data.subBuildsCache[ subBuild ] || ( data.subBuildsCache[ subBuild ] = {} );
+			data.subBuilds = subBuilds;
 
 		}
-
-		let data = nodeData;
-
-		for ( const key of path ) {
-
-			if ( data[ key ] === undefined || ( parentData !== null && ! Object.hasOwn( data, key ) ) ) {
-
-				data[ key ] = Object.create( data[ key ] || null );
-
-			}
-
-			data = data[ key ];
-
-		}
-
-		if ( parentData !== null && Object.getPrototypeOf( data ) !== parentData ) Object.setPrototypeOf( data, parentData );
-
-		if ( subBuild ) data.subBuilds = subBuilds;
 
 		return data;
 
@@ -2436,82 +2427,15 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Adds a code flow based on the code-block hierarchy.
-
-	 * This is used so that code-blocks like If,Else create their variables locally if the Node
-	 * is only used inside one of these conditionals in the current shader stage.
-	 *
-	 * @param {Node} node - The node to add.
-	 * @param {Node} nodeBlock - Node-based code-block. Usually 'ConditionalNode'.
-	 */
-	addFlowCodeHierarchy( node, nodeBlock ) {
-
-		const { flowCodes, flowCodeBlock } = this.getDataFromNode( node );
-
-		let needsFlowCode = true;
-		let nodeBlockHierarchy = nodeBlock;
-
-		while ( nodeBlockHierarchy ) {
-
-			if ( flowCodeBlock.get( nodeBlockHierarchy ) === true ) {
-
-				needsFlowCode = false;
-				break;
-
-			}
-
-			nodeBlockHierarchy = this.getDataFromNode( nodeBlockHierarchy ).parentNodeBlock;
-
-		}
-
-		if ( needsFlowCode ) {
-
-			for ( const flowCode of flowCodes ) {
-
-				this.addLineFlowCode( flowCode );
-
-			}
-
-			flowCodeBlock.set( nodeBlock, true );
-
-		}
-
-	}
-
-	/**
-	 * Add a inline-code to the current flow code-block.
-	 *
-	 * @param {Node} node - The node to add.
-	 * @param {string} code - The code to add.
-	 * @param {Node} nodeBlock - Current ConditionalNode
-	 */
-	addLineFlowCodeBlock( node, code, nodeBlock ) {
-
-		const nodeData = this.getDataFromNode( node );
-		const flowCodes = nodeData.flowCodes || ( nodeData.flowCodes = [] );
-		const codeBlock = nodeData.flowCodeBlock || ( nodeData.flowCodeBlock = new WeakMap() );
-
-		flowCodes.push( code );
-		codeBlock.set( nodeBlock, true );
-
-	}
-
-	/**
 	 * Add a inline-code to the current flow.
 	 *
 	 * @param {string} code - The code to add.
-	 * @param {?Node} [node= null] - Optional Node, can help the system understand if the Node is part of a code-block.
+	 * @param {?Node} [node= null] - The node that generated the code.
 	 * @return {NodeBuilder} A reference to this node builder.
 	 */
-	addLineFlowCode( code, node = null ) {
+	addLineFlowCode( code /*, node = null */ ) {
 
 		if ( code === '' ) return this;
-
-		if ( node !== null && this.context.nodeBlock ) {
-
-			this.addLineFlowCodeBlock( node, code, this.context.nodeBlock );
-
-		}
 
 		code = this.tab + code;
 
@@ -2744,6 +2668,7 @@ class NodeBuilder {
 		const previousCache = this.cache;
 		const previousBuildStage = this.buildStage;
 		const previousStack = this.stack;
+		const previousFlowBlock = this.flowBlock;
 
 		const flow = {
 			code: ''
@@ -2754,6 +2679,7 @@ class NodeBuilder {
 		this.declarations = {};
 		this.cache = new NodeCache();
 		this.stack = stack();
+		this.flowBlock = null;
 
 		for ( const buildStage of defaultBuildStages ) {
 
@@ -2770,6 +2696,7 @@ class NodeBuilder {
 		this.declarations = previousDeclarations;
 		this.cache = previousCache;
 		this.stack = previousStack;
+		this.flowBlock = previousFlowBlock;
 
 		this.setBuildStage( previousBuildStage );
 
@@ -2847,12 +2774,14 @@ class NodeBuilder {
 		const previousCache = this.cache;
 		const previousShaderStage = this.shaderStage;
 		const previousContext = this.context;
+		const previousFlowBlock = this.flowBlock;
 
 		this.setShaderStage( shaderStage );
 
 		const context = { ...this.context };
 		delete context.nodeBlock;
 
+		this.flowBlock = null;
 		this.cache = this.globalCache;
 		this.tab = '\t';
 		this.context = context;
@@ -2884,6 +2813,7 @@ class NodeBuilder {
 		this.cache = previousCache;
 		this.tab = previousTab;
 		this.context = previousContext;
+		this.flowBlock = previousFlowBlock;
 
 		return result;
 

@@ -106,16 +106,7 @@ class ConditionalNode extends Node {
 
 	setup( builder ) {
 
-		const condNode = this.condNode;
-		const ifNode = this.ifNode.isolate();
-		const elseNode = this.elseNode ? this.elseNode.isolate() : null;
-
-		//
-
-		const currentNodeBlock = builder.context.nodeBlock;
-
-		builder.getDataFromNode( ifNode ).parentNodeBlock = currentNodeBlock;
-		if ( elseNode !== null ) builder.getDataFromNode( elseNode ).parentNodeBlock = currentNodeBlock;
+		const { condNode, ifNode, elseNode } = this;
 
 		//
 
@@ -134,9 +125,9 @@ class ConditionalNode extends Node {
 
 		const nodeData = builder.getDataFromNode( this );
 
-		if ( nodeData.nodeProperty !== undefined ) {
+		if ( nodeData.propertyName !== undefined ) {
 
-			return nodeData.nodeProperty;
+			return nodeData.propertyName;
 
 		}
 
@@ -146,7 +137,7 @@ class ConditionalNode extends Node {
 		const needsOutput = output !== 'void';
 		const nodeProperty = needsOutput ? property( type ).build( builder ) : '';
 
-		nodeData.nodeProperty = nodeProperty;
+		nodeData.propertyName = nodeProperty;
 
 		const nodeSnippet = condNode.build( builder, 'bool' );
 		const isUniformFlow = builder.context.uniformFlow;
@@ -166,7 +157,13 @@ class ConditionalNode extends Node {
 
 		builder.addFlowCode( `\n${ builder.tab }if ( ${ nodeSnippet } ) {\n\n` ).addFlowTab();
 
+		const flowBlock = builder.flowBlock;
+
+		builder.flowBlock = { parent: flowBlock };
+
 		let ifSnippet = ifNode.build( builder, type );
+
+		builder.flowBlock = flowBlock;
 
 		if ( ifSnippet ) {
 
@@ -196,7 +193,11 @@ class ConditionalNode extends Node {
 
 			builder.addFlowCode( ' else {\n\n' ).addFlowTab();
 
+			builder.flowBlock = { parent: flowBlock };
+
 			let elseSnippet = elseNode.build( builder, type );
+
+			builder.flowBlock = flowBlock;
 
 			if ( elseSnippet ) {
 

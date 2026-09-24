@@ -126,48 +126,11 @@ class VarNode extends Node {
 	 */
 	isIntent( builder ) {
 
-		if ( this.intent !== true ) return false;
-
 		const data = builder.getDataFromNode( this );
 
-		if ( data.isIntent !== undefined ) return data.isIntent;
+		if ( data.forceDeclaration === true ) return false;
 
-		// The statements of a call are only known once the graph has been set up.
-		if ( builder.buildStage === 'setup' ) return true;
-
-		data.isIntent = this._isInlineable( builder, data );
-
-		return data.isIntent;
-
-	}
-
-	/**
-	 * Whether this intent can be inlined where it is used. A function call whose body
-	 * contains statements must run in its original stack position instead, so that
-	 * it is not repeated in loops and sees the state from where it was called.
-	 *
-	 * @private
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {Object} data - The node data.
-	 * @return {boolean} Whether this intent can be inlined.
-	 */
-	_isInlineable( builder, data ) {
-
-		const node = this.node;
-
-		if ( node.isShaderCallNodeInternal !== true || node.shaderNode.getLayout() !== null ) return true;
-		if ( data.stack === undefined || node.getNodeType( builder ) === 'void' ) return true;
-		if ( node.hasStatements( builder ) !== true ) return true;
-
-		// A call created outside of a stack has no original position,
-		// so it can stay in the conditional block where it is used.
-		if ( data.useBlocks !== undefined ) {
-
-			return data.useBlocks.size === 1 && data.useBlocks.has( null ) === false;
-
-		}
-
-		return false;
+		return this.intent;
 
 	}
 
@@ -226,36 +189,24 @@ class VarNode extends Node {
 
 		}
 
-		if ( builder.buildStage === 'setup' ) {
+		if ( this._hasStack( builder ) === false && builder.buildStage === 'setup' ) {
 
+			// A node created while a block is generated is declared where it is generated.
+			if ( ( builder.context.nodeLoop || builder.context.nodeBlock ) && builder.flowBlock === null ) {
+
+				builder.getBaseStack().addToStack( this );
+
+			}
+
+		} else if ( this.intent === true && builder.context.nodeLoop && builder.buildStage === 'analyze' && this.node.isCacheable( builder ) === false && builder.isDeterministic( this.node ) === false ) {
+
+			// A value that cannot be cached, e.g. a function call, is evaluated once at its declaration
+			// if it is used in a loop that runs after it, otherwise the loop would repeat it.
 			const data = builder.getDataFromNode( this );
-			const { nodeLoop, nodeBlock } = builder.context;
+			const declarationIndex = builder.activeStacks.indexOf( data.stack );
+			const loopIndex = builder.activeStacks.indexOf( builder.getDataFromNode( builder.context.nodeLoop ).stack );
 
-			if ( data.stack === undefined && ( nodeLoop || nodeBlock ) ) {
-
-				const baseStack = builder.getBaseStack();
-
-				if ( this.node.isShaderCallNodeInternal && this.node.shaderNode.getLayout() === null ) {
-
-					// Keep the call before its first use, in case it has to run in the stack.
-					baseStack.addToStackBefore( this );
-
-				} else {
-
-					baseStack.addToStack( this );
-
-				}
-
-				data.stack = baseStack;
-				data.useBlocks = new Set();
-
-			}
-
-			if ( data.useBlocks !== undefined && data.isIntent === undefined ) {
-
-				data.useBlocks.add( nodeLoop ? null : ( nodeBlock || null ) );
-
-			}
+			if ( declarationIndex !== - 1 && loopIndex >= declarationIndex ) data.forceDeclaration = true;
 
 		}
 
@@ -296,15 +247,6 @@ class VarNode extends Node {
 		const vectorType = builder.getVectorType( nodeType );
 		const snippet = node.build( builder, vectorType );
 
-		if ( this.intent === true && this.isAssign( builder ) !== true ) {
-
-			// A function call that returns one of its own variables doesn't need a copy.
-			const variable = this._getCallVariable( builder );
-
-			if ( variable !== null && builder.getVectorType( variable.getNodeType( builder ) ) === vectorType ) return snippet;
-
-		}
-
 		const nodeVar = builder.getVarFromNode( this, name, vectorType, undefined, readOnly, this.intent );
 
 		const propertyName = builder.getPropertyName( nodeVar );
@@ -331,28 +273,11 @@ class VarNode extends Node {
 
 	}
 
-	/**
-	 * Returns the variable returned by the wrapped function call, if it was declared
-	 * in the body of that call. Only the call can write to it, so it can be shared.
-	 *
-	 * @private
-	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {?VarNode} The variable or `null`.
-	 */
-	_getCallVariable( builder ) {
+	_hasStack( builder ) {
 
-		if ( this.node.isShaderCallNodeInternal !== true ) return null;
+		const nodeData = builder.getDataFromNode( this );
 
-		const stack = this.node.getOutputNode( builder );
-		const outputNode = stack.outputNode;
-
-		if ( outputNode && outputNode.isVarNode === true && outputNode.intent !== true && builder.getDataFromNode( outputNode ).stack === stack ) {
-
-			return outputNode;
-
-		}
-
-		return null;
+		return nodeData.stack !== undefined;
 
 	}
 

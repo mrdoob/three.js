@@ -973,6 +973,31 @@ class Node extends EventDispatcher {
 
 		} else if ( buildStage === 'generate' ) {
 
+			// A generated value is only visible in the block where it was declared and in its inner blocks.
+			if ( nodeData.flowBlock !== undefined ) {
+
+				let flowBlock = builder.flowBlock;
+
+				while ( flowBlock !== null && flowBlock !== nodeData.flowBlock ) {
+
+					flowBlock = flowBlock.parent;
+
+				}
+
+				if ( flowBlock === null ) {
+
+					nodeData.flowBlock = undefined;
+					nodeData.propertyName = undefined;
+					nodeData.snippet = undefined;
+					nodeData.generated = undefined;
+
+				}
+
+			}
+
+			const isCached = nodeData.propertyName !== undefined || nodeData.snippet !== undefined;
+			const flowCodeLength = builder.flow.code.length;
+
 			// References must be generated directly, even if a cached value exists.
 			const allowedCache = this.isCacheable( builder ) && builder.isReference( output ) === false;
 			const type = allowedCache ? builder.getVectorType( this.getNodeType( builder, output ) ) : null;
@@ -980,12 +1005,6 @@ class Node extends EventDispatcher {
 			const generateOutput = cacheResult ? type : output;
 
 			if ( allowedCache && nodeData.propertyName !== undefined ) {
-
-				if ( nodeData.flowCodes !== undefined && builder.context.nodeBlock !== undefined ) {
-
-					builder.addFlowCodeHierarchy( this, builder.context.nodeBlock );
-
-				}
 
 				result = builder.format( nodeData.propertyName, type, output );
 
@@ -1022,10 +1041,6 @@ class Node extends EventDispatcher {
 							result = '/* Recursion detected. */';
 
 						}
-
-					} else if ( nodeData.flowCodes !== undefined && builder.context.nodeBlock !== undefined ) {
-
-						builder.addFlowCodeHierarchy( this, builder.context.nodeBlock );
 
 					}
 
@@ -1066,6 +1081,16 @@ class Node extends EventDispatcher {
 					result = builder.format( propertyName, type, output );
 
 				}
+
+			}
+
+			// Keep the block where a value was generated, so it is only reused where it is visible.
+			// A global node is a declaration visible in any block, unless it emitted code in this block.
+			const isLocal = this.isGlobal( builder ) === false || builder.flow.code.length !== flowCodeLength;
+
+			if ( isCached === false && ( nodeData.propertyName !== undefined || nodeData.snippet !== undefined ) && isLocal && builder.flowBlock !== null ) {
+
+				nodeData.flowBlock = builder.flowBlock;
 
 			}
 
