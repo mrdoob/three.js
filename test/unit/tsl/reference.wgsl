@@ -713,8 +713,7 @@ if ( bool( nodeVar0 ) ) {
 
 	}
 
-	var nodeVar2 : f32 = ( nodeVar1 + 2.0 );
-	nodeVar0 = nodeVar2;
+	nodeVar0 = ( nodeVar1 + 2.0 );
 
 } else {
 
@@ -727,10 +726,10 @@ vec3<f32>( nodeVar0 )
 // function without stack shared conditional use
 
 var nodeVar0 : f32 = 0.0;
+var nodeVar1 : f32 = 2.0;
 
 for ( var i : i32 = 0; i < 1; i ++ ) {
 
-	var nodeVar1 : f32 = 2.0;
 	nodeVar1 = ( nodeVar1 + 1.0 );
 
 }
@@ -821,6 +820,89 @@ for ( var i : i32 = 0; i < 4; i ++ ) {
 }
 
 nodeVar4
+
+// function assign outside loop
+
+var counter : f32;
+var total : f32;
+
+counter = 0.0;
+counter = ( counter + 1.0 );
+var nodeVar0 : f32 = ( counter * 2.0 );
+total = 0.0;
+
+for ( var i : i32 = 0; i < 4; i ++ ) {
+
+	total = ( total + nodeVar0 );
+
+}
+
+vec2<f32>( counter, total )
+
+// function conditional outside loop
+
+var counter : f32;
+var result : f32;
+var total : f32;
+
+counter = 0.0;
+result = 1.0;
+
+if ( ( nodeVarying0.x > 0.5 ) ) {
+
+	counter = ( counter + 1.0 );
+	result = 2.0;
+
+}
+
+total = 0.0;
+
+for ( var i : i32 = 0; i < 4; i ++ ) {
+
+	total = ( total + result );
+
+}
+
+vec2<f32>( counter, total )
+
+// function read before assign
+
+var x : f32;
+var doubled : f32;
+
+x = 1.0;
+doubled = ( x * 2.0 );
+x = 100.0;
+
+doubled
+
+// function expression in conditional
+
+var result : f32;
+
+result = 0.0;
+
+if ( ( nodeVarying0.y > 0.5 ) ) {
+
+	result = ( nodeVarying0.x * 2.0 );
+
+}
+
+result
+
+// function returns variable
+
+var result : f32;
+
+result = nodeVarying0.x;
+
+if ( ( result > 0.5 ) ) {
+
+	result = 0.5;
+
+}
+
+( result + result )
 
 // function
 

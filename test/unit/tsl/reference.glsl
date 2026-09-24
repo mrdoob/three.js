@@ -657,8 +657,7 @@ if ( bool( nodeVar0 ) ) {
 
 	}
 
-	float nodeVar2 = ( nodeVar1 + 2.0 );
-	nodeVar0 = nodeVar2;
+	nodeVar0 = ( nodeVar1 + 2.0 );
 
 } else {
 
@@ -671,10 +670,10 @@ vec3( nodeVar0 )
 // function without stack shared conditional use
 
 float nodeVar0 = 0.0;
+float nodeVar1 = 2.0;
 
 for ( int i = 0; i < 1; i ++ ) {
 
-	float nodeVar1 = 2.0;
 	nodeVar1 = ( nodeVar1 + 1.0 );
 
 }
@@ -765,6 +764,84 @@ for ( int i = 0; i < 4; i ++ ) {
 }
 
 nodeVar4
+
+// function assign outside loop
+
+float counter;
+float total;
+counter = 0.0;
+counter = ( counter + 1.0 );
+float nodeVar0 = ( counter * 2.0 );
+total = 0.0;
+
+for ( int i = 0; i < 4; i ++ ) {
+
+	total = ( total + nodeVar0 );
+
+}
+
+vec2( counter, total )
+
+// function conditional outside loop
+
+float counter;
+float result;
+float total;
+counter = 0.0;
+result = 1.0;
+
+if ( ( nodeVarying0.x > 0.5 ) ) {
+
+	counter = ( counter + 1.0 );
+	result = 2.0;
+
+}
+
+total = 0.0;
+
+for ( int i = 0; i < 4; i ++ ) {
+
+	total = ( total + result );
+
+}
+
+vec2( counter, total )
+
+// function read before assign
+
+float x;
+float doubled;
+x = 1.0;
+doubled = ( x * 2.0 );
+x = 100.0;
+
+doubled
+
+// function expression in conditional
+
+float result;
+result = 0.0;
+
+if ( ( nodeVarying0.y > 0.5 ) ) {
+
+	result = ( nodeVarying0.x * 2.0 );
+
+}
+
+result
+
+// function returns variable
+
+float result;
+result = nodeVarying0.x;
+
+if ( ( result > 0.5 ) ) {
+
+	result = 0.5;
+
+}
+
+( result + result )
 
 // function
 

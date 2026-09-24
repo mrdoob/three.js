@@ -809,6 +809,112 @@ export const cases = {
 
 	} )(),
 
+	functionAssignOutsideLoop: () => Fn( () => {
+
+		const counter = float( 0 ).toVar( 'counter' );
+		const increment = Fn( () => {
+
+			counter.addAssign( 1 );
+
+			return counter.mul( 2 );
+
+		} );
+
+		const value = increment();
+		const total = float( 0 ).toVar( 'total' );
+
+		Loop( 4, () => {
+
+			total.addAssign( value );
+
+		} );
+
+		return vec2( counter, total );
+
+	} )(),
+
+	functionConditionalOutsideLoop: () => Fn( () => {
+
+		const counter = float( 0 ).toVar( 'counter' );
+		const pick = Fn( () => {
+
+			const result = float( 1 ).toVar( 'result' );
+
+			If( uv().x.greaterThan( 0.5 ), () => {
+
+				counter.addAssign( 1 );
+				result.assign( 2 );
+
+			} );
+
+			return result;
+
+		} );
+
+		const value = pick();
+		const total = float( 0 ).toVar( 'total' );
+
+		Loop( 4, () => {
+
+			total.addAssign( value );
+
+		} );
+
+		return vec2( counter, total );
+
+	} )(),
+
+	functionReadBeforeAssign: () => Fn( () => {
+
+		const x = float( 1 ).toVar( 'x' );
+		const double = Fn( () => x.mul( 2 ).toVar( 'doubled' ) );
+
+		const value = double();
+		x.assign( 100 );
+
+		return value;
+
+	} )(),
+
+	functionExpressionInConditional: () => Fn( () => {
+
+		const double = Fn( () => uv().x.mul( 2 ) );
+
+		const value = double();
+		const result = float( 0 ).toVar( 'result' );
+
+		If( uv().y.greaterThan( 0.5 ), () => {
+
+			result.assign( value );
+
+		} );
+
+		return result;
+
+	} )(),
+
+	functionReturnsVariable: () => Fn( () => {
+
+		const clamped = Fn( () => {
+
+			const result = uv().x.toVar( 'result' );
+
+			If( result.greaterThan( 0.5 ), () => {
+
+				result.assign( 0.5 );
+
+			} );
+
+			return result;
+
+		} );
+
+		const value = clamped();
+
+		return value.add( value );
+
+	} )(),
+
 	function: () => {
 
 		const square = Fn( ( { value } ) => value.mul( value ), { value: 'float', return: 'float' } );
