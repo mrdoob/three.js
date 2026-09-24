@@ -1,4 +1,4 @@
-import { Break, Continue, Fn, If, Loop, Switch, array, bool, float, int, inverse, ivec3, mat3, mat4, mix, mul, select, time, uint, uv, vec2, vec3, vec4 } from '../../../src/Three.TSL.js';
+import { Break, Continue, Fn, If, Loop, Switch, array, bool, float, int, inverse, ivec3, mat3, mat4, mix, mul, select, time, uint, uniform, uv, vec2, vec3, vec4 } from '../../../src/Three.TSL.js';
 
 // Create a fresh graph for every test and backend.
 export const cases = {
@@ -430,6 +430,108 @@ export const cases = {
 		} );
 
 		return sum;
+
+	} )(),
+
+	cachedFlipAfterLoop: () => Fn( () => {
+
+		const flipped = uv().flipX();
+		const accumulate = Fn( () => {
+
+			const sum = vec2( 0 );
+			Loop( 2, () => {
+
+				sum.addAssign( flipped );
+
+			} );
+			return sum;
+
+		} );
+		const value = accumulate();
+
+		return vec4( flipped, value );
+
+	} )(),
+
+	cachedExpressionAfterLoop: () => Fn( () => {
+
+		const value = uv().x.add( 1 );
+		const sum = float( 0 );
+
+		Loop( 2, () => {
+
+			sum.addAssign( value.mul( value ) );
+
+		} );
+
+		return vec2( value, sum );
+
+	} )(),
+
+	cachedExpressionBeforeLoop: () => Fn( () => {
+
+		const value = uv().x.add( 1 );
+		const sum = value.mul( value );
+
+		Loop( 2, () => {
+
+			sum.addAssign( value );
+
+		} );
+
+		return sum;
+
+	} )(),
+
+	cachedExpressionInSiblingLoops: () => Fn( () => {
+
+		const value = uv().x.add( 1 );
+		const squared = value.mul( value );
+		const first = float( 0 );
+		const second = float( 0 );
+
+		Loop( 2, () => {
+
+			first.addAssign( squared );
+
+		} );
+		Loop( 3, () => {
+
+			second.addAssign( squared );
+
+		} );
+
+		return vec2( first, second );
+
+	} )(),
+
+	cachedBooleanUniformAfterLoop: () => Fn( () => {
+
+		const enabled = uniform( true );
+		const sum = float( 0 );
+
+		Loop( 0, () => {
+
+			sum.addAssign( float( enabled ) );
+
+		} );
+
+		return vec2( float( enabled ), sum );
+
+	} )(),
+
+	cachedConditionalAfterLoop: () => Fn( () => {
+
+		const value = select( uv().x.lessThan( 0.5 ), float( 1 ), float( 2 ) );
+		const sum = float( 0 );
+
+		Loop( 0, () => {
+
+			sum.addAssign( value );
+
+		} );
+
+		return vec2( value, sum );
 
 	} )(),
 

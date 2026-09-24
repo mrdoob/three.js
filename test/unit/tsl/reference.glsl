@@ -435,6 +435,124 @@ for ( int i = 0; i < 4; i ++ ) {
 
 nodeVar0
 
+// cached flip after loop
+
+vec2 nodeVar1;
+vec2 nodeVar3;
+vec2 nodeVar0 = vec2( 0.0, 0.0 );
+
+for ( int i = 0; i < 2; i ++ ) {
+
+	nodeVar1 = nodeVarying0;
+	vec2 nodeConst0 = vec2( 1.0 - nodeVar1.x, nodeVar1.y );
+	nodeVar0 = ( nodeVar0 + nodeConst0 );
+
+}
+
+vec2 nodeVar2 = nodeVar0;
+nodeVar3 = nodeVarying0;
+vec2 nodeConst1 = vec2( 1.0 - nodeVar3.x, nodeVar3.y );
+
+vec4( nodeConst1, nodeVar2 )
+
+// cached expression after loop
+
+float nodeVar0 = 0.0;
+
+for ( int i = 0; i < 2; i ++ ) {
+
+	float nodeConst0 = ( nodeVarying0.x + 1.0 );
+	nodeVar0 = ( nodeVar0 + ( nodeConst0 * nodeConst0 ) );
+
+}
+
+vec2( ( nodeVarying0.x + 1.0 ), nodeVar0 )
+
+// cached expression before loop
+
+float nodeConst0 = ( nodeVarying0.x + 1.0 );
+float nodeVar0 = ( nodeConst0 * nodeConst0 );
+
+for ( int i = 0; i < 2; i ++ ) {
+
+	nodeVar0 = ( nodeVar0 + nodeConst0 );
+
+}
+
+nodeVar0
+
+// cached expression in sibling loops
+
+float nodeVar0 = 0.0;
+float nodeVar1 = 0.0;
+
+for ( int i = 0; i < 2; i ++ ) {
+
+	float nodeConst0 = ( nodeVarying0.x + 1.0 );
+	nodeVar0 = ( nodeVar0 + ( nodeConst0 * nodeConst0 ) );
+
+}
+
+for ( int i = 0; i < 3; i ++ ) {
+
+	float nodeConst1 = ( nodeVarying0.x + 1.0 );
+	nodeVar1 = ( nodeVar1 + ( nodeConst1 * nodeConst1 ) );
+
+}
+
+vec2( nodeVar0, nodeVar1 )
+
+// cached boolean uniform after loop
+
+bool nodeVar1;
+bool nodeVar2;
+float nodeVar0 = 0.0;
+
+for ( int i = 0; i < 0; i ++ ) {
+
+	nodeVar1 = bool( nodeUniform0 );
+	nodeVar0 = ( nodeVar0 + float( nodeVar1 ) );
+
+}
+
+nodeVar2 = bool( nodeUniform0 );
+
+vec2( float( nodeVar2 ), nodeVar0 )
+
+// cached conditional after loop
+
+float nodeVar1;
+float nodeVar2;
+float nodeVar0 = 0.0;
+
+for ( int i = 0; i < 0; i ++ ) {
+
+	if ( ( nodeVarying0.x < 0.5 ) ) {
+
+		nodeVar1 = 1.0;
+
+	} else {
+
+		nodeVar1 = 2.0;
+
+	}
+
+	nodeVar0 = ( nodeVar0 + nodeVar1 );
+
+}
+
+if ( ( nodeVarying0.x < 0.5 ) ) {
+
+	nodeVar2 = 1.0;
+
+} else {
+
+	nodeVar2 = 2.0;
+
+}
+
+vec2( nodeVar2, nodeVar0 )
+
 // function outside loop
 
 float nodeVar0 = 0.0;

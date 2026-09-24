@@ -488,6 +488,127 @@ for ( var i : i32 = 0; i < 4; i ++ ) {
 
 nodeVar0
 
+// cached flip after loop
+
+var nodeVar1 : vec2<f32>;
+var nodeVar3 : vec2<f32>;
+
+var nodeVar0 : vec2<f32> = vec2<f32>( 0.0, 0.0 );
+
+for ( var i : i32 = 0; i < 2; i ++ ) {
+
+	nodeVar1 = nodeVarying0;
+	let nodeConst0 = vec2<f32>( 1.0 - nodeVar1.x, nodeVar1.y );
+	nodeVar0 = ( nodeVar0 + nodeConst0 );
+
+}
+
+var nodeVar2 : vec2<f32> = nodeVar0;
+nodeVar3 = nodeVarying0;
+let nodeConst1 = vec2<f32>( 1.0 - nodeVar3.x, nodeVar3.y );
+
+vec4<f32>( nodeConst1, nodeVar2 )
+
+// cached expression after loop
+
+var nodeVar0 : f32 = 0.0;
+
+for ( var i : i32 = 0; i < 2; i ++ ) {
+
+	let nodeConst0 = ( nodeVarying0.x + 1.0 );
+	nodeVar0 = ( nodeVar0 + ( nodeConst0 * nodeConst0 ) );
+
+}
+
+vec2<f32>( ( nodeVarying0.x + 1.0 ), nodeVar0 )
+
+// cached expression before loop
+
+let nodeConst0 = ( nodeVarying0.x + 1.0 );
+var nodeVar0 : f32 = ( nodeConst0 * nodeConst0 );
+
+for ( var i : i32 = 0; i < 2; i ++ ) {
+
+	nodeVar0 = ( nodeVar0 + nodeConst0 );
+
+}
+
+nodeVar0
+
+// cached expression in sibling loops
+
+var nodeVar0 : f32 = 0.0;
+var nodeVar1 : f32 = 0.0;
+
+for ( var i : i32 = 0; i < 2; i ++ ) {
+
+	let nodeConst0 = ( nodeVarying0.x + 1.0 );
+	nodeVar0 = ( nodeVar0 + ( nodeConst0 * nodeConst0 ) );
+
+}
+
+for ( var i : i32 = 0; i < 3; i ++ ) {
+
+	let nodeConst1 = ( nodeVarying0.x + 1.0 );
+	nodeVar1 = ( nodeVar1 + ( nodeConst1 * nodeConst1 ) );
+
+}
+
+vec2<f32>( nodeVar0, nodeVar1 )
+
+// cached boolean uniform after loop
+
+var nodeVar1 : bool;
+var nodeVar2 : bool;
+
+var nodeVar0 : f32 = 0.0;
+
+for ( var i : i32 = 0; i < 0; i ++ ) {
+
+	nodeVar1 = bool( object.nodeUniform0 );
+	nodeVar0 = ( nodeVar0 + f32( nodeVar1 ) );
+
+}
+
+nodeVar2 = bool( object.nodeUniform0 );
+
+vec2<f32>( f32( nodeVar2 ), nodeVar0 )
+
+// cached conditional after loop
+
+var nodeVar1 : f32;
+var nodeVar2 : f32;
+
+var nodeVar0 : f32 = 0.0;
+
+for ( var i : i32 = 0; i < 0; i ++ ) {
+
+	if ( ( nodeVarying0.x < 0.5 ) ) {
+
+		nodeVar1 = 1.0;
+
+	} else {
+
+		nodeVar1 = 2.0;
+
+	}
+
+	nodeVar0 = ( nodeVar0 + nodeVar1 );
+
+}
+
+if ( ( nodeVarying0.x < 0.5 ) ) {
+
+	nodeVar2 = 1.0;
+
+} else {
+
+	nodeVar2 = 2.0;
+
+}
+
+vec2<f32>( nodeVar2, nodeVar0 )
+
 // function outside loop
 
 var nodeVar0 : f32 = 0.0;
