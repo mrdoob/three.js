@@ -1,4 +1,4 @@
-import { BufferAttribute, BufferGeometry } from 'three';
+import { BufferAttribute, BufferGeometry, InterleavedBuffer, InterleavedBufferAttribute } from 'three';
 import * as BufferGeometryUtils from '../../../../examples/jsm/utils/BufferGeometryUtils.js';
 import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
 
@@ -168,6 +168,37 @@ export default QUnit.module( 'Addons', () => {
 
 					assert.strictEqual( indexedGeometry.getAttribute( 'position' ).count, 2, 'keeps distinct positions' );
 					assert.deepEqual( Array.from( indexedGeometry.index.array ), [ 0, 1, 0 ], 'merges only identical positions' );
+
+				} );
+
+				QUnit.test( 'can handle interleaved attributes', ( assert ) => {
+
+					const geometry = new BufferGeometry();
+
+					// position ( xyz ) and normal ( xyz ) interleaved, the first and third vertex are identical
+					const interleavedBuffer = new InterleavedBuffer( new Float32Array( [
+						0, 0, 0, 0, 0, 1,
+						1, 0, 0, 0, 0, 1,
+						0, 0, 0, 0, 0, 1
+					] ), 6 );
+
+					geometry.setAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0 ) );
+					geometry.setAttribute( 'normal', new InterleavedBufferAttribute( interleavedBuffer, 3, 3 ) );
+
+					const morphBuffer = new InterleavedBuffer( new Float32Array( [
+						0, 1, 0, 9,
+						1, 1, 0, 9,
+						0, 1, 0, 9
+					] ), 4 );
+
+					geometry.morphAttributes.position = [ new InterleavedBufferAttribute( morphBuffer, 3, 0 ) ];
+
+					const indexedGeometry = BufferGeometryUtils.mergeVertices( geometry );
+
+					assert.deepEqual( Array.from( indexedGeometry.index.array ), [ 0, 1, 0 ], 'merges identical vertices' );
+					assert.deepEqual( Array.from( indexedGeometry.getAttribute( 'position' ).array ), [ 0, 0, 0, 1, 0, 0 ], 'has merged positions' );
+					assert.deepEqual( Array.from( indexedGeometry.getAttribute( 'normal' ).array ), [ 0, 0, 1, 0, 0, 1 ], 'has merged normals' );
+					assert.deepEqual( Array.from( indexedGeometry.morphAttributes.position[ 0 ].array ), [ 0, 1, 0, 1, 1, 0 ], 'has merged morph positions' );
 
 				} );
 

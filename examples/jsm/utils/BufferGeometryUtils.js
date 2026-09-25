@@ -688,7 +688,10 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 		const name = attributeNames[ i ];
 		const attr = geometry.attributes[ name ];
 
-		tmpAttributes[ name ] = new attr.constructor(
+		// interleaved attributes are converted to non-interleaved ones
+		const AttributeClass = attr.isInterleavedBufferAttribute ? BufferAttribute : attr.constructor;
+
+		tmpAttributes[ name ] = new AttributeClass(
 			new attr.array.constructor( attr.count * attr.itemSize ),
 			attr.itemSize,
 			attr.normalized
@@ -700,8 +703,9 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 			if ( ! tmpMorphAttributes[ name ] ) tmpMorphAttributes[ name ] = [];
 			morphAttributes.forEach( ( morphAttr, i ) => {
 
+				const MorphAttributeClass = morphAttr.isInterleavedBufferAttribute ? BufferAttribute : morphAttr.constructor;
 				const array = new morphAttr.array.constructor( morphAttr.count * morphAttr.itemSize );
-				tmpMorphAttributes[ name ][ i ] = new morphAttr.constructor( array, morphAttr.itemSize, morphAttr.normalized );
+				tmpMorphAttributes[ name ][ i ] = new MorphAttributeClass( array, morphAttr.itemSize, morphAttr.normalized );
 
 			} );
 
