@@ -677,6 +677,8 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 	const attributeNames = Object.keys( geometry.attributes );
 	const tmpAttributes = {};
 	const tmpMorphAttributes = {};
+	const tmpBuffers = new Map();
+	const resultBuffers = new Map();
 	const newIndices = [];
 	const getters = [ 'getX', 'getY', 'getZ', 'getW' ];
 	const setters = [ 'setX', 'setY', 'setZ', 'setW' ];
@@ -688,11 +690,7 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 		const name = attributeNames[ i ];
 		const attr = geometry.attributes[ name ];
 
-		tmpAttributes[ name ] = new attr.constructor(
-			new attr.array.constructor( attr.count * attr.itemSize ),
-			attr.itemSize,
-			attr.normalized
-		);
+		tmpAttributes[ name ] = createAttribute( attr, attr.count, tmpBuffers );
 
 		const morphAttributes = geometry.morphAttributes[ name ];
 		if ( morphAttributes ) {
@@ -700,8 +698,7 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 			if ( ! tmpMorphAttributes[ name ] ) tmpMorphAttributes[ name ] = [];
 			morphAttributes.forEach( ( morphAttr, i ) => {
 
-				const array = new morphAttr.array.constructor( morphAttr.count * morphAttr.itemSize );
-				tmpMorphAttributes[ name ][ i ] = new morphAttr.constructor( array, morphAttr.itemSize, morphAttr.normalized );
+				tmpMorphAttributes[ name ][ i ] = createAttribute( morphAttr, morphAttr.count, tmpBuffers );
 
 			} );
 
@@ -787,11 +784,7 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 		const tmpAttribute = tmpAttributes[ name ];
 
-		result.setAttribute( name, new tmpAttribute.constructor(
-			tmpAttribute.array.slice( 0, nextIndex * tmpAttribute.itemSize ),
-			tmpAttribute.itemSize,
-			tmpAttribute.normalized,
-		) );
+		result.setAttribute( name, createAttribute( tmpAttribute, nextIndex, resultBuffers ) );
 
 		if ( ! ( name in tmpMorphAttributes ) ) continue;
 
@@ -799,11 +792,7 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 			const tmpMorphAttribute = tmpMorphAttributes[ name ][ j ];
 
-			result.morphAttributes[ name ][ j ] = new tmpMorphAttribute.constructor(
-				tmpMorphAttribute.array.slice( 0, nextIndex * tmpMorphAttribute.itemSize ),
-				tmpMorphAttribute.itemSize,
-				tmpMorphAttribute.normalized,
-			);
+			result.morphAttributes[ name ][ j ] = createAttribute( tmpMorphAttribute, nextIndex, resultBuffers );
 
 		}
 
@@ -1500,6 +1489,28 @@ function toCreasedNormals( geometry, creaseAngle = Math.PI / 3 /* 60 degrees */ 
 
 	resultGeometry.setAttribute( 'normal', new BufferAttribute( normalArray, 3, false ) );
 	return resultGeometry;
+
+}
+
+function createAttribute( attribute, count, buffers ) {
+
+	if ( attribute.isInterleavedBufferAttribute ) {
+
+		let data = buffers.get( attribute.data );
+
+		if ( data === undefined ) {
+
+			const stride = attribute.data.stride;
+			data = new InterleavedBuffer( attribute.array.slice( 0, count * stride ), stride );
+			buffers.set( attribute.data, data );
+
+		}
+
+		return new InterleavedBufferAttribute( data, attribute.itemSize, attribute.offset, attribute.normalized );
+
+	}
+
+	return new attribute.constructor( attribute.array.slice( 0, count * attribute.itemSize ), attribute.itemSize, attribute.normalized );
 
 }
 
