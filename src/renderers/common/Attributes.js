@@ -49,7 +49,7 @@ class Attributes extends DataMap {
 
 		if ( attributeData !== null ) {
 
-			if ( attribute.isBufferAttribute === true ) {
+			if ( attribute.isStorageBufferAttribute === true ) {
 
 				attribute.removeEventListener( 'dispose', attributeData.onDispose );
 
@@ -102,9 +102,9 @@ class Attributes extends DataMap {
 
 			data.version = this._getBufferAttribute( attribute ).version;
 
-			// interleaved buffer attributes are not event dispatchers
+			// only storage buffer attributes support disposal
 
-			if ( attribute.isBufferAttribute === true ) {
+			if ( attribute.isStorageBufferAttribute === true ) {
 
 				data.onDispose = () => {
 
