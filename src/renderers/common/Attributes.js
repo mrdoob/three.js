@@ -40,7 +40,7 @@ class Attributes extends DataMap {
 		 * `dispose` event listeners.
 		 *
 		 * @private
-		 * @type {Set<WeakRef<StorageBufferAttribute>>}
+		 * @type {Set<WeakRef<StorageBufferAttribute|StorageInstancedBufferAttribute>>}
 		 */
 		this._tracked = new Set();
 
@@ -67,7 +67,7 @@ class Attributes extends DataMap {
 
 		if ( attributeData !== null ) {
 
-			if ( attribute.isStorageBufferAttribute === true ) {
+			if ( attribute.isStorageBufferAttribute === true || attribute.isStorageInstancedBufferAttribute === true ) {
 
 				attribute.removeEventListener( 'dispose', attributeData.onDispose );
 
@@ -125,7 +125,7 @@ class Attributes extends DataMap {
 
 			// only storage buffer attributes support disposal
 
-			if ( attribute.isStorageBufferAttribute === true ) {
+			if ( attribute.isStorageBufferAttribute === true || attribute.isStorageInstancedBufferAttribute === true ) {
 
 				data.onDispose = () => {
 
