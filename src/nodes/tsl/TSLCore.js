@@ -459,9 +459,10 @@ class ShaderCallNodeInternal extends Node {
 
 	}
 
-	isCacheable( /*builder*/ ) {
+	isCacheable( builder ) {
 
-		return false;
+		// A call is an expression unless its body has statements.
+		return this.getOutputNode( builder ).nodes.length === 0;
 
 	}
 

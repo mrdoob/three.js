@@ -1,4 +1,4 @@
-import { Break, Continue, Fn, If, Loop, Switch, array, bool, float, int, inverse, ivec3, mat3, mat4, mix, mul, select, time, uint, uv, vec2, vec3, vec4 } from '../../../src/Three.TSL.js';
+import { Break, Continue, Fn, If, Loop, Switch, array, bool, float, int, inverse, ivec3, mat3, mat4, mix, mul, select, time, uint, uniform, uv, vec2, vec3, vec4 } from '../../../src/Three.TSL.js';
 
 // Create a fresh graph for every test and backend.
 export const cases = {
@@ -10,11 +10,11 @@ export const cases = {
 	swizzle: () => vec3( 1, 2, 3 ).zyx.mul( 0.5 ),
 
 	// Operand order matters: scalar operators infer their type from the left operand.
-	autoConvertIntToFloat: () => Fn( () => float( 0.5 ).add( int( 2 ).toVar() ) )(),
+	autoConvertIntToFloat: () => Fn( () => float( 0.5 ).add( int( 2 ) ) )(),
 
-	autoConvertFloatToInt: () => Fn( () => int( 2 ).add( float( 0.5 ).toVar() ) )(),
+	autoConvertFloatToInt: () => Fn( () => int( 2 ).add( float( 0.5 ) ) )(),
 
-	autoConvertUintToFloat: () => Fn( () => float( 0.5 ).mul( uint( 3 ).toVar() ) )(),
+	autoConvertUintToFloat: () => Fn( () => float( 0.5 ).mul( uint( 3 ) ) )(),
 
 	autoConvertScalarToVector: () => vec3( 1, 2, 3 ).add( 0.5 ),
 
@@ -351,7 +351,7 @@ export const cases = {
 
 	functionResultConversion: () => Fn( () => {
 
-		const integerResult = Fn( () => int( 3 ).toVar() );
+		const integerResult = Fn( () => int( 3 ) );
 
 		return float( 0.5 ).add( integerResult() );
 
@@ -433,6 +433,108 @@ export const cases = {
 
 	} )(),
 
+	cachedFlipAfterLoop: () => Fn( () => {
+
+		const flipped = uv().flipX();
+		const accumulate = Fn( () => {
+
+			const sum = vec2( 0 );
+			Loop( 2, () => {
+
+				sum.addAssign( flipped );
+
+			} );
+			return sum;
+
+		} );
+		const value = accumulate();
+
+		return vec4( flipped, value );
+
+	} )(),
+
+	cachedExpressionAfterLoop: () => Fn( () => {
+
+		const value = uv().x.add( 1 );
+		const sum = float( 0 );
+
+		Loop( 2, () => {
+
+			sum.addAssign( value.mul( value ) );
+
+		} );
+
+		return vec2( value, sum );
+
+	} )(),
+
+	cachedExpressionBeforeLoop: () => Fn( () => {
+
+		const value = uv().x.add( 1 );
+		const sum = value.mul( value );
+
+		Loop( 2, () => {
+
+			sum.addAssign( value );
+
+		} );
+
+		return sum;
+
+	} )(),
+
+	cachedExpressionInSiblingLoops: () => Fn( () => {
+
+		const value = uv().x.add( 1 );
+		const squared = value.mul( value );
+		const first = float( 0 );
+		const second = float( 0 );
+
+		Loop( 2, () => {
+
+			first.addAssign( squared );
+
+		} );
+		Loop( 3, () => {
+
+			second.addAssign( squared );
+
+		} );
+
+		return vec2( first, second );
+
+	} )(),
+
+	cachedBooleanUniformAfterLoop: () => Fn( () => {
+
+		const enabled = uniform( true );
+		const sum = float( 0 );
+
+		Loop( 0, () => {
+
+			sum.addAssign( float( enabled ) );
+
+		} );
+
+		return vec2( float( enabled ), sum );
+
+	} )(),
+
+	cachedConditionalAfterLoop: () => Fn( () => {
+
+		const value = select( uv().x.lessThan( 0.5 ), float( 1 ), float( 2 ) );
+		const sum = float( 0 );
+
+		Loop( 0, () => {
+
+			sum.addAssign( value );
+
+		} );
+
+		return vec2( value, sum );
+
+	} )(),
+
 	functionOutsideLoop: () => Fn( () => {
 
 		const sumValues = Fn( () => {
@@ -460,6 +562,416 @@ export const cases = {
 		} );
 
 		return total;
+
+	} )(),
+
+	functionOutsideSequentialLoops: () => Fn( () => {
+
+		const accumulate = Fn( () => {
+
+			const value = vec3( 0 );
+
+			Loop( 10000, () => {
+
+				value.addAssign( 0.0001 );
+
+			} );
+
+			return value;
+
+		} );
+
+		const sharedValue = accumulate();
+		const total = vec3( 0 );
+
+		Loop( 10, () => {
+
+			total.addAssign( sharedValue );
+
+		} );
+
+		Loop( 10, () => {
+
+			total.addAssign( sharedValue );
+
+		} );
+
+		return total;
+
+	} )(),
+
+	functionWithLoopInsideLoop: () => Fn( () => {
+
+		const sumValues = Fn( ( [ value ] ) => {
+
+			const sum = float( 0 );
+
+			Loop( { end: 3, name: 'j' }, () => {
+
+				sum.addAssign( value );
+
+			} );
+
+			return sum;
+
+		} );
+
+		const total = float( 0 );
+
+		Loop( 4, ( { i } ) => {
+
+			total.addAssign( sumValues( i ) );
+
+		} );
+
+		return total;
+
+	} )(),
+
+	functionOutsideConditional: () => Fn( () => {
+
+		const sumValues = Fn( () => {
+
+			const sum = float( 0 );
+
+			Loop( 3, ( { i } ) => {
+
+				sum.addAssign( i );
+
+			} );
+
+			return sum;
+
+		} );
+
+		const value = sumValues();
+		const total = float( 0 );
+
+		If( uv().x.greaterThan( 0.5 ), () => {
+
+			total.assign( value );
+
+		} );
+
+		return total;
+
+	} )(),
+
+	functionWithoutStackSingleConditionalUse: () => {
+
+		const value = Fn( () => {
+
+			const n = float( 2 );
+
+			Loop( 1, () => {
+
+				n.addAssign( 1 );
+
+			} );
+
+			return n.add( 2 );
+
+		} )();
+
+		return Fn( () => {
+
+			const result = float( 0 );
+
+			If( result, () => {
+
+				result.assign( value );
+
+			} ).Else( () => {
+
+				result.assign( 1 );
+
+			} );
+
+			return vec3( result );
+
+		} )();
+
+	},
+
+	functionWithoutStackSharedConditionalUse: () => {
+
+		const value = Fn( () => {
+
+			const n = float( 2 );
+
+			Loop( 1, () => {
+
+				n.addAssign( 1 );
+
+			} );
+
+			return n.add( 2 );
+
+		} )();
+
+		return Fn( () => {
+
+			const result = float( 0 );
+
+			If( result, () => {
+
+				result.assign( value );
+
+			} ).Else( () => {
+
+				result.assign( value );
+
+			} );
+
+			return vec3( result );
+
+		} )();
+
+	},
+
+	functionWithLoopWithoutStack: () => {
+
+		const value = Fn( () => {
+
+			const sum = float( 0 );
+			Loop( 3, ( { i } ) => {
+
+				sum.addAssign( i );
+
+			} );
+			return sum;
+
+		} )();
+
+		return Fn( () => {
+
+			const total = float( 0 );
+			Loop( 4, () => {
+
+				total.addAssign( value );
+
+			} );
+			return total;
+
+		} )();
+
+	},
+
+	wrappedFunctionOutsideLoop: () => Fn( () => {
+
+		const sumValues = Fn( () => {
+
+			const sum = float( 0 );
+			Loop( 3, ( { i } ) => {
+
+				sum.addAssign( i );
+
+			} );
+			return sum;
+
+		} );
+		const wrapped = Fn( () => sumValues() );
+		const value = wrapped();
+		const total = float( 0 );
+
+		Loop( 4, () => {
+
+			total.addAssign( value );
+
+		} );
+		return total;
+
+	} )(),
+
+	functionLoopDefaultParameter: () => Fn( () => {
+
+		const sumValues = Fn( ( [ count = float( 5 ) ] ) => {
+
+			const sum = float( 0 );
+			Loop( count, ( { i } ) => {
+
+				sum.addAssign( i );
+
+			} );
+			return sum;
+
+		} );
+		const explicitCount = sumValues( int( 3 ) );
+		const defaultCount = sumValues();
+		const total = float( 0 );
+
+		Loop( 4, () => {
+
+			total.addAssign( explicitCount.add( defaultCount ) );
+
+		} );
+		return total;
+
+	} )(),
+
+	cachedValueAfterFunctionLoop: () => Fn( () => {
+
+		const flipped = uv().flipX();
+		const accumulate = Fn( () => {
+
+			const sum = vec2( 0 );
+
+			Loop( 2, () => {
+
+				sum.addAssign( flipped.mul( flipped ) );
+
+			} );
+
+			return sum;
+
+		} );
+
+		const value = accumulate();
+		const total = vec2( 0 );
+
+		Loop( 3, () => {
+
+			total.addAssign( value );
+
+		} );
+
+		return vec4( flipped, total );
+
+	} )(),
+
+	cachedValueAfterFunctionConditional: () => Fn( () => {
+
+		const value = uv().x.add( 1 );
+		const square = Fn( () => {
+
+			const result = float( 0 );
+
+			If( uv().y.greaterThan( 0.5 ), () => {
+
+				result.assign( value.mul( value ) );
+
+			} );
+
+			return result;
+
+		} );
+
+		const squared = square();
+		const total = float( 0 );
+
+		Loop( 3, () => {
+
+			total.addAssign( squared );
+
+		} );
+
+		return vec2( value.mul( value ), total );
+
+	} )(),
+
+	functionAssignOutsideLoop: () => Fn( () => {
+
+		const counter = float( 0 ).toVar( 'counter' );
+		const increment = Fn( () => {
+
+			counter.addAssign( 1 );
+
+			return counter.mul( 2 );
+
+		} );
+
+		const value = increment();
+		const total = float( 0 ).toVar( 'total' );
+
+		Loop( 4, () => {
+
+			total.addAssign( value );
+
+		} );
+
+		return vec2( counter, total );
+
+	} )(),
+
+	functionConditionalOutsideLoop: () => Fn( () => {
+
+		const counter = float( 0 ).toVar( 'counter' );
+		const pick = Fn( () => {
+
+			const result = float( 1 ).toVar( 'result' );
+
+			If( uv().x.greaterThan( 0.5 ), () => {
+
+				counter.addAssign( 1 );
+				result.assign( 2 );
+
+			} );
+
+			return result;
+
+		} );
+
+		const value = pick();
+		const total = float( 0 ).toVar( 'total' );
+
+		Loop( 4, () => {
+
+			total.addAssign( value );
+
+		} );
+
+		return vec2( counter, total );
+
+	} )(),
+
+	functionReadBeforeAssign: () => Fn( () => {
+
+		const x = float( 1 ).toVar( 'x' );
+		const double = Fn( () => x.mul( 2 ).toVar( 'doubled' ) );
+
+		const value = double();
+		x.assign( 100 );
+
+		return value;
+
+	} )(),
+
+	functionExpressionInConditional: () => Fn( () => {
+
+		const double = Fn( () => uv().x.mul( 2 ) );
+
+		const value = double();
+		const result = float( 0 ).toVar( 'result' );
+
+		If( uv().y.greaterThan( 0.5 ), () => {
+
+			result.assign( value );
+
+		} );
+
+		return result;
+
+	} )(),
+
+	functionReturnsVariable: () => Fn( () => {
+
+		const clamped = Fn( () => {
+
+			const result = uv().x.toVar( 'result' );
+
+			If( result.greaterThan( 0.5 ), () => {
+
+				result.assign( 0.5 );
+
+			} );
+
+			return result;
+
+		} );
+
+		const value = clamped();
+
+		return value.add( value );
 
 	} )(),
 

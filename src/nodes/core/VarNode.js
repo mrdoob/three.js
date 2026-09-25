@@ -191,42 +191,22 @@ class VarNode extends Node {
 
 		if ( this._hasStack( builder ) === false && builder.buildStage === 'setup' ) {
 
-			if ( builder.context.nodeLoop || builder.context.nodeBlock ) {
+			// A node created while a block is generated is declared where it is generated.
+			if ( ( builder.context.nodeLoop || builder.context.nodeBlock ) && builder.flowBlock === null ) {
 
-				let addBefore = false;
-
-				if ( this.node.isShaderCallNodeInternal && this.node.shaderNode.getLayout() === null ) {
-
-					if ( builder.fnCall && builder.fnCall.shaderNode ) {
-
-						const shaderNodeData = builder.getDataFromNode( this.node.shaderNode );
-
-						if ( shaderNodeData.hasLoop ) {
-
-							const data = builder.getDataFromNode( this );
-							data.forceDeclaration = true;
-
-							addBefore = true;
-
-						}
-
-					}
-
-				}
-
-				const baseStack = builder.getBaseStack();
-
-				if ( addBefore ) {
-
-					baseStack.addToStackBefore( this );
-
-				} else {
-
-					baseStack.addToStack( this );
-
-				}
+				builder.getBaseStack().addToStack( this );
 
 			}
+
+		} else if ( this.intent === true && builder.context.nodeLoop && builder.buildStage === 'analyze' && this.node.isCacheable( builder ) === false && builder.isDeterministic( this.node ) === false ) {
+
+			// A value that cannot be cached, e.g. a function call, is evaluated once at its declaration
+			// if it is used in a loop that runs after it, otherwise the loop would repeat it.
+			const data = builder.getDataFromNode( this );
+			const declarationIndex = builder.activeStacks.indexOf( data.stack );
+			const loopIndex = builder.activeStacks.indexOf( builder.getDataFromNode( builder.context.nodeLoop ).stack );
+
+			if ( declarationIndex !== - 1 && loopIndex >= declarationIndex ) data.forceDeclaration = true;
 
 		}
 
