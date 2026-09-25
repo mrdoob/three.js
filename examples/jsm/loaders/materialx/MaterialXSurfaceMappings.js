@@ -1,6 +1,6 @@
 import { DoubleSide } from 'three/webgpu';
 import { MaterialXLogCodes } from './MaterialXLog.js';
-import { float, color, mul, clamp, vec2, cos, sin, pow, mix, element, transformNormalToView } from 'three/tsl';
+import { Fn, float, vec3, color, mul, clamp, vec2, cos, sin, pow, mix, element, transformNormalToView, positionLocal, normalLocal, tangentLocal, bitangentLocal } from 'three/tsl';
 
 const mappedStandardSurfaceInputs = new Set( [
 	'base',
@@ -625,10 +625,50 @@ function applyOpenPbrSurface( material, inputs, log, nodeName ) {
 
 }
 
+// <displacement> maps onto vertex displacement like MeshStandardMaterial.displacementMap:
+// scalar displacement moves along the normal, vector displacement is authored in
+// (dPdu, dPdv, N) tangent space. `inputTypes` tells the two nodedefs apart.
+function applyDisplacement( material, inputs, log, nodeName, inputTypes = {} ) {
+
+	const displacementNode = inputs.displacement;
+	if ( ! hasNodeValue( displacementNode ) || isEffectivelyZero( displacementNode ) ) return;
+
+	const scaleNode = hasNodeValue( inputs.scale ) ? inputs.scale : float( 1 );
+	let offsetNode;
+
+	if ( inputTypes.displacement === 'vector3' ) {
+
+		const vector = vec3( displacementNode ).mul( scaleNode );
+
+		// tangentLocal/bitangentLocal need a tangent attribute; without one the
+		// bitangent is NaN, so fall back to displacing along the normal only.
+		offsetNode = Fn( ( builder ) => {
+
+			if ( builder.geometry.hasAttribute( 'tangent' ) ) {
+
+				return tangentLocal.mul( vector.x ).add( bitangentLocal.mul( vector.y ) ).add( normalLocal.mul( vector.z ) );
+
+			}
+
+			return normalLocal.normalize().mul( vector.z );
+
+		} )();
+
+	} else {
+
+		offsetNode = normalLocal.normalize().mul( float( displacementNode ).mul( scaleNode ) );
+
+	}
+
+	material.positionNode = positionLocal.add( offsetNode );
+
+}
+
 const MaterialXSurfaceMappings = {
 	standard_surface: applyStandardSurface,
 	gltf_pbr: applyGltfPbrSurface,
 	open_pbr_surface: applyOpenPbrSurface,
+	displacement: applyDisplacement,
 };
 
 const surfaceMapperRegistry = new Map( Object.entries( MaterialXSurfaceMappings ).map( ( [ category, apply ] ) => [
@@ -656,6 +696,7 @@ export {
 	applyStandardSurface,
 	applyGltfPbrSurface,
 	applyOpenPbrSurface,
+	applyDisplacement,
 	mappedStandardSurfaceInputs,
 	mappedGltfPbrInputs,
 	mappedOpenPbrInputs,
