@@ -4,25 +4,6 @@ import { textureSize } from '../accessors/TextureSizeNode.js';
 import { float, vec2 } from '../tsl/TSLBase.js';
 import { atan } from '../math/MathNode.js';
 import { remap } from '../utils/Remap.js';
-import { uniform } from '../core/UniformNode.js';
-import { renderGroup } from '../core/UniformGroupNode.js';
-import { cameraViewMatrix } from '../accessors/Camera.js';
-import { Vector3 } from '../../math/Vector3.js';
-
-// Returns the given axis of the light's local frame in view space.
-const lightViewAxis = ( light, index ) => {
-
-	const axis = uniform( new Vector3() );
-	axis.setGroup( renderGroup )
-		.onRenderUpdate( () => {
-
-			axis.value.setFromMatrixColumn( light.matrixWorld, index ).normalize();
-
-		} );
-
-	return cameraViewMatrix.transformDirection( axis );
-
-};
 
 /**
  * An IES version of the default spot light node.
@@ -71,11 +52,8 @@ class IESSpotLightNode extends SpotLightNode {
 
 		if ( iesMap && iesMap.isTexture === true ) {
 
-			const light = this.light;
-
-			const lightDirection = this.getLightVector( builder ).normalize();
-			const lightX = lightViewAxis( light, 0 );
-			const lightY = lightViewAxis( light, 1 );
+			// the light space coordinate used for projected maps, centered on the forward axis twist calculation
+			const lightCoord = this.getLightCoord( builder ).sub( 0.5 );
 
 			this._iesTextureNode = texture( iesMap );
 
@@ -84,7 +62,7 @@ class IESSpotLightNode extends SpotLightNode {
 
 			// the twist angle around the light's forward axis, mapping from [0, 359]deg texels
 			// offset by half a texel so we start at the center of the first texel
-			const twistAngle = remap( atan( lightDirection.dot( lightY ), lightDirection.dot( lightX ) ), - Math.PI, Math.PI ).add( texelInset.y );
+			const twistAngle = remap( atan( lightCoord.y, lightCoord.x ), - Math.PI, Math.PI ).add( texelInset.y );
 
 			// the tilt angle off the forward axis spanning from [0, 180]deg
 			// inset by half a texel on each side so we're clamping to the center of the extreme texels
