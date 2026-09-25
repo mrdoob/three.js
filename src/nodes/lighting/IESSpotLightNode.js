@@ -1,6 +1,7 @@
 import SpotLightNode from './SpotLightNode.js';
 import { texture } from '../accessors/TextureNode.js';
-import { vec2 } from '../tsl/TSLBase.js';
+import { textureSize } from '../accessors/TextureSizeNode.js';
+import { float, vec2 } from '../tsl/TSLBase.js';
 import { atan } from '../math/MathNode.js';
 import { remap } from '../utils/Remap.js';
 import { uniform } from '../core/UniformNode.js';
@@ -76,13 +77,20 @@ class IESSpotLightNode extends SpotLightNode {
 			const lightX = lightViewAxis( light, 0 );
 			const lightY = lightViewAxis( light, 1 );
 
-			// the tilt angle off the light's forward axis and the twist angle around it to sample the IES dimensions
-			const twistAngle = remap( atan( lightDirection.dot( lightY ), lightDirection.dot( lightX ) ), - Math.PI, Math.PI );
-			const tiltAngle = remap( angleCosine.acos(), 0, Math.PI );
+			this._iesTextureNode = texture( iesMap );
 
-			this._iesTextureNode = texture( iesMap, vec2( tiltAngle, twistAngle ), 0 );
+			// get the width of half a texel in uv
+			const texelInset = float( 0.5 ).div( vec2( textureSize( this._iesTextureNode ) ) );
 
-			spotAttenuation = this._iesTextureNode.r;
+			// the twist angle around the light's forward axis, mapping from [0, 359]deg texels
+			// offset by half a texel so we start at the center of the first texel
+			const twistAngle = remap( atan( lightDirection.dot( lightY ), lightDirection.dot( lightX ) ), - Math.PI, Math.PI ).add( texelInset.y );
+
+			// the tilt angle off the forward axis spanning from [0, 180]deg
+			// inset by half a texel on each side so we're clamping to the center of the extreme texels
+			const tiltAngle = remap( angleCosine.acos(), 0, Math.PI, texelInset.x, float( 1 ).sub( texelInset.x ) );
+
+			spotAttenuation = this._iesTextureNode.sample( vec2( tiltAngle, twistAngle ) ).level( 0 ).r;
 
 		} else {
 

@@ -113,12 +113,13 @@ class IESLoader extends Loader {
 
 		for ( let i = 0; i < size; ++ i ) {
 
+			// the horizontal angles cover 0 to 359 degrees
 			const theta = i % width;
 			const phi = Math.floor( i / width );
 
 			let sampleTheta = theta;
 
- 			// mirror the measured range around the cycle,
+ 			// mirror the measured range around the cycle
  			if ( endTheta !== 0 && sampleTheta > endTheta ) {
 
 				sampleTheta %= endTheta * 2;
@@ -131,7 +132,9 @@ class IESLoader extends Loader {
 
 			}
 
-			data[ phi + theta * height ] = interpolateCandelaValues( phi, sampleTheta );
+			// the vertical angles span [0, 180]
+			const samplePhi = phi * 180 / ( height - 1 );
+			data[ phi + theta * height ] = interpolateCandelaValues( samplePhi, sampleTheta );
 
 		}
 
@@ -185,6 +188,8 @@ class IESLoader extends Loader {
 		const iesLamp = new IESLamp( text );
 		const data = this._getIESValues( iesLamp, type );
 
+		// X holds the vertical angle from 0 to 180 degrees inclusively, Y holds the horizontal
+		// angle from 0 to 359 degrees and wraps around
 		const texture = new DataTexture( data, 180, 360, RedFormat, type );
 		texture.minFilter = LinearFilter;
 		texture.magFilter = LinearFilter;
