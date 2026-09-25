@@ -163,6 +163,14 @@ class Backend {
 	 */
 	draw( /*renderObject, info*/ ) { }
 
+	/**
+	 * Deletes the vertex state for the given render object.
+	 *
+	 * @abstract
+	 * @param {RenderObject} renderObject - The render object.
+	 */
+	deleteVertexState( /*renderObject*/ ) { }
+
 	// compute node
 
 	/**
@@ -246,6 +254,14 @@ class Backend {
 	 * @param {?Array<Promise>} [promises=null] - Optional compilation promises.
 	 */
 	createComputePipeline( /*computePipeline, bindings, promises*/ ) { }
+
+	/**
+	 * Destroys the given pipeline.
+	 *
+	 * @abstract
+	 * @param {Pipeline} pipeline - The pipeline.
+	 */
+	destroyPipeline( /*pipeline*/ ) { }
 
 	// cache key
 
@@ -470,7 +486,7 @@ class Backend {
 	 * Updates a unique identifier for the given render context that can be used
 	 * to allocate resources like occlusion queries or timestamp queries.
 	 *
-	 * @param {RenderContext|ComputeNode} abstractRenderContext - The render context.
+	 * @param {RenderContext|ComputeNode|Array<ComputeNode>} abstractRenderContext - The render context.
 	 */
 	updateTimeStampUID( abstractRenderContext ) {
 
@@ -479,7 +495,15 @@ class Backend {
 
 		let prefix;
 
-		if ( abstractRenderContext.isComputeNode === true ) {
+		let id = abstractRenderContext.id;
+
+		if ( Array.isArray( abstractRenderContext ) ) {
+
+			id = abstractRenderContext.map( c => c.id ).join( ',' );
+
+			prefix = 'c:' + this.renderer.info.compute.frameCalls;
+
+		} else if ( abstractRenderContext.isComputeNode === true ) {
 
 			prefix = 'c:' + this.renderer.info.compute.frameCalls;
 
@@ -489,7 +513,7 @@ class Backend {
 
 		}
 
-		contextData.timestampUID = prefix + ':' + abstractRenderContext.id + ':f' + frame;
+		contextData.timestampUID = prefix + ':' + id + ':f' + frame;
 
 	}
 

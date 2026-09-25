@@ -243,11 +243,11 @@ class Bindings extends DataMap {
 
 					} else if ( binding.isSampledTexture ) {
 
-						this.textures.updateTexture( binding.texture );
+						binding.generation = this.textures.updateTexture( binding.texture );
 
 					} else if ( binding.isSampler ) {
 
-						this.textures.updateSampler( binding );
+						binding.samplerKey = this.textures.updateSampler( binding );
 
 					} else if ( binding.isStorageBuffer ) {
 
@@ -419,13 +419,13 @@ class Bindings extends DataMap {
 
 					// version: update the texture data or create a new one
 
-					this.textures.updateTexture( texture );
+					const generation = this.textures.updateTexture( texture );
 
 					// generation: update the bindings if the binding refers to a different texture object
 
-					if ( binding.generation !== texturesTextureData.generation ) {
+					if ( binding.generation !== generation ) {
 
-						binding.generation = texturesTextureData.generation;
+						binding.generation = generation;
 
 						needsBindingsUpdate = true;
 

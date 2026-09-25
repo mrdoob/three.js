@@ -35,6 +35,23 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
+			QUnit.test( 'clone', ( assert ) => {
+
+				const clone = _nurbsCurve.clone();
+
+				assert.equal( clone.degree, _nurbsCurve.degree, 'clone.degree ok' );
+				assert.deepEqual( clone.knots, _nurbsCurve.knots, 'clone.knots ok' );
+				assert.deepEqual( clone.controlPoints, _nurbsCurve.controlPoints, 'clone.controlPoints ok' );
+				assert.equal( clone.startKnot, _nurbsCurve.startKnot, 'clone.startKnot ok' );
+				assert.equal( clone.endKnot, _nurbsCurve.endKnot, 'clone.endKnot ok' );
+
+				assert.notStrictEqual( clone.knots, _nurbsCurve.knots, 'clone.knots is not shared' );
+				assert.notStrictEqual( clone.controlPoints[ 0 ], _nurbsCurve.controlPoints[ 0 ], 'clone.controlPoints are not shared' );
+
+				assert.deepEqual( clone.getPoint( 0.5 ), _nurbsCurve.getPoint( 0.5 ), 'clone.getPoint() ok' );
+
+			} );
+
 			QUnit.test( 'toJSON', ( assert ) => {
 
 				const json = _nurbsCurve.toJSON();

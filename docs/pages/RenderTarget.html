@@ -104,16 +104,35 @@ e.g. in context of post-processing.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="resolveColorBuffer" translate="no">.<a href="#resolveColorBuffer">resolveColorBuffer</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to resolve the color buffer or not. When set to <code>false</code>, the color
+attachments do not receive the resolved (single-sampled) output of a render
+pass and the render target's textures are left untouched. The rendered
+content is then only accessible within the render pass itself.</p>
+<p>Only relevant for multisampled render targets.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="resolveDepthBuffer" translate="no">.<a href="#resolveDepthBuffer">resolveDepthBuffer</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Whether to resolve the depth buffer or not.</p>
+						<p>Whether to resolve the depth buffer or not. When set to <code>false</code>, the depth
+texture does not receive the resolved depth output of a render pass which
+saves memory bandwidth. Use this setting when the depth data of a render
+pass are not required afterwards.</p>
+<p>Only relevant for multisampled render targets in WebGL. WebGPU does not
+support depth resolves; sampling the depth texture of a multisampled render
+target accesses the multisampled data directly, see
+<a href="RenderTarget.html#storeMultisampledDepthBuffer">RenderTarget#storeMultisampledDepthBuffer</a>.</p>
 						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="resolveStencilBuffer" translate="no">.<a href="#resolveStencilBuffer">resolveStencilBuffer</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Whether to resolve the stencil buffer or not.</p>
+						<p>Whether to resolve the stencil buffer or not. Analogous to
+<a href="RenderTarget.html#resolveDepthBuffer">RenderTarget#resolveDepthBuffer</a> but for the stencil aspect.</p>
 						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
@@ -146,6 +165,41 @@ this render target or not.</p>
 					<div class="description">
 						<p>Whether to allocate a stencil buffer or not.</p>
 						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="storeMultisampledColorBuffer" translate="no">.<a href="#storeMultisampledColorBuffer">storeMultisampledColorBuffer</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to store the multisampled color buffer or not. When set to <code>false</code>,
+the multisampled data are discarded at the end of a render pass, right after
+they have been resolved. This saves memory bandwidth, especially on tile-based
+GPUs, and is the recommended setting for render targets that are fully redrawn
+each frame and whose output is only accessed via the resolved textures (e.g.
+scene passes in post-processing chains).</p>
+<p>Must be kept <code>true</code> when the multisampled data are needed after the render
+pass ends, e.g. when rendering into the target without clearing or when the
+scene contains transmissive objects which require a mid-pass framebuffer copy.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="storeMultisampledDepthBuffer" translate="no">.<a href="#storeMultisampledDepthBuffer">storeMultisampledDepthBuffer</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to store the multisampled depth buffer or not. When set to <code>false</code>,
+the multisampled depth data are discarded at the end of a render pass which
+saves memory bandwidth.</p>
+<p>Must be kept <code>true</code> in WebGPU when the depth texture of a multisampled render
+target is sampled (e.g. by depth-based post-processing effects) since depth
+is read directly from the multisampled data.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="storeMultisampledStencilBuffer" translate="no">.<a href="#storeMultisampledStencilBuffer">storeMultisampledStencilBuffer</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to store the multisampled stencil buffer or not. Analogous to
+<a href="RenderTarget.html#storeMultisampledDepthBuffer">RenderTarget#storeMultisampledDepthBuffer</a> but for the stencil aspect.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -405,12 +459,23 @@ method whenever this instance is no longer used in your app.</p>
 		</tr>
 		<tr>
 				<td class="name">
+					<strong>resolveColorBuffer</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether to resolve the color buffer or not. Only relevant for multisampled render targets.</p>
+						<p>Default is <code>true</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
 					<strong>resolveDepthBuffer</strong>
 						<br>
 <span class="param-type">boolean</span>
 				</td>
 			<td class="description last">
-				<p>Whether to resolve the depth buffer or not.</p>
+				<p>Whether to resolve the depth buffer or not. Only relevant for multisampled render targets.</p>
 						<p>Default is <code>true</code>.</p>
 			</td>
 		</tr>
@@ -421,7 +486,40 @@ method whenever this instance is no longer used in your app.</p>
 <span class="param-type">boolean</span>
 				</td>
 			<td class="description last">
-				<p>Whether  to resolve the stencil buffer or not.</p>
+				<p>Whether to resolve the stencil buffer or not. Only relevant for multisampled render targets.</p>
+						<p>Default is <code>true</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>storeMultisampledColorBuffer</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether to store the multisampled color buffer or not. Setting to <code>false</code> saves memory bandwidth when the multisampled data are not needed after a render pass.</p>
+						<p>Default is <code>true</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>storeMultisampledDepthBuffer</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether to store the multisampled depth buffer or not. Setting to <code>false</code> saves memory bandwidth when the multisampled data are not needed after a render pass.</p>
+						<p>Default is <code>true</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>storeMultisampledStencilBuffer</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether to store the multisampled stencil buffer or not. Setting to <code>false</code> saves memory bandwidth when the multisampled data are not needed after a render pass.</p>
 						<p>Default is <code>true</code>.</p>
 			</td>
 		</tr>

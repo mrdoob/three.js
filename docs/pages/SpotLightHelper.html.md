@@ -46,6 +46,8 @@ The light being visualized.
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
 
+**Overrides:** [Object3D#dispose](Object3D.html#dispose)
+
 ### .update()
 
 Updates the helper to match the position and direction of the light being visualized.

@@ -17,7 +17,7 @@ lightShadowMapViewer.update();
 
 ## Import
 
-ShadowMapViewer is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+ShadowMapViewer is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { ShadowMapViewer } from 'three/addons/utils/ShadowMapViewer.js';

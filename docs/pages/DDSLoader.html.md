@@ -14,7 +14,7 @@ map.colorSpace = THREE.SRGBColorSpace; // only for color textures
 
 ## Import
 
-DDSLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+DDSLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { DDSLoader } from 'three/addons/loaders/DDSLoader.js';

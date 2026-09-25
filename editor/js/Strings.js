@@ -366,6 +366,7 @@ function Strings( config ) {
 			'sidebar/script/remove': 'حذف',
 
 			'sidebar/project': 'پروژه ها',
+			'sidebar/project/camera': 'دوربین',
 			'sidebar/project/renderer': 'رندرر',
 			'sidebar/project/antialias': 'آنتی الآیس',
 			'sidebar/project/shadows': 'سایه ها',
@@ -1270,6 +1271,7 @@ function Strings( config ) {
 			'sidebar/script/remove': 'Supprimer',
 
 			'sidebar/project': 'Projet',
+			'sidebar/project/camera': 'Caméra',
 			'sidebar/project/renderer': 'Moteur',
 			'sidebar/project/antialias': 'Anticrénelage',
 			'sidebar/project/shadows': 'Ombres',
@@ -1721,6 +1723,7 @@ function Strings( config ) {
 			'sidebar/script/remove': '删除',
 
 			'sidebar/project': '项目',
+			'sidebar/project/camera': '摄像机',
 			'sidebar/project/renderer': '渲染器',
 			'sidebar/project/antialias': '抗锯齿',
 			'sidebar/project/shadows': '阴影',
@@ -2172,6 +2175,7 @@ function Strings( config ) {
 			'sidebar/script/remove': '削除',
 
 			'sidebar/project': 'プロジェクト',
+			'sidebar/project/camera': 'カメラ',
 			'sidebar/project/renderer': 'レンダラー',
 			'sidebar/project/antialias': 'アンチエイリアス',
 			'sidebar/project/shadows': 'シャドウ',
@@ -2622,6 +2626,7 @@ function Strings( config ) {
 			'sidebar/script/remove': '삭제',
 
 			'sidebar/project': '프로젝트',
+			'sidebar/project/camera': '카메라',
 			'sidebar/project/renderer': '렌더러',
 			'sidebar/project/antialias': '안티앨리어싱',
 			'sidebar/project/shadows': '그림자',

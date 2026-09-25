@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>BenchGenerator - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">BenchGenerator</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A public street bench: timber slats carried on two cast-iron end frames that
+curl into armrests, with a reclined slatted backrest. Built once and instanced
+across a list of placements, dressed with one cheap material that branches on a
+baked <code>partId</code> ( warm stained wood, dark iron ).</p>
+<p>The canonical model stands on <code>y = 0</code>, centred in X / Z, runs along X and seats
+toward <code>+Z</code>, so a placement whose local <code>+Z</code> faces the road sits a passer-by
+looking out over it.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const benches = new BenchGenerator();
+scene.add( benches.build( placements ) ); // placements: Matrix4[]
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="BenchGenerator" translate="no">new <a href="#BenchGenerator">BenchGenerator</a><span class="signature">()</span> </h3>
+					<div class="method">
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/generators/city/BenchGenerator.js" translate="no" target="_blank" rel="noopener">examples/jsm/generators/city/BenchGenerator.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -5,6 +5,7 @@ import {
 	Color,
 	UniformsLib,
 	UniformsUtils,
+	PMREMGenerator,
 } from 'three';
 import {
 	context,
@@ -24,6 +25,7 @@ import {
 	GLSLNodeBuilder,
 	BasicNodeLibrary,
 	WebGLCapabilities,
+	PMREMNode,
 } from 'three/webgpu';
 
 // Limitations
@@ -60,7 +62,7 @@ function generateUniformsList( program, uniforms ) {
 
 }
 
-// overrides shadow nodes to use the built in shadow textures
+// Adapts nodes to use WebGLRenderer resources.
 class WebGLNodeBuilder extends GLSLNodeBuilder {
 
 	addNode( node ) {
@@ -78,6 +80,10 @@ class WebGLNodeBuilder extends GLSLNodeBuilder {
 				// no need to rerender shadows since WebGLRenderer is handling it
 
 			};
+
+		} else if ( node instanceof PMREMNode && node._generator === null ) {
+
+			node._generator = new PMREMGenerator( this.renderer._renderer );
 
 		}
 
@@ -183,6 +189,8 @@ class SceneContext {
 class RendererProxy {
 
 	constructor( renderer ) {
+
+		this._renderer = renderer;
 
 		const backend = {
 			isWebGPUBackend: false,

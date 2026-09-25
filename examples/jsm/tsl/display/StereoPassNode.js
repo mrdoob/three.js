@@ -61,13 +61,11 @@ class StereoPassNode extends PassNode {
 
 		//
 
-		this._pixelRatio = renderer.getPixelRatio();
-
 		stereo.cameraL.coordinateSystem = renderer.coordinateSystem;
 		stereo.cameraR.coordinateSystem = renderer.coordinateSystem;
 		stereo.update( camera );
 
-		const size = renderer.getSize( _size );
+		const size = renderer.getDrawingBufferSize( _size );
 		this.setSize( size.width, size.height );
 
 		renderer.autoClear = false;

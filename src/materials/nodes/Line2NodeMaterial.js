@@ -209,7 +209,7 @@ const mvpLine = Fn( ( { material } ) => {
 		// get the offset direction as perpendicular to the view vector
 
 		const worldDir = end.xyz.sub( start.xyz ).normalize();
-		const tmpFwd = mix( start.xyz, end.xyz, 0.5 ).normalize();
+		const tmpFwd = perspective.select( mix( start.xyz, end.xyz, 0.5 ).normalize(), vec3( 0.0, 0.0, - 1.0 ) );
 		const worldUp = worldDir.cross( tmpFwd ).normalize();
 		const worldFwd = worldDir.cross( worldUp );
 
@@ -322,15 +322,31 @@ const alphaLine = Fn( ( { material, renderer } ) => {
 
 	if ( useWorldUnits ) {
 
-		// Find the closest points on the view ray and the line segment
-		const rayEnd = worldPos.xyz.normalize().mul( 1e5 );
-		const lineDir = worldEnd.sub( worldStart );
-		const params = closestLineToLine( { p1: worldStart, p2: worldEnd, p3: vec3( 0.0, 0.0, 0.0 ), p4: rayEnd } );
+		const len = float().toVar();
 
-		const p1 = worldStart.add( lineDir.mul( params.x ) );
-		const p2 = rayEnd.mul( params.y );
-		const delta = p1.sub( p2 );
-		const len = delta.length();
+		const orthographic = cameraProjectionMatrix.element( 2 ).element( 3 ).notEqual( - 1.0 ).toConst();
+
+		If( orthographic, () => {
+
+			// View rays are parallel to the z axis so the distance reduces to camera-space XY
+			const lineDir = worldEnd.xy.sub( worldStart.xy );
+			const t = worldPos.xy.sub( worldStart.xy ).dot( lineDir ).div( lineDir.dot( lineDir ) ).clamp();
+			len.assign( worldStart.xy.add( lineDir.mul( t ) ).sub( worldPos.xy ).length() );
+
+		} ).Else( () => {
+
+			// Find the closest points on the view ray and the line segment
+			const rayEnd = worldPos.xyz.normalize().mul( 1e5 );
+			const lineDir = worldEnd.sub( worldStart );
+			const params = closestLineToLine( { p1: worldStart, p2: worldEnd, p3: vec3( 0.0, 0.0, 0.0 ), p4: rayEnd } );
+
+			const p1 = worldStart.add( lineDir.mul( params.x ) );
+			const p2 = rayEnd.mul( params.y );
+			const delta = p1.sub( p2 );
+			len.assign( delta.length() );
+
+		} );
+
 		const norm = len.div( materialLineWidth );
 
 		if ( ! useDash ) {

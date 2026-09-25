@@ -11,7 +11,7 @@ scene.add( painter.mesh );
 
 ## Import
 
-TubePainter is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+TubePainter is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { TubePainter } from 'three/addons/misc/TubePainter.js';

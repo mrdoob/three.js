@@ -11,7 +11,7 @@ const selectedObjects = selectionBox.select( startPoint, endPoint );
 
 ## Import
 
-SelectionBox is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+SelectionBox is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { SelectionBox } from 'three/addons/interactive/SelectionBox.js';

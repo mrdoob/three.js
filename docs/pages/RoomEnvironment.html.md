@@ -17,7 +17,7 @@ scene.environment = envMap;
 
 ## Import
 
-RoomEnvironment is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+RoomEnvironment is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -32,6 +32,8 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 ### .dispose()
 
 Frees internal resources. This method should be called when the environment is no longer required.
+
+**Overrides:** [Scene#dispose](Scene.html#dispose)
 
 ## Source
 

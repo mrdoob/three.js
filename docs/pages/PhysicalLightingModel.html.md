@@ -6,7 +6,7 @@ Represents the lighting model for a PBR material.
 
 ## Constructor
 
-### new PhysicalLightingModel( clearcoat : boolean, sheen : boolean, iridescence : boolean, anisotropy : boolean, transmission : boolean, dispersion : boolean )
+### new PhysicalLightingModel( clearcoat : boolean, sheen : boolean, iridescence : boolean, anisotropy : boolean, transmission : boolean, dispersion : boolean, retroreflection : boolean )
 
 Constructs a new physical lighting model.
 
@@ -46,6 +46,12 @@ Whether dispersion is supported or not.
 
 Default is `false`.
 
+**retroreflection**
+
+Whether retroreflection is supported or not.
+
+Default is `false`.
+
 ## Properties
 
 ### .anisotropy : boolean
@@ -78,6 +84,12 @@ The clear coat specular indirect.
 
 Default is `null`.
 
+### .dfg : Node
+
+The sampled DFG LUT value, shared by the direct and indirect lighting paths.
+
+Default is `null`.
+
 ### .dispersion : boolean
 
 Whether dispersion is supported or not.
@@ -89,12 +101,6 @@ Default is `false`.
 Whether iridescence is supported or not.
 
 Default is `false`.
-
-### .iridescenceF0 : Node
-
-The iridescence F0.
-
-Default is `null`.
 
 ### .iridescenceF0Dielectric : Node
 
@@ -113,6 +119,18 @@ Default is `null`.
 The iridescence Fresnel.
 
 Default is `null`.
+
+### .multiScatteringCompensation : Node
+
+The multi-scattering energy compensation for direct lighting.
+
+Default is `null`.
+
+### .retroreflection : boolean
+
+Whether retroreflection is supported or not.
+
+Default is `false`.
 
 ### .sheen : boolean
 

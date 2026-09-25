@@ -94,11 +94,8 @@
 				const scenePass = pass( scene, camera );
 				const scenePassColor = scenePass.getTextureNode().toInspector( 'Scene Color' );
 
-				const dotScreenPass = dotScreen( scenePassColor );
-				dotScreenPass.scale.value = 0.3;
-
-				const rgbShiftPass = rgbShift( dotScreenPass );
-				rgbShiftPass.amount.value = 0.001;
+				const dotScreenPass = dotScreen( scenePassColor, 1.57, 0.3 );
+				const rgbShiftPass = rgbShift( dotScreenPass, 0.001 );
 
 				renderPipeline.outputNode = rgbShiftPass;
 

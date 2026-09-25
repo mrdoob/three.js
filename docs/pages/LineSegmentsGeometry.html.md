@@ -8,7 +8,7 @@ This is used in [LineSegments2](LineSegments2.html) to describe the shape.
 
 ## Import
 
-LineSegmentsGeometry is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+LineSegmentsGeometry is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { LineSegmentsGeometry } from 'three/addons/lines/LineSegmentsGeometry.js';

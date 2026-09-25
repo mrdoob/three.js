@@ -1,4 +1,5 @@
 import BRDF_Lambert from './BSDF/BRDF_Lambert.js';
+import BRDF_EON, { EON_DirectionalAlbedo } from './BSDF/BRDF_EON.js';
 import BRDF_GGX from './BSDF/BRDF_GGX.js';
 import DFGLUT from './BSDF/DFGLUT.js';
 import EnvironmentBRDF from './BSDF/EnvironmentBRDF.js';
@@ -7,7 +8,7 @@ import Schlick_to_F0 from './BSDF/Schlick_to_F0.js';
 import BRDF_Sheen from './BSDF/BRDF_Sheen.js';
 import { LTC_Evaluate, LTC_Uv } from './BSDF/LTC.js';
 import LightingModel from '../core/LightingModel.js';
-import { diffuseColor, diffuseContribution, specularColor, specularColorBlended, specularF90, roughness, metalness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, ior, thickness, transmission, attenuationDistance, attenuationColor, dispersion, retroreflectivity } from '../core/PropertyNode.js';
+import { diffuseColor, diffuseContribution, diffuseRoughness, specularColor, specularColorBlended, specularF90, roughness, metalness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, ior, thickness, transmission, attenuationDistance, attenuationColor, dispersion, retroreflectivity } from '../core/PropertyNode.js';
 import { normalView, clearcoatNormalView, normalWorld } from '../accessors/Normal.js';
 import { positionViewDirection, positionView, positionWorld } from '../accessors/Position.js';
 import { Fn, float, vec2, vec3, vec4, mat3, If } from '../tsl/TSLBase.js';
@@ -348,8 +349,9 @@ class PhysicalLightingModel extends LightingModel {
 	 * @param {boolean} [transmission=false] - Whether transmission is supported or not.
 	 * @param {boolean} [dispersion=false] - Whether dispersion is supported or not.
 	 * @param {boolean} [retroreflection=false] - Whether retroreflection is supported or not.
+	 * @param {boolean} [diffuseRoughness=false] - Whether EON rough diffuse reflection is supported or not.
 	 */
-	constructor( clearcoat = false, sheen = false, iridescence = false, anisotropy = false, transmission = false, dispersion = false, retroreflection = false ) {
+	constructor( clearcoat = false, sheen = false, iridescence = false, anisotropy = false, transmission = false, dispersion = false, retroreflection = false, diffuseRoughness = false ) {
 
 		super();
 
@@ -408,6 +410,14 @@ class PhysicalLightingModel extends LightingModel {
 		 * @default false
 		 */
 		this.retroreflection = retroreflection;
+
+		/**
+		 * Whether EON rough diffuse reflection is supported or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.diffuseRoughness = diffuseRoughness;
 
 		/**
 		 * The clear coat radiance.
@@ -488,6 +498,22 @@ class PhysicalLightingModel extends LightingModel {
 		 * @default null
 		 */
 		this.multiScatteringCompensation = null;
+
+		/**
+		 * The dielectric single-scattering term, shared by the indirect lighting paths.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.singleScatteringDielectric = null;
+
+		/**
+		 * The dielectric multi-scattering term, shared by the indirect lighting paths.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.multiScatteringDielectric = null;
 
 	}
 
@@ -588,6 +614,11 @@ class PhysicalLightingModel extends LightingModel {
 		// Compensate for the energy lost to multiple scattering, tinting the added term by F0 ( equation 16 )
 		this.multiScatteringCompensation = specularColorBlended.mul( Ess.reciprocal().sub( 1.0 ) ).add( 1.0 ).toConst( 'multiScatteringCompensation' );
 
+		this.singleScatteringDielectric = vec3().toVar( 'singleScatteringDielectric' );
+		this.multiScatteringDielectric = vec3().toVar( 'multiScatteringDielectric' );
+
+		this.computeMultiscattering( this.singleScatteringDielectric, this.multiScatteringDielectric, specularF90, specularColor, this.iridescenceF0Dielectric );
+
 		super.start( builder );
 
 	}
@@ -670,7 +701,11 @@ class PhysicalLightingModel extends LightingModel {
 
 		}
 
-		reflectedLight.directDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseContribution } ) ).mul( F.oneMinus() ) );
+		const diffuseBRDF = this.diffuseRoughness
+			? BRDF_EON( { lightDirection, diffuseColor: diffuseColor.rgb, roughness: diffuseRoughness } ).mul( metalness.oneMinus() )
+			: BRDF_Lambert( { diffuseColor: diffuseContribution } );
+
+		reflectedLight.directDiffuse.addAssign( irradiance.mul( diffuseBRDF ).mul( F.oneMinus() ) );
 
 		reflectedLight.directSpecular.addAssign( irradiance.mul( specularBRDF ).mul( this.multiScatteringCompensation ) );
 
@@ -760,12 +795,14 @@ class PhysicalLightingModel extends LightingModel {
 		const { irradiance, reflectedLight } = builder.context;
 
 		// Energy reflected by the specular lobe is not available to the diffuse layer
-		const singleScattering = vec3().toVar();
-		const multiScattering = vec3().toVar();
+		const singleScattering = this.singleScatteringDielectric;
+		const multiScattering = this.multiScatteringDielectric;
 
-		this.computeMultiscattering( singleScattering, multiScattering, specularF90, specularColor, this.iridescenceF0Dielectric );
+		const diffuseBRDF = this.diffuseRoughness
+			? EON_DirectionalAlbedo( { diffuseColor: diffuseColor.rgb, roughness: diffuseRoughness, dotNV: normalView.dot( positionViewDirection ).clamp() } ).mul( metalness.oneMinus(), 1 / Math.PI )
+			: BRDF_Lambert( { diffuseColor: diffuseContribution } );
 
-		const diffuse = irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseContribution } ) ).mul( singleScattering.add( multiScattering ).oneMinus() ).toVar();
+		const diffuse = irradiance.mul( diffuseBRDF ).mul( singleScattering.add( multiScattering ).oneMinus() ).toVar();
 
 		if ( this.sheen === true ) {
 
@@ -824,12 +861,11 @@ class PhysicalLightingModel extends LightingModel {
 		// Both indirect specular and indirect diffuse light accumulate here
 		// Compute multiscattering separately for dielectric and metallic, then mix
 
-		const singleScatteringDielectric = vec3().toVar( 'singleScatteringDielectric' );
-		const multiScatteringDielectric = vec3().toVar( 'multiScatteringDielectric' );
+		const singleScatteringDielectric = this.singleScatteringDielectric;
+		const multiScatteringDielectric = this.multiScatteringDielectric;
 		const singleScatteringMetallic = vec3().toVar( 'singleScatteringMetallic' );
 		const multiScatteringMetallic = vec3().toVar( 'multiScatteringMetallic' );
 
-		this.computeMultiscattering( singleScatteringDielectric, multiScatteringDielectric, specularF90, specularColor, this.iridescenceF0Dielectric );
 		this.computeMultiscattering( singleScatteringMetallic, multiScatteringMetallic, specularF90, diffuseColor.rgb, this.iridescenceF0Metallic );
 
 		// Mix based on metalness
@@ -839,7 +875,11 @@ class PhysicalLightingModel extends LightingModel {
 		// Diffuse energy conservation uses dielectric path
 		const totalScatteringDielectric = singleScatteringDielectric.add( multiScatteringDielectric );
 
-		const diffuse = diffuseContribution.mul( totalScatteringDielectric.oneMinus() );
+		const diffuseAlbedo = this.diffuseRoughness
+			? EON_DirectionalAlbedo( { diffuseColor: diffuseColor.rgb, roughness: diffuseRoughness, dotNV: normalView.dot( positionViewDirection ).clamp() } ).mul( metalness.oneMinus() )
+			: diffuseContribution;
+
+		const diffuse = diffuseAlbedo.mul( totalScatteringDielectric.oneMinus() );
 
 		const cosineWeightedIrradiance = iblIrradiance.mul( 1 / Math.PI );
 

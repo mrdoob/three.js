@@ -1,12 +1,14 @@
 import {
 	ExtrudeGeometry,
 	Group,
-	InstancedMesh,
 	MeshStandardNodeMaterial,
 	Shape
 } from 'three/webgpu';
 
-import { cameraPosition, color, float, floor, Fn, fract, fwidth, If, mix, mx_noise_float, normalView, normalWorldGeometry, positionView, positionWorld, sin, smoothstep } from 'three/tsl';
+import { cameraPosition, color, float, floor, Fn, fract, fwidth, If, mix, mx_noise_float, normalWorldGeometry, positionWorld, sin, smoothstep } from 'three/tsl';
+
+import { createInstances, updateInstances } from './InstancedMeshGenerator.js';
+import { bumpNormal } from './CityGeneratorUtils.js';
 
 /**
  * Generates the raised sidewalk for a city's blocks: per block, a rounded-corner concrete
@@ -32,40 +34,40 @@ class SidewalkGenerator {
 		this.material = null; // the procedural concrete, built once and reused across rebuilds
 		this.curbMaterial = null; // the procedural granite curb, likewise
 		this.mesh = null;
+		this._parametersKey = null;
 
 	}
 
 	build( placements ) {
 
-		this.dispose();
+		const parametersKey = JSON.stringify( this.parameters );
 
-		const { width, depth, height, radius, curbWidth, curbLip } = this.parameters;
+		if ( parametersKey !== this._parametersKey || ( this.mesh && placements.length > this.mesh.children[ 0 ].instanceMatrix.count ) ) {
+
+			this.dispose();
+			this._parametersKey = parametersKey;
+
+		}
 
 		if ( this.material === null ) this.material = createSidewalkMaterial();
 		if ( this.curbMaterial === null ) this.curbMaterial = createCurbMaterial();
 
-		// the walking slab and the curb are separate meshes so each carries its own material
-		const slab = new InstancedMesh( slabGeometry( width, depth, height, radius, curbWidth ), this.material, placements.length );
-		const curb = new InstancedMesh( curbGeometry( width, depth, height, radius, curbWidth, curbLip ), this.curbMaterial, placements.length );
+		if ( this.mesh === null ) {
 
-		for ( let i = 0; i < placements.length; i ++ ) {
+			const { width, depth, height, radius, curbWidth, curbLip } = this.parameters;
+			const slab = createInstances( slabGeometry( width, depth, height, radius, curbWidth ), this.material, placements.length, '' );
+			const curb = createInstances( curbGeometry( width, depth, height, radius, curbWidth, curbLip ), this.curbMaterial, placements.length, '' );
+			slab.castShadow = curb.castShadow = false;
 
-			slab.setMatrixAt( i, placements[ i ] );
-			curb.setMatrixAt( i, placements[ i ] );
+			this.mesh = new Group();
+			this.mesh.name = 'Sidewalk';
+			this.mesh.add( slab, curb );
 
 		}
 
-		slab.computeBoundingSphere();
-		curb.computeBoundingSphere();
-		slab.receiveShadow = curb.receiveShadow = true;
+		for ( const mesh of this.mesh.children ) updateInstances( mesh, placements );
 
-		const group = new Group();
-		group.name = 'Sidewalk';
-		group.add( slab, curb );
-
-		this.mesh = group;
-
-		return group;
+		return this.mesh;
 
 	}
 
@@ -73,7 +75,17 @@ class SidewalkGenerator {
 
 		if ( this.mesh === null ) return;
 
-		this.mesh.traverse( ( o ) => o.geometry && o.geometry.dispose() );
+		this.mesh.traverse( ( object ) => {
+
+			if ( object.geometry ) object.geometry.dispose();
+			object.dispose();
+
+		} );
+
+		this.material.dispose();
+		this.curbMaterial.dispose();
+		this.material = null;
+		this.curbMaterial = null;
 		this.mesh = null;
 
 	}
@@ -145,23 +157,6 @@ function curbGeometry( width, depth, height, radius, curbWidth, curbLip ) {
 }
 
 // --- material ------------------------------------------------------------
-
-// derivative-based bump for a procedural, world-space height field. the built-in bumpMap
-// offsets the UV to read its height, so it returns a zero gradient for a height keyed off
-// world position; this feeds the hardware screen-space derivatives of the height into
-// Mikkelsen's surface-gradient method so the relief actually perturbs the normal.
-function bumpNormal( height ) {
-
-	const dpdx = positionView.dFdx();
-	const dpdy = positionView.dFdy();
-	const r1 = dpdy.cross( normalView );
-	const r2 = normalView.cross( dpdx );
-	const det = dpdx.dot( r1 );
-	const grad = det.sign().mul( height.dFdx().mul( r1 ).add( height.dFdy().mul( r2 ) ) );
-
-	return det.abs().mul( normalView ).sub( grad ).normalize();
-
-}
 
 // an antialiased line repeated at every multiple of `period` ( the scored joints )
 function gridLine( coord, period, halfWidth ) {

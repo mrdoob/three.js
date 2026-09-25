@@ -6,7 +6,7 @@ The only type of 3D object that is supported by [CSS2DRenderer](CSS2DRenderer.ht
 
 ## Import
 
-CSS2DObject is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+CSS2DObject is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
@@ -26,7 +26,7 @@ The DOM element.
 
 ### .center : Vector2
 
-The 3D objects center point. `( 0, 0 )` is the lower left, `( 1, 1 )` is the top right.
+The object's anchor point, and the point around which the object rotates. A value of `(0.5, 0.5)` corresponds to the midpoint of the object. A value of `(0, 0)` corresponds to the upper left corner of the object.
 
 Default is `(0.5,0.5)`.
 
@@ -41,6 +41,12 @@ Default is `true`.
 This flag can be used for type testing.
 
 Default is `true`.
+
+### .rotation2D : number
+
+The object's angle of rotation, counterclockwise, in radians.
+
+Default is `0`.
 
 ## Source
 

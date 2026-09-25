@@ -160,11 +160,10 @@ Overrides the base setup to incorporate line/dash rendering and blending.</p>
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeMaterial.html#setupDiffuseColor">NodeMaterial#setupDiffuseColor</a></dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setupModelViewProjection" translate="no">.<a href="#setupModelViewProjection">setupModelViewProjection</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec4></span> </h3>
+					<h3 class="name name-method" id="setupPosition" translate="no">.<a href="#setupPosition">setupPosition</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Setups the position in clip space for the vertex stage of the fat line.
-Overrides the default model-view-projection to return the expanded fat line vertex coordinates.</p>
+							<p>Setups the position of the expanded fat line vertex in local space.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -179,10 +178,10 @@ Overrides the default model-view-projection to return the expanded fat line vert
 							</tbody>
 						</table>
 						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeMaterial.html#setupModelViewProjection">NodeMaterial#setupModelViewProjection</a></dt>
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeMaterial.html#setupPosition">NodeMaterial#setupPosition</a></dt>
 						</dl>
 						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> The position of the fat line vertex in clip space.</dt>
+							<dt class="tag-returns"><strong>Returns:</strong> The position of the fat line vertex in local space.</dt>
 						</dl>
 					</div>
 				<h2 class="subsection-title">Source</h2>

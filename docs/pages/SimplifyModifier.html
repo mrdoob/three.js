@@ -14,16 +14,16 @@
 			<header>
 				<div class="class-description"><p>This class can be used to modify a geometry by simplifying it. A typical use
 case for such a modifier is automatic LOD generation.</p>
-<p>The implementation is based on <a href="https://web.archive.org/web/20230610044040/http://www.melax.com/polychop/" target="_blank" rel="noopener">Progressive Mesh type Polygon Reduction Algorithm</a>
-by Stan Melax in 1998.</p></div>
+<p>The implementation is based on <a href="https://github.com/zeux/meshoptimizer" target="_blank" rel="noopener">meshoptimizer</a>.
+If you only need a simplified index buffer, use MeshoptSimplifier directly.</p></div>
 				<h2>Code Example</h2>
 				<div translate="no"><pre><code class="language-js">const modifier = new SimplifyModifier();
-geometry = modifier.modify( geometry );
+geometry = await modifier.modify( geometry, count );
 </code></pre></div>
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">SimplifyModifier</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<p><span translate="no">SimplifyModifier</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { SimplifyModifier } from 'three/addons/modifiers/SimplifyModifier.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -32,11 +32,11 @@ geometry = modifier.modify( geometry );
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="modify" translate="no">.<a href="#modify">modify</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, count : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<h3 class="name name-method" id="modify" translate="no">.<a href="#modify">modify</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, count : <span class="param-type">number</span> )</span><span class="type-signature"> : Promise.&lt;<a href="BufferGeometry.html">BufferGeometry</a>></span> <span class="type-signature">(async) </span></h3>
 					<div class="method">
 						<div class="description">
-							<p>Returns a new, modified version of the given geometry by applying a simplification.
-Please note that the resulting geometry is always non-indexed.</p>
+							<p>Returns a new, simplified version of the given geometry. The vertex buffers
+of the result only contain vertices referenced by the simplified index.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -53,13 +53,13 @@ Please note that the resulting geometry is always non-indexed.</p>
 										<strong translate="no">count</strong>
 									</td>
 									<td class="description last">
-										<p>The number of vertices to remove.</p>
+										<p>The approximate number of vertices to remove.</p>
 									</td>
 								</tr>
 							</tbody>
 						</table>
 						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> A new, modified geometry.</dt>
+							<dt class="tag-returns"><strong>Returns:</strong> A promise that resolves with the new, modified geometry.</dt>
 						</dl>
 					</div>
 				<h2 class="subsection-title">Source</h2>

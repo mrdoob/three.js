@@ -247,8 +247,10 @@ value instead, use <a href="TSL.html#materialOpacity">materialOpacity</a>.</p>
 				<div class="member">
 					<h3 class="name" id="outputNode" translate="no">.<a href="#outputNode">outputNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec4></span> </h3>
 					<div class="description">
-						<p>This node can be used to define the final output of the material.</p>
-<p>TODO: Explain the differences to <code>fragmentNode</code>.</p>
+						<p>This node can be used to overwrite the final output of the material.</p>
+<p>Unlike <a href="NodeMaterial.html#fragmentNode">NodeMaterial#fragmentNode</a>, the built-in material logic
+(diffuse color, lighting, etc.) is still evaluated; assigning a node
+only replaces the resulting output color.</p>
 						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
@@ -460,7 +462,7 @@ defining all material properties of the classic type in the node type.</p>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="setupDiffuseColor" translate="no">.<a href="#setupDiffuseColor">setupDiffuseColor</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span> )</span> </h3>
+					<h3 class="name name-method" id="setupDiffuseColor" translate="no">.<a href="#setupDiffuseColor">setupDiffuseColor</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Setups the computation of the material's diffuse color.</p>
@@ -473,14 +475,6 @@ defining all material properties of the classic type in the node type.</p>
 									</td>
 									<td class="description last">
 										<p>The current node builder.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">geometry</strong>
-									</td>
-									<td class="description last">
-										<p>The geometry.</p>
 									</td>
 								</tr>
 							</tbody>

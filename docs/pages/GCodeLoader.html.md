@@ -16,7 +16,7 @@ scene.add( object );
 
 ## Import
 
-GCodeLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+GCodeLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { GCodeLoader } from 'three/addons/loaders/GCodeLoader.js';

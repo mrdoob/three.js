@@ -342,7 +342,7 @@ class USDZExporter {
 
 		}
 
-		return zipSync( files, { level: 0 } );
+		return zipSync( files, { level: 0, mtime: new Date() } );
 
 	}
 

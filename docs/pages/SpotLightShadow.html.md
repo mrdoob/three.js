@@ -30,6 +30,20 @@ This flag can be used for type testing.
 
 Default is `true`.
 
+## Methods
+
+### .toJSON() : Object
+
+Serializes the light shadow into JSON.
+
+**Overrides:** [LightShadow#toJSON](LightShadow.html#toJSON)
+
+See:
+
+*   [ObjectLoader#parse](ObjectLoader.html#parse)
+
+**Returns:** A JSON object representing the serialized light shadow.
+
 ## Source
 
 [src/lights/SpotLightShadow.js](https://github.com/mrdoob/three.js/blob/master/src/lights/SpotLightShadow.js)

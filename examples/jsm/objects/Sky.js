@@ -83,7 +83,7 @@ Sky.SkyShader = {
 		'mieDirectionalG': { value: 0.8 },
 		'sunPosition': { value: new Vector3() },
 		'cloudScale': { value: 0.0002 },
-		'cloudSpeed': { value: 0.0001 },
+		'cloudSpeed': { value: 0.00002 },
 		'cloudCoverage': { value: 0.4 },
 		'cloudDensity': { value: 0.4 },
 		'cloudElevation': { value: 0.5 },

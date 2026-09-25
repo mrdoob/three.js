@@ -662,14 +662,14 @@ class Renderer {
 		this._compilationPromises = null;
 
 		/**
-		 * Whether the renderer is currently precompiling a render object in
-		 * `compileAsync()`.
+		 * The state of the current precompilation in `compileAsync()`.
+		 * `null` when the renderer is not precompiling.
 		 *
 		 * @private
-		 * @type {boolean}
-		 * @default false
+		 * @type {?Object}
+		 * @default null
 		 */
-		this._isPreCompiling = false;
+		this._precompilationState = null;
 
 		/**
 		 * When an override material is in use, this property points to the current
@@ -828,7 +828,7 @@ class Renderer {
 			this._animation = new Animation( this, this._nodes, this.info );
 			this._attributes = new Attributes( backend, this.info );
 			this._background = new Background( this, this._nodes );
-			this._geometries = new Geometries( this._attributes, this.info );
+			this._geometries = new Geometries( backend, this._attributes, this.info );
 			this._textures = new Textures( this, backend, this.info );
 			this._pipelines = new Pipelines( backend, this._nodes, this.info );
 			this._bindings = new Bindings( backend, this._nodes, this._textures, this._attributes, this._pipelines, this.info );
@@ -930,8 +930,17 @@ class Renderer {
 		const outputRenderTarget = this._renderTarget || this._outputRenderTarget;
 		const useXRCamera = this.xr.isPresenting === true && this.isOutputTarget;
 		const renderTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : outputRenderTarget;
-		const renderContext = this._renderContexts.get( renderTarget, this._mrt );
+
+		const activeCubeFace = this._activeCubeFace;
 		const activeMipmapLevel = this._activeMipmapLevel;
+
+		// a state snapshot is taken once at the beginning and reapplied every time precompilation continues
+
+		const precompilationState = { useFrameBufferTarget, renderTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel };
+
+		this._beginPreCompile( precompilationState );
+
+		const renderContext = this._renderContexts.get( renderTarget, this._mrt, this._callDepth );
 
 		const compilationPromises = [];
 
@@ -1052,40 +1061,51 @@ class Renderer {
 		this._handleObjectFunction = previousHandleObjectFunction;
 		this._compilationPromises = previousCompilationPromises;
 
+		this._finishPreCompile();
+
 		// Process compilation work items sequentially to avoid freezing
 		// Yields between objects to keep animation smooth
 
 		const total = compilationPromises.length;
 		let loaded = 0;
 
+		const yieldPreCompile = async () => {
+
+			this._finishPreCompile();
+
+			await yieldToMain();
+
+			this._beginPreCompile( precompilationState );
+
+		};
+
 		for ( const item of compilationPromises ) {
+
+			const pipelinePromises = [];
 
 			const renderObject = this._objects.get( item.object, item.material, item.scene, item.camera, item.lightsNode, item.renderContext, item.clippingContext, item.passId );
 			renderObject.drawRange = item.object.geometry.drawRange;
 			renderObject.group = item.group;
 
-			// Use async node building to yield to main thread
-			await this._nodes.getForRenderAsync( renderObject );
+			this._beginPreCompile( precompilationState );
 
-			this._isPreCompiling = true; // note: no awaits are allowed when this flag is true otherwise the state leaks outside of this method
+			await this._nodes.getForRenderAsync( renderObject, yieldPreCompile );
 			this._nodes.updateBefore( renderObject );
 			this._geometries.updateForRender( renderObject );
 			this._nodes.updateForRender( renderObject );
 			this._bindings.updateForRender( renderObject );
-			this._isPreCompiling = false;
-
-			// Wait for pipeline creation
-			const pipelinePromises = [];
 			this._pipelines.getForRender( renderObject, pipelinePromises );
+			this._nodes.updateAfter( renderObject );
+
+			this._finishPreCompile();
+
 			if ( pipelinePromises.length > 0 ) {
+
+				// Wait for pipeline creation
 
 				await Promise.all( pipelinePromises );
 
 			}
-
-			this._isPreCompiling = true;
-			this._nodes.updateAfter( renderObject );
-			this._isPreCompiling = false;
 
 			loaded ++;
 
@@ -1099,6 +1119,43 @@ class Renderer {
 			await yieldToMain();
 
 		}
+
+	}
+
+	/**
+	 * Sets up the renderer state for precompiling in `compileAsync()`.
+	 * The state must be restored with `_finishPreCompile()` before yielding to the main thread,
+	 * otherwise it leaks into renders executed in the meantime.
+	 *
+	 * @private
+	 * @param {Object} precompilationState - The precompilation state.
+	 */
+	_beginPreCompile( precompilationState ) {
+
+		const { useFrameBufferTarget, renderTarget } = precompilationState;
+
+		if ( useFrameBufferTarget === true ) this.setRenderTarget( renderTarget );
+
+		this._callDepth ++;
+
+		this._precompilationState = precompilationState;
+
+	}
+
+	/**
+	 * Restores the renderer state after precompiling in `compileAsync()`.
+	 *
+	 * @private
+	 */
+	_finishPreCompile() {
+
+		const { useFrameBufferTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel } = this._precompilationState;
+
+		if ( useFrameBufferTarget === true ) this.setRenderTarget( outputRenderTarget, activeCubeFace, activeMipmapLevel );
+
+		this._callDepth --;
+
+		this._precompilationState = null;
 
 	}
 
@@ -1163,6 +1220,7 @@ class Renderer {
 
 			await nodes.getForComputeAsync( computeNode );
 
+			nodes.updateBeforeForCompute( computeNode );
 			nodes.updateForCompute( computeNode );
 			bindings.updateForCompute( computeNode );
 
@@ -1171,6 +1229,8 @@ class Renderer {
 
 			pipelines.getForCompute( computeNode, computeBindings, compilationPromises );
 			await Promise.all( compilationPromises );
+
+			nodes.updateAfterForCompute( computeNode );
 
 			loaded ++;
 
@@ -1591,6 +1651,16 @@ class Renderer {
 
 				this._frameBufferTargets.delete( target );
 
+				const quadData = this._quadCache.get( frameBufferTarget );
+
+				if ( quadData !== undefined ) {
+
+					quadData.quad.material.dispose();
+
+					this._quadCache.delete( frameBufferTarget );
+
+				}
+
 			};
 
 			target.addEventListener( 'dispose', dispose );
@@ -1957,7 +2027,7 @@ class Renderer {
 
 		const cacheKey = this._nodes.getOutputCacheKey();
 
-		let quadData = this._quadCache.get( renderTarget.texture );
+		let quadData = this._quadCache.get( renderTarget );
 		let quad;
 
 		if ( quadData === undefined ) {
@@ -1973,21 +2043,7 @@ class Renderer {
 				cacheKey
 			};
 
-			this._quadCache.set( renderTarget.texture, quadData );
-
-			// dispose logic
-
-			const dispose = () => {
-
-				quad.material.dispose();
-
-				this._quadCache.delete( renderTarget.texture );
-
-				renderTarget.texture.removeEventListener( 'dispose', dispose );
-
-			};
-
-			renderTarget.texture.addEventListener( 'dispose', dispose );
+			this._quadCache.set( renderTarget, quadData );
 
 		} else {
 
@@ -2694,8 +2750,6 @@ class Renderer {
 
 		if ( this._initialized === true ) {
 
-			this.info.dispose();
-
 			this._inspector.dispose();
 			this._animation.dispose();
 			this._objects.dispose();
@@ -2705,13 +2759,15 @@ class Renderer {
 			this._bindings.dispose();
 			this._renderLists.dispose();
 			this._renderContexts.dispose();
-			this._textures.dispose();
 
 			for ( const canvasTarget of this._frameBufferTargets.keys() ) {
 
 				canvasTarget.dispose();
 
 			}
+
+			this._textures.dispose();
+			this.info.dispose();
 
 			await this.backend.dispose();
 
@@ -2877,7 +2933,7 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			warn( 'Renderer: .compute() called before the backend is initialized. Try using .computeAsync() instead.' );
+			warn( 'Renderer: ".compute()" called before the backend is initialized. Try using ".computeAsync()" instead.' );
 
 			return this.computeAsync( computeNodes, dispatchSize );
 
@@ -2950,6 +3006,7 @@ class Renderer {
 
 			}
 
+			nodes.updateBeforeForCompute( computeNode );
 			nodes.updateForCompute( computeNode );
 			bindings.updateForCompute( computeNode );
 
@@ -2957,6 +3014,8 @@ class Renderer {
 			const computePipeline = pipelines.getForCompute( computeNode, computeBindings );
 
 			backend.compute( computeNodes, computeNode, computeBindings, computePipeline, dispatchSize );
+
+			nodes.updateAfterForCompute( computeNode );
 
 		}
 

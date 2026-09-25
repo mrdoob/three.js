@@ -82,6 +82,12 @@ class VaryingNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Defines the interpolation type of the varying.
 	 *

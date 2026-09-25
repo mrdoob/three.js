@@ -140,7 +140,27 @@ The render object.
 
 **Returns:** The monitoring data.
 
-### .needsRefresh( renderObject : RenderObject, nodeFrame : NodeFrame ) : boolean
+### .getTextureData( texture : Texture ) : Object
+
+Returns a texture data structure holding the texture state for monitoring.
+
+**texture**
+
+The texture.
+
+**Returns:** An object for monitoring the texture.
+
+### .hasDynamicInstancing( object : Object3D ) : boolean
+
+Returns `true` if the given 3D object uses instance buffers with dynamic draw usage. Such buffers must be uploaded once per render so the render object requires a full refresh.
+
+**object**
+
+The 3D object.
+
+**Returns:** Whether the given 3D object uses instance buffers with dynamic draw usage or not.
+
+### .needsRefresh( renderObject : RenderObject, nodeFrame : NodeFrame ) : number
 
 Checks if the given render object requires a refresh.
 
@@ -152,7 +172,7 @@ The render object.
 
 The current node frame.
 
-**Returns:** Whether the given render object requires a refresh or not.
+**Returns:** The refresh type, see [RenderObjectRefreshType](global.html#RenderObjectRefreshType).
 
 ### .needsVelocity( renderer : Renderer ) : boolean
 

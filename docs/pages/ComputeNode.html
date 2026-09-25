@@ -99,9 +99,9 @@ Used directly if <code>count</code> is not provided.</p>
 				<div class="member">
 					<h3 class="name" id="updateBeforeType" translate="no">.<a href="#updateBeforeType">updateBeforeType</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
-						<p>The <code>updateBeforeType</code> is set to <code>NodeUpdateType.OBJECT</code> since <a href="ComputeNode.html#updateBefore">ComputeNode#updateBefore</a>
-is executed once per object by default.</p>
-						<p>Default is <code>'object'</code>.</p>
+						<p>The <code>updateBeforeType</code> is set to <code>NodeUpdateType.FRAME</code> since the node computes
+once per frame.</p>
+						<p>Default is <code>'frame'</code>.</p>
 					</div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#updateBeforeType">Node#updateBeforeType</a></dt>
@@ -124,13 +124,28 @@ is executed once per object by default.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<h3 class="name name-method" id="getUpdateBeforeType" translate="no">.<a href="#getUpdateBeforeType">getUpdateBeforeType</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span><span class="type-signature"> : <a href="global.html#NodeUpdateType">NodeUpdateType</a></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Executes the <code>dispose</code> event for this node.</p>
+							<p>Returns the update type of <a href="Node.html#updateBefore">Node#updateBefore</a>.</p>
 						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">frame</strong>
+									</td>
+									<td class="description last">
+										<p>The current node frame.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
 						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#dispose">Node#dispose</a></dt>
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#getUpdateBeforeType">Node#getUpdateBeforeType</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The update type.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="label" translate="no">.<a href="#label">label</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="ComputeNode.html">ComputeNode</a></span> </h3>

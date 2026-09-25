@@ -1,5 +1,5 @@
 import { Tab } from 'three/addons/inspector/ui/Tab.js';
-import { getItem, setItem } from './Inspector.js';
+import { getItem, setItem } from './Storage.js';
 
 export class Extension extends Tab {
 
