@@ -758,8 +758,15 @@ class PhysicalLightingModel extends LightingModel {
 	 */
 	indirect( builder ) {
 
-		this.indirectDiffuse( builder );
-		this.indirectSpecular( builder );
+		const dielectricScattering = {
+			single: vec3().toVar( 'singleScatteringDielectric' ),
+			multi: vec3().toVar( 'multiScatteringDielectric' )
+		};
+
+		this.computeMultiscattering( dielectricScattering.single, dielectricScattering.multi, specularF90, specularColor, this.iridescenceF0Dielectric );
+
+		this.indirectDiffuse( builder, dielectricScattering );
+		this.indirectSpecular( builder, dielectricScattering );
 		this.ambientOcclusion( builder );
 
 	}
@@ -768,16 +775,21 @@ class PhysicalLightingModel extends LightingModel {
 	 * Implements the indirect diffuse term.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {?Object} [dielectricScattering=null] - Optional dielectric scattering shared by the indirect lighting paths.
 	 */
-	indirectDiffuse( builder ) {
+	indirectDiffuse( builder, dielectricScattering = null ) {
 
 		const { irradiance, reflectedLight } = builder.context;
 
 		// Energy reflected by the specular lobe is not available to the diffuse layer
-		const singleScattering = vec3().toVar();
-		const multiScattering = vec3().toVar();
+		const singleScattering = dielectricScattering ? dielectricScattering.single : vec3().toVar();
+		const multiScattering = dielectricScattering ? dielectricScattering.multi : vec3().toVar();
 
-		this.computeMultiscattering( singleScattering, multiScattering, specularF90, specularColor, this.iridescenceF0Dielectric );
+		if ( dielectricScattering === null ) {
+
+			this.computeMultiscattering( singleScattering, multiScattering, specularF90, specularColor, this.iridescenceF0Dielectric );
+
+		}
 
 		const diffuseBRDF = this.diffuseRoughness
 			? EON_DirectionalAlbedo( { diffuseColor: diffuseColor.rgb, roughness: diffuseRoughness, dotNV: normalView.dot( positionViewDirection ).clamp() } ).mul( metalness.oneMinus(), 1 / Math.PI )
@@ -805,8 +817,9 @@ class PhysicalLightingModel extends LightingModel {
 	 * Implements the indirect specular term.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {?Object} [dielectricScattering=null] - Optional dielectric scattering shared by the indirect lighting paths.
 	 */
-	indirectSpecular( builder ) {
+	indirectSpecular( builder, dielectricScattering = null ) {
 
 		const { radiance, iblIrradiance, reflectedLight } = builder.context;
 
@@ -842,12 +855,17 @@ class PhysicalLightingModel extends LightingModel {
 		// Both indirect specular and indirect diffuse light accumulate here
 		// Compute multiscattering separately for dielectric and metallic, then mix
 
-		const singleScatteringDielectric = vec3().toVar( 'singleScatteringDielectric' );
-		const multiScatteringDielectric = vec3().toVar( 'multiScatteringDielectric' );
+		const singleScatteringDielectric = dielectricScattering ? dielectricScattering.single : vec3().toVar( 'singleScatteringDielectric' );
+		const multiScatteringDielectric = dielectricScattering ? dielectricScattering.multi : vec3().toVar( 'multiScatteringDielectric' );
 		const singleScatteringMetallic = vec3().toVar( 'singleScatteringMetallic' );
 		const multiScatteringMetallic = vec3().toVar( 'multiScatteringMetallic' );
 
-		this.computeMultiscattering( singleScatteringDielectric, multiScatteringDielectric, specularF90, specularColor, this.iridescenceF0Dielectric );
+		if ( dielectricScattering === null ) {
+
+			this.computeMultiscattering( singleScatteringDielectric, multiScatteringDielectric, specularF90, specularColor, this.iridescenceF0Dielectric );
+
+		}
+
 		this.computeMultiscattering( singleScatteringMetallic, multiScatteringMetallic, specularF90, diffuseColor.rgb, this.iridescenceF0Metallic );
 
 		// Mix based on metalness
