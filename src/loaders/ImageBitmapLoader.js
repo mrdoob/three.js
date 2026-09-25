@@ -176,7 +176,7 @@ class ImageBitmapLoader extends Loader {
 
 		} ).then( function ( blob ) {
 
-			return createImageBitmap( blob, Object.assign( scope.options, { colorSpaceConversion: 'none' } ) );
+			return createImageBitmap( blob, Object.assign( {}, scope.options, { colorSpaceConversion: 'none' } ) );
 
 		} ).then( function ( imageBitmap ) {
 
@@ -185,6 +185,8 @@ class ImageBitmapLoader extends Loader {
 			if ( onLoad ) onLoad( imageBitmap );
 
 			scope.manager.itemEnd( url );
+
+			return imageBitmap; // see #34150
 
 		} ).catch( function ( e ) {
 

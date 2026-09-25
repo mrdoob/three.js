@@ -286,7 +286,7 @@ Returns the child nodes as a JSON object.
 
 ### .getShared( builder : NodeBuilder ) : Node
 
-This method is used during the build process of a node and ensures equal nodes are not built multiple times but just once. For example if `attribute( 'uv' )` is used multiple times by the user, the build process makes sure to process just the first node.
+This method is used during the build process of a node and ensures equal nodes are not built multiple times but just once. For example if `attribute( 'uv' )` is used multiple times by the user, the build process makes sure to process just the first node. It also handles node overrides if an override context is set.
 
 **builder**
 
@@ -294,21 +294,33 @@ The current node builder.
 
 **Returns:** The shared node if possible. Otherwise `this` is returned.
 
-### .getUpdateAfterType() : NodeUpdateType
+### .getUpdateAfterType( frame : NodeFrame ) : NodeUpdateType
 
 Returns the update type of [Node#updateAfter](Node.html#updateAfter).
 
+**frame**
+
+The current node frame.
+
 **Returns:** The update type.
 
-### .getUpdateBeforeType() : NodeUpdateType
+### .getUpdateBeforeType( frame : NodeFrame ) : NodeUpdateType
 
 Returns the update type of [Node#updateBefore](Node.html#updateBefore).
 
+**frame**
+
+The current node frame.
+
 **Returns:** The update type.
 
-### .getUpdateType() : NodeUpdateType
+### .getUpdateType( frame : NodeFrame ) : NodeUpdateType
 
 Returns the update type of [Node#update](Node.html#update).
+
+**frame**
+
+The current node frame.
 
 **Returns:** The update type.
 

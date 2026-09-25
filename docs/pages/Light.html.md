@@ -40,12 +40,6 @@ This flag can be used for type testing.
 
 Default is `true`.
 
-## Methods
-
-### .dispose()
-
-Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
-
 ## Source
 
 [src/lights/Light.js](https://github.com/mrdoob/three.js/blob/master/src/lights/Light.js)

@@ -38,6 +38,34 @@ Default is `'render'`.
 
 ## Methods
 
+### .disposeShadowMaterial()
+
+Disposes the shadow material for the shadow casting light source.
+
+### .getShadowMaterial() : NodeMaterial
+
+Retrieves or creates a shadow material for the shadow casting light source.
+
+This method checks if a shadow material already exists for the provided light in the internal library. If not, it creates a new `NodeMaterial` configured for shadow rendering and stores it for future use.
+
+**Returns:** The shadow material associated with the given light.
+
+### .getShadowRenderObjectFunction( renderer : Renderer, shadow : LightShadow ) : function
+
+Returns a function to render shadow objects in a scene for the given light shadow and renderer.
+
+**renderer**
+
+The renderer.
+
+**shadow**
+
+The light shadow object containing shadow properties.
+
+Default is `this.light.shadow`.
+
+**Returns:** A function that renders shadow objects.
+
 ### .setupShadowPosition( object : NodeBuilder )
 
 Setups the shadow position node which is by default the predefined TSL node object `shadowPositionWorld`.

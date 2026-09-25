@@ -17,7 +17,7 @@
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">FirstPersonControls</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<p><span translate="no">FirstPersonControls</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -62,6 +62,14 @@
 					<div class="description">
 						<p>Whether or not looking around is vertically constrained by <code>verticalMin</code> and <code>verticalMax</code>.</p>
 						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="dampingFactor" translate="no">.<a href="#dampingFactor">dampingFactor</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>How quickly the movement and look velocity catches up to the input. Lower
+values feel heavier (more inertia), <code>1</code> disables damping.</p>
+						<p>Default is <code>0.1</code>.</p>
 					</div>
 				</div>
 				<div class="member">

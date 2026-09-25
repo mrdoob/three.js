@@ -21,7 +21,7 @@ scene.add( reflector );
 
 ## Import
 
-Reflector is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+Reflector is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { Reflector } from 'three/addons/objects/Reflector.js';
@@ -60,6 +60,8 @@ Default is `true`.
 ### .dispose()
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+
+**Overrides:** [Mesh#dispose](Mesh.html#dispose)
 
 ### .getReflectionCamera( camera : Camera ) : Camera
 

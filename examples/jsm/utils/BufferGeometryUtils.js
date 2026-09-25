@@ -30,7 +30,7 @@ import {
  *
  * @param {BufferGeometry} geometry - The geometry to compute tangents for.
  * @param {Object} MikkTSpace - Instance of `examples/jsm/libs/mikktspace.module.js`, or `mikktspace` npm package.
- * Await `MikkTSpace.ready` before use.
+ * The bundled JavaScript implementation is ready immediately. Await `MikkTSpace.ready` before using a WebAssembly implementation.
  * @param {boolean} [negateSign=true] - Whether to negate the sign component (.w) of each tangent.
  * Required for normal map conventions in some formats, including glTF.
  * @return {BufferGeometry} The updated geometry.
@@ -150,6 +150,7 @@ function mergeGeometries( geometries, useGroups = false ) {
 
 		const geometry = geometries[ i ];
 		let attributesCount = 0;
+		let morphAttributesCount = 0;
 
 		// ensure that all geometries are indexed, or none
 
@@ -206,9 +207,27 @@ function mergeGeometries( geometries, useGroups = false ) {
 
 			}
 
+			if ( geometry.morphAttributes[ name ].length !== geometries[ 0 ].morphAttributes[ name ].length ) {
+
+				console.error( 'THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index ' + i + '. All geometries must have the same number of morph targets for the "' + name + '" morph attribute.' );
+				return null;
+
+			}
+
 			if ( morphAttributes[ name ] === undefined ) morphAttributes[ name ] = [];
 
 			morphAttributes[ name ].push( geometry.morphAttributes[ name ] );
+
+			morphAttributesCount ++;
+
+		}
+
+		// ensure geometries have the same number of morph attributes
+
+		if ( morphAttributesCount !== morphAttributesUsed.size ) {
+
+			console.error( 'THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index ' + i + '. Make sure all geometries have the same number of morph attributes.' );
+			return null;
 
 		}
 
@@ -658,6 +677,8 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 	const attributeNames = Object.keys( geometry.attributes );
 	const tmpAttributes = {};
 	const tmpMorphAttributes = {};
+	const tmpBuffers = new Map();
+	const resultBuffers = new Map();
 	const newIndices = [];
 	const getters = [ 'getX', 'getY', 'getZ', 'getW' ];
 	const setters = [ 'setX', 'setY', 'setZ', 'setW' ];
@@ -669,11 +690,7 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 		const name = attributeNames[ i ];
 		const attr = geometry.attributes[ name ];
 
-		tmpAttributes[ name ] = new attr.constructor(
-			new attr.array.constructor( attr.count * attr.itemSize ),
-			attr.itemSize,
-			attr.normalized
-		);
+		tmpAttributes[ name ] = createAttribute( attr, attr.count, tmpBuffers );
 
 		const morphAttributes = geometry.morphAttributes[ name ];
 		if ( morphAttributes ) {
@@ -681,8 +698,7 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 			if ( ! tmpMorphAttributes[ name ] ) tmpMorphAttributes[ name ] = [];
 			morphAttributes.forEach( ( morphAttr, i ) => {
 
-				const array = new morphAttr.array.constructor( morphAttr.count * morphAttr.itemSize );
-				tmpMorphAttributes[ name ][ i ] = new morphAttr.constructor( array, morphAttr.itemSize, morphAttr.normalized );
+				tmpMorphAttributes[ name ][ i ] = createAttribute( morphAttr, morphAttr.count, tmpBuffers );
 
 			} );
 
@@ -709,8 +725,8 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 			for ( let k = 0; k < itemSize; k ++ ) {
 
-				// double tilde truncates the decimal value
-				hash += `${ ~ ~ ( attribute[ getters[ k ] ]( index ) * hashMultiplier + hashAdditive ) },`;
+				// Math.trunc() preserves the full Number range, ~~ would wrap to int32
+				hash += `${ Math.trunc( attribute[ getters[ k ] ]( index ) * hashMultiplier + hashAdditive ) },`;
 
 			}
 
@@ -768,11 +784,7 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 		const tmpAttribute = tmpAttributes[ name ];
 
-		result.setAttribute( name, new tmpAttribute.constructor(
-			tmpAttribute.array.slice( 0, nextIndex * tmpAttribute.itemSize ),
-			tmpAttribute.itemSize,
-			tmpAttribute.normalized,
-		) );
+		result.setAttribute( name, createAttribute( tmpAttribute, nextIndex, resultBuffers ) );
 
 		if ( ! ( name in tmpMorphAttributes ) ) continue;
 
@@ -780,11 +792,7 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 			const tmpMorphAttribute = tmpMorphAttributes[ name ][ j ];
 
-			result.morphAttributes[ name ][ j ] = new tmpMorphAttribute.constructor(
-				tmpMorphAttribute.array.slice( 0, nextIndex * tmpMorphAttribute.itemSize ),
-				tmpMorphAttribute.itemSize,
-				tmpMorphAttribute.normalized,
-			);
+			result.morphAttributes[ name ][ j ] = createAttribute( tmpMorphAttribute, nextIndex, resultBuffers );
 
 		}
 
@@ -799,12 +807,13 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 }
 
 /**
- * Returns a new indexed geometry based on `TrianglesDrawMode` draw mode.
- * This mode corresponds to the `gl.TRIANGLES` primitive in WebGL.
+ * Converts the given geometry to the `TrianglesDrawMode` draw mode, which
+ * corresponds to the `gl.TRIANGLES` primitive in WebGL. The conversion only
+ * rewrites the index, so the geometry is modified in place and returned.
  *
  * @param {BufferGeometry} geometry - The geometry to convert.
  * @param {number} drawMode - The current draw mode.
- * @return {BufferGeometry} The new geometry using `TrianglesDrawMode`.
+ * @return {BufferGeometry} The converted geometry using `TrianglesDrawMode`.
  */
 function toTrianglesDrawMode( geometry, drawMode ) {
 
@@ -894,13 +903,12 @@ function toTrianglesDrawMode( geometry, drawMode ) {
 
 		}
 
-		// build final geometry
+		// updated indices
 
-		const newGeometry = geometry.clone();
-		newGeometry.setIndex( newIndices );
-		newGeometry.clearGroups();
+		geometry.setIndex( newIndices );
+		geometry.clearGroups();
 
-		return newGeometry;
+		return geometry;
 
 	} else {
 
@@ -1314,106 +1322,195 @@ function mergeGroups( geometry ) {
  */
 function toCreasedNormals( geometry, creaseAngle = Math.PI / 3 /* 60 degrees */ ) {
 
-	const creaseDot = Math.cos( creaseAngle );
-	const hashMultiplier = ( 1 + 1e-10 ) * 1e2;
-
-	// reusable vectors
-	const verts = [ new Vector3(), new Vector3(), new Vector3() ];
-	const tempVec1 = new Vector3();
-	const tempVec2 = new Vector3();
-	const tempNorm = new Vector3();
-	const tempNorm2 = new Vector3();
-
-	// hashes a vector
-	function hashVertex( v ) {
-
-		const x = ~ ~ ( v.x * hashMultiplier );
-		const y = ~ ~ ( v.y * hashMultiplier );
-		const z = ~ ~ ( v.z * hashMultiplier );
-		return `${x},${y},${z}`;
-
-	}
-
 	// BufferGeometry.toNonIndexed() warns if the geometry is non-indexed
 	// and returns the original geometry
 	const resultGeometry = geometry.index ? geometry.toNonIndexed() : geometry;
 	const posAttr = resultGeometry.attributes.position;
-	const vertexMap = {};
+	const vertexCount = posAttr.count;
 
-	// find all the normals shared by commonly located vertices
-	for ( let i = 0, l = posAttr.count / 3; i < l; i ++ ) {
+	let positions;
 
-		const i3 = 3 * i;
-		const a = verts[ 0 ].fromBufferAttribute( posAttr, i3 + 0 );
-		const b = verts[ 1 ].fromBufferAttribute( posAttr, i3 + 1 );
-		const c = verts[ 2 ].fromBufferAttribute( posAttr, i3 + 2 );
+	if ( posAttr.isBufferAttribute === true && posAttr.itemSize === 3 && posAttr.normalized === false ) {
 
-		tempVec1.subVectors( c, b );
-		tempVec2.subVectors( a, b );
+		positions = posAttr.array;
 
-		// add the normal to the map for all vertices
-		const normal = new Vector3().crossVectors( tempVec1, tempVec2 ).normalize();
-		for ( let n = 0; n < 3; n ++ ) {
+	} else {
 
-			const vert = verts[ n ];
-			const hash = hashVertex( vert );
-			if ( ! ( hash in vertexMap ) ) {
+		// flatten the position buffer so the math below operates on plain numbers
+		positions = new Float64Array( vertexCount * 3 );
 
-				vertexMap[ hash ] = [];
+		for ( let i = 0; i < vertexCount; i ++ ) {
 
-			}
-
-			vertexMap[ hash ].push( normal );
+			positions[ 3 * i + 0 ] = posAttr.getX( i );
+			positions[ 3 * i + 1 ] = posAttr.getY( i );
+			positions[ 3 * i + 2 ] = posAttr.getZ( i );
 
 		}
 
 	}
 
-	// average normals from all vertices that share a common location if they are within the
-	// provided crease threshold
-	const normalArray = new Float32Array( posAttr.count * 3 );
-	const normAttr = new BufferAttribute( normalArray, 3, false );
-	for ( let i = 0, l = posAttr.count / 3; i < l; i ++ ) {
+	const creaseDot = Math.cos( creaseAngle );
+	const hashMultiplier = ( 1 + 1e-10 ) * 1e2;
+	const faceCount = vertexCount / 3;
 
-		// get the face normal for this vertex
+	// compute the normal of each face
+	const faceNormals = new Float64Array( faceCount * 3 );
+	for ( let f = 0; f < faceCount; f ++ ) {
+
+		const f9 = 9 * f;
+		const ax = positions[ f9 + 0 ], ay = positions[ f9 + 1 ], az = positions[ f9 + 2 ];
+		const bx = positions[ f9 + 3 ], by = positions[ f9 + 4 ], bz = positions[ f9 + 5 ];
+		const cx = positions[ f9 + 6 ], cy = positions[ f9 + 7 ], cz = positions[ f9 + 8 ];
+
+		const v1x = cx - bx, v1y = cy - by, v1z = cz - bz;
+		const v2x = ax - bx, v2y = ay - by, v2z = az - bz;
+
+		const nx = v1y * v2z - v1z * v2y;
+		const ny = v1z * v2x - v1x * v2z;
+		const nz = v1x * v2y - v1y * v2x;
+
+		const invLength = 1 / ( Math.sqrt( nx * nx + ny * ny + nz * nz ) || 1 );
+		faceNormals[ 3 * f + 0 ] = nx * invLength;
+		faceNormals[ 3 * f + 1 ] = ny * invLength;
+		faceNormals[ 3 * f + 2 ] = nz * invLength;
+
+	}
+
+	// assign an id to each vertex, sharing the id between vertices with the same
+	// quantized position via an open-addressed hash table (slots hold id + 1, 0 means empty)
+	const vertexIds = new Int32Array( vertexCount );
+	const quantized = new Float64Array( vertexCount * 3 );
+
+	let tableSize = 1;
+	while ( tableSize < vertexCount * 2 ) tableSize <<= 1;
+	const tableMask = tableSize - 1;
+	const table = new Int32Array( tableSize );
+
+	let uniqueCount = 0;
+	for ( let i = 0; i < vertexCount; i ++ ) {
+
 		const i3 = 3 * i;
-		const a = verts[ 0 ].fromBufferAttribute( posAttr, i3 + 0 );
-		const b = verts[ 1 ].fromBufferAttribute( posAttr, i3 + 1 );
-		const c = verts[ 2 ].fromBufferAttribute( posAttr, i3 + 2 );
+		const qx = Math.trunc( positions[ i3 + 0 ] * hashMultiplier );
+		const qy = Math.trunc( positions[ i3 + 1 ] * hashMultiplier );
+		const qz = Math.trunc( positions[ i3 + 2 ] * hashMultiplier );
 
-		tempVec1.subVectors( c, b );
-		tempVec2.subVectors( a, b );
+		let slot = ( Math.imul( qx, 73856093 ) ^ Math.imul( qy, 19349663 ) ^ Math.imul( qz, 83492791 ) ) & tableMask;
 
-		tempNorm.crossVectors( tempVec1, tempVec2 ).normalize();
+		while ( true ) {
 
-		// average all normals that meet the threshold and set the normal value
+			const id = table[ slot ];
+
+			if ( id === 0 ) {
+
+				const q3 = 3 * uniqueCount;
+				quantized[ q3 + 0 ] = qx;
+				quantized[ q3 + 1 ] = qy;
+				quantized[ q3 + 2 ] = qz;
+
+				table[ slot ] = uniqueCount + 1;
+				vertexIds[ i ] = uniqueCount ++;
+				break;
+
+			}
+
+			const q3 = 3 * ( id - 1 );
+
+			if ( quantized[ q3 + 0 ] === qx && quantized[ q3 + 1 ] === qy && quantized[ q3 + 2 ] === qz ) {
+
+				vertexIds[ i ] = id - 1;
+				break;
+
+			}
+
+			slot = ( slot + 1 ) & tableMask;
+
+		}
+
+	}
+
+	// bucket the faces surrounding each unique vertex position
+	const bucketOffsets = new Int32Array( uniqueCount + 1 );
+	for ( let i = 0; i < vertexCount; i ++ ) bucketOffsets[ vertexIds[ i ] + 1 ] ++;
+	for ( let i = 0; i < uniqueCount; i ++ ) bucketOffsets[ i + 1 ] += bucketOffsets[ i ];
+
+	const bucketFaces = new Int32Array( vertexCount );
+	const bucketCursors = bucketOffsets.slice( 0, uniqueCount );
+	for ( let f = 0; f < faceCount; f ++ ) {
+
+		const f3 = 3 * f;
+		bucketFaces[ bucketCursors[ vertexIds[ f3 + 0 ] ] ++ ] = f;
+		bucketFaces[ bucketCursors[ vertexIds[ f3 + 1 ] ] ++ ] = f;
+		bucketFaces[ bucketCursors[ vertexIds[ f3 + 2 ] ] ++ ] = f;
+
+	}
+
+	// average the normals of the faces surrounding each vertex if they are within the
+	// provided crease threshold
+	const normalArray = new Float32Array( vertexCount * 3 );
+	for ( let f = 0; f < faceCount; f ++ ) {
+
+		const f3 = 3 * f;
+		const nx = faceNormals[ f3 + 0 ];
+		const ny = faceNormals[ f3 + 1 ];
+		const nz = faceNormals[ f3 + 2 ];
+
 		for ( let n = 0; n < 3; n ++ ) {
 
-			const vert = verts[ n ];
-			const hash = hashVertex( vert );
-			const otherNormals = vertexMap[ hash ];
-			tempNorm2.set( 0, 0, 0 );
+			const i = f3 + n;
+			const id = vertexIds[ i ];
 
-			for ( let k = 0, lk = otherNormals.length; k < lk; k ++ ) {
+			let sumX = 0, sumY = 0, sumZ = 0;
 
-				const otherNorm = otherNormals[ k ];
-				if ( tempNorm.dot( otherNorm ) > creaseDot ) {
+			for ( let k = bucketOffsets[ id ], end = bucketOffsets[ id + 1 ]; k < end; k ++ ) {
 
-					tempNorm2.add( otherNorm );
+				const o3 = 3 * bucketFaces[ k ];
+				const ox = faceNormals[ o3 + 0 ];
+				const oy = faceNormals[ o3 + 1 ];
+				const oz = faceNormals[ o3 + 2 ];
+
+				if ( nx * ox + ny * oy + nz * oz > creaseDot ) {
+
+					sumX += ox;
+					sumY += oy;
+					sumZ += oz;
 
 				}
 
 			}
 
-			tempNorm2.normalize();
-			normAttr.setXYZ( i3 + n, tempNorm2.x, tempNorm2.y, tempNorm2.z );
+			const invLength = 1 / ( Math.sqrt( sumX * sumX + sumY * sumY + sumZ * sumZ ) || 1 );
+			normalArray[ 3 * i + 0 ] = sumX * invLength;
+			normalArray[ 3 * i + 1 ] = sumY * invLength;
+			normalArray[ 3 * i + 2 ] = sumZ * invLength;
 
 		}
 
 	}
 
-	resultGeometry.setAttribute( 'normal', normAttr );
+	resultGeometry.setAttribute( 'normal', new BufferAttribute( normalArray, 3, false ) );
 	return resultGeometry;
+
+}
+
+function createAttribute( attribute, count, buffers ) {
+
+	if ( attribute.isInterleavedBufferAttribute ) {
+
+		let data = buffers.get( attribute.data );
+
+		if ( data === undefined ) {
+
+			const stride = attribute.data.stride;
+			data = new InterleavedBuffer( attribute.array.slice( 0, count * stride ), stride );
+			buffers.set( attribute.data, data );
+
+		}
+
+		return new InterleavedBufferAttribute( data, attribute.itemSize, attribute.offset, attribute.normalized );
+
+	}
+
+	return new attribute.constructor( attribute.array.slice( 0, count * attribute.itemSize ), attribute.itemSize, attribute.normalized );
 
 }
 

@@ -13,7 +13,7 @@ composer.addPass( savePass );
 
 ## Import
 
-SavePass is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+SavePass is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { SavePass } from 'three/addons/postprocessing/SavePass.js';

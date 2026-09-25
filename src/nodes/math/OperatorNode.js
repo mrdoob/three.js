@@ -1,5 +1,5 @@
 import { WebGLCoordinateSystem } from '../../constants.js';
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
 import { addMethodChaining, Fn, int, nodeProxyIntent } from '../tsl/TSLCore.js';
 
 const _vectorOperators = {
@@ -16,9 +16,9 @@ const _vectorOperators = {
  * This node represents basic mathematical and logical operations like addition,
  * subtraction or comparisons (e.g. `equal()`).
  *
- * @augments TempNode
+ * @augments Node
  */
-class OperatorNode extends TempNode {
+class OperatorNode extends Node {
 
 	static get type() {
 
@@ -669,7 +669,7 @@ export const shiftRight = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '>>' ).se
  * @param {Node} a - The node to increment.
  * @returns {OperatorNode}
  */
-export const incrementBefore = Fn( ( [ a ] ) => {
+export const incrementBefore = /*@__PURE__*/ Fn( ( [ a ] ) => {
 
 	a.addAssign( 1 );
 	return a;
@@ -684,7 +684,7 @@ export const incrementBefore = Fn( ( [ a ] ) => {
  * @param {Node} a - The node to decrement.
  * @returns {OperatorNode}
  */
-export const decrementBefore = Fn( ( [ a ] ) => {
+export const decrementBefore = /*@__PURE__*/ Fn( ( [ a ] ) => {
 
 	a.subAssign( 1 );
 	return a;

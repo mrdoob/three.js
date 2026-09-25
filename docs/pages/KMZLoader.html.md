@@ -14,7 +14,7 @@ scene.add( kmz.scene );
 
 ## Import
 
-KMZLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+KMZLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { KMZLoader } from 'three/addons/loaders/KMZLoader.js';

@@ -187,6 +187,10 @@ class Frustum {
 	/**
 	 * Returns `true` if the given bounding sphere is intersecting this frustum.
 	 *
+	 * This is a fast, conservative test that favors performance over precision. It can
+	 * report false positives for spheres that lie outside the frustum but are not separated
+	 * by a single frustum plane. It never reports false negatives, so it is safe for culling.
+	 *
 	 * @param {Sphere} sphere - The bounding sphere to test.
 	 * @return {boolean} Whether the bounding sphere is intersecting this frustum or not.
 	 */
@@ -214,6 +218,11 @@ class Frustum {
 
 	/**
 	 * Returns `true` if the given bounding box is intersecting this frustum.
+	 *
+	 * This is a fast, conservative test that favors performance over precision. It can
+	 * report false positives for large boxes that lie outside the frustum but are not
+	 * separated by a single frustum plane. It never reports false negatives, so it is
+	 * safe for culling.
 	 *
 	 * @param {Box3} box - The bounding box to test.
 	 * @return {boolean} Whether the bounding box is intersecting this frustum or not.

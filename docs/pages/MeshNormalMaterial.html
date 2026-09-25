@@ -50,6 +50,8 @@ by <a href="Color.html#set">Color#set</a>.</p>
 perceived depth in relation to the lights. Bump doesn't actually affect
 the geometry of the object, only the lighting. If a normal map is defined
 this will be ignored.</p>
+<p><code>bumpMap</code> represents non-color data. Any texture assigned must have
+<code>texture.colorSpace = NoColorSpace</code> (default).</p>
 						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
@@ -115,6 +117,8 @@ maps do not change the actual shape of the surface, only the lighting. In
 case the material has a normal map authored using the left handed
 convention, the <code>y</code> component of <code>normalScale</code> should be negated to compensate
 for the different handedness.</p>
+<p><code>normalMap</code> represents non-color data. Any texture assigned must have
+<code>texture.colorSpace = NoColorSpace</code> (default).</p>
 						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>

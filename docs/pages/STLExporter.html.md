@@ -13,7 +13,7 @@ const data = exporter.parse( mesh, { binary: true } );
 
 ## Import
 
-STLExporter is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+STLExporter is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { STLExporter } from 'three/addons/exporters/STLExporter.js';

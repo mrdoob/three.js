@@ -19,7 +19,7 @@ scene.add( helper );
 
 ## Import
 
-VertexNormalsHelper is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+VertexNormalsHelper is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { VertexNormalsHelper } from 'three/addons/helpers/VertexNormalsHelper.js';
@@ -78,6 +78,8 @@ Default is `1`.
 ### .dispose()
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+
+**Overrides:** [LineSegments#dispose](LineSegments.html#dispose)
 
 ### .update()
 

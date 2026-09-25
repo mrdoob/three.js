@@ -9,6 +9,7 @@ An extension of the [MeshStandardMaterial](MeshStandardMaterial.html), providing
 *   Iridescence: Allows to render the effect where hue varies depending on the viewing angle and illumination angle. This can be seen on soap bubbles, oil films, or on the wings of many insects.
 *   Physically-based transparency: One limitation of [Material#opacity](Material.html#opacity) is that highly transparent materials are less reflective. Physically-based transmission provides a more realistic option for thin, transparent surfaces like glass.
 *   Advanced reflectivity: More flexible reflectivity for non-metallic materials.
+*   Retroreflection: Redirects specular light back toward the light source for safety materials like road markings and reflective tape.
 *   Sheen: Can be used for representing cloth and fabric materials.
 
 As a result of these complex shading features, `MeshPhysicalMaterial` has a higher performance cost, per pixel, than other three.js materials. Most effects are disabled by default, and add cost as they are enabled. For best results, always specify an environment map when using this material.
@@ -34,6 +35,8 @@ Default is `0`.
 ### .anisotropyMap : Texture
 
 Red and green channels represent the anisotropy direction in `[-1, 1]` tangent, bitangent space, to be rotated by `anisotropyRotation`. The blue channel contains strength as `[0, 1]` to be multiplied by `anisotropy`.
+
+`anisotropyMap` represents non-color data. Any texture assigned must have `texture.colorSpace = NoColorSpace` (default).
 
 Default is `null`.
 
@@ -65,11 +68,15 @@ Default is `0`.
 
 The red channel of this texture is multiplied against `clearcoat`, for per-pixel control over a coating's intensity.
 
+`clearcoatMap` represents non-color data. Any texture assigned must have `texture.colorSpace = NoColorSpace` (default).
+
 Default is `null`.
 
 ### .clearcoatNormalMap : Texture
 
 Can be used to enable independent normals for the clear coat layer.
+
+`clearcoatNormalMap` represents non-color data. Any texture assigned must have `texture.colorSpace = NoColorSpace` (default).
 
 Default is `null`.
 
@@ -88,6 +95,8 @@ Default is `0`.
 ### .clearcoatRoughnessMap : Texture
 
 The green channel of this texture is multiplied against `clearcoatRoughness`, for per-pixel control over a coating's roughness.
+
+`clearcoatRoughnessMap` represents non-color data. Any texture assigned must have `texture.colorSpace = NoColorSpace` (default).
 
 Default is `null`.
 
@@ -119,6 +128,8 @@ Default is `1.3`.
 
 The red channel of this texture is multiplied against `iridescence`, for per-pixel control over iridescence.
 
+`iridescenceMap` represents non-color data. Any texture assigned must have `texture.colorSpace = NoColorSpace` (default).
+
 Default is `null`.
 
 ### .iridescenceThicknessMap : Texture
@@ -128,6 +139,8 @@ A texture that defines the thickness of the iridescence layer, stored in the gre
 *   `0.0` in the green channel will result in thickness equal to first element of the array.
 *   `1.0` in the green channel will result in thickness equal to second element of the array.
 *   Values in-between will linearly interpolate between the elements of the array.
+
+`iridescenceThicknessMap` represents non-color data. Any texture assigned must have `texture.colorSpace = NoColorSpace` (default).
 
 Default is `null`.
 
@@ -151,6 +164,12 @@ This models the reflectivity of non-metallic materials. It has no effect when `m
 
 Default is `0.5`.
 
+### .retroreflectivity : number
+
+The strength of retroreflection, from `0.0` to `1.0`. A value of `1.0` evaluates the material's microfacet reflection with the view direction reflected about the surface normal, redirecting the specular lobe back toward the light source.
+
+Default is `0`.
+
 ### .sheen : number
 
 The intensity of the sheen layer, from `0.0` to `1.0`.
@@ -167,6 +186,8 @@ Default is `(0,0,0)`.
 
 The RGB channels of this texture are multiplied against `sheenColor`, for per-pixel control over sheen tint.
 
+`sheenColorMap` represents color data, and the texture must be assigned a [Texture#colorSpace](Texture.html#colorSpace). Most `sheenColorMap` textures set `texture.colorSpace = SRGBColorSpace`.
+
 Default is `null`.
 
 ### .sheenRoughness : number
@@ -178,6 +199,8 @@ Default is `1`.
 ### .sheenRoughnessMap : Texture
 
 The alpha channel of this texture is multiplied against `sheenRoughness`, for per-pixel control over sheen roughness.
+
+`sheenRoughnessMap` represents non-color data. Any texture assigned must have `texture.colorSpace = NoColorSpace` (default).
 
 Default is `null`.
 
@@ -191,6 +214,8 @@ Default is `(1,1,1)`.
 
 The RGB channels of this texture are multiplied against `specularColor`, for per-pixel control over specular color.
 
+`specularColorMap` represents color data, and the texture must be assigned a [Texture#colorSpace](Texture.html#colorSpace). Most `specularColorMap` textures set `texture.colorSpace = SRGBColorSpace`.
+
 Default is `null`.
 
 ### .specularIntensity : number
@@ -203,6 +228,8 @@ Default is `1`.
 
 The alpha channel of this texture is multiplied against `specularIntensity`, for per-pixel control over specular intensity.
 
+`specularIntensityMap` represents non-color data. Any texture assigned must have `texture.colorSpace = NoColorSpace` (default).
+
 Default is `null`.
 
 ### .thickness : number
@@ -214,6 +241,8 @@ Default is `0`.
 ### .thicknessMap : Texture
 
 A texture that defines the thickness, stored in the green channel. This will be multiplied by `thickness`.
+
+`thicknessMap` represents non-color data. Any texture assigned must have `texture.colorSpace = NoColorSpace` (default).
 
 Default is `null`.
 
@@ -230,6 +259,8 @@ Default is `0`.
 ### .transmissionMap : Texture
 
 The red channel of this texture is multiplied against `transmission`, for per-pixel control over optical transparency.
+
+`transmissionMap` represents non-color data. Any texture assigned must have `texture.colorSpace = NoColorSpace` (default).
 
 Default is `null`.
 

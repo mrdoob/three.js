@@ -36,7 +36,7 @@
 			import { setupWebGLXRFallback } from 'three/addons/webxr/WebGLXRFallback.js';
 
 			let mesh, material, geometry;
-			let renderer;
+			let renderer, renderPipeline;
 
 			const rendererParameters = { antialias: true, outputBufferType: THREE.UnsignedByteType, multiview: false };
 
@@ -79,6 +79,7 @@
 				}
 
 				renderer = newRenderer;
+				renderPipeline = new THREE.DirectRenderPipeline( renderer );
 
 			}
 
@@ -298,7 +299,7 @@
 
 				//
 
-				renderer.render( scene, camera );
+				renderPipeline.render( scene, camera );
 
 				prevTime = time;
 

@@ -26,6 +26,7 @@ export { default as NodeUniform } from './core/NodeUniform.js';
 export { default as NodeVar } from './core/NodeVar.js';
 export { default as NodeVarying } from './core/NodeVarying.js';
 export { default as OutputStructNode } from './core/OutputStructNode.js';
+export { default as OverrideContextNode } from './core/OverrideContextNode.js';
 export { default as ParameterNode } from './core/ParameterNode.js';
 export { default as PropertyNode } from './core/PropertyNode.js';
 export { default as StackNode } from './core/StackNode.js';
@@ -54,6 +55,7 @@ export { default as ModelNode } from './accessors/ModelNode.js';
 export { default as Object3DNode } from './accessors/Object3DNode.js';
 export { default as PointUVNode } from './accessors/PointUVNode.js';
 export { default as ReferenceBaseNode } from './accessors/ReferenceBaseNode.js';
+export { default as ReferenceElementNode } from './accessors/ReferenceElementNode.js';
 export { default as ReferenceNode } from './accessors/ReferenceNode.js';
 export { default as RendererReferenceNode } from './accessors/RendererReferenceNode.js';
 export { default as StorageBufferNode } from './accessors/StorageBufferNode.js';
@@ -129,6 +131,7 @@ export { default as ConditionalNode } from './math/ConditionalNode.js';
 export { default as MathNode } from './math/MathNode.js';
 export { default as OperatorNode } from './math/OperatorNode.js';
 export { default as PackFloatNode } from './math/PackFloatNode.js';
+export { default as Packed4x8IntegerNode } from './math/Packed4x8IntegerNode.js';
 export { default as UnpackFloatNode } from './math/UnpackFloatNode.js';
 
 // parsers

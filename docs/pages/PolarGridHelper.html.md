@@ -63,6 +63,8 @@ Default is `0x888888`.
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
 
+**Overrides:** [LineSegments#dispose](LineSegments.html#dispose)
+
 ## Source
 
 [src/helpers/PolarGridHelper.js](https://github.com/mrdoob/three.js/blob/master/src/helpers/PolarGridHelper.js)

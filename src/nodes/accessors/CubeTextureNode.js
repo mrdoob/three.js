@@ -3,7 +3,6 @@ import { reflectVector, refractVector } from './ReflectVector.js';
 import { nodeObject, nodeProxy, vec3 } from '../tsl/TSLBase.js';
 
 import { CubeReflectionMapping, CubeRefractionMapping, WebGPUCoordinateSystem } from '../../constants.js';
-import { materialEnvRotation } from './MaterialProperties.js';
 
 import { CubeTexture } from '../../textures/CubeTexture.js';
 import { error } from '../../utils.js';
@@ -111,7 +110,8 @@ class CubeTextureNode extends TextureNode {
 
 		const texture = this.value;
 
-		// Depth textures (shadow maps) - no environment rotation, Y flip for WebGPU
+		// Depth textures (shadow maps) - Y flip for WebGPU
+
 		if ( texture.isDepthTexture === true ) {
 
 			if ( builder.renderer.coordinateSystem === WebGPUCoordinateSystem ) {
@@ -123,12 +123,6 @@ class CubeTextureNode extends TextureNode {
 			return uvNode;
 
 		}
-
-		// rotate first
-
-		uvNode = materialEnvRotation.mul( uvNode );
-
-		// flip
 
 		if ( builder.renderer.coordinateSystem === WebGPUCoordinateSystem || ! texture.isRenderTargetTexture ) {
 
@@ -205,11 +199,19 @@ export const cubeTexture = ( value = EmptyTexture, uvNode = null, levelNode = nu
 };
 
 /**
- * TSL function for creating a uniform cube texture node.
+ * TSL function for creating a non-mergeable uniform cube texture node.
  *
  * @tsl
  * @function
  * @param {?CubeTexture} [value=EmptyTexture] - The cube texture.
  * @returns {CubeTextureNode}
  */
-export const uniformCubeTexture = ( value = EmptyTexture ) => cubeTextureBase( value );
+export const uniformCubeTexture = ( value = EmptyTexture ) => {
+
+	const textureNode = cubeTextureBase( value );
+
+	textureNode.mergeable = false;
+
+	return textureNode;
+
+};

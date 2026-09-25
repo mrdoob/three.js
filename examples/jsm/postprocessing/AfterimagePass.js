@@ -76,12 +76,14 @@ class AfterimagePass extends Pass {
 
 		this._textureComp = new WebGLRenderTarget( window.innerWidth, window.innerHeight, {
 			magFilter: NearestFilter,
-			type: HalfFloatType
+			type: HalfFloatType,
+			depthBuffer: false
 		} );
 
 		this._textureOld = new WebGLRenderTarget( window.innerWidth, window.innerHeight, {
 			magFilter: NearestFilter,
-			type: HalfFloatType
+			type: HalfFloatType,
+			depthBuffer: false
 		} );
 
 		this._compFsQuad = new FullScreenQuad( this.compFsMaterial );

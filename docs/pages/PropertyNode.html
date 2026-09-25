@@ -24,7 +24,7 @@ for TSL code.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="PropertyNode" translate="no">new <a href="#PropertyNode">PropertyNode</a><span class="signature">( nodeType : <span class="param-type">string</span>, name : <span class="param-type">string</span>, varying : <span class="param-type">boolean</span> )</span> </h3>
+					<h3 class="name name-method" id="PropertyNode" translate="no">new <a href="#PropertyNode">PropertyNode</a><span class="signature">( nodeType : <span class="param-type">string</span>, name : <span class="param-type">string</span>, varying : <span class="param-type">boolean</span>, placeholderNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new property node.</p>
@@ -55,6 +55,15 @@ for TSL code.</p></div>
 									<td class="description last">
 										<p>Whether this property is a varying or not.</p>
 										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">placeholderNode</strong>
+									</td>
+									<td class="description last">
+										<p>The placeholder node if not assigned.</p>
+										<p>Default is <code>null</code>.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -89,6 +98,13 @@ the node system auto-generates one.</p>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#name">Node#name</a></dt>
 						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="placeholderNode" translate="no">.<a href="#placeholderNode">placeholderNode</a><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="description">
+						<p>The placeholder node of the property if it is not assigned.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="varying" translate="no">.<a href="#varying">varying</a><span class="type-signature"> : boolean</span> </h3>

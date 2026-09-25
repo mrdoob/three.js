@@ -74,7 +74,7 @@ Default is `true`.
 
 Defines the lines color.
 
-Default is `null`.
+**Deprecated:** since r185. Use [NodeMaterial#colorNode](NodeMaterial.html#colorNode) instead.
 
 ### .offsetNode : Node.<float>
 
@@ -98,27 +98,27 @@ Default is `false`.
 
 ## Methods
 
-### .copy( source : Line2NodeMaterial ) : Line2NodeMaterial
+### .setupDiffuseColor( builder : NodeBuilder )
 
-Copies the properties of the given material to this instance.
-
-**source**
-
-The material to copy.
-
-**Overrides:** [NodeMaterial#copy](NodeMaterial.html#copy)
-
-**Returns:** A reference to this material.
-
-### .setup( builder : NodeBuilder )
-
-Setups the vertex and fragment stage of this node material.
+Setups the diffuse color of the line material in the fragment stage. Overrides the base setup to incorporate line/dash rendering and blending.
 
 **builder**
 
 The current node builder.
 
-**Overrides:** [NodeMaterial#setup](NodeMaterial.html#setup)
+**Overrides:** [NodeMaterial#setupDiffuseColor](NodeMaterial.html#setupDiffuseColor)
+
+### .setupPosition( builder : NodeBuilder ) : Node.<vec3>
+
+Setups the position of the expanded fat line vertex in local space.
+
+**builder**
+
+The current node builder.
+
+**Overrides:** [NodeMaterial#setupPosition](NodeMaterial.html#setupPosition)
+
+**Returns:** The position of the fat line vertex in local space.
 
 ## Source
 

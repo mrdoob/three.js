@@ -2,7 +2,7 @@ import { EventDispatcher } from './EventDispatcher.js';
 import { Texture } from '../textures/Texture.js';
 import { LinearFilter } from '../constants.js';
 import { Vector4 } from '../math/Vector4.js';
-import { Source } from '../textures/Source.js';
+import { TextureSource } from '../textures/TextureSource.js';
 
 /**
  * A render target is a buffer where the video card draws pixels for a scene
@@ -19,6 +19,7 @@ class RenderTarget extends EventDispatcher {
 	 *
 	 * @typedef {Object} RenderTarget~Options
 	 * @property {boolean} [generateMipmaps=false] - Whether to generate mipmaps or not.
+	 * @property {boolean} [mipmapsAutoUpdate=true] - Whether to regenerate mipmaps automatically after rendering or not.
 	 * @property {number} [magFilter=LinearFilter] - The mag filter.
 	 * @property {number} [minFilter=LinearFilter] - The min filter.
 	 * @property {number} [format=RGBAFormat] - The texture format.
@@ -30,8 +31,12 @@ class RenderTarget extends EventDispatcher {
 	 * @property {string} [colorSpace=NoColorSpace] - The texture's color space.
 	 * @property {boolean} [depthBuffer=true] - Whether to allocate a depth buffer or not.
 	 * @property {boolean} [stencilBuffer=false] - Whether to allocate a stencil buffer or not.
-	 * @property {boolean} [resolveDepthBuffer=true] - Whether to resolve the depth buffer or not.
-	 * @property {boolean} [resolveStencilBuffer=true] - Whether  to resolve the stencil buffer or not.
+	 * @property {boolean} [resolveColorBuffer=true] - Whether to resolve the color buffer or not. Only relevant for multisampled render targets.
+	 * @property {boolean} [resolveDepthBuffer=true] - Whether to resolve the depth buffer or not. Only relevant for multisampled render targets.
+	 * @property {boolean} [resolveStencilBuffer=true] - Whether to resolve the stencil buffer or not. Only relevant for multisampled render targets.
+	 * @property {boolean} [storeMultisampledColorBuffer=true] - Whether to store the multisampled color buffer or not. Setting to `false` saves memory bandwidth when the multisampled data are not needed after a render pass.
+	 * @property {boolean} [storeMultisampledDepthBuffer=true] - Whether to store the multisampled depth buffer or not. Setting to `false` saves memory bandwidth when the multisampled data are not needed after a render pass.
+	 * @property {boolean} [storeMultisampledStencilBuffer=true] - Whether to store the multisampled stencil buffer or not. Setting to `false` saves memory bandwidth when the multisampled data are not needed after a render pass.
 	 * @property {?Texture} [depthTexture=null] - Reference to a depth texture.
 	 * @property {number} [samples=0] - The MSAA samples count.
 	 * @property {number} [count=1] - Defines the number of color attachments . Must be at least `1`.
@@ -57,8 +62,12 @@ class RenderTarget extends EventDispatcher {
 			minFilter: LinearFilter,
 			depthBuffer: true,
 			stencilBuffer: false,
+			resolveColorBuffer: true,
 			resolveDepthBuffer: true,
 			resolveStencilBuffer: true,
+			storeMultisampledColorBuffer: true,
+			storeMultisampledDepthBuffer: true,
+			storeMultisampledStencilBuffer: true,
 			depthTexture: null,
 			samples: 0,
 			count: 1,
@@ -165,7 +174,28 @@ class RenderTarget extends EventDispatcher {
 		this.stencilBuffer = options.stencilBuffer;
 
 		/**
-		 * Whether to resolve the depth buffer or not.
+		 * Whether to resolve the color buffer or not. When set to `false`, the color
+		 * attachments do not receive the resolved (single-sampled) output of a render
+		 * pass and the render target's textures are left untouched. The rendered
+		 * content is then only accessible within the render pass itself.
+		 *
+		 * Only relevant for multisampled render targets.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.resolveColorBuffer = options.resolveColorBuffer;
+
+		/**
+		 * Whether to resolve the depth buffer or not. When set to `false`, the depth
+		 * texture does not receive the resolved depth output of a render pass which
+		 * saves memory bandwidth. Use this setting when the depth data of a render
+		 * pass are not required afterwards.
+		 *
+		 * Only relevant for multisampled render targets in WebGL. WebGPU does not
+		 * support depth resolves; sampling the depth texture of a multisampled render
+		 * target accesses the multisampled data directly, see
+		 * {@link RenderTarget#storeMultisampledDepthBuffer}.
 		 *
 		 * @type {boolean}
 		 * @default true
@@ -173,12 +203,53 @@ class RenderTarget extends EventDispatcher {
 		this.resolveDepthBuffer = options.resolveDepthBuffer;
 
 		/**
-		 * Whether to resolve the stencil buffer or not.
+		 * Whether to resolve the stencil buffer or not. Analogous to
+		 * {@link RenderTarget#resolveDepthBuffer} but for the stencil aspect.
 		 *
 		 * @type {boolean}
 		 * @default true
 		 */
 		this.resolveStencilBuffer = options.resolveStencilBuffer;
+
+		/**
+		 * Whether to store the multisampled color buffer or not. When set to `false`,
+		 * the multisampled data are discarded at the end of a render pass, right after
+		 * they have been resolved. This saves memory bandwidth, especially on tile-based
+		 * GPUs, and is the recommended setting for render targets that are fully redrawn
+		 * each frame and whose output is only accessed via the resolved textures (e.g.
+		 * scene passes in post-processing chains).
+		 *
+		 * Must be kept `true` when the multisampled data are needed after the render
+		 * pass ends, e.g. when rendering into the target without clearing or when the
+		 * scene contains transmissive objects which require a mid-pass framebuffer copy.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.storeMultisampledColorBuffer = options.storeMultisampledColorBuffer;
+
+		/**
+		 * Whether to store the multisampled depth buffer or not. When set to `false`,
+		 * the multisampled depth data are discarded at the end of a render pass which
+		 * saves memory bandwidth.
+		 *
+		 * Must be kept `true` in WebGPU when the depth texture of a multisampled render
+		 * target is sampled (e.g. by depth-based post-processing effects) since depth
+		 * is read directly from the multisampled data.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.storeMultisampledDepthBuffer = options.storeMultisampledDepthBuffer;
+
+		/**
+		 * Whether to store the multisampled stencil buffer or not. Analogous to
+		 * {@link RenderTarget#storeMultisampledDepthBuffer} but for the stencil aspect.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.storeMultisampledStencilBuffer = options.storeMultisampledStencilBuffer;
 
 		this._depthTexture = null;
 		this.depthTexture = options.depthTexture;
@@ -234,6 +305,7 @@ class RenderTarget extends EventDispatcher {
 		if ( options.colorSpace !== undefined ) values.colorSpace = options.colorSpace;
 		if ( options.flipY !== undefined ) values.flipY = options.flipY;
 		if ( options.generateMipmaps !== undefined ) values.generateMipmaps = options.generateMipmaps;
+		if ( options.mipmapsAutoUpdate !== undefined ) values.mipmapsAutoUpdate = options.mipmapsAutoUpdate;
 		if ( options.internalFormat !== undefined ) values.internalFormat = options.internalFormat;
 
 		for ( let i = 0; i < this.textures.length; i ++ ) {
@@ -264,8 +336,8 @@ class RenderTarget extends EventDispatcher {
 
 	set depthTexture( current ) {
 
-		if ( this._depthTexture !== null ) this._depthTexture.renderTarget = null;
-		if ( current !== null ) current.renderTarget = this;
+		if ( this._depthTexture !== null && this._depthTexture.renderTarget === this ) this._depthTexture.renderTarget = null;
+		if ( current !== null && current.renderTarget === null ) current.renderTarget = this;
 
 		this._depthTexture = current;
 
@@ -368,17 +440,37 @@ class RenderTarget extends EventDispatcher {
 			// ensure image object is not shared, see #20328
 
 			const image = Object.assign( {}, source.textures[ i ].image );
-			this.textures[ i ].source = new Source( image );
+			this.textures[ i ].source = new TextureSource( image );
 
 		}
 
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;
 
+		this.resolveColorBuffer = source.resolveColorBuffer;
 		this.resolveDepthBuffer = source.resolveDepthBuffer;
 		this.resolveStencilBuffer = source.resolveStencilBuffer;
 
-		if ( source.depthTexture !== null ) this.depthTexture = source.depthTexture.clone();
+		this.storeMultisampledColorBuffer = source.storeMultisampledColorBuffer;
+		this.storeMultisampledDepthBuffer = source.storeMultisampledDepthBuffer;
+		this.storeMultisampledStencilBuffer = source.storeMultisampledStencilBuffer;
+
+		if ( source.depthTexture !== null ) {
+
+			if ( source.depthTexture.renderTarget === source ) {
+
+				const depthTexture = source.depthTexture.clone();
+				depthTexture.renderTarget = null;
+
+				this.depthTexture = depthTexture;
+
+			} else {
+
+				this.depthTexture = source.depthTexture;
+
+			}
+
+		}
 
 		this.samples = source.samples;
 		this.multiview = source.multiview;
@@ -391,6 +483,9 @@ class RenderTarget extends EventDispatcher {
 	/**
 	 * Frees the GPU-related resources allocated by this instance. Call this
 	 * method whenever this instance is no longer used in your app.
+	 *
+	 * This also frees the resources of the render target's textures. There is
+	 * no need to dispose them separately.
 	 *
 	 * @fires RenderTarget#dispose
 	 */

@@ -5,7 +5,7 @@ import BasicLightMapNode from '../../nodes/lighting/BasicLightMapNode.js';
 import BasicLightingModel from '../../nodes/functions/BasicLightingModel.js';
 import { normalViewGeometry } from '../../nodes/accessors/Normal.js';
 import { diffuseColor } from '../../nodes/core/PropertyNode.js';
-import { directionToFaceDirection } from '../../nodes/display/FrontFacingNode.js';
+import { negateOnBackSide } from '../../nodes/display/FrontFacingNode.js';
 
 import { MeshBasicMaterial } from '../MeshBasicMaterial.js';
 
@@ -66,7 +66,7 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 	 */
 	setupNormal() {
 
-		return directionToFaceDirection( normalViewGeometry ); // see #28839
+		return negateOnBackSide( normalViewGeometry ); // see #28839
 
 	}
 

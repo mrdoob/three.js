@@ -35,7 +35,7 @@ const texture = loader.loadAsync( 'diffuse.ktx2' );
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">KTX2Loader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<p><span translate="no">KTX2Loader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -201,8 +201,8 @@ to the <code>onLoad()</code> callback.</p>
 					<h3 class="name name-method" id="setTranscoderPath" translate="no">.<a href="#setTranscoderPath">setTranscoderPath</a><span class="signature">( path : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="KTX2Loader.html">KTX2Loader</a></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Sets the transcoder path.</p>
-<p>The WASM transcoder and JS wrapper are available from the <code>examples/jsm/libs/basis</code> directory.</p>
+							<p>Sets the transcoder path to optionally set the decoder load path from a CDN.</p>
+<p>By default The WASM transcoder and JS wrapper are loaded from the <code>examples/jsm/libs/basis</code> directory.</p>
 						</div>
 						<table class="params">
 							<tbody>

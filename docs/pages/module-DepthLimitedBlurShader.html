@@ -15,7 +15,7 @@
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">DepthLimitedBlurShader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<p><span translate="no">DepthLimitedBlurShader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { DepthLimitedBlurShader, BlurShaderUtils } from 'three/addons/shaders/DepthLimitedBlurShader.js';</code></pre>
 				<div class="container-overview">
 				</div>
@@ -23,7 +23,10 @@
 				<div class="member">
 					<h3 class="name" id="~DepthLimitedBlurShader" translate="no">.<a href="#~DepthLimitedBlurShader">DepthLimitedBlurShader</a><span class="type-signature"> : <a href="ShaderMaterial.html#~Shader">ShaderMaterial~Shader</a></span> <span class="type-signature">(inner, constant) </span></h3>
 					<div class="description">
-						<p>TODO</p>
+						<p>A separable Gaussian blur shader that limits blurring across depth
+discontinuities, stopping when the view-space depth difference to a
+neighboring sample exceeds <code>depthCutoff</code>. This preserves edges and
+avoids bleeding across them.</p>
 <p>Used by <a href="SAOPass.html">SAOPass</a>.</p>
 					</div>
 				</div>

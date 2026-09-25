@@ -6,7 +6,7 @@ A special version of [Reflector](Reflector.html) for usage with [SSRPass](SSRPas
 
 ## Import
 
-ReflectorForSSRPass is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+ReflectorForSSRPass is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { ReflectorForSSRPass } from 'three/addons/objects/ReflectorForSSRPass.js';
@@ -31,6 +31,8 @@ The configuration options.
 ### .dispose()
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+
+**Overrides:** [Mesh#dispose](Mesh.html#dispose)
 
 ### .getRenderTarget() : WebGLRenderTarget
 

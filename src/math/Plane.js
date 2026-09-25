@@ -7,7 +7,7 @@ const _normalMatrix = /*@__PURE__*/ new Matrix3();
 
 /**
  * A two dimensional surface that extends infinitely in 3D space, represented
- * in [Hessian normal form](http://mathworld.wolfram.com/HessianNormalForm.html)
+ * in [Hessian normal form](https://mathworld.wolfram.com/HessianNormalForm.html)
  * by a unit length normal vector and a constant.
  */
 class Plane {
@@ -360,6 +360,35 @@ class Plane {
 	clone() {
 
 		return new this.constructor().copy( this );
+
+	}
+
+	/**
+	 * Returns a serialized structure of the plane.
+	 *
+	 * @return {Object} Serialized structure with fields representing the object state.
+	 */
+	toJSON() {
+
+		return {
+			normal: this.normal.toArray(),
+			constant: this.constant
+		};
+
+	}
+
+	/**
+	 * Sets the plane properties from the given JSON.
+	 *
+	 * @param {Object} json - The serialized json to set the plane from.
+	 * @return {Plane} A reference to this plane.
+	 */
+	fromJSON( json ) {
+
+		this.normal.fromArray( json.normal );
+		this.constant = json.constant;
+
+		return this;
 
 	}
 

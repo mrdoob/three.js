@@ -26,8 +26,8 @@ export const materialEnvIntensity = /*@__PURE__*/ uniform( 1 ).onReference( ( { 
 
 /**
  * TSL object that represents the rotation of environment maps.
- * When `material.envMap` is set, the value is `material.envMapRotation`. `scene.environmentRotation` controls the
- * rotation of `scene.environment` instead.
+ * When `material.envMap` is set, the value is `material.envMapRotation`.
+ * `scene.environmentRotation` controls the rotation of `scene.environment` or `scene.environmentNode` instead.
  *
  * @tsl
  * @type {Node<mat4>}
@@ -38,7 +38,8 @@ export const materialEnvRotation = /*@__PURE__*/ uniform( new Matrix4() ).onRefe
 
 } ).onObjectUpdate( function ( { material, scene } ) {
 
-	const rotation = ( scene.environment !== null && material.envMap === null ) ? scene.environmentRotation : material.envMapRotation;
+	const hasSceneEnvironment = ( scene.environment !== null ) || ( scene.environmentNode && scene.environmentNode.isNode );
+	const rotation = ( hasSceneEnvironment && material.envMap === null ) ? scene.environmentRotation : material.envMapRotation;
 
 	if ( rotation ) {
 

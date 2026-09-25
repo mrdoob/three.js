@@ -6,8 +6,11 @@ import TurndownService from 'turndown';
 const packageJson = JSON.parse( fs.readFileSync( 'package.json', 'utf8' ) );
 const version = packageJson.version;
 
-// Read TSL specification
-const tslSpec = fs.readFileSync( 'docs/TSL.md', 'utf8' );
+// Read the TSL guide; its <page> markers split it into site pages, the flat text uses headings instead.
+const tslSpec = fs.readFileSync( 'tsl/content/Guide.md', 'utf8' )
+	.replace( /^<page name="([^"]*)">$/gm, '## $1' )
+	.replace( /^<\/page>\n?/gm, '' )
+	.replace( /\n{3,}/g, '\n\n' );
 
 // Setup Turndown for HTML to Markdown conversion
 const turndown = new TurndownService( {
@@ -170,26 +173,27 @@ When using TSL, use node-based materials:
 
 ## Getting Started
 
-- [Installation](https://threejs.org/manual/#en/installation)
-- [Creating a Scene](https://threejs.org/manual/#en/creating-a-scene)
-- [Fundamentals](https://threejs.org/manual/#en/fundamentals)
-- [Responsive Design](https://threejs.org/manual/#en/responsive)
+- [Installation](https://threejs.org/manual/#installation)
+- [Creating a Scene](https://threejs.org/manual/#creating-a-scene)
+- [Fundamentals](https://threejs.org/manual/#fundamentals)
+- [Responsive Design](https://threejs.org/manual/#responsive)
 
 ## Renderer Guides
 
-- [WebGPURenderer](https://threejs.org/manual/#en/webgpurenderer)
+- [WebGPURenderer](https://threejs.org/manual/#webgpurenderer)
 
 ## Core Concepts
 
-- [TSL Specification](https://threejs.org/docs/#api/en/nodes/TSL): Complete shader language reference
-- [Animation System](https://threejs.org/manual/#en/animation-system)
-- [Loading 3D Models](https://threejs.org/manual/#en/loading-3d-models)
-- [Scene Graph](https://threejs.org/manual/#en/scenegraph)
-- [Materials](https://threejs.org/manual/#en/materials)
-- [Textures](https://threejs.org/manual/#en/textures)
-- [Lights](https://threejs.org/manual/#en/lights)
-- [Cameras](https://threejs.org/manual/#en/cameras)
-- [Shadows](https://threejs.org/manual/#en/shadows)
+- [TSL Guide](https://threejs.org/tsl/): Three.js Shading Language guide with playground
+- [TSL Reference](https://threejs.org/docs/#TSL): All TSL functions
+- [Animation System](https://threejs.org/manual/#animation-system)
+- [Loading 3D Models](https://threejs.org/manual/#loading-3d-models)
+- [Scene Graph](https://threejs.org/manual/#scenegraph)
+- [Materials](https://threejs.org/manual/#materials)
+- [Textures](https://threejs.org/manual/#textures)
+- [Lights](https://threejs.org/manual/#lights)
+- [Cameras](https://threejs.org/manual/#cameras)
+- [Shadows](https://threejs.org/manual/#shadows)
 
 ## Essential API
 

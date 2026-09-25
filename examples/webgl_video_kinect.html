@@ -11,6 +11,7 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - kinect</div>
 
 		<video id="video" loop muted crossOrigin="anonymous" playsinline style="display:none">
 			<source src="textures/kinect.webm">
@@ -97,11 +98,6 @@
 
 				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
-
-				const info = document.createElement( 'div' );
-				info.id = 'info';
-				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - kinect';
-				document.body.appendChild( info );
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, 0, 500 );

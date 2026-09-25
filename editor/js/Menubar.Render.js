@@ -202,13 +202,28 @@ class RenderImageDialog {
 			const loader = new THREE.ObjectLoader();
 
 			const camera = await loader.parseAsync( json.camera );
-			camera.aspect = imageWidth.getValue() / imageHeight.getValue();
+
+			const aspect = imageWidth.getValue() / imageHeight.getValue();
+
+			if ( camera.isPerspectiveCamera ) {
+
+				camera.aspect = aspect;
+
+			} else {
+
+				const frustumHeight = camera.top - camera.bottom;
+
+				camera.left = - frustumHeight * aspect / 2;
+				camera.right = frustumHeight * aspect / 2;
+
+			}
+
 			camera.updateProjectionMatrix();
 			camera.updateMatrixWorld();
 
 			const scene = await loader.parseAsync( json.scene );
 
-			const renderer = new THREE.WebGLRenderer( { antialias: true, logarithmicDepthBuffer: true } );
+			const renderer = new THREE.WebGLRenderer( { antialias: true, reversedDepthBuffer: true } );
 			renderer.setSize( imageWidth.getValue(), imageHeight.getValue() );
 			renderer.setClearColor( editor.viewportColor );
 

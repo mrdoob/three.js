@@ -46,7 +46,7 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+			import { DRACOLoader, DRACO_GLTF_CONFIG } from 'three/addons/loaders/DRACOLoader.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			let camera, scene, renderer, renderPipeline, controls;
@@ -73,6 +73,7 @@
 				dirLight.castShadow = true;
 				dirLight.shadow.bias = - 0.001; // remove self-shadowing artifacts
 				dirLight.shadow.camera.top = 4;
+				dirLight.shadow.radius = 2;
 				dirLight.shadow.camera.bottom = - 4;
 				dirLight.shadow.camera.left = - 4;
 				dirLight.shadow.camera.right = 4;
@@ -94,7 +95,7 @@
 				//
 
 				const dracoLoader = new DRACOLoader();
-				dracoLoader.setDecoderPath( 'jsm/libs/draco/gltf/' );
+				dracoLoader.setDecoderPath( DRACO_GLTF_CONFIG );
 
 				const loader = new GLTFLoader();
 				loader.setDRACOLoader( dracoLoader );
@@ -128,7 +129,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 

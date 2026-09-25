@@ -72,6 +72,12 @@ The current clipping context.
 
 This dictionary holds the (native) node codes of this builder. The codes are maintained in an array for each shader stage.
 
+### .compute : ComputeNode
+
+The compute node, if building for compute.
+
+Default is `null`.
+
 ### .computeShader : string
 
 The generated compute shader.
@@ -138,6 +144,12 @@ Since the [NodeBuilder#cache](NodeBuilder.html#cache) might be temporarily overw
 
 Default is `this.cache`.
 
+### .hardwareClipping : boolean
+
+Whether the built material uses hardware clipping or not.
+
+Default is `false`.
+
 ### .hashNodes : Object.<number, Node>
 
 A dictionary that assigns each node to a unique hash.
@@ -152,7 +164,7 @@ Default is `null`.
 
 The material of the 3D object.
 
-### .nodes : Array.<Node>
+### .nodes : Set.<Node>
 
 A list of all nodes the builder is processing for this 3D object.
 
@@ -170,6 +182,10 @@ Default is `null`.
 
 A reference to a node parser.
 
+### .renderPipeline : RenderPipeline
+
+A reference to the render pipeline.
+
 ### .renderer : Renderer
 
 The current renderer.
@@ -180,7 +196,7 @@ The scene the 3D object belongs to.
 
 Default is `null`.
 
-### .sequentialNodes : Array.<Node>
+### .sequentialNodes : Set.<Node>
 
 A list of all nodes the builder is processing in sequential order.
 
@@ -697,6 +713,24 @@ Snippet defining the texture coordinates.
 **depthSnippet**
 
 Snippet defining the 0-based texture array index to sample.
+
+**levelSnippet**
+
+Snippet defining the mip level.
+
+**Returns:** The generated shader string.
+
+### .generateTextureSize( texture : Texture, textureProperty : string, levelSnippet : string ) : string (abstract)
+
+Generates a texture size shader string for the given texture data.
+
+**texture**
+
+The texture.
+
+**textureProperty**
+
+The texture property name.
 
 **levelSnippet**
 
@@ -1438,6 +1472,16 @@ The attribute name.
 
 **Returns:** Whether the given attribute name is defined in the geometry.
 
+### .hasWriteUsage( node : Node ) : boolean
+
+Returns whether the given node has been written to in any shader stage.
+
+**node**
+
+The node to check.
+
+**Returns:** Whether the node has been written to.
+
 ### .includes( node : Node ) : boolean
 
 Whether the given node is included in the internal array of nodes or not.
@@ -1467,6 +1511,12 @@ Whether the requested feature is available or not.
 The requested feature.
 
 **Returns:** Whether the requested feature is supported or not.
+
+### .isContextAssign() : boolean
+
+Returns whether the builder is currently in an assignment context.
+
+**Returns:** Whether the builder is in an assignment context.
 
 ### .isDeterministic( node : Node ) : boolean
 
@@ -1535,6 +1585,16 @@ Whether the given type is a reference type or not.
 The type to check.
 
 **Returns:** Whether the given type is a reference type or not.
+
+### .isReservedKeyword( name : string ) : boolean
+
+Returns whether the given name is a reserved keyword of the backend's shading language. Backends override this method to provide their language-specific keywords.
+
+**name**
+
+The name to test.
+
+**Returns:** Whether the name is a reserved keyword or not.
 
 ### .isVector( type : string ) : boolean
 

@@ -4,6 +4,7 @@ export class Item {
 
 		this.children = [];
 		this.isOpen = true;
+		this.isCollapsible = false;
 		this.childrenContainer = null;
 		this.parent = null;
 		this.domElement = document.createElement( 'div' );
@@ -13,22 +14,14 @@ export class Item {
 
 		this.userData = {};
 
-		this.data = data;
-		this.data.forEach( ( cellData ) => {
+		this.data = [];
+		data.forEach( ( cellData, index ) => {
 
 			const cell = document.createElement( 'div' );
 			cell.className = 'list-item-cell';
-			if ( cellData instanceof HTMLElement ) {
-
-				cell.appendChild( cellData );
-
-			} else {
-
-				cell.append( String( cellData ) );
-
-			}
-
 			this.itemRow.appendChild( cell );
+
+			this.setValue( index, cellData );
 
 		} );
 
@@ -116,7 +109,7 @@ export class Item {
 		const firstCell = this.itemRow.querySelector( '.list-item-cell:first-child' );
 		let toggler = this.itemRow.querySelector( '.item-toggler' );
 
-		if ( this.children.length > 0 ) {
+		if ( this.children.length > 0 || this.isCollapsible ) {
 
 			if ( ! toggler ) {
 
@@ -137,6 +130,36 @@ export class Item {
 			toggler.remove();
 
 		}
+
+	}
+
+	setCollapsible( collapsible ) {
+
+		this.isCollapsible = collapsible;
+
+		if ( collapsible ) {
+
+			this.itemRow.classList.add( 'collapsible' );
+
+			if ( ! this.childrenContainer ) {
+
+				this.childrenContainer = document.createElement( 'div' );
+				this.childrenContainer.className = 'list-children-container';
+				this.childrenContainer.classList.toggle( 'closed', ! this.isOpen );
+				this.domElement.appendChild( this.childrenContainer );
+				this.itemRow.addEventListener( 'click', this.onItemClick );
+
+			}
+
+		} else {
+
+			this.itemRow.classList.remove( 'collapsible' );
+
+		}
+
+		this.updateToggler();
+
+		return this;
 
 	}
 
@@ -164,6 +187,62 @@ export class Item {
 		}
 
 		return this;
+
+	}
+
+	show() {
+
+		this.domElement.style.display = '';
+
+		return this;
+
+	}
+
+	hide() {
+
+		this.domElement.style.display = 'none';
+
+		return this;
+
+	}
+
+	setValue( index, value ) {
+
+		this.data[ index ] = value;
+
+		const cell = this.itemRow.children[ index ];
+
+		if ( cell ) {
+
+			const toggler = cell.querySelector( '.item-toggler' );
+
+			cell.innerHTML = '';
+
+			if ( toggler ) {
+
+				cell.appendChild( toggler );
+
+			}
+
+			if ( value instanceof HTMLElement ) {
+
+				cell.appendChild( value );
+
+			} else {
+
+				cell.append( String( value ) );
+
+			}
+
+		}
+
+		return this;
+
+	}
+
+	getValue( index ) {
+
+		return this.data[ index ];
 
 	}
 

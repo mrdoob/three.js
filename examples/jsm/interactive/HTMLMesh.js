@@ -90,8 +90,9 @@ class HTMLTexture extends CanvasTexture {
 		this.magFilter = LinearFilter;
 		this.generateMipmaps = false;
 
-		// Create an observer on the DOM, and run html2canvas update in the next loop
-		const observer = new MutationObserver( () => {
+		this.scheduleUpdate = null;
+
+		const scheduleUpdate = () => {
 
 			if ( ! this.scheduleUpdate ) {
 
@@ -100,12 +101,24 @@ class HTMLTexture extends CanvasTexture {
 
 			}
 
-		} );
+		};
+
+		// Create an observer on the DOM, and run html2canvas update in the next loop
+
+		const observer = new MutationObserver( scheduleUpdate );
+
+		// The state of form controls lives in properties (checked, value) which
+		// are not reported by MutationObserver, so listen to their events as well.
+
+		dom.addEventListener( 'input', scheduleUpdate );
+		dom.addEventListener( 'change', scheduleUpdate );
 
 		const config = { attributes: true, childList: true, subtree: true, characterData: true };
 		observer.observe( dom, config );
 
 		this.observer = observer;
+
+		this._scheduleUpdate = scheduleUpdate;
 
 	}
 
@@ -135,6 +148,9 @@ class HTMLTexture extends CanvasTexture {
 			this.observer.disconnect();
 
 		}
+
+		this.dom.removeEventListener( 'input', this._scheduleUpdate );
+		this.dom.removeEventListener( 'change', this._scheduleUpdate );
 
 		this.scheduleUpdate = clearTimeout( this.scheduleUpdate );
 

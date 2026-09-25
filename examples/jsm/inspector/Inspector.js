@@ -9,19 +9,28 @@ import { Settings } from './tabs/Settings.js';
 import { Viewer } from './tabs/Viewer.js';
 import { Timeline } from './tabs/Timeline.js';
 import { setText } from './ui/utils.js';
+import { getItem, setItem } from './Storage.js';
 
-import { setConsoleFunction, REVISION } from 'three/webgpu';
+import { setConsoleFunction, getConsoleFunction, REVISION } from 'three/webgpu';
 
 class Inspector extends RendererInspector {
 
-	constructor() {
+	constructor( options = {} ) {
 
 		super();
 
+		const {
+			nonce = null
+		} = options;
+
+		this.nonce = nonce;
+
 		// init profiler
 
-		const profiler = new Profiler( this );
+		const profiler = new Profiler( this, options );
 		profiler.addEventListener( 'resize', ( e ) => this.dispatchEvent( e ) );
+		profiler.addEventListener( 'orientationchange', ( e ) => this.dispatchEvent( e ) );
+		profiler.addEventListener( 'layoutchange', ( e ) => this.dispatchEvent( e ) );
 
 		const parameters = new Parameters( {
 			builtin: true,
@@ -68,6 +77,8 @@ class Inspector extends RendererInspector {
 		this.settings = settings;
 		this.once = {};
 		this.extensionsData = new WeakMap();
+		this.previousConsoleFunction = null;
+		this._domObserver = null;
 
 		this.displayCycle = {
 			text: {
@@ -79,6 +90,11 @@ class Inspector extends RendererInspector {
 				needsUpdate: false,
 				duration: .02,
 				time: 0
+			},
+			toggleGraph: {
+				needsUpdate: false,
+				duration: .02,
+				time: 0
 			}
 		};
 
@@ -87,6 +103,12 @@ class Inspector extends RendererInspector {
 	get domElement() {
 
 		return this.profiler.domElement;
+
+	}
+
+	isVertical() {
+
+		return this.profiler ? this.profiler.isVertical() : false;
 
 	}
 
@@ -130,6 +152,20 @@ class Inspector extends RendererInspector {
 
 	}
 
+	setVisible( value ) {
+
+		this.domElement.style.display = value ? '' : 'none';
+
+		return this;
+
+	}
+
+	getVisible() {
+
+		return this.domElement.style.display !== 'none';
+
+	}
+
 	getSize() {
 
 		return this.profiler.getSize();
@@ -144,6 +180,22 @@ class Inspector extends RendererInspector {
 
 	}
 
+	setHorizontalAlign( value ) {
+
+		this.profiler.setHorizontalAlign( value );
+
+		return this;
+
+	}
+
+	setVerticalAlign( value ) {
+
+		this.profiler.setVerticalAlign( value );
+
+		return this;
+
+	}
+
 	addTab( tab ) {
 
 		this.profiler.addTab( tab );
@@ -153,6 +205,8 @@ class Inspector extends RendererInspector {
 	}
 
 	removeTab( tab ) {
+
+		tab.dispose();
 
 		this.profiler.removeTab( tab );
 
@@ -229,47 +283,33 @@ class Inspector extends RendererInspector {
 
 	}
 
-	init() {
-
-		const renderer = this.getRenderer();
-
-		let sign = `THREE.WebGPURenderer: ${ REVISION } [ "`;
-
-		if ( renderer.backend.isWebGPUBackend ) {
-
-			sign += 'WebGPU';
-
-		} else if ( renderer.backend.isWebGLBackend ) {
-
-			sign += 'WebGL2';
-
-		}
-
-		sign += '" ]';
-
-		this.console.addMessage( 'info', sign );
-
-		//
-
-		if ( renderer.inspector.domElement.parentElement === null && renderer.domElement.parentElement !== null ) {
-
-			renderer.domElement.parentElement.appendChild( renderer.inspector.domElement );
-
-		}
-
-	}
-
 	setRenderer( renderer ) {
 
 		super.setRenderer( renderer );
 
 		if ( renderer !== null ) {
 
-			setConsoleFunction( this.resolveConsole.bind( this ) );
+			const previousConsoleFunction = getConsoleFunction();
+
+			this.previousConsoleFunction = previousConsoleFunction;
+
+			setConsoleFunction( ( type, message, ...params ) => {
+
+				if ( previousConsoleFunction ) {
+
+					previousConsoleFunction( type, message, ...params );
+
+				}
+
+				this.resolveConsole( type, message, ...params );
+
+			} );
 
 			if ( this.isAvailable ) {
 
-				renderer.init().then( () => {
+				const init = async () => {
+
+					if ( renderer.hasInitialized() === false ) await renderer.init();
 
 					renderer.backend.trackTimestamp = true;
 
@@ -279,11 +319,92 @@ class Inspector extends RendererInspector {
 
 					}
 
-				} );
+					let sign = `THREE.WebGPURenderer: ${ REVISION } [ "`;
+
+					if ( renderer.backend.isWebGPUBackend ) {
+
+						sign += 'WebGPU';
+
+					} else if ( renderer.backend.isWebGLBackend ) {
+
+						sign += 'WebGL2';
+
+					}
+
+					sign += '" ]';
+
+					this.console.addMessage( 'info', sign );
+
+					//
+
+					const domElement = this.domElement;
+
+					if ( domElement.parentElement === null ) {
+
+						if ( renderer.domElement.parentElement !== null ) {
+
+							renderer.domElement.parentElement.appendChild( domElement );
+
+						} else {
+
+							if ( this._domObserver !== null ) {
+
+								this._domObserver.disconnect();
+
+							}
+
+							this._domObserver = new MutationObserver( () => {
+
+								if ( renderer.domElement && renderer.domElement.parentElement !== null ) {
+
+									renderer.domElement.parentElement.appendChild( domElement );
+
+									if ( this._domObserver !== null ) {
+
+										this._domObserver.disconnect();
+										this._domObserver = null;
+
+									}
+
+								}
+
+							} );
+
+							this._domObserver.observe( document.body || document.documentElement, { childList: true, subtree: true } );
+
+						}
+
+					}
+
+				};
+
+				init();
 
 				this.timeline.setRenderer( renderer );
 
 			}
+
+		} else {
+
+			if ( this.previousConsoleFunction ) {
+
+				setConsoleFunction( this.previousConsoleFunction );
+				this.previousConsoleFunction = undefined;
+
+			}
+
+			if ( this._domObserver !== null ) {
+
+				this._domObserver.disconnect();
+				this._domObserver = null;
+
+			}
+
+			this.profiler.dispose();
+
+			this.statsData.clear();
+
+			super.dispose();
 
 		}
 
@@ -426,9 +547,9 @@ class Inspector extends RendererInspector {
 
 	resolveFrame( frame ) {
 
-		const nextFrame = this.getFrameById( frame.frameId + 1 );
+		const previousFrame = this.getFrameById( frame.frameId - 1 );
 
-		if ( ! nextFrame ) return;
+		if ( ! previousFrame ) return;
 
 		frame.cpu = 0;
 		frame.gpu = 0;
@@ -446,9 +567,9 @@ class Inspector extends RendererInspector {
 
 		}
 
-		// improve stats using next frame
+		// improve stats using previous frame
 
-		frame.deltaTime = nextFrame.startTime - frame.startTime;
+		frame.deltaTime = frame.startTime - previousFrame.startTime;
 		frame.miscellaneous = frame.deltaTime - frame.total;
 
 		if ( frame.miscellaneous < 0 ) {
@@ -463,6 +584,7 @@ class Inspector extends RendererInspector {
 
 		this.updateCycle( this.displayCycle.text );
 		this.updateCycle( this.displayCycle.graph );
+		this.updateCycle( this.displayCycle.toggleGraph );
 
 		if ( this.displayCycle.text.needsUpdate ) {
 
@@ -470,6 +592,17 @@ class Inspector extends RendererInspector {
 
 			this.performance.updateText( this, frame );
 			this.memory.updateText( this );
+
+		}
+
+		if ( this.displayCycle.toggleGraph.needsUpdate ) {
+
+			if ( this.profiler.toggleGraph ) {
+
+				this.profiler.toggleGraph.addPoint( 'fps', this.fps );
+				this.profiler.toggleGraph.update();
+
+			}
 
 		}
 
@@ -482,6 +615,7 @@ class Inspector extends RendererInspector {
 
 		this.displayCycle.text.needsUpdate = false;
 		this.displayCycle.graph.needsUpdate = false;
+		this.displayCycle.toggleGraph.needsUpdate = false;
 
 	}
 
@@ -498,45 +632,13 @@ class Inspector extends RendererInspector {
 
 	}
 
-}
+	dispose() {
 
-function getItem( id ) {
+		super.dispose();
 
-	const data = JSON.parse( localStorage.getItem( 'threejs-inspector' ) || '{}' );
-
-	if ( data.version !== REVISION ||
-		 data.settings && ( data.settings.storage === 'url' && data.settings.url !== location.href ) ) {
-
-		localStorage.removeItem( 'threejs-inspector' );
-
-		return {};
+		this.setRenderer( null );
 
 	}
-
-	return data[ id ] || {};
-
-}
-
-function setItem( id, state ) {
-
-	const data = JSON.parse( localStorage.getItem( 'threejs-inspector' ) || '{}' );
-
-	if ( state === null ) {
-
-		delete data[ id ];
-
-	} else {
-
-		data[ id ] = state;
-
-	}
-
-	data.settings = data.settings || {};
-	data.settings.url = data.settings.url || location.href;
-	data.settings.storage = data.settings.storage || 'url';
-	data.version = REVISION;
-
-	localStorage.setItem( 'threejs-inspector', JSON.stringify( data ) );
 
 }
 

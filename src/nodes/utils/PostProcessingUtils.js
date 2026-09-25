@@ -55,6 +55,27 @@ export const getScreenPosition = /*@__PURE__*/ Fn( ( [ viewPosition, projectionM
 } );
 
 /**
+ * Converts a clip-space position into a screen position expressed as uv coordinates.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec4>} clipPosition - The position in clip space.
+ * @return {Node<vec2>} The screen position expressed as uv coordinates.
+ */
+export const getScreenPositionFromClip = /*@__PURE__*/ Fn( ( [ clipPosition ] ) => {
+
+	const screen = clipPosition.xy.div( clipPosition.w ).mul( 0.5 ).add( 0.5 ).toVar();
+	return vec2( screen.x, screen.y.oneMinus() );
+
+} ).setLayout( {
+	name: 'getScreenPositionFromClip',
+	type: 'vec2',
+	inputs: [
+		{ name: 'clipPosition', type: 'vec4' }
+	]
+} );
+
+/**
  * Computes a normal vector based on depth data. Can be used as a fallback when no normal render
  * target is available or if flat surface normals are required.
  *
@@ -110,7 +131,7 @@ export const getNormalFromDepth = /*@__PURE__*/ Fn( ( [ uv, depthTexture, projec
  * @param {Node<vec2>} position - The input position, usually screen coordinates.
  * @return {Node<float>} The noise value.
  */
-export const interleavedGradientNoise = Fn( ( [ position ] ) => {
+export const interleavedGradientNoise = /*@__PURE__*/ Fn( ( [ position ] ) => {
 
 	return fract( float( 52.9829189 ).mul( fract( dot( position, vec2( 0.06711056, 0.00583715 ) ) ) ) );
 
@@ -136,7 +157,7 @@ export const interleavedGradientNoise = Fn( ( [ position ] ) => {
  * @param {Node<float>} phi - Rotation angle in radians (typically from IGN * 2π).
  * @return {Node<vec2>} A 2D point on the unit disk.
  */
-export const vogelDiskSample = Fn( ( [ sampleIndex, samplesCount, phi ] ) => {
+export const vogelDiskSample = /*@__PURE__*/ Fn( ( [ sampleIndex, samplesCount, phi ] ) => {
 
 	const goldenAngle = float( 2.399963229728653 ); // 2π * (2 - φ) where φ is golden ratio
 	const r = sqrt( float( sampleIndex ).add( 0.5 ).div( float( samplesCount ) ) );

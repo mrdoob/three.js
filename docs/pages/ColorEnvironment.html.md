@@ -15,7 +15,7 @@ scene.environment = envMap;
 
 ## Import
 
-ColorEnvironment is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+ColorEnvironment is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { ColorEnvironment } from 'three/addons/environments/ColorEnvironment.js';
@@ -38,6 +38,8 @@ Default is `16777215`.
 ### .dispose()
 
 Frees internal resources. This method should be called when the environment is no longer required.
+
+**Overrides:** [Scene#dispose](Scene.html#dispose)
 
 ## Source
 

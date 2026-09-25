@@ -260,7 +260,8 @@ class StorageTextureNode extends TextureNode {
 
 		const textureProperty = super.generate( builder, 'property' );
 		const uvSnippet = uvNode.build( builder, this.value.is3DTexture === true ? 'uvec3' : 'uvec2' );
-		const storeSnippet = storeNode.build( builder, 'vec4' );
+		const storeType = builder.getTypeFromLength( 4, builder.getComponentTypeFromTexture( this.value ) );
+		const storeSnippet = storeNode.build( builder, storeType );
 		const depthSnippet = depthNode ? depthNode.build( builder, 'int' ) : null;
 
 		const snippet = builder.generateTextureStore( this.value, textureProperty, uvSnippet, depthSnippet, storeSnippet );
@@ -297,11 +298,14 @@ export const storageTexture = /*@__PURE__*/ nodeProxy( StorageTextureNode ).setP
 
 
 /**
- * TODO: Explain difference to `storageTexture()`.
+ * TSL function for storing a value in a storage texture.
+ *
+ * Unlike {@link storageTexture}, this function also accepts an existing storage
+ * texture node and is intended for performing the store operation itself.
  *
  * @tsl
  * @function
- * @param {StorageTexture|StorageTextureNode} value - The storage texture.
+ * @param {StorageTexture|StorageTextureNode} value - The storage texture or storage texture node.
  * @param {Node<vec2|vec3>} uvNode - The uv node.
  * @param {?Node} [storeNode=null] - The value node that should be stored in the texture.
  * @returns {StorageTextureNode}

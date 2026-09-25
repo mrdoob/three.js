@@ -16,15 +16,14 @@ It is recommended to create one DRACOLoader instance and reuse it to avoid loadi
 
 ```js
 const loader = new DRACOLoader();
-loader.setDecoderPath( '/examples/jsm/libs/draco/' );
-const geometry = await dracoLoader.loadAsync( 'models/draco/bunny.drc' );
+const geometry = await loader.loadAsync( 'models/draco/bunny.drc' );
 geometry.computeVertexNormals(); // optional
-dracoLoader.dispose();
+loader.dispose();
 ```
 
 ## Import
 
-DRACOLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+DRACOLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -90,15 +89,17 @@ Provides configuration for the decoder libraries. Configuration cannot be change
 
 The decoder config.
 
+**Deprecated:** Yes
+
 **Returns:** A reference to this loader.
 
-### .setDecoderPath( path : string ) : DRACOLoader
+### .setDecoderPath( path : string | Object ) : DRACOLoader
 
 Provides configuration for the decoder libraries. Configuration cannot be changed after decoding begins.
 
 **path**
 
-The decoder path.
+The decoder path, or a config object with explicit URLs for each decoder file.
 
 **Returns:** A reference to this loader.
 

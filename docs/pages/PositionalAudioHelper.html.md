@@ -18,7 +18,7 @@ positionalAudio.add( helper );
 
 ## Import
 
-PositionalAudioHelper is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+PositionalAudioHelper is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { PositionalAudioHelper } from 'three/addons/helpers/PositionalAudioHelper.js';
@@ -81,6 +81,8 @@ Default is `1`.
 ### .dispose()
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+
+**Overrides:** [Line#dispose](Line.html#dispose)
 
 ### .update()
 

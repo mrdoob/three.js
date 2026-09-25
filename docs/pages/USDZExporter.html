@@ -20,7 +20,7 @@ const arraybuffer = await exporter.parseAsync( scene );
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">USDZExporter</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<p><span translate="no">USDZExporter</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { USDZExporter } from 'three/addons/exporters/USDZExporter.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -116,7 +116,7 @@ const arraybuffer = await exporter.parseAsync( scene );
 						<div class="description">
 							<p>Sets the texture utils for this exporter. Only relevant when compressed textures have to be exported.</p>
 <p>Depending on whether you use <a href="WebGLRenderer.html">WebGLRenderer</a> or <a href="WebGPURenderer.html">WebGPURenderer</a>, you must inject the
-corresponding texture utils <a href="WebGLTextureUtils.html">WebGLTextureUtils</a> or <a href="WebGPUTextureUtils.html">WebGPUTextureUtils</a>.</p>
+corresponding texture utils <a href="module-WebGLTextureUtils.html">module:WebGLTextureUtils</a> or <a href="module-WebGPUTextureUtils.html">module:WebGPUTextureUtils</a>.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -229,6 +229,29 @@ can be configured via <code>ar.anchoring.type</code> and <code>ar.planeAnchoring
 				<p>Whether to make the exported USDZ compatible to QuickLook
 which means the asset is modified to accommodate the bugs FB10036297 and FB11442287 (Apple Feedback).</p>
 						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>animations</strong>
+						<br>
+<span class="param-type">Array.&lt;<a href="AnimationClip.html">AnimationClip</a>></span>
+				</td>
+			<td class="description last">
+				<p>Animation clips to bake into <code>xformOp</code> time samples on the
+targeted objects. Only <code>position</code>, <code>quaternion</code>, and <code>scale</code> tracks are exported.</p>
+						<p>Default is <code>[]</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>animationFrameRate</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Time codes per second used when writing animation samples.</p>
+						<p>Default is <code>60</code>.</p>
 			</td>
 		</tr>
 	</tbody>

@@ -38,7 +38,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { output, normalView, pass, step, diffuseColor, emissive, directionToColor, screenUV, mix, mrt, Fn } from 'three/tsl';
+			import { output, normalView, pass, step, diffuseColor, emissive, packNormalToRGB, screenUV, mix, mrt, Fn } from 'three/tsl';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
@@ -99,7 +99,7 @@
 				const scenePass = pass( scene, camera, { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter } );
 				scenePass.setMRT( mrt( {
 					output: output,
-					normal: directionToColor( normalView ),
+					normal: packNormalToRGB( normalView ),
 					diffuse: diffuseColor,
 					emissive: emissive
 				} ) );

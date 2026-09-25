@@ -42,7 +42,7 @@ class UniformArrayElementNode extends ArrayElementNode {
 
 		const snippet = super.generate( builder );
 		const type = this.getNodeType( builder );
-		const paddedType = this.node.getPaddedType();
+		const paddedType = this.node.getPaddedType( builder );
 
 		return builder.format( snippet, paddedType, type );
 
@@ -102,14 +102,6 @@ class UniformArrayNode extends BufferNode {
 		this.elementType = elementType === null ? getValueType( value[ 0 ] ) : elementType;
 
 		/**
-		 * The padded type. Uniform buffers must conform to a certain buffer layout
-		 * so a separate type is computed to ensure correct buffer size.
-		 *
-		 * @type {string}
-		 */
-		this.paddedType = this.getPaddedType();
-
-		/**
 		 * Overwritten since uniform array nodes are updated per render.
 		 *
 		 * @type {string}
@@ -130,14 +122,14 @@ class UniformArrayNode extends BufferNode {
 
 	/**
 	 * This method is overwritten since the node type is inferred from the
-	 * {@link UniformArrayNode#paddedType}.
+	 * padded type.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
 	 */
-	generateNodeType( /*builder*/ ) {
+	generateNodeType( builder ) {
 
-		return this.paddedType;
+		return this.getPaddedType( builder );
 
 	}
 
@@ -156,9 +148,10 @@ class UniformArrayNode extends BufferNode {
 	/**
 	 * Returns the padded type based on the element type.
 	 *
+	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The padded type.
 	 */
-	getPaddedType() {
+	getPaddedType( builder ) {
 
 		const elementType = this.elementType;
 
@@ -166,7 +159,7 @@ class UniformArrayNode extends BufferNode {
 
 		if ( elementType === 'mat2' ) {
 
-			paddedType = 'mat2';
+			paddedType = builder.renderer.backend.isWebGLBackend === true ? 'vec4' : 'mat2';
 
 		} else if ( /mat/.test( elementType ) === true ) {
 
@@ -186,13 +179,38 @@ class UniformArrayNode extends BufferNode {
 
 	}
 
-	/**
-	 * The update makes sure to correctly transfer the data from the (complex) objects
-	 * in the array to the internal, correctly padded value buffer.
-	 *
-	 * @param {NodeFrame} frame - A reference to the current node frame.
-	 */
 	update( /*frame*/ ) {
+
+		this.updateBuffer();
+
+	}
+
+	/**
+	 * Composes a user-defined update with the buffer transfer.
+	 *
+	 * @param {Function} callback - The update function.
+	 * @param {string} updateType - The update type.
+	 * @return {UniformArrayNode} A reference to this node.
+	 */
+	onUpdate( callback, updateType ) {
+
+		callback = callback.bind( this );
+
+		return super.onUpdate( ( frame, self ) => {
+
+			callback( frame, self );
+
+			this.updateBuffer();
+
+		}, updateType );
+
+	}
+
+	/**
+	 * The method makes sure to correctly transfer the data from the (complex) objects
+	 * in the array to the internal, correctly padded value buffer.
+	 */
+	updateBuffer() {
 
 		const { array, value } = this;
 
@@ -305,7 +323,7 @@ class UniformArrayNode extends BufferNode {
 
 		let arrayType = Float32Array;
 
-		const paddedType = this.paddedType;
+		const paddedType = this.getPaddedType( builder );
 		const paddedElementLength = builder.getTypeLength( paddedType );
 
 		if ( elementType.charAt( 0 ) === 'i' ) arrayType = Int32Array;
@@ -315,7 +333,7 @@ class UniformArrayNode extends BufferNode {
 		this.bufferCount = length;
 		this.bufferType = paddedType;
 
-		this.update(); // initialize the buffer values
+		this.updateBuffer(); // initialize the buffer values
 
 		return super.setup( builder );
 

@@ -15,7 +15,7 @@
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">BufferGeometryUtils</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<p><span translate="no">BufferGeometryUtils</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';</code></pre>
 				<div class="container-overview">
 				</div>
@@ -338,8 +338,9 @@ faces that meet at an angle greater than the crease angle.</p>
 					<h3 class="name name-method" id="~toTrianglesDrawMode" translate="no">.<a href="#~toTrianglesDrawMode">toTrianglesDrawMode</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, drawMode : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> <span class="type-signature">(inner) </span></h3>
 					<div class="method">
 						<div class="description">
-							<p>Returns a new indexed geometry based on <code>TrianglesDrawMode</code> draw mode.
-This mode corresponds to the <code>gl.TRIANGLES</code> primitive in WebGL.</p>
+							<p>Converts the given geometry to the <code>TrianglesDrawMode</code> draw mode, which
+corresponds to the <code>gl.TRIANGLES</code> primitive in WebGL. The conversion only
+rewrites the index, so the geometry is modified in place and returned.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -362,7 +363,7 @@ This mode corresponds to the <code>gl.TRIANGLES</code> primitive in WebGL.</p>
 							</tbody>
 						</table>
 						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> The new geometry using <code>TrianglesDrawMode</code>.</dt>
+							<dt class="tag-returns"><strong>Returns:</strong> The converted geometry using <code>TrianglesDrawMode</code>.</dt>
 						</dl>
 					</div>
 				<h2 class="subsection-title">Source</h2>

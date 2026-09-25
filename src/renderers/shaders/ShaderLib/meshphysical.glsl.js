@@ -95,8 +95,20 @@ uniform float opacity;
 	uniform float clearcoatRoughness;
 #endif
 
+#ifdef USE_DIFFUSE_ROUGHNESS
+	uniform float diffuseRoughness;
+
+	#ifdef USE_DIFFUSE_ROUGHNESSMAP
+		uniform sampler2D diffuseRoughnessMap;
+	#endif
+#endif
+
 #ifdef USE_DISPERSION
 	uniform float dispersion;
+#endif
+
+#ifdef USE_RETROREFLECTION
+	uniform float retroreflectivity;
 #endif
 
 #ifdef USE_IRIDESCENCE
@@ -141,7 +153,6 @@ varying vec3 vViewPosition;
 #include <lightmap_pars_fragment>
 #include <emissivemap_pars_fragment>
 #include <iridescence_fragment>
-#include <cube_uv_reflection_fragment>
 #include <envmap_common_pars_fragment>
 #include <envmap_physical_pars_fragment>
 #include <fog_pars_fragment>

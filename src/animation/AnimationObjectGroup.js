@@ -275,12 +275,24 @@ class AnimationObjectGroup {
 						lastIndex = -- nObjects,
 						lastObject = objects[ lastIndex ];
 
-					// last cached object takes this object's place
-					indicesByUUID[ lastCachedObject.uuid ] = index;
+					if ( index !== firstActiveIndex ) {
+
+						// last cached object takes this object's place
+
+						indicesByUUID[ lastCachedObject.uuid ] = index;
+
+					}
+
 					objects[ index ] = lastCachedObject;
 
-					// last object goes to the activated slot and pop
-					indicesByUUID[ lastObject.uuid ] = firstActiveIndex;
+					if ( firstActiveIndex !== lastIndex ) {
+
+						// last object goes to the activated slot and pop
+
+						indicesByUUID[ lastObject.uuid ] = firstActiveIndex;
+
+					}
+
 					objects[ firstActiveIndex ] = lastObject;
 					objects.pop();
 
@@ -305,7 +317,7 @@ class AnimationObjectGroup {
 					const lastIndex = -- nObjects,
 						lastObject = objects[ lastIndex ];
 
-					if ( lastIndex > 0 ) {
+					if ( index !== lastIndex ) {
 
 						indicesByUUID[ lastObject.uuid ] = index;
 
@@ -389,7 +401,7 @@ class AnimationObjectGroup {
 				bindings = this._bindings,
 				lastBindingsIndex = bindings.length - 1,
 				lastBindings = bindings[ lastBindingsIndex ],
-				lastBindingsPath = path[ lastBindingsIndex ];
+				lastBindingsPath = paths[ lastBindingsIndex ];
 
 			indicesByPath[ lastBindingsPath ] = index;
 

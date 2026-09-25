@@ -104,9 +104,9 @@ class BloomPass extends Pass {
 
 		// internals
 
-		this._renderTargetX = new WebGLRenderTarget( 1, 1, { type: HalfFloatType } ); // will be resized later
+		this._renderTargetX = new WebGLRenderTarget( 1, 1, { type: HalfFloatType, depthBuffer: false } ); // will be resized later
 		this._renderTargetX.texture.name = 'BloomPass.x';
-		this._renderTargetY = new WebGLRenderTarget( 1, 1, { type: HalfFloatType } ); // will be resized later
+		this._renderTargetY = new WebGLRenderTarget( 1, 1, { type: HalfFloatType, depthBuffer: false } ); // will be resized later
 		this._renderTargetY.texture.name = 'BloomPass.y';
 
 		this._fsQuad = new FullScreenQuad( null );

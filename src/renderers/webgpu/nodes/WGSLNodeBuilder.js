@@ -16,7 +16,7 @@ import { NodeAccess } from '../../../nodes/core/constants.js';
 import VarNode from '../../../nodes/core/VarNode.js';
 import ExpressionNode from '../../../nodes/code/ExpressionNode.js';
 
-import { FloatType, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter, Compatibility } from '../../../constants.js';
+import { FloatType, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, NearestFilter, Compatibility, ShortType, UnsignedShortType } from '../../../constants.js';
 import { warn, error } from '../../../utils.js';
 
 import { GPUShaderStage } from '../utils/WebGPUConstants.js';
@@ -91,6 +91,83 @@ const wgslPolyfill = {
 	repeatWrapping_float: new CodeNode( 'fn tsl_repeatWrapping_float( coord: f32 ) -> f32 { return fract( coord ); }' ),
 	mirrorWrapping_float: new CodeNode( 'fn tsl_mirrorWrapping_float( coord: f32 ) -> f32 { let mirrored = fract( coord * 0.5 ) * 2.0; return 1.0 - abs( 1.0 - mirrored ); }' ),
 	clampWrapping_float: new CodeNode( 'fn tsl_clampWrapping_float( coord: f32 ) -> f32 { return clamp( coord, 0.0, 1.0 ); }' ),
+	inverse_mat2: new CodeNode( /* wgsl */`
+fn tsl_inverse_mat2( m : mat2x2<f32> ) -> mat2x2<f32> {
+
+	let det = m[ 0 ][ 0 ] * m[ 1 ][ 1 ] - m[ 0 ][ 1 ] * m[ 1 ][ 0 ];
+
+	return mat2x2<f32>(
+		m[ 1 ][ 1 ], - m[ 0 ][ 1 ],
+		- m[ 1 ][ 0 ], m[ 0 ][ 0 ]
+	) * ( 1.0 / det );
+
+}
+` ),
+	inverse_mat3: new CodeNode( /* wgsl */`
+fn tsl_inverse_mat3( m : mat3x3<f32> ) -> mat3x3<f32> {
+
+	let a00 = m[ 0 ][ 0 ]; let a01 = m[ 0 ][ 1 ]; let a02 = m[ 0 ][ 2 ];
+	let a10 = m[ 1 ][ 0 ]; let a11 = m[ 1 ][ 1 ]; let a12 = m[ 1 ][ 2 ];
+	let a20 = m[ 2 ][ 0 ]; let a21 = m[ 2 ][ 1 ]; let a22 = m[ 2 ][ 2 ];
+
+	let b01 = a22 * a11 - a12 * a21;
+	let b11 = - a22 * a10 + a12 * a20;
+	let b21 = a21 * a10 - a11 * a20;
+
+	let det = a00 * b01 + a01 * b11 + a02 * b21;
+
+	return mat3x3<f32>(
+		b01, ( - a22 * a01 + a02 * a21 ), ( a12 * a01 - a02 * a11 ),
+		b11, ( a22 * a00 - a02 * a20 ), ( - a12 * a00 + a02 * a10 ),
+		b21, ( - a21 * a00 + a01 * a20 ), ( a11 * a00 - a01 * a10 )
+	) * ( 1.0 / det );
+
+}
+` ),
+	inverse_mat4: new CodeNode( /* wgsl */`
+fn tsl_inverse_mat4( m : mat4x4<f32> ) -> mat4x4<f32> {
+
+	let a00 = m[ 0 ][ 0 ]; let a01 = m[ 0 ][ 1 ]; let a02 = m[ 0 ][ 2 ]; let a03 = m[ 0 ][ 3 ];
+	let a10 = m[ 1 ][ 0 ]; let a11 = m[ 1 ][ 1 ]; let a12 = m[ 1 ][ 2 ]; let a13 = m[ 1 ][ 3 ];
+	let a20 = m[ 2 ][ 0 ]; let a21 = m[ 2 ][ 1 ]; let a22 = m[ 2 ][ 2 ]; let a23 = m[ 2 ][ 3 ];
+	let a30 = m[ 3 ][ 0 ]; let a31 = m[ 3 ][ 1 ]; let a32 = m[ 3 ][ 2 ]; let a33 = m[ 3 ][ 3 ];
+
+	let b00 = a00 * a11 - a01 * a10;
+	let b01 = a00 * a12 - a02 * a10;
+	let b02 = a00 * a13 - a03 * a10;
+	let b03 = a01 * a12 - a02 * a11;
+	let b04 = a01 * a13 - a03 * a11;
+	let b05 = a02 * a13 - a03 * a12;
+	let b06 = a20 * a31 - a21 * a30;
+	let b07 = a20 * a32 - a22 * a30;
+	let b08 = a20 * a33 - a23 * a30;
+	let b09 = a21 * a32 - a22 * a31;
+	let b10 = a21 * a33 - a23 * a31;
+	let b11 = a22 * a33 - a23 * a32;
+
+	let det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
+
+	return mat4x4<f32>(
+		a11 * b11 - a12 * b10 + a13 * b09,
+		a02 * b10 - a01 * b11 - a03 * b09,
+		a31 * b05 - a32 * b04 + a33 * b03,
+		a22 * b04 - a21 * b05 - a23 * b03,
+		a12 * b08 - a10 * b11 - a13 * b07,
+		a00 * b11 - a02 * b08 + a03 * b07,
+		a32 * b02 - a30 * b05 - a33 * b01,
+		a20 * b05 - a22 * b02 + a23 * b01,
+		a10 * b10 - a11 * b08 + a13 * b06,
+		a01 * b08 - a00 * b10 - a03 * b06,
+		a30 * b04 - a31 * b02 + a33 * b00,
+		a21 * b02 - a20 * b04 - a23 * b00,
+		a11 * b07 - a10 * b09 - a12 * b06,
+		a00 * b09 - a01 * b07 + a02 * b06,
+		a31 * b01 - a30 * b03 - a32 * b00,
+		a20 * b03 - a21 * b01 + a22 * b00
+	) * ( 1.0 / det );
+
+}
+` ),
 	biquadraticTexture: new CodeNode( /* wgsl */`
 fn tsl_biquadraticTexture( map : texture_2d<f32>, coord : vec2f, iRes : vec2u, level : u32 ) -> vec4f {
 
@@ -150,15 +227,52 @@ const wgslMethods = {
 	equals_bvec2: 'tsl_equals_bvec2',
 	equals_bvec3: 'tsl_equals_bvec3',
 	equals_bvec4: 'tsl_equals_bvec4',
+	inverse_mat2: 'tsl_inverse_mat2',
+	inverse_mat3: 'tsl_inverse_mat3',
+	inverse_mat4: 'tsl_inverse_mat4',
 	inversesqrt: 'inverseSqrt',
+	faceforward: 'faceForward',
 	bitcast: 'bitcast<f32>',
 	floatpack_snorm_2x16: 'pack2x16snorm',
 	floatpack_unorm_2x16: 'pack2x16unorm',
 	floatpack_float16_2x16: 'pack2x16float',
+	floatpack_snorm_4x8: 'pack4x8snorm',
+	floatpack_unorm_4x8: 'pack4x8unorm',
 	floatunpack_snorm_2x16: 'unpack2x16snorm',
 	floatunpack_unorm_2x16: 'unpack2x16unorm',
-	floatunpack_float16_2x16: 'unpack2x16float'
+	floatunpack_float16_2x16: 'unpack2x16float',
+	floatunpack_snorm_4x8: 'unpack4x8snorm',
+	floatunpack_unorm_4x8: 'unpack4x8unorm'
 };
+
+// See: https://www.w3.org/TR/WGSL/#keyword-summary and #reserved-words-section
+
+const wgslReservedKeywords = new Set( [
+	// keywords
+	'alias', 'break', 'case', 'const', 'const_assert', 'continue', 'continuing', 'default', 'diagnostic',
+	'discard', 'else', 'enable', 'false', 'fn', 'for', 'if', 'let', 'loop', 'override', 'requires',
+	'return', 'struct', 'switch', 'true', 'var', 'while',
+	// reserved words
+	'NULL', 'Self', 'abstract', 'active', 'alignas', 'alignof', 'as', 'asm', 'asm_fragment', 'async',
+	'attribute', 'auto', 'await', 'become', 'binding_array', 'cast', 'catch', 'class', 'co_await',
+	'co_return', 'co_yield', 'coherent', 'column_major', 'common', 'compile', 'compile_fragment',
+	'concept', 'const_cast', 'consteval', 'constexpr', 'constinit', 'crate', 'debugger', 'decltype',
+	'delete', 'demote', 'demote_to_helper', 'do', 'dynamic_cast', 'enum', 'explicit', 'export',
+	'extends', 'extern', 'external', 'fallthrough', 'filter', 'final', 'finally', 'friend', 'from',
+	'fxgroup', 'get', 'goto', 'groupshared', 'highp', 'impl', 'implements', 'import', 'inline',
+	'instanceof', 'interface', 'layout', 'lowp', 'macro', 'macro_rules', 'match', 'mediump', 'meta',
+	'mod', 'module', 'move', 'mut', 'mutable', 'namespace', 'new', 'nil', 'noexcept', 'noinline',
+	'nointerpolation', 'non_coherent', 'noncoherent', 'noperspective', 'null', 'nullptr', 'of',
+	'operator', 'package', 'packoffset', 'partition', 'pass', 'patch', 'pixelfragment', 'precise',
+	'precision', 'premerge', 'priv', 'protected', 'pub', 'public', 'readonly', 'ref', 'regardless',
+	'register', 'reinterpret_cast', 'require', 'resource', 'restrict', 'self', 'set', 'shared',
+	'sizeof', 'smooth', 'snorm', 'static', 'static_assert', 'static_cast', 'std', 'subroutine',
+	'super', 'target', 'template', 'this', 'thread_local', 'throw', 'trait', 'try', 'type', 'typedef',
+	'typeid', 'typename', 'typeof', 'union', 'unless', 'unorm', 'unsafe', 'unsized', 'use', 'using',
+	'varying', 'virtual', 'volatile', 'wgsl', 'where', 'with', 'writeonly', 'yield',
+	// generated entry points
+	'main'
+] );
 
 //
 
@@ -511,6 +625,25 @@ class WGSLNodeBuilder extends NodeBuilder {
 	}
 
 	/**
+	 * Generates the WGSL snippet that resolves the dimensions of the given texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @param {string} textureProperty - The name of the texture uniform in the shader.
+	 * @param {string} levelSnippet - A WGSL snippet that represents the mip level.
+	 * @return {string} The WGSL snippet.
+	 */
+	generateTextureSize( texture, textureProperty, levelSnippet ) {
+
+		const { primarySamples } = this.renderer.backend.utils.getTextureSampleData( texture );
+		const isMultisampled = primarySamples > 1;
+
+		const params = ( isMultisampled || texture.isStorageTexture ) ? textureProperty : `${ textureProperty }, ${ levelSnippet }`;
+
+		return `textureDimensions( ${ params } )`;
+
+	}
+
+	/**
 	 * Generates the WGSL snippet for a manual filtered texture.
 	 *
 	 * @param {Texture} texture - The texture.
@@ -726,7 +859,8 @@ class WGSLNodeBuilder extends NodeBuilder {
 		return this.getComponentTypeFromTexture( texture ) !== 'float' ||
 			( ! this.isAvailable( 'float32Filterable' ) && texture.type === FloatType ) ||
 			( this.isSampleCompare( texture ) === false && texture.minFilter === NearestFilter && texture.magFilter === NearestFilter ) ||
-			this.renderer.backend.utils.getTextureSampleData( texture ).primarySamples > 1;
+			this.renderer.backend.utils.getTextureSampleData( texture ).primarySamples > 1 ||
+			texture.normalized === true && ( texture.type === ShortType || texture.type === UnsignedShortType );
 
 	}
 
@@ -859,10 +993,45 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {string} gatherSnippet - A WGSL snippet that represents the index of the channel to read.
 	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
 	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
-	 * @param {?string} flipYSnippet - A WGSL snippet that represents the y-flip. Only used for WebGL.
 	 * @return {string} The WGSL snippet.
 	 */
 	generateTextureGather( texture, textureProperty, uvSnippet, gatherSnippet, depthSnippet, offsetSnippet ) {
+
+		const { primarySamples } = this.renderer.backend.utils.getTextureSampleData( texture );
+
+		if ( primarySamples > 1 ) {
+
+			// textureGather() has no overload for multisampled textures (e.g. the depth
+			// of a MSAA render target), so the four texels are fetched with textureLoad()
+
+			const textureDimension = this.generateTextureDimension( texture, textureProperty, '0u' );
+
+			let coordSnippet = `vec2<i32>( floor( ${ uvSnippet } * vec2<f32>( ${ textureDimension } ) - 0.5 ) )`;
+
+			if ( offsetSnippet ) {
+
+				coordSnippet = `${ coordSnippet } + ${ offsetSnippet }`;
+
+			}
+
+			const coord = new VarNode( new ExpressionNode( coordSnippet, 'ivec2' ) ).build( this );
+			const coordMax = `vec2<i32>( ${ textureDimension } ) - 1`;
+
+			const load = ( x, y ) => {
+
+				const snippet = this.generateTextureLoad( texture, textureProperty, `clamp( ${ coord } + vec2<i32>( ${ x }, ${ y } ), vec2<i32>( 0 ), ${ coordMax } )`, null, null, null );
+
+				return texture.isDepthTexture === true ? snippet : `${ snippet }[ ${ gatherSnippet } ]`;
+
+			};
+
+			// same texel order as textureGather()
+
+			const componentPrefix = this.getComponentTypeFromTexture( texture ).charAt( 0 );
+
+			return `vec4<${ componentPrefix }32>( ${ load( 0, 1 ) }, ${ load( 1, 1 ) }, ${ load( 1, 0 ) }, ${ load( 0, 0 ) } )`;
+
+		}
 
 		const componentSnippet = texture.isDepthTexture === true ? '' : `${gatherSnippet}, `;
 
@@ -897,7 +1066,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {string} compareSnippet - A WGSL snippet that represents the reference value.
 	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
 	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
-	 * @param {?string} flipYSnippet - A WGSL snippet that represents the y-flip. Only used for WebGL.
 	 * @return {string} The WGSL snippet.
 	 */
 	generateTextureGatherCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, offsetSnippet ) {
@@ -933,7 +1101,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 * @param {string} levelSnippet - A WGSL snippet that represents the mip level, with level 0 containing a full size version of the texture.
 	 * @param {?string} depthSnippet - A WGSL snippet that represents 0-based texture array index to sample.
 	 * @param {?string} offsetSnippet - A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
-	 * @param {string} [shaderStage=this.shaderStage] - The shader stage this code snippet is generated for.
 	 * @return {string} The WGSL snippet.
 	 */
 	generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, offsetSnippet ) {
@@ -1069,6 +1236,18 @@ class WGSLNodeBuilder extends NodeBuilder {
 	}
 
 	/**
+	 * Returns whether the given name is a reserved keyword of WGSL.
+	 *
+	 * @param {string} name - The name to test.
+	 * @return {boolean} Whether the name is a reserved keyword or not.
+	 */
+	isReservedKeyword( name ) {
+
+		return wgslReservedKeywords.has( name );
+
+	}
+
+	/**
 	 * Returns the output struct name.
 	 *
 	 * @return {string} The name of the output struct.
@@ -1114,7 +1293,16 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			if ( node.isAtomic === true ) {
 
-				warn( 'WebGPURenderer: Atomic operations are only supported in compute shaders.' );
+				// Per the WGSL spec, atomic built-in functions are only allowed in
+				// the fragment and compute stages, not in the vertex stage.
+
+				if ( shaderStage === 'vertex' ) {
+
+					warn( 'WebGPURenderer: Atomic operations are not supported in the vertex stage. They are only available in the fragment and compute stages.' );
+
+					return NodeAccess.READ_ONLY;
+
+				}
 
 				return NodeAccess.READ_WRITE;
 
@@ -1560,20 +1748,17 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Enables the 'subgroups' directive.
+	 * Enables subgroups.
 	 */
 	enableSubGroups() {
 
+		if ( this.renderer.hasFeature( 'subgroups' ) === false ) {
+
+			error( 'WGSLNodeBuilder: The \'subgroups\' feature is not supported by the current device.' );
+
+		}
+
 		this.enableDirective( 'subgroups' );
-
-	}
-
-	/**
-	 * Enables the 'subgroups-f16' directive.
-	 */
-	enableSubgroupsF16() {
-
-		this.enableDirective( 'subgroups-f16' );
 
 	}
 
@@ -1587,7 +1772,7 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Enables the 'f16' directive.
+	 * Enables 16 bit floats.
 	 */
 	enableShaderF16() {
 
@@ -1596,7 +1781,7 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Enables the 'dual_source_blending' directive.
+	 * Enables dual source blending.
 	 */
 	enableDualSourceBlending() {
 
@@ -1650,9 +1835,10 @@ ${ flowData.code }
 	 * @param {string} scope - The scope.
 	 * @param {string} bufferType - The buffer type.
 	 * @param {string} bufferCount - The buffer count.
+	 * @param {boolean} isAtomic - Whether the array elements are atomic or not.
 	 * @return {string} The array name.
 	 */
-	getScopedArray( name, scope, bufferType, bufferCount ) {
+	getScopedArray( name, scope, bufferType, bufferCount, isAtomic ) {
 
 		if ( this.scopedArrays.has( name ) === false ) {
 
@@ -1660,7 +1846,8 @@ ${ flowData.code }
 				name,
 				scope,
 				bufferType,
-				bufferCount
+				bufferCount,
+				isAtomic
 			} );
 
 		}
@@ -1686,9 +1873,11 @@ ${ flowData.code }
 
 		const snippets = [];
 
-		for ( const { name, scope, bufferType, bufferCount } of this.scopedArrays.values() ) {
+		for ( const { name, scope, bufferType, bufferCount, isAtomic } of this.scopedArrays.values() ) {
 
-			const type = this.getType( bufferType );
+			let type = this.getType( bufferType );
+
+			if ( isAtomic === true ) type = `atomic<${type}>`;
 
 			snippets.push( `var<${scope}> ${name}: array< ${type}, ${bufferCount} >;` );
 
@@ -1846,6 +2035,48 @@ ${ flowData.code }
 	}
 
 	/**
+	 * Returns a single const variable statement as a WGSL string for the given variable type and name.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The WGSL snippet that defines a const variable.
+	 */
+	generateConstStatement( type, name/*, count = null*/ ) {
+
+		return `const ${ name }`;
+
+	}
+
+	/**
+	 * Returns a single variable statement as a WGSL string for the given variable type and name.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The WGSL snippet that defines a variable.
+	 */
+	generateVarStatement( type, name, count = null ) {
+
+		return this.getVar( type, name, count );
+
+	}
+
+	/**
+	 * Returns a runtime read-only variable statement as a WGSL string.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The WGSL snippet that defines a let variable.
+	 */
+	generateLetStatement( type, name/*, count = null*/ ) {
+
+		return `let ${ name }`;
+
+	}
+
+	/**
 	 * Returns the variables of the given shader stage as a WGSL string.
 	 *
 	 * @param {string} shaderStage - The shader stage.
@@ -1992,7 +2223,7 @@ ${ flowData.code }
 
 				if ( needsSampler ) {
 
-					if ( this.isSampleCompare( texture ) && textureNode.compareNode !== null ) {
+					if ( this.isSampleCompare( texture ) && textureNode.isSampleCompare() ) {
 
 						bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name }_sampler : sampler_comparison;` );
 
@@ -2050,11 +2281,13 @@ ${ flowData.code }
 
 				} else if ( texture.isArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
 
-					textureType = 'texture_2d_array<f32>';
+					const componentPrefix = this.getComponentTypeFromTexture( texture ).charAt( 0 );
+					textureType = `texture_2d_array<${ componentPrefix }32>`;
 
 				} else if ( texture.is3DTexture === true || texture.isData3DTexture === true ) {
 
-					textureType = 'texture_3d<f32>';
+					const componentPrefix = this.getComponentTypeFromTexture( texture ).charAt( 0 );
+					textureType = `texture_3d<${ componentPrefix }32>`;
 
 				} else {
 
@@ -2257,8 +2490,7 @@ ${ flowData.code }
 		} else {
 
 			// Early strictly validated in computeNode
-
-			const workgroupSize = this.object.workgroupSize;
+			const workgroupSize = this.compute.workgroupSize;
 
 			this.computeShader = this._getWGSLComputeCode( shadersData.compute, workgroupSize );
 
@@ -2311,11 +2543,12 @@ ${ flowData.code }
 	 * Returns the float packing method name for a given numeric encoding.
 	 *
 	 * @param {string} encoding - The numeric encoding that describes how the float values are mapped to the integer range.
+	 * @param {string} [layout='2x16'] - The component layout of the packed integer.
 	 * @returns {string} The resolve WGSL float packing method name.
 	 */
-	getFloatPackingMethod( encoding ) {
+	getFloatPackingMethod( encoding, layout = '2x16' ) {
 
-		return this.getMethod( `floatpack_${ encoding }_2x16` );
+		return this.getMethod( `floatpack_${ encoding }_${ layout }` );
 
 	}
 
@@ -2323,11 +2556,12 @@ ${ flowData.code }
 	 * Returns the float unpacking method name for a given numeric encoding.
 	 *
 	 * @param {string} encoding - The numeric encoding that describes how the integer values are mapped to the float range.
+	 * @param {string} [layout='2x16'] - The component layout of the packed integer.
 	 * @returns {string} The resolve WGSL float unpacking method name.
 	 */
-	getFloatUnpackingMethod( encoding ) {
+	getFloatUnpackingMethod( encoding, layout = '2x16' ) {
 
-		return this.getMethod( `floatunpack_${ encoding }_2x16` );
+		return this.getMethod( `floatunpack_${ encoding }_${ layout }` );
 
 	}
 
@@ -2479,6 +2713,9 @@ fn main( ${shaderData.attributes} ) -> VaryingsStruct {
 		return `${ this.getSignature() }
 // global
 ${ diagnostics }
+
+// directives
+${shaderData.directives}
 
 // structs
 ${shaderData.structs}

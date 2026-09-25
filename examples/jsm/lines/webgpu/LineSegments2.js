@@ -324,6 +324,14 @@ class LineSegments2 extends Mesh {
 
 		}
 
+		// early out if no resolution has been set (line was not rendered yet)
+
+		if ( worldUnits === false && ( this._resolution.x === 0 || this._resolution.y === 0 ) ) {
+
+			return;
+
+		}
+
 		const threshold = ( raycaster.params.Line2 !== undefined ) ? raycaster.params.Line2.threshold || 0 : 0;
 
 		_ray = raycaster.ray;

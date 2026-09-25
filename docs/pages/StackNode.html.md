@@ -100,17 +100,13 @@ TSL code which is executed if the condition evaluates to `true`.
 
 **Returns:** A reference to this stack node.
 
-### .Switch( expression : any, method : function ) : StackNode
+### .Switch( expression : any ) : StackNode
 
 Represents a `switch` statement in TSL.
 
 **expression**
 
 Represents the expression.
-
-**method**
-
-TSL code which is executed if the condition evaluates to `true`.
 
 **Returns:** A reference to this stack node.
 

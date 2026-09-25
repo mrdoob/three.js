@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<materialx version="1.39" colorspace="lin_rec709">
+  <surfacematerial name="Velvet" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="open_pbr_surface_surfaceshader" />
+  </surfacematerial>
+  <open_pbr_surface name="open_pbr_surface_surfaceshader" type="surfaceshader">
+    <input name="base_color" type="color3" value="0.02, 0.02, 0.02" />
+    <input name="specular_roughness" type="float" value="0.8" />
+    <input name="fuzz_weight" type="float" value="1" />
+    <input name="fuzz_color" type="color3" value="0.4, 0.4, 0.4" />
+    <input name="fuzz_roughness" type="float" value="0.5" />
+  </open_pbr_surface>
+</materialx>

@@ -2,22 +2,26 @@ import {
 	InstancedBufferAttribute,
 	InstancedMesh,
 	Matrix4,
-	ShaderMaterial,
+	NodeMaterial,
 	SphereGeometry,
 	Vector3
-} from 'three';
+} from 'three/webgpu';
+import { array, attribute, Fn, getShIrradianceAt, normalWorld, texture3D, uniform, vec3, vec4 } from 'three/tsl';
 
 /**
- * Visualizes an {@link LightProbeGrid} by rendering a sphere at each
- * probe position, shaded with the probe's L2 spherical harmonics.
+ * Visualizes a {@link LightProbeGrid} by rendering a sphere at each probe
+ * position, shaded with the probe's L2 spherical harmonics. Uses a single
+ * `InstancedMesh` draw call for all probes.
  *
- * Uses a single `InstancedMesh` draw call for all probes.
+ * This helper can only be used with {@link WebGPURenderer}.
+ * When using {@link WebGLRenderer}, import from `LightProbeGridHelperWebGL.js`.
  *
  * ```js
  * const helper = new LightProbeGridHelper( probes );
  * scene.add( helper );
  * ```
  *
+ * @private
  * @augments InstancedMesh
  * @three_import import { LightProbeGridHelper } from 'three/addons/helpers/LightProbeGridHelper.js';
  */
@@ -32,100 +36,7 @@ class LightProbeGridHelper extends InstancedMesh {
 	constructor( probes, sphereSize = 0.12 ) {
 
 		const geometry = new SphereGeometry( sphereSize, 16, 16 );
-
-		const material = new ShaderMaterial( {
-
-			uniforms: {
-
-				probesSH: { value: null },
-				probesResolution: { value: new Vector3() },
-
-			},
-
-			vertexShader: /* glsl */`
-
-				attribute vec3 instanceUVW;
-
-				varying vec3 vWorldNormal;
-				varying vec3 vUVW;
-
-				void main() {
-
-					vUVW = instanceUVW;
-					vWorldNormal = normalize( mat3( modelMatrix ) * normal );
-					gl_Position = projectionMatrix * modelViewMatrix * instanceMatrix * vec4( position, 1.0 );
-
-				}
-
-			`,
-
-			fragmentShader: /* glsl */`
-
-				precision highp sampler3D;
-
-				uniform sampler3D probesSH;
-				uniform vec3 probesResolution;
-
-				varying vec3 vWorldNormal;
-				varying vec3 vUVW;
-
-				void main() {
-
-					// Atlas UV mapping — must match lightprobes_pars_fragment.glsl.js
-					float nz          = probesResolution.z;
-					float paddedSlices = nz + 2.0;
-					float atlasDepth  = 7.0 * paddedSlices;
-					float uvZBase     = vUVW.z * nz + 1.0;
-
-					vec4 s0 = texture( probesSH, vec3( vUVW.xy, ( uvZBase                       ) / atlasDepth ) );
-					vec4 s1 = texture( probesSH, vec3( vUVW.xy, ( uvZBase +       paddedSlices   ) / atlasDepth ) );
-					vec4 s2 = texture( probesSH, vec3( vUVW.xy, ( uvZBase + 2.0 * paddedSlices   ) / atlasDepth ) );
-					vec4 s3 = texture( probesSH, vec3( vUVW.xy, ( uvZBase + 3.0 * paddedSlices   ) / atlasDepth ) );
-					vec4 s4 = texture( probesSH, vec3( vUVW.xy, ( uvZBase + 4.0 * paddedSlices   ) / atlasDepth ) );
-					vec4 s5 = texture( probesSH, vec3( vUVW.xy, ( uvZBase + 5.0 * paddedSlices   ) / atlasDepth ) );
-					vec4 s6 = texture( probesSH, vec3( vUVW.xy, ( uvZBase + 6.0 * paddedSlices   ) / atlasDepth ) );
-
-					// Unpack 9 vec3 SH L2 coefficients
-
-					vec3 c0 = s0.xyz;
-					vec3 c1 = vec3( s0.w, s1.xy );
-					vec3 c2 = vec3( s1.zw, s2.x );
-					vec3 c3 = s2.yzw;
-					vec3 c4 = s3.xyz;
-					vec3 c5 = vec3( s3.w, s4.xy );
-					vec3 c6 = vec3( s4.zw, s5.x );
-					vec3 c7 = s5.yzw;
-					vec3 c8 = s6.xyz;
-
-					vec3 n = normalize( vWorldNormal );
-
-					float x = n.x, y = n.y, z = n.z;
-
-					// band 0
-					vec3 result = c0 * 0.886227;
-
-					// band 1,
-					result += c1 * 2.0 * 0.511664 * y;
-					result += c2 * 2.0 * 0.511664 * z;
-					result += c3 * 2.0 * 0.511664 * x;
-
-					// band 2,
-					result += c4 * 2.0 * 0.429043 * x * y;
-					result += c5 * 2.0 * 0.429043 * y * z;
-					result += c6 * ( 0.743125 * z * z - 0.247708 );
-					result += c7 * 2.0 * 0.429043 * x * z;
-					result += c8 * 0.429043 * ( x * x - y * y );
-
-					gl_FragColor = vec4( max( result, vec3( 0.0 ) ), 1.0 );
-
-					#include <tonemapping_fragment>
-					#include <colorspace_fragment>
-
-				}
-
-			`
-
-		} );
+		const material = new NodeMaterial();
 
 		const res = probes.resolution;
 		const count = res.x * res.y * res.z;
@@ -141,13 +52,49 @@ class LightProbeGridHelper extends InstancedMesh {
 
 		this.type = 'LightProbeGridHelper';
 
+		// Atlas and resolution are swappable uniforms, so the shading node builds once.
+
+		this._atlas = texture3D( probes.texture );
+		this._resolution = uniform( new Vector3() );
+
+		const nz = this._resolution.z;
+		const paddedSlices = nz.add( 2.0 );
+		const atlasDepth = paddedSlices.mul( 7.0 );
+
+		material.fragmentNode = Fn( () => {
+
+			const uvw = attribute( 'instanceUVW', 'vec3' );
+			const uvZBase = uvw.z.mul( nz ).add( 1.0 );
+
+			const slice = ( t ) => this._atlas.sample( vec3( uvw.xy, uvZBase.add( paddedSlices.mul( t ) ).div( atlasDepth ) ) );
+
+			const s0 = slice( 0 ), s1 = slice( 1 ), s2 = slice( 2 ), s3 = slice( 3 );
+			const s4 = slice( 4 ), s5 = slice( 5 ), s6 = slice( 6 );
+
+			const sh = array( [
+				s0.xyz,
+				vec3( s0.w, s1.xy ),
+				vec3( s1.zw, s2.x ),
+				s2.yzw,
+				s3.xyz,
+				vec3( s3.w, s4.xy ),
+				vec3( s4.zw, s5.x ),
+				s5.yzw,
+				s6.xyz
+			] );
+
+			return vec4( getShIrradianceAt( normalWorld, sh ).max( vec3( 0.0 ) ), 1.0 );
+
+		} )();
+
 		this.update();
 
 	}
 
 	/**
-	 * Rebuilds instance matrices and UVW attributes from the current probe grid.
-	 * Call this after changing `probes` or after re-baking.
+	 * Rebuilds instance matrices and UVW attributes from the current probe grid,
+	 * and rebinds the shading node to its atlas. Call this after changing
+	 * `probes` or after re-baking.
 	 */
 	update() {
 
@@ -155,7 +102,7 @@ class LightProbeGridHelper extends InstancedMesh {
 		const res = probes.resolution;
 		const count = res.x * res.y * res.z;
 
-		// Resize instance matrix buffer if needed
+		// Resize instance matrix buffer if needed.
 
 		if ( this.instanceMatrix.count !== count ) {
 
@@ -177,7 +124,7 @@ class LightProbeGridHelper extends InstancedMesh {
 
 				for ( let ix = 0; ix < res.x; ix ++ ) {
 
-					// Remap to texel centers (must match lightprobes_pars_fragment.glsl.js)
+					// Remap to texel centers (must match LightProbeGridNode).
 					uvwArray[ i * 3 ] = ( ix + 0.5 ) / res.x;
 					uvwArray[ i * 3 + 1 ] = ( iy + 0.5 ) / res.y;
 					uvwArray[ i * 3 + 2 ] = ( iz + 0.5 ) / res.z;
@@ -198,10 +145,8 @@ class LightProbeGridHelper extends InstancedMesh {
 
 		this.geometry.setAttribute( 'instanceUVW', new InstancedBufferAttribute( uvwArray, 3 ) );
 
-		// Update texture uniforms
-
-		this.material.uniforms.probesSH.value = probes.texture;
-		this.material.uniforms.probesResolution.value.copy( probes.resolution );
+		this._atlas.value = probes.texture;
+		this._resolution.value.copy( res );
 
 	}
 

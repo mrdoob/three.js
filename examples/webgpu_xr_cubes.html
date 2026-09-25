@@ -43,7 +43,7 @@
 			const controllerModelFactory = new XRControllerModelFactory();
 
 			let container;
-			let camera, scene, raycaster, renderer;
+			let camera, scene, raycaster, renderer, renderPipeline;
 
 			let room;
 
@@ -152,6 +152,7 @@
 				}
 
 				renderer = newRenderer;
+				renderPipeline = new THREE.DirectRenderPipeline( renderer );
 				setupControllers();
 
 			}
@@ -317,7 +318,7 @@
 
 				}
 
-				renderer.render( scene, camera );
+				renderPipeline.render( scene, camera );
 
 			}
 

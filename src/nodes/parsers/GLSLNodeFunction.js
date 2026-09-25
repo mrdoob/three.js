@@ -12,7 +12,7 @@ const parse = ( source ) => {
 
 	const pragmaMainIndex = source.indexOf( pragmaMain );
 
-	const mainCode = pragmaMainIndex !== - 1 ? source.slice( pragmaMainIndex + pragmaMain.length ) : source;
+	const mainCode = ( pragmaMainIndex !== - 1 ? source.slice( pragmaMainIndex + pragmaMain.length ) : source ).replace( /^(?:\s*\/\/[^\r\n]*|\s*\/\*[\s\S]*?\*\/|\s*)+/, '' );
 
 	const declaration = mainCode.match( declarationRegexp );
 

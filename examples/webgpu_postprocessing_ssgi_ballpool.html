@@ -43,10 +43,12 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec4, directionToColor, colorToDirection, sample } from 'three/tsl';
+			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec4, packNormalToRGB, unpackRGBToNormal, sample } from 'three/tsl';
 			import { ssgi } from 'three/addons/tsl/display/SSGINode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 			import { World } from '@perplexdotgg/bounce';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			const BALL_RADIUS = 0.4;
 			const FILL_RATIO = 0.4;
@@ -68,8 +70,8 @@
 			let wallMeshes = [];
 			const boxSize = { w: 8, h: BOX_HEIGHT, d: BOX_DEPTH };
 
-			let mouseRayOrigin = new THREE.Vector3();
-			let mouseRayDir = new THREE.Vector3();
+			const mouseRayOrigin = new THREE.Vector3();
+			const mouseRayDir = new THREE.Vector3();
 			let mouseMoving = false;
 			let mouseStopTimer = 0;
 			let pointerDown = false;
@@ -92,6 +94,7 @@
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 0.5;
 				renderer.shadowMap.enabled = true;
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -102,7 +105,7 @@
 				scenePass.setMRT( mrt( {
 					output: output,
 					diffuseColor: diffuseColor,
-					normal: directionToColor( normalView ),
+					normal: packNormalToRGB( normalView ),
 					velocity: velocity
 				} ) );
 
@@ -122,7 +125,7 @@
 
 				const sceneNormal = sample( ( uv ) => {
 
-					return colorToDirection( scenePassNormal.sample( uv ) );
+					return unpackRGBToNormal( scenePassNormal.sample( uv ) );
 
 				} );
 
@@ -134,11 +137,11 @@
 
 				// composite
 
-				const gi = giPass.rgb;
-				const ao = giPass.a;
+				const ao = giPass.getAONode().toInspector( 'SSGI.AO' );
+				const gi = giPass.getGINode().toInspector( 'SSGI.GI' );
 
 				const compositePass = vec4(
-					add( scenePassColor.rgb.mul( ao ), scenePassDiffuse.rgb.mul( gi ) ),
+					add( scenePassColor.rgb.mul( ao ), scenePassDiffuse.rgb.mul( gi.rgb ) ),
 					scenePassColor.a
 				);
 

@@ -26,27 +26,13 @@ function setupWebGLXRFallback( renderer, createFallbackRenderer, onFallback = ()
 
 			}
 
-			if ( session !== null && renderer.backend.isWebGPUBackend === true && session.enabledFeatures.includes( 'webgpu' ) === false ) {
+			if ( session !== null && renderer.backend.isWebGPUBackend === true && typeof globalThis.XRGPUBinding === 'undefined' ) {
 
 				return switchToFallbackRenderer( session, renderer );
 
 			}
 
-			try {
-
-				return await setSession( session );
-
-			} catch ( error ) {
-
-				if ( session === null || renderer.backend.isWebGPUBackend !== true ) {
-
-					throw error;
-
-				}
-
-				return switchToFallbackRenderer( session, renderer );
-
-			}
+			return setSession( session );
 
 		};
 

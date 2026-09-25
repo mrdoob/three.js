@@ -93,7 +93,7 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 		let snippet;
 
-		const isAssignContext = builder.context.assign;
+		const isAssignContext = builder.isContextAssign();
 
 		//
 

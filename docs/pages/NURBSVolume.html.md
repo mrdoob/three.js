@@ -6,7 +6,7 @@ Implementation is based on `(x, y [, z=0 [, w=1]])` control points with `w=weigh
 
 ## Import
 
-NURBSVolume is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+NURBSVolume is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { NURBSVolume } from 'three/addons/curves/NURBSVolume.js';

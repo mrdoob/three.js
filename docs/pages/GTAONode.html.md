@@ -10,22 +10,26 @@ Reference: [Practical Real-Time Strategies for Accurate Indirect Occlusion](http
 
 ```js
 const renderPipeline = new THREE.RenderPipeline( renderer );
-const scenePass = pass( scene, camera );
-scenePass.setMRT( mrt( {
-	output: output,
-	normal: normalView
+// pre-pass for normals and depth
+const prePass = pass( scene, camera );
+prePass.setMRT( mrt( {
+	output: normalView
 } ) );
-const scenePassColor = scenePass.getTextureNode( 'output' );
-const scenePassNormal = scenePass.getTextureNode( 'normal' );
-const scenePassDepth = scenePass.getTextureNode( 'depth' );
-const aoPass = ao( scenePassDepth, scenePassNormal, camera );
+const prePassNormal = prePass.getTextureNode();
+const prePassDepth = prePass.getTextureNode( 'depth' );
+// scene pass
+const scenePass = pass( scene, camera );
+// ao
+const aoPass = ao( prePassDepth, prePassNormal, camera );
 const aoPassOutput = aoPass.getTextureNode();
-renderPipeline.outputNode = scenePassColor.mul( vec4( vec3( aoPassOutput.r ), 1 ) );
+// apply the ambient occlusion to the scene
+scenePass.contextNode = builtinAOContext( aoPassOutput.sample( screenUV ).r );
+renderPipeline.outputNode = scenePass;
 ```
 
 ## Import
 
-GTAONode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+GTAONode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { ao } from 'three/addons/tsl/display/GTAONode.js';
@@ -57,11 +61,11 @@ A node that represents the scene's depth.
 
 ### .distanceExponent : UniformNode.<float>
 
-Another option to tweak the occlusion. The recommended range is `[1,2]` for attenuating the AO.
+**Deprecated:** since r186. The new distance model "Quadratic Ray Stepping" does not need it anymore.
 
 ### .distanceFallOff : UniformNode.<float>
 
-The distance fall off value of the ambient occlusion. A lower value leads to a larger AO effect. The value should lie in the range `[0,1]`.
+**Deprecated:** since r186. The new distance model "Quadratic Ray Stepping" does not need it anymore.
 
 ### .normalNode : Node.<vec3>
 
@@ -70,10 +74,6 @@ A node that represents the scene's normals. If no normals are passed to the cons
 ### .radius : UniformNode.<float>
 
 The radius of the ambient occlusion.
-
-### .resolution : UniformNode.<vec2>
-
-The resolution of the effect. Can be scaled via `resolutionScale`.
 
 ### .resolutionScale : number
 
@@ -84,6 +84,8 @@ Default is `1`.
 ### .samples : UniformNode.<float>
 
 How many samples are used to compute the AO. A higher value results in better quality but also in a more expensive runtime behavior.
+
+Note: Changing this member triggers a shader recompilation.
 
 ### .scale : UniformNode.<float>
 

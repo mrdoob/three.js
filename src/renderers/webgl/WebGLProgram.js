@@ -1,7 +1,7 @@
 import { WebGLUniforms } from './WebGLUniforms.js';
 import { WebGLShader } from './WebGLShader.js';
 import { ShaderChunk } from '../shaders/ShaderChunk.js';
-import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, CubeRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFShadowMap, VSMShadowMap, AgXToneMapping, ACESFilmicToneMapping, NeutralToneMapping, CineonToneMapping, CustomToneMapping, ReinhardToneMapping, LinearToneMapping, GLSL3, LinearTransfer, SRGBTransfer } from '../../constants.js';
+import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, CubeRefractionMapping, PCFShadowMap, VSMShadowMap, AgXToneMapping, ACESFilmicToneMapping, NeutralToneMapping, CineonToneMapping, CustomToneMapping, ReinhardToneMapping, LinearToneMapping, GLSL3, LinearTransfer, SRGBTransfer } from '../../constants.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Matrix3 } from '../../math/Matrix3.js';
@@ -216,6 +216,7 @@ function replaceLightNums( string, parameters ) {
 	const numSpotLightCoords = parameters.numSpotLightShadows + parameters.numSpotLightMaps - parameters.numSpotLightShadowsWithMaps;
 
 	return string
+		.replace( /NUM_SUN_LIGHTS/g, parameters.numSunLights )
 		.replace( /NUM_DIR_LIGHTS/g, parameters.numDirLights )
 		.replace( /NUM_SPOT_LIGHTS/g, parameters.numSpotLights )
 		.replace( /NUM_SPOT_LIGHT_MAPS/g, parameters.numSpotLightMaps )
@@ -223,6 +224,7 @@ function replaceLightNums( string, parameters ) {
 		.replace( /NUM_RECT_AREA_LIGHTS/g, parameters.numRectAreaLights )
 		.replace( /NUM_POINT_LIGHTS/g, parameters.numPointLights )
 		.replace( /NUM_HEMI_LIGHTS/g, parameters.numHemiLights )
+		.replace( /NUM_SUN_LIGHT_SHADOWS/g, parameters.numSunLightShadows )
 		.replace( /NUM_DIR_LIGHT_SHADOWS/g, parameters.numDirLightShadows )
 		.replace( /NUM_SPOT_LIGHT_SHADOWS_WITH_MAPS/g, parameters.numSpotLightShadowsWithMaps )
 		.replace( /NUM_SPOT_LIGHT_SHADOWS/g, parameters.numSpotLightShadows )
@@ -248,26 +250,13 @@ function resolveIncludes( string ) {
 
 }
 
-const shaderChunkMap = new Map();
-
 function includeReplacer( match, include ) {
 
-	let string = ShaderChunk[ include ];
+	const string = ShaderChunk[ include ];
 
 	if ( string === undefined ) {
 
-		const newInclude = shaderChunkMap.get( include );
-
-		if ( newInclude !== undefined ) {
-
-			string = ShaderChunk[ newInclude ];
-			warn( 'WebGLRenderer: Shader chunk "%s" has been deprecated. Use "%s" instead.', include, newInclude );
-
-		} else {
-
-			throw new Error( 'THREE.WebGLProgram: Can not resolve #include <' + include + '>' );
-
-		}
+		throw new Error( 'THREE.WebGLProgram: Can not resolve #include <' + include + '>' );
 
 	}
 
@@ -353,20 +342,6 @@ function generateShadowMapTypeDefine( parameters ) {
 
 }
 
-const envMapTypeDefines = {
-	[ CubeReflectionMapping ]: 'ENVMAP_TYPE_CUBE',
-	[ CubeRefractionMapping ]: 'ENVMAP_TYPE_CUBE',
-	[ CubeUVReflectionMapping ]: 'ENVMAP_TYPE_CUBE_UV'
-};
-
-function generateEnvMapTypeDefine( parameters ) {
-
-	if ( parameters.envMap === false ) return 'ENVMAP_TYPE_CUBE';
-
-	return envMapTypeDefines[ parameters.envMapMode ] || 'ENVMAP_TYPE_CUBE';
-
-}
-
 const envMapModeDefines = {
 	[ CubeRefractionMapping ]: 'ENVMAP_MODE_REFRACTION'
 };
@@ -393,22 +368,6 @@ function generateEnvMapBlendingDefine( parameters ) {
 
 }
 
-function generateCubeUVSize( parameters ) {
-
-	const imageHeight = parameters.envMapCubeUVHeight;
-
-	if ( imageHeight === null ) return null;
-
-	const maxMip = Math.log2( imageHeight ) - 2;
-
-	const texelHeight = 1.0 / imageHeight;
-
-	const texelWidth = 1.0 / ( 3 * Math.max( Math.pow( 2, maxMip ), 7 * 16 ) );
-
-	return { texelWidth, texelHeight, maxMip };
-
-}
-
 function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 	// TODO Send this event to Three.js DevTools
@@ -422,10 +381,9 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 	let fragmentShader = parameters.fragmentShader;
 
 	const shadowMapTypeDefine = generateShadowMapTypeDefine( parameters );
-	const envMapTypeDefine = generateEnvMapTypeDefine( parameters );
+	const envMapTypeDefine = parameters.envMapPMREM === true ? 'ENVMAP_TYPE_PMREM' : 'ENVMAP_TYPE_CUBE';
 	const envMapModeDefine = generateEnvMapModeDefine( parameters );
 	const envMapBlendingDefine = generateEnvMapBlendingDefine( parameters );
-	const envMapCubeUVSize = generateCubeUVSize( parameters );
 
 	const customVertexExtensions = generateVertexExtensions( parameters );
 
@@ -507,6 +465,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.clearcoatMap ? '#define USE_CLEARCOATMAP' : '',
 			parameters.clearcoatRoughnessMap ? '#define USE_CLEARCOAT_ROUGHNESSMAP' : '',
 			parameters.clearcoatNormalMap ? '#define USE_CLEARCOAT_NORMALMAP' : '',
+			parameters.diffuseRoughnessMap ? '#define USE_DIFFUSE_ROUGHNESSMAP' : '',
 
 			parameters.iridescenceMap ? '#define USE_IRIDESCENCEMAP' : '',
 			parameters.iridescenceThicknessMap ? '#define USE_IRIDESCENCE_THICKNESSMAP' : '',
@@ -546,6 +505,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.clearcoatMapUv ? '#define CLEARCOATMAP_UV ' + parameters.clearcoatMapUv : '',
 			parameters.clearcoatNormalMapUv ? '#define CLEARCOAT_NORMALMAP_UV ' + parameters.clearcoatNormalMapUv : '',
 			parameters.clearcoatRoughnessMapUv ? '#define CLEARCOAT_ROUGHNESSMAP_UV ' + parameters.clearcoatRoughnessMapUv : '',
+			parameters.diffuseRoughnessMapUv ? '#define DIFFUSE_ROUGHNESSMAP_UV ' + parameters.diffuseRoughnessMapUv : '',
 
 			parameters.iridescenceMapUv ? '#define IRIDESCENCEMAP_UV ' + parameters.iridescenceMapUv : '',
 			parameters.iridescenceThicknessMapUv ? '#define IRIDESCENCE_THICKNESSMAP_UV ' + parameters.iridescenceThicknessMapUv : '',
@@ -688,9 +648,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.envMap ? '#define ' + envMapTypeDefine : '',
 			parameters.envMap ? '#define ' + envMapModeDefine : '',
 			parameters.envMap ? '#define ' + envMapBlendingDefine : '',
-			envMapCubeUVSize ? '#define CUBEUV_TEXEL_WIDTH ' + envMapCubeUVSize.texelWidth : '',
-			envMapCubeUVSize ? '#define CUBEUV_TEXEL_HEIGHT ' + envMapCubeUVSize.texelHeight : '',
-			envMapCubeUVSize ? '#define CUBEUV_MAX_MIP ' + envMapCubeUVSize.maxMip + '.0' : '',
+			parameters.envMapPMREM ? '#define ENVMAP_MAX_LOD ' + parameters.envMapMaxLod + '.0' : '',
+			parameters.envMapPMREM ? '#define ENVMAP_SIZE ' + parameters.envMapSize + '.0' : '',
 			parameters.lightMap ? '#define USE_LIGHTMAP' : '',
 			parameters.aoMap ? '#define USE_AOMAP' : '',
 			parameters.bumpMap ? '#define USE_BUMPMAP' : '',
@@ -708,7 +667,10 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.clearcoatRoughnessMap ? '#define USE_CLEARCOAT_ROUGHNESSMAP' : '',
 			parameters.clearcoatNormalMap ? '#define USE_CLEARCOAT_NORMALMAP' : '',
 
+			parameters.diffuseRoughness ? '#define USE_DIFFUSE_ROUGHNESS' : '',
+			parameters.diffuseRoughnessMap ? '#define USE_DIFFUSE_ROUGHNESSMAP' : '',
 			parameters.dispersion ? '#define USE_DISPERSION' : '',
+			parameters.retroreflection ? '#define USE_RETROREFLECTION' : '',
 
 			parameters.iridescence ? '#define USE_IRIDESCENCE' : '',
 			parameters.iridescenceMap ? '#define USE_IRIDESCENCEMAP' : '',
@@ -847,9 +809,10 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 		gl.bindAttribLocation( program, 0, parameters.index0AttributeName );
 
-	} else if ( parameters.morphTargets === true ) {
+	} else if ( parameters.hasPositionAttribute === true ) {
 
-		// programs with morphTargets displace position out of attribute 0
+		// below avoids the "Attribute 0 is disabled" performance penalty
+
 		gl.bindAttribLocation( program, 0, 'position' );
 
 	}

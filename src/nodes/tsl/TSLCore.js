@@ -8,7 +8,7 @@ import FlipNode from '../utils/FlipNode.js';
 import ConstNode from '../core/ConstNode.js';
 import MemberNode from '../utils/MemberNode.js';
 import StackTrace from '../core/StackTrace.js';
-import { getValueFromType, getValueType } from '../core/NodeUtils.js';
+import { getValueFromType, getValueType, isArrayAsParameter } from '../core/NodeUtils.js';
 import { warn, error } from '../../utils.js';
 
 let currentStack = null;
@@ -459,6 +459,13 @@ class ShaderCallNodeInternal extends Node {
 
 	}
 
+	isCacheable( builder ) {
+
+		// A call is an expression unless its body has statements.
+		return this.getOutputNode( builder ).nodes.length === 0;
+
+	}
+
 	generateNodeType( builder ) {
 
 		return this.shaderNode.nodeType || this.getOutputNode( builder ).getNodeType( builder );
@@ -703,12 +710,6 @@ class ShaderCallNodeInternal extends Node {
 
 }
 
-function isArrayAsParameter( params ) {
-
-	return params[ 0 ] && ( params[ 0 ].isNode || Object.getPrototypeOf( params[ 0 ] ) !== Object.prototype );
-
-}
-
 function getLayoutParameters( params ) {
 
 	let output;
@@ -826,6 +827,12 @@ class ShaderNodeInternal extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	setLayout( layout ) {
 
 		this.layout = layout;
@@ -865,10 +872,12 @@ for ( const bool of bools ) boolsCacheMap.set( bool, new ConstNode( bool ) );
 const uintsCacheMap = new Map();
 for ( const uint of uints ) uintsCacheMap.set( uint, new ConstNode( uint, 'uint' ) );
 
-const intsCacheMap = new Map( [ ...uintsCacheMap ].map( el => new ConstNode( el.value, 'int' ) ) );
+const intsCacheMap = new Map();
+for ( const value of uintsCacheMap.keys() ) intsCacheMap.set( value, new ConstNode( value, 'int' ) );
 for ( const int of ints ) intsCacheMap.set( int, new ConstNode( int, 'int' ) );
 
-const floatsCacheMap = new Map( [ ...intsCacheMap ].map( el => new ConstNode( el.value ) ) );
+const floatsCacheMap = new Map();
+for ( const value of intsCacheMap.keys() ) floatsCacheMap.set( value, new ConstNode( value ) );
 for ( const float of floats ) floatsCacheMap.set( float, new ConstNode( float ) );
 for ( const float of floats ) floatsCacheMap.set( - float, new ConstNode( - float ) );
 
@@ -1048,6 +1057,12 @@ class FnNode extends Node {
 		}
 
 		this.isFn = true;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -1269,27 +1284,3 @@ export const split = ( node, channels ) => new SplitNode( nodeObject( node ), ch
 
 addMethodChaining( 'element', element );
 addMethodChaining( 'convert', convert );
-
-// deprecated
-
-/**
- * @tsl
- * @function
- * @deprecated since r176. Use {@link Stack} instead.
- *
- * @param {Node} node - The node to add.
- * @returns {Function}
- */
-export const append = ( node ) => { // @deprecated, r176
-
-	warn( 'TSL: append() has been renamed to Stack().', new StackTrace() );
-	return Stack( node );
-
-};
-
-addMethodChaining( 'append', ( node ) => { // @deprecated, r176
-
-	warn( 'TSL: .append() has been renamed to .toStack().', new StackTrace() );
-	return Stack( node );
-
-} );

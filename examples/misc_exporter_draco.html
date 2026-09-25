@@ -15,7 +15,7 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - draco
 		</div>
 
-		<script src="jsm/libs/draco/draco_encoder.js"></script>
+		<script src="https://cdn.jsdelivr.net/gh/google/draco@1.5.7/javascript/draco_encoder.js"></script>
 
 		<script type="importmap">
 			{
@@ -131,9 +131,9 @@
 
 			}
 
-			function exportFile() {
+			async function exportFile() {
 
-				const result = exporter.parse( mesh );
+				const result = await exporter.parseAsync( mesh );
 				saveArrayBuffer( result, 'file.drc' );
 
 			}

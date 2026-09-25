@@ -92,6 +92,12 @@ class VarNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Sets the intent flag for this node.
 	 *
@@ -175,44 +181,32 @@ class VarNode extends Node {
 
 		const builder = params[ 0 ];
 
+		const refNode = this.getShared( builder );
+
+		if ( this !== refNode ) {
+
+			return refNode.build( ...params );
+
+		}
+
 		if ( this._hasStack( builder ) === false && builder.buildStage === 'setup' ) {
 
-			if ( builder.context.nodeLoop || builder.context.nodeBlock ) {
+			// A node created while a block is generated is declared where it is generated.
+			if ( ( builder.context.nodeLoop || builder.context.nodeBlock ) && builder.flowBlock === null ) {
 
-				let addBefore = false;
-
-				if ( this.node.isShaderCallNodeInternal && this.node.shaderNode.getLayout() === null ) {
-
-					if ( builder.fnCall && builder.fnCall.shaderNode ) {
-
-						const shaderNodeData = builder.getDataFromNode( this.node.shaderNode );
-
-						if ( shaderNodeData.hasLoop ) {
-
-							const data = builder.getDataFromNode( this );
-							data.forceDeclaration = true;
-
-							addBefore = true;
-
-						}
-
-					}
-
-				}
-
-				const baseStack = builder.getBaseStack();
-
-				if ( addBefore ) {
-
-					baseStack.addToStackBefore( this );
-
-				} else {
-
-					baseStack.addToStack( this );
-
-				}
+				builder.getBaseStack().addToStack( this );
 
 			}
+
+		} else if ( this.intent === true && builder.context.nodeLoop && builder.buildStage === 'analyze' && this.node.isCacheable( builder ) === false && builder.isDeterministic( this.node ) === false ) {
+
+			// A value that cannot be cached, e.g. a function call, is evaluated once at its declaration
+			// if it is used in a loop that runs after it, otherwise the loop would repeat it.
+			const data = builder.getDataFromNode( this );
+			const declarationIndex = builder.activeStacks.indexOf( data.stack );
+			const loopIndex = builder.activeStacks.indexOf( builder.getDataFromNode( builder.context.nodeLoop ).stack );
+
+			if ( declarationIndex !== - 1 && loopIndex >= declarationIndex ) data.forceDeclaration = true;
 
 		}
 
@@ -233,20 +227,6 @@ class VarNode extends Node {
 	generate( builder ) {
 
 		const { node, name, readOnly } = this;
-		const { renderer } = builder;
-
-		const isWebGPUBackend = renderer.backend.isWebGPUBackend === true;
-
-		let isDeterministic = false;
-		let shouldTreatAsReadOnly = false;
-
-		if ( readOnly ) {
-
-			isDeterministic = builder.isDeterministic( node );
-
-			shouldTreatAsReadOnly = isWebGPUBackend ? readOnly : isDeterministic;
-
-		}
 
 		const nodeType = this.getNodeType( builder );
 
@@ -267,27 +247,23 @@ class VarNode extends Node {
 		const vectorType = builder.getVectorType( nodeType );
 		const snippet = node.build( builder, vectorType );
 
-		const nodeVar = builder.getVarFromNode( this, name, vectorType, undefined, shouldTreatAsReadOnly );
+		const nodeVar = builder.getVarFromNode( this, name, vectorType, undefined, readOnly, this.intent );
 
 		const propertyName = builder.getPropertyName( nodeVar );
 
 		let declarationPrefix = propertyName;
 
-		if ( shouldTreatAsReadOnly ) {
+		if ( nodeVar.readOnly ) {
 
-			if ( isWebGPUBackend ) {
+			const count = node.getArrayCount( builder );
 
-				declarationPrefix = isDeterministic
-					? `const ${ propertyName }`
-					: `let ${ propertyName }`;
+			declarationPrefix = builder.isDeterministic( node )
+				? builder.generateConstStatement( nodeVar.type, propertyName, count )
+				: builder.generateLetStatement( nodeVar.type, propertyName, count );
 
-			} else {
+		} else if ( nodeVar.local ) {
 
-				const count = node.getArrayCount( builder );
-
-				declarationPrefix = `const ${ builder.getVar( nodeVar.type, propertyName, count ) }`;
-
-			}
+			declarationPrefix = builder.generateVarStatement( nodeVar.type, propertyName, nodeVar.count );
 
 		}
 
@@ -351,7 +327,6 @@ export const Const = ( node, name = null ) => createVar( node, name, true ).toSt
  * @tsl
  * @function
  * @param {Node} node - The node for which a variable should be created.
- * @param {?string} name - The name of the variable in the shader.
  * @returns {VarNode}
  */
 export const VarIntent = ( node ) => {

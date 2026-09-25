@@ -395,7 +395,7 @@ class InstancedMesh extends Mesh {
 	 */
 	dispose() {
 
-		this.dispatchEvent( { type: 'dispose' } );
+		super.dispose();
 
 		if ( this.morphTexture !== null ) {
 

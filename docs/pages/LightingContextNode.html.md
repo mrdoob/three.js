@@ -6,7 +6,7 @@
 
 ## Constructor
 
-### new LightingContextNode( lightsNode : LightsNode, lightingModel : LightingModel, backdropNode : Node.<vec3>, backdropAlphaNode : Node.<float> )
+### new LightingContextNode( lightsNode : LightsNode, lightingModel : LightingModel, materialLightings : Array.<LightingNode>, backdropNode : Node.<vec3>, backdropAlphaNode : Node.<float> )
 
 Constructs a new lighting context node.
 
@@ -19,6 +19,10 @@ The lights node.
 The current lighting model.
 
 Default is `null`.
+
+**materialLightings**
+
+The material lightings nodes.
 
 **backdropNode**
 
@@ -51,6 +55,8 @@ Default is `null`.
 The current lighting model.
 
 Default is `null`.
+
+### .materialLightings : Array.<LightingNode>
 
 ## Methods
 

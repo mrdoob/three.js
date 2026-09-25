@@ -52,7 +52,7 @@
 
 			const params = {
 				animated: true,
-				samples: 4
+				multisampling: true
 			};
 
 			const mat4 = new THREE.Matrix4();
@@ -81,7 +81,7 @@
 			function initGUI() {
 
 				const gui = renderer.inspector.createParameters( 'Settings' );
-				gui.add( params, 'samples', 0, 4, 1 );
+				gui.add( params, 'multisampling' );
 				gui.add( params, 'animated' );
 
 			}
@@ -126,7 +126,7 @@
 				document.body.appendChild( renderer.domElement );
 
 				renderTarget = new THREE.RenderTarget( window.innerWidth * dpr, window.innerHeight * dpr, {
-					samples: params.samples,
+					samples: params.multisampling ? 4 : 1,
 					depthBuffer: true,
 				} );
 
@@ -172,7 +172,7 @@
 
 				}
 
-				renderTarget.samples = params.samples;
+				renderTarget.samples = params.multisampling ? 4 : 1;
 
 				renderer.setRenderTarget( renderTarget );
 				renderer.render( scene, camera );

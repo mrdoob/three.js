@@ -8,7 +8,10 @@ import {
  */
 
 /**
- * TODO
+ * A separable Gaussian blur shader that limits blurring across depth
+ * discontinuities, stopping when the view-space depth difference to a
+ * neighboring sample exceeds `depthCutoff`. This preserves edges and
+ * avoids bleeding across them.
  *
  * Used by {@link SAOPass}.
  *

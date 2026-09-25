@@ -54,12 +54,6 @@ Default is `null`.
 
 An array of bones defining the skeleton.
 
-### .previousBoneMatrices : Float32Array
-
-An array buffer holding the bone data of the previous frame. Required for computing velocity. Maintained in [SkinningNode](SkinningNode.html).
-
-Default is `null`.
-
 ## Methods
 
 ### .calculateInverses()

@@ -1,10 +1,10 @@
 import NodeMaterial from './NodeMaterial.js';
 import { dashSize, diffuseColor, gapSize, varyingProperty } from '../../nodes/core/PropertyNode.js';
 import { attribute } from '../../nodes/core/AttributeNode.js';
-import { cameraProjectionMatrix } from '../../nodes/accessors/Camera.js';
+import { cameraProjectionMatrix, cameraProjectionMatrixInverse, cameraWorldMatrix } from '../../nodes/accessors/Camera.js';
 import { materialLineScale, materialLineDashSize, materialLineGapSize, materialLineDashOffset, materialLineWidth } from '../../nodes/accessors/MaterialNode.js';
-import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
-import { positionGeometry } from '../../nodes/accessors/Position.js';
+import { modelViewMatrix, modelWorldMatrixInverse } from '../../nodes/accessors/ModelNode.js';
+import { positionGeometry, positionLocal, positionPrevious } from '../../nodes/accessors/Position.js';
 import { mix, smoothstep } from '../../nodes/math/MathNode.js';
 import { Fn, float, vec2, vec3, vec4, If } from '../../nodes/tsl/TSLBase.js';
 import { uv } from '../../nodes/accessors/UV.js';
@@ -209,7 +209,7 @@ const mvpLine = Fn( ( { material } ) => {
 		// get the offset direction as perpendicular to the view vector
 
 		const worldDir = end.xyz.sub( start.xyz ).normalize();
-		const tmpFwd = mix( start.xyz, end.xyz, 0.5 ).normalize();
+		const tmpFwd = perspective.select( mix( start.xyz, end.xyz, 0.5 ).normalize(), vec3( 0.0, 0.0, - 1.0 ) );
 		const worldUp = worldDir.cross( tmpFwd ).normalize();
 		const worldFwd = worldDir.cross( worldUp );
 
@@ -322,15 +322,31 @@ const alphaLine = Fn( ( { material, renderer } ) => {
 
 	if ( useWorldUnits ) {
 
-		// Find the closest points on the view ray and the line segment
-		const rayEnd = worldPos.xyz.normalize().mul( 1e5 );
-		const lineDir = worldEnd.sub( worldStart );
-		const params = closestLineToLine( { p1: worldStart, p2: worldEnd, p3: vec3( 0.0, 0.0, 0.0 ), p4: rayEnd } );
+		const len = float().toVar();
 
-		const p1 = worldStart.add( lineDir.mul( params.x ) );
-		const p2 = rayEnd.mul( params.y );
-		const delta = p1.sub( p2 );
-		const len = delta.length();
+		const orthographic = cameraProjectionMatrix.element( 2 ).element( 3 ).notEqual( - 1.0 ).toConst();
+
+		If( orthographic, () => {
+
+			// View rays are parallel to the z axis so the distance reduces to camera-space XY
+			const lineDir = worldEnd.xy.sub( worldStart.xy );
+			const t = worldPos.xy.sub( worldStart.xy ).dot( lineDir ).div( lineDir.dot( lineDir ) ).clamp();
+			len.assign( worldStart.xy.add( lineDir.mul( t ) ).sub( worldPos.xy ).length() );
+
+		} ).Else( () => {
+
+			// Find the closest points on the view ray and the line segment
+			const rayEnd = worldPos.xyz.normalize().mul( 1e5 );
+			const lineDir = worldEnd.sub( worldStart );
+			const params = closestLineToLine( { p1: worldStart, p2: worldEnd, p3: vec3( 0.0, 0.0, 0.0 ), p4: rayEnd } );
+
+			const p1 = worldStart.add( lineDir.mul( params.x ) );
+			const p2 = rayEnd.mul( params.y );
+			const delta = p1.sub( p2 );
+			len.assign( delta.length() );
+
+		} );
+
 		const norm = len.div( materialLineWidth );
 
 		if ( ! useDash ) {
@@ -518,15 +534,24 @@ class Line2NodeMaterial extends NodeMaterial {
 	}
 
 	/**
-	 * Setups the position in clip space for the vertex stage of the fat line.
-	 * Overrides the default model-view-projection to return the expanded fat line vertex coordinates.
+	 * Setups the position of the expanded fat line vertex in local space.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {Node<vec4>} The position of the fat line vertex in clip space.
+	 * @return {Node<vec3>} The position of the fat line vertex in local space.
 	 */
-	setupModelViewProjection( /*builder*/ ) {
+	setupPosition( builder ) {
 
-		return mvpLine;
+		const localPosition = modelWorldMatrixInverse.mul( cameraWorldMatrix ).mul( cameraProjectionMatrixInverse ).mul( mvpLine );
+
+		positionLocal.assign( localPosition.xyz.div( localPosition.w ) );
+
+		if ( builder.needsPreviousData() ) {
+
+			positionPrevious.assign( positionLocal );
+
+		}
+
+		return super.setupPosition( builder );
 
 	}
 
@@ -617,32 +642,6 @@ class Line2NodeMaterial extends NodeMaterial {
 			this.needsUpdate = true;
 
 		}
-
-	}
-
-	/**
-	 * Copies the properties of the given material to this instance.
-	 *
-	 * @param {Line2NodeMaterial} source - The material to copy.
-	 * @return {Line2NodeMaterial} A reference to this material.
-	 */
-	copy( source ) {
-
-		super.copy( source );
-
-		this.vertexColors = source.vertexColors;
-		this.dashOffset = source.dashOffset;
-
-		this.offsetNode = source.offsetNode;
-		this.dashScaleNode = source.dashScaleNode;
-		this.dashSizeNode = source.dashSizeNode;
-		this.gapSizeNode = source.gapSizeNode;
-
-		this._useDash = source._useDash;
-		this._useAlphaToCoverage = source._useAlphaToCoverage;
-		this._useWorldUnits = source._useWorldUnits;
-
-		return this;
 
 	}
 

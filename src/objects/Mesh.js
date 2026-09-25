@@ -218,6 +218,18 @@ class Mesh extends Object3D {
 	}
 
 	/**
+	 * Returns `true` if this mesh intersects the given frustum.
+	 *
+	 * @param {Frustum|FrustumArray} frustum - The frustum to test.
+	 * @return {boolean} Whether this mesh intersects the given frustum or not.
+	 */
+	intersectsFrustum( frustum ) {
+
+		return frustum.intersectsObject( this );
+
+	}
+
+	/**
 	 * Computes intersection points between a casted ray and this line.
 	 *
 	 * @param {Raycaster} raycaster - The raycaster.

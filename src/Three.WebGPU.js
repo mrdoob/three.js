@@ -12,6 +12,7 @@ export { default as BundleGroup } from './renderers/common/BundleGroup.js';
 export { default as QuadMesh } from './renderers/common/QuadMesh.js';
 export { default as PMREMGenerator } from './renderers/common/extras/PMREMGenerator.js';
 export { default as RenderPipeline } from './renderers/common/RenderPipeline.js';
+export { default as DirectRenderPipeline } from './renderers/common/DirectRenderPipeline.js';
 export { default as PostProcessing } from './renderers/common/PostProcessing.js';
 export { default as ReadbackBuffer } from './renderers/common/ReadbackBuffer.js';
 import * as RendererUtils from './renderers/common/RendererUtils.js';
@@ -37,5 +38,5 @@ export { default as StandardNodeLibrary } from './renderers/webgpu/nodes/Standar
 export { default as WGSLNodeBuilder } from './renderers/webgpu/nodes/WGSLNodeBuilder.js';
 export { ClippingGroup } from './objects/ClippingGroup.js';
 export * from './nodes/Nodes.js';
-import * as TSL from './nodes/TSL.js';
+import * as TSL from './Three.TSL.js';
 export { TSL };

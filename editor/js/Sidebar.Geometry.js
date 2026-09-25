@@ -204,7 +204,7 @@ function SidebarGeometry( editor ) {
 
 		if ( editor.helpers[ object.id ] === undefined ) {
 
-			editor.addHelper( object, new VertexNormalsHelper( object ) );
+			editor.addHelper( object, new VertexNormalsHelper( object, vertexNormalsSize.getValue() ) );
 
 		} else {
 
@@ -216,6 +216,22 @@ function SidebarGeometry( editor ) {
 
 	} );
 	helpersRow.add( vertexNormalsButton );
+
+	const vertexNormalsSize = new UINumber( 1 ).setWidth( '30px' ).setMarginLeft( '7px' ).setRange( 0, Infinity ).onChange( function () {
+
+		const object = editor.selected;
+		const helper = editor.helpers[ object.id ];
+
+		if ( helper !== undefined && helper.isVertexNormalsHelper === true ) {
+
+			helper.size = vertexNormalsSize.getValue();
+
+			signals.objectChanged.dispatch( object );
+
+		}
+
+	} );
+	helpersRow.add( vertexNormalsSize );
 
 	// Export JSON
 
@@ -317,7 +333,7 @@ function SidebarGeometry( editor ) {
 			if ( helper !== undefined && helper.isVertexNormalsHelper === true ) {
 
 				editor.removeHelper( object );
-				editor.addHelper( object, new VertexNormalsHelper( object ) );
+				editor.addHelper( object, new VertexNormalsHelper( object, vertexNormalsSize.getValue() ) );
 
 			}
 

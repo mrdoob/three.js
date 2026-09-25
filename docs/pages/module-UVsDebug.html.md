@@ -2,7 +2,7 @@
 
 ## Import
 
-UVsDebug is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+UVsDebug is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { UVsDebug } from 'three/addons/utils/UVsDebug.js';

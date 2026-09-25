@@ -1,7 +1,7 @@
 import TextureNode from './TextureNode.js';
 import { nodeProxy, vec3, Fn, If } from '../tsl/TSLBase.js';
 
-const normal = Fn( ( { texture, uv } ) => {
+const normal = /*@__PURE__*/ Fn( ( { texture, uv } ) => {
 
 	const epsilon = 0.0001;
 

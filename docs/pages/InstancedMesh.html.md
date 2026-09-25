@@ -64,12 +64,6 @@ Represents the morph target weights of all instances. You have to set its [Textu
 
 Default is `null`.
 
-### .previousInstanceMatrix : InstancedBufferAttribute
-
-Represents the local transformation of all instances of the previous frame. Required for computing velocity. Maintained in [InstanceNode](InstanceNode.html).
-
-Default is `null`.
-
 ## Methods
 
 ### .computeBoundingBox()
@@ -83,6 +77,8 @@ Computes the bounding sphere of the instanced mesh, and updates [InstancedMesh#b
 ### .dispose()
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+
+**Overrides:** [Mesh#dispose](Mesh.html#dispose)
 
 ### .getColorAt( index : number, color : Color ) : Color
 

@@ -1,6 +1,9 @@
 import './utils/console-wrapper.js';
 import './utils/qunit-utils.js';
 
+// tsl
+import './tsl/TSL.tests.js';
+
 //src
 import './src/constants.tests.js';
 import './src/utils.tests.js';
@@ -11,10 +14,8 @@ import './src/animation/AnimationAction.tests.js';
 import './src/animation/AnimationClip.tests.js';
 import './src/animation/AnimationMixer.tests.js';
 import './src/animation/AnimationObjectGroup.tests.js';
-import './src/animation/AnimationUtils.tests.js';
 import './src/animation/KeyframeTrack.tests.js';
 import './src/animation/PropertyBinding.tests.js';
-import './src/animation/PropertyMixer.tests.js';
 
 //src/animation/tracks
 import './src/animation/tracks/BooleanKeyframeTrack.tests.js';
@@ -27,7 +28,6 @@ import './src/animation/tracks/VectorKeyframeTrack.tests.js';
 
 //src/audio
 import './src/audio/Audio.tests.js';
-import './src/audio/AudioAnalyser.tests.js';
 import './src/audio/AudioContext.tests.js';
 import './src/audio/AudioListener.tests.js';
 import './src/audio/PositionalAudio.tests.js';
@@ -62,15 +62,10 @@ import './src/core/UniformsGroup.tests.js';
 
 //src/extras
 import './src/extras/DataUtils.tests.js';
-import './src/extras/Earcut.tests.js';
-import './src/extras/ImageUtils.tests.js';
-import './src/extras/PMREMGenerator.tests.js';
-import './src/extras/ShapeUtils.tests.js';
 
 //src/extras/core
 import './src/extras/core/Curve.tests.js';
 import './src/extras/core/CurvePath.tests.js';
-import './src/extras/core/Interpolations.tests.js';
 import './src/extras/core/Path.tests.js';
 import './src/extras/core/Shape.tests.js';
 import './src/extras/core/ShapePath.tests.js';
@@ -234,7 +229,6 @@ import './src/objects/Sprite.tests.js';
 import './src/renderers/WebGL3DRenderTarget.tests.js';
 import './src/renderers/WebGLArrayRenderTarget.tests.js';
 import './src/renderers/WebGLCubeRenderTarget.tests.js';
-import './src/renderers/WebGLRenderer.tests.js';
 import './src/renderers/WebGLRenderTarget.tests.js';
 
 //src/renderers/shaders
@@ -244,27 +238,8 @@ import './src/renderers/shaders/UniformsLib.tests.js';
 import './src/renderers/shaders/UniformsUtils.tests.js';
 
 //src/renderers/webgl
-import './src/renderers/webgl/WebGLAttributes.tests.js';
-import './src/renderers/webgl/WebGLBackground.tests.js';
-import './src/renderers/webgl/WebGLBufferRenderer.tests.js';
-import './src/renderers/webgl/WebGLCapabilities.tests.js';
-import './src/renderers/webgl/WebGLClipping.tests.js';
 import './src/renderers/webgl/WebGLExtensions.tests.js';
-import './src/renderers/webgl/WebGLGeometries.tests.js';
-import './src/renderers/webgl/WebGLIndexedBufferRenderer.tests.js';
-import './src/renderers/webgl/WebGLLights.tests.js';
-import './src/renderers/webgl/WebGLMorphtargets.tests.js';
-import './src/renderers/webgl/WebGLObjects.tests.js';
-import './src/renderers/webgl/WebGLProgram.tests.js';
-import './src/renderers/webgl/WebGLPrograms.tests.js';
-import './src/renderers/webgl/WebGLProperties.tests.js';
 import './src/renderers/webgl/WebGLRenderLists.tests.js';
-import './src/renderers/webgl/WebGLShader.tests.js';
-import './src/renderers/webgl/WebGLShadowMap.tests.js';
-import './src/renderers/webgl/WebGLState.tests.js';
-import './src/renderers/webgl/WebGLTextures.tests.js';
-import './src/renderers/webgl/WebGLUniforms.tests.js';
-import './src/renderers/webgl/WebGLUtils.tests.js';
 
 
 //src/scenes
@@ -283,11 +258,14 @@ import './src/textures/DataArrayTexture.tests.js';
 import './src/textures/DataTexture.tests.js';
 import './src/textures/DepthTexture.tests.js';
 import './src/textures/FramebufferTexture.tests.js';
-import './src/textures/Source.tests.js';
 import './src/textures/Texture.tests.js';
+import './src/textures/TextureSource.tests.js';
 import './src/textures/VideoTexture.tests.js';
 
 
 //src/nodes/display
 import './src/nodes/display/ViewportTextureNode.tests.js';
 import './src/nodes/display/ViewportDepthTextureNode.tests.js';
+
+//src/nodes/tsl
+import './src/nodes/tsl/TSLCore.tests.js';

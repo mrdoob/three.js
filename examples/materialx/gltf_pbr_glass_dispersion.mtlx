@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<materialx version="1.39" colorspace="lin_rec709">
+  <gltf_pbr name="SR_dispersion_test" type="surfaceshader">
+    <input name="base_color" type="color3" value="1.0, 1.0, 1.0" />
+    <input name="metallic" type="float" value="0" />
+    <input name="roughness" type="float" value="0.02" />
+    <input name="transmission" type="float" value="1" />
+    <input name="ior" type="float" value="1.52" />
+    <input name="dispersion" type="float" value="0.35" />
+    <input name="thickness" type="float" value="0.8" />
+    <input name="attenuation_distance" type="float" value="0.75" />
+    <input name="attenuation_color" type="color3" value="0.85, 0.95, 1.0" />
+  </gltf_pbr>
+  <surfacematerial name="PBR_Dispersion_Test" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="SR_dispersion_test" />
+  </surfacematerial>
+</materialx>

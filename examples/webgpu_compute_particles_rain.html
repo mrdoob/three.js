@@ -106,6 +106,7 @@
 
 					const position = positionBuffer.element( instanceIndex );
 					const velocity = velocityBuffer.element( instanceIndex );
+					const ripplePosition = ripplePositionBuffer.element( instanceIndex );
 					const rippleTime = rippleTimeBuffer.element( instanceIndex );
 
 					const randX = hash( instanceIndex );
@@ -117,6 +118,10 @@
 					position.z = randZ.mul( 100 ).add( - 50 );
 
 					velocity.y = randX.mul( - .04 ).add( - .2 );
+
+					ripplePosition.x = randZ.mul( 100 ).add( - 50 );
+					ripplePosition.y = - 1;
+					ripplePosition.z = randY.mul( 100 ).add( - 50 );
 
 					rippleTime.x = 1000;
 
@@ -185,10 +190,9 @@
 
 				const rainMaterial = new THREE.MeshBasicNodeMaterial();
 				rainMaterial.colorNode = uv().distance( vec2( .5, 0 ) ).oneMinus().mul( 3 ).exp().mul( .1 );
-				rainMaterial.vertexNode = billboarding( { position: positionBuffer.toAttribute() } );
+				rainMaterial.positionNode = positionGeometry.add( positionBuffer.toAttribute() );
+				rainMaterial.vertexNode = billboarding( { horizontalRotation: true } );
 				rainMaterial.opacity = .2;
-				rainMaterial.side = THREE.DoubleSide;
-				rainMaterial.forceSinglePass = true;
 				rainMaterial.depthWrite = false;
 				rainMaterial.depthTest = true;
 				rainMaterial.transparent = true;

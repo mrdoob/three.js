@@ -670,15 +670,16 @@ class BufferAttribute extends EventDispatcher {
 			normalized: this.normalized
 		};
 
-		if ( this.name !== '' ) data.name = this.name;
-		if ( this.usage !== StaticDrawUsage ) data.usage = this.usage;
+		data.name = this.name;
+		data.usage = this.usage;
+		data.gpuType = this.gpuType;
 
 		return data;
 
 	}
 
 	/**
-	 * Disposes of the buffer attribute. Available only in {@link WebGPURenderer}.
+	 * Can be used to dispose storage buffer attributes. Available only in {@link WebGPURenderer}.
 	 */
 	dispose() {
 

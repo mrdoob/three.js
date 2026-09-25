@@ -4,7 +4,6 @@ import {
 	CubeRefractionMapping,
 	EquirectangularReflectionMapping,
 	EquirectangularRefractionMapping,
-	CubeUVReflectionMapping,
 
 	RepeatWrapping,
 	ClampToEdgeWrapping,
@@ -49,7 +48,7 @@ import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
 import { Scene } from '../scenes/Scene.js';
 import { CubeTexture } from '../textures/CubeTexture.js';
 import { Texture } from '../textures/Texture.js';
-import { Source } from '../textures/Source.js';
+import { TextureSource } from '../textures/TextureSource.js';
 import { DataTexture } from '../textures/DataTexture.js';
 import { ImageLoader } from './ImageLoader.js';
 import { LoadingManager } from './LoadingManager.js';
@@ -548,14 +547,14 @@ class ObjectLoader extends Loader {
 
 					}
 
-					images[ image.uuid ] = new Source( imageArray );
+					images[ image.uuid ] = new TextureSource( imageArray );
 
 				} else {
 
 					// load single image
 
 					const deserializedImage = deserializeImage( image.url );
-					images[ image.uuid ] = new Source( deserializedImage );
+					images[ image.uuid ] = new TextureSource( deserializedImage );
 
 
 				}
@@ -645,14 +644,14 @@ class ObjectLoader extends Loader {
 
 					}
 
-					images[ image.uuid ] = new Source( imageArray );
+					images[ image.uuid ] = new TextureSource( imageArray );
 
 				} else {
 
 					// load single image
 
 					const deserializedImage = await deserializeImage( image.url );
-					images[ image.uuid ] = new Source( deserializedImage );
+					images[ image.uuid ] = new TextureSource( deserializedImage );
 
 				}
 
@@ -756,6 +755,7 @@ class ObjectLoader extends Loader {
 				if ( data.flipY !== undefined ) texture.flipY = data.flipY;
 
 				if ( data.generateMipmaps !== undefined ) texture.generateMipmaps = data.generateMipmaps;
+				if ( data.mipmapsAutoUpdate !== undefined ) texture.mipmapsAutoUpdate = data.mipmapsAutoUpdate;
 				if ( data.premultiplyAlpha !== undefined ) texture.premultiplyAlpha = data.premultiplyAlpha;
 				if ( data.unpackAlignment !== undefined ) texture.unpackAlignment = data.unpackAlignment;
 				if ( data.compareFunction !== undefined ) texture.compareFunction = data.compareFunction;
@@ -1034,8 +1034,8 @@ class ObjectLoader extends Loader {
 				} );
 				object._instanceInfo = data.instanceInfo;
 
-				object._availableInstanceIds = data._availableInstanceIds;
-				object._availableGeometryIds = data._availableGeometryIds;
+				object._availableInstanceIds = data.availableInstanceIds;
+				object._availableGeometryIds = data.availableGeometryIds;
 
 				object._nextIndexStart = data.nextIndexStart;
 				object._nextVertexStart = data.nextVertexStart;
@@ -1162,6 +1162,9 @@ class ObjectLoader extends Loader {
 			if ( data.shadow.bias !== undefined ) object.shadow.bias = data.shadow.bias;
 			if ( data.shadow.normalBias !== undefined ) object.shadow.normalBias = data.shadow.normalBias;
 			if ( data.shadow.radius !== undefined ) object.shadow.radius = data.shadow.radius;
+			if ( data.shadow.blurSamples !== undefined ) object.shadow.blurSamples = data.shadow.blurSamples;
+			if ( data.shadow.focus !== undefined ) object.shadow.focus = data.shadow.focus;
+			if ( data.shadow.aspect !== undefined ) object.shadow.aspect = data.shadow.aspect;
 			if ( data.shadow.mapSize !== undefined ) object.shadow.mapSize.fromArray( data.shadow.mapSize );
 			if ( data.shadow.camera !== undefined ) object.shadow.camera = this.parseObject( data.shadow.camera );
 
@@ -1284,8 +1287,7 @@ const TEXTURE_MAPPING = {
 	CubeReflectionMapping: CubeReflectionMapping,
 	CubeRefractionMapping: CubeRefractionMapping,
 	EquirectangularReflectionMapping: EquirectangularReflectionMapping,
-	EquirectangularRefractionMapping: EquirectangularRefractionMapping,
-	CubeUVReflectionMapping: CubeUVReflectionMapping
+	EquirectangularRefractionMapping: EquirectangularRefractionMapping
 };
 
 const TEXTURE_WRAPPING = {

@@ -272,6 +272,7 @@ class BatchedMesh extends Mesh {
 		this._multiDrawCounts = new Int32Array( maxInstanceCount );
 		this._multiDrawStarts = new Int32Array( maxInstanceCount );
 		this._multiDrawCount = 0;
+		this._multiDrawBytesPerElement = 1;
 
 		// Local matrix per geometry by using data texture
 		this._matricesTexture = null;
@@ -1203,6 +1204,7 @@ class BatchedMesh extends Mesh {
 		this.validateGeometryId( geometryId );
 
 		this._instanceInfo[ instanceId ].geometryIndex = geometryId;
+		this._visibilityChanged = true;
 
 		return this;
 
@@ -1473,6 +1475,7 @@ class BatchedMesh extends Mesh {
 		this._geometryInitialized = source._geometryInitialized;
 		this._multiDrawCounts = source._multiDrawCounts.slice();
 		this._multiDrawStarts = source._multiDrawStarts.slice();
+		this._multiDrawBytesPerElement = source._multiDrawBytesPerElement;
 
 		this._indirectTexture = source._indirectTexture.clone();
 		this._indirectTexture.image.data = this._indirectTexture.image.data.slice();
@@ -1496,6 +1499,8 @@ class BatchedMesh extends Mesh {
 	 * method whenever this instance is no longer used in your app.
 	 */
 	dispose() {
+
+		super.dispose();
 
 		// Assuming the geometry is not shared with other meshes
 		this.geometry.dispose();
@@ -1552,17 +1557,25 @@ class BatchedMesh extends Mesh {
 
 		const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
 		// prepare the frustum in the local frame
-		if ( perObjectFrustumCulled && ! camera.isArrayCamera ) {
+		if ( perObjectFrustumCulled ) {
 
-			_matrix
-				.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse )
-				.multiply( this.matrixWorld );
+			if ( camera.isArrayCamera ) {
 
-			_frustum.setFromProjectionMatrix(
-				_matrix,
-				camera.coordinateSystem,
-				camera.reversedDepth
-			);
+				frustum.setFromArrayCamera( camera );
+
+			} else {
+
+				_matrix
+					.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse )
+					.multiply( this.matrixWorld );
+
+				frustum.setFromProjectionMatrix(
+					_matrix,
+					camera.coordinateSystem,
+					camera.reversedDepth
+				);
+
+			}
 
 		}
 
@@ -1588,7 +1601,7 @@ class BatchedMesh extends Mesh {
 					let culled = false;
 					if ( perObjectFrustumCulled ) {
 
-						culled = ! frustum.intersectsSphere( _sphere, camera );
+						culled = ! frustum.intersectsSphere( _sphere );
 
 					}
 
@@ -1645,7 +1658,7 @@ class BatchedMesh extends Mesh {
 						// get the bounds in world space
 						this.getMatrixAt( i, _matrix );
 						this.getBoundingSphereAt( geometryId, _sphere ).applyMatrix4( _matrix );
-						culled = ! frustum.intersectsSphere( _sphere, camera );
+						culled = ! frustum.intersectsSphere( _sphere );
 
 					}
 
@@ -1667,6 +1680,7 @@ class BatchedMesh extends Mesh {
 
 		indirectTexture.needsUpdate = true;
 		this._multiDrawCount = multiDrawCount;
+		this._multiDrawBytesPerElement = bytesPerElement;
 		this._visibilityChanged = false;
 
 	}

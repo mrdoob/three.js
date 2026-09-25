@@ -440,4 +440,4 @@ export const instancedBufferAttribute = ( array, type = null, stride = 0, offset
  */
 export const instancedDynamicBufferAttribute = ( array, type = null, stride = 0, offset = 0 ) => createBufferAttribute( array, type, stride, offset, DynamicDrawUsage, true );
 
-addMethodChaining( 'toAttribute', ( bufferNode ) => bufferAttribute( bufferNode.value ) );
+addMethodChaining( 'toAttribute', ( bufferNode ) => bufferAttribute( bufferNode.value, bufferNode.bufferType ) );

@@ -27,7 +27,7 @@ const texture = loader.loadAsync( 'diffuse.ktx2' );
 
 ## Import
 
-KTX2Loader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+KTX2Loader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
@@ -115,9 +115,9 @@ Executed when errors occur.
 
 ### .setTranscoderPath( path : string ) : KTX2Loader
 
-Sets the transcoder path.
+Sets the transcoder path to optionally set the decoder load path from a CDN.
 
-The WASM transcoder and JS wrapper are available from the `examples/jsm/libs/basis` directory.
+By default The WASM transcoder and JS wrapper are loaded from the `examples/jsm/libs/basis` directory.
 
 **path**
 

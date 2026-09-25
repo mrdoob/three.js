@@ -251,6 +251,8 @@ Rotates this matrix by the given angle.
 
 The rotation in radians.
 
+**Deprecated:** Yes
+
 **Returns:** A reference to this matrix.
 
 ### .scale( sx : number, sy : number ) : Matrix3
@@ -264,6 +266,8 @@ The amount to scale in the X axis.
 **sy**
 
 The amount to scale in the Y axis.
+
+**Deprecated:** Yes
 
 **Returns:** A reference to this matrix.
 
@@ -382,6 +386,8 @@ The amount to translate in the X axis.
 **ty**
 
 The amount to translate in the Y axis.
+
+**Deprecated:** Yes
 
 **Returns:** A reference to this matrix.
 

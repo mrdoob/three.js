@@ -65,12 +65,39 @@ class Storage3DTexture extends Texture {
 		this.isStorageTexture = true;
 
 		/**
+		 * Whether the renderer regenerates the mipmaps automatically.
+		 *
+		 * Overwritten and set to `false` by default since the WebGPU backend
+		 * does not support mipmap generation for 3D textures.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.mipmapsAutoUpdate = false;
+
+		/**
 		 * Indicates whether this texture is a 3D texture.
 		 *
 		 * @type {boolean}
 		 *
 		 */
 		this.is3DTexture = true;
+
+	}
+
+	/**
+	 * Copies the values of the given texture to this instance.
+	 *
+	 * @param {Storage3DTexture} source - The texture to copy.
+	 * @return {Storage3DTexture} A reference to this instance.
+	 */
+	copy( source ) {
+
+		super.copy( source );
+
+		this.wrapR = source.wrapR;
+
+		return this;
 
 	}
 

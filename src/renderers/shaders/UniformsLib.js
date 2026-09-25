@@ -122,6 +122,22 @@ const UniformsLib = {
 
 		lightProbe: { value: [] },
 
+		sunLights: { value: [], properties: {
+			direction: {},
+			color: {}
+		} },
+
+		sunLightShadows: { value: [], properties: {
+			shadowIntensity: 1,
+			shadowBias: {},
+			shadowNormalBias: {},
+			shadowRadius: {},
+			shadowMapSize: {}
+		} },
+
+		sunShadowMatrix: { value: [] },
+		sunShadowCascade: { value: [] },
+
 		directionalLights: { value: [], properties: {
 			direction: {},
 			color: {}

@@ -20,9 +20,9 @@
 			</div>
 
 			<small>
-				Bloom pass by <a href="http://eduperiment.com" target="_blank" rel="noopener">Prashant Sharma</a> and <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a>.<br/>
+				Bloom pass by <a href="https://github.com/spidersharma03" target="_blank" rel="noopener">Prashant Sharma</a> and <a href="https://ben3d.ca/" target="_blank" rel="noopener">Ben Houston</a>.<br/>
 				<a href="https://blog.sketchfab.com/art-spotlight-primary-ion-drive/" target="_blank" rel="noopener">Primary Ion Drive</a>
-				by <a href="http://mjmurdock.com/" target="_blank" rel="noopener">Mike Murdock</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution</a>.<br />
+				by <a href="https://mjmurdock.com/" target="_blank" rel="noopener">Mike Murdock</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution</a>.<br />
 			</small>
 		</div>
 
@@ -101,7 +101,19 @@
 
 				renderPipeline = new THREE.RenderPipeline( renderer );
 
-				const scenePass = pass( scene, camera );
+				// below optimized config is only relevant when using MSAA and also optional.
+				// store no multisampled data and only resolve color
+
+				const config = {
+ 					storeMultisampledColorBuffer: false,
+					storeMultisampledDepthBuffer: false,
+					storeMultisampledStencilBuffer: false,
+					resolveColorBuffer: true,
+					resolveDepthBuffer: false,
+					resolveStencilBuffer: false
+				};
+
+				const scenePass = pass( scene, camera, config );
 				const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
 
 				const bloomPass = bloom( scenePassColor ).toInspector( 'Bloom' );
@@ -133,7 +145,7 @@
 
 				} );
 
-				gui.add( params, 'radius', 0.0, 1.0, 0.01 ).onChange( function ( value ) {
+				bloomFolder.add( params, 'radius', 0.0, 1.0, 0.01 ).onChange( function ( value ) {
 
 					bloomPass.radius.value = value;
 

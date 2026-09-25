@@ -1,11 +1,11 @@
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
 
 import { normalView, transformNormalToView } from '../accessors/Normal.js';
 import { TBNViewMatrix } from '../accessors/AccessorsUtils.js';
 import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
 
 import { TangentSpaceNormalMap, ObjectSpaceNormalMap, NoNormalPacking, NormalRGPacking, NormalGAPacking } from '../../constants.js';
-import { directionToFaceDirection } from './FrontFacingNode.js';
+import { negateOnBackSide } from './FrontFacingNode.js';
 import { unpackNormal } from '../utils/Packing.js';
 import { error } from '../../utils.js';
 
@@ -16,9 +16,9 @@ import { error } from '../../utils.js';
  * material.normalNode = normalMap( texture( normalTex ) );
  * ```
  *
- * @augments TempNode
+ * @augments Node
  */
-class NormalMapNode extends TempNode {
+class NormalMapNode extends Node {
 
 	static get type() {
 
@@ -107,7 +107,7 @@ class NormalMapNode extends TempNode {
 
 			if ( builder.isFlatShading() === true ) {
 
-				scale = directionToFaceDirection( scale );
+				scale = negateOnBackSide( scale );
 
 			}
 

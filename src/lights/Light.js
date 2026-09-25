@@ -11,6 +11,17 @@ import { Color } from '../math/Color.js';
 class Light extends Object3D {
 
 	/**
+	 * Registers the node class that `WebGPURenderer` uses to shade lights of this type.
+	 *
+	 * @param {AnalyticLightNode.constructor} lightNodeClass - The light node class.
+	 */
+	static registerNode( lightNodeClass ) {
+
+		this.prototype._lightNode = lightNodeClass;
+
+	}
+
+	/**
 	 * Constructs a new light.
 	 *
 	 * @param {(number|Color|string)} [color=0xffffff] - The light's color.
@@ -45,16 +56,6 @@ class Light extends Object3D {
 		 * @default 1
 		 */
 		this.intensity = intensity;
-
-	}
-
-	/**
-	 * Frees the GPU-related resources allocated by this instance. Call this
-	 * method whenever this instance is no longer used in your app.
-	 */
-	dispose() {
-
-		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 

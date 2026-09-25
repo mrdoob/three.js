@@ -84,6 +84,8 @@ class PlaneHelper extends Line {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this.geometry.dispose();
 		this.material.dispose();
 		this.children[ 0 ].geometry.dispose();

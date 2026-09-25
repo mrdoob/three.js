@@ -20,7 +20,9 @@ class NodeUniformBuffer extends UniformBuffer {
 	 */
 	constructor( nodeUniform, groupNode ) {
 
-		super( 'UniformBuffer_' + _id ++, nodeUniform ? nodeUniform.value : null );
+		const label = nodeUniform && nodeUniform.name ? nodeUniform.name : _id ++;
+
+		super( 'UniformBuffer_' + label, nodeUniform ? nodeUniform.value : null );
 
 		/**
 		 * The uniform buffer node.

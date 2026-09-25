@@ -349,11 +349,12 @@ class UIOutliner extends UIDiv {
 
 		}
 
-		function onClick() {
+		function onClick( event ) {
 
 			scope.setValue( this.value );
 
 			const changeEvent = new Event( 'change', { bubbles: true, cancelable: true } );
+			changeEvent.shiftKey = event.shiftKey;
 			scope.dom.dispatchEvent( changeEvent );
 
 		}
@@ -546,6 +547,31 @@ class UIOutliner extends UIDiv {
 		}
 
 		this.selectedValue = value;
+
+		return this;
+
+	}
+
+	setValues( values ) {
+
+		for ( let i = 0; i < this.options.length; i ++ ) {
+
+			const element = this.options[ i ];
+
+			if ( values.indexOf( element.value ) !== - 1 ) {
+
+				element.classList.add( 'active' );
+
+			} else {
+
+				element.classList.remove( 'active' );
+
+			}
+
+		}
+
+		this.selectedIndex = - 1;
+		this.selectedValue = null;
 
 		return this;
 

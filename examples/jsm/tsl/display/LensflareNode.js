@@ -1,5 +1,5 @@
-import { RenderTarget, Vector2, TempNode, NodeUpdateType, QuadMesh, RendererUtils, NodeMaterial } from 'three/webgpu';
-import { convertToTexture, nodeObject, Fn, passTexture, uv, vec2, vec3, vec4, max, float, sub, int, Loop, fract, pow, distance } from 'three/tsl';
+import { RenderTarget, Vector2, Node, NodeUpdateType, QuadMesh, RendererUtils, NodeMaterial } from 'three/webgpu';
+import { convertToTexture, nodeObject, Fn, passTexture, uv, vec2, vec3, vec4, max, float, sub, int, Loop, fract, pow, distance, context } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -13,10 +13,10 @@ let _rendererState;
  * - {@link https://john-chapman-graphics.blogspot.com/2013/02/pseudo-lens-flare.html}.
  * - {@link https://john-chapman.github.io/2017/11/05/pseudo-lens-flare.html}.
  *
- * @augments TempNode
+ * @augments Node
  * @three_import import { lensflare } from 'three/addons/tsl/display/LensflareNode.js';
  */
-class LensflareNode extends TempNode {
+class LensflareNode extends Node {
 
 	static get type() {
 
@@ -239,7 +239,8 @@ class LensflareNode extends TempNode {
 
 		} );
 
-		this._material.fragmentNode = lensflare().context( builder.getSharedContext() );
+		this._material.contextNode = context( builder.getSharedContext() );
+		this._material.fragmentNode = lensflare();
 		this._material.needsUpdate = true;
 
 		return this._textureNode;
@@ -251,6 +252,8 @@ class LensflareNode extends TempNode {
 	 * when the effect is no longer required.
 	 */
 	dispose() {
+
+		super.dispose();
 
 		this._renderTarget.dispose();
 		this._material.dispose();

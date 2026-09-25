@@ -35,7 +35,7 @@ class Vector4 {
 		 * @readonly
 		 * @default true
 		 */
-		Vector4.prototype.isVector4 = true;
+		this.prototype.isVector4 = true;
 
 	}
 
@@ -493,8 +493,6 @@ class Vector4 {
 	 */
 	setAxisAngleFromQuaternion( q ) {
 
-		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToAngle/index.htm
-
 		// q is assumed to be normalized
 
 		this.w = 2 * Math.acos( q.w );
@@ -527,8 +525,6 @@ class Vector4 {
 	 * @return {Vector4} A reference to this vector.
 	 */
 	setAxisAngleFromRotationMatrix( m ) {
-
-		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToAngle/index.htm
 
 		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 

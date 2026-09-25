@@ -1,4 +1,4 @@
-import TempNode from './TempNode.js';
+import Node from './Node.js';
 import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
 
 /**
@@ -13,9 +13,9 @@ import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
  * const redColor = tintColors.element( 0 );
  * ```
  *
- * @augments TempNode
+ * @augments Node
  */
-class ArrayNode extends TempNode {
+class ArrayNode extends Node {
 
 	static get type() {
 
@@ -154,7 +154,7 @@ export const array = ( ...params ) => {
 
 	if ( params.length === 1 ) {
 
-		const values = params[ 0 ];
+		const values = params[ 0 ].map( ( value ) => nodeObject( value ) );
 
 		node = new ArrayNode( null, values.length, values );
 
@@ -167,7 +167,7 @@ export const array = ( ...params ) => {
 
 	}
 
-	return nodeObject( node );
+	return node;
 
 };
 

@@ -148,16 +148,6 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 	}
 
-	copy( source ) {
-
-		this.positionNode = source.positionNode;
-		this.rotationNode = source.rotationNode;
-		this.scaleNode = source.scaleNode;
-
-		return super.copy( source );
-
-	}
-
 	/**
 	 * Whether to use size attenuation or not.
 	 *

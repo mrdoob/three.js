@@ -8,7 +8,6 @@ const server = createServer();
 const exceptionList = [
 
 	// Take too long
-	'webgl_loader_lwo', 				// 8 min
 	'webgpu_cubemap_mix', 				// 2 min
 	'webgl_loader_texture_ultrahdr', 	// 1 min
 	'webgl_marchingcubes', 				// 1 min
@@ -38,12 +37,15 @@ const exceptionList = [
 	'webgpu_compute_audio',
 	'webgpu_compute_cloth',
 	'webgpu_compute_particles_fluid',
+	'webgpu_compute_rasterizer_ibl', // Rasterizer discrepancies
 	'webgpu_compute_sort_bitonic',
 	'webgpu_storage_buffer',
 	'webgpu_tsl_editor',
+	'webgpu_tsl_graph',
 	'webxr_vr_video',
 	'webgpu_tsl_transpiler',
 	'webgpu_rendertarget_2d-array_3d',
+	'webgpu_volume_fire',
 
 	// Need more time to render
 	'css3d_mixed',
@@ -55,6 +57,14 @@ const exceptionList = [
 	'webgpu_materials_matcap',
 	'webgpu_morphtargets_face',
 	'webgpu_shadowmap_progressive',
+	'webgpu_postprocessing_ssr_denoise',
+	'webgpu_vxgi',
+	'webgpu_vxgi_sponza',
+
+	// Incremental light probe baking
+	'webgl_lightprobes_sponza',
+	'webgpu_generator_city', // Sub-pixel coverage of thin high-contrast geometry edges differs across rasterizers #33817
+	'webgpu_lightprobes_sponza',
 
 	// Video hangs the CI?
 	'css3d_youtube',
@@ -221,13 +231,14 @@ async function main() {
 
 	/* Prepare injections */
 
-	const buildInjection = ( code ) => code
+	const cleanPage = await fs.readFile( 'test/e2e/clean-page.js', 'utf8' );
+	const injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );
+
+	// Workers do not receive evaluateOnNewDocument scripts.
+	const buildInjection = ( code ) => injection + '\n' + code
 		.replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' )
 		// Disables WebGPU timestamp queries to prevent Inspector/Profiler from crashing in E2E software mode
 		.replace( /this\.trackTimestamp\s*=\s*\(\s*parameters\.trackTimestamp\s*===\s*true\s*\);/g, 'Object.defineProperty(this, \'trackTimestamp\', { get: () => false, set: () => {} });' );
-
-	const cleanPage = await fs.readFile( 'test/e2e/clean-page.js', 'utf8' );
-	const injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );
 
 	const builds = {
 		'three.core.js': buildInjection( await fs.readFile( 'build/three.core.js', 'utf8' ) ),
@@ -310,8 +321,18 @@ async function main() {
 
 async function preparePage( page, injection, builds, errorMessages ) {
 
+	// Ignore ambient input from the browser window; scripted DOM clicks still work.
+	const client = await page.createCDPSession();
+	await client.send( 'Input.setIgnoreInputEvents', { ignore: true } );
+
 	await page.evaluateOnNewDocument( injection );
 	await page.setRequestInterception( true );
+
+	page.on( 'pageerror', error => {
+
+		if ( page.file !== undefined ) page.error = `${ page.file }: ${ error.message }`;
+
+	} );
 
 	page.on( 'console', async msg => {
 
@@ -422,6 +443,7 @@ async function preparePage( page, injection, builds, errorMessages ) {
 async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file ) {
 
 	const page = ctx.page;
+	const pageStart = performance.now();
 
 	try {
 
@@ -453,6 +475,11 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 			await page.waitForNetworkIdle( {
 				timeout: networkTimeout * 60000,
 				idleTime: idleTime * 1000
+			} );
+
+			await page.waitForFunction( () => window._videosReady(), {
+				polling: 100,
+				timeout: renderTimeout * 1000
 			} );
 
 			await page.evaluate( async ( renderTimeout, parseTime ) => {
@@ -491,7 +518,7 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 
 		} catch ( e ) {
 
-			if ( e.includes && e.includes( 'Render timeout exceeded' ) === false ) {
+			if ( e !== 'Render timeout exceeded' ) {
 
 				throw new Error( `Error happened while rendering file ${ file }: ${ e }` );
 
@@ -502,6 +529,8 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 			} */ // TODO: fix this
 
 		}
+
+		const pageElapsed = ( performance.now() - pageStart ) / 1000;
 
 		const screenshot = ( await Image.read( await page.screenshot() ) ).scale( 1 / viewScale );
 
@@ -555,14 +584,14 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 
 			if ( differentPixels < maxDifferentPixels ) {
 
-				console.green( `Diff ${ differentPixels.toFixed( 1 ) }% in file: ${ file }` );
+				console.green( `Diff ${ differentPixels.toFixed( 1 ) }% in file: ${ file } (${ pageElapsed.toFixed( 1 ) }s)` );
 
 			} else {
 
 				await screenshot.write( `test/e2e/output-screenshots/${ file }-actual.jpg`, jpgQuality );
 				await expected.write( `test/e2e/output-screenshots/${ file }-expected.jpg`, jpgQuality );
 				await diff.write( `test/e2e/output-screenshots/${ file }-diff.jpg`, jpgQuality );
-				throw new Error( `Diff wrong in ${ differentPixels.toFixed( 1 ) }% of pixels in file: ${ file }` );
+				throw new Error( `Diff wrong in ${ differentPixels.toFixed( 1 ) }% of pixels in file: ${ file } (${ pageElapsed.toFixed( 1 ) }s)` );
 
 			}
 

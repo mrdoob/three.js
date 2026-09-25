@@ -1,4 +1,4 @@
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
 import { default as TextureNode/*, texture*/ } from '../accessors/TextureNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { context } from '../tsl/TSLBase.js';
@@ -54,6 +54,12 @@ class PassTextureNode extends TextureNode {
 		this.isPassTextureNode = true;
 
 		this.setUpdateMatrix( false );
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return true;
 
 	}
 
@@ -177,9 +183,9 @@ class PassMultipleTextureNode extends PassTextureNode {
  * postProcessing.outputNode = scenePass;
  * ```
  *
- * @augments TempNode
+ * @augments Node
  */
-class PassNode extends TempNode {
+class PassNode extends Node {
 
 	static get type() {
 
@@ -250,7 +256,7 @@ class PassNode extends TempNode {
 
 		if ( this.scope === PassNode.DEPTH || options.depthBuffer !== false ) {
 
-			depthTexture = new DepthTexture();
+			depthTexture = options.depthTexture || new DepthTexture();
 			depthTexture.isRenderTargetTexture = true;
 			//depthTexture.type = FloatType;
 			depthTexture.name = 'depth';
@@ -288,6 +294,40 @@ class PassNode extends TempNode {
 		 * @default true
 		 */
 		this.opaque = true;
+
+		this.lighting = null;
+
+		/**
+		 * Whether the renderer should automatically clear before rendering the pass.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.autoClear = options.autoClear !== undefined ? options.autoClear : true;
+
+		/**
+		 * Whether the color buffer should be cleared.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.autoClearColor = options.autoClearColor !== undefined ? options.autoClearColor : true;
+
+		/**
+		 * Whether the depth buffer should be cleared.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.autoClearDepth = options.autoClearDepth !== undefined ? options.autoClearDepth : true;
+
+		/**
+		 * Whether the stencil buffer should be cleared.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.autoClearStencil = options.autoClearStencil !== undefined ? options.autoClearStencil : true;
 
 		/**
 		 * An optional global context for the pass.
@@ -450,6 +490,12 @@ class PassNode extends TempNode {
 		 * @default true
 		 */
 		this.global = true;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -807,8 +853,12 @@ class PassNode extends TempNode {
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentMRT = renderer.getMRT();
 		const currentAutoClear = renderer.autoClear;
+		const currentAutoClearColor = renderer.autoClearColor;
+		const currentAutoClearDepth = renderer.autoClearDepth;
+		const currentAutoClearStencil = renderer.autoClearStencil;
 		const currentTransparent = renderer.transparent;
 		const currentOpaque = renderer.opaque;
+		const currentLighting = renderer.lighting;
 		const currentMask = camera.layers.mask;
 		const currentContextNode = renderer.contextNode;
 		const currentOverrideMaterial = scene.overrideMaterial;
@@ -836,9 +886,18 @@ class PassNode extends TempNode {
 
 		renderer.setRenderTarget( this.renderTarget );
 		renderer.setMRT( this._mrt );
-		renderer.autoClear = true;
+		renderer.autoClear = this.autoClear;
+		renderer.autoClearColor = this.autoClearColor;
+		renderer.autoClearDepth = this.autoClearDepth;
+		renderer.autoClearStencil = this.autoClearStencil;
 		renderer.transparent = this.transparent;
 		renderer.opaque = this.opaque;
+
+		if ( this.lighting !== null ) {
+
+			renderer.lighting = this.lighting;
+
+		}
 
 		if ( this.contextNode !== null ) {
 
@@ -867,9 +926,13 @@ class PassNode extends TempNode {
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setMRT( currentMRT );
 		renderer.autoClear = currentAutoClear;
+		renderer.autoClearColor = currentAutoClearColor;
+		renderer.autoClearDepth = currentAutoClearDepth;
+		renderer.autoClearStencil = currentAutoClearStencil;
 		renderer.transparent = currentTransparent;
 		renderer.opaque = currentOpaque;
 		renderer.contextNode = currentContextNode;
+		renderer.lighting = currentLighting;
 
 		camera.layers.mask = currentMask;
 
@@ -988,26 +1051,36 @@ class PassNode extends TempNode {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this.renderTarget.dispose();
 
 	}
 
 
+	/**
+	 * @static
+	 * @type {'color'}
+	 * @default 'color'
+	 */
+	static get COLOR() {
+
+		return 'color';
+
+	}
+
+	/**
+	 * @static
+	 * @type {'depth'}
+	 * @default 'depth'
+	 */
+	static get DEPTH() {
+
+		return 'depth';
+
+	}
+
 }
-
-/**
- * @static
- * @type {'color'}
- * @default 'color'
- */
-PassNode.COLOR = 'color';
-
-/**
- * @static
- * @type {'depth'}
- * @default 'depth'
- */
-PassNode.DEPTH = 'depth';
 
 export default PassNode;
 

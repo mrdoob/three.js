@@ -414,6 +414,19 @@ function WebGLMaterials( renderer, properties ) {
 
 		uniforms.ior.value = material.ior; // also part of uniforms common
 
+		if ( material.diffuseRoughness > 0 ) {
+
+			uniforms.diffuseRoughness.value = material.diffuseRoughness;
+
+			if ( material.diffuseRoughnessMap ) {
+
+				uniforms.diffuseRoughnessMap.value = material.diffuseRoughnessMap;
+				refreshTransformUniform( material.diffuseRoughnessMap, uniforms.diffuseRoughnessMapTransform );
+
+			}
+
+		}
+
 		if ( material.sheen > 0 ) {
 
 			uniforms.sheenColor.value.copy( material.sheenColor ).multiplyScalar( material.sheen );
@@ -480,6 +493,12 @@ function WebGLMaterials( renderer, properties ) {
 		if ( material.dispersion > 0 ) {
 
 			uniforms.dispersion.value = material.dispersion;
+
+		}
+
+		if ( material.retroreflectivity > 0 ) {
+
+			uniforms.retroreflectivity.value = material.retroreflectivity;
 
 		}
 

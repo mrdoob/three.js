@@ -301,7 +301,7 @@ class LOD extends Object3D {
 
 		const data = super.toJSON( meta );
 
-		if ( this.autoUpdate === false ) data.object.autoUpdate = false;
+		data.object.autoUpdate = this.autoUpdate;
 
 		data.object.levels = [];
 

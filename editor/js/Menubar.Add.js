@@ -526,7 +526,9 @@ function MenubarAdd( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/add/camera/orthographic' ) );
 	option.onClick( function () {
 
-		const aspect = editor.camera.aspect;
+		const aspect = editor.camera.isPerspectiveCamera
+			? editor.camera.aspect
+			: ( editor.camera.right - editor.camera.left ) / ( editor.camera.top - editor.camera.bottom );
 		const camera = new THREE.OrthographicCamera( - aspect, aspect );
 		camera.name = 'OrthographicCamera';
 

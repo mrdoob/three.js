@@ -4,7 +4,7 @@ This class has been made to hold a slice of a volume data.
 
 ## Import
 
-VolumeSlice is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+VolumeSlice is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { VolumeSlice } from 'three/addons/misc/VolumeSlice.js';
