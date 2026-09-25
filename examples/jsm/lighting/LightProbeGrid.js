@@ -467,13 +467,6 @@ class LightProbeGrid extends Light {
 
 		}
 
-		// Register the light node with this renderer (idempotent).
-		if ( renderer.library.getLightNodeClass( LightProbeGrid ) === null ) {
-
-			renderer.library.addLight( LightProbeGridNode, LightProbeGrid );
-
-		}
-
 		const res = this.resolution;
 		const totalProbes = res.x * res.y * res.z;
 		const {
@@ -816,5 +809,7 @@ class LightProbeGrid extends Light {
 	}
 
 }
+
+LightProbeGrid.registerNode( LightProbeGridNode );
 
 export { LightProbeGrid };

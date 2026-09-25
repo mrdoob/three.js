@@ -42,11 +42,11 @@ const canBatchLight = ( light ) => {
 
 };
 
-const getOrCreateLightNode = ( light, nodeLibrary ) => {
+const getOrCreateLightNode = ( light ) => {
 
-	const lightNodeClass = nodeLibrary.getLightNodeClass( light.constructor );
+	const lightNodeClass = light._lightNode;
 
-	if ( lightNodeClass === null ) {
+	if ( lightNodeClass === undefined ) {
 
 		warn( `DynamicLightsNode: Light node not found for ${ light.constructor.name }.` );
 		return null;
@@ -153,12 +153,11 @@ class DynamicLightsNode extends LightsNode {
 
 	}
 
-	setupLightsNode( builder ) {
+	setupLightsNode( /*builder*/ ) {
 
 		const lightNodes = [];
 		const lightsByType = new Map();
 		const lights = sortLights( this._lights );
-		const nodeLibrary = builder.renderer.library;
 
 		for ( const light of lights ) {
 
@@ -188,7 +187,7 @@ class DynamicLightsNode extends LightsNode {
 
 			}
 
-			const lightNode = getOrCreateLightNode( light, nodeLibrary );
+			const lightNode = getOrCreateLightNode( light );
 
 			if ( lightNode !== null ) {
 

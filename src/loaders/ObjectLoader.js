@@ -755,6 +755,7 @@ class ObjectLoader extends Loader {
 				if ( data.flipY !== undefined ) texture.flipY = data.flipY;
 
 				if ( data.generateMipmaps !== undefined ) texture.generateMipmaps = data.generateMipmaps;
+				if ( data.mipmapsAutoUpdate !== undefined ) texture.mipmapsAutoUpdate = data.mipmapsAutoUpdate;
 				if ( data.premultiplyAlpha !== undefined ) texture.premultiplyAlpha = data.premultiplyAlpha;
 				if ( data.unpackAlignment !== undefined ) texture.unpackAlignment = data.unpackAlignment;
 				if ( data.compareFunction !== undefined ) texture.compareFunction = data.compareFunction;
@@ -1033,8 +1034,8 @@ class ObjectLoader extends Loader {
 				} );
 				object._instanceInfo = data.instanceInfo;
 
-				object._availableInstanceIds = data._availableInstanceIds;
-				object._availableGeometryIds = data._availableGeometryIds;
+				object._availableInstanceIds = data.availableInstanceIds;
+				object._availableGeometryIds = data.availableGeometryIds;
 
 				object._nextIndexStart = data.nextIndexStart;
 				object._nextVertexStart = data.nextVertexStart;

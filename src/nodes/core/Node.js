@@ -1049,10 +1049,15 @@ class Node extends EventDispatcher {
 
 				if ( cacheResult ) {
 
-					const nodeVar = builder.getVarFromNode( this, null, type );
+					const readOnly = nodeData.assign !== true;
+					const nodeVar = builder.getVarFromNode( this, null, type, undefined, readOnly, true );
 					const propertyName = builder.getPropertyName( nodeVar );
+					const count = this.getArrayCount( builder );
+					const declarationPrefix = readOnly
+						? builder.generateLetStatement( nodeVar.type, propertyName, count )
+						: builder.generateVarStatement( nodeVar.type, propertyName, count );
 
-					builder.addLineFlowCode( `${ propertyName } = ${ result }`, this );
+					builder.addLineFlowCode( `${ declarationPrefix } = ${ result }`, this );
 
 					nodeData.snippet = result;
 					nodeData.propertyName = propertyName;

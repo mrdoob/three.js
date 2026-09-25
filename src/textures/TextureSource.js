@@ -94,7 +94,7 @@ class TextureSource {
 
 		} else if ( data !== null ) {
 
-			target.set( data.width, data.height, data.depth || 0 );
+			target.set( data.width || 0, data.height || 0, data.depth || 0 );
 
 		} else {
 

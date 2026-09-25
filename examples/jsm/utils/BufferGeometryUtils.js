@@ -30,7 +30,7 @@ import {
  *
  * @param {BufferGeometry} geometry - The geometry to compute tangents for.
  * @param {Object} MikkTSpace - Instance of `examples/jsm/libs/mikktspace.module.js`, or `mikktspace` npm package.
- * Await `MikkTSpace.ready` before use.
+ * The bundled JavaScript implementation is ready immediately. Await `MikkTSpace.ready` before using a WebAssembly implementation.
  * @param {boolean} [negateSign=true] - Whether to negate the sign component (.w) of each tangent.
  * Required for normal map conventions in some formats, including glTF.
  * @return {BufferGeometry} The updated geometry.

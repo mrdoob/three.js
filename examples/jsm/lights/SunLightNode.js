@@ -3,10 +3,10 @@ import { cameraViewMatrix, lightPosition } from 'three/tsl';
 import { sunShadow } from './SunShadowNode.js';
 
 /**
- * Module for representing sun lights as nodes. Register it with the
- * renderer's node library to use {@link SunLight} with `WebGPURenderer`:
+ * Module for representing sun lights as nodes. Register it with {@link SunLight}
+ * to use the light with `WebGPURenderer`:
  * ```js
- * renderer.library.addLight( SunLightNode, SunLight );
+ * SunLight.registerNode( SunLightNode );
  * ```
  *
  * @augments AnalyticLightNode
