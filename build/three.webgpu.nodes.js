@@ -78,7 +78,8 @@ const refreshUniforms = [
 	'steps',
 	'thickness',
 	'transmission',
-	'transmissionMap'
+	'transmissionMap',
+	'wireframe'
 ];
 
 
@@ -2713,10 +2714,15 @@ class Node extends EventDispatcher {
 
 				if ( cacheResult ) {
 
-					const nodeVar = builder.getVarFromNode( this, null, type );
+					const readOnly = nodeData.assign !== true;
+					const nodeVar = builder.getVarFromNode( this, null, type, undefined, readOnly, true );
 					const propertyName = builder.getPropertyName( nodeVar );
+					const count = this.getArrayCount( builder );
+					const declarationPrefix = readOnly
+						? builder.generateLetStatement( nodeVar.type, propertyName, count )
+						: builder.generateVarStatement( nodeVar.type, propertyName, count );
 
-					builder.addLineFlowCode( `${ propertyName } = ${ result }`, this );
+					builder.addLineFlowCode( `${ declarationPrefix } = ${ result }`, this );
 
 					nodeData.snippet = result;
 					nodeData.propertyName = propertyName;
@@ -2984,6 +2990,18 @@ class ArrayElementNode extends Node {
 	}
 
 	/**
+	 * Returns the scope of the array-like node so assignments to elements
+	 * mark the underlying value as mutable.
+	 *
+	 * @return {Node} The scope of the node.
+	 */
+	getScope() {
+
+		return this.node.getScope();
+
+	}
+
+	/**
 	 * This method is overwritten since the node type is inferred from the array-like node.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
@@ -3059,12 +3077,6 @@ class ConvertNode extends Node {
 		 * @type {string}
 		 */
 		this.convertTo = convertTo;
-
-	}
-
-	isCacheable( /*builder*/ ) {
-
-		return false;
 
 	}
 
@@ -3877,6 +3889,18 @@ class MemberNode extends Node {
 	isCacheable( /*builder*/ ) {
 
 		return false;
+
+	}
+
+	/**
+	 * Returns the scope of the struct so assignments to members
+	 * mark the underlying value as mutable.
+	 *
+	 * @return {Node} The scope of the node.
+	 */
+	getScope() {
+
+		return this.structNode.getScope();
 
 	}
 
@@ -9439,7 +9463,7 @@ class VarNode extends Node {
 		const vectorType = builder.getVectorType( nodeType );
 		const snippet = node.build( builder, vectorType );
 
-		const nodeVar = builder.getVarFromNode( this, name, vectorType, undefined, readOnly );
+		const nodeVar = builder.getVarFromNode( this, name, vectorType, undefined, readOnly, this.intent );
 
 		const propertyName = builder.getPropertyName( nodeVar );
 
@@ -9451,7 +9475,11 @@ class VarNode extends Node {
 
 			declarationPrefix = builder.isDeterministic( node )
 				? builder.generateConstStatement( nodeVar.type, propertyName, count )
-				: builder.generateVarStatement( nodeVar.type, propertyName, count );
+				: builder.generateLetStatement( nodeVar.type, propertyName, count );
+
+		} else if ( nodeVar.local ) {
+
+			declarationPrefix = builder.generateVarStatement( nodeVar.type, propertyName, nodeVar.count );
 
 		}
 
@@ -19867,7 +19895,8 @@ class LoopNode extends Node {
 
 		const fnCall = params[ params.length - 1 ]( inputs );
 
-		properties.returnsNode = fnCall.context( { nodeLoop: fnCall } );
+		// Keep values first generated in the loop body out of the parent cache.
+		properties.returnsNode = fnCall.isolate().context( { nodeLoop: fnCall } );
 		properties.stackNode = stack;
 
 		const baseParam = params[ 0 ];
@@ -25053,10 +25082,13 @@ const getRoughness = /*@__PURE__*/ Fn( ( inputs ) => {
 
 	const geometryRoughness = getGeometryRoughness();
 
-	// GGX width scales with roughness squared; large normal variation needs a linear floor.
-	const roughnessFloor = geometryRoughness.sqrt().mul( 0.4 ).max( geometryRoughness );
+	// Minimum roughness, so even a perfect mirror samples a prefiltered level of the environment map.
+	// Matches Filament's desktop MIN_PERCEPTUAL_ROUGHNESS: https://github.com/google/filament/blob/main/shaders/src/surface_material.fs
+	let roughnessFactor = roughness.max( 0.045 );
+	roughnessFactor = roughnessFactor.add( geometryRoughness );
+	roughnessFactor = roughnessFactor.min( 1.0 );
 
-	return roughness.max( roughnessFloor ).min( 1.0 );
+	return roughnessFactor;
 
 } );
 
@@ -25213,7 +25245,7 @@ const D_GGX_Anisotropic = /*@__PURE__*/ Fn( ( { alphaT, alphaB, dotNH, dotTH, do
 // GGX Distribution, Schlick Fresnel, GGX_SmithCorrelated Visibility
 const BRDF_GGX = /*@__PURE__*/ Fn( ( { lightDirection, f0, f90, roughness, f, normalView: normalView$1 = normalView, viewDirection = positionViewDirection, USE_IRIDESCENCE, USE_ANISOTROPY } ) => {
 
-	const alpha = roughness.max( 0.0525 ).pow2(); // punctual lights need a minimum roughness to show a highlight
+	const alpha = roughness.max( 0.045 ).pow2(); // punctual lights need a minimum roughness to show a highlight
 
 	const halfDir = lightDirection.add( viewDirection ).normalize();
 
@@ -26580,22 +26612,18 @@ const GOLDEN_ANGLE = 2.399963229728653;
 
 /**
  * Returns the mip level of a PMREM that has been prefiltered for the given roughness.
- * Uses the inverse of `PMREMGenerator.lodToRoughness()`, compensating for base-level filtering.
+ * Uses the inverse of `PMREMGenerator.lodToRoughness()`.
  *
  * @tsl
  * @function
  * @param {Node<float>} roughness - The roughness.
  * @param {Node<float>} maxLod - The last mip level of the PMREM.
- * @param {Node<float>} size - The width of the sharpest mip level.
  * @return {Node<float>} The mip level.
+ * @see {@link https://github.com/google/filament/blob/main/shaders/src/surface_light_indirect.fs | Filament: perceptualRoughnessToLod()}
  */
-const roughnessToMip = ( roughness, maxLod, size ) => {
+const roughnessToMip = ( roughness, maxLod ) => {
 
 	roughness = float( roughness ).clamp();
-
-	// Subtract the base level's texel footprint from the GGX lobe.
-	const texelAngle = float( Math.PI * 0.5 ).div( size );
-	roughness = roughness.pow2().pow2().sub( texelAngle.pow2() ).max( 0.0 ).sqrt().sqrt();
 
 	return float( maxLod ).mul( roughness ).mul( float( 2.0 ).sub( roughness ) );
 
@@ -27723,7 +27751,7 @@ class PMREMNode extends Node {
 
 		//
 
-		return this._texture.sample( materialEnvRotation.mul( uvNode ) ).level( roughnessToMip( levelNode, this._maxLod, this._size ) ).rgb;
+		return this._texture.sample( materialEnvRotation.mul( uvNode ) ).level( roughnessToMip( levelNode, this._maxLod ) ).rgb;
 
 	}
 
@@ -31985,6 +32013,8 @@ class Geometries extends DataMap {
 
 			this._tracked.delete( geometryData.ref );
 			this._registry.unregister( geometryData.ref );
+
+			this.delete( geometry );
 
 		};
 
@@ -51081,8 +51111,9 @@ class NodeVar {
 	 * @param {string} type - The type of the variable.
 	 * @param {boolean} [readOnly=false] - The read-only flag.
 	 * @param {?number} [count=null] - The size.
+	 * @param {boolean} [local=false] - Whether the variable is declared locally in the flow.
 	 */
-	constructor( name, type, readOnly = false, count = null ) {
+	constructor( name, type, readOnly = false, count = null, local = false ) {
 
 		/**
 		 * This flag can be used for type testing.
@@ -51113,6 +51144,14 @@ class NodeVar {
 		 * @type {boolean}
 		 */
 		this.readOnly = readOnly;
+
+		/**
+		 * Whether the variable is declared locally in the flow.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.local = local;
 
 		/**
 		 * The size.
@@ -53139,6 +53178,8 @@ class NodeBuilder {
 		delete context.getAO;
 		delete context.getGI;
 		delete context.getShadow;
+		delete context.nodeLoop;
+		delete context.nodeBlock;
 
 		return context;
 
@@ -54246,10 +54287,11 @@ class NodeBuilder {
 	 * @param {string} [type=node.getNodeType( this )] - The variable's type.
 	 * @param {('vertex'|'fragment'|'compute'|'any')} [shaderStage=this.shaderStage] - The shader stage.
 	 * @param {boolean} [readOnly=false] - Whether the variable is read-only or not.
+	 * @param {boolean} [local=false] - Whether the variable is declared locally in the flow instead of the variable section.
 	 *
 	 * @return {NodeVar} The node variable.
 	 */
-	getVarFromNode( node, name = null, type = node.getNodeType( this ), shaderStage = this.shaderStage, readOnly = false ) {
+	getVarFromNode( node, name = null, type = node.getNodeType( this ), shaderStage = this.shaderStage, readOnly = false, local = false ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
 		const subBuildVariable = this.getSubBuildProperty( 'variable', nodeData.subBuilds );
@@ -54283,9 +54325,9 @@ class NodeBuilder {
 
 			const count = node.getArrayCount( this );
 
-			nodeVar = new NodeVar( name, type, readOnly, count );
+			nodeVar = new NodeVar( name, type, readOnly, count, local );
 
-			if ( ! readOnly ) {
+			if ( ! readOnly && ! local ) {
 
 				vars.push( nodeVar );
 
@@ -54506,6 +54548,8 @@ class NodeBuilder {
 				this.addLineFlowCode( flowCode );
 
 			}
+
+			flowCodeBlock.set( nodeBlock, true );
 
 		}
 
@@ -54998,6 +55042,21 @@ class NodeBuilder {
 	generateVarStatement( type, name, count = null ) {
 
 		return this.getVar( type, name, count );
+
+	}
+
+	/**
+	 * Returns a runtime read-only variable statement as a shader string.
+	 * Backends without a let declaration use a regular variable declaration.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The shader string.
+	 */
+	generateLetStatement( type, name, count = null ) {
+
+		return this.generateVarStatement( type, name, count );
 
 	}
 
@@ -83204,7 +83263,21 @@ ${ flowData.code }
 	 * @param {?number} [count=null] - The array length.
 	 * @return {string} The WGSL snippet that defines a variable.
 	 */
-	generateVarStatement( type, name/*, count = null*/ ) {
+	generateVarStatement( type, name, count = null ) {
+
+		return this.getVar( type, name, count );
+
+	}
+
+	/**
+	 * Returns a runtime read-only variable statement as a WGSL string.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The WGSL snippet that defines a let variable.
+	 */
+	generateLetStatement( type, name/*, count = null*/ ) {
 
 		return `let ${ name }`;
 
