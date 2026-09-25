@@ -1,6 +1,8 @@
 import { StorageBufferAttribute, DynamicDrawUsage } from 'three/webgpu';
 import { Fn, Loop, atomicAdd, atomicLoad, atomicStore, instanceIndex, storage, uint } from 'three/tsl';
 
+import { retargetPBOAttribute } from '../utils/StorageBufferUtils.js';
+
 /**
  * A reusable GPU counting sort.
  *
@@ -150,10 +152,7 @@ class CountingSort {
 
 		const capacity = Math.max( 1, value );
 
-		// Once WebGL PBO mode is enabled, avoid replacing the order buffer just because
-		// the live count shrank. Keeping the backing buffer stable prevents stale PBO
-		// bindings while still sorting and drawing only the first `count` entries.
-		if ( capacity > this._capacity || ( this._webGLBuffersEnabled === false && capacity !== this._capacity ) ) {
+		if ( capacity !== this._capacity ) {
 
 			this._resizeOrderBuffers( capacity );
 
@@ -186,6 +185,8 @@ class CountingSort {
 		this._binAttribute = new StorageBufferAttribute( new Uint32Array( capacity ), 1, Uint32Array );
 
 		if ( this._webGLBuffersEnabled === true ) this.orderAttribute.setUsage( DynamicDrawUsage );
+
+		retargetPBOAttribute( oldOrderAttribute, this.orderAttribute );
 
 		this.orderRead.value = this.orderAttribute;
 		this.orderWrite.value = this.orderAttribute;

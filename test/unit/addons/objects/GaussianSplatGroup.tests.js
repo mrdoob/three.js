@@ -1,5 +1,6 @@
-import { DataTexture, PerspectiveCamera } from 'three';
+import { Color, DataTexture, Matrix4, PerspectiveCamera, RenderTarget, Scene } from 'three';
 import { createGaussianSplatGeometry } from '../../../../examples/jsm/utils/GaussianSplatUtils.js';
+import { getSharedRenderer } from '../tsl/gpu-test-utils.js';
 import { GaussianSplatGroup } from '../../../../examples/jsm/objects/GaussianSplatGroup.js';
 
 // Builds a minimal splat cloud geometry with `count` splats - real enough to drive
@@ -57,6 +58,99 @@ export default QUnit.module( 'Addons', () => {
 	QUnit.module( 'Objects', () => {
 
 		QUnit.module( 'GaussianSplatGroup', () => {
+
+			for ( const backend of [ 'webgl', 'webgpu' ] ) {
+
+				QUnit.test( `rendering after growth and compaction matches a fresh group (${ backend })`, async ( assert ) => {
+
+					const renderer = await getSharedRenderer( backend );
+
+					if ( renderer === null ) {
+
+						assert.true( true, `${ backend } is unavailable` );
+						return;
+
+					}
+
+					const previousTarget = renderer.getRenderTarget();
+					const previousColor = renderer.getClearColor( new Color() );
+					const previousAlpha = renderer.getClearAlpha();
+					const target = new RenderTarget( 32, 32 );
+					const camera = new PerspectiveCamera( 60, 1, 0.1, 100 );
+					const scene = new Scene();
+					const group = new GaussianSplatGroup( { shDegree: 0 } );
+					const geometry = createTestSplatGeometry( 1 );
+					const matrices = new Map();
+
+					const read = async () => {
+
+						renderer.render( scene, camera );
+						return renderer.readRenderTargetPixelsAsync( target, 0, 0, 32, 32 );
+
+					};
+
+					const compare = async ( message ) => {
+
+						const actual = await read();
+						const reference = new GaussianSplatGroup( { shDegree: 0 } );
+
+						for ( const matrix of matrices.values() ) reference.setMatrixAt( reference.addSplat( geometry ), matrix );
+
+						scene.remove( group );
+						scene.add( reference );
+
+						try {
+
+							const expected = await read();
+							assert.true( expected.some( ( value, i ) => i % 4 !== 3 && value > 0 ), 'reference renders visible splats' );
+							assert.true( actual.every( ( value, i ) => Math.abs( value - expected[ i ] ) <= 1 ), message );
+
+						} finally {
+
+							scene.remove( reference );
+							scene.add( group );
+							reference.dispose();
+
+						}
+
+					};
+
+					try {
+
+						renderer.setRenderTarget( target );
+						renderer.setClearColor( 0, 0 );
+						scene.add( group );
+						const a = group.addSplat( geometry );
+						matrices.set( a, new Matrix4().makeTranslation( - 1, 0, - 5 ) );
+						group.setMatrixAt( a, matrices.get( a ) );
+						await read();
+
+						const b = group.addSplat( geometry );
+						matrices.set( b, new Matrix4().makeTranslation( 1, 0, - 6 ) );
+						group.setMatrixAt( b, matrices.get( b ) );
+						await compare( 'growth after first render preserves sorted reads' );
+
+						group.setVisibleAt( a, false );
+						matrices.delete( a );
+						await compare( 'hidden slots are excluded from the draw' );
+
+						group.deleteSplat( a );
+						group.compact();
+						await compare( 'compaction after rendering preserves sorted reads' );
+
+					} finally {
+
+						renderer.setRenderTarget( previousTarget );
+						renderer.setClearColor( previousColor, previousAlpha );
+						group.dispose();
+						geometry.dispose();
+						target.dispose();
+
+					}
+
+				} );
+
+			}
 
 			QUnit.test( 'defaults', ( assert ) => {
 
