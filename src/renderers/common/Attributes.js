@@ -35,6 +35,24 @@ class Attributes extends DataMap {
 		 */
 		this.info = info;
 
+		/**
+		 * Stores weak references to the storage attributes with attached
+		 * `dispose` event listeners.
+		 *
+		 * @private
+		 * @type {Set<WeakRef<StorageBufferAttribute>>}
+		 */
+		this._tracked = new Set();
+
+		/**
+		 * Removes weak references from `_tracked` when their attribute
+		 * has been garbage collected without an explicit `dispose()`.
+		 *
+		 * @private
+		 * @type {FinalizationRegistry}
+		 */
+		this._registry = new FinalizationRegistry( ( ref ) => this._tracked.delete( ref ) );
+
 	}
 
 	/**
@@ -52,6 +70,9 @@ class Attributes extends DataMap {
 			if ( attribute.isStorageBufferAttribute === true ) {
 
 				attribute.removeEventListener( 'dispose', attributeData.onDispose );
+
+				this._tracked.delete( attributeData.ref );
+				this._registry.unregister( attributeData.ref );
 
 			}
 
@@ -114,6 +135,12 @@ class Attributes extends DataMap {
 
 				attribute.addEventListener( 'dispose', data.onDispose );
 
+				// see #31798 why tracking separate remove listeners is required right now
+				data.ref = new WeakRef( attribute );
+
+				this._tracked.add( data.ref );
+				this._registry.register( attribute, data.ref, data.ref );
+
 			}
 
 		} else {
@@ -144,6 +171,24 @@ class Attributes extends DataMap {
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
 		return attribute;
+
+	}
+
+	dispose() {
+
+		for ( const ref of this._tracked ) {
+
+			const attribute = ref.deref();
+
+			if ( attribute === undefined || this.has( attribute ) === false ) continue;
+
+			this.delete( attribute );
+
+		}
+
+		this._tracked.clear();
+
+		super.dispose();
 
 	}
 
