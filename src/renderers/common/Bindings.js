@@ -244,10 +244,11 @@ class Bindings extends DataMap {
 					} else if ( binding.isSampledTexture ) {
 
 						this.textures.updateTexture( binding.texture );
+						binding.generation = this.textures.get( binding.texture ).generation;
 
 					} else if ( binding.isSampler ) {
 
-						this.textures.updateSampler( binding );
+						binding.samplerKey = this.textures.updateSampler( binding );
 
 					} else if ( binding.isStorageBuffer ) {
 
