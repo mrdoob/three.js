@@ -1,6 +1,6 @@
 import { DoubleSide } from 'three/webgpu';
 import { MaterialXLogCodes } from './MaterialXLog.js';
-import { float, vec3, color, mul, clamp, vec2, cos, sin, pow, mix, element, transformNormalToView, positionLocal, normalLocal, tangentLocal, bitangentLocal } from 'three/tsl';
+import { Fn, float, vec3, color, mul, clamp, vec2, cos, sin, pow, mix, element, transformNormalToView, positionLocal, normalLocal, tangentLocal, bitangentLocal } from 'three/tsl';
 
 const mappedStandardSurfaceInputs = new Set( [
 	'base',
@@ -639,7 +639,20 @@ function applyDisplacement( material, inputs, log, nodeName, inputTypes = {} ) {
 	if ( inputTypes.displacement === 'vector3' ) {
 
 		const vector = vec3( displacementNode ).mul( scaleNode );
-		offsetNode = tangentLocal.mul( vector.x ).add( bitangentLocal.mul( vector.y ) ).add( normalLocal.mul( vector.z ) );
+
+		// tangentLocal/bitangentLocal need a tangent attribute; without one the
+		// bitangent is NaN, so fall back to displacing along the normal only.
+		offsetNode = Fn( ( builder ) => {
+
+			if ( builder.geometry.hasAttribute( 'tangent' ) ) {
+
+				return tangentLocal.mul( vector.x ).add( bitangentLocal.mul( vector.y ) ).add( normalLocal.mul( vector.z ) );
+
+			}
+
+			return normalLocal.normalize().mul( vector.z );
+
+		} )();
 
 	} else {
 
