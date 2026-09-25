@@ -414,11 +414,7 @@ class GaussianSplatGroup extends Mesh {
 
 		this._syncLayout();
 
-		let total = 0;
-
-		for ( const record of this._records.values() ) total += record.count;
-
-		const target = Math.max( 1, total );
+		const target = Math.max( 1, this._totalCount() );
 
 		if ( target === this._buffers.capacity ) return;
 
@@ -623,17 +619,21 @@ class GaussianSplatGroup extends Mesh {
 		for ( let i = 0; i < pending.length; i ++ ) {
 
 			const record = pending[ i ];
-			const offset = this._allocateRange( record.count );
+			let offset = this._allocateRange( record.count );
 
 			if ( offset === - 1 ) {
 
-				let total = 0;
+				// Out of room: grow (doubling) in place, keeping every packed cloud where it is.
+				this._grow( Math.max( this._buffers.capacity * 2, this._totalCount() ) );
+				offset = this._allocateRange( record.count );
 
-				for ( const record of this._records.values() ) total += record.count;
+			}
 
-				// Doubling keeps the full repack rare. `_repackAll` places every cloud, including
-				// the ones placed earlier in this loop and the rest of the pending list.
-				this._repackAll( Math.max( total, this._buffers.capacity * 2 ) );
+			if ( offset === - 1 ) {
+
+				// Still no contiguous range (fragmentation): repack everything. `_repackAll`
+				// places every cloud, including the rest of the pending list.
+				this._repackAll( this._buffers.capacity );
 
 				return;
 
@@ -760,6 +760,39 @@ class GaussianSplatGroup extends Mesh {
 
 	}
 
+	_totalCount() {
+
+		let total = 0;
+
+		for ( const record of this._records.values() ) total += record.count;
+
+		return total;
+
+	}
+
+	// Grows the shared buffers to `capacity` slots, keeping every packed cloud where it is:
+	// the old arrays are copied over as a prefix and the new tail becomes free space.
+	_grow( capacity ) {
+
+		const buffers = this._buffers;
+		const oldCapacity = buffers.capacity;
+		const oldArrays = splatAttributes( buffers, this._maxSphericalHarmonicsDegree ).map( ( [ attribute ] ) => attribute.array );
+		const oldRecordData = buffers.recordDataAttribute.array;
+
+		resizeGroupBufferState( buffers, capacity, buffers.recordCapacity, this._maxSphericalHarmonicsDegree );
+		this._sort.count = capacity;
+
+		splatAttributes( buffers, this._maxSphericalHarmonicsDegree ).forEach( ( [ attribute ], i ) => copyPrefix( oldArrays[ i ], attribute.array ) );
+		copyPrefix( oldRecordData, buffers.recordDataAttribute.array );
+
+		this._freeRange( oldCapacity, capacity - oldCapacity );
+
+		// The renderer uploads the newly created attributes in full, so pending partial
+		// ranges (which referred to the old buffers) are dropped.
+		this._dirtySplatRanges.length = 0;
+
+	}
+
 	// Reallocates the shared buffers to `capacity` slots and packs every cloud contiguously.
 	_repackAll( capacity ) {
 
@@ -799,20 +832,7 @@ class GaussianSplatGroup extends Mesh {
 
 		if ( ranges.length === 0 ) return;
 
-		const buffers = this._buffers;
-		const targets = [
-			[ buffers.centerAttribute, 4 ],
-			[ buffers.covarianceAttribute, 8 ],
-			[ buffers.colorAttribute, 1 ]
-		];
-
-		for ( let degree = 1; degree <= this._maxSphericalHarmonicsDegree; degree ++ ) {
-
-			targets.push( [ buffers[ `sphericalHarmonics${ degree }Attribute` ], SH_BAND_WORDS[ degree ] ] );
-
-		}
-
-		for ( const [ attribute, stride ] of targets ) {
+		for ( const [ attribute, stride ] of splatAttributes( this._buffers, this._maxSphericalHarmonicsDegree ) ) {
 
 			for ( const range of ranges ) attribute.addUpdateRange( range.start * stride, range.count * stride );
 
@@ -1000,6 +1020,31 @@ class GaussianSplatGroup extends Mesh {
 		} );
 
 	}
+
+}
+
+// The per-splat storage attributes and their array stride per splat.
+function splatAttributes( buffers, sphericalHarmonicsDegree ) {
+
+	const result = [
+		[ buffers.centerAttribute, 4 ],
+		[ buffers.covarianceAttribute, 8 ],
+		[ buffers.colorAttribute, 1 ]
+	];
+
+	for ( let degree = 1; degree <= sphericalHarmonicsDegree; degree ++ ) {
+
+		result.push( [ buffers[ `sphericalHarmonics${ degree }Attribute` ], SH_BAND_WORDS[ degree ] ] );
+
+	}
+
+	return result;
+
+}
+
+function copyPrefix( source, target ) {
+
+	target.set( source.length <= target.length ? source : source.subarray( 0, target.length ) );
 
 }
 

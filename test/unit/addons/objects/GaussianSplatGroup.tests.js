@@ -86,6 +86,8 @@ export default QUnit.module( 'Addons', () => {
 				assert.strictEqual( sync( group ), 15, 'splatCount reflects both splat clouds' );
 				assert.strictEqual( group.capacity, 20, 'capacity doubles rather than growing to exactly fit' );
 				assert.strictEqual( record( group, b ).offset, 10, 'second cloud packs after the first' );
+				assert.strictEqual( record( group, a ).offset, 0, 'growing keeps the first cloud where it was' );
+				assert.deepEqual( slotRecords( group, 0, 1 ), [ 1 ], 'grown buffers keep the old contents' );
 
 				const centerAttribute = group._buffers.centerAttribute;
 				const c = group.addSplat( createTestSplatGeometry( 5 ) );
@@ -94,7 +96,7 @@ export default QUnit.module( 'Addons', () => {
 				assert.strictEqual( group.capacity, 20, 'a cloud that fits does not resize' );
 				assert.strictEqual( group._buffers.centerAttribute, centerAttribute, 'a cloud that fits does not reallocate the buffers' );
 				assert.strictEqual( record( group, c ).offset, 15, 'third cloud packs into the remaining free range' );
-				assert.deepEqual( group._dirtySplatRanges, [ { start: 15, count: 5 } ], 'only the new cloud\'s range is queued for upload' );
+				assert.deepEqual( group._dirtySplatRanges.at( - 1 ), { start: 15, count: 5 }, 'the new cloud\'s range is queued for upload' );
 
 				group.dispose();
 
@@ -146,6 +148,7 @@ export default QUnit.module( 'Addons', () => {
 				sync( group );
 
 				const centerAttribute = group._buffers.centerAttribute;
+				const queuedUploads = group._dirtySplatRanges.length;
 
 				group.setVisibleAt( a, false );
 
@@ -153,7 +156,7 @@ export default QUnit.module( 'Addons', () => {
 				assert.strictEqual( group.geometry.instanceCount, 5, 'hidden splats are not drawn' );
 				assert.strictEqual( record( group, a ).offset, 0, 'the hidden cloud stays packed' );
 				assert.strictEqual( group._buffers.centerAttribute, centerAttribute, 'hiding does not touch the shared buffers' );
-				assert.strictEqual( group._dirtySplatRanges.length, 0, 'hiding uploads no splat data' );
+				assert.strictEqual( group._dirtySplatRanges.length, queuedUploads, 'hiding queues no splat uploads' );
 
 				group.setVisibleAt( a, true );
 
