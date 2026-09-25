@@ -49,6 +49,12 @@ class Attributes extends DataMap {
 
 		if ( attributeData !== null ) {
 
+			if ( attribute.isBufferAttribute === true ) {
+
+				attribute.removeEventListener( 'dispose', attributeData.onDispose );
+
+			}
+
 			this.backend.destroyAttribute( attribute );
 
 			this.info.destroyAttribute( attribute );
@@ -95,6 +101,20 @@ class Attributes extends DataMap {
 			}
 
 			data.version = this._getBufferAttribute( attribute ).version;
+
+			// interleaved buffer attributes are not event dispatchers
+
+			if ( attribute.isBufferAttribute === true ) {
+
+				data.onDispose = () => {
+
+					this.delete( attribute );
+
+				};
+
+				attribute.addEventListener( 'dispose', data.onDispose );
+
+			}
 
 		} else {
 
