@@ -137,7 +137,7 @@
 					loader.loadAsync( './models/spz/tomatoes.v4.spz' )
 				] );
 
-				group = new GaussianSplatGroup( { autoCompact: false, shDegree: 2 } );
+				group = new GaussianSplatGroup( { shDegree: 2 } );
 				scene.add( group );
 
 				// build a single instance first so instanceSpacing can be derived from its
@@ -179,17 +179,8 @@
 					updateSplatCountDisplay();
 
 				} );
-				gui.add( { autoCompact: false }, 'autoCompact' ).name( 'Auto Compact' ).onChange( ( value ) => {
-
-					// Toggle GaussianSplatGroup's buffer-shrinking behavior at runtime: `true`
-					// keeps the shared storage buffers sized to exactly fit the live splat total
-					// on every change, `false` (the default here) only ever grows them - toggling
-					// Show Lion or lowering Instance Count with it off leaves the buffers at their
-					// high-water mark until Compact Now is used - see the class documentation for
-					// the full contract.
-					group.autoCompact = value;
-
-				} );
+				// The shared buffers only ever grow; lowering Instance Count leaves them at their
+				// high-water mark until Compact Now shrinks them to fit.
 				gui.add( { compactNow: () => group.compact() }, 'compactNow' ).name( 'Compact Now' );
 
 				window.addEventListener( 'resize', onWindowResize );

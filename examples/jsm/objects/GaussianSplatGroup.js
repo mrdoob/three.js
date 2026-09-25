@@ -11,7 +11,7 @@ import {
 	Vector3
 } from 'three/webgpu';
 
-import { instanceIndex, max, storage, uint, uniform, vec4 } from 'three/tsl';
+import { instanceIndex, max, select, storage, uint, uniform, vec4 } from 'three/tsl';
 
 import { CountingSort } from '../gpgpu/CountingSort.js';
 import { SH_BAND_WORDS, getSphericalHarmonicsDegree } from '../utils/GaussianSplatUtils.js';
@@ -38,6 +38,10 @@ const _instanceWorldMatrix = /*@__PURE__*/ new Matrix4();
 const _instanceWorldMatrixInverse = /*@__PURE__*/ new Matrix4();
 const _ray = /*@__PURE__*/ new Ray();
 
+// Record slot 0 is reserved and never flagged visible, so any splat slot whose record index
+// is 0 (freed ranges, never-used capacity) is skipped by the sort.
+const DEAD_RECORD_INDEX = 0;
+
 class SplatRecord {
 
 	constructor( id, geometry, count, sphericalHarmonicsDegree ) {
@@ -46,35 +50,15 @@ class SplatRecord {
 		this.geometry = geometry;
 		this.count = count;
 		this.sphericalHarmonicsDegree = sphericalHarmonicsDegree;
-		this.offset = 0;
-		this.recordIndex = 0;
+
+		// Start of this cloud's slot range in the shared buffers, -1 while not yet packed.
+		this.offset = - 1;
+		this.recordIndex = - 1;
 		this.matrix = new Matrix4();
 		this.visible = true;
-		this.matrixDirty = true;
 
-	}
-
-	setMatrix( matrix ) {
-
-		if ( this.matrix.equals( matrix ) ) return false;
-
-		this.matrix.copy( matrix );
-		this.matrixDirty = true;
-
-		return true;
-
-	}
-
-	setOffset( offset ) {
-
-		this.offset = offset;
-
-	}
-
-	setRecordIndex( recordIndex ) {
-
-		this.recordIndex = recordIndex;
-		this.matrixDirty = true;
+		// Matrix or visibility needs writing into the record data buffer.
+		this.dataDirty = true;
 
 	}
 
@@ -105,14 +89,18 @@ class SplatRecord {
  *
  * `GaussianSplatGroup` does not wrap independent scene-graph children - it takes a raw
  * `BufferGeometry` per splat cloud via {@link GaussianSplatGroup#addSplat}. All of the
- * group's work (merging, sorting, toggling visibility) happens automatically inside its own
+ * group's work (packing, sorting, toggling visibility) happens automatically inside its own
  * `onBeforeRender`, so there is no separate `update()` method to call before
  * `renderer.render()`.
  *
- * `setMatrixAt` updates only the moved splat cloud's transform. `addSplat`, `deleteSplat`
- * and `setVisibleAt` change which splat ranges are packed into the shared buffers, so they
- * rebuild the packed layout on the next render. WebGPU sorts the packed set on the GPU;
- * the WebGL2 fallback backend sorts the same packed set on the CPU and uploads the order.
+ * Every change costs only what it touches. `setMatrixAt` and `setVisibleAt` update a
+ * single per-cloud record (hidden clouds stay packed and are simply skipped by the sort).
+ * `addSplat` packs just the new cloud into free space and uploads only that range;
+ * `deleteSplat` frees the cloud's range for reuse. Only when there is no free range large
+ * enough do the shared buffers grow (by doubling) and every cloud gets repacked. Buffers
+ * never shrink on their own - call {@link GaussianSplatGroup#compact} to fit them to the
+ * current contents. WebGPU sorts the packed set on the GPU; the WebGL2 fallback backend
+ * sorts the same packed set on the CPU and uploads the order.
  *
  * The practical ceiling on total live splats is set by the renderer's storage buffer size
  * limit; roughly 8-16M live splats is a portable target for WebGPU hardware.
@@ -132,11 +120,10 @@ class GaussianSplatGroup extends Mesh {
 	 * @param {Object} [options] - Options.
 	 * @param {number} [options.binCount=4096] - The number of depth bins used by the group's {@link CountingSort}. Larger values improve sort accuracy when splats are spread across a large combined depth range, at the cost of a longer (but still single-pass) prefix sum.
 	 * @param {number} [options.workgroupSize=256] - The workgroup size of the compute shaders used for merging and sorting.
-	 * @param {boolean} [options.autoCompact=true] - Whether the group's shared storage buffers are kept sized to exactly fit the current live splat total. When `true`, every add/remove/visibility change that changes the total resizes the buffers, growing or shrinking them to fit. When `false`, the buffers only grow - shrinking the live total never reallocates smaller buffers on its own; call {@link GaussianSplatGroup#compact} to shrink them to fit. Can be changed at any time; a change only takes effect the next time buffer sizes are checked, i.e. the next `addSplat`/`deleteSplat`/`setVisibleAt` (or explicit {@link GaussianSplatGroup#compact} call). Defaults to `false` when `initialSize` is given, since preallocating a fixed size and then having it silently shrink would defeat the point - pass `autoCompact: true` explicitly alongside `initialSize` if that's actually what's wanted.
-	 * @param {number} [options.initialSize] - Preallocates the shared storage buffers to this many splats up front, so the group doesn't reallocate as splat clouds are added until the live total exceeds it. Useful to size a group for its expected peak (e.g. 2,000,000) once, up front. Implies `autoCompact: false` unless `autoCompact` is explicitly passed.
+	 * @param {number} [options.initialSize] - Preallocates the shared storage buffers to this many splats up front, so the group doesn't grow (and repack every cloud) as splat clouds are added until the total exceeds it. Useful to size a group for its expected peak (e.g. 2,000,000) once, up front.
 	 * @param {number} [options.shDegree=2] - Fixed spherical harmonics degree used by the group. Source splats with fewer bands are padded with neutral coefficients; source splats with more bands are truncated to this degree.
 	 */
-	constructor( { binCount = BIN_COUNT, workgroupSize = WORKGROUP_SIZE, autoCompact, initialSize, shDegree = 2 } = {} ) {
+	constructor( { binCount = BIN_COUNT, workgroupSize = WORKGROUP_SIZE, initialSize, shDegree = 2 } = {} ) {
 
 		if ( Number.isInteger( shDegree ) === false || shDegree < 0 || shDegree > 3 ) {
 
@@ -151,10 +138,13 @@ class GaussianSplatGroup extends Mesh {
 		const buffers = createGroupBufferState();
 		buffers.sphericalHarmonicsDegree = shDegree;
 
-		resizeGroupBufferState( buffers, Math.max( 1, initialSize || 1 ), 1, shDegree );
+		resizeGroupBufferState( buffers, Math.max( 1, initialSize || 1 ), 2, shDegree );
 
 		const localCameraPosition = uniform( new Vector3() );
-		const sort = new CountingSort( 0, { binCount, workgroupSize } );
+
+		// One extra bin past `binCount` collects hidden and freed slots so they sort to the
+		// end of the order buffer, past the drawn `instanceCount`.
+		const sort = new CountingSort( buffers.capacity, { binCount: binCount + 1, workgroupSize } );
 		const materialNodes = createMaterialNodes( buffers, sort, localCameraPosition, buffers );
 		const material = createMaterial( materialNodes.vertexNode, materialNodes.fragmentNode );
 
@@ -184,17 +174,6 @@ class GaussianSplatGroup extends Mesh {
 		 * @type {number}
 		 */
 		this.workgroupSize = workgroupSize;
-
-		/**
-		 * Whether the group's shared storage buffers are kept sized to exactly fit the
-		 * current live splat total (see the constructor's `autoCompact` option for the full
-		 * contract). Safe to change at any time; takes effect the next time buffer sizes are
-		 * checked, i.e. the next `addSplat`/`deleteSplat`/`setVisibleAt`/{@link GaussianSplatGroup#compact}.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.autoCompact = autoCompact !== undefined ? autoCompact : ( initialSize === undefined );
 
 		/**
 		 * The bounding box of the merged splats, in this group's local space. Not computed
@@ -228,6 +207,7 @@ class GaussianSplatGroup extends Mesh {
 
 			const centerRecord = this._buffers.centerRead.element( instanceIndex ).toVar( 'centerRecord' );
 			const recordIndex = uint( centerRecord.w.add( 0.5 ) ).toVar( 'recordIndex' );
+			const recordFlag = this._buffers.recordDataRead.element( recordIndex.mul( 4 ).add( 3 ) ).w.toVar( 'recordFlag' );
 			const center = transformCenter( centerRecord.xyz, this._buffers, recordIndex ).toVar( 'center' );
 			const viewCenter = this._sortMatrix.mul( vec4( center, 1 ) ).xyz.toVar( 'viewCenter' );
 			const depth = viewCenter.z.negate().toVar( 'depth' );
@@ -235,15 +215,25 @@ class GaussianSplatGroup extends Mesh {
 			const normalized = depth.sub( this._sortDepthRange.x ).div( range ).clamp( 0, 1 ).toVar( 'normalized' );
 			const depthBin = uint( normalized.mul( this.binCount - 1 ) ).toVar( 'depthBin' );
 
-			return uint( this.binCount - 1 ).sub( depthBin );
+			return select( recordFlag.lessThan( 0.5 ), uint( this.binCount ), uint( this.binCount - 1 ).sub( depthBin ) );
 
 		} );
 
 		this._records = new Map();
 		this._nextId = 0;
 
-		// Set when visible splat ranges or offsets change. Matrix changes only mark the
-		// affected record dirty because other records keep their offsets.
+		// Clouds added but not yet packed into the shared buffers.
+		this._pendingRecords = [];
+
+		// Free slot ranges in the shared buffers, sorted by start and coalesced.
+		this._freeRanges = [ { start: 0, count: buffers.capacity } ];
+		this._freeRecordIndices = [];
+		this._nextRecordIndex = DEAD_RECORD_INDEX + 1;
+
+		// Slot ranges written on the CPU since the last render, uploaded as partial updates.
+		this._dirtySplatRanges = [];
+
+		// Set when pending clouds need packing or the drawn count changed.
 		this._layoutDirty = true;
 
 		this._sortValid = false;
@@ -261,7 +251,8 @@ class GaussianSplatGroup extends Mesh {
 	}
 
 	/**
-	 * Adds a splat cloud to the group.
+	 * Adds a splat cloud to the group. The cloud is packed into the shared buffers on the
+	 * next render (or the next read of {@link GaussianSplatGroup#splatCount}).
 	 *
 	 * @param {BufferGeometry} splatGeometry - The splat geometry to add. Same attribute contract as {@link GaussianSplat}'s constructor.
 	 * @return {number} An id identifying this splat cloud, for use with {@link GaussianSplatGroup#setMatrixAt}/{@link GaussianSplatGroup#setVisibleAt}/{@link GaussianSplatGroup#deleteSplat}.
@@ -276,8 +267,10 @@ class GaussianSplatGroup extends Mesh {
 		if ( splatGeometry.boundingSphere === null ) splatGeometry.computeBoundingSphere();
 
 		const id = this._nextId ++;
+		const record = new SplatRecord( id, splatGeometry, count, sphericalHarmonicsDegree );
 
-		this._records.set( id, new SplatRecord( id, splatGeometry, count, sphericalHarmonicsDegree ) );
+		this._records.set( id, record );
+		this._pendingRecords.push( record );
 
 		this._layoutDirty = true;
 		this._boundsDirty = true;
@@ -287,7 +280,9 @@ class GaussianSplatGroup extends Mesh {
 	}
 
 	/**
-	 * Removes a splat cloud from the group, freeing its GPU buffers.
+	 * Removes a splat cloud from the group. Its slot range in the shared buffers is freed
+	 * for reuse by later {@link GaussianSplatGroup#addSplat} calls; the buffers themselves
+	 * keep their size until {@link GaussianSplatGroup#compact} is called.
 	 *
 	 * @param {number} id - The id returned by {@link GaussianSplatGroup#addSplat}.
 	 */
@@ -298,6 +293,16 @@ class GaussianSplatGroup extends Mesh {
 		if ( record === undefined ) return;
 
 		this._records.delete( id );
+
+		if ( record.offset >= 0 ) {
+
+			this._releaseRecord( record );
+
+		} else {
+
+			this._pendingRecords.splice( this._pendingRecords.indexOf( record ), 1 );
+
+		}
 
 		this._layoutDirty = true;
 		this._boundsDirty = true;
@@ -314,12 +319,13 @@ class GaussianSplatGroup extends Mesh {
 
 		const record = this._getRecord( id );
 
-		if ( record.setMatrix( matrix ) === true ) {
+		if ( record.matrix.equals( matrix ) ) return;
 
-			this._sortValid = false;
-			this._boundsDirty = true;
+		record.matrix.copy( matrix );
+		record.dataDirty = true;
 
-		}
+		this._sortValid = false;
+		this._boundsDirty = true;
 
 	}
 
@@ -337,9 +343,8 @@ class GaussianSplatGroup extends Mesh {
 	}
 
 	/**
-	 * Sets whether a splat cloud is drawn. Unlike {@link GaussianSplatGroup#setMatrixAt},
-	 * this changes which splat ranges are packed into the shared buffers, so it triggers a
-	 * full layout rebuild on the next render.
+	 * Sets whether a splat cloud is drawn. Hidden clouds stay packed in the shared buffers,
+	 * so toggling visibility only updates the cloud's record and re-sorts.
 	 *
 	 * @param {number} id - The id returned by {@link GaussianSplatGroup#addSplat}.
 	 * @param {boolean} visible - Whether to draw this splat cloud.
@@ -351,6 +356,8 @@ class GaussianSplatGroup extends Mesh {
 		if ( record.visible === visible ) return;
 
 		record.visible = visible;
+		record.dataDirty = true;
+
 		this._layoutDirty = true;
 		this._boundsDirty = true;
 
@@ -369,10 +376,9 @@ class GaussianSplatGroup extends Mesh {
 	}
 
 	/**
-	 * The number of splats the group's shared storage buffers currently have room for.
-	 * Always `>=` {@link GaussianSplatGroup#splatCount}; the two are equal exactly when the
-	 * buffers are compact - always true while {@link GaussianSplatGroup#autoCompact} is
-	 * `true`, and after an explicit {@link GaussianSplatGroup#compact} call otherwise.
+	 * The number of splat slots the group's shared storage buffers currently have room for.
+	 * Grows by doubling as clouds are added and never shrinks on its own; see
+	 * {@link GaussianSplatGroup#compact}.
 	 *
 	 * @type {number}
 	 * @readonly
@@ -384,53 +390,47 @@ class GaussianSplatGroup extends Mesh {
 	}
 
 	/**
-	 * The number of live (added and visible) splats currently packed into
-	 * the group's shared buffers. Not to be confused with the inherited {@link Mesh#count}
-	 * draw-call instance count, which this class manages internally.
+	 * The number of splats currently drawn, i.e. the total of every visible cloud. Not to be
+	 * confused with the inherited {@link Mesh#count} draw-call instance count, which this
+	 * class manages internally.
 	 *
 	 * @type {number}
 	 * @readonly
 	 */
 	get splatCount() {
 
-		if ( this._layoutDirty === true ) this._rebuildLayout();
+		this._syncLayout();
 
 		return this._splatCount;
 
 	}
 
 	/**
-	 * Shrinks the group's shared storage buffers to exactly fit the current live splat
-	 * total, freeing any slack accumulated while {@link GaussianSplatGroup#autoCompact} was
-	 * `false` (grow-only mode) or while the group was preallocated via the constructor's
-	 * `initialSize` option. A no-op if the buffers already fit exactly. Not needed when
-	 * `autoCompact` is `true`, since buffers are already kept sized to fit.
+	 * Repacks every cloud (visible or not) contiguously and shrinks the shared storage
+	 * buffers to exactly fit them, freeing slack left by deleted clouds and by growth. A
+	 * no-op if the buffers already fit exactly.
 	 */
 	compact() {
 
-		if ( this._layoutDirty === true ) this._rebuildLayout();
+		this._syncLayout();
 
-		const target = Math.max( 1, this._splatCount );
-		let recordTarget = 0;
+		let total = 0;
 
-		for ( const record of this._records.values() ) {
+		for ( const record of this._records.values() ) total += record.count;
 
-			if ( record.visible === true ) recordTarget ++;
+		const target = Math.max( 1, total );
 
-		}
+		if ( target === this._buffers.capacity ) return;
 
-		recordTarget = Math.max( 1, recordTarget );
-
-		if ( target === this._buffers.capacity && recordTarget === this._buffers.recordCapacity ) return;
-
-		this._resizeBuffers( target, recordTarget, this._maxSphericalHarmonicsDegree );
-		this._layoutDirty = true;
+		this._repackAll( target );
+		this._updateCounts();
 
 	}
 
 	/**
-	 * Updates record transforms, re-sorts the packed set when needed, and updates draw state.
-	 * Called automatically by the renderer - there is no need to call this directly.
+	 * Packs pending clouds, updates record transforms, re-sorts the packed set when needed,
+	 * and updates draw state. Called automatically by the renderer - there is no need to
+	 * call this directly.
 	 *
 	 * @param {Renderer} renderer - The renderer.
 	 * @param {Object3D} scene - The scene.
@@ -438,7 +438,8 @@ class GaussianSplatGroup extends Mesh {
 	 */
 	onBeforeRender( renderer, scene, camera ) {
 
-		if ( this._layoutDirty === true ) this._rebuildLayout();
+		this._syncLayout();
+		this._flushSplatUploads();
 
 		// Keep Object3D.visible user-controlled; an empty group draws zero instances.
 		if ( this._splatCount === 0 ) return;
@@ -453,7 +454,7 @@ class GaussianSplatGroup extends Mesh {
 		}
 
 		this.updateWorldMatrix( true, false );
-		const recordsUpdated = this._updateRecordMatrices();
+		const recordsUpdated = this._updateRecordData();
 		this._updateLocalCameraPositions( camera, recordsUpdated );
 
 		// Refresh the current view direction before recording it after a sort.
@@ -487,7 +488,7 @@ class GaussianSplatGroup extends Mesh {
 	 */
 	computeBoundingBox() {
 
-		if ( this._layoutDirty === true ) this._rebuildLayout();
+		this._syncLayout();
 
 		if ( this.boundingBox === null ) this.boundingBox = new Box3();
 
@@ -540,7 +541,7 @@ class GaussianSplatGroup extends Mesh {
 	 */
 	raycast( raycaster, intersects ) {
 
-		if ( this._layoutDirty === true ) this._rebuildLayout();
+		this._syncLayout();
 
 		for ( const record of this._records.values() ) {
 
@@ -585,6 +586,7 @@ class GaussianSplatGroup extends Mesh {
 		this._sort.dispose();
 
 		this._records.clear();
+		this._pendingRecords.length = 0;
 
 		this.geometry.dispose();
 		this.material.dispose();
@@ -601,83 +603,224 @@ class GaussianSplatGroup extends Mesh {
 
 	}
 
-	_rebuildLayout() {
+	_syncLayout() {
+
+		if ( this._layoutDirty === false ) return;
 
 		this._layoutDirty = false;
 
-		let total = 0;
-		const visibleRecords = [];
-
-		for ( const record of this._records.values() ) {
-
-			if ( record.visible === true ) {
-
-				total += record.count;
-				visibleRecords.push( record );
-
-			}
-
-		}
-
-		this._splatCount = total;
-		this._sort.count = total;
-
-		const requiredCapacity = Math.max( 1, total );
-		const requiredRecordCapacity = Math.max( 1, visibleRecords.length );
-
-		// autoCompact controls whether capacity shrinks automatically or only via compact().
-		if ( this.autoCompact === true ?
-			requiredCapacity !== this._buffers.capacity || requiredRecordCapacity !== this._buffers.recordCapacity :
-			requiredCapacity > this._buffers.capacity || requiredRecordCapacity > this._buffers.recordCapacity ) {
-
-			this._resizeBuffers( requiredCapacity, requiredRecordCapacity, this._maxSphericalHarmonicsDegree );
-
-		}
-
-		let offset = 0;
-		let recordIndex = 0;
-
-		for ( const record of visibleRecords ) {
-
-			record.setOffset( offset );
-			record.setRecordIndex( recordIndex );
-			this._packRecord( record );
-
-			offset += record.count;
-			recordIndex ++;
-
-		}
-
-		updateStorageAttribute( this._buffers.centerAttribute );
-		updateStorageAttribute( this._buffers.covarianceAttribute );
-		updateStorageAttribute( this._buffers.colorAttribute );
-
-		for ( let degree = 1; degree <= this._maxSphericalHarmonicsDegree; degree ++ ) {
-
-			updateStorageAttribute( this._buffers[ `sphericalHarmonics${ degree }Attribute` ] );
-
-		}
-
-		this.geometry.instanceCount = total;
-
-		this._boundsDirty = true;
-		this._sortValid = false;
+		this._packPending();
+		this._updateCounts();
 
 	}
 
-	// Shared buffers are derived from the source splat clouds, so resizing invalidates
-	// every visible record's packed data.
-	_resizeBuffers( capacity, recordCapacity, sphericalHarmonicsDegree ) {
+	// Packs each pending cloud into the first free range that fits, uploading only that
+	// range. Runs out of room (or too fragmented) -> grow and repack everything.
+	_packPending() {
 
-		resizeGroupBufferState( this._buffers, capacity, recordCapacity, sphericalHarmonicsDegree );
+		const pending = this._pendingRecords;
+
+		for ( let i = 0; i < pending.length; i ++ ) {
+
+			const record = pending[ i ];
+			const offset = this._allocateRange( record.count );
+
+			if ( offset === - 1 ) {
+
+				let total = 0;
+
+				for ( const record of this._records.values() ) total += record.count;
+
+				// Doubling keeps the full repack rare. `_repackAll` places every cloud, including
+				// the ones placed earlier in this loop and the rest of the pending list.
+				this._repackAll( Math.max( total, this._buffers.capacity * 2 ) );
+
+				return;
+
+			}
+
+			record.offset = offset;
+			record.recordIndex = this._allocateRecordIndex();
+			record.dataDirty = true;
+
+			this._packRecord( record );
+			this._dirtySplatRanges.push( { start: offset, count: record.count } );
+
+		}
+
+		pending.length = 0;
+
+	}
+
+	_updateCounts() {
+
+		let visible = 0;
 
 		for ( const record of this._records.values() ) {
 
-			if ( record.visible === false ) continue;
-
-			record.matrixDirty = true;
+			if ( record.visible === true ) visible += record.count;
 
 		}
+
+		this._splatCount = visible;
+		this.geometry.instanceCount = visible;
+
+		this._sortValid = false;
+		this._boundsDirty = true;
+
+	}
+
+	_allocateRange( count ) {
+
+		const ranges = this._freeRanges;
+
+		// ponytail: first-fit linear scan; a size-ordered structure if free lists get long.
+		for ( let i = 0; i < ranges.length; i ++ ) {
+
+			const range = ranges[ i ];
+
+			if ( range.count < count ) continue;
+
+			const start = range.start;
+
+			range.start += count;
+			range.count -= count;
+
+			if ( range.count === 0 ) ranges.splice( i, 1 );
+
+			return start;
+
+		}
+
+		return - 1;
+
+	}
+
+	_freeRange( start, count ) {
+
+		const ranges = this._freeRanges;
+		let i = 0;
+
+		while ( i < ranges.length && ranges[ i ].start < start ) i ++;
+
+		ranges.splice( i, 0, { start, count } );
+
+		// Coalesce with the following range, then the preceding one.
+		if ( i + 1 < ranges.length && ranges[ i ].start + ranges[ i ].count === ranges[ i + 1 ].start ) {
+
+			ranges[ i ].count += ranges[ i + 1 ].count;
+			ranges.splice( i + 1, 1 );
+
+		}
+
+		if ( i > 0 && ranges[ i - 1 ].start + ranges[ i - 1 ].count === start ) {
+
+			ranges[ i - 1 ].count += ranges[ i ].count;
+			ranges.splice( i, 1 );
+
+		}
+
+	}
+
+	_allocateRecordIndex() {
+
+		if ( this._freeRecordIndices.length > 0 ) return this._freeRecordIndices.pop();
+
+		if ( this._nextRecordIndex >= this._buffers.recordCapacity ) {
+
+			// The record buffer is tiny (64 bytes per cloud); growing it just rewrites every record.
+			resizeRecordData( this._buffers, this._buffers.recordCapacity * 2 );
+
+			for ( const record of this._records.values() ) record.dataDirty = true;
+
+		}
+
+		return this._nextRecordIndex ++;
+
+	}
+
+	// Frees a packed cloud's slot range. The freed slots are pointed at the reserved dead
+	// record so the sort skips them until they are reused.
+	_releaseRecord( record ) {
+
+		const centers = this._buffers.centerAttribute.array;
+
+		for ( let i = 0; i < record.count; i ++ ) {
+
+			centers[ ( record.offset + i ) * 4 + 3 ] = DEAD_RECORD_INDEX;
+
+		}
+
+		this._dirtySplatRanges.push( { start: record.offset, count: record.count } );
+		this._freeRange( record.offset, record.count );
+		this._freeRecordIndices.push( record.recordIndex );
+
+		record.offset = - 1;
+		record.recordIndex = - 1;
+
+	}
+
+	// Reallocates the shared buffers to `capacity` slots and packs every cloud contiguously.
+	_repackAll( capacity ) {
+
+		resizeGroupBufferState( this._buffers, capacity, Math.max( this._buffers.recordCapacity, this._records.size + 1 ), this._maxSphericalHarmonicsDegree );
+		this._sort.count = capacity;
+
+		let offset = 0;
+		let recordIndex = DEAD_RECORD_INDEX + 1;
+
+		for ( const record of this._records.values() ) {
+
+			record.offset = offset;
+			record.recordIndex = recordIndex ++;
+			record.dataDirty = true;
+
+			this._packRecord( record );
+
+			offset += record.count;
+
+		}
+
+		this._pendingRecords.length = 0;
+		this._freeRanges = offset < capacity ? [ { start: offset, count: capacity - offset } ] : [];
+		this._freeRecordIndices.length = 0;
+		this._nextRecordIndex = recordIndex;
+
+		// The renderer uploads the newly created attributes in full, so pending partial
+		// ranges (which referred to the old buffers) are dropped.
+		this._dirtySplatRanges.length = 0;
+
+	}
+
+	// Uploads only the slot ranges written since the last render.
+	_flushSplatUploads() {
+
+		const ranges = this._dirtySplatRanges;
+
+		if ( ranges.length === 0 ) return;
+
+		const buffers = this._buffers;
+		const targets = [
+			[ buffers.centerAttribute, 4 ],
+			[ buffers.covarianceAttribute, 8 ],
+			[ buffers.colorAttribute, 1 ]
+		];
+
+		for ( let degree = 1; degree <= this._maxSphericalHarmonicsDegree; degree ++ ) {
+
+			targets.push( [ buffers[ `sphericalHarmonics${ degree }Attribute` ], SH_BAND_WORDS[ degree ] ] );
+
+		}
+
+		for ( const [ attribute, stride ] of targets ) {
+
+			for ( const range of ranges ) attribute.addUpdateRange( range.start * stride, range.count * stride );
+
+			updateStorageAttribute( attribute );
+
+		}
+
+		ranges.length = 0;
 
 	}
 
@@ -743,20 +886,22 @@ class GaussianSplatGroup extends Mesh {
 
 	}
 
-	_updateRecordMatrices() {
+	// Writes each dirty record's matrix rows and visible flag into the record data buffer.
+	_updateRecordData() {
 
 		const recordData = this._buffers.recordDataAttribute.array;
 		let updated = false;
 
 		for ( const record of this._records.values() ) {
 
-			if ( record.visible === false || record.matrixDirty === false ) continue;
+			if ( record.offset < 0 || record.dataDirty === false ) continue;
 
 			const offset = record.recordIndex * 16;
 
 			writeMatrixRows( recordData, offset, record.matrix );
+			recordData[ offset + 15 ] = record.visible === true ? 1 : 0;
 
-			record.matrixDirty = false;
+			record.dataDirty = false;
 			updated = true;
 
 		}
@@ -798,7 +943,6 @@ class GaussianSplatGroup extends Mesh {
 			recordData[ offset ] = _cameraPositionInRecord.x;
 			recordData[ offset + 1 ] = _cameraPositionInRecord.y;
 			recordData[ offset + 2 ] = _cameraPositionInRecord.z;
-			recordData[ offset + 3 ] = 0;
 
 		}
 
@@ -806,23 +950,6 @@ class GaussianSplatGroup extends Mesh {
 		this._lastSHCameraMatrix.copy( camera.matrixWorld );
 		this._lastSHGroupWorldMatrix.copy( this.matrixWorld );
 		this._sphericalHarmonicsInitialized = true;
-
-	}
-
-	_rebuildMaterial( total ) {
-
-		const materialNodes = createMaterialNodes( this._buffers, this._sort, this._localCameraPosition, this._buffers );
-
-		const oldGeometry = this.geometry;
-		const oldMaterial = this.material;
-
-		this.geometry = createGeometry( total );
-		this.material = createMaterial( materialNodes.vertexNode, materialNodes.fragmentNode );
-
-		oldGeometry.dispose();
-		oldMaterial.dispose();
-
-		this._sortValid = false;
 
 	}
 
@@ -855,6 +982,10 @@ class GaussianSplatGroup extends Mesh {
 
 			const i4 = i * 4;
 			const record16 = Math.round( centers[ i4 + 3 ] ) * 16;
+
+			// Hidden or freed slots go to the discard bin, past the drawn range.
+			if ( recordData[ record16 + 15 ] < 0.5 ) return this.binCount;
+
 			const x = centers[ i4 ];
 			const y = centers[ i4 + 1 ];
 			const z = centers[ i4 + 2 ];
@@ -1024,22 +1155,20 @@ function resizeGroupBufferState( state, capacity, recordCapacity, sphericalHarmo
 	const oldCenterAttribute = state.centerAttribute;
 	const oldCovarianceAttribute = state.covarianceAttribute;
 	const oldColorAttribute = state.colorAttribute;
-	const oldRecordDataAttribute = state.recordDataAttribute;
 
 	state.centerAttribute = new StorageBufferAttribute( new Float32Array( capacity * 4 ), 4 );
 	state.covarianceAttribute = new StorageBufferAttribute( new Float32Array( capacity * 8 ), 4 );
 	state.colorAttribute = new StorageBufferAttribute( new Uint32Array( capacity ), 1 );
-	state.recordDataAttribute = new StorageBufferAttribute( new Float32Array( recordCapacity * 16 ), 4 );
 
 	retargetPBOAttribute( oldCenterAttribute, state.centerAttribute );
 	retargetPBOAttribute( oldCovarianceAttribute, state.covarianceAttribute );
 	retargetPBOAttribute( oldColorAttribute, state.colorAttribute );
-	retargetPBOAttribute( oldRecordDataAttribute, state.recordDataAttribute );
 
 	state.centerRead.value = state.centerAttribute;
 	state.covarianceRead.value = state.covarianceAttribute;
 	state.colorRead.value = state.colorAttribute;
-	state.recordDataRead.value = state.recordDataAttribute;
+
+	resizeRecordData( state, recordCapacity );
 
 	for ( let degree = 1; degree <= 3; degree ++ ) {
 
@@ -1075,14 +1204,27 @@ function resizeGroupBufferState( state, capacity, recordCapacity, sphericalHarmo
 	}
 
 	state.capacity = capacity;
-	state.recordCapacity = recordCapacity;
 	state.sphericalHarmonicsDegree = sphericalHarmonicsDegree;
-	state.webGLBuffersEnabled = false;
 
 	oldCenterAttribute.dispose();
 	oldCovarianceAttribute.dispose();
 	oldColorAttribute.dispose();
-	oldRecordDataAttribute.dispose();
+
+}
+
+// Resizes only the per-record transform/flag buffer (16 floats per record; slot 0 is the
+// reserved dead record). Contents are not preserved - callers mark every record dirty.
+function resizeRecordData( state, recordCapacity ) {
+
+	const oldAttribute = state.recordDataAttribute;
+
+	state.recordDataAttribute = new StorageBufferAttribute( new Float32Array( recordCapacity * 16 ), 4 );
+	retargetPBOAttribute( oldAttribute, state.recordDataAttribute );
+	state.recordDataRead.value = state.recordDataAttribute;
+	state.recordCapacity = recordCapacity;
+	state.webGLBuffersEnabled = false;
+
+	oldAttribute.dispose();
 
 }
 
