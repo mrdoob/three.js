@@ -354,13 +354,12 @@ class MaterialXNode {
 
 				if ( imageData.isTexture ) {
 
-					// Keep the texture subtype and upload settings while sharing the node
-					// with every sample compiled before the resource finishes loading.
+					// Clone so the wrapping and orientation set below don't modify the handler's texture.
 					textureNode.value = imageData.clone();
 					textureNode.value.wrapS = TEXTURE_ADDRESS_MODE_WRAPPING[ addressModes.u ];
 					textureNode.value.wrapT = TEXTURE_ADDRESS_MODE_WRAPPING[ addressModes.v ];
 
-					// MaterialX samples textures top-first. Loaders such as EXRLoader store rows
+					// MaterialXLoader keeps textures top-first. Loaders such as EXRLoader store rows
 					// bottom-first (flipY = false), so invert the loader's orientation to match.
 					// flipY has no meaning for compressed textures.
 					if ( imageData.isCompressedTexture !== true ) textureNode.value.flipY = ! imageData.flipY;
