@@ -1,4 +1,4 @@
-import { Color, DataTexture, Matrix4, PerspectiveCamera, RenderTarget, Scene } from 'three';
+import { Color, DataTexture, Frustum, Matrix4, PerspectiveCamera, RenderTarget, Scene } from 'three';
 import { createGaussianSplatGeometry } from '../../../../examples/jsm/utils/GaussianSplatUtils.js';
 import { getSharedRenderer } from '../tsl/gpu-test-utils.js';
 import { GaussianSplatGroup } from '../../../../examples/jsm/objects/GaussianSplatGroup.js';
@@ -58,6 +58,42 @@ export default QUnit.module( 'Addons', () => {
 	QUnit.module( 'Objects', () => {
 
 		QUnit.module( 'GaussianSplatGroup', () => {
+
+			QUnit.test( 'frustum culling refreshes bounds after cloud changes', ( assert ) => {
+
+				const group = new GaussianSplatGroup( { shDegree: 0 } );
+				const geometry = createTestSplatGeometry( 1 );
+				const camera = new PerspectiveCamera( 60, 1, 0.1, 1000 );
+				const frustum = new Frustum().setFromProjectionMatrix( camera.projectionMatrix );
+				const outside = new Matrix4().makeTranslation( 100, 0, - 10 );
+				const inside = new Matrix4().makeTranslation( 0, 0, - 10 );
+				const a = group.addSplat( geometry );
+
+				group.setMatrixAt( a, outside );
+				assert.false( group.intersectsFrustum( frustum ), 'initial cloud is outside the frustum' );
+
+				group.setMatrixAt( a, inside );
+				assert.true( group.intersectsFrustum( frustum ), 'moving into view refreshes bounds before rendering' );
+
+				group.setMatrixAt( a, outside );
+				assert.false( group.intersectsFrustum( frustum ), 'moving out of view refreshes bounds' );
+
+				const b = group.addSplat( geometry );
+				group.setMatrixAt( b, inside );
+				assert.true( group.intersectsFrustum( frustum ), 'adding a cloud in view expands the bounds' );
+
+				group.setVisibleAt( b, false );
+				assert.false( group.intersectsFrustum( frustum ), 'hiding the visible cloud shrinks the bounds' );
+				group.setVisibleAt( b, true );
+				assert.true( group.intersectsFrustum( frustum ), 'showing the cloud restores the bounds' );
+
+				group.deleteSplat( b );
+				assert.false( group.intersectsFrustum( frustum ), 'deleting the visible cloud shrinks the bounds' );
+
+				group.dispose();
+				geometry.dispose();
+
+			} );
 
 			for ( const backend of [ 'webgl', 'webgpu' ] ) {
 

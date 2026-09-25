@@ -478,6 +478,20 @@ class GaussianSplatGroup extends Mesh {
 	}
 
 	/**
+	 * Tests the current bounds against the camera frustum.
+	 *
+	 * @param {Frustum} frustum - The camera frustum.
+	 * @return {boolean} Whether the group intersects the frustum.
+	 */
+	intersectsFrustum( frustum ) {
+
+		if ( this.boundingSphere === null || this._boundsDirty === true ) this.computeBoundingSphere();
+
+		return super.intersectsFrustum( frustum );
+
+	}
+
+	/**
 	 * Computes the bounding box of the merged splats, in this group's local space,
 	 * as the union of each visible splat cloud's own geometry bounding box transformed
 	 * by that cloud's {@link GaussianSplatGroup#setMatrixAt} transform.
