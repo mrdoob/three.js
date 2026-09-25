@@ -34,32 +34,13 @@ const bicubicWeights = ( a ) => {
 
 };
 
-const bicubic = ( textureNode, texelSize, lod ) => {
+const bicubic = ( textureNode, p0, p3, g0, g1, lod ) => {
 
-	const uv = textureNode.uvNode;
-	const uvScaled = mul( uv, texelSize.zw ).add( 0.5 );
+	const p1 = vec2( p3.x, p0.y );
+	const p2 = vec2( p0.x, p3.y );
 
-	const iuv = floor( uvScaled );
-	const fuv = fract( uvScaled );
-
-	const { g0, g1, h0, h1 } = bicubicWeights( fuv );
-
-	const g0x = g0.x;
-	const g1x = g1.x;
-	const g0y = g0.y;
-	const g1y = g1.y;
-	const h0x = h0.x;
-	const h1x = h1.x;
-	const h0y = h0.y;
-	const h1y = h1.y;
-
-	const p0 = vec2( iuv.x.add( h0x ), iuv.y.add( h0y ) ).sub( 0.5 ).mul( texelSize.xy );
-	const p1 = vec2( iuv.x.add( h1x ), iuv.y.add( h0y ) ).sub( 0.5 ).mul( texelSize.xy );
-	const p2 = vec2( iuv.x.add( h0x ), iuv.y.add( h1y ) ).sub( 0.5 ).mul( texelSize.xy );
-	const p3 = vec2( iuv.x.add( h1x ), iuv.y.add( h1y ) ).sub( 0.5 ).mul( texelSize.xy );
-
-	const a = g0y.mul( add( g0x.mul( textureNode.sample( p0 ).level( lod ) ), g1x.mul( textureNode.sample( p1 ).level( lod ) ) ) );
-	const b = g1y.mul( add( g0x.mul( textureNode.sample( p2 ).level( lod ) ), g1x.mul( textureNode.sample( p3 ).level( lod ) ) ) );
+	const a = g0.y.mul( add( g0.x.mul( textureNode.sample( p0 ).level( lod ) ), g1.x.mul( textureNode.sample( p1 ).level( lod ) ) ) );
+	const b = g1.y.mul( add( g0.x.mul( textureNode.sample( p2 ).level( lod ) ), g1.x.mul( textureNode.sample( p3 ).level( lod ) ) ) );
 
 	return a.add( b );
 
@@ -78,10 +59,19 @@ export const textureBicubicLevel = /*@__PURE__*/ Fn( ( [ textureNode, lodNode ] 
 
 	const fLodSize = vec2( textureNode.size( int( lodNode ) ) );
 	const cLodSize = vec2( textureNode.size( int( lodNode.add( 1.0 ) ) ) );
-	const fLodSizeInv = div( 1.0, fLodSize );
-	const cLodSizeInv = div( 1.0, cLodSize );
-	const fSample = bicubic( textureNode, vec4( fLodSizeInv, fLodSize ), floor( lodNode ) );
-	const cSample = bicubic( textureNode, vec4( cLodSizeInv, cLodSize ), ceil( lodNode ) );
+	const lodSize = vec4( fLodSize, cLodSize );
+	const lodSizeInv = div( 1.0, lodSize );
+	const uvScaled = textureNode.uvNode.xyxy.mul( lodSize ).add( 0.5 );
+	const iuv = floor( uvScaled );
+	const fuv = fract( uvScaled );
+
+	const { g0, g1, h0, h1 } = bicubicWeights( fuv );
+
+	const p0 = iuv.add( h0 ).sub( 0.5 ).mul( lodSizeInv );
+	const p3 = iuv.add( h1 ).sub( 0.5 ).mul( lodSizeInv );
+
+	const fSample = bicubic( textureNode, p0.xy, p3.xy, g0.xy, g1.xy, floor( lodNode ) );
+	const cSample = bicubic( textureNode, p0.zw, p3.zw, g0.zw, g1.zw, ceil( lodNode ) );
 
 	return fract( lodNode ).mix( fSample, cSample );
 
