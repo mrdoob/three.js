@@ -16,14 +16,23 @@ const w2 = ( a ) => mul( bC, mul( a, mul( a, mul( - 3.0, a ).add( 3.0 ) ).add( 3
 
 const w3 = ( a ) => mul( bC, pow( a, 3 ) );
 
-const g0 = ( a ) => w0( a ).add( w1( a ) );
+const bicubicWeights = ( a ) => {
 
-const g1 = ( a ) => w2( a ).add( w3( a ) );
+	const w0a = w0( a );
+	const w1a = w1( a );
+	const w2a = w2( a );
+	const w3a = w3( a );
 
-// h0 and h1 are the two offset functions
-const h0 = ( a ) => add( - 1.0, w1( a ).div( w0( a ).add( w1( a ) ) ) );
+	const g0a = w0a.add( w1a );
+	const g1a = w2a.add( w3a );
 
-const h1 = ( a ) => add( 1.0, w3( a ).div( w2( a ).add( w3( a ) ) ) );
+	// h0 and h1 are the two offset functions.
+	const h0a = add( - 1.0, w1a.div( g0a ) );
+	const h1a = add( 1.0, w3a.div( g1a ) );
+
+	return { g0: g0a, g1: g1a, h0: h0a, h1: h1a };
+
+};
 
 const bicubic = ( textureNode, texelSize, lod ) => {
 
@@ -33,20 +42,24 @@ const bicubic = ( textureNode, texelSize, lod ) => {
 	const iuv = floor( uvScaled );
 	const fuv = fract( uvScaled );
 
-	const g0x = g0( fuv.x );
-	const g1x = g1( fuv.x );
-	const h0x = h0( fuv.x );
-	const h1x = h1( fuv.x );
-	const h0y = h0( fuv.y );
-	const h1y = h1( fuv.y );
+	const { g0, g1, h0, h1 } = bicubicWeights( fuv );
+
+	const g0x = g0.x;
+	const g1x = g1.x;
+	const g0y = g0.y;
+	const g1y = g1.y;
+	const h0x = h0.x;
+	const h1x = h1.x;
+	const h0y = h0.y;
+	const h1y = h1.y;
 
 	const p0 = vec2( iuv.x.add( h0x ), iuv.y.add( h0y ) ).sub( 0.5 ).mul( texelSize.xy );
 	const p1 = vec2( iuv.x.add( h1x ), iuv.y.add( h0y ) ).sub( 0.5 ).mul( texelSize.xy );
 	const p2 = vec2( iuv.x.add( h0x ), iuv.y.add( h1y ) ).sub( 0.5 ).mul( texelSize.xy );
 	const p3 = vec2( iuv.x.add( h1x ), iuv.y.add( h1y ) ).sub( 0.5 ).mul( texelSize.xy );
 
-	const a = g0( fuv.y ).mul( add( g0x.mul( textureNode.sample( p0 ).level( lod ) ), g1x.mul( textureNode.sample( p1 ).level( lod ) ) ) );
-	const b = g1( fuv.y ).mul( add( g0x.mul( textureNode.sample( p2 ).level( lod ) ), g1x.mul( textureNode.sample( p3 ).level( lod ) ) ) );
+	const a = g0y.mul( add( g0x.mul( textureNode.sample( p0 ).level( lod ) ), g1x.mul( textureNode.sample( p1 ).level( lod ) ) ) );
+	const b = g1y.mul( add( g0x.mul( textureNode.sample( p2 ).level( lod ) ), g1x.mul( textureNode.sample( p3 ).level( lod ) ) ) );
 
 	return a.add( b );
 
