@@ -12,6 +12,7 @@ import {
 	Euler,
 	Group,
 	LoaderUtils,
+	LinearSRGBColorSpace,
 	Matrix4,
 	Mesh,
 	MeshPhysicalMaterial,
@@ -1330,7 +1331,7 @@ class USDComposer {
 
 				if ( mat.color && mat.color.r === 1 && mat.color.g === 1 && mat.color.b === 1 && ! mat.map ) {
 
-					mat.color.setRGB( displayColor[ 0 ], displayColor[ 1 ], displayColor[ 2 ], SRGBColorSpace );
+					mat.color.setRGB( displayColor[ 0 ], displayColor[ 1 ], displayColor[ 2 ], LinearSRGBColorSpace );
 
 				}
 
@@ -3107,7 +3108,7 @@ class USDComposer {
 
 				if ( Array.isArray( color ) && color.length >= 3 ) {
 
-					material.color.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
+					material.color.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], LinearSRGBColorSpace );
 
 				}
 
@@ -3120,7 +3121,7 @@ class USDComposer {
 			const scale = material.map.userData.scale;
 			if ( Array.isArray( scale ) && scale.length >= 3 ) {
 
-				material.color.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], SRGBColorSpace );
+				material.color.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], LinearSRGBColorSpace );
 
 			}
 
@@ -3135,7 +3136,7 @@ class USDComposer {
 
 				if ( Array.isArray( color ) && color.length >= 3 ) {
 
-					material.emissive.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
+					material.emissive.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], LinearSRGBColorSpace );
 
 				}
 
@@ -3149,7 +3150,7 @@ class USDComposer {
 				const scale = material.emissiveMap.userData.scale;
 				if ( Array.isArray( scale ) && scale.length >= 3 ) {
 
-					material.emissive.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], SRGBColorSpace );
+					material.emissive.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], LinearSRGBColorSpace );
 
 				}
 
@@ -3228,7 +3229,7 @@ class USDComposer {
 
 				if ( Array.isArray( color ) && color.length >= 3 ) {
 
-					material.specularColor.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
+					material.specularColor.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], LinearSRGBColorSpace );
 
 				}
 
@@ -3241,7 +3242,7 @@ class USDComposer {
 			const scale = material.specularColorMap.userData.scale;
 			if ( Array.isArray( scale ) && scale.length >= 3 ) {
 
-				material.specularColor.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], SRGBColorSpace );
+				material.specularColor.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], LinearSRGBColorSpace );
 
 			}
 
@@ -3322,7 +3323,7 @@ class USDComposer {
 
 				if ( Array.isArray( color ) && color.length >= 3 ) {
 
-					material.color.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
+					material.color.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], LinearSRGBColorSpace );
 
 				}
 
@@ -3335,7 +3336,7 @@ class USDComposer {
 			const scale = material.map.userData.scale;
 			if ( Array.isArray( scale ) && scale.length >= 3 ) {
 
-				material.color.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], SRGBColorSpace );
+				material.color.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], LinearSRGBColorSpace );
 
 			}
 
@@ -3382,7 +3383,7 @@ class USDComposer {
 
 				if ( Array.isArray( color ) && color.length >= 3 ) {
 
-					material.emissive.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
+					material.emissive.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], LinearSRGBColorSpace );
 
 				}
 
@@ -3426,7 +3427,7 @@ class USDComposer {
 
 			if ( transmissionColor !== undefined && Array.isArray( transmissionColor ) ) {
 
-				material.attenuationColor.setRGB( transmissionColor[ 0 ], transmissionColor[ 1 ], transmissionColor[ 2 ] );
+				material.attenuationColor.setRGB( transmissionColor[ 0 ], transmissionColor[ 1 ], transmissionColor[ 2 ], LinearSRGBColorSpace );
 				material.attenuationDistance = transmissionDepth || 1.0;
 
 			}
@@ -3509,7 +3510,7 @@ class USDComposer {
 
 		if ( specularColor !== undefined && Array.isArray( specularColor ) ) {
 
-			material.specularColor.setRGB( specularColor[ 0 ], specularColor[ 1 ], specularColor[ 2 ] );
+			material.specularColor.setRGB( specularColor[ 0 ], specularColor[ 1 ], specularColor[ 2 ], LinearSRGBColorSpace );
 
 		}
 
