@@ -49,6 +49,7 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+			import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			import * as MikkTSpace from 'three/addons/libs/mikktspace.module.js';
@@ -100,6 +101,7 @@
 				'standard_surface_ior_test.mtlx',
 				'standard_surface_combined_test.mtlx',
 				'standard_surface_texture_opacity_test.mtlx',
+				'standard_surface_image_exr_test.mtlx',
 				'standard_surface_transmission_test.mtlx',
 				'standard_surface_transmission_only_test.mtlx',
 				'standard_surface_transmission_rough.mtlx',
@@ -117,6 +119,9 @@
 			let controls, prefab;
 			const models = [];
 			const strictInterfaceValidator = createStrictInterfaceValidator();
+
+			// Let MaterialX <image> nodes load .exr files through EXRLoader.
+			THREE.DefaultLoadingManager.addHandler( /\.exr$/i, new EXRLoader() );
 
 			init();
 

@@ -140,6 +140,9 @@ export default QUnit.module( 'Addons', () => {
 				await Promise.resolve();
 				assert.false( resolved, 'The MaterialX load remains pending while its texture is pending.' );
 
+				const expectedURL = documentURL.slice( 0, documentURL.lastIndexOf( '/' ) + 1 ) + 'texture.test';
+				assert.strictEqual( textureLoader.pending[ 0 ].url, expectedURL, 'Handler URLs are resolved against the document path.' );
+
 				const image = { width: 1, height: 1 };
 				textureLoader.succeed( image );
 				const result = await loadPromise;
@@ -148,7 +151,7 @@ export default QUnit.module( 'Addons', () => {
 				const material = result.materials.test_material;
 
 				assert.ok( findTexture( material, image ), 'The texture image is assigned before the load resolves.' );
-				assert.ok( progressURLs.includes( 'texture.test' ), 'LoadingManager reports dependent texture progress.' );
+				assert.ok( progressURLs.includes( expectedURL ), 'LoadingManager reports dependent texture progress.' );
 
 			} );
 
@@ -235,6 +238,7 @@ export default QUnit.module( 'Addons', () => {
 				assert.false( textureNode.generateMipmaps, 'generateMipmaps is propagated so loaders can opt out of mipmaps.' );
 				assert.strictEqual( textureNode.magFilter, NearestFilter, 'The mag filter is propagated.' );
 				assert.strictEqual( textureNode.colorSpace, LinearSRGBColorSpace, 'The color space is propagated.' );
+				assert.true( textureNode.flipY, 'Bottom-first data textures are flipped to match the top-first MaterialX orientation.' );
 				assert.strictEqual( textureNode.unpackAlignment, 1, 'Odd-width half-float rows retain their packed alignment.' );
 				assert.ok( textureNode instanceof DataTexture, 'The loaded texture retains its subtype.' );
 
@@ -287,7 +291,7 @@ export default QUnit.module( 'Addons', () => {
 				assert.strictEqual( first.wrapS, RepeatWrapping, 'Periodic addressing is applied.' );
 				assert.strictEqual( clamped.wrapS, ClampToEdgeWrapping, 'Clamp addressing is applied.' );
 				assert.strictEqual( clamped.wrapT, RepeatWrapping, 'The other axis keeps periodic addressing.' );
-				assert.false( first.flipY, 'MaterialX keeps its texture orientation.' );
+				assert.false( first.flipY, 'Top-first handler textures are not flipped again.' );
 				assert.strictEqual( source.wrapS, ClampToEdgeWrapping, 'The handler texture wrapping is unchanged.' );
 				assert.true( source.flipY, 'The handler texture orientation is unchanged.' );
 
