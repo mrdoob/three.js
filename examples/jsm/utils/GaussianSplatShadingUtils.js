@@ -860,6 +860,7 @@ function computeRayIntersection( positionAttribute, covarianceAttribute, colorAt
 export {
 	computeSplatBoundingBox,
 	computeSplatBoundingSphere,
+	packSplatStorage,
 	BIN_COUNT,
 	WORKGROUP_SIZE,
 	SORT_DIRECTION_THRESHOLD,

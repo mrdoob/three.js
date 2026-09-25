@@ -12,8 +12,8 @@ import {
 
 import { instanceIndex, max, select, storage, uint, uniform, vec4 } from 'three/tsl';
 
-import { retargetPBOAttribute } from '../utils/StorageBufferUtils.js';
 import { CountingSort } from '../gpgpu/CountingSort.js';
+import { retargetPBOAttribute } from '../utils/StorageBufferUtils.js';
 import { SH_BAND_WORDS, getSphericalHarmonicsDegree } from '../utils/GaussianSplatUtils.js';
 import {
 	BIN_COUNT,
@@ -26,6 +26,7 @@ import {
 	createMaterial,
 	createMaterialNodes,
 	needsSort,
+	packSplatStorage,
 	updateLastSortDirection,
 	updateSortDepthRange
 } from '../utils/GaussianSplatShadingUtils.js';
@@ -97,21 +98,22 @@ class SplatRecord {
  *
  * `GaussianSplatGroup` does not wrap independent scene-graph children - it takes a raw
  * `BufferGeometry` per splat cloud via {@link GaussianSplatGroup#addSplat}. All of the
- * group's work (packing, sorting, toggling visibility) happens automatically inside its own
- * `onBeforeRender`, so there is no separate `update()` method to call before
+ * group's packing, sorting, and visibility updates happen automatically during rendering,
+ * so there is no separate `update()` method to call before
  * `renderer.render()`.
  *
- * Every change costs only what it touches. `setMatrixAt` and `setVisibleAt` update a
- * single per-cloud record (hidden clouds stay packed and are simply skipped by the sort).
+ * Cloud data is packed incrementally. `setMatrixAt` and `setVisibleAt` change per-cloud
+ * records without repacking splats. Hidden clouds stay packed and are skipped by the sort.
  * `addSplat` packs just the new cloud into free space and uploads only that range;
  * `deleteSplat` frees the cloud's range for reuse. Only when there is no free range large
- * enough do the shared buffers grow (by doubling) and every cloud gets repacked. Buffers
- * never shrink on their own - call {@link GaussianSplatGroup#compact} to fit them to the
+ * enough do the shared buffers grow (by at least doubling), preserving existing offsets.
+ * Fragmentation can require a full repack if the new free space still cannot fit a cloud.
+ * Buffers never shrink on their own - call {@link GaussianSplatGroup#compact} to fit them to the
  * current contents. WebGPU sorts the packed set on the GPU; the WebGL2 fallback backend
  * sorts the same packed set on the CPU and uploads the order.
  *
- * The practical ceiling on total live splats is set by the renderer's storage buffer size
- * limit; roughly 8-16M live splats is a portable target for WebGPU hardware.
+ * Capacity is limited by the renderer's storage buffer size limits. Hidden clouds and
+ * unused capacity also consume storage and sorting work.
  *
  * This class requires {@link WebGPURenderer}. Its `forceWebGL` (WebGL2) fallback backend is
  * supported, but sorting runs on the CPU there, so large splat groups are expected to be
@@ -127,8 +129,8 @@ class GaussianSplatGroup extends Mesh {
 	 *
 	 * @param {Object} [options] - Options.
 	 * @param {number} [options.binCount=4096] - The number of depth bins used by the group's {@link CountingSort}. Larger values improve sort accuracy when splats are spread across a large combined depth range, at the cost of a longer (but still single-pass) prefix sum.
-	 * @param {number} [options.workgroupSize=256] - The workgroup size of the compute shaders used for merging and sorting.
-	 * @param {number} [options.initialSize] - Preallocates the shared storage buffers to this many splats up front, so the group doesn't grow (and repack every cloud) as splat clouds are added until the total exceeds it. Useful to size a group for its expected peak (e.g. 2,000,000) once, up front.
+	 * @param {number} [options.workgroupSize=256] - The workgroup size of the compute shaders used for sorting.
+	 * @param {number} [options.initialSize] - Preallocates the shared storage buffers to this many splats up front, to reduce reallocations as clouds are added. Fragmentation can still require growth before all slots are occupied.
 	 * @param {number} [options.shDegree=2] - Fixed spherical harmonics degree used by the group. Source splats with fewer bands are padded with neutral coefficients; source splats with more bands are truncated to this degree.
 	 */
 	constructor( { binCount = BIN_COUNT, workgroupSize = WORKGROUP_SIZE, initialSize, shDegree = 2 } = {} ) {
@@ -177,16 +179,15 @@ class GaussianSplatGroup extends Mesh {
 		this.binCount = binCount;
 
 		/**
-		 * The workgroup size of the compute shaders used for merging and sorting.
+		 * The workgroup size of the compute shaders used for sorting.
 		 *
 		 * @type {number}
 		 */
 		this.workgroupSize = workgroupSize;
 
 		/**
-		 * The bounding box of the merged splats, in this group's local space. Not computed
-		 * by default - call {@link GaussianSplatGroup#computeBoundingBox} explicitly, or
-		 * read {@link GaussianSplatGroup#boundingSphere}, otherwise it stays `null`.
+		 * The bounding box of the merged splats, in this group's local space. Computed
+		 * automatically during rendering, or explicitly with {@link GaussianSplatGroup#computeBoundingBox}.
 		 *
 		 * @type {?Box3}
 		 * @default null
@@ -194,9 +195,8 @@ class GaussianSplatGroup extends Mesh {
 		this.boundingBox = null;
 
 		/**
-		 * The bounding sphere of the merged splats, in this group's local space. Not computed
-		 * by default - call {@link GaussianSplatGroup#computeBoundingSphere} explicitly,
-		 * otherwise it stays `null`.
+		 * The bounding sphere of the merged splats, in this group's local space. Computed
+		 * automatically before frustum culling, or explicitly with {@link GaussianSplatGroup#computeBoundingSphere}.
 		 *
 		 * @type {?Sphere}
 		 * @default null
@@ -253,7 +253,7 @@ class GaussianSplatGroup extends Mesh {
 
 		this._boundsDirty = true;
 
-		// Required by `createMaterialNodes()`; grouped splats use precomputed SH contribution.
+		// Grouped splats read per-cloud camera positions from the record buffer.
 		this._localCameraPosition = localCameraPosition;
 
 	}
@@ -262,7 +262,7 @@ class GaussianSplatGroup extends Mesh {
 	 * Adds a splat cloud to the group. The cloud is packed into the shared buffers on the
 	 * next render (or the next read of {@link GaussianSplatGroup#splatCount}).
 	 *
-	 * @param {BufferGeometry} splatGeometry - The splat geometry to add. Same attribute contract as {@link GaussianSplat}'s constructor.
+	 * @param {BufferGeometry} splatGeometry - The caller-owned splat geometry to add. Keep its attributes unchanged while it is in the group; compact() repacks from this geometry. Same attribute contract as {@link GaussianSplat}'s constructor.
 	 * @return {number} An id identifying this splat cloud, for use with {@link GaussianSplatGroup#setMatrixAt}/{@link GaussianSplatGroup#setVisibleAt}/{@link GaussianSplatGroup#deleteSplat}.
 	 */
 	addSplat( splatGeometry ) {
@@ -593,7 +593,8 @@ class GaussianSplatGroup extends Mesh {
 
 	/**
 	 * Frees the GPU resources owned by this group (shared storage buffers, sort
-	 * buffers, geometry, material, and every added splat cloud's source buffers).
+	 * buffers, geometry, and material). Source geometries remain owned by the caller
+	 * and are not disposed.
 	 */
 	dispose() {
 
@@ -630,7 +631,7 @@ class GaussianSplatGroup extends Mesh {
 	}
 
 	// Packs each pending cloud into the first free range that fits, uploading only that
-	// range. Runs out of room (or too fragmented) -> grow and repack everything.
+	// range. Grow if needed, and repack only if the new free space still cannot fit it.
 	_packPending() {
 
 		const pending = this._pendingRecords;
@@ -693,7 +694,7 @@ class GaussianSplatGroup extends Mesh {
 
 		const ranges = this._freeRanges;
 
-		// ponytail: first-fit linear scan; a size-ordered structure if free lists get long.
+		// Allocate from the first free range large enough to hold the cloud.
 		for ( let i = 0; i < ranges.length; i ++ ) {
 
 			const range = ranges[ i ];
@@ -877,31 +878,7 @@ class GaussianSplatGroup extends Mesh {
 
 		for ( let i = 0; i < record.count; i ++ ) {
 
-			const source3 = i * 3;
-			const source4 = i * 4;
-			const source6 = i * 6;
-			const targetSplat = record.offset + i;
-			const target4 = targetSplat * 4;
-			const target8 = targetSplat * 8;
-
-			targetCenter[ target4 ] = positions[ source3 ];
-			targetCenter[ target4 + 1 ] = positions[ source3 + 1 ];
-			targetCenter[ target4 + 2 ] = positions[ source3 + 2 ];
-			targetCenter[ target4 + 3 ] = record.recordIndex;
-
-			targetCovariance[ target8 ] = covariances[ source6 ];
-			targetCovariance[ target8 + 1 ] = covariances[ source6 + 1 ];
-			targetCovariance[ target8 + 2 ] = covariances[ source6 + 2 ];
-			targetCovariance[ target8 + 3 ] = covariances[ source6 + 3 ];
-			targetCovariance[ target8 + 4 ] = covariances[ source6 + 4 ];
-			targetCovariance[ target8 + 5 ] = covariances[ source6 + 5 ];
-			targetCovariance[ target8 + 6 ] = 0;
-			targetCovariance[ target8 + 7 ] = 0;
-
-			targetColor[ targetSplat ] = ( colors[ source4 ] |
-				colors[ source4 + 1 ] << 8 |
-				colors[ source4 + 2 ] << 16 |
-				colors[ source4 + 3 ] << 24 ) >>> 0;
+			packSplatStorage( targetCenter, targetCovariance, targetColor, i, record.offset + i, positions, covariances, colors, record.recordIndex );
 
 		}
 
