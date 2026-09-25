@@ -17,6 +17,8 @@ import './addons/loaders/USDLoader.tests.js';
 import './addons/exporters/USDZExporter.tests.js';
 import './addons/tsl/WebGLNodesHandler.tests.js';
 import './addons/tsl/GPUTest.tests.js';
+import './addons/tsl/TSLMatrixInverseRoundTrip.tests.js';
+import './addons/tsl/TSLNeutralToneMapping.tests.js';
 import './addons/tsl/GPUAtomicsStorage.tests.js';
 import './addons/tsl/GPUComputeBuiltins.tests.js';
 import './addons/tsl/GPUBarriers.tests.js';

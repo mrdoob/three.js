@@ -87,6 +87,17 @@ const _checkWriteUsage = ( data ) => {
 
 };
 
+// Keep captured flows stable when a node generates more code later.
+const _appendFlowCode = ( data, flow ) => {
+
+	const previous = data.flowCodes;
+
+	if ( previous === flow ) return;
+
+	data.flowCodes = previous === undefined ? flow : { codes: [ previous, flow ], blocks: new WeakSet() };
+
+};
+
 /**
  * Base class for builders which generate a shader program based
  * on a 3D object and its node material definition.
@@ -391,7 +402,7 @@ class NodeBuilder {
 
 		/**
 		 * A chain of nodes.
-		 * Used to check recursive calls in node-graph.
+		 * Tracks node construction and the ownership of generated flow code.
 		 *
 		 * @type {Array<Node>}
 		 */
@@ -936,19 +947,17 @@ class NodeBuilder {
 
 	/**
 	 * Adds the given node to the internal node chain.
-	 * This is used to check recursive calls in node-graph.
+	 * Records the current block so child instructions stay within their scope.
 	 *
 	 * @param {Node} node - The node to add.
 	 */
 	addChain( node ) {
 
-		/*
-		if ( this.chaining.indexOf( node ) !== - 1 ) {
+		if ( this.buildStage === 'generate' ) {
 
-			warn( 'Recursive node: ', node );
+			this.getDataFromNode( node ).flowNodeBlock = this.context.nodeBlock;
 
 		}
-		*/
 
 		this.chaining.push( node );
 
@@ -956,6 +965,7 @@ class NodeBuilder {
 
 	/**
 	 * Removes the given node from the internal node chain.
+	 * Shares its flow instructions with its parent when both belong to the same block.
 	 *
 	 * @param {Node} node - The node to remove.
 	 */
@@ -966,6 +976,20 @@ class NodeBuilder {
 		if ( lastChain !== node ) {
 
 			throw new Error( 'THREE.NodeBuilder: Invalid node chaining!' );
+
+		}
+
+		if ( this.buildStage === 'generate' && this.context.nodeBlock !== undefined && this.currentNode !== undefined ) {
+
+			const { flowCodes } = this.getDataFromNode( node );
+			const parentData = this.getDataFromNode( this.currentNode );
+
+			// Share the child flow by reference, in build order and within the same block.
+			if ( flowCodes !== undefined && parentData.flowNodeBlock === this.context.nodeBlock ) {
+
+				_appendFlowCode( parentData, flowCodes );
+
+			}
 
 		}
 
@@ -2423,35 +2447,46 @@ class NodeBuilder {
 
 	 * This is used so that code-blocks like If,Else create their variables locally if the Node
 	 * is only used inside one of these conditionals in the current shader stage.
+	 * Shared child flows are emitted only once in each block hierarchy.
+	 * An explicit stack preserves instruction order without recursive traversal.
 	 *
 	 * @param {Node} node - The node to add.
 	 * @param {Node} nodeBlock - Node-based code-block. Usually 'ConditionalNode'.
 	 */
 	addFlowCodeHierarchy( node, nodeBlock ) {
 
-		const { flowCodes, flowCodeBlock } = this.getDataFromNode( node );
+		const { flowCodes } = this.getDataFromNode( node );
 
-		let needsFlowCode = true;
-		let nodeBlockHierarchy = nodeBlock;
+		if ( flowCodes === undefined || flowCodes.blocks.has( nodeBlock ) ) return;
 
-		while ( nodeBlockHierarchy ) {
+		const stack = [ flowCodes ];
 
-			if ( flowCodeBlock.get( nodeBlockHierarchy ) === true ) {
+		while ( stack.length > 0 ) {
 
-				needsFlowCode = false;
-				break;
+			const flow = stack.pop();
+
+			if ( typeof flow === 'string' ) {
+
+				this.addLineFlowCode( flow );
+				continue;
 
 			}
 
-			nodeBlockHierarchy = this.getDataFromNode( nodeBlockHierarchy ).parentNodeBlock;
+			let ancestor = nodeBlock;
 
-		}
+			while ( ancestor && flow.blocks.has( ancestor ) === false ) {
 
-		if ( needsFlowCode ) {
+				ancestor = this.getDataFromNode( ancestor ).parentNodeBlock;
 
-			for ( const flowCode of flowCodes ) {
+			}
 
-				this.addLineFlowCode( flowCode );
+			flow.blocks.add( nodeBlock );
+
+			if ( ancestor ) continue;
+
+			for ( let i = flow.codes.length - 1; i >= 0; i -- ) {
+
+				stack.push( flow.codes[ i ] );
 
 			}
 
@@ -2471,11 +2506,7 @@ class NodeBuilder {
 	addLineFlowCodeBlock( node, code, nodeBlock ) {
 
 		const nodeData = this.getDataFromNode( node );
-		const flowCodes = nodeData.flowCodes || ( nodeData.flowCodes = [] );
-		const codeBlock = nodeData.flowCodeBlock || ( nodeData.flowCodeBlock = new WeakMap() );
-
-		flowCodes.push( code );
-		codeBlock.set( nodeBlock, true );
+		_appendFlowCode( nodeData, { codes: [ code ], blocks: new WeakSet( [ nodeBlock ] ) } );
 
 	}
 

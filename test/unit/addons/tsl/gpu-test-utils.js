@@ -193,22 +193,22 @@ class AssertWriteNode extends Node {
 		this.resolvedColumnLength = columnLength;
 		this.resolvedIsMatrix = isMatrix;
 
-		// Force value1/value2 to evaluate ONCE, here, unconditionally --
-		// *before* any of writeColumn's per-column branching (an `If` per
-		// column, for gpuTest's addressing scheme; see gpuTest's own comment).
-		// Skipping this and reading `this.value1.element(c)` directly from
-		// inside each column's conditional branch is a real, confirmed trap:
-		// a node's generated value gets cached/declared in whichever branch
-		// happens to build it first, so any *sibling* conditional branch that
-		// references the same node sees an uninitialized (zero) variable
-		// instead of re-evaluating it. `.toVar()` sidesteps this by forcing
-		// the evaluation to happen up front, outside every branch, so each
-		// column's branch only ever *reads* an already-computed variable.
-		// (Recall multi-column values only arise for mat3/mat4 here since
-		// scalars/vectors are always a single column -- but `.toVar()` is
-		// cheap and correct for those too, so it's applied unconditionally.)
-		const v1 = this.value1.toVar();
-		const v2 = this.value2.toVar();
+		// A node's generated value getting cached/declared in whichever
+		// branch happens to build it first -- so a *sibling* conditional
+		// branch that references the same node sees an uninitialized (zero)
+		// variable instead of re-evaluating it -- used to be a real trap
+		// here (this file used to route value1/value2 through `.toVar()`
+		// specifically to paper over it). That was a symptom of two actual
+		// engine bugs (TempNode's own propertyName-cache fast path not
+		// re-flowing a cached assignment into a new block on repeat
+		// reference, and NodeBuilder.addFlowCodeHierarchy() crashing on an
+		// unconditional-then-conditional reference order) -- now fixed at
+		// the source (TempNode.js / NodeBuilder.js), so this file no longer
+		// needs to route around them. Left as plain references so this
+		// harness continues to exercise the real fix instead of masking a
+		// regression of it.
+		const v1 = this.value1;
+		const v2 = this.value2;
 
 		for ( let c = 0; c < columns; c ++ ) {
 
