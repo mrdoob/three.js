@@ -239,7 +239,20 @@ class WebGLAttributeUtils {
 
 		const attributeData = backend.get( attribute );
 
-		gl.deleteBuffer( attributeData.bufferGPU );
+		if ( attributeData.buffers !== undefined ) {
+
+			// storage attributes hold a second buffer for transform feedback
+			for ( const buffer of attributeData.buffers ) {
+
+				gl.deleteBuffer( buffer );
+
+			}
+
+		} else {
+
+			gl.deleteBuffer( attributeData.bufferGPU );
+
+		}
 
 		backend.delete( attribute );
 
