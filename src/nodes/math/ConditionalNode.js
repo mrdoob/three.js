@@ -20,9 +20,8 @@ import NodeError from '../core/NodeError.js';
  * per-component - each output lane picks independently based on its own
  * condition component, the same way WGSL's native `select()` and GLSL's
  * `mix( x, y, bvecN )` do - rather than picking one branch for the whole
- * vector. Vector values must have the same number of components as the
- * condition; scalar values are broadcast when the other value establishes
- * the result width.
+ * vector. The condition and values are converted to the largest vector width,
+ * with the condition converted to boolean components. Scalar values are broadcast.
  *
  * ```js
  * // per-component: each channel picks independently
@@ -89,7 +88,7 @@ class ConditionalNode extends Node {
 	 */
 	generateNodeType( builder ) {
 
-		const { ifNode, elseNode } = builder.getNodeProperties( this );
+		const { condNode, ifNode, elseNode } = builder.getNodeProperties( this );
 
 		if ( ifNode === undefined ) {
 
@@ -101,21 +100,29 @@ class ConditionalNode extends Node {
 
 		}
 
-		const ifType = ifNode.getNodeType( builder );
+		let type = ifNode.getNodeType( builder );
 
 		if ( elseNode !== null ) {
 
 			const elseType = elseNode.getNodeType( builder );
 
-			if ( builder.getTypeLength( elseType ) > builder.getTypeLength( ifType ) ) {
+			if ( builder.getTypeLength( elseType ) > builder.getTypeLength( type ) ) {
 
-				return elseType;
+				type = elseType;
 
 			}
 
 		}
 
-		return ifType;
+		const condLength = builder.getTypeLength( condNode.getNodeType( builder ) );
+
+		if ( condLength > 1 && ! builder.isReference( type ) && ( builder.getTypeLength( type ) === 1 || builder.isVector( builder.getVectorType( type ) ) ) ) {
+
+			type = builder.getTypeFromLength( Math.max( condLength, builder.getTypeLength( type ) ), builder.getComponentType( type ) );
+
+		}
+
+		return type;
 
 	}
 
@@ -169,26 +176,11 @@ class ConditionalNode extends Node {
 
 		if ( condLength > 1 ) {
 
-			if ( builder.getComponentType( condType ) !== 'bool' ) {
-
-				throw new NodeError( `TSL: select() requires a boolean condition, received "${ condType }".`, this.stackTrace );
-
-			}
-
 			const vectorType = builder.getVectorType( type );
 
-			if ( builder.isReference( type ) || ! builder.isVector( vectorType ) || builder.getTypeLength( vectorType ) !== condLength ) {
+			if ( builder.isReference( type ) || ! builder.isVector( vectorType ) ) {
 
-				throw new NodeError( `TSL: select() with a vector condition ("${ condType }") requires a vector result of the same width, received "${ type }".`, this.stackTrace );
-
-			}
-
-			const ifType = ifNode.getNodeType( builder );
-			const ifLength = builder.getTypeLength( ifType );
-
-			if ( ifLength !== 1 && ifLength !== condLength ) {
-
-				throw new NodeError( `TSL: select()'s vector condition ("${ condType }") is incompatible with its "if" value ("${ ifType }").`, this.stackTrace );
+				throw new NodeError( `TSL: select() with a vector condition ("${ condType }") requires scalar or vector values, received "${ type }".`, this.stackTrace );
 
 			}
 
@@ -196,15 +188,6 @@ class ConditionalNode extends Node {
 			let elseSnippet;
 
 			if ( elseNode !== null ) {
-
-				const elseType = elseNode.getNodeType( builder );
-				const elseLength = builder.getTypeLength( elseType );
-
-				if ( elseLength !== 1 && elseLength !== condLength ) {
-
-					throw new NodeError( `TSL: select()'s vector condition ("${ condType }") is incompatible with its "else" value ("${ elseType }").`, this.stackTrace );
-
-				}
 
 				elseSnippet = elseNode.build( builder, type );
 
@@ -214,7 +197,8 @@ class ConditionalNode extends Node {
 
 			}
 
-			const condSnippet = condNode.build( builder, condType );
+			const boolType = builder.changeComponentType( type, 'bool' );
+			const condSnippet = condNode.build( builder, boolType );
 			const ifSnippet = ifNode.build( builder, type );
 
 			const mathSnippet = builder.getVectorSelect( condSnippet, ifSnippet, elseSnippet, type );
