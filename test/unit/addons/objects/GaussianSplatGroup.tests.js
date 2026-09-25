@@ -1,5 +1,6 @@
-import { Color, DataTexture, Frustum, Matrix4, PerspectiveCamera, RenderTarget, Scene } from 'three';
+import { Color, DataTexture, Frustum, Matrix4, PerspectiveCamera, Raycaster, RenderTarget, Scene, Vector3 } from 'three';
 import { createGaussianSplatGeometry } from '../../../../examples/jsm/utils/GaussianSplatUtils.js';
+import { GaussianSplat } from '../../../../examples/jsm/objects/GaussianSplat.js';
 import { getSharedRenderer } from '../tsl/gpu-test-utils.js';
 import { GaussianSplatGroup } from '../../../../examples/jsm/objects/GaussianSplatGroup.js';
 
@@ -92,6 +93,50 @@ export default QUnit.module( 'Addons', () => {
 
 				group.dispose();
 				geometry.dispose();
+
+			} );
+
+			QUnit.test( 'bounds and raycasts include covariance extent without changing source bounds', ( assert ) => {
+
+				const geometry = createTestSplatGeometry( 1 );
+				geometry.computeBoundingBox();
+				geometry.computeBoundingSphere();
+				const sourceBox = geometry.boundingBox.clone();
+				const sourceSphere = geometry.boundingSphere.clone();
+				const single = new GaussianSplat( geometry );
+				const group = new GaussianSplatGroup( { shDegree: 0 } );
+				const id = group.addSplat( geometry );
+				const transform = new Matrix4().makeScale( 2, 1, 1 ).setPosition( 3, 0, - 5 );
+				group.setMatrixAt( id, transform );
+				single.matrixWorld.copy( transform );
+
+				group.computeBoundingBox();
+				single.computeBoundingBox();
+				assert.true( group.boundingBox.equals( single.boundingBox.clone().applyMatrix4( transform ) ), 'group and standalone bounds cover the same transformed extent' );
+
+				const raycaster = new Raycaster( new Vector3( 4, 0, 5 ), new Vector3( 0, 0, - 1 ) );
+				const singleHits = [];
+				const groupHits = [];
+				single.raycast( raycaster, singleHits );
+				group.raycast( raycaster, groupHits );
+
+				assert.strictEqual( singleHits.length, 1, 'the off-center ray hits the standalone splat' );
+				assert.strictEqual( groupHits.length, 1, 'the group does not reject the off-center hit' );
+				assert.strictEqual( groupHits[ 0 ]?.distance, singleHits[ 0 ]?.distance, 'intersection distances match' );
+				assert.strictEqual( groupHits[ 0 ]?.instanceId, id, 'the hit identifies the cloud' );
+				group.setMatrixAt( id, new Matrix4().makeTranslation( 7, 0, - 10 ) );
+				const camera = new PerspectiveCamera( 60, 1, 0.1, 100 );
+				const frustum = new Frustum().setFromProjectionMatrix( camera.projectionMatrix );
+				assert.false( frustum.intersectsSphere( sourceSphere.clone().applyMatrix4( group.getMatrixAt( id ) ) ), 'the center is outside the frustum' );
+				assert.true( group.intersectsFrustum( frustum ), 'the visible splat extent is not culled' );
+
+				assert.true( geometry.boundingBox.equals( sourceBox ), 'source bounding box is unchanged' );
+				assert.true( geometry.boundingSphere.equals( sourceSphere ), 'source bounding sphere is unchanged' );
+
+				group.dispose();
+				geometry.dispose();
+				single.geometry.dispose();
+				single.material.dispose();
 
 			} );
 

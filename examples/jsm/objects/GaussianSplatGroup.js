@@ -19,6 +19,8 @@ import {
 	BIN_COUNT,
 	WORKGROUP_SIZE,
 	computeRayIntersection,
+	computeSplatBoundingBox,
+	computeSplatBoundingSphere,
 	createAffineMatrix4,
 	createGeometry,
 	createMaterial,
@@ -48,6 +50,12 @@ class SplatRecord {
 
 		this.id = id;
 		this.geometry = geometry;
+		this.boundingBox = new Box3();
+		this.boundingSphere = new Sphere();
+
+		computeSplatBoundingBox( geometry, this.boundingBox );
+		computeSplatBoundingSphere( geometry, this.boundingBox, this.boundingSphere );
+
 		this.count = count;
 		this.sphericalHarmonicsDegree = sphericalHarmonicsDegree;
 
@@ -262,9 +270,6 @@ class GaussianSplatGroup extends Mesh {
 		const positionAttribute = splatGeometry.getAttribute( 'position' );
 		const sphericalHarmonicsDegree = getSphericalHarmonicsDegree( splatGeometry );
 		const count = positionAttribute.count;
-
-		if ( splatGeometry.boundingBox === null ) splatGeometry.computeBoundingBox();
-		if ( splatGeometry.boundingSphere === null ) splatGeometry.computeBoundingSphere();
 
 		const id = this._nextId ++;
 		const record = new SplatRecord( id, splatGeometry, count, sphericalHarmonicsDegree );
@@ -493,7 +498,7 @@ class GaussianSplatGroup extends Mesh {
 
 	/**
 	 * Computes the bounding box of the merged splats, in this group's local space,
-	 * as the union of each visible splat cloud's own geometry bounding box transformed
+	 * as the union of each visible splat cloud's covariance-aware bounding box transformed
 	 * by that cloud's {@link GaussianSplatGroup#setMatrixAt} transform.
 	 */
 	computeBoundingBox() {
@@ -508,7 +513,7 @@ class GaussianSplatGroup extends Mesh {
 
 			if ( record.visible === false ) continue;
 
-			_box.copy( record.geometry.boundingBox ).applyMatrix4( record.matrix );
+			_box.copy( record.boundingBox ).applyMatrix4( record.matrix );
 			this.boundingBox.union( _box );
 
 		}
@@ -531,7 +536,7 @@ class GaussianSplatGroup extends Mesh {
 
 			if ( record.visible === false ) continue;
 
-			_sphere.copy( record.geometry.boundingSphere ).applyMatrix4( record.matrix );
+			_sphere.copy( record.boundingSphere ).applyMatrix4( record.matrix );
 			maxRadius = Math.max( maxRadius, this.boundingSphere.center.distanceTo( _sphere.center ) + _sphere.radius );
 
 		}
@@ -559,14 +564,14 @@ class GaussianSplatGroup extends Mesh {
 
 			_instanceWorldMatrix.multiplyMatrices( this.matrixWorld, record.matrix );
 
-			_sphere.copy( record.geometry.boundingSphere ).applyMatrix4( _instanceWorldMatrix );
+			_sphere.copy( record.boundingSphere ).applyMatrix4( _instanceWorldMatrix );
 
 			if ( raycaster.ray.intersectsSphere( _sphere ) === false ) continue;
 
 			_instanceWorldMatrixInverse.copy( _instanceWorldMatrix ).invert();
 			_ray.copy( raycaster.ray ).applyMatrix4( _instanceWorldMatrixInverse );
 
-			if ( record.geometry.boundingBox !== null && _ray.intersectsBox( record.geometry.boundingBox ) === false ) continue;
+			if ( _ray.intersectsBox( record.boundingBox ) === false ) continue;
 
 			const positionAttribute = record.geometry.getAttribute( 'position' );
 			const covarianceAttribute = record.geometry.getAttribute( 'covariance' );

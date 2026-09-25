@@ -73,6 +73,79 @@ const _worldCenter = /*@__PURE__*/ new Vector3();
 const _viewCenter = /*@__PURE__*/ new Vector3();
 const _worldScale = /*@__PURE__*/ new Vector3();
 
+/**
+ * Computes bounds including each splat's covariance extent.
+ *
+ * @param {BufferGeometry} geometry - The source splat geometry.
+ * @param {Box3} target - The target bounding box.
+ */
+function computeSplatBoundingBox( geometry, target ) {
+
+	target.makeEmpty();
+
+	const positionAttribute = geometry.getAttribute( 'position' );
+	const covarianceAttribute = geometry.getAttribute( 'covariance' );
+	const count = positionAttribute.count;
+
+	for ( let i = 0; i < count; i ++ ) {
+
+		const x = positionAttribute.getX( i );
+		const y = positionAttribute.getY( i );
+		const z = positionAttribute.getZ( i );
+
+		const c00 = covarianceAttribute.getComponent( i, 0 );
+		const c11 = covarianceAttribute.getComponent( i, 3 );
+		const c22 = covarianceAttribute.getComponent( i, 5 );
+
+		// the radius of the drawn largest extent
+		const radius = SPLAT_KERNEL_CUTOFF * Math.sqrt( Math.max( c00, c11, c22 ) );
+
+		target.expandByPoint( _vector.set( x - radius, y - radius, z - radius ) );
+		target.expandByPoint( _vector.set( x + radius, y + radius, z + radius ) );
+
+	}
+
+}
+
+/**
+ * Computes a sphere including each splat's covariance extent.
+ *
+ * @param {BufferGeometry} geometry - The source splat geometry.
+ * @param {Box3} boundingBox - The covariance-aware bounding box.
+ * @param {Sphere} target - The target bounding sphere.
+ */
+function computeSplatBoundingSphere( geometry, boundingBox, target ) {
+
+	boundingBox.getCenter( target.center );
+
+	const positionAttribute = geometry.getAttribute( 'position' );
+	const covarianceAttribute = geometry.getAttribute( 'covariance' );
+	const count = positionAttribute.count;
+	const center = target.center;
+
+	let maxRadius = 0;
+
+	for ( let i = 0; i < count; i ++ ) {
+
+		const x = positionAttribute.getX( i );
+		const y = positionAttribute.getY( i );
+		const z = positionAttribute.getZ( i );
+
+		const c00 = covarianceAttribute.getComponent( i, 0 );
+		const c11 = covarianceAttribute.getComponent( i, 3 );
+		const c22 = covarianceAttribute.getComponent( i, 5 );
+
+		// the radius of the drawn largest extent
+		const radius = SPLAT_KERNEL_CUTOFF * Math.sqrt( Math.max( c00, c11, c22 ) );
+
+		maxRadius = Math.max( maxRadius, center.distanceTo( _vector.set( x, y, z ) ) + radius );
+
+	}
+
+	target.radius = maxRadius;
+
+}
+
 function packSplatStorage( centerArray, covarianceArray, colorArray, sourceIndex, targetIndex, positions, covariances, colors, recordIndex = 0 ) {
 
 	const source3 = sourceIndex * 3;
@@ -785,6 +858,8 @@ function computeRayIntersection( positionAttribute, covarianceAttribute, colorAt
 }
 
 export {
+	computeSplatBoundingBox,
+	computeSplatBoundingSphere,
 	BIN_COUNT,
 	WORKGROUP_SIZE,
 	SORT_DIRECTION_THRESHOLD,

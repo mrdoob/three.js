@@ -15,7 +15,8 @@ import { getSphericalHarmonicsDegree } from '../utils/GaussianSplatUtils.js';
 import {
 	BIN_COUNT,
 	WORKGROUP_SIZE,
-	SPLAT_KERNEL_CUTOFF,
+	computeSplatBoundingBox,
+	computeSplatBoundingSphere,
 	createGeometry,
 	createMaterial,
 	createMaterialNodes,
@@ -33,7 +34,6 @@ const _worldMatrixInverse = /*@__PURE__*/ new Matrix4();
 const _inverseMatrix = /*@__PURE__*/ new Matrix4();
 const _ray = /*@__PURE__*/ new Ray();
 const _sphere = /*@__PURE__*/ new Sphere();
-const _vector = /*@__PURE__*/ new Vector3();
 
 /**
  * A minimal renderer for 3D Gaussian splat geometry.
@@ -244,29 +244,7 @@ class GaussianSplat extends Mesh {
 
 		if ( this.boundingBox === null ) this.boundingBox = new Box3();
 
-		this.boundingBox.makeEmpty();
-
-		const positionAttribute = this.splatGeometry.getAttribute( 'position' );
-		const covarianceAttribute = this.splatGeometry.getAttribute( 'covariance' );
-		const count = positionAttribute.count;
-
-		for ( let i = 0; i < count; i ++ ) {
-
-			const x = positionAttribute.getX( i );
-			const y = positionAttribute.getY( i );
-			const z = positionAttribute.getZ( i );
-
-			const c00 = covarianceAttribute.getComponent( i, 0 );
-			const c11 = covarianceAttribute.getComponent( i, 3 );
-			const c22 = covarianceAttribute.getComponent( i, 5 );
-
-			// the radius of the drawn largest extent
-			const radius = SPLAT_KERNEL_CUTOFF * Math.sqrt( Math.max( c00, c11, c22 ) );
-
-			this.boundingBox.expandByPoint( _vector.set( x - radius, y - radius, z - radius ) );
-			this.boundingBox.expandByPoint( _vector.set( x + radius, y + radius, z + radius ) );
-
-		}
+		computeSplatBoundingBox( this.splatGeometry, this.boundingBox );
 
 	}
 
@@ -281,33 +259,7 @@ class GaussianSplat extends Mesh {
 		if ( this.boundingSphere === null ) this.boundingSphere = new Sphere();
 
 		this.computeBoundingBox();
-		this.boundingBox.getCenter( this.boundingSphere.center );
-
-		const positionAttribute = this.splatGeometry.getAttribute( 'position' );
-		const covarianceAttribute = this.splatGeometry.getAttribute( 'covariance' );
-		const count = positionAttribute.count;
-		const center = this.boundingSphere.center;
-
-		let maxRadius = 0;
-
-		for ( let i = 0; i < count; i ++ ) {
-
-			const x = positionAttribute.getX( i );
-			const y = positionAttribute.getY( i );
-			const z = positionAttribute.getZ( i );
-
-			const c00 = covarianceAttribute.getComponent( i, 0 );
-			const c11 = covarianceAttribute.getComponent( i, 3 );
-			const c22 = covarianceAttribute.getComponent( i, 5 );
-
-			// the radius of the drawn largest extent
-			const radius = SPLAT_KERNEL_CUTOFF * Math.sqrt( Math.max( c00, c11, c22 ) );
-
-			maxRadius = Math.max( maxRadius, center.distanceTo( _vector.set( x, y, z ) ) + radius );
-
-		}
-
-		this.boundingSphere.radius = maxRadius;
+		computeSplatBoundingSphere( this.splatGeometry, this.boundingBox, this.boundingSphere );
 
 	}
 
