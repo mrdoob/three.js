@@ -51,7 +51,7 @@ class IESLoader extends Loader {
 
 	_getIESValues( iesLamp, type ) {
 
-		const width = 360;
+		const width = iesLamp.numHorAngles === 1 ? 1 : 360;
 		const height = 180;
 		const size = width * height;
 
@@ -189,8 +189,8 @@ class IESLoader extends Loader {
 		const data = this._getIESValues( iesLamp, type );
 
 		// X holds the vertical angle from 0 to 180 degrees inclusively, Y holds the horizontal
-		// angle from 0 to 359 degrees and wraps around
-		const texture = new DataTexture( data, 180, 360, RedFormat, type );
+		// angle from 0 to 359 degrees and wraps around, or a single row for symmetric profiles
+		const texture = new DataTexture( data, 180, data.length / 180, RedFormat, type );
 		texture.minFilter = LinearFilter;
 		texture.magFilter = LinearFilter;
 		texture.wrapT = RepeatWrapping;
