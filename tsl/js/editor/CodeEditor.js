@@ -758,7 +758,7 @@ class CodeEditor extends EventDispatcher {
 
 					updateHighlights();
 
-					if ( this.isProgrammaticChange ) return;
+					if ( this.readOnly || this.isProgrammaticChange ) return;
 
 					this.dispatchEvent( { type: 'change', value: this.editor.getValue() } );
 
@@ -922,9 +922,26 @@ class CodeEditor extends EventDispatcher {
 
 	}
 
+	setReadOnly( readOnly ) {
+
+		this.readOnly = readOnly;
+
+		if ( this.editor ) {
+
+			this.editor.updateOptions( {
+				readOnly: readOnly,
+				renderLineHighlight: readOnly ? 'none' : 'line',
+				hideCursorInOverviewRuler: readOnly,
+				overviewRulerBorder: ! readOnly
+			} );
+
+		}
+
+	}
+
 	format( formatted ) {
 
-		if ( ! this.editor ) return;
+		if ( ! this.editor || this.readOnly ) return;
 		const model = this.editor.getModel();
 		this.isProgrammaticChange = true;
 		try {

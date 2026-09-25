@@ -97,7 +97,7 @@ class SkyMesh extends Mesh {
 		 *
 		 * @type {UniformNode<float>}
 		 */
-		this.cloudSpeed = uniform( 0.0001 );
+		this.cloudSpeed = uniform( 0.00002 );
 
 		/**
 		 * The cloud coverage uniform.
@@ -384,6 +384,7 @@ class SkyMesh extends Mesh {
 
 		material.side = BackSide;
 		material.depthWrite = false;
+		material.fog = false;
 
 		material.vertexNode = vertexNode;
 		material.colorNode = colorNode;

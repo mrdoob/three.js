@@ -36,6 +36,12 @@ class PointUVNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	generate( /*builder*/ ) {
 
 		return 'vec2( gl_PointCoord.x, 1.0 - gl_PointCoord.y )';

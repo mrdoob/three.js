@@ -6,7 +6,7 @@ A Decorated Torus Knot 5c.
 
 ## Import
 
-DecoratedTorusKnot5c is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+DecoratedTorusKnot5c is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { DecoratedTorusKnot5c } from 'three/addons/curves/CurveExtras.js';

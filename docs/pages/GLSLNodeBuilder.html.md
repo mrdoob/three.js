@@ -350,6 +350,26 @@ A GLSL snippet that represents the offset that will be applied to the unnormaliz
 
 **Returns:** The GLSL snippet.
 
+### .generateTextureSize( texture : Texture, textureProperty : string, levelSnippet : string ) : string
+
+Generates the GLSL snippet that resolves the dimensions of the given texture.
+
+**texture**
+
+The texture.
+
+**textureProperty**
+
+The name of the texture uniform in the shader.
+
+**levelSnippet**
+
+A GLSL snippet that represents the mip level.
+
+**Overrides:** [NodeBuilder#generateTextureSize](NodeBuilder.html#generateTextureSize)
+
+**Returns:** The GLSL snippet.
+
 ### .getAttributes( shaderStage : string ) : string
 
 Returns the shader attributes of the given shader stage as a GLSL string.
@@ -400,7 +420,7 @@ The shader stage.
 
 **Returns:** The GLSL snippet that defines the enabled extensions.
 
-### .getFloatPackingMethod( encoding : string ) : string
+### .getFloatPackingMethod( encoding : string, layout : string ) : string
 
 Returns the float packing method name for a given numeric encoding.
 
@@ -408,15 +428,27 @@ Returns the float packing method name for a given numeric encoding.
 
 The numeric encoding that describes how the float values are mapped to the integer range.
 
+**layout**
+
+The component layout of the packed integer.
+
+Default is `'2x16'`.
+
 **Returns:** The resolved GLSL float packing method name.
 
-### .getFloatUnpackingMethod( encoding : string ) : string
+### .getFloatUnpackingMethod( encoding : string, layout : string ) : string
 
 Returns the float unpacking method name for a given numeric encoding.
 
 **encoding**
 
 The numeric encoding that describes how the integer values are mapped to the float range.
+
+**layout**
+
+The component layout of the packed integer.
+
+Default is `'2x16'`.
 
 **Returns:** The resolved GLSL float unpacking method name.
 
@@ -645,6 +677,18 @@ Whether to flip texture data along its vertical axis or not.
 **Overrides:** [NodeBuilder#isFlipY](NodeBuilder.html#isFlipY)
 
 **Returns:** Returns always `true` in context of GLSL.
+
+### .isReservedKeyword( name : string ) : boolean
+
+Returns whether the given name is a reserved keyword of GLSL.
+
+**name**
+
+The name to test.
+
+**Overrides:** [NodeBuilder#isReservedKeyword](NodeBuilder.html#isReservedKeyword)
+
+**Returns:** Whether the name is a reserved keyword or not.
 
 ### .needsToWorkingColorSpace( texture : Texture ) : boolean
 

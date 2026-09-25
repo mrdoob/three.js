@@ -1,4 +1,4 @@
-export const REVISION = '186dev';
+export const REVISION = '187dev';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.
@@ -538,14 +538,6 @@ export const EquirectangularReflectionMapping = 303;
  * @constant
  */
 export const EquirectangularRefractionMapping = 304;
-
-/**
- * Reflection mapping for PMREM textures.
- *
- * @type {number}
- * @constant
- */
-export const CubeUVReflectionMapping = 306;
 
 /**
  * The texture will simply repeat to infinity.

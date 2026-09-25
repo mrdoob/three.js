@@ -1,4 +1,4 @@
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
 import { sub, mul, div, mod } from './OperatorNode.js';
 import { addMethodChaining, nodeObject, nodeProxyIntent, float, vec2, vec3, vec4, Fn } from '../tsl/TSLCore.js';
 import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../../constants.js';
@@ -12,9 +12,9 @@ import { error } from '../../utils.js';
  * - Methods with two inputs like `dot`, `cross` or `pow`.
  * - Methods with three inputs like `mix`, `clamp` or `smoothstep`.
  *
- * @augments TempNode
+ * @augments Node
  */
-class MathNode extends TempNode {
+class MathNode extends Node {
 
 	static get type() {
 

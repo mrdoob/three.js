@@ -64,6 +64,12 @@ export default /* glsl */`
 	varying vec2 vRoughnessMapUv;
 
 #endif
+#ifdef USE_DIFFUSE_ROUGHNESSMAP
+
+	uniform mat3 diffuseRoughnessMapTransform;
+	varying vec2 vDiffuseRoughnessMapUv;
+
+#endif
 #ifdef USE_ANISOTROPYMAP
 
 	uniform mat3 anisotropyMapTransform;

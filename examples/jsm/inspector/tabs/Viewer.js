@@ -2,7 +2,7 @@ import { Tab } from '../ui/Tab.js';
 import { List } from '../ui/List.js';
 import { Item } from '../ui/Item.js';
 import { splitPath, splitCamelCase } from '../ui/utils.js';
-import { getItem, setItem } from '../Inspector.js';
+import { getItem, setItem } from '../Storage.js';
 
 import { RendererUtils, NoToneMapping, LinearSRGBColorSpace, QuadMesh, NodeMaterial, CanvasTarget, Vector2, Color } from 'three/webgpu';
 import { renderOutput, vec2, vec3, vec4, Fn, screenUV, step, OnMaterialUpdate, uniform, float } from 'three/tsl';

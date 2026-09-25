@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>SunLightNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="LightingNode.html">LightingNode</a> → <a href="AnalyticLightNode.html">AnalyticLightNode</a> → </p>
+	<h1 translate="no">SunLightNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Module for representing sun lights as nodes. Register it with the
+renderer's node library to use <a href="SunLight.html">SunLight</a> with <code>WebGPURenderer</code>:</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">renderer.library.addLight( SunLightNode, SunLight );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">SunLightNode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { SunLightNode } from 'three/addons/lights/SunLightNode.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="SunLightNode" translate="no">new <a href="#SunLightNode">SunLightNode</a><span class="signature">( light : <span class="param-type"><a href="SunLight.html">SunLight</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new sun light node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">light</strong>
+									</td>
+									<td class="description last">
+										<p>The sun light source.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="setupShadowNode" translate="no">.<a href="#setupShadowNode">setupShadowNode</a><span class="signature">()</span><span class="type-signature"> : <a href="SunShadowNode.html">SunShadowNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwritten to setup the cascaded shadows of sun lights.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="AnalyticLightNode.html#setupShadowNode">AnalyticLightNode#setupShadowNode</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The created shadow node.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/lights/SunLightNode.js" translate="no" target="_blank" rel="noopener">examples/jsm/lights/SunLightNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

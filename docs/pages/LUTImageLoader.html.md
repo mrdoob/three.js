@@ -13,7 +13,7 @@ const map = loader.loadAsync( 'luts/NeutralLUT.png' );
 
 ## Import
 
-LUTImageLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+LUTImageLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { LUTImageLoader } from 'three/addons/loaders/LUTImageLoader.js';

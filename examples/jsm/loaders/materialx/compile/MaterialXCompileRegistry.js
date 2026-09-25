@@ -7,7 +7,6 @@ import {
 	mul,
 	normalMap,
 	texture,
-	uv,
 	vec2,
 	vec3,
 	vec4,
@@ -39,6 +38,7 @@ import {
 import {
 	getComponentCountForType,
 	normalizeSpaceName,
+	resolveTextureAddressMode,
 	toBooleanNode,
 	toVec3Channels,
 } from '../MaterialXUtils.js';
@@ -57,21 +57,17 @@ const register = ( registry, categories, handler ) => {
 const UV_FALLBACK_CATEGORIES = new Set( [ 'checkerboard', 'noise2d', 'fractal2d', 'cellnoise2d', 'worleynoise2d', 'unifiednoise2d', 'heighttonormal' ] );
 const SCALAR_TYPES = new Set( [ 'boolean', 'integer', 'float' ] );
 const THREE_COMPONENT_TYPES = new Set( [ 'vector2', 'vector3', 'vector4', 'color3', 'color4' ] );
-const TEXTURE_ADDRESS_MODES = new Set( [ 'constant', 'clamp', 'periodic', 'mirror' ] );
 const SWITCH_MIN_INDEX = 1;
 const SWITCH_MAX_INDEX = 10;
 
-const getDefaultUvNode = ( compileContext ) => compileContext.mxToBottomLeftUvSpace( uv( 0 ) );
+const getDefaultUvNode = ( compileContext ) => compileContext.getTexcoordNode( 0 );
 
 const toBooleanMaskNode = ( node ) => toBooleanNode( node ).select( float( 1 ), float( 0 ) );
 
 const getTextureAddressMode = ( nodeX, inputName ) => {
 
 	const value = nodeX.getInputValueByName( inputName );
-	if ( value === null || value === undefined || value === '' ) return 'periodic';
-
-	const mode = value.trim().toLowerCase();
-	return TEXTURE_ADDRESS_MODES.has( mode ) ? mode : 'periodic';
+	return resolveTextureAddressMode( value ) ?? 'periodic';
 
 };
 
@@ -344,7 +340,7 @@ const compileTexcoordNode = ( nodeX, compileContext ) => {
 
 	const indexNode = nodeX.getChildByName( 'index' );
 	const index = indexNode ? parseInt( indexNode.value, 10 ) : 0;
-	return compileContext.mxToBottomLeftUvSpace( uv( index ) );
+	return compileContext.getTexcoordNode( index );
 
 };
 

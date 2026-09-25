@@ -14,12 +14,20 @@ marked.use( {
 
 			return false;
 
+		},
+		link( href, title, text ) {
+
+			const targetAttr = href && ! href.startsWith( '#' ) ? ' target="_blank" rel="noopener noreferrer"' : '';
+			const titleAttr = title ? ` title="${title}"` : '';
+
+			return `<a href="${href}"${targetAttr}${titleAttr}>${text}</a>`;
+
 		}
 	}
 } );
 
 
-function parseTour( rawMarkdown ) {
+function parseGuide( markdown ) {
 
 	const pageTree = [];
 
@@ -29,10 +37,10 @@ function parseTour( rawMarkdown ) {
 	let lastIndex = 0;
 	const stack = [];
 
-	while ( ( match = tokenRegex.exec( rawMarkdown ) ) !== null ) {
+	while ( ( match = tokenRegex.exec( markdown ) ) !== null ) {
 
 		const index = match.index;
-		const textSegment = rawMarkdown.substring( lastIndex, index );
+		const textSegment = markdown.substring( lastIndex, index );
 
 		if ( stack.length > 0 ) {
 
@@ -95,9 +103,9 @@ function parseTour( rawMarkdown ) {
 	}
 
 	// Add any remaining text
-	if ( lastIndex < rawMarkdown.length && stack.length > 0 ) {
+	if ( lastIndex < markdown.length && stack.length > 0 ) {
 
-		stack[ stack.length - 1 ].content += rawMarkdown.substring( lastIndex );
+		stack[ stack.length - 1 ].content += markdown.substring( lastIndex );
 
 	}
 
@@ -352,8 +360,8 @@ function parse( md ) {
 
 	};
 
-	parseCallouts( 'Important', 'Important', '⚠️', 'tour-important' );
-	parseCallouts( 'Note', 'Note', '📌', 'tour-note' );
+	parseCallouts( 'Important', 'Important', '⚠️', 'guide-important' );
+	parseCallouts( 'Note', 'Note', '📌', 'guide-note' );
 
 	// Helper to parse collapsible accordion callout blocks for AI / LLM (> IA: or > AI: or > LLM:)
 	const parseAccordionCallouts = ( tag, title, icon, className ) => {
@@ -391,7 +399,7 @@ function parse( md ) {
 
 	};
 
-	parseAccordionCallouts( '(?:IA|AI|LLM)', 'AI / LLM Guide', 'sparkles', 'tour-ai' );
+	parseAccordionCallouts( '(?:IA|AI|LLM)', 'AI / LLM Guide', 'sparkles', 'guide-ai' );
 
 	// Group consecutive API blocks
 	const apiBlockRegex = /::: api\s+([^\n]+?)(?:\s*:::\s*(?=\n|$)|(?:\r?\n([\s\S]*?):::))/gi;
@@ -943,18 +951,18 @@ function parseApiSignature( rawSigText ) {
 	let retType = '';
 	let rowDesc = '';
 
-	const firstParen = sigText.indexOf( '(' );
-	const lastParen = sigText.lastIndexOf( ')' );
+	const firstLParen = sigText.indexOf( '(' );
+	const firstRParen = sigText.indexOf( ')' );
 
-	const prefixBeforeParen = firstParen !== - 1 ? sigText.substring( 0, firstParen ).trim() : '';
-	const isFunction = firstParen !== - 1 && lastParen > firstParen && /^[\.\w$]+$/i.test( prefixBeforeParen );
+	const prefixBeforeParen = firstLParen !== - 1 ? sigText.substring( 0, firstLParen ).trim() : '';
+	const isFunction = firstLParen !== - 1 && firstRParen > firstLParen && /^[\.\w$]+$/i.test( prefixBeforeParen );
 
 	if ( isFunction ) {
 
 		funcName = prefixBeforeParen;
-		argsText = sigText.substring( firstParen + 1, lastParen ).trim();
+		argsText = sigText.substring( firstLParen + 1, firstRParen ).trim();
 
-		const remainder = sigText.substring( lastParen + 1 ).trim();
+		const remainder = sigText.substring( firstRParen + 1 ).trim();
 		if ( remainder ) {
 
 			const afterMatch = remainder.match( /^(?:\s*(?::|->)\s*([^—–\-]+?))?(?:\s*[\-—–]\s*([\s\S]*))?$/ );
@@ -1456,4 +1464,4 @@ function tokenizeCodeToElement( codeContent, targetElement ) {
 
 }
 
-export { parseTour, parse, tokenizeInlineCode, tokenizeCodeToElement };
+export { parseGuide, parse, tokenizeInlineCode, tokenizeCodeToElement };

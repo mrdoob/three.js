@@ -16,7 +16,7 @@ The node to render a texture with.
 
 **width**
 
-The width of the internal render target. If not width is applied, the render target is automatically resized.
+The width of the internal render target. If no width is applied, the render target is automatically resized.
 
 Default is `null`.
 
@@ -30,7 +30,25 @@ Default is `null`.
 
 The options for the internal render target.
 
-Default is `{type:HalfFloatType}`.
+Default is `{}`.
+
+**type**
+
+The texture type.
+
+Default is `HalfFloatType`.
+
+**autoUpdate**
+
+Whether the texture should automatically be updated or not.
+
+Default is `true`.
+
+**resolutionScale**
+
+The resolution scale.
+
+Default is `1`.
 
 ## Properties
 
@@ -74,11 +92,23 @@ Default is `true`.
 
 ### .updateBeforeType : string
 
-The `updateBeforeType` is set to `NodeUpdateType.RENDER` since the node updates the texture once per render in its [RTTNode#updateBefore](RTTNode.html#updateBefore) method.
+The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node updates the texture once per frame in its [RTTNode#updateBefore](RTTNode.html#updateBefore) method.
 
-Default is `'render'`.
+Default is `'frame'`.
 
 **Overrides:** [TextureNode#updateBeforeType](TextureNode.html#updateBeforeType)
+
+### .value
+
+Overwritten since the value is defined by the internal render target.
+
+**Overrides:** [TextureNode#value](TextureNode.html#value)
+
+### .value : Texture
+
+The texture of the internal render target.
+
+**Overrides:** [TextureNode#value](TextureNode.html#value)
 
 ### .width : number
 
@@ -87,6 +117,12 @@ The width of the internal render target. If not width is applied, the render tar
 Default is `null`.
 
 ## Methods
+
+### .dispose()
+
+Frees internal resources. Should be called when the node is no longer in use.
+
+**Overrides:** [TextureNode#dispose](TextureNode.html#dispose)
 
 ### .getResolutionScale() : number
 
@@ -106,7 +142,7 @@ The resolution scale to set. A value of `1` means full resolution.
 
 ### .setSize( width : number, height : number )
 
-Sets the size of the internal render target
+Sets the size of the internal render target.
 
 **width**
 
@@ -114,7 +150,17 @@ The width to set.
 
 **height**
 
-The width to set.
+The height to set.
+
+### .updateBefore( frame : NodeFrame )
+
+Renders the node's output into the internal render target before the main render pass. Handles automatic resizing of the render target when `autoResize` is enabled, and skips rendering if neither `textureNeedsUpdate` nor `autoUpdate` is true.
+
+**frame**
+
+The current node frame, providing access to the renderer and other frame data.
+
+**Overrides:** [TextureNode#updateBefore](TextureNode.html#updateBefore)
 
 ## Source
 

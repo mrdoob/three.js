@@ -64,6 +64,12 @@ class AtomicFunctionNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Overwrites the default implementation to return the type of
 	 * the pointer node.

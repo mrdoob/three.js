@@ -55,6 +55,56 @@ class Textures extends DataMap {
 		 */
 		this._htmlTextures = new Set();
 
+		/**
+		 * Stores weak references to the textures and render targets
+		 * with attached `dispose` event listeners.
+		 *
+		 * @private
+		 * @type {Set<WeakRef<(Texture|RenderTarget)>>}
+		 */
+		this._tracked = new Set();
+
+		/**
+		 * Removes weak references from `_tracked` when their texture or
+		 * render target has been garbage collected without an explicit
+		 * `dispose()`.
+		 *
+		 * @private
+		 * @type {FinalizationRegistry}
+		 */
+		this._registry = new FinalizationRegistry( ( ref ) => this._tracked.delete( ref ) );
+
+	}
+
+	/**
+	 * Frees internal resources.
+	 */
+	dispose() {
+
+		for ( const ref of this._tracked ) {
+
+			const object = ref.deref();
+
+			if ( object === undefined || this.has( object ) === false ) continue;
+
+			if ( object.isRenderTarget === true ) {
+
+				this._destroyRenderTarget( object );
+
+			} else {
+
+				this._destroyTexture( object );
+
+			}
+
+		}
+
+		this._tracked.clear();
+
+		this._htmlTextures.clear();
+
+		super.dispose();
+
 	}
 
 	/**
@@ -189,6 +239,12 @@ class Textures extends DataMap {
 
 			renderTarget.addEventListener( 'dispose', renderTargetData.onDispose );
 
+			// see #34368 why tracking separate remove listeners is required right now
+			renderTargetData.ref = new WeakRef( renderTarget );
+
+			this._tracked.add( renderTargetData.ref );
+			this._registry.register( renderTarget, renderTargetData.ref, renderTargetData.ref );
+
 		}
 
 	}
@@ -296,10 +352,10 @@ class Textures extends DataMap {
 		options.levels = options.needsMipmaps ? this.getMipLevels( texture, width, height ) : 1;
 
 		// TODO: Uniformly handle mipmap definitions
-		// Normal textures and compressed cube textures define base level + mips with their mipmap array
+		// Normal textures, compressed cube textures and render targets define base level + mips with their mipmap array
 		// Uncompressed cube textures use their mipmap array only for mips (no base level)
 
-		if ( texture.isCubeTexture && texture.mipmaps.length > 0 ) options.levels ++;
+		if ( texture.isCubeTexture && texture.mipmaps.length > 0 && ! isRenderTarget ) options.levels ++;
 
 		//
 
@@ -354,9 +410,7 @@ class Textures extends DataMap {
 
 					if ( texture.source.dataReady === true ) backend.updateTexture( texture, options );
 
-					const skipAutoGeneration = texture.isStorageTexture === true && texture.mipmapsAutoUpdate === false;
-
-					if ( options.needsMipmaps && texture.mipmaps.length === 0 && ! skipAutoGeneration ) {
+					if ( options.needsMipmaps && texture.mipmaps.length === 0 && texture.mipmapsAutoUpdate === true ) {
 
 						backend.generateMipmaps( texture );
 
@@ -401,13 +455,23 @@ class Textures extends DataMap {
 
 			// dispose
 
-			textureData.onDispose = () => {
+			if ( texture.isRenderTargetTexture !== true ) {
 
-				this._destroyTexture( texture );
+				textureData.onDispose = () => {
 
-			};
+					this._destroyTexture( texture );
 
-			texture.addEventListener( 'dispose', textureData.onDispose );
+				};
+
+				texture.addEventListener( 'dispose', textureData.onDispose );
+
+			}
+
+			// see #34368 why tracking separate remove listeners is required right now
+			textureData.ref = new WeakRef( texture );
+
+			this._tracked.add( textureData.ref );
+			this._registry.register( texture, textureData.ref, textureData.ref );
 
 		}
 
@@ -560,6 +624,9 @@ class Textures extends DataMap {
 
 			renderTarget.removeEventListener( 'dispose', renderTargetData.onDispose );
 
+			this._tracked.delete( renderTargetData.ref );
+			this._registry.unregister( renderTargetData.ref );
+
 			//
 
 			for ( let i = 0; i < textures.length; i ++ ) {
@@ -598,6 +665,9 @@ class Textures extends DataMap {
 			//
 
 			texture.removeEventListener( 'dispose', textureData.onDispose );
+
+			this._tracked.delete( textureData.ref );
+			this._registry.unregister( textureData.ref );
 
 			// if a texture is not ready for use, it falls back to a default texture so it's possible
 			// to use it for rendering. If a texture in this state is disposed, it's important to

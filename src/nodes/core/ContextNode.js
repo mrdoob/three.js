@@ -62,6 +62,12 @@ class ContextNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * This method is overwritten to ensure it returns the reference to {@link ContextNode#node}.
 	 *
@@ -141,11 +147,9 @@ class ContextNode extends Node {
 
 		const previousContext = builder.addContext( this.value );
 
-		const node = this.node.build( builder );
+		this.node.build( builder );
 
 		builder.setContext( previousContext );
-
-		return node;
 
 	}
 

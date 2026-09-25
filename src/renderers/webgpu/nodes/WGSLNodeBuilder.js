@@ -997,6 +997,42 @@ class WGSLNodeBuilder extends NodeBuilder {
 	 */
 	generateTextureGather( texture, textureProperty, uvSnippet, gatherSnippet, depthSnippet, offsetSnippet ) {
 
+		const { primarySamples } = this.renderer.backend.utils.getTextureSampleData( texture );
+
+		if ( primarySamples > 1 ) {
+
+			// textureGather() has no overload for multisampled textures (e.g. the depth
+			// of a MSAA render target), so the four texels are fetched with textureLoad()
+
+			const textureDimension = this.generateTextureDimension( texture, textureProperty, '0u' );
+
+			let coordSnippet = `vec2<i32>( floor( ${ uvSnippet } * vec2<f32>( ${ textureDimension } ) - 0.5 ) )`;
+
+			if ( offsetSnippet ) {
+
+				coordSnippet = `${ coordSnippet } + ${ offsetSnippet }`;
+
+			}
+
+			const coord = new VarNode( new ExpressionNode( coordSnippet, 'ivec2' ) ).build( this );
+			const coordMax = `vec2<i32>( ${ textureDimension } ) - 1`;
+
+			const load = ( x, y ) => {
+
+				const snippet = this.generateTextureLoad( texture, textureProperty, `clamp( ${ coord } + vec2<i32>( ${ x }, ${ y } ), vec2<i32>( 0 ), ${ coordMax } )`, null, null, null );
+
+				return texture.isDepthTexture === true ? snippet : `${ snippet }[ ${ gatherSnippet } ]`;
+
+			};
+
+			// same texel order as textureGather()
+
+			const componentPrefix = this.getComponentTypeFromTexture( texture ).charAt( 0 );
+
+			return `vec4<${ componentPrefix }32>( ${ load( 0, 1 ) }, ${ load( 1, 1 ) }, ${ load( 1, 0 ) }, ${ load( 0, 0 ) } )`;
+
+		}
+
 		const componentSnippet = texture.isDepthTexture === true ? '' : `${gatherSnippet}, `;
 
 		if ( depthSnippet ) {
@@ -1712,20 +1748,17 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Enables the 'subgroups' directive.
+	 * Enables subgroups.
 	 */
 	enableSubGroups() {
 
+		if ( this.renderer.hasFeature( 'subgroups' ) === false ) {
+
+			error( 'WGSLNodeBuilder: The \'subgroups\' feature is not supported by the current device.' );
+
+		}
+
 		this.enableDirective( 'subgroups' );
-
-	}
-
-	/**
-	 * Enables the 'subgroups-f16' directive.
-	 */
-	enableSubgroupsF16() {
-
-		this.enableDirective( 'subgroups-f16' );
 
 	}
 
@@ -1739,7 +1772,7 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Enables the 'f16' directive.
+	 * Enables 16 bit floats.
 	 */
 	enableShaderF16() {
 
@@ -1748,7 +1781,7 @@ ${ flowData.code }
 	}
 
 	/**
-	 * Enables the 'dual_source_blending' directive.
+	 * Enables dual source blending.
 	 */
 	enableDualSourceBlending() {
 
@@ -1802,9 +1835,10 @@ ${ flowData.code }
 	 * @param {string} scope - The scope.
 	 * @param {string} bufferType - The buffer type.
 	 * @param {string} bufferCount - The buffer count.
+	 * @param {boolean} isAtomic - Whether the array elements are atomic or not.
 	 * @return {string} The array name.
 	 */
-	getScopedArray( name, scope, bufferType, bufferCount ) {
+	getScopedArray( name, scope, bufferType, bufferCount, isAtomic ) {
 
 		if ( this.scopedArrays.has( name ) === false ) {
 
@@ -1812,7 +1846,8 @@ ${ flowData.code }
 				name,
 				scope,
 				bufferType,
-				bufferCount
+				bufferCount,
+				isAtomic
 			} );
 
 		}
@@ -1838,9 +1873,11 @@ ${ flowData.code }
 
 		const snippets = [];
 
-		for ( const { name, scope, bufferType, bufferCount } of this.scopedArrays.values() ) {
+		for ( const { name, scope, bufferType, bufferCount, isAtomic } of this.scopedArrays.values() ) {
 
-			const type = this.getType( bufferType );
+			let type = this.getType( bufferType );
+
+			if ( isAtomic === true ) type = `atomic<${type}>`;
 
 			snippets.push( `var<${scope}> ${name}: array< ${type}, ${bufferCount} >;` );
 
@@ -1994,6 +2031,48 @@ ${ flowData.code }
 		}
 
 		return snippet;
+
+	}
+
+	/**
+	 * Returns a single const variable statement as a WGSL string for the given variable type and name.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The WGSL snippet that defines a const variable.
+	 */
+	generateConstStatement( type, name/*, count = null*/ ) {
+
+		return `const ${ name }`;
+
+	}
+
+	/**
+	 * Returns a single variable statement as a WGSL string for the given variable type and name.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The WGSL snippet that defines a variable.
+	 */
+	generateVarStatement( type, name, count = null ) {
+
+		return this.getVar( type, name, count );
+
+	}
+
+	/**
+	 * Returns a runtime read-only variable statement as a WGSL string.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The WGSL snippet that defines a let variable.
+	 */
+	generateLetStatement( type, name/*, count = null*/ ) {
+
+		return `let ${ name }`;
 
 	}
 
@@ -2202,11 +2281,13 @@ ${ flowData.code }
 
 				} else if ( texture.isArrayTexture === true || texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
 
-					textureType = 'texture_2d_array<f32>';
+					const componentPrefix = this.getComponentTypeFromTexture( texture ).charAt( 0 );
+					textureType = `texture_2d_array<${ componentPrefix }32>`;
 
 				} else if ( texture.is3DTexture === true || texture.isData3DTexture === true ) {
 
-					textureType = 'texture_3d<f32>';
+					const componentPrefix = this.getComponentTypeFromTexture( texture ).charAt( 0 );
+					textureType = `texture_3d<${ componentPrefix }32>`;
 
 				} else {
 
@@ -2632,6 +2713,9 @@ fn main( ${shaderData.attributes} ) -> VaryingsStruct {
 		return `${ this.getSignature() }
 // global
 ${ diagnostics }
+
+// directives
+${shaderData.directives}
 
 // structs
 ${shaderData.structs}

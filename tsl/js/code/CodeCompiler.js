@@ -1380,6 +1380,64 @@ ${declarationsStr}
 		const importNodes = ast.body.filter( node => node.type === 'ImportDeclaration' );
 		const replacements = [];
 
+		function getFullLineRange( text, start, end ) {
+
+			let lineStart = start;
+			while ( lineStart > 0 && text[ lineStart - 1 ] !== '\n' && text[ lineStart - 1 ] !== '\r' ) {
+
+				if ( ! /\s/.test( text[ lineStart - 1 ] ) ) {
+
+					return { start, end };
+
+				}
+
+				lineStart --;
+
+			}
+
+			let lineEnd = end;
+			while ( lineEnd < text.length && text[ lineEnd ] !== '\n' && text[ lineEnd ] !== '\r' ) {
+
+				if ( ! /\s/.test( text[ lineEnd ] ) && text[ lineEnd ] !== ';' ) {
+
+					return { start, end };
+
+				}
+
+				lineEnd ++;
+
+			}
+
+			if ( lineEnd < text.length ) {
+
+				if ( text[ lineEnd ] === '\r' && text[ lineEnd + 1 ] === '\n' ) {
+
+					lineEnd += 2;
+
+				} else if ( text[ lineEnd ] === '\n' || text[ lineEnd ] === '\r' ) {
+
+					lineEnd += 1;
+
+				}
+
+			} else if ( lineStart > 0 ) {
+
+				if ( text[ lineStart - 1 ] === '\n' && lineStart > 1 && text[ lineStart - 2 ] === '\r' ) {
+
+					lineStart -= 2;
+
+				} else if ( text[ lineStart - 1 ] === '\n' || text[ lineStart - 1 ] === '\r' ) {
+
+					lineStart -= 1;
+
+				}
+
+			}
+
+			return { start: lineStart, end: lineEnd };
+
+		}
+
 		importNodes.forEach( node => {
 
 			const moduleName = node.source.value;
@@ -1395,9 +1453,10 @@ ${declarationsStr}
 
 			if ( usedSpecifiers.length === 0 ) {
 
+				const range = getFullLineRange( code, node.start, node.end );
 				replacements.push( {
-					start: node.start,
-					end: node.end,
+					start: range.start,
+					end: range.end,
 					replacement: ''
 				} );
 
@@ -1508,6 +1567,7 @@ ${declarationsStr}
 				],
 				'no-multi-spaces': 2,
 				'no-extra-semi': 1,
+				'no-multiple-empty-lines': [ 'error', { 'max': 1, 'maxBOF': 0, 'maxEOF': 1 } ],
 				'quotes': [ 'error', 'single' ],
 				'prefer-const': [ 'error', {
 					'destructuring': 'any',

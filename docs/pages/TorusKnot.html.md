@@ -6,7 +6,7 @@ A torus knot.
 
 ## Import
 
-TorusKnot is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+TorusKnot is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { TorusKnot } from 'three/addons/curves/CurveExtras.js';

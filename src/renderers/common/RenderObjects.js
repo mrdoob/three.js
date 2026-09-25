@@ -217,6 +217,7 @@ class RenderObjects {
 
 		renderObject.onDispose = () => {
 
+			this.geometries.deleteVertexState( renderObject );
 			this.pipelines.delete( renderObject );
 			this.bindings.deleteForRender( renderObject );
 			this.nodes.delete( renderObject );

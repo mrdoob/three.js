@@ -13,7 +13,7 @@ const data = exporter.parse( scene );
 
 ## Import
 
-OBJExporter is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+OBJExporter is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { OBJExporter } from 'three/addons/exporters/OBJExporter.js';

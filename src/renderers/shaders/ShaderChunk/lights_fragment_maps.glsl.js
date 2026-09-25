@@ -10,7 +10,7 @@ export default /* glsl */`
 
 	#endif
 
-	#if defined( USE_ENVMAP ) && defined( ENVMAP_TYPE_CUBE_UV )
+	#if defined( USE_ENVMAP ) && defined( ENVMAP_TYPE_PMREM )
 
 		#if defined( STANDARD ) || defined( LAMBERT ) || defined( PHONG )
 
@@ -26,13 +26,31 @@ export default /* glsl */`
 
 	#ifdef USE_ANISOTROPY
 
-		radiance += getIBLAnisotropyRadiance( geometryViewDir, geometryNormal, material.roughness, material.anisotropyB, material.anisotropy );
+		vec3 iblRadiance = getIBLAnisotropyRadiance( geometryViewDir, geometryNormal, material.roughness, material.anisotropyB, material.anisotropy );
 
 	#else
 
-		radiance += getIBLRadiance( geometryViewDir, geometryNormal, material.roughness );
+		vec3 iblRadiance = getIBLRadiance( geometryViewDir, geometryNormal, material.roughness );
 
 	#endif
+
+	#ifdef USE_RETROREFLECTION
+
+		#ifdef USE_ANISOTROPY
+
+			vec3 retroIBLRadiance = getIBLAnisotropyRetroRadiance( geometryViewDir, geometryNormal, material.roughness, material.anisotropyB, material.anisotropy );
+
+		#else
+
+			vec3 retroIBLRadiance = getIBLRetroRadiance( geometryViewDir, geometryNormal, material.roughness );
+
+		#endif
+
+		iblRadiance = mix( iblRadiance, retroIBLRadiance, saturate( material.retroreflectivity ) );
+
+	#endif
+
+	radiance += iblRadiance;
 
 	#ifdef USE_CLEARCOAT
 

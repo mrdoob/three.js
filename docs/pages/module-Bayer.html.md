@@ -2,7 +2,7 @@
 
 ## Import
 
-Bayer is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+Bayer is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { bayer16 } from 'three/addons/tsl/math/Bayer.js';

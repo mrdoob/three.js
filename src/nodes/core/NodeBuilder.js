@@ -1084,6 +1084,8 @@ class NodeBuilder {
 		delete context.getAO;
 		delete context.getGI;
 		delete context.getShadow;
+		delete context.nodeLoop;
+		delete context.nodeBlock;
 
 		return context;
 
@@ -1197,6 +1199,75 @@ class NodeBuilder {
 	 * @return {string} The fragCoord shader string.
 	 */
 	getFragCoord() {
+
+		warn( 'Abstract function.' );
+
+	}
+
+	/**
+	 * Returns a builtin representing the size of a subgroup within the current shader.
+	 *
+	 * @abstract
+	 * @return {string} The subgroup size shader string.
+	 */
+	getSubgroupSize() {
+
+		warn( 'Abstract function.' );
+
+	}
+
+	/**
+	 * Returns a builtin representing the index of an invocation within its subgroup.
+	 *
+	 * @abstract
+	 * @return {string} The invocation subgroup index shader string.
+	 */
+	getInvocationSubgroupIndex() {
+
+		warn( 'Abstract function.' );
+
+	}
+
+	/**
+	 * Returns a builtin representing the index of the current invocation's subgroup within its workgroup.
+	 *
+	 * @abstract
+	 * @return {string} The subgroup index shader string.
+	 */
+	getSubgroupIndex() {
+
+		warn( 'Abstract function.' );
+
+	}
+
+	/**
+	 * Enables subgroups.
+	 *
+	 * @abstract
+	 */
+	enableSubGroups() {
+
+		warn( 'Abstract function.' );
+
+	}
+
+	/**
+	 * Enables 16 bit floats.
+	 *
+	 * @abstract
+	 */
+	enableShaderF16() {
+
+		warn( 'Abstract function.' );
+
+	}
+
+	/**
+	 * Enables dual source blending.
+	 *
+	 * @abstract
+	 */
+	enableDualSourceBlending() {
 
 		warn( 'Abstract function.' );
 
@@ -2122,10 +2193,11 @@ class NodeBuilder {
 	 * @param {string} [type=node.getNodeType( this )] - The variable's type.
 	 * @param {('vertex'|'fragment'|'compute'|'any')} [shaderStage=this.shaderStage] - The shader stage.
 	 * @param {boolean} [readOnly=false] - Whether the variable is read-only or not.
+	 * @param {boolean} [local=false] - Whether the variable is declared locally in the flow instead of the variable section.
 	 *
 	 * @return {NodeVar} The node variable.
 	 */
-	getVarFromNode( node, name = null, type = node.getNodeType( this ), shaderStage = this.shaderStage, readOnly = false ) {
+	getVarFromNode( node, name = null, type = node.getNodeType( this ), shaderStage = this.shaderStage, readOnly = false, local = false ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
 		const subBuildVariable = this.getSubBuildProperty( 'variable', nodeData.subBuilds );
@@ -2159,9 +2231,9 @@ class NodeBuilder {
 
 			const count = node.getArrayCount( this );
 
-			nodeVar = new NodeVar( name, type, readOnly, count );
+			nodeVar = new NodeVar( name, type, readOnly, count, local );
 
-			if ( ! readOnly ) {
+			if ( ! readOnly && ! local ) {
 
 				vars.push( nodeVar );
 
@@ -2184,6 +2256,12 @@ class NodeBuilder {
 	 * @return {boolean} Returns true if deterministic.
 	 */
 	isDeterministic( node ) {
+
+		if ( node.isVarNode && node.intent ) {
+
+			node = node.node;
+
+		}
 
 		if ( node.isMathNode ) {
 
@@ -2376,6 +2454,8 @@ class NodeBuilder {
 				this.addLineFlowCode( flowCode );
 
 			}
+
+			flowCodeBlock.set( nodeBlock, true );
 
 		}
 
@@ -2844,6 +2924,49 @@ class NodeBuilder {
 	}
 
 	/**
+	 * Returns a single const variable statement as a shader string for the given variable type and name.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The shader string.
+	 */
+	generateConstStatement( type, name, count = null ) {
+
+		return `const ${ this.getVar( type, name, count ) }`;
+
+	}
+
+	/**
+	 * Returns a single variable statement as a shader string for the given variable type and name.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The shader string.
+	 */
+	generateVarStatement( type, name, count = null ) {
+
+		return this.getVar( type, name, count );
+
+	}
+
+	/**
+	 * Returns a runtime read-only variable statement as a shader string.
+	 * Backends without a let declaration use a regular variable declaration.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The shader string.
+	 */
+	generateLetStatement( type, name, count = null ) {
+
+		return this.generateVarStatement( type, name, count );
+
+	}
+
+	/**
 	 * Returns the variable definitions as a shader string for the given shader stage.
 	 *
 	 * @param {('vertex'|'fragment'|'compute'|'any')} shaderStage - The shader stage.
@@ -3236,9 +3359,10 @@ class NodeBuilder {
 	 * Async version of build() that yields to main thread between shader stages.
 	 * Use this in compileAsync() to prevent blocking the main thread.
 	 *
+	 * @param {Function} [yieldFn=yieldToMain] - The function used to yield to the main thread.
 	 * @return {Promise<NodeBuilder>} A promise that resolves to this node builder.
 	 */
-	async buildAsync() {
+	async buildAsync( yieldFn = yieldToMain ) {
 
 		this.prebuild();
 
@@ -3277,7 +3401,7 @@ class NodeBuilder {
 				}
 
 				// Yield to main thread after each shader stage to prevent blocking
-				await yieldToMain();
+				await yieldFn();
 
 			}
 

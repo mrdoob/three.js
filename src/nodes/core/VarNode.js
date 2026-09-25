@@ -92,6 +92,12 @@ class VarNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Sets the intent flag for this node.
 	 *
@@ -241,20 +247,6 @@ class VarNode extends Node {
 	generate( builder ) {
 
 		const { node, name, readOnly } = this;
-		const { renderer } = builder;
-
-		const isWebGPUBackend = renderer.backend.isWebGPUBackend === true;
-
-		let isDeterministic = false;
-		let shouldTreatAsReadOnly = false;
-
-		if ( readOnly ) {
-
-			isDeterministic = builder.isDeterministic( node );
-
-			shouldTreatAsReadOnly = isWebGPUBackend ? readOnly : isDeterministic;
-
-		}
 
 		const nodeType = this.getNodeType( builder );
 
@@ -275,27 +267,23 @@ class VarNode extends Node {
 		const vectorType = builder.getVectorType( nodeType );
 		const snippet = node.build( builder, vectorType );
 
-		const nodeVar = builder.getVarFromNode( this, name, vectorType, undefined, shouldTreatAsReadOnly );
+		const nodeVar = builder.getVarFromNode( this, name, vectorType, undefined, readOnly, this.intent );
 
 		const propertyName = builder.getPropertyName( nodeVar );
 
 		let declarationPrefix = propertyName;
 
-		if ( shouldTreatAsReadOnly ) {
+		if ( nodeVar.readOnly ) {
 
-			if ( isWebGPUBackend ) {
+			const count = node.getArrayCount( builder );
 
-				declarationPrefix = isDeterministic
-					? `const ${ propertyName }`
-					: `let ${ propertyName }`;
+			declarationPrefix = builder.isDeterministic( node )
+				? builder.generateConstStatement( nodeVar.type, propertyName, count )
+				: builder.generateLetStatement( nodeVar.type, propertyName, count );
 
-			} else {
+		} else if ( nodeVar.local ) {
 
-				const count = node.getArrayCount( builder );
-
-				declarationPrefix = `const ${ builder.getVar( nodeVar.type, propertyName, count ) }`;
-
-			}
+			declarationPrefix = builder.generateVarStatement( nodeVar.type, propertyName, nodeVar.count );
 
 		}
 

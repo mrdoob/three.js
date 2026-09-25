@@ -1575,7 +1575,7 @@ class WebGPUBackend extends Backend {
 
 				const texture = textures[ i ];
 
-				if ( texture.generateMipmaps === true ) {
+				if ( texture.generateMipmaps === true && texture.mipmapsAutoUpdate === true ) {
 
 					this.textureUtils.generateMipmaps( texture );
 
@@ -2257,7 +2257,8 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			const pixelRatio = context.renderTarget !== null ? 1 : this.renderer.getPixelRatio();
+			const renderTarget = context.renderTarget;
+			const pixelRatio = ( renderTarget === null || renderTarget.isPostProcessingRenderTarget === true ) ? this.renderer.getPixelRatio() : 1;
 			const indexPos = cameraIndex ? bindings.indexOf( cameraIndex ) : - 1;
 
 			for ( let i = 0, len = cameras.length; i < len; i ++ ) {
@@ -3050,7 +3051,7 @@ class WebGPUBackend extends Backend {
 
 		submit( this.device, encoder.finish() );
 
-		if ( dstLevel === 0 && dstTexture.generateMipmaps ) {
+		if ( dstLevel === 0 && dstTexture.generateMipmaps === true && dstTexture.mipmapsAutoUpdate === true ) {
 
 			this.textureUtils.generateMipmaps( dstTexture );
 
@@ -3107,6 +3108,8 @@ class WebGPUBackend extends Backend {
 
 		}
 
+		const generateMipmaps = texture.generateMipmaps === true && texture.mipmapsAutoUpdate === true && destinationGPU.mipLevelCount > 1;
+
 		if ( this._isRenderCameraDepthArray( renderContext ) === true ) {
 
 			// Layered draws are only executed in finishRender(), so preserve this copy as a render-stage boundary.
@@ -3120,7 +3123,7 @@ class WebGPUBackend extends Backend {
 					destinationGPU,
 					rectangle: { x: rectangle.x, y: rectangle.y, z: rectangle.z, w: rectangle.w },
 					// ViewportTextureNode restores this flag before the deferred copy executes.
-					generateMipmaps: texture.generateMipmaps
+					generateMipmaps
 				}
 			} );
 
@@ -3149,7 +3152,7 @@ class WebGPUBackend extends Backend {
 		// mipmaps must be genereated with the same encoder otherwise the copied texture data
 		// might be out-of-sync, see #31768
 
-		this._copyFramebufferToTexture( encoder, texture, sourceGPU, destinationGPU, rectangle );
+		this._copyFramebufferToTexture( encoder, texture, sourceGPU, destinationGPU, rectangle, 0, generateMipmaps );
 
 		if ( renderContextData.currentPass ) {
 
@@ -3222,7 +3225,7 @@ class WebGPUBackend extends Backend {
 		_texelCopyTextureInfoDst.reset();
 		_extent3D.reset();
 
-		if ( generateMipmaps ) {
+		if ( generateMipmaps === true && destinationGPU.mipLevelCount > 1 ) {
 
 			this.textureUtils.generateMipmaps( texture, encoder );
 

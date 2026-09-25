@@ -167,6 +167,17 @@ value instead, use <a href="TSL.html#materialIridescenceThickness">materialIride
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="retroreflectivityNode" translate="no">.<a href="#retroreflectivityNode">retroreflectivityNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The retroreflective strength of physical materials is by default inferred from the
+<code>retroreflectivity</code> property. This node property allows to overwrite the default
+and define the retroreflective strength with a node instead.</p>
+<p>If you don't want to overwrite the retroreflective strength but modify the existing
+value instead, use <a href="TSL.html#materialRetroreflectivity">materialRetroreflectivity</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="sheenNode" translate="no">.<a href="#sheenNode">sheenNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
 					<div class="description">
 						<p>The sheen of physical materials is by default inferred from the <code>sheen</code>, <code>sheenColor</code>
@@ -257,6 +268,13 @@ value instead, use <a href="TSL.html#materialTransmission">materialTransmission<
 					<h3 class="name" id="useIridescence" translate="no">.<a href="#useIridescence">useIridescence</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
 						<p>Whether the lighting model should use iridescence or not.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="useRetroreflection" translate="no">.<a href="#useRetroreflection">useRetroreflection</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the lighting model should use retroreflection or not.</p>
 						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>

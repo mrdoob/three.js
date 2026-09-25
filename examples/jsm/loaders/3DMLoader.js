@@ -553,7 +553,10 @@ class Rhino3dmLoader extends Loader {
 		const instanceReferences = [];
 
 		object.userData[ 'layers' ] = data.layers;
+		object.userData[ 'views' ] = data.views;
+		object.userData[ 'namedViews' ] = data.namedViews;
 		object.userData[ 'groups' ] = data.groups;
+		object.userData[ 'strings' ] = data.strings;
 		object.userData[ 'settings' ] = data.settings;
 		object.userData.settings[ 'renderSettings' ] = data.renderSettings;
 		object.userData[ 'objectType' ] = 'File3dm';

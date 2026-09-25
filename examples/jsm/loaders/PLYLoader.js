@@ -674,8 +674,22 @@ class PLYLoader extends Loader {
 
 				} else if ( vertex_indices.length === 4 ) {
 
-					buffer.indices.push( vertex_indices[ 0 ], vertex_indices[ 1 ], vertex_indices[ 3 ] );
-					buffer.indices.push( vertex_indices[ 1 ], vertex_indices[ 2 ], vertex_indices[ 3 ] );
+					// according to the spec, quads need to be split along a specific rule
+					// 4 0 1 2 3 results in 0,1,2 and 0,2,3
+
+					buffer.indices.push( vertex_indices[ 0 ], vertex_indices[ 1 ], vertex_indices[ 2 ] );
+					buffer.indices.push( vertex_indices[ 0 ], vertex_indices[ 2 ], vertex_indices[ 3 ] );
+
+					if ( texcoord && texcoord.length === 8 ) {
+
+						buffer.faceVertexUvs.push( texcoord[ 0 ], texcoord[ 1 ] );
+						buffer.faceVertexUvs.push( texcoord[ 2 ], texcoord[ 3 ] );
+						buffer.faceVertexUvs.push( texcoord[ 4 ], texcoord[ 5 ] );
+						buffer.faceVertexUvs.push( texcoord[ 0 ], texcoord[ 1 ] );
+						buffer.faceVertexUvs.push( texcoord[ 4 ], texcoord[ 5 ] );
+						buffer.faceVertexUvs.push( texcoord[ 6 ], texcoord[ 7 ] );
+
+					}
 
 				}
 
@@ -707,6 +721,14 @@ class PLYLoader extends Loader {
 					buffer.faceVertexColors.push( r, g, b );
 					buffer.faceVertexColors.push( r, g, b );
 					buffer.faceVertexColors.push( r, g, b );
+
+					if ( vertex_indices.length === 4 ) {
+
+						buffer.faceVertexColors.push( r, g, b );
+						buffer.faceVertexColors.push( r, g, b );
+						buffer.faceVertexColors.push( r, g, b );
+
+					}
 
 				}
 

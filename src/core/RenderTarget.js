@@ -19,6 +19,7 @@ class RenderTarget extends EventDispatcher {
 	 *
 	 * @typedef {Object} RenderTarget~Options
 	 * @property {boolean} [generateMipmaps=false] - Whether to generate mipmaps or not.
+	 * @property {boolean} [mipmapsAutoUpdate=true] - Whether to regenerate mipmaps automatically after rendering or not.
 	 * @property {number} [magFilter=LinearFilter] - The mag filter.
 	 * @property {number} [minFilter=LinearFilter] - The min filter.
 	 * @property {number} [format=RGBAFormat] - The texture format.
@@ -304,6 +305,7 @@ class RenderTarget extends EventDispatcher {
 		if ( options.colorSpace !== undefined ) values.colorSpace = options.colorSpace;
 		if ( options.flipY !== undefined ) values.flipY = options.flipY;
 		if ( options.generateMipmaps !== undefined ) values.generateMipmaps = options.generateMipmaps;
+		if ( options.mipmapsAutoUpdate !== undefined ) values.mipmapsAutoUpdate = options.mipmapsAutoUpdate;
 		if ( options.internalFormat !== undefined ) values.internalFormat = options.internalFormat;
 
 		for ( let i = 0; i < this.textures.length; i ++ ) {
@@ -481,6 +483,9 @@ class RenderTarget extends EventDispatcher {
 	/**
 	 * Frees the GPU-related resources allocated by this instance. Call this
 	 * method whenever this instance is no longer used in your app.
+	 *
+	 * This also frees the resources of the render target's textures. There is
+	 * no need to dispose them separately.
 	 *
 	 * @fires RenderTarget#dispose
 	 */

@@ -2,7 +2,7 @@
 
 ## Import
 
-WebGPUTextureUtils is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+WebGPUTextureUtils is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import * as WebGPUTextureUtils from 'three/addons/utils/WebGPUTextureUtils.js';
@@ -14,7 +14,7 @@ import * as WebGPUTextureUtils from 'three/addons/utils/WebGPUTextureUtils.js';
 
 Returns an uncompressed version of the given compressed texture.
 
-This module can only be used with [WebGPURenderer](WebGPURenderer.html). When using [WebGLRenderer](WebGLRenderer.html), import the function from [WebGLTextureUtils](WebGLTextureUtils.html).
+This module can only be used with [WebGPURenderer](WebGPURenderer.html). When using [WebGLRenderer](WebGLRenderer.html), import the function from [module:WebGLTextureUtils](module-WebGLTextureUtils.html).
 
 **blitTexture**
 

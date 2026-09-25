@@ -9,34 +9,24 @@
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → <a href="Light.html">Light</a> → </p>
 	<h1 translate="no">LightProbeGrid</h1>
 		<section>
 			<header>
 				<div class="class-description"><p>A 3D grid of L2 Spherical Harmonic irradiance probes that provides
 position-dependent diffuse global illumination.</p>
-<p>Note that this class can only be used with <a href="WebGLRenderer.html">WebGLRenderer</a>.
-A version for <a href="WebGPURenderer.html">WebGPURenderer</a> will be added at a later point.</p>
-<p>All seven packed SH sub-volumes are stored in a <strong>single</strong> RGBA
-<code>WebGL3DRenderTarget</code> using a texture-atlas layout along the Z axis.
-Each sub-volume occupies <code>( nz + 2 )</code> atlas slices: one padding slice at
-each end (a copy of the nearest edge data slice) to prevent color bleeding
-when the hardware trilinear filter reads across a sub-volume boundary.</p>
-<p>Atlas layout (nz = resolution.z, PADDING = 1):</p>
-<p>Total atlas depth = <code>7 * ( nz + 2 )</code>.</p>
-<p>Baking is fully GPU-resident: cubemap rendering, SH projection, and
-texture packing all happen on the GPU with zero CPU readback.</p></div>
-				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source"><code>  slice   0              : padding  (copy of sub-volume 0, data slice 0)
-  slices  1 … nz         : sub-volume 0 data
-  slice   nz + 1         : padding  (copy of sub-volume 0, data slice nz-1)
-  slice   nz + 2         : padding  (copy of sub-volume 1, data slice 0)
-  slices  nz+3 … 2*nz+2  : sub-volume 1 data
-  …
-</code></pre></div>
+<p>This is the <a href="WebGPURenderer.html">WebGPURenderer</a> version of <code>LightProbeGrid</code>. The grid is a
+<a href="Light.html">Light</a>, so adding it to the scene applies its baked irradiance to every
+lit node material automatically. When using <a href="WebGLRenderer.html">WebGLRenderer</a>, import the
+grid from <code>LightProbeGridWebGL.js</code> instead.</p>
+<p>The baked data is stored in a single RGBA <code>RenderTarget3D</code> atlas that packs
+the nine L2 SH coefficients into seven sub-volumes stacked along Z. Baking is
+fully GPU-resident: cubemap rendering, SH projection, and texture packing all
+happen on the GPU with zero CPU readback.</p></div>
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">LightProbeGrid</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<p><span translate="no">LightProbeGrid</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -118,6 +108,16 @@ by <a href="LightProbeGrid.html#bake">LightProbeGrid#bake</a>.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="falloff" translate="no">.<a href="#falloff">falloff</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Distance in world units over which the grid contribution fades out
+past the volume boundary. <code>0</code> applies the contribution everywhere
+(clamped), which matches a single-volume setup. Use a small positive
+value to blend multiple overlapping grids.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="height" translate="no">.<a href="#height">height</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>The full height of the volume along Y.</p>
@@ -139,7 +139,8 @@ by <a href="LightProbeGrid.html#bake">LightProbeGrid#bake</a>.</p>
 				<div class="member">
 					<h3 class="name" id="texture" translate="no">.<a href="#texture">texture</a><span class="type-signature"> : <a href="Data3DTexture.html">Data3DTexture</a></span> </h3>
 					<div class="description">
-						<p>The single RGBA atlas 3D texture storing all seven packed SH sub-volumes.</p>
+						<p>The single RGBA atlas 3D texture storing all seven packed SH
+sub-volumes stacked along Z.</p>
 						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
@@ -150,14 +151,21 @@ by <a href="LightProbeGrid.html#bake">LightProbeGrid#bake</a>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="bake" translate="no">.<a href="#bake">bake</a><span class="signature">( renderer : <span class="param-type"><a href="WebGLRenderer.html">WebGLRenderer</a></span>, scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, options : <span class="param-type">Object</span> )</span> </h3>
+					<h3 class="name name-method" id="bake" translate="no">.<a href="#bake">bake</a><span class="signature">( renderer : <span class="param-type"><a href="WebGPURenderer.html">WebGPURenderer</a></span>, scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, options : <span class="param-type">Object</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Bakes all probes by rendering cubemaps at each probe position
-and projecting to L2 SH. Optionally iterates additional passes to
-capture indirect bounces — each extra pass samples the previous pass's
-atlas as indirect light, so a grid added to the scene before baking
-accumulates one bounce per extra pass.</p>
+							<p>Bakes probes by rendering cubemaps at each probe position and
+projecting to L2 SH. Optionally iterates additional passes to capture
+indirect bounces: each extra pass samples the previous pass's data as
+indirect light, accumulating one bounce per extra pass.</p>
+<p>Use <code>start</code> and <code>count</code> to bake a range and publish its cells immediately.
+Indices advance along X, then Z, then Y, filling horizontal layers from bottom
+to top. For incremental indirect bounces, finish the whole grid for <code>pass: 0</code>,
+then repeat with <code>pass: 1</code>, etc. Start each pass at index 0 to snapshot the
+previous pass before updating its cells.</p>
+<p>Shadow-casting instances of <code>SunLight</code> are temporarily replaced with
+equivalent directional lights, since their view-fitted shadow cascades
+cannot be frozen across probe renders.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -217,7 +225,42 @@ accumulates one bounce per extra pass.</p>
 										<strong translate="no">bounces</strong>
 									</td>
 									<td class="description last">
-										<p>Additional bounce passes after the initial direct pass.</p>
+										<p>Additional bounce passes. Only available when baking the whole grid.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">sampleCount</strong>
+									</td>
+									<td class="description last">
+										<p>Directions integrated when projecting each cubemap to SH.</p>
+										<p>Default is <code>512</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">start</strong>
+									</td>
+									<td class="description last">
+										<p>Index of the first probe to bake.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">count</strong>
+									</td>
+									<td class="description last">
+										<p>Number of probes to bake. Defaults to the remaining probes.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">pass</strong>
+									</td>
+									<td class="description last">
+										<p>Starting pass. Zero captures direct light; later passes sample the previous pass. Ranged calls require <code>bounces: 0</code>.</p>
 										<p>Default is <code>0</code>.</p>
 									</td>
 								</tr>
@@ -233,6 +276,9 @@ accumulates one bounce per extra pass.</p>
 						<div class="description">
 							<p>Frees GPU resources.</p>
 						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Light.html#dispose">Light#dispose</a></dt>
+						</dl>
 					</div>
 					<h3 class="name name-method" id="getProbePosition" translate="no">.<a href="#getProbePosition">getProbePosition</a><span class="signature">( ix : <span class="param-type">number</span>, iy : <span class="param-type">number</span>, iz : <span class="param-type">number</span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
 					<div class="method">

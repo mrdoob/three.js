@@ -110,12 +110,9 @@ class ComputeNode extends Node {
 
 	}
 
-	/**
-	 * Executes the `dispose` event for this node.
-	 */
-	dispose() {
+	isCacheable( /*builder*/ ) {
 
-		this.dispatchEvent( { type: 'dispose' } );
+		return false;
 
 	}
 

@@ -2,7 +2,7 @@
 
 ## Import
 
-WebGLTextureUtils is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+WebGLTextureUtils is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import * as WebGLTextureUtils from 'three/addons/utils/WebGLTextureUtils.js';
@@ -14,7 +14,7 @@ import * as WebGLTextureUtils from 'three/addons/utils/WebGLTextureUtils.js';
 
 Returns an uncompressed version of the given compressed texture.
 
-This module can only be used with [WebGLRenderer](WebGLRenderer.html). When using [WebGPURenderer](WebGPURenderer.html), import the function from [WebGPUTextureUtils](WebGPUTextureUtils.html).
+This module can only be used with [WebGLRenderer](WebGLRenderer.html). When using [WebGPURenderer](WebGPURenderer.html), import the function from [module:WebGPUTextureUtils](module-WebGPUTextureUtils.html).
 
 **texture**
 

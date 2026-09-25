@@ -95,6 +95,14 @@ class WorkgroupInfoNode extends Node {
 		this.bufferCount = bufferCount;
 
 		/**
+		 * Whether the node is atomic or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.isAtomic = false;
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -124,6 +132,12 @@ class WorkgroupInfoNode extends Node {
 		 * @default ''
 		 */
 		this.name = '';
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -167,6 +181,31 @@ class WorkgroupInfoNode extends Node {
 		this.scope = scope;
 
 		return this;
+
+	}
+
+	/**
+	 * Defines whether the node is atomic or not.
+	 *
+	 * @param {boolean} value - The atomic flag.
+	 * @return {WorkgroupInfoNode} A reference to this node.
+	 */
+	setAtomic( value ) {
+
+		this.isAtomic = value;
+
+		return this;
+
+	}
+
+	/**
+	 * Convenience method for making this node atomic.
+	 *
+	 * @return {WorkgroupInfoNode} A reference to this node.
+	 */
+	toAtomic() {
+
+		return this.setAtomic( true );
 
 	}
 
@@ -217,7 +256,7 @@ class WorkgroupInfoNode extends Node {
 
 		const name = ( this.name !== '' ) ? this.name : `${this.scope}Array_${this.id}`;
 
-		return builder.getScopedArray( name, this.scope.toLowerCase(), this.bufferType, this.bufferCount );
+		return builder.getScopedArray( name, this.scope.toLowerCase(), this.bufferType, this.bufferCount, this.isAtomic );
 
 	}
 
@@ -236,5 +275,4 @@ export default WorkgroupInfoNode;
  * @returns {WorkgroupInfoNode}
  */
 export const workgroupArray = ( type, count ) => new WorkgroupInfoNode( 'Workgroup', type, count );
-
 

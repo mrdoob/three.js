@@ -138,6 +138,12 @@ class LightsNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Overwrites the default {@link Node#customCacheKey} implementation by including
 	 * light data into the cache key.
@@ -207,26 +213,6 @@ class LightsNode extends Node {
 	}
 
 	/**
-	 * Analyzes the node's dependencies by building all nested light nodes
-	 * and the output node.
-	 *
-	 * @param {NodeBuilder} builder - A reference to the current node builder.
-	 */
-	analyze( builder ) {
-
-		const properties = builder.getNodeProperties( this );
-
-		for ( const node of properties.nodes ) {
-
-			node.build( builder );
-
-		}
-
-		properties.outputNode.build( builder );
-
-	}
-
-	/**
 	 * Creates lighting nodes for each scene light. This makes it possible to further
 	 * process lights in the node system.
 	 *
@@ -244,7 +230,6 @@ class LightsNode extends Node {
 		const builtinLights = this.getBuiltinLights();
 
 		const lights = sortLights( [ ...materialLightings, ...builtinLights ] );
-		const nodeLibrary = builder.renderer.library;
 
 		for ( const light of lights ) {
 
@@ -264,9 +249,9 @@ class LightsNode extends Node {
 
 				if ( lightNode === null ) {
 
-					const lightNodeClass = nodeLibrary.getLightNodeClass( light.constructor );
+					const lightNodeClass = light._lightNode;
 
-					if ( lightNodeClass === null ) {
+					if ( lightNodeClass === undefined ) {
 
 						warn( `LightsNode.setupNodeLights: Light node not found for ${ light.constructor.name }` );
 						continue;
@@ -381,17 +366,13 @@ class LightsNode extends Node {
 		const context = builder.context;
 		const lightingModel = context.lightingModel;
 
-		const properties = builder.getNodeProperties( this );
-
 		if ( lightingModel ) {
 
 			const { totalDiffuseNode, totalSpecularNode } = this;
 
 			context.outgoingLight = outgoingLightNode;
 
-			const stack = builder.addStack();
-
-			properties.nodes = stack.nodes;
+			builder.addStack();
 
 			lightingModel.start( builder );
 
@@ -422,10 +403,6 @@ class LightsNode extends Node {
 			lightingModel.finish( builder );
 
 			outgoingLightNode = outgoingLightNode.bypass( builder.removeStack() );
-
-		} else {
-
-			properties.nodes = [];
 
 		}
 
