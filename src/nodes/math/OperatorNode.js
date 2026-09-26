@@ -122,7 +122,7 @@ class OperatorNode extends Node {
 
 		} else if ( op === '%' ) {
 
-			const promotedType = builder.getPromotedComponentType( builder.getComponentType( typeA ), builder.getComponentType( typeB ) );
+			const promotedType = builder.getPromotedComponentType( aNode, bNode );
 
 			return builder.changeComponentType( typeA, promotedType );
 
@@ -190,7 +190,7 @@ class OperatorNode extends Node {
 
 			const type = builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ? typeB : typeA;
 
-			const promotedType = builder.getPromotedComponentType( builder.getComponentType( typeA ), builder.getComponentType( typeB ) );
+			const promotedType = builder.getPromotedComponentType( aNode, bNode );
 
 			return builder.changeComponentType( type, promotedType );
 
@@ -216,7 +216,7 @@ class OperatorNode extends Node {
 
 			if ( op === '<' || op === '>' || op === '<=' || op === '>=' || op === '==' || op === '!=' ) {
 
-				const promotedType = builder.getPromotedComponentType( builder.getComponentType( typeA ), builder.getComponentType( typeB ) );
+				const promotedType = builder.getPromotedComponentType( aNode, bNode );
 
 				if ( builder.isVector( typeA ) || builder.isVector( typeB ) ) {
 

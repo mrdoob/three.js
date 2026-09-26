@@ -1916,15 +1916,59 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Returns the higher-ranked component type for the given component types.
+	 * Returns the common component type of the input nodes. Explicit types are
+	 * promoted first, then weak constants adapt to that type if their values fit.
+	 * Inputs consisting only of weak constants default to float.
 	 *
-	 * @param {string} typeA - The first type.
-	 * @param {string} typeB - The second type.
-	 * @return {string} The new type.
+	 * @param {...?Node} nodes - The input nodes.
+	 * @return {string} The promoted component type.
 	 */
-	getPromotedComponentType( typeA, typeB ) {
+	getPromotedComponentType( ...nodes ) {
 
-		return _componentTypeRanks[ typeA ] >= _componentTypeRanks[ typeB ] ? typeA : typeB;
+		let type = null;
+
+		for ( const node of nodes ) {
+
+			if ( node === null || node.isWeak === true ) continue;
+
+			const componentType = this.getComponentType( node.getNodeType( this ) );
+
+			if ( type === null || _componentTypeRanks[ componentType ] > _componentTypeRanks[ type ] ) {
+
+				type = componentType;
+
+			}
+
+		}
+
+		if ( type === null ) return 'float';
+
+		let hasWeak = false;
+		let fitsUint = true;
+		let fitsInt = true;
+
+		for ( const node of nodes ) {
+
+			if ( node === null || node.isWeak !== true ) continue;
+
+			const value = node.value;
+
+			hasWeak = true;
+			fitsUint = fitsUint && Number.isInteger( value ) && value >= 0 && value <= 0xffffffff;
+			fitsInt = fitsInt && Number.isInteger( value ) && value >= - 0x80000000 && value <= 0x7fffffff;
+
+		}
+
+		if ( hasWeak ) {
+
+			if ( type === 'uint' && fitsUint ) return 'uint';
+			if ( ( type === 'uint' || type === 'int' ) && fitsInt ) return 'int';
+
+			return 'float';
+
+		}
+
+		return type;
 
 	}
 

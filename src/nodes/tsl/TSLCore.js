@@ -301,7 +301,7 @@ const ShaderNodeObject = function ( obj, altType = null ) {
 
 	} else if ( ( altType === null && ( type === 'float' || type === 'boolean' ) ) || ( type && type !== 'shader' && type !== 'string' ) ) {
 
-		return nodeObject( getConstNode( obj, altType ) );
+		return nodeObject( getConstNode( obj, altType, type === 'float' && altType === null ) );
 
 	} else if ( type === 'shader' ) {
 
@@ -884,12 +884,15 @@ for ( const float of floats ) floatsCacheMap.set( - float, new ConstNode( - floa
 const cacheMaps = { bool: boolsCacheMap, uint: uintsCacheMap, ints: intsCacheMap, float: floatsCacheMap };
 
 const constNodesCacheMap = new Map( [ ...boolsCacheMap, ...floatsCacheMap ] );
+const weakConstNodesCacheMap = new Map();
 
-const getConstNode = ( value, type ) => {
+const getConstNode = ( value, type, isWeak = false ) => {
 
-	if ( constNodesCacheMap.has( value ) ) {
+	const cacheMap = isWeak ? weakConstNodesCacheMap : constNodesCacheMap;
 
-		return constNodesCacheMap.get( value );
+	if ( cacheMap.has( value ) ) {
+
+		return cacheMap.get( value );
 
 	} else if ( value.isNode === true ) {
 
@@ -897,7 +900,12 @@ const getConstNode = ( value, type ) => {
 
 	} else {
 
-		return new ConstNode( value, type );
+		const node = new ConstNode( value, type );
+		node.isWeak = isWeak;
+
+		if ( isWeak && constNodesCacheMap.has( value ) ) cacheMap.set( value, node );
+
+		return node;
 
 	}
 

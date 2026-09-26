@@ -34,6 +34,14 @@ class ConstNode extends InputNode {
 		 */
 		this.isConstNode = true;
 
+		/**
+		 * Whether this constant is an implicit number whose type can adapt to other operands.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.isWeak = false;
+
 	}
 
 	/**
@@ -59,6 +67,22 @@ class ConstNode extends InputNode {
 		}
 
 		return builder.format( this.generateConst( builder ), type, output );
+
+	}
+
+	serialize( data ) {
+
+		super.serialize( data );
+
+		data.isWeak = this.isWeak;
+
+	}
+
+	deserialize( data ) {
+
+		super.deserialize( data );
+
+		this.isWeak = data.isWeak === true;
 
 	}
 

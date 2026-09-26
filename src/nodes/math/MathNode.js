@@ -129,9 +129,9 @@ class MathNode extends Node {
 
 		}
 
-		let promotedType = builder.getComponentType( aType );
-		if ( bType !== null ) promotedType = builder.getPromotedComponentType( promotedType, builder.getComponentType( bType ) );
-		if ( cType !== null ) promotedType = builder.getPromotedComponentType( promotedType, builder.getComponentType( cType ) );
+		if ( builder.isMatrix( type ) ) return type;
+
+		const promotedType = _floatMethods.has( this.method ) ? 'float' : builder.getPromotedComponentType( this.aNode, this.bNode, this.cNode );
 
 		return builder.changeComponentType( type, promotedType );
 
@@ -235,7 +235,7 @@ class MathNode extends Node {
 
 		let method = this.method;
 
-		let type = this.getNodeType( builder );
+		const type = this.getNodeType( builder );
 		const inputType = this.getInputType( builder );
 
 		const a = this.aNode;
@@ -308,14 +308,6 @@ class MathNode extends Node {
 				params.push( a.build( builder, inputType ) );
 				if ( b !== null ) params.push( b.build( builder, inputType ) );
 				if ( c !== null ) params.push( c.build( builder, inputType ) );
-
-			}
-
-			if ( method === MathNode.DOT ) {
-
-				// WGSL returns component type, whereas GLSL always returns float.
-
-				type = builder.getComponentType( inputType );
 
 			}
 
@@ -408,6 +400,18 @@ MathNode.CLAMP = 'clamp';
 MathNode.REFRACT = 'refract';
 MathNode.SMOOTHSTEP = 'smoothstep';
 MathNode.FACEFORWARD = 'faceforward';
+
+// Methods that are only defined for floating-point types.
+
+const _floatMethods = new Set( [
+	MathNode.RADIANS, MathNode.DEGREES, MathNode.EXP, MathNode.EXP2, MathNode.LOG, MathNode.LOG2,
+	MathNode.SQRT, MathNode.INVERSE_SQRT, MathNode.FLOOR, MathNode.CEIL, MathNode.NORMALIZE, MathNode.FRACT,
+	MathNode.SIN, MathNode.SINH, MathNode.COS, MathNode.COSH, MathNode.TAN, MathNode.TANH,
+	MathNode.ASIN, MathNode.ASINH, MathNode.ACOS, MathNode.ACOSH, MathNode.ATAN, MathNode.ATANH,
+	MathNode.LENGTH, MathNode.DFDX, MathNode.DFDY, MathNode.ROUND, MathNode.TRUNC, MathNode.FWIDTH,
+	MathNode.STEP, MathNode.REFLECT, MathNode.DISTANCE, MathNode.DOT, MathNode.CROSS, MathNode.POW,
+	MathNode.MIX, MathNode.REFRACT, MathNode.SMOOTHSTEP, MathNode.FACEFORWARD
+] );
 
 export default MathNode;
 
