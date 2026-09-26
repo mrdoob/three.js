@@ -48,7 +48,7 @@ vec4<f32>( vec3<f32>( 1.0, 0.5, 0.0 ), 1.0 )
 
 // weak promote out of range
 
-vec4<f32>( ( f32( object.nodeUniform0 ) * 0.5 ), f32( ( i32( object.nodeUniform0 ) < -1 ) ), ( f32( object.nodeUniform0 ) + 4294967296.0 ), ( 3.0 * 1.5 ) )
+vec4<f32>( f32( ( object.nodeUniform0 * 1u ) ), f32( ( i32( object.nodeUniform0 ) < -1 ) ), ( f32( object.nodeUniform0 ) + 4294967296.0 ), f32( ( 3 * 2 ) ) )
 
 // weak shared constant
 
@@ -56,7 +56,7 @@ vec2<f32>( f32( ( object.nodeUniform0 + 1u ) ), ( nodeVarying0.x + 1.0 ) )
 
 // weak math functions
 
-vec4<f32>( f32( clamp( object.nodeUniform0, 0u, 64u ) ), f32( clamp( 0u, object.nodeUniform0, 64u ) ), f32( max( 3, -1 ) ), max( 3.0, 0.5 ) )
+vec4<f32>( f32( clamp( object.nodeUniform0, 0u, 64u ) ), f32( clamp( 0u, object.nodeUniform0, 64u ) ), f32( max( 3, -1 ) ), f32( max( 3, 1 ) ) )
 
 // float only math functions
 

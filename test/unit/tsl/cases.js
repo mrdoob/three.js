@@ -37,7 +37,7 @@ export const cases = {
 
 	},
 
-	// A weak number that does not fit the explicit integer type promotes the operation.
+	// Weak numbers adopt the explicit integer type, rounded if needed; values out of its range promote it.
 	weakPromoteOutOfRange: () => {
 
 		const index = uniform( 70, 'uint' );

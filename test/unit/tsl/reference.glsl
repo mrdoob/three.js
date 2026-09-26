@@ -48,7 +48,7 @@ vec4( vec3( 1.0, 0.5, 0.0 ), 1.0 )
 
 // weak promote out of range
 
-vec4( ( float( nodeUniform0 ) * 0.5 ), float( ( int( nodeUniform0 ) < -1 ) ), ( float( nodeUniform0 ) + 4294967296.0 ), ( 3.0 * 1.5 ) )
+vec4( float( ( nodeUniform0 * 1u ) ), float( ( int( nodeUniform0 ) < -1 ) ), ( float( nodeUniform0 ) + 4294967296.0 ), float( ( 3 * 2 ) ) )
 
 // weak shared constant
 
@@ -56,7 +56,7 @@ vec2( float( ( nodeUniform0 + 1u ) ), ( nodeVarying0.x + 1.0 ) )
 
 // weak math functions
 
-vec4( float( clamp( nodeUniform0, 0u, 64u ) ), float( clamp( 0u, nodeUniform0, 64u ) ), float( max( 3, -1 ) ), max( 3.0, 0.5 ) )
+vec4( float( clamp( nodeUniform0, 0u, 64u ) ), float( clamp( 0u, nodeUniform0, 64u ) ), float( max( 3, -1 ) ), float( max( 3, 1 ) ) )
 
 // float only math functions
 
