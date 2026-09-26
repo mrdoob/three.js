@@ -2,6 +2,7 @@ import {
 	Texture,
 	ImageLoader,
 	ImageBitmapLoader,
+	LoaderUtils,
 	Matrix3,
 	Matrix4,
 	MeshBasicNodeMaterial,
@@ -10,6 +11,7 @@ import {
 
 import {
 	float,
+	texture,
 	int,
 	bool,
 	sub,
@@ -323,17 +325,24 @@ class MaterialXNode {
 		}
 
 		let loader = svgTexture ? this.materialX.imageLoader : this.materialX.textureLoader;
+		let textureURL = resolvedURI;
 		if ( resolvedURI && ! svgTexture ) {
 
 			const handler = this.materialX.manager.getHandler( resolvedURI );
-			if ( handler !== null ) loader = handler;
+			if ( handler !== null ) {
+
+				// The built-in loaders carry the document path; handlers do not.
+				loader = handler;
+				textureURL = LoaderUtils.resolveURL( resolvedURI, this.materialX.path );
+
+			}
 
 		}
 
-		const textureNode = new Texture();
-		textureNode.wrapS = TEXTURE_ADDRESS_MODE_WRAPPING[ addressModes.u ];
-		textureNode.wrapT = TEXTURE_ADDRESS_MODE_WRAPPING[ addressModes.v ];
-		textureNode.flipY = false;
+		const textureNode = texture( new Texture() );
+		textureNode.value.wrapS = TEXTURE_ADDRESS_MODE_WRAPPING[ addressModes.u ];
+		textureNode.value.wrapT = TEXTURE_ADDRESS_MODE_WRAPPING[ addressModes.v ];
+		textureNode.value.flipY = false;
 		this.materialX.textureCache.set( textureCacheKey, textureNode );
 
 		const nodeName = this.name;
@@ -341,10 +350,27 @@ class MaterialXNode {
 
 		materialX.pendingResources.push( new Promise( ( resolveLoad ) => {
 
-			loader.load( resolvedURI, ( imageData ) => {
+			loader.load( textureURL, ( imageData ) => {
 
-				textureNode.image = imageData;
-				textureNode.needsUpdate = true;
+				if ( imageData.isTexture ) {
+
+					// Clone so the wrapping and orientation set below don't modify the handler's texture.
+					textureNode.value = imageData.clone();
+					textureNode.value.wrapS = TEXTURE_ADDRESS_MODE_WRAPPING[ addressModes.u ];
+					textureNode.value.wrapT = TEXTURE_ADDRESS_MODE_WRAPPING[ addressModes.v ];
+
+					// MaterialXLoader keeps textures top-first. Loaders such as EXRLoader store rows
+					// bottom-first (flipY = false), so invert the loader's orientation to match.
+					// flipY has no meaning for compressed textures.
+					if ( imageData.isCompressedTexture !== true ) textureNode.value.flipY = ! imageData.flipY;
+
+				} else {
+
+					textureNode.value.image = imageData;
+
+				}
+
+				textureNode.value.needsUpdate = true;
 				resolveLoad();
 
 			}, undefined, () => {
