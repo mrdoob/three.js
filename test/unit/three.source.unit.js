@@ -262,10 +262,11 @@ import './src/textures/Texture.tests.js';
 import './src/textures/TextureSource.tests.js';
 import './src/textures/VideoTexture.tests.js';
 
-
 //src/nodes/display
 import './src/nodes/display/ViewportTextureNode.tests.js';
 import './src/nodes/display/ViewportDepthTextureNode.tests.js';
 
+//src/nodes/core
+import './src/nodes/core/StructTypeNode.js';
 //src/nodes/tsl
 import './src/nodes/tsl/TSLCore.tests.js';
