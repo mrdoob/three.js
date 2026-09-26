@@ -1,17 +1,14 @@
-import { error, warn } from '../../utils.js';
+import { warn } from '../../utils.js';
 
 function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 	let buffers = {};
 	let updateList = {};
-	let allocatedBindingPoints = [];
-
-	const maxBindingPoints = gl.getParameter( gl.MAX_UNIFORM_BUFFER_BINDINGS ); // binding points are global whereas block indices are per shader program
 
 	function bind( uniformsGroup, program ) {
 
 		const webglProgram = program.program;
-		state.uniformBlockBinding( uniformsGroup, webglProgram );
+		state.uniformBlockBinding( uniformsGroup, webglProgram, buffers[ uniformsGroup.id ] );
 
 	}
 
@@ -51,11 +48,6 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 	function createBuffer( uniformsGroup ) {
 
-		// the setup of an UBO is independent of a particular shader program but global
-
-		const bindingPointIndex = allocateBindingPointIndex();
-		uniformsGroup.__bindingPointIndex = bindingPointIndex;
-
 		const buffer = gl.createBuffer();
 		const size = uniformsGroup.__size;
 		const usage = uniformsGroup.usage;
@@ -63,28 +55,8 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 		gl.bindBuffer( gl.UNIFORM_BUFFER, buffer );
 		gl.bufferData( gl.UNIFORM_BUFFER, size, usage );
 		gl.bindBuffer( gl.UNIFORM_BUFFER, null );
-		gl.bindBufferBase( gl.UNIFORM_BUFFER, bindingPointIndex, buffer );
 
 		return buffer;
-
-	}
-
-	function allocateBindingPointIndex() {
-
-		for ( let i = 0; i < maxBindingPoints; i ++ ) {
-
-			if ( allocatedBindingPoints.indexOf( i ) === - 1 ) {
-
-				allocatedBindingPoints.push( i );
-				return i;
-
-			}
-
-		}
-
-		error( 'WebGLRenderer: Maximum number of simultaneously usable uniforms groups reached.' );
-
-		return 0;
 
 	}
 
@@ -403,9 +375,6 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 		uniformsGroup.removeEventListener( 'dispose', onUniformsGroupsDispose );
 
-		const index = allocatedBindingPoints.indexOf( uniformsGroup.__bindingPointIndex );
-		allocatedBindingPoints.splice( index, 1 );
-
 		gl.deleteBuffer( buffers[ uniformsGroup.id ] );
 
 		delete buffers[ uniformsGroup.id ];
@@ -421,7 +390,6 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 		}
 
-		allocatedBindingPoints = [];
 		buffers = {};
 		updateList = {};
 
