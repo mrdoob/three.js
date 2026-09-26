@@ -1,4 +1,4 @@
-import { Break, Continue, Fn, If, Loop, Switch, array, bool, float, int, inverse, ivec3, mat3, mat4, mix, mul, select, time, uint, uniform, uv, vec2, vec3, vec4 } from '../../../src/Three.TSL.js';
+import { Break, Continue, Fn, If, Loop, Switch, array, atan, bool, clamp, countOneBits, countTrailingZeros, determinant, dot, float, floor, int, inverse, ivec3, length, mat2, mat3, mat4, max, mix, mul, pow, select, smoothstep, sqrt, step, time, transpose, uint, uniform, uv, uvec3, vec2, vec3, vec4 } from '../../../src/Three.TSL.js';
 
 // Create a fresh graph for every test and backend.
 export const cases = {
@@ -9,10 +9,13 @@ export const cases = {
 
 	swizzle: () => vec3( 1, 2, 3 ).zyx.mul( 0.5 ),
 
-	// Operand order matters: scalar operators infer their type from the left operand.
+	// Explicit types promote to the broader component type in either operand order.
 	autoConvertIntToFloat: () => Fn( () => float( 0.5 ).add( int( 2 ) ) )(),
 
-	autoConvertFloatToInt: () => Fn( () => int( 2 ).add( float( 0.5 ) ) )(),
+	// An implicit integer-valued number adapts to int; an explicit float promotes it.
+	autoConvertFloatToInt: () => Fn( () => int( 2 ).add( 1 ) )(),
+
+	autoPromoteIntToFloat: () => Fn( () => int( 2 ).add( float( 0.5 ) ) )(),
 
 	autoConvertUintToFloat: () => Fn( () => float( 0.5 ).mul( uint( 3 ) ) )(),
 
@@ -20,7 +23,61 @@ export const cases = {
 
 	autoConvertVectorToFloat: () => vec3( 0.5 ).add( ivec3( 1, 2, 3 ) ),
 
-	autoConvertVectorToInt: () => ivec3( 1, 2, 3 ).add( vec3( 0.5 ) ),
+	// A weak scalar adapts to the integer vector; an explicit float vector promotes it.
+	autoConvertVectorToInt: () => ivec3( 1, 2, 3 ).add( 1 ),
+
+	autoPromoteIntVectorToFloat: () => ivec3( 1, 2, 3 ).add( vec3( 0.5 ) ),
+
+	// Integer-valued weak numbers keep unsigned index math in uint.
+	weakUintIndexMath: () => {
+
+		const index = uniform( 70, 'uint' );
+
+		return index.mod( 64 ).add( index.div( 64 ).mul( 2 ) ).sub( 1 );
+
+	},
+
+	// A weak number that does not fit the explicit integer type promotes the operation.
+	weakPromoteOutOfRange: () => {
+
+		const index = uniform( 70, 'uint' );
+
+		return vec4( index.mul( 0.5 ), index.lessThan( - 1 ), index.add( 0x100000000 ), int( 3 ).mul( 1.5 ) );
+
+	},
+
+	// A shared weak constant adapts independently to each use.
+	weakSharedConstant: () => vec2( float( uniform( 70, 'uint' ).add( 1 ) ), uv().x.add( 1 ) ),
+
+	// Math functions promote across all arguments, regardless of their order.
+	weakMathFunctions: () => {
+
+		const index = uniform( 70, 'uint' );
+
+		return vec4( clamp( index, 0, 64 ), clamp( 0, index, 64 ), max( int( 3 ), - 1 ), max( int( 3 ), 0.5 ) );
+
+	},
+
+	// Float-only math functions promote integer arguments to float.
+	floatOnlyMathFunctions: () => {
+
+		const index = uniform( 70, 'uint' );
+
+		return vec4( pow( int( 2 ), 2 ), smoothstep( 0, 1, int( 2 ) ), atan( int( 1 ), 2 ), dot( ivec3( 1, 2, 3 ), ivec3( 1, 2, 3 ) ) ).add( vec4( floor( index ), step( 1, int( 2 ) ), sqrt( int( 2 ) ), length( ivec3( 1, 2, 3 ) ) ) );
+
+	},
+
+	// Integer math functions keep integer arguments.
+	integerMathFunctions: () => {
+
+		const index = uniform( 70, 'uint' );
+
+		return uvec3( countTrailingZeros( index ), countOneBits( index.add( 1 ) ), max( index, 64 ) );
+
+	},
+
+	// Matrix functions keep the matrix type.
+	squareMatrixFunctions: () => determinant( transpose( inverse( mat2( 1, 2, 3, 4 ) ) ) ),
 
 	vectorComposition: () => vec4( vec2( 1, 2 ), int( 3 ), uint( 4 ) ),
 

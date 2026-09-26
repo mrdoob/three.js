@@ -18,6 +18,10 @@ vec4<f32>( vec3<f32>( 1.0, 0.5, 0.0 ), 1.0 )
 
 ( 2 + 1 )
 
+// auto promote int to float
+
+( 2.0 + 0.5 )
+
 // auto convert uint to float
 
 ( 0.5 * 3.0 )
@@ -32,7 +36,88 @@ vec4<f32>( vec3<f32>( 1.0, 0.5, 0.0 ), 1.0 )
 
 // auto convert vector to int
 
-( vec3<i32>( 1, 2, 3 ) + vec3<i32>( vec3<f32>( 0.5, 0.5, 0.5 ) ) )
+( vec3<i32>( 1, 2, 3 ) + vec3<i32>( i32( 1.0 ) ) )
+
+// auto promote int vector to float
+
+( vec3<f32>( vec3<i32>( 1, 2, 3 ) ) + vec3<f32>( 0.5, 0.5, 0.5 ) )
+
+// weak uint index math
+
+( ( ( object.nodeUniform0 % 64u ) + ( ( object.nodeUniform0 / 64u ) * 2u ) ) - 1u )
+
+// weak promote out of range
+
+vec4<f32>( ( f32( object.nodeUniform0 ) * 0.5 ), f32( ( i32( object.nodeUniform0 ) < -1 ) ), ( f32( object.nodeUniform0 ) + 4294967296.0 ), ( 3.0 * 1.5 ) )
+
+// weak shared constant
+
+vec2<f32>( f32( ( object.nodeUniform0 + 1u ) ), ( nodeVarying0.x + 1.0 ) )
+
+// weak math functions
+
+vec4<f32>( f32( clamp( object.nodeUniform0, 0u, 64u ) ), f32( clamp( 0u, object.nodeUniform0, 64u ) ), f32( max( 3, -1 ) ), max( 3.0, 0.5 ) )
+
+// float only math functions
+
+( vec4<f32>( pow( 2.0, 2.0 ), smoothstep( 0.0, 1.0, 2.0 ), atan( 1.0, 2.0 ), dot( vec3<f32>( vec3<i32>( 1, 2, 3 ) ), vec3<f32>( vec3<i32>( 1, 2, 3 ) ) ) ) + vec4<f32>( floor( f32( object.nodeUniform0 ) ), step( 1.0, 2.0 ), sqrt( 2.0 ), length( vec3<f32>( vec3<i32>( 1, 2, 3 ) ) ) ) )
+
+// integer math functions
+
+fn countTrailingZeros_base_uint ( value : u32 ) -> u32 {
+
+	if ( ( value == 0u ) ) {
+
+		return 32u;
+
+	}
+
+	var nodeVar0 : u32 = 0u;
+	nodeVar0 = value;
+
+	return ( ( bitcast<u32>( f32( ( nodeVar0 & ( - nodeVar0 ) ) ) ) >> 23u ) - 127u );
+
+}
+
+fn countOneBits_base_uint ( value : u32 ) -> u32 {
+
+	var nodeVar0 : u32 = 0u;
+	nodeVar0 = value;
+	nodeVar0 = ( nodeVar0 - ( ( nodeVar0 >> 1u ) & 1431655765u ) );
+	nodeVar0 = ( ( nodeVar0 & 858993459u ) + ( ( nodeVar0 >> 2u ) & 858993459u ) );
+
+	return ( ( ( ( nodeVar0 + ( nodeVar0 >> 4u ) ) & 252645135u ) * 16843009u ) >> 24u );
+
+}
+
+fn countTrailingZeros_uint ( value : u32 ) -> u32 {
+
+	return countTrailingZeros_base_uint( value );
+
+}
+
+fn countOneBits_uint ( value : u32 ) -> u32 {
+
+	return countOneBits_base_uint( value );
+
+}
+
+vec3<u32>( countTrailingZeros_uint( object.nodeUniform0 ), countOneBits_uint( ( object.nodeUniform0 + 1u ) ), max( object.nodeUniform0, 64u ) )
+
+// square matrix functions
+
+fn tsl_inverse_mat2( m : mat2x2<f32> ) -> mat2x2<f32> {
+
+	let det = m[ 0 ][ 0 ] * m[ 1 ][ 1 ] - m[ 0 ][ 1 ] * m[ 1 ][ 0 ];
+
+	return mat2x2<f32>(
+		m[ 1 ][ 1 ], - m[ 0 ][ 1 ],
+		- m[ 1 ][ 0 ], m[ 0 ][ 0 ]
+	) * ( 1.0 / det );
+
+}
+
+determinant( transpose( tsl_inverse_mat2( mat2x2<f32>( 1.0, 3.0, 2.0, 4.0 ) ) ) )
 
 // vector composition
 
@@ -156,7 +241,7 @@ explicitGlobal = ( explicitGlobal + nodeVar0 );
 
 // comparison and logic
 
-( ( ( 3.0 > 1.0 ) && ( 0.5 <= 1.0 ) ) || ( ! false ) )
+( ( ( 3 > 1 ) && ( 0.5 <= 1.0 ) ) || ( ! false ) )
 
 // vector comparison
 
@@ -270,13 +355,13 @@ nodeVar0
 
 var nodeVar0 : f32 = 0.0;
 
-if ( ( 2.0 == 0.0 ) ) {
+if ( ( 2 == 0 ) ) {
 
 	nodeVar0 = 1.0;
 
 } else {
 
-	if ( ( ( 2.0 == 1.0 ) || ( 2.0 == 2.0 ) ) ) {
+	if ( ( ( 2 == 1 ) || ( 2 == 2 ) ) ) {
 
 		nodeVar0 = 2.0;
 
@@ -296,13 +381,13 @@ var nodeVar0 : f32 = 0.0;
 
 for ( var i : i32 = 0; i < 8; i ++ ) {
 
-	if ( ( f32( i ) == 2.0 ) ) {
+	if ( ( i == 2 ) ) {
 
 		continue;
 
 	}
 
-	if ( ( f32( i ) > 5.0 ) ) {
+	if ( ( i > 5 ) ) {
 
 		break;
 
@@ -346,7 +431,7 @@ nodeVar0
 
 var nodeVar0 : i32 = 0;
 
-while ( ( f32( nodeVar0 ) < 3.0 ) ) {
+while ( ( nodeVar0 < 3 ) ) {
 
 	nodeVar0 = ( nodeVar0 + 1 );
 

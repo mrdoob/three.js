@@ -18,6 +18,10 @@ vec4( vec3( 1.0, 0.5, 0.0 ), 1.0 )
 
 ( 2 + 1 )
 
+// auto promote int to float
+
+( 2.0 + 0.5 )
+
 // auto convert uint to float
 
 ( 0.5 * 3.0 )
@@ -32,7 +36,77 @@ vec4( vec3( 1.0, 0.5, 0.0 ), 1.0 )
 
 // auto convert vector to int
 
-( ivec3( 1, 2, 3 ) + ivec3( vec3( 0.5, 0.5, 0.5 ) ) )
+( ivec3( 1, 2, 3 ) + ivec3( int( 1.0 ) ) )
+
+// auto promote int vector to float
+
+( vec3( ivec3( 1, 2, 3 ) ) + vec3( 0.5, 0.5, 0.5 ) )
+
+// weak uint index math
+
+( ( ( nodeUniform0 % 64u ) + ( ( nodeUniform0 / 64u ) * 2u ) ) - 1u )
+
+// weak promote out of range
+
+vec4( ( float( nodeUniform0 ) * 0.5 ), float( ( int( nodeUniform0 ) < -1 ) ), ( float( nodeUniform0 ) + 4294967296.0 ), ( 3.0 * 1.5 ) )
+
+// weak shared constant
+
+vec2( float( ( nodeUniform0 + 1u ) ), ( nodeVarying0.x + 1.0 ) )
+
+// weak math functions
+
+vec4( float( clamp( nodeUniform0, 0u, 64u ) ), float( clamp( 0u, nodeUniform0, 64u ) ), float( max( 3, -1 ) ), max( 3.0, 0.5 ) )
+
+// float only math functions
+
+( vec4( pow( 2.0, 2.0 ), smoothstep( 0.0, 1.0, 2.0 ), atan( 1.0, 2.0 ), dot( vec3( ivec3( 1, 2, 3 ) ), vec3( ivec3( 1, 2, 3 ) ) ) ) + vec4( floor( float( nodeUniform0 ) ), step( 1.0, 2.0 ), sqrt( 2.0 ), length( vec3( ivec3( 1, 2, 3 ) ) ) ) )
+
+// integer math functions
+
+uint countTrailingZeros_base_uint ( uint value ) {
+
+	if ( ( value == 0u ) ) {
+
+		return 32u;
+
+	}
+
+	uint nodeVar0 = 0u;
+	nodeVar0 = value;
+
+	return ( ( floatBitsToUint( float( ( nodeVar0 & ( - nodeVar0 ) ) ) ) >> 23u ) - 127u );
+
+}
+
+uint countOneBits_base_uint ( uint value ) {
+
+	uint nodeVar0 = 0u;
+	nodeVar0 = value;
+	nodeVar0 = ( nodeVar0 - ( ( nodeVar0 >> 1u ) & 1431655765u ) );
+	nodeVar0 = ( ( nodeVar0 & 858993459u ) + ( ( nodeVar0 >> 2u ) & 858993459u ) );
+
+	return ( ( ( ( nodeVar0 + ( nodeVar0 >> 4u ) ) & 252645135u ) * 16843009u ) >> 24u );
+
+}
+
+uint countTrailingZeros_uint ( uint value ) {
+
+	return countTrailingZeros_base_uint( value );
+
+}
+
+uint countOneBits_uint ( uint value ) {
+
+	return countOneBits_base_uint( value );
+
+}
+
+uvec3( countTrailingZeros_uint( nodeUniform0 ), countOneBits_uint( ( nodeUniform0 + 1u ) ), max( nodeUniform0, 64u ) )
+
+// square matrix functions
+
+determinant( transpose( inverse( mat2( 1.0, 3.0, 2.0, 4.0 ) ) ) )
 
 // vector composition
 
@@ -150,7 +224,7 @@ explicitGlobal = ( explicitGlobal + nodeVar0 );
 
 // comparison and logic
 
-( ( ( 3.0 > 1.0 ) && ( 0.5 <= 1.0 ) ) || ( ! false ) )
+( ( ( 3 > 1 ) && ( 0.5 <= 1.0 ) ) || ( ! false ) )
 
 // vector comparison
 
@@ -260,13 +334,13 @@ nodeVar0
 
 float nodeVar0 = 0.0;
 
-if ( ( 2.0 == 0.0 ) ) {
+if ( ( 2 == 0 ) ) {
 
 	nodeVar0 = 1.0;
 
 } else {
 
-	if ( ( ( 2.0 == 1.0 ) || ( 2.0 == 2.0 ) ) ) {
+	if ( ( ( 2 == 1 ) || ( 2 == 2 ) ) ) {
 
 		nodeVar0 = 2.0;
 
@@ -286,13 +360,13 @@ float nodeVar0 = 0.0;
 
 for ( int i = 0; i < 8; i ++ ) {
 
-	if ( ( float( i ) == 2.0 ) ) {
+	if ( ( i == 2 ) ) {
 
 		continue;
 
 	}
 
-	if ( ( float( i ) > 5.0 ) ) {
+	if ( ( i > 5 ) ) {
 
 		break;
 
@@ -336,7 +410,7 @@ nodeVar0
 
 int nodeVar0 = 0;
 
-while ( ( float( nodeVar0 ) < 3.0 ) ) {
+while ( ( nodeVar0 < 3 ) ) {
 
 	nodeVar0 = ( nodeVar0 + 1 );
 
