@@ -492,6 +492,14 @@ class PhysicalLightingModel extends LightingModel {
 		this.dfg = null;
 
 		/**
+		 * The EON directional albedo, shared by the indirect lighting paths.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.eonDirectionalAlbedo = null;
+
+		/**
 		 * The multi-scattering energy compensation for direct lighting.
 		 *
 		 * @type {?Node}
@@ -618,6 +626,12 @@ class PhysicalLightingModel extends LightingModel {
 		this.multiScatteringDielectric = vec3().toVar( 'multiScatteringDielectric' );
 
 		this.computeMultiscattering( this.singleScatteringDielectric, this.multiScatteringDielectric, specularF90, specularColor, this.iridescenceF0Dielectric );
+
+		if ( this.diffuseRoughness === true ) {
+
+			this.eonDirectionalAlbedo = EON_DirectionalAlbedo( { diffuseColor: diffuseColor.rgb, roughness: diffuseRoughness, dotNV: dotNV } );
+
+		}
 
 		super.start( builder );
 
@@ -799,7 +813,7 @@ class PhysicalLightingModel extends LightingModel {
 		const multiScattering = this.multiScatteringDielectric;
 
 		const diffuseBRDF = this.diffuseRoughness
-			? EON_DirectionalAlbedo( { diffuseColor: diffuseColor.rgb, roughness: diffuseRoughness, dotNV: normalView.dot( positionViewDirection ).clamp() } ).mul( metalness.oneMinus(), 1 / Math.PI )
+			? this.eonDirectionalAlbedo.mul( metalness.oneMinus(), 1 / Math.PI )
 			: BRDF_Lambert( { diffuseColor: diffuseContribution } );
 
 		const diffuse = irradiance.mul( diffuseBRDF ).mul( singleScattering.add( multiScattering ).oneMinus() ).toVar();
@@ -876,7 +890,7 @@ class PhysicalLightingModel extends LightingModel {
 		const totalScatteringDielectric = singleScatteringDielectric.add( multiScatteringDielectric );
 
 		const diffuseAlbedo = this.diffuseRoughness
-			? EON_DirectionalAlbedo( { diffuseColor: diffuseColor.rgb, roughness: diffuseRoughness, dotNV: normalView.dot( positionViewDirection ).clamp() } ).mul( metalness.oneMinus() )
+			? this.eonDirectionalAlbedo.mul( metalness.oneMinus() )
 			: diffuseContribution;
 
 		const diffuse = diffuseAlbedo.mul( totalScatteringDielectric.oneMinus() );
