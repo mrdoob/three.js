@@ -1917,7 +1917,8 @@ class NodeBuilder {
 
 	/**
 	 * Returns the common component type of the input nodes. Explicit types are
-	 * promoted first, then weak constants adapt to that type if their values fit.
+	 * promoted first, then weak constants adopt that type, being rounded like other
+	 * integer constants. Only weak constants out of the integer range promote it.
 	 * Inputs consisting only of weak constants default to float.
 	 *
 	 * @param {...?Node} nodes - The input nodes.
@@ -1926,47 +1927,35 @@ class NodeBuilder {
 	getPromotedComponentType( ...nodes ) {
 
 		let type = null;
-
-		for ( const node of nodes ) {
-
-			if ( node === null || node.isWeak === true ) continue;
-
-			const componentType = this.getComponentType( node.getNodeType( this ) );
-
-			if ( type === null || _componentTypeRanks[ componentType ] > _componentTypeRanks[ type ] ) {
-
-				type = componentType;
-
-			}
-
-		}
-
-		if ( type === null ) return 'float';
-
 		let hasWeak = false;
 		let fitsUint = true;
 		let fitsInt = true;
 
 		for ( const node of nodes ) {
 
-			if ( node === null || node.isWeak !== true ) continue;
+			if ( node === null ) continue;
 
-			const value = node.value;
+			if ( node.isWeak === true ) {
 
-			hasWeak = true;
-			fitsUint = fitsUint && Number.isInteger( value ) && value >= 0 && value <= 0xffffffff;
-			fitsInt = fitsInt && Number.isInteger( value ) && value >= - 0x80000000 && value <= 0x7fffffff;
+				const value = Math.round( node.value );
+
+				hasWeak = true;
+				fitsUint = fitsUint && value >= 0 && value <= 0xffffffff;
+				fitsInt = fitsInt && value >= - 0x80000000 && value <= 0x7fffffff;
+
+			} else {
+
+				const componentType = this.getComponentType( node.getNodeType( this ) );
+
+				if ( type === null || _componentTypeRanks[ componentType ] > _componentTypeRanks[ type ] ) type = componentType;
+
+			}
 
 		}
 
-		if ( hasWeak ) {
-
-			if ( type === 'uint' && fitsUint ) return 'uint';
-			if ( ( type === 'uint' || type === 'int' ) && fitsInt ) return 'int';
-
-			return 'float';
-
-		}
+		if ( type === null || ( type === 'bool' && hasWeak ) ) return 'float';
+		if ( type === 'uint' && fitsUint === false ) return fitsInt ? 'int' : 'float';
+		if ( type === 'int' && fitsInt === false ) return 'float';
 
 		return type;
 

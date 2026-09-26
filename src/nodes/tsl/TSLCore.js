@@ -301,7 +301,7 @@ const ShaderNodeObject = function ( obj, altType = null ) {
 
 	} else if ( ( altType === null && ( type === 'float' || type === 'boolean' ) ) || ( type && type !== 'shader' && type !== 'string' ) ) {
 
-		return nodeObject( getConstNode( obj, altType, type === 'float' && altType === null ) );
+		return nodeObject( getConstNode( obj, altType ) );
 
 	} else if ( type === 'shader' ) {
 
@@ -883,16 +883,13 @@ for ( const float of floats ) floatsCacheMap.set( - float, new ConstNode( - floa
 
 const cacheMaps = { bool: boolsCacheMap, uint: uintsCacheMap, ints: intsCacheMap, float: floatsCacheMap };
 
-const constNodesCacheMap = new Map( [ ...boolsCacheMap, ...floatsCacheMap ] );
-const weakConstNodesCacheMap = new Map();
+const constNodesCacheMap = new Map( boolsCacheMap );
 
-const getConstNode = ( value, type, isWeak = false ) => {
+const getConstNode = ( value, type ) => {
 
-	const cacheMap = isWeak ? weakConstNodesCacheMap : constNodesCacheMap;
+	if ( constNodesCacheMap.has( value ) ) {
 
-	if ( cacheMap.has( value ) ) {
-
-		return cacheMap.get( value );
+		return constNodesCacheMap.get( value );
 
 	} else if ( value.isNode === true ) {
 
@@ -901,15 +898,17 @@ const getConstNode = ( value, type, isWeak = false ) => {
 	} else {
 
 		const node = new ConstNode( value, type );
-		node.isWeak = isWeak;
 
-		if ( isWeak && constNodesCacheMap.has( value ) ) cacheMap.set( value, node );
+		// Implicit numbers are weak and can adapt to the type of other operands.
+		node.isWeak = ! type && typeof value === 'number';
 
 		return node;
 
 	}
 
 };
+
+for ( const value of floatsCacheMap.keys() ) constNodesCacheMap.set( value, getConstNode( value ) );
 
 const ConvertType = function ( type, cacheMap = null ) {
 

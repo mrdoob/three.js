@@ -183,7 +183,7 @@ class MathNode extends Node {
 
 		} else if ( method === MathNode.RECIPROCAL ) {
 
-			outputNode = div( 1.0, aNode );
+			outputNode = div( float( 1 ), aNode );
 
 		} else if ( method === MathNode.DIFFERENCE ) {
 
@@ -246,7 +246,7 @@ class MathNode extends Node {
 
 		if ( method === MathNode.NEGATE ) {
 
-			return builder.format( `( - ${ a.build( builder, inputType ) } )`, type, output );
+			return builder.format( '( - ' + a.build( builder, inputType ) + ' )', type, output );
 
 		} else {
 
@@ -408,7 +408,7 @@ const _floatMethods = new Set( [
 	MathNode.SQRT, MathNode.INVERSE_SQRT, MathNode.FLOOR, MathNode.CEIL, MathNode.NORMALIZE, MathNode.FRACT,
 	MathNode.SIN, MathNode.SINH, MathNode.COS, MathNode.COSH, MathNode.TAN, MathNode.TANH,
 	MathNode.ASIN, MathNode.ASINH, MathNode.ACOS, MathNode.ACOSH, MathNode.ATAN, MathNode.ATANH,
-	MathNode.LENGTH, MathNode.DFDX, MathNode.DFDY, MathNode.ROUND, MathNode.TRUNC, MathNode.FWIDTH,
+	MathNode.LENGTH, MathNode.DFDX, MathNode.DFDY, MathNode.ROUND, MathNode.TRUNC, MathNode.FWIDTH, MathNode.RECIPROCAL,
 	MathNode.STEP, MathNode.REFLECT, MathNode.DISTANCE, MathNode.DOT, MathNode.CROSS, MathNode.POW,
 	MathNode.MIX, MathNode.REFRACT, MathNode.SMOOTHSTEP, MathNode.FACEFORWARD
 ] );

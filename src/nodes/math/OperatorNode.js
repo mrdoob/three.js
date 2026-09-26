@@ -120,12 +120,6 @@ class OperatorNode extends Node {
 
 			return output || 'void';
 
-		} else if ( op === '%' ) {
-
-			const promotedType = builder.getPromotedComponentType( aNode, bNode );
-
-			return builder.changeComponentType( typeA, promotedType );
-
 		} else if ( op === '~' || op === '&' || op === '|' || op === '^' || op === '>>' || op === '<<' ) {
 
 			return builder.getIntegerType( typeA );
@@ -216,18 +210,9 @@ class OperatorNode extends Node {
 
 			if ( op === '<' || op === '>' || op === '<=' || op === '>=' || op === '==' || op === '!=' ) {
 
-				const promotedType = builder.getPromotedComponentType( aNode, bNode );
+				const length = Math.max( builder.getTypeLength( typeA ), builder.getTypeLength( typeB ) );
 
-				if ( builder.isVector( typeA ) || builder.isVector( typeB ) ) {
-
-					const length = Math.max( builder.getTypeLength( typeA ), builder.getTypeLength( typeB ) );
-					typeA = typeB = builder.getTypeFromLength( length, promotedType );
-
-				} else {
-
-					typeA = typeB = promotedType;
-
-				}
+				typeA = typeB = builder.getTypeFromLength( length, builder.getPromotedComponentType( aNode, bNode ) );
 
 			} else if ( op === '>>' || op === '<<' ) {
 
@@ -245,7 +230,6 @@ class OperatorNode extends Node {
 				} else if ( builder.isVector( typeB ) ) {
 
 					// matrix x vector
-
 					typeB = builder.getVectorFromMatrix( typeA );
 
 				} else if ( builder.isMatrix( typeB ) ) {
