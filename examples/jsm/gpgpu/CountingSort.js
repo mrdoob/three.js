@@ -1,6 +1,8 @@
 import { StorageBufferAttribute, DynamicDrawUsage } from 'three/webgpu';
 import { Fn, Loop, atomicAdd, atomicLoad, atomicStore, instanceIndex, storage, uint } from 'three/tsl';
 
+import { retargetPBOAttribute } from '../utils/StorageBufferUtils.js';
+
 /**
  * A reusable GPU counting sort.
  *
@@ -44,12 +46,7 @@ class CountingSort {
 	 */
 	constructor( count, { binCount = 4096, workgroupSize = 256 } = {} ) {
 
-		/**
-		 * The number of elements to sort.
-		 *
-		 * @type {number}
-		 */
-		this.count = count;
+		this._count = 0;
 
 		/**
 		 * The number of bins/buckets the sort key is quantized into.
@@ -65,48 +62,13 @@ class CountingSort {
 		 */
 		this.workgroupSize = workgroupSize;
 
-		const orderData = new Uint32Array( count );
-		for ( let i = 0; i < count; i ++ ) orderData[ i ] = i;
+		this._capacity = 0;
 
-		/**
-		 * The buffer attribute holding the sorted order (a permutation of `[0, count)`). This is
-		 * also the attribute that is kept up to date by {@link CountingSort#computeCPU}.
-		 *
-		 * @type {StorageBufferAttribute}
-		 */
-		this.orderAttribute = new StorageBufferAttribute( orderData, 1, Uint32Array );
-
-		const binAttribute = new StorageBufferAttribute( new Uint32Array( count ), 1, Uint32Array );
 		const histogramAttribute = new StorageBufferAttribute( new Uint32Array( binCount ), 1, Uint32Array );
 		const offsetAttribute = new StorageBufferAttribute( new Uint32Array( binCount ), 1, Uint32Array );
 
-		/**
-		 * A read-only storage node for the sorted order buffer.
-		 *
-		 * @type {StorageBufferNode}
-		 */
-		this.orderRead = storage( this.orderAttribute, 'uint', count ).toReadOnly();
-
-		/**
-		 * A writable storage node for the sorted order buffer.
-		 *
-		 * @type {StorageBufferNode}
-		 */
-		this.orderWrite = storage( this.orderAttribute, 'uint', count );
-
-		/**
-		 * A read-only storage node holding each element's bin, computed during the histogram pass.
-		 *
-		 * @type {StorageBufferNode}
-		 */
-		this.binRead = storage( binAttribute, 'uint', count ).toReadOnly();
-
-		/**
-		 * A writable storage node holding each element's bin.
-		 *
-		 * @type {StorageBufferNode}
-		 */
-		this.binWrite = storage( binAttribute, 'uint', count );
+		this._histogramAttribute = histogramAttribute;
+		this._offsetAttribute = offsetAttribute;
 
 		/**
 		 * An atomic storage node used to accumulate the per-bin histogram.
@@ -123,9 +85,42 @@ class CountingSort {
 		 */
 		this.offsetAtomic = storage( offsetAttribute, 'uint', binCount ).toAtomic();
 
+		// order/bin buffers are sized by `count` - built once against 1-element
+		// placeholders and resized in place by `_resizeOrderBuffers` as `count` changes.
+		this.orderAttribute = new StorageBufferAttribute( new Uint32Array( 1 ), 1, Uint32Array );
+		this._binAttribute = new StorageBufferAttribute( new Uint32Array( 1 ), 1, Uint32Array );
+
+		/**
+		 * A read-only storage node for the sorted order buffer.
+		 *
+		 * @type {StorageBufferNode}
+		 */
+		this.orderRead = storage( this.orderAttribute, 'uint', 0 ).toReadOnly();
+
+		/**
+		 * A writable storage node for the sorted order buffer.
+		 *
+		 * @type {StorageBufferNode}
+		 */
+		this.orderWrite = storage( this.orderAttribute, 'uint', 0 );
+
+		/**
+		 * A read-only storage node holding each element's bin, computed during the histogram pass.
+		 *
+		 * @type {StorageBufferNode}
+		 */
+		this.binRead = storage( this._binAttribute, 'uint', 0 ).toReadOnly();
+
+		/**
+		 * A writable storage node holding each element's bin.
+		 *
+		 * @type {StorageBufferNode}
+		 */
+		this.binWrite = storage( this._binAttribute, 'uint', 0 );
+
 		this._webGLBuffersEnabled = false;
 
-		this._cpuBins = new Uint32Array( count );
+		this._cpuBins = new Uint32Array( 0 );
 		this._cpuCounts = new Uint32Array( binCount );
 		this._cpuOffsets = new Uint32Array( binCount );
 
@@ -133,6 +128,76 @@ class CountingSort {
 		this._histogramNode = null;
 		this._prefixNode = null;
 		this._scatterNode = null;
+
+		this.count = count;
+
+	}
+
+	/**
+	 * The number of elements to sort. Assigning a value different from what the order/bin
+	 * buffers currently hold resizes them in place, to exactly fit the new value (see
+	 * `_resizeOrderBuffers`), and updates the dispatch bounds of the compute kernels set up
+	 * by {@link CountingSort#setBinNode}, if any - unlike constructing a new
+	 * {@link CountingSort}, this never rebuilds those kernels.
+	 *
+	 * @type {number}
+	 */
+	get count() {
+
+		return this._count;
+
+	}
+
+	set count( value ) {
+
+		const capacity = Math.max( 1, value );
+
+		if ( capacity !== this._capacity ) {
+
+			this._resizeOrderBuffers( capacity );
+
+		}
+
+		this._count = value;
+
+		if ( this._histogramNode !== null ) {
+
+			this._histogramNode.count = value;
+			this._scatterNode.count = value;
+
+		}
+
+	}
+
+	// Reallocates the order/bin buffers to exactly fit `capacity` elements and repoints
+	// `orderRead`/`orderWrite`/`binRead`/`binWrite` at them, without touching the
+	// histogram/offset buffers (sized by `binCount`, which never changes) or any
+	// compute kernel.
+	_resizeOrderBuffers( capacity ) {
+
+		const oldOrderAttribute = this.orderAttribute;
+		const oldBinAttribute = this._binAttribute;
+
+		const orderData = new Uint32Array( capacity );
+		for ( let i = 0; i < capacity; i ++ ) orderData[ i ] = i;
+
+		this.orderAttribute = new StorageBufferAttribute( orderData, 1, Uint32Array );
+		this._binAttribute = new StorageBufferAttribute( new Uint32Array( capacity ), 1, Uint32Array );
+
+		if ( this._webGLBuffersEnabled === true ) this.orderAttribute.setUsage( DynamicDrawUsage );
+
+		retargetPBOAttribute( oldOrderAttribute, this.orderAttribute );
+
+		this.orderRead.value = this.orderAttribute;
+		this.orderWrite.value = this.orderAttribute;
+		this.binRead.value = this._binAttribute;
+		this.binWrite.value = this._binAttribute;
+
+		this._cpuBins = new Uint32Array( capacity );
+		this._capacity = capacity;
+
+		oldOrderAttribute.dispose();
+		oldBinAttribute.dispose();
 
 	}
 
@@ -263,6 +328,19 @@ class CountingSort {
 		this.orderRead.setPBO( true );
 
 		this._webGLBuffersEnabled = true;
+
+	}
+
+	/**
+	 * Frees the GPU buffers backing this counting sort. To change the number of elements
+	 * to sort, assign {@link CountingSort#count}; there is no need to construct a new instance.
+	 */
+	dispose() {
+
+		this.orderAttribute.dispose();
+		this._binAttribute.dispose();
+		this._histogramAttribute.dispose();
+		this._offsetAttribute.dispose();
 
 	}
 

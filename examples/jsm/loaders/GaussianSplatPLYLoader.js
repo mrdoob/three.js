@@ -24,10 +24,11 @@ const GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING = {
 	opacity: [ 'opacity' ]
 };
 
-// Property names a Gaussian splat PLY must declare in its header. Checked
-// up front against the header text rather than the parsed geometry, since
-// PLYLoader still creates a (garbage-filled) attribute for a custom property
-// name that's missing from the file instead of omitting it.
+// Property names a Gaussian splat PLY must declare in its header. This is
+// checked against the header text before the file is parsed, because
+// PLYLoader creates a (garbage-filled) attribute for a custom property name
+// that's missing from the file rather than omitting it, so a missing
+// property can't be detected from the parsed geometry.
 const REQUIRED_PLY_PROPERTIES = [
 	'x', 'y', 'z',
 	...GAUSSIAN_SPLAT_PLY_PROPERTY_MAPPING.scale,
@@ -289,6 +290,7 @@ function convertPLYGeometry( geometry ) {
 	const covariances = new Float32Array( count * 6 );
 	const colors = new Uint8ClampedArray( count * 4 );
 	const sphericalHarmonicsDegree = getRestSphericalHarmonicsDegree( shRest );
+	const shRestStride = sphericalHarmonicsDegree > 0 ? shRest.itemSize / 3 : 0;
 	const sphericalHarmonics = {};
 	const sphericalHarmonicsBytes = {};
 
@@ -329,7 +331,7 @@ function convertPLYGeometry( geometry ) {
 
 		if ( sphericalHarmonicsDegree > 0 ) {
 
-			writeSphericalHarmonicsFromRest( sphericalHarmonicsBytes, i, shRest );
+			writeSphericalHarmonicsFromRest( sphericalHarmonicsBytes, i, shRest, shRestStride );
 
 		}
 
@@ -355,9 +357,8 @@ function getRestSphericalHarmonicsDegree( shRest ) {
 
 }
 
-function writeSphericalHarmonicsFromRest( sphericalHarmonicsBytes, index, shRest ) {
+function writeSphericalHarmonicsFromRest( sphericalHarmonicsBytes, index, shRest, stride ) {
 
-	const stride = shRest.itemSize / 3;
 	const source = shRest.array;
 	const sourceOffset = index * shRest.itemSize;
 
