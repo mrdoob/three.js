@@ -629,7 +629,7 @@ class PhysicalLightingModel extends LightingModel {
 
 		if ( this.diffuseRoughness === true ) {
 
-			this.eonDirectionalAlbedo = EON_DirectionalAlbedo( { diffuseColor: diffuseColor.rgb, roughness: diffuseRoughness, dotNV: normalView.dot( positionViewDirection ).clamp() } );
+			this.eonDirectionalAlbedo = EON_DirectionalAlbedo( { diffuseColor: diffuseColor.rgb, roughness: diffuseRoughness, dotNV: dotNV } );
 
 		}
 
