@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - node proxy material</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - node proxy material">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_materials_node_proxy.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_materials_node_proxy.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Node Proxy Material</span>
+			</div>
+
+			<small id="stats">Compiling...</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { uniform, time, sin, vec3, positionLocal } from 'three/tsl';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+			let camera, scene, renderer, controls, geometry, stats;
+
+			let compiling = false;
+			let builds = 0;
+
+			const amount = 40;
+			const meshes = [];
+			const colors = [];
+			const phases = [];
+
+			const params = {
+				material: 'Proxy Material',
+				randomize: randomizeColors
+			};
+
+			init();
+
+			async function init() {
+
+				stats = document.getElementById( 'stats' );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 200 );
+				camera.position.set( 0, 30, 42 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x111111 );
+
+				// one mesh and one material per sphere, each with its own color and wave phase
+
+				geometry = new THREE.IcosahedronGeometry( 0.4, 3 );
+
+				const offset = ( amount - 1 ) / 2;
+
+				for ( let x = 0; x < amount; x ++ ) {
+
+					for ( let z = 0; z < amount; z ++ ) {
+
+						const mesh = new THREE.Mesh( geometry );
+						mesh.position.set( x - offset, 0, z - offset );
+						scene.add( mesh );
+
+						meshes.push( mesh );
+						colors.push( new THREE.Color() );
+						phases.push( Math.hypot( x - offset, z - offset ) * - 0.5 );
+
+					}
+
+				}
+
+				randomizeColors();
+
+				//
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				// count the shader builds of the spheres
+
+				renderer.debug.onNodeBuilderCreated = ( builder, renderObject ) => {
+
+					if ( renderObject.geometry === geometry ) builds ++;
+
+				};
+
+				await renderer.init();
+
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
+
+				//
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.maxPolarAngle = Math.PI / 2.2;
+
+				//
+
+				const gui = renderer.inspector.createParameters( 'Settings' );
+
+				gui.add( params, 'material', [ 'Proxy Material', 'Node Material' ] ).onChange( setMaterials );
+				gui.add( params, 'randomize' ).name( 'randomize colors' );
+
+				await setMaterials();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function createNodes( colorNode, phaseNode ) {
+
+				// the same node graph is used by both approaches
+
+				const wave = sin( time.mul( 2 ).add( phaseNode ) );
+
+				return {
+					colorNode,
+					emissiveNode: colorNode.mul( wave.mul( 0.5 ).add( 0.5 ).pow( 6 ) ),
+					positionNode: positionLocal.add( vec3( 0, wave.mul( 0.5 ), 0 ) ),
+					roughness: 0.25,
+					metalness: 0.1
+				};
+
+			}
+
+			async function setMaterials() {
+
+				compiling = true;
+				stats.textContent = 'Compiling...';
+
+				const disposed = new Set();
+
+				for ( const mesh of meshes ) {
+
+					if ( mesh.material.isNodeProxyMaterial ) disposed.add( mesh.material.nodeMaterial );
+
+					disposed.add( mesh.material );
+
+				}
+
+				if ( params.material === 'Proxy Material' ) {
+
+					// one node material defines the shader, each proxy only stores its uniforms
+
+					const nodeMaterial = new THREE.MeshStandardNodeMaterial( createNodes( uniform( 'color', 'color' ), uniform( 'float', 'phase' ) ) );
+
+					for ( let i = 0; i < meshes.length; i ++ ) {
+
+						const material = new THREE.NodeProxyMaterial( nodeMaterial );
+						material.uniforms.color = colors[ i ];
+						material.uniforms.phase = phases[ i ];
+
+						meshes[ i ].material = material;
+
+					}
+
+				} else {
+
+					// each node material has its own uniforms, so each one builds its own shader
+
+					for ( let i = 0; i < meshes.length; i ++ ) {
+
+						meshes[ i ].material = new THREE.MeshStandardNodeMaterial( createNodes( uniform( colors[ i ] ), uniform( phases[ i ] ) ) );
+
+					}
+
+				}
+
+				for ( const material of disposed ) material.dispose();
+
+				builds = 0;
+
+				const start = performance.now();
+
+				await renderer.compileAsync( scene, camera );
+
+				const elapsed = performance.now() - start;
+
+				stats.textContent = `${ meshes.length } materials, ${ builds } shader build${ builds === 1 ? '' : 's' }, compiled in ${ elapsed.toFixed( 0 ) } ms.`;
+
+				compiling = false;
+
+			}
+
+			function randomizeColors() {
+
+				// the materials reference these colors, so no material update is needed
+
+				const hue = Math.random();
+
+				for ( const color of colors ) {
+
+					color.setHSL( ( hue + Math.random() * 0.25 ) % 1, 0.75, 0.55 );
+
+				}
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				if ( compiling ) return;
+
+				controls.update();
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
