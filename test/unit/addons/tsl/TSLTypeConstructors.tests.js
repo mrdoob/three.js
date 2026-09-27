@@ -98,6 +98,8 @@ export default QUnit.module( 'TSL', () => {
 			assert.eq( c.r, float( 0.2 ), 'color(0.2,0.4,0.6).r == 0.2' );
 			assert.eq( c.g, float( 0.4 ), 'color(0.2,0.4,0.6).g == 0.4' );
 			assert.eq( c.b, float( 0.6 ), 'color(0.2,0.4,0.6).b == 0.6' );
+			assert.eq( c, vec3( 0.2, 0.4, 0.6 ), 'color and vec3 have the same shader representation' );
+			assert.eq( vec3( 0.2, 0.4, 0.6 ), c, 'vec3 and color are equivalent in either order' );
 
 			// Arithmetic works the same as a vec3. closeAbs (not eq) since
 			// this crosses a float32 addition, which isn't guaranteed to be
