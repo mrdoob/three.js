@@ -554,6 +554,26 @@ function setValueV4ui( gl, v ) {
 }
 
 
+// Bound to shadow samplers when a light has no shadow map yet. A texture is only
+// uploaded once it has been flagged via needsUpdate; without that, the renderer
+// binds its RGBA fallback texture instead, which is invalid for a shadow sampler
+// and makes the draw call fail with GL_INVALID_OPERATION.
+
+function getEmptyShadowTexture( textures ) {
+
+	const compareFunction = textures.isReversedDepthBuffer() ? GreaterEqualCompare : LessEqualCompare;
+
+	if ( emptyShadowTexture.compareFunction !== compareFunction ) {
+
+		emptyShadowTexture.compareFunction = compareFunction;
+		emptyShadowTexture.needsUpdate = true;
+
+	}
+
+	return emptyShadowTexture;
+
+}
+
 // Single texture (2D / Cube)
 
 function setValueT1( gl, v, textures ) {
@@ -572,8 +592,7 @@ function setValueT1( gl, v, textures ) {
 
 	if ( this.type === gl.SAMPLER_2D_SHADOW ) {
 
-		emptyShadowTexture.compareFunction = textures.isReversedDepthBuffer() ? GreaterEqualCompare : LessEqualCompare;
-		emptyTexture2D = emptyShadowTexture;
+		emptyTexture2D = getEmptyShadowTexture( textures );
 
 	} else {
 
@@ -826,7 +845,7 @@ function setValueT1Array( gl, v, textures ) {
 
 	if ( this.type === gl.SAMPLER_2D_SHADOW ) {
 
-		emptyTexture2D = emptyShadowTexture;
+		emptyTexture2D = getEmptyShadowTexture( textures );
 
 	} else {
 
