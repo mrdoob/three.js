@@ -177,6 +177,11 @@ function copyArrayContents( src, target ) {
  * scene.add( batchedMesh );
  * ```
  *
+ * The first geometry added defines the layout of the batch. All following geometries must match it:
+ * they must be indexed if the first geometry is indexed (and non-indexed otherwise), and they must
+ * provide the same attributes with the same `itemSize` and `normalized` values. Attributes that the
+ * first geometry does not have are silently ignored, so the order in which geometries are added matters.
+ *
  * @augments Mesh
  */
 class BatchedMesh extends Mesh {
@@ -437,7 +442,7 @@ class BatchedMesh extends Mesh {
 			const dstAttribute = batchGeometry.getAttribute( attributeName );
 			if ( srcAttribute.itemSize !== dstAttribute.itemSize || srcAttribute.normalized !== dstAttribute.normalized ) {
 
-				throw new Error( 'THREE.BatchedMesh: All attributes must have a consistent itemSize and normalized value.' );
+				throw new Error( `THREE.BatchedMesh: Added geometry attribute "${ attributeName }" has an inconsistent itemSize or normalized value. All attributes must have a consistent itemSize and normalized value.` );
 
 			}
 
@@ -611,7 +616,9 @@ class BatchedMesh extends Mesh {
 
 	/**
 	 * Adds the given geometry to the batch and returns the associated
-	 * geometry id referring to it to be used in other functions.
+	 * geometry id referring to it to be used in other functions. The first geometry added
+	 * defines the layout of the batch (its attributes and index usage). All following geometries
+	 * must match it.
 	 *
 	 * @param {BufferGeometry} geometry - The geometry to add.
 	 * @param {number} [reservedVertexCount=-1] - Optional parameter specifying the amount of
