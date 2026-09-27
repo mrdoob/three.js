@@ -126,7 +126,7 @@
 
 				const gui = renderer.inspector.createParameters( 'Settings' );
 
-				gui.add( params, 'material', [ 'Proxy Node Material', 'Node Material' ] ).onChange( setMaterials );
+				gui.add( params, 'material', [ 'Proxy Node Material', 'Node Material per Mesh' ] ).onChange( setMaterials );
 				gui.add( params, 'randomize' ).name( 'randomize colors' );
 
 				await setMaterials();
