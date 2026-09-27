@@ -231,14 +231,30 @@ export default UniformNode;
 
 /**
  * TSL function for creating a uniform node.
+ * When called with a type and a name, reads `material.uniforms[ name ]` for
+ * each rendered object. Missing values use the default value for the type.
+ *
+ * ```js
+ * const colorNode = uniform( 'vec3', 'color' );
+ * material.uniforms = { color: new Vector3( 1, 0, 0 ) };
+ * ```
  *
  * @tsl
  * @function
  * @param {any|string} value - The value of this uniform or your type. Usually a JS primitive or three.js object (vector, matrix, color, texture).
- * @param {string} [type] - The node type. If no explicit type is defined, the node tries to derive the type from its value.
+ * @param {string} [type] - The node type, or the uniform name when the first argument is a type string. If omitted, the type is inferred from the value.
  * @returns {UniformNode}
  */
 export const uniform = ( value, type ) => {
+
+	if ( typeof value === 'string' && typeof type === 'string' ) {
+
+		const name = type;
+		const defaultValue = getValueFromType( value );
+
+		return new UniformNode( defaultValue, value ).onObjectUpdate( ( { material } ) => material.uniforms?.[ name ] ?? defaultValue );
+
+	}
 
 	const nodeType = getConstNodeType( type || value );
 
