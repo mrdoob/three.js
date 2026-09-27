@@ -1529,8 +1529,8 @@ class NodeBuilder {
 		}
 
 		if ( type === 'float' ) return _toFloat( value );
-		if ( type === 'int' ) return `${ Math.round( value ) }`;
-		if ( type === 'uint' ) return value >= 0 ? `${ Math.round( value ) }u` : '0u';
+		if ( type === 'int' ) return `${ Math.trunc( value ) }`;
+		if ( type === 'uint' ) return value >= 0 ? `${ Math.trunc( value ) }u` : '0u';
 		if ( type === 'bool' ) return value ? 'true' : 'false';
 		if ( type === 'color' ) return `${ this.getType( 'vec3' ) }( ${ _toFloat( value.r ) }, ${ _toFloat( value.g ) }, ${ _toFloat( value.b ) } )`;
 
@@ -1917,7 +1917,7 @@ class NodeBuilder {
 
 	/**
 	 * Returns the common component type of the input nodes. Explicit types are
-	 * promoted first, then weak constants adopt that type, being rounded like other
+	 * promoted first, then weak constants adopt that type, being truncated like other
 	 * integer constants. Only weak constants out of the integer range promote it.
 	 * Inputs consisting only of weak constants default to float.
 	 *
@@ -1937,7 +1937,7 @@ class NodeBuilder {
 
 			if ( node.isWeak === true ) {
 
-				const value = Math.round( node.value );
+				const value = Math.trunc( node.value );
 
 				hasWeak = true;
 				fitsUint = fitsUint && value >= 0 && value <= 0xffffffff;

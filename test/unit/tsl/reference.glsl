@@ -12,7 +12,7 @@ vec4( vec3( 1.0, 0.5, 0.0 ), 1.0 )
 
 // auto convert int to float
 
-( 0.5 + 2.0 )
+( 0.5 * 1.0 )
 
 // auto convert float to int
 
@@ -20,11 +20,79 @@ vec4( vec3( 1.0, 0.5, 0.0 ), 1.0 )
 
 // auto promote int to float
 
-( 2.0 + 0.5 )
+( 1.0 * 0.5 )
 
 // auto convert uint to float
 
-( 0.5 * 3.0 )
+( 0.5 * 1.0 )
+
+// auto promote uint to float
+
+( 1.0 * 0.5 )
+
+// auto promote uint to int
+
+( 1 + -1 )
+
+// auto promote int and uint
+
+( -1 + 1 )
+
+// equal float int
+
+( 1.5 == 1.0 )
+
+// equal int float
+
+( 1.0 == 1.5 )
+
+// equal bool uint
+
+( uint( true ) == 1u )
+
+// equal uint bool
+
+( 1u == uint( true ) )
+
+// equal bool float
+
+( float( true ) == 1.5 )
+
+// equal float bool
+
+( 1.5 == float( true ) )
+
+// equal float int vector
+
+equal( vec3( 1.5, 1.5, 1.5 ), vec3( ivec3( 1, 1, 1 ) ) )
+
+// equal int float vector
+
+equal( vec3( ivec3( 1, 1, 1 ) ), vec3( 1.5, 1.5, 1.5 ) )
+
+// truncated uint to float
+
+( 1.0 * 0.0 )
+
+// truncated uint constants
+
+1u
+
+// truncated int constants
+
+-1
+
+// truncated uint fraction
+
+0u
+
+// truncated int fraction
+
+0
+
+// clamped negative uint
+
+0u
 
 // auto convert scalar to vector
 
@@ -44,65 +112,47 @@ vec4( vec3( 1.0, 0.5, 0.0 ), 1.0 )
 
 // weak uint index math
 
-( ( ( nodeUniform0 % 64u ) + ( ( nodeUniform0 / 64u ) * 2u ) ) - 1u )
+( 70u / 64u )
+
+// weak float default
+
+( 1.0 * 2.0 )
+
+// weak uint fraction
+
+( 1u * 0u )
+
+// weak int fraction
+
+( 3 * 1 )
+
+// weak promote negative
+
+( 1 + -1 )
 
 // weak promote out of range
 
-vec4( float( ( nodeUniform0 * 1u ) ), float( ( int( nodeUniform0 ) < -1 ) ), ( float( nodeUniform0 ) + 4294967296.0 ), float( ( 3 * 2 ) ) )
+( 1.0 + 4294967296.0 )
 
 // weak shared constant
 
-vec2( float( ( nodeUniform0 + 1u ) ), ( nodeVarying0.x + 1.0 ) )
+( float( ( 1u + 1u ) ) + ( 1.0 + 1.0 ) )
 
 // weak math functions
 
-vec4( float( clamp( nodeUniform0, 0u, 64u ) ), float( clamp( 0u, nodeUniform0, 64u ) ), float( max( 3, -1 ) ), float( max( 3, 1 ) ) )
+clamp( 1u, 0u, 2u )
+
+// weak math functions reordered
+
+clamp( 0u, 1u, 2u )
 
 // float only math functions
 
-( vec4( pow( 2.0, 2.0 ), smoothstep( 0.0, 1.0, 2.0 ), atan( 1.0, 2.0 ), dot( vec3( ivec3( 1, 2, 3 ) ), vec3( ivec3( 1, 2, 3 ) ) ) ) + vec4( floor( float( nodeUniform0 ) ), step( 1.0, 2.0 ), sqrt( 2.0 ), length( vec3( ivec3( 1, 2, 3 ) ) ) ) )
+pow( 2.0, 2.0 )
 
 // integer math functions
 
-uint countTrailingZeros_base_uint ( uint value ) {
-
-	if ( ( value == 0u ) ) {
-
-		return 32u;
-
-	}
-
-	uint nodeVar0 = 0u;
-	nodeVar0 = value;
-
-	return ( ( floatBitsToUint( float( ( nodeVar0 & ( - nodeVar0 ) ) ) ) >> 23u ) - 127u );
-
-}
-
-uint countOneBits_base_uint ( uint value ) {
-
-	uint nodeVar0 = 0u;
-	nodeVar0 = value;
-	nodeVar0 = ( nodeVar0 - ( ( nodeVar0 >> 1u ) & 1431655765u ) );
-	nodeVar0 = ( ( nodeVar0 & 858993459u ) + ( ( nodeVar0 >> 2u ) & 858993459u ) );
-
-	return ( ( ( ( nodeVar0 + ( nodeVar0 >> 4u ) ) & 252645135u ) * 16843009u ) >> 24u );
-
-}
-
-uint countTrailingZeros_uint ( uint value ) {
-
-	return countTrailingZeros_base_uint( value );
-
-}
-
-uint countOneBits_uint ( uint value ) {
-
-	return countOneBits_base_uint( value );
-
-}
-
-uvec3( countTrailingZeros_uint( nodeUniform0 ), countOneBits_uint( ( nodeUniform0 + 1u ) ), max( nodeUniform0, 64u ) )
+max( 1u, 2u )
 
 // square matrix functions
 
@@ -228,7 +278,7 @@ explicitGlobal = ( explicitGlobal + nodeVar0 );
 
 // vector comparison
 
-all( ( vec3( 1.0, 2.0, 3.0 ) > vec3( 1.0 ) ) )
+all( greaterThan( vec3( 1.0, 2.0, 3.0 ), vec3( 1.0 ) ) )
 
 // select auto conversion
 

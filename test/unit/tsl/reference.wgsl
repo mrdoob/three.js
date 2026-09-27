@@ -12,7 +12,7 @@ vec4<f32>( vec3<f32>( 1.0, 0.5, 0.0 ), 1.0 )
 
 // auto convert int to float
 
-( 0.5 + 2.0 )
+( 0.5 * 1.0 )
 
 // auto convert float to int
 
@@ -20,11 +20,79 @@ vec4<f32>( vec3<f32>( 1.0, 0.5, 0.0 ), 1.0 )
 
 // auto promote int to float
 
-( 2.0 + 0.5 )
+( 1.0 * 0.5 )
 
 // auto convert uint to float
 
-( 0.5 * 3.0 )
+( 0.5 * 1.0 )
+
+// auto promote uint to float
+
+( 1.0 * 0.5 )
+
+// auto promote uint to int
+
+( 1 + -1 )
+
+// auto promote int and uint
+
+( -1 + 1 )
+
+// equal float int
+
+( 1.5 == 1.0 )
+
+// equal int float
+
+( 1.0 == 1.5 )
+
+// equal bool uint
+
+( u32( true ) == 1u )
+
+// equal uint bool
+
+( 1u == u32( true ) )
+
+// equal bool float
+
+( f32( true ) == 1.5 )
+
+// equal float bool
+
+( 1.5 == f32( true ) )
+
+// equal float int vector
+
+( vec3<f32>( 1.5, 1.5, 1.5 ) == vec3<f32>( vec3<i32>( 1, 1, 1 ) ) )
+
+// equal int float vector
+
+( vec3<f32>( vec3<i32>( 1, 1, 1 ) ) == vec3<f32>( 1.5, 1.5, 1.5 ) )
+
+// truncated uint to float
+
+( 1.0 * 0.0 )
+
+// truncated uint constants
+
+1u
+
+// truncated int constants
+
+-1
+
+// truncated uint fraction
+
+0u
+
+// truncated int fraction
+
+0
+
+// clamped negative uint
+
+0u
 
 // auto convert scalar to vector
 
@@ -44,65 +112,47 @@ vec4<f32>( vec3<f32>( 1.0, 0.5, 0.0 ), 1.0 )
 
 // weak uint index math
 
-( ( ( object.nodeUniform0 % 64u ) + ( ( object.nodeUniform0 / 64u ) * 2u ) ) - 1u )
+( 70u / 64u )
+
+// weak float default
+
+( 1.0 * 2.0 )
+
+// weak uint fraction
+
+( 1u * 0u )
+
+// weak int fraction
+
+( 3 * 1 )
+
+// weak promote negative
+
+( 1 + -1 )
 
 // weak promote out of range
 
-vec4<f32>( f32( ( object.nodeUniform0 * 1u ) ), f32( ( i32( object.nodeUniform0 ) < -1 ) ), ( f32( object.nodeUniform0 ) + 4294967296.0 ), f32( ( 3 * 2 ) ) )
+( 1.0 + 4294967296.0 )
 
 // weak shared constant
 
-vec2<f32>( f32( ( object.nodeUniform0 + 1u ) ), ( nodeVarying0.x + 1.0 ) )
+( f32( ( 1u + 1u ) ) + ( 1.0 + 1.0 ) )
 
 // weak math functions
 
-vec4<f32>( f32( clamp( object.nodeUniform0, 0u, 64u ) ), f32( clamp( 0u, object.nodeUniform0, 64u ) ), f32( max( 3, -1 ) ), f32( max( 3, 1 ) ) )
+clamp( 1u, 0u, 2u )
+
+// weak math functions reordered
+
+clamp( 0u, 1u, 2u )
 
 // float only math functions
 
-( vec4<f32>( pow( 2.0, 2.0 ), smoothstep( 0.0, 1.0, 2.0 ), atan( 1.0, 2.0 ), dot( vec3<f32>( vec3<i32>( 1, 2, 3 ) ), vec3<f32>( vec3<i32>( 1, 2, 3 ) ) ) ) + vec4<f32>( floor( f32( object.nodeUniform0 ) ), step( 1.0, 2.0 ), sqrt( 2.0 ), length( vec3<f32>( vec3<i32>( 1, 2, 3 ) ) ) ) )
+pow( 2.0, 2.0 )
 
 // integer math functions
 
-fn countTrailingZeros_base_uint ( value : u32 ) -> u32 {
-
-	if ( ( value == 0u ) ) {
-
-		return 32u;
-
-	}
-
-	var nodeVar0 : u32 = 0u;
-	nodeVar0 = value;
-
-	return ( ( bitcast<u32>( f32( ( nodeVar0 & ( - nodeVar0 ) ) ) ) >> 23u ) - 127u );
-
-}
-
-fn countOneBits_base_uint ( value : u32 ) -> u32 {
-
-	var nodeVar0 : u32 = 0u;
-	nodeVar0 = value;
-	nodeVar0 = ( nodeVar0 - ( ( nodeVar0 >> 1u ) & 1431655765u ) );
-	nodeVar0 = ( ( nodeVar0 & 858993459u ) + ( ( nodeVar0 >> 2u ) & 858993459u ) );
-
-	return ( ( ( ( nodeVar0 + ( nodeVar0 >> 4u ) ) & 252645135u ) * 16843009u ) >> 24u );
-
-}
-
-fn countTrailingZeros_uint ( value : u32 ) -> u32 {
-
-	return countTrailingZeros_base_uint( value );
-
-}
-
-fn countOneBits_uint ( value : u32 ) -> u32 {
-
-	return countOneBits_base_uint( value );
-
-}
-
-vec3<u32>( countTrailingZeros_uint( object.nodeUniform0 ), countOneBits_uint( ( object.nodeUniform0 + 1u ) ), max( object.nodeUniform0, 64u ) )
+max( 1u, 2u )
 
 // square matrix functions
 

@@ -62,7 +62,13 @@ class ConstNode extends InputNode {
 
 		if ( _regNum.test( type ) && _regNum.test( output ) ) {
 
-			return builder.generateConst( output, this.value );
+			let value = this.value;
+
+			// Preserve the declared integer value before converting to the output type.
+			if ( type === 'int' ) value = Math.trunc( value );
+			else if ( type === 'uint' ) value = value >= 0 ? Math.trunc( value ) : 0;
+
+			return builder.generateConst( output, value );
 
 		}
 
