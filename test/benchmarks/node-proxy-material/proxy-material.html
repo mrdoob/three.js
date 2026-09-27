@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - node proxy material after</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<style>
+			body { margin: 0; background: #111; color: #fff; font: 14px monospace; }
+			#info { position: absolute; padding: 16px; background: #111e; }
+			a { color: #8cf; }
+			canvas { display: block; }
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			<strong>NodeProxyMaterial - after</strong><br>
+			10,000 meshes, one material per mesh.<br>
+			<a href="node-material.html">Node Material</a> |
+			<a href="proxy-material.html">Proxy Material</a> |
+			<a href="shader-material.html">Shader Material</a>
+			<pre id="results">Initializing renderer...</pre>
+			<button id="update" disabled>Update uniforms</button>
+			<p>CPU times include command submission, not GPU completion.<br>Reload for a fresh run.</p>
+		</div>
+		<script type="importmap">
+			{
+				"imports": {
+					"three/webgpu": "../../../src/Three.WebGPU.js",
+					"three/tsl": "../../../src/Three.TSL.js"
+				}
+			}
+		</script>
+		<script type="module">
+			import * as THREE from 'three/webgpu';
+			import { uniform } from 'three/tsl';
+
+			const results = document.getElementById( 'results' );
+			const button = document.getElementById( 'update' );
+			const renderer = new THREE.WebGPURenderer();
+			renderer.setPixelRatio( 1 );
+			renderer.setSize( 800, 600 );
+			document.body.appendChild( renderer.domElement );
+			await renderer.init();
+
+			let builds = 0;
+			const scene = new THREE.Scene();
+			const camera = new THREE.OrthographicCamera( - 68, 68, 51, - 51, 0.1, 100 );
+			camera.position.z = 20;
+			const geometry = new THREE.SphereGeometry( 0.45, 8, 4 );
+			renderer.debug.onNodeBuilderCreated = ( builder, renderObject ) => {
+
+				if ( renderObject.geometry === geometry ) builds ++;
+
+			};
+
+			const materials = [];
+			const start = performance.now();
+			const baseMaterial = new THREE.MeshBasicNodeMaterial( { colorNode: uniform( 'vec3', 'color' ) } );
+
+			for ( let i = 0; i < 10000; i ++ ) {
+
+				// Use identical, deterministic values in all examples.
+				const color = new THREE.Vector3( ( i % 251 ) / 250, ( i % 127 ) / 126, ( i % 61 ) / 60 );
+				const material = new THREE.NodeProxyMaterial( baseMaterial );
+				material.uniforms.color = color;
+				materials.push( material );
+
+			}
+
+			const creation = performance.now() - start;
+
+			for ( let i = 0; i < materials.length; i ++ ) {
+
+				const mesh = new THREE.Mesh( geometry, materials[ i ] );
+				mesh.position.set( i % 100 - 49.5, Math.floor( i / 100 ) - 49.5, 0 );
+				scene.add( mesh );
+
+			}
+
+			const firstRender = render();
+			const firstBuilds = builds;
+			const secondRender = render();
+			const metrics = {
+				backend: renderer.backend.isWebGPUBackend ? 'WebGPU' : 'WebGL fallback',
+				count: materials.length,
+				creation,
+				firstRender,
+				secondRender,
+				firstBuilds,
+				drawCalls: renderer.info.render.drawCalls
+			};
+
+			// The benchmark runner reads these results after each measured render.
+			window.benchmarkResults = metrics;
+			showResults();
+			button.disabled = false;
+
+			button.addEventListener( 'click', () => {
+
+				for ( const material of materials ) {
+
+					const color = material.uniforms.color;
+					color.set( color.z, color.x, color.y );
+
+				}
+
+				metrics.uniformRender = render();
+				metrics.updateBuilds = builds - firstBuilds;
+				showResults();
+
+			} );
+
+			function render() {
+
+				renderer.info.reset();
+				const start = performance.now();
+				renderer.render( scene, camera );
+				return performance.now() - start;
+
+			}
+
+			function showResults() {
+
+				results.textContent = `Backend: ${ metrics.backend }
+Material creation: ${ metrics.creation.toFixed( 1 ) } ms
+First render: ${ metrics.firstRender.toFixed( 1 ) } ms
+Second render: ${ metrics.secondRender.toFixed( 1 ) } ms
+Node builds: ${ metrics.firstBuilds }
+Draw calls (including output pass): ${ metrics.drawCalls }`;
+
+				if ( metrics.uniformRender !== undefined ) {
+
+					results.textContent += `
+Uniform update render: ${ metrics.uniformRender.toFixed( 1 ) } ms
+Additional node builds: ${ metrics.updateBuilds }`;
+
+				}
+
+			}
+		</script>
+	</body>
+</html>
