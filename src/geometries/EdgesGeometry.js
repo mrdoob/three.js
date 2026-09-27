@@ -62,9 +62,51 @@ class EdgesGeometry extends BufferGeometry {
 
 			const indexArr = [ 0, 0, 0 ];
 			const vertKeys = [ 'a', 'b', 'c' ];
-			const hashes = new Array( 3 );
+			const ids = [ 0, 0, 0 ];
 
-			const edgeData = {};
+			// assign an id to each quantized position via an open-addressed hash table
+			// (slots hold id + 1, 0 means empty). the extra id is for out-of-range
+			// vertices, which all read as NaN
+			const maxIds = Math.ceil( positionAttr.count ) + 1;
+			const quantized = new Float64Array( maxIds * 3 );
+
+			let tableSize = 1;
+			while ( tableSize < maxIds * 2 ) tableSize <<= 1;
+			const tableMask = tableSize - 1;
+			const table = new Int32Array( tableSize );
+			let uniqueCount = 0;
+
+			// store edges in creation order and find them by the ids of their vertices
+			// through a second hash table. an edge's face offset into faceNormals is set
+			// to -1 once its sibling edge has been found
+			let edgeTableSize = 1;
+			while ( edgeTableSize < indexCount * 2 ) edgeTableSize <<= 1;
+			const edgeTableMask = edgeTableSize - 1;
+			const edgeTable = new Int32Array( edgeTableSize );
+
+			const edgeIds = new Int32Array( indexCount * 2 );
+			const edgeIndices = new Uint32Array( indexCount * 2 );
+			const edgeFaces = new Int32Array( indexCount );
+			const faceNormals = new Float64Array( indexCount );
+			let edgeCount = 0;
+
+			// returns the slot of the edge from id0 to id1, or the empty slot it would go in
+			function findEdgeSlot( id0, id1 ) {
+
+				let slot = ( Math.imul( id0, 73856093 ) ^ Math.imul( id1, 19349663 ) ) & edgeTableMask;
+
+				while ( true ) {
+
+					const edge = edgeTable[ slot ];
+
+					if ( edge === 0 || ( edgeIds[ 2 * edge - 2 ] === id0 && edgeIds[ 2 * edge - 1 ] === id1 ) ) return slot;
+
+					slot = ( slot + 1 ) & edgeTableMask;
+
+				}
+
+			}
+
 			const vertices = [];
 			for ( let i = 0; i < indexCount; i += 3 ) {
 
@@ -88,54 +130,106 @@ class EdgesGeometry extends BufferGeometry {
 				c.fromBufferAttribute( positionAttr, indexArr[ 2 ] );
 				_triangle.getNormal( _normal );
 
-				// create hashes for the edge from the vertices
-				hashes[ 0 ] = `${ Math.round( a.x * precision ) },${ Math.round( a.y * precision ) },${ Math.round( a.z * precision ) }`;
-				hashes[ 1 ] = `${ Math.round( b.x * precision ) },${ Math.round( b.y * precision ) },${ Math.round( b.z * precision ) }`;
-				hashes[ 2 ] = `${ Math.round( c.x * precision ) },${ Math.round( c.y * precision ) },${ Math.round( c.z * precision ) }`;
+				// look up the ids of the vertices
+				for ( let j = 0; j < 3; j ++ ) {
+
+					const v = _triangle[ vertKeys[ j ] ];
+					let qx = Math.round( v.x * precision );
+					let qy = Math.round( v.y * precision );
+					let qz = Math.round( v.z * precision );
+
+					// make NaN equal to itself, Math.round() never returns 0.5
+					if ( qx !== qx ) qx = 0.5;
+					if ( qy !== qy ) qy = 0.5;
+					if ( qz !== qz ) qz = 0.5;
+
+					// mix the hash before masking, grids with power-of-two spacing leave
+					// the low bits of every coordinate at zero
+					let h = Math.imul( qx, 73856093 ) ^ Math.imul( qy, 19349663 ) ^ Math.imul( qz, 83492791 );
+					h = Math.imul( h ^ ( h >>> 16 ), 0x45d9f3b );
+					let slot = ( h ^ ( h >>> 16 ) ) & tableMask;
+
+					while ( true ) {
+
+						const id = table[ slot ];
+
+						if ( id === 0 ) {
+
+							const q3 = 3 * uniqueCount;
+							quantized[ q3 + 0 ] = qx;
+							quantized[ q3 + 1 ] = qy;
+							quantized[ q3 + 2 ] = qz;
+
+							table[ slot ] = uniqueCount + 1;
+							ids[ j ] = uniqueCount ++;
+							break;
+
+						}
+
+						const q3 = 3 * ( id - 1 );
+
+						if ( quantized[ q3 + 0 ] === qx && quantized[ q3 + 1 ] === qy && quantized[ q3 + 2 ] === qz ) {
+
+							ids[ j ] = id - 1;
+							break;
+
+						}
+
+						slot = ( slot + 1 ) & tableMask;
+
+					}
+
+				}
 
 				// skip degenerate triangles
-				if ( hashes[ 0 ] === hashes[ 1 ] || hashes[ 1 ] === hashes[ 2 ] || hashes[ 2 ] === hashes[ 0 ] ) {
+				if ( ids[ 0 ] === ids[ 1 ] || ids[ 1 ] === ids[ 2 ] || ids[ 2 ] === ids[ 0 ] ) {
 
 					continue;
 
 				}
+
+				faceNormals[ i + 0 ] = _normal.x;
+				faceNormals[ i + 1 ] = _normal.y;
+				faceNormals[ i + 2 ] = _normal.z;
 
 				// iterate over every edge
 				for ( let j = 0; j < 3; j ++ ) {
 
 					// get the first and next vertex making up the edge
 					const jNext = ( j + 1 ) % 3;
-					const vecHash0 = hashes[ j ];
-					const vecHash1 = hashes[ jNext ];
+					const id0 = ids[ j ];
+					const id1 = ids[ jNext ];
 					const v0 = _triangle[ vertKeys[ j ] ];
 					const v1 = _triangle[ vertKeys[ jNext ] ];
 
-					const hash = `${ vecHash0 }_${ vecHash1 }`;
-					const reverseHash = `${ vecHash1 }_${ vecHash0 }`;
+					const reverseEdge = edgeTable[ findEdgeSlot( id1, id0 ) ] - 1;
+					const slot = findEdgeSlot( id0, id1 );
 
-					if ( reverseHash in edgeData && edgeData[ reverseHash ] ) {
+					if ( reverseEdge !== - 1 && edgeFaces[ reverseEdge ] !== - 1 ) {
 
 						// if we found a sibling edge add it into the vertex array if
-						// it meets the angle threshold and delete the edge from the map.
-						if ( _normal.dot( edgeData[ reverseHash ].normal ) <= thresholdDot ) {
+						// it meets the angle threshold and mark the edge as matched.
+						const f = edgeFaces[ reverseEdge ];
+
+						if ( _normal.x * faceNormals[ f ] + _normal.y * faceNormals[ f + 1 ] + _normal.z * faceNormals[ f + 2 ] <= thresholdDot ) {
 
 							vertices.push( v0.x, v0.y, v0.z );
 							vertices.push( v1.x, v1.y, v1.z );
 
 						}
 
-						edgeData[ reverseHash ] = null;
+						edgeFaces[ reverseEdge ] = - 1;
 
-					} else if ( ! ( hash in edgeData ) ) {
+					} else if ( edgeTable[ slot ] === 0 ) {
 
 						// if we've already got an edge here then skip adding a new one
-						edgeData[ hash ] = {
-
-							index0: indexArr[ j ],
-							index1: indexArr[ jNext ],
-							normal: _normal.clone(),
-
-						};
+						edgeTable[ slot ] = edgeCount + 1;
+						edgeIds[ 2 * edgeCount + 0 ] = id0;
+						edgeIds[ 2 * edgeCount + 1 ] = id1;
+						edgeIndices[ 2 * edgeCount + 0 ] = indexArr[ j ];
+						edgeIndices[ 2 * edgeCount + 1 ] = indexArr[ jNext ];
+						edgeFaces[ edgeCount ] = i;
+						edgeCount ++;
 
 					}
 
@@ -144,13 +238,12 @@ class EdgesGeometry extends BufferGeometry {
 			}
 
 			// iterate over all remaining, unmatched edges and add them to the vertex array
-			for ( const key in edgeData ) {
+			for ( let e = 0; e < edgeCount; e ++ ) {
 
-				if ( edgeData[ key ] ) {
+				if ( edgeFaces[ e ] !== - 1 ) {
 
-					const { index0, index1 } = edgeData[ key ];
-					_v0.fromBufferAttribute( positionAttr, index0 );
-					_v1.fromBufferAttribute( positionAttr, index1 );
+					_v0.fromBufferAttribute( positionAttr, edgeIndices[ 2 * e + 0 ] );
+					_v1.fromBufferAttribute( positionAttr, edgeIndices[ 2 * e + 1 ] );
 
 					vertices.push( _v0.x, _v0.y, _v0.z );
 					vertices.push( _v1.x, _v1.y, _v1.z );

@@ -1,5 +1,6 @@
 import { EdgesGeometry } from '../../../../src/geometries/EdgesGeometry.js';
 
+import { BoxGeometry } from '../../../../src/geometries/BoxGeometry.js';
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
@@ -230,6 +231,17 @@ export default QUnit.module( 'Geometries', () => {
 		QUnit.test( 'tetrahedron', ( assert ) => {
 
 			testEdges( vertList, [ 0, 1, 2, 0, 1, 4, 0, 4, 2, 1, 2, 4 ], 6, assert );
+
+		} );
+
+		QUnit.test( 'box, non-indexed', ( assert ) => {
+
+			// faces only share edges through separate vertices at the same position
+			const indexed = new EdgesGeometry( new BoxGeometry() );
+			const nonIndexed = new EdgesGeometry( new BoxGeometry().toNonIndexed() );
+
+			assert.equal( countEdges( indexed ), 12, 'Edges of indexed box!' );
+			assert.equal( countEdges( nonIndexed ), 12, 'Edges of non-indexed box!' );
 
 		} );
 
