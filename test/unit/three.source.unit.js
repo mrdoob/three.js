@@ -170,6 +170,7 @@ import './src/materials/MeshPhongMaterial.tests.js';
 import './src/materials/MeshPhysicalMaterial.tests.js';
 import './src/materials/MeshStandardMaterial.tests.js';
 import './src/materials/MeshToonMaterial.tests.js';
+import './src/materials/NodeProxyMaterial.tests.js';
 import './src/materials/PointsMaterial.tests.js';
 import './src/materials/RawShaderMaterial.tests.js';
 import './src/materials/ShaderMaterial.tests.js';
@@ -262,6 +263,9 @@ import './src/textures/Texture.tests.js';
 import './src/textures/TextureSource.tests.js';
 import './src/textures/VideoTexture.tests.js';
 
+
+//src/nodes/core
+import './src/nodes/core/UniformNode.tests.js';
 
 //src/nodes/display
 import './src/nodes/display/ViewportTextureNode.tests.js';
