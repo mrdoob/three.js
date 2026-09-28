@@ -1,3 +1,5 @@
+//addons/controls
+import './addons/controls/TrackballControls.tests.js';
 
 //addons/utils
 import './addons/utils/BufferGeometryUtils.tests.js';

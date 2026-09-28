@@ -996,6 +996,7 @@ function onMouseWheel( event ) {
 	}
 
 	this.dispatchEvent( _startEvent );
+	this.update();
 	this.dispatchEvent( _endEvent );
 
 }
