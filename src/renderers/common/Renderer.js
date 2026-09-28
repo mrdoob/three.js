@@ -1839,10 +1839,6 @@ class Renderer {
 
 		}
 
-		this.getDrawingBufferSize( _drawingBufferSize );
-
-		_screen.set( 0, 0, _drawingBufferSize.width, _drawingBufferSize.height );
-
 		const minDepth = ( viewport.minDepth === undefined ) ? 0 : viewport.minDepth;
 		const maxDepth = ( viewport.maxDepth === undefined ) ? 1 : viewport.maxDepth;
 
@@ -1851,10 +1847,8 @@ class Renderer {
 		renderContext.viewportValue.height >>= activeMipmapLevel;
 		renderContext.viewportValue.minDepth = minDepth;
 		renderContext.viewportValue.maxDepth = maxDepth;
-		renderContext.viewport = renderContext.viewportValue.equals( _screen ) === false;
 
 		renderContext.scissorValue.copy( scissor ).multiplyScalar( pixelRatio ).floor();
-		renderContext.scissor = canvasTarget._scissorTest && renderContext.scissorValue.equals( _screen ) === false;
 		renderContext.scissorValue.width >>= activeMipmapLevel;
 		renderContext.scissorValue.height >>= activeMipmapLevel;
 
@@ -1912,6 +1906,8 @@ class Renderer {
 
 		} else {
 
+			this.getDrawingBufferSize( _drawingBufferSize );
+
 			renderContext.textures = null;
 			renderContext.depthTexture = null;
 			renderContext.width = _drawingBufferSize.width;
@@ -1943,6 +1939,11 @@ class Renderer {
 			renderContext.scissorValue.height = Math.max( renderContext.height - renderContext.scissorValue.y, 0 );
 
 		}
+
+		_screen.set( 0, 0, renderContext.width, renderContext.height );
+
+		renderContext.viewport = renderContext.viewportValue.equals( _screen ) === false;
+		renderContext.scissor = canvasTarget._scissorTest && renderContext.scissorValue.equals( _screen ) === false;
 
 		//
 
