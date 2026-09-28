@@ -491,7 +491,7 @@ class WebGLBackend extends Backend {
 
 		} else {
 
-			const { width, height } = this.getDrawingBufferSize();
+			const { width, height } = renderContext;
 			state.viewport( 0, 0, width, height );
 
 		}
@@ -502,7 +502,7 @@ class WebGLBackend extends Backend {
 
 		} else {
 
-			const { width, height } = this.getDrawingBufferSize();
+			const { width, height } = renderContext;
 			state.scissor( 0, 0, width, height );
 
 		}
@@ -603,7 +603,7 @@ class WebGLBackend extends Backend {
 
 			} else {
 
-				const { width, height } = this.getDrawingBufferSize();
+				const { width, height } = previousContext;
 				state.viewport( 0, 0, width, height );
 
 			}
@@ -614,7 +614,7 @@ class WebGLBackend extends Backend {
 
 			} else {
 
-				const { width, height } = this.getDrawingBufferSize();
+				const { width, height } = previousContext;
 				state.scissor( 0, 0, width, height );
 
 			}
