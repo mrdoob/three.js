@@ -3,6 +3,8 @@ import { AttributeType } from './Constants.js';
 
 import { DynamicDrawUsage } from '../../constants.js';
 
+let _generation = 0;
+
 /**
  * This renderer module manages geometry attributes.
  *
@@ -36,11 +38,19 @@ class Attributes extends DataMap {
 		this.info = info;
 
 		/**
-		 * Stores weak references to the storage attributes with attached
+		 * Renderer component for managing geometries.
+		 *
+		 * @type {?Geometries}
+		 * @default null
+		 */
+		this.geometries = null;
+
+		/**
+		 * Stores weak references to the buffer attributes with attached
 		 * `dispose` event listeners.
 		 *
 		 * @private
-		 * @type {Set<WeakRef<StorageBufferAttribute|StorageInstancedBufferAttribute>>}
+		 * @type {Set<WeakRef<BufferAttribute>>}
 		 */
 		this._tracked = new Set();
 
@@ -67,7 +77,7 @@ class Attributes extends DataMap {
 
 		if ( attributeData !== null ) {
 
-			if ( attribute.isStorageBufferAttribute === true || attribute.isStorageInstancedBufferAttribute === true ) {
+			if ( attribute.isBufferAttribute === true ) {
 
 				attribute.removeEventListener( 'dispose', attributeData.onDispose );
 
@@ -122,14 +132,21 @@ class Attributes extends DataMap {
 			}
 
 			data.version = this._getBufferAttribute( attribute ).version;
+			data.generation = _generation ++;
 
-			// only storage buffer attributes support disposal
+			// interleaved buffer attributes are not event dispatchers
 
-			if ( attribute.isStorageBufferAttribute === true || attribute.isStorageInstancedBufferAttribute === true ) {
+			if ( attribute.isBufferAttribute === true ) {
 
 				data.onDispose = () => {
 
-					this.delete( attribute );
+					// attributes assigned to geometries are deleted when the geometries are disposed
+
+					if ( this.geometries.hasAttribute( attribute ) === false ) {
+
+						this.delete( attribute );
+
+					}
 
 				};
 

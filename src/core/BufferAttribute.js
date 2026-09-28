@@ -679,7 +679,8 @@ class BufferAttribute extends EventDispatcher {
 	}
 
 	/**
-	 * Can be used to dispose storage buffer attributes. Available only in {@link WebGPURenderer}.
+	 * Frees the GPU-related resources allocated by this instance. Attributes assigned
+	 * to a geometry are freed when the geometry is disposed. Available only in {@link WebGPURenderer}.
 	 */
 	dispose() {
 
