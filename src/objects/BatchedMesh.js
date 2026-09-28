@@ -181,6 +181,13 @@ function copyArrayContents( src, target ) {
  * match its index usage and provide its attributes with the same itemSize and normalized
  * values. Additional attributes are ignored.
  *
+ * When customizing the vertex shader of a built-in material, the ID of the rendered instance is
+ * available via `getIndirectIndex( gl_DrawID )`. It matches the IDs returned by `addInstance()`
+ * and `batchId` of raycast intersections. If instance colors are set, `getBatchingColor()` returns
+ * the color of an instance as a `vec4` including alpha. These functions are only defined when
+ * `USE_BATCHING` or respectively `USE_BATCHING_COLOR` is set. With node materials, use
+ * `batchIndirectIndex` and `batchColor` instead.
+ *
  * @augments Mesh
  */
 class BatchedMesh extends Mesh {
