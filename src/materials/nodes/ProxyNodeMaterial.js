@@ -23,7 +23,7 @@ class ProxyNodeMaterial extends Material {
 	 * Constructs a new proxy node material.
 	 *
 	 * @param {NodeMaterial} nodeMaterial - The node material defining the shared shader.
-	 * @throws {Error} When the given material is not a node material.
+	 * @throws {TypeError} When the given material is not a node material.
 	 */
 	constructor( nodeMaterial ) {
 
@@ -31,7 +31,7 @@ class ProxyNodeMaterial extends Material {
 
 		if ( nodeMaterial?.isNodeMaterial !== true ) {
 
-			throw new Error( 'ProxyNodeMaterial: The parameter must be a NodeMaterial.' );
+			throw new TypeError( 'THREE.ProxyNodeMaterial: The parameter must be a NodeMaterial.' );
 
 		}
 
