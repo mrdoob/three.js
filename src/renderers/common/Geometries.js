@@ -128,8 +128,6 @@ class Geometries extends DataMap {
 		 */
 		this.info = info;
 
-		attributes.geometries = this;
-
 		/**
 		 * Weak Map for managing attributes for wireframe rendering.
 		 *
@@ -144,13 +142,6 @@ class Geometries extends DataMap {
 		 * @type {WeakMap<BufferAttribute,number>}
 		 */
 		this.attributeCall = new WeakMap();
-
-		/**
-		 * Stores the number of geometries each attribute is assigned to.
-		 *
-		 * @type {WeakMap<BufferAttribute,number>}
-		 */
-		this.geometryCount = new WeakMap();
 
 		/**
 		 * Stores weak references to the geometries with attached
@@ -185,18 +176,6 @@ class Geometries extends DataMap {
 	}
 
 	/**
-	 * Returns `true` if the given attribute is assigned to at least one geometry.
-	 *
-	 * @param {BufferAttribute} attribute - The attribute.
-	 * @return {boolean} Whether the attribute is assigned to a geometry or not.
-	 */
-	hasAttribute( attribute ) {
-
-		return this.geometryCount.has( attribute );
-
-	}
-
-	/**
 	 * Prepares the geometry of the given render object for rendering.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
@@ -224,58 +203,25 @@ class Geometries extends DataMap {
 
 		this.info.memory.geometries ++;
 
-		// count the geometries each attribute is assigned to
-
-		const geometryCount = this.geometryCount;
-		const attributes = Object.values( geometry.attributes );
-
-		if ( geometry.index !== null ) attributes.push( geometry.index );
-
-		for ( const attribute of attributes ) {
-
-			geometryCount.set( attribute, ( geometryCount.get( attribute ) || 0 ) + 1 );
-
-		}
-
 		geometryData.onDispose = () => {
 
 			this.info.memory.geometries --;
-
-			for ( const attribute of attributes ) {
-
-				const count = geometryCount.get( attribute ) - 1;
-
-				if ( count > 0 ) {
-
-					geometryCount.set( attribute, count );
-
-				} else {
-
-					geometryCount.delete( attribute );
-
-				}
-
-			}
 
 			// index
 
 			const index = geometry.index;
 
-			if ( index !== null && this.hasAttribute( index ) === false ) {
+			if ( index !== null ) {
 
 				this.attributes.delete( index );
 
 			}
 
-			// geometry attributes, shared attributes are kept for other geometries
+			// geometry attributes
 
 			for ( const attribute of Object.values( geometry.attributes ) ) {
 
-				if ( this.hasAttribute( attribute ) === false ) {
-
-					this.attributes.delete( attribute );
-
-				}
+				this.attributes.delete( attribute );
 
 			}
 

@@ -38,14 +38,6 @@ class Attributes extends DataMap {
 		this.info = info;
 
 		/**
-		 * Renderer component for managing geometries.
-		 *
-		 * @type {?Geometries}
-		 * @default null
-		 */
-		this.geometries = null;
-
-		/**
 		 * Stores weak references to the buffer attributes with attached
 		 * `dispose` event listeners.
 		 *
@@ -140,13 +132,7 @@ class Attributes extends DataMap {
 
 				data.onDispose = () => {
 
-					// attributes assigned to geometries are deleted when the geometries are disposed
-
-					if ( this.geometries.hasAttribute( attribute ) === false ) {
-
-						this.delete( attribute );
-
-					}
+					this.delete( attribute );
 
 				};
 
