@@ -79,7 +79,7 @@ class AnimationAction {
 		 * loop state).
 		 *
 		 * @type {number}
-		 * @default Infinity
+		 * @default 0
 		 */
 		this.time = 0;
 
