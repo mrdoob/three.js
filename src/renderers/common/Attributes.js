@@ -58,7 +58,7 @@ class Attributes extends DataMap {
 	/**
 	 * Deletes the data for the given attribute.
 	 *
-	 * @param {BufferAttribute} attribute - The attribute.
+	 * @param {BufferAttribute|InterleavedBuffer} attribute - The attribute.
 	 * @return {?Object} The deleted attribute data.
 	 */
 	delete( attribute ) {
@@ -90,7 +90,7 @@ class Attributes extends DataMap {
 	 * Updates the given attribute. This method creates attribute buffers
 	 * for new attributes and updates data for existing ones.
 	 *
-	 * @param {BufferAttribute} attribute - The attribute to update.
+	 * @param {BufferAttribute|InterleavedBuffer} attribute - The attribute to update.
 	 * @param {number} type - The attribute type.
 	 */
 	update( attribute, type ) {
@@ -121,7 +121,7 @@ class Attributes extends DataMap {
 
 			}
 
-			data.version = this._getBufferAttribute( attribute ).version;
+			data.version = attribute.version;
 
 			// only storage buffer attributes support disposal
 
@@ -145,32 +145,15 @@ class Attributes extends DataMap {
 
 		} else {
 
-			const bufferAttribute = this._getBufferAttribute( attribute );
-
-			if ( data.version < bufferAttribute.version || bufferAttribute.usage === DynamicDrawUsage ) {
+			if ( data.version < attribute.version || attribute.usage === DynamicDrawUsage ) {
 
 				this.backend.updateAttribute( attribute );
 
-				data.version = bufferAttribute.version;
+				data.version = attribute.version;
 
 			}
 
 		}
-
-	}
-
-	/**
-	 * Utility method for handling interleaved buffer attributes correctly.
-	 * To process them, their `InterleavedBuffer` is returned.
-	 *
-	 * @param {BufferAttribute} attribute - The attribute.
-	 * @return {BufferAttribute|InterleavedBuffer}
-	 */
-	_getBufferAttribute( attribute ) {
-
-		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
-
-		return attribute;
 
 	}
 

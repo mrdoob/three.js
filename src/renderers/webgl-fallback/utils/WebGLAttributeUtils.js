@@ -81,23 +81,14 @@ class WebGLAttributeUtils {
 		const backend = this.backend;
 		const { gl } = backend;
 
+		const bufferAttribute = backend.getBufferAttribute( attribute );
+
+		if ( backend.get( bufferAttribute ).bufferGPU !== undefined ) return;
+
 		const array = attribute.array;
 		const usage = attribute.usage || gl.STATIC_DRAW;
 
-		const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
-		const bufferData = backend.get( bufferAttribute );
-
-		let bufferGPU = bufferData.bufferGPU;
-
-		if ( bufferGPU === undefined ) {
-
-			bufferGPU = this._createBuffer( gl, bufferType, array, usage );
-
-			bufferData.bufferGPU = bufferGPU;
-			bufferData.bufferType = bufferType;
-			bufferData.version = bufferAttribute.version;
-
-		}
+		const bufferGPU = this._createBuffer( gl, bufferType, array, usage );
 
 		//attribute.onUploadCallback();
 
@@ -159,7 +150,7 @@ class WebGLAttributeUtils {
 			type,
 			byteLength: array.byteLength,
 			bytesPerElement: array.BYTES_PER_ELEMENT,
-			version: attribute.version,
+			version: bufferAttribute.version,
 			pbo: attribute.pbo,
 			isInteger: type === gl.INT || type === gl.UNSIGNED_INT || attribute.gpuType === IntType,
 			id: _id ++
@@ -173,7 +164,7 @@ class WebGLAttributeUtils {
 
 		}
 
-		backend.set( attribute, attributeData );
+		backend.set( bufferAttribute, attributeData );
 
 	}
 
@@ -188,10 +179,10 @@ class WebGLAttributeUtils {
 		const { gl } = backend;
 
 		const array = attribute.array;
-		const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
+		const bufferAttribute = backend.getBufferAttribute( attribute );
 		const bufferData = backend.get( bufferAttribute );
 		const bufferType = bufferData.bufferType;
-		const updateRanges = attribute.isInterleavedBufferAttribute ? attribute.data.updateRanges : attribute.updateRanges;
+		const updateRanges = bufferAttribute.updateRanges;
 
 		gl.bindBuffer( bufferType, bufferData.bufferGPU );
 
@@ -231,13 +222,8 @@ class WebGLAttributeUtils {
 		const backend = this.backend;
 		const { gl } = backend;
 
-		if ( attribute.isInterleavedBufferAttribute ) {
-
-			backend.delete( attribute.data );
-
-		}
-
-		const attributeData = backend.get( attribute );
+		const bufferAttribute = backend.getBufferAttribute( attribute );
+		const attributeData = backend.get( bufferAttribute );
 
 		if ( attributeData.buffers !== undefined ) {
 
@@ -254,7 +240,7 @@ class WebGLAttributeUtils {
 
 		}
 
-		backend.delete( attribute );
+		backend.delete( bufferAttribute );
 
 	}
 
@@ -276,7 +262,7 @@ class WebGLAttributeUtils {
 		const backend = this.backend;
 		const { gl } = backend;
 
-		const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
+		const bufferAttribute = backend.getBufferAttribute( attribute );
 		const attributeInfo = backend.get( bufferAttribute );
 		const { bufferGPU } = attributeInfo;
 

@@ -454,6 +454,21 @@ class Backend {
 	 */
 	destroyAttribute( /*attribute*/ ) { }
 
+	/**
+	 * Utility method for handling interleaved buffer attributes correctly.
+	 * To process them, their `InterleavedBuffer` is returned.
+	 *
+	 * @param {BufferAttribute|InterleavedBufferAttribute} attribute - The attribute.
+	 * @return {BufferAttribute|InterleavedBuffer}
+	 */
+	getBufferAttribute( attribute ) {
+
+		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
+
+		return attribute;
+
+	}
+
 	// canvas
 
 	/**
