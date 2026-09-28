@@ -185,13 +185,13 @@ class InstancedMesh extends Mesh {
 
 		this.instanceMatrix.copy( source.instanceMatrix );
 
-		if ( source.morphTexture !== null ) this.morphTexture = source.morphTexture.clone();
-		if ( source.instanceColor !== null ) this.instanceColor = source.instanceColor.clone();
+		this.morphTexture = source.morphTexture !== null ? source.morphTexture.clone() : null;
+		this.instanceColor = source.instanceColor !== null ? source.instanceColor.clone() : null;
 
 		this.count = source.count;
 
-		if ( source.boundingBox !== null ) this.boundingBox = source.boundingBox.clone();
-		if ( source.boundingSphere !== null ) this.boundingSphere = source.boundingSphere.clone();
+		this.boundingBox = source.boundingBox !== null ? source.boundingBox.clone() : null;
+		this.boundingSphere = source.boundingSphere !== null ? source.boundingSphere.clone() : null;
 
 		return this;
 

@@ -1487,10 +1487,14 @@ class BatchedMesh extends Mesh {
 		this._matricesTexture = source._matricesTexture.clone();
 		this._matricesTexture.image.data = this._matricesTexture.image.data.slice();
 
-		if ( this._colorsTexture !== null ) {
+		if ( source._colorsTexture !== null ) {
 
 			this._colorsTexture = source._colorsTexture.clone();
 			this._colorsTexture.image.data = this._colorsTexture.image.data.slice();
+
+		} else {
+
+			this._colorsTexture = null;
 
 		}
 

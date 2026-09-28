@@ -115,11 +115,19 @@ class Mesh extends Object3D {
 
 			this.morphTargetInfluences = source.morphTargetInfluences.slice();
 
+		} else {
+
+			this.morphTargetInfluences = undefined;
+
 		}
 
 		if ( source.morphTargetDictionary !== undefined ) {
 
 			this.morphTargetDictionary = Object.assign( {}, source.morphTargetDictionary );
+
+		} else {
+
+			this.morphTargetDictionary = undefined;
 
 		}
 
