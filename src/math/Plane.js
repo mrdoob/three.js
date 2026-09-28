@@ -37,7 +37,10 @@ class Plane {
 		this.normal = normal;
 
 		/**
-		 * The signed distance from the origin to the plane.
+		 * The signed distance from the plane to the origin.
+		 *
+		 * A plane `x` units away from the origin in the positive
+		 * direction will have a constant of `-x`.
 		 *
 		 * @type {number}
 		 * @default 0
