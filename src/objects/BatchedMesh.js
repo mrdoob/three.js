@@ -177,8 +177,8 @@ function copyArrayContents( src, target ) {
  * scene.add( batchedMesh );
  * ```
  *
- * The first geometry added defines the layout of the batch. All subsequent geometries must 
- * match its index usage and provide its attributes with the same itemSize and normalized 
+ * The first geometry added defines the layout of the batch. All subsequent geometries must
+ * match its index usage and provide its attributes with the same itemSize and normalized
  * values. Additional attributes are ignored.
  *
  * @augments Mesh
