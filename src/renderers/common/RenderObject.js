@@ -871,6 +871,31 @@ class RenderObject {
 	}
 
 	/**
+	 * Whether the attributes must be uploaded again or not, e.g. after
+	 * they have been disposed.
+	 *
+	 * @type {boolean}
+	 * @readonly
+	 */
+	get needsAttributesUpdate() {
+
+		if ( this.attributes === null ) return false;
+
+		const attributes = this._geometries.attributes;
+
+		for ( const attribute of this.attributes ) {
+
+			if ( attributes.has( attribute ) === false ) return true;
+
+		}
+
+		const index = this.getIndex();
+
+		return index !== null && attributes.has( index ) === false;
+
+	}
+
+	/**
 	 * Whether the geometry requires an update or not.
 	 *
 	 * @type {boolean}
