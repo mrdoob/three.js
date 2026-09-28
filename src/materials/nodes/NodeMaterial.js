@@ -448,16 +448,22 @@ class NodeMaterial extends Material {
 	getUniformNodes() {
 
 		const uniformNodes = [];
+		const visited = new Set();
 
-		for ( const { childNode } of this._getNodeChildren() ) {
+		// visit each node once, in the same order as the cache key computation
+		const visit = ( node ) => {
 
-			childNode.traverse( node => {
+			if ( visited.has( node ) ) return;
 
-				if ( node.isValueKeyed === true ) uniformNodes.push( node );
+			visited.add( node );
 
-			} );
+			if ( node.isValueKeyed === true ) uniformNodes.push( node );
 
-		}
+			for ( const childNode of node.getChildren() ) visit( childNode );
+
+		};
+
+		for ( const { childNode } of this._getNodeChildren() ) visit( childNode );
 
 		return uniformNodes;
 
