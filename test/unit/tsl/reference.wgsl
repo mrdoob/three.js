@@ -12,15 +12,87 @@ vec4<f32>( vec3<f32>( 1.0, 0.5, 0.0 ), 1.0 )
 
 // auto convert int to float
 
-( 0.5 + 2.0 )
+( 0.5 * 1.0 )
 
 // auto convert float to int
 
 ( 2 + 1 )
 
+// auto promote int to float
+
+( 1.0 * 0.5 )
+
 // auto convert uint to float
 
-( 0.5 * 3.0 )
+( 0.5 * 1.0 )
+
+// auto promote uint to float
+
+( 1.0 * 0.5 )
+
+// auto promote uint to int
+
+( 1 + -1 )
+
+// auto promote int and uint
+
+( -1 + 1 )
+
+// equal float int
+
+( 1.5 == 1.0 )
+
+// equal int float
+
+( 1.0 == 1.5 )
+
+// equal bool uint
+
+( u32( true ) == 1u )
+
+// equal uint bool
+
+( 1u == u32( true ) )
+
+// equal bool float
+
+( f32( true ) == 1.5 )
+
+// equal float bool
+
+( 1.5 == f32( true ) )
+
+// equal float int vector
+
+( vec3<f32>( 1.5, 1.5, 1.5 ) == vec3<f32>( vec3<i32>( 1, 1, 1 ) ) )
+
+// equal int float vector
+
+( vec3<f32>( vec3<i32>( 1, 1, 1 ) ) == vec3<f32>( 1.5, 1.5, 1.5 ) )
+
+// truncated uint to float
+
+( 1.0 * 0.0 )
+
+// truncated uint constants
+
+1u
+
+// truncated int constants
+
+-1
+
+// truncated uint fraction
+
+0u
+
+// truncated int fraction
+
+0
+
+// clamped negative uint
+
+0u
 
 // auto convert scalar to vector
 
@@ -32,7 +104,70 @@ vec4<f32>( vec3<f32>( 1.0, 0.5, 0.0 ), 1.0 )
 
 // auto convert vector to int
 
-( vec3<i32>( 1, 2, 3 ) + vec3<i32>( vec3<f32>( 0.5, 0.5, 0.5 ) ) )
+( vec3<i32>( 1, 2, 3 ) + vec3<i32>( i32( 1.0 ) ) )
+
+// auto promote int vector to float
+
+( vec3<f32>( vec3<i32>( 1, 2, 3 ) ) + vec3<f32>( 0.5, 0.5, 0.5 ) )
+
+// weak uint index math
+
+( 70u / 64u )
+
+// weak float default
+
+( 1.0 * 2.0 )
+
+// weak uint fraction
+
+( 1u * 0u )
+
+// weak int fraction
+
+( 3 * 1 )
+
+// weak promote negative
+
+( 1 + -1 )
+
+// weak promote out of range
+
+( 1.0 + 4294967296.0 )
+
+// weak shared constant
+
+( f32( ( 1u + 1u ) ) + ( 1.0 + 1.0 ) )
+
+// weak math functions
+
+clamp( 1u, 0u, 2u )
+
+// weak math functions reordered
+
+clamp( 0u, 1u, 2u )
+
+// float only math functions
+
+pow( 2.0, 2.0 )
+
+// integer math functions
+
+max( 1u, 2u )
+
+// square matrix functions
+
+fn tsl_inverse_mat2( m : mat2x2<f32> ) -> mat2x2<f32> {
+
+	let det = m[ 0 ][ 0 ] * m[ 1 ][ 1 ] - m[ 0 ][ 1 ] * m[ 1 ][ 0 ];
+
+	return mat2x2<f32>(
+		m[ 1 ][ 1 ], - m[ 0 ][ 1 ],
+		- m[ 1 ][ 0 ], m[ 0 ][ 0 ]
+	) * ( 1.0 / det );
+
+}
+
+determinant( transpose( tsl_inverse_mat2( mat2x2<f32>( 1.0, 3.0, 2.0, 4.0 ) ) ) )
 
 // vector composition
 
@@ -156,7 +291,7 @@ explicitGlobal = ( explicitGlobal + nodeVar0 );
 
 // comparison and logic
 
-( ( ( 3.0 > 1.0 ) && ( 0.5 <= 1.0 ) ) || ( ! false ) )
+( ( ( 3 > 1 ) && ( 0.5 <= 1.0 ) ) || ( ! false ) )
 
 // vector comparison
 
@@ -270,13 +405,13 @@ nodeVar0
 
 var nodeVar0 : f32 = 0.0;
 
-if ( ( 2.0 == 0.0 ) ) {
+if ( ( 2 == 0 ) ) {
 
 	nodeVar0 = 1.0;
 
 } else {
 
-	if ( ( ( 2.0 == 1.0 ) || ( 2.0 == 2.0 ) ) ) {
+	if ( ( ( 2 == 1 ) || ( 2 == 2 ) ) ) {
 
 		nodeVar0 = 2.0;
 
@@ -296,13 +431,13 @@ var nodeVar0 : f32 = 0.0;
 
 for ( var i : i32 = 0; i < 8; i ++ ) {
 
-	if ( ( f32( i ) == 2.0 ) ) {
+	if ( ( i == 2 ) ) {
 
 		continue;
 
 	}
 
-	if ( ( f32( i ) > 5.0 ) ) {
+	if ( ( i > 5 ) ) {
 
 		break;
 
@@ -346,7 +481,7 @@ nodeVar0
 
 var nodeVar0 : i32 = 0;
 
-while ( ( f32( nodeVar0 ) < 3.0 ) ) {
+while ( ( nodeVar0 < 3 ) ) {
 
 	nodeVar0 = ( nodeVar0 + 1 );
 

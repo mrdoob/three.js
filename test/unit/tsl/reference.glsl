@@ -12,15 +12,87 @@ vec4( vec3( 1.0, 0.5, 0.0 ), 1.0 )
 
 // auto convert int to float
 
-( 0.5 + 2.0 )
+( 0.5 * 1.0 )
 
 // auto convert float to int
 
 ( 2 + 1 )
 
+// auto promote int to float
+
+( 1.0 * 0.5 )
+
 // auto convert uint to float
 
-( 0.5 * 3.0 )
+( 0.5 * 1.0 )
+
+// auto promote uint to float
+
+( 1.0 * 0.5 )
+
+// auto promote uint to int
+
+( 1 + -1 )
+
+// auto promote int and uint
+
+( -1 + 1 )
+
+// equal float int
+
+( 1.5 == 1.0 )
+
+// equal int float
+
+( 1.0 == 1.5 )
+
+// equal bool uint
+
+( uint( true ) == 1u )
+
+// equal uint bool
+
+( 1u == uint( true ) )
+
+// equal bool float
+
+( float( true ) == 1.5 )
+
+// equal float bool
+
+( 1.5 == float( true ) )
+
+// equal float int vector
+
+equal( vec3( 1.5, 1.5, 1.5 ), vec3( ivec3( 1, 1, 1 ) ) )
+
+// equal int float vector
+
+equal( vec3( ivec3( 1, 1, 1 ) ), vec3( 1.5, 1.5, 1.5 ) )
+
+// truncated uint to float
+
+( 1.0 * 0.0 )
+
+// truncated uint constants
+
+1u
+
+// truncated int constants
+
+-1
+
+// truncated uint fraction
+
+0u
+
+// truncated int fraction
+
+0
+
+// clamped negative uint
+
+0u
 
 // auto convert scalar to vector
 
@@ -32,7 +104,59 @@ vec4( vec3( 1.0, 0.5, 0.0 ), 1.0 )
 
 // auto convert vector to int
 
-( ivec3( 1, 2, 3 ) + ivec3( vec3( 0.5, 0.5, 0.5 ) ) )
+( ivec3( 1, 2, 3 ) + ivec3( int( 1.0 ) ) )
+
+// auto promote int vector to float
+
+( vec3( ivec3( 1, 2, 3 ) ) + vec3( 0.5, 0.5, 0.5 ) )
+
+// weak uint index math
+
+( 70u / 64u )
+
+// weak float default
+
+( 1.0 * 2.0 )
+
+// weak uint fraction
+
+( 1u * 0u )
+
+// weak int fraction
+
+( 3 * 1 )
+
+// weak promote negative
+
+( 1 + -1 )
+
+// weak promote out of range
+
+( 1.0 + 4294967296.0 )
+
+// weak shared constant
+
+( float( ( 1u + 1u ) ) + ( 1.0 + 1.0 ) )
+
+// weak math functions
+
+clamp( 1u, 0u, 2u )
+
+// weak math functions reordered
+
+clamp( 0u, 1u, 2u )
+
+// float only math functions
+
+pow( 2.0, 2.0 )
+
+// integer math functions
+
+max( 1u, 2u )
+
+// square matrix functions
+
+determinant( transpose( inverse( mat2( 1.0, 3.0, 2.0, 4.0 ) ) ) )
 
 // vector composition
 
@@ -150,11 +274,11 @@ explicitGlobal = ( explicitGlobal + nodeVar0 );
 
 // comparison and logic
 
-( ( ( 3.0 > 1.0 ) && ( 0.5 <= 1.0 ) ) || ( ! false ) )
+( ( ( 3 > 1 ) && ( 0.5 <= 1.0 ) ) || ( ! false ) )
 
 // vector comparison
 
-all( ( vec3( 1.0, 2.0, 3.0 ) > vec3( 1.0 ) ) )
+all( greaterThan( vec3( 1.0, 2.0, 3.0 ), vec3( 1.0 ) ) )
 
 // select auto conversion
 
@@ -260,13 +384,13 @@ nodeVar0
 
 float nodeVar0 = 0.0;
 
-if ( ( 2.0 == 0.0 ) ) {
+if ( ( 2 == 0 ) ) {
 
 	nodeVar0 = 1.0;
 
 } else {
 
-	if ( ( ( 2.0 == 1.0 ) || ( 2.0 == 2.0 ) ) ) {
+	if ( ( ( 2 == 1 ) || ( 2 == 2 ) ) ) {
 
 		nodeVar0 = 2.0;
 
@@ -286,13 +410,13 @@ float nodeVar0 = 0.0;
 
 for ( int i = 0; i < 8; i ++ ) {
 
-	if ( ( float( i ) == 2.0 ) ) {
+	if ( ( i == 2 ) ) {
 
 		continue;
 
 	}
 
-	if ( ( float( i ) > 5.0 ) ) {
+	if ( ( i > 5 ) ) {
 
 		break;
 
@@ -336,7 +460,7 @@ nodeVar0
 
 int nodeVar0 = 0;
 
-while ( ( float( nodeVar0 ) < 3.0 ) ) {
+while ( ( nodeVar0 < 3 ) ) {
 
 	nodeVar0 = ( nodeVar0 + 1 );
 

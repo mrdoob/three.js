@@ -1,4 +1,4 @@
-import { Break, Continue, Fn, If, Loop, Switch, array, bool, float, int, inverse, ivec3, mat3, mat4, mix, mul, select, time, uint, uniform, uv, vec2, vec3, vec4 } from '../../../src/Three.TSL.js';
+import { Break, Continue, Fn, If, Loop, Switch, array, bool, clamp, determinant, float, int, inverse, ivec3, mat2, mat3, mat4, mix, mul, select, time, transpose, uint, uniform, uv, vec2, vec3, vec4 } from '../../../src/Three.TSL.js';
 
 // Create a fresh graph for every test and backend.
 export const cases = {
@@ -9,18 +9,91 @@ export const cases = {
 
 	swizzle: () => vec3( 1, 2, 3 ).zyx.mul( 0.5 ),
 
-	// Operand order matters: scalar operators infer their type from the left operand.
-	autoConvertIntToFloat: () => Fn( () => float( 0.5 ).add( int( 2 ) ) )(),
+	// Explicit types promote to the broader component type in either operand order.
+	autoConvertIntToFloat: () => float( 0.5 ).mul( int( 1 ) ),
 
-	autoConvertFloatToInt: () => Fn( () => int( 2 ).add( float( 0.5 ) ) )(),
+	// An implicit integer-valued number adapts to int; an explicit float promotes it.
+	autoConvertFloatToInt: () => int( 2 ).add( 1 ),
 
-	autoConvertUintToFloat: () => Fn( () => float( 0.5 ).mul( uint( 3 ) ) )(),
+	autoPromoteIntToFloat: () => int( 1 ).mul( float( 0.5 ) ),
+
+	autoConvertUintToFloat: () => float( 0.5 ).mul( uint( 1 ) ),
+
+	autoPromoteUintToFloat: () => uint( 1 ).mul( float( 0.5 ) ),
+
+	autoPromoteUintToInt: () => uint( 1 ).add( int( - 1 ) ),
+
+	autoPromoteIntAndUint: () => int( - 1 ).add( uint( 1 ) ),
+
+	// Equality uses the same common type in either operand order.
+	equalFloatInt: () => float( 1.5 ).equal( int( 1 ) ),
+
+	equalIntFloat: () => int( 1 ).equal( float( 1.5 ) ),
+
+	equalBoolUint: () => bool( true ).equal( uint( 1 ) ),
+
+	equalUintBool: () => uint( 1 ).equal( bool( true ) ),
+
+	equalBoolFloat: () => bool( true ).equal( float( 1.5 ) ),
+
+	equalFloatBool: () => float( 1.5 ).equal( bool( true ) ),
+
+	equalFloatIntVector: () => vec3( 1.5 ).equal( ivec3( 1 ) ),
+
+	equalIntFloatVector: () => ivec3( 1 ).equal( vec3( 1.5 ) ),
+
+	// Explicit integer constants truncate before promotion to float, including cached values.
+	truncatedUintToFloat: () => float( 1 ).mul( uint( 0.4 ) ),
+
+	truncatedUintConstants: () => uint( 1.5 ),
+
+	truncatedIntConstants: () => int( - 1.5 ),
+
+	truncatedUintFraction: () => uint( 0.6 ),
+
+	truncatedIntFraction: () => int( - 0.6 ),
+
+	clampedNegativeUint: () => uint( - 0.4 ),
 
 	autoConvertScalarToVector: () => vec3( 1, 2, 3 ).add( 0.5 ),
 
 	autoConvertVectorToFloat: () => vec3( 0.5 ).add( ivec3( 1, 2, 3 ) ),
 
-	autoConvertVectorToInt: () => ivec3( 1, 2, 3 ).add( vec3( 0.5 ) ),
+	// A weak scalar adapts to the integer vector; an explicit float vector promotes it.
+	autoConvertVectorToInt: () => ivec3( 1, 2, 3 ).add( 1 ),
+
+	autoPromoteIntVectorToFloat: () => ivec3( 1, 2, 3 ).add( vec3( 0.5 ) ),
+
+	// Integer-valued weak numbers keep unsigned index math in uint.
+	weakUintIndexMath: () => uint( 70 ).div( 64 ),
+
+	weakFloatDefault: () => mul( 1, 2 ),
+
+	// Weak numbers adopt the explicit integer type, truncated if needed; values out of its range promote it.
+	weakUintFraction: () => uint( 1 ).mul( 0.5 ),
+
+	weakIntFraction: () => int( 3 ).mul( 1.5 ),
+
+	weakPromoteNegative: () => uint( 1 ).add( - 1 ),
+
+	weakPromoteOutOfRange: () => uint( 1 ).add( 0x100000000 ),
+
+	// A shared weak constant adapts independently to each use.
+	weakSharedConstant: () => uint( 1 ).add( 1 ).add( float( 1 ).add( 1 ) ),
+
+	// Math functions promote across all arguments, regardless of their order.
+	weakMathFunctions: () => clamp( uint( 1 ), 0, 2 ),
+
+	weakMathFunctionsReordered: () => clamp( 0, uint( 1 ), 2 ),
+
+	// Float-only math functions promote integer arguments to float.
+	floatOnlyMathFunctions: () => int( 2 ).pow( 2 ),
+
+	// Integer math functions keep integer arguments.
+	integerMathFunctions: () => uint( 1 ).max( 2 ),
+
+	// Matrix functions keep the matrix type.
+	squareMatrixFunctions: () => determinant( transpose( inverse( mat2( 1, 2, 3, 4 ) ) ) ),
 
 	vectorComposition: () => vec4( vec2( 1, 2 ), int( 3 ), uint( 4 ) ),
 

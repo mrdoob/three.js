@@ -2,6 +2,7 @@ import WGSLNodeBuilder from '../../../src/renderers/webgpu/nodes/WGSLNodeBuilder
 import GLSLNodeBuilder from '../../../src/renderers/webgl-fallback/nodes/GLSLNodeBuilder.js';
 import { BufferAttribute } from '../../../src/core/BufferAttribute.js';
 import { BufferGeometry } from '../../../src/core/BufferGeometry.js';
+import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../../../src/constants.js';
 
 export const builders = {
 	wgsl: WGSLNodeBuilder,
@@ -11,7 +12,8 @@ export const builders = {
 export function generateCode( createNode, language ) {
 
 	// These cases exercise node code generation without a GPU or renderer init.
-	const renderer = { backend: {}, debug: { diagnostics: { keywords: false } } };
+	const coordinateSystem = language === 'glsl' ? WebGLCoordinateSystem : WebGPUCoordinateSystem;
+	const renderer = { backend: {}, coordinateSystem, debug: { diagnostics: { keywords: false } } };
 	const geometry = new BufferGeometry();
 	geometry.setAttribute( 'uv', new BufferAttribute( new Float32Array( 2 ), 2 ) );
 	const builder = new builders[ language ]( { geometry }, renderer );

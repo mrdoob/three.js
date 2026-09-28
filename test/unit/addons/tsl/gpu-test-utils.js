@@ -171,8 +171,9 @@ class AssertWriteNode extends Node {
 
 	setup( builder ) {
 
-		const type1 = this.value1.getNodeType( builder );
-		const type2 = this.value2.getNodeType( builder );
+		// Compare shader representations so aliases such as color and vec3 are equivalent.
+		const type1 = builder.getVectorType( this.value1.getNodeType( builder ) );
+		const type2 = builder.getVectorType( this.value2.getNodeType( builder ) );
 
 		if ( type1 !== type2 ) {
 
