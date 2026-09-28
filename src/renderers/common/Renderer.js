@@ -1839,9 +1839,24 @@ class Renderer {
 
 		}
 
-		this.getDrawingBufferSize( _drawingBufferSize );
+		if ( renderTarget !== null ) {
 
-		_screen.set( 0, 0, _drawingBufferSize.width, _drawingBufferSize.height );
+			// the viewport and scissor must be applied when they differ from
+			// the size of the render target's texture, not from the canvas
+
+			_screen.set(
+				0, 0,
+				Math.floor( renderTarget.width ) >> activeMipmapLevel,
+				Math.floor( renderTarget.height ) >> activeMipmapLevel
+			);
+
+		} else {
+
+			this.getDrawingBufferSize( _drawingBufferSize );
+
+			_screen.set( 0, 0, _drawingBufferSize.width, _drawingBufferSize.height );
+
+		}
 
 		const minDepth = ( viewport.minDepth === undefined ) ? 0 : viewport.minDepth;
 		const maxDepth = ( viewport.maxDepth === undefined ) ? 1 : viewport.maxDepth;
