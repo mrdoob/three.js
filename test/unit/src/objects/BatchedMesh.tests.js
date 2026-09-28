@@ -1,6 +1,7 @@
 import { BatchedMesh } from '../../../../src/objects/BatchedMesh.js';
 import { BoxGeometry } from '../../../../src/geometries/BoxGeometry.js';
 import { MeshBasicMaterial } from '../../../../src/materials/MeshBasicMaterial.js';
+import { Color } from '../../../../src/math/Color.js';
 
 export default QUnit.module( 'Objects', () => {
 
@@ -32,6 +33,30 @@ export default QUnit.module( 'Objects', () => {
 			batchedMesh.setInstanceCount( 2 );
 
 			assert.ok( batchedMesh.instanceCount === 2, 'instance count unequal 2' );
+
+		} );
+
+		QUnit.test( 'copy', ( assert ) => {
+
+			const box = new BoxGeometry( 1, 1, 1 );
+			const material = new MeshBasicMaterial();
+
+			// initialize and add an instance of a geometry into the batched mesh
+			const batchedMesh = new BatchedMesh( 4, 5000, 10000, material );
+			const instanceId = batchedMesh.addInstance( batchedMesh.addGeometry( box ) );
+
+			// set a color for the instance
+			batchedMesh.setColorAt( instanceId, new Color( 0xff0000 ) );
+
+			// colors are copied
+			const clone = batchedMesh.clone();
+			assert.strictEqual( clone.getColorAt( instanceId, new Color() ).getHex(), 0xff0000, 'instance color is copied' );
+
+			// copying a batch without colors into a batch with colors
+			const plainBatchedMesh = new BatchedMesh( 4, 5000, 10000, material );
+			plainBatchedMesh.addInstance( plainBatchedMesh.addGeometry( box ) );
+			clone.copy( plainBatchedMesh );
+			assert.strictEqual( clone.getColorAt( instanceId, new Color() ).getHex(), 0xffffff, 'instance colors are removed' );
 
 		} );
 
