@@ -1807,7 +1807,12 @@ function onTouchStart( event ) {
 
 				case TOUCH.ROTATE:
 
-					if ( this.enableRotate === false ) return;
+					if ( this.enableRotate === false ) {
+
+						this.state = _STATE.NONE;
+						break;
+
+					}
 
 					this._handleTouchStartRotate( event );
 
@@ -1817,7 +1822,12 @@ function onTouchStart( event ) {
 
 				case TOUCH.PAN:
 
-					if ( this.enablePan === false ) return;
+					if ( this.enablePan === false ) {
+
+						this.state = _STATE.NONE;
+						break;
+
+					}
 
 					this._handleTouchStartPan( event );
 

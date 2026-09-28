@@ -1004,10 +1004,17 @@ class WebGLState {
 
 			if ( this.currentPolygonOffsetFactor !== factor || this.currentPolygonOffsetUnits !== units ) {
 
-				gl.polygonOffset( factor, units );
-
 				this.currentPolygonOffsetFactor = factor;
 				this.currentPolygonOffsetUnits = units;
+
+				if ( this.currentDepthReversed ) {
+
+					factor = - factor;
+					units = - units;
+
+				}
+
+				gl.polygonOffset( factor, units );
 
 			}
 

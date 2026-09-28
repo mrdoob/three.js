@@ -70,14 +70,14 @@ function WebGLEnvironments( renderer ) {
 
 	function getPMREM( texture ) {
 
-		if ( texture && texture.isTexture ) {
+		if ( texture && texture.isTexture && texture.isPMREMTexture !== true ) {
 
 			const mapping = texture.mapping;
 
 			const isEquirectMap = ( mapping === EquirectangularReflectionMapping || mapping === EquirectangularRefractionMapping );
 			const isCubeMap = ( mapping === CubeReflectionMapping || mapping === CubeRefractionMapping );
 
-			// equirect/cube map to cubeUV conversion
+			// equirect/cube map to PMREM conversion
 
 			if ( isEquirectMap || isCubeMap ) {
 

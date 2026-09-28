@@ -1,6 +1,6 @@
 import { Tab } from '../ui/Tab.js';
 import { Graph } from '../ui/Graph.js';
-import { getItem, setItem } from '../Inspector.js';
+import { getItem, setItem } from '../Storage.js';
 import { info } from '../ui/utils.js';
 import {
 	ByteType,

@@ -1,6 +1,6 @@
 import { Parameters } from './Parameters.js';
 import { WebGPURenderer, WebGLBackend, Node } from 'three/webgpu';
-import { getItem, setItem } from '../Inspector.js';
+import { getItem, setItem } from '../Storage.js';
 
 const _extensions = [
 	{

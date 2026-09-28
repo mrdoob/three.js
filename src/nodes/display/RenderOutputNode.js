@@ -1,4 +1,4 @@
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
 import { addMethodChaining, nodeObject, vec4 } from '../tsl/TSLCore.js';
 import { premultiplyAlpha, unpremultiplyAlpha } from './PremultiplyAlphaFunctions.js';
 
@@ -26,9 +26,9 @@ import { ColorManagement } from '../../math/ColorManagement.js';
  * postProcessing.outputNode = outputPass;
  * ```
  *
- * @augments TempNode
+ * @augments Node
  */
-class RenderOutputNode extends TempNode {
+class RenderOutputNode extends Node {
 
 	static get type() {
 

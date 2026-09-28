@@ -1,4 +1,4 @@
-import { RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, MathUtils, RGBFormat, RedFormat, UnsignedInt101111Type, UnsignedByteType } from 'three/webgpu';
+import { RenderTarget, Vector2, Node, QuadMesh, NodeMaterial, RendererUtils, MathUtils, RGBFormat, RedFormat, UnsignedInt101111Type, UnsignedByteType } from 'three/webgpu';
 import { clamp, normalize, reference, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, bool, getNormalFromDepth, countOneBits, interleavedGradientNoise, property, outputStruct, context } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -37,10 +37,10 @@ let _rendererState;
  * - Medium: `sliceCount` of `3`, `stepCount` of `8`.
  * - High: `sliceCount` of `4`, `stepCount` of `12`.
  *
- * @augments TempNode
+ * @augments Node
  * @three_import import { ssgi } from 'three/addons/tsl/display/SSGINode.js';
  */
-class SSGINode extends TempNode {
+class SSGINode extends Node {
 
 	static get type() {
 

@@ -1,4 +1,4 @@
-import { HalfFloatType, LinearFilter, NearestFilter, RenderTarget, Texture, Vector2, QuadMesh, NodeMaterial, TempNode, RendererUtils } from 'three/webgpu';
+import { HalfFloatType, LinearFilter, NearestFilter, RenderTarget, Texture, Vector2, QuadMesh, NodeMaterial, Node, RendererUtils } from 'three/webgpu';
 import { abs, Fn, NodeUpdateType, uv, uniform, convertToTexture, vec2, vec4, passTexture, max, step, dot, float, texture, If, Loop, int, Break, sqrt, sign, mix, context } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -14,10 +14,10 @@ let _rendererState;
  * Used Preset: SMAA 1x Medium (with color edge detection)
  * Reference: {@link https://github.com/iryoku/smaa/releases/tag/v2.8}.
  *
- * @augments TempNode
+ * @augments Node
  * @three_import import { smaa } from 'three/addons/tsl/display/SMAANode.js';
  */
-class SMAANode extends TempNode {
+class SMAANode extends Node {
 
 	static get type() {
 

@@ -37,7 +37,7 @@ class Vector3 {
 		 * @readonly
 		 * @default true
 		 */
-		Vector3.prototype.isVector3 = true;
+		this.prototype.isVector3 = true;
 
 	}
 

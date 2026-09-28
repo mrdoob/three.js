@@ -26,6 +26,12 @@ class BarrierNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	setup( builder ) {
 
 		builder.allowEarlyReturns = false;

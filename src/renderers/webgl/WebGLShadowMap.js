@@ -290,6 +290,8 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 			if ( light.isPointLight !== true ) shadow.updateMatrices( light, camera );
 
+			const layers = ( shadow.camera.layers.mask & 0xFFFFFFFE ) !== 0 ? shadow.camera.layers : camera.layers;
+
 			for ( let face = 0; face < faceCount; face ++ ) {
 
 				const shadowCamera = shadow.getCamera( face );
@@ -355,7 +357,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 				_frustum = shadow.getFrustum( face );
 
-				renderObject( scene, camera, shadowCamera, light, this.type );
+				renderObject( scene, camera, shadowCamera, light, layers, this.type );
 
 			}
 
@@ -515,11 +517,11 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 	}
 
-	function renderObject( object, camera, shadowCamera, light, type ) {
+	function renderObject( object, camera, shadowCamera, light, layers, type ) {
 
 		if ( object.visible === false ) return;
 
-		const visible = object.layers.test( camera.layers );
+		const visible = object.layers.test( layers );
 
 		if ( visible && ( object.isMesh || object.isLine || object.isPoints ) ) {
 
@@ -573,7 +575,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 		for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-			renderObject( children[ i ], camera, shadowCamera, light, type );
+			renderObject( children[ i ], camera, shadowCamera, light, layers, type );
 
 		}
 

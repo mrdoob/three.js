@@ -1220,6 +1220,7 @@ async function createRawTexture( container ) {
 		texture = container.pixelDepth === 0
 			? new DataTexture( mipmaps[ 0 ].data, container.pixelWidth, container.pixelHeight )
 			: new Data3DTexture( mipmaps[ 0 ].data, container.pixelWidth, container.pixelHeight, container.pixelDepth );
+		texture.mipmaps = mipmaps;
 		texture.minFilter = useMipmaps ? NearestMipmapNearestFilter : NearestFilter;
 		texture.magFilter = NearestFilter;
 		texture.generateMipmaps = container.levelCount === 0;
@@ -1229,13 +1230,42 @@ async function createRawTexture( container ) {
 
 		if ( container.pixelDepth > 0 ) throw new Error( 'THREE.KTX2Loader: Unsupported pixelDepth.' );
 
-		texture = new CompressedTexture( mipmaps, container.pixelWidth, container.pixelHeight );
+		if ( container.faceCount === 6 ) {
+
+			const faces = [];
+
+			for ( let face = 0; face < 6; face ++ ) {
+
+				const faceMipmaps = [];
+
+				for ( const mipmap of mipmaps ) {
+
+					const faceLength = mipmap.data.length / 6;
+
+					faceMipmaps.push( {
+						data: mipmap.data.subarray( face * faceLength, ( face + 1 ) * faceLength ),
+						width: mipmap.width,
+						height: mipmap.height
+					} );
+
+				}
+
+				faces.push( { mipmaps: faceMipmaps, width: container.pixelWidth, height: container.pixelHeight } );
+
+			}
+
+			texture = new CompressedCubeTexture( faces );
+
+		} else {
+
+			texture = new CompressedTexture( mipmaps, container.pixelWidth, container.pixelHeight );
+
+		}
+
 		texture.minFilter = useMipmaps ? LinearMipmapLinearFilter : LinearFilter;
 		texture.magFilter = LinearFilter;
 
 	}
-
-	texture.mipmaps = mipmaps;
 
 	texture.type = TYPE_MAP[ vkFormat ];
 	texture.format = FORMAT_MAP[ vkFormat ];
@@ -1244,7 +1274,7 @@ async function createRawTexture( container ) {
 
 	//
 
-	return Promise.resolve( texture );
+	return texture;
 
 }
 

@@ -82,6 +82,12 @@ class VaryingNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Defines the interpolation type of the varying.
 	 *
@@ -165,7 +171,10 @@ class VaryingNode extends Node {
 		const properties = builder.getNodeProperties( this );
 		const varying = this.setupVarying( builder );
 
-		if ( properties[ propertyKey ] === undefined ) {
+		// The vertex assignment is emitted once per block, from the fragment stage it is emitted outside of any block.
+		const flowBlock = builder.shaderStage === NodeShaderStage.VERTEX ? builder.flowBlock : null;
+
+		if ( properties[ propertyKey ] !== flowBlock ) {
 
 			const type = this.getNodeType( builder );
 			const propertyName = builder.getPropertyName( varying, NodeShaderStage.VERTEX );
@@ -183,7 +192,7 @@ class VaryingNode extends Node {
 
 			}
 
-			properties[ propertyKey ] = propertyName;
+			properties[ propertyKey ] = flowBlock;
 
 		}
 

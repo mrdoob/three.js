@@ -951,18 +951,18 @@ function parseApiSignature( rawSigText ) {
 	let retType = '';
 	let rowDesc = '';
 
-	const firstParen = sigText.indexOf( '(' );
-	const lastParen = sigText.lastIndexOf( ')' );
+	const firstLParen = sigText.indexOf( '(' );
+	const firstRParen = sigText.indexOf( ')' );
 
-	const prefixBeforeParen = firstParen !== - 1 ? sigText.substring( 0, firstParen ).trim() : '';
-	const isFunction = firstParen !== - 1 && lastParen > firstParen && /^[\.\w$]+$/i.test( prefixBeforeParen );
+	const prefixBeforeParen = firstLParen !== - 1 ? sigText.substring( 0, firstLParen ).trim() : '';
+	const isFunction = firstLParen !== - 1 && firstRParen > firstLParen && /^[\.\w$]+$/i.test( prefixBeforeParen );
 
 	if ( isFunction ) {
 
 		funcName = prefixBeforeParen;
-		argsText = sigText.substring( firstParen + 1, lastParen ).trim();
+		argsText = sigText.substring( firstLParen + 1, firstRParen ).trim();
 
-		const remainder = sigText.substring( lastParen + 1 ).trim();
+		const remainder = sigText.substring( firstRParen + 1 ).trim();
 		if ( remainder ) {
 
 			const afterMatch = remainder.match( /^(?:\s*(?::|->)\s*([^—–\-]+?))?(?:\s*[\-—–]\s*([\s\S]*))?$/ );

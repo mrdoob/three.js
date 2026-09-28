@@ -1,5 +1,5 @@
 import {
-	float, int, uint, vec3,
+	bool, float, int, uint, ivec3, vec3,
 	equal, notEqual, lessThan, greaterThan, lessThanEqual, greaterThanEqual,
 	and, or, not, xor, select,
 	bitAnd, bitOr, bitXor, bitNot, shiftLeft, shiftRight,
@@ -21,6 +21,22 @@ import { gpuTest } from './gpu-test-utils.js';
 export default QUnit.module( 'TSL', () => {
 
 	QUnit.module( 'logic and comparison operators', () => {
+
+		gpuTest( 'mixed-type equality is independent of operand order', ( { assert } ) => {
+
+			assert.eq( vec3( vec3( 1.5 ).equal( ivec3( 1 ) ) ), vec3( 0 ), 'Float and integer vectors differ in every component' );
+			assert.eq( vec3( ivec3( 1 ).equal( vec3( 1.5 ) ) ), vec3( 0 ), 'Reversing operands preserves every fractional component' );
+			assert.eq( vec3( vec3( 1 ).equal( ivec3( 1 ) ) ), vec3( 1 ), 'Matching vectors compare equal' );
+			assert.eq( vec3( ivec3( 1 ).equal( vec3( 1 ) ) ), vec3( 1 ), 'Matching vectors compare equal in reverse order' );
+
+			assert.eq( float( float( 1.5 ).equal( int( 1 ) ) ), float( 0 ), 'float versus int is false' );
+			assert.eq( float( int( 1 ).equal( float( 1.5 ) ) ), float( 0 ), 'int versus float is false' );
+			assert.eq( float( bool( true ).equal( uint( 1 ) ) ), float( 1 ), 'bool versus uint is true' );
+			assert.eq( float( uint( 1 ).equal( bool( true ) ) ), float( 1 ), 'uint versus bool is true' );
+			assert.eq( float( bool( true ).equal( float( 1.5 ) ) ), float( 0 ), 'bool versus float is false' );
+			assert.eq( float( float( 1.5 ).equal( bool( true ) ) ), float( 0 ), 'float versus bool is false' );
+
+		} );
 
 		gpuTest( 'relational operators at and around the boundary', ( { assert } ) => {
 
@@ -71,13 +87,8 @@ export default QUnit.module( 'TSL', () => {
 			assert.eq( select( equal( float( 1 ), float( 1 ) ), float( 10 ), float( 20 ) ), float( 10 ), 'select(true, 10, 20) picks the "if" branch' );
 			assert.eq( select( equal( float( 1 ), float( 0 ) ), float( 10 ), float( 20 ) ), float( 20 ), 'select(false, 10, 20) picks the "else" branch' );
 
-			// select() (ConditionalNode) is a scalar if/else, NOT a per-component
-			// blend -- a vector condition is coerced down to a single bool
-			// (empirically: the whole-vector "else" branch wins whenever *any*
-			// component of the condition is false), and the *entire* if/else
-			// value is picked as one unit. See tsl-unit-test-findings.md.
 			const cond = vec3( 1, 0, 1 ).greaterThan( vec3( 0, 0, 0 ) );
-			assert.eq( select( cond, vec3( 1, 2, 3 ), vec3( 100, 200, 300 ) ), vec3( 100, 200, 300 ), 'select() with a vector condition picks the "else" branch wholesale once any component is false -- it does not blend per-component' );
+			assert.eq( select( cond, vec3( 1, 2, 3 ), vec3( 100, 200, 300 ) ), vec3( 1, 200, 3 ), 'select() with a vector condition blends per-component' );
 
 		} );
 
@@ -94,8 +105,8 @@ export default QUnit.module( 'TSL', () => {
 			assert.eq( bitXor( int( 6 ), int( 3 ) ), int( 5 ), '0b0110 ^ 0b0011 == 0b0101 == 5' );
 
 			// bitNot is two's-complement: ~x == -x - 1.
-			assert.eq( bitNot( int( 0 ) ), int( -1 ), '~0 == -1' );
-			assert.eq( bitNot( int( 5 ) ), int( -6 ), '~5 == -5-1 == -6' );
+			assert.eq( bitNot( int( 0 ) ), int( - 1 ), '~0 == -1' );
+			assert.eq( bitNot( int( 5 ) ), int( - 6 ), '~5 == -5-1 == -6' );
 
 		} );
 

@@ -337,6 +337,12 @@ class ReflectorBaseNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Updates the resolution of the internal render target.
 	 *

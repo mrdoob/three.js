@@ -1,7 +1,7 @@
 import { EventDispatcher } from 'three';
 import { Style } from './Style.js';
 import { Graph } from './Graph.js';
-import { getItem, setItem } from '../Inspector.js';
+import { getItem, setItem } from '../Storage.js';
 
 export class Profiler extends EventDispatcher {
 

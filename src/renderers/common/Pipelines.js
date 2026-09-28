@@ -444,6 +444,8 @@ class Pipelines extends DataMap {
 	 */
 	_releasePipeline( pipeline ) {
 
+		this.backend.destroyPipeline( pipeline );
+
 		this.caches.delete( pipeline.cacheKey );
 
 	}
@@ -461,6 +463,7 @@ class Pipelines extends DataMap {
 
 		this.programs[ stage ].delete( code );
 
+		this.backend.destroyProgram( program );
 		this.info.destroyProgram( program );
 
 	}

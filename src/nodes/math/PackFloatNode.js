@@ -1,12 +1,12 @@
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
 import { nodeProxyIntent } from '../tsl/TSLCore.js';
 
 /**
  * This node represents an operation that packs floating-point values of a vector into an unsigned 32-bit integer
  *
- * @augments TempNode
+ * @augments Node
  */
-class PackFloatNode extends TempNode {
+class PackFloatNode extends Node {
 
 	static get type() {
 

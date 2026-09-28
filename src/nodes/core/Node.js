@@ -2,7 +2,7 @@ import { NodeUpdateType } from './constants.js';
 import { hash, hashArray, hashString } from './NodeUtils.js';
 
 import { EventDispatcher } from '../../core/EventDispatcher.js';
-import { MathUtils } from '../../math/MathUtils.js';
+import { generateUUID } from '../../math/MathUtils.js';
 import { warn, error } from '../../utils.js';
 
 import StackTrace from './StackTrace.js';
@@ -168,6 +168,19 @@ class Node extends EventDispatcher {
 	}
 
 	/**
+	 * Whether this node allows caching its result in a temporary variable.
+	 * Caching is enabled by default. Override this method to disable it.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {boolean} Whether temporary caching is allowed.
+	 */
+	isCacheable( /*builder*/ ) {
+
+		return true;
+
+	}
+
+	/**
 	 * Set this property to `true` when the node should be regenerated.
 	 *
 	 * @type {boolean}
@@ -194,7 +207,7 @@ class Node extends EventDispatcher {
 
 		if ( this._uuid === null ) {
 
-			this._uuid = MathUtils.generateUUID();
+			this._uuid = generateUUID();
 
 		}
 
@@ -960,59 +973,124 @@ class Node extends EventDispatcher {
 
 		} else if ( buildStage === 'generate' ) {
 
-			// If generate has just one argument, it means the output type is not required.
-			// This means that the node does not handle output conversions internally,
-			// so the value is stored in a cache and the builder handles the conversion
-			// for all requested output types.
+			// A generated value is only visible in the block where it was declared and in its inner blocks.
+			if ( nodeData.flowBlock !== undefined ) {
 
-			const isGenerateOnce = this.generate.length < 2;
+				let flowBlock = builder.flowBlock;
 
-			if ( isGenerateOnce ) {
+				while ( flowBlock !== null && flowBlock !== nodeData.flowBlock ) {
 
-				const type = this.getNodeType( builder );
-				const nodeData = builder.getDataFromNode( this );
-
-				result = nodeData.snippet;
-
-				if ( result === undefined ) {
-
-					if ( nodeData.generated === undefined ) {
-
-						nodeData.generated = true;
-
-						result = this.generate( builder ) || '';
-
-						nodeData.snippet = result;
-
-					} else {
-
-						warn( 'Node: Recursion detected.', this );
-
-						result = '/* Recursion detected. */';
-
-					}
-
-				} else if ( nodeData.flowCodes !== undefined && builder.context.nodeBlock !== undefined ) {
-
-					builder.addFlowCodeHierarchy( this, builder.context.nodeBlock );
+					flowBlock = flowBlock.parent;
 
 				}
 
-				result = builder.format( result, type, output );
+				if ( flowBlock === null ) {
 
-			} else {
+					nodeData.flowBlock = undefined;
+					nodeData.propertyName = undefined;
+					nodeData.snippet = undefined;
+					nodeData.generated = undefined;
 
-				result = this.generate( builder, output ) || '';
+				}
 
 			}
 
-			if ( result === '' && output !== null && output !== 'void' && output !== 'OutputType' ) {
+			const isCached = nodeData.propertyName !== undefined || nodeData.snippet !== undefined;
+			const flowCodeLength = builder.flow.code.length;
 
-				// if no snippet is generated, return a default value
+			// References must be generated directly, even if a cached value exists.
+			const allowedCache = this.isCacheable( builder ) && builder.isReference( output ) === false;
+			const type = allowedCache ? builder.getVectorType( this.getNodeType( builder, output ) ) : null;
+			const cacheResult = allowedCache && type !== 'void' && output !== 'void' && nodeData.usageCount > 1;
+			const generateOutput = cacheResult ? type : output;
 
-				error( `TSL: Invalid generated code, expected a "${ output }".` );
+			if ( allowedCache && nodeData.propertyName !== undefined ) {
 
-				result = builder.generateConst( output );
+				result = builder.format( nodeData.propertyName, type, output );
+
+			} else {
+
+				// If generate has just one argument, it means the output type is not required.
+				// This means that the node does not handle output conversions internally,
+				// so the value is stored in a cache and the builder handles the conversion
+				// for all requested output types.
+
+				const isGenerateOnce = this.generate.length < 2;
+
+				if ( isGenerateOnce ) {
+
+					const type = this.getNodeType( builder );
+					const nodeData = builder.getDataFromNode( this );
+
+					result = nodeData.snippet;
+
+					if ( result === undefined ) {
+
+						if ( nodeData.generated === undefined ) {
+
+							nodeData.generated = true;
+
+							result = this.generate( builder ) || '';
+
+							nodeData.snippet = result;
+
+						} else {
+
+							warn( 'Node: Recursion detected.', this );
+
+							result = '/* Recursion detected. */';
+
+						}
+
+					}
+
+					result = builder.format( result, type, generateOutput );
+
+				} else {
+
+					result = this.generate( builder, generateOutput ) || '';
+
+				}
+
+				if ( result === '' && generateOutput !== null && generateOutput !== 'void' && generateOutput !== 'OutputType' ) {
+
+					// if no snippet is generated, return a default value
+
+					error( `TSL: Invalid generated code, expected a "${ generateOutput }".` );
+
+					result = builder.generateConst( generateOutput );
+
+				}
+
+				if ( cacheResult ) {
+
+					const readOnly = nodeData.assign !== true;
+					// Use a dedicated property, the node may already own a variable.
+					const nodeVar = builder.getVarFromNode( this, null, type, undefined, readOnly, true, 'cacheVariable' );
+					const propertyName = builder.getPropertyName( nodeVar );
+					const count = this.getArrayCount( builder );
+					const declarationPrefix = readOnly
+						? builder.generateLetStatement( nodeVar.type, propertyName, count )
+						: builder.generateVarStatement( nodeVar.type, propertyName, count );
+
+					builder.addLineFlowCode( `${ declarationPrefix } = ${ result }`, this );
+
+					nodeData.snippet = result;
+					nodeData.propertyName = propertyName;
+
+					result = builder.format( propertyName, type, output );
+
+				}
+
+			}
+
+			// Keep the block where a value was generated, so it is only reused where it is visible.
+			// A global node is a declaration visible in any block, unless it emitted code in this block.
+			const isLocal = this.isGlobal( builder ) === false || builder.flow.code.length !== flowCodeLength;
+
+			if ( isCached === false && ( nodeData.propertyName !== undefined || nodeData.snippet !== undefined ) && isLocal && builder.flowBlock !== null ) {
+
+				nodeData.flowBlock = builder.flowBlock;
 
 			}
 

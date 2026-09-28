@@ -1,4 +1,4 @@
-import { RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
+import { RenderTarget, Vector2, Node, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
 import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getViewPosition, getScreenPositionFromClip, vogelDiskSample, interleavedGradientNoise, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec4, int, dot, max, clamp, length, screenCoordinate, PI2, texture, passTexture, context } from 'three/tsl';
 import { depthAwareBlur } from './depthAwareBlur.js';
 
@@ -26,10 +26,10 @@ let _rendererState;
  * renderPipeline.outputNode = scenePassColor.mul( aoPass.r );
  * ```
  *
- * @augments TempNode
+ * @augments Node
  * @three_import import { ssao } from 'three/addons/tsl/display/SSAONode.js';
  */
-class SSAONode extends TempNode {
+class SSAONode extends Node {
 
 	static get type() {
 

@@ -135,6 +135,12 @@ class WorkgroupInfoNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Sets the name of this node.
 	 *

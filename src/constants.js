@@ -540,14 +540,6 @@ export const EquirectangularReflectionMapping = 303;
 export const EquirectangularRefractionMapping = 304;
 
 /**
- * Reflection mapping for PMREM textures.
- *
- * @type {number}
- * @constant
- */
-export const CubeUVReflectionMapping = 306;
-
-/**
  * The texture will simply repeat to infinity.
  *
  * @type {number}

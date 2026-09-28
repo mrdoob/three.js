@@ -1,4 +1,4 @@
-import { Frustum, Matrix4, RenderTarget, Vector2, RendererUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType, Vector3, Plane } from 'three/webgpu';
+import { Frustum, Matrix4, RenderTarget, Vector2, RendererUtils, QuadMesh, Node, NodeMaterial, NodeUpdateType, Vector3, Plane } from 'three/webgpu';
 import { cubeTexture, clamp, viewZToPerspectiveDepth, logarithmicDepthToViewZ, float, Loop, max, Fn, passTexture, uv, dot, uniformArray, If, getViewPosition, uniform, vec4, add, interleavedGradientNoise, screenCoordinate, round, mul, uint, mix, exp, vec3, distance, pow, reference, lightPosition, vec2, bool, texture, perspectiveDepthToViewZ, lightShadowMatrix, context } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -45,10 +45,10 @@ let _rendererState;
  *
  * Reference: This Node is a part of [three-good-godrays](https://github.com/Ameobea/three-good-godrays).
  *
- * @augments TempNode
+ * @augments Node
  * @three_import import { godrays } from 'three/addons/tsl/display/GodraysNode.js';
  */
-class GodraysNode extends TempNode {
+class GodraysNode extends Node {
 
 	static get type() {
 

@@ -459,6 +459,13 @@ class ShaderCallNodeInternal extends Node {
 
 	}
 
+	isCacheable( builder ) {
+
+		// A call is an expression unless its body has statements.
+		return this.getOutputNode( builder ).nodes.length === 0;
+
+	}
+
 	generateNodeType( builder ) {
 
 		return this.shaderNode.nodeType || this.getOutputNode( builder ).getNodeType( builder );
@@ -820,6 +827,12 @@ class ShaderNodeInternal extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	setLayout( layout ) {
 
 		this.layout = layout;
@@ -859,16 +872,18 @@ for ( const bool of bools ) boolsCacheMap.set( bool, new ConstNode( bool ) );
 const uintsCacheMap = new Map();
 for ( const uint of uints ) uintsCacheMap.set( uint, new ConstNode( uint, 'uint' ) );
 
-const intsCacheMap = new Map( [ ...uintsCacheMap ].map( el => new ConstNode( el.value, 'int' ) ) );
+const intsCacheMap = new Map();
+for ( const value of uintsCacheMap.keys() ) intsCacheMap.set( value, new ConstNode( value, 'int' ) );
 for ( const int of ints ) intsCacheMap.set( int, new ConstNode( int, 'int' ) );
 
-const floatsCacheMap = new Map( [ ...intsCacheMap ].map( el => new ConstNode( el.value ) ) );
+const floatsCacheMap = new Map();
+for ( const value of intsCacheMap.keys() ) floatsCacheMap.set( value, new ConstNode( value ) );
 for ( const float of floats ) floatsCacheMap.set( float, new ConstNode( float ) );
 for ( const float of floats ) floatsCacheMap.set( - float, new ConstNode( - float ) );
 
 const cacheMaps = { bool: boolsCacheMap, uint: uintsCacheMap, ints: intsCacheMap, float: floatsCacheMap };
 
-const constNodesCacheMap = new Map( [ ...boolsCacheMap, ...floatsCacheMap ] );
+const constNodesCacheMap = new Map( boolsCacheMap );
 
 const getConstNode = ( value, type ) => {
 
@@ -882,11 +897,18 @@ const getConstNode = ( value, type ) => {
 
 	} else {
 
-		return new ConstNode( value, type );
+		const node = new ConstNode( value, type );
+
+		// Implicit numbers are weak and can adapt to the type of other operands.
+		node.isWeak = ! type && typeof value === 'number';
+
+		return node;
 
 	}
 
 };
+
+for ( const value of floatsCacheMap.keys() ) constNodesCacheMap.set( value, getConstNode( value ) );
 
 const ConvertType = function ( type, cacheMap = null ) {
 
@@ -1042,6 +1064,12 @@ class FnNode extends Node {
 		}
 
 		this.isFn = true;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 

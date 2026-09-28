@@ -9,6 +9,7 @@ import { Settings } from './tabs/Settings.js';
 import { Viewer } from './tabs/Viewer.js';
 import { Timeline } from './tabs/Timeline.js';
 import { setText } from './ui/utils.js';
+import { getItem, setItem } from './Storage.js';
 
 import { setConsoleFunction, getConsoleFunction, REVISION } from 'three/webgpu';
 
@@ -638,46 +639,6 @@ class Inspector extends RendererInspector {
 		this.setRenderer( null );
 
 	}
-
-}
-
-function getItem( id ) {
-
-	const data = JSON.parse( localStorage.getItem( 'threejs-inspector' ) || '{}' );
-
-	if ( data.version !== REVISION ||
-		 data.settings && ( data.settings.storage === 'url' && data.settings.url !== location.href ) ) {
-
-		localStorage.removeItem( 'threejs-inspector' );
-
-		return {};
-
-	}
-
-	return data[ id ] || {};
-
-}
-
-function setItem( id, state ) {
-
-	const data = JSON.parse( localStorage.getItem( 'threejs-inspector' ) || '{}' );
-
-	if ( state === null ) {
-
-		delete data[ id ];
-
-	} else {
-
-		data[ id ] = state;
-
-	}
-
-	data.settings = data.settings || {};
-	data.settings.url = data.settings.url || location.href;
-	data.settings.storage = data.settings.storage || 'url';
-	data.version = REVISION;
-
-	localStorage.setItem( 'threejs-inspector', JSON.stringify( data ) );
 
 }
 

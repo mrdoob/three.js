@@ -1,35 +1,15 @@
-import TempNode from '../core/TempNode.js';
-import { texture } from '../accessors/TextureNode.js';
-import { textureCubeUV } from './PMREMUtils.js';
+import Node from '../core/Node.js';
+import { cubeTexture } from '../accessors/CubeTextureNode.js';
+import { roughnessToMip } from './PMREMUtils.js';
 import { uniform } from '../core/UniformNode.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
+import { nodeProxy } from '../tsl/TSLBase.js';
 
-import { CubeUVReflectionMapping } from '../../constants.js';
-import { Texture } from '../../textures/Texture.js';
+import { CubeTexture } from '../../textures/CubeTexture.js';
 import PMREMGenerator from '../../renderers/common/extras/PMREMGenerator.js';
 import { materialEnvRotation } from '../accessors/MaterialProperties.js';
 
 const _cache = new WeakMap();
-
-/**
- * Generates the cubeUV size based on the given image height.
- *
- * @private
- * @param {number} imageHeight - The image height.
- * @return {{texelWidth: number,texelHeight: number, maxMip: number}} The result object.
- */
-function _generateCubeUVSize( imageHeight ) {
-
-	const maxMip = Math.log2( imageHeight ) - 2;
-
-	const texelHeight = 1.0 / imageHeight;
-
-	const texelWidth = 1.0 / ( 3 * Math.max( Math.pow( 2, maxMip ), 7 * 16 ) );
-
-	return { texelWidth, texelHeight, maxMip };
-
-}
 
 /**
  * Generates a PMREM from the given texture.
@@ -44,9 +24,9 @@ function _getPMREMFromTexture( texture, renderer, generator ) {
 
 	const cache = _getCache( renderer );
 
-	let cacheTexture = cache.get( texture );
+	let renderTarget = cache.get( texture );
 
-	const pmremVersion = cacheTexture !== undefined ? cacheTexture.pmremVersion : - 1;
+	const pmremVersion = renderTarget !== undefined ? renderTarget.texture.pmremVersion : - 1;
 
 	if ( pmremVersion !== texture.pmremVersion ) {
 
@@ -56,7 +36,7 @@ function _getPMREMFromTexture( texture, renderer, generator ) {
 
 			if ( isCubeMapReady( image ) ) {
 
-				cacheTexture = generator.fromCubemap( texture, cacheTexture );
+				renderTarget = generator.fromCubemap( texture, renderTarget );
 
 			} else {
 
@@ -69,7 +49,7 @@ function _getPMREMFromTexture( texture, renderer, generator ) {
 
 			if ( isEquirectangularMapReady( image ) ) {
 
-				cacheTexture = generator.fromEquirectangular( texture, cacheTexture );
+				renderTarget = generator.fromEquirectangular( texture, renderTarget );
 
 			} else {
 
@@ -79,7 +59,7 @@ function _getPMREMFromTexture( texture, renderer, generator ) {
 
 		}
 
-		cacheTexture.pmremVersion = texture.pmremVersion;
+		renderTarget.texture.pmremVersion = texture.pmremVersion;
 
 		// add dispose event listener for new PMREMs
 
@@ -106,11 +86,11 @@ function _getPMREMFromTexture( texture, renderer, generator ) {
 
 		//
 
-		cache.set( texture, cacheTexture );
+		cache.set( texture, renderTarget );
 
 	}
 
-	return cacheTexture.texture;
+	return renderTarget.texture;
 
 }
 
@@ -121,7 +101,7 @@ function _getPMREMFromTexture( texture, renderer, generator ) {
  *
  * @private
  * @param {Renderer} renderer - The renderer.
- * @return {WeakMap<Texture, Texture>} The PMREM cache.
+ * @return {WeakMap<Texture, CubeRenderTarget>} The PMREM cache.
  */
 function _getCache( renderer ) {
 
@@ -147,9 +127,9 @@ function _getCache( renderer ) {
  * material.envNode = pmremTexture( envMap );
  * ```
  *
- * @augments TempNode
+ * @augments Node
  */
-class PMREMNode extends TempNode {
+class PMREMNode extends Node {
 
 	static get type() {
 
@@ -158,10 +138,10 @@ class PMREMNode extends TempNode {
 	}
 
 	/**
-	 * Constructs a new function overloading node.
+	 * Constructs a new PMREM node.
 	 *
 	 * @param {Texture} value - The input texture.
-	 * @param {Node<vec2>} [uvNode=null] - The uv node.
+	 * @param {Node<vec3>} [uvNode=null] - The uv node.
 	 * @param {Node<float>} [levelNode=null] - The level node.
 	 */
 	constructor( value, uvNode = null, levelNode = null ) {
@@ -188,7 +168,7 @@ class PMREMNode extends TempNode {
 		/**
 		 *  The uv node.
 		 *
-		 * @type {Node<vec2>}
+		 * @type {Node<vec3>}
 		 */
 		this.uvNode = uvNode;
 
@@ -208,40 +188,32 @@ class PMREMNode extends TempNode {
 		 */
 		this._generator = null;
 
-		const defaultTexture = new Texture();
+		const defaultTexture = new CubeTexture();
 		defaultTexture.isRenderTargetTexture = true;
 
 		/**
 		 * The texture node holding the generated PMREM.
 		 *
 		 * @private
-		 * @type {TextureNode}
+		 * @type {CubeTextureNode}
 		 */
-		this._texture = texture( defaultTexture );
+		this._texture = cubeTexture( defaultTexture );
 
 		/**
-		 * A uniform representing the PMREM's width.
+		 * A uniform representing the last mip level of the PMREM.
 		 *
 		 * @private
 		 * @type {UniformNode<float>}
 		 */
-		this._width = uniform( 0 );
+		this._maxLod = uniform( 0 );
 
 		/**
-		 * A uniform representing the PMREM's height.
+		 * A uniform representing the width of the sharpest mip level of the PMREM.
 		 *
 		 * @private
 		 * @type {UniformNode<float>}
 		 */
-		this._height = uniform( 0 );
-
-		/**
-		 * A uniform representing the PMREM's max Mip.
-		 *
-		 * @private
-		 * @type {UniformNode<float>}
-		 */
-		this._maxMip = uniform( 0 );
+		this._size = uniform( 0 );
 
 		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.RENDER`.
@@ -278,12 +250,11 @@ class PMREMNode extends TempNode {
 	 */
 	updateFromTexture( texture ) {
 
-		const cubeUVSize = _generateCubeUVSize( texture.image.height );
+		const mipmaps = texture.isCompressedCubeTexture ? texture.image[ 0 ].mipmaps : texture.mipmaps;
 
 		this._texture.value = texture;
-		this._width.value = cubeUVSize.texelWidth;
-		this._height.value = cubeUVSize.texelHeight;
-		this._maxMip.value = cubeUVSize.maxMip;
+		this._maxLod.value = mipmaps.length - 1;
+		this._size.value = mipmaps[ 0 ].width;
 
 	}
 
@@ -296,11 +267,17 @@ class PMREMNode extends TempNode {
 
 		if ( pmremVersion !== texture.pmremVersion ) {
 
-			if ( texture.isPMREMTexture === true || texture.mapping === CubeUVReflectionMapping ) {
+			if ( texture.isPMREMTexture === true ) {
 
 				pmrem = texture;
 
 			} else {
+
+				if ( this._generator === null ) {
+
+					this._generator = new PMREMGenerator( frame.renderer );
+
+				}
 
 				pmrem = _getPMREMFromTexture( texture, frame.renderer, this._generator );
 
@@ -320,12 +297,6 @@ class PMREMNode extends TempNode {
 
 	setup( builder ) {
 
-		if ( this._generator === null ) {
-
-			this._generator = new PMREMGenerator( builder.renderer );
-
-		}
-
 		this.updateBefore( builder );
 
 		//
@@ -340,15 +311,6 @@ class PMREMNode extends TempNode {
 
 		//
 
-		// PMREMGenerator renders into a render target with inverted Y, so its output needs the Y
-		// flip on sampling. Externally authored PMREMs follow the standard convention and don't.
-
-		uvNode = this._pmrem === null || this._pmrem.isRenderTargetTexture
-			? materialEnvRotation.mul( vec3( uvNode.x, uvNode.y.negate(), uvNode.z ) )
-			: materialEnvRotation.mul( uvNode );
-
-		//
-
 		let levelNode = this.levelNode;
 
 		if ( levelNode === null && builder.context.getTextureLevel ) {
@@ -359,7 +321,7 @@ class PMREMNode extends TempNode {
 
 		//
 
-		return textureCubeUV( this._texture, uvNode, levelNode, this._width, this._height, this._maxMip );
+		return this._texture.sample( materialEnvRotation.mul( uvNode ) ).level( roughnessToMip( levelNode, this._maxLod ) ).rgb;
 
 	}
 
@@ -421,7 +383,7 @@ function isEquirectangularMapReady( image ) {
  * @tsl
  * @function
  * @param {Texture} value - The input texture.
- * @param {?Node<vec2>} [uvNode=null] - The uv node.
+ * @param {?Node<vec3>} [uvNode=null] - The uv node.
  * @param {?Node<float>} [levelNode=null] - The level node.
  * @returns {PMREMNode}
  */

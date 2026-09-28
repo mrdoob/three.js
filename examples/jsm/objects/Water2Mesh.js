@@ -5,7 +5,7 @@ import {
 	Vector3,
 	NodeMaterial,
 	NodeUpdateType,
-	TempNode
+	Node
 } from 'three/webgpu';
 
 import { Fn, vec2, viewportSafeUV, viewportSharedTexture, reflector, pow, float, abs, texture, uniform, vec4, cameraPosition, positionWorld, uv, mix, vec3, normalize, max, dot, screenUV } from 'three/tsl';
@@ -56,7 +56,7 @@ class WaterMesh extends Mesh {
 
 }
 
-class WaterNode extends TempNode {
+class WaterNode extends Node {
 
 	constructor( options, waterBody ) {
 

@@ -1,4 +1,4 @@
-import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, TempNode, NodeUpdateType, Matrix4, DepthTexture, FloatType } from 'three/webgpu';
+import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4, DepthTexture, FloatType } from 'three/webgpu';
 import { float, Fn, max, texture, uniform, uv, vec2, convertToTexture, passTexture, velocity, ivec2, mix, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
 import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth, samplePreviousDepth } from '../utils/TAAUtils.js';
 
@@ -17,10 +17,10 @@ let _rendererState;
  *
  * Note: MSAA must be disabled when TRAA is in use.
  *
- * @augments TempNode
+ * @augments Node
  * @three_import import { traa } from 'three/addons/tsl/display/TRAANode.js';
  */
-class TRAANode extends TempNode {
+class TRAANode extends Node {
 
 	static get type() {
 

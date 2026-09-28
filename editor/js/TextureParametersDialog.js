@@ -76,8 +76,7 @@ class TextureParametersDialog {
 			[ THREE.EquirectangularReflectionMapping ]: 'Equirectangular Reflection',
 			[ THREE.EquirectangularRefractionMapping ]: 'Equirectangular Refraction',
 			[ THREE.CubeReflectionMapping ]: 'Cube Reflection',
-			[ THREE.CubeRefractionMapping ]: 'Cube Refraction',
-			[ THREE.CubeUVReflectionMapping ]: 'CubeUV Reflection'
+			[ THREE.CubeRefractionMapping ]: 'Cube Refraction'
 		} ).setValue( texture.mapping ).onChange( updatePreview );
 		form.add( createRow( this.strings.getKey( 'dialog/texture/mapping' ), this.mapping ) );
 
