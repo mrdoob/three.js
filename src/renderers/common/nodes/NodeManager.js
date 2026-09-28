@@ -527,7 +527,7 @@ class NodeManager extends DataMap {
 	 */
 	_createNodeBuilderState( nodeBuilder ) {
 
-		return new NodeBuilderState(
+		const nodeBuilderState = new NodeBuilderState(
 			nodeBuilder.vertexShader,
 			nodeBuilder.fragmentShader,
 			nodeBuilder.computeShader,
@@ -540,6 +540,14 @@ class NodeManager extends DataMap {
 			nodeBuilder.hardwareClipping,
 			nodeBuilder.transforms
 		);
+
+		// core materials are converted to node materials during the build and have no user uniforms
+
+		const material = nodeBuilder.material;
+
+		if ( material !== null && material.isNodeMaterial === true ) nodeBuilderState.uniformNodes = material.getUniformNodes();
+
+		return nodeBuilderState;
 
 	}
 

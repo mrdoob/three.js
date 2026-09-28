@@ -440,6 +440,30 @@ class NodeMaterial extends Material {
 	}
 
 	/**
+	 * Returns the value keyed uniforms of this material in traversal order. Materials sharing
+	 * a node build use this order to map the build's uniforms to their own.
+	 *
+	 * @return {Array<UniformNode>} The uniform nodes.
+	 */
+	getUniformNodes() {
+
+		const uniformNodes = [];
+
+		for ( const { childNode } of this._getNodeChildren() ) {
+
+			childNode.traverse( node => {
+
+				if ( node.isValueKeyed === true ) uniformNodes.push( node );
+
+			} );
+
+		}
+
+		return uniformNodes;
+
+	}
+
+	/**
 	 * Builds this material with the given node builder.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.

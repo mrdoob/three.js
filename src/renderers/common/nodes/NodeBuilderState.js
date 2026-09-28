@@ -1,4 +1,5 @@
 import BindGroup from '../BindGroup.js';
+import NodeUniform from '../../../nodes/core/NodeUniform.js';
 
 /**
  * This module represents the state of a node builder after it was
@@ -109,6 +110,13 @@ class NodeBuilderState {
 		this.hardwareClipping = hardwareClipping;
 
 		/**
+		 * The value keyed uniforms of the built material, see {@link NodeMaterial#getUniformNodes}.
+		 *
+		 * @type {Array<UniformNode>}
+		 */
+		this.uniformNodes = [];
+
+		/**
 		 * How often this state is used by render objects.
 		 *
 		 * @type {number}
@@ -120,11 +128,15 @@ class NodeBuilderState {
 	/**
 	 * This method is used to create a array of bind groups based
 	 * on the existing bind groups of this state. Shared groups are
-	 * not cloned.
+	 * not cloned. Uniforms of the built material are mapped to the given
+	 * material's uniforms, so materials sharing this state keep their own values.
 	 *
+	 * @param {?Material} [material=null] - The material of the render object.
 	 * @return {Array<BindGroup>} A array of bind groups.
 	 */
-	createBindings() {
+	createBindings( material = null ) {
+
+		const uniformNodes = this.uniformNodes.length > 0 && material.isNodeMaterial === true ? material.getUniformNodes() : null;
 
 		const bindings = [];
 
@@ -139,7 +151,25 @@ class NodeBuilderState {
 
 				for ( const instanceBinding of instanceGroup.bindings ) {
 
-					bindingsGroup.bindings.push( instanceBinding.clone() );
+					const binding = instanceBinding.clone();
+
+					if ( uniformNodes !== null && binding.isNodeUniformsGroup === true ) {
+
+						binding.uniforms = binding.uniforms.map( uniform => {
+
+							const index = this.uniformNodes.indexOf( uniform.nodeUniform.node );
+
+							if ( index === - 1 || uniformNodes[ index ] === uniform.nodeUniform.node ) return uniform;
+
+							const { name, type } = uniform.nodeUniform;
+
+							return new uniform.constructor( new NodeUniform( name, type, uniformNodes[ index ] ) );
+
+						} );
+
+					}
+
+					bindingsGroup.bindings.push( binding );
 
 				}
 
