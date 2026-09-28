@@ -36,7 +36,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { uniform, time, sin, vec3, positionLocal } from 'three/tsl';
+			import { uniform, time, sin, vec3, positionLocal, materialReference } from 'three/tsl';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
@@ -166,29 +166,31 @@
 
 				}
 
-				if ( params.material === 'Proxy Node Material' ) {
-
-					// one node material defines the shader, each proxy only stores its uniforms
-
-					const nodeMaterial = new THREE.MeshStandardNodeMaterial( createNodes( uniform( 'color', 'color' ), uniform( 'float', 'phase' ) ) );
-
-					for ( let i = 0; i < meshes.length; i ++ ) {
-
-						const material = new THREE.ProxyNodeMaterial( nodeMaterial );
-						material.uniforms.color = colors[ i ];
-						material.uniforms.phase = phases[ i ];
-
-						meshes[ i ].material = material;
-
-					}
-
-				} else {
+				if ( params.material === 'Node Material per Mesh' ) {
 
 					// each node material has its own uniforms, so each one builds its own shader
 
 					for ( let i = 0; i < meshes.length; i ++ ) {
 
 						meshes[ i ].material = new THREE.MeshStandardNodeMaterial( createNodes( uniform( colors[ i ] ), uniform( phases[ i ] ) ) );
+
+					}
+
+				} else {
+
+					// one node material defines the shader, each proxy only stores its values
+
+					const nodeMaterial = new THREE.MeshStandardNodeMaterial( createNodes( materialReference( 'myColor' ), materialReference( 'userData.phase' ) ) );
+
+					for ( let i = 0; i < meshes.length; i ++ ) {
+
+						// values read by materialReference(), userData is independent for each proxy
+
+						const material = new THREE.ProxyNodeMaterial( nodeMaterial );
+						material.myColor = colors[ i ];
+						material.userData.phase = phases[ i ];
+
+						meshes[ i ].material = material;
 
 					}
 

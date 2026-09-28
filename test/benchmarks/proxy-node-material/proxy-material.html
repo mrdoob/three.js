@@ -32,7 +32,7 @@
 		</script>
 		<script type="module">
 			import * as THREE from 'three/webgpu';
-			import { uniform } from 'three/tsl';
+			import { materialReference } from 'three/tsl';
 
 			const results = document.getElementById( 'results' );
 			const button = document.getElementById( 'update' );
@@ -55,14 +55,14 @@
 
 			const materials = [];
 			const start = performance.now();
-			const baseMaterial = new THREE.MeshBasicNodeMaterial( { colorNode: uniform( 'vec3', 'color' ) } );
+			const baseMaterial = new THREE.MeshBasicNodeMaterial( { colorNode: materialReference( 'myColor' ) } );
 
 			for ( let i = 0; i < 10000; i ++ ) {
 
 				// Use identical, deterministic values in all examples.
 				const color = new THREE.Vector3( ( i % 251 ) / 250, ( i % 127 ) / 126, ( i % 61 ) / 60 );
 				const material = new THREE.ProxyNodeMaterial( baseMaterial );
-				material.uniforms.color = color;
+				material.myColor = color;
 				materials.push( material );
 
 			}
@@ -99,7 +99,7 @@
 
 				for ( const material of materials ) {
 
-					const color = material.uniforms.color;
+					const color = material.myColor;
 					color.set( color.z, color.x, color.y );
 
 				}

@@ -1,17 +1,18 @@
 import { Material } from '../Material.js';
 
 /**
- * A material instance that reuses the shader of a node material with its own uniforms.
+ * A material instance that reuses the shader of a node material with its own properties.
  * All instances created from the same node material share a single shader build, so
  * configure the node material before creating instances. Instance values are read in
- * the shared node graph with `uniform( type, name )`.
+ * the shared node graph with `materialReference( name, type )`. Node properties such as
+ * `colorNode` are read-only and always read from the node material.
  *
  * ```js
  * const nodeMaterial = new MeshBasicNodeMaterial();
- * nodeMaterial.colorNode = uniform( 'vec3', 'color' );
+ * nodeMaterial.colorNode = materialReference( 'myColor', 'color' );
  *
  * const material = new ProxyNodeMaterial( nodeMaterial );
- * material.uniforms.color = new Vector3( 1, 0, 0 );
+ * material.myColor = new Color( 1, 0, 0 );
  * ```
  *
  * @augments Material
@@ -36,6 +37,10 @@ class ProxyNodeMaterial extends Material {
 
 		copyProperties( this, nodeMaterial );
 
+		// Instance values often live in `userData`, so each instance starts with its own copy.
+
+		this.userData = cloneUserData( nodeMaterial.userData );
+
 		this.type = 'ProxyNodeMaterial';
 
 		/**
@@ -53,15 +58,6 @@ class ProxyNodeMaterial extends Material {
 		 * @type {NodeMaterial}
 		 */
 		this.nodeMaterial = nodeMaterial;
-
-		/**
-		 * The uniform values of this instance, read by `uniform( type, name )`
-		 * nodes. Missing values fall back to the default value of the uniform type.
-		 *
-		 * @type {Object<string, any>}
-		 * @default {}
-		 */
-		this.uniforms = {};
 
 	}
 
@@ -90,6 +86,40 @@ class ProxyNodeMaterial extends Material {
 	}
 
 	/**
+	 * The version of the node material. Setting `needsUpdate` on the node material
+	 * updates all its instances, while setting it on an instance has no effect.
+	 *
+	 * @type {number}
+	 */
+	get version() {
+
+		return this.nodeMaterial.version;
+
+	}
+
+	set version( value ) {}
+
+	/**
+	 * Copies the values of the given proxy node material to this instance.
+	 * Object values such as colors are shared with the source, except in `userData`.
+	 * Unlike {@link Material#copy}, `userData` is not copied via JSON: its first level
+	 * values are cloned when possible, so types such as colors are preserved. Textures
+	 * remain shared.
+	 *
+	 * @param {ProxyNodeMaterial} source - The material to copy.
+	 * @return {ProxyNodeMaterial} A reference to this instance.
+	 */
+	copy( source ) {
+
+		copyProperties( this, source );
+
+		this.userData = cloneUserData( source.userData );
+
+		return this;
+
+	}
+
+	/**
 	 * Returns a new proxy node material that shares the same node material.
 	 *
 	 * @return {ProxyNodeMaterial} A clone of this instance.
@@ -100,30 +130,41 @@ class ProxyNodeMaterial extends Material {
 
 	}
 
-	/**
-	 * Copies the values of the given proxy node material to this instance.
-	 * Uniform values are cloned, except textures which remain shared.
-	 *
-	 * @param {ProxyNodeMaterial} source - The material to copy.
-	 * @return {ProxyNodeMaterial} A reference to this instance.
-	 */
-	copy( source ) {
+}
 
-		copyProperties( this, source );
+// Read-only accessors shared by all instances, so node properties always reflect the node material.
+// They must be enumerable since the renderer detects node materials by iterating their properties.
 
-		this.uniforms = {};
+const _nodeDescriptors = {};
 
-		for ( const name in source.uniforms ) {
+function getNodeDescriptor( property ) {
 
-			const value = source.uniforms[ name ];
+	return _nodeDescriptors[ property ] ??= {
+		enumerable: true,
+		get() {
 
-			this.uniforms[ name ] = value?.clone !== undefined && value.isTexture !== true ? value.clone() : value;
+			return this.nodeMaterial[ property ];
 
 		}
+	};
 
-		return this;
+}
+
+// Copies the first level of user data, cloning values such as colors and sharing textures.
+
+function cloneUserData( userData ) {
+
+	const result = {};
+
+	for ( const key in userData ) {
+
+		const value = userData[ key ];
+
+		result[ key ] = value?.clone !== undefined && value.isTexture !== true ? value.clone() : value;
 
 	}
+
+	return result;
 
 }
 
@@ -135,7 +176,15 @@ function copyProperties( target, source ) {
 
 		if ( property === 'uuid' || property === 'version' || property === '_listeners' ) continue;
 
-		target[ property ] = source[ property ];
+		if ( property.endsWith( 'Node' ) ) {
+
+			if ( Object.hasOwn( target, property ) === false ) Object.defineProperty( target, property, getNodeDescriptor( property ) );
+
+		} else {
+
+			target[ property ] = source[ property ];
+
+		}
 
 	}
 
