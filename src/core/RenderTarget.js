@@ -470,6 +470,10 @@ class RenderTarget extends EventDispatcher {
 
 			}
 
+		} else {
+
+			this.depthTexture = null;
+
 		}
 
 		this.samples = source.samples;

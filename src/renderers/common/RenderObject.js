@@ -883,9 +883,9 @@ class RenderObject {
 
 		const attributes = this._geometries.attributes;
 
-		for ( const attribute of this.attributes ) {
+		for ( const vertexBuffer of this.vertexBuffers ) {
 
-			if ( attributes.has( attribute ) === false ) return true;
+			if ( attributes.has( vertexBuffer ) === false ) return true;
 
 		}
 

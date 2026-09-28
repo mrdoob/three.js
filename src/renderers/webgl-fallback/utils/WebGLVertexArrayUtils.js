@@ -56,9 +56,13 @@ class WebGLVertexArrayUtils {
 
 		for ( let i = 0; i < attributes.length; i ++ ) {
 
-			const attributeData = backend.get( attributes[ i ] );
+			const attribute = attributes[ i ];
+			const attributeData = backend.get( backend.getBufferAttribute( attribute ) );
 
 			key += ':' + attributeData.id;
+
+			if ( attribute.isInterleavedBufferAttribute ) key += '.' + attribute.offset;
+
 			variant += ':' + ( attributeData.activeBufferIndex || 0 );
 
 			buffers.push( attributeData.bufferGPU );
@@ -163,7 +167,9 @@ class WebGLVertexArrayUtils {
 
 		for ( let i = 0; i < attributes.length; i ++ ) {
 
-			if ( this.backend.get( attributes[ i ] ).bufferGPU !== buffers[ i ] ) return true;
+			const bufferAttribute = this.backend.getBufferAttribute( attributes[ i ] );
+
+			if ( this.backend.get( bufferAttribute ).bufferGPU !== buffers[ i ] ) return true;
 
 		}
 
@@ -217,7 +223,7 @@ class WebGLVertexArrayUtils {
 		for ( let i = 0; i < attributes.length; i ++ ) {
 
 			const attribute = attributes[ i ];
-			const attributeData = this.backend.get( attribute );
+			const attributeData = this.backend.get( this.backend.getBufferAttribute( attribute ) );
 
 			gl.bindBuffer( gl.ARRAY_BUFFER, attributeData.bufferGPU );
 			gl.enableVertexAttribArray( i );
