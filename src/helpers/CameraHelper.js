@@ -224,6 +224,40 @@ class CameraHelper extends LineSegments {
 	}
 
 	/**
+	 * Copies the values of the given camera helper to this instance.
+	 * The copy visualizes the same camera as `source`.
+	 *
+	 * @param {CameraHelper} source - The camera helper to copy.
+	 * @param {boolean} [recursive=true] - When set to `true`, descendants of the helper are copied.
+	 * @return {CameraHelper} A reference to this instance.
+	 */
+	copy( source, recursive ) {
+
+		super.copy( source, recursive );
+
+		this.camera = source.camera;
+		this.matrix = source.camera.matrixWorld;
+		this.matrixAutoUpdate = false;
+		this.pointMap = source.pointMap;
+
+		return this;
+
+	}
+
+	/**
+	 * Returns a new camera helper with copied values from this instance.
+	 * The clone visualizes the same camera.
+	 *
+	 * @param {boolean} [recursive=true] - When set to `true`, descendants of the helper are cloned.
+	 * @return {CameraHelper} A clone of this instance.
+	 */
+	clone( recursive ) {
+
+		return new this.constructor( this.camera ).copy( this, recursive );
+
+	}
+
+	/**
 	 * Updates the helper based on the projection matrix of the camera.
 	 */
 	update() {
