@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - occlusion dither</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - occlusion dither">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_tsl_occlusion_dither.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_tsl_occlusion_dither.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Occlusion Dither</span>
+			</div>
+
+			<small>Walls between the camera and the character are dithered away with <code>maskNode</code>.</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { Fn, bool, clamp, cameraPosition, normalWorld, positionWorld, screenCoordinate, smoothstep, uniform } from 'three/tsl';
+
+			import { bayer16 } from 'three/addons/tsl/math/Bayer.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+
+			let camera, scene, renderer, controls;
+			let model, mixer;
+
+			const timer = new THREE.Timer();
+			timer.connect( document );
+
+			const params = { paused: false };
+
+			const walkRadius = 3.8;
+			const walkSpeed = 0.35;
+			let walkAngle = 0;
+
+			// uniforms
+
+			const target = uniform( new THREE.Vector3( walkRadius, 1, 0 ) );
+			const radius = uniform( 1.6 );
+			const stopDistance = uniform( 0.5 );
+			const ditherScale = uniform( 1 );
+
+			init();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 4, 7, 14 );
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( '#c4d0dd', 20, 50 );
+				scene.background = scene.fog.color;
+
+				// lights
+
+				const sun = new THREE.DirectionalLight( '#ffffff', 3 );
+				sun.position.set( - 8, 10, 6 );
+				sun.castShadow = true;
+				sun.shadow.mapSize.set( 2048, 2048 );
+				sun.shadow.camera.left = - 7;
+				sun.shadow.camera.right = 6.9;
+				sun.shadow.camera.top = 8.1;
+				sun.shadow.camera.bottom = - 4.6;
+				sun.shadow.camera.near = 6.6;
+				sun.shadow.camera.far = 22.6;
+				sun.shadow.intensity = 0.8;
+				sun.shadow.radius = 2.5;
+				scene.add( sun );
+
+				scene.add( new THREE.HemisphereLight( '#b4c9e4', '#ffffff', 1.5 ) );
+
+				// occlusion cone from the camera to the target
+
+				const occlusionCut = Fn( () => {
+
+					const toTarget = target.sub( cameraPosition );
+
+					const t = positionWorld.sub( cameraPosition ).dot( toTarget ).div( toTarget.dot( toTarget ) ).toVar();
+					const progress = clamp( t ).toVar();
+					const closest = cameraPosition.add( toTarget.mul( progress ) );
+
+					const coneRadius = radius.mul( progress.mul( 0.75 ).add( 0.25 ) );
+					const inside = smoothstep( coneRadius.mul( 0.5 ), coneRadius, positionWorld.distance( closest ) ).oneMinus();
+
+					const inFront = t.lessThan( stopDistance.div( toTarget.length() ).oneMinus() );
+
+					return inFront.select( inside, 0 );
+
+				} )();
+
+				// dither
+
+				const threshold = bayer16( screenCoordinate.div( ditherScale ) ).r.mul( 255 / 256 ); // remap to [0, 1) so a full cut removes every fragment
+
+				// materials
+
+				const gradientMap = new THREE.TextureLoader().load( 'textures/gradientMaps/threeTone.jpg' );
+				gradientMap.minFilter = THREE.NearestFilter;
+				gradientMap.magFilter = THREE.NearestFilter;
+				gradientMap.generateMipmaps = false;
+
+				const wallParameters = {
+					gradientMap,
+					maskNode: threshold.greaterThanEqual( occlusionCut ),
+					maskShadowNode: bool( true ), // keep full shadows
+					receivedShadowPositionNode: positionWorld.add( normalWorld.mul( 0.03 ) ) // avoid shadow acne
+				};
+
+				const wallMaterials = [ '#9fb2c6', '#8aa0b8', '#b3c2d2' ].map( ( color ) => new THREE.MeshToonNodeMaterial( { ...wallParameters, color } ) );
+				const pillarMaterial = new THREE.MeshToonNodeMaterial( { ...wallParameters, color: '#5f7690' } );
+
+				// walls
+
+				function addWall( x, z, width, height, depth, rotation, material ) {
+
+					const wall = new THREE.Mesh( new RoundedBoxGeometry( width, height, depth, 3, 0.12 ), material );
+					wall.position.set( x, height / 2, z );
+					wall.rotation.y = rotation;
+					wall.castShadow = true;
+					wall.receiveShadow = true;
+					scene.add( wall );
+
+				}
+
+				const heights = [ 3.2, 4.4, 3.6, 5.0, 3.0, 4.2, 3.4, 4.8, 3.8, 3.1, 4.6, 3.5 ];
+
+				for ( let i = 0; i < heights.length; i ++ ) {
+
+					const angle = ( i / heights.length ) * Math.PI * 2;
+					addWall( Math.cos( angle ) * 6.5, Math.sin( angle ) * 6.5, 2.6, heights[ i ], 0.6, Math.PI / 2 - angle, wallMaterials[ i % wallMaterials.length ] );
+
+				}
+
+				for ( let i = 0; i < 5; i ++ ) {
+
+					const angle = ( i / 5 ) * Math.PI * 2 + 0.3;
+					addWall( Math.cos( angle ) * 1.6, Math.sin( angle ) * 1.6, 0.8, 4, 0.8, - angle, pillarMaterial );
+
+				}
+
+				// ground
+
+				const ground = new THREE.Mesh( new THREE.CircleGeometry( 50, 64 ), new THREE.MeshToonNodeMaterial( { color: '#c4d0dd', gradientMap } ) );
+				ground.rotation.x = - Math.PI / 2;
+				ground.receiveShadow = true;
+				scene.add( ground );
+
+				// character
+
+				const characterColors = { 'Beta_Joints': '#2a2d33', 'Beta_Surface': '#ff5a1f' };
+
+				new GLTFLoader().load( 'models/gltf/Xbot.glb', ( gltf ) => {
+
+					model = gltf.scene;
+					model.traverse( ( child ) => {
+
+						if ( child.isMesh ) {
+
+							child.castShadow = true;
+							child.material = new THREE.MeshToonNodeMaterial( { color: characterColors[ child.name ], gradientMap } );
+
+						}
+
+					} );
+
+					scene.add( model );
+
+					mixer = new THREE.AnimationMixer( model );
+					mixer.clipAction( THREE.AnimationClip.findByName( gltf.animations, 'walk' ) ).play();
+
+				} );
+
+				// renderer
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.shadowMap.enabled = true;
+				renderer.inspector = new Inspector();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				document.body.appendChild( renderer.domElement );
+
+				// controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 1, 0 );
+				controls.enableDamping = true;
+				controls.minDistance = 6;
+				controls.maxDistance = 25;
+				controls.maxPolarAngle = Math.PI * 0.45;
+
+				// events
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				// debug
+
+				const gui = renderer.inspector.createParameters( 'Parameters' );
+				gui.add( radius, 'value', 0.5, 3, 0.01 ).name( 'radius' );
+				gui.add( stopDistance, 'value', 0, 5, 0.01 ).name( 'stop distance' );
+				gui.add( ditherScale, 'value', 1, 8, 1 ).name( 'dither scale' );
+				gui.add( params, 'paused' );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				timer.update();
+
+				const delta = timer.getDelta();
+
+				if ( model && params.paused === false ) {
+
+					walkAngle += delta * walkSpeed;
+
+					model.position.set( Math.cos( walkAngle ) * walkRadius, 0, Math.sin( walkAngle ) * walkRadius );
+					model.rotation.y = - walkAngle;
+
+					mixer.update( delta );
+
+					target.value.copy( model.position ).y += 1;
+
+				}
+
+				controls.update();
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
