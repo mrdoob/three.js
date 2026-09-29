@@ -114,7 +114,7 @@ function onMessage( message ) {
 
 // Open a port to the background worker and identify this panel's tab.
 // Chrome stops that worker while DevTools stays open, which used to leave the panel blank.
-function connect() {
+function connect( reconnect = false ) {
 
 	port = chrome.runtime.connect();
 
@@ -138,14 +138,22 @@ function connect() {
 		reconnectTimer = setTimeout( () => {
 
 			reconnectTimer = null;
-			connect();
+			connect( true );
 
 		}, 0 );
 
 	} );
 
+	if ( reconnect ) {
+
+		clearState();
+		updateRenderers();
+		updateSceneTree();
+
+	}
+
 	send( MESSAGE_INIT, { tabId: chrome.devtools.inspectedWindow.tabId } );
-	send( MESSAGE_REQUEST_STATE );
+	send( MESSAGE_REQUEST_STATE, reconnect ? { full: true } : {} );
 
 }
 

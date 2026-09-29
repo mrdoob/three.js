@@ -307,7 +307,7 @@
 		switch ( message.name ) {
 
 			case MESSAGE_REQUEST_STATE:
-				sendState();
+				sendState( message.full === true );
 				break;
 
 			case MESSAGE_REQUEST_OBJECT_DETAILS:
@@ -330,7 +330,7 @@
 
 	} );
 
-	function sendState() {
+	function sendState( full = false ) {
 
 		if ( revision !== null ) postToPanel( EVENT_REGISTER, { revision: revision } );
 
@@ -349,7 +349,7 @@
 
 			if ( ticks < SCENE_EMPTY_TICKS_THRESHOLD ) {
 
-				sendSceneObjects( scene );
+				sendSceneObjects( scene, full );
 
 			} else if ( ticks === SCENE_EMPTY_TICKS_THRESHOLD ) {
 
@@ -382,12 +382,12 @@
 
 	}
 
-	// Send a scene batch when its object count changed (a hidden scene has no count, so it comes back)
-	function sendSceneObjects( scene ) {
+	// Send a scene batch when its object count changed, or for a full reconnect request
+	function sendSceneObjects( scene, full = false ) {
 
 		const objects = collectSceneObjects( scene );
 
-		if ( objects.length !== sceneObjectCountCache.get( scene.uuid ) ) {
+		if ( full || objects.length !== sceneObjectCountCache.get( scene.uuid ) ) {
 
 			sceneObjectCountCache.set( scene.uuid, objects.length );
 			postToPanel( EVENT_SCENE, { sceneUuid: scene.uuid, objects: objects } );
