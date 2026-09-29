@@ -26,10 +26,27 @@ document.querySelector( '.version' ).textContent = chrome.runtime.getManifest().
 
 // --- Connection ---
 
-const port = chrome.runtime.connect();
+let port = null;
+let reconnectTimer = null;
 const intervalId = setInterval( poll, STATE_POLLING_INTERVAL );
 
+function extensionContextAlive() {
+
+	try {
+
+		return chrome.runtime !== undefined && chrome.runtime.id !== undefined;
+
+	} catch ( error ) {
+
+		return false;
+
+	}
+
+}
+
 function send( name, data ) {
+
+	if ( port === null ) return;
 
 	try {
 
@@ -53,18 +70,7 @@ function poll() {
 
 }
 
-send( MESSAGE_INIT, { tabId: chrome.devtools.inspectedWindow.tabId } );
-send( MESSAGE_REQUEST_STATE );
-updateNotice();
-
-port.onDisconnect.addListener( () => {
-
-	clearInterval( intervalId );
-	clearState();
-
-} );
-
-port.onMessage.addListener( ( message ) => {
+function onMessage( message ) {
 
 	const detail = message.detail;
 
@@ -104,7 +110,47 @@ port.onMessage.addListener( ( message ) => {
 
 	}
 
-} );
+}
+
+// Open a port to the background worker and identify this panel's tab.
+// Chrome stops that worker while DevTools stays open, which used to leave the panel blank.
+function connect() {
+
+	port = chrome.runtime.connect();
+
+	port.onMessage.addListener( onMessage );
+
+	port.onDisconnect.addListener( () => {
+
+		port = null;
+
+		if ( extensionContextAlive() === false ) {
+
+			clearInterval( intervalId );
+			clearState();
+			return;
+
+		}
+
+		// Let the worker finish dropping the closed port before opening the next one.
+		if ( reconnectTimer !== null ) return;
+
+		reconnectTimer = setTimeout( () => {
+
+			reconnectTimer = null;
+			connect();
+
+		}, 0 );
+
+	} );
+
+	send( MESSAGE_INIT, { tabId: chrome.devtools.inspectedWindow.tabId } );
+	send( MESSAGE_REQUEST_STATE );
+
+}
+
+connect();
+updateNotice();
 
 // Drop a scene's objects, except the ones a new batch still lists
 function forgetObjects( sceneUuid, keep = new Set() ) {
@@ -170,7 +216,7 @@ function removeFrame( frameId ) {
 
 }
 
-// Clear state when the page navigates or the connection drops
+// Clear state when the page navigates or the extension context is gone
 function clearState() {
 
 	state.scenes.clear();

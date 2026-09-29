@@ -39,7 +39,7 @@ three.js ──dispatchEvent──▶ bridge.js ──postMessage──▶ conte
                             bridge.js ◀──postMessage── content-script.js ◀──tabs.sendMessage──── background.js ◀──port── panel.js
 ```
 
-The panel opens a port to the background script and identifies the inspected tab (`init`); the background script forwards its requests to that tab's content script.
+The panel opens a port to the background script and identifies the inspected tab (`init`); the background script forwards its requests to that tab's content script. If Chrome stops the background worker, the panel opens a new port and sends `init` again so the panel keeps updating.
 
 Events from the page: `register`, `renderer`, `scene`, `scene-removed`, `object-details`. Requests from the panel: `request-state`, `request-object-details`, `scroll-to-canvas`, `highlight-object`, `unhighlight-object`.
 
