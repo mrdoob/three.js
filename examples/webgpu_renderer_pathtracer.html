@@ -51,7 +51,7 @@
 
 			import * as THREE from 'three/webgpu';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
@@ -69,7 +69,6 @@
 				'Damaged Helmet': { url: 'models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf' },
 			};
 
-			let samplesEl;
 			let camera, scene, renderer, controls, gui;
 			let pathTracer, floor, model;
 
@@ -79,6 +78,7 @@
 				resolutionScale: 1,
 				roughness: 0.2,
 				metalness: 0.2,
+				samples: 0,
 			};
 
 			init();
@@ -91,6 +91,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				await renderer.init();
@@ -194,7 +195,7 @@
 
 			function createGUI() {
 
-				gui = new GUI();
+				gui = renderer.inspector.createParameters( 'Settings' );
 				gui.add( params, 'model', Object.keys( MODELS ) ).onChange( loadModel );
 				gui.add( params, 'enable' );
 				gui.add( params, 'resolutionScale', 0.1, 1.0, 0.1 ).onChange( v => {
@@ -217,13 +218,8 @@
 				} );
 
 				const renderFolder = gui.addFolder( 'Render' );
-
-				samplesEl = document.createElement( 'div' );
-				samplesEl.classList.add( 'gui-render' );
-				samplesEl.innerText = 'samples: 0';
-
-				renderFolder.$children.appendChild( samplesEl );
-				renderFolder.open();
+				const samplesUIValue = renderFolder.addString( params, 'samples' ).listen();
+				samplesUIValue.input.disabled = true;
 
 			}
 
@@ -237,7 +233,7 @@
 
 					pathTracer.getSampleCountsAsync().then( counts => {
 
-						samplesEl.innerText = `samples: ${ Math.floor( counts.avg ) }`;
+						params.samples = Math.floor( counts.avg );
 
 					} );
 
