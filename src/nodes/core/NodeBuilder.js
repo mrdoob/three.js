@@ -8,7 +8,7 @@ import ParameterNode from './ParameterNode.js';
 import StructType from './StructType.js';
 import FunctionNode from '../code/FunctionNode.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
-import { getDataFromObject, getTypeFromLength, getTextureType, hashString } from './NodeUtils.js';
+import { getDataFromObject, getTypeFromLength, getTextureType } from './NodeUtils.js';
 import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js';
 
 import {
@@ -34,7 +34,6 @@ import { warn, error, yieldToMain } from '../../utils.js';
 
 let _id = 0;
 
-const _bindingGroupsCache = new WeakMap();
 const _functionNodeCache = new WeakMap();
 
 const sharedNodeData = new WeakMap();
@@ -645,57 +644,9 @@ class NodeBuilder {
 
 		let bindGroup;
 
-		if ( sharedGroup ) {
+		if ( sharedGroup && this.renderer._bindings !== undefined ) {
 
-			let cacheKeyString = '';
-
-			for ( const binding of bindings ) {
-
-				if ( binding.isNodeUniformsGroup ) {
-
-					binding.uniforms.sort( ( a, b ) => a.nodeUniform.node.id - b.nodeUniform.node.id );
-
-					for ( const uniform of binding.uniforms ) {
-
-						cacheKeyString += uniform.nodeUniform.node.id;
-
-					}
-
-				} else {
-
-					cacheKeyString += binding.nodeUniform.id;
-
-				}
-
-			}
-
-			// TODO: Remove this hack ._currentRenderContext
-
-			const currentContext = this.renderer._currentRenderContext || this.renderer; // use renderer as fallback until we have a compute context
-
-			let bindingGroupsCache = _bindingGroupsCache.get( currentContext );
-
-			if ( bindingGroupsCache === undefined ) {
-
-				bindingGroupsCache = new Map();
-
-				_bindingGroupsCache.set( currentContext, bindingGroupsCache );
-
-			}
-
-			//
-
-			const cacheKey = hashString( cacheKeyString );
-
-			bindGroup = bindingGroupsCache.get( cacheKey );
-
-			if ( bindGroup === undefined ) {
-
-				bindGroup = new BindGroup( groupName, bindings );
-
-				bindingGroupsCache.set( cacheKey, bindGroup );
-
-			}
+			bindGroup = this.renderer._bindings.getSharedBindGroup( groupName, bindings );
 
 		} else {
 
