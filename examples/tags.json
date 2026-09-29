@@ -97,7 +97,7 @@
 	"webgl_postprocessing_unreal_bloom_selective": [ "glow" ],
 	"webgl_raycaster_bvh": [ "community", "three-mesh-bvh" ],
 	"webgl_refraction": [ "water" ],
-	"webgl_renderer_pathtracer": [ "community", "raytracing", "pathtracing", "three-gpu-pathtracer", "three-mesh-bvh" ],
+	"webgpu_renderer_pathtracer": [ "community", "raytracing", "pathtracing", "three-gpu-pathtracer", "three-mesh-bvh" ],
 	"webgl_rtt": [ "renderTarget" ],
 	"webgl_shaders_ocean": [ "water" ],
 	"webgl_shaders_sky": [ "sun" ],

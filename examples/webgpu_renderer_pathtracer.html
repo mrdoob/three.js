@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - three-gpu-pathtracer</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - three-gpu-pathtracer">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_renderer_pathtracer.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_renderer_pathtracer.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+		<style>
+			.lil-gui .gui-render {
+				line-height: var(--widget-height);
+				padding: var(--padding);
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Path Tracer</span>
+			</div>
+
+			<small>
+				<a href="https://github.com/gkjohnson/three-gpu-pathtracer" target="_blank" rel="noopener">three-gpu-pathtracer</a>. See the <a href="https://github.com/gkjohnson/three-gpu-pathtracer" target="_blank" rel="noopener">main project repository</a> for more information and examples on high fidelity path tracing.<br />
+				<a href="https://skfb.ly/6tqYD" target="_blank" rel="noopener">Steampunk Camera</a> by <a href="https://sketchfab.com/lumoize" target="_blank" rel="noopener">dylanheyes</a> (CC BY). Other models from the <a href="https://github.com/KhronosGroup/glTF-Sample-Assets" target="_blank" rel="noopener">Khronos glTF sample assets</a>.<br />
+				<a href="https://polyhaven.com/a/blouberg_sunrise_2" target="_blank" rel="noopener">Blouberg Sunrise 2</a> by <a href="https://gregzaal.com/" target="_blank" rel="noopener">Greg Zaal</a>.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/",
+					"three/examples/": "./",
+					"three-gpu-pathtracer/webgpu": "https://cdn.jsdelivr.net/npm/three-gpu-pathtracer@0.0.26/src/webgpu/index.js",
+					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.15/src/index.js",
+					"three-mesh-bvh/webgpu": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.15/src/webgpu/index.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+			import { WebGPUPathTracer } from 'three-gpu-pathtracer/webgpu';
+
+			// "rotation" turns the model about Y, "lift" raises it off the floor by a fraction of its
+			// height, "distance" scales how far back the camera starts
+			const MODELS = {
+				'Steampunk Camera': { url: 'models/gltf/steampunk_camera.glb' },
+				'Iridescent Dish With Olives': { url: 'models/gltf/IridescentDishWithOlives.glb', rotation: Math.PI / 3, distance: 0.7 },
+				'Anisotropy Barn Lamp': { url: 'models/gltf/AnisotropyBarnLamp.glb', lift: 0.05 },
+				'Venice Mask': { url: 'models/gltf/venice_mask.glb' },
+				'Damaged Helmet': { url: 'models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf' },
+			};
+
+			let samplesEl;
+			let camera, scene, renderer, controls, gui;
+			let pathTracer, floor, model;
+
+			const params = {
+				enable: true,
+				model: 'Steampunk Camera',
+				resolutionScale: 1,
+				roughness: 0.2,
+				metalness: 0.2,
+			};
+
+			init();
+
+			async function init() {
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				pathTracer = new WebGPUPathTracer( renderer );
+				pathTracer.filterGlossyFactor = 1;
+				pathTracer.minSamples = 3;
+				pathTracer.maxSamples = 32;
+				pathTracer.renderScale = params.resolutionScale;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xeeeeee );
+
+				// a floor that fades out toward the edges
+				floor = new THREE.Mesh(
+					new THREE.PlaneGeometry(),
+					new THREE.MeshStandardMaterial( {
+						side: THREE.DoubleSide,
+						roughness: params.roughness,
+						metalness: params.metalness,
+						map: generateRadialFloorTexture( 1024 ),
+						transparent: true,
+					} ),
+				);
+				floor.rotation.x = - Math.PI / 2;
+				scene.add( floor );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', () => {
+
+					pathTracer.updateCamera();
+
+				} );
+
+				window.addEventListener( 'resize', onWindowResize );
+				onWindowResize();
+
+				createGUI();
+
+				const envMap = await new HDRLoader().setPath( 'textures/equirectangular/' ).loadAsync( 'blouberg_sunrise_2_1k.hdr' );
+				envMap.mapping = THREE.EquirectangularReflectionMapping;
+				scene.environment = envMap;
+
+				await loadModel();
+
+				renderer.setAnimationLoop( animate );
+
+			}
+
+			async function loadModel() {
+
+				const { url, rotation = 0, lift = 0, distance = 1 } = MODELS[ params.model ];
+				const gltf = await new GLTFLoader().setDRACOLoader( new DRACOLoader() ).loadAsync( url );
+
+				if ( model ) {
+
+					scene.remove( model );
+
+				}
+
+				model = gltf.scene;
+				model.rotation.y = rotation;
+				model.updateMatrixWorld();
+				scene.add( model );
+
+				// place the floor under the model, then raise the model if asked
+				const bbox = new THREE.Box3().setFromObject( model );
+				const size = bbox.getSize( new THREE.Vector3() );
+				const radius = Math.max( size.x, size.y, size.z ) * 0.6;
+
+				floor.scale.setScalar( radius * 8 );
+				floor.position.y = bbox.min.y;
+
+				model.position.y = lift * size.y;
+				model.updateMatrixWorld();
+
+				// frame the model
+				controls.target0.copy( bbox.getCenter( new THREE.Vector3() ) );
+				controls.target0.y += model.position.y;
+				controls.position0.set( 2.3, 1, 2 ).multiplyScalar( radius * distance ).add( controls.target0 );
+				controls.reset();
+
+				pathTracer.setScene( scene, camera );
+
+			}
+
+			function onWindowResize() {
+
+				const w = window.innerWidth;
+				const h = window.innerHeight;
+
+				renderer.setSize( w, h );
+				renderer.setPixelRatio( window.devicePixelRatio );
+
+				camera.aspect = w / h;
+				camera.updateProjectionMatrix();
+
+				pathTracer.updateCamera();
+
+			}
+
+			function createGUI() {
+
+				gui = new GUI();
+				gui.add( params, 'model', Object.keys( MODELS ) ).onChange( loadModel );
+				gui.add( params, 'enable' );
+				gui.add( params, 'resolutionScale', 0.1, 1.0, 0.1 ).onChange( v => {
+
+					pathTracer.renderScale = v;
+					pathTracer.reset();
+
+				} );
+				gui.add( params, 'roughness', 0, 1 ).name( 'floor roughness' ).onChange( v => {
+
+					floor.material.roughness = v;
+					pathTracer.updateMaterials();
+
+				} );
+				gui.add( params, 'metalness', 0, 1 ).name( 'floor metalness' ).onChange( v => {
+
+					floor.material.metalness = v;
+					pathTracer.updateMaterials();
+
+				} );
+
+				const renderFolder = gui.addFolder( 'Render' );
+
+				samplesEl = document.createElement( 'div' );
+				samplesEl.classList.add( 'gui-render' );
+				samplesEl.innerText = 'samples: 0';
+
+				renderFolder.$children.appendChild( samplesEl );
+				renderFolder.open();
+
+			}
+
+			//
+
+			function animate() {
+
+				if ( params.enable ) {
+
+					pathTracer.renderSample();
+
+					pathTracer.getSampleCountsAsync().then( counts => {
+
+						samplesEl.innerText = `samples: ${ Math.floor( counts.avg ) }`;
+
+					} );
+
+				} else {
+
+					renderer.render( scene, camera );
+
+				}
+
+			}
+
+			function generateRadialFloorTexture( dim ) {
+
+				const data = new Uint8Array( dim * dim * 4 );
+
+				for ( let x = 0; x < dim; x ++ ) {
+
+					for ( let y = 0; y < dim; y ++ ) {
+
+						const xNorm = x / ( dim - 1 );
+						const yNorm = y / ( dim - 1 );
+
+						const xCent = 2.0 * ( xNorm - 0.5 );
+						const yCent = 2.0 * ( yNorm - 0.5 );
+						let a = Math.max( Math.min( 1.0 - Math.sqrt( xCent ** 2 + yCent ** 2 ), 1.0 ), 0.0 );
+						a = a ** 1.5;
+						a = a * 1.5;
+						a = Math.min( a, 1.0 );
+
+						const i = y * dim + x;
+						data[ i * 4 + 0 ] = 255;
+						data[ i * 4 + 1 ] = 255;
+						data[ i * 4 + 2 ] = 255;
+						data[ i * 4 + 3 ] = a * 255;
+
+					}
+
+				}
+
+				const tex = new THREE.DataTexture( data, dim, dim );
+				tex.format = THREE.RGBAFormat;
+				tex.type = THREE.UnsignedByteType;
+				tex.minFilter = THREE.LinearFilter;
+				tex.magFilter = THREE.LinearFilter;
+				tex.wrapS = THREE.RepeatWrapping;
+				tex.wrapT = THREE.RepeatWrapping;
+				tex.needsUpdate = true;
+				return tex;
+
+			}
+
+		</script>
+
+	</body>
+</html>
