@@ -253,7 +253,9 @@ class CameraHelper extends LineSegments {
 	 */
 	clone( recursive ) {
 
-		return new this.constructor( this.camera ).copy( this, recursive );
+		// The constructor updates its camera's projection matrix. A temporary camera
+		// prevents changes to the original before copy() restores the reference.
+		return new this.constructor( new Camera() ).copy( this, recursive );
 
 	}
 

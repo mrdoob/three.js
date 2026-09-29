@@ -61,9 +61,15 @@ export default QUnit.module( 'Helpers', () => {
 
 			const helper = new CameraHelper( camera );
 			helper.name = 'frustum';
+			camera.projectionMatrix.elements[ 8 ] = 0.31;
+			camera.projectionMatrixInverse.copy( camera.projectionMatrix ).invert();
+			const projection = camera.projectionMatrix.clone();
+			const projectionInverse = camera.projectionMatrixInverse.clone();
 
 			const clone = helper.clone();
 
+			assert.ok( camera.projectionMatrix.equals( projection ), 'clone preserves the camera projection' );
+			assert.ok( camera.projectionMatrixInverse.equals( projectionInverse ), 'clone preserves the inverse camera projection' );
 			assert.ok( clone instanceof CameraHelper, 'clone is a CameraHelper' );
 			assert.notStrictEqual( clone, helper, 'clone is a distinct object' );
 			assert.strictEqual( clone.camera, camera, 'clone visualizes the same camera' );
@@ -91,6 +97,8 @@ export default QUnit.module( 'Helpers', () => {
 			const sceneClone = scene.clone();
 			const helperClone = sceneClone.children[ 0 ];
 
+			assert.ok( camera.projectionMatrix.equals( projection ), 'scene.clone() preserves the camera projection' );
+			assert.ok( camera.projectionMatrixInverse.equals( projectionInverse ), 'scene.clone() preserves the inverse camera projection' );
 			assert.ok( helperClone instanceof CameraHelper, 'scene.clone() clones a child CameraHelper' );
 			assert.strictEqual( helperClone.camera, camera, 'cloned scene helper keeps the original camera' );
 
