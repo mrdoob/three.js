@@ -239,7 +239,7 @@ class ShadowNode extends ShadowBaseNode {
 		 *
 		 * @type {number}
 		 * @readonly
-		 * @default true
+		 * @default 0
 		 */
 		this.depthLayer = 0;
 

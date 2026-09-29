@@ -171,6 +171,7 @@ import './src/materials/MeshPhysicalMaterial.tests.js';
 import './src/materials/MeshStandardMaterial.tests.js';
 import './src/materials/MeshToonMaterial.tests.js';
 import './src/materials/PointsMaterial.tests.js';
+import './src/materials/ProxyNodeMaterial.tests.js';
 import './src/materials/RawShaderMaterial.tests.js';
 import './src/materials/ShaderMaterial.tests.js';
 import './src/materials/ShadowMaterial.tests.js';

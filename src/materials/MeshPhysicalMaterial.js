@@ -72,7 +72,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		 * property provides additional rotation to the vectors in the texture.
 		 *
 		 * @type {number}
-		 * @default 1
+		 * @default 0
 		 */
 		this.anisotropyRotation = 0;
 

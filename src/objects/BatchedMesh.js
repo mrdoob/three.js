@@ -498,7 +498,7 @@ class BatchedMesh extends Mesh {
 	/**
 	 * Computes the bounding box, updating {@link BatchedMesh#boundingBox}.
 	 * Bounding boxes aren't computed by default. They need to be explicitly computed,
-	 * otherwise they are `null`.
+	 * otherwise they are `null`. Must be recomputed when instances change.
 	 */
 	computeBoundingBox() {
 
@@ -527,8 +527,8 @@ class BatchedMesh extends Mesh {
 
 	/**
 	 * Computes the bounding sphere, updating {@link BatchedMesh#boundingSphere}.
-	 * Bounding spheres aren't computed by default. They need to be explicitly computed,
-	 * otherwise they are `null`.
+	 * The engine computes the bounding sphere once when it is needed. Must be
+	 * recomputed when instances change.
 	 */
 	computeBoundingSphere() {
 
