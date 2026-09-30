@@ -27,6 +27,7 @@ import {
  * custom material, and may be faster than MikkTSpace.
  *
  * Returns the original BufferGeometry. Indexed geometries will be de-indexed. Requires position, normal, and uv attributes.
+ * Tangents are stored like the normals: normalized Int8 or Int16 when the normals are, Float32 otherwise.
  *
  * @param {BufferGeometry} geometry - The geometry to compute tangents for.
  * @param {Object} MikkTSpace - Instance of `examples/jsm/libs/mikktspace.module.js`, or `mikktspace` npm package.
@@ -111,7 +112,29 @@ function computeMikkTSpaceTangents( geometry, MikkTSpace, negateSign = true ) {
 
 	//
 
-	_geometry.setAttribute( 'tangent', new BufferAttribute( tangents, 4 ) );
+	// Quantized normals get tangents of the same precision.
+
+	const normal = _geometry.attributes.normal;
+	const normalArray = normal.array;
+
+	if ( normal.normalized && ( normalArray instanceof Int8Array || normalArray instanceof Int16Array ) ) {
+
+		const scale = normalArray instanceof Int8Array ? 127 : 32767;
+		const quantized = new normalArray.constructor( tangents.length );
+
+		for ( let i = 0; i < tangents.length; i ++ ) {
+
+			quantized[ i ] = Math.round( tangents[ i ] * scale );
+
+		}
+
+		_geometry.setAttribute( 'tangent', new BufferAttribute( quantized, 4, true ) );
+
+	} else {
+
+		_geometry.setAttribute( 'tangent', new BufferAttribute( tangents, 4 ) );
+
+	}
 
 	if ( geometry !== _geometry ) {
 
