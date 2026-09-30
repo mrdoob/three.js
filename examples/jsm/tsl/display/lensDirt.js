@@ -19,9 +19,9 @@ export const lensDirt = /*#__PURE__*/ Fn( ( [ textureNode, dirtTextureNode, inte
 
 	const targetUV = textureNode.uvNode || uv();
 
-	const dirtSize = vec2( dirtTextureNode.size( 0 ) );
-	const aspect = screenSize.x.div( screenSize.y ).div( dirtSize.x.div( dirtSize.y ) );
-	const dirtUV = targetUV.sub( 0.5 ).mul( vec2( min( aspect, 1 ), min( aspect.reciprocal(), 1 ) ) ).add( 0.5 );
+	const dirtSize = vec2( dirtTextureNode.size( 0 ) ).toConst();
+	const aspect = screenSize.x.div( screenSize.y ).div( dirtSize.x.div( dirtSize.y ) ).toConst();
+	const dirtUV = targetUV.sub( 0.5 ).mul( vec2( min( aspect, 1 ), min( aspect.reciprocal(), 1 ) ) ).add( 0.5 ).toConst();
 
 	const dirt = dirtTextureNode.sample( dirtUV ).rgb.mul( textureNode.sample( targetUV ).rgb ).mul( intensity );
 
