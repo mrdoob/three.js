@@ -431,6 +431,8 @@ class GTAONode extends Node {
 
 			const texel = uv.mul( size ).floor().toConst();
 
+			// rejects off-screen samples and samples that fall into the center texel
+
 			return uv.x.greaterThan( 0 ).and( uv.x.lessThan( 1 ) ).and( uv.y.greaterThan( 0 ) ).and( uv.y.lessThan( 1 ) )
 				.and( texel.x.notEqual( centerTexel.x ).or( texel.y.notEqual( centerTexel.y ) ) );
 
