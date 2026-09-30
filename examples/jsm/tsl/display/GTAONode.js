@@ -424,6 +424,10 @@ class GTAONode extends Node {
 
 		};
 
+		const depthSize = vec2( textureSize( this.depthNode, 0 ) );
+		// Nearest depth samples describe texel centres, not the continuous ray UV.
+		const snapDepthUV = ( uv ) => uv.mul( depthSize ).floor().add( 0.5 ).div( depthSize );
+
 		const sampleNoise = ( uv ) => this._noiseNode.sample( uv );
 		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.sample( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this._cameraProjectionMatrixInverse );
 
@@ -432,6 +436,11 @@ class GTAONode extends Node {
 			const depth = this._resolutionScale.lessThan( 1 ).select( sampleCenterDepth( uvNode ), sampleDepth( uvNode ) ).toConst();
 
 			depth.greaterThanEqual( 1.0 ).discard();
+
+			const centerUV = snapDepthUV( uvNode ).toConst();
+			const isValidSample = ( uv ) => uv.x.greaterThan( 0 ).and( uv.x.lessThan( 1 ) )
+				.and( uv.y.greaterThan( 0 ) ).and( uv.y.lessThan( 1 ) )
+				.and( uv.x.notEqual( centerUV.x ).or( uv.y.notEqual( centerUV.y ) ) );
 
 			const viewPosition = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).toConst();
 			const viewNormal = sampleNormal( uvNode ).toConst();
@@ -506,7 +515,7 @@ class GTAONode extends Node {
 
 					// x
 
-					const sampleScreenPositionX = getScreenPositionFromClip( clipPosition.add( clipOffset ) ).toConst();
+					const sampleScreenPositionX = snapDepthUV( getScreenPositionFromClip( clipPosition.add( clipOffset ) ) ).toConst();
 					const sampleDepthX = sampleDepth( sampleScreenPositionX ).toConst();
 					const sampleSceneViewPositionX = getViewPosition( sampleScreenPositionX, sampleDepthX, this._cameraProjectionMatrixInverse ).toConst();
 					const viewDeltaX = sampleSceneViewPositionX.sub( viewPosition ).toConst();
@@ -522,7 +531,8 @@ class GTAONode extends Node {
 					const distFacX = min( lenX.mul( invRadius ), 1 );
 					const distFacSqX = distFacX.mul( distFacX );
 
-					If( abs( viewDeltaX.z ).lessThan( this.thickness ), () => {
+					// Subpixel steps can hit the centre texel; they are not occluders.
+					If( isValidSample( sampleScreenPositionX ).and( abs( viewDeltaX.z ).lessThan( this.thickness ) ), () => {
 
 						cosHorizons.x.assign( mix( max( cosHorizons.x, sHX ), cosHorizons.x, distFacSqX ) );
 
@@ -530,7 +540,7 @@ class GTAONode extends Node {
 
 					// y
 
-					const sampleScreenPositionY = getScreenPositionFromClip( clipPosition.sub( clipOffset ) ).toConst();
+					const sampleScreenPositionY = snapDepthUV( getScreenPositionFromClip( clipPosition.sub( clipOffset ) ) ).toConst();
 					const sampleDepthY = sampleDepth( sampleScreenPositionY ).toConst();
 					const sampleSceneViewPositionY = getViewPosition( sampleScreenPositionY, sampleDepthY, this._cameraProjectionMatrixInverse ).toConst();
 					const viewDeltaY = sampleSceneViewPositionY.sub( viewPosition ).toConst();
@@ -541,7 +551,7 @@ class GTAONode extends Node {
 					const distFacY = min( lenY.mul( invRadius ), 1 );
 					const distFacSqY = distFacY.mul( distFacY );
 
-					If( abs( viewDeltaY.z ).lessThan( this.thickness ), () => {
+					If( isValidSample( sampleScreenPositionY ).and( abs( viewDeltaY.z ).lessThan( this.thickness ) ), () => {
 
 						cosHorizons.y.assign( mix( max( cosHorizons.y, sHY ), cosHorizons.y, distFacSqY ) );
 
