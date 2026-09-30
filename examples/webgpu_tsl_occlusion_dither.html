@@ -36,7 +36,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { Fn, bool, clamp, cameraPosition, normalWorld, positionWorld, screenCoordinate, smoothstep, uniform } from 'three/tsl';
+			import { Fn, bool, clamp, cameraPosition, positionWorld, screenCoordinate, smoothstep, uniform } from 'three/tsl';
 
 			import { bayer16 } from 'three/addons/tsl/math/Bayer.js';
 
@@ -90,6 +90,8 @@
 				sun.shadow.camera.far = 22.6;
 				sun.shadow.intensity = 0.8;
 				sun.shadow.radius = 2.5;
+				sun.shadow.normalBias = 0.02;
+				sun.shadow.bias = 0.0011;
 				scene.add( sun );
 
 				scene.add( new THREE.HemisphereLight( '#b4c9e4', '#ffffff', 1.5 ) );
@@ -100,8 +102,8 @@
 
 					const toTarget = target.sub( cameraPosition );
 
-					const t = positionWorld.sub( cameraPosition ).dot( toTarget ).div( toTarget.dot( toTarget ) ).toVar();
-					const progress = clamp( t ).toVar();
+					const t = positionWorld.sub( cameraPosition ).dot( toTarget ).div( toTarget.dot( toTarget ) ).toConst();
+					const progress = clamp( t ).toConst();
 					const closest = cameraPosition.add( toTarget.mul( progress ) );
 
 					const coneRadius = radius.mul( progress.mul( 0.75 ).add( 0.25 ) );
@@ -127,8 +129,7 @@
 				const wallParameters = {
 					gradientMap,
 					maskNode: threshold.greaterThanEqual( occlusionCut ),
-					maskShadowNode: bool( true ), // keep full shadows
-					receivedShadowPositionNode: positionWorld.add( normalWorld.mul( 0.03 ) ) // avoid shadow acne
+					maskShadowNode: bool( true ) // keep full shadows
 				};
 
 				const wallMaterials = [ '#9fb2c6', '#8aa0b8', '#b3c2d2' ].map( ( color ) => new THREE.MeshToonNodeMaterial( { ...wallParameters, color } ) );
