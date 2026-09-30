@@ -424,8 +424,9 @@ class GTAONode extends Node {
 
 		};
 
+		// Nearest depth samples describe texel centers, not the continuous ray UV.
+
 		const depthSize = vec2( textureSize( this.depthNode, 0 ) );
-		// Nearest depth samples describe texel centres, not the continuous ray UV.
 		const snapDepthUV = ( uv ) => uv.mul( depthSize ).floor().add( 0.5 ).div( depthSize );
 
 		const sampleNoise = ( uv ) => this._noiseNode.sample( uv );
@@ -436,6 +437,8 @@ class GTAONode extends Node {
 			const depth = this._resolutionScale.lessThan( 1 ).select( sampleCenterDepth( uvNode ), sampleDepth( uvNode ) ).toConst();
 
 			depth.greaterThanEqual( 1.0 ).discard();
+
+			// Ignore off-screen samples and repeated reads of the center texel.
 
 			const centerUV = snapDepthUV( uvNode ).toConst();
 			const isValidSample = ( uv ) => uv.x.greaterThan( 0 ).and( uv.x.lessThan( 1 ) )
@@ -531,7 +534,6 @@ class GTAONode extends Node {
 					const distFacX = min( lenX.mul( invRadius ), 1 );
 					const distFacSqX = distFacX.mul( distFacX );
 
-					// Subpixel steps can hit the centre texel; they are not occluders.
 					If( isValidSample( sampleScreenPositionX ).and( abs( viewDeltaX.z ).lessThan( this.thickness ) ), () => {
 
 						cosHorizons.x.assign( mix( max( cosHorizons.x, sHX ), cosHorizons.x, distFacSqX ) );
