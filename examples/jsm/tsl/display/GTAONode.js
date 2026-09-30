@@ -427,7 +427,7 @@ class GTAONode extends Node {
 		const sampleNoise = ( uv ) => this._noiseNode.sample( uv );
 		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.sample( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this._cameraProjectionMatrixInverse );
 
-		const isValidSample = /*@__PURE__*/ Fn( ( [ uv, centerTexel, size ] ) => {
+		const isValidSample = Fn( ( [ uv, centerTexel, size ] ) => {
 
 			const texel = uv.mul( size ).floor().toConst();
 
