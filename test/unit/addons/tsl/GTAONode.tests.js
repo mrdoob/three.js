@@ -80,7 +80,6 @@ async function createFixture( backend, assert ) {
 			prePass.dispose();
 			wall.geometry.dispose();
 			wall.material.dispose();
-			renderer.setRenderTarget( null );
 			renderer.dispose();
 
 		}
@@ -108,8 +107,7 @@ QUnit.module( 'Addons', () => {
 
 							wall.position.z = - distance;
 							wall.rotation.y = angle * Math.PI / 180;
-							const target = await fixture.render();
-							const values = await readVisibility( renderer, target, 152, 82, 16, 16 );
+							const values = await readVisibility( renderer, await fixture.render(), 152, 82, 16, 16 );
 							const mean = values.reduce( ( sum, value ) => sum + value, 0 ) / values.length;
 							assert.ok( mean > 0.92, `${ angle } degrees, ${ distance } m: visibility ${ mean } should be near 1, not self-occluded.` );
 
@@ -148,7 +146,7 @@ QUnit.module( 'Addons', () => {
 				const fixture = await createFixture( backend, assert );
 				if ( fixture === null ) return;
 				const { renderer, scene, wall, effect } = fixture;
-				const blocker = new Mesh( new BoxGeometry( 1, 1, 0.25 ), new MeshBasicNodeMaterial() );
+				const blocker = new Mesh( new BoxGeometry( 1, 1, 0.25 ), wall.material );
 
 				try {
 
@@ -156,22 +154,19 @@ QUnit.module( 'Addons', () => {
 					blocker.position.z = - 3.875;
 					scene.add( blocker );
 					effect.radius.value = 1;
-					let target = await fixture.render();
-					const contact = await readVisibility( renderer, target, 128, 58, 64, 64 );
+					const contact = await readVisibility( renderer, await fixture.render(), 128, 58, 64, 64 );
 					assert.ok( contact.filter( value => value < 0.9 ).length > 100, 'A real protruding blocker still occludes the wall.' );
 
 					scene.remove( blocker );
 					wall.geometry.dispose();
 					wall.geometry = new PlaneGeometry( 3, 3 );
 					wall.position.z = - 6;
-					target = await fixture.render();
-					const sky = await readVisibility( renderer, target, 0, 0, 16, 16 );
+					const sky = await readVisibility( renderer, await fixture.render(), 0, 0, 16, 16 );
 					assert.ok( Math.min( ...sky ) > 0.99, 'Cleared depth stays unoccluded.' );
 
 				} finally {
 
 					blocker.geometry.dispose();
-					blocker.material.dispose();
 					fixture.dispose();
 
 				}
