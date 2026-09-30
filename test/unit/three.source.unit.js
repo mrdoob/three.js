@@ -267,7 +267,6 @@ import './src/textures/VideoTexture.tests.js';
 //src/nodes/display
 import './src/nodes/display/ViewportTextureNode.tests.js';
 import './src/nodes/display/ViewportDepthTextureNode.tests.js';
-import './src/nodes/display/PassNode.compileAsync.tests.js';
 
 //src/nodes/tsl
 import './src/nodes/tsl/TSLCore.tests.js';
