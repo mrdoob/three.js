@@ -424,13 +424,25 @@ class GTAONode extends Node {
 
 		};
 
-		// Nearest depth samples describe texel centers, not the continuous ray UV.
-
-		const depthSize = vec2( textureSize( this.depthNode, 0 ) );
-		const snapDepthUV = ( uv ) => uv.mul( depthSize ).floor().add( 0.5 ).div( depthSize );
-
 		const sampleNoise = ( uv ) => this._noiseNode.sample( uv );
 		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.sample( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this._cameraProjectionMatrixInverse );
+
+		const isValidSample = /*@__PURE__*/ Fn( ( [ uv, centerTexel, size ] ) => {
+
+			const texel = uv.mul( size ).floor().toConst();
+
+			return uv.x.greaterThan( 0 ).and( uv.x.lessThan( 1 ) ).and( uv.y.greaterThan( 0 ) ).and( uv.y.lessThan( 1 ) )
+				.and( texel.x.notEqual( centerTexel.x ).or( texel.y.notEqual( centerTexel.y ) ) );
+
+		} ).setLayout( {
+			name: 'isValidSample',
+			type: 'bool',
+			inputs: [
+				{ name: 'uv', type: 'vec2' },
+				{ name: 'centerTexel', type: 'vec2' },
+				{ name: 'size', type: 'vec2' }
+			]
+		} );
 
 		this._ao = Fn( () => {
 
@@ -438,12 +450,8 @@ class GTAONode extends Node {
 
 			depth.greaterThanEqual( 1.0 ).discard();
 
-			// Ignore off-screen samples and repeated reads of the center texel.
-
-			const centerUV = snapDepthUV( uvNode ).toConst();
-			const isValidSample = ( uv ) => uv.x.greaterThan( 0 ).and( uv.x.lessThan( 1 ) )
-				.and( uv.y.greaterThan( 0 ) ).and( uv.y.lessThan( 1 ) )
-				.and( uv.x.notEqual( centerUV.x ).or( uv.y.notEqual( centerUV.y ) ) );
+			const depthSize = vec2( textureSize( this.depthNode, 0 ) ).toConst();
+			const centerTexel = uvNode.mul( depthSize ).floor().toConst();
 
 			const viewPosition = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).toConst();
 			const viewNormal = sampleNormal( uvNode ).toConst();
@@ -518,7 +526,7 @@ class GTAONode extends Node {
 
 					// x
 
-					const sampleScreenPositionX = snapDepthUV( getScreenPositionFromClip( clipPosition.add( clipOffset ) ) ).toConst();
+					const sampleScreenPositionX = getScreenPositionFromClip( clipPosition.add( clipOffset ) ).toConst();
 					const sampleDepthX = sampleDepth( sampleScreenPositionX ).toConst();
 					const sampleSceneViewPositionX = getViewPosition( sampleScreenPositionX, sampleDepthX, this._cameraProjectionMatrixInverse ).toConst();
 					const viewDeltaX = sampleSceneViewPositionX.sub( viewPosition ).toConst();
@@ -534,7 +542,7 @@ class GTAONode extends Node {
 					const distFacX = min( lenX.mul( invRadius ), 1 );
 					const distFacSqX = distFacX.mul( distFacX );
 
-					If( isValidSample( sampleScreenPositionX ).and( abs( viewDeltaX.z ).lessThan( this.thickness ) ), () => {
+					If( isValidSample( sampleScreenPositionX, centerTexel, depthSize ).and( abs( viewDeltaX.z ).lessThan( this.thickness ) ), () => {
 
 						cosHorizons.x.assign( mix( max( cosHorizons.x, sHX ), cosHorizons.x, distFacSqX ) );
 
@@ -542,7 +550,7 @@ class GTAONode extends Node {
 
 					// y
 
-					const sampleScreenPositionY = snapDepthUV( getScreenPositionFromClip( clipPosition.sub( clipOffset ) ) ).toConst();
+					const sampleScreenPositionY = getScreenPositionFromClip( clipPosition.sub( clipOffset ) ).toConst();
 					const sampleDepthY = sampleDepth( sampleScreenPositionY ).toConst();
 					const sampleSceneViewPositionY = getViewPosition( sampleScreenPositionY, sampleDepthY, this._cameraProjectionMatrixInverse ).toConst();
 					const viewDeltaY = sampleSceneViewPositionY.sub( viewPosition ).toConst();
@@ -553,7 +561,7 @@ class GTAONode extends Node {
 					const distFacY = min( lenY.mul( invRadius ), 1 );
 					const distFacSqY = distFacY.mul( distFacY );
 
-					If( isValidSample( sampleScreenPositionY ).and( abs( viewDeltaY.z ).lessThan( this.thickness ) ), () => {
+					If( isValidSample( sampleScreenPositionY, centerTexel, depthSize ).and( abs( viewDeltaY.z ).lessThan( this.thickness ) ), () => {
 
 						cosHorizons.y.assign( mix( max( cosHorizons.y, sHY ), cosHorizons.y, distFacSqY ) );
 
