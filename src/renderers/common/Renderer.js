@@ -895,6 +895,11 @@ class Renderer {
 	 */
 	async compileAsync( scene, camera, targetScene = null, onProgress = null ) {
 
+		// The call depth a render issued now would take, 0 at the top level: render contexts are
+		// keyed by it, and a precompile keyed otherwise builds render objects no render uses.
+
+		const callDepth = this._callDepth + 1;
+
 		if ( this._isDeviceLost === true ) return;
 
 		if ( this._initialized === false ) await this.init();
@@ -940,7 +945,7 @@ class Renderer {
 
 		this._beginPreCompile( precompilationState );
 
-		const renderContext = this._renderContexts.get( renderTarget, this._mrt, this._callDepth );
+		const renderContext = this._renderContexts.get( renderTarget, this._mrt, callDepth );
 
 		const compilationPromises = [];
 

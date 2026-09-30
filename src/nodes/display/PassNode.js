@@ -800,7 +800,17 @@ class PassNode extends Node {
 		renderer.setRenderTarget( this.renderTarget );
 		renderer.setMRT( this._mrt );
 
-		await renderer.compileAsync( this.scene, this.camera );
+		// A pass is rendered inside the render of the node that reads it, one call depth below, and
+		// render contexts are keyed by call depth: compile at that depth, or the first render of the
+		// pass builds every object again.
+
+		renderer._callDepth ++;
+
+		const compilation = renderer.compileAsync( this.scene, this.camera );
+
+		renderer._callDepth --;
+
+		await compilation;
 
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setMRT( currentMRT );
