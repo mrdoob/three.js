@@ -1,6 +1,7 @@
 
 //addons/utils
 import './addons/utils/BufferGeometryUtils.tests.js';
+import './addons/libs/MikkTSpace.tests.js';
 import './addons/utils/ColorUtils.tests.js';
 import './addons/utils/GaussianSplatUtils.tests.js';
 import './addons/math/ColorSpaces.tests.js';
