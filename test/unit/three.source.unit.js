@@ -242,6 +242,9 @@ import './src/renderers/shaders/UniformsUtils.tests.js';
 import './src/renderers/webgl/WebGLExtensions.tests.js';
 import './src/renderers/webgl/WebGLRenderLists.tests.js';
 
+//src/renderers/webgl-fallback
+import './src/renderers/webgl-fallback/WebGLBackend.tests.js';
+
 
 //src/scenes
 import './src/scenes/Fog.tests.js';
