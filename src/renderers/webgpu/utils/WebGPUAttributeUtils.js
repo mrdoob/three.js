@@ -88,11 +88,27 @@ class WebGPUAttributeUtils {
 
 				} else if ( array.constructor === Uint16Array || array.constructor === Uint8Array ) {
 
-					const UintConstructor = ( usage & GPUBufferUsage.INDEX ) ? Uint16Array : Uint32Array;
+					const isIndexBuffer = ( usage & GPUBufferUsage.INDEX );
+					const isStorageBuffer = ( usage & GPUBufferUsage.STORAGE );
+
+					const UintConstructor = ( isIndexBuffer && ! isStorageBuffer ) ? Uint16Array : Uint32Array;
 
 					if ( array.constructor !== UintConstructor ) {
 
 						array = new UintConstructor( array );
+
+					}
+
+					// Use the correct primitive restart index if
+					// the uint16 values must be used for storage.
+
+					if ( isIndexBuffer && isStorageBuffer ) {
+
+						for ( let i = 0; i < array.length; i ++ ) {
+
+							if ( array[ i ] === 0xffff ) array[ i ] = 0xffffffff;
+
+						}
 
 					}
 
