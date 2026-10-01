@@ -35,6 +35,61 @@ const typeArraysToVertexFormatPrefixForItemSize1 = new Map( [
 	[ Float32Array, 'float32' ]
 ] );
 
+const _alignmentArray = new Uint8Array( 4 );
+
+/**
+ * Writes a range of a typed array into the given GPU buffer. `writeBuffer()` requires
+ * the offset and size to be multiples of 4 bytes, so the range is expanded to the
+ * element boundaries of the surrounding 4-byte word. The function assumes
+ * that the buffer is already properly sized to 4-bytes.
+ *
+ *
+ * @private
+ * @function
+ * @param {GPUDevice} device - The GPU device calling `writeBuffer()`.
+ * @param {GPUBuffer} buffer - The GPU buffer, properly sized to 4 bytes.
+ * @param {TypedArray} array - The source array.
+ * @param {number} start - The index of the first element to write.
+ * @param {number} count - The number of elements to write.
+ */
+function writeBufferAligned( device, buffer, array, start, count ) {
+
+	const bytesPerElement = array.BYTES_PER_ELEMENT;
+	const elementsPerWord = Math.max( 1, 4 / bytesPerElement );
+
+	// Find the starting edge of the word boundaries the start index belongs to
+	const alignedStart = start - ( start % elementsPerWord );
+
+	// Find length of values up to the word (start + count) belongs to
+	const endElementWordIndex = ( start + count ) / elementsPerWord;
+	let endOfLastWord = Math.ceil( endElementWordIndex ) * elementsPerWord;
+
+	if ( endOfLastWord > array.length ) {
+
+		// Move to index at start of last word
+		endOfLastWord -= elementsPerWord;
+
+		// Get number of valid elements we can write to temp array
+		const tailByteOffset = array.byteOffset + endOfLastWord * bytesPerElement;
+		const tailByteLength = ( array.length - endOfLastWord ) * bytesPerElement;
+
+		_alignmentArray.fill( 0 );
+		_alignmentArray.set( new Uint8Array( array.buffer, tailByteOffset, tailByteLength ) );
+
+		device.queue.writeBuffer( buffer, endOfLastWord * bytesPerElement, _alignmentArray );
+
+	}
+
+	// Write the rest of the data
+	if ( endOfLastWord > alignedStart ) {
+
+		const startInBytes = alignedStart * bytesPerElement;
+		device.queue.writeBuffer( buffer, startInBytes, array, alignedStart, endOfLastWord - alignedStart );
+
+	}
+
+}
+
 /**
  * A WebGPU backend utility module for managing shader attributes.
  *
@@ -233,16 +288,27 @@ class WebGPUAttributeUtils {
 
 		const updateRanges = bufferAttribute.updateRanges;
 
+		const needsAlignment = isTypedArray( array ) && array.BYTES_PER_ELEMENT < 4;
+
+		// writehttps://gpuweb.github.io/gpuweb/#dom-gpuqueue-writebuffer
 		if ( updateRanges.length === 0 ) {
 
 			// Not using update ranges
 
-			device.queue.writeBuffer(
-				buffer,
-				0,
-				array,
-				0
-			);
+			if ( needsAlignment ) {
+
+				writeBufferAligned( device, buffer, array, 0, array.length );
+
+			} else {
+
+				device.queue.writeBuffer(
+					buffer,
+					0,
+					array,
+					0
+				);
+
+			}
 
 		} else {
 
@@ -265,6 +331,13 @@ class WebGPUAttributeUtils {
 
 					dataOffset = range.start * byteOffsetFactor;
 					size = range.count * byteOffsetFactor;
+
+				}
+
+				if ( needsAlignment ) {
+
+					writeBufferAligned( device, buffer, array, dataOffset, size );
+					continue;
 
 				}
 
