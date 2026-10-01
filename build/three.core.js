@@ -9600,6 +9600,10 @@ class RenderTarget extends EventDispatcher {
 
 			}
 
+		} else {
+
+			this.depthTexture = null;
+
 		}
 
 		this.samples = source.samples;
@@ -15339,9 +15343,9 @@ class Scene extends Object3D {
 
 		super.copy( source, recursive );
 
-		if ( source.background !== null ) this.background = source.background.clone();
-		if ( source.environment !== null ) this.environment = source.environment.clone();
-		if ( source.fog !== null ) this.fog = source.fog.clone();
+		this.background = source.background !== null ? source.background.clone() : null;
+		this.environment = source.environment !== null ? source.environment.clone() : null;
+		this.fog = source.fog !== null ? source.fog.clone() : null;
 
 		this.backgroundBlurriness = source.backgroundBlurriness;
 		this.backgroundIntensity = source.backgroundIntensity;
@@ -15350,7 +15354,7 @@ class Scene extends Object3D {
 		this.environmentIntensity = source.environmentIntensity;
 		this.environmentRotation.copy( source.environmentRotation );
 
-		if ( source.overrideMaterial !== null ) this.overrideMaterial = source.overrideMaterial.clone();
+		this.overrideMaterial = source.overrideMaterial !== null ? source.overrideMaterial.clone() : null;
 
 		this.matrixAutoUpdate = source.matrixAutoUpdate;
 
@@ -15849,7 +15853,8 @@ class Triangle {
 		}
 
 		const vc = d1 * d4 - d3 * d2;
-		if ( vc <= 0 && d1 >= 0 && d3 <= 0 ) {
+
+		if ( vc <= 0 && d1 >= 0 && d3 <= 0 && d1 - d3 > 0 ) { // modification of the algorithm: d1 - d3 is the squared length of AB, so skip this region if a and b coincide
 
 			v = d1 / ( d1 - d3 );
 			// edge region of AB; barycentric coords (1-v, v, 0)
@@ -17600,7 +17605,7 @@ class BufferAttribute extends EventDispatcher {
 	}
 
 	/**
-	 * Disposes of the buffer attribute. Available only in {@link WebGPURenderer}.
+	 * Can be used to dispose storage buffer attributes. Available only in {@link WebGPURenderer}.
 	 */
 	dispose() {
 
@@ -24082,11 +24087,19 @@ class Mesh extends Object3D {
 
 			this.morphTargetInfluences = source.morphTargetInfluences.slice();
 
+		} else {
+
+			this.morphTargetInfluences = undefined;
+
 		}
 
 		if ( source.morphTargetDictionary !== undefined ) {
 
 			this.morphTargetDictionary = Object.assign( {}, source.morphTargetDictionary );
+
+		} else {
+
+			this.morphTargetDictionary = undefined;
 
 		}
 
@@ -24632,8 +24645,8 @@ class SkinnedMesh extends Mesh {
 
 		this.skeleton = source.skeleton;
 
-		if ( source.boundingBox !== null ) this.boundingBox = source.boundingBox.clone();
-		if ( source.boundingSphere !== null ) this.boundingSphere = source.boundingSphere.clone();
+		this.boundingBox = source.boundingBox !== null ? source.boundingBox.clone() : null;
+		this.boundingSphere = source.boundingSphere !== null ? source.boundingSphere.clone() : null;
 
 		return this;
 
@@ -25568,13 +25581,13 @@ class InstancedMesh extends Mesh {
 
 		this.instanceMatrix.copy( source.instanceMatrix );
 
-		if ( source.morphTexture !== null ) this.morphTexture = source.morphTexture.clone();
-		if ( source.instanceColor !== null ) this.instanceColor = source.instanceColor.clone();
+		this.morphTexture = source.morphTexture !== null ? source.morphTexture.clone() : null;
+		this.instanceColor = source.instanceColor !== null ? source.instanceColor.clone() : null;
 
 		this.count = source.count;
 
-		if ( source.boundingBox !== null ) this.boundingBox = source.boundingBox.clone();
-		if ( source.boundingSphere !== null ) this.boundingSphere = source.boundingSphere.clone();
+		this.boundingBox = source.boundingBox !== null ? source.boundingBox.clone() : null;
+		this.boundingSphere = source.boundingSphere !== null ? source.boundingSphere.clone() : null;
 
 		return this;
 
@@ -26465,6 +26478,10 @@ function copyArrayContents( src, target ) {
  * scene.add( batchedMesh );
  * ```
  *
+ * The first geometry added defines the layout of the batch. All subsequent geometries must
+ * match its index usage and provide its attributes with the same itemSize and normalized
+ * values. Additional attributes are ignored.
+ *
  * @augments Mesh
  */
 class BatchedMesh extends Mesh {
@@ -26725,7 +26742,7 @@ class BatchedMesh extends Mesh {
 			const dstAttribute = batchGeometry.getAttribute( attributeName );
 			if ( srcAttribute.itemSize !== dstAttribute.itemSize || srcAttribute.normalized !== dstAttribute.normalized ) {
 
-				throw new Error( 'THREE.BatchedMesh: All attributes must have a consistent itemSize and normalized value.' );
+				throw new Error( `THREE.BatchedMesh: Added geometry attribute "${ attributeName }" has an inconsistent itemSize or normalized value.` );
 
 			}
 
@@ -26782,7 +26799,7 @@ class BatchedMesh extends Mesh {
 	/**
 	 * Computes the bounding box, updating {@link BatchedMesh#boundingBox}.
 	 * Bounding boxes aren't computed by default. They need to be explicitly computed,
-	 * otherwise they are `null`.
+	 * otherwise they are `null`. Must be recomputed when instances change.
 	 */
 	computeBoundingBox() {
 
@@ -26811,8 +26828,8 @@ class BatchedMesh extends Mesh {
 
 	/**
 	 * Computes the bounding sphere, updating {@link BatchedMesh#boundingSphere}.
-	 * Bounding spheres aren't computed by default. They need to be explicitly computed,
-	 * otherwise they are `null`.
+	 * The engine computes the bounding sphere once when it is needed. Must be
+	 * recomputed when instances change.
 	 */
 	computeBoundingSphere() {
 
@@ -27771,10 +27788,14 @@ class BatchedMesh extends Mesh {
 		this._matricesTexture = source._matricesTexture.clone();
 		this._matricesTexture.image.data = this._matricesTexture.image.data.slice();
 
-		if ( this._colorsTexture !== null ) {
+		if ( source._colorsTexture !== null ) {
 
 			this._colorsTexture = source._colorsTexture.clone();
 			this._colorsTexture.image.data = this._colorsTexture.image.data.slice();
+
+		} else {
+
+			this._colorsTexture = null;
 
 		}
 
@@ -38884,7 +38905,7 @@ class MeshStandardMaterial extends Material {
 		 * map set, this value is not applied.
 		 *
 		 * @type {number}
-		 * @default 0
+		 * @default 1
 		 */
 		this.displacementScale = 1;
 
@@ -39155,7 +39176,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		 * property provides additional rotation to the vectors in the texture.
 		 *
 		 * @type {number}
-		 * @default 1
+		 * @default 0
 		 */
 		this.anisotropyRotation = 0;
 
@@ -39962,7 +39983,7 @@ class MeshPhongMaterial extends Material {
 		 * map set, this value is not applied.
 		 *
 		 * @type {number}
-		 * @default 0
+		 * @default 1
 		 */
 		this.displacementScale = 1;
 
@@ -40404,7 +40425,7 @@ class MeshToonMaterial extends Material {
 		 * map set, this value is not applied.
 		 *
 		 * @type {number}
-		 * @default 0
+		 * @default 1
 		 */
 		this.displacementScale = 1;
 
@@ -40638,7 +40659,7 @@ class MeshNormalMaterial extends Material {
 		 * map set, this value is not applied.
 		 *
 		 * @type {number}
-		 * @default 0
+		 * @default 1
 		 */
 		this.displacementScale = 1;
 
@@ -40926,7 +40947,7 @@ class MeshLambertMaterial extends Material {
 		 * map set, this value is not applied.
 		 *
 		 * @type {number}
-		 * @default 0
+		 * @default 1
 		 */
 		this.displacementScale = 1;
 
@@ -41237,7 +41258,7 @@ class MeshDepthMaterial extends Material {
 		 * map set, this value is not applied.
 		 *
 		 * @type {number}
-		 * @default 0
+		 * @default 1
 		 */
 		this.displacementScale = 1;
 
@@ -41387,7 +41408,7 @@ class MeshDistanceMaterial extends Material {
 		 * map set, this value is not applied.
 		 *
 		 * @type {number}
-		 * @default 0
+		 * @default 1
 		 */
 		this.displacementScale = 1;
 
@@ -41577,7 +41598,7 @@ class MeshMatcapMaterial extends Material {
 		 * map set, this value is not applied.
 		 *
 		 * @type {number}
-		 * @default 0
+		 * @default 1
 		 */
 		this.displacementScale = 1;
 
@@ -54360,7 +54381,7 @@ class AnimationAction {
 		 * loop state).
 		 *
 		 * @type {number}
-		 * @default Infinity
+		 * @default 0
 		 */
 		this.time = 0;
 
@@ -56751,6 +56772,8 @@ class Raycaster {
 	 * @property {Vector3} normal - Interpolated normal vector at point of intersection.
 	 * @property {number} instanceId - The index number of the instance where the ray
 	 * intersects the {@link InstancedMesh}.
+	 * @property {number} batchId - The index number of the instance where the ray
+	 * intersects the {@link BatchedMesh}.
 	 */
 
 	/**
@@ -56898,7 +56921,7 @@ class Clock {
 		 * Whether the clock is running or not.
 		 *
 		 * @type {boolean}
-		 * @default true
+		 * @default false
 		 */
 		this.running = false;
 
@@ -57961,9 +57984,7 @@ class Line3 {
 			c1.copy( p1 );
 			c2.copy( p2 );
 
-			c1.sub( c2 );
-
-			return c1.dot( c1 );
+			return c1.distanceToSquared( c2 );
 
 		}
 
@@ -59909,7 +59930,7 @@ class ShapePath {
 		 * The paths that have been generated for this shape.
 		 *
 		 * @type {Array<Path>}
-		 * @default null
+		 * @default []
 		 */
 		this.subPaths = [];
 

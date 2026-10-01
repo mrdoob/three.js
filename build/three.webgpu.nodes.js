@@ -2638,6 +2638,31 @@ class Node extends EventDispatcher {
 
 		} else if ( buildStage === 'generate' ) {
 
+			// A generated value is only visible in the block where it was declared and in its inner blocks.
+			if ( nodeData.flowBlock !== undefined ) {
+
+				let flowBlock = builder.flowBlock;
+
+				while ( flowBlock !== null && flowBlock !== nodeData.flowBlock ) {
+
+					flowBlock = flowBlock.parent;
+
+				}
+
+				if ( flowBlock === null ) {
+
+					nodeData.flowBlock = undefined;
+					nodeData.propertyName = undefined;
+					nodeData.snippet = undefined;
+					nodeData.generated = undefined;
+
+				}
+
+			}
+
+			const isCached = nodeData.propertyName !== undefined || nodeData.snippet !== undefined;
+			const flowCodeLength = builder.flow.code.length;
+
 			// References must be generated directly, even if a cached value exists.
 			const allowedCache = this.isCacheable( builder ) && builder.isReference( output ) === false;
 			const type = allowedCache ? builder.getVectorType( this.getNodeType( builder, output ) ) : null;
@@ -2645,12 +2670,6 @@ class Node extends EventDispatcher {
 			const generateOutput = cacheResult ? type : output;
 
 			if ( allowedCache && nodeData.propertyName !== undefined ) {
-
-				if ( nodeData.flowCodes !== undefined && builder.context.nodeBlock !== undefined ) {
-
-					builder.addFlowCodeHierarchy( this, builder.context.nodeBlock );
-
-				}
 
 				result = builder.format( nodeData.propertyName, type, output );
 
@@ -2688,10 +2707,6 @@ class Node extends EventDispatcher {
 
 						}
 
-					} else if ( nodeData.flowCodes !== undefined && builder.context.nodeBlock !== undefined ) {
-
-						builder.addFlowCodeHierarchy( this, builder.context.nodeBlock );
-
 					}
 
 					result = builder.format( result, type, generateOutput );
@@ -2715,7 +2730,8 @@ class Node extends EventDispatcher {
 				if ( cacheResult ) {
 
 					const readOnly = nodeData.assign !== true;
-					const nodeVar = builder.getVarFromNode( this, null, type, undefined, readOnly, true );
+					// Use a dedicated property, the node may already own a variable.
+					const nodeVar = builder.getVarFromNode( this, null, type, undefined, readOnly, true, 'cacheVariable' );
 					const propertyName = builder.getPropertyName( nodeVar );
 					const count = this.getArrayCount( builder );
 					const declarationPrefix = readOnly
@@ -2730,6 +2746,16 @@ class Node extends EventDispatcher {
 					result = builder.format( propertyName, type, output );
 
 				}
+
+			}
+
+			// Keep the block where a value was generated, so it is only reused where it is visible.
+			// A global node is a declaration visible in any block, unless it emitted code in this block.
+			const isLocal = this.isGlobal( builder ) === false || builder.flow.code.length !== flowCodeLength;
+
+			if ( isCached === false && ( nodeData.propertyName !== undefined || nodeData.snippet !== undefined ) && isLocal && builder.flowBlock !== null ) {
+
+				nodeData.flowBlock = builder.flowBlock;
 
 			}
 
@@ -3807,6 +3833,14 @@ class ConstNode extends InputNode {
 		 */
 		this.isConstNode = true;
 
+		/**
+		 * Whether this constant is an implicit number whose type can adapt to other operands.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.isWeak = false;
+
 	}
 
 	/**
@@ -3827,11 +3861,33 @@ class ConstNode extends InputNode {
 
 		if ( _regNum.test( type ) && _regNum.test( output ) ) {
 
-			return builder.generateConst( output, this.value );
+			let value = this.value;
+
+			// Preserve the declared integer value before converting to the output type.
+			if ( type === 'int' ) value = Math.trunc( value );
+			else if ( type === 'uint' ) value = value >= 0 ? Math.trunc( value ) : 0;
+
+			return builder.generateConst( output, value );
 
 		}
 
 		return builder.format( this.generateConst( builder ), type, output );
+
+	}
+
+	serialize( data ) {
+
+		super.serialize( data );
+
+		data.isWeak = this.isWeak;
+
+	}
+
+	deserialize( data ) {
+
+		super.deserialize( data );
+
+		this.isWeak = data.isWeak === true;
 
 	}
 
@@ -4419,9 +4475,10 @@ class ShaderCallNodeInternal extends Node {
 
 	}
 
-	isCacheable( /*builder*/ ) {
+	isCacheable( builder ) {
 
-		return false;
+		// A call is an expression unless its body has statements.
+		return this.getOutputNode( builder ).nodes.length === 0;
 
 	}
 
@@ -4842,7 +4899,7 @@ for ( const float of floats ) floatsCacheMap.set( - float, new ConstNode( - floa
 
 const cacheMaps = { bool: boolsCacheMap, uint: uintsCacheMap, ints: intsCacheMap, float: floatsCacheMap };
 
-const constNodesCacheMap = new Map( [ ...boolsCacheMap, ...floatsCacheMap ] );
+const constNodesCacheMap = new Map( boolsCacheMap );
 
 const getConstNode = ( value, type ) => {
 
@@ -4856,11 +4913,18 @@ const getConstNode = ( value, type ) => {
 
 	} else {
 
-		return new ConstNode( value, type );
+		const node = new ConstNode( value, type );
+
+		// Implicit numbers are weak and can adapt to the type of other operands.
+		node.isWeak = ! type && typeof value === 'number';
+
+		return node;
 
 	}
 
 };
+
+for ( const value of floatsCacheMap.keys() ) constNodesCacheMap.set( value, getConstNode( value ) );
 
 const ConvertType = function ( type, cacheMap = null ) {
 
@@ -6397,7 +6461,7 @@ class AssignNode extends Node {
 
 		let snippet;
 
-		if ( nodeData.initialized === true ) {
+		if ( nodeData.propertyName !== undefined ) {
 
 			if ( output !== 'void' ) {
 
@@ -6449,7 +6513,8 @@ class AssignNode extends Node {
 
 		}
 
-		nodeData.initialized = true;
+		// The value of an assignment is its target.
+		nodeData.propertyName = target;
 
 		return builder.format( snippet, targetType, output );
 
@@ -6770,10 +6835,6 @@ class OperatorNode extends Node {
 
 			return output || 'void';
 
-		} else if ( op === '%' ) {
-
-			return typeA;
-
 		} else if ( op === '~' || op === '&' || op === '|' || op === '^' || op === '>>' || op === '<<' ) {
 
 			return builder.getIntegerType( typeA );
@@ -6794,13 +6855,17 @@ class OperatorNode extends Node {
 
 			return typeLength > 1 ? `bvec${ typeLength }` : 'bool';
 
+		} else if ( typeB === null ) {
+
+			return typeA;
+
 		} else {
 
 			// Handle matrix operations
 
 			if ( builder.isMatrix( typeA ) ) {
 
-				if ( typeB === 'float' ) {
+				if ( builder.isScalar( typeB ) ) {
 
 					return typeA; // matrix * scalar = matrix
 
@@ -6816,7 +6881,7 @@ class OperatorNode extends Node {
 
 			} else if ( builder.isMatrix( typeB ) ) {
 
-				if ( typeA === 'float' ) {
+				if ( builder.isScalar( typeA ) ) {
 
 					return typeB; // scalar * matrix = matrix
 
@@ -6830,15 +6895,13 @@ class OperatorNode extends Node {
 
 			// Handle non-matrix cases
 
-			if ( builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ) {
+			// anytype x anytype: use the greater length vector
 
-				// anytype x anytype: use the greater length vector
+			const type = builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ? typeB : typeA;
 
-				return typeB;
+			const promotedType = builder.getPromotedComponentType( aNode, bNode );
 
-			}
-
-			return typeA;
+			return builder.changeComponentType( type, promotedType );
 
 		}
 
@@ -6862,33 +6925,18 @@ class OperatorNode extends Node {
 
 			if ( op === '<' || op === '>' || op === '<=' || op === '>=' || op === '==' || op === '!=' ) {
 
-				if ( builder.isVector( typeA ) ) {
+				const length = Math.max( builder.getTypeLength( typeA ), builder.getTypeLength( typeB ) );
 
-					typeB = typeA;
-
-				} else if ( builder.isVector( typeB ) ) {
-
-					typeA = typeB;
-
-				} else if ( typeA !== typeB ) {
-
-					typeA = typeB = 'float';
-
-				}
+				typeA = typeB = builder.getTypeFromLength( length, builder.getPromotedComponentType( aNode, bNode ) );
 
 			} else if ( op === '>>' || op === '<<' ) {
 
 				typeA = type;
 				typeB = builder.changeComponentType( typeB, 'uint' );
 
-			} else if ( op === '%' ) {
-
-				typeA = type;
-				typeB = builder.isInteger( typeA ) && builder.isInteger( typeB ) ? typeB : typeA;
-
 			} else if ( builder.isMatrix( typeA ) ) {
 
-				if ( typeB === 'float' ) {
+				if ( builder.isScalar( typeB ) ) {
 
 					// Keep matrix type for typeA, but ensure typeB stays float
 
@@ -6907,7 +6955,7 @@ class OperatorNode extends Node {
 
 			} else if ( builder.isMatrix( typeB ) ) {
 
-				if ( typeA === 'float' ) {
+				if ( builder.isScalar( typeA ) ) {
 
 					// Keep matrix type for typeB, but ensure typeA stays float
 
@@ -7008,11 +7056,11 @@ class OperatorNode extends Node {
 
 				// Handle matrix operations
 
-				if ( builder.isMatrix( typeA ) && typeB === 'float' ) {
+				if ( builder.isMatrix( typeA ) && builder.isScalar( typeB ) ) {
 
 					return builder.format( `( ${ b } ${ op } ${ a } )`, type, output );
 
-				} else if ( typeA === 'float' && builder.isMatrix( typeB ) ) {
+				} else if ( builder.isScalar( typeA ) && builder.isMatrix( typeB ) ) {
 
 					return builder.format( `${ a } ${ op } ${ b }`, type, output );
 
@@ -7040,7 +7088,7 @@ class OperatorNode extends Node {
 
 			} else {
 
-				if ( builder.isMatrix( typeA ) && typeB === 'float' ) {
+				if ( builder.isMatrix( typeA ) && builder.isScalar( typeB ) ) {
 
 					return builder.format( `${ b } ${ op } ${ a }`, type, output );
 
@@ -7500,21 +7548,31 @@ class MathNode extends Node {
 		const bLen = builder.isMatrix( bType ) ? 0 : builder.getTypeLength( bType );
 		const cLen = builder.isMatrix( cType ) ? 0 : builder.getTypeLength( cType );
 
+		let type;
+
 		if ( aLen > bLen && aLen > cLen ) {
 
-			return aType;
+			type = aType;
 
 		} else if ( bLen > cLen ) {
 
-			return bType;
+			type = bType;
 
 		} else if ( cLen > aLen ) {
 
-			return cType;
+			type = cType;
+
+		} else {
+
+			type = aType;
 
 		}
 
-		return aType;
+		if ( builder.isMatrix( type ) ) return type;
+
+		const promotedType = _floatMethods.has( this.method ) ? 'float' : builder.getPromotedComponentType( this.aNode, this.bNode, this.cNode );
+
+		return builder.changeComponentType( type, promotedType );
 
 	}
 
@@ -7564,7 +7622,7 @@ class MathNode extends Node {
 
 		} else if ( method === MathNode.RECIPROCAL ) {
 
-			outputNode = div( 1.0, aNode );
+			outputNode = div( float( 1 ), aNode );
 
 		} else if ( method === MathNode.DIFFERENCE ) {
 
@@ -7781,6 +7839,18 @@ MathNode.CLAMP = 'clamp';
 MathNode.REFRACT = 'refract';
 MathNode.SMOOTHSTEP = 'smoothstep';
 MathNode.FACEFORWARD = 'faceforward';
+
+// Methods that are only defined for floating-point types.
+
+const _floatMethods = new Set( [
+	MathNode.RADIANS, MathNode.DEGREES, MathNode.EXP, MathNode.EXP2, MathNode.LOG, MathNode.LOG2,
+	MathNode.SQRT, MathNode.INVERSE_SQRT, MathNode.FLOOR, MathNode.CEIL, MathNode.NORMALIZE, MathNode.FRACT,
+	MathNode.SIN, MathNode.SINH, MathNode.COS, MathNode.COSH, MathNode.TAN, MathNode.TANH,
+	MathNode.ASIN, MathNode.ASINH, MathNode.ACOS, MathNode.ACOSH, MathNode.ATAN, MathNode.ATANH,
+	MathNode.LENGTH, MathNode.DFDX, MathNode.DFDY, MathNode.ROUND, MathNode.TRUNC, MathNode.FWIDTH, MathNode.RECIPROCAL,
+	MathNode.STEP, MathNode.REFLECT, MathNode.DISTANCE, MathNode.DOT, MathNode.CROSS, MathNode.POW,
+	MathNode.MIX, MathNode.REFRACT, MathNode.SMOOTHSTEP, MathNode.FACEFORWARD
+] );
 
 // 1 inputs
 
@@ -8619,6 +8689,33 @@ addMethodChaining( 'inverse', inverse );
 addMethodChaining( 'rand', rand );
 
 /**
+ * Custom error class for node-related errors, including stack trace information.
+ */
+class NodeError extends Error {
+
+	constructor( message, stackTrace = null ) {
+
+		super( message );
+
+		/**
+		 * The name of the error.
+		 *
+		 * @type {string}
+		 */
+		this.name = 'NodeError';
+
+		/**
+		 * The stack trace associated with the error.
+		 *
+		 * @type {?StackTrace}
+		 */
+		this.stackTrace = stackTrace;
+
+	}
+
+}
+
+/**
  * Represents a logical `if/else` statement. Can be used as an alternative
  * to the `If()`/`Else()` syntax.
  *
@@ -8627,6 +8724,19 @@ addMethodChaining( 'rand', rand );
  *
  * ```js
  * velocity = position.greaterThanEqual( limit ).select( velocity.negate(), velocity );
+ * ```
+ *
+ * When the condition is itself a vector (e.g. the `bvec4` produced by
+ * `someVec4.greaterThanEqual( someOtherVec4 )`), `select()` resolves
+ * per-component - each output lane picks independently based on its own
+ * condition component, the same way WGSL's native `select()` and GLSL's
+ * `mix( x, y, bvecN )` do - rather than picking one branch for the whole
+ * vector. The condition and values are converted to the largest vector width,
+ * with the condition converted to boolean components. Scalar values are broadcast.
+ *
+ * ```js
+ * // per-component: each channel picks independently
+ * const clamped = value.greaterThan( vec3( 1.0 ) ).select( vec3( 1.0 ), value );
  * ```
  *
  * @augments Node
@@ -8689,7 +8799,7 @@ class ConditionalNode extends Node {
 	 */
 	generateNodeType( builder ) {
 
-		const { ifNode, elseNode } = builder.getNodeProperties( this );
+		const { condNode, ifNode, elseNode } = builder.getNodeProperties( this );
 
 		if ( ifNode === undefined ) {
 
@@ -8701,36 +8811,35 @@ class ConditionalNode extends Node {
 
 		}
 
-		const ifType = ifNode.getNodeType( builder );
+		let type = ifNode.getNodeType( builder );
 
 		if ( elseNode !== null ) {
 
 			const elseType = elseNode.getNodeType( builder );
 
-			if ( builder.getTypeLength( elseType ) > builder.getTypeLength( ifType ) ) {
+			if ( builder.getTypeLength( elseType ) > builder.getTypeLength( type ) ) {
 
-				return elseType;
+				type = elseType;
 
 			}
 
 		}
 
-		return ifType;
+		const condLength = builder.getTypeLength( condNode.getNodeType( builder ) );
+
+		if ( condLength > 1 && ! builder.isReference( type ) && ( builder.getTypeLength( type ) === 1 || builder.isVector( builder.getVectorType( type ) ) ) ) {
+
+			type = builder.getTypeFromLength( Math.max( condLength, builder.getTypeLength( type ) ), builder.getComponentType( type ) );
+
+		}
+
+		return type;
 
 	}
 
 	setup( builder ) {
 
-		const condNode = this.condNode;
-		const ifNode = this.ifNode.isolate();
-		const elseNode = this.elseNode ? this.elseNode.isolate() : null;
-
-		//
-
-		const currentNodeBlock = builder.context.nodeBlock;
-
-		builder.getDataFromNode( ifNode ).parentNodeBlock = currentNodeBlock;
-		if ( elseNode !== null ) builder.getDataFromNode( elseNode ).parentNodeBlock = currentNodeBlock;
+		const { condNode, ifNode, elseNode } = this;
 
 		//
 
@@ -8749,9 +8858,9 @@ class ConditionalNode extends Node {
 
 		const nodeData = builder.getDataFromNode( this );
 
-		if ( nodeData.nodeProperty !== undefined ) {
+		if ( nodeData.propertyName !== undefined ) {
 
-			return nodeData.nodeProperty;
+			return builder.format( nodeData.propertyName, type, output );
 
 		}
 
@@ -8761,7 +8870,48 @@ class ConditionalNode extends Node {
 		const needsOutput = output !== 'void';
 		const nodeProperty = needsOutput ? property( type ).build( builder ) : '';
 
-		nodeData.nodeProperty = nodeProperty;
+		nodeData.propertyName = nodeProperty;
+
+		// A vector condition selects per-component - see getVectorSelect().
+		const condType = condNode.getNodeType( builder );
+		const condLength = builder.getTypeLength( condType );
+
+		if ( condLength > 1 ) {
+
+			const vectorType = builder.getVectorType( type );
+
+			if ( builder.isReference( type ) || ! builder.isVector( vectorType ) ) {
+
+				throw new NodeError( `TSL: select() with a vector condition ("${ condType }") requires scalar or vector values, received "${ type }".`, this.stackTrace );
+
+			}
+
+			// No "else": unselected lanes fall back to the type's zero value.
+			let elseSnippet;
+
+			if ( elseNode !== null ) {
+
+				elseSnippet = elseNode.build( builder, type );
+
+			} else {
+
+				elseSnippet = builder.generateConst( type );
+
+			}
+
+			const boolType = builder.changeComponentType( type, 'bool' );
+			const condSnippet = condNode.build( builder, boolType );
+			const ifSnippet = ifNode.build( builder, type );
+
+			const mathSnippet = builder.getVectorSelect( condSnippet, ifSnippet, elseSnippet, type );
+
+			if ( ! needsOutput ) return '';
+
+			builder.addFlowCode( `\n${ builder.tab }${ nodeProperty } = ${ mathSnippet };\n\n` );
+
+			return builder.format( nodeProperty, type, output );
+
+		}
 
 		const nodeSnippet = condNode.build( builder, 'bool' );
 		const isUniformFlow = builder.context.uniformFlow;
@@ -8781,7 +8931,13 @@ class ConditionalNode extends Node {
 
 		builder.addFlowCode( `\n${ builder.tab }if ( ${ nodeSnippet } ) {\n\n` ).addFlowTab();
 
+		const flowBlock = builder.flowBlock;
+
+		builder.flowBlock = { parent: flowBlock };
+
 		let ifSnippet = ifNode.build( builder, type );
+
+		builder.flowBlock = flowBlock;
 
 		if ( ifSnippet ) {
 
@@ -8811,7 +8967,11 @@ class ConditionalNode extends Node {
 
 			builder.addFlowCode( ' else {\n\n' ).addFlowTab();
 
+			builder.flowBlock = { parent: flowBlock };
+
 			let elseSnippet = elseNode.build( builder, type );
+
+			builder.flowBlock = flowBlock;
 
 			if ( elseSnippet ) {
 
@@ -9387,42 +9547,22 @@ class VarNode extends Node {
 
 		if ( this._hasStack( builder ) === false && builder.buildStage === 'setup' ) {
 
-			if ( builder.context.nodeLoop || builder.context.nodeBlock ) {
+			// A node created while a block is generated is declared where it is generated.
+			if ( ( builder.context.nodeLoop || builder.context.nodeBlock ) && builder.flowBlock === null ) {
 
-				let addBefore = false;
-
-				if ( this.node.isShaderCallNodeInternal && this.node.shaderNode.getLayout() === null ) {
-
-					if ( builder.fnCall && builder.fnCall.shaderNode ) {
-
-						const shaderNodeData = builder.getDataFromNode( this.node.shaderNode );
-
-						if ( shaderNodeData.hasLoop ) {
-
-							const data = builder.getDataFromNode( this );
-							data.forceDeclaration = true;
-
-							addBefore = true;
-
-						}
-
-					}
-
-				}
-
-				const baseStack = builder.getBaseStack();
-
-				if ( addBefore ) {
-
-					baseStack.addToStackBefore( this );
-
-				} else {
-
-					baseStack.addToStack( this );
-
-				}
+				builder.getBaseStack().addToStack( this );
 
 			}
+
+		} else if ( this.intent === true && builder.context.nodeLoop && builder.buildStage === 'analyze' && this.node.isCacheable( builder ) === false && builder.isDeterministic( this.node ) === false ) {
+
+			// A value that cannot be cached, e.g. a function call, is evaluated once at its declaration
+			// if it is used in a loop that runs after it, otherwise the loop would repeat it.
+			const data = builder.getDataFromNode( this );
+			const declarationIndex = builder.activeStacks.indexOf( data.stack );
+			const loopIndex = builder.activeStacks.indexOf( builder.getDataFromNode( builder.context.nodeLoop ).stack );
+
+			if ( declarationIndex !== -1 && loopIndex >= declarationIndex ) data.forceDeclaration = true;
 
 		}
 
@@ -9814,7 +9954,10 @@ class VaryingNode extends Node {
 		const properties = builder.getNodeProperties( this );
 		const varying = this.setupVarying( builder );
 
-		if ( properties[ propertyKey ] === undefined ) {
+		// The vertex assignment is emitted once per block, from the fragment stage it is emitted outside of any block.
+		const flowBlock = builder.shaderStage === NodeShaderStage.VERTEX ? builder.flowBlock : null;
+
+		if ( properties[ propertyKey ] !== flowBlock ) {
 
 			const type = this.getNodeType( builder );
 			const propertyName = builder.getPropertyName( varying, NodeShaderStage.VERTEX );
@@ -9832,7 +9975,7 @@ class VaryingNode extends Node {
 
 			}
 
-			properties[ propertyKey ] = propertyName;
+			properties[ propertyKey ] = flowBlock;
 
 		}
 
@@ -12903,33 +13046,6 @@ class MaxMipLevelNode extends UniformNode {
  * @returns {MaxMipLevelNode}
  */
 const maxMipLevel = /*@__PURE__*/ nodeProxy( MaxMipLevelNode ).setParameterLength( 1 );
-
-/**
- * Custom error class for node-related errors, including stack trace information.
- */
-class NodeError extends Error {
-
-	constructor( message, stackTrace = null ) {
-
-		super( message );
-
-		/**
-		 * The name of the error.
-		 *
-		 * @type {string}
-		 */
-		this.name = 'NodeError';
-
-		/**
-		 * The stack trace associated with the error.
-		 *
-		 * @type {?StackTrace}
-		 */
-		this.stackTrace = stackTrace;
-
-	}
-
-}
 
 const EmptyTexture$1 = /*@__PURE__*/ new Texture();
 
@@ -19895,8 +20011,7 @@ class LoopNode extends Node {
 
 		const fnCall = params[ params.length - 1 ]( inputs );
 
-		// Keep values first generated in the loop body out of the parent cache.
-		properties.returnsNode = fnCall.isolate().context( { nodeLoop: fnCall } );
+		properties.returnsNode = fnCall.context( { nodeLoop: this, nodeBlock: fnCall } );
 		properties.stackNode = stack;
 
 		const baseParam = params[ 0 ];
@@ -19905,7 +20020,7 @@ class LoopNode extends Node {
 
 			const fnUpdateCall = Fn( baseParam.update )( inputs );
 
-			properties.updateNode = fnUpdateCall.context( { nodeLoop: fnUpdateCall } );
+			properties.updateNode = fnUpdateCall.context( { nodeLoop: this } );
 
 		}
 
@@ -19934,13 +20049,6 @@ class LoopNode extends Node {
 		// setup properties
 
 		this.getProperties( builder );
-
-		if ( builder.fnCall ) {
-
-			const shaderNodeData = builder.getDataFromNode( builder.fnCall.shaderNode );
-			shaderNodeData.hasLoop = true;
-
-		}
 
 	}
 
@@ -20106,9 +20214,15 @@ class LoopNode extends Node {
 
 		}
 
+		const flowBlock = builder.flowBlock;
+
+		builder.flowBlock = { parent: flowBlock };
+
 		const stackSnippet = stackNode.build( builder, 'void' );
 
 		properties.returnsNode.build( builder, 'void' );
+
+		builder.flowBlock = flowBlock;
 
 		builder.removeFlowTab().addFlowCode( '\n' + builder.tab + stackSnippet );
 
@@ -23108,6 +23222,196 @@ class NodeMaterial extends Material {
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 
 		return this;
+
+	}
+
+}
+
+/**
+ * A material instance that reuses the shader of a node material with its own properties.
+ * All instances created from the same node material share a single shader build, so
+ * configure the node material before creating instances. Instance values are read in
+ * the shared node graph with `materialReference( name, type )`. Node properties such as
+ * `colorNode` are read-only and always read from the node material.
+ *
+ * ```js
+ * const nodeMaterial = new MeshBasicNodeMaterial();
+ * nodeMaterial.colorNode = materialReference( 'myColor', 'color' );
+ *
+ * const material = new ProxyNodeMaterial( nodeMaterial );
+ * material.myColor = new Color( 1, 0, 0 );
+ * ```
+ *
+ * @augments Material
+ */
+class ProxyNodeMaterial extends Material {
+
+	/**
+	 * Constructs a new proxy node material.
+	 *
+	 * @param {NodeMaterial} nodeMaterial - The node material defining the shared shader.
+	 * @throws {TypeError} When the given material is not a node material.
+	 */
+	constructor( nodeMaterial ) {
+
+		super();
+
+		if ( nodeMaterial?.isNodeMaterial !== true ) {
+
+			throw new TypeError( 'THREE.ProxyNodeMaterial: The parameter must be a NodeMaterial.' );
+
+		}
+
+		copyProperties( this, nodeMaterial );
+
+		// Instance values often live in `userData`, so each instance starts with its own copy.
+
+		this.userData = cloneUserData( nodeMaterial.userData );
+
+		this.type = 'ProxyNodeMaterial';
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isProxyNodeMaterial = true;
+
+		/**
+		 * The node material defining the shared shader.
+		 *
+		 * @type {NodeMaterial}
+		 */
+		this.nodeMaterial = nodeMaterial;
+
+	}
+
+	/**
+	 * Returns a cache key that identifies the shared shader, without traversing
+	 * the node graph for each instance.
+	 *
+	 * @return {string} The custom program cache key.
+	 */
+	customProgramCacheKey() {
+
+		return this.nodeMaterial.uuid + ',' + this.nodeMaterial.version;
+
+	}
+
+	/**
+	 * Builds the shader of the node material while keeping this instance
+	 * as `builder.material`.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	build( builder ) {
+
+		this.nodeMaterial.build( builder );
+
+	}
+
+	/**
+	 * The version of the node material. Setting `needsUpdate` on the node material
+	 * updates all its instances, while setting it on an instance has no effect.
+	 *
+	 * @type {number}
+	 */
+	get version() {
+
+		return this.nodeMaterial.version;
+
+	}
+
+	set version( value ) {}
+
+	/**
+	 * Copies the values of the given proxy node material to this instance.
+	 * Object values such as colors are shared with the source, except in `userData`.
+	 * Unlike {@link Material#copy}, `userData` is not copied via JSON: its first level
+	 * values are cloned when possible, so types such as colors are preserved. Textures
+	 * remain shared.
+	 *
+	 * @param {ProxyNodeMaterial} source - The material to copy.
+	 * @return {ProxyNodeMaterial} A reference to this instance.
+	 */
+	copy( source ) {
+
+		copyProperties( this, source );
+
+		this.userData = cloneUserData( source.userData );
+
+		return this;
+
+	}
+
+	/**
+	 * Returns a new proxy node material that shares the same node material.
+	 *
+	 * @return {ProxyNodeMaterial} A clone of this instance.
+	 */
+	clone() {
+
+		return new this.constructor( this.nodeMaterial ).copy( this );
+
+	}
+
+}
+
+// Read-only accessors shared by all instances, so node properties always reflect the node material.
+// They must be enumerable since the renderer detects node materials by iterating their properties.
+
+const _nodeDescriptors = {};
+
+function getNodeDescriptor( property ) {
+
+	return _nodeDescriptors[ property ] ??= {
+		enumerable: true,
+		get() {
+
+			return this.nodeMaterial[ property ];
+
+		}
+	};
+
+}
+
+// Copies the first level of user data, cloning values such as colors and sharing textures.
+
+function cloneUserData( userData ) {
+
+	const result = {};
+
+	for ( const key in userData ) {
+
+		const value = userData[ key ];
+
+		result[ key ] = value?.clone !== undefined && value.isTexture !== true ? value.clone() : value;
+
+	}
+
+	return result;
+
+}
+
+// Copies configuration while preserving the target's identity and events.
+
+function copyProperties( target, source ) {
+
+	for ( const property of Object.keys( source ) ) {
+
+		if ( property === 'uuid' || property === 'version' || property === '_listeners' ) continue;
+
+		if ( property.endsWith( 'Node' ) ) {
+
+			if ( Object.hasOwn( target, property ) === false ) Object.defineProperty( target, property, getNodeDescriptor( property ) );
+
+		} else {
+
+			target[ property ] = source[ property ];
+
+		}
 
 	}
 
@@ -26148,6 +26452,14 @@ class PhysicalLightingModel extends LightingModel {
 		this.dfg = null;
 
 		/**
+		 * The EON directional albedo, shared by the indirect lighting paths.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.eonDirectionalAlbedo = null;
+
+		/**
 		 * The multi-scattering energy compensation for direct lighting.
 		 *
 		 * @type {?Node}
@@ -26274,6 +26586,12 @@ class PhysicalLightingModel extends LightingModel {
 		this.multiScatteringDielectric = vec3().toVar( 'multiScatteringDielectric' );
 
 		this.computeMultiscattering( this.singleScatteringDielectric, this.multiScatteringDielectric, specularF90, specularColor, this.iridescenceF0Dielectric );
+
+		if ( this.diffuseRoughness === true ) {
+
+			this.eonDirectionalAlbedo = EON_DirectionalAlbedo( { diffuseColor: diffuseColor.rgb, roughness: diffuseRoughness, dotNV: dotNV } );
+
+		}
 
 		super.start( builder );
 
@@ -26455,7 +26773,7 @@ class PhysicalLightingModel extends LightingModel {
 		const multiScattering = this.multiScatteringDielectric;
 
 		const diffuseBRDF = this.diffuseRoughness
-			? EON_DirectionalAlbedo( { diffuseColor: diffuseColor.rgb, roughness: diffuseRoughness, dotNV: normalView.dot( positionViewDirection ).clamp() } ).mul( metalness.oneMinus(), 1 / Math.PI )
+			? this.eonDirectionalAlbedo.mul( metalness.oneMinus(), 1 / Math.PI )
 			: BRDF_Lambert( { diffuseColor: diffuseContribution } );
 
 		const diffuse = irradiance.mul( diffuseBRDF ).mul( singleScattering.add( multiScattering ).oneMinus() ).toVar();
@@ -26532,7 +26850,7 @@ class PhysicalLightingModel extends LightingModel {
 		const totalScatteringDielectric = singleScatteringDielectric.add( multiScatteringDielectric );
 
 		const diffuseAlbedo = this.diffuseRoughness
-			? EON_DirectionalAlbedo( { diffuseColor: diffuseColor.rgb, roughness: diffuseRoughness, dotNV: normalView.dot( positionViewDirection ).clamp() } ).mul( metalness.oneMinus() )
+			? this.eonDirectionalAlbedo.mul( metalness.oneMinus() )
 			: diffuseContribution;
 
 		const diffuse = diffuseAlbedo.mul( totalScatteringDielectric.oneMinus() );
@@ -29777,7 +30095,7 @@ class ShadowNodeMaterial extends NodeMaterial {
 }
 
 const scatteringDensity = property( 'vec3' );
-const linearDepthRay = property( 'vec3' );
+const linearDepthRay = property( 'float' ); // always assigned a scalar (see `start()`) - not a per-channel value
 const outgoingRayLight = property( 'vec3' );
 
 /**
@@ -31702,12 +32020,30 @@ class Attributes extends DataMap {
 		 */
 		this.info = info;
 
+		/**
+		 * Stores weak references to the storage attributes with attached
+		 * `dispose` event listeners.
+		 *
+		 * @private
+		 * @type {Set<WeakRef<StorageBufferAttribute|StorageInstancedBufferAttribute>>}
+		 */
+		this._tracked = new Set();
+
+		/**
+		 * Removes weak references from `_tracked` when their attribute
+		 * has been garbage collected without an explicit `dispose()`.
+		 *
+		 * @private
+		 * @type {FinalizationRegistry}
+		 */
+		this._registry = new FinalizationRegistry( ( ref ) => this._tracked.delete( ref ) );
+
 	}
 
 	/**
 	 * Deletes the data for the given attribute.
 	 *
-	 * @param {BufferAttribute} attribute - The attribute.
+	 * @param {BufferAttribute|InterleavedBuffer} attribute - The attribute.
 	 * @return {?Object} The deleted attribute data.
 	 */
 	delete( attribute ) {
@@ -31715,6 +32051,15 @@ class Attributes extends DataMap {
 		const attributeData = super.delete( attribute );
 
 		if ( attributeData !== null ) {
+
+			if ( attribute.isStorageBufferAttribute === true || attribute.isStorageInstancedBufferAttribute === true ) {
+
+				attribute.removeEventListener( 'dispose', attributeData.onDispose );
+
+				this._tracked.delete( attributeData.ref );
+				this._registry.unregister( attributeData.ref );
+
+			}
 
 			this.backend.destroyAttribute( attribute );
 
@@ -31730,7 +32075,7 @@ class Attributes extends DataMap {
 	 * Updates the given attribute. This method creates attribute buffers
 	 * for new attributes and updates data for existing ones.
 	 *
-	 * @param {BufferAttribute} attribute - The attribute to update.
+	 * @param {BufferAttribute|InterleavedBuffer} attribute - The attribute to update.
 	 * @param {number} type - The attribute type.
 	 */
 	update( attribute, type ) {
@@ -31761,17 +32106,35 @@ class Attributes extends DataMap {
 
 			}
 
-			data.version = this._getBufferAttribute( attribute ).version;
+			data.version = attribute.version;
+
+			// only storage buffer attributes support disposal
+
+			if ( attribute.isStorageBufferAttribute === true || attribute.isStorageInstancedBufferAttribute === true ) {
+
+				data.onDispose = () => {
+
+					this.delete( attribute );
+
+				};
+
+				attribute.addEventListener( 'dispose', data.onDispose );
+
+				// see #31798 why tracking separate remove listeners is required right now
+				data.ref = new WeakRef( attribute );
+
+				this._tracked.add( data.ref );
+				this._registry.register( attribute, data.ref, data.ref );
+
+			}
 
 		} else {
 
-			const bufferAttribute = this._getBufferAttribute( attribute );
-
-			if ( data.version < bufferAttribute.version || bufferAttribute.usage === DynamicDrawUsage ) {
+			if ( data.version < attribute.version || attribute.usage === DynamicDrawUsage ) {
 
 				this.backend.updateAttribute( attribute );
 
-				data.version = bufferAttribute.version;
+				data.version = attribute.version;
 
 			}
 
@@ -31779,18 +32142,21 @@ class Attributes extends DataMap {
 
 	}
 
-	/**
-	 * Utility method for handling interleaved buffer attributes correctly.
-	 * To process them, their `InterleavedBuffer` is returned.
-	 *
-	 * @param {BufferAttribute} attribute - The attribute.
-	 * @return {BufferAttribute|InterleavedBuffer}
-	 */
-	_getBufferAttribute( attribute ) {
+	dispose() {
 
-		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
+		for ( const ref of this._tracked ) {
 
-		return attribute;
+			const attribute = ref.deref();
+
+			if ( attribute === undefined || this.has( attribute ) === false ) continue;
+
+			this.delete( attribute );
+
+		}
+
+		this._tracked.clear();
+
+		super.dispose();
 
 	}
 
@@ -32014,7 +32380,7 @@ class Geometries extends DataMap {
 
 			for ( const attribute of Object.values( geometry.attributes ) ) {
 
-				this.attributes.delete( attribute );
+				this.attributes.delete( this.backend.getBufferAttribute( attribute ) );
 
 			}
 
@@ -32106,33 +32472,13 @@ class Geometries extends DataMap {
 
 		const callId = this.info.render.calls;
 
-		if ( ! attribute.isInterleavedBufferAttribute ) {
+		const bufferAttribute = this.backend.getBufferAttribute( attribute );
 
-			if ( this.attributeCall.get( attribute ) !== callId ) {
+		if ( this.attributeCall.get( bufferAttribute ) !== callId ) {
 
-				this.attributes.update( attribute, type );
+			this.attributes.update( bufferAttribute, type );
 
-				this.attributeCall.set( attribute, callId );
-
-			}
-
-		} else {
-
-			if ( this.attributeCall.get( attribute ) === undefined ) {
-
-				this.attributes.update( attribute, type );
-
-				this.attributeCall.set( attribute, callId );
-
-			} else if ( this.attributeCall.get( attribute.data ) !== callId ) {
-
-				this.attributes.update( attribute, type );
-
-				this.attributeCall.set( attribute.data, callId );
-
-				this.attributeCall.set( attribute, callId );
-
-			}
+			this.attributeCall.set( bufferAttribute, callId );
 
 		}
 
@@ -32218,7 +32564,7 @@ class Geometries extends DataMap {
 
 			if ( currentAttributes.has( attribute ) === false ) {
 
-				this.attributes.delete( attribute );
+				this.attributes.delete( this.backend.getBufferAttribute( attribute ) );
 
 			}
 
@@ -33473,6 +33819,50 @@ class Pipelines extends DataMap {
 
 }
 
+let _id$8 = 0;
+
+/**
+ * A bind group represents a collection of bindings and thus a collection
+ * or resources. Bind groups are assigned to pipelines to provide them
+ * with the required resources (like uniform buffers or textures).
+ *
+ * @private
+ */
+class BindGroup {
+
+	/**
+	 * Constructs a new bind group.
+	 *
+	 * @param {string} name - The bind group's name.
+	 * @param {Array<Binding>} bindings - An array of bindings.
+	 */
+	constructor( name = '', bindings = [] ) {
+
+		/**
+		 * The bind group's name.
+		 *
+		 * @type {string}
+		 */
+		this.name = name;
+
+		/**
+		 * An array of bindings.
+		 *
+		 * @type {Array<Binding>}
+		 */
+		this.bindings = bindings;
+
+		/**
+		 * The group's ID.
+		 *
+		 * @type {number}
+		 */
+		this.id = _id$8 ++;
+
+	}
+
+}
+
 /**
  * This renderer module manages the bindings of the renderer.
  *
@@ -33537,6 +33927,14 @@ class Bindings extends DataMap {
 		 */
 		this.info = info;
 
+		/**
+		 * Shared bind groups per render context.
+		 *
+		 * @private
+		 * @type {WeakMap<RenderContext|Renderer,Map<number,BindGroup>>}
+		 */
+		this._sharedBindGroups = new WeakMap();
+
 		this.pipelines.bindings = this; // assign bindings to pipelines
 
 	}
@@ -33596,6 +33994,77 @@ class Bindings extends DataMap {
 		}
 
 		return bindings;
+
+	}
+
+	/**
+	 * Returns the shared bind group for the given bindings and the current render context.
+	 * If it does not exist yet, it is created with the given name and bindings.
+	 *
+	 * @param {string} name - The bind group's name.
+	 * @param {Array<Binding>} bindings - An array of bindings.
+	 * @return {BindGroup} The shared bind group.
+	 */
+	getSharedBindGroup( name, bindings ) {
+
+		// build cache key
+
+		let cacheKeyString = '';
+
+		for ( const binding of bindings ) {
+
+			if ( binding.isNodeUniformsGroup ) {
+
+				binding.uniforms.sort( ( a, b ) => a.nodeUniform.node.id - b.nodeUniform.node.id );
+
+				for ( const uniform of binding.uniforms ) {
+
+					cacheKeyString += uniform.nodeUniform.node.id;
+
+				}
+
+			} else {
+
+				cacheKeyString += binding.nodeUniform.id;
+
+			}
+
+		}
+
+		const cacheKey = hashString( cacheKeyString );
+
+		// lookup bind group cache
+
+		const renderer = this.backend.renderer;
+		const renderContext = renderer._currentRenderContext || renderer; // use renderer as fallback until we have a compute context
+
+		let bindGroupsCache = this._sharedBindGroups.get( renderContext );
+
+		if ( bindGroupsCache === undefined ) {
+
+			bindGroupsCache = new Map();
+
+			this._sharedBindGroups.set( renderContext, bindGroupsCache );
+
+		}
+
+		// lookup bind group
+
+		let bindGroup = bindGroupsCache.get( cacheKey );
+
+		if ( bindGroup === undefined ) {
+
+			bindGroup = new BindGroup( name, bindings );
+
+			bindGroupsCache.set( cacheKey, bindGroup );
+
+			const groupData = this.get( bindGroup );
+			groupData.renderContext = renderContext;
+			groupData.cacheKey = cacheKey;
+
+		}
+
+		return bindGroup;
 
 	}
 
@@ -33792,6 +34261,13 @@ class Bindings extends DataMap {
 						binding.release();
 
 					}
+
+				}
+
+				if ( groupData.cacheKey !== undefined ) {
+
+					const bindGroupsCache = this._sharedBindGroups.get( groupData.renderContext );
+					bindGroupsCache.delete( groupData.cacheKey );
 
 				}
 
@@ -34571,7 +35047,7 @@ class RenderLists {
 
 }
 
-let _id$8 = 0;
+let _id$7 = 0;
 
 /**
  * Any render or compute command is executed in a specific context that defines
@@ -34593,7 +35069,7 @@ class RenderContext {
 		 *
 		 * @type {number}
 		 */
-		this.id = _id$8 ++;
+		this.id = _id$7 ++;
 
 		/**
 		 * The MRT configuration.
@@ -42477,7 +42953,7 @@ class PassNode extends Node {
 		 * Whether the pass is transparent.
 		 *
 		 * @type {boolean}
-		 * @default false
+		 * @default true
 		 */
 		this.transparent = true;
 
@@ -45120,13 +45596,13 @@ class AtomicFunctionNode extends Node {
 
 		} else {
 
-			if ( properties.constNode === undefined ) {
+			// The result is stored in a constant, declared in the block where the operation is generated.
+			const nodeVar = builder.getVarFromNode( this, null, type, undefined, true, true );
+			const propertyName = builder.getPropertyName( nodeVar );
 
-				properties.constNode = expression( methodSnippet, type ).toConst();
+			builder.addLineFlowCode( `${ builder.generateLetStatement( type, propertyName ) } = ${ methodSnippet }`, this );
 
-			}
-
-			return properties.constNode.build( builder );
+			return propertyName;
 
 		}
 
@@ -47076,7 +47552,7 @@ class ShadowNode extends ShadowBaseNode {
 		 *
 		 * @type {number}
 		 * @readonly
-		 * @default true
+		 * @default 0
 		 */
 		this.depthLayer = 0;
 
@@ -50777,50 +51253,6 @@ class Background extends DataMap {
 
 }
 
-let _id$7 = 0;
-
-/**
- * A bind group represents a collection of bindings and thus a collection
- * or resources. Bind groups are assigned to pipelines to provide them
- * with the required resources (like uniform buffers or textures).
- *
- * @private
- */
-class BindGroup {
-
-	/**
-	 * Constructs a new bind group.
-	 *
-	 * @param {string} name - The bind group's name.
-	 * @param {Array<Binding>} bindings - An array of bindings.
-	 */
-	constructor( name = '', bindings = [] ) {
-
-		/**
-		 * The bind group's name.
-		 *
-		 * @type {string}
-		 */
-		this.name = name;
-
-		/**
-		 * An array of bindings.
-		 *
-		 * @type {Array<Binding>}
-		 */
-		this.bindings = bindings;
-
-		/**
-		 * The group's ID.
-		 *
-		 * @type {number}
-		 */
-		this.id = _id$7 ++;
-
-	}
-
-}
-
 /**
  * This module represents the state of a node builder after it was
  * used to build the nodes for a render object. The state holds the
@@ -52152,7 +52584,6 @@ class Matrix4NodeUniform extends Matrix4Uniform {
 
 let _id$5 = 0;
 
-const _bindingGroupsCache = new WeakMap();
 const _functionNodeCache = new WeakMap();
 
 const sharedNodeData = new WeakMap();
@@ -52182,6 +52613,8 @@ const _toFloat = ( value ) => {
 	}
 
 };
+
+const _componentTypeRanks = { bool: 0, uint: 1, int: 2, float: 3 };
 
 const _checkWriteUsage = ( data ) => {
 
@@ -52622,6 +53055,15 @@ class NodeBuilder {
 		 */
 		this.fnCall = null;
 
+		/**
+		 * The block of generated code the builder is in, e.g. a loop body or a conditional branch.
+		 * Every generated block is a new object linked to its parent, `null` outside of any block.
+		 *
+		 * @type {?{parent: ?Object}}
+		 * @default null
+		 */
+		this.flowBlock = null;
+
 		Object.defineProperty( this, 'id', { value: _id$5 ++ } );
 
 	}
@@ -52752,57 +53194,9 @@ class NodeBuilder {
 
 		let bindGroup;
 
-		if ( sharedGroup ) {
+		if ( sharedGroup && this.renderer._bindings !== undefined ) {
 
-			let cacheKeyString = '';
-
-			for ( const binding of bindings ) {
-
-				if ( binding.isNodeUniformsGroup ) {
-
-					binding.uniforms.sort( ( a, b ) => a.nodeUniform.node.id - b.nodeUniform.node.id );
-
-					for ( const uniform of binding.uniforms ) {
-
-						cacheKeyString += uniform.nodeUniform.node.id;
-
-					}
-
-				} else {
-
-					cacheKeyString += binding.nodeUniform.id;
-
-				}
-
-			}
-
-			// TODO: Remove this hack ._currentRenderContext
-
-			const currentContext = this.renderer._currentRenderContext || this.renderer; // use renderer as fallback until we have a compute context
-
-			let bindingGroupsCache = _bindingGroupsCache.get( currentContext );
-
-			if ( bindingGroupsCache === undefined ) {
-
-				bindingGroupsCache = new Map();
-
-				_bindingGroupsCache.set( currentContext, bindingGroupsCache );
-
-			}
-
-			//
-
-			const cacheKey = hashString( cacheKeyString );
-
-			bindGroup = bindingGroupsCache.get( cacheKey );
-
-			if ( bindGroup === undefined ) {
-
-				bindGroup = new BindGroup( groupName, bindings );
-
-				bindingGroupsCache.set( cacheKey, bindGroup );
-
-			}
+			bindGroup = this.renderer._bindings.getSharedBindGroup( groupName, bindings );
 
 		} else {
 
@@ -53117,6 +53511,23 @@ class NodeBuilder {
 	getTernary( /* condSnippet, ifSnippet, elseSnippet*/ ) {
 
 		return null;
+
+	}
+
+	/**
+	 * Returns the native snippet for a per-component vector select. The default
+	 * implementation uses {@link NodeBuilder#getTernary}; renderers can
+	 * override this when their ternary operation does not accept vectors.
+	 *
+	 * @param {string} condSnippet - The per-component boolean (`bvecN`) condition.
+	 * @param {string} ifSnippet - The vector expression selected where `condSnippet` is `true`.
+	 * @param {string} elseSnippet - The vector expression selected where `condSnippet` is `false`.
+	 * @param {string} type - The (vector) type of `ifSnippet`/`elseSnippet`.
+	 * @return {string} The resolved method name.
+	 */
+	getVectorSelect( condSnippet, ifSnippet, elseSnippet /*, type*/ ) {
+
+		return this.getTernary( condSnippet, ifSnippet, elseSnippet );
 
 	}
 
@@ -53612,15 +54023,15 @@ class NodeBuilder {
 			if ( type === 'float' || type === 'int' || type === 'uint' ) value = 0;
 			else if ( type === 'bool' ) value = false;
 			else if ( type === 'color' ) value = new Color();
-			else if ( type === 'vec2' || type === 'uvec2' || type === 'ivec2' ) value = new Vector2();
-			else if ( type === 'vec3' || type === 'uvec3' || type === 'ivec3' ) value = new Vector3();
-			else if ( type === 'vec4' || type === 'uvec4' || type === 'ivec4' ) value = new Vector4();
+			else if ( type === 'vec2' || type === 'uvec2' || type === 'ivec2' || type === 'bvec2' ) value = new Vector2();
+			else if ( type === 'vec3' || type === 'uvec3' || type === 'ivec3' || type === 'bvec3' ) value = new Vector3();
+			else if ( type === 'vec4' || type === 'uvec4' || type === 'ivec4' || type === 'bvec4' ) value = new Vector4();
 
 		}
 
 		if ( type === 'float' ) return _toFloat( value );
-		if ( type === 'int' ) return `${ Math.round( value ) }`;
-		if ( type === 'uint' ) return value >= 0 ? `${ Math.round( value ) }u` : '0u';
+		if ( type === 'int' ) return `${ Math.trunc( value ) }`;
+		if ( type === 'uint' ) return value >= 0 ? `${ Math.trunc( value ) }u` : '0u';
 		if ( type === 'bool' ) return value ? 'true' : 'false';
 		if ( type === 'color' ) return `${ this.getType( 'vec3' ) }( ${ _toFloat( value.r ) }, ${ _toFloat( value.g ) }, ${ _toFloat( value.b ) } )`;
 
@@ -53728,6 +54139,18 @@ class NodeBuilder {
 	getPropertyName( node/*, shaderStage*/ ) {
 
 		return node.name;
+
+	}
+
+	/**
+	 * Whether the given type is a scalar type or not.
+	 *
+	 * @param {string} type - The type to check.
+	 * @return {boolean} Whether the given type is a scalar type or not.
+	 */
+	isScalar( type ) {
+
+		return type === 'float' || type === 'bool' || type === 'int' || type === 'uint';
 
 	}
 
@@ -53990,6 +54413,52 @@ class NodeBuilder {
 	changeComponentType( type, newComponentType ) {
 
 		return this.getTypeFromLength( this.getTypeLength( type ), newComponentType );
+
+	}
+
+	/**
+	 * Returns the common component type of the input nodes. Explicit types are
+	 * promoted first, then weak constants adopt that type, being truncated like other
+	 * integer constants. Only weak constants out of the integer range promote it.
+	 * Inputs consisting only of weak constants default to float.
+	 *
+	 * @param {...?Node} nodes - The input nodes.
+	 * @return {string} The promoted component type.
+	 */
+	getPromotedComponentType( ...nodes ) {
+
+		let type = null;
+		let hasWeak = false;
+		let fitsUint = true;
+		let fitsInt = true;
+
+		for ( const node of nodes ) {
+
+			if ( node === null ) continue;
+
+			if ( node.isWeak === true ) {
+
+				const value = Math.trunc( node.value );
+
+				hasWeak = true;
+				fitsUint = fitsUint && value >= 0 && value <= 0xffffffff;
+				fitsInt = fitsInt && value >= -2147483648 && value <= 0x7fffffff;
+
+			} else {
+
+				const componentType = this.getComponentType( node.getNodeType( this ) );
+
+				if ( type === null || _componentTypeRanks[ componentType ] > _componentTypeRanks[ type ] ) type = componentType;
+
+			}
+
+		}
+
+		if ( type === null || ( type === 'bool' && hasWeak ) ) return 'float';
+		if ( type === 'uint' && fitsUint === false ) return fitsInt ? 'int' : 'float';
+		if ( type === 'int' && fitsInt === false ) return 'float';
+
+		return type;
 
 	}
 
@@ -54312,13 +54781,14 @@ class NodeBuilder {
 	 * @param {('vertex'|'fragment'|'compute'|'any')} [shaderStage=this.shaderStage] - The shader stage.
 	 * @param {boolean} [readOnly=false] - Whether the variable is read-only or not.
 	 * @param {boolean} [local=false] - Whether the variable is declared locally in the flow instead of the variable section.
+	 * @param {string} [property='variable'] - The node data property that holds the variable. Allows a node to own more than one variable.
 	 *
 	 * @return {NodeVar} The node variable.
 	 */
-	getVarFromNode( node, name = null, type = node.getNodeType( this ), shaderStage = this.shaderStage, readOnly = false, local = false ) {
+	getVarFromNode( node, name = null, type = node.getNodeType( this ), shaderStage = this.shaderStage, readOnly = false, local = false, property = 'variable' ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
-		const subBuildVariable = this.getSubBuildProperty( 'variable', nodeData.subBuilds );
+		const subBuildVariable = this.getSubBuildProperty( property, nodeData.subBuilds );
 
 		let nodeVar = nodeData[ subBuildVariable ];
 
@@ -54339,7 +54809,7 @@ class NodeBuilder {
 
 			//
 
-			if ( subBuildVariable !== 'variable' ) {
+			if ( subBuildVariable !== property ) {
 
 				name = this.getSubBuildProperty( name, nodeData.subBuilds );
 
@@ -54537,82 +55007,15 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Adds a code flow based on the code-block hierarchy.
-
-	 * This is used so that code-blocks like If,Else create their variables locally if the Node
-	 * is only used inside one of these conditionals in the current shader stage.
-	 *
-	 * @param {Node} node - The node to add.
-	 * @param {Node} nodeBlock - Node-based code-block. Usually 'ConditionalNode'.
-	 */
-	addFlowCodeHierarchy( node, nodeBlock ) {
-
-		const { flowCodes, flowCodeBlock } = this.getDataFromNode( node );
-
-		let needsFlowCode = true;
-		let nodeBlockHierarchy = nodeBlock;
-
-		while ( nodeBlockHierarchy ) {
-
-			if ( flowCodeBlock.get( nodeBlockHierarchy ) === true ) {
-
-				needsFlowCode = false;
-				break;
-
-			}
-
-			nodeBlockHierarchy = this.getDataFromNode( nodeBlockHierarchy ).parentNodeBlock;
-
-		}
-
-		if ( needsFlowCode ) {
-
-			for ( const flowCode of flowCodes ) {
-
-				this.addLineFlowCode( flowCode );
-
-			}
-
-			flowCodeBlock.set( nodeBlock, true );
-
-		}
-
-	}
-
-	/**
-	 * Add a inline-code to the current flow code-block.
-	 *
-	 * @param {Node} node - The node to add.
-	 * @param {string} code - The code to add.
-	 * @param {Node} nodeBlock - Current ConditionalNode
-	 */
-	addLineFlowCodeBlock( node, code, nodeBlock ) {
-
-		const nodeData = this.getDataFromNode( node );
-		const flowCodes = nodeData.flowCodes || ( nodeData.flowCodes = [] );
-		const codeBlock = nodeData.flowCodeBlock || ( nodeData.flowCodeBlock = new WeakMap() );
-
-		flowCodes.push( code );
-		codeBlock.set( nodeBlock, true );
-
-	}
-
-	/**
 	 * Add a inline-code to the current flow.
 	 *
 	 * @param {string} code - The code to add.
-	 * @param {?Node} [node= null] - Optional Node, can help the system understand if the Node is part of a code-block.
+	 * @param {?Node} [node= null] - The node that generated the code.
 	 * @return {NodeBuilder} A reference to this node builder.
 	 */
-	addLineFlowCode( code, node = null ) {
+	addLineFlowCode( code /*, node = null */ ) {
 
 		if ( code === '' ) return this;
-
-		if ( node !== null && this.context.nodeBlock ) {
-
-			this.addLineFlowCodeBlock( node, code, this.context.nodeBlock );
-
-		}
 
 		code = this.tab + code;
 
@@ -54845,6 +55248,7 @@ class NodeBuilder {
 		const previousCache = this.cache;
 		const previousBuildStage = this.buildStage;
 		const previousStack = this.stack;
+		const previousFlowBlock = this.flowBlock;
 
 		const flow = {
 			code: ''
@@ -54855,6 +55259,7 @@ class NodeBuilder {
 		this.declarations = {};
 		this.cache = new NodeCache();
 		this.stack = stack();
+		this.flowBlock = null;
 
 		for ( const buildStage of defaultBuildStages ) {
 
@@ -54871,6 +55276,7 @@ class NodeBuilder {
 		this.declarations = previousDeclarations;
 		this.cache = previousCache;
 		this.stack = previousStack;
+		this.flowBlock = previousFlowBlock;
 
 		this.setBuildStage( previousBuildStage );
 
@@ -54948,12 +55354,14 @@ class NodeBuilder {
 		const previousCache = this.cache;
 		const previousShaderStage = this.shaderStage;
 		const previousContext = this.context;
+		const previousFlowBlock = this.flowBlock;
 
 		this.setShaderStage( shaderStage );
 
 		const context = { ...this.context };
 		delete context.nodeBlock;
 
+		this.flowBlock = null;
 		this.cache = this.globalCache;
 		this.tab = '\t';
 		this.context = context;
@@ -54985,6 +55393,7 @@ class NodeBuilder {
 		this.cache = previousCache;
 		this.tab = previousTab;
 		this.context = previousContext;
+		this.flowBlock = previousFlowBlock;
 
 		return result;
 
@@ -55663,13 +56072,19 @@ class NodeBuilder {
 
 		if ( toTypeLength === 4 && fromTypeLength > 1 ) { // toType is vec4-like
 
-			return `${ this.getType( toType ) }( ${ this.format( snippet, fromType, 'vec3' ) }, 1.0 )`;
+			const componentType = this.getComponentType( toType );
+			const vectorType = this.getTypeFromLength( 3, componentType );
+
+			return `${ this.getType( toType ) }( ${ this.format( snippet, fromType, vectorType ) }, ${ this.generateConst( componentType, componentType === 'bool' ? true : 1 ) } )`;
 
 		}
 
 		if ( fromTypeLength === 2 ) { // fromType is vec2-like and toType is vec3-like
 
-			return `${ this.getType( toType ) }( ${ this.format( snippet, fromType, 'vec2' ) }, 0.0 )`;
+			const componentType = this.getComponentType( toType );
+			const vectorType = this.getTypeFromLength( 2, componentType );
+
+			return `${ this.getType( toType ) }( ${ this.format( snippet, fromType, vectorType ) }, ${ this.generateConst( componentType, componentType === 'bool' ? false : 0 ) } )`;
 
 		}
 
@@ -63053,10 +63468,6 @@ class Renderer {
 
 		}
 
-		this.getDrawingBufferSize( _drawingBufferSize );
-
-		_screen.set( 0, 0, _drawingBufferSize.width, _drawingBufferSize.height );
-
 		const minDepth = ( viewport.minDepth === undefined ) ? 0 : viewport.minDepth;
 		const maxDepth = ( viewport.maxDepth === undefined ) ? 1 : viewport.maxDepth;
 
@@ -63065,10 +63476,8 @@ class Renderer {
 		renderContext.viewportValue.height >>= activeMipmapLevel;
 		renderContext.viewportValue.minDepth = minDepth;
 		renderContext.viewportValue.maxDepth = maxDepth;
-		renderContext.viewport = renderContext.viewportValue.equals( _screen ) === false;
 
 		renderContext.scissorValue.copy( scissor ).multiplyScalar( pixelRatio ).floor();
-		renderContext.scissor = canvasTarget._scissorTest && renderContext.scissorValue.equals( _screen ) === false;
 		renderContext.scissorValue.width >>= activeMipmapLevel;
 		renderContext.scissorValue.height >>= activeMipmapLevel;
 
@@ -63126,6 +63535,8 @@ class Renderer {
 
 		} else {
 
+			this.getDrawingBufferSize( _drawingBufferSize );
+
 			renderContext.textures = null;
 			renderContext.depthTexture = null;
 			renderContext.width = _drawingBufferSize.width;
@@ -63157,6 +63568,11 @@ class Renderer {
 			renderContext.scissorValue.height = Math.max( renderContext.height - renderContext.scissorValue.y, 0 );
 
 		}
+
+		_screen.set( 0, 0, renderContext.width, renderContext.height );
+
+		renderContext.viewport = renderContext.viewportValue.equals( _screen ) === false;
+		renderContext.scissor = canvasTarget._scissorTest && renderContext.scissorValue.equals( _screen ) === false;
 
 		//
 
@@ -63968,6 +64384,7 @@ class Renderer {
 			this._animation.dispose();
 			this._objects.dispose();
 			this._geometries.dispose();
+			this._attributes.dispose();
 			this._pipelines.dispose();
 			this._nodes.dispose();
 			this._bindings.dispose();
@@ -66876,6 +67293,47 @@ class GLSLNodeBuilder extends NodeBuilder {
 	}
 
 	/**
+	 * Returns the native snippet for a genuinely per-component vector select.
+	 * GLSL has no vector ternary, so `float` types use `mix()`'s `bvecN`-selector
+	 * overload; `int`/`uint`/`bool` types use an arithmetic select instead, since
+	 * that overload doesn't exist for them.
+	 *
+	 * @param {string} condSnippet - The per-component boolean (`bvecN`) condition.
+	 * @param {string} ifSnippet - The vector expression selected where `condSnippet` is `true`.
+	 * @param {string} elseSnippet - The vector expression selected where `condSnippet` is `false`.
+	 * @param {string} type - The (vector) type of `ifSnippet`/`elseSnippet`.
+	 * @return {string} The resolved method name.
+	 */
+	getVectorSelect( condSnippet, ifSnippet, elseSnippet, type ) {
+
+		const componentType = this.getComponentType( type );
+
+		if ( componentType === 'float' ) {
+
+			return `mix( ${elseSnippet}, ${ifSnippet}, ${condSnippet} )`;
+
+		}
+
+		const glslType = this.getType( type );
+
+		if ( componentType === 'bool' ) {
+
+			const intType = this.getType( this.getTypeFromLength( this.getTypeLength( type ), 'int' ) );
+			const maskSnippet = `${intType}( ${condSnippet} )`;
+			const ifIntSnippet = `${intType}( ${ifSnippet} )`;
+			const elseIntSnippet = `${intType}( ${elseSnippet} )`;
+
+			return `${glslType}( ${elseIntSnippet} + ${maskSnippet} * ( ${ifIntSnippet} - ${elseIntSnippet} ) )`;
+
+		}
+
+		const maskSnippet = `${glslType}( ${condSnippet} )`;
+
+		return `${elseSnippet} + ${maskSnippet} * ( ${ifSnippet} - ${elseSnippet} )`;
+
+	}
+
+	/**
 	 * Returns the output struct name. Not relevant for GLSL.
 	 *
 	 * @return {string}
@@ -68915,6 +69373,21 @@ class Backend {
 	 */
 	destroyAttribute( /*attribute*/ ) { }
 
+	/**
+	 * Utility method for handling interleaved buffer attributes correctly.
+	 * To process them, their `InterleavedBuffer` is returned.
+	 *
+	 * @param {BufferAttribute|InterleavedBufferAttribute} attribute - The attribute.
+	 * @return {BufferAttribute|InterleavedBuffer}
+	 */
+	getBufferAttribute( attribute ) {
+
+		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
+
+		return attribute;
+
+	}
+
 	// canvas
 
 	/**
@@ -69396,23 +69869,14 @@ class WebGLAttributeUtils {
 		const backend = this.backend;
 		const { gl } = backend;
 
+		const bufferAttribute = backend.getBufferAttribute( attribute );
+
+		if ( backend.get( bufferAttribute ).bufferGPU !== undefined ) return;
+
 		const array = attribute.array;
 		const usage = attribute.usage || gl.STATIC_DRAW;
 
-		const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
-		const bufferData = backend.get( bufferAttribute );
-
-		let bufferGPU = bufferData.bufferGPU;
-
-		if ( bufferGPU === undefined ) {
-
-			bufferGPU = this._createBuffer( gl, bufferType, array, usage );
-
-			bufferData.bufferGPU = bufferGPU;
-			bufferData.bufferType = bufferType;
-			bufferData.version = bufferAttribute.version;
-
-		}
+		const bufferGPU = this._createBuffer( gl, bufferType, array, usage );
 
 		//attribute.onUploadCallback();
 
@@ -69474,7 +69938,7 @@ class WebGLAttributeUtils {
 			type,
 			byteLength: array.byteLength,
 			bytesPerElement: array.BYTES_PER_ELEMENT,
-			version: attribute.version,
+			version: bufferAttribute.version,
 			pbo: attribute.pbo,
 			isInteger: type === gl.INT || type === gl.UNSIGNED_INT || attribute.gpuType === IntType,
 			id: _id$1 ++
@@ -69488,7 +69952,7 @@ class WebGLAttributeUtils {
 
 		}
 
-		backend.set( attribute, attributeData );
+		backend.set( bufferAttribute, attributeData );
 
 	}
 
@@ -69503,10 +69967,10 @@ class WebGLAttributeUtils {
 		const { gl } = backend;
 
 		const array = attribute.array;
-		const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
+		const bufferAttribute = backend.getBufferAttribute( attribute );
 		const bufferData = backend.get( bufferAttribute );
 		const bufferType = bufferData.bufferType;
-		const updateRanges = attribute.isInterleavedBufferAttribute ? attribute.data.updateRanges : attribute.updateRanges;
+		const updateRanges = bufferAttribute.updateRanges;
 
 		gl.bindBuffer( bufferType, bufferData.bufferGPU );
 
@@ -69546,17 +70010,25 @@ class WebGLAttributeUtils {
 		const backend = this.backend;
 		const { gl } = backend;
 
-		if ( attribute.isInterleavedBufferAttribute ) {
+		const bufferAttribute = backend.getBufferAttribute( attribute );
+		const attributeData = backend.get( bufferAttribute );
 
-			backend.delete( attribute.data );
+		if ( attributeData.buffers !== undefined ) {
+
+			// storage attributes hold a second buffer for transform feedback
+			for ( const buffer of attributeData.buffers ) {
+
+				gl.deleteBuffer( buffer );
+
+			}
+
+		} else {
+
+			gl.deleteBuffer( attributeData.bufferGPU );
 
 		}
 
-		const attributeData = backend.get( attribute );
-
-		gl.deleteBuffer( attributeData.bufferGPU );
-
-		backend.delete( attribute );
+		backend.delete( bufferAttribute );
 
 	}
 
@@ -69578,7 +70050,7 @@ class WebGLAttributeUtils {
 		const backend = this.backend;
 		const { gl } = backend;
 
-		const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
+		const bufferAttribute = backend.getBufferAttribute( attribute );
 		const attributeInfo = backend.get( bufferAttribute );
 		const { bufferGPU } = attributeInfo;
 
@@ -69722,9 +70194,13 @@ class WebGLVertexArrayUtils {
 
 		for ( let i = 0; i < attributes.length; i ++ ) {
 
-			const attributeData = backend.get( attributes[ i ] );
+			const attribute = attributes[ i ];
+			const attributeData = backend.get( backend.getBufferAttribute( attribute ) );
 
 			key += ':' + attributeData.id;
+
+			if ( attribute.isInterleavedBufferAttribute ) key += '.' + attribute.offset;
+
 			variant += ':' + ( attributeData.activeBufferIndex || 0 );
 
 			buffers.push( attributeData.bufferGPU );
@@ -69829,7 +70305,9 @@ class WebGLVertexArrayUtils {
 
 		for ( let i = 0; i < attributes.length; i ++ ) {
 
-			if ( this.backend.get( attributes[ i ] ).bufferGPU !== buffers[ i ] ) return true;
+			const bufferAttribute = this.backend.getBufferAttribute( attributes[ i ] );
+
+			if ( this.backend.get( bufferAttribute ).bufferGPU !== buffers[ i ] ) return true;
 
 		}
 
@@ -69883,7 +70361,7 @@ class WebGLVertexArrayUtils {
 		for ( let i = 0; i < attributes.length; i ++ ) {
 
 			const attribute = attributes[ i ];
-			const attributeData = this.backend.get( attribute );
+			const attributeData = this.backend.get( this.backend.getBufferAttribute( attribute ) );
 
 			gl.bindBuffer( gl.ARRAY_BUFFER, attributeData.bufferGPU );
 			gl.enableVertexAttribArray( i );
@@ -74436,7 +74914,7 @@ class WebGLBackend extends Backend {
 
 		} else {
 
-			const { width, height } = this.getDrawingBufferSize();
+			const { width, height } = renderContext;
 			state.viewport( 0, 0, width, height );
 
 		}
@@ -74447,7 +74925,7 @@ class WebGLBackend extends Backend {
 
 		} else {
 
-			const { width, height } = this.getDrawingBufferSize();
+			const { width, height } = renderContext;
 			state.scissor( 0, 0, width, height );
 
 		}
@@ -74548,7 +75026,7 @@ class WebGLBackend extends Backend {
 
 			} else {
 
-				const { width, height } = this.getDrawingBufferSize();
+				const { width, height } = previousContext;
 				state.viewport( 0, 0, width, height );
 
 			}
@@ -74559,7 +75037,7 @@ class WebGLBackend extends Backend {
 
 			} else {
 
-				const { width, height } = this.getDrawingBufferSize();
+				const { width, height } = previousContext;
 				state.scissor( 0, 0, width, height );
 
 			}
@@ -76818,8 +77296,12 @@ class WebGLBackend extends Backend {
 		if ( this.vertexArrayUtils !== null ) this.vertexArrayUtils.dispose();
 		if ( this.textureUtils !== null ) this.textureUtils.dispose();
 
-		const extension = this.extensions.get( 'WEBGL_lose_context' );
-		if ( extension ) extension.loseContext();
+		if ( this.parameters.canvas === undefined ) {
+
+			const extension = this.extensions.get( 'WEBGL_lose_context' );
+			if ( extension ) extension.loseContext();
+
+		}
 
 		this.renderer.domElement.removeEventListener( 'webglcontextlost', this._onContextLost );
 
@@ -84137,9 +84619,9 @@ class WebGPUAttributeUtils {
 	 */
 	createAttribute( attribute, usage ) {
 
-		const bufferAttribute = this._getBufferAttribute( attribute );
-
 		const backend = this.backend;
+
+		const bufferAttribute = backend.getBufferAttribute( attribute );
 		const bufferData = backend.get( bufferAttribute );
 
 		let buffer = bufferData.buffer;
@@ -84255,11 +84737,10 @@ class WebGPUAttributeUtils {
 	 */
 	updateAttribute( attribute ) {
 
-		const bufferAttribute = this._getBufferAttribute( attribute );
-
 		const backend = this.backend;
 		const device = backend.device;
 
+		const bufferAttribute = backend.getBufferAttribute( attribute );
 		const bufferData = backend.get( bufferAttribute );
 		const buffer = backend.get( bufferAttribute ).buffer;
 
@@ -84362,7 +84843,7 @@ class WebGPUAttributeUtils {
 
 			const geometryAttribute = attributes[ slot ];
 			const bytesPerElement = geometryAttribute.array.BYTES_PER_ELEMENT;
-			const bufferAttribute = this._getBufferAttribute( geometryAttribute );
+			const bufferAttribute = this.backend.getBufferAttribute( geometryAttribute );
 
 			let vertexBufferLayout = vertexBuffers.get( bufferAttribute );
 
@@ -84423,11 +84904,13 @@ class WebGPUAttributeUtils {
 	destroyAttribute( attribute ) {
 
 		const backend = this.backend;
-		const data = backend.get( this._getBufferAttribute( attribute ) );
+
+		const bufferAttribute = backend.getBufferAttribute( attribute );
+		const data = backend.get( bufferAttribute );
 
 		data.buffer.destroy();
 
-		backend.delete( attribute );
+		backend.delete( bufferAttribute );
 
 	}
 
@@ -84449,7 +84932,7 @@ class WebGPUAttributeUtils {
 		const backend = this.backend;
 		const device = backend.device;
 
-		const data = backend.get( this._getBufferAttribute( attribute ) );
+		const data = backend.get( backend.getBufferAttribute( attribute ) );
 		const bufferGPU = data.buffer;
 		const byteLength = count === -1 ? bufferGPU.size - offset : count;
 
@@ -84620,22 +85103,6 @@ class WebGPUAttributeUtils {
 		}
 
 		return format;
-
-	}
-
-	/**
-	 * Utility method for handling interleaved buffer attributes correctly.
-	 * To process them, their `InterleavedBuffer` is returned.
-	 *
-	 * @private
-	 * @param {BufferAttribute} attribute - The attribute.
-	 * @return {BufferAttribute|InterleavedBuffer}
-	 */
-	_getBufferAttribute( attribute ) {
-
-		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
-
-		return attribute;
 
 	}
 
@@ -92367,4 +92834,4 @@ var Three_TSL = /*#__PURE__*/Object.freeze({
 	xor: xor
 });
 
-export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AtomicFunctionNode, AttributeNode, BackSide, BarrierNode, BasicEnvironmentNode, BasicLightMapNode, BasicShadowMap, BitcastNode, BitcountNode, BlendMode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BuiltinNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CanvasTarget, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, ClippingNode, CodeNode, Color, ColorManagement, ColorSpaceNode, Compatibility, ComputeBuiltinNode, ComputeNode, ConditionalNode, ConstNode, ConstantAlphaFactor, ConstantColorFactor, ContextNode, ConvertNode, CubeCamera, CubeDepthTexture, CubeMapNode, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CylinderGeometry, DataArrayTexture, DataTexture, DebugNode, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectRenderPipeline, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, EventDispatcher, EventNode, ExpressionNode, FileLoader, FlipNode, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FrustumArray, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InputNode, InspectorBase, InspectorNode, InstancedBufferAttribute, InstancedInterleavedBuffer, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, IsolateNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoopNode, MRTNode, Material, MaterialBlending, MaterialLoader, MaterialNode, MaterialReferenceNode, MathNode, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoNormalPacking, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeError, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalGAPacking, NormalMapNode, NormalRGPacking, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OperatorNode, OrthographicCamera, OutputStructNode, OverrideContextNode, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, PMREMNode, PackFloatNode, Packed4x8IntegerNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PlaneGeometry, PointLight, PointLightNode, PointShadowNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, ProjectorLight, ProjectorLightNode, PropertyNode, QuadMesh, Quaternion, R11_EAC_Format, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RG11_EAC_Format, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, ReadbackBuffer, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceBaseNode, ReferenceElementNode, ReferenceNode, ReflectorNode, ReinhardToneMapping, RenderObjectRefreshType, RenderOutputNode, RenderPipeline, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_R11_EAC_Format, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SIGNED_RG11_EAC_Format, SRGBColorSpace, SRGBTransfer, SampleNode, Scene, ScreenNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, Sphere, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StackTrace, StaticDrawUsage, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTexture3DNode, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubgroupFunctionNode, SubtractEquation, SubtractiveBlending, Three_TSL as TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, TimestampQuery, ToneMappingNode, ToonOutlinePassNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnpackFloatNode, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VelocityNode, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLBackend, WebGLCoordinateSystem, WebGPUBackend, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, WorkgroupInfoNode, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, error, log$1 as log, shaderStages, vectorComponents, warn, warnOnce };
+export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AtomicFunctionNode, AttributeNode, BackSide, BarrierNode, BasicEnvironmentNode, BasicLightMapNode, BasicShadowMap, BitcastNode, BitcountNode, BlendMode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BuiltinNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CanvasTarget, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, ClippingNode, CodeNode, Color, ColorManagement, ColorSpaceNode, Compatibility, ComputeBuiltinNode, ComputeNode, ConditionalNode, ConstNode, ConstantAlphaFactor, ConstantColorFactor, ContextNode, ConvertNode, CubeCamera, CubeDepthTexture, CubeMapNode, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CylinderGeometry, DataArrayTexture, DataTexture, DebugNode, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectRenderPipeline, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, EventDispatcher, EventNode, ExpressionNode, FileLoader, FlipNode, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FrustumArray, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InputNode, InspectorBase, InspectorNode, InstancedBufferAttribute, InstancedInterleavedBuffer, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, IsolateNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoopNode, MRTNode, Material, MaterialBlending, MaterialLoader, MaterialNode, MaterialReferenceNode, MathNode, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoNormalPacking, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeError, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalGAPacking, NormalMapNode, NormalRGPacking, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OperatorNode, OrthographicCamera, OutputStructNode, OverrideContextNode, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, PMREMNode, PackFloatNode, Packed4x8IntegerNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PlaneGeometry, PointLight, PointLightNode, PointShadowNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, ProjectorLight, ProjectorLightNode, PropertyNode, ProxyNodeMaterial, QuadMesh, Quaternion, R11_EAC_Format, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RG11_EAC_Format, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, ReadbackBuffer, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceBaseNode, ReferenceElementNode, ReferenceNode, ReflectorNode, ReinhardToneMapping, RenderObjectRefreshType, RenderOutputNode, RenderPipeline, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_R11_EAC_Format, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SIGNED_RG11_EAC_Format, SRGBColorSpace, SRGBTransfer, SampleNode, Scene, ScreenNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, Sphere, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StackTrace, StaticDrawUsage, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTexture3DNode, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubgroupFunctionNode, SubtractEquation, SubtractiveBlending, Three_TSL as TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, TimestampQuery, ToneMappingNode, ToonOutlinePassNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnpackFloatNode, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VelocityNode, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLBackend, WebGLCoordinateSystem, WebGPUBackend, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, WorkgroupInfoNode, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, error, log$1 as log, shaderStages, vectorComponents, warn, warnOnce };

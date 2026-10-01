@@ -1669,6 +1669,31 @@ class Node extends EventDispatcher {
 
 		} else if ( buildStage === 'generate' ) {
 
+			// A generated value is only visible in the block where it was declared and in its inner blocks.
+			if ( nodeData.flowBlock !== undefined ) {
+
+				let flowBlock = builder.flowBlock;
+
+				while ( flowBlock !== null && flowBlock !== nodeData.flowBlock ) {
+
+					flowBlock = flowBlock.parent;
+
+				}
+
+				if ( flowBlock === null ) {
+
+					nodeData.flowBlock = undefined;
+					nodeData.propertyName = undefined;
+					nodeData.snippet = undefined;
+					nodeData.generated = undefined;
+
+				}
+
+			}
+
+			const isCached = nodeData.propertyName !== undefined || nodeData.snippet !== undefined;
+			const flowCodeLength = builder.flow.code.length;
+
 			// References must be generated directly, even if a cached value exists.
 			const allowedCache = this.isCacheable( builder ) && builder.isReference( output ) === false;
 			const type = allowedCache ? builder.getVectorType( this.getNodeType( builder, output ) ) : null;
@@ -1676,12 +1701,6 @@ class Node extends EventDispatcher {
 			const generateOutput = cacheResult ? type : output;
 
 			if ( allowedCache && nodeData.propertyName !== undefined ) {
-
-				if ( nodeData.flowCodes !== undefined && builder.context.nodeBlock !== undefined ) {
-
-					builder.addFlowCodeHierarchy( this, builder.context.nodeBlock );
-
-				}
 
 				result = builder.format( nodeData.propertyName, type, output );
 
@@ -1719,10 +1738,6 @@ class Node extends EventDispatcher {
 
 						}
 
-					} else if ( nodeData.flowCodes !== undefined && builder.context.nodeBlock !== undefined ) {
-
-						builder.addFlowCodeHierarchy( this, builder.context.nodeBlock );
-
 					}
 
 					result = builder.format( result, type, generateOutput );
@@ -1746,7 +1761,8 @@ class Node extends EventDispatcher {
 				if ( cacheResult ) {
 
 					const readOnly = nodeData.assign !== true;
-					const nodeVar = builder.getVarFromNode( this, null, type, undefined, readOnly, true );
+					// Use a dedicated property, the node may already own a variable.
+					const nodeVar = builder.getVarFromNode( this, null, type, undefined, readOnly, true, 'cacheVariable' );
 					const propertyName = builder.getPropertyName( nodeVar );
 					const count = this.getArrayCount( builder );
 					const declarationPrefix = readOnly
@@ -1761,6 +1777,16 @@ class Node extends EventDispatcher {
 					result = builder.format( propertyName, type, output );
 
 				}
+
+			}
+
+			// Keep the block where a value was generated, so it is only reused where it is visible.
+			// A global node is a declaration visible in any block, unless it emitted code in this block.
+			const isLocal = this.isGlobal( builder ) === false || builder.flow.code.length !== flowCodeLength;
+
+			if ( isCached === false && ( nodeData.propertyName !== undefined || nodeData.snippet !== undefined ) && isLocal && builder.flowBlock !== null ) {
+
+				nodeData.flowBlock = builder.flowBlock;
 
 			}
 
@@ -2838,6 +2864,14 @@ class ConstNode extends InputNode {
 		 */
 		this.isConstNode = true;
 
+		/**
+		 * Whether this constant is an implicit number whose type can adapt to other operands.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.isWeak = false;
+
 	}
 
 	/**
@@ -2858,11 +2892,33 @@ class ConstNode extends InputNode {
 
 		if ( _regNum.test( type ) && _regNum.test( output ) ) {
 
-			return builder.generateConst( output, this.value );
+			let value = this.value;
+
+			// Preserve the declared integer value before converting to the output type.
+			if ( type === 'int' ) value = Math.trunc( value );
+			else if ( type === 'uint' ) value = value >= 0 ? Math.trunc( value ) : 0;
+
+			return builder.generateConst( output, value );
 
 		}
 
 		return builder.format( this.generateConst( builder ), type, output );
+
+	}
+
+	serialize( data ) {
+
+		super.serialize( data );
+
+		data.isWeak = this.isWeak;
+
+	}
+
+	deserialize( data ) {
+
+		super.deserialize( data );
+
+		this.isWeak = data.isWeak === true;
 
 	}
 
@@ -3450,9 +3506,10 @@ class ShaderCallNodeInternal extends Node {
 
 	}
 
-	isCacheable( /*builder*/ ) {
+	isCacheable( builder ) {
 
-		return false;
+		// A call is an expression unless its body has statements.
+		return this.getOutputNode( builder ).nodes.length === 0;
 
 	}
 
@@ -3873,7 +3930,7 @@ for ( const float of floats ) floatsCacheMap.set( - float, new ConstNode( - floa
 
 const cacheMaps = { bool: boolsCacheMap, uint: uintsCacheMap, ints: intsCacheMap, float: floatsCacheMap };
 
-const constNodesCacheMap = new Map( [ ...boolsCacheMap, ...floatsCacheMap ] );
+const constNodesCacheMap = new Map( boolsCacheMap );
 
 const getConstNode = ( value, type ) => {
 
@@ -3887,11 +3944,18 @@ const getConstNode = ( value, type ) => {
 
 	} else {
 
-		return new ConstNode( value, type );
+		const node = new ConstNode( value, type );
+
+		// Implicit numbers are weak and can adapt to the type of other operands.
+		node.isWeak = ! type && typeof value === 'number';
+
+		return node;
 
 	}
 
 };
+
+for ( const value of floatsCacheMap.keys() ) constNodesCacheMap.set( value, getConstNode( value ) );
 
 const ConvertType = function ( type, cacheMap = null ) {
 
@@ -4393,7 +4457,7 @@ class AssignNode extends Node {
 
 		let snippet;
 
-		if ( nodeData.initialized === true ) {
+		if ( nodeData.propertyName !== undefined ) {
 
 			if ( output !== 'void' ) {
 
@@ -4445,7 +4509,8 @@ class AssignNode extends Node {
 
 		}
 
-		nodeData.initialized = true;
+		// The value of an assignment is its target.
+		nodeData.propertyName = target;
 
 		return builder.format( snippet, targetType, output );
 
@@ -5801,10 +5866,6 @@ class OperatorNode extends Node {
 
 			return output || 'void';
 
-		} else if ( op === '%' ) {
-
-			return typeA;
-
 		} else if ( op === '~' || op === '&' || op === '|' || op === '^' || op === '>>' || op === '<<' ) {
 
 			return builder.getIntegerType( typeA );
@@ -5825,13 +5886,17 @@ class OperatorNode extends Node {
 
 			return typeLength > 1 ? `bvec${ typeLength }` : 'bool';
 
+		} else if ( typeB === null ) {
+
+			return typeA;
+
 		} else {
 
 			// Handle matrix operations
 
 			if ( builder.isMatrix( typeA ) ) {
 
-				if ( typeB === 'float' ) {
+				if ( builder.isScalar( typeB ) ) {
 
 					return typeA; // matrix * scalar = matrix
 
@@ -5847,7 +5912,7 @@ class OperatorNode extends Node {
 
 			} else if ( builder.isMatrix( typeB ) ) {
 
-				if ( typeA === 'float' ) {
+				if ( builder.isScalar( typeA ) ) {
 
 					return typeB; // scalar * matrix = matrix
 
@@ -5861,15 +5926,13 @@ class OperatorNode extends Node {
 
 			// Handle non-matrix cases
 
-			if ( builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ) {
+			// anytype x anytype: use the greater length vector
 
-				// anytype x anytype: use the greater length vector
+			const type = builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ? typeB : typeA;
 
-				return typeB;
+			const promotedType = builder.getPromotedComponentType( aNode, bNode );
 
-			}
-
-			return typeA;
+			return builder.changeComponentType( type, promotedType );
 
 		}
 
@@ -5893,33 +5956,18 @@ class OperatorNode extends Node {
 
 			if ( op === '<' || op === '>' || op === '<=' || op === '>=' || op === '==' || op === '!=' ) {
 
-				if ( builder.isVector( typeA ) ) {
+				const length = Math.max( builder.getTypeLength( typeA ), builder.getTypeLength( typeB ) );
 
-					typeB = typeA;
-
-				} else if ( builder.isVector( typeB ) ) {
-
-					typeA = typeB;
-
-				} else if ( typeA !== typeB ) {
-
-					typeA = typeB = 'float';
-
-				}
+				typeA = typeB = builder.getTypeFromLength( length, builder.getPromotedComponentType( aNode, bNode ) );
 
 			} else if ( op === '>>' || op === '<<' ) {
 
 				typeA = type;
 				typeB = builder.changeComponentType( typeB, 'uint' );
 
-			} else if ( op === '%' ) {
-
-				typeA = type;
-				typeB = builder.isInteger( typeA ) && builder.isInteger( typeB ) ? typeB : typeA;
-
 			} else if ( builder.isMatrix( typeA ) ) {
 
-				if ( typeB === 'float' ) {
+				if ( builder.isScalar( typeB ) ) {
 
 					// Keep matrix type for typeA, but ensure typeB stays float
 
@@ -5938,7 +5986,7 @@ class OperatorNode extends Node {
 
 			} else if ( builder.isMatrix( typeB ) ) {
 
-				if ( typeA === 'float' ) {
+				if ( builder.isScalar( typeA ) ) {
 
 					// Keep matrix type for typeB, but ensure typeA stays float
 
@@ -6039,11 +6087,11 @@ class OperatorNode extends Node {
 
 				// Handle matrix operations
 
-				if ( builder.isMatrix( typeA ) && typeB === 'float' ) {
+				if ( builder.isMatrix( typeA ) && builder.isScalar( typeB ) ) {
 
 					return builder.format( `( ${ b } ${ op } ${ a } )`, type, output );
 
-				} else if ( typeA === 'float' && builder.isMatrix( typeB ) ) {
+				} else if ( builder.isScalar( typeA ) && builder.isMatrix( typeB ) ) {
 
 					return builder.format( `${ a } ${ op } ${ b }`, type, output );
 
@@ -6071,7 +6119,7 @@ class OperatorNode extends Node {
 
 			} else {
 
-				if ( builder.isMatrix( typeA ) && typeB === 'float' ) {
+				if ( builder.isMatrix( typeA ) && builder.isScalar( typeB ) ) {
 
 					return builder.format( `${ b } ${ op } ${ a }`, type, output );
 
@@ -6531,21 +6579,31 @@ class MathNode extends Node {
 		const bLen = builder.isMatrix( bType ) ? 0 : builder.getTypeLength( bType );
 		const cLen = builder.isMatrix( cType ) ? 0 : builder.getTypeLength( cType );
 
+		let type;
+
 		if ( aLen > bLen && aLen > cLen ) {
 
-			return aType;
+			type = aType;
 
 		} else if ( bLen > cLen ) {
 
-			return bType;
+			type = bType;
 
 		} else if ( cLen > aLen ) {
 
-			return cType;
+			type = cType;
+
+		} else {
+
+			type = aType;
 
 		}
 
-		return aType;
+		if ( builder.isMatrix( type ) ) return type;
+
+		const promotedType = _floatMethods.has( this.method ) ? 'float' : builder.getPromotedComponentType( this.aNode, this.bNode, this.cNode );
+
+		return builder.changeComponentType( type, promotedType );
 
 	}
 
@@ -6595,7 +6653,7 @@ class MathNode extends Node {
 
 		} else if ( method === MathNode.RECIPROCAL ) {
 
-			outputNode = div( 1.0, aNode );
+			outputNode = div( float( 1 ), aNode );
 
 		} else if ( method === MathNode.DIFFERENCE ) {
 
@@ -6812,6 +6870,18 @@ MathNode.CLAMP = 'clamp';
 MathNode.REFRACT = 'refract';
 MathNode.SMOOTHSTEP = 'smoothstep';
 MathNode.FACEFORWARD = 'faceforward';
+
+// Methods that are only defined for floating-point types.
+
+const _floatMethods = new Set( [
+	MathNode.RADIANS, MathNode.DEGREES, MathNode.EXP, MathNode.EXP2, MathNode.LOG, MathNode.LOG2,
+	MathNode.SQRT, MathNode.INVERSE_SQRT, MathNode.FLOOR, MathNode.CEIL, MathNode.NORMALIZE, MathNode.FRACT,
+	MathNode.SIN, MathNode.SINH, MathNode.COS, MathNode.COSH, MathNode.TAN, MathNode.TANH,
+	MathNode.ASIN, MathNode.ASINH, MathNode.ACOS, MathNode.ACOSH, MathNode.ATAN, MathNode.ATANH,
+	MathNode.LENGTH, MathNode.DFDX, MathNode.DFDY, MathNode.ROUND, MathNode.TRUNC, MathNode.FWIDTH, MathNode.RECIPROCAL,
+	MathNode.STEP, MathNode.REFLECT, MathNode.DISTANCE, MathNode.DOT, MathNode.CROSS, MathNode.POW,
+	MathNode.MIX, MathNode.REFRACT, MathNode.SMOOTHSTEP, MathNode.FACEFORWARD
+] );
 
 // 1 inputs
 
@@ -7650,6 +7720,33 @@ addMethodChaining( 'inverse', inverse );
 addMethodChaining( 'rand', rand );
 
 /**
+ * Custom error class for node-related errors, including stack trace information.
+ */
+class NodeError extends Error {
+
+	constructor( message, stackTrace = null ) {
+
+		super( message );
+
+		/**
+		 * The name of the error.
+		 *
+		 * @type {string}
+		 */
+		this.name = 'NodeError';
+
+		/**
+		 * The stack trace associated with the error.
+		 *
+		 * @type {?StackTrace}
+		 */
+		this.stackTrace = stackTrace;
+
+	}
+
+}
+
+/**
  * Represents a logical `if/else` statement. Can be used as an alternative
  * to the `If()`/`Else()` syntax.
  *
@@ -7658,6 +7755,19 @@ addMethodChaining( 'rand', rand );
  *
  * ```js
  * velocity = position.greaterThanEqual( limit ).select( velocity.negate(), velocity );
+ * ```
+ *
+ * When the condition is itself a vector (e.g. the `bvec4` produced by
+ * `someVec4.greaterThanEqual( someOtherVec4 )`), `select()` resolves
+ * per-component - each output lane picks independently based on its own
+ * condition component, the same way WGSL's native `select()` and GLSL's
+ * `mix( x, y, bvecN )` do - rather than picking one branch for the whole
+ * vector. The condition and values are converted to the largest vector width,
+ * with the condition converted to boolean components. Scalar values are broadcast.
+ *
+ * ```js
+ * // per-component: each channel picks independently
+ * const clamped = value.greaterThan( vec3( 1.0 ) ).select( vec3( 1.0 ), value );
  * ```
  *
  * @augments Node
@@ -7720,7 +7830,7 @@ class ConditionalNode extends Node {
 	 */
 	generateNodeType( builder ) {
 
-		const { ifNode, elseNode } = builder.getNodeProperties( this );
+		const { condNode, ifNode, elseNode } = builder.getNodeProperties( this );
 
 		if ( ifNode === undefined ) {
 
@@ -7732,36 +7842,35 @@ class ConditionalNode extends Node {
 
 		}
 
-		const ifType = ifNode.getNodeType( builder );
+		let type = ifNode.getNodeType( builder );
 
 		if ( elseNode !== null ) {
 
 			const elseType = elseNode.getNodeType( builder );
 
-			if ( builder.getTypeLength( elseType ) > builder.getTypeLength( ifType ) ) {
+			if ( builder.getTypeLength( elseType ) > builder.getTypeLength( type ) ) {
 
-				return elseType;
+				type = elseType;
 
 			}
 
 		}
 
-		return ifType;
+		const condLength = builder.getTypeLength( condNode.getNodeType( builder ) );
+
+		if ( condLength > 1 && ! builder.isReference( type ) && ( builder.getTypeLength( type ) === 1 || builder.isVector( builder.getVectorType( type ) ) ) ) {
+
+			type = builder.getTypeFromLength( Math.max( condLength, builder.getTypeLength( type ) ), builder.getComponentType( type ) );
+
+		}
+
+		return type;
 
 	}
 
 	setup( builder ) {
 
-		const condNode = this.condNode;
-		const ifNode = this.ifNode.isolate();
-		const elseNode = this.elseNode ? this.elseNode.isolate() : null;
-
-		//
-
-		const currentNodeBlock = builder.context.nodeBlock;
-
-		builder.getDataFromNode( ifNode ).parentNodeBlock = currentNodeBlock;
-		if ( elseNode !== null ) builder.getDataFromNode( elseNode ).parentNodeBlock = currentNodeBlock;
+		const { condNode, ifNode, elseNode } = this;
 
 		//
 
@@ -7780,9 +7889,9 @@ class ConditionalNode extends Node {
 
 		const nodeData = builder.getDataFromNode( this );
 
-		if ( nodeData.nodeProperty !== undefined ) {
+		if ( nodeData.propertyName !== undefined ) {
 
-			return nodeData.nodeProperty;
+			return builder.format( nodeData.propertyName, type, output );
 
 		}
 
@@ -7792,7 +7901,48 @@ class ConditionalNode extends Node {
 		const needsOutput = output !== 'void';
 		const nodeProperty = needsOutput ? property( type ).build( builder ) : '';
 
-		nodeData.nodeProperty = nodeProperty;
+		nodeData.propertyName = nodeProperty;
+
+		// A vector condition selects per-component - see getVectorSelect().
+		const condType = condNode.getNodeType( builder );
+		const condLength = builder.getTypeLength( condType );
+
+		if ( condLength > 1 ) {
+
+			const vectorType = builder.getVectorType( type );
+
+			if ( builder.isReference( type ) || ! builder.isVector( vectorType ) ) {
+
+				throw new NodeError( `TSL: select() with a vector condition ("${ condType }") requires scalar or vector values, received "${ type }".`, this.stackTrace );
+
+			}
+
+			// No "else": unselected lanes fall back to the type's zero value.
+			let elseSnippet;
+
+			if ( elseNode !== null ) {
+
+				elseSnippet = elseNode.build( builder, type );
+
+			} else {
+
+				elseSnippet = builder.generateConst( type );
+
+			}
+
+			const boolType = builder.changeComponentType( type, 'bool' );
+			const condSnippet = condNode.build( builder, boolType );
+			const ifSnippet = ifNode.build( builder, type );
+
+			const mathSnippet = builder.getVectorSelect( condSnippet, ifSnippet, elseSnippet, type );
+
+			if ( ! needsOutput ) return '';
+
+			builder.addFlowCode( `\n${ builder.tab }${ nodeProperty } = ${ mathSnippet };\n\n` );
+
+			return builder.format( nodeProperty, type, output );
+
+		}
 
 		const nodeSnippet = condNode.build( builder, 'bool' );
 		const isUniformFlow = builder.context.uniformFlow;
@@ -7812,7 +7962,13 @@ class ConditionalNode extends Node {
 
 		builder.addFlowCode( `\n${ builder.tab }if ( ${ nodeSnippet } ) {\n\n` ).addFlowTab();
 
+		const flowBlock = builder.flowBlock;
+
+		builder.flowBlock = { parent: flowBlock };
+
 		let ifSnippet = ifNode.build( builder, type );
+
+		builder.flowBlock = flowBlock;
 
 		if ( ifSnippet ) {
 
@@ -7842,7 +7998,11 @@ class ConditionalNode extends Node {
 
 			builder.addFlowCode( ' else {\n\n' ).addFlowTab();
 
+			builder.flowBlock = { parent: flowBlock };
+
 			let elseSnippet = elseNode.build( builder, type );
+
+			builder.flowBlock = flowBlock;
 
 			if ( elseSnippet ) {
 
@@ -8418,42 +8578,22 @@ class VarNode extends Node {
 
 		if ( this._hasStack( builder ) === false && builder.buildStage === 'setup' ) {
 
-			if ( builder.context.nodeLoop || builder.context.nodeBlock ) {
+			// A node created while a block is generated is declared where it is generated.
+			if ( ( builder.context.nodeLoop || builder.context.nodeBlock ) && builder.flowBlock === null ) {
 
-				let addBefore = false;
-
-				if ( this.node.isShaderCallNodeInternal && this.node.shaderNode.getLayout() === null ) {
-
-					if ( builder.fnCall && builder.fnCall.shaderNode ) {
-
-						const shaderNodeData = builder.getDataFromNode( this.node.shaderNode );
-
-						if ( shaderNodeData.hasLoop ) {
-
-							const data = builder.getDataFromNode( this );
-							data.forceDeclaration = true;
-
-							addBefore = true;
-
-						}
-
-					}
-
-				}
-
-				const baseStack = builder.getBaseStack();
-
-				if ( addBefore ) {
-
-					baseStack.addToStackBefore( this );
-
-				} else {
-
-					baseStack.addToStack( this );
-
-				}
+				builder.getBaseStack().addToStack( this );
 
 			}
+
+		} else if ( this.intent === true && builder.context.nodeLoop && builder.buildStage === 'analyze' && this.node.isCacheable( builder ) === false && builder.isDeterministic( this.node ) === false ) {
+
+			// A value that cannot be cached, e.g. a function call, is evaluated once at its declaration
+			// if it is used in a loop that runs after it, otherwise the loop would repeat it.
+			const data = builder.getDataFromNode( this );
+			const declarationIndex = builder.activeStacks.indexOf( data.stack );
+			const loopIndex = builder.activeStacks.indexOf( builder.getDataFromNode( builder.context.nodeLoop ).stack );
+
+			if ( declarationIndex !== -1 && loopIndex >= declarationIndex ) data.forceDeclaration = true;
 
 		}
 
@@ -8845,7 +8985,10 @@ class VaryingNode extends Node {
 		const properties = builder.getNodeProperties( this );
 		const varying = this.setupVarying( builder );
 
-		if ( properties[ propertyKey ] === undefined ) {
+		// The vertex assignment is emitted once per block, from the fragment stage it is emitted outside of any block.
+		const flowBlock = builder.shaderStage === NodeShaderStage.VERTEX ? builder.flowBlock : null;
+
+		if ( properties[ propertyKey ] !== flowBlock ) {
 
 			const type = this.getNodeType( builder );
 			const propertyName = builder.getPropertyName( varying, NodeShaderStage.VERTEX );
@@ -8863,7 +9006,7 @@ class VaryingNode extends Node {
 
 			}
 
-			properties[ propertyKey ] = propertyName;
+			properties[ propertyKey ] = flowBlock;
 
 		}
 
@@ -14737,8 +14880,7 @@ class LoopNode extends Node {
 
 		const fnCall = params[ params.length - 1 ]( inputs );
 
-		// Keep values first generated in the loop body out of the parent cache.
-		properties.returnsNode = fnCall.isolate().context( { nodeLoop: fnCall } );
+		properties.returnsNode = fnCall.context( { nodeLoop: this, nodeBlock: fnCall } );
 		properties.stackNode = stack;
 
 		const baseParam = params[ 0 ];
@@ -14747,7 +14889,7 @@ class LoopNode extends Node {
 
 			const fnUpdateCall = Fn( baseParam.update )( inputs );
 
-			properties.updateNode = fnUpdateCall.context( { nodeLoop: fnUpdateCall } );
+			properties.updateNode = fnUpdateCall.context( { nodeLoop: this } );
 
 		}
 
@@ -14776,13 +14918,6 @@ class LoopNode extends Node {
 		// setup properties
 
 		this.getProperties( builder );
-
-		if ( builder.fnCall ) {
-
-			const shaderNodeData = builder.getDataFromNode( builder.fnCall.shaderNode );
-			shaderNodeData.hasLoop = true;
-
-		}
 
 	}
 
@@ -14948,9 +15083,15 @@ class LoopNode extends Node {
 
 		}
 
+		const flowBlock = builder.flowBlock;
+
+		builder.flowBlock = { parent: flowBlock };
+
 		const stackSnippet = stackNode.build( builder, 'void' );
 
 		properties.returnsNode.build( builder, 'void' );
+
+		builder.flowBlock = flowBlock;
 
 		builder.removeFlowTab().addFlowCode( '\n' + builder.tab + stackSnippet );
 
@@ -18124,33 +18265,6 @@ class TextureSizeNode extends Node {
  * @returns {TextureSizeNode}
  */
 const textureSize = /*@__PURE__*/ nodeProxy( TextureSizeNode ).setParameterLength( 1, 2 );
-
-/**
- * Custom error class for node-related errors, including stack trace information.
- */
-class NodeError extends Error {
-
-	constructor( message, stackTrace = null ) {
-
-		super( message );
-
-		/**
-		 * The name of the error.
-		 *
-		 * @type {string}
-		 */
-		this.name = 'NodeError';
-
-		/**
-		 * The stack trace associated with the error.
-		 *
-		 * @type {?StackTrace}
-		 */
-		this.stackTrace = stackTrace;
-
-	}
-
-}
 
 const EmptyTexture$1 = /*@__PURE__*/ new Texture();
 
@@ -30249,7 +30363,7 @@ class PassNode extends Node {
 		 * Whether the pass is transparent.
 		 *
 		 * @type {boolean}
-		 * @default false
+		 * @default true
 		 */
 		this.transparent = true;
 
@@ -32892,13 +33006,13 @@ class AtomicFunctionNode extends Node {
 
 		} else {
 
-			if ( properties.constNode === undefined ) {
+			// The result is stored in a constant, declared in the block where the operation is generated.
+			const nodeVar = builder.getVarFromNode( this, null, type, undefined, true, true );
+			const propertyName = builder.getPropertyName( nodeVar );
 
-				properties.constNode = expression( methodSnippet, type ).toConst();
+			builder.addLineFlowCode( `${ builder.generateLetStatement( type, propertyName ) } = ${ methodSnippet }`, this );
 
-			}
-
-			return properties.constNode.build( builder );
+			return propertyName;
 
 		}
 
@@ -34969,7 +35083,7 @@ class ShadowNode extends ShadowBaseNode {
 		 *
 		 * @type {number}
 		 * @readonly
-		 * @default true
+		 * @default 0
 		 */
 		this.depthLayer = 0;
 
