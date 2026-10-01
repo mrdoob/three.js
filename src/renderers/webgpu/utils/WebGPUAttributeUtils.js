@@ -88,15 +88,11 @@ class WebGPUAttributeUtils {
 
 				} else if ( array.constructor === Uint16Array || array.constructor === Uint8Array ) {
 
-					array = new Uint32Array( array );
+					const UintConstructor = ( usage & GPUBufferUsage.INDEX ) ? Uint16Array : Uint32Array;
 
-					if ( usage & GPUBufferUsage.INDEX ) {
+					if ( array.constructor !== UintConstructor ) {
 
-						for ( let i = 0; i < array.length; i ++ ) {
-
-							if ( array[ i ] === 0xffff ) array[ i ] = 0xffffffff; // use correct primitive restart index
-
-						}
+						array = new UintConstructor( array );
 
 					}
 
