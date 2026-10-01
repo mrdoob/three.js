@@ -275,13 +275,13 @@ class WebGPUAttributeUtils {
 	}
 
 	/**
-	 * This method creates the vertex buffer layout data which are
-	 * require when creating a render pipeline for the given render object.
+	 * Returns the vertex buffer layout data which are required
+	 * when creating a render pipeline for the given render object.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
 	 * @return {Array<Object>} An array holding objects which describe the vertex buffer layout.
 	 */
-	createShaderVertexBuffers( renderObject ) {
+	getVertexBufferLayout( renderObject ) {
 
 		const attributes = renderObject.getAttributes();
 		const vertexBuffers = new Map();
@@ -340,6 +340,35 @@ class WebGPUAttributeUtils {
 		}
 
 		return Array.from( vertexBuffers.values() );
+
+	}
+
+	/**
+	 * Returns a cache key that represents the vertex buffer layout data
+	 * of the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {string} The cache key.
+	 */
+	getVertexBufferLayoutCacheKey( renderObject ) {
+
+		const vertexBufferLayout = this.getVertexBufferLayout( renderObject );
+
+		let cacheKey = '';
+
+		for ( const entry of vertexBufferLayout ) {
+
+			cacheKey += entry.arrayStride + ',' + entry.stepMode + ',';
+
+			for ( const attribute of entry.attributes ) {
+
+				cacheKey += attribute.shaderLocation + ',' + attribute.offset + ',' + attribute.format + ',';
+
+			}
+
+		}
+
+		return cacheKey;
 
 	}
 

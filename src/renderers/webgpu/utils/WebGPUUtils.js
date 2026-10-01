@@ -1,5 +1,5 @@
 import { HalfFloatType, UnsignedByteType } from '../../../constants.js';
-import { GPUPrimitiveTopology, GPUTextureFormat } from './WebGPUConstants.js';
+import { GPUIndexFormat, GPUPrimitiveTopology, GPUTextureFormat } from './WebGPUConstants.js';
 
 const _commandList = [ null ];
 
@@ -218,6 +218,23 @@ class WebGPUUtils {
 		else if ( object.isLineSegments || ( object.isMesh && material.wireframe === true ) ) return GPUPrimitiveTopology.LineList;
 		else if ( object.isLine ) return GPUPrimitiveTopology.LineStrip;
 		else if ( object.isMesh ) return GPUPrimitiveTopology.TriangleList;
+
+	}
+
+	/**
+	 * Returns the GPU strip index format for the given object and geometry.
+	 *
+	 * @param {Object3D} object - The 3D object.
+	 * @param {BufferGeometry} geometry - The geometry.
+	 * @return {string|undefined} The GPU strip index format. `undefined` if the object is not rendered as an indexed strip.
+	 */
+	getStripIndexFormat( object, geometry ) {
+
+		if ( geometry.index !== null && object.isLine === true && object.isLineSegments !== true ) {
+
+			return ( geometry.index.array instanceof Uint16Array ) ? GPUIndexFormat.Uint16 : GPUIndexFormat.Uint32;
+
+		}
 
 	}
 
