@@ -427,11 +427,33 @@ class GTAONode extends Node {
 		const sampleNoise = ( uv ) => this._noiseNode.sample( uv );
 		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.sample( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this._cameraProjectionMatrixInverse );
 
+		const isValidSample = Fn( ( [ uv, centerTexel, size ] ) => {
+
+			const texel = uv.mul( size ).floor().toConst();
+
+			// rejects off-screen samples and samples that fall into the center texel
+
+			return uv.x.greaterThan( 0 ).and( uv.x.lessThan( 1 ) ).and( uv.y.greaterThan( 0 ) ).and( uv.y.lessThan( 1 ) )
+				.and( texel.x.notEqual( centerTexel.x ).or( texel.y.notEqual( centerTexel.y ) ) );
+
+		} ).setLayout( {
+			name: 'isValidSample',
+			type: 'bool',
+			inputs: [
+				{ name: 'uv', type: 'vec2' },
+				{ name: 'centerTexel', type: 'vec2' },
+				{ name: 'size', type: 'vec2' }
+			]
+		} );
+
 		this._ao = Fn( () => {
 
 			const depth = this._resolutionScale.lessThan( 1 ).select( sampleCenterDepth( uvNode ), sampleDepth( uvNode ) ).toConst();
 
 			depth.greaterThanEqual( 1.0 ).discard();
+
+			const depthSize = vec2( textureSize( this.depthNode, 0 ) ).toConst();
+			const centerTexel = uvNode.mul( depthSize ).floor().toConst();
 
 			const viewPosition = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).toConst();
 			const viewNormal = sampleNormal( uvNode ).toConst();
@@ -522,7 +544,7 @@ class GTAONode extends Node {
 					const distFacX = min( lenX.mul( invRadius ), 1 );
 					const distFacSqX = distFacX.mul( distFacX );
 
-					If( abs( viewDeltaX.z ).lessThan( this.thickness ), () => {
+					If( isValidSample( sampleScreenPositionX, centerTexel, depthSize ).and( abs( viewDeltaX.z ).lessThan( this.thickness ) ), () => {
 
 						cosHorizons.x.assign( mix( max( cosHorizons.x, sHX ), cosHorizons.x, distFacSqX ) );
 
@@ -541,7 +563,7 @@ class GTAONode extends Node {
 					const distFacY = min( lenY.mul( invRadius ), 1 );
 					const distFacSqY = distFacY.mul( distFacY );
 
-					If( abs( viewDeltaY.z ).lessThan( this.thickness ), () => {
+					If( isValidSample( sampleScreenPositionY, centerTexel, depthSize ).and( abs( viewDeltaY.z ).lessThan( this.thickness ) ), () => {
 
 						cosHorizons.y.assign( mix( max( cosHorizons.y, sHY ), cosHorizons.y, distFacSqY ) );
 
