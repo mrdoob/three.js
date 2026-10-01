@@ -19,7 +19,7 @@ export const getViewPosition = /*@__PURE__*/ Fn( ( [ screenPosition, depth, proj
 
 	let clipSpacePosition;
 
-	if ( builder.renderer.coordinateSystem === WebGPUCoordinateSystem ) {
+	if ( builder.renderer.coordinateSystem === WebGPUCoordinateSystem || builder.renderer.reversedDepthBuffer === true ) {
 
 		screenPosition = vec2( screenPosition.x, screenPosition.y.oneMinus() ).mul( 2.0 ).sub( 1.0 );
 		clipSpacePosition = vec4( vec3( screenPosition, depth ), 1.0 );
