@@ -2376,7 +2376,7 @@ class WebGPUBackend extends Backend {
 
 		const data = this.get( renderObject );
 
-		const { object, material } = renderObject;
+		const { object, material, geometry } = renderObject;
 
 		const utils = this.utils;
 
@@ -2385,6 +2385,7 @@ class WebGPUBackend extends Backend {
 		const colorFormat = utils.getCurrentColorFormat( renderObject.context );
 		const depthStencilFormat = utils.getCurrentDepthStencilFormat( renderObject.context );
 		const primitiveTopology = utils.getPrimitiveTopology( object, material );
+		const stripIndexFormat = utils.getStripIndexFormat( object, geometry );
 		const frontFaceCW = ( object.isMesh && object.matrixWorld.determinantAffine() < 0 );
 
 		let needsUpdate = false;
@@ -2401,7 +2402,7 @@ class WebGPUBackend extends Backend {
 			data.side !== material.side || data.alphaToCoverage !== material.alphaToCoverage ||
 			data.sampleCount !== sampleCount || data.colorSpace !== colorSpace ||
 			data.colorFormat !== colorFormat || data.depthStencilFormat !== depthStencilFormat ||
-			data.primitiveTopology !== primitiveTopology ||
+			data.primitiveTopology !== primitiveTopology || data.stripIndexFormat !== stripIndexFormat ||
 			data.frontFaceCW !== frontFaceCW ||
 			data.geometryVersion !== renderObject.geometryVersion ||
 			data.clippingContextCacheKey !== renderObject.clippingContextCacheKey
@@ -2423,6 +2424,7 @@ class WebGPUBackend extends Backend {
 			data.colorFormat = colorFormat;
 			data.depthStencilFormat = depthStencilFormat;
 			data.primitiveTopology = primitiveTopology;
+			data.stripIndexFormat = stripIndexFormat;
 			data.frontFaceCW = frontFaceCW;
 			data.geometryVersion = renderObject.geometryVersion;
 			data.clippingContextCacheKey = renderObject.clippingContextCacheKey;
