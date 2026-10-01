@@ -189,6 +189,28 @@ class NodeManager extends DataMap {
 	}
 
 	/**
+	 * Logs an error thrown while building a node material.
+	 *
+	 * @private
+	 * @param {Error} e - The build error.
+	 */
+	_reportBuildError( e ) {
+
+		let stackTrace = e.stackTrace;
+
+		if ( ! stackTrace && e.stack ) {
+
+			// Capture stack trace for JavaScript errors
+
+			stackTrace = new StackTrace( e.stack );
+
+		}
+
+		error( 'TSL: ' + e, stackTrace );
+
+	}
+
+	/**
 	 * Returns a node builder state for the given render object.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
@@ -241,7 +263,7 @@ class NodeManager extends DataMap {
 
 						}
 
-						error( 'TSL: ' + e );
+						this._reportBuildError( e );
 
 					}
 
@@ -276,17 +298,7 @@ class NodeManager extends DataMap {
 						nodeBuilder = this._createNodeBuilder( renderObject, new NodeMaterial() );
 						nodeBuilder.build();
 
-						let stackTrace = e.stackTrace;
-
-						if ( ! stackTrace && e.stack ) {
-
-							// Capture stack trace for JavaScript errors
-
-							stackTrace = new StackTrace( e.stack );
-
-						}
-
-						error( 'TSL: ' + e, stackTrace );
+						this._reportBuildError( e );
 
 					}
 
