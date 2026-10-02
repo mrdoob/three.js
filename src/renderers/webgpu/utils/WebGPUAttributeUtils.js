@@ -35,7 +35,7 @@ const typeArraysToVertexFormatPrefixForItemSize1 = new Map( [
 	[ Float32Array, 'float32' ]
 ] );
 
-const _alignmentArray = new Uint8Array( 4 );
+const _tail = new Uint8Array( 4 );
 
 /**
  * Writes a range of a typed array into the given GPU buffer. `writeBuffer()` requires
@@ -54,37 +54,20 @@ const _alignmentArray = new Uint8Array( 4 );
  */
 function writeBufferAligned( device, buffer, array, start, count ) {
 
-	const bytesPerElement = array.BYTES_PER_ELEMENT;
-	const elementsPerWord = Math.max( 1, 4 / bytesPerElement );
+	const bytes = new Uint8Array( array.buffer, array.byteOffset, array.byteLength );
 
-	// Find the starting edge of the word boundaries the start index belongs to
-	const alignedStart = start - ( start % elementsPerWord );
+	const byteStart = Math.floor( start * array.BYTES_PER_ELEMENT / 4 ) * 4;
+	const byteEnd = ( start + count ) * array.BYTES_PER_ELEMENT;
+	const alignedEnd = Math.floor( byteEnd / 4 ) * 4;
 
-	// Find length of values up to the word (start + count) belongs to
-	const endElementWordIndex = ( start + count ) / elementsPerWord;
-	let endOfLastWord = Math.ceil( endElementWordIndex ) * elementsPerWord;
+	if ( alignedEnd > byteStart ) device.queue.writeBuffer( buffer, byteStart, bytes, byteStart, alignedEnd - byteStart );
 
-	if ( endOfLastWord > array.length ) {
+	if ( byteEnd > alignedEnd ) {
 
-		// Move to index at start of last word
-		endOfLastWord -= elementsPerWord;
+		_tail.fill( 0 );
+		_tail.set( bytes.subarray( alignedEnd, alignedEnd + 4 ) );
 
-		// Get number of valid elements we can write to temp array
-		const tailByteOffset = array.byteOffset + endOfLastWord * bytesPerElement;
-		const tailByteLength = ( array.length - endOfLastWord ) * bytesPerElement;
-
-		_alignmentArray.fill( 0 );
-		_alignmentArray.set( new Uint8Array( array.buffer, tailByteOffset, tailByteLength ) );
-
-		device.queue.writeBuffer( buffer, endOfLastWord * bytesPerElement, _alignmentArray );
-
-	}
-
-	// Write the rest of the data
-	if ( endOfLastWord > alignedStart ) {
-
-		const startInBytes = alignedStart * bytesPerElement;
-		device.queue.writeBuffer( buffer, startInBytes, array, alignedStart, endOfLastWord - alignedStart );
+		device.queue.writeBuffer( buffer, alignedEnd, _tail );
 
 	}
 
@@ -134,7 +117,9 @@ class WebGPUAttributeUtils {
 
 			let array = bufferAttribute.array;
 
-			// patch for INT16 and UINT16
+			// WGSL has no 8 or 16 bit integer types and vertex strides must be a multiple of 4 bytes,
+			// so widen these integers to 32 bit. index buffers only need uint16 unless used as storage
+
 			if ( attribute.normalized === false && attribute.isInterleavedBufferAttribute !== true ) {
 
 				if ( array.constructor === Int16Array || array.constructor === Int8Array ) {
@@ -154,8 +139,7 @@ class WebGPUAttributeUtils {
 
 					}
 
-					// Use the correct primitive restart index if
-					// the uint16 values must be used for storage.
+					// widened indices need the uint32 primitive restart value
 
 					if ( isIndexBuffer && isStorageBuffer ) {
 
@@ -290,7 +274,6 @@ class WebGPUAttributeUtils {
 
 		const needsAlignment = isTypedArray( array ) && array.BYTES_PER_ELEMENT < 4;
 
-		// writehttps://gpuweb.github.io/gpuweb/#dom-gpuqueue-writebuffer
 		if ( updateRanges.length === 0 ) {
 
 			// Not using update ranges
@@ -337,19 +320,20 @@ class WebGPUAttributeUtils {
 				if ( needsAlignment ) {
 
 					writeBufferAligned( device, buffer, array, dataOffset, size );
-					continue;
+
+				} else {
+
+					const bufferOffset = dataOffset * ( isTyped ? array.BYTES_PER_ELEMENT : 1 ); // bufferOffset is always in bytes
+
+					device.queue.writeBuffer(
+						buffer,
+						bufferOffset,
+						array,
+						dataOffset,
+						size
+					);
 
 				}
-
-				const bufferOffset = dataOffset * ( isTyped ? array.BYTES_PER_ELEMENT : 1 ); // bufferOffset is always in bytes
-
-				device.queue.writeBuffer(
-					buffer,
-					bufferOffset,
-					array,
-					dataOffset,
-					size
-				);
 
 			}
 
