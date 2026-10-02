@@ -42,6 +42,8 @@ class Timer {
 	 */
 	connect( document ) {
 
+		this.disconnect();
+
 		this._document = document;
 
 		// use Page Visibility API to avoid large time delta values
