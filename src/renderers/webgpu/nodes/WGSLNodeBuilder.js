@@ -6,7 +6,7 @@ import { NodeSampledTexture, NodeSampledCubeTexture, NodeSampledTexture3D } from
 import NodeUniformBuffer from '../../common/nodes/NodeUniformBuffer.js';
 import NodeStorageBuffer from '../../common/nodes/NodeStorageBuffer.js';
 
-import { NodeBuilder, CodeNode } from '../../../nodes/Nodes.js';
+import { NodeBuilder, CodeNode, IndexNode } from '../../../nodes/Nodes.js';
 
 import { getFormat } from '../utils/WebGPUTextureUtils.js';
 
@@ -20,6 +20,8 @@ import { FloatType, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping,
 import { warn, error } from '../../../utils.js';
 
 import { GPUShaderStage } from '../utils/WebGPUConstants.js';
+
+const objectIndex = new IndexNode( IndexNode.INSTANCE );
 
 const accessNames = {
 	[ NodeAccess.READ_ONLY ]: 'read',
@@ -1225,7 +1227,18 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			} else {
 
-				return node.groupNode.name + '.' + name;
+				let group = node.groupNode.name;
+
+				if ( group === 'object' ) {
+
+					let index = objectIndex.build( this );
+					//index = 0;
+
+					group = `object[ ${ index } ]`;
+
+				}
+
+				return group + '.' + name;
 
 			}
 
@@ -1441,6 +1454,12 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 					uniformsGroup = new NodeUniformsGroup( groupName, group );
 					uniformsGroup.setVisibility( GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE );
+
+					if ( groupName === 'object' ) {
+
+						uniformsGroup.count = this.getCount();
+
+					}
 
 					this.uniformGroups[ groupName ] = uniformsGroup;
 
@@ -2486,6 +2505,7 @@ ${ flowData.code }
 
 			this.vertexShader = this._getWGSLVertexCode( shadersData.vertex );
 			this.fragmentShader = this._getWGSLFragmentCode( shadersData.fragment );
+			console.log( this.fragmentShader );
 
 		} else {
 
@@ -2823,8 +2843,16 @@ ${vars}
 	 */
 	_getWGSLStructBinding( name, vars, access, binding = 0, group = 0 ) {
 
-		const structName = name + 'Struct';
+		let structName = name + 'Struct';
 		const structSnippet = this._getWGSLStruct( structName, vars );
+
+		if ( name === 'object' ) {
+
+			const count = this.getCount();
+
+			structName = `array< ${ structName }, ${ count } >`;
+
+		}
 
 		return `${structSnippet}
 @binding( ${ binding } ) @group( ${ group } )

@@ -3223,7 +3223,7 @@ class NodeBuilder {
 
 	getCount() {
 
-		return roundInstances( this.instances.length );
+		return this.instances ? roundInstances( this.instances.length ) : 1;
 
 	}
 

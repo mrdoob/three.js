@@ -4010,12 +4010,24 @@ class Renderer {
 
 		if ( refreshType === RenderObjectRefreshType.FULL ) {
 
-			this._nodes.updateBefore( renderObject );
+			const count = renderObject.instances ? renderObject.instances.length : 1;
 
-			this._geometries.updateForRender( renderObject );
+			for ( let i = 0; i < count; i ++ ) {
 
-			this._nodes.updateForRender( renderObject );
-			this._bindings.updateForRender( renderObject );
+				renderObject.index = i;
+				renderObject.object = renderObject.instances ? renderObject.instances[ i ] : object;
+
+				this._nodes.updateBefore( renderObject );
+
+				this._geometries.updateForRender( renderObject );
+
+				this._nodes.updateForRender( renderObject );
+				this._bindings.updateForRender( renderObject );
+
+			}
+
+			renderObject.object = object;
+			renderObject.index = 0;
 
 		} else if ( refreshType === RenderObjectRefreshType.SHARED ) {
 

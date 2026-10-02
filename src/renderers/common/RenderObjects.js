@@ -118,6 +118,8 @@ class RenderObjects {
 
 			renderObject = this.createRenderObject( this.nodes, this.geometries, this.renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext, passId, instances );
 
+			//console.log( material, 'new render object', renderObject );
+
 			chainMap.set( _chainKeys, renderObject );
 
 		} else {
