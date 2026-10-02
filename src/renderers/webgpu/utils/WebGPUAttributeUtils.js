@@ -41,13 +41,12 @@ const _tail = new Uint8Array( 4 );
  * Writes a range of a typed array into the given GPU buffer. `writeBuffer()` requires
  * the offset and size to be multiples of 4 bytes, so the range is expanded to the
  * element boundaries of the surrounding 4-byte word. The function assumes
- * that the buffer is already properly sized to 4-bytes.
- *
+ * that the buffer is already properly sized to a multiple of 4 bytes.
  *
  * @private
  * @function
  * @param {GPUDevice} device - The GPU device calling `writeBuffer()`.
- * @param {GPUBuffer} buffer - The GPU buffer, properly sized to 4 bytes.
+ * @param {GPUBuffer} buffer - The GPU buffer, properly sized to a multiple of 4 bytes.
  * @param {TypedArray} array - The source array.
  * @param {number} start - The index of the first element to write.
  * @param {number} count - The number of elements to write.
