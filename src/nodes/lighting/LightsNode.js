@@ -229,7 +229,9 @@ class LightsNode extends Node {
 
 		const builtinLights = this.getBuiltinLights();
 
-		const lights = sortLights( [ ...materialLightings, ...builtinLights ] );
+		// material lightings ( environment, light map, AO ) first, so a light can build on them
+
+		const lights = [ ...materialLightings, ...sortLights( [ ...builtinLights ] ) ];
 
 		for ( const light of lights ) {
 
