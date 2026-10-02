@@ -213,7 +213,8 @@ const UniformsLib = {
 		probesSH: { value: null },
 		probesMin: { value: /*@__PURE__*/ new Vector3() },
 		probesMax: { value: /*@__PURE__*/ new Vector3() },
-		probesResolution: { value: /*@__PURE__*/ new Vector3() }
+		probesResolution: { value: /*@__PURE__*/ new Vector3() },
+		probesEnvironment: { value: false }
 
 	},
 

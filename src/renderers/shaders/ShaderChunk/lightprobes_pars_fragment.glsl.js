@@ -12,7 +12,12 @@ uniform vec3 probesMin;
 uniform vec3 probesMax;
 uniform vec3 probesResolution;
 
-vec3 getLightProbeGridIrradiance( vec3 worldPos, vec3 worldNormal ) {
+// True when the grid was baked in the environment this material is lit by.
+uniform bool probesEnvironment;
+
+// Returns the irradiance in rgb and the share of baked probes behind it in a:
+// 1 inside a baked grid, 0 in cells not baked yet.
+vec4 sampleLightProbeGrid( vec3 worldPos, vec3 worldNormal ) {
 
 	vec3 res = probesResolution;
 	vec3 gridRange = probesMax - probesMin;
@@ -72,7 +77,23 @@ vec3 getLightProbeGridIrradiance( vec3 worldPos, vec3 worldNormal ) {
 	result += c7 * 2.0 * 0.429043 * x * z;
 	result += c8 * 0.429043 * ( x * x - y * y );
 
-	return max( result, vec3( 0.0 ) );
+	return vec4( max( result, vec3( 0.0 ) ), s6.w );
+
+}
+
+vec3 getLightProbeGridIrradiance( vec3 worldPos, vec3 worldNormal ) {
+
+	return sampleLightProbeGrid( worldPos, worldNormal ).rgb;
+
+}
+
+// 1 inside the grid, falling to 0 one probe spacing outside it.
+float getLightProbeGridFade( vec3 worldPos ) {
+
+	vec3 probeSpacing = ( probesMax - probesMin ) / ( probesResolution - 1.0 );
+	vec3 outside = max( probesMin - worldPos, 0.0 ) + max( worldPos - probesMax, 0.0 );
+
+	return 1.0 - smoothstep( 0.0, max( probeSpacing.x, max( probeSpacing.y, probeSpacing.z ) ), length( outside ) );
 
 }
 

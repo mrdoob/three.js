@@ -20,7 +20,7 @@ import {
 	WebGLRenderTarget
 } from 'three';
 
-import { replaceSunLights, restoreSunLights } from './LightProbeGridUtils.js';
+import { getSky, replaceBackground, replaceSunLights, restoreBackground, restoreSunLights } from './LightProbeGridUtils.js';
 
 // Shared fullscreen-quad scene / camera
 let _scene = null;
@@ -82,6 +82,11 @@ const ATLAS_PADDING = 1;
  *
  * Baking is fully GPU-resident: cubemap rendering, SH projection, and
  * texture packing all happen on the GPU with zero CPU readback.
+ *
+ * In a scene with an environment, the probes see `Scene.environment` as their
+ * sky, and for materials lit by it the grid takes the place of the
+ * environment's irradiance (its reflections stay), handing back to it past the
+ * grid's box. Re-bake after changing the environment or its intensity.
  *
  * @three_import import { LightProbeGridWebGL } from 'three/addons/lighting/LightProbeGridWebGL.js';
  */
@@ -288,6 +293,7 @@ class LightProbeGridWebGL extends Object3D {
 		const currentActiveCubeFace = renderer.getActiveCubeFace();
 		const currentActiveMipmapLevel = renderer.getActiveMipmapLevel();
 		const currentAutoClear = renderer.autoClear;
+		const currentAutoClearColor = renderer.autoClearColor;
 		const currentXrEnabled = renderer.xr.enabled;
 		const currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
 		const currentMatrixWorldAutoUpdate = scene.matrixWorldAutoUpdate;
@@ -296,6 +302,8 @@ class LightProbeGridWebGL extends Object3D {
 		const renderTarget = this._renderTarget;
 		const currentViewport = renderTarget.viewport.clone();
 		let replacedSunLights = null;
+		let replacedBackground = null;
+		let sky = null;
 
 		try {
 
@@ -312,6 +320,10 @@ class LightProbeGridWebGL extends Object3D {
 
 			replacedSunLights = replaceSunLights( scene );
 
+			sky = getSky( scene, scene.environment );
+
+			if ( sky !== null ) replacedBackground = replaceBackground( scene );
+
 			// Render shadow maps once, not once per cube face.
 
 			renderer.shadowMap.autoUpdate = false;
@@ -320,7 +332,7 @@ class LightProbeGridWebGL extends Object3D {
 			for ( let pass = firstPass; pass <= firstPass + bounces; pass ++ ) {
 
 				this._updateBakeTexture( renderer, pass, start );
-				this._captureProbes( renderer, scene, start, end );
+				this._captureProbes( renderer, scene, sky, start, end );
 				this._repackProbes( renderer, start, end );
 
 			}
@@ -330,10 +342,12 @@ class LightProbeGridWebGL extends Object3D {
 			renderTarget.viewport.copy( currentViewport );
 			renderer.setRenderTarget( currentRenderTarget, currentActiveCubeFace, currentActiveMipmapLevel );
 			renderer.autoClear = currentAutoClear;
+			renderer.autoClearColor = currentAutoClearColor;
 			renderer.xr.enabled = currentXrEnabled;
 			renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
 
 			if ( replacedSunLights !== null ) restoreSunLights( scene, replacedSunLights );
+			if ( replacedBackground !== null ) restoreBackground( scene, replacedBackground );
 
 			scene.matrixWorldAutoUpdate = currentMatrixWorldAutoUpdate;
 			this.visible = currentVisible;
@@ -387,10 +401,11 @@ class LightProbeGridWebGL extends Object3D {
 	 * @private
 	 * @param {WebGLRenderer} renderer - The renderer.
 	 * @param {Scene} scene - The scene to capture.
+	 * @param {?Scene} sky - The sky to draw before the scene, if any.
 	 * @param {number} start - The first probe index.
 	 * @param {number} end - The exclusive end probe index.
 	 */
-	_captureProbes( renderer, scene, start, end ) {
+	_captureProbes( renderer, scene, sky, start, end ) {
 
 		const { x: nx, y: ny, z: nz } = this.resolution;
 		const probesPerLayer = nx * nz;
@@ -407,8 +422,17 @@ class LightProbeGridWebGL extends Object3D {
 			this.getProbePosition( ix, iy, iz, _position );
 			_cubeCamera.position.copy( _position );
 
-			// The cube faces must be cleared per face.
+			// The cube faces must be cleared per face. With a sky, the scene is drawn over it.
 			renderer.autoClear = true;
+			renderer.autoClearColor = true;
+
+			if ( sky !== null ) {
+
+				_cubeCamera.update( renderer, sky );
+				renderer.autoClearColor = false;
+
+			}
+
 			_cubeCamera.update( renderer, scene );
 
 			// Keep batch rows in texture order (X, Y, Z).
@@ -701,7 +725,7 @@ function _ensureRepackResources() {
 	// Texture 3: (c4.r, c4.g, c4.b, c5.r)
 	// Texture 4: (c5.g, c5.b, c6.r, c6.g)
 	// Texture 5: (c6.b, c7.r, c7.g, c7.b)
-	// Texture 6: (c8.r, c8.g, c8.b, 0.0)
+	// Texture 6: (c8.r, c8.g, c8.b, 1.0), alpha marks a baked probe
 
 	const repackVertexShader = /* glsl */`
 		void main() {
@@ -762,7 +786,7 @@ function _ensureRepackResources() {
 					#elif TEXTURE_INDEX == 5
 						gl_FragColor = vec4( c6.b, c7.rgb );
 					#else
-						gl_FragColor = vec4( c8.rgb, 0.0 );
+						gl_FragColor = vec4( c8.rgb, 1.0 );
 					#endif
 
 				}

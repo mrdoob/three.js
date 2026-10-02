@@ -1,8 +1,11 @@
-import { Box3, DirectionalLight, Sphere, Vector3 } from 'three';
+import { Box3, DirectionalLight, Scene, Sphere, Vector3 } from 'three';
 
 const _casterBox = /*@__PURE__*/ new Box3();
 const _casterSphere = /*@__PURE__*/ new Sphere();
 const _sunDirection = /*@__PURE__*/ new Vector3();
+
+// The sky of every bake, kept so the renderer compiles its background once.
+const _sky = /*@__PURE__*/ new Scene();
 
 // One bake light per SunLight: WebGPU pipelines are keyed by light identity,
 // so a fresh light per ranged bake would recompile every material each call.
@@ -104,4 +107,63 @@ function restoreSunLights( scene, replacements ) {
 
 }
 
-export { replaceSunLights, restoreSunLights };
+/**
+ * Returns the sky of a bake: a scene whose background shows the scene's
+ * environment, drawn before the scene so the probes capture the light a grid
+ * stands in for when it lights materials that use the same environment. As a
+ * scene of its own, it leaves the scene's background, and what the renderer
+ * compiled for it, as they are.
+ *
+ * @param {Scene} scene - The scene to bake.
+ * @param {?(Texture|Node)} environment - The scene's environment.
+ * @return {?Scene} The sky, or `null` if the scene has no environment or its background already shows it.
+ */
+function getSky( scene, environment ) {
+
+	if ( ! environment ) return null;
+
+	const isNode = environment.isNode === true;
+	const background = isNode ? scene.backgroundNode : ( scene.backgroundNode || scene.background );
+
+	if ( background === environment && scene.backgroundBlurriness === 0 && scene.backgroundIntensity === scene.environmentIntensity && scene.backgroundRotation.equals( scene.environmentRotation ) ) return null;
+
+	_sky.background = isNode ? null : environment;
+	_sky.backgroundNode = isNode ? environment : null;
+	_sky.backgroundIntensity = scene.environmentIntensity;
+	_sky.backgroundRotation.copy( scene.environmentRotation );
+
+	return _sky;
+
+}
+
+/**
+ * Hides the scene's background, which the sky of the bake takes the place of.
+ *
+ * @param {Scene} scene - The scene to bake.
+ * @return {Object} The background to pass to {@link restoreBackground}.
+ */
+function replaceBackground( scene ) {
+
+	const background = { background: scene.background, backgroundNode: scene.backgroundNode };
+
+	scene.background = null;
+	if ( scene.backgroundNode ) scene.backgroundNode = null;
+
+	return background;
+
+}
+
+/**
+ * Restores the background hidden by {@link replaceBackground}.
+ *
+ * @param {Scene} scene - The baked scene.
+ * @param {Object} background - The background to restore.
+ */
+function restoreBackground( scene, background ) {
+
+	scene.background = background.background;
+	if ( background.backgroundNode ) scene.backgroundNode = background.backgroundNode;
+
+}
+
+export { replaceSunLights, restoreSunLights, getSky, replaceBackground, restoreBackground };

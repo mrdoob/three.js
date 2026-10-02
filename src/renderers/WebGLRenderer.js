@@ -2794,14 +2794,26 @@ class WebGLRenderer {
 
 				// light probe volume
 
-				if ( materialProperties.needsLights && materialProperties.lightProbeGrid ) {
+				if ( materialProperties.needsLights && currentRenderState.state.lightProbeGridArray.length > 0 ) {
 
 					const volume = materialProperties.lightProbeGrid;
 
-					m_uniforms.probesSH.value = volume.texture;
-					m_uniforms.probesMin.value.copy( volume.boundingBox.min );
-					m_uniforms.probesMax.value.copy( volume.boundingBox.max );
-					m_uniforms.probesResolution.value.copy( volume.resolution );
+					if ( volume ) {
+
+						m_uniforms.probesSH.value = volume.texture;
+						m_uniforms.probesMin.value.copy( volume.boundingBox.min );
+						m_uniforms.probesMax.value.copy( volume.boundingBox.max );
+						m_uniforms.probesResolution.value.copy( volume.resolution );
+
+					} else {
+
+						// outside every grid: an empty atlas instead of the last grid drawn with this material
+						m_uniforms.probesSH.value = null;
+
+					}
+
+					// the bake captures the scene's environment, so the grid can stand in for it
+					m_uniforms.probesEnvironment.value = environment !== null && ! material.envMap;
 
 				}
 

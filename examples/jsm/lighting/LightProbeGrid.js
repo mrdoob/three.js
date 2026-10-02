@@ -32,7 +32,7 @@ import {
 } from 'three/tsl';
 
 import { LightProbeGridNode, ATLAS_PADDING } from '../tsl/lighting/LightProbeGridNode.js';
-import { replaceSunLights, restoreSunLights } from './LightProbeGridUtils.js';
+import { getSky, replaceBackground, replaceSunLights, restoreBackground, restoreSunLights } from './LightProbeGridUtils.js';
 
 // Shared fullscreen-quad for the bake passes.
 const _quad = /*@__PURE__*/ new QuadMesh();
@@ -162,7 +162,7 @@ function repackNode( batch, textureIndex, resolution, sliceZ ) {
 			case 3: packed = vec4( c4.xyz, c5.x ); break;
 			case 4: packed = vec4( c5.yz, c6.xy ); break;
 			case 5: packed = vec4( c6.z, c7.xyz ); break;
-			default: packed = vec4( c8.xyz, 0.0 ); break;
+			default: packed = vec4( c8.xyz, 1.0 ); break; // alpha marks a baked probe
 
 		}
 
@@ -279,6 +279,11 @@ function ensureBakeMaterials( sampleCount, cubeMap, batchMap ) {
  * fully GPU-resident: cubemap rendering, SH projection, and texture packing all
  * happen on the GPU with zero CPU readback.
  *
+ * In a scene with an environment, the probes see `Scene.environment` as their
+ * sky, and for materials lit by it the grid takes the place of the
+ * environment's irradiance (its reflections stay), handing back to it past the
+ * grid's box. Re-bake after changing the environment or its intensity.
+ *
  * @augments Light
  * @three_import import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
  */
@@ -355,7 +360,9 @@ class LightProbeGrid extends Light {
 		 * Distance in world units over which the grid contribution fades out
 		 * past the volume boundary. `0` applies the contribution everywhere
 		 * (clamped), which matches a single-volume setup. Use a small positive
-		 * value to blend multiple overlapping grids.
+		 * value to blend multiple overlapping grids. For materials lit by the
+		 * scene's environment, `0` fades the grid out over one probe spacing,
+		 * and where grids overlap the one created last is on top.
 		 *
 		 * @type {number}
 		 * @default 0
@@ -522,6 +529,7 @@ class LightProbeGrid extends Light {
 		const currentActiveCubeFace = renderer.getActiveCubeFace();
 		const currentActiveMipmapLevel = renderer.getActiveMipmapLevel();
 		const currentAutoClear = renderer.autoClear;
+		const currentAutoClearColor = renderer.autoClearColor;
 		const currentXrEnabled = renderer.xr.enabled;
 		const currentInspectorEnabled = renderer.inspector.enabled;
 		const currentMatrixWorldAutoUpdate = scene.matrixWorldAutoUpdate;
@@ -530,6 +538,8 @@ class LightProbeGrid extends Light {
 		const currentViewport = renderTarget.viewport.clone();
 		const shadowStates = [];
 		let replacedSunLights = null;
+		let replacedBackground = null;
+		let sky = null;
 
 		try {
 
@@ -546,6 +556,10 @@ class LightProbeGrid extends Light {
 			}
 
 			replacedSunLights = replaceSunLights( scene );
+
+			sky = getSky( scene, scene.environmentNode || scene.environment );
+
+			if ( sky !== null ) replacedBackground = replaceBackground( scene );
 
 			// Render each shadow map once, not once per cube face.
 
@@ -565,7 +579,7 @@ class LightProbeGrid extends Light {
 			for ( let pass = firstPass; pass <= firstPass + bounces; pass ++ ) {
 
 				this._updateBounceGrid( renderer, scene, pass, start );
-				this._captureProbes( renderer, scene, start, end );
+				this._captureProbes( renderer, scene, sky, start, end );
 				this._repackProbes( renderer, start, end );
 
 			}
@@ -577,12 +591,14 @@ class LightProbeGrid extends Light {
 			renderTarget.viewport.copy( currentViewport );
 			renderer.setRenderTarget( currentRenderTarget, currentActiveCubeFace, currentActiveMipmapLevel );
 			renderer.autoClear = currentAutoClear;
+			renderer.autoClearColor = currentAutoClearColor;
 			renderer.xr.enabled = currentXrEnabled;
 			scene.matrixWorldAutoUpdate = currentMatrixWorldAutoUpdate;
 
 			for ( const { shadow, autoUpdate } of shadowStates ) shadow.autoUpdate = autoUpdate;
 
 			if ( replacedSunLights !== null ) restoreSunLights( scene, replacedSunLights );
+			if ( replacedBackground !== null ) restoreBackground( scene, replacedBackground );
 
 			this.visible = currentVisible;
 			if ( this._bounceGrid !== null ) this._bounceGrid.removeFromParent();
@@ -647,10 +663,11 @@ class LightProbeGrid extends Light {
 	 * @private
 	 * @param {WebGPURenderer} renderer - The renderer.
 	 * @param {Scene} scene - The scene to capture.
+	 * @param {?Scene} sky - The sky to draw before the scene, if any.
 	 * @param {number} start - The first probe index.
 	 * @param {number} end - The exclusive end probe index.
 	 */
-	_captureProbes( renderer, scene, start, end ) {
+	_captureProbes( renderer, scene, sky, start, end ) {
 
 		const { x: nx, y: ny, z: nz } = this.resolution;
 		const probesPerLayer = nx * nz;
@@ -666,8 +683,17 @@ class LightProbeGrid extends Light {
 			this.getProbePosition( ix, iy, iz, _position );
 			_cubeCamera.position.copy( _position );
 
-			// The cube faces must be cleared per face.
+			// The cube faces must be cleared per face. With a sky, the scene is drawn over it.
 			renderer.autoClear = true;
+			renderer.autoClearColor = true;
+
+			if ( sky !== null ) {
+
+				_cubeCamera.update( renderer, sky );
+				renderer.autoClearColor = false;
+
+			}
+
 			_cubeCamera.update( renderer, scene );
 
 			// Keep batch rows in texture order (X, Y, Z).

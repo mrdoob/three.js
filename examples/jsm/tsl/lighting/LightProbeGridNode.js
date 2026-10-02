@@ -1,11 +1,13 @@
-import { AnalyticLightNode, Vector3 } from 'three/webgpu';
-import { array, getShIrradianceAt, normalWorld, positionWorld, texture3D, uniform, vec3 } from 'three/tsl';
+import { AnalyticLightNode, EnvironmentNode, Vector3 } from 'three/webgpu';
+import { array, getShIrradianceAt, normalWorld, positionWorld, texture3D, uniform, vec3, vec4 } from 'three/tsl';
 
 // Padding texels at each boundary of every atlas sub-volume.
 export const ATLAS_PADDING = 1;
 
 /**
  * Samples the packed SH atlas and evaluates L2 irradiance for the given normal.
+ * The alpha is the share of baked probes behind it: 1 inside a baked grid, 0 in
+ * cells not baked yet.
  *
  * The atlas stores the seven RGBA sub-volumes stacked along Z, each occupying
  * `( nz + 2 )` slices: one padding slice (a copy of the nearest edge slice) at
@@ -17,7 +19,7 @@ export const ATLAS_PADDING = 1;
  * @param {Node<vec3>} uvw - The probe-grid sample coordinate (texel centers).
  * @param {Node<vec3>} res - The probe resolution.
  * @param {Node<vec3>} normal - The world-space normal.
- * @return {Node<vec3>} The non-negative irradiance.
+ * @return {Node<vec4>} The non-negative irradiance and the share of baked probes.
  */
 function evaluateGridIrradiance( atlas, uvw, res, normal ) {
 
@@ -45,7 +47,7 @@ function evaluateGridIrradiance( atlas, uvw, res, normal ) {
 		s6.xyz
 	] );
 
-	return getShIrradianceAt( normal, sh ).max( vec3( 0.0 ) );
+	return vec4( getShIrradianceAt( normal, sh ).max( vec3( 0.0 ) ), s6.w );
 
 }
 
@@ -53,8 +55,9 @@ function evaluateGridIrradiance( atlas, uvw, res, normal ) {
  * The light node that applies a {@link LightProbeGrid} to the scene. It samples
  * the baked L2 spherical-harmonic atlas at the surface position and adds the
  * resulting irradiance to the lighting context, so every standard node material
- * picks up the grid automatically (same role as the WebGL `lights_fragment_begin`
- * integration).
+ * picks up the grid automatically (same role as the WebGL `lights_fragment_maps`
+ * integration). For materials lit by the scene's environment, which the bake
+ * captures, the grid takes the place of the environment's irradiance.
  *
  * @private
  * @augments AnalyticLightNode
@@ -114,20 +117,46 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		const result = evaluateGridIrradiance( texture3D( light.texture ), uvw, res, normalWorld );
 
-		let irradiance = result.mul( this._intensity );
+		let irradiance = result.rgb.mul( this._intensity );
+		let coverage = result.a;
+
+		const outside = min.sub( positionWorld ).max( 0.0 ).add( positionWorld.sub( max ).max( 0.0 ) ).length();
 
 		// Optional smooth boundary for blending grids; falloff 0 applies everywhere.
 
 		if ( light.falloff > 0 ) {
 
-			const outside = min.sub( positionWorld ).max( 0.0 ).add( positionWorld.sub( max ).max( 0.0 ) );
-			const weight = outside.length().smoothstep( 0.0, this._falloff ).oneMinus();
+			const weight = outside.smoothstep( 0.0, this._falloff ).oneMinus();
 
 			irradiance = irradiance.mul( weight );
+			coverage = coverage.mul( weight );
 
 		}
 
-		builder.context.irradiance.addAssign( irradiance );
+		const { context, environmentNode } = builder;
+
+		if ( environmentNode !== null && context.materialLightings.some( ( node ) => node instanceof EnvironmentNode && node.envNode === environmentNode ) ) {
+
+			// Baked in this environment, the grid holds its irradiance, occluded and bounced,
+			// so it takes its place where its probes are baked. Without a falloff it fades out
+			// over one probe spacing past its box, where the environment's own light is right.
+
+			if ( light.falloff <= 0 ) {
+
+				const weight = outside.smoothstep( 0.0, spacing.x.max( spacing.y ).max( spacing.z ) ).oneMinus();
+
+				irradiance = irradiance.mul( weight );
+				coverage = coverage.mul( weight );
+
+			}
+
+			context.iblIrradiance.assign( irradiance.add( context.iblIrradiance.mul( coverage.oneMinus() ) ) );
+
+		} else {
+
+			context.irradiance.addAssign( irradiance );
+
+		}
 
 	}
 
