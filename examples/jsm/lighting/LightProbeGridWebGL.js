@@ -112,7 +112,7 @@ class LightProbeGridWebGL extends Light {
 		 */
 		this.isLightProbeGrid = true;
 
-		this.type = 'LightProbeGrid';
+		this.type = 'LightProbeGridWebGL';
 
 		/**
 		 * The full width of the volume along X.
