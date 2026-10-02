@@ -1886,10 +1886,6 @@ class WebGLRenderer {
 
 					if ( object.autoUpdate === true ) object.update( camera );
 
-				} else if ( object.isLightProbeGrid ) {
-
-					currentRenderState.pushLightProbeGrid( object );
-
 				} else if ( object.isLight ) {
 
 					currentRenderState.pushLight( object );

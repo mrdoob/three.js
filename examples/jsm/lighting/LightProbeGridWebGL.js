@@ -4,11 +4,11 @@ import {
 	Data3DTexture,
 	FloatType,
 	HalfFloatType,
+	Light,
 	LinearFilter,
 	MathUtils,
 	Mesh,
 	NearestFilter,
-	Object3D,
 	OrthographicCamera,
 	PlaneGeometry,
 	RGBAFormat,
@@ -85,7 +85,7 @@ const ATLAS_PADDING = 1;
  *
  * @three_import import { LightProbeGridWebGL } from 'three/addons/lighting/LightProbeGridWebGL.js';
  */
-class LightProbeGridWebGL extends Object3D {
+class LightProbeGridWebGL extends Light {
 
 	/**
 	 * Constructs a new irradiance probe grid.
@@ -101,7 +101,7 @@ class LightProbeGridWebGL extends Object3D {
 	 */
 	constructor( width = 1, height = 1, depth = 1, widthProbes, heightProbes, depthProbes ) {
 
-		super();
+		super( 0xffffff, 1 );
 
 		/**
 		 * This flag can be used for type testing.
@@ -111,6 +111,8 @@ class LightProbeGridWebGL extends Object3D {
 		 * @default true
 		 */
 		this.isLightProbeGrid = true;
+
+		this.type = 'LightProbeGrid';
 
 		/**
 		 * The full width of the volume along X.
@@ -552,6 +554,8 @@ class LightProbeGridWebGL extends Object3D {
 			this.texture = null;
 
 		}
+
+		super.dispose();
 
 	}
 
