@@ -2201,11 +2201,16 @@ class WebGLRenderer {
 
 		}
 
-		function getProgram( material, scene, object ) {
+		function getProgram( material, scene, object, isOutputVariantLookup = false ) {
 
 			if ( scene.isScene !== true ) scene = _emptyScene; // scene could be a Mesh, Line, Points, ...
 
 			const materialProperties = properties.get( material );
+
+			// a lookup for any other reason than filling the output variant map may change any of
+			// the state a remembered output variant program was found for, so drop the remembered
+			// programs: they no longer necessarily match the current state
+			if ( isOutputVariantLookup === false && materialProperties.outputPrograms !== undefined ) materialProperties.outputPrograms.clear();
 
 			const lights = currentRenderState.state.lights;
 			const shadowsArray = currentRenderState.state.shadowsArray;
@@ -2446,10 +2451,6 @@ class WebGLRenderer {
 
 					needsProgramChange = true;
 
-				} else if ( materialProperties.outputColorSpace !== colorSpace ) {
-
-					needsProgramChange = true;
-
 				} else if ( object.isBatchedMesh && materialProperties.batching === false ) {
 
 					needsProgramChange = true;
@@ -2532,10 +2533,6 @@ class WebGLRenderer {
 
 					needsProgramChange = true;
 
-				} else if ( materialProperties.toneMapping !== toneMapping ) {
-
-					needsProgramChange = true;
-
 				} else if ( materialProperties.morphTargetsCount !== morphTargetsCount ) {
 
 					needsProgramChange = true;
@@ -2566,6 +2563,46 @@ class WebGLRenderer {
 				if ( _nodesHandler && material.isNodeMaterial ) {
 
 					_nodesHandler.onUpdateProgram( material, program, materialProperties );
+
+				}
+
+			} else if ( material.isNodeMaterial !== true && ( materialProperties.outputColorSpace !== colorSpace || materialProperties.toneMapping !== toneMapping ) ) {
+
+				// Only the output color space or the tone mapping differs from the state the current
+				// program was found for. This happens when a transmissive object makes the transmission
+				// pass draw the opaque objects into a render target (working color space, no tone
+				// mapping) before the main pass draws them with the renderer's output settings. Switch
+				// to the program remembered for this output variant instead of doing a full program lookup.
+
+				const outputKey = colorSpace + ':' + toneMapping;
+
+				let outputPrograms = materialProperties.outputPrograms;
+
+				if ( outputPrograms === undefined ) {
+
+					outputPrograms = new Map();
+					materialProperties.outputPrograms = outputPrograms;
+
+				}
+
+				const outputProgram = outputPrograms.get( outputKey );
+
+				if ( outputProgram !== undefined ) {
+
+					program = outputProgram;
+
+					materialProperties.currentProgram = program;
+					materialProperties.uniformsList = null; // rebuilt for the switched program
+
+					materialProperties.outputColorSpace = colorSpace;
+					materialProperties.toneMapping = toneMapping;
+
+				} else {
+
+					// first draw with this output variant: do a full lookup and remember the program
+
+					program = getProgram( material, scene, object, true );
+					outputPrograms.set( outputKey, program );
 
 				}
 
