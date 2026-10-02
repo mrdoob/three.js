@@ -3,17 +3,20 @@ import ChainMap from '../ChainMap.js';
 import NodeBuilderState from './NodeBuilderState.js';
 import NodeMaterial from '../../../materials/nodes/NodeMaterial.js';
 import { cubeMapNode } from '../../../nodes/utils/CubeMapNode.js';
-import { NodeFrame, StackTrace } from '../../../nodes/Nodes.js';
-import { renderGroup, cubeTexture, texture, fog, rangeFogFactor, densityFogFactor, reference, pmremTexture, screenUV } from '../../../nodes/TSL.js';
+import { NodeFrame, NodeUpdateType, StackTrace } from '../../../nodes/Nodes.js';
+import { renderGroup, cubeTexture, texture, fog, rangeFogFactor, densityFogFactor, reference, pmremTexture, screenUV, uniform } from '../../../nodes/TSL.js';
 import { builtin } from '../../../nodes/accessors/BuiltinNode.js';
 
-import { CubeUVReflectionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../../constants.js';
+import { EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../../constants.js';
 import { hashArray } from '../../../nodes/core/NodeUtils.js';
-import { error } from '../../../utils.js';
+import { error, yieldToMain } from '../../../utils.js';
 
-const _outputNodeMap = new WeakMap();
 const _chainKeys = [];
 const _cacheKeyValues = [];
+
+// Dedicated uniform for output pass array layer selection
+// This is separate from cameraIndex to avoid the sharedUniformGroup complexity
+const _outputLayerIndex = /*@__PURE__*/ uniform( 0, 'int' ).setGroup( renderGroup );
 
 /**
  * This renderer module manages node-related objects and is the
@@ -112,6 +115,12 @@ class NodeManager extends DataMap {
 
 		const groupNode = nodeUniformsGroup.groupNode;
 
+		// groups that are updated per object always require an update so no further checks are needed
+
+		if ( groupNode.updateType === NodeUpdateType.OBJECT ) return true;
+
+		// check for update
+
 		_chainKeys[ 0 ] = groupNode;
 		_chainKeys[ 1 ] = nodeUniformsGroup;
 
@@ -157,6 +166,10 @@ class NodeManager extends DataMap {
 
 		const nodeBuilder = this.backend.createNodeBuilder( renderObject.object, this.renderer );
 		nodeBuilder.instances = renderObject.instances;
+		const onNodeBuilderCreated = this.renderer.debug.onNodeBuilderCreated;
+
+		if ( onNodeBuilderCreated !== null ) onNodeBuilderCreated( nodeBuilder, renderObject );
+
 		nodeBuilder.scene = renderObject.scene;
 		nodeBuilder.material = material;
 		nodeBuilder.camera = renderObject.camera;
@@ -177,13 +190,35 @@ class NodeManager extends DataMap {
 	}
 
 	/**
+	 * Logs an error thrown while building a node material.
+	 *
+	 * @private
+	 * @param {Error} e - The build error.
+	 */
+	_reportBuildError( e ) {
+
+		let stackTrace = e.stackTrace;
+
+		if ( ! stackTrace && e.stack ) {
+
+			// Capture stack trace for JavaScript errors
+
+			stackTrace = new StackTrace( e.stack );
+
+		}
+
+		error( 'TSL: ' + e, stackTrace );
+
+	}
+
+	/**
 	 * Returns a node builder state for the given render object.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
-	 * @param {boolean} [useAsync=false] - Whether to use async build with yielding.
+	 * @param {?Function} [yieldFn=null] - If set, the build is async and yields to the main thread via this function.
 	 * @return {NodeBuilderState|Promise<NodeBuilderState>} The node builder state (or Promise if async).
 	 */
-	getForRender( renderObject, useAsync = false ) {
+	getForRender( renderObject, yieldFn = null ) {
 
 		const renderObjectData = this.get( renderObject );
 
@@ -205,9 +240,9 @@ class NodeManager extends DataMap {
 
 					try {
 
-						if ( useAsync ) {
+						if ( yieldFn !== null ) {
 
-							await nodeBuilder.buildAsync();
+							await nodeBuilder.buildAsync( yieldFn );
 
 						} else {
 
@@ -219,9 +254,9 @@ class NodeManager extends DataMap {
 
 						nodeBuilder = this._createNodeBuilder( renderObject, new NodeMaterial() );
 
-						if ( useAsync ) {
+						if ( yieldFn !== null ) {
 
-							await nodeBuilder.buildAsync();
+							await nodeBuilder.buildAsync( yieldFn );
 
 						} else {
 
@@ -229,7 +264,7 @@ class NodeManager extends DataMap {
 
 						}
 
-						error( 'TSL: ' + e );
+						this._reportBuildError( e );
 
 					}
 
@@ -237,7 +272,7 @@ class NodeManager extends DataMap {
 
 				};
 
-				if ( useAsync ) {
+				if ( yieldFn !== null ) {
 
 					return buildNodeBuilder().then( ( nodeBuilder ) => {
 
@@ -264,17 +299,7 @@ class NodeManager extends DataMap {
 						nodeBuilder = this._createNodeBuilder( renderObject, new NodeMaterial() );
 						nodeBuilder.build();
 
-						let stackTrace = e.stackTrace;
-
-						if ( ! stackTrace && e.stack ) {
-
-							// Capture stack trace for JavaScript errors
-
-							stackTrace = new StackTrace( e.stack );
-
-						}
-
-						error( 'TSL: ' + e, stackTrace );
+						this._reportBuildError( e );
 
 					}
 
@@ -301,11 +326,12 @@ class NodeManager extends DataMap {
 	 * Use this in compileAsync() to prevent blocking the main thread.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
+	 * @param {Function} [yieldFn=yieldToMain] - The function used to yield to the main thread.
 	 * @return {Promise<NodeBuilderState>} A promise that resolves to the node builder state.
 	 */
-	getForRenderAsync( renderObject ) {
+	getForRenderAsync( renderObject, yieldFn = yieldToMain ) {
 
-		const result = this.getForRender( renderObject, true );
+		const result = this.getForRender( renderObject, yieldFn );
 
 		// Ensure we always return a Promise (cache hit returns nodeBuilderState directly)
 		if ( result.then ) {
@@ -438,26 +464,70 @@ class NodeManager extends DataMap {
 	 * Returns a node builder state for the given compute node.
 	 *
 	 * @param {Node} computeNode - The compute node.
-	 * @return {NodeBuilderState} The node builder state.
+	 * @param {boolean} [useAsync=false] - Whether to use async build with yielding.
+	 * @return {NodeBuilderState|Promise<NodeBuilderState>} The node builder state (or Promise if async).
 	 */
-	getForCompute( computeNode ) {
+	getForCompute( computeNode, useAsync = false ) {
 
 		const computeData = this.get( computeNode );
 
 		let nodeBuilderState = computeData.nodeBuilderState;
 
-		if ( nodeBuilderState === undefined ) {
+		if ( nodeBuilderState === undefined || computeData.version !== computeNode.version ) {
 
-			const nodeBuilder = this.backend.createNodeBuilder( computeNode, this.renderer );
+			const nodeBuilder = this.backend.createNodeBuilder( null, this.renderer );
+			nodeBuilder.compute = computeNode;
+
+			const onNodeBuilderCreated = this.renderer.debug.onNodeBuilderCreated;
+
+			if ( onNodeBuilderCreated !== null ) onNodeBuilderCreated( nodeBuilder, computeNode );
+
+			if ( useAsync ) {
+
+				return nodeBuilder.buildAsync().then( () => {
+
+					nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
+
+					computeData.nodeBuilderState = nodeBuilderState;
+					computeData.version = computeNode.version;
+
+					return nodeBuilderState;
+
+				} );
+
+			}
+
 			nodeBuilder.build();
 
 			nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
 
 			computeData.nodeBuilderState = nodeBuilderState;
+			computeData.version = computeNode.version;
 
 		}
 
 		return nodeBuilderState;
+
+	}
+
+	/**
+	 * Async version of getForCompute() that yields to main thread during build.
+	 * Use this in compileComputeAsync() to prevent blocking the main thread.
+	 *
+	 * @param {Node} computeNode - The compute node.
+	 * @return {Promise<NodeBuilderState>} A promise that resolves to the node builder state.
+	 */
+	getForComputeAsync( computeNode ) {
+
+		const result = this.getForCompute( computeNode, true );
+
+		if ( result.then ) {
+
+			return result;
+
+		}
+
+		return Promise.resolve( result );
 
 	}
 
@@ -480,6 +550,7 @@ class NodeManager extends DataMap {
 			nodeBuilder.updateBeforeNodes,
 			nodeBuilder.updateAfterNodes,
 			nodeBuilder.observer,
+			nodeBuilder.hardwareClipping,
 			nodeBuilder.transforms,
 			nodeBuilder.instances
 		);
@@ -494,6 +565,8 @@ class NodeManager extends DataMap {
 	 * @return {Node} A node representing the current scene environment.
 	 */
 	getEnvironmentNode( scene ) {
+
+		if ( this.renderer.lighting.enabled === false ) return null;
 
 		this.updateEnvironment( scene );
 
@@ -567,6 +640,40 @@ class NodeManager extends DataMap {
 	}
 
 	/**
+	 * Returns the custom program cache key of the given material. Since
+	 * computing the key traverses the material's node graph, the result
+	 * is cached per material version if possible.
+	 *
+	 * @param {Material} material - The material.
+	 * @param {Scene} scene - The scene.
+	 * @return {string} The custom program cache key.
+	 */
+	getCustomProgramCacheKey( material, scene ) {
+
+		if ( material === scene.overrideMaterial ) {
+
+			// override materials can't be cached since they dynamically change node properties
+
+			return material.customProgramCacheKey();
+
+		} else {
+
+			const materialData = this.get( material );
+
+			if ( materialData.cacheKeyVersion !== material.version ) {
+
+				materialData.cacheKeyVersion = material.version;
+				materialData.cacheKey = material.customProgramCacheKey();
+
+			}
+
+			return materialData.cacheKey;
+
+		}
+
+	}
+
+	/**
 	 * Returns a cache key for the given scene and lights node.
 	 * This key is used by `RenderObject` as a part of the dynamic
 	 * cache key (a key that must be checked every time the render
@@ -587,16 +694,23 @@ class NodeManager extends DataMap {
 
 		if ( cacheKeyData.callId !== callId ) {
 
-			const environmentNode = this.getEnvironmentNode( scene );
-			const fogNode = this.getFogNode( scene );
-
-			if ( lightsNode ) _cacheKeyValues.push( lightsNode.getCacheKey( true ) );
-			if ( environmentNode ) _cacheKeyValues.push( environmentNode.getCacheKey() );
-			if ( fogNode ) _cacheKeyValues.push( fogNode.getCacheKey() );
-
 			_cacheKeyValues.push( this.renderer.getOutputRenderTarget() && this.renderer.getOutputRenderTarget().multiview ? 1 : 0 );
-			_cacheKeyValues.push( this.renderer.shadowMap.enabled ? 1 : 0 );
-			_cacheKeyValues.push( this.renderer.shadowMap.type );
+			_cacheKeyValues.push( this.renderer.lighting.enabled ? 1 : 0 );
+
+			if ( this.renderer.lighting.enabled ) {
+
+				_cacheKeyValues.push( lightsNode.getCacheKey( true ) );
+
+				_cacheKeyValues.push( this.renderer.shadowMap.enabled ? 1 : 0 );
+				_cacheKeyValues.push( this.renderer.shadowMap.type );
+
+				const environmentNode = this.getEnvironmentNode( scene );
+				if ( environmentNode ) _cacheKeyValues.push( environmentNode.getCacheKey() );
+
+			}
+
+			const fogNode = this.getFogNode( scene );
+			if ( fogNode ) _cacheKeyValues.push( fogNode.getCacheKey() );
 
 			cacheKeyData.callId = callId;
 			cacheKeyData.cacheKey = hashArray( _cacheKeyValues );
@@ -645,9 +759,9 @@ class NodeManager extends DataMap {
 
 				const backgroundNode = this.getCacheNode( 'background', background, () => {
 
-					if ( background.isCubeTexture === true || ( background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping || background.mapping === CubeUVReflectionMapping ) ) {
+					if ( background.isCubeTexture === true || background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping ) {
 
-						if ( scene.backgroundBlurriness > 0 || background.mapping === CubeUVReflectionMapping ) {
+						if ( scene.backgroundBlurriness > 0 || background.isPMREMTexture === true ) {
 
 							return pmremTexture( background );
 
@@ -713,6 +827,27 @@ class NodeManager extends DataMap {
 		let node = nodeCache.get( object );
 
 		if ( node === undefined || forceUpdate ) {
+
+			if ( node === undefined && object.isTexture === true ) {
+
+				const onTextureDispose = () => {
+
+					object.removeEventListener( 'dispose', onTextureDispose );
+
+					const node = nodeCache.get( object );
+
+					if ( node !== undefined ) {
+
+						nodeCache.delete( object );
+						node.dispose();
+
+					}
+
+				};
+
+				object.addEventListener( 'dispose', onTextureDispose );
+
+			}
 
 			node = callback();
 			nodeCache.set( object, node );
@@ -824,7 +959,19 @@ class NodeManager extends DataMap {
 
 	}
 
-	getNodeFrame( renderer = this.renderer, scene = null, object = null, camera = null, material = null, instances = null ) {
+	/**
+	 * Returns a node frame configured with the given parameters.
+	 *
+	 * @param {Renderer} [renderer=this.renderer] - The renderer.
+	 * @param {?Scene} [scene=null] - The scene.
+	 * @param {?Object3D} [object=null] - The object.
+	 * @param {?Camera} [camera=null] - The camera.
+	 * @param {?Material} [material=null] - The material.
+	 * @param {?Node} [compute=null] - The compute node.
+	 * @param {?Array<Object3D>} [instances=null] - The instances.
+	 * @return {NodeFrame} The node frame.
+	 */
+	getNodeFrame( renderer = this.renderer, scene = null, object = null, camera = null, material = null, compute = null, instances = null ) {
 
 		const nodeFrame = this.nodeFrame;
 		nodeFrame.renderer = renderer;
@@ -832,15 +979,34 @@ class NodeManager extends DataMap {
 		nodeFrame.object = object;
 		nodeFrame.camera = camera;
 		nodeFrame.material = material;
+		nodeFrame.compute = compute;
 		nodeFrame.instances = instances;
 
 		return nodeFrame;
 
 	}
 
+	/**
+	 * Returns a node frame configured for the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {NodeFrame} The node frame.
+	 */
 	getNodeFrameForRender( renderObject ) {
 
-		return this.getNodeFrame( renderObject.renderer, renderObject.scene, renderObject.object, renderObject.camera, renderObject.material, renderObject.instances );
+		return this.getNodeFrame( renderObject.renderer, renderObject.scene, renderObject.object, renderObject.camera, renderObject.material, null, renderObject.instances );
+
+	}
+
+	/**
+	 * Returns a node frame configured for the given compute node.
+	 *
+	 * @param {Node} computeNode - The compute node.
+	 * @return {NodeFrame} The node frame.
+	 */
+	getNodeFrameForCompute( computeNode ) {
+
+		return this.getNodeFrame( this.renderer, null, null, null, null, computeNode );
 
 	}
 
@@ -858,21 +1024,6 @@ class NodeManager extends DataMap {
 	}
 
 	/**
-	 * Checks if the output configuration (tone mapping and color space) for
-	 * the given target has changed.
-	 *
-	 * @param {Texture} outputTarget - The output target.
-	 * @return {boolean} Whether the output configuration has changed or not.
-	 */
-	hasOutputChange( outputTarget ) {
-
-		const cacheKey = _outputNodeMap.get( outputTarget );
-
-		return cacheKey !== this.getOutputCacheKey();
-
-	}
-
-	/**
 	 * Returns a node that represents the output configuration (tone mapping and
 	 * color space) for the current target.
 	 *
@@ -882,15 +1033,40 @@ class NodeManager extends DataMap {
 	getOutputNode( outputTarget ) {
 
 		const renderer = this.renderer;
-		const cacheKey = this.getOutputCacheKey();
 
-		const output = outputTarget.isArrayTexture ?
-			texture( outputTarget, screenUV ).depth( builtin( 'gl_ViewID_OVR' ) ).renderOutput( renderer.toneMapping, renderer.currentColorSpace ) :
-			texture( outputTarget, screenUV ).renderOutput( renderer.toneMapping, renderer.currentColorSpace );
+		let output;
 
-		_outputNodeMap.set( outputTarget, cacheKey );
+		if ( outputTarget.isArrayTexture ) {
+
+			if ( this.backend.isWebGLBackend ) {
+
+				output = texture( outputTarget, screenUV ).depth( builtin( 'gl_ViewID_OVR' ) ).renderOutput( renderer.toneMapping, renderer.currentColorSpace );
+
+			} else {
+
+				output = texture( outputTarget, screenUV ).depth( _outputLayerIndex ).renderOutput( renderer.toneMapping, renderer.currentColorSpace );
+
+			}
+
+		} else {
+
+			output = texture( outputTarget, screenUV ).renderOutput( renderer.toneMapping, renderer.currentColorSpace );
+
+		}
 
 		return output;
+
+	}
+
+	/**
+	 * Sets the output layer index for array texture output pass.
+	 * This should be called before each layer render during the output pass.
+	 *
+	 * @param {number} index - The layer index.
+	 */
+	setOutputLayerIndex( index ) {
+
+		_outputLayerIndex.value = index;
 
 	}
 
@@ -935,6 +1111,46 @@ class NodeManager extends DataMap {
 	}
 
 	/**
+	 * Triggers the call of `updateBefore()` methods
+	 * for all nodes of the given compute node.
+	 *
+	 * @param {Node} computeNode - The compute node.
+	 */
+	updateBeforeForCompute( computeNode ) {
+
+		const nodeBuilder = this.getForCompute( computeNode );
+
+		for ( const node of nodeBuilder.updateBeforeNodes ) {
+
+			// update frame state for each node
+
+			this.getNodeFrameForCompute( computeNode ).updateBeforeNode( node );
+
+		}
+
+	}
+
+	/**
+	 * Triggers the call of `updateAfter()` methods
+	 * for all nodes of the given compute node.
+	 *
+	 * @param {Node} computeNode - The compute node.
+	 */
+	updateAfterForCompute( computeNode ) {
+
+		const nodeBuilder = this.getForCompute( computeNode );
+
+		for ( const node of nodeBuilder.updateAfterNodes ) {
+
+			// update frame state for each node
+
+			this.getNodeFrameForCompute( computeNode ).updateAfterNode( node );
+
+		}
+
+	}
+
+	/**
 	 * Triggers the call of `update()` methods
 	 * for all nodes of the given compute node.
 	 *
@@ -973,10 +1189,10 @@ class NodeManager extends DataMap {
 	}
 
 	/**
-	 * Returns `true` if the given render object requires a refresh.
+	 * Returns the refresh type of the given render object.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
-	 * @return {boolean} Whether the given render object requires a refresh or not.
+	 * @return {number} The refresh type, see `RenderObjectRefreshType`.
 	 */
 	needsRefresh( renderObject ) {
 

@@ -48,7 +48,7 @@ The current node builder.
 
 **Returns:** Whether the node builder's material uses node properties or not.
 
-### .equals( renderObject : RenderObject, lightsData : Array.<Light> ) : boolean
+### .equals( renderObject : RenderObject, lightsData : Array.<Light>, renderId : number ) : boolean
 
 Returns `true` if the given render object has not changed its state.
 
@@ -60,7 +60,11 @@ The render object.
 
 The current material lights.
 
-**Returns:** Whether the given render object has changed its state or not.
+**renderId**
+
+The current render ID.
+
+**Returns:** Whether the given render object is equal to its cached state or not.
 
 ### .firstInitialization( renderObject : RenderObject ) : boolean
 
@@ -81,6 +85,16 @@ Returns an attribute data structure holding the attributes versions for monitori
 The geometry attributes.
 
 **Returns:** An object for monitoring the versions of attributes.
+
+### .getGeometryData( geometry : BufferGeometry ) : Object
+
+Returns a geometry data structure holding the geometry property values for monitoring.
+
+**geometry**
+
+The geometry.
+
+**Returns:** An object for monitoring geometry properties.
 
 ### .getLights( lightsNode : LightsNode, renderId : number ) : Array.<Object>
 
@@ -126,7 +140,27 @@ The render object.
 
 **Returns:** The monitoring data.
 
-### .needsRefresh( renderObject : RenderObject, nodeFrame : NodeFrame ) : boolean
+### .getTextureData( texture : Texture ) : Object
+
+Returns a texture data structure holding the texture state for monitoring.
+
+**texture**
+
+The texture.
+
+**Returns:** An object for monitoring the texture.
+
+### .hasDynamicInstancing( object : Object3D ) : boolean
+
+Returns `true` if the given 3D object uses instance buffers with dynamic draw usage. Such buffers must be uploaded once per render so the render object requires a full refresh.
+
+**object**
+
+The 3D object.
+
+**Returns:** Whether the given 3D object uses instance buffers with dynamic draw usage or not.
+
+### .needsRefresh( renderObject : RenderObject, nodeFrame : NodeFrame ) : number
 
 Checks if the given render object requires a refresh.
 
@@ -138,7 +172,7 @@ The render object.
 
 The current node frame.
 
-**Returns:** Whether the given render object requires a refresh or not.
+**Returns:** The refresh type, see [RenderObjectRefreshType](global.html#RenderObjectRefreshType).
 
 ### .needsVelocity( renderer : Renderer ) : boolean
 

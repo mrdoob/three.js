@@ -212,6 +212,12 @@ Setting this property to `true` indicates the engine the texture must be updated
 
 Default is `false`.
 
+### .normalized : boolean
+
+Whether the texture should use one of the 16 bit integer formats which are normalized to \[0, 1\] or \[-1, 1\] (depending on signed/unsigned) when sampled.
+
+Default is `false`.
+
 ### .offset : Vector2
 
 How much a single repetition of the texture is offset from the beginning, in each direction U and V. Typical range is `0.0` to `1.0`.
@@ -256,7 +262,7 @@ How much the texture is rotated around the center point, in radians. Positive va
 
 Default is `0`.
 
-### .source : Source
+### .source : TextureSource
 
 The data definition of a texture. A reference to the data source can be shared across textures. This is often useful in context of spritesheets where multiple textures render the same data but with different texture transformations.
 
@@ -400,7 +406,7 @@ The uv vector.
 
 ### .updateMatrix()
 
-Updates the texture transformation matrix from the from the properties [Texture#offset](Texture.html#offset), [Texture#repeat](Texture.html#repeat), [Texture#rotation](Texture.html#rotation), and [Texture#center](Texture.html#center).
+Updates the texture transformation matrix from the properties [Texture#offset](Texture.html#offset), [Texture#repeat](Texture.html#repeat), [Texture#rotation](Texture.html#rotation), and [Texture#center](Texture.html#center).
 
 ## Events
 

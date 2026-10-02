@@ -10,7 +10,7 @@ This module can only be used with [WebGLRenderer](WebGLRenderer.html). When usin
 
 ## Import
 
-LineMaterial is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+LineMaterial is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
@@ -94,7 +94,7 @@ Default is `1`.
 
 ### .resolution : Vector2
 
-The size of the viewport, in screen pixels. This must be kept updated to make screen-space rendering accurate.The `LineSegments2.onBeforeRender` callback performs the update for visible objects.
+The size of the viewport, in screen pixels. This must be kept updated to make screen-space rendering accurate. The `LineSegments2.onBeforeRender` callback performs the update for visible objects.
 
 ### .worldUnits : boolean
 

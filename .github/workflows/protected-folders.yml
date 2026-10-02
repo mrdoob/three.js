@@ -6,12 +6,12 @@ on:
       - 'build/**'
       - 'docs/**'
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   check:
     runs-on: ubuntu-latest
+    permissions: {}
     steps:
       - name: Check for protected folder changes
         if: ${{ github.event.pull_request.author_association != 'OWNER' && github.event.pull_request.author_association != 'COLLABORATOR' }}

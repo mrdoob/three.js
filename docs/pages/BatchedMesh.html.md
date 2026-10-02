@@ -171,6 +171,8 @@ The ID of the instance to remove from the batch.
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
 
+**Overrides:** [Mesh#dispose](Mesh.html#dispose)
+
 ### .getBoundingBoxAt( geometryId : number, target : Box3 ) : Box3
 
 Returns the bounding box for the given geometry.

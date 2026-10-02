@@ -187,6 +187,24 @@ WebGL and WebGPU ignore this property and always render 1 pixel wide lines.
 
 Default is `1`.
 
+## Methods
+
+### .fromJSON( json : Object, textures : Object.<string, Texture> ) : ShaderMaterial
+
+Deserializes the material from the given JSON.
+
+**json**
+
+The JSON holding the serialized material.
+
+**textures**
+
+A dictionary holding textures referenced by the material.
+
+**Overrides:** [Material#fromJSON](Material.html#fromJSON)
+
+**Returns:** A reference to this material.
+
 ## Type Definitions
 
 ### .Shader

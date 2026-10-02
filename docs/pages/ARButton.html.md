@@ -1,6 +1,6 @@
 # ARButton
 
-A utility class for creating a button that allows to initiate immersive AR sessions based on WebXR. The button can be created with a factory method and then appended ot the website's DOM.
+A utility class for creating a button that allows to initiate immersive AR sessions based on WebXR. The button can be created with a factory method and then appended to the website's DOM.
 
 ## Code Example
 
@@ -10,7 +10,7 @@ document.body.appendChild( ARButton.createButton( renderer ) );
 
 ## Import
 
-ARButton is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+ARButton is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { ARButton } from 'three/addons/webxr/ARButton.js';

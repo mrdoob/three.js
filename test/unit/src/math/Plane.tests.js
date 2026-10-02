@@ -229,6 +229,17 @@ export default QUnit.module( 'Maths', () => {
 			a.intersectLine( l1, point );
 			assert.ok( point.equals( new Vector3( 3, 0, 0 ) ), 'Passed!' );
 
+			// plane lies outside the segment's endpoints
+			a = new Plane( new Vector3( 1, 0, 0 ), - 20 );
+			const l2 = new Line3( new Vector3( - 10, 0, 0 ), new Vector3( 10, 0, 0 ) );
+
+			assert.strictEqual( a.intersectLine( l2, point ), null, 'Default clamps to segment and returns null' );
+			assert.strictEqual( a.intersectLine( l2, point, true ), null, 'Explicit clampToLine=true returns null' );
+
+			const result = a.intersectLine( l2, point, false );
+			assert.ok( result === point, 'clampToLine=false returns the target vector' );
+			assert.ok( point.equals( new Vector3( 20, 0, 0 ) ), 'clampToLine=false returns infinite-line intersection' );
+
 		} );
 
 		QUnit.test( 'intersectsBox', ( assert ) => {

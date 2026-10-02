@@ -21,7 +21,7 @@ scene.add( reflector );
 
 ## Import
 
-Reflector is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+Reflector is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { Reflector } from 'three/addons/objects/Reflector.js';
@@ -43,10 +43,6 @@ The configuration options.
 
 ## Properties
 
-### .camera : PerspectiveCamera
-
-The reflector's virtual camera. This is used to render the scene from the mirror's point of view.
-
 ### .forceUpdate : boolean
 
 Whether to force an update, no matter if the reflector is in view or not.
@@ -64,6 +60,18 @@ Default is `true`.
 ### .dispose()
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+
+**Overrides:** [Mesh#dispose](Mesh.html#dispose)
+
+### .getReflectionCamera( camera : Camera ) : Camera
+
+Returns a reflection camera for the given camera. The reflection camera is used to render the scene from the reflector's view so correct reflections can be produced.
+
+**camera**
+
+The scene's camera.
+
+**Returns:** The corresponding reflection camera.
 
 ### .getRenderTarget() : WebGLRenderTarget
 

@@ -22,6 +22,18 @@ The node type.
 
 ## Methods
 
+### .generateNodeType( builder : NodeBuilder ) : string
+
+This method is overwritten since the node type is simply derived from `nodeType`..
+
+**builder**
+
+The current node builder.
+
+**Overrides:** [Node#generateNodeType](Node.html#generateNodeType)
+
+**Returns:** The node type.
+
 ### .getBuiltinName( builder : NodeBuilder ) : string
 
 Returns the builtin name.
@@ -43,18 +55,6 @@ The current node builder.
 **Overrides:** [Node#getHash](Node.html#getHash)
 
 **Returns:** The hash.
-
-### .getNodeType( builder : NodeBuilder ) : string
-
-This method is overwritten since the node type is simply derived from `nodeType`..
-
-**builder**
-
-The current node builder.
-
-**Overrides:** [Node#getNodeType](Node.html#getNodeType)
-
-**Returns:** The node type.
 
 ### .hasBuiltin( builder : NodeBuilder ) : boolean
 

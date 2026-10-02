@@ -8,7 +8,7 @@ This module can only be used with [WebGLRenderer](WebGLRenderer.html). When usin
 
 ## Import
 
-LDrawConditionalLineMaterial is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+LDrawConditionalLineMaterial is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { LDrawConditionalLineMaterial } from 'three/addons/materials/LDrawConditionalLineMaterial.js';

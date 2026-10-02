@@ -11,11 +11,13 @@ class RenderBundle {
 	 *
 	 * @param {BundleGroup} bundleGroup - The bundle group.
 	 * @param {Camera} camera - The camera the bundle group is rendered with.
+	 * @param {RenderContext} renderContext - The render context the bundle is rendered with.
 	 */
-	constructor( bundleGroup, camera ) {
+	constructor( bundleGroup, camera, renderContext ) {
 
 		this.bundleGroup = bundleGroup;
 		this.camera = camera;
+		this.renderContext = renderContext;
 
 	}
 

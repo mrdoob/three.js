@@ -4,7 +4,7 @@ Represents one of the hand model types [XRHandModelFactory](XRHandModelFactory.h
 
 ## Import
 
-XRHandMeshModel is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+XRHandMeshModel is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { XRHandMeshModel } from 'three/addons/webxr/XRHandMeshModel.js';
@@ -12,7 +12,7 @@ import { XRHandMeshModel } from 'three/addons/webxr/XRHandMeshModel.js';
 
 ## Constructor
 
-### new XRHandMeshModel( handModel : XRHandModel, controller : Group, path : string, handedness : XRHandedness, loader : Loader, onLoad : function )
+### new XRHandMeshModel( handModel : XRHandModel, controller : Group, path : string, handedness : XRHandedness, loader : Loader, onLoad : function, customCache : Object )
 
 Constructs a new XR hand mesh model.
 
@@ -41,6 +41,12 @@ Default is `null`.
 **onLoad**
 
 A callback that is executed when a controller model has been loaded.
+
+Default is `null`.
+
+**customCache**
+
+An optional shared cache object for storing and reusing loaded assets across instances.
 
 Default is `null`.
 

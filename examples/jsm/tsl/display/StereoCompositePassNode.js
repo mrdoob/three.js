@@ -139,11 +139,9 @@ class StereoCompositePassNode extends PassNode {
 
 		//
 
-		this._pixelRatio = renderer.getPixelRatio();
-
 		this.updateStereoCamera( renderer.coordinateSystem );
 
-		const size = renderer.getSize( _size );
+		const size = renderer.getDrawingBufferSize( _size );
 		this.setSize( size.width, size.height );
 
 		// left

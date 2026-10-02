@@ -21,16 +21,22 @@ When using <a href="WebGLRenderer.html">WebGLRenderer</a>, use <a href="Sky.html
 <ul>
 <li><a href="http://simonwallner.at/project/atmospheric-scattering/" target="_blank" rel="noopener">http://simonwallner.at/project/atmospheric-scattering/</a></li>
 <li><a href="http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR" target="_blank" rel="noopener">http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR</a></li>
-</ul></div>
-				<h2>Code Example</h2>
-				<div translate="no"><pre><code class="language-js">const sky = new SkyMesh();
+</ul>
+<pre><code class="language-js">const sky = new SkyMesh();
 sky.scale.setScalar( 10000 );
 scene.add( sky );
+</code></pre>
+<p>It can be useful to hide the sun disc when generating an environment map to avoid artifacts</p>
+<pre><code class="language-js">// disable before rendering environment map
+sky.showSunDisc.value = false;
+// ...
+// re-enable before scene sky box rendering
+sky.showSunDisc.value = true;
 </code></pre></div>
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">SkyMesh</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<p><span translate="no">SkyMesh</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { SkyMesh } from 'three/addons/objects/SkyMesh.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -108,6 +114,12 @@ scene.add( sky );
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="showSunDisc" translate="no">.<a href="#showSunDisc">showSunDisc</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Whether to render the solar disc.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="sunPosition" translate="no">.<a href="#sunPosition">sunPosition</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;vec3></span> </h3>
 					<div class="description">
 						<p>The sun position uniform.</p>
@@ -117,12 +129,6 @@ scene.add( sky );
 					<h3 class="name" id="turbidity" translate="no">.<a href="#turbidity">turbidity</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
 					<div class="description">
 						<p>The turbidity uniform.</p>
-					</div>
-				</div>
-				<div class="member">
-					<h3 class="name" id="upUniform" translate="no">.<a href="#upUniform">upUniform</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;vec3></span> </h3>
-					<div class="description">
-						<p>The up position.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Source</h2>

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>LightProbeGrid - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → <a href="Light.html">Light</a> → </p>
+	<h1 translate="no">LightProbeGrid</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A 3D grid of L2 Spherical Harmonic irradiance probes that provides
+position-dependent diffuse global illumination.</p>
+<p>This is the <a href="WebGPURenderer.html">WebGPURenderer</a> version of <code>LightProbeGrid</code>. The grid is a
+<a href="Light.html">Light</a>, so adding it to the scene applies its baked irradiance to every
+lit node material automatically. When using <a href="WebGLRenderer.html">WebGLRenderer</a>, import the
+grid from <code>LightProbeGridWebGL.js</code> instead.</p>
+<p>The baked data is stored in a single RGBA <code>RenderTarget3D</code> atlas that packs
+the nine L2 SH coefficients into seven sub-volumes stacked along Z. Baking is
+fully GPU-resident: cubemap rendering, SH projection, and texture packing all
+happen on the GPU with zero CPU readback.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">LightProbeGrid</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="LightProbeGrid" translate="no">new <a href="#LightProbeGrid">LightProbeGrid</a><span class="signature">( width : <span class="param-type">number</span>, height : <span class="param-type">number</span>, depth : <span class="param-type">number</span>, widthProbes : <span class="param-type">number</span>, heightProbes : <span class="param-type">number</span>, depthProbes : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new irradiance probe grid.</p>
+<p>The volume is centered at the object's position.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">width</strong>
+									</td>
+									<td class="description last">
+										<p>Full width of the volume along X.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">height</strong>
+									</td>
+									<td class="description last">
+										<p>Full height of the volume along Y.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">depth</strong>
+									</td>
+									<td class="description last">
+										<p>Full depth of the volume along Z.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">widthProbes</strong>
+									</td>
+									<td class="description last">
+										<p>Number of probes along X. Defaults to <code>Math.max( 2, Math.round( width ) + 1 )</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">heightProbes</strong>
+									</td>
+									<td class="description last">
+										<p>Number of probes along Y. Defaults to <code>Math.max( 2, Math.round( height ) + 1 )</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">depthProbes</strong>
+									</td>
+									<td class="description last">
+										<p>Number of probes along Z. Defaults to <code>Math.max( 2, Math.round( depth ) + 1 )</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="boundingBox" translate="no">.<a href="#boundingBox">boundingBox</a><span class="type-signature"> : <a href="Box3.html">Box3</a></span> </h3>
+					<div class="description">
+						<p>The world-space bounding box for the grid. Updated automatically
+by <a href="LightProbeGrid.html#bake">LightProbeGrid#bake</a>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="depth" translate="no">.<a href="#depth">depth</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The full depth of the volume along Z.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="falloff" translate="no">.<a href="#falloff">falloff</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Distance in world units over which the grid contribution fades out
+past the volume boundary. <code>0</code> applies the contribution everywhere
+(clamped), which matches a single-volume setup. Use a small positive
+value to blend multiple overlapping grids.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="height" translate="no">.<a href="#height">height</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The full height of the volume along Y.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isLightProbeGrid" translate="no">.<a href="#isLightProbeGrid">isLightProbeGrid</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="resolution" translate="no">.<a href="#resolution">resolution</a><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="description">
+						<p>The number of probes along each axis.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="texture" translate="no">.<a href="#texture">texture</a><span class="type-signature"> : <a href="Data3DTexture.html">Data3DTexture</a></span> </h3>
+					<div class="description">
+						<p>The single RGBA atlas 3D texture storing all seven packed SH
+sub-volumes stacked along Z.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="width" translate="no">.<a href="#width">width</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The full width of the volume along X.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="bake" translate="no">.<a href="#bake">bake</a><span class="signature">( renderer : <span class="param-type"><a href="WebGPURenderer.html">WebGPURenderer</a></span>, scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, options : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Bakes probes by rendering cubemaps at each probe position and
+projecting to L2 SH. Optionally iterates additional passes to capture
+indirect bounces: each extra pass samples the previous pass's data as
+indirect light, accumulating one bounce per extra pass.</p>
+<p>Use <code>start</code> and <code>count</code> to bake a range and publish its cells immediately.
+Indices advance along X, then Z, then Y, filling horizontal layers from bottom
+to top. For incremental indirect bounces, finish the whole grid for <code>pass: 0</code>,
+then repeat with <code>pass: 1</code>, etc. Start each pass at index 0 to snapshot the
+previous pass before updating its cells.</p>
+<p>Shadow-casting instances of <code>SunLight</code> are temporarily replaced with
+equivalent directional lights, since their view-fitted shadow cascades
+cannot be frozen across probe renders.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene to render.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">options</strong>
+									</td>
+									<td class="description last">
+										<p>Bake options.</p>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">cubemapSize</strong>
+									</td>
+									<td class="description last">
+										<p>Resolution of each cubemap face.</p>
+										<p>Default is <code>8</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">near</strong>
+									</td>
+									<td class="description last">
+										<p>Near plane for the cube camera.</p>
+										<p>Default is <code>0.1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">far</strong>
+									</td>
+									<td class="description last">
+										<p>Far plane for the cube camera.</p>
+										<p>Default is <code>100</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">bounces</strong>
+									</td>
+									<td class="description last">
+										<p>Additional bounce passes. Only available when baking the whole grid.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">sampleCount</strong>
+									</td>
+									<td class="description last">
+										<p>Directions integrated when projecting each cubemap to SH.</p>
+										<p>Default is <code>512</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">start</strong>
+									</td>
+									<td class="description last">
+										<p>Index of the first probe to bake.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">count</strong>
+									</td>
+									<td class="description last">
+										<p>Number of probes to bake. Defaults to the remaining probes.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">pass</strong>
+									</td>
+									<td class="description last">
+										<p>Starting pass. Zero captures direct light; later passes sample the previous pass. Ranged calls require <code>bounces: 0</code>.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees GPU resources.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Light.html#dispose">Light#dispose</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getProbePosition" translate="no">.<a href="#getProbePosition">getProbePosition</a><span class="signature">( ix : <span class="param-type">number</span>, iy : <span class="param-type">number</span>, iz : <span class="param-type">number</span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the world-space position of the probe at grid indices (ix, iy, iz).</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">ix</strong>
+									</td>
+									<td class="description last">
+										<p>X index.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">iy</strong>
+									</td>
+									<td class="description last">
+										<p>Y index.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">iz</strong>
+									</td>
+									<td class="description last">
+										<p>Z index.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">target</strong>
+									</td>
+									<td class="description last">
+										<p>The target vector.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The world-space position.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="updateBoundingBox" translate="no">.<a href="#updateBoundingBox">updateBoundingBox</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the world-space bounding box from the current position and size.</p>
+						</div>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/lighting/LightProbeGrid.js" translate="no" target="_blank" rel="noopener">examples/jsm/lighting/LightProbeGrid.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

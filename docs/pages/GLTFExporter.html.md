@@ -21,6 +21,7 @@ GLTFExporter supports the [glTF 2.0 extensions](https://github.com/KhronosGroup/
 *   KHR\_texture\_transform
 *   EXT\_materials\_bump
 *   EXT\_mesh\_gpu\_instancing
+*   EXT\_texture\_webp
 
 The following glTF 2.0 extension is supported by an external user plugin:
 
@@ -35,7 +36,7 @@ const data = await exporter.parseAsync( scene, options );
 
 ## Import
 
-GLTFExporter is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+GLTFExporter is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
@@ -105,7 +106,7 @@ The callback function to register.
 
 Sets the texture utils for this exporter. Only relevant when compressed textures have to be exported.
 
-Depending on whether you use [WebGLRenderer](WebGLRenderer.html) or [WebGPURenderer](WebGPURenderer.html), you must inject the corresponding texture utils [WebGLTextureUtils](WebGLTextureUtils.html) or [WebGPUTextureUtils](WebGPUTextureUtils.html).
+Depending on whether you use [WebGLRenderer](WebGLRenderer.html) or [WebGPURenderer](WebGPURenderer.html), you must inject the corresponding texture utils [module:WebGLTextureUtils](module-WebGLTextureUtils.html) or [module:WebGPUTextureUtils](module-WebGPUTextureUtils.html).
 
 **utils**
 
@@ -174,9 +175,9 @@ Restricts the image maximum size (both width and height) to the given value.
 Default is `Infinity`.
 
 **animations**  
-Array.<[AnimationClip](AnimationClip.html)\>
+Array.<[AnimationClip](AnimationClip.html)\> | Array.<Array.<[AnimationClip](AnimationClip.html)\>>
 
-List of animations to be included in the export.
+List of animations to be included in the export. When exporting a single 3D object or scene, this is a flat list of clips. When exporting an array of multiple scenes, this must be a nested array with one list of clips per scene, matched to the input by index.
 
 Default is `[]`.
 
@@ -186,6 +187,13 @@ boolean
 Export custom glTF extensions defined on an object's `userData.gltfExtensions` property.
 
 Default is `false`.
+
+**copyright**  
+string
+
+Export with a copyright notice embedded in the glTF.
+
+Default is `null`.
 
 ## Source
 

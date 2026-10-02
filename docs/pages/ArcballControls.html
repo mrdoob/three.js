@@ -26,7 +26,7 @@ animation loop when animations are on.</p></div>
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">ArcballControls</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<p><span translate="no">ArcballControls</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { ArcballControls } from 'three/addons/controls/ArcballControls.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -74,6 +74,9 @@ animation loop when animations are on.</p></div>
 						<p>If set to <code>true</code>, the camera's near and far values will be adjusted every time zoom is
 performed trying to maintain the same visible portion given by initial near and far
 values. Only works with perspective cameras.</p>
+<p>This feature only works as expected if the camera's initial state (position, near and far values)
+is correctly configured before creating the controls. Otherwise <a href="ArcballControls.html#setCamera">ArcballControls#setCamera</a>
+must be called by the application.</p>
 						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>

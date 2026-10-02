@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>SkyscraperGenerator - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">SkyscraperGenerator</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Generates intricate, tripartite &quot;Beaux-Arts / Neo-Gothic&quot; terracotta
+skyscrapers from a small set of parameters.</p>
+<p>The mass is read as a footprint polygon (a rectangle with one chamfered
+corner) split into vertical faces, each split into three tiers — a tall
+arcaded base, a repeating shaft and an ornate crown — then into floors and
+bays. A handful of authored pieces (a pier, a window, a cornice profile, a
+gothic arch) are instanced across the whole tower, then baked — together with
+the bespoke base arcade — into a single non-indexed BufferGeometry tagged with
+a per-vertex <code>partId</code> (PartId) so one material can shade every zone.</p>
+<p>The generator is material agnostic — it only produces geometry. Pass a single
+material (e.g. a TSL node material that branches on <code>partId</code>) to dress it.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const generator = new SkyscraperGenerator( { seed: 35, totalHeight: 140 }, material );
+scene.add( generator.build() ); // a single Mesh
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="SkyscraperGenerator" translate="no">new <a href="#SkyscraperGenerator">SkyscraperGenerator</a><span class="signature">()</span> </h3>
+					<div class="method">
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/generators/city/SkyscraperGenerator.js" translate="no" target="_blank" rel="noopener">examples/jsm/generators/city/SkyscraperGenerator.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

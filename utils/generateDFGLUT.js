@@ -1,8 +1,8 @@
 /**
  * DFG LUT Generator
  *
- * Generates a precomputed lookup table for the split-sum approximation
- * used in Image-Based Lighting.
+ * Generates a precomputed lookup table for the split-sum approximation,
+ * used by image-based lighting and direct-light multi-scattering energy compensation.
  *
  * Reference: "Real Shading in Unreal Engine 4" by Brian Karis
  */
@@ -243,7 +243,8 @@ function saveAsJavaScript( data ) {
 	}
 
 	const webgl = `/**
- * Precomputed DFG LUT for Image-Based Lighting
+ * Precomputed DFG LUT for physically based specular lighting, used by both
+ * image-based lighting and direct-light multi-scattering energy compensation
  * Resolution: ${LUT_SIZE}x${LUT_SIZE}
  * Samples: ${SAMPLE_COUNT} per texel
  * Format: RG16F (2 half floats per texel: scale, bias)
@@ -285,7 +286,8 @@ import { DataTexture } from '../../../textures/DataTexture.js';
 import { RGFormat, HalfFloatType, LinearFilter, ClampToEdgeWrapping } from '../../../constants.js';
 
 /**
- * Precomputed DFG LUT for Image-Based Lighting
+ * Precomputed DFG LUT for physically based specular lighting, used by both
+ * image-based lighting and direct-light multi-scattering energy compensation
  * Resolution: ${LUT_SIZE}x${LUT_SIZE}
  * Samples: ${SAMPLE_COUNT} per texel
  * Format: RG16F (2 half floats per texel: scale, bias)
@@ -297,7 +299,7 @@ ${rows.join( ',\n' )}
 
 let lut = null;
 
-const DFG = /*@__PURE__*/ Fn( ( { roughness, dotNV } ) => {
+const DFGLUT = /*@__PURE__*/ Fn( ( { roughness, dotNV } ) => {
 
 	if ( lut === null ) {
 
@@ -318,14 +320,14 @@ const DFG = /*@__PURE__*/ Fn( ( { roughness, dotNV } ) => {
 
 } );
 
-export default DFG;
+export default DFGLUT;
 `;
 
 	fs.writeFileSync( './src/renderers/shaders/DFGLUTData.js', webgl );
 	console.log( 'Saved WebGL version to ./src/renderers/shaders/DFGLUTData.js' );
 
-	fs.writeFileSync( './src/nodes/functions/BSDF/DFG.js', webgpu );
-	console.log( 'Saved WebGPU version to ./src/nodes/functions/BSDF/DFG.js' );
+	fs.writeFileSync( './src/nodes/functions/BSDF/DFGLUT.js', webgpu );
+	console.log( 'Saved WebGPU version to ./src/nodes/functions/BSDF/DFGLUT.js' );
 
 }
 

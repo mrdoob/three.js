@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - deferred rendering</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - deferred rendering">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_deferred.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_deferred.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Deferred Rendering</span>
+			</div>
+
+			<small>
+				Simple deferred rendering using custom pipeline.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { vec4, normalView, pass, diffuseColor, positionGeometry, positionView, positionViewDirection, roughness, metalness, mrt, Fn, overrideNodes } from 'three/tsl';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
+
+			const RESOLVE_LAYER = 2;
+
+			let camera, scene, renderer;
+			let renderPipeline;
+			let lightGroup, planesGroup;
+			let params;
+
+			const timer = new THREE.Timer();
+
+			init();
+
+			function init() {
+
+				const container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				// scene
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
+				camera.position.set( - 1.8, 0.6, 2.7 );
+
+				scene = new THREE.Scene();
+
+				new UltraHDRLoader()
+					.setPath( 'textures/equirectangular/' )
+					.load( 'royal_esplanade_2k.hdr.jpg', function ( texture ) {
+
+						texture.mapping = THREE.EquirectangularReflectionMapping;
+
+						scene.background = texture;
+						scene.environment = texture;
+
+						// teapot model
+						const teapotGeometry = new TeapotGeometry( 0.4, 18 );
+						const teapotMaterial = new THREE.MeshStandardMaterial( { color: 0x333333, roughness: 0.2, metalness: 0.8 } );
+						const teapot = new THREE.Mesh( teapotGeometry, teapotMaterial );
+						teapot.position.y = - 0.15;
+						scene.add( teapot );
+
+					} );
+
+				// light group
+				lightGroup = new THREE.Group();
+				lightGroup.position.y = - 0.15;
+				scene.add( lightGroup );
+
+				const numLights = 8;
+				const radius = 1.2;
+				const sphereGeometry = new THREE.SphereGeometry( 0.03, 16, 8 );
+
+				for ( let i = 0; i < numLights; i ++ ) {
+
+					const angle = ( i / numLights ) * Math.PI * 2;
+					const x = Math.cos( angle ) * radius;
+					const z = Math.sin( angle ) * radius;
+
+					const colorHex = new THREE.Color().setHSL( i / numLights, 1.0, 0.5 );
+
+					const lightMat = new THREE.MeshStandardMaterial( { color: colorHex } );
+					const lightMesh = new THREE.Mesh( sphereGeometry, lightMat );
+
+					const light = new THREE.PointLight( colorHex, 5, 5 );
+					light.layers.enable( RESOLVE_LAYER );
+					light.position.set( x, 0, z );
+					light.add( lightMesh );
+
+					lightGroup.add( light );
+
+				}
+
+				// planes group
+				planesGroup = new THREE.Group();
+				planesGroup.position.y = - 0.15;
+				scene.add( planesGroup );
+
+				const planeGeometry = new THREE.PlaneGeometry( 0.4, 0.4 );
+				const planeMaterial = new THREE.MeshStandardMaterial( { color: 0x999999, roughness: 0.5, metalness: 0.5, side: THREE.DoubleSide, transparent: true, opacity: 0.5 } );
+
+				const numPlanes = 6;
+				const planesRadius = 1.5;
+
+				for ( let i = 0; i < numPlanes; i ++ ) {
+
+					const angle = ( i / numPlanes ) * Math.PI * 2;
+
+					const pivot = new THREE.Group();
+					pivot.rotation.y = angle;
+					planesGroup.add( pivot );
+
+					const plane = new THREE.Mesh( planeGeometry, planeMaterial );
+					plane.position.z = planesRadius;
+					pivot.add( plane );
+
+				}
+
+				// renderer
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( render );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.inspector = new Inspector();
+				container.appendChild( renderer.domElement );
+
+				// opaque pass
+
+				const opaquePass = pass( scene, camera );
+				opaquePass.name = 'opaque pass';
+				opaquePass.transparent = false;
+				opaquePass.setLayers( new THREE.Layers() ); // default layer 0 is used by the renderer
+				opaquePass.setMRT( mrt( {
+					output: diffuseColor,
+					position: vec4( positionView, metalness ),
+					normal: vec4( normalView, roughness )
+				} ) );
+
+				opaquePass.lighting = new THREE.Lighting();
+				opaquePass.lighting.enabled = false;
+
+				// opaque nodes
+
+				const opaqueOutputNode = opaquePass.getTextureNode( 'output' ).toInspector( 'output' );
+				const opaquePositionView = opaquePass.getTextureNode( 'position' ).xyz.toInspector( 'position' );
+				const opaqueNormalView = opaquePass.getTextureNode( 'normal' ).xyz.toInspector( 'normal' );
+				const opaqueDepthNode = opaquePass.getTextureNode( 'depth' ).toInspector( 'depth' );
+				const opaqueMetalness = opaquePass.getTextureNode( 'position' ).w.toInspector( 'metalness' );
+				const opaqueRoughness = opaquePass.getTextureNode( 'normal' ).w.toInspector( 'roughness' );
+
+				// resolve opaque pass - deferred lighting
+
+				const resolveLayers = new THREE.Layers();
+				resolveLayers.disableAll();
+				resolveLayers.enable( RESOLVE_LAYER );
+
+				// the resolve material must be compatible with the other materials in the scene;
+				// in common deferred rendering scenarios, a standardized material is used.
+
+				const resolveMaterial = new THREE.MeshStandardNodeMaterial();
+				resolveMaterial.colorNode = Fn( () => {
+
+					opaqueDepthNode.greaterThanEqual( 1.0 ).discard();
+
+					return opaqueOutputNode;
+
+				} )();
+				resolveMaterial.metalnessNode = opaqueMetalness;
+				resolveMaterial.roughnessNode = opaqueRoughness;
+				resolveMaterial.vertexNode = vec4( positionGeometry.xy, 0.0, 1.0 );
+				resolveMaterial.depthNode = opaqueDepthNode;
+				resolveMaterial.contextNode =
+					overrideNodes( [
+						[ positionView, opaquePositionView ],
+						[ positionViewDirection, opaquePositionView.negate().normalize() ],
+						[ normalView, opaqueNormalView ]
+					] );
+
+				const resolveMesh = new THREE.QuadMesh( resolveMaterial );
+				resolveMesh.layers.set( RESOLVE_LAYER );
+				scene.add( resolveMesh );
+
+				const resolvedPass = pass( scene, camera );
+				resolvedPass.setLayers( resolveLayers );
+				resolvedPass.lighting = new THREE.Lighting();
+
+				// transparent pass
+
+				const opaqueDepthTexture = opaquePass.getTexture( 'depth' );
+
+				const transparentPass = pass( scene, camera, { depthTexture: opaqueDepthTexture, autoClearDepth: false } );
+				transparentPass.name = 'transparent pass';
+				transparentPass.setLayers( new THREE.Layers() ); // default layer 0 is used by the renderer
+				transparentPass.opaque = false;
+
+				// forward pass
+
+				const forwardPass = pass( scene, camera ).toInspector( 'forward' );
+
+				// resolved - render pipeline
+
+				const opaqueNode = resolvedPass.toInspector( 'resolved opaque' );
+				const transparentNode = transparentPass.toInspector( 'transparent' );
+
+				const deferredNode = vec4( opaqueNode.rgb.mul( transparentNode.a.oneMinus() ).add( transparentNode.rgb ), 1.0 );
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputNode = deferredNode;
+
+				// gui
+
+				params = {
+					mode: 'deferred',
+					animated: true
+				};
+
+				const gui = renderer.inspector.createParameters( 'Settings' );
+				gui.add( params, 'mode', [ 'forward', 'deferred' ] ).onChange( ( value ) => {
+
+					renderPipeline.outputNode = ( value === 'forward' ) ? forwardPass : deferredNode;
+					renderPipeline.needsUpdate = true;
+
+				} );
+				gui.add( params, 'animated' );
+
+				// controls
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 2;
+				controls.maxDistance = 10;
+				controls.target.set( 0, 0, - 0.2 );
+				controls.update();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function render() {
+
+				timer.update();
+
+				if ( params.animated ) {
+
+					const delta = timer.getDelta();
+
+					lightGroup.rotation.y += delta * 1.0;
+					planesGroup.rotation.y -= delta * 0.5;
+
+				}
+
+				renderPipeline.render();
+
+			}
+
+		</script>
+
+	</body>
+</html>

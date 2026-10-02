@@ -7,7 +7,7 @@ const _normalMatrix = /*@__PURE__*/ new Matrix3();
 
 /**
  * A two dimensional surface that extends infinitely in 3D space, represented
- * in [Hessian normal form](http://mathworld.wolfram.com/HessianNormalForm.html)
+ * in [Hessian normal form](https://mathworld.wolfram.com/HessianNormalForm.html)
  * by a unit length normal vector and a constant.
  */
 class Plane {
@@ -210,9 +210,10 @@ class Plane {
 	 *
 	 * @param {Line3} line - The line to compute the intersection for.
 	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {?Vector3} The intersection point.
+	 * @param {boolean} [clampToLine=true] - Whether to clamp the intersection to the line segment.
+	 * @return {?Vector3} The intersection point. Returns `null` if no intersection is detected.
 	 */
-	intersectLine( line, target ) {
+	intersectLine( line, target, clampToLine = true ) {
 
 		const direction = line.delta( _vector1 );
 
@@ -234,7 +235,7 @@ class Plane {
 
 		const t = - ( line.start.dot( this.normal ) + this.constant ) / denominator;
 
-		if ( t < 0 || t > 1 ) {
+		if ( ( clampToLine === true ) && ( t < 0 || t > 1 ) ) {
 
 			return null;
 
@@ -359,6 +360,35 @@ class Plane {
 	clone() {
 
 		return new this.constructor().copy( this );
+
+	}
+
+	/**
+	 * Returns a serialized structure of the plane.
+	 *
+	 * @return {Object} Serialized structure with fields representing the object state.
+	 */
+	toJSON() {
+
+		return {
+			normal: this.normal.toArray(),
+			constant: this.constant
+		};
+
+	}
+
+	/**
+	 * Sets the plane properties from the given JSON.
+	 *
+	 * @param {Object} json - The serialized json to set the plane from.
+	 * @return {Plane} A reference to this plane.
+	 */
+	fromJSON( json ) {
+
+		this.normal.fromArray( json.normal );
+		this.constant = json.constant;
+
+		return this;
 
 	}
 

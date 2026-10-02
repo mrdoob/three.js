@@ -51,7 +51,7 @@ retrieve member types, and generate the struct type for a builder.</p></div>
 				</div>
 				<h2 class="subsection-title">Properties</h2>
 				<div class="member">
-					<h3 class="name" id="isStructLayoutNode" translate="no">.<a href="#isStructLayoutNode">isStructLayoutNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<h3 class="name" id="isStructTypeNode" translate="no">.<a href="#isStructTypeNode">isStructTypeNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
 						<p>This flag can be used for type testing.</p>
 						<p>Default is <code>true</code>.</p>
@@ -77,11 +77,12 @@ retrieve member types, and generate the struct type for a builder.</p></div>
 					<h3 class="name name-method" id="getLength" translate="no">.<a href="#getLength">getLength</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Returns the length of the struct.
-The length is calculated by summing the lengths of the struct's members.</p>
+							<p>Returns the length of the struct in 4-byte elements (e.g. float or int components).
+The length is calculated by summing the lengths of the struct's members, accounting for memory alignment.
+To get the size in bytes, multiply the returned value by 4.</p>
 						</div>
 						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> The length of the struct.</dt>
+							<dt class="tag-returns"><strong>Returns:</strong> The length of the struct in 4-byte elements.</dt>
 						</dl>
 					</div>
 				<h2 class="subsection-title">Source</h2>

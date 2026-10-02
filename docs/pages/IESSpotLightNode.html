@@ -18,8 +18,32 @@
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="IESSpotLightNode" translate="no">new <a href="#IESSpotLightNode">IESSpotLightNode</a><span class="signature">()</span> </h3>
+					<h3 class="name name-method" id="IESSpotLightNode" translate="no">new <a href="#IESSpotLightNode">IESSpotLightNode</a><span class="signature">( light : <span class="param-type"><a href="SpotLight.html">SpotLight</a></span> )</span> </h3>
 					<div class="method">
+						<div class="description">
+							<p>Constructs a new IES spot light node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">light</strong>
+									</td>
+									<td class="description last">
+										<p>The spot light source.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="_iesTextureNode" translate="no">.<a href="#_iesTextureNode">_iesTextureNode</a><span class="type-signature"> : <a href="TextureNode.html">TextureNode</a></span> </h3>
+					<div class="description">
+						<p>The texture node representing the IES texture.</p>
+						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -53,6 +77,27 @@
 						</dl>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The spot attenuation.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwritten to update the IES spot light texture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">frame</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node frame.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="SpotLightNode.html#update">SpotLightNode#update</a></dt>
 						</dl>
 					</div>
 				<h2 class="subsection-title">Source</h2>

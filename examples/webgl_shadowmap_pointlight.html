@@ -4,6 +4,10 @@
 		<title>three.js webgl - PointLight ShadowMap</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - PointLight ShadowMap">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_shadowmap_pointlight.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_shadowmap_pointlight.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -50,7 +54,7 @@
 					const light = new THREE.PointLight( color, intensity, 20 );
 					light.castShadow = true;
 					light.shadow.bias = - 0.005; // reduces self-shadowing on double-sided objects
-					light.shadow.mapSize.width = 128;
+					light.shadow.mapSize.setScalar( 128 );
 					light.shadow.radius = 10;
 
 					let geometry = new THREE.SphereGeometry( 0.3, 12, 6 );

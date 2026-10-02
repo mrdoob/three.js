@@ -4,6 +4,10 @@
 		<title>three.js webgl - trackball controls</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - trackball controls">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/misc_controls_trackball.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/misc_controls_trackball.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
@@ -43,7 +47,8 @@
 			let perspectiveCamera, orthographicCamera, controls, scene, renderer, stats;
 
 			const params = {
-				orthographicCamera: false
+				orthographicCamera: false,
+				multiTouchRoll: false
 			};
 
 			const frustumSize = 400;
@@ -120,6 +125,12 @@
 
 				} );
 
+				gui.add( params, 'multiTouchRoll' ).name( 'multi touch roll' ).onChange( function ( value ) {
+
+					controls.multiTouchRoll = value;
+
+				} );
+
 				//
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -135,6 +146,8 @@
 				controls.rotateSpeed = 1.0;
 				controls.zoomSpeed = 1.2;
 				controls.panSpeed = 0.8;
+
+				controls.multiTouchRoll = params.multiTouchRoll;
 
 				controls.keys = [ 'KeyA', 'KeyS', 'KeyD' ];
 

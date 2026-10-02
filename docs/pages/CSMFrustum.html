@@ -16,7 +16,7 @@
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">CSMFrustum</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<p><span translate="no">CSMFrustum</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { CSMFrustum } from 'three/addons/csm/CSMFrustum.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -45,6 +45,12 @@
 					<div class="description">
 						<p>An object representing the vertices of the near and
 far plane in view space.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="zFar" translate="no">.<a href="#zFar">zFar</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The zFar value.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -156,6 +162,16 @@ given camera matrix.</p>
 				</td>
 			<td class="description last">
 				<p>Whether this CSM frustum is used with WebGL or WebGPU.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>reversedDepth</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether reversed depth buffer is enabled.</p>
 			</td>
 		</tr>
 		<tr>

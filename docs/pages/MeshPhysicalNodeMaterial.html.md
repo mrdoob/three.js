@@ -110,6 +110,14 @@ This flag can be used for type testing.
 
 Default is `true`.
 
+### .retroreflectivityNode : Node.<float>
+
+The retroreflective strength of physical materials is by default inferred from the `retroreflectivity` property. This node property allows to overwrite the default and define the retroreflective strength with a node instead.
+
+If you don't want to overwrite the retroreflective strength but modify the existing value instead, use [materialRetroreflectivity](TSL.html#materialRetroreflectivity).
+
+Default is `null`.
+
 ### .sheenNode : Node.<vec3>
 
 The sheen of physical materials is by default inferred from the `sheen`, `sheenColor` and `sheenColorMap` properties. This node property allows to overwrite the default and define the sheen with a node instead.
@@ -179,6 +187,12 @@ Default is `true`.
 ### .useIridescence : boolean
 
 Whether the lighting model should use iridescence or not.
+
+Default is `true`.
+
+### .useRetroreflection : boolean
+
+Whether the lighting model should use retroreflection or not.
 
 Default is `true`.
 

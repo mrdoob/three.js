@@ -6,7 +6,7 @@ Note that this class can only be used with [WebGLRenderer](WebGLRenderer.html). 
 
 ## Import
 
-StereoEffect is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+StereoEffect is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { StereoEffect } from 'three/addons/effects/StereoEffect.js';

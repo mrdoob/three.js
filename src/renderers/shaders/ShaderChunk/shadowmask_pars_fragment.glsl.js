@@ -5,6 +5,21 @@ float getShadowMask() {
 
 	#ifdef USE_SHADOWMAP
 
+	#if NUM_SUN_LIGHT_SHADOWS > 0
+
+	SunLightShadow sunLight;
+
+	#pragma unroll_loop_start
+	for ( int i = 0; i < NUM_SUN_LIGHT_SHADOWS; i ++ ) {
+
+		sunLight = sunLightShadows[ i ];
+		shadow *= receiveShadow ? getSunShadow( sunShadowMap[ i ], sunLight, UNROLLED_LOOP_INDEX ) : 1.0;
+
+	}
+	#pragma unroll_loop_end
+
+	#endif
+
 	#if NUM_DIR_LIGHT_SHADOWS > 0
 
 	DirectionalLightShadow directionalLight;

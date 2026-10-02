@@ -12,7 +12,7 @@ const parse = ( source ) => {
 
 	const pragmaMainIndex = source.indexOf( pragmaMain );
 
-	const mainCode = pragmaMainIndex !== - 1 ? source.slice( pragmaMainIndex + pragmaMain.length ) : source;
+	const mainCode = ( pragmaMainIndex !== - 1 ? source.slice( pragmaMainIndex + pragmaMain.length ) : source ).replace( /^(?:\s*\/\/[^\r\n]*|\s*\/\*[\s\S]*?\*\/|\s*)+/, '' );
 
 	const declaration = mainCode.match( declarationRegexp );
 
@@ -95,7 +95,7 @@ const parse = ( source ) => {
 
 	} else {
 
-		throw new Error( 'FunctionNode: Function is not a GLSL code.' );
+		throw new Error( 'THREE.FunctionNode: Function is not a GLSL code.' );
 
 	}
 

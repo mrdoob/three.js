@@ -4,6 +4,10 @@
 		<title>three.js webgpu - mrt</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - mrt">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_mrt.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_mrt.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
@@ -34,7 +38,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { output, normalView, pass, step, diffuseColor, emissive, directionToColor, screenUV, mix, mrt, Fn } from 'three/tsl';
+			import { output, normalView, pass, step, diffuseColor, emissive, packNormalToRGB, screenUV, mix, mrt, Fn } from 'three/tsl';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
@@ -95,7 +99,7 @@
 				const scenePass = pass( scene, camera, { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter } );
 				scenePass.setMRT( mrt( {
 					output: output,
-					normal: directionToColor( normalView ),
+					normal: packNormalToRGB( normalView ),
 					diffuse: diffuseColor,
 					emissive: emissive
 				} ) );

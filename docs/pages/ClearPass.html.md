@@ -13,7 +13,7 @@ composer.addPass( clearPass );
 
 ## Import
 
-ClearPass is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+ClearPass is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { ClearPass } from 'three/addons/postprocessing/ClearPass.js';

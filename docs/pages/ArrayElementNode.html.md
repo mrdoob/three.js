@@ -36,6 +36,18 @@ The array-like node.
 
 ## Methods
 
+### .generateNodeType( builder : NodeBuilder ) : string
+
+This method is overwritten since the node type is inferred from the array-like node.
+
+**builder**
+
+The current node builder.
+
+**Overrides:** [Node#generateNodeType](Node.html#generateNodeType)
+
+**Returns:** The node type.
+
 ### .getMemberType( builder : NodeBuilder, name : string ) : string
 
 This method is overwritten since the member type is inferred from the array-like node.
@@ -51,18 +63,6 @@ The member name.
 **Overrides:** [Node#getMemberType](Node.html#getMemberType)
 
 **Returns:** The member type.
-
-### .getNodeType( builder : NodeBuilder ) : string
-
-This method is overwritten since the node type is inferred from the array-like node.
-
-**builder**
-
-The current node builder.
-
-**Overrides:** [Node#getNodeType](Node.html#getNodeType)
-
-**Returns:** The node type.
 
 ## Source
 

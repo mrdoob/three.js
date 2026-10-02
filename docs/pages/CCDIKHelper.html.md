@@ -6,7 +6,7 @@ Helper for visualizing IK bones.
 
 ## Import
 
-CCDIKHelper is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+CCDIKHelper is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { CCDIKHelper } from 'three/addons/animation/CCDIKSolver.js';
@@ -67,6 +67,8 @@ The material for the target spheres.
 ### .dispose()
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+
+**Overrides:** [Object3D#dispose](Object3D.html#dispose)
 
 ## Source
 

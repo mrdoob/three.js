@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>SoftParticles - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">SoftParticles</h1>
+		<section>
+			<header>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">SoftParticles</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { softParticles } from 'three/addons/tsl/utils/SoftParticles.js';</code></pre>
+				<div class="container-overview">
+				</div>
+				<h2 class="subsection-title">Static Methods</h2>
+					<h3 class="name name-method" id=".softParticles" translate="no">.<a href="#.softParticles">softParticles</a><span class="signature">( parameters : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes an opacity node for soft particles, based on the &quot;Soft Particles&quot; white
+paper (NVIDIA, Tristan Lorach).</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">parameters</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration parameters.</p>
+										<p>Default is <code>{}</code>.</p>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">opacity</strong>
+									</td>
+									<td class="description last">
+										<p>The sprite's base opacity, which the soft fade is multiplied with.</p>
+										<p>Default is <code>float(1)</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">distance</strong>
+									</td>
+									<td class="description last">
+										<p>The world-space distance over which the sprite fades out against the scene.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">contrast</strong>
+									</td>
+									<td class="description last">
+										<p>The contrast power of the fade curve. <code>1</code> is linear, higher values sharpen the transition.</p>
+										<p>Default is <code>2</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">viewportDepth</strong>
+									</td>
+									<td class="description last">
+										<p>The opaque scene depth the particles fade against.</p>
+										<p>Default is <code>viewportDepthTexture()</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The opacity node to assign to <code>material.opacityNode</code>.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/tsl/utils/SoftParticles.js" translate="no" target="_blank" rel="noopener">examples/jsm/tsl/utils/SoftParticles.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

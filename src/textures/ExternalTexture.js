@@ -6,9 +6,6 @@ import { Texture } from './Texture.js';
  * This may be a texture from a protected media stream, device camera feed,
  * or other data feeds like a depth sensor.
  *
- * Note that this class is only supported in {@link WebGLRenderer}, and in
- * the {@link WebGPURenderer} WebGPU backend.
- *
  * @augments Texture
  */
 class ExternalTexture extends Texture {

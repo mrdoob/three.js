@@ -4,7 +4,7 @@ Represents the frustum of a CSM instance.
 
 ## Import
 
-CSMFrustum is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+CSMFrustum is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { CSMFrustum } from 'three/addons/csm/CSMFrustum.js';
@@ -25,6 +25,10 @@ The CSM data.
 ### .vertices : Object
 
 An object representing the vertices of the near and far plane in view space.
+
+### .zFar : number
+
+The zFar value.
 
 ### .zNear : number
 
@@ -80,6 +84,11 @@ Constructor data of `CSMFrustum`.
 boolean
 
 Whether this CSM frustum is used with WebGL or WebGPU.
+
+**reversedDepth**  
+boolean
+
+Whether reversed depth buffer is enabled.
 
 **projectionMatrix**  
 [Matrix4](Matrix4.html)

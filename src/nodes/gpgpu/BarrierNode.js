@@ -1,3 +1,4 @@
+import { error } from '../../utils.js';
 import Node from '../core/Node.js';
 import { nodeProxy } from '../tsl/TSLCore.js';
 
@@ -25,20 +26,39 @@ class BarrierNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
+	setup( builder ) {
+
+		builder.allowEarlyReturns = false;
+		builder.allowGlobalVariables = false;
+
+	}
+
 	generate( builder ) {
 
 		const { scope } = this;
-		const { renderer } = builder;
+		const { renderer, shaderStage } = builder;
 
-		builder.allowEarlyReturns = false;
+		const barrierMethod = `${scope}Barrier`;
+
+		if ( shaderStage !== 'compute' ) {
+
+			error( `TSL: "${barrierMethod}" is not supported in the ${shaderStage} stage and can only be executed in compute.` );
+
+		}
 
 		if ( renderer.backend.isWebGLBackend === true ) {
 
-			builder.addFlowCode( `\t// ${scope}Barrier \n` );
+			builder.addFlowCode( `\t// ${barrierMethod}() \n` );
 
 		} else {
 
-			builder.addLineFlowCode( `${scope}Barrier()`, this );
+			builder.addLineFlowCode( `${barrierMethod}()`, this );
 
 		}
 
@@ -56,7 +76,7 @@ export default BarrierNode;
  * @param {string} scope - The scope defines the behavior of the node..
  * @returns {BarrierNode}
  */
-const barrier = nodeProxy( BarrierNode );
+const barrier = /*@__PURE__*/ nodeProxy( BarrierNode );
 
 /**
  * TSL function for creating a workgroup barrier. All compute shader

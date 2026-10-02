@@ -4,6 +4,10 @@
 		<title>three.js webgpu - instancing morph target animations</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - instancing morph target animations">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_instancing_morph.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_instancing_morph.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
@@ -35,6 +39,8 @@
 
 			import * as THREE from 'three/webgpu';
 
+			import { SunLight } from 'three/addons/lights/SunLight.js';
+			import { SunLightNode } from 'three/addons/lights/SunLightNode.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
@@ -68,21 +74,14 @@
 
 				//
 
-				const light = new THREE.DirectionalLight( 0xffffff, 1 );
+				const light = new SunLight( 0xffffff, 1 );
 
 				light.position.set( 200, 1000, 50 );
 
 				light.shadow.mapSize.width = 2048;
 				light.shadow.mapSize.height = 2048;
 				light.castShadow = true;
-
-				light.shadow.camera.left = - 5000;
-				light.shadow.camera.right = 5000;
-				light.shadow.camera.top = 5000;
-				light.shadow.camera.bottom = - 5000;
-				light.shadow.camera.far = 2000;
-
-				light.shadow.camera.updateProjectionMatrix();
+				light.shadow.camera.far = 10000;
 
 				scene.add( light );
 
@@ -146,6 +145,7 @@
 				// renderer
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				SunLight.registerNode( SunLightNode );
 				renderer.setAnimationLoop( animate );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );

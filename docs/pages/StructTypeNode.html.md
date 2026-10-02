@@ -22,7 +22,7 @@ Default is `null`.
 
 ## Properties
 
-### .isStructLayoutNode : boolean (readonly)
+### .isStructTypeNode : boolean (readonly)
 
 This flag can be used for type testing.
 
@@ -44,9 +44,9 @@ Default is `null`.
 
 ### .getLength() : number
 
-Returns the length of the struct. The length is calculated by summing the lengths of the struct's members.
+Returns the length of the struct in 4-byte elements (e.g. float or int components). The length is calculated by summing the lengths of the struct's members, accounting for memory alignment. To get the size in bytes, multiply the returned value by 4.
 
-**Returns:** The length of the struct.
+**Returns:** The length of the struct in 4-byte elements.
 
 ## Source
 

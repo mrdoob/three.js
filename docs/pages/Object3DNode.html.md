@@ -64,11 +64,11 @@ The current node builder.
 
 **Returns:** The generated code snippet.
 
-### .getNodeType() : 'mat4' | 'vec3' | 'float'
+### .generateNodeType() : 'mat4' | 'vec3' | 'float'
 
 Overwritten since the node type is inferred from the scope.
 
-**Overrides:** [Node#getNodeType](Node.html#getNodeType)
+**Overrides:** [Node#generateNodeType](Node.html#generateNodeType)
 
 **Returns:** The node type.
 

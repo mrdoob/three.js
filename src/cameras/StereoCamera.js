@@ -136,8 +136,11 @@ class StereoCamera {
 
 		}
 
-		this.cameraL.matrixWorld.copy( camera.matrixWorld ).multiply( _eyeLeft );
-		this.cameraR.matrixWorld.copy( camera.matrixWorld ).multiply( _eyeRight );
+		this.cameraL.matrix.copy( camera.matrixWorld ).multiply( _eyeLeft );
+		this.cameraL.matrixWorldNeedsUpdate = true;
+
+		this.cameraR.matrix.copy( camera.matrixWorld ).multiply( _eyeRight );
+		this.cameraR.matrixWorldNeedsUpdate = true;
 
 	}
 

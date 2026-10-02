@@ -2,6 +2,15 @@
 const DEF_MATCH_REGEX = /^def\s+(?:(\w+)\s+)?"?([^"]+)"?$/;
 const VARIANT_STRING_REGEX = /^string\s+(\w+)$/;
 const ATTR_MATCH_REGEX = /^(?:uniform\s+)?(\w+(?:\[\])?)\s+(.+)$/;
+// Preserve metadata blocks without changing the legacy parseText value shape.
+const VALUE_METADATA = Symbol( 'valueMetadata' );
+
+// Spec types (must match USDCParser/USDComposer)
+const SpecType = {
+	Attribute: 1,
+	Prim: 6,
+	Relationship: 8
+};
 
 class USDAParser {
 
@@ -48,10 +57,12 @@ class USDAParser {
 
 					// see #28631
 
-					const values = rhs.slice( 0, - 1 );
+					const values = rhs.slice( 0, - 1 ).trim();
 					target[ lhs ] = values;
 
 					const meta = {};
+					if ( target[ VALUE_METADATA ] === undefined ) target[ VALUE_METADATA ] = {};
+					target[ VALUE_METADATA ][ lhs ] = meta;
 					stack.push( meta );
 
 					target = meta;
@@ -77,6 +88,8 @@ class USDAParser {
 				}
 
 			} else if ( line.endsWith( '{' ) ) {
+
+				string = line.slice( 0, - 1 ).trim() || string;
 
 				const group = target[ string ] || {};
 				stack.push( group );
@@ -429,13 +442,6 @@ class USDAParser {
 		const root = this.parseText( text );
 		const specsByPath = {};
 
-		// Spec types (must match USDCParser/USDComposer)
-		const SpecType = {
-			Attribute: 1,
-			Prim: 6,
-			Relationship: 8
-		};
-
 		// Parse root metadata
 		const rootFields = {};
 		if ( '#usda 1.0' in root ) {
@@ -457,6 +463,18 @@ class USDAParser {
 			if ( header.metersPerUnit !== undefined ) {
 
 				rootFields.metersPerUnit = parseFloat( header.metersPerUnit );
+
+			}
+
+			if ( header.framesPerSecond !== undefined ) {
+
+				rootFields.framesPerSecond = parseFloat( header.framesPerSecond );
+
+			}
+
+			if ( header.timeCodesPerSecond !== undefined ) {
+
+				rootFields.timeCodesPerSecond = parseFloat( header.timeCodesPerSecond );
 
 			}
 
@@ -512,7 +530,42 @@ class USDAParser {
 
 		walkTree( root, '/' );
 
+		// Fallback: infer elementSize for primvars:skel:jointIndices/jointWeights
+		// when not explicitly declared in the USDA text
+		this._inferSkelElementSize( specsByPath );
+
 		return { specsByPath };
+
+	}
+
+	_inferSkelElementSize( specsByPath ) {
+
+		// For each mesh prim with primvars:skel:jointIndices/jointWeights but no
+		// elementSize, infer it from the data: elementSize = array.length / numVertices.
+		for ( const path in specsByPath ) {
+
+			const spec = specsByPath[ path ];
+			if ( spec.specType !== SpecType.Prim || spec.fields.typeName !== 'Mesh' ) continue;
+
+			const pointsSpec = specsByPath[ path + '.points' ];
+			if ( ! pointsSpec || ! pointsSpec.fields.default ) continue;
+
+			const numVertices = pointsSpec.fields.default.length / 3;
+			if ( numVertices === 0 ) continue;
+
+			this._inferElementSize( specsByPath[ path + '.primvars:skel:jointIndices' ], numVertices );
+			this._inferElementSize( specsByPath[ path + '.primvars:skel:jointWeights' ], numVertices );
+
+		}
+
+	}
+
+	_inferElementSize( attrSpec, numVertices ) {
+
+		if ( ! attrSpec || attrSpec.fields.elementSize !== undefined || ! attrSpec.fields.default ) return;
+
+		const len = attrSpec.fields.default.length;
+		if ( len > 0 && len % numVertices === 0 ) attrSpec.fields.elementSize = len / numVertices;
 
 	}
 
@@ -572,9 +625,18 @@ class USDAParser {
 				const relName = key.slice( 4 );
 				const relPath = path + '.' + relName;
 				const target = data[ key ].replace( /[<>]/g, '' );
+				const metadata = data[ VALUE_METADATA ]?.[ key ];
+				const fields = { targetPaths: [ target ] };
+
+				if ( metadata?.bindMaterialAs !== undefined ) {
+
+					fields.bindMaterialAs = this._parseString( String( metadata.bindMaterialAs ).trim() );
+
+				}
+
 				specsByPath[ relPath ] = {
 					specType: SpecType.Relationship,
-					fields: { targetPaths: [ target ] }
+					fields
 				};
 				continue;
 
@@ -663,12 +725,23 @@ class USDAParser {
 					// Parse value based on type
 					const parsedValue = this._parseAttributeValue( valueType, rawValue );
 
-					// Store as attribute spec
+					// Store as attribute spec, preserving any existing fields
+					// (e.g. connectionPaths set by an earlier `.connect` form)
 					const attrPath = path + '.' + attrName;
-					specsByPath[ attrPath ] = {
-						specType: SpecType.Attribute,
-						fields: { default: parsedValue, typeName: valueType }
-					};
+
+					if ( specsByPath[ attrPath ] ) {
+
+						specsByPath[ attrPath ].fields.default = parsedValue;
+						specsByPath[ attrPath ].fields.typeName = valueType;
+
+					} else {
+
+						specsByPath[ attrPath ] = {
+							specType: SpecType.Attribute,
+							fields: { default: parsedValue, typeName: valueType }
+						};
+
+					}
 
 				}
 
@@ -687,6 +760,8 @@ class USDAParser {
 		// Array types
 		if ( valueType.endsWith( '[]' ) ) {
 
+			let result;
+
 			// Parse JSON-like arrays
 			try {
 
@@ -697,19 +772,13 @@ class USDAParser {
 				const parsed = JSON.parse( cleaned );
 
 				// Flatten nested arrays for types like point3f[]
-				if ( Array.isArray( parsed ) && Array.isArray( parsed[ 0 ] ) ) {
-
-					return parsed.flat();
-
-				}
-
-				return parsed;
+				result = Array.isArray( parsed ) && Array.isArray( parsed[ 0 ] ) ? parsed.flat() : parsed;
 
 			} catch ( e ) {
 
 				// Try simple array parsing
 				const cleaned = str.replace( /[\[\]]/g, '' );
-				return cleaned.split( ',' ).map( s => {
+				result = cleaned.split( ',' ).map( s => {
 
 					const trimmed = s.trim();
 					const num = parseFloat( trimmed );
@@ -718,6 +787,23 @@ class USDAParser {
 				} );
 
 			}
+
+			//reorder (w, x, y, z) to (x, y, z, w)
+			if ( valueType.startsWith( 'quat' ) ) {
+
+				for ( let i = 0; i < result.length; i += 4 ) {
+
+					const w = result[ i ];
+					result[ i ] = result[ i + 1 ];
+					result[ i + 1 ] = result[ i + 2 ];
+					result[ i + 2 ] = result[ i + 3 ];
+					result[ i + 3 ] = w;
+
+				}
+
+			}
+
+			return result;
 
 		}
 

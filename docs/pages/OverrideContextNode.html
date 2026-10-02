@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>OverrideContextNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="ContextNode.html">ContextNode</a> → </p>
+	<h1 translate="no">OverrideContextNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A specialized context node designed to override specific target nodes within a
+node sub-graph or flow. This allows replacing specific inputs (e.g., normal
+and position vectors) dynamically during compilation for a specific flow node,
+without having to reconstruct or duplicate the source nodes.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">// Method chaining example:
+node.overrideNode( positionLocal, () => positionLocal.add( vec3( 1, 0, 0 ) ) );
+// Context assignment example:
+material.contextNode = overrideNode( positionLocal, () => positionLocal.add( vec3( 1, 0, 0 ) ) );
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="OverrideContextNode" translate="no">new <a href="#OverrideContextNode">OverrideContextNode</a><span class="signature">( overrideNodes : <span class="param-type">Map.&lt;<a href="Node.html">Node</a>, function()></span>, flowNode : <span class="param-type"><a href="Node.html">Node</a> | null</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new override context node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">overrideNodes</strong>
+									</td>
+									<td class="description last">
+										<p>A map mapping target nodes to their respective override callback functions.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">flowNode</strong>
+									</td>
+									<td class="description last">
+										<p>The node whose context should be modified.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isOverrideContextNode" translate="no">.<a href="#isOverrideContextNode">isOverrideContextNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id=".type" translate="no">.<a href="#.type">type</a><span class="type-signature"> : string</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>Returns the type of the node.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getFlowContextData" translate="no">.<a href="#getFlowContextData">getFlowContextData</a><span class="signature">()</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Gathers the context data from all parent context nodes by traversing the hierarchy,
+merging the <code>overrideNodes</code> maps from all encountered <code>OverrideContextNode</code> instances.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="ContextNode.html#getFlowContextData">ContextNode#getFlowContextData</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The gathered context data, containing the merged <code>overrideNodes</code> map.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/core/OverrideContextNode.js" translate="no" target="_blank" rel="noopener">src/nodes/core/OverrideContextNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

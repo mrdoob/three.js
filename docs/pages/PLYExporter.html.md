@@ -13,7 +13,7 @@ const data = exporter.parse( scene, options );
 
 ## Import
 
-PLYExporter is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+PLYExporter is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { PLYExporter } from 'three/addons/exporters/PLYExporter.js';
@@ -77,6 +77,11 @@ boolean
 Whether the binary export uses little or big endian.
 
 Default is `false`.
+
+**customPropertyMapping**  
+Object.<string, Array.<string>>
+
+A mapping that allows exporting custom buffer attributes as PLY vertex properties. Each entry maps a buffer attribute name to an array of PLY property names. The number of property names must match the item size of the buffer attribute. This is the inverse of `PLYLoader.setCustomPropertyNameMapping()`.
 
 ## Source
 

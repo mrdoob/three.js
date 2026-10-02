@@ -1,8 +1,6 @@
 import { WebGLCoordinateSystem } from '../../constants.js';
-import TempNode from '../core/TempNode.js';
-import StackTrace from '../core/StackTrace.js';
+import Node from '../core/Node.js';
 import { addMethodChaining, Fn, int, nodeProxyIntent } from '../tsl/TSLCore.js';
-import { warn } from '../../utils.js';
 
 const _vectorOperators = {
 	'==': 'equal',
@@ -18,9 +16,9 @@ const _vectorOperators = {
  * This node represents basic mathematical and logical operations like addition,
  * subtraction or comparisons (e.g. `equal()`).
  *
- * @augments TempNode
+ * @augments Node
  */
-class OperatorNode extends TempNode {
+class OperatorNode extends Node {
 
 	static get type() {
 
@@ -122,17 +120,19 @@ class OperatorNode extends TempNode {
 
 			return output || 'void';
 
-		} else if ( op === '%' ) {
-
-			return typeA;
-
 		} else if ( op === '~' || op === '&' || op === '|' || op === '^' || op === '>>' || op === '<<' ) {
 
 			return builder.getIntegerType( typeA );
 
-		} else if ( op === '!' || op === '&&' || op === '||' || op === '^^' ) {
+		} else if ( op === '&&' || op === '||' || op === '^^' ) {
 
 			return 'bool';
+
+		} else if ( op === '!' ) {
+
+			const typeLength = builder.getTypeLength( typeA );
+
+			return typeLength > 1 ? `bvec${ typeLength }` : 'bool';
 
 		} else if ( op === '==' || op === '!=' || op === '<' || op === '>' || op === '<=' || op === '>=' ) {
 
@@ -140,13 +140,17 @@ class OperatorNode extends TempNode {
 
 			return typeLength > 1 ? `bvec${ typeLength }` : 'bool';
 
+		} else if ( typeB === null ) {
+
+			return typeA;
+
 		} else {
 
 			// Handle matrix operations
 
 			if ( builder.isMatrix( typeA ) ) {
 
-				if ( typeB === 'float' ) {
+				if ( builder.isScalar( typeB ) ) {
 
 					return typeA; // matrix * scalar = matrix
 
@@ -162,7 +166,7 @@ class OperatorNode extends TempNode {
 
 			} else if ( builder.isMatrix( typeB ) ) {
 
-				if ( typeA === 'float' ) {
+				if ( builder.isScalar( typeA ) ) {
 
 					return typeB; // scalar * matrix = matrix
 
@@ -176,15 +180,13 @@ class OperatorNode extends TempNode {
 
 			// Handle non-matrix cases
 
-			if ( builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ) {
+			// anytype x anytype: use the greater length vector
 
-				// anytype x anytype: use the greater length vector
+			const type = builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ? typeB : typeA;
 
-				return typeB;
+			const promotedType = builder.getPromotedComponentType( aNode, bNode );
 
-			}
-
-			return typeA;
+			return builder.changeComponentType( type, promotedType );
 
 		}
 
@@ -208,33 +210,18 @@ class OperatorNode extends TempNode {
 
 			if ( op === '<' || op === '>' || op === '<=' || op === '>=' || op === '==' || op === '!=' ) {
 
-				if ( builder.isVector( typeA ) ) {
+				const length = Math.max( builder.getTypeLength( typeA ), builder.getTypeLength( typeB ) );
 
-					typeB = typeA;
-
-				} else if ( builder.isVector( typeB ) ) {
-
-					typeA = typeB;
-
-				} else if ( typeA !== typeB ) {
-
-					typeA = typeB = 'float';
-
-				}
+				typeA = typeB = builder.getTypeFromLength( length, builder.getPromotedComponentType( aNode, bNode ) );
 
 			} else if ( op === '>>' || op === '<<' ) {
 
 				typeA = type;
 				typeB = builder.changeComponentType( typeB, 'uint' );
 
-			} else if ( op === '%' ) {
-
-				typeA = type;
-				typeB = builder.isInteger( typeA ) && builder.isInteger( typeB ) ? typeB : typeA;
-
 			} else if ( builder.isMatrix( typeA ) ) {
 
-				if ( typeB === 'float' ) {
+				if ( builder.isScalar( typeB ) ) {
 
 					// Keep matrix type for typeA, but ensure typeB stays float
 
@@ -257,7 +244,7 @@ class OperatorNode extends TempNode {
 
 			} else if ( builder.isMatrix( typeB ) ) {
 
-				if ( typeA === 'float' ) {
+				if ( builder.isScalar( typeA ) ) {
 
 					// Keep matrix type for typeB, but ensure typeA stays float
 
@@ -332,9 +319,23 @@ class OperatorNode extends TempNode {
 
 				}
 
-			} else if ( op === '!' || op === '~' ) {
+			} else if ( op === '!' ) {
 
-				return builder.format( `(${op}${a})`, typeA, output );
+				if ( isGLSL && builder.isVector( typeA ) ) {
+
+					return builder.format( `not( ${a} )`, output );
+
+				} else {
+
+					// WGSL and scalars on GLSL
+
+					return builder.format( `( ${op} ${a} )`, typeA, output );
+
+				}
+
+			} else if ( op === '~' ) {
+
+				return builder.format( `( ${op} ${a} )`, typeA, output );
 
 			} else if ( fnOpSnippet ) {
 
@@ -344,11 +345,11 @@ class OperatorNode extends TempNode {
 
 				// Handle matrix operations
 
-				if ( builder.isMatrix( typeA ) && typeB === 'float' ) {
+				if ( builder.isMatrix( typeA ) && builder.isScalar( typeB ) ) {
 
 					return builder.format( `( ${ b } ${ op } ${ a } )`, type, output );
 
-				} else if ( typeA === 'float' && builder.isMatrix( typeB ) ) {
+				} else if ( builder.isScalar( typeA ) && builder.isMatrix( typeB ) ) {
 
 					return builder.format( `${ a } ${ op } ${ b }`, type, output );
 
@@ -376,7 +377,7 @@ class OperatorNode extends TempNode {
 
 			} else {
 
-				if ( builder.isMatrix( typeA ) && typeB === 'float' ) {
+				if ( builder.isMatrix( typeA ) && builder.isScalar( typeB ) ) {
 
 					return builder.format( `${ b } ${ op } ${ a }`, type, output );
 
@@ -652,7 +653,7 @@ export const shiftRight = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '>>' ).se
  * @param {Node} a - The node to increment.
  * @returns {OperatorNode}
  */
-export const incrementBefore = Fn( ( [ a ] ) => {
+export const incrementBefore = /*@__PURE__*/ Fn( ( [ a ] ) => {
 
 	a.addAssign( 1 );
 	return a;
@@ -667,7 +668,7 @@ export const incrementBefore = Fn( ( [ a ] ) => {
  * @param {Node} a - The node to decrement.
  * @returns {OperatorNode}
  */
-export const decrementBefore = Fn( ( [ a ] ) => {
+export const decrementBefore = /*@__PURE__*/ Fn( ( [ a ] ) => {
 
 	a.subAssign( 1 );
 	return a;
@@ -732,21 +733,3 @@ addMethodChaining( 'incrementBefore', incrementBefore );
 addMethodChaining( 'decrementBefore', decrementBefore );
 addMethodChaining( 'increment', increment );
 addMethodChaining( 'decrement', decrement );
-
-/**
- * @tsl
- * @function
- * @deprecated since r175. Use {@link mod} instead.
- *
- * @param {Node} a - The first input.
- * @param {Node} b - The second input.
- * @returns {OperatorNode}
- */
-export const modInt = ( a, b ) => { // @deprecated, r175
-
-	warn( 'TSL: "modInt()" is deprecated. Use "mod( int( ... ) )" instead.', new StackTrace() );
-	return mod( int( a ), int( b ) );
-
-};
-
-addMethodChaining( 'modInt', modInt );

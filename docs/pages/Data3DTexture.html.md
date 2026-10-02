@@ -104,6 +104,20 @@ This defines how the texture is wrapped in the depth and corresponds to _W_ in U
 
 Default is `ClampToEdgeWrapping`.
 
+## Methods
+
+### .copy( source : Data3DTexture ) : Data3DTexture
+
+Copies the values of the given texture to this instance.
+
+**source**
+
+The texture to copy.
+
+**Overrides:** [Texture#copy](Texture.html#copy)
+
+**Returns:** A reference to this instance.
+
 ## Source
 
 [src/textures/Data3DTexture.js](https://github.com/mrdoob/three.js/blob/master/src/textures/Data3DTexture.js)

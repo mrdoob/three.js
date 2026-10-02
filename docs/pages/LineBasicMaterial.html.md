@@ -70,6 +70,8 @@ Default is `1`.
 
 Sets the color of the lines using data from a texture. The texture map color is modulated by the diffuse `color`.
 
+`map` represents color data, and the texture must be assigned a [Texture#colorSpace](Texture.html#colorSpace). Most `map` textures set `texture.colorSpace = SRGBColorSpace`.
+
 Default is `null`.
 
 ## Source

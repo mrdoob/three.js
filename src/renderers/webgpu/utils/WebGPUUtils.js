@@ -1,5 +1,7 @@
 import { HalfFloatType, UnsignedByteType } from '../../../constants.js';
-import { GPUPrimitiveTopology, GPUTextureFormat } from './WebGPUConstants.js';
+import { GPUIndexFormat, GPUPrimitiveTopology, GPUTextureFormat } from './WebGPUConstants.js';
+
+const _commandList = [ null ];
 
 /**
  * A WebGPU backend utility module with common helpers.
@@ -21,6 +23,15 @@ class WebGPUUtils {
 		 * @type {WebGPUBackend}
 		 */
 		this.backend = backend;
+
+		/**
+		 * Caches the preferred canvas format.
+		 *
+		 * @private
+		 * @type {?string}
+		 * @default null
+		 */
+		this._preferredCanvasFormat = null;
 
 	}
 
@@ -100,10 +111,21 @@ class WebGPUUtils {
 
 		} else if ( texture.isDepthTexture && ! texture.renderTarget ) {
 
-			const renderer = this.backend.renderer;
-			const renderTarget = renderer.getRenderTarget();
+			const textureData = this.backend.get( texture );
 
-			samples = renderTarget ? renderTarget.samples : renderer.currentSamples;
+			if ( textureData.texture !== undefined ) {
+
+				// use the effective sample count of the allocated texture
+
+				samples = textureData.texture.sampleCount;
+
+			} else {
+
+				// otherwise use the current samples of the renderer
+
+				samples = this.backend.renderer.currentSamples;
+
+			}
 
 		} else if ( texture.renderTarget ) {
 
@@ -111,10 +133,11 @@ class WebGPUUtils {
 
 		}
 
-		samples = samples || 1;
+		samples = this.getSampleCount( samples || 1 );
 
 		const isMSAA = samples > 1 && texture.renderTarget !== null && ( texture.isDepthTexture !== true && texture.isFramebufferTexture !== true );
-		const primarySamples = isMSAA ? 1 : samples;
+		const isMSAAArrayDepthTexture = samples > 1 && texture.renderTarget !== null && texture.isDepthTexture === true && texture.isArrayTexture === true;
+		const primarySamples = isMSAA || isMSAAArrayDepthTexture ? 1 : samples;
 
 		return { samples, primarySamples, isMSAA };
 
@@ -199,6 +222,23 @@ class WebGPUUtils {
 	}
 
 	/**
+	 * Returns the GPU strip index format for the given object and geometry.
+	 *
+	 * @param {Object3D} object - The 3D object.
+	 * @param {BufferGeometry} geometry - The geometry.
+	 * @return {string|undefined} The GPU strip index format. `undefined` if the object is not rendered as an indexed strip.
+	 */
+	getStripIndexFormat( object, geometry ) {
+
+		if ( geometry.index !== null && object.isLine === true && object.isLineSegments !== true ) {
+
+			return ( geometry.index.array instanceof Uint16Array ) ? GPUIndexFormat.Uint16 : GPUIndexFormat.Uint32;
+
+		}
+
+	}
+
+	/**
 	 * Returns a modified sample count from the given sample count value.
 	 *
 	 * That is required since WebGPU only supports either 1 or 4.
@@ -246,7 +286,13 @@ class WebGPUUtils {
 
 		if ( bufferType === undefined ) {
 
-			return navigator.gpu.getPreferredCanvasFormat();
+			if ( this._preferredCanvasFormat === null ) {
+
+				this._preferredCanvasFormat = navigator.gpu.getPreferredCanvasFormat();
+
+			}
+
+			return this._preferredCanvasFormat;
 
 		} else if ( bufferType === UnsignedByteType ) {
 
@@ -258,11 +304,29 @@ class WebGPUUtils {
 
 		} else {
 
-			throw new Error( 'Unsupported output buffer type.' );
+			throw new Error( 'THREE.WebGPUUtils: Unsupported output buffer type.' );
 
 		}
 
 	}
+
+}
+
+/**
+ * Submits a single GPU command to the device queue using a shared, module-scoped
+ * array to avoid per-call array allocations.
+ *
+ * @private
+ * @param {GPUDevice} device - The GPU device.
+ * @param {GPUCommandBuffer} command - The command buffer to submit.
+ */
+export function submit( device, command ) {
+
+	_commandList[ 0 ] = command;
+
+	device.queue.submit( _commandList );
+
+	_commandList[ 0 ] = null;
 
 }
 

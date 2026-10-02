@@ -57,7 +57,7 @@ varying vec3 vWorldPosition;
 #include <alphahash_pars_fragment>
 #include <clipping_planes_pars_fragment>
 
-void main () {
+void main() {
 
 	vec4 diffuseColor = vec4( 1.0 );
 	#include <clipping_planes_fragment>

@@ -115,11 +115,19 @@ class Mesh extends Object3D {
 
 			this.morphTargetInfluences = source.morphTargetInfluences.slice();
 
+		} else {
+
+			this.morphTargetInfluences = undefined;
+
 		}
 
 		if ( source.morphTargetDictionary !== undefined ) {
 
 			this.morphTargetDictionary = Object.assign( {}, source.morphTargetDictionary );
+
+		} else {
+
+			this.morphTargetDictionary = undefined;
 
 		}
 
@@ -214,6 +222,18 @@ class Mesh extends Object3D {
 		}
 
 		return target;
+
+	}
+
+	/**
+	 * Returns `true` if this mesh intersects the given frustum.
+	 *
+	 * @param {Frustum|FrustumArray} frustum - The frustum to test.
+	 * @return {boolean} Whether this mesh intersects the given frustum or not.
+	 */
+	intersectsFrustum( frustum ) {
+
+		return frustum.intersectsObject( this );
 
 	}
 

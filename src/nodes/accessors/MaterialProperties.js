@@ -1,8 +1,6 @@
-import { Euler } from '../../math/Euler.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { uniform } from '../core/UniformNode.js';
 
-const _e1 = /*@__PURE__*/ new Euler();
 const _m1 = /*@__PURE__*/ new Matrix4();
 
 /**
@@ -28,8 +26,8 @@ export const materialEnvIntensity = /*@__PURE__*/ uniform( 1 ).onReference( ( { 
 
 /**
  * TSL object that represents the rotation of environment maps.
- * When `material.envMap` is set, the value is `material.envMapRotation`. `scene.environmentRotation` controls the
- * rotation of `scene.environment` instead.
+ * When `material.envMap` is set, the value is `material.envMapRotation`.
+ * `scene.environmentRotation` controls the rotation of `scene.environment` or `scene.environmentNode` instead.
  *
  * @tsl
  * @type {Node<mat4>}
@@ -40,13 +38,13 @@ export const materialEnvRotation = /*@__PURE__*/ uniform( new Matrix4() ).onRefe
 
 } ).onObjectUpdate( function ( { material, scene } ) {
 
-	const rotation = ( scene.environment !== null && material.envMap === null ) ? scene.environmentRotation : material.envMapRotation;
+	const hasSceneEnvironment = ( scene.environment !== null ) || ( scene.environmentNode && scene.environmentNode.isNode );
+	const rotation = ( hasSceneEnvironment && material.envMap === null ) ? scene.environmentRotation : material.envMapRotation;
 
 	if ( rotation ) {
 
-		_e1.copy( rotation );
-
-		_m1.makeRotationFromEuler( _e1 );
+		// note: since the matrix is orthonormal, we can use the more-efficient transpose() in lieu of invert()
+		_m1.makeRotationFromEuler( rotation ).transpose();
 
 	} else {
 

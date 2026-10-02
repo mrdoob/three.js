@@ -106,6 +106,18 @@ The current node builder.
 
 **Returns:** The generated code snippet.
 
+### .generateNodeType( builder : NodeBuilder ) : string
+
+This method is overwritten since the node type from the availability of storage buffers and the attribute data.
+
+**builder**
+
+The current node builder.
+
+**Overrides:** [BufferNode#generateNodeType](BufferNode.html#generateNodeType)
+
+**Returns:** The node type.
+
 ### .getAttributeData() : Object
 
 Returns attribute data for this storage buffer node.
@@ -151,18 +163,6 @@ The name of the member.
 **Overrides:** [BufferNode#getMemberType](BufferNode.html#getMemberType)
 
 **Returns:** The type of the member.
-
-### .getNodeType( builder : NodeBuilder ) : string
-
-This method is overwritten since the node type from the availability of storage buffers and the attribute data.
-
-**builder**
-
-The current node builder.
-
-**Overrides:** [BufferNode#getNodeType](BufferNode.html#getNodeType)
-
-**Returns:** The node type.
 
 ### .getPBO() : boolean
 

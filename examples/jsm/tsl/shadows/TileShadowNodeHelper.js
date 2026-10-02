@@ -1,5 +1,5 @@
 import { Group, NodeMaterial, Mesh, PlaneGeometry, DoubleSide, CameraHelper } from 'three/webgpu';
-import { Fn, vec4, vec3, texture, uv, positionLocal, vec2, float, screenSize } from 'three/tsl';
+import { Fn, vec4, vec3, texture, uv, positionLocal, vec2, float, int, screenSize } from 'three/tsl';
 
 /**
  * Helper class to manage and display debug visuals for TileShadowNode.
@@ -18,7 +18,7 @@ class TileShadowNodeHelper extends Group {
 
 		if ( ! tileShadowNode ) {
 
-			throw new Error( 'TileShadowNode instance is required for TileShadowNodeHelper.' );
+			throw new Error( 'THREE.TileShadowNode instance is required for TileShadowNodeHelper.' );
 
 		}
 
@@ -109,7 +109,7 @@ class TileShadowNodeHelper extends Group {
 
 				const sampledDepth = texture( this.tileShadowNode.shadowMap.depthTexture )
 					.sample( uv().flipY() )
-					.depth( float( i ) ) // Sample correct layer
+					.depth( int( i ) ) // Sample correct layer
 					.compare( 0.9 ); // Example comparison value
 
 				// Simple tint based on index for visual distinction

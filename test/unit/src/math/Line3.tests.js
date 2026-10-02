@@ -161,6 +161,12 @@ export default QUnit.module( 'Maths', () => {
 			a.closestPointToPoint( one3.clone(), true, point );
 			assert.ok( point.distanceTo( one3.clone() ) < 0.0001, 'Passed!' );
 
+			// degenerate line (zero-length)
+			const b = new Line3( one3.clone(), one3.clone() );
+			assert.ok( b.closestPointToPointParameter( zero3.clone(), true ) == 0, 'Passed!' );
+			b.closestPointToPoint( zero3.clone(), true, point );
+			assert.ok( point.distanceTo( one3.clone() ) < 0.0001, 'Passed!' );
+
 		} );
 
 		QUnit.test( 'applyMatrix4', ( assert ) => {
@@ -262,6 +268,17 @@ export default QUnit.module( 'Maths', () => {
 			line2.end.set( 0, 0, 4 );
 
 			assert.numEqual( line1.distanceSqToLine3( line2 ), 8 );
+
+			// Both segments degenerate into points
+			line1.set( one3, one3 );
+			line2.set( two3, two3 );
+
+			const c1 = new Vector3();
+			const c2 = new Vector3();
+
+			assert.numEqual( line1.distanceSqToLine3( line2, c1, c2 ), 3 );
+			assert.ok( c1.equals( one3 ), 'Passed!' );
+			assert.ok( c2.equals( two3 ), 'Passed!' );
 
 		} );
 

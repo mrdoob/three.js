@@ -19,5 +19,6 @@ export { SetScaleCommand } from './SetScaleCommand.js';
 export { SetSceneCommand } from './SetSceneCommand.js';
 export { SetScriptValueCommand } from './SetScriptValueCommand.js';
 export { SetShadowValueCommand } from './SetShadowValueCommand.js';
+export { SetTextureParametersCommand } from './SetTextureParametersCommand.js';
 export { SetUuidCommand } from './SetUuidCommand.js';
 export { SetValueCommand } from './SetValueCommand.js';

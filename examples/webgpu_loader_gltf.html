@@ -4,6 +4,10 @@
 		<title>three.js webgpu - gltf loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - gltf loader">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_loader_gltf.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_loader_gltf.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
@@ -211,9 +215,7 @@
 				const center = box.getCenter( new THREE.Vector3() );
 
 				const maxSize = Math.max( size.x, size.y, size.z );
-				const fitHeightDistance = maxSize / ( 2 * Math.atan( Math.PI * camera.fov / 360 ) );
-				// const fitWidthDistance = fitHeightDistance / camera.aspect;
-				// const distance = fitOffset * Math.max( fitHeightDistance, fitWidthDistance );
+				const fitHeightDistance = maxSize / ( 2 * Math.tan( Math.PI * camera.fov / 360 ) );
 				const distance = fitOffset * fitHeightDistance;
 
 				const direction = controls.target.clone().sub( camera.position ).normalize().multiplyScalar( distance );

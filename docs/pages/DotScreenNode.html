@@ -17,11 +17,11 @@
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">DotScreenNode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<p><span translate="no">DotScreenNode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { dotScreen } from 'three/addons/tsl/display/DotScreenNode.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="DotScreenNode" translate="no">new <a href="#DotScreenNode">DotScreenNode</a><span class="signature">( inputNode : <span class="param-type"><a href="Node.html">Node</a></span>, angle : <span class="param-type">number</span>, scale : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="DotScreenNode" translate="no">new <a href="#DotScreenNode">DotScreenNode</a><span class="signature">( inputNode : <span class="param-type"><a href="Node.html">Node</a></span>, angle : <span class="param-type">number | <a href="Node.html">Node</a>.&lt;float></span>, scale : <span class="param-type">number | <a href="Node.html">Node</a>.&lt;float></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new dot screen node.</p>
@@ -60,9 +60,9 @@
 				</div>
 				<h2 class="subsection-title">Properties</h2>
 				<div class="member">
-					<h3 class="name" id="angle" translate="no">.<a href="#angle">angle</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<h3 class="name" id="angle" translate="no">.<a href="#angle">angle</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
 					<div class="description">
-						<p>A uniform node that represents the rotation of the effect in radians.</p>
+						<p>The rotation of the effect in radians.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -72,9 +72,9 @@
 					</div>
 				</div>
 				<div class="member">
-					<h3 class="name" id="scale" translate="no">.<a href="#scale">scale</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<h3 class="name" id="scale" translate="no">.<a href="#scale">scale</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
 					<div class="description">
-						<p>A uniform node that represents the scale of the effect. A higher value means smaller dots.</p>
+						<p>The scale of the effect. A higher value means smaller dots.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>

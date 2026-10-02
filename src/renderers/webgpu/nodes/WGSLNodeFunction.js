@@ -50,6 +50,7 @@ const wgslTypeLib = {
 	'mat4x4f': 'mat4',
 
 	'sampler': 'sampler',
+	'sampler_comparison': 'samplerComparison',
 
 	'texture_1d': 'texture',
 
@@ -77,7 +78,7 @@ const wgslTypeLib = {
 
 const parse = ( source ) => {
 
-	source = source.trim();
+	source = source.replace( /^(?:\s*\/\/[^\r\n]*|\s*\/\*[\s\S]*?\*\/|\s*)+/, '' );
 
 	const declaration = source.match( declarationRegexp );
 
@@ -138,7 +139,7 @@ const parse = ( source ) => {
 
 	} else {
 
-		throw new Error( 'FunctionNode: Function is not a WGSL code.' );
+		throw new Error( 'THREE.WGSLNodeFunction: Function is not a WGSL code.' );
 
 	}
 

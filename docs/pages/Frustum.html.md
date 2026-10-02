@@ -72,6 +72,8 @@ The frustum to copy.
 
 Returns `true` if the given bounding box is intersecting this frustum.
 
+This is a fast, conservative test that favors performance over precision. It can report false positives for large boxes that lie outside the frustum but are not separated by a single frustum plane. It never reports false negatives, so it is safe for culling.
+
 **box**
 
 The bounding box to test.
@@ -93,6 +95,8 @@ The 3D object to test.
 ### .intersectsSphere( sphere : Sphere ) : boolean
 
 Returns `true` if the given bounding sphere is intersecting this frustum.
+
+This is a fast, conservative test that favors performance over precision. It can report false positives for spheres that lie outside the frustum but are not separated by a single frustum plane. It never reports false negatives, so it is safe for culling.
 
 **sphere**
 

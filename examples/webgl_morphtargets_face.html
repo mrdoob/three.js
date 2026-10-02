@@ -4,6 +4,10 @@
 		<title>three.js webgl - morph targets - face</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - morph targets - face">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_morphtargets_face.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_morphtargets_face.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
@@ -69,7 +73,6 @@
 				container.appendChild( renderer.domElement );
 
 				const ktx2Loader = new KTX2Loader()
-					.setTranscoderPath( 'jsm/libs/basis/' )
 					.detectSupport( renderer );
 
 				new GLTFLoader()

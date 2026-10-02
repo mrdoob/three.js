@@ -132,12 +132,6 @@ The idea is to assign a `Fn` definition that holds the geometry modification log
 
 Default is `null`.
 
-### .hardwareClipping : boolean
-
-Whether this material uses hardware clipping or not. This property is managed by the engine and should not be modified by apps.
-
-Default is `false`.
-
 ### .isNodeMaterial : boolean (readonly)
 
 This flag can be used for type testing.
@@ -197,9 +191,9 @@ Default is `null`.
 
 ### .outputNode : Node.<vec4>
 
-This node can be used to define the final output of the material.
+This node can be used to overwrite the final output of the material.
 
-TODO: Explain the differences to `fragmentNode`.
+Unlike [NodeMaterial#fragmentNode](NodeMaterial.html#fragmentNode), the built-in material logic (diffuse color, lighting, etc.) is still evaluated; assigning a node only replaces the resulting output color.
 
 Default is `null`.
 
@@ -258,9 +252,9 @@ Builds this material with the given node builder.
 
 The current node builder.
 
-### .copy( source : NodeMaterial ) : NodeMaterial
+### .copy( source : Material ) : NodeMaterial
 
-Copies the properties of the given node material to this instance.
+Copies the common properties of the given material to this instance.
 
 **source**
 
@@ -294,6 +288,16 @@ Setups the vertex and fragment stage of this node material.
 
 The current node builder.
 
+### .setupAmbientOcclusion( builder : NodeBuilder ) : Node
+
+Setups the ambient occlusion node from the material.
+
+**builder**
+
+The current node builder.
+
+**Returns:** The ambient occlusion node.
+
 ### .setupClipping( builder : NodeBuilder ) : ClippingNode
 
 Setups the clipping node.
@@ -312,17 +316,13 @@ Setups the depth of this material.
 
 The current node builder.
 
-### .setupDiffuseColor( builder : NodeBuilder, geometry : BufferGeometry )
+### .setupDiffuseColor( builder : NodeBuilder )
 
 Setups the computation of the material's diffuse color.
 
 **builder**
 
 The current node builder.
-
-**geometry**
-
-The geometry.
 
 ### .setupEnvironment( builder : NodeBuilder ) : Node.<vec4>
 
@@ -386,7 +386,7 @@ The current node builder.
 
 **Returns:** The lighting model.
 
-### .setupLights( builder : NodeBuilder ) : LightsNode
+### .setupMaterialLightings( builder : NodeBuilder ) : LightingNode.<Array>
 
 Setups the lights node based on the scene, environment and material.
 
@@ -431,6 +431,24 @@ Setups the outgoing light node variable
 ### .setupOutput( builder : NodeBuilder, outputNode : Node.<vec4> ) : Node.<vec4>
 
 Setups the output node.
+
+This method can be implemented by derived materials to extend the functionality of the material's output or replace it altogether.
+
+```js
+class ColoredShadowMaterial extends MeshPhongNodeMaterial {
+  constructor( parameters ) {
+    super( parameters );
+    this._shadeColor = uniform( new Color( parameters.shadeColor ?? 0xff0000 ) );
+  }
+  setupOutput( builder, outputNode ) {
+	   // Modify the native output of the MeshPhongNodeMaterial fragment shader
+    const brightness = min( outputNode.r, 1.0 );
+    const mixedColor = mix( this._shadeColor, diffuseColor.rgb, brightness );
+	   // Return new output back into NodeMaterial flow
+    return super.setupOutput( builder, vec4( mixedColor, outputNode.a ) );
+  }
+}
+```
 
 **builder**
 

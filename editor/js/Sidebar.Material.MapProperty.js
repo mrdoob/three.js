@@ -1,11 +1,13 @@
 import * as THREE from 'three';
 
-import { UICheckbox, UIDiv, UINumber, UIRow, UIText } from './libs/ui.js';
+import { UIButton, UICheckbox, UIDiv, UINumber, UIRow, UIText } from './libs/ui.js';
 import { UITexture } from './libs/ui.three.js';
 import { SetMaterialMapCommand } from './commands/SetMaterialMapCommand.js';
 import { SetMaterialValueCommand } from './commands/SetMaterialValueCommand.js';
 import { SetMaterialRangeCommand } from './commands/SetMaterialRangeCommand.js';
 import { SetMaterialVectorCommand } from './commands/SetMaterialVectorCommand.js';
+import { SetTextureParametersCommand } from './commands/SetTextureParametersCommand.js';
+import { TextureParametersDialog } from './TextureParametersDialog.js';
 
 function SidebarMaterialMapProperty( editor, property, name ) {
 
@@ -19,6 +21,10 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 	const map = new UITexture( editor ).onChange( onMapChange );
 	container.add( map );
+
+	const settings = new UIButton( '⚙' ).setClass( 'TextureSettingsButton' ).setMarginRight( '4px' ).onClick( onSettingsClick );
+	settings.setDisabled( true );
+	container.add( settings );
 
 	const mapType = property.replace( 'Map', '' );
 
@@ -110,6 +116,26 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 	}
 
+	async function onSettingsClick() {
+
+		const texture = map.getValue();
+		if ( texture === null ) return;
+
+		const dialog = new TextureParametersDialog( editor, texture );
+
+		try {
+
+			const parameters = await dialog.show();
+			editor.execute( new SetTextureParametersCommand( editor, texture, parameters ) );
+
+		} catch ( e ) {
+
+			// Edit cancelled
+
+		}
+
+	}
+
 	function onMapChange( texture ) {
 
 		if ( texture !== null ) {
@@ -124,6 +150,7 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 		}
 
 		enabled.setDisabled( false );
+		settings.setDisabled( texture === null );
 
 		onChange();
 
@@ -193,6 +220,7 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 			enabled.setValue( material[ property ] !== null );
 			enabled.setDisabled( map.getValue() === null );
+			settings.setDisabled( map.getValue() === null );
 
 			if ( intensity !== undefined ) {
 

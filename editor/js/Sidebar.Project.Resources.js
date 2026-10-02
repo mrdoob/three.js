@@ -128,6 +128,7 @@ function SidebarProjectResources( editor ) {
 	function refreshTexturesUI() {
 
 		const textures = [];
+		const types = [];
 		const texturesUsed = new Set();
 
 		const materials = Object.values( editor.materials );
@@ -143,6 +144,7 @@ function SidebarProjectResources( editor ) {
 					if ( texturesUsed.has( value.uuid ) === false ) {
 
 						textures.push( value );
+						types.push( getTextureType( value ) );
 						texturesUsed.add( value.uuid );
 
 					}
@@ -153,8 +155,27 @@ function SidebarProjectResources( editor ) {
 
 		}
 
-		texturesListbox.setItems( textures );
+		texturesListbox.setItems( textures, types );
 		texturesInfo.setValue( textures.length + ' ' + strings.getKey( 'sidebar/project/textures' ).toLowerCase() );
+
+	}
+
+	function getTextureType( texture ) {
+
+		if ( texture.isCanvasTexture ) return 'CanvasTexture';
+		if ( texture.isVideoTexture ) return 'VideoTexture';
+		if ( texture.isCubeDepthTexture ) return 'CubeDepthTexture';
+		if ( texture.isDepthTexture ) return 'DepthTexture';
+		if ( texture.isCompressedArrayTexture ) return 'CompressedArrayTexture';
+		if ( texture.isCompressedCubeTexture ) return 'CompressedCubeTexture';
+		if ( texture.isCompressedTexture ) return 'CompressedTexture';
+		if ( texture.isCubeTexture ) return 'CubeTexture';
+		if ( texture.isData3DTexture ) return 'Data3DTexture';
+		if ( texture.isDataArrayTexture ) return 'DataArrayTexture';
+		if ( texture.isDataTexture ) return 'DataTexture';
+		if ( texture.isFramebufferTexture ) return 'FramebufferTexture';
+
+		return 'Texture';
 
 	}
 

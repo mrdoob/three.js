@@ -18,7 +18,7 @@ scene.add( mesh );
 
 ## Import
 
-VTKLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+VTKLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { VTKLoader } from 'three/addons/loaders/VTKLoader.js';
@@ -34,11 +34,13 @@ Constructs a new VTK loader.
 
 The loading manager.
 
+**Deprecated:** since r184.
+
 ## Methods
 
 ### .load( url : string, onLoad : function, onProgress : onProgressCallback, onError : onErrorCallback )
 
-Starts loading from the given URL and passes the loaded VRML asset to the `onLoad()` callback.
+Starts loading from the given URL and passes the loaded VTK asset to the `onLoad()` callback.
 
 **url**
 

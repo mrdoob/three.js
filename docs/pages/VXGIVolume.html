@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>VXGIVolume - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">VXGIVolume</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Holds the voxel representation of a scene for <a href="VXGINode.html">VXGINode</a>: an anisotropic opacity
+mip chain, a direct radiance volume and a radiance volume with cached bounces.</p>
+<p>The representation is a dense variant of the pre-filtered voxel hierarchy of Crassin et al. 2011
+(a dense mip chain instead of a sparse octree, which keeps cone samples to two texture fetches):
+opacity stores visibility per major axis and is filtered directionally (volumetric integration
+along the axis, averaging across it), radiance is stored opacity-premultiplied and indirect bounces
+are cached in the volume via cone tracing. Only direct lights are injected.
+Voxelization uses conservative rasterization along the dominant triangle axis in a compute shader.</p>
+<p>Direct light is injected per voxel instead of splatting photons from a light-view map as in the
+paper: the shadow maps rendered by the renderer are the light-view maps, and every occupied voxel
+pulls its visibility from them (2D maps for directional and spot lights, cube maps for point
+lights) and evaluates its irradiance analytically. This reuses the existing shadow passes, makes
+the injected shadows match the direct lighting exactly and needs neither atomics nor a
+normalization by photon density. Lights without a shadow map fall back to a visibility cone
+traced through the volume. The trade-off is a cost proportional to the number of occupied voxels
+times lights rather than to the light-view resolution, and that only outgoing diffuse radiance
+is stored (no incoming direction distribution for glossy cones).</p>
+<p>References:</p>
+<ul>
+<li><a href="https://research.nvidia.com/publication/2011-09_interactive-indirect-illumination-using-voxel-cone-tracing" target="_blank" rel="noopener">https://research.nvidia.com/publication/2011-09_interactive-indirect-illumination-using-voxel-cone-tracing</a>:
+Crassin et al., Interactive Indirect Illumination Using Voxel Cone Tracing, Pacific Graphics 2011.</li>
+<li><a href="https://developer.nvidia.com/content/basics-gpu-voxelization" target="_blank" rel="noopener">https://developer.nvidia.com/content/basics-gpu-voxelization</a>: Basics of GPU voxelization.</li>
+</ul>
+<p>Note: This class can only be used with <code>WebGPURenderer</code> and a WebGPU backend.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">VXGIVolume</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { VXGIVolume } from 'three/addons/lighting/vxgi/VXGIVolume.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="VXGIVolume" translate="no">new <a href="#VXGIVolume">VXGIVolume</a><span class="signature">( resolution : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new volume.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">resolution</strong>
+									</td>
+									<td class="description last">
+										<p>Number of voxels along the longest axis of the bounds. Should not exceed <code>256</code>, higher values exceed the maximum storage buffer size of the voxelizer.</p>
+										<p>Default is <code>128</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="bounceConeAngle" translate="no">.<a href="#bounceConeAngle">bounceConeAngle</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Aperture of the cones used for the cached bounces in degrees.</p>
+						<p>Default is <code>60</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="bounces" translate="no">.<a href="#bounces">bounces</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Number of cached indirect bounces stored in the volume. Should be in the range <code>[0, 2]</code>.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="bounds" translate="no">.<a href="#bounds">bounds</a><span class="type-signature"> : <a href="Box3.html">Box3</a></span> </h3>
+					<div class="description">
+						<p>The requested world-space bounds of the volume. If empty (the default), the bounds are
+computed from the scene at voxelization. See <a href="VXGIVolume.html#worldBounds">VXGIVolume#worldBounds</a> for the
+effective bounds.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="boundsMinNode" translate="no">.<a href="#boundsMinNode">boundsMinNode</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;vec3></span> </h3>
+					<div class="description">
+						<p>The minimum corner of the volume.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="directionalNode" translate="no">.<a href="#directionalNode">directionalNode</a><span class="type-signature"> : <a href="Texture3DNode.html">Texture3DNode</a></span> </h3>
+					<div class="description">
+						<p>Texture node of <a href="VXGIVolume.html#directionalTexture">VXGIVolume#directionalTexture</a>. Stays valid across re-allocations of the volume.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="directionalRadiance" translate="no">.<a href="#directionalRadiance">directionalRadiance</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the coarser radiance levels are filtered directionally: along each axis the finer
+voxels are composited front to back using their surface normals, so a cone only gathers
+the surfaces facing it. This reduces light bleeding through thin walls and floors (e.g. a
+sunlit floor brightening the ceiling of the room below) at the cost of additional memory
+and a more expensive radiance lookup. Changing it triggers a re-voxelization.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="directionalTexture" translate="no">.<a href="#directionalTexture">directionalTexture</a><span class="type-signature"> : <a href="Storage3DTexture.html">Storage3DTexture</a></span> </h3>
+					<div class="description">
+						<p>The coarser radiance levels filtered directionally for the six directions a ray can travel
+(+x, -x, +y, -y, +z, -z), only allocated with <a href="VXGIVolume.html#directionalRadiance">VXGIVolume#directionalRadiance</a>. Each
+texel holds the radiance of the surfaces facing the direction premultiplied by their weight
+(<code>rgb</code>) and the weight (<code>a</code>); occlusion comes from the opacity mip chain. The six directions
+are stored side by side along x in one half-resolution mip chain; level <code>n</code> of the volume is
+its level <code>n - 1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="directionalWidthNode" translate="no">.<a href="#directionalWidthNode">directionalWidthNode</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The width of one direction block of the directional texture in texels (at its level 0).</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="layers" translate="no">.<a href="#layers">layers</a><span class="type-signature"> : <a href="Layers.html">Layers</a></span> </h3>
+					<div class="description">
+						<p>Only meshes that pass this layer test are voxelized.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="lightingNeedsUpdate" translate="no">.<a href="#lightingNeedsUpdate">lightingNeedsUpdate</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Set to <code>true</code> to re-inject lighting in the next update. Changes of the lights and of the
+injection parameters are detected automatically, so this is rarely needed.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="maxDistance" translate="no">.<a href="#maxDistance">maxDistance</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Maximum cone length in world units. <code>0</code> means unbounded.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="maxLevelNode" translate="no">.<a href="#maxLevelNode">maxLevelNode</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The highest valid mip level of the voxel textures.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="maxLights" translate="no">.<a href="#maxLights">maxLights</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Maximum number of lights injected into the volume.</p>
+						<p>Default is <code>8</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="minOpacity" translate="no">.<a href="#minOpacity">minOpacity</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Triangles with a lower opacity are not voxelized.</p>
+						<p>Default is <code>0.1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="needsUpdate" translate="no">.<a href="#needsUpdate">needsUpdate</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Set to <code>true</code> to re-voxelize the scene in the next update.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="opacityNode" translate="no">.<a href="#opacityNode">opacityNode</a><span class="type-signature"> : <a href="Texture3DNode.html">Texture3DNode</a></span> </h3>
+					<div class="description">
+						<p>Texture node of <a href="VXGIVolume.html#opacityTexture">VXGIVolume#opacityTexture</a>. Stays valid across re-allocations of the volume.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="opacityTexture" translate="no">.<a href="#opacityTexture">opacityTexture</a><span class="type-signature"> : <a href="Storage3DTexture.html">Storage3DTexture</a></span> </h3>
+					<div class="description">
+						<p>The per-axis opacity of the scene (<code>xyz</code>) and the occupancy (<code>w</code>) as a mip chain.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="radianceNode" translate="no">.<a href="#radianceNode">radianceNode</a><span class="type-signature"> : <a href="Texture3DNode.html">Texture3DNode</a></span> </h3>
+					<div class="description">
+						<p>Texture node of <a href="VXGIVolume.html#radianceTexture">VXGIVolume#radianceTexture</a>. Stays valid across re-allocations of the volume.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="radianceTexture" translate="no">.<a href="#radianceTexture">radianceTexture</a><span class="type-signature"> : <a href="Storage3DTexture.html">Storage3DTexture</a></span> </h3>
+					<div class="description">
+						<p>The radiance of the scene including cached bounces, premultiplied by occupancy, as a mip chain.
+With <a href="VXGIVolume.html#directionalRadiance">VXGIVolume#directionalRadiance</a> only the finest level is used and the coarser
+levels live in <a href="VXGIVolume.html#directionalTexture">VXGIVolume#directionalTexture</a>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="resolution" translate="no">.<a href="#resolution">resolution</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Number of voxels along the longest axis of the bounds. Should not exceed <code>256</code>, higher values exceed the maximum storage buffer size of the voxelizer.</p>
+						<p>Default is <code>128</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="shadowConeAngle" translate="no">.<a href="#shadowConeAngle">shadowConeAngle</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Aperture in degrees of the visibility cones traced towards lights that do not provide a
+shadow map. Wider cones are cheaper but soften the injected shadows.</p>
+						<p>Default is <code>10</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="stepScale" translate="no">.<a href="#stepScale">stepScale</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Step size relative to the texel size of the sampled mip level.</p>
+						<p>Default is <code>0.5</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="traceDistanceNode" translate="no">.<a href="#traceDistanceNode">traceDistanceNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The effective maximum cone length as a node.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="volumeSizeNode" translate="no">.<a href="#volumeSizeNode">volumeSizeNode</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;vec3></span> </h3>
+					<div class="description">
+						<p>The size of the volume.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="voxelSizeNode" translate="no">.<a href="#voxelSizeNode">voxelSizeNode</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>The size of a voxel.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="worldBounds" translate="no">.<a href="#worldBounds">worldBounds</a><span class="type-signature"> : <a href="Box3.html">Box3</a></span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The effective world-space bounds of the voxel grid, updated at voxelization.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees internal resources.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a></span>, scene : <span class="param-type"><a href="Scene.html">Scene</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the volume if required. Voxelizes the scene when <code>needsUpdate</code> is set and re-injects
+lighting when <code>lightingNeedsUpdate</code> is set or a light has changed.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/lighting/vxgi/VXGIVolume.js" translate="no" target="_blank" rel="noopener">examples/jsm/lighting/vxgi/VXGIVolume.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

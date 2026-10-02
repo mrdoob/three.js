@@ -1,6 +1,6 @@
 # Plane
 
-A two dimensional surface that extends infinitely in 3D space, represented in [Hessian normal form](http://mathworld.wolfram.com/HessianNormalForm.html) by a unit length normal vector and a constant.
+A two dimensional surface that extends infinitely in 3D space, represented in [Hessian normal form](https://mathworld.wolfram.com/HessianNormalForm.html) by a unit length normal vector and a constant.
 
 ## Constructor
 
@@ -116,7 +116,17 @@ The plane to test for equality.
 
 **Returns:** Whether this plane is equal with the given one.
 
-### .intersectLine( line : Line3, target : Vector3 ) : Vector3
+### .fromJSON( json : Object ) : Plane
+
+Sets the plane properties from the given JSON.
+
+**json**
+
+The serialized json to set the plane from.
+
+**Returns:** A reference to this plane.
+
+### .intersectLine( line : Line3, target : Vector3, clampToLine : boolean ) : Vector3
 
 Returns the intersection point of the passed line and the plane. Returns `null` if the line does not intersect. Returns the line's starting point if the line is coplanar with the plane.
 
@@ -128,7 +138,13 @@ The line to compute the intersection for.
 
 The target vector that is used to store the method's result.
 
-**Returns:** The intersection point.
+**clampToLine**
+
+Whether to clamp the intersection to the line segment.
+
+Default is `true`.
+
+**Returns:** The intersection point. Returns `null` if no intersection is detected.
 
 ### .intersectsBox( box : Box3 ) : boolean
 
@@ -253,6 +269,12 @@ The normal.
 A coplanar point.
 
 **Returns:** A reference to this plane.
+
+### .toJSON() : Object
+
+Returns a serialized structure of the plane.
+
+**Returns:** Serialized structure with fields representing the object state.
 
 ### .translate( offset : Vector3 ) : Plane
 

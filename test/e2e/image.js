@@ -171,7 +171,7 @@ class Image {
 
 		} else {
 
-			buffer = input;
+			buffer = Buffer.isBuffer( input ) ? input : Buffer.from( input );
 
 		}
 

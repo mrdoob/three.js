@@ -69,6 +69,18 @@ Overwrites the default `element()` method to provide element access based on [Un
 
 The index node.
 
+### .generateNodeType( builder : NodeBuilder ) : string
+
+This method is overwritten since the node type is inferred from the [UniformArrayNode#paddedType](UniformArrayNode.html#paddedType).
+
+**builder**
+
+The current node builder.
+
+**Overrides:** [BufferNode#generateNodeType](BufferNode.html#generateNodeType)
+
+**Returns:** The node type.
+
 ### .getElementType( builder : NodeBuilder ) : string
 
 The data type of the array elements.
@@ -81,23 +93,27 @@ The current node builder.
 
 **Returns:** The element type.
 
-### .getNodeType( builder : NodeBuilder ) : string
-
-This method is overwritten since the node type is inferred from the [UniformArrayNode#paddedType](UniformArrayNode.html#paddedType).
-
-**builder**
-
-The current node builder.
-
-**Overrides:** [BufferNode#getNodeType](BufferNode.html#getNodeType)
-
-**Returns:** The node type.
-
 ### .getPaddedType() : string
 
 Returns the padded type based on the element type.
 
 **Returns:** The padded type.
+
+### .onUpdate( callback : function, updateType : string ) : UniformArrayNode
+
+Composes a user-defined update with the buffer transfer.
+
+**callback**
+
+The update function.
+
+**updateType**
+
+The update type.
+
+**Overrides:** [BufferNode#onUpdate](BufferNode.html#onUpdate)
+
+**Returns:** A reference to this node.
 
 ### .setup( builder : NodeBuilder ) : null
 
@@ -109,15 +125,9 @@ A reference to the current node builder.
 
 **Overrides:** [BufferNode#setup](BufferNode.html#setup)
 
-### .update( frame : NodeFrame )
+### .updateBuffer()
 
-The update makes sure to correctly transfer the data from the (complex) objects in the array to the internal, correctly padded value buffer.
-
-**frame**
-
-A reference to the current node frame.
-
-**Overrides:** [BufferNode#update](BufferNode.html#update)
+The method makes sure to correctly transfer the data from the (complex) objects in the array to the internal, correctly padded value buffer.
 
 ## Source
 

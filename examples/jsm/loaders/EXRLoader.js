@@ -173,6 +173,7 @@ class EXRLoader extends DataTextureLoader {
 		const logBase = Math.pow( 2.7182818, 2.2 );
 
 		let b44LogTable = null; // lazily initialized for pLinear B44 channels
+		let dwaToLinearTable = null; // lazily initialized for DWA lossy DCT channels
 
 		function reverseLutFromBitmap( bitmap, lut ) {
 
@@ -276,7 +277,7 @@ class EXRLoader extends DataTextureLoader {
 
 					if ( p.value - inOffset.value > ni ) {
 
-						throw new Error( 'Something wrong with hufUnpackEncTable' );
+						throw new Error( 'THREE.EXRLoader: Something wrong with hufUnpackEncTable' );
 
 					}
 
@@ -288,7 +289,7 @@ class EXRLoader extends DataTextureLoader {
 
 					if ( im + zerun > iM + 1 ) {
 
-						throw new Error( 'Something wrong with hufUnpackEncTable' );
+						throw new Error( 'THREE.EXRLoader: Something wrong with hufUnpackEncTable' );
 
 					}
 
@@ -302,7 +303,7 @@ class EXRLoader extends DataTextureLoader {
 
 					if ( im + zerun > iM + 1 ) {
 
-						throw new Error( 'Something wrong with hufUnpackEncTable' );
+						throw new Error( 'THREE.EXRLoader: Something wrong with hufUnpackEncTable' );
 
 					}
 
@@ -339,7 +340,7 @@ class EXRLoader extends DataTextureLoader {
 
 				if ( c >> l ) {
 
-					throw new Error( 'Invalid table entry' );
+					throw new Error( 'THREE.EXRLoader: Invalid table entry' );
 
 				}
 
@@ -349,7 +350,7 @@ class EXRLoader extends DataTextureLoader {
 
 					if ( pl.len ) {
 
-						throw new Error( 'Invalid table entry' );
+						throw new Error( 'THREE.EXRLoader: Invalid table entry' );
 
 					}
 
@@ -384,7 +385,7 @@ class EXRLoader extends DataTextureLoader {
 
 						if ( pl.len || pl.p ) {
 
-							throw new Error( 'Invalid table entry' );
+							throw new Error( 'THREE.EXRLoader: Invalid table entry' );
 
 						}
 
@@ -673,7 +674,7 @@ class EXRLoader extends DataTextureLoader {
 
 						if ( ! pl.p ) {
 
-							throw new Error( 'hufDecode issues' );
+							throw new Error( 'THREE.EXRLoader: hufDecode issues' );
 
 						}
 
@@ -713,7 +714,7 @@ class EXRLoader extends DataTextureLoader {
 
 						if ( j == pl.lit ) {
 
-							throw new Error( 'hufDecode issues' );
+							throw new Error( 'THREE.EXRLoader: hufDecode issues' );
 
 						}
 
@@ -743,7 +744,7 @@ class EXRLoader extends DataTextureLoader {
 
 				} else {
 
-					throw new Error( 'hufDecode issues' );
+					throw new Error( 'THREE.EXRLoader: hufDecode issues' );
 
 				}
 
@@ -769,7 +770,7 @@ class EXRLoader extends DataTextureLoader {
 
 			if ( im < 0 || im >= HUF_ENCSIZE || iM < 0 || iM >= HUF_ENCSIZE ) {
 
-				throw new Error( 'Something wrong with HUF_ENCSIZE' );
+				throw new Error( 'THREE.EXRLoader: Something wrong with HUF_ENCSIZE' );
 
 			}
 
@@ -784,7 +785,7 @@ class EXRLoader extends DataTextureLoader {
 
 			if ( nBits > 8 * ( nCompressed - ( inOffset.value - initialInOffset ) ) ) {
 
-				throw new Error( 'Something wrong with hufUncompress' );
+				throw new Error( 'THREE.EXRLoader: Something wrong with hufUncompress' );
 
 			}
 
@@ -1030,7 +1031,7 @@ class EXRLoader extends DataTextureLoader {
 
 					for ( let x = 0; x < width; ++ x ) {
 
-						dataView.setFloat32( offset + x * INT16_SIZE * type, decodeFloat16( halfRow[ x ] ), true );
+						dataView.setFloat32( offset + x * INT16_SIZE * type, DataUtils.fromHalfFloat( halfRow[ x ] ), true );
 
 					}
 
@@ -1147,76 +1148,76 @@ class EXRLoader extends DataTextureLoader {
 
 		function unZigZag( src, dst ) {
 
-			dst[ 0 ] = decodeFloat16( src[ 0 ] );
-			dst[ 1 ] = decodeFloat16( src[ 1 ] );
-			dst[ 2 ] = decodeFloat16( src[ 5 ] );
-			dst[ 3 ] = decodeFloat16( src[ 6 ] );
-			dst[ 4 ] = decodeFloat16( src[ 14 ] );
-			dst[ 5 ] = decodeFloat16( src[ 15 ] );
-			dst[ 6 ] = decodeFloat16( src[ 27 ] );
-			dst[ 7 ] = decodeFloat16( src[ 28 ] );
-			dst[ 8 ] = decodeFloat16( src[ 2 ] );
-			dst[ 9 ] = decodeFloat16( src[ 4 ] );
+			dst[ 0 ] = DataUtils.fromHalfFloat( src[ 0 ] );
+			dst[ 1 ] = DataUtils.fromHalfFloat( src[ 1 ] );
+			dst[ 2 ] = DataUtils.fromHalfFloat( src[ 5 ] );
+			dst[ 3 ] = DataUtils.fromHalfFloat( src[ 6 ] );
+			dst[ 4 ] = DataUtils.fromHalfFloat( src[ 14 ] );
+			dst[ 5 ] = DataUtils.fromHalfFloat( src[ 15 ] );
+			dst[ 6 ] = DataUtils.fromHalfFloat( src[ 27 ] );
+			dst[ 7 ] = DataUtils.fromHalfFloat( src[ 28 ] );
+			dst[ 8 ] = DataUtils.fromHalfFloat( src[ 2 ] );
+			dst[ 9 ] = DataUtils.fromHalfFloat( src[ 4 ] );
 
-			dst[ 10 ] = decodeFloat16( src[ 7 ] );
-			dst[ 11 ] = decodeFloat16( src[ 13 ] );
-			dst[ 12 ] = decodeFloat16( src[ 16 ] );
-			dst[ 13 ] = decodeFloat16( src[ 26 ] );
-			dst[ 14 ] = decodeFloat16( src[ 29 ] );
-			dst[ 15 ] = decodeFloat16( src[ 42 ] );
-			dst[ 16 ] = decodeFloat16( src[ 3 ] );
-			dst[ 17 ] = decodeFloat16( src[ 8 ] );
-			dst[ 18 ] = decodeFloat16( src[ 12 ] );
-			dst[ 19 ] = decodeFloat16( src[ 17 ] );
+			dst[ 10 ] = DataUtils.fromHalfFloat( src[ 7 ] );
+			dst[ 11 ] = DataUtils.fromHalfFloat( src[ 13 ] );
+			dst[ 12 ] = DataUtils.fromHalfFloat( src[ 16 ] );
+			dst[ 13 ] = DataUtils.fromHalfFloat( src[ 26 ] );
+			dst[ 14 ] = DataUtils.fromHalfFloat( src[ 29 ] );
+			dst[ 15 ] = DataUtils.fromHalfFloat( src[ 42 ] );
+			dst[ 16 ] = DataUtils.fromHalfFloat( src[ 3 ] );
+			dst[ 17 ] = DataUtils.fromHalfFloat( src[ 8 ] );
+			dst[ 18 ] = DataUtils.fromHalfFloat( src[ 12 ] );
+			dst[ 19 ] = DataUtils.fromHalfFloat( src[ 17 ] );
 
-			dst[ 20 ] = decodeFloat16( src[ 25 ] );
-			dst[ 21 ] = decodeFloat16( src[ 30 ] );
-			dst[ 22 ] = decodeFloat16( src[ 41 ] );
-			dst[ 23 ] = decodeFloat16( src[ 43 ] );
-			dst[ 24 ] = decodeFloat16( src[ 9 ] );
-			dst[ 25 ] = decodeFloat16( src[ 11 ] );
-			dst[ 26 ] = decodeFloat16( src[ 18 ] );
-			dst[ 27 ] = decodeFloat16( src[ 24 ] );
-			dst[ 28 ] = decodeFloat16( src[ 31 ] );
-			dst[ 29 ] = decodeFloat16( src[ 40 ] );
+			dst[ 20 ] = DataUtils.fromHalfFloat( src[ 25 ] );
+			dst[ 21 ] = DataUtils.fromHalfFloat( src[ 30 ] );
+			dst[ 22 ] = DataUtils.fromHalfFloat( src[ 41 ] );
+			dst[ 23 ] = DataUtils.fromHalfFloat( src[ 43 ] );
+			dst[ 24 ] = DataUtils.fromHalfFloat( src[ 9 ] );
+			dst[ 25 ] = DataUtils.fromHalfFloat( src[ 11 ] );
+			dst[ 26 ] = DataUtils.fromHalfFloat( src[ 18 ] );
+			dst[ 27 ] = DataUtils.fromHalfFloat( src[ 24 ] );
+			dst[ 28 ] = DataUtils.fromHalfFloat( src[ 31 ] );
+			dst[ 29 ] = DataUtils.fromHalfFloat( src[ 40 ] );
 
-			dst[ 30 ] = decodeFloat16( src[ 44 ] );
-			dst[ 31 ] = decodeFloat16( src[ 53 ] );
-			dst[ 32 ] = decodeFloat16( src[ 10 ] );
-			dst[ 33 ] = decodeFloat16( src[ 19 ] );
-			dst[ 34 ] = decodeFloat16( src[ 23 ] );
-			dst[ 35 ] = decodeFloat16( src[ 32 ] );
-			dst[ 36 ] = decodeFloat16( src[ 39 ] );
-			dst[ 37 ] = decodeFloat16( src[ 45 ] );
-			dst[ 38 ] = decodeFloat16( src[ 52 ] );
-			dst[ 39 ] = decodeFloat16( src[ 54 ] );
+			dst[ 30 ] = DataUtils.fromHalfFloat( src[ 44 ] );
+			dst[ 31 ] = DataUtils.fromHalfFloat( src[ 53 ] );
+			dst[ 32 ] = DataUtils.fromHalfFloat( src[ 10 ] );
+			dst[ 33 ] = DataUtils.fromHalfFloat( src[ 19 ] );
+			dst[ 34 ] = DataUtils.fromHalfFloat( src[ 23 ] );
+			dst[ 35 ] = DataUtils.fromHalfFloat( src[ 32 ] );
+			dst[ 36 ] = DataUtils.fromHalfFloat( src[ 39 ] );
+			dst[ 37 ] = DataUtils.fromHalfFloat( src[ 45 ] );
+			dst[ 38 ] = DataUtils.fromHalfFloat( src[ 52 ] );
+			dst[ 39 ] = DataUtils.fromHalfFloat( src[ 54 ] );
 
-			dst[ 40 ] = decodeFloat16( src[ 20 ] );
-			dst[ 41 ] = decodeFloat16( src[ 22 ] );
-			dst[ 42 ] = decodeFloat16( src[ 33 ] );
-			dst[ 43 ] = decodeFloat16( src[ 38 ] );
-			dst[ 44 ] = decodeFloat16( src[ 46 ] );
-			dst[ 45 ] = decodeFloat16( src[ 51 ] );
-			dst[ 46 ] = decodeFloat16( src[ 55 ] );
-			dst[ 47 ] = decodeFloat16( src[ 60 ] );
-			dst[ 48 ] = decodeFloat16( src[ 21 ] );
-			dst[ 49 ] = decodeFloat16( src[ 34 ] );
+			dst[ 40 ] = DataUtils.fromHalfFloat( src[ 20 ] );
+			dst[ 41 ] = DataUtils.fromHalfFloat( src[ 22 ] );
+			dst[ 42 ] = DataUtils.fromHalfFloat( src[ 33 ] );
+			dst[ 43 ] = DataUtils.fromHalfFloat( src[ 38 ] );
+			dst[ 44 ] = DataUtils.fromHalfFloat( src[ 46 ] );
+			dst[ 45 ] = DataUtils.fromHalfFloat( src[ 51 ] );
+			dst[ 46 ] = DataUtils.fromHalfFloat( src[ 55 ] );
+			dst[ 47 ] = DataUtils.fromHalfFloat( src[ 60 ] );
+			dst[ 48 ] = DataUtils.fromHalfFloat( src[ 21 ] );
+			dst[ 49 ] = DataUtils.fromHalfFloat( src[ 34 ] );
 
-			dst[ 50 ] = decodeFloat16( src[ 37 ] );
-			dst[ 51 ] = decodeFloat16( src[ 47 ] );
-			dst[ 52 ] = decodeFloat16( src[ 50 ] );
-			dst[ 53 ] = decodeFloat16( src[ 56 ] );
-			dst[ 54 ] = decodeFloat16( src[ 59 ] );
-			dst[ 55 ] = decodeFloat16( src[ 61 ] );
-			dst[ 56 ] = decodeFloat16( src[ 35 ] );
-			dst[ 57 ] = decodeFloat16( src[ 36 ] );
-			dst[ 58 ] = decodeFloat16( src[ 48 ] );
-			dst[ 59 ] = decodeFloat16( src[ 49 ] );
+			dst[ 50 ] = DataUtils.fromHalfFloat( src[ 37 ] );
+			dst[ 51 ] = DataUtils.fromHalfFloat( src[ 47 ] );
+			dst[ 52 ] = DataUtils.fromHalfFloat( src[ 50 ] );
+			dst[ 53 ] = DataUtils.fromHalfFloat( src[ 56 ] );
+			dst[ 54 ] = DataUtils.fromHalfFloat( src[ 59 ] );
+			dst[ 55 ] = DataUtils.fromHalfFloat( src[ 61 ] );
+			dst[ 56 ] = DataUtils.fromHalfFloat( src[ 35 ] );
+			dst[ 57 ] = DataUtils.fromHalfFloat( src[ 36 ] );
+			dst[ 58 ] = DataUtils.fromHalfFloat( src[ 48 ] );
+			dst[ 59 ] = DataUtils.fromHalfFloat( src[ 49 ] );
 
-			dst[ 60 ] = decodeFloat16( src[ 57 ] );
-			dst[ 61 ] = decodeFloat16( src[ 58 ] );
-			dst[ 62 ] = decodeFloat16( src[ 62 ] );
-			dst[ 63 ] = decodeFloat16( src[ 63 ] );
+			dst[ 60 ] = DataUtils.fromHalfFloat( src[ 57 ] );
+			dst[ 61 ] = DataUtils.fromHalfFloat( src[ 58 ] );
+			dst[ 62 ] = DataUtils.fromHalfFloat( src[ 62 ] );
+			dst[ 63 ] = DataUtils.fromHalfFloat( src[ 63 ] );
 
 		}
 
@@ -1324,25 +1325,58 @@ class EXRLoader extends DataTextureLoader {
 
 		}
 
-		function convertToHalf( src, dst, idx ) {
+		const _f32 = new Float32Array( 1 );
+		const _u32 = new Uint32Array( _f32.buffer );
 
-			for ( let i = 0; i < 64; ++ i ) {
+		// float -> half bits with round-to-nearest-even, like Imath's float_to_half
+		// (DataUtils.toHalfFloat truncates, which is what put DWA output 1-5 ulp off OpenEXR).
+		function floatToHalfBits( f ) {
 
-				dst[ idx + i ] = DataUtils.toHalfFloat( toLinear( src[ i ] ) );
+			_f32[ 0 ] = f;
+			const x = _u32[ 0 ];
+			const sign = ( x >>> 16 ) & 0x8000;
+			const a = x & 0x7fffffff;
+
+			if ( a >= 0x47800000 ) return sign | ( a > 0x7f800000 ? 0x7e00 : 0x7c00 ); // overflow, Inf, NaN
+
+			if ( a < 0x38800000 ) { // subnormal or zero in half
+
+				_f32[ 0 ] = Math.abs( f ) + 0.5; // 0.5 = 2^-1: forces rounding to a 2^-24 grid
+				return sign | ( _u32[ 0 ] - 0x3f000000 );
 
 			}
 
+			const r = a + 0xfff + ( ( a >>> 13 ) & 1 );
+			return sign | ( ( r - 0x38000000 ) >>> 13 );
+
 		}
 
-		function toLinear( float ) {
+		function convertToHalf( src, dst, idx ) {
 
-			if ( float <= 1 ) {
+			if ( dwaToLinearTable === null ) {
 
-				return Math.sign( float ) * Math.pow( Math.abs( float ), 2.2 );
+				// Mirrors OpenEXR dwaLookups.cpp: gamma 2.2 below 1, log curve above,
+				// applied to the half bits after rounding so results match bit for bit.
 
-			} else {
+				dwaToLinearTable = new Uint16Array( 65536 );
 
-				return Math.sign( float ) * Math.pow( logBase, Math.abs( float ) - 1.0 );
+				for ( let i = 1; i < 65536; ++ i ) {
+
+					if ( ( i & 0x7c00 ) === 0x7c00 ) continue; // NaN / Inf -> 0
+
+					const h = DataUtils.fromHalfFloat( i );
+					const v = Math.abs( h );
+					const linear = v <= 1 ? Math.pow( v, 2.2 ) : Math.pow( logBase, v - 1 );
+
+					dwaToLinearTable[ i ] = floatToHalfBits( h < 0 ? - linear : linear );
+
+				}
+
+			}
+
+			for ( let i = 0; i < 64; ++ i ) {
+
+				dst[ idx + i ] = dwaToLinearTable[ floatToHalfBits( src[ i ] ) ];
 
 			}
 
@@ -1415,7 +1449,7 @@ class EXRLoader extends DataTextureLoader {
 
 			if ( maxNonZero >= BITMAP_SIZE ) {
 
-				throw new Error( 'Something is wrong with PIZ_COMPRESSION BITMAP_SIZE' );
+				throw new Error( 'THREE.EXRLoader: Something is wrong with PIZ_COMPRESSION BITMAP_SIZE' );
 
 			}
 
@@ -1694,7 +1728,7 @@ class EXRLoader extends DataTextureLoader {
 
 									} else {
 
-										const f = decodeFloat16( i );
+										const f = DataUtils.fromHalfFloat( i );
 										b44LogTable[ i ] = ( f <= 0 ) ? 0 : DataUtils.toHalfFloat( 8 * Math.log( f ) );
 
 									}
@@ -1781,7 +1815,7 @@ class EXRLoader extends DataTextureLoader {
 			};
 
 			if ( dwaHeader.version < 2 )
-				throw new Error( 'EXRLoader.parse: ' + EXRHeader.compression + ' version ' + dwaHeader.version + ' is unsupported' );
+				throw new Error( 'THREE.EXRLoader: ' + EXRHeader.compression + ' version ' + dwaHeader.version + ' is unsupported' );
 
 			// Read channel ruleset information
 			const channelRules = new Array();
@@ -1979,7 +2013,7 @@ class EXRLoader extends DataTextureLoader {
 						break;
 
 					default:
-						throw new Error( 'EXRLoader.parse: unsupported channel compression' );
+						throw new Error( 'THREE.EXRLoader: unsupported channel compression' );
 
 				}
 
@@ -2082,17 +2116,7 @@ class EXRLoader extends DataTextureLoader {
 
 		const parseInt64 = function ( dataView, offset ) {
 
-			let int;
-
-			if ( 'getBigInt64' in DataView.prototype ) {
-
-				int = Number( dataView.getBigInt64( offset.value, true ) );
-
-			} else {
-
-				int = dataView.getUint32( offset.value + 4, true ) + Number( dataView.getUint32( offset.value, true ) << 32 );
-
-			}
+			const int = Number( dataView.getBigInt64( offset.value, true ) );
 
 			offset.value += ULONG_SIZE;
 
@@ -2116,24 +2140,6 @@ class EXRLoader extends DataTextureLoader {
 
 		}
 
-		// https://stackoverflow.com/questions/5678432/decompressing-half-precision-floats-in-javascript
-		function decodeFloat16( binary ) {
-
-			const exponent = ( binary & 0x7C00 ) >> 10,
-				fraction = binary & 0x03FF;
-
-			return ( binary >> 15 ? - 1 : 1 ) * (
-				exponent ?
-					(
-						exponent === 0x1F ?
-							fraction ? NaN : Infinity :
-							Math.pow( 2, exponent - 15 ) * ( 1 + fraction / 0x400 )
-					) :
-					6.103515625e-5 * ( fraction / 0x400 )
-			);
-
-		}
-
 		function parseUint16( dataView, offset ) {
 
 			const Uint16 = dataView.getUint16( offset.value, true );
@@ -2146,7 +2152,7 @@ class EXRLoader extends DataTextureLoader {
 
 		function parseFloat16( buffer, offset ) {
 
-			return decodeFloat16( parseUint16( buffer, offset ) );
+			return DataUtils.fromHalfFloat( parseUint16( buffer, offset ) );
 
 		}
 
@@ -2357,8 +2363,9 @@ class EXRLoader extends DataTextureLoader {
 
 				return parseTimecode( dataView, offset );
 
-			} else if ( type === 'preview' ) {
+			} else if ( type === 'preview' || type === 'deepImageState' || type === 'idmanifest' ) {
 
+				// Known metadata-only types: silently skip, they carry no pixel data.
 				offset.value += size;
 				return 'skipped';
 
@@ -2494,11 +2501,9 @@ class EXRLoader extends DataTextureLoader {
 
 				offset.value += EXRDecoder.size;
 
-				for ( let line_y = 0; line_y < EXRDecoder.blockHeight; line_y ++ ) {
+				for ( let line_y = 0; line_y < EXRDecoder.lines; line_y ++ ) {
 
-					const scan_y = scanlineBlockIdx * EXRDecoder.blockHeight;
-					const true_y = line_y + EXRDecoder.scanOrder( scan_y );
-					if ( true_y >= EXRDecoder.height ) continue;
+					const true_y = line + line_y;
 
 					const lineOffset = line_y * bytesPerLine;
 					const outLineOffset = ( EXRDecoder.height - 1 - true_y ) * EXRDecoder.outLineWidth;
@@ -2552,10 +2557,9 @@ class EXRLoader extends DataTextureLoader {
 				const viewer = isCompressed ? EXRDecoder.uncompress( EXRDecoder ) : uncompressRAW( EXRDecoder );
 				EXRDecoder.offset = savedOffset;
 
-				for ( let line_y = 0; line_y < EXRDecoder.blockHeight; line_y ++ ) {
+				for ( let line_y = 0; line_y < EXRDecoder.lines; line_y ++ ) {
 
-					const true_y = line_y + line;
-					if ( true_y >= EXRDecoder.height ) continue;
+					const true_y = line + line_y;
 
 					const lineOffset = line_y * bytesPerLine;
 					const outLineOffset = ( EXRDecoder.height - 1 - true_y ) * EXRDecoder.outLineWidth;
@@ -2617,7 +2621,7 @@ class EXRLoader extends DataTextureLoader {
 				}
 
 				default:
-					throw new Error( 'EXRLoader.parse: ' + compression + ' is unsupported for deep data' );
+					throw new Error( 'THREE.EXRLoader: ' + compression + ' is unsupported for deep data' );
 
 			}
 
@@ -2736,7 +2740,7 @@ class EXRLoader extends DataTextureLoader {
 							const aOff = channelOffsets[ alphaChannelIdx ] + sampleIdx * aBps;
 
 							sampleAlpha = aBps === 2
-								? decodeFloat16( pixelView.getUint16( aOff, true ) )
+								? DataUtils.fromHalfFloat( pixelView.getUint16( aOff, true ) )
 								: pixelView.getFloat32( aOff, true );
 
 						}
@@ -2753,7 +2757,7 @@ class EXRLoader extends DataTextureLoader {
 							const dataOff = channelOffsets[ ci ] + sampleIdx * bps;
 
 							const value = bps === 2
-								? decodeFloat16( pixelView.getUint16( dataOff, true ) )
+								? DataUtils.fromHalfFloat( pixelView.getUint16( dataOff, true ) )
 								: pixelView.getFloat32( dataOff, true );
 
 							composited[ cOff ] += value * factor;
@@ -2897,7 +2901,6 @@ class EXRLoader extends DataTextureLoader {
 				channelByteOffsets: {},
 				shouldExpand: false,
 				yCbCr: false,
-				scanOrder: null,
 				totalBytes: null,
 				columns: null,
 				lines: null,
@@ -2957,7 +2960,7 @@ class EXRLoader extends DataTextureLoader {
 					break;
 
 				default:
-					throw new Error( 'EXRLoader.parse: ' + EXRHeader.compression + ' is unsupported' );
+					throw new Error( 'THREE.EXRLoader: ' + EXRHeader.compression + ' is unsupported' );
 
 			}
 
@@ -3000,7 +3003,7 @@ class EXRLoader extends DataTextureLoader {
 
 			} else {
 
-				throw new Error( 'EXRLoader.parse: file contains unsupported data channels.' );
+				throw new Error( 'THREE.EXRLoader: file contains unsupported data channels.' );
 
 			}
 
@@ -3079,7 +3082,7 @@ class EXRLoader extends DataTextureLoader {
 
 			}
 
-			if ( invalidOutput ) throw new Error( 'EXRLoader.parse: invalid output format for specified file.' );
+			if ( invalidOutput ) throw new Error( 'THREE.EXRLoader: invalid output format for specified file.' );
 
 			// Luminance/chroma images always decode to RGBA; override whatever the output-format switch selected.
 			if ( EXRDecoder.yCbCr ) {
@@ -3122,7 +3125,7 @@ class EXRLoader extends DataTextureLoader {
 
 			} else {
 
-				throw new Error( 'EXRLoader.parse: unsupported pixelType ' + EXRDecoder.type + ' for ' + EXRHeader.compression + '.' );
+				throw new Error( 'THREE.EXRLoader: unsupported pixelType ' + EXRDecoder.type + ' for ' + EXRHeader.compression + '.' );
 
 			}
 
@@ -3169,16 +3172,6 @@ class EXRLoader extends DataTextureLoader {
 
 			EXRDecoder.totalBytes = byteOffset;
 			EXRDecoder.outLineWidth = EXRDecoder.width * EXRDecoder.outputChannels;
-
-			if ( EXRHeader.lineOrder === 'INCREASING_Y' ) {
-
-				EXRDecoder.scanOrder = ( y ) => y;
-
-			} else {
-
-				EXRDecoder.scanOrder = ( y ) => EXRDecoder.height - 1 - y;
-
-			}
 
 			if ( EXRHeader.spec.deepFormat ) {
 
@@ -3326,9 +3319,9 @@ class EXRLoader extends DataTextureLoader {
 				for ( let i = 0; i < nPixels; i ++ ) {
 
 					const base = i * 4;
-					const Y = decodeFloat16( byteArray[ base ] );
-					const RY = decodeFloat16( byteArray[ base + 1 ] );
-					const BY = decodeFloat16( byteArray[ base + 2 ] );
+					const Y = DataUtils.fromHalfFloat( byteArray[ base ] );
+					const RY = DataUtils.fromHalfFloat( byteArray[ base + 1 ] );
+					const BY = DataUtils.fromHalfFloat( byteArray[ base + 2 ] );
 					const R = ( 1 + RY ) * Y;
 					const B = ( 1 + BY ) * Y;
 					const G = ( Y - R * 0.2126 - B * 0.0722 ) / 0.7152;
@@ -3366,6 +3359,10 @@ class EXRLoader extends DataTextureLoader {
 			format: EXRDecoder.format,
 			colorSpace: EXRDecoder.colorSpace,
 			type: this.type,
+			minFilter: LinearFilter,
+			magFilter: LinearFilter,
+			generateMipmaps: false,
+			flipY: false,
 		};
 
 	}
@@ -3406,24 +3403,6 @@ class EXRLoader extends DataTextureLoader {
 
 		this.part = value;
 		return this;
-
-	}
-
-	load( url, onLoad, onProgress, onError ) {
-
-		function onLoadCallback( texture, texData ) {
-
-			texture.colorSpace = texData.colorSpace;
-			texture.minFilter = LinearFilter;
-			texture.magFilter = LinearFilter;
-			texture.generateMipmaps = false;
-			texture.flipY = false;
-
-			if ( onLoad ) onLoad( texture, texData );
-
-		}
-
-		return super.load( url, onLoadCallback, onProgress, onError );
 
 	}
 

@@ -126,7 +126,7 @@ class TimestampQueryPool {
 	 * @param {string} uid - A unique identifier for the render context.
 	 * @return {boolean} True if a timestamp is available, false otherwise.
 	 */
-	hasTimestamp( uid ) {
+	hasTimestampQuery( uid ) {
 
 		return this.timestamps.has( uid );
 

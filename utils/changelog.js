@@ -1,16 +1,21 @@
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 
 // Path-based categories (used as fallback for non-JS files)
 // Ordered from most specific to least specific
 const categoryPaths = [
+	// CI
+	[ '.github', 'CI' ],
+
 	// Specific renderer paths
 	[ 'src/renderers/webgl', 'WebGLRenderer' ],
 	[ 'src/renderers/webgpu', 'WebGPURenderer' ],
 	[ 'src/renderers/common', 'Renderer' ],
 
 	// Main sections
+	[ 'utils/docs', 'Docs' ],
 	[ 'docs', 'Docs' ],
 	[ 'manual', 'Manual' ],
+	[ 'devtools', 'Devtools' ],
 	[ 'editor', 'Editor' ],
 	[ 'test', 'Tests' ],
 	[ 'playground', 'Playground' ],
@@ -25,26 +30,43 @@ const categoryPaths = [
 const skipPatterns = [
 	/^Updated? builds?\.?$/i,
 	/^Merge /i,
-	/^Update dependency .* to /i,
-	/^Update devDependencies/i,
+	/^(\w+:\s*)?Updated? (dev)?dep\w*enc(y|ies)\b/i, // Update dependencies, devDependencies, dependency X to Y (with typos)
 	/^Update github\/codeql-action/i,
 	/^Update actions\//i,
 	/^Bump .* and /i,
-	/^Updated package-lock\.json/i,
+	/^(\w+:\s*)?Updated? package(-lock)?\.json/i,
+	/npm audit/i,
 	/^Update copyright year/i,
 	/^Update \w+\.js\.?$/i, // Generic "Update File.js" commits
 	/^Updated? docs\.?$/i,
-	/^Update REVISION/i
+	/^Update REVISION/i,
+	/^r\d+(\s*\(bis\))*$/i
 ];
 
-// Categories that map to sections
-const sectionCategories = [ 'Docs', 'Manual', 'Examples', 'Editor', 'Tests', 'Utils', 'Build' ];
+// Authors to skip (bots)
+const skipAuthors = new Set( [ 'dependabot', 'app/renovate', 'renovate[bot]', 'github-advanced-security[bot]' ] );
 
-function exec( command ) {
+// Categories that map to sections
+const sectionCategories = [ 'Docs', 'Manual', 'Examples', 'Devtools', 'Editor', 'Tests', 'Utils', 'Build', 'CI' ];
+
+// Sections matched loosely against title prefixes (Doc, Exampler, e2e, DevTools, Examples/TSL, ...)
+const sectionPrefixes = [
+	[ /^doc/i, 'Docs' ],
+	[ /^manual/i, 'Manual' ],
+	[ /^exampl/i, 'Examples' ],
+	[ /^devtools/i, 'Devtools' ],
+	[ /^editor/i, 'Editor' ],
+	[ /^(test|e2e|puppeteer)/i, 'Tests' ],
+	[ /^(utils|scripts)/i, 'Utils' ],
+	[ /^build/i, 'Build' ],
+	[ /^ci$/i, 'CI' ]
+];
+
+function exec( file, args ) {
 
 	try {
 
-		return execSync( command, { encoding: 'utf8', maxBuffer: 50 * 1024 * 1024 } ).trim();
+		return execFileSync( file, args, { encoding: 'utf8', maxBuffer: 50 * 1024 * 1024, stdio: [ 'ignore', 'pipe', 'ignore' ] } ).trim();
 
 	} catch ( error ) {
 
@@ -54,16 +76,11 @@ function exec( command ) {
 
 }
 
-function getLastTag() {
+function getCommitsBetweenTags( fromTag, toTag ) {
 
-	return exec( 'git describe --tags --abbrev=0' );
-
-}
-
-function getCommitsSinceTag( tag ) {
-
-	// Get commits since tag, oldest first, excluding merge commits
-	const log = exec( `git log ${tag}..HEAD --no-merges --reverse --format="%H|%s|%an"` );
+	// Get commits between refs (exclusive fromTag, inclusive toTag), oldest first, excluding merge commits
+	// --cherry-pick drops commits already released via cherry-pick onto a release branch (same patch, different hash)
+	const log = exec( 'git', [ 'log', `${fromTag}...${toTag}`, '--right-only', '--cherry-pick', '--no-merges', '--reverse', '--format=%H|%s|%an' ] );
 
 	if ( ! log ) return [];
 
@@ -78,16 +95,23 @@ function getCommitsSinceTag( tag ) {
 
 function getChangedFiles( hash ) {
 
-	const files = exec( `git diff-tree --no-commit-id --name-only -r ${hash}` );
+	const files = exec( 'git', [ 'diff-tree', '--no-commit-id', '--name-only', '-r', hash ] );
 	return files ? files.split( '\n' ).filter( Boolean ) : [];
 
 }
 
-function getCoAuthors( hash ) {
+function getCoAuthorsFromPR( prNumber ) {
 
-	const body = exec( `git log -1 --format="%b" ${hash}` );
+	const result = exec( 'gh', [ 'pr', 'view', prNumber, '--json', 'commits', '--jq', '[.commits[].authors[].login] | unique | .[]' ] );
+	return result ? result.split( '\n' ).filter( Boolean ) : [];
+
+}
+
+function getCoAuthorsFromCommit( hash ) {
+
+	const body = exec( 'git', [ 'log', '-1', '--format=%b', hash ] );
 	const regex = /Co-authored-by:\s*([^<]+)\s*<[^>]+>/gi;
-	return [ ...body.matchAll( regex ) ].map( m => m[ 1 ].trim() );
+	return [ ...body.matchAll( regex ) ].map( m => normalizeAuthor( m[ 1 ].trim() ) );
 
 }
 
@@ -101,7 +125,7 @@ function extractPRNumber( subject ) {
 
 function getPRInfo( prNumber ) {
 
-	const result = exec( `gh pr view ${prNumber} --json author,title,files --jq '{author: .author.login, title: .title, files: [.files[].path]}' 2>/dev/null` );
+	const result = exec( 'gh', [ 'pr', 'view', prNumber, '--json', 'author,title,files', '--jq', '{author: .author.login, title: .title, files: [.files[].path]}' ] );
 
 	try {
 
@@ -118,16 +142,13 @@ function getPRInfo( prNumber ) {
 function categorizeFile( file ) {
 
 	// Extract category from JS filename in src/ or examples/jsm/
-	if ( file.endsWith( '.js' ) ) {
+	if ( file.endsWith( '.js' ) && ( file.startsWith( 'src/' ) || file.startsWith( 'examples/jsm/' ) ) ) {
 
-		const isAddon = file.startsWith( 'examples/jsm/' );
+		// Skip barrel/index files
+		if ( /\/Three(\.\w+)?\.js$/.test( file ) ) return { category: 'Global' };
 
-		if ( file.startsWith( 'src/' ) || isAddon ) {
-
-			const match = file.match( /\/([^/]+)\.js$/ );
-			if ( match ) return { category: match[ 1 ], isAddon };
-
-		}
+		const match = file.match( /\/([^/]+)\.js$/ );
+		if ( match ) return { category: match[ 1 ] };
 
 	}
 
@@ -136,118 +157,81 @@ function categorizeFile( file ) {
 
 		if ( file.startsWith( pathPrefix ) ) {
 
-			return {
-				category,
-				isAddon: file.startsWith( 'examples/jsm/' ),
-				section: sectionCategories.includes( category ) ? category : null
-			};
+			return { category, section: sectionCategories.includes( category ) ? category : null };
 
 		}
 
 	}
 
-	return { category: 'Global', isAddon: false };
+	return { category: 'Global' };
+
+}
+
+function getGroup( file ) {
+
+	// Library groups: core and nodes in src/, addons and node addons in examples/jsm/
+	if ( file.startsWith( 'examples/jsm/' ) ) return file.startsWith( 'examples/jsm/tsl/' ) || /Node[^/]*\.js$/.test( file ) ? 'addonNodes' : 'addons';
+	if ( file.startsWith( 'src/' ) ) return file.includes( '/nodes/' ) ? 'nodes' : 'core';
+
+	return null;
+
+}
+
+function countBy( items ) {
+
+	const counts = {};
+
+	for ( const item of items ) {
+
+		if ( item ) counts[ item ] = ( counts[ item ] || 0 ) + 1;
+
+	}
+
+	return counts;
+
+}
+
+function maxKey( counts ) {
+
+	let best = null;
+	let bestCount = 0;
+
+	for ( const [ key, count ] of Object.entries( counts ) ) {
+
+		if ( count > bestCount ) {
+
+			bestCount = count;
+			best = key;
+
+		}
+
+	}
+
+	return best;
 
 }
 
 function categorizeCommit( files ) {
 
-	const categoryCounts = {};
-	const sectionCounts = {};
-	let hasAddon = false;
-	let addonCategory = null;
-	let addonCount = 0;
-	let srcCount = 0;
+	files = files.filter( f => ! f.startsWith( 'examples/screenshots/' ) );
 
-	for ( const file of files ) {
+	// Library files win over sections, category from the most touched group only
+	const group = maxKey( countBy( files.map( getGroup ) ) );
 
-		const result = categorizeFile( file );
-		const cat = result.category;
+	if ( group ) {
 
-		categoryCounts[ cat ] = ( categoryCounts[ cat ] || 0 ) + 1;
-
-		// Track src files vs addon files
-		if ( file.startsWith( 'src/' ) ) srcCount ++;
-
-		if ( result.isAddon ) {
-
-			hasAddon = true;
-			addonCount ++;
-
-			// Track addon category separately (ignore generic ones)
-			if ( cat !== 'Examples' && cat !== 'Loaders' && cat !== 'Exporters' ) {
-
-				if ( ! addonCategory || categoryCounts[ cat ] > categoryCounts[ addonCategory ] ) {
-
-					addonCategory = cat;
-
-				}
-
-			} else if ( ! addonCategory ) {
-
-				addonCategory = cat;
-
-			}
-
-		}
-
-		if ( result.section ) {
-
-			sectionCounts[ result.section ] = ( sectionCounts[ result.section ] || 0 ) + 1;
-
-		}
+		const categories = files.filter( file => getGroup( file ) === group ).map( file => categorizeFile( file ).category );
+		return { category: maxKey( countBy( categories ) ), group, section: null };
 
 	}
 
-	// If commit primarily touches src/ files, don't treat as addon even if it has some addon files
-	if ( srcCount > addonCount ) {
+	const results = files.map( categorizeFile );
 
-		hasAddon = false;
-
-	}
-
-	// If this commit has addon files and a specific addon category, use it
-	if ( hasAddon && addonCategory && addonCategory !== 'Examples' ) {
-
-		return { category: addonCategory, isAddon: true, section: null };
-
-	}
-
-	// Find the most common section (excluding Tests unless it's dominant)
-	let maxSection = null;
-	let maxSectionCount = 0;
-	const totalFiles = files.length;
-
-	for ( const [ sec, count ] of Object.entries( sectionCounts ) ) {
-
-		// Only use Tests/Build section if it's the majority of files
-		if ( ( sec === 'Tests' || sec === 'Build' ) && count < totalFiles * 0.5 ) continue;
-
-		if ( count > maxSectionCount ) {
-
-			maxSectionCount = count;
-			maxSection = sec;
-
-		}
-
-	}
-
-	// Return the category with the most files changed
-	let maxCategory = 'Global';
-	let maxCount = 0;
-
-	for ( const [ cat, count ] of Object.entries( categoryCounts ) ) {
-
-		if ( count > maxCount ) {
-
-			maxCount = count;
-			maxCategory = cat;
-
-		}
-
-	}
-
-	return { category: maxCategory, isAddon: false, section: maxSection };
+	return {
+		category: maxKey( countBy( results.map( r => r.category ) ) ) || 'Global',
+		group: null,
+		section: maxKey( countBy( results.map( r => r.section ) ) )
+	};
 
 }
 
@@ -265,17 +249,29 @@ function extractCategoryFromTitle( title ) {
 
 }
 
+function sectionFromPrefix( prefix ) {
+
+	const match = sectionPrefixes.find( ( [ pattern ] ) => pattern.test( prefix ) );
+	return match ? match[ 1 ] : null;
+
+}
+
 function cleanSubject( subject, category ) {
 
 	// Remove PR number from subject
 	let cleaned = subject.replace( /\s*\(#\d+\)\s*$/, '' ).replace( /\s*#\d+\s*$/, '' ).trim();
 
-	// Remove category prefix if it matches (e.g., "Editor: " when category is "Editor")
-	const prefixPattern = new RegExp( `^${category}:\\s*`, 'i' );
-	cleaned = cleaned.replace( prefixPattern, '' );
+	// Remove title prefix if it matches the category, including section typos like "Exampler:"
+	const prefix = extractCategoryFromTitle( cleaned );
+
+	if ( prefix && ( prefix.toLowerCase() === category.toLowerCase() || sectionFromPrefix( prefix ) === category ) ) {
+
+		cleaned = cleaned.replace( /^[A-Za-z0-9_/]+:\s*/, '' );
+
+	}
 
 	// Also remove common prefixes
-	cleaned = cleaned.replace( /^(Examples|Docs|Manual|Editor|Tests|Build|Global|TSL|WebGLRenderer|WebGPURenderer|Renderer|Scripts|Utils):\s*/i, '' );
+	cleaned = cleaned.replace( /^(Examples|Docs|Manual|Editor|Tests|Build|CI|Global|TSL|WebGLRenderer|WebGPURenderer|Renderer|Scripts|Utils):\s*/i, '' );
 
 	// Remove trailing period if present, we'll add it back
 	cleaned = cleaned.replace( /\.\s*$/, '' );
@@ -330,9 +326,9 @@ function addToGroup( groups, key, value ) {
 
 }
 
-function validateEnvironment() {
+function validateEnvironment( tag ) {
 
-	if ( ! exec( 'gh --version 2>/dev/null' ) ) {
+	if ( ! exec( 'gh', [ '--version' ] ) ) {
 
 		console.error( 'GitHub CLI (gh) is required but not installed.' );
 		console.error( 'Install from: https://cli.github.com/' );
@@ -340,16 +336,51 @@ function validateEnvironment() {
 
 	}
 
-	const lastTag = getLastTag();
+	if ( ! tag ) {
 
-	if ( ! lastTag ) {
-
-		console.error( 'No tags found in repository' );
+		console.error( 'Usage: node utils/changelog.js <tag|branch>' );
+		console.error( 'Example: node utils/changelog.js r185' );
+		console.error( 'Example: node utils/changelog.js dev' );
 		process.exit( 1 );
 
 	}
 
-	return lastTag;
+	// Verify the ref exists
+	const resolved = exec( 'git', [ 'rev-parse', '--verify', tag ] );
+
+	if ( ! resolved ) {
+
+		console.error( `Invalid tag or branch: ${tag}` );
+		process.exit( 1 );
+
+	}
+
+	let previousTag, version;
+
+	if ( /^r\d+$/.test( tag ) ) {
+
+		// Release tag: changes since the previous release
+		version = parseInt( tag.slice( 1 ) );
+		previousTag = `r${version - 1}`;
+
+	} else {
+
+		// Branch or commit: changes since the latest release
+		previousTag = exec( 'git', [ 'tag', '--list', 'r[0-9]*', '--sort=-v:refname' ] ).split( '\n' )[ 0 ];
+		version = parseInt( previousTag.slice( 1 ) ) + 1;
+
+	}
+
+	const previousResolved = previousTag && exec( 'git', [ 'rev-parse', '--verify', previousTag ] );
+
+	if ( ! previousResolved ) {
+
+		console.error( `Previous tag not found: ${previousTag}` );
+		process.exit( 1 );
+
+	}
+
+	return { tag, previousTag, version };
 
 }
 
@@ -393,6 +424,9 @@ function processCommit( commit, revertedTitles ) {
 
 		if ( prInfo ) {
 
+			// Skip commits from bots
+			if ( skipAuthors.has( prInfo.author ) ) return null;
+
 			author = prInfo.author;
 			if ( prInfo.title ) subject = prInfo.title;
 			if ( prInfo.files && prInfo.files.length > 0 ) files = prInfo.files;
@@ -405,19 +439,36 @@ function processCommit( commit, revertedTitles ) {
 	if ( ! files ) files = getChangedFiles( commit.hash );
 	if ( ! author ) author = commit.author;
 
-	const result = categorizeCommit( files );
-	let { category, section } = result;
-	const { isAddon } = result;
+	// Skip commits from bots (check normalized name for git author fallback)
+	if ( skipAuthors.has( normalizeAuthor( author ) ) ) return null;
 
-	// Override category if title has a clear prefix
-	const titleCategory = extractCategoryFromTitle( subject );
+	let { category, group, section } = categorizeCommit( files );
 
-	if ( titleCategory ) {
+	// Use title prefix as category only if file-based didn't assign a section
+	if ( ! section ) {
 
-		category = titleCategory;
-		if ( category === 'Puppeteer' ) category = 'Tests';
-		if ( category === 'Scripts' ) category = 'Utils';
-		section = sectionCategories.includes( category ) ? category : null;
+		const titleCategory = extractCategoryFromTitle( subject );
+
+		if ( titleCategory ) {
+
+			section = sectionFromPrefix( titleCategory );
+			category = section || titleCategory;
+
+			// A title naming a changed file belongs to that file's group
+			const titleFile = files.find( file => file.endsWith( `/${category}.js` ) );
+
+			if ( titleFile && getGroup( titleFile ) ) {
+
+				group = getGroup( titleFile );
+
+			} else if ( group === 'core' || group === 'nodes' ) {
+
+				// Generic src titles: node system names go to Nodes, the rest stays in core
+				group = /Node|^TSL$/.test( category ) ? 'nodes' : 'core';
+
+			}
+
+		}
 
 	}
 
@@ -428,7 +479,10 @@ function processCommit( commit, revertedTitles ) {
 
 	}
 
-	const coAuthors = getCoAuthors( commit.hash );
+	// Section entries are flat, so the section is what a title prefix is matched against
+	if ( section ) category = section;
+
+	const coAuthors = ( prNumber ? getCoAuthorsFromPR( prNumber ) : getCoAuthorsFromCommit( commit.hash ) ).filter( login => login !== author && ! skipAuthors.has( login ) );
 
 	return {
 		entry: {
@@ -439,36 +493,30 @@ function processCommit( commit, revertedTitles ) {
 			formatted: formatEntry( subject, prNumber, commit.hash, author, coAuthors, category )
 		},
 		category,
-		section,
-		isAddon
+		group,
+		section
 	};
 
 }
 
-function formatOutput( lastTag, coreChanges, addonChanges, sections ) {
+function formatGroups( groups, first ) {
 
-	let output = '';
+	// Categories alphabetically, with one pinned first
+	const sorted = Object.keys( groups ).sort( ( a, b ) => {
 
-	// Migration guide and milestone links
-	const version = lastTag.replace( 'r', '' );
-	const nextVersion = parseInt( version ) + 1;
-	output += `https://github.com/mrdoob/three.js/wiki/Migration-Guide#${version}--${nextVersion}\n`;
-	output += 'https://github.com/mrdoob/three.js/milestone/XX?closed=1\n\n';
-
-	// Core changes (Global first, then alphabetically)
-	const sortedCore = Object.keys( coreChanges ).sort( ( a, b ) => {
-
-		if ( a === 'Global' ) return - 1;
-		if ( b === 'Global' ) return 1;
+		if ( a === first ) return - 1;
+		if ( b === first ) return 1;
 		return a.localeCompare( b );
 
 	} );
 
-	for ( const category of sortedCore ) {
+	let output = '';
+
+	for ( const category of sorted ) {
 
 		output += `- ${category}\n`;
 
-		for ( const entry of coreChanges[ category ] ) {
+		for ( const entry of groups[ category ] ) {
 
 			output += `  - ${entry.formatted}\n`;
 
@@ -476,39 +524,49 @@ function formatOutput( lastTag, coreChanges, addonChanges, sections ) {
 
 	}
 
+	return output;
+
+}
+
+function formatOutput( version, groups, sections ) {
+
+	let output = '';
+
+	const previousVersion = version - 1;
+	output += `https://github.com/mrdoob/three.js/wiki/Migration-Guide#${previousVersion}--${version}\n`;
+	output += `https://github.com/mrdoob/three.js/milestone/${version - 87}?closed=1\n\n`;
+
+	// Core changes
+	output += formatGroups( groups.core, 'Global' );
+
+	// Node system changes in src/
+	if ( Object.keys( groups.nodes ).length > 0 ) {
+
+		output += '\n**Nodes**\n\n';
+		output += formatGroups( groups.nodes, 'Nodes' );
+
+	}
+
+	// Addons in examples/jsm/
+	if ( Object.keys( groups.addons ).length > 0 ) {
+
+		output += '\n**Addons**\n\n';
+		output += formatGroups( groups.addons, 'Addons' );
+
+	}
+
+	// Node system addons in examples/jsm/
+	if ( Object.keys( groups.addonNodes ).length > 0 ) {
+
+		output += '\n**Addons / Nodes**\n\n';
+		output += formatGroups( groups.addonNodes, 'TSL' );
+
+	}
+
 	// Output sections in order
-	const sectionOrder = [ 'Docs', 'Manual', 'Examples', 'Addons', 'Editor', 'Tests', 'Utils', 'Build' ];
+	const sectionOrder = [ 'Docs', 'Manual', 'Examples', 'Devtools', 'Editor', 'Tests', 'Utils', 'Build', 'CI' ];
 
 	for ( const sectionName of sectionOrder ) {
-
-		// Addons section has nested categories
-		if ( sectionName === 'Addons' ) {
-
-			const sortedAddons = Object.keys( addonChanges ).sort();
-
-			if ( sortedAddons.length > 0 ) {
-
-				output += '\n**Addons**\n\n';
-
-				for ( const category of sortedAddons ) {
-
-					output += `- ${category}\n`;
-
-					for ( const entry of addonChanges[ category ] ) {
-
-						output += `  - ${entry.formatted}\n`;
-
-					}
-
-					output += '\n';
-
-				}
-
-			}
-
-			continue;
-
-		}
 
 		if ( sections[ sectionName ].length > 0 ) {
 
@@ -530,15 +588,15 @@ function formatOutput( lastTag, coreChanges, addonChanges, sections ) {
 
 function generateChangelog() {
 
-	const lastTag = validateEnvironment();
+	const { tag, previousTag, version } = validateEnvironment( process.argv[ 2 ] );
 
-	console.error( `Generating changelog since ${lastTag}...\n` );
+	console.error( `Generating changelog ${previousTag}..${tag}\n` );
 
-	const commits = getCommitsSinceTag( lastTag );
+	const commits = getCommitsBetweenTags( previousTag, tag );
 
 	if ( commits.length === 0 ) {
 
-		console.error( 'No commits found since last tag' );
+		console.error( `No commits found between ${previousTag} and ${tag}` );
 		process.exit( 1 );
 
 	}
@@ -548,16 +606,17 @@ function generateChangelog() {
 	const revertedTitles = collectRevertedTitles( commits );
 
 	// Group commits by category
-	const coreChanges = {};
-	const addonChanges = {};
+	const groups = { core: {}, nodes: {}, addons: {}, addonNodes: {} };
 	const sections = {
 		Docs: [],
 		Manual: [],
 		Examples: [],
+		Devtools: [],
 		Editor: [],
 		Tests: [],
 		Utils: [],
-		Build: []
+		Build: [],
+		CI: []
 	};
 
 	let skipped = 0;
@@ -582,19 +641,15 @@ function generateChangelog() {
 
 		}
 
-		const { entry, category, section, isAddon } = result;
+		const { entry, category, group, section } = result;
 
 		if ( section && sections[ section ] ) {
 
 			sections[ section ].push( entry );
 
-		} else if ( isAddon ) {
-
-			addToGroup( addonChanges, category, entry );
-
 		} else {
 
-			addToGroup( coreChanges, category, entry );
+			addToGroup( groups[ group || 'core' ], category, entry );
 
 		}
 
@@ -608,7 +663,7 @@ function generateChangelog() {
 
 	}
 
-	console.log( formatOutput( lastTag, coreChanges, addonChanges, sections ) );
+	console.log( formatOutput( version, groups, sections ) );
 
 }
 

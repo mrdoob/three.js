@@ -1,6 +1,6 @@
 import Node from '../core/Node.js';
 import { expression } from '../code/ExpressionNode.js';
-import { nodeArray, Fn } from '../tsl/TSLBase.js';
+import { nodeArray, Fn, bool } from '../tsl/TSLBase.js';
 import { error } from '../../utils.js';
 
 /**
@@ -36,7 +36,7 @@ import { error } from '../../utils.js';
  *
  * } );
  * ```
- * The module also provides `Break()` and `Continue()` TSL expression for loop control.
+ * The module also provides `Break()` and `Continue()` TSL expressions for loop control.
  * @augments Node
  */
 class LoopNode extends Node {
@@ -50,13 +50,19 @@ class LoopNode extends Node {
 	/**
 	 * Constructs a new loop node.
 	 *
-	 * @param {Array<any>} params - Depending on the loop type, array holds different parameterization values for the loop.
+	 * @param {Array<LoopNode~Params|loopBodyCallback>} params - Any number of loop parameters followed by the loop body.
 	 */
 	constructor( params = [] ) {
 
 		super( 'void' );
 
 		this.params = params;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -88,10 +94,11 @@ class LoopNode extends Node {
 		//
 
 		const inputs = {};
+		const params = this._getInternalParams();
 
-		for ( let i = 0, l = this.params.length - 1; i < l; i ++ ) {
+		for ( let i = 0, l = params.length - 1; i < l; i ++ ) {
 
-			const param = this.params[ i ];
+			const param = params[ i ];
 
 			const name = ( param.isNode !== true && param.name ) || this.getVarName( i );
 			const type = ( param.isNode !== true && param.type ) || 'int';
@@ -102,18 +109,18 @@ class LoopNode extends Node {
 
 		const stack = builder.addStack();
 
-		const fnCall = this.params[ this.params.length - 1 ]( inputs );
+		const fnCall = params[ params.length - 1 ]( inputs );
 
-		properties.returnsNode = fnCall.context( { nodeLoop: fnCall } );
+		properties.returnsNode = fnCall.context( { nodeLoop: this, nodeBlock: fnCall } );
 		properties.stackNode = stack;
 
-		const baseParam = this.params[ 0 ];
+		const baseParam = params[ 0 ];
 
 		if ( baseParam.isNode !== true && typeof baseParam.update === 'function' ) {
 
-			const fnUpdateCall = Fn( this.params[ 0 ].update )( inputs );
+			const fnUpdateCall = Fn( baseParam.update )( inputs );
 
-			properties.updateNode = fnUpdateCall.context( { nodeLoop: fnUpdateCall } );
+			properties.updateNode = fnUpdateCall.context( { nodeLoop: this } );
 
 		}
 
@@ -123,18 +130,25 @@ class LoopNode extends Node {
 
 	}
 
+	_getInternalParams() {
+
+		const params = this.params;
+
+		if ( typeof params[ 0 ] === 'function' ) {
+
+			return [ bool( true ), params[ 0 ] ];
+
+		}
+
+		return params;
+
+	}
+
 	setup( builder ) {
 
 		// setup properties
 
 		this.getProperties( builder );
-
-		if ( builder.fnCall ) {
-
-			const shaderNodeData = builder.getDataFromNode( builder.fnCall.shaderNode );
-			shaderNodeData.hasLoop = true;
-
-		}
 
 	}
 
@@ -142,7 +156,7 @@ class LoopNode extends Node {
 
 		const properties = this.getProperties( builder );
 
-		const params = this.params;
+		const params = this._getInternalParams();
 		const stackNode = properties.stackNode;
 
 		for ( let i = 0, l = params.length - 1; i < l; i ++ ) {
@@ -300,13 +314,19 @@ class LoopNode extends Node {
 
 		}
 
+		const flowBlock = builder.flowBlock;
+
+		builder.flowBlock = { parent: flowBlock };
+
 		const stackSnippet = stackNode.build( builder, 'void' );
 
 		properties.returnsNode.build( builder, 'void' );
 
+		builder.flowBlock = flowBlock;
+
 		builder.removeFlowTab().addFlowCode( '\n' + builder.tab + stackSnippet );
 
-		for ( let i = 0, l = this.params.length - 1; i < l; i ++ ) {
+		for ( let i = 0, l = params.length - 1; i < l; i ++ ) {
 
 			builder.addFlowCode( ( i === 0 ? '' : builder.tab ) + '}\n\n' ).removeFlowTab();
 
@@ -325,13 +345,13 @@ export default LoopNode;
  *
  * @tsl
  * @function
- * @param {...any} params - A list of parameters.
+ * @param {...(LoopNode~Params|loopBodyCallback)} params - Any number of loop parameters followed by the loop body.
  * @returns {LoopNode}
  */
 export const Loop = ( ...params ) => new LoopNode( nodeArray( params, 'int' ) ).toStack();
 
 /**
- * TSL function for creating a `Continue()` expression.
+ * TSL function for inserting a `continue` expression into the shader.
  *
  * @tsl
  * @function
@@ -340,10 +360,36 @@ export const Loop = ( ...params ) => new LoopNode( nodeArray( params, 'int' ) ).
 export const Continue = () => expression( 'continue' ).toStack();
 
 /**
- * TSL function for creating a `Break()` expression.
+ * TSL function for inserting a `break` expression into the shader.
  *
  * @tsl
  * @function
  * @returns {ExpressionNode}
  */
 export const Break = () => expression( 'break' ).toStack();
+
+/**
+ * The parameters of a loop. A number or int/uint node defines the loop's end value,
+ * a bool node defines a `while` loop and an object allows a more detailed configuration.
+ *
+ * @typedef {number|Node<int>|Node<uint>|Node<bool>|LoopNode~ObjectParams} LoopNode~Params
+ */
+
+/**
+ * A detailed loop configuration.
+ *
+ * @typedef {Object} LoopNode~ObjectParams
+ * @property {number|Node<int>|Node<uint>} [start=0] - The initial value of the loop variable.
+ * @property {number|Node<int>|Node<uint>} [end] - The value the loop variable is compared against. If omitted, the loop counts down from `start - 1` to `0`.
+ * @property {string} [name] - The name of the loop variable. Defaults to `i`, `j`, `k` and so on.
+ * @property {string} [type='int'] - The data type of the loop variable.
+ * @property {('<'|'<='|'>'|'>=')} [condition] - The comparison operator. The loop runs as long as the comparison is true. Inferred from `start` and `end` if not set.
+ * @property {string|number|Function|Node} [update] - Defines how the loop variable is updated after each iteration. Inferred from `condition` and `type` if not set.
+ */
+
+/**
+ * The loop body.
+ *
+ * @callback loopBodyCallback
+ * @param {Object<string, Node>} inputs - The loop variables of the current `Loop()` call, keyed by their name.
+ */

@@ -65,6 +65,8 @@ class PointLightHelper extends Mesh {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this.geometry.dispose();
 		this.material.dispose();
 
@@ -75,6 +77,8 @@ class PointLightHelper extends Mesh {
 	 * light being visualized.
 	 */
 	update() {
+
+		this.matrixWorldNeedsUpdate = true;
 
 		this.light.updateWorldMatrix( true, false );
 

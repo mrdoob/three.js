@@ -53,13 +53,23 @@ class UITexture extends UISpan {
 
 			const hash = `${file.lastModified}_${file.size}_${file.name}`;
 
+			function deliver( texture ) {
+
+				if ( ! cache.has( hash ) ) cache.set( hash, texture );
+
+				const cached = cache.get( hash );
+				const clone = cached.clone();
+				clone.sourceFile = cached.sourceFile;
+
+				scope.setValue( clone );
+
+				if ( scope.onChangeCallback ) scope.onChangeCallback( clone );
+
+			}
+
 			if ( cache.has( hash ) ) {
 
-				const texture = cache.get( hash );
-
-				scope.setValue( texture );
-
-				if ( scope.onChangeCallback ) scope.onChangeCallback( texture );
+				deliver( cache.get( hash ) );
 
 			} else if ( extension === 'hdr' || extension === 'pic' ) {
 
@@ -74,11 +84,7 @@ class UITexture extends UISpan {
 
 						hdrTexture.sourceFile = file.name;
 
-						cache.set( hash, hdrTexture );
-
-						scope.setValue( hdrTexture );
-
-						if ( scope.onChangeCallback ) scope.onChangeCallback( hdrTexture );
+						deliver( hdrTexture );
 
 					} );
 
@@ -98,12 +104,7 @@ class UITexture extends UISpan {
 						texture.colorSpace = THREE.SRGBColorSpace;
 						texture.sourceFile = file.name;
 
-						cache.set( hash, texture );
-
-						scope.setValue( texture );
-
-						if ( scope.onChangeCallback ) scope.onChangeCallback( texture );
-
+						deliver( texture );
 
 					} );
 
@@ -129,11 +130,7 @@ class UITexture extends UISpan {
 						texture.sourceFile = file.name;
 						texture.needsUpdate = true;
 
-						cache.set( hash, texture );
-
-						scope.setValue( texture );
-
-						if ( scope.onChangeCallback ) scope.onChangeCallback( texture );
+						deliver( texture );
 						ktx2Loader.dispose();
 
 					} );
@@ -157,11 +154,7 @@ class UITexture extends UISpan {
 						texture.sourceFile = file.name;
 						texture.needsUpdate = true;
 
-						cache.set( hash, texture );
-
-						scope.setValue( texture );
-
-						if ( scope.onChangeCallback ) scope.onChangeCallback( texture );
+						deliver( texture );
 
 					} );
 
@@ -180,11 +173,7 @@ class UITexture extends UISpan {
 						texture.sourceFile = file.name;
 						texture.needsUpdate = true;
 
-						cache.set( hash, texture );
-
-						scope.setValue( texture );
-
-						if ( scope.onChangeCallback ) scope.onChangeCallback( texture );
+						deliver( texture );
 
 					}, false );
 
@@ -360,11 +349,12 @@ class UIOutliner extends UIDiv {
 
 		}
 
-		function onClick() {
+		function onClick( event ) {
 
 			scope.setValue( this.value );
 
 			const changeEvent = new Event( 'change', { bubbles: true, cancelable: true } );
+			changeEvent.shiftKey = event.shiftKey;
 			scope.dom.dispatchEvent( changeEvent );
 
 		}
@@ -557,6 +547,31 @@ class UIOutliner extends UIDiv {
 		}
 
 		this.selectedValue = value;
+
+		return this;
+
+	}
+
+	setValues( values ) {
+
+		for ( let i = 0; i < this.options.length; i ++ ) {
+
+			const element = this.options[ i ];
+
+			if ( values.indexOf( element.value ) !== - 1 ) {
+
+				element.classList.add( 'active' );
+
+			} else {
+
+				element.classList.remove( 'active' );
+
+			}
+
+		}
+
+		this.selectedIndex = - 1;
+		this.selectedValue = null;
 
 		return this;
 
@@ -882,4 +897,4 @@ function renderToCanvas( texture ) {
 
 }
 
-export { UITexture, UIOutliner, UIPoints, UIPoints2, UIPoints3, UIBoolean };
+export { UITexture, UIOutliner, UIPoints, UIPoints2, UIPoints3, UIBoolean, renderToCanvas };

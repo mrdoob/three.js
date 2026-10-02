@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - sculpt</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+		<style>
+			canvas.sculpt-canvas { cursor: none; }
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Sculpt</span>
+			</div>
+
+			<small>
+				Dynamic-topology mesh sculpting with WebGPU.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+			import { Sculptor } from 'three/addons/misc/Sculptor.js';
+
+			let renderer, scene, camera, controls, sculptor, mesh;
+			let cursorGroup, cursorRing, cursorDot, cursorMaterial;
+			let releasedPointerId = null;
+
+			const _normal = new THREE.Vector3();
+			const _normalMatrix = new THREE.Matrix3();
+			const _forward = new THREE.Vector3( 0, 0, 1 );
+			const _pointer = new THREE.Vector2();
+			const _mouse = new THREE.Vector3();
+			const _mouseOffset = new THREE.Vector3();
+			const cursorDotRadius = 2.5;
+
+			const link = document.createElement( 'a' );
+			link.style.display = 'none';
+			document.body.appendChild( link );
+
+			function exportGLTF() {
+
+				const exporter = new GLTFExporter();
+				const snapshot = mesh.clone();
+				snapshot.geometry = sculptor.getGeometry();
+
+				exporter.parse( snapshot, function ( buffer ) {
+
+					const blob = new Blob( [ buffer ], { type: 'application/octet-stream' } );
+					const objectURL = URL.createObjectURL( blob );
+					link.href = objectURL;
+					link.download = 'sculpt.glb';
+					link.click();
+
+					setTimeout( function () {
+
+						URL.revokeObjectURL( objectURL );
+						link.removeAttribute( 'href' );
+
+					}, 0 );
+
+				}, function ( error ) {
+
+					console.error( error );
+
+				}, { binary: true } );
+
+			}
+
+			init();
+
+			function init() {
+
+				// Renderer
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				renderer.domElement.classList.add( 'sculpt-canvas' );
+				document.body.appendChild( renderer.domElement );
+
+				// Scene
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x222222 );
+
+				// Camera
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 0, 0, 4 );
+
+				// Lights
+
+				scene.add( new THREE.AmbientLight( 0x404040 ) );
+
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 2.0 );
+				dirLight.position.set( 1, 1.5, 2 );
+				scene.add( dirLight );
+
+				const dirLight2 = new THREE.DirectionalLight( 0x88aaff, 0.5 );
+				dirLight2.position.set( - 1, - 0.5, - 1 );
+				scene.add( dirLight2 );
+
+				// Mesh
+
+				const geometry = new THREE.IcosahedronGeometry( 1, 50 );
+				const material = new THREE.MeshStandardMaterial( {
+					color: 0xcc6644,
+					roughness: 0.4,
+					metalness: 0.1
+				} );
+				mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+				// Sculptor
+
+				sculptor = new Sculptor( mesh, camera );
+				sculptor.connect( renderer.domElement );
+
+				sculptor.addEventListener( 'start', function () {
+
+					releasedPointerId = null;
+					controls.enabled = false;
+
+				} );
+
+				sculptor.addEventListener( 'end', function () {
+
+					controls.enabled = true;
+
+				} );
+
+				function handlePointerUp( event ) {
+
+					// Ignore releases from other pointers during a stroke.
+					if ( sculptor.isSculpting() ) return;
+
+					releasedPointerId = event.pointerId;
+					updateCursor( event );
+
+				}
+
+				function handlePointerCancel() {
+
+					releasedPointerId = null;
+					cursorGroup.visible = false;
+
+				}
+
+				function handleLostPointerCapture( event ) {
+
+					// Keep the pointerup cursor; capture-loss coordinates are unreliable.
+					if ( event.pointerId === releasedPointerId ) {
+
+						releasedPointerId = null;
+						return;
+
+					}
+
+					cursorGroup.visible = false;
+
+				}
+
+				renderer.domElement.addEventListener( 'pointerup', handlePointerUp );
+				renderer.domElement.addEventListener( 'pointercancel', handlePointerCancel );
+				renderer.domElement.addEventListener( 'lostpointercapture', handleLostPointerCapture );
+
+				// Register OrbitControls after Sculptor so sculpt presses can disable orbiting.
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.dampingFactor = 0.1;
+
+				// Inspector
+
+				const tools = {
+					Clay: 'clay',
+					Brush: 'brush',
+					Inflate: 'inflate',
+					Smooth: 'smooth',
+					Flatten: 'flatten',
+					Pinch: 'pinch',
+					Crease: 'crease',
+					Drag: 'drag',
+					Scale: 'scale'
+				};
+				const params = {
+					tool: sculptor.getTool(),
+					size: sculptor.getSize(),
+					strength: sculptor.getStrength(),
+					detail: sculptor.getDetail(),
+					negative: sculptor.getNegative()
+				};
+				const actions = { export: exportGLTF };
+				const gui = renderer.inspector.createParameters( 'Sculptor' );
+
+				gui.add( params, 'tool', tools ).onChange( function ( value ) {
+
+					sculptor.setTool( value );
+					params.size = sculptor.getSize();
+					params.strength = sculptor.getStrength();
+					params.negative = sculptor.getNegative();
+
+				} );
+
+				gui.add( params, 'size', 5, 500, 1 ).listen().onChange( function ( value ) {
+
+					sculptor.setSize( value );
+
+				} );
+
+				gui.add( params, 'strength', 0, 1 ).listen().onChange( function ( value ) {
+
+					sculptor.setStrength( value );
+
+				} );
+
+				gui.add( params, 'negative' ).listen().onChange( function ( value ) {
+
+					sculptor.setNegative( value );
+
+				} );
+
+				gui.add( params, 'detail', 0, 1 ).onChange( function ( value ) {
+
+					sculptor.setDetail( value );
+
+				} );
+
+				gui.add( mesh.material, 'wireframe' ).onChange( function () {
+
+					mesh.material.needsUpdate = true;
+
+				} );
+				gui.add( actions, 'export' ).name( 'export GLB' );
+
+				// Cursor
+
+				cursorMaterial = new THREE.MeshBasicMaterial( {
+					color: 0xcc0000,
+					side: THREE.DoubleSide,
+					depthTest: false,
+					depthWrite: false
+				} );
+
+				cursorRing = new THREE.Mesh( new THREE.RingGeometry( 0.95, 1, 48 ), cursorMaterial );
+				cursorDot = new THREE.Mesh( new THREE.CircleGeometry( 1, 16 ), cursorMaterial );
+
+				cursorGroup = new THREE.Group();
+				cursorGroup.add( cursorRing );
+				cursorGroup.add( cursorDot );
+				cursorGroup.visible = false;
+				cursorGroup.renderOrder = 1;
+				cursorRing.renderOrder = 1;
+				cursorDot.renderOrder = 1;
+				scene.add( cursorGroup );
+
+				renderer.domElement.addEventListener( 'pointermove', updateCursor );
+				renderer.domElement.addEventListener( 'pointerleave', function () {
+
+					if ( sculptor.isSculpting() === false ) cursorGroup.visible = false;
+
+				} );
+				controls.addEventListener( 'change', function () {
+
+					// Keep the cursor under the pointer while damping moves the camera.
+					if ( cursorGroup.visible && sculptor.isSculpting() === false ) updateCursorPosition();
+
+				} );
+
+				function updateCursorScale( worldRadius ) {
+
+					cursorGroup.scale.setScalar( worldRadius );
+					cursorDot.scale.setScalar( cursorDotRadius / sculptor.getSize() );
+
+				}
+
+				function updateCursor( event ) {
+
+					_pointer.set( event.clientX, event.clientY );
+
+					// Hide the cursor while orbiting.
+					if ( event.buttons > 0 && sculptor.isSculpting() === false ) {
+
+						cursorGroup.visible = false;
+						return;
+
+					}
+
+					updateCursorPosition();
+
+				}
+
+				function updateCursorPosition() {
+
+					if ( sculptor.domElement === null ) {
+
+						cursorGroup.visible = false;
+						return;
+
+					}
+
+					const isHovering = sculptor.isSculpting() === false;
+					if ( isHovering ) sculptor.pickFromPointer( _pointer.x, _pointer.y );
+
+					const hasHit = sculptor.hasHit();
+
+					if ( hasHit ) {
+
+						mesh.updateWorldMatrix( true, false );
+
+						sculptor.getHitPoint( cursorGroup.position ).applyMatrix4( mesh.matrixWorld );
+
+						_normalMatrix.getNormalMatrix( mesh.matrixWorld );
+						sculptor.getHitNormal( _normal ).applyNormalMatrix( _normalMatrix );
+						cursorGroup.quaternion.setFromUnitVectors( _forward, _normal );
+
+						updateCursorScale( sculptor.getWorldRadius() );
+
+					} else {
+
+						// Face the camera when the ray misses the mesh.
+						const rect = renderer.domElement.getBoundingClientRect();
+						const x = ( ( _pointer.x - rect.left ) / rect.width ) * 2 - 1;
+						const offsetX = ( ( _pointer.x + sculptor.getSize() - rect.left ) / rect.width ) * 2 - 1;
+						const y = - ( ( _pointer.y - rect.top ) / rect.height ) * 2 + 1;
+						camera.updateWorldMatrix( true, false );
+						_mouse.set( x, y, 0.5 ).unproject( camera );
+						_mouseOffset.set( offsetX, y, 0.5 ).unproject( camera );
+
+						cursorGroup.position.copy( _mouse );
+						camera.getWorldQuaternion( cursorGroup.quaternion );
+						updateCursorScale( _mouse.distanceTo( _mouseOffset ) );
+
+					}
+
+					cursorMaterial.color.setHex( hasHit && isHovering ? 0xcc0000 : 0xcc6600 );
+					cursorRing.visible = isHovering;
+					cursorDot.visible = true;
+					cursorGroup.visible = true;
+
+				}
+
+				// Resize
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				controls.update();
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

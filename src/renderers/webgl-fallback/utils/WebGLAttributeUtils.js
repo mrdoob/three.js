@@ -23,14 +23,7 @@ class DualAttributeData {
 		this.version = attributeData.version;
 		this.isInteger = attributeData.isInteger;
 		this.activeBufferIndex = 0;
-		this.baseId = attributeData.id;
-
-	}
-
-
-	get id() {
-
-		return `${ this.baseId }|${ this.activeBufferIndex }`;
+		this.id = attributeData.id;
 
 	}
 
@@ -88,23 +81,14 @@ class WebGLAttributeUtils {
 		const backend = this.backend;
 		const { gl } = backend;
 
+		const bufferAttribute = backend.getBufferAttribute( attribute );
+
+		if ( backend.get( bufferAttribute ).bufferGPU !== undefined ) return;
+
 		const array = attribute.array;
 		const usage = attribute.usage || gl.STATIC_DRAW;
 
-		const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
-		const bufferData = backend.get( bufferAttribute );
-
-		let bufferGPU = bufferData.bufferGPU;
-
-		if ( bufferGPU === undefined ) {
-
-			bufferGPU = this._createBuffer( gl, bufferType, array, usage );
-
-			bufferData.bufferGPU = bufferGPU;
-			bufferData.bufferType = bufferType;
-			bufferData.version = bufferAttribute.version;
-
-		}
+		const bufferGPU = this._createBuffer( gl, bufferType, array, usage );
 
 		//attribute.onUploadCallback();
 
@@ -166,7 +150,7 @@ class WebGLAttributeUtils {
 			type,
 			byteLength: array.byteLength,
 			bytesPerElement: array.BYTES_PER_ELEMENT,
-			version: attribute.version,
+			version: bufferAttribute.version,
 			pbo: attribute.pbo,
 			isInteger: type === gl.INT || type === gl.UNSIGNED_INT || attribute.gpuType === IntType,
 			id: _id ++
@@ -180,7 +164,7 @@ class WebGLAttributeUtils {
 
 		}
 
-		backend.set( attribute, attributeData );
+		backend.set( bufferAttribute, attributeData );
 
 	}
 
@@ -195,10 +179,10 @@ class WebGLAttributeUtils {
 		const { gl } = backend;
 
 		const array = attribute.array;
-		const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
+		const bufferAttribute = backend.getBufferAttribute( attribute );
 		const bufferData = backend.get( bufferAttribute );
 		const bufferType = bufferData.bufferType;
-		const updateRanges = attribute.isInterleavedBufferAttribute ? attribute.data.updateRanges : attribute.updateRanges;
+		const updateRanges = bufferAttribute.updateRanges;
 
 		gl.bindBuffer( bufferType, bufferData.bufferGPU );
 
@@ -238,63 +222,105 @@ class WebGLAttributeUtils {
 		const backend = this.backend;
 		const { gl } = backend;
 
-		if ( attribute.isInterleavedBufferAttribute ) {
+		const bufferAttribute = backend.getBufferAttribute( attribute );
+		const attributeData = backend.get( bufferAttribute );
 
-			backend.delete( attribute.data );
+		if ( attributeData.buffers !== undefined ) {
+
+			// storage attributes hold a second buffer for transform feedback
+			for ( const buffer of attributeData.buffers ) {
+
+				gl.deleteBuffer( buffer );
+
+			}
+
+		} else {
+
+			gl.deleteBuffer( attributeData.bufferGPU );
 
 		}
 
-		const attributeData = backend.get( attribute );
-
-		gl.deleteBuffer( attributeData.bufferGPU );
-
-		backend.delete( attribute );
+		backend.delete( bufferAttribute );
 
 	}
 
 	/**
 	 * This method performs a readback operation by moving buffer data from
-	 * a storage buffer attribute from the GPU to the CPU.
+	 * a storage buffer attribute from the GPU to the CPU. ReadbackBuffer can
+	 * be used to retain and reuse handles to the intermediate buffers and prevent
+	 * new allocation.
 	 *
 	 * @async
-	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
-	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
+	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
+	 * @param {number} offset - The storage buffer attribute.
+	 * @param {number} count - The offset from which to start reading the
+	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( attribute ) {
+	async getArrayBufferAsync( attribute, target = null, offset = 0, count = - 1 ) {
 
 		const backend = this.backend;
 		const { gl } = backend;
 
-		const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
-		const { bufferGPU } = backend.get( bufferAttribute );
+		const bufferAttribute = backend.getBufferAttribute( attribute );
+		const attributeInfo = backend.get( bufferAttribute );
+		const { bufferGPU } = attributeInfo;
 
-		const array = attribute.array;
-		const byteLength = array.byteLength;
+		const byteLength = count === - 1 ? attributeInfo.byteLength - offset : count;
 
-		gl.bindBuffer( gl.COPY_READ_BUFFER, bufferGPU );
+		// read the data back
+		let dstBuffer;
+		if ( target === null ) {
 
-		const writeBuffer = gl.createBuffer();
+			dstBuffer = new Uint8Array( new ArrayBuffer( byteLength ) );
 
-		gl.bindBuffer( gl.COPY_WRITE_BUFFER, writeBuffer );
-		gl.bufferData( gl.COPY_WRITE_BUFFER, byteLength, gl.STREAM_READ );
+		} else if ( target.isReadbackBuffer ) {
 
-		gl.copyBufferSubData( gl.COPY_READ_BUFFER, gl.COPY_WRITE_BUFFER, 0, 0, byteLength );
+			if ( target._mapped === true ) {
 
-		await backend.utils._clientWaitAsync();
+				throw new Error( 'THREE.WebGPURenderer: ReadbackBuffer must be released before being used again.' );
 
-		const dstBuffer = new attribute.array.constructor( array.length );
+			}
+
+			const releaseCallback = () => {
+
+				target.buffer = null;
+				target._mapped = false;
+				target.removeEventListener( 'release', releaseCallback );
+				target.removeEventListener( 'dispose', releaseCallback );
+
+			};
+
+			target.addEventListener( 'release', releaseCallback );
+			target.addEventListener( 'dispose', releaseCallback );
+
+			// WebGL has no concept of a "mapped" data buffer so we create a new buffer, instead.
+			dstBuffer = new Uint8Array( new ArrayBuffer( byteLength ) );
+			target.buffer = dstBuffer.buffer;
+
+		} else {
+
+			dstBuffer = new Uint8Array( target );
+
+		}
 
 		// Ensure the buffer is bound before reading
-		gl.bindBuffer( gl.COPY_WRITE_BUFFER, writeBuffer );
-
-		gl.getBufferSubData( gl.COPY_WRITE_BUFFER, 0, dstBuffer );
-
-		gl.deleteBuffer( writeBuffer );
+		gl.bindBuffer( gl.COPY_READ_BUFFER, bufferGPU );
+		gl.getBufferSubData( gl.COPY_READ_BUFFER, offset, dstBuffer );
 
 		gl.bindBuffer( gl.COPY_READ_BUFFER, null );
 		gl.bindBuffer( gl.COPY_WRITE_BUFFER, null );
 
-		return dstBuffer.buffer;
+		// return the appropriate type
+		if ( target && target.isReadbackBuffer ) {
+
+			return target;
+
+		} else {
+
+			return dstBuffer.buffer;
+
+		}
 
 	}
 

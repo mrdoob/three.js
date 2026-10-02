@@ -10,7 +10,7 @@ Reference: [https://en.wikipedia.org/wiki/Supersampling](https://en.wikipedia.or
 
 ## Import
 
-SSAAPassNode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+SSAAPassNode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { ssaaPass } from 'three/addons/tsl/display/SSAAPassNode.js';
@@ -31,18 +31,6 @@ The scene to render.
 The camera to render the scene with.
 
 ## Properties
-
-### .clearAlpha : number
-
-The clear alpha of the pass.
-
-Default is `0`.
-
-### .clearColor : Color
-
-The clear color of the pass.
-
-Default is `0x000000`.
 
 ### .isSSAAPassNode : boolean (readonly)
 

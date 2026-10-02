@@ -1,5 +1,6 @@
-import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, TempNode, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
-import { add, float, If, Fn, max, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, viewZToPerspectiveDepth, struct, ivec2, mix } from 'three/tsl';
+import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4, DepthTexture, FloatType } from 'three/webgpu';
+import { float, Fn, max, texture, uniform, uv, vec2, convertToTexture, passTexture, velocity, ivec2, mix, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
+import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth, samplePreviousDepth } from '../utils/TAAUtils.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -14,10 +15,12 @@ let _rendererState;
  * - {@link https://alextardif.com/TAA.html}
  * - {@link https://www.elopezr.com/temporal-aa-and-the-quest-for-the-holy-trail/}
  *
- * @augments TempNode
+ * Note: MSAA must be disabled when TRAA is in use.
+ *
+ * @augments Node
  * @three_import import { traa } from 'three/addons/tsl/display/TRAANode.js';
  */
-class TRAANode extends TempNode {
+class TRAANode extends Node {
 
 	static get type() {
 
@@ -234,11 +237,12 @@ class TRAANode extends TempNode {
 		this._previousDepthNode = texture( new DepthTexture( 1, 1 ) );
 
 		/**
-		 * Sync the post processing stack with the TRAA node.
+		 * The node used to render the scene's velocity.
+		 *
 		 * @private
-		 * @type {boolean}
+		 * @type {?VelocityNode}
 		 */
-		this._needsPostProcessingSync = false;
+		this._velocityNode = null;
 
 	}
 
@@ -282,7 +286,7 @@ class TRAANode extends TempNode {
 		this.camera.updateProjectionMatrix();
 		this._originalProjectionMatrix.copy( this.camera.projectionMatrix );
 
-		velocity.setProjectionMatrix( this._originalProjectionMatrix );
+		this._velocityNode.setProjectionMatrix( this._originalProjectionMatrix );
 
 		//
 
@@ -318,12 +322,12 @@ class TRAANode extends TempNode {
 
 		this.camera.clearViewOffset();
 
-		velocity.setProjectionMatrix( null );
+		this._velocityNode.setProjectionMatrix( null );
 
 		// update jitter index
 
 		this._jitterIndex ++;
-		this._jitterIndex = this._jitterIndex % ( _haltonOffsets.length - 1 );
+		this._jitterIndex = this._jitterIndex % _haltonOffsets.length;
 
 	}
 
@@ -354,16 +358,6 @@ class TRAANode extends TempNode {
 
 		const width = beautyRenderTarget.texture.width;
 		const height = beautyRenderTarget.texture.height;
-
-		//
-
-		if ( this._needsPostProcessingSync === true ) {
-
-			this.setViewOffset( width, height );
-
-			this._needsPostProcessingSync = false;
-
-		}
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
@@ -431,106 +425,44 @@ class TRAANode extends TempNode {
 	 */
 	setup( builder ) {
 
-		const renderPipeline = builder.context.renderPipeline;
+		this.depthNode.build( builder );
+		this.velocityNode.build( builder );
+		this.beautyNode.build( builder );
 
-		if ( renderPipeline ) {
+		if ( builder.renderPipeline && ! builder.context.renderPipelineState.viewOffsetOwner ) {
 
-			this._needsPostProcessingSync = true;
+			builder.context.renderPipelineState.viewOffsetOwner = this;
 
-			renderPipeline.context.onBeforeRenderPipeline = () => {
+			OnBeforeRenderPipeline( () => {
 
 				const size = builder.renderer.getDrawingBufferSize( _size );
 				this.setViewOffset( size.width, size.height );
 
-			};
+			} );
 
-			renderPipeline.context.onAfterRenderPipeline = () => {
+			OnAfterRenderPipeline( () => {
 
 				this.clearViewOffset();
 
-			};
+			} );
 
 		}
 
-		const currentDepthStruct = struct( {
+		if ( builder.renderer.reversedDepthBuffer === true ) {
 
-			closestDepth: 'float',
-			closestPositionTexel: 'vec2',
-			farthestDepth: 'float',
+			this._historyRenderTarget.depthTexture.type = FloatType;
 
-		} );
+		}
 
-		// Samples 3×3 neighborhood pixels and returns the closest and farthest depths.
-		const sampleCurrentDepth = Fn( ( [ positionTexel ] ) => {
+		if ( builder.context.velocity !== undefined ) {
 
-			const closestDepth = float( 2 ).toVar();
-			const closestPositionTexel = vec2( 0 ).toVar();
-			const farthestDepth = float( - 1 ).toVar();
+			this._velocityNode = builder.context.velocity;
 
-			for ( let x = - 1; x <= 1; ++ x ) {
+		} else {
 
-				for ( let y = - 1; y <= 1; ++ y ) {
+			this._velocityNode = velocity;
 
-					const neighbor = positionTexel.add( vec2( x, y ) ).toVar();
-					const depth = this.depthNode.load( neighbor ).r.toVar();
-
-					If( depth.lessThan( closestDepth ), () => {
-
-						closestDepth.assign( depth );
-						closestPositionTexel.assign( neighbor );
-
-					} );
-
-					If( depth.greaterThan( farthestDepth ), () => {
-
-						farthestDepth.assign( depth );
-
-					} );
-
-				}
-
-			}
-
-			return currentDepthStruct( closestDepth, closestPositionTexel, farthestDepth );
-
-		} );
-
-		// Samples a previous depth and reproject it using the current camera matrices.
-		const samplePreviousDepth = ( uv ) => {
-
-			const depth = this._previousDepthNode.sample( uv ).r;
-			const positionView = getViewPosition( uv, depth, this._previousCameraProjectionMatrixInverse );
-			const positionWorld = this._previousCameraWorldMatrix.mul( vec4( positionView, 1 ) ).xyz;
-			const viewZ = this._cameraWorldMatrixInverse.mul( vec4( positionWorld, 1 ) ).z;
-			return viewZToPerspectiveDepth( viewZ, this._cameraNearFar.x, this._cameraNearFar.y );
-
-		};
-
-		// Optimized version of AABB clipping.
-		// Reference: https://github.com/playdeadgames/temporal
-		const clipAABB = Fn( ( [ currentColor, historyColor, minColor, maxColor ] ) => {
-
-			const pClip = maxColor.rgb.add( minColor.rgb ).mul( 0.5 );
-			const eClip = maxColor.rgb.sub( minColor.rgb ).mul( 0.5 ).add( 1e-7 );
-			const vClip = historyColor.sub( vec4( pClip, currentColor.a ) );
-			const vUnit = vClip.xyz.div( eClip );
-			const absUnit = vUnit.abs();
-			const maxUnit = max( absUnit.x, absUnit.y, absUnit.z );
-			return maxUnit.greaterThan( 1 ).select(
-				vec4( pClip, currentColor.a ).add( vClip.div( maxUnit ) ),
-				historyColor
-			);
-
-		} ).setLayout( {
-			name: 'clipAABB',
-			type: 'vec4',
-			inputs: [
-				{ name: 'currentColor', type: 'vec4' },
-				{ name: 'historyColor', type: 'vec4' },
-				{ name: 'minColor', type: 'vec4' },
-				{ name: 'maxColor', type: 'vec4' }
-			]
-		} );
+		}
 
 		// Performs variance clipping.
 		// See: https://developer.download.nvidia.com/gameworks/events/GDC2016/msalvi_temporal_supersampling.pdf
@@ -586,23 +518,6 @@ class TRAANode extends TempNode {
 			]
 		} );
 
-		// Flicker reduction based on luminance weighing.
-		const flickerReduction = Fn( ( [ currentColor, historyColor, currentWeight ] ) => {
-
-			const historyWeight = currentWeight.oneMinus();
-			const compressedCurrent = currentColor.mul( float( 1 ).div( ( max( currentColor.r, currentColor.g, currentColor.b ).add( 1 ) ) ) );
-			const compressedHistory = historyColor.mul( float( 1 ).div( ( max( historyColor.r, historyColor.g, historyColor.b ).add( 1 ) ) ) );
-
-			const luminanceCurrent = luminance( compressedCurrent.rgb );
-			const luminanceHistory = luminance( compressedHistory.rgb );
-
-			currentWeight.mulAssign( float( 1 ).div( luminanceCurrent.add( 1 ) ) );
-			historyWeight.mulAssign( float( 1 ).div( luminanceHistory.add( 1 ) ) );
-
-			return add( currentColor.mul( currentWeight ), historyColor.mul( historyWeight ) ).div( max( currentWeight.add( historyWeight ), 0.00001 ) ).toVar();
-
-		} );
-
 		const historyNode = texture( this._historyRenderTarget.texture );
 
 		const resolve = Fn( () => {
@@ -613,7 +528,7 @@ class TRAANode extends TempNode {
 
 			// sample the closest and farthest depths in the current buffer
 
-			const currentDepth = sampleCurrentDepth( positionTexel );
+			const currentDepth = sampleCurrentDepth( this.depthNode, positionTexel, this._cameraNearFar );
 			const closestDepth = currentDepth.get( 'closestDepth' );
 			const closestPositionTexel = currentDepth.get( 'closestPositionTexel' );
 			const farthestDepth = currentDepth.get( 'farthestDepth' );
@@ -625,7 +540,7 @@ class TRAANode extends TempNode {
 			// sample the previous depth
 
 			const historyUV = uvNode.sub( offsetUV );
-			const previousDepth = samplePreviousDepth( historyUV );
+			const previousDepth = samplePreviousDepth( this._previousDepthNode, historyUV, this._previousCameraProjectionMatrixInverse, this._previousCameraWorldMatrix, this._cameraWorldMatrixInverse, this._cameraNearFar, this.camera );
 
 			// history is considered valid when the UV is in range and there's no disocclusion except on edges
 
@@ -637,7 +552,7 @@ class TRAANode extends TempNode {
 			// sample the current and previous colors
 
 			const currentColor = this.beautyNode.sample( uvNode );
-			const historyColor = historyNode.sample( uvNode.sub( offsetUV ) );
+			const historyColor = historyNode.sample( historyUV );
 
 			// increase the weight towards the current frame under motion
 
@@ -668,6 +583,7 @@ class TRAANode extends TempNode {
 
 		// materials
 
+		this._resolveMaterial.contextNode = context( builder.getSharedContext() );
 		this._resolveMaterial.colorNode = resolve();
 
 		return this._textureNode;
@@ -680,6 +596,8 @@ class TRAANode extends TempNode {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this._historyRenderTarget.dispose();
 		this._resolveRenderTarget.dispose();
 
@@ -691,26 +609,7 @@ class TRAANode extends TempNode {
 
 export default TRAANode;
 
-function _halton( index, base ) {
-
-	let fraction = 1;
-	let result = 0;
-	while ( index > 0 ) {
-
-		fraction /= base;
-		result += fraction * ( index % base );
-		index = Math.floor( index / base );
-
-	}
-
-	return result;
-
-}
-
-const _haltonOffsets = /*@__PURE__*/ Array.from(
-	{ length: 32 },
-	( _, index ) => [ _halton( index + 1, 2 ), _halton( index + 1, 3 ) ]
-);
+const _haltonOffsets = /*@__PURE__*/ computeHaltonOffsets( 32 );
 
 /**
  * TSL function for creating a TRAA node for Temporal Reprojection Anti-Aliasing.

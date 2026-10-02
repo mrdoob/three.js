@@ -82,6 +82,28 @@ which is updated per frame or render call.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The uniform group.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="getSharedNode" translate="no">.<a href="#getSharedNode">getSharedNode</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Uniform nodes with the same hash share a single uniform. This method returns the node
+the shared uniform refers to which is the first node registered for the hash.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The node the shared uniform refers to.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="getUniformHash" translate="no">.<a href="#getUniformHash">getUniformHash</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">

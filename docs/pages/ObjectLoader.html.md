@@ -91,6 +91,20 @@ The serialized 3D object.
 
 **Returns:** A Promise that resolves with the parsed 3D object.
 
+## Static Methods
+
+### .registerGeometry( type : string, geometryClass : BufferGeometry.constructor )
+
+Registers the given geometry at the internal geometry library.
+
+**type**
+
+The geometry type.
+
+**geometryClass**
+
+The geometry class.
+
 ## Source
 
 [src/loaders/ObjectLoader.js](https://github.com/mrdoob/three.js/blob/master/src/loaders/ObjectLoader.js)

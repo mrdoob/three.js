@@ -16,6 +16,7 @@ import { XR } from './Viewport.XR.js';
 import { SetPositionCommand } from './commands/SetPositionCommand.js';
 import { SetRotationCommand } from './commands/SetRotationCommand.js';
 import { SetScaleCommand } from './commands/SetScaleCommand.js';
+import { MultiCmdsCommand } from './commands/MultiCmdsCommand.js';
 
 import { ColorEnvironment } from 'three/addons/environments/ColorEnvironment.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -39,7 +40,7 @@ function Viewport( editor ) {
 	let pmremGenerator = null;
 	let pathtracer = null;
 
-	const camera = editor.camera;
+	let camera = editor.camera;
 	const scene = editor.scene;
 	const sceneHelpers = editor.sceneHelpers;
 
@@ -72,9 +73,7 @@ function Viewport( editor ) {
 	selectionBox.visible = false;
 	sceneHelpers.add( selectionBox );
 
-	let objectPositionOnDown = null;
-	let objectRotationOnDown = null;
-	let objectScaleOnDown = null;
+	let objectStatesOnDown = [];
 
 	const transformControls = new TransformControls( camera );
 	transformControls.addEventListener( 'axis-changed', function () {
@@ -91,50 +90,56 @@ function Viewport( editor ) {
 
 		const object = transformControls.object;
 
-		objectPositionOnDown = object.position.clone();
-		objectRotationOnDown = object.rotation.clone();
-		objectScaleOnDown = object.scale.clone();
+		const objects = ( object === selector.group ) ? selector.selection : [ object ];
+
+		objectStatesOnDown = objects.map( ( object ) => ( {
+			object: object,
+			position: object.position.clone(),
+			rotation: object.rotation.clone(),
+			scale: object.scale.clone()
+		} ) );
 
 		controls.enabled = false;
 
 	} );
 	transformControls.addEventListener( 'mouseUp', function () {
 
-		const object = transformControls.object;
+		if ( transformControls.object !== undefined ) {
 
-		if ( object !== undefined ) {
+			const commands = [];
 
-			switch ( transformControls.getMode() ) {
+			for ( let i = 0; i < objectStatesOnDown.length; i ++ ) {
 
-				case 'translate':
+				const state = objectStatesOnDown[ i ];
+				const object = state.object;
 
-					if ( ! objectPositionOnDown.equals( object.position ) ) {
+				if ( ! state.position.equals( object.position ) ) {
 
-						editor.execute( new SetPositionCommand( editor, object, object.position, objectPositionOnDown ) );
+					commands.push( new SetPositionCommand( editor, object, object.position, state.position ) );
 
-					}
+				}
 
-					break;
+				if ( ! state.rotation.equals( object.rotation ) ) {
 
-				case 'rotate':
+					commands.push( new SetRotationCommand( editor, object, object.rotation, state.rotation ) );
 
-					if ( ! objectRotationOnDown.equals( object.rotation ) ) {
+				}
 
-						editor.execute( new SetRotationCommand( editor, object, object.rotation, objectRotationOnDown ) );
+				if ( ! state.scale.equals( object.scale ) ) {
 
-					}
+					commands.push( new SetScaleCommand( editor, object, object.scale, state.scale ) );
 
-					break;
+				}
 
-				case 'scale':
+			}
 
-					if ( ! objectScaleOnDown.equals( object.scale ) ) {
+			if ( commands.length === 1 ) {
 
-						editor.execute( new SetScaleCommand( editor, object, object.scale, objectScaleOnDown ) );
+				editor.execute( commands[ 0 ] );
 
-					}
+			} else if ( commands.length > 1 ) {
 
-					break;
+				editor.execute( new MultiCmdsCommand( editor, commands ) );
 
 			}
 
@@ -166,8 +171,10 @@ function Viewport( editor ) {
 
 			} else {
 
-				camera.left = - aspect;
-				camera.right = aspect;
+				const frustumHeight = camera.top - camera.bottom;
+
+				camera.left = - frustumHeight * aspect / 2;
+				camera.right = frustumHeight * aspect / 2;
 
 			}
 
@@ -191,12 +198,12 @@ function Viewport( editor ) {
 
 	}
 
-	function handleClick() {
+	function handleClick( event ) {
 
 		if ( onDownPosition.distanceTo( onUpPosition ) === 0 ) {
 
 			const intersects = selector.getPointerIntersects( onUpPosition, camera );
-			signals.intersectionsDetected.dispatch( intersects );
+			signals.intersectionsDetected.dispatch( intersects, event.shiftKey );
 
 			render();
 
@@ -222,7 +229,7 @@ function Viewport( editor ) {
 		const array = getMousePosition( container.dom, event.clientX, event.clientY );
 		onUpPosition.fromArray( array );
 
-		handleClick();
+		handleClick( event );
 
 		document.removeEventListener( 'mouseup', onMouseUp );
 
@@ -246,7 +253,7 @@ function Viewport( editor ) {
 		const array = getMousePosition( container.dom, touch.clientX, touch.clientY );
 		onUpPosition.fromArray( array );
 
-		handleClick();
+		handleClick( event );
 
 		document.removeEventListener( 'touchend', onTouchEnd );
 
@@ -439,7 +446,14 @@ function Viewport( editor ) {
 		selectionBox.visible = false;
 		transformControls.detach();
 
-		if ( object !== null && object !== scene && object !== camera ) {
+		if ( selector.selection.length > 1 ) {
+
+			selector.getSelectionBox( box );
+
+			selectionBox.visible = true;
+			transformControls.attach( selector.group );
+
+		} else if ( object !== null && object !== scene && object !== camera ) {
 
 			box.setFromObject( object, true );
 
@@ -482,6 +496,10 @@ function Viewport( editor ) {
 
 			box.setFromObject( object, true );
 
+		} else if ( selector.selection.length > 1 && ( object === selector.group || selector.selection.indexOf( object ) !== - 1 ) ) {
+
+			selector.getSelectionBox( box );
+
 		}
 
 		if ( object.isPerspectiveCamera ) {
@@ -495,6 +513,20 @@ function Viewport( editor ) {
 		if ( helper !== undefined && helper.isSkeletonHelper !== true ) {
 
 			helper.update();
+
+		}
+
+		// update light helper when light target is changed
+
+		for ( const id in editor.helpers ) {
+
+			const helper = editor.helpers[ id ];
+
+			if ( helper.light && helper.light.target === object ) {
+
+				helper.update();
+
+			}
 
 		}
 
@@ -798,7 +830,22 @@ function Viewport( editor ) {
 
 	} );
 
-	signals.cameraResetted.add( updateAspectRatio );
+	signals.cameraResetted.add( function () {
+
+		if ( camera !== editor.camera ) {
+
+			camera = editor.camera;
+
+			controls.setCamera( camera );
+			transformControls.camera = camera;
+			viewHelper.camera = camera;
+
+		}
+
+		updateAspectRatio();
+		render();
+
+	} );
 
 	// animations
 

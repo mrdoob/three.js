@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import * as TSL from 'three/tsl';
 
 const _library = {
+	'three': { ...THREE },
 	'three/tsl': { ...TSL }
 };
 
@@ -236,7 +237,7 @@ export class TSLGraphLoader extends FileLoader {
 
 		if ( ! json.codes || ! json.graphs ) {
 
-			throw new Error( 'TSLGraph: Invalid import file structure.' );
+			throw new Error( 'TSLGraphLoader: Invalid import file structure.' );
 
 		}
 

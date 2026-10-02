@@ -16,7 +16,7 @@ scene.add( model );
 
 ## Import
 
-USDLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+USDLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { USDLoader } from 'three/addons/loaders/USDLoader.js';
@@ -56,13 +56,29 @@ Executed when errors occur.
 
 **Overrides:** [Loader#load](Loader.html#load)
 
-### .parse( buffer : ArrayBuffer | string ) : Group
+### .parse( buffer : ArrayBuffer | string, path : string, onLoad : function, onError : onErrorCallback ) : Group
 
 Parses the given USDZ data and returns the resulting group.
+
+The returned group is created synchronously, but any referenced textures are loaded asynchronously. Provide `onLoad` to be notified once all textures have finished loading.
 
 **buffer**
 
 The raw USDZ data as an array buffer.
+
+**path**
+
+The URL base path.
+
+Default is `''`.
+
+**onLoad**
+
+Executed once the group and all of its textures are ready.
+
+**onError**
+
+Executed when errors occur.
 
 **Overrides:** [Loader#parse](Loader.html#parse)
 

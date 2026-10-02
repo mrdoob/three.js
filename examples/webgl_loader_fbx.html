@@ -4,6 +4,10 @@
 		<title>three.js webgl - FBX loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - FBX loader">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_loader_fbx.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_loader_fbx.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
@@ -34,7 +38,7 @@
 
 			const manager = new THREE.LoadingManager();
 
-			let camera, scene, renderer, stats, object, loader, guiMorphsFolder;
+			let camera, scene, renderer, controls, stats, object, loader, guiMorphsFolder, guiAnimationsFolder;
 			let mixer;
 
 			const timer = new THREE.Timer();
@@ -50,8 +54,23 @@
 				'monkey',
 				'monkey_embedded_texture',
 				'vCube',
+				'archer/ArcherRi01',
+				'warrior/Warrior',
+				'stanford-bunny',
+				'mixamo',
+				'RotationTest',
+				'exampleWindow',
+				'Head_69',
+				'morph-translation',
+				'ball_anims_asc_2018',
 			];
 
+			const scales = new Map();
+			scales.set( 'warrior/Warrior', 100 );
+			scales.set( 'archer/ArcherRi01', 100 );
+			scales.set( 'stanford-bunny', 0.001 );
+			scales.set( 'Head_69', 100 );
+			scales.set( 'ball_anims_asc_2018', 50 );
 
 			init();
 
@@ -103,7 +122,10 @@
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableZoom = false;
+				controls.enablePan = false;
+				controls.enableDamping = true;
 				controls.target.set( 0, 100, 0 );
 				controls.update();
 
@@ -121,10 +143,13 @@
 				} );
 
 				guiMorphsFolder = gui.addFolder( 'Morphs' ).hide();
+				guiAnimationsFolder = gui.addFolder( 'Animations' ).hide();
 
 			}
 
 			function loadAsset( asset ) {
+
+				loader.trimAnimationClips = ( asset === 'ball_anims_asc_2018' );
 
 				loader.load( 'models/fbx/' + asset + '.fbx', function ( group ) {
 
@@ -162,12 +187,31 @@
 
 					object = group;
 
+					const scale = scales.get( asset );
+					object.scale.setScalar( scale || 1 );
+
+					guiAnimationsFolder.children.forEach( ( child ) => child.destroy() );
+					guiAnimationsFolder.hide();
+
 					if ( object.animations && object.animations.length ) {
 
 						mixer = new THREE.AnimationMixer( object );
 
 						const action = mixer.clipAction( object.animations[ 0 ] );
 						action.play();
+
+						const clips = object.animations;
+						const animationParams = { clip: clips[ 0 ].name };
+
+						guiAnimationsFolder.show();
+						guiAnimationsFolder.add( animationParams, 'clip', clips.map( ( clip ) => clip.name ) ).onChange( function ( name ) {
+
+							mixer.stopAllAction();
+
+							const clip = THREE.AnimationClip.findByName( clips, name );
+							mixer.clipAction( clip ).play();
+
+						} );
 
 					} else {
 
@@ -225,6 +269,8 @@
 				const delta = timer.getDelta();
 
 				if ( mixer ) mixer.update( delta );
+
+				controls.update();
 
 				renderer.render( scene, camera );
 

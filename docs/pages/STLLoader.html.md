@@ -12,6 +12,12 @@ Limitations:
 *   There is perhaps some question as to how valid it is to always assume little-endian-ness.
 *   ASCII decoding assumes file is UTF-8.
 
+```js
+const loader = new STLLoader();
+const geometry = await loader.loadAsync( './models/stl/slotted_disk.stl' )
+scene.add( new THREE.Mesh( geometry ) );
+```
+
 For binary STLs geometry might contain colors for vertices. To use it:
 
 ```js
@@ -34,17 +40,9 @@ for ( let i = 0; i < nGeometryGroups; i ++ ) {
 const mesh = new THREE.Mesh(geometry, materials);
 ```
 
-## Code Example
-
-```js
-const loader = new STLLoader();
-const geometry = await loader.loadAsync( './models/stl/slotted_disk.stl' )
-scene.add( new THREE.Mesh( geometry ) );
-```
-
 ## Import
 
-STLLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+STLLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { STLLoader } from 'three/addons/loaders/STLLoader.js';

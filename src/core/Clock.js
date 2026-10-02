@@ -54,11 +54,11 @@ class Clock {
 		 * Whether the clock is running or not.
 		 *
 		 * @type {boolean}
-		 * @default true
+		 * @default false
 		 */
 		this.running = false;
 
-		warn( 'THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.' ); // @deprecated, r183
+		warn( 'Clock: This module has been deprecated. Please use THREE.Timer instead.' ); // @deprecated, r183
 
 	}
 

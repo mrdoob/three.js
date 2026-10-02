@@ -29,6 +29,8 @@ Default is `1`.
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
 
+**Overrides:** [LineSegments#dispose](LineSegments.html#dispose)
+
 ### .setColors( xAxisColor : number | Color | string, yAxisColor : number | Color | string, zAxisColor : number | Color | string ) : AxesHelper
 
 Defines the colors of the axes helper.

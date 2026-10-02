@@ -58,11 +58,12 @@ class LightProbeHelper extends Mesh {
 
 				#define RECIPROCAL_PI 0.318309886
 
-				vec3 inverseTransformDirection( in vec3 normal, in mat4 matrix ) {
 
-					// matrix is assumed to be orthogonal
+				vec3 transformNormalByInverseViewMatrix( in vec3 normal, in mat4 viewMatrix ) {
 
-					return normalize( ( vec4( normal, 0.0 ) * matrix ).xyz );
+					// upper-left 3x3 of view matrix is assumed to be orthogonal
+
+					return normalize( ( vec4( normal, 0.0 ) * viewMatrix ).xyz );
 
 				}
 
@@ -101,7 +102,7 @@ class LightProbeHelper extends Mesh {
 
 					vec3 normal = normalize( vNormal );
 
-					vec3 worldNormal = inverseTransformDirection( normal, viewMatrix );
+					vec3 worldNormal = transformNormalByInverseViewMatrix( normal, viewMatrix );
 
 					vec3 irradiance = shGetIrradianceAt( worldNormal, sh );
 

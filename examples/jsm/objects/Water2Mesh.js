@@ -5,7 +5,7 @@ import {
 	Vector3,
 	NodeMaterial,
 	NodeUpdateType,
-	TempNode
+	Node
 } from 'three/webgpu';
 
 import { Fn, vec2, viewportSafeUV, viewportSharedTexture, reflector, pow, float, abs, texture, uniform, vec4, cameraPosition, positionWorld, uv, mix, vec3, normalize, max, dot, screenUV } from 'three/tsl';
@@ -56,7 +56,7 @@ class WaterMesh extends Mesh {
 
 }
 
-class WaterNode extends TempNode {
+class WaterNode extends Node {
 
 	constructor( options, waterBody ) {
 
@@ -66,7 +66,7 @@ class WaterNode extends TempNode {
 
 		this.normalMap0 = texture( options.normalMap0 );
 		this.normalMap1 = texture( options.normalMap1 );
-		this.flowMap = texture( options.flowMap !== undefined ? options.flowMap : null );
+		this.flowMap = texture( options.flowMap );
 
 		this.color = uniform( options.color !== undefined ? new Color( options.color ) : new Color( 0xffffff ) );
 		this.flowDirection = uniform( options.flowDirection !== undefined ? options.flowDirection : new Vector2( 1, 0 ) );

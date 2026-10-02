@@ -12,7 +12,7 @@ const physics = await RapierPhysics();
 
 ## Import
 
-RapierPhysics is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+RapierPhysics is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { RapierPhysics } from 'three/addons/physics/RapierPhysics.js';
@@ -89,6 +89,24 @@ box.userData.physics = { mass: 1, restitution: 0 };
 **scene**
 
 The scene or any type of 3D object to add.
+
+### .applyImpulse( mesh : Mesh, impulse : Vector3, index : number )
+
+Applies an impulse to the given mesh which is part of the physics simulation.
+
+**mesh**
+
+The mesh to apply the impulse to.
+
+**impulse**
+
+The impulse to apply.
+
+**index**
+
+If the mesh is instanced, the index represents the instanced ID.
+
+Default is `0`.
 
 ### .removeMesh( mesh : Mesh )
 

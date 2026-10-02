@@ -552,7 +552,7 @@ class USDCParser {
 		const magic = reader.readString( 8 );
 		if ( magic !== 'PXR-USDC' ) {
 
-			throw new Error( 'Not a valid USDC file' );
+			throw new Error( 'THREE.USDCParser: Not a valid USDC file.' );
 
 		}
 
@@ -656,10 +656,7 @@ class USDCParser {
 		const reader = this.reader;
 		reader.seek( section.start );
 
-		// Strings section has an 8-byte count prefix, but string indices stored
-		// elsewhere in the file are relative to the section start (not the data).
-		// So we read the entire section as uint32 values to maintain correct indexing.
-		const numStrings = Math.floor( section.size / 4 );
+		const numStrings = reader.readUint64();
 		this.strings = [];
 
 		for ( let i = 0; i < numStrings; i ++ ) {

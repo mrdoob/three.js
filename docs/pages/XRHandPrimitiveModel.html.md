@@ -4,7 +4,7 @@ Represents one of the hand model types [XRHandModelFactory](XRHandModelFactory.h
 
 ## Import
 
-XRHandPrimitiveModel is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+XRHandPrimitiveModel is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { XRHandPrimitiveModel } from 'three/addons/webxr/XRHandPrimitiveModel.js';

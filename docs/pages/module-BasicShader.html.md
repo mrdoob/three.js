@@ -2,7 +2,7 @@
 
 ## Import
 
-BasicShader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+BasicShader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { BasicShader } from 'three/addons/shaders/BasicShader.js';

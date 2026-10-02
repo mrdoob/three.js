@@ -13,7 +13,7 @@ composer.addPass( renderPixelatedPass );
 
 ## Import
 
-RenderPixelatedPass is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+RenderPixelatedPass is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { RenderPixelatedPass } from 'three/addons/postprocessing/RenderPixelatedPass.js';

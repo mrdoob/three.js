@@ -2,6 +2,11 @@
 
 A Color instance is represented by RGB components in the linear _working color space_, which defaults to `LinearSRGBColorSpace`. Inputs conventionally using `SRGBColorSpace` (such as hexadecimals and CSS strings) are converted to the working color space automatically.
 
+```js
+// converted automatically from SRGBColorSpace to LinearSRGBColorSpace
+const color = new THREE.Color().setHex( 0x112233 );
+```
+
 Source color spaces may be specified explicitly, to ensure correct conversions.
 
 ```js
@@ -28,13 +33,6 @@ const color5 = new THREE.Color( 'skyblue' );
 const color6 = new THREE.Color("hsl(0, 100%, 50%)");
 //Separate RGB values between 0 and 1
 const color7 = new THREE.Color( 1, 0, 0 );
-```
-
-## Code Example
-
-```js
-// converted automatically from SRGBColorSpace to LinearSRGBColorSpace
-const color = new THREE.Color().setHex( 0x112233 );
 ```
 
 ## Constructor

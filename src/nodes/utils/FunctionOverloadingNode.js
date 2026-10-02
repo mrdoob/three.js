@@ -58,6 +58,12 @@ class FunctionOverloadingNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * This method is overwritten since the node type is inferred from
 	 * the function's return type.
@@ -97,7 +103,7 @@ class FunctionOverloadingNode extends Node {
 
 				if ( layout === null ) {
 
-					throw new Error( 'FunctionOverloadingNode: FunctionNode must be a layout.' );
+					throw new Error( 'THREE.FunctionOverloadingNode: FunctionNode must be a layout.' );
 
 				}
 

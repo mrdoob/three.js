@@ -183,6 +183,18 @@ class LightShadow {
 	}
 
 	/**
+	 * Used internally by the renderer to get the camera that renders the given viewport.
+	 *
+	 * @param {number} [viewportIndex=0] - The viewport index.
+	 * @return {Camera} The shadow camera.
+	 */
+	getCamera( /* viewportIndex */ ) {
+
+		return this.camera;
+
+	}
+
+	/**
 	 * Gets the shadow cameras frustum. Used internally by the renderer to cull objects.
 	 *
 	 * @return {Frustum} The shadow camera frustum.
@@ -201,23 +213,41 @@ class LightShadow {
 	updateMatrices( light ) {
 
 		const shadowCamera = this.camera;
-		const shadowMatrix = this.matrix;
-
 		_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
 		shadowCamera.position.copy( _lightPositionWorld );
 
 		_lookTarget.setFromMatrixPosition( light.target.matrixWorld );
 		shadowCamera.lookAt( _lookTarget );
 		shadowCamera.updateMatrixWorld();
+		this._updateMatrix( shadowCamera, this.matrix, this._frustum );
+
+	}
+
+	/**
+	 * Updates a shadow projection matrix and its corresponding frustum.
+	 *
+	 * @private
+	 * @param {Camera} shadowCamera - The shadow camera.
+	 * @param {Matrix4} shadowMatrix - The target shadow matrix.
+	 * @param {Frustum} frustum - The target frustum.
+	 * @param {Vector4} [viewport] - The viewport within the shadow atlas.
+	 */
+	_updateMatrix( shadowCamera, shadowMatrix, frustum, viewport ) {
 
 		_projScreenMatrix.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
-		this._frustum.setFromProjectionMatrix( _projScreenMatrix, shadowCamera.coordinateSystem, shadowCamera.reversedDepth );
+		frustum.setFromProjectionMatrix( _projScreenMatrix, shadowCamera.coordinateSystem, shadowCamera.reversedDepth );
+
+		const frameExtents = this._frameExtents;
+		const scaleX = viewport ? viewport.z / frameExtents.x : 1;
+		const scaleY = viewport ? viewport.w / frameExtents.y : 1;
+		const offsetX = viewport ? viewport.x / frameExtents.x : 0;
+		const offsetY = viewport ? viewport.y / frameExtents.y : 0;
 
 		if ( shadowCamera.coordinateSystem === WebGPUCoordinateSystem || shadowCamera.reversedDepth ) {
 
 			shadowMatrix.set(
-				0.5, 0.0, 0.0, 0.5,
-				0.0, 0.5, 0.0, 0.5,
+				0.5 * scaleX, 0.0, 0.0, 0.5 * scaleX + offsetX,
+				0.0, 0.5 * scaleY, 0.0, 0.5 * scaleY + offsetY,
 				0.0, 0.0, 1.0, 0.0, // Identity Z (preserving the correct [0, 1] range from the projection matrix)
 				0.0, 0.0, 0.0, 1.0
 			);
@@ -225,8 +255,8 @@ class LightShadow {
 		} else {
 
 			shadowMatrix.set(
-				0.5, 0.0, 0.0, 0.5,
-				0.0, 0.5, 0.0, 0.5,
+				0.5 * scaleX, 0.0, 0.0, 0.5 * scaleX + offsetX,
+				0.0, 0.5 * scaleY, 0.0, 0.5 * scaleY + offsetY,
 				0.0, 0.0, 0.5, 0.5,
 				0.0, 0.0, 0.0, 1.0
 			);
@@ -329,11 +359,12 @@ class LightShadow {
 
 		const object = {};
 
-		if ( this.intensity !== 1 ) object.intensity = this.intensity;
-		if ( this.bias !== 0 ) object.bias = this.bias;
-		if ( this.normalBias !== 0 ) object.normalBias = this.normalBias;
-		if ( this.radius !== 1 ) object.radius = this.radius;
-		if ( this.mapSize.x !== 512 || this.mapSize.y !== 512 ) object.mapSize = this.mapSize.toArray();
+		object.intensity = this.intensity;
+		object.bias = this.bias;
+		object.normalBias = this.normalBias;
+		object.radius = this.radius;
+		object.blurSamples = this.blurSamples;
+		object.mapSize = this.mapSize.toArray();
 
 		object.camera = this.camera.toJSON( false ).object;
 		delete object.camera.matrix;

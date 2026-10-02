@@ -119,7 +119,11 @@ function WebGLRenderList() {
 
 	}
 
-	function push( object, geometry, material, groupOrder, z, group ) {
+	function push( object, geometry, material, groupOrder, z, group, camera ) {
+
+		// with a reversed depth buffer the projected z is inverted
+
+		if ( camera.reversedDepth === true ) z = - z;
 
 		const renderItem = getNextRenderItem( object, geometry, material, groupOrder, z, group );
 

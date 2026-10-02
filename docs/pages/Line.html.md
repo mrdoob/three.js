@@ -69,6 +69,18 @@ Computes an array of distance values which are necessary for rendering dashed li
 
 **Returns:** A reference to this line.
 
+### .intersectsFrustum( frustum : Frustum | FrustumArray ) : boolean
+
+Returns `true` if this line intersects the given frustum.
+
+**frustum**
+
+The frustum to test.
+
+**Overrides:** [Object3D#intersectsFrustum](Object3D.html#intersectsFrustum)
+
+**Returns:** Whether this line intersects the given frustum or not.
+
 ### .raycast( raycaster : Raycaster, intersects : Array.<Object> )
 
 Computes intersection points between a casted ray and this line.

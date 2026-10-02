@@ -35,7 +35,7 @@ class EXRExporter {
 	 * This method has two variants.
 	 *
 	 * - When exporting a data texture, it receives two parameters. The texture and the exporter options.
-	 * - When exporting a render target (e.g. a PMREM), it receives three parameters. The renderer, the
+	 * - When exporting a render target, it receives three parameters. The renderer, the
 	 * render target and the exporter options.
 	 *
 	 * @async

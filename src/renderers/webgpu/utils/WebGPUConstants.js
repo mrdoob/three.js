@@ -96,6 +96,8 @@ export const GPUTextureFormat = {
 	RG8Snorm: 'rg8snorm',
 	RG8Uint: 'rg8uint',
 	RG8Sint: 'rg8sint',
+	R16Unorm: 'r16unorm',
+	R16Snorm: 'r16snorm',
 
 	// 32-bit formats
 
@@ -112,7 +114,11 @@ export const GPUTextureFormat = {
 	RGBA8Sint: 'rgba8sint',
 	BGRA8Unorm: 'bgra8unorm',
 	BGRA8UnormSRGB: 'bgra8unorm-srgb',
+	RG16Unorm: 'rg16unorm',
+	RG16Snorm: 'rg16snorm',
+
 	// Packed 32-bit formats
+
 	RGB9E5UFloat: 'rgb9e5ufloat',
 	RGB10A2Unorm: 'rgb10a2unorm',
 	RG11B10UFloat: 'rg11b10ufloat',
@@ -125,6 +131,8 @@ export const GPUTextureFormat = {
 	RGBA16Uint: 'rgba16uint',
 	RGBA16Sint: 'rgba16sint',
 	RGBA16Float: 'rgba16float',
+	RGBA16Unorm: 'rgba16unorm',
+	RGBA16Snorm: 'rgba16snorm',
 
 	// 128-bit formats
 

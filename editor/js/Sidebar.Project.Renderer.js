@@ -15,6 +15,30 @@ function SidebarProjectRenderer( editor ) {
 	const container = new UIPanel();
 	container.setBorderTop( '0px' );
 
+	// Camera
+
+	const cameraRow = new UIRow();
+	container.add( cameraRow );
+
+	cameraRow.add( new UIText( strings.getKey( 'sidebar/project/camera' ) ).setClass( 'Label' ) );
+
+	const cameraTypeSelect = new UISelect().setOptions( {
+		'perspective': 'Perspective',
+		'orthographic': 'Orthographic'
+	} ).setWidth( '150px' ).onChange( function () {
+
+		editor.setCameraType( this.getValue() );
+
+	} );
+	cameraTypeSelect.setValue( config.getKey( 'project/camera' ) );
+	cameraRow.add( cameraTypeSelect );
+
+	if ( config.getKey( 'project/camera' ) === 'orthographic' ) {
+
+		editor.setCameraType( 'orthographic' );
+
+	}
+
 	// Renderer
 
 	const rendererRow = new UIRow();
@@ -111,12 +135,12 @@ function SidebarProjectRenderer( editor ) {
 
 		if ( rendererType === 'WebGPURenderer' ) {
 
-			currentRenderer = new WebGPURenderer( { antialias: antialias, logarithmicDepthBuffer: true } );
+			currentRenderer = new WebGPURenderer( { antialias: antialias, reversedDepthBuffer: true } );
 			await currentRenderer.init();
 
 		} else {
 
-			currentRenderer = new THREE.WebGLRenderer( { antialias: antialias, logarithmicDepthBuffer: true } );
+			currentRenderer = new THREE.WebGLRenderer( { antialias: antialias, reversedDepthBuffer: true } );
 
 		}
 
@@ -134,6 +158,15 @@ function SidebarProjectRenderer( editor ) {
 
 
 	// Signals
+
+	signals.cameraResetted.add( function () {
+
+		const type = editor.camera.isOrthographicCamera ? 'orthographic' : 'perspective';
+
+		cameraTypeSelect.setValue( type );
+		config.setKey( 'project/camera', type );
+
+	} );
 
 	signals.editorCleared.add( function () {
 

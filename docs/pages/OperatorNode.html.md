@@ -48,7 +48,7 @@ The operator.
 
 ## Methods
 
-### .getNodeType( builder : NodeBuilder, output : string ) : string
+### .generateNodeType( builder : NodeBuilder, output : string ) : string
 
 This method is overwritten since the node type is inferred from the operator and the input node types.
 
@@ -62,7 +62,7 @@ The output type.
 
 Default is `null`.
 
-**Overrides:** [TempNode#getNodeType](TempNode.html#getNodeType)
+**Overrides:** [TempNode#generateNodeType](TempNode.html#generateNodeType)
 
 **Returns:** The node type.
 

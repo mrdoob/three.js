@@ -37,6 +37,12 @@ class AttributeNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	getHash( builder ) {
 
 		return this.getAttributeName( builder );

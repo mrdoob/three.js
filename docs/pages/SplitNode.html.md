@@ -44,6 +44,18 @@ The node that should be accessed.
 
 ## Methods
 
+### .generateNodeType( builder : NodeBuilder ) : string
+
+This method is overwritten since the node type is inferred from requested components.
+
+**builder**
+
+The current node builder.
+
+**Overrides:** [Node#generateNodeType](Node.html#generateNodeType)
+
+**Returns:** The node type.
+
 ### .getComponentType( builder : NodeBuilder ) : string
 
 Returns the component type of the node's type.
@@ -53,18 +65,6 @@ Returns the component type of the node's type.
 The current node builder.
 
 **Returns:** The component type.
-
-### .getNodeType( builder : NodeBuilder ) : string
-
-This method is overwritten since the node type is inferred from requested components.
-
-**builder**
-
-The current node builder.
-
-**Overrides:** [Node#getNodeType](Node.html#getNodeType)
-
-**Returns:** The node type.
 
 ### .getScope() : Node
 

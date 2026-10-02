@@ -22,7 +22,7 @@ to use the component with an active Internet connection.</p></div>
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">RapierPhysics</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<p><span translate="no">RapierPhysics</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { RapierPhysics } from 'three/addons/physics/RapierPhysics.js';</code></pre>
 				<div class="container-overview">
 					<div class="method">
@@ -163,6 +163,41 @@ The object can be used to store the mass and restitution of the mesh. E.g.:</p>
 									</td>
 									<td class="description last">
 										<p>The scene or any type of 3D object to add.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="applyImpulse" translate="no">.<a href="#applyImpulse">applyImpulse</a><span class="signature">( mesh : <span class="param-type"><a href="Mesh.html">Mesh</a></span>, impulse : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, index : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Applies an impulse to the given mesh which is part of the physics simulation.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">mesh</strong>
+									</td>
+									<td class="description last">
+										<p>The mesh to apply the impulse to.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">impulse</strong>
+									</td>
+									<td class="description last">
+										<p>The impulse to apply.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">index</strong>
+									</td>
+									<td class="description last">
+										<p>If the mesh is instanced, the index represents the instanced ID.</p>
+										<p>Default is <code>0</code>.</p>
 									</td>
 								</tr>
 							</tbody>

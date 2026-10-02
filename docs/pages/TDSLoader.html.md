@@ -17,7 +17,7 @@ scene.add( object );
 
 ## Import
 
-TDSLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+TDSLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { TDSLoader } from 'three/addons/loaders/TDSLoader.js';

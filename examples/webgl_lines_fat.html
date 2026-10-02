@@ -4,6 +4,10 @@
 		<title>three.js webgl - lines - fat</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - lines - fat">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_lines_fat.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_lines_fat.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
@@ -35,6 +39,7 @@
 			import * as GeometryUtils from 'three/addons/utils/GeometryUtils.js';
 
 			let line, renderer, scene, camera, camera2, controls;
+			let cameraPerspective, cameraOrthographic;
 			let line1;
 			let matLine, matLineBasic, matLineDashed;
 			let gui;
@@ -42,6 +47,8 @@
 			// viewport
 			let insetWidth;
 			let insetHeight;
+
+			const frustumSize = 60;
 
 			init();
 
@@ -56,8 +63,15 @@
 
 				scene = new THREE.Scene();
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.set( - 40, 0, 60 );
+				const aspect = window.innerWidth / window.innerHeight;
+
+				cameraPerspective = new THREE.PerspectiveCamera( 40, aspect, 1, 1000 );
+				cameraPerspective.position.set( - 40, 0, 60 );
+
+				cameraOrthographic = new THREE.OrthographicCamera( - frustumSize * aspect / 2, frustumSize * aspect / 2, frustumSize / 2, - frustumSize / 2, 1, 1000 );
+				cameraOrthographic.position.copy( cameraPerspective.position );
+
+				camera = cameraPerspective;
 
 				camera2 = new THREE.PerspectiveCamera( 40, 1, 1, 1000 );
 				camera2.position.copy( camera.position );
@@ -141,8 +155,16 @@
 
 			function onWindowResize() {
 
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
+				const aspect = window.innerWidth / window.innerHeight;
+
+				cameraPerspective.aspect = aspect;
+				cameraPerspective.updateProjectionMatrix();
+
+				cameraOrthographic.left = - frustumSize * aspect / 2;
+				cameraOrthographic.right = frustumSize * aspect / 2;
+				cameraOrthographic.top = frustumSize / 2;
+				cameraOrthographic.bottom = - frustumSize / 2;
+				cameraOrthographic.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -194,6 +216,7 @@
 				gui = new GUI();
 
 				const param = {
+					'camera': 0,
 					'line type': 0,
 					'world units': false,
 					'width': 5,
@@ -202,6 +225,18 @@
 					'dash scale': 1,
 					'dash / gap': 1
 				};
+
+				gui.add( param, 'camera', { 'perspective': 0, 'orthographic': 1 } ).onChange( function ( val ) {
+
+					const previous = camera;
+
+					camera = ( val === 0 ) ? cameraPerspective : cameraOrthographic;
+					camera.position.copy( previous.position );
+					camera.quaternion.copy( previous.quaternion );
+
+					controls.object = camera;
+
+				} );
 
 				gui.add( param, 'line type', { 'LineGeometry': 0, 'gl.LINE': 1 } ).onChange( function ( val ) {
 
@@ -228,10 +263,21 @@
 				gui.add( param, 'world units' ).onChange( function ( val ) {
 
 					matLine.worldUnits = val;
+					matLine.needsUpdate = true;
+
+					if ( val ) {
+
+						widthController.name( 'width (world units)' ).min( 0.1 ).max( 0.5 ).setValue( 0.5 );
+
+					} else {
+
+						widthController.name( 'width (pixels)' ).min( 1 ).max( 10 ).setValue( 5 );
+
+					}
 
 				} );
 
-				gui.add( param, 'width', 1, 10 ).onChange( function ( val ) {
+				const widthController = gui.add( param, 'width', 1, 10 ).name( 'width (pixels)' ).onChange( function ( val ) {
 
 					matLine.linewidth = val;
 

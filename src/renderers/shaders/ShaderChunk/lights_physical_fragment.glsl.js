@@ -7,9 +7,25 @@ material.metalness = metalnessFactor;
 vec3 dxy = max( abs( dFdx( nonPerturbedNormal ) ), abs( dFdy( nonPerturbedNormal ) ) );
 float geometryRoughness = max( max( dxy.x, dxy.y ), dxy.z );
 
-material.roughness = max( roughnessFactor, 0.0525 );// 0.0525 corresponds to the base mip of a 256 cubemap.
+// Minimum roughness, so even a perfect mirror samples a prefiltered level of the environment map.
+// Matches Filament's desktop MIN_PERCEPTUAL_ROUGHNESS: https://github.com/google/filament/blob/main/shaders/src/surface_material.fs
+material.roughness = max( roughnessFactor, 0.045 );
 material.roughness += geometryRoughness;
 material.roughness = min( material.roughness, 1.0 );
+
+#ifdef USE_DIFFUSE_ROUGHNESS
+
+	float diffuseRoughnessFactor = diffuseRoughness;
+
+	#ifdef USE_DIFFUSE_ROUGHNESSMAP
+
+		diffuseRoughnessFactor *= texture2D( diffuseRoughnessMap, vDiffuseRoughnessMapUv ).r;
+
+	#endif
+
+	material.diffuseRoughness = saturate( diffuseRoughnessFactor );
+
+#endif
 
 #ifdef IOR
 
@@ -73,7 +89,7 @@ material.roughness = min( material.roughness, 1.0 );
 	#endif
 
 	material.clearcoat = saturate( material.clearcoat ); // Burley clearcoat model
-	material.clearcoatRoughness = max( material.clearcoatRoughness, 0.0525 );
+	material.clearcoatRoughness = max( material.clearcoatRoughness, 0.045 );
 	material.clearcoatRoughness += geometryRoughness;
 	material.clearcoatRoughness = min( material.clearcoatRoughness, 1.0 );
 
@@ -82,6 +98,12 @@ material.roughness = min( material.roughness, 1.0 );
 #ifdef USE_DISPERSION
 
 	material.dispersion = dispersion;
+
+#endif
+
+#ifdef USE_RETROREFLECTION
+
+	material.retroreflectivity = retroreflectivity;
 
 #endif
 

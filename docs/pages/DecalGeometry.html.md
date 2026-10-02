@@ -19,7 +19,7 @@ scene.add( mesh );
 
 ## Import
 
-DecalGeometry is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+DecalGeometry is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { DecalGeometry } from 'three/addons/geometries/DecalGeometry.js';

@@ -195,6 +195,19 @@ class BufferGeometry extends EventDispatcher {
 		 */
 		this.userData = {};
 
+		/**
+		 * `true` when the geometry has been transformed since construction
+		 * (e.g. via {@link BufferGeometry#applyMatrix4}). Only relevant for
+		 * geometry generators (subclasses that populate `parameters`): when set,
+		 * {@link BufferGeometry#toJSON} omits `parameters` since they no longer
+		 * describe the geometry.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._transformed = false;
+
 	}
 
 	/**
@@ -405,6 +418,8 @@ class BufferGeometry extends EventDispatcher {
 			this.computeBoundingSphere();
 
 		}
+
+		this._transformed = true;
 
 		return this;
 
@@ -841,15 +856,17 @@ class BufferGeometry extends EventDispatcher {
 		const normalAttribute = attributes.normal;
 		const uvAttribute = attributes.uv;
 
-		if ( this.hasAttribute( 'tangent' ) === false ) {
+		let tangentAttribute = this.getAttribute( 'tangent' );
 
-			this.setAttribute( 'tangent', new BufferAttribute( new Float32Array( 4 * positionAttribute.count ), 4 ) );
+		if ( tangentAttribute === undefined || tangentAttribute.count !== positionAttribute.count ) {
+
+			tangentAttribute = new BufferAttribute( new Float32Array( 4 * positionAttribute.count ), 4 );
+			this.setAttribute( 'tangent', tangentAttribute );
 
 		}
 
-		const tangentAttribute = this.getAttribute( 'tangent' );
-
 		const tan1 = [], tan2 = [];
+		const used = new Uint8Array( positionAttribute.count );
 
 		for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
@@ -870,6 +887,8 @@ class BufferGeometry extends EventDispatcher {
 			tdir = new Vector3();
 
 		function handleTriangle( a, b, c ) {
+
+			used[ a ] = used[ b ] = used[ c ] = 1;
 
 			vA.fromBufferAttribute( positionAttribute, a );
 			vB.fromBufferAttribute( positionAttribute, b );
@@ -959,22 +978,13 @@ class BufferGeometry extends EventDispatcher {
 
 		}
 
-		for ( let i = 0, il = groups.length; i < il; ++ i ) {
+		for ( let i = 0, il = positionAttribute.count; i < il; ++ i ) {
 
-			const group = groups[ i ];
-
-			const start = group.start;
-			const count = group.count;
-
-			for ( let j = start, jl = start + count; j < jl; j += 3 ) {
-
-				handleVertex( index.getX( j + 0 ) );
-				handleVertex( index.getX( j + 1 ) );
-				handleVertex( index.getX( j + 2 ) );
-
-			}
+			if ( used[ i ] ) handleVertex( i );
 
 		}
+
+		this._transformed = true;
 
 	}
 
@@ -993,7 +1003,7 @@ class BufferGeometry extends EventDispatcher {
 
 			let normalAttribute = this.getAttribute( 'normal' );
 
-			if ( normalAttribute === undefined ) {
+			if ( normalAttribute === undefined || normalAttribute.count !== positionAttribute.count ) {
 
 				normalAttribute = new BufferAttribute( new Float32Array( positionAttribute.count * 3 ), 3 );
 				this.setAttribute( 'normal', normalAttribute );
@@ -1222,11 +1232,11 @@ class BufferGeometry extends EventDispatcher {
 		// standard BufferGeometry serialization
 
 		data.uuid = this.uuid;
-		data.type = this.type;
-		if ( this.name !== '' ) data.name = this.name;
+		data.type = ( this.parameters !== undefined && this._transformed === true ) ? 'BufferGeometry' : this.type;
+		data.name = this.name;
 		if ( Object.keys( this.userData ).length > 0 ) data.userData = this.userData;
 
-		if ( this.parameters !== undefined ) {
+		if ( this.parameters !== undefined && this._transformed !== true ) {
 
 			const parameters = this.parameters;
 
@@ -1436,6 +1446,10 @@ class BufferGeometry extends EventDispatcher {
 		// user data
 
 		this.userData = source.userData;
+
+		// transformed flag
+
+		this._transformed = source._transformed;
 
 		return this;
 

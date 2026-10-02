@@ -9,6 +9,10 @@
 			name="viewport"
 			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
 		/>
+		<meta property="og:title" content="threejs webgl - materials - ground projected environment mapping" />
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://threejs.org/examples/webgl_materials_envmaps_groundprojected.html" />
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_materials_envmaps_groundprojected.jpg" />
 		<link type="text/css" rel="stylesheet" href="main.css" />
 	</head>
 	<body>
@@ -35,7 +39,7 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GroundedSkybox } from 'three/addons/objects/GroundedSkybox.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+			import { DRACOLoader, DRACO_GLTF_CONFIG } from 'three/addons/loaders/DRACOLoader.js';
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 			const params = {
@@ -72,7 +76,7 @@
 				scene.environment = envMap;
 
 				const dracoLoader = new DRACOLoader();
-				dracoLoader.setDecoderPath( 'jsm/libs/draco/gltf/' );
+				dracoLoader.setDecoderPath( DRACO_GLTF_CONFIG );
 
 				const loader = new GLTFLoader();
 				loader.setDRACOLoader( dracoLoader );

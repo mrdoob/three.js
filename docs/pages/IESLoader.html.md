@@ -17,7 +17,7 @@ spotLight.iesMap = texture;
 
 ## Import
 
-IESLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+IESLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { IESLoader } from 'three/addons/loaders/IESLoader.js';

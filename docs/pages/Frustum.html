@@ -142,6 +142,10 @@ frustum can safely be excluded from rendering.</p>
 					<div class="method">
 						<div class="description">
 							<p>Returns <code>true</code> if the given bounding box is intersecting this frustum.</p>
+<p>This is a fast, conservative test that favors performance over precision. It can
+report false positives for large boxes that lie outside the frustum but are not
+separated by a single frustum plane. It never reports false negatives, so it is
+safe for culling.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -185,6 +189,9 @@ frustum can safely be excluded from rendering.</p>
 					<div class="method">
 						<div class="description">
 							<p>Returns <code>true</code> if the given bounding sphere is intersecting this frustum.</p>
+<p>This is a fast, conservative test that favors performance over precision. It can
+report false positives for spheres that lie outside the frustum but are not separated
+by a single frustum plane. It never reports false negatives, so it is safe for culling.</p>
 						</div>
 						<table class="params">
 							<tbody>

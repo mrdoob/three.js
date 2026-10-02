@@ -72,6 +72,12 @@ class Animation {
 
 			this._requestId = this._context.requestAnimationFrame( update );
 
+			if ( this.renderer._inspector.isRunning ) {
+
+				this.renderer._inspector.finish();
+
+			}
+
 			if ( this.info.autoReset === true ) this.info.reset();
 
 			this.nodes.nodeFrame.update();
@@ -80,9 +86,11 @@ class Animation {
 
 			this.renderer._inspector.begin();
 
-			if ( this._animationLoop !== null ) this._animationLoop( time, xrFrame );
+			if ( this._animationLoop !== null ) {
 
-			this.renderer._inspector.finish();
+				this._animationLoop( time, xrFrame );
+
+			}
 
 		};
 
@@ -94,6 +102,8 @@ class Animation {
 	 * Stops the internal animation loop.
 	 */
 	stop() {
+
+		if ( this.renderer._inspector.isRunning ) this.renderer._inspector.finish();
 
 		if ( this._context !== null ) this._context.cancelAnimationFrame( this._requestId );
 

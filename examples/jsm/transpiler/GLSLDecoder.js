@@ -170,7 +170,7 @@ class Tokenizer {
 
 	skip( ...params ) {
 
-		let remainingCode = this.source.substr( this.position );
+		let remainingCode = this.source.slice( this.position );
 		let i = params.length;
 
 		while ( i -- ) {
@@ -182,7 +182,7 @@ class Tokenizer {
 
 				this.position += skipLength;
 
-				remainingCode = this.source.substr( this.position );
+				remainingCode = this.source.slice( this.position );
 
 				// re-skip, new remainingCode is generated
 				// maybe exist previous regexp non detected
@@ -278,6 +278,25 @@ class GLSLDecoder {
 	readToken() {
 
 		return this.tokens[ this.index ++ ];
+
+	}
+
+	getTokenPosition( token ) {
+
+		if ( ! token || token.pos === undefined || ! token.tokenizer || ! token.tokenizer.source ) {
+
+			return '';
+
+		}
+
+		const source = token.tokenizer.source;
+		const textBefore = source.slice( 0, token.pos );
+
+		const lines = textBefore.split( '\n' );
+		const lineNumber = lines.length;
+		const columnNumber = lines[ lines.length - 1 ].length + 1;
+
+		return ` (line ${ lineNumber }, column ${ columnNumber })`;
 
 	}
 
@@ -481,6 +500,14 @@ class GLSLDecoder {
 
 			return left;
 
+		} else if ( firstToken.str === '{' ) {
+
+			const internalTokens = tokens.slice( 1, tokens.length - 1 );
+
+			const paramsTokens = this.parseFunctionParametersFromTokens( internalTokens );
+
+			return new FunctionCall( 'array', paramsTokens );
+
 		}
 
 		// primitives and accessors
@@ -558,6 +585,20 @@ class GLSLDecoder {
 
 				} else if ( secondToken.str === '[' ) {
 
+					const bracketTokens = this.getTokensUntil( ']', tokens, 1 );
+					const parenToken = tokens[ 1 + bracketTokens.length ];
+
+					if ( parenToken && parenToken.str === '(' ) {
+
+						// array constructor: type[N](args...) or type[](args...)
+						const parenIndex = 1 + bracketTokens.length;
+						const internalTokens = this.getTokensUntil( ')', tokens, parenIndex ).slice( 1, - 1 );
+						const paramsTokens = this.parseFunctionParametersFromTokens( internalTokens );
+
+						return new FunctionCall( 'array', paramsTokens );
+
+					}
+
 					// array accessor
 
 					const elements = this.parseAccessorElementsFromTokens( tokens.slice( 1 ) );
@@ -571,6 +612,8 @@ class GLSLDecoder {
 			return new Accessor( firstToken.str );
 
 		}
+
+		throw new Error( 'THREE.GLSLDecoder: Unexpected token "' + firstToken.str + '"' + this.getTokenPosition( firstToken ) );
 
 	}
 
@@ -606,9 +649,7 @@ class GLSLDecoder {
 
 			} else {
 
-				console.error( 'Unknown accessor expression', token );
-
-				break;
+				throw new Error( 'THREE.GLSLDecoder: Unknown accessor expression token "' + token.str + '"' + this.getTokenPosition( token ) );
 
 			}
 
@@ -623,19 +664,26 @@ class GLSLDecoder {
 		if ( tokens.length === 0 ) return [];
 
 		const expression = this.parseExpressionFromTokens( tokens );
+
+		if ( ! expression ) {
+
+			throw new Error( 'THREE.GLSLDecoder: Invalid parameter expression' + this.getTokenPosition( tokens[ 0 ] ) );
+
+		}
+
 		const params = [];
 
 		let current = expression;
 
-		while ( current.type === ',' ) {
+		while ( current && current.type === ',' ) {
 
-			params.push( current.left );
+			if ( current.left ) params.push( current.left );
 
 			current = current.right;
 
 		}
 
-		params.push( current );
+		if ( current ) params.push( current );
 
 		return params;
 
@@ -677,7 +725,7 @@ class GLSLDecoder {
 
 			params.push( new FunctionParameter( type, name, qualifier, immutable ) );
 
-			if ( tokens[ i ] && tokens[ i ].str !== ',' ) throw new Error( 'Expected ","' );
+			if ( tokens[ i ] && tokens[ i ].str !== ',' ) throw new Error( 'THREE.GLSLDecoder: Expected ","' );
 
 		}
 
@@ -711,10 +759,19 @@ class GLSLDecoder {
 		type = type || tokens[ index ++ ].str;
 		const name = tokens[ index ++ ].str;
 
-		const token = tokens[ index ];
+		let token = tokens[ index ];
 
 		let init = null;
 		let next = null;
+
+		if ( token && token.str === '[' ) {
+
+			const bracketTokens = this.getTokensUntil( ']', tokens, index );
+
+			index += bracketTokens.length;
+			token = tokens[ index ];
+
+		}
 
 		if ( token ) {
 
@@ -789,7 +846,7 @@ class GLSLDecoder {
 
 		if ( tokens[ 2 ].str !== '{' ) {
 
-			throw new Error( 'Expected \'{\' after struct name ' );
+			throw new Error( 'THREE.GLSLDecoder: Expected \'{\' after struct name ' );
 
 		}
 
@@ -801,13 +858,13 @@ class GLSLDecoder {
 
 			if ( typeToken.type != 'literal' || nameToken.type != 'literal' ) {
 
-				throw new Error( 'Invalid struct declaration' );
+				throw new Error( 'THREE.GLSLDecoder: Invalid struct declaration' );
 
 			}
 
 			if ( tokens[ i + 2 ].str !== ';' ) {
 
-				throw new Error( 'Missing \';\' after struct member name' );
+				throw new Error( 'THREE.GLSLDecoder: Missing \';\' after struct member name' );
 
 			}
 
@@ -818,7 +875,7 @@ class GLSLDecoder {
 
 		if ( tokens[ tokens.length - 2 ].str !== '}' ) {
 
-			throw new Error( 'Missing closing \'}\' for struct ' + structName );
+			throw new Error( 'THREE.GLSLDecoder: Missing closing \'}\' for struct ' + structName );
 
 		}
 
@@ -861,6 +918,45 @@ class GLSLDecoder {
 		const statement = new While( condition, body );
 
 		return statement;
+
+	}
+
+	parseDoWhile() {
+
+		this.readToken(); // skip 'do'
+
+		let body;
+
+		if ( this.getToken().str === '{' ) {
+
+			body = this.parseBlock();
+
+		} else {
+
+			body = [ this.parseExpression() ];
+
+		}
+
+		if ( this.getToken() && this.getToken().str === 'while' ) {
+
+			this.readToken(); // skip 'while'
+
+		} else {
+
+			throw new Error( 'THREE.GLSLDecoder: Expected \'while\' after \'do\' block' + this.getTokenPosition( this.getToken() ) );
+
+		}
+
+		const condTokens = this.readTokensUntil( ')' );
+		const condition = this.parseExpressionFromTokens( condTokens.slice( 1, - 1 ) );
+
+		if ( this.getToken() && this.getToken().str === ';' ) {
+
+			this.readToken(); // skip trailing ';'
+
+		}
+
+		return new While( condition, body, true );
 
 	}
 
@@ -921,7 +1017,7 @@ class GLSLDecoder {
 		// Validate curly braces
 		if ( this.getToken().str !== '{' ) {
 
-			throw new Error( 'Expected \'{\' after switch(...) ' );
+			throw new Error( 'THREE.GLSLDecoder: Expected \'{\' after switch(...) ' );
 
 		}
 
@@ -1162,6 +1258,10 @@ class GLSLDecoder {
 
 					statement = this.parseWhile();
 
+				} else if ( token.str === 'do' ) {
+
+					statement = this.parseDoWhile();
+
 				} else if ( token.str === 'switch' ) {
 
 					statement = this.parseSwitch();
@@ -1190,7 +1290,398 @@ class GLSLDecoder {
 
 	}
 
+	evaluateCondition( expr, macros ) {
+
+		let str = expr;
+
+		str = str.replace( /defined\s*\(\s*(\w+)\s*\)/g, ( _, name ) => macros.has( name ) ? '1' : '0' );
+		str = str.replace( /defined\s+(\w+)/g, ( _, name ) => macros.has( name ) ? '1' : '0' );
+
+		str = str.replace( /\b([A-Za-z_]\w*)\b/g, ( _, name ) => {
+
+			if ( name === 'true' ) return '1';
+			if ( name === 'false' ) return '0';
+
+			if ( macros.has( name ) ) {
+
+				const macro = macros.get( name );
+				const val = macro.body;
+				return val !== '' ? val : '1';
+
+			}
+
+			return '0';
+
+		} );
+
+		try {
+
+			if ( /^[\d\s+\-*/%&|^!=<>~()]+$/.test( str ) ) {
+
+				return Boolean( Function( `"use strict"; return (${ str });` )() );
+
+			}
+
+		} catch ( e ) {
+
+			return false;
+
+		}
+
+		return false;
+
+	}
+
+	extractMacroArgs( str ) {
+
+		const args = [];
+		let currentArg = '';
+		let parenDepth = 0;
+
+		for ( let i = 0; i < str.length; i ++ ) {
+
+			const char = str[ i ];
+
+			if ( char === '(' || char === '[' || char === '{' ) {
+
+				parenDepth ++;
+				currentArg += char;
+
+			} else if ( char === ')' || char === ']' || char === '}' ) {
+
+				parenDepth --;
+				currentArg += char;
+
+			} else if ( char === ',' && parenDepth === 0 ) {
+
+				args.push( currentArg.trim() );
+				currentArg = '';
+
+			} else {
+
+				currentArg += char;
+
+			}
+
+		}
+
+		if ( currentArg.trim() !== '' || args.length > 0 ) {
+
+			args.push( currentArg.trim() );
+
+		}
+
+		return args;
+
+	}
+
+	expandMacros( line, macros ) {
+
+		if ( macros.size === 0 ) return line;
+
+		let result = line;
+		let passes = 0;
+		const maxPasses = 10;
+
+		while ( passes < maxPasses ) {
+
+			let changed = false;
+
+			for ( const [ name, macro ] of macros ) {
+
+				if ( macro.params !== null ) {
+
+					const regex = new RegExp( `\\b${ name }\\s*\\(`, 'g' );
+					let match;
+
+					while ( ( match = regex.exec( result ) ) !== null ) {
+
+						const startIdx = match.index;
+						const parenStartIdx = startIdx + match[ 0 ].length - 1;
+
+						let parenDepth = 1;
+						let parenEndIdx = - 1;
+
+						for ( let i = parenStartIdx + 1; i < result.length; i ++ ) {
+
+							if ( result[ i ] === '(' ) parenDepth ++;
+							else if ( result[ i ] === ')' ) parenDepth --;
+
+							if ( parenDepth === 0 ) {
+
+								parenEndIdx = i;
+								break;
+
+							}
+
+						}
+
+						if ( parenEndIdx !== - 1 ) {
+
+							const rawArgs = result.slice( parenStartIdx + 1, parenEndIdx );
+							const args = this.extractMacroArgs( rawArgs );
+
+							let substitutedBody = macro.body;
+
+							for ( let p = 0; p < macro.params.length; p ++ ) {
+
+								const paramName = macro.params[ p ];
+								const argVal = args[ p ] !== undefined ? args[ p ] : '';
+								const paramRegex = new RegExp( `\\b${ paramName }\\b`, 'g' );
+
+								substitutedBody = substitutedBody.replace( paramRegex, argVal );
+
+							}
+
+							result = result.slice( 0, startIdx ) + substitutedBody + result.slice( parenEndIdx + 1 );
+							changed = true;
+
+							break;
+
+						}
+
+					}
+
+				} else {
+
+					if ( macro.body === '' ) continue;
+
+					const regex = new RegExp( `\\b${ name }\\b`, 'g' );
+
+					if ( regex.test( result ) ) {
+
+						result = result.replace( regex, macro.body );
+						changed = true;
+
+					}
+
+				}
+
+			}
+
+			if ( ! changed ) break;
+
+			passes ++;
+
+		}
+
+		return result;
+
+	}
+
+	preprocess( source ) {
+
+		const macros = new Map();
+		const conditionalStack = [];
+
+		const isExecuting = () => conditionalStack.every( frame => frame.active );
+
+		const lines = source.split( '\n' );
+		const outputLines = [];
+
+		let inBlockComment = false;
+
+		for ( let i = 0; i < lines.length; i ++ ) {
+
+			let line = lines[ i ];
+
+			while ( line.endsWith( '\\' ) && i + 1 < lines.length ) {
+
+				line = line.slice( 0, - 1 ) + ' ' + lines[ i + 1 ];
+				i ++;
+				outputLines.push( '' );
+
+			}
+
+			let trimmedLine = line.trim();
+
+			if ( inBlockComment ) {
+
+				const endCommentIndex = trimmedLine.indexOf( '*/' );
+
+				if ( endCommentIndex !== - 1 ) {
+
+					inBlockComment = false;
+					trimmedLine = trimmedLine.slice( endCommentIndex + 2 ).trim();
+
+				} else {
+
+					outputLines.push( line );
+					continue;
+
+				}
+
+			}
+
+			if ( trimmedLine.startsWith( '/*' ) ) {
+
+				const endCommentIndex = trimmedLine.indexOf( '*/', 2 );
+
+				if ( endCommentIndex === - 1 ) {
+
+					inBlockComment = true;
+					outputLines.push( line );
+					continue;
+
+				}
+
+			}
+
+			const directiveMatch = trimmedLine.match( /^#\s*(\w+)(?:\s+(.*))?$/ );
+
+			if ( directiveMatch ) {
+
+				const directive = directiveMatch[ 1 ];
+				let args = directiveMatch[ 2 ] || '';
+
+				args = args.replace( /\/\/.*$/, '' ).replace( /\/\*.*?\*\//g, '' ).trim();
+
+				if ( directive === 'define' ) {
+
+					if ( isExecuting() ) {
+
+						const fnMatch = args.match( /^(\w+)\((.*?)\)\s*(.*)$/ );
+
+						if ( fnMatch ) {
+
+							const name = fnMatch[ 1 ];
+							const params = fnMatch[ 2 ].split( ',' ).map( p => p.trim() ).filter( p => p !== '' );
+							const body = fnMatch[ 3 ] !== undefined ? fnMatch[ 3 ].trim() : '';
+
+							macros.set( name, { params, body } );
+
+						} else {
+
+							const objMatch = args.match( /^(\w+)(?:\s+(.*))?$/ );
+
+							if ( objMatch ) {
+
+								const name = objMatch[ 1 ];
+								const value = objMatch[ 2 ] !== undefined ? objMatch[ 2 ].trim() : '';
+
+								macros.set( name, { params: null, body: value } );
+
+							}
+
+						}
+
+					}
+
+				} else if ( directive === 'undef' ) {
+
+					if ( isExecuting() ) {
+
+						const name = args.trim();
+
+						macros.delete( name );
+
+					}
+
+				} else if ( directive === 'ifdef' ) {
+
+					const name = args.trim();
+					const parentActive = isExecuting();
+					const condition = parentActive && macros.has( name );
+
+					conditionalStack.push( { active: condition, anyBranchExecuted: condition } );
+
+				} else if ( directive === 'ifndef' ) {
+
+					const name = args.trim();
+					const parentActive = isExecuting();
+					const condition = parentActive && ! macros.has( name );
+
+					conditionalStack.push( { active: condition, anyBranchExecuted: condition } );
+
+				} else if ( directive === 'if' ) {
+
+					const parentActive = isExecuting();
+					const condition = parentActive && this.evaluateCondition( args, macros );
+
+					conditionalStack.push( { active: Boolean( condition ), anyBranchExecuted: Boolean( condition ) } );
+
+				} else if ( directive === 'elif' ) {
+
+					if ( conditionalStack.length > 0 ) {
+
+						const currentFrame = conditionalStack[ conditionalStack.length - 1 ];
+						const parentActive = conditionalStack.slice( 0, - 1 ).every( frame => frame.active );
+
+						if ( ! parentActive || currentFrame.anyBranchExecuted ) {
+
+							currentFrame.active = false;
+
+						} else {
+
+							const condition = this.evaluateCondition( args, macros );
+
+							currentFrame.active = Boolean( condition );
+
+							if ( condition ) {
+
+								currentFrame.anyBranchExecuted = true;
+
+							}
+
+						}
+
+					}
+
+				} else if ( directive === 'else' ) {
+
+					if ( conditionalStack.length > 0 ) {
+
+						const currentFrame = conditionalStack[ conditionalStack.length - 1 ];
+						const parentActive = conditionalStack.slice( 0, - 1 ).every( frame => frame.active );
+
+						if ( ! parentActive || currentFrame.anyBranchExecuted ) {
+
+							currentFrame.active = false;
+
+						} else {
+
+							currentFrame.active = true;
+							currentFrame.anyBranchExecuted = true;
+
+						}
+
+					}
+
+				} else if ( directive === 'endif' ) {
+
+					if ( conditionalStack.length > 0 ) {
+
+						conditionalStack.pop();
+
+					}
+
+				}
+
+				outputLines.push( '' );
+
+			} else {
+
+				if ( isExecuting() ) {
+
+					outputLines.push( this.expandMacros( line, macros ) );
+
+				} else {
+
+					outputLines.push( '' );
+
+				}
+
+			}
+
+		}
+
+		return outputLines.join( '\n' );
+
+	}
+
 	parse( source ) {
+
+		source = this.preprocess( source );
 
 		let polyfill = '';
 
@@ -1219,7 +1710,6 @@ class GLSLDecoder {
 		program.structTypes = this.structTypes;
 
 		return program;
-
 
 	}
 

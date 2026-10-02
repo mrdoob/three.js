@@ -364,6 +364,20 @@ Frees the GPU-related resources allocated by this instance. Call this method whe
 
 *   [Material#event:dispose](Material.html#event:dispose)
 
+### .fromJSON( json : Object, textures : Object.<string, Texture> ) : Material
+
+Deserializes the material from the given JSON.
+
+**json**
+
+The JSON holding the serialized material.
+
+**textures**
+
+A dictionary holding textures referenced by the material.
+
+**Returns:** A reference to this material.
+
 ### .onBeforeCompile( shaderobject : Object, renderer : WebGLRenderer )
 
 An optional callback that is executed immediately before the shader program is compiled. This function is called with the shader source code as a parameter. Useful for the modification of built-in materials.

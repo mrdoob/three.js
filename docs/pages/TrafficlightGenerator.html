@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>TrafficlightGenerator - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">TrafficlightGenerator</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A NYC traffic signal: a round pole at the curb with a horizontal mast arm
+reaching out over the roadway to a vertical three-section signal head, plus a
+pedestrian-signal box on the pole. Built once and instanced across a list of
+placements, dressed with one cheap material that branches on a baked <code>partId</code>
+( dark metal, three coloured lenses ).</p>
+<p>The canonical model stands on <code>y = 0</code>, centred in X / Z, with the arm reaching
+toward <code>+Z</code>, so a placement whose local <code>+Z</code> faces the road throws the head
+over it with its lenses aimed back at oncoming traffic.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const lights = new TrafficlightGenerator();
+scene.add( lights.build( placements ) ); // placements: Matrix4[]
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="TrafficlightGenerator" translate="no">new <a href="#TrafficlightGenerator">TrafficlightGenerator</a><span class="signature">()</span> </h3>
+					<div class="method">
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/generators/city/TrafficlightGenerator.js" translate="no" target="_blank" rel="noopener">examples/jsm/generators/city/TrafficlightGenerator.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

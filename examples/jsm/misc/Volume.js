@@ -122,7 +122,7 @@ class Volume {
 				case 'unsigned long long int' :
 				case 'uint64' :
 				case 'uint64_t' :
-					throw new Error( 'Error in Volume constructor : this type is not supported in JavaScript' );
+					throw new Error( 'THREE.Volume: type is not supported in JavaScript.' );
 				case 'Float32' :
 				case 'float32' :
 				case 'float' :
@@ -140,7 +140,7 @@ class Volume {
 
 			if ( this.data.length !== this.xLength * this.yLength * this.zLength ) {
 
-				throw new Error( 'Error in Volume constructor, lengths are not matching arrayBuffer size' );
+				throw new Error( 'THREE.Volume: lengths are not matching arrayBuffer size.' );
 
 			}
 

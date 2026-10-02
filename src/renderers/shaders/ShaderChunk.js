@@ -22,7 +22,6 @@ import color_pars_fragment from './ShaderChunk/color_pars_fragment.glsl.js';
 import color_pars_vertex from './ShaderChunk/color_pars_vertex.glsl.js';
 import color_vertex from './ShaderChunk/color_vertex.glsl.js';
 import common from './ShaderChunk/common.glsl.js';
-import cube_uv_reflection_fragment from './ShaderChunk/cube_uv_reflection_fragment.glsl.js';
 import defaultnormal_vertex from './ShaderChunk/defaultnormal_vertex.glsl.js';
 import displacementmap_pars_vertex from './ShaderChunk/displacementmap_pars_vertex.glsl.js';
 import displacementmap_vertex from './ShaderChunk/displacementmap_vertex.glsl.js';
@@ -54,6 +53,7 @@ import lights_physical_pars_fragment from './ShaderChunk/lights_physical_pars_fr
 import lights_fragment_begin from './ShaderChunk/lights_fragment_begin.glsl.js';
 import lights_fragment_maps from './ShaderChunk/lights_fragment_maps.glsl.js';
 import lights_fragment_end from './ShaderChunk/lights_fragment_end.glsl.js';
+import lightprobes_pars_fragment from './ShaderChunk/lightprobes_pars_fragment.glsl.js';
 import logdepthbuf_fragment from './ShaderChunk/logdepthbuf_fragment.glsl.js';
 import logdepthbuf_pars_fragment from './ShaderChunk/logdepthbuf_pars_fragment.glsl.js';
 import logdepthbuf_pars_vertex from './ShaderChunk/logdepthbuf_pars_vertex.glsl.js';
@@ -149,7 +149,6 @@ export const ShaderChunk = {
 	color_pars_vertex: color_pars_vertex,
 	color_vertex: color_vertex,
 	common: common,
-	cube_uv_reflection_fragment: cube_uv_reflection_fragment,
 	defaultnormal_vertex: defaultnormal_vertex,
 	displacementmap_pars_vertex: displacementmap_pars_vertex,
 	displacementmap_vertex: displacementmap_vertex,
@@ -181,6 +180,7 @@ export const ShaderChunk = {
 	lights_fragment_begin: lights_fragment_begin,
 	lights_fragment_maps: lights_fragment_maps,
 	lights_fragment_end: lights_fragment_end,
+	lightprobes_pars_fragment: lightprobes_pars_fragment,
 	logdepthbuf_fragment: logdepthbuf_fragment,
 	logdepthbuf_pars_fragment: logdepthbuf_pars_fragment,
 	logdepthbuf_pars_vertex: logdepthbuf_pars_vertex,

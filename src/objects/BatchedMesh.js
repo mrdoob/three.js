@@ -177,6 +177,10 @@ function copyArrayContents( src, target ) {
  * scene.add( batchedMesh );
  * ```
  *
+ * The first geometry added defines the layout of the batch. All subsequent geometries must
+ * match its index usage and provide its attributes with the same itemSize and normalized
+ * values. Additional attributes are ignored.
+ *
  * @augments Mesh
  */
 class BatchedMesh extends Mesh {
@@ -272,7 +276,7 @@ class BatchedMesh extends Mesh {
 		this._multiDrawCounts = new Int32Array( maxInstanceCount );
 		this._multiDrawStarts = new Int32Array( maxInstanceCount );
 		this._multiDrawCount = 0;
-		this._multiDrawInstances = null;
+		this._multiDrawBytesPerElement = 1;
 
 		// Local matrix per geometry by using data texture
 		this._matricesTexture = null;
@@ -437,7 +441,7 @@ class BatchedMesh extends Mesh {
 			const dstAttribute = batchGeometry.getAttribute( attributeName );
 			if ( srcAttribute.itemSize !== dstAttribute.itemSize || srcAttribute.normalized !== dstAttribute.normalized ) {
 
-				throw new Error( 'THREE.BatchedMesh: All attributes must have a consistent itemSize and normalized value.' );
+				throw new Error( `THREE.BatchedMesh: Added geometry attribute "${ attributeName }" has an inconsistent itemSize or normalized value.` );
 
 			}
 
@@ -494,7 +498,7 @@ class BatchedMesh extends Mesh {
 	/**
 	 * Computes the bounding box, updating {@link BatchedMesh#boundingBox}.
 	 * Bounding boxes aren't computed by default. They need to be explicitly computed,
-	 * otherwise they are `null`.
+	 * otherwise they are `null`. Must be recomputed when instances change.
 	 */
 	computeBoundingBox() {
 
@@ -523,8 +527,8 @@ class BatchedMesh extends Mesh {
 
 	/**
 	 * Computes the bounding sphere, updating {@link BatchedMesh#boundingSphere}.
-	 * Bounding spheres aren't computed by default. They need to be explicitly computed,
-	 * otherwise they are `null`.
+	 * The engine computes the bounding sphere once when it is needed. Must be
+	 * recomputed when instances change.
 	 */
 	computeBoundingSphere() {
 
@@ -1204,6 +1208,7 @@ class BatchedMesh extends Mesh {
 		this.validateGeometryId( geometryId );
 
 		this._instanceInfo[ instanceId ].geometryIndex = geometryId;
+		this._visibilityChanged = true;
 
 		return this;
 
@@ -1278,7 +1283,7 @@ class BatchedMesh extends Mesh {
 		// throw an error if it can't be shrunk to the desired size
 		if ( maxInstanceCount < instanceInfo.length ) {
 
-			throw new Error( `BatchedMesh: Instance ids outside the range ${ maxInstanceCount } are being used. Cannot shrink instance count.` );
+			throw new Error( `THREE.BatchedMesh: Instance ids outside the range ${ maxInstanceCount } are being used. Cannot shrink instance count.` );
 
 		}
 
@@ -1330,7 +1335,7 @@ class BatchedMesh extends Mesh {
 		const requiredVertexLength = Math.max( ...validRanges.map( range => range.vertexStart + range.reservedVertexCount ) );
 		if ( requiredVertexLength > maxVertexCount ) {
 
-			throw new Error( `BatchedMesh: Geometry vertex values are being used outside the range ${ maxIndexCount }. Cannot shrink further.` );
+			throw new Error( `THREE.BatchedMesh: Geometry vertex values are being used outside the range ${ maxIndexCount }. Cannot shrink further.` );
 
 		}
 
@@ -1340,7 +1345,7 @@ class BatchedMesh extends Mesh {
 			const requiredIndexLength = Math.max( ...validRanges.map( range => range.indexStart + range.reservedIndexCount ) );
 			if ( requiredIndexLength > maxIndexCount ) {
 
-				throw new Error( `BatchedMesh: Geometry index values are being used outside the range ${ maxIndexCount }. Cannot shrink further.` );
+				throw new Error( `THREE.BatchedMesh: Geometry index values are being used outside the range ${ maxIndexCount }. Cannot shrink further.` );
 
 			}
 
@@ -1474,6 +1479,7 @@ class BatchedMesh extends Mesh {
 		this._geometryInitialized = source._geometryInitialized;
 		this._multiDrawCounts = source._multiDrawCounts.slice();
 		this._multiDrawStarts = source._multiDrawStarts.slice();
+		this._multiDrawBytesPerElement = source._multiDrawBytesPerElement;
 
 		this._indirectTexture = source._indirectTexture.clone();
 		this._indirectTexture.image.data = this._indirectTexture.image.data.slice();
@@ -1481,10 +1487,14 @@ class BatchedMesh extends Mesh {
 		this._matricesTexture = source._matricesTexture.clone();
 		this._matricesTexture.image.data = this._matricesTexture.image.data.slice();
 
-		if ( this._colorsTexture !== null ) {
+		if ( source._colorsTexture !== null ) {
 
 			this._colorsTexture = source._colorsTexture.clone();
 			this._colorsTexture.image.data = this._colorsTexture.image.data.slice();
+
+		} else {
+
+			this._colorsTexture = null;
 
 		}
 
@@ -1497,6 +1507,8 @@ class BatchedMesh extends Mesh {
 	 * method whenever this instance is no longer used in your app.
 	 */
 	dispose() {
+
+		super.dispose();
 
 		// Assuming the geometry is not shared with other meshes
 		this.geometry.dispose();
@@ -1553,17 +1565,25 @@ class BatchedMesh extends Mesh {
 
 		const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
 		// prepare the frustum in the local frame
-		if ( perObjectFrustumCulled && ! camera.isArrayCamera ) {
+		if ( perObjectFrustumCulled ) {
 
-			_matrix
-				.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse )
-				.multiply( this.matrixWorld );
+			if ( camera.isArrayCamera ) {
 
-			_frustum.setFromProjectionMatrix(
-				_matrix,
-				camera.coordinateSystem,
-				camera.reversedDepth
-			);
+				frustum.setFromArrayCamera( camera );
+
+			} else {
+
+				_matrix
+					.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse )
+					.multiply( this.matrixWorld );
+
+				frustum.setFromProjectionMatrix(
+					_matrix,
+					camera.coordinateSystem,
+					camera.reversedDepth
+				);
+
+			}
 
 		}
 
@@ -1589,7 +1609,7 @@ class BatchedMesh extends Mesh {
 					let culled = false;
 					if ( perObjectFrustumCulled ) {
 
-						culled = ! frustum.intersectsSphere( _sphere, camera );
+						culled = ! frustum.intersectsSphere( _sphere );
 
 					}
 
@@ -1646,7 +1666,7 @@ class BatchedMesh extends Mesh {
 						// get the bounds in world space
 						this.getMatrixAt( i, _matrix );
 						this.getBoundingSphereAt( geometryId, _sphere ).applyMatrix4( _matrix );
-						culled = ! frustum.intersectsSphere( _sphere, camera );
+						culled = ! frustum.intersectsSphere( _sphere );
 
 					}
 
@@ -1668,6 +1688,7 @@ class BatchedMesh extends Mesh {
 
 		indirectTexture.needsUpdate = true;
 		this._multiDrawCount = multiDrawCount;
+		this._multiDrawBytesPerElement = bytesPerElement;
 		this._visibilityChanged = false;
 
 	}

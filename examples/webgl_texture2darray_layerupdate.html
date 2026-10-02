@@ -4,6 +4,10 @@
 		<title>three.js webgl - texture array layer update</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - texture array layer update">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_texture2darray_layerupdate.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_texture2darray_layerupdate.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<script id="vs" type="x-shader/x-vertex">
@@ -94,7 +98,6 @@
 				// Configure the KTX2 loader.
 
 				const ktx2Loader = new KTX2Loader();
-				ktx2Loader.setTranscoderPath( 'jsm/libs/basis/' );
 				ktx2Loader.detectSupport( renderer );
 
 				// Load several KTX2 textures which will later be used to modify

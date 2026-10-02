@@ -41,7 +41,7 @@ function Storage() {
 
 			request.onerror = function ( event ) {
 
-				console.error( 'IndexedDB', event );
+				console.error( 'Storage: IndexedDB', event );
 
 			};
 
@@ -50,12 +50,37 @@ function Storage() {
 
 		get: function ( callback ) {
 
+			const retrievalStart = performance.now();
+
 			const transaction = database.transaction( [ 'states' ], 'readonly' );
 			const objectStore = transaction.objectStore( 'states' );
+
+			transaction.onerror = function ( event ) {
+
+				console.error( 'Storage: IndexedDB get failed:', event.target.error );
+
+			};
+
 			const request = objectStore.get( 0 );
 			request.onsuccess = function ( event ) {
 
+				const retrievalDuration = performance.now() - retrievalStart;
+
+				const hydrationStart = performance.now();
+
 				callback( event.target.result );
+
+				const hydrationDuration = performance.now() - hydrationStart;
+
+				const restorationDuration = retrievalDuration + hydrationDuration;
+
+				console.log(
+
+					'[' + /\d\d\:\d\d\:\d\d/.exec( new Date() )[ 0 ] + ']',
+
+					`Restored state. ${ restorationDuration.toFixed( 2 ) } ms. ( Retrieval: ${ retrievalDuration.toFixed( 2 ) } ms, Hydration: ${ hydrationDuration.toFixed( 2 ) } ms )`
+
+				);
 
 			};
 
@@ -67,12 +92,20 @@ function Storage() {
 
 			const transaction = database.transaction( [ 'states' ], 'readwrite' );
 			const objectStore = transaction.objectStore( 'states' );
-			const request = objectStore.put( data, 0 );
-			request.onsuccess = function () {
+
+			transaction.oncomplete = function () {
 
 				console.log( '[' + /\d\d\:\d\d\:\d\d/.exec( new Date() )[ 0 ] + ']', 'Saved state to IndexedDB. ' + ( performance.now() - start ).toFixed( 2 ) + 'ms' );
 
 			};
+
+			transaction.onerror = function ( event ) {
+
+				console.error( 'Storage: IndexedDB put failed:', event.target.error );
+
+			};
+
+			objectStore.put( data, 0 );
 
 		},
 
@@ -82,12 +115,20 @@ function Storage() {
 
 			const transaction = database.transaction( [ 'states' ], 'readwrite' );
 			const objectStore = transaction.objectStore( 'states' );
-			const request = objectStore.clear();
-			request.onsuccess = function () {
+
+			transaction.oncomplete = function () {
 
 				console.log( '[' + /\d\d\:\d\d\:\d\d/.exec( new Date() )[ 0 ] + ']', 'Cleared IndexedDB.' );
 
 			};
+
+			transaction.onerror = function ( event ) {
+
+				console.error( 'Storage: IndexedDB clear failed:', event.target.error );
+
+			};
+
+			objectStore.clear();
 
 		}
 

@@ -121,7 +121,7 @@ class Line3 {
 	 *
 	 * @param {number} t - A value between `[0,1]` to represent a position along the line segment.
 	 * @param {Vector3} target - The target vector that is used to store the method's result.
-	 * @return {Vector3} The delta vector.
+	 * @return {Vector3} The point along the line segment.
 	 */
 	at( t, target ) {
 
@@ -142,6 +142,9 @@ class Line3 {
 		_startEnd.subVectors( this.end, this.start );
 
 		const startEnd2 = _startEnd.dot( _startEnd );
+
+		if ( startEnd2 === 0 ) return 0;
+
 		const startEnd_startP = _startEnd.dot( _startP );
 
 		let t = startEnd_startP / startEnd2;
@@ -213,9 +216,7 @@ class Line3 {
 			c1.copy( p1 );
 			c2.copy( p2 );
 
-			c1.sub( c2 );
-
-			return c1.dot( c1 );
+			return c1.distanceToSquared( c2 );
 
 		}
 

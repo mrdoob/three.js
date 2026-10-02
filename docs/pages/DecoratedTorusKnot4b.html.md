@@ -6,7 +6,7 @@ A Decorated Torus Knot 4b.
 
 ## Import
 
-DecoratedTorusKnot4b is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+DecoratedTorusKnot4b is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { DecoratedTorusKnot4b } from 'three/addons/curves/CurveExtras.js';

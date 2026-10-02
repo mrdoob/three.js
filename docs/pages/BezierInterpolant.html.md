@@ -6,10 +6,7 @@ A Bezier interpolant using cubic Bezier curves with 2D control points.
 
 This interpolant supports the COLLADA/Maya style of Bezier animation where each keyframe has explicit in/out tangent control points specified as 2D coordinates (time, value).
 
-The tangent data must be provided via the `settings` object:
-
-*   `settings.inTangents`: Float32Array with \[time, value\] pairs per keyframe per component
-*   `settings.outTangents`: Float32Array with \[time, value\] pairs per keyframe per component
+Tangent data is read from `inTangents` and `outTangents` on the interpolant (populated by `KeyframeTrack.InterpolantFactoryMethodBezier`).
 
 For a track with N keyframes and stride S:
 

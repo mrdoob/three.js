@@ -38,6 +38,18 @@ Default is `{}`.
 
 ## Methods
 
+### .generateNodeType( builder : NodeBuilder ) : string
+
+Returns the type of this function call node.
+
+**builder**
+
+The current node builder.
+
+**Overrides:** [TempNode#generateNodeType](TempNode.html#generateNodeType)
+
+**Returns:** The type of this node.
+
 ### .getMemberType( builder : NodeBuilder, name : string ) : string
 
 Returns the function node of this function call node.
@@ -53,18 +65,6 @@ The name of the member.
 **Overrides:** [TempNode#getMemberType](TempNode.html#getMemberType)
 
 **Returns:** The type of the member.
-
-### .getNodeType( builder : NodeBuilder ) : string
-
-Returns the type of this function call node.
-
-**builder**
-
-The current node builder.
-
-**Overrides:** [TempNode#getNodeType](TempNode.html#getNodeType)
-
-**Returns:** The type of this node.
 
 ### .getParameters() : Object.<string, Node>
 

@@ -22,7 +22,6 @@ Either variation may be used with `DRACOLoader`:
 ```js
 var dracoLoader = new DRACOLoader();
 dracoLoader.setDecoderPath('path/to/decoders/');
-dracoLoader.setDecoderConfig({type: 'js'}); // (Optional) Override detection of WASM support.
 ```
 
 Further [documentation on GitHub](https://github.com/google/draco/tree/master/javascript/example#static-loading-javascript-decoder).

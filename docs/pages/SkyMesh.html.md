@@ -11,17 +11,25 @@ More references:
 *   [http://simonwallner.at/project/atmospheric-scattering/](http://simonwallner.at/project/atmospheric-scattering/)
 *   [http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR](http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR)
 
-## Code Example
-
 ```js
 const sky = new SkyMesh();
 sky.scale.setScalar( 10000 );
 scene.add( sky );
 ```
 
+It can be useful to hide the sun disc when generating an environment map to avoid artifacts
+
+```js
+// disable before rendering environment map
+sky.showSunDisc.value = false;
+// ...
+// re-enable before scene sky box rendering
+sky.showSunDisc.value = true;
+```
+
 ## Import
 
-SkyMesh is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+SkyMesh is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
@@ -81,6 +89,10 @@ The mieDirectionalG uniform.
 
 The rayleigh uniform.
 
+### .showSunDisc : UniformNode.<float>
+
+Whether to render the solar disc.
+
 ### .sunPosition : UniformNode.<vec3>
 
 The sun position uniform.
@@ -88,10 +100,6 @@ The sun position uniform.
 ### .turbidity : UniformNode.<float>
 
 The turbidity uniform.
-
-### .upUniform : UniformNode.<vec3>
-
-The up position.
 
 ## Source
 

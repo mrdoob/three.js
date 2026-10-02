@@ -30,7 +30,7 @@ The node which type should be converted.
 
 ## Methods
 
-### .getNodeType( builder : NodeBuilder ) : string
+### .generateNodeType( builder : NodeBuilder ) : string
 
 This method is overwritten since the implementation tries to infer the best matching type from the [ConvertNode#convertTo](ConvertNode.html#convertTo) property.
 
@@ -38,7 +38,7 @@ This method is overwritten since the implementation tries to infer the best matc
 
 The current node builder.
 
-**Overrides:** [Node#getNodeType](Node.html#getNodeType)
+**Overrides:** [Node#generateNodeType](Node.html#generateNodeType)
 
 **Returns:** The node type.
 

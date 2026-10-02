@@ -73,7 +73,7 @@ The current color space of the renderer. When not producing screen output, the c
 
 The current number of samples used for multi-sample anti-aliasing (MSAA).
 
-When rendering to a custom render target, the number of samples of that render target is used. If the renderer needs an internal framebuffer target for tone mapping or color space conversion, the number of samples is set to 0.
+When rendering to a custom render target, the number of samples of that render target is used. The number of samples is set to 0 when the renderer needs an internal framebuffer target for tone mapping or color space conversion, or when rendering a fullscreen quad to screen.
 
 ### .currentToneMapping : number
 
@@ -139,13 +139,17 @@ Whether logarithmic depth buffer is enabled or not.
 
 Default is `false`.
 
-### .needsFrameBufferTarget
+### .needsFrameBufferTarget : boolean
 
 Returns `true` if a framebuffer target is needed to perform tone mapping or color space conversion. If this is the case, the renderer allocates an internal render target for that purpose.
 
 ### .onDeviceLost : function
 
 A callback function that defines what should happen when a device/context lost occurs.
+
+### .onError : function
+
+A callback function that defines what should happen when an uncaptured backend error is reported (e.g. a WebGPU validation/out-of-memory/internal error raised outside an error scope). Applications can override this to surface errors in their own UI without letting them escalate to a device loss. The default implementation logs to the console.
 
 ### .opaque : boolean
 
@@ -297,7 +301,7 @@ Async version of [Renderer#clearStencil](Renderer.html#clearStencil).
 
 **Returns:** A Promise that resolves when the clear operation has been executed.
 
-### .compile( scene : Object3D, camera : Camera, targetScene : Scene ) : function
+### .compile( scene : Object3D, camera : Camera, targetScene : Scene, onProgress : onProgressCallback ) : function
 
 Alias for `compileAsync()`.
 
@@ -313,9 +317,13 @@ The camera that is used to render the scene.
 
 If the first argument is a 3D object, this parameter must represent the scene the 3D object is going to be added.
 
+**onProgress**
+
+Executed while the compilation is in progress.
+
 **Returns:** A Promise that resolves when the compile has been finished.
 
-### .compileAsync( scene : Object3D, camera : Camera, targetScene : Scene ) : Promise (async)
+### .compileAsync( scene : Object3D, camera : Camera, targetScene : Scene, onProgress : onProgressCallback ) : Promise (async)
 
 Compiles all materials in the given scene. This can be useful to avoid a phenomenon which is called "shader compilation stutter", which occurs when rendering an object with a new shader for the first time.
 
@@ -332,6 +340,28 @@ The camera that is used to render the scene.
 **targetScene**
 
 If the first argument is a 3D object, this parameter must represent the scene the 3D object is going to be added.
+
+Default is `null`.
+
+**onProgress**
+
+Executed while the compilation is in progress.
+
+Default is `null`.
+
+**Returns:** A Promise that resolves when the compile has been finished.
+
+### .compileComputeAsync( computeNodes : Node | Array.<Node>, onProgress : onProgressCallback ) : Promise (async)
+
+Compile compute programs. This can be useful to avoid a phenomenon which is called "shader compilation stutter", which occurs when rendering an object with a new shader for the first time.
+
+**computeNodes**
+
+The compute node(s).
+
+**onProgress**
+
+Executed while the compilation is in progress.
 
 Default is `null`.
 
@@ -423,7 +453,7 @@ The destination mip level to copy to.
 
 Default is `0`.
 
-### .dispose()
+### .dispose() (async)
 
 Frees all internal resources of the renderer. Call this method if the renderer is no longer in use by your app.
 
@@ -445,13 +475,29 @@ Returns the current animation loop callback.
 
 **Returns:** The current animation loop callback.
 
-### .getArrayBufferAsync( attribute : StorageBufferAttribute ) : Promise.<ArrayBuffer> (async)
+### .getArrayBufferAsync( attribute : BufferAttribute, target : ReadbackBuffer | ArrayBuffer, offset : number, count : number ) : Promise.<(ArrayBuffer|ReadbackBuffer)> (async)
 
 Can be used to transfer buffer data from a storage buffer attribute from the GPU to the CPU in context of compute shaders.
 
 **attribute**
 
+The storage buffer attribute to read frm.
+
+**target**
+
 The storage buffer attribute.
+
+Default is `null`.
+
+**offset**
+
+The storage buffer attribute.
+
+Default is `0`.
+
+**count**
+
+The offset from which to start reading the
 
 **Returns:** A promise that resolves with the buffer data when the data are ready.
 
@@ -593,7 +639,7 @@ The method writes the result in this target object.
 
 ### .hasCompatibility( name : string ) : boolean
 
-Checks if the given compatibility is supported by the selected backend. If the renderer has not been initialized, this method always returns `false`.
+Checks if the given compatibility is supported by the selected backend.
 
 **name**
 
@@ -707,7 +753,7 @@ Default is `0`.
 
 **faceIndex**
 
-The active cube face index.
+The cube face, depth slice or array layer index.
 
 Default is `0`.
 
@@ -788,6 +834,10 @@ Default is `null`.
 An optional ID for identifying the pass.
 
 Default is `null`.
+
+### .resetState()
+
+Resets the backend's internal state cache. Useful when the rendering context is shared with other libraries that change the state. A no-op for the WebGPU backend.
 
 ### .setAnimationLoop( callback : onAnimationCallback ) : Promise (async)
 
@@ -884,7 +934,7 @@ Defines a manual sort function for the opaque render list. Pass `null` to use th
 
 The sort function.
 
-### .setOutputRenderTarget( renderTarget : Object )
+### .setOutputRenderTarget( renderTarget : RenderTarget )
 
 Sets the output render target for the renderer.
 

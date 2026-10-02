@@ -22,6 +22,18 @@ The renderer.
 
 ## Properties
 
+### .allowEarlyReturns : boolean
+
+A flag that indicates that early returns are allowed.
+
+Default is `true`.
+
+### .allowGlobalVariables : boolean
+
+A flag that indicates that global variables are allowed.
+
+Default is `true`.
+
 ### .builtins : Object.<string, Map.<string, Object>>
 
 A dictionary that holds for each shader stage a Map of builtins.
@@ -306,6 +318,66 @@ A WGSL snippet that represents the mip level, with level 0 containing a full siz
 
 **Returns:** The name of the dimension variable.
 
+### .generateTextureGather( texture : Texture, textureProperty : string, uvSnippet : string, gatherSnippet : string, depthSnippet : string, offsetSnippet : string ) : string
+
+Generates the WGSL snippet for gathering four texels from the given texture.
+
+**texture**
+
+The texture.
+
+**textureProperty**
+
+The name of the texture uniform in the shader.
+
+**uvSnippet**
+
+A WGSL snippet that represents texture coordinates used for sampling.
+
+**gatherSnippet**
+
+A WGSL snippet that represents the index of the channel to read.
+
+**depthSnippet**
+
+A WGSL snippet that represents 0-based texture array index to sample.
+
+**offsetSnippet**
+
+A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+
+**Returns:** The WGSL snippet.
+
+### .generateTextureGatherCompare( texture : Texture, textureProperty : string, uvSnippet : string, compareSnippet : string, depthSnippet : string, offsetSnippet : string ) : string
+
+Generates the WGSL snippet for performing a depth comparison on four texels in the given depth texture.
+
+**texture**
+
+The texture.
+
+**textureProperty**
+
+The name of the texture uniform in the shader.
+
+**uvSnippet**
+
+A WGSL snippet that represents texture coordinates used for sampling.
+
+**compareSnippet**
+
+A WGSL snippet that represents the reference value.
+
+**depthSnippet**
+
+A WGSL snippet that represents 0-based texture array index to sample.
+
+**offsetSnippet**
+
+A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+
+**Returns:** The WGSL snippet.
+
 ### .generateTextureGrad( texture : Texture, textureProperty : string, uvSnippet : string, gradSnippet : Array.<string>, depthSnippet : string, offsetSnippet : string, shaderStage : string ) : string
 
 Generates the WGSL snippet for sampling/loading the given texture using explicit gradients.
@@ -342,7 +414,7 @@ Default is `this.shaderStage`.
 
 **Returns:** The WGSL snippet.
 
-### .generateTextureLevel( texture : Texture, textureProperty : string, uvSnippet : string, levelSnippet : string, depthSnippet : string, offsetSnippet : string, shaderStage : string ) : string
+### .generateTextureLevel( texture : Texture, textureProperty : string, uvSnippet : string, levelSnippet : string, depthSnippet : string, offsetSnippet : string ) : string
 
 Generates the WGSL snippet when sampling textures with explicit mip level.
 
@@ -369,12 +441,6 @@ A WGSL snippet that represents 0-based texture array index to sample.
 **offsetSnippet**
 
 A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
-
-**shaderStage**
-
-The shader stage this code snippet is generated for.
-
-Default is `this.shaderStage`.
 
 **Returns:** The WGSL snippet.
 
@@ -439,6 +505,26 @@ A WGSL snippet that represents the mip level, with level 0 containing a full siz
 Default is `'0u'`.
 
 **Overrides:** [NodeBuilder#generateTextureLod](NodeBuilder.html#generateTextureLod)
+
+**Returns:** The WGSL snippet.
+
+### .generateTextureSize( texture : Texture, textureProperty : string, levelSnippet : string ) : string
+
+Generates the WGSL snippet that resolves the dimensions of the given texture.
+
+**texture**
+
+The texture.
+
+**textureProperty**
+
+The name of the texture uniform in the shader.
+
+**levelSnippet**
+
+A WGSL snippet that represents the mip level.
+
+**Overrides:** [NodeBuilder#generateTextureSize](NodeBuilder.html#generateTextureSize)
 
 **Returns:** The WGSL snippet.
 
@@ -558,7 +644,7 @@ Overwritten as a NOP since this method is intended for the WebGL 2 backend.
 
 **Returns:** Null.
 
-### .getFloatPackingMethod( encoding : string ) : string
+### .getFloatPackingMethod( encoding : string, layout : string ) : string
 
 Returns the float packing method name for a given numeric encoding.
 
@@ -566,15 +652,27 @@ Returns the float packing method name for a given numeric encoding.
 
 The numeric encoding that describes how the float values are mapped to the integer range.
 
+**layout**
+
+The component layout of the packed integer.
+
+Default is `'2x16'`.
+
 **Returns:** The resolve WGSL float packing method name.
 
-### .getFloatUnpackingMethod( encoding : string ) : string
+### .getFloatUnpackingMethod( encoding : string, layout : string ) : string
 
 Returns the float unpacking method name for a given numeric encoding.
 
 **encoding**
 
 The numeric encoding that describes how the integer values are mapped to the float range.
+
+**layout**
+
+The component layout of the packed integer.
+
+Default is `'2x16'`.
 
 **Returns:** The resolve WGSL float unpacking method name.
 
@@ -690,7 +788,7 @@ Default is `this.shaderStage`.
 
 **Returns:** The property name.
 
-### .getScopedArray( name : string, scope : string, bufferType : string, bufferCount : string ) : string
+### .getScopedArray( name : string, scope : string, bufferType : string, bufferCount : string, isAtomic : boolean ) : string
 
 This method should be used when a new scoped buffer is used in context of compute shaders. It adds the array to the internal data structure which is later used to generate the respective WGSL.
 
@@ -709,6 +807,10 @@ The buffer type.
 **bufferCount**
 
 The buffer count.
+
+**isAtomic**
+
+Whether the array elements are atomic or not.
 
 **Returns:** The array name.
 
@@ -800,14 +902,6 @@ The node data type.
 
 **Returns:** The WGSL type.
 
-### .getUniformBufferLimit() : number
-
-Returns the maximum uniform buffer size limit.
-
-**Overrides:** [NodeBuilder#getUniformBufferLimit](NodeBuilder.html#getUniformBufferLimit)
-
-**Returns:** The maximum uniform buffer size in bytes.
-
 ### .getUniformFromNode( node : UniformNode, type : string, shaderStage : string, name : string ) : NodeUniform
 
 This method is one of the more important ones since it's responsible for generating a matching binding instance for the given uniform node.
@@ -848,7 +942,7 @@ The shader stage.
 
 **Returns:** The WGSL snippet that defines the uniforms.
 
-### .getVar( type : string, name : string, count : number ) : string
+### .getVar( type : string, name : string, count : number, qualifier : string ) : string
 
 Returns a WGSL string representing a variable.
 
@@ -865,6 +959,12 @@ The variable's name.
 The array length.
 
 Default is `null`.
+
+**qualifier**
+
+The variable's qualifier.
+
+Default is `''`.
 
 **Overrides:** [NodeBuilder#getVar](NodeBuilder.html#getVar)
 
@@ -937,6 +1037,18 @@ Whether to flip texture data along its vertical axis or not.
 **Overrides:** [NodeBuilder#isFlipY](NodeBuilder.html#isFlipY)
 
 **Returns:** Returns always `false` in context of WGSL.
+
+### .isReservedKeyword( name : string ) : boolean
+
+Returns whether the given name is a reserved keyword of WGSL.
+
+**name**
+
+The name to test.
+
+**Overrides:** [NodeBuilder#isReservedKeyword](NodeBuilder.html#isReservedKeyword)
+
+**Returns:** Whether the name is a reserved keyword or not.
 
 ### .isSampleCompare( texture : Texture ) : boolean
 

@@ -14,6 +14,10 @@ Variable names should be valid identifiers and should not collide with THREE GLS
 
 The size of the computation (sizeX \* sizeY) is defined as 'resolution' automatically in the shader. For example:
 
+```js
+#DEFINE resolution vec2( 1024.0, 1024.0 )
+```
+
 Basic use:
 
 ```js
@@ -64,15 +68,9 @@ gpuCompute.doRenderTarget( myFilter1, myRenderTarget );
 gpuCompute.doRenderTarget( myFilter2, outputRenderTarget );
 ```
 
-## Code Example
-
-```js
-#DEFINE resolution vec2( 1024.0, 1024.0 )
-```
-
 ## Import
 
-GPUComputationRenderer is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+GPUComputationRenderer is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { GPUComputationRenderer } from 'three/addons/misc/GPUComputationRenderer.js';

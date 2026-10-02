@@ -4,6 +4,10 @@
 		<title>three.js vr - xr layers</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<meta property="og:title" content="three.js vr - xr layers">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_xr_native_layers.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_xr_native_layers.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
@@ -42,7 +46,7 @@
 			import { HTMLMesh } from 'three/addons/interactive/HTMLMesh.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			let camera, scene, renderer;
+			let camera, scene, renderer, renderPipeline;
 			let controller1, controller2;
 			let controllerGrip1, controllerGrip2;
 
@@ -184,9 +188,10 @@
 				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true, outputBufferType: THREE.UnsignedByteType, multiview: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
 				renderer.setAnimationLoop( render );
 				renderer.xr.enabled = true;
-				document.body.appendChild( renderer.domElement );
+				renderPipeline = new THREE.DirectRenderPipeline( renderer );
 
 				//
 
@@ -629,8 +634,6 @@
 
 				timer.update();
 
-				renderer.xr.renderLayers( );
-
 				handleController( controller1 );
 				handleController( controller2 );
 
@@ -708,7 +711,7 @@
 
 				}
 
-				renderer.render( scene, camera );
+				renderPipeline.render( scene, camera );
 
 			}
 

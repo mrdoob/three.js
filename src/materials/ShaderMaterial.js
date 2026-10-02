@@ -1,5 +1,11 @@
 import { Material } from './Material.js';
 import { cloneUniforms, cloneUniformsGroups } from '../renderers/shaders/UniformsUtils.js';
+import { Color } from '../math/Color.js';
+import { Vector2 } from '../math/Vector2.js';
+import { Vector3 } from '../math/Vector3.js';
+import { Vector4 } from '../math/Vector4.js';
+import { Matrix3 } from '../math/Matrix3.js';
+import { Matrix4 } from '../math/Matrix4.js';
 
 import default_vertex from '../renderers/shaders/ShaderChunk/default_vertex.glsl.js';
 import default_fragment from '../renderers/shaders/ShaderChunk/default_fragment.glsl.js';
@@ -394,6 +400,86 @@ class ShaderMaterial extends Material {
 		if ( Object.keys( extensions ).length > 0 ) data.extensions = extensions;
 
 		return data;
+
+	}
+
+	/**
+	 * Deserializes the material from the given JSON.
+	 *
+	 * @param {Object} json - The JSON holding the serialized material.
+	 * @param {Object<string,Texture>} textures - A dictionary holding textures referenced by the material.
+	 * @return {ShaderMaterial} A reference to this material.
+	 */
+	fromJSON( json, textures ) {
+
+		super.fromJSON( json, textures );
+
+		if ( json.uniforms !== undefined ) {
+
+			for ( const name in json.uniforms ) {
+
+				const uniform = json.uniforms[ name ];
+
+				this.uniforms[ name ] = {};
+
+				switch ( uniform.type ) {
+
+					case 't':
+						this.uniforms[ name ].value = textures[ uniform.value ] || null;
+						break;
+
+					case 'c':
+						this.uniforms[ name ].value = new Color().setHex( uniform.value );
+						break;
+
+					case 'v2':
+						this.uniforms[ name ].value = new Vector2().fromArray( uniform.value );
+						break;
+
+					case 'v3':
+						this.uniforms[ name ].value = new Vector3().fromArray( uniform.value );
+						break;
+
+					case 'v4':
+						this.uniforms[ name ].value = new Vector4().fromArray( uniform.value );
+						break;
+
+					case 'm3':
+						this.uniforms[ name ].value = new Matrix3().fromArray( uniform.value );
+						break;
+
+					case 'm4':
+						this.uniforms[ name ].value = new Matrix4().fromArray( uniform.value );
+						break;
+
+					default:
+						this.uniforms[ name ].value = uniform.value;
+
+				}
+
+			}
+
+		}
+
+		if ( json.defines !== undefined ) this.defines = json.defines;
+		if ( json.vertexShader !== undefined ) this.vertexShader = json.vertexShader;
+		if ( json.fragmentShader !== undefined ) this.fragmentShader = json.fragmentShader;
+		if ( json.glslVersion !== undefined ) this.glslVersion = json.glslVersion;
+
+		if ( json.extensions !== undefined ) {
+
+			for ( const key in json.extensions ) {
+
+				this.extensions[ key ] = json.extensions[ key ];
+
+			}
+
+		}
+
+		if ( json.lights !== undefined ) this.lights = json.lights;
+		if ( json.clipping !== undefined ) this.clipping = json.clipping;
+
+		return this;
 
 	}
 

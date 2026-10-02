@@ -10,7 +10,7 @@ UniformsLib.line = {
 
 	worldUnits: { value: 1 },
 	linewidth: { value: 1 },
-	resolution: { value: new Vector2( 1, 1 ) },
+	resolution: { value: new Vector2() },
 	dashOffset: { value: 0 },
 	dashScale: { value: 1 },
 	dashSize: { value: 1 },
@@ -70,18 +70,20 @@ ShaderLib[ 'line' ] = {
 
 		#endif
 
-		void trimSegment( const in vec4 start, inout vec4 end ) {
+		float trimSegmentAlpha( const in vec4 start, const in vec4 end ) {
 
-			// trim end segment so it terminates between the camera plane and the near plane
+			// compute the interpolation factor needed to trim the segment so it terminates
+			// between the camera plane and the near plane
 
 			// conservative estimate of the near plane
 			float a = projectionMatrix[ 2 ][ 2 ]; // 3nd entry in 3th column
 			float b = projectionMatrix[ 3 ][ 2 ]; // 3nd entry in 4th column
-			float nearEstimate = - 0.5 * b / a;
 
-			float alpha = ( nearEstimate - start.z ) / ( end.z - start.z );
+			// we need different nearEstimate formula for reversed and default depth buffer
+			// a is positive with a reversed depth buffer so it can be used for controlling the code flow
+			float nearEstimate = ( a > 0.0 ) ? ( - b / ( a + 1.0 ) ) : ( - 0.5 * b / a );
 
-			end.xyz = mix( start.xyz, end.xyz, alpha );
+			return ( nearEstimate - start.z ) / ( end.z - start.z );
 
 		}
 
@@ -93,18 +95,18 @@ ShaderLib[ 'line' ] = {
 
 			#endif
 
-			#ifdef USE_DASH
-
-				vLineDistance = ( position.y < 0.5 ) ? dashScale * instanceDistanceStart : dashScale * instanceDistanceEnd;
-				vUv = uv;
-
-			#endif
-
 			float aspect = resolution.x / resolution.y;
 
 			// camera space
 			vec4 start = modelViewMatrix * vec4( instanceStart, 1.0 );
 			vec4 end = modelViewMatrix * vec4( instanceEnd, 1.0 );
+
+			#ifdef USE_DASH
+
+				float lineDistanceStart = dashScale * instanceDistanceStart;
+				float lineDistanceEnd = dashScale * instanceDistanceEnd;
+
+			#endif
 
 			#ifdef WORLD_UNITS
 
@@ -128,15 +130,36 @@ ShaderLib[ 'line' ] = {
 
 				if ( start.z < 0.0 && end.z >= 0.0 ) {
 
-					trimSegment( start, end );
+					float alpha = trimSegmentAlpha( start, end );
+					end.xyz = mix( start.xyz, end.xyz, alpha );
+
+					#ifdef USE_DASH
+
+						lineDistanceEnd = mix( lineDistanceStart, lineDistanceEnd, alpha );
+
+					#endif
 
 				} else if ( end.z < 0.0 && start.z >= 0.0 ) {
 
-					trimSegment( end, start );
+					float alpha = trimSegmentAlpha( end, start );
+					start.xyz = mix( end.xyz, start.xyz, alpha );
+
+					#ifdef USE_DASH
+
+						lineDistanceStart = mix( lineDistanceEnd, lineDistanceStart, alpha );
+
+					#endif
 
 				}
 
 			}
+
+			#ifdef USE_DASH
+
+				vLineDistance = ( position.y < 0.5 ) ? lineDistanceStart : lineDistanceEnd;
+				vUv = uv;
+
+			#endif
 
 			// clip space
 			vec4 clipStart = projectionMatrix * start;
@@ -156,7 +179,7 @@ ShaderLib[ 'line' ] = {
 			#ifdef WORLD_UNITS
 
 				vec3 worldDir = normalize( end.xyz - start.xyz );
-				vec3 tmpFwd = normalize( mix( start.xyz, end.xyz, 0.5 ) );
+				vec3 tmpFwd = perspective ? normalize( mix( start.xyz, end.xyz, 0.5 ) ) : vec3( 0.0, 0.0, - 1.0 );
 				vec3 worldUp = normalize( cross( worldDir, tmpFwd ) );
 				vec3 worldFwd = cross( worldDir, worldUp );
 				worldPos = position.y < 0.5 ? start: end;
@@ -326,15 +349,29 @@ ShaderLib[ 'line' ] = {
 
 			#ifdef WORLD_UNITS
 
-				// Find the closest points on the view ray and the line segment
-				vec3 rayEnd = normalize( worldPos.xyz ) * 1e5;
-				vec3 lineDir = worldEnd - worldStart;
-				vec2 params = closestLineToLine( worldStart, worldEnd, vec3( 0.0, 0.0, 0.0 ), rayEnd );
+				float len;
 
-				vec3 p1 = worldStart + lineDir * params.x;
-				vec3 p2 = rayEnd * params.y;
-				vec3 delta = p1 - p2;
-				float len = length( delta );
+				if ( isOrthographic ) {
+
+					// View rays are parallel to the z axis so the distance reduces to camera-space XY
+					vec2 lineDir = worldEnd.xy - worldStart.xy;
+					float t = clamp( dot( worldPos.xy - worldStart.xy, lineDir ) / dot( lineDir, lineDir ), 0.0, 1.0 );
+					len = length( worldStart.xy + lineDir * t - worldPos.xy );
+
+				} else {
+
+					// Find the closest points on the view ray and the line segment
+					vec3 rayEnd = normalize( worldPos.xyz ) * 1e5;
+					vec3 lineDir = worldEnd - worldStart;
+					vec2 params = closestLineToLine( worldStart, worldEnd, vec3( 0.0, 0.0, 0.0 ), rayEnd );
+
+					vec3 p1 = worldStart + lineDir * params.x;
+					vec3 p2 = rayEnd * params.y;
+					vec3 delta = p1 - p2;
+					len = length( delta );
+
+				}
+
 				float norm = len / linewidth;
 
 				#ifndef USE_DASH
@@ -647,7 +684,7 @@ class LineMaterial extends ShaderMaterial {
 
 	/**
 	 * The size of the viewport, in screen pixels. This must be kept updated to make
-	 * screen-space rendering accurate.The `LineSegments2.onBeforeRender` callback
+	 * screen-space rendering accurate. The `LineSegments2.onBeforeRender` callback
 	 * performs the update for visible objects.
 	 *
 	 * @type {Vector2}

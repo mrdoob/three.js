@@ -2,9 +2,7 @@
 
 # XRManager
 
-The XR manager is built on top of the WebXR Device API to manage XR sessions with `WebGPURenderer`.
-
-XR is currently only supported with a WebGL 2 backend.
+The XR manager is built on top of the WebXR Device API to manage XR sessions with renderer backends.
 
 ## Constructor
 
@@ -86,6 +84,10 @@ Allows to configure the layer's render target.
 
 Default is `{}`.
 
+**samples**
+
+The scene MSAA sample count. Defaults to the renderer's sample count.
+
 **Returns:** A mesh representing the cylindrical XR layer. This mesh should be added to the XR scene.
 
 ### .createQuadLayer( width : number, height : number, translation : Vector3, quaternion : Quaternion, pixelwidth : number, pixelheight : number, rendercall : function, attributes : Object ) : Mesh
@@ -126,7 +128,29 @@ Allows to configure the layer's render target.
 
 Default is `{}`.
 
+**samples**
+
+The scene MSAA sample count. Defaults to the renderer's sample count.
+
 **Returns:** A mesh representing the quadratic XR layer. This mesh should be added to the XR scene.
+
+### .foveateBoundTexture( renderTarget : RenderTarget )
+
+Applies WebXR fixed foveation to the internal post-processing render target used by the first XR render pass before compositing into a projection layer.
+
+Browser-side `XRWebGLBinding.foveateBoundTexture()` failures are treated as non-fatal so they do not interrupt rendering.
+
+**renderTarget**
+
+The internal render target.
+
+### .getBaseLayer() : XRWebGLLayer | XRProjectionLayer
+
+Returns the current base layer.
+
+This is an `XRProjectionLayer` when the targeted XR device supports the WebXR Layers API, or an `XRWebGLLayer` otherwise.
+
+**Returns:** The XR base layer.
 
 ### .getBinding() : XRWebGLBinding
 
@@ -172,7 +196,7 @@ Returns the environment blend mode from the current XR session.
 
 Returns the foveation value.
 
-**Returns:** The foveation value. Returns `undefined` if no base or projection layer is defined.
+**Returns:** The foveation value.
 
 ### .getFrame() : XRFrame
 
@@ -213,6 +237,14 @@ Returns the reference space type.
 Returns the current XR session.
 
 **Returns:** The XR session. Returns `null` when used outside a XR session.
+
+### .getWebGPUBinding() : XRGPUBinding
+
+Returns the current XR WebGPU binding.
+
+Creates a new binding if needed and the browser is capable of doing so.
+
+**Returns:** The XR WebGPU binding. Returns `null` if one cannot be created.
 
 ### .renderLayers()
 

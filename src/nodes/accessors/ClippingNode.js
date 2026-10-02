@@ -44,6 +44,12 @@ class ClippingNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Setups the node depending on the selected scope.
 	 *
@@ -57,7 +63,7 @@ class ClippingNode extends Node {
 		const clippingContext = builder.clippingContext;
 		const { intersectionPlanes, unionPlanes } = clippingContext;
 
-		this.hardwareClipping = builder.material.hardwareClipping;
+		this.hardwareClipping = builder.hardwareClipping;
 
 		if ( this.scope === ClippingNode.ALPHA_TO_COVERAGE ) {
 

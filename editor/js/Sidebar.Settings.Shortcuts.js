@@ -1,5 +1,6 @@
 import { UIPanel, UIText, UIRow, UIInput } from './libs/ui.js';
 
+import { MultiCmdsCommand } from './commands/MultiCmdsCommand.js';
 import { RemoveObjectCommand } from './commands/RemoveObjectCommand.js';
 
 function SidebarSettingsShortcuts( editor ) {
@@ -23,7 +24,7 @@ function SidebarSettingsShortcuts( editor ) {
 	headerRow.add( new UIText( strings.getKey( 'sidebar/settings/shortcuts' ).toUpperCase() ) );
 	container.add( headerRow );
 
-	const shortcuts = [ 'translate', 'rotate', 'scale', 'undo', 'focus' ];
+	const shortcuts = [ 'translate', 'rotate', 'scale', 'undo', 'focus', 'perspective', 'orthographic', 'selectAll' ];
 
 	function createShortcutInput( name ) {
 
@@ -105,16 +106,80 @@ function SidebarSettingsShortcuts( editor ) {
 
 				// fall-through
 
-			case 'delete':
+			case 'delete': {
 
-				const object = editor.selected;
+				const objects = editor.selector.selection;
 
-				if ( object === null ) return;
+				const commands = [];
 
-				const parent = object.parent;
-				if ( parent !== null ) editor.execute( new RemoveObjectCommand( editor, object ) );
+				for ( let i = 0; i < objects.length; i ++ ) {
+
+					const object = objects[ i ];
+
+					if ( object.parent === null ) continue; // avoid deleting the camera or scene
+
+					if ( object.isSpotLight || object.isDirectionalLight ) {
+
+						commands.push( new RemoveObjectCommand( editor, object ) );
+						commands.push( new RemoveObjectCommand( editor, object.target ) );
+
+					} else {
+
+						commands.push( new RemoveObjectCommand( editor, object ) );
+
+					}
+
+				}
+
+				if ( commands.length === 1 ) {
+
+					editor.execute( commands[ 0 ] );
+
+				} else if ( commands.length > 1 ) {
+
+					editor.execute( new MultiCmdsCommand( editor, commands ) );
+
+				}
 
 				break;
+
+			}
+
+			case config.getKey( 'settings/shortcuts/selectAll' ): {
+
+				if ( event.altKey === true || event.ctrlKey === true || event.metaKey === true ) break;
+
+				// toggle between selecting and deselecting all scene objects
+
+				const objects = editor.scene.children;
+				const selection = editor.selector.selection;
+
+				let allSelected = objects.length > 0;
+
+				for ( let i = 0; i < objects.length; i ++ ) {
+
+					if ( selection.indexOf( objects[ i ] ) === - 1 ) {
+
+						allSelected = false;
+						break;
+
+					}
+
+				}
+
+				if ( allSelected === true ) {
+
+					editor.deselect();
+
+				} else {
+
+					editor.selector.setSelection( objects );
+
+				}
+
+				break;
+
+			}
 
 			case config.getKey( 'settings/shortcuts/translate' ):
 
@@ -161,6 +226,18 @@ function SidebarSettingsShortcuts( editor ) {
 					editor.focus( editor.selected );
 
 				}
+
+				break;
+
+			case config.getKey( 'settings/shortcuts/perspective' ):
+
+				editor.setCameraType( 'perspective' );
+
+				break;
+
+			case config.getKey( 'settings/shortcuts/orthographic' ):
+
+				editor.setCameraType( 'orthographic' );
 
 				break;
 

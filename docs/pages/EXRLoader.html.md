@@ -4,7 +4,7 @@
 
 A loader for the OpenEXR texture format.
 
-`EXRLoader` currently supports uncompressed, ZIP(S), RLE, PIZ and DWA/B compression. Supports reading as UnsignedByte, HalfFloat and Float type data texture.
+`EXRLoader` currently supports uncompressed, ZIP(S), RLE, PIZ, B44/A and DWA/B compression. Supports reading as UnsignedByte, HalfFloat and Float type data texture.
 
 ## Code Example
 
@@ -15,7 +15,7 @@ const texture = await loader.loadAsync( 'textures/memorial.exr' );
 
 ## Import
 
-EXRLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+EXRLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
@@ -38,6 +38,12 @@ The loading manager.
 Texture output format.
 
 Default is `RGBAFormat`.
+
+### .part : number
+
+For multi-part EXR files, the index of the part to load.
+
+Default is `0`.
 
 ### .type : HalfFloatType | FloatType
 
@@ -76,6 +82,16 @@ Sets texture output format. Defaults to `RGBAFormat`.
 **value**
 
 Texture output format.
+
+**Returns:** A reference to this loader.
+
+### .setPart( value : number ) : EXRLoader
+
+For multi-part EXR files, sets which part to load.
+
+**value**
+
+The part index to load.
 
 **Returns:** A reference to this loader.
 

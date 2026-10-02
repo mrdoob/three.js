@@ -49,7 +49,7 @@ class Linker {
 
 		if ( this.block === null || this.block.node !== node ) {
 
-			throw new Error( 'No block to remove or block mismatch.' );
+			throw new Error( 'THREE.Linker: No block to remove or block mismatch.' );
 
 		}
 

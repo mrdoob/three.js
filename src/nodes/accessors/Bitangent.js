@@ -2,7 +2,7 @@ import { Fn } from '../tsl/TSLCore.js';
 import { normalGeometry, normalLocal, normalView, normalWorld } from './Normal.js';
 import { tangentGeometry, tangentLocal, tangentView, tangentWorld } from './Tangent.js';
 import { bitangentViewFrame } from './TangentUtils.js';
-import { directionToFaceDirection } from '../display/FrontFacingNode.js';
+import { negateOnBackSide } from '../display/FrontFacingNode.js';
 
 /**
  * Returns the bitangent node and assigns it to a varying if the material is not flat shaded.
@@ -65,7 +65,7 @@ export const bitangentView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	if ( builder.isFlatShading() !== true ) {
 
-		node = directionToFaceDirection( node );
+		node = negateOnBackSide( node );
 
 	}
 

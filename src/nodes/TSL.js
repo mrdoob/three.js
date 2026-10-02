@@ -7,6 +7,7 @@ export * from './core/AttributeNode.js';
 export * from './core/BypassNode.js';
 export * from './core/IsolateNode.js';
 export * from './core/ContextNode.js';
+export * from './core/OverrideContextNode.js';
 export * from './core/IndexNode.js';
 export * from './core/ParameterNode.js';
 export * from './core/PropertyNode.js';
@@ -24,6 +25,7 @@ export * from './math/BitcountNode.js';
 export * from './math/Hash.js';
 export * from './math/MathUtils.js';
 export * from './math/PackFloatNode.js';
+export * from './math/Packed4x8IntegerNode.js';
 export * from './math/UnpackFloatNode.js';
 export * from './math/TriNoise3D.js';
 
@@ -48,6 +50,7 @@ export * from './utils/RTTNode.js';
 export * from './utils/PostProcessingUtils.js';
 export * from './utils/SampleNode.js';
 export * from './utils/EventNode.js';
+export * from './utils/StorageArrayElementNode.js';
 
 // three.js shading language
 export * from './tsl/TSLBase.js';
@@ -57,20 +60,21 @@ export * from './accessors/AccessorsUtils.js';
 export * from './accessors/Arrays.js';
 export * from './accessors/UniformArrayNode.js';
 export * from './accessors/Bitangent.js';
+export * from './accessors/ClippingNode.js';
+export * from './accessors/TangentUtils.js';
 export * from './accessors/BufferAttributeNode.js';
 export * from './accessors/BufferNode.js';
 export * from './accessors/BuiltinNode.js';
 export * from './accessors/Camera.js';
 export * from './accessors/VertexColorNode.js';
 export * from './accessors/CubeTextureNode.js';
-export * from './accessors/InstanceNode.js';
-export * from './accessors/InstancedMeshNode.js';
-export * from './accessors/BatchNode.js';
+export * from './accessors/Instance.js';
+export * from './accessors/Batch.js';
 export * from './accessors/MaterialNode.js';
 export * from './accessors/MaterialProperties.js';
 export * from './accessors/MaterialReferenceNode.js';
 export * from './accessors/RendererReferenceNode.js';
-export * from './accessors/MorphNode.js';
+export * from './accessors/Morph.js';
 export * from './accessors/TextureBicubic.js';
 export * from './accessors/ModelNode.js';
 export * from './accessors/ModelViewProjectionNode.js';
@@ -80,13 +84,14 @@ export * from './accessors/PointUVNode.js';
 export * from './accessors/Position.js';
 export * from './accessors/ReferenceNode.js';
 export * from './accessors/ReflectVector.js';
-export * from './accessors/SkinningNode.js';
+export * from './accessors/Skinning.js';
 export * from './accessors/SceneProperties.js';
 export * from './accessors/StorageBufferNode.js';
+export * from './accessors/StorageTexture3DNode.js';
+export * from './accessors/StorageTextureNode.js';
 export * from './accessors/Tangent.js';
 export * from './accessors/TextureNode.js';
 export * from './accessors/TextureSizeNode.js';
-export * from './accessors/StorageTextureNode.js';
 export * from './accessors/Texture3DNode.js';
 export * from './accessors/UV.js';
 export * from './accessors/UserDataNode.js';
@@ -99,6 +104,7 @@ export * from './display/ColorAdjustment.js';
 export * from './display/ColorSpaceNode.js';
 export * from './display/FrontFacingNode.js';
 export * from './display/NormalMapNode.js';
+export * from './display/PremultiplyAlphaFunctions.js';
 export * from './display/ToneMappingNode.js';
 export * from './display/ScreenNode.js';
 export * from './display/ViewportTextureNode.js';
@@ -138,14 +144,13 @@ export * from './accessors/Lights.js';
 export * from './lighting/LightsNode.js';
 export * from './lighting/LightingContextNode.js';
 export * from './lighting/ShadowBaseNode.js';
-export * from './lighting/ShadowNode.js';
-export * from './lighting/ShadowFilterNode.js';
+export { shadow } from './lighting/ShadowNode.js';
+export { BasicShadowFilter, PCFShadowFilter, VSMShadowFilter } from './lighting/ShadowFilterNode.js';
 export * from './lighting/PointShadowNode.js';
 export * from './lighting/PointLightNode.js';
 
 // pmrem
 export * from './pmrem/PMREMNode.js';
-export * from './pmrem/PMREMUtils.js';
 
 // procedural
 export * from './procedural/Checker.js';
@@ -157,13 +162,19 @@ export * from './shapes/Shapes.js';
 export * from './materialx/MaterialXNodes.js';
 
 // functions
+export { default as BRDF_EON, EON_DirectionalAlbedo } from './functions/BSDF/BRDF_EON.js';
 export { default as BRDF_GGX } from './functions/BSDF/BRDF_GGX.js';
 export { default as BRDF_Lambert } from './functions/BSDF/BRDF_Lambert.js';
+export { default as BRDF_Sheen } from './functions/BSDF/BRDF_Sheen.js';
 export { default as D_GGX } from './functions/BSDF/D_GGX.js';
+export { default as D_GGX_Anisotropic } from './functions/BSDF/D_GGX_Anisotropic.js';
 export { default as DFGLUT } from './functions/BSDF/DFGLUT.js';
+export { default as EnvironmentBRDF } from './functions/BSDF/EnvironmentBRDF.js';
 export { default as F_Schlick } from './functions/BSDF/F_Schlick.js';
 export { default as Schlick_to_F0 } from './functions/BSDF/Schlick_to_F0.js';
 export { default as V_GGX_SmithCorrelated } from './functions/BSDF/V_GGX_SmithCorrelated.js';
+export { default as V_GGX_SmithCorrelated_Anisotropic } from './functions/BSDF/V_GGX_SmithCorrelated_Anisotropic.js';
+export { LTC_Evaluate, LTC_Evaluate_Volume, LTC_Uv } from './functions/BSDF/LTC.js';
 
 export * from './lighting/LightUtils.js';
 

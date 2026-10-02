@@ -192,6 +192,74 @@ Default is `this.shaderStage`.
 
 **Returns:** The GLSL snippet.
 
+### .generateTextureGather( texture : Texture, textureProperty : string, uvSnippet : string, gatherSnippet : string, depthSnippet : string, offsetSnippet : string, flipYSnippet : string ) : string
+
+Generates the GLSL snippet for gathering four texels from the given texture.
+
+**texture**
+
+The texture.
+
+**textureProperty**
+
+The name of the texture uniform in the shader.
+
+**uvSnippet**
+
+A GLSL snippet that represents texture coordinates used for sampling.
+
+**gatherSnippet**
+
+A GLSL snippet that represents the index of the channel to read.
+
+**depthSnippet**
+
+A GLSL snippet that represents 0-based texture array index to sample.
+
+**offsetSnippet**
+
+A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+
+**flipYSnippet**
+
+A GLSL snippet that represents the y-flip. Only used for WebGL.
+
+**Returns:** The GLSL snippet.
+
+### .generateTextureGatherCompare( texture : Texture, textureProperty : string, uvSnippet : string, compareSnippet : string, depthSnippet : string, offsetSnippet : string, flipYSnippet : string ) : string
+
+Generates the GLSL snippet for performing a depth comparison on four texels in the given depth texture.
+
+**texture**
+
+The texture.
+
+**textureProperty**
+
+The name of the texture uniform in the shader.
+
+**uvSnippet**
+
+A GLSL snippet that represents texture coordinates used for sampling.
+
+**compareSnippet**
+
+A GLSL snippet that represents the reference value.
+
+**depthSnippet**
+
+A GLSL snippet that represents 0-based texture array index to sample.
+
+**offsetSnippet**
+
+A GLSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
+
+**flipYSnippet**
+
+A GLSL snippet that represents the y-flip. Only used for WebGL.
+
+**Returns:** The GLSL snippet.
+
 ### .generateTextureGrad( texture : Texture, textureProperty : string, uvSnippet : string, gradSnippet : Array.<string>, depthSnippet : string, offsetSnippet : string ) : string
 
 Generates the GLSL snippet for sampling/loading the given texture using explicit gradients.
@@ -282,6 +350,26 @@ A GLSL snippet that represents the offset that will be applied to the unnormaliz
 
 **Returns:** The GLSL snippet.
 
+### .generateTextureSize( texture : Texture, textureProperty : string, levelSnippet : string ) : string
+
+Generates the GLSL snippet that resolves the dimensions of the given texture.
+
+**texture**
+
+The texture.
+
+**textureProperty**
+
+The name of the texture uniform in the shader.
+
+**levelSnippet**
+
+A GLSL snippet that represents the mip level.
+
+**Overrides:** [NodeBuilder#generateTextureSize](NodeBuilder.html#generateTextureSize)
+
+**Returns:** The GLSL snippet.
+
 ### .getAttributes( shaderStage : string ) : string
 
 Returns the shader attributes of the given shader stage as a GLSL string.
@@ -306,7 +394,7 @@ The output type to bitcast to.
 
 The input type of the.
 
-**Returns:** The resolved WGSL bitcast invocation.
+**Returns:** The resolved GLSL bitcast invocation.
 
 ### .getClipDistance() : string
 
@@ -332,7 +420,7 @@ The shader stage.
 
 **Returns:** The GLSL snippet that defines the enabled extensions.
 
-### .getFloatPackingMethod( encoding : string ) : string
+### .getFloatPackingMethod( encoding : string, layout : string ) : string
 
 Returns the float packing method name for a given numeric encoding.
 
@@ -340,15 +428,27 @@ Returns the float packing method name for a given numeric encoding.
 
 The numeric encoding that describes how the float values are mapped to the integer range.
 
+**layout**
+
+The component layout of the packed integer.
+
+Default is `'2x16'`.
+
 **Returns:** The resolved GLSL float packing method name.
 
-### .getFloatUnpackingMethod( encoding : string ) : string
+### .getFloatUnpackingMethod( encoding : string, layout : string ) : string
 
 Returns the float unpacking method name for a given numeric encoding.
 
 **encoding**
 
 The numeric encoding that describes how the integer values are mapped to the float range.
+
+**layout**
+
+The component layout of the packed integer.
+
+Default is `'2x16'`.
 
 **Returns:** The resolved GLSL float unpacking method name.
 
@@ -498,14 +598,6 @@ The buffer attribute.
 
 **Returns:** The type.
 
-### .getUniformBufferLimit() : number
-
-Returns the maximum number of bytes available for uniform buffers.
-
-**Overrides:** [NodeBuilder#getUniformBufferLimit](NodeBuilder.html#getUniformBufferLimit)
-
-**Returns:** The maximum number of bytes available for uniform buffers.
-
 ### .getUniformFromNode( node : UniformNode, type : string, shaderStage : string, name : string ) : NodeUniform
 
 This method is one of the more important ones since it's responsible for generating a matching binding instance for the given uniform node.
@@ -546,18 +638,6 @@ The shader stage.
 
 **Returns:** The GLSL snippet that defines the uniforms.
 
-### .getVars( shaderStage : string ) : string
-
-Returns the variables of the given shader stage as a GLSL string.
-
-**shaderStage**
-
-The shader stage.
-
-**Overrides:** [NodeBuilder#getVars](NodeBuilder.html#getVars)
-
-**Returns:** The GLSL snippet that defines the variables.
-
 ### .getVaryings( shaderStage : string ) : string
 
 Returns the varyings of the given shader stage as a GLSL string.
@@ -597,6 +677,18 @@ Whether to flip texture data along its vertical axis or not.
 **Overrides:** [NodeBuilder#isFlipY](NodeBuilder.html#isFlipY)
 
 **Returns:** Returns always `true` in context of GLSL.
+
+### .isReservedKeyword( name : string ) : boolean
+
+Returns whether the given name is a reserved keyword of GLSL.
+
+**name**
+
+The name to test.
+
+**Overrides:** [NodeBuilder#isReservedKeyword](NodeBuilder.html#isReservedKeyword)
+
+**Returns:** Whether the name is a reserved keyword or not.
 
 ### .needsToWorkingColorSpace( texture : Texture ) : boolean
 

@@ -1,9 +1,8 @@
-import { AdditiveBlending, Color, Vector2, RendererUtils, PassNode, QuadMesh, NodeMaterial } from 'three/webgpu';
+import { AdditiveBlending, Color, Vector2, PassNode, QuadMesh, NodeMaterial } from 'three/webgpu';
 import { uniform, mrt, texture, getTextureIndex, unpremultiplyAlpha } from 'three/tsl';
 
 const _size = /*@__PURE__*/ new Vector2();
-
-let _rendererState;
+const _clearColor = /*@__PURE__*/ new Color();
 
 /**
  * A special render pass node that renders the scene with SSAA (Supersampling Anti-Aliasing).
@@ -33,7 +32,7 @@ class SSAAPassNode extends PassNode {
 	 */
 	constructor( scene, camera ) {
 
-		super( PassNode.COLOR, scene, camera );
+		super( PassNode.COLOR, scene, camera, { samples: 0 } );
 
 		/**
 		 * This flag can be used for type testing.
@@ -60,22 +59,6 @@ class SSAAPassNode extends PassNode {
 		 * @default true
 		 */
 		this.unbiased = true;
-
-		/**
-		 * The clear color of the pass.
-		 *
-		 * @type {Color}
-		 * @default 0x000000
-		 */
-		this.clearColor = new Color( 0x000000 );
-
-		/**
-		 * The clear alpha of the pass.
-		 *
-		 * @type {number}
-		 * @default 0
-		 */
-		this.clearAlpha = 0;
 
 		/**
 		 * A uniform node representing the sample weight.
@@ -114,13 +97,9 @@ class SSAAPassNode extends PassNode {
 		const { renderer } = frame;
 		const { scene, camera } = this;
 
-		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
-
 		//
 
-		this._pixelRatio = renderer.getPixelRatio();
-
-		const size = renderer.getSize( _size );
+		const size = renderer.getDrawingBufferSize( _size );
 
 		this.setSize( size.width, size.height );
 		this._sampleRenderTarget.setSize( this.renderTarget.width, this.renderTarget.height );
@@ -129,6 +108,12 @@ class SSAAPassNode extends PassNode {
 
 		this._cameraNear.value = camera.near;
 		this._cameraFar.value = camera.far;
+
+		const currentRenderTarget = renderer.getRenderTarget();
+		const currentMRT = renderer.getMRT();
+		const currentAutoClear = renderer.autoClear;
+		const currentClearColor = renderer.getClearColor( _clearColor );
+		const currentClearAlpha = renderer.getClearAlpha();
 
 		renderer.setMRT( this.getMRT() );
 		renderer.autoClear = false;
@@ -186,7 +171,6 @@ class SSAAPassNode extends PassNode {
 
 			}
 
-			renderer.setClearColor( this.clearColor, this.clearAlpha );
 			renderer.setRenderTarget( this._sampleRenderTarget );
 			renderer.clear();
 			renderer.render( scene, camera );
@@ -199,6 +183,8 @@ class SSAAPassNode extends PassNode {
 
 				renderer.setClearColor( 0x000000, 0.0 );
 				renderer.clear();
+
+				renderer.setClearColor( currentClearColor, currentClearAlpha );
 
 			}
 
@@ -228,9 +214,9 @@ class SSAAPassNode extends PassNode {
 
 		}
 
-		//
-
-		RendererUtils.restoreRendererState( renderer, _rendererState );
+		renderer.setRenderTarget( currentRenderTarget );
+		renderer.setMRT( currentMRT );
+		renderer.autoClear = currentAutoClear;
 
 	}
 

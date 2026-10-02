@@ -4,6 +4,10 @@
 		<title>three.js webgpu - volumetric perlin</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - volumetric perlin">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_volume_perlin.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_volume_perlin.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 
@@ -33,7 +37,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { Break, If, vec3, vec4, texture3D, uniform, Fn } from 'three/tsl';
+			import { Break, If, Loop, select, bool, vec3, vec4, texture3D, uniform, Fn } from 'three/tsl';
 
 			import { RaymarchingBox } from 'three/addons/tsl/utils/Raymarching.js';
 
@@ -41,6 +45,8 @@
 			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			const REFINEMENT_STEPS = 4;
 
 			let renderer, scene, camera;
 			let mesh;
@@ -99,9 +105,12 @@
 
 				// Shader
 
-				const opaqueRaymarchingTexture = Fn( ( { texture, steps, threshold } ) => {
+				const opaqueRaymarchingTexture = Fn( ( { texture, steps, threshold, refine } ) => {
 
 					const finalColor = vec4( 0 ).toVar();
+
+					const positionPrev = vec3( 0 ).toVar();
+					const hasPrev = bool( false ).toVar();
 
 					RaymarchingBox( steps, ( { positionRay } ) => {
 
@@ -109,13 +118,43 @@
 
 						If( mapValue.greaterThan( threshold ), () => {
 
-							const p = vec3( positionRay ).add( 0.5 );
+							const surfacePos = positionRay.toVar();
 
-							finalColor.rgb.assign( texture.normal( p ).mul( 0.5 ).add( positionRay.mul( 1.5 ).add( 0.25 ) ) );
+							If( refine.and( hasPrev ), () => {
+
+								// The surface lies between the previous sample (below the threshold)
+								// and the current one (above it). Bisect that interval to localize
+								// the crossing precisely.
+
+								const p0 = positionPrev.toVar();
+								const p1 = positionRay.toVar();
+
+								Loop( REFINEMENT_STEPS, () => {
+
+									const pm = p0.add( p1 ).mul( 0.5 ).toConst();
+									const dm = texture.sample( pm.add( 0.5 ) ).r.toConst();
+
+									const isGreater = dm.greaterThan( threshold );
+
+									p1.assign( select( isGreater, pm, p1 ).uniformFlow() );
+									p0.assign( select( isGreater, p0, pm ).uniformFlow() );
+
+								} );
+
+								surfacePos.assign( p1 );
+
+							} );
+
+							const p = vec3( surfacePos ).add( 0.5 );
+
+							finalColor.rgb.assign( texture.normal( p ).mul( 0.5 ).add( surfacePos.mul( 1.5 ).add( 0.25 ) ) );
 							finalColor.a.assign( 1 );
 							Break();
 
 						} );
+
+						positionPrev.assign( positionRay );
+						hasPrev.assign( true );
 
 					} );
 
@@ -127,12 +166,14 @@
 
 				const threshold = uniform( 0.6 );
 				const steps = uniform( 200 );
+				const refine = uniform( true );
 
 				const material = new THREE.NodeMaterial();
 				material.colorNode = opaqueRaymarchingTexture( {
 					texture: texture3D( texture, null, 0 ),
 					steps,
-					threshold
+					threshold,
+					refine
 				} );
 				material.side = THREE.BackSide;
 				material.transparent = true;
@@ -145,6 +186,7 @@
 				const gui = renderer.inspector.createParameters( 'Parameters' );
 				gui.add( threshold, 'value', 0, 1, 0.01 ).name( 'threshold' );
 				gui.add( steps, 'value', 0, 300, 1 ).name( 'steps' );
+				gui.add( refine, 'value' ).name( 'refine' );
 
 				window.addEventListener( 'resize', onWindowResize );
 

@@ -4,6 +4,10 @@
 		<title>three.js webgpu - compute fluid particles</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - compute fluid particles">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_compute_particles_fluid.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_compute_particles_fluid.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
@@ -138,6 +142,10 @@
 					particleCountUniform.value = value;
 
 				} );
+
+				await renderer.init();
+				await renderer.compileComputeAsync( [ clearGridKernel, p2g1Kernel, p2g2Kernel, updateGridKernel, g2pKernel ] );
+				await renderer.compileAsync( scene, camera );
 
 				window.addEventListener( 'resize', onWindowResize );
 				controls.update();

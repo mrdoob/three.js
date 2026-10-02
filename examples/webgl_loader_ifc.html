@@ -7,6 +7,10 @@
 			name="viewport"
 			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
 		/>
+		<meta property="og:title" content="three.js webgl - IFCLoader" />
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://threejs.org/examples/webgl_loader_ifc.html" />
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_loader_ifc.jpg" />
 		<link type="text/css" rel="stylesheet" href="main.css" />
 	</head>
 
@@ -14,6 +18,8 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
 			-
+			IFC loader using
+			<a href="https://github.com/ThatOpen/engine_web-ifc" target="_blank" rel="noopener">web-ifc</a>.
 			See <a href="https://github.com/ThatOpen" target="_blank" rel="noopener">main project repository</a> for more information and BIM tools.
 		</div>
 
@@ -22,10 +28,7 @@
 				"imports": {
 					"three": "../build/three.module.js",
 					"three/addons/": "./jsm/",
-					"three/examples/jsm/utils/BufferGeometryUtils": "./jsm/utils/BufferGeometryUtils.js",
-					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.5.23/build/index.module.js",
-					"web-ifc": "https://cdn.jsdelivr.net/npm/web-ifc@0.0.36/web-ifc-api.js",
-					"web-ifc-three": "https://cdn.jsdelivr.net/npm/web-ifc-three@0.0.126/IFCLoader.js"
+					"web-ifc": "https://cdn.jsdelivr.net/npm/web-ifc@0.0.77/web-ifc-api.js"
 				}
 			}
 		</script>
@@ -34,31 +37,25 @@
 
 			import * as THREE from 'three';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 
-			import { IFCLoader } from 'web-ifc-three';
-			import { IFCSPACE } from 'web-ifc';
+			import { IfcAPI } from 'web-ifc';
+
+			const WEB_IFC_VERSION = '0.0.77';
+			const WEB_IFC_WASM_PATH = `https://cdn.jsdelivr.net/npm/web-ifc@${ WEB_IFC_VERSION }/`;
 
 			let scene, camera, renderer;
 
+			init();
+
 			async function init() {
 
-				//Scene
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x8cc7de );
 
-				//Camera
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
-				camera.position.z = - 70;
-				camera.position.y = 25;
-				camera.position.x = 90;
+				camera.position.set( 82.48, 22.09, - 45.24 );
 
-				//Initial cube
-				const geometry = new THREE.BoxGeometry();
-				const material = new THREE.MeshPhongMaterial( { color: 0xffffff } );
-				const cube = new THREE.Mesh( geometry, material );
-				scene.add( cube );
-
-				//Lights
 				const directionalLight1 = new THREE.DirectionalLight( 0xffeeff, 2.5 );
 				directionalLight1.position.set( 1, 1, 1 );
 				scene.add( directionalLight1 );
@@ -70,38 +67,173 @@
 				const ambientLight = new THREE.AmbientLight( 0xffffee, 0.75 );
 				scene.add( ambientLight );
 
-				//Setup IFC Loader
-				const ifcLoader = new IFCLoader();
-				await ifcLoader.ifcManager.setWasmPath( 'https://cdn.jsdelivr.net/npm/web-ifc@0.0.36/', true );
-
-				await ifcLoader.ifcManager.parser.setupOptionalCategories( {
-					[ IFCSPACE ]: false,
-				} );
-
-				await ifcLoader.ifcManager.applyWebIfcConfig( {
-					USE_FAST_BOOLS: true
-				} );
-
-				ifcLoader.load( 'models/ifc/rac_advanced_sample_project.ifc', function ( model ) {
-
-					scene.add( model.mesh );
-					render();
-
-				} );
-
-				//Renderer
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				document.body.appendChild( renderer.domElement );
 
-				//Controls
 				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 30.86, 7.73, 0.15 );
+				controls.update();
 				controls.addEventListener( 'change', render );
 
 				window.addEventListener( 'resize', onWindowResize );
 
+				const ifcAPI = new IfcAPI();
+				ifcAPI.SetWasmPath( WEB_IFC_WASM_PATH );
+				await ifcAPI.Init();
+
+				const response = await fetch( 'models/ifc/rac_advanced_sample_project.ifc' );
+				const data = new Uint8Array( await response.arrayBuffer() );
+
+				const modelID = ifcAPI.OpenModel( data, { COORDINATE_TO_ORIGIN: true } );
+				loadAllGeometry( ifcAPI, modelID );
+				ifcAPI.CloseModel( modelID );
+
 				render();
+
+			}
+
+			function loadAllGeometry( ifcAPI, modelID ) {
+
+				const opaqueGeometries = [];
+				const transparentGeometries = [];
+				const materialCache = {};
+
+				ifcAPI.StreamAllMeshes( modelID, ( flatMesh ) => {
+
+					const placedGeometries = flatMesh.geometries;
+
+					for ( let i = 0; i < placedGeometries.size(); i ++ ) {
+
+						const placedGeometry = placedGeometries.get( i );
+						const mesh = getPlacedGeometry( ifcAPI, modelID, placedGeometry, materialCache );
+						const geometry = mesh.geometry.applyMatrix4( mesh.matrix );
+
+						if ( placedGeometry.color.w !== 1 ) {
+
+							transparentGeometries.push( geometry );
+
+						} else {
+
+							opaqueGeometries.push( geometry );
+
+						}
+
+					}
+
+				} );
+
+				if ( opaqueGeometries.length > 0 ) {
+
+					const merged = BufferGeometryUtils.mergeGeometries( opaqueGeometries );
+					const material = new THREE.MeshPhongMaterial( { side: THREE.DoubleSide, vertexColors: true } );
+					scene.add( new THREE.Mesh( merged, material ) );
+
+				}
+
+				if ( transparentGeometries.length > 0 ) {
+
+					const merged = BufferGeometryUtils.mergeGeometries( transparentGeometries );
+					const material = new THREE.MeshPhongMaterial( {
+						side: THREE.DoubleSide,
+						vertexColors: true,
+						transparent: true,
+					} );
+					scene.add( new THREE.Mesh( merged, material ) );
+
+				}
+
+			}
+
+			function getPlacedGeometry( ifcAPI, modelID, placedGeometry, materialCache ) {
+
+				const geometry = getBufferGeometry( ifcAPI, modelID, placedGeometry );
+				const material = getMeshMaterial( placedGeometry.color, materialCache );
+				const mesh = new THREE.Mesh( geometry, material );
+				mesh.matrix = new THREE.Matrix4().fromArray( placedGeometry.flatTransformation );
+				mesh.matrixAutoUpdate = false;
+				return mesh;
+
+			}
+
+			function getBufferGeometry( ifcAPI, modelID, placedGeometry ) {
+
+				const geometry = ifcAPI.GetGeometry( modelID, placedGeometry.geometryExpressID );
+				const vertexData = ifcAPI.GetVertexArray( geometry.GetVertexData(), geometry.GetVertexDataSize() );
+				const indexData = ifcAPI.GetIndexArray( geometry.GetIndexData(), geometry.GetIndexDataSize() );
+
+				const bufferGeometry = ifcGeometryToBuffer( placedGeometry.color, vertexData, indexData );
+
+				// Geometry is owned by the WASM heap and must be released.
+				geometry.delete();
+				return bufferGeometry;
+
+			}
+
+			function getMeshMaterial( color, materialCache ) {
+
+				const id = `${ color.x }-${ color.y }-${ color.z }-${ color.w }`;
+				const cached = materialCache[ id ];
+				if ( cached ) return cached;
+
+				const material = new THREE.MeshPhongMaterial( {
+					color: new THREE.Color( color.x, color.y, color.z ),
+					side: THREE.DoubleSide,
+				} );
+
+				if ( color.w !== 1 ) {
+
+					material.transparent = true;
+					material.opacity = color.w;
+
+				}
+
+				materialCache[ id ] = material;
+				return material;
+
+			}
+
+			const _tmpColor = new THREE.Color();
+
+			function ifcGeometryToBuffer( color, vertexData, indexData ) {
+
+				// web-ifc returns interleaved [px, py, pz, nx, ny, nz] per vertex.
+				const vertexCount = vertexData.length / 6;
+				const positions = new Float32Array( vertexCount * 3 );
+				const normals = new Float32Array( vertexCount * 3 );
+				const colors = new Float32Array( vertexCount * 4 );
+
+				// IFC stores colors in sRGB display space; convert to linear once per geometry.
+				_tmpColor.setRGB( color.x, color.y, color.z, THREE.SRGBColorSpace );
+
+				for ( let v = 0; v < vertexCount; v ++ ) {
+
+					const src = v * 6;
+					const dst3 = v * 3;
+					const dst4 = v * 4;
+
+					positions[ dst3 + 0 ] = vertexData[ src + 0 ];
+					positions[ dst3 + 1 ] = vertexData[ src + 1 ];
+					positions[ dst3 + 2 ] = vertexData[ src + 2 ];
+
+					normals[ dst3 + 0 ] = vertexData[ src + 3 ];
+					normals[ dst3 + 1 ] = vertexData[ src + 4 ];
+					normals[ dst3 + 2 ] = vertexData[ src + 5 ];
+
+					colors[ dst4 + 0 ] = _tmpColor.r;
+					colors[ dst4 + 1 ] = _tmpColor.g;
+					colors[ dst4 + 2 ] = _tmpColor.b;
+					colors[ dst4 + 3 ] = color.w;
+
+				}
+
+				const geometry = new THREE.BufferGeometry();
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.setAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+				geometry.setAttribute( 'color', new THREE.BufferAttribute( colors, 4 ) );
+				geometry.setIndex( new THREE.BufferAttribute( indexData, 1 ) );
+				return geometry;
 
 			}
 
@@ -110,7 +242,6 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				render();
 
 			}
@@ -120,8 +251,6 @@
 				renderer.render( scene, camera );
 
 			}
-
-			init();
 
 		</script>
 	</body>

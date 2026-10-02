@@ -8,7 +8,7 @@ The helper allows to click on the X, Y and Z axes which animates the camera so i
 
 ## Import
 
-ViewHelper is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+ViewHelper is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { ViewHelper } from 'three/addons/helpers/ViewHelper.js';
@@ -36,6 +36,10 @@ Whether the helper is currently animating or not.
 
 Default is `false`.
 
+### .camera : Camera
+
+The camera whose transformation is visualized. It can be reassigned at any time to rebind the helper to a different camera.
+
 ### .center : Vector3
 
 The helper's center point.
@@ -55,6 +59,8 @@ Controls the position of the helper in the viewport. Use `top`/`bottom` for vert
 ### .dispose()
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+
+**Overrides:** [Object3D#dispose](Object3D.html#dispose)
 
 ### .handleClick( event : PointerEvent ) : boolean
 

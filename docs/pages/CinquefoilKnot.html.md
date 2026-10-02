@@ -6,7 +6,7 @@ A Cinquefoil Knot.
 
 ## Import
 
-CinquefoilKnot is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+CinquefoilKnot is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { CinquefoilKnot } from 'three/addons/curves/CurveExtras.js';

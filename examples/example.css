@@ -15,7 +15,7 @@ a {
 	position: fixed;
 	top: 15px;
 	left: 15px;
-	z-index: 1001;
+	z-index: 100;
 
 	display: grid;
 	grid-template-columns: 50px auto;
@@ -25,6 +25,11 @@ a {
 	color: #e0e0e0;
 	text-shadow: 1px 1px 5px rgba(0, 0, 0, .7);
 	font: 400 14px 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	pointer-events: none;
+}
+
+#info a {
+	pointer-events: auto;
 }
 
 #info > a.logo-link {
@@ -42,7 +47,7 @@ a {
     left: 60px;
     top: 2px;
     display: flex;
-    width: 300px;
+    width: 400px;
 }
 
 #info > small {

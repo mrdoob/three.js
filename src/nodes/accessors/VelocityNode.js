@@ -1,4 +1,4 @@
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
 import { modelViewMatrix } from './ModelNode.js';
 import { positionLocal, positionPrevious } from './Position.js';
 import { nodeImmutable } from '../tsl/TSLBase.js';
@@ -6,7 +6,6 @@ import { NodeUpdateType } from '../core/constants.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { uniform } from '../core/UniformNode.js';
 import { sub } from '../math/OperatorNode.js';
-import { cameraProjectionMatrix } from './Camera.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 
 const _objectData = new WeakMap();
@@ -19,9 +18,9 @@ const _objectData = new WeakMap();
  * of the previous frame and uses them to compute offsets in NDC space.
  * These offsets represent the final velocity.
  *
- * @augments TempNode
+ * @augments Node
  */
-class VelocityNode extends TempNode {
+class VelocityNode extends Node {
 
 	static get type() {
 
@@ -37,7 +36,7 @@ class VelocityNode extends TempNode {
 		super( 'vec2' );
 
 		/**
-		 * The current projection matrix.
+		 * An optional projection matrix that overrides the camera's projection matrix.
 		 *
 		 * @type {?Matrix4}
 		 * @default null
@@ -69,6 +68,13 @@ class VelocityNode extends TempNode {
 		this.previousModelWorldMatrix = uniform( new Matrix4() );
 
 		/**
+		 * The projection matrix of the current frame.
+		 *
+		 * @type {UniformNode<mat4>}
+		 */
+		this.currentProjectionMatrix = uniform( new Matrix4() ).setGroup( renderGroup );
+
+		/**
 		 * Uniform node representing the previous projection matrix.
 		 *
 		 * @type {UniformNode<mat4>}
@@ -82,7 +88,7 @@ class VelocityNode extends TempNode {
 		 * @type {UniformNode<mat4>}
 		 * @default null
 		 */
-		this.previousCameraViewMatrix = uniform( new Matrix4() );
+		this.previousCameraViewMatrix = uniform( new Matrix4() ).setGroup( renderGroup );
 
 	}
 
@@ -139,6 +145,7 @@ class VelocityNode extends TempNode {
 
 			this.previousProjectionMatrix.value.copy( cameraData.previousProjectionMatrix );
 			this.previousCameraViewMatrix.value.copy( cameraData.previousCameraViewMatrix );
+			this.currentProjectionMatrix.value.copy( cameraData.currentProjectionMatrix );
 
 		}
 
@@ -163,11 +170,9 @@ class VelocityNode extends TempNode {
 	 */
 	setup( /*builder*/ ) {
 
-		const projectionMatrix = ( this.projectionMatrix === null ) ? cameraProjectionMatrix : uniform( this.projectionMatrix );
-
 		const previousModelViewMatrix = this.previousCameraViewMatrix.mul( this.previousModelWorldMatrix );
 
-		const clipPositionCurrent = projectionMatrix.mul( modelViewMatrix ).mul( positionLocal );
+		const clipPositionCurrent = this.currentProjectionMatrix.mul( modelViewMatrix ).mul( positionLocal );
 		const clipPositionPrevious = this.previousProjectionMatrix.mul( previousModelViewMatrix ).mul( positionPrevious );
 
 		const ndcPositionCurrent = clipPositionCurrent.xy.div( clipPositionCurrent.w );

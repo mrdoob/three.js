@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>PersonGenerator - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">PersonGenerator</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A low-poly pedestrian crowd with shaped heads, jackets and lofted limbs.
+Two shared poses stand or walk, with sleeves and trousers swept through
+their joints. Each placement gets deterministic proportions and a small
+seed attribute for its complexion, hairstyle and outfit, in two instanced draws.</p>
+<p>The material splits the figure into zones on a baked <code>partId</code> and hashes
+the seed per zone, drawing clothes, skin and hair from small palettes.
+Local UVs keep facial features, cuffs and shoe soles attached to their parts
+as the figure is posed.</p>
+<p>The canonical figure stands on <code>y = 0</code>, centred in X / Z and ~1.75 m tall,
+facing <code>+Z</code> so a placement turns it to face the road.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const people = new PersonGenerator();
+scene.add( people.build( placements ) ); // placements: Matrix4[]
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="PersonGenerator" translate="no">new <a href="#PersonGenerator">PersonGenerator</a><span class="signature">()</span> </h3>
+					<div class="method">
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/generators/city/PersonGenerator.js" translate="no" target="_blank" rel="noopener">examples/jsm/generators/city/PersonGenerator.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

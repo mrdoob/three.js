@@ -52,6 +52,18 @@ Default is `''`.
 
 ## Methods
 
+### .generateNodeType( builder : NodeBuilder ) : string
+
+Returns the type of this function node.
+
+**builder**
+
+The current node builder.
+
+**Overrides:** [CodeNode#generateNodeType](CodeNode.html#generateNodeType)
+
+**Returns:** The type.
+
 ### .getInputs( builder : NodeBuilder ) : Array.<NodeFunctionInput>
 
 Returns the inputs of this function node.
@@ -87,18 +99,6 @@ Returns the node function for this function node.
 The current node builder.
 
 **Returns:** The node function.
-
-### .getNodeType( builder : NodeBuilder ) : string
-
-Returns the type of this function node.
-
-**builder**
-
-The current node builder.
-
-**Overrides:** [CodeNode#getNodeType](CodeNode.html#getNodeType)
-
-**Returns:** The type.
 
 ## Source
 

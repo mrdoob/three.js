@@ -2,6 +2,8 @@ import { BufferGeometry } from '../../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../../core/BufferAttribute.js';
 import { Mesh } from '../../objects/Mesh.js';
 import { OrthographicCamera } from '../../cameras/OrthographicCamera.js';
+import { vec4, array } from '../../nodes/tsl/TSLBase.js';
+import { vertexIndex } from '../../nodes/core/IndexNode.js';
 import { warnOnce } from '../../utils.js';
 
 const _camera = /*@__PURE__*/ new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
@@ -36,6 +38,12 @@ class QuadGeometry extends BufferGeometry {
 
 const _geometry = /*@__PURE__*/ new QuadGeometry();
 
+const _vertexNode = /*@__PURE__*/ vec4(
+	array( [ - 1.0, - 1.0, 3.0 ] ).element( vertexIndex ),
+	array( [ 3.0, - 1.0, - 1.0 ] ).element( vertexIndex ),
+	0.0,
+	1.0
+);
 
 /**
  * This module is a helper for passes which need to render a full
@@ -53,9 +61,9 @@ class QuadMesh extends Mesh {
 	/**
 	 * Constructs a new quad mesh.
 	 *
-	 * @param {?Material} [material=null] - The material to render the quad mesh with.
+	 * @param {NodeMaterial} material - The material to render the quad mesh with.
 	 */
-	constructor( material = null ) {
+	constructor( material ) {
 
 		super( _geometry, material );
 
@@ -103,7 +111,13 @@ class QuadMesh extends Mesh {
 	 */
 	render( renderer ) {
 
+		const previousVertexNode = this.material.vertexNode;
+
+		this.material.vertexNode = _vertexNode;
+
 		renderer.render( this, _camera );
+
+		this.material.vertexNode = previousVertexNode;
 
 	}
 

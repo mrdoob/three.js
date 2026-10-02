@@ -19,14 +19,13 @@
 <li>By rendering point primitives with <a href="Points.html">Points</a>. Since WebGPU only supports point primitives
 with a pixel size of <code>1</code>, it's not possible to define a size.</li>
 </ul>
+<pre><code class="language-js">const pointCloud = new THREE.Points( geometry, new THREE.PointsNodeMaterial() );
+</code></pre>
 <ul>
 <li>By rendering point primitives with Sprites. In this case, size is honored,
 see <a href="PointsNodeMaterial.html#sizeNode">PointsNodeMaterial#sizeNode</a>.</li>
 </ul>
 <pre><code class="language-js">const instancedPoints = new THREE.Sprite( new THREE.PointsNodeMaterial( { positionNode: instancedBufferAttribute( positionAttribute ) } ) );
-</code></pre></div>
-				<h2>Code Example</h2>
-				<div translate="no"><pre><code class="language-js">const pointCloud = new THREE.Points( geometry, new THREE.PointsNodeMaterial() );
 </code></pre></div>
 			</header>
 			<article>

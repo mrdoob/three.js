@@ -51,6 +51,8 @@ The light being visualized.
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
 
+**Overrides:** [Mesh#dispose](Mesh.html#dispose)
+
 ### .update()
 
 Updates the helper to match the position of the light being visualized.

@@ -4,10 +4,14 @@
 
 ## Run
 
-You can run the unit tests in two environments:
+You can run the unit tests in two ways:
 
-- Node.js: Execute `npm run test-unit` from the root folder
-- Browser: Execute `node utils/server.js` (or run any other local web server) from the root folder and access `http://localhost:8080/test/unit/UnitTests.html` in a web browser.
+- Headless: Execute `npm run test-unit`, `npm run test-unit-addons` from the root folder.  
+  In headless mode the tests will run in a headless browser.
+- Headful: Execute `npm run test-unit-headful`, `npm run test-unit-addons-headful` from the root folder.  
+  In headful mode, a browser window will open, and you can see the tests running.  
+  While the headful mode is running you can also use any browser to navigate to http://localhost:8080/test/unit/UnitTests.html or http://localhost:8080/test/unit/UnitTestsAddons.html to run the tests in that browser.  
+  Further changes to the library will not be reflected until the page is refreshed.
 
 See [Installation](https://threejs.org/docs/#manual/introduction/Installation) for more information.
 

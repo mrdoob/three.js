@@ -54,9 +54,10 @@ renderPipeline.outputNode = scenePass;
 				</div>
 				<h2 class="subsection-title">Properties</h2>
 				<div class="member">
-					<h3 class="name" id="context" translate="no">.<a href="#context">context</a><span class="type-signature"> : Object</span> <span class="type-signature">(readonly) </span></h3>
+					<h3 class="name" id="isRenderPipeline" translate="no">.<a href="#isRenderPipeline">isRenderPipeline</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>Returns the current context of the render pipeline stack.</p>
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -70,8 +71,8 @@ renderPipeline.outputNode = scenePass;
 					<div class="description">
 						<p>Whether the default output tone mapping and color
 space transformation should be enabled or not.</p>
-<p>It is enabled by default by it must be disabled when
-effects must be executed after tone mapping and color
+<p>This is enabled by default but it must be disabled for
+effects that expect to be executed after tone mapping and color
 space conversion. A typical example is FXAA which
 requires sRGB input.</p>
 <p>When set to <code>false</code>, the app must control the output

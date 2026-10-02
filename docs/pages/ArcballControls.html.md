@@ -10,7 +10,7 @@ Unlike [OrbitControls](OrbitControls.html) and [TrackballControls](TrackballCont
 
 ## Import
 
-ArcballControls is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+ArcballControls is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { ArcballControls } from 'three/addons/controls/ArcballControls.js';
@@ -43,6 +43,8 @@ Default is `null`.
 ### .adjustNearFar : boolean
 
 If set to `true`, the camera's near and far values will be adjusted every time zoom is performed trying to maintain the same visible portion given by initial near and far values. Only works with perspective cameras.
+
+This feature only works as expected if the camera's initial state (position, near and far values) is correctly configured before creating the controls. Otherwise [ArcballControls#setCamera](ArcballControls.html#setCamera) must be called by the application.
 
 Default is `false`.
 

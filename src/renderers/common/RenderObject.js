@@ -1,36 +1,45 @@
-import { hash, hashString, roundInstances } from '../../nodes/core/NodeUtils.js';
+import { hashArray, hashString, roundInstances } from '../../nodes/core/NodeUtils.js';
 
 let _id = 0;
+const _protoKeysCache = new WeakMap();
+const _cacheKeyValues = [ 0, 0, 0, 0, 0, 0 ];
 
 function getKeys( obj ) {
 
 	const keys = Object.keys( obj );
 
-	let proto = Object.getPrototypeOf( obj );
+	let protoKeys = _protoKeysCache.get( obj.constructor );
 
-	while ( proto ) {
+	if ( protoKeys === undefined ) {
 
-		const descriptors = Object.getOwnPropertyDescriptors( proto );
+		protoKeys = [];
+		let proto = Object.getPrototypeOf( obj );
 
-		for ( const key in descriptors ) {
+		while ( proto ) {
 
-			if ( descriptors[ key ] !== undefined ) {
+			const descriptors = Object.getOwnPropertyDescriptors( proto );
+
+			for ( const key in descriptors ) {
 
 				const descriptor = descriptors[ key ];
 
 				if ( descriptor && typeof descriptor.get === 'function' ) {
 
-					keys.push( key );
+					protoKeys.push( key );
 
 				}
 
 			}
 
+			proto = Object.getPrototypeOf( proto );
+
 		}
 
-		proto = Object.getPrototypeOf( proto );
+		_protoKeysCache.set( obj.constructor, protoKeys );
 
 	}
+
+	for ( let i = 0; i < protoKeys.length; i ++ ) keys.push( protoKeys[ i ] );
 
 	return keys;
 
@@ -146,6 +155,14 @@ class RenderObject {
 		 * @type {BufferGeometry}
 		 */
 		this.geometry = object.geometry;
+
+		/**
+		 * The geometry's version. Incremented whenever the geometry is updated.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.geometryVersion = 0;
 
 		/**
 		 * The render object's version.
@@ -297,6 +314,16 @@ class RenderObject {
 		this._monitor = null;
 
 		/**
+		 * The object's original material when this render object is drawn with an
+		 * override material.
+		 *
+		 * @type {?Material}
+		 * @private
+		 * @default null
+		 */
+		this._sourceMaterial = renderer._currentSourceMaterial;
+
+		/**
 		 * An event listener which is defined by `RenderObjects`. It performs
 		 * clean up tasks when `dispose()` on this render object.
 		 *
@@ -333,6 +360,9 @@ class RenderObject {
 		 */
 		this.onGeometryDispose = () => {
 
+			this._geometries.deleteNodeAttributes( this );
+			this._geometries.deleteVertexState( this );
+
 			// clear geometry cache attributes
 
 			this.attributes = null;
@@ -340,8 +370,27 @@ class RenderObject {
 
 		};
 
+		/**
+		 * An event listener which is executed when `dispose()` is called on
+		 * the 3D object of this render object.
+		 *
+		 * @method
+		 */
+		this.onObjectDispose = () => {
+
+			this.dispose();
+
+		};
+
+		this.object.addEventListener( 'dispose', this.onObjectDispose );
 		this.material.addEventListener( 'dispose', this.onMaterialDispose );
 		this.geometry.addEventListener( 'dispose', this.onGeometryDispose );
+
+		if ( this._sourceMaterial !== null ) {
+
+			this._sourceMaterial.addEventListener( 'dispose', this.onMaterialDispose );
+
+		}
 
 	}
 
@@ -380,7 +429,7 @@ class RenderObject {
 	 */
 	get hardwareClippingPlanes() {
 
-		return this.material.hardwareClipping === true ? this.clippingContext.unionClippingCount : 0;
+		return this.getNodeBuilderState().hardwareClipping === true ? this.clippingContext.unionClippingCount : 0;
 
 	}
 
@@ -503,9 +552,18 @@ class RenderObject {
 	 */
 	setGeometry( geometry ) {
 
+		// exchanging the geometry means we must move the dipose handler to the new geometry
+
+		this.geometry.removeEventListener( 'dispose', this.onGeometryDispose );
+
 		this.geometry = geometry;
+
+		this.geometry.addEventListener( 'dispose', this.onGeometryDispose );
+
 		this.attributes = null;
 		this.attributesId = null;
+
+		this.geometryVersion ++;
 
 	}
 
@@ -540,7 +598,20 @@ class RenderObject {
 
 				// geometry attribute
 				attribute = geometry.getAttribute( nodeAttribute.name );
-				attributesId[ nodeAttribute.name ] = attribute.id;
+
+				if ( attribute !== undefined ) {
+
+					if ( attribute.isInterleavedBufferAttribute ) {
+
+						attributesId[ nodeAttribute.name ] = attribute.data.uuid;
+
+					} else {
+
+						attributesId[ nodeAttribute.name ] = attribute.id;
+
+					}
+
+				}
 
 			}
 
@@ -675,8 +746,6 @@ class RenderObject {
 
 			cacheKey += name + ',';
 
-			if ( attribute.data ) cacheKey += attribute.data.stride + ',';
-			if ( attribute.offset ) cacheKey += attribute.offset + ',';
 			if ( attribute.itemSize ) cacheKey += attribute.itemSize + ',';
 			if ( attribute.normalized ) cacheKey += 'n,';
 
@@ -684,7 +753,7 @@ class RenderObject {
 
 		// structural equality isn't sufficient for morph targets since the
 		// data are maintained in textures. only if the targets are all equal
-		// the texture and thus the instance of `MorphNode` can be shared.
+		// the texture and thus the `morphReference` can be shared.
 
 		for ( const name of Object.keys( geometry.morphAttributes ).sort() ) {
 
@@ -702,12 +771,6 @@ class RenderObject {
 
 		}
 
-		if ( geometry.index ) {
-
-			cacheKey += 'index,';
-
-		}
-
 		return cacheKey;
 
 	}
@@ -721,9 +784,9 @@ class RenderObject {
 	 */
 	getMaterialCacheKey() {
 
-		const { object, material, renderer } = this;
+		const { object, material, renderer, scene } = this;
 
-		let cacheKey = material.customProgramCacheKey();
+		let cacheKey = this._nodes.getCustomProgramCacheKey( material, scene );
 
 		for ( const property of getKeys( material ) ) {
 
@@ -741,7 +804,20 @@ class RenderObject {
 
 				if ( type === 'number' ) {
 
-					valueKey = value !== 0 ? '1' : '0'; // Convert to on/off, important for clearcoat, transmission, etc
+					if ( property === 'side' ) {
+
+						// `side` is an enum (FrontSide/BackSide/DoubleSide) that changes code
+						// generation, so its exact value must be preserved.
+
+						valueKey = String( value );
+
+					} else {
+
+						// Other numbers are reduced to on/off
+
+						valueKey = value !== 0 ? '1' : '0';
+
+					}
 
 				} else if ( type === 'object' ) {
 
@@ -809,7 +885,7 @@ class RenderObject {
 
 		}
 
-		if ( object.isInstancedMesh || object.count > 1 || Array.isArray( object.morphTargetInfluences ) ) {
+		if ( object.isInstancedMesh || object.count > 1 ) {
 
 			// TODO: https://github.com/mrdoob/three.js/pull/29066#issuecomment-2269400850
 
@@ -843,7 +919,11 @@ class RenderObject {
 
 				const attribute = this.geometry.getAttribute( name );
 
-				if ( attribute === undefined || attributesId[ name ] !== attribute.id ) {
+				if ( attribute === undefined ) return true;
+
+				const id = attribute.isInterleavedBufferAttribute ? attribute.data.uuid : attribute.id;
+
+				if ( attributesId[ name ] !== id ) {
 
 					return true;
 
@@ -887,28 +967,22 @@ class RenderObject {
 	 */
 	getDynamicCacheKey() {
 
-		let cacheKey = 0;
+		let environmentKey = 0;
 
 		// `Nodes.getCacheKey()` returns an environment cache key which is not relevant when
 		// the renderer is inside a shadow pass.
 
 		if ( this.material.isShadowPassMaterial !== true ) {
 
-			cacheKey = this._nodes.getCacheKey( this.scene, this.lightsNode );
+			environmentKey = this._nodes.getCacheKey( this.scene, this.lightsNode );
 
 		}
 
-		if ( this.camera.isArrayCamera ) {
-
-			cacheKey = hash( cacheKey, this.camera.cameras.length );
-
-		}
-
-		if ( this.object.receiveShadow ) {
-
-			cacheKey = hash( cacheKey, 1 );
-
-		}
+		_cacheKeyValues[ 0 ] = environmentKey;
+		_cacheKeyValues[ 1 ] = this.camera.isArrayCamera ? this.camera.cameras.length : 0;
+		_cacheKeyValues[ 2 ] = this.object.receiveShadow ? 1 : 0;
+		_cacheKeyValues[ 3 ] = this.renderer.contextNode.id;
+		_cacheKeyValues[ 4 ] = this.renderer.contextNode.version;
 
 		let count;
 
@@ -922,9 +996,9 @@ class RenderObject {
 
 		}
 
-		cacheKey = hash( cacheKey, count, this.renderer.contextNode.id, this.renderer.contextNode.version );
+		_cacheKeyValues[ 5 ] = count;
 
-		return cacheKey;
+		return hashArray( _cacheKeyValues );
 
 	}
 
@@ -944,8 +1018,15 @@ class RenderObject {
 	 */
 	dispose() {
 
+		this.object.removeEventListener( 'dispose', this.onObjectDispose );
 		this.material.removeEventListener( 'dispose', this.onMaterialDispose );
 		this.geometry.removeEventListener( 'dispose', this.onGeometryDispose );
+
+		if ( this._sourceMaterial !== null ) {
+
+			this._sourceMaterial.removeEventListener( 'dispose', this.onMaterialDispose );
+
+		}
 
 		this.onDispose();
 

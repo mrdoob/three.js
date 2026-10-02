@@ -1,8 +1,8 @@
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
 import { sub, mul, div, mod } from './OperatorNode.js';
 import { addMethodChaining, nodeObject, nodeProxyIntent, float, vec2, vec3, vec4, Fn } from '../tsl/TSLCore.js';
 import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../../constants.js';
-import { warn } from '../../utils.js';
+import { error } from '../../utils.js';
 
 /**
  * This node represents a variety of mathematical methods available in shaders.
@@ -12,9 +12,9 @@ import { warn } from '../../utils.js';
  * - Methods with two inputs like `dot`, `cross` or `pow`.
  * - Methods with three inputs like `mix`, `clamp` or `smoothstep`.
  *
- * @augments TempNode
+ * @augments Node
  */
-class MathNode extends TempNode {
+class MathNode extends Node {
 
 	static get type() {
 
@@ -40,7 +40,7 @@ class MathNode extends TempNode {
 
 			let finalOp = new MathNode( method, aNode, bNode );
 
-			for ( let i = 2; i < arguments.length - 1; i ++ ) {
+			for ( let i = 3; i < arguments.length - 1; i ++ ) {
 
 				finalOp = new MathNode( method, finalOp, arguments[ i ] );
 
@@ -109,21 +109,31 @@ class MathNode extends TempNode {
 		const bLen = builder.isMatrix( bType ) ? 0 : builder.getTypeLength( bType );
 		const cLen = builder.isMatrix( cType ) ? 0 : builder.getTypeLength( cType );
 
+		let type;
+
 		if ( aLen > bLen && aLen > cLen ) {
 
-			return aType;
+			type = aType;
 
 		} else if ( bLen > cLen ) {
 
-			return bType;
+			type = bType;
 
 		} else if ( cLen > aLen ) {
 
-			return cType;
+			type = cType;
+
+		} else {
+
+			type = aType;
 
 		}
 
-		return aType;
+		if ( builder.isMatrix( type ) ) return type;
+
+		const promotedType = _floatMethods.has( this.method ) ? 'float' : builder.getPromotedComponentType( this.aNode, this.bNode, this.cNode );
+
+		return builder.changeComponentType( type, promotedType );
 
 	}
 
@@ -137,7 +147,7 @@ class MathNode extends TempNode {
 
 		const method = this.method;
 
-		if ( method === MathNode.LENGTH || method === MathNode.DISTANCE || method === MathNode.DOT ) {
+		if ( method === MathNode.LENGTH || method === MathNode.DISTANCE || method === MathNode.DOT || method === MathNode.DETERMINANT ) {
 
 			return 'float';
 
@@ -173,7 +183,7 @@ class MathNode extends TempNode {
 
 		} else if ( method === MathNode.RECIPROCAL ) {
 
-			outputNode = div( 1.0, aNode );
+			outputNode = div( float( 1 ), aNode );
 
 		} else if ( method === MathNode.DIFFERENCE ) {
 
@@ -181,25 +191,23 @@ class MathNode extends TempNode {
 
 		} else if ( method === MathNode.TRANSFORM_DIRECTION ) {
 
-			// dir can be either a direction vector or a normal vector
-			// upper-left 3x3 of matrix is assumed to be orthogonal
+			// pre-multiplies the direction by the matrix and normalizes the result
 
-			let tA = aNode;
-			let tB = bNode;
+			let matrixNode, directionNode;
 
-			if ( builder.isMatrix( tA.getNodeType( builder ) ) ) {
+			if ( builder.isMatrix( aNode.getNodeType( builder ) ) ) {
 
-				tB = vec4( vec3( tB ), 0.0 );
+				matrixNode = aNode;
+				directionNode = bNode;
 
 			} else {
 
-				tA = vec4( vec3( tA ), 0.0 );
+				matrixNode = bNode;
+				directionNode = aNode;
 
 			}
 
-			const mulNode = mul( tA, tB ).xyz;
-
-			outputNode = normalize( mulNode );
+			outputNode = normalize( mul( matrixNode, vec4( vec3( directionNode ), 0.0 ) ).xyz );
 
 		}
 
@@ -262,7 +270,7 @@ class MathNode extends TempNode {
 
 				params.push(
 					a.build( builder, inputType ),
-					b.build( builder, builder.getTypeLength( b.getNodeType( builder ) ) === 1 ? 'float' : inputType )
+					b.build( builder, builder.getTypeLength( b.getNodeType( builder ) ) === 1 ? builder.getComponentType( inputType ) : inputType )
 				);
 
 			} else if ( method === MathNode.REFRACT ) {
@@ -291,7 +299,7 @@ class MathNode extends TempNode {
 
 				if ( builder.shaderStage !== 'fragment' && ( method === MathNode.DFDX || method === MathNode.DFDY ) ) {
 
-					warn( `TSL: '${ method }' is not supported in the ${ builder.shaderStage } stage.`, this.stackTrace );
+					error( `TSL: '${ method }' is not supported in the ${ builder.shaderStage } stage.`, this.stackTrace );
 
 					method = '/*' + method + '*/';
 
@@ -345,11 +353,17 @@ MathNode.CEIL = 'ceil';
 MathNode.NORMALIZE = 'normalize';
 MathNode.FRACT = 'fract';
 MathNode.SIN = 'sin';
+MathNode.SINH = 'sinh';
 MathNode.COS = 'cos';
+MathNode.COSH = 'cosh';
 MathNode.TAN = 'tan';
+MathNode.TANH = 'tanh';
 MathNode.ASIN = 'asin';
+MathNode.ASINH = 'asinh';
 MathNode.ACOS = 'acos';
+MathNode.ACOSH = 'acosh';
 MathNode.ATAN = 'atan';
+MathNode.ATANH = 'atanh';
 MathNode.ABS = 'abs';
 MathNode.SIGN = 'sign';
 MathNode.LENGTH = 'length';
@@ -386,6 +400,18 @@ MathNode.CLAMP = 'clamp';
 MathNode.REFRACT = 'refract';
 MathNode.SMOOTHSTEP = 'smoothstep';
 MathNode.FACEFORWARD = 'faceforward';
+
+// Methods that are only defined for floating-point types.
+
+const _floatMethods = new Set( [
+	MathNode.RADIANS, MathNode.DEGREES, MathNode.EXP, MathNode.EXP2, MathNode.LOG, MathNode.LOG2,
+	MathNode.SQRT, MathNode.INVERSE_SQRT, MathNode.FLOOR, MathNode.CEIL, MathNode.NORMALIZE, MathNode.FRACT,
+	MathNode.SIN, MathNode.SINH, MathNode.COS, MathNode.COSH, MathNode.TAN, MathNode.TANH,
+	MathNode.ASIN, MathNode.ASINH, MathNode.ACOS, MathNode.ACOSH, MathNode.ATAN, MathNode.ATANH,
+	MathNode.LENGTH, MathNode.DFDX, MathNode.DFDY, MathNode.ROUND, MathNode.TRUNC, MathNode.FWIDTH, MathNode.RECIPROCAL,
+	MathNode.STEP, MathNode.REFLECT, MathNode.DISTANCE, MathNode.DOT, MathNode.CROSS, MathNode.POW,
+	MathNode.MIX, MathNode.REFRACT, MathNode.SMOOTHSTEP, MathNode.FACEFORWARD
+] );
 
 export default MathNode;
 
@@ -591,6 +617,16 @@ export const fract = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.FRACT ).s
 export const sin = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.SIN ).setParameterLength( 1 );
 
 /**
+ * Returns the hyperbolic sine of the parameter.
+ *
+ * @tsl
+ * @function
+ * @param {Node | number} x - The parameter.
+ * @returns {Node}
+ */
+export const sinh = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.SINH ).setParameterLength( 1 );
+
+/**
  * Returns the cosine of the parameter.
  *
  * @tsl
@@ -599,6 +635,16 @@ export const sin = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.SIN ).setPa
  * @returns {Node}
  */
 export const cos = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.COS ).setParameterLength( 1 );
+
+/**
+ * Returns the hyperbolic cosine of the parameter.
+ *
+ * @tsl
+ * @function
+ * @param {Node | number} x - The parameter.
+ * @returns {Node}
+ */
+export const cosh = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.COSH ).setParameterLength( 1 );
 
 /**
  * Returns the tangent of the parameter.
@@ -611,6 +657,16 @@ export const cos = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.COS ).setPa
 export const tan = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.TAN ).setParameterLength( 1 );
 
 /**
+ * Returns the hyperbolic tangent of the parameter.
+ *
+ * @tsl
+ * @function
+ * @param {Node | number} x - The parameter.
+ * @returns {Node}
+ */
+export const tanh = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.TANH ).setParameterLength( 1 );
+
+/**
  * Returns the arcsine of the parameter.
  *
  * @tsl
@@ -619,6 +675,16 @@ export const tan = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.TAN ).setPa
  * @returns {Node}
  */
 export const asin = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ASIN ).setParameterLength( 1 );
+
+/**
+ * Returns the inverse hyperbolic sine of the parameter.
+ *
+ * @tsl
+ * @function
+ * @param {Node | number} x - The parameter.
+ * @returns {Node}
+ */
+export const asinh = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ASINH ).setParameterLength( 1 );
 
 /**
  * Returns the arccosine of the parameter.
@@ -631,6 +697,16 @@ export const asin = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ASIN ).set
 export const acos = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ACOS ).setParameterLength( 1 );
 
 /**
+ * Returns the inverse hyperbolic cosine of the parameter.
+ *
+ * @tsl
+ * @function
+ * @param {Node | number} x - The parameter.
+ * @returns {Node}
+ */
+export const acosh = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ACOSH ).setParameterLength( 1 );
+
+/**
  * Returns the arc-tangent of the parameter.
  * If two parameters are provided, the result is `atan2(y/x)`.
  *
@@ -641,6 +717,16 @@ export const acos = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ACOS ).set
  * @returns {Node}
  */
 export const atan = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ATAN ).setParameterLength( 1, 2 );
+
+/**
+ * Returns the inverse hyperbolic tangent of the parameter.
+ *
+ * @tsl
+ * @function
+ * @param {Node | number} x - The parameter.
+ * @returns {Node}
+ */
+export const atanh = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ATANH ).setParameterLength( 1 );
 
 /**
  * Returns the absolute value of the parameter.
@@ -923,6 +1009,34 @@ export const pow4 = ( x ) => mul( x, x, x, x );
 export const transformDirection = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.TRANSFORM_DIRECTION ).setParameterLength( 2 );
 
 /**
+ * Transforms a normal vector by the view matrix and then normalizes the result.
+ *
+ * The upper-left 3x3 of the view matrix is assumed to be orthonormal, so the
+ * normal can be transformed directly without involving the normal matrix.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec3>} normal - The normal vector, given in world space.
+ * @param {Node<mat3|mat4>} viewMatrix - The view matrix.
+ * @returns {Node<vec3>} The normal vector in view space.
+ */
+export const transformNormalByViewMatrix = ( normal, viewMatrix ) => normalize( mul( viewMatrix, vec4( vec3( normal ), 0.0 ) ).xyz );
+
+/**
+ * Transforms a normal vector by the inverse of the view matrix and then normalizes the result.
+ *
+ * The upper-left 3x3 of the view matrix is assumed to be orthonormal, so post-multiplying
+ * by the view matrix is equivalent to pre-multiplying by its inverse.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec3>} normal - The normal vector, given in view space.
+ * @param {Node<mat3|mat4>} viewMatrix - The view matrix.
+ * @returns {Node<vec3>} The normal vector in world space.
+ */
+export const transformNormalByInverseViewMatrix = ( normal, viewMatrix ) => normalize( vec4( vec3( normal ), 0.0 ).mul( viewMatrix ).xyz );
+
+/**
  * Returns the cube root of a number.
  *
  * @tsl
@@ -1087,11 +1201,17 @@ addMethodChaining( 'ceil', ceil );
 addMethodChaining( 'normalize', normalize );
 addMethodChaining( 'fract', fract );
 addMethodChaining( 'sin', sin );
+addMethodChaining( 'sinh', sinh );
 addMethodChaining( 'cos', cos );
+addMethodChaining( 'cosh', cosh );
 addMethodChaining( 'tan', tan );
+addMethodChaining( 'tanh', tanh );
 addMethodChaining( 'asin', asin );
+addMethodChaining( 'asinh', asinh );
 addMethodChaining( 'acos', acos );
+addMethodChaining( 'acosh', acosh );
 addMethodChaining( 'atan', atan );
+addMethodChaining( 'atanh', atanh );
 addMethodChaining( 'abs', abs );
 addMethodChaining( 'sign', sign );
 addMethodChaining( 'length', length );
@@ -1116,6 +1236,8 @@ addMethodChaining( 'pow2', pow2 );
 addMethodChaining( 'pow3', pow3 );
 addMethodChaining( 'pow4', pow4 );
 addMethodChaining( 'transformDirection', transformDirection );
+addMethodChaining( 'transformNormalByViewMatrix', transformNormalByViewMatrix );
+addMethodChaining( 'transformNormalByInverseViewMatrix', transformNormalByInverseViewMatrix );
 addMethodChaining( 'mix', mixElement );
 addMethodChaining( 'clamp', clamp );
 addMethodChaining( 'refract', refract );

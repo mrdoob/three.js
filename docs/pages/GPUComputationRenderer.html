@@ -24,6 +24,8 @@ as inputs to render the textures of the next frame.</p>
 <p>Variable names should be valid identifiers and should not collide with THREE GLSL used identifiers.
 a common approach could be to use 'texture' prefixing the variable name; i.e texturePosition, textureVelocity...</p>
 <p>The size of the computation (sizeX * sizeY) is defined as 'resolution' automatically in the shader. For example:</p>
+<pre class="prettyprint source"><code>#DEFINE resolution vec2( 1024.0, 1024.0 )
+</code></pre>
 <p>Basic use:</p>
 <pre><code class="language-js">// Initialization...
 // Create computation renderer
@@ -69,13 +71,10 @@ myMaterial.uniforms.map.value = outputRenderTarget.texture;
 gpuCompute.doRenderTarget( myFilter1, myRenderTarget );
 gpuCompute.doRenderTarget( myFilter2, outputRenderTarget );
 </code></pre></div>
-				<h2>Code Example</h2>
-				<div translate="no"><pre class="prettyprint source"><code>#DEFINE resolution vec2( 1024.0, 1024.0 )
-</code></pre></div>
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">GPUComputationRenderer</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<p><span translate="no">GPUComputationRenderer</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { GPUComputationRenderer } from 'three/addons/misc/GPUComputationRenderer.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>

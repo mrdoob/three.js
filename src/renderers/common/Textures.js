@@ -48,6 +48,63 @@ class Textures extends DataMap {
 		 */
 		this.info = info;
 
+		/**
+		 * A set of HTMLTextures that need paint updates.
+		 *
+		 * @type {Set<HTMLTexture>}
+		 */
+		this._htmlTextures = new Set();
+
+		/**
+		 * Stores weak references to the textures and render targets
+		 * with attached `dispose` event listeners.
+		 *
+		 * @private
+		 * @type {Set<WeakRef<(Texture|RenderTarget)>>}
+		 */
+		this._tracked = new Set();
+
+		/**
+		 * Removes weak references from `_tracked` when their texture or
+		 * render target has been garbage collected without an explicit
+		 * `dispose()`.
+		 *
+		 * @private
+		 * @type {FinalizationRegistry}
+		 */
+		this._registry = new FinalizationRegistry( ( ref ) => this._tracked.delete( ref ) );
+
+	}
+
+	/**
+	 * Frees internal resources.
+	 */
+	dispose() {
+
+		for ( const ref of this._tracked ) {
+
+			const object = ref.deref();
+
+			if ( object === undefined || this.has( object ) === false ) continue;
+
+			if ( object.isRenderTarget === true ) {
+
+				this._destroyRenderTarget( object );
+
+			} else {
+
+				this._destroyTexture( object );
+
+			}
+
+		}
+
+		this._tracked.clear();
+
+		this._htmlTextures.clear();
+
+		super.dispose();
+
 	}
 
 	/**
@@ -76,6 +133,9 @@ class Textures extends DataMap {
 
 		let textureNeedsUpdate = false;
 
+		const hasArrayDepthTexture = depthTexture !== undefined && depthTexture.image !== undefined && depthTexture.image.depth > 1;
+		const useArrayDepth = size.depth > 1 && ( renderTarget.useArrayDepthTexture || renderTarget.multiview || hasArrayDepthTexture );
+
 		if ( depthTexture === undefined && useDepthTexture ) {
 
 			depthTexture = new DepthTexture();
@@ -86,9 +146,14 @@ class Textures extends DataMap {
 			depthTexture.image.height = mipHeight;
 			depthTexture.image.depth = size.depth;
 			depthTexture.renderTarget = renderTarget;
-			depthTexture.isArrayTexture = renderTarget.multiview === true && size.depth > 1;
 
 			depthTextureMips[ activeMipmapLevel ] = depthTexture;
+
+		}
+
+		if ( depthTexture ) {
+
+			depthTexture.isArrayTexture = useArrayDepth;
 
 		}
 
@@ -96,12 +161,12 @@ class Textures extends DataMap {
 
 			textureNeedsUpdate = true;
 
-			if ( depthTexture ) {
+			if ( depthTexture && depthTexture.renderTarget === renderTarget ) {
 
 				depthTexture.needsUpdate = true;
 				depthTexture.image.width = mipWidth;
 				depthTexture.image.height = mipHeight;
-				depthTexture.image.depth = depthTexture.isArrayTexture ? depthTexture.image.depth : 1;
+				depthTexture.image.depth = useArrayDepth ? size.depth : 1;
 
 			}
 
@@ -119,7 +184,7 @@ class Textures extends DataMap {
 
 			textureNeedsUpdate = true;
 
-			if ( depthTexture ) {
+			if ( depthTexture && depthTexture.renderTarget === renderTarget ) {
 
 				depthTexture.needsUpdate = true;
 
@@ -174,6 +239,12 @@ class Textures extends DataMap {
 
 			renderTarget.addEventListener( 'dispose', renderTargetData.onDispose );
 
+			// see #34368 why tracking separate remove listeners is required right now
+			renderTargetData.ref = new WeakRef( renderTarget );
+
+			this._tracked.add( renderTargetData.ref );
+			this._registry.register( renderTarget, renderTargetData.ref, renderTargetData.ref );
+
 		}
 
 	}
@@ -185,11 +256,12 @@ class Textures extends DataMap {
 	 *
 	 * @param {Texture} texture - The texture to update.
 	 * @param {Object} [options={}] - The options.
+	 * @return {number} The current texture generation.
 	 */
 	updateTexture( texture, options = {} ) {
 
 		const textureData = this.get( texture );
-		if ( textureData.initialized === true && textureData.version === texture.version ) return;
+		if ( textureData.initialized === true && textureData.version === texture.version ) return textureData.generation;
 
 		const isRenderTarget = texture.isRenderTargetTexture || texture.isDepthTexture || texture.isFramebufferTexture;
 		const backend = this.backend;
@@ -220,6 +292,56 @@ class Textures extends DataMap {
 
 		}
 
+		// Ensure HTMLTexture elements are in the canvas before measuring size.
+
+		if ( texture.isHTMLTexture && texture.image ) {
+
+			const canvas = this.renderer.domElement;
+
+			if ( 'requestPaint' in canvas ) {
+
+				if ( ! canvas.hasAttribute( 'layoutsubtree' ) ) {
+
+					canvas.setAttribute( 'layoutsubtree', 'true' );
+
+				}
+
+				if ( texture.image.parentNode !== canvas ) {
+
+					canvas.appendChild( texture.image );
+
+				}
+
+				// Set up shared paint callback for all HTMLTextures.
+
+				if ( this._htmlTextures.size === 0 ) {
+
+					const htmlTextures = this._htmlTextures;
+
+					canvas.onpaint = ( event ) => {
+
+						const changed = event && event.changedElements;
+
+						for ( const t of htmlTextures ) {
+
+							if ( ! changed || changed.includes( t.image ) ) {
+
+								t.needsUpdate = true;
+
+							}
+
+						}
+
+					};
+
+				}
+
+				this._htmlTextures.add( texture );
+
+			}
+
+		}
+
 		//
 
 		const { width, height, depth } = this.getSize( texture );
@@ -231,10 +353,10 @@ class Textures extends DataMap {
 		options.levels = options.needsMipmaps ? this.getMipLevels( texture, width, height ) : 1;
 
 		// TODO: Uniformly handle mipmap definitions
-		// Normal textures and compressed cube textures define base level + mips with their mipmap array
+		// Normal textures, compressed cube textures and render targets define base level + mips with their mipmap array
 		// Uncompressed cube textures use their mipmap array only for mips (no base level)
 
-		if ( texture.isCubeTexture && texture.mipmaps.length > 0 ) options.levels ++;
+		if ( texture.isCubeTexture && texture.mipmaps.length > 0 && ! isRenderTarget ) options.levels ++;
 
 		//
 
@@ -289,9 +411,7 @@ class Textures extends DataMap {
 
 					if ( texture.source.dataReady === true ) backend.updateTexture( texture, options );
 
-					const skipAutoGeneration = texture.isStorageTexture === true && texture.mipmapsAutoUpdate === false;
-
-					if ( options.needsMipmaps && texture.mipmaps.length === 0 && ! skipAutoGeneration ) {
+					if ( options.needsMipmaps && texture.mipmaps.length === 0 && texture.mipmapsAutoUpdate === true ) {
 
 						backend.generateMipmaps( texture );
 
@@ -336,19 +456,31 @@ class Textures extends DataMap {
 
 			// dispose
 
-			textureData.onDispose = () => {
+			if ( texture.isRenderTargetTexture !== true ) {
 
-				this._destroyTexture( texture );
+				textureData.onDispose = () => {
 
-			};
+					this._destroyTexture( texture );
 
-			texture.addEventListener( 'dispose', textureData.onDispose );
+				};
+
+				texture.addEventListener( 'dispose', textureData.onDispose );
+
+			}
+
+			// see #34368 why tracking separate remove listeners is required right now
+			textureData.ref = new WeakRef( texture );
+
+			this._tracked.add( textureData.ref );
+			this._registry.register( texture, textureData.ref, textureData.ref );
 
 		}
 
 		//
 
 		textureData.version = texture.version;
+
+		return textureData.generation;
 
 	}
 
@@ -361,12 +493,12 @@ class Textures extends DataMap {
 	 * In WebGPU, samplers are objects like textures and it's possible to share
 	 * them when the texture parameters match.
 	 *
-	 * @param {Texture} texture - The texture to update the sampler for.
+	 * @param {Sampler} binding - The sampler binding to update.
 	 * @return {string} The current sampler key.
 	 */
-	updateSampler( texture ) {
+	updateSampler( binding ) {
 
-		return this.backend.updateSampler( texture );
+		return this.backend.updateSampler( binding );
 
 	}
 
@@ -390,7 +522,13 @@ class Textures extends DataMap {
 
 			if ( image.image !== undefined ) image = image.image;
 
-			if ( ( typeof HTMLVideoElement !== 'undefined' ) && ( image instanceof HTMLVideoElement ) ) {
+			if ( texture.isHTMLTexture ) {
+
+				target.width = image.offsetWidth || 1;
+				target.height = image.offsetHeight || 1;
+				target.depth = 1;
+
+			} else if ( ( typeof HTMLVideoElement !== 'undefined' ) && ( image instanceof HTMLVideoElement ) ) {
 
 				target.width = image.videoWidth || 1;
 				target.height = image.videoHeight || 1;
@@ -489,6 +627,9 @@ class Textures extends DataMap {
 
 			renderTarget.removeEventListener( 'dispose', renderTargetData.onDispose );
 
+			this._tracked.delete( renderTargetData.ref );
+			this._registry.unregister( renderTargetData.ref );
+
 			//
 
 			for ( let i = 0; i < textures.length; i ++ ) {
@@ -497,7 +638,7 @@ class Textures extends DataMap {
 
 			}
 
-			if ( depthTexture ) {
+			if ( depthTexture && depthTexture.renderTarget === renderTarget ) {
 
 				this._destroyTexture( depthTexture );
 
@@ -528,6 +669,9 @@ class Textures extends DataMap {
 
 			texture.removeEventListener( 'dispose', textureData.onDispose );
 
+			this._tracked.delete( textureData.ref );
+			this._registry.unregister( textureData.ref );
+
 			// if a texture is not ready for use, it falls back to a default texture so it's possible
 			// to use it for rendering. If a texture in this state is disposed, it's important to
 			// not destroy/delete the underlying GPU texture object since it is cached and shared with
@@ -547,9 +691,30 @@ class Textures extends DataMap {
 					bindingsData.groups = undefined;
 					bindingsData.versions = undefined;
 
+					// go through all bindings and if one points to the destroyed texture, trigger dispose as well
+
+					for ( const binding of bindGroup.bindings ) {
+
+						if ( binding.isSampler && binding.texture === texture ) {
+
+							if ( binding.isSampledTexture !== true ) {
+
+								this.backend.destroySampler( binding );
+
+							}
+
+							binding.reset();
+							binding.release();
+
+						}
+
+					}
+
 				}
 
 			}
+
+			this._htmlTextures.delete( texture );
 
 			this.delete( texture );
 

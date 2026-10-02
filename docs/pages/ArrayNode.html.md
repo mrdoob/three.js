@@ -65,6 +65,18 @@ The current node builder.
 
 **Returns:** The generated shader string.
 
+### .generateNodeType( builder : NodeBuilder ) : string
+
+Returns the node's type.
+
+**builder**
+
+The current node builder.
+
+**Overrides:** [TempNode#generateNodeType](TempNode.html#generateNodeType)
+
+**Returns:** The type of the node.
+
 ### .getArrayCount( builder : NodeBuilder ) : number
 
 Returns the number of elements in the node array.
@@ -104,18 +116,6 @@ The name of the member variable.
 **Overrides:** [TempNode#getMemberType](TempNode.html#getMemberType)
 
 **Returns:** The type of the member variable.
-
-### .getNodeType( builder : NodeBuilder ) : string
-
-Returns the node's type.
-
-**builder**
-
-The current node builder.
-
-**Overrides:** [TempNode#getNodeType](TempNode.html#getNodeType)
-
-**Returns:** The type of the node.
 
 ## Source
 

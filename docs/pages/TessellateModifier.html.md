@@ -11,7 +11,7 @@ geometry = modifier.modify( geometry );
 
 ## Import
 
-TessellateModifier is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+TessellateModifier is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { TessellateModifier } from 'three/addons/modifiers/TessellateModifier.js';
@@ -53,7 +53,7 @@ Default is `0.1`.
 
 ### .modify( geometry : BufferGeometry ) : BufferGeometry
 
-Returns a new, modified version of the given geometry by applying a tesselation. Please note that the resulting geometry is always non-indexed.
+Returns a new, modified version of the given geometry by applying a tessellation. Please note that the resulting geometry is always non-indexed.
 
 **geometry**
 
