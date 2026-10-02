@@ -1407,11 +1407,15 @@ class WebGLRenderer {
 
 			renderStateStack.push( currentRenderState );
 
-			// gather lights from both the target scene and the new object that will be added to the scene.
+			// gather lights and light probe grids from both the target scene and the new object that will be added to the scene.
 
 			targetScene.traverseVisible( function ( object ) {
 
-				if ( object.isLight && object.layers.test( camera.layers ) ) {
+				if ( object.isLightProbeGrid && object.layers.test( camera.layers ) ) {
+
+					currentRenderState.pushLightProbeGrid( object );
+
+				} else if ( object.isLight && object.layers.test( camera.layers ) ) {
 
 					currentRenderState.pushLight( object );
 
@@ -1429,7 +1433,11 @@ class WebGLRenderer {
 
 				scene.traverseVisible( function ( object ) {
 
-					if ( object.isLight && object.layers.test( camera.layers ) ) {
+					if ( object.isLightProbeGrid && object.layers.test( camera.layers ) ) {
+
+						currentRenderState.pushLightProbeGrid( object );
+
+					} else if ( object.isLight && object.layers.test( camera.layers ) ) {
 
 						currentRenderState.pushLight( object );
 
