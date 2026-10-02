@@ -1,6 +1,7 @@
 import { error } from '../../utils.js';
 import StackTrace from '../core/StackTrace.js';
 import PropertyNode from './PropertyNode.js';
+import { shaderStages } from './constants.js';
 
 /**
  * Special version of {@link PropertyNode} which is used for parameters.
@@ -46,19 +47,40 @@ class ParameterNode extends PropertyNode {
 	getMemberType( builder, name ) {
 
 		const type = this.getNodeType( builder );
-		const struct = builder.getStructTypeNode( type );
+		let struct = builder.getStructTypeNode( type );
 
-		let memberType;
+		if ( struct === null ) {
 
-		if ( struct !== null ) {
+			// Struct types are registered per shader stage as a side effect of
+			// `StructTypeNode.setup()`. Since a node is set up only once, the
+			// registration happens in the first stage that builds the struct.
+			// When the struct is also used in another stage, the type might not
+			// be registered for the current stage yet. Member layouts are
+			// stage-independent, so resolve the type from another stage.
 
-			memberType = struct.getMemberType( builder, name );
+			for ( const shaderStage of shaderStages ) {
 
-		} else {
+				struct = builder.getStructTypeNode( type, shaderStage );
+
+				if ( struct !== null ) break;
+
+			}
+
+			if ( struct === null ) {
+
+				error( `TSL: Struct type "${ type }" is not registered for the "${ builder.shaderStage }" stage.`, new StackTrace() );
+
+				return 'float';
+
+			}
+
+		}
+
+		const memberType = struct.getMemberType( builder, name );
+
+		if ( memberType === 'void' ) {
 
 			error( `TSL: Member "${ name }" not found in struct "${ type }".`, new StackTrace() );
-
-			memberType = 'float';
 
 		}
 

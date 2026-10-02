@@ -3,6 +3,7 @@ import './utils/qunit-utils.js';
 
 // tsl
 import './tsl/TSL.tests.js';
+import './tsl/Struct.tests.js';
 
 //src
 import './src/constants.tests.js';
