@@ -1318,14 +1318,32 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			} else if ( texture.isHTMLTexture ) {
 
-				if ( 'texElementImage2D' in _gl ) {
+				// Chromium 155+ replaces texElementImage2D() with texElementSubImage2D().
+				if ( 'texElementImage2D' in _gl || 'texElementSubImage2D' in _gl ) {
 
 					const canvas = _gl.canvas;
 
 					// Ensure the canvas supports HTML-in-Canvas and the element is a child.
-					if ( ! canvas.hasAttribute( 'layoutsubtree' ) ) {
+					if ( ! canvas.hasAttribute( 'content' ) && ! canvas.hasAttribute( 'layoutsubtree' ) ) {
 
-						canvas.setAttribute( 'layoutsubtree', 'true' );
+						if ( 'content' in canvas ) {
+
+							// Chromium 155+: layoutsubtree was renamed to content="drawable"
+							canvas.setAttribute( 'content', 'drawable' );
+
+						} else {
+
+							// Chromium <= 155
+							canvas.setAttribute( 'layoutsubtree', 'true' );
+
+						}
+
+					}
+
+					// Chromium 155+ requires the drawable attribute on drawn canvas children.
+					if ( ! image.hasAttribute( 'drawable' ) ) {
+
+						image.setAttribute( 'drawable', '' );
 
 					}
 
@@ -1357,15 +1375,77 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					}
 
-					if ( _gl.texElementImage2D.length === 3 ) {
+					if ( typeof _gl.texElementSubImage2D === 'function' ) {
 
-						// Chrome 150+
+						// Chromium 155+
+						// The texture has to be allocated first.
+						let width, height;
+
+						if ( typeof canvas.captureElementImage === 'function' ) {
+
+							let elementImage;
+
+							try {
+
+								elementImage = canvas.captureElementImage( image );
+
+							} catch ( e ) {
+
+								// No paint record for the element yet. Returning early keeps the
+								// texture marked for upload, so the copy is retried on the next frame.
+								canvas.requestPaint();
+								return;
+
+							}
+
+							width = Math.ceil( elementImage.width );
+							height = Math.ceil( elementImage.height );
+
+						} else {
+
+							const dpr = window.devicePixelRatio || 1;
+
+							width = Math.max( 1, Math.round( image.offsetWidth * dpr ) );
+							height = Math.max( 1, Math.round( image.offsetHeight * dpr ) );
+
+						}
+
+						if ( width > 0 && height > 0 ) {
+
+							// Allocate only on first upload or when the size changes; re-allocating resets the contents.
+							if ( allocateMemory || textureProperties.__width !== width || textureProperties.__height !== height ) {
+
+								state.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA8, width, height, 0, _gl.RGBA, _gl.UNSIGNED_BYTE, null );
+								textureProperties.__width = width;
+								textureProperties.__height = height;
+
+							}
+
+							try {
+
+								// Pass the destination size. It forces the copy to exactly fill the
+								// allocated texture, independently of how the canvas is sized.
+								_gl.texElementSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, image, { width, height } );
+
+							} catch ( e ) {
+
+								// Keep the previous contents and retry on the next frame.
+								canvas.requestPaint();
+								return;
+
+							}
+
+						}
+
+					} else if ( _gl.texElementImage2D.length === 3 ) {
+
+						// Chromium 150+
 
 						_gl.texElementImage2D( _gl.TEXTURE_2D, _gl.RGBA8, image );
 
 					} else {
 
-						// Chrome 138 - 149
+						// Chromium 138 - 149
 
 						const level = 0;
 						const internalFormat = _gl.RGBA;
