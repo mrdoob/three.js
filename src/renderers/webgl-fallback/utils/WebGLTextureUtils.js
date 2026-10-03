@@ -1185,7 +1185,7 @@ class WebGLTextureUtils {
 
 				if ( depthTexture && depthTexture.isDepthTexture ) {
 
-					if ( depthTexture.type === gl.FLOAT ) {
+					if ( depthTexture.type === FloatType ) {
 
 						glInternalFormat = gl.DEPTH_COMPONENT32F;
 
