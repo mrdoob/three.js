@@ -10,9 +10,23 @@ const tangents = MikkTSpace.generateTangents( positions, normals, uvs );
 
 The inputs are matching, non-indexed `Float32Array` attributes: three position and normal components, and two UV components per vertex. Input components should be finite and normals should be unit length. As in the reference, extreme magnitudes can overflow intermediate float32 arithmetic. The result contains four components per vertex: tangent XYZ and handedness W. `computeMikkTSpaceTangents()` handles indexed, normalized, and interleaved geometry attributes and negates W by default for conventions such as glTF.
 
-There is no initialization or WebAssembly dependency. The `isReady` and `ready` exports remain available for existing callers; `isReady` is always `true` and `ready` is an already resolved promise. `dispose()` is retained as a no-op because there are no persistent buffers to release.
+`isReady` is always `true`: the JavaScript needs no initialization and nothing runs on import. A caller that awaits `ready` has `generateTangents()` run in the WebAssembly build below from then on (`ready` resolves to `false` where WebAssembly is unavailable, and the JavaScript keeps serving). `dispose()` releases the build and its memory; awaiting `ready` again brings it back.
 
 The port retains attribute welding, connected orientation groups, angular subgroups, corner-angle weighting, float32 arithmetic, and degenerate-triangle fallback. Typed hash tables replace sorting and linear lookups, and projected derivatives and corner angles are reused within each group. It supports the reference's default 180-degree threshold and basic tangent output. Quads, custom thresholds, and bitangent/magnitude output are not exposed by this API.
+
+## WebAssembly
+
+The module also embeds a WebAssembly build of the port above, compiled from this file's JavaScript by [jz](https://github.com/dy/jz) (commit `a4e3da3a`; the two-line recipe is in the module). `generateTangents()` runs in it once `ready` resolves, and in JavaScript otherwise. Both give the same tangents: on `ShaderBall.glb` and on a 20,000-triangle random mesh every output component is the same bit under V8 and under JavaScriptCore (jz's `Math.acos` is fdlibm's, within one ulp of the engine's).
+
+`ShaderBall.glb` (88,264 triangles), warm, least of 120 runs, copies in and out included:
+
+| | JavaScript | WebAssembly |
+| --- | --- | --- |
+| Chrome 154 | 31.8 ms | 17.8 ms (1.8× faster) |
+| Node 25.9 (V8) | 29.5 ms | 15.9 ms (1.9× faster) |
+| Bun 1.3.14 (JavaScriptCore) | 15.1 ms | 16.4 ms (0.92×, slower) |
+
+The build is 64 KB (28 KB gzipped) and uses no SIMD or tail calls, so it runs from Chrome 85, Firefox 78 and Safari 15. Where it cannot instantiate, or traps inside a call, the JavaScript answers. Every call returns its memory; an instance whose memory grew past 16 MB (a 200k-corner mesh needs 19 MB) is dropped after the call and remade for the next, so no more than that stays allocated between calls. `test/unit/addons/libs/MikkTSpace.tests.js` holds the two paths to the same tangents.
 
 ## Compatibility
 
