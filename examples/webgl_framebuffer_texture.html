@@ -9,34 +9,11 @@
 		<meta property="og:url" content="https://threejs.org/examples/webgl_framebuffer_texture.html">
 		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_framebuffer_texture.jpg">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<style>
-			#selection {
-				position: fixed;
-				display: flex;
-				flex-direction: column;
-				justify-content: center;
-				align-items: center;
-				height: 100%;
-				width: 100%;
-				top: 0;
-				z-index: 999;
-			}
-
-			#selection > div {
-				height: 128px;
-				width: 128px;
-				border: 1px solid white;
-			}
-		</style>
 	</head>
 	<body>
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> framebuffer to texture
-		</div>
-
-		<div id="selection">
-			<div></div>
 		</div>
 
 		<script type="importmap">
@@ -56,7 +33,7 @@
 			import * as GeometryUtils from 'three/addons/utils/GeometryUtils.js';
 
 			let camera, scene, renderer;
-			let line, sprite, texture;
+			let line, sprite, texture, outline;
 
 			let cameraOrtho, sceneOrtho;
 
@@ -118,6 +95,47 @@
 
 				updateSpritePosition();
 
+				// outline of the copied region: a screen-space line, one CSS pixel wide, smoothed with fwidth()
+
+				const outlineMaterial = new THREE.ShaderMaterial( {
+					uniforms: {
+						lineWidth: { value: dpr } // in device pixels
+					},
+					vertexShader: /* glsl */`
+						varying vec2 vUv;
+
+						void main() {
+
+							vUv = uv;
+							gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+						}
+					`,
+					fragmentShader: /* glsl */`
+						uniform float lineWidth;
+
+						varying vec2 vUv;
+
+						void main() {
+
+							// distance to the nearest edge of the quad, in pixels
+							vec2 distance = min( vUv, 1.0 - vUv ) / fwidth( vUv );
+							float edge = min( distance.x, distance.y );
+
+							float alpha = 1.0 - smoothstep( lineWidth - 0.5, lineWidth + 0.5, edge );
+
+							gl_FragColor = vec4( 1.0, 1.0, 1.0, alpha );
+
+						}
+					`,
+					transparent: true,
+					depthTest: false
+				} );
+
+				outline = new THREE.Mesh( new THREE.PlaneGeometry( textureSize / dpr, textureSize / dpr ), outlineMaterial );
+				outline.position.z = 1;
+				sceneOrtho.add( outline );
+
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -129,8 +147,7 @@
 
 				//
 
-				const selection = document.getElementById( 'selection' );
-				const controls = new OrbitControls( camera, selection );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.enablePan = false;
 
 				//
