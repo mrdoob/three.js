@@ -1336,6 +1336,8 @@ class WebGPUBackend extends Backend {
 		for ( let i = 0; i < cameras.length; i ++ ) {
 
 			const layerDescriptor = renderContextData.layerDescriptors[ i ];
+			layerDescriptor.timestampWrites = descriptor.timestampWrites;
+
 			const sourceColorAttachment = descriptor.colorAttachments[ 0 ];
 			const layerColorAttachment = descriptor.colorAttachments[ i ];
 			const colorAttachment = layerDescriptor.colorAttachments[ 0 ];
@@ -2588,7 +2590,12 @@ class WebGPUBackend extends Backend {
 	 */
 	initTimestampQuery( type, uid, descriptor ) {
 
-		if ( ! this.trackTimestamp ) return;
+		if ( ! this.trackTimestamp ) {
+
+			descriptor.timestampWrites = undefined;
+			return;
+
+		}
 
 		if ( ! this.timestampQueryPool[ type ] ) {
 
