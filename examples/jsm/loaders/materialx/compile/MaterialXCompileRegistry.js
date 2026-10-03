@@ -38,7 +38,6 @@ import {
 import {
 	getComponentCountForType,
 	normalizeSpaceName,
-	resolveTextureAddressMode,
 	toBooleanNode,
 	toVec3Channels,
 } from '../MaterialXUtils.js';
@@ -54,27 +53,13 @@ const register = ( registry, categories, handler ) => {
 
 };
 
-const UV_FALLBACK_CATEGORIES = new Set( [ 'checkerboard', 'noise2d', 'fractal2d', 'cellnoise2d', 'worleynoise2d', 'unifiednoise2d', 'heighttonormal' ] );
 const SCALAR_TYPES = new Set( [ 'boolean', 'integer', 'float' ] );
 const THREE_COMPONENT_TYPES = new Set( [ 'vector2', 'vector3', 'vector4', 'color3', 'color4' ] );
 const SWITCH_MIN_INDEX = 1;
 const SWITCH_MAX_INDEX = 10;
 
-const getDefaultUvNode = ( compileContext ) => compileContext.getTexcoordNode( 0 );
 
 const toBooleanMaskNode = ( node ) => toBooleanNode( node ).select( float( 1 ), float( 0 ) );
-
-const getTextureAddressMode = ( nodeX, inputName ) => {
-
-	const value = nodeX.getInputValueByName( inputName );
-	return resolveTextureAddressMode( value ) ?? 'periodic';
-
-};
-
-const getTextureAddressModes = ( nodeX ) => ( {
-	u: getTextureAddressMode( nodeX, 'uaddressmode' ),
-	v: getTextureAddressMode( nodeX, 'vaddressmode' ),
-} );
 
 const getZeroNodeForType = ( type ) => {
 
@@ -94,13 +79,13 @@ const toTextureDefaultNode = ( node, type ) => {
 
 };
 
-const getTextureInputs = ( nodeX, compileContext ) => {
+const getTextureInputs = ( nodeX ) => {
 
 	const file = nodeX.getChildByName( 'file' );
-	const uvNode = nodeX.getNodeByName( 'texcoord' ) || getDefaultUvNode( compileContext );
+	const uvNode = nodeX.getNodeByName( 'texcoord' );
 	const textureFile = file ? file.getTexture() : null;
-	const defaultNode = nodeX.getNodeByName( 'default' ) || getZeroNodeForType( nodeX.type );
-	const addressModes = getTextureAddressModes( nodeX );
+	const defaultNode = nodeX.getNodeByName( 'default' );
+	const addressModes = nodeX.getTextureAddressModes();
 	return { file, uvNode, textureFile, defaultNode, addressModes };
 
 };
@@ -149,7 +134,7 @@ const compileConvertNode = ( nodeX ) => {
 
 	const input = nodeX.getNodeByName( 'in' );
 	const inputElement = nodeX.getChildByName( 'in' );
-	const inputType = inputElement ? inputElement.type : null;
+	const inputType = inputElement && inputElement.type ? inputElement.type : nodeX.getNodeDefInputType( 'in' );
 	const nodeClass = nodeX.getClassFromType( nodeX.type ) || float;
 
 	if ( nodeX.type === 'boolean' ) {
@@ -194,11 +179,11 @@ const compileConstantNode = ( nodeX ) => nodeX.getNodeByName( 'value' );
 const compileArtisticIorNode = ( nodeX, out ) => {
 
 	const reflectivity = clamp(
-		nodeX.getNodeByName( 'reflectivity' ) || vec3( 0.944, 0.776, 0.373 ),
+		nodeX.getNodeByName( 'reflectivity' ),
 		vec3( 0, 0, 0 ),
 		vec3( 0.99, 0.99, 0.99 ),
 	);
-	const edgeColor = nodeX.getNodeByName( 'edge_color' ) || vec3( 0.998, 0.981, 0.751 );
+	const edgeColor = nodeX.getNodeByName( 'edge_color' );
 	const one = vec3( 1, 1, 1 );
 	const nMin = div( sub( one, reflectivity ), add( one, reflectivity ) );
 	const nMax = div( add( one, sqrt( reflectivity ) ), sub( one, sqrt( reflectivity ) ) );
@@ -224,10 +209,8 @@ const compileBooleanConditionalNode = ( nodeX ) => {
 
 	if ( nodeX.type !== 'boolean' ) return null;
 
-	const value1Default = nodeX.element === 'ifequal' ? float( 0 ) : float( 1 );
-	const value2Default = float( 0 );
-	const value1 = nodeX.getNodeByName( 'value1' ) || value1Default;
-	const value2 = nodeX.getNodeByName( 'value2' ) || value2Default;
+	const value1 = nodeX.getNodeByName( 'value1' );
+	const value2 = nodeX.getNodeByName( 'value2' );
 
 	if ( nodeX.element === 'ifgreater' ) return value1.greaterThan( value2 );
 	if ( nodeX.element === 'ifgreatereq' ) return value1.greaterThanEqual( value2 );
@@ -239,16 +222,16 @@ const compileBooleanConditionalNode = ( nodeX ) => {
 
 const compileClampNode = ( nodeX ) => {
 
-	const inNode = nodeX.getNodeByName( 'in' ) || float( 0 );
-	const low = nodeX.getNodeByName( 'low' ) || float( 0 );
-	const high = nodeX.getNodeByName( 'high' ) || float( 1 );
+	const inNode = nodeX.getNodeByName( 'in' );
+	const low = nodeX.getNodeByName( 'low' );
+	const high = nodeX.getNodeByName( 'high' );
 	return min( max( inNode, low ), high );
 
 };
 
 const compileNormalizeNode = ( nodeX ) => {
 
-	const inNode = nodeX.getNodeByName( 'in' ) || getZeroNodeForType( nodeX.type );
+	const inNode = nodeX.getNodeByName( 'in' );
 	const zeroNode = getZeroNodeForType( nodeX.type );
 	const lengthSquared = dot( inNode, inNode );
 	const safeLengthSquared = max( lengthSquared, float( 1e-8 ) );
@@ -259,11 +242,11 @@ const compileNormalizeNode = ( nodeX ) => {
 
 const compileRemapNode = ( nodeX ) => {
 
-	const inNode = nodeX.getNodeByName( 'in' ) || float( 0 );
-	const inLow = nodeX.getNodeByName( 'inlow' ) || float( 0 );
-	const inHigh = nodeX.getNodeByName( 'inhigh' ) || float( 1 );
-	const outLow = nodeX.getNodeByName( 'outlow' ) || float( 0 );
-	const outHigh = nodeX.getNodeByName( 'outhigh' ) || float( 1 );
+	const inNode = nodeX.getNodeByName( 'in' );
+	const inLow = nodeX.getNodeByName( 'inlow' );
+	const inHigh = nodeX.getNodeByName( 'inhigh' );
+	const outLow = nodeX.getNodeByName( 'outlow' );
+	const outHigh = nodeX.getNodeByName( 'outhigh' );
 	const denominator = sub( inHigh, inLow );
 	const isDegenerate = abs( denominator ).lessThan( float( 1e-8 ) );
 	const safeDenominator = isDegenerate.select( float( 1 ), denominator );
@@ -277,13 +260,13 @@ const compileRemapNode = ( nodeX ) => {
 
 const compileRangeNode = ( nodeX ) => {
 
-	const inNode = nodeX.getNodeByName( 'in' ) || float( 0 );
-	const inLow = nodeX.getNodeByName( 'inlow' ) || float( 0 );
-	const inHigh = nodeX.getNodeByName( 'inhigh' ) || float( 1 );
-	const outLow = nodeX.getNodeByName( 'outlow' ) || float( 0 );
-	const outHigh = nodeX.getNodeByName( 'outhigh' ) || float( 1 );
-	const gamma = nodeX.getNodeByName( 'gamma' ) || float( 1 );
-	const doClamp = nodeX.getNodeByName( 'doclamp' ) || int( 0 );
+	const inNode = nodeX.getNodeByName( 'in' );
+	const inLow = nodeX.getNodeByName( 'inlow' );
+	const inHigh = nodeX.getNodeByName( 'inhigh' );
+	const outLow = nodeX.getNodeByName( 'outlow' );
+	const outHigh = nodeX.getNodeByName( 'outhigh' );
+	const gamma = nodeX.getNodeByName( 'gamma' );
+	const doClamp = nodeX.getNodeByName( 'doclamp' );
 
 	const denominator = sub( inHigh, inLow );
 	const isDegenerate = abs( denominator ).lessThan( float( 1e-8 ) );
@@ -301,13 +284,12 @@ const compileRangeNode = ( nodeX ) => {
 
 };
 
-const getSwitchBranchNode = ( nodeX, index ) => nodeX.getNodeByName( `in${index}` ) || getZeroNodeForType( nodeX.type );
+const getSwitchBranchNode = ( nodeX, index ) => nodeX.getNodeByName( `in${index}` );
 
 const compileSwitchNode = ( nodeX ) => {
 
 	const fallbackNode = getSwitchBranchNode( nodeX, SWITCH_MIN_INDEX );
-	const whichInput = nodeX.getNodeByName( 'which' );
-	const switchIndex = add( floor( float( whichInput === undefined || whichInput === null ? 0 : whichInput ) ), 1 );
+	const switchIndex = add( floor( float( nodeX.getNodeByName( 'which' ) ) ), 1 );
 	const whichNode = clamp(
 		float( switchIndex ),
 		float( SWITCH_MIN_INDEX ),
@@ -328,8 +310,7 @@ const compileSwitchNode = ( nodeX ) => {
 
 const compileSpaceInputNode = ( nodeX, objectNode, worldNode ) => {
 
-	const rawSpace = nodeX.getInputValueByName( 'space' ) ?? nodeX.getAttribute( 'space' );
-	const space = normalizeSpaceName( rawSpace, 'object' );
+	const space = normalizeSpaceName( nodeX.getNodeByName( 'space' ), 'object' );
 	return space === 'world' ? worldNode : objectNode;
 
 };
@@ -354,7 +335,7 @@ const compileGeomColorNode = ( nodeX ) => {
 
 const compileImageLikeNode = ( nodeX, compileContext ) => {
 
-	const { file, uvNode, textureFile, defaultNode, addressModes } = getTextureInputs( nodeX, compileContext );
+	const { file, uvNode, textureFile, defaultNode, addressModes } = getTextureInputs( nodeX );
 	const textureDefault = toTextureDefaultNode( defaultNode, nodeX.type );
 	const node = sampleTexture( textureFile, uvNode, compileContext, textureDefault, addressModes, textureDefault );
 	return applyTextureColorSpace( node, file );
@@ -363,7 +344,7 @@ const compileImageLikeNode = ( nodeX, compileContext ) => {
 
 const compileTiledImageNode = ( nodeX, compileContext ) => {
 
-	const { file, uvNode, textureFile, defaultNode, addressModes } = getTextureInputs( nodeX, compileContext );
+	const { file, uvNode, textureFile, defaultNode, addressModes } = getTextureInputs( nodeX );
 	const textureDefault = toTextureDefaultNode( defaultNode, nodeX.type );
 	if ( ! textureFile ) {
 
@@ -382,7 +363,7 @@ const compileTiledImageNode = ( nodeX, compileContext ) => {
 const compileHexTiledNormalMapNode = ( nodeX, compileContext, sampleNode ) => {
 
 	const normalMapNodeElement = compileContext.nodeLibrary.normalmap;
-	const strengthNode = nodeX.getNodeByName( 'strength' ) || float( 1 );
+	const strengthNode = nodeX.getNodeByName( 'strength' );
 
 	if ( ! normalMapNodeElement || typeof normalMapNodeElement.nodeFunc !== 'function' ) {
 
@@ -428,7 +409,7 @@ const compileHexTiledTextureNode = ( nodeX, compileContext, category ) => {
 		);
 		if ( category === 'hextilednormalmap' ) {
 
-			return normalize( nodeX.getNodeByName( 'normal' ) || normalLocal );
+			return normalize( nodeX.getNodeByName( 'normal' ) );
 
 		}
 
@@ -441,7 +422,7 @@ const compileHexTiledTextureNode = ( nodeX, compileContext, category ) => {
 
 		if ( category === 'hextilednormalmap' ) {
 
-			return normalize( nodeX.getNodeByName( 'normal' ) || normalLocal );
+			return normalize( nodeX.getNodeByName( 'normal' ) );
 
 		}
 
@@ -449,17 +430,17 @@ const compileHexTiledTextureNode = ( nodeX, compileContext, category ) => {
 
 	}
 
-	const uvNode = nodeX.getNodeByName( 'texcoord' ) || getDefaultUvNode( compileContext );
-	const tiling = nodeX.getNodeByName( 'tiling' ) || vec2( 1, 1 );
-	const rotation = nodeX.getNodeByName( 'rotation' ) || float( 1 );
-	const rotationRange = nodeX.getNodeByName( 'rotationrange' ) || vec2( 0, 360 );
-	const scale = nodeX.getNodeByName( 'scale' ) || float( 1 );
-	const scaleRange = nodeX.getNodeByName( 'scalerange' ) || vec2( 0.5, 2 );
-	const offset = nodeX.getNodeByName( 'offset' ) || float( 1 );
-	const offsetRange = nodeX.getNodeByName( 'offsetrange' ) || vec2( 0, 1 );
-	const falloff = nodeX.getNodeByName( 'falloff' ) || float( 0.5 );
-	const falloffContrast = nodeX.getNodeByName( 'falloffcontrast' ) || float( 0.5 );
-	let lumaCoeffs = nodeX.getNodeByName( 'lumacoeffs' ) || vec3( 0.2722287, 0.6740818, 0.0536895 );
+	const uvNode = nodeX.getNodeByName( 'texcoord' );
+	const tiling = nodeX.getNodeByName( 'tiling' );
+	const rotation = nodeX.getNodeByName( 'rotation' );
+	const rotationRange = nodeX.getNodeByName( 'rotationrange' );
+	const scale = nodeX.getNodeByName( 'scale' );
+	const scaleRange = nodeX.getNodeByName( 'scalerange' );
+	const offset = nodeX.getNodeByName( 'offset' );
+	const offsetRange = nodeX.getNodeByName( 'offsetrange' );
+	const falloff = nodeX.getNodeByName( 'falloff' );
+	const falloffContrast = nodeX.getNodeByName( 'falloffcontrast' );
+	let lumaCoeffs = nodeX.getNodeByName( 'lumacoeffs' );
 	const lumaCoeffsInput = nodeX.getChildByName( 'lumacoeffs' );
 	if ( lumaCoeffsInput && lumaCoeffsInput.isConst ) {
 
@@ -546,17 +527,17 @@ const compileHexTiledTextureNode = ( nodeX, compileContext, category ) => {
 
 const compileGltfTextureNode = ( nodeX, compileContext, category ) => {
 
-	const { file, uvNode, textureFile, addressModes } = getTextureInputs( nodeX, compileContext );
+	const { file, uvNode, textureFile, addressModes } = getTextureInputs( nodeX );
 	let transformedUv = uvNode;
 	const place2d = compileContext.nodeLibrary.place2d;
 
 	if ( place2d ) {
 
-		const pivot = nodeX.getNodeByName( 'pivot' ) || vec2( 0, 1 );
-		const scale = nodeX.getNodeByName( 'scale' ) || vec2( 1, 1 );
-		const rotate = nodeX.getNodeByName( 'rotate' ) || float( 0 );
-		const offset = nodeX.getNodeByName( 'offset' ) || vec2( 0, 0 );
-		const operationorder = nodeX.getNodeByName( 'operationorder' ) || int( 0 );
+		const pivot = nodeX.getNodeByName( 'pivot' );
+		const scale = nodeX.getNodeByName( 'scale' );
+		const rotate = nodeX.getNodeByName( 'rotate' );
+		const offset = nodeX.getNodeByName( 'offset' );
+		const operationorder = nodeX.getNodeByName( 'operationorder' );
 		transformedUv = place2d.nodeFunc(
 			uvNode,
 			pivot,
@@ -591,7 +572,7 @@ const compileGltfTextureNode = ( nodeX, compileContext, category ) => {
 
 	if ( category === 'gltf_normalmap' ) {
 
-		const normalScale = nodeX.getNodeByName( 'scale' ) || float( 1 );
+		const normalScale = nodeX.getNodeByName( 'scale' );
 		return normalMap( node, normalScale );
 
 	}
@@ -616,16 +597,16 @@ const compileGltfTextureNode = ( nodeX, compileContext, category ) => {
 
 const compileGltfColorImageNode = ( nodeX, out, compileContext ) => {
 
-	const { file, uvNode, textureFile, addressModes } = getTextureInputs( nodeX, compileContext );
+	const { file, uvNode, textureFile, addressModes } = getTextureInputs( nodeX );
 	let transformedUv = uvNode;
 	const place2d = compileContext.nodeLibrary.place2d;
 
 	if ( place2d ) {
 
-		const pivot = nodeX.getNodeByName( 'pivot' ) || vec2( 0, 1 );
-		const scale = nodeX.getNodeByName( 'scale' ) || vec2( 1, 1 );
-		const rotate = nodeX.getNodeByName( 'rotate' ) || float( 0 );
-		const offset = nodeX.getNodeByName( 'offset' ) || vec2( 0, 0 );
+		const pivot = nodeX.getNodeByName( 'pivot' );
+		const scale = nodeX.getNodeByName( 'scale' );
+		const rotate = nodeX.getNodeByName( 'rotate' );
+		const offset = nodeX.getNodeByName( 'offset' );
 		// Match MaterialX's ND_gltf_colorimage graph implementation, which wires gltf_image with operationorder=0.
 		const operationorder = int( 0 );
 		transformedUv = place2d.nodeFunc(
@@ -639,12 +620,12 @@ const compileGltfColorImageNode = ( nodeX, out, compileContext ) => {
 
 	}
 
-	const defaultInput = nodeX.getNodeByName( 'default' ) || vec4( 0, 0, 0, 0 );
+	const defaultInput = nodeX.getNodeByName( 'default' );
 	const fallback = vec4( defaultInput );
 	const sampled = sampleTexture( textureFile, transformedUv, compileContext, fallback, addressModes, fallback );
 	const converted = applyTextureColorSpace( sampled, file );
-	const color = nodeX.getNodeByName( 'color' ) || vec4( 1, 1, 1, 1 );
-	const geomcolor = nodeX.getNodeByName( 'geomcolor' ) || vec4( 1, 1, 1, 1 );
+	const color = nodeX.getNodeByName( 'color' );
+	const geomcolor = nodeX.getNodeByName( 'geomcolor' );
 	const modulated = mul( mul( converted, color ), geomcolor );
 
 	if ( out === 'outa' ) {
@@ -659,12 +640,12 @@ const compileGltfColorImageNode = ( nodeX, out, compileContext ) => {
 
 const compileGltfAnisotropyImageNode = ( nodeX, out, compileContext ) => {
 
-	const { uvNode, textureFile, addressModes } = getTextureInputs( nodeX, compileContext );
-	const defaultInput = nodeX.getNodeByName( 'default' ) || vec3( 1, 0.5, 1 );
+	const { uvNode, textureFile, addressModes } = getTextureInputs( nodeX );
+	const defaultInput = nodeX.getNodeByName( 'default' );
 	const fallback = vec4( element( defaultInput, 0 ), element( defaultInput, 1 ), element( defaultInput, 2 ), 1 );
 	const sampled = sampleTexture( textureFile, uvNode, compileContext, fallback, addressModes, fallback );
-	const anisotropyStrengthFactor = nodeX.getNodeByName( 'anisotropy_strength' ) || float( 1 );
-	const anisotropyRotationFactor = nodeX.getNodeByName( 'anisotropy_rotation' ) || float( 0 );
+	const anisotropyStrengthFactor = nodeX.getNodeByName( 'anisotropy_strength' );
+	const anisotropyRotationFactor = nodeX.getNodeByName( 'anisotropy_rotation' );
 	const encodedDirection = vec2( sub( mul( element( sampled, 0 ), 2 ), 1 ), sub( mul( element( sampled, 1 ), 2 ), 1 ) );
 	const textureRotation = mx_atan2( element( encodedDirection, 1 ), element( encodedDirection, 0 ) );
 	const anisotropyStrengthOut = clamp( mul( anisotropyStrengthFactor, element( sampled, 2 ) ), 0, 1 );
@@ -682,40 +663,37 @@ const compileGltfAnisotropyImageNode = ( nodeX, out, compileContext ) => {
 
 const compileGltfIridescenceThicknessNode = ( nodeX, compileContext ) => {
 
-	const { uvNode, textureFile, addressModes } = getTextureInputs( nodeX, compileContext );
+	const { uvNode, textureFile, addressModes } = getTextureInputs( nodeX );
 	const fallback = vec4( 0, 0, 0, 1 );
 	const sampled = sampleTexture( textureFile, uvNode, compileContext, fallback, addressModes, fallback );
 	const sampledThickness = element( sampled, 0 );
-	const thicknessMin = nodeX.getNodeByName( 'thicknessMin' ) || float( 100 );
-	const thicknessMax = nodeX.getNodeByName( 'thicknessMax' ) || float( 400 );
+	const thicknessMin = nodeX.getNodeByName( 'thicknessMin' );
+	const thicknessMax = nodeX.getNodeByName( 'thicknessMax' );
 	return add( thicknessMin, mul( sampledThickness, sub( thicknessMax, thicknessMin ) ) );
 
 };
 
-const compileTransformMatrixNode = ( nodeX, compileContext ) => {
+const compileTransformMatrixNode = ( nodeX ) => {
 
-	const nodeDefName = nodeX.getAttribute( 'nodedef' );
-	const inNode = nodeX.getNodeByName( 'in' ) || float( 0 );
-	const matrixNode =
-    nodeX.getNodeByName( 'mat' ) ||
-    ( nodeDefName === 'ND_transformmatrix_vector2M3' || nodeDefName === 'ND_transformmatrix_vector3'
-    	? mat3( ...compileContext.IDENTITY_MAT3_VALUES )
-    	: mat4( ...compileContext.IDENTITY_MAT4_VALUES ) );
+	const inputType = nodeX.getNodeDefInputType( 'in' );
+	const matrixType = nodeX.getNodeDefInputType( 'mat' );
+	const inNode = nodeX.getNodeByName( 'in' );
+	const matrixNode = nodeX.getNodeByName( 'mat' );
 
-	if ( nodeDefName === 'ND_transformmatrix_vector2M3' ) {
+	if ( inputType === 'vector2' ) {
 
 		const transformed = mul( matrixNode, vec3( element( inNode, 0 ), element( inNode, 1 ), 1 ) );
 		return vec2( element( transformed, 0 ), element( transformed, 1 ) );
 
 	}
 
-	if ( nodeDefName === 'ND_transformmatrix_vector3' ) {
+	if ( inputType === 'vector3' && matrixType === 'matrix33' ) {
 
 		return mul( matrixNode, vec3( element( inNode, 0 ), element( inNode, 1 ), element( inNode, 2 ) ) );
 
 	}
 
-	if ( nodeDefName === 'ND_transformmatrix_vector3M4' ) {
+	if ( inputType === 'vector3' ) {
 
 		const transformed = mul( matrixNode, vec4( element( inNode, 0 ), element( inNode, 1 ), element( inNode, 2 ), 1 ) );
 		return vec3( element( transformed, 0 ), element( transformed, 1 ), element( transformed, 2 ) );
@@ -730,25 +708,25 @@ const compileCreateMatrixNode = ( nodeX ) => {
 
 	if ( nodeX.type === 'matrix44' ) {
 
-		const vector3Input = nodeX.getAttribute( 'nodedef' ) === 'ND_creatematrix_vector3_matrix44';
-		const toVec4Input = ( name, fallback, w ) => {
+		const vector3Input = nodeX.getNodeDefInputType( 'in1' ) === 'vector3';
+		const toVec4Input = ( name, w ) => {
 
-			const input = nodeX.getNodeByName( name ) || fallback;
+			const input = nodeX.getNodeByName( name );
 			return vector3Input ? vec4( element( input, 0 ), element( input, 1 ), element( input, 2 ), w ) : input;
 
 		};
 
-		const in1 = toVec4Input( 'in1', vector3Input ? vec3( 1, 0, 0 ) : vec4( 1, 0, 0, 0 ), 0 );
-		const in2 = toVec4Input( 'in2', vector3Input ? vec3( 0, 1, 0 ) : vec4( 0, 1, 0, 0 ), 0 );
-		const in3 = toVec4Input( 'in3', vector3Input ? vec3( 0, 0, 1 ) : vec4( 0, 0, 1, 0 ), 0 );
-		const in4 = toVec4Input( 'in4', vector3Input ? vec3( 0, 0, 0 ) : vec4( 0, 0, 0, 1 ), 1 );
+		const in1 = toVec4Input( 'in1', 0 );
+		const in2 = toVec4Input( 'in2', 0 );
+		const in3 = toVec4Input( 'in3', 0 );
+		const in4 = toVec4Input( 'in4', 1 );
 		return mat4( in1, in2, in3, in4 );
 
 	}
 
-	const in1 = nodeX.getNodeByName( 'in1' ) || vec3( 1, 0, 0 );
-	const in2 = nodeX.getNodeByName( 'in2' ) || vec3( 0, 1, 0 );
-	const in3 = nodeX.getNodeByName( 'in3' ) || vec3( 0, 0, 1 );
+	const in1 = nodeX.getNodeByName( 'in1' );
+	const in2 = nodeX.getNodeByName( 'in2' );
+	const in3 = nodeX.getNodeByName( 'in3' );
 	return mat3( in1, in2, in3 );
 
 };
@@ -883,14 +861,11 @@ const compileInvertMatrixNode = ( nodeX, compileContext ) => {
 	const inNode = nodeX.getNodeByName( 'in' );
 	if ( isMatrixType ) {
 
-		const size = matrixType === 'matrix33' ? 3 : 4;
-		const fallback = size === 3 ? mat3( ...compileContext.IDENTITY_MAT3_VALUES ) : mat4( ...compileContext.IDENTITY_MAT4_VALUES );
-		const matrixNode = inNode === undefined || inNode === null ? fallback : inNode;
-		return size === 3 ? compileInvertMatrix3Node( matrixNode ) : compileInvertMatrix4Node( matrixNode );
+		return matrixType === 'matrix33' ? compileInvertMatrix3Node( inNode ) : compileInvertMatrix4Node( inNode );
 
 	}
 
-	return inNode === undefined || inNode === null ? float( 0 ) : inNode;
+	return inNode;
 
 };
 
@@ -922,7 +897,7 @@ function createMaterialXCompileRegistry() {
 	register( registry, [ 'gltf_iridescence_thickness' ], ( nodeX, out, compileContext ) =>
 		compileGltfIridescenceThicknessNode( nodeX, compileContext ) );
 	register( registry, [ 'switch' ], ( nodeX ) => compileSwitchNode( nodeX ) );
-	register( registry, [ 'transformmatrix' ], ( nodeX, out, compileContext ) => compileTransformMatrixNode( nodeX, compileContext ) );
+	register( registry, [ 'transformmatrix' ], ( nodeX ) => compileTransformMatrixNode( nodeX ) );
 	register( registry, [ 'creatematrix' ], ( nodeX ) => compileCreateMatrixNode( nodeX ) );
 	register( registry, [ 'invertmatrix' ], ( nodeX, out, compileContext ) => compileInvertMatrixNode( nodeX, compileContext ) );
 	return registry;
@@ -955,31 +930,11 @@ function compileNodeFromRegistry( nodeX, out, compileContext ) {
 	const args = nodeX.getNodesByNames( ...nodeElement.params );
 	for ( let i = 0; i < nodeElement.params.length; i += 1 ) {
 
-		if ( args[ i ] !== undefined && args[ i ] !== null ) {
-
-			continue;
-
-		}
-
-		const paramName = nodeElement.params[ i ];
-		if ( paramName === 'texcoord' && UV_FALLBACK_CATEGORIES.has( nodeX.element ) ) {
-
-			args[ i ] = getDefaultUvNode( compileContext );
-			continue;
-
-		}
-
-		const defaultValue = nodeElement.defaults ? nodeElement.defaults[ paramName ] : undefined;
-		if ( defaultValue !== undefined ) {
-
-			args[ i ] = typeof defaultValue === 'function' ? defaultValue() : float( defaultValue );
-			continue;
-
-		}
+		if ( args[ i ] !== undefined && args[ i ] !== null ) continue;
 
 		nodeX.materialX.log.add(
 			MaterialXLogCodes.INVALID_VALUE,
-			`Missing input "${paramName}" for node "${nodeX.name || nodeX.element}" (${nodeX.element}). Using fallback 0.`,
+			`Missing input "${nodeElement.params[ i ]}" for node "${nodeX.name || nodeX.element}" (${nodeX.element}) and no nodedef default. Using fallback 0.`,
 			nodeX.name,
 		);
 		args[ i ] = float( 0 );
