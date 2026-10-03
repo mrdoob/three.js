@@ -440,6 +440,36 @@ class NodeMaterial extends Material {
 	}
 
 	/**
+	 * Returns the value keyed uniforms of this material in traversal order. Materials sharing
+	 * a node build use this order to map the build's uniforms to their own.
+	 *
+	 * @return {Array<UniformNode>} The uniform nodes.
+	 */
+	getUniformNodes() {
+
+		const uniformNodes = [];
+		const visited = new Set();
+
+		// visit each node once, in the same order as the cache key computation
+		const visit = ( node ) => {
+
+			if ( visited.has( node ) ) return;
+
+			visited.add( node );
+
+			if ( node.isValueKeyed === true ) uniformNodes.push( node );
+
+			for ( const childNode of node.getChildren() ) visit( childNode );
+
+		};
+
+		for ( const { childNode } of this._getNodeChildren() ) visit( childNode );
+
+		return uniformNodes;
+
+	}
+
+	/**
 	 * Builds this material with the given node builder.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
