@@ -56,7 +56,8 @@ class ParameterNode extends PropertyNode {
 
 		} else {
 
-			error( `TSL: Member "${ name }" not found in struct "${ type }".`, new StackTrace() );
+			// The member cannot be checked without the struct type; name the actual cause.
+			error( `TSL: Struct type "${ type }" of parameter "${ this.name }" is not registered for the "${ builder.shaderStage }" shader stage.`, new StackTrace() );
 
 			memberType = 'float';
 

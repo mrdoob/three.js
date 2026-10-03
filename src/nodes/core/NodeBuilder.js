@@ -2135,7 +2135,35 @@ class NodeBuilder {
 	 */
 	getStructTypeNode( name, shaderStage = this.shaderStage ) {
 
-		return this.types[ shaderStage ][ name ] || null;
+		let structTypeNode = this.types[ shaderStage ][ name ] || null;
+
+		if ( structTypeNode === null ) {
+
+			// A struct type is registered for a shader stage when its node is set up or
+			// generated in that stage. Node setup runs once per build, so a struct first
+			// met in another stage is not registered here yet when a typed function
+			// parameter resolves its members. Register it for this stage from the stage
+			// that already knows it, which also declares the struct in this stage.
+
+			for ( const knownStage of shaderStages ) {
+
+				const knownNode = this.types[ knownStage ][ name ];
+
+				if ( knownNode !== undefined && knownNode.membersLayout !== undefined ) {
+
+					this.getStructTypeFromNode( knownNode, knownNode.membersLayout, name, shaderStage );
+
+					structTypeNode = knownNode;
+
+					break;
+
+				}
+
+			}
+
+		}
+
+		return structTypeNode;
 
 	}
 
