@@ -153,6 +153,12 @@ class PLYExporter {
 				const normals = geometry.getAttribute( 'normal' );
 				const colors = geometry.getAttribute( 'color' );
 
+				if ( vertices === undefined ) {
+
+					return;
+
+				}
+
 				vertexCount += vertices.count;
 
 				positionType = getPlyType( vertices.array );
