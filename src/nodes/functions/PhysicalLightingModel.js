@@ -698,7 +698,7 @@ class PhysicalLightingModel extends LightingModel {
 		const dotVH = positionViewDirection.dot( halfDir ).clamp();
 		let F = F_Schlick( { f0: specularColor, f90: specularF90, dotVH } );
 
-		let specularBRDF = BRDF_GGX( { lightDirection, f0: specularColorBlended, f90: 1, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } );
+		let specularBRDF = BRDF_GGX( { lightDirection, f0: specularColorBlended, f90: specularF90, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } );
 
 		if ( this.retroreflection === true ) {
 
@@ -708,7 +708,7 @@ class PhysicalLightingModel extends LightingModel {
 			const retroHalfDir = lightDirection.add( retroViewDirection ).normalize();
 			const dotRetroVH = retroViewDirection.dot( retroHalfDir ).clamp();
 			const retroF = F_Schlick( { f0: specularColor, f90: specularF90, dotVH: dotRetroVH } );
-			const retroSpecularBRDF = BRDF_GGX( { lightDirection, viewDirection: retroViewDirection, f0: specularColorBlended, f90: 1, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } );
+			const retroSpecularBRDF = BRDF_GGX( { lightDirection, viewDirection: retroViewDirection, f0: specularColorBlended, f90: specularF90, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } );
 
 			F = mix( F, retroF, retroreflectivity.clamp() );
 			specularBRDF = mix( specularBRDF, retroSpecularBRDF, retroreflectivity.clamp() );
