@@ -795,9 +795,17 @@ class NodeMaterial extends Material {
 
 		}
 
-		if ( ( object.isInstancedMesh && object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) ) {
+		if ( object.isInstancedMesh && object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) {
 
 			instancedMesh( object );
+
+		} else if ( builder.instances !== null ) {
+
+			console.log( '>>', builder.getCount() );
+
+		} else {
+
+			console.log( '>> no instances' );
 
 		}
 

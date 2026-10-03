@@ -2146,7 +2146,7 @@ class WebGPUBackend extends Backend {
 
 		} else if ( hasIndex === true ) {
 
-			const { vertexCount: indexCount, instanceCount, firstVertex: firstIndex } = drawParams;
+			const { vertexCount: indexCount, instanceCount, firstVertex: firstIndex, firstInstance } = drawParams;
 
 			const indirect = renderObject.getIndirect();
 
@@ -2164,7 +2164,7 @@ class WebGPUBackend extends Backend {
 
 			} else {
 
-				passEncoderGPU.drawIndexed( indexCount, instanceCount, firstIndex, 0, 0 );
+				passEncoderGPU.drawIndexed( indexCount, instanceCount, firstIndex, 0, firstInstance );
 
 			}
 
@@ -2172,7 +2172,7 @@ class WebGPUBackend extends Backend {
 
 		} else {
 
-			const { vertexCount, instanceCount, firstVertex } = drawParams;
+			const { vertexCount, instanceCount, firstVertex, firstInstance } = drawParams;
 
 			const indirect = renderObject.getIndirect();
 
@@ -2191,7 +2191,7 @@ class WebGPUBackend extends Backend {
 
 			} else {
 
-				passEncoderGPU.draw( vertexCount, instanceCount, firstVertex, 0 );
+				passEncoderGPU.draw( vertexCount, instanceCount, firstVertex, firstInstance );
 
 			}
 
@@ -2353,6 +2353,15 @@ class WebGPUBackend extends Backend {
 						renderContextData.lastOcclusionObject = object;
 
 					}
+
+				}
+
+				const drawInstances = renderObject.getDrawInstances();
+
+				if ( drawInstances ) {
+
+					drawParams.firstInstance = 0;
+					drawParams.instanceCount = drawInstances.length;
 
 				}
 
