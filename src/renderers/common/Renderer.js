@@ -2749,6 +2749,14 @@ class Renderer {
 	 */
 	async dispose() {
 
+		// edge case: If dispose() is called during an init, wait for the finish
+
+		if ( this._initPromise !== null ) {
+
+			await this.init();
+
+		}
+
 		if ( this._initialized === true ) {
 
 			this._inspector.dispose();
@@ -2776,7 +2784,6 @@ class Renderer {
 		}
 
 		this.setRenderTarget( null );
-		this.setAnimationLoop( null );
 
 	}
 
