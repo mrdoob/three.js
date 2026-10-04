@@ -342,7 +342,7 @@ class SSAONode extends Node {
 
 			const depth = sampleDepth( uvNode ).toVar();
 
-			depth.greaterThanEqual( 1.0 ).discard();
+			( builder.renderer.reversedDepthBuffer === true ? depth.lessThanEqual( 0.0 ) : depth.greaterThanEqual( 1.0 ) ).discard();
 
 			const viewPosition = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).toVar();
 			const viewNormal = this.normalNode.sample( uvNode ).rgb.normalize().toVar();
