@@ -418,7 +418,7 @@ class GTAONode extends Node {
 			// Sidestep the nearest-rounding during depth access for the unjittered center pixel to avoid banding
 
 			const g = this.depthNode.gather().sample( uv );
-			const depth = min( min( g.x, g.y ), min( g.z, g.w ) );
+			const depth = builder.renderer.reversedDepthBuffer === true ? max( max( g.x, g.y ), max( g.z, g.w ) ) : min( min( g.x, g.y ), min( g.z, g.w ) );
 
 			return linearizeDepth( depth );
 
@@ -450,7 +450,7 @@ class GTAONode extends Node {
 
 			const depth = this._resolutionScale.lessThan( 1 ).select( sampleCenterDepth( uvNode ), sampleDepth( uvNode ) ).toConst();
 
-			depth.greaterThanEqual( 1.0 ).discard();
+			( builder.renderer.reversedDepthBuffer === true ? depth.lessThanEqual( 0.0 ) : depth.greaterThanEqual( 1.0 ) ).discard();
 
 			const depthSize = vec2( textureSize( this.depthNode, 0 ) ).toConst();
 			const centerTexel = uvNode.mul( depthSize ).floor().toConst();
