@@ -797,6 +797,7 @@ class RenderObject {
 					if ( value.isTexture ) {
 
 						valueKey += value.mapping;
+						valueKey += value.channel;
 
 						// WebGPU must honor the sampler data because they are part of the bindings
 
