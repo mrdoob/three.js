@@ -714,7 +714,18 @@ class TemporalReprojectNode extends Node {
 
 		if ( srcW > 0 && srcH > 0 ) {
 
-			renderer.copyTextureToTexture( currentDepth, this._historyRenderTarget.depthTexture );
+			// The copy requires matching formats, e.g. a float depth buffer with reversed depth.
+
+			const historyDepth = this._historyRenderTarget.depthTexture;
+
+			if ( historyDepth.type !== currentDepth.type ) {
+
+				historyDepth.type = currentDepth.type;
+				historyDepth.needsUpdate = true;
+
+			}
+
+			renderer.copyTextureToTexture( currentDepth, historyDepth );
 			renderer.copyTextureToTexture( this.normalNode.value, this._previousNormalTexture );
 
 			this._previousDepthNode.value = this._historyRenderTarget.depthTexture;
