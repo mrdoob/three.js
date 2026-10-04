@@ -1049,7 +1049,7 @@ class WebGLBackend extends Backend {
 	 * @param {number} vertexCount - The vertex count.
 	 * @param {number} instanceCount - The intance count.
 	 * @param {WebGLProgram} programGPU - The raw WebGL shader program.
-	 * @param {Array<Object3D>} instances - The instances.
+	 * @param {?InstanceGroup} instances - The group of objects drawn as instances.
 	 */
 	_draw( object, renderer, firstVertex, vertexCount, instanceCount, programGPU, instances ) {
 
@@ -1086,7 +1086,7 @@ class WebGLBackend extends Backend {
 
 			if ( instances !== null ) {
 
-				renderer.renderInstances( firstVertex, vertexCount, instances.length );
+				renderer.renderInstances( firstVertex, vertexCount, instances.objects.length );
 
 			} else {
 

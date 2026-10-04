@@ -48,6 +48,15 @@ class IndexNode extends Node {
 		 */
 		this.isIndexNode = true;
 
+		/**
+		 * The varying of the index in the fragment stage.
+		 *
+		 * @private
+		 * @type {?VaryingNode}
+		 * @default null
+		 */
+		this._varyingNode = null;
+
 	}
 
 	isCacheable( /*builder*/ ) {
@@ -101,9 +110,11 @@ class IndexNode extends Node {
 
 		} else {
 
-			const nodeVarying = varying( this );
+			// reuse the varying, the index can be generated again in other flow blocks
 
-			output = nodeVarying.build( builder, nodeType );
+			if ( this._varyingNode === null ) this._varyingNode = varying( this );
+
+			output = this._varyingNode.build( builder, nodeType );
 
 		}
 

@@ -25,7 +25,7 @@ class NodeBuilderState {
 	 * @param {NodeMaterialObserver} observer - A node material observer.
 	 * @param {boolean} hardwareClipping - Whether the built material uses hardware clipping or not.
 	 * @param {Array<Object>} transforms - An array with transform attribute objects. Only relevant when using compute shaders with WebGL 2.
-	 * @param {Array<Object>|null} instances - An array of instance data or null if instancing is not used.
+	 * @param {?InstanceGroup} instances - The group of objects drawn as instances or null if instancing is not used.
 	 */
 	constructor( vertexShader, fragmentShader, computeShader, nodeAttributes, bindings, updateNodes, updateBeforeNodes, updateAfterNodes, observer, hardwareClipping, transforms = [], instances = null ) {
 
@@ -59,9 +59,9 @@ class NodeBuilderState {
 		this.transforms = transforms;
 
 		/**
-		 * An array of instance data or null if instancing is not used.
+		 * The group of objects drawn as instances or null if instancing is not used.
 		 *
-		 * @type {Array<Object>|null}
+		 * @type {?InstanceGroup}
 		 */
 		this.instances = instances;
 

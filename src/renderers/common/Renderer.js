@@ -19,14 +19,12 @@ import Lighting from './Lighting.js';
 import XRManager from './XRManager.js';
 import InspectorBase from './InspectorBase.js';
 import CanvasTarget from './CanvasTarget.js';
+import OptimizedDrawer from './OptimizedDrawer.js';
 
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 import { Scene } from '../../scenes/Scene.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
-import { Frustum } from '../../math/Frustum.js';
-import { FrustumArray } from '../../math/FrustumArray.js';
-import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
@@ -41,13 +39,10 @@ import { error, warn, warnOnce, yieldToMain } from '../../utils.js';
 const _scene = /*@__PURE__*/ new Scene();
 const _drawingBufferSize = /*@__PURE__*/ new Vector2();
 const _screen = /*@__PURE__*/ new Vector4();
-const _frustum = /*@__PURE__*/ new Frustum();
-const _frustumArray = /*@__PURE__*/ new FrustumArray();
-
-const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _vector4 = /*@__PURE__*/ new Vector4();
 
 const _shadowSide = { [ FrontSide ]: BackSide, [ BackSide ]: FrontSide, [ DoubleSide ]: DoubleSide };
+
 
 /**
  * Base class for renderers.
@@ -212,6 +207,7 @@ class Renderer {
 		 */
 		this.sortObjects = true;
 
+
 		/**
 		 * Whether the default framebuffer should have a depth buffer or not.
 		 *
@@ -262,6 +258,16 @@ class Renderer {
 		 * @type {Lighting}
 		 */
 		this.lighting = new Lighting();
+
+		/**
+		 * The current drawer. See {@link Renderer#drawer}.
+		 *
+		 * @private
+		 * @type {Drawer}
+		 */
+		this._drawer = null;
+
+		this.drawer = new OptimizedDrawer();
 
 		// internals
 
@@ -555,6 +561,16 @@ class Renderer {
 		this._currentRenderObjectFunction = null;
 
 		/**
+		 * The render item which is currently processed by the render object function.
+		 * Used to resolve the instances of merged objects in `renderObject()`.
+		 *
+		 * @private
+		 * @type {?Object}
+		 * @default null
+		 */
+		this._currentRenderItem = null;
+
+		/**
 		 * Used to keep track of the current render bundle.
 		 *
 		 * @private
@@ -776,6 +792,31 @@ class Renderer {
 	}
 
 	/**
+	 * Decides which objects of a scene are rendered and how they are submitted
+	 * to the render list. Assigning a drawer binds it to this renderer.
+	 * The default is an {@link OptimizedDrawer}. This property is experimental.
+	 *
+	 * ```js
+	 * renderer.drawer = new Drawer(); // disables the optimizations of the default OptimizedDrawer
+	 * ```
+	 *
+	 * @type {Drawer}
+	 */
+	set drawer( drawer ) {
+
+		drawer.renderer = this;
+
+		this._drawer = drawer;
+
+	}
+
+	get drawer() {
+
+		return this._drawer;
+
+	}
+
+	/**
 	 * Initializes the renderer so it is ready for usage.
 	 *
 	 * @async
@@ -977,23 +1018,13 @@ class Renderer {
 
 		//
 
-		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-
-		if ( camera.isArrayCamera ) {
-
-			_frustumArray.setFromArrayCamera( camera );
-
-		} else {
-
-			_frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
-
-		}
+		this.drawer.begin( camera );
 
 		// Use sceneRef for render list to ensure lightsNode matches between compileAsync and render
 		const renderList = this._renderLists.get( sceneRef, camera, this.lighting );
-		renderList.begin();
+		this.drawer.beginRenderList( renderList );
 
-		this._projectObject( scene, camera, 0, renderList, renderContext.clippingContext );
+		this.drawer.project( scene, camera, 0, renderList, renderContext.clippingContext );
 
 		// include lights from target scene
 		if ( targetScene !== scene ) {
@@ -1010,7 +1041,7 @@ class Renderer {
 
 		}
 
-		renderList.finish();
+		this.drawer.finishRenderList( renderList );
 
 		//
 
@@ -1083,7 +1114,7 @@ class Renderer {
 
 			const pipelinePromises = [];
 
-			const renderObject = this._objects.get( item.object, item.material, item.scene, item.camera, item.lightsNode, item.renderContext, item.clippingContext, item.passId );
+			const renderObject = this._objects.get( item.object, item.material, item.scene, item.camera, item.lightsNode, item.renderContext, item.clippingContext, item.passId, item.instances );
 			renderObject.drawRange = item.object.geometry.drawRange;
 			renderObject.group = item.group;
 
@@ -1440,7 +1471,8 @@ class Renderer {
 
 	/**
 	 * Returns `true` if the cached GPU render bundle for the given bundle group is
-	 * out-of-date and must be recorded again.
+	 * out-of-date and must be recorded again. The drawer decides which objects are
+	 * recorded, so bundles recorded by another drawer are recorded again.
 	 *
 	 * @private
 	 * @param {BundleGroup} bundleGroup - The bundle group.
@@ -1449,7 +1481,7 @@ class Renderer {
 	 */
 	_bundleNeedsUpdate( bundleGroup, renderBundleData ) {
 
-		return renderBundleData.bundleGPU === undefined || bundleGroup.version !== renderBundleData.version;
+		return renderBundleData.bundleGPU === undefined || bundleGroup.version !== renderBundleData.version || renderBundleData.drawer !== this.drawer;
 
 	}
 
@@ -1477,6 +1509,10 @@ class Renderer {
 
 			this.backend.beginBundle( renderContext );
 
+			// nested renders, like shadow maps updated by the objects of the bundle, record their own bundles
+
+			const previousRenderBundle = this._currentRenderBundle;
+
 			this._currentRenderBundle = renderBundle;
 
 			const {
@@ -1488,13 +1524,14 @@ class Renderer {
 			if ( this.opaque === true && opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
 			if ( this.transparent === true && transparentObjects.length > 0 ) this._renderTransparents( transparentObjects, transparentDoublePassObjects, camera, sceneRef, lightsNode );
 
-			this._currentRenderBundle = null;
+			this._currentRenderBundle = previousRenderBundle;
 
 			//
 
 			this.backend.finishBundle( renderContext, renderBundle );
 
 			renderBundleData.version = bundleGroup.version;
+			renderBundleData.drawer = this.drawer;
 
 		} else {
 
@@ -1508,11 +1545,7 @@ class Renderer {
 
 				if ( refreshType === RenderObjectRefreshType.FULL ) {
 
-					this._nodes.updateBefore( renderObject );
-
-					this._geometries.updateForRender( renderObject );
-					this._nodes.updateForRender( renderObject );
-					this._bindings.updateForRender( renderObject );
+					this._updateRenderObject( renderObject );
 
 					this._nodes.updateAfter( renderObject );
 
@@ -1742,6 +1775,11 @@ class Renderer {
 		const previousRenderContext = this._currentRenderContext;
 		const previousRenderObjectFunction = this._currentRenderObjectFunction;
 		const previousHandleObjectFunction = this._handleObjectFunction;
+		const previousRenderBundle = this._currentRenderBundle;
+
+		// a render nested in the recording of a render bundle draws its objects directly
+
+		this._currentRenderBundle = null;
 
 		this.lighting.beginRender( scene );
 
@@ -1861,36 +1899,22 @@ class Renderer {
 
 		//
 
-		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-
-		if ( camera.isArrayCamera ) {
-
-			_frustumArray.setFromArrayCamera( camera );
-
-		} else {
-
-			_frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
-
-		}
+		this.drawer.begin( camera );
 
 		this._renderLists.update( nodeFrame.frameId );
 
 		const renderList = this._renderLists.get( scene, camera, this.lighting );
-		renderList.begin();
+		this.drawer.beginRenderList( renderList );
 
-		this._projectObject( scene, camera, 0, renderList, renderContext.clippingContext );
+		this.drawer.project( scene, camera, 0, renderList, renderContext.clippingContext );
 
-		renderList.finish();
+		this.drawer.finishRenderList( renderList );
 
 		if ( this.sortObjects === true ) {
 
 			renderList.sort( this._opaqueSort, this._transparentSort );
 
 		}
-
-		//
-
-		this._filterRenderList( renderList, camera, sceneRef );
 
 		//
 
@@ -1982,6 +2006,7 @@ class Renderer {
 		this._currentRenderContext = previousRenderContext;
 		this._currentRenderObjectFunction = previousRenderObjectFunction;
 		this._handleObjectFunction = previousHandleObjectFunction;
+		this._currentRenderBundle = previousRenderBundle;
 
 		this.lighting.finishRender( scene );
 
@@ -2901,6 +2926,10 @@ class Renderer {
 	 * object that has material of a certain type should perform a pre-pass with a special overwrite material".
 	 * The custom function must always call `renderObject()` in its implementation.
 	 *
+	 * When a drawer that merges objects like {@link OptimizedDrawer} is used, the custom function receives
+	 * the first object of each group of merged objects and calling `renderObject()` with it renders all
+	 * objects of the group. Render calls which select objects individually should use a {@link Drawer}.
+	 *
 	 * Use `null` as the first argument to reset the state.
 	 *
 	 * @param {?renderObjectFunction} renderObjectFunction - The render object function.
@@ -2919,83 +2948,6 @@ class Renderer {
 	getRenderObjectFunction() {
 
 		return this._renderObjectFunction;
-
-	}
-
-	/**
-	 * Filters the render list to remove duplicate objects based on their
-	 * geometry, material, scene, camera, lightsNode, render context and clipping context.
-	 *
-	 * @private
-	 * @param {RenderList} renderList - The render list.
-	 * @param {Camera} camera - The camera.
-	 * @param {Scene} scene - The scene.
-	 * @param {?string} [passId=null] - An optional ID for identifying the pass.
-	 */
-	_filterRenderList( renderList, camera, scene, passId = null ) {
-
-		const lightsNode = renderList.lightsNode;
-
-		renderList.opaque = this._filterObjects( renderList.opaque, camera, scene, lightsNode, passId );
-		renderList.transparent = this._filterObjects( renderList.transparent, camera, scene, lightsNode, passId );
-		renderList.transparentDoublePass = this._filterObjects( renderList.transparentDoublePass, camera, scene, lightsNode, passId );
-
-	}
-
-	/**
-	 * Filters the given render items to remove duplicate objects based on their
-	 * geometry, material, scene, camera, lightsNode, render context and clipping context.
-	 *
-	 * @private
-	 * @param {Array<RenderItem>} renderItems - The render items.
-	 * @param {Camera} camera - The camera.
-	 * @param {Scene} scene - The scene.
-	 * @param {LightsNode} lightsNode - The lights node.
-	 * @param {?string} [passId=null] - An optional ID for identifying the pass.
-	 * @return {Array<RenderItem>} The filtered render items.
-	 */
-	_filterObjects( renderItems, camera, scene, lightsNode, passId = null ) {
-
-		const renderList = [];
-		const renderId = this._nodes.nodeFrame.renderId;
-
-		for ( const renderItem of renderItems ) {
-
-			const { geometry, material, clippingContext } = renderItem;
-
-			const chainMap = this._objects.getChainMap( passId );
-			const chainKeys = [ material, geometry, scene, camera, lightsNode, this._currentRenderContext, clippingContext ];
-
-			let map = chainMap.get( chainKeys );
-
-			if ( map === undefined ) {
-
-				map = {
-					renderItem: null,
-					renderId: - 1
-				};
-
-				chainMap.set( chainKeys, map );
-
-			}
-
-			if ( map.renderId !== renderId || Array.isArray( renderItem.object.material ) ) {
-
-				map.renderId = renderId;
-				map.renderItem = renderItem;
-
-				renderList.push( renderItem );
-
-			} else {
-
-				map.renderItem.instances = map.renderItem.instances || [ map.renderItem.object ];
-				map.renderItem.instances.push( renderItem.object );
-
-			}
-
-		}
-
-		return renderList;
 
 	}
 
@@ -3365,175 +3317,6 @@ class Renderer {
 	}
 
 	/**
-	 * Analyzes the given 3D object's hierarchy and builds render lists from the
-	 * processed hierarchy.
-	 *
-	 * @private
-	 * @param {Object3D} object - The 3D object to process (usually a scene).
-	 * @param {Camera} camera - The camera the object is rendered with.
-	 * @param {number} groupOrder - The group order is derived from the `renderOrder` of groups and is used to group 3D objects within groups.
-	 * @param {RenderList} renderList - The current render list.
-	 * @param {ClippingContext} clippingContext - The current clipping context.
-	 */
-	_projectObject( object, camera, groupOrder, renderList, clippingContext ) {
-
-		if ( object.visible === false ) return;
-
-		const visible = object.layers.test( camera.layers );
-
-		if ( visible ) {
-
-			if ( object.isGroup ) {
-
-				groupOrder = object.renderOrder;
-
-				if ( object.isClippingGroup && object.enabled ) clippingContext = clippingContext.getGroupContext( object );
-
-			} else if ( object.isLOD ) {
-
-				if ( object.autoUpdate === true ) object.update( camera );
-
-			} else if ( object.isLight ) {
-
-				renderList.pushLight( object );
-
-			} else if ( object.isSprite ) {
-
-				const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
-
-				if ( ! object.frustumCulled || object.intersectsFrustum( frustum ) ) {
-
-					if ( this.sortObjects === true ) {
-
-						_vector4.setFromMatrixPosition( object.matrixWorld ).applyMatrix4( _projScreenMatrix );
-
-					}
-
-					const { geometry, material } = object;
-
-					if ( material.visible ) {
-
-						renderList.push( object, geometry, material, groupOrder, _vector4.z, null, clippingContext );
-
-					}
-
-				}
-
-			} else if ( object.isLineLoop ) {
-
-				error( 'Renderer: Objects of type THREE.LineLoop are not supported. Please use THREE.Line or THREE.LineSegments.' );
-
-			} else if ( object.isMesh || object.isLine || object.isPoints ) {
-
-				const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
-
-				if ( ! object.frustumCulled || object.intersectsFrustum( frustum ) ) {
-
-					const { geometry, material } = object;
-
-					if ( this.sortObjects === true ) {
-
-						if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
-
-						_vector4
-							.copy( geometry.boundingSphere.center )
-							.applyMatrix4( object.matrixWorld )
-							.applyMatrix4( _projScreenMatrix );
-
-					}
-
-					if ( Array.isArray( material ) ) {
-
-						const groups = geometry.groups;
-
-						for ( let i = 0, l = groups.length; i < l; i ++ ) {
-
-							const group = groups[ i ];
-							const groupMaterial = material[ group.materialIndex ];
-
-							if ( groupMaterial && groupMaterial.visible ) {
-
-								renderList.push( object, geometry, groupMaterial, groupOrder, _vector4.z, group, clippingContext );
-
-							}
-
-						}
-
-					} else if ( material.visible ) {
-
-						renderList.push( object, geometry, material, groupOrder, _vector4.z, null, clippingContext );
-
-					}
-
-				}
-
-			}
-
-		}
-
-		if ( object.isBundleGroup === true && this.backend.beginBundle !== undefined ) {
-
-			const baseRenderList = renderList;
-
-			// replace render list
-
-			renderList = this._renderLists.get( object, camera, this.lighting );
-
-			const renderBundle = this._bundles.get( object, camera, this._currentRenderContext );
-			const renderBundleData = this.backend.get( renderBundle );
-			const renderBundleNeedsUpdate = this._bundleNeedsUpdate( object, renderBundleData );
-
-			if ( renderBundleNeedsUpdate ) {
-
-				// update render list if necessary
-
-				renderList.begin();
-
-				if ( renderBundleData.renderObjects === undefined ) {
-
-					renderBundleData.renderObjects = [];
-
-				} else {
-
-					renderBundleData.renderObjects.length = 0;
-
-				}
-
-				const children = object.children;
-
-				for ( let i = 0, l = children.length; i < l; i ++ ) {
-
-					this._projectObject( children[ i ], camera, groupOrder, renderList, clippingContext );
-
-				}
-
-				renderList.finish();
-
-			}
-
-			baseRenderList.pushBundle( {
-				bundleGroup: object,
-				camera,
-				renderList,
-			} );
-
-			return;
-
-		}
-
-		//
-
-		const children = object.children;
-
-		for ( let i = 0, l = children.length; i < l; i ++ ) {
-
-			this._projectObject( children[ i ], camera, groupOrder, renderList, clippingContext );
-
-		}
-
-	}
-
-	/**
 	 * Renders the given render bundles.
 	 *
 	 * @private
@@ -3613,11 +3396,20 @@ class Renderer {
 	 */
 	_renderObjects( renderList, camera, scene, lightsNode, passId = null ) {
 
+		// nested render calls (e.g. triggered by node updates) must not change the render item of this loop
+
+		const previousRenderItem = this._currentRenderItem;
+
 		for ( let i = 0, il = renderList.length; i < il; i ++ ) {
 
-			const { object, geometry, material, group, clippingContext, instances } = renderList[ i ];
+			const renderItem = renderList[ i ];
+			const { object, geometry, material, group, clippingContext } = renderItem;
 
-			this._currentRenderObjectFunction( object, scene, camera, geometry, material, group, lightsNode, clippingContext, passId, instances );
+			this._currentRenderItem = renderItem;
+
+			this._currentRenderObjectFunction( object, scene, camera, geometry, material, group, lightsNode, clippingContext, passId );
+
+			this._currentRenderItem = previousRenderItem;
 
 		}
 
@@ -3838,9 +3630,13 @@ class Renderer {
 	 * @param {LightsNode} lightsNode - The current lights node.
 	 * @param {?ClippingContext} clippingContext - The clipping context.
 	 * @param {?string} [passId=null] - An optional ID for identifying the pass.
-	 * @param {?Array<Object3D>} [instances=null] - An optional array of instances if the objects are instanced.
 	 */
-	renderObject( object, scene, camera, geometry, material, group, lightsNode, clippingContext = null, passId = null, instances = null ) {
+	renderObject( object, scene, camera, geometry, material, group, lightsNode, clippingContext = null, passId = null ) {
+
+		// objects merged by the drawer are drawn as instances of the current render item
+
+		const renderItem = this._currentRenderItem;
+		const instances = ( renderItem !== null && renderItem.object === object ) ? renderItem.instances : null;
 
 		let materialOverride = false;
 		let materialColorNode;
@@ -3974,6 +3770,37 @@ class Renderer {
 	}
 
 	/**
+	 * Performs a full update of the given render object. If the render object draws merged
+	 * objects, the per-object data of each instance is updated.
+	 *
+	 * @private
+	 * @param {RenderObject} renderObject - The render object.
+	 */
+	_updateRenderObject( renderObject ) {
+
+		const { object, instances } = renderObject;
+		const count = instances !== null ? instances.objects.length : 1;
+
+		for ( let i = 0; i < count; i ++ ) {
+
+			renderObject.index = i;
+			renderObject.object = instances !== null ? instances.objects[ i ] : object;
+
+			this._nodes.updateBefore( renderObject );
+
+			this._geometries.updateForRender( renderObject );
+
+			this._nodes.updateForRender( renderObject );
+			this._bindings.updateForRender( renderObject );
+
+		}
+
+		renderObject.object = object;
+		renderObject.index = 0;
+
+	}
+
+	/**
 	 * This method represents the default `_handleObjectFunction` implementation which creates
 	 * a render object from the given data and performs the draw command with the selected backend.
 	 *
@@ -4010,24 +3837,7 @@ class Renderer {
 
 		if ( refreshType === RenderObjectRefreshType.FULL ) {
 
-			const count = renderObject.instances ? renderObject.instances.length : 1;
-
-			for ( let i = 0; i < count; i ++ ) {
-
-				renderObject.index = i;
-				renderObject.object = renderObject.instances ? renderObject.instances[ i ] : object;
-
-				this._nodes.updateBefore( renderObject );
-
-				this._geometries.updateForRender( renderObject );
-
-				this._nodes.updateForRender( renderObject );
-				this._bindings.updateForRender( renderObject );
-
-			}
-
-			renderObject.object = object;
-			renderObject.index = 0;
+			this._updateRenderObject( renderObject );
 
 		} else if ( refreshType === RenderObjectRefreshType.SHARED ) {
 
@@ -4065,8 +3875,9 @@ class Renderer {
 	 * @param {?{start: number, count: number}} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
 	 * @param {ClippingContext} clippingContext - The clipping context.
 	 * @param {string} [passId] - An optional ID for identifying the pass.
+	 * @param {?Array<Object3D>} [instances=null] - An optional array of instances if the objects are instanced.
 	 */
-	_createObjectPipeline( object, material, scene, camera, lightsNode, group, clippingContext, passId ) {
+	_createObjectPipeline( object, material, scene, camera, lightsNode, group, clippingContext, passId, instances = null ) {
 
 		// If in async compilation mode, queue the work for sequential execution
 		if ( this._compilationPromises !== null ) {
@@ -4081,6 +3892,7 @@ class Renderer {
 				group,
 				clippingContext,
 				passId,
+				instances,
 				renderContext: this._currentRenderContext
 			} );
 
@@ -4089,7 +3901,7 @@ class Renderer {
 		}
 
 		// Sync path
-		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, clippingContext, passId );
+		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, clippingContext, passId, instances );
 		renderObject.drawRange = object.geometry.drawRange;
 		renderObject.group = group;
 

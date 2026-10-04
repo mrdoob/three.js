@@ -107,8 +107,8 @@ class NodeFrame {
 		this.scene = null;
 
 		/**
-		 * A reference to the current instances array.
-		 * @type {?Array<Object3D>}
+		 * A reference to the current group of objects drawn as instances.
+		 * @type {?InstanceGroup}
 		 * @default null
 		 */
 		this.instances = null;

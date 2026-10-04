@@ -105,7 +105,31 @@ class AttributeNode extends Node {
 
 	}
 
+	setup( builder ) {
+
+		// the value of an attribute can be provided by the context, e.g. to reconstruct it per fragment
+
+		const getAttribute = builder.context.getAttribute;
+
+		if ( getAttribute ) {
+
+			const node = getAttribute( this.getAttributeName( builder ), builder );
+
+			if ( node ) return node;
+
+		}
+
+		return super.setup( builder );
+
+	}
+
 	generate( builder ) {
+
+		// a single parameter keeps the generated snippet cached, so the attribute is only generated once
+
+		const { outputNode } = builder.getNodeProperties( this );
+
+		if ( outputNode ) return outputNode.build( builder, this.getNodeType( builder ) );
 
 		const attributeName = this.getAttributeName( builder );
 		const nodeType = this.getNodeType( builder );

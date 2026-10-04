@@ -94,7 +94,7 @@ class RenderObjects {
 	 * @param {RenderContext} renderContext - The render context.
 	 * @param {ClippingContext} clippingContext - The clipping context.
 	 * @param {string} [passId] - An optional ID for identifying the pass.
-	 * @param {Array<Object3D>} [instances=null] - An optional array of instances to render.
+	 * @param {?InstanceGroup} [instances=null] - An optional group of objects drawn as instances.
 	 * @return {RenderObject} The render object.
 	 */
 	get( object, material, scene, camera, lightsNode, renderContext, clippingContext, passId, instances = null ) {
@@ -103,9 +103,9 @@ class RenderObjects {
 
 		// set chain keys
 
-		// TODO: revisit if geometry was changed
+		// merged objects share one render object whose source is their instance group
 
-		_chainKeys[ 0 ] = object.geometry;
+		_chainKeys[ 0 ] = instances !== null ? instances : object;
 		_chainKeys[ 1 ] = material;
 		_chainKeys[ 2 ] = renderContext;
 		_chainKeys[ 3 ] = lightsNode;
@@ -117,8 +117,6 @@ class RenderObjects {
 		if ( renderObject === undefined ) {
 
 			renderObject = this.createRenderObject( this.nodes, this.geometries, this.renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext, passId, instances );
-
-			//console.log( material, 'new render object', renderObject );
 
 			chainMap.set( _chainKeys, renderObject );
 
@@ -214,7 +212,7 @@ class RenderObjects {
 	 * @param {RenderContext} renderContext - The render context.
 	 * @param {ClippingContext} clippingContext - The clipping context.
 	 * @param {string} [passId] - An optional ID for identifying the pass.
-	 * @param {Array<Object3D>} [instances] - An optional array of instances to render.
+	 * @param {?InstanceGroup} [instances] - An optional group of objects drawn as instances.
 	 * @return {RenderObject} The render object.
 	 */
 	createRenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext, passId, instances = null ) {

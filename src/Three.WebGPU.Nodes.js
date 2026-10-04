@@ -5,6 +5,8 @@ export { default as WebGPURenderer } from './renderers/webgpu/WebGPURenderer.Nod
 export { default as WebGPUBackend } from './renderers/webgpu/WebGPUBackend.js';
 export { default as WebGLBackend } from './renderers/webgl-fallback/WebGLBackend.js';
 export { default as Lighting } from './renderers/common/Lighting.js';
+export { default as Drawer } from './renderers/common/Drawer.js';
+export { default as OptimizedDrawer } from './renderers/common/OptimizedDrawer.js';
 export { default as BundleGroup } from './renderers/common/BundleGroup.js';
 export { default as QuadMesh } from './renderers/common/QuadMesh.js';
 export { default as PMREMGenerator } from './renderers/common/extras/PMREMGenerator.js';

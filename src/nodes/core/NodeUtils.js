@@ -439,7 +439,7 @@ export function getValueFromType( type, ...params ) {
  */
 export function roundInstances( count ) {
 
-	return Math.ceil( count / 32 ) * 32;
+	return Math.max( Math.ceil( count / 32 ), 1 ) * 32;
 
 }
 

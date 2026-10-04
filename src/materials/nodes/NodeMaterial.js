@@ -799,14 +799,6 @@ class NodeMaterial extends Material {
 
 			instancedMesh( object );
 
-		} else if ( builder.instances !== null ) {
-
-			console.log( '>>', builder.getCount() );
-
-		} else {
-
-			console.log( '>> no instances' );
-
 		}
 
 		if ( this.positionNode !== null ) {

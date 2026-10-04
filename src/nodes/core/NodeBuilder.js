@@ -424,9 +424,9 @@ class NodeBuilder {
 		this.tab = '\t';
 
 		/**
-		 * Reference to the current instance data.
+		 * The group of objects drawn as instances, or `null` if instancing is not used.
 		 *
-		 * @type {?Array}
+		 * @type {?InstanceGroup}
 		 */
 		this.instances = null;
 
@@ -3223,7 +3223,7 @@ class NodeBuilder {
 
 	getCount() {
 
-		return this.instances ? roundInstances( this.instances.length ) : 1;
+		return this.instances ? roundInstances( this.instances.objects.length ) : 1;
 
 	}
 

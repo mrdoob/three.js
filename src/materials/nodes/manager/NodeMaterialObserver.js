@@ -928,7 +928,7 @@ class NodeMaterialObserver {
 	 */
 	needsRefresh( renderObject, nodeFrame ) {
 
-		if ( this.hasNode || this.hasAnimation || this.hasDynamicInstancing( renderObject.object ) || this.firstInitialization( renderObject ) || this.needsVelocity( nodeFrame.renderer ) )
+		if ( this.hasAnimation || this.hasDynamicInstancing( renderObject.object ) || this.firstInitialization( renderObject ) || this.needsVelocity( nodeFrame.renderer ) )
 			return RenderObjectRefreshType.FULL;
 
 		const { renderId } = nodeFrame;
@@ -953,6 +953,19 @@ class NodeMaterialObserver {
 
 		if ( isStatic || isBundle )
 			return refreshType;
+
+		// changes of node graphs can't be detected, and merged objects are only tracked through the first instance,
+		// so per-instance changes or a different instance order can't be detected either. Always refresh them.
+
+		if ( renderObject.instances !== null || this.hasNode ) {
+
+			// the render object of a bundle is in sync with the bundle after the refresh
+
+			if ( renderObject.bundle !== null ) this.getRenderObjectData( renderObject ).version = renderObject.bundle.version;
+
+			return RenderObjectRefreshType.FULL;
+
+		}
 
 		const lightsData = this.getLights( renderObject.lightsNode, renderId );
 

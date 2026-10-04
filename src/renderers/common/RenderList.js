@@ -65,6 +65,22 @@ function reversePainterSortStable( a, b ) {
 }
 
 /**
+ * Returns `true` if render items with the given material belong to the transparent render list.
+ *
+ * @private
+ * @function
+ * @param {Material} material - The material.
+ * @return {boolean} Whether the given material is rendered as transparent or not.
+ */
+export function isTransparentMaterial( material ) {
+
+	return material.transparent === true || material.transmission > 0 ||
+		( material.transmissionNode && material.transmissionNode.isNode ) ||
+		( material.backdropNode && material.backdropNode.isNode );
+
+}
+
+/**
  * Returns `true` if the given transparent material requires a double pass.
  *
  * @private
@@ -307,6 +323,7 @@ class RenderList {
 	 * @param {number} z - Th 3D object's depth value (z value in clip space).
 	 * @param {?number} group - {?Object} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
 	 * @param {ClippingContext} clippingContext - The current clipping context.
+	 * @return {Object} The render item.
 	 */
 	push( object, geometry, material, groupOrder, z, group, clippingContext ) {
 
@@ -323,9 +340,7 @@ class RenderList {
 
 		}
 
-		if ( material.transparent === true || material.transmission > 0 ||
-			( material.transmissionNode && material.transmissionNode.isNode ) ||
-			( material.backdropNode && material.backdropNode.isNode ) ) {
+		if ( isTransparentMaterial( material ) ) {
 
 			if ( needsDoublePass( material ) ) this.transparentDoublePass.push( renderItem );
 
@@ -336,6 +351,8 @@ class RenderList {
 			this.opaque.push( renderItem );
 
 		}
+
+		return renderItem;
 
 	}
 
@@ -355,9 +372,7 @@ class RenderList {
 
 		const renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group, clippingContext );
 
-		if ( material.transparent === true || material.transmission > 0 ||
-			( material.transmissionNode && material.transmissionNode.isNode ) ||
-			( material.backdropNode && material.backdropNode.isNode ) ) {
+		if ( isTransparentMaterial( material ) ) {
 
 			if ( needsDoublePass( material ) ) this.transparentDoublePass.unshift( renderItem );
 

@@ -151,6 +151,22 @@ class VaryingNode extends Node {
 
 	setup( builder ) {
 
+		// the context can evaluate varyings directly in the fragment stage, e.g. if the surface is reconstructed per fragment.
+		// indices and attributes only exist in the vertex stage, their varyings are kept unless the context provides the attribute
+
+		if ( builder.context.inlineVaryings === true ) {
+
+			let node = this.node;
+
+			while ( node.isSubBuildNode === true ) node = node.node;
+
+			const getAttribute = builder.context.getAttribute;
+			const providedAttribute = node.isAttributeNode === true && typeof getAttribute === 'function' && Boolean( getAttribute( node.getAttributeName( builder ), builder ) );
+
+			if ( node.isIndexNode !== true && ( node.isAttributeNode !== true || providedAttribute ) ) return this.node;
+
+		}
+
 		this.setupVarying( builder );
 
 		builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, this.node );
@@ -159,6 +175,8 @@ class VaryingNode extends Node {
 
 	analyze( builder ) {
 
+		if ( builder.getNodeProperties( this ).outputNode ) return super.analyze( builder );
+
 		this.setupVarying( builder );
 
 		builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, this.node );
@@ -166,6 +184,10 @@ class VaryingNode extends Node {
 	}
 
 	generate( builder ) {
+
+		const { outputNode } = builder.getNodeProperties( this );
+
+		if ( outputNode ) return outputNode.build( builder, this.getNodeType( builder ) );
 
 		const propertyKey = builder.getSubBuildProperty( 'property', builder.currentStack );
 		const properties = builder.getNodeProperties( this );

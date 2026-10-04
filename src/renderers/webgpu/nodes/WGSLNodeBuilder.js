@@ -1231,8 +1231,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				if ( group === 'object' ) {
 
-					let index = objectIndex.build( this );
-					//index = 0;
+					// only instanced groups need the instance index, which is a varying in the fragment stage
+
+					const index = this.getCount() > 1 ? objectIndex.build( this ) : '0';
 
 					group = `object[ ${ index } ]`;
 
@@ -1444,7 +1445,18 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				uniformGPU = buffer;
 
-				uniformNode.name = name ? name : 'NodeBuffer_' + uniformNode.id;
+				// the name is derived from the uniform index instead of the node id, so shaders with the same structure
+				// but different buffers produce the same code and share their shader modules and pipelines
+
+				if ( name ) {
+
+					uniformNode.name = name;
+
+				} else if ( uniformNode.name.startsWith( 'NodeBuffer_' ) === false ) {
+
+					uniformNode.name = 'NodeBuffer_' + uniformNode.name;
+
+				}
 
 			} else {
 
@@ -2505,7 +2517,6 @@ ${ flowData.code }
 
 			this.vertexShader = this._getWGSLVertexCode( shadersData.vertex );
 			this.fragmentShader = this._getWGSLFragmentCode( shadersData.fragment );
-			console.log( this.fragmentShader );
 
 		} else {
 
@@ -2851,6 +2862,14 @@ ${vars}
 			const count = this.getCount();
 
 			structName = `array< ${ structName }, ${ count } >`;
+
+			// per-instance data is stored in a storage buffer, the struct layout is the same
+
+			if ( this.uniformGroups[ name ].count > 1 ) {
+
+				access = 'storage, read';
+
+			}
 
 		}
 

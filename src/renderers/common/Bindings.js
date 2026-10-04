@@ -109,7 +109,6 @@ class Bindings extends DataMap {
 
 					if ( binding.isNodeUniformsGroup ) {
 
-						//console.log( renderObject.index );
 						binding.index = renderObject.index;
 
 					}

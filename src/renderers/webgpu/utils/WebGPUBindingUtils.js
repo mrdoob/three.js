@@ -435,7 +435,13 @@ class WebGPUBindingUtils {
 
 				const buffer = {}; // GPUBufferBindingLayout
 
-				if ( binding.isStorageBuffer ) {
+				if ( binding.isUniformBuffer && binding.count > 1 ) {
+
+					// uniforms groups with per-instance data
+
+					buffer.type = GPUBufferBindingType.ReadOnlyStorage;
+
+				} else if ( binding.isStorageBuffer ) {
 
 					if ( binding.visibility & GPUShaderStage.COMPUTE ) {
 

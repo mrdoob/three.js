@@ -8,6 +8,8 @@ export { default as Renderer } from './renderers/common/Renderer.js';
 export { default as Backend } from './renderers/common/Backend.js';
 export { default as WebGLCapabilities } from './renderers/webgl-fallback/utils/WebGLCapabilities.js';
 export { default as Lighting } from './renderers/common/Lighting.js';
+export { default as Drawer } from './renderers/common/Drawer.js';
+export { default as OptimizedDrawer } from './renderers/common/OptimizedDrawer.js';
 export { default as BundleGroup } from './renderers/common/BundleGroup.js';
 export { default as QuadMesh } from './renderers/common/QuadMesh.js';
 export { default as PMREMGenerator } from './renderers/common/extras/PMREMGenerator.js';

@@ -78,7 +78,7 @@ class RenderObject {
 	 * @param {LightsNode} lightsNode - The lights node.
 	 * @param {RenderContext} renderContext - The render context.
 	 * @param {ClippingContext} clippingContext - The clipping context.
-	 * @param {Array<Object3D>} [instances=null] - An array of instances for instanced rendering.
+	 * @param {?InstanceGroup} [instances=null] - The group of objects drawn as instances.
 	 */
 	constructor( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext, instances = null ) {
 
@@ -172,18 +172,34 @@ class RenderObject {
 		this.version = material.version;
 
 		/**
-		 * An array of instances for instanced rendering.
+		 * The group of objects drawn as instances, or `null` if the render object draws a single object.
 		 *
-		 * @type {?Array<Object3D>}
+		 * @type {?InstanceGroup}
 		 */
 		this.instances = instances;
+
+		/**
+		 * The source of this render object: the instance group if objects are drawn as instances,
+		 * otherwise the 3D object. It identifies the render object and defines its lifecycle.
+		 *
+		 * @type {InstanceGroup|Object3D}
+		 */
+		this.source = instances !== null ? instances : object;
 
 		/**
 		 * The count of instances.
 		 *
 		 * @type {number}
 		 */
-		this.count = instances !== null ? roundInstances( instances.length ) : 1;
+		this.count = instances !== null ? roundInstances( instances.objects.length ) : 1;
+
+		/**
+		 * The index of the instance which is currently updated.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.index = 0;
 
 		/**
 		 * The draw range of the geometry.
@@ -372,7 +388,7 @@ class RenderObject {
 
 		/**
 		 * An event listener which is executed when `dispose()` is called on
-		 * the 3D object of this render object.
+		 * the source of this render object.
 		 *
 		 * @method
 		 */
@@ -382,7 +398,7 @@ class RenderObject {
 
 		};
 
-		this.object.addEventListener( 'dispose', this.onObjectDispose );
+		this.source.addEventListener( 'dispose', this.onObjectDispose );
 		this.material.addEventListener( 'dispose', this.onMaterialDispose );
 		this.geometry.addEventListener( 'dispose', this.onGeometryDispose );
 
@@ -433,15 +449,12 @@ class RenderObject {
 
 	}
 
+	/**
+	 * Returns the objects that are drawn as instances by this render object.
+	 *
+	 * @return {?InstanceGroup} The instance group, or `null` if the render object draws a single object.
+	 */
 	getDrawInstances() {
-
-		const builderInstances = this.getNodeBuilderState().instances;
-
-		if ( builderInstances !== null && this.instances === null ) {
-
-			this.instances = [ this.object ];
-
-		}
 
 		return this.instances;
 
@@ -540,7 +553,7 @@ class RenderObject {
 	 */
 	getChainArray() {
 
-		return [ this.object.geometry, this.material, this.context, this.lightsNode ];
+		return [ this.source, this.material, this.context, this.lightsNode ];
 
 	}
 
@@ -986,9 +999,9 @@ class RenderObject {
 
 		let count;
 
-		if ( this.instances !== null && this.instances.length > this.count ) {
+		if ( this.instances !== null && this.instances.objects.length > this.count ) {
 
-			count = roundInstances( this.instances.length );
+			count = roundInstances( this.instances.objects.length );
 
 		} else {
 
@@ -1018,7 +1031,8 @@ class RenderObject {
 	 */
 	dispose() {
 
-		this.object.removeEventListener( 'dispose', this.onObjectDispose );
+		this.source.removeEventListener( 'dispose', this.onObjectDispose );
+
 		this.material.removeEventListener( 'dispose', this.onMaterialDispose );
 		this.geometry.removeEventListener( 'dispose', this.onGeometryDispose );
 

@@ -65,7 +65,8 @@ class UniformsGroup extends UniformBuffer {
 		this._addedIndices = new Set();
 
 		/**
-		 * The number of instances for this uniform group.
+		 * The number of instances for this uniform group. Groups with more than one
+		 * instance are stored in a read-only storage buffer instead of a uniform buffer.
 		 *
 		 * @type {number}
 		 */

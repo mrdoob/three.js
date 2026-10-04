@@ -2361,7 +2361,7 @@ class WebGPUBackend extends Backend {
 				if ( drawInstances ) {
 
 					drawParams.firstInstance = 0;
-					drawParams.instanceCount = drawInstances.length;
+					drawParams.instanceCount = drawInstances.objects.length;
 
 				}
 
@@ -2765,7 +2765,9 @@ class WebGPUBackend extends Backend {
 
 			const byteLength = uniformBuffer.byteLength;
 
-			const usage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
+			// uniforms groups with per-instance data are stored in a storage buffer
+
+			const usage = ( uniformBuffer.count > 1 ? GPUBufferUsage.STORAGE : GPUBufferUsage.UNIFORM ) | GPUBufferUsage.COPY_DST;
 
 			const visibilities = [];
 

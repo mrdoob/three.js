@@ -968,7 +968,7 @@ class NodeManager extends DataMap {
 	 * @param {?Camera} [camera=null] - The camera.
 	 * @param {?Material} [material=null] - The material.
 	 * @param {?Node} [compute=null] - The compute node.
-	 * @param {?Array<Object3D>} [instances=null] - The instances.
+	 * @param {?InstanceGroup} [instances=null] - The group of objects drawn as instances.
 	 * @return {NodeFrame} The node frame.
 	 */
 	getNodeFrame( renderer = this.renderer, scene = null, object = null, camera = null, material = null, compute = null, instances = null ) {
