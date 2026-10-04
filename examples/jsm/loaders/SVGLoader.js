@@ -762,10 +762,18 @@ class SVGLoader extends Loader {
 
 				for ( let j = 0; j < selectorList.length; j ++ ) {
 
-					// Remove empty rules
-					const definitions = Object.fromEntries(
-						Object.entries( stylesheet.style ).filter( ( [ , v ] ) => v !== '' )
-					);
+					// Read declarations by index, since not every browser exposes them as enumerable properties
+					const definitions = {};
+
+					for ( let k = 0; k < stylesheet.style.length; k ++ ) {
+
+						const name = stylesheet.style[ k ];
+						const value = stylesheet.style.getPropertyValue( name );
+
+						// Remove empty rules
+						if ( value !== '' ) definitions[ name.replace( /-([a-z])/g, ( m, c ) => c.toUpperCase() ) ] = value;
+
+					}
 
 					stylesheets[ selectorList[ j ] ] = Object.assign(
 						stylesheets[ selectorList[ j ] ] || {},
