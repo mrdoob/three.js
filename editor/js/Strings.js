@@ -401,6 +401,8 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/scale': 'مقیاس',
 			'sidebar/settings/shortcuts/undo': 'بازگشت به عقب',
 			'sidebar/settings/shortcuts/focus': 'فوکوس',
+			'sidebar/settings/shortcuts/perspective': 'پرسپکتیو',
+			'sidebar/settings/shortcuts/orthographic': 'ارتوگرافیک',
 			'sidebar/settings/shortcuts/selectAll': 'انتخاب همه',
 
 			'sidebar/history': 'هیستوری',
@@ -1306,6 +1308,8 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/scale': 'Échelle',
 			'sidebar/settings/shortcuts/undo': 'Annuler',
 			'sidebar/settings/shortcuts/focus': 'Focus',
+			'sidebar/settings/shortcuts/perspective': 'Perspective',
+			'sidebar/settings/shortcuts/orthographic': 'Orthographique',
 			'sidebar/settings/shortcuts/selectAll': 'Tout sélectionner',
 
 			'sidebar/history': 'Historique',
@@ -1758,6 +1762,8 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/scale': '缩放',
 			'sidebar/settings/shortcuts/undo': '撤销',
 			'sidebar/settings/shortcuts/focus': '聚焦',
+			'sidebar/settings/shortcuts/perspective': '透视',
+			'sidebar/settings/shortcuts/orthographic': '正交',
 			'sidebar/settings/shortcuts/selectAll': '全选',
 
 			'sidebar/history': '历史记录',
@@ -2210,6 +2216,8 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/scale': 'スケール',
 			'sidebar/settings/shortcuts/undo': '元に戻す',
 			'sidebar/settings/shortcuts/focus': 'フォーカス',
+			'sidebar/settings/shortcuts/perspective': '透視投影',
+			'sidebar/settings/shortcuts/orthographic': '平行投影',
 			'sidebar/settings/shortcuts/selectAll': 'すべて選択',
 
 			'sidebar/history': '履歴',
@@ -2661,6 +2669,8 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/scale': '스케일',
 			'sidebar/settings/shortcuts/undo': '되돌리기',
 			'sidebar/settings/shortcuts/focus': '포커스',
+			'sidebar/settings/shortcuts/perspective': '원근 투영',
+			'sidebar/settings/shortcuts/orthographic': '직교 투영',
 			'sidebar/settings/shortcuts/selectAll': '모두 선택',
 
 			'sidebar/history': '기록',
