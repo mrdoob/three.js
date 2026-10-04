@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - city generator - gpu-driven</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - city generator - gpu-driven">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_generator_city_gpudriven.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_generator_city_gpudriven.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>City Generator — GPU-Driven</span>
+			</div>
+
+			<small>
+				<span id="stats"></span> drawn with GPUDrivenDrawer or VisibilityBufferDrawer.<br />
+				Walk: click to look around, WASD to move, Shift to run. Fly: steer with the mouse, WASD to move.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../src/three.webgpu.js",
+					"three/webgpu": "../src/three.webgpu.js",
+					"three/tsl": "../src/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { pass, mrt, output, velocity, fog, pmremTexture, positionWorld, cameraPosition, uniform, vec3, select, abs, exp, max } from 'three/tsl';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
+			import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+			import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
+			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
+			import { traa } from 'three/addons/tsl/display/TRAANode.js';
+			import { CityGenerator, createBuildingMaterial, createRoadMaterial } from 'three/addons/generators/CityGenerator.js';
+			import { GPUDrivenDrawer } from 'three/addons/renderers/GPUDrivenDrawer.js';
+			import { VisibilityBufferDrawer } from 'three/addons/renderers/VisibilityBufferDrawer.js';
+
+			let camera, scene, renderer, controls, timer;
+			let cityGroup, tilesGroup, ground, materials, city, renderPipeline;
+			let sky, sun, sunLight, pmremGenerator, envScene, envRenderTarget, cityBounds;
+			let drawers, hazeDensity, postProcessing = [];
+
+			const keys = {};
+
+			const EYE_HEIGHT = 1.7;
+			const WALK_SPEED = 6;
+			const RUN_SPEED = 25;
+
+			const search = new URLSearchParams( location.search );
+
+			const parameters = {
+				seed: 94,
+				tiles: parseInt( search.get( 'tiles' ) || '6' ), // the generated city is repeated on a tiles x tiles grid
+				timeOfDay: 9, // hours: 6 sunrise, 12 noon, 18 sunset
+				shadows: search.get( 'shadows' ) !== '0',
+				drawer: search.get( 'drawer' ) || 'gpu-driven',
+				static: search.get( 'static' ) !== '0',
+				occlusion: search.get( 'occlusion' ) !== '0',
+				prepass: search.get( 'prepass' ) !== '0',
+				meshlets: search.get( 'meshlets' ) === '1',
+				shadowLod: parseFloat( search.get( 'shadowLod' ) || '1' ),
+				lod: parseFloat( search.get( 'lod' ) || '1' ),
+				camera: search.get( 'camera' ) || 'walk', // walk along the streets or fly over the city
+				cars: search.get( 'cars' ) !== '0',
+				people: search.get( 'people' ) !== '0',
+				trees: search.get( 'trees' ) !== '0',
+				lights: search.get( 'lights' ) !== '0',
+				furniture: search.get( 'furniture' ) !== '0',
+				haze: parseFloat( search.get( 'haze' ) || '1' ), // density of the atmospheric haze, 0 disables it
+				antialiasing: search.get( 'aa' ) || 'msaa',
+				interiors: search.get( 'interiors' ) !== '0', // the features of the building material
+				weathering: search.get( 'weathering' ) === '1',
+				relief: search.get( 'relief' ) !== '0',
+				farMaterial: search.get( 'far' ) !== '0', // distant towers use a cheaper material
+				detailDistance: parseFloat( search.get( 'detail' ) || '340' ) // the distance of the cheaper material
+			};
+
+			// the instanced meshes of the street props, toggled by the parameters
+
+			const props = {
+				cars: [ 'Car' ],
+				people: [ 'People' ],
+				trees: [ 'StreetTrees' ],
+				lights: [ 'Streetlights', 'Trafficlights' ],
+				furniture: [ 'Benches', 'Hydrants', 'Trashcans' ]
+			};
+
+			init();
+
+			async function init() {
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( Math.min( window.devicePixelRatio, 1.5 ) ); // limit the pixel ratio to improve performance on high-DPI displays
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 0.13;
+				renderer.shadowMap.enabled = true;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				// the GPU-driven drawers draw the towers, the optimized drawer is the default of the renderer and
+				// the simple drawer draws every object on its own, for comparison
+
+				drawers = {
+					'gpu-driven': new GPUDrivenDrawer( { debug: parameters.meshlets, occlusionCulling: parameters.occlusion, depthPrepass: parameters.prepass, lodThreshold: parameters.lod, shadowLodThreshold: parameters.shadowLod } ),
+					'visibility-buffer': new VisibilityBufferDrawer( { debug: parameters.meshlets, occlusionCulling: parameters.occlusion, lodThreshold: parameters.lod, shadowLodThreshold: parameters.shadowLod } ),
+					'optimized': renderer.drawer,
+					'simple': new THREE.Drawer()
+				};
+
+				renderer.drawer = drawers[ parameters.drawer ];
+
+				await renderer.init();
+
+				pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+				scene = new THREE.Scene();
+
+				// without irradiance probes the sky provides the fill light
+
+				scene.environmentIntensity = 0.2;
+
+				// a physical sky drives both the backdrop and the image-based
+				// lighting; the time-of-day slider walks the sun along its arc
+
+				sky = new SkyMesh();
+				sky.scale.setScalar( 20000 );
+				sky.turbidity.value = 8;
+				sky.rayleigh.value = 3;
+				sky.mieCoefficient.value = 0.008;
+				sky.mieDirectionalG.value = 0.88;
+
+				sun = new THREE.Vector3();
+				envScene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 1, 30000 );
+
+				setCameraMode( parameters.camera );
+
+				renderer.domElement.addEventListener( 'click', () => {
+
+					if ( parameters.camera === 'walk' ) controls.lock();
+
+				} );
+
+				window.addEventListener( 'keydown', ( event ) => keys[ event.code ] = true );
+				window.addEventListener( 'keyup', ( event ) => keys[ event.code ] = false );
+
+				timer = new THREE.Timer();
+
+				city = new CityGenerator( { seed: parameters.seed } );
+
+				// a single directional key aligned with the sky's sun
+
+				sunLight = new THREE.DirectionalLight();
+				sunLight.castShadow = parameters.shadows;
+				sunLight.shadow.mapSize.set( 4096, 4096 );
+				sunLight.shadow.normalBias = 0.05;
+
+				// the sun and the city are static, the shadow map is only rendered again when something changes
+
+				sunLight.shadow.autoUpdate = false;
+				scene.add( sunLight );
+
+				// distant towers use a cheaper material: the rooms are averaged instead of raymarched and the weathering
+				// noise is left out. it is a separate pipeline, so the near material doesn't slow down the distant pixels
+
+				materials = {
+					building: createBuildingMaterial( city.layout, city.seedNode, getBuildingOptions() ),
+					buildingFar: createBuildingMaterial( city.layout, city.seedNode, { interiors: 'average', weathering: false, relief: false } )
+				};
+
+				generateCity();
+
+				// aerial perspective: the air between the camera and a surface scatters the light of the sky,
+				// distant towers lose contrast and take the color of the sky behind them. the haze is denser
+				// near the ground, its density is integrated along the view ray through an exponential falloff
+
+				hazeDensity = uniform( 0.00035 * parameters.haze );
+
+				const hazeFalloff = uniform( 1 / 250 ); // the density halves every ~170m of height
+
+				const ray = positionWorld.sub( cameraPosition );
+				const distance = ray.length();
+				const direction = ray.div( distance );
+
+				const k = hazeFalloff.mul( direction.y ).mul( distance );
+				const opticalDepth = hazeDensity.mul( exp( hazeFalloff.mul( max( cameraPosition.y, 0 ) ).negate() ) ).mul( distance ).mul( select( abs( k ).lessThan( 1e-4 ), 1, exp( k.negate() ).oneMinus().div( k ) ) );
+
+				// the sky seen in the view direction, kept above the horizon where the haze meets the sky
+
+				const skyColor = pmremTexture( envRenderTarget.texture, vec3( direction.x, max( direction.y, 0.02 ), direction.z ), 0.25 );
+
+				scene.fogNode = fog( skyColor, exp( opticalDepth.negate() ).oneMinus() );
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+
+				setupPostProcessing();
+
+				// parameters
+
+				const gui = renderer.inspector.createParameters( 'City' );
+				gui.add( parameters, 'seed', 0, 100, 1 ).debounce( 300 ).onChange( generateCity );
+				gui.add( parameters, 'tiles', 1, 10, 1 ).debounce( 300 ).onChange( generateCity );
+				gui.add( parameters, 'timeOfDay', 6, 18, 0.1 ).name( 'time of day' ).onChange( updateSun );
+				gui.add( renderer, 'toneMappingExposure', 0.01, 1 ).name( 'exposure' );
+				gui.add( parameters, 'haze', 0, 4, 0.1 ).onChange( ( value ) => hazeDensity.value = 0.00035 * value );
+				gui.add( parameters, 'shadows' ).onChange( ( value ) => {
+
+					sunLight.castShadow = value;
+					sunLight.shadow.needsUpdate = true;
+
+				} );
+				gui.add( parameters, 'antialiasing', [ 'traa', 'msaa' ] ).onChange( setupPostProcessing );
+				gui.add( parameters, 'camera', [ 'walk', 'fly' ] ).onChange( setCameraMode );
+				gui.add( parameters, 'drawer', Object.keys( drawers ) ).onChange( ( value ) => {
+
+					renderer.drawer = drawers[ value ];
+					sunLight.shadow.needsUpdate = true;
+
+				} );
+				gui.add( parameters, 'static' ).name( 'static bundle' ).onChange( generateCity );
+				gui.add( parameters, 'occlusion' ).name( 'occlusion culling' ).onChange( ( value ) => {
+
+					drawers[ 'gpu-driven' ].occlusionCulling = value;
+					drawers[ 'visibility-buffer' ].occlusionCulling = value;
+
+				} );
+				gui.add( drawers[ 'gpu-driven' ], 'depthPrepass' ).name( 'depth prepass' );
+				gui.add( parameters, 'lod', 0, 8, 0.5 ).name( 'lod (pixels)' ).onChange( ( value ) => {
+
+					drawers[ 'gpu-driven' ].lodThreshold = value;
+					drawers[ 'visibility-buffer' ].lodThreshold = value;
+
+				} );
+				gui.add( parameters, 'shadowLod', 0, 8, 0.5 ).name( 'shadow lod (texels)' ).onChange( ( value ) => {
+
+					drawers[ 'gpu-driven' ].shadowLodThreshold = value;
+					drawers[ 'visibility-buffer' ].shadowLodThreshold = value;
+					sunLight.shadow.needsUpdate = true;
+
+				} );
+				gui.add( parameters, 'interiors' ).name( 'window interiors' ).onChange( updateBuildingMaterial );
+				gui.add( parameters, 'weathering' ).onChange( updateBuildingMaterial );
+				gui.add( parameters, 'relief' ).name( 'brick relief' ).onChange( updateBuildingMaterial );
+				gui.add( parameters, 'farMaterial' ).name( 'far material' ).onChange( generateCity );
+				gui.add( parameters, 'detailDistance', 50, 2000, 10 ).name( 'far distance' ).debounce( 100 ).onChange( updateDetailDistance );
+				gui.add( parameters, 'cars' ).onChange( updateProps );
+				gui.add( parameters, 'people' ).onChange( updateProps );
+				gui.add( parameters, 'trees' ).onChange( updateProps );
+				gui.add( parameters, 'lights' ).name( 'street lights' ).onChange( updateProps );
+				gui.add( parameters, 'furniture' ).name( 'street furniture' ).onChange( updateProps );
+				gui.add( parameters, 'meshlets' ).name( 'show meshlets' ).onChange( ( value ) => {
+
+					drawers[ 'gpu-driven' ].debug = value;
+					drawers[ 'visibility-buffer' ].debug = value;
+
+				} );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function setupPostProcessing() {
+
+				for ( const node of postProcessing ) node.dispose();
+
+				let scenePass, colorNode;
+
+				if ( parameters.antialiasing === 'traa' ) {
+
+					// the thin windows of distant towers are resolved over several frames, the velocity
+					// reprojects the history when the camera moves. MSAA only smooths the triangle edges
+
+					scenePass = pass( scene, camera, { samples: 0 } );
+					scenePass.setMRT( mrt( {
+						output: output,
+						velocity: velocity
+					} ) );
+
+					colorNode = traa( scenePass.getTextureNode( 'output' ), scenePass.getTextureNode( 'depth' ), scenePass.getTextureNode( 'velocity' ), camera );
+
+				} else {
+
+					scenePass = pass( scene, camera );
+					colorNode = scenePass.getTextureNode();
+
+				}
+
+				const bloomPass = bloom( colorNode, 0.05, 0.0, 0.0 );
+				bloomPass.setResolutionScale( 0.25 );
+
+				renderPipeline.outputNode = colorNode.add( bloomPass );
+				renderPipeline.needsUpdate = true;
+
+				postProcessing = colorNode.isTextureNode === true ? [ scenePass, bloomPass ] : [ scenePass, colorNode, bloomPass ];
+
+			}
+
+			function updateSun() {
+
+				const t = parameters.timeOfDay;
+				const u = ( t - 12 ) / 6; // -1 at sunrise, 0 at noon, +1 at sunset
+				const elevation = Math.max( 0, 1 - u * u ) * 72; // degrees above the horizon, peaks at noon
+				const azimuth = 90 - u * 55; // the sun swings east → west across the day
+
+				sun.setFromSphericalCoords(
+					1,
+					THREE.MathUtils.degToRad( 90 - elevation ),
+					THREE.MathUtils.degToRad( azimuth )
+				);
+				sky.sunPosition.value.copy( sun );
+
+				const sinElevation = Math.sin( THREE.MathUtils.degToRad( elevation ) );
+				const transmittance = Math.sqrt( Math.max( sinElevation, 0 ) ); // 0 at the horizon → 1 at the zenith
+				sunLight.color.set( 0xffb072 ).lerp( new THREE.Color( 0xfff4e8 ), transmittance );
+				sunLight.intensity = 100 * transmittance;
+				sunLight.position.copy( sun ).multiplyScalar( 4000 );
+
+				// shrink-wrap the shadow camera around the whole city for this sun angle
+
+				const shadowCamera = sunLight.shadow.camera;
+				const lightSpace = new THREE.Quaternion().setFromRotationMatrix( new THREE.Matrix4().lookAt( sunLight.position, scene.position, THREE.Object3D.DEFAULT_UP ) ).invert();
+
+				const fit = new THREE.Box3();
+				const corner = new THREE.Vector3();
+
+				for ( let i = 0; i < 8; i ++ ) {
+
+					corner.set(
+						i & 1 ? cityBounds.max.x : cityBounds.min.x,
+						i & 2 ? cityBounds.max.y : cityBounds.min.y,
+						i & 4 ? cityBounds.max.z : cityBounds.min.z
+					).sub( sunLight.position ).applyQuaternion( lightSpace );
+
+					fit.expandByPoint( corner );
+
+				}
+
+				const pad = 2;
+				shadowCamera.left = fit.min.x - pad;
+				shadowCamera.right = fit.max.x + pad;
+				shadowCamera.bottom = fit.min.y - pad;
+				shadowCamera.top = fit.max.y + pad;
+				shadowCamera.near = - fit.max.z - pad; // the camera looks down its negative z axis, so depth flips sign
+				shadowCamera.far = - fit.min.z + pad;
+				shadowCamera.updateProjectionMatrix();
+
+				// re-bake the sky ( without the sun disc ) into the environment map for IBL
+
+				sky.showSunDisc.value = false;
+				envScene.add( sky );
+				envRenderTarget = pmremGenerator.fromScene( envScene, 0, 0.1, 100, { renderTarget: envRenderTarget } );
+				scene.environment = envRenderTarget.texture;
+				sky.showSunDisc.value = true;
+
+				sunLight.shadow.needsUpdate = true;
+				scene.add( sky );
+
+			}
+
+			function getBuildingOptions() {
+
+				return { interiors: parameters.interiors, weathering: parameters.weathering, relief: parameters.relief };
+
+			}
+
+			// the towers share one material, rebuilt with the selected features
+
+			function updateBuildingMaterial() {
+
+				const previous = materials.building;
+
+				materials.building = createBuildingMaterial( city.layout, city.seedNode, getBuildingOptions() );
+
+				tilesGroup.traverse( ( object ) => {
+
+					if ( object.material === previous ) object.material = materials.building;
+
+				} );
+
+				previous.dispose();
+
+				if ( tilesGroup.isBundleGroup ) tilesGroup.needsUpdate = true;
+
+				sunLight.shadow.needsUpdate = true;
+
+			}
+
+			function updateDetailDistance( value ) {
+
+				if ( parameters.farMaterial === false ) return;
+
+				tilesGroup.traverse( ( object ) => {
+
+					if ( object.isLOD ) object.levels[ 1 ].distance = value;
+
+				} );
+
+				if ( tilesGroup.isBundleGroup ) tilesGroup.needsUpdate = true;
+
+			}
+
+			function updateProps() {
+
+				tilesGroup.traverse( ( object ) => {
+
+					for ( const key in props ) {
+
+						if ( props[ key ].includes( object.name ) ) object.visible = parameters[ key ];
+
+					}
+
+				} );
+
+				// the render bundle of a static bundle group is recorded again
+
+				if ( tilesGroup.isBundleGroup ) tilesGroup.needsUpdate = true;
+
+				sunLight.shadow.needsUpdate = true;
+
+			}
+
+			function generateCity() {
+
+				if ( tilesGroup ) scene.remove( tilesGroup );
+				if ( ground ) {
+
+					scene.remove( ground );
+					ground.geometry.dispose();
+
+				}
+
+				city.parameters.seed = parameters.seed;
+				cityGroup = city.build( materials );
+
+				// each tower is the first level of a LOD object, the same geometry with the cheaper material is the second
+
+				if ( parameters.farMaterial ) {
+
+					const skyscrapers = [];
+
+					cityGroup.traverse( ( child ) => {
+
+						if ( child.name === 'Skyscraper' ) skyscrapers.push( child );
+
+					} );
+
+					for ( const tower of skyscrapers ) {
+
+						const lod = new THREE.LOD();
+						lod.position.copy( tower.position );
+						lod.quaternion.copy( tower.quaternion );
+						lod.scale.copy( tower.scale );
+						tower.parent.add( lod );
+
+						tower.position.set( 0, 0, 0 );
+						tower.quaternion.identity();
+						tower.scale.set( 1, 1, 1 );
+
+						const far = new THREE.Mesh( tower.geometry, materials.buildingFar );
+						far.name = 'SkyscraperFar';
+						far.castShadow = tower.castShadow;
+						far.receiveShadow = tower.receiveShadow;
+
+						lod.addLevel( tower, 0 );
+						lod.addLevel( far, parameters.detailDistance );
+
+					}
+
+				}
+
+				// repeat the city on a grid. the tile span is a whole number of block periods, so
+				// the streets of neighbouring tiles line up. tiles share the geometries of the towers,
+				// which lets the GPU-driven drawer draw all copies of a tower in one batch
+
+				const { cityW, cityD, street } = city.layout;
+				const spanX = cityW + street;
+				const spanZ = cityD + street;
+				const tiles = parameters.tiles;
+
+				// a static bundle group is kept on the GPU by the GPU-driven drawers and recorded once
+				// as a render bundle by the optimized drawer, so the city is not traversed every frame
+
+				tilesGroup = parameters.static ? new THREE.BundleGroup() : new THREE.Group();
+
+				for ( let x = 0; x < tiles; x ++ ) {
+
+					for ( let z = 0; z < tiles; z ++ ) {
+
+						const tile = ( x === 0 && z === 0 ) ? cityGroup : cityGroup.clone();
+						tile.position.set( ( x - ( tiles - 1 ) / 2 ) * spanX, 0, ( z - ( tiles - 1 ) / 2 ) * spanZ );
+						tilesGroup.add( tile );
+
+					}
+
+				}
+
+				scene.add( tilesGroup );
+
+				updateProps();
+
+				// one road plane under all tiles, the road material repeats per block period
+
+				const floorW = tiles * spanX + street;
+				const floorD = tiles * spanZ + street;
+
+				ground = new THREE.Mesh( new THREE.PlaneGeometry( floorW, floorD ).rotateX( - Math.PI / 2 ), ground ? ground.material : createRoadMaterial( city.layout ) );
+				ground.receiveShadow = true;
+				scene.add( ground );
+
+				cityBounds = new THREE.Box3(
+					new THREE.Vector3( - floorW / 2, 0, - floorD / 2 ),
+					new THREE.Vector3( floorW / 2, 160, floorD / 2 )
+				);
+
+				updateSun();
+
+				// statistics of the towers
+
+				let triangles = 0;
+
+				cityGroup.traverse( ( child ) => {
+
+					if ( child.name === 'Skyscraper' ) {
+
+						const geometry = child.geometry;
+						triangles += ( geometry.index !== null ? geometry.index.count : geometry.attributes.position.count ) / 3;
+
+					}
+
+				} );
+
+				const towers = city.towers.length * tiles * tiles;
+				document.getElementById( 'stats' ).textContent = `${ new Intl.NumberFormat().format( towers ) } towers, ${ new Intl.NumberFormat().format( Math.round( triangles * tiles * tiles ) ) } triangles`;
+
+			}
+
+			// walking along a street at eye height, or flying over the city
+
+			function setCameraMode( mode ) {
+
+				if ( controls ) controls.dispose();
+
+				if ( mode === 'walk' ) {
+
+					// the middle of the city, where the central avenues cross
+
+					camera.position.set( 0, EYE_HEIGHT, 6 );
+					camera.lookAt( 600, 20, 6 );
+
+					controls = new PointerLockControls( camera, renderer.domElement );
+
+				} else {
+
+					camera.position.set( - 420, 260, - 520 );
+
+					controls = new FirstPersonControls( camera, renderer.domElement );
+					controls.movementSpeed = 80;
+					controls.lookSpeed = 0.1;
+					controls.lookAt( 0, 0, 0 );
+
+				}
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				timer.update();
+
+				const delta = timer.getDelta();
+
+				if ( parameters.camera === 'walk' ) {
+
+					const distance = ( keys.ShiftLeft || keys.ShiftRight ? RUN_SPEED : WALK_SPEED ) * delta;
+
+					if ( keys.KeyW ) controls.moveForward( distance );
+					if ( keys.KeyS ) controls.moveForward( - distance );
+					if ( keys.KeyD ) controls.moveRight( distance );
+					if ( keys.KeyA ) controls.moveRight( - distance );
+
+					camera.position.y = EYE_HEIGHT;
+
+				} else {
+
+					controls.update( delta );
+
+				}
+
+				renderPipeline.render();
+
+			}
+
+		</script>
+
+	</body>
+</html>
