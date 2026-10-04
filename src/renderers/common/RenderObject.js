@@ -798,6 +798,10 @@ class RenderObject {
 
 						valueKey += value.mapping;
 
+						// The channel selects the UV attribute, so it changes the generated shader
+
+						valueKey += value.channel;
+
 						// WebGPU must honor the sampler data because they are part of the bindings
 
 						if ( renderer.backend.isWebGPUBackend === true ) {
