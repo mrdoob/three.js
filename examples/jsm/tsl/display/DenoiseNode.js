@@ -160,7 +160,7 @@ class DenoiseNode extends Node {
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {ShaderCallNodeInternal}
 	 */
-	setup( /* builder */ ) {
+	setup( builder ) {
 
 		const uvNode = uv();
 
@@ -197,7 +197,9 @@ class DenoiseNode extends Node {
 			const texel = sampleTexture( uvNode ).toVar();
 			const result = property( 'vec4' );
 
-			If( depth.greaterThanEqual( 1.0 ).or( dot( viewNormal, viewNormal ).equal( 0.0 ) ), () => {
+			const isBackground = builder.renderer.reversedDepthBuffer === true ? depth.lessThanEqual( 0.0 ) : depth.greaterThanEqual( 1.0 );
+
+			If( isBackground.or( dot( viewNormal, viewNormal ).equal( 0.0 ) ), () => {
 
 				result.assign( texel );
 
