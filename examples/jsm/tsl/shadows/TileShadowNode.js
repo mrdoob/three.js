@@ -11,7 +11,8 @@ import {
 	ArrayCamera,
 	VSMShadowMap,
 	RendererUtils,
-	Quaternion
+	Quaternion,
+	UnsignedIntType
 } from 'three/webgpu';
 
 import { min, Fn, shadow, NodeUpdateType } from 'three/tsl';
@@ -57,6 +58,7 @@ class TileShadowNode extends ShadowBaseNode {
 	 * @param {number} [options.tilesX=2] - The number of tiles along the X-axis.
 	 * @param {number} [options.tilesY=2] - The number of tiles along the Y-axis.
 	 * @param {Object} [options.resolution] - The resolution of the shadow map.
+	 * @param {number} [options.depthType=UnsignedIntType] - The type of the tile depth texture. `UnsignedShortType` halves the memory when the depth range allows it.
 	 * @param {boolean} [options.debug=false] - Whether to enable debug mode.
 	 */
 	constructor( light, options = {} ) {
@@ -68,6 +70,7 @@ class TileShadowNode extends ShadowBaseNode {
 			tilesX: options.tilesX || 2,
 			tilesY: options.tilesY || 2,
 			resolution: options.resolution || light.shadow.mapSize,
+			depthType: options.depthType || UnsignedIntType,
 			debug: options.debug !== undefined ? options.debug : false
 		};
 
@@ -159,7 +162,7 @@ class TileShadowNode extends ShadowBaseNode {
 		// Clear existing lights/nodes if re-initializing
 		this.disposeLightsAndNodes();
 
-		const depthTexture = new DepthTexture( shadowWidth, shadowHeight, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, tileCount );
+		const depthTexture = new DepthTexture( shadowWidth, shadowHeight, this.config.depthType, undefined, undefined, undefined, undefined, undefined, undefined, undefined, tileCount );
 		depthTexture.compareFunction = LessCompare;
 		depthTexture.name = 'ShadowDepthArrayTexture';
 		const shadowMap = builder.createRenderTarget( shadowWidth, shadowHeight, { format: RedFormat, depth: tileCount, useArrayDepthTexture: true } );
