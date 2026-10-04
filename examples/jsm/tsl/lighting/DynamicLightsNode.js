@@ -153,11 +153,12 @@ class DynamicLightsNode extends LightsNode {
 
 	}
 
-	setupLightsNode( /*builder*/ ) {
+	setupLightsNode( builder ) {
 
 		const lightNodes = [];
 		const lightsByType = new Map();
-		const lights = sortLights( this._lights );
+		const materialLightings = builder.context.materialLightings;
+		const lights = sortLights( [ ...materialLightings, ...this._lights ] );
 
 		for ( const light of lights ) {
 
