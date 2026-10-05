@@ -69,9 +69,13 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 	setup( builder ) {
 
-		// All visible grids are evaluated together by the first one in scene order,
-		// so a fragment only samples the grids that contain it. Grids are summed;
-		// an `exclusive` grid instead lights the fragments inside it on its own.
+		// All visible grids are evaluated by the first one in scene order, so that
+		// each fragment samples at most one grid: the last one in scene order that
+		// contains its sample position: the fragment offset along the normal by
+		// half a probe spacing. Grids containing it within their bounds take
+		// precedence; otherwise their bounds grown by half a probe spacing are
+		// tested, so the surfaces around an inset grid, such as walls, select it
+		// too. Surfaces facing out of every grid fall back to the fragment position.
 
 		const grids = builder.lightsNode.getLights().filter( light => light.isLightProbeGrid && light.texture !== null );
 
@@ -84,90 +88,48 @@ class LightProbeGridNode extends AnalyticLightNode {
 			const min = reference( 'boundingBox.min', 'vec3', light ).setGroup( renderGroup );
 			const max = reference( 'boundingBox.max', 'vec3', light ).setGroup( renderGroup );
 			const res = reference( 'resolution', 'vec3', light ).setGroup( renderGroup );
+			const intensity = reference( 'intensity', 'float', light ).setGroup( renderGroup );
 			const range = max.sub( min );
 			const spacing = range.div( res.sub( 1.0 ) );
 
-			// Distance from the fragment to the grid's bounds, zero inside.
-			const distance = min.sub( positionWorld ).max( 0.0 ).add( positionWorld.sub( max ).max( 0.0 ) ).length();
-
-			// Surfaces just outside the probes, such as the walls around an inset
-			// grid, are still lit for one probe spacing.
-			const margin = spacing.x.max( spacing.y ).max( spacing.z );
-
-			return { light, min, max, res, range, spacing, distance, margin };
-
-		} );
-
-		const sample = ( { light, min, res, range, spacing } ) => {
-
-			const intensity = reference( 'intensity', 'float', light ).setGroup( renderGroup );
-
-			// Offset along the normal by half a probe spacing, then remap to texel centers.
+			// Offset along the normal by half a probe spacing.
 
 			const samplePos = positionWorld.add( normalWorld.mul( spacing ).mul( 0.5 ) );
-			const uvw = samplePos.sub( min ).div( range ).clamp( 0.0, 1.0 ).mul( res.sub( 1.0 ) ).div( res ).add( vec3( 0.5 ).div( res ) );
+			const margin = spacing.mul( 0.5 );
+			const contains = ( position, grow ) => position.greaterThanEqual( min.sub( grow ) ).all().and( position.lessThanEqual( max.add( grow ) ).all() );
+			const inside = contains( samplePos, 0 );
+			const around = contains( samplePos, margin );
+			const near = contains( positionWorld, margin );
 
-			return evaluateGridIrradiance( texture3D( light.texture ), uvw, res, normalWorld ).mul( intensity );
+			const sample = () => {
 
-		};
+				// Remap to texel centers.
 
-		const blend = () => {
+				const uvw = samplePos.sub( min ).div( range ).clamp( 0.0, 1.0 ).mul( res.sub( 1.0 ) ).div( res ).add( vec3( 0.5 ).div( res ) );
 
-			for ( const grid of nodes ) {
+				irradiance.assign( evaluateGridIrradiance( texture3D( light.texture ), uvw, res, normalWorld ).mul( intensity ) );
 
-				if ( grid.light.exclusive ) continue;
+			};
 
-				if ( grid.light.falloff > 0 ) {
+			return { inside, around, near, sample };
 
-					const falloff = reference( 'falloff', 'float', grid.light ).setGroup( renderGroup );
+		} ).reverse();
 
-					If( grid.distance.lessThan( falloff ), () => {
+		let chain = If( nodes[ 0 ].inside, nodes[ 0 ].sample );
 
-						irradiance.addAssign( sample( grid ).mul( grid.distance.smoothstep( 0.0, falloff ).oneMinus() ) );
+		for ( let i = 1; i < nodes.length; i ++ ) {
 
-					} );
+			chain = chain.ElseIf( nodes[ i ].inside, nodes[ i ].sample );
 
-				} else {
+		}
 
-					If( grid.distance.lessThanEqual( grid.margin ), () => {
+		for ( const test of [ 'around', 'near' ] ) {
 
-						irradiance.addAssign( sample( grid ) );
+			for ( const node of nodes ) {
 
-					} );
-
-				}
-
-			}
-
-		};
-
-		// The last exclusive grid containing the fragment wins; otherwise blend.
-
-		const exclusive = nodes.filter( grid => grid.light.exclusive ).reverse();
-
-		if ( exclusive.length > 0 ) {
-
-			let chain = If( exclusive[ 0 ].distance.lessThanEqual( exclusive[ 0 ].margin ), () => {
-
-				irradiance.assign( sample( exclusive[ 0 ] ) );
-
-			} );
-
-			for ( let i = 1; i < exclusive.length; i ++ ) {
-
-				chain = chain.ElseIf( exclusive[ i ].distance.lessThanEqual( exclusive[ i ].margin ), () => {
-
-					irradiance.assign( sample( exclusive[ i ] ) );
-
-				} );
+				chain = chain.ElseIf( node[ test ], node.sample );
 
 			}
-
-			chain.Else( blend );
-
-		} else {
-
-			blend();
 
 		}
 

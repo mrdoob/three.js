@@ -212,9 +212,7 @@ const UniformsLib = {
 		probesSH: { value: [] },
 		probesMin: { value: [] },
 		probesMax: { value: [] },
-		probesResolution: { value: [] },
-		probesFalloff: { value: [] },
-		probesExclusive: { value: [] }
+		probesResolution: { value: [] }
 
 	},
 

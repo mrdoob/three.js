@@ -172,7 +172,7 @@ class LightsNode extends Node {
 
 			if ( light.isLightProbeGrid === true ) {
 
-				_hashData.push( light.texture !== null ? light.texture.id : - 1, light.exclusive ? 1 : 0, light.falloff > 0 ? 1 : 0 );
+				_hashData.push( light.texture !== null ? light.texture.id : - 1 );
 
 			}
 

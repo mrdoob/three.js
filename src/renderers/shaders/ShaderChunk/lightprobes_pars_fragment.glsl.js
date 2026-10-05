@@ -11,22 +11,17 @@ uniform highp sampler3D probesSH[ NUM_LIGHT_PROBE_GRIDS ];
 uniform vec3 probesMin[ NUM_LIGHT_PROBE_GRIDS ];
 uniform vec3 probesMax[ NUM_LIGHT_PROBE_GRIDS ];
 uniform vec3 probesResolution[ NUM_LIGHT_PROBE_GRIDS ];
-uniform float probesFalloff[ NUM_LIGHT_PROBE_GRIDS ];
-uniform float probesExclusive[ NUM_LIGHT_PROBE_GRIDS ];
 
-// Distance from a point to a grid's bounds, zero inside.
-float getLightProbeGridDistance( vec3 worldPos, vec3 probesMin, vec3 probesMax ) {
+// Grids are selected at the sample position, offset along the normal by half a
+// probe spacing. Grids containing it within their bounds take precedence;
+// otherwise their bounds grown by half a probe spacing are tested, so the
+// surfaces around an inset grid, such as walls, select it too. Surfaces facing
+// out of every grid fall back to the fragment position ( normalOffset = 0 ).
+bool isInsideLightProbeGrid( vec3 worldPos, vec3 worldNormal, float normalOffset, float grow, vec3 probesMin, vec3 probesMax, vec3 probesResolution ) {
 
-	return length( max( probesMin - worldPos, 0.0 ) + max( worldPos - probesMax, 0.0 ) );
-
-}
-
-// Surfaces just outside the probes, such as the walls around an inset grid,
-// are still lit for one probe spacing.
-float getLightProbeGridMargin( vec3 probesMin, vec3 probesMax, vec3 probesResolution ) {
-
-	vec3 spacing = ( probesMax - probesMin ) / ( probesResolution - 1.0 );
-	return max( spacing.x, max( spacing.y, spacing.z ) );
+	vec3 margin = ( probesMax - probesMin ) / ( probesResolution - 1.0 ) * 0.5;
+	vec3 samplePos = worldPos + worldNormal * margin * normalOffset;
+	return all( greaterThanEqual( samplePos, probesMin - margin * grow ) ) && all( lessThanEqual( samplePos, probesMax + margin * grow ) );
 
 }
 

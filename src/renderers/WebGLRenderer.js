@@ -131,7 +131,7 @@ class WebGLRenderer {
 
 		const uintClearColor = new Uint32Array( 4 );
 		const intClearColor = new Int32Array( 4 );
-		const lightProbeGridUniforms = { textures: [], min: [], max: [], resolution: [], falloff: [], exclusive: [] };
+		const lightProbeGridUniforms = { textures: [], min: [], max: [], resolution: [] };
 
 		let currentRenderList = null;
 		let currentRenderState = null;
@@ -2790,7 +2790,7 @@ class WebGLRenderer {
 
 				if ( materialProperties.needsLights && materialProperties.numLightProbeGrids > 0 ) {
 
-					// All baked grids in scene order; the shader samples the ones containing each fragment.
+					// All baked grids in scene order; the shader samples the last one containing each fragment.
 
 					const grids = lightProbeGridUniforms;
 					let count = 0;
@@ -2803,8 +2803,6 @@ class WebGLRenderer {
 						grids.min[ count ] = grid.boundingBox.min;
 						grids.max[ count ] = grid.boundingBox.max;
 						grids.resolution[ count ] = grid.resolution;
-						grids.falloff[ count ] = grid.falloff;
-						grids.exclusive[ count ] = grid.exclusive ? 1 : 0;
 						count ++;
 
 					}
@@ -2815,8 +2813,6 @@ class WebGLRenderer {
 					m_uniforms.probesMin.value = grids.min;
 					m_uniforms.probesMax.value = grids.max;
 					m_uniforms.probesResolution.value = grids.resolution;
-					m_uniforms.probesFalloff.value = grids.falloff;
-					m_uniforms.probesExclusive.value = grids.exclusive;
 
 				}
 

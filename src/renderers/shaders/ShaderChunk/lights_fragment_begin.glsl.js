@@ -248,36 +248,29 @@ IncidentLight directLight;
 		vec3 probeWorldPos = ( ( vec4( geometryPosition, 1.0 ) - viewMatrix[ 3 ] ) * viewMatrix ).xyz;
 		vec3 probeWorldNormal = transformNormalByInverseViewMatrix( geometryNormal, viewMatrix );
 
-		// Grids are only sampled where they contain the fragment, and are summed.
-		// The last exclusive grid in scene order that contains it lights it alone.
+		// Only the last grid in scene order that contains the sample position is used.
 
-		int exclusiveProbeGrid = - 1;
+		int probeGrid = - 1;
+		int probeGridAround = - 1;
+		int probeGridNear = - 1;
 
 		#pragma unroll_loop_start
 		for ( int i = 0; i < NUM_LIGHT_PROBE_GRIDS; i ++ ) {
 
-			if ( probesExclusive[ i ] > 0.5 && getLightProbeGridDistance( probeWorldPos, probesMin[ i ], probesMax[ i ] ) <= getLightProbeGridMargin( probesMin[ i ], probesMax[ i ], probesResolution[ i ] ) ) exclusiveProbeGrid = UNROLLED_LOOP_INDEX;
+			if ( isInsideLightProbeGrid( probeWorldPos, probeWorldNormal, 1.0, 0.0, probesMin[ i ], probesMax[ i ], probesResolution[ i ] ) ) probeGrid = UNROLLED_LOOP_INDEX;
+			if ( isInsideLightProbeGrid( probeWorldPos, probeWorldNormal, 1.0, 1.0, probesMin[ i ], probesMax[ i ], probesResolution[ i ] ) ) probeGridAround = UNROLLED_LOOP_INDEX;
+			if ( isInsideLightProbeGrid( probeWorldPos, probeWorldNormal, 0.0, 1.0, probesMin[ i ], probesMax[ i ], probesResolution[ i ] ) ) probeGridNear = UNROLLED_LOOP_INDEX;
 
 		}
 		#pragma unroll_loop_end
 
+		if ( probeGrid < 0 ) probeGrid = probeGridAround;
+		if ( probeGrid < 0 ) probeGrid = probeGridNear;
+
 		#pragma unroll_loop_start
 		for ( int i = 0; i < NUM_LIGHT_PROBE_GRIDS; i ++ ) {
 
-			if ( exclusiveProbeGrid == UNROLLED_LOOP_INDEX ) {
-
-				irradiance += getLightProbeGridIrradiance( probesSH[ i ], probesMin[ i ], probesMax[ i ], probesResolution[ i ], probeWorldPos, probeWorldNormal );
-
-			} else if ( exclusiveProbeGrid < 0 && probesExclusive[ i ] < 0.5 ) {
-
-				float probeGridDistance = getLightProbeGridDistance( probeWorldPos, probesMin[ i ], probesMax[ i ] );
-				float probeGridWeight = probesFalloff[ i ] > 0.0
-					? 1.0 - smoothstep( 0.0, probesFalloff[ i ], probeGridDistance )
-					: step( probeGridDistance, getLightProbeGridMargin( probesMin[ i ], probesMax[ i ], probesResolution[ i ] ) );
-
-				if ( probeGridWeight > 0.0 ) irradiance += probeGridWeight * getLightProbeGridIrradiance( probesSH[ i ], probesMin[ i ], probesMax[ i ], probesResolution[ i ], probeWorldPos, probeWorldNormal );
-
-			}
+			if ( probeGrid == UNROLLED_LOOP_INDEX ) irradiance += getLightProbeGridIrradiance( probesSH[ i ], probesMin[ i ], probesMax[ i ], probesResolution[ i ], probeWorldPos, probeWorldNormal );
 
 		}
 		#pragma unroll_loop_end
