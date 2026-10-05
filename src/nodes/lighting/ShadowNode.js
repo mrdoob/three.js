@@ -376,6 +376,7 @@ class ShadowNode extends ShadowBaseNode {
 		}
 
 		shadow.camera.coordinateSystem = camera.coordinateSystem;
+		shadow.camera._reversedDepth = renderer.reversedDepthBuffer;
 		shadow.camera.updateProjectionMatrix();
 
 		// VSM
