@@ -3252,7 +3252,17 @@ class NodeBuilder {
 
 			if ( material.contextNode.isContextNode === true ) {
 
+				// the node overrides of the renderer and the material are merged, the material overrides take precedence
+
+				const rendererOverrideNodes = this.context.overrideNodes;
+
 				this.context = { ...this.context, ...material.contextNode.getFlowContextData() };
+
+				if ( rendererOverrideNodes !== undefined && rendererOverrideNodes.size > 0 && this.context.overrideNodes !== rendererOverrideNodes ) {
+
+					this.context.overrideNodes = new Map( [ ...rendererOverrideNodes, ...( this.context.overrideNodes || [] ) ] );
+
+				}
 
 			} else {
 

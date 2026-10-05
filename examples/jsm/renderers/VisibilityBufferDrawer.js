@@ -561,9 +561,9 @@ class VisibilityBufferBatch extends GPUDrivenBatch {
 
 	}
 
-	update( objects, camera, projScreenMatrix, frustum, width, height, drawer, upload, levels ) {
+	update( objects, drawer, upload, levels ) {
 
-		super.update( objects, camera, projScreenMatrix, frustum, width, height, drawer, upload, levels );
+		super.update( objects, drawer, upload, levels );
 
 		this.maxRasterSize.value = drawer.maxRasterSize;
 
@@ -610,7 +610,7 @@ class VisibilityBufferDrawer extends GPUDrivenDrawer {
 
 		super( { instancing, lodThreshold, shadowLodThreshold, debug, occlusionCulling } );
 
-		this._mrt = false;
+		this._hardware = false;
 
 		/**
 		 * The maximum screen-space size in pixels of triangles rasterized in software.
@@ -643,18 +643,19 @@ class VisibilityBufferDrawer extends GPUDrivenDrawer {
 
 		if ( this._shadowPass === true ) return null;
 
-		// the resolve only writes the color, render calls with MRT draw all clusters with the hardware rasterizer
+		// the resolve only writes the color and the software rasterizer doesn't deform the positions: render calls
+		// with MRT or deformed positions draw all clusters with the hardware rasterizer
 
-		const mrt = this.renderer.getMRT() !== null;
+		const hardware = this.renderer.getMRT() !== null || this._boundsNode !== null;
 
-		if ( record.view !== null && record.view.mrt !== mrt ) {
+		if ( record.view !== null && record.view.hardware !== hardware ) {
 
 			record.view.dispose();
 			record.view = null;
 
 		}
 
-		this._mrt = mrt;
+		this._hardware = hardware;
 
 		return super.updateView( record, width, height );
 
@@ -690,18 +691,18 @@ class VisibilityBufferDrawer extends GPUDrivenDrawer {
 
 	createView( width, height, occlusion ) {
 
-		if ( this._mrt === true ) {
+		if ( this._hardware === true ) {
 
 			const view = super.createView( width, height, occlusion );
 
-			if ( view !== null ) view.mrt = true;
+			if ( view !== null ) view.hardware = true;
 
 			return view;
 
 		}
 
 		const view = createView( width, height );
-		view.mrt = false;
+		view.hardware = false;
 		const disposeBuffers = view.dispose;
 
 		view.occlusion = occlusion === true ? createOcclusion( width, height ) : null;
@@ -717,7 +718,7 @@ class VisibilityBufferDrawer extends GPUDrivenDrawer {
 
 	}
 
-	createBatch( entry, capacity, view ) {
+	createBatch( entry, capacity, view, culling ) {
 
 		// the levels of detail whose triangles fit into the triangle index of the visibility buffer,
 		// the levels are ordered from the most detailed one
@@ -725,7 +726,7 @@ class VisibilityBufferDrawer extends GPUDrivenDrawer {
 		// the resolve reconstructs the surface without the instancing of node materials, instanced meshes
 		// are drawn by the hardware rasterizer of the base drawer
 
-		if ( this._shadowPass === true || entry.instanced === true || view === null || view.mrt === true ) return super.createBatch( entry, capacity, view );
+		if ( this._shadowPass === true || entry.instanced === true || view === null || view.hardware === true ) return super.createBatch( entry, capacity, view, culling );
 
 		const lodTriangleEnds = entry.clusters.lodTriangleEnds;
 
@@ -733,9 +734,9 @@ class VisibilityBufferDrawer extends GPUDrivenDrawer {
 
 		while ( lodCount < lodTriangleEnds.length && lodTriangleEnds[ lodCount ] <= MAX_TRIANGLES ) lodCount ++;
 
-		if ( lodCount === 0 ) return super.createBatch( entry, capacity, view );
+		if ( lodCount === 0 ) return super.createBatch( entry, capacity, view, culling );
 
-		return new VisibilityBufferBatch( entry.clusters, entry.material, entry.receiveShadow, capacity, this.renderer, { debug: this.debug, lodCount, view, occlusion: view.occlusion } );
+		return new VisibilityBufferBatch( entry.clusters, entry.material, entry.receiveShadow, capacity, this.renderer, culling, { debug: this.debug, lodCount, view } );
 
 	}
 
