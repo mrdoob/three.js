@@ -17,7 +17,7 @@ function SidebarSettings( editor ) {
 
 	// language
 
-	const options = Object.fromEntries( [ 'en', 'fr', 'zh', 'ja', 'ko', 'fa' ].map( locale => {
+	const options = Object.fromEntries( [ 'en', 'fr', 'zh', 'ja', 'ko', 'fa', 'ar' ].map( locale => {
 
 		return [ locale, new Intl.DisplayNames( locale, { type: 'language' } ).of( locale ) ];
 
