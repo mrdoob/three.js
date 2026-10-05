@@ -360,6 +360,48 @@ const compileTiledImageNode = ( nodeX, compileContext ) => {
 
 };
 
+const compileTriplanarProjectionNode = ( nodeX, compileContext ) => {
+
+	const position = nodeX.getNodeByName( 'position' );
+	const normal = nodeX.getNodeByName( 'normal' );
+	const upAxis = nodeX.getNodeByName( 'upaxis' );
+	const blend = nodeX.getNodeByName( 'blend' );
+	const defaultNode = nodeX.getNodeByName( 'default' );
+	const textureDefault = toTextureDefaultNode( defaultNode, nodeX.type );
+
+	const x = element( position, 0 );
+	const y = element( position, 1 );
+	const z = element( position, 2 );
+	const xUp = upAxis.equal( int( 0 ) );
+	const zUp = upAxis.equal( int( 2 ) );
+	const texcoords = {
+		filex: zUp.select( vec2( y, z ), vec2( z, y ) ),
+		filey: xUp.select( vec2( z, x ), vec2( x, z ) ),
+		filez: xUp.select( vec2( mul( y, - 1 ), x ), vec2( x, y ) ),
+	};
+
+	// color4 and vector4 keep the alpha of the textures.
+	const fourChannels = nodeX.type === 'color4' || nodeX.type === 'vector4';
+	const samples = Object.entries( texcoords ).map( ( [ fileInput, texcoord ] ) => {
+
+		const file = nodeX.getChildByName( fileInput );
+		const textureFile = file && file.getValue() !== '' ? file.getTexture() : null;
+		const sample = applyTextureColorSpace( sampleTexture( textureFile, texcoord, compileContext, textureDefault ), file );
+		return fourChannels ? sample : toVec3Channels( sample );
+
+	} );
+
+	const absNormal = abs( normalize( normal ) );
+	const weights = pow( div( absNormal, dot( absNormal, vec3( 1, 1, 1 ) ) ), div( 1, clamp( blend, float( 0.03 ), float( 1 ) ) ) );
+	const normalizedWeights = div( weights, dot( weights, vec3( 1, 1, 1 ) ) );
+
+	return add(
+		add( mul( samples[ 0 ], element( normalizedWeights, 0 ) ), mul( samples[ 1 ], element( normalizedWeights, 1 ) ) ),
+		mul( samples[ 2 ], element( normalizedWeights, 2 ) ),
+	);
+
+};
+
 const compileHexTiledNormalMapNode = ( nodeX, compileContext, sampleNode ) => {
 
 	const normalMapNodeElement = compileContext.nodeLibrary.normalmap;
@@ -895,6 +937,7 @@ function createMaterialXCompileRegistry() {
 	register( registry, [ 'geomcolor' ], ( nodeX ) => compileGeomColorNode( nodeX ) );
 	register( registry, [ 'tiledimage' ], ( nodeX, out, compileContext ) => compileTiledImageNode( nodeX, compileContext ) );
 	register( registry, [ 'image' ], ( nodeX, out, compileContext ) => compileImageLikeNode( nodeX, compileContext ) );
+	register( registry, [ 'triplanarprojection' ], ( nodeX, out, compileContext ) => compileTriplanarProjectionNode( nodeX, compileContext ) );
 	register( registry, [ 'hextiledimage', 'hextilednormalmap' ], ( nodeX, out, compileContext ) =>
 		compileHexTiledTextureNode( nodeX, compileContext, nodeX.element ) );
 	register( registry, [ 'gltf_image', 'gltf_normalmap' ], ( nodeX, out, compileContext ) =>

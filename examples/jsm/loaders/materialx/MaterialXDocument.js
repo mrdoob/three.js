@@ -75,6 +75,7 @@ const GEOMPROP_NODES = {
 	Tworld: tangentWorld,
 	Bobject: bitangentLocal,
 	Bworld: bitangentWorld,
+	Vworld: MtlXLibrary.viewdirection.nodeFunc( 'world' ),
 };
 
 function parseValueVector( value ) {

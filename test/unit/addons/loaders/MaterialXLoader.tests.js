@@ -293,6 +293,32 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
+			QUnit.test( 'supports hsvadjust, facingratio and triplanarprojection', ( assert ) => {
+
+				const nodes = [
+					'<hsvadjust name="test_node" type="color3"><input name="amount" type="vector3" value="0.5, 1, 1" /></hsvadjust>',
+					'<hsvadjust name="test_node" type="color4"><input name="in" type="color4" value="1, 0, 0, 0.5" /></hsvadjust>',
+					'<facingratio name="test_node" type="float"><input name="invert" type="boolean" value="true" /></facingratio>',
+					'<triplanarprojection name="test_node" type="color3"><input name="filez" type="filename" value="texture.test" /></triplanarprojection>',
+				];
+
+				for ( const node of nodes ) {
+
+					const type = /type="(\w+)"/.exec( node )[ 1 ];
+					const text = `<?xml version="1.0"?>
+<materialx version="1.39">
+	<nodegraph name="test_graph">
+		${ node }
+		<output name="out" type="${ type }" nodename="test_node" />
+	</nodegraph>
+</materialx>`;
+					const result = new MaterialXLoader().parse( text, { throwOnErrors: false } );
+					assert.deepEqual( result.errors.map( ( error ) => error.message ), [], `${ /<(\w+)/.exec( node )[ 1 ] } ${ type } is supported.` );
+
+				}
+
+			} );
+
 			QUnit.test( 'maps <displacement> onto vertex displacement instead of failing', ( assert ) => {
 
 				const result = new MaterialXLoader().parse( MATERIAL_X_DISPLACEMENT );
