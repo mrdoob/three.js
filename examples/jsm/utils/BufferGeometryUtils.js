@@ -5,6 +5,7 @@ import {
 	InstancedBufferAttribute,
 	InterleavedBuffer,
 	InterleavedBufferAttribute,
+	MathUtils,
 	TriangleFanDrawMode,
 	TriangleStripDrawMode,
 	TrianglesDrawMode,
@@ -119,12 +120,11 @@ function computeMikkTSpaceTangents( geometry, MikkTSpace, negateSign = true ) {
 
 	if ( normal.normalized && ( normalArray instanceof Int8Array || normalArray instanceof Int16Array ) ) {
 
-		const scale = normalArray instanceof Int8Array ? 127 : 32767;
 		const quantized = new normalArray.constructor( tangents.length );
 
 		for ( let i = 0; i < tangents.length; i ++ ) {
 
-			quantized[ i ] = Math.round( tangents[ i ] * scale );
+			quantized[ i ] = MathUtils.normalize( tangents[ i ], quantized );
 
 		}
 
