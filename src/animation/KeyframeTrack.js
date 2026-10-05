@@ -305,6 +305,13 @@ class KeyframeTrack {
 
 			}
 
+			if ( AnimationUtils.hasTangents( this.settings ) ) {
+
+				shiftTangentTimes( this.settings.inTangents, timeOffset );
+				shiftTangentTimes( this.settings.outTangents, timeOffset );
+
+			}
+
 		}
 
 		return this;
@@ -621,6 +628,18 @@ class KeyframeTrack {
 		}
 
 		return track;
+
+	}
+
+}
+
+function shiftTangentTimes( tangents, timeOffset ) {
+
+	// tangents are [ time, value ] pairs, so only every second entry is a time
+
+	for ( let i = 0, n = tangents.length; i !== n; i += 2 ) {
+
+		tangents[ i ] += timeOffset;
 
 	}
 
