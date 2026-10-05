@@ -170,12 +170,6 @@ class LightsNode extends Node {
 
 			}
 
-			if ( light.isLightProbeGrid === true ) {
-
-				_hashData.push( light.texture !== null ? light.texture.id : - 1 );
-
-			}
-
 		}
 
 		const cacheKey = hashArray( _hashData );
