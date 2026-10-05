@@ -64,6 +64,9 @@ class EdgesGeometry extends BufferGeometry {
 			const vertKeys = [ 'a', 'b', 'c' ];
 			const hashes = new Array( 3 );
 
+			// every vertex read gets at most one new id, so ids stay below indexCount + 2 and edge keys are unique
+			const idRange = indexCount + 2;
+			const vertexIds = new Map();
 			const edgeData = new Map();
 			const vertices = [];
 			for ( let i = 0; i < indexCount; i += 3 ) {
@@ -100,6 +103,22 @@ class EdgesGeometry extends BufferGeometry {
 
 				}
 
+				// replace the vertex hashes with integer ids so that edges can be keyed by a number
+				for ( let j = 0; j < 3; j ++ ) {
+
+					let id = vertexIds.get( hashes[ j ] );
+
+					if ( id === undefined ) {
+
+						id = vertexIds.size;
+						vertexIds.set( hashes[ j ], id );
+
+					}
+
+					hashes[ j ] = id;
+
+				}
+
 				// iterate over every edge
 				for ( let j = 0; j < 3; j ++ ) {
 
@@ -110,8 +129,8 @@ class EdgesGeometry extends BufferGeometry {
 					const v0 = _triangle[ vertKeys[ j ] ];
 					const v1 = _triangle[ vertKeys[ jNext ] ];
 
-					const hash = `${ vecHash0 }_${ vecHash1 }`;
-					const reverseHash = `${ vecHash1 }_${ vecHash0 }`;
+					const hash = vecHash0 * idRange + vecHash1;
+					const reverseHash = vecHash1 * idRange + vecHash0;
 
 					const sibling = edgeData.get( reverseHash );
 
