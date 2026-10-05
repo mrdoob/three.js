@@ -300,6 +300,7 @@ class WebGLTextureUtils {
 		if ( glFormat === gl.DEPTH_STENCIL ) {
 
 			if ( glType === gl.UNSIGNED_INT_24_8 ) internalFormat = gl.DEPTH24_STENCIL8;
+			if ( glType === gl.FLOAT ) internalFormat = gl.DEPTH32F_STENCIL8;
 
 		}
 
@@ -1207,7 +1208,19 @@ class WebGLTextureUtils {
 
 			if ( samples > 0 ) {
 
-				gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, gl.DEPTH24_STENCIL8, width, height );
+				let glInternalFormat = gl.DEPTH24_STENCIL8;
+
+				if ( depthTexture && depthTexture.isDepthTexture ) {
+
+					if ( depthTexture.type === FloatType ) {
+
+						glInternalFormat = gl.DEPTH32F_STENCIL8;
+
+					}
+
+				}
+
+				gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, glInternalFormat, width, height );
 
 			} else {
 
