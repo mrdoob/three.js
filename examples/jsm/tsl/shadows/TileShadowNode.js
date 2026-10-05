@@ -6,6 +6,7 @@ import {
 	Line3,
 	DepthTexture,
 	LessCompare,
+	GreaterEqualCompare,
 	Vector2,
 	RedFormat,
 	ArrayCamera,
@@ -160,7 +161,7 @@ class TileShadowNode extends ShadowBaseNode {
 		this.disposeLightsAndNodes();
 
 		const depthTexture = new DepthTexture( shadowWidth, shadowHeight, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, tileCount );
-		depthTexture.compareFunction = LessCompare;
+		depthTexture.compareFunction = builder.renderer.reversedDepthBuffer ? GreaterEqualCompare : LessCompare;
 		depthTexture.name = 'ShadowDepthArrayTexture';
 		const shadowMap = builder.createRenderTarget( shadowWidth, shadowHeight, { format: RedFormat, depth: tileCount, useArrayDepthTexture: true } );
 		shadowMap.depthTexture = depthTexture;
