@@ -1,4 +1,4 @@
-import { ClampToEdgeWrapping, CompressedTexture, DataTexture, HalfFloatType, LinearFilter, LinearSRGBColorSpace, LoadingManager, NearestFilter, RedFormat, RepeatWrapping, RGB_S3TC_DXT1_Format, SRGBColorSpace } from 'three';
+import { CustomBlending, OneFactor, OneMinusSrcAlphaFactor, ClampToEdgeWrapping, CompressedTexture, DataTexture, HalfFloatType, LinearFilter, LinearSRGBColorSpace, LoadingManager, NearestFilter, RedFormat, RepeatWrapping, RGB_S3TC_DXT1_Format, SRGBColorSpace } from 'three';
 import { mul, vec3 } from 'three/tsl';
 import { MaterialXLoader } from '../../../../examples/jsm/loaders/MaterialXLoader.js';
 import { MtlXLibrary } from '../../../../examples/jsm/loaders/materialx/MaterialXNodeLibrary.js';
@@ -290,6 +290,95 @@ export default QUnit.module( 'Addons', () => {
 
 				const colorResult = parseNodeGraph( '<randomcolor name="test_node" type="color3"><input name="in" type="float" value="0.5" /></randomcolor>', 'color3' );
 				assert.strictEqual( colorResult.errors.length, 0, 'randomcolor: no errors.' );
+
+			} );
+
+			QUnit.test( 'renders <surface_unlit> without lighting', ( assert ) => {
+
+				const text = ( inputs ) => `<?xml version="1.0"?>
+<materialx version="1.39">
+	<surface_unlit name="unlit" type="surfaceshader">${ inputs }</surface_unlit>
+	<surfacematerial name="test_material" type="material">
+		<input name="surfaceshader" type="surfaceshader" nodename="unlit" />
+	</surfacematerial>
+</materialx>`;
+
+				const opaque = new MaterialXLoader().parse( text( '<input name="emission_color" type="color3" value="0.2, 0.6, 0.9" />' ) );
+				const material = opaque.materials.test_material;
+
+				assert.strictEqual( opaque.errors.length, 0, 'surface_unlit is supported.' );
+				assert.true( material.isMeshBasicNodeMaterial, 'An unlit surface makes an unlit material.' );
+				assert.ok( material.colorNode, 'The emission is the color.' );
+				assert.false( material.transparent, 'An opaque unlit surface stays opaque.' );
+
+				const translucent = new MaterialXLoader().parse( text( '<input name="opacity" type="float" value="0.5" />' ) ).materials.test_material;
+				assert.true( translucent.transparent, 'Opacity makes the material transparent.' );
+				// MaterialX adds transparency * background to a color that already carries the opacity.
+				assert.strictEqual( translucent.blending, CustomBlending, 'The material blends its own way.' );
+				assert.strictEqual( translucent.blendSrc, OneFactor, 'The color is added as it is.' );
+				assert.strictEqual( translucent.blendDst, OneMinusSrcAlphaFactor, 'The background is weighted by the transparency.' );
+				assert.false( translucent.premultipliedAlpha, 'The color is not multiplied by alpha a second time.' );
+				assert.ok( translucent.opacityNode, 'The opacity becomes the alpha.' );
+
+			} );
+
+			QUnit.test( 'resolves unlit surface shaders through nodegraph outputs', ( assert ) => {
+
+				for ( const connection of [ 'nodegraph="NG" output="surface"', 'nodegraph="NG"' ] ) {
+
+					const outputs = [
+						'<output name="offset" type="displacementshader" nodename="displacement" />',
+						'<output name="surface" type="surfaceshader" nodename="unlit" />'
+					];
+					if ( connection === 'nodegraph="NG"' ) outputs.reverse();
+
+					const text = `<materialx version="1.39">
+	<nodegraph name="NG">
+		<displacement name="displacement" type="displacementshader"><input name="displacement" type="float" value="0.1" /></displacement>
+		<surface_unlit name="unlit" type="surfaceshader"><input name="emission_color" type="color3" value="0.2, 0.6, 0.9" /></surface_unlit>
+		${ outputs.join( '\n' ) }
+	</nodegraph>
+	<surfacematerial name="test_material" type="material">
+		<input name="surfaceshader" type="surfaceshader" ${ connection } />
+		<input name="displacementshader" type="displacementshader" nodegraph="NG" output="offset" />
+	</surfacematerial>
+</materialx>`;
+
+					const result = new MaterialXLoader().parse( text );
+					const material = result.materials.test_material;
+					assert.strictEqual( result.errors.length, 0, `${ connection }: shader connections resolve.` );
+					assert.true( material.isMeshBasicNodeMaterial, 'The resolved front surface selects the material class.' );
+					assert.ok( material.positionNode, 'Displacement is retained on the unlit material.' );
+					assert.true( collectConstValues( material.colorNode ).some( ( value ) => value.isColor && value.r === 0.2 ), 'The selected output reaches the surface mapper.' );
+
+				}
+
+			} );
+
+			QUnit.test( 'a back surface does not replace the front surface or its material class', ( assert ) => {
+
+				for ( const [ front, back ] of [[ 'standard_surface', 'surface_unlit' ], [ 'surface_unlit', 'standard_surface' ]] ) {
+
+					const colorInput = ( category ) => category === 'surface_unlit' ? 'emission_color' : 'base_color';
+					const text = `<materialx version="1.39">
+	<${ front } name="front" type="surfaceshader"><input name="${ colorInput( front ) }" type="color3" value="0.2, 0.6, 0.9" /></${ front }>
+	<${ back } name="back" type="surfaceshader"><input name="${ colorInput( back ) }" type="color3" value="0.9, 0.3, 0.1" /></${ back }>
+	<surfacematerial name="test_material" type="material">
+		<input name="surfaceshader" type="surfaceshader" nodename="front" />
+		<input name="backsurfaceshader" type="surfaceshader" nodename="back" />
+	</surfacematerial>
+</materialx>`;
+
+					const result = new MaterialXLoader().parse( text );
+					const material = result.materials.test_material;
+					assert.strictEqual( result.errors.length, 0, 'The front shader translates.' );
+					assert.strictEqual( material.isMeshBasicNodeMaterial === true, front === 'surface_unlit', 'Only the front surface determines whether the material is unlit.' );
+					const values = collectConstValues( material.colorNode );
+					assert.true( values.some( ( value ) => value.isColor && value.r === 0.2 ), 'The front surface color is retained.' );
+					assert.false( values.some( ( value ) => value.isColor && value.r === 0.9 ), 'The back surface does not overwrite the front color.' );
+					assert.true( result.warnings.some( ( warning ) => warning.code === 'ignored-surface-input' && warning.message.includes( 'backsurfaceshader' ) ), 'Unsupported back-surface shading is reported.' );
+
+				}
 
 			} );
 

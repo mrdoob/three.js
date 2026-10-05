@@ -346,6 +346,19 @@ class MaterialXNode {
 		return this.referencePath !== null;
 
 	}
+
+	getReferencedNode() {
+
+		if ( this.nodeGraph !== null ) {
+
+			const graph = this.materialX.getMaterialXNode( this.nodeGraph );
+			return graph ? this.output !== null ? graph.getChildByName( this.output ) || null : graph.children.find( ( child ) => child.element === 'output' ) || null : null;
+
+		}
+
+		return this.hasReference ? this.materialX.getMaterialXNode( this.referencePath ) || null : null;
+
+	}
 	get isConst() {
 
 		return this.element === 'input' && this.value !== null && this.type !== 'filename';
@@ -800,7 +813,7 @@ class MaterialXNode {
 
 	}
 
-	toBasicMaterial() {
+	toNodeGraphMaterial() {
 
 		const material = new MeshBasicNodeMaterial();
 		material.name = this.name;
@@ -822,28 +835,47 @@ class MaterialXNode {
 
 	resolveSurfaceShaderNode( nodeX ) {
 
-		if ( nodeX.hasReference ) {
+		const visited = new Set();
+		let shader = nodeX || null;
 
-			return this.materialX.getMaterialXNode( nodeX.referencePath ) || null;
+		while ( shader !== null && ( shader.element === 'input' || shader.element === 'output' ) ) {
+
+			if ( visited.has( shader ) ) return null;
+			visited.add( shader );
+
+			shader = shader.getReferencedNode();
 
 		}
 
-		if ( nodeX.nodeName ) {
-
-			return this.materialX.getMaterialXNode( nodeX.nodeName ) || null;
-
-		}
-
-		return null;
+		return shader;
 
 	}
 
-	toPhysicalMaterial() {
+	toSurfaceMaterial() {
 
-		const material = new MeshPhysicalNodeMaterial();
+		const surfaceShader = this.resolveSurfaceShaderNode( this.getChildByName( 'surfaceshader' ) );
+		const material = surfaceShader?.nodeDef?.name === 'ND_surface_unlit' ? new MeshBasicNodeMaterial() : new MeshPhysicalNodeMaterial();
 		material.name = this.name;
 
 		for ( const nodeX of this.children ) {
+
+			if ( nodeX.name === 'backsurfaceshader' ) {
+
+				// MaterialX supports separate back-surface shaders. Their use in practice
+				// is unclear; translating them per face is left for future work.
+				if ( nodeX.hasReference || nodeX.nodeGraph !== null ) {
+
+					this.materialX.log.add(
+						MaterialXLogCodes.IGNORED_SURFACE_INPUT,
+						'surfacematerial input "backsurfaceshader" is currently ignored in MaterialX translation.',
+						this.name,
+					);
+
+				}
+
+				continue;
+
+			}
 
 			const shaderProperties = this.resolveSurfaceShaderNode( nodeX );
 			if ( shaderProperties === null ) {
@@ -888,7 +920,7 @@ class MaterialXNode {
 
 		for ( const nodeX of selectedSurfaceMaterials ) {
 
-			const material = nodeX.toPhysicalMaterial();
+			const material = nodeX.toSurfaceMaterial();
 			materials[ material.name ] = material;
 
 		}
@@ -899,7 +931,7 @@ class MaterialXNode {
 
 				if ( nodeX.element === 'nodegraph' ) {
 
-					const material = nodeX.toBasicMaterial();
+					const material = nodeX.toNodeGraphMaterial();
 					materials[ material.name ] = material;
 
 				}
