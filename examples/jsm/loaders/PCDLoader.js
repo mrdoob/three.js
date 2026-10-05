@@ -341,12 +341,14 @@ class PCDLoader extends Loader {
 			PCDheader.offset = {};
 
 			let sizeSum = 0;
+			let countSum = 0;
 
 			for ( let i = 0, l = PCDheader.fields.length; i < l; i ++ ) {
 
 				if ( PCDheader.data === 'ascii' ) {
 
-					PCDheader.offset[ PCDheader.fields[ i ] ] = i;
+					PCDheader.offset[ PCDheader.fields[ i ] ] = countSum;
+					countSum += PCDheader.count[ i ];
 
 				} else {
 
