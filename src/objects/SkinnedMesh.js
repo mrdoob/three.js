@@ -331,7 +331,7 @@ class SkinnedMesh extends Mesh {
 
 		} else {
 
-			_baseVector.set( ...target, 1 );
+			_baseVector.set( target.x, target.y, target.z, 1 );
 			target.set( 0, 0, 0 );
 
 		}
