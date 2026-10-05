@@ -1,5 +1,5 @@
-import { AnalyticLightNode, Vector3 } from 'three/webgpu';
-import { array, getShIrradianceAt, normalWorld, positionWorld, texture3D, uniform, vec3 } from 'three/tsl';
+import { AnalyticLightNode } from 'three/webgpu';
+import { If, array, getShIrradianceAt, normalWorld, positionWorld, reference, renderGroup, texture3D, vec3 } from 'three/tsl';
 
 // Padding texels at each boundary of every atlas sub-volume.
 export const ATLAS_PADDING = 1;
@@ -67,63 +67,107 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 	}
 
-	constructor( light = null ) {
-
-		super( light );
-
-		this._min = uniform( new Vector3() );
-		this._max = uniform( new Vector3() );
-		this._resolution = uniform( new Vector3() );
-		this._intensity = uniform( 1 );
-		this._falloff = uniform( 0 );
-
-	}
-
-	update( /* frame */ ) {
-
-		const light = this.light;
-
-		this._min.value.copy( light.boundingBox.min );
-		this._max.value.copy( light.boundingBox.max );
-		this._resolution.value.copy( light.resolution );
-		this._intensity.value = light.intensity;
-		this._falloff.value = light.falloff;
-
-	}
-
 	setup( builder ) {
 
-		const light = this.light;
+		// All visible grids are evaluated together by the first one in scene order,
+		// so a fragment only samples the grids that contain it. Grids are summed;
+		// an `exclusive` grid instead lights the fragments inside it on its own.
 
-		// No baked data yet: contribute nothing.
+		const grids = builder.lightsNode.getLights().filter( light => light.isLightProbeGrid && light.texture !== null );
 
-		if ( light.texture === null ) return;
+		if ( grids[ 0 ] !== this.light ) return;
 
-		const min = this._min;
-		const max = this._max;
-		const res = this._resolution;
+		const irradiance = vec3( 0 ).toVar( 'lightProbeGridIrradiance' );
 
-		const range = max.sub( min );
-		const resMinusOne = res.sub( 1.0 );
-		const spacing = range.div( resMinusOne );
+		const nodes = grids.map( ( light ) => {
 
-		// Offset along the normal by half a probe spacing, then remap to texel centers.
+			const min = reference( 'boundingBox.min', 'vec3', light ).setGroup( renderGroup );
+			const max = reference( 'boundingBox.max', 'vec3', light ).setGroup( renderGroup );
+			const res = reference( 'resolution', 'vec3', light ).setGroup( renderGroup );
+			const range = max.sub( min );
+			const spacing = range.div( res.sub( 1.0 ) );
 
-		const samplePos = positionWorld.add( normalWorld.mul( spacing ).mul( 0.5 ) );
-		const uvw = samplePos.sub( min ).div( range ).clamp( 0.0, 1.0 ).mul( resMinusOne ).div( res ).add( vec3( 0.5 ).div( res ) );
+			// Distance from the fragment to the grid's bounds, zero inside.
+			const distance = min.sub( positionWorld ).max( 0.0 ).add( positionWorld.sub( max ).max( 0.0 ) ).length();
 
-		const result = evaluateGridIrradiance( texture3D( light.texture ), uvw, res, normalWorld );
+			// Surfaces just outside the probes, such as the walls around an inset
+			// grid, are still lit for one probe spacing.
+			const margin = spacing.x.max( spacing.y ).max( spacing.z );
 
-		let irradiance = result.mul( this._intensity );
+			return { light, min, max, res, range, spacing, distance, margin };
 
-		// Optional smooth boundary for blending grids; falloff 0 applies everywhere.
+		} );
 
-		if ( light.falloff > 0 ) {
+		const sample = ( { light, min, res, range, spacing } ) => {
 
-			const outside = min.sub( positionWorld ).max( 0.0 ).add( positionWorld.sub( max ).max( 0.0 ) );
-			const weight = outside.length().smoothstep( 0.0, this._falloff ).oneMinus();
+			const intensity = reference( 'intensity', 'float', light ).setGroup( renderGroup );
 
-			irradiance = irradiance.mul( weight );
+			// Offset along the normal by half a probe spacing, then remap to texel centers.
+
+			const samplePos = positionWorld.add( normalWorld.mul( spacing ).mul( 0.5 ) );
+			const uvw = samplePos.sub( min ).div( range ).clamp( 0.0, 1.0 ).mul( res.sub( 1.0 ) ).div( res ).add( vec3( 0.5 ).div( res ) );
+
+			return evaluateGridIrradiance( texture3D( light.texture ), uvw, res, normalWorld ).mul( intensity );
+
+		};
+
+		const blend = () => {
+
+			for ( const grid of nodes ) {
+
+				if ( grid.light.exclusive ) continue;
+
+				if ( grid.light.falloff > 0 ) {
+
+					const falloff = reference( 'falloff', 'float', grid.light ).setGroup( renderGroup );
+
+					If( grid.distance.lessThan( falloff ), () => {
+
+						irradiance.addAssign( sample( grid ).mul( grid.distance.smoothstep( 0.0, falloff ).oneMinus() ) );
+
+					} );
+
+				} else {
+
+					If( grid.distance.lessThanEqual( grid.margin ), () => {
+
+						irradiance.addAssign( sample( grid ) );
+
+					} );
+
+				}
+
+			}
+
+		};
+
+		// The last exclusive grid containing the fragment wins; otherwise blend.
+
+		const exclusive = nodes.filter( grid => grid.light.exclusive ).reverse();
+
+		if ( exclusive.length > 0 ) {
+
+			let chain = If( exclusive[ 0 ].distance.lessThanEqual( exclusive[ 0 ].margin ), () => {
+
+				irradiance.assign( sample( exclusive[ 0 ] ) );
+
+			} );
+
+			for ( let i = 1; i < exclusive.length; i ++ ) {
+
+				chain = chain.ElseIf( exclusive[ i ].distance.lessThanEqual( exclusive[ i ].margin ), () => {
+
+					irradiance.assign( sample( exclusive[ i ] ) );
+
+				} );
+
+			}
+
+			chain.Else( blend );
+
+		} else {
+
+			blend();
 
 		}
 

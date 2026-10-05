@@ -243,11 +243,44 @@ IncidentLight directLight;
 
 	#endif
 
-	#ifdef USE_LIGHT_PROBES_GRID
+	#if NUM_LIGHT_PROBE_GRIDS > 0
 
 		vec3 probeWorldPos = ( ( vec4( geometryPosition, 1.0 ) - viewMatrix[ 3 ] ) * viewMatrix ).xyz;
 		vec3 probeWorldNormal = transformNormalByInverseViewMatrix( geometryNormal, viewMatrix );
-		irradiance += getLightProbeGridIrradiance( probeWorldPos, probeWorldNormal );
+
+		// Grids are only sampled where they contain the fragment, and are summed.
+		// The last exclusive grid in scene order that contains it lights it alone.
+
+		int exclusiveProbeGrid = - 1;
+
+		#pragma unroll_loop_start
+		for ( int i = 0; i < NUM_LIGHT_PROBE_GRIDS; i ++ ) {
+
+			if ( probesExclusive[ i ] > 0.5 && getLightProbeGridDistance( probeWorldPos, probesMin[ i ], probesMax[ i ] ) <= getLightProbeGridMargin( probesMin[ i ], probesMax[ i ], probesResolution[ i ] ) ) exclusiveProbeGrid = UNROLLED_LOOP_INDEX;
+
+		}
+		#pragma unroll_loop_end
+
+		#pragma unroll_loop_start
+		for ( int i = 0; i < NUM_LIGHT_PROBE_GRIDS; i ++ ) {
+
+			if ( exclusiveProbeGrid == UNROLLED_LOOP_INDEX ) {
+
+				irradiance += getLightProbeGridIrradiance( probesSH[ i ], probesMin[ i ], probesMax[ i ], probesResolution[ i ], probeWorldPos, probeWorldNormal );
+
+			} else if ( exclusiveProbeGrid < 0 && probesExclusive[ i ] < 0.5 ) {
+
+				float probeGridDistance = getLightProbeGridDistance( probeWorldPos, probesMin[ i ], probesMax[ i ] );
+				float probeGridWeight = probesFalloff[ i ] > 0.0
+					? 1.0 - smoothstep( 0.0, probesFalloff[ i ], probeGridDistance )
+					: step( probeGridDistance, getLightProbeGridMargin( probesMin[ i ], probesMax[ i ], probesResolution[ i ] ) );
+
+				if ( probeGridWeight > 0.0 ) irradiance += probeGridWeight * getLightProbeGridIrradiance( probesSH[ i ], probesMin[ i ], probesMax[ i ], probesResolution[ i ], probeWorldPos, probeWorldNormal );
+
+			}
+
+		}
+		#pragma unroll_loop_end
 
 	#endif
 

@@ -1,18 +1,36 @@
 export default /* glsl */`
-#ifdef USE_LIGHT_PROBES_GRID
+#if NUM_LIGHT_PROBE_GRIDS > 0
 
 // Single atlas 3D texture that stores all 7 SH sub-volumes stacked along Z.
 // Atlas depth = 7 * ( nz + 2 ) where nz = probesResolution.z.
 // Each sub-volume occupies ( nz + 2 ) slices: 1 padding + nz data + 1 padding.
 // Padding is a copy of the first / last data slice and prevents color bleeding
 // when the hardware linear filter reads across a sub-volume boundary.
-uniform highp sampler3D probesSH;
+uniform highp sampler3D probesSH[ NUM_LIGHT_PROBE_GRIDS ];
 
-uniform vec3 probesMin;
-uniform vec3 probesMax;
-uniform vec3 probesResolution;
+uniform vec3 probesMin[ NUM_LIGHT_PROBE_GRIDS ];
+uniform vec3 probesMax[ NUM_LIGHT_PROBE_GRIDS ];
+uniform vec3 probesResolution[ NUM_LIGHT_PROBE_GRIDS ];
+uniform float probesFalloff[ NUM_LIGHT_PROBE_GRIDS ];
+uniform float probesExclusive[ NUM_LIGHT_PROBE_GRIDS ];
 
-vec3 getLightProbeGridIrradiance( vec3 worldPos, vec3 worldNormal ) {
+// Distance from a point to a grid's bounds, zero inside.
+float getLightProbeGridDistance( vec3 worldPos, vec3 probesMin, vec3 probesMax ) {
+
+	return length( max( probesMin - worldPos, 0.0 ) + max( worldPos - probesMax, 0.0 ) );
+
+}
+
+// Surfaces just outside the probes, such as the walls around an inset grid,
+// are still lit for one probe spacing.
+float getLightProbeGridMargin( vec3 probesMin, vec3 probesMax, vec3 probesResolution ) {
+
+	vec3 spacing = ( probesMax - probesMin ) / ( probesResolution - 1.0 );
+	return max( spacing.x, max( spacing.y, spacing.z ) );
+
+}
+
+vec3 getLightProbeGridIrradiance( highp sampler3D probesSH, vec3 probesMin, vec3 probesMax, vec3 probesResolution, vec3 worldPos, vec3 worldNormal ) {
 
 	vec3 res = probesResolution;
 	vec3 gridRange = probesMax - probesMin;
