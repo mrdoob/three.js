@@ -1,5 +1,5 @@
 import { RedFormat, RenderTarget, Vector2, RendererUtils, QuadMesh, Node, NodeMaterial, NodeUpdateType, UnsignedByteType } from 'three/webgpu';
-import { reference, viewZToPerspectiveDepth, logarithmicDepthToViewZ, getScreenPosition, getViewPosition, float, Break, Loop, int, max, abs, If, interleavedGradientNoise, screenCoordinate, Fn, passTexture, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, lightPosition, lightTargetPosition, fract, rand, mix, context } from 'three/tsl';
+import { reference, viewZToPerspectiveDepth, logarithmicDepthToViewZ, getScreenPosition, getViewPosition, float, Break, Loop, int, max, abs, If, interleavedGradientNoise, screenCoordinate, Fn, passTexture, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, lightPosition, lightTargetPosition, fract, rand, mix, context, isBackgroundDepth } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -376,7 +376,7 @@ class SSSNode extends Node {
 		const sss = Fn( () => {
 
 			const depth = sampleDepth( uvNode ).toVar();
-			depth.greaterThanEqual( 1.0 ).discard();
+			isBackgroundDepth( depth ).discard();
 
 			// compute ray position and direction (in view-space)
 
