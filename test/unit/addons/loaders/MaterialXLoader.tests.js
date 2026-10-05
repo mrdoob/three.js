@@ -1,4 +1,5 @@
 import { ClampToEdgeWrapping, CompressedTexture, DataTexture, HalfFloatType, LinearFilter, LinearSRGBColorSpace, LoadingManager, NearestFilter, RedFormat, RepeatWrapping, RGB_S3TC_DXT1_Format, SRGBColorSpace } from 'three';
+import { mul } from 'three/tsl';
 import { MaterialXLoader } from '../../../../examples/jsm/loaders/MaterialXLoader.js';
 
 const MATERIAL_X = `<?xml version="1.0"?>
@@ -100,11 +101,88 @@ function findTexture( object, image, visited = new WeakSet(), depth = 0 ) {
 
 }
 
+function collectConstValues( object, values = [], visited = new WeakSet(), depth = 0 ) {
+
+	if ( object === null || typeof object !== 'object' || depth > 24 || visited.has( object ) ) return values;
+
+	visited.add( object );
+	if ( object.isConstNode === true ) values.push( object.value );
+
+	for ( const key of Object.keys( object ) ) collectConstValues( object[ key ], values, visited, depth + 1 );
+
+	return values;
+
+}
+
+function hasNode( object, predicate, visited = new WeakSet(), depth = 0 ) {
+
+	if ( object === null || typeof object !== 'object' || depth > 24 || visited.has( object ) ) return false;
+
+	visited.add( object );
+	if ( object.isNode === true && predicate( object ) ) return true;
+
+	return Object.keys( object ).some( ( key ) => hasNode( object[ key ], predicate, visited, depth + 1 ) );
+
+}
+
 export default QUnit.module( 'Addons', () => {
 
 	QUnit.module( 'Loaders', () => {
 
 		QUnit.module( 'MaterialXLoader', () => {
+
+			QUnit.test( 'builds nodes of a host node library through the node resolver', ( assert ) => {
+
+				const text = `<?xml version="1.0"?>
+<materialx version="1.39">
+	<nodegraph name="test_graph">
+		<custom_double name="doubled" type="float">
+			<input name="in" type="float" value="0.25" />
+		</custom_double>
+		<add name="sum" type="float">
+			<input name="in1" type="float" nodename="doubled" />
+			<input name="in2" type="float" value="0.5" />
+		</add>
+		<output name="out" type="float" nodename="sum" />
+	</nodegraph>
+</materialx>`;
+
+				const resolved = [];
+				const loader = new MaterialXLoader().setNodeResolver( ( nodeX, output ) => {
+
+					resolved.push( nodeX.element );
+					if ( nodeX.element !== 'custom_double' ) return null;
+
+					assert.strictEqual( output, null, 'The resolver receives the requested output.' );
+					assert.strictEqual( nodeX.getChildByName( 'in' ).value, '0.25', 'The resolver reads the inputs.' );
+					return mul( nodeX.getNodeByName( 'in' ), 2 );
+
+				} );
+
+				const result = loader.parse( text );
+				const values = collectConstValues( result.materials.test_graph.colorNode );
+
+				assert.strictEqual( result.errors.length, 0, 'The custom node is not unsupported.' );
+				assert.true( resolved.includes( 'add' ), 'The resolver is asked about every node.' );
+				assert.true( values.includes( 2 ) && values.includes( 0.5 ), 'The resolved node and the loader-built node are both part of the graph.' );
+
+				// The resolver builds the requested output; the loader does not extract a channel from it again.
+				const channelText = text.replace( '<input name="in1" type="float" nodename="doubled" />', '<input name="in1" type="float" nodename="doubled" output="outy" />' ).replace( 'name="doubled" type="float"', 'name="doubled" type="vector3"' );
+				const outputs = [];
+				const channelResult = new MaterialXLoader().setNodeResolver( ( nodeX, output ) => {
+
+					if ( nodeX.element !== 'custom_double' ) return null;
+					outputs.push( output );
+					return mul( nodeX.getNodeByName( 'in' ), 2 );
+
+				} ).parse( channelText );
+				assert.deepEqual( outputs, [ 'outy' ], 'The resolver receives the channel output.' );
+				assert.false( hasNode( channelResult.materials.test_graph.colorNode, ( node ) => node.isArrayElementNode === true ), 'The resolved output is used as it is.' );
+
+				loader.setNodeResolver( null );
+				assert.true( loader.parse( text, { throwOnErrors: false } ).errors.length > 0, 'Without the resolver the custom node is unsupported.' );
+
+			} );
 
 			QUnit.test( 'reads the first output of a separate node connected without an output', ( assert ) => {
 

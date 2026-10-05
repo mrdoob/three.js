@@ -49,6 +49,44 @@ class MaterialXLoader extends Loader {
 		 */
 		this.archiveDisposer = null;
 
+		/**
+		 * Builds nodes before the built-in node library, see {@link MaterialXLoader#setNodeResolver}.
+		 *
+		 * @type {?function(Object, ?string): ?Node}
+		 * @default null
+		 */
+		this.nodeResolver = null;
+
+	}
+
+	/**
+	 * Sets a function that builds the TSL node for MaterialX nodes, before the built-in node library.
+	 *
+	 * This is how documents use nodes of a host's own node library, for example nodedefs implemented
+	 * by TSL functions instead of MaterialX node graphs. The resolver is called for every node with the
+	 * node and the name of the requested output (`null` for the default output). It returns the TSL node
+	 * of that output, which the loader converts to the type of the node (or `float` for a channel output
+	 * such as `outx`), or `null` to leave the node to the loader. The node passed in has the MaterialX
+	 * `element` (category), `name` and `type`, and reads its inputs through `getNodeByName()` (the TSL
+	 * node of an input) and `getChildByName()` (the input itself, with its `type` and `value`).
+	 *
+	 * ```js
+	 * loader.setNodeResolver( ( nodeX ) => {
+	 *
+	 * 	if ( nodeX.element !== 'my_desaturate' ) return null;
+	 * 	return luminance( nodeX.getNodeByName( 'in' ) );
+	 *
+	 * } );
+	 * ```
+	 *
+	 * @param {?function(Object, ?string): ?Node} nodeResolver - The resolver, or `null` to remove it.
+	 * @return {MaterialXLoader} A reference to this loader.
+	 */
+	setNodeResolver( nodeResolver ) {
+
+		this.nodeResolver = nodeResolver;
+		return this;
+
 	}
 
 	/**
@@ -242,6 +280,7 @@ class MaterialXLoader extends Loader {
 		const document = new MaterialXDocument( this.manager, options.path || this.path, log, options.archiveResolver || null, options.uvSpace );
 		const result = document.parse( text, options.materialName || null, {
 			interfaceValidator: options.interfaceValidator,
+			nodeResolver: this.nodeResolver,
 		} );
 
 		return { document, log, result };

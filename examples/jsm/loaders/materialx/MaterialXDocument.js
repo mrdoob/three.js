@@ -407,6 +407,8 @@ class MaterialXNode {
 		if ( this.node !== null && out === null ) return this.node;
 
 		let node;
+		// A node resolver builds the node of the requested output itself.
+		let resolved = false;
 
 
 		// A connection that names no output reads the first one, as in MaterialX.
@@ -489,7 +491,9 @@ class MaterialXNode {
 
 		} else {
 
-			node = compileNodeFromRegistry( this, out, this.materialX.compileContext );
+			const resolvedNode = this.materialX.nodeResolver !== null ? this.materialX.nodeResolver( this, out ) : null;
+			resolved = resolvedNode !== null && resolvedNode !== undefined;
+			node = resolved ? resolvedNode : compileNodeFromRegistry( this, out, this.materialX.compileContext );
 
 		}
 
@@ -500,7 +504,7 @@ class MaterialXNode {
 
 		}
 
-		if ( channelRequested ) {
+		if ( channelRequested && ! resolved ) {
 
 			node = element( node, getOutputChannel( out ) );
 
@@ -835,6 +839,7 @@ class MaterialXDocument {
 		this.textureLoader.setPath( path );
 		this.textureCache = new Map();
 		this.pendingResources = [];
+		this.nodeResolver = null;
 		const bottomLeftUvSpaceHelpers = getBottomLeftUvSpaceHelpers( this.uvSpace );
 
 		this.compileContext = {
@@ -895,6 +900,8 @@ class MaterialXDocument {
 	}
 
 	parse( text, materialName = null, options = {} ) {
+
+		this.nodeResolver = options.nodeResolver || null;
 
 		const rootNode = parseMaterialXText(
 			text,
