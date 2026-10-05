@@ -1,4 +1,4 @@
-import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4, DepthTexture, FloatType } from 'three/webgpu';
+import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
 import { exp, float, Fn, max, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, ivec2, mix, property, outputStruct, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
 import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth, samplePreviousDepth } from '../utils/TAAUtils.js';
 
@@ -505,11 +505,8 @@ class TAAUNode extends Node {
 
 		}
 
-		if ( builder.renderer.reversedDepthBuffer === true ) {
-
-			this._previousDepthRenderTarget.depthTexture.type = FloatType;
-
-		}
+		this._previousDepthRenderTarget.depthTexture.format = this.depthNode.value.format;
+		this._previousDepthRenderTarget.depthTexture.type = this.depthNode.value.type;
 
 		const historyNode = texture( this._historyRenderTarget.textures[ 0 ] );
 		const lockNode = texture( this._historyRenderTarget.textures[ 1 ] );
