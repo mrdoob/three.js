@@ -409,7 +409,8 @@ class MaterialXNode {
 		let node;
 
 
-		if ( ( this.element === 'separate2' || this.element === 'separate3' || this.element === 'separate4' ) && out ) {
+		// A connection that names no output reads the first one, as in MaterialX.
+		if ( this.element === 'separate2' || this.element === 'separate3' || this.element === 'separate4' ) {
 
 			const inNode = this.getNodeByName( 'in' );
 			return element( inNode, getOutputChannel( out ) );
