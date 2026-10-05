@@ -1130,12 +1130,21 @@ class ObjectLoader extends Loader {
 
 		if ( data.name !== undefined ) object.name = data.name;
 
+		if ( data.pivot !== undefined ) object.pivot = new Vector3().fromArray( data.pivot );
+
 		if ( data.matrix !== undefined ) {
 
 			object.matrix.fromArray( data.matrix );
 
 			if ( data.matrixAutoUpdate !== undefined ) object.matrixAutoUpdate = data.matrixAutoUpdate;
-			if ( object.matrixAutoUpdate ) object.matrix.decompose( object.position, object.quaternion, object.scale );
+
+			if ( object.matrixAutoUpdate ) {
+
+				object.matrix.decompose( object.position, object.quaternion, object.scale );
+
+				if ( object.pivot !== null ) object.position.copy( object.pivot ).applyMatrix4( object.matrix ).sub( object.pivot );
+
+			}
 
 		} else {
 
@@ -1147,8 +1156,6 @@ class ObjectLoader extends Loader {
 		}
 
 		if ( data.up !== undefined ) object.up.fromArray( data.up );
-
-		if ( data.pivot !== undefined ) object.pivot = new Vector3().fromArray( data.pivot );
 
 		if ( data.morphTargetDictionary !== undefined ) object.morphTargetDictionary = Object.assign( {}, data.morphTargetDictionary );
 		if ( data.morphTargetInfluences !== undefined ) object.morphTargetInfluences = data.morphTargetInfluences.slice();

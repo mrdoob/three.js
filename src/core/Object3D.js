@@ -453,6 +453,13 @@ class Object3D extends EventDispatcher {
 
 		this.matrix.decompose( this.position, this.quaternion, this.scale );
 
+		if ( this.pivot !== null ) {
+
+			// the matrix maps the pivot to position + pivot, see updateMatrix()
+			this.position.copy( this.pivot ).applyMatrix4( this.matrix ).sub( this.pivot );
+
+		}
+
 	}
 
 	/**
