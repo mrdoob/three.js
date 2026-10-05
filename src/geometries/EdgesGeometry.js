@@ -64,7 +64,7 @@ class EdgesGeometry extends BufferGeometry {
 			const vertKeys = [ 'a', 'b', 'c' ];
 			const hashes = new Array( 3 );
 
-			const edgeData = {};
+			const edgeData = new Map();
 			const vertices = [];
 			for ( let i = 0; i < indexCount; i += 3 ) {
 
@@ -113,29 +113,31 @@ class EdgesGeometry extends BufferGeometry {
 					const hash = `${ vecHash0 }_${ vecHash1 }`;
 					const reverseHash = `${ vecHash1 }_${ vecHash0 }`;
 
-					if ( reverseHash in edgeData && edgeData[ reverseHash ] ) {
+					const sibling = edgeData.get( reverseHash );
+
+					if ( sibling ) {
 
 						// if we found a sibling edge add it into the vertex array if
 						// it meets the angle threshold and delete the edge from the map.
-						if ( _normal.dot( edgeData[ reverseHash ].normal ) <= thresholdDot ) {
+						if ( _normal.dot( sibling.normal ) <= thresholdDot ) {
 
 							vertices.push( v0.x, v0.y, v0.z );
 							vertices.push( v1.x, v1.y, v1.z );
 
 						}
 
-						edgeData[ reverseHash ] = null;
+						edgeData.set( reverseHash, null );
 
-					} else if ( ! ( hash in edgeData ) ) {
+					} else if ( ! edgeData.has( hash ) ) {
 
 						// if we've already got an edge here then skip adding a new one
-						edgeData[ hash ] = {
+						edgeData.set( hash, {
 
 							index0: indexArr[ j ],
 							index1: indexArr[ jNext ],
 							normal: _normal.clone(),
 
-						};
+						} );
 
 					}
 
@@ -144,11 +146,11 @@ class EdgesGeometry extends BufferGeometry {
 			}
 
 			// iterate over all remaining, unmatched edges and add them to the vertex array
-			for ( const key in edgeData ) {
+			for ( const edge of edgeData.values() ) {
 
-				if ( edgeData[ key ] ) {
+				if ( edge ) {
 
-					const { index0, index1 } = edgeData[ key ];
+					const { index0, index1 } = edge;
 					_v0.fromBufferAttribute( positionAttr, index0 );
 					_v1.fromBufferAttribute( positionAttr, index1 );
 
