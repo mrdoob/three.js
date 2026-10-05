@@ -270,8 +270,6 @@ class TileShadowNode extends ShadowBaseNode {
 		const { shadowMap, light } = this;
 		const { renderer, scene, camera } = frame;
 		const shadowType = renderer.shadowMap.type;
-		const depthVersion = shadowMap.depthTexture.version;
-		this._depthVersionCached = depthVersion;
 		const currentRenderObjectFunction = renderer.getRenderObjectFunction();
 
 		_rendererState = resetRendererAndSceneState( renderer, scene, _rendererState );
@@ -352,11 +350,7 @@ class TileShadowNode extends ShadowBaseNode {
 			this.update();
 			this.updateShadow( frame );
 
-			if ( this.shadowMap.depthTexture.version === this._depthVersionCached ) {
-
-				shadow.needsUpdate = false;
-
-			}
+			shadow.needsUpdate = false;
 
 		}
 
