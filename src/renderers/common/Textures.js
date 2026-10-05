@@ -2,7 +2,7 @@ import DataMap from './DataMap.js';
 
 import { Vector3 } from '../../math/Vector3.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
-import { DepthStencilFormat, DepthFormat, UnsignedIntType, UnsignedInt248Type, UnsignedByteType, SRGBTransfer } from '../../constants.js';
+import { DepthStencilFormat, DepthFormat, UnsignedIntType, UnsignedInt248Type, UnsignedByteType, FloatType, SRGBTransfer } from '../../constants.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 import { warn } from '../../utils.js';
 
@@ -141,7 +141,7 @@ class Textures extends DataMap {
 			depthTexture = new DepthTexture();
 
 			depthTexture.format = renderTarget.stencilBuffer ? DepthStencilFormat : DepthFormat;
-			depthTexture.type = renderTarget.stencilBuffer ? UnsignedInt248Type : UnsignedIntType; // FloatType
+			depthTexture.type = this.renderer.reversedDepthBuffer === true ? FloatType : ( renderTarget.stencilBuffer ? UnsignedInt248Type : UnsignedIntType );
 			depthTexture.image.width = mipWidth;
 			depthTexture.image.height = mipHeight;
 			depthTexture.image.depth = size.depth;
