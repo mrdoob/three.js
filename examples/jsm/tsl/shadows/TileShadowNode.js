@@ -277,6 +277,9 @@ class TileShadowNode extends ShadowBaseNode {
 		scene.overrideMaterial = this.getShadowMaterial();
 		renderer.setRenderTarget( this.shadowMap );
 
+		const cameraArrayLayers = this.cameraArray.layers.mask;
+		this.cameraArray.layers.mask = 0;
+
 		for ( let index = 0; index < this.lights.length; index ++ ) {
 
 			const light = this.lights[ index ];
@@ -292,6 +295,9 @@ class TileShadowNode extends ShadowBaseNode {
 			}
 
 			shadow.updateMatrices( light );
+
+			// The tiles render through the array camera, so it has to see every tile's layers.
+			this.cameraArray.layers.mask |= shadow.camera.layers.mask;
 
 			renderer.setRenderObjectFunction( this.getShadowRenderObjectFunction( renderer, shadow ) );
 			this.shadowMap.setSize( shadow.mapSize.width, shadow.mapSize.height, shadowMap.depth );
@@ -309,6 +315,8 @@ class TileShadowNode extends ShadowBaseNode {
 		}
 
 		restoreRendererAndSceneState( renderer, scene, _rendererState );
+
+		this.cameraArray.layers.mask = cameraArrayLayers;
 
 		for ( let index = 0; index < this.lights.length; index ++ ) {
 
