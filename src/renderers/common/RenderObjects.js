@@ -119,11 +119,13 @@ class RenderObjects {
 
 		} else {
 
+			let force = false;
+
 			// update references
 
 			renderObject.camera = camera;
 
-			//
+			// clipping and geometry updates
 
 			renderObject.updateClipping( clippingContext );
 
@@ -131,9 +133,19 @@ class RenderObjects {
 
 				renderObject.setGeometry( object.geometry );
 
+				// structural change, force into rebuild
+
+				if ( renderObject.initialGeometryCacheKey !== renderObject.getGeometryCacheKey() ) {
+
+					force = true;
+
+				}
+
 			}
 
-			if ( renderObject.version !== material.version || renderObject.needsUpdate ) {
+			// check if a new render object (rebuild) is required
+
+			if ( renderObject.version !== material.version || renderObject.needsUpdate || force ) {
 
 				if ( renderObject.initialCacheKey !== renderObject.getCacheKey() ) {
 
