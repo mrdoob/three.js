@@ -12,16 +12,11 @@ uniform vec3 probesMin[ NUM_LIGHT_PROBE_GRIDS ];
 uniform vec3 probesMax[ NUM_LIGHT_PROBE_GRIDS ];
 uniform vec3 probesResolution[ NUM_LIGHT_PROBE_GRIDS ];
 
-// Grids are selected at the sample position, offset along the normal by half a
-// probe spacing. Grids containing it within their bounds take precedence;
-// otherwise their bounds grown by half a probe spacing are tested, so the
-// surfaces around an inset grid, such as walls, select it too. Surfaces facing
-// out of every grid fall back to the fragment position ( normalOffset = 0 ).
-bool isInsideLightProbeGrid( vec3 worldPos, vec3 worldNormal, float normalOffset, float grow, vec3 probesMin, vec3 probesMax, vec3 probesResolution ) {
+bool isInsideLightProbeGrid( vec3 worldPos, vec3 worldNormal, vec3 probesMin, vec3 probesMax, vec3 probesResolution ) {
 
-	vec3 margin = ( probesMax - probesMin ) / ( probesResolution - 1.0 ) * 0.5;
-	vec3 samplePos = worldPos + worldNormal * margin * normalOffset;
-	return all( greaterThanEqual( samplePos, probesMin - margin * grow ) ) && all( lessThanEqual( samplePos, probesMax + margin * grow ) );
+	vec3 cell = ( probesMax - probesMin ) / ( probesResolution - 1.0 ) * 0.5;
+	vec3 samplePos = worldPos + worldNormal * cell;
+	return all( greaterThanEqual( samplePos, probesMin - cell ) ) && all( lessThanEqual( samplePos, probesMax + cell ) );
 
 }
 

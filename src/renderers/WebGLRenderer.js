@@ -2790,8 +2790,6 @@ class WebGLRenderer {
 
 				if ( materialProperties.needsLights && materialProperties.numLightProbeGrids > 0 ) {
 
-					// All baked grids in scene order; the shader samples the last one containing each fragment.
-
 					const grids = lightProbeGridUniforms;
 					let count = 0;
 

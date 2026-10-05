@@ -248,24 +248,17 @@ IncidentLight directLight;
 		vec3 probeWorldPos = ( ( vec4( geometryPosition, 1.0 ) - viewMatrix[ 3 ] ) * viewMatrix ).xyz;
 		vec3 probeWorldNormal = transformNormalByInverseViewMatrix( geometryNormal, viewMatrix );
 
-		// Only the last grid in scene order that contains the sample position is used.
+		// Sample the last grid whose cells contain the fragment.
 
 		int probeGrid = - 1;
-		int probeGridAround = - 1;
-		int probeGridNear = - 1;
 
 		#pragma unroll_loop_start
 		for ( int i = 0; i < NUM_LIGHT_PROBE_GRIDS; i ++ ) {
 
-			if ( isInsideLightProbeGrid( probeWorldPos, probeWorldNormal, 1.0, 0.0, probesMin[ i ], probesMax[ i ], probesResolution[ i ] ) ) probeGrid = UNROLLED_LOOP_INDEX;
-			if ( isInsideLightProbeGrid( probeWorldPos, probeWorldNormal, 1.0, 1.0, probesMin[ i ], probesMax[ i ], probesResolution[ i ] ) ) probeGridAround = UNROLLED_LOOP_INDEX;
-			if ( isInsideLightProbeGrid( probeWorldPos, probeWorldNormal, 0.0, 1.0, probesMin[ i ], probesMax[ i ], probesResolution[ i ] ) ) probeGridNear = UNROLLED_LOOP_INDEX;
+			if ( isInsideLightProbeGrid( probeWorldPos, probeWorldNormal, probesMin[ i ], probesMax[ i ], probesResolution[ i ] ) ) probeGrid = UNROLLED_LOOP_INDEX;
 
 		}
 		#pragma unroll_loop_end
-
-		if ( probeGrid < 0 ) probeGrid = probeGridAround;
-		if ( probeGrid < 0 ) probeGrid = probeGridNear;
 
 		#pragma unroll_loop_start
 		for ( int i = 0; i < NUM_LIGHT_PROBE_GRIDS; i ++ ) {

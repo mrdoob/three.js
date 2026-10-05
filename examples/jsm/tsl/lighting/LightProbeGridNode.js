@@ -69,13 +69,7 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 	setup( builder ) {
 
-		// All visible grids are evaluated by the first one in scene order, so that
-		// each fragment samples at most one grid: the last one in scene order that
-		// contains its sample position: the fragment offset along the normal by
-		// half a probe spacing. Grids containing it within their bounds take
-		// precedence; otherwise their bounds grown by half a probe spacing are
-		// tested, so the surfaces around an inset grid, such as walls, select it
-		// too. Surfaces facing out of every grid fall back to the fragment position.
+		// The first grid samples the last grid whose cells contain the fragment.
 
 		const grids = builder.lightsNode.getLights().filter( light => light.isLightProbeGrid && light.texture !== null );
 
@@ -92,18 +86,11 @@ class LightProbeGridNode extends AnalyticLightNode {
 			const range = max.sub( min );
 			const spacing = range.div( res.sub( 1.0 ) );
 
-			// Offset along the normal by half a probe spacing.
-
 			const samplePos = positionWorld.add( normalWorld.mul( spacing ).mul( 0.5 ) );
-			const margin = spacing.mul( 0.5 );
-			const contains = ( position, grow ) => position.greaterThanEqual( min.sub( grow ) ).all().and( position.lessThanEqual( max.add( grow ) ).all() );
-			const inside = contains( samplePos, 0 );
-			const around = contains( samplePos, margin );
-			const near = contains( positionWorld, margin );
+			const cell = spacing.mul( 0.5 );
+			const inside = samplePos.greaterThanEqual( min.sub( cell ) ).all().and( samplePos.lessThanEqual( max.add( cell ) ).all() );
 
 			const sample = () => {
-
-				// Remap to texel centers.
 
 				const uvw = samplePos.sub( min ).div( range ).clamp( 0.0, 1.0 ).mul( res.sub( 1.0 ) ).div( res ).add( vec3( 0.5 ).div( res ) );
 
@@ -111,7 +98,7 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 			};
 
-			return { inside, around, near, sample };
+			return { inside, sample };
 
 		} ).reverse();
 
@@ -123,15 +110,6 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		}
 
-		for ( const test of [ 'around', 'near' ] ) {
-
-			for ( const node of nodes ) {
-
-				chain = chain.ElseIf( node[ test ], node.sample );
-
-			}
-
-		}
 
 		builder.context.irradiance.addAssign( irradiance );
 
