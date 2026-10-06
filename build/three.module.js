@@ -8714,19 +8714,21 @@ function WebGLRenderState( extensions ) {
 
 	function pushLight( light ) {
 
-		lightsArray.push( light );
+		if ( light.isLightProbeGrid ) {
+
+			lightProbeGridArray.push( light );
+
+		} else {
+
+			lightsArray.push( light );
+
+		}
 
 	}
 
 	function pushShadow( shadowLight ) {
 
 		shadowsArray.push( shadowLight );
-
-	}
-
-	function pushLightProbeGrid( volume ) {
-
-		lightProbeGridArray.push( volume );
 
 	}
 
@@ -8762,8 +8764,7 @@ function WebGLRenderState( extensions ) {
 		setupLightsView: setupLightsView,
 
 		pushLight: pushLight,
-		pushShadow: pushShadow,
-		pushLightProbeGrid: pushLightProbeGrid
+		pushShadow: pushShadow
 	};
 
 }
@@ -17632,10 +17633,6 @@ class WebGLRenderer {
 
 					if ( object.autoUpdate === true ) object.update( camera );
 
-				} else if ( object.isLightProbeGrid ) {
-
-					currentRenderState.pushLightProbeGrid( object );
-
 				} else if ( object.isLight ) {
 
 					currentRenderState.pushLight( object );
@@ -17980,6 +17977,7 @@ class WebGLRenderer {
 
 				programs = new Map();
 				materialProperties.programs = programs;
+				materialProperties.programVariants = new Map();
 
 			}
 
@@ -18065,6 +18063,33 @@ class WebGLRenderer {
 
 			materialProperties.currentProgram = program;
 			materialProperties.uniformsList = null;
+
+			return program;
+
+		}
+
+		function getProgramVariant( material, scene, object, colorSpace, toneMapping ) {
+
+			const materialProperties = properties.get( material );
+
+			const programVariantKey = materialProperties.currentProgram.id + ',' + colorSpace + ',' + toneMapping;
+
+			let program = materialProperties.programVariants.get( programVariantKey );
+
+			if ( program === undefined ) {
+
+				program = getProgram( material, scene, object );
+
+				materialProperties.programVariants.set( programVariantKey, program );
+
+			} else {
+
+				materialProperties.currentProgram = program;
+				materialProperties.uniformsList = null;
+				materialProperties.outputColorSpace = colorSpace;
+				materialProperties.toneMapping = toneMapping;
+
+			}
 
 			return program;
 
@@ -18185,14 +18210,11 @@ class WebGLRenderer {
 			//
 
 			let needsProgramChange = false;
+			let needsProgramVariant = false;
 
 			if ( material.version === materialProperties.__version ) {
 
 				if ( materialProperties.needsLights && ( materialProperties.lightsStateVersion !== lights.state.version ) ) {
-
-					needsProgramChange = true;
-
-				} else if ( materialProperties.outputColorSpace !== colorSpace ) {
 
 					needsProgramChange = true;
 
@@ -18278,10 +18300,6 @@ class WebGLRenderer {
 
 					needsProgramChange = true;
 
-				} else if ( materialProperties.toneMapping !== toneMapping ) {
-
-					needsProgramChange = true;
-
 				} else if ( materialProperties.morphTargetsCount !== morphTargetsCount ) {
 
 					needsProgramChange = true;
@@ -18289,6 +18307,10 @@ class WebGLRenderer {
 				} else if ( !! materialProperties.lightProbeGrid !== ( currentRenderState.state.lightProbeGridArray.length > 0 ) ) {
 
 					needsProgramChange = true;
+
+				} else if ( materialProperties.outputColorSpace !== colorSpace || materialProperties.toneMapping !== toneMapping ) {
+
+					needsProgramVariant = true;
 
 				}
 
@@ -18303,9 +18325,9 @@ class WebGLRenderer {
 
 			let program = materialProperties.currentProgram;
 
-			if ( needsProgramChange === true ) {
+			if ( needsProgramChange === true || needsProgramVariant === true ) {
 
-				program = getProgram( material, scene, object );
+				program = ( needsProgramVariant === true ) ? getProgramVariant( material, scene, object, colorSpace, toneMapping ) : getProgram( material, scene, object );
 
 				// notify the node builder that the program has changed so uniforms and update nodes can
 				// be cached and triggered.

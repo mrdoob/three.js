@@ -20051,19 +20051,15 @@ class InterleavedBuffer {
 
 		}
 
-		if ( this.array.buffer._uuid === undefined ) {
+		const key = getArrayKey( this.array );
 
-			this.array.buffer._uuid = generateUUID();
+		if ( data.arrayBuffers[ key ] === undefined ) {
 
-		}
-
-		if ( data.arrayBuffers[ this.array.buffer._uuid ] === undefined ) {
-
-			data.arrayBuffers[ this.array.buffer._uuid ] = this.array.slice( 0 ).buffer;
+			data.arrayBuffers[ key ] = this.array.slice( 0 ).buffer;
 
 		}
 
-		const array = new this.array.constructor( data.arrayBuffers[ this.array.buffer._uuid ] );
+		const array = new this.array.constructor( data.arrayBuffers[ key ] );
 
 		const ib = new this.constructor( array, this.stride );
 		ib.setUsage( this.usage );
@@ -20102,17 +20098,11 @@ class InterleavedBuffer {
 
 		}
 
-		// generate UUID for array buffer if necessary
+		const key = getArrayKey( this.array );
 
-		if ( this.array.buffer._uuid === undefined ) {
+		if ( data.arrayBuffers[ key ] === undefined ) {
 
-			this.array.buffer._uuid = generateUUID();
-
-		}
-
-		if ( data.arrayBuffers[ this.array.buffer._uuid ] === undefined ) {
-
-			data.arrayBuffers[ this.array.buffer._uuid ] = Array.from( new Uint32Array( this.array.buffer ) );
+			data.arrayBuffers[ key ] = Array.from( new Uint32Array( this.array.slice( 0 ).buffer ) );
 
 		}
 
@@ -20120,7 +20110,7 @@ class InterleavedBuffer {
 
 		const json = {
 			uuid: this.uuid,
-			buffer: this.array.buffer._uuid,
+			buffer: key,
 			type: this.array.constructor.name,
 			stride: this.stride
 		};
@@ -20130,6 +20120,26 @@ class InterleavedBuffer {
 		return json;
 
 	}
+
+}
+
+// Returns the key under which the data of the given typed array is shared when cloning or serializing.
+// Interleaved buffers can be views at different offsets into the same array buffer (e.g. the interleaved
+// accessors of a glTF buffer view), so only views over the same range share their data.
+
+function getArrayKey( array ) {
+
+	// generate UUID for array buffer if necessary
+
+	if ( array.buffer._uuid === undefined ) {
+
+		array.buffer._uuid = generateUUID();
+
+	}
+
+	if ( array.byteOffset === 0 && array.byteLength === array.buffer.byteLength ) return array.buffer._uuid;
+
+	return array.buffer._uuid + ':' + array.byteOffset + ':' + array.byteLength;
 
 }
 
@@ -24808,7 +24818,7 @@ class SkinnedMesh extends Mesh {
 
 		} else {
 
-			_baseVector.set( ...target, 1 );
+			_baseVector.set( target.x, target.y, target.z, 1 );
 			target.set( 0, 0, 0 );
 
 		}
@@ -31303,7 +31313,7 @@ class EdgesGeometry extends BufferGeometry {
 			const vertKeys = [ 'a', 'b', 'c' ];
 			const hashes = new Array( 3 );
 
-			const edgeData = {};
+			const edgeData = new Map();
 			const vertices = [];
 			for ( let i = 0; i < indexCount; i += 3 ) {
 
@@ -31352,29 +31362,31 @@ class EdgesGeometry extends BufferGeometry {
 					const hash = `${ vecHash0 }_${ vecHash1 }`;
 					const reverseHash = `${ vecHash1 }_${ vecHash0 }`;
 
-					if ( reverseHash in edgeData && edgeData[ reverseHash ] ) {
+					const sibling = edgeData.get( reverseHash );
+
+					if ( sibling ) {
 
 						// if we found a sibling edge add it into the vertex array if
 						// it meets the angle threshold and delete the edge from the map.
-						if ( _normal.dot( edgeData[ reverseHash ].normal ) <= thresholdDot ) {
+						if ( _normal.dot( sibling.normal ) <= thresholdDot ) {
 
 							vertices.push( v0.x, v0.y, v0.z );
 							vertices.push( v1.x, v1.y, v1.z );
 
 						}
 
-						edgeData[ reverseHash ] = null;
+						edgeData.set( reverseHash, null );
 
-					} else if ( ! ( hash in edgeData ) ) {
+					} else if ( ! edgeData.has( hash ) ) {
 
 						// if we've already got an edge here then skip adding a new one
-						edgeData[ hash ] = {
+						edgeData.set( hash, {
 
 							index0: indexArr[ j ],
 							index1: indexArr[ jNext ],
 							normal: _normal.clone(),
 
-						};
+						} );
 
 					}
 
@@ -31383,11 +31395,11 @@ class EdgesGeometry extends BufferGeometry {
 			}
 
 			// iterate over all remaining, unmatched edges and add them to the vertex array
-			for ( const key in edgeData ) {
+			for ( const edge of edgeData.values() ) {
 
-				if ( edgeData[ key ] ) {
+				if ( edge ) {
 
-					const { index0, index1 } = edgeData[ key ];
+					const { index0, index1 } = edge;
 					_v0.fromBufferAttribute( positionAttr, index0 );
 					_v1$1.fromBufferAttribute( positionAttr, index1 );
 
@@ -46134,9 +46146,9 @@ class TextureLoader extends Loader {
 	 * may pop up in your scene once the respective loading process is finished.
 	 *
 	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
-	 * @param {function(Texture)} onLoad - Executed when the loading process has been finished.
-	 * @param {onProgressCallback} onProgress - Unsupported in this loader.
-	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 * @param {function(Texture)} [onLoad] - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} [onProgress] - Unsupported in this loader.
+	 * @param {onErrorCallback} [onError] - Executed when errors occur.
 	 * @return {Texture} The texture.
 	 */
 	load( url, onLoad, onProgress, onError ) {

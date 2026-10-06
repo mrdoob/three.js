@@ -23170,21 +23170,25 @@ class NodeMaterial extends Material {
 	 */
 	copy( source ) {
 
-		const descriptors = Object.getOwnPropertyDescriptors( this.constructor.prototype );
+		for ( let prototype = Object.getPrototypeOf( this ); prototype !== Object.prototype; prototype = Object.getPrototypeOf( prototype ) ) {
 
-		for ( const property in descriptors ) {
+			const descriptors = Object.getOwnPropertyDescriptors( prototype );
 
-			if ( descriptors[ property ].set !== undefined && source[ property ] !== undefined ) {
+			for ( const property in descriptors ) {
 
-				const value = source[ property ];
+				if ( descriptors[ property ].set !== undefined && source[ property ] !== undefined ) {
 
-				if ( this[ property ] && this[ property ].copy !== undefined ) {
+					const value = source[ property ];
 
-					this[ property ].copy( value );
+					if ( this[ property ] && this[ property ].copy !== undefined ) {
 
-				} else {
+						this[ property ].copy( value );
 
-					this[ property ] = value;
+					} else {
+
+						this[ property ] = value;
+
+					}
 
 				}
 
@@ -26658,7 +26662,7 @@ class PhysicalLightingModel extends LightingModel {
 		const dotVH = positionViewDirection.dot( halfDir ).clamp();
 		let F = F_Schlick( { f0: specularColor, f90: specularF90, dotVH } );
 
-		let specularBRDF = BRDF_GGX( { lightDirection, f0: specularColorBlended, f90: 1, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } );
+		let specularBRDF = BRDF_GGX( { lightDirection, f0: specularColorBlended, f90: specularF90, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } );
 
 		if ( this.retroreflection === true ) {
 
@@ -26668,7 +26672,7 @@ class PhysicalLightingModel extends LightingModel {
 			const retroHalfDir = lightDirection.add( retroViewDirection ).normalize();
 			const dotRetroVH = retroViewDirection.dot( retroHalfDir ).clamp();
 			const retroF = F_Schlick( { f0: specularColor, f90: specularF90, dotVH: dotRetroVH } );
-			const retroSpecularBRDF = BRDF_GGX( { lightDirection, viewDirection: retroViewDirection, f0: specularColorBlended, f90: 1, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } );
+			const retroSpecularBRDF = BRDF_GGX( { lightDirection, viewDirection: retroViewDirection, f0: specularColorBlended, f90: specularF90, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } );
 
 			F = mix( F, retroF, retroreflectivity.clamp() );
 			specularBRDF = mix( specularBRDF, retroSpecularBRDF, retroreflectivity.clamp() );
@@ -30538,6 +30542,8 @@ class Animation {
 
 		this.stop();
 
+		this._animationLoop = null;
+
 	}
 
 }
@@ -30819,6 +30825,14 @@ class RenderObject {
 		this.geometry = object.geometry;
 
 		/**
+		 * The geometry's version. Incremented whenever the geometry is updated.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.geometryVersion = 0;
+
+		/**
 		 * The render object's version.
 		 *
 		 * @type {number}
@@ -30925,6 +30939,13 @@ class RenderObject {
 		 * @type {number}
 		 */
 		this.initialCacheKey = this.getCacheKey();
+
+		/**
+		 * The initial geometry cache key.
+		 *
+		 * @type {string}
+		 */
+		this.initialGeometryCacheKey = this.getGeometryCacheKey();
 
 		/**
 		 * The node builder state.
@@ -31189,6 +31210,8 @@ class RenderObject {
 		this.attributes = null;
 		this.attributesId = null;
 
+		this.geometryVersion ++;
+
 	}
 
 	/**
@@ -31370,8 +31393,6 @@ class RenderObject {
 
 			cacheKey += name + ',';
 
-			if ( attribute.data ) cacheKey += attribute.data.stride + ',';
-			if ( attribute.offset ) cacheKey += attribute.offset + ',';
 			if ( attribute.itemSize ) cacheKey += attribute.itemSize + ',';
 			if ( attribute.normalized ) cacheKey += 'n,';
 
@@ -31394,12 +31415,6 @@ class RenderObject {
 				cacheKey += attribute.id + ',';
 
 			}
-
-		}
-
-		if ( geometry.index ) {
-
-			cacheKey += 'index,';
 
 		}
 
@@ -31458,6 +31473,7 @@ class RenderObject {
 					if ( value.isTexture ) {
 
 						valueKey += value.mapping;
+						valueKey += value.channel;
 
 						// WebGPU must honor the sampler data because they are part of the bindings
 
@@ -31514,6 +31530,12 @@ class RenderObject {
 				cacheKey += object._colorsTexture.uuid + ',';
 
 			}
+
+		}
+
+		if ( object.isInstancedMesh && object.instanceColor !== null ) {
+
+			cacheKey += object.instanceColor.id + ',';
 
 		}
 
@@ -31770,11 +31792,13 @@ class RenderObjects {
 
 		} else {
 
+			let force = false;
+
 			// update references
 
 			renderObject.camera = camera;
 
-			//
+			// clipping and geometry updates
 
 			renderObject.updateClipping( clippingContext );
 
@@ -31782,9 +31806,19 @@ class RenderObjects {
 
 				renderObject.setGeometry( object.geometry );
 
+				// structural change, force into rebuild
+
+				if ( renderObject.initialGeometryCacheKey !== renderObject.getGeometryCacheKey() ) {
+
+					force = true;
+
+				}
+
 			}
 
-			if ( renderObject.version !== material.version || renderObject.needsUpdate ) {
+			// check if a new render object (rebuild) is required
+
+			if ( renderObject.version !== material.version || renderObject.needsUpdate || force ) {
 
 				if ( renderObject.initialCacheKey !== renderObject.getCacheKey() ) {
 
@@ -35564,7 +35598,7 @@ class Textures extends DataMap {
 			depthTexture = new DepthTexture();
 
 			depthTexture.format = renderTarget.stencilBuffer ? DepthStencilFormat : DepthFormat;
-			depthTexture.type = renderTarget.stencilBuffer ? UnsignedInt248Type : UnsignedIntType; // FloatType
+			depthTexture.type = this.renderer.reversedDepthBuffer === true ? FloatType : ( renderTarget.stencilBuffer ? UnsignedInt248Type : UnsignedIntType );
 			depthTexture.image.width = mipWidth;
 			depthTexture.image.height = mipHeight;
 			depthTexture.image.depth = size.depth;
@@ -40919,6 +40953,21 @@ const convertToTexture = ( node, ...params ) => {
 };
 
 /**
+ * Returns `true` if the given depth value belongs to the background, i.e. the cleared
+ * far plane. Takes the renderer's reversed depth buffer into account.
+ *
+ * @tsl
+ * @function
+ * @param {Node<float>} depth - The depth value.
+ * @return {Node<bool>} Whether the depth value belongs to the background.
+ */
+const isBackgroundDepth = /*@__PURE__*/ Fn( ( [ depth ], builder ) => {
+
+	return builder.renderer.reversedDepthBuffer === true ? depth.lessThanEqual( 0.0 ) : depth.greaterThanEqual( 1.0 );
+
+} );
+
+/**
  * Computes a position in view space based on a fragment's screen position expressed as uv coordinates, the fragments
  * depth value and the camera's inverse projection matrix.
  *
@@ -40933,7 +40982,7 @@ const getViewPosition = /*@__PURE__*/ Fn( ( [ screenPosition, depth, projectionM
 
 	let clipSpacePosition;
 
-	if ( builder.renderer.coordinateSystem === WebGPUCoordinateSystem ) {
+	if ( builder.renderer.coordinateSystem === WebGPUCoordinateSystem || builder.renderer.reversedDepthBuffer === true ) {
 
 		screenPosition = vec2( screenPosition.x, screenPosition.y.oneMinus() ).mul( 2.0 ).sub( 1.0 );
 		clipSpacePosition = vec4( vec3( screenPosition, depth ), 1.0 );
@@ -42926,7 +42975,23 @@ class PassNode extends Node {
 
 		if ( this.scope === PassNode.DEPTH || options.depthBuffer !== false ) {
 
-			depthTexture = options.depthTexture || new DepthTexture();
+			if ( options.depthTexture !== undefined ) {
+
+				depthTexture = options.depthTexture;
+
+			} else {
+
+				depthTexture = new DepthTexture();
+
+				if ( renderTarget.stencilBuffer === true ) {
+
+					depthTexture.format = DepthStencilFormat;
+					depthTexture.type = UnsignedInt248Type;
+
+				}
+
+			}
+
 			depthTexture.isRenderTargetTexture = true;
 			//depthTexture.type = FloatType;
 			depthTexture.name = 'depth';
@@ -43844,12 +43909,37 @@ class ToonOutlinePassNode extends PassNode {
 		this.alphaNode = alphaNode;
 
 		/**
+		 * The outline material for toon materials without node modifications.
+		 *
+		 * @private
+		 * @type {NodeMaterial}
+		 */
+		this._outlineMaterial = this._createMaterial();
+
+		/**
 		 * An internal material cache.
 		 *
 		 * @private
-		 * @type {WeakMap<Material, NodeMaterial>}
+		 * @type {Map<Material, NodeMaterial>}
 		 */
-		this._materialCache = new WeakMap();
+		this._materialCache = new Map();
+
+		/**
+		 * Disposes the outline material of a disposed toon material.
+		 *
+		 * @private
+		 * @type {Function}
+		 */
+		this._onMaterialDispose = ( event ) => {
+
+			const originalMaterial = event.target;
+
+			originalMaterial.removeEventListener( 'dispose', this._onMaterialDispose );
+
+			this._materialCache.get( originalMaterial ).dispose();
+			this._materialCache.delete( originalMaterial );
+
+		};
 
 		/**
 		 * The name of this pass.
@@ -43891,6 +43981,27 @@ class ToonOutlinePassNode extends PassNode {
 		super.updateBefore( frame );
 
 		renderer.setRenderObjectFunction( currentRenderObjectFunction );
+
+	}
+
+	/**
+	 * Frees internal resources. Should be called when the node is no longer in use.
+	 */
+	dispose() {
+
+		super.dispose();
+
+		this._outlineMaterial.dispose();
+
+		for ( const [ originalMaterial, outlineMaterial ] of this._materialCache ) {
+
+			originalMaterial.removeEventListener( 'dispose', this._onMaterialDispose );
+
+			outlineMaterial.dispose();
+
+		}
+
+		this._materialCache.clear();
 
 	}
 
@@ -43937,13 +44048,31 @@ class ToonOutlinePassNode extends PassNode {
 	 */
 	_getOutlineMaterial( originalMaterial ) {
 
+		if ( ! originalMaterial.positionNode ) return this._outlineMaterial; // early out if there are no node modifications
+
+		let force = false;
 		let outlineMaterial = this._materialCache.get( originalMaterial );
+
+		// create
 
 		if ( outlineMaterial === undefined ) {
 
 			outlineMaterial = this._createMaterial();
 
 			this._materialCache.set( originalMaterial, outlineMaterial );
+
+			originalMaterial.addEventListener( 'dispose', this._onMaterialDispose );
+
+			force = true;
+
+		}
+
+		// update
+
+		if ( outlineMaterial.version !== originalMaterial.version || force === true ) {
+
+			outlineMaterial.positionNode = originalMaterial.positionNode || null;
+			outlineMaterial.version = originalMaterial.version;
 
 		}
 
@@ -47689,6 +47818,7 @@ class ShadowNode extends ShadowBaseNode {
 		}
 
 		shadow.camera.coordinateSystem = camera.coordinateSystem;
+		shadow.camera._reversedDepth = renderer.reversedDepthBuffer;
 		shadow.camera.updateProjectionMatrix();
 
 		// VSM
@@ -47982,9 +48112,6 @@ class ShadowNode extends ShadowBaseNode {
 
 		const shadowType = renderer.shadowMap.type;
 
-		const depthVersion = shadowMap.depthTexture.version;
-		this._depthVersionCached = depthVersion;
-
 		const _shadowCameraLayer = shadow.camera.layers.mask;
 
 		if ( ( shadow.camera.layers.mask & 0xFFFFFFFE ) === 0 ) {
@@ -48128,11 +48255,7 @@ class ShadowNode extends ShadowBaseNode {
 
 			this.updateShadow( frame );
 
-			if ( this.shadowMap.depthTexture.version === this._depthVersionCached ) {
-
-				shadow.needsUpdate = false;
-
-			}
+			shadow.needsUpdate = false;
 
 		}
 
@@ -57684,6 +57807,28 @@ class NodeManager extends DataMap {
 	}
 
 	/**
+	 * Logs an error thrown while building a node material.
+	 *
+	 * @private
+	 * @param {Error} e - The build error.
+	 */
+	_reportBuildError( e ) {
+
+		let stackTrace = e.stackTrace;
+
+		if ( ! stackTrace && e.stack ) {
+
+			// Capture stack trace for JavaScript errors
+
+			stackTrace = new StackTrace( e.stack );
+
+		}
+
+		error( 'TSL: ' + e, stackTrace );
+
+	}
+
+	/**
 	 * Returns a node builder state for the given render object.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
@@ -57736,7 +57881,7 @@ class NodeManager extends DataMap {
 
 						}
 
-						error( 'TSL: ' + e );
+						this._reportBuildError( e );
 
 					}
 
@@ -57771,17 +57916,7 @@ class NodeManager extends DataMap {
 						nodeBuilder = this._createNodeBuilder( renderObject, new NodeMaterial() );
 						nodeBuilder.build();
 
-						let stackTrace = e.stackTrace;
-
-						if ( ! stackTrace && e.stack ) {
-
-							// Capture stack trace for JavaScript errors
-
-							stackTrace = new StackTrace( e.stack );
-
-						}
-
-						error( 'TSL: ' + e, stackTrace );
+						this._reportBuildError( e );
 
 					}
 
@@ -64378,6 +64513,14 @@ class Renderer {
 	 */
 	async dispose() {
 
+		// edge case: If dispose() is called during an init, wait for the finish
+
+		if ( this._initPromise !== null ) {
+
+			await this.init();
+
+		}
+
 		if ( this._initialized === true ) {
 
 			this._inspector.dispose();
@@ -64405,7 +64548,6 @@ class Renderer {
 		}
 
 		this.setRenderTarget( null );
-		this.setAnimationLoop( null );
 
 	}
 
@@ -72521,6 +72663,7 @@ class WebGLTextureUtils {
 		if ( glFormat === gl.DEPTH_STENCIL ) {
 
 			if ( glType === gl.UNSIGNED_INT_24_8 ) internalFormat = gl.DEPTH24_STENCIL8;
+			if ( glType === gl.FLOAT ) internalFormat = gl.DEPTH32F_STENCIL8;
 
 		}
 
@@ -73406,7 +73549,7 @@ class WebGLTextureUtils {
 
 				if ( depthTexture && depthTexture.isDepthTexture ) {
 
-					if ( depthTexture.type === gl.FLOAT ) {
+					if ( depthTexture.type === FloatType ) {
 
 						glInternalFormat = gl.DEPTH_COMPONENT32F;
 
@@ -73428,7 +73571,19 @@ class WebGLTextureUtils {
 
 			if ( samples > 0 ) {
 
-				gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, gl.DEPTH24_STENCIL8, width, height );
+				let glInternalFormat = gl.DEPTH24_STENCIL8;
+
+				if ( depthTexture && depthTexture.isDepthTexture ) {
+
+					if ( depthTexture.type === FloatType ) {
+
+						glInternalFormat = gl.DEPTH32F_STENCIL8;
+
+					}
+
+				}
+
+				gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, glInternalFormat, width, height );
 
 			} else {
 
@@ -75253,6 +75408,7 @@ class WebGLBackend extends Backend {
 			const clearDepth = renderer.getClearDepth();
 			const clearStencil = renderer.getClearStencil();
 
+			if ( color ) this.state.setColorMask( true );
 			if ( depth ) this.state.setDepthMask( true );
 			if ( stencil ) this.state.setStencilMask( 0xffffffff );
 
@@ -75769,7 +75925,9 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
-	 * Explain why always null is returned.
+	 * Always returns `false` since WebGL has no pipeline state objects. Render state
+	 * like blending, depth/stencil or the vertex layout is set per draw, so a render
+	 * pipeline only represents a linked shader program which never needs an update.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
 	 * @return {boolean} Whether the render pipeline requires an update or not.
@@ -75781,7 +75939,9 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
-	 * Explain why no cache key is computed.
+	 * Returns an empty string since a render pipeline only represents a linked shader
+	 * program in WebGL. The program is fully identified by its shader stages, which are
+	 * already part of the pipeline cache key.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
 	 * @return {string} The cache key.
@@ -78011,6 +78171,23 @@ class WebGPUUtils {
 		else if ( object.isLineSegments || ( object.isMesh && material.wireframe === true ) ) return GPUPrimitiveTopology.LineList;
 		else if ( object.isLine ) return GPUPrimitiveTopology.LineStrip;
 		else if ( object.isMesh ) return GPUPrimitiveTopology.TriangleList;
+
+	}
+
+	/**
+	 * Returns the GPU strip index format for the given object and geometry.
+	 *
+	 * @param {Object3D} object - The 3D object.
+	 * @param {BufferGeometry} geometry - The geometry.
+	 * @return {string|undefined} The GPU strip index format. `undefined` if the object is not rendered as an indexed strip.
+	 */
+	getStripIndexFormat( object, geometry ) {
+
+		if ( geometry.index !== null && object.isLine === true && object.isLineSegments !== true ) {
+
+			return ( geometry.index.array instanceof Uint16Array ) ? GPUIndexFormat.Uint16 : GPUIndexFormat.Uint32;
+
+		}
 
 	}
 
@@ -84588,6 +84765,43 @@ const typeArraysToVertexFormatPrefixForItemSize1 = new Map( [
 	[ Float32Array, 'float32' ]
 ] );
 
+const _tail = new Uint8Array( 4 );
+
+/**
+ * Writes a range of a typed array into the given GPU buffer. `writeBuffer()` requires
+ * the offset and size to be multiples of 4 bytes, so the range is expanded to the
+ * element boundaries of the surrounding 4-byte word. The function assumes
+ * that the buffer is already properly sized to a multiple of 4 bytes.
+ *
+ * @private
+ * @function
+ * @param {GPUDevice} device - The GPU device calling `writeBuffer()`.
+ * @param {GPUBuffer} buffer - The GPU buffer, properly sized to a multiple of 4 bytes.
+ * @param {TypedArray} array - The source array.
+ * @param {number} start - The index of the first element to write.
+ * @param {number} count - The number of elements to write.
+ */
+function writeBufferAligned( device, buffer, array, start, count ) {
+
+	const bytes = new Uint8Array( array.buffer, array.byteOffset, array.byteLength );
+
+	const byteStart = Math.floor( start * array.BYTES_PER_ELEMENT / 4 ) * 4;
+	const byteEnd = ( start + count ) * array.BYTES_PER_ELEMENT;
+	const alignedEnd = Math.floor( byteEnd / 4 ) * 4;
+
+	if ( alignedEnd > byteStart ) device.queue.writeBuffer( buffer, byteStart, bytes, byteStart, alignedEnd - byteStart );
+
+	if ( byteEnd > alignedEnd ) {
+
+		_tail.fill( 0 );
+		_tail.set( bytes.subarray( alignedEnd, alignedEnd + 4 ) );
+
+		device.queue.writeBuffer( buffer, alignedEnd, _tail );
+
+	}
+
+}
+
 /**
  * A WebGPU backend utility module for managing shader attributes.
  *
@@ -84632,7 +84846,9 @@ class WebGPUAttributeUtils {
 
 			let array = bufferAttribute.array;
 
-			// patch for INT16 and UINT16
+			// WGSL has no 8 or 16 bit integer types and vertex strides must be a multiple of 4 bytes,
+			// so widen these integers to 32 bit. index buffers only need uint16 unless used as storage
+
 			if ( attribute.normalized === false && attribute.isInterleavedBufferAttribute !== true ) {
 
 				if ( array.constructor === Int16Array || array.constructor === Int8Array ) {
@@ -84641,13 +84857,24 @@ class WebGPUAttributeUtils {
 
 				} else if ( array.constructor === Uint16Array || array.constructor === Uint8Array ) {
 
-					array = new Uint32Array( array );
+					const isIndexBuffer = ( usage & GPUBufferUsage.INDEX );
+					const isStorageBuffer = ( usage & GPUBufferUsage.STORAGE );
 
-					if ( usage & GPUBufferUsage.INDEX ) {
+					const UintConstructor = ( isIndexBuffer && ! isStorageBuffer ) ? Uint16Array : Uint32Array;
+
+					if ( array.constructor !== UintConstructor ) {
+
+						array = new UintConstructor( array );
+
+					}
+
+					// widened indices need the uint32 primitive restart value
+
+					if ( isIndexBuffer && isStorageBuffer ) {
 
 						for ( let i = 0; i < array.length; i ++ ) {
 
-							if ( array[ i ] === 0xffff ) array[ i ] = 0xffffffff; // use correct primitive restart index
+							if ( array[ i ] === 0xffff ) array[ i ] = 0xffffffff;
 
 						}
 
@@ -84774,16 +85001,21 @@ class WebGPUAttributeUtils {
 
 		const updateRanges = bufferAttribute.updateRanges;
 
+		const needsAlignment = isTypedArray( array ) && array.BYTES_PER_ELEMENT < 4;
+
 		if ( updateRanges.length === 0 ) {
 
 			// Not using update ranges
 
-			device.queue.writeBuffer(
-				buffer,
-				0,
-				array,
-				0
-			);
+			if ( needsAlignment ) {
+
+				writeBufferAligned( device, buffer, array, 0, array.length );
+
+			} else {
+
+				device.queue.writeBuffer( buffer, 0, array, 0 );
+
+			}
 
 		} else {
 
@@ -84809,15 +85041,17 @@ class WebGPUAttributeUtils {
 
 				}
 
-				const bufferOffset = dataOffset * ( isTyped ? array.BYTES_PER_ELEMENT : 1 ); // bufferOffset is always in bytes
+				if ( needsAlignment ) {
 
-				device.queue.writeBuffer(
-					buffer,
-					bufferOffset,
-					array,
-					dataOffset,
-					size
-				);
+					writeBufferAligned( device, buffer, array, dataOffset, size );
+
+				} else {
+
+					const bufferOffset = dataOffset * ( isTyped ? array.BYTES_PER_ELEMENT : 1 ); // bufferOffset is always in bytes
+
+					device.queue.writeBuffer( buffer, bufferOffset, array, dataOffset, size );
+
+				}
 
 			}
 
@@ -84828,13 +85062,13 @@ class WebGPUAttributeUtils {
 	}
 
 	/**
-	 * This method creates the vertex buffer layout data which are
-	 * require when creating a render pipeline for the given render object.
+	 * Returns the vertex buffer layout data which are required
+	 * when creating a render pipeline for the given render object.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
 	 * @return {Array<Object>} An array holding objects which describe the vertex buffer layout.
 	 */
-	createShaderVertexBuffers( renderObject ) {
+	getVertexBufferLayout( renderObject ) {
 
 		const attributes = renderObject.getAttributes();
 		const vertexBuffers = new Map();
@@ -84893,6 +85127,35 @@ class WebGPUAttributeUtils {
 		}
 
 		return Array.from( vertexBuffers.values() );
+
+	}
+
+	/**
+	 * Returns a cache key that represents the vertex buffer layout data
+	 * of the given render object.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @return {string} The cache key.
+	 */
+	getVertexBufferLayoutCacheKey( renderObject ) {
+
+		const vertexBufferLayout = this.getVertexBufferLayout( renderObject );
+
+		let cacheKey = '';
+
+		for ( const entry of vertexBufferLayout ) {
+
+			cacheKey += entry.arrayStride + ',' + entry.stepMode + ',';
+
+			for ( const attribute of entry.attributes ) {
+
+				cacheKey += attribute.shaderLocation + ',' + attribute.offset + ',' + attribute.format + ',';
+
+			}
+
+		}
+
+		return cacheKey;
 
 	}
 
@@ -85954,7 +86217,7 @@ class WebGPUPipelineUtils {
 
 		// vertex buffers
 
-		const vertexBuffers = backend.attributeUtils.createShaderVertexBuffers( renderObject );
+		const vertexBuffers = backend.attributeUtils.getVertexBufferLayout( renderObject );
 
 		// material blending
 
@@ -86762,12 +87025,7 @@ class WebGPUPipelineUtils {
 		//
 
 		descriptor.topology = utils.getPrimitiveTopology( object, material );
-
-		if ( geometry.index !== null && object.isLine === true && object.isLineSegments !== true ) {
-
-			descriptor.stripIndexFormat = ( geometry.index.array instanceof Uint16Array ) ? GPUIndexFormat.Uint16 : GPUIndexFormat.Uint32;
-
-		}
+		descriptor.stripIndexFormat = utils.getStripIndexFormat( object, geometry );
 
 		//
 
@@ -88672,7 +88930,7 @@ class WebGPUBackend extends Backend {
 				layerDepthStencilAttachment.view = depthTextureData.viewCache[ layerIndex ];
 				layerDepthStencilAttachment.depthLoadOp = depthStencilAttachment.depthLoadOp || GPULoadOp.Clear;
 				layerDepthStencilAttachment.depthStoreOp = depthStencilAttachment.depthStoreOp || GPUStoreOp.Store;
-				layerDepthStencilAttachment.depthClearValue = depthStencilAttachment.depthClearValue || 1.0;
+				layerDepthStencilAttachment.depthClearValue = depthStencilAttachment.depthClearValue ?? 1.0;
 
 				if ( renderContext.stencil ) {
 
@@ -88724,6 +88982,8 @@ class WebGPUBackend extends Backend {
 		for ( let i = 0; i < cameras.length; i ++ ) {
 
 			const layerDescriptor = renderContextData.layerDescriptors[ i ];
+			layerDescriptor.timestampWrites = descriptor.timestampWrites;
+
 			const sourceColorAttachment = descriptor.colorAttachments[ 0 ];
 			const layerColorAttachment = descriptor.colorAttachments[ i ];
 			const colorAttachment = layerDescriptor.colorAttachments[ 0 ];
@@ -89764,7 +90024,7 @@ class WebGPUBackend extends Backend {
 
 		const data = this.get( renderObject );
 
-		const { object, material } = renderObject;
+		const { object, material, geometry } = renderObject;
 
 		const utils = this.utils;
 
@@ -89773,6 +90033,7 @@ class WebGPUBackend extends Backend {
 		const colorFormat = utils.getCurrentColorFormat( renderObject.context );
 		const depthStencilFormat = utils.getCurrentDepthStencilFormat( renderObject.context );
 		const primitiveTopology = utils.getPrimitiveTopology( object, material );
+		const stripIndexFormat = utils.getStripIndexFormat( object, geometry );
 		const frontFaceCW = ( object.isMesh && object.matrixWorld.determinantAffine() < 0 );
 
 		let needsUpdate = false;
@@ -89789,8 +90050,9 @@ class WebGPUBackend extends Backend {
 			data.side !== material.side || data.alphaToCoverage !== material.alphaToCoverage ||
 			data.sampleCount !== sampleCount || data.colorSpace !== colorSpace ||
 			data.colorFormat !== colorFormat || data.depthStencilFormat !== depthStencilFormat ||
-			data.primitiveTopology !== primitiveTopology ||
+			data.primitiveTopology !== primitiveTopology || data.stripIndexFormat !== stripIndexFormat ||
 			data.frontFaceCW !== frontFaceCW ||
+			data.geometryVersion !== renderObject.geometryVersion ||
 			data.clippingContextCacheKey !== renderObject.clippingContextCacheKey
 		) {
 
@@ -89810,7 +90072,9 @@ class WebGPUBackend extends Backend {
 			data.colorFormat = colorFormat;
 			data.depthStencilFormat = depthStencilFormat;
 			data.primitiveTopology = primitiveTopology;
+			data.stripIndexFormat = stripIndexFormat;
 			data.frontFaceCW = frontFaceCW;
+			data.geometryVersion = renderObject.geometryVersion;
 			data.clippingContextCacheKey = renderObject.clippingContextCacheKey;
 
 			needsUpdate = true;
@@ -89829,7 +90093,7 @@ class WebGPUBackend extends Backend {
 	 */
 	getRenderCacheKey( renderObject ) {
 
-		const { object, material } = renderObject;
+		const { object, material, geometry } = renderObject;
 
 		const utils = this.utils;
 		const renderContext = renderObject.context;
@@ -89853,8 +90117,8 @@ class WebGPUBackend extends Backend {
 			frontFaceCW,
 			utils.getSampleCountRenderContext( renderContext ),
 			utils.getCurrentColorSpace( renderContext ), utils.getCurrentColorFormat( renderContext ), utils.getCurrentDepthStencilFormat( renderContext ),
-			utils.getPrimitiveTopology( object, material ),
-			renderObject.getGeometryCacheKey(),
+			utils.getPrimitiveTopology( object, material ), utils.getStripIndexFormat( object, geometry ),
+			this.attributeUtils.getVertexBufferLayoutCacheKey( renderObject ),
 			renderObject.clippingContextCacheKey
 		].join();
 
@@ -89972,7 +90236,12 @@ class WebGPUBackend extends Backend {
 	 */
 	initTimestampQuery( type, uid, descriptor ) {
 
-		if ( ! this.trackTimestamp ) return;
+		if ( ! this.trackTimestamp ) {
+
+			descriptor.timestampWrites = undefined;
+			return;
+
+		}
 
 		if ( ! this.timestampQueryPool[ type ] ) {
 
@@ -92416,6 +92685,7 @@ var Three_TSL = /*#__PURE__*/Object.freeze({
 	iridescence: iridescence,
 	iridescenceIOR: iridescenceIOR,
 	iridescenceThickness: iridescenceThickness,
+	isBackgroundDepth: isBackgroundDepth,
 	isolate: isolate,
 	ivec2: ivec2,
 	ivec3: ivec3,
