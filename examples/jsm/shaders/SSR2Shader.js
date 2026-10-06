@@ -148,6 +148,7 @@ const SSR2TraceShader = {
 				vec2 span = ( d1 - d0 ) / totalStep;
 				float sStep = 1.0 / totalStep;
 				float s = sStep;
+				bool found = false;
 
 				for ( float i = 1.0; i < float( MAX_STEP ); i ++ ) {
 
@@ -190,6 +191,7 @@ const SSR2TraceShader = {
 									float rayLength = length( vP - viewPosition );
 									float conePx = rayLength * roughness * roughness * cameraProjectionMatrix[ 1 ][ 1 ] * resolution.y / max( - vP.z, 1e-4 );
 									blurLod = log2( max( conePx, 1.0 ) );
+									found = true;
 									break;
 
 								}
@@ -201,6 +203,17 @@ const SSR2TraceShader = {
 					}
 
 					s += sStep;
+
+				}
+
+				// Misses get the cone footprint over the distance the ray travelled, so the blur
+				// is continuous across the silhouette of a reflected object instead of stopping at it.
+				if ( ! found ) {
+
+					float t = clamp( s, 0.0, 1.0 );
+					float rayLength = maxReflectRayLen * t;
+					float z = mix( viewPosition.z, d1viewPosition.z, t );
+					blurLod = log2( max( rayLength * roughness * roughness * cameraProjectionMatrix[ 1 ][ 1 ] * resolution.y / max( - z, 1e-4 ), 1.0 ) );
 
 				}
 
