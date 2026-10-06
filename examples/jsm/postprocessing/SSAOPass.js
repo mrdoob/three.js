@@ -51,8 +51,9 @@ class SSAOPass extends Pass {
 	 * @param {number} [width=512] - The width of the effect.
 	 * @param {number} [height=512] - The height of the effect.
 	 * @param {number} [kernelSize=32] - The kernel size.
+	 * @param {Object} [parameters={}] - Optional depthTexture and normalTexture shared inputs (see setGBuffer).
 	 */
-	constructor( scene, camera, width = 512, height = 512, kernelSize = 32 ) {
+	constructor( scene, camera, width = 512, height = 512, kernelSize = 32, parameters = {} ) {
 
 		super();
 
@@ -146,21 +147,6 @@ class SSAOPass extends Pass {
 		this._generateSampleKernel( kernelSize );
 		this._generateRandomKernelRotations();
 
-		// depth texture
-
-		const depthTexture = new DepthTexture();
-		depthTexture.format = DepthStencilFormat;
-		depthTexture.type = UnsignedInt248Type;
-
-		// normal render target with depth buffer
-
-		this.normalRenderTarget = new WebGLRenderTarget( this.width, this.height, {
-			minFilter: NearestFilter,
-			magFilter: NearestFilter,
-			type: HalfFloatType,
-			depthTexture: depthTexture
-		} );
-
 		// ssao render target
 
 		this.ssaoRenderTarget = new WebGLRenderTarget( this.width, this.height, { type: HalfFloatType, depthBuffer: false } );
@@ -179,8 +165,6 @@ class SSAOPass extends Pass {
 
 		this.ssaoMaterial.defines[ 'KERNEL_SIZE' ] = kernelSize;
 
-		this.ssaoMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
-		this.ssaoMaterial.uniforms[ 'tDepth' ].value = this.normalRenderTarget.depthTexture;
 		this.ssaoMaterial.uniforms[ 'tNoise' ].value = this.noiseTexture;
 		this.ssaoMaterial.uniforms[ 'kernel' ].value = this.kernel;
 		this.ssaoMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
@@ -214,7 +198,6 @@ class SSAOPass extends Pass {
 			fragmentShader: SSAODepthShader.fragmentShader,
 			blending: NoBlending
 		} );
-		this.depthRenderMaterial.uniforms[ 'tDepth' ].value = this.normalRenderTarget.depthTexture;
 		this.depthRenderMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
 		this.depthRenderMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
 
@@ -241,6 +224,64 @@ class SSAOPass extends Pass {
 
 		this._originalClearColor = new Color();
 
+		this.setGBuffer( parameters.depthTexture, parameters.normalTexture );
+
+	}
+
+	/**
+	 * Configures shared geometry inputs. Call without arguments to restore internal rendering.
+	 * Both textures must describe the same surfaces, frame, camera and projection as this pass.
+	 * Normals are unit view-space vectors encoded as RGB = normal * 0.5 + 0.5, with
+	 * NoColorSpace. Depth is a separate DepthTexture sampled from red, with near = 0
+	 * and far/background = 1. Reversed and logarithmic depth are not supported.
+	 * Inputs must match the pass width/height in physical pixels, use nearest filtering,
+	 * clamp-to-edge wrapping and no mipmaps. The caller renders, resizes and disposes them.
+	 *
+	 * @param {DepthTexture} [depthTexture] - External depth texture.
+	 * @param {Texture} [normalTexture] - External encoded view-space normal texture.
+	 */
+	setGBuffer( depthTexture, normalTexture ) {
+
+		if ( depthTexture !== undefined || normalTexture !== undefined ) {
+
+			if ( ! depthTexture?.isDepthTexture || ! normalTexture?.isTexture || depthTexture === normalTexture ) {
+
+				throw new Error( 'THREE.SSAOPass: Expected a separate depth texture and normal texture.' );
+
+			}
+
+			if ( this.normalRenderTarget ) this.normalRenderTarget.dispose();
+			this.normalRenderTarget = null;
+			this.depthTexture = depthTexture;
+			this.normalTexture = normalTexture;
+			this._renderGBuffer = false;
+
+		} else {
+
+			if ( ! this._renderGBuffer ) {
+
+				const depth = new DepthTexture();
+				depth.format = DepthStencilFormat;
+				depth.type = UnsignedInt248Type;
+				this.normalRenderTarget = new WebGLRenderTarget( this.width, this.height, {
+					minFilter: NearestFilter,
+					magFilter: NearestFilter,
+					type: HalfFloatType,
+					depthTexture: depth
+				} );
+
+			}
+
+			this.depthTexture = this.normalRenderTarget.depthTexture;
+			this.normalTexture = this.normalRenderTarget.texture;
+			this._renderGBuffer = true;
+
+		}
+
+		this.ssaoMaterial.uniforms.tDepth.value = this.depthTexture;
+		this.ssaoMaterial.uniforms.tNormal.value = this.normalTexture;
+		this.depthRenderMaterial.uniforms.tDepth.value = this.depthTexture;
+
 	}
 
 	/**
@@ -249,14 +290,17 @@ class SSAOPass extends Pass {
 	 */
 	dispose() {
 
+		this.noiseTexture.dispose();
+
 		// dispose render targets
 
-		this.normalRenderTarget.dispose();
+		if ( this.normalRenderTarget ) this.normalRenderTarget.dispose();
 		this.ssaoRenderTarget.dispose();
 		this.blurRenderTarget.dispose();
 
 		// dispose materials
 
+		this.ssaoMaterial.dispose();
 		this.normalMaterial.dispose();
 		this.blurMaterial.dispose();
 		this.copyMaterial.dispose();
@@ -281,11 +325,54 @@ class SSAOPass extends Pass {
 	 */
 	render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
+		const perspective = this.camera.isPerspectiveCamera ? 1 : 0;
+		for ( const material of [ this.ssaoMaterial, this.depthRenderMaterial ] ) {
+
+			if ( material.defines.PERSPECTIVE_CAMERA !== perspective ) {
+
+				material.defines.PERSPECTIVE_CAMERA = perspective;
+				material.needsUpdate = true;
+
+			}
+
+		}
+
+		if ( ! this._renderGBuffer ) {
+
+			if ( renderer.capabilities.reversedDepthBuffer || renderer.capabilities.logarithmicDepthBuffer ) {
+
+				throw new Error( 'THREE.SSAOPass: Shared inputs require conventional depth.' );
+
+			}
+
+			for ( const texture of [ this.depthTexture, this.normalTexture ] ) {
+
+				if ( texture.image?.width !== this.width || texture.image?.height !== this.height ) {
+
+					throw new Error( 'THREE.SSAOPass: Shared inputs must match the pass dimensions.' );
+
+				}
+
+			}
+
+		}
+
+		this.ssaoMaterial.uniforms.cameraNear.value = this.camera.near;
+		this.ssaoMaterial.uniforms.cameraFar.value = this.camera.far;
+		this.ssaoMaterial.uniforms.cameraProjectionMatrix.value.copy( this.camera.projectionMatrix );
+		this.ssaoMaterial.uniforms.cameraInverseProjectionMatrix.value.copy( this.camera.projectionMatrixInverse );
+		this.depthRenderMaterial.uniforms.cameraNear.value = this.camera.near;
+		this.depthRenderMaterial.uniforms.cameraFar.value = this.camera.far;
+
 		// render normals and depth (honor only meshes, points and lines do not contribute to SSAO)
 
-		this._overrideVisibility();
-		this._renderOverride( renderer, this.normalMaterial, this.normalRenderTarget, 0x7777ff, 1.0 );
-		this._restoreVisibility();
+		if ( this._renderGBuffer ) {
+
+			this._overrideVisibility();
+			this._renderOverride( renderer, this.normalMaterial, this.normalRenderTarget, 0x7777ff, 1.0 );
+			this._restoreVisibility();
+
+		}
 
 		// render SSAO
 
@@ -326,7 +413,7 @@ class SSAOPass extends Pass {
 
 			case SSAOPass.OUTPUT.Normal:
 
-				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.normalRenderTarget.texture;
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.normalTexture;
 				this.copyMaterial.blending = NoBlending;
 				this._renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : readBuffer );
 
@@ -359,7 +446,7 @@ class SSAOPass extends Pass {
 		this.height = height;
 
 		this.ssaoRenderTarget.setSize( width, height );
-		this.normalRenderTarget.setSize( width, height );
+		if ( this.normalRenderTarget ) this.normalRenderTarget.setSize( width, height );
 		this.blurRenderTarget.setSize( width, height );
 
 		this.ssaoMaterial.uniforms[ 'resolution' ].value.set( width, height );

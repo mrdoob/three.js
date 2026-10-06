@@ -191,6 +191,7 @@ export * from './postprocessing/FXAAPass.js';
 export * from './postprocessing/FilmPass.js';
 export * from './postprocessing/GlitchPass.js';
 export * from './postprocessing/GTAOPass.js';
+export * from './postprocessing/GBufferPass.js';
 export * from './postprocessing/HalftonePass.js';
 export * from './postprocessing/LUTPass.js';
 export * from './postprocessing/MaskPass.js';

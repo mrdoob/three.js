@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Shared WebGL geometry buffers</title>
+	<style>
+		body { font: 14px system-ui; margin: 24px; background: #eee; color: #222; }
+		canvas, img { max-width: 100%; }
+		#images { display: flex; flex-wrap: wrap; gap: 12px; }
+		figure { margin: 0; }
+		table { border-collapse: collapse; margin: 16px 0; }
+		th, td { border: 1px solid #bbb; padding: 6px 12px; text-align: right; }
+		th:first-child, td:first-child { text-align: left; }
+		pre { white-space: pre-wrap; }
+	</style>
+</head>
+<body>
+	<h1>Shared WebGL geometry buffers</h1>
+	<p>SSAO and SSR use one normal/depth prepass. Results include that prepass's cost.
+		SSR still renders beauty and its selection mask. Reload to repeat the measurements.</p>
+	<p>URL options: <code>?detail=128</code> uses denser spheres;
+		<code>&amp;depth=24</code> compares both SSR paths with 24-bit depth;
+		<code>&amp;order=shared</code> reverses measurement order. Default SSR retains its 16-bit depth.
+		<code>&amp;mode=throughput</code> runs four five-second frame counts in ABBA order,
+		with one-second warmups, GPU completion fences and no display refresh limit.</p>
+	<p id="status">Running image comparisons and measurements…</p>
+	<div id="images"></div>
+	<div id="measurements"></div>
+	<details><summary>Raw measurements and image errors</summary><pre id="results"></pre></details>
+	<script type="importmap">
+		{ "imports": { "three": "../../src/Three.js" } }
+	</script>
+	<script type="module" src="./shared-webgl-buffers.js"></script>
+</body>
+</html>

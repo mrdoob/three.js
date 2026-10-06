@@ -43,7 +43,7 @@ class SSRPass extends Pass {
 	 *
 	 * @param {SSRPass~Options} options - The pass options.
 	 */
-	constructor( { renderer, scene, camera, width = 512, height = 512, selects = null, bouncing = false, groundReflector = null } ) {
+	constructor( { renderer, scene, camera, width = 512, height = 512, selects = null, bouncing = false, groundReflector = null, depthTexture, normalTexture } ) {
 
 		super();
 
@@ -299,16 +299,16 @@ class SSRPass extends Pass {
 
 		// beauty render target with depth buffer
 
-		const depthTexture = new DepthTexture();
-		depthTexture.type = UnsignedShortType;
-		depthTexture.minFilter = NearestFilter;
-		depthTexture.magFilter = NearestFilter;
+		const beautyDepthTexture = new DepthTexture();
+		beautyDepthTexture.type = UnsignedShortType;
+		beautyDepthTexture.minFilter = NearestFilter;
+		beautyDepthTexture.magFilter = NearestFilter;
 
 		this.beautyRenderTarget = new WebGLRenderTarget( this.width, this.height, {
 			minFilter: NearestFilter,
 			magFilter: NearestFilter,
 			type: HalfFloatType,
-			depthTexture: depthTexture,
+			depthTexture: beautyDepthTexture,
 			depthBuffer: true
 		} );
 
@@ -317,14 +317,6 @@ class SSRPass extends Pass {
 			minFilter: NearestFilter,
 			magFilter: NearestFilter,
 			depthBuffer: false
-		} );
-
-		// normal render target
-
-		this.normalRenderTarget = new WebGLRenderTarget( this.width, this.height, {
-			minFilter: NearestFilter,
-			magFilter: NearestFilter,
-			type: HalfFloatType,
 		} );
 
 		// metalness render target
@@ -362,11 +354,9 @@ class SSRPass extends Pass {
 		} );
 
 		this.ssrMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
-		this.ssrMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
 		this.ssrMaterial.defines.SELECTIVE = this.selective;
 		this.ssrMaterial.needsUpdate = true;
 		this.ssrMaterial.uniforms[ 'tMetalness' ].value = this.metalnessRenderTarget.texture;
-		this.ssrMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
 		this.ssrMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
 		this.ssrMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
 		this.ssrMaterial.uniforms[ 'thickness' ].value = this.thickness;
@@ -433,7 +423,6 @@ class SSRPass extends Pass {
 			fragmentShader: SSRDepthShader.fragmentShader,
 			blending: NoBlending
 		} );
-		this.depthRenderMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
 		this.depthRenderMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
 		this.depthRenderMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
 
@@ -458,6 +447,8 @@ class SSRPass extends Pass {
 		this.fsQuad = new FullScreenQuad( null );
 
 		this.originalClearColor = new Color();
+
+		this.setGBuffer( depthTexture, normalTexture );
 
 	}
 
@@ -485,6 +476,58 @@ class SSRPass extends Pass {
 	}
 
 	/**
+	 * Configures shared geometry inputs. Call without arguments to restore internal rendering.
+	 * Both textures must describe the same surfaces, frame, camera and projection as this pass.
+	 * Normals are unit view-space vectors encoded as RGB = normal * 0.5 + 0.5, with
+	 * NoColorSpace. Depth is a separate DepthTexture sampled from red, with near = 0
+	 * and far/background = 1. Reversed and logarithmic depth are not supported.
+	 * Inputs must match the pass width/height in physical pixels, use nearest filtering,
+	 * clamp-to-edge wrapping and no mipmaps. The caller renders, resizes and disposes them.
+	 *
+	 * @param {DepthTexture} [depthTexture] - External depth texture.
+	 * @param {Texture} [normalTexture] - External encoded view-space normal texture.
+	 */
+	setGBuffer( depthTexture, normalTexture ) {
+
+		if ( depthTexture !== undefined || normalTexture !== undefined ) {
+
+			if ( ! depthTexture?.isDepthTexture || ! normalTexture?.isTexture || depthTexture === normalTexture ) {
+
+				throw new Error( 'THREE.SSRPass: Expected a separate depth texture and normal texture.' );
+
+			}
+
+			if ( this.normalRenderTarget ) this.normalRenderTarget.dispose();
+			this.normalRenderTarget = null;
+			this.depthTexture = depthTexture;
+			this.normalTexture = normalTexture;
+			this._renderGBuffer = false;
+
+		} else {
+
+			if ( ! this._renderGBuffer ) {
+
+				this.normalRenderTarget = new WebGLRenderTarget( this.width, this.height, {
+					minFilter: NearestFilter,
+					magFilter: NearestFilter,
+					type: HalfFloatType
+				} );
+
+			}
+
+			this.depthTexture = this.beautyRenderTarget.depthTexture;
+			this.normalTexture = this.normalRenderTarget.texture;
+			this._renderGBuffer = true;
+
+		}
+
+		this.ssrMaterial.uniforms.tDepth.value = this.depthTexture;
+		this.ssrMaterial.uniforms.tNormal.value = this.normalTexture;
+		this.depthRenderMaterial.uniforms.tDepth.value = this.depthTexture;
+
+	}
+
+	/**
 	 * Frees the GPU-related resources allocated by this instance. Call this
 	 * method whenever the pass is no longer used in your app.
 	 */
@@ -494,7 +537,7 @@ class SSRPass extends Pass {
 
 		this.beautyRenderTarget.dispose();
 		this.prevRenderTarget.dispose();
-		this.normalRenderTarget.dispose();
+		if ( this.normalRenderTarget ) this.normalRenderTarget.dispose();
 		this.metalnessRenderTarget.dispose();
 		this.ssrRenderTarget.dispose();
 		this.blurRenderTarget.dispose();
@@ -503,6 +546,7 @@ class SSRPass extends Pass {
 
 		// dispose materials
 
+		this.ssrMaterial.dispose();
 		this.normalMaterial.dispose();
 		this.metalnessOnMaterial.dispose();
 		this.metalnessOffMaterial.dispose();
@@ -530,6 +574,50 @@ class SSRPass extends Pass {
 	 */
 	render( renderer, writeBuffer /*, readBuffer, deltaTime, maskActive */ ) {
 
+		const perspective = this.camera.isPerspectiveCamera ? true : undefined;
+		if ( this.ssrMaterial.defines.PERSPECTIVE_CAMERA !== perspective ) {
+
+			if ( perspective ) this.ssrMaterial.defines.PERSPECTIVE_CAMERA = true;
+			else delete this.ssrMaterial.defines.PERSPECTIVE_CAMERA;
+			this.ssrMaterial.needsUpdate = true;
+
+		}
+
+		const depthPerspective = this.camera.isPerspectiveCamera ? 1 : 0;
+		if ( this.depthRenderMaterial.defines.PERSPECTIVE_CAMERA !== depthPerspective ) {
+
+			this.depthRenderMaterial.defines.PERSPECTIVE_CAMERA = depthPerspective;
+			this.depthRenderMaterial.needsUpdate = true;
+
+		}
+
+		if ( ! this._renderGBuffer ) {
+
+			if ( renderer.capabilities.reversedDepthBuffer || renderer.capabilities.logarithmicDepthBuffer ) {
+
+				throw new Error( 'THREE.SSRPass: Shared inputs require conventional depth.' );
+
+			}
+
+			for ( const texture of [ this.depthTexture, this.normalTexture ] ) {
+
+				if ( texture.image?.width !== this.width || texture.image?.height !== this.height ) {
+
+					throw new Error( 'THREE.SSRPass: Shared inputs must match the pass dimensions.' );
+
+				}
+
+			}
+
+		}
+
+		this.ssrMaterial.uniforms.cameraNear.value = this.camera.near;
+		this.ssrMaterial.uniforms.cameraFar.value = this.camera.far;
+		this.ssrMaterial.uniforms.cameraProjectionMatrix.value.copy( this.camera.projectionMatrix );
+		this.ssrMaterial.uniforms.cameraInverseProjectionMatrix.value.copy( this.camera.projectionMatrixInverse );
+		this.depthRenderMaterial.uniforms.cameraNear.value = this.camera.near;
+		this.depthRenderMaterial.uniforms.cameraFar.value = this.camera.far;
+
 		// render beauty and depth
 
 		renderer.setRenderTarget( this.beautyRenderTarget );
@@ -547,7 +635,7 @@ class SSRPass extends Pass {
 
 		// render normals
 
-		this._renderOverride( renderer, this.normalMaterial, this.normalRenderTarget, 0, 0 );
+		if ( this._renderGBuffer ) this._renderOverride( renderer, this.normalMaterial, this.normalRenderTarget, 0, 0 );
 
 		// render metalnesses
 
@@ -656,7 +744,7 @@ class SSRPass extends Pass {
 
 			case SSRPass.OUTPUT.Normal:
 
-				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.normalRenderTarget.texture;
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.normalTexture;
 				this.copyMaterial.blending = NoBlending;
 				this._renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
@@ -695,7 +783,7 @@ class SSRPass extends Pass {
 		this.ssrMaterial.needsUpdate = true;
 
 		this.beautyRenderTarget.setSize( width, height );
-		this.normalRenderTarget.setSize( width, height );
+		if ( this.normalRenderTarget ) this.normalRenderTarget.setSize( width, height );
 		this.metalnessRenderTarget.setSize( width, height );
 		this.ssrRenderTarget.setSize( effectiveWidth, effectiveHeight );
 		this.prevRenderTarget.setSize( effectiveWidth, effectiveHeight );
@@ -842,6 +930,8 @@ class SSRPass extends Pass {
  * @property {number} [width=512] - The width of the effect.
  * @property {number} [height=512] - The width of the effect.
  * @property {?Array<Object3D>} [selects=null] - Which 3D objects should be affected by SSR. If not set, the entire scene is affected.
+ * @property {DepthTexture} [depthTexture] - Shared depth input (see setGBuffer).
+ * @property {Texture} [normalTexture] - Shared encoded view-space normal input (see setGBuffer).
  * @property {boolean} [bouncing=false] - Whether bouncing is enabled or not.
  * @property {?ReflectorForSSRPass} [groundReflector=null] - A ground reflector.
  **/
