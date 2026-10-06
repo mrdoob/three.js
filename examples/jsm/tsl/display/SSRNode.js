@@ -812,7 +812,7 @@ class SSRNode extends Node {
 
 			return cross( point.sub( linePointA ), point.sub( linePointB ) ).length().div( linePointB.sub( linePointA ).length() );
 
-		} );
+		}, { point: 'vec3', linePointA: 'vec3', linePointB: 'vec3', return: 'float' } );
 
 		const pointPlaneDistance = Fn( ( [ point, planePoint, planeNormal ] ) => {
 
@@ -825,7 +825,7 @@ class SSRNode extends Node {
 			const distance = mul( planeNormal.x, point.x ).add( mul( planeNormal.y, point.y ) ).add( mul( planeNormal.z, point.z ) ).add( d );
 			return distance;
 
-		} );
+		}, { point: 'vec3', planePoint: 'vec3', planeNormal: 'vec3', return: 'float' } );
 
 		const getViewZ = Fn( ( [ depth ] ) => {
 
@@ -878,14 +878,7 @@ class SSRNode extends Node {
 
 			return t.smoothstep( 0, 1 ).pow( 0.125 );
 
-		} ).setLayout( {
-			name: 'computeScreenBorderFactor',
-			type: 'float',
-			inputs: [
-				{ name: 'uvCoord', type: 'vec2' },
-				{ name: 'borderWidth', type: 'float' }
-			]
-		} );
+		}, { uvCoord: 'vec2', borderWidth: 'float', return: 'float' } );
 
 		const ssr = Fn( () => {
 

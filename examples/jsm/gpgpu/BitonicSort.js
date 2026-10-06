@@ -33,14 +33,7 @@ export const getBitonicFlipIndices = /*@__PURE__*/ Fn( ( [ index, blockHeight ] 
 
 	return idx;
 
-} ).setLayout( {
-	name: 'getBitonicFlipIndices',
-	type: 'uvec2',
-	inputs: [
-		{ name: 'index', type: 'uint' },
-		{ name: 'blockHeight', type: 'uint' }
-	]
-} );
+}, { index: 'uint', blockHeight: 'uint', return: 'uvec2' } );
 
 /**
  * Returns the indices that will be compared in a bitonic sort's disperse operation.
@@ -65,14 +58,7 @@ export const getBitonicDisperseIndices = /*@__PURE__*/ Fn( ( [ index, swapSpan ]
 
 	return idx;
 
-} ).setLayout( {
-	name: 'getBitonicDisperseIndices',
-	type: 'uvec2',
-	inputs: [
-		{ name: 'index', type: 'uint' },
-		{ name: 'blockHeight', type: 'uint' }
-	]
-} );
+}, { index: 'uint', blockHeight: 'uint', return: 'uvec2' } );
 
 export class BitonicSort {
 

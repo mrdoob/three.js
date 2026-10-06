@@ -41,16 +41,13 @@ const getVolumeTransmissionRay = /*@__PURE__*/ Fn( ( [ n, v, thickness, ior, mod
 	// The thickness is specified in local space.
 	return normalize( refractionVector ).mul( thickness.mul( modelScale ) );
 
-} ).setLayout( {
-	name: 'getVolumeTransmissionRay',
-	type: 'vec3',
-	inputs: [
-		{ name: 'n', type: 'vec3' },
-		{ name: 'v', type: 'vec3' },
-		{ name: 'thickness', type: 'float' },
-		{ name: 'ior', type: 'float' },
-		{ name: 'modelMatrix', type: 'mat4' }
-	]
+}, {
+	n: 'vec3',
+	v: 'vec3',
+	thickness: 'float',
+	ior: 'float',
+	modelMatrix: 'mat4',
+	return: 'vec3'
 } );
 
 const applyIorToRoughness = /*@__PURE__*/ Fn( ( [ roughness, ior ] ) => {
@@ -59,14 +56,7 @@ const applyIorToRoughness = /*@__PURE__*/ Fn( ( [ roughness, ior ] ) => {
 	// an IOR of 1.5 results in the default amount of microfacet refraction.
 	return roughness.mul( clamp( ior.mul( 2.0 ).sub( 2.0 ), 0.0, 1.0 ) );
 
-} ).setLayout( {
-	name: 'applyIorToRoughness',
-	type: 'float',
-	inputs: [
-		{ name: 'roughness', type: 'float' },
-		{ name: 'ior', type: 'float' }
-	]
-} );
+}, { roughness: 'float', ior: 'float', return: 'float' } );
 
 const viewportBackSideTexture = /*@__PURE__*/ viewportMipTexture();
 const viewportFrontSideTexture = /*@__PURE__*/ viewportOpaqueMipTexture();
@@ -99,15 +89,7 @@ const volumeAttenuation = /*@__PURE__*/ Fn( ( [ transmissionDistance, attenuatio
 	// Attenuation distance is +∞, i.e. the transmitted color is not attenuated at all.
 	return vec3( 1.0 );
 
-} ).setLayout( {
-	name: 'volumeAttenuation',
-	type: 'vec3',
-	inputs: [
-		{ name: 'transmissionDistance', type: 'float' },
-		{ name: 'attenuationColor', type: 'vec3' },
-		{ name: 'attenuationDistance', type: 'float' }
-	]
-} );
+}, { transmissionDistance: 'float', attenuationColor: 'vec3', attenuationDistance: 'float', return: 'vec3' } );
 
 const getIBLVolumeRefraction = /*@__PURE__*/ Fn( ( [ n, v, roughness, diffuseColor, specularColor, specularF90, position, modelMatrix, viewMatrix, projMatrix, ior, thickness, attenuationColor, attenuationDistance, dispersion ] ) => {
 
@@ -295,16 +277,13 @@ const evalIridescence = /*@__PURE__*/ Fn( ( { outsideIOR, eta2, cosTheta1, thinF
 	// Since out of gamut colors might be produced, negative color values are clamped to 0.
 	return I.max( vec3( 0.0 ) );
 
-} ).setLayout( {
-	name: 'evalIridescence',
-	type: 'vec3',
-	inputs: [
-		{ name: 'outsideIOR', type: 'float' },
-		{ name: 'eta2', type: 'float' },
-		{ name: 'cosTheta1', type: 'float' },
-		{ name: 'thinFilmThickness', type: 'float' },
-		{ name: 'baseF0', type: 'vec3' }
-	]
+}, {
+	outsideIOR: 'float',
+	eta2: 'float',
+	cosTheta1: 'float',
+	thinFilmThickness: 'float',
+	baseF0: 'vec3',
+	return: 'vec3'
 } );
 
 //
@@ -326,15 +305,7 @@ const IBLSheenBRDF = /*@__PURE__*/ Fn( ( { normal, viewDir, roughness } ) => {
 
 	return DG.saturate();
 
-} ).setLayout( {
-	name: 'IBLSheenBRDF',
-	type: 'float',
-	inputs: [
-		{ name: 'normal', type: 'vec3' },
-		{ name: 'viewDir', type: 'vec3' },
-		{ name: 'roughness', type: 'float' }
-	]
-} );
+}, { normal: 'vec3', viewDir: 'vec3', roughness: 'float', return: 'float' } );
 
 const clearcoatF0 = vec3( 0.04 );
 const clearcoatF90 = float( 1 );

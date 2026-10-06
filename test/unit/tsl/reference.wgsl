@@ -1101,10 +1101,10 @@ if ( ( result > 0.5 ) ) {
 
 // function
 
-fn fn2 ( value : f32 ) -> f32 {
+fn fn0 ( value : f32 ) -> f32 {
 
 	return ( value * value );
 
 }
 
-fn2( 3.0 )
+fn0( 3.0 )

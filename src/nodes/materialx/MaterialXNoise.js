@@ -15,15 +15,7 @@ export const mx_select = /*@__PURE__*/ Fn( ( [ b_immutable, t_immutable, f_immut
 
 	return select( b, t, f ).uniformFlow();
 
-} ).setLayout( {
-	name: 'mx_select',
-	type: 'float',
-	inputs: [
-		{ name: 'b', type: 'bool' },
-		{ name: 't', type: 'float' },
-		{ name: 'f', type: 'float' }
-	]
-} );
+}, { b: 'bool', t: 'float', f: 'float', return: 'float' } );
 
 export const mx_negate_if = /*@__PURE__*/ Fn( ( [ val_immutable, b_immutable ] ) => {
 
@@ -32,14 +24,7 @@ export const mx_negate_if = /*@__PURE__*/ Fn( ( [ val_immutable, b_immutable ] )
 
 	return select( b, val.negate(), val ).uniformFlow();
 
-} ).setLayout( {
-	name: 'mx_negate_if',
-	type: 'float',
-	inputs: [
-		{ name: 'val', type: 'float' },
-		{ name: 'b', type: 'bool' }
-	]
-} );
+}, { val: 'float', b: 'bool', return: 'float' } );
 
 export const mx_floor = /*@__PURE__*/ Fn( ( [ x_immutable ] ) => {
 
@@ -47,13 +32,7 @@ export const mx_floor = /*@__PURE__*/ Fn( ( [ x_immutable ] ) => {
 
 	return int( floor( x ) );
 
-} ).setLayout( {
-	name: 'mx_floor',
-	type: 'int',
-	inputs: [
-		{ name: 'x', type: 'float' }
-	]
-} );
+}, { x: 'float', return: 'int' } );
 
 export const mx_floorfrac = /*@__PURE__*/ Fn( ( [ x_immutable, i ] ) => {
 
@@ -91,17 +70,14 @@ export const mx_bilerp_0 = /*@__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2_
 
 	return mxBilerpValue( v0, v1, v2, v3, s, t );
 
-} ).setLayout( {
-	name: 'mx_bilerp_0',
-	type: 'float',
-	inputs: [
-		{ name: 'v0', type: 'float' },
-		{ name: 'v1', type: 'float' },
-		{ name: 'v2', type: 'float' },
-		{ name: 'v3', type: 'float' },
-		{ name: 's', type: 'float' },
-		{ name: 't', type: 'float' }
-	]
+}, {
+	v0: 'float',
+	v1: 'float',
+	v2: 'float',
+	v3: 'float',
+	s: 'float',
+	t: 'float',
+	return: 'float'
 } );
 
 export const mx_bilerp_1 = /*@__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2_immutable, v3_immutable, s_immutable, t_immutable ] ) => {
@@ -115,17 +91,14 @@ export const mx_bilerp_1 = /*@__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2_
 
 	return mxBilerpValue( v0, v1, v2, v3, s, t );
 
-} ).setLayout( {
-	name: 'mx_bilerp_1',
-	type: 'vec3',
-	inputs: [
-		{ name: 'v0', type: 'vec3' },
-		{ name: 'v1', type: 'vec3' },
-		{ name: 'v2', type: 'vec3' },
-		{ name: 'v3', type: 'vec3' },
-		{ name: 's', type: 'float' },
-		{ name: 't', type: 'float' }
-	]
+}, {
+	v0: 'vec3',
+	v1: 'vec3',
+	v2: 'vec3',
+	v3: 'vec3',
+	s: 'float',
+	t: 'float',
+	return: 'vec3'
 } );
 
 export const mx_bilerp = /*@__PURE__*/ overloadingFn( [ mx_bilerp_0, mx_bilerp_1 ] );
@@ -146,22 +119,19 @@ export const mx_trilerp_0 = /*@__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2
 
 	return mxTrilerpValue( v0, v1, v2, v3, v4, v5, v6, v7, s, t, r );
 
-} ).setLayout( {
-	name: 'mx_trilerp_0',
-	type: 'float',
-	inputs: [
-		{ name: 'v0', type: 'float' },
-		{ name: 'v1', type: 'float' },
-		{ name: 'v2', type: 'float' },
-		{ name: 'v3', type: 'float' },
-		{ name: 'v4', type: 'float' },
-		{ name: 'v5', type: 'float' },
-		{ name: 'v6', type: 'float' },
-		{ name: 'v7', type: 'float' },
-		{ name: 's', type: 'float' },
-		{ name: 't', type: 'float' },
-		{ name: 'r', type: 'float' }
-	]
+}, {
+	v0: 'float',
+	v1: 'float',
+	v2: 'float',
+	v3: 'float',
+	v4: 'float',
+	v5: 'float',
+	v6: 'float',
+	v7: 'float',
+	s: 'float',
+	t: 'float',
+	r: 'float',
+	return: 'float'
 } );
 
 export const mx_trilerp_1 = /*@__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2_immutable, v3_immutable, v4_immutable, v5_immutable, v6_immutable, v7_immutable, s_immutable, t_immutable, r_immutable ] ) => {
@@ -180,22 +150,19 @@ export const mx_trilerp_1 = /*@__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2
 
 	return mxTrilerpValue( v0, v1, v2, v3, v4, v5, v6, v7, s, t, r );
 
-} ).setLayout( {
-	name: 'mx_trilerp_1',
-	type: 'vec3',
-	inputs: [
-		{ name: 'v0', type: 'vec3' },
-		{ name: 'v1', type: 'vec3' },
-		{ name: 'v2', type: 'vec3' },
-		{ name: 'v3', type: 'vec3' },
-		{ name: 'v4', type: 'vec3' },
-		{ name: 'v5', type: 'vec3' },
-		{ name: 'v6', type: 'vec3' },
-		{ name: 'v7', type: 'vec3' },
-		{ name: 's', type: 'float' },
-		{ name: 't', type: 'float' },
-		{ name: 'r', type: 'float' }
-	]
+}, {
+	v0: 'vec3',
+	v1: 'vec3',
+	v2: 'vec3',
+	v3: 'vec3',
+	v4: 'vec3',
+	v5: 'vec3',
+	v6: 'vec3',
+	v7: 'vec3',
+	s: 'float',
+	t: 'float',
+	r: 'float',
+	return: 'vec3'
 } );
 
 export const mx_trilerp = /*@__PURE__*/ overloadingFn( [ mx_trilerp_0, mx_trilerp_1 ] );
@@ -211,15 +178,7 @@ export const mx_gradient_float_0 = /*@__PURE__*/ Fn( ( [ hash_immutable, x_immut
 
 	return mx_negate_if( u, bool( h.bitAnd( uint( 1 ) ) ) ).add( mx_negate_if( v, bool( h.bitAnd( uint( 2 ) ) ) ) );
 
-} ).setLayout( {
-	name: 'mx_gradient_float_0',
-	type: 'float',
-	inputs: [
-		{ name: 'hash', type: 'uint' },
-		{ name: 'x', type: 'float' },
-		{ name: 'y', type: 'float' }
-	]
-} );
+}, { hash: 'uint', x: 'float', y: 'float', return: 'float' } );
 
 export const mx_gradient_float_1 = /*@__PURE__*/ Fn( ( [ hash_immutable, x_immutable, y_immutable, z_immutable ] ) => {
 
@@ -233,15 +192,12 @@ export const mx_gradient_float_1 = /*@__PURE__*/ Fn( ( [ hash_immutable, x_immut
 
 	return mx_negate_if( u, bool( h.bitAnd( uint( 1 ) ) ) ).add( mx_negate_if( v, bool( h.bitAnd( uint( 2 ) ) ) ) );
 
-} ).setLayout( {
-	name: 'mx_gradient_float_1',
-	type: 'float',
-	inputs: [
-		{ name: 'hash', type: 'uint' },
-		{ name: 'x', type: 'float' },
-		{ name: 'y', type: 'float' },
-		{ name: 'z', type: 'float' }
-	]
+}, {
+	hash: 'uint',
+	x: 'float',
+	y: 'float',
+	z: 'float',
+	return: 'float'
 } );
 
 export const mx_gradient_float = /*@__PURE__*/ overloadingFn( [ mx_gradient_float_0, mx_gradient_float_1 ] );
@@ -254,15 +210,7 @@ export const mx_gradient_vec3_0 = /*@__PURE__*/ Fn( ( [ hash_immutable, x_immuta
 
 	return vec3( mx_gradient_float( hash.x, x, y ), mx_gradient_float( hash.y, x, y ), mx_gradient_float( hash.z, x, y ) );
 
-} ).setLayout( {
-	name: 'mx_gradient_vec3_0',
-	type: 'vec3',
-	inputs: [
-		{ name: 'hash', type: 'uvec3' },
-		{ name: 'x', type: 'float' },
-		{ name: 'y', type: 'float' }
-	]
-} );
+}, { hash: 'uvec3', x: 'float', y: 'float', return: 'vec3' } );
 
 export const mx_gradient_vec3_1 = /*@__PURE__*/ Fn( ( [ hash_immutable, x_immutable, y_immutable, z_immutable ] ) => {
 
@@ -273,15 +221,12 @@ export const mx_gradient_vec3_1 = /*@__PURE__*/ Fn( ( [ hash_immutable, x_immuta
 
 	return vec3( mx_gradient_float( hash.x, x, y, z ), mx_gradient_float( hash.y, x, y, z ), mx_gradient_float( hash.z, x, y, z ) );
 
-} ).setLayout( {
-	name: 'mx_gradient_vec3_1',
-	type: 'vec3',
-	inputs: [
-		{ name: 'hash', type: 'uvec3' },
-		{ name: 'x', type: 'float' },
-		{ name: 'y', type: 'float' },
-		{ name: 'z', type: 'float' }
-	]
+}, {
+	hash: 'uvec3',
+	x: 'float',
+	y: 'float',
+	z: 'float',
+	return: 'vec3'
 } );
 
 export const mx_gradient_vec3 = /*@__PURE__*/ overloadingFn( [ mx_gradient_vec3_0, mx_gradient_vec3_1 ] );
@@ -292,13 +237,7 @@ export const mx_gradient_scale2d_0 = /*@__PURE__*/ Fn( ( [ v_immutable ] ) => {
 
 	return mul( 0.6616, v );
 
-} ).setLayout( {
-	name: 'mx_gradient_scale2d_0',
-	type: 'float',
-	inputs: [
-		{ name: 'v', type: 'float' }
-	]
-} );
+}, { v: 'float', return: 'float' } );
 
 export const mx_gradient_scale3d_0 = /*@__PURE__*/ Fn( ( [ v_immutable ] ) => {
 
@@ -306,13 +245,7 @@ export const mx_gradient_scale3d_0 = /*@__PURE__*/ Fn( ( [ v_immutable ] ) => {
 
 	return mul( 0.9820, v );
 
-} ).setLayout( {
-	name: 'mx_gradient_scale3d_0',
-	type: 'float',
-	inputs: [
-		{ name: 'v', type: 'float' }
-	]
-} );
+}, { v: 'float', return: 'float' } );
 
 export const mx_gradient_scale2d_1 = /*@__PURE__*/ Fn( ( [ v_immutable ] ) => {
 
@@ -320,13 +253,7 @@ export const mx_gradient_scale2d_1 = /*@__PURE__*/ Fn( ( [ v_immutable ] ) => {
 
 	return mul( 0.6616, v );
 
-} ).setLayout( {
-	name: 'mx_gradient_scale2d_1',
-	type: 'vec3',
-	inputs: [
-		{ name: 'v', type: 'vec3' }
-	]
-} );
+}, { v: 'vec3', return: 'vec3' } );
 
 export const mx_gradient_scale2d = /*@__PURE__*/ overloadingFn( [ mx_gradient_scale2d_0, mx_gradient_scale2d_1 ] );
 
@@ -336,13 +263,7 @@ export const mx_gradient_scale3d_1 = /*@__PURE__*/ Fn( ( [ v_immutable ] ) => {
 
 	return mul( 0.9820, v );
 
-} ).setLayout( {
-	name: 'mx_gradient_scale3d_1',
-	type: 'vec3',
-	inputs: [
-		{ name: 'v', type: 'vec3' }
-	]
-} );
+}, { v: 'vec3', return: 'vec3' } );
 
 export const mx_gradient_scale3d = /*@__PURE__*/ overloadingFn( [ mx_gradient_scale3d_0, mx_gradient_scale3d_1 ] );
 
@@ -353,14 +274,7 @@ export const mx_rotl32 = /*@__PURE__*/ Fn( ( [ x_immutable, k_immutable ] ) => {
 
 	return x.shiftLeft( k ).bitOr( x.shiftRight( int( 32 ).sub( k ) ) );
 
-} ).setLayout( {
-	name: 'mx_rotl32',
-	type: 'uint',
-	inputs: [
-		{ name: 'x', type: 'uint' },
-		{ name: 'k', type: 'int' }
-	]
-} );
+}, { x: 'uint', k: 'int', return: 'uint' } );
 
 export const mx_bjmix = /*@__PURE__*/ Fn( ( [ a, b, c ] ) => {
 
@@ -388,15 +302,7 @@ export const mx_bjmix = /*@__PURE__*/ Fn( ( [ a, b, c ] ) => {
 
 	return uvec3( a, b, c );
 
-} ).setLayout( {
-	name: 'mx_bjmix',
-	type: 'uvec3',
-	inputs: [
-		{ name: 'a', type: 'uint' },
-		{ name: 'b', type: 'uint' },
-		{ name: 'c', type: 'uint' }
-	]
-} );
+}, { a: 'uint', b: 'uint', c: 'uint', return: 'uvec3' } );
 
 export const mx_bjfinal = /*@__PURE__*/ Fn( ( [ a_immutable, b_immutable, c_immutable ] ) => {
 
@@ -420,15 +326,7 @@ export const mx_bjfinal = /*@__PURE__*/ Fn( ( [ a_immutable, b_immutable, c_immu
 
 	return c;
 
-} ).setLayout( {
-	name: 'mx_bjfinal',
-	type: 'uint',
-	inputs: [
-		{ name: 'a', type: 'uint' },
-		{ name: 'b', type: 'uint' },
-		{ name: 'c', type: 'uint' }
-	]
-} );
+}, { a: 'uint', b: 'uint', c: 'uint', return: 'uint' } );
 
 export const mx_bits_to_01 = /*@__PURE__*/ Fn( ( [ bits_immutable ] ) => {
 
@@ -436,13 +334,7 @@ export const mx_bits_to_01 = /*@__PURE__*/ Fn( ( [ bits_immutable ] ) => {
 
 	return float( bits ).div( float( uint( 0xffffffff ) ) );
 
-} ).setLayout( {
-	name: 'mx_bits_to_01',
-	type: 'float',
-	inputs: [
-		{ name: 'bits', type: 'uint' }
-	]
-} );
+}, { bits: 'uint', return: 'float' } );
 
 export const mx_fade = /*@__PURE__*/ Fn( ( [ t_immutable ] ) => {
 
@@ -450,13 +342,7 @@ export const mx_fade = /*@__PURE__*/ Fn( ( [ t_immutable ] ) => {
 
 	return t.mul( t ).mul( t ).mul( t.mul( t.mul( 6.0 ).sub( 15.0 ) ).add( 10.0 ) );
 
-} ).setLayout( {
-	name: 'mx_fade',
-	type: 'float',
-	inputs: [
-		{ name: 't', type: 'float' }
-	]
-} );
+}, { t: 'float', return: 'float' } );
 
 export const mx_hash_int_0 = /*@__PURE__*/ Fn( ( [ x_immutable ] ) => {
 
@@ -466,13 +352,7 @@ export const mx_hash_int_0 = /*@__PURE__*/ Fn( ( [ x_immutable ] ) => {
 
 	return mx_bjfinal( seed.add( uint( x ) ), seed, seed );
 
-} ).setLayout( {
-	name: 'mx_hash_int_0',
-	type: 'uint',
-	inputs: [
-		{ name: 'x', type: 'int' }
-	]
-} );
+}, { x: 'int', return: 'uint' } );
 
 export const mx_hash_int_1 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable ] ) => {
 
@@ -486,14 +366,7 @@ export const mx_hash_int_1 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable ] ) 
 
 	return mx_bjfinal( a, b, c );
 
-} ).setLayout( {
-	name: 'mx_hash_int_1',
-	type: 'uint',
-	inputs: [
-		{ name: 'x', type: 'int' },
-		{ name: 'y', type: 'int' }
-	]
-} );
+}, { x: 'int', y: 'int', return: 'uint' } );
 
 export const mx_hash_int_2 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_immutable ] ) => {
 
@@ -509,15 +382,7 @@ export const mx_hash_int_2 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_i
 
 	return mx_bjfinal( a, b, c );
 
-} ).setLayout( {
-	name: 'mx_hash_int_2',
-	type: 'uint',
-	inputs: [
-		{ name: 'x', type: 'int' },
-		{ name: 'y', type: 'int' },
-		{ name: 'z', type: 'int' }
-	]
-} );
+}, { x: 'int', y: 'int', z: 'int', return: 'uint' } );
 
 export const mx_hash_int_3 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_immutable, xx_immutable ] ) => {
 
@@ -539,15 +404,12 @@ export const mx_hash_int_3 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_i
 
 	return mx_bjfinal( a, b, c );
 
-} ).setLayout( {
-	name: 'mx_hash_int_3',
-	type: 'uint',
-	inputs: [
-		{ name: 'x', type: 'int' },
-		{ name: 'y', type: 'int' },
-		{ name: 'z', type: 'int' },
-		{ name: 'xx', type: 'int' }
-	]
+}, {
+	x: 'int',
+	y: 'int',
+	z: 'int',
+	xx: 'int',
+	return: 'uint'
 } );
 
 export const mx_hash_int_4 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_immutable, xx_immutable, yy_immutable ] ) => {
@@ -572,16 +434,13 @@ export const mx_hash_int_4 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_i
 
 	return mx_bjfinal( a, b, c );
 
-} ).setLayout( {
-	name: 'mx_hash_int_4',
-	type: 'uint',
-	inputs: [
-		{ name: 'x', type: 'int' },
-		{ name: 'y', type: 'int' },
-		{ name: 'z', type: 'int' },
-		{ name: 'xx', type: 'int' },
-		{ name: 'yy', type: 'int' }
-	]
+}, {
+	x: 'int',
+	y: 'int',
+	z: 'int',
+	xx: 'int',
+	yy: 'int',
+	return: 'uint'
 } );
 
 export const mx_hash_int = /*@__PURE__*/ overloadingFn( [ mx_hash_int_0, mx_hash_int_1, mx_hash_int_2, mx_hash_int_3, mx_hash_int_4 ] );
@@ -598,14 +457,7 @@ export const mx_hash_vec3_0 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable ] )
 
 	return result;
 
-} ).setLayout( {
-	name: 'mx_hash_vec3_0',
-	type: 'uvec3',
-	inputs: [
-		{ name: 'x', type: 'int' },
-		{ name: 'y', type: 'int' }
-	]
-} );
+}, { x: 'int', y: 'int', return: 'uvec3' } );
 
 export const mx_hash_vec3_1 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_immutable ] ) => {
 
@@ -620,15 +472,7 @@ export const mx_hash_vec3_1 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_
 
 	return result;
 
-} ).setLayout( {
-	name: 'mx_hash_vec3_1',
-	type: 'uvec3',
-	inputs: [
-		{ name: 'x', type: 'int' },
-		{ name: 'y', type: 'int' },
-		{ name: 'z', type: 'int' }
-	]
-} );
+}, { x: 'int', y: 'int', z: 'int', return: 'uvec3' } );
 
 export const mx_hash_vec3 = /*@__PURE__*/ overloadingFn( [ mx_hash_vec3_0, mx_hash_vec3_1 ] );
 
@@ -644,13 +488,7 @@ export const mx_perlin_noise_float_0 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => 
 
 	return mx_gradient_scale2d( result );
 
-} ).setLayout( {
-	name: 'mx_perlin_noise_float_0',
-	type: 'float',
-	inputs: [
-		{ name: 'p', type: 'vec2' }
-	]
-} );
+}, { p: 'vec2', return: 'float' } );
 
 export const mx_perlin_noise_float_1 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 
@@ -666,13 +504,7 @@ export const mx_perlin_noise_float_1 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => 
 
 	return mx_gradient_scale3d( result );
 
-} ).setLayout( {
-	name: 'mx_perlin_noise_float_1',
-	type: 'float',
-	inputs: [
-		{ name: 'p', type: 'vec3' }
-	]
-} );
+}, { p: 'vec3', return: 'float' } );
 
 export const mx_perlin_noise_float = /*@__PURE__*/ overloadingFn( [ mx_perlin_noise_float_0, mx_perlin_noise_float_1 ] );
 
@@ -688,13 +520,7 @@ export const mx_perlin_noise_vec3_0 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 
 	return mx_gradient_scale2d( result );
 
-} ).setLayout( {
-	name: 'mx_perlin_noise_vec3_0',
-	type: 'vec3',
-	inputs: [
-		{ name: 'p', type: 'vec2' }
-	]
-} );
+}, { p: 'vec2', return: 'vec3' } );
 
 export const mx_perlin_noise_vec3_1 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 
@@ -710,13 +536,7 @@ export const mx_perlin_noise_vec3_1 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 
 	return mx_gradient_scale3d( result );
 
-} ).setLayout( {
-	name: 'mx_perlin_noise_vec3_1',
-	type: 'vec3',
-	inputs: [
-		{ name: 'p', type: 'vec3' }
-	]
-} );
+}, { p: 'vec3', return: 'vec3' } );
 
 export const mx_perlin_noise_vec3 = /*@__PURE__*/ overloadingFn( [ mx_perlin_noise_vec3_0, mx_perlin_noise_vec3_1 ] );
 
@@ -727,13 +547,7 @@ export const mx_cell_noise_float_0 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 
 	return mx_bits_to_01( mx_hash_int( ix ) );
 
-} ).setLayout( {
-	name: 'mx_cell_noise_float_0',
-	type: 'float',
-	inputs: [
-		{ name: 'p', type: 'float' }
-	]
-} );
+}, { p: 'float', return: 'float' } );
 
 export const mx_cell_noise_float_1 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 
@@ -743,13 +557,7 @@ export const mx_cell_noise_float_1 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 
 	return mx_bits_to_01( mx_hash_int( ix, iy ) );
 
-} ).setLayout( {
-	name: 'mx_cell_noise_float_1',
-	type: 'float',
-	inputs: [
-		{ name: 'p', type: 'vec2' }
-	]
-} );
+}, { p: 'vec2', return: 'float' } );
 
 export const mx_cell_noise_float_2 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 
@@ -760,13 +568,7 @@ export const mx_cell_noise_float_2 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 
 	return mx_bits_to_01( mx_hash_int( ix, iy, iz ) );
 
-} ).setLayout( {
-	name: 'mx_cell_noise_float_2',
-	type: 'float',
-	inputs: [
-		{ name: 'p', type: 'vec3' }
-	]
-} );
+}, { p: 'vec3', return: 'float' } );
 
 export const mx_cell_noise_float_3 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 
@@ -778,13 +580,7 @@ export const mx_cell_noise_float_3 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 
 	return mx_bits_to_01( mx_hash_int( ix, iy, iz, iw ) );
 
-} ).setLayout( {
-	name: 'mx_cell_noise_float_3',
-	type: 'float',
-	inputs: [
-		{ name: 'p', type: 'vec4' }
-	]
-} );
+}, { p: 'vec4', return: 'float' } );
 
 export const mx_cell_noise_float = /*@__PURE__*/ overloadingFn( [ mx_cell_noise_float_0, mx_cell_noise_float_1, mx_cell_noise_float_2, mx_cell_noise_float_3 ] );
 
@@ -799,13 +595,7 @@ export const mx_cell_noise_vec3_0 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 		mx_bits_to_01( mx_hash_int( ix, int( 2 ) ) )
 	);
 
-} ).setLayout( {
-	name: 'mx_cell_noise_vec3_0',
-	type: 'vec3',
-	inputs: [
-		{ name: 'p', type: 'float' }
-	]
-} );
+}, { p: 'float', return: 'vec3' } );
 
 export const mx_cell_noise_vec3_1 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 
@@ -819,13 +609,7 @@ export const mx_cell_noise_vec3_1 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 		mx_bits_to_01( mx_hash_int( ix, iy, int( 2 ) ) )
 	);
 
-} ).setLayout( {
-	name: 'mx_cell_noise_vec3_1',
-	type: 'vec3',
-	inputs: [
-		{ name: 'p', type: 'vec2' }
-	]
-} );
+}, { p: 'vec2', return: 'vec3' } );
 
 export const mx_cell_noise_vec3_2 = /*@__PURE__*/ Fn( ( [ positionInput ] ) => {
 
@@ -851,13 +635,7 @@ export const mx_cell_noise_vec3_2 = /*@__PURE__*/ Fn( ( [ positionInput ] ) => {
 		mx_bits_to_01( hash2 )
 	);
 
-} ).setLayout( {
-	name: 'mx_cell_noise_vec3_2',
-	type: 'vec3',
-	inputs: [
-		{ name: 'p', type: 'vec3' }
-	]
-} );
+}, { p: 'vec3', return: 'vec3' } );
 
 export const mx_cell_noise_vec3_3 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 
@@ -885,13 +663,7 @@ export const mx_cell_noise_vec3_3 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 		mx_bits_to_01( mx_bjfinal( a, add( b, uint( 2 ) ), c ) )
 	);
 
-} ).setLayout( {
-	name: 'mx_cell_noise_vec3_3',
-	type: 'vec3',
-	inputs: [
-		{ name: 'p', type: 'vec4' }
-	]
-} );
+}, { p: 'vec4', return: 'vec3' } );
 
 export const mx_cell_noise_vec3 = /*@__PURE__*/ overloadingFn( [ mx_cell_noise_vec3_0, mx_cell_noise_vec3_1, mx_cell_noise_vec3_2, mx_cell_noise_vec3_3 ] );
 
@@ -919,7 +691,7 @@ const mx_cell_noise_vec3_3d = /*@__PURE__*/ Fn( ( [ positionInput ] ) => {
 		mx_bits_to_01( hash2 )
 	);
 
-} );
+}, { position: 'vec3', return: 'vec3' } );
 
 export const mx_fractal_noise_float_2d = /*@__PURE__*/ Fn( ( [ p_immutable, octaves_immutable, lacunarity_immutable, diminish_immutable ] ) => {
 
@@ -940,15 +712,12 @@ export const mx_fractal_noise_float_2d = /*@__PURE__*/ Fn( ( [ p_immutable, octa
 
 	return result;
 
-} ).setLayout( {
-	name: 'mx_fractal_noise_float_2d',
-	type: 'float',
-	inputs: [
-		{ name: 'p', type: 'vec2' },
-		{ name: 'octaves', type: 'int' },
-		{ name: 'lacunarity', type: 'float' },
-		{ name: 'diminish', type: 'float' }
-	]
+}, {
+	p: 'vec2',
+	octaves: 'int',
+	lacunarity: 'float',
+	diminish: 'float',
+	return: 'float'
 } );
 
 export const mx_fractal_noise_float = /*@__PURE__*/ Fn( ( [ p_immutable, octaves_immutable, lacunarity_immutable, diminish_immutable ] ) => {
@@ -970,15 +739,12 @@ export const mx_fractal_noise_float = /*@__PURE__*/ Fn( ( [ p_immutable, octaves
 
 	return result;
 
-} ).setLayout( {
-	name: 'mx_fractal_noise_float',
-	type: 'float',
-	inputs: [
-		{ name: 'p', type: 'vec3' },
-		{ name: 'octaves', type: 'int' },
-		{ name: 'lacunarity', type: 'float' },
-		{ name: 'diminish', type: 'float' }
-	]
+}, {
+	p: 'vec3',
+	octaves: 'int',
+	lacunarity: 'float',
+	diminish: 'float',
+	return: 'float'
 } );
 
 export const mx_fractal_noise_vec3 = /*@__PURE__*/ Fn( ( [ p_immutable, octaves_immutable, lacunarity_immutable, diminish_immutable ] ) => {
@@ -1000,15 +766,12 @@ export const mx_fractal_noise_vec3 = /*@__PURE__*/ Fn( ( [ p_immutable, octaves_
 
 	return result;
 
-} ).setLayout( {
-	name: 'mx_fractal_noise_vec3',
-	type: 'vec3',
-	inputs: [
-		{ name: 'p', type: 'vec3' },
-		{ name: 'octaves', type: 'int' },
-		{ name: 'lacunarity', type: 'float' },
-		{ name: 'diminish', type: 'float' }
-	]
+}, {
+	p: 'vec3',
+	octaves: 'int',
+	lacunarity: 'float',
+	diminish: 'float',
+	return: 'vec3'
 } );
 
 export const mx_fractal_noise_vec2 = /*@__PURE__*/ Fn( ( [ p_immutable, octaves_immutable, lacunarity_immutable, diminish_immutable ] ) => {
@@ -1020,15 +783,12 @@ export const mx_fractal_noise_vec2 = /*@__PURE__*/ Fn( ( [ p_immutable, octaves_
 
 	return vec2( mx_fractal_noise_float( p, octaves, lacunarity, diminish ), mx_fractal_noise_float( p.add( vec3( int( 19 ), int( 193 ), int( 17 ) ) ), octaves, lacunarity, diminish ) );
 
-} ).setLayout( {
-	name: 'mx_fractal_noise_vec2',
-	type: 'vec2',
-	inputs: [
-		{ name: 'p', type: 'vec3' },
-		{ name: 'octaves', type: 'int' },
-		{ name: 'lacunarity', type: 'float' },
-		{ name: 'diminish', type: 'float' }
-	]
+}, {
+	p: 'vec3',
+	octaves: 'int',
+	lacunarity: 'float',
+	diminish: 'float',
+	return: 'vec2'
 } );
 
 export const mx_fractal_noise_vec4 = /*@__PURE__*/ Fn( ( [ p_immutable, octaves_immutable, lacunarity_immutable, diminish_immutable ] ) => {
@@ -1042,15 +802,12 @@ export const mx_fractal_noise_vec4 = /*@__PURE__*/ Fn( ( [ p_immutable, octaves_
 
 	return vec4( c, f );
 
-} ).setLayout( {
-	name: 'mx_fractal_noise_vec4',
-	type: 'vec4',
-	inputs: [
-		{ name: 'p', type: 'vec3' },
-		{ name: 'octaves', type: 'int' },
-		{ name: 'lacunarity', type: 'float' },
-		{ name: 'diminish', type: 'float' }
-	]
+}, {
+	p: 'vec3',
+	octaves: 'int',
+	lacunarity: 'float',
+	diminish: 'float',
+	return: 'vec4'
 } );
 
 export const mx_worley_distance_0 = /*@__PURE__*/ Fn( ( [ p_immutable, x_immutable, y_immutable, xoff_immutable, yoff_immutable, jitter_immutable, metric_immutable ] ) => {
@@ -1084,18 +841,15 @@ export const mx_worley_distance_0 = /*@__PURE__*/ Fn( ( [ p_immutable, x_immutab
 
 	return dot( diff, diff );
 
-} ).setLayout( {
-	name: 'mx_worley_distance_0',
-	type: 'float',
-	inputs: [
-		{ name: 'p', type: 'vec2' },
-		{ name: 'x', type: 'int' },
-		{ name: 'y', type: 'int' },
-		{ name: 'xoff', type: 'int' },
-		{ name: 'yoff', type: 'int' },
-		{ name: 'jitter', type: 'float' },
-		{ name: 'metric', type: 'int' }
-	]
+}, {
+	p: 'vec2',
+	x: 'int',
+	y: 'int',
+	xoff: 'int',
+	yoff: 'int',
+	jitter: 'float',
+	metric: 'int',
+	return: 'float'
 } );
 
 export const mx_worley_distance_1 = /*@__PURE__*/ Fn( ( [ p_immutable, x_immutable, y_immutable, z_immutable, xoff_immutable, yoff_immutable, zoff_immutable, jitter_immutable, metric_immutable ] ) => {
@@ -1130,20 +884,17 @@ export const mx_worley_distance_1 = /*@__PURE__*/ Fn( ( [ p_immutable, x_immutab
 
 	return dot( diff, diff );
 
-} ).setLayout( {
-	name: 'mx_worley_distance_1',
-	type: 'float',
-	inputs: [
-		{ name: 'p', type: 'vec3' },
-		{ name: 'x', type: 'int' },
-		{ name: 'y', type: 'int' },
-		{ name: 'z', type: 'int' },
-		{ name: 'xoff', type: 'int' },
-		{ name: 'yoff', type: 'int' },
-		{ name: 'zoff', type: 'int' },
-		{ name: 'jitter', type: 'float' },
-		{ name: 'metric', type: 'int' }
-	]
+}, {
+	p: 'vec3',
+	x: 'int',
+	y: 'int',
+	z: 'int',
+	xoff: 'int',
+	yoff: 'int',
+	zoff: 'int',
+	jitter: 'float',
+	metric: 'int',
+	return: 'float'
 } );
 
 export const mx_worley_distance = /*@__PURE__*/ overloadingFn( [ mx_worley_distance_0, mx_worley_distance_1 ] );
@@ -1198,7 +949,7 @@ export const mx_worley_noise_float_3d = /*@__PURE__*/ Fn( ( [ positionInput, jit
 
 	return sqdist;
 
-} );
+}, { position: 'vec3', jitter: 'float', style: 'int', return: 'float' } );
 
 export const mx_worley_noise_float_2d = /*@__PURE__*/ Fn( ( [ texcoordInput, jitterInput, styleInput ] ) => {
 
@@ -1246,7 +997,7 @@ export const mx_worley_noise_float_2d = /*@__PURE__*/ Fn( ( [ texcoordInput, jit
 
 	return sqdist;
 
-} );
+}, { texcoord: 'vec2', jitter: 'float', style: 'int', return: 'float' } );
 
 export const mx_worley_noise_float = /*@__PURE__*/ overloadingFn( [ mx_worley_noise_float_2d, mx_worley_noise_float_3d ] );
 
@@ -1288,15 +1039,7 @@ export const mx_worley_noise_vec2_0 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_
 
 	return sqdist;
 
-} ).setLayout( {
-	name: 'mx_worley_noise_vec2_0',
-	type: 'vec2',
-	inputs: [
-		{ name: 'p', type: 'vec2' },
-		{ name: 'jitter', type: 'float' },
-		{ name: 'metric', type: 'int' }
-	]
-} );
+}, { p: 'vec2', jitter: 'float', metric: 'int', return: 'vec2' } );
 
 export const mx_worley_noise_vec3_0 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
 
@@ -1342,15 +1085,7 @@ export const mx_worley_noise_vec3_0 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_
 
 	return sqdist;
 
-} ).setLayout( {
-	name: 'mx_worley_noise_vec3_0',
-	type: 'vec3',
-	inputs: [
-		{ name: 'p', type: 'vec2' },
-		{ name: 'jitter', type: 'float' },
-		{ name: 'metric', type: 'int' }
-	]
-} );
+}, { p: 'vec2', jitter: 'float', metric: 'int', return: 'vec3' } );
 
 export const mx_worley_noise_vec2_1 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
 
@@ -1394,15 +1129,7 @@ export const mx_worley_noise_vec2_1 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_
 
 	return sqdist;
 
-} ).setLayout( {
-	name: 'mx_worley_noise_vec2_1',
-	type: 'vec2',
-	inputs: [
-		{ name: 'p', type: 'vec3' },
-		{ name: 'jitter', type: 'float' },
-		{ name: 'metric', type: 'int' }
-	]
-} );
+}, { p: 'vec3', jitter: 'float', metric: 'int', return: 'vec2' } );
 
 export const mx_worley_noise_vec2 = /*@__PURE__*/ overloadingFn( [ mx_worley_noise_vec2_0, mx_worley_noise_vec2_1 ] );
 
@@ -1454,15 +1181,7 @@ export const mx_worley_noise_vec3_1 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_
 
 	return sqdist;
 
-} ).setLayout( {
-	name: 'mx_worley_noise_vec3_1',
-	type: 'vec3',
-	inputs: [
-		{ name: 'p', type: 'vec3' },
-		{ name: 'jitter', type: 'float' },
-		{ name: 'metric', type: 'int' }
-	]
-} );
+}, { p: 'vec3', jitter: 'float', metric: 'int', return: 'vec3' } );
 
 export const mx_worley_noise_vec3 = /*@__PURE__*/ overloadingFn( [ mx_worley_noise_vec3_0, mx_worley_noise_vec3_1 ] );
 
@@ -1509,15 +1228,12 @@ export const mx_worley_noise_vec3_style_0 = /*@__PURE__*/ Fn( ( [ p_immutable, j
 
 	return result;
 
-} ).setLayout( {
-	name: 'mx_worley_noise_vec3_style_0',
-	type: 'vec3',
-	inputs: [
-		{ name: 'p', type: 'vec2' },
-		{ name: 'jitter', type: 'float' },
-		{ name: 'style', type: 'int' },
-		{ name: 'metric', type: 'int' }
-	]
+}, {
+	p: 'vec2',
+	jitter: 'float',
+	style: 'int',
+	metric: 'int',
+	return: 'vec3'
 } );
 
 export const mx_worley_noise_vec3_style_1 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_immutable, style_immutable, metric_immutable ] ) => {
@@ -1566,15 +1282,12 @@ export const mx_worley_noise_vec3_style_1 = /*@__PURE__*/ Fn( ( [ p_immutable, j
 
 	return result;
 
-} ).setLayout( {
-	name: 'mx_worley_noise_vec3_style_1',
-	type: 'vec3',
-	inputs: [
-		{ name: 'p', type: 'vec3' },
-		{ name: 'jitter', type: 'float' },
-		{ name: 'style', type: 'int' },
-		{ name: 'metric', type: 'int' }
-	]
+}, {
+	p: 'vec3',
+	jitter: 'float',
+	style: 'int',
+	metric: 'int',
+	return: 'vec3'
 } );
 
 export const mx_worley_noise_vec3_style = /*@__PURE__*/ overloadingFn( [ mx_worley_noise_vec3_style_0, mx_worley_noise_vec3_style_1 ] );
@@ -1648,6 +1361,20 @@ export const mx_unifiednoise2d = /*@__PURE__*/ Fn( ( [
 
 	return output;
 
+}, {
+	noiseType: 'int',
+	texcoord: 'vec2',
+	freq: 'vec2',
+	offset: 'vec2',
+	jitter: 'float',
+	outmin: 'float',
+	outmax: 'float',
+	clampoutput: 'float',
+	octaves: 'int',
+	lacunarity: 'float',
+	diminish: 'float',
+	style: 'int',
+	return: 'float'
 } );
 
 // Unified Noise 3D
@@ -1717,4 +1444,18 @@ export const mx_unifiednoise3d = /*@__PURE__*/ Fn( ( [
 
 	return output;
 
+}, {
+	noiseType: 'int',
+	position: 'vec3',
+	freq: 'vec3',
+	offset: 'vec3',
+	jitter: 'float',
+	outmin: 'float',
+	outmax: 'float',
+	clampoutput: 'float',
+	octaves: 'int',
+	lacunarity: 'float',
+	diminish: 'float',
+	style: 'int',
+	return: 'float'
 } );

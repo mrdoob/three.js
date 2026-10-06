@@ -22,4 +22,4 @@ export const getDistanceAttenuation = /*@__PURE__*/ Fn( ( { lightDistance, cutof
 		distanceFalloff
 	);
 
-} ); // validated
+}, { lightDistance: 'float', cutoffDistance: 'float', decayExponent: 'float', return: 'float' } ); // validated

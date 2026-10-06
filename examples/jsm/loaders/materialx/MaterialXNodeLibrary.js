@@ -566,6 +566,13 @@ const mx_fractal_noise_float_materialx_2d = Fn( ( [ texcoordInput, octavesInput,
 
 	return mul( result, amplitude );
 
+}, {
+	texcoord: 'vec2',
+	octaves: 'int',
+	lacunarity: 'float',
+	diminish: 'float',
+	amplitude: 'float',
+	return: 'float'
 } );
 
 const mx_fractal_noise_vec3_materialx_2d = Fn( ( [ texcoordInput, octavesInput, lacunarityInput, diminishInput, amplitudeInput ] ) => {
@@ -588,6 +595,13 @@ const mx_fractal_noise_vec3_materialx_2d = Fn( ( [ texcoordInput, octavesInput, 
 
 	return mul( result, amplitude );
 
+}, {
+	texcoord: 'vec2',
+	octaves: 'int',
+	lacunarity: 'float',
+	diminish: 'float',
+	amplitude: 'vec3',
+	return: 'vec3'
 } );
 
 const MXElements = [

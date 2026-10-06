@@ -12,7 +12,7 @@ const sdBox = /*@__PURE__*/ Fn( ( [ p, b ] ) => {
 
 	return length( max( d, 0.0 ) ).add( min( max( d.x, d.y ), 0.0 ) );
 
-} );
+}, { p: 'vec2', b: 'vec2', return: 'float' } );
 
 /**
  * An implementation of a projector light node.
