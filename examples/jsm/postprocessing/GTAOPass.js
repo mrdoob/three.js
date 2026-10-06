@@ -3,24 +3,21 @@ import {
 	Color,
 	CustomBlending,
 	DataTexture,
-	DepthTexture,
-	DepthStencilFormat,
 	DstAlphaFactor,
 	DstColorFactor,
 	HalfFloatType,
 	MeshNormalMaterial,
-	NearestFilter,
 	NoBlending,
 	RepeatWrapping,
 	RGBAFormat,
 	ShaderMaterial,
 	UniformsUtils,
 	UnsignedByteType,
-	UnsignedInt248Type,
 	WebGLRenderTarget,
 	ZeroFactor
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
+import { setGBuffer, updatePerspectiveCamera } from './GBufferUtils.js';
 import { generateMagicSquareNoise, GTAOShader, GTAODepthShader, GTAOBlendShader } from '../shaders/GTAOShader.js';
 import { generatePdSamplePointInitializer, PoissonDenoiseShader } from '../shaders/PoissonDenoiseShader.js';
 import { CopyShader } from '../shaders/CopyShader.js';
@@ -305,33 +302,8 @@ class GTAOPass extends Pass {
 	 */
 	setGBuffer( depthTexture, normalTexture ) {
 
-		if ( depthTexture !== undefined ) {
-
-			this.depthTexture = depthTexture;
-			this.normalTexture = normalTexture;
-			this._renderGBuffer = false;
-
-		} else {
-
-			if ( this.normalRenderTarget === undefined ) {
-
-				const depthTexture = new DepthTexture();
-				depthTexture.format = DepthStencilFormat;
-				depthTexture.type = UnsignedInt248Type;
-				this.normalRenderTarget = new WebGLRenderTarget( this.width, this.height, {
-					minFilter: NearestFilter,
-					magFilter: NearestFilter,
-					type: HalfFloatType,
-					depthTexture: depthTexture
-				} );
-
-			}
-
-			this.depthTexture = this.normalRenderTarget.depthTexture;
-			this.normalTexture = this.normalRenderTarget.texture;
-			this._renderGBuffer = true;
-
-		}
+		// Preserve GTAO's retained internal target and depth-only/combined inputs.
+		setGBuffer( this, depthTexture, normalTexture, undefined, true );
 
 		const normalVectorType = ( this.normalTexture ) ? 1 : 0;
 		const depthValueSource = ( this.depthTexture === this.normalTexture ) ? 'w' : 'x';
@@ -508,6 +480,9 @@ class GTAOPass extends Pass {
 	 * @param {boolean} maskActive - Whether masking is active or not.
 	 */
 	render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
+
+		updatePerspectiveCamera( this.gtaoMaterial, this.camera );
+		updatePerspectiveCamera( this.depthRenderMaterial, this.camera );
 
 		// render normals and depth (honor only meshes, points and lines do not contribute to AO)
 

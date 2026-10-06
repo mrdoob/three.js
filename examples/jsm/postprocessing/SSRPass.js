@@ -16,6 +16,7 @@ import {
 	HalfFloatType,
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
+import { setGBuffer, validateGBuffer, validateGBufferTextures, updatePerspectiveCamera } from './GBufferUtils.js';
 import { SSRBlurShader, SSRDepthShader, SSRShader } from '../shaders/SSRShader.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
@@ -489,37 +490,8 @@ class SSRPass extends Pass {
 	 */
 	setGBuffer( depthTexture, normalTexture ) {
 
-		if ( depthTexture !== undefined || normalTexture !== undefined ) {
-
-			if ( ! depthTexture?.isDepthTexture || ! normalTexture?.isTexture || depthTexture === normalTexture ) {
-
-				throw new Error( 'THREE.SSRPass: Expected a separate depth texture and normal texture.' );
-
-			}
-
-			if ( this.normalRenderTarget ) this.normalRenderTarget.dispose();
-			this.normalRenderTarget = null;
-			this.depthTexture = depthTexture;
-			this.normalTexture = normalTexture;
-			this._renderGBuffer = false;
-
-		} else {
-
-			if ( ! this._renderGBuffer ) {
-
-				this.normalRenderTarget = new WebGLRenderTarget( this.width, this.height, {
-					minFilter: NearestFilter,
-					magFilter: NearestFilter,
-					type: HalfFloatType
-				} );
-
-			}
-
-			this.depthTexture = this.beautyRenderTarget.depthTexture;
-			this.normalTexture = this.normalRenderTarget.texture;
-			this._renderGBuffer = true;
-
-		}
+		validateGBufferTextures( depthTexture, normalTexture, 'SSRPass' );
+		setGBuffer( this, depthTexture, normalTexture, this.beautyRenderTarget.depthTexture );
 
 		this.ssrMaterial.uniforms.tDepth.value = this.depthTexture;
 		this.ssrMaterial.uniforms.tNormal.value = this.normalTexture;
@@ -574,42 +546,9 @@ class SSRPass extends Pass {
 	 */
 	render( renderer, writeBuffer /*, readBuffer, deltaTime, maskActive */ ) {
 
-		const perspective = this.camera.isPerspectiveCamera ? true : undefined;
-		if ( this.ssrMaterial.defines.PERSPECTIVE_CAMERA !== perspective ) {
-
-			if ( perspective ) this.ssrMaterial.defines.PERSPECTIVE_CAMERA = true;
-			else delete this.ssrMaterial.defines.PERSPECTIVE_CAMERA;
-			this.ssrMaterial.needsUpdate = true;
-
-		}
-
-		const depthPerspective = this.camera.isPerspectiveCamera ? 1 : 0;
-		if ( this.depthRenderMaterial.defines.PERSPECTIVE_CAMERA !== depthPerspective ) {
-
-			this.depthRenderMaterial.defines.PERSPECTIVE_CAMERA = depthPerspective;
-			this.depthRenderMaterial.needsUpdate = true;
-
-		}
-
-		if ( ! this._renderGBuffer ) {
-
-			if ( renderer.capabilities.reversedDepthBuffer || renderer.capabilities.logarithmicDepthBuffer ) {
-
-				throw new Error( 'THREE.SSRPass: Shared inputs require conventional depth.' );
-
-			}
-
-			for ( const texture of [ this.depthTexture, this.normalTexture ] ) {
-
-				if ( texture.image?.width !== this.width || texture.image?.height !== this.height ) {
-
-					throw new Error( 'THREE.SSRPass: Shared inputs must match the pass dimensions.' );
-
-				}
-
-			}
-
-		}
+		updatePerspectiveCamera( this.ssrMaterial, this.camera, true );
+		updatePerspectiveCamera( this.depthRenderMaterial, this.camera );
+		validateGBuffer( this, renderer );
 
 		this.ssrMaterial.uniforms.cameraNear.value = this.camera.near;
 		this.ssrMaterial.uniforms.cameraFar.value = this.camera.far;

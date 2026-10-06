@@ -3,18 +3,14 @@ import {
 	Color,
 	CustomBlending,
 	DataTexture,
-	DepthTexture,
 	DstAlphaFactor,
 	DstColorFactor,
 	FloatType,
 	HalfFloatType,
 	MathUtils,
 	MeshNormalMaterial,
-	NearestFilter,
 	NoBlending,
 	RedFormat,
-	DepthStencilFormat,
-	UnsignedInt248Type,
 	RepeatWrapping,
 	ShaderMaterial,
 	UniformsUtils,
@@ -23,6 +19,7 @@ import {
 	ZeroFactor
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
+import { setGBuffer, validateGBuffer, validateGBufferTextures, updatePerspectiveCamera } from './GBufferUtils.js';
 import { SimplexNoise } from '../math/SimplexNoise.js';
 import { SSAOBlurShader, SSAODepthShader, SSAOShader } from '../shaders/SSAOShader.js';
 import { CopyShader } from '../shaders/CopyShader.js';
@@ -242,41 +239,8 @@ class SSAOPass extends Pass {
 	 */
 	setGBuffer( depthTexture, normalTexture ) {
 
-		if ( depthTexture !== undefined || normalTexture !== undefined ) {
-
-			if ( ! depthTexture?.isDepthTexture || ! normalTexture?.isTexture || depthTexture === normalTexture ) {
-
-				throw new Error( 'THREE.SSAOPass: Expected a separate depth texture and normal texture.' );
-
-			}
-
-			if ( this.normalRenderTarget ) this.normalRenderTarget.dispose();
-			this.normalRenderTarget = null;
-			this.depthTexture = depthTexture;
-			this.normalTexture = normalTexture;
-			this._renderGBuffer = false;
-
-		} else {
-
-			if ( ! this._renderGBuffer ) {
-
-				const depth = new DepthTexture();
-				depth.format = DepthStencilFormat;
-				depth.type = UnsignedInt248Type;
-				this.normalRenderTarget = new WebGLRenderTarget( this.width, this.height, {
-					minFilter: NearestFilter,
-					magFilter: NearestFilter,
-					type: HalfFloatType,
-					depthTexture: depth
-				} );
-
-			}
-
-			this.depthTexture = this.normalRenderTarget.depthTexture;
-			this.normalTexture = this.normalRenderTarget.texture;
-			this._renderGBuffer = true;
-
-		}
+		validateGBufferTextures( depthTexture, normalTexture, 'SSAOPass' );
+		setGBuffer( this, depthTexture, normalTexture );
 
 		this.ssaoMaterial.uniforms.tDepth.value = this.depthTexture;
 		this.ssaoMaterial.uniforms.tNormal.value = this.normalTexture;
@@ -325,37 +289,9 @@ class SSAOPass extends Pass {
 	 */
 	render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
-		const perspective = this.camera.isPerspectiveCamera ? 1 : 0;
-		for ( const material of [ this.ssaoMaterial, this.depthRenderMaterial ] ) {
-
-			if ( material.defines.PERSPECTIVE_CAMERA !== perspective ) {
-
-				material.defines.PERSPECTIVE_CAMERA = perspective;
-				material.needsUpdate = true;
-
-			}
-
-		}
-
-		if ( ! this._renderGBuffer ) {
-
-			if ( renderer.capabilities.reversedDepthBuffer || renderer.capabilities.logarithmicDepthBuffer ) {
-
-				throw new Error( 'THREE.SSAOPass: Shared inputs require conventional depth.' );
-
-			}
-
-			for ( const texture of [ this.depthTexture, this.normalTexture ] ) {
-
-				if ( texture.image?.width !== this.width || texture.image?.height !== this.height ) {
-
-					throw new Error( 'THREE.SSAOPass: Shared inputs must match the pass dimensions.' );
-
-				}
-
-			}
-
-		}
+		updatePerspectiveCamera( this.ssaoMaterial, this.camera );
+		updatePerspectiveCamera( this.depthRenderMaterial, this.camera );
+		validateGBuffer( this, renderer );
 
 		this.ssaoMaterial.uniforms.cameraNear.value = this.camera.near;
 		this.ssaoMaterial.uniforms.cameraFar.value = this.camera.far;

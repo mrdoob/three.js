@@ -1,4 +1,4 @@
-import { DataTexture, DepthTexture, PerspectiveCamera, Scene, Texture, WebGLRenderer, WebGLRenderTarget } from 'three';
+import { DataTexture, DepthTexture, OrthographicCamera, PerspectiveCamera, Scene, Texture, WebGLRenderer, WebGLRenderTarget } from 'three';
 import { GTAOPass } from '../../../../examples/jsm/postprocessing/GTAOPass.js';
 
 function assertGBuffer( assert, pass, depth, normal ) {
@@ -137,6 +137,10 @@ export default QUnit.module( 'Postprocessing', () => {
 			checkPreview( GTAOPass.OUTPUT.Normal, [ 47, 47, 255, 255 ], 'Internal background normal preview' );
 			pass.setGBuffer( depth, normal );
 			checkPreview( GTAOPass.OUTPUT.Normal, [ 64, 128, 192, 51 ], 'External preview replaces the retained internal source' );
+			pass.camera = new OrthographicCamera( - 1, 1, 1, - 1, 1, 11 );
+			checkPreview( GTAOPass.OUTPUT.Depth, [ 102, 102, 102, 255 ], 'Depth preview follows an orthographic camera switch' );
+			pass.camera = camera;
+			checkPreview( GTAOPass.OUTPUT.Depth, [ 224, 224, 224, 255 ], 'Depth preview restores the perspective camera' );
 			pass.dispose();
 			target.dispose();
 			depth.dispose();
