@@ -45,6 +45,8 @@ const SSR2TraceShader = {
 	defines: {
 		MAX_STEP: 0,
 		MAX_RAYS: 16,
+		MAX_RAY_STEPS: 64,
+		STEP_EXPONENT: '2.0',
 		USE_ENV: false,
 		STOCHASTIC: true
 	},
@@ -69,6 +71,7 @@ const SSR2TraceShader = {
 		'maxRoughness': { value: 1 },
 		'screenEdgeFade': { value: 0.2 },
 		'rayCount': { value: 4 },
+		'quality': { value: 0.5 },
 		'frame': { value: 0 },
 		'noiseBlurLod': { value: 1.5 }
 
@@ -100,6 +103,7 @@ const SSR2TraceShader = {
 		uniform float maxRoughness;
 		uniform float screenEdgeFade;
 		uniform int rayCount;
+		uniform float quality;
 		uniform float frame;
 		uniform float noiseBlurLod;
 		#include <packing>
@@ -150,7 +154,7 @@ const SSR2TraceShader = {
 
 		// Marches the ray through the depth buffer. On a hit returns true with the hit uv;
 		// rayLen and endZ describe the traversed segment (used for the cone footprint).
-		bool traceRay( const in vec3 viewPosition, const in vec3 viewNormal, const in vec3 dir, out vec2 hitUv, out float rayLen, out float endZ ) {
+		bool traceRay( const in vec3 viewPosition, const in vec3 viewNormal, const in vec3 dir, const in float jitter, out vec2 hitUv, out float rayLen, out float endZ ) {
 
 			float maxRayLen = maxDistance / max( dot( dir, viewNormal ), 0.05 );
 			vec3 d1viewPosition = viewPosition + dir * maxRayLen;
@@ -167,16 +171,45 @@ const SSR2TraceShader = {
 
 			float totalStep = max( abs( d1.x - d0.x ), abs( d1.y - d0.y ) );
 			vec2 span = ( d1 - d0 ) / totalStep;
-			float sStep = 1.0 / totalStep;
-			float s = sStep;
+
+			#ifdef STOCHASTIC
+
+				// bounded sample count (as SSRNode): quality * MAX_RAY_STEPS samples per ray, spaced as
+				// (i / count) ^ STEP_EXPONENT so they concentrate near the origin, at least one pixel apart
+				float totalSamples = max( floor( quality * float( MAX_RAY_STEPS ) + 0.5 ), 1.0 );
+				float stepLimit = float( MAX_RAY_STEPS );
+
+			#else
+
+				// one sample every 1 / quality pixels along the ray
+				float stride = 1.0 / max( quality, 0.05 );
+				float stepLimit = float( MAX_STEP );
+
+			#endif
+
+			float s = 0.0;
+
+			// 1 / z is linear along the ray in screen space (perspective-correct depth)
+			float recipZ = 1.0 / viewPosition.z;
+			float recipZStep = 1.0 / d1viewPosition.z - recipZ;
 
 			hitUv = vec2( 0.0 );
 
-			for ( float i = 1.0; i < float( MAX_STEP ); i ++ ) {
+			for ( float i = 1.0; i < stepLimit; i ++ ) {
 
-				if ( i >= totalStep ) break;
+				#ifdef STOCHASTIC
 
-				vec2 xy = d0 + i * span;
+					if ( i > totalSamples ) break;
+					s = clamp( max( pow( ( i + jitter - 0.5 ) / totalSamples, float( STEP_EXPONENT ) ), i / totalStep ), 0.0, 1.0 );
+
+				#else
+
+					s = i * stride / totalStep;
+					if ( s >= 1.0 ) break;
+
+				#endif
+
+				vec2 xy = d0 + s * ( d1 - d0 );
 				if ( xy.x < 0.0 || xy.x > resolution.x || xy.y < 0.0 || xy.y > resolution.y ) break;
 
 				vec2 uv = xy / resolution;
@@ -184,14 +217,12 @@ const SSR2TraceShader = {
 
 				if ( d < 1.0 ) {
 
-					vec3 vP = getViewPosition( uv, d );
+					// cheap view-space depth first; the position is only rebuilt on a crossing
+					float rayZ = 1.0 / ( recipZ + s * recipZStep );
 
-					// perspective-correct ray depth at this step
-					float recipZ = 1.0 / viewPosition.z;
-					float rayZ = 1.0 / ( recipZ + s * ( 1.0 / d1viewPosition.z - recipZ ) );
+					if ( rayZ <= perspectiveDepthToViewZ( d, cameraNear, cameraFar ) ) {
 
-					if ( rayZ <= vP.z ) {
-
+						vec3 vP = getViewPosition( uv, d );
 						float away = pointToLineDistance( vP, viewPosition, d1viewPosition );
 						vec3 vPNeighbor = getViewPosition( ( xy + vec2( 1.0, 0.0 ) ) / resolution, d );
 						float tk = max( ( vPNeighbor.x - vP.x ) * 3.0, thickness );
@@ -217,8 +248,6 @@ const SSR2TraceShader = {
 					}
 
 				}
-
-				s += sStep;
 
 			}
 
@@ -283,7 +312,9 @@ const SSR2TraceShader = {
 						vec2 xi = fract( n + vec2( 0.7548776662, 0.5698402909 ) * float( k ) );
 						vec3 dir = sampleGGXReflection( viewIncidentDir, viewNormal, alpha, xi );
 
-						if ( traceRay( viewPosition, viewNormal, dir, hitUv, rayLen, endZ ) ) {
+						float jitter = fract( n.x + 0.61803398875 * float( k ) );
+
+						if ( traceRay( viewPosition, viewNormal, dir, jitter, hitUv, rayLen, endZ ) ) {
 
 							sum += mix( envColor, texture2D( tColor, hitUv ).rgb, hitEdgeFactor( hitUv ) );
 
@@ -300,7 +331,7 @@ const SSR2TraceShader = {
 
 				#else
 
-					if ( traceRay( viewPosition, viewNormal, mirrorDir, hitUv, rayLen, endZ ) ) {
+					if ( traceRay( viewPosition, viewNormal, mirrorDir, 0.5, hitUv, rayLen, endZ ) ) {
 
 						result = mix( envColor, texture2D( tColor, hitUv ).rgb, hitEdgeFactor( hitUv ) );
 

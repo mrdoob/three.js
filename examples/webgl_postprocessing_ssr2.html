@@ -55,7 +55,9 @@
 		};
 
 		const renderer = new THREE.WebGLRenderer();
-		renderer.setPixelRatio( window.devicePixelRatio );
+		// like the WebGPU SSR examples, render at CSS pixels; raise for sharper output at a high cost
+		const pixelRatio = 1;
+		renderer.setPixelRatio( pixelRatio );
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		renderer.setAnimationLoop( animate );
 		document.body.appendChild( renderer.domElement );
@@ -108,14 +110,15 @@
 		controls.enabled = ! params.autoRotate;
 		controls.update();
 
-		const width = window.innerWidth * window.devicePixelRatio;
-		const height = window.innerHeight * window.devicePixelRatio;
+		const width = window.innerWidth * pixelRatio;
+		const height = window.innerHeight * pixelRatio;
 
 		const composer = new EffectComposer( renderer );
 		const gBufferPass = new GBufferPass( scene, camera, width, height, { material: true } );
 		const ssr2Pass = new SSR2Pass( scene, camera, width, height, gBufferPass );
 		ssr2Pass.maxDistance = 0.3;
 		ssr2Pass.thickness = 0.02;
+		ssr2Pass.resolutionScale = 0.5;
 
 		composer.addPass( gBufferPass );
 		composer.addPass( new RenderPass( scene, camera ) );
@@ -176,6 +179,8 @@
 		gui.add( params, 'bunnyRoughness', 0, 1 ).onChange( v => bunny && ( bunny.material.roughness = v ) );
 		gui.add( params, 'bunnyMetalness', 0, 1 ).onChange( v => bunny && ( bunny.material.metalness = v ) );
 		gui.add( ssr2Pass, 'stochastic' );
+		gui.add( ssr2Pass, 'quality', 0.1, 1 );
+		gui.add( ssr2Pass, 'resolutionScale', 0.25, 1 );
 		gui.add( ssr2Pass, 'rayCount', 1, 16, 1 );
 		gui.add( ssr2Pass, 'noiseBlur', 0, 4 );
 		gui.add( ssr2Pass, 'maxDistance', 0, 1 );

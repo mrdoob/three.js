@@ -94,7 +94,20 @@ class SSR2Pass extends Pass {
 		 */
 		this.screenEdgeFade = 0.2;
 
+		/**
+		 * Ray march sample density from 0 to 1. In stochastic mode a ray takes
+		 * `quality * 64` samples, spaced to concentrate near the origin; otherwise one sample is
+		 * taken every `1 / quality` pixels along the ray. Lower is faster but can miss thin geometry.
+		 *
+		 * @type {number}
+		 * @default 0.5
+		 */
+		this.quality = 0.5;
+
 		this._stochastic = true;
+		this._resolutionScale = 1;
+		this._width = width;
+		this._height = height;
 
 		/**
 		 * Number of GGX-sampled rays per pixel in stochastic mode (1 to 16). More rays means
@@ -181,6 +194,28 @@ class SSR2Pass extends Pass {
 	}
 
 	/**
+	 * Scale of the trace resolution from 0 to 1 relative to the G-buffer. The result is
+	 * upsampled when resolved. Lower is faster.
+	 *
+	 * @type {number}
+	 * @default 1
+	 */
+	get resolutionScale() {
+
+		return this._resolutionScale;
+
+	}
+
+	set resolutionScale( value ) {
+
+		if ( value === this._resolutionScale ) return;
+
+		this._resolutionScale = value;
+		this.setSize( this._width, this._height );
+
+	}
+
+	/**
 	 * The prefiltered specular radiance texture. Assign it to `scene.indirectSpecularMap`.
 	 * The texture identity is stable across resizes.
 	 *
@@ -234,6 +269,7 @@ class SSR2Pass extends Pass {
 		uniforms.thickness.value = this.thickness;
 		uniforms.maxRoughness.value = this.maxRoughness;
 		uniforms.screenEdgeFade.value = this.screenEdgeFade;
+		uniforms.quality.value = Math.min( Math.max( this.quality, 0.05 ), 1 );
 		uniforms.rayCount.value = Math.min( Math.max( Math.round( this.rayCount ), 1 ), 16 );
 		uniforms.noiseBlurLod.value = this.noiseBlur;
 		uniforms.frame.value = this._frame ++ % 64;
@@ -260,14 +296,27 @@ class SSR2Pass extends Pass {
 	 */
 	setSize( width, height ) {
 
-		this._traceTarget.setSize( width, height );
+		this._width = width;
+		this._height = height;
+
+		const traceWidth = Math.max( Math.round( width * this._resolutionScale ), 1 );
+		const traceHeight = Math.max( Math.round( height * this._resolutionScale ), 1 );
+
+		this._traceTarget.setSize( traceWidth, traceHeight );
 		this._resolveTarget.setSize( width, height );
 
-		this._traceMaterial.defines.MAX_STEP = Math.ceil( Math.sqrt( width * width + height * height ) );
-		this._traceMaterial.needsUpdate = true;
-		this._traceMaterial.uniforms.resolution.value.set( width, height );
-		this._resolveMaterial.uniforms.resolution.value.set( width, height );
-		this._resolveMaterial.uniforms.maxMip.value = Math.floor( Math.log2( Math.max( width, height ) ) );
+		const maxStep = Math.ceil( Math.sqrt( traceWidth * traceWidth + traceHeight * traceHeight ) );
+
+		if ( this._traceMaterial.defines.MAX_STEP !== maxStep ) {
+
+			this._traceMaterial.defines.MAX_STEP = maxStep;
+			this._traceMaterial.needsUpdate = true;
+
+		}
+
+		this._traceMaterial.uniforms.resolution.value.set( traceWidth, traceHeight );
+		this._resolveMaterial.uniforms.resolution.value.set( traceWidth, traceHeight );
+		this._resolveMaterial.uniforms.maxMip.value = Math.floor( Math.log2( Math.max( traceWidth, traceHeight ) ) );
 
 	}
 
