@@ -42,6 +42,7 @@ const UniformsLib = {
 	aomap: {
 
 		aoMap: { value: null },
+		ambientOcclusionMap: { value: null }, // screen-space AO, see Scene.ambientOcclusionMap
 		aoMapIntensity: { value: 1 },
 		aoMapTransform: { value: /*@__PURE__*/ new Matrix3() }
 
