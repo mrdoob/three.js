@@ -527,7 +527,7 @@ class WebGPUTextureUtils {
 		const colorTexture = canvasTarget.colorTexture;
 		const colorTextureData = backend.get( colorTexture );
 
-		if ( colorTexture.width === width && colorTexture.height === height && colorTexture.samples === samples ) {
+		if ( colorTextureData.texture !== undefined && colorTexture.width === width && colorTexture.height === height && colorTexture.samples === samples ) {
 
 			return colorTextureData.texture;
 
@@ -552,8 +552,8 @@ class WebGPUTextureUtils {
 
 		//
 
-		colorTexture.source.width = width;
-		colorTexture.source.height = height;
+		colorTexture.image.width = width;
+		colorTexture.image.height = height;
 		colorTexture.samples = samples;
 
 		colorTextureData.texture = colorBuffer;
