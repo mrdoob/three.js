@@ -28,6 +28,11 @@ const _shaderProperties = [ 'side', 'flatShading', 'normalMapType', 'wireframe',
  * Blended materials without alpha testing do not contribute. Custom shader modifications,
  * including custom vertex deformation and fragment discard, are not reproduced.
  *
+ * With options.material, a second color attachment is added holding RG = roughness,
+ * metalness (scalar material values; roughness and metalness maps are not sampled;
+ * materials without them write roughness 1, metalness 0) in an RGBA half-float
+ * NoColorSpace texture, exposed as materialTexture. It shares the depth buffer.
+ *
  * ```js
  * const gBufferPass = new GBufferPass( scene, camera, width, height );
  * ssaoPass.setGBuffer( gBufferPass.depthTexture, gBufferPass.normalTexture );
@@ -50,6 +55,7 @@ class GBufferPass extends Pass {
 	 * @param {Object} [options] - Buffer options.
 	 * @param {number} [options.depthTextureType=UnsignedInt248Type] - UnsignedShortType (16-bit),
 	 * UnsignedIntType (24-bit), FloatType (32-bit), or UnsignedInt248Type (24-bit with stencil).
+	 * @param {boolean} [options.material=false] - Adds a second attachment with roughness and metalness.
 	 */
 	constructor( scene, camera, width = 512, height = 512, options = {} ) {
 
@@ -74,8 +80,10 @@ class GBufferPass extends Pass {
 			minFilter: NearestFilter,
 			magFilter: NearestFilter,
 			type: HalfFloatType,
-			depthTexture
+			depthTexture,
+			count: options.material === true ? 2 : 1
 		} );
+		this._material = options.material === true;
 		this._materialCache = new Map();
 		this._invisibleMaterial = new MeshNormalMaterial();
 		this._invisibleMaterial.visible = false;
@@ -92,6 +100,19 @@ class GBufferPass extends Pass {
 	get normalTexture() {
 
 		return this._renderTarget.texture;
+
+	}
+
+	/**
+	 * The shared roughness (R) and metalness (G) texture, or `null` unless
+	 * constructed with `options.material`.
+	 *
+	 * @type {?Texture}
+	 * @readonly
+	 */
+	get materialTexture() {
+
+		return this._material ? this._renderTarget.textures[ 1 ] : null;
 
 	}
 
@@ -127,7 +148,23 @@ class GBufferPass extends Pass {
 			};
 
 			source.addEventListener( 'dispose', onDispose );
-			entry = { material, channels: {}, version: - 1, onDispose };
+			entry = { material, channels: {}, version: - 1, onDispose, uniforms: { gRoughness: { value: 1 }, gMetalness: { value: 0 } } };
+
+			if ( this._material ) {
+
+				material.customProgramCacheKey = () => 'GBufferPass.material';
+				material.onBeforeCompile = shader => {
+
+					shader.uniforms.gRoughness = entry.uniforms.gRoughness;
+					shader.uniforms.gMetalness = entry.uniforms.gMetalness;
+					shader.fragmentShader = 'uniform float gRoughness;\nuniform float gMetalness;\nlayout(location = 1) out highp vec4 gMaterial;\n' +
+						shader.fragmentShader.replace( '#ifdef OPAQUE', 'gMaterial = vec4( gRoughness, gMetalness, 0.0, 1.0 );\n#ifdef OPAQUE' );
+
+				};
+
+			}
+
+
 			this._materialCache.set( source, entry );
 
 		}
@@ -153,6 +190,9 @@ class GBufferPass extends Pass {
 			material[ property ] = value;
 
 		}
+
+		entry.uniforms.gRoughness.value = source.roughness !== undefined ? source.roughness : 1;
+		entry.uniforms.gMetalness.value = source.metalness !== undefined ? source.metalness : 0;
 
 		// The renderer updates texture matrices and uniforms without recompiling these materials.
 		material.alphaTest = source.alphaTest;
