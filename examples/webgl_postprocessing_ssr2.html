@@ -40,6 +40,7 @@
 		import { GBufferPass } from 'three/addons/postprocessing/GBufferPass.js';
 		import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 		import { SSR2Pass } from 'three/addons/postprocessing/SSR2Pass.js';
+		import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 		import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 		const params = {
@@ -47,7 +48,7 @@
 			autoRotate: true,
 			roughness: 0.1,
 			metalness: 0.5,
-			output: 'Beauty'
+			view: 'Beauty'
 		};
 
 		const renderer = new THREE.WebGLRenderer();
@@ -111,11 +112,51 @@
 		composer.addPass( gBufferPass );
 		composer.addPass( new RenderPass( scene, camera ) );
 		composer.addPass( ssr2Pass );
+
+		// debug view: replaces the beauty with one of the buffers
+		const viewPass = new ShaderPass( {
+			uniforms: { tView: { value: null }, mode: { value: 0 } },
+			vertexShader: /* glsl */`
+				varying vec2 vUv;
+				void main() {
+					vUv = uv;
+					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+				}`,
+			fragmentShader: /* glsl */`
+				uniform sampler2D tView;
+				uniform int mode;
+				varying vec2 vUv;
+				void main() {
+					vec4 c = texture2D( tView, vUv );
+					if ( mode == 1 ) c = vec4( vec3( c.r ), 1.0 ); // roughness
+					gl_FragColor = vec4( c.rgb, 1.0 );
+				}`
+		}, 'unused' );
+		viewPass.enabled = false;
+		composer.addPass( viewPass );
 		composer.addPass( new OutputPass() );
 
 		scene.indirectSpecularMap = ssr2Pass.texture;
 
+		const views = {
+			'Beauty': null,
+			'SSR radiance': [ ssr2Pass.texture, 0 ],
+			'Roughness': [ gBufferPass.materialTexture, 1 ],
+			'Normals': [ gBufferPass.normalTexture, 0 ]
+		};
+
 		const gui = new GUI( { width: 260 } );
+		gui.add( params, 'view', Object.keys( views ) ).onChange( v => {
+
+			viewPass.enabled = views[ v ] !== null;
+			if ( viewPass.enabled ) {
+
+				viewPass.uniforms.tView.value = views[ v ][ 0 ];
+				viewPass.uniforms.mode.value = views[ v ][ 1 ];
+
+			}
+
+		} );
 		gui.add( params, 'ssr' ).name( 'SSR as indirect specular' ).onChange( v => {
 
 			scene.indirectSpecularMap = v ? ssr2Pass.texture : null;
