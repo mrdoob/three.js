@@ -2983,6 +2983,12 @@ class Renderer {
 
 		}
 
+		if ( dispatchSize !== null && computeList.some( computeNode => computeNode.count !== null ) ) {
+
+			throw new Error( 'THREE.Renderer: .compute() can not use a dispatch size with nodes created with "compute( count )". Use "computeKernel()" instead.' );
+
+		}
+
 		backend.beginCompute( computeNodes );
 
 		for ( const computeNode of computeList ) {
