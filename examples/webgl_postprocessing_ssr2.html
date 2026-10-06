@@ -33,6 +33,7 @@
 		import * as THREE from 'three';
 
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+		import Stats from 'three/addons/libs/stats.module.js';
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 		import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -97,6 +98,9 @@
 			dracoLoader.dispose();
 
 		} );
+
+		const stats = new Stats();
+		document.body.appendChild( stats.dom );
 
 		const controls = new OrbitControls( camera, renderer.domElement );
 		controls.target.set( 0, 0.0635, 0 );
@@ -191,6 +195,8 @@
 
 		function animate() {
 
+			stats.begin();
+
 			if ( params.autoRotate ) {
 
 				const t = performance.now() / 1000 * 0.3;
@@ -205,6 +211,8 @@
 			}
 
 			composer.render();
+
+			stats.end();
 
 		}
 
