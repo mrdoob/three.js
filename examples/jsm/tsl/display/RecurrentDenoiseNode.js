@@ -908,8 +908,8 @@ export default RecurrentDenoiseNode;
  * @param {RecurrentDenoiseNodeOptions} [options={}]
  * @returns {RecurrentDenoiseNode}
  */
-export const recurrentDenoise = ( inputTexture, camera, options = {} ) => nodeObject( new RecurrentDenoiseNode(
+export const recurrentDenoise = ( inputTexture, camera, options = {} ) => new RecurrentDenoiseNode(
 	toTextureNode( inputTexture ),
 	camera,
 	options
-) );
+);

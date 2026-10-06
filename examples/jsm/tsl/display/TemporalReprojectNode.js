@@ -1038,11 +1038,11 @@ export default TemporalReprojectNode;
  * @param {TemporalReprojectNodeOptions} [options]
  * @returns {TemporalReprojectNode}
  */
-export const temporalReproject = ( beautyNode, depthNode, normalNode, velocityNode, camera, options = {} ) => nodeObject( new TemporalReprojectNode(
+export const temporalReproject = ( beautyNode, depthNode, normalNode, velocityNode, camera, options = {} ) => new TemporalReprojectNode(
 	convertToTexture( beautyNode ),
 	nodeObject( depthNode ),
 	nodeObject( normalNode ),
 	nodeObject( velocityNode ),
 	camera,
 	options
-) );
+);

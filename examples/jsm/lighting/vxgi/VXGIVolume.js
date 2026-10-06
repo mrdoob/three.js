@@ -1,5 +1,5 @@
 import { Box3, Vector3, Vector4, Matrix4, Layers, Storage3DTexture, StorageBufferAttribute, StorageTexture3DNode, CubeTextureNode, RendererUtils, HalfFloatType, UnsignedByteType, RGBAFormat, LinearFilter, LinearMipmapLinearFilter, ClampToEdgeWrapping, MathUtils } from 'three/webgpu';
-import { Fn, If, Loop, nodeObject, uniform, uniformArray, storage, instanceIndex, textureStore, texture3D, texture, float, int, uint, vec2, vec3, vec4, ivec3, uvec3, max, min, abs, dot, cross, normalize, floor, sign, select, countOneBits, atomicOr, smoothstep, hash, fract, sqrt, cos, sin, length, PI, getDistanceAttenuation, viewZToPerspectiveDepth, viewZToReversedPerspectiveDepth } from 'three/tsl';
+import { Fn, If, Loop, uniform, uniformArray, storage, instanceIndex, textureStore, texture3D, texture, float, int, uint, vec2, vec3, vec4, ivec3, uvec3, max, min, abs, dot, cross, normalize, floor, sign, select, countOneBits, atomicOr, smoothstep, hash, fract, sqrt, cos, sin, length, PI, getDistanceAttenuation, viewZToPerspectiveDepth, viewZToReversedPerspectiveDepth } from 'three/tsl';
 
 import { collectSceneTriangles, computeSceneBounds, TRIANGLE_STRIDE } from './VXGISceneCollector.js';
 import { createConeTracer } from './VXGIConeTracer.js';
@@ -1280,7 +1280,7 @@ class VXGIVolume {
 
 								If( viewZ.greaterThanEqual( near ).and( viewZ.lessThanEqual( far ) ), () => {
 
-									const depth = nodeObject( new PlainCubeTextureNode( shadowTexture, normalize( lightToVoxel ) ) ).r; // depth cubes need an integer level, which the compute path emits by default
+									const depth = new PlainCubeTextureNode( shadowTexture, normalize( lightToVoxel ) ).r; // depth cubes need an integer level, which the compute path emits by default
 
 									if ( reversedDepth ) {
 

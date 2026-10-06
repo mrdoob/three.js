@@ -181,7 +181,7 @@ export const cubeTexture = ( value = EmptyTexture, uvNode = null, levelNode = nu
 
 	if ( value && value.isCubeTextureNode === true ) {
 
-		textureNode = nodeObject( value.clone() );
+		textureNode = value.clone();
 		textureNode.referenceNode = value; // Ensure the reference is set to the original node
 
 		if ( uvNode !== null ) textureNode.uvNode = nodeObject( uvNode );
