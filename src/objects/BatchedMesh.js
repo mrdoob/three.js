@@ -84,6 +84,7 @@ const _frustumArray = /*@__PURE__*/ new FrustumArray();
 const _box = /*@__PURE__*/ new Box3();
 const _sphere = /*@__PURE__*/ new Sphere();
 const _vector = /*@__PURE__*/ new Vector3();
+const _cameraPosition = /*@__PURE__*/ new Vector3();
 const _forward = /*@__PURE__*/ new Vector3();
 const _temp = /*@__PURE__*/ new Vector3();
 const _renderList = /*@__PURE__*/ new MultiDrawRenderList();
@@ -1592,7 +1593,7 @@ class BatchedMesh extends Mesh {
 
 			// get the camera position in the local frame
 			_matrix.copy( this.matrixWorld ).invert();
-			_vector.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _matrix );
+			_cameraPosition.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _matrix );
 			_forward.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld ).transformDirection( _matrix );
 
 			for ( let i = 0, l = instanceInfo.length; i < l; i ++ ) {
@@ -1617,7 +1618,7 @@ class BatchedMesh extends Mesh {
 
 						// get the distance from camera used for sorting
 						const geometryInfo = geometryInfoList[ geometryId ];
-						const z = _temp.subVectors( _sphere.center, _vector ).dot( _forward );
+						const z = _temp.subVectors( _sphere.center, _cameraPosition ).dot( _forward );
 						_renderList.push( geometryInfo.start, geometryInfo.count, z, i );
 
 					}
