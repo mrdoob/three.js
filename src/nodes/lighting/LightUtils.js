@@ -23,6 +23,7 @@ export const getDistanceAttenuation = /*@__PURE__*/ Fn( ( { lightDistance, cutof
 	);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 }, { lightDistance: 'float', cutoffDistance: 'float', decayExponent: 'float', return: 'float' } ); // validated
 =======
 } ).setLayout( {
@@ -35,3 +36,6 @@ export const getDistanceAttenuation = /*@__PURE__*/ Fn( ( { lightDistance, cutof
 	]
 } );
 >>>>>>> 9c1b752288 (fix getDistanceAttenuation doc)
+=======
+}, { lightDistance: 'float', cutoffDistance: 'float', decayExponent: 'float', return: 'float' } ); // validated
+>>>>>>> 559031a573 (adjust)
