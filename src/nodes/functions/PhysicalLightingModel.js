@@ -326,6 +326,14 @@ const IBLSheenBRDF = /*@__PURE__*/ Fn( ( { normal, viewDir, roughness } ) => {
 
 	return DG.saturate();
 
+} ).setLayout( {
+	name: 'IBLSheenBRDF',
+	type: 'float',
+	inputs: [
+		{ name: 'normal', type: 'vec3' },
+		{ name: 'viewDir', type: 'vec3' },
+		{ name: 'roughness', type: 'float' }
+	]
 } );
 
 const clearcoatF0 = vec3( 0.04 );
