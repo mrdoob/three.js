@@ -1,5 +1,5 @@
 import { ClampToEdgeWrapping, CompressedTexture, DataTexture, HalfFloatType, LinearFilter, LinearSRGBColorSpace, LoadingManager, NearestFilter, RedFormat, RepeatWrapping, RGB_S3TC_DXT1_Format, SRGBColorSpace } from 'three';
-import { mul } from 'three/tsl';
+import { mul, vec3 } from 'three/tsl';
 import { MaterialXLoader } from '../../../../examples/jsm/loaders/MaterialXLoader.js';
 
 const MATERIAL_X = `<?xml version="1.0"?>
@@ -166,18 +166,19 @@ export default QUnit.module( 'Addons', () => {
 				assert.true( resolved.includes( 'add' ), 'The resolver is asked about every node.' );
 				assert.true( values.includes( 2 ) && values.includes( 0.5 ), 'The resolved node and the loader-built node are both part of the graph.' );
 
-				// The resolver builds the requested output; the loader does not extract a channel from it again.
+				// A channel output takes the channel of the resolved node, as for the loader's own nodes.
 				const channelText = text.replace( '<input name="in1" type="float" nodename="doubled" />', '<input name="in1" type="float" nodename="doubled" output="outy" />' ).replace( 'name="doubled" type="float"', 'name="doubled" type="vector3"' );
 				const outputs = [];
 				const channelResult = new MaterialXLoader().setNodeResolver( ( nodeX, output ) => {
 
 					if ( nodeX.element !== 'custom_double' ) return null;
 					outputs.push( output );
-					return mul( nodeX.getNodeByName( 'in' ), 2 );
+					const inNode = nodeX.getNodeByName( 'in' );
+					return vec3( inNode, mul( inNode, 2 ), mul( inNode, 3 ) );
 
 				} ).parse( channelText );
 				assert.deepEqual( outputs, [ 'outy' ], 'The resolver receives the channel output.' );
-				assert.false( hasNode( channelResult.materials.test_graph.colorNode, ( node ) => node.isArrayElementNode === true ), 'The resolved output is used as it is.' );
+				assert.true( hasNode( channelResult.materials.test_graph.colorNode, ( node ) => node.isArrayElementNode === true && node.indexNode.value === 1 ), 'The loader takes the y channel of the resolved node.' );
 
 				loader.setNodeResolver( null );
 				assert.true( loader.parse( text, { throwOnErrors: false } ).errors.length > 0, 'Without the resolver the custom node is unsupported.' );

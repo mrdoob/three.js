@@ -65,8 +65,9 @@ class MaterialXLoader extends Loader {
 	 * This is how documents use nodes of a host's own node library, for example nodedefs implemented
 	 * by TSL functions instead of MaterialX node graphs. The resolver is called for every node with the
 	 * node and the name of the requested output (`null` for the default output). It returns the TSL node
-	 * of that output, which the loader converts to the type of the node (or `float` for a channel output
-	 * such as `outx`), or `null` to leave the node to the loader. The node passed in has the MaterialX
+	 * of that output, which the loader converts to the type of the node, or `null` to leave the node to
+	 * the loader. For a channel output such as `outx` it returns the node itself, and the loader takes
+	 * the channel, as for its own nodes. The node passed in has the MaterialX
 	 * `element` (category), `name` and `type`, and reads its inputs through `getNodeByName()` (the TSL
 	 * node of an input) and `getChildByName()` (the input itself, with its `type` and `value`).
 	 *

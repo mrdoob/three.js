@@ -407,8 +407,6 @@ class MaterialXNode {
 		if ( this.node !== null && out === null ) return this.node;
 
 		let node;
-		// A node resolver builds the node of the requested output itself.
-		let resolved = false;
 
 
 		// A connection that names no output reads the first one, as in MaterialX.
@@ -492,8 +490,7 @@ class MaterialXNode {
 		} else {
 
 			const resolvedNode = this.materialX.nodeResolver !== null ? this.materialX.nodeResolver( this, out ) : null;
-			resolved = resolvedNode !== null && resolvedNode !== undefined;
-			node = resolved ? resolvedNode : compileNodeFromRegistry( this, out, this.materialX.compileContext );
+			node = resolvedNode !== null && resolvedNode !== undefined ? resolvedNode : compileNodeFromRegistry( this, out, this.materialX.compileContext );
 
 		}
 
@@ -504,7 +501,7 @@ class MaterialXNode {
 
 		}
 
-		if ( channelRequested && ! resolved ) {
+		if ( channelRequested ) {
 
 			node = element( node, getOutputChannel( out ) );
 
