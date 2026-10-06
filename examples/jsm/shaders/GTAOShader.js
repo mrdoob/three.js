@@ -29,7 +29,6 @@ const GTAOShader = {
 		PERSPECTIVE_CAMERA: 1,
 		SAMPLES: 16,
 		NORMAL_VECTOR_TYPE: 1,
-		DEPTH_SWIZZLING: 'x',
 		SCREEN_SPACE_RADIUS: 0,
 		SCREEN_SPACE_RADIUS_SCALE: 100.0,
 		SCENE_CLIP_BOX: 0,
@@ -102,11 +101,11 @@ const GTAOShader = {
 		}
 
 		float getDepth(const vec2 uv) {
-			return textureLod(tDepth, uv.xy, 0.0).DEPTH_SWIZZLING;
+			return textureLod(tDepth, uv.xy, 0.0).r;
 		}
 
 		float fetchDepth(const ivec2 uv) {
-			return texelFetch(tDepth, uv.xy, 0).DEPTH_SWIZZLING;
+			return texelFetch(tDepth, uv.xy, 0).r;
 		}
 
 		float getViewZ(const in float depth) {
@@ -267,8 +266,7 @@ const GTAODepthShader = {
 	name: 'GTAODepthShader',
 
 	defines: {
-		PERSPECTIVE_CAMERA: 1,
-		DEPTH_SWIZZLING: 'x'
+		PERSPECTIVE_CAMERA: 1
 	},
 
 	uniforms: {
@@ -295,11 +293,11 @@ const GTAODepthShader = {
 
 		float getLinearDepth( const in vec2 screenPosition ) {
 			#if PERSPECTIVE_CAMERA == 1
-				float fragCoordZ = texture2D( tDepth, screenPosition ).DEPTH_SWIZZLING;
+				float fragCoordZ = texture2D( tDepth, screenPosition ).x;
 				float viewZ = perspectiveDepthToViewZ( fragCoordZ, cameraNear, cameraFar );
 				return viewZToOrthographicDepth( viewZ, cameraNear, cameraFar );
 			#else
-				return texture2D( tDepth, screenPosition ).DEPTH_SWIZZLING;
+				return texture2D( tDepth, screenPosition ).x;
 			#endif
 		}
 
