@@ -1,5 +1,5 @@
 import {
-	BackSide, Color, DataTexture, DoubleSide, Mesh, MeshBasicMaterial, MeshStandardMaterial, Plane, Vector2, Vector3, NearestFilter, NoBlending,
+	BackSide, Color, DataTexture, DoubleSide, Mesh, MeshBasicMaterial, MeshStandardMaterial, Plane, Vector2, Vector3, LinearFilter, NearestFilter, NoBlending,
 	OrthographicCamera, PlaneGeometry, RepeatWrapping, Scene, ShaderMaterial,
 	WebGLRenderer, WebGLRenderTarget
 } from 'three';
@@ -14,7 +14,7 @@ QUnit.module( 'Addons', () => {
 
 	QUnit.module( 'GBufferPass', () => {
 
-		QUnit.test( 'normal maps, displacement and local clipping use source settings', assert => {
+		QUnit.test( 'normal maps, bump maps, displacement and local clipping use source settings', assert => {
 
 			const renderer = new WebGLRenderer();
 			renderer.setSize( 64, 64 );
@@ -76,6 +76,18 @@ QUnit.module( 'Addons', () => {
 			source.needsUpdate = true;
 			read( false );
 			assert.true( cached.version > changedVersion, 'source material invalidation reaches the cached override' );
+			const bumpMap = new DataTexture( new Uint8Array( [ 0, 0, 0, 255, 255, 255, 255, 255 ] ), 2, 1 );
+			bumpMap.magFilter = bumpMap.minFilter = LinearFilter;
+			bumpMap.needsUpdate = true;
+			source.normalMap = null;
+			source.bumpMap = bumpMap;
+			source.bumpScale = 16;
+			const bump = read( false );
+			assert.true( bump[ 0 ] < 100 && bump[ 2 ] > 220, 'bump-map gradient perturbs the normal buffer' );
+			const bumpVersion = cached.version;
+			source.bumpScale = 0;
+			assert.deepEqual( read( false ), [ 128, 128, 255, 255 ], 'bumpScale changes update the normal buffer' );
+			assert.strictEqual( cached.version, bumpVersion, 'bumpScale change does not invalidate the shader' );
 			assert.true( Math.abs( read( true )[ 0 ] - 43 ) <= 1, 'depth includes displacementScale' );
 			source.displacementBias = 0.25;
 			assert.true( Math.abs( read( true )[ 0 ] - 36 ) <= 1, 'depth includes changed displacementBias' );
@@ -91,6 +103,7 @@ QUnit.module( 'Addons', () => {
 			geometry.dispose();
 			source.dispose();
 			normalMap.dispose();
+			bumpMap.dispose();
 			displacementMap.dispose();
 			renderer.dispose();
 

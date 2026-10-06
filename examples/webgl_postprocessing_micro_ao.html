@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - alpha cutout AO</title>
+		<title>three.js webgl - microgeometry AO</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="example.css">
@@ -10,10 +10,10 @@
 		<div id="info">
 			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
 			<div class="title-wrapper">
-				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Alpha cutout AO</span>
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Microgeometry AO</span>
 			</div>
 			<small>
-				Alpha-aware AO via alpha-aware depth and normal pre-passes by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>
+				Alpha, displacement, normal, and bump-aware pre-pass by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>
 			</small>
 		</div>
 
@@ -30,7 +30,7 @@
 			import * as THREE from 'three';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-			import { createAlphaCutoutScene } from 'three/addons/scenes/AlphaCutoutScene.js';
+			import { createMicroGeometryScene } from 'three/addons/scenes/MicroGeometryScene.js';
 
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
@@ -44,13 +44,13 @@
 			renderer.setSize( innerWidth, innerHeight );
 			document.body.appendChild( renderer.domElement );
 
-			const { scene, cutouts, alphaMap } = createAlphaCutoutScene();
+			const { scene, cutouts, update } = await createMicroGeometryScene();
 			const camera = new THREE.PerspectiveCamera( 45, innerWidth / innerHeight, 0.1, 30 );
 			camera.position.set( 0, 1.5, 11 );
 			const controls = new OrbitControls( camera, renderer.domElement );
 			controls.target.set( 0, 1.5, 0 );
 			controls.update();
-			const params = { view: 'AO + beauty', alphaTest: 0.5, opacity: 0.75, rotation: 0.3, samples: 64 };
+			const params = { view: 'AO + beauty', alphaTest: 0.5, opacity: 0.75, animate: true };
 			const gui = new GUI();
 			gui.add( params, 'alphaTest', 0, 1 ).onChange( value => {
 
@@ -58,7 +58,7 @@
 
 			} );
 			gui.add( params, 'opacity', 0, 1 ).onChange( value => cutouts[ 2 ].opacity = value );
-			gui.add( params, 'rotation', - Math.PI, Math.PI ).onChange( value => alphaMap.rotation = value );
+			gui.add( params, 'animate' ).name( 'animate displacement' );
 
 			const composer = new EffectComposer( renderer );
 			const prepass = new GBufferPass( scene, camera );
@@ -69,8 +69,7 @@
 				normalTexture: prepass.normalTexture
 			} );
 			// Match GTAONode's sample budget and quadratic distance distribution.
-			gtaoPass.updateGtaoMaterial( { radius: 0.5, samples: params.samples, distanceExponent: 2, thickness: 1, scale: 1 } );
-			gui.add( params, 'samples', [ 16, 32, 64 ] ).onChange( samples => gtaoPass.updateGtaoMaterial( { samples } ) );
+			gtaoPass.updateGtaoMaterial( { radius: 0.5, samples: 64, distanceExponent: 2, thickness: 1, scale: 1 } );
 			composer.addPass( gtaoPass );
 			// Composite raw AO; GTAOPass's denoised intermediate is not used.
 			const compositePass = new ShaderPass( {
@@ -131,7 +130,9 @@
 			metrics.style.cssText = 'position:absolute;bottom:16px;left:16px;padding:8px;color:white;background:rgba(0,0,0,0.6)';
 			document.body.appendChild( metrics );
 			renderer.info.autoReset = false;
-			renderer.setAnimationLoop( () => {
+			renderer.setAnimationLoop( time => {
+
+				if ( params.animate ) update( time / 1000 );
 
 				renderer.info.reset();
 				composer.render();

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - alpha cutout AO</title>
+		<title>three.js webgpu - microgeometry AO</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="example.css">
@@ -10,10 +10,10 @@
 		<div id="info">
 			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
 			<div class="title-wrapper">
-				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Alpha cutout AO</span>
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Microgeometry AO</span>
 			</div>
 			<small>
-				Alpha-aware AO via alpha-aware depth and normal pre-passes by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>
+				Alpha, displacement, normal, and bump-aware pre-pass by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>
 			</small>
 		</div>
 
@@ -30,7 +30,7 @@
 			import * as THREE from 'three';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-			import { createAlphaCutoutScene } from 'three/addons/scenes/AlphaCutoutScene.js';
+			import { createMicroGeometryScene } from 'three/addons/scenes/MicroGeometryScene.js';
 
 			import { pass, mrt, output, normalView, vec4 } from 'three/tsl';
 			import { ao } from 'three/addons/tsl/display/GTAONode.js';
@@ -41,13 +41,13 @@
 			document.body.appendChild( renderer.domElement );
 			await renderer.init();
 
-			const { scene, cutouts, alphaMap } = createAlphaCutoutScene();
+			const { scene, cutouts, update } = await createMicroGeometryScene();
 			const camera = new THREE.PerspectiveCamera( 45, innerWidth / innerHeight, 0.1, 30 );
 			camera.position.set( 0, 1.5, 11 );
 			const controls = new OrbitControls( camera, renderer.domElement );
 			controls.target.set( 0, 1.5, 0 );
 			controls.update();
-			const params = { view: 'AO + beauty', alphaTest: 0.5, opacity: 0.75, rotation: 0.3, samples: 64 };
+			const params = { view: 'AO + beauty', alphaTest: 0.5, opacity: 0.75, animate: true };
 			const gui = new GUI();
 			gui.add( params, 'alphaTest', 0, 1 ).onChange( value => {
 
@@ -55,7 +55,7 @@
 
 			} );
 			gui.add( params, 'opacity', 0, 1 ).onChange( value => cutouts[ 2 ].opacity = value );
-			gui.add( params, 'rotation', - Math.PI, Math.PI ).onChange( value => alphaMap.rotation = value );
+			gui.add( params, 'animate' ).name( 'animate displacement' );
 
 			// MRT evaluates the original materials, including alpha discard, for every group.
 			const scenePass = pass( scene, camera );
@@ -65,10 +65,9 @@
 			const depth = scenePass.getTextureNode( 'depth' );
 			const aoPass = ao( depth, normals, camera );
 			aoPass.radius.value = 0.5;
-			aoPass.samples.value = params.samples;
+			aoPass.samples.value = 64;
 			aoPass.thickness.value = 1;
 			aoPass.scale.value = 1;
-			gui.add( params, 'samples', [ 16, 32, 64 ] ).onChange( samples => aoPass.samples.value = samples );
 			aoPass.resolutionScale = 1;
 			aoPass.useTemporalFiltering = false;
 			const pipeline = new THREE.RenderPipeline( renderer );
@@ -88,7 +87,12 @@
 
 			gui.add( params, 'view', [ 'AO + beauty', 'Beauty', 'AO', 'Normals', 'Depth' ] ).onChange( updateOutput );
 			updateOutput();
-			renderer.setAnimationLoop( () => pipeline.render() );
+			renderer.setAnimationLoop( time => {
+
+				if ( params.animate ) update( time / 1000 );
+				pipeline.render();
+
+			} );
 
 			window.addEventListener( 'resize', () => {
 
