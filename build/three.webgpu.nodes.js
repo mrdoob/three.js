@@ -26290,6 +26290,14 @@ const IBLSheenBRDF = /*@__PURE__*/ Fn( ( { normal, viewDir, roughness } ) => {
 
 	return DG.saturate();
 
+} ).setLayout( {
+	name: 'IBLSheenBRDF',
+	type: 'float',
+	inputs: [
+		{ name: 'normal', type: 'vec3' },
+		{ name: 'viewDir', type: 'vec3' },
+		{ name: 'roughness', type: 'float' }
+	]
 } );
 
 const clearcoatF0 = vec3( 0.04 );
@@ -33464,8 +33472,6 @@ class Pipelines extends DataMap {
 
 			if ( stageCompute === undefined ) {
 
-				if ( previousPipeline && previousPipeline.computeProgram.usedTimes === 0 ) this._releaseProgram( previousPipeline.computeProgram );
-
 				stageCompute = new ProgrammableStage( nodeBuilderState.computeShader, 'compute', computeNode.name, nodeBuilderState.transforms, nodeBuilderState.nodeAttributes );
 				this.programs.compute.set( nodeBuilderState.computeShader, stageCompute );
 
@@ -33482,8 +33488,6 @@ class Pipelines extends DataMap {
 
 			if ( pipeline === undefined ) {
 
-				if ( previousPipeline && previousPipeline.usedTimes === 0 ) this._releasePipeline( previousPipeline );
-
 				pipeline = this._getComputePipeline( computeNode, stageCompute, cacheKey, bindings, promises );
 
 			}
@@ -33492,6 +33496,15 @@ class Pipelines extends DataMap {
 
 			pipeline.usedTimes ++;
 			stageCompute.usedTimes ++;
+
+			// release previous pipeline and program if they are not used anymore
+
+			if ( previousPipeline ) {
+
+				if ( previousPipeline.usedTimes === 0 ) this._releasePipeline( previousPipeline );
+				if ( previousPipeline.computeProgram.usedTimes === 0 ) this._releaseProgram( previousPipeline.computeProgram );
+
+			}
 
 			//
 
@@ -33541,8 +33554,6 @@ class Pipelines extends DataMap {
 
 			if ( stageVertex === undefined ) {
 
-				if ( previousPipeline && previousPipeline.vertexProgram.usedTimes === 0 ) this._releaseProgram( previousPipeline.vertexProgram );
-
 				stageVertex = new ProgrammableStage( nodeBuilderState.vertexShader, 'vertex', name );
 				this.programs.vertex.set( nodeBuilderState.vertexShader, stageVertex );
 
@@ -33554,8 +33565,6 @@ class Pipelines extends DataMap {
 			let stageFragment = this.programs.fragment.get( nodeBuilderState.fragmentShader );
 
 			if ( stageFragment === undefined ) {
-
-				if ( previousPipeline && previousPipeline.fragmentProgram.usedTimes === 0 ) this._releaseProgram( previousPipeline.fragmentProgram );
 
 				stageFragment = new ProgrammableStage( nodeBuilderState.fragmentShader, 'fragment', name );
 				this.programs.fragment.set( nodeBuilderState.fragmentShader, stageFragment );
@@ -33573,8 +33582,6 @@ class Pipelines extends DataMap {
 
 			if ( pipeline === undefined ) {
 
-				if ( previousPipeline && previousPipeline.usedTimes === 0 ) this._releasePipeline( previousPipeline );
-
 				pipeline = this._getRenderPipeline( renderObject, stageVertex, stageFragment, cacheKey, promises );
 
 			} else {
@@ -33588,6 +33595,16 @@ class Pipelines extends DataMap {
 			pipeline.usedTimes ++;
 			stageVertex.usedTimes ++;
 			stageFragment.usedTimes ++;
+
+			// release previous pipeline and programs if they are not used anymore
+
+			if ( previousPipeline ) {
+
+				if ( previousPipeline.usedTimes === 0 ) this._releasePipeline( previousPipeline );
+				if ( previousPipeline.vertexProgram.usedTimes === 0 ) this._releaseProgram( previousPipeline.vertexProgram );
+				if ( previousPipeline.fragmentProgram.usedTimes === 0 ) this._releaseProgram( previousPipeline.fragmentProgram );
+
+			}
 
 			//
 
@@ -35416,8 +35433,8 @@ class RenderContexts {
 
 		} else {
 
-			const format = renderTarget.texture.format;
-			const type = renderTarget.texture.type;
+			const format = renderTarget.texture?.format;
+			const type = renderTarget.texture?.type;
 			const count = renderTarget.textures.length;
 
 			attachmentState = `${ count }:${ format }:${ type }:${ renderTarget.samples }:${ renderTarget.depthBuffer }:${ renderTarget.stencilBuffer }`;
@@ -35580,7 +35597,8 @@ class Textures extends DataMap {
 
 		const textures = renderTarget.textures;
 
-		const size = this.getSize( textures[ 0 ] );
+		// Depth-only render targets take their size from the depth texture.
+		const size = this.getSize( textures.length > 0 ? textures[ 0 ] : renderTarget.depthTexture );
 
 		const mipWidth = size.width >> activeMipmapLevel;
 		const mipHeight = size.height >> activeMipmapLevel;
@@ -53266,7 +53284,7 @@ class NodeBuilder {
 
 		const renderTarget = this.renderer.getRenderTarget();
 
-		if ( renderTarget !== null ) {
+		if ( renderTarget !== null && renderTarget.textures[ index ] !== undefined ) {
 
 			return getTextureType( renderTarget.textures[ index ] );
 
@@ -71707,7 +71725,7 @@ class WebGLState {
 
 			if ( drawBuffers === undefined ) {
 
-				drawBuffers = [];
+				drawBuffers = [ gl.COLOR_ATTACHMENT0 ];
 				this.currentDrawbuffers.set( framebuffer, drawBuffers );
 
 			}
@@ -71715,7 +71733,7 @@ class WebGLState {
 
 			const textures = renderContext.textures;
 
-			if ( drawBuffers.length !== textures.length || drawBuffers[ 0 ] !== gl.COLOR_ATTACHMENT0 ) {
+			if ( drawBuffers.length !== textures.length ) {
 
 				for ( let i = 0, il = textures.length; i < il; i ++ ) {
 
@@ -77053,19 +77071,23 @@ class WebGLBackend extends Backend {
 
 					// rebind color
 
-					const textureData = this.get( descriptor.textures[ 0 ] );
+					if ( descriptor.textures.length > 0 ) {
 
-					if ( renderTarget.multiview ) {
+						const textureData = this.get( descriptor.textures[ 0 ] );
 
-						multiviewExt.framebufferTextureMultisampleMultiviewOVR( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, textureData.textureGPU, 0, samples, 0, 2 );
+						if ( renderTarget.multiview ) {
 
-					} else if ( useMultisampledRTT ) {
+							multiviewExt.framebufferTextureMultisampleMultiviewOVR( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, textureData.textureGPU, 0, samples, 0, 2 );
 
-						multisampledRTTExt.framebufferTexture2DMultisampleEXT( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureData.textureGPU, 0, samples );
+						} else if ( useMultisampledRTT ) {
 
-					} else {
+							multisampledRTTExt.framebufferTexture2DMultisampleEXT( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureData.textureGPU, 0, samples );
 
-						gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+						} else {
+
+							gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+
+						}
 
 					}
 
@@ -77306,8 +77328,9 @@ class WebGLBackend extends Backend {
 			if ( renderTarget.samples > 0 && renderTargetContextData.msaaFrameBuffer !== undefined && this._useMultisampledExtension( renderTarget ) === false ) {
 
 				const fb = renderTargetContextData.framebuffers[ renderContext.getCacheKey() ];
+				const textures = renderContext.textures;
 
-				let mask = renderTarget.resolveColorBuffer === false ? 0 : gl.COLOR_BUFFER_BIT;
+				let mask = renderTarget.resolveColorBuffer === false || textures.length === 0 ? 0 : gl.COLOR_BUFFER_BIT;
 
 				if ( renderTarget.resolveDepthBuffer ) {
 
@@ -77319,8 +77342,10 @@ class WebGLBackend extends Backend {
 				const msaaFrameBuffer = renderTargetContextData.msaaFrameBuffer;
 				const msaaRenderbuffers = renderTargetContextData.msaaRenderbuffers;
 
-				const textures = renderContext.textures;
 				const isMRT = textures.length > 1;
+
+				// Depth-only render targets have no color attachment but still resolve their depth.
+				const blitCount = Math.max( textures.length, 1 );
 
 				state.bindFramebuffer( gl.READ_FRAMEBUFFER, msaaFrameBuffer );
 				state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
@@ -77339,7 +77364,7 @@ class WebGLBackend extends Backend {
 
 				}
 
-				for ( let i = 0; i < textures.length; i ++ ) {
+				for ( let i = 0; i < blitCount; i ++ ) {
 
 					if ( isMRT ) {
 
@@ -78108,7 +78133,7 @@ class WebGPUUtils {
 
 		if ( renderContext.textures !== null ) {
 
-			format = this.getTextureFormatGPU( renderContext.textures[ 0 ] );
+			format = renderContext.textures.length > 0 ? this.getTextureFormatGPU( renderContext.textures[ 0 ] ) : null;
 
 		} else {
 
@@ -78150,7 +78175,7 @@ class WebGPUUtils {
 
 		if ( renderContext.textures !== null ) {
 
-			return renderContext.textures[ 0 ].colorSpace;
+			return renderContext.textures[ 0 ]?.colorSpace;
 
 		}
 
@@ -88883,22 +88908,27 @@ class WebGPUBackend extends Backend {
 
 		for ( let i = 0; i < cameras.length; i ++ ) {
 
-			const sourceAttachment = descriptor.colorAttachments[ 0 ];
-			const layerAttachment = descriptor.colorAttachments[ i ];
-
-			const layerColorAttachment = new GPURenderPassColorAttachment();
-			layerColorAttachment.view = layerAttachment.view;
-			layerColorAttachment.depthSlice = layerAttachment.depthSlice;
-			layerColorAttachment.resolveTarget = layerAttachment.resolveTarget;
-			layerColorAttachment.loadOp = sourceAttachment.loadOp;
-			layerColorAttachment.storeOp = sourceAttachment.storeOp;
-			layerColorAttachment.clearValue = sourceAttachment.clearValue;
-
 			const layerDescriptor = new GPURenderPassDescriptor();
 			layerDescriptor.label = descriptor.label;
 			layerDescriptor.occlusionQuerySet = descriptor.occlusionQuerySet;
 			layerDescriptor.timestampWrites = descriptor.timestampWrites;
-			layerDescriptor.colorAttachments.push( layerColorAttachment );
+
+			if ( descriptor.colorAttachments.length > 0 ) {
+
+				const sourceAttachment = descriptor.colorAttachments[ 0 ];
+				const layerAttachment = descriptor.colorAttachments[ i ];
+
+				const layerColorAttachment = new GPURenderPassColorAttachment();
+				layerColorAttachment.view = layerAttachment.view;
+				layerColorAttachment.depthSlice = layerAttachment.depthSlice;
+				layerColorAttachment.resolveTarget = layerAttachment.resolveTarget;
+				layerColorAttachment.loadOp = sourceAttachment.loadOp;
+				layerColorAttachment.storeOp = sourceAttachment.storeOp;
+				layerColorAttachment.clearValue = sourceAttachment.clearValue;
+
+				layerDescriptor.colorAttachments.push( layerColorAttachment );
+
+			}
 
 			if ( descriptor.depthStencilAttachment ) {
 
@@ -88984,16 +89014,20 @@ class WebGPUBackend extends Backend {
 			const layerDescriptor = renderContextData.layerDescriptors[ i ];
 			layerDescriptor.timestampWrites = descriptor.timestampWrites;
 
-			const sourceColorAttachment = descriptor.colorAttachments[ 0 ];
-			const layerColorAttachment = descriptor.colorAttachments[ i ];
-			const colorAttachment = layerDescriptor.colorAttachments[ 0 ];
+			if ( descriptor.colorAttachments.length > 0 ) {
 
-			colorAttachment.view = layerColorAttachment.view;
-			colorAttachment.resolveTarget = layerColorAttachment.resolveTarget;
-			colorAttachment.depthSlice = layerColorAttachment.depthSlice;
-			colorAttachment.loadOp = sourceColorAttachment.loadOp;
-			colorAttachment.storeOp = sourceColorAttachment.storeOp;
-			colorAttachment.clearValue = sourceColorAttachment.clearValue;
+				const sourceColorAttachment = descriptor.colorAttachments[ 0 ];
+				const layerColorAttachment = descriptor.colorAttachments[ i ];
+				const colorAttachment = layerDescriptor.colorAttachments[ 0 ];
+
+				colorAttachment.view = layerColorAttachment.view;
+				colorAttachment.resolveTarget = layerColorAttachment.resolveTarget;
+				colorAttachment.depthSlice = layerColorAttachment.depthSlice;
+				colorAttachment.loadOp = sourceColorAttachment.loadOp;
+				colorAttachment.storeOp = sourceColorAttachment.storeOp;
+				colorAttachment.clearValue = sourceColorAttachment.clearValue;
+
+			}
 
 			if ( layerDescriptor.depthStencilAttachment ) {
 
