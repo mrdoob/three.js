@@ -29,7 +29,6 @@ const GTAOShader = {
 		PERSPECTIVE_CAMERA: 1,
 		SAMPLES: 16,
 		NORMAL_VECTOR_TYPE: 1,
-		DEPTH_SWIZZLING: 'x',
 		SCREEN_SPACE_RADIUS: 0,
 		SCREEN_SPACE_RADIUS_SCALE: 100.0,
 		SCENE_CLIP_BOX: 0,
@@ -102,11 +101,11 @@ const GTAOShader = {
 		}
 
 		float getDepth(const vec2 uv) {
-			return textureLod(tDepth, uv.xy, 0.0).DEPTH_SWIZZLING;
+			return textureLod(tDepth, uv.xy, 0.0).r;
 		}
 
 		float fetchDepth(const ivec2 uv) {
-			return texelFetch(tDepth, uv.xy, 0).DEPTH_SWIZZLING;
+			return texelFetch(tDepth, uv.xy, 0).r;
 		}
 
 		float getViewZ(const in float depth) {

@@ -296,10 +296,11 @@ class GTAOPass extends Pass {
 	/**
 	 * Configures the GBuffer of this pass. If no arguments are passed,
 	 * the pass creates an internal render target for holding depth
-	 * and normal data.
+	 * and normal data. External depth and normal data must use separate
+	 * textures.
 	 *
 	 * @param {DepthTexture} [depthTexture] - The depth texture.
-	 * @param {DepthTexture} [normalTexture] - The normal texture.
+	 * @param {Texture} [normalTexture] - The normal texture. If omitted, normals are reconstructed from depth.
 	 */
 	setGBuffer( depthTexture, normalTexture ) {
 
@@ -326,15 +327,12 @@ class GTAOPass extends Pass {
 		}
 
 		const normalVectorType = ( this.normalTexture ) ? 1 : 0;
-		const depthValueSource = ( this.depthTexture === this.normalTexture ) ? 'w' : 'x';
 
 		this.gtaoMaterial.defines.NORMAL_VECTOR_TYPE = normalVectorType;
-		this.gtaoMaterial.defines.DEPTH_SWIZZLING = depthValueSource;
 		this.gtaoMaterial.uniforms.tNormal.value = this.normalTexture;
 		this.gtaoMaterial.uniforms.tDepth.value = this.depthTexture;
 
 		this.pdMaterial.defines.NORMAL_VECTOR_TYPE = normalVectorType;
-		this.pdMaterial.defines.DEPTH_SWIZZLING = depthValueSource;
 		this.pdMaterial.uniforms.tNormal.value = this.normalTexture;
 		this.pdMaterial.uniforms.tDepth.value = this.depthTexture;
 
