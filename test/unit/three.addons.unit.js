@@ -54,3 +54,5 @@ import './addons/tsl/TSLProceduralUtils.tests.js';
 import './addons/tsl/TSLBSDFLightingRemainder.tests.js';
 import './addons/tsl/TSL.Irradiance.tests.js';
 import './addons/tsl/TSLUtilsMisc.tests.js';
+
+import './addons/postprocessing/GTAOPass.tests.js';
