@@ -35,6 +35,25 @@ class MeshNormalMaterial extends Material {
 		this.type = 'MeshNormalMaterial';
 
 		/**
+		 * The alpha channel of this texture modulates {@link Material#opacity}.
+		 * RGB values do not affect the normal output. Use {@link Material#alphaTest}
+		 * to discard texels below a threshold.
+		 *
+		 * @type {?Texture}
+		 * @default null
+		 */
+		this.map = null;
+
+		/**
+		 * A texture whose green channel modulates {@link Material#opacity}.
+		 * Use {@link Material#alphaTest} to discard texels below a threshold.
+		 *
+		 * @type {?Texture}
+		 * @default null
+		 */
+		this.alphaMap = null;
+
+		/**
 		 * The texture to create a bump map. The black and white values map to the
 		 * perceived depth in relation to the lights. Bump doesn't actually affect
 		 * the geometry of the object, only the lighting. If a normal map is defined
@@ -157,6 +176,9 @@ class MeshNormalMaterial extends Material {
 	copy( source ) {
 
 		super.copy( source );
+
+		this.map = source.map;
+		this.alphaMap = source.alphaMap;
 
 		this.bumpMap = source.bumpMap;
 		this.bumpScale = source.bumpScale;

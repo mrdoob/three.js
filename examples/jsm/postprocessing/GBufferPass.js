@@ -117,19 +117,6 @@ class GBufferPass extends Pass {
 		if ( entry === undefined ) {
 
 			const material = new MeshNormalMaterial( { blending: NoBlending } );
-			material.onBeforeCompile = shader => {
-
-				shader.fragmentShader = shader.fragmentShader
-					.replace( '#include <uv_pars_fragment>', `#include <uv_pars_fragment>
-#include <map_pars_fragment>
-#include <alphamap_pars_fragment>
-#include <alphatest_pars_fragment>` )
-					.replace( '#include <clipping_planes_fragment>', `#include <clipping_planes_fragment>
-#include <map_fragment>
-#include <alphamap_fragment>
-#include <alphatest_fragment>` );
-
-			};
 
 			const onDispose = () => {
 
