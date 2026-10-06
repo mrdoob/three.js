@@ -59,7 +59,7 @@ const SSR2TraceShader = {
 		'cameraWorldMatrix': { value: new Matrix4() },
 		'maxDistance': { value: 10 },
 		'thickness': { value: 0.1 },
-		'maxRoughness': { value: 0.5 },
+		'maxRoughness': { value: 1 },
 		'screenEdgeFade': { value: 0.2 }
 
 	},
@@ -127,6 +127,7 @@ const SSR2TraceShader = {
 			#endif
 
 			vec3 result = envColor;
+			float blurLod = 0.0; // log2 of the reflection cone footprint in pixels, resolved by SSR2ResolveShader
 
 			if ( roughness <= maxRoughness ) {
 
@@ -184,6 +185,11 @@ const SSR2TraceShader = {
 									vec2 e = min( uv, 1.0 - uv );
 									float edge = screenEdgeFade > 0.0 ? smoothstep( 0.0, screenEdgeFade, min( e.x, e.y ) ) : 1.0;
 									result = mix( envColor, texture2D( tColor, uv ).rgb, edge );
+
+									// footprint of the GGX cone (half angle ~ roughness^2) at the hit, in pixels
+									float rayLength = length( vP - viewPosition );
+									float conePx = rayLength * roughness * roughness * cameraProjectionMatrix[ 1 ][ 1 ] * resolution.y / max( - vP.z, 1e-4 );
+									blurLod = log2( max( conePx, 1.0 ) );
 									break;
 
 								}
@@ -200,7 +206,7 @@ const SSR2TraceShader = {
 
 			}
 
-			gl_FragColor = vec4( result, 1.0 );
+			gl_FragColor = vec4( result, blurLod );
 
 		}
 	`
@@ -209,7 +215,8 @@ const SSR2TraceShader = {
 
 /**
  * Resolves the traced radiance for roughness: samples the mip chain of the traced
- * texture at a per-pixel level derived from the G-buffer roughness.
+ * texture at the per-pixel level the trace stored in alpha (the reflection cone
+ * footprint, so reflections are sharp near contact and blur with hit distance).
  *
  * @constant
  * @type {ShaderMaterial~Shader}
@@ -221,7 +228,7 @@ const SSR2ResolveShader = {
 	uniforms: {
 
 		'tRadiance': { value: null },
-		'tMaterial': { value: null },
+		'resolution': { value: new Vector2() },
 		'maxMip': { value: 0 }
 
 	},
@@ -231,14 +238,22 @@ const SSR2ResolveShader = {
 	fragmentShader: /* glsl */`
 		varying vec2 vUv;
 		uniform sampler2D tRadiance;
-		uniform sampler2D tMaterial;
+		uniform vec2 resolution;
 		uniform float maxMip;
 
 		void main() {
 
-			float roughness = texture2D( tMaterial, vUv ).r;
+			float lod = clamp( textureLod( tRadiance, vUv, 0.0 ).a, 0.0, maxMip );
 
-			gl_FragColor = vec4( textureLod( tRadiance, vUv, clamp( roughness * roughness * maxMip, 0.0, maxMip ) ).rgb, 1.0 );
+			// a few taps at the chosen mip hide the blockiness of the box-filtered chain
+			vec2 o = exp2( lod - 1.0 ) / resolution;
+			vec3 c = textureLod( tRadiance, vUv, lod ).rgb * 2.0;
+			c += textureLod( tRadiance, vUv + vec2( o.x, o.y ) * 0.5, lod ).rgb;
+			c += textureLod( tRadiance, vUv + vec2( - o.x, o.y ) * 0.5, lod ).rgb;
+			c += textureLod( tRadiance, vUv + vec2( o.x, - o.y ) * 0.5, lod ).rgb;
+			c += textureLod( tRadiance, vUv + vec2( - o.x, - o.y ) * 0.5, lod ).rgb;
+
+			gl_FragColor = vec4( c / 6.0, 1.0 );
 
 		}
 	`

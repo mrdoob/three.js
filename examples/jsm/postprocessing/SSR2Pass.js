@@ -80,9 +80,9 @@ class SSR2Pass extends Pass {
 		 * Surfaces rougher than this skip the ray march and use the environment only.
 		 *
 		 * @type {number}
-		 * @default 0.5
+		 * @default 1
 		 */
-		this.maxRoughness = 0.5;
+		this.maxRoughness = 1;
 
 		/**
 		 * Width in UV units over which hits fade to the environment near the screen border.
@@ -126,7 +126,6 @@ class SSR2Pass extends Pass {
 		this._traceMaterial.uniforms.tNormal.value = gBufferPass.normalTexture;
 		this._traceMaterial.uniforms.tMaterial.value = gBufferPass.materialTexture;
 		this._resolveMaterial.uniforms.tRadiance.value = this._traceTarget.texture;
-		this._resolveMaterial.uniforms.tMaterial.value = gBufferPass.materialTexture;
 
 		this._fsQuad = new FullScreenQuad( null );
 		this._environment = null;
@@ -218,6 +217,7 @@ class SSR2Pass extends Pass {
 		this._traceMaterial.defines.MAX_STEP = Math.ceil( Math.sqrt( width * width + height * height ) );
 		this._traceMaterial.needsUpdate = true;
 		this._traceMaterial.uniforms.resolution.value.set( width, height );
+		this._resolveMaterial.uniforms.resolution.value.set( width, height );
 		this._resolveMaterial.uniforms.maxMip.value = Math.floor( Math.log2( Math.max( width, height ) ) );
 
 	}
