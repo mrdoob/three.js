@@ -5,6 +5,25 @@ import { ShaderNode, nodeProxy, getCurrentStack, setCurrentStack, nodeObject } f
 import { error } from '../../utils.js';
 
 /**
+ * Whether the given node is a variable intent that is not assigned. It is just
+ * an expression, which is generated where it is used instead of in the stack.
+ *
+ * @private
+ * @param {NodeBuilder} builder - The current node builder.
+ * @param {Node} node - The node to check.
+ * @return {boolean} Whether the node is an expression intent.
+ */
+const isExpressionIntent = ( builder, node ) => {
+
+	if ( node.intent !== true ) return false;
+
+	const data = builder.getDataFromNode( node );
+
+	return data.forceDeclaration !== true && data.assign !== true;
+
+};
+
+/**
  * Stack is a helper for Nodes that need to produce stack-based code instead of continuous flow.
  * They are usually needed in cases like `If`, `Else`.
  *
@@ -334,15 +353,7 @@ class StackNode extends Node {
 
 		for ( const childNode of this.getChildren() ) {
 
-			if ( childNode.isVarNode && childNode.isIntent( builder ) ) {
-
-				if ( childNode.isAssign( builder ) !== true ) {
-
-					continue;
-
-				}
-
-			}
+			if ( isExpressionIntent( builder, childNode ) ) continue;
 
 			nodeProperties[ 'node' + index ++ ] = childNode;
 
@@ -373,15 +384,7 @@ class StackNode extends Node {
 
 			this._currentNode = node;
 
-			if ( node.isVarNode && node.isIntent( builder ) ) {
-
-				if ( node.isAssign( builder ) !== true ) {
-
-					continue;
-
-				}
-
-			}
+			if ( isExpressionIntent( builder, node ) ) continue;
 
 			if ( buildStage === 'setup' ) {
 

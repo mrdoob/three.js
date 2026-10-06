@@ -9,9 +9,11 @@ import ConstNode from '../core/ConstNode.js';
 import MemberNode from '../utils/MemberNode.js';
 import StackTrace from '../core/StackTrace.js';
 import { getValueFromType, getValueType, isArrayAsParameter } from '../core/NodeUtils.js';
-import { warn, error } from '../../utils.js';
+import { warn, warnOnce, error } from '../../utils.js';
 
 let currentStack = null;
+
+const _secureNodeBuilders = new WeakMap();
 
 const NodeElements = new Map();
 
@@ -37,8 +39,6 @@ export function addMethodChaining( name, nodeElement ) {
 		// Changing Node prototype to add method chaining
 
 		Node.prototype[ name ] = function ( ...params ) {
-
-			//if ( name === 'toVarIntent' ) return this;
 
 			return this.isStackNode ? this.addToStack( nodeElement( ...params ) ) : nodeElement( this, ...params );
 
@@ -349,7 +349,7 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, setti
 
 			if ( settings.intent === true ) {
 
-				node = node.toVarIntent();
+				node = node.toIntent();
 
 			}
 
@@ -567,31 +567,39 @@ class ShaderCallNodeInternal extends Node {
 
 		} else {
 
-			const secureNodeBuilder = new Proxy( builder, {
+			let secureNodeBuilder = _secureNodeBuilders.get( builder );
 
-				get: ( target, property, receiver ) => {
+			if ( secureNodeBuilder === undefined ) {
 
-					let value;
+				secureNodeBuilder = new Proxy( builder, {
 
-					if ( Symbol.iterator === property ) {
+					get: ( target, property, receiver ) => {
 
-						value = function* () {
+						let value;
 
-							yield undefined;
+						if ( Symbol.iterator === property ) {
 
-						};
+							value = function* () {
 
-					} else {
+								yield undefined;
 
-						value = Reflect.get( target, property, receiver );
+							};
+
+						} else {
+
+							value = Reflect.get( target, property, receiver );
+
+						}
+
+						return value;
 
 					}
 
-					return value;
+				} );
 
-				}
+				_secureNodeBuilders.set( builder, secureNodeBuilder );
 
-			} );
+			}
 
 			//
 
@@ -641,12 +649,31 @@ class ShaderCallNodeInternal extends Node {
 
 	}
 
+	generate( builder, output ) {
+
+		return this.getOutputNode( builder ).build( builder, output ) || '';
+
+	}
+
 	build( builder, output = null ) {
+
+		// The call does not use Node.build(), so it handles shared and overridden nodes and its intent here.
+		const refNode = this.getShared( builder );
+
+		if ( this !== refNode ) {
+
+			return refNode.build( builder, output );
+
+		}
 
 		let result = null;
 
 		const buildStage = builder.getBuildStage();
 		const properties = builder.getNodeProperties( this );
+
+		const nodeData = this.intent === true ? builder.getDataFromNode( this ) : null;
+
+		if ( nodeData !== null ) this._updateIntent( builder, nodeData );
 
 		const subBuildOutput = builder.getSubBuildOutput( this );
 		const outputNode = this.getOutputNode( builder );
@@ -694,11 +721,31 @@ class ShaderCallNodeInternal extends Node {
 
 		} else if ( buildStage === 'analyze' ) {
 
-			outputNode.build( builder, output );
+			// A variable is evaluated once, so its value is analyzed only once.
+			if ( nodeData === null || this._isVariable( builder, nodeData ) === false || builder.increaseUsage( this ) === 1 ) {
+
+				outputNode.build( builder, output );
+
+			}
 
 		} else if ( buildStage === 'generate' ) {
 
-			result = outputNode.build( builder, output ) || '';
+			if ( nodeData !== null && this._isVariable( builder, nodeData ) ) {
+
+				this._checkFlowBlock( builder, nodeData );
+
+				const isCached = nodeData.propertyName !== undefined;
+				const flowCodeLength = builder.flow.code.length;
+
+				result = this._buildVariable( builder, nodeData, output );
+
+				this._setFlowBlock( builder, nodeData, isCached, flowCodeLength );
+
+			} else {
+
+				result = outputNode.build( builder, output ) || '';
+
+			}
 
 		}
 
@@ -940,20 +987,33 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 		if ( params.length === 1 && cacheMap !== null && cacheMap.has( params[ 0 ] ) ) {
 
-			return nodeObjectIntent( cacheMap.get( params[ 0 ] ) );
+			const cached = cacheMap.get( params[ 0 ] );
+
+			return new ConstNode( cached.value, cached.nodeType ).toIntent();
 
 		}
 
 		if ( params.length === 1 ) {
 
-			const node = getConstNode( params[ 0 ], type );
-			if ( node.nodeType === type ) return nodeObjectIntent( node );
-			return nodeObjectIntent( new ConvertNode( node, type ) );
+			const param = params[ 0 ];
+			const node = getConstNode( param, type );
+
+			if ( node.nodeType === type ) {
+
+				// A node given by the user or a shared constant must not become the variable itself.
+				if ( node === param ) return new ConvertNode( node, type ).toIntent();
+				if ( constNodesCacheMap.get( param ) === node ) return new ConstNode( node.value, node.nodeType ).toIntent();
+
+				return node.toIntent();
+
+			}
+
+			return new ConvertNode( node, type ).toIntent();
 
 		}
 
 		const nodes = params.map( param => getConstNode( param ) );
-		return nodeObjectIntent( new JoinNode( nodes, type ) );
+		return new JoinNode( nodes, type ).toIntent();
 
 	};
 
@@ -994,7 +1054,14 @@ export function ShaderNode( jsFunc, nodeType ) {
 }
 
 export const nodeObject = ( val, altType = null ) => /* new */ ShaderNodeObject( val, altType );
-export const nodeObjectIntent = ( val, altType = null ) => /* new */ nodeObject( val, altType ).toVarIntent();
+export const nodeObjectIntent = ( val, altType = null ) => { // @deprecated r187
+
+	warnOnce( 'TSL: "nodeObjectIntent()" has been deprecated. Use "nodeObject().toIntent()" instead.' );
+
+	return nodeObject( val, altType ).toVarIntent();
+
+};
+
 export const nodeObjects = ( val, altType = null ) => new ShaderNodeObjects( val, altType );
 export const nodeArray = ( val, altType = null ) => new ShaderNodeArray( val, altType );
 export const nodeProxy = ( NodeClass, scope = null, factor = null, settings = null ) => new ShaderNodeProxy( NodeClass, scope, factor, settings );
@@ -1116,9 +1183,10 @@ class FnNode extends Node {
 
 		const fnCall = this.shaderNode.call( params );
 
-		if ( this.shaderNode.nodeType === 'void' ) fnCall.toStack();
+		// A call without a return value is a statement.
+		if ( this.shaderNode.nodeType === 'void' ) return fnCall.toStack();
 
-		return fnCall.toVarIntent();
+		return fnCall.toIntent();
 
 	}
 

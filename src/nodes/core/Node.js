@@ -104,6 +104,15 @@ class Node extends EventDispatcher {
 		this.parents = false;
 
 		/**
+		 * Whether this node is a variable intent. An intent is generated as an expression,
+		 * unless it is assigned, in which case it is declared as a variable where it was created.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.intent = false;
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -177,6 +186,225 @@ class Node extends EventDispatcher {
 	isCacheable( /*builder*/ ) {
 
 		return true;
+
+	}
+
+	/**
+	 * Turns this node into a variable intent and adds it to the current stack,
+	 * so it can be declared where it was created if it is assigned later.
+	 * Only use it with nodes that are not shared, see {@link Node#intent}.
+	 *
+	 * @return {Node} A reference to this node.
+	 */
+	toIntent() {
+
+		this.intent = true;
+
+		return this.toStack();
+
+	}
+
+	/**
+	 * Checks if this node is used as a variable intent.
+	 *
+	 * @param {NodeBuilder} builder - The node builder.
+	 * @returns {boolean} Whether this node is used as a variable intent.
+	 */
+	isIntent( builder ) {
+
+		const data = builder.getDataFromNode( this );
+
+		if ( data.forceDeclaration === true ) return false;
+
+		return this.intent;
+
+	}
+
+	/**
+	 * Checks if this node is the target of an assignment.
+	 *
+	 * @param {NodeBuilder} builder - The node builder.
+	 * @returns {boolean} Whether this node is assigned.
+	 */
+	isAssign( builder ) {
+
+		const data = builder.getDataFromNode( this );
+
+		return data.assign;
+
+	}
+
+	/**
+	 * Declares the intent where it is generated if it is created in a block, and
+	 * decides if a value that cannot be cached must be evaluated once at its declaration.
+	 *
+	 * @private
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {Object} data - The node data.
+	 * @param {Node} [valueNode=this] - The node that defines the value of the intent.
+	 */
+	_updateIntent( builder, data, valueNode = this ) {
+
+		if ( data.stack === undefined && builder.buildStage === 'setup' ) {
+
+			// A node created while a block is generated is declared where it is generated.
+			if ( ( builder.context.nodeLoop || builder.context.nodeBlock ) && builder.flowBlock === null ) {
+
+				builder.getBaseStack().addToStack( this );
+
+			}
+
+		} else if ( this.intent === true && builder.context.nodeLoop && builder.buildStage === 'analyze' ) {
+
+			if ( valueNode.isCacheable( builder ) === false && builder.isDeterministic( valueNode ) === false ) {
+
+				// A value that cannot be cached, e.g. a function call, is evaluated once at its declaration
+				// if it is used in a loop that runs after it, otherwise the loop would repeat it.
+				const declarationIndex = builder.activeStacks.indexOf( data.stack );
+				const loopIndex = builder.activeStacks.indexOf( builder.getDataFromNode( builder.context.nodeLoop ).stack );
+
+				if ( declarationIndex !== - 1 && loopIndex >= declarationIndex ) data.forceDeclaration = true;
+
+			}
+
+		}
+
+	}
+
+	/**
+	 * Whether `build()` declares this node as a variable if its intent is assigned.
+	 * Nodes that wrap the value of an intent, like {@link VarNode}, declare it themselves.
+	 *
+	 * @private
+	 * @return {boolean} Whether `build()` declares the intent.
+	 */
+	_declaresIntent() {
+
+		return true;
+
+	}
+
+	/**
+	 * Declares a variable for this node in the current flow, initialized with the given snippet.
+	 *
+	 * @private
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {string} snippet - The initial value.
+	 * @param {string} type - The variable type.
+	 * @param {boolean} readOnly - Whether the variable is read-only.
+	 * @param {string} property - The node data property that holds the variable.
+	 * @return {string} The property name of the variable.
+	 */
+	_declareVariable( builder, snippet, type, readOnly, property ) {
+
+		const nodeVar = builder.getVarFromNode( this, null, type, undefined, readOnly, true, property );
+		const propertyName = builder.getPropertyName( nodeVar );
+		const declarationPrefix = readOnly
+			? builder.generateLetStatement( nodeVar.type, propertyName, nodeVar.count )
+			: builder.generateVarStatement( nodeVar.type, propertyName, nodeVar.count );
+
+		builder.addLineFlowCode( `${ declarationPrefix } = ${ snippet }`, this );
+
+		return propertyName;
+
+	}
+
+	/**
+	 * Whether this intent must be declared as a variable, because it is assigned
+	 * or must be evaluated once at its declaration.
+	 *
+	 * @private
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {Object} nodeData - The node data.
+	 * @return {boolean} Whether the intent is a variable.
+	 */
+	_isVariable( builder, nodeData ) {
+
+		return ( nodeData.assign === true || nodeData.forceDeclaration === true ) && this.getNodeType( builder ) !== 'void';
+
+	}
+
+	/**
+	 * Generates an intent that is a variable. The variable is declared the first
+	 * time it is generated, which is its stack position, and then referenced by name.
+	 *
+	 * @private
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {Object} nodeData - The node data.
+	 * @param {?string} output - The output type.
+	 * @return {string} The generated shader string.
+	 */
+	_buildVariable( builder, nodeData, output ) {
+
+		const nodeType = this.getNodeType( builder );
+		const type = builder.getVectorType( nodeType );
+
+		if ( nodeData.propertyName === undefined ) {
+
+			const snippet = this.generate.length < 2
+				? builder.format( this.generate( builder ) || '', nodeType, type )
+				: this.generate( builder, type ) || '';
+
+			nodeData.propertyName = this._declareVariable( builder, snippet, type, false, 'variable' );
+
+		}
+
+		return builder.format( nodeData.propertyName, type, output );
+
+	}
+
+	/**
+	 * A generated value is only visible in the block where it was declared and in its inner blocks.
+	 * This method discards the generated value if it is not visible in the current block.
+	 *
+	 * @private
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {Object} nodeData - The node data.
+	 */
+	_checkFlowBlock( builder, nodeData ) {
+
+		if ( nodeData.flowBlock !== undefined ) {
+
+			let flowBlock = builder.flowBlock;
+
+			while ( flowBlock !== null && flowBlock !== nodeData.flowBlock ) {
+
+				flowBlock = flowBlock.parent;
+
+			}
+
+			if ( flowBlock === null ) {
+
+				nodeData.flowBlock = undefined;
+				nodeData.propertyName = undefined;
+				nodeData.snippet = undefined;
+				nodeData.generated = undefined;
+
+			}
+
+		}
+
+	}
+
+	/**
+	 * Keeps the block where a value was generated, so it is only reused where it is visible.
+	 * A global node is a declaration visible in any block, unless it emitted code in this block.
+	 *
+	 * @private
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {Object} nodeData - The node data.
+	 * @param {boolean} isCached - Whether the value was generated before.
+	 * @param {number} flowCodeLength - The length of the flow code before the value was generated.
+	 */
+	_setFlowBlock( builder, nodeData, isCached, flowCodeLength ) {
+
+		const isLocal = this.isGlobal( builder ) === false || builder.flow.code.length !== flowCodeLength;
+
+		if ( isCached === false && ( nodeData.propertyName !== undefined || nodeData.snippet !== undefined ) && isLocal && builder.flowBlock !== null ) {
+
+			nodeData.flowBlock = builder.flowBlock;
+
+		}
 
 	}
 
@@ -324,18 +552,22 @@ class Node extends EventDispatcher {
 	}
 
 	/**
-	 * Generator function that can be used to iterate over the child nodes.
+	 * Returns the child nodes of this node.
 	 *
-	 * @generator
-	 * @yields {Node} A child node.
+	 * @return {Array<Node>} The child nodes.
 	 */
-	* getChildren() {
+	getChildren() {
 
-		for ( const { childNode } of this._getChildren() ) {
+		const children = this._getChildren();
+		const nodes = [];
 
-			yield childNode;
+		for ( let i = 0; i < children.length; i ++ ) {
+
+			nodes.push( children[ i ].childNode );
 
 		}
+
+		return nodes;
 
 	}
 
@@ -387,12 +619,19 @@ class Node extends EventDispatcher {
 		// avoid circular references
 		ignores.add( this );
 
-		for ( const property of Object.getOwnPropertyNames( this ) ) {
+		const properties = Object.getOwnPropertyNames( this );
+
+		for ( let p = 0; p < properties.length; p ++ ) {
+
+			const property = properties[ p ];
+
+			// Ignore private properties.
+			if ( property.charCodeAt( 0 ) === 95 ) continue;
 
 			const object = this[ property ];
 
-			// Ignore private properties and ignored nodes.
-			if ( property.startsWith( '_' ) === true || ignores.has( object ) ) continue;
+			// Ignore primitives and ignored nodes.
+			if ( object === null || ( typeof object !== 'object' && typeof object !== 'function' ) || ignores.has( object ) ) continue;
 
 			if ( Array.isArray( object ) === true ) {
 
@@ -889,7 +1128,10 @@ class Node extends EventDispatcher {
 		//
 
 		const nodeData = builder.getDataFromNode( this );
-		nodeData.buildStages = nodeData.buildStages || {};
+
+		if ( this.intent === true && this._declaresIntent() ) this._updateIntent( builder, nodeData );
+
+		nodeData.buildStages = nodeData.buildStages || { setup: false, analyze: false, generate: false };
 		nodeData.buildStages[ builder.buildStage ] = true;
 
 		const parentBuildStage = _parentBuildStage[ builder.buildStage ];
@@ -973,27 +1215,7 @@ class Node extends EventDispatcher {
 
 		} else if ( buildStage === 'generate' ) {
 
-			// A generated value is only visible in the block where it was declared and in its inner blocks.
-			if ( nodeData.flowBlock !== undefined ) {
-
-				let flowBlock = builder.flowBlock;
-
-				while ( flowBlock !== null && flowBlock !== nodeData.flowBlock ) {
-
-					flowBlock = flowBlock.parent;
-
-				}
-
-				if ( flowBlock === null ) {
-
-					nodeData.flowBlock = undefined;
-					nodeData.propertyName = undefined;
-					nodeData.snippet = undefined;
-					nodeData.generated = undefined;
-
-				}
-
-			}
+			this._checkFlowBlock( builder, nodeData );
 
 			const isCached = nodeData.propertyName !== undefined || nodeData.snippet !== undefined;
 			const flowCodeLength = builder.flow.code.length;
@@ -1004,7 +1226,11 @@ class Node extends EventDispatcher {
 			const cacheResult = allowedCache && type !== 'void' && output !== 'void' && nodeData.usageCount > 1;
 			const generateOutput = cacheResult ? type : output;
 
-			if ( allowedCache && nodeData.propertyName !== undefined ) {
+			if ( this.intent === true && this._declaresIntent() && this._isVariable( builder, nodeData ) ) {
+
+				result = this._buildVariable( builder, nodeData, output );
+
+			} else if ( allowedCache && nodeData.propertyName !== undefined ) {
 
 				result = builder.format( nodeData.propertyName, type, output );
 
@@ -1020,7 +1246,6 @@ class Node extends EventDispatcher {
 				if ( isGenerateOnce ) {
 
 					const type = this.getNodeType( builder );
-					const nodeData = builder.getDataFromNode( this );
 
 					result = nodeData.snippet;
 
@@ -1064,16 +1289,8 @@ class Node extends EventDispatcher {
 
 				if ( cacheResult ) {
 
-					const readOnly = nodeData.assign !== true;
 					// Use a dedicated property, the node may already own a variable.
-					const nodeVar = builder.getVarFromNode( this, null, type, undefined, readOnly, true, 'cacheVariable' );
-					const propertyName = builder.getPropertyName( nodeVar );
-					const count = this.getArrayCount( builder );
-					const declarationPrefix = readOnly
-						? builder.generateLetStatement( nodeVar.type, propertyName, count )
-						: builder.generateVarStatement( nodeVar.type, propertyName, count );
-
-					builder.addLineFlowCode( `${ declarationPrefix } = ${ result }`, this );
+					const propertyName = this._declareVariable( builder, result, type, nodeData.assign !== true, 'cacheVariable' );
 
 					nodeData.snippet = result;
 					nodeData.propertyName = propertyName;
@@ -1084,15 +1301,7 @@ class Node extends EventDispatcher {
 
 			}
 
-			// Keep the block where a value was generated, so it is only reused where it is visible.
-			// A global node is a declaration visible in any block, unless it emitted code in this block.
-			const isLocal = this.isGlobal( builder ) === false || builder.flow.code.length !== flowCodeLength;
-
-			if ( isCached === false && ( nodeData.propertyName !== undefined || nodeData.snippet !== undefined ) && isLocal && builder.flowBlock !== null ) {
-
-				nodeData.flowBlock = builder.flowBlock;
-
-			}
+			this._setFlowBlock( builder, nodeData, isCached, flowCodeLength );
 
 		}
 
