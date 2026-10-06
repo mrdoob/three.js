@@ -327,7 +327,8 @@ const SSR2TraceShader = {
 					}
 
 					result = sum / float( max( rayCount, 1 ) );
-					blurLod = noiseBlurLod;
+					// the noise grows with the lobe width, so mirror-like surfaces stay sharp
+					blurLod = noiseBlurLod * smoothstep( 0.0, 0.3, roughness );
 
 				#else
 
@@ -383,6 +384,13 @@ const SSR2ResolveShader = {
 		void main() {
 
 			float lod = clamp( textureLod( tRadiance, vUv, 0.0 ).a, 0.0, maxMip );
+
+			if ( lod < 0.05 ) {
+
+				gl_FragColor = vec4( textureLod( tRadiance, vUv, 0.0 ).rgb, 1.0 );
+				return;
+
+			}
 
 			// a few taps at the chosen mip hide the blockiness of the box-filtered chain
 			vec2 o = exp2( lod - 1.0 ) / resolution;

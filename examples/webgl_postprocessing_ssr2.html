@@ -118,7 +118,6 @@
 		const ssr2Pass = new SSR2Pass( scene, camera, width, height, gBufferPass );
 		ssr2Pass.maxDistance = 0.3;
 		ssr2Pass.thickness = 0.02;
-		ssr2Pass.resolutionScale = 0.5;
 
 		composer.addPass( gBufferPass );
 		composer.addPass( new RenderPass( scene, camera ) );
