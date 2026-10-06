@@ -112,6 +112,14 @@ const SSR2TraceShader = {
 			return view.xyz / view.w;
 		}
 
+		// view-space point on the ray at a screen uv and view depth (symmetric perspective projection)
+		vec3 getViewPointAtZ( const in vec2 uv, const in float viewZ ) {
+			float w = - viewZ;
+			vec2 ndc = uv * 2.0 - 1.0;
+			vec4 view = cameraInverseProjectionMatrix * vec4( ndc * w, 0.0, w );
+			return vec3( view.xy, viewZ );
+		}
+
 		float pointToLineDistance( vec3 x0, vec3 x1, vec3 x2 ) {
 			return length( cross( x0 - x1, x0 - x2 ) ) / length( x2 - x1 );
 		}
@@ -193,6 +201,9 @@ const SSR2TraceShader = {
 
 			hitUv = vec2( 0.0 );
 
+			vec2 prevUv = vUv;
+			float prevRayZ = viewPosition.z;
+
 			for ( float i = 1.0; i < stepLimit; i ++ ) {
 
 				#ifdef STOCHASTIC
@@ -213,17 +224,21 @@ const SSR2TraceShader = {
 				vec2 uv = xy / resolution;
 				float d = texture2D( tDepth, uv ).x;
 
-				if ( d < 1.0 ) {
+				// cheap view-space depth first; the position is only rebuilt on a crossing
+				float rayZ = 1.0 / ( recipZ + s * recipZStep );
 
-					// cheap view-space depth first; the position is only rebuilt on a crossing
-					float rayZ = 1.0 / ( recipZ + s * recipZStep );
+				if ( d < 1.0 ) {
 
 					if ( rayZ <= perspectiveDepthToViewZ( d, cameraNear, cameraFar ) ) {
 
 						vec3 vP = getViewPosition( uv, d );
 						float away = pointToLineDistance( vP, viewPosition, d1viewPosition );
-						vec3 vPNeighbor = getViewPosition( ( xy + vec2( 1.0, 0.0 ) ) / resolution, d );
-						float tk = max( ( vPNeighbor.x - vP.x ) * 3.0, thickness );
+
+						// A ray crossing a surface between two samples can be up to one 3D ray step away
+						// from it at the first sample past it, so that step is the minimum tolerance. This
+						// keeps coverage independent of the resolution, the sample spacing and the angle.
+						float stepLength = length( getViewPointAtZ( uv, rayZ ) - getViewPointAtZ( prevUv, prevRayZ ) );
+						float tk = max( thickness, 2.0 * stepLength );
 
 						if ( away <= tk ) {
 
@@ -246,6 +261,9 @@ const SSR2TraceShader = {
 					}
 
 				}
+
+				prevUv = uv;
+				prevRayZ = rayZ;
 
 			}
 

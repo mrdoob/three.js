@@ -70,7 +70,7 @@
 
 		const pmrem = new THREE.PMREMGenerator( renderer );
 		scene.environment = pmrem.fromScene( new RoomEnvironment(), 0.04 ).texture;
-		scene.environmentIntensity = 0.6;
+		scene.environmentIntensity = 1;
 		pmrem.dispose();
 
 		const add = ( geometry, color, x, y, z, roughness = 0.3, metalness = 0 ) => {
