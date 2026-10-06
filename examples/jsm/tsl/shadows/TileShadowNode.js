@@ -5,8 +5,12 @@ import {
 	Plane,
 	Line3,
 	DepthTexture,
+	Compatibility,
 	LessCompare,
 	GreaterEqualCompare,
+	LinearFilter,
+	NearestFilter,
+	PCFShadowMap,
 	Vector2,
 	RedFormat,
 	ArrayCamera,
@@ -16,7 +20,7 @@ import {
 	UnsignedIntType
 } from 'three/webgpu';
 
-import { min, Fn, shadow, NodeUpdateType } from 'three/tsl';
+import { Fn, int, lightShadowMatrix, mix, normalWorld, reference, renderGroup, shadow, shadowPositionWorld, texture, vec2, vec3, vec4, NodeUpdateType } from 'three/tsl';
 
 const { resetRendererAndSceneState, restoreRendererAndSceneState } = RendererUtils;
 let _rendererState;
@@ -166,6 +170,12 @@ class TileShadowNode extends ShadowBaseNode {
 		const depthTexture = new DepthTexture( shadowWidth, shadowHeight, this.config.depthType, undefined, undefined, undefined, undefined, undefined, undefined, undefined, tileCount );
 		depthTexture.compareFunction = builder.renderer.reversedDepthBuffer ? GreaterEqualCompare : LessCompare;
 		depthTexture.name = 'ShadowDepthArrayTexture';
+
+		// Hardware-filtered depth comparisons for PCF, as in ShadowNode.
+		const filter = builder.renderer.shadowMap.type === PCFShadowMap && builder.renderer.hasCompatibility( Compatibility.TEXTURE_COMPARE ) ? LinearFilter : NearestFilter;
+		depthTexture.minFilter = filter;
+		depthTexture.magFilter = filter;
+
 		const shadowMap = builder.createRenderTarget( shadowWidth, shadowHeight, { format: RedFormat, depth: tileCount, useArrayDepthTexture: true } );
 		shadowMap.depthTexture = depthTexture;
 		shadowMap.texture.name = 'ShadowTexture';
@@ -225,6 +235,10 @@ class TileShadowNode extends ShadowBaseNode {
 		const cameraArray = new ArrayCamera( cameras );
 		this.cameraArray = cameraArray;
 
+		// setup() reads depth through this camera.
+		light.shadow.camera.coordinateSystem = builder.renderer.coordinateSystem;
+		light.shadow.camera._reversedDepth = builder.renderer.reversedDepthBuffer;
+
 	}
 
 	/**
@@ -262,6 +276,11 @@ class TileShadowNode extends ShadowBaseNode {
 			this._shadowNodes[ i ].shadow.needsUpdate = true;
 
 		}
+
+		// The original light does not render a shadow map, but setup() uses its shadow matrix.
+
+		shadowCam.updateProjectionMatrix();
+		light.shadow.updateMatrices( light );
 
 	}
 
@@ -409,7 +428,44 @@ class TileShadowNode extends ShadowBaseNode {
 		return Fn( ( builder ) => {
 
 			this.setupShadowPosition( builder );
-			return min( ...this._shadowNodes ).toVar( 'shadowValue' );
+
+			// The fragment's position in the full shadow camera gives its tile and the coordinate within it.
+
+			const { tilesX, tilesY } = this.config;
+			const tileShadowNode = this._shadowNodes[ 0 ];
+			const tileShadow = this.lights[ 0 ].shadow;
+			const shadow = this.originalLight.shadow;
+			const normalBias = reference( 'normalBias', 'float', shadow ).setGroup( renderGroup );
+
+			const shadowPosition = lightShadowMatrix( this.originalLight ).mul( vec4( shadowPositionWorld.add( normalWorld.mul( normalBias ) ), 1 ) );
+			const shadowCoord = tileShadowNode.setupShadowCoord( builder, shadowPosition );
+
+			const grid = shadowCoord.xy.mul( vec2( tilesX, tilesY ) ); // tiles start from the top row
+			const tile = grid.floor().clamp( vec2( 0 ), vec2( tilesX - 1, tilesY - 1 ) );
+			const depthLayer = int( tile.y.mul( tilesX ).add( tile.x ) );
+
+			const tileCoord = vec3( grid.sub( tile ), shadowCoord.z );
+
+			const filterFn = tileShadow.filterNode || tileShadowNode.getShadowFilterFn( builder.renderer.shadowMap.type );
+			const shadowValue = tileShadowNode.setupShadowFilter( builder, {
+				filterFn,
+				depthTexture: this.shadowMap.depthTexture,
+				shadowCoord: tileCoord,
+				shadow: tileShadow,
+				depthLayer
+			} );
+
+			const shadowIntensity = reference( 'intensity', 'float', shadow ).setGroup( renderGroup );
+
+			if ( builder.renderer.shadowMap.transmitted === true ) {
+
+				const shadowColor = texture( this.shadowMap.texture, tileCoord ).depth( depthLayer );
+
+				return mix( 1, shadowValue.rgb.mix( shadowColor, 1 ), shadowIntensity.mul( shadowColor.a ) ).toVar( 'shadowValue' );
+
+			}
+
+			return mix( 1, shadowValue, shadowIntensity ).toVar( 'shadowValue' );
 
 		} )();
 
