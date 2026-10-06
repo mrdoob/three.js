@@ -1,6 +1,6 @@
 import {
-	Color, DepthStencilFormat, DepthTexture, HalfFloatType, MeshNormalMaterial,
-	NearestFilter, NoBlending, UnsignedInt248Type, WebGLRenderTarget
+	Color, DepthFormat, DepthStencilFormat, DepthTexture, FloatType, HalfFloatType, MeshNormalMaterial,
+	NearestFilter, NoBlending, UnsignedInt248Type, UnsignedIntType, UnsignedShortType, WebGLRenderTarget
 } from 'three';
 import { Pass } from './Pass.js';
 
@@ -10,7 +10,12 @@ import { Pass } from './Pass.js';
  * It renders mesh geometry; points and lines do not contribute.
  *
  * Normals are unit view-space vectors encoded as RGB = normal * 0.5 + 0.5 in
- * NoColorSpace. Depth is sampled from red, with near = 0 and far/background = 1.
+ * NoColorSpace, stored in an RGBA half-float texture. Depth is a separate
+ * depth texture sampled from red, with near = 0 and far/background = 1. Depth defaults
+ * to 24-bit depth/stencil; options.depthTextureType can select 16-bit, 24-bit or
+ * 32-bit floating-point depth without stencil.
+ * Both textures use nearest filtering, clamp-to-edge wrapping and no mipmaps.
+ * Background normals are undefined; consumers identify background through depth.
  * Reversed and logarithmic depth are not supported. Consumers must use the same
  * frame, camera, projection, viewport and physical pixel dimensions.
  *
@@ -37,8 +42,11 @@ class GBufferPass extends Pass {
 	 * @param {Camera} camera - The camera used by all consuming effects.
 	 * @param {number} [width=512] - Width in physical pixels.
 	 * @param {number} [height=512] - Height in physical pixels.
+	 * @param {Object} [options] - Buffer options.
+	 * @param {number} [options.depthTextureType=UnsignedInt248Type] - UnsignedShortType (16-bit),
+	 * UnsignedIntType (24-bit), FloatType (32-bit), or UnsignedInt248Type (24-bit with stencil).
 	 */
-	constructor( scene, camera, width = 512, height = 512 ) {
+	constructor( scene, camera, width = 512, height = 512, options = {} ) {
 
 		super();
 
@@ -48,9 +56,15 @@ class GBufferPass extends Pass {
 		this.camera = camera;
 		this.needsSwap = false;
 
-		const depthTexture = new DepthTexture( width, height );
-		depthTexture.format = DepthStencilFormat;
-		depthTexture.type = UnsignedInt248Type;
+		const depthTextureType = options.depthTextureType ?? UnsignedInt248Type;
+		if ( ! [ UnsignedShortType, UnsignedIntType, FloatType, UnsignedInt248Type ].includes( depthTextureType ) ) {
+
+			throw new Error( 'THREE.GBufferPass: Unsupported depth texture type.' );
+
+		}
+
+		const depthTexture = new DepthTexture( width, height, depthTextureType );
+		depthTexture.format = depthTextureType === UnsignedInt248Type ? DepthStencilFormat : DepthFormat;
 		this._renderTarget = new WebGLRenderTarget( width, height, {
 			minFilter: NearestFilter,
 			magFilter: NearestFilter,

@@ -178,7 +178,9 @@
 			// composer
 
 			composer = new EffectComposer( renderer );
-			const gBufferPass = new GBufferPass( scene, camera, innerWidth, innerHeight );
+			const gBufferPass = new GBufferPass( scene, camera, innerWidth, innerHeight, {
+				depthTextureType: THREE.UnsignedShortType
+			} );
 			composer.addPass( gBufferPass );
 			ssrPass = new SSRPass( {
 				renderer,

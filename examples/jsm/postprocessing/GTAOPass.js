@@ -291,12 +291,11 @@ class GTAOPass extends Pass {
 	}
 
 	/**
-	 * Configures the GBuffer of this pass. If no arguments are passed,
-	 * the pass creates an internal render target for holding depth
-	 * and normal data. External depth and normal data must use separate
-	 * textures, which remain owned by the caller.
-	 * If no normal texture is supplied, normals are reconstructed from depth
-	 * for AO and denoising, and the normal output displays black.
+	 * Uses textures from {@link GBufferPass} or compatible textures meeting its
+	 * requirements. Call without arguments to restore internal rendering.
+	 * Caller-owned textures are never resized or disposed by this pass.
+	 * If normals are omitted, they are reconstructed from depth and the normal
+	 * output displays black.
 	 *
 	 * @param {DepthTexture} [depthTexture] - The depth texture.
 	 * @param {Texture} [normalTexture] - The normal texture.

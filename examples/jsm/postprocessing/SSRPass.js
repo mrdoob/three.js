@@ -477,13 +477,9 @@ class SSRPass extends Pass {
 	}
 
 	/**
-	 * Configures shared geometry inputs. Call without arguments to restore internal rendering.
-	 * Both textures must describe the same surfaces, frame, camera and projection as this pass.
-	 * Normals are unit view-space vectors encoded as RGB = normal * 0.5 + 0.5, with
-	 * NoColorSpace. Depth is a separate DepthTexture sampled from red, with near = 0
-	 * and far/background = 1. Reversed and logarithmic depth are not supported.
-	 * Inputs must match the pass width/height in physical pixels, use nearest filtering,
-	 * clamp-to-edge wrapping and no mipmaps. The caller renders, resizes and disposes them.
+	 * Uses textures from {@link GBufferPass} or compatible textures meeting its
+	 * requirements. Call without arguments to restore internal rendering.
+	 * Caller-owned textures are never resized or disposed by this pass.
 	 *
 	 * @param {DepthTexture} [depthTexture] - External depth texture.
 	 * @param {Texture} [normalTexture] - External encoded view-space normal texture.
@@ -574,7 +570,7 @@ class SSRPass extends Pass {
 
 		// render normals
 
-		if ( this._renderGBuffer ) this._renderOverride( renderer, this.normalMaterial, this.normalRenderTarget, 0, 0 );
+		if ( this._renderGBuffer ) this._renderOverride( renderer, this.normalMaterial, this.normalRenderTarget, 0x7777ff, 1 );
 
 		// render metalnesses
 
