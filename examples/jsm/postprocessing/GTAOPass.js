@@ -304,12 +304,6 @@ class GTAOPass extends Pass {
 	 */
 	setGBuffer( depthTexture, normalTexture ) {
 
-		if ( depthTexture !== undefined && depthTexture === normalTexture ) {
-
-			throw new Error( 'THREE.GTAOPass: Depth and normal data must use separate textures.' );
-
-		}
-
 		if ( depthTexture !== undefined ) {
 
 			this.depthTexture = depthTexture;
