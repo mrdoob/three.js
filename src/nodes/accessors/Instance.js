@@ -12,20 +12,20 @@ import { instanceIndex } from '../core/IndexNode.js';
 import { InstancedInterleavedBuffer } from '../../core/InstancedInterleavedBuffer.js';
 import { InstancedBufferAttribute } from '../../core/InstancedBufferAttribute.js';
 import { InterleavedBufferAttribute } from '../../core/InterleavedBufferAttribute.js';
-import { getDataFromObject } from '../core/NodeUtils.js';
 import { DynamicDrawUsage } from '../../constants.js';
 
 const _matrixBuffers = /*@__PURE__*/ new WeakMap();
 const _colorBuffers = /*@__PURE__*/ new WeakMap();
 const _previousInstanceMatrices = /*@__PURE__*/ new WeakMap();
 const _matrixColumns = /*@__PURE__*/ new WeakMap();
+const _previousMatrices = /*@__PURE__*/ new WeakMap();
 
 /**
  * Returns `true` if the instanced mesh can share its node builder state with
  * other instanced meshes. Shared programs read the instance matrices of the
  * object being rendered instead of embedding the buffers of a specific mesh.
- * Storage buffers, instance colors, morph targets and previous-frame data for
- * motion vectors remain per object, as does instancing outside WebGPURenderer.
+ * Storage buffers, instance colors and morph targets remain per object, as does
+ * instancing outside WebGPURenderer.
  *
  * @param {InstancedMesh} object - The instanced mesh.
  * @param {Renderer} renderer - The renderer.
@@ -45,11 +45,7 @@ export function isSharedInstancing( object, renderer ) {
 	// Morph target influences are bound per mesh.
 	const morphAttributes = object.geometry.morphAttributes;
 
-	if ( morphAttributes.position || morphAttributes.normal || morphAttributes.color ) return false;
-
-	const mrt = renderer.getMRT();
-
-	return ! ( mrt && mrt.has( 'velocity' ) ) && getDataFromObject( object ).useVelocity !== true;
+	return ! ( morphAttributes.position || morphAttributes.normal || morphAttributes.color );
 
 }
 
@@ -145,6 +141,28 @@ function createSharedMatrixNode( matrices, getMatrices ) {
 	} );
 
 	return mat4( ...columns );
+
+}
+
+/**
+ * Returns the previous-frame matrices of an instanced mesh in a shared instancing setup.
+ *
+ * @param {InstancedMesh} object - The instanced mesh.
+ * @returns {InstancedBufferAttribute} The previous-frame matrices.
+ */
+function getPreviousMatrices( object ) {
+
+	const instanceMatrix = object.instanceMatrix;
+	let previous = _previousMatrices.get( object );
+
+	if ( previous === undefined || previous.array.length !== instanceMatrix.array.length ) {
+
+		previous = instanceMatrix.clone();
+		_previousMatrices.set( object, previous );
+
+	}
+
+	return previous;
 
 }
 
@@ -349,7 +367,22 @@ function setupInstance( builder, matrices, colors, shared ) {
 	const instancePosition = instanceMatrixNode.mul( positionLocal ).xyz;
 	positionLocal.assign( instancePosition );
 
-	if ( builder.needsPreviousData() ) {
+	if ( builder.needsPreviousData() && shared ) {
+
+		OnAfterObjectUpdate( ( { object } ) => {
+
+			const instanceMatrix = object.instanceMatrix;
+			const previous = getPreviousMatrices( object );
+
+			previous.array.set( instanceMatrix.array );
+			getInterleavedMatrix( previous ).version = instanceMatrix.version;
+
+		} );
+
+		const previousMatrixNode = createSharedMatrixNode( getPreviousMatrices( builder.object ), getPreviousMatrices );
+		positionPrevious.assign( previousMatrixNode.mul( positionPrevious ).xyz );
+
+	} else if ( builder.needsPreviousData() ) {
 
 		const instancedMesh = builder.object;
 
