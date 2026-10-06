@@ -267,7 +267,8 @@ const GTAODepthShader = {
 	name: 'GTAODepthShader',
 
 	defines: {
-		PERSPECTIVE_CAMERA: 1
+		PERSPECTIVE_CAMERA: 1,
+		DEPTH_SWIZZLING: 'x'
 	},
 
 	uniforms: {
@@ -294,11 +295,11 @@ const GTAODepthShader = {
 
 		float getLinearDepth( const in vec2 screenPosition ) {
 			#if PERSPECTIVE_CAMERA == 1
-				float fragCoordZ = texture2D( tDepth, screenPosition ).x;
+				float fragCoordZ = texture2D( tDepth, screenPosition ).DEPTH_SWIZZLING;
 				float viewZ = perspectiveDepthToViewZ( fragCoordZ, cameraNear, cameraFar );
 				return viewZToOrthographicDepth( viewZ, cameraNear, cameraFar );
 			#else
-				return texture2D( tDepth, screenPosition ).x;
+				return texture2D( tDepth, screenPosition ).DEPTH_SWIZZLING;
 			#endif
 		}
 

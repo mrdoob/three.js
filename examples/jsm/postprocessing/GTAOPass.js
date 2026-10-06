@@ -250,7 +250,7 @@ class GTAOPass extends Pass {
 		this.height = height;
 
 		this.gtaoRenderTarget.setSize( width, height );
-		this.normalRenderTarget.setSize( width, height );
+		if ( this.normalRenderTarget ) this.normalRenderTarget.setSize( width, height );
 		this.pdRenderTarget.setSize( width, height );
 
 		this.gtaoMaterial.uniforms.resolution.value.set( width, height );
@@ -270,7 +270,7 @@ class GTAOPass extends Pass {
 
 		this.gtaoNoiseTexture.dispose();
 		this.pdNoiseTexture.dispose();
-		this.normalRenderTarget.dispose();
+		if ( this.normalRenderTarget ) this.normalRenderTarget.dispose();
 		this.gtaoRenderTarget.dispose();
 		this.pdRenderTarget.dispose();
 		this.normalMaterial.dispose();
@@ -296,10 +296,12 @@ class GTAOPass extends Pass {
 	/**
 	 * Configures the GBuffer of this pass. If no arguments are passed,
 	 * the pass creates an internal render target for holding depth
-	 * and normal data.
+	 * and normal data. External textures remain owned by the caller.
+	 * If no normal texture is supplied, normals are reconstructed from depth
+	 * for AO and denoising, and the normal output displays black.
 	 *
 	 * @param {DepthTexture} [depthTexture] - The depth texture.
-	 * @param {DepthTexture} [normalTexture] - The normal texture.
+	 * @param {Texture} [normalTexture] - The normal texture.
 	 */
 	setGBuffer( depthTexture, normalTexture ) {
 
@@ -311,15 +313,21 @@ class GTAOPass extends Pass {
 
 		} else {
 
-			this.depthTexture = new DepthTexture();
-			this.depthTexture.format = DepthStencilFormat;
-			this.depthTexture.type = UnsignedInt248Type;
-			this.normalRenderTarget = new WebGLRenderTarget( this.width, this.height, {
-				minFilter: NearestFilter,
-				magFilter: NearestFilter,
-				type: HalfFloatType,
-				depthTexture: this.depthTexture
-			} );
+			if ( this.normalRenderTarget === undefined ) {
+
+				const depthTexture = new DepthTexture();
+				depthTexture.format = DepthStencilFormat;
+				depthTexture.type = UnsignedInt248Type;
+				this.normalRenderTarget = new WebGLRenderTarget( this.width, this.height, {
+					minFilter: NearestFilter,
+					magFilter: NearestFilter,
+					type: HalfFloatType,
+					depthTexture: depthTexture
+				} );
+
+			}
+
+			this.depthTexture = this.normalRenderTarget.depthTexture;
 			this.normalTexture = this.normalRenderTarget.texture;
 			this._renderGBuffer = true;
 
@@ -330,15 +338,19 @@ class GTAOPass extends Pass {
 
 		this.gtaoMaterial.defines.NORMAL_VECTOR_TYPE = normalVectorType;
 		this.gtaoMaterial.defines.DEPTH_SWIZZLING = depthValueSource;
+		this.gtaoMaterial.needsUpdate = true;
 		this.gtaoMaterial.uniforms.tNormal.value = this.normalTexture;
 		this.gtaoMaterial.uniforms.tDepth.value = this.depthTexture;
 
 		this.pdMaterial.defines.NORMAL_VECTOR_TYPE = normalVectorType;
 		this.pdMaterial.defines.DEPTH_SWIZZLING = depthValueSource;
+		this.pdMaterial.needsUpdate = true;
 		this.pdMaterial.uniforms.tNormal.value = this.normalTexture;
 		this.pdMaterial.uniforms.tDepth.value = this.depthTexture;
 
-		this.depthRenderMaterial.uniforms.tDepth.value = this.normalRenderTarget.depthTexture;
+		this.depthRenderMaterial.defines.DEPTH_SWIZZLING = depthValueSource;
+		this.depthRenderMaterial.needsUpdate = true;
+		this.depthRenderMaterial.uniforms.tDepth.value = this.depthTexture;
 
 	}
 
@@ -562,7 +574,7 @@ class GTAOPass extends Pass {
 
 			case GTAOPass.OUTPUT.Normal:
 
-				this.copyMaterial.uniforms.tDiffuse.value = this.normalRenderTarget.texture;
+				this.copyMaterial.uniforms.tDiffuse.value = this.normalTexture || null;
 				this.copyMaterial.blending = NoBlending;
 				this._renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
