@@ -660,7 +660,23 @@ class TemporalReprojectNode extends Node {
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
-		const needsRestart = this._historyRenderTarget.width !== width || this._historyRenderTarget.height !== height;
+		const currentDepth = this.depthNode.value;
+		const historyDepth = this._historyRenderTarget.depthTexture;
+
+		const depthFormatChanged = historyDepth.format !== currentDepth.format || historyDepth.type !== currentDepth.type;
+
+		// The texture copy requires matching formats, e.g. float depth with reversed depth or depth/stencil.
+		// Checked here since updateBefore() can run before setup() when driven by another node.
+
+		if ( depthFormatChanged === true ) {
+
+			historyDepth.format = currentDepth.format;
+			historyDepth.type = currentDepth.type;
+			historyDepth.needsUpdate = true;
+
+		}
+
+		const needsRestart = depthFormatChanged === true || this._historyRenderTarget.width !== width || this._historyRenderTarget.height !== height;
 		this.setSize( width, height );
 
 		let historySwappedForRestart = false;
@@ -708,29 +724,15 @@ class TemporalReprojectNode extends Node {
 
 		}
 
-		const currentDepth = this.depthNode.value;
 		const srcW = currentDepth.image !== null && currentDepth.image !== undefined ? currentDepth.image.width : 0;
 		const srcH = currentDepth.image !== null && currentDepth.image !== undefined ? currentDepth.image.height : 0;
 
 		if ( srcW > 0 && srcH > 0 ) {
 
-			// The copy requires matching formats, e.g. float depth with reversed depth or depth/stencil.
-			// Checked here since updateBefore() can run before setup() when driven by another node.
-
-			const historyDepth = this._historyRenderTarget.depthTexture;
-
-			if ( historyDepth.format !== currentDepth.format || historyDepth.type !== currentDepth.type ) {
-
-				historyDepth.format = currentDepth.format;
-				historyDepth.type = currentDepth.type;
-				historyDepth.needsUpdate = true;
-
-			}
-
 			renderer.copyTextureToTexture( currentDepth, historyDepth );
 			renderer.copyTextureToTexture( this.normalNode.value, this._previousNormalTexture );
 
-			this._previousDepthNode.value = this._historyRenderTarget.depthTexture;
+			this._previousDepthNode.value = historyDepth;
 
 		}
 
