@@ -106,6 +106,41 @@ export default QUnit.module( 'Addons', () => {
 
 		QUnit.module( 'MaterialXLoader', () => {
 
+			QUnit.test( 'reads the first output of a separate node connected without an output', ( assert ) => {
+
+				const text = `<?xml version="1.0"?>
+<materialx version="1.39">
+	<nodegraph name="test_graph">
+		<separate3 name="channels" type="multioutput">
+			<input name="in" type="vector3" value="0.25, 0.5, 0.75" />
+		</separate3>
+		<multiply name="test_node" type="float">
+			<input name="in1" type="float" nodename="channels" />
+			<input name="in2" type="float" value="2" />
+		</multiply>
+		<output name="out" type="float" nodename="test_node" />
+	</nodegraph>
+</materialx>`;
+
+				const messages = [];
+				const consoleError = console.error;
+				console.error = ( ...args ) => messages.push( args.join( ' ' ) );
+
+				try {
+
+					const result = new MaterialXLoader().parse( text );
+					assert.strictEqual( result.errors.length, 0, 'The connection is valid MaterialX.' );
+
+				} finally {
+
+					console.error = consoleError;
+
+				}
+
+				assert.deepEqual( messages, [], 'The separate node builds a channel instead of an incomplete element node.' );
+
+			} );
+
 			QUnit.test( 'maps <displacement> onto vertex displacement instead of failing', ( assert ) => {
 
 				const result = new MaterialXLoader().parse( MATERIAL_X_DISPLACEMENT );
