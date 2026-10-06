@@ -1,7 +1,7 @@
 import { Fn } from '../tsl/TSLBase.js';
 
 /**
- * Represents a `discard` shader operation in TSL.
+ * Calculates, at a given distance from a light, the falloff of the light's brightness.
  *
  * @method
  * @param {Object} inputs - The input parameter object.
