@@ -4,7 +4,7 @@ import {
 } from 'three';
 
 // Internal helpers for geometry-buffer consumers. Validation of the standard separate
-// depth/normal contract is opt-in so GTAO retains its depth-only and combined inputs.
+// depth/normal contract is opt-in so GTAO retains its depth-only inputs.
 // An optional internal depth source (e.g. SSR's beauty depth) remains owned by its
 // original render target. Otherwise the normal target owns a new depth texture.
 function setGBuffer( pass, depthTexture, normalTexture, internalDepthTexture, retainInternalTarget = false ) {

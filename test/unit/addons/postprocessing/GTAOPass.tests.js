@@ -15,6 +15,20 @@ export default QUnit.module( 'Postprocessing', () => {
 
 	QUnit.module( 'GTAOPass', () => {
 
+		QUnit.test( 'combined input rejection preserves the active internal inputs', ( assert ) => {
+
+			const pass = new GTAOPass( new Scene(), new PerspectiveCamera(), 16, 16 );
+			const depth = pass.depthTexture;
+			const normal = pass.normalTexture;
+			const combined = new Texture();
+			assert.throws( () => pass.setGBuffer( combined, combined ), /separate textures/ );
+			assertGBuffer( assert, pass, depth, normal );
+			assert.ok( pass._renderGBuffer, 'Internal rendering remains enabled' );
+			pass.dispose();
+			combined.dispose();
+
+		} );
+
 		QUnit.test( 'external construction, resize and disposal preserve caller ownership', ( assert ) => {
 
 			const depth = new DepthTexture( 32, 32 );
@@ -46,14 +60,14 @@ export default QUnit.module( 'Postprocessing', () => {
 			target.addEventListener( 'dispose', () => disposed ++ );
 			assertGBuffer( assert, pass, target.depthTexture, target.texture );
 			assert.ok( pass._renderGBuffer, 'Default mode renders the internal prepass' );
-			const packed = new Texture();
-			const versions = [ pass.gtaoMaterial.version, pass.pdMaterial.version, pass.depthRenderMaterial.version ];
-			pass.setGBuffer( packed, packed );
-			assertGBuffer( assert, pass, packed, packed );
+			const depth = new DepthTexture( 32, 32 );
+			const normal = new Texture();
+			const versions = [ pass.gtaoMaterial.version, pass.pdMaterial.version ];
+			pass.setGBuffer( depth, normal );
+			assertGBuffer( assert, pass, depth, normal );
 
-			for ( const [ i, material ] of [ pass.gtaoMaterial, pass.pdMaterial, pass.depthRenderMaterial ].entries() ) {
+			for ( const [ i, material ] of [ pass.gtaoMaterial, pass.pdMaterial ].entries() ) {
 
-				assert.strictEqual( material.defines.DEPTH_SWIZZLING, 'w', 'Combined input uses alpha depth' );
 				assert.ok( material.version > versions[ i ], 'Input switch invalidates the shader' );
 
 			}
@@ -65,15 +79,10 @@ export default QUnit.module( 'Postprocessing', () => {
 			assert.ok( pass._renderGBuffer, 'Internal prepass is restored' );
 			assertGBuffer( assert, pass, target.depthTexture, target.texture );
 
-			for ( const material of [ pass.gtaoMaterial, pass.pdMaterial, pass.depthRenderMaterial ] ) {
-
-				assert.strictEqual( material.defines.DEPTH_SWIZZLING, 'x', 'Internal depth restores red channel selection' );
-
-			}
-
 			pass.dispose();
 			assert.strictEqual( disposed, 1, 'Owned target is disposed once' );
-			packed.dispose();
+			depth.dispose();
+			normal.dispose();
 
 		} );
 
@@ -127,8 +136,8 @@ export default QUnit.module( 'Postprocessing', () => {
 
 			checkPreview( GTAOPass.OUTPUT.Depth, [ 224, 224, 224, 255 ], 'External depth preview' );
 			checkPreview( GTAOPass.OUTPUT.Normal, [ 64, 128, 192, 51 ], 'External normal preview' );
-			pass.setGBuffer( normal, normal );
-			checkPreview( GTAOPass.OUTPUT.Depth, [ 249, 249, 249, 255 ], 'Combined texture preview selects alpha depth' );
+			assert.throws( () => pass.setGBuffer( normal, normal ), /separate textures/, 'Combined inputs are rejected' );
+			checkPreview( GTAOPass.OUTPUT.Depth, [ 224, 224, 224, 255 ], 'Rejected input preserves the external depth preview' );
 			pass.setGBuffer( depth );
 			checkPreview( GTAOPass.OUTPUT.Normal, [ 0, 0, 0, 0 ], 'Depth-only normal preview is black' );
 			checkPreview( GTAOPass.OUTPUT.Depth, [ 224, 224, 224, 255 ], 'Depth preview restores red depth' );
