@@ -46,8 +46,10 @@
 		const params = {
 			ssr: true,
 			autoRotate: true,
-			roughness: 0.1,
-			metalness: 0.5,
+			floorRoughness: 0.1,
+			floorMetalness: 0.5,
+			bunnyRoughness: 0.3,
+			bunnyMetalness: 0.5,
 			view: 'Beauty'
 		};
 
@@ -68,19 +70,21 @@
 		scene.environmentIntensity = 0.6;
 		pmrem.dispose();
 
-		const materials = [];
-		const add = ( geometry, color, x, y, z ) => {
+		const add = ( geometry, color, x, y, z, roughness = 0.3, metalness = 0 ) => {
 
-			const material = new THREE.MeshStandardMaterial( { color, roughness: params.roughness, metalness: params.metalness } );
+			const material = new THREE.MeshStandardMaterial( { color, roughness, metalness } );
 			const mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( x, y, z );
 			scene.add( mesh );
-			materials.push( material );
 			return mesh;
 
 		};
 
-		add( new THREE.PlaneGeometry( 8, 8 ), 0xcbcbcb, 0, - 0.0001, 0 ).rotation.x = - Math.PI / 2;
+		const floor = add( new THREE.PlaneGeometry( 8, 8 ), 0xcbcbcb, 0, - 0.0001, 0, params.floorRoughness, params.floorMetalness );
+		floor.rotation.x = - Math.PI / 2;
+		let bunny = null;
+
+		// the box, sphere and cone use fixed materials
 		add( new THREE.BoxGeometry( 0.05, 0.05, 0.05 ), 'green', - 0.12, 0.025, 0.015 );
 		add( new THREE.IcosahedronGeometry( 0.025, 4 ), 'cyan', - 0.05, 0.025, 0.08 );
 		add( new THREE.ConeGeometry( 0.025, 0.05, 64 ), 'yellow', - 0.05, 0.025, - 0.055 );
@@ -89,7 +93,7 @@
 		dracoLoader.load( 'models/draco/bunny.drc', function ( geometry ) {
 
 			geometry.computeVertexNormals();
-			add( geometry, 0xa5a5a5, 0, - 0.0365, 0 );
+			bunny = add( geometry, 0xa5a5a5, 0, - 0.0365, 0, params.bunnyRoughness, params.bunnyMetalness );
 			dracoLoader.dispose();
 
 		} );
@@ -163,8 +167,10 @@
 
 		} );
 		gui.add( params, 'autoRotate' ).onChange( v => controls.enabled = ! v );
-		gui.add( params, 'roughness', 0, 1 ).onChange( v => materials.forEach( m => m.roughness = v ) );
-		gui.add( params, 'metalness', 0, 1 ).onChange( v => materials.forEach( m => m.metalness = v ) );
+		gui.add( params, 'floorRoughness', 0, 1 ).onChange( v => floor.material.roughness = v );
+		gui.add( params, 'floorMetalness', 0, 1 ).onChange( v => floor.material.metalness = v );
+		gui.add( params, 'bunnyRoughness', 0, 1 ).onChange( v => bunny && ( bunny.material.roughness = v ) );
+		gui.add( params, 'bunnyMetalness', 0, 1 ).onChange( v => bunny && ( bunny.material.metalness = v ) );
 		gui.add( ssr2Pass, 'maxDistance', 0, 1 );
 		gui.add( ssr2Pass, 'thickness', 0, 0.1 );
 		gui.add( ssr2Pass, 'maxRoughness', 0, 1 );
