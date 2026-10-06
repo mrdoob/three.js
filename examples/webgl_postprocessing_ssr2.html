@@ -171,6 +171,9 @@
 		gui.add( params, 'floorMetalness', 0, 1 ).onChange( v => floor.material.metalness = v );
 		gui.add( params, 'bunnyRoughness', 0, 1 ).onChange( v => bunny && ( bunny.material.roughness = v ) );
 		gui.add( params, 'bunnyMetalness', 0, 1 ).onChange( v => bunny && ( bunny.material.metalness = v ) );
+		gui.add( ssr2Pass, 'stochastic' );
+		gui.add( ssr2Pass, 'rayCount', 1, 16, 1 );
+		gui.add( ssr2Pass, 'noiseBlur', 0, 4 );
 		gui.add( ssr2Pass, 'maxDistance', 0, 1 );
 		gui.add( ssr2Pass, 'thickness', 0, 0.1 );
 		gui.add( ssr2Pass, 'maxRoughness', 0, 1 );

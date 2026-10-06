@@ -16,10 +16,12 @@ import { SSR2TraceShader, SSR2ResolveShader } from '../shaders/SSR2Shader.js';
  * be consumed by the material lighting through {@link Scene#indirectSpecularMap}
  * instead of being composited over the beauty image.
  *
- * Each pixel traces one mirror ray through the depth buffer. A hit returns the lit scene
+ * Each pixel traces rays through the depth buffer, importance-sampled from its GGX
+ * specular lobe (or one mirror ray with `stochastic = false`). A hit returns the lit scene
  * color; a miss (or the screen border) fades to the scene's PMREM environment sampled at
- * the surface roughness. A mip chain of the result is then sampled at a per-pixel level
- * chosen from the roughness. Materials apply their own BRDF to the result.
+ * the surface roughness. The result is blurred over its mip chain, by a small fixed amount in
+ * stochastic mode or by the reflection cone footprint otherwise. Materials apply their own BRDF
+ * to the result.
  *
  * Inputs come from a {@link GBufferPass} created with `{ material: true }`. Place this
  * pass after the pass that renders the lit scene, and assign {@link SSR2Pass#texture} to
@@ -92,6 +94,27 @@ class SSR2Pass extends Pass {
 		 */
 		this.screenEdgeFade = 0.2;
 
+		this._stochastic = true;
+
+		/**
+		 * Number of GGX-sampled rays per pixel in stochastic mode (1 to 16). More rays means
+		 * less noise and proportionally higher cost.
+		 *
+		 * @type {number}
+		 * @default 4
+		 */
+		this.rayCount = 4;
+
+		/**
+		 * Mip level of the cleanup blur applied to the stochastic result.
+		 *
+		 * @type {number}
+		 * @default 1.5
+		 */
+		this.noiseBlur = 1.5;
+
+		this._frame = 0;
+
 		this._traceTarget = new WebGLRenderTarget( width, height, {
 			type: HalfFloatType,
 			minFilter: LinearMipmapLinearFilter,
@@ -131,6 +154,29 @@ class SSR2Pass extends Pass {
 		this._environment = null;
 
 		this.setSize( width, height );
+
+	}
+
+	/**
+	 * Whether rays are importance-sampled from the GGX lobe (`true`) or a single mirror ray
+	 * is traced and blurred by the cone footprint (`false`).
+	 *
+	 * @type {boolean}
+	 * @default true
+	 */
+	get stochastic() {
+
+		return this._stochastic;
+
+	}
+
+	set stochastic( value ) {
+
+		if ( value === this._stochastic ) return;
+
+		this._stochastic = value;
+		this._traceMaterial.defines.STOCHASTIC = value;
+		this._traceMaterial.needsUpdate = true;
 
 	}
 
@@ -188,6 +234,9 @@ class SSR2Pass extends Pass {
 		uniforms.thickness.value = this.thickness;
 		uniforms.maxRoughness.value = this.maxRoughness;
 		uniforms.screenEdgeFade.value = this.screenEdgeFade;
+		uniforms.rayCount.value = Math.min( Math.max( Math.round( this.rayCount ), 1 ), 16 );
+		uniforms.noiseBlurLod.value = this.noiseBlur;
+		uniforms.frame.value = this._frame ++ % 64;
 
 		const target = renderer.getRenderTarget();
 

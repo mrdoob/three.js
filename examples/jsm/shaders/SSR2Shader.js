@@ -25,10 +25,15 @@ const vertexShader = /* glsl */`
 `;
 
 /**
- * Traces a mirror reflection ray per pixel through the depth buffer. The result is the
- * incoming radiance along the reflection direction: the lit scene color at the hit,
- * faded to the environment map (sampled at the surface roughness) on a miss or near
- * the screen border.
+ * Traces reflection rays through the depth buffer. The result is the incoming radiance along
+ * the reflection direction: the lit scene color at the hit, faded to the environment map
+ * (sampled at the surface roughness) on a miss or near the screen border.
+ *
+ * With `STOCHASTIC`, each pixel averages `rayCount` rays importance-sampled from the GGX
+ * distribution of visible normals (Eto and Tokuyoshi 2023, as in SSRNode), so rough
+ * surfaces see a cone of directions and a reflected object's silhouette softens through
+ * partial coverage. Otherwise a single mirror ray is traced and the cone footprint is
+ * written to alpha so the resolve pass can blur it.
  *
  * @constant
  * @type {ShaderMaterial~Shader}
@@ -39,7 +44,9 @@ const SSR2TraceShader = {
 
 	defines: {
 		MAX_STEP: 0,
-		USE_ENV: false
+		MAX_RAYS: 16,
+		USE_ENV: false,
+		STOCHASTIC: true
 	},
 
 	uniforms: {
@@ -60,7 +67,10 @@ const SSR2TraceShader = {
 		'maxDistance': { value: 10 },
 		'thickness': { value: 0.1 },
 		'maxRoughness': { value: 1 },
-		'screenEdgeFade': { value: 0.2 }
+		'screenEdgeFade': { value: 0.2 },
+		'rayCount': { value: 4 },
+		'frame': { value: 0 },
+		'noiseBlurLod': { value: 1.5 }
 
 	},
 
@@ -89,6 +99,9 @@ const SSR2TraceShader = {
 		uniform float thickness;
 		uniform float maxRoughness;
 		uniform float screenEdgeFade;
+		uniform int rayCount;
+		uniform float frame;
+		uniform float noiseBlurLod;
 		#include <packing>
 
 		vec3 getViewPosition( const in vec2 uv, const in float depth ) {
@@ -99,6 +112,126 @@ const SSR2TraceShader = {
 
 		float pointToLineDistance( vec3 x0, vec3 x1, vec3 x2 ) {
 			return length( cross( x0 - x1, x0 - x2 ) ) / length( x2 - x1 );
+		}
+
+		// interleaved gradient noise (Jimenez 2014)
+		float ign( const in vec2 p ) {
+			return fract( 52.9829189 * fract( dot( p, vec2( 0.06711056, 0.00583715 ) ) ) );
+		}
+
+		// Bounded VNDF sampling of the GGX distribution (Eto and Tokuyoshi 2023), isotropic.
+		// V is the view direction in the tangent frame, alpha = roughness^2.
+		vec3 sampleGGXVNDF( const in vec3 V, const in float alpha, const in vec2 xi ) {
+			vec3 wiStd = normalize( vec3( alpha * V.x, alpha * V.y, V.z ) );
+			float s = 1.0 + length( V.xy );
+			float a2 = alpha * alpha;
+			float s2 = s * s;
+			float k = ( 1.0 - a2 ) * s2 / ( s2 + a2 * V.z * V.z );
+			float b = wiStd.z * k;
+			float phi = 6.283185307179586 * xi.x;
+			float z = ( 1.0 - xi.y ) * ( 1.0 + b ) - b;
+			float sinTheta = sqrt( max( 0.0, 1.0 - z * z ) );
+			vec3 wm = vec3( sinTheta * cos( phi ), sinTheta * sin( phi ), z ) + wiStd;
+			return normalize( vec3( alpha * wm.x, alpha * wm.y, max( 0.0, wm.z ) ) );
+		}
+
+		// a reflection direction drawn from the GGX lobe; falls back to the mirror direction
+		vec3 sampleGGXReflection( const in vec3 I, const in vec3 N, const in float alpha, const in vec2 xi ) {
+			vec3 up = abs( N.z ) < 0.999 ? vec3( 0.0, 0.0, 1.0 ) : vec3( 1.0, 0.0, 0.0 );
+			vec3 T = normalize( cross( up, N ) );
+			vec3 B = cross( N, T );
+			vec3 V = - I;
+			vec3 Vl = vec3( dot( V, T ), dot( V, B ), max( dot( V, N ), 0.01 ) );
+			vec3 Ne = sampleGGXVNDF( normalize( Vl ), alpha, xi );
+			vec3 H = T * Ne.x + B * Ne.y + N * Ne.z;
+			vec3 L = reflect( I, H );
+			return dot( L, N ) > 0.0 ? L : reflect( I, N );
+		}
+
+		// Marches the ray through the depth buffer. On a hit returns true with the hit uv;
+		// rayLen and endZ describe the traversed segment (used for the cone footprint).
+		bool traceRay( const in vec3 viewPosition, const in vec3 viewNormal, const in vec3 dir, out vec2 hitUv, out float rayLen, out float endZ ) {
+
+			float maxRayLen = maxDistance / max( dot( dir, viewNormal ), 0.05 );
+			vec3 d1viewPosition = viewPosition + dir * maxRayLen;
+
+			// clip the ray at the near plane
+			if ( d1viewPosition.z > - cameraNear ) {
+				float t = ( - cameraNear - viewPosition.z ) / dir.z;
+				d1viewPosition = viewPosition + dir * t;
+			}
+
+			vec4 d1clip = cameraProjectionMatrix * vec4( d1viewPosition, 1.0 );
+			vec2 d0 = gl_FragCoord.xy;
+			vec2 d1 = ( d1clip.xy / d1clip.w * 0.5 + 0.5 ) * resolution;
+
+			float totalStep = max( abs( d1.x - d0.x ), abs( d1.y - d0.y ) );
+			vec2 span = ( d1 - d0 ) / totalStep;
+			float sStep = 1.0 / totalStep;
+			float s = sStep;
+
+			hitUv = vec2( 0.0 );
+
+			for ( float i = 1.0; i < float( MAX_STEP ); i ++ ) {
+
+				if ( i >= totalStep ) break;
+
+				vec2 xy = d0 + i * span;
+				if ( xy.x < 0.0 || xy.x > resolution.x || xy.y < 0.0 || xy.y > resolution.y ) break;
+
+				vec2 uv = xy / resolution;
+				float d = texture2D( tDepth, uv ).x;
+
+				if ( d < 1.0 ) {
+
+					vec3 vP = getViewPosition( uv, d );
+
+					// perspective-correct ray depth at this step
+					float recipZ = 1.0 / viewPosition.z;
+					float rayZ = 1.0 / ( recipZ + s * ( 1.0 / d1viewPosition.z - recipZ ) );
+
+					if ( rayZ <= vP.z ) {
+
+						float away = pointToLineDistance( vP, viewPosition, d1viewPosition );
+						vec3 vPNeighbor = getViewPosition( ( xy + vec2( 1.0, 0.0 ) ) / resolution, d );
+						float tk = max( ( vPNeighbor.x - vP.x ) * 3.0, thickness );
+
+						if ( away <= tk ) {
+
+							vec3 hitNormal = normalize( texture2D( tNormal, uv ).xyz * 2.0 - 1.0 );
+
+							// rays pass through back-facing surfaces
+							if ( dot( dir, hitNormal ) < 0.0 ) {
+
+								rayLen = length( vP - viewPosition );
+								if ( rayLen > maxDistance ) break;
+
+								endZ = vP.z;
+								hitUv = uv;
+								return true;
+
+							}
+
+						}
+
+					}
+
+				}
+
+				s += sStep;
+
+			}
+
+			float t = clamp( s, 0.0, 1.0 );
+			rayLen = maxRayLen * t;
+			endZ = mix( viewPosition.z, d1viewPosition.z, t );
+			return false;
+
+		}
+
+		float hitEdgeFactor( const in vec2 uv ) {
+			vec2 e = min( uv, 1.0 - uv );
+			return screenEdgeFade > 0.0 ? smoothstep( 0.0, screenEdgeFade, min( e.x, e.y ) ) : 1.0;
 		}
 
 		void main() {
@@ -117,105 +250,67 @@ const SSR2TraceShader = {
 			float roughness = texture2D( tMaterial, vUv ).r;
 
 			vec3 viewIncidentDir = normalize( viewPosition );
-			vec3 viewReflectDir = reflect( viewIncidentDir, viewNormal );
+			vec3 mirrorDir = reflect( viewIncidentDir, viewNormal );
 
 			vec3 envColor = vec3( 0.0 );
 
 			#ifdef USE_ENV
 				float envMip = envMaxLod * roughness * ( 2.0 - roughness );
-				envColor = textureLod( envMap, ( cameraWorldMatrix * vec4( viewReflectDir, 0.0 ) ).xyz, envMip ).rgb * envIntensity;
+				envColor = textureLod( envMap, ( cameraWorldMatrix * vec4( mirrorDir, 0.0 ) ).xyz, envMip ).rgb * envIntensity;
 			#endif
 
 			vec3 result = envColor;
-			float blurLod = 0.0; // log2 of the reflection cone footprint in pixels, resolved by SSR2ResolveShader
+			float blurLod = 0.0;
 
 			if ( roughness <= maxRoughness ) {
 
-				float maxReflectRayLen = maxDistance / max( dot( - viewIncidentDir, viewNormal ), 0.05 );
-				vec3 d1viewPosition = viewPosition + viewReflectDir * maxReflectRayLen;
+				vec2 hitUv;
+				float rayLen;
+				float endZ;
 
-				// clip the ray at the near plane
-				if ( d1viewPosition.z > - cameraNear ) {
-					float t = ( - cameraNear - viewPosition.z ) / viewReflectDir.z;
-					d1viewPosition = viewPosition + viewReflectDir * t;
-				}
+				#ifdef STOCHASTIC
 
-				vec4 d1clip = cameraProjectionMatrix * vec4( d1viewPosition, 1.0 );
-				vec2 d0 = gl_FragCoord.xy;
-				vec2 d1 = ( d1clip.xy / d1clip.w * 0.5 + 0.5 ) * resolution;
+					float alpha = max( roughness * roughness, 0.002 );
+					vec2 p = gl_FragCoord.xy + 5.588238 * frame;
+					vec2 n = vec2( ign( p ), ign( p.yx + vec2( 47.0, 13.0 ) ) );
+					vec3 sum = vec3( 0.0 );
 
-				float totalStep = max( abs( d1.x - d0.x ), abs( d1.y - d0.y ) );
-				vec2 span = ( d1 - d0 ) / totalStep;
-				float sStep = 1.0 / totalStep;
-				float s = sStep;
-				bool found = false;
+					for ( int k = 0; k < MAX_RAYS; k ++ ) {
 
-				for ( float i = 1.0; i < float( MAX_STEP ); i ++ ) {
+						if ( k >= rayCount ) break;
 
-					if ( i >= totalStep ) break;
+						// per-pixel noise rotated by an R2 sequence across the rays of the pixel
+						vec2 xi = fract( n + vec2( 0.7548776662, 0.5698402909 ) * float( k ) );
+						vec3 dir = sampleGGXReflection( viewIncidentDir, viewNormal, alpha, xi );
 
-					vec2 xy = d0 + i * span;
-					if ( xy.x < 0.0 || xy.x > resolution.x || xy.y < 0.0 || xy.y > resolution.y ) break;
+						if ( traceRay( viewPosition, viewNormal, dir, hitUv, rayLen, endZ ) ) {
 
-					vec2 uv = xy / resolution;
-					float d = texture2D( tDepth, uv ).x;
+							sum += mix( envColor, texture2D( tColor, hitUv ).rgb, hitEdgeFactor( hitUv ) );
 
-					if ( d < 1.0 ) {
+						} else {
 
-						vec3 vP = getViewPosition( uv, d );
-
-						// perspective-correct ray depth at this step
-						float recipZ = 1.0 / viewPosition.z;
-						float rayZ = 1.0 / ( recipZ + s * ( 1.0 / d1viewPosition.z - recipZ ) );
-
-						if ( rayZ <= vP.z ) {
-
-							float away = pointToLineDistance( vP, viewPosition, d1viewPosition );
-							vec3 vPNeighbor = getViewPosition( ( xy + vec2( 1.0, 0.0 ) ) / resolution, d );
-							float tk = max( ( vPNeighbor.x - vP.x ) * 3.0, thickness );
-
-							if ( away <= tk ) {
-
-								vec3 hitNormal = normalize( texture2D( tNormal, uv ).xyz * 2.0 - 1.0 );
-
-								// rays pass through back-facing surfaces
-								if ( dot( viewReflectDir, hitNormal ) < 0.0 ) {
-
-									if ( length( vP - viewPosition ) > maxDistance ) break;
-
-									vec2 e = min( uv, 1.0 - uv );
-									float edge = screenEdgeFade > 0.0 ? smoothstep( 0.0, screenEdgeFade, min( e.x, e.y ) ) : 1.0;
-									result = mix( envColor, texture2D( tColor, uv ).rgb, edge );
-
-									// footprint of the GGX cone (half angle ~ roughness^2) at the hit, in pixels
-									float rayLength = length( vP - viewPosition );
-									float conePx = rayLength * roughness * roughness * cameraProjectionMatrix[ 1 ][ 1 ] * resolution.y / max( - vP.z, 1e-4 );
-									blurLod = log2( max( conePx, 1.0 ) );
-									found = true;
-									break;
-
-								}
-
-							}
+							sum += envColor;
 
 						}
 
 					}
 
-					s += sStep;
+					result = sum / float( max( rayCount, 1 ) );
+					blurLod = noiseBlurLod;
 
-				}
+				#else
 
-				// Misses get the cone footprint over the distance the ray travelled, so the blur
-				// is continuous across the silhouette of a reflected object instead of stopping at it.
-				if ( ! found ) {
+					if ( traceRay( viewPosition, viewNormal, mirrorDir, hitUv, rayLen, endZ ) ) {
 
-					float t = clamp( s, 0.0, 1.0 );
-					float rayLength = maxReflectRayLen * t;
-					float z = mix( viewPosition.z, d1viewPosition.z, t );
-					blurLod = log2( max( rayLength * roughness * roughness * cameraProjectionMatrix[ 1 ][ 1 ] * resolution.y / max( - z, 1e-4 ), 1.0 ) );
+						result = mix( envColor, texture2D( tColor, hitUv ).rgb, hitEdgeFactor( hitUv ) );
 
-				}
+					}
+
+					// footprint of the GGX cone (half angle ~ roughness^2) over the traversed segment, in pixels
+					float conePx = rayLen * roughness * roughness * cameraProjectionMatrix[ 1 ][ 1 ] * resolution.y / max( - endZ, 1e-4 );
+					blurLod = log2( max( conePx, 1.0 ) );
+
+				#endif
 
 			}
 
