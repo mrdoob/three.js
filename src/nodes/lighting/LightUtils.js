@@ -1,7 +1,7 @@
 import { Fn } from '../tsl/TSLBase.js';
 
 /**
- * Represents a `discard` shader operation in TSL.
+ * Calculates, at a given distance from a light, the falloff of the light's brightness.
  *
  * @method
  * @param {Object} inputs - The input parameter object.
@@ -22,4 +22,16 @@ export const getDistanceAttenuation = /*@__PURE__*/ Fn( ( { lightDistance, cutof
 		distanceFalloff
 	);
 
+<<<<<<< HEAD
 }, { lightDistance: 'float', cutoffDistance: 'float', decayExponent: 'float', return: 'float' } ); // validated
+=======
+} ).setLayout( {
+	name: 'getDistanceAttenuation',
+	type: 'float',
+	inputs: [
+		{ name: 'lightDistance', type: 'float' },
+		{ name: 'cutoffDistance', type: 'float' },
+		{ name: 'decayExponent', type: 'float' }
+	]
+} );
+>>>>>>> 9c1b752288 (fix getDistanceAttenuation doc)
