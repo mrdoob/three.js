@@ -69,7 +69,7 @@
 				normalTexture: prepass.normalTexture
 			} );
 			// Match GTAONode's sample budget and quadratic distance distribution.
-			gtaoPass.updateGtaoMaterial( { radius: 0.5, samples: 64, distanceExponent: 2, thickness: 1, scale: 1 } );
+			gtaoPass.updateGtaoMaterial( { radius: 0.5, samples: 64, distanceExponent: 2, thickness: 1, scale: 2 } );
 			composer.addPass( gtaoPass );
 			// Composite raw AO; GTAOPass's denoised intermediate is not used.
 			const compositePass = new ShaderPass( {
