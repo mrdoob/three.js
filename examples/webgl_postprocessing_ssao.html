@@ -38,6 +38,7 @@
 
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { GBufferPass } from 'three/addons/postprocessing/GBufferPass.js';
 			import { SSAOPass } from 'three/addons/postprocessing/SSAOPass.js';
 			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
@@ -109,7 +110,11 @@
 				const renderPass = new RenderPass( scene, camera );
 				composer.addPass( renderPass );
 
+				const gBufferPass = new GBufferPass( scene, camera, width, height );
+				composer.addPass( gBufferPass );
+
 				const ssaoPass = new SSAOPass( scene, camera, width, height );
+				ssaoPass.setGBuffer( gBufferPass.depthTexture, gBufferPass.normalTexture );
 				composer.addPass( ssaoPass );
 
 				const outputPass = new OutputPass();
@@ -132,7 +137,11 @@
 				gui.add( ssaoPass, 'kernelRadius' ).min( 0 ).max( 32 );
 				gui.add( ssaoPass, 'minDistance' ).min( 0.001 ).max( 0.02 );
 				gui.add( ssaoPass, 'maxDistance' ).min( 0.01 ).max( 0.3 );
-				gui.add( ssaoPass, 'enabled' );
+				gui.add( ssaoPass, 'enabled' ).onChange( value => {
+
+					gBufferPass.enabled = value;
+
+				} );
 
 				window.addEventListener( 'resize', onWindowResize );
 

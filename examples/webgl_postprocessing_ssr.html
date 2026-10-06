@@ -39,6 +39,7 @@
 
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+		import { GBufferPass } from 'three/addons/postprocessing/GBufferPass.js';
 		import { SSRPass } from 'three/addons/postprocessing/SSRPass.js';
 		import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 		import { ReflectorForSSRPass } from 'three/addons/objects/ReflectorForSSRPass.js';
@@ -177,6 +178,8 @@
 			// composer
 
 			composer = new EffectComposer( renderer );
+			const gBufferPass = new GBufferPass( scene, camera, innerWidth, innerHeight );
+			composer.addPass( gBufferPass );
 			ssrPass = new SSRPass( {
 				renderer,
 				scene,
@@ -184,7 +187,9 @@
 				width: innerWidth,
 				height: innerHeight,
 				groundReflector: params.groundReflector ? groundReflector : null,
-				selects: params.groundReflector ? selects : null
+				selects: params.groundReflector ? selects : null,
+				depthTexture: gBufferPass.depthTexture,
+				normalTexture: gBufferPass.normalTexture
 			} );
 
 			composer.addPass( ssrPass );

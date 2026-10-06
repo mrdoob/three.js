@@ -1,10 +1,13 @@
-import { BoxGeometry, DepthTexture, HalfFloatType, Mesh, MeshNormalMaterial, MeshBasicMaterial, NearestFilter, NoBlending, OrthographicCamera, PerspectiveCamera, Scene, Texture, WebGLRenderer, WebGLRenderTarget } from 'three';
+import { BoxGeometry, DepthTexture, HalfFloatType, Mesh, MeshNormalMaterial, MeshBasicMaterial, NearestFilter, NoBlending, OrthographicCamera, PerspectiveCamera, Scene, Texture, Vector2, WebGLRenderer, WebGLRenderTarget } from 'three';
 import { SSAOPass } from '../../../../examples/jsm/postprocessing/SSAOPass.js';
+import { GBufferPass } from '../../../../examples/jsm/postprocessing/GBufferPass.js';
+import { GTAOPass } from '../../../../examples/jsm/postprocessing/GTAOPass.js';
+import { SAOPass } from '../../../../examples/jsm/postprocessing/SAOPass.js';
 import { SSRPass } from '../../../../examples/jsm/postprocessing/SSRPass.js';
 
 export default QUnit.module( 'Postprocessing', () => {
 
-	for ( const PassClass of [ SSAOPass, SSRPass ] ) {
+	for ( const PassClass of [ SSAOPass, SSRPass, SAOPass ] ) {
 
 		QUnit.module( PassClass.name, () => {
 
@@ -12,6 +15,7 @@ export default QUnit.module( 'Postprocessing', () => {
 
 				const scene = new Scene();
 				const camera = new PerspectiveCamera();
+				if ( PassClass === SAOPass ) return new SAOPass( scene, camera, new Vector2( 32, 32 ), parameters );
 				return PassClass === SSAOPass ?
 					new SSAOPass( scene, camera, 32, 32, 32, parameters ) :
 					new SSRPass( { scene, camera, width: 32, height: 32, ...parameters } );
@@ -49,10 +53,16 @@ export default QUnit.module( 'Postprocessing', () => {
 				pass.setGBuffer( depth, normal );
 				assert.strictEqual( disposed, 1, 'Unused owned attachments are released' );
 				assert.strictEqual( pass.normalRenderTarget, null, 'Owned target reference is cleared' );
-				const effect = pass.ssaoMaterial || pass.ssrMaterial;
+				const effect = pass.ssaoMaterial || pass.ssrMaterial || pass.saoMaterial;
 				assert.strictEqual( effect.uniforms.tDepth.value, depth, 'Effect uses external depth' );
 				assert.strictEqual( effect.uniforms.tNormal.value, normal, 'Effect uses external normals' );
-				assert.strictEqual( pass.depthRenderMaterial.uniforms.tDepth.value, depth, 'Debug output uses external depth' );
+				if ( pass.depthRenderMaterial ) assert.strictEqual( pass.depthRenderMaterial.uniforms.tDepth.value, depth, 'Debug output uses external depth' );
+				if ( PassClass === SAOPass ) {
+
+					assert.strictEqual( pass.vBlurMaterial.uniforms.tDepth.value, depth, 'Vertical blur uses external depth' );
+					assert.strictEqual( pass.hBlurMaterial.uniforms.tDepth.value, depth, 'Horizontal blur uses external depth' );
+
+				}
 				pass.setSize( 64, 48 );
 				pass.setGBuffer();
 				const restored = pass.normalRenderTarget;
@@ -129,16 +139,27 @@ export default QUnit.module( 'Postprocessing', () => {
 
 					}
 
-					for ( const mode of PassClass === SSAOPass ? [ 'Normal', 'Depth', 'SSAO', 'Blur' ] : [ 'Normal', 'Depth', 'SSR', 'Metalness', 'Default' ] ) {
+					const modes = PassClass === SSAOPass ? [ 'Normal', 'Depth', 'SSAO', 'Blur' ] :
+						PassClass === SAOPass ? [ 'Normal', 'SAO', 'SAOBlur' ] : [ 'Normal', 'Depth', 'SSR', 'Metalness', 'Default' ];
+					for ( const mode of modes ) {
 
-						pass.output = PassClass.OUTPUT[ mode ];
+						if ( PassClass === SAOPass ) {
+
+							pass.params.output = SAOPass.OUTPUT[ mode === 'SAOBlur' ? 'SAO' : mode ];
+							pass.params.saoBlur = mode === 'SAOBlur';
+
+						} else {
+
+							pass.output = PassClass.OUTPUT[ mode ];
+
+						}
 						pass.setGBuffer();
 						geometryRenders = 0;
 						pass.render( renderer, target, target );
-						assert.strictEqual( geometryRenders, PassClass === SSAOPass ? 1 : 3, 'Default geometry renders' );
+						assert.strictEqual( geometryRenders, PassClass === SSRPass ? 3 : 1, 'Default geometry renders' );
 						const internal = new Uint8Array( target.width * target.height * 4 );
 						renderer.readRenderTargetPixels( target, 0, 0, target.width, target.height, internal );
-						renderer.setClearColor( PassClass === SSAOPass ? 0x7777ff : 0, PassClass === SSAOPass ? 1 : 0 );
+						renderer.setClearColor( PassClass === SSRPass ? 0 : 0x7777ff, PassClass === SSRPass ? 0 : 1 );
 						renderer.setRenderTarget( shared );
 						pass.scene.overrideMaterial = material;
 						renderer.clear();
@@ -147,7 +168,7 @@ export default QUnit.module( 'Postprocessing', () => {
 						pass.setGBuffer( shared.depthTexture, shared.texture );
 						geometryRenders = 0;
 						pass.render( renderer, target, target );
-						assert.strictEqual( geometryRenders, PassClass === SSAOPass ? 0 : 2, 'External geometry render is removed; SSR beauty remains' );
+						assert.strictEqual( geometryRenders, PassClass === SSRPass ? 2 : 0, 'External geometry render is removed; SSR beauty remains' );
 						const external = new Uint8Array( internal.length );
 						renderer.readRenderTargetPixels( target, 0, 0, target.width, target.height, external );
 						let maxError = 0;
@@ -196,5 +217,69 @@ export default QUnit.module( 'Postprocessing', () => {
 		} );
 
 	}
+
+	QUnit.test( 'One GBufferPass serves all four effects and removes three geometry renders', assert => {
+
+		const canvas = document.createElement( 'canvas' );
+		const context = canvas.getContext( 'webgl2' );
+		if ( context === null ) {
+
+			assert.ok( true, 'SKIPPED: WebGL2 is unavailable.' );
+			return;
+
+		}
+
+		const renderer = new WebGLRenderer( { canvas, context } );
+		const scene = new Scene();
+		const camera = new PerspectiveCamera( 60, 1, 0.1, 10 );
+		camera.position.set( 2, 2, 3 );
+		camera.lookAt( 0, 0, 0 );
+		camera.updateMatrixWorld();
+		const mesh = new Mesh( new BoxGeometry(), new MeshBasicMaterial() );
+		scene.add( mesh );
+		const effects = [
+			new GTAOPass( scene, camera, 32, 32 ),
+			new SSAOPass( scene, camera, 32, 32 ),
+			new SAOPass( scene, camera, new Vector2( 32, 32 ) ),
+			new SSRPass( { scene, camera, width: 32, height: 32, selects: [ mesh ] } )
+		];
+		const target = new WebGLRenderTarget( 32, 32 );
+		const readBuffer = new WebGLRenderTarget( 32, 32 );
+		const gBuffer = new GBufferPass( scene, camera, 32, 32 );
+		const render = renderer.render.bind( renderer );
+		let geometryRenders = 0;
+		renderer.render = ( renderScene, renderCamera ) => {
+
+			if ( renderScene === scene ) geometryRenders ++;
+			render( renderScene, renderCamera );
+
+		};
+		renderer.info.autoReset = false;
+		renderer.info.reset();
+		for ( const effect of effects ) effect.render( renderer, target, readBuffer );
+		assert.strictEqual( geometryRenders, 6, 'Four geometry buffers plus SSR beauty and selection' );
+		const internalCalls = renderer.info.render.calls;
+
+		geometryRenders = 0;
+		renderer.info.reset();
+		gBuffer.render( renderer );
+		for ( const effect of effects ) {
+
+			effect.setGBuffer( gBuffer.depthTexture, gBuffer.normalTexture );
+			effect.render( renderer, target, readBuffer );
+
+		}
+
+		assert.strictEqual( geometryRenders, 3, 'Shared prepass plus SSR beauty and selection' );
+		assert.strictEqual( internalCalls - renderer.info.render.calls, 3, 'Shared prepass cost is included in draw-call savings' );
+		for ( const effect of effects ) effect.dispose();
+		gBuffer.dispose();
+		target.dispose();
+		readBuffer.dispose();
+		mesh.geometry.dispose();
+		mesh.material.dispose();
+		renderer.dispose();
+
+	} );
 
 } );

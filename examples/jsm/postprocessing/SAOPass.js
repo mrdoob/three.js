@@ -2,22 +2,19 @@ import {
 	AddEquation,
 	Color,
 	CustomBlending,
-	DepthTexture,
 	DstAlphaFactor,
 	DstColorFactor,
 	HalfFloatType,
 	MeshNormalMaterial,
-	NearestFilter,
 	NoBlending,
 	ShaderMaterial,
 	UniformsUtils,
-	DepthStencilFormat,
-	UnsignedInt248Type,
 	Vector2,
 	WebGLRenderTarget,
 	ZeroFactor
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
+import { setGBuffer, validateGBuffer, validateGBufferTextures, updatePerspectiveCamera } from './GBufferUtils.js';
 import { SAOShader } from '../shaders/SAOShader.js';
 import { BlurShaderUtils, DepthLimitedBlurShader } from '../shaders/DepthLimitedBlurShader.js';
 import { CopyShader } from '../shaders/CopyShader.js';
@@ -43,8 +40,9 @@ class SAOPass extends Pass {
 	 * @param {Scene} scene - The scene to compute the AO for.
 	 * @param {Camera} camera - The camera.
 	 * @param {Vector2} [resolution] - The effect's resolution.
+	 * @param {Object} [parameters] - Optional external depthTexture and normalTexture inputs.
 	 */
-	constructor( scene, camera, resolution = new Vector2( 256, 256 ) ) {
+	constructor( scene, camera, resolution = new Vector2( 256, 256 ), parameters = {} ) {
 
 		super();
 
@@ -107,20 +105,11 @@ class SAOPass extends Pass {
 		 * @default (256,256)
 		 */
 		this.resolution = new Vector2( resolution.x, resolution.y );
+		this.width = resolution.x;
+		this.height = resolution.y;
 
 		this.saoRenderTarget = new WebGLRenderTarget( this.resolution.x, this.resolution.y, { type: HalfFloatType, depthBuffer: false } );
 		this.blurIntermediateRenderTarget = this.saoRenderTarget.clone();
-
-		const depthTexture = new DepthTexture();
-		depthTexture.format = DepthStencilFormat;
-		depthTexture.type = UnsignedInt248Type;
-
-		this.normalRenderTarget = new WebGLRenderTarget( this.resolution.x, this.resolution.y, {
-			minFilter: NearestFilter,
-			magFilter: NearestFilter,
-			type: HalfFloatType,
-			depthTexture: depthTexture
-		} );
 
 		this.normalMaterial = new MeshNormalMaterial();
 		this.normalMaterial.blending = NoBlending;
@@ -132,11 +121,9 @@ class SAOPass extends Pass {
 			uniforms: UniformsUtils.clone( SAOShader.uniforms )
 		} );
 		this.saoMaterial.defines[ 'PERSPECTIVE_CAMERA' ] = this.camera.isPerspectiveCamera ? 1 : 0;
-		this.saoMaterial.uniforms[ 'tDepth' ].value = depthTexture;
-		this.saoMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
 		this.saoMaterial.uniforms[ 'size' ].value.set( this.resolution.x, this.resolution.y );
 		this.saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
-		this.saoMaterial.uniforms[ 'cameraProjectionMatrix' ].value = this.camera.projectionMatrix;
+		this.saoMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
 		this.saoMaterial.blending = NoBlending;
 
 		this.vBlurMaterial = new ShaderMaterial( {
@@ -148,7 +135,6 @@ class SAOPass extends Pass {
 		this.vBlurMaterial.defines[ 'DEPTH_PACKING' ] = 0;
 		this.vBlurMaterial.defines[ 'PERSPECTIVE_CAMERA' ] = this.camera.isPerspectiveCamera ? 1 : 0;
 		this.vBlurMaterial.uniforms[ 'tDiffuse' ].value = this.saoRenderTarget.texture;
-		this.vBlurMaterial.uniforms[ 'tDepth' ].value = depthTexture;
 		this.vBlurMaterial.uniforms[ 'size' ].value.set( this.resolution.x, this.resolution.y );
 		this.vBlurMaterial.blending = NoBlending;
 
@@ -161,7 +147,6 @@ class SAOPass extends Pass {
 		this.hBlurMaterial.defines[ 'DEPTH_PACKING' ] = 0;
 		this.hBlurMaterial.defines[ 'PERSPECTIVE_CAMERA' ] = this.camera.isPerspectiveCamera ? 1 : 0;
 		this.hBlurMaterial.uniforms[ 'tDiffuse' ].value = this.blurIntermediateRenderTarget.texture;
-		this.hBlurMaterial.uniforms[ 'tDepth' ].value = depthTexture;
 		this.hBlurMaterial.uniforms[ 'size' ].value.set( this.resolution.x, this.resolution.y );
 		this.hBlurMaterial.blending = NoBlending;
 
@@ -183,6 +168,31 @@ class SAOPass extends Pass {
 		this.materialCopy.blendEquationAlpha = AddEquation;
 
 		this.fsQuad = new FullScreenQuad( null );
+		this.setGBuffer( parameters.depthTexture, parameters.normalTexture );
+
+	}
+
+	/**
+	 * Configures shared geometry inputs. Call without arguments to restore internal rendering.
+	 * Both textures must describe the same surfaces, frame, camera and projection as this pass.
+	 * Normals are unit view-space vectors encoded as RGB = normal * 0.5 + 0.5, with
+	 * NoColorSpace. Depth is a separate DepthTexture sampled from red, with near = 0
+	 * and far/background = 1. Reversed and logarithmic depth are not supported.
+	 * Inputs must match the pass width/height in physical pixels, use nearest filtering,
+	 * clamp-to-edge wrapping and no mipmaps. The caller renders, resizes and disposes them.
+	 *
+	 * @param {DepthTexture} [depthTexture] - External depth texture.
+	 * @param {Texture} [normalTexture] - External encoded view-space normal texture.
+	 */
+	setGBuffer( depthTexture, normalTexture ) {
+
+		validateGBufferTextures( depthTexture, normalTexture, 'SAOPass' );
+		setGBuffer( this, depthTexture, normalTexture );
+
+		this.saoMaterial.uniforms[ 'tDepth' ].value = this.depthTexture;
+		this.saoMaterial.uniforms[ 'tNormal' ].value = this.normalTexture;
+		this.vBlurMaterial.uniforms[ 'tDepth' ].value = this.depthTexture;
+		this.hBlurMaterial.uniforms[ 'tDepth' ].value = this.depthTexture;
 
 	}
 
@@ -198,6 +208,14 @@ class SAOPass extends Pass {
 	 * @param {boolean} maskActive - Whether masking is active or not.
 	 */
 	render( renderer, writeBuffer, readBuffer/*, deltaTime, maskActive*/ ) {
+
+		updatePerspectiveCamera( this.saoMaterial, this.camera );
+		updatePerspectiveCamera( this.vBlurMaterial, this.camera );
+		updatePerspectiveCamera( this.hBlurMaterial, this.camera );
+		validateGBuffer( this, renderer );
+
+		this.saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
+		this.saoMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
 
 		// Rendering readBuffer first when rendering to screen
 		if ( this.renderToScreen ) {
@@ -243,7 +261,7 @@ class SAOPass extends Pass {
 		}
 
 		// render normal and depth
-		this._renderOverride( renderer, this.normalMaterial, this.normalRenderTarget, 0x7777ff, 1.0 );
+		if ( this._renderGBuffer ) this._renderOverride( renderer, this.normalMaterial, this.normalRenderTarget, 0x7777ff, 1.0 );
 
 		// Rendering SAO texture
 		this._renderPass( renderer, this.saoMaterial, this.saoRenderTarget, 0xffffff, 1.0 );
@@ -261,7 +279,7 @@ class SAOPass extends Pass {
 		// Setting up SAO rendering
 		if ( this.params.output === SAOPass.OUTPUT.Normal ) {
 
-			this.materialCopy.uniforms[ 'tDiffuse' ].value = this.normalRenderTarget.texture;
+			this.materialCopy.uniforms[ 'tDiffuse' ].value = this.normalTexture;
 			this.materialCopy.needsUpdate = true;
 
 		} else {
@@ -298,13 +316,17 @@ class SAOPass extends Pass {
 	 */
 	setSize( width, height ) {
 
+		this.width = width;
+		this.height = height;
+		this.resolution.set( width, height );
+
 		this.saoRenderTarget.setSize( width, height );
 		this.blurIntermediateRenderTarget.setSize( width, height );
-		this.normalRenderTarget.setSize( width, height );
+		if ( this.normalRenderTarget ) this.normalRenderTarget.setSize( width, height );
 
 		this.saoMaterial.uniforms[ 'size' ].value.set( width, height );
 		this.saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
-		this.saoMaterial.uniforms[ 'cameraProjectionMatrix' ].value = this.camera.projectionMatrix;
+		this.saoMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
 		this.saoMaterial.needsUpdate = true;
 
 		this.vBlurMaterial.uniforms[ 'size' ].value.set( width, height );
@@ -323,7 +345,7 @@ class SAOPass extends Pass {
 
 		this.saoRenderTarget.dispose();
 		this.blurIntermediateRenderTarget.dispose();
-		this.normalRenderTarget.dispose();
+		if ( this.normalRenderTarget ) this.normalRenderTarget.dispose();
 
 		this.normalMaterial.dispose();
 		this.saoMaterial.dispose();

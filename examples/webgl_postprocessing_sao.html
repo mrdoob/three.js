@@ -34,6 +34,7 @@
 
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { GBufferPass } from 'three/addons/postprocessing/GBufferPass.js';
 			import { SAOPass } from 'three/addons/postprocessing/SAOPass.js';
 			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
@@ -124,7 +125,10 @@
 				composer = new EffectComposer( renderer );
 				renderPass = new RenderPass( scene, camera );
 				composer.addPass( renderPass );
+				const gBufferPass = new GBufferPass( scene, camera, width, height );
+				composer.addPass( gBufferPass );
 				saoPass = new SAOPass( scene, camera );
+				saoPass.setGBuffer( gBufferPass.depthTexture, gBufferPass.normalTexture );
 				composer.addPass( saoPass );
 				const outputPass = new OutputPass();
 				composer.addPass( outputPass );
@@ -149,7 +153,11 @@
 				gui.add( saoPass.params, 'saoBlurRadius', 0, 200 );
 				gui.add( saoPass.params, 'saoBlurStdDev', 0.5, 150 );
 				gui.add( saoPass.params, 'saoBlurDepthCutoff', 0.0, 0.1 );
-				gui.add( saoPass, 'enabled' );
+				gui.add( saoPass, 'enabled' ).onChange( value => {
+
+					gBufferPass.enabled = value;
+
+				} );
 
 				window.addEventListener( 'resize', onWindowResize );
 

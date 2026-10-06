@@ -44,6 +44,7 @@
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { GBufferPass } from 'three/addons/postprocessing/GBufferPass.js';
 			import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
@@ -94,7 +95,13 @@
 				const renderPass = new RenderPass( scene, camera );
 				composer.addPass( renderPass );
 
-				const gtaoPass = new GTAOPass( scene, camera, width, height );
+				const gBufferPass = new GBufferPass( scene, camera, width, height );
+				composer.addPass( gBufferPass );
+
+				const gtaoPass = new GTAOPass( scene, camera, width, height, {
+					depthTexture: gBufferPass.depthTexture,
+					normalTexture: gBufferPass.normalTexture
+				} );
 				gtaoPass.output = GTAOPass.OUTPUT.Denoise;
 				composer.addPass( gtaoPass );
 
