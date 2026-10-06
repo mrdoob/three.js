@@ -611,7 +611,7 @@ function deinterleaveAttribute( attribute ) {
 function deinterleaveGeometry( geometry ) {
 
 	const attributes = geometry.attributes;
-	const morphTargets = geometry.morphTargets;
+	const morphAttributes = geometry.morphAttributes;
 	const attrMap = new Map();
 
 	for ( const key in attributes ) {
@@ -631,18 +631,24 @@ function deinterleaveGeometry( geometry ) {
 
 	}
 
-	for ( const key in morphTargets ) {
+	for ( const key in morphAttributes ) {
 
-		const attr = morphTargets[ key ];
-		if ( attr.isInterleavedBufferAttribute ) {
+		const morphAttribute = morphAttributes[ key ];
 
-			if ( ! attrMap.has( attr ) ) {
+		for ( let i = 0, l = morphAttribute.length; i < l; i ++ ) {
 
-				attrMap.set( attr, deinterleaveAttribute( attr ) );
+			const attr = morphAttribute[ i ];
+			if ( attr.isInterleavedBufferAttribute ) {
+
+				if ( ! attrMap.has( attr ) ) {
+
+					attrMap.set( attr, deinterleaveAttribute( attr ) );
+
+				}
+
+				morphAttribute[ i ] = attrMap.get( attr );
 
 			}
-
-			morphTargets[ key ] = attrMap.get( attr );
 
 		}
 
