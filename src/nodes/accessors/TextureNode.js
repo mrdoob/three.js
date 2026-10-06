@@ -766,7 +766,7 @@ class TextureNode extends UniformNode {
 		textureNode.uvNode = nodeObject( uvNode );
 		textureNode.referenceNode = this.getBase();
 
-		return nodeObject( textureNode );
+		return textureNode;
 
 	}
 
@@ -804,7 +804,7 @@ class TextureNode extends UniformNode {
 
 		}
 
-		return nodeObject( textureNode );
+		return textureNode;
 
 	}
 
@@ -820,7 +820,7 @@ class TextureNode extends UniformNode {
 		textureNode.levelNode = nodeObject( levelNode );
 		textureNode.referenceNode = this.getBase();
 
-		return nodeObject( textureNode );
+		return textureNode;
 
 	}
 
@@ -848,7 +848,7 @@ class TextureNode extends UniformNode {
 		textureNode.biasNode = nodeObject( biasNode );
 		textureNode.referenceNode = this.getBase();
 
-		return nodeObject( textureNode );
+		return textureNode;
 
 	}
 
@@ -874,7 +874,7 @@ class TextureNode extends UniformNode {
 		textureNode.compareNode = nodeObject( compareNode );
 		textureNode.referenceNode = this.getBase();
 
-		return nodeObject( textureNode );
+		return textureNode;
 
 	}
 
@@ -891,7 +891,7 @@ class TextureNode extends UniformNode {
 		textureNode.gradNode = [ nodeObject( gradNodeX ), nodeObject( gradNodeY ) ];
 		textureNode.referenceNode = this.getBase();
 
-		return nodeObject( textureNode );
+		return textureNode;
 
 	}
 
@@ -907,7 +907,7 @@ class TextureNode extends UniformNode {
 		textureNode.gatherNode = nodeObject( gatherNode );
 		textureNode.referenceNode = this.getBase();
 
-		return nodeObject( textureNode );
+		return textureNode;
 
 	}
 
@@ -935,7 +935,7 @@ class TextureNode extends UniformNode {
 		textureNode.depthNode = nodeObject( depthNode );
 		textureNode.referenceNode = this.getBase();
 
-		return nodeObject( textureNode );
+		return textureNode;
 
 	}
 
@@ -951,7 +951,7 @@ class TextureNode extends UniformNode {
 		textureNode.offsetNode = nodeObject( offsetNode );
 		textureNode.referenceNode = this.getBase();
 
-		return nodeObject( textureNode );
+		return textureNode;
 
 	}
 
@@ -1030,7 +1030,7 @@ export const texture = ( value = EmptyTexture, uvNode = null, levelNode = null, 
 
 	if ( value && value.isTextureNode === true ) {
 
-		textureNode = nodeObject( value.clone() );
+		textureNode = value.clone();
 		textureNode.referenceNode = value.getBase(); // Ensure the reference is set to the original node
 
 		if ( uvNode !== null ) textureNode.uvNode = nodeObject( uvNode );

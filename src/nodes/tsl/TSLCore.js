@@ -301,7 +301,7 @@ const ShaderNodeObject = function ( obj, altType = null ) {
 
 	} else if ( ( altType === null && ( type === 'float' || type === 'boolean' ) ) || ( type && type !== 'shader' && type !== 'string' ) ) {
 
-		return nodeObject( getConstNode( obj, altType ) );
+		return getConstNode( obj, altType );
 
 	} else if ( type === 'shader' ) {
 
@@ -345,17 +345,13 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, setti
 
 		if ( settings !== null ) {
 
-			node = nodeObject( Object.assign( node, settings ) );
+			Object.assign( node, settings );
 
 			if ( settings.intent === true ) {
 
 				node = node.toVarIntent();
 
 			}
-
-		} else {
-
-			node = nodeObject( node );
 
 		}
 
@@ -756,7 +752,7 @@ function getProxyParameters( params ) {
 
 					for ( const inputNode of params ) {
 
-						yield nodeObject( inputNode );
+						yield inputNode;
 
 					}
 

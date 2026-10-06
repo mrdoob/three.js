@@ -1343,9 +1343,9 @@ export default SSRNode;
  * @param {SSRNodeOptions} [options] - Optional inputs for material and environment data.
  * @returns {SSRNode}
  */
-export const ssr = ( colorNode, depthNode, normalNode, options = {} ) => nodeObject( new SSRNode(
+export const ssr = ( colorNode, depthNode, normalNode, options = {} ) => new SSRNode(
 	nodeObject( colorNode ),
 	nodeObject( depthNode ),
 	nodeObject( normalNode ),
 	options
-) );
+);

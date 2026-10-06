@@ -153,13 +153,11 @@ export default ChromaticAberrationNode;
  */
 export const chromaticAberration = ( node, strength = 1.0, center = null, scale = 1.1 ) => {
 
-	return nodeObject(
-		new ChromaticAberrationNode(
-			convertToTexture( node ),
-			nodeObject( strength ),
-			nodeObject( center ),
-			nodeObject( scale )
-		)
+	return new ChromaticAberrationNode(
+		convertToTexture( node ),
+		nodeObject( strength ),
+		nodeObject( center ),
+		nodeObject( scale )
 	);
 
 };
