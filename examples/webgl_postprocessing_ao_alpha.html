@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - alpha cutout AO</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Alpha cutout AO</span>
+			</div>
+			<small>
+				Left: base-map alpha. Center: transformed alphaMap on UV1. Right: both masks.<br>
+				Lower row: solid/cutout groups viewed from the back. Small panels reuse materials.<br>
+				<a href="webgpu_postprocessing_ao_alpha.html">webgpu comparison</a>
+			</small>
+		</div>
+
+		<script type="importmap">
+			{ "imports": {
+				"three": "../build/three.module.js",
+				"three/webgpu": "../build/three.webgpu.js",
+				"three/tsl": "../build/three.tsl.js",
+				"three/addons/": "./jsm/"
+			} }
+		</script>
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { createAlphaCutoutScene } from 'three/addons/scenes/AlphaCutoutScene.js';
+
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { GBufferPass } from 'three/addons/postprocessing/GBufferPass.js';
+			import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
+			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+			const renderer = new THREE.WebGLRenderer();
+			renderer.setPixelRatio( devicePixelRatio );
+			renderer.setSize( innerWidth, innerHeight );
+			document.body.appendChild( renderer.domElement );
+
+			const { scene, cutouts, alphaMap } = createAlphaCutoutScene();
+			const camera = new THREE.PerspectiveCamera( 45, innerWidth / innerHeight, 0.1, 30 );
+			camera.position.set( 0, 1.5, 11 );
+			const controls = new OrbitControls( camera, renderer.domElement );
+			controls.target.set( 0, 1.5, 0 );
+			controls.update();
+			const params = { view: 'AO + beauty', alphaTest: 0.5, opacity: 0.75, rotation: 0.3 };
+			const gui = new GUI();
+			gui.add( params, 'alphaTest', 0, 1 ).onChange( value => {
+
+				for ( const material of cutouts ) material.alphaTest = value;
+
+			} );
+			gui.add( params, 'opacity', 0, 1 ).onChange( value => cutouts[ 2 ].opacity = value );
+			gui.add( params, 'rotation', - Math.PI, Math.PI ).onChange( value => alphaMap.rotation = value );
+
+			const composer = new EffectComposer( renderer );
+			const prepass = new GBufferPass( scene, camera );
+			composer.addPass( prepass );
+			composer.addPass( new RenderPass( scene, camera ) );
+			const gtaoPass = new GTAOPass( scene, camera, innerWidth, innerHeight, {
+				depthTexture: prepass.depthTexture,
+				normalTexture: prepass.normalTexture
+			} );
+			gtaoPass.updateGtaoMaterial( { radius: 0.5 } );
+			composer.addPass( gtaoPass );
+			composer.addPass( new OutputPass() );
+			const views = {
+				'AO + beauty': GTAOPass.OUTPUT.Default,
+				Beauty: GTAOPass.OUTPUT.Diffuse,
+				AO: GTAOPass.OUTPUT.Denoise,
+				Normals: GTAOPass.OUTPUT.Normal,
+				Depth: GTAOPass.OUTPUT.Depth
+			};
+			gui.add( params, 'view', Object.keys( views ) ).onChange( value => gtaoPass.output = views[ value ] );
+			// Compare the reusable prepass with GTAO's original internal solid override.
+			params.legacyPrepass = false;
+			gui.add( params, 'legacyPrepass' ).name( 'legacy solid prepass' ).onChange( legacy => {
+
+				prepass.enabled = ! legacy;
+				if ( legacy ) {
+
+					gtaoPass.setGBuffer();
+
+				} else {
+
+					gtaoPass.setGBuffer( prepass.depthTexture, prepass.normalTexture );
+
+				}
+
+			} );
+			const metrics = document.createElement( 'div' );
+			metrics.style.cssText = 'position:absolute;bottom:16px;left:16px;padding:8px;color:white;background:rgba(0,0,0,0.6)';
+			document.body.appendChild( metrics );
+			renderer.info.autoReset = false;
+			renderer.setAnimationLoop( () => {
+
+				renderer.info.reset();
+				composer.render();
+				metrics.textContent = `Draw calls: ${ renderer.info.render.calls } | Programs: ${ renderer.info.programs.length } | Cached materials: ${ prepass._materialCache.size }`;
+
+			} );
+
+			window.addEventListener( 'resize', () => {
+
+				camera.aspect = innerWidth / innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( innerWidth, innerHeight );
+				composer.setSize( innerWidth, innerHeight );
+
+			} );
+
+		</script>
+	</body>
+</html>

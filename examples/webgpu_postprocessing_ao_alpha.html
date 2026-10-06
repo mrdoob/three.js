@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - alpha cutout AO</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Alpha cutout AO</span>
+			</div>
+			<small>
+				Left: base-map alpha. Center: transformed alphaMap on UV1. Right: both masks.<br>
+				Lower row: solid/cutout groups viewed from the back. Small panels reuse materials.<br>
+				<a href="webgl_postprocessing_ao_alpha.html">webgl comparison</a>
+			</small>
+		</div>
+
+		<script type="importmap">
+			{ "imports": {
+				"three": "../build/three.webgpu.js",
+				"three/webgpu": "../build/three.webgpu.js",
+				"three/tsl": "../build/three.tsl.js",
+				"three/addons/": "./jsm/"
+			} }
+		</script>
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { createAlphaCutoutScene } from 'three/addons/scenes/AlphaCutoutScene.js';
+
+			import { pass, mrt, output, normalView, vec4 } from 'three/tsl';
+			import { ao } from 'three/addons/tsl/display/GTAONode.js';
+
+			const renderer = new THREE.WebGPURenderer();
+			renderer.setPixelRatio( devicePixelRatio );
+			renderer.setSize( innerWidth, innerHeight );
+			document.body.appendChild( renderer.domElement );
+			await renderer.init();
+
+			const { scene, cutouts, alphaMap } = createAlphaCutoutScene();
+			const camera = new THREE.PerspectiveCamera( 45, innerWidth / innerHeight, 0.1, 30 );
+			camera.position.set( 0, 1.5, 11 );
+			const controls = new OrbitControls( camera, renderer.domElement );
+			controls.target.set( 0, 1.5, 0 );
+			controls.update();
+			const params = { view: 'AO + beauty', alphaTest: 0.5, opacity: 0.75, rotation: 0.3 };
+			const gui = new GUI();
+			gui.add( params, 'alphaTest', 0, 1 ).onChange( value => {
+
+				for ( const material of cutouts ) material.alphaTest = value;
+
+			} );
+			gui.add( params, 'opacity', 0, 1 ).onChange( value => cutouts[ 2 ].opacity = value );
+			gui.add( params, 'rotation', - Math.PI, Math.PI ).onChange( value => alphaMap.rotation = value );
+
+			// MRT evaluates the original materials, including alpha discard, for every group.
+			const scenePass = pass( scene, camera );
+			scenePass.setMRT( mrt( { output, normal: normalView } ) );
+			const beauty = scenePass.getTextureNode( 'output' );
+			const normals = scenePass.getTextureNode( 'normal' );
+			const depth = scenePass.getTextureNode( 'depth' );
+			const aoPass = ao( depth, normals, camera );
+			aoPass.radius.value = 0.5;
+			aoPass.resolutionScale = 1;
+			aoPass.useTemporalFiltering = false;
+			const pipeline = new THREE.RenderPipeline( renderer );
+			function updateOutput() {
+
+				const views = {
+					'AO + beauty': beauty.mul( aoPass.getTextureNode() ),
+					Beauty: beauty,
+					AO: vec4( aoPass.getTextureNode().rrr, 1 ),
+					Normals: vec4( normals.rgb.mul( 0.5 ).add( 0.5 ), 1 ),
+					Depth: vec4( scenePass.getLinearDepthNode().mul( 5 ).rrr, 1 )
+				};
+				pipeline.outputNode = views[ params.view ];
+				pipeline.needsUpdate = true;
+
+			}
+
+			gui.add( params, 'view', [ 'AO + beauty', 'Beauty', 'AO', 'Normals', 'Depth' ] ).onChange( updateOutput );
+			updateOutput();
+			renderer.setAnimationLoop( () => pipeline.render() );
+
+			window.addEventListener( 'resize', () => {
+
+				camera.aspect = innerWidth / innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( innerWidth, innerHeight );
+
+			} );
+
+		</script>
+	</body>
+</html>

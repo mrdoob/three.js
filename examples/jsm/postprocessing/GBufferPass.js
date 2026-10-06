@@ -1,13 +1,16 @@
 import {
 	Color, DepthFormat, DepthStencilFormat, DepthTexture, FloatType, HalfFloatType, MeshNormalMaterial,
-	NearestFilter, NoBlending, UnsignedInt248Type, UnsignedIntType, UnsignedShortType, WebGLRenderTarget
+	NearestFilter, NoBlending, TangentSpaceNormalMap, UnsignedInt248Type, UnsignedIntType, UnsignedShortType, WebGLRenderTarget
 } from 'three';
 import { Pass } from './Pass.js';
+
+const _textureProperties = [ 'map', 'alphaMap', 'normalMap', 'bumpMap', 'displacementMap' ];
+const _shaderProperties = [ 'side', 'flatShading', 'normalMapType', 'wireframe', 'clippingPlanes', 'clipIntersection' ];
 
 /**
  * Renders shared view-space normals and depth for WebGL postprocessing effects.
  * Add this pass before effects that consume its textures via setGBuffer().
- * It renders mesh geometry; points and lines do not contribute.
+ * It renders mesh geometry; points, lines and sprites do not contribute.
  *
  * Normals are unit view-space vectors encoded as RGB = normal * 0.5 + 0.5 in
  * NoColorSpace, stored in an RGBA half-float texture. Depth is a separate
@@ -20,8 +23,10 @@ import { Pass } from './Pass.js';
  * frame, camera, projection, viewport and physical pixel dimensions.
  *
  * This pass owns its attachments. Consumers must not resize or dispose them.
- * The MeshNormalMaterial override has the same geometry semantics as the AO passes;
- * it does not reproduce each source material's normal maps or transparency settings.
+ * Built-in materials retain alpha-tested coverage, texture transforms, UV channels,
+ * material groups, side orientation, normal/bump maps, displacement and clipping.
+ * Blended materials without alpha testing do not contribute. Custom shader modifications,
+ * including custom vertex deformation and fragment discard, are not reproduced.
  *
  * ```js
  * const gBufferPass = new GBufferPass( scene, camera, width, height );
@@ -71,9 +76,10 @@ class GBufferPass extends Pass {
 			type: HalfFloatType,
 			depthTexture
 		} );
-		this._normalMaterial = new MeshNormalMaterial( { blending: NoBlending } );
+		this._materialCache = new Map();
+		this._invisibleMaterial = new MeshNormalMaterial();
+		this._invisibleMaterial.visible = false;
 		this._clearColor = new Color();
-		this._visibilityCache = [];
 
 	}
 
@@ -101,6 +107,81 @@ class GBufferPass extends Pass {
 
 	}
 
+	_getMaterial( source ) {
+
+		if ( source === undefined ) return source;
+		if ( source.visible === false || ( source.transparent === true && source.alphaTest === 0 ) ) return this._invisibleMaterial;
+
+		let entry = this._materialCache.get( source );
+
+		if ( entry === undefined ) {
+
+			const material = new MeshNormalMaterial( { blending: NoBlending } );
+			material.onBeforeCompile = shader => {
+
+				shader.fragmentShader = shader.fragmentShader
+					.replace( '#include <uv_pars_fragment>', `#include <uv_pars_fragment>
+#include <map_pars_fragment>
+#include <alphamap_pars_fragment>
+#include <alphatest_pars_fragment>` )
+					.replace( '#include <clipping_planes_fragment>', `#include <clipping_planes_fragment>
+#include <map_fragment>
+#include <alphamap_fragment>
+#include <alphatest_fragment>` );
+
+			};
+
+			const onDispose = () => {
+
+				material.dispose();
+				source.removeEventListener( 'dispose', onDispose );
+				this._materialCache.delete( source );
+
+			};
+
+			source.addEventListener( 'dispose', onDispose );
+			entry = { material, channels: {}, version: - 1, onDispose };
+			this._materialCache.set( source, entry );
+
+		}
+
+		const material = entry.material;
+		if ( entry.version !== source.version ) material.needsUpdate = true;
+		entry.version = source.version;
+
+		for ( const property of _textureProperties ) {
+
+			const texture = ( ( property === 'map' || property === 'alphaMap' ) && source.alphaTest === 0 ) ? null : source[ property ] || null;
+			const channel = texture ? texture.channel : undefined;
+			if ( material[ property ] !== texture || entry.channels[ property ] !== channel ) material.needsUpdate = true;
+			material[ property ] = texture;
+			entry.channels[ property ] = channel;
+
+		}
+
+		for ( const property of _shaderProperties ) {
+
+			const value = source[ property ] !== undefined ? source[ property ] : ( property === 'normalMapType' ? TangentSpaceNormalMap : false );
+			if ( material[ property ] !== value ) material.needsUpdate = true;
+			material[ property ] = value;
+
+		}
+
+		// The renderer updates texture matrices and uniforms without recompiling these materials.
+		material.alphaTest = source.alphaTest;
+		material.opacity = source.alphaTest > 0 ? source.opacity : 1;
+		if ( source.normalScale ) material.normalScale.copy( source.normalScale );
+		material.bumpScale = source.bumpScale !== undefined ? source.bumpScale : 1;
+		material.displacementScale = source.displacementScale !== undefined ? source.displacementScale : 1;
+		material.displacementBias = source.displacementBias !== undefined ? source.displacementBias : 0;
+		material.polygonOffset = source.polygonOffset;
+		material.polygonOffsetFactor = source.polygonOffsetFactor;
+		material.polygonOffsetUnits = source.polygonOffsetUnits;
+
+		return material;
+
+	}
+
 	/**
 	 * Renders the geometry buffers without modifying composer color buffers.
 	 *
@@ -115,27 +196,43 @@ class GBufferPass extends Pass {
 		}
 
 		const scene = this.scene;
-		const visibility = this._visibilityCache;
 		const overrideMaterial = scene.overrideMaterial;
+		const background = scene.background;
 		const target = renderer.getRenderTarget();
+		const cubeFace = renderer.getActiveCubeFace();
+		const mipmapLevel = renderer.getActiveMipmapLevel();
 		renderer.getClearColor( this._clearColor );
 		const alpha = renderer.getClearAlpha();
 		const autoClear = renderer.autoClear;
+		const shadowMapEnabled = renderer.shadowMap.enabled;
+		const materials = new Map();
+		const overrides = new Map();
+		const getOverride = source => {
+
+			if ( ! overrides.has( source ) ) overrides.set( source, this._getMaterial( source ) );
+			return overrides.get( source );
+
+		};
 
 		try {
 
-			scene.traverse( object => {
+			scene.background = null;
+			scene.overrideMaterial = null;
+			scene.traverseVisible( object => {
 
-				if ( ( object.isPoints || object.isLine || object.isLine2 ) && object.visible ) {
+				if ( object.material !== undefined ) {
 
-					visibility.push( object );
-					object.visible = false;
+					const source = object.material;
+					materials.set( object, source );
+					const mesh = object.isMesh && ! object.isLine2;
+					object.material = mesh ? ( Array.isArray( source ) ? source.map( getOverride ) : getOverride( source ) ) : this._invisibleMaterial;
 
 				}
 
 			} );
 
-			scene.overrideMaterial = this._normalMaterial;
+			// Normal/depth output does not use shadows. Avoid updating them with substituted materials.
+			renderer.shadowMap.enabled = false;
 			renderer.autoClear = false;
 			renderer.setRenderTarget( this._renderTarget );
 			renderer.setClearColor( 0x7777ff, 1 );
@@ -144,12 +241,13 @@ class GBufferPass extends Pass {
 
 		} finally {
 
+			for ( const [ object, material ] of materials ) object.material = material;
 			scene.overrideMaterial = overrideMaterial;
-			for ( const object of visibility ) object.visible = true;
-			visibility.length = 0;
+			scene.background = background;
+			renderer.shadowMap.enabled = shadowMapEnabled;
 			renderer.autoClear = autoClear;
 			renderer.setClearColor( this._clearColor, alpha );
-			renderer.setRenderTarget( target );
+			renderer.setRenderTarget( target, cubeFace, mipmapLevel );
 
 		}
 
@@ -173,7 +271,15 @@ class GBufferPass extends Pass {
 	dispose() {
 
 		this._renderTarget.dispose();
-		this._normalMaterial.dispose();
+		this._invisibleMaterial.dispose();
+		for ( const [ source, entry ] of this._materialCache ) {
+
+			source.removeEventListener( 'dispose', entry.onDispose );
+			entry.material.dispose();
+
+		}
+
+		this._materialCache.clear();
 
 	}
 
