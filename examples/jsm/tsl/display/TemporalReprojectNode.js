@@ -714,12 +714,14 @@ class TemporalReprojectNode extends Node {
 
 		if ( srcW > 0 && srcH > 0 ) {
 
-			// The copy requires matching formats, e.g. a float depth buffer with reversed depth.
+			// The copy requires matching formats, e.g. float depth with reversed depth or depth/stencil.
+			// Checked here since updateBefore() can run before setup() when driven by another node.
 
 			const historyDepth = this._historyRenderTarget.depthTexture;
 
-			if ( historyDepth.type !== currentDepth.type ) {
+			if ( historyDepth.format !== currentDepth.format || historyDepth.type !== currentDepth.type ) {
 
+				historyDepth.format = currentDepth.format;
 				historyDepth.type = currentDepth.type;
 				historyDepth.needsUpdate = true;
 
