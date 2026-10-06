@@ -117,15 +117,6 @@ class ChromaticAberrationNode extends Node {
 
 			return vec4( r, g, b, a );
 
-		} ).setLayout( {
-			name: 'ChromaticAberrationShader',
-			type: 'vec4',
-			inputs: [
-				{ name: 'uv', type: 'vec2' },
-				{ name: 'strength', type: 'float' },
-				{ name: 'center', type: 'vec2' },
-				{ name: 'scale', type: 'float' }
-			]
 		} );
 
 		const chromaticAberrationFn = Fn( () => {

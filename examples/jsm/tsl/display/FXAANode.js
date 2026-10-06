@@ -328,13 +328,6 @@ class FXAANode extends Node {
 
 			return Sample( finalUv );
 
-		} ).setLayout( {
-			name: 'FxaaPixelShader',
-			type: 'vec4',
-			inputs: [
-				{ name: 'uv', type: 'vec2' },
-				{ name: 'texSize', type: 'vec2' },
-			]
 		} );
 
 		const fxaa = Fn( () => {

@@ -120,11 +120,10 @@ class BitcountNode extends MathNode {
 	 * Creates and registers a reusable GLSL function that emulates the behavior of countTrailingZeros.
 	 *
 	 * @private
-	 * @param {string} method - The name of the function to create.
 	 * @param {string} elementType - The type of the input value.
 	 * @returns {Function} - The generated function
 	 */
-	_createTrailingZerosBaseLayout( method, elementType ) {
+	_createTrailingZerosBaseLayout( elementType ) {
 
 		const outputConvertNode = this._returnDataNode( elementType );
 
@@ -147,13 +146,7 @@ class BitcountNode extends MathNode {
 
 			return outputConvertNode( numTrailingZeros );
 
-		} ).setLayout( {
-			name: method,
-			type: elementType,
-			inputs: [
-				{ name: 'value', type: elementType }
-			]
-		} );
+		}, { value: elementType, return: elementType } );
 
 		return fnDef;
 
@@ -163,11 +156,10 @@ class BitcountNode extends MathNode {
 	 * Creates and registers a reusable GLSL function that emulates the behavior of countLeadingZeros.
 	 *
 	 * @private
-	 * @param {string} method - The name of the function to create.
 	 * @param {string} elementType - The type of the input value.
 	 * @returns {Function} - The generated function
 	 */
-	_createLeadingZerosBaseLayout( method, elementType ) {
+	_createLeadingZerosBaseLayout( elementType ) {
 
 		const outputConvertNode = this._returnDataNode( elementType );
 
@@ -219,13 +211,7 @@ class BitcountNode extends MathNode {
 
 			return outputConvertNode( n );
 
-		} ).setLayout( {
-			name: method,
-			type: elementType,
-			inputs: [
-				{ name: 'value', type: elementType }
-			]
-		} );
+		}, { value: elementType, return: elementType } );
 
 		return fnDef;
 
@@ -235,11 +221,10 @@ class BitcountNode extends MathNode {
 	 * Creates and registers a reusable GLSL function that emulates the behavior of countOneBits.
 	 *
 	 * @private
-	 * @param {string} method - The name of the function to create.
 	 * @param {string} elementType - The type of the input value.
 	 * @returns {Function} - The generated function
 	 */
-	_createOneBitsBaseLayout( method, elementType ) {
+	_createOneBitsBaseLayout( elementType ) {
 
 		const outputConvertNode = this._returnDataNode( elementType );
 
@@ -256,13 +241,7 @@ class BitcountNode extends MathNode {
 
 			return outputConvertNode( numBits );
 
-		} ).setLayout( {
-			name: method,
-			type: elementType,
-			inputs: [
-				{ name: 'value', type: elementType }
-			]
-		} );
+		}, { value: elementType, return: elementType } );
 
 		return fnDef;
 
@@ -273,13 +252,12 @@ class BitcountNode extends MathNode {
 	 * including considerations for component-wise bitcounts on vector type inputs.
 	 *
 	 * @private
-	 * @param {string} method - The name of the function to create.
 	 * @param {string} inputType - The type of the input value.
 	 * @param {number} typeLength - The vec length of the input value.
 	 * @param {Function} baseFn - The base function that operates on an individual component of the vector.
 	 * @returns {Function} - The alias function for the specified bitcount method.
 	 */
-	_createMainLayout( method, inputType, typeLength, baseFn ) {
+	_createMainLayout( inputType, typeLength, baseFn ) {
 
 		const outputConvertNode = this._returnDataNode( inputType );
 
@@ -306,13 +284,7 @@ class BitcountNode extends MathNode {
 
 			}
 
-		} ).setLayout( {
-			name: method,
-			type: inputType,
-			inputs: [
-				{ name: 'value', type: inputType }
-			]
-		} );
+		}, { value: inputType, return: inputType } );
 
 		return fnDef;
 
@@ -348,21 +320,21 @@ class BitcountNode extends MathNode {
 
 				case BitcountNode.COUNT_LEADING_ZEROS: {
 
-					baseFn = this._createLeadingZerosBaseLayout( baseMethod, elementType );
+					baseFn = this._createLeadingZerosBaseLayout( elementType );
 					break;
 
 				}
 
 				case BitcountNode.COUNT_TRAILING_ZEROS: {
 
-					baseFn = this._createTrailingZerosBaseLayout( baseMethod, elementType );
+					baseFn = this._createTrailingZerosBaseLayout( elementType );
 					break;
 
 				}
 
 				case BitcountNode.COUNT_ONE_BITS: {
 
-					baseFn = this._createOneBitsBaseLayout( baseMethod, elementType );
+					baseFn = this._createOneBitsBaseLayout( elementType );
 					break;
 
 				}
@@ -377,7 +349,7 @@ class BitcountNode extends MathNode {
 
 		if ( fn === undefined ) {
 
-			fn = this._createMainLayout( newMethod, inputType, typeLength, baseFn );
+			fn = this._createMainLayout( inputType, typeLength, baseFn );
 			registeredBitcountFunctions[ newMethod ] = fn;
 
 		}

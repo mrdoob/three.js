@@ -18,14 +18,7 @@ export const blendBurn = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 
 	return min( 1.0, base.oneMinus().div( blend ) ).oneMinus();
 
-} ).setLayout( {
-	name: 'blendBurn',
-	type: 'vec3',
-	inputs: [
-		{ name: 'base', type: 'vec3' },
-		{ name: 'blend', type: 'vec3' }
-	]
-} );
+}, { base: 'vec3', blend: 'vec3', return: 'vec3' } );
 
 /**
  * Represents a "Color Dodge" blend mode.
@@ -44,14 +37,7 @@ export const blendDodge = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 
 	return min( base.div( blend.oneMinus() ), 1.0 );
 
-} ).setLayout( {
-	name: 'blendDodge',
-	type: 'vec3',
-	inputs: [
-		{ name: 'base', type: 'vec3' },
-		{ name: 'blend', type: 'vec3' }
-	]
-} );
+}, { base: 'vec3', blend: 'vec3', return: 'vec3' } );
 
 /**
  * Represents a "Screen" blend mode.
@@ -70,14 +56,7 @@ export const blendScreen = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 
 	return base.oneMinus().mul( blend.oneMinus() ).oneMinus();
 
-} ).setLayout( {
-	name: 'blendScreen',
-	type: 'vec3',
-	inputs: [
-		{ name: 'base', type: 'vec3' },
-		{ name: 'blend', type: 'vec3' }
-	]
-} );
+}, { base: 'vec3', blend: 'vec3', return: 'vec3' } );
 
 /**
  * Represents a "Overlay" blend mode.
@@ -96,14 +75,7 @@ export const blendOverlay = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 
 	return mix( base.mul( 2.0 ).mul( blend ), base.oneMinus().mul( 2.0 ).mul( blend.oneMinus() ).oneMinus(), step( 0.5, base ) );
 
-} ).setLayout( {
-	name: 'blendOverlay',
-	type: 'vec3',
-	inputs: [
-		{ name: 'base', type: 'vec3' },
-		{ name: 'blend', type: 'vec3' }
-	]
-} );
+}, { base: 'vec3', blend: 'vec3', return: 'vec3' } );
 
 /**
  * This function blends two color based on their alpha values by replicating the behavior of `THREE.NormalBlending`.
@@ -121,11 +93,4 @@ export const blendColor = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 
 	return vec4( blend.rgb.mul( blend.a ).add( base.rgb.mul( base.a ).mul( blend.a.oneMinus() ) ).div( outAlpha ), outAlpha );
 
-} ).setLayout( {
-	name: 'blendColor',
-	type: 'vec4',
-	inputs: [
-		{ name: 'base', type: 'vec4' },
-		{ name: 'blend', type: 'vec4' }
-	]
-} );
+}, { base: 'vec4', blend: 'vec4', return: 'vec4' } );

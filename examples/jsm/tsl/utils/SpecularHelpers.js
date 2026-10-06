@@ -57,15 +57,12 @@ const SampleGGXVNDF = Fn( ( [ V, ax, ay, r1, r2 ] ) => {
 	return Ne;
 
 }, {
-	name: 'SampleGGXVNDF',
-	type: 'vec3',
-	inputs: [
-		{ name: 'V', type: 'vec3' },
-		{ name: 'ax', type: 'float' },
-		{ name: 'ay', type: 'float' },
-		{ name: 'r1', type: 'float' },
-		{ name: 'r2', type: 'float' },
-	]
+	V: 'vec3',
+	ax: 'float',
+	ay: 'float',
+	r1: 'float',
+	r2: 'float',
+	return: 'vec3'
 } );
 
 // Generalized Trowbridge-Reitz (GTR). For GGX set k=2.
@@ -79,7 +76,7 @@ export const D_GTR = Fn( ( [ roughness, NoH, k ] ) => {
 	// a² / (π * base^k)
 	return a2.div( PI.mul( pow( base, k ) ) ).toVar(); // float
 
-} );
+}, { roughness: 'float', NoH: 'float', k: 'float', return: 'float' } );
 
 // Smith G1 (Heitz): expects alpha (not squared); it squares internally
 export const SmithG = Fn( ( [ NDotX, alpha ] ) => {
@@ -94,7 +91,7 @@ export const SmithG = Fn( ( [ NDotX, alpha ] ) => {
 		) )
 	);
 
-} );
+}, { NDotX: 'float', alpha: 'float', return: 'float' } );
 
 // Geometry term G = G1(N·L, α_G) * G1(N·V, α_G)  (α_G is NOT squared here)
 export const GeometryTerm = Fn( ( [ NoL, NoV, alphaG ] ) => {
@@ -103,7 +100,7 @@ export const GeometryTerm = Fn( ( [ NoL, NoV, alphaG ] ) => {
 	const G1l = SmithG( NoL, alphaG ).toVar();
 	return G1v.mul( G1l ).toVar();
 
-} );
+}, { NoL: 'float', NoV: 'float', alphaG: 'float', return: 'float' } );
 
 // Bounded VNDF direction PDF (reflection mapping), matching SampleGGXVNDF above.
 // p(L) = D_GTR(roughness, NoH, 2) / ( 2 * (k * N·V + t) )   (Eto & Tokuyoshi eq. 8)
@@ -119,7 +116,7 @@ const GGXVNDFPdf = Fn( ( [ NoH, NoV, roughness ] ) => {
 	const t = sqrt( a2.mul( sinV2 ).add( NoV.mul( NoV ) ) ).toVar();
 	return D.div( max( float( 1e-6 ), float( 2.0 ).mul( k.mul( NoV ).add( t ) ) ) ).toVar();
 
-} );
+}, { NoH: 'float', NoV: 'float', roughness: 'float', return: 'float' } );
 
 /**
  * Fresnel reflectance for the Schlick approximation.
@@ -131,7 +128,7 @@ export const F_Schlick = Fn( ( [ f0, theta ] ) => {
 	const oneMinus5 = oneMinus2.mul( oneMinus2 ).mul( oneMinus ).toVar();
 	return f0.add( vec3( 1.0 ).sub( f0 ).mul( oneMinus5 ) ).toVar(); // vec3
 
-} );
+}, { f0: 'vec3', theta: 'float', return: 'vec3' } );
 
 /**
  * Specular dominant factor for parallax-corrected ray length.
@@ -147,14 +144,7 @@ export const getSpecularDominantFactor = Fn( ( [ NoV, roughness ] ) => {
 		.add( a );
 	return clamp( f );
 
-} ).setLayout( {
-	name: 'getSpecularDominantFactor',
-	type: 'float',
-	inputs: [
-		{ name: 'NoV', type: 'float' },
-		{ name: 'roughness', type: 'float' }
-	]
-} );
+}, { NoV: 'float', roughness: 'float', return: 'float' } );
 
 /**
  * Everything a single GGX reflection sample produces. `reflectDir` and `sampleWeight`
@@ -279,11 +269,7 @@ export const equirectUvToDir = Fn( ( [ uvIn ] ) => {
 		cosLat.mul( sin( phi ) )
 	) );
 
-} ).setLayout( {
-	name: 'equirectUvToDir',
-	type: 'vec3',
-	inputs: [ { name: 'uv', type: 'vec2' } ]
-} );
+}, { uv: 'vec2', return: 'vec3' } );
 
 // Solid-angle PDF of a direction under equirectangular parameterization.
 export const equirectDirPdf = Fn( ( [ direction ] ) => {
@@ -295,11 +281,7 @@ export const equirectDirPdf = Fn( ( [ direction ] ) => {
 		float( 1 ).div( float( 2 * Math.PI * Math.PI ).mul( sinTheta ) )
 	);
 
-} ).setLayout( {
-	name: 'equirectDirPdf',
-	type: 'float',
-	inputs: [ { name: 'direction', type: 'vec3' } ]
-} );
+}, { direction: 'vec3', return: 'float' } );
 
 /**
  * MIS power heuristic with β = 2: `pdfA² / (pdfA² + pdfB²)`.
@@ -314,12 +296,5 @@ export const misPowerHeuristic = Fn( ( [ pdfA, pdfB ] ) => {
 	const pdfBSq = pdfB.mul( pdfB );
 	return pdfASq.div( pdfASq.add( pdfBSq ) );
 
-} ).setLayout( {
-	name: 'misPowerHeuristic',
-	type: 'float',
-	inputs: [
-		{ name: 'pdfA', type: 'float' },
-		{ name: 'pdfB', type: 'float' }
-	]
-} );
+}, { pdfA: 'float', pdfB: 'float', return: 'float' } );
 

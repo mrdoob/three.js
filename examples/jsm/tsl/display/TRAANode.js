@@ -506,14 +506,7 @@ class TRAANode extends Node {
 			const weight = max( phase, phase.oneMinus() );
 			return weight.x.mul( weight.y ).oneMinus().div( 0.75 );
 
-		} ).setLayout( {
-			name: 'subpixelCorrection',
-			type: 'float',
-			inputs: [
-				{ name: 'velocityUV', type: 'vec2' },
-				{ name: 'textureSize', type: 'ivec2' }
-			]
-		} );
+		}, { velocityUV: 'vec2', textureSize: 'ivec2', return: 'float' } );
 
 		const historyNode = texture( this._historyRenderTarget.texture );
 

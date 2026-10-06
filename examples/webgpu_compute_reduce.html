@@ -467,13 +467,7 @@
 				val.assign( val.bitOr( val.shiftRight( 16 ) ) );
 				return val.add( 1 );
 
-			} ).setLayout( {
-				name: 'pow2Ceil',
-				type: 'uint',
-				inputs: [
-					{ name: 'x', type: 'uint' }
-				]
-			} );
+			}, { x: 'uint', return: 'uint' } );
 
 			// ALGORITHM CONSTRUCTORS
 

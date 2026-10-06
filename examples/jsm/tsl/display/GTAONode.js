@@ -436,15 +436,7 @@ class GTAONode extends Node {
 			return uv.x.greaterThan( 0 ).and( uv.x.lessThan( 1 ) ).and( uv.y.greaterThan( 0 ) ).and( uv.y.lessThan( 1 ) )
 				.and( texel.x.notEqual( centerTexel.x ).or( texel.y.notEqual( centerTexel.y ) ) );
 
-		} ).setLayout( {
-			name: 'isValidSample',
-			type: 'bool',
-			inputs: [
-				{ name: 'uv', type: 'vec2' },
-				{ name: 'centerTexel', type: 'vec2' },
-				{ name: 'size', type: 'vec2' }
-			]
-		} );
+		}, { uv: 'vec2', centerTexel: 'vec2', size: 'vec2', return: 'bool' } );
 
 		this._ao = Fn( () => {
 

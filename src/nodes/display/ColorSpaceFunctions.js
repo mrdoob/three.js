@@ -19,13 +19,7 @@ export const sRGBTransferEOTF = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
 	return rgbResult;
 
-} ).setLayout( {
-	name: 'sRGBTransferEOTF',
-	type: 'vec3',
-	inputs: [
-		{ name: 'color', type: 'vec3' }
-	]
-} );
+}, { color: 'vec3', return: 'vec3' } );
 
 /**
  * Converts the given color value from linear-sRGB to sRGB color space.
@@ -45,10 +39,4 @@ export const sRGBTransferOETF = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
 	return rgbResult;
 
-} ).setLayout( {
-	name: 'sRGBTransferOETF',
-	type: 'vec3',
-	inputs: [
-		{ name: 'color', type: 'vec3' }
-	]
-} );
+}, { color: 'vec3', return: 'vec3' } );

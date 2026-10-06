@@ -1145,6 +1145,9 @@ class FnNode extends Node {
 
 export function Fn( jsFunc, layout = null ) {
 
+	// Layout functions are cached across shaders of the same backend. Their bodies
+	// must depend only on explicit inputs and constants, not uniforms or material context.
+
 	const instance = new FnNode( jsFunc, layout );
 
 	return new Proxy( () => {}, {
