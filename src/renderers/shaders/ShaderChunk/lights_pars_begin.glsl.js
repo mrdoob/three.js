@@ -2,6 +2,12 @@ export default /* glsl */`
 uniform bool receiveShadow;
 uniform vec3 ambientLightColor;
 
+#ifdef USE_INDIRECT_SPECULAR_MAP
+
+	uniform sampler2D indirectSpecularMap;
+
+#endif
+
 #if defined( USE_LIGHT_PROBES )
 
 	uniform vec3 lightProbe[ 9 ];

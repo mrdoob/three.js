@@ -22,7 +22,18 @@ export default /* glsl */`
 
 #endif
 
-#if defined( USE_ENVMAP ) && defined( RE_IndirectSpecular )
+#if defined( USE_INDIRECT_SPECULAR_MAP ) && defined( RE_IndirectSpecular )
+
+	// screen-space prefiltered radiance; replaces the environment specular term
+	radiance += texture2D( indirectSpecularMap, gl_FragCoord.xy / vec2( textureSize( indirectSpecularMap, 0 ) ) ).rgb;
+
+	#if defined( USE_CLEARCOAT ) && defined( USE_ENVMAP )
+
+		clearcoatRadiance += getIBLRadiance( geometryViewDir, geometryClearcoatNormal, material.clearcoatRoughness );
+
+	#endif
+
+#elif defined( USE_ENVMAP ) && defined( RE_IndirectSpecular )
 
 	#ifdef USE_ANISOTROPY
 
