@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+	<title>three.js webgl - postprocessing - Ground Truth Ambient Occlusion 2</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<meta property="og:title" content="three.js webgl - postprocessing - Ground Truth Ambient Occlusion 2">
+	<meta property="og:type" content="website">
+	<meta property="og:url" content="https://threejs.org/examples/webgl_postprocessing_gtao2.html">
+	<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_postprocessing_gtao2.jpg">
+	<link type="text/css" rel="stylesheet" href="main.css">
+
+</head>
+
+<body>
+	<div id="info">
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - screen space AO as a lighting input<br />
+		GTAOPass runs before the scene and fills <code>scene.ambientOcclusionMap</code>; materials apply it to indirect light only.
+	</div>
+
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "../build/three.module.js",
+				"three/addons/": "./jsm/"
+			}
+		}
+	</script>
+
+	<script type="module">
+		import * as THREE from 'three';
+
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+		import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+		import { GBufferPass } from 'three/addons/postprocessing/GBufferPass.js';
+		import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
+		import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+		import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+		const params = {
+			ao: true,
+			denoise: true,
+			radius: 0.1,
+			scale: 1,
+			thickness: 1,
+			autoRotate: true
+		};
+
+		const renderer = new THREE.WebGLRenderer();
+		renderer.setPixelRatio( window.devicePixelRatio );
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		renderer.toneMapping = THREE.ACESFilmicToneMapping;
+		renderer.setAnimationLoop( animate );
+		document.body.appendChild( renderer.domElement );
+
+		const camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 0.1, 15 );
+		camera.position.set( 0.13, 0.35, 0.44 );
+
+		const scene = new THREE.Scene();
+		scene.background = new THREE.Color( 0x443333 );
+
+		const pmrem = new THREE.PMREMGenerator( renderer );
+		scene.environment = pmrem.fromScene( new RoomEnvironment(), 0.04 ).texture;
+		scene.environmentIntensity = 0.6;
+		pmrem.dispose();
+
+		const spotLight = new THREE.SpotLight( 0xffffff, 2, 0, Math.PI / 8, 0.5 );
+		spotLight.position.set( - 1, 1, 1 );
+		scene.add( spotLight );
+
+		const add = ( geometry, color, x, y, z ) => {
+
+			const mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial( { color, roughness: 0.7 } ) );
+			mesh.position.set( x, y, z );
+			scene.add( mesh );
+			return mesh;
+
+		};
+
+		add( new THREE.PlaneGeometry( 8, 8 ), 0xcbcbcb, 0, - 0.0001, 0 ).rotation.x = - Math.PI / 2;
+		add( new THREE.BoxGeometry( 0.05, 0.05, 0.05 ), 'green', - 0.12, 0.025, 0.015 );
+		add( new THREE.IcosahedronGeometry( 0.025, 4 ), 'cyan', - 0.05, 0.025, 0.08 );
+		add( new THREE.ConeGeometry( 0.025, 0.05, 64 ), 'yellow', - 0.05, 0.025, - 0.055 );
+
+		const dracoLoader = new DRACOLoader();
+		dracoLoader.load( 'models/draco/bunny.drc', function ( geometry ) {
+
+			geometry.computeVertexNormals();
+			add( geometry, 0xa5a5a5, 0, - 0.0365, 0 );
+			dracoLoader.dispose();
+
+		} );
+
+		const controls = new OrbitControls( camera, renderer.domElement );
+		controls.target.set( 0, 0.0635, 0 );
+		controls.enableDamping = true;
+		controls.enabled = ! params.autoRotate;
+		controls.update();
+
+		const width = window.innerWidth * window.devicePixelRatio;
+		const height = window.innerHeight * window.devicePixelRatio;
+
+		const composer = new EffectComposer( renderer );
+		const gBufferPass = new GBufferPass( scene, camera, width, height );
+		const gtaoPass = new GTAOPass( scene, camera, width, height, {
+			depthTexture: gBufferPass.depthTexture,
+			normalTexture: gBufferPass.normalTexture
+		} );
+		gtaoPass.output = GTAOPass.OUTPUT.Off;
+		gtaoPass.needsSwap = false;
+
+		// AO is computed before the scene is lit so the materials can consume it
+		composer.addPass( gBufferPass );
+		composer.addPass( gtaoPass );
+		composer.addPass( new RenderPass( scene, camera ) );
+		composer.addPass( new OutputPass() );
+
+		function update() {
+
+			scene.ambientOcclusionMap = ! params.ao ? null : ( params.denoise ? gtaoPass.pdRenderTarget.texture : gtaoPass.gtaoRenderTarget.texture );
+			gtaoPass.updateGtaoMaterial( { radius: params.radius, scale: params.scale, thickness: params.thickness } );
+
+		}
+
+		update();
+
+		const gui = new GUI( { width: 260 } );
+		gui.add( params, 'ao' ).name( 'AO as lighting input' ).onChange( update );
+		gui.add( params, 'denoise' ).onChange( update );
+		gui.add( params, 'radius', 0.01, 0.5 ).onChange( update );
+		gui.add( params, 'scale', 0, 4 ).onChange( update );
+		gui.add( params, 'thickness', 0.01, 4 ).onChange( update );
+		gui.add( scene, 'environmentIntensity', 0, 3 );
+		gui.add( spotLight, 'intensity', 0, 20 ).name( 'spot light intensity' );
+		gui.add( params, 'autoRotate' ).onChange( v => controls.enabled = ! v );
+
+		window.addEventListener( 'resize', () => {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			composer.setSize( window.innerWidth, window.innerHeight );
+
+		} );
+
+		function animate() {
+
+			if ( params.autoRotate ) {
+
+				const t = performance.now() / 1000 * 0.3;
+				camera.position.set( Math.sin( t ) * 0.45, 0.3, Math.cos( t ) * 0.45 );
+				camera.lookAt( controls.target );
+
+			} else {
+
+				controls.update();
+
+			}
+
+			composer.render();
+
+		}
+
+	</script>
+</body>
+
+</html>
