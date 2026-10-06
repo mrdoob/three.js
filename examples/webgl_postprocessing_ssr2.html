@@ -181,7 +181,8 @@
 		gui.add( ssr2Pass, 'quality', 0.1, 1 );
 		gui.add( ssr2Pass, 'resolutionScale', 0.25, 1 );
 		gui.add( ssr2Pass, 'rayCount', 1, 16, 1 );
-		gui.add( ssr2Pass, 'noiseBlur', 0, 4 );
+		gui.add( ssr2Pass, 'maxFrames', 1, 64, 1 );
+		gui.add( ssr2Pass, 'temporalClip', 0.5, 4 );
 		gui.add( ssr2Pass, 'maxDistance', 0, 1 );
 		gui.add( ssr2Pass, 'thickness', 0, 0.1 );
 		gui.add( ssr2Pass, 'maxRoughness', 0, 1 );

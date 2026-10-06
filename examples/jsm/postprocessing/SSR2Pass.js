@@ -1,5 +1,6 @@
 import {
 	HalfFloatType,
+	Matrix4,
 	LinearFilter,
 	LinearMipmapLinearFilter,
 	NearestFilter,
@@ -9,7 +10,8 @@ import {
 	WebGLRenderTarget
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
-import { SSR2TraceShader, SSR2ResolveShader } from '../shaders/SSR2Shader.js';
+import { SSR2TraceShader, SSR2ResolveShader, SSR2TemporalShader } from '../shaders/SSR2Shader.js';
+import { CopyShader } from '../shaders/CopyShader.js';
 
 /**
  * Screen-space reflections computed as prefiltered incoming specular radiance, meant to
@@ -19,9 +21,9 @@ import { SSR2TraceShader, SSR2ResolveShader } from '../shaders/SSR2Shader.js';
  * Each pixel traces rays through the depth buffer, importance-sampled from its GGX
  * specular lobe (or one mirror ray with `stochastic = false`). A hit returns the lit scene
  * color; a miss (or the screen border) fades to the scene's PMREM environment sampled at
- * the surface roughness. The result is blurred over its mip chain, by a small fixed amount in
- * stochastic mode or by the reflection cone footprint otherwise. Materials apply their own BRDF
- * to the result.
+ * the surface roughness. In stochastic mode the noisy result is accumulated over frames by
+ * reprojecting the reflected hit point; otherwise it is blurred by the reflection cone footprint
+ * over its mip chain. Materials apply their own BRDF to the result.
  *
  * Inputs come from a {@link GBufferPass} created with `{ material: true }`. Place this
  * pass after the pass that renders the lit scene, and assign {@link SSR2Pass#texture} to
@@ -119,12 +121,33 @@ class SSR2Pass extends Pass {
 		this.rayCount = 4;
 
 		/**
-		 * Mip level of the cleanup blur applied to the stochastic result.
+		 * Maximum number of frames accumulated per pixel in stochastic mode (1 disables
+		 * accumulation). History is reprojected for camera motion only; moving objects ghost
+		 * until the clamp rejects the stale history.
 		 *
 		 * @type {number}
-		 * @default 1.5
+		 * @default 16
 		 */
-		this.noiseBlur = 1.5;
+		this.maxFrames = 16;
+
+		/**
+		 * Width of the history clamp around the current neighborhood, in standard deviations.
+		 * Lower rejects ghosting more aggressively but accumulates less.
+		 *
+		 * @type {number}
+		 * @default 2
+		 */
+		this.temporalClip = 2;
+
+		this._historyTargets = [ 0, 1 ].map( () => new WebGLRenderTarget( width, height, {
+			type: HalfFloatType,
+			minFilter: LinearFilter,
+			magFilter: LinearFilter,
+			depthBuffer: false
+		} ) );
+		this._historyIndex = 0;
+		this._historyValid = false;
+		this._prevViewProjection = new Matrix4();
 
 		this._frame = 0;
 
@@ -158,6 +181,22 @@ class SSR2Pass extends Pass {
 			blending: NoBlending
 		} );
 
+		this._temporalMaterial = new ShaderMaterial( {
+			uniforms: UniformsUtils.clone( SSR2TemporalShader.uniforms ),
+			vertexShader: SSR2TemporalShader.vertexShader,
+			fragmentShader: SSR2TemporalShader.fragmentShader,
+			blending: NoBlending
+		} );
+
+		this._copyMaterial = new ShaderMaterial( {
+			uniforms: UniformsUtils.clone( CopyShader.uniforms ),
+			vertexShader: CopyShader.vertexShader,
+			fragmentShader: CopyShader.fragmentShader,
+			blending: NoBlending
+		} );
+
+		this._temporalMaterial.uniforms.tDepth.value = gBufferPass.depthTexture;
+		this._temporalMaterial.uniforms.tNormal.value = gBufferPass.normalTexture;
 		this._traceMaterial.uniforms.tDepth.value = gBufferPass.depthTexture;
 		this._traceMaterial.uniforms.tNormal.value = gBufferPass.normalTexture;
 		this._traceMaterial.uniforms.tMaterial.value = gBufferPass.materialTexture;
@@ -190,6 +229,7 @@ class SSR2Pass extends Pass {
 		this._stochastic = value;
 		this._traceMaterial.defines.STOCHASTIC = value;
 		this._traceMaterial.needsUpdate = true;
+		this._historyValid = false;
 
 	}
 
@@ -271,7 +311,6 @@ class SSR2Pass extends Pass {
 		uniforms.screenEdgeFade.value = this.screenEdgeFade;
 		uniforms.quality.value = Math.min( Math.max( this.quality, 0.05 ), 1 );
 		uniforms.rayCount.value = Math.min( Math.max( Math.round( this.rayCount ), 1 ), 16 );
-		uniforms.noiseBlurLod.value = this.noiseBlur;
 		uniforms.frame.value = this._frame ++ % 64;
 
 		const target = renderer.getRenderTarget();
@@ -279,6 +318,40 @@ class SSR2Pass extends Pass {
 		this._fsQuad.material = this._traceMaterial;
 		renderer.setRenderTarget( this._traceTarget );
 		this._fsQuad.render( renderer );
+
+		if ( this._stochastic ) {
+
+			// accumulate over time, then copy to the stable output target
+			const temporal = this._temporalMaterial.uniforms;
+			const read = this._historyTargets[ this._historyIndex ];
+			const write = this._historyTargets[ 1 - this._historyIndex ];
+
+			temporal.tCurrent.value = this._traceTarget.texture;
+			temporal.tHistory.value = read.texture;
+			temporal.cameraInverseProjectionMatrix.value.copy( camera.projectionMatrixInverse );
+			temporal.cameraWorldMatrix.value.copy( camera.matrixWorld );
+			temporal.prevViewProjectionMatrix.value.copy( this._prevViewProjection );
+			temporal.maxFrames.value = Math.max( this.maxFrames, 1 );
+			temporal.clipGamma.value = this.temporalClip;
+			temporal.historyValid.value = this._historyValid ? 1 : 0;
+
+			this._fsQuad.material = this._temporalMaterial;
+			renderer.setRenderTarget( write );
+			this._fsQuad.render( renderer );
+
+			this._copyMaterial.uniforms.tDiffuse.value = write.texture;
+			this._fsQuad.material = this._copyMaterial;
+			renderer.setRenderTarget( this._resolveTarget );
+			this._fsQuad.render( renderer );
+
+			this._historyIndex = 1 - this._historyIndex;
+			this._historyValid = true;
+			this._prevViewProjection.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+
+			renderer.setRenderTarget( target );
+			return;
+
+		}
 
 		this._fsQuad.material = this._resolveMaterial;
 		renderer.setRenderTarget( this._resolveTarget );
@@ -303,6 +376,9 @@ class SSR2Pass extends Pass {
 		const traceHeight = Math.max( Math.round( height * this._resolutionScale ), 1 );
 
 		this._traceTarget.setSize( traceWidth, traceHeight );
+		for ( const history of this._historyTargets ) history.setSize( traceWidth, traceHeight );
+		this._historyValid = false;
+		this._temporalMaterial.uniforms.resolution.value.set( traceWidth, traceHeight );
 		this._resolveTarget.setSize( width, height );
 
 		const maxStep = Math.ceil( Math.sqrt( traceWidth * traceWidth + traceHeight * traceHeight ) );
@@ -326,6 +402,9 @@ class SSR2Pass extends Pass {
 	dispose() {
 
 		this._traceTarget.dispose();
+		for ( const history of this._historyTargets ) history.dispose();
+		this._temporalMaterial.dispose();
+		this._copyMaterial.dispose();
 		this._resolveTarget.dispose();
 		this._traceMaterial.dispose();
 		this._resolveMaterial.dispose();
