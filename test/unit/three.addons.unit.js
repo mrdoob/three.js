@@ -56,3 +56,4 @@ import './addons/tsl/TSL.Irradiance.tests.js';
 import './addons/tsl/TSLUtilsMisc.tests.js';
 
 import './addons/postprocessing/GBufferPass.tests.js';
+import './addons/postprocessing/GTAOPass.tests.js';
