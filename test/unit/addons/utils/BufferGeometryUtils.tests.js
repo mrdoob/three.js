@@ -234,6 +234,48 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
+			QUnit.module( 'deinterleaveGeometry', () => {
+
+				QUnit.test( 'deinterleaves attributes and morph attributes', ( assert ) => {
+
+					const geometry = new BufferGeometry();
+
+					const interleavedBuffer = new InterleavedBuffer( new Float32Array( [
+						0, 0, 0, 0, 0, 1,
+						1, 0, 0, 0, 0, 1
+					] ), 6 );
+
+					geometry.setAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0 ) );
+					geometry.setAttribute( 'normal', new InterleavedBufferAttribute( interleavedBuffer, 3, 3 ) );
+
+					const morphBuffer = new InterleavedBuffer( new Float32Array( [
+						0, 1, 0, 0, 2, 0,
+						1, 1, 0, 1, 2, 0
+					] ), 6 );
+
+					geometry.morphAttributes.position = [
+						new InterleavedBufferAttribute( morphBuffer, 3, 0 ),
+						new InterleavedBufferAttribute( morphBuffer, 3, 3 )
+					];
+
+					BufferGeometryUtils.deinterleaveGeometry( geometry );
+
+					const position = geometry.getAttribute( 'position' );
+					const normal = geometry.getAttribute( 'normal' );
+					const [ morphPosition0, morphPosition1 ] = geometry.morphAttributes.position;
+
+					assert.ok( ! position.isInterleavedBufferAttribute && ! normal.isInterleavedBufferAttribute, 'deinterleaves attributes' );
+					assert.ok( ! morphPosition0.isInterleavedBufferAttribute && ! morphPosition1.isInterleavedBufferAttribute, 'deinterleaves morph attributes' );
+
+					assert.deepEqual( Array.from( position.array ), [ 0, 0, 0, 1, 0, 0 ], 'keeps positions' );
+					assert.deepEqual( Array.from( normal.array ), [ 0, 0, 1, 0, 0, 1 ], 'keeps normals' );
+					assert.deepEqual( Array.from( morphPosition0.array ), [ 0, 1, 0, 1, 1, 0 ], 'keeps first morph target' );
+					assert.deepEqual( Array.from( morphPosition1.array ), [ 0, 2, 0, 1, 2, 0 ], 'keeps second morph target' );
+
+				} );
+
+			} );
+
 		} );
 
 	} );
