@@ -1,4 +1,5 @@
-import { hashArray, hashString } from '../../nodes/core/NodeUtils.js';
+import { getDataFromObject, hashArray, hashString } from '../../nodes/core/NodeUtils.js';
+import { isSharedInstancing } from '../../nodes/accessors/Instance.js';
 
 let _id = 0;
 const _protoKeysCache = new WeakMap();
@@ -570,7 +571,7 @@ class RenderObject {
 			if ( nodeAttribute.node && nodeAttribute.node.attribute ) {
 
 				// node attribute
-				attribute = nodeAttribute.node.attribute;
+				attribute = nodeAttribute.node.getObjectAttribute( this.object );
 
 			} else {
 
@@ -870,9 +871,12 @@ class RenderObject {
 
 		}
 
-		if ( object.isInstancedMesh || object.count > 1 ) {
+		if ( object.isInstancedMesh && isSharedInstancing( object, renderer ) ) {
 
-			// TODO: https://github.com/mrdoob/three.js/pull/29066#issuecomment-2269400850
+			// Objects with velocity also read their previous instance matrices.
+			cacheKey += getDataFromObject( object ).useVelocity === true ? 'sharedInstancing:velocity,' : 'sharedInstancing,';
+
+		} else if ( object.isInstancedMesh || object.count > 1 ) {
 
 			cacheKey += object.uuid + ',';
 
