@@ -94,15 +94,18 @@ class RenderObjects {
 	 * @param {RenderContext} renderContext - The render context.
 	 * @param {ClippingContext} clippingContext - The clipping context.
 	 * @param {string} [passId] - An optional ID for identifying the pass.
+	 * @param {?InstanceGroup} [instances=null] - An optional group of objects drawn as instances.
 	 * @return {RenderObject} The render object.
 	 */
-	get( object, material, scene, camera, lightsNode, renderContext, clippingContext, passId ) {
+	get( object, material, scene, camera, lightsNode, renderContext, clippingContext, passId, instances = null ) {
 
 		const chainMap = this.getChainMap( passId );
 
 		// set chain keys
 
-		_chainKeys[ 0 ] = object;
+		// merged objects share one render object whose source is their instance group
+
+		_chainKeys[ 0 ] = instances !== null ? instances : object;
 		_chainKeys[ 1 ] = material;
 		_chainKeys[ 2 ] = renderContext;
 		_chainKeys[ 3 ] = lightsNode;
@@ -113,7 +116,7 @@ class RenderObjects {
 
 		if ( renderObject === undefined ) {
 
-			renderObject = this.createRenderObject( this.nodes, this.geometries, this.renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext, passId );
+			renderObject = this.createRenderObject( this.nodes, this.geometries, this.renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext, passId, instances );
 
 			chainMap.set( _chainKeys, renderObject );
 
@@ -124,6 +127,8 @@ class RenderObjects {
 			// update references
 
 			renderObject.camera = camera;
+			renderObject.object = object;
+			renderObject.instances = instances;
 
 			// clipping and geometry updates
 
@@ -151,7 +156,7 @@ class RenderObjects {
 
 					renderObject.dispose();
 
-					renderObject = this.get( object, material, scene, camera, lightsNode, renderContext, clippingContext, passId );
+					renderObject = this.get( object, material, scene, camera, lightsNode, renderContext, clippingContext, passId, instances );
 
 				} else {
 
@@ -219,13 +224,14 @@ class RenderObjects {
 	 * @param {RenderContext} renderContext - The render context.
 	 * @param {ClippingContext} clippingContext - The clipping context.
 	 * @param {string} [passId] - An optional ID for identifying the pass.
+	 * @param {?InstanceGroup} [instances] - An optional group of objects drawn as instances.
 	 * @return {RenderObject} The render object.
 	 */
-	createRenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext, passId ) {
+	createRenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext, passId, instances = null ) {
 
 		const chainMap = this.getChainMap( passId );
 
-		const renderObject = new RenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext );
+		const renderObject = new RenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext, instances );
 
 		renderObject.onDispose = () => {
 

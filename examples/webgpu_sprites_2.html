@@ -1,0 +1,113 @@
+<html lang="en">
+	<head>
+		<title>three.js webgpu - sprites</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Sprites</span>
+			</div>
+
+			<small>
+				Example of using a custom SpriteMaterial with nodes.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../src/three.webgpu.js",
+					"three/webgpu": "../src/three.webgpu.js",
+					"three/tsl": "../src/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { texture, uv, userData, fog, rangeFogFactor, color } from 'three/tsl';
+
+			let camera, scene, renderer;
+
+			let map;
+
+			let group;
+
+			let imageWidth = 1, imageHeight = 1;
+
+			init();
+
+			async function init() {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera = new THREE.PerspectiveCamera( 60, width / height, 1, 2100 );
+				camera.position.z = 150;
+
+				scene = new THREE.Scene();
+
+				//
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( render );
+				document.body.appendChild( renderer.domElement );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				await renderer.init();
+
+				//
+
+				const material = new THREE.SpriteNodeMaterial();
+				material.colorNode = color( 0x0066ff );
+				
+				const sprite = new THREE.Sprite( material );
+				sprite.scale.set( 100, 100, 1.0 );
+				sprite.position.set( -55, 0, 0 );
+				scene.add( sprite );
+
+				renderer.render( scene, camera );
+
+				material.colorNode = color( 0xff6600 );
+
+				const sprite2 = new THREE.Sprite( material );
+				sprite2.scale.set( 100, 100, 1.0 );
+				sprite2.position.set( 55, 0, 0 );
+				scene.add( sprite2 );
+
+				renderer.render( scene, camera );
+
+			}
+
+			function onWindowResize() {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function render() {
+
+				//renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

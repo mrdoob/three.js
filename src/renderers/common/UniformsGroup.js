@@ -51,7 +51,7 @@ class UniformsGroup extends UniformBuffer {
 		 * A cache for the uniform update ranges.
 		 *
 		 * @private
-		 * @type {Map<number, {start: number, count: number}>}
+		 * @type {Map<string, {start: number, count: number}>}
 		 */
 		this._updateRangeCache = new Map();
 
@@ -60,9 +60,26 @@ class UniformsGroup extends UniformBuffer {
 		 * during the current update cycle. Reset on `clearUpdateRanges()`.
 		 *
 		 * @private
-		 * @type {Set<number>}
+		 * @type {Set<string>}
 		 */
 		this._addedIndices = new Set();
+
+		/**
+		 * The number of instances for this uniform group. Groups with more than one
+		 * instance are stored in a read-only storage buffer instead of a uniform buffer.
+		 *
+		 * @type {number}
+		 */
+		this.count = 1;
+
+		/**
+		 * The current instance index for this uniform group.
+		 *
+		 * @type {number}
+		 */
+		this.offset = 0;
+
+		this.index = 0;
 
 	}
 
@@ -73,7 +90,7 @@ class UniformsGroup extends UniformBuffer {
 	 */
 	addUniformUpdateRange( uniform ) {
 
-		const index = uniform.index;
+		const index = uniform.index + '_' + this.offset;
 
 		if ( this._addedIndices.has( index ) ) return;
 
@@ -86,7 +103,7 @@ class UniformsGroup extends UniformBuffer {
 
 		}
 
-		range.start = uniform.offset;
+		range.start = uniform.offset + this.offset;
 		range.count = uniform.itemSize;
 
 		this._addedIndices.add( index );
@@ -218,7 +235,10 @@ class UniformsGroup extends UniformBuffer {
 
 		}
 
-		return Math.ceil( offset / GPU_CHUNK_BYTES ) * GPU_CHUNK_BYTES;
+
+		this.size = Math.ceil( offset / GPU_CHUNK_BYTES ) * GPU_CHUNK_BYTES;
+
+		return this.size * this.count;
 
 	}
 
@@ -235,6 +255,12 @@ class UniformsGroup extends UniformBuffer {
 
 		let updated = false;
 
+		const bytesPerElement = this.bytesPerElement;
+
+		//for ( let i = 0, l = this.count; i < l; i ++ ) {
+
+		this.offset = this.index * this.size / bytesPerElement;
+
 		for ( const uniform of this.uniforms ) {
 
 			if ( this.updateByType( uniform ) === true ) {
@@ -244,6 +270,8 @@ class UniformsGroup extends UniformBuffer {
 			}
 
 		}
+
+		//}
 
 		return updated;
 
@@ -293,7 +321,7 @@ class UniformsGroup extends UniformBuffer {
 
 		const a = this.values;
 		const v = uniform.getValue();
-		const offset = uniform.offset;
+		const offset = uniform.offset + this.offset;
 		const type = uniform.getType();
 
 		if ( a[ offset ] !== v ) {
@@ -323,7 +351,7 @@ class UniformsGroup extends UniformBuffer {
 
 		const a = this.values;
 		const v = uniform.getValue();
-		const offset = uniform.offset;
+		const offset = uniform.offset + this.offset;
 		const type = uniform.getType();
 
 		if ( a[ offset + 0 ] !== v.x || a[ offset + 1 ] !== v.y ) {
@@ -355,7 +383,7 @@ class UniformsGroup extends UniformBuffer {
 
 		const a = this.values;
 		const v = uniform.getValue();
-		const offset = uniform.offset;
+		const offset = uniform.offset + this.offset;
 		const type = uniform.getType();
 
 		if ( a[ offset + 0 ] !== v.x || a[ offset + 1 ] !== v.y || a[ offset + 2 ] !== v.z ) {
@@ -388,7 +416,7 @@ class UniformsGroup extends UniformBuffer {
 
 		const a = this.values;
 		const v = uniform.getValue();
-		const offset = uniform.offset;
+		const offset = uniform.offset + this.offset;
 		const type = uniform.getType();
 
 		if ( a[ offset + 0 ] !== v.x || a[ offset + 1 ] !== v.y || a[ offset + 2 ] !== v.z || a[ offset + 3 ] !== v.w ) {
@@ -422,7 +450,7 @@ class UniformsGroup extends UniformBuffer {
 
 		const a = this.values;
 		const c = uniform.getValue();
-		const offset = uniform.offset;
+		const offset = uniform.offset + this.offset;
 
 		if ( a[ offset + 0 ] !== c.r || a[ offset + 1 ] !== c.g || a[ offset + 2 ] !== c.b ) {
 
@@ -454,7 +482,7 @@ class UniformsGroup extends UniformBuffer {
 
 		const a = this.values;
 		const e = uniform.getValue().elements;
-		const offset = uniform.offset;
+		const offset = uniform.offset + this.offset;
 
 		if ( a[ offset + 0 ] !== e[ 0 ] || a[ offset + 1 ] !== e[ 1 ] || a[ offset + 2 ] !== e[ 2 ] ||
 			a[ offset + 4 ] !== e[ 3 ] || a[ offset + 5 ] !== e[ 4 ] || a[ offset + 6 ] !== e[ 5 ] ||
@@ -494,7 +522,7 @@ class UniformsGroup extends UniformBuffer {
 
 		const a = this.values;
 		const e = uniform.getValue().elements;
-		const offset = uniform.offset;
+		const offset = uniform.offset + this.offset;
 
 		if ( arraysEqual( a, e, offset ) === false ) {
 

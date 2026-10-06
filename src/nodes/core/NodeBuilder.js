@@ -8,7 +8,7 @@ import ParameterNode from './ParameterNode.js';
 import StructType from './StructType.js';
 import FunctionNode from '../code/FunctionNode.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
-import { getDataFromObject, getTypeFromLength, getTextureType } from './NodeUtils.js';
+import { getDataFromObject, getTypeFromLength, getTextureType, roundInstances } from './NodeUtils.js';
 import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js';
 
 import {
@@ -422,6 +422,13 @@ class NodeBuilder {
 		 * @default '\t'
 		 */
 		this.tab = '\t';
+
+		/**
+		 * The group of objects drawn as instances, or `null` if instancing is not used.
+		 *
+		 * @type {?InstanceGroup}
+		 */
+		this.instances = null;
 
 		/**
 		 * Reference to the current function node.
@@ -3214,6 +3221,12 @@ class NodeBuilder {
 
 	}
 
+	getCount() {
+
+		return this.instances ? roundInstances( this.instances.objects.length ) : 1;
+
+	}
+
 	/**
 	 * Prebuild the node builder.
 	 */
@@ -3239,7 +3252,17 @@ class NodeBuilder {
 
 			if ( material.contextNode.isContextNode === true ) {
 
+				// the node overrides of the renderer and the material are merged, the material overrides take precedence
+
+				const rendererOverrideNodes = this.context.overrideNodes;
+
 				this.context = { ...this.context, ...material.contextNode.getFlowContextData() };
+
+				if ( rendererOverrideNodes !== undefined && rendererOverrideNodes.size > 0 && this.context.overrideNodes !== rendererOverrideNodes ) {
+
+					this.context.overrideNodes = new Map( [ ...rendererOverrideNodes, ...( this.context.overrideNodes || [] ) ] );
+
+				}
 
 			} else {
 

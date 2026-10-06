@@ -795,7 +795,7 @@ class NodeMaterial extends Material {
 
 		}
 
-		if ( ( object.isInstancedMesh && object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) ) {
+		if ( object.isInstancedMesh && object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) {
 
 			instancedMesh( object );
 

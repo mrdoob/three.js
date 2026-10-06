@@ -1,11 +1,10 @@
 import Object3DNode from './Object3DNode.js';
 import { Fn, nodeImmutable } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
-
-import { Matrix4 } from '../../math/Matrix4.js';
-import { builtin } from './BuiltinNode.js';
 import { cameraIndex, cameraViewMatrix } from './Camera.js';
+import { builtin } from './BuiltinNode.js';
 import { uniformArray } from './UniformArrayNode.js';
+import { Matrix4 } from '../../math/Matrix4.js';
 import { Matrix3 } from '../../math/Matrix3.js';
 
 const _modelViewMatrix = /*@__PURE__*/ new Matrix4();

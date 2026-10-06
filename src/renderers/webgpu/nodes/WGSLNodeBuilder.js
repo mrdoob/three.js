@@ -6,7 +6,7 @@ import { NodeSampledTexture, NodeSampledCubeTexture, NodeSampledTexture3D } from
 import NodeUniformBuffer from '../../common/nodes/NodeUniformBuffer.js';
 import NodeStorageBuffer from '../../common/nodes/NodeStorageBuffer.js';
 
-import { NodeBuilder, CodeNode } from '../../../nodes/Nodes.js';
+import { NodeBuilder, CodeNode, IndexNode } from '../../../nodes/Nodes.js';
 
 import { getFormat } from '../utils/WebGPUTextureUtils.js';
 
@@ -20,6 +20,8 @@ import { FloatType, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping,
 import { warn, error } from '../../../utils.js';
 
 import { GPUShaderStage } from '../utils/WebGPUConstants.js';
+
+const objectIndex = new IndexNode( IndexNode.INSTANCE );
 
 const accessNames = {
 	[ NodeAccess.READ_ONLY ]: 'read',
@@ -1225,7 +1227,19 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			} else {
 
-				return node.groupNode.name + '.' + name;
+				let group = node.groupNode.name;
+
+				if ( group === 'object' ) {
+
+					// only instanced groups need the instance index, which is a varying in the fragment stage
+
+					const index = this.getCount() > 1 ? objectIndex.build( this ) : '0';
+
+					group = `object[ ${ index } ]`;
+
+				}
+
+				return group + '.' + name;
 
 			}
 
@@ -1431,7 +1445,18 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				uniformGPU = buffer;
 
-				uniformNode.name = name ? name : 'NodeBuffer_' + uniformNode.id;
+				// the name is derived from the uniform index instead of the node id, so shaders with the same structure
+				// but different buffers produce the same code and share their shader modules and pipelines
+
+				if ( name ) {
+
+					uniformNode.name = name;
+
+				} else if ( uniformNode.name.startsWith( 'NodeBuffer_' ) === false ) {
+
+					uniformNode.name = 'NodeBuffer_' + uniformNode.name;
+
+				}
 
 			} else {
 
@@ -1441,6 +1466,12 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 					uniformsGroup = new NodeUniformsGroup( groupName, group );
 					uniformsGroup.setVisibility( GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE );
+
+					if ( groupName === 'object' ) {
+
+						uniformsGroup.count = this.getCount();
+
+					}
 
 					this.uniformGroups[ groupName ] = uniformsGroup;
 
@@ -2823,8 +2854,24 @@ ${vars}
 	 */
 	_getWGSLStructBinding( name, vars, access, binding = 0, group = 0 ) {
 
-		const structName = name + 'Struct';
+		let structName = name + 'Struct';
 		const structSnippet = this._getWGSLStruct( structName, vars );
+
+		if ( name === 'object' ) {
+
+			const count = this.getCount();
+
+			structName = `array< ${ structName }, ${ count } >`;
+
+			// per-instance data is stored in a storage buffer, the struct layout is the same
+
+			if ( this.uniformGroups[ name ].count > 1 ) {
+
+				access = 'storage, read';
+
+			}
+
+		}
 
 		return `${structSnippet}
 @binding( ${ binding } ) @group( ${ group } )

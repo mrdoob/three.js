@@ -48,6 +48,15 @@ class IndexNode extends Node {
 		 */
 		this.isIndexNode = true;
 
+		/**
+		 * The varying of the index in the fragment stage.
+		 *
+		 * @private
+		 * @type {?VaryingNode}
+		 * @default null
+		 */
+		this._varyingNode = null;
+
 	}
 
 	isCacheable( /*builder*/ ) {
@@ -101,9 +110,11 @@ class IndexNode extends Node {
 
 		} else {
 
-			const nodeVarying = varying( this );
+			// reuse the varying, the index can be generated again in other flow blocks
 
-			output = nodeVarying.build( builder, nodeType );
+			if ( this._varyingNode === null ) this._varyingNode = varying( this );
+
+			output = this._varyingNode.build( builder, nodeType );
 
 		}
 
@@ -159,6 +170,14 @@ export const vertexIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.VER
  * @type {IndexNode}
  */
 export const instanceIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.INSTANCE );
+
+/**
+ * TSL object that represents the index of either a mesh instance or an invocation of a compute shader.
+ *
+ * @tsl
+ * @type {IndexNode}
+ */
+export const objectIndex = instanceIndex;
 
 /**
  * TSL object that represents the index of the subgroup the current compute invocation belongs to.

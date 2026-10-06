@@ -107,6 +107,13 @@ class NodeFrame {
 		this.scene = null;
 
 		/**
+		 * A reference to the current group of objects drawn as instances.
+		 * @type {?InstanceGroup}
+		 * @default null
+		 */
+		this.instances = null;
+
+		/**
 		 * A reference to the current compute node.
 		 *
 		 * @type {?ComputeNode}

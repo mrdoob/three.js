@@ -1049,8 +1049,9 @@ class WebGLBackend extends Backend {
 	 * @param {number} vertexCount - The vertex count.
 	 * @param {number} instanceCount - The intance count.
 	 * @param {WebGLProgram} programGPU - The raw WebGL shader program.
+	 * @param {?InstanceGroup} instances - The group of objects drawn as instances.
 	 */
-	_draw( object, renderer, firstVertex, vertexCount, instanceCount, programGPU ) {
+	_draw( object, renderer, firstVertex, vertexCount, instanceCount, programGPU, instances ) {
 
 		if ( object.isBatchedMesh ) {
 
@@ -1083,7 +1084,15 @@ class WebGLBackend extends Backend {
 
 		} else {
 
-			renderer.render( firstVertex, vertexCount );
+			if ( instances !== null ) {
+
+				renderer.renderInstances( firstVertex, vertexCount, instances.objects.length );
+
+			} else {
+
+				renderer.render( firstVertex, vertexCount );
+
+			}
 
 		}
 
@@ -1097,7 +1106,7 @@ class WebGLBackend extends Backend {
 	 */
 	draw( renderObject/*, info*/ ) {
 
-		const { object, pipeline, material, context, hardwareClippingPlanes } = renderObject;
+		const { object, pipeline, material, context, hardwareClippingPlanes, instances } = renderObject;
 		const { programGPU } = this.get( pipeline );
 
 		const { gl, state } = this;
@@ -1318,7 +1327,7 @@ class WebGLBackend extends Backend {
 
 					state.bindBufferBase( gl.UNIFORM_BUFFER, cameraIndexBufferIndex, cameraData.indexesGPU[ i ] );
 
-					this._draw( object, renderer, firstVertex, vertexCount, instanceCount, programGPU );
+					this._draw( object, renderer, firstVertex, vertexCount, instanceCount, programGPU, instances );
 
 				}
 
@@ -1329,7 +1338,7 @@ class WebGLBackend extends Backend {
 
 		} else {
 
-			this._draw( object, renderer, firstVertex, vertexCount, instanceCount, programGPU );
+			this._draw( object, renderer, firstVertex, vertexCount, instanceCount, programGPU, instances );
 
 		}
 

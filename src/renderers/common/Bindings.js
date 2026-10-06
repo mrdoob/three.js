@@ -101,6 +101,24 @@ class Bindings extends DataMap {
 
 		}
 
+		for ( const bindGroup of bindings ) {
+
+			if ( bindGroup.name === 'object' ) {
+
+				for ( const binding of bindGroup.bindings ) {
+
+					if ( binding.isNodeUniformsGroup ) {
+
+						binding.index = renderObject.index;
+
+					}
+
+				}
+
+			}
+
+		}
+
 		return bindings;
 
 	}
