@@ -66,6 +66,47 @@ const _toFloat = ( value ) => {
 
 const _componentTypeRanks = { bool: 0, uint: 1, int: 2, float: 3 };
 
+/**
+ * Data of a node in a shader stage. All common properties are declared upfront,
+ * so the objects share a single shape.
+ *
+ * @private
+ */
+class NodeData {
+
+	constructor() {
+
+		this.properties = undefined;
+		this.type = undefined;
+		this.typeFromOutput = undefined;
+		this.buildStages = undefined;
+		this.usageCount = undefined;
+		this.readUsageCount = undefined;
+		this.writeUsageCount = undefined;
+		this.stack = undefined;
+		this.stages = undefined;
+		this.snippet = undefined;
+		this.propertyName = undefined;
+		this.generated = undefined;
+		this.flowBlock = undefined;
+		this.assign = undefined;
+		this.forceDeclaration = undefined;
+		this.variable = undefined;
+		this.cacheVariable = undefined;
+		this.uniform = undefined;
+		this.subBuilds = undefined;
+		this.subBuildsCache = undefined;
+
+	}
+
+}
+
+const _componentTypeCache = new Map();
+const _typeLengthCache = new Map();
+const _isVectorCache = new Map();
+const _isMatrixCache = new Map();
+const _isIntegerCache = new Map();
+
 const _checkWriteUsage = ( data ) => {
 
 	if ( data.writeUsageCount > 0 ) return true;
@@ -1626,7 +1667,9 @@ class NodeBuilder {
 	 */
 	isVector( type ) {
 
-		return /vec\d/.test( type );
+		let result = _isVectorCache.get( type );
+		if ( result === undefined ) _isVectorCache.set( type, result = /vec\d/.test( type ) );
+		return result;
 
 	}
 
@@ -1638,7 +1681,9 @@ class NodeBuilder {
 	 */
 	isMatrix( type ) {
 
-		return /mat\d/.test( type );
+		let result = _isMatrixCache.get( type );
+		if ( result === undefined ) _isMatrixCache.set( type, result = /mat\d/.test( type ) );
+		return result;
 
 	}
 
@@ -1714,15 +1759,23 @@ class NodeBuilder {
 
 		if ( type === 'float' || type === 'bool' || type === 'int' || type === 'uint' ) return type;
 
-		const componentType = /(b|i|u|)(vec|mat)([2-4])/.exec( type );
+		let result = _componentTypeCache.get( type );
 
-		if ( componentType === null ) return null;
+		if ( result === undefined ) {
 
-		if ( componentType[ 1 ] === 'b' ) return 'bool';
-		if ( componentType[ 1 ] === 'i' ) return 'int';
-		if ( componentType[ 1 ] === 'u' ) return 'uint';
+			const componentType = /(b|i|u|)(vec|mat)([2-4])/.exec( type );
 
-		return 'float';
+			if ( componentType === null ) result = null;
+			else if ( componentType[ 1 ] === 'b' ) result = 'bool';
+			else if ( componentType[ 1 ] === 'i' ) result = 'int';
+			else if ( componentType[ 1 ] === 'u' ) result = 'uint';
+			else result = 'float';
+
+			_componentTypeCache.set( type, result );
+
+		}
+
+		return result;
 
 	}
 
@@ -1786,7 +1839,9 @@ class NodeBuilder {
 	 */
 	isInteger( type ) {
 
-		return /int|uint|(i|u)vec/.test( type );
+		let result = _isIntegerCache.get( type );
+		if ( result === undefined ) _isIntegerCache.set( type, result = /int|uint|(i|u)vec/.test( type ) );
+		return result;
 
 	}
 
@@ -1827,6 +1882,24 @@ class NodeBuilder {
 	getTypeLength( type ) {
 
 		const vecType = this.getVectorType( type );
+
+		let length = _typeLengthCache.get( vecType );
+
+		if ( length === undefined ) {
+
+			length = this._getTypeLength( vecType );
+
+			_typeLengthCache.set( vecType, length );
+
+		}
+
+		return length;
+
+	}
+
+	_getTypeLength( type ) {
+
+		const vecType = type;
 		const vecNum = /vec([2-4])/.exec( vecType );
 
 		if ( vecNum !== null ) return Number( vecNum[ 1 ] );
@@ -2045,7 +2118,7 @@ class NodeBuilder {
 
 		}
 
-		if ( nodeData[ shaderStage ] === undefined ) nodeData[ shaderStage ] = {};
+		if ( nodeData[ shaderStage ] === undefined ) nodeData[ shaderStage ] = new NodeData();
 
 		//
 
@@ -2060,7 +2133,7 @@ class NodeBuilder {
 
 			if ( data.subBuildsCache === undefined ) data.subBuildsCache = {};
 
-			data = data.subBuildsCache[ subBuild ] || ( data.subBuildsCache[ subBuild ] = {} );
+			data = data.subBuildsCache[ subBuild ] || ( data.subBuildsCache[ subBuild ] = new NodeData() );
 			data.subBuilds = subBuilds;
 
 		}
@@ -2469,7 +2542,7 @@ class NodeBuilder {
 
 		code = this.tab + code;
 
-		if ( ! /;\s*$/.test( code ) ) {
+		if ( code.trimEnd().endsWith( ';' ) === false ) {
 
 			code = code + ';\n';
 

@@ -1108,3 +1108,82 @@ fn fn2 ( value : f32 ) -> f32 {
 }
 
 fn2( 3.0 )
+
+// shared constant assigned
+
+var nodeVar0 : f32 = 0.0;
+nodeVar0 = 1.0;
+
+( nodeVar0 + 0.0 )
+
+// converted node assigned
+
+let nodeConst0 = ( nodeVarying0.x + 1.0 );
+var nodeVar0 : f32 = nodeConst0;
+nodeVar0 = 5.0;
+
+( nodeVar0 + nodeConst0 )
+
+// converted uniform assigned
+
+var nodeVar0 : f32 = object.nodeUniform0;
+nodeVar0 = ( nodeVar0 + 1.0 );
+
+( nodeVar0 + object.nodeUniform0 )
+
+// node outside function assigned
+
+var nodeVar0 : f32 = 2.0;
+nodeVar0 = 3.0;
+
+( nodeVar0 * 2.0 )
+
+// operation swizzle assigned
+
+var nodeVar1 : vec2<f32>;
+
+var nodeVar0 : vec3<f32> = ( vec3<f32>( nodeVarying0, 1.0 ) * vec3<f32>( 2.0 ) );
+nodeVar0.y = 0.0;
+nodeVar1 = ( nodeVar0.xz + vec2<f32>( 1.0 ) );
+nodeVar0.x = nodeVar1[ 0 ];
+nodeVar0.z = nodeVar1[ 1 ];
+
+vec4<f32>( nodeVar0, 1.0 )
+
+// operation assigned inside and outside conditional
+
+var nodeVar0 : f32 = ( 0.25 * nodeVarying0.y );
+
+if ( ( nodeVarying0.x > 0.5 ) ) {
+
+	nodeVar0 = ( nodeVar0 * 2.0 );
+
+}
+
+nodeVar0 = ( nodeVar0 + 1.0 );
+
+nodeVar0
+
+// join component assigned
+
+var nodeVar0 : vec3<f32> = vec3<f32>( nodeVarying0.x, 0.0, 1.0 );
+nodeVar0.z = 2.0;
+
+nodeVar0
+
+// cached expression inside loop
+
+var nodeVar0 : f32 = 0.0;
+
+for ( var i : i32 = 0; i < 3; i ++ ) {
+
+	let nodeConst0 = ( f32( i ) * 0.5 );
+	nodeVar0 = ( nodeVar0 + ( nodeConst0 * nodeConst0 ) );
+
+}
+
+nodeVar0
+
+// overridden function call
+
+( nodeVarying0.y * 2.0 )

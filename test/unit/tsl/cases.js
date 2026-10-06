@@ -1,4 +1,4 @@
-import { Break, Continue, Fn, If, Loop, Switch, array, bool, clamp, determinant, float, int, inverse, ivec3, mat2, mat3, mat4, mix, mul, select, time, transpose, uint, uniform, uv, vec2, vec3, vec4 } from '../../../src/Three.TSL.js';
+import { Break, Continue, Fn, If, Loop, Switch, array, bool, clamp, determinant, float, int, inverse, ivec3, mat2, mat3, mat4, mix, mul, overrideNode, select, time, transpose, uint, uniform, uv, vec2, vec3, vec4 } from '../../../src/Three.TSL.js';
 
 // Create a fresh graph for every test and backend.
 export const cases = {
@@ -1053,6 +1053,118 @@ export const cases = {
 		const square = Fn( ( { value } ) => value.mul( value ), { value: 'float', return: 'float' } );
 
 		return square( float( 3 ) );
+
+	},
+
+	// Assigning a constant must not change other uses of the same value.
+	sharedConstantAssigned: () => Fn( () => {
+
+		const a = float( 0 );
+		const b = float( 0 );
+
+		a.assign( 1 );
+
+		return a.add( b );
+
+	} )(),
+
+	// A conversion of an existing node is a copy, assigning it must not change the source.
+	convertedNodeAssigned: () => Fn( () => {
+
+		const x = uv().x.add( 1 );
+		const copy = float( x );
+
+		copy.assign( 5 );
+
+		return copy.add( x );
+
+	} )(),
+
+	convertedUniformAssigned: () => Fn( () => {
+
+		const u = uniform( 1 );
+		const v = float( u );
+
+		v.addAssign( 1 );
+
+		return v.add( u );
+
+	} )(),
+
+	// A node created outside of a function is declared where it is first used.
+	nodeOutsideFunctionAssigned: () => {
+
+		const outside = float( 2 );
+
+		return Fn( () => {
+
+			outside.assign( 3 );
+
+			return outside.mul( 2 );
+
+		} )();
+
+	},
+
+	operationSwizzleAssigned: () => Fn( () => {
+
+		const v = vec3( uv(), 1 ).mul( 2 );
+
+		v.y.assign( 0 );
+		v.xz.addAssign( 1 );
+
+		return vec4( v, 1 );
+
+	} )(),
+
+	operationAssignedInsideAndOutsideConditional: () => Fn( () => {
+
+		const r = float( 0.25 ).mul( uv().y );
+
+		If( uv().x.greaterThan( 0.5 ), () => {
+
+			r.mulAssign( 2 );
+
+		} );
+
+		r.addAssign( 1 );
+
+		return r;
+
+	} )(),
+
+	joinComponentAssigned: () => Fn( () => {
+
+		const v = vec3( uv().x, 0, 1 );
+
+		v.z.assign( int( 2 ) );
+
+		return v;
+
+	} )(),
+
+	cachedExpressionInsideLoop: () => Fn( () => {
+
+		const sum = float( 0 );
+
+		Loop( { start: int( 0 ), end: int( 3 ) }, ( { i } ) => {
+
+			const t = float( i ).mul( 0.5 );
+
+			sum.addAssign( t.mul( t ) );
+
+		} );
+
+		return sum;
+
+	} )(),
+
+	// Overriding a function call replaces it, like any other node.
+	overriddenFunctionCall: () => {
+
+		const value = Fn( () => uv().x.add( 1 ) )();
+
+		return overrideNode( value, uv().y, value.mul( 2 ) );
 
 	}
 

@@ -1,6 +1,6 @@
 import Node from './Node.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
-import { error } from '../../utils.js';
+import { error, warnOnce } from '../../utils.js';
 
 /**
  * Class for representing shader variables as nodes. Variables are created from
@@ -119,22 +119,6 @@ class VarNode extends Node {
 	}
 
 	/**
-	 * Checks if this node is used for intent.
-	 *
-	 * @param {NodeBuilder} builder - The node builder.
-	 * @returns {boolean} Whether this node is used for intent.
-	 */
-	isIntent( builder ) {
-
-		const data = builder.getDataFromNode( this );
-
-		if ( data.forceDeclaration === true ) return false;
-
-		return this.intent;
-
-	}
-
-	/**
 	 * Returns the intent flag of this node.
 	 *
 	 * @return {boolean} The intent flag.
@@ -169,58 +153,34 @@ class VarNode extends Node {
 
 	}
 
-	isAssign( builder ) {
+	_declaresIntent() {
 
-		const data = builder.getDataFromNode( this );
-
-		return data.assign;
+		return false;
 
 	}
 
-	build( ...params ) {
-
-		const builder = params[ 0 ];
+	build( builder, output = null ) {
 
 		const refNode = this.getShared( builder );
 
 		if ( this !== refNode ) {
 
-			return refNode.build( ...params );
+			return refNode.build( builder, output );
 
 		}
 
-		if ( this._hasStack( builder ) === false && builder.buildStage === 'setup' ) {
+		const data = builder.getDataFromNode( this );
 
-			// A node created while a block is generated is declared where it is generated.
-			if ( ( builder.context.nodeLoop || builder.context.nodeBlock ) && builder.flowBlock === null ) {
+		this._updateIntent( builder, data, this.node );
 
-				builder.getBaseStack().addToStack( this );
+		// An intent that is not assigned is just its value.
+		if ( this.intent && data.forceDeclaration !== true && data.assign !== true ) {
 
-			}
-
-		} else if ( this.intent === true && builder.context.nodeLoop && builder.buildStage === 'analyze' && this.node.isCacheable( builder ) === false && builder.isDeterministic( this.node ) === false ) {
-
-			// A value that cannot be cached, e.g. a function call, is evaluated once at its declaration
-			// if it is used in a loop that runs after it, otherwise the loop would repeat it.
-			const data = builder.getDataFromNode( this );
-			const declarationIndex = builder.activeStacks.indexOf( data.stack );
-			const loopIndex = builder.activeStacks.indexOf( builder.getDataFromNode( builder.context.nodeLoop ).stack );
-
-			if ( declarationIndex !== - 1 && loopIndex >= declarationIndex ) data.forceDeclaration = true;
+			return this.node.build( builder, output );
 
 		}
 
-		if ( this.isIntent( builder ) ) {
-
-			if ( this.isAssign( builder ) !== true ) {
-
-				return this.node.build( ...params );
-
-			}
-
-		}
-
-		return super.build( ...params );
+		return super.build( builder, output );
 
 	}
 
@@ -273,14 +233,6 @@ class VarNode extends Node {
 
 	}
 
-	_hasStack( builder ) {
-
-		const nodeData = builder.getDataFromNode( this );
-
-		return nodeData.stack !== undefined;
-
-	}
-
 }
 
 export default VarNode;
@@ -326,10 +278,13 @@ export const Const = ( node, name = null ) => createVar( node, name, true ).toSt
  *
  * @tsl
  * @function
+ * @deprecated since r187. Use {@link Node#toIntent} instead.
  * @param {Node} node - The node for which a variable should be created.
  * @returns {VarNode}
  */
-export const VarIntent = ( node ) => {
+export const VarIntent = ( node ) => { // @deprecated r187
+
+	warnOnce( 'TSL: "VarIntent()" and ".toVarIntent()" have been deprecated. Use ".toIntent()" instead.' );
 
 	return createVar( node ).setIntent( true ).toStack();
 
