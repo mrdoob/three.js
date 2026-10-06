@@ -13,9 +13,7 @@
 				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Alpha cutout AO</span>
 			</div>
 			<small>
-				Left: base-map alpha. Center: transformed alphaMap on UV1. Right: both masks.<br>
-				Lower row: solid/cutout groups viewed from the back. Small panels reuse materials.<br>
-				<a href="webgpu_postprocessing_ao_alpha.html">webgpu comparison</a>
+				Alpha-aware AO via alpha-aware depth and normal pre-passes by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>
 			</small>
 		</div>
 
@@ -38,6 +36,7 @@
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { GBufferPass } from 'three/addons/postprocessing/GBufferPass.js';
 			import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
+			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 			const renderer = new THREE.WebGLRenderer();
@@ -51,7 +50,7 @@
 			const controls = new OrbitControls( camera, renderer.domElement );
 			controls.target.set( 0, 1.5, 0 );
 			controls.update();
-			const params = { view: 'AO + beauty', alphaTest: 0.5, opacity: 0.75, rotation: 0.3 };
+			const params = { view: 'AO + beauty', alphaTest: 0.5, opacity: 0.75, rotation: 0.3, samples: 64 };
 			const gui = new GUI();
 			gui.add( params, 'alphaTest', 0, 1 ).onChange( value => {
 
@@ -69,17 +68,49 @@
 				depthTexture: prepass.depthTexture,
 				normalTexture: prepass.normalTexture
 			} );
-			gtaoPass.updateGtaoMaterial( { radius: 0.5 } );
+			// Match GTAONode's sample budget and quadratic distance distribution.
+			gtaoPass.updateGtaoMaterial( { radius: 0.5, samples: params.samples, distanceExponent: 2, thickness: 1, scale: 1 } );
+			gui.add( params, 'samples', [ 16, 32, 64 ] ).onChange( samples => gtaoPass.updateGtaoMaterial( { samples } ) );
 			composer.addPass( gtaoPass );
+			// Composite raw AO; GTAOPass's denoised intermediate is not used.
+			const compositePass = new ShaderPass( {
+				uniforms: { tDiffuse: { value: null }, tAO: { value: null } },
+				vertexShader: /* glsl */`
+					varying vec2 vUv;
+					void main() {
+						vUv = uv;
+						gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+					}`,
+				fragmentShader: /* glsl */`
+					uniform sampler2D tDiffuse;
+					uniform sampler2D tAO;
+					varying vec2 vUv;
+					void main() {
+						vec4 beauty = texture2D( tDiffuse, vUv );
+						gl_FragColor = vec4( beauty.rgb * texture2D( tAO, vUv ).r, beauty.a );
+					}`
+			} );
+			compositePass.uniforms.tAO.value = gtaoPass.gtaoRenderTarget.texture;
+			composer.addPass( compositePass );
 			composer.addPass( new OutputPass() );
 			const views = {
-				'AO + beauty': GTAOPass.OUTPUT.Default,
+				'AO + beauty': GTAOPass.OUTPUT.Off,
 				Beauty: GTAOPass.OUTPUT.Diffuse,
-				AO: GTAOPass.OUTPUT.Denoise,
+				AO: GTAOPass.OUTPUT.AO,
 				Normals: GTAOPass.OUTPUT.Normal,
 				Depth: GTAOPass.OUTPUT.Depth
 			};
-			gui.add( params, 'view', Object.keys( views ) ).onChange( value => gtaoPass.output = views[ value ] );
+			function updateOutput() {
+
+				compositePass.enabled = params.view === 'AO + beauty';
+				gtaoPass.output = views[ params.view ];
+				// OUTPUT.Off preserves the beauty buffer for the raw AO composite.
+				gtaoPass.needsSwap = ! compositePass.enabled;
+
+			}
+
+			gui.add( params, 'view', Object.keys( views ) ).onChange( updateOutput );
+			updateOutput();
 			// Compare the reusable prepass with GTAO's original internal solid override.
 			params.legacyPrepass = false;
 			gui.add( params, 'legacyPrepass' ).name( 'legacy solid prepass' ).onChange( legacy => {

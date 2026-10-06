@@ -13,9 +13,7 @@
 				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Alpha cutout AO</span>
 			</div>
 			<small>
-				Left: base-map alpha. Center: transformed alphaMap on UV1. Right: both masks.<br>
-				Lower row: solid/cutout groups viewed from the back. Small panels reuse materials.<br>
-				<a href="webgl_postprocessing_ao_alpha.html">webgl comparison</a>
+				Alpha-aware AO via alpha-aware depth and normal pre-passes by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>
 			</small>
 		</div>
 
@@ -49,7 +47,7 @@
 			const controls = new OrbitControls( camera, renderer.domElement );
 			controls.target.set( 0, 1.5, 0 );
 			controls.update();
-			const params = { view: 'AO + beauty', alphaTest: 0.5, opacity: 0.75, rotation: 0.3 };
+			const params = { view: 'AO + beauty', alphaTest: 0.5, opacity: 0.75, rotation: 0.3, samples: 64 };
 			const gui = new GUI();
 			gui.add( params, 'alphaTest', 0, 1 ).onChange( value => {
 
@@ -67,6 +65,10 @@
 			const depth = scenePass.getTextureNode( 'depth' );
 			const aoPass = ao( depth, normals, camera );
 			aoPass.radius.value = 0.5;
+			aoPass.samples.value = params.samples;
+			aoPass.thickness.value = 1;
+			aoPass.scale.value = 1;
+			gui.add( params, 'samples', [ 16, 32, 64 ] ).onChange( samples => aoPass.samples.value = samples );
 			aoPass.resolutionScale = 1;
 			aoPass.useTemporalFiltering = false;
 			const pipeline = new THREE.RenderPipeline( renderer );
