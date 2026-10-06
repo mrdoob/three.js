@@ -727,6 +727,10 @@ class TemporalReprojectNode extends Node {
 
 	setup( builder ) {
 
+		// Ensures the pass providing the depth updates before this node.
+
+		this.depthNode.build( builder );
+
 		const sharedContext = context( builder.getSharedContext() );
 
 		if ( builder.renderPipeline && ! builder.context.renderPipelineState.viewOffsetOwner ) {
