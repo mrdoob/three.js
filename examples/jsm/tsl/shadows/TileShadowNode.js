@@ -166,9 +166,11 @@ class TileShadowNode extends ShadowBaseNode {
 		const depthTexture = new DepthTexture( shadowWidth, shadowHeight, this.config.depthType, undefined, undefined, undefined, undefined, undefined, undefined, undefined, tileCount );
 		depthTexture.compareFunction = builder.renderer.reversedDepthBuffer ? GreaterEqualCompare : LessCompare;
 		depthTexture.name = 'ShadowDepthArrayTexture';
-		const shadowMap = builder.createRenderTarget( shadowWidth, shadowHeight, { format: RedFormat, depth: tileCount, useArrayDepthTexture: true } );
+		// The color attachment is only sampled for transmitted shadows.
+		const count = builder.renderer.shadowMap.transmitted === true ? 1 : 0;
+		const shadowMap = builder.createRenderTarget( shadowWidth, shadowHeight, { count, format: RedFormat, depth: tileCount, useArrayDepthTexture: true } );
 		shadowMap.depthTexture = depthTexture;
-		shadowMap.texture.name = 'ShadowTexture';
+		if ( count > 0 ) shadowMap.texture.name = 'ShadowTexture';
 		this.shadowMap = shadowMap;
 		const cameras = [];
 
