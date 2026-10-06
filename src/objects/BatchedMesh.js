@@ -1529,7 +1529,16 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	onBeforeRender( renderer, scene, camera, geometry, material/*, _group*/ ) {
+	/**
+	 * Updates the draw parameters for the next draw. Depending on {@link BatchedMesh#perObjectFrustumCulled}
+	 * and {@link BatchedMesh#sortObjects}, this includes per-object frustum culling and sorting.
+	 *
+	 * @private
+	 * @param {Camera} camera - The camera of the next draw.
+	 * @param {BufferGeometry} geometry - The batch's geometry.
+	 * @param {Material} material - The material of the next draw.
+	 */
+	_updateDrawParameters( camera, geometry, material ) {
 
 		// if visibility has not changed and frustum culling and object sorting is not required
 		// then skip iterating over all items
@@ -1694,9 +1703,31 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	onBeforeRender( renderer, scene, camera, geometry, material/*, _group*/ ) {
+
+		if ( renderer.isWebGPURenderer === true ) {
+
+			if ( this._visibilityChanged || this.perObjectFrustumCulled || this.sortObjects ) {
+
+				this._indirectTexture.needsUpdate = true;
+
+			}
+
+		} else {
+
+			this._updateDrawParameters( camera, geometry, material );
+
+		}
+
+	}
+
 	onBeforeShadow( renderer, object, camera, shadowCamera, geometry, depthMaterial/* , group */ ) {
 
-		this.onBeforeRender( renderer, null, shadowCamera, geometry, depthMaterial );
+		if ( renderer.isWebGPURenderer !== true ) {
+
+			this._updateDrawParameters( shadowCamera, geometry, depthMaterial );
+
+		}
 
 	}
 
