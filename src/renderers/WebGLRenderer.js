@@ -744,10 +744,6 @@ class WebGLRenderer {
 		/**
 		 * Sets the post-processing effects to be applied after rendering.
 		 *
-		 * Effects that read the scene's depth must set `needsDepthTexture` to `true`.
-		 * The renderer then stores the scene's depth in a depth texture and passes it
-		 * to these effects via `setDepthTexture( depthTexture )`.
-		 *
 		 * @param {Array} effects - An array of post-processing effects.
 		 */
 		this.setEffects = function ( effects ) {
@@ -769,12 +765,6 @@ class WebGLRenderer {
 						break;
 
 					}
-
-				}
-
-				if ( depth === false && effects.some( ( effect ) => effect.needsDepthTexture === true ) ) {
-
-					warn( 'WebGLRenderer: Effects with needsDepthTexture require the renderer to be created with depth set to true.' );
 
 				}
 
