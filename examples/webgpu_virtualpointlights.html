@@ -50,7 +50,7 @@
 			import { BVHComputeData, rayStruct, rayIntersectionResultStruct, wgslTagFn } from 'three-mesh-bvh/webgpu';
 
 			const MAX_VPLS = 1024;
-			const params = { mode: 'combined', count: 256, shadows: true, showVPLs: false, seed: 1, minDistance: Math.sqrt( 0.2 ) };
+			const params = { mode: 'combined', count: 256, shadows: false, showVPLs: false, seed: 1, minDistance: Math.sqrt( 0.2 ) };
 
 			init();
 
@@ -100,6 +100,8 @@
 
 				const generator = new VirtualPointLightGenerator( MAX_VPLS );
 				const vpl = new VirtualPointLightsNode( generator, ( start, end ) => visibility( { start, end } ) );
+				// Keep expensive GPU BVH visibility opt-in while experimenting with the gather.
+				vpl.shadows.value = params.shadows;
 				const lighting = lights( [ ...sourceLights, vpl ] );
 				const materials = new Map();
 
@@ -193,7 +195,23 @@
 	} );
 
 				regenerate();
-				renderer.setAnimationLoop( () => renderer.render( scene, camera ) );
+				if ( new URLSearchParams( window.location.search ).has( 'benchmark' ) ) {
+
+					const { createBenchmark } = await import( '../test/benchmarks/virtual-point-lights/benchmark.js' );
+					window.vplBenchmark = createBenchmark( renderer, scene, camera, settings => {
+
+						Object.assign( params, settings );
+						vpl.shadows.value = params.shadows;
+						regenerate();
+						return generator.count;
+
+					} );
+
+				} else {
+
+					renderer.setAnimationLoop( () => renderer.render( scene, camera ) );
+
+				}
 
 				window.addEventListener( 'resize', () => {
 
