@@ -297,14 +297,14 @@
 
 				const resolution = probes.resolution;
 				const totalProbes = resolution.x * resolution.y * resolution.z;
-				const count = Math.min( 4, totalProbes - bakeIndex );
+				const count = Math.min( 16, totalProbes - bakeIndex );
 
 				// Keep the helper spheres out of the cubemap captures.
 				if ( probesHelper ) probesHelper.visible = false;
 
 				try {
 
-					// Publish a few probes per frame, finishing each pass before the next bounce.
+					// Publish 16 probes per frame (two capture batches), finishing each pass before the next bounce.
 					probes.bake( renderer, scene, {
 						cubemapSize: 32,
 						near: 0.05,
