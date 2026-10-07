@@ -296,6 +296,10 @@ class RTTNode extends TextureNode {
 
 		resetRendererState( renderer, this._rendererState );
 
+		// keep the clear color so nested passes (e.g. PassNode) still clear with the renderer's clear color and alpha
+
+		renderer.setClearColor( this._rendererState.clearColor, this._rendererState.clearAlpha );
+
 		renderer.setRenderTarget( this.renderTarget );
 
 		this._quadMesh.render( renderer );
