@@ -20,7 +20,7 @@
 
 <body>
 	<div id="info">
-		screen space indirect specular by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a><br />
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - screen space indirect specular by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a><br />
 		Reflections pre-calcuated in screen space and passed into material BRDFs
 	</div>
 
@@ -162,6 +162,7 @@
 		const height = window.innerHeight * pixelRatio;
 
 		const composer = new EffectComposer( renderer );
+		let firstFrame = true;
 		const gBufferPass = new GBufferPass( scene, camera, width, height, { material: true } );
 		const ssisPass = new SSISPass( scene, camera, width, height, gBufferPass );
 
@@ -246,6 +247,14 @@
 			if ( params.rotateHelmet ) helmet.rotation.y += timer.getDelta() * 0.3;
 
 			controls.update();
+
+			// Prime the previous-frame lighting input before presenting the first frame.
+			if ( firstFrame ) {
+
+				composer.render();
+				firstFrame = false;
+
+			}
 
 			composer.render();
 
