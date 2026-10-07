@@ -14,7 +14,7 @@ export default /* glsl */`
 		sheenSpecularIndirect *= ambientOcclusion;
 	#endif
 
-	#if ( defined( USE_ENVMAP ) || defined( USE_SSIS_MAP ) ) && defined( STANDARD )
+	#if ( defined( USE_ENVMAP ) || defined( USE_INDIRECT_SPECULAR_MAP ) ) && defined( STANDARD )
 
 		float dotNV = saturate( dot( geometryNormal, geometryViewDir ) );
 

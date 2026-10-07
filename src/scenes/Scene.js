@@ -50,20 +50,19 @@ class Scene extends Object3D {
 		this.environment = null;
 
 		/**
-		 * A screen-space map of prefiltered incoming specular radiance (for example the
-		 * output of an SSIS pass, faded to the environment). When set,
-		 * it replaces the environment specular term of {@link MeshStandardMaterial} and
-		 * {@link MeshPhysicalMaterial}, which then apply their own BRDF (Fresnel, F0,
-		 * multiple scattering, specular occlusion) to it. Environment diffuse lighting is
-		 * unaffected.
+		 * A map of prefiltered incoming specular radiance (for example the output of an
+		 * SSIS pass, faded to the environment). When set, it replaces the environment
+		 * specular term of {@link MeshStandardMaterial} and {@link MeshPhysicalMaterial},
+		 * which then apply their own BRDF (Fresnel, F0, multiple scattering, specular
+		 * occlusion) to it. Environment diffuse lighting is unaffected.
 		 *
-		 * The texture is sampled at `gl_FragCoord / textureSize` so it must match the
-		 * dimensions of the render target being drawn to. It is not cloned or serialized.
+		 * The texture must match the dimensions of the render target being drawn to.
+		 * It is not cloned or serialized.
 		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
-		this.ssisMap = null;
+		this.indirectSpecularMap = null;
 
 		/**
 		 * A fog instance defining the type of fog that affects everything
@@ -142,7 +141,7 @@ class Scene extends Object3D {
 
 		this.background = source.background !== null ? source.background.clone() : null;
 		this.environment = source.environment !== null ? source.environment.clone() : null;
-		this.ssisMap = source.ssisMap;
+		this.indirectSpecularMap = source.indirectSpecularMap;
 		this.fog = source.fog !== null ? source.fog.clone() : null;
 
 		this.backgroundBlurriness = source.backgroundBlurriness;

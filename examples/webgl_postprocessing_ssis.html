@@ -21,7 +21,7 @@
 <body>
 	<div id="info">
 		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - screen space indirect specular by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a><br />
-		Reflections pre-calcuated in screen space and passed into material BRDFs
+		Reflections pre-calculated in screen space and passed into material BRDFs
 	</div>
 
 	<script type="importmap">
@@ -48,6 +48,7 @@
 		import { SSISPass } from 'three/addons/postprocessing/SSISPass.js';
 		import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 		import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { CopyShader } from 'three/addons/shaders/CopyShader.js';
 
 		const params = {
 			ssis: true,
@@ -58,9 +59,7 @@
 		const renderer = new THREE.WebGLRenderer();
 		renderer.toneMapping = THREE.ACESFilmicToneMapping;
 		renderer.toneMappingExposure = 1.3;
-		// like the WebGPU SSR examples, render at CSS pixels; raise for sharper output at a high cost
-		const pixelRatio = 1;
-		renderer.setPixelRatio( pixelRatio );
+		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		renderer.setAnimationLoop( animate );
 		document.body.appendChild( renderer.domElement );
@@ -158,73 +157,52 @@
 		controls.maxDistance = 14;
 		controls.update();
 
-		const width = window.innerWidth * pixelRatio;
-		const height = window.innerHeight * pixelRatio;
+		const width = window.innerWidth * window.devicePixelRatio;
+		const height = window.innerHeight * window.devicePixelRatio;
 
 		const composer = new EffectComposer( renderer );
 		let firstFrame = true;
 		const gBufferPass = new GBufferPass( scene, camera, width, height, { material: true } );
-		const ssisPass = new SSISPass( scene, camera, width, height, gBufferPass );
+		const ssisPass = new SSISPass( scene, camera, width, height );
+		ssisPass.setGBuffer( gBufferPass.depthTexture, gBufferPass.normalTexture, gBufferPass.materialTexture );
 
 		composer.addPass( gBufferPass );
 		composer.addPass( new RenderPass( scene, camera ) );
 		composer.addPass( ssisPass );
 
 		// debug view: replaces the beauty with one of the buffers
-		const viewPass = new ShaderPass( {
-			uniforms: { tView: { value: null }, mode: { value: 0 } },
-			vertexShader: /* glsl */`
-				varying vec2 vUv;
-				void main() {
-					vUv = uv;
-					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-				}`,
-			fragmentShader: /* glsl */`
-				uniform sampler2D tView;
-				uniform int mode;
-				varying vec2 vUv;
-				void main() {
-					vec4 c = texture2D( tView, vUv );
-					if ( mode == 1 ) c = vec4( vec3( c.r ), 1.0 ); // roughness
-					gl_FragColor = vec4( c.rgb, 1.0 );
-				}`
-		}, 'unused' );
+		const viewPass = new ShaderPass( CopyShader, 'unused' );
 		viewPass.enabled = false;
 		composer.addPass( viewPass );
 		composer.addPass( new OutputPass() );
 
-		scene.ssisMap = ssisPass.texture;
+		scene.indirectSpecularMap = ssisPass.texture;
 
 		const views = {
 			'Beauty': null,
-			'SSIS radiance': [ ssisPass.texture, 0 ],
-			'Roughness': [ gBufferPass.materialTexture, 1 ],
-			'Normals': [ gBufferPass.normalTexture, 0 ]
+			'SSIS radiance': ssisPass.texture,
+			'Material (R roughness, G metalness)': gBufferPass.materialTexture,
+			'Normals': gBufferPass.normalTexture
 		};
 
 		const gui = new GUI( { width: 260 } );
 		gui.add( params, 'view', Object.keys( views ) ).onChange( v => {
 
 			viewPass.enabled = views[ v ] !== null;
-			if ( viewPass.enabled ) {
-
-				viewPass.uniforms.tView.value = views[ v ][ 0 ];
-				viewPass.uniforms.mode.value = views[ v ][ 1 ];
-
-			}
+			if ( viewPass.enabled ) viewPass.uniforms.tDiffuse.value = views[ v ];
 
 		} );
 		gui.add( params, 'ssis' ).name( 'SSIS as lighting input' ).onChange( v => {
 
-			scene.ssisMap = v ? ssisPass.texture : null;
+			scene.indirectSpecularMap = v ? ssisPass.texture : null;
+			ssisPass.enabled = v;
 
 		} );
 		gui.add( params, 'rotateHelmet' );
 		const ssisFolder = gui.addFolder( 'SSIS settings' );
 		ssisFolder.close();
-		ssisFolder.add( ssisPass, 'stochastic' );
 		ssisFolder.add( ssisPass, 'quality', 0.1, 1 );
-		ssisFolder.add( ssisPass, 'resolutionScale', 0.25, 1 );
+		ssisFolder.add( ssisPass, 'downSample', 1, 4, 1 );
 		ssisFolder.add( ssisPass, 'rayCount', 1, 64, 1 );
 		ssisFolder.add( ssisPass, 'maxDistance', 0, 30 );
 		ssisFolder.add( ssisPass, 'thickness', 0, 0.5 );

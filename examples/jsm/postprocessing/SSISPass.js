@@ -1,43 +1,41 @@
 import {
 	HalfFloatType,
 	LinearFilter,
-	LinearMipmapLinearFilter,
-	NearestFilter,
 	NoBlending,
 	ShaderMaterial,
 	UniformsUtils,
 	WebGLRenderTarget
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
-import { SSISTraceShader, SSISResolveShader } from '../shaders/SSISShader.js';
+import { validateGBuffer, validateGBufferTextures } from './GBufferUtils.js';
+import { SSISShader } from '../shaders/SSISShader.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
 /**
  * Screen-space indirect specular (SSIS) computed as prefiltered incoming specular radiance, meant to
- * be consumed by the material lighting through {@link Scene#ssisMap}
+ * be consumed by the material lighting through {@link Scene#indirectSpecularMap}
  * instead of being composited over the beauty image.
  *
  * Each pixel traces rays through the depth buffer, importance-sampled from its GGX
- * specular lobe (or one mirror ray with `stochastic = false`). A hit returns the lit scene
- * color; a miss (or the screen border) fades to the scene's PMREM environment sampled at
- * the surface roughness. Stochastic mode publishes the current frame without temporal smoothing;
- * otherwise the result is blurred by the reflection cone footprint over its mip chain.
- * Materials apply their own BRDF to the result.
+ * specular lobe. A hit returns the lit scene color; a miss (or the screen border) fades to
+ * the scene's PMREM environment sampled at the surface roughness. Materials apply their own
+ * BRDF to the result.
  *
- * Inputs come from a {@link GBufferPass} created with `{ material: true }`. Place this
- * pass after the pass that renders the lit scene, and assign {@link SSISPass#texture} to
- * `scene.ssisMap` once. The pass reads the lit color of the current frame
- * and the scene consumes the result on the next frame, so reflections lag by one
- * frame under motion and the first frame has no specular. The lit color already contains
- * the previous reflections, which gives free multiple bounces.
+ * Inputs come from a {@link GBufferPass} created with `{ material: true }` and must be set
+ * with {@link SSISPass#setGBuffer}. Place this pass after the pass that renders the lit scene,
+ * and assign {@link SSISPass#texture} to `scene.indirectSpecularMap` once. The pass reads
+ * the lit color of the current frame and the scene consumes the result on the next frame,
+ * so reflections lag by one frame under motion and the first frame has no specular. The lit
+ * color already contains the previous reflections, which gives free multiple bounces.
  *
  * Perspective cameras only. The environment is `scene.environment` and must be a PMREM
  * texture (see {@link PMREMGenerator}); its rotation is ignored.
  *
  * ```js
  * const gBufferPass = new GBufferPass( scene, camera, width, height, { material: true } );
- * const ssisPass = new SSISPass( scene, camera, width, height, gBufferPass );
- * scene.ssisMap = ssisPass.texture;
+ * const ssisPass = new SSISPass( scene, camera, width, height );
+ * ssisPass.setGBuffer( gBufferPass.depthTexture, gBufferPass.normalTexture, gBufferPass.materialTexture );
+ * scene.indirectSpecularMap = ssisPass.texture;
  * composer.addPass( gBufferPass );
  * composer.addPass( new RenderPass( scene, camera ) );
  * composer.addPass( ssisPass );
@@ -49,18 +47,53 @@ import { CopyShader } from '../shaders/CopyShader.js';
 class SSISPass extends Pass {
 
 	/**
+	 * Constructs a new SSIS pass.
+	 *
 	 * @param {Scene} scene - The scene (its environment is used for misses).
 	 * @param {PerspectiveCamera} camera - The camera.
-	 * @param {number} width - Width in physical pixels.
-	 * @param {number} height - Height in physical pixels.
-	 * @param {GBufferPass} gBufferPass - A G-buffer pass created with `{ material: true }`.
+	 * @param {number} [width=512] - Width in physical pixels.
+	 * @param {number} [height=512] - Height in physical pixels.
 	 */
-	constructor( scene, camera, width, height, gBufferPass ) {
+	constructor( scene, camera, width = 512, height = 512 ) {
 
 		super();
 
+		/**
+		 * The scene, its environment is used for misses.
+		 *
+		 * @type {Scene}
+		 */
 		this.scene = scene;
+
+		/**
+		 * The camera.
+		 *
+		 * @type {PerspectiveCamera}
+		 */
 		this.camera = camera;
+
+		/**
+		 * The width of the effect in physical pixels.
+		 *
+		 * @type {number}
+		 * @default 512
+		 */
+		this.width = width;
+
+		/**
+		 * The height of the effect in physical pixels.
+		 *
+		 * @type {number}
+		 * @default 512
+		 */
+		this.height = height;
+
+		/**
+		 * Overwritten to disable the swap, the pass only reads the read buffer.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
 		this.needsSwap = false;
 
 		/**
@@ -72,7 +105,7 @@ class SSISPass extends Pass {
 		this.maxDistance = 10;
 
 		/**
-		 * Depth tolerance behind a surface that still counts as a hit.
+		 * Depth tolerance behind a surface that still counts as a hit, in world units.
 		 *
 		 * @type {number}
 		 * @default 0.01
@@ -88,72 +121,82 @@ class SSISPass extends Pass {
 		this.screenEdgeFade = 0.2;
 
 		/**
-		 * Ray march sample density from 0 to 1. In stochastic mode a ray takes
-		 * `quality * 64` samples, spaced to concentrate near the origin; otherwise one sample is
-		 * taken every `1 / quality` pixels along the ray. Lower is faster but can miss thin geometry.
+		 * Ray march sample density from 0.05 to 1. A ray takes `quality * 64` samples, spaced
+		 * to concentrate near the origin. Lower is faster but can miss thin geometry.
 		 *
 		 * @type {number}
 		 * @default 1
 		 */
 		this.quality = 1;
 
-		this._stochastic = true;
-		this._resolutionScale = 1;
-		this._width = width;
-		this._height = height;
-
 		/**
-		 * Number of GGX-sampled rays per pixel in stochastic mode (1 to 64). More rays means
-		 * less noise and proportionally higher cost.
+		 * Number of GGX-sampled rays per pixel (1 to 64). More rays means less noise and
+		 * proportionally higher cost.
 		 *
 		 * @type {number}
 		 * @default 16
 		 */
 		this.rayCount = 16;
 
+		/**
+		 * The depth texture of the G-buffer, see {@link SSISPass#setGBuffer}.
+		 *
+		 * @type {?DepthTexture}
+		 * @default null
+		 */
+		this.depthTexture = null;
+
+		/**
+		 * The normal texture of the G-buffer, see {@link SSISPass#setGBuffer}.
+		 *
+		 * @type {?Texture}
+		 * @default null
+		 */
+		this.normalTexture = null;
+
+		/**
+		 * The material (roughness) texture of the G-buffer, see {@link SSISPass#setGBuffer}.
+		 *
+		 * @type {?Texture}
+		 * @default null
+		 */
+		this.materialTexture = null;
+
+		this._downSample = 2;
 		this._frame = 0;
 
 		this._traceTarget = new WebGLRenderTarget( width, height, {
 			type: HalfFloatType,
-			minFilter: LinearMipmapLinearFilter,
+			minFilter: LinearFilter,
 			magFilter: LinearFilter,
-			generateMipmaps: true,
 			depthBuffer: false
 		} );
 
-		this._resolveTarget = new WebGLRenderTarget( width, height, {
+		this._renderTarget = new WebGLRenderTarget( width, height, {
 			type: HalfFloatType,
-			minFilter: NearestFilter,
-			magFilter: NearestFilter,
+			minFilter: LinearFilter,
+			magFilter: LinearFilter,
 			depthBuffer: false
 		} );
 
 		this._traceMaterial = new ShaderMaterial( {
-			defines: Object.assign( {}, SSISTraceShader.defines ),
-			uniforms: UniformsUtils.clone( SSISTraceShader.uniforms ),
-			vertexShader: SSISTraceShader.vertexShader,
-			fragmentShader: SSISTraceShader.fragmentShader,
-			blending: NoBlending
-		} );
-
-		this._resolveMaterial = new ShaderMaterial( {
-			uniforms: UniformsUtils.clone( SSISResolveShader.uniforms ),
-			vertexShader: SSISResolveShader.vertexShader,
-			fragmentShader: SSISResolveShader.fragmentShader,
+			name: SSISShader.name,
+			defines: Object.assign( {}, SSISShader.defines ),
+			uniforms: UniformsUtils.clone( SSISShader.uniforms ),
+			vertexShader: SSISShader.vertexShader,
+			fragmentShader: SSISShader.fragmentShader,
 			blending: NoBlending
 		} );
 
 		this._copyMaterial = new ShaderMaterial( {
+			name: CopyShader.name,
 			uniforms: UniformsUtils.clone( CopyShader.uniforms ),
 			vertexShader: CopyShader.vertexShader,
 			fragmentShader: CopyShader.fragmentShader,
 			blending: NoBlending
 		} );
 
-		this._traceMaterial.uniforms.tDepth.value = gBufferPass.depthTexture;
-		this._traceMaterial.uniforms.tNormal.value = gBufferPass.normalTexture;
-		this._traceMaterial.uniforms.tMaterial.value = gBufferPass.materialTexture;
-		this._resolveMaterial.uniforms.tRadiance.value = this._traceTarget.texture;
+		this._copyMaterial.uniforms.tDiffuse.value = this._traceTarget.texture;
 
 		this._fsQuad = new FullScreenQuad( null );
 		this._environment = null;
@@ -163,52 +206,31 @@ class SSISPass extends Pass {
 	}
 
 	/**
-	 * Whether rays are importance-sampled from the GGX lobe (`true`) or a single mirror ray
-	 * is traced and blurred by the cone footprint (`false`).
-	 *
-	 * @type {boolean}
-	 * @default true
-	 */
-	get stochastic() {
-
-		return this._stochastic;
-
-	}
-
-	set stochastic( value ) {
-
-		if ( value === this._stochastic ) return;
-
-		this._stochastic = value;
-		this._traceMaterial.defines.STOCHASTIC = value;
-		this._traceMaterial.needsUpdate = true;
-
-	}
-
-	/**
-	 * Scale of the trace resolution from 0 to 1 relative to the G-buffer. The result is
-	 * upsampled when resolved. Lower is faster.
+	 * How many times smaller the trace resolution is than the G-buffer, as an integer from 1
+	 * to 4. The result is upsampled to the full resolution. Higher is faster but blurrier.
 	 *
 	 * @type {number}
-	 * @default 1
+	 * @default 2
 	 */
-	get resolutionScale() {
+	get downSample() {
 
-		return this._resolutionScale;
+		return this._downSample;
 
 	}
 
-	set resolutionScale( value ) {
+	set downSample( value ) {
 
-		if ( value === this._resolutionScale ) return;
+		value = Math.min( Math.max( Math.round( value ), 1 ), 4 );
 
-		this._resolutionScale = value;
-		this.setSize( this._width, this._height );
+		if ( value === this._downSample ) return;
+
+		this._downSample = value;
+		this.setSize( this.width, this.height );
 
 	}
 
 	/**
-	 * The prefiltered specular radiance texture. Assign it to `scene.ssisMap`.
+	 * The prefiltered specular radiance texture. Assign it to `scene.indirectSpecularMap`.
 	 * The texture identity is stable across resizes.
 	 *
 	 * @type {Texture}
@@ -216,7 +238,37 @@ class SSISPass extends Pass {
 	 */
 	get texture() {
 
-		return this._resolveTarget.texture;
+		return this._renderTarget.texture;
+
+	}
+
+	/**
+	 * Sets the inputs from a {@link GBufferPass} created with `{ material: true }`, or
+	 * compatible textures meeting its requirements. They are required: rendering without
+	 * them throws. Caller-owned textures are never resized or disposed by this pass.
+	 *
+	 * @param {DepthTexture} depthTexture - The depth texture.
+	 * @param {Texture} normalTexture - The encoded view-space normal texture.
+	 * @param {Texture} materialTexture - The material texture holding roughness in the red channel.
+	 */
+	setGBuffer( depthTexture, normalTexture, materialTexture ) {
+
+		validateGBufferTextures( depthTexture, normalTexture, 'SSISPass' );
+
+		if ( ! materialTexture?.isTexture ) {
+
+			throw new Error( 'THREE.SSISPass: Expected a material texture, create the GBufferPass with { material: true }.' );
+
+		}
+
+		this.depthTexture = depthTexture;
+		this.normalTexture = normalTexture;
+		this.materialTexture = materialTexture;
+
+		const uniforms = this._traceMaterial.uniforms;
+		uniforms.tDepth.value = depthTexture;
+		uniforms.tNormal.value = normalTexture;
+		uniforms.tMaterial.value = materialTexture;
 
 	}
 
@@ -228,6 +280,14 @@ class SSISPass extends Pass {
 	 * @param {WebGLRenderTarget} readBuffer - The lit scene color (linear, before tone mapping).
 	 */
 	render( renderer, writeBuffer, readBuffer ) {
+
+		if ( this.depthTexture === null ) {
+
+			throw new Error( 'THREE.SSISPass: Call setGBuffer() before rendering.' );
+
+		}
+
+		validateGBuffer( this, renderer );
 
 		const camera = this.camera;
 		const uniforms = this._traceMaterial.uniforms;
@@ -270,18 +330,8 @@ class SSISPass extends Pass {
 		renderer.setRenderTarget( this._traceTarget );
 		this._fsQuad.render( renderer );
 
-		if ( this._stochastic ) {
-
-			this._copyMaterial.uniforms.tDiffuse.value = this._traceTarget.texture;
-			this._fsQuad.material = this._copyMaterial;
-
-		} else {
-
-			this._fsQuad.material = this._resolveMaterial;
-
-		}
-
-		renderer.setRenderTarget( this._resolveTarget );
+		this._fsQuad.material = this._copyMaterial;
+		renderer.setRenderTarget( this._renderTarget );
 		this._fsQuad.render( renderer );
 
 		renderer.setRenderTarget( target );
@@ -296,27 +346,15 @@ class SSISPass extends Pass {
 	 */
 	setSize( width, height ) {
 
-		this._width = width;
-		this._height = height;
+		this.width = width;
+		this.height = height;
 
-		const traceWidth = Math.max( Math.round( width * this._resolutionScale ), 1 );
-		const traceHeight = Math.max( Math.round( height * this._resolutionScale ), 1 );
+		const traceWidth = Math.max( Math.ceil( width / this._downSample ), 1 );
+		const traceHeight = Math.max( Math.ceil( height / this._downSample ), 1 );
 
 		this._traceTarget.setSize( traceWidth, traceHeight );
-		this._resolveTarget.setSize( width, height );
-
-		const maxStep = Math.ceil( Math.sqrt( traceWidth * traceWidth + traceHeight * traceHeight ) );
-
-		if ( this._traceMaterial.defines.MAX_STEP !== maxStep ) {
-
-			this._traceMaterial.defines.MAX_STEP = maxStep;
-			this._traceMaterial.needsUpdate = true;
-
-		}
-
+		this._renderTarget.setSize( width, height );
 		this._traceMaterial.uniforms.resolution.value.set( traceWidth, traceHeight );
-		this._resolveMaterial.uniforms.resolution.value.set( traceWidth, traceHeight );
-		this._resolveMaterial.uniforms.maxMip.value = Math.floor( Math.log2( Math.max( traceWidth, traceHeight ) ) );
 
 	}
 
@@ -326,10 +364,9 @@ class SSISPass extends Pass {
 	dispose() {
 
 		this._traceTarget.dispose();
-		this._copyMaterial.dispose();
-		this._resolveTarget.dispose();
+		this._renderTarget.dispose();
 		this._traceMaterial.dispose();
-		this._resolveMaterial.dispose();
+		this._copyMaterial.dispose();
 		this._fsQuad.dispose();
 
 	}

@@ -178,7 +178,6 @@ class GBufferPass extends Pass {
 
 			}
 
-
 			this._materialCache.set( source, entry );
 
 		}

@@ -4,51 +4,34 @@ import {
 } from 'three';
 
 /**
- * Shaders for {@link SSISPass}.
+ * Shader for {@link SSISPass}.
  *
  * @module SSISShader
  * @three_import import * as SSISShader from 'three/addons/shaders/SSISShader.js';
  */
-
-const vertexShader = /* glsl */`
-
-	varying vec2 vUv;
-
-	void main() {
-
-		vUv = uv;
-
-		gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-
-	}
-
-`;
 
 /**
  * Traces reflection rays through the depth buffer. The result is the incoming radiance along
  * the reflection direction: the lit scene color at the hit, faded to the environment map
  * (sampled at the surface roughness) on a miss or near the screen border.
  *
- * With `STOCHASTIC`, each pixel averages `rayCount` rays importance-sampled from the GGX
- * distribution of visible normals (Eto and Tokuyoshi 2023, as in SSRNode), so rough
- * surfaces see a cone of directions and a reflected object's silhouette softens through
- * partial coverage. Otherwise a single mirror ray is traced and the cone footprint is
- * written to alpha so the resolve pass can blur it.
+ * Each pixel averages `rayCount` rays importance-sampled from the GGX distribution of visible
+ * normals (Eto and Tokuyoshi 2023, the same sampler as `SampleGGXVNDF` in
+ * `SpecularHelpers.js` used by SSRNode), so rough surfaces see a cone of directions and a
+ * reflected object's silhouette softens through partial coverage.
  *
  * @constant
  * @type {ShaderMaterial~Shader}
  */
-const SSISTraceShader = {
+const SSISShader = {
 
-	name: 'SSISTraceShader',
+	name: 'SSISShader',
 
 	defines: {
-		MAX_STEP: 0,
 		MAX_RAYS: 64,
 		MAX_RAY_STEPS: 64,
 		STEP_EXPONENT: '2.0',
-		USE_ENV: false,
-		STOCHASTIC: true
+		USE_ENV: false
 	},
 
 	uniforms: {
@@ -75,7 +58,19 @@ const SSISTraceShader = {
 
 	},
 
-	vertexShader,
+	vertexShader: /* glsl */`
+
+		varying vec2 vUv;
+
+		void main() {
+
+			vUv = uv;
+
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+		}
+
+	`,
 
 	fragmentShader: /* glsl */`
 		precision highp float;
@@ -110,14 +105,6 @@ const SSISTraceShader = {
 			return view.xyz / view.w;
 		}
 
-		// view-space point on the ray at a screen uv and view depth (symmetric perspective projection)
-		vec3 getViewPointAtZ( const in vec2 uv, const in float viewZ ) {
-			float w = - viewZ;
-			vec2 ndc = uv * 2.0 - 1.0;
-			vec4 view = cameraInverseProjectionMatrix * vec4( ndc * w, 0.0, w );
-			return vec3( view.xy, viewZ );
-		}
-
 		float pointToLineDistance( vec3 x0, vec3 x1, vec3 x2 ) {
 			return length( cross( x0 - x1, x0 - x2 ) ) / length( x2 - x1 );
 		}
@@ -149,6 +136,7 @@ const SSISTraceShader = {
 			vec3 T = normalize( cross( up, N ) );
 			vec3 B = cross( N, T );
 			vec3 V = - I;
+			// keep V above the horizon of the shading normal so the sampler stays defined at grazing views
 			vec3 Vl = vec3( dot( V, T ), dot( V, B ), max( dot( V, N ), 0.01 ) );
 			vec3 Ne = sampleGGXVNDF( normalize( Vl ), alpha, xi );
 			vec3 H = T * Ne.x + B * Ne.y + N * Ne.z;
@@ -156,12 +144,10 @@ const SSISTraceShader = {
 			return dot( L, N ) > 0.0 ? L : reflect( I, N );
 		}
 
-		// Marches the ray through the depth buffer. On a hit returns true with the hit uv;
-		// rayLen and endZ describe the traversed segment (used for the cone footprint).
-		bool traceRay( const in vec3 viewPosition, const in vec3 viewNormal, const in vec3 dir, const in float jitter, out vec2 hitUv, out float rayLen, out float endZ ) {
+		// Marches the ray through the depth buffer. On a hit returns true with the hit uv.
+		bool traceRay( const in vec3 viewPosition, const in vec3 viewNormal, const in vec3 dir, const in float jitter, out vec2 hitUv ) {
 
-			float maxRayLen = maxDistance / max( dot( dir, viewNormal ), 0.05 );
-			vec3 d1viewPosition = viewPosition + dir * maxRayLen;
+			vec3 d1viewPosition = viewPosition + dir * maxDistance;
 
 			// clip the ray at the near plane
 			if ( d1viewPosition.z > - cameraNear ) {
@@ -174,47 +160,20 @@ const SSISTraceShader = {
 			vec2 d1 = ( d1clip.xy / d1clip.w * 0.5 + 0.5 ) * resolution;
 
 			float totalStep = max( abs( d1.x - d0.x ), abs( d1.y - d0.y ) );
-			vec2 span = ( d1 - d0 ) / totalStep;
 
-			#ifdef STOCHASTIC
-
-				// bounded sample count (as SSRNode): quality * MAX_RAY_STEPS samples per ray, spaced as
-				// (i / count) ^ STEP_EXPONENT so they concentrate near the origin, at least one pixel apart
-				float totalSamples = max( floor( quality * float( MAX_RAY_STEPS ) + 0.5 ), 1.0 );
-				float stepLimit = float( MAX_RAY_STEPS );
-
-			#else
-
-				// one sample every 1 / quality pixels along the ray
-				float stride = 1.0 / max( quality, 0.05 );
-				float stepLimit = float( MAX_STEP );
-
-			#endif
-
-			float s = 0.0;
+			// bounded sample count (as SSRNode): quality * MAX_RAY_STEPS samples per ray, spaced as
+			// (i / count) ^ STEP_EXPONENT so they concentrate near the origin, at least one pixel apart
+			float totalSamples = max( floor( quality * float( MAX_RAY_STEPS ) + 0.5 ), 1.0 );
 
 			// 1 / z is linear along the ray in screen space (perspective-correct depth)
 			float recipZ = 1.0 / viewPosition.z;
 			float recipZStep = 1.0 / d1viewPosition.z - recipZ;
 
-			hitUv = vec2( 0.0 );
+			for ( float i = 1.0; i < float( MAX_RAY_STEPS ); i ++ ) {
 
-			vec2 prevUv = vUv;
-			float prevRayZ = viewPosition.z;
+				if ( i > totalSamples ) break;
 
-			for ( float i = 1.0; i < stepLimit; i ++ ) {
-
-				#ifdef STOCHASTIC
-
-					if ( i > totalSamples ) break;
-					s = clamp( max( pow( ( i + jitter - 0.5 ) / totalSamples, float( STEP_EXPONENT ) ), i / totalStep ), 0.0, 1.0 );
-
-				#else
-
-					s = i * stride / totalStep;
-					if ( s >= 1.0 ) break;
-
-				#endif
+				float s = clamp( max( pow( ( i + jitter - 0.5 ) / totalSamples, float( STEP_EXPONENT ) ), i / totalStep ), 0.0, 1.0 );
 
 				vec2 xy = d0 + s * ( d1 - d0 );
 				if ( xy.x < 0.0 || xy.x > resolution.x || xy.y < 0.0 || xy.y > resolution.y ) break;
@@ -232,23 +191,15 @@ const SSISTraceShader = {
 						vec3 vP = getViewPosition( uv, d );
 						float away = pointToLineDistance( vP, viewPosition, d1viewPosition );
 
-						// A ray crossing a surface between two samples can be up to one 3D ray step away
-						// from it at the first sample past it, so that step is the minimum tolerance. This
-						// keeps coverage independent of the resolution, the sample spacing and the angle.
-						float stepLength = length( getViewPointAtZ( uv, rayZ ) - getViewPointAtZ( prevUv, prevRayZ ) );
-						float tk = max( thickness, 2.0 * stepLength );
-
-						if ( away <= tk ) {
+						if ( away <= thickness ) {
 
 							vec3 hitNormal = normalize( texture2D( tNormal, uv ).xyz * 2.0 - 1.0 );
 
 							// rays pass through back-facing surfaces
 							if ( dot( dir, hitNormal ) < 0.0 ) {
 
-								rayLen = length( vP - viewPosition );
-								if ( rayLen > maxDistance ) break;
+								if ( length( vP - viewPosition ) > maxDistance ) break;
 
-								endZ = vP.z;
 								hitUv = uv;
 								return true;
 
@@ -260,14 +211,8 @@ const SSISTraceShader = {
 
 				}
 
-				prevUv = uv;
-				prevRayZ = rayZ;
-
 			}
 
-			float t = clamp( s, 0.0, 1.0 );
-			rayLen = maxRayLen * t;
-			endZ = mix( viewPosition.z, d1viewPosition.z, t );
 			return false;
 
 		}
@@ -293,126 +238,49 @@ const SSISTraceShader = {
 			float roughness = texture2D( tMaterial, vUv ).r;
 
 			vec3 viewIncidentDir = normalize( viewPosition );
-			vec3 mirrorDir = reflect( viewIncidentDir, viewNormal );
 
 			vec3 envColor = vec3( 0.0 );
 
 			#ifdef USE_ENV
+				vec3 mirrorDir = reflect( viewIncidentDir, viewNormal );
 				float envMip = envMaxLod * roughness * ( 2.0 - roughness );
 				envColor = textureLod( envMap, ( cameraWorldMatrix * vec4( mirrorDir, 0.0 ) ).xyz, envMip ).rgb * envIntensity;
 			#endif
 
-			vec3 result = envColor;
-			float alphaOut = 0.0; // non-stochastic: reflection cone blur lod
-
+			// floor alpha so mirror-like surfaces still get a (very narrow) lobe to sample
+			float alpha = max( roughness * roughness, 0.002 );
+			vec2 p = gl_FragCoord.xy + 5.588238 * frame;
+			vec2 n = vec2( ign( p ), ign( p.yx + vec2( 47.0, 13.0 ) ) );
+			vec3 sum = vec3( 0.0 );
 			vec2 hitUv;
-			float rayLen;
-			float endZ;
 
-			#ifdef STOCHASTIC
+			for ( int k = 0; k < MAX_RAYS; k ++ ) {
 
-				float alpha = max( roughness * roughness, 0.002 );
-				vec2 p = gl_FragCoord.xy + 5.588238 * frame;
-				vec2 n = vec2( ign( p ), ign( p.yx + vec2( 47.0, 13.0 ) ) );
-				vec3 sum = vec3( 0.0 );
+				if ( k >= rayCount ) break;
 
-				for ( int k = 0; k < MAX_RAYS; k ++ ) {
+				// per-pixel noise rotated by an R2 sequence across the rays of the pixel
+				vec2 xi = fract( n + vec2( 0.7548776662, 0.5698402909 ) * float( k ) );
+				vec3 dir = sampleGGXReflection( viewIncidentDir, viewNormal, alpha, xi );
 
-					if ( k >= rayCount ) break;
+				float jitter = fract( n.x + 0.61803398875 * float( k ) );
 
-					// per-pixel noise rotated by an R2 sequence across the rays of the pixel
-					vec2 xi = fract( n + vec2( 0.7548776662, 0.5698402909 ) * float( k ) );
-					vec3 dir = sampleGGXReflection( viewIncidentDir, viewNormal, alpha, xi );
+				if ( traceRay( viewPosition, viewNormal, dir, jitter, hitUv ) ) {
 
-					float jitter = fract( n.x + 0.61803398875 * float( k ) );
+					sum += mix( envColor, texture2D( tColor, hitUv ).rgb, hitEdgeFactor( hitUv ) );
 
-					if ( traceRay( viewPosition, viewNormal, dir, jitter, hitUv, rayLen, endZ ) ) {
+				} else {
 
-						sum += mix( envColor, texture2D( tColor, hitUv ).rgb, hitEdgeFactor( hitUv ) );
-
-					} else {
-
-						sum += envColor;
-
-					}
+					sum += envColor;
 
 				}
-
-				result = sum / float( max( rayCount, 1 ) );
-
-			#else
-
-				if ( traceRay( viewPosition, viewNormal, mirrorDir, 0.5, hitUv, rayLen, endZ ) ) {
-
-					result = mix( envColor, texture2D( tColor, hitUv ).rgb, hitEdgeFactor( hitUv ) );
-
-				}
-
-				// footprint of the GGX cone (half angle ~ roughness^2) over the traversed segment, in pixels
-				float conePx = rayLen * roughness * roughness * cameraProjectionMatrix[ 1 ][ 1 ] * resolution.y / max( - endZ, 1e-4 );
-				alphaOut = log2( max( conePx, 1.0 ) );
-
-			#endif
-
-			gl_FragColor = vec4( result, alphaOut );
-
-		}
-	`
-
-};
-
-/**
- * Resolves the traced radiance for roughness: samples the mip chain of the traced
- * texture at the per-pixel level the trace stored in alpha (the reflection cone
- * footprint, so reflections are sharp near contact and blur with hit distance).
- *
- * @constant
- * @type {ShaderMaterial~Shader}
- */
-const SSISResolveShader = {
-
-	name: 'SSISResolveShader',
-
-	uniforms: {
-
-		'tRadiance': { value: null },
-		'resolution': { value: new Vector2() },
-		'maxMip': { value: 0 }
-
-	},
-
-	vertexShader,
-
-	fragmentShader: /* glsl */`
-		varying vec2 vUv;
-		uniform sampler2D tRadiance;
-		uniform vec2 resolution;
-		uniform float maxMip;
-
-		void main() {
-
-			float lod = clamp( textureLod( tRadiance, vUv, 0.0 ).a, 0.0, maxMip );
-
-			if ( lod < 0.05 ) {
-
-				gl_FragColor = vec4( textureLod( tRadiance, vUv, 0.0 ).rgb, 1.0 );
-				return;
 
 			}
 
-			// a few taps at the chosen mip hide the blockiness of the box-filtered chain
-			vec2 o = exp2( lod - 1.0 ) / resolution;
-			vec3 c = textureLod( tRadiance, vUv, lod ).rgb * 2.0;
-			c += textureLod( tRadiance, vUv + vec2( o.x, o.y ) * 0.5, lod ).rgb;
-			c += textureLod( tRadiance, vUv + vec2( - o.x, o.y ) * 0.5, lod ).rgb;
-			c += textureLod( tRadiance, vUv + vec2( o.x, - o.y ) * 0.5, lod ).rgb;
-			c += textureLod( tRadiance, vUv + vec2( - o.x, - o.y ) * 0.5, lod ).rgb;
-
-			gl_FragColor = vec4( c / 6.0, 1.0 );
+			gl_FragColor = vec4( sum / float( max( rayCount, 1 ) ), 1.0 );
 
 		}
 	`
 
 };
 
-export { SSISTraceShader, SSISResolveShader };
+export { SSISShader };

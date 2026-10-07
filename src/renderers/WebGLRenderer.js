@@ -2217,7 +2217,7 @@ class WebGLRenderer {
 
 			materialProperties.environment = ( material.isMeshStandardMaterial || material.isMeshLambertMaterial || material.isMeshPhongMaterial ) ? scene.environment : null;
 			materialProperties.fog = scene.fog;
-			materialProperties.ssisMap = material.isMeshStandardMaterial ? ( scene.ssisMap || null ) : null;
+			materialProperties.indirectSpecularMap = material.isMeshStandardMaterial ? ( scene.indirectSpecularMap || null ) : null;
 
 			const usePMREM = material.isMeshStandardMaterial || ( material.isMeshLambertMaterial && ! material.envMap ) || ( material.isMeshPhongMaterial && ! material.envMap );
 			materialProperties.envMap = environments.get( material.envMap || materialProperties.environment, usePMREM );
@@ -2417,7 +2417,7 @@ class WebGLRenderer {
 
 			const fog = scene.fog;
 			const environment = ( material.isMeshStandardMaterial || material.isMeshLambertMaterial || material.isMeshPhongMaterial ) ? scene.environment : null;
-			const ssisMap = material.isMeshStandardMaterial ? ( scene.ssisMap || null ) : null;
+			const indirectSpecularMap = material.isMeshStandardMaterial ? ( scene.indirectSpecularMap || null ) : null;
 			const colorSpace = ( _currentRenderTarget === null ) ? _this.outputColorSpace : ( _currentRenderTarget.isXRRenderTarget === true ? _currentRenderTarget.texture.colorSpace : ColorManagement.workingColorSpace );
 			const usePMREM = material.isMeshStandardMaterial || ( material.isMeshLambertMaterial && ! material.envMap ) || ( material.isMeshPhongMaterial && ! material.envMap );
 			const envMap = environments.get( material.envMap || environment, usePMREM );
@@ -2525,7 +2525,7 @@ class WebGLRenderer {
 
 					needsProgramChange = true;
 
-				} else if ( materialProperties.ssisMap !== ssisMap ) {
+				} else if ( materialProperties.indirectSpecularMap !== indirectSpecularMap ) {
 
 					needsProgramChange = true;
 
@@ -2783,9 +2783,9 @@ class WebGLRenderer {
 
 			}
 
-			if ( m_uniforms.ssisMap !== undefined ) {
+			if ( m_uniforms.indirectSpecularMap !== undefined ) {
 
-				m_uniforms.ssisMap.value = ssisMap;
+				m_uniforms.indirectSpecularMap.value = indirectSpecularMap;
 
 			}
 
