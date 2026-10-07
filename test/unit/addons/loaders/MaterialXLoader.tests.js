@@ -271,6 +271,23 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
+			QUnit.test( 'randomfloat and randomcolor', ( assert ) => {
+
+				const floatResult = parseNodeGraph( '<randomfloat name="test_node" type="float"><input name="in" type="float" value="0.5" /><input name="seed" type="integer" value="3" /></randomfloat>', 'float' );
+				assert.strictEqual( floatResult.errors.length, 0, 'randomfloat float: no errors.' );
+				assert.true( collectConstValues( floatResult.materials.test_graph.colorNode ).includes( 4096 ), 'randomfloat float: input scaled by 4096.' );
+
+				const integerResult = parseNodeGraph( '<randomfloat name="test_node" type="float"><input name="in" type="integer" value="3" /></randomfloat>', 'float' );
+				assert.strictEqual( integerResult.errors.length, 0, 'randomfloat integer: no errors.' );
+				const integerValues = collectConstValues( integerResult.materials.test_graph.colorNode );
+				assert.true( integerValues.includes( 3 ), 'randomfloat integer: input found.' );
+				assert.false( integerValues.includes( 4096 ), 'randomfloat integer: input not scaled.' );
+
+				const colorResult = parseNodeGraph( '<randomcolor name="test_node" type="color3"><input name="in" type="float" value="0.5" /></randomcolor>', 'color3' );
+				assert.strictEqual( colorResult.errors.length, 0, 'randomcolor: no errors.' );
+
+			} );
+
 			QUnit.test( 'maps <displacement> onto vertex displacement instead of failing', ( assert ) => {
 
 				const result = new MaterialXLoader().parse( MATERIAL_X_DISPLACEMENT );

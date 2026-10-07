@@ -581,6 +581,32 @@ const mx_fractal_noise_materialx_3d = ( position, octaves, lacunarity, diminish,
 
 };
 
+const mx_randomfloat = ( inNode, minNode, maxNode, seed, scale = 4096 ) => {
+
+	const noise = mx_cell_noise_float( vec2( mul( float( inNode ), scale ), float( seed ) ) );
+	return clamp( add( minNode, mul( noise, sub( maxNode, minNode ) ) ), minNode, maxNode );
+
+};
+
+const mx_randomfloat_materialx = ( inNode, minNode, maxNode, seed, nodeX ) => {
+
+	const input = nodeX.getChildByName( 'in' );
+	return mx_randomfloat( inNode, minNode, maxNode, seed, input && input.type === 'integer' ? 1 : 4096 );
+
+};
+
+const mx_randomcolor = ( inNode, hueLow, hueHigh, saturationLow, saturationHigh, brightnessLow, brightnessHigh, seed ) => {
+
+	const randomInRange = ( offset, low, high ) => add( low, mul( mx_randomfloat( inNode, float( 0 ), float( 1 ), ceil( add( float( seed ), offset ) ) ), sub( high, low ) ) );
+
+	return mx_hsvtorgb( vec3(
+		randomInRange( 413.3, hueLow, hueHigh ),
+		randomInRange( 1522.4, saturationLow, saturationHigh ),
+		randomInRange( 1813.8, brightnessLow, brightnessHigh ),
+	) );
+
+};
+
 const mx_cell_noise_materialx = ( position, nodeX ) =>
 	usesVec3Noise( nodeX ) ? mx_cell_noise_vec3( position ) : mx_cell_noise_float( position );
 
@@ -937,6 +963,22 @@ const MXElements = [
 	}, true ),
 	createMXElement( 'cellnoise2d', mx_cell_noise_materialx, [ 'texcoord' ], { texcoord: defaultVec2( 0, 0 ) }, true ),
 	createMXElement( 'cellnoise3d', mx_cell_noise_materialx, [ 'position' ], { position: () => positionLocal }, true ),
+	createMXElement( 'randomfloat', mx_randomfloat_materialx, [ 'in', 'min', 'max', 'seed' ], {
+		in: defaultFloat( 0 ),
+		min: defaultFloat( 0 ),
+		max: defaultFloat( 1 ),
+		seed: defaultInt( 0 ),
+	}, true ),
+	createMXElement( 'randomcolor', mx_randomcolor, [ 'in', 'huelow', 'huehigh', 'saturationlow', 'saturationhigh', 'brightnesslow', 'brightnesshigh', 'seed' ], {
+		in: defaultFloat( 0 ),
+		huelow: defaultFloat( 0 ),
+		huehigh: defaultFloat( 1 ),
+		saturationlow: defaultFloat( 0.825 ),
+		saturationhigh: defaultFloat( 1 ),
+		brightnesslow: defaultFloat( 1 ),
+		brightnesshigh: defaultFloat( 1 ),
+		seed: defaultInt( 0 ),
+	} ),
 	createMXElement( 'worleynoise2d', mx_worley_noise_materialx_2d, [ 'texcoord', 'jitter', 'style' ], {
 		texcoord: defaultVec2( 0, 0 ),
 		jitter: defaultFloat( 1 ),
