@@ -22,6 +22,7 @@ import './addons/tsl/GPUTest.tests.js';
 import './addons/tsl/TSLConditionalSelect.tests.js';
 import './addons/tsl/GPUAtomicsStorage.tests.js';
 import './addons/tsl/GPUComputeBuiltins.tests.js';
+import './addons/tsl/GPUCompute.tests.js';
 import './addons/tsl/GPUBarriers.tests.js';
 import './addons/tsl/GPUSubgroup.tests.js';
 import './addons/tsl/GPUWorkgroupAtomic.tests.js';

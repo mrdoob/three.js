@@ -111,7 +111,7 @@ class Pipelines extends DataMap {
 
 			if ( stageCompute === undefined ) {
 
-				stageCompute = new ProgrammableStage( nodeBuilderState.computeShader, 'compute', computeNode.name, nodeBuilderState.transforms, nodeBuilderState.nodeAttributes );
+				stageCompute = new ProgrammableStage( nodeBuilderState.computeShader, 'compute', computeNode.name );
 				this.programs.compute.set( nodeBuilderState.computeShader, stageCompute );
 
 				backend.createProgram( stageCompute );
@@ -365,7 +365,9 @@ class Pipelines extends DataMap {
 
 		if ( pipeline === undefined ) {
 
-			pipeline = new ComputePipeline( cacheKey, stageCompute );
+			const nodeBuilderState = this.nodes.getForCompute( computeNode );
+
+			pipeline = new ComputePipeline( cacheKey, stageCompute, nodeBuilderState.transforms, nodeBuilderState.nodeAttributes );
 
 			this.caches.set( cacheKey, pipeline );
 
