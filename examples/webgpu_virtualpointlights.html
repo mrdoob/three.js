@@ -225,13 +225,14 @@
 				controls.update();
 
 				const gui = renderer.inspector.createParameters( 'Virtual Point Lights' );
-				gui.add( params, 'shadowBias', - 0.01, 0.01, 0.0001 ).name( 'Direct Shadow Bias' ).info( 'Bias for direct point-light shadows. Set to zero to compare contact shadows.' ).onChange( updateShadowBias );
 				gui.add( params, 'mode', [ 'direct only', 'indirect only', 'combined' ] ).name( 'Lighting' ).onChange( updateMode );
 				gui.add( params, 'count', sourceLights.length, MAX_VPLS, 1 ).name( 'Ray Budget' ).info( 'Total rays shared across the source lights. Escaped rays do not become VPLs.' ).onChange( regenerate ).debounce( 250 );
 				gui.add( params, 'seed', 1, 100, 1 ).name( 'Seed' ).onChange( regenerate ).debounce( 250 );
-				gui.add( params, 'shadows' ).name( 'VPL Shadows' ).onChange( updateVisibility );
-				gui.add( params, 'visibility', [ 'shadow maps', 'BVH reference' ] ).name( 'Visibility' ).info( 'Cached GPU-rasterized cube faces, or triangle BVH reference. Direct shadows remain enabled.' ).onChange( updateVisibility );
-				gui.add( params, 'shadowResolution', [ 32, 64 ] ).name( 'Shadow Resolution' ).info( 'Pixels per cube face. Maps rebuild when the VPL set or resolution changes.' ).onChange( () => {
+				const shadowParameters = gui.addFolder( 'Shadows' );
+				shadowParameters.add( params, 'shadowBias', - 0.01, 0.01, 0.0001 ).name( 'Direct Shadow Bias' ).info( 'Bias for direct point-light shadows. Set to zero to compare contact shadows.' ).onChange( updateShadowBias );
+				shadowParameters.add( params, 'shadows' ).name( 'VPL Shadows' ).onChange( updateVisibility );
+				shadowParameters.add( params, 'visibility', [ 'shadow maps', 'BVH reference' ] ).name( 'Visibility' ).info( 'Cached GPU-rasterized cube faces, or triangle BVH reference. Direct shadows remain enabled.' ).onChange( updateVisibility );
+				shadowParameters.add( params, 'shadowResolution', [ 32, 64 ] ).name( 'Shadow Resolution' ).info( 'Pixels per cube face. Maps rebuild when the VPL set or resolution changes.' ).onChange( () => {
 
 					mapsDirty = true;
 					updateVisibility();
