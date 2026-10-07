@@ -125,6 +125,35 @@ function hasNode( object, predicate, visited = new WeakSet(), depth = 0 ) {
 
 }
 
+function collectFunctionLayouts( object, layouts = new Set(), visited = new WeakSet(), depth = 0 ) {
+
+	// TSL functions (Fn) are function objects that carry their layout.
+	if ( object === null || ( typeof object !== 'object' && typeof object !== 'function' ) || depth > 24 || visited.has( object ) ) return layouts;
+
+	visited.add( object );
+	if ( typeof object.layout?.type === 'string' ) layouts.add( object.layout );
+	if ( typeof object === 'function' ) collectFunctionLayouts( object.shaderNode, layouts, visited, depth + 1 );
+
+	for ( const key of Object.keys( object ) ) collectFunctionLayouts( object[ key ], layouts, visited, depth + 1 );
+
+	return layouts;
+
+}
+
+function parseNodeGraph( body, type ) {
+
+	const text = `<?xml version="1.0"?>
+<materialx version="1.39">
+	<nodegraph name="test_graph">
+		${ body }
+		<output name="out" type="${ type }" nodename="test_node" />
+	</nodegraph>
+</materialx>`;
+
+	return new MaterialXLoader().parse( text, { throwOnErrors: false } );
+
+}
+
 export default QUnit.module( 'Addons', () => {
 
 	QUnit.module( 'Loaders', () => {
@@ -217,6 +246,28 @@ export default QUnit.module( 'Addons', () => {
 				}
 
 				assert.deepEqual( messages, [], 'The separate node builds a channel instead of an incomplete element node.' );
+
+			} );
+
+			QUnit.test( 'gives vector and color noise one noise per channel', ( assert ) => {
+
+				// Function layouts are matched by return type; the TSL noise functions have generated names.
+				const usesFunction = ( category, type, returnType ) => {
+
+					const { materials } = parseNodeGraph( `<${ category } name="test_node" type="${ type }" />`, type );
+					return [ ...collectFunctionLayouts( materials.test_graph.colorNode ) ].some( layout => layout.type === returnType );
+
+				};
+
+				// MaterialX builds these variants from vec3 noise (plus an offset scalar for a fourth channel);
+				// they used to repeat the scalar noise in every channel.
+				assert.true( usesFunction( 'noise2d', 'vector2', 'vec3' ), 'noise2d vector2 samples vec3 noise.' );
+				assert.true( usesFunction( 'noise2d', 'vector4', 'vec4' ), 'noise2d vector4 samples vec4 noise.' );
+				assert.true( usesFunction( 'noise2d', 'color4', 'vec4' ), 'noise2d color4 samples vec4 noise.' );
+				assert.true( usesFunction( 'noise3d', 'vector4', 'vec4' ), 'noise3d vector4 samples vec4 noise.' );
+				assert.true( usesFunction( 'fractal3d', 'vector2', 'vec2' ), 'fractal3d vector2 uses vec2 fractal noise.' );
+				assert.true( usesFunction( 'fractal3d', 'vector4', 'vec4' ), 'fractal3d vector4 uses vec4 fractal noise.' );
+				assert.false( usesFunction( 'noise2d', 'float', 'vec3' ), 'Scalar noise stays scalar.' );
 
 			} );
 
