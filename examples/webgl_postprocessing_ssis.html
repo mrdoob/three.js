@@ -11,6 +11,10 @@
 	<meta property="og:url" content="https://threejs.org/examples/webgl_postprocessing_ssis.html">
 	<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_postprocessing_ssis.jpg">
 	<link type="text/css" rel="stylesheet" href="main.css">
+	<style>
+		#info { color: #38434b; }
+		#info a { color: #456d6b; }
+	</style>
 
 </head>
 
@@ -35,8 +39,9 @@
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 		import Stats from 'three/addons/libs/stats.module.js';
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-		import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+		import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+		import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 		import { GBufferPass } from 'three/addons/postprocessing/GBufferPass.js';
 		import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
@@ -48,13 +53,13 @@
 			ssis: true,
 			autoRotate: true,
 			floorRoughness: 0.1,
-			floorMetalness: 0.5,
-			bunnyRoughness: 0.3,
-			bunnyMetalness: 0.5,
+			floorMetalness: 0.15,
 			view: 'Beauty'
 		};
 
 		const renderer = new THREE.WebGLRenderer();
+		renderer.toneMapping = THREE.ACESFilmicToneMapping;
+		renderer.toneMappingExposure = 1.3;
 		// like the WebGPU SSR examples, render at CSS pixels; raise for sharper output at a high cost
 		const pixelRatio = 1;
 		renderer.setPixelRatio( pixelRatio );
@@ -62,42 +67,56 @@
 		renderer.setAnimationLoop( animate );
 		document.body.appendChild( renderer.domElement );
 
-		const camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 0.1, 15 );
-		camera.position.set( 0.13, 0.35, 0.44 );
+		const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 100 );
+		camera.position.set( 2.8, 2.4, 5.6 );
 
 		const scene = new THREE.Scene();
-		scene.background = new THREE.Color( 0x443333 );
+		scene.background = new THREE.Color( 0xe9edf2 );
+		scene.fog = new THREE.Fog( 0xe9edf2, 10, 35 );
+		scene.environmentIntensity = 2;
 
 		const pmrem = new THREE.PMREMGenerator( renderer );
-		scene.environment = pmrem.fromScene( new RoomEnvironment(), 0.04 ).texture;
-		scene.environmentIntensity = 1;
-		pmrem.dispose();
+		pmrem.compileEquirectangularShader();
+		new HDRLoader().load( 'textures/equirectangular/monochrome_studio_02_1k.hdr', texture => {
 
-		const add = ( geometry, color, x, y, z, roughness = 0.3, metalness = 0 ) => {
+			scene.environment = pmrem.fromEquirectangular( texture ).texture;
+			texture.dispose();
+			pmrem.dispose();
 
-			const material = new THREE.MeshStandardMaterial( { color, roughness, metalness } );
-			const mesh = new THREE.Mesh( geometry, material );
+		} );
+
+		const floor = new THREE.Mesh(
+			new THREE.PlaneGeometry( 200, 200 ),
+			new THREE.MeshStandardMaterial( { color: 0xffffff, roughness: params.floorRoughness, metalness: params.floorMetalness } )
+		);
+		floor.rotation.x = - Math.PI / 2;
+		scene.add( floor );
+
+		// A restrained palette complements the helmet and gives the floor distinct reflections.
+		const add = ( geometry, color, roughness, metalness, x, y, z ) => {
+
+			const mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial( { color, roughness, metalness } ) );
 			mesh.position.set( x, y, z );
 			scene.add( mesh );
 			return mesh;
 
 		};
 
-		const floor = add( new THREE.PlaneGeometry( 8, 8 ), 0xcbcbcb, 0, - 0.0001, 0, params.floorRoughness, params.floorMetalness );
-		floor.rotation.x = - Math.PI / 2;
-		let bunny = null;
+		const box = add( new RoundedBoxGeometry( 0.7, 0.7, 0.7, 4, 0.08 ), 0xe8dfce, 0.25, 0.15, - 1.65, 0.35, 0.65 );
+		box.rotation.y = Math.PI / 6;
+		add( new THREE.SphereGeometry( 0.45, 64, 32 ), 0xbba477, 0.22, 0.8, 1.65, 0.45, 0.25 );
+		add( new THREE.ConeGeometry( 0.38, 1.1, 64 ), 0x365a59, 0.3, 0.45, - 2, 0.55, - 0.4 );
 
-		// the box, sphere and cone use fixed materials
-		add( new THREE.BoxGeometry( 0.05, 0.05, 0.05 ), 'green', - 0.12, 0.025, 0.015 );
-		add( new THREE.IcosahedronGeometry( 0.025, 4 ), 'cyan', - 0.05, 0.025, 0.08 );
-		add( new THREE.ConeGeometry( 0.025, 0.05, 64 ), 'yellow', - 0.05, 0.025, - 0.055 );
+		new GLTFLoader().load( 'models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf', gltf => {
 
-		const dracoLoader = new DRACOLoader();
-		dracoLoader.load( 'models/draco/bunny.drc', function ( geometry ) {
-
-			geometry.computeVertexNormals();
-			bunny = add( geometry, 0xa5a5a5, 0, - 0.0365, 0, params.bunnyRoughness, params.bunnyMetalness );
-			dracoLoader.dispose();
+			const helmet = gltf.scene;
+			const bounds = new THREE.Box3().setFromObject( helmet );
+			const size = bounds.getSize( new THREE.Vector3() );
+			const center = bounds.getCenter( new THREE.Vector3() );
+			const scale = 2 / size.y;
+			helmet.scale.multiplyScalar( scale );
+			helmet.position.set( - center.x * scale, - bounds.min.y * scale, - center.z * scale );
+			scene.add( helmet );
 
 		} );
 
@@ -105,9 +124,13 @@
 		document.body.appendChild( stats.dom );
 
 		const controls = new OrbitControls( camera, renderer.domElement );
-		controls.target.set( 0, 0.0635, 0 );
+		controls.target.set( 0, 0.85, 0 );
 		controls.enableDamping = true;
-		controls.enabled = ! params.autoRotate;
+		controls.autoRotate = params.autoRotate;
+		controls.autoRotateSpeed = 0.6;
+		controls.minDistance = 3;
+		controls.maxDistance = 10;
+		controls.maxPolarAngle = Math.PI / 2 - 0.05;
 		controls.update();
 
 		const width = window.innerWidth * pixelRatio;
@@ -116,8 +139,8 @@
 		const composer = new EffectComposer( renderer );
 		const gBufferPass = new GBufferPass( scene, camera, width, height, { material: true } );
 		const ssisPass = new SSISPass( scene, camera, width, height, gBufferPass );
-		ssisPass.maxDistance = 0.3;
-		ssisPass.thickness = 0.02;
+		ssisPass.maxDistance = 6;
+		ssisPass.thickness = 0.1;
 
 		composer.addPass( gBufferPass );
 		composer.addPass( new RenderPass( scene, camera ) );
@@ -172,22 +195,22 @@
 			scene.ssisMap = v ? ssisPass.texture : null;
 
 		} );
-		gui.add( params, 'autoRotate' ).onChange( v => controls.enabled = ! v );
+		gui.add( params, 'autoRotate' ).onChange( v => controls.autoRotate = v );
 		gui.add( params, 'floorRoughness', 0, 1 ).onChange( v => floor.material.roughness = v );
 		gui.add( params, 'floorMetalness', 0, 1 ).onChange( v => floor.material.metalness = v );
-		gui.add( params, 'bunnyRoughness', 0, 1 ).onChange( v => bunny && ( bunny.material.roughness = v ) );
-		gui.add( params, 'bunnyMetalness', 0, 1 ).onChange( v => bunny && ( bunny.material.metalness = v ) );
-		gui.add( ssisPass, 'stochastic' );
-		gui.add( ssisPass, 'quality', 0.1, 1 );
-		gui.add( ssisPass, 'resolutionScale', 0.25, 1 );
-		gui.add( ssisPass, 'rayCount', 1, 16, 1 );
-		gui.add( ssisPass, 'maxFrames', 1, 64, 1 );
-		gui.add( ssisPass, 'temporalClip', 0.5, 4 );
-		gui.add( ssisPass, 'maxDistance', 0, 1 );
-		gui.add( ssisPass, 'thickness', 0, 0.1 );
-		gui.add( ssisPass, 'maxRoughness', 0, 1 );
-		gui.add( ssisPass, 'screenEdgeFade', 0, 0.5 );
-		gui.add( scene, 'environmentIntensity', 0, 2 );
+		const ssisFolder = gui.addFolder( 'SSIS settings' );
+		ssisFolder.close();
+		ssisFolder.add( ssisPass, 'stochastic' );
+		ssisFolder.add( ssisPass, 'quality', 0.1, 1 );
+		ssisFolder.add( ssisPass, 'resolutionScale', 0.25, 1 );
+		ssisFolder.add( ssisPass, 'rayCount', 1, 16, 1 );
+		ssisFolder.add( ssisPass, 'maxFrames', 1, 64, 1 );
+		ssisFolder.add( ssisPass, 'temporalClip', 0.5, 4 );
+		ssisFolder.add( ssisPass, 'maxDistance', 0, 10 );
+		ssisFolder.add( ssisPass, 'thickness', 0, 0.5 );
+		ssisFolder.add( ssisPass, 'maxRoughness', 0, 1 );
+		ssisFolder.add( ssisPass, 'screenEdgeFade', 0, 0.5 );
+		gui.add( scene, 'environmentIntensity', 0, 3 );
 
 		window.addEventListener( 'resize', () => {
 
@@ -202,18 +225,7 @@
 
 			stats.begin();
 
-			if ( params.autoRotate ) {
-
-				const t = performance.now() / 1000 * 0.3;
-				camera.position.set( Math.sin( t ) * 0.45, 0.3, Math.cos( t ) * 0.45 );
-				controls.target.set( 0, 0.0635, 0 );
-				camera.lookAt( controls.target );
-
-			} else {
-
-				controls.update();
-
-			}
+			controls.update();
 
 			composer.render();
 
