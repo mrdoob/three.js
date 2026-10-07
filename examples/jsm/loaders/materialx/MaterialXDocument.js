@@ -489,7 +489,8 @@ class MaterialXNode {
 
 		} else {
 
-			node = compileNodeFromRegistry( this, out, this.materialX.compileContext );
+			const resolvedNode = this.materialX.nodeResolver !== null ? this.materialX.nodeResolver( this, out ) : null;
+			node = resolvedNode !== null && resolvedNode !== undefined ? resolvedNode : compileNodeFromRegistry( this, out, this.materialX.compileContext );
 
 		}
 
@@ -835,6 +836,7 @@ class MaterialXDocument {
 		this.textureLoader.setPath( path );
 		this.textureCache = new Map();
 		this.pendingResources = [];
+		this.nodeResolver = null;
 		const bottomLeftUvSpaceHelpers = getBottomLeftUvSpaceHelpers( this.uvSpace );
 
 		this.compileContext = {
@@ -895,6 +897,8 @@ class MaterialXDocument {
 	}
 
 	parse( text, materialName = null, options = {} ) {
+
+		this.nodeResolver = options.nodeResolver || null;
 
 		const rootNode = parseMaterialXText(
 			text,
