@@ -319,8 +319,20 @@ class Bindings extends DataMap {
 
 					if ( binding.isUniformBuffer ) {
 
-						this.backend.createUniformBuffer( binding );
-						this.info.createUniformBuffer( binding );
+						// uniform buffers can be shared by multiple bind groups so they are reference counted
+
+						const bindingData = this.get( binding );
+
+						if ( bindingData.usedTimes === undefined ) {
+
+							this.backend.createUniformBuffer( binding );
+							this.info.createUniformBuffer( binding );
+
+							bindingData.usedTimes = 0;
+
+						}
+
+						bindingData.usedTimes ++;
 
 					} else if ( binding.isSampledTexture ) {
 
@@ -376,12 +388,25 @@ class Bindings extends DataMap {
 
 					if ( binding.isUniformBuffer ) {
 
-						this.backend.destroyUniformBuffer( binding );
-						this.info.destroyUniformBuffer( binding );
+						const bindingData = this.get( binding );
+						bindingData.usedTimes --;
 
-						// release arrays
+						if ( bindingData.usedTimes === 0 ) {
 
-						binding.release();
+							this.backend.destroyUniformBuffer( binding );
+							this.info.destroyUniformBuffer( binding );
+
+							// release arrays
+
+							binding.release();
+
+							// shared bindings can be used again, so make sure a recreated buffer is updated
+
+							this.nodes.groupsData.delete( [ binding.groupNode, binding ] );
+
+							this.delete( binding );
+
+						}
 
 					} else if ( binding.isSampler ) {
 

@@ -3,7 +3,6 @@ import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
 import NodeSampler from '../../common/nodes/NodeSampler.js';
 import { NodeSampledTexture, NodeSampledCubeTexture, NodeSampledTexture3D } from '../../common/nodes/NodeSampledTexture.js';
 
-import NodeUniformBuffer from '../../common/nodes/NodeUniformBuffer.js';
 import NodeStorageBuffer from '../../common/nodes/NodeStorageBuffer.js';
 
 import { NodeBuilder, CodeNode } from '../../../nodes/Nodes.js';
@@ -1411,21 +1410,10 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			} else if ( type === 'buffer' || type === 'storageBuffer' || type === 'indirectStorageBuffer' ) {
 
-				const sharedData = this.getSharedDataFromNode( node );
+				// uniform buffers of shared groups are shared across pipelines, storage buffers already share their GPU buffer via the attribute
 
-				let buffer = sharedData.buffer;
-
-				if ( buffer === undefined ) {
-
-					const bufferClass = type === 'buffer' ? NodeUniformBuffer : NodeStorageBuffer;
-
-					buffer = new bufferClass( node, group );
-
-					sharedData.buffer = buffer;
-
-				}
-
-				buffer.setVisibility( buffer.getVisibility() | gpuShaderStageLib[ shaderStage ] );
+				const buffer = type === 'buffer' ? this.getUniformBufferFromNode( node, shaderStage ) : new NodeStorageBuffer( node, group );
+				buffer.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 				bindings.push( buffer );
 

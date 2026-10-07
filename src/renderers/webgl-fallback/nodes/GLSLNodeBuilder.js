@@ -1,6 +1,5 @@
 import { GLSLNodeParser, NodeBuilder, TextureNode, vectorComponents, CodeNode } from '../../../nodes/Nodes.js';
 
-import NodeUniformBuffer from '../../common/nodes/NodeUniformBuffer.js';
 import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
 
 import { NodeSampledTexture, NodeSampledCubeTexture, NodeSampledTexture3D } from '../../common/nodes/NodeSampledTexture.js';
@@ -1891,22 +1890,11 @@ void main() {
 
 			} else if ( type === 'buffer' ) {
 
+				node.name = `NodeBuffer_${ node.id }`;
 				uniformNode.name = `buffer${ node.id }`;
 
-				const sharedData = this.getSharedDataFromNode( node );
-
-				let buffer = sharedData.buffer;
-
-				if ( buffer === undefined ) {
-
-					node.name = `NodeBuffer_${ node.id }`;
-
-					buffer = new NodeUniformBuffer( node, group );
-					buffer.name = node.name;
-
-					sharedData.buffer = buffer;
-
-				}
+				const buffer = this.getUniformBufferFromNode( node, shaderStage );
+				buffer.name = node.name;
 
 				bindings.push( buffer );
 

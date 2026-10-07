@@ -16,6 +16,8 @@ import {
 	ColorNodeUniform, Matrix2NodeUniform, Matrix3NodeUniform, Matrix4NodeUniform
 } from '../../renderers/common/nodes/NodeUniform.js';
 
+import NodeUniformBuffer from '../../renderers/common/nodes/NodeUniformBuffer.js';
+
 import { stack } from './StackNode.js';
 import { getCurrentStack, setCurrentStack } from '../tsl/TSLBase.js';
 
@@ -36,7 +38,7 @@ let _id = 0;
 
 const _functionNodeCache = new WeakMap();
 
-const sharedNodeData = new WeakMap();
+const sharedNodeData = new WeakMap(); // backend -> node -> data
 
 const typeFromArray = new Map( [
 	[ Int8Array, 'int' ],
@@ -3397,22 +3399,75 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Returns shared data object for the given node.
+	 * Returns shared data object for the given node. The data is shared by
+	 * all node builders of the same backend, e.g. to reuse bindings across pipelines.
 	 *
 	 * @param {Node} node - The node to get shared data from.
 	 * @return {Object} The shared data.
 	 */
 	getSharedDataFromNode( node ) {
 
-		let data = sharedNodeData.get( node );
+		const backend = this.renderer.backend;
+
+		let backendData = sharedNodeData.get( backend );
+
+		if ( backendData === undefined ) {
+
+			backendData = new WeakMap();
+			sharedNodeData.set( backend, backendData );
+
+		}
+
+		let data = backendData.get( node );
 
 		if ( data === undefined ) {
 
 			data = {};
+			backendData.set( node, data );
 
 		}
 
 		return data;
+
+	}
+
+	/**
+	 * Returns a uniform buffer binding for the given buffer node and shader stage.
+	 * Bindings of shared uniform groups are shared by all node builders of the same
+	 * backend so a buffer used by multiple pipelines is only allocated and updated once.
+	 *
+	 * @param {BufferNode} node - The buffer node.
+	 * @param {('vertex'|'fragment'|'compute')} shaderStage - The shader stage.
+	 * @return {NodeUniformBuffer} The uniform buffer binding.
+	 */
+	getUniformBufferFromNode( node, shaderStage ) {
+
+		const group = node.groupNode;
+
+		if ( group.shared !== true ) return new NodeUniformBuffer( node, group );
+
+		const sharedData = this.getSharedDataFromNode( node );
+		const uniformBuffers = sharedData.uniformBuffers || ( sharedData.uniformBuffers = {} );
+
+		let uniformBuffer = uniformBuffers[ shaderStage ];
+
+		if ( uniformBuffer === undefined || uniformBuffer.groupNode !== group ) {
+
+			// one binding per shader stage since each stage declares its own binding
+
+			uniformBuffer = new NodeUniformBuffer( node, group );
+
+			uniformBuffers[ shaderStage ] = uniformBuffer;
+
+		} else if ( this.getBindGroupArray( group.name, shaderStage ).includes( uniformBuffer ) ) {
+
+			// already used in this stage (e.g. by a sub-build), every node uniform requires its own binding
+
+			uniformBuffer = new NodeUniformBuffer( node, group );
+
+		}
+
+		return uniformBuffer;
 
 	}
 
@@ -3425,31 +3480,16 @@ class NodeBuilder {
 	 */
 	getNodeUniform( uniformNode, type ) {
 
-		const nodeData = this.getSharedDataFromNode( uniformNode );
+		if ( type === 'float' || type === 'int' || type === 'uint' ) return new NumberNodeUniform( uniformNode );
+		if ( type === 'vec2' || type === 'ivec2' || type === 'uvec2' ) return new Vector2NodeUniform( uniformNode );
+		if ( type === 'vec3' || type === 'ivec3' || type === 'uvec3' ) return new Vector3NodeUniform( uniformNode );
+		if ( type === 'vec4' || type === 'ivec4' || type === 'uvec4' ) return new Vector4NodeUniform( uniformNode );
+		if ( type === 'color' ) return new ColorNodeUniform( uniformNode );
+		if ( type === 'mat2' ) return new Matrix2NodeUniform( uniformNode );
+		if ( type === 'mat3' ) return new Matrix3NodeUniform( uniformNode );
+		if ( type === 'mat4' ) return new Matrix4NodeUniform( uniformNode );
 
-		let node = nodeData.cache;
-
-		if ( node === undefined ) {
-
-			if ( type === 'float' || type === 'int' || type === 'uint' ) node = new NumberNodeUniform( uniformNode );
-			else if ( type === 'vec2' || type === 'ivec2' || type === 'uvec2' ) node = new Vector2NodeUniform( uniformNode );
-			else if ( type === 'vec3' || type === 'ivec3' || type === 'uvec3' ) node = new Vector3NodeUniform( uniformNode );
-			else if ( type === 'vec4' || type === 'ivec4' || type === 'uvec4' ) node = new Vector4NodeUniform( uniformNode );
-			else if ( type === 'color' ) node = new ColorNodeUniform( uniformNode );
-			else if ( type === 'mat2' ) node = new Matrix2NodeUniform( uniformNode );
-			else if ( type === 'mat3' ) node = new Matrix3NodeUniform( uniformNode );
-			else if ( type === 'mat4' ) node = new Matrix4NodeUniform( uniformNode );
-			else {
-
-				throw new Error( `THREE.NodeBuilder: Uniform "${ type }" not implemented.` );
-
-			}
-
-			nodeData.cache = node;
-
-		}
-
-		return node;
+		throw new Error( `THREE.NodeBuilder: Uniform "${ type }" not implemented.` );
 
 	}
 
