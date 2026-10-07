@@ -38,7 +38,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { Fn, Loop, If, Break, uniform, uniformArray, vec3, float, int, max, min, dot, normalize, length, select, positionWorld, normalWorld } from 'three/tsl';
+			import { Fn, Loop, If, Break, uniform, uniformArray, vec2, vec3, float, int, max, min, dot, normalize, length, select, positionWorld, normalWorld, screenCoordinate, fract } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -112,8 +112,9 @@
 				const n = normalize( normalWorld );
 				const sum = vec3( 0 ).toVar();
 
-				// direct: a grid of point samples on the area light
+				// direct: stratified point samples on the area light, jittered per pixel (noise instead of banding)
 
+				const ign = fract( fract( dot( screenCoordinate.xy, vec2( 0.06711056, 0.00583715 ) ) ).mul( 52.9829189 ) ); // interleaved gradient noise
 				const lightNormal = vec3( 0, - 1, 0 );
 				const directFlux = vec3( LIGHT_FLUX / ( LIGHT_SAMPLES * LIGHT_SAMPLES ) );
 
@@ -121,7 +122,9 @@
 
 					for ( let j = 0; j < LIGHT_SAMPLES; j ++ ) {
 
-						const p = vec3( ( ( i + 0.5 ) / LIGHT_SAMPLES - 0.5 ) * LIGHT_SIZE, LIGHT_Y, ( ( j + 0.5 ) / LIGHT_SAMPLES - 0.5 ) * LIGHT_SIZE );
+						const k = i * LIGHT_SAMPLES + j;
+						const u = fract( ign.add( k * 0.7548776662 ) ), v = fract( ign.add( k * 0.5698402909 ) );
+						const p = vec3( u.add( i ).div( LIGHT_SAMPLES ).sub( 0.5 ).mul( LIGHT_SIZE ), LIGHT_Y, v.add( j ).div( LIGHT_SAMPLES ).sub( 0.5 ).mul( LIGHT_SIZE ) );
 						sum.addAssign( gather( x, n, p, lightNormal, directFlux ).mul( directWeight ) );
 
 					}
