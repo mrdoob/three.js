@@ -100,17 +100,17 @@ class SSISPass extends Pass {
 		 * Maximum reflection ray length in world units.
 		 *
 		 * @type {number}
-		 * @default 10
+		 * @default 8
 		 */
-		this.maxDistance = 10;
+		this.maxDistance = 8;
 
 		/**
 		 * Depth tolerance behind a surface that still counts as a hit, in world units.
 		 *
 		 * @type {number}
-		 * @default 0.01
+		 * @default 0.12
 		 */
-		this.thickness = 0.01;
+		this.thickness = 0.12;
 
 		/**
 		 * Width in UV units over which hits fade to the environment near the screen border.
@@ -134,9 +134,9 @@ class SSISPass extends Pass {
 		 * proportionally higher cost.
 		 *
 		 * @type {number}
-		 * @default 16
+		 * @default 8
 		 */
-		this.rayCount = 16;
+		this.rayCount = 8;
 
 		/**
 		 * The depth texture of the G-buffer, see {@link SSISPass#setGBuffer}.

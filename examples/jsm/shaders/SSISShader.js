@@ -49,10 +49,10 @@ const SSISShader = {
 		'cameraProjectionMatrix': { value: new Matrix4() },
 		'cameraInverseProjectionMatrix': { value: new Matrix4() },
 		'cameraWorldMatrix': { value: new Matrix4() },
-		'maxDistance': { value: 10 },
-		'thickness': { value: 0.01 },
+		'maxDistance': { value: 8 },
+		'thickness': { value: 0.12 },
 		'screenEdgeFade': { value: 0.2 },
-		'rayCount': { value: 16 },
+		'rayCount': { value: 8 },
 		'quality': { value: 1 },
 		'frame': { value: 0 }
 
