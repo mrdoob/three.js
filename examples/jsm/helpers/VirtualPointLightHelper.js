@@ -1,42 +1,66 @@
-import { BufferAttribute, BufferGeometry, Points, PointsMaterial } from 'three';
+import { BufferAttribute, Color, InstancedMesh, Matrix4, MeshBasicMaterial, SphereGeometry } from 'three';
 
-/** Visualizes the positions sampled by a VirtualPointLightGenerator. */
-class VirtualPointLightHelper extends Points {
+/** Visualizes the positions and reflected light colors sampled by a VirtualPointLightGenerator. */
+class VirtualPointLightHelper extends InstancedMesh {
 
 	/**
 	 * @param {VirtualPointLightGenerator} generator - The sample data.
-	 * @param {number} [size=0.06] - Point size in world units.
+	 * @param {number} [size=0.12] - Sphere radius in world units.
 	 */
-	constructor( generator, size = 0.06 ) {
+	constructor( generator, size = 0.12 ) {
 
-		const geometry = new BufferGeometry();
-		geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( generator.capacity * 3 ), 3 ) );
-		super( geometry, new PointsMaterial( { size, color: 0xffff00, toneMapped: false } ) );
+		const geometry = new SphereGeometry( size, 16, 16 );
+		const normals = geometry.getAttribute( 'normal' );
+		const colors = new Float32Array( normals.count * 3 );
+
+		// A fixed soft gradient makes the spheres readable independently of scene lighting.
+
+		for ( let i = 0; i < normals.count; i ++ ) {
+
+			const shade = 0.35 + 0.65 * Math.max( 0, normals.getX( i ) * 0.4 + normals.getY( i ) * 0.8 + normals.getZ( i ) * 0.44 );
+			colors.fill( shade, i * 3, i * 3 + 3 );
+
+		}
+
+		geometry.setAttribute( 'color', new BufferAttribute( colors, 3 ) );
+		super( geometry, new MeshBasicMaterial( { vertexColors: true } ), generator.capacity );
 		this.generator = generator;
 		this.update();
 
 	}
 
-	/** Updates positions and draw range without reallocating geometry. */
+	/** Updates sphere positions and colors without reallocating geometry. */
 	update() {
 
-		const position = this.geometry.getAttribute( 'position' );
-		for ( let i = 0; i < this.generator.count; i ++ ) {
+		const matrix = new Matrix4();
+		const color = new Color();
+		this.count = this.generator.count;
 
-			const point = this.generator.positions[ i ];
-			position.setXYZ( i, point.x, point.y, point.z );
+		for ( let i = 0; i < this.count; i ++ ) {
+
+			matrix.makeTranslation( this.generator.positions[ i ] );
+			this.setMatrixAt( i, matrix );
+
+			const flux = this.generator.flux[ i ];
+			const peak = Math.max( flux.x, flux.y, flux.z );
+
+			// Preserve reflected light hue while keeping markers below white.
+
+			color.setRGB( flux.x, flux.y, flux.z ).multiplyScalar( peak > 0 ? 0.5 / peak : 0 );
+			this.setColorAt( i, color );
 
 		}
 
-		position.needsUpdate = true;
-		this.geometry.setDrawRange( 0, this.generator.count );
-		this.geometry.computeBoundingSphere();
+		this.instanceMatrix.needsUpdate = true;
+		if ( this.instanceColor !== null ) this.instanceColor.needsUpdate = true;
+		this.computeBoundingSphere();
 
 	}
 
 	/** Releases the helper's GPU resources. */
 	dispose() {
 
+		super.dispose();
 		this.geometry.dispose();
 		this.material.dispose();
 
