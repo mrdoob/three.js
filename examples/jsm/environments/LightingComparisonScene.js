@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { createWoodTableMaterial } from './WoodTableMaterial.js';
 
 /**
  * Shared geometry, materials and source lights for the VPL / light probe examples.
@@ -96,9 +97,11 @@ class LightingComparisonScene extends THREE.Scene {
 			}
 
 			// Table with golden sphere
+			const wood = createWoodTableMaterial();
+			this.ready = wood.ready;
 			const tableTop = new THREE.Mesh(
 				new THREE.BoxGeometry( 2.4, 0.12, 1.4 ),
-				new THREE.MeshStandardMaterial( { color: 0x886644 } )
+				wood.material
 			);
 			tableTop.position.set( - 4, 1.0, 0 );
 			tableTop.castShadow = true;

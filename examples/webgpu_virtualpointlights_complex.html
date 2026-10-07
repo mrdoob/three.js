@@ -61,6 +61,7 @@
 				camera.position.set( 0, 2.5, 16 );
 
 				const scene = new LightingComparisonScene( true );
+				await scene.ready;
 				scene.updateMatrixWorld( true );
 
 				const surfaces = [], sourceLights = [];

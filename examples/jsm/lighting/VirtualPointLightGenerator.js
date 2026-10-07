@@ -1,9 +1,10 @@
 import { Color, Matrix3, Raycaster, Vector3 } from 'three';
+import { VirtualPointLightTextureSampler } from './VirtualPointLightTextureSampler.js';
 
 /**
  * Generates a deterministic, single diffuse bounce from isotropic point lights.
- * Samples visible, static meshes using CPU raycasting. Texture maps, alpha tests,
- * instancing, skinning and specular transport are not evaluated.
+ * Samples visible, static meshes using CPU raycasting. Base-color maps and alpha cutouts use cached CPU texels.
+ * Instancing, skinning, mip selection and specular transport are not evaluated.
  *
  * @three_import import { VirtualPointLightGenerator } from 'three/addons/lighting/VirtualPointLightGenerator.js';
  */
@@ -18,6 +19,7 @@ class VirtualPointLightGenerator {
 
 		/** @type {number} The maximum sample count. */
 		this.capacity = capacity;
+		this.textureSampler = new VirtualPointLightTextureSampler();
 		/** @type {number} The number of successful hits from the last generation. */
 		this.count = 0;
 		/** @type {Array<Vector3>} World-space emitter positions. */
@@ -63,7 +65,8 @@ class VirtualPointLightGenerator {
 		} );
 
 		const raycaster = new Raycaster();
-		raycaster.firstHitOnly = true; // Accelerated raycasting uses this; native raycasting ignores it.
+		const hasCutouts = surfaces.some( surface => ( Array.isArray( surface.material ) ? surface.material : [ surface.material ] ).some( material => material.alphaTest > 0 ) );
+		raycaster.firstHitOnly = ! hasCutouts; // Accelerated raycasting uses this; native raycasting ignores it.
 		const origin = new Vector3();
 		const direction = new Vector3();
 		const normalMatrix = new Matrix3();
@@ -94,11 +97,38 @@ class VirtualPointLightGenerator {
 				const phi = random() * Math.PI * 2;
 				const r = Math.sqrt( 1 - z * z );
 				raycaster.set( origin, direction.set( r * Math.cos( phi ), z, r * Math.sin( phi ) ) );
-				const hit = raycaster.intersectObjects( surfaces, false )[ 0 ];
-				if ( hit === undefined ) continue;
+				const hits = raycaster.intersectObjects( surfaces, false );
+				let hit, material;
 
-				const material = Array.isArray( hit.object.material ) ? hit.object.material[ hit.face.materialIndex ] : hit.object.material;
+				for ( const candidate of hits ) {
+
+					const candidateMaterial = Array.isArray( candidate.object.material ) ? candidate.object.material[ candidate.face.materialIndex ] : candidate.object.material;
+					let alpha = candidateMaterial.opacity;
+					if ( candidateMaterial.alphaTest > 0 ) {
+
+						if ( candidateMaterial.map ) alpha *= this.textureSampler.sample( candidateMaterial.map, candidate ).w;
+						if ( candidateMaterial.alphaMap ) alpha *= this.textureSampler.sample( candidateMaterial.alphaMap, candidate ).y;
+						if ( alpha <= candidateMaterial.alphaTest ) continue;
+
+					}
+
+					hit = candidate;
+					material = candidateMaterial;
+					break;
+
+				}
+
+				if ( hit === undefined ) continue;
 				albedo.copy( material.color || new Color( 0xffffff ) ).multiply( light.color );
+				if ( material.map ) {
+
+					const texel = this.textureSampler.sample( material.map, hit );
+					albedo.r *= texel.x;
+					albedo.g *= texel.y;
+					albedo.b *= texel.z;
+
+				}
+
 				albedo.multiplyScalar( 1 - ( material.metalness || 0 ) );
 				const index = this.count ++;
 				this.positions[ index ].copy( hit.point );

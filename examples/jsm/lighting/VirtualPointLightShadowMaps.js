@@ -1,5 +1,5 @@
 import { Color, DoubleSide, HalfFloatType, MeshBasicNodeMaterial, NearestFilter, NoBlending, PerspectiveCamera, RedFormat, RenderTarget, Vector3 } from 'three/webgpu';
-import { Fn, If, dot, int, ivec2, max, normalWorld, positionWorld, textureLoad, uniform, vec2, vec3, vec4 } from 'three/tsl';
+import { Fn, If, dot, float, int, ivec2, max, normalWorld, positionWorld, texture, textureLoad, uniform, vec2, vec3, vec4 } from 'three/tsl';
 
 // Cached radial-distance cube faces packed into one atlas. Static geometry only:
 // call update() after regenerating VPLs or changing the visibility bias.
@@ -22,6 +22,7 @@ class VirtualPointLightShadowMaps {
 		this.material.blending = NoBlending;
 		this.material.toneMapped = false;
 		this.material.fragmentNode = vec4( positionWorld.sub( this.origin ).length().div( far ), 0, 0, 1 );
+		this.cutoutMaterials = new Map();
 		this.camera = new PerspectiveCamera( 90, 1, 0.001, far );
 		this.directions = [ new Vector3( 1, 0, 0 ), new Vector3( - 1, 0, 0 ), new Vector3( 0, 1, 0 ), new Vector3( 0, - 1, 0 ), new Vector3( 0, 0, 1 ), new Vector3( 0, 0, - 1 ) ];
 		this.up = [ new Vector3( 0, 1, 0 ), new Vector3( 0, 1, 0 ), new Vector3( 0, 0, 1 ), new Vector3( 0, 0, - 1 ), new Vector3( 0, 1, 0 ), new Vector3( 0, 1, 0 ) ];
@@ -126,6 +127,28 @@ class VirtualPointLightShadowMaps {
 
 	}
 
+	getCaptureMaterial( source ) {
+
+		if ( ! source.alphaTest ) return this.material;
+		const key = [ source.map, source.alphaMap, source.alphaTest, source.opacity ];
+		const cached = this.cutoutMaterials.get( source );
+		if ( cached && key.every( ( value, i ) => value === cached.key[ i ] ) ) return cached.material;
+		if ( cached ) cached.material.dispose();
+		const material = this.material.clone();
+		material.fragmentNode = Fn( () => {
+
+			let alpha = float( source.opacity );
+			if ( source.map ) alpha = alpha.mul( texture( source.map ).a );
+			if ( source.alphaMap ) alpha = alpha.mul( texture( source.alphaMap ).g );
+			alpha.lessThanEqual( source.alphaTest ).discard();
+			return this.material.fragmentNode;
+
+		} )();
+		this.cutoutMaterials.set( source, { key, material } );
+		return material;
+
+	}
+
 	update( renderer, scene, generator, bias, resolution = this.resolution.value ) {
 
 		if ( generator.count > this.capacity ) throw new RangeError( 'VPL count exceeds shadow-map capacity.' );
@@ -143,6 +166,12 @@ class VirtualPointLightShadowMaps {
 			override: scene.overrideMaterial, background: scene.background
 		};
 		const lookAt = new Vector3();
+		const surfaces = [];
+		scene.traverseVisible( object => {
+
+			if ( object.isMesh ) surfaces.push( { object, material: object.material } );
+
+		} );
 
 		try {
 
@@ -152,7 +181,13 @@ class VirtualPointLightShadowMaps {
 			renderer.shadowMap.enabled = false;
 			renderer.autoClear = false;
 			scene.background = null;
-			scene.overrideMaterial = this.material;
+			scene.overrideMaterial = null;
+			for ( const { object, material } of surfaces ) {
+
+				object.material = Array.isArray( material ) ? material.map( source => this.getCaptureMaterial( source ) ) : this.getCaptureMaterial( material );
+
+			}
+
 			this.target.scissorTest = false;
 			renderer.clear();
 			this.target.scissorTest = true;
@@ -176,6 +211,7 @@ class VirtualPointLightShadowMaps {
 
 		} finally {
 
+			for ( const { object, material } of surfaces ) object.material = material;
 			scene.overrideMaterial = saved.override;
 			scene.background = saved.background;
 			renderer.autoClear = saved.autoClear;
@@ -192,6 +228,8 @@ class VirtualPointLightShadowMaps {
 
 		this.target.dispose();
 		this.material.dispose();
+		for ( const { material } of this.cutoutMaterials.values() ) material.dispose();
+		this.cutoutMaterials.clear();
 
 	}
 
