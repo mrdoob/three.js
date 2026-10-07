@@ -1,5 +1,6 @@
 import { GLTFLoader } from '../../../../examples/jsm/loaders/GLTFLoader.js';
 import { GLTFGaussianSplatLoaderExtension } from '../../../../examples/jsm/loaders/GLTFGaussianSplatLoaderExtension.js';
+import { makeClipAdditive } from '../../../../src/animation/AnimationUtils.js';
 import { unpackSphericalHarmonicsBand } from '../utils/GaussianSplatTestUtils.js';
 
 const EPS = 1e-6;
@@ -139,6 +140,41 @@ export default QUnit.module( 'Addons', () => {
 	QUnit.module( 'Loaders', () => {
 
 		QUnit.module( 'GLTFLoader', () => {
+
+			QUnit.test( 'CUBICSPLINE animations can be made additive at an interpolated frame', async ( assert ) => {
+
+				const buffer = new Float32Array( [
+					0, 1,
+					0, 0, 0, 1, 2, 3, 0, 0, 0,
+					0, 0, 0, 3, 4, 5, 0, 0, 0
+				] );
+				const json = {
+					asset: { version: '2.0' },
+					scene: 0,
+					scenes: [ { nodes: [ 0 ] } ],
+					nodes: [ {} ],
+					buffers: [ { byteLength: buffer.byteLength, uri: 'data:application/octet-stream;base64,' + arrayBufferToBase64( buffer.buffer ) } ],
+					bufferViews: [ { buffer: 0, byteLength: 8 }, { buffer: 0, byteOffset: 8, byteLength: 72 } ],
+					accessors: [
+						{ bufferView: 0, componentType: FLOAT, count: 2, type: 'SCALAR', min: [ 0 ], max: [ 1 ] },
+						{ bufferView: 1, componentType: FLOAT, count: 6, type: 'VEC3' }
+					],
+					animations: [ {
+						samplers: [ { input: 0, output: 1, interpolation: 'CUBICSPLINE' } ],
+						channels: [ { sampler: 0, target: { node: 0, path: 'translation' } } ]
+					} ]
+				};
+				const gltf = await new GLTFLoader().parseAsync( JSON.stringify( json ), '' );
+				const clip = gltf.animations[ 0 ];
+
+				makeClipAdditive( clip, 15, clip, 30 );
+
+				assert.deepEqual( Array.from( clip.tracks[ 0 ].values ), [
+					0, 0, 0, - 1, - 1, - 1, 0, 0, 0,
+					0, 0, 0, 1, 1, 1, 0, 0, 0
+				], 'Subtracts the interpolated reference value and preserves tangents' );
+
+			} );
 
 			QUnit.test( 'loads KHR_gaussian_splatting primitives as GaussianSplat', async ( assert ) => {
 
