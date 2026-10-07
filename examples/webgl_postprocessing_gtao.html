@@ -27,7 +27,7 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../src/Three.js",
+					"three": "../build/three.module.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -124,7 +124,6 @@
 					for ( const pass of passes ) composer.addPass( pass );
 
 					gtaoPass.output = brdfAware ? GTAOPass.OUTPUT.Off : params.output;
-					gtaoPass.needsSwap = ! brdfAware;
 					scene.ambientOcclusionMap = brdfAware ? gtaoPass.pdRenderTarget.texture : null;
 
 				}
