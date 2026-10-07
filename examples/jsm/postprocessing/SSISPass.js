@@ -1,6 +1,5 @@
 import {
 	HalfFloatType,
-	Matrix4,
 	LinearFilter,
 	LinearMipmapLinearFilter,
 	NearestFilter,
@@ -10,7 +9,7 @@ import {
 	WebGLRenderTarget
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
-import { SSISTraceShader, SSISResolveShader, SSISTemporalShader } from '../shaders/SSISShader.js';
+import { SSISTraceShader, SSISResolveShader } from '../shaders/SSISShader.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
 /**
@@ -21,9 +20,9 @@ import { CopyShader } from '../shaders/CopyShader.js';
  * Each pixel traces rays through the depth buffer, importance-sampled from its GGX
  * specular lobe (or one mirror ray with `stochastic = false`). A hit returns the lit scene
  * color; a miss (or the screen border) fades to the scene's PMREM environment sampled at
- * the surface roughness. In stochastic mode the noisy result is accumulated over frames by
- * reprojecting the reflected hit point; otherwise it is blurred by the reflection cone footprint
- * over its mip chain. Materials apply their own BRDF to the result.
+ * the surface roughness. Stochastic mode publishes the current frame without temporal smoothing;
+ * otherwise the result is blurred by the reflection cone footprint over its mip chain.
+ * Materials apply their own BRDF to the result.
  *
  * Inputs come from a {@link GBufferPass} created with `{ material: true }`. Place this
  * pass after the pass that renders the lit scene, and assign {@link SSISPass#texture} to
@@ -76,17 +75,9 @@ class SSISPass extends Pass {
 		 * Depth tolerance behind a surface that still counts as a hit.
 		 *
 		 * @type {number}
-		 * @default 0.1
+		 * @default 0.01
 		 */
-		this.thickness = 0.1;
-
-		/**
-		 * Surfaces rougher than this skip the ray march and use the environment only.
-		 *
-		 * @type {number}
-		 * @default 1
-		 */
-		this.maxRoughness = 1;
+		this.thickness = 0.01;
 
 		/**
 		 * Width in UV units over which hits fade to the environment near the screen border.
@@ -102,9 +93,9 @@ class SSISPass extends Pass {
 		 * taken every `1 / quality` pixels along the ray. Lower is faster but can miss thin geometry.
 		 *
 		 * @type {number}
-		 * @default 0.5
+		 * @default 1
 		 */
-		this.quality = 0.5;
+		this.quality = 1;
 
 		this._stochastic = true;
 		this._resolutionScale = 1;
@@ -112,42 +103,13 @@ class SSISPass extends Pass {
 		this._height = height;
 
 		/**
-		 * Number of GGX-sampled rays per pixel in stochastic mode (1 to 16). More rays means
+		 * Number of GGX-sampled rays per pixel in stochastic mode (1 to 64). More rays means
 		 * less noise and proportionally higher cost.
-		 *
-		 * @type {number}
-		 * @default 4
-		 */
-		this.rayCount = 4;
-
-		/**
-		 * Maximum number of frames accumulated per pixel in stochastic mode (1 disables
-		 * accumulation). History is reprojected for camera motion only; moving objects ghost
-		 * until the clamp rejects the stale history.
 		 *
 		 * @type {number}
 		 * @default 16
 		 */
-		this.maxFrames = 16;
-
-		/**
-		 * Width of the history clamp around the current neighborhood, in standard deviations.
-		 * Lower rejects ghosting more aggressively but accumulates less.
-		 *
-		 * @type {number}
-		 * @default 2
-		 */
-		this.temporalClip = 2;
-
-		this._historyTargets = [ 0, 1 ].map( () => new WebGLRenderTarget( width, height, {
-			type: HalfFloatType,
-			minFilter: LinearFilter,
-			magFilter: LinearFilter,
-			depthBuffer: false
-		} ) );
-		this._historyIndex = 0;
-		this._historyValid = false;
-		this._prevViewProjection = new Matrix4();
+		this.rayCount = 16;
 
 		this._frame = 0;
 
@@ -181,13 +143,6 @@ class SSISPass extends Pass {
 			blending: NoBlending
 		} );
 
-		this._temporalMaterial = new ShaderMaterial( {
-			uniforms: UniformsUtils.clone( SSISTemporalShader.uniforms ),
-			vertexShader: SSISTemporalShader.vertexShader,
-			fragmentShader: SSISTemporalShader.fragmentShader,
-			blending: NoBlending
-		} );
-
 		this._copyMaterial = new ShaderMaterial( {
 			uniforms: UniformsUtils.clone( CopyShader.uniforms ),
 			vertexShader: CopyShader.vertexShader,
@@ -195,8 +150,6 @@ class SSISPass extends Pass {
 			blending: NoBlending
 		} );
 
-		this._temporalMaterial.uniforms.tDepth.value = gBufferPass.depthTexture;
-		this._temporalMaterial.uniforms.tNormal.value = gBufferPass.normalTexture;
 		this._traceMaterial.uniforms.tDepth.value = gBufferPass.depthTexture;
 		this._traceMaterial.uniforms.tNormal.value = gBufferPass.normalTexture;
 		this._traceMaterial.uniforms.tMaterial.value = gBufferPass.materialTexture;
@@ -229,7 +182,6 @@ class SSISPass extends Pass {
 		this._stochastic = value;
 		this._traceMaterial.defines.STOCHASTIC = value;
 		this._traceMaterial.needsUpdate = true;
-		this._historyValid = false;
 
 	}
 
@@ -307,10 +259,9 @@ class SSISPass extends Pass {
 		uniforms.cameraWorldMatrix.value.copy( camera.matrixWorld );
 		uniforms.maxDistance.value = this.maxDistance;
 		uniforms.thickness.value = this.thickness;
-		uniforms.maxRoughness.value = this.maxRoughness;
 		uniforms.screenEdgeFade.value = this.screenEdgeFade;
 		uniforms.quality.value = Math.min( Math.max( this.quality, 0.05 ), 1 );
-		uniforms.rayCount.value = Math.min( Math.max( Math.round( this.rayCount ), 1 ), 16 );
+		uniforms.rayCount.value = Math.min( Math.max( Math.round( this.rayCount ), 1 ), 64 );
 		uniforms.frame.value = this._frame ++ % 64;
 
 		const target = renderer.getRenderTarget();
@@ -321,39 +272,15 @@ class SSISPass extends Pass {
 
 		if ( this._stochastic ) {
 
-			// accumulate over time, then copy to the stable output target
-			const temporal = this._temporalMaterial.uniforms;
-			const read = this._historyTargets[ this._historyIndex ];
-			const write = this._historyTargets[ 1 - this._historyIndex ];
-
-			temporal.tCurrent.value = this._traceTarget.texture;
-			temporal.tHistory.value = read.texture;
-			temporal.cameraInverseProjectionMatrix.value.copy( camera.projectionMatrixInverse );
-			temporal.cameraWorldMatrix.value.copy( camera.matrixWorld );
-			temporal.prevViewProjectionMatrix.value.copy( this._prevViewProjection );
-			temporal.maxFrames.value = Math.max( this.maxFrames, 1 );
-			temporal.clipGamma.value = this.temporalClip;
-			temporal.historyValid.value = this._historyValid ? 1 : 0;
-
-			this._fsQuad.material = this._temporalMaterial;
-			renderer.setRenderTarget( write );
-			this._fsQuad.render( renderer );
-
-			this._copyMaterial.uniforms.tDiffuse.value = write.texture;
+			this._copyMaterial.uniforms.tDiffuse.value = this._traceTarget.texture;
 			this._fsQuad.material = this._copyMaterial;
-			renderer.setRenderTarget( this._resolveTarget );
-			this._fsQuad.render( renderer );
 
-			this._historyIndex = 1 - this._historyIndex;
-			this._historyValid = true;
-			this._prevViewProjection.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+		} else {
 
-			renderer.setRenderTarget( target );
-			return;
+			this._fsQuad.material = this._resolveMaterial;
 
 		}
 
-		this._fsQuad.material = this._resolveMaterial;
 		renderer.setRenderTarget( this._resolveTarget );
 		this._fsQuad.render( renderer );
 
@@ -376,9 +303,6 @@ class SSISPass extends Pass {
 		const traceHeight = Math.max( Math.round( height * this._resolutionScale ), 1 );
 
 		this._traceTarget.setSize( traceWidth, traceHeight );
-		for ( const history of this._historyTargets ) history.setSize( traceWidth, traceHeight );
-		this._historyValid = false;
-		this._temporalMaterial.uniforms.resolution.value.set( traceWidth, traceHeight );
 		this._resolveTarget.setSize( width, height );
 
 		const maxStep = Math.ceil( Math.sqrt( traceWidth * traceWidth + traceHeight * traceHeight ) );
@@ -402,8 +326,6 @@ class SSISPass extends Pass {
 	dispose() {
 
 		this._traceTarget.dispose();
-		for ( const history of this._historyTargets ) history.dispose();
-		this._temporalMaterial.dispose();
 		this._copyMaterial.dispose();
 		this._resolveTarget.dispose();
 		this._traceMaterial.dispose();

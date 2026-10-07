@@ -12,8 +12,8 @@
 	<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_postprocessing_ssis.jpg">
 	<link type="text/css" rel="stylesheet" href="main.css">
 	<style>
-		#info { color: #38434b; }
-		#info a { color: #456d6b; }
+		#info { color: #ffffff; text-shadow: 0 1px 4px #000000; }
+		#info a { color: #abe7e2; }
 	</style>
 
 </head>
@@ -51,9 +51,7 @@
 
 		const params = {
 			ssis: true,
-			autoRotate: true,
-			floorRoughness: 0.1,
-			floorMetalness: 0.15,
+			rotateHelmet: true,
 			view: 'Beauty'
 		};
 
@@ -68,69 +66,96 @@
 		document.body.appendChild( renderer.domElement );
 
 		const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 100 );
-		camera.position.set( 2.8, 2.4, 5.6 );
+		camera.position.set( 3, 1.8, 8.5 ).multiplyScalar( 0.75 );
 
 		const scene = new THREE.Scene();
-		scene.background = new THREE.Color( 0xe9edf2 );
-		scene.fog = new THREE.Fog( 0xe9edf2, 10, 35 );
-		scene.environmentIntensity = 2;
+		scene.environmentIntensity = 1;
 
 		const pmrem = new THREE.PMREMGenerator( renderer );
 		pmrem.compileEquirectangularShader();
-		new HDRLoader().load( 'textures/equirectangular/monochrome_studio_02_1k.hdr', texture => {
+		new HDRLoader().load( 'textures/equirectangular/san_giuseppe_bridge_2k.hdr', texture => {
 
+			texture.mapping = THREE.EquirectangularReflectionMapping;
+			scene.background = texture;
 			scene.environment = pmrem.fromEquirectangular( texture ).texture;
-			texture.dispose();
 			pmrem.dispose();
 
 		} );
 
-		const floor = new THREE.Mesh(
-			new THREE.PlaneGeometry( 200, 200 ),
-			new THREE.MeshStandardMaterial( { color: 0xffffff, roughness: params.floorRoughness, metalness: params.floorMetalness } )
-		);
-		floor.rotation.x = - Math.PI / 2;
-		scene.add( floor );
+		const geometries = [
+			new RoundedBoxGeometry( 0.6, 0.6, 0.6, 4, 0.08 ),
+			new THREE.SphereGeometry( 0.35, 64, 32 ),
+			new THREE.ConeGeometry( 0.3, 0.75, 64 ),
+			new THREE.TorusGeometry( 0.32, 0.1, 24, 64 )
+		];
+		const colors = [
+			0xe8dfce, 0xbba477, 0x365a59, 0xb8cad5,
+			0xc5816b, 0x708b85, 0xd8b47b, 0x8299b0,
+			0xc2b4cc, 0x404b55, 0xd4c6b3, 0x83b5b0
+		];
+		const goldenAngle = Math.PI * ( 3 - Math.sqrt( 5 ) );
+		const random = THREE.MathUtils.seededRandom;
+		random( 42 );
 
-		// A restrained palette complements the helmet and gives the floor distinct reflections.
-		const add = ( geometry, color, roughness, metalness, x, y, z ) => {
+		// Keep the original ring and scatter another twelve objects within its outer radius.
+		for ( let i = 0; i < 24; i ++ ) {
 
-			const mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial( { color, roughness, metalness } ) );
-			mesh.position.set( x, y, z );
+			const shape = i % geometries.length;
+			const finish = Math.floor( i / geometries.length );
+			const material = new THREE.MeshStandardMaterial( {
+				color: colors[ i % colors.length ],
+				roughness: finish / 5,
+				metalness: ( ( finish + shape ) % 6 ) / 5
+			} );
+			const mesh = new THREE.Mesh( geometries[ shape ], material );
+			if ( i < 12 ) {
+
+				mesh.position.setFromSphericalCoords( 2.1 + 0.15 * ( i % 3 ), Math.acos( 1 - 2 * ( i + 0.5 ) / 12 ), i * goldenAngle );
+				mesh.rotation.set( i * 0.73, i * 0.49, i * 0.31 );
+
+			} else {
+
+				do {
+
+					const radius = 1.55 + 0.85 * random();
+					mesh.position.setFromSphericalCoords( radius, Math.acos( 2 * random() - 1 ), 2 * Math.PI * random() );
+
+				} while ( scene.children.some( object => object.position.distanceToSquared( mesh.position ) < 0.9 * 0.9 ) );
+
+				mesh.rotation.set( 2 * Math.PI * random(), 2 * Math.PI * random(), 2 * Math.PI * random() );
+
+			}
+
+			mesh.scale.setScalar( 0.85 + 0.1 * ( i % 4 ) );
 			scene.add( mesh );
-			return mesh;
 
-		};
+		}
 
-		const box = add( new RoundedBoxGeometry( 0.7, 0.7, 0.7, 4, 0.08 ), 0xe8dfce, 0.25, 0.15, - 1.65, 0.35, 0.65 );
-		box.rotation.y = Math.PI / 6;
-		add( new THREE.SphereGeometry( 0.45, 64, 32 ), 0xbba477, 0.22, 0.8, 1.65, 0.45, 0.25 );
-		add( new THREE.ConeGeometry( 0.38, 1.1, 64 ), 0x365a59, 0.3, 0.45, - 2, 0.55, - 0.4 );
-
+		const helmet = new THREE.Group();
 		new GLTFLoader().load( 'models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf', gltf => {
 
-			const helmet = gltf.scene;
-			const bounds = new THREE.Box3().setFromObject( helmet );
+			const model = gltf.scene;
+			const bounds = new THREE.Box3().setFromObject( model );
 			const size = bounds.getSize( new THREE.Vector3() );
 			const center = bounds.getCenter( new THREE.Vector3() );
 			const scale = 2 / size.y;
-			helmet.scale.multiplyScalar( scale );
-			helmet.position.set( - center.x * scale, - bounds.min.y * scale, - center.z * scale );
+			model.scale.multiplyScalar( scale );
+			model.position.set( - center.x * scale, - center.y * scale, - center.z * scale );
+			helmet.add( model );
 			scene.add( helmet );
 
 		} );
 
 		const stats = new Stats();
 		document.body.appendChild( stats.dom );
+		const timer = new THREE.Timer();
+		timer.connect( document );
 
 		const controls = new OrbitControls( camera, renderer.domElement );
-		controls.target.set( 0, 0.85, 0 );
+		controls.target.set( 0, 0, 0 );
 		controls.enableDamping = true;
-		controls.autoRotate = params.autoRotate;
-		controls.autoRotateSpeed = 0.6;
-		controls.minDistance = 3;
-		controls.maxDistance = 10;
-		controls.maxPolarAngle = Math.PI / 2 - 0.05;
+		controls.minDistance = 4;
+		controls.maxDistance = 14;
 		controls.update();
 
 		const width = window.innerWidth * pixelRatio;
@@ -139,8 +164,6 @@
 		const composer = new EffectComposer( renderer );
 		const gBufferPass = new GBufferPass( scene, camera, width, height, { material: true } );
 		const ssisPass = new SSISPass( scene, camera, width, height, gBufferPass );
-		ssisPass.maxDistance = 6;
-		ssisPass.thickness = 0.1;
 
 		composer.addPass( gBufferPass );
 		composer.addPass( new RenderPass( scene, camera ) );
@@ -195,22 +218,16 @@
 			scene.ssisMap = v ? ssisPass.texture : null;
 
 		} );
-		gui.add( params, 'autoRotate' ).onChange( v => controls.autoRotate = v );
-		gui.add( params, 'floorRoughness', 0, 1 ).onChange( v => floor.material.roughness = v );
-		gui.add( params, 'floorMetalness', 0, 1 ).onChange( v => floor.material.metalness = v );
+		gui.add( params, 'rotateHelmet' );
 		const ssisFolder = gui.addFolder( 'SSIS settings' );
 		ssisFolder.close();
 		ssisFolder.add( ssisPass, 'stochastic' );
 		ssisFolder.add( ssisPass, 'quality', 0.1, 1 );
 		ssisFolder.add( ssisPass, 'resolutionScale', 0.25, 1 );
-		ssisFolder.add( ssisPass, 'rayCount', 1, 16, 1 );
-		ssisFolder.add( ssisPass, 'maxFrames', 1, 64, 1 );
-		ssisFolder.add( ssisPass, 'temporalClip', 0.5, 4 );
-		ssisFolder.add( ssisPass, 'maxDistance', 0, 10 );
+		ssisFolder.add( ssisPass, 'rayCount', 1, 64, 1 );
+		ssisFolder.add( ssisPass, 'maxDistance', 0, 30 );
 		ssisFolder.add( ssisPass, 'thickness', 0, 0.5 );
-		ssisFolder.add( ssisPass, 'maxRoughness', 0, 1 );
 		ssisFolder.add( ssisPass, 'screenEdgeFade', 0, 0.5 );
-		gui.add( scene, 'environmentIntensity', 0, 3 );
 
 		window.addEventListener( 'resize', () => {
 
@@ -224,6 +241,9 @@
 		function animate() {
 
 			stats.begin();
+
+			timer.update();
+			if ( params.rotateHelmet ) helmet.rotation.y += timer.getDelta() * 0.3;
 
 			controls.update();
 

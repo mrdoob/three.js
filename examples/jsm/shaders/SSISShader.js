@@ -44,7 +44,7 @@ const SSISTraceShader = {
 
 	defines: {
 		MAX_STEP: 0,
-		MAX_RAYS: 16,
+		MAX_RAYS: 64,
 		MAX_RAY_STEPS: 64,
 		STEP_EXPONENT: '2.0',
 		USE_ENV: false,
@@ -67,11 +67,10 @@ const SSISTraceShader = {
 		'cameraInverseProjectionMatrix': { value: new Matrix4() },
 		'cameraWorldMatrix': { value: new Matrix4() },
 		'maxDistance': { value: 10 },
-		'thickness': { value: 0.1 },
-		'maxRoughness': { value: 1 },
+		'thickness': { value: 0.01 },
 		'screenEdgeFade': { value: 0.2 },
-		'rayCount': { value: 4 },
-		'quality': { value: 0.5 },
+		'rayCount': { value: 16 },
+		'quality': { value: 1 },
 		'frame': { value: 0 }
 
 	},
@@ -99,7 +98,6 @@ const SSISTraceShader = {
 		uniform mat4 cameraWorldMatrix;
 		uniform float maxDistance;
 		uniform float thickness;
-		uniform float maxRoughness;
 		uniform float screenEdgeFade;
 		uniform int rayCount;
 		uniform float quality;
@@ -305,65 +303,56 @@ const SSISTraceShader = {
 			#endif
 
 			vec3 result = envColor;
-			float alphaOut = 0.0; // stochastic: mean hit ray length (for temporal reprojection); otherwise the blur lod
+			float alphaOut = 0.0; // non-stochastic: reflection cone blur lod
 
-			if ( roughness <= maxRoughness ) {
+			vec2 hitUv;
+			float rayLen;
+			float endZ;
 
-				vec2 hitUv;
-				float rayLen;
-				float endZ;
+			#ifdef STOCHASTIC
 
-				#ifdef STOCHASTIC
+				float alpha = max( roughness * roughness, 0.002 );
+				vec2 p = gl_FragCoord.xy + 5.588238 * frame;
+				vec2 n = vec2( ign( p ), ign( p.yx + vec2( 47.0, 13.0 ) ) );
+				vec3 sum = vec3( 0.0 );
 
-					float alpha = max( roughness * roughness, 0.002 );
-					vec2 p = gl_FragCoord.xy + 5.588238 * frame;
-					vec2 n = vec2( ign( p ), ign( p.yx + vec2( 47.0, 13.0 ) ) );
-					vec3 sum = vec3( 0.0 );
-					float lengthSum = 0.0;
-					float hits = 0.0;
+				for ( int k = 0; k < MAX_RAYS; k ++ ) {
 
-					for ( int k = 0; k < MAX_RAYS; k ++ ) {
+					if ( k >= rayCount ) break;
 
-						if ( k >= rayCount ) break;
+					// per-pixel noise rotated by an R2 sequence across the rays of the pixel
+					vec2 xi = fract( n + vec2( 0.7548776662, 0.5698402909 ) * float( k ) );
+					vec3 dir = sampleGGXReflection( viewIncidentDir, viewNormal, alpha, xi );
 
-						// per-pixel noise rotated by an R2 sequence across the rays of the pixel
-						vec2 xi = fract( n + vec2( 0.7548776662, 0.5698402909 ) * float( k ) );
-						vec3 dir = sampleGGXReflection( viewIncidentDir, viewNormal, alpha, xi );
+					float jitter = fract( n.x + 0.61803398875 * float( k ) );
 
-						float jitter = fract( n.x + 0.61803398875 * float( k ) );
+					if ( traceRay( viewPosition, viewNormal, dir, jitter, hitUv, rayLen, endZ ) ) {
 
-						if ( traceRay( viewPosition, viewNormal, dir, jitter, hitUv, rayLen, endZ ) ) {
+						sum += mix( envColor, texture2D( tColor, hitUv ).rgb, hitEdgeFactor( hitUv ) );
 
-							sum += mix( envColor, texture2D( tColor, hitUv ).rgb, hitEdgeFactor( hitUv ) );
-							lengthSum += rayLen;
-							hits += 1.0;
+					} else {
 
-						} else {
-
-							sum += envColor;
-
-						}
+						sum += envColor;
 
 					}
 
-					result = sum / float( max( rayCount, 1 ) );
-					alphaOut = hits > 0.0 ? lengthSum / hits : 1e4; // misses reproject as environment at infinity
+				}
 
-				#else
+				result = sum / float( max( rayCount, 1 ) );
 
-					if ( traceRay( viewPosition, viewNormal, mirrorDir, 0.5, hitUv, rayLen, endZ ) ) {
+			#else
 
-						result = mix( envColor, texture2D( tColor, hitUv ).rgb, hitEdgeFactor( hitUv ) );
+				if ( traceRay( viewPosition, viewNormal, mirrorDir, 0.5, hitUv, rayLen, endZ ) ) {
 
-					}
+					result = mix( envColor, texture2D( tColor, hitUv ).rgb, hitEdgeFactor( hitUv ) );
 
-					// footprint of the GGX cone (half angle ~ roughness^2) over the traversed segment, in pixels
-					float conePx = rayLen * roughness * roughness * cameraProjectionMatrix[ 1 ][ 1 ] * resolution.y / max( - endZ, 1e-4 );
-					alphaOut = log2( max( conePx, 1.0 ) );
+				}
 
-				#endif
+				// footprint of the GGX cone (half angle ~ roughness^2) over the traversed segment, in pixels
+				float conePx = rayLen * roughness * roughness * cameraProjectionMatrix[ 1 ][ 1 ] * resolution.y / max( - endZ, 1e-4 );
+				alphaOut = log2( max( conePx, 1.0 ) );
 
-			}
+			#endif
 
 			gl_FragColor = vec4( result, alphaOut );
 
@@ -426,111 +415,4 @@ const SSISResolveShader = {
 
 };
 
-/**
- * Accumulates the stochastic trace over time. Each pixel reprojects its virtual reflection
- * point (the surface position plus the reflected direction times the mean hit distance) into
- * the previous frame, fetches the history there and clamps it to the colors of the
- * current 3x3 neighborhood to limit ghosting before blending. The accumulated frame count
- * is kept in alpha.
- *
- * @constant
- * @type {ShaderMaterial~Shader}
- */
-const SSISTemporalShader = {
-
-	name: 'SSISTemporalShader',
-
-	uniforms: {
-
-		'tCurrent': { value: null },
-		'tHistory': { value: null },
-		'tDepth': { value: null },
-		'tNormal': { value: null },
-		'resolution': { value: new Vector2() },
-		'cameraInverseProjectionMatrix': { value: new Matrix4() },
-		'cameraWorldMatrix': { value: new Matrix4() },
-		'prevViewProjectionMatrix': { value: new Matrix4() },
-		'maxFrames': { value: 16 },
-		'clipGamma': { value: 2 },
-		'historyValid': { value: 0 }
-
-	},
-
-	vertexShader,
-
-	fragmentShader: /* glsl */`
-		varying vec2 vUv;
-		uniform sampler2D tCurrent;
-		uniform sampler2D tHistory;
-		uniform sampler2D tDepth;
-		uniform sampler2D tNormal;
-		uniform vec2 resolution;
-		uniform mat4 cameraInverseProjectionMatrix;
-		uniform mat4 cameraWorldMatrix;
-		uniform mat4 prevViewProjectionMatrix;
-		uniform float maxFrames;
-		uniform float clipGamma;
-		uniform float historyValid;
-
-		vec3 getViewPosition( const in vec2 uv, const in float depth ) {
-			vec4 clip = vec4( vec3( uv, depth ) * 2.0 - 1.0, 1.0 );
-			vec4 view = cameraInverseProjectionMatrix * clip;
-			return view.xyz / view.w;
-		}
-
-		void main() {
-
-			vec4 current = texture2D( tCurrent, vUv );
-			float depth = texture2D( tDepth, vUv ).x;
-
-			if ( depth >= 1.0 ) {
-
-				gl_FragColor = vec4( current.rgb, 1.0 );
-				return;
-
-			}
-
-			// statistics of the current neighborhood
-			vec2 texel = 1.0 / resolution;
-			vec3 m1 = vec3( 0.0 );
-			vec3 m2 = vec3( 0.0 );
-
-			for ( int y = - 1; y <= 1; y ++ ) {
-
-				for ( int x = - 1; x <= 1; x ++ ) {
-
-					vec3 c = texture2D( tCurrent, vUv + vec2( float( x ), float( y ) ) * texel ).rgb;
-					m1 += c;
-					m2 += c * c;
-
-				}
-
-			}
-
-			vec3 mean = m1 / 9.0;
-			vec3 sigma = sqrt( max( m2 / 9.0 - mean * mean, 0.0 ) );
-
-			// reproject the virtual reflection point, so the reflected image follows the camera motion
-			vec3 viewPosition = getViewPosition( vUv, depth );
-			vec3 viewNormal = normalize( texture2D( tNormal, vUv ).xyz * 2.0 - 1.0 );
-			vec3 reflectDir = reflect( normalize( viewPosition ), viewNormal );
-			vec3 worldPosition = ( cameraWorldMatrix * vec4( viewPosition, 1.0 ) ).xyz;
-			vec3 worldDir = ( cameraWorldMatrix * vec4( reflectDir, 0.0 ) ).xyz;
-			vec4 prevClip = prevViewProjectionMatrix * vec4( worldPosition + worldDir * current.a, 1.0 );
-			vec2 prevUv = prevClip.xy / prevClip.w * 0.5 + 0.5;
-
-			bool valid = historyValid > 0.5 && prevClip.w > 0.0 && all( greaterThanEqual( prevUv, vec2( 0.0 ) ) ) && all( lessThanEqual( prevUv, vec2( 1.0 ) ) );
-
-			vec4 history = texture2D( tHistory, prevUv );
-			vec3 clamped = clamp( history.rgb, mean - sigma * clipGamma, mean + sigma * clipGamma );
-
-			float count = valid ? min( history.a + 1.0, maxFrames ) : 1.0;
-
-			gl_FragColor = vec4( mix( clamped, current.rgb, 1.0 / count ), count );
-
-		}
-	`
-
-};
-
-export { SSISTraceShader, SSISResolveShader, SSISTemporalShader };
+export { SSISTraceShader, SSISResolveShader };
