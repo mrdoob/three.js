@@ -644,7 +644,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.alphaToCoverage ? '#define ALPHA_TO_COVERAGE' : '',
 			parameters.map ? '#define USE_MAP' : '',
 			parameters.matcap ? '#define USE_MATCAP' : '',
-			parameters.ssaoMap ? '#define USE_SSAO_MAP' : '',
+			parameters.ambientOcclusionMap ? '#define USE_AMBIENT_OCCLUSION_MAP' : '',
 			parameters.envMap ? '#define USE_ENVMAP' : '',
 			parameters.envMap ? '#define ' + envMapTypeDefine : '',
 			parameters.envMap ? '#define ' + envMapModeDefine : '',

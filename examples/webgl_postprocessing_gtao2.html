@@ -17,7 +17,7 @@
 <body>
 	<div id="info">
 		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - screen space AO as a lighting input<br />
-		GTAOPass runs before the scene and fills <code>scene.ssaoMap</code>; materials apply it to indirect light only.
+		GTAOPass runs before the scene and fills <code>scene.ambientOcclusionMap</code>; materials apply it to indirect light only.
 	</div>
 
 	<script type="importmap">
@@ -122,7 +122,7 @@
 
 		function update() {
 
-			scene.ssaoMap = ! params.ao ? null : ( params.denoise ? gtaoPass.pdRenderTarget.texture : gtaoPass.gtaoRenderTarget.texture );
+			scene.ambientOcclusionMap = ! params.ao ? null : ( params.denoise ? gtaoPass.pdRenderTarget.texture : gtaoPass.gtaoRenderTarget.texture );
 			gtaoPass.updateGtaoMaterial( { radius: params.radius, scale: params.scale, thickness: params.thickness } );
 
 		}

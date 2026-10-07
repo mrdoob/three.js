@@ -50,20 +50,20 @@ class Scene extends Object3D {
 		this.environment = null;
 
 		/**
-		 * A screen-space ambient occlusion map (for example the output of a GTAO pass),
-		 * where the red channel is the visibility (1 = unoccluded). It is applied inside the
-		 * material lighting like {@link MeshStandardMaterial#aoMap}: it scales indirect diffuse
+		 * An ambient occlusion map (for example the output of a GTAO pass), where the red
+		 * channel is the visibility (1 = unoccluded). It is applied inside the material
+		 * lighting like {@link MeshStandardMaterial#aoMap}: it scales indirect diffuse
 		 * (and, for standard materials, indirect specular through specular occlusion) but never
 		 * direct light. If a material also has an `aoMap`, the stronger occlusion of the two wins.
 		 * Applies to standard, Lambert, Phong and toon materials.
 		 *
-		 * The texture is sampled at `gl_FragCoord / textureSize` so it must match the
-		 * dimensions of the render target being drawn to. It is not cloned or serialized.
+		 * The texture must match the dimensions of the render target being drawn to.
+		 * It is not cloned or serialized.
 		 *
 		 * @type {?Texture}
 		 * @default null
 		 */
-		this.ssaoMap = null;
+		this.ambientOcclusionMap = null;
 
 		/**
 		 * A fog instance defining the type of fog that affects everything
@@ -142,7 +142,7 @@ class Scene extends Object3D {
 
 		this.background = source.background !== null ? source.background.clone() : null;
 		this.environment = source.environment !== null ? source.environment.clone() : null;
-		this.ssaoMap = source.ssaoMap;
+		this.ambientOcclusionMap = source.ambientOcclusionMap;
 		this.fog = source.fog !== null ? source.fog.clone() : null;
 
 		this.backgroundBlurriness = source.backgroundBlurriness;

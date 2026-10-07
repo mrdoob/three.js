@@ -6,9 +6,9 @@ export default /* glsl */`
 
 #endif
 
-#ifdef USE_SSAO_MAP
+#ifdef USE_AMBIENT_OCCLUSION_MAP
 
-	uniform sampler2D ssaoMap;
+	uniform sampler2D ambientOcclusionMap;
 
 #endif
 `;
