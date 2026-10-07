@@ -1,4 +1,4 @@
-import { getDataFromObject, hashArray, hashString } from '../../nodes/core/NodeUtils.js';
+import { hashArray, hashString } from '../../nodes/core/NodeUtils.js';
 import { isSharedInstancing } from '../../nodes/accessors/Instance.js';
 
 let _id = 0;
@@ -873,8 +873,7 @@ class RenderObject {
 
 		if ( object.isInstancedMesh && isSharedInstancing( object, renderer ) ) {
 
-			// Objects with velocity also read their previous instance matrices.
-			cacheKey += getDataFromObject( object ).useVelocity === true ? 'sharedInstancing:velocity,' : 'sharedInstancing,';
+			cacheKey += 'sharedInstancing,';
 
 		} else if ( object.isInstancedMesh || object.count > 1 ) {
 
