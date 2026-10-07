@@ -38,19 +38,20 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { lights } from 'three/tsl';
+			import { Fn, If, float, lights, uniform } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { LightingComparisonScene } from 'three/addons/environments/LightingComparisonScene.js';
 			import { VirtualPointLightGenerator } from 'three/addons/lighting/VirtualPointLightGenerator.js';
+			import { VirtualPointLightShadowMaps } from 'three/addons/lighting/VirtualPointLightShadowMaps.js';
 			import { VirtualPointLightsNode } from 'three/addons/tsl/lighting/VirtualPointLightsNode.js';
 			import { VirtualPointLightHelper } from 'three/addons/helpers/VirtualPointLightHelper.js';
 			import { acceleratedRaycast } from 'three-mesh-bvh';
 			import { BVHComputeData, rayStruct, rayIntersectionResultStruct, wgslTagFn } from 'three-mesh-bvh/webgpu';
 
 			const MAX_VPLS = 1024;
-			const params = { mode: 'combined', count: 256, shadows: false, showVPLs: false, seed: 1, minDistance: Math.sqrt( 0.2 ) };
+			const params = { mode: 'combined', count: 256, shadows: true, visibility: 'shadow maps', shadowResolution: 64, showVPLs: false, seed: 1, minDistance: 1 };
 
 			init();
 
@@ -99,8 +100,23 @@
 				`;
 
 				const generator = new VirtualPointLightGenerator( MAX_VPLS );
-				const vpl = new VirtualPointLightsNode( generator, ( start, end ) => visibility( { start, end } ) );
-				// Keep expensive GPU BVH visibility opt-in while experimenting with the gather.
+				const shadowMaps = new VirtualPointLightShadowMaps( MAX_VPLS );
+				const useShadowMaps = uniform( true );
+				const vpl = new VirtualPointLightsNode( generator, ( start, end, index ) => Fn( () => {
+
+					const visible = float( 1 ).toVar();
+					If( useShadowMaps, () => {
+
+						visible.assign( shadowMaps.visibility( start, end, index ) );
+
+					} ).Else( () => {
+
+						visible.assign( visibility( { start, end } ) );
+
+					} );
+					return visible;
+
+				} )() );
 				vpl.shadows.value = params.shadows;
 				const lighting = lights( [ ...sourceLights, vpl ] );
 				const materials = new Map();
@@ -131,10 +147,35 @@
 					generator.generate( scene, sourceLights, params );
 					vpl.update();
 					helper.update();
+					mapsDirty = true;
 
 				}
 
+				let mapsDirty = true;
 				const intensities = sourceLights.map( light => light.intensity );
+
+				function updateVisibility() {
+
+					vpl.shadows.value = params.shadows;
+					useShadowMaps.value = params.visibility === 'shadow maps';
+					if ( params.shadows && useShadowMaps.value && mapsDirty ) {
+
+						const visible = helper.visible;
+						helper.visible = false;
+						try {
+
+							shadowMaps.update( renderer, scene, generator, vpl.bias.value, params.shadowResolution );
+							mapsDirty = false;
+
+						} finally {
+
+							helper.visible = visible;
+
+						}
+
+					}
+
+				}
 
 				function updateMode() {
 
@@ -157,6 +198,7 @@
 					} );
 					generate();
 					updateMode();
+					updateVisibility();
 
 				}
 
@@ -178,11 +220,14 @@
 				gui.add( params, 'mode', [ 'direct only', 'indirect only', 'combined' ] ).name( 'Lighting' ).onChange( updateMode );
 				gui.add( params, 'count', sourceLights.length, MAX_VPLS, 1 ).name( 'Ray Budget' ).info( 'Total rays shared across the source lights. Escaped rays do not become VPLs.' ).onChange( regenerate ).debounce( 250 );
 				gui.add( params, 'seed', 1, 100, 1 ).name( 'Seed' ).onChange( regenerate ).debounce( 250 );
-				gui.add( params, 'shadows' ).name( 'VPL Shadows' ).info( 'Triangle visibility via three-mesh-bvh. Direct-light shadows remain enabled.' ).onChange( value => {
+				gui.add( params, 'shadows' ).name( 'VPL Shadows' ).onChange( updateVisibility );
+				gui.add( params, 'visibility', [ 'shadow maps', 'BVH reference' ] ).name( 'Visibility' ).info( 'Cached GPU-rasterized cube faces, or triangle BVH reference. Direct shadows remain enabled.' ).onChange( updateVisibility );
+				gui.add( params, 'shadowResolution', [ 32, 64 ] ).name( 'Shadow Resolution' ).info( 'Pixels per cube face. Maps rebuild when the VPL set or resolution changes.' ).onChange( () => {
 
-		vpl.shadows.value = value;
+					mapsDirty = true;
+					updateVisibility();
 
-	} );
+				} );
 				gui.add( params, 'minDistance', 0.01, 1, 0.01 ).name( 'Distance Clamp' ).info( 'Reduces near-field singularities at the expense of indirect-light energy.' ).onChange( value => {
 
 		vpl.minDistance.value = value;
@@ -201,6 +246,7 @@
 					window.vplBenchmark = createBenchmark( renderer, scene, camera, settings => {
 
 						Object.assign( params, settings );
+						vpl.minDistance.value = params.minDistance;
 						vpl.shadows.value = params.shadows;
 						regenerate();
 						return generator.count;

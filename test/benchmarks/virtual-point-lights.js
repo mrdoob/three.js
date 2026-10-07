@@ -6,8 +6,8 @@ import { PNG } from 'pngjs';
 import { createServer } from '../../utils/server.js';
 
 // Run from the repository root: node test/benchmarks/virtual-point-lights.js
-// Arguments: output directory, width (800), height (600); append --bvh to include GPU BVH visibility.
-const args = process.argv.slice( 2 ).filter( argument => argument !== '--bvh' );
+// Arguments: output directory, width (800), height (600); append --bvh and/or --shadow-maps.
+const args = process.argv.slice( 2 ).filter( argument => argument !== '--bvh' && argument !== '--shadow-maps' );
 const output = args[ 0 ];
 const width = Number( args[ 1 ] || 800 );
 const height = Number( args[ 2 ] || 600 );
@@ -21,8 +21,9 @@ const modes = [
 	{ name: 'visibility off', mode: 'combined', shadows: false },
 	{ name: 'direct only', mode: 'direct only', shadows: true }
 ];
-if ( includeBVH ) modes.unshift( { name: 'gather', mode: 'combined', shadows: true } );
-const referenceName = includeBVH ? 'BVH-visible' : 'unoccluded';
+if ( process.argv.includes( '--shadow-maps' ) ) modes.unshift( { name: 'shadow maps', mode: 'combined', shadows: true, visibility: 'shadow maps' } );
+if ( includeBVH ) modes.unshift( { name: 'gather', mode: 'combined', shadows: true, visibility: 'BVH reference' } );
+const referenceName = includeBVH ? 'BVH-visible' : process.argv.includes( '--shadow-maps' ) ? 'shadow-map-visible' : 'unoccluded';
 const results = [];
 const server = createServer();
 let browser;
@@ -77,7 +78,7 @@ try {
 					} );
 					await page.goto( `http://localhost:${ server.address().port }/examples/${ scene }.html?benchmark` );
 					await page.waitForFunction( () => window.vplBenchmark !== undefined, { timeout: 120000 } );
-					const result = await page.evaluate( ( settings, warmup, duration ) => window.vplBenchmark.run( settings, warmup, duration ), { count, mode: mode.mode, shadows: mode.shadows, seed: 1 }, warmup, duration );
+					const result = await page.evaluate( ( settings, warmup, duration ) => window.vplBenchmark.run( settings, warmup, duration ), { count, mode: mode.mode, shadows: mode.shadows, visibility: mode.visibility || 'BVH reference', seed: 1 }, warmup, duration );
 					console.log( `Completed measurement: ${ result.frames } frames in ${ result.elapsed.toFixed( 1 ) } ms` );
 					assert.deepEqual( errors, [], 'The example must render without errors' );
 					assert.ok( result.frames > 0 && result.elapsed >= duration );
@@ -87,6 +88,7 @@ try {
 
 						// Read the completed output target outside the measurement interval.
 						const pixels = await page.evaluate( () => window.vplBenchmark.capture() );
+						assert.equal( pixels.length, width * height * 4, 'Readback must be tightly packed RGBA8; rebuild stale build files if this fails' );
 						const image = new PNG( { width, height } );
 						image.data = Buffer.from( pixels );
 						assert.ok( pixels.some( ( value, i ) => i % 4 !== 3 && value > 0 ), 'Output must contain rendered geometry' );
@@ -127,7 +129,8 @@ try {
 
 				const samples = results.filter( result => result.scene === scene && result.budget === count && result.mode === mode.name );
 				const median = samples.map( result => result.msPerFrame ).sort( ( a, b ) => a - b )[ 1 ];
-				rows.push( { scene, budget: count, VPLs: samples[ 0 ].count, mode: mode.name, fps: ( 1000 / median ).toFixed( 1 ), 'ms/frame': median.toFixed( 3 ), 'image RMSE': samples[ 0 ].imageRMSE.toFixed( 4 ) } );
+				const rebuildMedian = samples.map( result => result.rebuildMs ).sort( ( a, b ) => a - b )[ 1 ];
+				rows.push( { scene, budget: count, VPLs: samples[ 0 ].count, mode: mode.name, fps: ( 1000 / median ).toFixed( 1 ), 'ms/frame': median.toFixed( 3 ), 'rebuild ms': rebuildMedian.toFixed( 1 ), 'image RMSE': samples[ 0 ].imageRMSE.toFixed( 4 ) } );
 
 			}
 

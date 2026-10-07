@@ -51,11 +51,14 @@ export function createBenchmark( renderer, scene, camera, configure ) {
 		async run( settings, warmup, duration ) {
 
 			await queue.onSubmittedWorkDone();
+			const rebuildStart = performance.now();
 			const count = configure( settings );
+			await queue.onSubmittedWorkDone();
+			const rebuildMs = performance.now() - rebuildStart;
 			await renderer.compileAsync( scene, camera );
 			await measure( warmup );
 			const result = await measure( duration );
-			return { ...result, count };
+			return { ...result, count, rebuildMs };
 
 		}
 

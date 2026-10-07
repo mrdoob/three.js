@@ -20,7 +20,7 @@ class VirtualPointLightsNode extends IrradianceNode {
 
 	/**
 	 * @param {VirtualPointLightGenerator} generator - The CPU sample data.
-	 * @param {?Function} [visibility=null] - Segment visibility callback accepting two vec3 nodes.
+	 * @param {?Function} [visibility=null] - Segment visibility callback accepting two vec3 nodes and the VPL index.
 	 */
 	constructor( generator, visibility = null ) {
 
@@ -32,7 +32,7 @@ class VirtualPointLightsNode extends IrradianceNode {
 		/** @type {UniformNode<bool>} Whether to evaluate the visibility callback. */
 		this.shadows = uniform( true );
 		/** @type {UniformNode<float>} Minimum attenuation distance in world units. */
-		this.minDistance = uniform( Math.sqrt( 0.2 ) );
+		this.minDistance = uniform( 1 );
 		/** @type {UniformNode<float>} Surface-normal offset for both segment endpoints. */
 		this.bias = uniform( 0.01 );
 		this.count = uniform( generator.count, 'int' );
@@ -59,7 +59,7 @@ class VirtualPointLightsNode extends IrradianceNode {
 
 					If( cosine.greaterThan( 0 ), () => {
 
-						const visible = getVisibility( visibility, this.shadows, x.add( n.mul( this.bias ) ), y.add( ny.mul( this.bias ) ) );
+						const visible = getVisibility( visibility, this.shadows, x.add( n.mul( this.bias ) ), y.add( ny.mul( this.bias ) ), i );
 						const attenuation = cosine.div( max( distanceSquared, this.minDistance.mul( this.minDistance ) ) );
 						sum.addAssign( flux.element( i ).mul( attenuation.mul( visible ).div( Math.PI ) ) );
 
@@ -84,14 +84,14 @@ class VirtualPointLightsNode extends IrradianceNode {
 
 }
 
-function getVisibility( visibility, shadows, start, end ) {
+function getVisibility( visibility, shadows, start, end, index ) {
 
 	const value = float( 1 ).toVar();
 	if ( visibility !== null ) {
 
 		If( shadows, () => {
 
-			value.assign( visibility( start, end ) );
+			value.assign( visibility( start, end, index ) );
 
 		} );
 
