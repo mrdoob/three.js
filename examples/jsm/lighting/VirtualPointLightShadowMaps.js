@@ -8,10 +8,12 @@ class VirtualPointLightShadowMaps {
 	constructor( capacity, resolution = 32, far = 40 ) {
 
 		this.resolution = uniform( resolution, 'int' );
+		this.capacity = capacity;
 		this.columns = Math.ceil( Math.sqrt( capacity * 6 ) );
-		this.rows = Math.ceil( capacity * 6 / this.columns );
+		this.rows = 1;
 		this.far = far;
-		this.target = new RenderTarget( this.columns * resolution, this.rows * resolution, {
+		// Allocate the atlas on the first capture, once the active count is known.
+		this.target = new RenderTarget( 1, 1, {
 			type: HalfFloatType, minFilter: NearestFilter, magFilter: NearestFilter, generateMipmaps: false
 		} );
 		this.origin = uniform( new Vector3() );
@@ -126,8 +128,13 @@ class VirtualPointLightShadowMaps {
 
 	update( renderer, scene, generator, bias, resolution = this.resolution.value ) {
 
+		if ( generator.count > this.capacity ) throw new RangeError( 'VPL count exceeds shadow-map capacity.' );
+		const tiles = Math.max( 1, generator.count * 6 );
+		// Keep the width fixed so shader tile division remains a constant operation.
+		const columns = this.columns;
+		this.rows = Math.ceil( tiles / columns );
 		this.resolution.value = resolution;
-		this.target.setSize( this.columns * resolution, this.rows * resolution );
+		this.target.setSize( columns * resolution, this.rows * resolution );
 		this.target.viewport.set( 0, 0, this.target.width, this.target.height );
 		const saved = {
 			target: renderer.getRenderTarget(), output: renderer.getOutputRenderTarget(),
@@ -157,7 +164,7 @@ class VirtualPointLightShadowMaps {
 				for ( let face = 0; face < 6; face ++ ) {
 
 					const tile = i * 6 + face;
-					this.target.viewport.set( tile % this.columns * resolution, Math.floor( tile / this.columns ) * resolution, resolution, resolution );
+					this.target.viewport.set( tile % columns * resolution, Math.floor( tile / columns ) * resolution, resolution, resolution );
 					this.target.scissor.copy( this.target.viewport );
 					this.camera.up.copy( this.up[ face ] );
 					this.camera.lookAt( lookAt.copy( this.camera.position ).add( this.directions[ face ] ) );
