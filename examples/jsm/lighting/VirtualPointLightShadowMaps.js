@@ -1,4 +1,4 @@
-import { Color, DoubleSide, HalfFloatType, MeshBasicNodeMaterial, NearestFilter, NoBlending, PerspectiveCamera, RenderTarget, Vector3 } from 'three/webgpu';
+import { Color, DoubleSide, HalfFloatType, MeshBasicNodeMaterial, NearestFilter, NoBlending, PerspectiveCamera, RedFormat, RenderTarget, Vector3 } from 'three/webgpu';
 import { Fn, If, dot, int, ivec2, max, normalWorld, positionWorld, textureLoad, uniform, vec2, vec3, vec4 } from 'three/tsl';
 
 // Cached radial-distance cube faces packed into one atlas. Static geometry only:
@@ -14,7 +14,7 @@ class VirtualPointLightShadowMaps {
 		this.far = far;
 		// Allocate the atlas on the first capture, once the active count is known.
 		this.target = new RenderTarget( 1, 1, {
-			type: HalfFloatType, minFilter: NearestFilter, magFilter: NearestFilter, generateMipmaps: false
+			format: RedFormat, type: HalfFloatType, minFilter: NearestFilter, magFilter: NearestFilter, generateMipmaps: false
 		} );
 		this.origin = uniform( new Vector3() );
 		this.material = new MeshBasicNodeMaterial();
