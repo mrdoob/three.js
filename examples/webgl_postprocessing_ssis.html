@@ -195,8 +195,7 @@ import { CopyShader } from 'three/addons/shaders/CopyShader.js';
 
 		} );
 		gui.add( params, 'rotateHelmet' );
-		const ssisFolder = gui.addFolder( 'SSIS settings' );
-		ssisFolder.close();
+		const ssisFolder = gui.addFolder( 'SSR' );
 		ssisFolder.add( ssisPass, 'quality', 0.1, 1 );
 		ssisFolder.add( ssisPass, 'downSample', 1, 4, 1 );
 		ssisFolder.add( ssisPass, 'rayCount', 1, 64, 1 );
