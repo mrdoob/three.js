@@ -45,6 +45,7 @@ import {
 	mx_fractal_noise_vec4,
 	mx_noise_float,
 	mx_noise_vec3,
+	mx_noise_vec4,
 	mx_cell_noise_float,
 	mx_cell_noise_vec3,
 	mx_smoothstep,
@@ -524,19 +525,12 @@ const usesVec2Noise = ( nodeX ) => nodeX && nodeX.type === 'vector2';
 const usesVec3Noise = ( nodeX ) => nodeX && ( nodeX.type === 'vector3' || nodeX.type === 'color3' );
 const usesVec4Noise = ( nodeX ) => nodeX && ( nodeX.type === 'vector4' || nodeX.type === 'color4' );
 
-// Channels beyond the vec3 noise sample the scalar noise at an offset, as in MaterialX's mx_noise.glsl.
-const noiseOffset = ( nodeX ) => nodeX.element === 'noise3d' ? vec3( 19, 73, 29 ) : vec2( 19, 73 );
+// Offset of the fourth channel of fractal2d vector4, as in MaterialX's mx_noise.glsl.
 const fractalOffset2d = () => vec2( 19, 193 );
 
 const mx_noise_materialx = ( texcoord, amplitude, pivot, nodeX ) => {
 
-	if ( usesVec4Noise( nodeX ) ) {
-
-		const noise = vec4( mx_noise_vec3( texcoord ), mx_noise_float( add( texcoord, noiseOffset( nodeX ) ) ) );
-		return add( mul( noise, vec4( amplitude ) ), pivot );
-
-	}
-
+	if ( usesVec4Noise( nodeX ) ) return mx_noise_vec4( texcoord, vec4( amplitude ), pivot );
 	if ( usesVec3Noise( nodeX ) ) return mx_noise_vec3( texcoord, vec3( amplitude ), pivot );
 
 	if ( usesVec2Noise( nodeX ) ) {

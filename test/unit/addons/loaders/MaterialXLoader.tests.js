@@ -261,13 +261,10 @@ export default QUnit.module( 'Addons', () => {
 
 				// MaterialX builds these variants from vec3 noise (plus an offset scalar for a fourth channel);
 				// they used to repeat the scalar noise in every channel.
-				for ( const type of [ 'vector2', 'vector4', 'color4' ] ) {
-
-					assert.true( usesFunction( 'noise2d', type, 'vec3' ), `noise2d ${ type } samples vec3 noise.` );
-
-				}
-
-				assert.true( usesFunction( 'noise3d', 'vector4', 'vec3' ), 'noise3d vector4 samples vec3 noise.' );
+				assert.true( usesFunction( 'noise2d', 'vector2', 'vec3' ), 'noise2d vector2 samples vec3 noise.' );
+				assert.true( usesFunction( 'noise2d', 'vector4', 'vec4' ), 'noise2d vector4 samples vec4 noise.' );
+				assert.true( usesFunction( 'noise2d', 'color4', 'vec4' ), 'noise2d color4 samples vec4 noise.' );
+				assert.true( usesFunction( 'noise3d', 'vector4', 'vec4' ), 'noise3d vector4 samples vec4 noise.' );
 				assert.true( usesFunction( 'fractal3d', 'vector2', 'vec2' ), 'fractal3d vector2 uses vec2 fractal noise.' );
 				assert.true( usesFunction( 'fractal3d', 'vector4', 'vec4' ), 'fractal3d vector4 uses vec4 fractal noise.' );
 				assert.false( usesFunction( 'noise2d', 'float', 'vec3' ), 'Scalar noise stays scalar.' );

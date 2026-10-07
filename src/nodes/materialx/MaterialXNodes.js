@@ -13,9 +13,10 @@ import { mx_hsvtorgb, mx_rgbtohsv } from './MaterialXColor.js';
 import { mx_srgb_texture_to_lin_rec709 } from './MaterialXColorTransform.js';
 
 import {
-	float, vec2, vec3, vec4, int, add, sub, mul, div, atan, mix, pow, smoothstep,
+	Fn, float, vec2, vec3, vec4, int, add, sub, mul, div, atan, mix, pow, smoothstep,
 	floor, abs, max, clamp, step, cross, dot, normalize
 } from '../tsl/TSLBase.js';
+import { overloadingFn } from '../utils/FunctionOverloadingNode.js';
 import { uv } from '../accessors/UV.js';
 import { frameId, time } from '../utils/Timer.js';
 
@@ -66,15 +67,11 @@ export const mx_contrast = ( input, amount = 1, pivot = .5 ) => float( input ).s
 export const mx_noise_float = ( texcoord = uv(), amplitude = 1, pivot = 0 ) => mx_perlin_noise_float( texcoord.convert( 'vec2|vec3' ) ).mul( amplitude ).add( pivot );
 //export const mx_noise_vec2 = ( texcoord = uv(), amplitude = 1, pivot = 0 ) => mx_perlin_noise_vec3( texcoord.convert( 'vec2|vec3' ) ).mul( amplitude ).add( pivot );
 export const mx_noise_vec3 = ( texcoord = uv(), amplitude = 1, pivot = 0 ) => mx_perlin_noise_vec3( texcoord.convert( 'vec2|vec3' ) ).mul( amplitude ).add( pivot );
-export const mx_noise_vec4 = ( texcoord = uv(), amplitude = 1, pivot = 0 ) => {
+const mx_perlin_noise_vec4_0 = /*@__PURE__*/ Fn( ( [ p ] ) => vec4( mx_perlin_noise_vec3( p ), mx_perlin_noise_float( p.add( vec2( 19, 73 ) ) ) ), { p: 'vec2', return: 'vec4' } );
+const mx_perlin_noise_vec4_1 = /*@__PURE__*/ Fn( ( [ p ] ) => vec4( mx_perlin_noise_vec3( p ), mx_perlin_noise_float( p.add( vec3( 19, 73, 29 ) ) ) ), { p: 'vec3', return: 'vec4' } );
+const mx_perlin_noise_vec4 = /*@__PURE__*/ overloadingFn( [ mx_perlin_noise_vec4_0, mx_perlin_noise_vec4_1 ] );
 
-	texcoord = texcoord.convert( 'vec2|vec3' ); // overloading type
-
-	const noise_vec4 = vec4( mx_perlin_noise_vec3( texcoord ), mx_perlin_noise_float( texcoord.add( vec2( 19, 73 ) ) ) );
-
-	return noise_vec4.mul( amplitude ).add( pivot );
-
-};
+export const mx_noise_vec4 = ( texcoord = uv(), amplitude = 1, pivot = 0 ) => mx_perlin_noise_vec4( texcoord.convert( 'vec2|vec3' ) ).mul( amplitude ).add( pivot );
 
 export const mx_smoothstep = ( inNode, low = 0, high = 1 ) => {
 
