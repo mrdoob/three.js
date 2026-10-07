@@ -202,7 +202,7 @@ class LightingComparisonScene extends THREE.Scene {
 			warmLight.castShadow = true;
 			warmLight.shadow.mapSize.setScalar( 256 );
 			warmLight.shadow.radius = 12;
-			warmLight.shadow.bias = - 0.002;
+			warmLight.shadow.bias = 0;
 			this.add( warmLight );
 
 			// Cool point light in right room
@@ -211,7 +211,7 @@ class LightingComparisonScene extends THREE.Scene {
 			coolLight.castShadow = true;
 			coolLight.shadow.mapSize.setScalar( 256 );
 			coolLight.shadow.radius = 12;
-			coolLight.shadow.bias = - 0.002;
+			coolLight.shadow.bias = 0;
 			this.add( coolLight );
 
 		} else {

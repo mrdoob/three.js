@@ -51,7 +51,7 @@
 			import { BVHComputeData, rayStruct, rayIntersectionResultStruct, wgslTagFn } from 'three-mesh-bvh/webgpu';
 
 			const MAX_VPLS = 1024;
-			const params = { mode: 'combined', count: 256, shadows: true, visibility: 'shadow maps', shadowResolution: 64, showVPLs: false, seed: 1, minDistance: 1 };
+			const params = { mode: 'combined', count: 256, shadows: true, visibility: 'shadow maps', shadowResolution: 64, shadowBias: 0, showVPLs: false, seed: 1, minDistance: 1 };
 
 			init();
 
@@ -154,6 +154,14 @@
 				let mapsDirty = true;
 				const intensities = sourceLights.map( light => light.intensity );
 
+				function updateShadowBias() {
+
+					for ( const light of sourceLights ) light.shadow.bias = params.shadowBias;
+
+				}
+
+				updateShadowBias();
+
 				function updateVisibility() {
 
 					vpl.shadows.value = params.shadows;
@@ -217,6 +225,7 @@
 				controls.update();
 
 				const gui = renderer.inspector.createParameters( 'Virtual Point Lights' );
+				gui.add( params, 'shadowBias', - 0.01, 0.01, 0.0001 ).name( 'Direct Shadow Bias' ).info( 'Bias for direct point-light shadows. Set to zero to compare contact shadows.' ).onChange( updateShadowBias );
 				gui.add( params, 'mode', [ 'direct only', 'indirect only', 'combined' ] ).name( 'Lighting' ).onChange( updateMode );
 				gui.add( params, 'count', sourceLights.length, MAX_VPLS, 1 ).name( 'Ray Budget' ).info( 'Total rays shared across the source lights. Escaped rays do not become VPLs.' ).onChange( regenerate ).debounce( 250 );
 				gui.add( params, 'seed', 1, 100, 1 ).name( 'Seed' ).onChange( regenerate ).debounce( 250 );
@@ -246,6 +255,7 @@
 					window.vplBenchmark = createBenchmark( renderer, scene, camera, settings => {
 
 						Object.assign( params, settings );
+						updateShadowBias();
 						vpl.minDistance.value = params.minDistance;
 						vpl.shadows.value = params.shadows;
 						regenerate();
