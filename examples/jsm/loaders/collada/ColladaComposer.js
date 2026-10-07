@@ -1673,6 +1673,9 @@ class ColladaComposer {
 
 			// geometry data
 
+			primitive.positionSource = sources[ vertices.POSITION ];
+			primitive.positionOffset = inputs.VERTEX.offset;
+
 			for ( const name in inputs ) {
 
 				const input = inputs[ name ];
@@ -1796,6 +1799,9 @@ class ColladaComposer {
 		const stride = primitive.stride;
 		const vcount = primitive.vcount;
 
+		const positionSource = primitive.positionSource;
+		const positionOffset = primitive.positionOffset;
+
 		const tempColor = this.tempColor;
 
 		function pushVector( i ) {
@@ -1861,16 +1867,17 @@ class ColladaComposer {
 
 					const vertices = [];
 
-					// prepare vertices which represent the polygon's contour
+					// prepare vertices which represent the polygon's contour. the contour is always
+					// based on positions so all vertex attributes end up with the same triangles
 
 					for ( let k = 0; k < count; k ++ ) {
 
-						const a = index + stride * k;
-						const positionIndex = indices[ a ] * sourceStride;
+						const a = index + stride * k + positionOffset;
+						const positionIndex = indices[ a ] * positionSource.stride;
 
-						const x = sourceArray[ positionIndex ];
-						const y = sourceArray[ positionIndex + 1 ];
-						const z = sourceArray[ positionIndex + 2 ];
+						const x = positionSource.array[ positionIndex ];
+						const y = positionSource.array[ positionIndex + 1 ];
+						const z = positionSource.array[ positionIndex + 2 ];
 
 						vertices.push( new Vector3( x, y, z ) );
 
