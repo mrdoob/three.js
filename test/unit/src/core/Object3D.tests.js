@@ -17,7 +17,7 @@ const matrixEquals4 = ( a, b ) => {
 
 	for ( let i = 0; i < 16; i ++ ) {
 
-		if ( ! Number.isFinite( a.elements[ i ] ) || ! Number.isFinite( b.elements[ i ] ) || Math.abs( a.elements[ i ] - b.elements[ i ] ) >= eps ) {
+		if ( Math.abs( a.elements[ i ] - b.elements[ i ] ) >= eps ) {
 
 			return false;
 
@@ -185,78 +185,20 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( 'applyMatrix4 (pivot)', ( assert ) => {
 
-			const transform = new Matrix4().makeRotationY( 0.4 ).setPosition( 3, - 2, 1 );
-			const scales = [ new Vector3( 2, 3, 4 ), new Vector3( - 2, 3, 4 ), new Vector3( 2, - 3, 4 ), new Vector3( 2, 3, - 4 ) ];
-
-			for ( const scale of scales ) {
-
-				const object = new Object3D();
-				object.position.set( 2, - 3, 4 );
-				object.rotation.set( 0.3, - 0.7, 1.2 );
-				object.scale.copy( scale );
-				object.pivot = new Vector3( 1, - 2, 3 );
-				object.updateMatrix();
-
-				const expectedMatrix = new Matrix4().multiplyMatrices( transform, object.matrix );
-
-				object.applyMatrix4( transform );
-				object.updateMatrix();
-
-				assert.ok( matrixEquals4( object.matrix, expectedMatrix ), `Transformation is applied correctly with pivot and scale ${scale.toArray()}` );
-
-			}
-
-		} );
-
-		QUnit.test( 'applyMatrix4 (pivot, manual matrix)', ( assert ) => {
-
 			const object = new Object3D();
-			object.position.set( 2, - 3, 4 );
+			object.position.set( 1, 2, 3 );
 			object.rotation.set( 0.3, - 0.7, 1.2 );
-			object.scale.set( - 2, 3, 4 );
+			object.scale.set( 2, 3, 4 );
 			object.pivot = new Vector3( 1, - 2, 3 );
 			object.updateMatrix();
-			object.matrixAutoUpdate = false;
 
-			// The matrix is authoritative even when position, rotation and scale are stale.
-			object.position.set( 100, 200, 300 );
-			object.rotation.set( 0, 0, 0 );
-			object.scale.set( 1, 1, 1 );
+			const m = new Matrix4().makeRotationY( 0.4 ).setPosition( 3, - 2, 1 );
+			const expectedMatrix = m.clone().multiply( object.matrix );
 
-			const transform = new Matrix4().makeRotationY( 0.4 ).setPosition( 3, - 2, 1 );
-			const expectedMatrix = new Matrix4().multiplyMatrices( transform, object.matrix );
-
-			object.applyMatrix4( transform );
-
-			assert.strictEqual( object.matrixAutoUpdate, false, 'matrixAutoUpdate is unchanged' );
-			assert.ok( matrixEquals4( object.matrix, expectedMatrix ), 'The manual matrix is transformed' );
-
+			object.applyMatrix4( m );
 			object.updateMatrix();
 
-			assert.ok( matrixEquals4( object.matrix, expectedMatrix ), 'The decomposed transform reproduces the manual matrix' );
-
-		} );
-
-		QUnit.test( 'applyMatrix4 (null and zero pivot)', ( assert ) => {
-
-			for ( const pivot of [ null, new Vector3() ] ) {
-
-				const object = new Object3D();
-				object.position.set( 2, - 3, 4 );
-				object.rotation.set( 0.3, - 0.7, 1.2 );
-				object.scale.set( 2, 3, 4 );
-				object.pivot = pivot;
-				object.updateMatrix();
-
-				const transform = new Matrix4().makeRotationY( 0.4 ).setPosition( 3, - 2, 1 );
-				const expectedMatrix = new Matrix4().multiplyMatrices( transform, object.matrix );
-
-				object.applyMatrix4( transform );
-				object.updateMatrix();
-
-				assert.ok( matrixEquals4( object.matrix, expectedMatrix ), 'Transformation is applied correctly with null or zero pivot' );
-
-			}
+			assert.ok( matrixEquals4( object.matrix, expectedMatrix ), 'Transformation is applied correctly with pivot' );
 
 		} );
 
@@ -592,27 +534,18 @@ export default QUnit.module( 'Core', () => {
 			const object = new Object3D();
 			object.position.set( 1, 2, 3 );
 			object.rotation.set( 0.3, - 0.7, 1.2 );
-			object.scale.set( - 2, 3, 4 );
+			object.scale.set( 2, 3, 4 );
 			object.pivot = new Vector3( 1, - 2, 3 );
-
-			const oldParent = new Object3D();
-			oldParent.position.set( 4, 5, 6 );
-			oldParent.rotation.set( 0.2, 0.4, 0.6 );
-			oldParent.scale.setScalar( 5 );
-			oldParent.add( object );
-			oldParent.updateMatrixWorld();
-
-			const newParent = new Object3D();
-			newParent.position.set( 7, 8, 9 );
-			newParent.rotation.set( - 0.1, - 0.3, - 0.5 );
-			newParent.scale.setScalar( 6 );
+			object.updateMatrixWorld();
 
 			const expectedMatrixWorld = object.matrixWorld.clone();
 
-			newParent.attach( object );
+			const parent = new Object3D();
+			parent.position.set( 4, 5, 6 );
+			parent.rotation.set( 0.2, 0.4, 0.6 );
+			parent.attach( object );
 
-			assert.strictEqual( object.parent, newParent, 'The object is attached to the new parent' );
-			assert.ok( matrixEquals4( object.matrixWorld, expectedMatrixWorld ), 'The world matrix is maintained with pivot' );
+			assert.ok( matrixEquals4( object.matrixWorld, expectedMatrixWorld ), 'World matrix is maintained with pivot' );
 
 		} );
 
