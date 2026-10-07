@@ -170,12 +170,6 @@ class TileShadowNode extends ShadowBaseNode {
 		const depthTexture = new DepthTexture( shadowWidth, shadowHeight, this.config.depthType, undefined, undefined, undefined, undefined, undefined, undefined, undefined, tileCount );
 		depthTexture.compareFunction = builder.renderer.reversedDepthBuffer ? GreaterEqualCompare : LessCompare;
 		depthTexture.name = 'ShadowDepthArrayTexture';
-
-		// Hardware-filtered depth comparisons for PCF, as in ShadowNode.
-		const filter = builder.renderer.shadowMap.type === PCFShadowMap && builder.renderer.hasCompatibility( Compatibility.TEXTURE_COMPARE ) ? LinearFilter : NearestFilter;
-		depthTexture.minFilter = filter;
-		depthTexture.magFilter = filter;
-
 		const shadowMap = builder.createRenderTarget( shadowWidth, shadowHeight, { format: RedFormat, depth: tileCount, useArrayDepthTexture: true } );
 		shadowMap.depthTexture = depthTexture;
 		shadowMap.texture.name = 'ShadowTexture';
@@ -425,6 +419,22 @@ class TileShadowNode extends ShadowBaseNode {
 
 		}
 
+		// Hardware-filtered depth comparisons for PCF, as in ShadowNode. The shadow type can change between
+		// builds, so this is checked every time; disposing the shadow map recreates it with the new filter.
+
+		const { renderer } = builder;
+		const filter = renderer.shadowMap.type === PCFShadowMap && renderer.hasCompatibility( Compatibility.TEXTURE_COMPARE ) ? LinearFilter : NearestFilter;
+		const depthTexture = this.shadowMap.depthTexture;
+
+		if ( depthTexture.magFilter !== filter ) {
+
+			depthTexture.minFilter = filter;
+			depthTexture.magFilter = filter;
+
+			this.shadowMap.dispose();
+
+		}
+
 		return Fn( ( builder ) => {
 
 			this.setupShadowPosition( builder );
@@ -449,7 +459,7 @@ class TileShadowNode extends ShadowBaseNode {
 			const filterFn = tileShadow.filterNode || tileShadowNode.getShadowFilterFn( builder.renderer.shadowMap.type );
 			const shadowValue = tileShadowNode.setupShadowFilter( builder, {
 				filterFn,
-				depthTexture: this.shadowMap.depthTexture,
+				depthTexture,
 				shadowCoord: tileCoord,
 				shadow: tileShadow,
 				depthLayer
@@ -457,15 +467,29 @@ class TileShadowNode extends ShadowBaseNode {
 
 			const shadowIntensity = reference( 'intensity', 'float', shadow ).setGroup( renderGroup );
 
+			let shadowOutput;
+
 			if ( builder.renderer.shadowMap.transmitted === true ) {
 
 				const shadowColor = texture( this.shadowMap.texture, tileCoord ).depth( depthLayer );
 
-				return mix( 1, shadowValue.rgb.mix( shadowColor, 1 ), shadowIntensity.mul( shadowColor.a ) ).toVar( 'shadowValue' );
+				shadowOutput = mix( 1, shadowValue.rgb.mix( shadowColor, 1 ), shadowIntensity.mul( shadowColor.a ) ).toVar( 'shadowValue' );
+
+			} else {
+
+				shadowOutput = mix( 1, shadowValue, shadowIntensity ).toVar( 'shadowValue' );
 
 			}
 
-			return mix( 1, shadowValue, shadowIntensity ).toVar( 'shadowValue' );
+			// As in ShadowNode.setup(), which the tiles no longer go through.
+
+			if ( builder.material.receivedShadowNode ) {
+
+				shadowOutput = builder.material.receivedShadowNode( shadowOutput );
+
+			}
+
+			return shadowOutput;
 
 		} )();
 
