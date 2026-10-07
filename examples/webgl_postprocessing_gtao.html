@@ -27,7 +27,7 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
+					"three": "../src/Three.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -78,6 +78,10 @@
 				scene.background = new THREE.Color( 0xbfe3dd );
 				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
 
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
+				directionalLight.position.set( 4, 8, 3 );
+				scene.add( directionalLight );
+
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
 				camera.position.set( 5, 2, 8 );
 
@@ -93,20 +97,39 @@
 				composer = new EffectComposer( renderer );
 
 				const renderPass = new RenderPass( scene, camera );
-				composer.addPass( renderPass );
 
 				const gBufferPass = new GBufferPass( scene, camera, width, height );
-				composer.addPass( gBufferPass );
 
 				const gtaoPass = new GTAOPass( scene, camera, width, height, {
 					depthTexture: gBufferPass.depthTexture,
 					normalTexture: gBufferPass.normalTexture
 				} );
-				gtaoPass.output = GTAOPass.OUTPUT.Denoise;
-				composer.addPass( gtaoPass );
 
 				const outputPass = new OutputPass();
-				composer.addPass( outputPass );
+
+				// 'Blended': GTAO runs after the scene is lit and darkens the finished image.
+				// 'BRDF-Aware': GTAO runs first and fills scene.ambientOcclusionMap, which the materials
+				// apply to indirect light only (like aoMap), so direct light and specular highlights keep their intensity.
+				// The other outputs are views of the pass and use the blended pass order.
+				const BRDF_AWARE = 'BRDF-Aware';
+				const params = { output: GTAOPass.OUTPUT.Denoise };
+
+				function updateOutput() {
+
+					const brdfAware = params.output === BRDF_AWARE;
+
+					for ( const pass of [ ...composer.passes ] ) composer.removePass( pass );
+
+					const passes = brdfAware ? [ gBufferPass, gtaoPass, renderPass, outputPass ] : [ renderPass, gBufferPass, gtaoPass, outputPass ];
+					for ( const pass of passes ) composer.addPass( pass );
+
+					gtaoPass.output = brdfAware ? GTAOPass.OUTPUT.Off : params.output;
+					gtaoPass.needsSwap = ! brdfAware;
+					scene.ambientOcclusionMap = brdfAware ? gtaoPass.pdRenderTarget.texture : null;
+
+				}
+
+				updateOutput();
 
 				//
 
@@ -128,18 +151,15 @@
 				// Init gui
 				const gui = new GUI();
 
-				gui.add( gtaoPass, 'output', {
-					'Default': GTAOPass.OUTPUT.Default,
+				gui.add( params, 'output', {
+					'Blended': GTAOPass.OUTPUT.Default,
+					'BRDF-Aware': BRDF_AWARE,
 					'Diffuse': GTAOPass.OUTPUT.Diffuse,
 					'AO Only': GTAOPass.OUTPUT.AO,
 					'AO Only + Denoise': GTAOPass.OUTPUT.Denoise,
 					'Depth': GTAOPass.OUTPUT.Depth,
 					'Normal': GTAOPass.OUTPUT.Normal
-				} ).onChange( function ( value ) {
-
-					gtaoPass.output = value;
-
-				} );
+				} ).onChange( updateOutput );
 
 				const aoParameters = {
 					radius: 0.25,
@@ -161,6 +181,7 @@
 				};
 				gtaoPass.updateGtaoMaterial( aoParameters );
 				gtaoPass.updatePdMaterial( pdParameters );
+				gui.add( directionalLight, 'intensity', 0, 5 ).name( 'light intensity' );
 				gui.add( gtaoPass, 'blendIntensity' ).min( 0 ).max( 1 ).step( 0.01 );
 				gui.add( aoParameters, 'radius' ).min( 0.01 ).max( 1 ).step( 0.01 ).onChange( () => gtaoPass.updateGtaoMaterial( aoParameters ) );
 				gui.add( aoParameters, 'distanceExponent' ).min( 1 ).max( 4 ).step( 0.01 ).onChange( () => gtaoPass.updateGtaoMaterial( aoParameters ) );
