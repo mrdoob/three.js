@@ -51,7 +51,7 @@
 			import { BVHComputeData, rayStruct, rayIntersectionResultStruct, wgslTagFn } from 'three-mesh-bvh/webgpu';
 
 			const MAX_VPLS = 1024;
-			const params = { mode: 'combined', count: 256, shadows: true, visibility: 'shadow maps', shadowResolution: 64, shadowBias: 0, showVPLs: false, seed: 1, minDistance: 1 };
+			const params = { mode: 'combined', count: 256, shadows: true, visibility: 'shadow maps', shadowResolution: 64, shadowBias: 0, showVPLs: false, seed: 1, minDistance: 1, progressive: false };
 
 			init();
 
@@ -144,7 +144,18 @@
 
 				function generate() {
 
-					generator.generate( scene, sourceLights, params );
+					const visible = helper.visible;
+					helper.visible = false;
+					try {
+
+						generator.generate( scene, sourceLights, { count: previewCount, seed: params.seed } );
+
+					} finally {
+
+						helper.visible = visible;
+
+					}
+
 					vpl.update();
 					helper.update();
 					mapsDirty = true;
@@ -152,6 +163,8 @@
 				}
 
 				let mapsDirty = true;
+				let previewCount = params.count;
+				let nextPreviewTime = Infinity;
 				const intensities = sourceLights.map( light => light.intensity );
 
 				function updateShadowBias() {
@@ -197,7 +210,9 @@
 				}
 
 				// Sampling always uses the original source power, including in indirect-only mode.
-				function regenerate() {
+				function regenerate( restart = true ) {
+
+					if ( restart !== false ) previewCount = params.progressive ? Math.min( 32, params.count ) : params.count;
 
 					sourceLights.forEach( ( light, i ) => {
 
@@ -207,6 +222,7 @@
 					generate();
 					updateMode();
 					updateVisibility();
+					nextPreviewTime = params.progressive && previewCount < params.count ? performance.now() + 500 : Infinity;
 
 				}
 
@@ -227,6 +243,8 @@
 				const gui = renderer.inspector.createParameters( 'Virtual Point Lights' );
 				gui.add( params, 'mode', [ 'direct only', 'indirect only', 'combined' ] ).name( 'Lighting' ).onChange( updateMode );
 				gui.add( params, 'count', sourceLights.length, MAX_VPLS, 1 ).name( 'Ray Budget' ).info( 'Total rays shared across the source lights. Escaped rays do not become VPLs.' ).onChange( regenerate ).debounce( 250 );
+				gui.add( params, 'progressive' ).name( 'Progressive Preview' ).info( 'Double the ray budget every 0.5 seconds, up to Ray Budget. Each stage regenerates a normalized estimate.' ).onChange( () => regenerate() );
+				gui.add( { restart: () => regenerate() }, 'restart' ).name( 'Restart Preview' );
 				gui.add( params, 'seed', 1, 100, 1 ).name( 'Seed' ).onChange( regenerate ).debounce( 250 );
 				const shadowParameters = gui.addFolder( 'Shadows' );
 				shadowParameters.add( params, 'shadowBias', - 0.01, 0.01, 0.0001 ).name( 'Direct Shadow Bias' ).info( 'Bias for direct point-light shadows. Set to zero to compare contact shadows.' ).onChange( updateShadowBias );
@@ -266,7 +284,18 @@
 
 				} else {
 
-					renderer.setAnimationLoop( () => renderer.render( scene, camera ) );
+					renderer.setAnimationLoop( () => {
+
+						if ( performance.now() >= nextPreviewTime ) {
+
+							previewCount = Math.min( params.count, previewCount * 2 );
+							regenerate( false );
+
+						}
+
+						renderer.render( scene, camera );
+
+					} );
 
 				}
 
