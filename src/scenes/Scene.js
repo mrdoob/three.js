@@ -63,7 +63,7 @@ class Scene extends Object3D {
 		 * @type {?Texture}
 		 * @default null
 		 */
-		this.ambientOcclusionMap = null;
+		this.ssaoMap = null;
 
 		/**
 		 * A fog instance defining the type of fog that affects everything
@@ -142,7 +142,7 @@ class Scene extends Object3D {
 
 		this.background = source.background !== null ? source.background.clone() : null;
 		this.environment = source.environment !== null ? source.environment.clone() : null;
-		this.ambientOcclusionMap = source.ambientOcclusionMap;
+		this.ssaoMap = source.ssaoMap;
 		this.fog = source.fog !== null ? source.fog.clone() : null;
 
 		this.backgroundBlurriness = source.backgroundBlurriness;

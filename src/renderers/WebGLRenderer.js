@@ -2217,7 +2217,7 @@ class WebGLRenderer {
 
 			materialProperties.environment = ( material.isMeshStandardMaterial || material.isMeshLambertMaterial || material.isMeshPhongMaterial ) ? scene.environment : null;
 			materialProperties.fog = scene.fog;
-			materialProperties.ambientOcclusionMap = ( material.isMeshStandardMaterial || material.isMeshLambertMaterial || material.isMeshPhongMaterial || material.isMeshToonMaterial ) ? ( scene.ambientOcclusionMap || null ) : null;
+			materialProperties.ssaoMap = ( material.isMeshStandardMaterial || material.isMeshLambertMaterial || material.isMeshPhongMaterial || material.isMeshToonMaterial ) ? ( scene.ssaoMap || null ) : null;
 
 			const usePMREM = material.isMeshStandardMaterial || ( material.isMeshLambertMaterial && ! material.envMap ) || ( material.isMeshPhongMaterial && ! material.envMap );
 			materialProperties.envMap = environments.get( material.envMap || materialProperties.environment, usePMREM );
@@ -2417,7 +2417,7 @@ class WebGLRenderer {
 
 			const fog = scene.fog;
 			const environment = ( material.isMeshStandardMaterial || material.isMeshLambertMaterial || material.isMeshPhongMaterial ) ? scene.environment : null;
-			const ambientOcclusionMap = ( material.isMeshStandardMaterial || material.isMeshLambertMaterial || material.isMeshPhongMaterial || material.isMeshToonMaterial ) ? ( scene.ambientOcclusionMap || null ) : null;
+			const ssaoMap = ( material.isMeshStandardMaterial || material.isMeshLambertMaterial || material.isMeshPhongMaterial || material.isMeshToonMaterial ) ? ( scene.ssaoMap || null ) : null;
 			const colorSpace = ( _currentRenderTarget === null ) ? _this.outputColorSpace : ( _currentRenderTarget.isXRRenderTarget === true ? _currentRenderTarget.texture.colorSpace : ColorManagement.workingColorSpace );
 			const usePMREM = material.isMeshStandardMaterial || ( material.isMeshLambertMaterial && ! material.envMap ) || ( material.isMeshPhongMaterial && ! material.envMap );
 			const envMap = environments.get( material.envMap || environment, usePMREM );
@@ -2525,7 +2525,7 @@ class WebGLRenderer {
 
 					needsProgramChange = true;
 
-				} else if ( materialProperties.ambientOcclusionMap !== ambientOcclusionMap ) {
+				} else if ( materialProperties.ssaoMap !== ssaoMap ) {
 
 					needsProgramChange = true;
 
@@ -2783,9 +2783,9 @@ class WebGLRenderer {
 
 			}
 
-			if ( m_uniforms.ambientOcclusionMap !== undefined ) {
+			if ( m_uniforms.ssaoMap !== undefined ) {
 
-				m_uniforms.ambientOcclusionMap.value = ambientOcclusionMap;
+				m_uniforms.ssaoMap.value = ssaoMap;
 
 			}
 

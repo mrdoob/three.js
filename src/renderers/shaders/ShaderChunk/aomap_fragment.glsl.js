@@ -1,5 +1,5 @@
 export default /* glsl */`
-#if defined( USE_AOMAP ) || defined( USE_AMBIENT_OCCLUSION_MAP )
+#if defined( USE_AOMAP ) || defined( USE_SSAO_MAP )
 
 	float ambientOcclusion = 1.0;
 
@@ -10,10 +10,10 @@ export default /* glsl */`
 
 	#endif
 
-	#ifdef USE_AMBIENT_OCCLUSION_MAP
+	#ifdef USE_SSAO_MAP
 
 		// screen-space AO; the stronger occlusion of the per-object and screen-space maps wins
-		ambientOcclusion = min( ambientOcclusion, texture2D( ambientOcclusionMap, gl_FragCoord.xy / vec2( textureSize( ambientOcclusionMap, 0 ) ) ).r );
+		ambientOcclusion = min( ambientOcclusion, texture2D( ssaoMap, gl_FragCoord.xy / vec2( textureSize( ssaoMap, 0 ) ) ).r );
 
 	#endif
 
