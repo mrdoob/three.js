@@ -1,7 +1,6 @@
 import Node from '../core/Node.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import ChainMap from '../../renderers/common/ChainMap.js';
-import { getDataFromObject } from '../core/NodeUtils.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { property, vec4 } from '../tsl/TSLBase.js';
 import { positionWorld } from '../accessors/Position.js';
@@ -73,27 +72,20 @@ const _disposeShadowMaterial = ( light ) => {
  * @param {Renderer} renderer - The renderer.
  * @param {LightShadow} shadow - The light shadow object containing shadow properties.
  * @param {number} shadowType - The type of shadow map (e.g., BasicShadowMap).
- * @param {boolean} useVelocity - Whether to use velocity data for rendering.
  * @return {shadowRenderObjectFunction} A function that renders shadow objects.
  */
-const _getShadowRenderObjectFunction = ( renderer, shadow, shadowType, useVelocity ) => {
+const _getShadowRenderObjectFunction = ( renderer, shadow, shadowType ) => {
 
 	_shadowRenderObjectKeys[ 0 ] = renderer;
 	_shadowRenderObjectKeys[ 1 ] = shadow;
 
 	let renderObjectFunction = _shadowRenderObjectLibrary.get( _shadowRenderObjectKeys );
 
-	if ( renderObjectFunction === undefined || ( renderObjectFunction.shadowType !== shadowType || renderObjectFunction.useVelocity !== useVelocity ) ) {
+	if ( renderObjectFunction === undefined || renderObjectFunction.shadowType !== shadowType ) {
 
 		renderObjectFunction = ( object, scene, _camera, geometry, material, group, lightsNode, clippingContext, passId ) => {
 
 			if ( object.castShadow === true || ( object.receiveShadow && shadowType === VSMShadowMap ) ) {
-
-				if ( useVelocity ) {
-
-					getDataFromObject( object ).useVelocity = true;
-
-				}
 
 				object.onBeforeShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
 
@@ -106,7 +98,6 @@ const _getShadowRenderObjectFunction = ( renderer, shadow, shadowType, useVeloci
 		};
 
 		renderObjectFunction.shadowType = shadowType;
-		renderObjectFunction.useVelocity = useVelocity;
 
 		_shadowRenderObjectLibrary.set( _shadowRenderObjectKeys, renderObjectFunction );
 
@@ -209,12 +200,7 @@ class ShadowBaseNode extends Node {
 	 */
 	getShadowRenderObjectFunction( renderer, shadow = this.light.shadow ) {
 
-		const shadowType = renderer.shadowMap.type;
-
-		const currentMRT = renderer.getMRT();
-		const useVelocity = currentMRT ? currentMRT.has( 'velocity' ) : false;
-
-		return _getShadowRenderObjectFunction( renderer, shadow, shadowType, useVelocity );
+		return _getShadowRenderObjectFunction( renderer, shadow, renderer.shadowMap.type );
 
 	}
 
