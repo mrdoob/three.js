@@ -1,10 +1,11 @@
 import {
-	Color, DepthFormat, DepthStencilFormat, DepthTexture, FloatType, HalfFloatType, MeshNormalMaterial,
+	Color, DepthFormat, DepthStencilFormat, DepthTexture, FloatType, HalfFloatType, Matrix3, MeshNormalMaterial,
 	NearestFilter, NoBlending, TangentSpaceNormalMap, UnsignedInt248Type, UnsignedIntType, UnsignedShortType, WebGLRenderTarget
 } from 'three';
 import { Pass } from './Pass.js';
 
 const _textureProperties = [ 'map', 'alphaMap', 'normalMap', 'bumpMap', 'displacementMap' ];
+const _materialTextureProperties = [ ..._textureProperties, 'roughnessMap', 'metalnessMap' ];
 const _shaderProperties = [ 'side', 'flatShading', 'normalMapType', 'wireframe', 'clippingPlanes', 'clipIntersection' ];
 
 /**
@@ -29,8 +30,9 @@ const _shaderProperties = [ 'side', 'flatShading', 'normalMapType', 'wireframe',
  * including custom vertex deformation and fragment discard, are not reproduced.
  *
  * With options.material, a second color attachment is added holding RG = roughness,
- * metalness (scalar material values; roughness and metalness maps are not sampled;
- * materials without them write roughness 1, metalness 0) in an RGBA half-float
+ * metalness (material values multiplied by the roughness map's green channel and
+ * metalness map's blue channel; materials without these values write roughness 1,
+ * metalness 0) in an RGBA half-float
  * NoColorSpace texture, exposed as materialTexture. It shares the depth buffer.
  *
  * ```js
@@ -152,13 +154,25 @@ class GBufferPass extends Pass {
 
 			if ( this._material ) {
 
+				entry.uniforms.roughnessMap = { value: null };
+				entry.uniforms.metalnessMap = { value: null };
+				entry.uniforms.roughnessMapTransform = { value: new Matrix3() };
+				entry.uniforms.metalnessMapTransform = { value: new Matrix3() };
 				material.customProgramCacheKey = () => 'GBufferPass.material';
 				material.onBeforeCompile = shader => {
 
-					shader.uniforms.gRoughness = entry.uniforms.gRoughness;
-					shader.uniforms.gMetalness = entry.uniforms.gMetalness;
+					Object.assign( shader.uniforms, entry.uniforms );
 					shader.fragmentShader = 'uniform float gRoughness;\nuniform float gMetalness;\nlayout(location = 1) out highp vec4 gMaterial;\n' +
-						shader.fragmentShader.replace( '#ifdef OPAQUE', 'gMaterial = vec4( gRoughness, gMetalness, 0.0, 1.0 );\n#ifdef OPAQUE' );
+						shader.fragmentShader
+							.replace( '#include <normalmap_pars_fragment>', '#include <normalmap_pars_fragment>\n#include <roughnessmap_pars_fragment>\n#include <metalnessmap_pars_fragment>' )
+							.replace( '#ifdef OPAQUE', /* glsl */`
+								float roughness = gRoughness;
+								float metalness = gMetalness;
+								#include <roughnessmap_fragment>
+								#include <metalnessmap_fragment>
+								gMaterial = vec4( roughnessFactor, metalnessFactor, 0.0, 1.0 );
+								#ifdef OPAQUE
+							` );
 
 				};
 
@@ -173,7 +187,7 @@ class GBufferPass extends Pass {
 		if ( entry.version !== source.version ) material.needsUpdate = true;
 		entry.version = source.version;
 
-		for ( const property of _textureProperties ) {
+		for ( const property of this._material ? _materialTextureProperties : _textureProperties ) {
 
 			const texture = ( ( property === 'map' || property === 'alphaMap' ) && source.alphaTest === 0 ) ? null : source[ property ] || null;
 			const channel = texture ? texture.channel : undefined;
@@ -193,6 +207,24 @@ class GBufferPass extends Pass {
 
 		entry.uniforms.gRoughness.value = source.roughness !== undefined ? source.roughness : 1;
 		entry.uniforms.gMetalness.value = source.metalness !== undefined ? source.metalness : 0;
+
+		if ( this._material ) {
+
+			// MeshNormalMaterial does not refresh these map uniforms in the renderer.
+			for ( const property of [ 'roughnessMap', 'metalnessMap' ] ) {
+
+				const texture = material[ property ];
+				entry.uniforms[ property ].value = texture;
+				if ( texture ) {
+
+					if ( texture.matrixAutoUpdate ) texture.updateMatrix();
+					entry.uniforms[ property + 'Transform' ].value.copy( texture.matrix );
+
+				}
+
+			}
+
+		}
 
 		// The renderer updates texture matrices and uniforms without recompiling these materials.
 		material.alphaTest = source.alphaTest;
