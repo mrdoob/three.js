@@ -87,11 +87,7 @@ import { CopyShader } from 'three/addons/shaders/CopyShader.js';
 			new THREE.ConeGeometry( 0.3, 0.75, 64 ),
 			new THREE.TorusGeometry( 0.32, 0.1, 24, 64 )
 		];
-		const colors = [
-			0xe8dfce, 0xbba477, 0x365a59, 0xb8cad5,
-			0xc5816b, 0x708b85, 0xd8b47b, 0x8299b0,
-			0xc2b4cc, 0x404b55, 0xd4c6b3, 0x83b5b0
-		];
+		const colors = [ 0xe02020, 0xf2d21b, 0x2050e0 ]; // primaries, coprime with the 4 shapes so every shape gets every color
 		const goldenAngle = Math.PI * ( 3 - Math.sqrt( 5 ) );
 		const random = THREE.MathUtils.seededRandom;
 		random( 42 );
