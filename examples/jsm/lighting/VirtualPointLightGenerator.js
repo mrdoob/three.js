@@ -2,7 +2,7 @@ import { Color, Matrix3, Raycaster, Vector3 } from 'three';
 import { VirtualPointLightTextureSampler } from './VirtualPointLightTextureSampler.js';
 
 /**
- * Generates a deterministic, single diffuse bounce from isotropic point lights.
+ * Generates a deterministic, single diffuse bounce from point or directional lights.
  * Samples visible, static meshes using CPU raycasting. Base-color maps and alpha cutouts use cached CPU texels.
  * Instancing, skinning, mip selection and specular transport are not evaluated.
  *
@@ -36,13 +36,14 @@ class VirtualPointLightGenerator {
 	 * Escaped rays retain their share of the source power; misses are not renormalized.
 	 *
 	 * @param {Scene} scene - The static scene.
-	 * @param {Array<PointLight>} lights - Isotropic, inverse-square source lights.
+	 * @param {Array<PointLight|DirectionalLight>} lights - Source lights.
 	 * @param {Object} [options={}] - Sampling options.
 	 * @param {number} [options.count=256] - Total ray budget across all lights.
 	 * @param {number} [options.seed=1] - Random seed.
+	 * @param {Box3} [options.bounds] - World-space sampling domain, required for directional lights.
 	 * @return {VirtualPointLightGenerator} This generator.
 	 */
-	generate( scene, lights, { count = 256, seed = 1 } = {} ) {
+	generate( scene, lights, { count = 256, seed = 1, bounds = null } = {} ) {
 
 		if ( ! Number.isInteger( count ) || count < Math.max( 1, lights.length ) || count > this.capacity ) {
 
@@ -50,9 +51,15 @@ class VirtualPointLightGenerator {
 
 		}
 
-		if ( lights.some( light => ! light.isPointLight || light.decay !== 2 || light.distance !== 0 ) ) {
+		if ( lights.some( light => ! light.isDirectionalLight && ( ! light.isPointLight || light.decay !== 2 || light.distance !== 0 ) ) ) {
 
-			throw new Error( 'Virtual point lights require isotropic, inverse-square point lights without a distance cutoff.' );
+			throw new Error( 'Virtual point lights require directional lights or inverse-square point lights without a distance cutoff.' );
+
+		}
+
+		if ( lights.some( light => light.isDirectionalLight ) && ( bounds === null || bounds.isEmpty() ) ) {
+
+			throw new Error( 'Directional VPL sampling requires non-empty world-space bounds.' );
 
 		}
 
@@ -69,6 +76,9 @@ class VirtualPointLightGenerator {
 		raycaster.firstHitOnly = ! hasCutouts; // Accelerated raycasting uses this; native raycasting ignores it.
 		const origin = new Vector3();
 		const direction = new Vector3();
+		const u = new Vector3();
+		const v = new Vector3();
+		const corner = new Vector3();
 		const normalMatrix = new Matrix3();
 		const albedo = new Color();
 		let state = seed >>> 0;
@@ -89,14 +99,54 @@ class VirtualPointLightGenerator {
 			light.updateWorldMatrix( true, false );
 			light.getWorldPosition( origin );
 			const samples = Math.floor( count / lights.length ) + ( l < count % lights.length ? 1 : 0 );
-			const power = 4 * Math.PI * light.intensity / samples;
+			let power = 4 * Math.PI * light.intensity / samples;
+			let minU = Infinity, maxU = - Infinity, minV = Infinity, maxV = - Infinity, minDepth = Infinity;
+
+			if ( light.isDirectionalLight ) {
+
+				light.target.updateWorldMatrix( true, false );
+				light.target.getWorldPosition( direction ).sub( origin ).normalize();
+				if ( direction.lengthSq() === 0 ) throw new Error( 'Directional light position and target must differ.' );
+				u.set( 0, 1, 0 );
+				if ( Math.abs( direction.y ) > 0.99 ) u.set( 1, 0, 0 );
+				u.cross( direction ).normalize();
+				v.crossVectors( direction, u );
+
+				for ( let j = 0; j < 8; j ++ ) {
+
+					corner.set( j & 1 ? bounds.max.x : bounds.min.x, j & 2 ? bounds.max.y : bounds.min.y, j & 4 ? bounds.max.z : bounds.min.z );
+					minU = Math.min( minU, corner.dot( u ) );
+					maxU = Math.max( maxU, corner.dot( u ) );
+					minV = Math.min( minV, corner.dot( v ) );
+					maxV = Math.max( maxV, corner.dot( v ) );
+					minDepth = Math.min( minDepth, corner.dot( direction ) );
+
+				}
+
+				// Parallel rays carry irradiance times projected area; no inverse-square falloff.
+
+				power = light.intensity * ( maxU - minU ) * ( maxV - minV ) / samples;
+
+			}
 
 			for ( let i = 0; i < samples; i ++ ) {
 
-				const z = random() * 2 - 1;
-				const phi = random() * Math.PI * 2;
-				const r = Math.sqrt( 1 - z * z );
-				raycaster.set( origin, direction.set( r * Math.cos( phi ), z, r * Math.sin( phi ) ) );
+				if ( light.isDirectionalLight ) {
+
+					origin.copy( direction ).multiplyScalar( minDepth - 0.01 );
+					origin.addScaledVector( u, minU + random() * ( maxU - minU ) );
+					origin.addScaledVector( v, minV + random() * ( maxV - minV ) );
+					raycaster.set( origin, direction );
+
+				} else {
+
+					const z = random() * 2 - 1;
+					const phi = random() * Math.PI * 2;
+					const r = Math.sqrt( 1 - z * z );
+					raycaster.set( origin, direction.set( r * Math.cos( phi ), z, r * Math.sin( phi ) ) );
+
+				}
+
 				const hits = raycaster.intersectObjects( surfaces, false );
 				let hit, material;
 

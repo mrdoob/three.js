@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - virtual point lights (kitchen)</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - virtual point lights (kitchen)">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_virtualpointlights_kitchen.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_virtualpointlights_kitchen.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Virtual Point Lights (Kitchen)</span>
+			</div>
+
+			<small>Single-bounce diffuse GI from sunlight through a window. Same room and sunlight as the light-probe kitchen.</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/",
+					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.15/src/index.js",
+					"three-mesh-bvh/webgpu": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.15/src/webgpu/index.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { Fn, If, float, lights, uniform } from 'three/tsl';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { KitchenScene } from 'three/addons/environments/KitchenScene.js';
+			import { VirtualPointLightGenerator } from 'three/addons/lighting/VirtualPointLightGenerator.js';
+			import { VirtualPointLightShadowMaps } from 'three/addons/lighting/VirtualPointLightShadowMaps.js';
+			import { VirtualPointLightsNode } from 'three/addons/tsl/lighting/VirtualPointLightsNode.js';
+			import { VirtualPointLightHelper } from 'three/addons/helpers/VirtualPointLightHelper.js';
+			import { acceleratedRaycast } from 'three-mesh-bvh';
+			import { BVHComputeData, rayStruct, rayIntersectionResultStruct, wgslTagFn } from 'three-mesh-bvh/webgpu';
+
+			const MAX_VPLS = 1024;
+			const params = { mode: 'combined', count: 256, shadows: true, visibility: 'shadow maps', shadowResolution: 64, shadowBias: 0, showVPLs: false, seed: 1, minDistance: 1, progressive: false, sunIntensity: 6 };
+
+			init();
+
+			async function init() {
+
+				const camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 3.2, 2.6, 2.65 );
+
+				const scene = new KitchenScene();
+				await scene.ready;
+				scene.updateMatrixWorld( true );
+
+				const surfaces = [], sourceLights = [];
+				scene.traverseVisible( object => {
+
+					if ( object.isMesh ) {
+
+						surfaces.push( object );
+						object.raycast = acceleratedRaycast;
+
+					} else if ( object.isDirectionalLight ) {
+
+						sourceLights.push( object );
+
+					}
+
+				} );
+
+				// The same triangle BVHs accelerate CPU sampling and GPU visibility.
+				// Include every surface: the ray's maximum distance excludes its emitter.
+
+				const bvh = new BVHComputeData( surfaces );
+				bvh.update();
+
+				const visibility = wgslTagFn /* wgsl */`
+					fn vplVisibility( start: vec3f, end: vec3f ) -> f32 {
+
+						let delta = end - start;
+						let distance = length( delta );
+						if ( distance < 1e-5 ) { return 1.0; }
+						let ray = ${ rayStruct }( start, delta / distance, distance );
+						var hit: ${ rayIntersectionResultStruct };
+						if ( ${ bvh.fns.raycastFirstHit }( ray, &hit ) ) { return 0.0; }
+						return 1.0;
+
+					}
+				`;
+
+				const generator = new VirtualPointLightGenerator( MAX_VPLS );
+				const shadowMaps = new VirtualPointLightShadowMaps( MAX_VPLS );
+				const useShadowMaps = uniform( true );
+				const vpl = new VirtualPointLightsNode( generator, ( start, end, index ) => Fn( () => {
+
+					const visible = float( 1 ).toVar();
+					If( useShadowMaps, () => {
+
+						visible.assign( shadowMaps.visibility( start, end, index ) );
+
+					} ).Else( () => {
+
+						visible.assign( visibility( { start, end } ) );
+
+					} );
+					return visible;
+
+				} )() );
+				vpl.shadows.value = params.shadows;
+				const lighting = lights( [ ...sourceLights, vpl ] );
+				const materials = new Map();
+
+				for ( const surface of surfaces ) {
+
+					// Retain the probe example's albedo, roughness, metalness and sidedness.
+					const original = surface.material;
+					if ( ! materials.has( original ) ) {
+
+						const material = new THREE.MeshStandardNodeMaterial();
+						material.copy( original );
+						material.lightsNode = lighting;
+						materials.set( original, material );
+
+					}
+
+					surface.material = materials.get( original );
+
+				}
+
+				const helper = new VirtualPointLightHelper( generator );
+				helper.visible = params.showVPLs;
+				scene.add( helper );
+
+				function generate() {
+
+					const visible = helper.visible;
+					helper.visible = false;
+					try {
+
+						generator.generate( scene, sourceLights, { count: previewCount, seed: params.seed, bounds: scene.samplingBounds } );
+
+					} finally {
+
+						helper.visible = visible;
+
+					}
+
+					vpl.update();
+					helper.update();
+					mapsDirty = true;
+
+				}
+
+				let mapsDirty = true;
+				let previewCount = params.count;
+				let nextPreviewTime = Infinity;
+				const intensities = sourceLights.map( light => light.intensity );
+
+				function updateShadowBias() {
+
+					for ( const light of sourceLights ) light.shadow.bias = params.shadowBias;
+
+				}
+
+				updateShadowBias();
+
+				function updateVisibility() {
+
+					vpl.shadows.value = params.shadows;
+					useShadowMaps.value = params.visibility === 'shadow maps';
+					if ( params.shadows && useShadowMaps.value && mapsDirty ) {
+
+						const visible = helper.visible;
+						helper.visible = false;
+						try {
+
+							shadowMaps.update( renderer, scene, generator, vpl.bias.value, params.shadowResolution );
+							mapsDirty = false;
+
+						} finally {
+
+							helper.visible = visible;
+
+						}
+
+					}
+
+				}
+
+				function updateMode() {
+
+					sourceLights.forEach( ( light, i ) => {
+
+						light.intensity = params.mode === 'indirect only' ? 0 : intensities[ i ];
+
+					} );
+					vpl.intensity.value = params.mode === 'direct only' ? 0 : 1;
+
+				}
+
+				// Sampling always uses the original source power, including in indirect-only mode.
+				function regenerate( restart = true ) {
+
+					if ( restart !== false ) previewCount = params.progressive ? Math.min( 32, params.count ) : params.count;
+
+					sourceLights.forEach( ( light, i ) => {
+
+						light.intensity = intensities[ i ];
+
+					} );
+					generate();
+					updateMode();
+					updateVisibility();
+					nextPreviewTime = params.progressive && previewCount < params.count ? performance.now() + 500 : Infinity;
+
+				}
+
+				const renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( Math.min( window.devicePixelRatio, 1.5 ) );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1.0;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+				await renderer.init();
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( - 1.25, 1.5, 0.4 );
+				controls.update();
+
+				const gui = renderer.inspector.createParameters( 'Virtual Point Lights' );
+				gui.add( params, 'sunIntensity', 0, 20, 0.1 ).name( 'Sun Intensity' ).onChange( value => {
+
+					intensities[ 0 ] = value;
+					regenerate();
+
+				} ).debounce( 250 );
+				gui.add( params, 'mode', [ 'direct only', 'indirect only', 'combined' ] ).name( 'Lighting' ).onChange( updateMode );
+				gui.add( params, 'count', sourceLights.length, MAX_VPLS, 1 ).name( 'Ray Budget' ).info( 'Total rays shared across the source lights. Escaped rays do not become VPLs.' ).onChange( regenerate ).debounce( 250 );
+				gui.add( params, 'progressive' ).name( 'Progressive Preview' ).info( 'Double the ray budget every 0.5 seconds, up to Ray Budget. Each stage regenerates a normalized estimate.' ).onChange( () => regenerate() );
+				gui.add( { restart: () => regenerate() }, 'restart' ).name( 'Restart Preview' );
+				gui.add( params, 'seed', 1, 100, 1 ).name( 'Seed' ).onChange( regenerate ).debounce( 250 );
+				const shadowParameters = gui.addFolder( 'Shadows' );
+				shadowParameters.add( params, 'shadowBias', - 0.01, 0.01, 0.0001 ).name( 'Direct Shadow Bias' ).info( 'Bias for direct sunlight shadows. Set to zero to compare contact shadows.' ).onChange( updateShadowBias );
+				shadowParameters.add( params, 'shadows' ).name( 'VPL Shadows' ).onChange( updateVisibility );
+				shadowParameters.add( params, 'visibility', [ 'shadow maps', 'BVH reference' ] ).name( 'Visibility' ).info( 'Cached GPU-rasterized cube faces, or triangle BVH reference. Direct shadows remain enabled.' ).onChange( updateVisibility );
+				shadowParameters.add( params, 'shadowResolution', [ 32, 64 ] ).name( 'Shadow Resolution' ).info( 'Pixels per cube face. Maps rebuild when the VPL set or resolution changes.' ).onChange( () => {
+
+					mapsDirty = true;
+					updateVisibility();
+
+				} );
+				gui.add( params, 'minDistance', 0.01, 1, 0.01 ).name( 'Distance Clamp' ).info( 'Reduces near-field singularities at the expense of indirect-light energy.' ).onChange( value => {
+
+		vpl.minDistance.value = value;
+
+	} );
+				gui.add( params, 'showVPLs' ).name( 'Show VPLs' ).onChange( value => {
+
+		helper.visible = value;
+
+	} );
+
+				regenerate();
+				if ( new URLSearchParams( window.location.search ).has( 'benchmark' ) ) {
+
+					const { createBenchmark } = await import( '../test/benchmarks/virtual-point-lights/benchmark.js' );
+					window.vplBenchmark = createBenchmark( renderer, scene, camera, settings => {
+
+						Object.assign( params, settings );
+						intensities[ 0 ] = params.sunIntensity;
+						updateShadowBias();
+						vpl.minDistance.value = params.minDistance;
+						vpl.shadows.value = params.shadows;
+						regenerate();
+						return generator.count;
+
+					} );
+
+				} else {
+
+					renderer.setAnimationLoop( () => {
+
+						if ( performance.now() >= nextPreviewTime ) {
+
+							previewCount = Math.min( params.count, previewCount * 2 );
+							regenerate( false );
+
+						}
+
+						renderer.render( scene, camera );
+
+					} );
+
+				}
+
+				window.addEventListener( 'resize', () => {
+
+					camera.aspect = window.innerWidth / window.innerHeight;
+					camera.updateProjectionMatrix();
+					renderer.setSize( window.innerWidth, window.innerHeight );
+
+				} );
+
+			}
+
+		</script>
+	</body>
+</html>
