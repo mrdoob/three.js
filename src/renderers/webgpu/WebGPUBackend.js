@@ -5,6 +5,7 @@ import { GPUFeatureName, GPULoadOp, GPUStoreOp, GPUIndexFormat, GPUTextureViewDi
 
 import WGSLNodeBuilder from './nodes/WGSLNodeBuilder.js';
 import Backend from '../common/Backend.js';
+import { AttributeType } from '../common/Constants.js';
 
 import WebGPUUtils, { submit } from './utils/WebGPUUtils.js';
 import WebGPUAttributeUtils from './utils/WebGPUAttributeUtils.js';
@@ -1940,6 +1941,8 @@ class WebGPUBackend extends Backend {
 		// When the dispatchSize is set with a StorageBuffer from the GPU.
 
 		if ( dispatchSize && dispatchSize.isIndirectStorageBufferAttribute ) {
+
+			this.renderer._attributes.update( dispatchSize, AttributeType.INDIRECT );
 
 			const dispatchBuffer = this.get( dispatchSize ).buffer;
 
