@@ -3,21 +3,21 @@
 
 <head>
 
-	<title>three.js webgl - postprocessing - Screen Space Reflection 2</title>
+	<title>three.js webgl - postprocessing - Screen Space Indirect Specular</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<meta property="og:title" content="three.js webgl - postprocessing - Screen Space Reflection 2">
+	<meta property="og:title" content="three.js webgl - postprocessing - Screen Space Indirect Specular">
 	<meta property="og:type" content="website">
-	<meta property="og:url" content="https://threejs.org/examples/webgl_postprocessing_ssr2.html">
-	<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_postprocessing_ssr2.jpg">
+	<meta property="og:url" content="https://threejs.org/examples/webgl_postprocessing_ssis.html">
+	<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_postprocessing_ssis.jpg">
 	<link type="text/css" rel="stylesheet" href="main.css">
 
 </head>
 
 <body>
 	<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - screen space reflections as indirect specular<br />
-		SSR2Pass fills <code>scene.indirectSpecularMap</code>; materials apply their own BRDF to it.
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - screen space indirect specular<br />
+		SSISPass fills <code>scene.ssisMap</code>; materials apply their own BRDF to it.
 	</div>
 
 	<script type="importmap">
@@ -40,12 +40,12 @@
 		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 		import { GBufferPass } from 'three/addons/postprocessing/GBufferPass.js';
 		import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-		import { SSR2Pass } from 'three/addons/postprocessing/SSR2Pass.js';
+		import { SSISPass } from 'three/addons/postprocessing/SSISPass.js';
 		import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 		import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 		const params = {
-			ssr: true,
+			ssis: true,
 			autoRotate: true,
 			floorRoughness: 0.1,
 			floorMetalness: 0.5,
@@ -115,13 +115,13 @@
 
 		const composer = new EffectComposer( renderer );
 		const gBufferPass = new GBufferPass( scene, camera, width, height, { material: true } );
-		const ssr2Pass = new SSR2Pass( scene, camera, width, height, gBufferPass );
-		ssr2Pass.maxDistance = 0.3;
-		ssr2Pass.thickness = 0.02;
+		const ssisPass = new SSISPass( scene, camera, width, height, gBufferPass );
+		ssisPass.maxDistance = 0.3;
+		ssisPass.thickness = 0.02;
 
 		composer.addPass( gBufferPass );
 		composer.addPass( new RenderPass( scene, camera ) );
-		composer.addPass( ssr2Pass );
+		composer.addPass( ssisPass );
 
 		// debug view: replaces the beauty with one of the buffers
 		const viewPass = new ShaderPass( {
@@ -146,11 +146,11 @@
 		composer.addPass( viewPass );
 		composer.addPass( new OutputPass() );
 
-		scene.indirectSpecularMap = ssr2Pass.texture;
+		scene.ssisMap = ssisPass.texture;
 
 		const views = {
 			'Beauty': null,
-			'SSR radiance': [ ssr2Pass.texture, 0 ],
+			'SSIS radiance': [ ssisPass.texture, 0 ],
 			'Roughness': [ gBufferPass.materialTexture, 1 ],
 			'Normals': [ gBufferPass.normalTexture, 0 ]
 		};
@@ -167,9 +167,9 @@
 			}
 
 		} );
-		gui.add( params, 'ssr' ).name( 'SSR as indirect specular' ).onChange( v => {
+		gui.add( params, 'ssis' ).name( 'SSIS as lighting input' ).onChange( v => {
 
-			scene.indirectSpecularMap = v ? ssr2Pass.texture : null;
+			scene.ssisMap = v ? ssisPass.texture : null;
 
 		} );
 		gui.add( params, 'autoRotate' ).onChange( v => controls.enabled = ! v );
@@ -177,16 +177,16 @@
 		gui.add( params, 'floorMetalness', 0, 1 ).onChange( v => floor.material.metalness = v );
 		gui.add( params, 'bunnyRoughness', 0, 1 ).onChange( v => bunny && ( bunny.material.roughness = v ) );
 		gui.add( params, 'bunnyMetalness', 0, 1 ).onChange( v => bunny && ( bunny.material.metalness = v ) );
-		gui.add( ssr2Pass, 'stochastic' );
-		gui.add( ssr2Pass, 'quality', 0.1, 1 );
-		gui.add( ssr2Pass, 'resolutionScale', 0.25, 1 );
-		gui.add( ssr2Pass, 'rayCount', 1, 16, 1 );
-		gui.add( ssr2Pass, 'maxFrames', 1, 64, 1 );
-		gui.add( ssr2Pass, 'temporalClip', 0.5, 4 );
-		gui.add( ssr2Pass, 'maxDistance', 0, 1 );
-		gui.add( ssr2Pass, 'thickness', 0, 0.1 );
-		gui.add( ssr2Pass, 'maxRoughness', 0, 1 );
-		gui.add( ssr2Pass, 'screenEdgeFade', 0, 0.5 );
+		gui.add( ssisPass, 'stochastic' );
+		gui.add( ssisPass, 'quality', 0.1, 1 );
+		gui.add( ssisPass, 'resolutionScale', 0.25, 1 );
+		gui.add( ssisPass, 'rayCount', 1, 16, 1 );
+		gui.add( ssisPass, 'maxFrames', 1, 64, 1 );
+		gui.add( ssisPass, 'temporalClip', 0.5, 4 );
+		gui.add( ssisPass, 'maxDistance', 0, 1 );
+		gui.add( ssisPass, 'thickness', 0, 0.1 );
+		gui.add( ssisPass, 'maxRoughness', 0, 1 );
+		gui.add( ssisPass, 'screenEdgeFade', 0, 0.5 );
 		gui.add( scene, 'environmentIntensity', 0, 2 );
 
 		window.addEventListener( 'resize', () => {

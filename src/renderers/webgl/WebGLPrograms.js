@@ -220,7 +220,7 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 			map: HAS_MAP,
 			matcap: HAS_MATCAP,
 			envMap: HAS_ENVMAP,
-			indirectSpecularMap: material.isMeshStandardMaterial && !! scene.indirectSpecularMap,
+			ssisMap: material.isMeshStandardMaterial && !! scene.ssisMap,
 			envMapMode: HAS_ENVMAP && envMap.mapping,
 			envMapPMREM: HAS_PMREM,
 			envMapMaxLod: HAS_PMREM ? envMapMipmaps.length - 1 : null,
@@ -454,7 +454,7 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 		array.push( parameters.precision );
 		array.push( parameters.outputColorSpace );
 		array.push( parameters.envMapMode );
-		array.push( parameters.indirectSpecularMap );
+		array.push( parameters.ssisMap );
 		array.push( parameters.envMapPMREM );
 		array.push( parameters.envMapMaxLod );
 		array.push( parameters.envMapSize );

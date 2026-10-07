@@ -4,10 +4,10 @@ import {
 } from 'three';
 
 /**
- * Shaders for {@link SSR2Pass}.
+ * Shaders for {@link SSISPass}.
  *
- * @module SSR2Shader
- * @three_import import * as SSR2Shader from 'three/addons/shaders/SSR2Shader.js';
+ * @module SSISShader
+ * @three_import import * as SSISShader from 'three/addons/shaders/SSISShader.js';
  */
 
 const vertexShader = /* glsl */`
@@ -38,9 +38,9 @@ const vertexShader = /* glsl */`
  * @constant
  * @type {ShaderMaterial~Shader}
  */
-const SSR2TraceShader = {
+const SSISTraceShader = {
 
-	name: 'SSR2TraceShader',
+	name: 'SSISTraceShader',
 
 	defines: {
 		MAX_STEP: 0,
@@ -380,9 +380,9 @@ const SSR2TraceShader = {
  * @constant
  * @type {ShaderMaterial~Shader}
  */
-const SSR2ResolveShader = {
+const SSISResolveShader = {
 
-	name: 'SSR2ResolveShader',
+	name: 'SSISResolveShader',
 
 	uniforms: {
 
@@ -436,9 +436,9 @@ const SSR2ResolveShader = {
  * @constant
  * @type {ShaderMaterial~Shader}
  */
-const SSR2TemporalShader = {
+const SSISTemporalShader = {
 
-	name: 'SSR2TemporalShader',
+	name: 'SSISTemporalShader',
 
 	uniforms: {
 
@@ -533,4 +533,4 @@ const SSR2TemporalShader = {
 
 };
 
-export { SSR2TraceShader, SSR2ResolveShader, SSR2TemporalShader };
+export { SSISTraceShader, SSISResolveShader, SSISTemporalShader };

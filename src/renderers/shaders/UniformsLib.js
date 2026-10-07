@@ -31,7 +31,7 @@ const UniformsLib = {
 	envmap: {
 
 		envMap: { value: null },
-		indirectSpecularMap: { value: null }, // screen-space specular radiance, see Scene.indirectSpecularMap
+		ssisMap: { value: null }, // screen-space specular radiance, see Scene.ssisMap
 		envMapRotation: { value: /*@__PURE__*/ new Matrix3() },
 		reflectivity: { value: 1.0 }, // basic, lambert, phong
 		ior: { value: 1.5 }, // physical

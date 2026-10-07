@@ -10,12 +10,12 @@ import {
 	WebGLRenderTarget
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
-import { SSR2TraceShader, SSR2ResolveShader, SSR2TemporalShader } from '../shaders/SSR2Shader.js';
+import { SSISTraceShader, SSISResolveShader, SSISTemporalShader } from '../shaders/SSISShader.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
 /**
- * Screen-space reflections computed as prefiltered incoming specular radiance, meant to
- * be consumed by the material lighting through {@link Scene#indirectSpecularMap}
+ * Screen-space indirect specular (SSIS) computed as prefiltered incoming specular radiance, meant to
+ * be consumed by the material lighting through {@link Scene#ssisMap}
  * instead of being composited over the beauty image.
  *
  * Each pixel traces rays through the depth buffer, importance-sampled from its GGX
@@ -26,8 +26,8 @@ import { CopyShader } from '../shaders/CopyShader.js';
  * over its mip chain. Materials apply their own BRDF to the result.
  *
  * Inputs come from a {@link GBufferPass} created with `{ material: true }`. Place this
- * pass after the pass that renders the lit scene, and assign {@link SSR2Pass#texture} to
- * `scene.indirectSpecularMap` once. The pass reads the lit color of the current frame
+ * pass after the pass that renders the lit scene, and assign {@link SSISPass#texture} to
+ * `scene.ssisMap` once. The pass reads the lit color of the current frame
  * and the scene consumes the result on the next frame, so reflections lag by one
  * frame under motion and the first frame has no specular. The lit color already contains
  * the previous reflections, which gives free multiple bounces.
@@ -37,17 +37,17 @@ import { CopyShader } from '../shaders/CopyShader.js';
  *
  * ```js
  * const gBufferPass = new GBufferPass( scene, camera, width, height, { material: true } );
- * const ssr2Pass = new SSR2Pass( scene, camera, width, height, gBufferPass );
- * scene.indirectSpecularMap = ssr2Pass.texture;
+ * const ssisPass = new SSISPass( scene, camera, width, height, gBufferPass );
+ * scene.ssisMap = ssisPass.texture;
  * composer.addPass( gBufferPass );
  * composer.addPass( new RenderPass( scene, camera ) );
- * composer.addPass( ssr2Pass );
+ * composer.addPass( ssisPass );
  * ```
  *
  * @augments Pass
- * @three_import import { SSR2Pass } from 'three/addons/postprocessing/SSR2Pass.js';
+ * @three_import import { SSISPass } from 'three/addons/postprocessing/SSISPass.js';
  */
-class SSR2Pass extends Pass {
+class SSISPass extends Pass {
 
 	/**
 	 * @param {Scene} scene - The scene (its environment is used for misses).
@@ -167,24 +167,24 @@ class SSR2Pass extends Pass {
 		} );
 
 		this._traceMaterial = new ShaderMaterial( {
-			defines: Object.assign( {}, SSR2TraceShader.defines ),
-			uniforms: UniformsUtils.clone( SSR2TraceShader.uniforms ),
-			vertexShader: SSR2TraceShader.vertexShader,
-			fragmentShader: SSR2TraceShader.fragmentShader,
+			defines: Object.assign( {}, SSISTraceShader.defines ),
+			uniforms: UniformsUtils.clone( SSISTraceShader.uniforms ),
+			vertexShader: SSISTraceShader.vertexShader,
+			fragmentShader: SSISTraceShader.fragmentShader,
 			blending: NoBlending
 		} );
 
 		this._resolveMaterial = new ShaderMaterial( {
-			uniforms: UniformsUtils.clone( SSR2ResolveShader.uniforms ),
-			vertexShader: SSR2ResolveShader.vertexShader,
-			fragmentShader: SSR2ResolveShader.fragmentShader,
+			uniforms: UniformsUtils.clone( SSISResolveShader.uniforms ),
+			vertexShader: SSISResolveShader.vertexShader,
+			fragmentShader: SSISResolveShader.fragmentShader,
 			blending: NoBlending
 		} );
 
 		this._temporalMaterial = new ShaderMaterial( {
-			uniforms: UniformsUtils.clone( SSR2TemporalShader.uniforms ),
-			vertexShader: SSR2TemporalShader.vertexShader,
-			fragmentShader: SSR2TemporalShader.fragmentShader,
+			uniforms: UniformsUtils.clone( SSISTemporalShader.uniforms ),
+			vertexShader: SSISTemporalShader.vertexShader,
+			fragmentShader: SSISTemporalShader.fragmentShader,
 			blending: NoBlending
 		} );
 
@@ -256,7 +256,7 @@ class SSR2Pass extends Pass {
 	}
 
 	/**
-	 * The prefiltered specular radiance texture. Assign it to `scene.indirectSpecularMap`.
+	 * The prefiltered specular radiance texture. Assign it to `scene.ssisMap`.
 	 * The texture identity is stable across resizes.
 	 *
 	 * @type {Texture}
@@ -414,4 +414,4 @@ class SSR2Pass extends Pass {
 
 }
 
-export { SSR2Pass };
+export { SSISPass };

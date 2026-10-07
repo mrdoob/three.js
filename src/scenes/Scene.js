@@ -51,7 +51,7 @@ class Scene extends Object3D {
 
 		/**
 		 * A screen-space map of prefiltered incoming specular radiance (for example the
-		 * output of a screen-space reflection pass, faded to the environment). When set,
+		 * output of an SSIS pass, faded to the environment). When set,
 		 * it replaces the environment specular term of {@link MeshStandardMaterial} and
 		 * {@link MeshPhysicalMaterial}, which then apply their own BRDF (Fresnel, F0,
 		 * multiple scattering, specular occlusion) to it. Environment diffuse lighting is
@@ -63,7 +63,7 @@ class Scene extends Object3D {
 		 * @type {?Texture}
 		 * @default null
 		 */
-		this.indirectSpecularMap = null;
+		this.ssisMap = null;
 
 		/**
 		 * A fog instance defining the type of fog that affects everything
@@ -142,7 +142,7 @@ class Scene extends Object3D {
 
 		this.background = source.background !== null ? source.background.clone() : null;
 		this.environment = source.environment !== null ? source.environment.clone() : null;
-		this.indirectSpecularMap = source.indirectSpecularMap;
+		this.ssisMap = source.ssisMap;
 		this.fog = source.fog !== null ? source.fog.clone() : null;
 
 		this.backgroundBlurriness = source.backgroundBlurriness;

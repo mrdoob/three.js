@@ -2,9 +2,9 @@ export default /* glsl */`
 uniform bool receiveShadow;
 uniform vec3 ambientLightColor;
 
-#ifdef USE_INDIRECT_SPECULAR_MAP
+#ifdef USE_SSIS_MAP
 
-	uniform sampler2D indirectSpecularMap;
+	uniform sampler2D ssisMap;
 
 #endif
 
