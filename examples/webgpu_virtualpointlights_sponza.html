@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - virtual point lights (Sponza)</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - virtual point lights (Sponza)">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_virtualpointlights_sponza.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_virtualpointlights_sponza.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Virtual Point Lights (Sponza)</span>
+			</div>
+
+			<small>Single-bounce point-light GI in Sponza. WASD to move, mouse to look. Bounce sampling uses material colors; texture maps and alpha tests are not sampled.</small>
+			<small id="samplingStatus"></small>
+		</div>
+
+		<progress id="progressBar" value="0" max="100" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)"></progress>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/",
+					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.15/src/index.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { lights } from 'three/tsl';
+
+			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { VirtualPointLightGenerator } from 'three/addons/lighting/VirtualPointLightGenerator.js';
+			import { VirtualPointLightShadowMaps } from 'three/addons/lighting/VirtualPointLightShadowMaps.js';
+			import { VirtualPointLightsNode } from 'three/addons/tsl/lighting/VirtualPointLightsNode.js';
+			import { VirtualPointLightHelper } from 'three/addons/helpers/VirtualPointLightHelper.js';
+			import { acceleratedRaycast, computeBoundsTree } from 'three-mesh-bvh';
+
+			const MAX_VPLS = 1024;
+			const params = { mode: 'combined', count: 256, shadows: true, shadowResolution: 64, shadowBias: 0, showVPLs: false, seed: 1, minDistance: 1, progressive: false };
+
+			const MODEL_INDEX_URL = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/model-index.json';
+			const SAMPLE_ASSETS_BASE_URL = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/';
+
+			init().catch( error => {
+
+				console.error( error );
+				document.getElementById( 'progressBar' )?.remove();
+				document.querySelector( '#info small' ).textContent = 'Could not initialize Sponza: ' + error.message;
+
+			} );
+
+			async function init() {
+
+				const camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1000 );
+				camera.position.set( - 10.25, 4.99, 0.40 );
+				camera.rotation.set( 1.6505, - 1.5008, 1.6507 );
+
+				const scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x202830 );
+				const progressBar = document.getElementById( 'progressBar' );
+				const manager = new THREE.LoadingManager();
+				manager.onProgress = ( url, loaded, total ) => {
+
+					progressBar.value = loaded / total * 100;
+
+				};
+
+				const gltf = await new GLTFLoader( manager ).loadAsync( await getSponzaModelURL() );
+				progressBar.remove();
+				const model = gltf.scene;
+				const embeddedLights = [];
+				model.traverse( object => {
+
+					if ( object.isLight ) embeddedLights.push( object );
+
+				} );
+				for ( const light of embeddedLights ) light.removeFromParent();
+				scene.add( model );
+
+				// The current generator models isotropic point sources, rather than sunlight.
+
+				for ( const [ x, y, z, color, intensity ] of [[ - 3, 6, 0, 0xfff2dc, 100 ], [ 6, 4, 0, 0xdceaff, 60 ]] ) {
+
+					const light = new THREE.PointLight( color, intensity );
+					light.position.set( x, y, z );
+					light.castShadow = true;
+					light.shadow.mapSize.setScalar( 1024 );
+					light.shadow.camera.near = 0.1;
+					light.shadow.camera.far = 80;
+					scene.add( light );
+
+				}
+
+				scene.updateMatrixWorld( true );
+
+				const surfaces = [], sourceLights = [];
+				scene.traverseVisible( object => {
+
+					if ( object.isMesh ) {
+
+						surfaces.push( object );
+						object.raycast = acceleratedRaycast;
+						object.castShadow = true;
+						object.receiveShadow = true;
+						if ( ! object.geometry.boundsTree ) computeBoundsTree.call( object.geometry );
+
+					} else if ( object.isPointLight ) {
+
+						sourceLights.push( object );
+
+					}
+
+				} );
+
+				const generator = new VirtualPointLightGenerator( MAX_VPLS );
+				const bounds = new THREE.Box3().setFromObject( model );
+				const far = Math.max( 40, bounds.getSize( new THREE.Vector3() ).length() * 2 );
+				const shadowMaps = new VirtualPointLightShadowMaps( MAX_VPLS, params.shadowResolution, far );
+				const vpl = new VirtualPointLightsNode( generator, ( start, end, index ) => shadowMaps.visibility( start, end, index ) );
+				vpl.shadows.value = params.shadows;
+				const lighting = lights( [ ...sourceLights, vpl ] );
+				const materials = new Map();
+
+				function convertMaterial( original ) {
+
+					if ( ! materials.has( original ) ) {
+
+						const material = new THREE.MeshStandardNodeMaterial();
+						material.copy( original );
+						material.lightsNode = lighting;
+						materials.set( original, material );
+
+					}
+
+					return materials.get( original );
+
+				}
+
+				for ( const surface of surfaces ) {
+
+					surface.material = Array.isArray( surface.material ) ? surface.material.map( convertMaterial ) : convertMaterial( surface.material );
+
+				}
+
+				const helper = new VirtualPointLightHelper( generator );
+				helper.visible = params.showVPLs;
+				scene.add( helper );
+
+				function generate() {
+
+					const visible = helper.visible;
+					helper.visible = false;
+					try {
+
+						generator.generate( scene, sourceLights, { count: previewCount, seed: params.seed } );
+
+					} finally {
+
+						helper.visible = visible;
+
+					}
+
+					vpl.update();
+					document.getElementById( 'samplingStatus' ).textContent = params.progressive ? `Preview: ${ previewCount } / ${ params.count } rays, ${ generator.count } VPLs` : '';
+					helper.update();
+					mapsDirty = true;
+
+				}
+
+				let mapsDirty = true;
+				let previewCount = params.count;
+				let nextPreviewTime = Infinity;
+				const intensities = sourceLights.map( light => light.intensity );
+
+				function updateShadowBias() {
+
+					for ( const light of sourceLights ) light.shadow.bias = params.shadowBias;
+
+				}
+
+				updateShadowBias();
+
+				function updateVisibility() {
+
+					vpl.shadows.value = params.shadows;
+					if ( params.shadows && mapsDirty ) {
+
+						const visible = helper.visible;
+						helper.visible = false;
+						try {
+
+							shadowMaps.update( renderer, scene, generator, vpl.bias.value, params.shadowResolution );
+							mapsDirty = false;
+
+						} finally {
+
+							helper.visible = visible;
+
+						}
+
+					}
+
+				}
+
+				function updateMode() {
+
+					sourceLights.forEach( ( light, i ) => {
+
+						light.intensity = params.mode === 'indirect only' ? 0 : intensities[ i ];
+
+					} );
+					vpl.intensity.value = params.mode === 'direct only' ? 0 : 1;
+
+				}
+
+				// Sampling always uses the original source power, including in indirect-only mode.
+				function regenerate( restart = true ) {
+
+					if ( restart !== false ) previewCount = params.progressive ? Math.min( 32, params.count ) : params.count;
+
+					sourceLights.forEach( ( light, i ) => {
+
+						light.intensity = intensities[ i ];
+
+					} );
+					generate();
+					updateMode();
+					updateVisibility();
+					nextPreviewTime = params.progressive && previewCount < params.count ? performance.now() + 500 : Infinity;
+
+				}
+
+				const renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( Math.min( window.devicePixelRatio, 1.5 ) );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1.0;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+				await renderer.init();
+
+				const controls = new FirstPersonControls( camera, renderer.domElement );
+				controls.movementSpeed = 2;
+				controls.lookSpeed = 0.2;
+				const timer = new THREE.Timer();
+
+				const gui = renderer.inspector.createParameters( 'Virtual Point Lights' );
+				gui.add( params, 'mode', [ 'direct only', 'indirect only', 'combined' ] ).name( 'Lighting' ).onChange( updateMode );
+				gui.add( params, 'count', sourceLights.length, MAX_VPLS, 1 ).name( 'Ray Budget' ).info( 'Total rays shared across the source lights. Escaped rays do not become VPLs.' ).onChange( regenerate ).debounce( 250 );
+				gui.add( params, 'progressive' ).name( 'Progressive Preview' ).info( 'Double the ray budget every 0.5 seconds, up to Ray Budget. Each stage regenerates a normalized estimate.' ).onChange( () => regenerate() );
+				gui.add( { restart: () => regenerate() }, 'restart' ).name( 'Restart Preview' );
+				gui.add( params, 'seed', 1, 100, 1 ).name( 'Seed' ).onChange( regenerate ).debounce( 250 );
+				const shadowParameters = gui.addFolder( 'Shadows' );
+				shadowParameters.add( params, 'shadowBias', - 0.01, 0.01, 0.0001 ).name( 'Direct Shadow Bias' ).info( 'Bias for direct point-light shadows. Set to zero to compare contact shadows.' ).onChange( updateShadowBias );
+				shadowParameters.add( params, 'shadows' ).name( 'VPL Shadows' ).onChange( updateVisibility );
+				shadowParameters.add( params, 'shadowResolution', [ 32, 64 ] ).name( 'Shadow Resolution' ).info( 'Pixels per cube face. Maps rebuild when the VPL set or resolution changes.' ).onChange( () => {
+
+					mapsDirty = true;
+					updateVisibility();
+
+				} );
+				gui.add( params, 'minDistance', 0.01, 1, 0.01 ).name( 'Distance Clamp' ).info( 'Reduces near-field singularities at the expense of indirect-light energy.' ).onChange( value => {
+
+		vpl.minDistance.value = value;
+
+	} );
+				gui.add( params, 'showVPLs' ).name( 'Show VPLs' ).onChange( value => {
+
+		helper.visible = value;
+
+	} );
+
+				regenerate();
+				if ( new URLSearchParams( window.location.search ).has( 'benchmark' ) ) {
+
+					const { createBenchmark } = await import( '../test/benchmarks/virtual-point-lights/benchmark.js' );
+					window.vplBenchmark = createBenchmark( renderer, scene, camera, settings => {
+
+						Object.assign( params, settings );
+						updateShadowBias();
+						vpl.minDistance.value = params.minDistance;
+						vpl.shadows.value = params.shadows;
+						regenerate();
+						return generator.count;
+
+					} );
+
+				} else {
+
+					renderer.setAnimationLoop( timestamp => {
+
+						timer.update( timestamp );
+						controls.update( timer.getDelta() );
+
+						if ( performance.now() >= nextPreviewTime ) {
+
+							previewCount = Math.min( params.count, previewCount * 2 );
+							regenerate( false );
+
+						}
+
+						renderer.render( scene, camera );
+
+					} );
+
+				}
+
+				window.addEventListener( 'resize', () => {
+
+					controls.handleResize();
+					camera.aspect = window.innerWidth / window.innerHeight;
+					camera.updateProjectionMatrix();
+					renderer.setSize( window.innerWidth, window.innerHeight );
+
+				} );
+
+			}
+
+			async function getSponzaModelURL() {
+
+				const response = await fetch( MODEL_INDEX_URL );
+				if ( ! response.ok ) throw new Error( 'Could not fetch the Sponza model index.' );
+				const models = await response.json();
+				const sponzaInfo = models.find( ( model ) => model.name === 'Sponza' );
+
+				if ( ! sponzaInfo ) {
+
+					throw new Error( 'Sponza entry was not found in the glTF sample model index.' );
+
+				}
+
+				const variants = sponzaInfo.variants || {};
+				const variantName = variants[ 'glTF-Binary' ] || variants[ 'glTF' ] || variants[ 'glTF-Embedded' ] || Object.values( variants )[ 0 ];
+
+				if ( ! variantName ) {
+
+					throw new Error( 'Sponza has no supported glTF variant in the model index.' );
+
+				}
+
+				const variantFolder = variantName.endsWith( '.glb' ) ? 'glTF-Binary' : 'glTF';
+				return `${ SAMPLE_ASSETS_BASE_URL }${ sponzaInfo.name }/${ variantFolder }/${ variantName }`;
+
+			}
+
+
+		</script>
+	</body>
+</html>
