@@ -1,7 +1,6 @@
 import {
+	ArrayCamera,
 	Box3,
-	CubeCamera,
-	CubeRenderTarget,
 	FloatType,
 	HalfFloatType,
 	Light,
@@ -9,16 +8,18 @@ import {
 	MathUtils,
 	NearestFilter,
 	NodeMaterial,
+	PerspectiveCamera,
 	QuadMesh,
 	RenderTarget,
 	RenderTarget3D,
 	RGBAFormat,
-	Vector3
+	Vector3,
+	Vector4
 } from 'three/webgpu';
 
 import {
 	array,
-	cubeTexture,
+	atan,
 	float,
 	Fn,
 	int,
@@ -34,95 +35,124 @@ import {
 import { LightProbeGridNode, ATLAS_PADDING } from '../tsl/lighting/LightProbeGridNode.js';
 import { replaceSunLights, restoreSunLights } from './LightProbeGridUtils.js';
 
+// Probes captured per render. Each probe adds six sub-cameras to the capture
+// camera, so this trades per-render overhead against uniform buffer size.
+const PROBES_PER_BATCH = 8;
+
+// Per-face basis of the capture cameras: forward, right and up. A texel at
+// NDC ( x, y ) of face f looks along forward + x * right + y * up.
+const FACE_FORWARD = [[ 1, 0, 0 ], [ - 1, 0, 0 ], [ 0, 1, 0 ], [ 0, - 1, 0 ], [ 0, 0, 1 ], [ 0, 0, - 1 ]];
+const FACE_RIGHT = [[ 0, 0, 1 ], [ 0, 0, - 1 ], [ - 1, 0, 0 ], [ - 1, 0, 0 ], [ - 1, 0, 0 ], [ 1, 0, 0 ]];
+const FACE_UP = [[ 0, 1, 0 ], [ 0, 1, 0 ], [ 0, 0, - 1 ], [ 0, 0, 1 ], [ 0, 1, 0 ], [ 0, 1, 0 ]];
+
 // Shared fullscreen-quad for the bake passes.
 const _quad = /*@__PURE__*/ new QuadMesh();
 
 // Reusable temp objects.
 const _position = /*@__PURE__*/ new Vector3();
+const _target = /*@__PURE__*/ new Vector3();
 const _size = /*@__PURE__*/ new Vector3();
 const _copyRegion = /*@__PURE__*/ new Box3();
 
 // Bake materials, shared across grids so the shaders compile once, not per bake.
 let _shMaterial = null;
-let _shSampleCount = - 1;
-let _cubeNode = null;
+let _shFaceSize = - 1;
+let _faceNode = null;
 let _batchNode = null;
+let _batchStartUniform = null;
 let _resolutionUniform = null;
 let _sliceZUniform = null;
 let _repackMaterials = null;
 
 // Bake render targets, pooled by size so rebakes don't churn allocations.
-let _cubeRenderTarget = null;
-let _cubeCamera = null;
-let _cubeKey = '';
+let _faceTarget = null;
+let _faceSize = - 1;
 let _batchTarget = null;
 let _batchProbes = - 1;
 
-// Golden-angle increment for the equal-area Fibonacci sphere.
-const GOLDEN_ANGLE = Math.PI * ( 3.0 - Math.sqrt( 5.0 ) );
+// The capture camera renders every face of a probe batch in one pass. It is
+// never recreated: the camera uniform arrays reference its sub-camera matrices.
+let _captureCamera = null;
 
 /**
  * Returns the output node for the spherical-harmonic projection pass. Each
- * fragment of the 9-wide batch row computes a single SH coefficient by
- * integrating the captured cubemap over an equal-area Fibonacci sphere,
- * selecting the basis function for its column. Sampling the cubemap by world
- * direction keeps the projection independent of the cube face layout.
+ * fragment of a batch row integrates one SH coefficient over one captured cube
+ * face, weighting every texel by its exact solid angle. Columns are ordered
+ * `coefficient * 6 + face`; the repack pass sums the six faces.
  *
  * @private
- * @param {Node} cube - The captured environment cubemap texture node.
- * @param {number} sampleCount - Number of directions to integrate.
- * @return {Node<vec4>} The projected coefficient.
+ * @param {Node} faces - The face atlas texture node.
+ * @param {number} size - The face resolution.
+ * @param {Node<int>} batchStart - The probe index of the first batch row.
+ * @return {Node<vec4>} The projected coefficient for one face.
  */
-function projectSHNode( cube, sampleCount ) {
+function projectSHNode( faces, size, batchStart ) {
+
+	const toVec3 = ( v ) => vec3( ...v );
 
 	return Fn( () => {
 
-		const coefIndex = int( screenCoordinate.x ).toVar();
+		const column = int( screenCoordinate.x );
+		const coefIndex = column.div( 6 ).toVar();
+		const face = column.mod( 6 ).toVar();
+		const slot = int( screenCoordinate.y ).sub( batchStart );
+
+		const forward = array( FACE_FORWARD.map( toVec3 ) ).element( face ).toVar();
+		const right = array( FACE_RIGHT.map( toVec3 ) ).element( face ).toVar();
+		const up = array( FACE_UP.map( toVec3 ) ).element( face ).toVar();
+
+		const origin = ivec2( face.mul( size ), slot.mul( size ) ).toVar();
+		const texelSize = 2.0 / size;
 		const accum = vec3( 0.0 ).toVar();
 
-		Loop( sampleCount, ( { i } ) => {
+		// Signed area of the projected face region from its center to ( x, y ).
+		const area = ( x, y ) => atan( x.mul( y ), x.mul( x ).add( y.mul( y ) ).add( 1.0 ).sqrt() );
 
-			const fi = float( i );
+		Loop( size, size, ( { i, j } ) => {
 
-			// Equal-area Fibonacci sphere direction.
-			const z = float( 1.0 ).sub( fi.mul( 2.0 ).add( 1.0 ).div( sampleCount ) );
-			const r = z.mul( z ).oneMinus().max( 0.0 ).sqrt();
-			const phi = fi.mul( GOLDEN_ANGLE );
-			const dir = vec3( r.mul( phi.cos() ), z, r.mul( phi.sin() ) ).toVar();
+			// Rows run top to bottom, so NDC y decreases with j.
+			const x0 = float( i ).mul( texelSize ).sub( 1.0 );
+			const x1 = x0.add( texelSize );
+			const y0 = float( 1.0 ).sub( float( j ).mul( texelSize ) );
+			const y1 = y0.sub( texelSize );
 
-			const radiance = cube.sample( dir ).level( 0 ).rgb;
+			const solidAngle = area( x0, y0 ).sub( area( x0, y1 ) ).sub( area( x1, y0 ) ).add( area( x1, y1 ) ).abs();
+
+			const x = x0.add( texelSize * 0.5 );
+			const y = y0.sub( texelSize * 0.5 );
+			const dir = forward.add( right.mul( x ) ).add( up.mul( y ) ).normalize().toVar();
+
+			const radiance = faces.load( origin.add( ivec2( i, j ) ) ).rgb;
 
 			// The L2 SH basis function for this fragment's coefficient.
-			const x = dir.x, y = dir.y, zc = dir.z;
+			const dx = dir.x, dy = dir.y, dz = dir.z;
 			const basis = array( [
 				float( 0.282095 ),
-				y.mul( 0.488603 ),
-				zc.mul( 0.488603 ),
-				x.mul( 0.488603 ),
-				x.mul( y ).mul( 1.092548 ),
-				y.mul( zc ).mul( 1.092548 ),
-				zc.mul( zc ).mul( 3.0 ).sub( 1.0 ).mul( 0.315392 ),
-				x.mul( zc ).mul( 1.092548 ),
-				x.mul( x ).sub( y.mul( y ) ).mul( 0.546274 )
+				dy.mul( 0.488603 ),
+				dz.mul( 0.488603 ),
+				dx.mul( 0.488603 ),
+				dx.mul( dy ).mul( 1.092548 ),
+				dy.mul( dz ).mul( 1.092548 ),
+				dz.mul( dz ).mul( 3.0 ).sub( 1.0 ).mul( 0.315392 ),
+				dx.mul( dz ).mul( 1.092548 ),
+				dx.mul( dx ).sub( dy.mul( dy ) ).mul( 0.546274 )
 			] ).element( coefIndex );
 
-			accum.addAssign( radiance.mul( basis ) );
+			accum.addAssign( radiance.mul( basis.mul( solidAngle ) ) );
 
 		} );
 
-		// Equal-area quadrature: each direction covers 4*PI / sampleCount.
-		const norm = float( 4.0 * Math.PI / sampleCount );
-
-		return vec4( accum.mul( norm ), 1.0 );
+		return vec4( accum, 1.0 );
 
 	} )();
 
 }
 
 /**
- * Returns the repack output node for one of the seven SH textures. It reads the
- * 9 projected coefficients from the batch texture for the probe at the current
- * texel and packs the four floats stored by this texture index.
+ * Returns the repack output node for one of the seven SH textures. It sums the
+ * per-face projections of the 9 coefficients from the batch texture for the
+ * probe at the current texel and packs the four floats stored by this texture
+ * index.
  *
  * @private
  * @param {Node} batch - The batch texture node holding projected coefficients.
@@ -138,19 +168,28 @@ function repackNode( batch, textureIndex, resolution, sliceZ ) {
 		const ix = int( screenCoordinate.x );
 		const iy = int( screenCoordinate.y );
 
+		// Batch rows follow the bake order (X, then Z, then Y).
 		const nx = int( resolution.x );
-		const ny = int( resolution.y );
-		const probeIndex = ix.add( iy.mul( nx ) ).add( sliceZ.mul( nx ).mul( ny ) );
+		const nz = int( resolution.z );
+		const probeIndex = ix.add( sliceZ.mul( nx ) ).add( iy.mul( nx ).mul( nz ) ).toVar();
 
-		const c0 = batch.load( ivec2( 0, probeIndex ) );
-		const c1 = batch.load( ivec2( 1, probeIndex ) );
-		const c2 = batch.load( ivec2( 2, probeIndex ) );
-		const c3 = batch.load( ivec2( 3, probeIndex ) );
-		const c4 = batch.load( ivec2( 4, probeIndex ) );
-		const c5 = batch.load( ivec2( 5, probeIndex ) );
-		const c6 = batch.load( ivec2( 6, probeIndex ) );
-		const c7 = batch.load( ivec2( 7, probeIndex ) );
-		const c8 = batch.load( ivec2( 8, probeIndex ) );
+		const coefficient = ( c ) => {
+
+			let sum = batch.load( ivec2( c * 6, probeIndex ) );
+			for ( let f = 1; f < 6; f ++ ) sum = sum.add( batch.load( ivec2( c * 6 + f, probeIndex ) ) );
+			return sum;
+
+		};
+
+		const c0 = coefficient( 0 );
+		const c1 = coefficient( 1 );
+		const c2 = coefficient( 2 );
+		const c3 = coefficient( 3 );
+		const c4 = coefficient( 4 );
+		const c5 = coefficient( 5 );
+		const c6 = coefficient( 6 );
+		const c7 = coefficient( 7 );
+		const c8 = coefficient( 8 );
 
 		let packed;
 
@@ -173,26 +212,74 @@ function repackNode( batch, textureIndex, resolution, sliceZ ) {
 }
 
 /**
- * Lazily pools the shared cube and batch render targets, recreating them only
- * when their dimensions change.
+ * Lazily creates the shared capture camera: six 90° sub-cameras per batch slot,
+ * each rendering into its own tile of the face atlas.
  *
  * @private
  * @param {number} cubemapSize - Resolution of each cubemap face.
- * @param {number} near - Cube camera near plane.
- * @param {number} far - Cube camera far plane.
+ * @param {number} near - Capture near plane.
+ * @param {number} far - Capture far plane.
+ */
+function ensureCaptureCamera( cubemapSize, near, far ) {
+
+	if ( _captureCamera === null ) {
+
+		const cameras = [];
+
+		for ( let i = 0; i < PROBES_PER_BATCH * 6; i ++ ) {
+
+			const camera = new PerspectiveCamera( 90, 1, near, far );
+			camera.viewport = new Vector4();
+			camera.up.fromArray( FACE_UP[ i % 6 ] );
+			cameras.push( camera );
+
+		}
+
+		_captureCamera = new ArrayCamera( cameras );
+
+	}
+
+	for ( let i = 0; i < _captureCamera.cameras.length; i ++ ) {
+
+		const camera = _captureCamera.cameras[ i ];
+
+		if ( camera.near !== near || camera.far !== far ) {
+
+			camera.near = near;
+			camera.far = far;
+			camera.updateProjectionMatrix();
+
+		}
+
+		camera.viewport.set( ( i % 6 ) * cubemapSize, Math.floor( i / 6 ) * cubemapSize, cubemapSize, cubemapSize );
+
+	}
+
+}
+
+/**
+ * Lazily pools the shared face atlas and batch render targets, recreating them
+ * only when their dimensions change.
+ *
+ * @private
+ * @param {number} cubemapSize - Resolution of each cubemap face.
  * @param {number} totalProbes - Number of probes (batch target height).
  */
-function ensureBakeTargets( cubemapSize, near, far, totalProbes ) {
+function ensureBakeTargets( cubemapSize, totalProbes ) {
 
-	const cubeKey = `${ cubemapSize },${ near },${ far }`;
+	if ( _faceTarget === null || _faceSize !== cubemapSize ) {
 
-	if ( _cubeRenderTarget === null || _cubeKey !== cubeKey ) {
+		if ( _faceTarget !== null ) _faceTarget.dispose();
 
-		if ( _cubeRenderTarget !== null ) _cubeRenderTarget.dispose();
+		// One row of six face tiles per batch slot.
+		_faceTarget = new RenderTarget( 6 * cubemapSize, PROBES_PER_BATCH * cubemapSize, {
+			type: HalfFloatType,
+			minFilter: NearestFilter,
+			magFilter: NearestFilter,
+			generateMipmaps: false
+		} );
 
-		_cubeRenderTarget = new CubeRenderTarget( cubemapSize, { type: HalfFloatType, generateMipmaps: false } );
-		_cubeCamera = new CubeCamera( near, far, _cubeRenderTarget );
-		_cubeKey = cubeKey;
+		_faceSize = cubemapSize;
 
 	}
 
@@ -200,7 +287,8 @@ function ensureBakeTargets( cubemapSize, near, far, totalProbes ) {
 
 		if ( _batchTarget !== null ) _batchTarget.dispose();
 
-		_batchTarget = new RenderTarget( 9, totalProbes, {
+		// One row per probe: 9 coefficients x 6 faces.
+		_batchTarget = new RenderTarget( 9 * 6, totalProbes, {
 			type: FloatType,
 			format: RGBAFormat,
 			minFilter: NearestFilter,
@@ -216,20 +304,21 @@ function ensureBakeTargets( cubemapSize, near, far, totalProbes ) {
 
 /**
  * Lazily builds the shared bake materials and rebinds them to the current
- * cube/batch textures. The SH projection material is rebuilt only when the
- * sample count changes; the repack materials are static.
+ * face/batch textures. The SH projection material is rebuilt only when the
+ * face size changes; the repack materials are static.
  *
  * @private
- * @param {number} sampleCount - Number of directions integrated by the projection.
- * @param {CubeTexture} cubeMap - The current cube render target texture.
+ * @param {number} cubemapSize - Resolution of each cubemap face.
+ * @param {Texture} faceMap - The current face atlas texture.
  * @param {Texture} batchMap - The current batch render target texture.
  */
-function ensureBakeMaterials( sampleCount, cubeMap, batchMap ) {
+function ensureBakeMaterials( cubemapSize, faceMap, batchMap ) {
 
 	if ( _repackMaterials === null ) {
 
-		_cubeNode = cubeTexture( cubeMap );
+		_faceNode = texture( faceMap );
 		_batchNode = texture( batchMap );
+		_batchStartUniform = uniform( 0, 'int' );
 		_resolutionUniform = uniform( new Vector3() );
 		_sliceZUniform = uniform( 0, 'int' );
 		_repackMaterials = [];
@@ -246,20 +335,20 @@ function ensureBakeMaterials( sampleCount, cubeMap, batchMap ) {
 
 	} else {
 
-		_cubeNode.value = cubeMap;
+		_faceNode.value = faceMap;
 		_batchNode.value = batchMap;
 
 	}
 
-	if ( _shMaterial === null || _shSampleCount !== sampleCount ) {
+	if ( _shMaterial === null || _shFaceSize !== cubemapSize ) {
 
 		if ( _shMaterial !== null ) _shMaterial.dispose();
 
 		_shMaterial = new NodeMaterial();
-		_shMaterial.outputNode = projectSHNode( _cubeNode, sampleCount );
+		_shMaterial.outputNode = projectSHNode( _faceNode, cubemapSize, _batchStartUniform );
 		_shMaterial.depthTest = false;
 		_shMaterial.depthWrite = false;
-		_shSampleCount = sampleCount;
+		_shFaceSize = cubemapSize;
 
 	}
 
@@ -446,7 +535,6 @@ class LightProbeGrid extends Light {
 	 * @param {number} [options.near=0.1] - Near plane for the cube camera.
 	 * @param {number} [options.far=100] - Far plane for the cube camera.
 	 * @param {number} [options.bounces=0] - Additional bounce passes. Only available when baking the whole grid.
-	 * @param {number} [options.sampleCount=512] - Directions integrated when projecting each cubemap to SH.
 	 * @param {number} [options.start=0] - Index of the first probe to bake.
 	 * @param {number} [options.count] - Number of probes to bake. Defaults to the remaining probes.
 	 * @param {number} [options.pass=0] - Starting pass. Zero captures direct light; later passes sample the previous pass. Ranged calls require `bounces: 0`.
@@ -474,7 +562,6 @@ class LightProbeGrid extends Light {
 			near = 0.1,
 			far = 100,
 			bounces = 0,
-			sampleCount = 512,
 			start = 0,
 			count = totalProbes - start,
 			pass: firstPass = 0
@@ -512,8 +599,9 @@ class LightProbeGrid extends Light {
 
 		// Bind the pooled bake resources to the current textures.
 
-		ensureBakeTargets( cubemapSize, near, far, totalProbes );
-		ensureBakeMaterials( sampleCount, _cubeRenderTarget.texture, _batchTarget.texture );
+		ensureCaptureCamera( cubemapSize, near, far );
+		ensureBakeTargets( cubemapSize, totalProbes );
+		ensureBakeMaterials( cubemapSize, _faceTarget.texture, _batchTarget.texture );
 		_resolutionUniform.value.copy( res );
 
 		// Save renderer / scene state to restore after the bake.
@@ -534,6 +622,7 @@ class LightProbeGrid extends Light {
 		try {
 
 			renderer.inspector.enabled = false;
+			renderer.xr.enabled = false;
 			this.visible = false;
 
 			// Scene is static during the bake: update once, disable auto-update.
@@ -642,7 +731,8 @@ class LightProbeGrid extends Light {
 	}
 
 	/**
-	 * Captures cubemaps and projects their SH coefficients into the batch target.
+	 * Captures the cube faces of probe batches in single passes and projects
+	 * their SH coefficients into the batch target, one row per probe in bake order.
 	 *
 	 * @private
 	 * @param {WebGPURenderer} renderer - The renderer.
@@ -652,30 +742,60 @@ class LightProbeGrid extends Light {
 	 */
 	_captureProbes( renderer, scene, start, end ) {
 
-		const { x: nx, y: ny, z: nz } = this.resolution;
+		const { x: nx, z: nz } = this.resolution;
 		const probesPerLayer = nx * nz;
+		const cameras = _captureCamera.cameras;
 
-		_quad.material = _shMaterial;
+		for ( let batchStart = start; batchStart < end; batchStart += PROBES_PER_BATCH ) {
 
-		for ( let probeIndex = start; probeIndex < end; probeIndex ++ ) {
+			const batchCount = Math.min( PROBES_PER_BATCH, end - batchStart );
 
-			const ix = probeIndex % nx;
-			const iy = Math.floor( probeIndex / probesPerLayer );
-			const iz = Math.floor( probeIndex / nx ) % nz;
+			for ( let slot = 0; slot < PROBES_PER_BATCH; slot ++ ) {
 
-			this.getProbePosition( ix, iy, iz, _position );
-			_cubeCamera.position.copy( _position );
+				const probeIndex = batchStart + slot;
 
-			// The cube faces must be cleared per face.
+				if ( slot < batchCount ) {
+
+					const ix = probeIndex % nx;
+					const iy = Math.floor( probeIndex / probesPerLayer );
+					const iz = Math.floor( probeIndex / nx ) % nz;
+
+					this.getProbePosition( ix, iy, iz, _position );
+
+				}
+
+				for ( let face = 0; face < 6; face ++ ) {
+
+					const camera = cameras[ slot * 6 + face ];
+
+					// Unused slots of a partial batch draw nothing. The camera count
+					// stays fixed so the capture pipelines are reused.
+					if ( slot < batchCount ) {
+
+						camera.layers.set( 0 );
+						camera.position.copy( _position );
+						camera.lookAt( _target.fromArray( FACE_FORWARD[ face ] ).add( _position ) );
+						camera.updateMatrixWorld();
+
+					} else {
+
+						camera.layers.disableAll();
+
+					}
+
+				}
+
+			}
+
 			renderer.autoClear = true;
-			_cubeCamera.update( renderer, scene );
-
-			// Keep batch rows in texture order (X, Y, Z).
-			const batchRow = ix + iy * nx + iz * nx * ny;
+			renderer.setRenderTarget( _faceTarget );
+			renderer.render( scene, _captureCamera );
 
 			renderer.autoClear = false;
-			_batchTarget.viewport.set( 0, batchRow, 9, 1 );
+			_batchStartUniform.value = batchStart;
+			_batchTarget.viewport.set( 0, batchStart, 9 * 6, batchCount );
 			renderer.setRenderTarget( _batchTarget );
+			_quad.material = _shMaterial;
 			_quad.render( renderer );
 
 		}
