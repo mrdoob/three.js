@@ -1231,7 +1231,7 @@ class BatchedMesh extends Mesh {
 
 	/**
 	 * Get the range representing the subset of triangles related to the attached geometry,
-	 * indicating the starting offset and count, or `null` if invalid.
+	 * indicating the starting offset and count, or throws an error if invalid.
 	 *
 	 * @param {number} geometryId - The id of the geometry to get the range of.
 	 * @param {Object} [target] - The target object that is used to store the method's result.
