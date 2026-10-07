@@ -20,7 +20,7 @@
 			</div>
 
 			<small>
-				Instant radiosity: one bounce of light from the ceiling is ray cast on the CPU and every hit becomes a point light.
+				Instant radiosity: one bounce of light from the point light is ray cast on the CPU and every hit becomes a virtual point light. Same scene as webgpu_lightprobes.
 			</small>
 		</div>
 
@@ -38,22 +38,21 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { Fn, Loop, If, Break, uniform, uniformArray, vec2, vec3, float, int, max, min, dot, normalize, length, select, positionWorld, normalWorld, screenCoordinate, fract } from 'three/tsl';
+			import { Fn, Loop, If, uniform, uniformArray, vec3, vec4, float, max, min, dot, normalize, sqrt, select, positionWorld, normalWorld } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			const MAX_VPLS = 1024;
-			const LIGHT_SAMPLES = 8; // direct light samples per axis (8 x 8 on the ceiling quad)
-			const LIGHT_FLUX = 300;
-			const LIGHT_SIZE = 1.2;
-			const LIGHT_Y = 4.99;
+			const LIGHT_INTENSITY = 40; // candela, same as webgpu_lightprobes
+			const LIGHT_POSITION = new THREE.Vector3( 0, 4.5, 0 );
 
 			const params = { mode: 'combined', count: 256, shadows: true, showVPLs: false, seed: 1 };
 
 			let renderer, scene, camera;
-			const occluders = []; // everything a ray can hit (walls + boxes)
-			const boxes = []; // axis-aligned boxes, the only shadow casters
+			const surfaces = []; // everything a CPU ray can hit
+			const boxes = []; // oriented boxes: shadow casters
+			const spheres = []; // spheres: shadow casters
 
 			const vplPosition = uniformArray( Array.from( { length: MAX_VPLS }, () => new THREE.Vector3() ), 'vec3' );
 			const vplNormal = uniformArray( Array.from( { length: MAX_VPLS }, () => new THREE.Vector3( 0, 1, 0 ) ), 'vec3' );
@@ -65,18 +64,22 @@
 
 			let vplPoints;
 
-			// Is the segment a -> b blocked by any box? (slab test, t in [0,1])
+			// Is the segment a -> b blocked by a box or a sphere? (t in [0,1])
 
 			function occluded( a, b ) {
 
-				const d = b.sub( a ).add( 1e-6 ).toVar();
-				const inv = float( 1 ).div( d );
+				const d = b.sub( a ).toVar();
 				const hit = float( 0 ).toVar();
 
 				for ( const box of boxes ) {
 
-					const t1 = box.min.sub( a ).mul( inv );
-					const t2 = box.max.sub( a ).mul( inv );
+					// slab test in the box's local space, the segment parameter t is unchanged by the transform
+
+					const la = box.inverse.mul( vec4( a, 1 ) ).xyz;
+					const ld = box.inverse.mul( vec4( d, 0 ) ).xyz.add( 1e-6 );
+					const inv = float( 1 ).div( ld );
+					const t1 = box.half.negate().sub( la ).mul( inv );
+					const t2 = box.half.sub( la ).mul( inv );
 					const tNear = max( max( min( t1.x, t2.x ), min( t1.y, t2.y ) ), min( t1.z, t2.z ) );
 					const tFar = min( min( max( t1.x, t2.x ), max( t1.y, t2.y ) ), max( t1.z, t2.z ) );
 
@@ -88,21 +91,31 @@
 
 				}
 
+				for ( const sphere of spheres ) {
+
+					const oc = a.sub( sphere.center );
+					const A = dot( d, d );
+					const B = dot( oc, d );
+					const disc = B.mul( B ).sub( A.mul( dot( oc, oc ).sub( sphere.radius * sphere.radius ) ) );
+					const root = sqrt( max( disc, 0 ) );
+					const t1 = B.negate().sub( root ).div( A );
+					const t2 = B.negate().add( root ).div( A );
+
+					If( disc.greaterThan( 0 ).and( t1.lessThan( 1 ) ).and( t2.greaterThan( 0 ) ), () => {
+
+						hit.assign( 1 );
+
+					} );
+
+				}
+
 				return hit;
 
 			}
 
-			// Radiance from a Lambertian point emitter y with flux phi and normal ny, received at x with normal nx (without albedo / pi).
+			function visibility( x, nx, y, ny ) {
 
-			function gather( x, nx, y, ny, phi ) {
-
-				const v = y.sub( x );
-				const d2 = max( dot( v, v ), 0.2 ); // clamped: hides the 1/d^2 singularity (energy loss, see limitations)
-				const w = normalize( v );
-				const g = max( dot( nx, w ), 0 ).mul( max( dot( ny, w.negate() ), 0 ) ).div( d2 );
-				const vis = select( useShadows.greaterThan( 0.5 ), float( 1 ).sub( occluded( x.add( nx.mul( 0.01 ) ), y.add( ny.mul( 0.01 ) ) ) ), float( 1 ) );
-
-				return phi.mul( g.mul( vis ).div( Math.PI ) );
+				return select( useShadows.greaterThan( 0.5 ), float( 1 ).sub( occluded( x.add( nx.mul( 0.01 ) ), y.add( ny.mul( 0.01 ) ) ) ), float( 1 ) );
 
 			}
 
@@ -112,30 +125,25 @@
 				const n = normalize( normalWorld );
 				const sum = vec3( 0 ).toVar();
 
-				// direct: stratified point samples on the area light, jittered per pixel (noise instead of banding)
+				// direct: irradiance from the point light, I * cos / d^2
 
-				const ign = fract( fract( dot( screenCoordinate.xy, vec2( 0.06711056, 0.00583715 ) ) ).mul( 52.9829189 ) ); // interleaved gradient noise
-				const lightNormal = vec3( 0, - 1, 0 );
-				const directFlux = vec3( LIGHT_FLUX / ( LIGHT_SAMPLES * LIGHT_SAMPLES ) );
+				const toLight = vec3( LIGHT_POSITION ).sub( x );
+				const d2 = max( dot( toLight, toLight ), 1e-4 );
+				const cosine = max( dot( n, normalize( toLight ) ), 0 );
+				sum.addAssign( vec3( LIGHT_INTENSITY ).mul( cosine ).div( d2 ).mul( visibility( x, n, vec3( LIGHT_POSITION ), n ) ).mul( directWeight ) );
 
-				for ( let i = 0; i < LIGHT_SAMPLES; i ++ ) {
-
-					for ( let j = 0; j < LIGHT_SAMPLES; j ++ ) {
-
-						const k = i * LIGHT_SAMPLES + j;
-						const u = fract( ign.add( k * 0.7548776662 ) ), v = fract( ign.add( k * 0.5698402909 ) );
-						const p = vec3( u.add( i ).div( LIGHT_SAMPLES ).sub( 0.5 ).mul( LIGHT_SIZE ), LIGHT_Y, v.add( j ).div( LIGHT_SAMPLES ).sub( 0.5 ).mul( LIGHT_SIZE ) );
-						sum.addAssign( gather( x, n, p, lightNormal, directFlux ).mul( directWeight ) );
-
-					}
-
-				}
-
-				// indirect: the virtual point lights
+				// indirect: every VPL is a Lambertian emitter with flux phi, irradiance = phi / PI * cos(x) * cos(y) / d^2
 
 				Loop( vplCount, ( { i } ) => {
 
-					sum.addAssign( gather( x, n, vplPosition.element( i ), vplNormal.element( i ), vplFlux.element( i ) ).mul( indirectWeight ) );
+					const y = vplPosition.element( i );
+					const ny = vplNormal.element( i );
+					const v = y.sub( x );
+					const vd2 = max( dot( v, v ), 0.2 ); // clamped: hides the 1/d^2 singularity (energy loss, see limitations)
+					const w = normalize( v );
+					const g = max( dot( n, w ), 0 ).mul( max( dot( ny, w.negate() ), 0 ) ).div( vd2 );
+
+					sum.addAssign( vplFlux.element( i ).mul( g.mul( visibility( x, n, y, ny ) ).div( Math.PI ) ).mul( indirectWeight ) );
 
 				} );
 
@@ -153,66 +161,78 @@
 
 			}
 
-			function addBox( min, max, material ) {
+			function addWall( width, height, position, rotation, material ) {
 
-				const size = new THREE.Vector3().subVectors( max, min );
-				const mesh = new THREE.Mesh( new THREE.BoxGeometry( size.x, size.y, size.z ), material );
-				mesh.position.copy( min ).addScaledVector( size, 0.5 );
-				scene.add( mesh );
-				occluders.push( mesh );
-				boxes.push( { min: vec3( min.x, min.y, min.z ), max: vec3( max.x, max.y, max.z ) } );
-
-			}
-
-			function addWall( position, rotation, material ) {
-
-				const wall = new THREE.Mesh( new THREE.PlaneGeometry( 5, 5 ), material );
+				const wall = new THREE.Mesh( new THREE.PlaneGeometry( width, height ), material );
 				wall.position.copy( position );
 				wall.rotation.set( ...rotation );
 				scene.add( wall );
-				occluders.push( wall );
+				surfaces.push( wall );
 
 			}
 
-			// Cast cosine distributed rays from the area light and turn every first hit into a VPL.
+			function addBox( size, position, rotationY, material ) {
+
+				const mesh = new THREE.Mesh( new THREE.BoxGeometry( size.x, size.y, size.z ), material );
+				mesh.position.copy( position );
+				mesh.rotation.y = rotationY;
+				mesh.updateMatrixWorld();
+				scene.add( mesh );
+				surfaces.push( mesh );
+				boxes.push( { inverse: uniform( mesh.matrixWorld.clone().invert() ), half: vec3( size.x / 2, size.y / 2, size.z / 2 ) } );
+
+			}
+
+			function addSphere( radius, position, material ) {
+
+				const mesh = new THREE.Mesh( new THREE.SphereGeometry( radius, 32, 32 ), material );
+				mesh.position.copy( position );
+				scene.add( mesh );
+				surfaces.push( mesh );
+				spheres.push( { center: vec3( position.x, position.y, position.z ), radius } );
+
+			}
+
+			// Cast rays uniformly over the sphere from the point light and turn every first hit into a VPL.
 
 			function generateVPLs() {
 
 				const raycaster = new THREE.Raycaster();
 				const normal = new THREE.Vector3();
-				const flux = new THREE.Vector3();
-				let seed = params.seed;
-				const random = () => ( seed = ( seed * 16807 ) % 2147483647 ) / 2147483647; // deterministic
+				const direction = new THREE.Vector3();
+				let seed = params.seed * 2654435761 >>> 0;
+				const random = () => { // mulberry32
+
+					seed = seed + 0x6D2B79F5 >>> 0;
+					let t = Math.imul( seed ^ seed >>> 15, 1 | seed );
+					t = t + Math.imul( t ^ t >>> 7, 61 | t ) ^ t;
+					return ( ( t ^ t >>> 14 ) >>> 0 ) / 4294967296;
+
+				};
+
+				const power = 4 * Math.PI * LIGHT_INTENSITY / params.count; // total flux of an isotropic point light, split evenly
 
 				vplCount.value = 0;
 
 				for ( let n = 0; n < params.count; n ++ ) {
 
-					const origin = new THREE.Vector3( ( random() - 0.5 ) * LIGHT_SIZE, LIGHT_Y, ( random() - 0.5 ) * LIGHT_SIZE );
+					const z = random() * 2 - 1, phi = random() * Math.PI * 2, r = Math.sqrt( 1 - z * z );
+					raycaster.set( LIGHT_POSITION, direction.set( r * Math.cos( phi ), z, r * Math.sin( phi ) ) );
 
-					const r = Math.sqrt( random() ), phi = random() * Math.PI * 2;
-					raycaster.set( origin, new THREE.Vector3( r * Math.cos( phi ), - Math.sqrt( 1 - r * r ), r * Math.sin( phi ) ) );
-
-					const hit = raycaster.intersectObjects( occluders )[ 0 ];
+					const hit = raycaster.intersectObjects( surfaces )[ 0 ];
 					if ( hit === undefined ) continue;
 
 					normal.copy( hit.face.normal ).transformDirection( hit.object.matrixWorld );
 					const albedo = hit.object.material.userData.albedo;
 
-					// equal flux per sample (cosine sampling), tinted by the surface it hit
-
-					flux.set( albedo.r, albedo.g, albedo.b ).multiplyScalar( LIGHT_FLUX / params.count );
-
 					const i = vplCount.value ++;
 					vplPosition.array[ i ].copy( hit.point );
 					vplNormal.array[ i ].copy( normal );
-					vplFlux.array[ i ].copy( flux );
+					vplFlux.array[ i ].set( albedo.r, albedo.g, albedo.b ).multiplyScalar( power ); // tinted by the surface it hit
 
 				}
 
-				const positions = vplPosition.array.slice( 0, vplCount.value );
-				vplPoints.geometry.setFromPoints( positions );
-				vplPoints.geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( vplFlux.array.slice( 0, vplCount.value ).flatMap( ( f ) => [ f.x, f.y, f.z ].map( ( c ) => Math.sqrt( c * params.count / LIGHT_FLUX ) ) ), 3 ) );
+				vplPoints.geometry.setFromPoints( vplPosition.array.slice( 0, vplCount.value ) );
 
 			}
 
@@ -225,41 +245,47 @@
 
 			function init() {
 
+				// Camera
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 0, 2.5, 8 );
+
+				// Scene
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x111111 );
+
+				// Cornell box, same as webgpu_lightprobes
+
+				const wallMaterial = makeMaterial( 0xcccccc );
+				const redMaterial = makeMaterial( 0xff0000 );
+				const greenMaterial = makeMaterial( 0x00ff00 );
+				const objectMaterial = makeMaterial( 0xeeeeee );
+
+				addWall( 6, 6, new THREE.Vector3( 0, 0, 0 ), [ - Math.PI / 2, 0, 0 ], wallMaterial ); // floor
+				addWall( 6, 6, new THREE.Vector3( 0, 5, 0 ), [ Math.PI / 2, 0, 0 ], wallMaterial ); // ceiling
+				addWall( 6, 5, new THREE.Vector3( 0, 2.5, - 3 ), [ 0, 0, 0 ], wallMaterial ); // back
+				addWall( 6, 5, new THREE.Vector3( 0, 2.5, 3 ), [ 0, Math.PI, 0 ], wallMaterial ); // front
+				addWall( 6, 5, new THREE.Vector3( - 3, 2.5, 0 ), [ 0, Math.PI / 2, 0 ], redMaterial ); // left
+				addWall( 6, 5, new THREE.Vector3( 3, 2.5, 0 ), [ 0, - Math.PI / 2, 0 ], greenMaterial ); // right
+
+				addBox( new THREE.Vector3( 1.2, 2.5, 1.2 ), new THREE.Vector3( - 0.8, 1.25, - 0.8 ), Math.PI / 8, objectMaterial ); // tall box
+				addBox( new THREE.Vector3( 1.2, 1.2, 1.2 ), new THREE.Vector3( 1, 0.6, 0.5 ), - Math.PI / 6, objectMaterial ); // short box
+				addSphere( 0.5, new THREE.Vector3( 1, 1.9, 0.5 ), objectMaterial );
+
+				vplPoints = new THREE.Points( new THREE.BufferGeometry(), new THREE.PointsMaterial( { size: 0.06, color: 0xffff00, toneMapped: false } ) );
+				vplPoints.visible = false;
+				scene.add( vplPoints );
+
+				// Renderer
+
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( () => renderer.render( scene, camera ) );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1.0;
 				document.body.appendChild( renderer.domElement );
-
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 50 );
-				camera.position.set( 0, 2.5, 11 );
-
-				scene = new THREE.Scene();
-
-				// Cornell box: x, y in [-2.5, 2.5] x [0, 5], open towards +z
-
-				const white = makeMaterial( 0xbbbbbb ), red = makeMaterial( 0xc0201a ), green = makeMaterial( 0x2ba02b );
-
-				addWall( new THREE.Vector3( 0, 0, 0 ), [ - Math.PI / 2, 0, 0 ], white ); // floor
-				addWall( new THREE.Vector3( 0, 5, 0 ), [ Math.PI / 2, 0, 0 ], white ); // ceiling
-				addWall( new THREE.Vector3( 0, 2.5, - 2.5 ), [ 0, 0, 0 ], white ); // back
-				addWall( new THREE.Vector3( - 2.5, 2.5, 0 ), [ 0, Math.PI / 2, 0 ], red ); // left
-				addWall( new THREE.Vector3( 2.5, 2.5, 0 ), [ 0, - Math.PI / 2, 0 ], green ); // right
-
-				addBox( new THREE.Vector3( - 1.7, 0, - 1.6 ), new THREE.Vector3( - 0.3, 3, - 0.2 ), white );
-				addBox( new THREE.Vector3( 0.4, 0, - 0.6 ), new THREE.Vector3( 1.8, 1.5, 0.8 ), white );
-
-				const light = new THREE.Mesh( new THREE.PlaneGeometry( LIGHT_SIZE, LIGHT_SIZE ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
-				light.rotation.x = Math.PI / 2;
-				light.position.y = LIGHT_Y;
-				scene.add( light );
-
-				vplPoints = new THREE.Points( new THREE.BufferGeometry(), new THREE.PointsMaterial( { size: 0.06, vertexColors: true, toneMapped: false } ) );
-				vplPoints.visible = false;
-				scene.add( vplPoints );
-
-				scene.updateMatrixWorld( true );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 2.5, 0 );
@@ -273,6 +299,7 @@
 				gui.add( params, 'showVPLs' ).name( 'show VPLs' ).onChange( ( v ) => ( vplPoints.visible = v ) );
 
 				updateMode();
+				scene.updateMatrixWorld( true );
 				generateVPLs();
 
 				window.addEventListener( 'resize', () => {
