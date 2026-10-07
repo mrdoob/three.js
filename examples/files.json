@@ -532,6 +532,7 @@
 		"webgpu_volume_lighting_rectarea",
 		"webgpu_volume_lighting_traa",
 		"webgpu_volume_perlin",
+		"webgpu_vpl",
 		"webgpu_vxgi",
 		"webgpu_vxgi_sponza",
 		"webgpu_water",
