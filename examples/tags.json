@@ -168,6 +168,8 @@
 	"webgpu_tsl_compute_attractors_particles": [ "gpgpu" ],
 	"webgpu_upscaling_taau": [ "traa", "anti-aliasing" ],
 	"webgpu_video_frame": [ "webcodecs" ],
+	"webgpu_virtualpointlights": [ "virtual point lights", "vpl", "instant radiosity" ],
+	"webgpu_virtualpointlights_complex": [ "virtual point lights", "vpl", "instant radiosity" ],
 	"webgpu_volume_lighting_traa": [ "taa", "anti-aliasing" ],
 	"webgpu_vxgi": [ "global illumination", "indirect diffuse", "voxel cone tracing" ],
 	"webgpu_vxgi_sponza": [ "global illumination", "indirect diffuse", "voxel cone tracing" ],

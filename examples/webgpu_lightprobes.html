@@ -37,6 +37,7 @@
 
 			import * as THREE from 'three/webgpu';
 
+			import { LightingComparisonScene } from 'three/addons/environments/LightingComparisonScene.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
@@ -56,90 +57,7 @@
 
 				// Scene
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x111111 );
-
-				// Cornell box
-
-				const wallMaterial = new THREE.MeshStandardMaterial( { color: 0xcccccc } );
-				const redMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
-				const greenMaterial = new THREE.MeshStandardMaterial( { color: 0x00ff00 } );
-
-				// Floor
-				const floor = new THREE.Mesh( new THREE.PlaneGeometry( 6, 6 ), wallMaterial );
-				floor.rotation.x = - Math.PI / 2;
-				floor.receiveShadow = true;
-				scene.add( floor );
-
-				// Ceiling
-				const ceiling = new THREE.Mesh( new THREE.PlaneGeometry( 6, 6 ), wallMaterial );
-				ceiling.rotation.x = Math.PI / 2;
-				ceiling.position.y = 5;
-				ceiling.receiveShadow = true;
-				scene.add( ceiling );
-
-				// Back wall
-				const backWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), wallMaterial );
-				backWall.position.set( 0, 2.5, - 3 );
-				backWall.receiveShadow = true;
-				scene.add( backWall );
-
-				// Front wall
-				const frontWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), wallMaterial );
-				frontWall.rotation.y = Math.PI;
-				frontWall.position.set( 0, 2.5, 3 );
-				frontWall.receiveShadow = true;
-				scene.add( frontWall );
-
-				// Left wall (red)
-				const leftWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), redMaterial );
-				leftWall.rotation.y = Math.PI / 2;
-				leftWall.position.set( - 3, 2.5, 0 );
-				leftWall.receiveShadow = true;
-				scene.add( leftWall );
-
-				// Right wall (green)
-				const rightWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), greenMaterial );
-				rightWall.rotation.y = - Math.PI / 2;
-				rightWall.position.set( 3, 2.5, 0 );
-				rightWall.receiveShadow = true;
-				scene.add( rightWall );
-
-				// Objects inside the box
-
-				const objectMaterial = new THREE.MeshStandardMaterial( { color: 0xeeeeee } );
-
-				// Tall box
-				const tallBox = new THREE.Mesh( new THREE.BoxGeometry( 1.2, 2.5, 1.2 ), objectMaterial );
-				tallBox.position.set( - 0.8, 1.25, - 0.8 );
-				tallBox.rotation.y = Math.PI / 8;
-				tallBox.castShadow = true;
-				tallBox.receiveShadow = true;
-				scene.add( tallBox );
-
-				// Short box
-				const shortBox = new THREE.Mesh( new THREE.BoxGeometry( 1.2, 1.2, 1.2 ), objectMaterial );
-				shortBox.position.set( 1, 0.6, 0.5 );
-				shortBox.rotation.y = - Math.PI / 6;
-				shortBox.castShadow = true;
-				shortBox.receiveShadow = true;
-				scene.add( shortBox );
-
-				// Sphere (to show smooth GI variation)
-				const sphere = new THREE.Mesh( new THREE.SphereGeometry( 0.5, 32, 32 ), objectMaterial.clone() );
-				sphere.position.set( 1, 1.9, 0.5 );
-				sphere.castShadow = true;
-				sphere.receiveShadow = true;
-				scene.add( sphere );
-
-				// Light
-				const light = new THREE.PointLight( 0xffffff, 40 );
-				light.position.set( 0, 4.5, 0 );
-				light.castShadow = true;
-				light.shadow.mapSize.setScalar( 256 );
-				light.shadow.radius = 10;
-				light.shadow.normalBias = - 0.02;
-				scene.add( light );
+				scene = new LightingComparisonScene( false );
 
 				// Renderer
 
