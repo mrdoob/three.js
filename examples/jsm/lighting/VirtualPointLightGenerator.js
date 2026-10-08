@@ -1,33 +1,65 @@
-import { Color, Matrix3, Raycaster, Vector3 } from 'three';
-import { VirtualPointLightTextureSampler } from './VirtualPointLightTextureSampler.js';
+import { Color, FloatType, Matrix3, MirroredRepeatWrapping, NearestFilter, Raycaster, RepeatWrapping, SRGBColorSpace, Vector2, Vector3, Vector4 } from 'three';
+
+const _white = /*@__PURE__*/ new Color( 0xffffff );
 
 /**
  * Generates deterministic diffuse light paths from point or directional lights.
  * Samples visible, static meshes using CPU raycasting. Base-color maps and alpha cutouts use cached CPU texels.
  * Instancing, skinning, mip selection and specular transport are not evaluated.
  *
+ * Source lights must be directional lights or point lights with `decay = 2` and `distance = 0`.
+ * Material textures must be loaded and use UV channel 0 or 1. Data textures must be RGBA
+ * unsigned-byte or float textures.
+ *
  * @three_import import { VirtualPointLightGenerator } from 'three/addons/lighting/VirtualPointLightGenerator.js';
  */
 class VirtualPointLightGenerator {
 
 	/**
+	 * Constructs a new virtual point light generator.
+	 *
 	 * @param {number} [capacity=1024] - Maximum number of samples.
 	 */
 	constructor( capacity = 1024 ) {
 
-		if ( ! Number.isInteger( capacity ) || capacity < 1 ) throw new RangeError( 'Capacity must be a positive integer.' );
-
-		/** @type {number} The maximum sample count. */
+		/**
+		 * The maximum sample count.
+		 *
+		 * @type {number}
+		 * @default 1024
+		 */
 		this.capacity = capacity;
-		this.textureSampler = new VirtualPointLightTextureSampler();
-		/** @type {number} The number of successful hits from the last generation. */
+
+		/**
+		 * The number of successful hits from the last generation.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
 		this.count = 0;
-		/** @type {Array<Vector3>} World-space emitter positions. */
+
+		/**
+		 * World-space emitter positions.
+		 *
+		 * @type {Array<Vector3>}
+		 */
 		this.positions = Array.from( { length: capacity }, () => new Vector3() );
-		/** @type {Array<Vector3>} World-space geometric emitter normals. */
+
+		/**
+		 * World-space geometric emitter normals.
+		 *
+		 * @type {Array<Vector3>}
+		 */
 		this.normals = Array.from( { length: capacity }, () => new Vector3() );
-		/** @type {Array<Vector3>} Reflected RGB radiant flux, before the emitter's Lambertian factor. */
+
+		/**
+		 * Reflected RGB radiant flux, before the emitter's Lambertian factor.
+		 *
+		 * @type {Array<Vector3>}
+		 */
 		this.flux = Array.from( { length: capacity }, () => new Vector3() );
+
+		this._textureSampler = new TextureSampler();
 
 	}
 
@@ -38,33 +70,13 @@ class VirtualPointLightGenerator {
 	 * @param {Scene} scene - The static scene.
 	 * @param {Array<PointLight|DirectionalLight>} lights - Source lights.
 	 * @param {Object} [options={}] - Sampling options.
-	 * @param {number} [options.count=256] - Total ray budget across all lights and bounce depths.
-	 * @param {number} [options.bounces=1] - Maximum diffuse bounce depth.
+	 * @param {number} [options.count=256] - Total ray budget across all lights and bounce depths. Must be at least `lights.length * bounces` and at most `capacity`.
+	 * @param {number} [options.bounces=1] - Maximum diffuse bounce depth, from 1 to 4.
 	 * @param {number} [options.seed=1] - Random seed.
 	 * @param {Box3} [options.bounds] - World-space sampling domain, required for directional lights.
-	 * @return {VirtualPointLightGenerator} This generator.
+	 * @return {VirtualPointLightGenerator} A reference to this generator.
 	 */
 	generate( scene, lights, { count = 256, seed = 1, bounds = null, bounces = 1 } = {} ) {
-
-		if ( ! Number.isInteger( bounces ) || bounces < 1 || bounces > 4 ) throw new RangeError( 'Bounces must be an integer from 1 to 4.' );
-
-		if ( ! Number.isInteger( count ) || count < Math.max( 1, lights.length ) * bounces || count > this.capacity ) {
-
-			throw new RangeError( 'Ray budget must cover every light and bounce depth, and fit the capacity.' );
-
-		}
-
-		if ( lights.some( light => ! light.isDirectionalLight && ( ! light.isPointLight || light.decay !== 2 || light.distance !== 0 ) ) ) {
-
-			throw new Error( 'Virtual point lights require directional lights or inverse-square point lights without a distance cutoff.' );
-
-		}
-
-		if ( lights.some( light => light.isDirectionalLight ) && ( bounds === null || bounds.isEmpty() ) ) {
-
-			throw new Error( 'Directional VPL sampling requires non-empty world-space bounds.' );
-
-		}
 
 		scene.updateMatrixWorld( true );
 		const surfaces = [];
@@ -111,7 +123,6 @@ class VirtualPointLightGenerator {
 
 				light.target.updateWorldMatrix( true, false );
 				light.target.getWorldPosition( direction ).sub( origin ).normalize();
-				if ( direction.lengthSq() === 0 ) throw new Error( 'Directional light position and target must differ.' );
 				u.set( 0, 1, 0 );
 				if ( Math.abs( direction.y ) > 0.99 ) u.set( 1, 0, 0 );
 				u.cross( direction ).normalize();
@@ -174,8 +185,8 @@ class VirtualPointLightGenerator {
 						let alpha = candidateMaterial.opacity;
 						if ( candidateMaterial.alphaTest > 0 ) {
 
-							if ( candidateMaterial.map ) alpha *= this.textureSampler.sample( candidateMaterial.map, candidate ).w;
-							if ( candidateMaterial.alphaMap ) alpha *= this.textureSampler.sample( candidateMaterial.alphaMap, candidate ).y;
+							if ( candidateMaterial.map ) alpha *= this._textureSampler.sample( candidateMaterial.map, candidate ).w;
+							if ( candidateMaterial.alphaMap ) alpha *= this._textureSampler.sample( candidateMaterial.alphaMap, candidate ).y;
 							if ( alpha <= candidateMaterial.alphaTest ) continue;
 
 						}
@@ -187,10 +198,10 @@ class VirtualPointLightGenerator {
 					}
 
 					if ( hit === undefined ) break;
-					albedo.copy( material.color || new Color( 0xffffff ) ).multiply( throughput );
+					albedo.copy( material.color || _white ).multiply( throughput );
 					if ( material.map ) {
 
-						const texel = this.textureSampler.sample( material.map, hit );
+						const texel = this._textureSampler.sample( material.map, hit );
 						albedo.r *= texel.x;
 						albedo.g *= texel.y;
 						albedo.b *= texel.z;
@@ -226,6 +237,103 @@ class VirtualPointLightGenerator {
 		}
 
 		return this;
+
+	}
+
+}
+
+// CPU base-level texture sampling with cached texels.
+
+class TextureSampler {
+
+	constructor() {
+
+		this.images = new WeakMap();
+		this.uv = new Vector2();
+		this.value = new Vector4();
+
+	}
+
+	sample( texture, hit ) {
+
+		if ( texture.matrixAutoUpdate ) texture.updateMatrix();
+		texture.transformUv( this.uv.copy( texture.channel === 1 ? hit.uv1 : hit.uv ) );
+
+		let image = this.images.get( texture );
+		if ( ! image || image.version !== texture.source.version ) {
+
+			const source = texture.image;
+			let data;
+			let scale = 1 / 255;
+
+			if ( source.data ) {
+
+				data = source.data;
+				if ( texture.type === FloatType ) scale = 1;
+
+			} else {
+
+				const canvas = document.createElement( 'canvas' );
+				canvas.width = source.width;
+				canvas.height = source.height;
+				const context = canvas.getContext( '2d', { willReadFrequently: true } );
+				context.drawImage( source, 0, 0 );
+				data = context.getImageData( 0, 0, canvas.width, canvas.height ).data;
+
+			}
+
+			image = { data, width: source.width, height: source.height, scale, version: texture.source.version };
+			this.images.set( texture, image );
+
+		}
+
+		const wrap = ( index, size, mode ) => {
+
+			if ( mode === RepeatWrapping ) return ( index % size + size ) % size;
+			if ( mode === MirroredRepeatWrapping ) {
+
+				const mirrored = ( index % ( size * 2 ) + size * 2 ) % ( size * 2 );
+				return mirrored < size ? mirrored : size * 2 - mirrored - 1;
+
+			}
+
+			return Math.min( size - 1, Math.max( 0, index ) );
+
+		};
+
+		const x = this.uv.x * image.width - 0.5;
+		const y = this.uv.y * image.height - 0.5;
+		const nearest = texture.magFilter === NearestFilter;
+		const ix = nearest ? Math.round( x ) : Math.floor( x );
+		const iy = nearest ? Math.round( y ) : Math.floor( y );
+		const fx = nearest ? 0 : x - ix;
+		const fy = nearest ? 0 : y - iy;
+		this.value.set( 0, 0, 0, 0 );
+
+		for ( let j = 0; j < 2; j ++ ) {
+
+			for ( let i = 0; i < 2; i ++ ) {
+
+				const weight = ( i ? fx : 1 - fx ) * ( j ? fy : 1 - fy );
+				if ( weight === 0 ) continue;
+				const offset = ( wrap( iy + j, image.height, texture.wrapT ) * image.width + wrap( ix + i, image.width, texture.wrapS ) ) * 4;
+
+				for ( let c = 0; c < 4; c ++ ) {
+
+					let value = image.data[ offset + c ] * image.scale;
+
+					// decode sRGB before filtering, matching GPU sampling
+
+					if ( c < 3 && texture.colorSpace === SRGBColorSpace ) value = value <= 0.04045 ? value / 12.92 : Math.pow( ( value + 0.055 ) / 1.055, 2.4 );
+					this.value.setComponent( c, this.value.getComponent( c ) + value * weight );
+
+				}
+
+			}
+
+		}
+
+		return this.value;
 
 	}
 

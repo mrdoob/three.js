@@ -1,10 +1,21 @@
 import { Color, DoubleSide, HalfFloatType, MeshBasicNodeMaterial, NearestFilter, NoBlending, PerspectiveCamera, RedFormat, RenderTarget, Vector3 } from 'three/webgpu';
 import { Fn, If, dot, float, int, ivec2, max, normalWorld, positionWorld, texture, textureLoad, uniform, vec2, vec3, vec4 } from 'three/tsl';
 
-// Cached radial-distance cube faces packed into one atlas. Static geometry only:
-// call update() after regenerating VPLs or changing the visibility bias.
+/**
+ * Cached radial-distance cube faces for each VPL, packed into one atlas.
+ * Static geometry only: call `update()` after regenerating VPLs or changing the visibility bias.
+ *
+ * @three_import import { VirtualPointLightShadowMaps } from 'three/addons/lighting/VirtualPointLightShadowMaps.js';
+ */
 class VirtualPointLightShadowMaps {
 
+	/**
+	 * Constructs new VPL shadow maps.
+	 *
+	 * @param {number} capacity - Maximum number of VPLs.
+	 * @param {number} [resolution=32] - Pixels per cube face.
+	 * @param {number} [far=40] - Maximum shadow distance in world units.
+	 */
 	constructor( capacity, resolution = 32, far = 40 ) {
 
 		this.resolution = uniform( resolution, 'int' );
@@ -12,7 +23,7 @@ class VirtualPointLightShadowMaps {
 		this.columns = Math.ceil( Math.sqrt( capacity * 6 ) );
 		this.rows = 1;
 		this.far = far;
-		// Allocate the atlas on the first capture, once the active count is known.
+		// the atlas is sized on the first update()
 		this.target = new RenderTarget( 1, 1, {
 			format: RedFormat, type: HalfFloatType, minFilter: NearestFilter, magFilter: NearestFilter, generateMipmaps: false
 		} );
@@ -29,6 +40,15 @@ class VirtualPointLightShadowMaps {
 
 	}
 
+	/**
+	 * Returns a node that evaluates to `true` if the segment between `start` and `end` is unoccluded.
+	 *
+	 * @param {Node<vec3>} start - The receiver position.
+	 * @param {Node<vec3>} end - The VPL position.
+	 * @param {Node<int>} index - The VPL index.
+	 * @param {Node<vec3>} [receiverNormal=normalWorld] - The receiver normal.
+	 * @return {Node<bool>} The visibility node.
+	 */
 	visibility( start, end, index, receiverNormal = normalWorld ) {
 
 		return Fn( () => {
@@ -83,9 +103,7 @@ class VirtualPointLightShadowMaps {
 			const pixel = ivec2( uv.mul( 0.5 ).add( 0.5 ).mul( this.resolution ) ).clamp( 0, this.resolution.sub( 1 ) );
 			const offset = ivec2( tile.mod( this.columns ), tile.div( this.columns ) ).mul( this.resolution );
 			const depth = textureLoad( this.target.texture, offset.add( pixel ) ).r.mul( this.far );
-			// Compare at the sampled texel's ray, rather than the receiver's ray.
-			// On a sloping receiver these have different distances to the same plane.
-			// A constant bias cannot correct that mismatch at low map resolutions.
+			// compare at the sampled texel's ray to avoid self-shadowing on sloped receivers
 			const center = vec2( pixel ).add( 0.5 ).div( this.resolution ).mul( 2 ).sub( 1 );
 			const ray = vec3( 0 ).toVar();
 			If( face.equal( 0 ), () => {
@@ -127,6 +145,13 @@ class VirtualPointLightShadowMaps {
 
 	}
 
+	/**
+	 * Returns the capture material for the given material, honoring alpha cutouts.
+	 *
+	 * @private
+	 * @param {Material} source - The original material.
+	 * @return {NodeMaterial} The capture material.
+	 */
 	getCaptureMaterial( source ) {
 
 		if ( ! source.alphaTest ) return this.material;
@@ -149,11 +174,19 @@ class VirtualPointLightShadowMaps {
 
 	}
 
+	/**
+	 * Renders six cube faces per VPL into the atlas. `generator.count` must not exceed `capacity`.
+	 *
+	 * @param {WebGPURenderer} renderer - The renderer.
+	 * @param {Scene} scene - The static scene.
+	 * @param {VirtualPointLightGenerator} generator - The VPL samples.
+	 * @param {number} bias - Offset of each capture origin along the VPL normal.
+	 * @param {number} [resolution] - Pixels per cube face.
+	 */
 	update( renderer, scene, generator, bias, resolution = this.resolution.value ) {
 
-		if ( generator.count > this.capacity ) throw new RangeError( 'VPL count exceeds shadow-map capacity.' );
 		const tiles = Math.max( 1, generator.count * 6 );
-		// Keep the width fixed so shader tile division remains a constant operation.
+		// fixed width keeps the tile division in the shader constant
 		const columns = this.columns;
 		this.rows = Math.ceil( tiles / columns );
 		this.resolution.value = resolution;
@@ -224,6 +257,9 @@ class VirtualPointLightShadowMaps {
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance.
+	 */
 	dispose() {
 
 		this.target.dispose();

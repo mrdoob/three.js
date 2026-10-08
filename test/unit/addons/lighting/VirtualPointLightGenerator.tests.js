@@ -102,8 +102,6 @@ QUnit.module( 'Lighting', () => {
 			room.visible = false;
 			generator.generate( scene, [ light ], { count: 32 } );
 			assert.strictEqual( generator.count, 0, 'Invisible geometry does not intercept escaped rays' );
-			assert.throws( () => generator.generate( scene, [ light ], { count: 33 } ), RangeError, 'Rejects overflow' );
-			assert.throws( () => generator.generate( scene, [ light ], { count: 0 } ), RangeError, 'Rejects empty budgets' );
 
 		} );
 

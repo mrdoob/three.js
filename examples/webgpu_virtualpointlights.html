@@ -41,7 +41,6 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
-			import { LightingComparisonScene } from 'three/addons/environments/LightingComparisonScene.js';
 			import { VirtualPointLightGenerator } from 'three/addons/lighting/VirtualPointLightGenerator.js';
 			import { VirtualPointLightShadowMaps } from 'three/addons/lighting/VirtualPointLightShadowMaps.js';
 			import { VirtualPointLightsNode } from 'three/addons/tsl/lighting/VirtualPointLightsNode.js';
@@ -51,17 +50,112 @@
 			const MAX_VPLS = 1024;
 			const params = { mode: 'combined', count: 128, shadows: true, shadowResolution: 64, showVPLs: false, seed: 1, minDistance: 1, progressive: false, bounces: 2 };
 
+			let camera, scene, renderer;
+			let generator, shadowMaps, vpl, helper;
+			let sourceLights, intensities;
+			let mapsDirty = true;
+			let previewCount = params.count;
+			let nextPreviewTime = Infinity;
+
 			init();
 
 			async function init() {
 
-				const camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.set( 0, 2.5, 8 );
 
-				const scene = new LightingComparisonScene( false );
+				// Scene
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x111111 );
+
+				const wallMaterial = new THREE.MeshStandardMaterial( { color: 0xcccccc } );
+				const redMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
+				const greenMaterial = new THREE.MeshStandardMaterial( { color: 0x00ff00 } );
+
+				// Floor
+				const floor = new THREE.Mesh( new THREE.PlaneGeometry( 6, 6 ), wallMaterial );
+				floor.rotation.x = - Math.PI / 2;
+				floor.receiveShadow = true;
+				scene.add( floor );
+
+				// Ceiling
+				const ceiling = new THREE.Mesh( new THREE.PlaneGeometry( 6, 6 ), wallMaterial );
+				ceiling.rotation.x = Math.PI / 2;
+				ceiling.position.y = 5;
+				ceiling.receiveShadow = true;
+				scene.add( ceiling );
+
+				// Back wall
+				const backWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), wallMaterial );
+				backWall.position.set( 0, 2.5, - 3 );
+				backWall.receiveShadow = true;
+				scene.add( backWall );
+
+				// Front wall
+				const frontWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), wallMaterial );
+				frontWall.rotation.y = Math.PI;
+				frontWall.position.set( 0, 2.5, 3 );
+				frontWall.receiveShadow = true;
+				scene.add( frontWall );
+
+				// Left wall (red)
+				const leftWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), redMaterial );
+				leftWall.rotation.y = Math.PI / 2;
+				leftWall.position.set( - 3, 2.5, 0 );
+				leftWall.receiveShadow = true;
+				scene.add( leftWall );
+
+				// Right wall (green)
+				const rightWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), greenMaterial );
+				rightWall.rotation.y = - Math.PI / 2;
+				rightWall.position.set( 3, 2.5, 0 );
+				rightWall.receiveShadow = true;
+				scene.add( rightWall );
+
+				// Objects inside the box
+
+				const objectMaterial = new THREE.MeshStandardMaterial( { color: 0xeeeeee } );
+
+				// Tall box
+				const tallBox = new THREE.Mesh( new THREE.BoxGeometry( 1.2, 2.5, 1.2 ), objectMaterial );
+				tallBox.position.set( - 0.8, 1.25, - 0.8 );
+				tallBox.rotation.y = Math.PI / 8;
+				tallBox.castShadow = true;
+				tallBox.receiveShadow = true;
+				scene.add( tallBox );
+
+				// Short box
+				const shortBox = new THREE.Mesh( new THREE.BoxGeometry( 1.2, 1.2, 1.2 ), objectMaterial );
+				shortBox.position.set( 1, 0.6, 0.5 );
+				shortBox.rotation.y = - Math.PI / 6;
+				shortBox.castShadow = true;
+				shortBox.receiveShadow = true;
+				scene.add( shortBox );
+
+				// Sphere (to show smooth GI variation)
+				const sphere = new THREE.Mesh( new THREE.SphereGeometry( 0.5, 32, 32 ), objectMaterial.clone() );
+				sphere.position.set( 1, 1.9, 0.5 );
+				sphere.castShadow = true;
+				sphere.receiveShadow = true;
+				scene.add( sphere );
+
+				// Light
+				const light = new THREE.PointLight( 0xffffff, 40 );
+				light.position.set( 0, 4.5, 0 );
+				light.castShadow = true;
+				light.shadow.mapSize.setScalar( 256 );
+				light.shadow.radius = 10;
+				light.shadow.normalBias = - 0.02;
+				scene.add( light );
+
+				// Virtual point lights
+
 				scene.updateMatrixWorld( true );
 
-				const surfaces = [], sourceLights = [];
+				const surfaces = [];
+				sourceLights = [];
+
 				scene.traverseVisible( object => {
 
 					if ( object.isMesh ) {
@@ -78,17 +172,22 @@
 
 				} );
 
-				const generator = new VirtualPointLightGenerator( MAX_VPLS );
-				const shadowMaps = new VirtualPointLightShadowMaps( MAX_VPLS );
-				const vpl = new VirtualPointLightsNode( generator, ( start, end, index ) => shadowMaps.visibility( start, end, index ) );
+				intensities = sourceLights.map( light => light.intensity );
+
+				generator = new VirtualPointLightGenerator( MAX_VPLS );
+				shadowMaps = new VirtualPointLightShadowMaps( MAX_VPLS );
+				vpl = new VirtualPointLightsNode( generator, ( start, end, index ) => shadowMaps.visibility( start, end, index ) );
 				vpl.shadows.value = params.shadows;
+
 				const lighting = lights( [ ...sourceLights, vpl ] );
 				const materials = new Map();
 
 				for ( const surface of surfaces ) {
 
-					// Retain the probe example's albedo, roughness, metalness and sidedness.
+					// node materials are required to add the VPL irradiance via lightsNode
+
 					const original = surface.material;
+
 					if ( ! materials.has( original ) ) {
 
 						const material = new THREE.MeshStandardNodeMaterial();
@@ -102,92 +201,17 @@
 
 				}
 
-				const helper = new VirtualPointLightHelper( generator );
+				helper = new VirtualPointLightHelper( generator );
 				helper.visible = params.showVPLs;
 				scene.add( helper );
 
-				function generate() {
+				// Renderer
 
-					const visible = helper.visible;
-					helper.visible = false;
-					try {
-
-						generator.generate( scene, sourceLights, { count: previewCount, seed: params.seed, bounces: params.bounces } );
-
-					} finally {
-
-						helper.visible = visible;
-
-					}
-
-					vpl.update();
-					helper.update();
-					mapsDirty = true;
-
-				}
-
-				let mapsDirty = true;
-				let previewCount = params.count;
-				let nextPreviewTime = Infinity;
-				const intensities = sourceLights.map( light => light.intensity );
-
-				function updateVisibility() {
-
-					vpl.shadows.value = params.shadows;
-					if ( params.shadows && mapsDirty ) {
-
-						const visible = helper.visible;
-						helper.visible = false;
-						try {
-
-							shadowMaps.update( renderer, scene, generator, vpl.bias.value, params.shadowResolution );
-							mapsDirty = false;
-
-						} finally {
-
-							helper.visible = visible;
-
-						}
-
-					}
-
-				}
-
-				function updateMode() {
-
-					sourceLights.forEach( ( light, i ) => {
-
-						light.intensity = params.mode === 'indirect only' ? 0 : intensities[ i ];
-
-					} );
-					vpl.intensity.value = params.mode === 'direct only' ? 0 : 1;
-
-				}
-
-				// Sampling always uses the original source power, including in indirect-only mode.
-				function regenerate( restart = true ) {
-
-					params.count = Math.max( params.count, sourceLights.length * params.bounces );
-					if ( restart !== false ) previewCount = params.progressive ? Math.min( 32, params.count ) : params.count;
-
-					sourceLights.forEach( ( light, i ) => {
-
-						light.intensity = intensities[ i ];
-
-					} );
-					generate();
-					updateMode();
-					updateVisibility();
-					nextPreviewTime = params.progressive && previewCount < params.count ? performance.now() + 500 : Infinity;
-
-				}
-
-				const renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.toneMappingExposure = 1.0;
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 				await renderer.init();
@@ -196,25 +220,20 @@
 				controls.target.set( 0, 2.5, 0 );
 				controls.update();
 
+				// GUI
+
 				const gui = renderer.inspector.createParameters( 'Virtual Point Lights' );
 				gui.add( params, 'mode', [ 'direct only', 'indirect only', 'combined' ] ).name( 'Lighting' ).onChange( updateMode );
 				gui.add( params, 'count', sourceLights.length, MAX_VPLS, 1 ).name( 'Ray Budget' ).info( 'Total rays shared across source lights and bounce depths. Escaped rays do not become VPLs.' ).onChange( regenerate ).debounce( 250 );
 				gui.add( params, 'bounces', 1, 4, 1 ).name( 'Bounces' ).info( 'Maximum diffuse bounces. Ray Budget is shared across depths; more bounces use fewer initial paths.' ).onChange( () => regenerate() );
 				gui.add( params, 'seed', 1, 100, 1 ).name( 'Seed' ).onChange( regenerate ).debounce( 250 );
-				gui.add( params, 'minDistance', 0.01, 1, 0.01 ).name( 'Distance Clamp' ).info( 'Reduces near-field singularities at the expense of indirect-light energy.' ).onChange( value => {
-
-		vpl.minDistance.value = value;
-
-	} );
-				gui.add( params, 'showVPLs' ).name( 'Show VPLs' ).onChange( value => {
-
-		helper.visible = value;
-
-	} );
+				gui.add( params, 'minDistance', 0.01, 1, 0.01 ).name( 'Distance Clamp' ).info( 'Reduces near-field singularities at the expense of indirect-light energy.' ).onChange( value => vpl.minDistance.value = value );
+				gui.add( params, 'showVPLs' ).name( 'Show VPLs' ).onChange( value => helper.visible = value );
 
 				const progressiveParameters = gui.addFolder( 'Progressive' );
 				progressiveParameters.add( params, 'progressive' ).name( 'Progressive Preview' ).info( 'Double the ray budget every 0.5 seconds, up to Ray Budget. Each stage regenerates a normalized estimate.' ).onChange( () => regenerate() );
 				progressiveParameters.add( { restart: () => regenerate() }, 'restart' ).name( 'Restart Preview' );
+
 				const shadowParameters = gui.addFolder( 'Shadows' );
 				shadowParameters.add( params, 'shadows' ).name( 'VPL Shadows' ).onChange( updateVisibility );
 				shadowParameters.add( params, 'shadowResolution', [ 32, 64 ] ).name( 'Shadow Resolution' ).info( 'Pixels per cube face. Maps rebuild when the VPL set or resolution changes.' ).onChange( () => {
@@ -223,46 +242,103 @@
 					updateVisibility();
 
 				} );
+
 				regenerate();
-				if ( new URLSearchParams( window.location.search ).has( 'benchmark' ) ) {
 
-					const { createBenchmark } = await import( '../test/benchmarks/virtual-point-lights/benchmark.js' );
-					window.vplBenchmark = createBenchmark( renderer, scene, camera, settings => {
+				renderer.setAnimationLoop( animate );
 
-						Object.assign( params, settings );
-						vpl.minDistance.value = params.minDistance;
-						vpl.shadows.value = params.shadows;
-						regenerate();
-						return generator.count;
+				window.addEventListener( 'resize', onWindowResize );
 
-					} );
+			}
 
-				} else {
+			function generate() {
 
-					renderer.setAnimationLoop( () => {
+				const visible = helper.visible;
+				helper.visible = false;
 
-						if ( performance.now() >= nextPreviewTime ) {
+				generator.generate( scene, sourceLights, { count: previewCount, seed: params.seed, bounces: params.bounces } );
 
-							previewCount = Math.min( params.count, previewCount * 2 );
-							regenerate( false );
+				helper.visible = visible;
 
-						}
+				vpl.update();
+				helper.update();
+				mapsDirty = true;
 
-						renderer.render( scene, camera );
+			}
 
-					} );
+			function updateVisibility() {
+
+				vpl.shadows.value = params.shadows;
+
+				if ( params.shadows && mapsDirty ) {
+
+					const visible = helper.visible;
+					helper.visible = false;
+
+					shadowMaps.update( renderer, scene, generator, vpl.bias.value, params.shadowResolution );
+					mapsDirty = false;
+
+					helper.visible = visible;
 
 				}
 
-				window.addEventListener( 'resize', () => {
+			}
 
-					camera.aspect = window.innerWidth / window.innerHeight;
-					camera.updateProjectionMatrix();
-					renderer.setSize( window.innerWidth, window.innerHeight );
+			function updateMode() {
+
+				sourceLights.forEach( ( light, i ) => {
+
+					light.intensity = params.mode === 'indirect only' ? 0 : intensities[ i ];
 
 				} );
 
+				vpl.intensity.value = params.mode === 'direct only' ? 0 : 1;
+
 			}
+
+			// sampling always uses the original source power, including in indirect-only mode
+
+			function regenerate( restart = true ) {
+
+				params.count = Math.max( params.count, sourceLights.length * params.bounces );
+				if ( restart !== false ) previewCount = params.progressive ? Math.min( 32, params.count ) : params.count;
+
+				sourceLights.forEach( ( light, i ) => {
+
+					light.intensity = intensities[ i ];
+
+				} );
+
+				generate();
+				updateMode();
+				updateVisibility();
+
+				nextPreviewTime = params.progressive && previewCount < params.count ? performance.now() + 500 : Infinity;
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				if ( performance.now() >= nextPreviewTime ) {
+
+					previewCount = Math.min( params.count, previewCount * 2 );
+					regenerate( false );
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
 
 		</script>
 	</body>

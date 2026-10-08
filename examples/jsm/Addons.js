@@ -55,7 +55,6 @@ export * from './geometries/TextGeometry.js';
 
 export * from './helpers/AnimationPathHelper.js';
 export * from './helpers/LightProbeHelper.js';
-export * from './helpers/VirtualPointLightHelper.js';
 export * from './helpers/OctreeHelper.js';
 export * from './helpers/PositionalAudioHelper.js';
 export * from './helpers/RapierHelper.js';
@@ -69,8 +68,6 @@ export * from './interactive/HTMLMesh.js';
 export * from './interactive/InteractiveGroup.js';
 export * from './interactive/SelectionBox.js';
 export * from './interactive/SelectionHelper.js';
-
-export * from './lighting/VirtualPointLightGenerator.js';
 
 export * from './lights/LightProbeGenerator.js';
 export * from './lights/RectAreaLightTexturesLib.js';
