@@ -271,8 +271,8 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 				const values = Array.isArray( uniform.value ) ? uniform.value : [ uniform.value ];
 
-				// uniforms with array values represent GLSL arrays
-				const isArray = Array.isArray( uniform.value );
+				// arrays of uniforms and uniforms with array values both represent GLSL arrays
+				const isArray = Array.isArray( uniforms[ i ] ) || Array.isArray( uniform.value );
 
 				let start = offset;
 
