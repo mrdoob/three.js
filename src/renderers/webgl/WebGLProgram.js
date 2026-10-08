@@ -645,6 +645,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.map ? '#define USE_MAP' : '',
 			parameters.matcap ? '#define USE_MATCAP' : '',
 			parameters.indirectSpecularMap ? '#define USE_INDIRECT_SPECULAR_MAP' : '',
+			parameters.ambientOcclusionMap ? '#define USE_AMBIENT_OCCLUSION_MAP' : '',
 			parameters.envMap ? '#define USE_ENVMAP' : '',
 			parameters.envMap ? '#define ' + envMapTypeDefine : '',
 			parameters.envMap ? '#define ' + envMapModeDefine : '',

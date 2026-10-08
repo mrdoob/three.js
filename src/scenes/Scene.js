@@ -65,6 +65,18 @@ class Scene extends Object3D {
 		this.indirectSpecularMap = null;
 
 		/**
+		 * Screen-space ambient visibility in red (1 = unoccluded). Scales indirect
+		 * diffuse and BRDF-aware specular occlusion, without affecting direct light.
+		 * When aoMap is also set, the stronger occlusion wins. Applies to standard,
+		 * Lambert, Phong and toon materials. Match the render target dimensions.
+		 * This texture is not cloned or serialized.
+		 *
+		 * @type {?Texture}
+		 * @default null
+		 */
+		this.ambientOcclusionMap = null;
+
+		/**
 		 * A fog instance defining the type of fog that affects everything
 		 * rendered in the scene.
 		 *
@@ -142,6 +154,7 @@ class Scene extends Object3D {
 		this.background = source.background !== null ? source.background.clone() : null;
 		this.environment = source.environment !== null ? source.environment.clone() : null;
 		this.indirectSpecularMap = source.indirectSpecularMap;
+		this.ambientOcclusionMap = source.ambientOcclusionMap;
 		this.fog = source.fog !== null ? source.fog.clone() : null;
 
 		this.backgroundBlurriness = source.backgroundBlurriness;

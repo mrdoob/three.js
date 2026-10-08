@@ -1,8 +1,21 @@
 export default /* glsl */`
-#ifdef USE_AOMAP
+#if defined( USE_AOMAP ) || defined( USE_AMBIENT_OCCLUSION_MAP )
 
-	// reads channel R, compatible with a combined OcclusionRoughnessMetallic (RGB) texture
-	float ambientOcclusion = ( texture2D( aoMap, vAoMapUv ).r - 1.0 ) * aoMapIntensity + 1.0;
+	float ambientOcclusion = 1.0;
+
+	#ifdef USE_AOMAP
+
+		// reads channel R, compatible with a combined OcclusionRoughnessMetallic (RGB) texture
+		ambientOcclusion = ( texture2D( aoMap, vAoMapUv ).r - 1.0 ) * aoMapIntensity + 1.0;
+
+	#endif
+
+	#ifdef USE_AMBIENT_OCCLUSION_MAP
+
+		// the stronger occlusion of the per-object and screen-space maps wins
+		ambientOcclusion = min( ambientOcclusion, texture2D( ambientOcclusionMap, gl_FragCoord.xy / vec2( textureSize( ambientOcclusionMap, 0 ) ) ).r );
+
+	#endif
 
 	reflectedLight.indirectDiffuse *= ambientOcclusion;
 
@@ -14,7 +27,7 @@ export default /* glsl */`
 		sheenSpecularIndirect *= ambientOcclusion;
 	#endif
 
-	#if ( defined( USE_ENVMAP ) || defined( USE_INDIRECT_SPECULAR_MAP ) ) && defined( STANDARD )
+	#ifdef STANDARD
 
 		float dotNV = saturate( dot( geometryNormal, geometryViewDir ) );
 

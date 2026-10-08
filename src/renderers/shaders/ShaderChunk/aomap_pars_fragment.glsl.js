@@ -5,4 +5,10 @@ export default /* glsl */`
 	uniform float aoMapIntensity;
 
 #endif
+
+#ifdef USE_AMBIENT_OCCLUSION_MAP
+
+	uniform sampler2D ambientOcclusionMap;
+
+#endif
 `;

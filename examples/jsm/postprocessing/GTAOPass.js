@@ -93,7 +93,9 @@ class GTAOPass extends Pass {
 		this.scene = scene;
 
 		/**
-		 * The output configuration.
+		 * The output configuration. `GTAOPass.OUTPUT.Off` only renders the AO targets and
+		 * leaves the read buffer unchanged, for example when the result is assigned to
+		 * {@link Scene#ambientOcclusionMap}.
 		 *
 		 * @type {number}
 		 * @default 0
@@ -482,6 +484,9 @@ class GTAOPass extends Pass {
 	 * @param {boolean} maskActive - Whether masking is active or not.
 	 */
 	render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
+
+		// the Off output does not write to the write buffer
+		this.needsSwap = this.output !== GTAOPass.OUTPUT.Off;
 
 		updatePerspectiveCamera( this.gtaoMaterial, this.camera );
 		updatePerspectiveCamera( this.depthRenderMaterial, this.camera );

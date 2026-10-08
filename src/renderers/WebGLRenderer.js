@@ -2218,6 +2218,7 @@ class WebGLRenderer {
 			materialProperties.environment = ( material.isMeshStandardMaterial || material.isMeshLambertMaterial || material.isMeshPhongMaterial ) ? scene.environment : null;
 			materialProperties.fog = scene.fog;
 			materialProperties.indirectSpecularMap = material.isMeshStandardMaterial ? ( scene.indirectSpecularMap || null ) : null;
+			materialProperties.ambientOcclusionMap = ( material.isMeshStandardMaterial || material.isMeshLambertMaterial || material.isMeshPhongMaterial || material.isMeshToonMaterial ) ? ( scene.ambientOcclusionMap || null ) : null;
 
 			const usePMREM = material.isMeshStandardMaterial || ( material.isMeshLambertMaterial && ! material.envMap ) || ( material.isMeshPhongMaterial && ! material.envMap );
 			materialProperties.envMap = environments.get( material.envMap || materialProperties.environment, usePMREM );
@@ -2418,6 +2419,7 @@ class WebGLRenderer {
 			const fog = scene.fog;
 			const environment = ( material.isMeshStandardMaterial || material.isMeshLambertMaterial || material.isMeshPhongMaterial ) ? scene.environment : null;
 			const indirectSpecularMap = material.isMeshStandardMaterial ? ( scene.indirectSpecularMap || null ) : null;
+			const ambientOcclusionMap = ( material.isMeshStandardMaterial || material.isMeshLambertMaterial || material.isMeshPhongMaterial || material.isMeshToonMaterial ) ? ( scene.ambientOcclusionMap || null ) : null;
 			const colorSpace = ( _currentRenderTarget === null ) ? _this.outputColorSpace : ( _currentRenderTarget.isXRRenderTarget === true ? _currentRenderTarget.texture.colorSpace : ColorManagement.workingColorSpace );
 			const usePMREM = material.isMeshStandardMaterial || ( material.isMeshLambertMaterial && ! material.envMap ) || ( material.isMeshPhongMaterial && ! material.envMap );
 			const envMap = environments.get( material.envMap || environment, usePMREM );
@@ -2526,6 +2528,10 @@ class WebGLRenderer {
 					needsProgramChange = true;
 
 				} else if ( materialProperties.indirectSpecularMap !== indirectSpecularMap ) {
+
+					needsProgramChange = true;
+
+				} else if ( materialProperties.ambientOcclusionMap !== ambientOcclusionMap ) {
 
 					needsProgramChange = true;
 
@@ -2786,6 +2792,12 @@ class WebGLRenderer {
 			if ( m_uniforms.indirectSpecularMap !== undefined ) {
 
 				m_uniforms.indirectSpecularMap.value = indirectSpecularMap;
+
+			}
+
+			if ( m_uniforms.ambientOcclusionMap !== undefined ) {
+
+				m_uniforms.ambientOcclusionMap.value = ambientOcclusionMap;
 
 			}
 
