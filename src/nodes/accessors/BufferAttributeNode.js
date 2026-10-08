@@ -71,7 +71,7 @@ class BufferAttributeNode extends InputNode {
 	/**
 	 * Constructs a new buffer attribute node.
 	 *
-	 * @param {BufferAttribute|InterleavedBuffer|TypedArray} value - The attribute data.
+	 * @param {BufferAttribute|InterleavedBufferAttribute|InterleavedBuffer|TypedArray} value - The attribute data.
 	 * @param {?string} [bufferType=null] - The buffer type (e.g. `'vec3'`).
 	 * @param {number} [bufferStride=0] - The buffer stride.
 	 * @param {number} [bufferOffset=0] - The buffer offset.
@@ -155,7 +155,7 @@ class BufferAttributeNode extends InputNode {
 		 */
 		this.objectAttribute = null;
 
-		if ( value && value.isBufferAttribute === true && value.itemSize <= 4 ) {
+		if ( value && ( value.isBufferAttribute === true || value.isInterleavedBufferAttribute === true ) && value.itemSize <= 4 ) {
 
 			this.attribute = value;
 			this.usage = value.usage;

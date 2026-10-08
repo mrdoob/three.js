@@ -12,7 +12,6 @@ import { instanceIndex } from '../core/IndexNode.js';
 import { InstancedInterleavedBuffer } from '../../core/InstancedInterleavedBuffer.js';
 import { InstancedBufferAttribute } from '../../core/InstancedBufferAttribute.js';
 import { InterleavedBufferAttribute } from '../../core/InterleavedBufferAttribute.js';
-import { getDataFromObject } from '../core/NodeUtils.js';
 import { DynamicDrawUsage } from '../../constants.js';
 
 const _matrixBuffers = /*@__PURE__*/ new WeakMap();
@@ -47,9 +46,10 @@ export function isSharedInstancing( object, renderer ) {
 
 	if ( morphAttributes.position || morphAttributes.normal || morphAttributes.color ) return false;
 
+	// Previous-frame matrices for motion vectors are stored per mesh.
 	const mrt = renderer.getMRT();
 
-	return ! ( mrt && mrt.has( 'velocity' ) ) && getDataFromObject( object ).useVelocity !== true;
+	return mrt === null || mrt.has( 'velocity' ) === false;
 
 }
 
@@ -108,14 +108,7 @@ function getMatrixColumns( matrices ) {
 
 		const interleaved = getInterleavedMatrix( matrices ).setUsage( matrices.usage );
 
-		columns = [ 0, 4, 8, 12 ].map( offset => {
-
-			const attribute = new InterleavedBufferAttribute( interleaved, 4, offset );
-			attribute.isInstancedBufferAttribute = true;
-
-			return attribute;
-
-		} );
+		columns = [ 0, 4, 8, 12 ].map( offset => new InterleavedBufferAttribute( interleaved, 4, offset ) );
 
 		_matrixColumns.set( matrices, columns );
 
@@ -127,28 +120,22 @@ function getMatrixColumns( matrices ) {
 
 /**
  * Creates a matrix node for programs shared between instanced meshes. Each render object binds
- * the matrices that `getMatrices()` returns for its own mesh, so the program does not depend on
- * the instance count.
+ * the instance matrices of its own mesh, so the program does not depend on the instance count.
  *
  * @param {InstancedBufferAttribute} matrices - The matrices of the object being built.
- * @param {function(InstancedMesh): InstancedBufferAttribute} getMatrices - Returns the matrices of a rendered object.
  * @returns {Node} The matrix node.
  */
-function createSharedMatrixNode( matrices, getMatrices ) {
+function createSharedMatrixNode( matrices ) {
 
-	const interleaved = getInterleavedMatrix( matrices );
+	const columns = getMatrixColumns( matrices ).map( ( column, i ) => {
 
-	const columns = [ 0, 4, 8, 12 ].map( ( offset, i ) => {
-
-		return instancedBufferAttribute( interleaved, 'vec4', 16, offset ).setObjectAttribute( object => getMatrixColumns( getMatrices( object ) )[ i ] );
+		return instancedBufferAttribute( column ).setObjectAttribute( object => getMatrixColumns( object.instanceMatrix )[ i ] );
 
 	} );
 
 	return mat4( ...columns );
 
 }
-
-const getInstanceMatrices = object => object.instanceMatrix;
 
 /**
  * Creates the appropriate node for instanced matrix transformations.
@@ -266,7 +253,7 @@ function setupInstance( builder, matrices, colors, shared ) {
 	const isStorageMatrix = matrices.isStorageInstancedBufferAttribute === true;
 	const isStorageColor = colors && colors.isStorageInstancedBufferAttribute === true;
 
-	const instanceMatrixNode = shared ? createSharedMatrixNode( matrices, getInstanceMatrices ) : createInstanceMatrixNode( builder, matrices );
+	const instanceMatrixNode = shared ? createSharedMatrixNode( matrices ) : createInstanceMatrixNode( builder, matrices );
 
 	if ( shared ) {
 

@@ -871,7 +871,7 @@ class RenderObject {
 
 		}
 
-		if ( object.isInstancedMesh && isSharedInstancing( object, renderer ) ) {
+		if ( isSharedInstancing( object, renderer ) ) {
 
 			cacheKey += 'sharedInstancing,';
 
