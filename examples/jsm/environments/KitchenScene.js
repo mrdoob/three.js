@@ -1,4 +1,4 @@
-import { Box3, BoxGeometry, Color, DirectionalLight, Mesh, MeshStandardMaterial, Scene, SphereGeometry, Vector3 } from 'three';
+import { Box3, BoxGeometry, Color, DirectionalLight, DoubleSide, Mesh, MeshStandardMaterial, PlaneGeometry, Scene, SphereGeometry, Vector3 } from 'three';
 import { createWoodTableMaterial } from './WoodTableMaterial.js';
 
 /** Shared sunlit room for the probe and VPL kitchen comparisons. */
@@ -28,11 +28,27 @@ class KitchenScene extends Scene {
 
 		};
 
+		const wall = ( width, height, position, rotation, source ) => {
+
+			const material = source.clone();
+			material.shadowSide = DoubleSide;
+			const mesh = new Mesh( new PlaneGeometry( width, height ), material );
+			mesh.position.set( ...position );
+			mesh.rotation.set( ...rotation );
+			mesh.castShadow = true;
+			mesh.receiveShadow = true;
+			this.add( mesh );
+
+		};
+
+		// Inward-facing surfaces let an exterior camera see into the room.
+		// Both faces still cast shadows; the window wall retains its solid geometry.
+
 		box( [ 8.4, 0.2, 6.4 ], [ 0, - 0.1, 0 ], floor );
-		box( [ 8.4, 0.2, 6.4 ], [ 0, 4.1, 0 ], plaster );
-		box( [ 0.2, 4, 6.4 ], [ 4.1, 2, 0 ], plaster );
-		box( [ 8, 4, 0.2 ], [ 0, 2, - 3.1 ], plaster );
-		box( [ 8, 4, 0.2 ], [ 0, 2, 3.1 ], plaster );
+		wall( 8, 6, [ 0, 4, 0 ], [ Math.PI / 2, 0, 0 ], plaster );
+		wall( 6, 4, [ 4, 2, 0 ], [ 0, - Math.PI / 2, 0 ], plaster );
+		wall( 8, 4, [ 0, 2, - 3 ], [ 0, 0, 0 ], plaster );
+		wall( 8, 4, [ 0, 2, 3 ], [ 0, Math.PI, 0 ], plaster );
 
 		// A real opening in the left wall, with no invisible fill light or window glass.
 
@@ -67,7 +83,7 @@ class KitchenScene extends Scene {
 
 		box( [ 4.9, 0.1, 0.8 ], [ 1.1, 1.05, - 2.6 ], stone );
 
-		this.sun = new DirectionalLight( 0xfff2dc, 6 );
+		this.sun = new DirectionalLight( 0xfff2dc, 20 );
 		this.sun.position.set( - 6, 6, 0 );
 		this.sun.target.position.set( 0, 2.4, 0 );
 		this.sun.castShadow = true;

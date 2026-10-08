@@ -51,7 +51,7 @@
 			import { BVHComputeData, rayStruct, rayIntersectionResultStruct, wgslTagFn } from 'three-mesh-bvh/webgpu';
 
 			const MAX_VPLS = 1024;
-			const params = { mode: 'combined', count: 256, shadows: true, visibility: 'shadow maps', shadowResolution: 64, shadowBias: 0, showVPLs: false, seed: 1, minDistance: 1, progressive: false, sunIntensity: 6 };
+			const params = { mode: 'combined', count: 256, shadows: true, visibility: 'shadow maps', shadowResolution: 64, shadowBias: 0, showVPLs: false, seed: 1, minDistance: 1, progressive: false, sunIntensity: 20 };
 
 			init();
 
@@ -242,7 +242,7 @@
 				controls.update();
 
 				const gui = renderer.inspector.createParameters( 'Virtual Point Lights' );
-				gui.add( params, 'sunIntensity', 0, 20, 0.1 ).name( 'Sun Intensity' ).onChange( value => {
+				gui.add( params, 'sunIntensity', 0, 100, 0.1 ).name( 'Sun Intensity' ).onChange( value => {
 
 					intensities[ 0 ] = value;
 					regenerate();

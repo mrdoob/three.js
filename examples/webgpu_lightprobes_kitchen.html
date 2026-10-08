@@ -120,7 +120,7 @@
 					enabled: true,
 					showProbes: false,
 					resolution: 6,
-					sunIntensity: 6
+					sunIntensity: 20
 				};
 
 				await bake( params.resolution );
@@ -128,7 +128,7 @@
 				// GUI
 
 				const gui = renderer.inspector.createParameters( 'Light Probes' );
-				gui.add( params, 'sunIntensity', 0, 20, 0.1 ).name( 'Sun Intensity' ).onChange( value => {
+				gui.add( params, 'sunIntensity', 0, 100, 0.1 ).name( 'Sun Intensity' ).onChange( value => {
 
 					scene.sun.intensity = value;
 					bake( params.resolution );
