@@ -21,13 +21,14 @@ TRAA upscaling. The WebGPU canvas and scene pass use matching resolutions so
 camera jitter remains one fraction of an actual render pixel. Changing the scale
 resets history. The status line shows the drawing-buffer dimensions and MSAA state.
 
-## Repeatable visual checks
+## Visual checks
 
-Keep **Fixed 1/60 step** enabled and restart at t=0 for each run. Playback runs at
-normal speed. Pause freezes scene motion while temporal accumulation continues.
-**step** advances scene time by 1/60 second. Compare **TRAA enabled** with no AA
-at the same paused time and render resolution. Renderer/material/backend
-differences also affect the comparison.
+Animation advances using the elapsed time between frames through THREE.Timer,
+so motion runs at normal speed regardless of frame rate. Pause freezes scene
+motion while temporal accumulation continues; the timer keeps updating to avoid
+a jump when playback resumes. The timer also handles hidden browser tabs.
+Compare **TRAA enabled** with no AA at the same paused time and render resolution.
+Renderer/material/backend differences also affect the comparison.
 
 | Challenge | Watch for |
 | --- | --- |
@@ -42,8 +43,9 @@ differences also affect the comparison.
 | Morphing mesh and moving instances | Missing previous deformation/instance transforms; differing backend coverage |
 
 Camera **Pan**, **Orbit** and **Zoom** add camera motion to all the object motion.
-**cameraCut** jumps camera position and explicitly resets history. Resize also
-resets history. Toggle **transparentBackground** to composite the canvas over a
+History resets automatically when resizing or changing render resolution, TRAA,
+camera motion or background transparency. Toggle **transparentBackground** to
+composite the canvas over a
 CSS checkerboard: inspect alpha fringes, halos and silhouettes, not just RGB.
 A CSS background has no motion vectors and must never become scene history.
 Blended geometry is a separate challenge: a single opaque depth/velocity field

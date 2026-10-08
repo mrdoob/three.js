@@ -154,7 +154,7 @@ export async function createTRAATestScene() {
 	groups[ 8 ].add( instances );
 	const matrix = new THREE.Matrix4();
 
-	function update( time, { cameraMotion = 'Still', cameraCutOffset = 0, transparentBackground = false } = {} ) {
+	function update( time, { cameraMotion = 'Still', transparentBackground = false } = {} ) {
 
 		scene.background = transparentBackground ? null : environment;
 		linear.position.set( 0.65 * Math.sin( time ), 0.18 * Math.cos( time * 0.7 ), 0 );
@@ -183,7 +183,6 @@ export async function createTRAATestScene() {
 		if ( cameraMotion === 'Pan' ) camera.position.x = 0.8 * Math.sin( time * 0.6 );
 		if ( cameraMotion === 'Orbit' ) camera.position.set( 3 * Math.sin( time * 0.4 ), 0.7 * Math.cos( time * 0.4 ), distance );
 		if ( cameraMotion === 'Zoom' ) camera.position.z = distance - 1 + 1.5 * Math.sin( time * 0.5 );
-		camera.position.x += cameraCutOffset;
 		camera.lookAt( 0, 0, 0 );
 
 	}

@@ -39,28 +39,7 @@
 			const query = new URLSearchParams( location.search );
 			const params = {
 				backend: query.get( 'backend' ) || 'WebGL', traa: true, resolutionScale: 1, paused: false,
-				fixedStep: true, cameraMotion: 'Still', cameraCutOffset: 0, transparentBackground: false,
-				resetHistory: () => resetHistory(),
-				restart: () => {
-
-					time = 0;
-					params.cameraCutOffset = 0;
-					resetHistory();
-
-				},
-				step: () => {
-
-					time += 1 / 60;
-					render();
-
-				},
-				cameraCut: () => {
-
-					params.cameraCutOffset = params.cameraCutOffset === 0 ? 2 : 0;
-					resetHistory();
-					render();
-
-				}
+				cameraMotion: 'Still', transparentBackground: false
 			};
 			const { scene, camera, labels, update } = await createTRAATestScene();
 			for ( const text of labels ) {
@@ -72,7 +51,7 @@
 			}
 
 			let renderer, composer, temporal, pipeline, colorNode, depthNode, velocityNode, traaFactory;
-			let time = 0, frame = 0, previousTime = performance.now();
+			let time = 0, frame = 0;
 			if ( params.backend === 'WebGPU' ) {
 
 				const { WebGPURenderer, RenderPipeline } = await import( 'three/webgpu' );
@@ -121,10 +100,8 @@
 			gui.add( params, 'traa' ).name( 'TRAA enabled' ).onChange( resetHistory );
 			gui.add( params, 'resolutionScale', { '100% (device)': 1, '75%': 0.75, '50%': 0.5, '25%': 0.25, '12.5%': 0.125 } ).name( 'Render resolution' ).onChange( resize );
 			gui.add( params, 'paused' );
-			gui.add( params, 'fixedStep' ).name( 'Fixed 1/60 step' );
 			gui.add( params, 'cameraMotion', [ 'Still', 'Pan', 'Orbit', 'Zoom' ] ).onChange( resetHistory );
 			gui.add( params, 'transparentBackground' ).onChange( resetHistory );
-			for ( const key of [ 'resetHistory', 'restart', 'step', 'cameraCut' ] ) gui.add( params, key );
 
 			function resetHistory() {
 
@@ -174,11 +151,12 @@
 
 			window.addEventListener( 'resize', resize );
 			resize();
+			const timer = new THREE.Timer();
+			timer.connect( document );
 			renderer.setAnimationLoop( () => {
 
-				const now = performance.now();
-				if ( ! params.paused ) time += params.fixedStep ? 1 / 60 : Math.min( ( now - previousTime ) / 1000, 0.1 );
-				previousTime = now;
+				timer.update();
+				if ( ! params.paused ) time += timer.getDelta();
 				render();
 
 			} );

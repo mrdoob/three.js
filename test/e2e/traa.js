@@ -55,14 +55,12 @@ try {
 		await new Promise( resolve => setTimeout( resolve, 700 ) );
 		await page.screenshot( { path: join( tmpdir(), `three-traa-${ backend }-downsampled.png` ) } );
 		await change( 'paused', true );
-		await change( 'step' );
 		await change( 'paused', false );
 		await change( 'TRAA enabled', true );
 		await change( 'cameraMotion', 'Orbit' );
 		await change( 'transparentBackground', true );
 		await new Promise( resolve => setTimeout( resolve, 700 ) );
 		await page.screenshot( { path: join( tmpdir(), `three-traa-${ backend }-alpha.png` ) } );
-		await change( 'cameraCut' );
 		await change( 'TRAA enabled', false );
 		await new Promise( resolve => setTimeout( resolve, 700 ) );
 		await page.setViewport( { width: 960, height: 720, deviceScaleFactor: 2 } );
