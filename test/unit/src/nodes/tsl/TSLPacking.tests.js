@@ -8,7 +8,7 @@ import {
 	packNormalToRGB, unpackRGBToNormal, unpackNormal,
 	length
 } from 'three/tsl';
-import { toHalfFloat } from '../../../../src/extras/DataUtils.js';
+import { toHalfFloat } from '../../../../../src/extras/DataUtils.js';
 import { gpuTest, gpuFuzzTest } from './gpu-test-utils.js';
 
 // Packing/unpacking coverage: every round-trip test checks a value that was

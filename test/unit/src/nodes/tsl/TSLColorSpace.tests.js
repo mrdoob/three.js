@@ -2,7 +2,7 @@ import {
 	vec3,
 	sRGBTransferEOTF, sRGBTransferOETF
 } from 'three/tsl';
-import { SRGBToLinear, LinearToSRGB } from '../../../../src/math/ColorManagement.js';
+import { SRGBToLinear, LinearToSRGB } from '../../../../../src/math/ColorManagement.js';
 import { gpuTest } from './gpu-test-utils.js';
 
 // sRGB <-> linear-sRGB transfer function coverage. Every expected value below
