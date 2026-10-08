@@ -36,8 +36,6 @@ let _id = 0;
 
 const _functionNodeCache = new WeakMap();
 
-const sharedNodeData = new WeakMap();
-
 const typeFromArray = new Map( [
 	[ Int8Array, 'int' ],
 	[ Int16Array, 'int' ],
@@ -3397,26 +3395,6 @@ class NodeBuilder {
 	}
 
 	/**
-	 * Returns shared data object for the given node.
-	 *
-	 * @param {Node} node - The node to get shared data from.
-	 * @return {Object} The shared data.
-	 */
-	getSharedDataFromNode( node ) {
-
-		let data = sharedNodeData.get( node );
-
-		if ( data === undefined ) {
-
-			data = {};
-
-		}
-
-		return data;
-
-	}
-
-	/**
 	 * Returns a uniform representation which is later used for UBO generation and rendering.
 	 *
 	 * @param {NodeUniform} uniformNode - The uniform node.
@@ -3425,31 +3403,16 @@ class NodeBuilder {
 	 */
 	getNodeUniform( uniformNode, type ) {
 
-		const nodeData = this.getSharedDataFromNode( uniformNode );
+		if ( type === 'float' || type === 'int' || type === 'uint' ) return new NumberNodeUniform( uniformNode );
+		if ( type === 'vec2' || type === 'ivec2' || type === 'uvec2' ) return new Vector2NodeUniform( uniformNode );
+		if ( type === 'vec3' || type === 'ivec3' || type === 'uvec3' ) return new Vector3NodeUniform( uniformNode );
+		if ( type === 'vec4' || type === 'ivec4' || type === 'uvec4' ) return new Vector4NodeUniform( uniformNode );
+		if ( type === 'color' ) return new ColorNodeUniform( uniformNode );
+		if ( type === 'mat2' ) return new Matrix2NodeUniform( uniformNode );
+		if ( type === 'mat3' ) return new Matrix3NodeUniform( uniformNode );
+		if ( type === 'mat4' ) return new Matrix4NodeUniform( uniformNode );
 
-		let node = nodeData.cache;
-
-		if ( node === undefined ) {
-
-			if ( type === 'float' || type === 'int' || type === 'uint' ) node = new NumberNodeUniform( uniformNode );
-			else if ( type === 'vec2' || type === 'ivec2' || type === 'uvec2' ) node = new Vector2NodeUniform( uniformNode );
-			else if ( type === 'vec3' || type === 'ivec3' || type === 'uvec3' ) node = new Vector3NodeUniform( uniformNode );
-			else if ( type === 'vec4' || type === 'ivec4' || type === 'uvec4' ) node = new Vector4NodeUniform( uniformNode );
-			else if ( type === 'color' ) node = new ColorNodeUniform( uniformNode );
-			else if ( type === 'mat2' ) node = new Matrix2NodeUniform( uniformNode );
-			else if ( type === 'mat3' ) node = new Matrix3NodeUniform( uniformNode );
-			else if ( type === 'mat4' ) node = new Matrix4NodeUniform( uniformNode );
-			else {
-
-				throw new Error( `THREE.NodeBuilder: Uniform "${ type }" not implemented.` );
-
-			}
-
-			nodeData.cache = node;
-
-		}
-
-		return node;
+		throw new Error( `THREE.NodeBuilder: Uniform "${ type }" not implemented.` );
 
 	}
 
