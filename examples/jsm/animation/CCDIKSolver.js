@@ -216,15 +216,23 @@ class CCDIKSolver {
 
 				}
 
-				if ( rotationMin !== undefined ) {
+				if ( rotationMin !== undefined || rotationMax !== undefined ) {
 
-					link.rotation.setFromVector3( _vector.setFromEuler( link.rotation ).max( rotationMin ) );
+					_vector.setFromEuler( link.rotation );
 
-				}
+					if ( rotationMin !== undefined && rotationMax !== undefined ) {
 
-				if ( rotationMax !== undefined ) {
+						// The outer Euler axes are periodic; the middle axis uses a different branch.
+						const middleAxis = link.rotation.order[ 1 ];
+						if ( middleAxis !== 'X' ) _vector.x = wrapRotation( _vector.x, rotationMin.x, rotationMax.x );
+						if ( middleAxis !== 'Y' ) _vector.y = wrapRotation( _vector.y, rotationMin.y, rotationMax.y );
+						if ( middleAxis !== 'Z' ) _vector.z = wrapRotation( _vector.z, rotationMin.z, rotationMax.z );
 
-					link.rotation.setFromVector3( _vector.setFromEuler( link.rotation ).min( rotationMax ) );
+					}
+
+					if ( rotationMin !== undefined ) _vector.max( rotationMin );
+					if ( rotationMax !== undefined ) _vector.min( rotationMax );
+					link.rotation.setFromVector3( _vector );
 
 				}
 
@@ -303,6 +311,22 @@ class CCDIKSolver {
 		}
 
 	}
+
+}
+
+function wrapRotation( angle, min, max ) {
+
+	const fullTurn = 2 * Math.PI;
+
+	// Preserve linear clamping for principal-range, unbounded and inverted limits.
+	if ( ( min < - Math.PI || max > Math.PI ) && Number.isFinite( min ) && Number.isFinite( max ) && min <= max && max - min < fullTurn ) {
+
+		const center = ( min + max ) / 2;
+		angle += fullTurn * Math.round( ( center - angle ) / fullTurn );
+
+	}
+
+	return angle;
 
 }
 
