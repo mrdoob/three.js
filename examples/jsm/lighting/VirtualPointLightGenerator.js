@@ -122,7 +122,10 @@ class VirtualPointLightGenerator {
 		};
 
 		const raycaster = new Raycaster();
-		// Native Mesh.raycast is used. Alpha cutouts require considering later intersections.
+		// Native Mesh.raycast ignores this hint. Preserve the existing opaque closest-hit
+		// optimization for callers that already installed an accelerated mesh raycaster.
+		// Alpha cutouts require considering later intersections.
+		raycaster.firstHitOnly = ! surfaces.some( surface => ( Array.isArray( surface.material ) ? surface.material : [ surface.material ] ).some( material => material.alphaTest > 0 ) );
 		const normalMatrix = new Matrix3();
 		const throughput = new Color(), albedo = new Color();
 		const origin = new Vector3(), direction = new Vector3(), u = new Vector3(), v = new Vector3();
