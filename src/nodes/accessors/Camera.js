@@ -6,28 +6,22 @@ import { uniformArray } from './UniformArrayNode.js';
 import { builtin } from './BuiltinNode.js';
 import { screenSize } from '../display/ScreenNode.js';
 
-// Cache node uniforms
+// Cache single-camera uniforms. Array uniforms belong to each shader builder so
+// cameras with different array sizes cannot overwrite each other's buffers.
 
 let _cameraProjectionMatrixBase = null;
-let _cameraProjectionMatrixArray = null;
 
 let _cameraProjectionMatrixInverseBase = null;
-let _cameraProjectionMatrixInverseArray = null;
 
 let _cameraViewMatrixBase = null;
-let _cameraViewMatrixArray = null;
 
 let _cameraWorldMatrixBase = null;
-let _cameraWorldMatrixArray = null;
 
 let _cameraNormalMatrixBase = null;
-let _cameraNormalMatrixArray = null;
 
 let _cameraPositionBase = null;
-let _cameraPositionArray = null;
 
 let _cameraViewportBase = null;
-let _cameraViewportArray = null;
 
 /**
  * TSL object that represents the current `index` value of the camera if used ArrayCamera.
@@ -65,25 +59,18 @@ export const cameraProjectionMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
 
 	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
 
-		const matrices = [];
+		const values = camera.cameras.map( ( subCamera ) => subCamera.projectionMatrix );
+		const cameraArray = uniformArray( values ).setGroup( renderGroup ).setName( 'cameraProjectionMatrices' ).onRenderUpdate( ( { camera }, self ) => {
 
-		for ( const subCamera of camera.cameras ) {
+			for ( let i = 0; i < camera.cameras.length; i ++ ) {
 
-			matrices.push( subCamera.projectionMatrix );
+				self.array[ i ] = camera.cameras[ i ].projectionMatrix;
 
-		}
+			}
 
-		if ( _cameraProjectionMatrixArray === null ) {
+		} );
 
-			_cameraProjectionMatrixArray = uniformArray( matrices ).setGroup( renderGroup ).setName( 'cameraProjectionMatrices' );
-
-		} else {
-
-			_cameraProjectionMatrixArray.array = matrices;
-
-		}
-
-		cameraProjectionMatrix = _cameraProjectionMatrixArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
+		cameraProjectionMatrix = cameraArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
 
 	} else {
 
@@ -113,25 +100,18 @@ export const cameraProjectionMatrixInverse = /*@__PURE__*/ ( Fn( ( { camera } ) 
 
 	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
 
-		const matrices = [];
+		const values = camera.cameras.map( ( subCamera ) => subCamera.projectionMatrixInverse );
+		const cameraArray = uniformArray( values ).setGroup( renderGroup ).setName( 'cameraProjectionMatricesInverse' ).onRenderUpdate( ( { camera }, self ) => {
 
-		for ( const subCamera of camera.cameras ) {
+			for ( let i = 0; i < camera.cameras.length; i ++ ) {
 
-			matrices.push( subCamera.projectionMatrixInverse );
+				self.array[ i ] = camera.cameras[ i ].projectionMatrixInverse;
 
-		}
+			}
 
-		if ( _cameraProjectionMatrixInverseArray === null ) {
+		} );
 
-			_cameraProjectionMatrixInverseArray = uniformArray( matrices ).setGroup( renderGroup ).setName( 'cameraProjectionMatricesInverse' );
-
-		} else {
-
-			_cameraProjectionMatrixInverseArray.array = matrices;
-
-		}
-
-		cameraProjectionMatrixInverse = _cameraProjectionMatrixInverseArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
+		cameraProjectionMatrixInverse = cameraArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
 
 	} else {
 
@@ -161,25 +141,18 @@ export const cameraViewMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
 
 	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
 
-		const matrices = [];
+		const values = camera.cameras.map( ( subCamera ) => subCamera.matrixWorldInverse );
+		const cameraArray = uniformArray( values ).setGroup( renderGroup ).setName( 'cameraViewMatrices' ).onRenderUpdate( ( { camera }, self ) => {
 
-		for ( const subCamera of camera.cameras ) {
+			for ( let i = 0; i < camera.cameras.length; i ++ ) {
 
-			matrices.push( subCamera.matrixWorldInverse );
+				self.array[ i ] = camera.cameras[ i ].matrixWorldInverse;
 
-		}
+			}
 
-		if ( _cameraViewMatrixArray === null ) {
+		} );
 
-			_cameraViewMatrixArray = uniformArray( matrices ).setGroup( renderGroup ).setName( 'cameraViewMatrices' );
-
-		} else {
-
-			_cameraViewMatrixArray.array = matrices;
-
-		}
-
-		cameraViewMatrix = _cameraViewMatrixArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
+		cameraViewMatrix = cameraArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
 
 	} else {
 
@@ -209,25 +182,18 @@ export const cameraWorldMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
 
 	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
 
-		const matrices = [];
+		const values = camera.cameras.map( ( subCamera ) => subCamera.matrixWorld );
+		const cameraArray = uniformArray( values ).setGroup( renderGroup ).setName( 'cameraWorldMatrices' ).onRenderUpdate( ( { camera }, self ) => {
 
-		for ( const subCamera of camera.cameras ) {
+			for ( let i = 0; i < camera.cameras.length; i ++ ) {
 
-			matrices.push( subCamera.matrixWorld );
+				self.array[ i ] = camera.cameras[ i ].matrixWorld;
 
-		}
+			}
 
-		if ( _cameraWorldMatrixArray === null ) {
+		} );
 
-			_cameraWorldMatrixArray = uniformArray( matrices ).setGroup( renderGroup ).setName( 'cameraWorldMatrices' );
-
-		} else {
-
-			_cameraWorldMatrixArray.array = matrices;
-
-		}
-
-		cameraWorldMatrix = _cameraWorldMatrixArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
+		cameraWorldMatrix = cameraArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
 
 	} else {
 
@@ -257,25 +223,18 @@ export const cameraNormalMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
 
 	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
 
-		const matrices = [];
+		const values = camera.cameras.map( ( subCamera ) => subCamera.normalMatrix );
+		const cameraArray = uniformArray( values ).setGroup( renderGroup ).setName( 'cameraNormalMatrices' ).onRenderUpdate( ( { camera }, self ) => {
 
-		for ( const subCamera of camera.cameras ) {
+			for ( let i = 0; i < camera.cameras.length; i ++ ) {
 
-			matrices.push( subCamera.normalMatrix );
+				self.array[ i ] = camera.cameras[ i ].normalMatrix;
 
-		}
+			}
 
-		if ( _cameraNormalMatrixArray === null ) {
+		} );
 
-			_cameraNormalMatrixArray = uniformArray( matrices ).setGroup( renderGroup ).setName( 'cameraNormalMatrices' );
-
-		} else {
-
-			_cameraNormalMatrixArray.array = matrices;
-
-		}
-
-		cameraNormalMatrix = _cameraNormalMatrixArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
+		cameraNormalMatrix = cameraArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
 
 	} else {
 
@@ -313,28 +272,20 @@ export const cameraPosition = /*@__PURE__*/ ( Fn( ( { camera } ) => {
 
 		}
 
-		if ( _cameraPositionArray === null ) {
+		const cameraArray = uniformArray( positions ).setGroup( renderGroup ).setName( 'cameraPositions' ).onRenderUpdate( ( { camera }, self ) => {
 
-			_cameraPositionArray = uniformArray( positions ).setGroup( renderGroup ).setName( 'cameraPositions' ).onRenderUpdate( ( { camera }, self ) => {
+			const subCameras = camera.cameras;
+			const array = self.array;
 
-				const subCameras = camera.cameras;
-				const array = self.array;
+			for ( let i = 0, l = subCameras.length; i < l; i ++ ) {
 
-				for ( let i = 0, l = subCameras.length; i < l; i ++ ) {
+				array[ i ].setFromMatrixPosition( subCameras[ i ].matrixWorld );
 
-					array[ i ].setFromMatrixPosition( subCameras[ i ].matrixWorld );
+			}
 
-				}
+		} );
 
-			} );
-
-		} else {
-
-			_cameraPositionArray.array = positions;
-
-		}
-
-		cameraPosition = _cameraPositionArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
+		cameraPosition = cameraArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
 
 	} else {
 
@@ -365,25 +316,18 @@ export const cameraViewport = /*@__PURE__*/ ( Fn( ( { camera } ) => {
 
 	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
 
-		const viewports = [];
+		const values = camera.cameras.map( ( subCamera ) => subCamera.viewport );
+		const cameraArray = uniformArray( values, 'vec4' ).setGroup( renderGroup ).setName( 'cameraViewports' ).onRenderUpdate( ( { camera }, self ) => {
 
-		for ( const subCamera of camera.cameras ) {
+			for ( let i = 0; i < camera.cameras.length; i ++ ) {
 
-			viewports.push( subCamera.viewport );
+				self.array[ i ] = camera.cameras[ i ].viewport;
 
-		}
+			}
 
-		if ( _cameraViewportArray === null ) {
+		} );
 
-			_cameraViewportArray = uniformArray( viewports, 'vec4' ).setGroup( renderGroup ).setName( 'cameraViewports' );
-
-		} else {
-
-			_cameraViewportArray.array = viewports;
-
-		}
-
-		cameraViewport = _cameraViewportArray.element( cameraIndex );
+		cameraViewport = cameraArray.element( cameraIndex );
 
 	} else {
 
