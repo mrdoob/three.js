@@ -27,43 +27,47 @@ const DISPATCH_COUNT = WORKGROUP_SIZE * WORKGROUP_COUNT;
 // WGSL's "subgroup functions need uniform control flow" rule.
 const DISPATCH_SIZE = [ WORKGROUP_COUNT, 1, 1 ];
 
-export default QUnit.module( 'TSL', () => {
+export default QUnit.module( 'Nodes', () => {
 
-	QUnit.module( 'subgroup functions', () => {
+	QUnit.module( 'TSL', () => {
 
-		rawComputeTest( 'subgroupAll and subgroupAny reflect a lane-0-only predicate', { requiredFeature: 'subgroups' }, async ( { assert, renderer } ) => {
+		QUnit.module( 'subgroup functions', () => {
 
-			const allOut = instancedArray( DISPATCH_COUNT, 'uint' );
-			const anyOut = instancedArray( DISPATCH_COUNT, 'uint' );
+			rawComputeTest( 'subgroupAll and subgroupAny reflect a lane-0-only predicate', { requiredFeature: 'subgroups' }, async ( { assert, renderer } ) => {
 
-			const kernel = Fn( () => {
+				const allOut = instancedArray( DISPATCH_COUNT, 'uint' );
+				const anyOut = instancedArray( DISPATCH_COUNT, 'uint' );
 
-				// Lane 0 always exists in every active subgroup, and (for a
-				// non-divergent compute shader like this one) every lane in
-				// the subgroup is active -- so both predicates below have an
-				// unambiguous, group-size-independent expected result.
-				const isLaneZero = invocationSubgroupIndex.equal( uint( 0 ) );
+				const kernel = Fn( () => {
 
-				// Not every lane is lane 0 (unless the subgroup has exactly
-				// 1 lane, which subgroupSize being >= 1 doesn't rule out --
-				// but this sandbox's subgroupSize is 32, so this is false).
-				allOut.element( instanceIndex ).assign( subgroupAll( bool( isLaneZero.not() ) ).select( uint( 1 ), uint( 0 ) ) );
-				// Some lane (lane 0 itself) is lane 0 -- always true.
-				anyOut.element( instanceIndex ).assign( subgroupAny( bool( isLaneZero ) ).select( uint( 1 ), uint( 0 ) ) );
+					// Lane 0 always exists in every active subgroup, and (for a
+					// non-divergent compute shader like this one) every lane in
+					// the subgroup is active -- so both predicates below have an
+					// unambiguous, group-size-independent expected result.
+					const isLaneZero = invocationSubgroupIndex.equal( uint( 0 ) );
 
-			} )().compute( DISPATCH_SIZE, [ WORKGROUP_SIZE ] );
+					// Not every lane is lane 0 (unless the subgroup has exactly
+					// 1 lane, which subgroupSize being >= 1 doesn't rule out --
+					// but this sandbox's subgroupSize is 32, so this is false).
+					allOut.element( instanceIndex ).assign( subgroupAll( bool( isLaneZero.not() ) ).select( uint( 1 ), uint( 0 ) ) );
+					// Some lane (lane 0 itself) is lane 0 -- always true.
+					anyOut.element( instanceIndex ).assign( subgroupAny( bool( isLaneZero ) ).select( uint( 1 ), uint( 0 ) ) );
 
-			await renderer.computeAsync( kernel );
+				} )().compute( DISPATCH_SIZE, [ WORKGROUP_SIZE ] );
 
-			const allData = await readUintBuffer( renderer, allOut );
-			const anyData = await readUintBuffer( renderer, anyOut );
+				await renderer.computeAsync( kernel );
 
-			for ( let i = 0; i < DISPATCH_COUNT; i ++ ) {
+				const allData = await readUintBuffer( renderer, allOut );
+				const anyData = await readUintBuffer( renderer, anyOut );
 
-				assert.strictEqual( allData[ i ], 0, `invocation ${ i }: subgroupAll(laneId != 0) should be false (lane 0 fails it)` );
-				assert.strictEqual( anyData[ i ], 1, `invocation ${ i }: subgroupAny(laneId == 0) should be true (lane 0 satisfies it)` );
+				for ( let i = 0; i < DISPATCH_COUNT; i ++ ) {
 
-			}
+					assert.strictEqual( allData[ i ], 0, `invocation ${ i }: subgroupAll(laneId != 0) should be false (lane 0 fails it)` );
+					assert.strictEqual( anyData[ i ], 1, `invocation ${ i }: subgroupAny(laneId == 0) should be true (lane 0 satisfies it)` );
+
+				}
+
+			} );
 
 		} );
 

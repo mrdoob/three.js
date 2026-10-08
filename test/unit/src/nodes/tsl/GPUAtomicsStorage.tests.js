@@ -49,177 +49,181 @@ async function seed( renderer, counter, value ) {
 
 }
 
-export default QUnit.module( 'TSL', () => {
+export default QUnit.module( 'Nodes', () => {
 
-	QUnit.module( 'storage buffer atomics', () => {
+	QUnit.module( 'TSL', () => {
 
-		rawComputeTest( 'atomicAdd: concurrent adds across multiple workgroups sum exactly once each', {}, async ( { assert, renderer } ) => {
+		QUnit.module( 'storage buffer atomics', () => {
 
-			const dispatchCount = 64; // 8 workgroups of WORKGROUP_SIZE
-			const counter = makeCounter();
+			rawComputeTest( 'atomicAdd: concurrent adds across multiple workgroups sum exactly once each', {}, async ( { assert, renderer } ) => {
 
-			const kernel = Fn( () => {
+				const dispatchCount = 64; // 8 workgroups of WORKGROUP_SIZE
+				const counter = makeCounter();
 
-				atomicAdd( counter.element( uint( 0 ) ), uint( 1 ) );
+				const kernel = Fn( () => {
 
-			} )().compute( dispatchCount, [ WORKGROUP_SIZE ] );
+					atomicAdd( counter.element( uint( 0 ) ), uint( 1 ) );
 
-			await renderer.computeAsync( kernel );
+				} )().compute( dispatchCount, [ WORKGROUP_SIZE ] );
 
-			const data = await readUintBuffer( renderer, counter );
-			assert.strictEqual( data[ 0 ], dispatchCount, `expected ${ dispatchCount } (one add per invocation, across ${ dispatchCount / WORKGROUP_SIZE } workgroups)` );
+				await renderer.computeAsync( kernel );
 
-		} );
+				const data = await readUintBuffer( renderer, counter );
+				assert.strictEqual( data[ 0 ], dispatchCount, `expected ${ dispatchCount } (one add per invocation, across ${ dispatchCount / WORKGROUP_SIZE } workgroups)` );
 
-		rawComputeTest( 'atomicSub: concurrent subs across multiple workgroups drain exactly once each', {}, async ( { assert, renderer } ) => {
+			} );
 
-			const dispatchCount = 64;
-			const counter = makeCounter();
+			rawComputeTest( 'atomicSub: concurrent subs across multiple workgroups drain exactly once each', {}, async ( { assert, renderer } ) => {
 
-			await seed( renderer, counter, dispatchCount );
+				const dispatchCount = 64;
+				const counter = makeCounter();
 
-			const kernel = Fn( () => {
+				await seed( renderer, counter, dispatchCount );
 
-				atomicSub( counter.element( uint( 0 ) ), uint( 1 ) );
+				const kernel = Fn( () => {
 
-			} )().compute( dispatchCount, [ WORKGROUP_SIZE ] );
+					atomicSub( counter.element( uint( 0 ) ), uint( 1 ) );
 
-			await renderer.computeAsync( kernel );
+				} )().compute( dispatchCount, [ WORKGROUP_SIZE ] );
 
-			const data = await readUintBuffer( renderer, counter );
-			assert.strictEqual( data[ 0 ], 0, 'expected 0 (one sub per invocation, draining the seeded count exactly)' );
+				await renderer.computeAsync( kernel );
 
-		} );
+				const data = await readUintBuffer( renderer, counter );
+				assert.strictEqual( data[ 0 ], 0, 'expected 0 (one sub per invocation, draining the seeded count exactly)' );
 
-		rawComputeTest( 'atomicMax: concurrent max across multiple workgroups converges to the true maximum', {}, async ( { assert, renderer } ) => {
+			} );
 
-			const dispatchCount = 37; // deliberately not a multiple of WORKGROUP_SIZE
-			const counter = makeCounter();
+			rawComputeTest( 'atomicMax: concurrent max across multiple workgroups converges to the true maximum', {}, async ( { assert, renderer } ) => {
 
-			await seed( renderer, counter, 0 );
+				const dispatchCount = 37; // deliberately not a multiple of WORKGROUP_SIZE
+				const counter = makeCounter();
 
-			const kernel = Fn( () => {
+				await seed( renderer, counter, 0 );
 
-				atomicMax( counter.element( uint( 0 ) ), instanceIndex );
+				const kernel = Fn( () => {
 
-			} )().compute( dispatchCount, [ WORKGROUP_SIZE ] );
+					atomicMax( counter.element( uint( 0 ) ), instanceIndex );
 
-			await renderer.computeAsync( kernel );
+				} )().compute( dispatchCount, [ WORKGROUP_SIZE ] );
 
-			const data = await readUintBuffer( renderer, counter );
-			assert.strictEqual( data[ 0 ], dispatchCount - 1, `expected ${ dispatchCount - 1 } (the largest instanceIndex)` );
+				await renderer.computeAsync( kernel );
 
-		} );
+				const data = await readUintBuffer( renderer, counter );
+				assert.strictEqual( data[ 0 ], dispatchCount - 1, `expected ${ dispatchCount - 1 } (the largest instanceIndex)` );
 
-		rawComputeTest( 'atomicMin: concurrent min across multiple workgroups converges to the true minimum', {}, async ( { assert, renderer } ) => {
+			} );
 
-			const dispatchCount = 37;
-			const counter = makeCounter();
+			rawComputeTest( 'atomicMin: concurrent min across multiple workgroups converges to the true minimum', {}, async ( { assert, renderer } ) => {
 
-			await seed( renderer, counter, 0xffffffff );
+				const dispatchCount = 37;
+				const counter = makeCounter();
 
-			const kernel = Fn( () => {
+				await seed( renderer, counter, 0xffffffff );
 
-				atomicMin( counter.element( uint( 0 ) ), instanceIndex );
+				const kernel = Fn( () => {
 
-			} )().compute( dispatchCount, [ WORKGROUP_SIZE ] );
+					atomicMin( counter.element( uint( 0 ) ), instanceIndex );
 
-			await renderer.computeAsync( kernel );
+				} )().compute( dispatchCount, [ WORKGROUP_SIZE ] );
 
-			const data = await readUintBuffer( renderer, counter );
-			assert.strictEqual( data[ 0 ], 0, 'expected 0 (the smallest instanceIndex)' );
+				await renderer.computeAsync( kernel );
 
-		} );
+				const data = await readUintBuffer( renderer, counter );
+				assert.strictEqual( data[ 0 ], 0, 'expected 0 (the smallest instanceIndex)' );
 
-		rawComputeTest( 'atomicAnd: each invocation clears one distinct bit, all clears land', {}, async ( { assert, renderer } ) => {
+			} );
 
-			// 32 invocations, each clearing a different one of the 32 bits --
-			// only passes if every single invocation's AND actually took
-			// effect (a lost update would leave a stray 1 bit set).
-			const dispatchCount = 32;
-			const counter = makeCounter();
+			rawComputeTest( 'atomicAnd: each invocation clears one distinct bit, all clears land', {}, async ( { assert, renderer } ) => {
 
-			await seed( renderer, counter, 0xffffffff );
+				// 32 invocations, each clearing a different one of the 32 bits --
+				// only passes if every single invocation's AND actually took
+				// effect (a lost update would leave a stray 1 bit set).
+				const dispatchCount = 32;
+				const counter = makeCounter();
 
-			const kernel = Fn( () => {
+				await seed( renderer, counter, 0xffffffff );
 
-				const bit = shiftLeft( uint( 1 ), instanceIndex );
-				atomicAnd( counter.element( uint( 0 ) ), bitNot( bit ) );
+				const kernel = Fn( () => {
 
-			} )().compute( dispatchCount, [ WORKGROUP_SIZE ] );
+					const bit = shiftLeft( uint( 1 ), instanceIndex );
+					atomicAnd( counter.element( uint( 0 ) ), bitNot( bit ) );
 
-			await renderer.computeAsync( kernel );
+				} )().compute( dispatchCount, [ WORKGROUP_SIZE ] );
 
-			const data = await readUintBuffer( renderer, counter );
-			assert.strictEqual( data[ 0 ], 0, 'expected 0x00000000 (every one of the 32 bits cleared exactly once)' );
+				await renderer.computeAsync( kernel );
 
-		} );
+				const data = await readUintBuffer( renderer, counter );
+				assert.strictEqual( data[ 0 ], 0, 'expected 0x00000000 (every one of the 32 bits cleared exactly once)' );
 
-		rawComputeTest( 'atomicOr: each invocation sets one distinct bit, all sets land', {}, async ( { assert, renderer } ) => {
+			} );
 
-			const dispatchCount = 32;
-			const counter = makeCounter();
+			rawComputeTest( 'atomicOr: each invocation sets one distinct bit, all sets land', {}, async ( { assert, renderer } ) => {
 
-			await seed( renderer, counter, 0 );
+				const dispatchCount = 32;
+				const counter = makeCounter();
 
-			const kernel = Fn( () => {
+				await seed( renderer, counter, 0 );
 
-				const bit = shiftLeft( uint( 1 ), instanceIndex );
-				atomicOr( counter.element( uint( 0 ) ), bit );
+				const kernel = Fn( () => {
 
-			} )().compute( dispatchCount, [ WORKGROUP_SIZE ] );
+					const bit = shiftLeft( uint( 1 ), instanceIndex );
+					atomicOr( counter.element( uint( 0 ) ), bit );
 
-			await renderer.computeAsync( kernel );
+				} )().compute( dispatchCount, [ WORKGROUP_SIZE ] );
 
-			const data = await readUintBuffer( renderer, counter );
-			assert.strictEqual( data[ 0 ] >>> 0, 0xffffffff, 'expected 0xffffffff (every one of the 32 bits set exactly once)' );
+				await renderer.computeAsync( kernel );
 
-		} );
+				const data = await readUintBuffer( renderer, counter );
+				assert.strictEqual( data[ 0 ] >>> 0, 0xffffffff, 'expected 0xffffffff (every one of the 32 bits set exactly once)' );
 
-		rawComputeTest( 'atomicXor: each invocation flips one distinct bit, all flips land', {}, async ( { assert, renderer } ) => {
+			} );
 
-			const dispatchCount = 32;
-			const counter = makeCounter();
+			rawComputeTest( 'atomicXor: each invocation flips one distinct bit, all flips land', {}, async ( { assert, renderer } ) => {
 
-			await seed( renderer, counter, 0 );
+				const dispatchCount = 32;
+				const counter = makeCounter();
 
-			const kernel = Fn( () => {
+				await seed( renderer, counter, 0 );
 
-				const bit = shiftLeft( uint( 1 ), instanceIndex );
-				atomicXor( counter.element( uint( 0 ) ), bit );
+				const kernel = Fn( () => {
 
-			} )().compute( dispatchCount, [ WORKGROUP_SIZE ] );
+					const bit = shiftLeft( uint( 1 ), instanceIndex );
+					atomicXor( counter.element( uint( 0 ) ), bit );
 
-			await renderer.computeAsync( kernel );
+				} )().compute( dispatchCount, [ WORKGROUP_SIZE ] );
 
-			const data = await readUintBuffer( renderer, counter );
-			assert.strictEqual( data[ 0 ] >>> 0, 0xffffffff, 'expected 0xffffffff (every one of the 32 bits toggled from 0 to 1 exactly once)' );
+				await renderer.computeAsync( kernel );
 
-		} );
+				const data = await readUintBuffer( renderer, counter );
+				assert.strictEqual( data[ 0 ] >>> 0, 0xffffffff, 'expected 0xffffffff (every one of the 32 bits toggled from 0 to 1 exactly once)' );
 
-		rawComputeTest( 'atomicStore + atomicLoad: a store from one dispatch is visible to a later dispatch\'s loads', {}, async ( { assert, renderer } ) => {
+			} );
 
-			const dispatchCount = 16;
-			const counter = makeCounter();
-			const output = instancedArray( dispatchCount, 'uint' );
+			rawComputeTest( 'atomicStore + atomicLoad: a store from one dispatch is visible to a later dispatch\'s loads', {}, async ( { assert, renderer } ) => {
 
-			await seed( renderer, counter, 424242 );
+				const dispatchCount = 16;
+				const counter = makeCounter();
+				const output = instancedArray( dispatchCount, 'uint' );
 
-			const kernel = Fn( () => {
+				await seed( renderer, counter, 424242 );
 
-				output.element( instanceIndex ).assign( atomicLoad( counter.element( uint( 0 ) ) ) );
+				const kernel = Fn( () => {
 
-			} )().compute( dispatchCount, [ WORKGROUP_SIZE ] );
+					output.element( instanceIndex ).assign( atomicLoad( counter.element( uint( 0 ) ) ) );
 
-			await renderer.computeAsync( kernel );
+				} )().compute( dispatchCount, [ WORKGROUP_SIZE ] );
 
-			const data = await readUintBuffer( renderer, output );
+				await renderer.computeAsync( kernel );
 
-			for ( let i = 0; i < dispatchCount; i ++ ) {
+				const data = await readUintBuffer( renderer, output );
 
-				assert.strictEqual( data[ i ], 424242, `invocation ${ i }: atomicLoad should read back the earlier atomicStore's value` );
+				for ( let i = 0; i < dispatchCount; i ++ ) {
 
-			}
+					assert.strictEqual( data[ i ], 424242, `invocation ${ i }: atomicLoad should read back the earlier atomicStore's value` );
+
+				}
+
+			} );
 
 		} );
 

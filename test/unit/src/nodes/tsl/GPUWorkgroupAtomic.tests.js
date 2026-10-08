@@ -32,112 +32,116 @@ async function readUintBuffer( renderer, buffer ) {
 // fallback backend (no `getScopedArray()` there), so these only register
 // against the 'webgpu' backend.
 
-export default QUnit.module( 'TSL', () => {
+export default QUnit.module( 'Nodes', () => {
 
-	QUnit.module( 'workgroup arrays and atomics', () => {
+	QUnit.module( 'TSL', () => {
 
-		QUnit.test( 'workgroupArray: plain (non-atomic) shared read/write survives a barrier', async ( assert ) => {
+		QUnit.module( 'workgroup arrays and atomics', () => {
 
-			const renderer = await getSharedRenderer( 'webgpu' );
+			QUnit.test( 'workgroupArray: plain (non-atomic) shared read/write survives a barrier', async ( assert ) => {
 
-			if ( renderer === null ) {
+				const renderer = await getSharedRenderer( 'webgpu' );
 
-				assert.ok( true, 'SKIPPED: "webgpu" backend is not available in this environment.' );
-				return;
+				if ( renderer === null ) {
 
-			}
+					assert.ok( true, 'SKIPPED: "webgpu" backend is not available in this environment.' );
+					return;
 
-			// Regression guard: PR #34428 threads an `isAtomic` flag through
-			// `WorkgroupInfoNode`/`WGSLNodeBuilder.getScopedArray()` -- this
-			// confirms the default (non-atomic) path still declares and
-			// round-trips a plain `array<uint, N>` in the `workgroup` address
-			// space exactly as before.
-			const workgroupSize = 8;
-			const dispatchCount = 32; // 4 workgroups of 8
-			const output = instancedArray( dispatchCount, 'uint' );
+				}
 
-			const kernel = Fn( () => {
+				// Regression guard: PR #34428 threads an `isAtomic` flag through
+				// `WorkgroupInfoNode`/`WGSLNodeBuilder.getScopedArray()` -- this
+				// confirms the default (non-atomic) path still declares and
+				// round-trips a plain `array<uint, N>` in the `workgroup` address
+				// space exactly as before.
+				const workgroupSize = 8;
+				const dispatchCount = 32; // 4 workgroups of 8
+				const output = instancedArray( dispatchCount, 'uint' );
 
-				const shared = workgroupArray( 'uint', workgroupSize );
+				const kernel = Fn( () => {
 
-				// Every invocation writes a distinct non-zero value into its own
-				// slot, then reads back the value written by its right-hand
-				// neighbor. Using non-zero values ensures this cannot pass from
-				// workgroup memory's default initialization alone.
-				shared.element( invocationLocalIndex ).assign( invocationLocalIndex.add( uint( 1 ) ) );
+					const shared = workgroupArray( 'uint', workgroupSize );
 
-				workgroupBarrier();
+					// Every invocation writes a distinct non-zero value into its own
+					// slot, then reads back the value written by its right-hand
+					// neighbor. Using non-zero values ensures this cannot pass from
+					// workgroup memory's default initialization alone.
+					shared.element( invocationLocalIndex ).assign( invocationLocalIndex.add( uint( 1 ) ) );
 
-				const neighborLocalIndex = invocationLocalIndex.add( uint( 1 ) ).mod( uint( workgroupSize ) );
-				output.element( instanceIndex ).assign( shared.element( neighborLocalIndex ) );
+					workgroupBarrier();
 
-			} )().compute( dispatchCount, [ workgroupSize ] );
+					const neighborLocalIndex = invocationLocalIndex.add( uint( 1 ) ).mod( uint( workgroupSize ) );
+					output.element( instanceIndex ).assign( shared.element( neighborLocalIndex ) );
 
-			await renderer.computeAsync( kernel );
+				} )().compute( dispatchCount, [ workgroupSize ] );
 
-			const data = await readUintBuffer( renderer, output );
+				await renderer.computeAsync( kernel );
 
-			for ( let i = 0; i < dispatchCount; i ++ ) {
+				const data = await readUintBuffer( renderer, output );
 
-				const localIndex = i % workgroupSize;
-				const expected = ( ( localIndex + 1 ) % workgroupSize ) + 1;
+				for ( let i = 0; i < dispatchCount; i ++ ) {
 
-				assert.strictEqual( data[ i ], expected, `invocation ${ i }: should read its right neighbor's non-zero value (${ expected })` );
+					const localIndex = i % workgroupSize;
+					const expected = ( ( localIndex + 1 ) % workgroupSize ) + 1;
 
-			}
+					assert.strictEqual( data[ i ], expected, `invocation ${ i }: should read its right neighbor's non-zero value (${ expected })` );
 
-		} );
+				}
 
-		QUnit.test( 'workgroupArray.toAtomic(): concurrent atomicAdd sums exactly once per invocation, per workgroup', async ( assert ) => {
+			} );
 
-			const renderer = await getSharedRenderer( 'webgpu' );
+			QUnit.test( 'workgroupArray.toAtomic(): concurrent atomicAdd sums exactly once per invocation, per workgroup', async ( assert ) => {
 
-			if ( renderer === null ) {
+				const renderer = await getSharedRenderer( 'webgpu' );
 
-				assert.ok( true, 'SKIPPED: "webgpu" backend is not available in this environment.' );
-				return;
+				if ( renderer === null ) {
 
-			}
+					assert.ok( true, 'SKIPPED: "webgpu" backend is not available in this environment.' );
+					return;
 
-			const workgroupSize = 8;
-			const workgroupCount = 4;
-			const dispatchCount = workgroupSize * workgroupCount;
-			const output = instancedArray( dispatchCount, 'uint' );
+				}
 
-			const kernel = Fn( () => {
+				const workgroupSize = 8;
+				const workgroupCount = 4;
+				const dispatchCount = workgroupSize * workgroupCount;
+				const output = instancedArray( dispatchCount, 'uint' );
 
-				// A single atomic counter, shared by the whole workgroup. WGSL
-				// zero-initializes `workgroup`-address-space variables (atomic
-				// ones included) once per workgroup, so no explicit reset is
-				// needed here -- and a plain `.assign()` on an atomic element
-				// wouldn't be valid WGSL anyway (writes must go through
-				// `atomicStore`/`atomicAdd`/etc.).
-				const counter = workgroupArray( 'uint', 1 ).toAtomic();
+				const kernel = Fn( () => {
 
-				// Every invocation in the workgroup increments the same
-				// atomic slot concurrently -- this only produces the exact
-				// expected sum if `getScopedArray()` genuinely declared the
-				// element as `atomic<u32>` (PR #34428); a plain (non-atomic)
-				// `array<u32, 1>` here would race and typically undercount.
-				atomicAdd( counter.element( uint( 0 ) ), uint( 1 ) );
+					// A single atomic counter, shared by the whole workgroup. WGSL
+					// zero-initializes `workgroup`-address-space variables (atomic
+					// ones included) once per workgroup, so no explicit reset is
+					// needed here -- and a plain `.assign()` on an atomic element
+					// wouldn't be valid WGSL anyway (writes must go through
+					// `atomicStore`/`atomicAdd`/etc.).
+					const counter = workgroupArray( 'uint', 1 ).toAtomic();
 
-				workgroupBarrier();
+					// Every invocation in the workgroup increments the same
+					// atomic slot concurrently -- this only produces the exact
+					// expected sum if `getScopedArray()` genuinely declared the
+					// element as `atomic<u32>` (PR #34428); a plain (non-atomic)
+					// `array<u32, 1>` here would race and typically undercount.
+					atomicAdd( counter.element( uint( 0 ) ), uint( 1 ) );
 
-				// WGSL forbids reading an `atomic<u32>` element with a plain
-				// load/assign -- it must go through `atomicLoad()`.
-				output.element( instanceIndex ).assign( atomicLoad( counter.element( uint( 0 ) ) ) );
+					workgroupBarrier();
 
-			} )().compute( dispatchCount, [ workgroupSize ] );
+					// WGSL forbids reading an `atomic<u32>` element with a plain
+					// load/assign -- it must go through `atomicLoad()`.
+					output.element( instanceIndex ).assign( atomicLoad( counter.element( uint( 0 ) ) ) );
 
-			await renderer.computeAsync( kernel );
+				} )().compute( dispatchCount, [ workgroupSize ] );
 
-			const data = await readUintBuffer( renderer, output );
+				await renderer.computeAsync( kernel );
 
-			for ( let i = 0; i < dispatchCount; i ++ ) {
+				const data = await readUintBuffer( renderer, output );
 
-				assert.strictEqual( data[ i ], workgroupSize, `invocation ${ i }: atomic counter should equal workgroupSize (${ workgroupSize }) -- every invocation in its workgroup added exactly once` );
+				for ( let i = 0; i < dispatchCount; i ++ ) {
 
-			}
+					assert.strictEqual( data[ i ], workgroupSize, `invocation ${ i }: atomic counter should equal workgroupSize (${ workgroupSize }) -- every invocation in its workgroup added exactly once` );
+
+				}
+
+			} );
 
 		} );
 

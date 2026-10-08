@@ -9,52 +9,56 @@ import { gpuTest } from './gpu-test-utils.js';
 // etc.) -- so the math-library method itself is used as the independent
 // reference here, rather than a hand-rolled JS transliteration of the node's
 // own formula.
-export default QUnit.module( 'TSL', () => {
+export default QUnit.module( 'Nodes', () => {
 
-	QUnit.module( 'getShIrradianceAt()', () => {
+	QUnit.module( 'TSL', () => {
 
-		// A fixed, arbitrary-but-deterministic set of 9 SH coefficient triples
-		// (one per color channel) shared by every case below.
-		const shValues = [
-			[ 1, 0, 0 ], [ 0, 1, 0 ], [ 0, 0, 1 ],
-			[ 0.5, 0.5, 0 ], [ 0.2, 0, 0.3 ], [ 0, 0.4, 0 ],
-			[ 0.1, 0.1, 0.1 ], [ 0, 0, 0.6 ], [ 0.3, 0, 0 ]
-		];
+		QUnit.module( 'getShIrradianceAt()', () => {
 
-		const makeShArray = ( values ) => array( values.map( ( v ) => vec3( ...v ) ) );
-
-		gpuTest( 'getShIrradianceAt() matches SphericalHarmonics3.getIrradianceAt() for several normals', ( { assert } ) => {
-
-			const shArray = makeShArray( shValues );
-			const sh = new SphericalHarmonics3().set( shValues.map( ( v ) => new Vector3( ...v ) ) );
-
-			const cases = [
-				[ 0, 0, 1 ],
-				[ 1, 0, 0 ],
-				[ 1 / Math.sqrt( 3 ), 1 / Math.sqrt( 3 ), 1 / Math.sqrt( 3 ) ]
+			// A fixed, arbitrary-but-deterministic set of 9 SH coefficient triples
+			// (one per color channel) shared by every case below.
+			const shValues = [
+				[ 1, 0, 0 ], [ 0, 1, 0 ], [ 0, 0, 1 ],
+				[ 0.5, 0.5, 0 ], [ 0.2, 0, 0.3 ], [ 0, 0.4, 0 ],
+				[ 0.1, 0.1, 0.1 ], [ 0, 0, 0.6 ], [ 0.3, 0, 0 ]
 			];
 
-			for ( const normal of cases ) {
+			const makeShArray = ( values ) => array( values.map( ( v ) => vec3( ...v ) ) );
 
-				const expected = sh.getIrradianceAt( new Vector3( ...normal ), new Vector3() );
+			gpuTest( 'getShIrradianceAt() matches SphericalHarmonics3.getIrradianceAt() for several normals', ( { assert } ) => {
 
-				assert.closeAbs(
-					getShIrradianceAt( vec3( ...normal ), shArray ),
-					vec3( expected.x, expected.y, expected.z ), 1e-4,
-					`getShIrradianceAt(normal=${ JSON.stringify( normal ) }) matches SphericalHarmonics3.getIrradianceAt()`
-				);
+				const shArray = makeShArray( shValues );
+				const sh = new SphericalHarmonics3().set( shValues.map( ( v ) => new Vector3( ...v ) ) );
 
-			}
+				const cases = [
+					[ 0, 0, 1 ],
+					[ 1, 0, 0 ],
+					[ 1 / Math.sqrt( 3 ), 1 / Math.sqrt( 3 ), 1 / Math.sqrt( 3 ) ]
+				];
 
-		} );
+				for ( const normal of cases ) {
 
-		gpuTest( 'getShIrradianceAt() is exactly zero for all-zero SH coefficients, regardless of normal', ( { assert } ) => {
+					const expected = sh.getIrradianceAt( new Vector3( ...normal ), new Vector3() );
 
-			const zeroValues = new Array( 9 ).fill( [ 0, 0, 0 ] );
-			const shArray = makeShArray( zeroValues );
+					assert.closeAbs(
+						getShIrradianceAt( vec3( ...normal ), shArray ),
+						vec3( expected.x, expected.y, expected.z ), 1e-4,
+						`getShIrradianceAt(normal=${ JSON.stringify( normal ) }) matches SphericalHarmonics3.getIrradianceAt()`
+					);
 
-			assert.closeAbs( getShIrradianceAt( vec3( 0, 1, 0 ), shArray ), vec3( 0, 0, 0 ), 1e-6, 'getShIrradianceAt is 0 with all-zero SH coefficients (normal (0,1,0))' );
-			assert.closeAbs( getShIrradianceAt( vec3( 0.6, 0, 0.8 ), shArray ), vec3( 0, 0, 0 ), 1e-6, 'getShIrradianceAt is 0 with all-zero SH coefficients (normal (0.6,0,0.8))' );
+				}
+
+			} );
+
+			gpuTest( 'getShIrradianceAt() is exactly zero for all-zero SH coefficients, regardless of normal', ( { assert } ) => {
+
+				const zeroValues = new Array( 9 ).fill( [ 0, 0, 0 ] );
+				const shArray = makeShArray( zeroValues );
+
+				assert.closeAbs( getShIrradianceAt( vec3( 0, 1, 0 ), shArray ), vec3( 0, 0, 0 ), 1e-6, 'getShIrradianceAt is 0 with all-zero SH coefficients (normal (0,1,0))' );
+				assert.closeAbs( getShIrradianceAt( vec3( 0.6, 0, 0.8 ), shArray ), vec3( 0, 0, 0 ), 1e-6, 'getShIrradianceAt is 0 with all-zero SH coefficients (normal (0.6,0,0.8))' );
+
+			} );
 
 		} );
 

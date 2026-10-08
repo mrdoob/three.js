@@ -25,31 +25,35 @@ const DISPATCH_COUNT = WORKGROUP_SIZE * WORKGROUP_COUNT;
 // WGSL's "subgroup functions need uniform control flow" rule.
 const DISPATCH_SIZE = [ WORKGROUP_COUNT, 1, 1 ];
 
-export default QUnit.module( 'TSL', () => {
+export default QUnit.module( 'Nodes', () => {
 
-	QUnit.module( 'subgroup functions', () => {
+	QUnit.module( 'TSL', () => {
 
-		rawComputeTest( 'subgroupBroadcastFirst reads the first active lane\'s value', { requiredFeature: 'subgroups' }, async ( { assert, renderer } ) => {
+		QUnit.module( 'subgroup functions', () => {
 
-			const output = instancedArray( DISPATCH_COUNT, 'uint' );
+			rawComputeTest( 'subgroupBroadcastFirst reads the first active lane\'s value', { requiredFeature: 'subgroups' }, async ( { assert, renderer } ) => {
 
-			const kernel = Fn( () => {
+				const output = instancedArray( DISPATCH_COUNT, 'uint' );
 
-				const value = invocationSubgroupIndex.add( uint( 100 ) ); // 100, 101, 102, ...
+				const kernel = Fn( () => {
 
-				output.element( instanceIndex ).assign( subgroupBroadcastFirst( value ) );
+					const value = invocationSubgroupIndex.add( uint( 100 ) ); // 100, 101, 102, ...
 
-			} )().compute( DISPATCH_SIZE, [ WORKGROUP_SIZE ] );
+					output.element( instanceIndex ).assign( subgroupBroadcastFirst( value ) );
 
-			await renderer.computeAsync( kernel );
+				} )().compute( DISPATCH_SIZE, [ WORKGROUP_SIZE ] );
 
-			const data = await readUintBuffer( renderer, output );
+				await renderer.computeAsync( kernel );
 
-			for ( let i = 0; i < DISPATCH_COUNT; i ++ ) {
+				const data = await readUintBuffer( renderer, output );
 
-				assert.strictEqual( data[ i ], 100, `invocation ${ i }: subgroupBroadcastFirst(value) should read back the first lane's value (100)` );
+				for ( let i = 0; i < DISPATCH_COUNT; i ++ ) {
 
-			}
+					assert.strictEqual( data[ i ], 100, `invocation ${ i }: subgroupBroadcastFirst(value) should read back the first lane's value (100)` );
+
+				}
+
+			} );
 
 		} );
 

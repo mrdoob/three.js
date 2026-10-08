@@ -59,352 +59,356 @@ const DISPATCH_COUNT = WORKGROUP_SIZE * WORKGROUP_COUNT; // 256
 // `[workgroupCount, 1, 1]` array form instead skips that guard entirely.
 const DISPATCH_SIZE = [ WORKGROUP_COUNT, 1, 1 ];
 
-export default QUnit.module( 'TSL', () => {
+export default QUnit.module( 'Nodes', () => {
 
-	QUnit.module( 'subgroup functions', () => {
+	QUnit.module( 'TSL', () => {
 
-		rawComputeTest( 'subgroupSize is a plausible, non-skipped value', { requiredFeature: 'subgroups' }, async ( { assert, renderer } ) => {
+		QUnit.module( 'subgroup functions', () => {
 
-			const output = instancedArray( DISPATCH_COUNT, 'uint' );
+			rawComputeTest( 'subgroupSize is a plausible, non-skipped value', { requiredFeature: 'subgroups' }, async ( { assert, renderer } ) => {
 
-			const kernel = Fn( () => {
+				const output = instancedArray( DISPATCH_COUNT, 'uint' );
 
-				output.element( instanceIndex ).assign( subgroupSize );
+				const kernel = Fn( () => {
 
-			} )().compute( DISPATCH_SIZE, [ WORKGROUP_SIZE ] );
+					output.element( instanceIndex ).assign( subgroupSize );
 
-			await renderer.computeAsync( kernel );
+				} )().compute( DISPATCH_SIZE, [ WORKGROUP_SIZE ] );
 
-			const data = await readUintBuffer( renderer, output );
+				await renderer.computeAsync( kernel );
 
-			for ( let i = 0; i < DISPATCH_COUNT; i ++ ) {
+				const data = await readUintBuffer( renderer, output );
 
-				assert.ok( data[ i ] >= 1 && data[ i ] <= 128, `invocation ${ i }: subgroupSize (${ data[ i ] }) should be a plausible subgroup size` );
+				for ( let i = 0; i < DISPATCH_COUNT; i ++ ) {
 
-			}
-
-		} );
-
-		rawComputeTest( 'subgroupAdd, subgroupMin, subgroupMax reduce across the whole subgroup', { requiredFeature: 'subgroups' }, async ( { assert, renderer } ) => {
-
-			const laneIdOut = instancedArray( DISPATCH_COUNT, 'uint' );
-			const groupSizeOut = instancedArray( DISPATCH_COUNT, 'uint' );
-			const addOut = instancedArray( DISPATCH_COUNT, 'uint' );
-			const minOut = instancedArray( DISPATCH_COUNT, 'uint' );
-			const maxOut = instancedArray( DISPATCH_COUNT, 'uint' );
-
-			const kernel = Fn( () => {
-
-				// value(lane) = lane + 1, so the sum has a simple closed form
-				// (a triangular number) and min/max are unambiguous (0 is
-				// never contributed, so min > 0 genuinely exercises the
-				// reduction rather than trivially reading back a contributed 0).
-				const value = invocationSubgroupIndex.add( uint( 1 ) );
-
-				laneIdOut.element( instanceIndex ).assign( invocationSubgroupIndex );
-				groupSizeOut.element( instanceIndex ).assign( subgroupSize );
-				addOut.element( instanceIndex ).assign( subgroupAdd( value ) );
-				minOut.element( instanceIndex ).assign( subgroupMin( value ) );
-				maxOut.element( instanceIndex ).assign( subgroupMax( value ) );
-
-			} )().compute( DISPATCH_SIZE, [ WORKGROUP_SIZE ] );
-
-			await renderer.computeAsync( kernel );
-
-			const laneIdData = await readUintBuffer( renderer, laneIdOut );
-			const groupSizeData = await readUintBuffer( renderer, groupSizeOut );
-			const addData = await readUintBuffer( renderer, addOut );
-			const minData = await readUintBuffer( renderer, minOut );
-			const maxData = await readUintBuffer( renderer, maxOut );
-
-			for ( let i = 0; i < DISPATCH_COUNT; i ++ ) {
-
-				const n = groupSizeData[ i ];
-				const expectedSum = ( n * ( n + 1 ) ) / 2; // sum_{lane=0}^{n-1} (lane+1)
-
-				assert.strictEqual( addData[ i ], expectedSum, `invocation ${ i } (lane ${ laneIdData[ i ] }, group size ${ n }): subgroupAdd` );
-				assert.strictEqual( minData[ i ], 1, `invocation ${ i }: subgroupMin should be 1 (lane 0's value)` );
-				assert.strictEqual( maxData[ i ], n, `invocation ${ i }: subgroupMax should be ${ n } (last lane's value)` );
-
-			}
-
-		} );
-
-		rawComputeTest( 'subgroupMul multiplies contributions from exactly two lanes', { requiredFeature: 'subgroups' }, async ( { assert, renderer } ) => {
-
-			const output = instancedArray( DISPATCH_COUNT, 'uint' );
-
-			const kernel = Fn( () => {
-
-				// Every lane contributes the multiplicative identity (1)
-				// except lanes 0 and 1, which contribute 2 and 3 -- keeps the
-				// product exactly 6 regardless of subgroup size (a genuinely
-				// unbounded per-lane value would overflow uint32 on wide
-				// subgroups), while still exercising a real multi-lane
-				// combination rather than a single-contributor trivial case.
-				const value = invocationSubgroupIndex
-					.equal( uint( 0 ) ).select( uint( 2 ),
-						invocationSubgroupIndex.equal( uint( 1 ) ).select( uint( 3 ), uint( 1 ) ) );
-
-				output.element( instanceIndex ).assign( subgroupMul( value ) );
-
-			} )().compute( DISPATCH_SIZE, [ WORKGROUP_SIZE ] );
-
-			await renderer.computeAsync( kernel );
-
-			const data = await readUintBuffer( renderer, output );
-
-			for ( let i = 0; i < DISPATCH_COUNT; i ++ ) {
-
-				assert.strictEqual( data[ i ], 6, `invocation ${ i }: subgroupMul should be 2 * 3 * 1^(n-2) = 6` );
-
-			}
-
-		} );
-
-		rawComputeTest( 'subgroupAnd, subgroupOr, subgroupXor combine one distinguishing bit per lane', { requiredFeature: 'subgroups' }, async ( { assert, renderer } ) => {
-
-			const groupSizeOut = instancedArray( DISPATCH_COUNT, 'uint' );
-			const andOut = instancedArray( DISPATCH_COUNT, 'uint' );
-			const orOut = instancedArray( DISPATCH_COUNT, 'uint' );
-			const xorOut = instancedArray( DISPATCH_COUNT, 'uint' );
-
-			const kernel = Fn( () => {
-
-				// Same "one bit per lane" construction as the storage-buffer
-				// atomic bitwise tests (GPUAtomicsStorage.tests.js), scoped
-				// to a subgroup instead of the whole dispatch: bit position
-				// wraps at 32 (a uint's width), matching what the JS-side
-				// expected-value computation below also wraps at.
-				const bit = shiftLeft( uint( 1 ), invocationSubgroupIndex.mod( uint( 32 ) ) );
-
-				groupSizeOut.element( instanceIndex ).assign( subgroupSize );
-				// AND starts from all-ones and each lane clears its own bit
-				// (contributes ~bit, identity 0xffffffff elsewhere).
-				andOut.element( instanceIndex ).assign( subgroupAnd( bit.bitNot() ) );
-				orOut.element( instanceIndex ).assign( subgroupOr( bit ) );
-				xorOut.element( instanceIndex ).assign( subgroupXor( bit ) );
-
-			} )().compute( DISPATCH_SIZE, [ WORKGROUP_SIZE ] );
-
-			await renderer.computeAsync( kernel );
-
-			const groupSizeData = await readUintBuffer( renderer, groupSizeOut );
-			const andData = await readUintBuffer( renderer, andOut );
-			const orData = await readUintBuffer( renderer, orOut );
-			const xorData = await readUintBuffer( renderer, xorOut );
-
-			for ( let i = 0; i < DISPATCH_COUNT; i ++ ) {
-
-				const n = groupSizeData[ i ];
-				let expectedOr = 0;
-				let expectedXor = 0;
-
-				for ( let lane = 0; lane < n; lane ++ ) {
-
-					const bit = 1 << ( lane % 32 );
-					expectedOr |= bit;
-					expectedXor ^= bit;
+					assert.ok( data[ i ] >= 1 && data[ i ] <= 128, `invocation ${ i }: subgroupSize (${ data[ i ] }) should be a plausible subgroup size` );
 
 				}
 
-				// AND of (~bit) over every lane clears exactly the bits that
-				// were contributed by at least one lane -- i.e. the bitwise
-				// complement of the OR result.
-				const expectedAnd = ( ~ expectedOr ) >>> 0;
+			} );
 
-				assert.strictEqual( andData[ i ] >>> 0, expectedAnd, `invocation ${ i } (group size ${ n }): subgroupAnd` );
-				assert.strictEqual( orData[ i ] >>> 0, expectedOr >>> 0, `invocation ${ i } (group size ${ n }): subgroupOr` );
-				assert.strictEqual( xorData[ i ] >>> 0, expectedXor >>> 0, `invocation ${ i } (group size ${ n }): subgroupXor` );
+			rawComputeTest( 'subgroupAdd, subgroupMin, subgroupMax reduce across the whole subgroup', { requiredFeature: 'subgroups' }, async ( { assert, renderer } ) => {
 
-			}
+				const laneIdOut = instancedArray( DISPATCH_COUNT, 'uint' );
+				const groupSizeOut = instancedArray( DISPATCH_COUNT, 'uint' );
+				const addOut = instancedArray( DISPATCH_COUNT, 'uint' );
+				const minOut = instancedArray( DISPATCH_COUNT, 'uint' );
+				const maxOut = instancedArray( DISPATCH_COUNT, 'uint' );
 
-		} );
+				const kernel = Fn( () => {
 
-		rawComputeTest( 'subgroupInclusiveAdd and subgroupExclusiveAdd compute correct prefix sums', { requiredFeature: 'subgroups' }, async ( { assert, renderer } ) => {
+					// value(lane) = lane + 1, so the sum has a simple closed form
+					// (a triangular number) and min/max are unambiguous (0 is
+					// never contributed, so min > 0 genuinely exercises the
+					// reduction rather than trivially reading back a contributed 0).
+					const value = invocationSubgroupIndex.add( uint( 1 ) );
 
-			const laneIdOut = instancedArray( DISPATCH_COUNT, 'uint' );
-			const inclusiveOut = instancedArray( DISPATCH_COUNT, 'uint' );
-			const exclusiveOut = instancedArray( DISPATCH_COUNT, 'uint' );
+					laneIdOut.element( instanceIndex ).assign( invocationSubgroupIndex );
+					groupSizeOut.element( instanceIndex ).assign( subgroupSize );
+					addOut.element( instanceIndex ).assign( subgroupAdd( value ) );
+					minOut.element( instanceIndex ).assign( subgroupMin( value ) );
+					maxOut.element( instanceIndex ).assign( subgroupMax( value ) );
 
-			const kernel = Fn( () => {
+				} )().compute( DISPATCH_SIZE, [ WORKGROUP_SIZE ] );
 
-				const value = invocationSubgroupIndex.add( uint( 1 ) ); // 1, 2, 3, ...
+				await renderer.computeAsync( kernel );
 
-				laneIdOut.element( instanceIndex ).assign( invocationSubgroupIndex );
-				inclusiveOut.element( instanceIndex ).assign( subgroupInclusiveAdd( value ) );
-				exclusiveOut.element( instanceIndex ).assign( subgroupExclusiveAdd( value ) );
+				const laneIdData = await readUintBuffer( renderer, laneIdOut );
+				const groupSizeData = await readUintBuffer( renderer, groupSizeOut );
+				const addData = await readUintBuffer( renderer, addOut );
+				const minData = await readUintBuffer( renderer, minOut );
+				const maxData = await readUintBuffer( renderer, maxOut );
 
-			} )().compute( DISPATCH_SIZE, [ WORKGROUP_SIZE ] );
+				for ( let i = 0; i < DISPATCH_COUNT; i ++ ) {
 
-			await renderer.computeAsync( kernel );
+					const n = groupSizeData[ i ];
+					const expectedSum = ( n * ( n + 1 ) ) / 2; // sum_{lane=0}^{n-1} (lane+1)
 
-			const laneIdData = await readUintBuffer( renderer, laneIdOut );
-			const inclusiveData = await readUintBuffer( renderer, inclusiveOut );
-			const exclusiveData = await readUintBuffer( renderer, exclusiveOut );
+					assert.strictEqual( addData[ i ], expectedSum, `invocation ${ i } (lane ${ laneIdData[ i ] }, group size ${ n }): subgroupAdd` );
+					assert.strictEqual( minData[ i ], 1, `invocation ${ i }: subgroupMin should be 1 (lane 0's value)` );
+					assert.strictEqual( maxData[ i ], n, `invocation ${ i }: subgroupMax should be ${ n } (last lane's value)` );
 
-			for ( let i = 0; i < DISPATCH_COUNT; i ++ ) {
+				}
 
-				const l = laneIdData[ i ];
-				// inclusive prefix sum of (1, 2, ..., l+1) = (l+1)(l+2)/2
-				const expectedInclusive = ( ( l + 1 ) * ( l + 2 ) ) / 2;
-				// exclusive prefix sum of (1, 2, ..., l) = l(l+1)/2 (0 at lane 0)
-				const expectedExclusive = ( l * ( l + 1 ) ) / 2;
+			} );
 
-				assert.strictEqual( inclusiveData[ i ], expectedInclusive, `invocation ${ i } (lane ${ l }): subgroupInclusiveAdd` );
-				assert.strictEqual( exclusiveData[ i ], expectedExclusive, `invocation ${ i } (lane ${ l }): subgroupExclusiveAdd` );
+			rawComputeTest( 'subgroupMul multiplies contributions from exactly two lanes', { requiredFeature: 'subgroups' }, async ( { assert, renderer } ) => {
 
-			}
+				const output = instancedArray( DISPATCH_COUNT, 'uint' );
 
-		} );
+				const kernel = Fn( () => {
 
-		// subgroupAll()/subgroupAny() are NOT covered here: calling either
-		// with the one boolean predicate argument the WGSL spec requires
-		// (`subgroupAll(e: bool) -> bool`) is rejected by this codebase with
-		// "parameter length exceeds limit" -- both are declared with
-		// `setParameterLength(0)` in SubgroupFunctionNode.js, so as shipped
-		// neither is callable for its actual purpose. See the sibling branch
-		// with the fix + the (now-passing) test for this.
+					// Every lane contributes the multiplicative identity (1)
+					// except lanes 0 and 1, which contribute 2 and 3 -- keeps the
+					// product exactly 6 regardless of subgroup size (a genuinely
+					// unbounded per-lane value would overflow uint32 on wide
+					// subgroups), while still exercising a real multi-lane
+					// combination rather than a single-contributor trivial case.
+					const value = invocationSubgroupIndex
+						.equal( uint( 0 ) ).select( uint( 2 ),
+							invocationSubgroupIndex.equal( uint( 1 ) ).select( uint( 3 ), uint( 1 ) ) );
 
-		rawComputeTest( 'subgroupElect is true for exactly lane 0', { requiredFeature: 'subgroups' }, async ( { assert, renderer } ) => {
+					output.element( instanceIndex ).assign( subgroupMul( value ) );
 
-			const laneIdOut = instancedArray( DISPATCH_COUNT, 'uint' );
-			const electOut = instancedArray( DISPATCH_COUNT, 'uint' );
+				} )().compute( DISPATCH_SIZE, [ WORKGROUP_SIZE ] );
 
-			const kernel = Fn( () => {
+				await renderer.computeAsync( kernel );
 
-				laneIdOut.element( instanceIndex ).assign( invocationSubgroupIndex );
-				electOut.element( instanceIndex ).assign( subgroupElect().select( uint( 1 ), uint( 0 ) ) );
+				const data = await readUintBuffer( renderer, output );
 
-			} )().compute( DISPATCH_SIZE, [ WORKGROUP_SIZE ] );
+				for ( let i = 0; i < DISPATCH_COUNT; i ++ ) {
 
-			await renderer.computeAsync( kernel );
+					assert.strictEqual( data[ i ], 6, `invocation ${ i }: subgroupMul should be 2 * 3 * 1^(n-2) = 6` );
 
-			const laneIdData = await readUintBuffer( renderer, laneIdOut );
-			const electData = await readUintBuffer( renderer, electOut );
+				}
 
-			for ( let i = 0; i < DISPATCH_COUNT; i ++ ) {
+			} );
 
-				const expected = laneIdData[ i ] === 0 ? 1 : 0;
-				assert.strictEqual( electData[ i ], expected, `invocation ${ i } (lane ${ laneIdData[ i ] }): subgroupElect should be true only for lane 0` );
+			rawComputeTest( 'subgroupAnd, subgroupOr, subgroupXor combine one distinguishing bit per lane', { requiredFeature: 'subgroups' }, async ( { assert, renderer } ) => {
 
-			}
+				const groupSizeOut = instancedArray( DISPATCH_COUNT, 'uint' );
+				const andOut = instancedArray( DISPATCH_COUNT, 'uint' );
+				const orOut = instancedArray( DISPATCH_COUNT, 'uint' );
+				const xorOut = instancedArray( DISPATCH_COUNT, 'uint' );
 
-		} );
+				const kernel = Fn( () => {
 
-		rawComputeTest( 'subgroupBallot sets exactly bits [0, groupSize) for an always-true predicate', { requiredFeature: 'subgroups' }, async ( { assert, renderer } ) => {
+					// Same "one bit per lane" construction as the storage-buffer
+					// atomic bitwise tests (GPUAtomicsStorage.tests.js), scoped
+					// to a subgroup instead of the whole dispatch: bit position
+					// wraps at 32 (a uint's width), matching what the JS-side
+					// expected-value computation below also wraps at.
+					const bit = shiftLeft( uint( 1 ), invocationSubgroupIndex.mod( uint( 32 ) ) );
 
-			const groupSizeOut = instancedArray( DISPATCH_COUNT, 'uint' );
-			const ballotXOut = instancedArray( DISPATCH_COUNT, 'uint' );
-			const ballotYOut = instancedArray( DISPATCH_COUNT, 'uint' );
+					groupSizeOut.element( instanceIndex ).assign( subgroupSize );
+					// AND starts from all-ones and each lane clears its own bit
+					// (contributes ~bit, identity 0xffffffff elsewhere).
+					andOut.element( instanceIndex ).assign( subgroupAnd( bit.bitNot() ) );
+					orOut.element( instanceIndex ).assign( subgroupOr( bit ) );
+					xorOut.element( instanceIndex ).assign( subgroupXor( bit ) );
 
-			const kernel = Fn( () => {
+				} )().compute( DISPATCH_SIZE, [ WORKGROUP_SIZE ] );
 
-				const ballot = subgroupBallot( bool( true ) );
+				await renderer.computeAsync( kernel );
 
-				groupSizeOut.element( instanceIndex ).assign( subgroupSize );
-				// A subgroup wider than 32 would need .z/.w too -- this
-				// sandbox's subgroupSize (32) only ever needs .x, and .y
-				// should stay 0, which the check below asserts explicitly.
-				ballotXOut.element( instanceIndex ).assign( ballot.x );
-				ballotYOut.element( instanceIndex ).assign( ballot.y );
+				const groupSizeData = await readUintBuffer( renderer, groupSizeOut );
+				const andData = await readUintBuffer( renderer, andOut );
+				const orData = await readUintBuffer( renderer, orOut );
+				const xorData = await readUintBuffer( renderer, xorOut );
 
-			} )().compute( DISPATCH_SIZE, [ WORKGROUP_SIZE ] );
+				for ( let i = 0; i < DISPATCH_COUNT; i ++ ) {
 
-			await renderer.computeAsync( kernel );
+					const n = groupSizeData[ i ];
+					let expectedOr = 0;
+					let expectedXor = 0;
 
-			const groupSizeData = await readUintBuffer( renderer, groupSizeOut );
-			const ballotXData = await readUintBuffer( renderer, ballotXOut );
-			const ballotYData = await readUintBuffer( renderer, ballotYOut );
+					for ( let lane = 0; lane < n; lane ++ ) {
 
-			for ( let i = 0; i < DISPATCH_COUNT; i ++ ) {
+						const bit = 1 << ( lane % 32 );
+						expectedOr |= bit;
+						expectedXor ^= bit;
 
-				const n = groupSizeData[ i ];
+					}
 
-				assert.ok( n <= 32, `invocation ${ i }: this test only checks .x/.y -- group size ${ n } would need .z/.w too` );
+					// AND of (~bit) over every lane clears exactly the bits that
+					// were contributed by at least one lane -- i.e. the bitwise
+					// complement of the OR result.
+					const expectedAnd = ( ~ expectedOr ) >>> 0;
 
-				// Per the WGSL spec, subgroupBallot's nth bit corresponds to
-				// the invocation with subgroup_invocation_id == n -- so for
-				// an always-true predicate, bits [0, n) are set.
-				const expectedX = n >= 32 ? 0xffffffff : ( ( 1 << n ) - 1 ) >>> 0;
+					assert.strictEqual( andData[ i ] >>> 0, expectedAnd, `invocation ${ i } (group size ${ n }): subgroupAnd` );
+					assert.strictEqual( orData[ i ] >>> 0, expectedOr >>> 0, `invocation ${ i } (group size ${ n }): subgroupOr` );
+					assert.strictEqual( xorData[ i ] >>> 0, expectedXor >>> 0, `invocation ${ i } (group size ${ n }): subgroupXor` );
 
-				assert.strictEqual( ballotXData[ i ] >>> 0, expectedX, `invocation ${ i } (group size ${ n }): subgroupBallot(true).x` );
-				assert.strictEqual( ballotYData[ i ], 0, `invocation ${ i }: subgroupBallot(true).y should be 0 for a <=32-lane subgroup` );
+				}
 
-			}
+			} );
 
-		} );
+			rawComputeTest( 'subgroupInclusiveAdd and subgroupExclusiveAdd compute correct prefix sums', { requiredFeature: 'subgroups' }, async ( { assert, renderer } ) => {
 
-		// subgroupBroadcastFirst() is NOT covered here: calling it with the
-		// one argument the WGSL spec requires (`subgroupBroadcastFirst(e: T)
-		// -> T` -- no lane id, unlike subgroupBroadcast) is rejected by this
-		// codebase with "parameter length is less than minimum required" --
-		// it's declared with `setParameterLength(2)` in
-		// SubgroupFunctionNode.js, so three.js auto-pads a bogus second
-		// argument, producing invalid WGSL. See the sibling branch with the
-		// fix + the (now-passing) test for this.
+				const laneIdOut = instancedArray( DISPATCH_COUNT, 'uint' );
+				const inclusiveOut = instancedArray( DISPATCH_COUNT, 'uint' );
+				const exclusiveOut = instancedArray( DISPATCH_COUNT, 'uint' );
 
-		rawComputeTest( 'subgroupBroadcast reads a specific lane\'s value', { requiredFeature: 'subgroups' }, async ( { assert, renderer } ) => {
+				const kernel = Fn( () => {
 
-			const broadcastOut = instancedArray( DISPATCH_COUNT, 'uint' );
+					const value = invocationSubgroupIndex.add( uint( 1 ) ); // 1, 2, 3, ...
 
-			const kernel = Fn( () => {
+					laneIdOut.element( instanceIndex ).assign( invocationSubgroupIndex );
+					inclusiveOut.element( instanceIndex ).assign( subgroupInclusiveAdd( value ) );
+					exclusiveOut.element( instanceIndex ).assign( subgroupExclusiveAdd( value ) );
 
-				const value = invocationSubgroupIndex.add( uint( 100 ) ); // 100, 101, 102, ...
+				} )().compute( DISPATCH_SIZE, [ WORKGROUP_SIZE ] );
 
-				// Every lane asks for lane 0's value explicitly.
-				broadcastOut.element( instanceIndex ).assign( subgroupBroadcast( value, uint( 0 ) ) );
+				await renderer.computeAsync( kernel );
 
-			} )().compute( DISPATCH_SIZE, [ WORKGROUP_SIZE ] );
+				const laneIdData = await readUintBuffer( renderer, laneIdOut );
+				const inclusiveData = await readUintBuffer( renderer, inclusiveOut );
+				const exclusiveData = await readUintBuffer( renderer, exclusiveOut );
 
-			await renderer.computeAsync( kernel );
+				for ( let i = 0; i < DISPATCH_COUNT; i ++ ) {
 
-			const broadcastData = await readUintBuffer( renderer, broadcastOut );
+					const l = laneIdData[ i ];
+					// inclusive prefix sum of (1, 2, ..., l+1) = (l+1)(l+2)/2
+					const expectedInclusive = ( ( l + 1 ) * ( l + 2 ) ) / 2;
+					// exclusive prefix sum of (1, 2, ..., l) = l(l+1)/2 (0 at lane 0)
+					const expectedExclusive = ( l * ( l + 1 ) ) / 2;
 
-			for ( let i = 0; i < DISPATCH_COUNT; i ++ ) {
+					assert.strictEqual( inclusiveData[ i ], expectedInclusive, `invocation ${ i } (lane ${ l }): subgroupInclusiveAdd` );
+					assert.strictEqual( exclusiveData[ i ], expectedExclusive, `invocation ${ i } (lane ${ l }): subgroupExclusiveAdd` );
 
-				assert.strictEqual( broadcastData[ i ], 100, `invocation ${ i }: subgroupBroadcast(value, 0) should read back lane 0's value (100)` );
+				}
 
-			}
+			} );
 
-		} );
+			// subgroupAll()/subgroupAny() are NOT covered here: calling either
+			// with the one boolean predicate argument the WGSL spec requires
+			// (`subgroupAll(e: bool) -> bool`) is rejected by this codebase with
+			// "parameter length exceeds limit" -- both are declared with
+			// `setParameterLength(0)` in SubgroupFunctionNode.js, so as shipped
+			// neither is callable for its actual purpose. See the sibling branch
+			// with the fix + the (now-passing) test for this.
 
-		rawComputeTest( 'subgroupShuffle reverses lane order within the subgroup', { requiredFeature: 'subgroups' }, async ( { assert, renderer } ) => {
+			rawComputeTest( 'subgroupElect is true for exactly lane 0', { requiredFeature: 'subgroups' }, async ( { assert, renderer } ) => {
 
-			const laneIdOut = instancedArray( DISPATCH_COUNT, 'uint' );
-			const groupSizeOut = instancedArray( DISPATCH_COUNT, 'uint' );
-			const shuffledOut = instancedArray( DISPATCH_COUNT, 'int' );
+				const laneIdOut = instancedArray( DISPATCH_COUNT, 'uint' );
+				const electOut = instancedArray( DISPATCH_COUNT, 'uint' );
 
-			const kernel = Fn( () => {
+				const kernel = Fn( () => {
 
-				const laneId = invocationSubgroupIndex;
-				const targetLane = subgroupSize.sub( uint( 1 ) ).sub( laneId );
+					laneIdOut.element( instanceIndex ).assign( invocationSubgroupIndex );
+					electOut.element( instanceIndex ).assign( subgroupElect().select( uint( 1 ), uint( 0 ) ) );
 
-				laneIdOut.element( instanceIndex ).assign( laneId );
-				groupSizeOut.element( instanceIndex ).assign( subgroupSize );
-				// Each lane fetches the value from its mirror-image lane
-				// (targetLane) -- so the value it fetches is that lane's own
-				// id, and the expected result is fully determined by
-				// (laneId, groupSize) alone.
-				shuffledOut.element( instanceIndex ).assign( subgroupShuffle( laneId.toInt(), targetLane ) );
+				} )().compute( DISPATCH_SIZE, [ WORKGROUP_SIZE ] );
 
-			} )().compute( DISPATCH_SIZE, [ WORKGROUP_SIZE ] );
+				await renderer.computeAsync( kernel );
 
-			await renderer.computeAsync( kernel );
+				const laneIdData = await readUintBuffer( renderer, laneIdOut );
+				const electData = await readUintBuffer( renderer, electOut );
 
-			const laneIdData = await readUintBuffer( renderer, laneIdOut );
-			const groupSizeData = await readUintBuffer( renderer, groupSizeOut );
-			const shuffledData = await readIntBuffer( renderer, shuffledOut );
+				for ( let i = 0; i < DISPATCH_COUNT; i ++ ) {
 
-			for ( let i = 0; i < DISPATCH_COUNT; i ++ ) {
+					const expected = laneIdData[ i ] === 0 ? 1 : 0;
+					assert.strictEqual( electData[ i ], expected, `invocation ${ i } (lane ${ laneIdData[ i ] }): subgroupElect should be true only for lane 0` );
 
-				const laneId = laneIdData[ i ];
-				const n = groupSizeData[ i ];
-				const expected = n - 1 - laneId;
+				}
 
-				assert.strictEqual( shuffledData[ i ], expected, `invocation ${ i } (lane ${ laneId }, group size ${ n }): subgroupShuffle should fetch the mirror lane's id (${ expected })` );
+			} );
 
-			}
+			rawComputeTest( 'subgroupBallot sets exactly bits [0, groupSize) for an always-true predicate', { requiredFeature: 'subgroups' }, async ( { assert, renderer } ) => {
+
+				const groupSizeOut = instancedArray( DISPATCH_COUNT, 'uint' );
+				const ballotXOut = instancedArray( DISPATCH_COUNT, 'uint' );
+				const ballotYOut = instancedArray( DISPATCH_COUNT, 'uint' );
+
+				const kernel = Fn( () => {
+
+					const ballot = subgroupBallot( bool( true ) );
+
+					groupSizeOut.element( instanceIndex ).assign( subgroupSize );
+					// A subgroup wider than 32 would need .z/.w too -- this
+					// sandbox's subgroupSize (32) only ever needs .x, and .y
+					// should stay 0, which the check below asserts explicitly.
+					ballotXOut.element( instanceIndex ).assign( ballot.x );
+					ballotYOut.element( instanceIndex ).assign( ballot.y );
+
+				} )().compute( DISPATCH_SIZE, [ WORKGROUP_SIZE ] );
+
+				await renderer.computeAsync( kernel );
+
+				const groupSizeData = await readUintBuffer( renderer, groupSizeOut );
+				const ballotXData = await readUintBuffer( renderer, ballotXOut );
+				const ballotYData = await readUintBuffer( renderer, ballotYOut );
+
+				for ( let i = 0; i < DISPATCH_COUNT; i ++ ) {
+
+					const n = groupSizeData[ i ];
+
+					assert.ok( n <= 32, `invocation ${ i }: this test only checks .x/.y -- group size ${ n } would need .z/.w too` );
+
+					// Per the WGSL spec, subgroupBallot's nth bit corresponds to
+					// the invocation with subgroup_invocation_id == n -- so for
+					// an always-true predicate, bits [0, n) are set.
+					const expectedX = n >= 32 ? 0xffffffff : ( ( 1 << n ) - 1 ) >>> 0;
+
+					assert.strictEqual( ballotXData[ i ] >>> 0, expectedX, `invocation ${ i } (group size ${ n }): subgroupBallot(true).x` );
+					assert.strictEqual( ballotYData[ i ], 0, `invocation ${ i }: subgroupBallot(true).y should be 0 for a <=32-lane subgroup` );
+
+				}
+
+			} );
+
+			// subgroupBroadcastFirst() is NOT covered here: calling it with the
+			// one argument the WGSL spec requires (`subgroupBroadcastFirst(e: T)
+			// -> T` -- no lane id, unlike subgroupBroadcast) is rejected by this
+			// codebase with "parameter length is less than minimum required" --
+			// it's declared with `setParameterLength(2)` in
+			// SubgroupFunctionNode.js, so three.js auto-pads a bogus second
+			// argument, producing invalid WGSL. See the sibling branch with the
+			// fix + the (now-passing) test for this.
+
+			rawComputeTest( 'subgroupBroadcast reads a specific lane\'s value', { requiredFeature: 'subgroups' }, async ( { assert, renderer } ) => {
+
+				const broadcastOut = instancedArray( DISPATCH_COUNT, 'uint' );
+
+				const kernel = Fn( () => {
+
+					const value = invocationSubgroupIndex.add( uint( 100 ) ); // 100, 101, 102, ...
+
+					// Every lane asks for lane 0's value explicitly.
+					broadcastOut.element( instanceIndex ).assign( subgroupBroadcast( value, uint( 0 ) ) );
+
+				} )().compute( DISPATCH_SIZE, [ WORKGROUP_SIZE ] );
+
+				await renderer.computeAsync( kernel );
+
+				const broadcastData = await readUintBuffer( renderer, broadcastOut );
+
+				for ( let i = 0; i < DISPATCH_COUNT; i ++ ) {
+
+					assert.strictEqual( broadcastData[ i ], 100, `invocation ${ i }: subgroupBroadcast(value, 0) should read back lane 0's value (100)` );
+
+				}
+
+			} );
+
+			rawComputeTest( 'subgroupShuffle reverses lane order within the subgroup', { requiredFeature: 'subgroups' }, async ( { assert, renderer } ) => {
+
+				const laneIdOut = instancedArray( DISPATCH_COUNT, 'uint' );
+				const groupSizeOut = instancedArray( DISPATCH_COUNT, 'uint' );
+				const shuffledOut = instancedArray( DISPATCH_COUNT, 'int' );
+
+				const kernel = Fn( () => {
+
+					const laneId = invocationSubgroupIndex;
+					const targetLane = subgroupSize.sub( uint( 1 ) ).sub( laneId );
+
+					laneIdOut.element( instanceIndex ).assign( laneId );
+					groupSizeOut.element( instanceIndex ).assign( subgroupSize );
+					// Each lane fetches the value from its mirror-image lane
+					// (targetLane) -- so the value it fetches is that lane's own
+					// id, and the expected result is fully determined by
+					// (laneId, groupSize) alone.
+					shuffledOut.element( instanceIndex ).assign( subgroupShuffle( laneId.toInt(), targetLane ) );
+
+				} )().compute( DISPATCH_SIZE, [ WORKGROUP_SIZE ] );
+
+				await renderer.computeAsync( kernel );
+
+				const laneIdData = await readUintBuffer( renderer, laneIdOut );
+				const groupSizeData = await readUintBuffer( renderer, groupSizeOut );
+				const shuffledData = await readIntBuffer( renderer, shuffledOut );
+
+				for ( let i = 0; i < DISPATCH_COUNT; i ++ ) {
+
+					const laneId = laneIdData[ i ];
+					const n = groupSizeData[ i ];
+					const expected = n - 1 - laneId;
+
+					assert.strictEqual( shuffledData[ i ], expected, `invocation ${ i } (lane ${ laneId }, group size ${ n }): subgroupShuffle should fetch the mirror lane's id (${ expected })` );
+
+				}
+
+			} );
 
 		} );
 
