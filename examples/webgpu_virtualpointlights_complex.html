@@ -29,8 +29,7 @@
 					"three/webgpu": "../build/three.webgpu.js",
 					"three/tsl": "../build/three.tsl.js",
 					"three/addons/": "./jsm/",
-					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.15/src/index.js",
-					"three-mesh-bvh/webgpu": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.15/src/webgpu/index.js"
+					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.15/src/index.js"
 				}
 			}
 		</script>
@@ -38,7 +37,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { Fn, If, float, lights, uniform } from 'three/tsl';
+			import { lights } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
@@ -47,11 +46,10 @@
 			import { VirtualPointLightShadowMaps } from 'three/addons/lighting/VirtualPointLightShadowMaps.js';
 			import { VirtualPointLightsNode } from 'three/addons/tsl/lighting/VirtualPointLightsNode.js';
 			import { VirtualPointLightHelper } from 'three/addons/helpers/VirtualPointLightHelper.js';
-			import { acceleratedRaycast } from 'three-mesh-bvh';
-			import { BVHComputeData, rayStruct, rayIntersectionResultStruct, wgslTagFn } from 'three-mesh-bvh/webgpu';
+			import { acceleratedRaycast, computeBoundsTree } from 'three-mesh-bvh';
 
 			const MAX_VPLS = 1024;
-			const params = { mode: 'combined', count: 256, shadows: true, visibility: 'shadow maps', shadowResolution: 64, shadowBias: 0, showVPLs: false, seed: 1, minDistance: 1, progressive: false };
+			const params = { mode: 'combined', count: 256, shadows: true, shadowResolution: 64, shadowBias: 0, showVPLs: false, seed: 1, minDistance: 1, progressive: false };
 
 			init();
 
@@ -71,6 +69,7 @@
 
 						surfaces.push( object );
 						object.raycast = acceleratedRaycast;
+						if ( ! object.geometry.boundsTree ) computeBoundsTree.call( object.geometry );
 
 					} else if ( object.isPointLight ) {
 
@@ -80,44 +79,9 @@
 
 				} );
 
-				// The same triangle BVHs accelerate CPU sampling and GPU visibility.
-				// Include every surface: the ray's maximum distance excludes its emitter.
-
-				const bvh = new BVHComputeData( surfaces );
-				bvh.update();
-
-				const visibility = wgslTagFn /* wgsl */`
-					fn vplVisibility( start: vec3f, end: vec3f ) -> f32 {
-
-						let delta = end - start;
-						let distance = length( delta );
-						if ( distance < 1e-5 ) { return 1.0; }
-						let ray = ${ rayStruct }( start, delta / distance, distance );
-						var hit: ${ rayIntersectionResultStruct };
-						if ( ${ bvh.fns.raycastFirstHit }( ray, &hit ) ) { return 0.0; }
-						return 1.0;
-
-					}
-				`;
-
 				const generator = new VirtualPointLightGenerator( MAX_VPLS );
 				const shadowMaps = new VirtualPointLightShadowMaps( MAX_VPLS );
-				const useShadowMaps = uniform( true );
-				const vpl = new VirtualPointLightsNode( generator, ( start, end, index ) => Fn( () => {
-
-					const visible = float( 1 ).toVar();
-					If( useShadowMaps, () => {
-
-						visible.assign( shadowMaps.visibility( start, end, index ) );
-
-					} ).Else( () => {
-
-						visible.assign( visibility( { start, end } ) );
-
-					} );
-					return visible;
-
-				} )() );
+				const vpl = new VirtualPointLightsNode( generator, ( start, end, index ) => shadowMaps.visibility( start, end, index ) );
 				vpl.shadows.value = params.shadows;
 				const lighting = lights( [ ...sourceLights, vpl ] );
 				const materials = new Map();
@@ -179,8 +143,7 @@
 				function updateVisibility() {
 
 					vpl.shadows.value = params.shadows;
-					useShadowMaps.value = params.visibility === 'shadow maps';
-					if ( params.shadows && useShadowMaps.value && mapsDirty ) {
+					if ( params.shadows && mapsDirty ) {
 
 						const visible = helper.visible;
 						helper.visible = false;
@@ -250,7 +213,6 @@
 				const shadowParameters = gui.addFolder( 'Shadows' );
 				shadowParameters.add( params, 'shadowBias', - 0.01, 0.01, 0.0001 ).name( 'Direct Shadow Bias' ).info( 'Bias for direct point-light shadows. Set to zero to compare contact shadows.' ).onChange( updateShadowBias );
 				shadowParameters.add( params, 'shadows' ).name( 'VPL Shadows' ).onChange( updateVisibility );
-				shadowParameters.add( params, 'visibility', [ 'shadow maps', 'BVH reference' ] ).name( 'Visibility' ).info( 'Cached GPU-rasterized cube faces, or triangle BVH reference. Direct shadows remain enabled.' ).onChange( updateVisibility );
 				shadowParameters.add( params, 'shadowResolution', [ 32, 64 ] ).name( 'Shadow Resolution' ).info( 'Pixels per cube face. Maps rebuild when the VPL set or resolution changes.' ).onChange( () => {
 
 					mapsDirty = true;

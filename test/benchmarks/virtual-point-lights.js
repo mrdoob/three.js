@@ -6,8 +6,9 @@ import { PNG } from 'pngjs';
 import { createServer } from '../../utils/server.js';
 
 // Run from the repository root: node test/benchmarks/virtual-point-lights.js
-// Arguments: output directory, width (800), height (600); append --bvh and/or --shadow-maps.
-const args = process.argv.slice( 2 ).filter( argument => argument !== '--bvh' && argument !== '--shadow-maps' );
+// Arguments: output directory, width (800), height (600). Shadows use cached GPU maps.
+const args = process.argv.slice( 2 );
+assert.ok( args.every( argument => ! argument.startsWith( '--' ) ), 'Usage: node test/benchmarks/virtual-point-lights.js [output directory] [width] [height]' );
 const output = args[ 0 ];
 const width = Number( args[ 1 ] || 800 );
 const height = Number( args[ 2 ] || 600 );
@@ -16,14 +17,12 @@ const runs = 3;
 const warmup = 1000;
 const duration = 5000;
 const scenes = [ 'webgpu_virtualpointlights', 'webgpu_virtualpointlights_complex' ];
-const includeBVH = process.argv.includes( '--bvh' );
 const modes = [
+	{ name: 'shadow maps', mode: 'combined', shadows: true },
 	{ name: 'visibility off', mode: 'combined', shadows: false },
 	{ name: 'direct only', mode: 'direct only', shadows: true }
 ];
-if ( process.argv.includes( '--shadow-maps' ) ) modes.unshift( { name: 'shadow maps', mode: 'combined', shadows: true, visibility: 'shadow maps' } );
-if ( includeBVH ) modes.unshift( { name: 'gather', mode: 'combined', shadows: true, visibility: 'BVH reference' } );
-const referenceName = includeBVH ? 'BVH-visible' : process.argv.includes( '--shadow-maps' ) ? 'shadow-map-visible' : 'unoccluded';
+const referenceName = 'shadow-map-visible';
 const results = [];
 const server = createServer();
 let browser;
@@ -78,7 +77,7 @@ try {
 					} );
 					await page.goto( `http://localhost:${ server.address().port }/examples/${ scene }.html?benchmark` );
 					await page.waitForFunction( () => window.vplBenchmark !== undefined, { timeout: 120000 } );
-					const result = await page.evaluate( ( settings, warmup, duration ) => window.vplBenchmark.run( settings, warmup, duration ), { count, mode: mode.mode, shadows: mode.shadows, visibility: mode.visibility || 'BVH reference', seed: 1 }, warmup, duration );
+					const result = await page.evaluate( ( settings, warmup, duration ) => window.vplBenchmark.run( settings, warmup, duration ), { count, mode: mode.mode, shadows: mode.shadows, seed: 1 }, warmup, duration );
 					console.log( `Completed measurement: ${ result.frames } frames in ${ result.elapsed.toFixed( 1 ) } ms` );
 					assert.deepEqual( errors, [], 'The example must render without errors' );
 					assert.ok( result.frames > 0 && result.elapsed >= duration );
