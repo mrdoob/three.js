@@ -14,7 +14,6 @@ import { InstancedBufferAttribute } from '../../core/InstancedBufferAttribute.js
 import { InterleavedBufferAttribute } from '../../core/InterleavedBufferAttribute.js';
 import { DynamicDrawUsage } from '../../constants.js';
 
-const _matrixBuffers = /*@__PURE__*/ new WeakMap();
 const _colorBuffers = /*@__PURE__*/ new WeakMap();
 const _previousInstanceMatrices = /*@__PURE__*/ new WeakMap();
 const _matrixColumns = /*@__PURE__*/ new WeakMap();
@@ -54,35 +53,15 @@ export function isSharedInstancing( object, renderer ) {
 }
 
 /**
- * Returns the interleaved buffer that feeds the instance matrix attributes.
- *
- * @param {InstancedBufferAttribute} instanceMatrix - The matrix buffer attribute.
- * @returns {InstancedInterleavedBuffer} The interleaved buffer.
- */
-function getInterleavedMatrix( instanceMatrix ) {
-
-	let interleaved = _matrixBuffers.get( instanceMatrix );
-
-	if ( ! interleaved ) {
-
-		interleaved = new InstancedInterleavedBuffer( instanceMatrix.array, 16, 1 );
-		_matrixBuffers.set( instanceMatrix, interleaved );
-
-	}
-
-	return interleaved;
-
-}
-
-/**
  * Copies pending matrix updates into the interleaved buffer used for rendering.
  *
  * @param {InstancedBufferAttribute} matrices - The source matrix attribute.
- * @param {?InstancedInterleavedBuffer} interleavedMatrix - The interleaved buffer.
  */
-function syncInterleavedMatrix( matrices, interleavedMatrix ) {
+function syncInterleavedMatrix( matrices ) {
 
-	if ( interleavedMatrix !== null && interleavedMatrix.version !== matrices.version ) {
+	const interleavedMatrix = getMatrixColumns( matrices )[ 0 ].data;
+
+	if ( interleavedMatrix.version !== matrices.version ) {
 
 		interleavedMatrix.clearUpdateRanges();
 		interleavedMatrix.updateRanges.push( ...matrices.updateRanges );
@@ -106,7 +85,7 @@ function getMatrixColumns( matrices ) {
 
 	if ( columns === undefined ) {
 
-		const interleaved = getInterleavedMatrix( matrices ).setUsage( matrices.usage );
+		const interleaved = new InstancedInterleavedBuffer( matrices.array, 16, 1 ).setUsage( matrices.usage );
 
 		columns = [ 0, 4, 8, 12 ].map( offset => new InterleavedBufferAttribute( interleaved, 4, offset ) );
 
@@ -240,7 +219,7 @@ function setupInstance( builder, matrices, colors, shared ) {
 
 		OnBeforeObjectUpdate( ( { object } ) => {
 
-			syncInterleavedMatrix( object.instanceMatrix, getInterleavedMatrix( object.instanceMatrix ) );
+			syncInterleavedMatrix( object.instanceMatrix );
 
 		} );
 
@@ -255,7 +234,7 @@ function setupInstance( builder, matrices, colors, shared ) {
 
 		if ( uniformBufferSize > builder.getUniformBufferLimit() ) {
 
-			interleavedMatrix = _matrixBuffers.get( matrices );
+			interleavedMatrix = getMatrixColumns( matrices )[ 0 ].data;
 
 		}
 
@@ -296,7 +275,7 @@ function setupInstance( builder, matrices, colors, shared ) {
 
 		OnBeforeFrameUpdate( () => {
 
-			syncInterleavedMatrix( matrices, interleavedMatrix );
+			if ( interleavedMatrix !== null ) syncInterleavedMatrix( matrices );
 
 			if ( colors && interleavedColor !== null && interleavedColor.version !== colors.version ) {
 
@@ -330,9 +309,9 @@ function setupInstance( builder, matrices, colors, shared ) {
 
 			// handle interleaved path
 
-			const previousInterleavedMatrix = _matrixBuffers.get( previousInstanceMatrix );
+			const previousColumns = _matrixColumns.get( previousInstanceMatrix );
 
-			if ( previousInterleavedMatrix !== undefined ) previousInterleavedMatrix.version = matrices.version;
+			if ( previousColumns !== undefined ) previousColumns[ 0 ].data.version = matrices.version;
 
 		} );
 
