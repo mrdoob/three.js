@@ -28,11 +28,13 @@ class KitchenScene extends Scene {
 
 		};
 
+		const wallOverlap = 0.2;
+
 		const wall = ( width, height, position, rotation, source ) => {
 
 			const material = source.clone();
 			material.shadowSide = DoubleSide;
-			const mesh = new Mesh( new PlaneGeometry( width, height ), material );
+			const mesh = new Mesh( new PlaneGeometry( width + wallOverlap * 2, height + wallOverlap * 2 ), material );
 			mesh.position.set( ...position );
 			mesh.rotation.set( ...rotation );
 			mesh.castShadow = true;
@@ -43,6 +45,7 @@ class KitchenScene extends Scene {
 
 		// Inward-facing surfaces let an exterior camera see into the room.
 		// Both faces still cast shadows; the window wall retains its solid geometry.
+		// Extend each plane past neighboring walls, floor and ceiling to seal the seams.
 
 		box( [ 8.4, 0.2, 6.4 ], [ 0, - 0.1, 0 ], floor );
 		wall( 8, 6, [ 0, 4, 0 ], [ Math.PI / 2, 0, 0 ], plaster );
