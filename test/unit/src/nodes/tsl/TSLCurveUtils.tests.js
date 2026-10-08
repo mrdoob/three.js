@@ -87,13 +87,13 @@ export default QUnit.module( 'TSL', () => {
 			// -2.0f's bit pattern is 0xC0000000, which as a signed 32-bit int
 			// is -1073741824 (sign bit set) -- again, an independently known
 			// IEEE-754 fact.
-			assert.eq( floatBitsToInt( float( -2.0 ) ), int( -1073741824 ), 'floatBitsToInt(-2.0) == 0xC0000000 (signed)' );
+			assert.eq( floatBitsToInt( float( - 2.0 ) ), int( - 1073741824 ), 'floatBitsToInt(-2.0) == 0xC0000000 (signed)' );
 
 			// Round trips: reinterpreting bits out and back must recover the
 			// exact original value (bit-reinterpretation is lossless, unlike a
 			// numeric cast).
 			assert.eq( intBitsToFloat( floatBitsToInt( float( 3.140625 ) ) ), float( 3.140625 ), 'int bit round trip recovers the exact float' );
-			assert.eq( uintBitsToFloat( floatBitsToUint( float( -7.5 ) ) ), float( -7.5 ), 'uint bit round trip recovers the exact float' );
+			assert.eq( uintBitsToFloat( floatBitsToUint( float( - 7.5 ) ) ), float( - 7.5 ), 'uint bit round trip recovers the exact float' );
 
 		} );
 
