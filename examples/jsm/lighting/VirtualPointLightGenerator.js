@@ -1,83 +1,43 @@
 import { Color, FloatType, Matrix3, MirroredRepeatWrapping, NearestFilter, Raycaster, RepeatWrapping, SRGBColorSpace, Vector2, Vector3, Vector4 } from 'three';
 
-const _white = /*@__PURE__*/ new Color( 0xffffff );
+import { emissiveSources, sampleEmission, luminance } from './VirtualPointLightSources.js';
 
-/**
- * Generates deterministic diffuse light paths from point or directional lights.
- * Samples visible, static meshes using CPU raycasting. Base-color maps and alpha cutouts use cached CPU texels.
- * Instancing, skinning, mip selection and specular transport are not evaluated.
- *
- * Source lights must be directional lights or point lights with `decay = 2` and `distance = 0`.
- * Material textures must be loaded and use UV channel 0 or 1. Data textures must be RGBA
- * unsigned-byte or float textures.
- *
+/** Deterministic diffuse light paths with source-power sampling and optional flux-weighted compression.
+ * Static visible meshes, point/directional lights and emissive triangles; no BVH dependency.
+ * Instancing, skinning, normal maps and texture mip selection are not evaluated.
  * @three_import import { VirtualPointLightGenerator } from 'three/addons/lighting/VirtualPointLightGenerator.js';
  */
 class VirtualPointLightGenerator {
 
-	/**
-	 * Constructs a new virtual point light generator.
-	 *
-	 * @param {number} [capacity=1024] - Maximum number of samples.
-	 */
 	constructor( capacity = 1024 ) {
 
-		/**
-		 * The maximum sample count.
-		 *
-		 * @type {number}
-		 * @default 1024
-		 */
+		if ( ! Number.isInteger( capacity ) || capacity < 1 ) throw new RangeError( 'Capacity must be a positive integer.' );
 		this.capacity = capacity;
-
-		/**
-		 * The number of successful hits from the last generation.
-		 *
-		 * @type {number}
-		 * @default 0
-		 */
-		this.count = 0;
-
-		/**
-		 * World-space emitter positions.
-		 *
-		 * @type {Array<Vector3>}
-		 */
-		this.positions = Array.from( { length: capacity }, () => new Vector3() );
-
-		/**
-		 * World-space geometric emitter normals.
-		 *
-		 * @type {Array<Vector3>}
-		 */
-		this.normals = Array.from( { length: capacity }, () => new Vector3() );
-
-		/**
-		 * Reflected RGB radiant flux, before the emitter's Lambertian factor.
-		 *
-		 * @type {Array<Vector3>}
-		 */
-		this.flux = Array.from( { length: capacity }, () => new Vector3() );
-
 		this._textureSampler = new TextureSampler();
+		this.count = 0;
+		this.rayCount = 0;
+		this.candidateCount = 0;
+		this.positions = Array.from( { length: capacity }, () => new Vector3() );
+		this.normals = Array.from( { length: capacity }, () => new Vector3() );
+		this.flux = Array.from( { length: capacity }, () => new Vector3() );
 
 	}
 
-	/**
-	 * Regenerate samples after changing geometry, materials or source lights.
-	 * Escaped rays retain their share of the source power; misses are not renormalized.
-	 *
-	 * @param {Scene} scene - The static scene.
-	 * @param {Array<PointLight|DirectionalLight>} lights - Source lights.
-	 * @param {Object} [options={}] - Sampling options.
-	 * @param {number} [options.count=256] - Total ray budget across all lights and bounce depths. Must be at least `lights.length * bounces` and at most `capacity`.
-	 * @param {number} [options.bounces=1] - Maximum diffuse bounce depth, from 1 to 4.
-	 * @param {number} [options.seed=1] - Random seed.
-	 * @param {Box3} [options.bounds] - World-space sampling domain, required for directional lights.
-	 * @return {VirtualPointLightGenerator} A reference to this generator.
+	/** `count` limits the GPU emitter count. `candidateMultiplier` traces additional CPU paths
+	 * and compresses their flux into that same GPU budget. Misses retain their share of power.
+	 * `bounces` limits diffuse reflections; an emissive surface also contributes its own emission.
+	 * @param {Scene} scene
+	 * @param {Array<PointLight|DirectionalLight>} lights
+	 * @param {Object} [options]
+	 * @return {VirtualPointLightGenerator}
 	 */
-	generate( scene, lights, { count = 256, seed = 1, bounds = null, bounces = 1 } = {} ) {
+	generate( scene, lights, { count = 256, seed = 1, bounds = null, bounces = 1, candidateMultiplier = 1, importanceSampling = true, emissive = true, stratified = true, spatialResampling = true } = {} ) {
 
+		if ( ! Number.isInteger( bounces ) || bounces < 1 || bounces > 16 ) throw new RangeError( 'Bounces must be an integer from 1 to 16.' );
+		if ( ! Number.isInteger( candidateMultiplier ) || candidateMultiplier < 1 || candidateMultiplier > 16 ) throw new RangeError( 'Candidate multiplier must be an integer from 1 to 16.' );
+		if ( ! Number.isInteger( count ) || count < Math.max( 1, lights.length ) * bounces || count > this.capacity ) throw new RangeError( 'Ray budget must cover every light and bounce depth, and fit the capacity.' );
+		if ( lights.some( light => ! light.isDirectionalLight && ( ! light.isPointLight || light.decay !== 2 ) ) ) throw new Error( 'Virtual point lights require directional lights or inverse-square point lights.' );
+		if ( lights.some( light => light.isDirectionalLight ) && ( bounds === null || bounds.isEmpty() ) ) throw new Error( 'Directional VPL sampling requires non-empty world-space bounds.' );
 		scene.updateMatrixWorld( true );
 		const surfaces = [];
 		scene.traverseVisible( object => {
@@ -85,19 +45,43 @@ class VirtualPointLightGenerator {
 			if ( object.isMesh ) surfaces.push( object );
 
 		} );
-
-		const raycaster = new Raycaster();
-		const hasCutouts = surfaces.some( surface => ( Array.isArray( surface.material ) ? surface.material : [ surface.material ] ).some( material => material.alphaTest > 0 ) );
-		raycaster.firstHitOnly = ! hasCutouts; // Accelerated raycasting uses this; native raycasting ignores it.
-		const origin = new Vector3();
-		const direction = new Vector3();
-		const u = new Vector3();
-		const v = new Vector3();
+		const sources = [];
 		const corner = new Vector3();
-		const normalMatrix = new Matrix3();
-		const albedo = new Color();
-		const throughput = new Color();
-		const paths = Math.floor( count / bounces );
+		for ( const light of lights ) {
+
+			const origin = light.getWorldPosition( new Vector3() );
+			const source = { light, origin, power: 4 * Math.PI * light.intensity, emission: light.color };
+			if ( light.isDirectionalLight ) {
+
+				const direction = light.target.getWorldPosition( new Vector3() ).sub( origin ).normalize();
+				if ( direction.lengthSq() === 0 ) throw new Error( 'Directional light position and target must differ.' );
+				const u = new Vector3( Math.abs( direction.y ) > 0.99 ? 1 : 0, Math.abs( direction.y ) > 0.99 ? 0 : 1, 0 ).cross( direction ).normalize();
+				const v = new Vector3().crossVectors( direction, u );
+				let minU = Infinity, maxU = - Infinity, minV = Infinity, maxV = - Infinity, minDepth = Infinity;
+				for ( let j = 0; j < 8; j ++ ) {
+
+					corner.set( j & 1 ? bounds.max.x : bounds.min.x, j & 2 ? bounds.max.y : bounds.min.y, j & 4 ? bounds.max.z : bounds.min.z );
+					minU = Math.min( minU, corner.dot( u ) ); maxU = Math.max( maxU, corner.dot( u ) );
+					minV = Math.min( minV, corner.dot( v ) ); maxV = Math.max( maxV, corner.dot( v ) );
+					minDepth = Math.min( minDepth, corner.dot( direction ) );
+
+				}
+
+				Object.assign( source, { direction, u, v, minU, maxU, minV, maxV, minDepth } );
+				source.power = light.intensity * ( maxU - minU ) * ( maxV - minV );
+
+			}
+
+			source.weight = source.power * luminance( source.emission );
+			if ( source.weight > 0 ) sources.push( source );
+
+		}
+
+		if ( emissive ) sources.push( ...emissiveSources( surfaces ) );
+		this.count = 0; this.rayCount = 0; this.candidateCount = 0;
+		if ( sources.length === 0 ) return this;
+		const paths = Math.floor( count * candidateMultiplier / bounces );
+		if ( paths < sources.length ) throw new RangeError( 'Ray budget must cover every source, including emissive meshes.' );
 		let state = seed >>> 0;
 		const random = () => {
 
@@ -108,77 +92,78 @@ class VirtualPointLightGenerator {
 
 		};
 
-		this.count = 0;
+		const weightSum = sources.reduce( ( sum, source ) => sum + ( importanceSampling ? source.weight : 1 ), 0 );
+		let allocated = 0;
+		const allocations = sources.map( source => {
 
-		for ( let l = 0; l < lights.length; l ++ ) {
+			const exact = ( paths - sources.length ) * ( importanceSampling ? source.weight : 1 ) / weightSum;
+			const samples = 1 + Math.floor( exact );
+			allocated += samples;
+			return { source, samples, remainder: exact % 1 };
 
-			const light = lights[ l ];
-			light.updateWorldMatrix( true, false );
-			light.getWorldPosition( origin );
-			const samples = Math.floor( paths / lights.length ) + ( l < paths % lights.length ? 1 : 0 );
-			let power = 4 * Math.PI * light.intensity / samples;
-			let minU = Infinity, maxU = - Infinity, minV = Infinity, maxV = - Infinity, minDepth = Infinity;
+		} );
+		const priority = allocations.slice().sort( ( a, b ) => b.remainder - a.remainder );
+		for ( let i = 0; i < paths - allocated; i ++ ) priority[ i ].samples ++;
+		const candidates = [];
+		const record = ( position, normal, flux ) => {
 
-			if ( light.isDirectionalLight ) {
+			candidates.push( { position: position.clone(), normal: normal.clone(), flux: flux.clone() } );
 
-				light.target.updateWorldMatrix( true, false );
-				light.target.getWorldPosition( direction ).sub( origin ).normalize();
-				u.set( 0, 1, 0 );
-				if ( Math.abs( direction.y ) > 0.99 ) u.set( 1, 0, 0 );
-				u.cross( direction ).normalize();
-				v.crossVectors( direction, u );
+		};
 
-				for ( let j = 0; j < 8; j ++ ) {
+		const raycaster = new Raycaster();
+		// Native Mesh.raycast is used. Alpha cutouts require considering later intersections.
+		const normalMatrix = new Matrix3();
+		const throughput = new Color(), albedo = new Color();
+		const origin = new Vector3(), direction = new Vector3(), u = new Vector3(), v = new Vector3();
+		const cosineDirection = normal => {
 
-					corner.set( j & 1 ? bounds.max.x : bounds.min.x, j & 2 ? bounds.max.y : bounds.min.y, j & 4 ? bounds.max.z : bounds.min.z );
-					minU = Math.min( minU, corner.dot( u ) );
-					maxU = Math.max( maxU, corner.dot( u ) );
-					minV = Math.min( minV, corner.dot( v ) );
-					maxV = Math.max( maxV, corner.dot( v ) );
-					minDepth = Math.min( minDepth, corner.dot( direction ) );
+			const radius = Math.sqrt( random() ), phi = 2 * Math.PI * random();
+			u.set( Math.abs( normal.y ) > 0.99 ? 1 : 0, Math.abs( normal.y ) > 0.99 ? 0 : 1, 0 ).cross( normal ).normalize();
+			v.crossVectors( normal, u );
+			direction.copy( normal ).multiplyScalar( Math.sqrt( 1 - radius * radius ) ).addScaledVector( u, radius * Math.cos( phi ) ).addScaledVector( v, radius * Math.sin( phi ) );
 
-				}
+		};
 
-				// Parallel rays carry irradiance times projected area; no inverse-square falloff.
+		for ( const { source, samples } of allocations ) {
 
-				power = light.intensity * ( maxU - minU ) * ( maxV - minV ) / samples;
-
-			}
-
-			const emissionOrigin = origin.clone();
-			const emissionDirection = direction.clone();
-			const emissionU = u.clone();
-			const emissionV = v.clone();
-
+			const shift = random(), azimuth = random();
+			const power = source.power / samples;
 			for ( let i = 0; i < samples; i ++ ) {
 
-				throughput.copy( light.color );
-				direction.copy( emissionDirection );
-				u.copy( emissionU );
-				v.copy( emissionV );
-				origin.copy( emissionOrigin );
+				throughput.copy( source.emission );
+				if ( source.mesh ) {
 
-				if ( light.isDirectionalLight ) {
+					const sample = sampleEmission( source, stratified ? ( i + shift ) / samples : random(), random, this._textureSampler );
+					throughput.copy( sample.emission );
+					if ( luminance( throughput ) === 0 ) continue;
+					record( sample.position, sample.normal, new Vector3( throughput.r, throughput.g, throughput.b ).multiplyScalar( power ) );
+					cosineDirection( sample.normal );
+					origin.copy( sample.position ).addScaledVector( sample.normal, 0.001 );
 
-					origin.copy( direction ).multiplyScalar( minDepth - 0.01 );
-					origin.addScaledVector( u, minU + random() * ( maxU - minU ) );
-					origin.addScaledVector( v, minV + random() * ( maxV - minV ) );
-					raycaster.set( origin, direction );
+				} else if ( source.direction ) {
+
+					direction.copy( source.direction );
+					origin.copy( direction ).multiplyScalar( source.minDepth - 0.01 );
+					origin.addScaledVector( source.u, source.minU + ( stratified ? ( i + shift ) / samples : random() ) * ( source.maxU - source.minU ) );
+					origin.addScaledVector( source.v, source.minV + ( stratified ? ( i * 0.61803398875 + azimuth ) % 1 : random() ) * ( source.maxV - source.minV ) );
 
 				} else {
 
-					const z = random() * 2 - 1;
-					const phi = random() * Math.PI * 2;
+					origin.copy( source.origin );
+					const z = ( stratified ? ( i + shift ) / samples : random() ) * 2 - 1;
+					const phi = 2 * Math.PI * ( stratified ? ( i * 0.61803398875 + azimuth ) % 1 : random() );
 					const r = Math.sqrt( 1 - z * z );
-					raycaster.set( origin, direction.set( r * Math.cos( phi ), z, r * Math.sin( phi ) ) );
+					direction.set( r * Math.cos( phi ), z, r * Math.sin( phi ) );
 
 				}
 
 				for ( let depth = 0; depth < bounces; depth ++ ) {
 
+					raycaster.set( origin, direction );
+					this.rayCount ++;
 					const hits = raycaster.intersectObjects( surfaces, false );
 					let hit, material;
-
 					for ( const candidate of hits ) {
 
 						const candidateMaterial = Array.isArray( candidate.object.material ) ? candidate.object.material[ candidate.face.materialIndex ] : candidate.object.material;
@@ -191,44 +176,95 @@ class VirtualPointLightGenerator {
 
 						}
 
-						hit = candidate;
-						material = candidateMaterial;
-						break;
+						hit = candidate; material = candidateMaterial; break;
 
 					}
 
-					if ( hit === undefined ) break;
-					albedo.copy( material.color || _white ).multiply( throughput );
+					if ( ! hit ) break;
+					albedo.copy( material.color || new Color( 0xffffff ) ).multiply( throughput );
 					if ( material.map ) {
 
 						const texel = this._textureSampler.sample( material.map, hit );
-						albedo.r *= texel.x;
-						albedo.g *= texel.y;
-						albedo.b *= texel.z;
+						albedo.r *= texel.x; albedo.g *= texel.y; albedo.b *= texel.z;
 
 					}
 
+					if ( depth === 0 && source.light?.isPointLight && source.light.distance > 0 ) albedo.multiplyScalar( Math.pow( Math.max( 0, 1 - Math.pow( hit.distance / source.light.distance, 4 ) ), 2 ) );
 					albedo.multiplyScalar( 1 - ( material.metalness || 0 ) );
-					const index = this.count ++;
-					this.positions[ index ].copy( hit.point );
 					normalMatrix.getNormalMatrix( hit.object.matrixWorld );
-					const normal = this.normals[ index ].copy( hit.face.normal ).applyNormalMatrix( normalMatrix );
+					const normal = hit.face.normal.clone().applyNormalMatrix( normalMatrix );
 					if ( normal.dot( direction ) > 0 ) normal.negate();
-					this.flux[ index ].set( albedo.r, albedo.g, albedo.b ).multiplyScalar( power );
-
+					record( hit.point, normal, new Vector3( albedo.r, albedo.g, albedo.b ).multiplyScalar( power ) );
 					throughput.copy( albedo );
-					if ( depth + 1 === bounces || Math.max( throughput.r, throughput.g, throughput.b ) === 0 ) break;
-
-					// Cosine-weighted diffuse continuation cancels the BRDF cosine/PDF factors.
-
-					const radius = Math.sqrt( random() );
-					const phi = random() * Math.PI * 2;
-					u.set( Math.abs( normal.y ) > 0.99 ? 1 : 0, Math.abs( normal.y ) > 0.99 ? 0 : 1, 0 ).cross( normal ).normalize();
-					v.crossVectors( normal, u );
-					direction.copy( normal ).multiplyScalar( Math.sqrt( 1 - radius * radius ) );
-					direction.addScaledVector( u, radius * Math.cos( phi ) ).addScaledVector( v, radius * Math.sin( phi ) );
+					if ( depth + 1 === bounces || luminance( throughput ) === 0 ) break;
+					cosineDirection( normal );
 					origin.copy( hit.point ).addScaledVector( normal, 0.001 );
-					raycaster.set( origin, direction );
+
+				}
+
+			}
+
+		}
+
+		this.candidateCount = candidates.length;
+		if ( candidates.length <= count ) {
+
+			for ( const candidate of candidates ) this.store( this.count ++, candidate, 1 );
+
+		} else {
+
+			// Spatial ordering makes systematic importance samples cover the source
+			// surfaces instead of following correlated vertices along each path.
+			if ( spatialResampling ) {
+
+				const lower = new Vector3( Infinity, Infinity, Infinity ), upper = new Vector3( - Infinity, - Infinity, - Infinity );
+				for ( const candidate of candidates ) {
+
+					lower.min( candidate.position ); upper.max( candidate.position );
+
+				}
+
+				const size = upper.sub( lower ).max( new Vector3( 1e-6, 1e-6, 1e-6 ) );
+				const spread = value => {
+
+					let bits = Math.min( 1023, Math.max( 0, Math.floor( value * 1024 ) ) );
+					bits = ( bits | bits << 16 ) & 0x030000FF;
+					bits = ( bits | bits << 8 ) & 0x0300F00F;
+					bits = ( bits | bits << 4 ) & 0x030C30C3;
+					return ( bits | bits << 2 ) & 0x09249249;
+
+				};
+
+				for ( const candidate of candidates ) {
+
+					const p = candidate.position.clone().sub( lower ).divide( size );
+					candidate.order = spread( p.x ) + 2 * spread( p.y ) + 4 * spread( p.z );
+
+				}
+
+				candidates.sort( ( a, b ) => a.order - b.order );
+
+			}
+
+			// Stratified flux importance resampling: E[sum selected flux] = sum candidate flux.
+			// No PDF depends on visibility, so shadowing remains unbiased apart from the maps.
+			let total = 0;
+			const cumulative = candidates.map( candidate => {
+
+				total += 0.2126 * candidate.flux.x + 0.7152 * candidate.flux.y + 0.0722 * candidate.flux.z;
+				return total;
+
+			} );
+			if ( total > 0 ) {
+
+				const offset = random();
+				let selected = 0;
+				for ( let i = 0; i < count; i ++ ) {
+
+					const target = ( i + offset ) * total / count;
+					while ( selected < cumulative.length - 1 && cumulative[ selected ] <= target ) selected ++;
+					const weight = cumulative[ selected ] - ( selected === 0 ? 0 : cumulative[ selected - 1 ] );
+					this.store( this.count ++, candidates[ selected ], total / ( count * weight ) );
 
 				}
 
@@ -240,9 +276,15 @@ class VirtualPointLightGenerator {
 
 	}
 
-}
+	store( index, candidate, weight ) {
 
-// CPU base-level texture sampling with cached texels.
+		this.positions[ index ].copy( candidate.position );
+		this.normals[ index ].copy( candidate.normal );
+		this.flux[ index ].copy( candidate.flux ).multiplyScalar( weight );
+
+	}
+
+}
 
 class TextureSampler {
 
@@ -339,4 +381,8 @@ class TextureSampler {
 
 }
 
+
 export { VirtualPointLightGenerator };
+
+
+
