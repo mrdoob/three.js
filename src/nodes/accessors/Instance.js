@@ -119,33 +119,15 @@ function getMatrixColumns( matrices ) {
 }
 
 /**
- * Creates a matrix node for programs shared between instanced meshes. Each render object binds
- * the instance matrices of its own mesh, so the program does not depend on the instance count.
- *
- * @param {InstancedBufferAttribute} matrices - The matrices of the object being built.
- * @returns {Node} The matrix node.
- */
-function createSharedMatrixNode( matrices ) {
-
-	const columns = getMatrixColumns( matrices ).map( ( column, i ) => {
-
-		return instancedBufferAttribute( column ).setObjectAttribute( object => getMatrixColumns( object.instanceMatrix )[ i ] );
-
-	} );
-
-	return mat4( ...columns );
-
-}
-
-/**
  * Creates the appropriate node for instanced matrix transformations.
  * Depending on buffer limits and storage capability, returns either a storage, buffer, or instanced interleaved attribute node.
  *
  * @param {NodeBuilder} builder - The current node builder.
  * @param {InstancedBufferAttribute|StorageInstancedBufferAttribute} instanceMatrix - The matrix buffer attribute.
+ * @param {boolean} [shared=false] - Whether the matrices are resolved from the rendered object.
  * @returns {Node} The matrix node.
  */
-function createInstanceMatrixNode( builder, instanceMatrix ) {
+function createInstanceMatrixNode( builder, instanceMatrix, shared = false ) {
 
 	let instanceMatrixNode;
 	const matrixCount = Math.max( instanceMatrix.count, 1 );
@@ -160,24 +142,23 @@ function createInstanceMatrixNode( builder, instanceMatrix ) {
 
 		const uniformBufferSize = matrixCount * 16 * 4;
 
-		if ( uniformBufferSize <= builder.getUniformBufferLimit() ) {
+		if ( ! shared && uniformBufferSize <= builder.getUniformBufferLimit() ) {
 
 			instanceMatrixNode = buffer( instanceMatrix.array, 'mat4', matrixCount ).element( instanceIndex );
 
 		} else {
 
-			const interleaved = getInterleavedMatrix( instanceMatrix );
+			const columns = getMatrixColumns( instanceMatrix ).map( ( column, i ) => {
 
-			const bufferFn = instanceMatrix.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
+				const node = instancedBufferAttribute( column );
 
-			const instanceBuffers = [
-				bufferFn( interleaved, 'vec4', 16, 0 ),
-				bufferFn( interleaved, 'vec4', 16, 4 ),
-				bufferFn( interleaved, 'vec4', 16, 8 ),
-				bufferFn( interleaved, 'vec4', 16, 12 )
-			];
+				if ( shared ) node.setObjectAttribute( object => getMatrixColumns( object.instanceMatrix )[ i ] );
 
-			instanceMatrixNode = mat4( ...instanceBuffers );
+				return node;
+
+			} );
+
+			instanceMatrixNode = mat4( ...columns );
 
 		}
 
@@ -253,7 +234,7 @@ function setupInstance( builder, matrices, colors, shared ) {
 	const isStorageMatrix = matrices.isStorageInstancedBufferAttribute === true;
 	const isStorageColor = colors && colors.isStorageInstancedBufferAttribute === true;
 
-	const instanceMatrixNode = shared ? createSharedMatrixNode( matrices ) : createInstanceMatrixNode( builder, matrices );
+	const instanceMatrixNode = createInstanceMatrixNode( builder, matrices, shared );
 
 	if ( shared ) {
 
