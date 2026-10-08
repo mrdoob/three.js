@@ -414,8 +414,6 @@ class Textures extends DataMap {
 
 						backend.updateTexture( texture, options );
 
-						// the backends upload the whole texture so update ranges are not used yet
-
 						texture.clearUpdateRanges();
 
 					}
