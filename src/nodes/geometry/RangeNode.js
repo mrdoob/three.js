@@ -4,37 +4,14 @@ import { getValueType } from '../core/NodeUtils.js';
 import { buffer } from '../accessors/BufferNode.js';
 import { instancedBufferAttribute } from '../accessors/BufferAttributeNode.js';
 import { instanceIndex } from '../core/IndexNode.js';
-import { isSharedInstancing } from '../accessors/Instance.js';
 import { nodeProxy, float } from '../tsl/TSLBase.js';
 
 import { Vector4 } from '../../math/Vector4.js';
 import { lerp } from '../../math/MathUtils.js';
 import { InstancedBufferAttribute } from '../../core/InstancedBufferAttribute.js';
 
-/**
- * Returns random values between `min` and `max` for the given number of instances.
- *
- * @private
- * @param {Vector4} min - The lower bound.
- * @param {Vector4} max - The upper bound.
- * @param {number} count - The number of instances.
- * @return {Float32Array} Four values per instance.
- */
-function getRandomData( min, max, count ) {
-
-	const array = new Float32Array( count * 4 );
-
-	for ( let i = 0; i < array.length; i ++ ) {
-
-		const index = i % 4;
-
-		array[ i ] = lerp( min.getComponent( index ), max.getComponent( index ), Math.random() );
-
-	}
-
-	return array;
-
-}
+let min = null;
+let max = null;
 
 /**
  * `RangeNode` generates random instanced attribute data in a defined range.
@@ -81,14 +58,6 @@ class RangeNode extends Node {
 		 */
 		this.maxNode = maxNode;
 
-		/**
-		 * The random data of each instanced mesh, for programs shared between instanced meshes.
-		 *
-		 * @private
-		 * @type {WeakMap<InstancedMesh, InstancedBufferAttribute>}
-		 */
-		this._objectData = new WeakMap();
-
 	}
 
 	isCacheable( /*builder*/ ) {
@@ -123,9 +92,7 @@ class RangeNode extends Node {
 	 */
 	generateNodeType( builder ) {
 
-		const object = builder.object;
-
-		return object.count > 1 || isSharedInstancing( object, builder.renderer ) ? builder.getTypeFromLength( this.getVectorLength( builder ) ) : 'float';
+		return builder.object.count > 1 ? builder.getTypeFromLength( this.getVectorLength( builder ) ) : 'float';
 
 	}
 
@@ -165,7 +132,7 @@ class RangeNode extends Node {
 
 		let output = null;
 
-		if ( object.count > 1 || isSharedInstancing( object, builder.renderer ) ) {
+		if ( object.count > 1 ) {
 
 			const minNode = this.getConstNode( this.minNode );
 			const maxNode = this.getConstNode( this.maxNode );
@@ -176,8 +143,11 @@ class RangeNode extends Node {
 			const minLength = builder.getTypeLength( getValueType( minValue ) );
 			const maxLength = builder.getTypeLength( getValueType( maxValue ) );
 
-			const min = new Vector4();
-			const max = new Vector4();
+			min = min || new Vector4();
+			max = max || new Vector4();
+
+			min.setScalar( 0 );
+			max.setScalar( 0 );
 
 			if ( minLength === 1 ) min.setScalar( minValue );
 			else if ( minValue.isColor ) min.set( minValue.r, minValue.g, minValue.b, 1 );
@@ -187,48 +157,36 @@ class RangeNode extends Node {
 			else if ( maxValue.isColor ) max.set( maxValue.r, maxValue.g, maxValue.b, 1 );
 			else max.set( maxValue.x, maxValue.y, maxValue.z || 0, maxValue.w || 0 );
 
+			const stride = 4;
+
+			const length = stride * object.count;
+			const array = new Float32Array( length );
+
+			for ( let i = 0; i < length; i ++ ) {
+
+				const index = i % stride;
+
+				const minElementValue = min.getComponent( index );
+				const maxElementValue = max.getComponent( index );
+
+				array[ i ] = lerp( minElementValue, maxElementValue, Math.random() );
+
+			}
+
 			const nodeType = this.getNodeType( builder );
+			const uniformBufferSize = object.count * 4 * 4; // count * 4 components * 4 bytes (float)
 
-			if ( isSharedInstancing( object, builder.renderer ) ) {
+			if ( uniformBufferSize <= builder.getUniformBufferLimit() ) {
 
-				// Programs shared between instanced meshes read the random data of the rendered mesh.
-
-				const getObjectData = mesh => {
-
-					const count = mesh.instanceMatrix.count;
-					let data = this._objectData.get( mesh );
-
-					if ( data === undefined || data.count !== count ) {
-
-						data = new InstancedBufferAttribute( getRandomData( min, max, count ), 4 );
-						this._objectData.set( mesh, data );
-
-					}
-
-					return data;
-
-				};
-
-				output = instancedBufferAttribute( getObjectData( object ) ).setObjectAttribute( getObjectData ).convert( nodeType );
+				output = buffer( array, 'vec4', object.count ).element( instanceIndex ).convert( nodeType );
 
 			} else {
 
-				const array = getRandomData( min, max, object.count );
-				const uniformBufferSize = object.count * 4 * 4; // count * 4 components * 4 bytes (float)
+				// TODO: Improve anonymous buffer attribute creation removing this part
+				const bufferAttribute = new InstancedBufferAttribute( array, 4 );
+				builder.geometry.setAttribute( '__range' + this.id, bufferAttribute );
 
-				if ( uniformBufferSize <= builder.getUniformBufferLimit() ) {
-
-					output = buffer( array, 'vec4', object.count ).element( instanceIndex ).convert( nodeType );
-
-				} else {
-
-					// TODO: Improve anonymous buffer attribute creation removing this part
-					const bufferAttribute = new InstancedBufferAttribute( array, 4 );
-					builder.geometry.setAttribute( '__range' + this.id, bufferAttribute );
-
-					output = instancedBufferAttribute( bufferAttribute ).convert( nodeType );
-
-				}
+				output = instancedBufferAttribute( bufferAttribute ).convert( nodeType );
 
 			}
 
