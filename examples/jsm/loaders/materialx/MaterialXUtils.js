@@ -64,7 +64,7 @@ function toVec3Channels( input ) {
 // when unset and returning `null` when the value isn't a recognized mode.
 function resolveTextureAddressMode( value ) {
 
-	if ( value === null || value === undefined || value === '' ) return 'periodic';
+	if ( typeof value !== 'string' || value === '' ) return 'periodic';
 
 	const mode = value.trim().toLowerCase();
 	return mode in TEXTURE_ADDRESS_MODE_WRAPPING ? mode : null;
