@@ -1,5 +1,5 @@
 import {
-	Color, DepthFormat, DepthStencilFormat, DepthTexture, FloatType, HalfFloatType, Matrix3, MeshNormalMaterial,
+	Color, DepthFormat, DepthStencilFormat, DepthTexture, FloatType, HalfFloatType, Matrix3, Matrix4, MeshNormalMaterial,
 	NearestFilter, NoBlending, TangentSpaceNormalMap, UnsignedInt248Type, UnsignedIntType, UnsignedShortType, WebGLRenderTarget
 } from 'three';
 import { Pass } from './Pass.js';
@@ -35,6 +35,13 @@ const _shaderProperties = [ 'side', 'flatShading', 'normalMapType', 'wireframe',
  * metalness 0) in an RGBA half-float
  * NoColorSpace texture, exposed as materialTexture. It shares the depth buffer.
  *
+ * With options.velocity, an optional half-float attachment stores RG = current
+ * minus previous unjittered NDC position, B = previous window depth, A = valid
+ * history (0 or 1). Use RG * 0.5 for bottom-left-origin UV motion. It includes
+ * camera and rigid mesh motion. Skinned, morphing, instanced and batched meshes
+ * write invalid history: their previous vertex deformation is not retained.
+ * Call resetVelocity() after camera cuts or discontinuous scene changes.
+ *
  * ```js
  * const gBufferPass = new GBufferPass( scene, camera, width, height );
  * ssaoPass.setGBuffer( gBufferPass.depthTexture, gBufferPass.normalTexture );
@@ -58,6 +65,7 @@ class GBufferPass extends Pass {
 	 * @param {number} [options.depthTextureType=UnsignedInt248Type] - UnsignedShortType (16-bit),
 	 * UnsignedIntType (24-bit), FloatType (32-bit), or UnsignedInt248Type (24-bit with stencil).
 	 * @param {boolean} [options.material=false] - Adds a second attachment with roughness and metalness.
+	 * @param {boolean} [options.velocity=false] - Adds rigid mesh and camera motion vectors.
 	 */
 	constructor( scene, camera, width = 512, height = 512, options = {} ) {
 
@@ -83,9 +91,16 @@ class GBufferPass extends Pass {
 			magFilter: NearestFilter,
 			type: HalfFloatType,
 			depthTexture,
-			count: options.material === true ? 2 : 1
+			count: 1 + Number( options.material === true ) + Number( options.velocity === true )
 		} );
 		this._material = options.material === true;
+		this._velocity = options.velocity === true;
+		this._velocityKeys = new WeakMap();
+		this._velocityHistory = new WeakMap();
+		this._velocityFrame = 0;
+		this._velocityProjectionMatrix = null;
+		this._currentViewProjection = new Matrix4();
+		this._previousViewProjection = new Matrix4();
 		this._materialCache = new Map();
 		this._invisibleMaterial = new MeshNormalMaterial();
 		this._invisibleMaterial.visible = false;
@@ -130,12 +145,67 @@ class GBufferPass extends Pass {
 
 	}
 
-	_getMaterial( source ) {
+	/**
+	 * Optional motion texture. Its identity remains stable when resized.
+	 *
+	 * @type {?Texture}
+	 * @readonly
+	 */
+	get velocityTexture() {
+
+		return this._velocity ? this._renderTarget.textures[ this._material ? 2 : 1 ] : null;
+
+	}
+
+	/**
+	 * Supplies an unjittered projection for motion vectors, or null to use the camera.
+	 *
+	 * @param {?Matrix4} matrix - The projection matrix.
+	 * @return {?Matrix4} The previous override.
+	 */
+	setVelocityProjectionMatrix( matrix ) {
+
+		const previous = this._velocityProjectionMatrix;
+		this._velocityProjectionMatrix = matrix;
+		return previous;
+
+	}
+
+	/** Clears motion history after a camera cut or discontinuous scene change. */
+	resetVelocity() {
+
+		this._velocityHistory = new WeakMap();
+		this._velocityFrame = 0;
+
+	}
+
+	_getMaterial( source, object ) {
 
 		if ( source === undefined ) return source;
 		if ( source.visible === false || ( source.transparent === true && source.alphaTest === 0 ) ) return this._invisibleMaterial;
 
-		let entry = this._materialCache.get( source );
+		let key = source;
+		if ( this._velocity ) {
+
+			let keys = this._velocityKeys.get( object );
+			if ( keys === undefined ) {
+
+				keys = new WeakMap();
+				this._velocityKeys.set( object, keys );
+
+			}
+
+			key = keys.get( source );
+			if ( key === undefined ) {
+
+				key = {};
+				keys.set( source, key );
+
+			}
+
+		}
+
+		let entry = this._materialCache.get( key );
 
 		if ( entry === undefined ) {
 
@@ -145,12 +215,12 @@ class GBufferPass extends Pass {
 
 				material.dispose();
 				source.removeEventListener( 'dispose', onDispose );
-				this._materialCache.delete( source );
+				this._materialCache.delete( key );
 
 			};
 
 			source.addEventListener( 'dispose', onDispose );
-			entry = { material, channels: {}, version: - 1, onDispose, uniforms: { gRoughness: { value: 1 }, gMetalness: { value: 0 } } };
+			entry = { source, material, channels: {}, version: - 1, onDispose, uniforms: { gRoughness: { value: 1 }, gMetalness: { value: 0 } } };
 
 			if ( this._material ) {
 
@@ -178,7 +248,60 @@ class GBufferPass extends Pass {
 
 			}
 
-			this._materialCache.set( source, entry );
+			if ( this._velocity ) {
+
+				Object.assign( entry.uniforms, {
+					gCurrentViewProjection: { value: this._currentViewProjection },
+					gPreviousViewProjection: { value: this._previousViewProjection },
+					gPreviousModelMatrix: { value: new Matrix4() },
+					gVelocityValid: { value: 0 }
+				} );
+				const compileMaterial = material.onBeforeCompile;
+				material.customProgramCacheKey = () => 'GBufferPass.velocity.' + this._material;
+				material.onBeforeCompile = shader => {
+
+					compileMaterial( shader );
+					Object.assign( shader.uniforms, entry.uniforms );
+					shader.vertexShader = /* glsl */`
+						uniform mat4 gCurrentViewProjection;
+						uniform mat4 gPreviousViewProjection;
+						uniform mat4 gPreviousModelMatrix;
+						varying vec4 vGCurrentClip;
+						varying vec4 vGPreviousClip;
+					` + shader.vertexShader.replace( '#include <project_vertex>', /* glsl */`
+						#include <project_vertex>
+						vGCurrentClip = gCurrentViewProjection * modelMatrix * vec4( transformed, 1.0 );
+						vGPreviousClip = gPreviousViewProjection * gPreviousModelMatrix * vec4( transformed, 1.0 );
+					` );
+					shader.fragmentShader = /* glsl */`
+						uniform float gVelocityValid;
+						varying vec4 vGCurrentClip;
+						varying vec4 vGPreviousClip;
+						layout(location = ${ this._material ? 2 : 1 }) out highp vec4 gVelocity;
+					` + shader.fragmentShader.replace( '#ifdef OPAQUE', /* glsl */`
+						vec3 previousNDC = vGPreviousClip.xyz / max( vGPreviousClip.w, 1e-7 );
+						vec2 currentNDC = vGCurrentClip.xy / max( vGCurrentClip.w, 1e-7 );
+						float valid = gVelocityValid * float( vGPreviousClip.w > 0.0 );
+						gVelocity = vec4( currentNDC - previousNDC.xy, previousNDC.z * 0.5 + 0.5, valid );
+						#ifdef OPAQUE
+					` );
+
+				};
+
+			}
+
+			this._materialCache.set( key, entry );
+
+		}
+
+		if ( this._velocity ) {
+
+			const previous = this._velocityHistory.get( object );
+			const valid = previous !== undefined && previous.frame === this._velocityFrame - 1 &&
+				! object.isSkinnedMesh && ! object.isInstancedMesh && ! object.isBatchedMesh &&
+				object.morphTargetInfluences === undefined;
+			entry.uniforms.gPreviousModelMatrix.value.copy( valid ? previous.matrix : object.matrixWorld );
+			entry.uniforms.gVelocityValid.value = valid ? 1 : 0;
 
 		}
 
@@ -265,12 +388,22 @@ class GBufferPass extends Pass {
 		const shadowMapEnabled = renderer.shadowMap.enabled;
 		const materials = new Map();
 		const overrides = new Map();
-		const getOverride = source => {
+		const getOverride = ( source, object ) => {
 
-			if ( ! overrides.has( source ) ) overrides.set( source, this._getMaterial( source ) );
+			if ( this._velocity ) return this._getMaterial( source, object );
+			if ( ! overrides.has( source ) ) overrides.set( source, this._getMaterial( source, object ) );
 			return overrides.get( source );
 
 		};
+
+		if ( this._velocity ) {
+
+			if ( scene.matrixWorldAutoUpdate ) scene.updateMatrixWorld();
+			if ( this.camera.parent === null && this.camera.matrixWorldAutoUpdate ) this.camera.updateMatrixWorld();
+			this._currentViewProjection.multiplyMatrices( this._velocityProjectionMatrix || this.camera.projectionMatrix, this.camera.matrixWorldInverse );
+			if ( this._velocityFrame === 0 ) this._previousViewProjection.copy( this._currentViewProjection );
+
+		}
 
 		try {
 
@@ -283,7 +416,7 @@ class GBufferPass extends Pass {
 					const source = object.material;
 					materials.set( object, source );
 					const mesh = object.isMesh && ! object.isLine2;
-					object.material = mesh ? ( Array.isArray( source ) ? source.map( getOverride ) : getOverride( source ) ) : this._invisibleMaterial;
+					object.material = mesh ? ( Array.isArray( source ) ? source.map( material => getOverride( material, object ) ) : getOverride( source, object ) ) : this._invisibleMaterial;
 
 				}
 
@@ -296,6 +429,19 @@ class GBufferPass extends Pass {
 			renderer.setClearColor( 0x7777ff, 1 );
 			renderer.clear();
 			renderer.render( scene, this.camera );
+
+			if ( this._velocity ) {
+
+				for ( const object of materials.keys() ) {
+
+					this._velocityHistory.set( object, { matrix: object.matrixWorld.clone(), frame: this._velocityFrame } );
+
+				}
+
+				this._previousViewProjection.copy( this._currentViewProjection );
+				this._velocityFrame ++;
+
+			}
 
 		} finally {
 
@@ -319,6 +465,7 @@ class GBufferPass extends Pass {
 	 */
 	setSize( width, height ) {
 
+		if ( this._renderTarget.width !== width || this._renderTarget.height !== height ) this.resetVelocity();
 		this._renderTarget.setSize( width, height );
 
 	}
@@ -330,9 +477,9 @@ class GBufferPass extends Pass {
 
 		this._renderTarget.dispose();
 		this._invisibleMaterial.dispose();
-		for ( const [ source, entry ] of this._materialCache ) {
+		for ( const entry of this._materialCache.values() ) {
 
-			source.removeEventListener( 'dispose', entry.onDispose );
+			entry.source.removeEventListener( 'dispose', entry.onDispose );
 			entry.material.dispose();
 
 		}

@@ -210,6 +210,7 @@ export * from './postprocessing/SSRPass.js';
 export * from './postprocessing/SavePass.js';
 export * from './postprocessing/ShaderPass.js';
 export * from './postprocessing/TAARenderPass.js';
+export * from './postprocessing/TRAAPass.js';
 export * from './postprocessing/TexturePass.js';
 export * from './postprocessing/UnrealBloomPass.js';
 
@@ -263,6 +264,7 @@ export * from './shaders/SobelOperatorShader.js';
 export * from './shaders/SubsurfaceScatteringShader.js';
 export * from './shaders/TechnicolorShader.js';
 export * from './shaders/ToonShader.js';
+export * from './shaders/TRAAShader.js';
 export * from './shaders/TriangleBlurShader.js';
 export * from './shaders/UnpackDepthRGBAShader.js';
 export * from './shaders/VelocityShader.js';
