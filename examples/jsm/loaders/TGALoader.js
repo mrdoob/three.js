@@ -192,18 +192,19 @@ class TGALoader extends DataTextureLoader {
 		function tgaGetImageData8bits( imageData, y_start, y_step, y_end, x_start, x_step, x_end, image, palettes ) {
 
 			const colormap = palettes;
-			let color, i = 0, x, y;
+			const colormap_index = header.colormap_index;
+			let index, i = 0, x, y;
 			const width = header.width;
 
 			for ( y = y_start; y !== y_end; y += y_step ) {
 
 				for ( x = x_start; x !== x_end; x += x_step, i ++ ) {
 
-					color = image[ i ];
+					index = image[ i ] - colormap_index; // map from full color map index to stored palette index
 					imageData[ ( x + width * y ) * 4 + 3 ] = 255;
-					imageData[ ( x + width * y ) * 4 + 2 ] = colormap[ ( color * 3 ) + 0 ];
-					imageData[ ( x + width * y ) * 4 + 1 ] = colormap[ ( color * 3 ) + 1 ];
-					imageData[ ( x + width * y ) * 4 + 0 ] = colormap[ ( color * 3 ) + 2 ];
+					imageData[ ( x + width * y ) * 4 + 2 ] = colormap[ ( index * 3 ) + 0 ];
+					imageData[ ( x + width * y ) * 4 + 1 ] = colormap[ ( index * 3 ) + 1 ];
+					imageData[ ( x + width * y ) * 4 + 0 ] = colormap[ ( index * 3 ) + 2 ];
 
 				}
 
