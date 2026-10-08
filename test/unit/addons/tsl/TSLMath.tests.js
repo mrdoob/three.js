@@ -1,5 +1,5 @@
 import {
-	float, int, uint,
+	float, int, uint, vec2, vec3, vec4, Fn, Loop,
 	abs, sign, floor, ceil, round, trunc, fract,
 	sin, cos, tan, asin, acos, atan,
 	exp, exp2, log, log2, sqrt, inverseSqrt, pow,
@@ -60,7 +60,62 @@ export default QUnit.module( 'TSL', () => {
 
 			for ( const [ y, x ] of cases ) {
 
-				assert.closeAbs( atan( float( y ), float( x ) ), float( Math.atan2( y, x ) ), 1e-5, `atan(${ y }, ${ x })` );
+				// Native WebGL atan can differ by ~1.1e-5 on NVIDIA hardware.
+				assert.closeAbs( atan( float( y ), float( x ) ), float( Math.atan2( y, x ) ), 1e-4, `atan(${ y }, ${ x })` );
+
+			}
+
+		} );
+
+		gpuTest( 'atan integrates cubemap solid angles inside nested loops', ( { assert } ) => {
+
+			// One face subtends 2*pi/3 steradians. ANGLE/SwiftShader previously
+			// produced ~14.258 instead; this also reproduces without Three.js:
+			// https://github.com/bhouston/swift-shader-atan-bug
+			const integral = Fn( () => {
+
+				const sum = float( 0 ).toVar();
+				const area = ( x, y ) => atan( x.mul( y ), x.mul( x ).add( y.mul( y ) ).add( 1 ).sqrt() );
+
+				Loop( 4, 4, ( { i, j } ) => {
+
+					const x = float( i ).mul( 0.5 ).sub( 1 );
+					const y = float( 1 ).sub( float( j ).mul( 0.5 ) );
+					sum.addAssign( area( x, y ).sub( area( x, y.sub( 0.5 ) ) )
+						.sub( area( x.add( 0.5 ), y ) ).add( area( x.add( 0.5 ), y.sub( 0.5 ) ) ).abs() );
+
+				} );
+
+				return sum;
+
+			} )();
+
+			assert.closeAbs( integral, float( 2 * Math.PI / 3 ), 1e-4, 'Cubemap face solid angle' );
+
+		} );
+
+		gpuTest( 'atan preserves vector overloads and scalar broadcasting', ( { assert } ) => {
+
+			const y = vec4( 1, - 1, 2, - 2 ).toVar();
+			const x = vec4( 1, 1, - 1, - 1 ).toVar();
+			const expected = [ Math.atan2( 1, 1 ), Math.atan2( - 1, 1 ), Math.atan2( 2, - 1 ), Math.atan2( - 2, - 1 ) ];
+
+			assert.closeAbs( atan( y.xy, x.xy ), vec2( ...expected.slice( 0, 2 ) ), 1e-4, 'vec2 atan' );
+			assert.closeAbs( atan( y.xyz, x.xyz ), vec3( ...expected.slice( 0, 3 ) ), 1e-4, 'vec3 atan' );
+			assert.closeAbs( atan( y, x ), vec4( ...expected ), 1e-4, 'vec4 atan' );
+			assert.closeAbs( atan( y, float( 1 ).toVar() ), vec4( Math.atan2( 1, 1 ), Math.atan2( - 1, 1 ), Math.atan2( 2, 1 ), Math.atan2( - 2, 1 ) ), 1e-4, 'Scalar denominator broadcasts' );
+			assert.closeAbs( atan( float( 1 ).toVar(), x ), vec4( Math.atan2( 1, 1 ), Math.atan2( 1, 1 ), Math.atan2( 1, - 1 ), Math.atan2( 1, - 1 ) ), 1e-4, 'Scalar numerator broadcasts' );
+
+		} );
+
+		gpuTest( 'atan handles bounded and extreme positive-denominator ratios', ( { assert } ) => {
+
+			for ( const [ y, x ] of [
+				[ 2, 1 ], [ - 2, 1 ], [ 0.0001, 1 ], [ - 0.0001, 1 ],
+				[ 1e30, 1e-30 ], [ - 1e30, 1e-30 ], [ 1e-30, 1e30 ]
+			] ) {
+
+				assert.closeAbs( atan( float( y ).toVar(), float( x ).toVar() ), float( Math.atan2( y, x ) ), 1e-4, `atan(${ y }, ${ x })` );
 
 			}
 

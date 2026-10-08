@@ -1,7 +1,7 @@
 import Node from '../core/Node.js';
 import { sub, mul, div, mod } from './OperatorNode.js';
 import { addMethodChaining, nodeObject, nodeProxyIntent, float, vec2, vec3, vec4, Fn } from '../tsl/TSLCore.js';
-import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../../constants.js';
+import { WebGLCoordinateSystem } from '../../constants.js';
 import { error } from '../../utils.js';
 
 /**
@@ -291,7 +291,7 @@ class MathNode extends Node {
 
 			} else {
 
-				if ( coordinateSystem === WebGPUCoordinateSystem && method === MathNode.ATAN && b !== null ) {
+				if ( method === MathNode.ATAN && b !== null ) {
 
 					method = 'atan2';
 

@@ -10,6 +10,25 @@ import { DataTexture } from '../../../textures/DataTexture.js';
 import { error } from '../../../utils.js';
 
 const glslPolyfills = {
+	atan2: new CodeNode( /* glsl */`
+float tsl_atan2( float y, float x ) {
+	// Avoid incorrect two-argument atan results in loops on ANGLE/SwiftShader.
+	if ( x > 0.0 ) {
+		// Keep the quotient bounded when y is much larger than x.
+		return abs( y ) > x ? sign( y ) * 1.5707963267948966 - atan( x / y ) : atan( y / x );
+	}
+	return atan( y, x );
+}
+vec2 tsl_atan2( vec2 y, vec2 x ) {
+	return vec2( tsl_atan2( y.x, x.x ), tsl_atan2( y.y, x.y ) );
+}
+vec3 tsl_atan2( vec3 y, vec3 x ) {
+	return vec3( tsl_atan2( y.x, x.x ), tsl_atan2( y.y, x.y ), tsl_atan2( y.z, x.z ) );
+}
+vec4 tsl_atan2( vec4 y, vec4 x ) {
+	return vec4( tsl_atan2( y.x, x.x ), tsl_atan2( y.y, x.y ), tsl_atan2( y.z, x.z ), tsl_atan2( y.w, x.w ) );
+}
+` ),
 	textureGather: new CodeNode( /* glsl */`
 vec4 tsl_textureGather( const int comp, sampler2D map, vec2 coord, ivec2 offset, bool flipY ) {
 	if ( flipY ) offset.y = - offset.y;
@@ -77,6 +96,7 @@ vec4 tsl_textureGatherCompare_array( sampler2DArrayShadow map, vec3 coord, ivec2
 };
 
 const glslMethods = {
+	atan2: 'tsl_atan2',
 	equals: 'equal',
 	bitcast_float_int: 'floatBitsToInt',
 	bitcast_int_float: 'intBitsToFloat',
