@@ -49,7 +49,7 @@
 			import { acceleratedRaycast, computeBoundsTree } from 'three-mesh-bvh';
 
 			const MAX_VPLS = 1024;
-			const params = { mode: 'combined', count: 256, shadows: true, shadowResolution: 64, shadowBias: 0, showVPLs: false, seed: 1, minDistance: 1, progressive: false };
+			const params = { mode: 'combined', count: 256, shadows: true, shadowResolution: 64, showVPLs: false, seed: 1, minDistance: 1, progressive: false };
 
 			init();
 
@@ -130,14 +130,6 @@
 				let previewCount = params.count;
 				let nextPreviewTime = Infinity;
 				const intensities = sourceLights.map( light => light.intensity );
-
-				function updateShadowBias() {
-
-					for ( const light of sourceLights ) light.shadow.bias = params.shadowBias;
-
-				}
-
-				updateShadowBias();
 
 				function updateVisibility() {
 
@@ -223,7 +215,6 @@
 		vpl.minDistance.value = value;
 
 	} );
-				shadowParameters.add( params, 'shadowBias', - 0.01, 0.01, 0.0001 ).name( 'Direct Shadow Bias' ).info( 'Bias for direct point-light shadows. Set to zero to compare contact shadows.' ).onChange( updateShadowBias );
 				gui.add( params, 'showVPLs' ).name( 'Show VPLs' ).onChange( value => {
 
 		helper.visible = value;
@@ -237,7 +228,6 @@
 					window.vplBenchmark = createBenchmark( renderer, scene, camera, settings => {
 
 						Object.assign( params, settings );
-						updateShadowBias();
 						vpl.minDistance.value = params.minDistance;
 						vpl.shadows.value = params.shadows;
 						regenerate();
