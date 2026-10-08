@@ -517,6 +517,12 @@ class ReflectorBaseNode extends Node {
 		virtualCamera.updateMatrixWorld();
 		virtualCamera.projectionMatrix.copy( camera.projectionMatrix );
 
+		// the reflection is sampled with flipped x (see _defaultUV) so the frustum must be mirrored, too.
+		// this only matters for asymmetric frustums e.g. when using a view offset
+
+		virtualCamera.projectionMatrix.elements[ 8 ] *= - 1;
+		virtualCamera.projectionMatrix.elements[ 12 ] *= - 1;
+
 		// Now update projection matrix with new clip plane, implementing code from: http://www.terathon.com/code/oblique.html
 		// Paper explaining this technique: http://www.terathon.com/lengyel/Lengyel-Oblique.pdf
 		_reflectorPlane.setFromNormalAndCoplanarPoint( _normal, _reflectorWorldPosition );
