@@ -11,7 +11,7 @@ import { add } from '../math/OperatorNode.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { Loop } from '../utils/LoopNode.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
-import { Compatibility, GreaterEqualCompare, HalfFloatType, LessEqualCompare, LinearFilter, NearestFilter, PCFShadowMap, RGFormat, VSMShadowMap } from '../../constants.js';
+import { Compatibility, GreaterEqualCompare, HalfFloatType, LessEqualCompare, LinearFilter, NearestFilter, PCFShadowMap, RGFormat, VSMShadowMap, WebGPUCoordinateSystem } from '../../constants.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import { viewZToLogarithmicDepth, perspectiveDepthToViewZ, orthographicDepthToViewZ, viewZToOrthographicDepth } from '../display/ViewportDepthNode.js';
 import { lightShadowMatrix } from '../accessors/Lights.js';
@@ -495,8 +495,9 @@ class ShadowNode extends ShadowBaseNode {
 
 			if ( shadowMap.texture.isCubeTexture ) {
 
-				// For cube shadow maps (point lights), use cubeTexture with vec3 coordinates
-				shadowColor = cubeTexture( shadowMap.texture, shadowCoord.xyz );
+				// Compensate for the color cube's X flip to match the depth cube's Y flip on WebGPU.
+				const shadowColorCoord = renderer.coordinateSystem === WebGPUCoordinateSystem ? shadowCoord.xyz.mul( vec3( - 1, - 1, 1 ) ) : shadowCoord.xyz;
+				shadowColor = cubeTexture( shadowMap.texture, shadowColorCoord );
 
 			} else {
 
