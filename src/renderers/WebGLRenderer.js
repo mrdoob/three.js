@@ -3716,7 +3716,7 @@ class WebGLRenderer {
 		this._outputColorSpace = colorSpace;
 
 		const gl = this.getContext();
-		gl.drawingBufferColorSpace = ColorManagement._getDrawingBufferColorSpace( colorSpace );
+		gl.drawingBufferColorSpace = colorSpace;
 		gl.unpackColorSpace = ColorManagement._getUnpackColorSpace();
 
 	}
