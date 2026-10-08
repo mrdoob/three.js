@@ -210,7 +210,6 @@ export const instance = /*@__PURE__*/ Fn( ( [ matrices, colors = null ], builder
  */
 function setupInstance( builder, matrices, colors, shared ) {
 
-	const isStorageMatrix = matrices.isStorageInstancedBufferAttribute === true;
 	const isStorageColor = colors && colors.isStorageInstancedBufferAttribute === true;
 
 	const instanceMatrixNode = createInstanceMatrixNode( builder, matrices, shared );
@@ -225,20 +224,7 @@ function setupInstance( builder, matrices, colors, shared ) {
 
 	}
 
-	// interleaved buffer tracking for matrix
-	let interleavedMatrix = null;
-
-	if ( ! isStorageMatrix && ! shared ) {
-
-		const uniformBufferSize = Math.max( matrices.count, 1 ) * 16 * 4;
-
-		if ( uniformBufferSize > builder.getUniformBufferLimit() ) {
-
-			interleavedMatrix = getMatrixColumns( matrices )[ 0 ].data;
-
-		}
-
-	}
+	const hasInterleavedMatrix = ! shared && _matrixColumns.has( matrices );
 
 	let instanceColorNode = null;
 	let interleavedColor = null;
@@ -271,11 +257,11 @@ function setupInstance( builder, matrices, colors, shared ) {
 	}
 
 	// Synchronization of dynamic buffer updates per frame.
-	if ( interleavedMatrix !== null || interleavedColor !== null ) {
+	if ( hasInterleavedMatrix || interleavedColor !== null ) {
 
 		OnBeforeFrameUpdate( () => {
 
-			if ( interleavedMatrix !== null ) syncInterleavedMatrix( matrices );
+			if ( hasInterleavedMatrix ) syncInterleavedMatrix( matrices );
 
 			if ( colors && interleavedColor !== null && interleavedColor.version !== colors.version ) {
 
