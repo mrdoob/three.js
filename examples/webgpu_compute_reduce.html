@@ -956,11 +956,11 @@
 					'Debug Buffer': debugStorage,
 				};
 
-				let readbackBuffers = {};
+				const readbackBuffers = {};
 
-				for (const [key, storageNode] of Object.entries(storageNodes)) {
+				for ( const [ key, storageNode ] of Object.entries( storageNodes ) ) {
 
-					readbackBuffers[key] = new THREE.ReadbackBuffer(storageNode.value.array.byteLength);
+					readbackBuffers[ key ] = new THREE.ReadbackBuffer( storageNode.value.array.byteLength );
 
 				}
 
@@ -973,7 +973,7 @@
 
 					await renderer.getArrayBufferAsync( selectedStorageNode.value, readbackBuffer );
 
-					console.log( new Uint32Array( readbackBuffer.buffer ));
+					console.log( new Uint32Array( readbackBuffer.buffer ) );
 
 					// Release GPU/CPU readback buffer so it can be remapped for next log.
 
