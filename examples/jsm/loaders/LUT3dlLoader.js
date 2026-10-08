@@ -160,7 +160,7 @@ export class LUT3dlLoader extends Loader {
 		}
 
 		// Determine the bit depth to scale the values to [0.0, 1.0].
-		const bits = Math.ceil( Math.log2( maxValue ) );
+		const bits = Math.max( 0, Math.ceil( Math.log2( maxValue ) ) );
 		const maxBitValue = Math.pow( 2, bits );
 
 		const data = this.type === UnsignedByteType ? new Uint8Array( dataFloat.length ) : dataFloat;
