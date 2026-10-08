@@ -230,9 +230,9 @@ class PDBLoader extends Loader {
 
 			if ( lines[ i ].slice( 0, 4 ) === 'ATOM' || lines[ i ].slice( 0, 6 ) === 'HETATM' ) {
 
-				const x = parseFloat( lines[ i ].slice( 30, 37 ) );
-				const y = parseFloat( lines[ i ].slice( 38, 45 ) );
-				const z = parseFloat( lines[ i ].slice( 46, 53 ) );
+				const x = parseFloat( lines[ i ].slice( 30, 38 ) );
+				const y = parseFloat( lines[ i ].slice( 38, 46 ) );
+				const z = parseFloat( lines[ i ].slice( 46, 54 ) );
 				const index = parseInt( lines[ i ].slice( 6, 11 ) ) - 1;
 
 				let e = trim( lines[ i ].slice( 76, 78 ) ).toLowerCase();
