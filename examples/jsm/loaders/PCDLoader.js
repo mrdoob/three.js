@@ -258,14 +258,20 @@ class PCDLoader extends Loader {
 
 				data += char;
 
+				if ( char === '\r' && buffer[ i ] === 10 ) {
+
+					data += '\n';
+					i ++;
+
+				}
+
 			}
 
-			const result1 = data.search( /[\r\n]DATA\s(\S*)\s/i );
-			const result2 = /[\r\n]DATA\s(\S*)\s/i.exec( data.slice( result1 - 1 ) );
+			const result = /[\r\n]DATA\s(\S*)\s/i.exec( data );
 
-			PCDheader.data = result2[ 1 ];
-			PCDheader.headerLen = result2[ 0 ].length + result1;
-			PCDheader.str = data.slice( 0, PCDheader.headerLen );
+			PCDheader.data = result[ 1 ];
+			PCDheader.headerLen = i;
+			PCDheader.str = data;
 
 			// remove comments
 
