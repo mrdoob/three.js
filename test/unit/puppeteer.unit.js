@@ -63,6 +63,13 @@ function main() {
 			'--no-sandbox'
 		];
 
+		// Exercise software WebGPU independently of the native adapter.
+		if ( process.argv.includes( '--swiftshader' ) ) {
+
+			flags.push( '--use-webgpu-adapter=swiftshader' );
+
+		}
+
 		let testPage = '';
 		let testMode = '';
 
@@ -70,7 +77,7 @@ function main() {
 
 		if ( process.argv[ argvIndex ].startsWith( '--testPage' ) ) {
 
-			testPage = process.argv[ argvIndex ].split( '=' )[ 1 ];
+			testPage = process.argv[ argvIndex ].slice( '--testPage='.length );
 			argvIndex ++;
 
 		}
@@ -178,6 +185,25 @@ function main() {
 		} );
 
 		const failures = await page.evaluate( () => window._QUnitFailures );
+
+		if ( process.argv.includes( '--swiftshader' ) ) {
+
+			const softwareAdapter = await page.evaluate( async () => {
+
+				const adapter = await navigator.gpu?.requestAdapter();
+				return adapter && /swiftshader/i.test( [ adapter.info.vendor, adapter.info.architecture, adapter.info.device, adapter.info.description ].join( ' ' ) );
+
+			} );
+
+			if ( ! softwareAdapter ) {
+
+				red( 'SwiftShader WebGPU adapter is unavailable.' );
+				close( 1 );
+				return;
+
+			}
+
+		}
 
 		white( `1..${stats.total}` );
 		green( `# pass ${stats.passed}` );

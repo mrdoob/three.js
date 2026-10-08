@@ -79,6 +79,27 @@ const wgslTypeLib = {
 const wgslCodeCache = {};
 
 const wgslPolyfill = {
+	atan2_float: new CodeNode( /* wgsl */`
+fn tsl_atan2_float( y : f32, x : f32 ) -> f32 {
+	// SwiftShader selects the wrong quadrant for runtime negative zero.
+	return atan2( select( y, 0.0, y == 0.0 ), x );
+}
+` ),
+	atan2_vec2: new CodeNode( /* wgsl */`
+fn tsl_atan2_vec2( y : vec2f, x : vec2f ) -> vec2f {
+	return atan2( select( y, vec2f( 0.0 ), y == vec2f( 0.0 ) ), x );
+}
+` ),
+	atan2_vec3: new CodeNode( /* wgsl */`
+fn tsl_atan2_vec3( y : vec3f, x : vec3f ) -> vec3f {
+	return atan2( select( y, vec3f( 0.0 ), y == vec3f( 0.0 ) ), x );
+}
+` ),
+	atan2_vec4: new CodeNode( /* wgsl */`
+fn tsl_atan2_vec4( y : vec4f, x : vec4f ) -> vec4f {
+	return atan2( select( y, vec4f( 0.0 ), y == vec4f( 0.0 ) ), x );
+}
+` ),
 	tsl_xor: new CodeNode( 'fn tsl_xor( a : bool, b : bool ) -> bool { return ( a || b ) && !( a && b ); }' ),
 	mod_float: new CodeNode( 'fn tsl_mod_float( x : f32, y : f32 ) -> f32 { return x - y * floor( x / y ); }' ),
 	mod_vec2: new CodeNode( 'fn tsl_mod_vec2( x : vec2f, y : vec2f ) -> vec2f { return x - y * floor( x / y ); }' ),
@@ -217,6 +238,10 @@ fn tsl_biquadraticTexture_array( map : texture_2d_array<f32>, coord : vec2f, iRe
 };
 
 const wgslMethods = {
+	atan2_float: 'tsl_atan2_float',
+	atan2_vec2: 'tsl_atan2_vec2',
+	atan2_vec3: 'tsl_atan2_vec3',
+	atan2_vec4: 'tsl_atan2_vec4',
 	dFdx: 'dpdx',
 	dFdy: '- dpdy',
 	mod_float: 'tsl_mod_float',

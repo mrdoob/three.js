@@ -1,5 +1,5 @@
 import {
-	float, int, uint, uniform,
+	float, int, uint, uniform, vec2, vec3, vec4, Loop,
 	abs, sign, floor, ceil, round, trunc, fract,
 	sin, cos, tan, asin, acos, atan,
 	exp, exp2, log, log2, sqrt, inverseSqrt, pow,
@@ -81,6 +81,37 @@ export default QUnit.module( 'TSL', () => {
 			assert.closeAbs( abs( atan( negativeZero, uniform( - smallestNormal ) ) ), float( Math.PI ), 1e-6, '|atan(-0, -2^-126)|' );
 			assert.closeAbs( atan( negativeSubnormal, uniform( 1 ) ), float( Math.atan2( smallestSubnormal, 1 ) ), 1e-6, 'atan(-2^-149, 1)' );
 			assert.closeAbs( atan( negativeSubnormal, uniform( smallestNormal ) ), float( Math.atan2( smallestSubnormal, smallestNormal ) ), 1e-6, 'atan(-2^-149, 2^-126)' );
+
+		} );
+
+		gpuTest( 'atan handles runtime negative zero in vectors', ( { assert } ) => {
+
+			const zero = uniform( - 1 ).mul( uniform( 0 ) );
+
+			assert.closeAbs( abs( atan( vec2( zero ), uniform( vec2( 1, - 1 ) ) ) ), vec2( 0, Math.PI ), 1e-6, 'vec2 atan' );
+			assert.closeAbs( abs( atan( vec3( zero ), uniform( vec3( 1, - 1, 1 ) ) ) ), vec3( 0, Math.PI, 0 ), 1e-6, 'vec3 atan' );
+			assert.closeAbs( abs( atan( vec4( zero ), uniform( vec4( 1, - 1, 1, - 1 ) ) ) ), vec4( 0, Math.PI, 0, Math.PI ), 1e-6, 'vec4 atan' );
+			assert.closeAbs( atan( uniform( vec4( 1, 1, - 1, - 1 ) ), uniform( vec4( 1, - 1, - 1, 1 ) ) ), vec4( Math.PI / 4, 3 * Math.PI / 4, - 3 * Math.PI / 4, - Math.PI / 4 ), 2e-5, 'runtime nonzero quadrants' );
+
+		} );
+
+		gpuTest( 'atan solid angles sum to one cube face', ( { assert } ) => {
+
+			const sum = float( 0 ).toVar();
+			const texelSize = uniform( 0.5 );
+			const area = ( x, y ) => atan( x.mul( y ), x.mul( x ).add( y.mul( y ) ).add( 1 ).sqrt() );
+
+			Loop( 4, 4, ( { i, j } ) => {
+
+				const x = float( i ).mul( texelSize ).sub( 1 );
+				const y = float( 1 ).sub( float( j ).mul( texelSize ) );
+				const x1 = x.add( texelSize );
+				const y1 = y.sub( texelSize );
+				sum.addAssign( abs( area( x, y ).sub( area( x, y1 ) ).sub( area( x1, y ) ).add( area( x1, y1 ) ) ) );
+
+			} );
+
+			assert.closeAbs( sum, float( 2 * Math.PI / 3 ), 1e-4, 'cube face covers 2*PI/3 steradians' );
 
 		} );
 
