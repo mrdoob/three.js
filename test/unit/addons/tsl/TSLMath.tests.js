@@ -1,5 +1,5 @@
 import {
-	float, int, uint, vec2, vec3, vec4, Fn, Loop,
+	float, int, uint, vec2, vec3, vec4, Fn, Loop, uniform, bitcast,
 	abs, sign, floor, ceil, round, trunc, fract,
 	sin, cos, tan, asin, acos, atan,
 	exp, exp2, log, log2, sqrt, inverseSqrt, pow,
@@ -108,7 +108,7 @@ export default QUnit.module( 'TSL', () => {
 
 		} );
 
-		gpuTest( 'atan handles bounded and extreme positive-denominator ratios', ( { assert } ) => {
+		gpuTest( 'atan preserves nonzero inputs across extreme positive-denominator ratios', ( { assert } ) => {
 
 			for ( const [ y, x ] of [
 				[ 2, 1 ], [ - 2, 1 ], [ 0.0001, 1 ], [ - 0.0001, 1 ],
@@ -116,6 +116,30 @@ export default QUnit.module( 'TSL', () => {
 			] ) {
 
 				assert.closeAbs( atan( float( y ).toVar(), float( x ).toVar() ), float( Math.atan2( y, x ) ), 1e-4, `atan(${ y }, ${ x })` );
+
+			}
+
+		} );
+
+		gpuTest( 'atan handles runtime negative zero with positive denominator', ( { assert } ) => {
+
+			const y = uniform( - 1 ).mul( uniform( 0 ) ).toVar();
+			assert.eq( bitcast( y, 'uint' ), uint( 0x80000000 ), 'Input is runtime negative zero' );
+			assert.closeAbs( atan( y, uniform( 1 ) ), float( 0 ), 1e-6, 'atan(-0, 1)' );
+			assert.closeAbs( atan( y, uniform( Math.pow( 2, - 126 ) ) ), float( 0 ), 1e-6, 'atan(-0, smallest normal positive x)' );
+			// Either signed-zero convention is permitted; the negative-x axis
+			// must remain a native atan call and have angle magnitude PI.
+			assert.closeAbs( abs( atan( y, uniform( - 1 ) ) ), float( Math.PI ), 1e-4, 'atan(-0, -1) preserves the negative-x axis' );
+
+		} );
+
+		gpuTest( 'atan handles negative subnormal numerator', ( { assert } ) => {
+
+			const y = uniform( - Math.pow( 2, - 149 ) ).toVar();
+
+			for ( const x of [ 1, Math.pow( 2, - 126 ) ] ) {
+
+				assert.closeAbs( atan( y, uniform( x ) ), float( Math.atan2( - Math.pow( 2, - 149 ), x ) ), 1e-6, `atan(-2^-149, ${ x })` );
 
 			}
 

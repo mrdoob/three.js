@@ -12,12 +12,8 @@ import { error } from '../../../utils.js';
 const glslPolyfills = {
 	atan2: new CodeNode( /* glsl */`
 float tsl_atan2( float y, float x ) {
-	// Avoid incorrect two-argument atan results in loops on ANGLE/SwiftShader.
-	if ( x > 0.0 ) {
-		// Keep the quotient bounded when y is much larger than x.
-		return abs( y ) > x ? sign( y ) * 1.5707963267948966 - atan( x / y ) : atan( y / x );
-	}
-	return atan( y, x );
+	// ANGLE/SwiftShader can return PI for runtime negative zero with positive x.
+	return atan( y == 0.0 && x > 0.0 ? 0.0 : y, x );
 }
 vec2 tsl_atan2( vec2 y, vec2 x ) {
 	return vec2( tsl_atan2( y.x, x.x ), tsl_atan2( y.y, x.y ) );
