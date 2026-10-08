@@ -410,7 +410,15 @@ class Textures extends DataMap {
 
 					}
 
-					if ( texture.source.dataReady === true ) backend.updateTexture( texture, options );
+					if ( texture.source.dataReady === true ) {
+
+						backend.updateTexture( texture, options );
+
+						// the backends upload the whole texture so update ranges are not used yet
+
+						texture.clearUpdateRanges();
+
+					}
 
 					if ( options.needsMipmaps && texture.mipmaps.length === 0 && texture.mipmapsAutoUpdate === true ) {
 
