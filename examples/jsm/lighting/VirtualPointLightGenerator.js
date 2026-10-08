@@ -9,6 +9,7 @@ import { emissiveSources, sampleEmission, luminance } from './VirtualPointLightS
  */
 class VirtualPointLightGenerator {
 
+	/** @param {number} [capacity=1024] Maximum GPU emitter count. */
 	constructor( capacity = 1024 ) {
 
 		if ( ! Number.isInteger( capacity ) || capacity < 1 ) throw new RangeError( 'Capacity must be a positive integer.' );
@@ -28,7 +29,16 @@ class VirtualPointLightGenerator {
 	 * `bounces` limits diffuse reflections; an emissive surface also contributes its own emission.
 	 * @param {Scene} scene
 	 * @param {Array<PointLight|DirectionalLight>} lights
-	 * @param {Object} [options]
+	 * @param {Object} [options={}]
+	 * @param {number} [options.count=256] Maximum GPU emitter count.
+	 * @param {number} [options.seed=1] Reproducible random seed.
+	 * @param {?Box3} [options.bounds=null] World sampling bounds, required for directional lights.
+	 * @param {number} [options.bounces=1] Maximum diffuse reflections, from 1 to 16.
+	 * @param {number} [options.candidateMultiplier=1] CPU ray-budget multiplier, from 1 to 16.
+	 * @param {boolean} [options.importanceSampling=true] Allocate paths by source luminance times power.
+	 * @param {boolean} [options.emissive=true] Include emission from visible mesh surfaces.
+	 * @param {boolean} [options.stratified=true] Stratify initial directions and emitter areas.
+	 * @param {boolean} [options.spatialResampling=true] Spatially order candidates before flux resampling.
 	 * @return {VirtualPointLightGenerator}
 	 */
 	generate( scene, lights, { count = 256, seed = 1, bounds = null, bounces = 1, candidateMultiplier = 1, importanceSampling = true, emissive = true, stratified = true, spatialResampling = true } = {} ) {
@@ -383,6 +393,3 @@ class TextureSampler {
 
 
 export { VirtualPointLightGenerator };
-
-
-
