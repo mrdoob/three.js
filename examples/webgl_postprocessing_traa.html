@@ -38,7 +38,7 @@
 
 			const query = new URLSearchParams( location.search );
 			const params = {
-				backend: query.get( 'backend' ) || 'WebGL', traa: true, reference: false, paused: false,
+				backend: query.get( 'backend' ) || 'WebGL', traa: true, reference: false, resolutionScale: 1, paused: false,
 				speed: 1, fixedStep: true, cameraMotion: 'Still', cameraCutOffset: 0, transparentBackground: false,
 				resetHistory: () => resetHistory(),
 				restart: () => {
@@ -62,7 +62,7 @@
 
 				}
 			};
-			const { scene, camera, labels, update } = createTRAATestScene();
+			const { scene, camera, labels, update } = await createTRAATestScene();
 			for ( const text of labels ) {
 
 				const label = document.createElement( 'span' );
@@ -82,7 +82,7 @@
 				renderer = new WebGPURenderer( { antialias: false, alpha: true } );
 				await renderer.init();
 				pipeline = new RenderPipeline( renderer );
-				scenePass = pass( scene, camera );
+				scenePass = pass( scene, camera, { samples: 0 } );
 				scenePass.setMRT( mrt( { output, velocity } ) );
 				colorNode = scenePass.getTextureNode( 'output' );
 				depthNode = scenePass.getTextureNode( 'depth' );
@@ -120,6 +120,7 @@
 			} );
 			gui.add( params, 'traa' ).name( 'TRAA enabled' ).onChange( resetHistory );
 			gui.add( params, 'reference' ).name( '2× size reference (no AA)' ).onChange( resize );
+			gui.add( params, 'resolutionScale', { '100% (device)': 1, '75%': 0.75, '50%': 0.5, '25%': 0.25, '12.5%': 0.125 } ).name( 'Render resolution' ).onChange( resize );
 			gui.add( params, 'paused' );
 			gui.add( params, 'fixedStep' ).name( 'Fixed 1/60 step' );
 			gui.add( params, 'speed', 0.1, 4 );
@@ -149,6 +150,7 @@
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
+				renderer.setPixelRatio( window.devicePixelRatio * params.resolutionScale );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				if ( composer ) {
 
@@ -168,7 +170,8 @@
 				if ( composer ) temporal.renderFrame( composer );
 				else pipeline.render();
 				frame ++;
-				document.getElementById( 'status' ).textContent = `${ backendName } | ${ params.reference ? '2× size reference' : params.traa ? 'TRAA' : 'No AA' } | t=${ time.toFixed( 2 ) } | frame ${ frame }`;
+				const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
+				document.getElementById( 'status' ).textContent = `${ backendName } | ${ params.reference ? '2× size reference' : params.traa ? 'TRAA' : 'No AA' } | ${ size.x }×${ size.y } (${ params.resolutionScale * 100 }%) | MSAA off | t=${ time.toFixed( 2 ) } | frame ${ frame }`;
 
 			}
 

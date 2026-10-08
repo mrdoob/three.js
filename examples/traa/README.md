@@ -4,7 +4,22 @@ Open `examples/webgl_postprocessing_traa.html` with the example server. Select
 WebGL or WebGPU in the GUI; the backend selector reloads the page. Both runners
 use `scene.js`, the same materials, geometry, camera and analytic animations.
 The WebGL runner uses GBufferPass + TRAAPass; WebGPU uses the existing TRAANode.
-MSAA is disabled. Neither implementation was upgraded beyond the new WebGL port.
+MSAA is disabled in both the canvas and scene render targets. Neither implementation was upgraded beyond the new WebGL port.
+
+The glossy knot uses a periodic wavy bump texture and the existing Venice sunset
+HDR environment for colored reflections. That environment is also the opaque
+background; the transparency toggle removes the visible background while keeping
+it for lighting/reflections.
+
+**Render resolution** scales the canvas drawing buffer relative to device pixels
+(100%, 75%, 50%, 25%, or 12.5%), keeping its CSS size unchanged. On a 2× Retina
+screen, 50% gives one render pixel per CSS pixel; 25% gives half that resolution.
+Both TRAA implementations resolve at that lower resolution before the browser
+scales the canvas for display. This is ordinary downsampling for testing, not
+TRAA upscaling. The WebGPU canvas and scene pass use matching resolutions so
+camera jitter remains one fraction of an actual render pixel. Changing the scale
+resets history. The status line shows the drawing-buffer dimensions and MSAA state.
+The 2× reference renders twice the selected resolution in each dimension.
 
 ## Repeatable visual checks
 
@@ -21,7 +36,7 @@ also affect the comparison. Reference mode disables temporal accumulation.
 | Static fine checker and thin diagonal bars | Shimmer, detail loss, slow convergence, unstable silhouettes |
 | Linear translation | Trails, blur, sign errors in motion, subpixel phase changes |
 | Rotating checker/spokes | Rotational motion accuracy; disappearing thin features |
-| Glossy knot, bright environment strips, moving light | Specular shimmer and history lag; shading/reflections move differently from geometry |
+| Wavy glossy knot, colored HDR environment, moving light | Specular shimmer and history lag; shading/reflections move differently from geometry |
 | Opposing bars and checker | Mixed motion at silhouettes, foreground velocity dilation, ghost trails |
 | Approaching patterned plane | Scale changes, rapidly changing pixel footprints, texture aliasing |
 | Rotating finned cavity | Repeated disocclusion, fresh surface history rejection, color leaking between surfaces |

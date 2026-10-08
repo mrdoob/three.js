@@ -1,4 +1,5 @@
 import puppeteer from 'puppeteer';
+import assert from 'node:assert/strict';
 import { createServer } from '../../utils/server.js';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -10,7 +11,7 @@ try {
 	for ( const backend of [ 'WebGL', 'WebGPU' ] ) {
 
 		const page = await browser.newPage();
-		await page.setViewport( { width: 1280, height: 900 } );
+		await page.setViewport( { width: 1280, height: 900, deviceScaleFactor: 2 } );
 		const errors = [];
 		page.on( 'pageerror', error => errors.push( error.message ) );
 		page.on( 'console', message => {
@@ -40,6 +41,19 @@ try {
 			} else row.querySelector( 'button' ).click();
 
 		}, { name, value } );
+		assert.deepEqual( await page.$eval( 'canvas', canvas => [ canvas.width, canvas.height ] ), [ 2560, 1800 ], 'Full Retina resolution' );
+		if ( backend === 'WebGL' ) {
+
+			assert.equal( await page.$eval( 'canvas', canvas => canvas.getContext( 'webgl2' ).getContextAttributes().antialias ), false, 'MSAA disabled' );
+
+		}
+
+		await change( 'Render resolution', '50%' );
+		assert.deepEqual( await page.$eval( 'canvas', canvas => [ canvas.width, canvas.height ] ), [ 1280, 900 ], 'Half resolution has one pixel per CSS pixel on Retina' );
+		await change( 'Render resolution', '25%' );
+		assert.deepEqual( await page.$eval( 'canvas', canvas => [ canvas.width, canvas.height ] ), [ 640, 450 ], 'Quarter resolution renders below CSS resolution' );
+		await new Promise( resolve => setTimeout( resolve, 700 ) );
+		await page.screenshot( { path: join( tmpdir(), `three-traa-${ backend }-downsampled.png` ) } );
 		await change( 'cameraMotion', 'Orbit' );
 		await change( 'transparentBackground', true );
 		await new Promise( resolve => setTimeout( resolve, 700 ) );
@@ -48,9 +62,10 @@ try {
 		await change( 'TRAA enabled', false );
 		await change( '2× size reference (no AA)', true );
 		await new Promise( resolve => setTimeout( resolve, 700 ) );
-		await page.setViewport( { width: 960, height: 720 } );
+		await page.setViewport( { width: 960, height: 720, deviceScaleFactor: 2 } );
 		await change( '2× size reference (no AA)', false );
 		await change( 'TRAA enabled', true );
+		assert.deepEqual( await page.$eval( 'canvas', canvas => [ canvas.width, canvas.height ] ), [ 480, 360 ], 'Resize preserves the selected Retina resolution scale' );
 		await new Promise( resolve => setTimeout( resolve, 700 ) );
 		console.log( backend, await page.$eval( '#status', element => element.textContent ), errors );
 		await page.close();

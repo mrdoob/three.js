@@ -1,7 +1,8 @@
 import * as THREE from 'three';
+import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 // Procedural, deterministic challenges shared by the WebGL and WebGPU runners.
-export function createTRAATestScene() {
+export async function createTRAATestScene() {
 
 	const scene = new THREE.Scene();
 	const camera = new THREE.PerspectiveCamera( 42, 1, 0.1, 60 );
@@ -11,23 +12,34 @@ export function createTRAATestScene() {
 	const light = new THREE.PointLight( 0xffffff, 100 );
 	light.position.set( 2, 4, 6 );
 	scene.add( light );
-	const environmentData = new Float32Array( 64 * 32 * 4 );
-	for ( let y = 0; y < 32; y ++ ) {
+	const environment = await new HDRLoader().loadAsync( new URL( '../textures/equirectangular/venice_sunset_1k.hdr', import.meta.url ).href );
+	environment.mapping = THREE.EquirectangularReflectionMapping;
+	scene.environment = environment;
+	scene.backgroundBlurriness = 0.15;
 
-		for ( let x = 0; x < 64; x ++ ) {
+	// A periodic height texture perturbs the surface normals without moving geometry.
+	// Its small bright reflections stress shading changes that velocity cannot track.
+	const waveData = new Uint8Array( 256 * 256 * 4 );
+	for ( let y = 0; y < 256; y ++ ) {
 
-			const i = ( y * 64 + x ) * 4;
-			const value = ( x % 16 < 2 && y > 5 && y < 26 ) ? 8 : 0.08;
-			environmentData.set( [ value, value, value, 1 ], i );
+		for ( let x = 0; x < 256; x ++ ) {
+
+			const u = x / 256 * Math.PI * 2;
+			const v = y / 256 * Math.PI * 2;
+			const height = Math.round( 128 + 48 * Math.sin( u * 24 + Math.sin( v * 4 ) ) + 48 * Math.sin( v * 8 ) );
+			waveData.set( [ height, height, height, 255 ], ( y * 256 + x ) * 4 );
 
 		}
 
 	}
 
-	const environment = new THREE.DataTexture( environmentData, 64, 32, THREE.RGBAFormat, THREE.FloatType );
-	environment.mapping = THREE.EquirectangularReflectionMapping;
-	environment.needsUpdate = true;
-	scene.environment = environment;
+	const waves = new THREE.DataTexture( waveData, 256, 256 );
+	waves.wrapS = waves.wrapT = THREE.RepeatWrapping;
+	waves.minFilter = THREE.LinearMipmapLinearFilter;
+	waves.magFilter = THREE.LinearFilter;
+	waves.generateMipmaps = true;
+	waves.needsUpdate = true;
+
 	const checkerData = new Uint8Array( 64 * 64 * 4 );
 	const cutoutData = new Uint8Array( 64 * 64 * 4 );
 	for ( let y = 0; y < 64; y ++ ) {
@@ -99,7 +111,7 @@ export function createTRAATestScene() {
 
 	}
 
-	const shiny = mesh( new THREE.TorusKnotGeometry( 0.55, 0.18, 160, 24 ), new THREE.MeshStandardMaterial( { color: 0xddddff, metalness: 1, roughness: 0.04 } ), groups[ 3 ] );
+	const shiny = mesh( new THREE.TorusKnotGeometry( 0.55, 0.18, 160, 24 ), new THREE.MeshStandardMaterial( { color: 0xddddff, metalness: 1, roughness: 0.04, bumpMap: waves, bumpScale: 0.06 } ), groups[ 3 ] );
 	const rear = mesh( new THREE.PlaneGeometry( 1.7, 1.6 ), patterned, groups[ 4 ] );
 	const front = new THREE.Group();
 	groups[ 4 ].add( front );
@@ -135,7 +147,7 @@ export function createTRAATestScene() {
 
 	function update( time, { cameraMotion = 'Still', cameraCutOffset = 0, transparentBackground = false } = {} ) {
 
-		scene.background = transparentBackground ? null : new THREE.Color( 0x17212b );
+		scene.background = transparentBackground ? null : environment;
 		linear.position.set( 0.65 * Math.sin( time ), 0.18 * Math.cos( time * 0.7 ), 0 );
 		spinner.rotation.z = time * 0.6;
 		shiny.rotation.set( time * 0.3, time * 0.5, 0 );
