@@ -46,29 +46,48 @@ function hasExactInputMatch( nodedef, nodeX ) {
 
 }
 
+// Mirrors `NodeDef::isVersionCompatible()`: an unversioned node takes the default version.
+function isVersionCompatible( nodedef, version ) {
+
+	if ( ( nodedef.version || '' ) === version ) return true;
+	return nodedef.isdefaultversion === true && version === '';
+
+}
+
 /**
- * Resolves the stdlib nodedef of a node instance, mirroring `Node::getNodeDef()` in the
- * MaterialX reference implementation: an explicit `nodedef` attribute wins, otherwise the
- * first nodedef of the same category whose output type matches and whose declared input
- * types match every authored input, otherwise the first nodedef whose output type matches.
+ * Resolves the nodedef of a node instance, mirroring `Node::getNodeDef()` in the MaterialX
+ * reference implementation: an explicit `nodedef` attribute wins, otherwise the first
+ * version-compatible nodedef of the same category, stdlib first and then the document's own,
+ * whose output type matches and whose declared input types match every authored input,
+ * otherwise the first such nodedef whose output type matches.
  *
  * @param {MaterialXNode} nodeX - The node instance.
  * @return {?{name: string, node: string, inputs: Object, outputs: Object}} The resolved nodedef or `null`.
  */
 function resolveNodeDef( nodeX ) {
 
-	const explicitName = nodeX.getAttribute( 'nodedef' );
-	if ( explicitName && registryData.nodedefs[ explicitName ] ) {
+	const documentNodeDefs = nodeX.materialX.getDocumentNodeDefs();
 
-		return { name: explicitName, ...registryData.nodedefs[ explicitName ] };
+	const explicitName = nodeX.getAttribute( 'nodedef' );
+	if ( explicitName ) {
+
+		const nodedef = registryData.nodedefs[ explicitName ] || documentNodeDefs[ explicitName ];
+		if ( nodedef ) return { name: explicitName, ...nodedef };
 
 	}
 
+	const version = nodeX.getAttribute( 'version' ) || '';
+	const candidates = [
+		...getNodeDefNames( nodeX.element ).map( ( name ) => [ name, registryData.nodedefs[ name ] ] ),
+		...Object.entries( documentNodeDefs ).filter( ( [ , nodedef ] ) => nodedef.node === nodeX.element ),
+	];
+
 	let roughMatch = null;
 
-	for ( const name of getNodeDefNames( nodeX.element ) ) {
+	for ( const [ name, nodedef ] of candidates ) {
 
-		const nodedef = registryData.nodedefs[ name ];
+		if ( isVersionCompatible( nodedef, version ) === false ) continue;
+
 		const outputType = getOutputType( nodedef );
 		// Multioutput nodedefs (e.g. separate2/3/4) don't declare a single output type to match
 		// against; authored `type` on those instances instead disambiguates the "in" overload,

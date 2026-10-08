@@ -5,6 +5,7 @@ import { MtlXLibrary } from '../../../../examples/jsm/loaders/materialx/Material
 import { createMaterialXCompileRegistry } from '../../../../examples/jsm/loaders/materialx/compile/MaterialXCompileRegistry.js';
 import registryData from '../../../../examples/jsm/loaders/materialx/MaterialXNodeInterfaceRegistry.js';
 import { getNodeDefNames } from '../../../../examples/jsm/loaders/materialx/MaterialXNodeDefs.js';
+import { createStrictInterfaceValidator } from '../../../../examples/jsm/loaders/materialx/MaterialXInterfaceValidation.js';
 
 const MATERIAL_X = `<?xml version="1.0"?>
 <materialx version="1.39">
@@ -542,6 +543,83 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
+
+			QUnit.test( 'resolves default nodedef versions and document nodedefs like MaterialX', ( assert ) => {
+
+				// Maps node names to the names of their resolved nodedefs.
+				const resolveNodeDefs = ( body ) => {
+
+					const nodeDefs = {};
+					const interfaceValidator = ( rootNode ) => {
+
+						for ( const nodeX of rootNode.children ) nodeDefs[ nodeX.name ] = nodeX.nodeDef ? nodeX.nodeDef.name : null;
+
+					};
+
+					new MaterialXLoader().parse( `<?xml version="1.0"?>\n<materialx version="1.39">${ body }</materialx>`, { throwOnErrors: false, interfaceValidator } );
+					return nodeDefs;
+
+				};
+
+				const versions = resolveNodeDefs( `
+	<UsdUVTexture name="texture" type="multioutput" />
+	<standard_surface name="default_surface" type="surfaceshader" />
+	<standard_surface name="surface_100" type="surfaceshader" version="1.0.0" />` );
+
+				assert.strictEqual( versions.texture, 'ND_UsdUVTexture_23', 'An unversioned node resolves to the default version.' );
+				assert.strictEqual( versions.default_surface, 'ND_standard_surface_surfaceshader', 'standard_surface resolves to 1.0.1.' );
+				assert.strictEqual( versions.surface_100, 'ND_standard_surface_surfaceshader_100', 'An explicit version resolves to that version.' );
+
+				const documentNodeDefs = resolveNodeDefs( `
+	<nodedef name="ND_tinted_checker" node="tinted_checker">
+		<input name="tint" type="color3" value="1, 0.45, 0.1" />
+		<output name="color" type="color3" />
+		<output name="mask" type="float" />
+	</nodedef>
+	<tinted_checker name="checker" type="multioutput" />` );
+
+				assert.strictEqual( documentNodeDefs.checker, 'ND_tinted_checker', 'Nodedefs declared in the document resolve.' );
+
+				const result = new MaterialXLoader().parse( `<?xml version="1.0"?>
+<materialx version="1.39">
+	<UsdUVTexture name="texture" type="multioutput" />
+	<convert name="texture_rgb" type="color3">
+		<input name="in" type="color4" nodename="texture" output="rgba" />
+	</convert>
+</materialx>`, { throwOnErrors: false, interfaceValidator: createStrictInterfaceValidator() } );
+
+				assert.true( result.errors.some( ( entry ) => /rgba/.test( entry.message ) ), 'The rgba output of UsdUVTexture 2.2 is not an output of the default 2.3.' );
+
+			} );
+
+			QUnit.test( 'hextilednormalmap translates with only a file input', ( assert ) => {
+
+				const manager = new LoadingManager();
+				manager.addHandler( /\.test$/i, new ControlledTextureLoader( manager ) );
+
+				const result = new MaterialXLoader( manager ).parse( `<?xml version="1.0"?>
+<materialx version="1.39">
+	<hextilednormalmap name="test_normal" type="vector3">
+		<input name="file" type="filename" value="texture.test" />
+	</hextilednormalmap>
+	<convert name="test_convert" type="color3">
+		<input name="in" type="vector3" nodename="test_normal" />
+	</convert>
+	<standard_surface name="test_surface" type="surfaceshader">
+		<input name="base_color" type="color3" nodename="test_convert" />
+	</standard_surface>
+	<surfacematerial name="test_material" type="material">
+		<input name="surfaceshader" type="surfaceshader" nodename="test_surface" />
+	</surfacematerial>
+</materialx>`, { throwOnErrors: false } );
+
+				assert.deepEqual( result.errors, [], 'hextilednormalmap does not read the hextiledimage-only inputs.' );
+				// An undeclared input used to become an undefined operand, which TSL rejects when building.
+				const missingOperand = ( node ) => node.isOperatorNode === true && ( node.aNode == null || node.bNode == null );
+				// The hextile graph is deeper than hasNode() walks by default, so start at a negative depth.
+				assert.false( hasNode( result.materials.test_material.colorNode, missingOperand, new WeakSet(), - 40 ), 'Every operator has its operands.' );
+
+			} );
 
 			QUnit.test( 'node library parameter names are declared by the nodedef registry', ( assert ) => {
 

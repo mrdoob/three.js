@@ -5,7 +5,7 @@
  * Usage:
  *   node utils/materialx/generateNodeInterfaceRegistry.js <path-to-MaterialX>/libraries
  *
- * The registry records, for every stdlib nodedef, the node category, the declared
+ * The registry records, for every stdlib nodedef, the node category, its version, the declared
  * inputs with their types and default values, and the declared outputs. The loader
  * uses it to resolve the nodedef of a node instance and to supply nodedef defaults
  * for inputs the document does not author.
@@ -103,8 +103,8 @@ function parseNodeDefs( xml, nodedefs ) {
 
 			}
 
-			const { name, node, inherit, type } = tag.attributes;
-			current = { node, inherit: inherit || null, inputs: {}, outputs: {} };
+			const { name, node, inherit, type, version, isdefaultversion } = tag.attributes;
+			current = { node, inherit: inherit || null, version, isdefaultversion: isdefaultversion === 'true', inputs: {}, outputs: {} };
 			if ( type && type !== 'multioutput' ) current.outputs.out = type;
 			nodedefs[ name ] = current;
 			if ( tag.selfClosing ) current = null;
@@ -144,8 +144,11 @@ function resolveInheritance( nodedefs ) {
 		seen.add( name );
 
 		const base = nodedef.inherit ? resolve( nodedef.inherit, seen ) : { inputs: {}, outputs: {} };
+		// Versions are not inherited: MaterialX reads them from each nodedef's own attributes.
 		resolved[ name ] = {
 			node: nodedef.node,
+			...( nodedef.version && { version: nodedef.version } ),
+			...( nodedef.isdefaultversion && { isdefaultversion: true } ),
 			inputs: { ...base.inputs, ...nodedef.inputs },
 			outputs: { ...base.outputs, ...nodedef.outputs },
 		};

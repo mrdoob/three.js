@@ -208,6 +208,7 @@ const compileArtisticIorNode = ( nodeX, out ) => {
 const compileBooleanConditionalNode = ( nodeX ) => {
 
 	if ( nodeX.type !== 'boolean' ) return null;
+	if ( nodeX.element !== 'ifgreater' && nodeX.element !== 'ifgreatereq' && nodeX.element !== 'ifequal' ) return null;
 
 	const value1 = nodeX.getNodeByName( 'value1' );
 	const value2 = nodeX.getNodeByName( 'value2' );
@@ -397,6 +398,32 @@ const compileHexTiledNormalMapNode = ( nodeX, compileContext, sampleNode ) => {
 
 };
 
+const getHextileLuminanceWeights = ( nodeX, c0, c1, c2 ) => {
+
+	const falloffContrast = nodeX.getNodeByName( 'falloffcontrast' );
+	let lumaCoeffs = nodeX.getNodeByName( 'lumacoeffs' );
+	const lumaCoeffsInput = nodeX.getChildByName( 'lumacoeffs' );
+	if ( lumaCoeffsInput && lumaCoeffsInput.isConst ) {
+
+		const lumaCoeffValues = lumaCoeffsInput.getVector();
+		if ( lumaCoeffValues.length === 3 ) {
+
+			// Treat luminance coefficients as raw numeric values, not display colors.
+			lumaCoeffs = vec3( lumaCoeffValues[ 0 ], lumaCoeffValues[ 1 ], lumaCoeffValues[ 2 ] );
+
+		}
+
+	}
+
+	const falloffContrastWeight = mul( falloffContrast, 0.5 );
+	return mix(
+		vec3( 1, 1, 1 ),
+		vec3( dot( c0, lumaCoeffs ), dot( c1, lumaCoeffs ), dot( c2, lumaCoeffs ) ),
+		vec3( falloffContrastWeight, falloffContrastWeight, falloffContrastWeight ),
+	);
+
+};
+
 const compileHexTiledTextureNode = ( nodeX, compileContext, category ) => {
 
 	const file = nodeX.getChildByName( 'file' );
@@ -439,20 +466,6 @@ const compileHexTiledTextureNode = ( nodeX, compileContext, category ) => {
 	const offset = nodeX.getNodeByName( 'offset' );
 	const offsetRange = nodeX.getNodeByName( 'offsetrange' );
 	const falloff = nodeX.getNodeByName( 'falloff' );
-	const falloffContrast = nodeX.getNodeByName( 'falloffcontrast' );
-	let lumaCoeffs = nodeX.getNodeByName( 'lumacoeffs' );
-	const lumaCoeffsInput = nodeX.getChildByName( 'lumacoeffs' );
-	if ( lumaCoeffsInput && lumaCoeffsInput.isConst ) {
-
-		const lumaCoeffValues = lumaCoeffsInput.getVector();
-		if ( lumaCoeffValues.length === 3 ) {
-
-			// Treat luminance coefficients as raw numeric values, not display colors.
-			lumaCoeffs = vec3( lumaCoeffValues[ 0 ], lumaCoeffValues[ 1 ], lumaCoeffValues[ 2 ] );
-
-		}
-
-	}
 
 	const transformedUv = compileContext.mxFromBottomLeftUvSpace( mul( uvNode, tiling ) );
 	const tileData = compileContext.mxHextileCoord( transformedUv, rotation, rotationRange, scale, scaleRange, offset, offsetRange );
@@ -485,12 +498,9 @@ const compileHexTiledTextureNode = ( nodeX, compileContext, category ) => {
 	const c0 = toVec3Channels( sample0 );
 	const c1 = toVec3Channels( sample1 );
 	const c2 = toVec3Channels( sample2 );
-	const falloffContrastWeight = mul( falloffContrast, 0.5 );
-	const cw = mix(
-		vec3( 1, 1, 1 ),
-		vec3( dot( c0, lumaCoeffs ), dot( c1, lumaCoeffs ), dot( c2, lumaCoeffs ) ),
-		vec3( falloffContrastWeight, falloffContrastWeight, falloffContrastWeight ),
-	);
+	// Only hextiledimage weights tiles by luminance; hextilednormalmap declares neither
+	// falloffcontrast nor lumacoeffs and blends with unit weights, as in MaterialX.
+	const cw = category === 'hextilednormalmap' ? vec3( 1, 1, 1 ) : getHextileLuminanceWeights( nodeX, c0, c1, c2 );
 	const blendWeights = compileContext.mxHextileComputeBlendWeights( cw, tileData.weights, falloff );
 	const alphaWeights = compileContext.mxHextileComputeBlendWeights( vec3( 1, 1, 1 ), tileData.weights, falloff );
 	const blendedRgb = add( add( mul( element( blendWeights, 0 ), c0 ), mul( element( blendWeights, 1 ), c1 ) ), mul( element( blendWeights, 2 ), c2 ) );
@@ -577,7 +587,7 @@ const compileGltfTextureNode = ( nodeX, compileContext, category ) => {
 
 	}
 
-	const factor = nodeX.getNodeByName( 'factor' );
+	const factor = nodeX.declaresInput( 'factor' ) ? nodeX.getNodeByName( 'factor' ) : null;
 
 	if ( factor ) {
 

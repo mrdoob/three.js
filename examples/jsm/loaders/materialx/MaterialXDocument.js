@@ -354,7 +354,7 @@ class MaterialXNode {
 	}
 
 	/**
-	 * The stdlib nodedef this node instance resolves to, or `null` when the category is unknown.
+	 * The stdlib or document nodedef this node instance resolves to, or `null` when the category is unknown.
 	 *
 	 * @type {?Object}
 	 */
@@ -432,6 +432,9 @@ class MaterialXNode {
 	}
 
 	getTextureAddressMode( inputName ) {
+
+		// e.g. tiledimage, which samples with the image node's default addressing.
+		if ( this.declaresInput( inputName ) === false ) return 'periodic';
 
 		const rawMode = this.getNodeByName( inputName );
 		const mode = resolveTextureAddressMode( rawMode );
@@ -705,10 +708,26 @@ class MaterialXNode {
 
 	}
 
+	// Whether the input is authored or declared by the nodedef. Unknown categories declare everything.
+	declaresInput( name ) {
+
+		return this.getChildByName( name ) !== undefined || this.nodeDef === null || name in this.nodeDef.inputs;
+
+	}
+
 	getNodeByName( name ) {
 
 		const child = this.getChildByName( name );
-		return child ? child.getNode( child.output ) : this.getDefaultInputNode( name );
+		if ( child ) return child.getNode( child.output );
+
+		// Reading an input the nodedef does not declare is a loader bug; fail here rather than inside TSL.
+		if ( this.declaresInput( name ) === false ) {
+
+			throw new Error( `THREE.MaterialXLoader: "${this.element}" reads input "${name}", which nodedef "${this.nodeDef.name}" does not declare.` );
+
+		}
+
+		return this.getDefaultInputNode( name );
 
 	}
 
@@ -933,6 +952,7 @@ class MaterialXDocument {
 		this.textureCache = new Map();
 		this.pendingResources = [];
 		this.nodeResolver = null;
+		this.documentNodeDefs = null;
 		const bottomLeftUvSpaceHelpers = getBottomLeftUvSpaceHelpers( this.uvSpace );
 
 		this.compileContext = {
@@ -988,6 +1008,49 @@ class MaterialXDocument {
 
 	}
 
+	// The document's own nodedefs, in the shape of the stdlib registry entries.
+	getDocumentNodeDefs() {
+
+		if ( this.documentNodeDefs !== null ) return this.documentNodeDefs;
+
+		this.documentNodeDefs = {};
+
+		for ( const nodeX of this.nodesXLib.values() ) {
+
+			if ( nodeX.element !== 'nodedef' ) continue;
+
+			const nodedef = { node: nodeX.getAttribute( 'node' ), inputs: {}, outputs: {} };
+			const version = nodeX.getAttribute( 'version' );
+			if ( version ) nodedef.version = version;
+			if ( nodeX.getAttribute( 'isdefaultversion' ) === 'true' ) nodedef.isdefaultversion = true;
+			if ( nodeX.type && nodeX.type !== 'multioutput' ) nodedef.outputs.out = nodeX.type;
+
+			for ( const child of nodeX.children ) {
+
+				if ( child.element === 'output' ) {
+
+					nodedef.outputs[ child.name ] = child.type;
+
+				} else if ( child.element === 'input' ) {
+
+					const input = { type: child.type };
+					if ( child.value !== null ) input.value = child.value;
+					const geomprop = child.getAttribute( 'defaultgeomprop' );
+					if ( geomprop ) input.defaultgeomprop = geomprop;
+					nodedef.inputs[ child.name ] = input;
+
+				}
+
+			}
+
+			this.documentNodeDefs[ nodeX.name ] = nodedef;
+
+		}
+
+		return this.documentNodeDefs;
+
+	}
+
 	parseNode( nodeXML, nodePath = '' ) {
 
 		return parseMaterialXNodeTree(
@@ -1002,6 +1065,7 @@ class MaterialXDocument {
 	parse( text, materialName = null, options = {} ) {
 
 		this.nodeResolver = options.nodeResolver || null;
+		this.documentNodeDefs = null;
 
 		const rootNode = parseMaterialXText(
 			text,
