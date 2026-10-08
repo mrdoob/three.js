@@ -35,12 +35,10 @@ import {
 import { LightProbeGridNode, ATLAS_PADDING } from '../tsl/lighting/LightProbeGridNode.js';
 import { replaceSunLights, restoreSunLights } from './LightProbeGridUtils.js';
 
-// Probes captured per render. Each probe adds six sub-cameras to the capture
-// camera, so this trades per-render overhead against uniform buffer size.
+// Probes captured per render, six sub-cameras each.
 const PROBES_PER_BATCH = 8;
 
-// Per-face basis of the capture cameras: forward, right and up. A texel at
-// NDC ( x, y ) of face f looks along forward + x * right + y * up.
+// Per-face forward, right and up vectors of the capture cameras.
 const FACE_FORWARD = [[ 1, 0, 0 ], [ - 1, 0, 0 ], [ 0, 1, 0 ], [ 0, - 1, 0 ], [ 0, 0, 1 ], [ 0, 0, - 1 ]];
 const FACE_RIGHT = [[ 0, 0, 1 ], [ 0, 0, - 1 ], [ - 1, 0, 0 ], [ - 1, 0, 0 ], [ - 1, 0, 0 ], [ 1, 0, 0 ]];
 const FACE_UP = [[ 0, 1, 0 ], [ 0, 1, 0 ], [ 0, 0, - 1 ], [ 0, 0, 1 ], [ 0, 1, 0 ], [ 0, 1, 0 ]];
@@ -70,8 +68,7 @@ let _faceSize = - 1;
 let _batchTarget = null;
 let _batchProbes = - 1;
 
-// The capture camera renders every face of a probe batch in one pass. It is
-// never recreated: the camera uniform arrays reference its sub-camera matrices.
+// Renders all faces of a probe batch in one pass.
 let _captureCamera = null;
 
 /**
@@ -88,8 +85,6 @@ let _captureCamera = null;
  */
 function projectSHNode( faces, size, batchStart ) {
 
-	const toVec3 = ( v ) => vec3( ...v );
-
 	return Fn( () => {
 
 		const column = int( screenCoordinate.x );
@@ -97,16 +92,16 @@ function projectSHNode( faces, size, batchStart ) {
 		const face = column.mod( 6 ).toVar();
 		const slot = int( screenCoordinate.y ).sub( batchStart );
 
-		const forward = array( FACE_FORWARD.map( toVec3 ) ).element( face ).toVar();
-		const right = array( FACE_RIGHT.map( toVec3 ) ).element( face ).toVar();
-		const up = array( FACE_UP.map( toVec3 ) ).element( face ).toVar();
+		const forward = array( FACE_FORWARD.map( ( v ) => vec3( ...v ) ) ).element( face ).toVar();
+		const right = array( FACE_RIGHT.map( ( v ) => vec3( ...v ) ) ).element( face ).toVar();
+		const up = array( FACE_UP.map( ( v ) => vec3( ...v ) ) ).element( face ).toVar();
 
 		const origin = ivec2( face.mul( size ), slot.mul( size ) ).toVar();
 		const texelSize = 2.0 / size;
 		const accum = vec3( 0.0 ).toVar();
 
 		// Signed area of the projected face region from its center to ( x, y ).
-		const area = ( x, y ) => atan( x.mul( y ), x.mul( x ).add( y.mul( y ) ).add( 1.0 ).sqrt() );
+		const area = ( x, y ) => atan( x.mul( y ).div( x.mul( x ).add( y.mul( y ) ).add( 1.0 ).sqrt() ) );
 
 		Loop( size, size, ( { i, j } ) => {
 
@@ -173,23 +168,14 @@ function repackNode( batch, textureIndex, resolution, sliceZ ) {
 		const nz = int( resolution.z );
 		const probeIndex = ix.add( sliceZ.mul( nx ) ).add( iy.mul( nx ).mul( nz ) ).toVar();
 
-		const coefficient = ( c ) => {
+		// Sum the six face projections of each coefficient.
+		const [ c0, c1, c2, c3, c4, c5, c6, c7, c8 ] = [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ].map( ( c ) => {
 
 			let sum = batch.load( ivec2( c * 6, probeIndex ) );
 			for ( let f = 1; f < 6; f ++ ) sum = sum.add( batch.load( ivec2( c * 6 + f, probeIndex ) ) );
 			return sum;
 
-		};
-
-		const c0 = coefficient( 0 );
-		const c1 = coefficient( 1 );
-		const c2 = coefficient( 2 );
-		const c3 = coefficient( 3 );
-		const c4 = coefficient( 4 );
-		const c5 = coefficient( 5 );
-		const c6 = coefficient( 6 );
-		const c7 = coefficient( 7 );
-		const c8 = coefficient( 8 );
+		} );
 
 		let packed;
 
@@ -212,15 +198,13 @@ function repackNode( batch, textureIndex, resolution, sliceZ ) {
 }
 
 /**
- * Lazily creates the shared capture camera: six 90° sub-cameras per batch slot,
- * each rendering into its own tile of the face atlas.
+ * Lazily creates the shared capture camera: six 90° sub-cameras per batch slot.
  *
  * @private
- * @param {number} cubemapSize - Resolution of each cubemap face.
  * @param {number} near - Capture near plane.
  * @param {number} far - Capture far plane.
  */
-function ensureCaptureCamera( cubemapSize, near, far ) {
+function ensureCaptureCamera( near, far ) {
 
 	if ( _captureCamera === null ) {
 
@@ -239,9 +223,7 @@ function ensureCaptureCamera( cubemapSize, near, far ) {
 
 	}
 
-	for ( let i = 0; i < _captureCamera.cameras.length; i ++ ) {
-
-		const camera = _captureCamera.cameras[ i ];
+	for ( const camera of _captureCamera.cameras ) {
 
 		if ( camera.near !== near || camera.far !== far ) {
 
@@ -251,15 +233,14 @@ function ensureCaptureCamera( cubemapSize, near, far ) {
 
 		}
 
-		camera.viewport.set( ( i % 6 ) * cubemapSize, Math.floor( i / 6 ) * cubemapSize, cubemapSize, cubemapSize );
-
 	}
 
 }
 
 /**
  * Lazily pools the shared face atlas and batch render targets, recreating them
- * only when their dimensions change.
+ * only when their dimensions change. Each capture sub-camera renders into its
+ * own tile of the face atlas.
  *
  * @private
  * @param {number} cubemapSize - Resolution of each cubemap face.
@@ -277,6 +258,12 @@ function ensureBakeTargets( cubemapSize, totalProbes ) {
 			minFilter: NearestFilter,
 			magFilter: NearestFilter,
 			generateMipmaps: false
+		} );
+
+		_captureCamera.cameras.forEach( ( camera, i ) => {
+
+			camera.viewport.set( ( i % 6 ) * cubemapSize, Math.floor( i / 6 ) * cubemapSize, cubemapSize, cubemapSize );
+
 		} );
 
 		_faceSize = cubemapSize;
@@ -599,7 +586,7 @@ class LightProbeGrid extends Light {
 
 		// Bind the pooled bake resources to the current textures.
 
-		ensureCaptureCamera( cubemapSize, near, far );
+		ensureCaptureCamera( near, far );
 		ensureBakeTargets( cubemapSize, totalProbes );
 		ensureBakeMaterials( cubemapSize, _faceTarget.texture, _batchTarget.texture );
 		_resolutionUniform.value.copy( res );
@@ -768,8 +755,7 @@ class LightProbeGrid extends Light {
 
 					const camera = cameras[ slot * 6 + face ];
 
-					// Unused slots of a partial batch draw nothing. The camera count
-					// stays fixed so the capture pipelines are reused.
+					// unused slots draw nothing, keeping the camera count fixed
 					if ( slot < batchCount ) {
 
 						camera.layers.set( 0 );
