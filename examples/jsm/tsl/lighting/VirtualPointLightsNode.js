@@ -2,7 +2,7 @@ import { IrradianceNode } from 'three/webgpu';
 import { Fn, If, Loop, dot, float, max, normalWorld, positionWorld, uniform, uniformArray, vec3 } from 'three/tsl';
 
 /**
- * Adds single-bounce VPL irradiance to standard node materials via `lights()`.
+ * Adds diffuse VPL irradiance to standard node materials via `lights()`.
  * The visibility callback is optional and returns 0 for occluded segments, 1 otherwise.
  * Cost scales with the number of VPLs per shaded fragment. Distance clamping
  * reduces singularities at the expense of energy near the emitters.

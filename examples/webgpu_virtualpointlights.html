@@ -19,7 +19,7 @@
 				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Virtual Point Lights</span>
 			</div>
 
-			<small>Single-bounce instant radiosity via Virtual Point Lights by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a></small>
+			<small>Diffuse instant radiosity via Virtual Point Lights by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a></small>
 		</div>
 
 		<script type="importmap">
@@ -49,7 +49,7 @@
 			import { acceleratedRaycast, computeBoundsTree } from 'three-mesh-bvh';
 
 			const MAX_VPLS = 1024;
-			const params = { mode: 'combined', count: 256, shadows: true, shadowResolution: 64, showVPLs: false, seed: 1, minDistance: 1, progressive: false };
+			const params = { mode: 'combined', count: 256, shadows: true, shadowResolution: 64, showVPLs: false, seed: 1, minDistance: 1, progressive: false, bounces: 1 };
 
 			init();
 
@@ -112,7 +112,7 @@
 					helper.visible = false;
 					try {
 
-						generator.generate( scene, sourceLights, { count: previewCount, seed: params.seed } );
+						generator.generate( scene, sourceLights, { count: previewCount, seed: params.seed, bounces: params.bounces } );
 
 					} finally {
 
@@ -167,6 +167,7 @@
 				// Sampling always uses the original source power, including in indirect-only mode.
 				function regenerate( restart = true ) {
 
+					params.count = Math.max( params.count, sourceLights.length * params.bounces );
 					if ( restart !== false ) previewCount = params.progressive ? Math.min( 32, params.count ) : params.count;
 
 					sourceLights.forEach( ( light, i ) => {
@@ -197,7 +198,8 @@
 
 				const gui = renderer.inspector.createParameters( 'Virtual Point Lights' );
 				gui.add( params, 'mode', [ 'direct only', 'indirect only', 'combined' ] ).name( 'Lighting' ).onChange( updateMode );
-				gui.add( params, 'count', sourceLights.length, MAX_VPLS, 1 ).name( 'Ray Budget' ).info( 'Total rays shared across the source lights. Escaped rays do not become VPLs.' ).onChange( regenerate ).debounce( 250 );
+				gui.add( params, 'count', sourceLights.length, MAX_VPLS, 1 ).name( 'Ray Budget' ).info( 'Total rays shared across source lights and bounce depths. Escaped rays do not become VPLs.' ).onChange( regenerate ).debounce( 250 );
+				gui.add( params, 'bounces', 1, 4, 1 ).name( 'Bounces' ).info( 'Maximum diffuse bounces. Ray Budget is shared across depths; more bounces use fewer initial paths.' ).onChange( () => regenerate() );
 				gui.add( params, 'seed', 1, 100, 1 ).name( 'Seed' ).onChange( regenerate ).debounce( 250 );
 				gui.add( params, 'minDistance', 0.01, 1, 0.01 ).name( 'Distance Clamp' ).info( 'Reduces near-field singularities at the expense of indirect-light energy.' ).onChange( value => {
 

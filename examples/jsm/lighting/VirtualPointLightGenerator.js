@@ -2,7 +2,7 @@ import { Color, Matrix3, Raycaster, Vector3 } from 'three';
 import { VirtualPointLightTextureSampler } from './VirtualPointLightTextureSampler.js';
 
 /**
- * Generates a deterministic, single diffuse bounce from point or directional lights.
+ * Generates deterministic diffuse light paths from point or directional lights.
  * Samples visible, static meshes using CPU raycasting. Base-color maps and alpha cutouts use cached CPU texels.
  * Instancing, skinning, mip selection and specular transport are not evaluated.
  *
@@ -38,16 +38,19 @@ class VirtualPointLightGenerator {
 	 * @param {Scene} scene - The static scene.
 	 * @param {Array<PointLight|DirectionalLight>} lights - Source lights.
 	 * @param {Object} [options={}] - Sampling options.
-	 * @param {number} [options.count=256] - Total ray budget across all lights.
+	 * @param {number} [options.count=256] - Total ray budget across all lights and bounce depths.
+	 * @param {number} [options.bounces=1] - Maximum diffuse bounce depth.
 	 * @param {number} [options.seed=1] - Random seed.
 	 * @param {Box3} [options.bounds] - World-space sampling domain, required for directional lights.
 	 * @return {VirtualPointLightGenerator} This generator.
 	 */
-	generate( scene, lights, { count = 256, seed = 1, bounds = null } = {} ) {
+	generate( scene, lights, { count = 256, seed = 1, bounds = null, bounces = 1 } = {} ) {
 
-		if ( ! Number.isInteger( count ) || count < Math.max( 1, lights.length ) || count > this.capacity ) {
+		if ( ! Number.isInteger( bounces ) || bounces < 1 || bounces > 4 ) throw new RangeError( 'Bounces must be an integer from 1 to 4.' );
 
-			throw new RangeError( 'Sample count must cover all lights and fit the capacity.' );
+		if ( ! Number.isInteger( count ) || count < Math.max( 1, lights.length ) * bounces || count > this.capacity ) {
+
+			throw new RangeError( 'Ray budget must cover every light and bounce depth, and fit the capacity.' );
 
 		}
 
@@ -81,6 +84,8 @@ class VirtualPointLightGenerator {
 		const corner = new Vector3();
 		const normalMatrix = new Matrix3();
 		const albedo = new Color();
+		const throughput = new Color();
+		const paths = Math.floor( count / bounces );
 		let state = seed >>> 0;
 		const random = () => {
 
@@ -98,7 +103,7 @@ class VirtualPointLightGenerator {
 			const light = lights[ l ];
 			light.updateWorldMatrix( true, false );
 			light.getWorldPosition( origin );
-			const samples = Math.floor( count / lights.length ) + ( l < count % lights.length ? 1 : 0 );
+			const samples = Math.floor( paths / lights.length ) + ( l < paths % lights.length ? 1 : 0 );
 			let power = 4 * Math.PI * light.intensity / samples;
 			let minU = Infinity, maxU = - Infinity, minV = Infinity, maxV = - Infinity, minDepth = Infinity;
 
@@ -129,7 +134,18 @@ class VirtualPointLightGenerator {
 
 			}
 
+			const emissionOrigin = origin.clone();
+			const emissionDirection = direction.clone();
+			const emissionU = u.clone();
+			const emissionV = v.clone();
+
 			for ( let i = 0; i < samples; i ++ ) {
+
+				throughput.copy( light.color );
+				direction.copy( emissionDirection );
+				u.copy( emissionU );
+				v.copy( emissionV );
+				origin.copy( emissionOrigin );
 
 				if ( light.isDirectionalLight ) {
 
@@ -147,45 +163,63 @@ class VirtualPointLightGenerator {
 
 				}
 
-				const hits = raycaster.intersectObjects( surfaces, false );
-				let hit, material;
+				for ( let depth = 0; depth < bounces; depth ++ ) {
 
-				for ( const candidate of hits ) {
+					const hits = raycaster.intersectObjects( surfaces, false );
+					let hit, material;
 
-					const candidateMaterial = Array.isArray( candidate.object.material ) ? candidate.object.material[ candidate.face.materialIndex ] : candidate.object.material;
-					let alpha = candidateMaterial.opacity;
-					if ( candidateMaterial.alphaTest > 0 ) {
+					for ( const candidate of hits ) {
 
-						if ( candidateMaterial.map ) alpha *= this.textureSampler.sample( candidateMaterial.map, candidate ).w;
-						if ( candidateMaterial.alphaMap ) alpha *= this.textureSampler.sample( candidateMaterial.alphaMap, candidate ).y;
-						if ( alpha <= candidateMaterial.alphaTest ) continue;
+						const candidateMaterial = Array.isArray( candidate.object.material ) ? candidate.object.material[ candidate.face.materialIndex ] : candidate.object.material;
+						let alpha = candidateMaterial.opacity;
+						if ( candidateMaterial.alphaTest > 0 ) {
+
+							if ( candidateMaterial.map ) alpha *= this.textureSampler.sample( candidateMaterial.map, candidate ).w;
+							if ( candidateMaterial.alphaMap ) alpha *= this.textureSampler.sample( candidateMaterial.alphaMap, candidate ).y;
+							if ( alpha <= candidateMaterial.alphaTest ) continue;
+
+						}
+
+						hit = candidate;
+						material = candidateMaterial;
+						break;
 
 					}
 
-					hit = candidate;
-					material = candidateMaterial;
-					break;
+					if ( hit === undefined ) break;
+					albedo.copy( material.color || new Color( 0xffffff ) ).multiply( throughput );
+					if ( material.map ) {
+
+						const texel = this.textureSampler.sample( material.map, hit );
+						albedo.r *= texel.x;
+						albedo.g *= texel.y;
+						albedo.b *= texel.z;
+
+					}
+
+					albedo.multiplyScalar( 1 - ( material.metalness || 0 ) );
+					const index = this.count ++;
+					this.positions[ index ].copy( hit.point );
+					normalMatrix.getNormalMatrix( hit.object.matrixWorld );
+					const normal = this.normals[ index ].copy( hit.face.normal ).applyNormalMatrix( normalMatrix );
+					if ( normal.dot( direction ) > 0 ) normal.negate();
+					this.flux[ index ].set( albedo.r, albedo.g, albedo.b ).multiplyScalar( power );
+
+					throughput.copy( albedo );
+					if ( depth + 1 === bounces || Math.max( throughput.r, throughput.g, throughput.b ) === 0 ) break;
+
+					// Cosine-weighted diffuse continuation cancels the BRDF cosine/PDF factors.
+
+					const radius = Math.sqrt( random() );
+					const phi = random() * Math.PI * 2;
+					u.set( Math.abs( normal.y ) > 0.99 ? 1 : 0, Math.abs( normal.y ) > 0.99 ? 0 : 1, 0 ).cross( normal ).normalize();
+					v.crossVectors( normal, u );
+					direction.copy( normal ).multiplyScalar( Math.sqrt( 1 - radius * radius ) );
+					direction.addScaledVector( u, radius * Math.cos( phi ) ).addScaledVector( v, radius * Math.sin( phi ) );
+					origin.copy( hit.point ).addScaledVector( normal, 0.001 );
+					raycaster.set( origin, direction );
 
 				}
-
-				if ( hit === undefined ) continue;
-				albedo.copy( material.color || new Color( 0xffffff ) ).multiply( light.color );
-				if ( material.map ) {
-
-					const texel = this.textureSampler.sample( material.map, hit );
-					albedo.r *= texel.x;
-					albedo.g *= texel.y;
-					albedo.b *= texel.z;
-
-				}
-
-				albedo.multiplyScalar( 1 - ( material.metalness || 0 ) );
-				const index = this.count ++;
-				this.positions[ index ].copy( hit.point );
-				normalMatrix.getNormalMatrix( hit.object.matrixWorld );
-				const normal = this.normals[ index ].copy( hit.face.normal ).applyNormalMatrix( normalMatrix );
-				if ( normal.dot( direction ) > 0 ) normal.negate();
-				this.flux[ index ].set( albedo.r, albedo.g, albedo.b ).multiplyScalar( power );
 
 			}
 
