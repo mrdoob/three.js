@@ -423,6 +423,14 @@ class Backend {
 	createStorageAttribute( /*attribute*/ ) { }
 
 	/**
+	 * Creates the GPU buffer of an indirect storage attribute.
+	 *
+	 * @abstract
+	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 */
+	createIndirectStorageAttribute( /*attribute*/ ) { }
+
+	/**
 	 * Creates a uniform buffer.
 	 *
 	 * @abstract
