@@ -30,12 +30,13 @@ class KitchenScene extends Scene {
 
 		const wallOverlap = 0.2;
 
-		const wall = ( width, height, position, rotation, source ) => {
+		const wall = ( width, height, position, rotation, source, bottomOverlap = 0 ) => {
 
 			const material = source.clone();
 			material.shadowSide = DoubleSide;
-			const mesh = new Mesh( new PlaneGeometry( width + wallOverlap * 2, height + wallOverlap * 2 ), material );
+			const mesh = new Mesh( new PlaneGeometry( width + wallOverlap * 2, height + wallOverlap * 2 + bottomOverlap ), material );
 			mesh.position.set( ...position );
+			mesh.position.y -= bottomOverlap / 2;
 			mesh.rotation.set( ...rotation );
 			mesh.castShadow = true;
 			mesh.receiveShadow = true;
@@ -46,16 +47,17 @@ class KitchenScene extends Scene {
 		// Inward-facing surfaces let an exterior camera see into the room.
 		// Both faces still cast shadows; the window wall retains its solid geometry.
 		// Extend each plane past neighboring walls, floor and ceiling to seal the seams.
+		// The floor overhangs the wall edges, and vertical walls extend below its underside.
 
-		box( [ 8.4, 0.2, 6.4 ], [ 0, - 0.1, 0 ], floor );
+		box( [ 9, 0.2, 7 ], [ 0, - 0.1, 0 ], floor );
 		wall( 8, 6, [ 0, 4, 0 ], [ Math.PI / 2, 0, 0 ], plaster );
-		wall( 6, 4, [ 4, 2, 0 ], [ 0, - Math.PI / 2, 0 ], plaster );
-		wall( 8, 4, [ 0, 2, - 3 ], [ 0, 0, 0 ], plaster );
-		wall( 8, 4, [ 0, 2, 3 ], [ 0, Math.PI, 0 ], plaster );
+		wall( 6, 4, [ 4, 2, 0 ], [ 0, - Math.PI / 2, 0 ], plaster, wallOverlap );
+		wall( 8, 4, [ 0, 2, - 3 ], [ 0, 0, 0 ], plaster, wallOverlap );
+		wall( 8, 4, [ 0, 2, 3 ], [ 0, Math.PI, 0 ], plaster, wallOverlap );
 
 		// A real opening in the left wall, with no invisible fill light or window glass.
 
-		box( [ 0.2, 1.8, 6.4 ], [ - 4.1, 0.9, 0 ], plaster );
+		box( [ 0.2, 2.2, 6.4 ], [ - 4.1, 0.7, 0 ], plaster );
 		box( [ 0.2, 0.4, 6.4 ], [ - 4.1, 3.8, 0 ], plaster );
 		box( [ 0.2, 1.8, 2.4 ], [ - 4.1, 2.7, - 2 ], plaster );
 		box( [ 0.2, 1.8, 1.6 ], [ - 4.1, 2.7, 2.4 ], plaster );
@@ -70,7 +72,7 @@ class KitchenScene extends Scene {
 
 		}
 
-		const sphere = new Mesh( new SphereGeometry( 0.35, 32, 32 ), new MeshStandardMaterial( { color: 0xffd700, metalness: 0.3, roughness: 0.4 } ) );
+		const sphere = new Mesh( new SphereGeometry( 0.35, 32, 32 ), new MeshStandardMaterial( { color: 0x3366ff, metalness: 0.3, roughness: 0.4 } ) );
 		sphere.position.set( - 1.25, 1.41, 0.4 );
 		sphere.castShadow = true;
 		sphere.receiveShadow = true;
