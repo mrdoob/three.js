@@ -247,6 +247,7 @@
 		"webgl_postprocessing_ssis",
 		"webgl_postprocessing_ssr",
 		"webgl_postprocessing_taa",
+		"webgl_postprocessing_traa",
 		"webgl_postprocessing_unreal_bloom",
 		"webgl_postprocessing_unreal_bloom_selective"
 	],

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js - WebGL / WebGPU TRAA challenges</title>
+		<meta charset="utf-8">
+		<link rel="icon" href="../files/favicon.ico">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="example.css">
+		<style>
+			body { background: repeating-conic-gradient(#444 0% 25%, #999 0% 50%) 0 / 24px 24px; }
+			#info { display: block; width: calc(100% - 290px); }
+			#info > small { position: static; display: block; width: auto; }
+			#labels { position: absolute; inset: 12% 8% 10%; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); pointer-events: none; }
+			#labels span { text-align: center; color: white; font: 12px sans-serif; text-shadow: 0 1px 3px black; }
+			#status { position: absolute; bottom: 8px; left: 8px; color: white; background: #000a; padding: 6px; font: 12px monospace; }
+		</style>
+	</head>
+	<body>
+		<div id="info">TRAA challenges — one deterministic scene for WebGL and WebGPU<br>
+			<small>Look for shimmer, trailing edges, lost detail and unstable highlights. Disable TRAA for comparison.</small>
+		</div>
+		<div id="labels"></div>
+		<div id="status">Starting…</div>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../src/Three.js",
+					"three/webgpu": "../src/Three.WebGPU.js",
+					"three/tsl": "../src/Three.TSL.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+		<script type="module">
+			import * as THREE from 'three';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { createTRAATestScene } from './traa/scene.js';
+
+			const query = new URLSearchParams( location.search );
+			const params = {
+				backend: query.get( 'backend' ) || 'WebGL', traa: true, reference: false, paused: false,
+				speed: 1, fixedStep: true, cameraMotion: 'Still', cameraCutOffset: 0, transparentBackground: false,
+				resetHistory: () => resetHistory(),
+				restart: () => {
+
+					time = 0;
+					params.cameraCutOffset = 0;
+					resetHistory();
+
+				},
+				step: () => {
+
+					time += 1 / 60;
+					render();
+
+				},
+				cameraCut: () => {
+
+					params.cameraCutOffset = params.cameraCutOffset === 0 ? 2 : 0;
+					resetHistory();
+					render();
+
+				}
+			};
+			const { scene, camera, labels, update } = createTRAATestScene();
+			for ( const text of labels ) {
+
+				const label = document.createElement( 'span' );
+				label.textContent = text;
+				document.getElementById( 'labels' ).appendChild( label );
+
+			}
+
+			let renderer, composer, temporal, pipeline, colorNode, depthNode, velocityNode, traaFactory, scenePass;
+			let time = 0, frame = 0, previousTime = performance.now();
+			if ( params.backend === 'WebGPU' ) {
+
+				const { WebGPURenderer, RenderPipeline } = await import( 'three/webgpu' );
+				const { mrt, output, pass, velocity } = await import( 'three/tsl' );
+				const { traa } = await import( 'three/addons/tsl/display/TRAANode.js' );
+				traaFactory = traa;
+				renderer = new WebGPURenderer( { antialias: false, alpha: true } );
+				await renderer.init();
+				pipeline = new RenderPipeline( renderer );
+				scenePass = pass( scene, camera );
+				scenePass.setMRT( mrt( { output, velocity } ) );
+				colorNode = scenePass.getTextureNode( 'output' );
+				depthNode = scenePass.getTextureNode( 'depth' );
+				velocityNode = scenePass.getTextureNode( 'velocity' );
+				resetHistory();
+
+			} else {
+
+				const { EffectComposer } = await import( 'three/addons/postprocessing/EffectComposer.js' );
+				const { GBufferPass } = await import( 'three/addons/postprocessing/GBufferPass.js' );
+				const { RenderPass } = await import( 'three/addons/postprocessing/RenderPass.js' );
+				const { TRAAPass } = await import( 'three/addons/postprocessing/TRAAPass.js' );
+				const { OutputPass } = await import( 'three/addons/postprocessing/OutputPass.js' );
+				renderer = new THREE.WebGLRenderer( { antialias: false, alpha: true } );
+				composer = new EffectComposer( renderer );
+				const gBuffer = new GBufferPass( scene, camera, 1, 1, { velocity: true } );
+				temporal = new TRAAPass( camera, gBuffer );
+				composer.addPass( gBuffer );
+				composer.addPass( new RenderPass( scene, camera ) );
+				composer.addPass( temporal );
+				composer.addPass( new OutputPass() );
+
+			}
+
+			const backendName = params.backend === 'WebGPU' && ! renderer.backend.isWebGPUBackend ? 'WebGPU renderer / WebGL backend' : params.backend;
+			renderer.setClearColor( 0, 0 );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.toneMapping = THREE.ACESFilmicToneMapping;
+			document.body.appendChild( renderer.domElement );
+			const gui = new GUI();
+			gui.add( params, 'backend', [ 'WebGL', 'WebGPU' ] ).onChange( backend => {
+
+				location.search = new URLSearchParams( { backend } );
+
+			} );
+			gui.add( params, 'traa' ).name( 'TRAA enabled' ).onChange( resetHistory );
+			gui.add( params, 'reference' ).name( '2× size reference (no AA)' ).onChange( resize );
+			gui.add( params, 'paused' );
+			gui.add( params, 'fixedStep' ).name( 'Fixed 1/60 step' );
+			gui.add( params, 'speed', 0.1, 4 );
+			gui.add( params, 'cameraMotion', [ 'Still', 'Pan', 'Orbit', 'Zoom' ] ).onChange( resetHistory );
+			gui.add( params, 'transparentBackground' ).onChange( resetHistory );
+			for ( const key of [ 'resetHistory', 'restart', 'step', 'cameraCut' ] ) gui.add( params, key );
+
+			function resetHistory() {
+
+				if ( pipeline ) {
+
+					if ( temporal ) temporal.dispose();
+					temporal = traaFactory( colorNode, depthNode, velocityNode, camera );
+					pipeline.outputNode = params.traa && ! params.reference ? temporal : colorNode;
+					pipeline.needsUpdate = true;
+
+				} else if ( temporal ) {
+
+					temporal.enabled = params.traa && ! params.reference;
+					temporal.reset();
+
+				}
+
+			}
+
+			function resize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				if ( composer ) {
+
+					composer.setPixelRatio( renderer.getPixelRatio() * ( params.reference ? 2 : 1 ) );
+					composer.setSize( window.innerWidth, window.innerHeight );
+
+				}
+
+				if ( scenePass ) scenePass.setResolutionScale( params.reference ? 2 : 1 );
+				resetHistory();
+
+			}
+
+			function render() {
+
+				update( time, params );
+				if ( composer ) temporal.renderFrame( composer );
+				else pipeline.render();
+				frame ++;
+				document.getElementById( 'status' ).textContent = `${ backendName } | ${ params.reference ? '2× size reference' : params.traa ? 'TRAA' : 'No AA' } | t=${ time.toFixed( 2 ) } | frame ${ frame }`;
+
+			}
+
+			window.addEventListener( 'resize', resize );
+			resize();
+			renderer.setAnimationLoop( () => {
+
+				const now = performance.now();
+				if ( ! params.paused ) time += ( params.fixedStep ? 1 / 60 : Math.min( ( now - previousTime ) / 1000, 0.1 ) ) * params.speed;
+				previousTime = now;
+				render();
+
+			} );
+		</script>
+	</body>
+</html>
