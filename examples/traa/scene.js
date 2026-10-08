@@ -188,6 +188,6 @@ export async function createTRAATestScene() {
 
 	}
 
-	return { scene, camera, labels, update, specularMaterial: shiny.material };
+	return { scene, camera, labels, update };
 
 }

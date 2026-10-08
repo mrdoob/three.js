@@ -38,8 +38,8 @@
 
 			const query = new URLSearchParams( location.search );
 			const params = {
-				backend: query.get( 'backend' ) || 'WebGL', traa: true, reference: false, resolutionScale: 1, paused: false,
-				speed: 1, waveStrength: 1, fixedStep: true, cameraMotion: 'Still', cameraCutOffset: 0, transparentBackground: false,
+				backend: query.get( 'backend' ) || 'WebGL', traa: true, resolutionScale: 1, paused: false,
+				fixedStep: true, cameraMotion: 'Still', cameraCutOffset: 0, transparentBackground: false,
 				resetHistory: () => resetHistory(),
 				restart: () => {
 
@@ -62,7 +62,7 @@
 
 				}
 			};
-			const { scene, camera, labels, update, specularMaterial } = await createTRAATestScene();
+			const { scene, camera, labels, update } = await createTRAATestScene();
 			for ( const text of labels ) {
 
 				const label = document.createElement( 'span' );
@@ -71,7 +71,7 @@
 
 			}
 
-			let renderer, composer, temporal, pipeline, colorNode, depthNode, velocityNode, traaFactory, scenePass;
+			let renderer, composer, temporal, pipeline, colorNode, depthNode, velocityNode, traaFactory;
 			let time = 0, frame = 0, previousTime = performance.now();
 			if ( params.backend === 'WebGPU' ) {
 
@@ -82,7 +82,7 @@
 				renderer = new WebGPURenderer( { antialias: false, alpha: true } );
 				await renderer.init();
 				pipeline = new RenderPipeline( renderer );
-				scenePass = pass( scene, camera, { samples: 0 } );
+				const scenePass = pass( scene, camera, { samples: 0 } );
 				scenePass.setMRT( mrt( { output, velocity } ) );
 				colorNode = scenePass.getTextureNode( 'output' );
 				depthNode = scenePass.getTextureNode( 'depth' );
@@ -119,17 +119,9 @@
 
 			} );
 			gui.add( params, 'traa' ).name( 'TRAA enabled' ).onChange( resetHistory );
-			gui.add( params, 'reference' ).name( '2× size reference (no AA)' ).onChange( resize );
 			gui.add( params, 'resolutionScale', { '100% (device)': 1, '75%': 0.75, '50%': 0.5, '25%': 0.25, '12.5%': 0.125 } ).name( 'Render resolution' ).onChange( resize );
 			gui.add( params, 'paused' );
 			gui.add( params, 'fixedStep' ).name( 'Fixed 1/60 step' );
-			gui.add( params, 'speed', 0.1, 4 );
-			gui.add( params, 'waveStrength', 0, 2, 0.1 ).name( 'Surface waves' ).onChange( value => {
-
-				specularMaterial.normalScale.setScalar( value );
-				resetHistory();
-
-			} );
 			gui.add( params, 'cameraMotion', [ 'Still', 'Pan', 'Orbit', 'Zoom' ] ).onChange( resetHistory );
 			gui.add( params, 'transparentBackground' ).onChange( resetHistory );
 			for ( const key of [ 'resetHistory', 'restart', 'step', 'cameraCut' ] ) gui.add( params, key );
@@ -140,12 +132,12 @@
 
 					if ( temporal ) temporal.dispose();
 					temporal = traaFactory( colorNode, depthNode, velocityNode, camera );
-					pipeline.outputNode = params.traa && ! params.reference ? temporal : colorNode;
+					pipeline.outputNode = params.traa ? temporal : colorNode;
 					pipeline.needsUpdate = true;
 
 				} else if ( temporal ) {
 
-					temporal.enabled = params.traa && ! params.reference;
+					temporal.enabled = params.traa;
 					temporal.reset();
 
 				}
@@ -160,12 +152,11 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				if ( composer ) {
 
-					composer.setPixelRatio( renderer.getPixelRatio() * ( params.reference ? 2 : 1 ) );
+					composer.setPixelRatio( renderer.getPixelRatio() );
 					composer.setSize( window.innerWidth, window.innerHeight );
 
 				}
 
-				if ( scenePass ) scenePass.setResolutionScale( params.reference ? 2 : 1 );
 				resetHistory();
 
 			}
@@ -177,7 +168,7 @@
 				else pipeline.render();
 				frame ++;
 				const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
-				document.getElementById( 'status' ).textContent = `${ backendName } | ${ params.reference ? '2× size reference' : params.traa ? 'TRAA' : 'No AA' } | ${ size.x }×${ size.y } (${ params.resolutionScale * 100 }%) | MSAA off | t=${ time.toFixed( 2 ) } | frame ${ frame }`;
+				document.getElementById( 'status' ).textContent = `${ backendName } | ${ params.traa ? 'TRAA' : 'No AA' } | ${ size.x }×${ size.y } (${ params.resolutionScale * 100 }%) | MSAA off | t=${ time.toFixed( 2 ) } | frame ${ frame }`;
 
 			}
 
@@ -186,7 +177,7 @@
 			renderer.setAnimationLoop( () => {
 
 				const now = performance.now();
-				if ( ! params.paused ) time += ( params.fixedStep ? 1 / 60 : Math.min( ( now - previousTime ) / 1000, 0.1 ) ) * params.speed;
+				if ( ! params.paused ) time += params.fixedStep ? 1 / 60 : Math.min( ( now - previousTime ) / 1000, 0.1 );
 				previousTime = now;
 				render();
 

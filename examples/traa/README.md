@@ -9,9 +9,8 @@ MSAA is disabled in both the canvas and scene render targets. Neither implementa
 The glossy knot uses a periodic tangent-space wave normal texture and the existing Venice sunset
 HDR environment for colored reflections. That environment is also the opaque
 background; the transparency toggle removes the visible background while keeping
-it for lighting/reflections. **Surface waves** adjusts the normal strength; zero
-shows the smooth knot for comparison. Wave frequency is three times the initial
-normal-map pattern in both texture directions. The waves affect shading, not the silhouette.
+it for lighting/reflections. Wave frequency is three times the initial normal-map
+pattern in both texture directions. The waves affect shading, not the silhouette.
 
 **Render resolution** scales the canvas drawing buffer relative to device pixels
 (100%, 75%, 50%, 25%, or 12.5%), keeping its CSS size unchanged. On a 2× Retina
@@ -21,17 +20,14 @@ scales the canvas for display. This is ordinary downsampling for testing, not
 TRAA upscaling. The WebGPU canvas and scene pass use matching resolutions so
 camera jitter remains one fraction of an actual render pixel. Changing the scale
 resets history. The status line shows the drawing-buffer dimensions and MSAA state.
-The 2× reference renders twice the selected resolution in each dimension.
 
 ## Repeatable visual checks
 
-Keep **Fixed 1/60 step** enabled, choose a speed, and restart at t=0 for each run.
-Pause freezes scene motion while temporal accumulation continues. **step** advances
-scene time by 1/60 second. Compare **TRAA enabled** with no AA and with **2× size
-reference (no AA)** at the same paused time. The reference renders twice the width
-and height (four samples per display pixel), then downsamples: it is a useful
-spatial reference, not converged ground truth. Renderer/material/backend differences
-also affect the comparison. Reference mode disables temporal accumulation.
+Keep **Fixed 1/60 step** enabled and restart at t=0 for each run. Playback runs at
+normal speed. Pause freezes scene motion while temporal accumulation continues.
+**step** advances scene time by 1/60 second. Compare **TRAA enabled** with no AA
+at the same paused time and render resolution. Renderer/material/backend
+differences also affect the comparison.
 
 | Challenge | Watch for |
 | --- | --- |

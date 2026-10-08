@@ -1,6 +1,5 @@
 import puppeteer from 'puppeteer';
 import assert from 'node:assert/strict';
-import { PNG } from 'pngjs';
 import { createServer } from '../../utils/server.js';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -39,12 +38,6 @@ try {
 
 				if ( checkbox.checked !== value ) checkbox.click();
 
-			} else if ( row.querySelector( 'input[type=number]' ) ) {
-
-				const input = row.querySelector( 'input[type=number]' );
-				input.value = value;
-				input.dispatchEvent( new Event( 'input', { bubbles: true } ) );
-
 			} else row.querySelector( 'button' ).click();
 
 		}, { name, value } );
@@ -62,25 +55,7 @@ try {
 		await new Promise( resolve => setTimeout( resolve, 700 ) );
 		await page.screenshot( { path: join( tmpdir(), `three-traa-${ backend }-downsampled.png` ) } );
 		await change( 'paused', true );
-		await change( 'TRAA enabled', false );
-		const surfaceImages = [];
-		for ( const strength of [ 0, 1 ] ) {
-
-			await change( 'Surface waves', strength );
-			await new Promise( resolve => setTimeout( resolve, 100 ) );
-			const screenshot = await page.screenshot( { clip: { x: 210, y: 350, width: 230, height: 230 } } );
-			surfaceImages.push( PNG.sync.read( Buffer.from( screenshot ) ) );
-
-		}
-
-		let changedPixels = 0;
-		for ( let i = 0; i < surfaceImages[ 0 ].data.length; i += 4 ) {
-
-			if ( [ 0, 1, 2 ].some( channel => Math.abs( surfaceImages[ 0 ].data[ i + channel ] - surfaceImages[ 1 ].data[ i + channel ] ) > 10 ) ) changedPixels ++;
-
-		}
-
-		assert.ok( changedPixels > surfaceImages[ 0 ].width * surfaceImages[ 0 ].height * 0.05, 'Surface waves visibly change the knot at reduced Retina resolution' );
+		await change( 'step' );
 		await change( 'paused', false );
 		await change( 'TRAA enabled', true );
 		await change( 'cameraMotion', 'Orbit' );
@@ -89,10 +64,14 @@ try {
 		await page.screenshot( { path: join( tmpdir(), `three-traa-${ backend }-alpha.png` ) } );
 		await change( 'cameraCut' );
 		await change( 'TRAA enabled', false );
-		await change( '2× size reference (no AA)', true );
 		await new Promise( resolve => setTimeout( resolve, 700 ) );
 		await page.setViewport( { width: 960, height: 720, deviceScaleFactor: 2 } );
-		await change( '2× size reference (no AA)', false );
+		await page.waitForFunction( () => {
+
+			const canvas = document.querySelector( 'canvas' );
+			return canvas.width === 480 && canvas.height === 360;
+
+		} );
 		await change( 'TRAA enabled', true );
 		assert.deepEqual( await page.$eval( 'canvas', canvas => [ canvas.width, canvas.height ] ), [ 480, 360 ], 'Resize preserves the selected Retina resolution scale' );
 		await new Promise( resolve => setTimeout( resolve, 700 ) );
