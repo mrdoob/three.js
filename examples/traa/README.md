@@ -6,10 +6,12 @@ use `scene.js`, the same materials, geometry, camera and analytic animations.
 The WebGL runner uses GBufferPass + TRAAPass; WebGPU uses the existing TRAANode.
 MSAA is disabled in both the canvas and scene render targets. Neither implementation was upgraded beyond the new WebGL port.
 
-The glossy knot uses a periodic wavy bump texture and the existing Venice sunset
+The glossy knot uses a periodic tangent-space wave normal texture and the existing Venice sunset
 HDR environment for colored reflections. That environment is also the opaque
 background; the transparency toggle removes the visible background while keeping
-it for lighting/reflections.
+it for lighting/reflections. **Surface waves** adjusts the normal strength; zero
+shows the smooth knot for comparison. Wave frequency is three times the initial
+normal-map pattern in both texture directions. The waves affect shading, not the silhouette.
 
 **Render resolution** scales the canvas drawing buffer relative to device pixels
 (100%, 75%, 50%, 25%, or 12.5%), keeping its CSS size unchanged. On a 2× Retina

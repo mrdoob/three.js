@@ -17,17 +17,26 @@ export async function createTRAATestScene() {
 	scene.environment = environment;
 	scene.backgroundBlurriness = 0.15;
 
-	// A periodic height texture perturbs the surface normals without moving geometry.
-	// Its small bright reflections stress shading changes that velocity cannot track.
+	// Explicit tangent-space wave normals remain pronounced at different resolutions.
+	// A small screen-space height difference was too subtle for this challenge.
 	const waveData = new Uint8Array( 256 * 256 * 4 );
+	const waveFrequency = 3;
 	for ( let y = 0; y < 256; y ++ ) {
 
 		for ( let x = 0; x < 256; x ++ ) {
 
-			const u = x / 256 * Math.PI * 2;
-			const v = y / 256 * Math.PI * 2;
-			const height = Math.round( 128 + 48 * Math.sin( u * 24 + Math.sin( v * 4 ) ) + 48 * Math.sin( v * 8 ) );
-			waveData.set( [ height, height, height, 255 ], ( y * 256 + x ) * 4 );
+			const u = x / 256 * Math.PI * 2 * waveFrequency;
+			const v = y / 256 * Math.PI * 2 * waveFrequency;
+			const phase = u * 12 + 0.4 * Math.sin( v * 3 );
+			const nx = - 0.65 * Math.cos( phase );
+			const ny = - 0.9 * Math.cos( v * 6 ) - 0.2 * Math.cos( phase ) * Math.cos( v * 3 );
+			const length = Math.hypot( nx, ny, 1 );
+			waveData.set( [
+				Math.round( ( nx / length * 0.5 + 0.5 ) * 255 ),
+				Math.round( ( ny / length * 0.5 + 0.5 ) * 255 ),
+				Math.round( ( 1 / length * 0.5 + 0.5 ) * 255 ),
+				255
+			], ( y * 256 + x ) * 4 );
 
 		}
 
@@ -111,7 +120,7 @@ export async function createTRAATestScene() {
 
 	}
 
-	const shiny = mesh( new THREE.TorusKnotGeometry( 0.55, 0.18, 160, 24 ), new THREE.MeshStandardMaterial( { color: 0xddddff, metalness: 1, roughness: 0.04, bumpMap: waves, bumpScale: 0.06 } ), groups[ 3 ] );
+	const shiny = mesh( new THREE.TorusKnotGeometry( 0.55, 0.18, 160, 24 ), new THREE.MeshStandardMaterial( { color: 0xddddff, metalness: 1, roughness: 0.04, normalMap: waves } ), groups[ 3 ] );
 	const rear = mesh( new THREE.PlaneGeometry( 1.7, 1.6 ), patterned, groups[ 4 ] );
 	const front = new THREE.Group();
 	groups[ 4 ].add( front );
@@ -179,6 +188,6 @@ export async function createTRAATestScene() {
 
 	}
 
-	return { scene, camera, labels, update };
+	return { scene, camera, labels, update, specularMaterial: shiny.material };
 
 }

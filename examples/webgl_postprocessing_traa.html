@@ -39,7 +39,7 @@
 			const query = new URLSearchParams( location.search );
 			const params = {
 				backend: query.get( 'backend' ) || 'WebGL', traa: true, reference: false, resolutionScale: 1, paused: false,
-				speed: 1, fixedStep: true, cameraMotion: 'Still', cameraCutOffset: 0, transparentBackground: false,
+				speed: 1, waveStrength: 1, fixedStep: true, cameraMotion: 'Still', cameraCutOffset: 0, transparentBackground: false,
 				resetHistory: () => resetHistory(),
 				restart: () => {
 
@@ -62,7 +62,7 @@
 
 				}
 			};
-			const { scene, camera, labels, update } = await createTRAATestScene();
+			const { scene, camera, labels, update, specularMaterial } = await createTRAATestScene();
 			for ( const text of labels ) {
 
 				const label = document.createElement( 'span' );
@@ -124,6 +124,12 @@
 			gui.add( params, 'paused' );
 			gui.add( params, 'fixedStep' ).name( 'Fixed 1/60 step' );
 			gui.add( params, 'speed', 0.1, 4 );
+			gui.add( params, 'waveStrength', 0, 2, 0.1 ).name( 'Surface waves' ).onChange( value => {
+
+				specularMaterial.normalScale.setScalar( value );
+				resetHistory();
+
+			} );
 			gui.add( params, 'cameraMotion', [ 'Still', 'Pan', 'Orbit', 'Zoom' ] ).onChange( resetHistory );
 			gui.add( params, 'transparentBackground' ).onChange( resetHistory );
 			for ( const key of [ 'resetHistory', 'restart', 'step', 'cameraCut' ] ) gui.add( params, key );
