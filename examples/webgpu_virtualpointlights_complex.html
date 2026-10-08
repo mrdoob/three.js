@@ -207,11 +207,10 @@
 				const gui = renderer.inspector.createParameters( 'Virtual Point Lights' );
 				gui.add( params, 'mode', [ 'direct only', 'indirect only', 'combined' ] ).name( 'Lighting' ).onChange( updateMode );
 				gui.add( params, 'count', sourceLights.length, MAX_VPLS, 1 ).name( 'Ray Budget' ).info( 'Total rays shared across the source lights. Escaped rays do not become VPLs.' ).onChange( regenerate ).debounce( 250 );
+				gui.add( params, 'seed', 1, 100, 1 ).name( 'Seed' ).onChange( regenerate ).debounce( 250 );
 				gui.add( params, 'progressive' ).name( 'Progressive Preview' ).info( 'Double the ray budget every 0.5 seconds, up to Ray Budget. Each stage regenerates a normalized estimate.' ).onChange( () => regenerate() );
 				gui.add( { restart: () => regenerate() }, 'restart' ).name( 'Restart Preview' );
-				gui.add( params, 'seed', 1, 100, 1 ).name( 'Seed' ).onChange( regenerate ).debounce( 250 );
 				const shadowParameters = gui.addFolder( 'Shadows' );
-				shadowParameters.add( params, 'shadowBias', - 0.01, 0.01, 0.0001 ).name( 'Direct Shadow Bias' ).info( 'Bias for direct point-light shadows. Set to zero to compare contact shadows.' ).onChange( updateShadowBias );
 				shadowParameters.add( params, 'shadows' ).name( 'VPL Shadows' ).onChange( updateVisibility );
 				shadowParameters.add( params, 'shadowResolution', [ 32, 64 ] ).name( 'Shadow Resolution' ).info( 'Pixels per cube face. Maps rebuild when the VPL set or resolution changes.' ).onChange( () => {
 
@@ -219,11 +218,12 @@
 					updateVisibility();
 
 				} );
-				gui.add( params, 'minDistance', 0.01, 1, 0.01 ).name( 'Distance Clamp' ).info( 'Reduces near-field singularities at the expense of indirect-light energy.' ).onChange( value => {
+				shadowParameters.add( params, 'minDistance', 0.01, 1, 0.01 ).name( 'Distance Clamp' ).info( 'Reduces near-field singularities at the expense of indirect-light energy.' ).onChange( value => {
 
 		vpl.minDistance.value = value;
 
 	} );
+				shadowParameters.add( params, 'shadowBias', - 0.01, 0.01, 0.0001 ).name( 'Direct Shadow Bias' ).info( 'Bias for direct point-light shadows. Set to zero to compare contact shadows.' ).onChange( updateShadowBias );
 				gui.add( params, 'showVPLs' ).name( 'Show VPLs' ).onChange( value => {
 
 		helper.visible = value;
