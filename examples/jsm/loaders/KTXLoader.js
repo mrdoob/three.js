@@ -185,8 +185,8 @@ class KhronosTextureContainer {
 
 			}
 
-			width = Math.max( 1.0, width * 0.5 );
-			height = Math.max( 1.0, height * 0.5 );
+			width = Math.max( width >> 1, 1 );
+			height = Math.max( height >> 1, 1 );
 
 		}
 
