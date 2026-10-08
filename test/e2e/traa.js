@@ -1,5 +1,6 @@
 import puppeteer from 'puppeteer';
 import assert from 'node:assert/strict';
+import { PNG } from 'pngjs';
 import { createServer } from '../../utils/server.js';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -54,14 +55,45 @@ try {
 		assert.deepEqual( await page.$eval( 'canvas', canvas => [ canvas.width, canvas.height ] ), [ 640, 450 ], 'Quarter resolution renders below CSS resolution' );
 		await new Promise( resolve => setTimeout( resolve, 700 ) );
 		await page.screenshot( { path: join( tmpdir(), `three-traa-${ backend }-downsampled.png` ) } );
-		await change( 'paused', true );
-		await change( 'paused', false );
-		await change( 'TRAA enabled', true );
+		await change( 'output', 'TRAA' );
+		for ( const output of [ 'Single Jitter', 'No TRAA', 'Velocity', 'TRAA', 'Single Jitter', 'TRAA' ] ) {
+
+			await change( 'output', output );
+			await page.waitForFunction( output => document.querySelector( '#status' ).textContent.includes( ` | ${ output } | ` ), {}, output );
+			await new Promise( resolve => setTimeout( resolve, 300 ) );
+			const screenshot = await page.screenshot( { path: join( tmpdir(), `three-traa-${ backend }-${ output.replaceAll( ' ', '-' ) }.png` ) } );
+			if ( output === 'Single Jitter' || output === 'No TRAA' ) {
+
+				const images = [];
+				for ( let i = 0; i < 3; i ++ ) {
+
+					const startFrame = await page.$eval( '#status', element => Number( element.textContent.split( 'frame ' )[ 1 ] ) );
+					await page.waitForFunction( start => Number( document.querySelector( '#status' ).textContent.split( 'frame ' )[ 1 ] ) > start + 2, {}, startFrame );
+					const image = await page.screenshot( { captureBeyondViewport: false, clip: { x: 245, y: 165, width: 170, height: 160 } } );
+					images.push( PNG.sync.read( Buffer.from( image ) ).data );
+
+				}
+
+				const changes = images.slice( 1 ).some( image => ! image.equals( images[ 0 ] ) );
+				assert.equal( changes, output === 'Single Jitter', `${ backend } ${ output }: static panel varies with jitter and stays stable without TRAA` );
+
+			}
+
+			if ( output === 'Velocity' ) {
+
+				const image = PNG.sync.read( Buffer.from( screenshot ) );
+				const pixel = ( 225 * 2 * image.width + 310 * 2 ) * 4;
+				assert.ok( [ 0, 1, 2 ].every( channel => Math.abs( image.data[ pixel + channel ] - 128 ) <= 2 ), 'Static geometry has neutral gray velocity' );
+
+			}
+
+		}
+
 		await change( 'cameraMotion', 'Orbit' );
 		await change( 'transparentBackground', true );
 		await new Promise( resolve => setTimeout( resolve, 700 ) );
 		await page.screenshot( { path: join( tmpdir(), `three-traa-${ backend }-alpha.png` ) } );
-		await change( 'TRAA enabled', false );
+		await change( 'output', 'No TRAA' );
 		await new Promise( resolve => setTimeout( resolve, 700 ) );
 		await page.setViewport( { width: 960, height: 720, deviceScaleFactor: 2 } );
 		await page.waitForFunction( () => {
@@ -70,7 +102,7 @@ try {
 			return canvas.width === 480 && canvas.height === 360;
 
 		} );
-		await change( 'TRAA enabled', true );
+		await change( 'output', 'TRAA' );
 		assert.deepEqual( await page.$eval( 'canvas', canvas => [ canvas.width, canvas.height ] ), [ 480, 360 ], 'Resize preserves the selected Retina resolution scale' );
 		await new Promise( resolve => setTimeout( resolve, 700 ) );
 		console.log( backend, await page.$eval( '#status', element => element.textContent ), errors );

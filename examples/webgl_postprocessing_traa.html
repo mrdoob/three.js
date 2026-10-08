@@ -17,7 +17,7 @@
 	</head>
 	<body>
 		<div id="info">TRAA challenges — one deterministic scene for WebGL and WebGPU<br>
-			<small>Look for shimmer, trailing edges, lost detail and unstable highlights. Disable TRAA for comparison.</small>
+			<small>Look for shimmer, trailing edges, lost detail and unstable highlights. Compare the jittered input, unjittered image and motion field.</small>
 		</div>
 		<div id="labels"></div>
 		<div id="status">Starting…</div>
@@ -38,7 +38,7 @@
 
 			const query = new URLSearchParams( location.search );
 			const params = {
-				backend: query.get( 'backend' ) || 'WebGL', traa: true, resolutionScale: 1, paused: false,
+				backend: query.get( 'backend' ) || 'WebGL', output: 'TRAA', resolutionScale: 1,
 				cameraMotion: 'Still', transparentBackground: false
 			};
 			const { scene, camera, labels, update } = await createTRAATestScene();
@@ -51,11 +51,17 @@
 			}
 
 			let renderer, composer, temporal, pipeline, colorNode, depthNode, velocityNode, traaFactory;
+			let velocityPass, outputPass, beautyPass, setVelocityProjection;
+			const gpuOutputs = {};
+			const resolution = new THREE.Vector2();
+			const projection = new THREE.Matrix4();
+			const projectionInverse = new THREE.Matrix4();
+			let jitterIndex = 0, jitterActive = false;
 			let time = 0, frame = 0;
 			if ( params.backend === 'WebGPU' ) {
 
 				const { WebGPURenderer, RenderPipeline } = await import( 'three/webgpu' );
-				const { mrt, output, pass, velocity } = await import( 'three/tsl' );
+				const { Fn, mrt, output, pass, velocity, uniform, vec2, vec3, vec4, OnBeforeRenderPipeline, OnAfterRenderPipeline } = await import( 'three/tsl' );
 				const { traa } = await import( 'three/addons/tsl/display/TRAANode.js' );
 				traaFactory = traa;
 				renderer = new WebGPURenderer( { antialias: false, alpha: true } );
@@ -66,6 +72,23 @@
 				colorNode = scenePass.getTextureNode( 'output' );
 				depthNode = scenePass.getTextureNode( 'depth' );
 				velocityNode = scenePass.getTextureNode( 'velocity' );
+				setVelocityProjection = matrix => velocity.setProjectionMatrix( matrix );
+				gpuOutputs[ 'No TRAA' ] = colorNode;
+				gpuOutputs[ 'Single Jitter' ] = Fn( () => {
+
+					OnBeforeRenderPipeline( setSingleJitter );
+					OnAfterRenderPipeline( clearSingleJitter );
+					return colorNode;
+
+				} )();
+				const size = uniform( resolution );
+				gpuOutputs.Velocity = Fn( () => {
+
+					const motion = velocityNode.xy.mul( vec2( 0.5, - 0.5 ) ).mul( size ).div( 2 );
+					const color = vec4( vec3( motion.add( 0.5 ), 0.5 ).clamp( 0, 1 ), 1 );
+					return depthNode.r.lessThan( 1 ).select( color, vec4( 0, 0, 0, 1 ) );
+
+				} )();
 				resetHistory();
 
 			} else {
@@ -75,14 +98,52 @@
 				const { RenderPass } = await import( 'three/addons/postprocessing/RenderPass.js' );
 				const { TRAAPass } = await import( 'three/addons/postprocessing/TRAAPass.js' );
 				const { OutputPass } = await import( 'three/addons/postprocessing/OutputPass.js' );
+				const { ShaderPass } = await import( 'three/addons/postprocessing/ShaderPass.js' );
 				renderer = new THREE.WebGLRenderer( { antialias: false, alpha: true } );
 				composer = new EffectComposer( renderer );
 				const gBuffer = new GBufferPass( scene, camera, 1, 1, { velocity: true } );
 				temporal = new TRAAPass( camera, gBuffer );
+				setVelocityProjection = matrix => gBuffer.setVelocityProjectionMatrix( matrix );
+				beautyPass = new RenderPass( scene, camera );
+				outputPass = new OutputPass();
+				velocityPass = new ShaderPass( {
+					uniforms: {
+						tVelocity: { value: gBuffer.velocityTexture },
+						tDepth: { value: gBuffer.depthTexture },
+						resolution: { value: resolution }
+					},
+					vertexShader: /* glsl */`
+						varying vec2 vUv;
+						void main() {
+							vUv = uv;
+							gl_Position = vec4( position.xy, 0.0, 1.0 );
+						}
+					`,
+					fragmentShader: /* glsl */`
+						uniform sampler2D tVelocity, tDepth;
+						uniform vec2 resolution;
+						varying vec2 vUv;
+						void main() {
+							vec4 motion = texture2D( tVelocity, vUv );
+							vec2 pixels = motion.xy * vec2( 0.5, -0.5 ) * resolution;
+							vec3 color = clamp( vec3( 0.5 + pixels / 2.0, 0.5 ), 0.0, 1.0 );
+							if ( motion.a < 0.5 ) color = vec3( 1.0, 0.0, 1.0 );
+							if ( texture2D( tDepth, vUv ).r >= 1.0 ) color = vec3( 0.0 );
+							gl_FragColor = vec4( color, 1.0 );
+						}
+					`
+				}, 'unused' );
+				velocityPass.uniforms.tVelocity.value = gBuffer.velocityTexture;
+				velocityPass.uniforms.tDepth.value = gBuffer.depthTexture;
+				velocityPass.uniforms.resolution.value = resolution;
+				velocityPass.material.depthTest = false;
+				velocityPass.material.depthWrite = false;
+				velocityPass.material.toneMapped = false;
 				composer.addPass( gBuffer );
-				composer.addPass( new RenderPass( scene, camera ) );
+				composer.addPass( beautyPass );
 				composer.addPass( temporal );
-				composer.addPass( new OutputPass() );
+				composer.addPass( velocityPass );
+				composer.addPass( outputPass );
 
 			}
 
@@ -97,24 +158,28 @@
 				location.search = new URLSearchParams( { backend } );
 
 			} );
-			gui.add( params, 'traa' ).name( 'TRAA enabled' ).onChange( resetHistory );
+			gui.add( params, 'output', [ 'TRAA', 'Single Jitter', 'No TRAA', 'Velocity' ] ).onChange( resetHistory );
 			gui.add( params, 'resolutionScale', { '100% (device)': 1, '75%': 0.75, '50%': 0.5, '25%': 0.25, '12.5%': 0.125 } ).name( 'Render resolution' ).onChange( resize );
-			gui.add( params, 'paused' );
 			gui.add( params, 'cameraMotion', [ 'Still', 'Pan', 'Orbit', 'Zoom' ] ).onChange( resetHistory );
 			gui.add( params, 'transparentBackground' ).onChange( resetHistory );
 
 			function resetHistory() {
 
+				jitterIndex = 0;
 				if ( pipeline ) {
 
 					if ( temporal ) temporal.dispose();
 					temporal = traaFactory( colorNode, depthNode, velocityNode, camera );
-					pipeline.outputNode = params.traa ? temporal : colorNode;
+					pipeline.outputNode = params.output === 'TRAA' ? temporal : gpuOutputs[ params.output ];
+					pipeline.outputColorTransform = params.output !== 'Velocity';
 					pipeline.needsUpdate = true;
 
 				} else if ( temporal ) {
 
-					temporal.enabled = params.traa;
+					temporal.enabled = params.output === 'TRAA';
+					velocityPass.enabled = params.output === 'Velocity';
+					outputPass.enabled = ! velocityPass.enabled;
+					beautyPass.enabled = ! velocityPass.enabled;
 					temporal.reset();
 
 				}
@@ -127,10 +192,12 @@
 				camera.updateProjectionMatrix();
 				renderer.setPixelRatio( window.devicePixelRatio * params.resolutionScale );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.getDrawingBufferSize( resolution );
 				if ( composer ) {
 
 					composer.setPixelRatio( renderer.getPixelRatio() );
 					composer.setSize( window.innerWidth, window.innerHeight );
+					velocityPass.uniforms.resolution.value.copy( resolution );
 
 				}
 
@@ -138,14 +205,80 @@
 
 			}
 
+			function halton( index, base ) {
+
+				let value = 0, fraction = 1;
+				while ( index > 0 ) {
+
+					fraction /= base;
+					value += fraction * ( index % base );
+					index = Math.floor( index / base );
+
+				}
+
+				return value;
+
+			}
+
+			function setSingleJitter() {
+
+				projection.copy( camera.projectionMatrix );
+				projectionInverse.copy( camera.projectionMatrixInverse );
+				setVelocityProjection( projection );
+				const index = jitterIndex + 1;
+				const dx = - 2 * ( halton( index, 2 ) - 0.5 ) / resolution.x;
+				const dy = 2 * ( halton( index, 3 ) - 0.5 ) / resolution.y;
+				const e = camera.projectionMatrix.elements;
+				for ( let column = 0; column < 4; column ++ ) {
+
+					const offset = column * 4;
+					e[ offset ] += dx * e[ offset + 3 ];
+					e[ offset + 1 ] += dy * e[ offset + 3 ];
+
+				}
+
+				camera.projectionMatrixInverse.copy( camera.projectionMatrix ).invert();
+				jitterActive = true;
+
+			}
+
+			function clearSingleJitter() {
+
+				if ( ! jitterActive ) return;
+				camera.projectionMatrix.copy( projection );
+				camera.projectionMatrixInverse.copy( projectionInverse );
+				setVelocityProjection( null );
+				jitterIndex = ( jitterIndex + 1 ) % 32;
+				jitterActive = false;
+
+			}
+
 			function render() {
 
 				update( time, params );
-				if ( composer ) temporal.renderFrame( composer );
-				else pipeline.render();
+				try {
+
+					if ( composer ) {
+
+						if ( params.output === 'TRAA' ) temporal.renderFrame( composer );
+						else {
+
+							if ( params.output === 'Single Jitter' ) setSingleJitter();
+							composer.render();
+
+						}
+
+					} else pipeline.render();
+
+				} finally {
+
+					clearSingleJitter();
+
+				}
+
 				frame ++;
-				const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
-				document.getElementById( 'status' ).textContent = `${ backendName } | ${ params.traa ? 'TRAA' : 'No AA' } | ${ size.x }×${ size.y } (${ params.resolutionScale * 100 }%) | MSAA off | t=${ time.toFixed( 2 ) } | frame ${ frame }`;
+				const size = resolution;
+				document.getElementById( 'status' ).textContent = `${ backendName } | ${ params.output } | ${ size.x }×${ size.y } (${ params.resolutionScale * 100 }%) | MSAA off | t=${ time.toFixed( 2 ) } | frame ${ frame }`;
 
 			}
 
@@ -156,7 +289,7 @@
 			renderer.setAnimationLoop( () => {
 
 				timer.update();
-				if ( ! params.paused ) time += timer.getDelta();
+				time += timer.getDelta();
 				render();
 
 			} );
