@@ -12,8 +12,8 @@ import { error } from '../../../utils.js';
 const glslPolyfills = {
 	atan2: new CodeNode( /* glsl */`
 float tsl_atan2( float y, float x ) {
-	// ANGLE/SwiftShader can return PI for runtime negative zero with positive x.
-	return atan( y == 0.0 && x > 0.0 ? 0.0 : y, x );
+	// SwiftShader selects the wrong quadrant for runtime negative zero.
+	return atan( y == 0.0 ? 0.0 : y, x );
 }
 vec2 tsl_atan2( vec2 y, vec2 x ) {
 	return vec2( tsl_atan2( y.x, x.x ), tsl_atan2( y.y, x.y ) );

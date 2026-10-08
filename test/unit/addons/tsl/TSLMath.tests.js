@@ -75,6 +75,10 @@ export default QUnit.module( 'TSL', () => {
 
 			assert.closeAbs( atan( negativeZero, uniform( 1 ) ), float( 0 ), 1e-6, 'atan(-0, 1)' );
 			assert.closeAbs( atan( negativeZero, uniform( smallestNormal ) ), float( 0 ), 1e-6, 'atan(-0, 2^-126)' );
+			// Either sign of PI is valid when zero signs are interchanged.
+			// SwiftShader incorrectly returns zero for these negative-x cases.
+			assert.closeAbs( abs( atan( negativeZero, uniform( - 1 ) ) ), float( Math.PI ), 1e-6, '|atan(-0, -1)|' );
+			assert.closeAbs( abs( atan( negativeZero, uniform( - smallestNormal ) ) ), float( Math.PI ), 1e-6, '|atan(-0, -2^-126)|' );
 			assert.closeAbs( atan( negativeSubnormal, uniform( 1 ) ), float( Math.atan2( smallestSubnormal, 1 ) ), 1e-6, 'atan(-2^-149, 1)' );
 			assert.closeAbs( atan( negativeSubnormal, uniform( smallestNormal ) ), float( Math.atan2( smallestSubnormal, smallestNormal ) ), 1e-6, 'atan(-2^-149, 2^-126)' );
 
