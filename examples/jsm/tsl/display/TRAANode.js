@@ -234,7 +234,7 @@ class TRAANode extends Node {
 		 * @private
 		 * @type {TextureNode}
 		 */
-		this._previousDepthNode = texture( new DepthTexture( 1, 1 ) );
+		this._previousDepthNode = texture( this._historyRenderTarget.depthTexture );
 
 		/**
 		 * The node used to render the scene's velocity.
