@@ -155,7 +155,7 @@ export default QUnit.module( 'Nodes', () => {
 
 			} );
 
-			QUnit.test( 'lighting disposal releases cached buffers and allows rebuilding', ( assert ) => {
+			QUnit.test( 'node disposal releases buffers and lighting disposal clears cached nodes', ( assert ) => {
 
 				const lighting = new Lighting();
 				const scene = new Scene();
@@ -163,15 +163,16 @@ export default QUnit.module( 'Nodes', () => {
 				const key = node.customCacheKey();
 				const batch = node.setupLightsNode( createBuilder() )[ 0 ];
 				let disposed = 0;
-				for ( const attribute of [ batch.cellAttribute, batch.indexAttribute, batch.lightAttribute ] ) {
+				for ( const attribute of [ batch.cellsNode.value, batch.indicesNode.value, batch.lightsNode.value ] ) {
 
 					attribute.addEventListener( 'dispose', () => disposed ++ );
 
 				}
 
-				lighting.dispose();
+				node.dispose();
 				assert.strictEqual( disposed, 3 );
 				assert.notStrictEqual( node.customCacheKey(), key );
+				lighting.dispose();
 				assert.notStrictEqual( lighting.getNode( scene ), node );
 
 			} );

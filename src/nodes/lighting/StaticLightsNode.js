@@ -35,14 +35,14 @@ class StaticLightsNode extends LightingNode {
 		this.grid = grid;
 		this.shadowNode = null;
 
-		this.cellAttribute = new StorageBufferAttribute( grid.cells, 2 );
-		this.indexAttribute = new StorageBufferAttribute( grid.indices, 1 );
-		this.lightAttribute = new StorageBufferAttribute( grid.data, 4 );
+		const cellAttribute = new StorageBufferAttribute( grid.cells, 2 );
+		const indexAttribute = new StorageBufferAttribute( grid.indices, 1 );
+		const lightAttribute = new StorageBufferAttribute( grid.data, 4 );
 
 		// Stable names allow materials using the same grid to share shader programs.
-		this.cellsNode = storage( this.cellAttribute, 'uvec2', this.cellAttribute.count ).toReadOnly().setName( 'staticLightCells' );
-		this.indicesNode = storage( this.indexAttribute, 'uint', this.indexAttribute.count ).toReadOnly().setName( 'staticLightIndices' );
-		this.lightsNode = storage( this.lightAttribute, 'vec4', this.lightAttribute.count ).toReadOnly().setName( 'staticLights' );
+		this.cellsNode = storage( cellAttribute, 'uvec2', cellAttribute.count ).toReadOnly().setName( 'staticLightCells' );
+		this.indicesNode = storage( indexAttribute, 'uint', indexAttribute.count ).toReadOnly().setName( 'staticLightIndices' );
+		this.lightsNode = storage( lightAttribute, 'vec4', lightAttribute.count ).toReadOnly().setName( 'staticLights' );
 
 	}
 
@@ -138,9 +138,9 @@ class StaticLightsNode extends LightingNode {
 	 */
 	dispose() {
 
-		this.cellAttribute.dispose();
-		this.indexAttribute.dispose();
-		this.lightAttribute.dispose();
+		this.cellsNode.value.dispose();
+		this.indicesNode.value.dispose();
+		this.lightsNode.value.dispose();
 
 		super.dispose();
 

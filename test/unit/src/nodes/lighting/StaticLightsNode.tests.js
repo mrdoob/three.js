@@ -222,10 +222,42 @@ export default QUnit.module( 'Nodes', () => {
 
 				} finally {
 
-					reference.dispose();
-					batched.dispose();
-					target.dispose();
-					await renderer.dispose();
+					const destroyCounts = new Map();
+					for ( const node of renderer.lighting.getNode( batched.scene )._staticLightsNodes.values() ) {
+
+						if ( node === null ) continue;
+
+						for ( const storageNode of [ node.cellsNode, node.indicesNode, node.lightsNode ] ) {
+
+							const attribute = storageNode.value;
+							if ( renderer.backend.has( attribute ) && renderer.backend.get( attribute ).buffer !== undefined ) destroyCounts.set( attribute, 0 );
+
+						}
+
+					}
+
+					const destroyAttribute = renderer.backend.destroyAttribute;
+					renderer.backend.destroyAttribute = function ( attribute ) {
+
+						if ( destroyCounts.has( attribute ) ) destroyCounts.set( attribute, destroyCounts.get( attribute ) + 1 );
+						return destroyAttribute.call( this, attribute );
+
+					};
+
+					try {
+
+						reference.dispose();
+						batched.dispose();
+						target.dispose();
+						await renderer.dispose();
+						assert.true( destroyCounts.size > 0, 'static light grids uploaded GPU buffers' );
+						assert.true( [ ...destroyCounts.values() ].every( count => count === 1 ), 'renderer disposal destroys every static light buffer exactly once' );
+
+					} finally {
+
+						renderer.backend.destroyAttribute = destroyAttribute;
+
+					}
 
 				}
 
