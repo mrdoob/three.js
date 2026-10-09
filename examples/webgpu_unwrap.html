@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - UV unwrap</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+		<style>
+			#panel { position: absolute; top: 12px; left: 12px; width: 320px; padding: 12px; background: #18202de8; color: #fff; font: 13px monospace; }
+			#panel label { display: block; margin-bottom: 8px; }
+			#panel select, #panel button { font: inherit; }
+			#status { white-space: pre-wrap; line-height: 1.5; }
+			#atlas { width: 320px; height: 320px; background: #080c12; }
+			#panel a { color: #9cf; }
+		</style>
+	</head>
+	<body>
+		<div id="panel">
+			<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a> / native UV unwrap
+			<p>Unique scene atlas on uv1. Checker squares represent equal texel counts. Characters use their loaded bake pose.</p>
+			<label>Model <select id="model">
+				<option value="boxes">Scaled boxes</option>
+				<option value="DamagedHelmet/glTF/DamagedHelmet.gltf">Damaged Helmet</option>
+				<option value="Soldier.glb">Soldier</option>
+				<option value="Xbot.glb">Xbot</option>
+				<option value="LeePerrySmith/LeePerrySmith.glb">Lee Perry Smith</option>
+				<option value="space_ship_hallway.glb">Space ship hallway</option>
+			</select></label>
+			<label>Method <select id="mode"><option value="lightmap">Lightmap / projection</option><option value="normal">Normal bake / conformal</option></select></label>
+			<label>Atlas <select id="resolution"><option>1024</option><option selected>2048</option><option>4096</option></select></label>
+			<label><input id="checker" type="checkbox" checked> Show UV checker</label>
+			<label><input id="inputUV" type="checkbox"> Preserve valid authored UV islands</label>
+			<button id="unwrap">Unwrap again</button>
+			<p id="status">Loading renderer…</p>
+			<canvas id="atlas" width="512" height="512"></canvas>
+		</div>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+		<script type="module">
+			import * as THREE from 'three/webgpu';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+			import { UVUnwrapper } from 'three/addons/utils/UVUnwrapper.js';
+
+			const status = document.getElementById( 'status' );
+			const scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x303b4b );
+			const camera = new THREE.PerspectiveCamera( 45, innerWidth / innerHeight, 0.01, 10000 );
+			const renderer = new THREE.WebGPURenderer( { antialias: true } );
+			renderer.setPixelRatio( devicePixelRatio );
+			renderer.setSize( innerWidth, innerHeight );
+			document.body.appendChild( renderer.domElement );
+			const controls = new OrbitControls( camera, renderer.domElement );
+			controls.enableDamping = true;
+			scene.add( new THREE.HemisphereLight( 0xffffff, 0x667788, 3 ) );
+			const light = new THREE.DirectionalLight( 0xffffff, 3 );
+			light.position.set( 3, 5, 4 );
+			scene.add( light );
+
+			const checkerCanvas = document.createElement( 'canvas' );
+			checkerCanvas.width = checkerCanvas.height = 1024;
+			const ctx = checkerCanvas.getContext( '2d' );
+			for ( let y = 0; y < 32; y ++ ) {
+
+				for ( let x = 0; x < 32; x ++ ) {
+
+					ctx.fillStyle = ( x + y ) % 2 ? '#e8edf7' : '#2559a0';
+					ctx.fillRect( x * 32, y * 32, 32, 32 );
+					ctx.fillStyle = '#e09028';
+					ctx.fillRect( x * 32, y * 32, 2, 32 );
+					ctx.fillRect( x * 32, y * 32, 32, 2 );
+
+				}
+
+			}
+
+			const checkerTexture = new THREE.CanvasTexture( checkerCanvas );
+			checkerTexture.channel = 1;
+			checkerTexture.colorSpace = THREE.SRGBColorSpace;
+			const previewMaterial = new THREE.MeshStandardMaterial( { map: checkerTexture, roughness: 0.8, side: THREE.DoubleSide } );
+			const draco = new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' );
+			const loader = new GLTFLoader().setDRACOLoader( draco );
+			const unwrapper = new UVUnwrapper();
+			let root, originals = [], result, loadId = 0;
+
+			function updateMaterials() {
+
+				for ( const item of originals ) item.mesh.material = document.getElementById( 'checker' ).checked ? previewMaterial : item.material;
+
+			}
+
+			function unwrap() {
+
+				if ( ! root ) return;
+				status.textContent = 'Unwrapping…';
+				for ( const item of originals ) {
+
+					if ( item.mesh.geometry !== item.geometry ) item.mesh.geometry.dispose();
+					item.mesh.geometry = item.geometry;
+
+				}
+
+				try {
+
+					result = unwrapper.unwrap( root, {
+						mode: document.getElementById( 'mode' ).value,
+						useInputUVs: document.getElementById( 'inputUV' ).checked,
+						resolution: Number( document.getElementById( 'resolution' ).value )
+					} );
+					const s = result.statistics;
+					status.textContent = `${ s.triangles.toLocaleString() } triangles / ${ s.charts } charts\n${ s.totalMilliseconds.toFixed( 1 ) } ms / ${ ( s.utilization * 100 ).toFixed( 1 ) }% triangle coverage\n${ result.texelsPerUnit.toFixed( 2 ) } texels/world unit\nLocal density ${ s.minTexelsPerUnit.toFixed( 2 ) }–${ s.maxTexelsPerUnit.toFixed( 2 ) }\nWorst stretch ${ s.maxStretch.toFixed( 3 ) }\n${ s.degenerateTriangles } degenerate triangles`;
+					window.unwrapExample.result = result;
+					drawAtlas();
+					updateMaterials();
+
+				} catch ( error ) {
+
+					result = null;
+					window.unwrapExample.result = null;
+					const canvas = document.getElementById( 'atlas' );
+					canvas.getContext( '2d' ).clearRect( 0, 0, canvas.width, canvas.height );
+					for ( const item of originals ) item.mesh.material = item.material;
+					status.textContent = error.message;
+					throw error;
+
+				}
+
+			}
+
+			function drawAtlas() {
+
+				const canvas = document.getElementById( 'atlas' ), context = canvas.getContext( '2d' );
+				context.clearRect( 0, 0, canvas.width, canvas.height );
+				for ( const chart of result.charts ) {
+
+					const geometry = chart.mesh.geometry, uv = geometry.attributes.uv1, index = geometry.index;
+					context.fillStyle = `hsl(${ chart.index * 137.508 % 360 },65%,60%)`;
+					context.beginPath();
+					for ( const face of chart.faces ) {
+
+						for ( let j = 0; j < 3; j ++ ) {
+
+							const v = index.getX( face * 3 + j ), x = uv.getX( v ) * canvas.width, y = ( 1 - uv.getY( v ) ) * canvas.height;
+							if ( j === 0 ) context.moveTo( x, y ); else context.lineTo( x, y );
+
+						}
+
+						context.closePath();
+
+					}
+
+					context.fill();
+
+				}
+
+			}
+
+			async function loadModel( name ) {
+
+				document.getElementById( 'model' ).value = name;
+				const id = ++ loadId;
+				status.textContent = 'Loading model…';
+				let loaded;
+				if ( name === 'boxes' ) {
+
+					loaded = new THREE.Group();
+					const geometry = new THREE.BoxGeometry();
+					for ( let i = 0; i < 8; i ++ ) {
+
+						const mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
+						mesh.position.set( ( i % 4 ) * 1.8, 0, Math.floor( i / 4 ) * 2 );
+						mesh.scale.set( 0.5 + i * 0.1, 0.7 + i * 0.2, 1 );
+						mesh.rotation.y = i * 0.3;
+						loaded.add( mesh );
+
+					}
+
+				} else {
+
+					loaded = ( await loader.loadAsync( `models/gltf/${ name }` ) ).scene;
+
+				}
+
+				if ( id !== loadId ) {
+
+					disposeModel( loaded );
+					return;
+
+				}
+
+				if ( root ) {
+
+					scene.remove( root );
+					for ( const item of originals ) {
+
+						item.mesh.material = item.material;
+						item.geometry.dispose();
+
+					}
+
+					disposeModel( root );
+
+				}
+
+				root = loaded;
+				originals = [];
+				root.traverse( mesh => {
+
+					if ( mesh.isMesh ) originals.push( { mesh, geometry: mesh.geometry, material: mesh.material } );
+
+				} );
+				scene.add( root );
+				const box = new THREE.Box3().setFromObject( root ), center = box.getCenter( new THREE.Vector3() );
+				const size = box.getSize( new THREE.Vector3() ).length();
+				controls.target.copy( center );
+				camera.position.copy( center ).add( new THREE.Vector3( size * 0.65, size * 0.35, size * 0.9 ) );
+				camera.near = Math.max( size / 10000, 0.001 );
+				camera.far = Math.max( size * 100, 10 );
+				camera.updateProjectionMatrix();
+				controls.update();
+				unwrap();
+				return result;
+
+			}
+
+			function disposeModel( object ) {
+
+				object.traverse( mesh => {
+
+					if ( ! mesh.isMesh ) return;
+					mesh.geometry.dispose();
+					for ( const material of [].concat( mesh.material ) ) {
+
+						for ( const value of Object.values( material ) ) if ( value && value.isTexture ) value.dispose();
+						material.dispose();
+
+					}
+
+				} );
+
+			}
+
+			window.unwrapExample = { loadModel, unwrap, result: null };
+			function reportError( error ) {
+
+				status.textContent = error.message;
+				console.error( error );
+
+			}
+
+			document.getElementById( 'model' ).onchange = event => loadModel( event.target.value ).catch( reportError );
+			for ( const id of [ 'mode', 'resolution', 'inputUV', 'unwrap' ] ) {
+
+				document.getElementById( id )[ id === 'unwrap' ? 'onclick' : 'onchange' ] = () => {
+
+					try {
+
+						unwrap();
+
+					} catch ( error ) {
+
+						reportError( error );
+
+					}
+
+				};
+
+			}
+
+			document.getElementById( 'checker' ).onchange = updateMaterials;
+			window.addEventListener( 'resize', () => {
+
+				camera.aspect = innerWidth / innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( innerWidth, innerHeight );
+
+			} );
+			renderer.init().then( () => {
+
+				renderer.setAnimationLoop( () => {
+
+					controls.update();
+					renderer.render( scene, camera );
+
+				} );
+				return loadModel( 'boxes' );
+
+			} ).catch( reportError );
+		</script>
+	</body>
+</html>
