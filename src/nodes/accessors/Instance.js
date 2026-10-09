@@ -57,10 +57,11 @@ export function isSharedInstancing( object, renderer ) {
  * Copies pending matrix updates into the interleaved buffer used for rendering.
  *
  * @param {InstancedBufferAttribute} matrices - The source matrix attribute.
+ * @param {Object} [owner=matrices] - The owner of the interleaved buffer.
  */
-function syncInterleavedMatrix( matrices ) {
+function syncInterleavedMatrix( matrices, owner = matrices ) {
 
-	const interleavedMatrix = getMatrixColumns( matrices )[ 0 ].data;
+	const interleavedMatrix = getMatrixColumns( matrices, owner )[ 0 ].data;
 
 	if ( interleavedMatrix.version !== matrices.version ) {
 
@@ -93,17 +94,18 @@ function createMatrixColumns( array, usage = StaticDrawUsage ) {
  * Returns the four column attributes that bind the given matrices as an instanced vertex buffer.
  *
  * @param {InstancedBufferAttribute} matrices - The matrix buffer attribute.
+ * @param {Object} [owner=matrices] - The owner of the vertex buffer. Shared programs use the rendered object, so the buffer is released with it.
  * @returns {Array<InterleavedBufferAttribute>} The column attributes.
  */
-function getMatrixColumns( matrices ) {
+function getMatrixColumns( matrices, owner = matrices ) {
 
-	let columns = _matrixColumns.get( matrices );
+	let columns = _matrixColumns.get( owner );
 
-	if ( columns === undefined ) {
+	if ( columns === undefined || columns[ 0 ].data.array !== matrices.array ) {
 
 		columns = createMatrixColumns( matrices.array, matrices.usage );
 
-		_matrixColumns.set( matrices, columns );
+		_matrixColumns.set( owner, columns );
 
 	}
 
@@ -111,10 +113,11 @@ function getMatrixColumns( matrices ) {
 
 }
 
-const getInstanceMatrix = object => object.instanceMatrix;
+const getObjectColumns = object => getMatrixColumns( object.instanceMatrix, object );
+const getPreviousColumns = object => getMatrixColumns( getPreviousMatrix( object ) );
 
 // Callbacks of shared programs are declared here, so they don't retain the matrices of the mesh the program was built from.
-const syncObjectMatrix = ( { object } ) => syncInterleavedMatrix( object.instanceMatrix );
+const syncObjectMatrix = ( { object } ) => syncInterleavedMatrix( object.instanceMatrix, object );
 const updateObjectPreviousMatrix = ( { object } ) => updatePreviousMatrix( object, object.instanceMatrix );
 
 /**
@@ -123,10 +126,10 @@ const updateObjectPreviousMatrix = ( { object } ) => updatePreviousMatrix( objec
  *
  * @param {NodeBuilder} builder - The current node builder.
  * @param {InstancedBufferAttribute|StorageInstancedBufferAttribute} instanceMatrix - The matrix buffer attribute.
- * @param {?Function} [getObjectMatrices=null] - Optional callback returning the matrix attribute of the rendered object.
+ * @param {?Function} [getObjectColumns=null] - Optional callback returning the matrix columns of the rendered object.
  * @returns {Node} The matrix node.
  */
-function createInstanceMatrixNode( builder, instanceMatrix, getObjectMatrices = null ) {
+function createInstanceMatrixNode( builder, instanceMatrix, getObjectColumns = null ) {
 
 	let instanceMatrixNode;
 	const matrixCount = Math.max( instanceMatrix.count, 1 );
@@ -141,20 +144,20 @@ function createInstanceMatrixNode( builder, instanceMatrix, getObjectMatrices = 
 
 		const uniformBufferSize = matrixCount * 16 * 4;
 
-		if ( getObjectMatrices === null && uniformBufferSize <= builder.getUniformBufferLimit() ) {
+		if ( getObjectColumns === null && uniformBufferSize <= builder.getUniformBufferLimit() ) {
 
 			instanceMatrixNode = buffer( instanceMatrix.array, 'mat4', matrixCount ).element( instanceIndex );
 
 		} else {
 
 			// Shared programs bind the columns of the rendered object, placeholder columns only provide the layout.
-			const layout = getObjectMatrices === null ? getMatrixColumns( instanceMatrix ) : createMatrixColumns( new Float32Array( 16 ) );
+			const layout = getObjectColumns === null ? getMatrixColumns( instanceMatrix ) : createMatrixColumns( new Float32Array( 16 ) );
 
 			const columns = layout.map( ( column, i ) => {
 
 				const node = instancedBufferAttribute( column );
 
-				if ( getObjectMatrices !== null ) node.setObjectAttribute( object => getMatrixColumns( getObjectMatrices( object ) )[ i ] );
+				if ( getObjectColumns !== null ) node.setObjectAttribute( object => getObjectColumns( object )[ i ] );
 
 				return node;
 
@@ -248,7 +251,7 @@ function setupInstance( builder, matrices, colors, shared ) {
 
 	const isStorageColor = colors && colors.isStorageInstancedBufferAttribute === true;
 
-	const instanceMatrixNode = createInstanceMatrixNode( builder, matrices, shared ? getInstanceMatrix : null );
+	const instanceMatrixNode = createInstanceMatrixNode( builder, matrices, shared ? getObjectColumns : null );
 
 	if ( shared ) OnBeforeObjectUpdate( syncObjectMatrix );
 
@@ -315,7 +318,7 @@ function setupInstance( builder, matrices, colors, shared ) {
 		OnAfterObjectUpdate( shared ? updateObjectPreviousMatrix : ( { object } ) => updatePreviousMatrix( object, matrices ) );
 
 		const previousMatrix = getPreviousMatrix( builder.object, matrices );
-		const previousMatrixNode = createInstanceMatrixNode( builder, previousMatrix, shared ? getPreviousMatrix : null );
+		const previousMatrixNode = createInstanceMatrixNode( builder, previousMatrix, shared ? getPreviousColumns : null );
 		positionPrevious.assign( previousMatrixNode.mul( positionPrevious ).xyz );
 
 	}

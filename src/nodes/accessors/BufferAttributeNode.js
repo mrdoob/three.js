@@ -149,6 +149,7 @@ class BufferAttributeNode extends InputNode {
 		/**
 		 * An optional function that returns the buffer attribute of the rendered object.
 		 * Programs shared between objects use it so each object binds its own data.
+		 * The returned attribute belongs to the object and is released when the object is disposed.
 		 *
 		 * @type {?Function}
 		 * @default null
