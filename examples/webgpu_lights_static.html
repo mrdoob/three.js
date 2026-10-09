@@ -97,14 +97,14 @@
 
 				const plinths = new THREE.InstancedMesh(
 					new THREE.CylinderGeometry( 1.9, 2.1, 0.35, 24 ),
-					new THREE.MeshStandardMaterial( { color: 0x666666, roughness: 0.4, metalness: 0.3 } ),
+					new THREE.MeshStandardMaterial( { roughness: 0.4, metalness: 0.3 } ),
 					COUNT
 				);
 				scene.add( plinths );
 
 				sculptures = new THREE.InstancedMesh(
 					new THREE.TorusKnotGeometry( 0.9, 0.3, 64, 12 ),
-					new THREE.MeshStandardMaterial( { color: 0xdddddd, roughness: 0.28, metalness: 0.5 } ),
+					new THREE.MeshStandardMaterial( { roughness: 0.28, metalness: 0.5 } ),
 					COUNT
 				);
 				sculptures.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
@@ -115,14 +115,14 @@
 				const spotLights = new THREE.Group();
 				scene.add( pointLights, spotLights );
 
-				const markerGeometry = new THREE.SphereGeometry( 0.12, 8, 6 );
-				const markerMaterial = new THREE.MeshBasicMaterial();
-				const pointMarkers = new THREE.InstancedMesh( markerGeometry, markerMaterial, COUNT );
-				const spotMarkers = new THREE.InstancedMesh( markerGeometry, markerMaterial, COUNT );
-				pointLights.add( pointMarkers );
-				spotLights.add( spotMarkers );
+				const helpers = new THREE.Group();
+				const pointHelpers = new THREE.Group();
+				const spotHelpers = new THREE.Group();
+				helpers.add( pointHelpers, spotHelpers );
+				helpers.visible = false;
+				scene.add( helpers );
 
-				const colors = [ 0x68c8ff, 0xffae68, 0x9694ff, 0xff7c96 ];
+				const color = new THREE.Color();
 				const span = ( GRID - 1 ) * SPACING;
 
 				for ( let x = 0; x < GRID; x ++ ) {
@@ -132,39 +132,33 @@
 						const index = x * GRID + z;
 						const px = x * SPACING - span / 2;
 						const pz = z * SPACING - span / 2;
-						const color = new THREE.Color( colors[ ( x + z ) % colors.length ] );
+						const hue = ( index * 0.618033988749895 ) % 1;
 
 						positions.push( new THREE.Vector3( px, 2, pz ) );
 
 						dummy.position.set( px, 0.175, pz );
 						dummy.updateMatrix();
 						plinths.setMatrixAt( index, dummy.matrix );
+						plinths.setColorAt( index, color.setHSL( hue, 0.3, 0.35 ) );
+						sculptures.setColorAt( index, color.setHSL( hue + 0.5, 0.5, 0.65 ) );
 
 						// Finite range and light.static opt into the storage-buffer grid.
 						// Position, color, intensity and range stay fixed after the first render.
 
-						const point = new THREE.PointLight( color, 25, 6 );
+						const point = new THREE.PointLight( color.setHSL( hue, 0.85, 0.6 ), 25, 6 );
 						point.position.set( px - 2.4, 0.8, pz + 1.5 );
 						point.static = true;
 						pointLights.add( point );
+						pointHelpers.add( new THREE.PointLightHelper( point, 0.25 ) );
 
-						dummy.position.copy( point.position );
-						dummy.updateMatrix();
-						pointMarkers.setMatrixAt( index, dummy.matrix );
-						pointMarkers.setColorAt( index, color );
-
-						const spot = new THREE.SpotLight( color, 220, 12, Math.PI / 7, 0.35 );
+						const spot = new THREE.SpotLight( color.setHSL( hue + 0.3, 0.85, 0.6 ), 220, 12, Math.PI / 7, 0.35 );
 						spot.position.set( px + 2, 6, pz - 1.5 );
 						spot.target.position.set( px + 0.8, 0, pz );
 						spot.static = true;
 
 						// A static spotlight's target also stays fixed in world space.
 						spotLights.add( spot, spot.target );
-
-						dummy.position.copy( spot.position );
-						dummy.updateMatrix();
-						spotMarkers.setMatrixAt( index, dummy.matrix );
-						spotMarkers.setColorAt( index, color );
+						spotHelpers.add( new THREE.SpotLightHelper( spot ) );
 
 					}
 
@@ -180,8 +174,9 @@
 				controls.update();
 
 				const gui = renderer.inspector.createParameters( 'Settings' );
-				gui.add( pointLights, 'visible' ).name( 'point lights' );
-				gui.add( spotLights, 'visible' ).name( 'spot lights' );
+				gui.add( pointLights, 'visible' ).name( 'point lights' ).onChange( value => pointHelpers.visible = value );
+				gui.add( spotLights, 'visible' ).name( 'spot lights' ).onChange( value => spotHelpers.visible = value );
+				gui.add( helpers, 'visible' ).name( 'light helpers' );
 				gui.add( params, 'animate' ).name( 'animate objects' );
 				gui.add( controls, 'autoRotate' ).name( 'orbit camera' );
 
