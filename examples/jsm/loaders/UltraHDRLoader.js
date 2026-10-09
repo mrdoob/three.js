@@ -199,12 +199,17 @@ class UltraHDRLoader extends Loader {
 				/* JPEG Header - no useful information */
 			} else if ( sectionType === 0xe1 ) {
 
-				/* APP1: XMP Metadata */
+				/* APP1: XMP Metadata (an APP1 segment can also hold EXIF, which is skipped) */
 
-				this._parseXMPMetadata(
-					textDecoder.decode( new Uint8Array( section ) ),
-					metadata
-				);
+				// The payload starts after the marker (2 bytes) and the segment length (2 bytes)
+				if ( this._hasNameSpace( section, 'http://ns.adobe.com/xap/1.0/\0' ) ) {
+
+					this._parseXMPMetadata(
+						textDecoder.decode( new Uint8Array( section ) ),
+						metadata
+					);
+
+				}
 
 			} else if ( sectionType === 0xe2 ) {
 
@@ -214,28 +219,13 @@ class UltraHDRLoader extends Loader {
 
 				// Check for ISO 21496-1 namespace: "urn:iso:std:iso:ts:21496:-1\0"
 				const isoNameSpace = 'urn:iso:std:iso:ts:21496:-1\0';
-				if ( section.byteLength >= isoNameSpace.length + 2 ) {
 
-					let isISO = true;
-					for ( let j = 0; j < isoNameSpace.length; j ++ ) {
+				if ( this._hasNameSpace( section, isoNameSpace ) ) {
 
-						if ( section[ 2 + j ] !== isoNameSpace.charCodeAt( j ) ) {
-
-							isISO = false;
-							break;
-
-						}
-
-					}
-
-					if ( isISO ) {
-
-						// Parse ISO 21496-1 metadata
-						const isoData = section.subarray( 2 + isoNameSpace.length );
-						this._parseISOMetadata( isoData, metadata );
-						continue;
-
-					}
+					// Parse ISO 21496-1 metadata
+					const isoData = section.subarray( 4 + isoNameSpace.length );
+					this._parseISOMetadata( isoData, metadata );
+					continue;
 
 				}
 
@@ -344,6 +334,28 @@ class UltraHDRLoader extends Loader {
 			throw new Error( 'THREE.UltraHDRLoader: Could not parse UltraHDR images' );
 
 		}
+
+	}
+
+	/**
+	 * Returns whether the payload of the given JPEG segment starts with the given namespace.
+	 *
+	 * @private
+	 * @param {Uint8Array} section - The segment, starting at its marker (2 bytes), followed by the segment length (2 bytes).
+	 * @param {string} nameSpace - The namespace string, including its terminating null character.
+	 * @return {boolean} Whether the payload starts with the namespace.
+	 */
+	_hasNameSpace( section, nameSpace ) {
+
+		if ( section.byteLength < 4 + nameSpace.length ) return false;
+
+		for ( let i = 0; i < nameSpace.length; i ++ ) {
+
+			if ( section[ 4 + i ] !== nameSpace.charCodeAt( i ) ) return false;
+
+		}
+
+		return true;
 
 	}
 

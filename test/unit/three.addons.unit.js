@@ -15,6 +15,7 @@ import './addons/loaders/GaussianSplatPLYLoader.tests.js';
 import './addons/loaders/MaterialXLoader.tests.js';
 import './addons/loaders/SPLATLoader.tests.js';
 import './addons/loaders/SPZLoader.tests.js';
+import './addons/loaders/UltraHDRLoader.tests.js';
 import './addons/loaders/USDLoader.tests.js';
 import './addons/exporters/USDZExporter.tests.js';
 import './addons/tsl/WebGLNodesHandler.tests.js';
