@@ -22,8 +22,8 @@ const _matrixColumns = /*@__PURE__*/ new WeakMap();
  * Returns `true` if the instanced mesh can share its node builder state with
  * other instanced meshes. Shared programs read the instance matrices of the
  * object being rendered instead of embedding the buffers of a specific mesh.
- * Storage buffers, instance colors, morph targets and previous-frame data for
- * motion vectors remain per object, as does instancing outside WebGPURenderer.
+ * Storage buffers, instance colors and morph targets remain per object, as does
+ * instancing outside WebGPURenderer.
  *
  * @param {InstancedMesh} object - The instanced mesh.
  * @param {Renderer} renderer - The renderer.
@@ -43,12 +43,7 @@ export function isSharedInstancing( object, renderer ) {
 	// Morph target influences are bound per mesh.
 	const morphAttributes = object.geometry.morphAttributes;
 
-	if ( morphAttributes.position || morphAttributes.normal || morphAttributes.color ) return false;
-
-	// Previous-frame matrices for motion vectors are stored per mesh.
-	const mrt = renderer.getMRT();
-
-	return mrt === null || mrt.has( 'velocity' ) === false;
+	return ! ( morphAttributes.position || morphAttributes.normal || morphAttributes.color );
 
 }
 
@@ -97,16 +92,18 @@ function getMatrixColumns( matrices ) {
 
 }
 
+const getInstanceMatrix = object => object.instanceMatrix;
+
 /**
  * Creates the appropriate node for instanced matrix transformations.
  * Depending on buffer limits and storage capability, returns either a storage, buffer, or instanced interleaved attribute node.
  *
  * @param {NodeBuilder} builder - The current node builder.
  * @param {InstancedBufferAttribute|StorageInstancedBufferAttribute} instanceMatrix - The matrix buffer attribute.
- * @param {boolean} [shared=false] - Whether the matrices are resolved from the rendered object.
+ * @param {?Function} [getObjectMatrices=null] - Optional callback returning the matrix attribute of the rendered object.
  * @returns {Node} The matrix node.
  */
-function createInstanceMatrixNode( builder, instanceMatrix, shared = false ) {
+function createInstanceMatrixNode( builder, instanceMatrix, getObjectMatrices = null ) {
 
 	let instanceMatrixNode;
 	const matrixCount = Math.max( instanceMatrix.count, 1 );
@@ -121,7 +118,7 @@ function createInstanceMatrixNode( builder, instanceMatrix, shared = false ) {
 
 		const uniformBufferSize = matrixCount * 16 * 4;
 
-		if ( ! shared && uniformBufferSize <= builder.getUniformBufferLimit() ) {
+		if ( getObjectMatrices === null && uniformBufferSize <= builder.getUniformBufferLimit() ) {
 
 			instanceMatrixNode = buffer( instanceMatrix.array, 'mat4', matrixCount ).element( instanceIndex );
 
@@ -131,7 +128,7 @@ function createInstanceMatrixNode( builder, instanceMatrix, shared = false ) {
 
 				const node = instancedBufferAttribute( column );
 
-				if ( shared ) node.setObjectAttribute( object => getMatrixColumns( object.instanceMatrix )[ i ] );
+				if ( getObjectMatrices !== null ) node.setObjectAttribute( object => getMatrixColumns( getObjectMatrices( object ) )[ i ] );
 
 				return node;
 
@@ -148,32 +145,24 @@ function createInstanceMatrixNode( builder, instanceMatrix, shared = false ) {
 }
 
 /**
- * Retrieves or initializes the previous frame instance matrix node for motion vectors.
- * Uses a WeakMap to cache previous frame instance matrices and their TSL nodes.
+ * Retrieves or initializes the previous-frame instance matrix attribute for motion vectors.
  *
- * @param {InstancedMesh} instancedMesh - The instanced mesh object.
- * @param {InstancedBufferAttribute|StorageInstancedBufferAttribute} instanceMatrix - The current matrix buffer attribute.
- * @param {NodeBuilder} builder - The current node builder.
- * @returns {Node} The previous frame instance matrix node.
+ * @param {Object3D} object - The rendered object.
+ * @param {InstancedBufferAttribute|StorageInstancedBufferAttribute} [matrices=object.instanceMatrix] - The current matrix buffer attribute.
+ * @returns {InstancedBufferAttribute|StorageInstancedBufferAttribute} The previous-frame matrix buffer attribute.
  */
-function getPreviousInstance( instancedMesh, instanceMatrix, builder ) {
+function getPreviousMatrix( object, matrices = object.instanceMatrix ) {
 
-	let data = _previousInstanceMatrices.get( instancedMesh );
+	let previous = _previousInstanceMatrices.get( object );
 
-	if ( data === undefined ) {
+	if ( previous === undefined || previous.array.length !== matrices.array.length ) {
 
-		const previousInstanceMatrix = instanceMatrix.clone();
-
-		data = {
-			previousInstanceMatrix,
-			node: createInstanceMatrixNode( builder, previousInstanceMatrix )
-		};
-
-		_previousInstanceMatrices.set( instancedMesh, data );
+		previous = matrices.clone();
+		_previousInstanceMatrices.set( object, previous );
 
 	}
 
-	return data.node;
+	return previous;
 
 }
 
@@ -212,7 +201,7 @@ function setupInstance( builder, matrices, colors, shared ) {
 
 	const isStorageColor = colors && colors.isStorageInstancedBufferAttribute === true;
 
-	const instanceMatrixNode = createInstanceMatrixNode( builder, matrices, shared );
+	const instanceMatrixNode = createInstanceMatrixNode( builder, matrices, shared ? getInstanceMatrix : null );
 
 	if ( shared ) {
 
@@ -284,25 +273,25 @@ function setupInstance( builder, matrices, colors, shared ) {
 
 	if ( builder.needsPreviousData() ) {
 
-		const instancedMesh = builder.object;
-
 		OnAfterObjectUpdate( ( { object } ) => {
 
-			const { previousInstanceMatrix } = _previousInstanceMatrices.get( object );
+			const source = shared ? object.instanceMatrix : matrices;
+			const previous = getPreviousMatrix( object, source );
 
-			previousInstanceMatrix.array.set( matrices.array );
-			previousInstanceMatrix.version = matrices.version;
+			previous.array.set( source.array );
+			previous.version = source.version;
 
 			// handle interleaved path
 
-			const previousColumns = _matrixColumns.get( previousInstanceMatrix );
+			const previousColumns = _matrixColumns.get( previous );
 
-			if ( previousColumns !== undefined ) previousColumns[ 0 ].data.version = matrices.version;
+			if ( previousColumns !== undefined ) previousColumns[ 0 ].data.version = source.version;
 
 		} );
 
-		const previousInstanceMatrixNode = getPreviousInstance( instancedMesh, matrices, builder );
-		positionPrevious.assign( previousInstanceMatrixNode.mul( positionPrevious ).xyz );
+		const previousMatrix = getPreviousMatrix( builder.object, matrices );
+		const previousMatrixNode = createInstanceMatrixNode( builder, previousMatrix, shared ? getPreviousMatrix : null );
+		positionPrevious.assign( previousMatrixNode.mul( positionPrevious ).xyz );
 
 	}
 
