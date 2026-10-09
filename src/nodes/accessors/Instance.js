@@ -69,7 +69,7 @@ function syncInterleavedMatrix( matrices ) {
 }
 
 /**
- * Returns the four column attributes of the given matrices, which a shared program binds per object.
+ * Returns the four column attributes that bind the given matrices as an instanced vertex buffer.
  *
  * @param {InstancedBufferAttribute} matrices - The matrix buffer attribute.
  * @returns {Array<InterleavedBufferAttribute>} The column attributes.
