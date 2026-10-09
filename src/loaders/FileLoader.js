@@ -59,7 +59,7 @@ class FileLoader extends Loader {
 
 		/**
 		 * Additional [request options](https://developer.mozilla.org/en-US/docs/Web/API/RequestInit)
-		 * passed to `fetch()`, e.g. `{ cache: 'no-cache' }`.
+		 * passed to `fetch()`, e.g. `{ cache: 'no-cache', priority: 'high' }`.
 		 *
 		 * @type {Object}
 		 */
