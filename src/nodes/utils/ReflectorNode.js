@@ -517,8 +517,7 @@ class ReflectorBaseNode extends Node {
 		virtualCamera.updateMatrixWorld();
 		virtualCamera.projectionMatrix.copy( camera.projectionMatrix );
 
-		// the reflection is sampled with flipped x (see _defaultUV) so the frustum must be mirrored, too.
-		// this only matters for asymmetric frustums e.g. when using a view offset
+		// The reflection is mirrored horizontally, so the view offset must be mirrored as well.
 
 		virtualCamera.projectionMatrix.elements[ 8 ] *= - 1;
 		virtualCamera.projectionMatrix.elements[ 12 ] *= - 1;
