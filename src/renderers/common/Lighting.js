@@ -41,6 +41,7 @@ class Lighting {
 		 * @type {WeakMap<Scene, LightsNode>}
 		 */
 		this._lightsNodeMap = new WeakMap();
+		this._lightsNodeRefs = new Set();
 
 	}
 
@@ -74,6 +75,14 @@ class Lighting {
 			node = this.createNode();
 			this._lightsNodeMap.set( scene, node );
 
+			for ( const ref of this._lightsNodeRefs ) {
+
+				if ( ref.deref() === undefined ) this._lightsNodeRefs.delete( ref );
+
+			}
+
+			this._lightsNodeRefs.add( new WeakRef( node ) );
+
 		}
 
 		return node;
@@ -104,6 +113,24 @@ class Lighting {
 	finishRender( scene ) {
 
 		this.getNode( scene ).setLights( this._cache.pop() );
+
+	}
+
+	/**
+	 * Releases the cached lighting nodes without retaining their scenes.
+	 */
+	dispose() {
+
+		for ( const ref of this._lightsNodeRefs ) {
+
+			const node = ref.deref();
+			if ( node !== undefined ) node.dispose();
+
+		}
+
+		this._lightsNodeRefs.clear();
+		this._lightsNodeMap = new WeakMap();
+		this._cache.length = 0;
 
 	}
 

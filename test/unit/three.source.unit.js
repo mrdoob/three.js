@@ -268,5 +268,10 @@ import './src/textures/VideoTexture.tests.js';
 import './src/nodes/display/ViewportTextureNode.tests.js';
 import './src/nodes/display/ViewportDepthTextureNode.tests.js';
 
+//src/nodes/lighting
+import './src/nodes/lighting/StaticLightGrid.tests.js';
+import './src/nodes/lighting/StaticLightsNode.tests.js';
+import './src/nodes/lighting/LightsNode.tests.js';
+
 //src/nodes/tsl
 import './src/nodes/tsl/TSLCore.tests.js';
