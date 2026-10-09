@@ -1257,7 +1257,7 @@ class WebGLBackend extends Backend {
 			if ( isRenderCameraDepthArray ) {
 
 				// Clear the depth texture
-				const textureData = this.get( renderTarget.depthTexture );
+				const textureData = this.get( this._currentContext.depthTexture );
 
 				if ( textureData.clearedRenderId !== this.renderer._nodes.nodeFrame.renderId ) {
 
