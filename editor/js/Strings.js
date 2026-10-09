@@ -1,6 +1,4 @@
-function Strings( config ) {
-
-	const language = config.getKey( 'language' );
+function Strings( language = 'en' ) {
 
 	const values = {
 		fa: {

@@ -105,7 +105,7 @@ function Editor() {
 	this.history = new _History( this );
 	this.selector = new Selector( this );
 	this.storage = new _Storage();
-	this.strings = new Strings( this.config );
+	this.strings = new Strings( this.config.getKey( 'language' ) );
 
 	this.loader = new Loader( this );
 
