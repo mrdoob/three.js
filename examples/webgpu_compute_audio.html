@@ -74,7 +74,7 @@
 				audioOutputBuffer.copyToChannel( wave, 0 );
 
 				// Only release readback after the buffer output has been read
-			
+
 				readbackBuffer.release();
 
 				const source = audioOutputContext.createBufferSource();
@@ -90,7 +90,6 @@
 				currentAnalyser.fftSize = 2048;
 
 				source.connect( currentAnalyser );
-			
 
 			}
 
