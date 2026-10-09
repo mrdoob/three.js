@@ -39,6 +39,9 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
+			import { color as tslColor, densityFogFactor, fog, mrt, mx_noise_float, normalMap, normalView, normalViewGeometry, output, packNormalToRGB, pass, positionViewDirection, positionWorld, positionWorldDirection, roughness, metalness, sample, uv, vec2, vec3, vec4, unpackRGBToNormal } from 'three/tsl';
+			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
+			import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -50,7 +53,7 @@
 			const CAR_COUNT = 48;
 			const palette = [ 0x23d9ff, 0xff527b, 0xffbe53, 0xab79ff, 0x64ffc9, 0xff71df ];
 
-			let camera, scene, renderer, controls, timer;
+			let camera, scene, renderer, renderPipeline, controls, timer;
 			let cars, carWindows, carLamps, carWheels;
 			let elapsed = 0;
 			let tour = 0.4;
@@ -59,7 +62,7 @@
 			const dummy = new THREE.Object3D();
 			const color = new THREE.Color();
 			const boxGeometry = new THREE.BoxGeometry();
-			const params = { animate: true, tour: true };
+			const params = { animate: true, tour: true, reflections: true };
 
 			init();
 
@@ -76,8 +79,9 @@
 				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.1, 500 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x050917 );
-				scene.fog = new THREE.FogExp2( 0x050917, 0.009 );
+				const haze = positionWorld.y.smoothstep( 0, 30 ).mix( 1, 0.25 );
+				scene.backgroundNode = positionWorldDirection.y.max( 0 ).pow( 0.4 ).mix( tslColor( 0x18364a ), tslColor( 0x030712 ) );
+				scene.fogNode = fog( tslColor( 0x18364a ), densityFogFactor( 0.012 ).mul( haze ) );
 				scene.add( new THREE.HemisphereLight( 0x7189b5, 0x182038, 0.8 ) );
 
 				timer = new THREE.Timer();
@@ -94,19 +98,42 @@
 
 				// Standard materials receive the batched lights, including moving objects.
 
-				const masonry = new THREE.MeshStandardMaterial( { roughness: 0.65, metalness: 0.2 } );
+				const masonry = new THREE.MeshStandardNodeMaterial( { roughness: 0.72, metalness: 0.15 } );
+				const grain = mx_noise_float( positionWorld.mul( 28 ) ).mul( 0.15 ).add( 0.85 );
+				const joints = positionWorld.y.mul( 0.77 ).fract().smoothstep( 0, 0.035 );
+				masonry.colorNode = vec3( grain.mul( joints.mul( 0.45 ).add( 0.55 ) ) );
+
 				const metal = new THREE.MeshStandardMaterial( { roughness: 0.28, metalness: 0.65 } );
 				const paint = new THREE.MeshStandardMaterial( { roughness: 0.24, metalness: 0.35 } );
 				const glass = new THREE.MeshStandardMaterial( { color: 0x111a28, roughness: 0.12, metalness: 0.65 } );
-				const neon = new THREE.MeshBasicMaterial();
+				const neon = new THREE.MeshBasicNodeMaterial( { color: new THREE.Color( 3, 3, 3 ) } );
+
+				// Broad puddles and fine asphalt grain vary reflections without image textures.
+
+				const roadUV = uv().mul( vec2( 130, LENGTH + 30 ) );
+				const puddles = mx_noise_float( roadUV.mul( 0.32 ) ).smoothstep( - 0.05, 0.3 );
+				const asphalt = mx_noise_float( roadUV.mul( 18 ) );
+				const road = new THREE.MeshStandardNodeMaterial();
+				road.colorNode = tslColor( 0x293443 ).mul( asphalt.mul( 0.15 ).add( 0.85 ) ).mul( puddles.mix( 1, 0.45 ) );
+				road.roughnessNode = puddles.mix( 0.48, 0.08 );
+				road.metalnessNode = puddles.mix( 0.2, 0.65 );
+				const roadNormal = vec2( asphalt, mx_noise_float( roadUV.mul( 18 ).add( 17 ) ) ).mul( puddles.mix( 0.18, 0.025 ) );
+				road.normalNode = normalMap( vec3( roadNormal.add( 0.5 ), 1 ) );
+
+				const paving = new THREE.MeshStandardNodeMaterial( { metalness: 0.4 } );
+				const tileEdge = positionWorld.xz.mul( 1.25 ).fract();
+				const tile = tileEdge.x.min( tileEdge.y ).smoothstep( 0, 0.035 );
+				paving.colorNode = tslColor( 0x414b5b ).mul( tile.mul( 0.7 ).add( 0.3 ) ).mul( grain );
+				paving.roughnessNode = mx_noise_float( positionWorld.xz.mul( 0.7 ) ).mul( 0.15 ).add( 0.25 );
 
 				const ground = new THREE.Mesh(
 					new THREE.PlaneGeometry( 130, LENGTH + 30 ).rotateX( - Math.PI / 2 ),
-					new THREE.MeshStandardMaterial( { color: 0x293443, roughness: 0.23, metalness: 0.45 } )
+					road
 				);
 				scene.add( ground );
 
 				const buildings = [];
+				const pavements = [];
 				const details = [];
 				const accents = [];
 				const windows = [];
@@ -119,6 +146,19 @@
 				spotLights.name = 'Static spot lights';
 				scene.add( pointLights, spotLights );
 
+				// Open cones approximate scattering, with soft silhouettes and fading ends.
+
+				const beamMaterial = new THREE.MeshBasicNodeMaterial( { transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, forceSinglePass: true } );
+				const edgeFade = normalViewGeometry.dot( positionViewDirection ).abs().pow( 2 );
+				beamMaterial.opacityNode = edgeFade.mul( uv().y.smoothstep( 0, 0.65 ) ).mul( uv().y.oneMinus().smoothstep( 0, 0.08 ) ).mul( 0.035 );
+				const beams = new THREE.InstancedMesh( new THREE.ConeGeometry( 1, 1, 24, 1, true ).translate( 0, - 0.5, 0 ), beamMaterial, BLOCKS * 16 );
+				beams.name = 'Spotlight beams';
+				spotLights.add( beams );
+				const beamTransform = new THREE.Object3D();
+				const down = new THREE.Vector3( 0, - 1, 0 );
+				const direction = new THREE.Vector3();
+				let beamIndex = 0;
+
 				const helpers = new THREE.Group();
 				const pointHelpers = new THREE.Group();
 				const spotHelpers = new THREE.Group();
@@ -130,7 +170,7 @@
 
 				for ( let side = - 1; side <= 1; side += 2 ) {
 
-					addBox( buildings, side * 11.5, 0.16, 0, 6.5, 0.32, LENGTH, 0x505b6a );
+					addBox( pavements, side * 11.5, 0.16, 0, 6.5, 0.32, LENGTH, 0xffffff );
 					addBox( accents, side * 8.3, 0.33, 0, 0.06, 0.025, LENGTH, 0x405578 );
 
 					for ( let row = 0; row < 2; row ++ ) {
@@ -179,7 +219,7 @@
 
 								const upper = j >= 4;
 								const street = row === 0 && j < 2;
-								const light = new THREE.PointLight( palette[ ( i + j + row ) % palette.length ], street ? 55 : upper ? 24 : 32, street ? 10 : 6 );
+								const light = new THREE.PointLight( palette[ ( i + j + row ) % palette.length ], street ? 55 : upper ? 10 : 24, street ? 10 : 6 );
 								light.position.set( street ? side * 7 : front - side * 0.7, street ? 3.8 : upper ? 7.5 : 2.3, z + ( j % 4 - 1.5 ) * 1.8 );
 								light.static = true;
 								pointLights.add( light );
@@ -189,6 +229,7 @@
 								const helper = new THREE.PointLightHelper( light, 0.12 );
 								helper.material.transparent = true;
 								helper.material.opacity = 0.6;
+								helper.material.depthWrite = false;
 								pointHelpers.add( helper );
 
 							}
@@ -204,9 +245,19 @@
 								// A static spotlight's target stays fixed in world space too.
 								spotLights.add( light, light.target );
 
+								const length = light.position.distanceTo( light.target.position );
+								const radius = Math.tan( light.angle ) * length;
+								beamTransform.position.copy( light.position );
+								beamTransform.quaternion.setFromUnitVectors( down, direction.subVectors( light.target.position, light.position ).normalize() );
+								beamTransform.scale.set( radius, length, radius );
+								beamTransform.updateMatrix();
+								beams.setMatrixAt( beamIndex, beamTransform.matrix );
+								beams.setColorAt( beamIndex ++, light.color );
+
 								const helper = new THREE.SpotLightHelper( light );
 								helper.cone.material.transparent = true;
 								helper.cone.material.opacity = 0.2;
+								helper.cone.material.depthWrite = false;
 								spotHelpers.add( helper );
 
 								addBox( details, light.position.x, 5.85, light.position.z, 0.35, 0.3, 0.5, 0x606d81 );
@@ -256,9 +307,14 @@
 				}
 
 				createInstances( 'Buildings and pavement', buildings, masonry );
+				createInstances( 'Pavement', pavements, paving );
 				createInstances( 'Metalwork', details, metal );
 				createInstances( 'Neon strips', accents, neon );
-				createInstances( 'Windows', windows, new THREE.MeshBasicMaterial( { color: 0x566073 } ) );
+				const windowMaterial = new THREE.MeshBasicNodeMaterial();
+				const windowEdge = uv().sub( 0.5 ).abs();
+				const windowFrame = windowEdge.x.max( windowEdge.y ).smoothstep( 0.42, 0.49 ).oneMinus();
+				windowMaterial.colorNode = vec3( windowFrame.mul( uv().y.mul( 12 ).fract().smoothstep( 0, 0.15 ).mul( 0.6 ).add( 0.4 ) ).mul( 1.5 ) );
+				createInstances( 'Windows', windows, windowMaterial );
 
 				cars = new THREE.InstancedMesh( boxGeometry, paint, CAR_COUNT );
 				carWindows = new THREE.InstancedMesh( boxGeometry, glass, CAR_COUNT );
@@ -321,10 +377,52 @@
 				controls.maxPolarAngle = Math.PI * 0.49;
 				controls.addEventListener( 'start', () => params.tour = false );
 
+				// Keep opaque surface data behind the transparent helpers and light cones.
+
+				const opaque = output.a.greaterThanEqual( 1 ).select( 1, 0 );
+				const sceneMRT = mrt( {
+					output,
+					normal: vec4( packNormalToRGB( normalView ), opaque ),
+					metalrough: vec4( metalness, roughness, 0, opaque )
+				} );
+				sceneMRT.setBlendMode( 'normal', new THREE.BlendMode( THREE.NormalBlending ) );
+				sceneMRT.setBlendMode( 'metalrough', new THREE.BlendMode( THREE.NormalBlending ) );
+
+				const scenePass = pass( scene, camera );
+				scenePass.setMRT( sceneMRT );
+				scenePass.getTexture( 'normal' ).type = THREE.UnsignedByteType;
+				scenePass.getTexture( 'metalrough' ).type = THREE.UnsignedByteType;
+
+				const sceneColor = scenePass.getTextureNode( 'output' );
+				const sceneNormal = scenePass.getTextureNode( 'normal' );
+				const sceneMaterial = scenePass.getTextureNode( 'metalrough' );
+				const reflections = ssr( sceneColor, scenePass.getTextureNode( 'depth' ), sample( uv => unpackRGBToNormal( sceneNormal.sample( uv ) ) ), {
+					metalnessNode: sceneMaterial.r,
+					roughnessNode: sceneMaterial.g
+				} );
+				reflections.resolutionScale = 0.5;
+				reflections.quality.value = 0.5;
+				reflections.blurQuality = 1;
+				reflections.maxDistance.value = 25;
+				reflections.thickness.value = 0.25;
+				reflections.intensity.value = 0.8;
+
+				const glow = bloom( sceneColor, 0.3, 0.5, 1 );
+				const reflectedColor = sceneColor.add( reflections.rgb );
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputNode = reflectedColor.add( glow );
+
 				const gui = renderer.inspector.createParameters( 'Settings' );
 				gui.add( pointLights, 'visible' ).name( 'point lights' ).onChange( value => pointHelpers.visible = value );
 				gui.add( spotLights, 'visible' ).name( 'spot lights' ).onChange( value => spotHelpers.visible = value );
 				gui.add( helpers, 'visible' ).name( 'light helpers' );
+				gui.add( beams, 'visible' ).name( 'light beams' );
+				gui.add( params, 'reflections' ).onChange( value => {
+
+					renderPipeline.outputNode = ( value ? reflectedColor : sceneColor ).add( glow );
+					renderPipeline.needsUpdate = true;
+
+				} );
 				gui.add( params, 'animate' ).name( 'animate traffic' );
 				gui.add( params, 'tour' ).name( 'camera tour' ).listen();
 
@@ -445,7 +543,7 @@
 				}
 
 				controls.update();
-				renderer.render( scene, camera );
+				renderPipeline.render();
 
 			}
 
