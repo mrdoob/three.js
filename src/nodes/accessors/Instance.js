@@ -12,7 +12,7 @@ import { instanceIndex } from '../core/IndexNode.js';
 import { InstancedInterleavedBuffer } from '../../core/InstancedInterleavedBuffer.js';
 import { InstancedBufferAttribute } from '../../core/InstancedBufferAttribute.js';
 import { InterleavedBufferAttribute } from '../../core/InterleavedBufferAttribute.js';
-import { DynamicDrawUsage } from '../../constants.js';
+import { DynamicDrawUsage, StaticDrawUsage } from '../../constants.js';
 
 const _colorBuffers = /*@__PURE__*/ new WeakMap();
 const _previousInstanceMatrices = /*@__PURE__*/ new WeakMap();
@@ -75,6 +75,21 @@ function syncInterleavedMatrix( matrices ) {
 }
 
 /**
+ * Creates four column attributes that read the given array as an instanced vertex buffer of matrices.
+ *
+ * @param {Float32Array} array - The matrix data.
+ * @param {number} [usage=StaticDrawUsage] - The buffer usage.
+ * @returns {Array<InterleavedBufferAttribute>} The column attributes.
+ */
+function createMatrixColumns( array, usage = StaticDrawUsage ) {
+
+	const interleaved = new InstancedInterleavedBuffer( array, 16, 1 ).setUsage( usage );
+
+	return [ 0, 4, 8, 12 ].map( offset => new InterleavedBufferAttribute( interleaved, 4, offset ) );
+
+}
+
+/**
  * Returns the four column attributes that bind the given matrices as an instanced vertex buffer.
  *
  * @param {InstancedBufferAttribute} matrices - The matrix buffer attribute.
@@ -86,9 +101,7 @@ function getMatrixColumns( matrices ) {
 
 	if ( columns === undefined ) {
 
-		const interleaved = new InstancedInterleavedBuffer( matrices.array, 16, 1 ).setUsage( matrices.usage );
-
-		columns = [ 0, 4, 8, 12 ].map( offset => new InterleavedBufferAttribute( interleaved, 4, offset ) );
+		columns = createMatrixColumns( matrices.array, matrices.usage );
 
 		_matrixColumns.set( matrices, columns );
 
@@ -99,6 +112,10 @@ function getMatrixColumns( matrices ) {
 }
 
 const getInstanceMatrix = object => object.instanceMatrix;
+
+// Callbacks of shared programs are declared here, so they don't retain the matrices of the mesh the program was built from.
+const syncObjectMatrix = ( { object } ) => syncInterleavedMatrix( object.instanceMatrix );
+const updateObjectPreviousMatrix = ( { object } ) => updatePreviousMatrix( object, object.instanceMatrix );
 
 /**
  * Creates the appropriate node for instanced matrix transformations.
@@ -130,7 +147,10 @@ function createInstanceMatrixNode( builder, instanceMatrix, getObjectMatrices = 
 
 		} else {
 
-			const columns = getMatrixColumns( instanceMatrix ).map( ( column, i ) => {
+			// Shared programs bind the columns of the rendered object, placeholder columns only provide the layout.
+			const layout = getObjectMatrices === null ? getMatrixColumns( instanceMatrix ) : createMatrixColumns( new Float32Array( 16 ) );
+
+			const columns = layout.map( ( column, i ) => {
 
 				const node = instancedBufferAttribute( column );
 
@@ -173,6 +193,27 @@ function getPreviousMatrix( object, matrices = object.instanceMatrix ) {
 }
 
 /**
+ * Copies the current matrices into the previous-frame matrices of the given object.
+ *
+ * @param {Object3D} object - The rendered object.
+ * @param {InstancedBufferAttribute|StorageInstancedBufferAttribute} matrices - The current matrix buffer attribute.
+ */
+function updatePreviousMatrix( object, matrices ) {
+
+	const previous = getPreviousMatrix( object, matrices );
+
+	previous.array.set( matrices.array );
+	previous.version = matrices.version;
+
+	// handle interleaved path
+
+	const previousColumns = _matrixColumns.get( previous );
+
+	if ( previousColumns !== undefined ) previousColumns[ 0 ].data.version = matrices.version;
+
+}
+
+/**
  * TSL object representing a varying property for the instanced color vector.
  *
  * @type {VaryingNode<vec3>}
@@ -209,15 +250,7 @@ function setupInstance( builder, matrices, colors, shared ) {
 
 	const instanceMatrixNode = createInstanceMatrixNode( builder, matrices, shared ? getInstanceMatrix : null );
 
-	if ( shared ) {
-
-		OnBeforeObjectUpdate( ( { object } ) => {
-
-			syncInterleavedMatrix( object.instanceMatrix );
-
-		} );
-
-	}
+	if ( shared ) OnBeforeObjectUpdate( syncObjectMatrix );
 
 	const hasInterleavedMatrix = ! shared && _matrixColumns.has( matrices );
 
@@ -279,21 +312,7 @@ function setupInstance( builder, matrices, colors, shared ) {
 
 	if ( builder.needsPreviousData() ) {
 
-		OnAfterObjectUpdate( ( { object } ) => {
-
-			const source = shared ? object.instanceMatrix : matrices;
-			const previous = getPreviousMatrix( object, source );
-
-			previous.array.set( source.array );
-			previous.version = source.version;
-
-			// handle interleaved path
-
-			const previousColumns = _matrixColumns.get( previous );
-
-			if ( previousColumns !== undefined ) previousColumns[ 0 ].data.version = source.version;
-
-		} );
+		OnAfterObjectUpdate( shared ? updateObjectPreviousMatrix : ( { object } ) => updatePreviousMatrix( object, matrices ) );
 
 		const previousMatrix = getPreviousMatrix( builder.object, matrices );
 		const previousMatrixNode = createInstanceMatrixNode( builder, previousMatrix, shared ? getPreviousMatrix : null );
