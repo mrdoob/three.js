@@ -20,9 +20,49 @@ function getMembersLayout( members ) {
 
 		}
 
-		return { name, type: value.type, atomic: value.atomic || false };
+		return { name, type: value.type, atomic: value.atomic || false, offset: 0 };
 
 	} );
+
+}
+
+/**
+	* Calculates the length of the struct in 4-byte elements (e.g. float or int components)
+	* and assigns a buffer write offset for every struct member variable.
+	* The length is calculated by summing the lengths of the struct's members, accounting for memory alignment.
+	* To get the size in bytes, multiply the returned value by 4.
+	*
+	* @param {Array.<{name: string, type: string, atomic: boolean, offset: number}>} membersLayout - A layout for struct members.
+	* @returns {number} The length of the struct in 4-byte elements.
+	*/
+function calculateLengthAndOffsets( membersLayout ) {
+
+	let maxAlignment = 1; // maximum alignment value in this struct
+	let offset = 0; // global buffer offset in 4 byte elements, also offset for first element
+
+	for ( const member of membersLayout ) {
+
+		const type = member.type;
+
+		const itemSize = getMemoryLengthFromType( type );
+		const alignment = getAlignmentFromType( type );
+		maxAlignment = Math.max( maxAlignment, alignment );
+
+		const chunkOffset = offset % maxAlignment; // offset in the current chunk of maxAlignment elements
+		const overhang = chunkOffset % alignment; // distance from the last aligned offset
+		if ( overhang !== 0 ) {
+
+			offset += alignment - overhang; // move to next aligned offset
+
+		}
+
+		member.offset = offset;
+
+		offset += itemSize;
+
+	}
+
+	return ( Math.ceil( offset / maxAlignment ) * maxAlignment ); // ensure length is a multiple of maxAlignment
 
 }
 
@@ -55,7 +95,7 @@ class StructTypeNode extends Node {
 		/**
 		 * The layout of the members for the struct
 		 *
-		 * @type {Array.<{name: string, type: string, atomic: boolean}>}
+		 * @type {Array.<{name: string, type: string, atomic: boolean, offset: number}>}
 		 */
 		this.membersLayout = getMembersLayout( membersLayout );
 
@@ -76,47 +116,22 @@ class StructTypeNode extends Node {
 		 */
 		this.isStructTypeNode = true;
 
+
+		/**
+		 * The length of the struct in four byte elements.
+		 *
+		 * @type {number}
+		 * @readonly
+		 * @default true
+		 */
+		this.structLength = calculateLengthAndOffsets( this.membersLayout );
+
 	}
+
 
 	isCacheable( /*builder*/ ) {
 
 		return false;
-
-	}
-
-	/**
-	 * Returns the length of the struct in 4-byte elements (e.g. float or int components).
-	 * The length is calculated by summing the lengths of the struct's members, accounting for memory alignment.
-	 * To get the size in bytes, multiply the returned value by 4.
-	 *
-	 * @returns {number} The length of the struct in 4-byte elements.
-	 */
-	getLength() {
-
-		let maxAlignment = 1; // maximum alignment value in this struct
-		let offset = 0; // global buffer offset in 4 byte elements
-
-		for ( const member of this.membersLayout ) {
-
-			const type = member.type;
-
-			const itemSize = getMemoryLengthFromType( type );
-			const alignment = getAlignmentFromType( type );
-			maxAlignment = Math.max( maxAlignment, alignment );
-
-			const chunkOffset = offset % maxAlignment; // offset in the current chunk of maxAlignment elements
-			const overhang = chunkOffset % alignment; // distance from the last aligned offset
-			if ( overhang !== 0 ) {
-
-				offset += alignment - overhang; // move to next aligned offset
-
-			}
-
-			offset += itemSize;
-
-		}
-
-		return ( Math.ceil( offset / maxAlignment ) * maxAlignment ); // ensure length is a multiple of maxAlignment
 
 	}
 
