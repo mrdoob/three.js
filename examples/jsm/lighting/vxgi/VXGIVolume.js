@@ -1,5 +1,5 @@
-import { Box3, Vector3, Vector4, Matrix4, Layers, Storage3DTexture, StorageBufferAttribute, StorageTexture3DNode, CubeTextureNode, RendererUtils, HalfFloatType, UnsignedByteType, RGBAFormat, LinearFilter, LinearMipmapLinearFilter, ClampToEdgeWrapping, MathUtils } from 'three/webgpu';
-import { Fn, If, Loop, uniform, uniformArray, storage, instanceIndex, textureStore, texture3D, texture, float, int, uint, vec2, vec3, vec4, ivec3, uvec3, max, min, abs, dot, cross, normalize, floor, sign, select, countOneBits, atomicOr, smoothstep, hash, fract, sqrt, cos, sin, length, PI, getDistanceAttenuation, viewZToPerspectiveDepth, viewZToReversedPerspectiveDepth } from 'three/tsl';
+import { Box3, Vector3, Vector4, Matrix4, Layers, Storage3DTexture, StorageBufferAttribute, StorageTexture3DNode, RendererUtils, HalfFloatType, UnsignedByteType, RGBAFormat, LinearFilter, LinearMipmapLinearFilter, ClampToEdgeWrapping, MathUtils } from 'three/webgpu';
+import { Fn, If, Loop, uniform, uniformArray, storage, instanceIndex, textureStore, texture3D, texture, cubeTexture, float, int, uint, vec2, vec3, vec4, ivec3, uvec3, max, min, abs, dot, cross, normalize, floor, sign, select, countOneBits, atomicOr, smoothstep, hash, fract, sqrt, cos, sin, length, PI, getDistanceAttenuation, viewZToPerspectiveDepth, viewZToReversedPerspectiveDepth } from 'three/tsl';
 
 import { collectSceneTriangles, computeSceneBounds, TRIANGLE_STRIDE } from './VXGISceneCollector.js';
 import { createConeTracer } from './VXGIConeTracer.js';
@@ -39,28 +39,6 @@ class MipStorageTexture3DNode extends StorageTexture3DNode {
 	getUniformHash() {
 
 		return `${ this.value.uuid }:${ this.access }:${ this.mipLevel }`;
-
-	}
-
-}
-
-/**
- * Cube texture node without the material's environment rotation, which requires a material and
- * scene context that compute passes lack. Used for point light shadow maps.
- *
- * @private
- */
-class PlainCubeTextureNode extends CubeTextureNode {
-
-	setupUV( builder, uvNode ) {
-
-		if ( this.value.isDepthTexture === true ) {
-
-			return vec3( uvNode.x, uvNode.y.negate(), uvNode.z );
-
-		}
-
-		return vec3( uvNode.x.negate(), uvNode.yz );
 
 	}
 
@@ -453,7 +431,7 @@ class VXGIVolume {
 		this.voxelSizeNode.value = voxelSize;
 		this.maxLevelNode.value = levels - 1;
 
-		if ( gridSize.equals( this._gridSize ) === false || levels !== this._levels || this._directional !== this.directionalRadiance ) {
+		if ( this._allocated === false || gridSize.equals( this._gridSize ) === false || levels !== this._levels || this._directional !== this.directionalRadiance ) {
 
 			this._allocateGrid( gridSize, levels );
 
@@ -475,12 +453,15 @@ class VXGIVolume {
 
 		this._triangleCount = count;
 		this._triangleCountNode.value = count;
+
+		if ( this._triangleAttribute !== null ) this._triangleAttribute.dispose();
+
 		this._triangleAttribute = new StorageBufferAttribute( count > 0 ? data : new Float32Array( TRIANGLE_STRIDE ), 4 );
 		this._trianglesNode = storage( this._triangleAttribute, 'vec4', this._triangleAttribute.count ).toReadOnly();
 
 		// kernels depend on the triangle buffer and grid
 
-		this._kernels = null;
+		this._disposeKernels();
 		const kernels = this._getKernels();
 
 		renderer.compute( kernels.clear );
@@ -561,6 +542,8 @@ class VXGIVolume {
 
 	_disposeGrid() {
 
+		this._disposeKernels();
+
 		this.opacityTexture.dispose();
 		this.radianceTexture.dispose();
 		this.directionalTexture.dispose();
@@ -585,9 +568,25 @@ class VXGIVolume {
 
 		}
 
-		this._occupancyAttribute = null;
-		this._triangleIdAttribute = null;
-		this._kernels = null;
+		if ( this._occupancyAttribute !== null ) {
+
+			this._occupancyAttribute.dispose();
+			this._triangleIdAttribute.dispose();
+
+			this._occupancyAttribute = null;
+			this._triangleIdAttribute = null;
+
+		}
+
+		if ( this._triangleAttribute !== null ) {
+
+			this._triangleAttribute.dispose();
+
+			this._triangleAttribute = null;
+			this._trianglesNode = null;
+
+		}
+
 		this._allocated = false;
 
 	}
@@ -702,6 +701,8 @@ class VXGIVolume {
 
 		if ( kernels.inject[ index ] === null || kernels.injectKey[ index ] !== this._lightsKey ) {
 
+			if ( kernels.inject[ index ] !== null ) kernels.inject[ index ].dispose();
+
 			kernels.inject[ index ] = this._createInjectKernel( renderer, index );
 			kernels.injectKey[ index ] = this._lightsKey;
 
@@ -774,6 +775,22 @@ class VXGIVolume {
 		this._kernels = kernels;
 
 		return kernels;
+
+	}
+
+	_disposeKernels() {
+
+		if ( this._kernels === null ) return;
+
+		const { clear, voxelize, resolve, opacityMips, radianceMips, inject, bounce } = this._kernels;
+
+		for ( const kernel of [ clear, voxelize, resolve, ...opacityMips, ...radianceMips.flat(), ...inject, ...bounce ] ) {
+
+			if ( kernel !== null ) kernel.dispose();
+
+		}
+
+		this._kernels = null;
 
 	}
 
@@ -1280,7 +1297,7 @@ class VXGIVolume {
 
 								If( viewZ.greaterThanEqual( near ).and( viewZ.lessThanEqual( far ) ), () => {
 
-									const depth = new PlainCubeTextureNode( shadowTexture, normalize( lightToVoxel ) ).r; // depth cubes need an integer level, which the compute path emits by default
+									const depth = cubeTexture( shadowTexture, normalize( lightToVoxel ) ).r; // depth cubes need an integer level, which the compute path emits by default
 
 									if ( reversedDepth ) {
 
