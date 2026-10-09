@@ -174,7 +174,7 @@ function createSharedMatrixNode( getColumns ) {
 	// Placeholder columns only provide the layout, each object binds its own columns.
 	const columns = createMatrixColumns( new Float32Array( 16 ) ).map( ( column, i ) => {
 
-		return instancedBufferAttribute( column ).setObjectAttribute( object => getColumns( object )[ i ] );
+		return instancedBufferAttribute( column ).setAttributeCallback( object => getColumns( object )[ i ] );
 
 	} );
 

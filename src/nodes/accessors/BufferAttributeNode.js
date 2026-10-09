@@ -154,7 +154,7 @@ class BufferAttributeNode extends InputNode {
 		 * @type {?Function}
 		 * @default null
 		 */
-		this.objectAttribute = null;
+		this.attributeCallback = null;
 
 		if ( value && ( value.isBufferAttribute === true || value.isInterleavedBufferAttribute === true ) && value.itemSize <= 4 ) {
 
@@ -362,9 +362,9 @@ class BufferAttributeNode extends InputNode {
 	 * @param {?Function} callback - The function, receiving the rendered object.
 	 * @return {BufferAttributeNode} A reference to this node.
 	 */
-	setObjectAttribute( callback ) {
+	setAttributeCallback( callback ) {
 
-		this.objectAttribute = callback;
+		this.attributeCallback = callback;
 
 		return this;
 
@@ -378,7 +378,7 @@ class BufferAttributeNode extends InputNode {
 	 */
 	getObjectAttribute( object ) {
 
-		return this.objectAttribute !== null ? this.objectAttribute( object ) : this.attribute;
+		return this.attributeCallback !== null ? this.attributeCallback( object ) : this.attribute;
 
 	}
 
