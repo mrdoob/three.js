@@ -58,7 +58,6 @@ const THREE_COMPONENT_TYPES = new Set( [ 'vector2', 'vector3', 'vector4', 'color
 const SWITCH_MIN_INDEX = 1;
 const SWITCH_MAX_INDEX = 10;
 
-
 const toBooleanMaskNode = ( node ) => toBooleanNode( node ).select( float( 1 ), float( 0 ) );
 
 const getZeroNodeForType = ( type ) => {
@@ -498,8 +497,7 @@ const compileHexTiledTextureNode = ( nodeX, compileContext, category ) => {
 	const c0 = toVec3Channels( sample0 );
 	const c1 = toVec3Channels( sample1 );
 	const c2 = toVec3Channels( sample2 );
-	// Only hextiledimage weights tiles by luminance; hextilednormalmap declares neither
-	// falloffcontrast nor lumacoeffs and blends with unit weights, as in MaterialX.
+	// hextilednormalmap blends with unit weights, as in MaterialX
 	const cw = category === 'hextilednormalmap' ? vec3( 1, 1, 1 ) : getHextileLuminanceWeights( nodeX, c0, c1, c2 );
 	const blendWeights = compileContext.mxHextileComputeBlendWeights( cw, tileData.weights, falloff );
 	const alphaWeights = compileContext.mxHextileComputeBlendWeights( vec3( 1, 1, 1 ), tileData.weights, falloff );
@@ -907,7 +905,7 @@ function createMaterialXCompileRegistry() {
 	register( registry, [ 'gltf_iridescence_thickness' ], ( nodeX, out, compileContext ) =>
 		compileGltfIridescenceThicknessNode( nodeX, compileContext ) );
 	register( registry, [ 'switch' ], ( nodeX ) => compileSwitchNode( nodeX ) );
-	register( registry, [ 'transformmatrix' ], ( nodeX ) => compileTransformMatrixNode( nodeX ) );
+	register( registry, [ 'transformmatrix' ], compileTransformMatrixNode );
 	register( registry, [ 'creatematrix' ], ( nodeX ) => compileCreateMatrixNode( nodeX ) );
 	register( registry, [ 'invertmatrix' ], ( nodeX, out, compileContext ) => compileInvertMatrixNode( nodeX, compileContext ) );
 	return registry;

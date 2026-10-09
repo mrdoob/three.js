@@ -4,7 +4,6 @@ import { MaterialXLogCodes } from './MaterialXLog.js';
 const SKIP_ELEMENTS = new Set( [ 'materialx', 'input', 'output' ] );
 const CONTAINER_ELEMENTS = new Set( [ 'nodegraph' ] );
 
-
 function formatElement( nodeX, attrNames, tagName = nodeX.element ) {
 
 	const attrs = [];

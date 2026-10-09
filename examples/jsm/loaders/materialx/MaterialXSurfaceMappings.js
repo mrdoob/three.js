@@ -203,9 +203,7 @@ function toAttenuationDistance( distanceNode, hasAttenuationColorInput ) {
 
 }
 
-// Every mapper receives `inputs` pre-filled with the nodedef defaults of the surface shader,
-// so an omitted input and one authored at its default value take the same path. `authored`
-// holds only the inputs present in the document.
+// `inputs` includes the nodedef defaults, `authored` only the inputs present in the document.
 function applyStandardSurface( material, inputs, log, nodeName, authored ) {
 
 	const coatEnabled = isEnabledWeightNode( inputs.coat );

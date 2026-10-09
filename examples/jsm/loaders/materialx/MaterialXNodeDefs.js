@@ -55,11 +55,7 @@ function isVersionCompatible( nodedef, version ) {
 }
 
 /**
- * Resolves the nodedef of a node instance, mirroring `Node::getNodeDef()` in the MaterialX
- * reference implementation: an explicit `nodedef` attribute wins, otherwise the first
- * version-compatible nodedef of the same category, stdlib first and then the document's own,
- * whose output type matches and whose declared input types match every authored input,
- * otherwise the first such nodedef whose output type matches.
+ * Resolves the nodedef of a node instance like `Node::getNodeDef()` in MaterialX.
  *
  * @param {MaterialXNode} nodeX - The node instance.
  * @return {?{name: string, node: string, inputs: Object, outputs: Object}} The resolved nodedef or `null`.
@@ -89,9 +85,7 @@ function resolveNodeDef( nodeX ) {
 		if ( isVersionCompatible( nodedef, version ) === false ) continue;
 
 		const outputType = getOutputType( nodedef );
-		// Multioutput nodedefs (e.g. separate2/3/4) don't declare a single output type to match
-		// against; authored `type` on those instances instead disambiguates the "in" overload,
-		// so let hasExactInputMatch() below do the discrimination.
+		// multioutput nodedefs are matched by their input types only
 		if ( nodeX.type && outputType !== 'multioutput' && outputType !== nodeX.type ) continue;
 		if ( hasExactInputMatch( nodedef, nodeX ) ) return { name, ...nodedef };
 		roughMatch ??= { name, ...nodedef };

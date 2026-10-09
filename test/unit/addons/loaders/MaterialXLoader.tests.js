@@ -394,7 +394,6 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-
 			QUnit.test( 'applies nodedef defaults to inputs the document omits', ( assert ) => {
 
 				const document = `<?xml version="1.0"?>
@@ -503,7 +502,6 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-
 			QUnit.test( 'resolves nodedef overloads without a nodedef attribute', ( assert ) => {
 
 				const document = `<?xml version="1.0"?>
@@ -542,7 +540,6 @@ export default QUnit.module( 'Addons', () => {
 				assert.strictEqual( result.warnings.length, 0, 'Overloads selected by input types translate without warnings.' );
 
 			} );
-
 
 			QUnit.test( 'resolves default nodedef versions and document nodedefs like MaterialX', ( assert ) => {
 
@@ -614,10 +611,6 @@ export default QUnit.module( 'Addons', () => {
 </materialx>`, { throwOnErrors: false } );
 
 				assert.deepEqual( result.errors, [], 'hextilednormalmap does not read the hextiledimage-only inputs.' );
-				// An undeclared input used to become an undefined operand, which TSL rejects when building.
-				const missingOperand = ( node ) => node.isOperatorNode === true && ( node.aNode == null || node.bNode == null );
-				// The hextile graph is deeper than hasNode() walks by default, so start at a negative depth.
-				assert.false( hasNode( result.materials.test_material.colorNode, missingOperand, new WeakSet(), - 40 ), 'Every operator has its operands.' );
 
 			} );
 

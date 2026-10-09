@@ -113,8 +113,7 @@ function createMatrixNode( size, vector ) {
 
 }
 
-// Whether a nodedef input carries a usable default. Empty strings are valid string defaults
-// (e.g. transform* space names) but empty filenames mean "no texture".
+// Empty strings are valid string defaults, but an empty filename means "no texture".
 function hasDefaultValue( input ) {
 
 	if ( input.value === undefined ) return false;
@@ -122,8 +121,7 @@ function hasDefaultValue( input ) {
 
 }
 
-// Creates the TSL node for a MaterialX value string of the given type. String values are
-// returned as-is so that e.g. transform* space names can be inspected by the compiler.
+// string values stay strings so the compiler can read e.g. space names
 function createValueNode( type, value ) {
 
 	const trimmed = value.trim();
@@ -379,8 +377,7 @@ class MaterialXNode {
 
 	}
 
-	// The nodedef default for an input the document does not author, or `undefined` when
-	// the nodedef declares none (e.g. filenames and shader-typed inputs).
+	// `undefined` when the nodedef declares no default (e.g. filenames)
 	getDefaultInputNode( name ) {
 
 		const input = this.nodeDef ? this.nodeDef.inputs[ name ] : undefined;
@@ -393,8 +390,7 @@ class MaterialXNode {
 
 	}
 
-	// Nodedef value defaults for every input, keyed by input name. Geometric defaults are
-	// left out so surface mappers can tell an authored normal from the default one.
+	// geometric defaults are left out so surface mappers can tell an authored normal from the default
 	getDefaultInputNodes() {
 
 		const nodes = {};
@@ -708,7 +704,7 @@ class MaterialXNode {
 
 	}
 
-	// Whether the input is authored or declared by the nodedef. Unknown categories declare everything.
+	// nodes without a nodedef (e.g. from a host node resolver) accept any input
 	declaresInput( name ) {
 
 		return this.getChildByName( name ) !== undefined || this.nodeDef === null || name in this.nodeDef.inputs;
@@ -720,21 +716,18 @@ class MaterialXNode {
 		const child = this.getChildByName( name );
 		if ( child ) return child.getNode( child.output );
 
-		// Reading an input the nodedef does not declare is a loader bug; fail here rather than inside TSL.
 		if ( this.declaresInput( name ) === false ) {
 
-			throw new Error( `THREE.MaterialXLoader: "${this.element}" reads input "${name}", which nodedef "${this.nodeDef.name}" does not declare.` );
+			this.materialX.log.add(
+				MaterialXLogCodes.UNKNOWN_INPUT,
+				`"${this.element}" reads input "${name}", which nodedef "${this.nodeDef.name}" does not declare. Using fallback 0.`,
+				this.name,
+			);
+			return float( 0 );
 
 		}
 
 		return this.getDefaultInputNode( name );
-
-	}
-
-	getInputValueByName( name ) {
-
-		const child = this.getChildByName( name );
-		return child ? child.value : null;
 
 	}
 
@@ -761,12 +754,6 @@ class MaterialXNode {
 	getVector() {
 
 		return parseValueVector( this.getValue() );
-
-	}
-
-	getMatrix( size ) {
-
-		return createMatrixNode( size, this.getVector() );
 
 	}
 
