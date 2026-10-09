@@ -13,45 +13,11 @@ import { InstancedInterleavedBuffer } from '../../core/InstancedInterleavedBuffe
 import { InstancedBufferAttribute } from '../../core/InstancedBufferAttribute.js';
 import { InterleavedBufferAttribute } from '../../core/InterleavedBufferAttribute.js';
 import { DynamicDrawUsage, StaticDrawUsage } from '../../constants.js';
+import { isSharedInstancing } from '../../renderers/common/RenderObject.js';
 
 const _colorBuffers = /*@__PURE__*/ new WeakMap();
 const _previousInstanceMatrices = /*@__PURE__*/ new WeakMap();
 const _matrixColumns = /*@__PURE__*/ new WeakMap();
-
-/**
- * Returns `true` if the instanced mesh can share its node builder state with
- * other instanced meshes. Shared programs read the instance matrices of the
- * object being rendered instead of embedding the buffers of a specific mesh.
- * Storage buffers, instance colors, morph targets and geometries with many
- * attributes remain per object, as does instancing outside WebGPURenderer.
- *
- * @param {InstancedMesh} object - The instanced mesh.
- * @param {Renderer} renderer - The renderer.
- * @returns {boolean} Whether the instancing setup can be shared.
- */
-export function isSharedInstancing( object, renderer ) {
-
-	// Only WebGPURenderer's render objects share node builder states.
-	if ( renderer.isWebGPURenderer !== true ) return false;
-
-	if ( object.isInstancedMesh !== true || object.instanceColor !== null ) return false;
-
-	const instanceMatrix = object.instanceMatrix;
-
-	if ( ! instanceMatrix || instanceMatrix.isInstancedBufferAttribute !== true || instanceMatrix.isStorageInstancedBufferAttribute === true ) return false;
-
-	const geometry = object.geometry;
-
-	// Shared programs bind the matrices as one more vertex buffer, two with velocity.
-	// Leave room for them within the default limit of eight vertex buffers.
-	if ( Object.keys( geometry.attributes ).length > 6 ) return false;
-
-	// Morph target influences are bound per mesh.
-	const morphAttributes = geometry.morphAttributes;
-
-	return ! ( morphAttributes.position || morphAttributes.normal || morphAttributes.color );
-
-}
 
 /**
  * Copies pending matrix updates into the interleaved buffer used for rendering.
