@@ -50,6 +50,85 @@ const _vector4 = /*@__PURE__*/ new Vector4();
 
 const _shadowSide = { [ FrontSide ]: BackSide, [ BackSide ]: FrontSide, [ DoubleSide ]: DoubleSide };
 
+// The time in milliseconds an async compilation works before it yields to the main thread.
+const _compileYieldInterval = 8;
+
+// The maximum number of pipelines an async compilation creates at the same time.
+// Too many pipelines in flight stall the rendering of new frames.
+const _maxCompilingPipelines = 16;
+
+/**
+ * Yields to the main thread during an async compilation, but only after a time
+ * budget, so the compilation does not wait for a new task or frame after every
+ * small piece of work.
+ *
+ * @private
+ */
+class CompileScheduler {
+
+	constructor() {
+
+		this.lastYieldTime = performance.now();
+
+	}
+
+	/**
+	 * Whether the compilation worked longer than the time budget since the last yield.
+	 *
+	 * @return {boolean} Whether the compilation should yield to the main thread.
+	 */
+	needsYield() {
+
+		return performance.now() - this.lastYieldTime >= _compileYieldInterval;
+
+	}
+
+	/**
+	 * Yields to the main thread until the next frame was rendered. `scheduler.yield()`
+	 * alone is not enough, since its continuations run before the browser renders.
+	 *
+	 * @return {Promise} A promise that resolves when the compilation can continue.
+	 */
+	async yield() {
+
+		if ( typeof requestAnimationFrame === 'undefined' || ( typeof document !== 'undefined' && document.hidden === true ) ) {
+
+			// no frames are rendered
+			await yieldToMain();
+
+		} else {
+
+			await new Promise( ( resolve ) => {
+
+				let resolved = false;
+
+				const done = () => {
+
+					if ( resolved === false ) {
+
+						resolved = true;
+						resolve();
+
+					}
+
+				};
+
+				// continue in a new task after the next frame was rendered
+				requestAnimationFrame( () => setTimeout( done, 0 ) );
+
+				// requestAnimationFrame() stops if the page is hidden in the meantime
+				setTimeout( done, 100 );
+
+			} );
+
+		}
+
+		this.lastYieldTime = performance.now();
+
+	}
+
+}
+
 /**
  * Base class for renderers.
  */
@@ -1064,17 +1143,35 @@ class Renderer {
 
 		this._finishPreCompile();
 
-		// Process compilation work items sequentially to avoid freezing
-		// Yields between objects to keep animation smooth
+		// Process compilation work items sequentially and yield to the main thread after a
+		// time budget to keep animation smooth. Pipelines are compiled in parallel while
+		// the next items are processed.
 
 		const total = compilationPromises.length;
 		let loaded = 0;
 
+		const scheduler = new CompileScheduler();
+		const compilingPipelines = new Set();
+
+		const onLoaded = () => {
+
+			loaded ++;
+
+			if ( onProgress !== null ) {
+
+				onProgress( new ProgressEvent( 'progress', { lengthComputable: true, loaded, total } ) );
+
+			}
+
+		};
+
 		const yieldPreCompile = async () => {
+
+			if ( scheduler.needsYield() === false ) return;
 
 			this._finishPreCompile();
 
-			await yieldToMain();
+			await scheduler.yield();
 
 			this._beginPreCompile( precompilationState );
 
@@ -1102,24 +1199,28 @@ class Renderer {
 
 			if ( pipelinePromises.length > 0 ) {
 
-				// Wait for pipeline creation
+				const promise = Promise.all( pipelinePromises ).then( () => {
 
-				await Promise.all( pipelinePromises );
+					compilingPipelines.delete( promise );
+					onLoaded();
+
+				} );
+
+				compilingPipelines.add( promise );
+
+				while ( compilingPipelines.size >= _maxCompilingPipelines ) await Promise.race( compilingPipelines );
+
+			} else {
+
+				onLoaded();
 
 			}
 
-			loaded ++;
-
-			if ( onProgress !== null ) {
-
-				onProgress( new ProgressEvent( 'progress', { lengthComputable: true, loaded, total } ) );
-
-			}
-
-			// Yield between objects to allow animation frames
-			await yieldToMain();
+			if ( scheduler.needsYield() ) await scheduler.yield();
 
 		}
+
+		await Promise.all( compilingPipelines );
 
 	}
 
@@ -1187,6 +1288,27 @@ class Renderer {
 		const total = computeList.length;
 		let loaded = 0;
 
+		const scheduler = new CompileScheduler();
+		const compilingPipelines = new Set();
+
+		const onLoaded = () => {
+
+			loaded ++;
+
+			if ( onProgress !== null ) {
+
+				onProgress( new ProgressEvent( 'progress', { lengthComputable: true, loaded, total } ) );
+
+			}
+
+		};
+
+		const yieldCompile = async () => {
+
+			if ( scheduler.needsYield() ) await scheduler.yield();
+
+		};
+
 		//
 
 		const pipelines = this._pipelines;
@@ -1219,7 +1341,7 @@ class Renderer {
 
 			}
 
-			await nodes.getForComputeAsync( computeNode );
+			await nodes.getForComputeAsync( computeNode, yieldCompile );
 
 			nodes.updateBeforeForCompute( computeNode );
 			nodes.updateForCompute( computeNode );
@@ -1229,21 +1351,35 @@ class Renderer {
 			const compilationPromises = [];
 
 			pipelines.getForCompute( computeNode, computeBindings, compilationPromises );
-			await Promise.all( compilationPromises );
 
 			nodes.updateAfterForCompute( computeNode );
 
-			loaded ++;
+			// Pipelines are compiled in parallel while the next compute nodes are processed
 
-			if ( onProgress !== null ) {
+			if ( compilationPromises.length > 0 ) {
 
-				onProgress( new ProgressEvent( 'progress', { lengthComputable: true, loaded, total } ) );
+				const promise = Promise.all( compilationPromises ).then( () => {
+
+					compilingPipelines.delete( promise );
+					onLoaded();
+
+				} );
+
+				compilingPipelines.add( promise );
+
+				while ( compilingPipelines.size >= _maxCompilingPipelines ) await Promise.race( compilingPipelines );
+
+			} else {
+
+				onLoaded();
 
 			}
 
-			if ( loaded < total ) await yieldToMain();
+			await yieldCompile();
 
 		}
+
+		await Promise.all( compilingPipelines );
 
 	}
 
