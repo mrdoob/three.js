@@ -133,6 +133,21 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
+			QUnit.test( 'principal limits with float32 pi boundaries', ( assert ) => {
+
+				for ( const sign of [ - 1, 1 ] ) {
+
+					const min = sign < 0 ? - Math.fround( PI ) : 0.0087;
+					const max = sign < 0 ? - 0.0087 : Math.fround( PI );
+					const chain = createChain( { initial: sign * 0.1, target: - sign * 2, min, max } );
+					chain.solver.update();
+					checkPose( assert, chain, sign * 0.0087, `float32 boundary ${ sign }` );
+					disposeChain( chain );
+
+				}
+
+			} );
+
 			QUnit.test( 'unbounded and single-sided limits', ( assert ) => {
 
 				for ( const limits of [ {}, { min: - Infinity, max: Infinity }, { min: - 5 * PI / 4 }, { max: 5 * PI / 4 } ] ) {

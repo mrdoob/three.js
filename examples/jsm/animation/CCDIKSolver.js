@@ -318,8 +318,9 @@ function wrapRotation( angle, min, max ) {
 
 	const fullTurn = 2 * Math.PI;
 
-	// Preserve linear clamping for principal-range, unbounded and inverted limits.
-	if ( ( min < - Math.PI || max > Math.PI ) && Number.isFinite( min ) && Number.isFinite( max ) && min <= max && max - min < fullTurn ) {
+	// Preserve linear clamping for principal-range limits, including float32 pi boundaries.
+	// Unbounded and inverted limits also retain their existing behavior.
+	if ( ( min < - Math.PI - 1e-6 || max > Math.PI + 1e-6 ) && Number.isFinite( min ) && Number.isFinite( max ) && min <= max && max - min < fullTurn ) {
 
 		const center = ( min + max ) / 2;
 		angle += fullTurn * Math.round( ( center - angle ) / fullTurn );
