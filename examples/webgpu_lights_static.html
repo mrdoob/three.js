@@ -39,9 +39,8 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { color as tslColor, densityFogFactor, fog, mrt, mx_noise_float, normalMap, normalView, normalViewGeometry, output, packNormalToRGB, pass, positionViewDirection, positionWorld, positionWorldDirection, roughness, metalness, sample, uv, vec2, vec3, vec4, unpackRGBToNormal } from 'three/tsl';
+			import { color as tslColor, densityFogFactor, fog, mx_noise_float, normalMap, normalViewGeometry, pass, positionViewDirection, positionWorld, positionWorldDirection, uv, vec2, vec3 } from 'three/tsl';
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
-			import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -62,7 +61,7 @@
 			const dummy = new THREE.Object3D();
 			const color = new THREE.Color();
 			const boxGeometry = new THREE.BoxGeometry();
-			const params = { animate: true, tour: true, reflections: true };
+			const params = { animate: true, tour: true };
 
 			init();
 
@@ -108,7 +107,7 @@
 				const glass = new THREE.MeshStandardMaterial( { color: 0x111a28, roughness: 0.12, metalness: 0.65 } );
 				const neon = new THREE.MeshBasicNodeMaterial( { color: new THREE.Color( 3, 3, 3 ) } );
 
-				// Broad puddles and fine asphalt grain vary reflections without image textures.
+				// Broad puddles and fine asphalt grain vary the wet surface without image textures.
 
 				const roadUV = uv().mul( vec2( 130, LENGTH + 30 ) );
 				const puddles = mx_noise_float( roadUV.mul( 0.32 ) ).smoothstep( - 0.05, 0.3 );
@@ -379,52 +378,18 @@
 				controls.maxPolarAngle = Math.PI * 0.49;
 				controls.addEventListener( 'start', () => params.tour = false );
 
-				// Keep opaque surface data behind the transparent helpers and light cones.
-
-				const opaque = output.a.greaterThanEqual( 1 ).select( 1, 0 );
-				const sceneMRT = mrt( {
-					output,
-					normal: vec4( packNormalToRGB( normalView ), opaque ),
-					metalrough: vec4( metalness, roughness, 0, opaque )
-				} );
-				sceneMRT.setBlendMode( 'normal', new THREE.BlendMode( THREE.NormalBlending ) );
-				sceneMRT.setBlendMode( 'metalrough', new THREE.BlendMode( THREE.NormalBlending ) );
-
 				const scenePass = pass( scene, camera );
-				scenePass.setMRT( sceneMRT );
-				scenePass.getTexture( 'normal' ).type = THREE.UnsignedByteType;
-				scenePass.getTexture( 'metalrough' ).type = THREE.UnsignedByteType;
-
 				const sceneColor = scenePass.getTextureNode( 'output' );
-				const sceneNormal = scenePass.getTextureNode( 'normal' );
-				const sceneMaterial = scenePass.getTextureNode( 'metalrough' );
-				const reflections = ssr( sceneColor, scenePass.getTextureNode( 'depth' ), sample( uv => unpackRGBToNormal( sceneNormal.sample( uv ) ) ), {
-					metalnessNode: sceneMaterial.r,
-					roughnessNode: sceneMaterial.g
-				} );
-				reflections.resolutionScale = 0.5;
-				reflections.quality.value = 0.5;
-				reflections.blurQuality = 1;
-				reflections.maxDistance.value = 25;
-				reflections.thickness.value = 0.25;
-				reflections.intensity.value = 0.8;
-
 				const glow = bloom( sceneColor, 0.3, 0.5, 1 );
-				const reflectedColor = sceneColor.add( reflections.rgb );
+
 				renderPipeline = new THREE.RenderPipeline( renderer );
-				renderPipeline.outputNode = reflectedColor.add( glow );
+				renderPipeline.outputNode = sceneColor.add( glow );
 
 				const gui = renderer.inspector.createParameters( 'Settings' );
 				gui.add( pointLights, 'visible' ).name( 'point lights' ).onChange( value => pointHelpers.visible = value );
 				gui.add( spotLights, 'visible' ).name( 'spot lights' ).onChange( value => spotHelpers.visible = value );
 				gui.add( helpers, 'visible' ).name( 'light helpers' );
 				gui.add( beams, 'visible' ).name( 'light beams' );
-				gui.add( params, 'reflections' ).onChange( value => {
-
-					renderPipeline.outputNode = ( value ? reflectedColor : sceneColor ).add( glow );
-					renderPipeline.needsUpdate = true;
-
-				} );
 				gui.add( params, 'animate' ).name( 'animate traffic' );
 				gui.add( params, 'tour' ).name( 'camera tour' ).listen();
 
