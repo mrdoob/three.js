@@ -12260,9 +12260,16 @@ class Object3D extends EventDispatcher {
 
 		/**
 		 * Whether the 3D object is supposed to be static or not. If set to `true`, it means
-		 * the 3D object is not going to be changed after the initial renderer. This includes
+		 * the 3D object is not going to be changed after the first render. This includes
 		 * geometry and material settings. A static 3D object can be processed by the renderer
 		 * slightly faster since certain state checks can be bypassed.
+		 *
+		 * With the default lighting system, finite-range, unshadowed point and spot
+		 * lights can be batched into a world-space light grid for standard materials.
+		 * Their world transforms, colors, intensities, ranges and decay must remain
+		 * fixed while static. For spot lights this also includes the target's
+		 * world position, angle and penumbra. Visibility and camera layers still apply.
+		 * Unsupported lighting features use the ordinary light path.
 		 *
 		 * Only relevant in context of {@link WebGPURenderer}.
 		 *
