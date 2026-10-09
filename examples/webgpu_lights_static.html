@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - static lights</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - static lights">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_lights_static.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_lights_static.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Static Lights</span>
+			</div>
+
+			<small>
+				1,024 point lights + 1,024 spot lights.<br />
+				Static lights, moving objects. Drag to orbit.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+
+			const GRID = 32;
+			const SPACING = 8;
+			const COUNT = GRID * GRID;
+
+			let camera, scene, renderer, controls, timer, sculptures;
+			let elapsed = 0;
+
+			const dummy = new THREE.Object3D();
+			const positions = [];
+			const params = { animate: true };
+
+			init();
+
+			async function init() {
+
+				if ( WebGPU.isAvailable() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw new Error( 'No WebGPU support' );
+
+				}
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 400 );
+				camera.position.set( 30, 21, 34 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x080b12 );
+				scene.fog = new THREE.FogExp2( 0x080b12, 0.009 );
+				scene.add( new THREE.HemisphereLight( 0xc7dfff, 0x303040, 0.3 ) );
+
+				timer = new THREE.Timer();
+				timer.connect( document );
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.NeutralToneMapping;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				// All receivers use standard materials. Their transforms remain dynamic.
+
+				const ground = new THREE.Mesh(
+					new THREE.PlaneGeometry( GRID * SPACING, GRID * SPACING ).rotateX( - Math.PI / 2 ),
+					new THREE.MeshStandardMaterial( { color: 0x808080, roughness: 0.65, metalness: 0.15 } )
+				);
+				scene.add( ground );
+
+				const plinths = new THREE.InstancedMesh(
+					new THREE.CylinderGeometry( 1.9, 2.1, 0.35, 24 ),
+					new THREE.MeshStandardMaterial( { color: 0x666666, roughness: 0.4, metalness: 0.3 } ),
+					COUNT
+				);
+				scene.add( plinths );
+
+				sculptures = new THREE.InstancedMesh(
+					new THREE.TorusKnotGeometry( 0.9, 0.3, 64, 12 ),
+					new THREE.MeshStandardMaterial( { color: 0xdddddd, roughness: 0.28, metalness: 0.5 } ),
+					COUNT
+				);
+				sculptures.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
+				sculptures.frustumCulled = false;
+				scene.add( sculptures );
+
+				const pointLights = new THREE.Group();
+				const spotLights = new THREE.Group();
+				scene.add( pointLights, spotLights );
+
+				const markerGeometry = new THREE.SphereGeometry( 0.12, 8, 6 );
+				const markerMaterial = new THREE.MeshBasicMaterial();
+				const pointMarkers = new THREE.InstancedMesh( markerGeometry, markerMaterial, COUNT );
+				const spotMarkers = new THREE.InstancedMesh( markerGeometry, markerMaterial, COUNT );
+				pointLights.add( pointMarkers );
+				spotLights.add( spotMarkers );
+
+				const colors = [ 0x68c8ff, 0xffae68, 0x9694ff, 0xff7c96 ];
+				const span = ( GRID - 1 ) * SPACING;
+
+				for ( let x = 0; x < GRID; x ++ ) {
+
+					for ( let z = 0; z < GRID; z ++ ) {
+
+						const index = x * GRID + z;
+						const px = x * SPACING - span / 2;
+						const pz = z * SPACING - span / 2;
+						const color = new THREE.Color( colors[ ( x + z ) % colors.length ] );
+
+						positions.push( new THREE.Vector3( px, 2, pz ) );
+
+						dummy.position.set( px, 0.175, pz );
+						dummy.updateMatrix();
+						plinths.setMatrixAt( index, dummy.matrix );
+
+						// Finite range and light.static opt into the storage-buffer grid.
+						// Position, color, intensity and range stay fixed after the first render.
+
+						const point = new THREE.PointLight( color, 25, 6 );
+						point.position.set( px - 2.4, 0.8, pz + 1.5 );
+						point.static = true;
+						pointLights.add( point );
+
+						dummy.position.copy( point.position );
+						dummy.updateMatrix();
+						pointMarkers.setMatrixAt( index, dummy.matrix );
+						pointMarkers.setColorAt( index, color );
+
+						const spot = new THREE.SpotLight( color, 220, 12, Math.PI / 7, 0.35 );
+						spot.position.set( px + 2, 6, pz - 1.5 );
+						spot.target.position.set( px + 0.8, 0, pz );
+						spot.static = true;
+
+						// A static spotlight's target also stays fixed in world space.
+						spotLights.add( spot, spot.target );
+
+						dummy.position.copy( spot.position );
+						dummy.updateMatrix();
+						spotMarkers.setMatrixAt( index, dummy.matrix );
+						spotMarkers.setColorAt( index, color );
+
+					}
+
+				}
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 1, 0 );
+				controls.enableDamping = true;
+				controls.autoRotateSpeed = 0.15;
+				controls.minDistance = 5;
+				controls.maxDistance = 250;
+				controls.maxPolarAngle = Math.PI * 0.48;
+				controls.update();
+
+				const gui = renderer.inspector.createParameters( 'Settings' );
+				gui.add( pointLights, 'visible' ).name( 'point lights' );
+				gui.add( spotLights, 'visible' ).name( 'spot lights' );
+				gui.add( params, 'animate' ).name( 'animate objects' );
+				gui.add( controls, 'autoRotate' ).name( 'orbit camera' );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				renderer.setAnimationLoop( animate );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				timer.update();
+
+				if ( params.animate ) elapsed += timer.getDelta();
+
+				for ( let i = 0; i < COUNT; i ++ ) {
+
+					dummy.position.copy( positions[ i ] );
+					dummy.position.y += Math.sin( elapsed + i * 0.3 ) * 0.4;
+					dummy.rotation.set( elapsed * 0.2 + i * 0.1, elapsed * 0.3, 0 );
+					dummy.updateMatrix();
+					sculptures.setMatrixAt( i, dummy.matrix );
+
+				}
+
+				sculptures.instanceMatrix.needsUpdate = true;
+
+				controls.update( timer.getDelta() );
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
