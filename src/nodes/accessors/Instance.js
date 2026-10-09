@@ -79,23 +79,15 @@ function getMatrixColumns( matrices, owner = matrices ) {
 
 }
 
-const getObjectColumns = object => getMatrixColumns( object.instanceMatrix, object );
-const getPreviousColumns = object => getMatrixColumns( getPreviousMatrix( object ) );
-
-// Callbacks of shared programs are declared here, so they don't retain the matrices of the mesh the program was built from.
-const syncObjectMatrix = ( { object } ) => syncInterleavedMatrix( object.instanceMatrix, object );
-const updateObjectPreviousMatrix = ( { object } ) => updatePreviousMatrix( object, object.instanceMatrix );
-
 /**
  * Creates the appropriate node for instanced matrix transformations.
  * Depending on buffer limits and storage capability, returns either a storage, buffer, or instanced interleaved attribute node.
  *
  * @param {NodeBuilder} builder - The current node builder.
  * @param {InstancedBufferAttribute|StorageInstancedBufferAttribute} instanceMatrix - The matrix buffer attribute.
- * @param {?Function} [getObjectColumns=null] - Optional callback returning the matrix columns of the rendered object.
  * @returns {Node} The matrix node.
  */
-function createInstanceMatrixNode( builder, instanceMatrix, getObjectColumns = null ) {
+function createInstanceMatrixNode( builder, instanceMatrix ) {
 
 	let instanceMatrixNode;
 	const matrixCount = Math.max( instanceMatrix.count, 1 );
@@ -110,24 +102,13 @@ function createInstanceMatrixNode( builder, instanceMatrix, getObjectColumns = n
 
 		const uniformBufferSize = matrixCount * 16 * 4;
 
-		if ( getObjectColumns === null && uniformBufferSize <= builder.getUniformBufferLimit() ) {
+		if ( uniformBufferSize <= builder.getUniformBufferLimit() ) {
 
 			instanceMatrixNode = buffer( instanceMatrix.array, 'mat4', matrixCount ).element( instanceIndex );
 
 		} else {
 
-			// Shared programs bind the columns of the rendered object, placeholder columns only provide the layout.
-			const layout = getObjectColumns === null ? getMatrixColumns( instanceMatrix ) : createMatrixColumns( new Float32Array( 16 ) );
-
-			const columns = layout.map( ( column, i ) => {
-
-				const node = instancedBufferAttribute( column );
-
-				if ( getObjectColumns !== null ) node.setObjectAttribute( object => getObjectColumns( object )[ i ] );
-
-				return node;
-
-			} );
+			const columns = getMatrixColumns( instanceMatrix ).map( column => instancedBufferAttribute( column ) );
 
 			instanceMatrixNode = mat4( ...columns );
 
@@ -183,6 +164,79 @@ function updatePreviousMatrix( object, matrices ) {
 }
 
 /**
+ * Creates a matrix node that binds the matrices of the rendered object, so the program can be shared between objects.
+ *
+ * @param {Function} getColumns - Returns the matrix columns of the rendered object.
+ * @returns {Node} The matrix node.
+ */
+function createSharedMatrixNode( getColumns ) {
+
+	// Placeholder columns only provide the layout, each object binds its own columns.
+	const columns = createMatrixColumns( new Float32Array( 16 ) ).map( ( column, i ) => {
+
+		return instancedBufferAttribute( column ).setObjectAttribute( object => getColumns( object )[ i ] );
+
+	} );
+
+	return mat4( ...columns );
+
+}
+
+/**
+ * Transforms the local position, the previous position and the normal with the given instance matrices.
+ *
+ * @param {NodeBuilder} builder - The current node builder.
+ * @param {Node} instanceMatrixNode - The instance matrix node.
+ * @param {?Node} previousMatrixNode - The previous-frame instance matrix node, if motion vectors are needed.
+ */
+function transformInstance( builder, instanceMatrixNode, previousMatrixNode ) {
+
+	// POSITION
+
+	const instancePosition = instanceMatrixNode.mul( positionLocal ).xyz;
+	positionLocal.assign( instancePosition );
+
+	if ( previousMatrixNode !== null ) {
+
+		positionPrevious.assign( previousMatrixNode.mul( positionPrevious ).xyz );
+
+	}
+
+	// NORMAL
+
+	if ( builder.hasGeometryAttribute( 'normal' ) ) {
+
+		const instanceNormal = transformNormal( normalLocal, instanceMatrixNode );
+		normalLocal.assign( instanceNormal );
+
+	}
+
+}
+
+/**
+ * Sets up instancing with the matrices of the rendered object, so the program can be shared between instanced meshes.
+ *
+ * @param {NodeBuilder} builder - The current node builder.
+ */
+function setupSharedInstance( builder ) {
+
+	OnBeforeObjectUpdate( ( { object } ) => syncInterleavedMatrix( object.instanceMatrix, object ) );
+
+	let previousMatrixNode = null;
+
+	if ( builder.needsPreviousData() ) {
+
+		OnAfterObjectUpdate( ( { object } ) => updatePreviousMatrix( object, object.instanceMatrix ) );
+
+		previousMatrixNode = createSharedMatrixNode( object => getMatrixColumns( getPreviousMatrix( object ) ) );
+
+	}
+
+	transformInstance( builder, createSharedMatrixNode( object => getMatrixColumns( object.instanceMatrix, object ) ), previousMatrixNode );
+
+}
+
+/**
  * TSL object representing a varying property for the instanced color vector.
  *
  * @type {VaryingNode<vec3>}
@@ -200,28 +254,11 @@ export const instanceColor = /*@__PURE__*/ varyingProperty( 'vec3', 'vInstanceCo
  */
 export const instance = /*@__PURE__*/ Fn( ( [ matrices, colors = null ], builder ) => {
 
-	setupInstance( builder, matrices, colors, false );
-
-}, 'void' );
-
-/**
- * Sets up instanced transformations and colors.
- *
- * @private
- * @param {NodeBuilder} builder - The current node builder.
- * @param {InstancedBufferAttribute|StorageInstancedBufferAttribute} matrices - The instanced transformation matrices.
- * @param {?InstancedBufferAttribute|StorageInstancedBufferAttribute} colors - The optional instanced colors.
- * @param {boolean} shared - Whether the matrices are resolved from the rendered object, so the program can be shared.
- */
-function setupInstance( builder, matrices, colors, shared ) {
-
 	const isStorageColor = colors && colors.isStorageInstancedBufferAttribute === true;
 
-	const instanceMatrixNode = createInstanceMatrixNode( builder, matrices, shared ? getObjectColumns : null );
+	const instanceMatrixNode = createInstanceMatrixNode( builder, matrices );
 
-	if ( shared ) OnBeforeObjectUpdate( syncObjectMatrix );
-
-	const hasInterleavedMatrix = ! shared && _matrixColumns.has( matrices );
+	const hasInterleavedMatrix = _matrixColumns.has( matrices );
 
 	let instanceColorNode = null;
 	let interleavedColor = null;
@@ -274,29 +311,17 @@ function setupInstance( builder, matrices, colors, shared ) {
 
 	}
 
-	// POSITION
-
-	const instancePosition = instanceMatrixNode.mul( positionLocal ).xyz;
-	positionLocal.assign( instancePosition );
+	let previousMatrixNode = null;
 
 	if ( builder.needsPreviousData() ) {
 
-		OnAfterObjectUpdate( shared ? updateObjectPreviousMatrix : ( { object } ) => updatePreviousMatrix( object, matrices ) );
+		OnAfterObjectUpdate( ( { object } ) => updatePreviousMatrix( object, matrices ) );
 
-		const previousMatrix = getPreviousMatrix( builder.object, matrices );
-		const previousMatrixNode = createInstanceMatrixNode( builder, previousMatrix, shared ? getPreviousColumns : null );
-		positionPrevious.assign( previousMatrixNode.mul( positionPrevious ).xyz );
+		previousMatrixNode = createInstanceMatrixNode( builder, getPreviousMatrix( builder.object, matrices ) );
 
 	}
 
-	// NORMAL
-
-	if ( builder.hasGeometryAttribute( 'normal' ) ) {
-
-		const instanceNormal = transformNormal( normalLocal, instanceMatrixNode );
-		normalLocal.assign( instanceNormal );
-
-	}
+	transformInstance( builder, instanceMatrixNode, previousMatrixNode );
 
 	// COLOR
 
@@ -306,7 +331,7 @@ function setupInstance( builder, matrices, colors, shared ) {
 
 	}
 
-}
+}, 'void' );
 
 /**
  * TSL wrapper for applying instanced mesh rendering setup.
@@ -317,8 +342,14 @@ function setupInstance( builder, matrices, colors, shared ) {
  */
 export const instancedMesh = /*@__PURE__*/ Fn( ( [ instancedMesh ], builder ) => {
 
-	const { instanceMatrix, instanceColor } = instancedMesh;
+	if ( isSharedInstancing( instancedMesh, builder.renderer ) ) {
 
-	setupInstance( builder, instanceMatrix, instanceColor, isSharedInstancing( instancedMesh, builder.renderer ) );
+		setupSharedInstance( builder );
+
+	} else {
+
+		instance( instancedMesh.instanceMatrix, instancedMesh.instanceColor );
+
+	}
 
 }, 'void' );
