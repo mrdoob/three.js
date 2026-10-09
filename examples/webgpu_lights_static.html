@@ -165,8 +165,6 @@
 				helpers.add( pointHelpers, spotHelpers );
 				scene.add( helpers );
 
-				const signs = createSigns();
-
 				for ( let side = - 1; side <= 1; side += 2 ) {
 
 					addBox( pavements, side * 11.5, 0.16, 0, 6.5, 0.32, LENGTH, 0xffffff );
@@ -206,11 +204,6 @@
 
 							}
 
-							const sign = new THREE.Mesh( new THREE.PlaneGeometry( 5, 1.45 ), signs[ index % signs.length ] );
-							sign.position.set( front - side * 0.07, 4.25, z );
-							sign.rotation.y = - side * Math.PI / 2;
-							scene.add( sign );
-
 							// Finite ranges and light.static opt into the storage-buffer grid.
 							// Light transforms and properties remain fixed after the first render.
 
@@ -234,9 +227,9 @@
 							for ( let j = 0; j < 4; j ++ ) {
 
 								const street = row === 0 && i % 2 === 0 && j === 0;
-								const light = new THREE.SpotLight( palette[ ( i + j * 2 + 2 ) % palette.length ], street ? 320 : 180, street ? 12 : 10, Math.PI / 7, 0.45 );
+								const light = new THREE.SpotLight( palette[ ( i + j * 2 + 2 ) % palette.length ], street ? 320 : 180, street ? 12 : 10, street ? Math.PI / 4 : Math.PI / 7, 0.45 );
 								light.position.set( street ? side * 7 : front - side * 1.75, street ? 5.7 : 3.15, z + ( street ? 0 : ( j - 1.5 ) * 1.9 ) );
-								light.target.position.set( street ? light.position.x : front - side * 3.5, street ? 0.02 : 0.34, light.position.z + ( street ? 0 : 0.8 ) );
+								light.target.position.set( street ? side * 5 : front - side * 3.5, street ? 0.02 : 0.34, light.position.z + ( street ? 0 : 0.8 ) );
 								light.static = true;
 
 								// A static spotlight's target stays fixed in world space too.
@@ -244,10 +237,10 @@
 
 								const length = light.position.distanceTo( light.target.position );
 								const radius = Math.tan( light.angle ) * length;
-								const inset = street ? 0.3 : 0;
-								beamTransform.position.copy( light.position );
-								beamTransform.position.y += inset;
-								beamTransform.quaternion.setFromUnitVectors( down, direction.subVectors( light.target.position, light.position ).normalize() );
+								const inset = street ? 0.1 : 0;
+								direction.subVectors( light.target.position, light.position ).normalize();
+								beamTransform.position.copy( light.position ).addScaledVector( direction, - inset );
+								beamTransform.quaternion.setFromUnitVectors( down, direction );
 								beamTransform.scale.set( radius, length + inset, radius );
 								beamTransform.updateMatrix();
 								beams.setMatrixAt( beamIndex, beamTransform.matrix );
@@ -428,33 +421,6 @@
 				}
 
 				scene.add( mesh );
-
-			}
-
-			function createSigns() {
-
-				return [ 'NOVA', 'RAMEN', 'ARCADE', 'METRO', 'KINO', 'HOTEL' ].map( ( text, i ) => {
-
-					const canvas = document.createElement( 'canvas' );
-					canvas.width = 512;
-					canvas.height = 128;
-					const context = canvas.getContext( '2d' );
-					context.fillStyle = '#101827';
-					context.fillRect( 0, 0, 512, 128 );
-					context.strokeStyle = color.setHex( palette[ i ] ).getStyle();
-					context.lineWidth = 4;
-					context.strokeRect( 4, 4, 504, 120 );
-					context.fillStyle = context.strokeStyle;
-					context.font = 'bold 72px sans-serif';
-					context.textAlign = 'center';
-					context.textBaseline = 'middle';
-					context.fillText( text, 256, 66 );
-
-					const texture = new THREE.CanvasTexture( canvas );
-					texture.colorSpace = THREE.SRGBColorSpace;
-					return new THREE.MeshBasicMaterial( { map: texture } );
-
-				} );
 
 			}
 
