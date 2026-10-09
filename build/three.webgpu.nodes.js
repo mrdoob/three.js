@@ -44508,6 +44508,18 @@ const fog = /*@__PURE__*/ Fn( ( [ color, factor ] ) => {
 
 } );
 
+let _rangeId = 0;
+
+// Per-object seed shared by all range nodes, so the values differ between objects.
+
+const objectSeed = /*@__PURE__*/ uniform( 0, 'uint' ).onObjectUpdate( ( { object } ) => {
+
+	const objectId = object !== null ? object.id : 0; // compute has no object
+
+	return Math.imul( objectId, 0x9E3779B9 ) >>> 0;
+
+} );
+
 /**
  * `RangeNode` generates random per-instance values in a defined range.
  * An exemplary use case for this utility node is to generate random per-instance
@@ -44552,6 +44564,15 @@ class RangeNode extends Node {
 		 * @default float()
 		 */
 		this.maxNode = maxNode;
+
+		/**
+		 * Salt of the random sequence. It uses a counter of range nodes instead of the
+		 * global node id, so the values only change when range nodes are added or removed.
+		 *
+		 * @private
+		 * @type {number}
+		 */
+		this._salt = Math.imul( _rangeId ++, 0x85EBCA6B ) >>> 0;
 
 	}
 
@@ -44644,17 +44665,9 @@ class RangeNode extends Node {
 		else max.set( maxValue.x, maxValue.y, maxValue.z || 0, maxValue.w || 0 );
 
 		// The values are hashed from the instance index instead of stored per object, so they work
-		// for any instance count. The seed decorrelates objects and range nodes.
+		// for any instance count. The salt decorrelates range nodes.
 
-		const salt = Math.imul( this.id, 0x85EBCA6B );
-
-		const seed = uniform( 0, 'uint' ).onObjectUpdate( ( { object } ) => {
-
-			const objectId = object !== null ? object.id : 0; // compute has no object
-
-			return ( Math.imul( objectId, 0x9E3779B9 ) ^ salt ) >>> 0;
-
-		} );
+		const seed = objectSeed.bitXor( uint( this._salt ) );
 
 		const index = instanceIndex.mul( 4 ).add( seed );
 		const random = vec4( hash( index ), hash( index.add( 1 ) ), hash( index.add( 2 ) ), hash( index.add( 3 ) ) );
