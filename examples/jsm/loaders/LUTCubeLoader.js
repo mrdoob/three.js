@@ -107,8 +107,8 @@ export class LUTCubeLoader extends Loader {
 
 		const regExpTitle = /TITLE +"([^"]*)"/;
 		const regExpSize = /LUT_3D_SIZE +(\d+)/;
-		const regExpDomainMin = /DOMAIN_MIN +([\d.]+) +([\d.]+) +([\d.]+)/;
-		const regExpDomainMax = /DOMAIN_MAX +([\d.]+) +([\d.]+) +([\d.]+)/;
+		const regExpDomainMin = /DOMAIN_MIN +([\d.e+-]+) +([\d.e+-]+) +([\d.e+-]+)/;
+		const regExpDomainMax = /DOMAIN_MAX +([\d.e+-]+) +([\d.e+-]+) +([\d.e+-]+)/;
 		const regExpDataPoints = /^([\d.e+-]+) +([\d.e+-]+) +([\d.e+-]+) *$/gm;
 
 		let result = regExpTitle.exec( input );

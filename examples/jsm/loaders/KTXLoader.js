@@ -104,6 +104,7 @@ class KhronosTextureContainer {
 		const endianness = headerDataView.getUint32( 0, true );
 		const littleEndian = endianness === 0x04030201;
 
+		this.littleEndian = littleEndian;
 		this.glType = headerDataView.getUint32( 1 * dataSize, littleEndian ); // must be 0 for compressed textures
 		this.glTypeSize = headerDataView.getUint32( 2 * dataSize, littleEndian ); // must be 1 for compressed textures
 		this.glFormat = headerDataView.getUint32( 3 * dataSize, littleEndian ); // must be 0 for compressed textures
@@ -160,6 +161,7 @@ class KhronosTextureContainer {
 	mipmaps( loadMipmaps ) {
 
 		const mipmaps = [];
+		const dataView = new DataView( this.arrayBuffer );
 
 		// initialize width & height for level 1
 		let dataOffset = HEADER_LEN + this.bytesOfKeyValueData;
@@ -169,7 +171,7 @@ class KhronosTextureContainer {
 
 		for ( let level = 0; level < mipmapCount; level ++ ) {
 
-			const imageSize = new Int32Array( this.arrayBuffer, dataOffset, 1 )[ 0 ]; // size per face, since not supporting array cubemaps
+			const imageSize = dataView.getUint32( dataOffset, this.littleEndian ); // size per face, since not supporting array cubemaps
 			dataOffset += 4; // size of the image + 4 for the imageSize field
 
 			for ( let face = 0; face < this.numberOfFaces; face ++ ) {
@@ -183,8 +185,8 @@ class KhronosTextureContainer {
 
 			}
 
-			width = Math.max( 1.0, width * 0.5 );
-			height = Math.max( 1.0, height * 0.5 );
+			width = Math.max( width >> 1, 1 );
+			height = Math.max( height >> 1, 1 );
 
 		}
 

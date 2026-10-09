@@ -542,6 +542,19 @@ class PLYLoader extends Loader {
 
 			}
 
+			// custom buffer data
+
+			for ( const customProperty of Object.keys( scope.customPropertyMapping ) ) {
+
+				if ( buffer[ customProperty ].length > 0 ) {
+
+					const CustomClass = getBufferAttributeClass( vertexDescriptor.custom[ customProperty ].type );
+					geometry.setAttribute( customProperty, new CustomClass( buffer[ customProperty ], scope.customPropertyMapping[ customProperty ].length ) );
+
+				}
+
+			}
+
 			if ( buffer.faceVertexUvs.length > 0 || buffer.faceVertexColors.length > 0 ) {
 
 				geometry = geometry.toNonIndexed();
@@ -560,19 +573,6 @@ class PLYLoader extends Loader {
 
 					const ColorClass = getBufferAttributeClass( colorType );
 					geometry.setAttribute( 'color', new ColorClass( buffer.faceVertexColors, 3, normalized ) );
-
-				}
-
-			}
-
-			// custom buffer data
-
-			for ( const customProperty of Object.keys( scope.customPropertyMapping ) ) {
-
-				if ( buffer[ customProperty ].length > 0 ) {
-
-					const CustomClass = getBufferAttributeClass( vertexDescriptor.custom[ customProperty ].type );
-					geometry.setAttribute( customProperty, new CustomClass( buffer[ customProperty ], scope.customPropertyMapping[ customProperty ].length ) );
 
 				}
 
