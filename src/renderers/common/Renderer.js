@@ -2763,7 +2763,6 @@ class Renderer {
 			this._inspector.dispose();
 			this._animation.dispose();
 			this._objects.dispose();
-			this.lighting.dispose();
 			this._geometries.dispose();
 			this._attributes.dispose();
 			this._pipelines.dispose();
@@ -2779,6 +2778,7 @@ class Renderer {
 			}
 
 			this._textures.dispose();
+			this.lighting.dispose();
 			this.info.dispose();
 
 			await this.backend.dispose();
