@@ -52,13 +52,14 @@ function* walk( directory ) {
 // nodedef files only use elements and attributes, and Node has no DOMParser
 function* tags( xml ) {
 
-	const withoutComments = xml.replace( /<!--[\s\S]*?-->/g, '' );
-	const tagPattern = /<(\/?)([\w:.-]+)((?:\s+[\w:.-]+\s*=\s*"[^"]*")*)\s*(\/?)>/g;
+	const tagPattern = /<!--[\s\S]*?-->|<(\/?)([\w:.-]+)((?:\s+[\w:.-]+\s*=\s*"[^"]*")*)\s*(\/?)>/g;
 	const attributePattern = /([\w:.-]+)\s*=\s*"([^"]*)"/g;
 
-	for ( const match of withoutComments.matchAll( tagPattern ) ) {
+	for ( const match of xml.matchAll( tagPattern ) ) {
 
 		const [ , closing, name, attributeText, selfClosing ] = match;
+		if ( name === undefined ) continue; // comment
+
 		const attributes = {};
 		for ( const attribute of attributeText.matchAll( attributePattern ) ) attributes[ attribute[ 1 ] ] = attribute[ 2 ];
 		yield { name, attributes, closing: closing === '/', selfClosing: selfClosing === '/' };
