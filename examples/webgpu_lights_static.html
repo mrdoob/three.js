@@ -234,10 +234,10 @@
 
 							for ( let j = 0; j < 4; j ++ ) {
 
-								const street = row === 0 && j < 2;
+								const street = row === 0 && i % 2 === 0 && j === 0;
 								const light = new THREE.SpotLight( palette[ ( i + j * 2 + 2 ) % palette.length ], street ? 320 : 180, street ? 12 : 10, Math.PI / 7, 0.45 );
-								light.position.set( front - side * 1.75, 3.15, z + ( j - 1.5 ) * 1.9 );
-								light.target.position.set( front - side * ( street ? 8.5 : 3.5 ), 0.34, light.position.z + 0.8 );
+								light.position.set( street ? side * 7 : front - side * 1.75, street ? 5.7 : 3.15, z + ( street ? 0 : ( j - 1.5 ) * 1.9 ) );
+								light.target.position.set( street ? light.position.x : front - side * 3.5, street ? 0.02 : 0.34, light.position.z + ( street ? 0 : 0.8 ) );
 								light.static = true;
 
 								// A static spotlight's target stays fixed in world space too.
@@ -258,7 +258,15 @@
 								helper.cone.material.depthWrite = false;
 								spotHelpers.add( helper );
 
-								addBox( details, light.position.x, 3.25, light.position.z, 0.35, 0.1, 0.5, 0x606d81 );
+								addBox( details, light.position.x, street ? 5.85 : 3.25, light.position.z, 0.35, street ? 0.3 : 0.1, 0.5, 0x606d81 );
+
+								if ( street ) {
+
+									addBox( details, side * 8.4, 2.95, light.position.z, 0.1, 5.9, 0.1, 0x69788c );
+									addBox( details, side * 7.7, 5.85, light.position.z, 1.4, 0.1, 0.1, 0x69788c );
+									addBox( accents, light.position.x, 5.69, light.position.z, 0.3, 0.02, 0.45, light.color.getHex() );
+
+								}
 
 							}
 
