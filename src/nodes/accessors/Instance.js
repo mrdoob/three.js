@@ -22,8 +22,8 @@ const _matrixColumns = /*@__PURE__*/ new WeakMap();
  * Returns `true` if the instanced mesh can share its node builder state with
  * other instanced meshes. Shared programs read the instance matrices of the
  * object being rendered instead of embedding the buffers of a specific mesh.
- * Storage buffers, instance colors and morph targets remain per object, as does
- * instancing outside WebGPURenderer.
+ * Storage buffers, instance colors, morph targets and geometries with many
+ * attributes remain per object, as does instancing outside WebGPURenderer.
  *
  * @param {InstancedMesh} object - The instanced mesh.
  * @param {Renderer} renderer - The renderer.
@@ -40,8 +40,14 @@ export function isSharedInstancing( object, renderer ) {
 
 	if ( ! instanceMatrix || instanceMatrix.isInstancedBufferAttribute !== true || instanceMatrix.isStorageInstancedBufferAttribute === true ) return false;
 
+	const geometry = object.geometry;
+
+	// Shared programs bind the matrices as one more vertex buffer, two with velocity.
+	// Leave room for them within the default limit of eight vertex buffers.
+	if ( Object.keys( geometry.attributes ).length > 6 ) return false;
+
 	// Morph target influences are bound per mesh.
-	const morphAttributes = object.geometry.morphAttributes;
+	const morphAttributes = geometry.morphAttributes;
 
 	return ! ( morphAttributes.position || morphAttributes.normal || morphAttributes.color );
 
