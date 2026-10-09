@@ -245,9 +245,11 @@
 
 								const length = light.position.distanceTo( light.target.position );
 								const radius = Math.tan( light.angle ) * length;
+								const inset = street ? 0.3 : 0;
 								beamTransform.position.copy( light.position );
+								beamTransform.position.y += inset;
 								beamTransform.quaternion.setFromUnitVectors( down, direction.subVectors( light.target.position, light.position ).normalize() );
-								beamTransform.scale.set( radius, length, radius );
+								beamTransform.scale.set( radius, length + inset, radius );
 								beamTransform.updateMatrix();
 								beams.setMatrixAt( beamIndex, beamTransform.matrix );
 								beams.setColorAt( beamIndex ++, light.color );
