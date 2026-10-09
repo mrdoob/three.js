@@ -355,7 +355,7 @@ class WebGPUBackend extends Backend {
 
 			// Before applying `outputColorSpace: LinearSRGBColorSpace` to 8-bit contexts,
 			// we must support `workingColorSpace: SRGBColorSpace` for legacy workflows. See #34914.
-			const colorSpace = parameters.outputType === HalfFloatType ?  this.renderer.outputColorSpace : undefined;
+			const colorSpace = parameters.outputType === HalfFloatType ? this.renderer.outputColorSpace : undefined;
 
 			const toneMappingMode = parameters.outputType === HalfFloatType ? 'extended' : 'standard';
 
