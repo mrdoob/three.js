@@ -301,9 +301,26 @@ class Textures extends DataMap {
 
 			if ( 'requestPaint' in canvas ) {
 
-				if ( ! canvas.hasAttribute( 'layoutsubtree' ) ) {
+				if ( ! canvas.hasAttribute( 'content' ) && ! canvas.hasAttribute( 'layoutsubtree' ) ) {
 
-					canvas.setAttribute( 'layoutsubtree', 'true' );
+					if ( 'content' in canvas ) {
+
+						// Chrome 155+: layoutsubtree was renamed to content="drawable"
+						canvas.setAttribute( 'content', 'drawable' );
+
+					} else {
+
+						// Chrome <= 155
+						canvas.setAttribute( 'layoutsubtree', 'true' );
+
+					}
+
+				}
+
+				// Chrome 155+ requires the drawable attribute on drawn canvas children.
+				if ( ! texture.image.hasAttribute( 'drawable' ) ) {
+
+					texture.image.setAttribute( 'drawable', '' );
 
 				}
 

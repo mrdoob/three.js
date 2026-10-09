@@ -61,6 +61,9 @@ class InteractionManager {
 		this._cachedCssW = - 1;
 		this._cachedCssH = - 1;
 
+		// TODO: Remove once Chromium 157.0.8081.0+ is the baseline.
+		this._supportsCanvasTransform = null;
+
 	}
 
 	/**
@@ -119,6 +122,7 @@ class InteractionManager {
 
 		this.camera = camera;
 		this.element = renderer.domElement;
+		this._supportsCanvasTransform = null; // TODO: Remove once Chromium 157.0.8081.0+ is the baseline.
 
 	}
 
@@ -168,7 +172,7 @@ class InteractionManager {
 			element.style.position = 'absolute';
 			element.style.left = '0';
 			element.style.top = '0';
-			element.style.transformOrigin = '0 0';
+			element.style.transformOrigin = '0 0'; // TODO: Remove once Chromium 157.0.8081.0+ is the baseline
 
 			const elemW = element.offsetWidth;
 			const elemH = element.offsetHeight;
@@ -201,9 +205,48 @@ class InteractionManager {
 
 			_mvp.premultiply( _viewport );
 
-			// The browser performs the perspective divide (by w) when applying the matrix3d.
+			if ( typeof canvas.updateElementGeometry === 'function' ) {
 
-			element.style.transform = 'matrix3d(' + _mvp.elements.join( ',' ) + ')';
+				const initialized =
+					( canvas.hasAttribute( 'content' ) || canvas.hasAttribute( 'layoutsubtree' ) ) &&
+					element.hasAttribute( 'drawable' ) &&
+					canvas.contains( element );
+
+				if ( initialized === false ) continue;
+
+				// TODO: Remove once Chromium 157.0.8081.0+ is the baseline.
+				if ( this._supportsCanvasTransform === null ) {
+
+					this._supportsCanvasTransform = supportsElementCanvasTransform( canvas, element );
+
+				}
+
+			}
+
+			// TODO: Remove once Chromium 157.0.8081.0+ is the baseline: drop this check and the
+			// legacy `else` branch, keeping only updateElementGeometry().
+			if ( this._supportsCanvasTransform === true ) {
+
+				// Chromium 157.0.8081.0+
+
+				canvas.updateElementGeometry( element, { canvasTransform: new DOMMatrix( _mvp.elements ) } );
+
+			} else {
+
+				// Legacy: Chromium <= 157.0.8079.0.
+
+				element.style.transform = 'matrix3d(' + _mvp.elements.join( ',' ) + ')';
+
+				// Chromium 155 - 157.0.8079.0 only hit test canvas children registered via
+				// updateElementGeometry(). Register the element without a canvas transform,
+				// since it isn't applied in these versions.
+				if ( typeof canvas.updateElementGeometry === 'function' ) {
+
+					canvas.updateElementGeometry( element );
+
+				}
+
+			}
 
 		}
 
@@ -218,6 +261,29 @@ class InteractionManager {
 		this.element = null;
 		this._cachedCssW = - 1;
 		this._cachedCssH = - 1;
+		this._supportsCanvasTransform = null; // TODO: Remove once Chromium 157.0.8081.0+ is the baseline.
+
+	}
+
+}
+
+// TODO: Remove once Chromium 157.0.8081.0+ is the baseline.
+// Chromium builds 155.0.8059.12 - 157.0.8079.0 expose updateElementGeometry()
+// but don't apply the transform without a flag, see crrev.com/c/8489932.
+
+function supportsElementCanvasTransform( canvas, element ) {
+
+	if ( typeof canvas.updateElementGeometry !== 'function' || typeof canvas.getElementTransform !== 'function' ) return false;
+
+	try {
+
+		canvas.getElementTransform( element );
+		return true;
+
+	} catch ( e ) {
+
+		// Any other error (e.g. InvalidStateError) means the overload exists.
+		return e.name !== 'TypeError';
 
 	}
 
