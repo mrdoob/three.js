@@ -48,7 +48,7 @@
 			import { acceleratedRaycast, computeBoundsTree } from 'three-mesh-bvh';
 
 			const MAX_VPLS = 1024;
-			const params = { mode: 'combined', count: 128, shadows: true, shadowResolution: 64, showVPLs: false, seed: 1, minDistance: 1, progressive: false, bounces: 2 };
+			const params = { mode: 'combined', count: 128, shadows: true, shadowResolution: 64, showVPLs: false, seed: 1, minDistance: 1, progressive: false, bounces: 2, candidateMultiplier: 4, importanceSampling: true, emissive: true };
 
 			let camera, scene, renderer;
 			let generator, shadowMaps, vpl, helper;
@@ -348,14 +348,17 @@
 
 				const gui = renderer.inspector.createParameters( 'Virtual Point Lights' );
 				gui.add( params, 'mode', [ 'direct only', 'indirect only', 'combined' ] ).name( 'Lighting' ).onChange( updateMode );
-				gui.add( params, 'count', sourceLights.length, MAX_VPLS, 1 ).name( 'Ray Budget' ).info( 'Total rays shared across source lights and bounce depths. Escaped rays do not become VPLs.' ).onChange( regenerate ).debounce( 250 );
-				gui.add( params, 'bounces', 1, 4, 1 ).name( 'Bounces' ).info( 'Maximum diffuse bounces. Ray Budget is shared across depths; more bounces use fewer initial paths.' ).onChange( () => regenerate() );
+				gui.add( params, 'count', sourceLights.length, MAX_VPLS, 1 ).name( 'VPL Budget' ).info( 'Maximum emitters used by the renderer. Escaped paths do not become VPLs.' ).onChange( regenerate ).debounce( 250 );
+				gui.add( params, 'bounces', 1, 16, 1 ).name( 'Bounces' ).info( 'Maximum diffuse reflections. More depths share the initial-path budget.' ).onChange( () => regenerate() );
+				gui.add( params, 'candidateMultiplier', [ 1, 2, 4, 8, 16 ] ).name( 'CPU Candidates' ).info( 'Trace more paths during generation while keeping the VPL and shadow-map budgets fixed.' ).onChange( regenerate );
+				gui.add( params, 'importanceSampling' ).name( 'Source Importance' ).onChange( regenerate );
+				gui.add( params, 'emissive' ).name( 'Emissive Surfaces' ).onChange( regenerate );
 				gui.add( params, 'seed', 1, 100, 1 ).name( 'Seed' ).onChange( regenerate ).debounce( 250 );
 				gui.add( params, 'minDistance', 0.01, 1, 0.01 ).name( 'Distance Clamp' ).info( 'Reduces near-field singularities at the expense of indirect-light energy.' ).onChange( value => vpl.minDistance.value = value );
 				gui.add( params, 'showVPLs' ).name( 'Show VPLs' ).onChange( value => helper.visible = value );
 
 				const progressiveParameters = gui.addFolder( 'Progressive' );
-				progressiveParameters.add( params, 'progressive' ).name( 'Progressive Preview' ).info( 'Double the ray budget every 0.5 seconds, up to Ray Budget. Each stage regenerates a normalized estimate.' ).onChange( () => regenerate() );
+				progressiveParameters.add( params, 'progressive' ).name( 'Progressive Preview' ).info( 'Double the ray budget every 0.5 seconds, up to VPL Budget. Each stage regenerates a normalized estimate.' ).onChange( () => regenerate() );
 				progressiveParameters.add( { restart: () => regenerate() }, 'restart' ).name( 'Restart Preview' );
 
 				const shadowParameters = gui.addFolder( 'Shadows' );
@@ -380,7 +383,7 @@
 				const visible = helper.visible;
 				helper.visible = false;
 
-				generator.generate( scene, sourceLights, { count: previewCount, seed: params.seed, bounces: params.bounces } );
+				generator.generate( scene, sourceLights, { count: previewCount, seed: params.seed, bounces: params.bounces, candidateMultiplier: params.candidateMultiplier, importanceSampling: params.importanceSampling, emissive: params.emissive } );
 
 				helper.visible = visible;
 
