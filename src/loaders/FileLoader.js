@@ -58,6 +58,14 @@ class FileLoader extends Loader {
 		this.responseType = '';
 
 		/**
+		 * Additional [request options](https://developer.mozilla.org/en-US/docs/Web/API/RequestInit)
+		 * passed to `fetch()`, e.g. `{ cache: 'no-cache', priority: 'high' }`.
+		 *
+		 * @type {Object}
+		 */
+		this.requestInit = {};
+
+		/**
 		 * Used for aborting requests.
 		 *
 		 * @private
@@ -130,6 +138,7 @@ class FileLoader extends Loader {
 		const req = new Request( url, {
 			headers: new Headers( this.requestHeader ),
 			credentials: this.withCredentials ? 'include' : 'same-origin',
+			...this.requestInit,
 			signal: ( typeof AbortSignal.any === 'function' ) ? AbortSignal.any( [ this._abortController.signal, this.manager.abortController.signal ] ) : this._abortController.signal
 		} );
 
@@ -343,6 +352,19 @@ class FileLoader extends Loader {
 	setMimeType( value ) {
 
 		this.mimeType = value;
+		return this;
+
+	}
+
+	/**
+	 * Sets additional request options passed to `fetch()`.
+	 *
+	 * @param {Object} value - The request options.
+	 * @return {FileLoader} A reference to this file loader.
+	 */
+	setRequestInit( value ) {
+
+		this.requestInit = value;
 		return this;
 
 	}
