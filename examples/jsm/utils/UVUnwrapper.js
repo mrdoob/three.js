@@ -353,6 +353,15 @@ function connectedComponents( record, faces ) {
 
 }
 
+function triangleFrame( positions, triangle ) {
+
+	const [ a, b, c ] = triangle.map( i => positions[ i ] );
+	const ab = new Vector3().subVectors( b, a ), ac = new Vector3().subVectors( c, a );
+	const length = ab.length(), cross = new Vector3().crossVectors( ab, ac ).length();
+	return { length, x: ac.dot( ab ) / length, y: cross / length, cross };
+
+}
+
 // LSCM energy: area * ((du/dx - dv/dy)^2 + (du/dy + dv/dx)^2).
 // Two pinned vertices remove similarity null modes. Matrix-free Jacobi PCG
 // solves the normal equations; every result must pass geometric validation.
@@ -387,10 +396,7 @@ function solveLSCM( positions, triangles, initial ) {
 	const rows = [];
 	for ( const tri of triangles ) {
 
-		const [ a, b, c ] = tri.map( i => positions[ i ] );
-		const ab = new Vector3().subVectors( b, a ), ac = new Vector3().subVectors( c, a );
-		const length = ab.length(), x = ac.dot( ab ) / length;
-		const y = new Vector3().crossVectors( ab, ac ).length() / length;
+		const { length, x, y } = triangleFrame( positions, tri );
 		if ( ! ( y > 0 && length > 0 ) ) return null;
 		const weight = Math.sqrt( length * y * 0.5 );
 		const gx = [ - 1 / length, 1 / length, 0 ], gy = [ ( x - length ) / ( length * y ), - x / ( length * y ), 1 / y ];
@@ -482,10 +488,8 @@ function checkChart( positions, triangles, uv, worldArea, settings ) {
 	let area = 0, maxStretch = 1, minRatio = Infinity, maxRatio = 0;
 	for ( const tri of triangles ) {
 
-		const [ a, b, c ] = tri.map( i => positions[ i ] ), [ p, q, r ] = tri.map( i => uv[ i ] );
-		const ab = new Vector3().subVectors( b, a ), ac = new Vector3().subVectors( c, a );
-		const length = ab.length(), cross = new Vector3().crossVectors( ab, ac ).length();
-		const x = ac.dot( ab ) / length, y = cross / length;
+		const { length, x, y, cross } = triangleFrame( positions, tri );
+		const [ p, q, r ] = tri.map( i => uv[ i ] );
 		const determinant = cross2( p, q, r );
 		if ( ! ( determinant > 0 ) ) return null;
 		area += determinant * 0.5;
