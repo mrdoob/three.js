@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - gltf light maps</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - gltf light maps">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_loader_gltf_lightmaps.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_loader_gltf_lightmaps.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>glTF Light Maps</span>
+			</div>
+
+			<small>Baked indirect lighting with MOZ_lightmap. A glTF point light supplies direct lighting and reflections.</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { GLTFLightMapLoaderExtension } from 'three/addons/loaders/GLTFLightMapLoaderExtension.js';
+
+			let camera, scene, renderer, controls;
+
+			init();
+
+			async function init() {
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 0, 2.5, 8 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x111111 );
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 2.5, 0 );
+				controls.enableDamping = true;
+				controls.update();
+
+				const loader = new GLTFLoader();
+				loader.register( parser => new GLTFLightMapLoaderExtension( parser ) );
+
+				const gltf = await loader.loadAsync( 'models/gltf/LightmappedCornellBox/LightmappedCornellBox.glb' );
+				scene.add( gltf.scene );
+
+				const materials = new Map();
+				gltf.scene.traverse( object => {
+
+					// glTF stores the light, while shadow settings belong to the renderer.
+					if ( object.isPointLight ) {
+
+						object.castShadow = true;
+						object.shadow.mapSize.setScalar( 256 );
+						object.shadow.radius = 10;
+						object.shadow.normalBias = - 0.02;
+
+					}
+
+					if ( ! object.isMesh ) return;
+					object.castShadow = true;
+					object.receiveShadow = true;
+					for ( const material of Array.isArray( object.material ) ? object.material : [ object.material ] ) {
+
+						if ( material.lightMap ) materials.set( material, material.lightMapIntensity );
+
+					}
+
+				} );
+
+				const params = { enabled: true, intensity: 1 };
+				function updateLightMaps() {
+
+					for ( const [ material, intensity ] of materials ) material.lightMapIntensity = params.enabled ? intensity * params.intensity : 0;
+
+				}
+
+				const gui = renderer.inspector.createParameters( 'Light Maps' );
+				gui.add( params, 'enabled' ).name( 'Baked Lighting' ).onChange( updateLightMaps );
+				gui.add( params, 'intensity', 0, 2 ).name( 'Intensity' ).onChange( updateLightMaps );
+
+				window.addEventListener( 'resize', onWindowResize );
+				renderer.setAnimationLoop( animate );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				controls.update();
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

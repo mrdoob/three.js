@@ -94,6 +94,7 @@ export * from './loaders/FontLoader.js';
 export * from './loaders/GCodeLoader.js';
 export * from './loaders/GLTFGaussianSplatLoaderExtension.js';
 export * from './loaders/GLTFLoader.js';
+export * from './loaders/GLTFLightMapLoaderExtension.js';
 export * from './loaders/HDRLoader.js';
 export * from './loaders/HDRCubeTextureLoader.js';
 export * from './loaders/IESLoader.js';
