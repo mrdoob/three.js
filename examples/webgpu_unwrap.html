@@ -3,7 +3,10 @@
 	<head>
 		<title>three.js webgpu - UV unwrap</title>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - UV unwrap">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_unwrap.html">
 		<link type="text/css" rel="stylesheet" href="example.css">
 		<style>
 			#atlas-preview { position: absolute; bottom: 20px; left: 20px; pointer-events: none; }
@@ -12,9 +15,19 @@
 		</style>
 	</head>
 	<body>
-		<div id="info"><a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a> / native UV unwrap<br>
-			Density: green = target, yellow = 1.414x deviation, red = 2x or greater (either direction).
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>UV Unwrapping</span>
+			</div>
+
+			<small>
+				Density: green = target, yellow = 1.414x deviation, red = 2x or greater (either direction).
+			</small>
 		</div>
+
 		<div id="atlas-preview">
 			<p id="status">Loading renderer...</p>
 			<canvas id="atlas" width="512" height="512"></canvas>
