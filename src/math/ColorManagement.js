@@ -33,7 +33,6 @@ function createColorManagement() {
 		 *	- luminanceCoefficients: RGB luminance coefficients
 		 *
 		 * Optional:
-		 *  - outputColorSpaceConfig: { drawingBufferColorSpace: ColorSpace, toneMappingMode: 'extended' | 'standard' }
 		 *  - workingColorSpaceConfig: { unpackColorSpace: ColorSpace }
 		 *
 		 * Reference:
@@ -102,12 +101,6 @@ function createColorManagement() {
 
 		},
 
-		getToneMappingMode: function ( colorSpace ) {
-
-			return this.spaces[ colorSpace ].outputColorSpaceConfig.toneMappingMode || 'standard';
-
-		},
-
 		getLuminanceCoefficients: function ( target, colorSpace = this.workingColorSpace ) {
 
 			return target.fromArray( this.spaces[ colorSpace ].luminanceCoefficients );
@@ -127,12 +120,6 @@ function createColorManagement() {
 			return targetMatrix
 				.copy( this.spaces[ sourceColorSpace ].toXYZ )
 				.multiply( this.spaces[ targetColorSpace ].fromXYZ );
-
-		},
-
-		_getDrawingBufferColorSpace: function ( colorSpace ) {
-
-			return this.spaces[ colorSpace ].outputColorSpaceConfig.drawingBufferColorSpace;
 
 		},
 
@@ -161,8 +148,7 @@ function createColorManagement() {
 			toXYZ: LINEAR_REC709_TO_XYZ,
 			fromXYZ: XYZ_TO_LINEAR_REC709,
 			luminanceCoefficients: REC709_LUMINANCE_COEFFICIENTS,
-			workingColorSpaceConfig: { unpackColorSpace: SRGBColorSpace },
-			outputColorSpaceConfig: { drawingBufferColorSpace: SRGBColorSpace }
+			workingColorSpaceConfig: { unpackColorSpace: SRGBColorSpace }
 		},
 
 		[ SRGBColorSpace ]: {
@@ -171,8 +157,7 @@ function createColorManagement() {
 			transfer: SRGBTransfer,
 			toXYZ: LINEAR_REC709_TO_XYZ,
 			fromXYZ: XYZ_TO_LINEAR_REC709,
-			luminanceCoefficients: REC709_LUMINANCE_COEFFICIENTS,
-			outputColorSpaceConfig: { drawingBufferColorSpace: SRGBColorSpace }
+			luminanceCoefficients: REC709_LUMINANCE_COEFFICIENTS
 		},
 
 	} );
