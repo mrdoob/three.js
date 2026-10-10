@@ -115,11 +115,11 @@
 				'Space ship hallway': 'space_ship_hallway.glb'
 			} ).name( 'Model' ).listen().onChange( value => loadModel( value ).catch( reportError ) );
 			gui.add( params, 'view', { 'UV grid': 'checker', 'UV islands': 'islands', 'Texel density': 'density', 'Original materials': 'original' } ).name( 'View' ).onChange( updateMaterials );
-			gui.add( params, 'referenceDensity' ).name( 'Target texels / unit' ).info( '0 uses the fitted atlas density. Both principal directions are compared with this target.' ).onChange( updateMaterials );
 			const inputs = gui.addFolder( 'Unwrap Input' );
-			inputs.add( params, 'mode', { 'Lightmap': 'lightmap', 'Normal bake': 'normal' } ).name( 'Method' ).onChange( unwrap );
+			inputs.add( params, 'mode', { 'Lightmap': 'lightmap', 'Normal bake': 'normal' } ).name( 'Method' ).info( 'Lightmap: faster, but produces more islands. Normal bake: fewer, larger islands (via LSCM) that follow the original UV seams.' ).onChange( unwrap );
 			inputs.add( params, 'resolution', [ 1024, 2048, 4096 ] ).name( 'Atlas size' ).onChange( unwrap );
-			inputs.add( params, 'useInputUVs' ).name( 'Preserve authored islands' ).onChange( unwrap );
+			inputs.add( params, 'useInputUVs' ).name( 'Preserve authored islands' ).info( 'Splits charts only at seams in the existing uv attribute and reuses the authored UV layout of each island, rescaled and repacked into the atlas. Islands that exceed the stretch limit are split or reprojected.' ).onChange( unwrap );
+			inputs.add( params, 'referenceDensity' ).name( 'Target texels / unit' ).info( '0 uses the fitted atlas density. Both principal directions are compared with this target.' ).onChange( updateMaterials );
 			const draco = new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' );
 			const loader = new GLTFLoader().setDRACOLoader( draco );
 			let root, originals = [], result, loadId = 0;
