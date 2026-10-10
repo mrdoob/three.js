@@ -15,6 +15,13 @@ function auditAtlas( result ) {
 			const ids = [ 0, 1, 2 ].map( j => index.getX( f * 3 + j ) );
 			const p = ids.map( v => [ uv.getX( v ), uv.getY( v ) ] );
 			if ( p.some( v => ! Number.isFinite( v[ 0 ] + v[ 1 ] ) || v[ 0 ] < 0 || v[ 0 ] > 1 || v[ 1 ] < 0 || v[ 1 ] > 1 ) ) throw new Error( 'Invalid UV coordinate.' );
+			if ( record.faceCharts[ f ] === - 1 ) {
+
+				if ( p.some( v => v[ 0 ] !== 0 || v[ 1 ] !== 0 ) ) throw new Error( 'Ignored faces must have UV (0, 0).' );
+				continue;
+
+			}
+
 			const world = ids.map( v => record.mesh.getVertexPosition( v, new Vector3() ).applyMatrix4( record.mesh.matrixWorld ) );
 			const ab = world[ 1 ].clone().sub( world[ 0 ] ), ac = world[ 2 ].clone().sub( world[ 0 ] );
 			const cross = new Vector3().crossVectors( ab, ac ).length();

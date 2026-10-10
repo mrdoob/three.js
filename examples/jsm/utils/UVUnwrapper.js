@@ -9,6 +9,8 @@ import { potpack } from '../libs/potpack.module.js';
  * Input must use finite CPU-readable per-vertex attributes and complete triangles.
  * Attributes must match the position count; groups must contain complete triangles.
  * Options must be finite and in their documented ranges.
+ * Faces below the area tolerance, or subtexel faces failing Float32 validation,
+ * retain their geometry with UV (0, 0) and faceCharts -1.
  * Instanced and batched meshes must first be expanded into ordinary meshes.
  *
  * @three_import import { UVUnwrapper } from 'three/addons/utils/UVUnwrapper.js';
@@ -28,6 +30,7 @@ class UVUnwrapper {
 	 * @param {number} [options.maxChartFaces=2048] - Positive integer bounding chart validation/solver work.
 	 * @param {boolean} [options.respectUVSeams] - Cut discontinuities in existing uv (normal default).
 	 * @param {boolean} [options.useInputUVs=false] - Preserve valid authored UV charts before trying LSCM.
+	 * @param {number} [options.minTriangleArea=1.1920928955078125e-7] - World-area tolerance matching xatlas's Float32 epsilon. Zero disables tolerance and subtexel precision fallback.
 	 * @param {boolean} [options.diagnostics=false] - Include chart methods, quality and timings in result.diagnostics.
 	 * @return {Object} Atlas dimensions, density, chart bounds and mesh vertex/face mappings.
 	 * @throws {Error} If packing or output precision cannot produce a valid atlas. Mesh
@@ -39,7 +42,7 @@ class UVUnwrapper {
 		const settings = {
 			attribute: 'uv1', mode: 'lightmap', resolution: 1024, padding: 4,
 			texelsPerUnit: 0, maxAreaRatio: 2, maxChartFaces: 2048,
-			useInputUVs: false,
+			useInputUVs: false, minTriangleArea: 2 ** - 23,
 			...options
 		};
 		settings.maxStretch ??= settings.mode === 'normal' ? 2 : 1.5;
@@ -67,7 +70,12 @@ class UVUnwrapper {
 
 		const chartTime = options.diagnostics ? performance.now() : 0;
 		const density = packCharts( charts, settings );
-		for ( const chart of charts ) validateFloat32Chart( chart, settings, density );
+		for ( let i = charts.length - 1; i >= 0; i -- ) {
+
+			if ( ! validateFloat32Chart( charts[ i ], settings, density ) ) charts.splice( i, 1 );
+
+		}
+
 		const packTime = options.diagnostics ? performance.now() : 0;
 		let worldArea = 0, uvArea = 0, maxStretch = 1, minDensity = Infinity, maxDensity = 0;
 		for ( let i = 0; i < charts.length; i ++ ) {
@@ -105,6 +113,8 @@ class UVUnwrapper {
 				statistics: {
 					triangles: records.reduce( ( sum, record ) => sum + record.faces.length, 0 ),
 					degenerateTriangles: records.reduce( ( sum, record ) => sum + record.degenerate, 0 ),
+					ignoredTriangles: records.reduce( ( sum, record ) => sum + record.ignoredTriangles, 0 ),
+					ignoredWorldArea: records.reduce( ( sum, record ) => sum + record.ignoredWorldArea, 0 ),
 					charts: charts.length, worldArea, utilization: uvArea, maxStretch,
 					minTexelsPerUnit: charts.length ? minDensity : 0, maxTexelsPerUnit: maxDensity,
 					chartMilliseconds: chartTime - start, packMilliseconds: packTime - chartTime,
@@ -155,19 +165,22 @@ function readMesh( mesh, settings ) {
 	}
 
 	const faces = [], edges = new Map();
-	let degenerate = 0;
+	let degenerate = 0, ignoredTriangles = 0, ignoredWorldArea = 0;
 	for ( let offset = 0; offset < count; offset += 3 ) {
 
 		const vertices = [ 0, 1, 2 ].map( j => index ? index.getX( offset + j ) : offset + j );
 		const normal = new Vector3().subVectors( points[ vertices[ 1 ] ], points[ vertices[ 0 ] ] );
 		normal.cross( new Vector3().subVectors( points[ vertices[ 2 ] ], points[ vertices[ 0 ] ] ) );
 		const area = normal.length() * 0.5;
-		const face = { vertices, welds: vertices.map( v => welds[ v ] ), normal: normal.normalize(), area, neighbors: [] };
+		const face = { vertices, welds: vertices.map( v => welds[ v ] ), normal: normal.normalize(), area, ignored: float32TriangleArea( ...vertices.map( v => points[ v ] ) ) <= settings.minTriangleArea, neighbors: [] };
 		const f = faces.length;
 		faces.push( face );
-		if ( area === 0 ) {
+		if ( face.ignored ) {
 
-			degenerate ++; continue;
+			if ( area === 0 ) degenerate ++;
+			ignoredTriangles ++;
+			ignoredWorldArea += area;
+			continue;
 
 		}
 
@@ -203,7 +216,23 @@ function readMesh( mesh, settings ) {
 	// UV discontinuities can be cuts inside a connected chart (e.g. a slit
 	// cylinder). Keep the two coincident seam endpoints distinct in the solver.
 	const vertexKeys = welds.map( ( weld, i ) => uv && ( settings.respectUVSeams || settings.useInputUVs ) ? `${ weld },${ uv.getX( i ) },${ uv.getY( i ) }` : weld );
-	return { mesh, original: geometry, points, faces, vertexKeys, degenerate, faceCharts: new Int32Array( faces.length ).fill( - 1 ) };
+	return { mesh, original: geometry, points, faces, vertexKeys, degenerate, ignoredTriangles, ignoredWorldArea, faceCharts: new Int32Array( faces.length ).fill( - 1 ) };
+
+}
+
+// xatlas tests degeneracy using Float32 geometry, before parameterization.
+function float32TriangleArea( a, b, c ) {
+
+	const ab = [ 'x', 'y', 'z' ].map( axis => Math.fround( Math.fround( b[ axis ] ) - Math.fround( a[ axis ] ) ) );
+	const ac = [ 'x', 'y', 'z' ].map( axis => Math.fround( Math.fround( c[ axis ] ) - Math.fround( a[ axis ] ) ) );
+	const cross = [ 0, 1, 2 ].map( i => {
+
+		const j = ( i + 1 ) % 3, k = ( i + 2 ) % 3;
+		return Math.fround( Math.fround( ab[ j ] * ac[ k ] ) - Math.fround( ab[ k ] * ac[ j ] ) );
+
+	} );
+	const lengthSquared = Math.fround( Math.fround( Math.fround( cross[ 0 ] ** 2 ) + Math.fround( cross[ 1 ] ** 2 ) ) + Math.fround( cross[ 2 ] ** 2 ) );
+	return Math.fround( Math.fround( Math.sqrt( lengthSquared ) ) * 0.5 );
 
 }
 
@@ -220,7 +249,7 @@ function growCharts( record, settings ) {
 	const cosine = settings.useInputUVs && record.original.attributes.uv ? - 1 : settings.mode === 'normal' ? 0.35 : 1 / settings.maxStretch;
 	for ( let seed = 0; seed < assigned.length; seed ++ ) {
 
-		if ( assigned[ seed ] || record.faces[ seed ].area === 0 ) continue;
+		if ( assigned[ seed ] || record.faces[ seed ].ignored ) continue;
 		const faces = [ seed ], normal = record.faces[ seed ].normal;
 		assigned[ seed ] = 1;
 		for ( let i = 0; i < faces.length && faces.length < settings.maxChartFaces; i ++ ) {
@@ -737,14 +766,43 @@ function validateFloat32Chart( chart, settings, density ) {
 	] );
 	// Validate the coordinates the GPU actually receives, not just the solver's
 	// doubles. Slivers can collapse or reverse after atlas translation/rounding.
-	const quality = checkChart( chart.positions, chart.triangles, chart.outputUV, chart.worldArea, {
-		...settings, maxStretch: settings.maxStretch * ( 1 + 5e-4 ), maxAreaRatio: settings.maxAreaRatio * ( 1 + 5e-4 )
-	} );
+	const limits = { ...settings, maxStretch: settings.maxStretch * ( 1 + 5e-4 ), maxAreaRatio: settings.maxAreaRatio * ( 1 + 5e-4 ) };
+	let quality = checkChart( chart.positions, chart.triangles, chart.outputUV, chart.worldArea, limits );
+	if ( ! quality && settings.minTriangleArea > 0 ) {
+
+		const faces = [], triangles = [];
+		for ( let i = 0; i < chart.triangles.length; i ++ ) {
+
+			const triangle = chart.triangles[ i ], face = chart.record.faces[ chart.faces[ i ] ];
+			if ( face.area * density * density < 1 && ! checkChart( chart.positions, [ triangle ], chart.outputUV, face.area, limits ) ) {
+
+				face.ignored = true;
+				chart.record.ignoredTriangles ++;
+				chart.record.ignoredWorldArea += face.area;
+				chart.worldArea -= face.area;
+
+			} else {
+
+				faces.push( chart.faces[ i ] );
+				triangles.push( triangle );
+
+			}
+
+		}
+
+		chart.faces = faces;
+		chart.triangles = triangles;
+		if ( faces.length === 0 ) return false;
+		quality = checkChart( chart.positions, triangles, chart.outputUV, chart.worldArea, limits );
+
+	}
+
 	if ( ! quality ) throw new Error( `UVUnwrapper: Float32 atlas precision is insufficient for mesh "${ chart.record.mesh.name }"; repair sliver triangles or partition the hierarchy.` );
 	chart.outputArea = quality.area;
 	chart.maxStretch = quality.maxStretch;
 	chart.minDensity = quality.minDensity * Math.sqrt( quality.area / chart.worldArea ) * settings.resolution;
 	chart.maxDensity = quality.maxDensity * Math.sqrt( quality.area / chart.worldArea ) * settings.resolution;
+	return true;
 
 }
 

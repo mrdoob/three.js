@@ -217,18 +217,76 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'Float32 collapse is rejected atomically even when double precision flattening succeeds', assert => {
+			QUnit.test( 'near-zero area slivers are retained but excluded from the atlas', assert => {
 
-				const root = new Group(), large = new Mesh( new PlaneGeometry( 10, 10 ) );
-				root.add( large );
+				for ( const mode of [ 'lightmap', 'normal' ] ) {
+
+					const root = new Group(), large = new Mesh( new PlaneGeometry( 10, 10 ) );
+					const geometry = new BufferGeometry();
+					geometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 1, 0, 0, 0.5, 1e-12, 0 ], 3 ) );
+					const sliver = new Mesh( geometry );
+					root.add( large, sliver );
+					const result = unwrap( root, { mode } );
+					verify( assert, result, mode === 'normal' ? 2 : 1.5 );
+					const record = result.meshes[ 1 ];
+					assert.strictEqual( record.geometry.index.count, 3 );
+					assert.deepEqual( record.faceCharts, new Int32Array( [ - 1 ] ) );
+					assert.deepEqual( record.geometry.attributes.position.array, geometry.attributes.position.array );
+					assert.ok( record.geometry.attributes.uv1.array.every( value => value === 0 ) );
+					assert.strictEqual( result.diagnostics.statistics.ignoredTriangles, 1 );
+					assert.ok( result.diagnostics.statistics.ignoredWorldArea > 0 );
+					assert.strictEqual( result.diagnostics.statistics.degenerateTriangles, 0 );
+
+				}
+
+			} );
+
+			QUnit.test( 'ignored shared vertices are split and the area tolerance is configurable', assert => {
+
 				const geometry = new BufferGeometry();
-				geometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 1, 0, 0, 0.5, 1e-12, 0 ], 3 ) );
-				const sliver = new Mesh( geometry );
-				root.add( sliver );
-				const original = large.geometry;
-				assert.throws( () => unwrap( root ), /Float32 atlas precision/ );
-				assert.strictEqual( large.geometry, original );
-				assert.strictEqual( sliver.geometry, geometry );
+				geometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 1e-8, 0 ], 3 ) );
+				geometry.setIndex( [ 0, 1, 2, 0, 1, 3 ] );
+				const result = unwrap( new Mesh( geometry ) );
+				verify( assert, result );
+				const record = result.meshes[ 0 ];
+				assert.deepEqual( record.faceCharts, new Int32Array( [ 0, - 1 ] ) );
+				assert.strictEqual( record.geometry.index.count, 6 );
+				assert.strictEqual( record.geometry.attributes.position.count, 6 );
+				const allIgnored = unwrap( new Mesh( geometry ), { minTriangleArea: 1 } );
+				assert.strictEqual( allIgnored.charts.length, 0 );
+				assert.strictEqual( allIgnored.diagnostics.statistics.ignoredTriangles, 2 );
+				assert.throws( () => unwrap( new Mesh( geometry ), { minTriangleArea: 0 } ), /Float32 atlas precision/ );
+
+			} );
+
+			QUnit.test( 'Float32 geometry cancellation is detected before parameterization', assert => {
+
+				const geometry = new BufferGeometry();
+				geometry.setAttribute( 'position', new BufferAttribute( new Float64Array( [ 0, 0, 0, 10000, 10000, 0, 10000, 10000.0001, 0 ] ), 3 ) );
+				const result = unwrap( new Mesh( geometry ) );
+				assert.strictEqual( result.charts.length, 0 );
+				assert.strictEqual( result.diagnostics.statistics.ignoredTriangles, 1 );
+				assert.ok( result.diagnostics.statistics.ignoredWorldArea > 0.49, 'Double precision area is nonzero, but Float32 positions are collinear' );
+				assert.ok( result.meshes[ 0 ].geometry.attributes.uv1.array.every( value => value === 0 ) );
+
+			} );
+
+			QUnit.test( 'subtexel Float32 failures are excluded without weakening retained chart validation', assert => {
+
+				const geometry = new BufferGeometry();
+				geometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 1, 0, 0, 0.5, 2e-5, 0 ], 3 ) );
+				for ( const mode of [ 'lightmap', 'normal' ] ) {
+
+					const root = new Group();
+					root.add( new Mesh( new PlaneGeometry() ), new Mesh( geometry ) );
+					const result = unwrap( root, { mode, texelsPerUnit: 0.001 } );
+					verify( assert, result, mode === 'normal' ? 2 : 1.5 );
+					assert.strictEqual( result.diagnostics.statistics.ignoredTriangles, 1 );
+					assert.strictEqual( result.meshes[ 1 ].faceCharts[ 0 ], - 1 );
+					assert.strictEqual( result.meshes[ 1 ].geometry.index.count, 3 );
+					assert.ok( result.meshes[ 1 ].geometry.attributes.uv1.array.every( value => value === 0 ) );
+
+				}
 
 			} );
 
@@ -310,7 +368,7 @@ export default QUnit.module( 'Addons', () => {
 				const root = new Group();
 				root.add( new Mesh( new PlaneGeometry() ) );
 				const small = new BufferGeometry();
-				small.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 1e-6, 0, 0, 0, 1e-6, 0 ], 3 ) );
+				small.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0.0005, 0, 0, 0, 0.0005, 0 ], 3 ) );
 				root.add( new Mesh( small ) );
 				const result = unwrap( root, { texelsPerUnit: 400 } );
 				const audit = verify( assert, result );

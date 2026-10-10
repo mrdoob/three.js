@@ -152,7 +152,7 @@
 					} );
 					atlasSize.value = result.width;
 					const s = result.diagnostics.statistics;
-					status.textContent = `${ s.triangles.toLocaleString() } triangles / ${ s.charts } charts\n${ s.totalMilliseconds.toFixed( 1 ) } ms / ${ ( s.utilization * 100 ).toFixed( 1 ) }% triangle coverage\n${ result.texelsPerUnit.toFixed( 2 ) } texels/world unit\nLocal density ${ s.minTexelsPerUnit.toFixed( 2 ) }–${ s.maxTexelsPerUnit.toFixed( 2 ) }\nWorst stretch ${ s.maxStretch.toFixed( 3 ) }\n${ s.degenerateTriangles } degenerate triangles`;
+					status.textContent = `${ s.triangles.toLocaleString() } triangles / ${ s.charts } charts\n${ s.totalMilliseconds.toFixed( 1 ) } ms / ${ ( s.utilization * 100 ).toFixed( 1 ) }% triangle coverage\n${ result.texelsPerUnit.toFixed( 2 ) } texels/world unit\nLocal density ${ s.minTexelsPerUnit.toFixed( 2 ) }–${ s.maxTexelsPerUnit.toFixed( 2 ) }\nWorst stretch ${ s.maxStretch.toFixed( 3 ) }\n${ s.ignoredTriangles } ignored triangles (${ s.ignoredWorldArea.toPrecision( 3 ) } world area)`;
 					drawAtlas();
 					updateMaterials();
 
