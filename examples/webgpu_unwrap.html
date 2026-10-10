@@ -145,14 +145,17 @@
 
 				try {
 
+					const start = performance.now();
 					result = unwrapper.unwrap( root, {
 						mode: params.mode,
 						useInputUVs: params.useInputUVs,
-						resolution: Number( params.resolution ), diagnostics: true
+						resolution: Number( params.resolution )
 					} );
 					atlasSize.value = result.width;
-					const s = result.diagnostics.statistics;
-					status.textContent = `${ s.triangles.toLocaleString() } triangles / ${ s.charts } charts\n${ s.totalMilliseconds.toFixed( 1 ) } ms / ${ ( s.utilization * 100 ).toFixed( 1 ) }% triangle coverage\n${ result.texelsPerUnit.toFixed( 2 ) } texels/world unit\nLocal density ${ s.minTexelsPerUnit.toFixed( 2 ) }–${ s.maxTexelsPerUnit.toFixed( 2 ) }\nWorst stretch ${ s.maxStretch.toFixed( 3 ) }\n${ s.ignoredTriangles } ignored triangles (${ s.ignoredWorldArea.toPrecision( 3 ) } world area)`;
+					const elapsed = performance.now() - start;
+					const triangles = result.meshes.reduce( ( sum, record ) => sum + record.faceCharts.length, 0 );
+					const ignored = result.meshes.reduce( ( sum, record ) => sum + record.faceCharts.reduce( ( count, chart ) => count + ( chart === - 1 ? 1 : 0 ), 0 ), 0 );
+					status.textContent = `${ triangles.toLocaleString() } triangles / ${ result.charts.length } charts\n${ elapsed.toFixed( 1 ) } ms\n${ result.texelsPerUnit.toFixed( 2 ) } texels/world unit\n${ ignored } ignored triangles`;
 					drawAtlas();
 					updateMaterials();
 

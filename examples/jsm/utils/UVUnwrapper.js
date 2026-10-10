@@ -25,27 +25,21 @@ class UVUnwrapper {
 	 * @param {number} [options.resolution=1024] - Square atlas size in pixels, integer >= 4.
 	 * @param {number} [options.padding=4] - Nonnegative gutter in pixels; 2 * padding + 1 must be less than resolution.
 	 * @param {number} [options.texelsPerUnit=0] - Common world density; zero fits the atlas. Must be nonnegative.
-	 * @param {number} [options.maxStretch] - Maximum triangle singular-value ratio, >= 1.
-	 * @param {number} [options.maxAreaRatio=2] - Maximum local area deviation from chart mean, >= 1.
-	 * @param {number} [options.maxChartFaces=2048] - Positive integer bounding chart validation/solver work.
 	 * @param {boolean} [options.respectUVSeams] - Cut discontinuities in existing uv (normal default).
 	 * @param {boolean} [options.useInputUVs=false] - Preserve valid authored UV charts before trying LSCM.
-	 * @param {number} [options.minTriangleArea=1.1920928955078125e-7] - World-area tolerance matching xatlas's Float32 epsilon. Zero disables tolerance and subtexel precision fallback.
-	 * @param {boolean} [options.diagnostics=false] - Include chart methods, quality and timings in result.diagnostics.
 	 * @return {Object} Atlas dimensions, density, chart bounds and mesh vertex/face mappings.
 	 * @throws {Error} If packing or output precision cannot produce a valid atlas. Mesh
 	 * geometries remain unchanged on failure; invalid input is outside this contract.
 	 */
 	unwrap( root, options = {} ) {
 
-		const start = options.diagnostics ? performance.now() : 0;
 		const settings = {
 			attribute: 'uv1', mode: 'lightmap', resolution: 1024, padding: 4,
-			texelsPerUnit: 0, maxAreaRatio: 2, maxChartFaces: 2048,
-			useInputUVs: false, minTriangleArea: 2 ** - 23,
-			...options
+			texelsPerUnit: 0,
+			useInputUVs: false,
+			...options, maxAreaRatio: 2
 		};
-		settings.maxStretch ??= settings.mode === 'normal' ? 2 : 1.5;
+		settings.maxStretch = settings.mode === 'normal' ? 2 : 1.5;
 		settings.respectUVSeams ??= settings.mode === 'normal';
 		root.updateWorldMatrix( true, true );
 
@@ -68,7 +62,6 @@ class UVUnwrapper {
 
 		}
 
-		const chartTime = options.diagnostics ? performance.now() : 0;
 		const density = packCharts( charts, settings );
 		for ( let i = charts.length - 1; i >= 0; i -- ) {
 
@@ -76,22 +69,9 @@ class UVUnwrapper {
 
 		}
 
-		const packTime = options.diagnostics ? performance.now() : 0;
-		let worldArea = 0, uvArea = 0, maxStretch = 1, minDensity = Infinity, maxDensity = 0;
 		for ( let i = 0; i < charts.length; i ++ ) {
 
-			const chart = charts[ i ];
-			if ( options.diagnostics ) {
-
-				worldArea += chart.worldArea;
-				uvArea += chart.outputArea;
-				maxStretch = Math.max( maxStretch, chart.maxStretch );
-				minDensity = Math.min( minDensity, chart.minDensity );
-				maxDensity = Math.max( maxDensity, chart.maxDensity );
-
-			}
-
-			for ( const face of chart.faces ) chart.record.faceCharts[ face ] = i;
+			for ( const face of charts[ i ].faces ) charts[ i ].record.faceCharts[ face ] = i;
 
 		}
 
@@ -106,24 +86,6 @@ class UVUnwrapper {
 				sourceVertices: record.sourceVertices, faceCharts: record.faceCharts
 			} ) )
 		};
-		if ( options.diagnostics ) {
-
-			result.diagnostics = {
-				charts: charts.map( chart => ( { method: chart.method, worldArea: chart.worldArea, maxStretch: chart.maxStretch } ) ),
-				statistics: {
-					triangles: records.reduce( ( sum, record ) => sum + record.faces.length, 0 ),
-					degenerateTriangles: records.reduce( ( sum, record ) => sum + record.degenerate, 0 ),
-					ignoredTriangles: records.reduce( ( sum, record ) => sum + record.ignoredTriangles, 0 ),
-					ignoredWorldArea: records.reduce( ( sum, record ) => sum + record.ignoredWorldArea, 0 ),
-					charts: charts.length, worldArea, utilization: uvArea, maxStretch,
-					minTexelsPerUnit: charts.length ? minDensity : 0, maxTexelsPerUnit: maxDensity,
-					chartMilliseconds: chartTime - start, packMilliseconds: packTime - chartTime,
-					totalMilliseconds: performance.now() - start
-				}
-			};
-
-		}
-
 		// Commit only after validation and all result allocations succeed.
 		for ( const record of records ) record.mesh.geometry = record.geometry;
 		return result;
@@ -165,24 +127,16 @@ function readMesh( mesh, settings ) {
 	}
 
 	const faces = [], edges = new Map();
-	let degenerate = 0, ignoredTriangles = 0, ignoredWorldArea = 0;
 	for ( let offset = 0; offset < count; offset += 3 ) {
 
 		const vertices = [ 0, 1, 2 ].map( j => index ? index.getX( offset + j ) : offset + j );
 		const normal = new Vector3().subVectors( points[ vertices[ 1 ] ], points[ vertices[ 0 ] ] );
 		normal.cross( new Vector3().subVectors( points[ vertices[ 2 ] ], points[ vertices[ 0 ] ] ) );
 		const area = normal.length() * 0.5;
-		const face = { vertices, welds: vertices.map( v => welds[ v ] ), normal: normal.normalize(), area, ignored: float32TriangleArea( ...vertices.map( v => points[ v ] ) ) <= settings.minTriangleArea, neighbors: [] };
+		const face = { vertices, welds: vertices.map( v => welds[ v ] ), normal: normal.normalize(), area, ignored: float32TriangleArea( ...vertices.map( v => points[ v ] ) ) <= 2 ** - 23, neighbors: [] };
 		const f = faces.length;
 		faces.push( face );
-		if ( face.ignored ) {
-
-			if ( area === 0 ) degenerate ++;
-			ignoredTriangles ++;
-			ignoredWorldArea += area;
-			continue;
-
-		}
+		if ( face.ignored ) continue;
 
 		for ( let j = 0; j < 3; j ++ ) {
 
@@ -216,7 +170,7 @@ function readMesh( mesh, settings ) {
 	// UV discontinuities can be cuts inside a connected chart (e.g. a slit
 	// cylinder). Keep the two coincident seam endpoints distinct in the solver.
 	const vertexKeys = welds.map( ( weld, i ) => uv && ( settings.respectUVSeams || settings.useInputUVs ) ? `${ weld },${ uv.getX( i ) },${ uv.getY( i ) }` : weld );
-	return { mesh, original: geometry, points, faces, vertexKeys, degenerate, ignoredTriangles, ignoredWorldArea, faceCharts: new Int32Array( faces.length ).fill( - 1 ) };
+	return { mesh, original: geometry, points, faces, vertexKeys, faceCharts: new Int32Array( faces.length ).fill( - 1 ) };
 
 }
 
@@ -252,14 +206,14 @@ function growCharts( record, settings ) {
 		if ( assigned[ seed ] || record.faces[ seed ].ignored ) continue;
 		const faces = [ seed ], normal = record.faces[ seed ].normal;
 		assigned[ seed ] = 1;
-		for ( let i = 0; i < faces.length && faces.length < settings.maxChartFaces; i ++ ) {
+		for ( let i = 0; i < faces.length && faces.length < 2048; i ++ ) {
 
 			for ( const neighbor of record.faces[ faces[ i ] ].neighbors ) {
 
 				if ( assigned[ neighbor ] || record.faces[ neighbor ].normal.dot( normal ) < cosine ) continue;
 				assigned[ neighbor ] = 1;
 				faces.push( neighbor );
-				if ( faces.length === settings.maxChartFaces ) break;
+				if ( faces.length === 2048 ) break;
 
 			}
 
@@ -313,7 +267,7 @@ function parameterize( record, faces, settings, charts ) {
 
 	}
 
-	let candidate = uv, method = useInput ? 'input' : 'orthographic';
+	let candidate = uv;
 	const initialQuality = checkChart( positions, triangles, uv, worldArea, settings );
 	let quality = initialQuality;
 	if ( settings.mode === 'normal' && faces.length > 1 && ! ( initialQuality && ( useInput || initialQuality.maxStretch < 1.000001 ) ) ) {
@@ -323,7 +277,6 @@ function parameterize( record, faces, settings, charts ) {
 		if ( conformalQuality ) {
 
 			candidate = conformal;
-			method = 'conformal';
 			quality = conformalQuality;
 
 		}
@@ -368,10 +321,9 @@ function parameterize( record, faces, settings, charts ) {
 	}
 
 	charts.push( {
-		record, faces, vertexMap, uv: candidate, method, worldArea,
+		record, faces, vertexMap, uv: candidate, worldArea,
 		width: bounds.maxX - bounds.minX, height: bounds.maxY - bounds.minY,
-		positions, triangles,
-		maxStretch: quality.maxStretch, minDensity: quality.minDensity, maxDensity: quality.maxDensity
+		positions, triangles
 	} );
 
 }
@@ -555,7 +507,7 @@ function checkChart( positions, triangles, uv, worldArea, settings ) {
 	const mean = area / worldArea;
 	if ( minRatio / mean < 1 / settings.maxAreaRatio - 1e-8 || maxRatio / mean > settings.maxAreaRatio + 1e-8 ) return null;
 	if ( hasOverlap( uv, triangles ) ) return null;
-	return { area, maxStretch, minDensity: Math.sqrt( minRatio / mean ), maxDensity: Math.sqrt( maxRatio / mean ) };
+	return { area, maxStretch };
 
 }
 
@@ -768,7 +720,7 @@ function validateFloat32Chart( chart, settings, density ) {
 	// doubles. Slivers can collapse or reverse after atlas translation/rounding.
 	const limits = { ...settings, maxStretch: settings.maxStretch * ( 1 + 5e-4 ), maxAreaRatio: settings.maxAreaRatio * ( 1 + 5e-4 ) };
 	let quality = checkChart( chart.positions, chart.triangles, chart.outputUV, chart.worldArea, limits );
-	if ( ! quality && settings.minTriangleArea > 0 ) {
+	if ( ! quality ) {
 
 		const faces = [], triangles = [];
 		for ( let i = 0; i < chart.triangles.length; i ++ ) {
@@ -777,8 +729,6 @@ function validateFloat32Chart( chart, settings, density ) {
 			if ( face.area * density * density < 1 && ! checkChart( chart.positions, [ triangle ], chart.outputUV, face.area, limits ) ) {
 
 				face.ignored = true;
-				chart.record.ignoredTriangles ++;
-				chart.record.ignoredWorldArea += face.area;
 				chart.worldArea -= face.area;
 
 			} else {
@@ -798,10 +748,6 @@ function validateFloat32Chart( chart, settings, density ) {
 	}
 
 	if ( ! quality ) throw new Error( `UVUnwrapper: Float32 atlas precision is insufficient for mesh "${ chart.record.mesh.name }"; repair sliver triangles or partition the hierarchy.` );
-	chart.outputArea = quality.area;
-	chart.maxStretch = quality.maxStretch;
-	chart.minDensity = quality.minDensity * Math.sqrt( quality.area / chart.worldArea ) * settings.resolution;
-	chart.maxDensity = quality.maxDensity * Math.sqrt( quality.area / chart.worldArea ) * settings.resolution;
 	return true;
 
 }

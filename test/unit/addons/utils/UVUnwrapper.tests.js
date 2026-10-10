@@ -10,7 +10,7 @@ const unwrapper = new UVUnwrapper();
 
 function unwrap( root, options = {} ) {
 
-	return unwrapper.unwrap( root, { diagnostics: true, ...options } );
+	return unwrapper.unwrap( root, options );
 
 }
 
@@ -21,8 +21,6 @@ function verify( assert, result, limit = 1.5 ) {
 	assert.strictEqual( audit.collapsed, 0, 'No collapsed or reversed nondegenerate triangles' );
 	assert.strictEqual( audit.paddingViolations, 0, 'Gutters preserved' );
 	assert.ok( audit.maxStretch <= limit + 0.002, `Stretch ${ audit.maxStretch } within limit ${ limit }` );
-	assert.ok( Math.abs( audit.worldArea - result.diagnostics.statistics.worldArea ) < Math.max( 1e-8, audit.worldArea * 1e-6 ) );
-	assert.ok( Math.abs( audit.utilization - result.diagnostics.statistics.utilization ) < 1e-6 );
 	return audit;
 
 }
@@ -91,9 +89,8 @@ export default QUnit.module( 'Addons', () => {
 					if ( mode === 'lightmap' ) lightmap = result;
 					else {
 
-						assert.ok( result.diagnostics.charts.some( c => c.method === 'conformal' ) );
 						assert.ok( result.charts.length < lightmap.charts.length );
-						assert.ok( audit.maxStretch < lightmap.diagnostics.statistics.maxStretch );
+						assert.ok( audit.maxStretch < auditAtlas( lightmap ).maxStretch );
 
 					}
 
@@ -176,7 +173,7 @@ export default QUnit.module( 'Addons', () => {
 				geometry.setIndex( [ 0, 1, 2, 1, 0, 3, 1, 0, 4, 0, 0, 0 ] );
 				const result = unwrap( new Mesh( geometry ) );
 				verify( assert, result );
-				assert.strictEqual( result.diagnostics.statistics.degenerateTriangles, 1 );
+				assert.strictEqual( result.meshes[ 0 ].faceCharts.filter( chart => chart === - 1 ).length, 1 );
 				assert.strictEqual( result.meshes[ 0 ].geometry.index.count, 12 );
 				assert.strictEqual( result.meshes[ 0 ].faceCharts[ 3 ], - 1 );
 				const empty = unwrap( new Group() );
@@ -184,13 +181,13 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'deterministic output and configurable chart work bound', assert => {
+			QUnit.test( 'deterministic output and bounded chart work', assert => {
 
-				const results = [ 0, 1 ].map( () => unwrap( new Mesh( new SphereGeometry( 1, 24, 12 ) ), { mode: 'normal', maxChartFaces: 32 } ) );
+				const results = [ 0, 1 ].map( () => unwrap( new Mesh( new PlaneGeometry( 1, 1, 40, 40 ) ), { mode: 'normal' } ) );
 				verify( assert, results[ 0 ], 2 );
 				const sizes = new Map();
 				for ( const chart of results[ 0 ].meshes[ 0 ].faceCharts ) sizes.set( chart, ( sizes.get( chart ) || 0 ) + 1 );
-				assert.ok( Array.from( sizes.values() ).every( count => count <= 32 ) );
+				assert.ok( Array.from( sizes.values() ).every( count => count <= 2048 ) );
 				assert.deepEqual( results[ 0 ].meshes[ 0 ].geometry.attributes.uv1.array, results[ 1 ].meshes[ 0 ].geometry.attributes.uv1.array );
 
 			} );
@@ -201,7 +198,6 @@ export default QUnit.module( 'Addons', () => {
 				const result = unwrap( mesh, { mode: 'normal', useInputUVs: true } );
 				verify( assert, result, 2 );
 				assert.strictEqual( result.charts.length, 1, 'The slit cylinder stays one connected island' );
-				assert.strictEqual( result.diagnostics.charts[ 0 ].method, 'input' );
 				const original = result.meshes[ 0 ].originalGeometry.attributes.uv;
 				for ( let i = 0; i < mesh.geometry.attributes.uv.count; i ++ ) {
 
@@ -233,15 +229,13 @@ export default QUnit.module( 'Addons', () => {
 					assert.deepEqual( record.faceCharts, new Int32Array( [ - 1 ] ) );
 					assert.deepEqual( record.geometry.attributes.position.array, geometry.attributes.position.array );
 					assert.ok( record.geometry.attributes.uv1.array.every( value => value === 0 ) );
-					assert.strictEqual( result.diagnostics.statistics.ignoredTriangles, 1 );
-					assert.ok( result.diagnostics.statistics.ignoredWorldArea > 0 );
-					assert.strictEqual( result.diagnostics.statistics.degenerateTriangles, 0 );
+					assert.strictEqual( result.meshes.reduce( ( sum, record ) => sum + record.faceCharts.filter( chart => chart === - 1 ).length, 0 ), 1 );
 
 				}
 
 			} );
 
-			QUnit.test( 'ignored shared vertices are split and the area tolerance is configurable', assert => {
+			QUnit.test( 'ignored shared vertices are split and fully degenerate meshes retain topology', assert => {
 
 				const geometry = new BufferGeometry();
 				geometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 1e-8, 0 ], 3 ) );
@@ -252,10 +246,12 @@ export default QUnit.module( 'Addons', () => {
 				assert.deepEqual( record.faceCharts, new Int32Array( [ 0, - 1 ] ) );
 				assert.strictEqual( record.geometry.index.count, 6 );
 				assert.strictEqual( record.geometry.attributes.position.count, 6 );
-				const allIgnored = unwrap( new Mesh( geometry ), { minTriangleArea: 1 } );
+				const degenerate = new BufferGeometry();
+				degenerate.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ], 3 ) );
+				const allIgnored = unwrap( new Mesh( degenerate ) );
 				assert.strictEqual( allIgnored.charts.length, 0 );
-				assert.strictEqual( allIgnored.diagnostics.statistics.ignoredTriangles, 2 );
-				assert.throws( () => unwrap( new Mesh( geometry ), { minTriangleArea: 0 } ), /Float32 atlas precision/ );
+				assert.strictEqual( allIgnored.meshes[ 0 ].faceCharts[ 0 ], - 1 );
+				assert.strictEqual( allIgnored.meshes[ 0 ].geometry.index.count, 3 );
 
 			} );
 
@@ -265,8 +261,7 @@ export default QUnit.module( 'Addons', () => {
 				geometry.setAttribute( 'position', new BufferAttribute( new Float64Array( [ 0, 0, 0, 10000, 10000, 0, 10000, 10000.0001, 0 ] ), 3 ) );
 				const result = unwrap( new Mesh( geometry ) );
 				assert.strictEqual( result.charts.length, 0 );
-				assert.strictEqual( result.diagnostics.statistics.ignoredTriangles, 1 );
-				assert.ok( result.diagnostics.statistics.ignoredWorldArea > 0.49, 'Double precision area is nonzero, but Float32 positions are collinear' );
+				assert.strictEqual( result.meshes.reduce( ( sum, record ) => sum + record.faceCharts.filter( chart => chart === - 1 ).length, 0 ), 1 );
 				assert.ok( result.meshes[ 0 ].geometry.attributes.uv1.array.every( value => value === 0 ) );
 
 			} );
@@ -281,7 +276,7 @@ export default QUnit.module( 'Addons', () => {
 					root.add( new Mesh( new PlaneGeometry() ), new Mesh( geometry ) );
 					const result = unwrap( root, { mode, texelsPerUnit: 0.001 } );
 					verify( assert, result, mode === 'normal' ? 2 : 1.5 );
-					assert.strictEqual( result.diagnostics.statistics.ignoredTriangles, 1 );
+					assert.strictEqual( result.meshes.reduce( ( sum, record ) => sum + record.faceCharts.filter( chart => chart === - 1 ).length, 0 ), 1 );
 					assert.strictEqual( result.meshes[ 1 ].faceCharts[ 0 ], - 1 );
 					assert.strictEqual( result.meshes[ 1 ].geometry.index.count, 3 );
 					assert.ok( result.meshes[ 1 ].geometry.attributes.uv1.array.every( value => value === 0 ) );
@@ -309,7 +304,7 @@ export default QUnit.module( 'Addons', () => {
 				root.scale.setScalar( 2 );
 				const result = unwrap( root );
 				verify( assert, result );
-				assert.ok( Math.abs( result.diagnostics.statistics.worldArea - 24 ) < 1e-6, 'Skin bind scale cancels mesh scale; root scale and morph remain' );
+				assert.ok( Math.abs( auditAtlas( result ).worldArea - 24 ) < 1e-6, 'Skin bind scale cancels mesh scale; root scale and morph remain' );
 				assert.strictEqual( mesh.morphTargetInfluences[ 0 ], 0.5 );
 				for ( let i = 0; i < mesh.geometry.attributes.position.count; i ++ ) {
 
@@ -356,33 +351,17 @@ export default QUnit.module( 'Addons', () => {
 					const result = unwrap( root, { texelsPerUnit } );
 					verify( assert, result );
 					assert.ok( result.texelsPerUnit >= 500 - 1e-4 );
-					assert.ok( result.diagnostics.statistics.utilization > 0.71 );
+					assert.ok( auditAtlas( result ).utilization > 0.71 );
 					for ( const chart of result.charts ) assert.ok( chart.x + chart.width <= 1024 && chart.y + chart.height <= 1024 );
 
 				}
 
 			} );
 
-			QUnit.test( 'reported density measures the rounded Float32 output in absolute units', assert => {
-
-				const root = new Group();
-				root.add( new Mesh( new PlaneGeometry() ) );
-				const small = new BufferGeometry();
-				small.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0.0005, 0, 0, 0, 0.0005, 0 ], 3 ) );
-				root.add( new Mesh( small ) );
-				const result = unwrap( root, { texelsPerUnit: 400 } );
-				const audit = verify( assert, result );
-				const stats = result.diagnostics.statistics;
-				assert.ok( Math.abs( stats.minTexelsPerUnit - audit.minDensity ) < 1e-6 );
-				assert.ok( Math.abs( stats.maxTexelsPerUnit - audit.maxDensity ) < 1e-6 );
-				assert.ok( Math.max( Math.abs( audit.maxDensity - 400 ), Math.abs( audit.minDensity - 400 ) ) > 0.001, 'The fixture exposes absolute rounding drift' );
-
-			} );
-
-			QUnit.test( 'default result retains mappings and omits detailed diagnostics', assert => {
+			QUnit.test( 'result retains atlas metadata and vertex and face mappings', assert => {
 
 				const result = unwrapper.unwrap( new Mesh( new BoxGeometry() ) );
-				assert.strictEqual( result.diagnostics, undefined );
+				assert.deepEqual( Object.keys( result ), [ 'attribute', 'channel', 'width', 'height', 'padding', 'texelsPerUnit', 'charts', 'meshes' ] );
 				assert.strictEqual( result.meshes[ 0 ].sourceVertices.length, result.meshes[ 0 ].geometry.attributes.position.count );
 				assert.strictEqual( result.meshes[ 0 ].faceCharts.length, 12 );
 				assert.deepEqual( Object.keys( result.charts[ 0 ] ), [ 'x', 'y', 'width', 'height' ] );
