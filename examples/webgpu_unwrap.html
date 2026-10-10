@@ -6,16 +6,19 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="example.css">
 		<style>
-			#status { position: absolute; bottom: 20px; left: 20px; color: white; white-space: pre-wrap; pointer-events: none; }
-			#atlas { position: absolute; bottom: 150px; left: 20px; width: 240px; height: 240px; background: #080c12; pointer-events: none; }
+			#atlas-preview { position: absolute; bottom: 20px; left: 20px; pointer-events: none; }
+			#status { color: white; white-space: pre-wrap; margin: 0 0 12px; }
+			#atlas { display: block; width: 240px; height: 240px; background: #080c12; }
 		</style>
 	</head>
 	<body>
 		<div id="info"><a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a> / native UV unwrap<br>
 			Density: green = target, yellow = 1.414x deviation, red = 2x or greater (either direction).
 		</div>
-		<p id="status">Loading renderer...</p>
-		<canvas id="atlas" width="512" height="512"></canvas>
+		<div id="atlas-preview">
+			<p id="status">Loading renderer...</p>
+			<canvas id="atlas" width="512" height="512"></canvas>
+		</div>
 		<script type="importmap">
 			{
 				"imports": {
@@ -107,7 +110,7 @@
 			} )();
 			const params = {
 				model: 'boxes', mode: 'lightmap', resolution: 2048, useInputUVs: false,
-				view: 'checker', referenceDensity: 0, showAtlas: true
+				view: 'checker', referenceDensity: 0
 			};
 			const gui = renderer.inspector.createParameters( 'UV unwrap' );
 			gui.add( params, 'model', {
@@ -116,7 +119,6 @@
 				'Space ship hallway': 'space_ship_hallway.glb'
 			} ).name( 'Model' ).listen().onChange( value => loadModel( value ).catch( reportError ) );
 			gui.add( params, 'view', { 'UV checker': 'checker', 'UV islands': 'islands', 'Texel density': 'density', 'Original materials': 'original' } ).name( 'View' ).onChange( updateMaterials );
-			gui.add( params, 'showAtlas' ).name( 'Show Atlas' ).onChange( updateAtlasVisibility );
 			gui.add( params, 'referenceDensity' ).name( 'Target texels / unit' ).info( '0 uses the fitted atlas density. Both principal directions are compared with this target.' ).onChange( updateMaterials );
 			const inputs = gui.addFolder( 'Unwrap Input' );
 			inputs.add( params, 'mode', { 'Lightmap': 'lightmap', 'Normal bake': 'normal' } ).name( 'Method' ).onChange( unwrapAndReport );
@@ -126,12 +128,6 @@
 			const loader = new GLTFLoader().setDRACOLoader( draco );
 			const unwrapper = new UVUnwrapper();
 			let root, originals = [], result, loadId = 0;
-
-			function updateAtlasVisibility() {
-
-				document.getElementById( 'atlas' ).hidden = ! params.showAtlas;
-
-			}
 
 			function updateMaterials() {
 
