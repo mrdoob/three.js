@@ -1,6 +1,6 @@
 
 import { vec3, mat4, Fn } from '../tsl/TSLBase.js';
-import { OnAfterObjectUpdate, OnBeforeFrameUpdate } from '../utils/EventNode.js';
+import { OnAfterObjectUpdate, OnBeforeFrameUpdate, OnBeforeObjectUpdate } from '../utils/EventNode.js';
 import { normalLocal, transformNormal } from './Normal.js';
 import { positionLocal, positionPrevious } from './Position.js';
 import { varyingProperty } from '../core/PropertyNode.js';
@@ -11,11 +11,73 @@ import { instanceIndex } from '../core/IndexNode.js';
 
 import { InstancedInterleavedBuffer } from '../../core/InstancedInterleavedBuffer.js';
 import { InstancedBufferAttribute } from '../../core/InstancedBufferAttribute.js';
-import { DynamicDrawUsage } from '../../constants.js';
+import { InterleavedBufferAttribute } from '../../core/InterleavedBufferAttribute.js';
+import { DynamicDrawUsage, StaticDrawUsage } from '../../constants.js';
+import { isSharedInstancing } from '../../renderers/common/RenderObject.js';
 
-const _matrixBuffers = /*@__PURE__*/ new WeakMap();
 const _colorBuffers = /*@__PURE__*/ new WeakMap();
 const _previousInstanceMatrices = /*@__PURE__*/ new WeakMap();
+const _matrixColumns = /*@__PURE__*/ new WeakMap();
+
+/**
+ * Copies pending matrix updates into the interleaved buffer used for rendering.
+ *
+ * @param {InstancedBufferAttribute} matrices - The source matrix attribute.
+ * @param {Object} [owner=matrices] - The owner of the interleaved buffer.
+ */
+function syncInterleavedMatrix( matrices, owner = matrices ) {
+
+	const interleavedMatrix = getMatrixColumns( matrices, owner )[ 0 ].data;
+
+	if ( interleavedMatrix.version !== matrices.version ) {
+
+		interleavedMatrix.clearUpdateRanges();
+		interleavedMatrix.updateRanges.push( ...matrices.updateRanges );
+		matrices.clearUpdateRanges(); // "matrices" as the source is never uploaded directly. clear to avoid update range accumulation
+
+		interleavedMatrix.version = matrices.version;
+
+	}
+
+}
+
+/**
+ * Creates four column attributes that read the given array as an instanced vertex buffer of matrices.
+ *
+ * @param {Float32Array} array - The matrix data.
+ * @param {number} [usage=StaticDrawUsage] - The buffer usage.
+ * @returns {Array<InterleavedBufferAttribute>} The column attributes.
+ */
+function createMatrixColumns( array, usage = StaticDrawUsage ) {
+
+	const interleaved = new InstancedInterleavedBuffer( array, 16, 1 ).setUsage( usage );
+
+	return [ 0, 4, 8, 12 ].map( offset => new InterleavedBufferAttribute( interleaved, 4, offset ) );
+
+}
+
+/**
+ * Returns the four column attributes that bind the given matrices as an instanced vertex buffer.
+ *
+ * @param {InstancedBufferAttribute} matrices - The matrix buffer attribute.
+ * @param {Object} [owner=matrices] - The owner of the vertex buffer. Shared programs use the rendered object, so the buffer is released with it.
+ * @returns {Array<InterleavedBufferAttribute>} The column attributes.
+ */
+function getMatrixColumns( matrices, owner = matrices ) {
+
+	let columns = _matrixColumns.get( owner );
+
+	if ( columns === undefined || columns[ 0 ].data.array !== matrices.array ) {
+
+		columns = createMatrixColumns( matrices.array, matrices.usage );
+
+		_matrixColumns.set( owner, columns );
+
+	}
+
+	return columns;
+
+}
 
 /**
  * Creates the appropriate node for instanced matrix transformations.
@@ -46,25 +108,9 @@ function createInstanceMatrixNode( builder, instanceMatrix ) {
 
 		} else {
 
-			let interleaved = _matrixBuffers.get( instanceMatrix );
+			const columns = getMatrixColumns( instanceMatrix ).map( column => instancedBufferAttribute( column ) );
 
-			if ( ! interleaved ) {
-
-				interleaved = new InstancedInterleavedBuffer( instanceMatrix.array, 16, 1 );
-				_matrixBuffers.set( instanceMatrix, interleaved );
-
-			}
-
-			const bufferFn = instanceMatrix.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
-
-			const instanceBuffers = [
-				bufferFn( interleaved, 'vec4', 16, 0 ),
-				bufferFn( interleaved, 'vec4', 16, 4 ),
-				bufferFn( interleaved, 'vec4', 16, 8 ),
-				bufferFn( interleaved, 'vec4', 16, 12 )
-			];
-
-			instanceMatrixNode = mat4( ...instanceBuffers );
+			instanceMatrixNode = mat4( ...columns );
 
 		}
 
@@ -75,32 +121,118 @@ function createInstanceMatrixNode( builder, instanceMatrix ) {
 }
 
 /**
- * Retrieves or initializes the previous frame instance matrix node for motion vectors.
- * Uses a WeakMap to cache previous frame instance matrices and their TSL nodes.
+ * Retrieves or initializes the previous-frame instance matrix attribute for motion vectors.
  *
- * @param {InstancedMesh} instancedMesh - The instanced mesh object.
- * @param {InstancedBufferAttribute|StorageInstancedBufferAttribute} instanceMatrix - The current matrix buffer attribute.
- * @param {NodeBuilder} builder - The current node builder.
- * @returns {Node} The previous frame instance matrix node.
+ * @param {Object3D} object - The rendered object.
+ * @param {InstancedBufferAttribute|StorageInstancedBufferAttribute} [matrices=object.instanceMatrix] - The current matrix buffer attribute.
+ * @returns {InstancedBufferAttribute|StorageInstancedBufferAttribute} The previous-frame matrix buffer attribute.
  */
-function getPreviousInstance( instancedMesh, instanceMatrix, builder ) {
+function getPreviousMatrix( object, matrices = object.instanceMatrix ) {
 
-	let data = _previousInstanceMatrices.get( instancedMesh );
+	let previous = _previousInstanceMatrices.get( object );
 
-	if ( data === undefined ) {
+	if ( previous === undefined || previous.array.length !== matrices.array.length ) {
 
-		const previousInstanceMatrix = instanceMatrix.clone();
-
-		data = {
-			previousInstanceMatrix,
-			node: createInstanceMatrixNode( builder, previousInstanceMatrix )
-		};
-
-		_previousInstanceMatrices.set( instancedMesh, data );
+		previous = matrices.clone();
+		_previousInstanceMatrices.set( object, previous );
 
 	}
 
-	return data.node;
+	return previous;
+
+}
+
+/**
+ * Copies the current matrices into the previous-frame matrices of the given object.
+ *
+ * @param {Object3D} object - The rendered object.
+ * @param {InstancedBufferAttribute|StorageInstancedBufferAttribute} matrices - The current matrix buffer attribute.
+ */
+function updatePreviousMatrix( object, matrices ) {
+
+	const previous = getPreviousMatrix( object, matrices );
+
+	previous.array.set( matrices.array );
+	previous.version = matrices.version;
+
+	// handle interleaved path
+
+	const previousColumns = _matrixColumns.get( previous );
+
+	if ( previousColumns !== undefined ) previousColumns[ 0 ].data.version = matrices.version;
+
+}
+
+/**
+ * Creates a matrix node that binds the matrices of the rendered object, so the program can be shared between objects.
+ *
+ * @param {Function} getColumns - Returns the matrix columns of the rendered object.
+ * @returns {Node} The matrix node.
+ */
+function createSharedMatrixNode( getColumns ) {
+
+	// Placeholder columns only provide the layout, each object binds its own columns.
+	const columns = createMatrixColumns( new Float32Array( 16 ) ).map( ( column, i ) => {
+
+		return instancedBufferAttribute( column ).setAttributeCallback( object => getColumns( object )[ i ] );
+
+	} );
+
+	return mat4( ...columns );
+
+}
+
+/**
+ * Transforms the local position, the previous position and the normal with the given instance matrices.
+ *
+ * @param {NodeBuilder} builder - The current node builder.
+ * @param {Node} instanceMatrixNode - The instance matrix node.
+ * @param {?Node} previousMatrixNode - The previous-frame instance matrix node, if motion vectors are needed.
+ */
+function transformInstance( builder, instanceMatrixNode, previousMatrixNode ) {
+
+	// POSITION
+
+	const instancePosition = instanceMatrixNode.mul( positionLocal ).xyz;
+	positionLocal.assign( instancePosition );
+
+	if ( previousMatrixNode !== null ) {
+
+		positionPrevious.assign( previousMatrixNode.mul( positionPrevious ).xyz );
+
+	}
+
+	// NORMAL
+
+	if ( builder.hasGeometryAttribute( 'normal' ) ) {
+
+		const instanceNormal = transformNormal( normalLocal, instanceMatrixNode );
+		normalLocal.assign( instanceNormal );
+
+	}
+
+}
+
+/**
+ * Sets up instancing with the matrices of the rendered object, so the program can be shared between instanced meshes.
+ *
+ * @param {NodeBuilder} builder - The current node builder.
+ */
+function setupSharedInstance( builder ) {
+
+	OnBeforeObjectUpdate( ( { object } ) => syncInterleavedMatrix( object.instanceMatrix, object ) );
+
+	let previousMatrixNode = null;
+
+	if ( builder.needsPreviousData() ) {
+
+		OnAfterObjectUpdate( ( { object } ) => updatePreviousMatrix( object, object.instanceMatrix ) );
+
+		previousMatrixNode = createSharedMatrixNode( object => getMatrixColumns( getPreviousMatrix( object ) ) );
+
+	}
+
+	transformInstance( builder, createSharedMatrixNode( object => getMatrixColumns( object.instanceMatrix, object ) ), previousMatrixNode );
 
 }
 
@@ -122,25 +254,11 @@ export const instanceColor = /*@__PURE__*/ varyingProperty( 'vec3', 'vInstanceCo
  */
 export const instance = /*@__PURE__*/ Fn( ( [ matrices, colors = null ], builder ) => {
 
-	const isStorageMatrix = matrices.isStorageInstancedBufferAttribute === true;
 	const isStorageColor = colors && colors.isStorageInstancedBufferAttribute === true;
 
 	const instanceMatrixNode = createInstanceMatrixNode( builder, matrices );
 
-	// interleaved buffer tracking for matrix
-	let interleavedMatrix = null;
-
-	if ( ! isStorageMatrix ) {
-
-		const uniformBufferSize = Math.max( matrices.count, 1 ) * 16 * 4;
-
-		if ( uniformBufferSize > builder.getUniformBufferLimit() ) {
-
-			interleavedMatrix = _matrixBuffers.get( matrices );
-
-		}
-
-	}
+	const hasInterleavedMatrix = _matrixColumns.has( matrices );
 
 	let instanceColorNode = null;
 	let interleavedColor = null;
@@ -173,19 +291,11 @@ export const instance = /*@__PURE__*/ Fn( ( [ matrices, colors = null ], builder
 	}
 
 	// Synchronization of dynamic buffer updates per frame.
-	if ( interleavedMatrix !== null || interleavedColor !== null ) {
+	if ( hasInterleavedMatrix || interleavedColor !== null ) {
 
 		OnBeforeFrameUpdate( () => {
 
-			if ( interleavedMatrix !== null && interleavedMatrix.version !== matrices.version ) {
-
-				interleavedMatrix.clearUpdateRanges();
-				interleavedMatrix.updateRanges.push( ...matrices.updateRanges );
-				matrices.clearUpdateRanges(); // "matrices" as the source is never uploaded directly. clear to avoid update range accumulation
-
-				interleavedMatrix.version = matrices.version;
-
-			}
+			if ( hasInterleavedMatrix ) syncInterleavedMatrix( matrices );
 
 			if ( colors && interleavedColor !== null && interleavedColor.version !== colors.version ) {
 
@@ -201,43 +311,17 @@ export const instance = /*@__PURE__*/ Fn( ( [ matrices, colors = null ], builder
 
 	}
 
-	// POSITION
-
-	const instancePosition = instanceMatrixNode.mul( positionLocal ).xyz;
-	positionLocal.assign( instancePosition );
+	let previousMatrixNode = null;
 
 	if ( builder.needsPreviousData() ) {
 
-		const instancedMesh = builder.object;
+		OnAfterObjectUpdate( ( { object } ) => updatePreviousMatrix( object, matrices ) );
 
-		OnAfterObjectUpdate( ( { object } ) => {
-
-			const { previousInstanceMatrix } = _previousInstanceMatrices.get( object );
-
-			previousInstanceMatrix.array.set( matrices.array );
-			previousInstanceMatrix.version = matrices.version;
-
-			// handle interleaved path
-
-			const previousInterleavedMatrix = _matrixBuffers.get( previousInstanceMatrix );
-
-			if ( previousInterleavedMatrix !== undefined ) previousInterleavedMatrix.version = matrices.version;
-
-		} );
-
-		const previousInstanceMatrixNode = getPreviousInstance( instancedMesh, matrices, builder );
-		positionPrevious.assign( previousInstanceMatrixNode.mul( positionPrevious ).xyz );
+		previousMatrixNode = createInstanceMatrixNode( builder, getPreviousMatrix( builder.object, matrices ) );
 
 	}
 
-	// NORMAL
-
-	if ( builder.hasGeometryAttribute( 'normal' ) ) {
-
-		const instanceNormal = transformNormal( normalLocal, instanceMatrixNode );
-		normalLocal.assign( instanceNormal );
-
-	}
+	transformInstance( builder, instanceMatrixNode, previousMatrixNode );
 
 	// COLOR
 
@@ -256,10 +340,16 @@ export const instance = /*@__PURE__*/ Fn( ( [ matrices, colors = null ], builder
  * @function
  * @param {InstancedMesh} instancedMesh - The instanced mesh.
  */
-export const instancedMesh = /*@__PURE__*/ Fn( ( [ instancedMesh ] ) => {
+export const instancedMesh = /*@__PURE__*/ Fn( ( [ instancedMesh ], builder ) => {
 
-	const { instanceMatrix, instanceColor } = instancedMesh;
+	if ( isSharedInstancing( instancedMesh, builder.renderer ) ) {
 
-	instance( instanceMatrix, instanceColor );
+		setupSharedInstance( builder );
+
+	} else {
+
+		instance( instancedMesh.instanceMatrix, instancedMesh.instanceColor );
+
+	}
 
 }, 'void' );

@@ -71,7 +71,7 @@ class BufferAttributeNode extends InputNode {
 	/**
 	 * Constructs a new buffer attribute node.
 	 *
-	 * @param {BufferAttribute|InterleavedBuffer|TypedArray} value - The attribute data.
+	 * @param {BufferAttribute|InterleavedBufferAttribute|InterleavedBuffer|TypedArray} value - The attribute data.
 	 * @param {?string} [bufferType=null] - The buffer type (e.g. `'vec3'`).
 	 * @param {number} [bufferStride=0] - The buffer stride.
 	 * @param {number} [bufferOffset=0] - The buffer offset.
@@ -146,7 +146,17 @@ class BufferAttributeNode extends InputNode {
 		 */
 		this.global = true;
 
-		if ( value && value.isBufferAttribute === true && value.itemSize <= 4 ) {
+		/**
+		 * An optional function that returns the buffer attribute of the rendered object.
+		 * Programs shared between objects use it so each object binds its own data.
+		 * The returned attribute belongs to the object and is released when the object is disposed.
+		 *
+		 * @type {?Function}
+		 * @default null
+		 */
+		this.attributeCallback = null;
+
+		if ( value && ( value.isBufferAttribute === true || value.isInterleavedBufferAttribute === true ) && value.itemSize <= 4 ) {
 
 			this.attribute = value;
 			this.usage = value.usage;
@@ -343,6 +353,32 @@ class BufferAttributeNode extends InputNode {
 		this.instanced = value;
 
 		return this;
+
+	}
+
+	/**
+	 * Sets a function that returns the buffer attribute of the rendered object.
+	 *
+	 * @param {?Function} callback - The function, receiving the rendered object.
+	 * @return {BufferAttributeNode} A reference to this node.
+	 */
+	setAttributeCallback( callback ) {
+
+		this.attributeCallback = callback;
+
+		return this;
+
+	}
+
+	/**
+	 * Returns the buffer attribute to bind when rendering the given object.
+	 *
+	 * @param {Object3D} object - The rendered object.
+	 * @return {BufferAttribute|InterleavedBufferAttribute} The buffer attribute.
+	 */
+	getObjectAttribute( object ) {
+
+		return this.attributeCallback !== null ? this.attributeCallback( object ) : this.attribute;
 
 	}
 
