@@ -117,9 +117,9 @@
 			gui.add( params, 'view', { 'UV grid': 'checker', 'UV islands': 'islands', 'Texel density': 'density', 'Original materials': 'original' } ).name( 'View' ).onChange( updateMaterials );
 			gui.add( params, 'referenceDensity' ).name( 'Target texels / unit' ).info( '0 uses the fitted atlas density. Both principal directions are compared with this target.' ).onChange( updateMaterials );
 			const inputs = gui.addFolder( 'Unwrap Input' );
-			inputs.add( params, 'mode', { 'Lightmap': 'lightmap', 'Normal bake': 'normal' } ).name( 'Method' ).onChange( unwrapAndReport );
-			inputs.add( params, 'resolution', [ 1024, 2048, 4096 ] ).name( 'Atlas size' ).onChange( unwrapAndReport );
-			inputs.add( params, 'useInputUVs' ).name( 'Preserve authored islands' ).onChange( unwrapAndReport );
+			inputs.add( params, 'mode', { 'Lightmap': 'lightmap', 'Normal bake': 'normal' } ).name( 'Method' ).onChange( unwrap );
+			inputs.add( params, 'resolution', [ 1024, 2048, 4096 ] ).name( 'Atlas size' ).onChange( unwrap );
+			inputs.add( params, 'useInputUVs' ).name( 'Preserve authored islands' ).onChange( unwrap );
 			const draco = new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' );
 			const loader = new GLTFLoader().setDRACOLoader( draco );
 			let root, originals = [], result, loadId = 0;
@@ -165,8 +165,7 @@
 					canvas.getContext( '2d' ).clearRect( 0, 0, canvas.width, canvas.height );
 					islandTexture.needsUpdate = true;
 					for ( const item of originals ) item.mesh.material = item.material;
-					status.textContent = error.message;
-					throw error;
+					reportError( error );
 
 				}
 
@@ -285,20 +284,6 @@
 					}
 
 				} );
-
-			}
-
-			function unwrapAndReport() {
-
-				try {
-
-					unwrap();
-
-				} catch ( error ) {
-
-					reportError( error );
-
-				}
 
 			}
 
