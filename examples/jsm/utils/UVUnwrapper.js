@@ -1,4 +1,4 @@
-import { BufferAttribute, BufferGeometry, Float16BufferAttribute, Float32BufferAttribute, Vector3 } from 'three';
+import { Box2, BufferAttribute, BufferGeometry, Float16BufferAttribute, Float32BufferAttribute, Vector2, Vector3 } from 'three';
 import { potpack } from '../libs/potpack.module.js';
 
 /**
@@ -316,13 +316,13 @@ function parameterize( record, faces, settings, charts ) {
 	const bounds = getBounds( candidate );
 	for ( const p of candidate ) {
 
-		p[ 0 ] -= bounds.minX; p[ 1 ] -= bounds.minY;
+		p[ 0 ] -= bounds.min.x; p[ 1 ] -= bounds.min.y;
 
 	}
 
 	charts.push( {
 		record, faces, vertexMap, uv: candidate, worldArea,
-		width: bounds.maxX - bounds.minX, height: bounds.maxY - bounds.minY,
+		width: bounds.max.x - bounds.min.x, height: bounds.max.y - bounds.min.y,
 		positions, triangles
 	} );
 
@@ -519,30 +519,24 @@ function cross2( a, b, c ) {
 
 function getBounds( points ) {
 
-	let minX = Infinity, minY = Infinity, maxX = - Infinity, maxY = - Infinity;
-	for ( const p of points ) {
-
-		minX = Math.min( minX, p[ 0 ] ); minY = Math.min( minY, p[ 1 ] );
-		maxX = Math.max( maxX, p[ 0 ] ); maxY = Math.max( maxY, p[ 1 ] );
-
-	}
-
-	return { minX, minY, maxX, maxY };
+	const bounds = new Box2(), point = new Vector2();
+	for ( const p of points ) bounds.expandByPoint( point.set( p[ 0 ], p[ 1 ] ) );
+	return bounds;
 
 }
 
 function hasOverlap( uv, triangles ) {
 
 	const bounds = getBounds( uv );
-	const extent = Math.max( bounds.maxX - bounds.minX, bounds.maxY - bounds.minY );
+	const extent = Math.max( bounds.max.x - bounds.min.x, bounds.max.y - bounds.min.y );
 	const cellSize = extent / Math.max( 1, Math.sqrt( triangles.length ) );
 	const epsilon = extent * 1e-10, cells = new Map();
 	for ( let i = 0; i < triangles.length; i ++ ) {
 
 		const points = triangles[ i ].map( v => uv[ v ] ), box = getBounds( points ), seen = new Set();
-		for ( let x = Math.floor( ( box.minX - bounds.minX ) / cellSize ); x <= Math.floor( ( box.maxX - bounds.minX ) / cellSize ); x ++ ) {
+		for ( let x = Math.floor( ( box.min.x - bounds.min.x ) / cellSize ); x <= Math.floor( ( box.max.x - bounds.min.x ) / cellSize ); x ++ ) {
 
-			for ( let y = Math.floor( ( box.minY - bounds.minY ) / cellSize ); y <= Math.floor( ( box.maxY - bounds.minY ) / cellSize ); y ++ ) {
+			for ( let y = Math.floor( ( box.min.y - bounds.min.y ) / cellSize ); y <= Math.floor( ( box.max.y - bounds.min.y ) / cellSize ); y ++ ) {
 
 				const key = `${ x },${ y }`;
 				if ( ! cells.has( key ) ) cells.set( key, [] );
@@ -614,7 +608,7 @@ function alignChart( uv ) {
 	const angle = 0.5 * Math.atan2( 2 * xy, xx - yy ), cosine = Math.cos( angle ), sine = Math.sin( angle );
 	const rotated = uv.map( p => [ cosine * p[ 0 ] + sine * p[ 1 ], - sine * p[ 0 ] + cosine * p[ 1 ] ] );
 	const a = getBounds( uv ), b = getBounds( rotated );
-	if ( ( b.maxX - b.minX ) * ( b.maxY - b.minY ) < ( a.maxX - a.minX ) * ( a.maxY - a.minY ) ) {
+	if ( ( b.max.x - b.min.x ) * ( b.max.y - b.min.y ) < ( a.max.x - a.min.x ) * ( a.max.y - a.min.y ) ) {
 
 		for ( let i = 0; i < uv.length; i ++ ) uv[ i ] = rotated[ i ];
 
