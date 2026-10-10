@@ -19,7 +19,7 @@
 				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>glTF Light Maps</span>
 			</div>
 
-			<small>Baked indirect lighting with MOZ_lightmap. A glTF point light supplies direct lighting and reflections.</small>
+			<small>Static baked indirect diffuse with MOZ_lightmap. A glTF point light supplies direct lighting and specular highlights.</small>
 		</div>
 
 		<script type="importmap">
@@ -76,7 +76,10 @@
 				scene.add( gltf.scene );
 
 				const materials = new Map();
+				const lights = new Map();
 				gltf.scene.traverse( object => {
+
+					if ( object.isLight ) lights.set( object, object.intensity );
 
 					// glTF stores the light, while shadow settings belong to the renderer.
 					if ( object.isPointLight ) {
@@ -99,16 +102,24 @@
 
 				} );
 
-				const params = { enabled: true, intensity: 1 };
-				function updateLightMaps() {
+				const params = { lightIntensity: 1, indirectIntensity: 1 };
+				function updateLights() {
 
-					for ( const [ material, intensity ] of materials ) material.lightMapIntensity = params.enabled ? intensity * params.intensity : 0;
+					for ( const [ light, intensity ] of lights ) light.intensity = intensity * params.lightIntensity;
 
 				}
 
-				const gui = renderer.inspector.createParameters( 'Light Maps' );
-				gui.add( params, 'enabled' ).name( 'Baked Lighting' ).onChange( updateLightMaps );
-				gui.add( params, 'intensity', 0, 2 ).name( 'Intensity' ).onChange( updateLightMaps );
+				function updateLightMaps() {
+
+					for ( const [ material, intensity ] of materials ) material.lightMapIntensity = intensity * params.indirectIntensity;
+
+				}
+
+				const liveLights = renderer.inspector.createParameters( 'Live Lights' );
+				liveLights.add( params, 'lightIntensity', 0, 2 ).name( 'Intensity' ).onChange( updateLights );
+
+				const bakedIndirect = renderer.inspector.createParameters( 'Baked Indirect Diffuse' );
+				bakedIndirect.add( params, 'indirectIntensity', 0, 2 ).name( 'Indirect Intensity' ).onChange( updateLightMaps );
 
 				window.addEventListener( 'resize', onWindowResize );
 				renderer.setAnimationLoop( animate );

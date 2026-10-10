@@ -16,5 +16,10 @@ Lighting was baked on an Apple Metal GPU. No environment map is needed.
 Register `GLTFLightMapLoaderExtension` before loading the asset. The
 `webgpu_loader_gltf_lightmaps.html` example uses the glTF light for direct lighting
 and shadows. The sphere has roughness 0.15 to demonstrate a dynamic specular
-highlight. Its baked-lighting toggle removes only the indirect illumination.
+highlight. The `Live Lights` group's `Intensity` and the `Baked Indirect Diffuse`
+group's `Indirect Intensity` independently scale the stored light and lightmap
+intensities. Both default to 1; setting either to 0 disables that contribution.
+The indirect diffuse is assumed to be static: changing the live light's intensity
+does not recompute the baked illumination. Direct diffuse and specular lighting
+are not baked into the atlas.
 Shadow settings are configured in the example because glTF does not store them.
