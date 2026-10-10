@@ -1,3 +1,4 @@
+import './addons/lighting/VirtualPointLightGenerator.tests.js';
 
 //addons/utils
 import './addons/utils/BufferGeometryUtils.tests.js';
