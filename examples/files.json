@@ -305,7 +305,6 @@
 		"webgl_tsl_instancing"
 	],
 	"webgpu": [
-		"webgpu_unwrap",
 		"webgpu_animation_retargeting",
 		"webgpu_animation_retargeting_readyplayer",
 		"webgpu_backdrop",
@@ -522,6 +521,7 @@
 		"webgpu_tsl_vfx_linkedparticles",
 		"webgpu_tsl_vfx_tornado",
 		"webgpu_tsl_wood",
+		"webgpu_unwrap",
 		"webgpu_upscaling_fsr1",
 		"webgpu_upscaling_taau",
 		"webgpu_video_frame",

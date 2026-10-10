@@ -3,6 +3,8 @@
 import './addons/utils/BufferGeometryUtils.tests.js';
 import './addons/utils/ColorUtils.tests.js';
 import './addons/utils/GaussianSplatUtils.tests.js';
+import './addons/utils/unwrapUVs.tests.js';
+import './addons/utils/unwrapUVs/LSCM.tests.js';
 import './addons/math/ColorConverter.tests.js';
 import './addons/math/ColorSpaces.tests.js';
 import './addons/math/Octree.tests.js';
@@ -55,6 +57,3 @@ import './addons/tsl/TSLBSDFLightingRemainder.tests.js';
 import './addons/tsl/TSL.Irradiance.tests.js';
 import './addons/tsl/TSLUtilsMisc.tests.js';
 import './addons/postprocessing/GTAOPass.tests.js';
-
-import './addons/utils/unwrapUVs.tests.js';
-import './addons/utils/unwrapUVs/LSCM.tests.js';
