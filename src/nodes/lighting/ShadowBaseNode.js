@@ -7,7 +7,7 @@ import { positionWorld } from '../accessors/Position.js';
 import { DoubleSide, NoBlending, VSMShadowMap } from '../../constants.js';
 
 const _shadowMaterialLib = /*@__PURE__*/ new WeakMap();
-const _defaultShadowMaterials = /*@__PURE__*/ new WeakSet();
+const _doubleSideShadowMaterials = /*@__PURE__*/ new WeakMap();
 const _shadowRenderObjectLibrary = /*@__PURE__*/ new ChainMap();
 const _shadowRenderObjectKeys = [];
 
@@ -37,11 +37,16 @@ const _getShadowMaterial = ( light ) => {
 		material.name = 'ShadowMaterial';
 		material.blending = NoBlending;
 		material.fog = false;
-		material.polygonOffsetFactor = 2;
-		material.polygonOffsetUnits = 1;
+
+		const doubleSideMaterial = material.clone();
+		doubleSideMaterial.isShadowPassMaterial = true;
+		doubleSideMaterial.name = 'DoubleSideShadowMaterial';
+		doubleSideMaterial.polygonOffset = true;
+		doubleSideMaterial.polygonOffsetFactor = 2;
+		doubleSideMaterial.polygonOffsetUnits = 1;
 
 		_shadowMaterialLib.set( light, material );
-		_defaultShadowMaterials.add( material );
+		_doubleSideShadowMaterials.set( material, doubleSideMaterial );
 
 	}
 
@@ -61,6 +66,8 @@ const _disposeShadowMaterial = ( light ) => {
 
 	if ( material !== undefined ) {
 
+		_doubleSideShadowMaterials.get( material ).dispose();
+		_doubleSideShadowMaterials.delete( material );
 		material.dispose();
 		_shadowMaterialLib.delete( light );
 
@@ -91,9 +98,12 @@ const _getShadowRenderObjectFunction = ( renderer, shadow, shadowType ) => {
 
 			if ( object.castShadow === true || ( object.receiveShadow && shadowType === VSMShadowMap ) ) {
 
-				if ( _defaultShadowMaterials.has( scene.overrideMaterial ) ) {
+				const shadowMaterial = scene.overrideMaterial;
+				const doubleSideMaterial = _doubleSideShadowMaterials.get( shadowMaterial );
 
-					scene.overrideMaterial.polygonOffset = ( material.shadowSide ?? material.side ) === DoubleSide;
+				if ( doubleSideMaterial !== undefined && ( material.shadowSide ?? material.side ) === DoubleSide ) {
+
+					scene.overrideMaterial = doubleSideMaterial;
 
 				}
 
@@ -102,6 +112,8 @@ const _getShadowRenderObjectFunction = ( renderer, shadow, shadowType ) => {
 				renderer.renderObject( object, scene, _camera, geometry, material, group, lightsNode, clippingContext, passId );
 
 				object.onAfterShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
+
+				scene.overrideMaterial = shadowMaterial;
 
 			}
 
