@@ -92,12 +92,12 @@
 
 			} )();
 			const params = {
-				model: 'boxes', mode: 'lightmap', resolution: 2048, useInputUVs: false,
+				model: 'DamagedHelmet/glTF/DamagedHelmet.gltf', mode: 'lightmap', resolution: 2048, useInputUVs: false,
 				view: 'checker', referenceDensity: 0
 			};
 			const gui = renderer.inspector.createParameters( 'UV unwrap' );
 			gui.add( params, 'model', {
-				'Scaled boxes': 'boxes', 'Damaged Helmet': 'DamagedHelmet/glTF/DamagedHelmet.gltf',
+				'Damaged Helmet': 'DamagedHelmet/glTF/DamagedHelmet.gltf',
 				'Soldier': 'Soldier.glb', 'Xbot': 'Xbot.glb', 'Lee Perry Smith': 'LeePerrySmith/LeePerrySmith.glb',
 				'Space ship hallway': 'space_ship_hallway.glb'
 			} ).name( 'Model' ).listen().onChange( value => loadModel( value ).catch( reportError ) );
@@ -212,26 +212,7 @@
 				params.model = name;
 				const id = ++ loadId;
 				status.textContent = 'Loading model…';
-				let loaded;
-				if ( name === 'boxes' ) {
-
-					loaded = new THREE.Group();
-					const geometry = new THREE.BoxGeometry();
-					for ( let i = 0; i < 8; i ++ ) {
-
-						const mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
-						mesh.position.set( ( i % 4 ) * 1.8, 0, Math.floor( i / 4 ) * 2 );
-						mesh.scale.set( 0.5 + i * 0.1, 0.7 + i * 0.2, 1 );
-						mesh.rotation.y = i * 0.3;
-						loaded.add( mesh );
-
-					}
-
-				} else {
-
-					loaded = ( await loader.loadAsync( `models/gltf/${ name }` ) ).scene;
-
-				}
+				const loaded = ( await loader.loadAsync( `models/gltf/${ name }` ) ).scene;
 
 				if ( id !== loadId ) {
 
@@ -323,7 +304,7 @@
 			renderer.init().then( () => {
 
 				renderer.setAnimationLoop( animate );
-				return loadModel( 'boxes' );
+				return loadModel( params.model );
 
 			} ).catch( reportError );
 			function animate() {

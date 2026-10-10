@@ -11,6 +11,34 @@ try {
 	await page.setViewport( { width: 1440, height: 1000 } );
 	const errors = [];
 	page.on( 'pageerror', error => errors.push( error.message ) );
+	// A planar glTF fixture gives an exact density reference independent of the model menu.
+	const vertices = new Float32Array( [ - 1, - 1, 0, 1, - 1, 0, 1, 1, 0, - 1, 1, 0 ] );
+	const indices = new Uint16Array( [ 0, 1, 2, 0, 2, 3 ] );
+	const data = Buffer.concat( [ Buffer.from( vertices.buffer ), Buffer.from( indices.buffer ) ] );
+	const fixture = {
+		asset: { version: '2.0' }, scene: 0, scenes: [ { nodes: [ 0 ] } ], nodes: [ { mesh: 0 } ],
+		meshes: [ { primitives: [ { attributes: { POSITION: 0 }, indices: 1 } ] } ],
+		buffers: [ { byteLength: data.length, uri: `data:application/octet-stream;base64,${ data.toString( 'base64' ) }` } ],
+		bufferViews: [ { buffer: 0, byteLength: vertices.byteLength }, { buffer: 0, byteOffset: vertices.byteLength, byteLength: indices.byteLength } ],
+		accessors: [
+			{ bufferView: 0, componentType: 5126, count: 4, type: 'VEC3', min: [ - 1, - 1, 0 ], max: [ 1, 1, 0 ] },
+			{ bufferView: 1, componentType: 5123, count: 6, type: 'SCALAR' }
+		]
+	};
+	await page.setRequestInterception( true );
+	page.on( 'request', request => {
+
+		if ( request.url().endsWith( '/DamagedHelmet.gltf' ) ) {
+
+			request.respond( { status: 200, contentType: 'application/json', body: JSON.stringify( fixture ) } );
+
+		} else {
+
+			request.continue();
+
+		}
+
+	} );
 	await page.goto( `http://localhost:${ server.address().port }/examples/webgpu_unwrap.html` );
 	await page.waitForFunction( () => document.getElementById( 'status' ).textContent.includes( 'texels/world unit' ) );
 	const gpu = await page.evaluate( async () => {
