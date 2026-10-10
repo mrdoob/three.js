@@ -1,5 +1,5 @@
 import { Vector3 } from 'three';
-import { solveLSCM, triangleFrame } from '../../../../../examples/jsm/utils/UVUnwrapper/LSCM.js';
+import { solveLSCM, triangleFrame } from '../../../../../examples/jsm/utils/unwrapUVs/LSCM.js';
 
 const triangles = [[ 0, 1, 4 ], [ 1, 2, 4 ], [ 2, 3, 4 ], [ 3, 0, 4 ]];
 const expected = [[ 0, 0 ], [ 2, 0 ], [ 2, 1 ], [ 0, 1 ], [ 1, 0.5 ]];
@@ -21,7 +21,7 @@ export default QUnit.module( 'Addons', () => {
 
 	QUnit.module( 'Utils', () => {
 
-		QUnit.module( 'UVUnwrapper / LSCM', () => {
+		QUnit.module( 'unwrapUVs / LSCM', () => {
 
 			QUnit.test( 'planar chart converges and preserves inputs and pins', assert => {
 

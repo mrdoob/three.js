@@ -15,7 +15,7 @@ function triangleFrame( positions, triangle ) {
  * are [u, v] pairs. The initial coordinates choose and position two pins.
  * Returns new UV pairs, or null for coincident pins, degenerate triangles or
  * a failed solve. Callers must validate the result for distortion and overlap.
- * This is an internal implementation detail of UVUnwrapper.
+ * This is an internal implementation detail of unwrapUVs.
  */
 // LSCM energy: area * ((du/dx - dv/dy)^2 + (du/dy + dv/dx)^2).
 // Two pinned vertices remove similarity null modes. Matrix-free Jacobi PCG

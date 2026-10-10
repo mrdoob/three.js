@@ -3,8 +3,8 @@ import {
 	Group, ObjectLoader, InterleavedBuffer, InterleavedBufferAttribute, Matrix4, Mesh, PlaneGeometry, Skeleton, SkinnedMesh, SphereGeometry,
 	TorusGeometry, Uint16BufferAttribute, Vector3
 } from 'three';
-import { unwrapUVs as unwrap } from '../../../../examples/jsm/utils/UVUnwrapper.js';
-import { auditAtlas } from './UVUnwrapperTestUtils.js';
+import { unwrapUVs as unwrap } from '../../../../examples/jsm/utils/unwrapUVs.js';
+import { auditAtlas } from './unwrapUVsTestUtils.js';
 
 function verify( assert, result, limit = 1.5 ) {
 
@@ -21,7 +21,7 @@ export default QUnit.module( 'Addons', () => {
 
 	QUnit.module( 'Utils', () => {
 
-		QUnit.module( 'UVUnwrapper', () => {
+		QUnit.module( 'unwrapUVs', () => {
 
 			QUnit.test( 'unique atlas for shared geometry under nested, mirrored, nonuniform transforms', assert => {
 

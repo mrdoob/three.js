@@ -1,5 +1,5 @@
 import { Box2, BufferGeometry, Float32BufferAttribute, Vector2, Vector3 } from 'three';
-import { solveLSCM, triangleFrame } from './UVUnwrapper/LSCM.js';
+import { solveLSCM, triangleFrame } from './unwrapUVs/LSCM.js';
 import { remapAttribute } from './BufferGeometryUtils.js';
 import { potpack } from '../libs/potpack.module.js';
 
@@ -15,7 +15,7 @@ import { potpack } from '../libs/potpack.module.js';
  * retain their geometry with UV (0, 0) and faceCharts -1.
  * Instanced and batched meshes must first be expanded into ordinary meshes.
  *
- * @three_import import { unwrapUVs } from 'three/addons/utils/UVUnwrapper.js';
+ * @three_import import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
  *
  * @param {Object3D} root - A mesh or hierarchy to unwrap.
  * @param {Object} [options] - Atlas and chart options.
@@ -289,7 +289,7 @@ function parameterize( record, faces, settings, charts ) {
 
 		}
 
-		if ( faces.length === 1 ) throw new Error( 'UVUnwrapper: triangle cannot be parameterized at this precision.' );
+		if ( faces.length === 1 ) throw new Error( 'unwrapUVs: triangle cannot be parameterized at this precision.' );
 		const half = Math.floor( faces.length / 2 );
 		for ( const subset of [ faces.slice( 0, half ), faces.slice( half ) ] ) {
 
@@ -509,11 +509,11 @@ function packCharts( charts, settings ) {
 	if ( density > 0 ) {
 
 		boxes = pack( density );
-		if ( ! boxes ) throw new Error( 'UVUnwrapper: no packing found for requested texelsPerUnit; increase resolution or partition the hierarchy.' );
+		if ( ! boxes ) throw new Error( 'unwrapUVs: no packing found for requested texelsPerUnit; increase resolution or partition the hierarchy.' );
 
 	} else {
 
-		if ( ! pack( 0 ) ) throw new Error( 'UVUnwrapper: chart gutters do not fit; increase resolution or partition the hierarchy.' );
+		if ( ! pack( 0 ) ) throw new Error( 'unwrapUVs: chart gutters do not fit; increase resolution or partition the hierarchy.' );
 		const area = charts.reduce( ( sum, chart ) => sum + chart.width * chart.height, 0 );
 		let low = 0, high = settings.resolution / Math.sqrt( area );
 		for ( let iteration = 0; iteration < 24; iteration ++ ) {
@@ -532,7 +532,7 @@ function packCharts( charts, settings ) {
 		}
 
 		density = low;
-		if ( ! boxes || density === 0 ) throw new Error( 'UVUnwrapper: no positive density fits the atlas.' );
+		if ( ! boxes || density === 0 ) throw new Error( 'unwrapUVs: no positive density fits the atlas.' );
 
 	}
 
@@ -613,7 +613,7 @@ function validateFloat32Chart( chart, settings, density ) {
 
 	}
 
-	if ( ! quality ) throw new Error( `UVUnwrapper: Float32 atlas precision is insufficient for mesh "${ chart.record.mesh.name }"; repair sliver triangles or partition the hierarchy.` );
+	if ( ! quality ) throw new Error( `unwrapUVs: Float32 atlas precision is insufficient for mesh "${ chart.record.mesh.name }"; repair sliver triangles or partition the hierarchy.` );
 	return true;
 
 }

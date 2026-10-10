@@ -56,5 +56,5 @@ import './addons/tsl/TSL.Irradiance.tests.js';
 import './addons/tsl/TSLUtilsMisc.tests.js';
 import './addons/postprocessing/GTAOPass.tests.js';
 
-import './addons/utils/UVUnwrapper.tests.js';
-import './addons/utils/UVUnwrapper/LSCM.tests.js';
+import './addons/utils/unwrapUVs.tests.js';
+import './addons/utils/unwrapUVs/LSCM.tests.js';
