@@ -16,7 +16,8 @@ import {
 	UnsignedInt248Type,
 	UnsignedShort4444Type,
 	UnsignedShort5551Type,
-	WebGLCoordinateSystem
+	WebGLCoordinateSystem,
+	LinearTransfer
 } from '../constants.js';
 import { Color } from '../math/Color.js';
 import { Frustum } from '../math/Frustum.js';
@@ -3716,8 +3717,15 @@ class WebGLRenderer {
 		this._outputColorSpace = colorSpace;
 
 		const gl = this.getContext();
-		gl.drawingBufferColorSpace = colorSpace;
 		gl.unpackColorSpace = ColorManagement._getUnpackColorSpace();
+
+		// Before applying `outputColorSpace: LinearSRGBColorSpace` to 8-bit contexts,
+		// we must support `workingColorSpace: SRGBColorSpace` for legacy workflows. See #34914.
+		if ( ColorManagement.getTransfer( colorSpace ) !== LinearTransfer ) {
+
+			gl.drawingBufferColorSpace = colorSpace;
+
+		}
 
 	}
 
