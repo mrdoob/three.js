@@ -57,3 +57,4 @@ import './addons/tsl/TSLUtilsMisc.tests.js';
 import './addons/postprocessing/GTAOPass.tests.js';
 
 import './addons/utils/UVUnwrapper.tests.js';
+import './addons/utils/UVUnwrapper/LSCM.tests.js';
