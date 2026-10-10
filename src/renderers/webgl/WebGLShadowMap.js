@@ -443,7 +443,14 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 		let result = null;
 
 		const customMaterial = ( light.isPointLight === true ) ? object.customDistanceMaterial : object.customDepthMaterial;
-		const side = ( material.shadowSide !== null ) ? material.shadowSide : ( type === VSMShadowMap ? material.side : shadowSide[ material.side ] );
+
+		let side = material.shadowSide;
+
+		if ( side === null ) {
+
+			side = ( type === VSMShadowMap ) ? material.side : shadowSide[ material.side ];
+
+		}
 
 		if ( customMaterial !== undefined ) {
 
