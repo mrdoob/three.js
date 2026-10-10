@@ -704,7 +704,7 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 	// attributes and new attribute arrays
 	const attributeNames = Object.keys( geometry.attributes );
-	const sourceVertices = [];
+	const sourceIndices = [];
 	const buffers = new Map();
 	const newIndices = [];
 	const getters = [ 'getX', 'getY', 'getZ', 'getW' ];
@@ -743,7 +743,7 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 		} else {
 
-			sourceVertices.push( index );
+			sourceIndices.push( index );
 
 			hashToIndex[ hash ] = nextIndex;
 			newIndices.push( nextIndex );
@@ -757,13 +757,13 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 	const result = geometry.clone();
 	for ( const name in geometry.attributes ) {
 
-		result.setAttribute( name, remapAttribute( geometry.attributes[ name ], sourceVertices, buffers ) );
+		result.setAttribute( name, remapAttribute( geometry.attributes[ name ], sourceIndices, buffers ) );
 
 	}
 
 	for ( const name in geometry.morphAttributes ) {
 
-		result.morphAttributes[ name ] = geometry.morphAttributes[ name ].map( attribute => remapAttribute( attribute, sourceVertices, buffers ) );
+		result.morphAttributes[ name ] = geometry.morphAttributes[ name ].map( attribute => remapAttribute( attribute, sourceIndices, buffers ) );
 
 	}
 
@@ -1467,11 +1467,11 @@ function toCreasedNormals( geometry, creaseAngle = Math.PI / 3 /* 60 degrees */ 
  * across calls to preserve shared interleaved buffers for the same mapping.
  *
  * @param {BufferAttribute|InterleavedBufferAttribute} attribute - The source attribute.
- * @param {Array<number>|TypedArray} sourceVertices - The source index for each output vertex.
+ * @param {Array<number>|TypedArray} sourceIndices - The source index for each output vertex.
  * @param {Map<InterleavedBuffer, InterleavedBuffer>} [buffers] - Shared interleaved buffer copies.
  * @return {BufferAttribute|InterleavedBufferAttribute} The remapped attribute.
  */
-function remapAttribute( attribute, sourceVertices, buffers = new Map() ) {
+function remapAttribute( attribute, sourceIndices, buffers = new Map() ) {
 
 	const interleaved = attribute.isInterleavedBufferAttribute;
 	const source = interleaved ? attribute.data : attribute;
@@ -1480,10 +1480,10 @@ function remapAttribute( attribute, sourceVertices, buffers = new Map() ) {
 
 	if ( data === undefined ) {
 
-		const array = new source.array.constructor( sourceVertices.length * stride );
-		for ( let i = 0; i < sourceVertices.length; i ++ ) {
+		const array = new source.array.constructor( sourceIndices.length * stride );
+		for ( let i = 0; i < sourceIndices.length; i ++ ) {
 
-			for ( let j = 0; j < stride; j ++ ) array[ i * stride + j ] = source.array[ sourceVertices[ i ] * stride + j ];
+			for ( let j = 0; j < stride; j ++ ) array[ i * stride + j ] = source.array[ sourceIndices[ i ] * stride + j ];
 
 		}
 
@@ -1497,7 +1497,7 @@ function remapAttribute( attribute, sourceVertices, buffers = new Map() ) {
 
 	const result = interleaved ? new attribute.constructor( data, attribute.itemSize, attribute.offset, attribute.normalized ) : data;
 	result.name = attribute.name;
-	result.gpuType = attribute.gpuType;
+	if ( ! interleaved ) result.gpuType = attribute.gpuType;
 	return result;
 
 }
