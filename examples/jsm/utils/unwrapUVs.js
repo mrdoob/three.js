@@ -3,16 +3,9 @@ import { remapAttribute } from './BufferGeometryUtils.js';
 import { potpack } from '../libs/potpack.module.js';
 
 /**
- * Generates a unique atlas for the triangle meshes in an Object3D hierarchy.
- * Geometry is measured in world space, cloned per mesh, and replaced atomically.
- * Skinning and morphs are measured in their current pose without changing the
- * underlying position data. Supply the intended bake pose for character maps.
- * Input must use finite CPU-readable per-vertex attributes and complete triangles.
- * Attributes must match the position count; groups must contain complete triangles.
- * Options must be finite and in their documented ranges.
- * Faces below the area tolerance, or subtexel faces failing Float32 validation,
- * retain their geometry with UV (0, 0) and faceCharts -1.
- * Instanced and batched meshes must first be expanded into ordinary meshes.
+ * Generates a unique UV atlas for the meshes in a hierarchy, measured in world space.
+ * Each mesh receives a new geometry. Skinned and morphed meshes are unwrapped in
+ * their current pose. Degenerate faces keep UV (0, 0) and a faceCharts entry of -1.
  *
  * @three_import import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
  *
@@ -26,8 +19,7 @@ import { potpack } from '../libs/potpack.module.js';
  * @param {boolean} [options.respectUVSeams] - Cut discontinuities in existing uv (normal default).
  * @param {boolean} [options.useInputUVs=false] - Preserve valid authored UV charts before trying LSCM.
  * @return {Object} Atlas dimensions, density, chart bounds and mesh vertex/face mappings.
- * @throws {Error} If packing or output precision cannot produce a valid atlas. Mesh
- * geometries remain unchanged on failure; invalid input is outside this contract.
+ * @throws {Error} If the charts do not fit the atlas. Meshes are left unchanged.
  */
 function unwrapUVs( root, options = {} ) {
 
