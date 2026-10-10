@@ -3,16 +3,8 @@ import {
 	Group, ObjectLoader, InterleavedBuffer, InterleavedBufferAttribute, Matrix4, Mesh, PlaneGeometry, Skeleton, SkinnedMesh, SphereGeometry,
 	TorusGeometry, Uint16BufferAttribute, Vector3
 } from 'three';
-import { UVUnwrapper } from '../../../../examples/jsm/utils/UVUnwrapper.js';
+import { unwrapUVs as unwrap } from '../../../../examples/jsm/utils/UVUnwrapper.js';
 import { auditAtlas } from './UVUnwrapperTestUtils.js';
-
-const unwrapper = new UVUnwrapper();
-
-function unwrap( root, options = {} ) {
-
-	return unwrapper.unwrap( root, options );
-
-}
 
 function verify( assert, result, limit = 1.5 ) {
 
@@ -360,7 +352,7 @@ export default QUnit.module( 'Addons', () => {
 
 			QUnit.test( 'result retains atlas metadata and vertex and face mappings', assert => {
 
-				const result = unwrapper.unwrap( new Mesh( new BoxGeometry() ) );
+				const result = unwrap( new Mesh( new BoxGeometry() ) );
 				assert.deepEqual( Object.keys( result ), [ 'attribute', 'channel', 'width', 'height', 'padding', 'texelsPerUnit', 'charts', 'meshes' ] );
 				assert.strictEqual( result.meshes[ 0 ].sourceVertices.length, result.meshes[ 0 ].geometry.attributes.position.count );
 				assert.strictEqual( result.meshes[ 0 ].faceCharts.length, 12 );

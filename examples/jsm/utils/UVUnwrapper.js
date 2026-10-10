@@ -15,84 +15,79 @@ import { potpack } from '../libs/potpack.module.js';
  * retain their geometry with UV (0, 0) and faceCharts -1.
  * Instanced and batched meshes must first be expanded into ordinary meshes.
  *
- * @three_import import { UVUnwrapper } from 'three/addons/utils/UVUnwrapper.js';
+ * @three_import import { unwrapUVs } from 'three/addons/utils/UVUnwrapper.js';
+ *
+ * @param {Object3D} root - A mesh or hierarchy to unwrap.
+ * @param {Object} [options] - Atlas and chart options.
+ * @param {string} [options.attribute='uv1'] - Output attribute: uv, uv1, uv2, uv3.
+ * @param {string} [options.mode='lightmap'] - 'lightmap' or 'normal'. Normal tries LSCM.
+ * @param {number} [options.resolution=1024] - Square atlas size in pixels, integer >= 4.
+ * @param {number} [options.padding=4] - Nonnegative gutter in pixels; 2 * padding + 1 must be less than resolution.
+ * @param {number} [options.texelsPerUnit=0] - Common world density; zero fits the atlas. Must be nonnegative.
+ * @param {boolean} [options.respectUVSeams] - Cut discontinuities in existing uv (normal default).
+ * @param {boolean} [options.useInputUVs=false] - Preserve valid authored UV charts before trying LSCM.
+ * @return {Object} Atlas dimensions, density, chart bounds and mesh vertex/face mappings.
+ * @throws {Error} If packing or output precision cannot produce a valid atlas. Mesh
+ * geometries remain unchanged on failure; invalid input is outside this contract.
  */
-class UVUnwrapper {
+function unwrapUVs( root, options = {} ) {
 
-	/**
-	 * @param {Object3D} root - A mesh or hierarchy to unwrap.
-	 * @param {Object} [options] - Atlas and chart options.
-	 * @param {string} [options.attribute='uv1'] - Output attribute: uv, uv1, uv2, uv3.
-	 * @param {string} [options.mode='lightmap'] - 'lightmap' or 'normal'. Normal tries LSCM.
-	 * @param {number} [options.resolution=1024] - Square atlas size in pixels, integer >= 4.
-	 * @param {number} [options.padding=4] - Nonnegative gutter in pixels; 2 * padding + 1 must be less than resolution.
-	 * @param {number} [options.texelsPerUnit=0] - Common world density; zero fits the atlas. Must be nonnegative.
-	 * @param {boolean} [options.respectUVSeams] - Cut discontinuities in existing uv (normal default).
-	 * @param {boolean} [options.useInputUVs=false] - Preserve valid authored UV charts before trying LSCM.
-	 * @return {Object} Atlas dimensions, density, chart bounds and mesh vertex/face mappings.
-	 * @throws {Error} If packing or output precision cannot produce a valid atlas. Mesh
-	 * geometries remain unchanged on failure; invalid input is outside this contract.
-	 */
-	unwrap( root, options = {} ) {
+	const settings = {
+		attribute: 'uv1', mode: 'lightmap', resolution: 1024, padding: 4,
+		texelsPerUnit: 0,
+		useInputUVs: false,
+		...options, maxAreaRatio: 2
+	};
+	settings.maxStretch = settings.mode === 'normal' ? 2 : 1.5;
+	settings.respectUVSeams ??= settings.mode === 'normal';
+	root.updateWorldMatrix( true, true );
 
-		const settings = {
-			attribute: 'uv1', mode: 'lightmap', resolution: 1024, padding: 4,
-			texelsPerUnit: 0,
-			useInputUVs: false,
-			...options, maxAreaRatio: 2
-		};
-		settings.maxStretch = settings.mode === 'normal' ? 2 : 1.5;
-		settings.respectUVSeams ??= settings.mode === 'normal';
-		root.updateWorldMatrix( true, true );
+	const records = [];
+	root.traverse( mesh => {
 
-		const records = [];
-		root.traverse( mesh => {
+		if ( ! mesh.isMesh ) return;
+		records.push( readMesh( mesh, settings ) );
 
-			if ( ! mesh.isMesh ) return;
-			records.push( readMesh( mesh, settings ) );
+	} );
 
-		} );
+	const charts = [];
+	for ( const record of records ) {
 
-		const charts = [];
-		for ( const record of records ) {
+		for ( const faces of growCharts( record, settings ) ) {
 
-			for ( const faces of growCharts( record, settings ) ) {
-
-				parameterize( record, faces, settings, charts );
-
-			}
+			parameterize( record, faces, settings, charts );
 
 		}
-
-		const density = packCharts( charts, settings );
-		for ( let i = charts.length - 1; i >= 0; i -- ) {
-
-			if ( ! validateFloat32Chart( charts[ i ], settings, density ) ) charts.splice( i, 1 );
-
-		}
-
-		for ( let i = 0; i < charts.length; i ++ ) {
-
-			for ( const face of charts[ i ].faces ) charts[ i ].record.faceCharts[ face ] = i;
-
-		}
-
-		for ( const record of records ) rebuildGeometry( record, charts, settings );
-		const result = {
-			attribute: settings.attribute, channel: [ 'uv', 'uv1', 'uv2', 'uv3' ].indexOf( settings.attribute ),
-			width: settings.resolution, height: settings.resolution, padding: settings.padding,
-			texelsPerUnit: density,
-			charts: charts.map( chart => ( { x: chart.box.x, y: chart.box.y, width: chart.box.w, height: chart.box.h } ) ),
-			meshes: records.map( record => ( {
-				mesh: record.mesh, originalGeometry: record.original, geometry: record.geometry,
-				sourceVertices: record.sourceVertices, faceCharts: record.faceCharts
-			} ) )
-		};
-		// Commit only after validation and all result allocations succeed.
-		for ( const record of records ) record.mesh.geometry = record.geometry;
-		return result;
 
 	}
+
+	const density = packCharts( charts, settings );
+	for ( let i = charts.length - 1; i >= 0; i -- ) {
+
+		if ( ! validateFloat32Chart( charts[ i ], settings, density ) ) charts.splice( i, 1 );
+
+	}
+
+	for ( let i = 0; i < charts.length; i ++ ) {
+
+		for ( const face of charts[ i ].faces ) charts[ i ].record.faceCharts[ face ] = i;
+
+	}
+
+	for ( const record of records ) rebuildGeometry( record, charts, settings );
+	const result = {
+		attribute: settings.attribute, channel: [ 'uv', 'uv1', 'uv2', 'uv3' ].indexOf( settings.attribute ),
+		width: settings.resolution, height: settings.resolution, padding: settings.padding,
+		texelsPerUnit: density,
+		charts: charts.map( chart => ( { x: chart.box.x, y: chart.box.y, width: chart.box.w, height: chart.box.h } ) ),
+		meshes: records.map( record => ( {
+			mesh: record.mesh, originalGeometry: record.original, geometry: record.geometry,
+			sourceVertices: record.sourceVertices, faceCharts: record.faceCharts
+		} ) )
+	};
+	// Commit only after validation and all result allocations succeed.
+	for ( const record of records ) record.mesh.geometry = record.geometry;
+	return result;
 
 }
 
@@ -663,4 +658,4 @@ function rebuildGeometry( record, charts, settings ) {
 
 }
 
-export { UVUnwrapper };
+export { unwrapUVs };
