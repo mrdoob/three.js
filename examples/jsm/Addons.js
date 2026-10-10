@@ -37,6 +37,7 @@ export * from './environments/RoomEnvironment.js';
 export * from './exporters/DRACOExporter.js';
 export * from './exporters/EXRExporter.js';
 export * from './exporters/GLTFExporter.js';
+export * from './exporters/GLTFLightMapExporterExtension.js';
 export * from './exporters/KTX2Exporter.js';
 export * from './exporters/OBJExporter.js';
 export * from './exporters/PLYExporter.js';
