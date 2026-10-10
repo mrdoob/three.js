@@ -6,34 +6,16 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="example.css">
 		<style>
-			#panel { position: absolute; top: 12px; left: 12px; width: 320px; padding: 12px; background: #18202de8; color: #fff; font: 13px monospace; }
-			#panel label { display: block; margin-bottom: 8px; }
-			#panel select, #panel button { font: inherit; }
-			#status { white-space: pre-wrap; line-height: 1.5; }
-			#atlas { width: 320px; height: 320px; background: #080c12; }
-			#panel a { color: #9cf; }
+			#status { position: absolute; bottom: 20px; left: 20px; color: white; white-space: pre-wrap; pointer-events: none; }
+			#atlas { position: absolute; bottom: 150px; left: 20px; width: 240px; height: 240px; background: #080c12; pointer-events: none; }
 		</style>
 	</head>
 	<body>
-		<div id="panel">
-			<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a> / native UV unwrap
-			<p>Unique scene atlas on uv1. Checker squares represent equal texel counts. Characters use their loaded bake pose.</p>
-			<label>Model <select id="model">
-				<option value="boxes">Scaled boxes</option>
-				<option value="DamagedHelmet/glTF/DamagedHelmet.gltf">Damaged Helmet</option>
-				<option value="Soldier.glb">Soldier</option>
-				<option value="Xbot.glb">Xbot</option>
-				<option value="LeePerrySmith/LeePerrySmith.glb">Lee Perry Smith</option>
-				<option value="space_ship_hallway.glb">Space ship hallway</option>
-			</select></label>
-			<label>Method <select id="mode"><option value="lightmap">Lightmap / projection</option><option value="normal">Normal bake / conformal</option></select></label>
-			<label>Atlas <select id="resolution"><option>1024</option><option selected>2048</option><option>4096</option></select></label>
-			<label><input id="checker" type="checkbox" checked> Show UV checker</label>
-			<label><input id="inputUV" type="checkbox"> Preserve valid authored UV islands</label>
-			<button id="unwrap">Unwrap again</button>
-			<p id="status">Loading renderer…</p>
-			<canvas id="atlas" width="512" height="512"></canvas>
+		<div id="info"><a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a> / native UV unwrap<br>
+			Density: green = target, yellow = 1.414x deviation, red = 2x or greater (either direction).
 		</div>
+		<p id="status">Loading renderer...</p>
+		<canvas id="atlas" width="512" height="512"></canvas>
 		<script type="importmap">
 			{
 				"imports": {
@@ -46,6 +28,8 @@
 		</script>
 		<script type="module">
 			import * as THREE from 'three/webgpu';
+			import { Fn, color, mix, positionWorld, uniform, uv } from 'three/tsl';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -56,6 +40,7 @@
 			scene.background = new THREE.Color( 0x303b4b );
 			const camera = new THREE.PerspectiveCamera( 45, innerWidth / innerHeight, 0.01, 10000 );
 			const renderer = new THREE.WebGPURenderer( { antialias: true } );
+			renderer.inspector = new Inspector();
 			renderer.setPixelRatio( devicePixelRatio );
 			renderer.setSize( innerWidth, innerHeight );
 			document.body.appendChild( renderer.domElement );
@@ -87,14 +72,65 @@
 			checkerTexture.channel = 1;
 			checkerTexture.colorSpace = THREE.SRGBColorSpace;
 			const previewMaterial = new THREE.MeshStandardMaterial( { map: checkerTexture, roughness: 0.8, side: THREE.DoubleSide } );
+			const atlasSize = uniform( 2048 );
+			const densityTarget = uniform( 1 );
+			const densityMaterial = new THREE.MeshBasicNodeMaterial( { side: THREE.DoubleSide, toneMapped: false } );
+			densityMaterial.colorNode = Fn( () => {
+
+				const dx = positionWorld.dFdx(), dy = positionWorld.dFdy();
+				const texel = uv( 1 ).mul( atlasSize );
+				const tx = texel.dFdx(), ty = texel.dFdy();
+				const normal = dx.cross( dy );
+				const areaSquared = normal.dot( normal ).max( 1e-30 );
+				const a = dy.cross( normal ).div( areaSquared );
+				const b = normal.cross( dx ).div( areaSquared );
+				const gradientU = a.mul( tx.x ).add( b.mul( ty.x ) );
+				const gradientV = a.mul( tx.y ).add( b.mul( ty.y ) );
+				// Singular values measure density along both principal surface directions.
+				const trace = gradientU.dot( gradientU ).add( gradientV.dot( gradientV ) );
+				const cross = gradientU.cross( gradientV );
+				const determinant = cross.dot( cross );
+				const largest = trace.add( trace.mul( trace ).sub( determinant.mul( 4 ) ).max( 0 ).sqrt() ).mul( 0.5 );
+				const smallest = determinant.div( largest.max( 1e-30 ) );
+				const ratio = largest.sqrt().div( densityTarget ).max( densityTarget.div( smallest.max( 1e-30 ).sqrt() ) ).max( 1 );
+				const deviation = ratio.log2().clamp( 0, 1 );
+				const green = color( '#28d45c' ), yellow = color( '#ffe030' ), red = color( '#ef3028' );
+				return mix( mix( green, yellow, deviation.mul( 2 ).clamp( 0, 1 ) ), red, deviation.mul( 2 ).sub( 1 ).clamp( 0, 1 ) );
+
+			} )();
+			const params = {
+				model: 'boxes', mode: 'lightmap', resolution: 2048, useInputUVs: false,
+				view: 'checker', referenceDensity: 0, showAtlas: true,
+				unwrap: unwrapAndReport
+			};
+			const gui = renderer.inspector.createParameters( 'UV unwrap' );
+			gui.add( params, 'model', {
+				'Scaled boxes': 'boxes', 'Damaged Helmet': 'DamagedHelmet/glTF/DamagedHelmet.gltf',
+				'Soldier': 'Soldier.glb', 'Xbot': 'Xbot.glb', 'Lee Perry Smith': 'LeePerrySmith/LeePerrySmith.glb',
+				'Space ship hallway': 'space_ship_hallway.glb'
+			} ).name( 'Model' ).listen().onChange( value => loadModel( value ).catch( reportError ) );
+			gui.add( params, 'mode', { 'Lightmap': 'lightmap', 'Normal bake': 'normal' } ).name( 'Method' ).listen().onChange( params.unwrap );
+			gui.add( params, 'resolution', [ 1024, 2048, 4096 ] ).name( 'Atlas size' ).listen().onChange( params.unwrap );
+			gui.add( params, 'useInputUVs' ).name( 'Preserve authored islands' ).listen().onChange( params.unwrap );
+			gui.add( params, 'unwrap' ).name( 'Unwrap again' );
+			gui.add( params, 'view', { 'UV checker': 'checker', 'Texel density': 'density', 'Original materials': 'original' } ).name( 'View' ).onChange( updateMaterials );
+			gui.add( params, 'referenceDensity' ).name( 'Target texels / unit' ).info( '0 uses the fitted atlas density. Both principal directions are compared with this target.' ).onChange( updateMaterials );
+			gui.add( params, 'showAtlas' ).name( 'Show atlas' ).onChange( updateAtlasVisibility );
 			const draco = new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' );
 			const loader = new GLTFLoader().setDRACOLoader( draco );
 			const unwrapper = new UVUnwrapper();
 			let root, originals = [], result, loadId = 0;
 
+			function updateAtlasVisibility() {
+
+				document.getElementById( 'atlas' ).hidden = ! params.showAtlas;
+
+			}
+
 			function updateMaterials() {
 
-				for ( const item of originals ) item.mesh.material = document.getElementById( 'checker' ).checked ? previewMaterial : item.material;
+				if ( result ) densityTarget.value = params.referenceDensity > 0 ? params.referenceDensity : result.texelsPerUnit;
+				for ( const item of originals ) item.mesh.material = params.view === 'checker' ? previewMaterial : params.view === 'density' ? densityMaterial : item.material;
 
 			}
 
@@ -112,10 +148,11 @@
 				try {
 
 					result = unwrapper.unwrap( root, {
-						mode: document.getElementById( 'mode' ).value,
-						useInputUVs: document.getElementById( 'inputUV' ).checked,
-						resolution: Number( document.getElementById( 'resolution' ).value )
+						mode: params.mode,
+						useInputUVs: params.useInputUVs,
+						resolution: Number( params.resolution )
 					} );
+					atlasSize.value = result.width;
 					const s = result.statistics;
 					status.textContent = `${ s.triangles.toLocaleString() } triangles / ${ s.charts } charts\n${ s.totalMilliseconds.toFixed( 1 ) } ms / ${ ( s.utilization * 100 ).toFixed( 1 ) }% triangle coverage\n${ result.texelsPerUnit.toFixed( 2 ) } texels/world unit\nLocal density ${ s.minTexelsPerUnit.toFixed( 2 ) }–${ s.maxTexelsPerUnit.toFixed( 2 ) }\nWorst stretch ${ s.maxStretch.toFixed( 3 ) }\n${ s.degenerateTriangles } degenerate triangles`;
 					window.unwrapExample.result = result;
@@ -166,7 +203,7 @@
 
 			async function loadModel( name ) {
 
-				document.getElementById( 'model' ).value = name;
+				params.model = name;
 				const id = ++ loadId;
 				status.textContent = 'Loading model…';
 				let loaded;
@@ -249,7 +286,21 @@
 
 			}
 
-			window.unwrapExample = { loadModel, unwrap, result: null };
+			window.unwrapExample = { loadModel, unwrap, params, result: null };
+			function unwrapAndReport() {
+
+				try {
+
+					unwrap();
+
+				} catch ( error ) {
+
+					reportError( error );
+
+				}
+
+			}
+
 			function reportError( error ) {
 
 				status.textContent = error.message;
@@ -257,26 +308,6 @@
 
 			}
 
-			document.getElementById( 'model' ).onchange = event => loadModel( event.target.value ).catch( reportError );
-			for ( const id of [ 'mode', 'resolution', 'inputUV', 'unwrap' ] ) {
-
-				document.getElementById( id )[ id === 'unwrap' ? 'onclick' : 'onchange' ] = () => {
-
-					try {
-
-						unwrap();
-
-					} catch ( error ) {
-
-						reportError( error );
-
-					}
-
-				};
-
-			}
-
-			document.getElementById( 'checker' ).onchange = updateMaterials;
 			window.addEventListener( 'resize', () => {
 
 				camera.aspect = innerWidth / innerHeight;
@@ -286,15 +317,16 @@
 			} );
 			renderer.init().then( () => {
 
-				renderer.setAnimationLoop( () => {
-
-					controls.update();
-					renderer.render( scene, camera );
-
-				} );
+				renderer.setAnimationLoop( animate );
 				return loadModel( 'boxes' );
 
 			} ).catch( reportError );
+			function animate() {
+
+				controls.update();
+				renderer.render( scene, camera );
+
+			}
 		</script>
 	</body>
 </html>

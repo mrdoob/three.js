@@ -49,8 +49,8 @@ try {
 
 			const sample = await page.evaluate( async ( model, mode ) => {
 
-				document.getElementById( 'mode' ).value = mode === 'lightmap' ? mode : 'normal';
-				document.getElementById( 'inputUV' ).checked = mode === 'normal-input';
+				window.unwrapExample.params.mode = mode === 'lightmap' ? mode : 'normal';
+				window.unwrapExample.params.useInputUVs = mode === 'normal-input';
 				const { auditAtlas } = await import( '/test/benchmarks/uv-unwrapper/validate.js' );
 				const first = await window.unwrapExample.loadModel( model );
 				const runs = [];
@@ -94,8 +94,8 @@ try {
 
 		const failure = await page.evaluate( async mode => {
 
-			document.getElementById( 'mode' ).value = mode;
-			document.getElementById( 'inputUV' ).checked = false;
+			window.unwrapExample.params.mode = mode;
+			window.unwrapExample.params.useInputUVs = false;
 			try {
 
 				await window.unwrapExample.loadModel( 'space_ship_hallway.glb' );
