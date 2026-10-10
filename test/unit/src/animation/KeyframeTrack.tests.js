@@ -1,6 +1,7 @@
 import { NumberKeyframeTrack } from '../../../../src/animation/tracks/NumberKeyframeTrack.js';
 
 import { KeyframeTrack } from '../../../../src/animation/KeyframeTrack.js';
+import { InterpolateBezier } from '../../../../src/constants.js';
 import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
 
 export default QUnit.module( 'Animation', () => {
@@ -43,6 +44,22 @@ export default QUnit.module( 'Animation', () => {
 		// PROPERTIES - PROTOTYPE
 
 		// PUBLIC
+
+		QUnit.test( 'shift', ( assert ) => {
+
+			const track = new NumberKeyframeTrack( '.material.opacity', [ 0, 1 ], [ 0, 1 ], InterpolateBezier );
+			track.settings = {
+				inTangents: new Float32Array( [ - 0.5, 0, 0.5, 1 ] ),
+				outTangents: new Float32Array( [ 0.5, 0, 1.5, 1 ] )
+			};
+
+			track.shift( 2 );
+
+			assert.smartEqual( Array.from( track.settings.inTangents ), [ 1.5, 0, 2.5, 1 ] );
+			assert.smartEqual( Array.from( track.settings.outTangents ), [ 2.5, 0, 3.5, 1 ] );
+			assert.strictEqual( track.createInterpolant().evaluate( 2.5 )[ 0 ], 0.5, 'Shifted curve keeps its shape.' );
+
+		} );
 
 		QUnit.test( 'validate', ( assert ) => {
 
