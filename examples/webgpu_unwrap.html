@@ -150,19 +150,17 @@
 					result = unwrapper.unwrap( root, {
 						mode: params.mode,
 						useInputUVs: params.useInputUVs,
-						resolution: Number( params.resolution )
+						resolution: Number( params.resolution ), diagnostics: true
 					} );
 					atlasSize.value = result.width;
-					const s = result.statistics;
+					const s = result.diagnostics.statistics;
 					status.textContent = `${ s.triangles.toLocaleString() } triangles / ${ s.charts } charts\n${ s.totalMilliseconds.toFixed( 1 ) } ms / ${ ( s.utilization * 100 ).toFixed( 1 ) }% triangle coverage\n${ result.texelsPerUnit.toFixed( 2 ) } texels/world unit\nLocal density ${ s.minTexelsPerUnit.toFixed( 2 ) }–${ s.maxTexelsPerUnit.toFixed( 2 ) }\nWorst stretch ${ s.maxStretch.toFixed( 3 ) }\n${ s.degenerateTriangles } degenerate triangles`;
-					window.unwrapExample.result = result;
 					drawAtlas();
 					updateMaterials();
 
 				} catch ( error ) {
 
 					result = null;
-					window.unwrapExample.result = null;
 					const canvas = document.getElementById( 'atlas' );
 					canvas.getContext( '2d' ).clearRect( 0, 0, canvas.width, canvas.height );
 					for ( const item of originals ) item.mesh.material = item.material;
@@ -177,13 +175,15 @@
 
 				const canvas = document.getElementById( 'atlas' ), context = canvas.getContext( '2d' );
 				context.clearRect( 0, 0, canvas.width, canvas.height );
-				for ( const chart of result.charts ) {
+				for ( const record of result.meshes ) {
 
-					const geometry = chart.mesh.geometry, uv = geometry.attributes.uv1, index = geometry.index;
-					context.fillStyle = `hsl(${ chart.index * 137.508 % 360 },65%,60%)`;
-					context.beginPath();
-					for ( const face of chart.faces ) {
+					const geometry = record.geometry, uv = geometry.attributes.uv1, index = geometry.index;
+					for ( let face = 0; face < record.faceCharts.length; face ++ ) {
 
+						const chart = record.faceCharts[ face ];
+						if ( chart < 0 ) continue;
+						context.fillStyle = `hsl(${ chart * 137.508 % 360 },65%,60%)`;
+						context.beginPath();
 						for ( let j = 0; j < 3; j ++ ) {
 
 							const v = index.getX( face * 3 + j ), x = uv.getX( v ) * canvas.width, y = ( 1 - uv.getY( v ) ) * canvas.height;
@@ -192,10 +192,9 @@
 						}
 
 						context.closePath();
+						context.fill();
 
 					}
-
-					context.fill();
 
 				}
 
@@ -286,7 +285,6 @@
 
 			}
 
-			window.unwrapExample = { loadModel, unwrap, params, result: null };
 			function unwrapAndReport() {
 
 				try {

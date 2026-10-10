@@ -42,10 +42,9 @@
     "> 1%, not dead, not ie 11, not op_mini all"
   ],
   "scripts": {
-		"test-uv-unwrapper": "node --test test/uv-unwrapper.test.js",
-		"benchmark-uv-unwrapper": "node test/benchmarks/uv-unwrapper.js",
+    "benchmark-uv-unwrapper": "node test/benchmarks/uv-unwrapper.js",
     "start": "npm run dev",
-		"test": "npm run lint && npm run test-unit && npm run test-unit-addons && npm run test-uv-unwrapper",
+		"test": "npm run lint && npm run test-unit && npm run test-unit-addons",
     "build": "rollup -c utils/build/rollup.config.js",
     "build-docs": "jsdoc -c utils/docs/jsdoc.config.json && npm run build-llms",
     "build-llms": "node utils/llms/build.js",

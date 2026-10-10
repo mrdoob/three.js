@@ -1,11 +1,10 @@
 import assert from 'node:assert/strict';
-import { mkdir, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import puppeteer from 'puppeteer';
 import { createServer } from '../../utils/server.js';
 
-// Browser CPU benchmarks and independent output audit, plus actual WebGPU
-// rendering. No software GPU results are accepted. Run from repository root.
+// Browser CPU benchmarks and independent output audit in a dedicated harness.
+// Run from repository root; generated results are local output.
 const server = createServer();
 let browser;
 const output = { date: new Date().toISOString(), cpu: os.cpus()[ 0 ].model, samples: [] };
@@ -39,9 +38,8 @@ try {
 	assert.doesNotMatch( JSON.stringify( output.gpu ), /swiftshader|llvmpipe|software|lavapipe/i );
 	assert.match( JSON.stringify( output.gpu ), /nvidia|amd|intel|apple|10de|1002|8086/i, 'Identify a real GPU before rendering' );
 	console.log( 'Hardware:', output.gpu );
-	await page.goto( `${ base }/examples/webgpu_unwrap.html` );
-	await page.waitForFunction( () => window.unwrapExample?.result, { timeout: 60000 } );
-	await mkdir( `${ directory }/screenshots`, { recursive: true } );
+	await page.goto( `${ base }/${ directory }/harness.html` );
+	await page.waitForFunction( () => window.unwrapHarness );
 
 	for ( const model of [ 'boxes', 'DamagedHelmet/glTF/DamagedHelmet.gltf', 'Soldier.glb', 'Xbot.glb', 'LeePerrySmith/LeePerrySmith.glb' ] ) {
 
@@ -49,24 +47,24 @@ try {
 
 			const sample = await page.evaluate( async ( model, mode ) => {
 
-				window.unwrapExample.params.mode = mode === 'lightmap' ? mode : 'normal';
-				window.unwrapExample.params.useInputUVs = mode === 'normal-input';
-				const { auditAtlas } = await import( '/test/benchmarks/uv-unwrapper/validate.js' );
-				const first = await window.unwrapExample.loadModel( model );
+				window.unwrapHarness.params.mode = mode === 'lightmap' ? mode : 'normal';
+				window.unwrapHarness.params.useInputUVs = mode === 'normal-input';
+				const { auditAtlas } = await import( '/test/unit/addons/utils/UVUnwrapperTestUtils.js' );
+				const first = await window.unwrapHarness.loadModel( model );
 				const runs = [];
 				for ( let i = 0; i < 3; i ++ ) {
 
-					window.unwrapExample.unwrap();
-					runs.push( window.unwrapExample.result.statistics.totalMilliseconds );
+					window.unwrapHarness.unwrap();
+					runs.push( window.unwrapHarness.result.diagnostics.statistics.totalMilliseconds );
 
 				}
 
-				const result = window.unwrapExample.result;
+				const result = window.unwrapHarness.result;
 				runs.sort( ( a, b ) => a - b );
 				return {
-					model, mode, coldMilliseconds: first.statistics.totalMilliseconds, medianMilliseconds: runs[ 1 ],
-					statistics: result.statistics, density: result.texelsPerUnit,
-					methods: result.charts.reduce( ( counts, chart ) => {
+					model, mode, coldMilliseconds: first.diagnostics.statistics.totalMilliseconds, medianMilliseconds: runs[ 1 ],
+					statistics: result.diagnostics.statistics, density: result.texelsPerUnit,
+					methods: result.diagnostics.charts.reduce( ( counts, chart ) => {
 
 						counts[ chart.method ] = ( counts[ chart.method ] || 0 ) + 1; return counts;
 
@@ -80,10 +78,9 @@ try {
 			assert.equal( sample.audit.overlaps, 0, `${ model }/${ mode } overlap` );
 			assert.equal( sample.audit.collapsed, 0, `${ model }/${ mode } collapsed` );
 			assert.equal( sample.audit.paddingViolations, 0 );
+			assert.ok( Math.abs( sample.statistics.minTexelsPerUnit - sample.audit.minDensity ) < 1e-6 );
+			assert.ok( Math.abs( sample.statistics.maxTexelsPerUnit - sample.audit.maxDensity ) < 1e-6 );
 			assert.ok( sample.audit.maxStretch <= ( mode === 'lightmap' ? 1.5 : 2 ) + 0.01 );
-			// Give the render loop two frames after the synchronous CPU work.
-			await page.evaluate( () => new Promise( resolve => requestAnimationFrame( () => requestAnimationFrame( resolve ) ) ) );
-			if ( mode === 'normal' ) await page.screenshot( { path: `${ directory }/screenshots/${ model.split( '/' )[ 0 ].replace( '.glb', '' ) }.png` } );
 
 		}
 
@@ -94,11 +91,11 @@ try {
 
 		const failure = await page.evaluate( async mode => {
 
-			window.unwrapExample.params.mode = mode;
-			window.unwrapExample.params.useInputUVs = false;
+			window.unwrapHarness.params.mode = mode;
+			window.unwrapHarness.params.useInputUVs = false;
 			try {
 
-				await window.unwrapExample.loadModel( 'space_ship_hallway.glb' );
+				await window.unwrapHarness.loadModel( 'space_ship_hallway.glb' );
 				return null;
 
 			} catch ( error ) {
@@ -118,7 +115,7 @@ try {
 
 		const THREE = await import( 'three' );
 		const { UVUnwrapper } = await import( '/examples/jsm/utils/UVUnwrapper.js' );
-		const { auditAtlas } = await import( '/test/benchmarks/uv-unwrapper/validate.js' );
+		const { auditAtlas } = await import( '/test/unit/addons/utils/UVUnwrapperTestUtils.js' );
 		const samples = [];
 		for ( const segments of [ 32, 64, 128, 256 ] ) {
 
@@ -129,13 +126,13 @@ try {
 				for ( let i = 0; i < 3; i ++ ) {
 
 					const mesh = new THREE.Mesh( new THREE.SphereGeometry( 1, segments, segments / 2 ) );
-					result = new UVUnwrapper().unwrap( mesh, { mode, resolution: 2048 } );
-					times.push( result.statistics.totalMilliseconds );
+					result = new UVUnwrapper().unwrap( mesh, { mode, resolution: 2048, diagnostics: true } );
+					times.push( result.diagnostics.statistics.totalMilliseconds );
 
 				}
 
 				times.sort( ( a, b ) => a - b );
-				samples.push( { segments, mode, medianMilliseconds: times[ 1 ], statistics: result.statistics, audit: auditAtlas( result ) } );
+				samples.push( { segments, mode, medianMilliseconds: times[ 1 ], statistics: result.diagnostics.statistics, audit: auditAtlas( result ) } );
 
 			}
 
@@ -157,7 +154,7 @@ try {
 
 		const THREE = await import( 'three' );
 		const { UVUnwrapper } = await import( '/examples/jsm/utils/UVUnwrapper.js' );
-		const { auditAtlas } = await import( '/test/benchmarks/uv-unwrapper/validate.js' );
+		const { auditAtlas } = await import( '/test/unit/addons/utils/UVUnwrapperTestUtils.js' );
 		const samples = [];
 		for ( const count of [ 100, 1000, 10000 ] ) {
 
@@ -177,13 +174,13 @@ try {
 			for ( let i = 0; i < 3; i ++ ) {
 
 				for ( const mesh of root.children ) mesh.geometry = geometry;
-				result = new UVUnwrapper().unwrap( root, { resolution: 4096 } );
-				times.push( result.statistics.totalMilliseconds );
+				result = new UVUnwrapper().unwrap( root, { resolution: 4096, diagnostics: true } );
+				times.push( result.diagnostics.statistics.totalMilliseconds );
 
 			}
 
 			times.sort( ( a, b ) => a - b );
-			samples.push( { meshes: count, medianMilliseconds: times[ 1 ], statistics: result.statistics, audit: auditAtlas( result ) } );
+			samples.push( { meshes: count, medianMilliseconds: times[ 1 ], statistics: result.diagnostics.statistics, audit: auditAtlas( result ) } );
 
 		}
 
@@ -201,8 +198,7 @@ try {
 
 	assert.deepEqual( errors, [], 'No browser/runtime errors' );
 	output.browser = await browser.version();
-	await writeFile( `${ directory }/results.json`, JSON.stringify( output, null, 2 ) + '\n' );
-	console.log( `Results: ${ directory }/results.json` );
+	console.log( JSON.stringify( output ) );
 
 } finally {
 

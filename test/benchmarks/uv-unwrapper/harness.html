@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>UV unwrap benchmark harness</title></head>
+<body>
+<script type="importmap">
+{"imports":{"three":"../../../src/Three.js","three/addons/":"../../../examples/jsm/"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+import { UVUnwrapper } from 'three/addons/utils/UVUnwrapper.js';
+const loader = new GLTFLoader().setDRACOLoader( new DRACOLoader().setDecoderPath( '/examples/jsm/libs/draco/gltf/' ) );
+const unwrapper = new UVUnwrapper();
+let root, originals = [];
+const params = { mode: 'lightmap', useInputUVs: false };
+function unwrap() {
+
+	for ( const record of originals ) record.mesh.geometry = record.geometry;
+	const result = unwrapper.unwrap( root, { ...params, resolution: 2048, diagnostics: true } );
+	window.unwrapHarness.result = result;
+	return result;
+
+}
+
+async function loadModel( name ) {
+
+	if ( root ) {
+
+		for ( const record of originals ) record.mesh.geometry = record.geometry;
+		root.traverse( mesh => {
+
+			if ( ! mesh.isMesh ) return;
+			mesh.geometry.dispose();
+			for ( const material of [].concat( mesh.material ) ) {
+
+				for ( const value of Object.values( material ) ) if ( value && value.isTexture ) value.dispose();
+				material.dispose();
+
+			}
+
+		} );
+
+	}
+
+	if ( name === 'boxes' ) {
+
+		root = new THREE.Group();
+		const geometry = new THREE.BoxGeometry();
+		for ( let i = 0; i < 8; i ++ ) {
+
+			const mesh = new THREE.Mesh( geometry );
+			mesh.position.set( i % 4 * 1.8, 0, Math.floor( i / 4 ) * 2 );
+			mesh.scale.set( 0.5 + i * 0.1, 0.7 + i * 0.2, 1 );
+			mesh.rotation.y = i * 0.3;
+			root.add( mesh );
+
+		}
+
+	} else {
+
+		root = ( await loader.loadAsync( `/examples/models/gltf/${ name }` ) ).scene;
+
+	}
+
+	originals = [];
+	root.traverse( mesh => {
+
+		if ( mesh.isMesh ) originals.push( { mesh, geometry: mesh.geometry } );
+
+	} );
+	return unwrap();
+
+}
+
+window.unwrapHarness = { params, loadModel, unwrap, result: null };
+</script>
+</body>
+</html>

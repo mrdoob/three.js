@@ -1,4 +1,4 @@
-import { BufferAttribute, Float16BufferAttribute, Float32BufferAttribute, Vector3 } from 'three';
+import { BufferAttribute, BufferGeometry, Float16BufferAttribute, Float32BufferAttribute, Vector3 } from 'three';
 import { potpack } from '../libs/potpack.module.js';
 
 /**
@@ -6,6 +6,9 @@ import { potpack } from '../libs/potpack.module.js';
  * Geometry is measured in world space, cloned per mesh, and replaced atomically.
  * Skinning and morphs are measured in their current pose without changing the
  * underlying position data. Supply the intended bake pose for character maps.
+ * Input must use finite CPU-readable per-vertex attributes and complete triangles.
+ * Attributes must match the position count; groups must contain complete triangles.
+ * Options must be finite and in their documented ranges.
  * Instanced and batched meshes must first be expanded into ordinary meshes.
  *
  * @three_import import { UVUnwrapper } from 'three/addons/utils/UVUnwrapper.js';
@@ -17,19 +20,22 @@ class UVUnwrapper {
 	 * @param {Object} [options] - Atlas and chart options.
 	 * @param {string} [options.attribute='uv1'] - Output attribute: uv, uv1, uv2, uv3.
 	 * @param {string} [options.mode='lightmap'] - 'lightmap' or 'normal'. Normal tries LSCM.
-	 * @param {number} [options.resolution=1024] - Square atlas size in pixels.
-	 * @param {number} [options.padding=4] - Gutter on each side of every chart, in pixels.
-	 * @param {number} [options.texelsPerUnit=0] - Common world density; zero fits the atlas.
-	 * @param {number} [options.maxStretch] - Maximum triangle singular-value ratio.
-	 * @param {number} [options.maxAreaRatio=2] - Maximum local area deviation from chart mean.
-	 * @param {number} [options.maxChartFaces=2048] - Bounds chart validation/solver work.
+	 * @param {number} [options.resolution=1024] - Square atlas size in pixels, integer >= 4.
+	 * @param {number} [options.padding=4] - Nonnegative gutter in pixels; 2 * padding + 1 must be less than resolution.
+	 * @param {number} [options.texelsPerUnit=0] - Common world density; zero fits the atlas. Must be nonnegative.
+	 * @param {number} [options.maxStretch] - Maximum triangle singular-value ratio, >= 1.
+	 * @param {number} [options.maxAreaRatio=2] - Maximum local area deviation from chart mean, >= 1.
+	 * @param {number} [options.maxChartFaces=2048] - Positive integer bounding chart validation/solver work.
 	 * @param {boolean} [options.respectUVSeams] - Cut discontinuities in existing uv (normal default).
 	 * @param {boolean} [options.useInputUVs=false] - Preserve valid authored UV charts before trying LSCM.
-	 * @return {Object} Atlas, chart and mesh records, remapping, quality and timing.
+	 * @param {boolean} [options.diagnostics=false] - Include chart methods, quality and timings in result.diagnostics.
+	 * @return {Object} Atlas dimensions, density, chart bounds and mesh vertex/face mappings.
+	 * @throws {Error} If packing or output precision cannot produce a valid atlas. Mesh
+	 * geometries remain unchanged on failure; invalid input is outside this contract.
 	 */
 	unwrap( root, options = {} ) {
 
-		const start = performance.now();
+		const start = options.diagnostics ? performance.now() : 0;
 		const settings = {
 			attribute: 'uv1', mode: 'lightmap', resolution: 1024, padding: 4,
 			texelsPerUnit: 0, maxAreaRatio: 2, maxChartFaces: 2048,
@@ -38,14 +44,12 @@ class UVUnwrapper {
 		};
 		settings.maxStretch ??= settings.mode === 'normal' ? 2 : 1.5;
 		settings.respectUVSeams ??= settings.mode === 'normal';
-		validateOptions( root, settings );
 		root.updateWorldMatrix( true, true );
 
 		const records = [];
 		root.traverse( mesh => {
 
 			if ( ! mesh.isMesh ) return;
-			if ( mesh.isInstancedMesh || mesh.isBatchedMesh ) throw new Error( 'UVUnwrapper: expand instanced/batched meshes first.' );
 			records.push( readMesh( mesh, settings ) );
 
 		} );
@@ -61,76 +65,58 @@ class UVUnwrapper {
 
 		}
 
-		const chartTime = performance.now();
+		const chartTime = options.diagnostics ? performance.now() : 0;
 		const density = packCharts( charts, settings );
 		for ( const chart of charts ) validateFloat32Chart( chart, settings, density );
-		const packTime = performance.now();
+		const packTime = options.diagnostics ? performance.now() : 0;
 		let worldArea = 0, uvArea = 0, maxStretch = 1, minDensity = Infinity, maxDensity = 0;
 		for ( let i = 0; i < charts.length; i ++ ) {
 
 			const chart = charts[ i ];
-			chart.index = i;
-			worldArea += chart.worldArea;
-			uvArea += chart.outputArea;
-			maxStretch = Math.max( maxStretch, chart.maxStretch );
-			minDensity = Math.min( minDensity, chart.minDensity * density );
-			maxDensity = Math.max( maxDensity, chart.maxDensity * density );
-			chart.record.charts.push( chart );
+			if ( options.diagnostics ) {
+
+				worldArea += chart.worldArea;
+				uvArea += chart.outputArea;
+				maxStretch = Math.max( maxStretch, chart.maxStretch );
+				minDensity = Math.min( minDensity, chart.minDensity );
+				maxDensity = Math.max( maxDensity, chart.maxDensity );
+
+			}
+
 			for ( const face of chart.faces ) chart.record.faceCharts[ face ] = i;
 
 		}
 
 		for ( const record of records ) rebuildGeometry( record, charts, settings );
-		// No mesh geometry is changed until all validation and output allocation succeed.
-		for ( const record of records ) record.mesh.geometry = record.geometry;
-
-		return {
+		const result = {
 			attribute: settings.attribute, channel: [ 'uv', 'uv1', 'uv2', 'uv3' ].indexOf( settings.attribute ),
 			width: settings.resolution, height: settings.resolution, padding: settings.padding,
-			texelsPerUnit: density, charts: charts.map( chart => ( {
-				index: chart.index, mesh: chart.record.mesh, faces: Uint32Array.from( chart.faces ),
-				method: chart.method, x: chart.box.x, y: chart.box.y, width: chart.box.w, height: chart.box.h,
-				worldArea: chart.worldArea, maxStretch: chart.maxStretch
-			} ) ),
+			texelsPerUnit: density,
+			charts: charts.map( chart => ( { x: chart.box.x, y: chart.box.y, width: chart.box.w, height: chart.box.h } ) ),
 			meshes: records.map( record => ( {
 				mesh: record.mesh, originalGeometry: record.original, geometry: record.geometry,
 				sourceVertices: record.sourceVertices, faceCharts: record.faceCharts
-			} ) ),
-			statistics: {
-				triangles: records.reduce( ( sum, record ) => sum + record.faces.length, 0 ),
-				degenerateTriangles: records.reduce( ( sum, record ) => sum + record.degenerate, 0 ),
-				charts: charts.length, worldArea, utilization: uvArea, maxStretch,
-				minTexelsPerUnit: charts.length ? minDensity : 0, maxTexelsPerUnit: maxDensity,
-				chartMilliseconds: chartTime - start, packMilliseconds: packTime - chartTime,
-				totalMilliseconds: performance.now() - start
-			}
+			} ) )
 		};
+		if ( options.diagnostics ) {
 
-	}
+			result.diagnostics = {
+				charts: charts.map( chart => ( { method: chart.method, worldArea: chart.worldArea, maxStretch: chart.maxStretch } ) ),
+				statistics: {
+					triangles: records.reduce( ( sum, record ) => sum + record.faces.length, 0 ),
+					degenerateTriangles: records.reduce( ( sum, record ) => sum + record.degenerate, 0 ),
+					charts: charts.length, worldArea, utilization: uvArea, maxStretch,
+					minTexelsPerUnit: charts.length ? minDensity : 0, maxTexelsPerUnit: maxDensity,
+					chartMilliseconds: chartTime - start, packMilliseconds: packTime - chartTime,
+					totalMilliseconds: performance.now() - start
+				}
+			};
 
-}
+		}
 
-function validateOptions( root, options ) {
-
-	if ( ! root || ! root.isObject3D ) throw new Error( 'UVUnwrapper: expected an Object3D.' );
-	if ( ! [ 'uv', 'uv1', 'uv2', 'uv3' ].includes( options.attribute ) || ! [ 'lightmap', 'normal' ].includes( options.mode ) ) {
-
-		throw new Error( 'UVUnwrapper: invalid attribute or mode.' );
-
-	}
-
-	for ( const key of [ 'resolution', 'padding', 'texelsPerUnit', 'maxStretch', 'maxAreaRatio', 'maxChartFaces' ] ) {
-
-		if ( ! Number.isFinite( options[ key ] ) ) throw new Error( `UVUnwrapper: invalid ${ key }.` );
-
-	}
-
-	if ( ! Number.isInteger( options.resolution ) || options.resolution < 4 || options.padding < 0 ||
-		options.padding * 2 + 1 >= options.resolution || options.texelsPerUnit < 0 ||
-		options.maxStretch < 1 || options.maxAreaRatio < 1 ||
-		! Number.isInteger( options.maxChartFaces ) || options.maxChartFaces < 1 ) {
-
-		throw new Error( 'UVUnwrapper: options out of range.' );
+		// Commit only after validation and all result allocations succeed.
+		for ( const record of records ) record.mesh.geometry = record.geometry;
+		return result;
 
 	}
 
@@ -146,22 +132,8 @@ function readMesh( mesh, settings ) {
 	}
 
 	const geometry = mesh.geometry, position = geometry.getAttribute( 'position' );
-	if ( ! position || position.itemSize !== 3 || position.count === 0 ) throw new Error( 'UVUnwrapper: position must have three components.' );
-	const attributes = [ ...Object.values( geometry.attributes ), ...Object.values( geometry.morphAttributes ).flat() ];
-	for ( const attribute of attributes ) {
-
-		if ( attribute.isGLBufferAttribute || attribute.isInstancedBufferAttribute || attribute.count !== position.count ||
-			! ( attribute.array || attribute.data && attribute.data.array ) ) {
-
-			throw new Error( 'UVUnwrapper: attributes must be CPU-readable, per-vertex, and match position count.' );
-
-		}
-
-	}
-
 	const index = geometry.index;
 	const count = index ? index.count : position.count;
-	if ( count % 3 !== 0 ) throw new Error( 'UVUnwrapper: expected triangle geometry.' );
 	const points = [], welds = [], unique = new Map();
 	for ( let i = 0; i < position.count; i ++ ) {
 
@@ -171,19 +143,12 @@ function readMesh( mesh, settings ) {
 		if ( ! unique.has( key ) ) unique.set( key, unique.size );
 		welds.push( unique.get( key ) );
 		p.applyMatrix4( mesh.matrixWorld );
-		if ( ! Number.isFinite( p.x + p.y + p.z ) ) throw new Error( 'UVUnwrapper: nonfinite world positions.' );
 		points.push( p );
 
 	}
 
 	const materials = new Int32Array( count / 3 );
 	for ( const group of geometry.groups ) {
-
-		if ( group.start % 3 !== 0 || group.count % 3 !== 0 || group.start < 0 || group.start + group.count > count ) {
-
-			throw new Error( 'UVUnwrapper: groups must contain complete, in-range triangles.' );
-
-		}
 
 		materials.fill( group.materialIndex, group.start / 3, ( group.start + group.count ) / 3 );
 
@@ -194,11 +159,9 @@ function readMesh( mesh, settings ) {
 	for ( let offset = 0; offset < count; offset += 3 ) {
 
 		const vertices = [ 0, 1, 2 ].map( j => index ? index.getX( offset + j ) : offset + j );
-		if ( vertices.some( v => ! Number.isInteger( v ) || v < 0 || v >= position.count ) ) throw new Error( 'UVUnwrapper: index out of range.' );
 		const normal = new Vector3().subVectors( points[ vertices[ 1 ] ], points[ vertices[ 0 ] ] );
 		normal.cross( new Vector3().subVectors( points[ vertices[ 2 ] ], points[ vertices[ 0 ] ] ) );
 		const area = normal.length() * 0.5;
-		if ( ! Number.isFinite( area ) ) throw new Error( 'UVUnwrapper: nonfinite triangle area.' );
 		const face = { vertices, welds: vertices.map( v => welds[ v ] ), normal: normal.normalize(), area, neighbors: [] };
 		const f = faces.length;
 		faces.push( face );
@@ -220,17 +183,6 @@ function readMesh( mesh, settings ) {
 	}
 
 	const uv = geometry.getAttribute( 'uv' );
-	if ( uv && ( settings.respectUVSeams || settings.useInputUVs ) ) {
-
-		if ( uv.itemSize !== 2 ) throw new Error( 'UVUnwrapper: input uv must have two components.' );
-		for ( let i = 0; i < uv.count; i ++ ) {
-
-			if ( ! Number.isFinite( uv.getX( i ) + uv.getY( i ) ) ) throw new Error( 'UVUnwrapper: nonfinite input uv.' );
-
-		}
-
-	}
-
 	for ( const edge of edges.values() ) {
 
 		if ( edge.length !== 2 ) continue; // Nonmanifold edges are seams.
@@ -251,7 +203,7 @@ function readMesh( mesh, settings ) {
 	// UV discontinuities can be cuts inside a connected chart (e.g. a slit
 	// cylinder). Keep the two coincident seam endpoints distinct in the solver.
 	const vertexKeys = welds.map( ( weld, i ) => uv && ( settings.respectUVSeams || settings.useInputUVs ) ? `${ weld },${ uv.getX( i ) },${ uv.getY( i ) }` : weld );
-	return { mesh, original: geometry, points, faces, vertexKeys, degenerate, charts: [], faceCharts: new Int32Array( faces.length ).fill( - 1 ) };
+	return { mesh, original: geometry, points, faces, vertexKeys, degenerate, faceCharts: new Int32Array( faces.length ).fill( - 1 ) };
 
 }
 
@@ -701,7 +653,7 @@ function packCharts( charts, settings ) {
 			h: Math.max( 1, Math.ceil( chart.height * density + border * 2 ) )
 		} ) );
 		const result = potpack( boxes );
-		if ( result.w > settings.resolution || result.h > settings.resolution ) return null;
+		if ( result.w > settings.resolution || result.h > settings.resolution ) return packShelves( boxes, settings.resolution );
 		return boxes;
 
 	}
@@ -710,7 +662,7 @@ function packCharts( charts, settings ) {
 	if ( density > 0 ) {
 
 		boxes = pack( density );
-		if ( ! boxes ) throw new Error( 'UVUnwrapper: requested texelsPerUnit does not fit; increase resolution or partition the hierarchy.' );
+		if ( ! boxes ) throw new Error( 'UVUnwrapper: no packing found for requested texelsPerUnit; increase resolution or partition the hierarchy.' );
 
 	} else {
 
@@ -742,6 +694,40 @@ function packCharts( charts, settings ) {
 
 }
 
+// A fixed-width fallback avoids potpack's unconstrained container-width heuristic.
+function packShelves( boxes, resolution ) {
+
+	const shelves = [];
+	let height = 0;
+	for ( const box of boxes ) {
+
+		if ( box.w > resolution || box.h > resolution ) return null;
+		let best = null;
+		for ( const shelf of shelves ) {
+
+			if ( shelf.h >= box.h && shelf.x + box.w <= resolution && ( best === null || shelf.x > best.x ) ) best = shelf;
+
+		}
+
+		if ( best === null ) {
+
+			if ( height + box.h > resolution ) return null;
+			best = { x: 0, y: height, h: box.h };
+			shelves.push( best );
+			height += box.h;
+
+		}
+
+		box.x = best.x;
+		box.y = best.y;
+		best.x += box.w;
+
+	}
+
+	return boxes;
+
+}
+
 function validateFloat32Chart( chart, settings, density ) {
 
 	const border = settings.padding + 0.5;
@@ -757,8 +743,8 @@ function validateFloat32Chart( chart, settings, density ) {
 	if ( ! quality ) throw new Error( `UVUnwrapper: Float32 atlas precision is insufficient for mesh "${ chart.record.mesh.name }"; repair sliver triangles or partition the hierarchy.` );
 	chart.outputArea = quality.area;
 	chart.maxStretch = quality.maxStretch;
-	chart.minDensity = quality.minDensity;
-	chart.maxDensity = quality.maxDensity;
+	chart.minDensity = quality.minDensity * Math.sqrt( quality.area / chart.worldArea ) * settings.resolution;
+	chart.maxDensity = quality.maxDensity * Math.sqrt( quality.area / chart.worldArea ) * settings.resolution;
 
 }
 
@@ -786,7 +772,7 @@ function rebuildGeometry( record, charts, settings ) {
 
 	}
 
-	const geometry = original.clone();
+	const geometry = new BufferGeometry().copy( original );
 	for ( const name of Object.keys( original.attributes ) ) geometry.setAttribute( name, remapAttribute( original.attributes[ name ], source ) );
 	for ( const name of Object.keys( original.morphAttributes ) ) {
 
