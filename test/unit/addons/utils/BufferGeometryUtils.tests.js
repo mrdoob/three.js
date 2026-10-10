@@ -70,6 +70,8 @@ export default QUnit.module( 'Addons', () => {
 				assert.strictEqual( p.data.usage, DynamicDrawUsage );
 				assert.deepEqual( Array.from( p.data.array ), [ 4, 5, 6, 1, 2, 3, 4, 5, 6 ] );
 				assert.strictEqual( w.getX( 2 ), 6 );
+				assert.false( 'gpuType' in p, 'interleaved attributes do not acquire gpuType' );
+				assert.false( 'gpuType' in w, 'shared interleaved attributes do not acquire gpuType' );
 
 			} );
 
