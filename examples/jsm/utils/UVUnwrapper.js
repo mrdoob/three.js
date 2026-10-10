@@ -1,4 +1,5 @@
-import { Box2, BufferAttribute, BufferGeometry, Float16BufferAttribute, Float32BufferAttribute, Vector2, Vector3 } from 'three';
+import { Box2, BufferGeometry, Float32BufferAttribute, Vector2, Vector3 } from 'three';
+import { remapAttribute } from './BufferGeometryUtils.js';
 import { potpack } from '../libs/potpack.module.js';
 
 /**
@@ -774,11 +775,11 @@ function rebuildGeometry( record, charts, settings ) {
 
 	}
 
-	const geometry = new BufferGeometry().copy( original );
-	for ( const name of Object.keys( original.attributes ) ) geometry.setAttribute( name, remapAttribute( original.attributes[ name ], source ) );
+	const geometry = new BufferGeometry().copy( original ), buffers = new Map();
+	for ( const name of Object.keys( original.attributes ) ) geometry.setAttribute( name, remapAttribute( original.attributes[ name ], source, buffers ) );
 	for ( const name of Object.keys( original.morphAttributes ) ) {
 
-		geometry.morphAttributes[ name ] = original.morphAttributes[ name ].map( attribute => remapAttribute( attribute, source ) );
+		geometry.morphAttributes[ name ] = original.morphAttributes[ name ].map( attribute => remapAttribute( attribute, source, buffers ) );
 
 	}
 
@@ -787,28 +788,6 @@ function rebuildGeometry( record, charts, settings ) {
 	if ( settings.attribute === 'uv' ) geometry.deleteAttribute( 'tangent' );
 	record.geometry = geometry;
 	record.sourceVertices = Uint32Array.from( source );
-
-}
-
-function remapAttribute( attribute, source ) {
-
-	const interleaved = attribute.isInterleavedBufferAttribute;
-	const input = interleaved ? attribute.data.array : attribute.array;
-	const stride = interleaved ? attribute.data.stride : attribute.itemSize;
-	const offset = interleaved ? attribute.offset : 0;
-	const output = new input.constructor( source.length * attribute.itemSize );
-	for ( let i = 0; i < source.length; i ++ ) {
-
-		for ( let j = 0; j < attribute.itemSize; j ++ ) output[ i * attribute.itemSize + j ] = input[ source[ i ] * stride + offset + j ];
-
-	}
-
-	const Attribute = attribute.isFloat16BufferAttribute ? Float16BufferAttribute : BufferAttribute;
-	const result = new Attribute( output, attribute.itemSize, attribute.normalized );
-	result.name = attribute.name;
-	result.setUsage( interleaved ? attribute.data.usage : attribute.usage );
-	result.gpuType = attribute.gpuType;
-	return result;
 
 }
 
