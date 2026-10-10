@@ -14,7 +14,7 @@ function auditAtlas( result ) {
 	let worldArea = 0, uvArea = 0, paddingViolations = 0, collapsed = 0;
 	for ( const record of result.meshes ) {
 
-		const geometry = record.geometry, uv = geometry.attributes[ result.attribute ];
+		const geometry = record.mesh.geometry, uv = geometry.attributes[ result.attribute ];
 		const index = geometry.index;
 		for ( let f = 0; f < index.count / 3; f ++ ) {
 
@@ -41,13 +41,13 @@ function auditAtlas( result ) {
 			const difference = ux * ux + vx * vx - uy * uy - vy * vy, product = ux * uy + vx * vy;
 			const delta = Math.sqrt( difference * difference + 4 * product * product );
 			stretches.push( ( trace + delta ) / 2 / ( det / cross ) );
-			densities.push( Math.sqrt( det / cross ) * result.width );
+			densities.push( Math.sqrt( det / cross ) * result.resolution );
 			worldArea += cross / 2;
 			uvArea += det / 2;
 			const chart = result.charts[ record.faceCharts[ f ] ];
 			for ( const v of p ) {
 
-				const px = v[ 0 ] * result.width, py = v[ 1 ] * result.height;
+				const px = v[ 0 ] * result.resolution, py = v[ 1 ] * result.resolution;
 				if ( px < chart.x + result.padding - 1e-4 || py < chart.y + result.padding - 1e-4 ||
 					px > chart.x + chart.width - result.padding + 1e-4 || py > chart.y + chart.height - result.padding + 1e-4 ) paddingViolations ++;
 
@@ -182,12 +182,12 @@ export default QUnit.module( 'Addons', () => {
 				const result = unwrap( root );
 				verify( assert, result );
 				assert.strictEqual( result.meshes.length, 3 );
-				assert.strictEqual( new Set( result.meshes.map( r => r.geometry ) ).size, 3 );
+				assert.strictEqual( new Set( result.meshes.map( r => r.mesh.geometry ) ).size, 3 );
 				assert.strictEqual( geometry.getAttribute( 'uv1' ), undefined );
 				for ( const record of result.meshes ) {
 
-					assert.notStrictEqual( record.geometry, geometry );
-					assert.deepEqual( record.geometry.groups, geometry.groups );
+					assert.notStrictEqual( record.mesh.geometry, geometry );
+					assert.deepEqual( record.mesh.geometry.groups, geometry.groups );
 
 				}
 
@@ -207,7 +207,6 @@ export default QUnit.module( 'Addons', () => {
 				const result = unwrap( root, { resolution: 512, texelsPerUnit: 16 } );
 				const audit = verify( assert, result );
 				assert.ok( Math.abs( audit.minDensity - 16 ) < 0.0001 && Math.abs( audit.maxDensity - 16 ) < 0.0001 );
-				assert.strictEqual( result.channel, 1 );
 
 			} );
 
@@ -250,7 +249,7 @@ export default QUnit.module( 'Addons', () => {
 				const record = result.meshes[ 0 ];
 				for ( const [ name, original ] of Object.entries( geometry.attributes ) ) {
 
-					const output = record.geometry.attributes[ name ];
+					const output = record.mesh.geometry.attributes[ name ];
 					assert.strictEqual( output.normalized, original.normalized );
 					for ( let i = 0; i < output.count; i ++ ) {
 
@@ -260,12 +259,12 @@ export default QUnit.module( 'Addons', () => {
 
 				}
 
-				const morph = record.geometry.morphAttributes.position[ 0 ];
+				const morph = record.mesh.geometry.morphAttributes.position[ 0 ];
 				for ( let i = 0; i < morph.count; i ++ ) assert.strictEqual( morph.getX( i ), geometry.morphAttributes.position[ 0 ].getX( record.sourceVertices[ i ] ) );
-				assert.strictEqual( record.geometry.morphTargetsRelative, true );
-				assert.deepEqual( record.geometry.drawRange, geometry.drawRange );
-				assert.notStrictEqual( record.geometry.attributes.uv.array, geometry.attributes.uv.array );
-				assert.strictEqual( unwrap( record.mesh, { attribute: 'uv' } ).meshes[ 0 ].geometry.attributes.tangent, undefined );
+				assert.strictEqual( record.mesh.geometry.morphTargetsRelative, true );
+				assert.deepEqual( record.mesh.geometry.drawRange, geometry.drawRange );
+				assert.notStrictEqual( record.mesh.geometry.attributes.uv.array, geometry.attributes.uv.array );
+				assert.strictEqual( unwrap( record.mesh, { attribute: 'uv' } ).meshes[ 0 ].mesh.geometry.attributes.tangent, undefined );
 
 			} );
 
@@ -310,7 +309,7 @@ export default QUnit.module( 'Addons', () => {
 				const result = unwrap( new Mesh( geometry ) );
 				verify( assert, result );
 				assert.strictEqual( result.meshes[ 0 ].faceCharts.filter( chart => chart === - 1 ).length, 1 );
-				assert.strictEqual( result.meshes[ 0 ].geometry.index.count, 12 );
+				assert.strictEqual( result.meshes[ 0 ].mesh.geometry.index.count, 12 );
 				assert.strictEqual( result.meshes[ 0 ].faceCharts[ 3 ], - 1 );
 				const empty = unwrap( new Group() );
 				assert.strictEqual( empty.charts.length, 0 );
@@ -324,17 +323,17 @@ export default QUnit.module( 'Addons', () => {
 				const sizes = new Map();
 				for ( const chart of results[ 0 ].meshes[ 0 ].faceCharts ) sizes.set( chart, ( sizes.get( chart ) || 0 ) + 1 );
 				assert.ok( Array.from( sizes.values() ).every( count => count <= 2048 ) );
-				assert.deepEqual( results[ 0 ].meshes[ 0 ].geometry.attributes.uv1.array, results[ 1 ].meshes[ 0 ].geometry.attributes.uv1.array );
+				assert.deepEqual( results[ 0 ].meshes[ 0 ].mesh.geometry.attributes.uv1.array, results[ 1 ].meshes[ 0 ].mesh.geometry.attributes.uv1.array );
 
 			} );
 
 			QUnit.test( 'authored cylinder seams remain distinct and valid islands retain their shape', assert => {
 
 				const mesh = new Mesh( new CylinderGeometry( 1, 1, 6.4, 32, 1, true ) );
+				const original = mesh.geometry.attributes.uv;
 				const result = unwrap( mesh, { mode: 'normal', useInputUVs: true } );
 				verify( assert, result, 2 );
 				assert.strictEqual( result.charts.length, 1, 'The slit cylinder stays one connected island' );
-				const original = result.meshes[ 0 ].originalGeometry.attributes.uv;
 				for ( let i = 0; i < mesh.geometry.attributes.uv.count; i ++ ) {
 
 					const source = result.meshes[ 0 ].sourceVertices[ i ];
@@ -361,10 +360,10 @@ export default QUnit.module( 'Addons', () => {
 					const result = unwrap( root, { mode } );
 					verify( assert, result, mode === 'normal' ? 2 : 1.5 );
 					const record = result.meshes[ 1 ];
-					assert.strictEqual( record.geometry.index.count, 3 );
+					assert.strictEqual( record.mesh.geometry.index.count, 3 );
 					assert.deepEqual( record.faceCharts, new Int32Array( [ - 1 ] ) );
-					assert.deepEqual( record.geometry.attributes.position.array, geometry.attributes.position.array );
-					assert.ok( record.geometry.attributes.uv1.array.every( value => value === 0 ) );
+					assert.deepEqual( record.mesh.geometry.attributes.position.array, geometry.attributes.position.array );
+					assert.ok( record.mesh.geometry.attributes.uv1.array.every( value => value === 0 ) );
 					assert.strictEqual( result.meshes.reduce( ( sum, record ) => sum + record.faceCharts.filter( chart => chart === - 1 ).length, 0 ), 1 );
 
 				}
@@ -380,14 +379,14 @@ export default QUnit.module( 'Addons', () => {
 				verify( assert, result );
 				const record = result.meshes[ 0 ];
 				assert.deepEqual( record.faceCharts, new Int32Array( [ 0, - 1 ] ) );
-				assert.strictEqual( record.geometry.index.count, 6 );
-				assert.strictEqual( record.geometry.attributes.position.count, 6 );
+				assert.strictEqual( record.mesh.geometry.index.count, 6 );
+				assert.strictEqual( record.mesh.geometry.attributes.position.count, 6 );
 				const degenerate = new BufferGeometry();
 				degenerate.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ], 3 ) );
 				const allIgnored = unwrap( new Mesh( degenerate ) );
 				assert.strictEqual( allIgnored.charts.length, 0 );
 				assert.strictEqual( allIgnored.meshes[ 0 ].faceCharts[ 0 ], - 1 );
-				assert.strictEqual( allIgnored.meshes[ 0 ].geometry.index.count, 3 );
+				assert.strictEqual( allIgnored.meshes[ 0 ].mesh.geometry.index.count, 3 );
 
 			} );
 
@@ -398,7 +397,7 @@ export default QUnit.module( 'Addons', () => {
 				const result = unwrap( new Mesh( geometry ) );
 				assert.strictEqual( result.charts.length, 0 );
 				assert.strictEqual( result.meshes.reduce( ( sum, record ) => sum + record.faceCharts.filter( chart => chart === - 1 ).length, 0 ), 1 );
-				assert.ok( result.meshes[ 0 ].geometry.attributes.uv1.array.every( value => value === 0 ) );
+				assert.ok( result.meshes[ 0 ].mesh.geometry.attributes.uv1.array.every( value => value === 0 ) );
 
 			} );
 
@@ -414,8 +413,8 @@ export default QUnit.module( 'Addons', () => {
 					verify( assert, result, mode === 'normal' ? 2 : 1.5 );
 					assert.strictEqual( result.meshes.reduce( ( sum, record ) => sum + record.faceCharts.filter( chart => chart === - 1 ).length, 0 ), 1 );
 					assert.strictEqual( result.meshes[ 1 ].faceCharts[ 0 ], - 1 );
-					assert.strictEqual( result.meshes[ 1 ].geometry.index.count, 3 );
-					assert.ok( result.meshes[ 1 ].geometry.attributes.uv1.array.every( value => value === 0 ) );
+					assert.strictEqual( result.meshes[ 1 ].mesh.geometry.index.count, 3 );
+					assert.ok( result.meshes[ 1 ].mesh.geometry.attributes.uv1.array.every( value => value === 0 ) );
 
 				}
 
@@ -493,8 +492,9 @@ export default QUnit.module( 'Addons', () => {
 			QUnit.test( 'result retains atlas metadata and vertex and face mappings', assert => {
 
 				const result = unwrap( new Mesh( new BoxGeometry() ) );
-				assert.deepEqual( Object.keys( result ), [ 'attribute', 'channel', 'width', 'height', 'padding', 'texelsPerUnit', 'charts', 'meshes' ] );
-				assert.strictEqual( result.meshes[ 0 ].sourceVertices.length, result.meshes[ 0 ].geometry.attributes.position.count );
+				assert.deepEqual( Object.keys( result ), [ 'attribute', 'resolution', 'padding', 'texelsPerUnit', 'charts', 'meshes' ] );
+				assert.deepEqual( Object.keys( result.meshes[ 0 ] ), [ 'mesh', 'sourceVertices', 'faceCharts' ] );
+				assert.strictEqual( result.meshes[ 0 ].sourceVertices.length, result.meshes[ 0 ].mesh.geometry.attributes.position.count );
 				assert.strictEqual( result.meshes[ 0 ].faceCharts.length, 12 );
 				assert.deepEqual( Object.keys( result.charts[ 0 ] ), [ 'x', 'y', 'width', 'height' ] );
 

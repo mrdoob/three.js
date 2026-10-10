@@ -151,7 +151,7 @@
 						resolution: Number( params.resolution )
 					} );
 					if ( ! result ) throw new Error( 'Charts do not fit in the atlas.' );
-					atlasSize.value = result.width;
+					atlasSize.value = result.resolution;
 					const elapsed = performance.now() - start;
 					const triangles = result.meshes.reduce( ( sum, record ) => sum + record.faceCharts.length, 0 );
 					const ignored = result.meshes.reduce( ( sum, record ) => sum + record.faceCharts.reduce( ( count, chart ) => count + ( chart === - 1 ? 1 : 0 ), 0 ), 0 );
@@ -174,11 +174,10 @@
 
 			function drawAtlas() {
 
-				if ( atlasCanvas.width !== result.width || atlasCanvas.height !== result.height ) {
+				if ( atlasCanvas.width !== result.resolution ) {
 
 					islandTexture.dispose();
-					atlasCanvas.width = result.width;
-					atlasCanvas.height = result.height;
+					atlasCanvas.width = atlasCanvas.height = result.resolution;
 
 				}
 
@@ -188,7 +187,7 @@
 				const paths = result.charts.map( () => new Path2D() );
 				for ( const record of result.meshes ) {
 
-					const geometry = record.geometry, uv = geometry.attributes.uv1, index = geometry.index;
+					const geometry = record.mesh.geometry, uv = geometry.attributes.uv1, index = geometry.index;
 					for ( let face = 0; face < record.faceCharts.length; face ++ ) {
 
 						const chart = record.faceCharts[ face ];

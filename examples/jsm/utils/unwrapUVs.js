@@ -18,7 +18,7 @@ import { potpack } from '../libs/potpack.module.js';
  * @param {number} [options.texelsPerUnit=0] - Common world density; zero fits the atlas. Must be nonnegative.
  * @param {boolean} [options.respectUVSeams] - Cut discontinuities in existing uv (normal default).
  * @param {boolean} [options.useInputUVs=false] - Preserve valid authored UV charts before trying LSCM.
- * @return {?Object} Atlas dimensions, density, chart bounds and mesh vertex/face mappings,
+ * @return {?Object} Atlas size, density, chart bounds and mesh vertex/face mappings,
  * or null if the charts do not fit the atlas. Meshes are left unchanged in that case.
  */
 function unwrapUVs( root, options = {} ) {
@@ -67,20 +67,14 @@ function unwrapUVs( root, options = {} ) {
 
 	}
 
-	for ( const record of records ) rebuildGeometry( record, charts, settings );
-	const result = {
-		attribute: settings.attribute, channel: [ 'uv', 'uv1', 'uv2', 'uv3' ].indexOf( settings.attribute ),
-		width: settings.resolution, height: settings.resolution, padding: settings.padding,
+	for ( const record of records ) record.mesh.geometry = rebuildGeometry( record, charts, settings );
+
+	return {
+		attribute: settings.attribute, resolution: settings.resolution, padding: settings.padding,
 		texelsPerUnit: density,
 		charts: charts.map( chart => ( { x: chart.box.x, y: chart.box.y, width: chart.box.w, height: chart.box.h } ) ),
-		meshes: records.map( record => ( {
-			mesh: record.mesh, originalGeometry: record.original, geometry: record.geometry,
-			sourceVertices: record.sourceVertices, faceCharts: record.faceCharts
-		} ) )
+		meshes: records.map( record => ( { mesh: record.mesh, sourceVertices: record.sourceVertices, faceCharts: record.faceCharts } ) )
 	};
-	// Commit only after validation and all result allocations succeed.
-	for ( const record of records ) record.mesh.geometry = record.geometry;
-	return result;
 
 }
 
@@ -658,8 +652,8 @@ function rebuildGeometry( record, charts, settings ) {
 	geometry.setIndex( indices );
 	geometry.setAttribute( settings.attribute, new Float32BufferAttribute( values, 2 ) );
 	if ( settings.attribute === 'uv' ) geometry.deleteAttribute( 'tangent' );
-	record.geometry = geometry;
 	record.sourceVertices = Uint32Array.from( source );
+	return geometry;
 
 }
 
