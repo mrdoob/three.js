@@ -3,6 +3,7 @@
 import './addons/utils/BufferGeometryUtils.tests.js';
 import './addons/utils/ColorUtils.tests.js';
 import './addons/utils/GaussianSplatUtils.tests.js';
+import './addons/utils/unwrapUVs.tests.js';
 import './addons/math/ColorConverter.tests.js';
 import './addons/math/ColorSpaces.tests.js';
 import './addons/math/Octree.tests.js';

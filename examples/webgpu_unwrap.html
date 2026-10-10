@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - UV unwrap</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - UV unwrap">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_unwrap.html">
+		<link type="text/css" rel="stylesheet" href="example.css">
+		<style>
+			#atlas-preview { position: absolute; bottom: 20px; left: 20px; pointer-events: none; }
+			#status { color: #e0e0e0; text-shadow: 1px 1px 5px rgba(0, 0, 0, .7); font: 400 12px/20px 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; white-space: pre-wrap; margin: 0 0 12px; }
+			#atlas { display: block; width: 240px; height: 240px; background: #080c12; }
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>UV Unwrapping</span>
+			</div>
+
+			<small>
+				<a href="https://www.cs.jhu.edu/~misha/Fall09/Levy02.pdf" target="_blank" rel="noopener">Least Squares Conformal Maps</a>-based UV atlas generation for lightmap and normal baking, by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.
+			</small>
+		</div>
+
+		<div id="atlas-preview">
+			<p id="status">Loading renderer...</p>
+			<canvas id="atlas" width="512" height="512"></canvas>
+		</div>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+		<script type="module">
+			import * as THREE from 'three/webgpu';
+			import { Fn, color, mix, positionWorld, uniform, uv } from 'three/tsl';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+			import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
+
+			const status = document.getElementById( 'status' );
+			const scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x303b4b );
+			const camera = new THREE.PerspectiveCamera( 45, innerWidth / innerHeight, 0.01, 10000 );
+			const renderer = new THREE.WebGPURenderer( { antialias: true } );
+			renderer.inspector = new Inspector();
+			renderer.setPixelRatio( devicePixelRatio );
+			renderer.setSize( innerWidth, innerHeight );
+			document.body.appendChild( renderer.domElement );
+			const controls = new OrbitControls( camera, renderer.domElement );
+			controls.enableDamping = true;
+			scene.add( new THREE.HemisphereLight( 0xffffff, 0x667788, 3 ) );
+			const light = new THREE.DirectionalLight( 0xffffff, 3 );
+			light.position.set( 3, 5, 4 );
+			scene.add( light );
+
+			const checkerTexture = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
+			checkerTexture.channel = 1;
+			checkerTexture.colorSpace = THREE.SRGBColorSpace;
+			const atlasCanvas = document.getElementById( 'atlas' );
+			const islandTexture = new THREE.CanvasTexture( atlasCanvas );
+			islandTexture.channel = 1;
+			islandTexture.colorSpace = THREE.SRGBColorSpace;
+			islandTexture.generateMipmaps = false;
+			islandTexture.minFilter = THREE.LinearFilter;
+			const islandMaterial = new THREE.MeshBasicNodeMaterial( { map: islandTexture, side: THREE.DoubleSide, toneMapped: false } );
+			const previewMaterial = new THREE.MeshStandardMaterial( { map: checkerTexture, roughness: 0.8, side: THREE.DoubleSide } );
+			const atlasSize = uniform( 2048 );
+			const densityTarget = uniform( 1 );
+			const densityMaterial = new THREE.MeshBasicNodeMaterial( { side: THREE.DoubleSide, toneMapped: false } );
+			densityMaterial.colorNode = Fn( () => {
+
+				const dx = positionWorld.dFdx(), dy = positionWorld.dFdy();
+				const texel = uv( 1 ).mul( atlasSize );
+				const tx = texel.dFdx(), ty = texel.dFdy();
+				const normal = dx.cross( dy );
+				const areaSquared = normal.dot( normal ).max( 1e-30 );
+				const a = dy.cross( normal ).div( areaSquared );
+				const b = normal.cross( dx ).div( areaSquared );
+				const gradientU = a.mul( tx.x ).add( b.mul( ty.x ) );
+				const gradientV = a.mul( tx.y ).add( b.mul( ty.y ) );
+				// Singular values measure density along both principal surface directions.
+				const trace = gradientU.dot( gradientU ).add( gradientV.dot( gradientV ) );
+				const cross = gradientU.cross( gradientV );
+				const determinant = cross.dot( cross );
+				const largest = trace.add( trace.mul( trace ).sub( determinant.mul( 4 ) ).max( 0 ).sqrt() ).mul( 0.5 );
+				const smallest = determinant.div( largest.max( 1e-30 ) );
+				const ratio = largest.sqrt().div( densityTarget ).max( densityTarget.div( smallest.max( 1e-30 ).sqrt() ) ).max( 1 );
+				const deviation = ratio.log2().clamp( 0, 1 );
+				const green = color( '#28d45c' ), yellow = color( '#ffe030' ), red = color( '#ef3028' );
+				return mix( mix( green, yellow, deviation.mul( 2 ).clamp( 0, 1 ) ), red, deviation.mul( 2 ).sub( 1 ).clamp( 0, 1 ) );
+
+			} )();
+			const params = {
+				model: 'DamagedHelmet/glTF/DamagedHelmet.gltf', mode: 'lightmap', resolution: 2048, useInputUVs: false,
+				view: 'checker', referenceDensity: 0
+			};
+			const gui = renderer.inspector.createParameters( 'UV unwrap' );
+			gui.add( params, 'model', {
+				'Damaged Helmet': 'DamagedHelmet/glTF/DamagedHelmet.gltf',
+				'Soldier': 'Soldier.glb', 'Xbot': 'Xbot.glb', 'Lee Perry Smith': 'LeePerrySmith/LeePerrySmith.glb',
+				'Space ship hallway': 'space_ship_hallway.glb'
+			} ).name( 'Model' ).listen().onChange( value => loadModel( value ).catch( reportError ) );
+			gui.add( params, 'view', { 'UV grid': 'checker', 'UV islands': 'islands', 'Texel density': 'density', 'Original materials': 'original' } ).name( 'View' ).onChange( updateMaterials );
+			const inputs = gui.addFolder( 'Unwrap Input' );
+			inputs.add( params, 'mode', { 'Lightmap': 'lightmap', 'Normal bake': 'normal' } ).name( 'Method' ).info( 'Lightmap: faster, but produces more islands. Normal bake: fewer, larger islands (via LSCM) that follow the original UV seams.' ).onChange( unwrap );
+			inputs.add( params, 'resolution', [ 1024, 2048, 4096 ] ).name( 'Atlas size' ).onChange( unwrap );
+			inputs.add( params, 'useInputUVs' ).name( 'Preserve authored islands' ).info( 'Splits charts only at seams in the existing uv attribute and reuses the authored UV layout of each island, rescaled and repacked into the atlas. Islands that exceed the stretch limit are split or reprojected.' ).onChange( unwrap );
+			inputs.add( params, 'referenceDensity' ).name( 'Target texels / unit' ).info( '0 uses the fitted atlas density. Both principal directions are compared with this target.' ).onChange( updateMaterials );
+			const draco = new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' );
+			const loader = new GLTFLoader().setDRACOLoader( draco );
+			let root, originals = [], result, loadId = 0;
+
+			function updateMaterials() {
+
+				if ( result ) densityTarget.value = params.referenceDensity > 0 ? params.referenceDensity : result.texelsPerUnit;
+				for ( const item of originals ) item.mesh.material = params.view === 'checker' ? previewMaterial : params.view === 'density' ? densityMaterial : params.view === 'islands' ? islandMaterial : item.material;
+
+			}
+
+			function unwrap() {
+
+				if ( ! root ) return;
+				status.textContent = 'Unwrapping…';
+				for ( const item of originals ) {
+
+					if ( item.mesh.geometry !== item.geometry ) item.mesh.geometry.dispose();
+					item.mesh.geometry = item.geometry;
+
+				}
+
+				try {
+
+					const start = performance.now();
+					result = unwrapUVs( root, {
+						mode: params.mode,
+						useInputUVs: params.useInputUVs,
+						resolution: Number( params.resolution )
+					} );
+					if ( ! result ) throw new Error( 'Charts do not fit in the atlas.' );
+					atlasSize.value = result.resolution;
+					const elapsed = performance.now() - start;
+					const triangles = result.meshes.reduce( ( sum, record ) => sum + record.faceCharts.length, 0 );
+					const ignored = result.meshes.reduce( ( sum, record ) => sum + record.faceCharts.reduce( ( count, chart ) => count + ( chart === - 1 ? 1 : 0 ), 0 ), 0 );
+					status.textContent = `${ triangles.toLocaleString() } triangles / ${ result.charts.length } charts\n${ elapsed.toFixed( 1 ) } ms\n${ result.texelsPerUnit.toFixed( 2 ) } texels/world unit\n${ ignored } ignored triangles`;
+					drawAtlas();
+					updateMaterials();
+
+				} catch ( error ) {
+
+					result = null;
+					const canvas = document.getElementById( 'atlas' );
+					canvas.getContext( '2d' ).clearRect( 0, 0, canvas.width, canvas.height );
+					islandTexture.needsUpdate = true;
+					for ( const item of originals ) item.mesh.material = item.material;
+					reportError( error );
+
+				}
+
+			}
+
+			function drawAtlas() {
+
+				if ( atlasCanvas.width !== result.resolution ) {
+
+					islandTexture.dispose();
+					atlasCanvas.width = atlasCanvas.height = result.resolution;
+
+				}
+
+				const context = atlasCanvas.getContext( '2d' );
+				context.fillStyle = '#000';
+				context.fillRect( 0, 0, atlasCanvas.width, atlasCanvas.height );
+				const paths = result.charts.map( () => new Path2D() );
+				for ( const record of result.meshes ) {
+
+					const geometry = record.mesh.geometry, uv = geometry.attributes.uv1, index = geometry.index;
+					for ( let face = 0; face < record.faceCharts.length; face ++ ) {
+
+						const chart = record.faceCharts[ face ];
+						if ( chart < 0 ) continue;
+						const path = paths[ chart ];
+						for ( let j = 0; j < 3; j ++ ) {
+
+							const v = index.getX( face * 3 + j ), x = uv.getX( v ) * atlasCanvas.width, y = ( 1 - uv.getY( v ) ) * atlasCanvas.height;
+							if ( j === 0 ) path.moveTo( x, y ); else path.lineTo( x, y );
+
+						}
+
+						path.closePath();
+
+					}
+
+				}
+
+				// Fill the chart gutters too, so filtering at island edges does not sample black.
+				context.lineWidth = 2 * result.padding;
+				context.lineJoin = 'round';
+				for ( let chart = 0; chart < paths.length; chart ++ ) {
+
+					context.fillStyle = context.strokeStyle = `hsl(${ chart * 137.508 % 360 },65%,60%)`;
+					context.stroke( paths[ chart ] );
+					context.fill( paths[ chart ] );
+
+				}
+
+				islandTexture.needsUpdate = true;
+
+			}
+
+			async function loadModel( name ) {
+
+				params.model = name;
+				const id = ++ loadId;
+				status.textContent = 'Loading model…';
+				const loaded = ( await loader.loadAsync( `models/gltf/${ name }` ) ).scene;
+
+				if ( id !== loadId ) {
+
+					disposeModel( loaded );
+					return;
+
+				}
+
+				if ( root ) {
+
+					scene.remove( root );
+					for ( const item of originals ) {
+
+						item.mesh.material = item.material;
+						item.geometry.dispose();
+
+					}
+
+					disposeModel( root );
+
+				}
+
+				root = loaded;
+				originals = [];
+				root.traverse( mesh => {
+
+					if ( mesh.isMesh ) originals.push( { mesh, geometry: mesh.geometry, material: mesh.material } );
+
+				} );
+				scene.add( root );
+				const box = new THREE.Box3().setFromObject( root ), center = box.getCenter( new THREE.Vector3() );
+				const size = box.getSize( new THREE.Vector3() ).length();
+				controls.target.copy( center );
+				camera.position.copy( center ).add( new THREE.Vector3( size * 0.65, size * 0.35, size * 0.9 ) );
+				camera.near = Math.max( size / 10000, 0.001 );
+				camera.far = Math.max( size * 100, 10 );
+				camera.updateProjectionMatrix();
+				controls.update();
+				unwrap();
+				return result;
+
+			}
+
+			function disposeModel( object ) {
+
+				object.traverse( mesh => {
+
+					if ( ! mesh.isMesh ) return;
+					mesh.geometry.dispose();
+					for ( const material of [].concat( mesh.material ) ) {
+
+						for ( const value of Object.values( material ) ) if ( value && value.isTexture ) value.dispose();
+						material.dispose();
+
+					}
+
+				} );
+
+			}
+
+			function reportError( error ) {
+
+				status.textContent = error.message;
+				console.error( error );
+
+			}
+
+			window.addEventListener( 'resize', () => {
+
+				camera.aspect = innerWidth / innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( innerWidth, innerHeight );
+
+			} );
+			renderer.init().then( () => {
+
+				renderer.setAnimationLoop( animate );
+				return loadModel( params.model );
+
+			} ).catch( reportError );
+			function animate() {
+
+				controls.update();
+				renderer.render( scene, camera );
+
+			}
+		</script>
+	</body>
+</html>

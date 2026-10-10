@@ -1,4 +1,4 @@
-import { BufferAttribute, BufferGeometry, InterleavedBuffer, InterleavedBufferAttribute } from 'three';
+import { BufferAttribute, BufferGeometry, DynamicDrawUsage, Float16BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute } from 'three';
 import * as BufferGeometryUtils from '../../../../examples/jsm/utils/BufferGeometryUtils.js';
 import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
 
@@ -36,6 +36,64 @@ export default QUnit.module( 'Addons', () => {
 	QUnit.module( 'Utils', () => {
 
 		QUnit.module( 'BufferGeometryUtils', () => {
+
+			QUnit.test( 'remapAttribute preserves raw values and metadata', ( assert ) => {
+
+				const attribute = new BufferAttribute( new Int16Array( [ - 32768, 32767, - 1, 1 ] ), 2, true );
+				attribute.name = 'weights';
+				attribute.setUsage( DynamicDrawUsage );
+				attribute.gpuType = IntType;
+				const result = BufferGeometryUtils.remapAttribute( attribute, [ 1, 0, 1 ] );
+				assert.deepEqual( Array.from( result.array ), [ - 1, 1, - 32768, 32767, - 1, 1 ] );
+				assert.strictEqual( result.normalized, true );
+				assert.strictEqual( result.name, attribute.name );
+				assert.strictEqual( result.usage, DynamicDrawUsage );
+				assert.strictEqual( result.gpuType, IntType );
+				const half = new Float16BufferAttribute( [ 0x8000, 0x3c00, 0x0001 ], 1 );
+				const remappedHalf = BufferGeometryUtils.remapAttribute( half, [ 2, 0, 1 ] );
+				assert.true( remappedHalf.isFloat16BufferAttribute );
+				assert.deepEqual( Array.from( remappedHalf.array ), [ 0x0001, 0x8000, 0x3c00 ] );
+				assert.notStrictEqual( result.array, attribute.array );
+
+			} );
+
+			QUnit.test( 'remapAttribute preserves shared interleaved buffers', ( assert ) => {
+
+				const data = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 ).setUsage( DynamicDrawUsage );
+				const position = new InterleavedBufferAttribute( data, 2, 0 );
+				const weight = new InterleavedBufferAttribute( data, 1, 2 );
+				const buffers = new Map(), source = [ 1, 0, 1 ];
+				const p = BufferGeometryUtils.remapAttribute( position, source, buffers );
+				const w = BufferGeometryUtils.remapAttribute( weight, source, buffers );
+				assert.strictEqual( p.data, w.data );
+				assert.notStrictEqual( p.data, data );
+				assert.strictEqual( p.data.usage, DynamicDrawUsage );
+				assert.deepEqual( Array.from( p.data.array ), [ 4, 5, 6, 1, 2, 3, 4, 5, 6 ] );
+				assert.strictEqual( w.getX( 2 ), 6 );
+				assert.false( 'gpuType' in p, 'interleaved attributes do not acquire gpuType' );
+				assert.false( 'gpuType' in w, 'shared interleaved attributes do not acquire gpuType' );
+
+			} );
+
+			QUnit.test( 'mergeVertices remaps half-float morphs without conversion', ( assert ) => {
+
+				const geometry = new BufferGeometry();
+				geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( [ 1, 0, 0, 2, 0, 0, 1, 0, 0 ] ), 3 ) );
+				const morph = new Float16BufferAttribute( [ 0x8000, 0x0001, 0x3c00, 0x4000, 0x4200, 0x4400, 0, 0, 0 ], 3 );
+				morph.name = 'pose';
+				morph.setUsage( DynamicDrawUsage );
+				geometry.morphAttributes.position = [ morph ];
+				geometry.setIndex( [ 1, 0, 2 ] );
+				const result = BufferGeometryUtils.mergeVertices( geometry );
+				assert.deepEqual( Array.from( result.index.array ), [ 0, 1, 1 ] );
+				const output = result.morphAttributes.position[ 0 ];
+				assert.true( output.isFloat16BufferAttribute );
+				assert.deepEqual( Array.from( output.array ), [ 0x4000, 0x4200, 0x4400, 0x8000, 0x0001, 0x3c00 ] );
+				assert.strictEqual( output.name, 'pose' );
+				assert.strictEqual( output.usage, DynamicDrawUsage );
+				assert.strictEqual( morph.count, 3 );
+
+			} );
 
 			QUnit.module( 'mergeGeometries', () => {
 
