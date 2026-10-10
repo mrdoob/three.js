@@ -92,6 +92,8 @@ const parseTime = 1; // 1 second per megabyte
 
 const networkTimeout = 5; // 5 minutes, set to 0 to disable
 const renderTimeout = 5; // 5 seconds, set to 0 to disable
+const initTimeout = 30; // 30 seconds - how long to wait for a pending WebGPU initialization
+const maxDeviceLostRetries = 2; // how often an example is retried after a WebGPU device loss
 const numCIJobs = 5; // GitHub Actions run the script in 5 threads
 
 const width = 400;
@@ -284,7 +286,19 @@ async function main() {
 
 	for ( const file of files ) {
 
-		await checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file );
+		let result;
+
+		for ( let attempt = 0; ; attempt ++ ) {
+
+			result = await checkFile( ctx, cleanPage, isMakeScreenshot, file );
+
+			if ( result !== 'device-lost' || attempt === maxDeviceLostRetries ) break;
+
+			console.yellow( `Retrying ${ file } after WebGPU device loss (${ attempt + 1 }/${ maxDeviceLostRetries })...` );
+
+		}
+
+		if ( result !== 'ok' ) failedScreenshots.push( file );
 
 	}
 
@@ -440,7 +454,8 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 }
 
-async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file ) {
+// Resolves to 'ok', 'failed' or 'device-lost' (the browser has been restarted and the example can be retried).
+async function checkFile( ctx, cleanPage, isMakeScreenshot, file ) {
 
 	const page = ctx.page;
 	const pageStart = performance.now();
@@ -476,6 +491,24 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 				timeout: networkTimeout * 60000,
 				idleTime: idleTime * 1000
 			} );
+
+			// Examples usually start loading assets only after `await renderer.init()`, so on a cold
+			// machine the network can be idle while WebGPU is still initializing. Wait for the
+			// initialization to settle, then require the network to be idle again.
+
+			if ( await page.evaluate( () => window._webgpuInit === 'pending' ) ) {
+
+				await page.waitForFunction( () => window._webgpuInit !== 'pending', {
+					polling: 100,
+					timeout: initTimeout * 1000
+				} );
+
+				await page.waitForNetworkIdle( {
+					timeout: networkTimeout * 60000,
+					idleTime: idleTime * 1000
+				} );
+
+			}
 
 			await page.waitForFunction( () => window._videosReady(), {
 				polling: 100,
@@ -522,11 +555,11 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 
 				throw new Error( `Error happened while rendering file ${ file }: ${ e }` );
 
-			} /* else { // This can mean that the example doesn't use requestAnimationFrame loop
+			} else { // This can mean that the example doesn't use requestAnimationFrame loop
 
 				console.yellow( `Render timeout exceeded in file ${ file }` );
 
-			} */ // TODO: fix this
+			}
 
 		}
 
@@ -605,18 +638,21 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 			console.yellow( 'Restarting browser...' );
 			await ctx.restart();
 
-		} else {
-
-			console.red( e );
-			failedScreenshots.push( file );
+			return 'device-lost';
 
 		}
+
+		console.red( e );
+
+		return 'failed';
 
 	} finally {
 
 		page.file = undefined; // release lock
 
 	}
+
+	return 'ok';
 
 }
 

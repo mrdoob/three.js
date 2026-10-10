@@ -27,6 +27,67 @@
 	// Workers keep their render loops running against the frozen clock.
 	if ( typeof window === 'undefined' ) return;
 
+	/* WebGPU initialization state */
+
+	// 'none' until the page requests an adapter, 'pending' while adapter/device creation is in
+	// flight, 'done' afterwards. The test runner waits for a pending initialization before it
+	// opens the render gate, because examples typically start loading assets only after
+	// `await renderer.init()`, so the network can be idle while WebGPU is still initializing.
+	window._webgpuInit = 'none';
+
+	if ( navigator.gpu ) {
+
+		const requestAdapter = navigator.gpu.requestAdapter.bind( navigator.gpu );
+
+		navigator.gpu.requestAdapter = async function ( ...args ) {
+
+			window._webgpuInit = 'pending';
+
+			let adapter;
+
+			try {
+
+				adapter = await requestAdapter( ...args );
+
+			} catch ( error ) {
+
+				window._webgpuInit = 'done';
+				throw error;
+
+			}
+
+			if ( adapter === null ) {
+
+				window._webgpuInit = 'done';
+				return adapter;
+
+			}
+
+			const info = adapter.info;
+			console.log( `WebGPU adapter: ${ info.vendor } ${ info.architecture } ${ info.device } ${ info.description }`.trim() );
+
+			const requestDevice = adapter.requestDevice.bind( adapter );
+
+			adapter.requestDevice = async function ( ...deviceArgs ) {
+
+				try {
+
+					return await requestDevice( ...deviceArgs );
+
+				} finally {
+
+					window._webgpuInit = 'done';
+
+				}
+
+			};
+
+			return adapter;
+
+		};
+
+	}
+
 	/* Deterministic RAF */
 
 	window._renderStarted = false;
