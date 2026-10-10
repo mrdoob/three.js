@@ -2,6 +2,20 @@ import Node from '../core/Node.js';
 import { property, vec3 } from '../tsl/TSLBase.js';
 import { hashArray } from '../core/NodeUtils.js';
 import { warn } from '../../utils.js';
+import PointLightNode from './PointLightNode.js';
+import SpotLightNode from './SpotLightNode.js';
+import StaticLightsNode from './StaticLightsNode.js';
+import { buildStaticLightGrid } from './StaticLightGrid.js';
+
+const canBatchStaticLight = ( light ) => {
+
+	return light.static === true && light.castShadow === false && light.colorNode == null &&
+		Number.isFinite( light.distance ) && light.distance > 0 && (
+		( light.isPointLight === true && light._lightNode === PointLightNode ) ||
+			( light.isSpotLight === true && light._lightNode === SpotLightNode && light.map === null )
+	);
+
+};
 
 /**
  * A node representing the total diffuse light.
@@ -128,6 +142,13 @@ class LightsNode extends Node {
 		 */
 		this._lights = [];
 
+		// Immutable batches can be shared by material builders and by cameras with
+		// the same light set. Keep a bounded cache; additional sets use normal lights.
+		this._staticLightsNodes = new Map();
+		this._staticLightsBytes = 0;
+		this._staticLightsVersion = 0;
+		this._staticLightStates = new WeakMap();
+
 		/**
 		 * `LightsNode` sets this property to `true` by default.
 		 *
@@ -153,6 +174,7 @@ class LightsNode extends Node {
 	customCacheKey() {
 
 		const builtinLights = this.getBuiltinLights();
+		_hashData.push( this._staticLightsVersion );
 
 		for ( let i = 0; i < builtinLights.length; i ++ ) {
 
@@ -160,6 +182,7 @@ class LightsNode extends Node {
 
 			_hashData.push( light.id );
 			_hashData.push( light.castShadow ? 1 : 0 );
+			_hashData.push( canBatchStaticLight( light ) ? 1 : 0 );
 
 			if ( light.isSpotLight === true ) {
 
@@ -230,8 +253,12 @@ class LightsNode extends Node {
 		const builtinLights = this.getBuiltinLights();
 
 		const lights = sortLights( [ ...materialLightings, ...builtinLights ] );
+		const staticLights = StaticLightsNode.supports( builder ) ? lights.filter( canBatchStaticLight ) : [];
+		const staticLightsNode = this._getStaticLightsNode( staticLights );
 
 		for ( const light of lights ) {
+
+			if ( staticLightsNode !== null && canBatchStaticLight( light ) ) continue;
 
 			if ( light.isNode ) {
 
@@ -274,7 +301,68 @@ class LightsNode extends Node {
 
 		}
 
+		if ( staticLightsNode !== null ) lightNodes.push( staticLightsNode );
+
 		return lightNodes;
+
+	}
+
+	/**
+	 * Gets an immutable grid for an already sorted set of static lights.
+	 *
+	 * @private
+	 * @param {Array<Light>} lights - The eligible lights.
+	 * @return {?StaticLightsNode} The batch, or null to use ordinary lights.
+	 */
+	_getStaticLightsNode( lights ) {
+
+		if ( lights.length === 0 ) return null;
+
+		const key = this._staticLightsVersion + ':' + lights.map( light => light.id ).join( ',' );
+		const nodes = this._staticLightsNodes;
+
+		if ( nodes.has( key ) ) return nodes.get( key );
+		if ( nodes.size >= 8 ) return null;
+
+		const grid = buildStaticLightGrid( lights );
+		let node = null;
+
+		if ( grid !== null ) {
+
+			const bytes = grid.cells.byteLength + grid.indices.byteLength + grid.data.byteLength;
+
+			if ( this._staticLightsBytes + bytes <= 16 * 1024 * 1024 ) {
+
+				node = new StaticLightsNode( grid );
+				this._staticLightsBytes += bytes;
+
+			}
+
+		}
+
+		// Cache failed builds too, so each material does not repeat the work.
+		nodes.set( key, node );
+
+		return node;
+
+	}
+
+	/**
+	 * Releases cached static light grids.
+	 */
+	dispose() {
+
+		for ( const node of this._staticLightsNodes.values() ) {
+
+			if ( node !== null ) node.dispose();
+
+		}
+
+		this._staticLightsNodes.clear();
+		this._staticLightsBytes = 0;
+		this._staticLightsVersion ++;
+
+		super.dispose();
 
 	}
 
@@ -419,6 +507,16 @@ class LightsNode extends Node {
 	 * @return {LightsNode} A reference to this node.
 	 */
 	setLights( lights ) {
+
+		for ( const light of lights ) {
+
+			const eligible = canBatchStaticLight( light );
+			const previous = this._staticLightStates.get( light );
+
+			if ( previous !== undefined && previous !== eligible ) this._staticLightsVersion ++;
+			this._staticLightStates.set( light, eligible );
+
+		}
 
 		this._lights = lights;
 

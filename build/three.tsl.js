@@ -3,7 +3,7 @@
  * Copyright 2010-2026 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-import { Color, Vector2, Vector3, Vector4, Matrix2, Matrix3, Matrix4, error, UnsignedIntType, IntType, RedFormat, RedIntegerFormat, DepthFormat, DepthStencilFormat, AlphaFormat, RGFormat, RGIntegerFormat, RGBFormat, RGBIntegerFormat, EventDispatcher, generateUUID, warn, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBufferAttribute, InterleavedBuffer, DynamicDrawUsage, NoColorSpace, log as log$1, warnOnce, NormalBlending, SrcAlphaFactor, OneMinusSrcAlphaFactor, AddEquation, MaterialBlending, NoBlending, Sphere, BackSide, DoubleSide, Texture, Compatibility, LessCompare, LessEqualCompare, GreaterCompare, GreaterEqualCompare, NearestFilter, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, RenderTarget, Object3D, HalfFloatType, LinearMipMapLinearFilter, Plane, CubeTexture, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, NoNormalPacking, NormalRGPacking, NormalGAPacking, ObjectSpaceNormalMap, RED_GREEN_RGTC2_Format, RG11_EAC_Format, InstancedBufferAttribute, InstancedInterleavedBuffer, DataTexture, RGBAFormat, FloatType, DataArrayTexture, RenderObjectRefreshType, Material, Mesh, OrthographicCamera, BufferGeometry, Float32BufferAttribute, BufferAttribute, UVMapping, LinearSRGBColorSpace, UnsignedInt248Type, VSMShadowMap, PCFShadowMap, LinearFilter, BasicShadowMap, CubeDepthTexture, BoxGeometry, Scene, CubeCamera, floorPowerOfTwo, ClampToEdgeWrapping } from './three.core.js';
+import { Color, Vector2, Vector3, Vector4, Matrix2, Matrix3, Matrix4, error, UnsignedIntType, IntType, RedFormat, RedIntegerFormat, DepthFormat, DepthStencilFormat, AlphaFormat, RGFormat, RGIntegerFormat, RGBFormat, RGBIntegerFormat, EventDispatcher, generateUUID, warn, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBufferAttribute, InterleavedBuffer, DynamicDrawUsage, NoColorSpace, log as log$1, warnOnce, NormalBlending, SrcAlphaFactor, OneMinusSrcAlphaFactor, AddEquation, MaterialBlending, NoBlending, Sphere, BackSide, DoubleSide, Texture, Compatibility, LessCompare, LessEqualCompare, GreaterCompare, GreaterEqualCompare, NearestFilter, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, RenderTarget, Object3D, HalfFloatType, LinearMipMapLinearFilter, Plane, CubeTexture, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, NoNormalPacking, NormalRGPacking, NormalGAPacking, ObjectSpaceNormalMap, RED_GREEN_RGTC2_Format, RG11_EAC_Format, InstancedBufferAttribute, InstancedInterleavedBuffer, DataTexture, RGBAFormat, FloatType, DataArrayTexture, RenderObjectRefreshType, Material, Mesh, OrthographicCamera, BufferGeometry, Float32BufferAttribute, BufferAttribute, UVMapping, LinearSRGBColorSpace, UnsignedInt248Type, VSMShadowMap, PCFShadowMap, LinearFilter, BasicShadowMap, CubeDepthTexture, ClampToEdgeWrapping, BoxGeometry, Scene, CubeCamera, floorPowerOfTwo } from './three.core.js';
 
 /**
  * Possible shader stages.
@@ -20517,6 +20517,11 @@ class ReflectorBaseNode extends Node {
 		virtualCamera.updateMatrixWorld();
 		virtualCamera.projectionMatrix.copy( camera.projectionMatrix );
 
+		// The reflection is mirrored horizontally, so the view offset must be mirrored as well.
+
+		virtualCamera.projectionMatrix.elements[ 8 ] *= -1;
+		virtualCamera.projectionMatrix.elements[ 12 ] *= -1;
+
 		// Now update projection matrix with new clip plane, implementing code from: http://www.terathon.com/code/oblique.html
 		// Paper explaining this technique: http://www.terathon.com/lengyel/Lengyel-Oblique.pdf
 		_reflectorPlane.setFromNormalAndCoplanarPoint( _normal, _reflectorWorldPosition );
@@ -33807,478 +33812,6 @@ function lightViewPosition( light ) {
 const lightTargetDirection = ( light ) => cameraViewMatrix.transformDirection( lightPosition( light ).sub( lightTargetPosition( light ) ) );
 
 /**
- * A node representing the total diffuse light.
- *
- * @type {Node<vec3>}
- */
-const totalDiffuse = property( 'vec3', 'totalDiffuse' );
-
-/**
- * A node representing the total specular light.
- *
- * @type {Node<vec3>}
- */
-const totalSpecular = property( 'vec3', 'totalSpecular' );
-
-/**
- * A node representing the outgoing light.
- *
- * @type {Node<vec3>}
- */
-const outgoingLight = property( 'vec3', 'outgoingLight' );
-
-/**
- * Sorts an array of lights in ascending order by their IDs.
- *
- * @private
- * @param {Array<Light>} lights - The array of lights to sort.
- * @return {Array<Light>} The sorted array of lights.
- */
-const sortLights = ( lights ) => {
-
-	return lights.sort( ( a, b ) => a.id - b.id );
-
-};
-
-/**
- * Finds and returns a lighting node associated with a specific light ID.
- *
- * @private
- * @param {number} id - The ID of the light to search for.
- * @param {Array<LightingNode>} lightNodes - The array of lighting nodes to search within.
- * @return {?LightingNode} The matching lighting node, or null if not found.
- */
-const getLightNodeById = ( id, lightNodes ) => {
-
-	for ( const lightNode of lightNodes ) {
-
-		if ( lightNode.isAnalyticLightNode && lightNode.light.id === id ) {
-
-			return lightNode;
-
-		}
-
-	}
-
-	return null;
-
-};
-
-/**
- * WeakMap cache mapping light objects to their corresponding lighting node instances.
- *
- * @private
- * @type {WeakMap<Light, LightingNode>}
- */
-const _lightsNodeRef = /*@__PURE__*/ new WeakMap();
-
-/**
- * Array used to temporarily store light IDs and shadow casting states for hashing.
- *
- * @private
- * @type {Array<number>}
- */
-const _hashData = [];
-
-/**
- * This node represents the scene's lighting and manages the lighting model's life cycle
- * for the current build 3D object. It is responsible for computing the total outgoing
- * light in a given lighting context.
- *
- * @augments Node
- */
-class LightsNode extends Node {
-
-	static get type() {
-
-		return 'LightsNode';
-
-	}
-
-	/**
-	 * Constructs a new lights node.
-	 */
-	constructor() {
-
-		super( 'vec3' );
-
-		/**
-		 * A node representing the total diffuse light.
-		 *
-		 * @type {Node<vec3>}
-		 */
-		this.totalDiffuseNode = totalDiffuse;
-
-		/**
-		 * A node representing the total specular light.
-		 *
-		 * @type {Node<vec3>}
-		 */
-		this.totalSpecularNode = totalSpecular;
-
-		/**
-		 * A node representing the outgoing light.
-		 *
-		 * @type {Node<vec3>}
-		 */
-		this.outgoingLightNode = outgoingLight;
-
-		/**
-		 * An array representing the lights in the scene.
-		 *
-		 * @private
-		 * @type {Array<Light>}
-		 */
-		this._lights = [];
-
-		/**
-		 * `LightsNode` sets this property to `true` by default.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.global = true;
-
-	}
-
-	isCacheable( /*builder*/ ) {
-
-		return false;
-
-	}
-
-	/**
-	 * Overwrites the default {@link Node#customCacheKey} implementation by including
-	 * light data into the cache key.
-	 *
-	 * @return {number} The custom cache key.
-	 */
-	customCacheKey() {
-
-		const builtinLights = this.getBuiltinLights();
-
-		for ( let i = 0; i < builtinLights.length; i ++ ) {
-
-			const light = builtinLights[ i ];
-
-			_hashData.push( light.id );
-			_hashData.push( light.castShadow ? 1 : 0 );
-
-			if ( light.isSpotLight === true ) {
-
-				const hashMap = ( light.map !== null ) ? light.map.id : -1;
-				const hashColorNode = ( light.colorNode ) ? light.colorNode.getCacheKey() : -1;
-
-				_hashData.push( hashMap, hashColorNode );
-
-			}
-
-		}
-
-		const cacheKey = hashArray( _hashData );
-
-		_hashData.length = 0;
-
-		return cacheKey;
-
-	}
-
-	/**
-	 * Computes a hash value for identifying the current light nodes setup.
-	 *
-	 * @param {NodeBuilder} builder - A reference to the current node builder.
-	 * @return {string} The computed hash.
-	 */
-	getHash( builder ) {
-
-		const nodeData = builder.getDataFromNode( this );
-
-		if ( nodeData.lightNodesHash === undefined ) {
-
-			const lightNodes = this.setupLightsNode( builder );
-
-			nodeData.lightNodes = lightNodes;
-
-			const hash = [];
-
-			for ( const lightNode of lightNodes ) {
-
-				hash.push( lightNode.getHash() );
-
-			}
-
-			nodeData.lightNodesHash = 'lights-' + hash.join( ',' );
-
-		}
-
-		return nodeData.lightNodesHash;
-
-	}
-
-	/**
-	 * Creates lighting nodes for each scene light. This makes it possible to further
-	 * process lights in the node system.
-	 *
-	 * @param {NodeBuilder} builder - A reference to the current node builder.
-	 * @return {Array<LightingNode>} The array of lighting nodes.
-	 */
-	setupLightsNode( builder ) {
-
-		const nodeData = builder.getDataFromNode( this );
-		const lightNodes = [];
-
-		const previousLightNodes = nodeData.lightNodes || null;
-		const materialLightings = builder.context.materialLightings;
-
-		const builtinLights = this.getBuiltinLights();
-
-		const lights = sortLights( [ ...materialLightings, ...builtinLights ] );
-
-		for ( const light of lights ) {
-
-			if ( light.isNode ) {
-
-				lightNodes.push( light );
-
-			} else {
-
-				let lightNode = null;
-
-				if ( previousLightNodes !== null ) {
-
-					lightNode = getLightNodeById( light.id, previousLightNodes );
-
-				}
-
-				if ( lightNode === null ) {
-
-					const lightNodeClass = light._lightNode;
-
-					if ( lightNodeClass === undefined ) {
-
-						warn( `LightsNode.setupNodeLights: Light node not found for ${ light.constructor.name }` );
-						continue;
-
-					}
-
-					if ( _lightsNodeRef.has( light ) === false ) {
-
-						_lightsNodeRef.set( light, new lightNodeClass( light ) );
-
-					}
-
-					lightNode = _lightsNodeRef.get( light );
-
-				}
-
-				lightNodes.push( lightNode );
-
-			}
-
-		}
-
-		return lightNodes;
-
-	}
-
-	/**
-	 * Sets up a direct light in the lighting model.
-	 *
-	 * @param {Object} builder - The builder object containing the context and stack.
-	 * @param {Object} lightNode - The light node.
-	 * @param {Object} lightData - The light object containing color and direction properties.
-	 */
-	setupDirectLight( builder, lightNode, lightData ) {
-
-		const { lightingModel, reflectedLight } = builder.context;
-
-		lightingModel.direct( {
-			...lightData,
-			lightNode,
-			reflectedLight
-		}, builder );
-
-	}
-
-	/**
-	 * Sets up a direct rect area light in the lighting model.
-	 *
-	 * @param {Object} builder - The builder object containing the context and stack.
-	 * @param {Object} lightNode - The light node.
-	 * @param {Object} lightData - The light object containing color and area light properties.
-	 */
-	setupDirectRectAreaLight( builder, lightNode, lightData ) {
-
-		const { lightingModel, reflectedLight } = builder.context;
-
-		lightingModel.directRectArea( {
-			...lightData,
-			lightNode,
-			reflectedLight
-		}, builder );
-
-	}
-
-	/**
-	 * Setups the internal lights by building all respective
-	 * light nodes.
-	 *
-	 * @param {NodeBuilder} builder - A reference to the current node builder.
-	 * @param {Array<LightingNode>} lightNodes - An array of lighting nodes.
-	 */
-	setupLights( builder, lightNodes ) {
-
-		for ( const lightNode of lightNodes ) {
-
-			lightNode.build( builder );
-
-		}
-
-	}
-
-	getLightNodes( builder ) {
-
-		const nodeData = builder.getDataFromNode( this );
-
-		if ( nodeData.lightNodes === undefined ) {
-
-			nodeData.lightNodes = this.setupLightsNode( builder );
-
-		}
-
-		return nodeData.lightNodes;
-
-	}
-
-	/**
-	 * The implementation makes sure that for each light in the scene
-	 * there is a corresponding light node. By building the light nodes
-	 * and evaluating the lighting model the outgoing light is computed.
-	 *
-	 * @param {NodeBuilder} builder - A reference to the current node builder.
-	 * @return {Node<vec3>} A node representing the outgoing light.
-	 */
-	setup( builder ) {
-
-		const currentLightsNode = builder.lightsNode;
-
-		builder.lightsNode = this;
-
-		let outgoingLightNode = this.outgoingLightNode;
-
-		const context = builder.context;
-		const lightingModel = context.lightingModel;
-
-		if ( lightingModel ) {
-
-			const { totalDiffuseNode, totalSpecularNode } = this;
-
-			context.outgoingLight = outgoingLightNode;
-
-			builder.addStack();
-
-			lightingModel.start( builder );
-
-			const { backdrop, backdropAlpha } = context;
-			const { directDiffuse, directSpecular, indirectDiffuse, indirectSpecular } = context.reflectedLight;
-
-			let totalDiffuse = directDiffuse.add( indirectDiffuse );
-
-			if ( backdrop !== null ) {
-
-				if ( backdropAlpha !== null ) {
-
-					totalDiffuse = vec3( backdropAlpha.mix( totalDiffuse, backdrop ) );
-
-				} else {
-
-					totalDiffuse = vec3( backdrop );
-
-				}
-
-			}
-
-			totalDiffuseNode.assign( totalDiffuse );
-			totalSpecularNode.assign( directSpecular.add( indirectSpecular ) );
-
-			outgoingLightNode.assign( totalDiffuseNode.add( totalSpecularNode ) );
-
-			lightingModel.finish( builder );
-
-			outgoingLightNode = outgoingLightNode.bypass( builder.removeStack() );
-
-		}
-
-		builder.lightsNode = currentLightsNode;
-
-		return outgoingLightNode;
-
-	}
-
-	/**
-	 * Configures this node with an array of lights.
-	 *
-	 * @param {Array<Light>} lights - An array of lights.
-	 * @return {LightsNode} A reference to this node.
-	 */
-	setLights( lights ) {
-
-		this._lights = lights;
-
-		return this;
-
-	}
-
-	/**
-	 * Returns an array of the scene's lights.
-	 *
-	 * @return {Array<Light>} The scene's lights.
-	 */
-	getLights() {
-
-		return this._lights;
-
-	}
-
-	/**
-	 * Returns an array of the scene's lights.
-	 *
-	 * The light variations are shader-dependent;
-	 * if this array changes, the shader needs to be recreated.
-	 *
-	 * @return {Array<Light>} The scene's lights.
-	 */
-	getBuiltinLights() {
-
-		return this._lights;
-
-	}
-
-	/**
-	 * Whether the scene has lights or not.
-	 *
-	 * @type {boolean}
-	 */
-	get hasLights() {
-
-		return this._lights.length > 0;
-
-	}
-
-}
-
-/**
- * TSL function for creating an instance of `LightsNode` and configuring
- * it with the given array of lights.
- *
- * @tsl
- * @function
- * @param {Array<Light>} lights - An array of lights.
- * @return {LightsNode} The created lights node.
- */
-const lights = ( lights = [] ) => new LightsNode().setLights( lights );
-
-/**
  * Data structure for the renderer. It allows defining values
  * with chained, hierarchical keys. Keys are meant to be
  * objects since the module internally works with Weak Maps
@@ -35550,319 +35083,6 @@ class ShadowNode extends ShadowBaseNode {
  */
 const shadow = ( light, shadow ) => new ShadowNode( light, shadow );
 
-const _clearColor$1 = /*@__PURE__*/ new Color();
-const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
-const _lightPositionWorld = /*@__PURE__*/ new Vector3();
-const _lookTarget = /*@__PURE__*/ new Vector3();
-
-// Cube map face directions and up vectors for point light shadows
-// Face order: +X, -X, +Y, -Y, +Z, -Z
-// WebGPU coordinate system - same face orientations as CubeCamera
-const _cubeDirectionsWebGPU = [
-	/*@__PURE__*/ new Vector3( -1, 0, 0 ), /*@__PURE__*/ new Vector3( 1, 0, 0 ), /*@__PURE__*/ new Vector3( 0, 1, 0 ),
-	/*@__PURE__*/ new Vector3( 0, -1, 0 ), /*@__PURE__*/ new Vector3( 0, 0, 1 ), /*@__PURE__*/ new Vector3( 0, 0, -1 )
-];
-
-const _cubeUpsWebGPU = [
-	/*@__PURE__*/ new Vector3( 0, 1, 0 ), /*@__PURE__*/ new Vector3( 0, 1, 0 ), /*@__PURE__*/ new Vector3( 0, 0, -1 ),
-	/*@__PURE__*/ new Vector3( 0, 0, 1 ), /*@__PURE__*/ new Vector3( 0, 1, 0 ), /*@__PURE__*/ new Vector3( 0, 1, 0 )
-];
-
-// WebGL coordinate system - standard OpenGL convention
-const _cubeDirectionsWebGL = [
-	/*@__PURE__*/ new Vector3( 1, 0, 0 ), /*@__PURE__*/ new Vector3( -1, 0, 0 ), /*@__PURE__*/ new Vector3( 0, 1, 0 ),
-	/*@__PURE__*/ new Vector3( 0, -1, 0 ), /*@__PURE__*/ new Vector3( 0, 0, 1 ), /*@__PURE__*/ new Vector3( 0, 0, -1 )
-];
-
-const _cubeUpsWebGL = [
-	/*@__PURE__*/ new Vector3( 0, -1, 0 ), /*@__PURE__*/ new Vector3( 0, -1, 0 ), /*@__PURE__*/ new Vector3( 0, 0, 1 ),
-	/*@__PURE__*/ new Vector3( 0, 0, -1 ), /*@__PURE__*/ new Vector3( 0, -1, 0 ), /*@__PURE__*/ new Vector3( 0, -1, 0 )
-];
-
-const BasicPointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp } ) => {
-
-	return cubeTexture( depthTexture, bd3D ).compare( dp );
-
-} );
-
-/**
- * A shadow filtering function for point lights using Vogel disk sampling and IGN.
- *
- * Uses 5 samples distributed via Vogel disk pattern in tangent space around the
- * sample direction, rotated per-pixel using Interleaved Gradient Noise (IGN).
- *
- * @method
- * @param {Object} inputs - The input parameter object.
- * @param {CubeDepthTexture} inputs.depthTexture - A reference to the shadow cube map.
- * @param {Node<vec3>} inputs.bd3D - The normalized direction from light to fragment.
- * @param {Node<float>} inputs.dp - The depth value to compare against.
- * @param {LightShadow} inputs.shadow - The light shadow.
- * @return {Node<float>} The filtering result.
- */
-const PointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp, shadow } ) => {
-
-	const radius = reference( 'radius', 'float', shadow ).setGroup( renderGroup );
-	const mapSize = reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup );
-
-	const texelSize = radius.div( mapSize.x );
-
-	// Build a tangent-space coordinate system for applying offsets
-	const absDir = abs( bd3D );
-	const tangent = normalize( cross( bd3D, absDir.x.greaterThan( absDir.z ).select( vec3( 0, 1, 0 ), vec3( 1, 0, 0 ) ) ) );
-	const bitangent = cross( bd3D, tangent );
-
-	// Use IGN to rotate sampling pattern per pixel (phi = IGN * 2π)
-	const phi = interleavedGradientNoise( screenCoordinate.xy ).mul( 6.28318530718 );
-
-	// 5 samples using Vogel disk distribution in tangent space
-	const sample0 = vogelDiskSample( 0, 5, phi );
-	const sample1 = vogelDiskSample( 1, 5, phi );
-	const sample2 = vogelDiskSample( 2, 5, phi );
-	const sample3 = vogelDiskSample( 3, 5, phi );
-	const sample4 = vogelDiskSample( 4, 5, phi );
-
-	return cubeTexture( depthTexture, bd3D.add( tangent.mul( sample0.x ).add( bitangent.mul( sample0.y ) ).mul( texelSize ) ) ).compare( dp )
-		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample1.x ).add( bitangent.mul( sample1.y ) ).mul( texelSize ) ) ).compare( dp ) )
-		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample2.x ).add( bitangent.mul( sample2.y ) ).mul( texelSize ) ) ).compare( dp ) )
-		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample3.x ).add( bitangent.mul( sample3.y ) ).mul( texelSize ) ) ).compare( dp ) )
-		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample4.x ).add( bitangent.mul( sample4.y ) ).mul( texelSize ) ) ).compare( dp ) )
-		.mul( 1.0 / 5.0 );
-
-} );
-
-const pointShadowFilter = /*@__PURE__*/ Fn( ( { filterFn, depthTexture, shadowCoord, shadow }, builder ) => {
-
-	// for point lights, the uniform @vShadowCoord is re-purposed to hold
-	// the vector from the light to the world-space position of the fragment.
-	const shadowPosition = shadowCoord.xyz.toConst();
-	const shadowPositionAbs = shadowPosition.abs().toConst();
-	const viewZ = shadowPositionAbs.x.max( shadowPositionAbs.y ).max( shadowPositionAbs.z );
-
-	const shadowCameraNear = uniform( 'float' ).setGroup( renderGroup ).onRenderUpdate( () => shadow.camera.near );
-	const shadowCameraFar = uniform( 'float' ).setGroup( renderGroup ).onRenderUpdate( () => shadow.camera.far );
-	const bias = reference( 'bias', 'float', shadow ).setGroup( renderGroup );
-
-	const result = float( 1.0 ).toVar();
-
-	If( viewZ.sub( shadowCameraFar ).lessThanEqual( 0.0 ).and( viewZ.sub( shadowCameraNear ).greaterThanEqual( 0.0 ) ), () => {
-
-		let dp;
-
-		if ( builder.renderer.reversedDepthBuffer ) {
-
-			dp = viewZToReversedPerspectiveDepth( viewZ.negate(), shadowCameraNear, shadowCameraFar );
-			dp.subAssign( bias );
-
-		} else if ( builder.renderer.logarithmicDepthBuffer ) {
-
-			dp = viewZToLogarithmicDepth( viewZ.negate(), shadowCameraNear, shadowCameraFar );
-			dp.addAssign( bias );
-
-		} else {
-
-			dp = viewZToPerspectiveDepth( viewZ.negate(), shadowCameraNear, shadowCameraFar );
-			dp.addAssign( bias );
-
-		}
-
-		// bd3D = base direction 3D (direction from light to fragment)
-		const bd3D = shadowPosition.normalize();
-
-		// percentage-closer filtering using cube texture sampling
-		result.assign( filterFn( { depthTexture, bd3D, dp, shadow } ) );
-
-	} );
-
-	return result;
-
-} );
-
-
-/**
- * Represents the shadow implementation for point light nodes.
- *
- * @augments ShadowNode
- */
-class PointShadowNode extends ShadowNode {
-
-	static get type() {
-
-		return 'PointShadowNode';
-
-	}
-
-	/**
-	 * Constructs a new point shadow node.
-	 *
-	 * @param {PointLight} light - The shadow casting point light.
-	 * @param {?PointLightShadow} [shadow=null] - An optional point light shadow.
-	 */
-	constructor( light, shadow = null ) {
-
-		super( light, shadow );
-
-	}
-
-	/**
-	 * Overwrites the default implementation to return point light shadow specific
-	 * filtering functions.
-	 *
-	 * @param {number} type - The shadow type.
-	 * @return {Function} The filtering function.
-	 */
-	getShadowFilterFn( type ) {
-
-		return type === BasicShadowMap ? BasicPointShadowFilter : PointShadowFilter;
-
-	}
-
-	/**
-	 * Overwrites the default implementation so the unaltered shadow position is used.
-	 *
-	 * @param {NodeBuilder} builder - A reference to the current node builder.
-	 * @param {Node<vec3>} shadowPosition - A node representing the shadow position.
-	 * @return {Node<vec3>} The shadow coordinates.
-	 */
-	setupShadowCoord( builder, shadowPosition ) {
-
-		return shadowPosition;
-
-	}
-
-	/**
-	 * Overwrites the default implementation to only use point light specific
-	 * shadow filter functions.
-	 *
-	 * @param {NodeBuilder} builder - A reference to the current node builder.
-	 * @param {Object} inputs - A configuration object that defines the shadow filtering.
-	 * @param {Function} inputs.filterFn - This function defines the filtering type of the shadow map e.g. PCF.
-	 * @param {DepthTexture} inputs.depthTexture - A reference to the shadow map's depth texture.
-	 * @param {Node<vec3>} inputs.shadowCoord - Shadow coordinates which are used to sample from the shadow map.
-	 * @param {LightShadow} inputs.shadow - The light shadow.
-	 * @return {Node<float>} The result node of the shadow filtering.
-	 */
-	setupShadowFilter( builder, { filterFn, depthTexture, shadowCoord, shadow } ) {
-
-		return pointShadowFilter( { filterFn, depthTexture, shadowCoord, shadow } );
-
-	}
-
-	/**
-	 * Overwrites the default implementation to create a CubeRenderTarget with CubeDepthTexture.
-	 *
-	 * @param {LightShadow} shadow - The light shadow object.
-	 * @param {NodeBuilder} builder - A reference to the current node builder.
-	 * @return {Object} An object containing the shadow map and depth texture.
-	 */
-	setupRenderTarget( shadow, builder ) {
-
-		const depthTexture = new CubeDepthTexture( shadow.mapSize.width );
-		depthTexture.name = 'PointShadowDepthTexture';
-		depthTexture.compareFunction = builder.renderer.reversedDepthBuffer ? GreaterEqualCompare : LessEqualCompare;
-
-		const shadowMap = builder.createCubeRenderTarget( shadow.mapSize.width );
-		shadowMap.texture.name = 'PointShadowMap';
-		shadowMap.depthTexture = depthTexture;
-
-		return { shadowMap, depthTexture };
-
-	}
-
-	/**
-	 * Overwrites the default implementation with point light specific
-	 * rendering code.
-	 *
-	 * @param {NodeFrame} frame - A reference to the current node frame.
-	 */
-	renderShadow( frame ) {
-
-		const { shadow, shadowMap, light } = this;
-		const { renderer, scene } = frame;
-
-		const camera = shadow.camera;
-		const shadowMatrix = shadow.matrix;
-
-		// Select cube directions/ups based on coordinate system
-		const isWebGPU = renderer.coordinateSystem === WebGPUCoordinateSystem;
-		const cubeDirections = isWebGPU ? _cubeDirectionsWebGPU : _cubeDirectionsWebGL;
-		const cubeUps = isWebGPU ? _cubeUpsWebGPU : _cubeUpsWebGL;
-
-		shadowMap.setSize( shadow.mapSize.width, shadow.mapSize.width );
-
-		//
-
-		const previousAutoClear = renderer.autoClear;
-
-		const previousClearColor = renderer.getClearColor( _clearColor$1 );
-		const previousClearAlpha = renderer.getClearAlpha();
-
-		renderer.autoClear = false;
-		renderer.setClearColor( shadow.clearColor, shadow.clearAlpha );
-
-		// Render each cube face
-		for ( let face = 0; face < 6; face ++ ) {
-
-			// Set render target to the specific cube face
-			renderer.setRenderTarget( shadowMap, face );
-			renderer.clear();
-
-			// Update shadow camera matrices for this face
-
-			const far = light.distance || camera.far;
-
-			if ( far !== camera.far ) {
-
-				camera.far = far;
-				camera.updateProjectionMatrix();
-
-			}
-
-			_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
-			camera.position.copy( _lightPositionWorld );
-
-			_lookTarget.copy( camera.position );
-			_lookTarget.add( cubeDirections[ face ] );
-			camera.up.copy( cubeUps[ face ] );
-			camera.lookAt( _lookTarget );
-			camera.updateMatrixWorld();
-
-			shadowMatrix.makeTranslation( - _lightPositionWorld.x, - _lightPositionWorld.y, - _lightPositionWorld.z );
-
-			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-			shadow._frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
-
-			//
-
-			const currentSceneName = scene.name;
-
-			scene.name = `Point Light Shadow [ ${ light.name || 'ID: ' + light.id } ] - Face ${ face + 1 }`;
-
-			renderer.render( scene, camera );
-
-			scene.name = currentSceneName;
-
-		}
-
-		//
-
-		renderer.autoClear = previousAutoClear;
-		renderer.setClearColor( previousClearColor, previousClearAlpha );
-
-	}
-
-}
-
-/**
- * TSL function for creating an instance of `PointShadowNode`.
- *
- * @tsl
- * @function
- * @param {PointLight} light - The shadow casting point light.
- * @param {?PointLightShadow} [shadow=null] - An optional point light shadow.
- * @return {PointShadowNode} The created point shadow node.
- */
-const pointShadow = ( light, shadow ) => new PointShadowNode( light, shadow );
-
 /**
  * Base class for analytic light nodes.
  *
@@ -36185,6 +35405,319 @@ const getDistanceAttenuation = /*@__PURE__*/ Fn( ( { lightDistance, cutoffDistan
 
 }, { lightDistance: 'float', cutoffDistance: 'float', decayExponent: 'float', return: 'float' } ); // validated
 
+const _clearColor$1 = /*@__PURE__*/ new Color();
+const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
+const _lightPositionWorld = /*@__PURE__*/ new Vector3();
+const _lookTarget = /*@__PURE__*/ new Vector3();
+
+// Cube map face directions and up vectors for point light shadows
+// Face order: +X, -X, +Y, -Y, +Z, -Z
+// WebGPU coordinate system - same face orientations as CubeCamera
+const _cubeDirectionsWebGPU = [
+	/*@__PURE__*/ new Vector3( -1, 0, 0 ), /*@__PURE__*/ new Vector3( 1, 0, 0 ), /*@__PURE__*/ new Vector3( 0, 1, 0 ),
+	/*@__PURE__*/ new Vector3( 0, -1, 0 ), /*@__PURE__*/ new Vector3( 0, 0, 1 ), /*@__PURE__*/ new Vector3( 0, 0, -1 )
+];
+
+const _cubeUpsWebGPU = [
+	/*@__PURE__*/ new Vector3( 0, 1, 0 ), /*@__PURE__*/ new Vector3( 0, 1, 0 ), /*@__PURE__*/ new Vector3( 0, 0, -1 ),
+	/*@__PURE__*/ new Vector3( 0, 0, 1 ), /*@__PURE__*/ new Vector3( 0, 1, 0 ), /*@__PURE__*/ new Vector3( 0, 1, 0 )
+];
+
+// WebGL coordinate system - standard OpenGL convention
+const _cubeDirectionsWebGL = [
+	/*@__PURE__*/ new Vector3( 1, 0, 0 ), /*@__PURE__*/ new Vector3( -1, 0, 0 ), /*@__PURE__*/ new Vector3( 0, 1, 0 ),
+	/*@__PURE__*/ new Vector3( 0, -1, 0 ), /*@__PURE__*/ new Vector3( 0, 0, 1 ), /*@__PURE__*/ new Vector3( 0, 0, -1 )
+];
+
+const _cubeUpsWebGL = [
+	/*@__PURE__*/ new Vector3( 0, -1, 0 ), /*@__PURE__*/ new Vector3( 0, -1, 0 ), /*@__PURE__*/ new Vector3( 0, 0, 1 ),
+	/*@__PURE__*/ new Vector3( 0, 0, -1 ), /*@__PURE__*/ new Vector3( 0, -1, 0 ), /*@__PURE__*/ new Vector3( 0, -1, 0 )
+];
+
+const BasicPointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp } ) => {
+
+	return cubeTexture( depthTexture, bd3D ).compare( dp );
+
+} );
+
+/**
+ * A shadow filtering function for point lights using Vogel disk sampling and IGN.
+ *
+ * Uses 5 samples distributed via Vogel disk pattern in tangent space around the
+ * sample direction, rotated per-pixel using Interleaved Gradient Noise (IGN).
+ *
+ * @method
+ * @param {Object} inputs - The input parameter object.
+ * @param {CubeDepthTexture} inputs.depthTexture - A reference to the shadow cube map.
+ * @param {Node<vec3>} inputs.bd3D - The normalized direction from light to fragment.
+ * @param {Node<float>} inputs.dp - The depth value to compare against.
+ * @param {LightShadow} inputs.shadow - The light shadow.
+ * @return {Node<float>} The filtering result.
+ */
+const PointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp, shadow } ) => {
+
+	const radius = reference( 'radius', 'float', shadow ).setGroup( renderGroup );
+	const mapSize = reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup );
+
+	const texelSize = radius.div( mapSize.x );
+
+	// Build a tangent-space coordinate system for applying offsets
+	const absDir = abs( bd3D );
+	const tangent = normalize( cross( bd3D, absDir.x.greaterThan( absDir.z ).select( vec3( 0, 1, 0 ), vec3( 1, 0, 0 ) ) ) );
+	const bitangent = cross( bd3D, tangent );
+
+	// Use IGN to rotate sampling pattern per pixel (phi = IGN * 2π)
+	const phi = interleavedGradientNoise( screenCoordinate.xy ).mul( 6.28318530718 );
+
+	// 5 samples using Vogel disk distribution in tangent space
+	const sample0 = vogelDiskSample( 0, 5, phi );
+	const sample1 = vogelDiskSample( 1, 5, phi );
+	const sample2 = vogelDiskSample( 2, 5, phi );
+	const sample3 = vogelDiskSample( 3, 5, phi );
+	const sample4 = vogelDiskSample( 4, 5, phi );
+
+	return cubeTexture( depthTexture, bd3D.add( tangent.mul( sample0.x ).add( bitangent.mul( sample0.y ) ).mul( texelSize ) ) ).compare( dp )
+		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample1.x ).add( bitangent.mul( sample1.y ) ).mul( texelSize ) ) ).compare( dp ) )
+		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample2.x ).add( bitangent.mul( sample2.y ) ).mul( texelSize ) ) ).compare( dp ) )
+		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample3.x ).add( bitangent.mul( sample3.y ) ).mul( texelSize ) ) ).compare( dp ) )
+		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample4.x ).add( bitangent.mul( sample4.y ) ).mul( texelSize ) ) ).compare( dp ) )
+		.mul( 1.0 / 5.0 );
+
+} );
+
+const pointShadowFilter = /*@__PURE__*/ Fn( ( { filterFn, depthTexture, shadowCoord, shadow }, builder ) => {
+
+	// for point lights, the uniform @vShadowCoord is re-purposed to hold
+	// the vector from the light to the world-space position of the fragment.
+	const shadowPosition = shadowCoord.xyz.toConst();
+	const shadowPositionAbs = shadowPosition.abs().toConst();
+	const viewZ = shadowPositionAbs.x.max( shadowPositionAbs.y ).max( shadowPositionAbs.z );
+
+	const shadowCameraNear = uniform( 'float' ).setGroup( renderGroup ).onRenderUpdate( () => shadow.camera.near );
+	const shadowCameraFar = uniform( 'float' ).setGroup( renderGroup ).onRenderUpdate( () => shadow.camera.far );
+	const bias = reference( 'bias', 'float', shadow ).setGroup( renderGroup );
+
+	const result = float( 1.0 ).toVar();
+
+	If( viewZ.sub( shadowCameraFar ).lessThanEqual( 0.0 ).and( viewZ.sub( shadowCameraNear ).greaterThanEqual( 0.0 ) ), () => {
+
+		let dp;
+
+		if ( builder.renderer.reversedDepthBuffer ) {
+
+			dp = viewZToReversedPerspectiveDepth( viewZ.negate(), shadowCameraNear, shadowCameraFar );
+			dp.subAssign( bias );
+
+		} else if ( builder.renderer.logarithmicDepthBuffer ) {
+
+			dp = viewZToLogarithmicDepth( viewZ.negate(), shadowCameraNear, shadowCameraFar );
+			dp.addAssign( bias );
+
+		} else {
+
+			dp = viewZToPerspectiveDepth( viewZ.negate(), shadowCameraNear, shadowCameraFar );
+			dp.addAssign( bias );
+
+		}
+
+		// bd3D = base direction 3D (direction from light to fragment)
+		const bd3D = shadowPosition.normalize();
+
+		// percentage-closer filtering using cube texture sampling
+		result.assign( filterFn( { depthTexture, bd3D, dp, shadow } ) );
+
+	} );
+
+	return result;
+
+} );
+
+
+/**
+ * Represents the shadow implementation for point light nodes.
+ *
+ * @augments ShadowNode
+ */
+class PointShadowNode extends ShadowNode {
+
+	static get type() {
+
+		return 'PointShadowNode';
+
+	}
+
+	/**
+	 * Constructs a new point shadow node.
+	 *
+	 * @param {PointLight} light - The shadow casting point light.
+	 * @param {?PointLightShadow} [shadow=null] - An optional point light shadow.
+	 */
+	constructor( light, shadow = null ) {
+
+		super( light, shadow );
+
+	}
+
+	/**
+	 * Overwrites the default implementation to return point light shadow specific
+	 * filtering functions.
+	 *
+	 * @param {number} type - The shadow type.
+	 * @return {Function} The filtering function.
+	 */
+	getShadowFilterFn( type ) {
+
+		return type === BasicShadowMap ? BasicPointShadowFilter : PointShadowFilter;
+
+	}
+
+	/**
+	 * Overwrites the default implementation so the unaltered shadow position is used.
+	 *
+	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 * @param {Node<vec3>} shadowPosition - A node representing the shadow position.
+	 * @return {Node<vec3>} The shadow coordinates.
+	 */
+	setupShadowCoord( builder, shadowPosition ) {
+
+		return shadowPosition;
+
+	}
+
+	/**
+	 * Overwrites the default implementation to only use point light specific
+	 * shadow filter functions.
+	 *
+	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 * @param {Object} inputs - A configuration object that defines the shadow filtering.
+	 * @param {Function} inputs.filterFn - This function defines the filtering type of the shadow map e.g. PCF.
+	 * @param {DepthTexture} inputs.depthTexture - A reference to the shadow map's depth texture.
+	 * @param {Node<vec3>} inputs.shadowCoord - Shadow coordinates which are used to sample from the shadow map.
+	 * @param {LightShadow} inputs.shadow - The light shadow.
+	 * @return {Node<float>} The result node of the shadow filtering.
+	 */
+	setupShadowFilter( builder, { filterFn, depthTexture, shadowCoord, shadow } ) {
+
+		return pointShadowFilter( { filterFn, depthTexture, shadowCoord, shadow } );
+
+	}
+
+	/**
+	 * Overwrites the default implementation to create a CubeRenderTarget with CubeDepthTexture.
+	 *
+	 * @param {LightShadow} shadow - The light shadow object.
+	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 * @return {Object} An object containing the shadow map and depth texture.
+	 */
+	setupRenderTarget( shadow, builder ) {
+
+		const depthTexture = new CubeDepthTexture( shadow.mapSize.width );
+		depthTexture.name = 'PointShadowDepthTexture';
+		depthTexture.compareFunction = builder.renderer.reversedDepthBuffer ? GreaterEqualCompare : LessEqualCompare;
+
+		const shadowMap = builder.createCubeRenderTarget( shadow.mapSize.width );
+		shadowMap.texture.name = 'PointShadowMap';
+		shadowMap.depthTexture = depthTexture;
+
+		return { shadowMap, depthTexture };
+
+	}
+
+	/**
+	 * Overwrites the default implementation with point light specific
+	 * rendering code.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 */
+	renderShadow( frame ) {
+
+		const { shadow, shadowMap, light } = this;
+		const { renderer, scene } = frame;
+
+		const camera = shadow.camera;
+		const shadowMatrix = shadow.matrix;
+
+		// Select cube directions/ups based on coordinate system
+		const isWebGPU = renderer.coordinateSystem === WebGPUCoordinateSystem;
+		const cubeDirections = isWebGPU ? _cubeDirectionsWebGPU : _cubeDirectionsWebGL;
+		const cubeUps = isWebGPU ? _cubeUpsWebGPU : _cubeUpsWebGL;
+
+		shadowMap.setSize( shadow.mapSize.width, shadow.mapSize.width );
+
+		//
+
+		const previousAutoClear = renderer.autoClear;
+
+		const previousClearColor = renderer.getClearColor( _clearColor$1 );
+		const previousClearAlpha = renderer.getClearAlpha();
+
+		renderer.autoClear = false;
+		renderer.setClearColor( shadow.clearColor, shadow.clearAlpha );
+
+		// Render each cube face
+		for ( let face = 0; face < 6; face ++ ) {
+
+			// Set render target to the specific cube face
+			renderer.setRenderTarget( shadowMap, face );
+			renderer.clear();
+
+			// Update shadow camera matrices for this face
+
+			const far = light.distance || camera.far;
+
+			if ( far !== camera.far ) {
+
+				camera.far = far;
+				camera.updateProjectionMatrix();
+
+			}
+
+			_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
+			camera.position.copy( _lightPositionWorld );
+
+			_lookTarget.copy( camera.position );
+			_lookTarget.add( cubeDirections[ face ] );
+			camera.up.copy( cubeUps[ face ] );
+			camera.lookAt( _lookTarget );
+			camera.updateMatrixWorld();
+
+			shadowMatrix.makeTranslation( - _lightPositionWorld.x, - _lightPositionWorld.y, - _lightPositionWorld.z );
+
+			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+			shadow._frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
+
+			//
+
+			const currentSceneName = scene.name;
+
+			scene.name = `Point Light Shadow [ ${ light.name || 'ID: ' + light.id } ] - Face ${ face + 1 }`;
+
+			renderer.render( scene, camera );
+
+			scene.name = currentSceneName;
+
+		}
+
+		//
+
+		renderer.autoClear = previousAutoClear;
+		renderer.setClearColor( previousClearColor, previousClearAlpha );
+
+	}
+
+}
+
+/**
+ * TSL function for creating an instance of `PointShadowNode`.
+ *
+ * @tsl
+ * @function
+ * @param {PointLight} light - The shadow casting point light.
+ * @param {?PointLightShadow} [shadow=null] - An optional point light shadow.
+ * @return {PointShadowNode} The created point shadow node.
+ */
+const pointShadow = ( light, shadow ) => new PointShadowNode( light, shadow );
+
 const directPointLight = ( { color, lightVector, cutoffDistance, decayExponent } ) => {
 
 	const lightDirection = lightVector.normalize();
@@ -36279,6 +35812,2543 @@ class PointLightNode extends AnalyticLightNode {
 	}
 
 }
+
+/**
+ * Module for representing spot lights as nodes.
+ *
+ * @augments AnalyticLightNode
+ */
+class SpotLightNode extends AnalyticLightNode {
+
+	static get type() {
+
+		return 'SpotLightNode';
+
+	}
+
+	/**
+	 * Constructs a new spot light node.
+	 *
+	 * @param {?SpotLight} [light=null] - The spot light source.
+	 */
+	constructor( light = null ) {
+
+		super( light );
+
+		/**
+		 * Uniform node representing the cone cosine.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.coneCosNode = uniform( 0 ).setGroup( renderGroup );
+
+		/**
+		 * Uniform node representing the penumbra cosine.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.penumbraCosNode = uniform( 0 ).setGroup( renderGroup );
+
+		/**
+		 * Uniform node representing the cutoff distance.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.cutoffDistanceNode = uniform( 0 ).setGroup( renderGroup );
+
+		/**
+		 * Uniform node representing the decay exponent.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.decayExponentNode = uniform( 0 ).setGroup( renderGroup );
+
+		/**
+		 * Uniform node representing the light color.
+		 *
+		 * @type {UniformNode<Color>}
+		 */
+		this.colorNode = uniform( this.color ).setGroup( renderGroup );
+
+	}
+
+	/**
+	 * Overwritten to updated spot light specific uniforms.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 */
+	update( frame ) {
+
+		super.update( frame );
+
+		const { light } = this;
+
+		this.coneCosNode.value = Math.cos( light.angle );
+		this.penumbraCosNode.value = Math.cos( light.angle * ( 1 - light.penumbra ) );
+
+		this.cutoffDistanceNode.value = light.distance;
+		this.decayExponentNode.value = light.decay;
+
+	}
+
+	/**
+	 * Computes the spot attenuation for the given angle.
+	 *
+	 * @param {NodeBuilder} builder - The node builder.
+	 * @param {Node<float>} angleCosine - The angle to compute the spot attenuation for.
+	 * @return {Node<float>} The spot attenuation.
+	 */
+	getSpotAttenuation( builder, angleCosine ) {
+
+		const { coneCosNode, penumbraCosNode } = this;
+
+		return smoothstep( coneCosNode, penumbraCosNode, angleCosine );
+
+	}
+
+	getLightCoord( builder ) {
+
+		const properties = builder.getNodeProperties( this );
+		let projectionUV = properties.projectionUV;
+
+		if ( projectionUV === undefined ) {
+
+			projectionUV = lightProjectionUV( this.light, builder.context.positionWorld );
+
+			properties.projectionUV = projectionUV;
+
+		}
+
+		return projectionUV;
+
+	}
+
+	setupDirect( builder ) {
+
+		const { colorNode, cutoffDistanceNode, decayExponentNode, light } = this;
+
+		const lightVector = this.getLightVector( builder );
+
+		const lightDirection = lightVector.normalize();
+		const angleCos = lightDirection.dot( lightTargetDirection( light ) );
+
+		const spotAttenuation = this.getSpotAttenuation( builder, angleCos );
+
+		const lightDistance = lightVector.length();
+
+		const lightAttenuation = getDistanceAttenuation( {
+			lightDistance,
+			cutoffDistance: cutoffDistanceNode,
+			decayExponent: decayExponentNode
+		} );
+
+		let lightColor = colorNode.mul( spotAttenuation ).mul( lightAttenuation );
+
+		let projected, lightCoord;
+
+		if ( light.colorNode ) {
+
+			lightCoord = this.getLightCoord( builder );
+			projected = light.colorNode( lightCoord );
+
+		} else if ( light.map ) {
+
+			lightCoord = this.getLightCoord( builder );
+			projected = texture( light.map, lightCoord.xy ).onRenderUpdate( () => light.map );
+
+		}
+
+		if ( projected ) {
+
+			const inSpotLightMap = lightCoord.mul( 2. ).sub( 1. ).abs().lessThan( 1. ).all();
+
+			lightColor = inSpotLightMap.select( lightColor.mul( projected ), lightColor );
+
+		}
+
+		return { lightColor, lightDirection };
+
+	}
+
+}
+
+const BRDF_Lambert = /*@__PURE__*/ Fn( ( inputs ) => {
+
+	return inputs.diffuseColor.mul( 1 / Math.PI ); // punctual light
+
+} ); // validated
+
+const EON_EPSILON = 1e-7;
+const FON_A_COEFFICIENT = 0.5 - 2 / ( 3 * Math.PI );
+const FON_AVERAGE_ALBEDO_COEFFICIENT = 2 / 3 - 28 / ( 15 * Math.PI );
+
+const FON_DirectionalAlbedo = /*@__PURE__*/ Fn( ( { mu, roughness, A } ) => {
+
+	const muComp = mu.oneMinus();
+	const gOverPi = muComp.mul(
+		muComp.mul(
+			muComp.mul(
+				muComp.mul( 0.0714429953 ).sub( 0.332181442 )
+			).add( 0.491881867 )
+		).add( 0.0571085289 )
+	);
+
+	return A.mul( roughness.mul( gOverPi ).add( 1.0 ) );
+
+}, { mu: 'float', roughness: 'float', A: 'float', return: 'float' } );
+
+// Portsmouth et al. 2025, "EON: A Practical Energy-Preserving Rough Diffuse BRDF"
+// https://jcgt.org/published/0014/01/06/
+const BRDF_EON = /*@__PURE__*/ Fn( ( { lightDirection, diffuseColor, roughness, normalView: normalView$1 = normalView, viewDirection = positionViewDirection } ) => {
+
+	const rho = diffuseColor.clamp();
+	const dotNL = normalView$1.dot( lightDirection ).clamp();
+	const dotNV = normalView$1.dot( viewDirection ).clamp();
+	const s = lightDirection.dot( viewDirection ).sub( dotNL.mul( dotNV ) );
+	const sOverT = s.greaterThan( 0.0 ).select( s.div( dotNL.max( dotNV ).max( EON_EPSILON ) ), s );
+
+	const A = roughness.mul( FON_A_COEFFICIENT ).add( 1.0 ).reciprocal();
+	const singleScatter = rho.mul( 1 / Math.PI, A, roughness.mul( sOverT ).add( 1.0 ) );
+
+	const averageAlbedo = A.mul( roughness.mul( FON_AVERAGE_ALBEDO_COEFFICIENT ).add( 1.0 ) );
+	const albedoV = FON_DirectionalAlbedo( { mu: dotNV, roughness, A } );
+	const albedoL = FON_DirectionalAlbedo( { mu: dotNL, roughness, A } );
+	const rhoMultiScatter = rho.mul( rho, averageAlbedo ).div( rho.mul( averageAlbedo.oneMinus() ).oneMinus().max( EON_EPSILON ) );
+	const multiScatter = rhoMultiScatter.mul(
+		1 / Math.PI,
+		albedoV.oneMinus().max( EON_EPSILON ),
+		albedoL.oneMinus().max( EON_EPSILON )
+	).div( averageAlbedo.oneMinus().max( EON_EPSILON ) );
+	const eon = singleScatter.add( multiScatter );
+
+	return roughness.lessThanEqual( EON_EPSILON ).select( rho.mul( 1 / Math.PI ), eon );
+
+} );
+
+const EON_DirectionalAlbedo = /*@__PURE__*/ Fn( ( { diffuseColor, roughness, dotNV } ) => {
+
+	const rho = diffuseColor.clamp();
+	const A = roughness.mul( FON_A_COEFFICIENT ).add( 1.0 ).reciprocal();
+	const directionalAlbedo = FON_DirectionalAlbedo( { mu: dotNV.clamp(), roughness, A } );
+	const averageAlbedo = A.mul( roughness.mul( FON_AVERAGE_ALBEDO_COEFFICIENT ).add( 1.0 ) );
+	const rhoMultiScatter = rho.mul( rho, averageAlbedo ).div( rho.mul( averageAlbedo.oneMinus() ).oneMinus().max( EON_EPSILON ) );
+	const eonAlbedo = rho.mul( directionalAlbedo ).add( rhoMultiScatter.mul( directionalAlbedo.oneMinus() ) );
+
+	return roughness.lessThanEqual( EON_EPSILON ).select( rho, eonAlbedo );
+
+}, { diffuseColor: 'vec3', roughness: 'float', dotNV: 'float', return: 'vec3' } );
+
+const F_Schlick = /*@__PURE__*/ Fn( ( { f0, f90, dotVH } ) => {
+
+	// Original approximation by Christophe Schlick '94
+	// float fresnel = pow( 1.0 - dotVH, 5.0 );
+
+	// Optimized variant (presented by Epic at SIGGRAPH '13)
+	// https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf
+	const fresnel = dotVH.mul( -5.55473 ).sub( 6.98316 ).mul( dotVH ).exp2();
+
+	return f0.mul( fresnel.oneMinus() ).add( f90.mul( fresnel ) );
+
+} ); // validated
+
+// Moving Frostbite to Physically Based Rendering 3.0 - page 12, listing 2
+// https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
+const V_GGX_SmithCorrelated = /*@__PURE__*/ Fn( ( { alpha, dotNL, dotNV } ) => {
+
+	const a2 = alpha.pow2();
+
+	const gv = dotNL.mul( a2.add( a2.oneMinus().mul( dotNV.pow2() ) ).sqrt() );
+	const gl = dotNV.mul( a2.add( a2.oneMinus().mul( dotNL.pow2() ) ).sqrt() );
+
+	return div( 0.5, gv.add( gl ).max( EPSILON ) );
+
+}, { alpha: 'float', dotNL: 'float', dotNV: 'float', return: 'float' } ); // validated
+
+// https://google.github.io/filament/Filament.md.html#materialsystem/anisotropicmodel/anisotropicspecularbrdf
+
+const V_GGX_SmithCorrelated_Anisotropic = /*@__PURE__*/ Fn( ( { alphaT, alphaB, dotTV, dotBV, dotTL, dotBL, dotNV, dotNL } ) => {
+
+	const gv = dotNL.mul( vec3( alphaT.mul( dotTV ), alphaB.mul( dotBV ), dotNV ).length() );
+	const gl = dotNV.mul( vec3( alphaT.mul( dotTL ), alphaB.mul( dotBL ), dotNL ).length() );
+
+	return div( 0.5, gv.add( gl ).max( EPSILON ) );
+
+}, {
+	alphaT: 'float',
+	alphaB: 'float',
+	dotTV: 'float',
+	dotBV: 'float',
+	dotTL: 'float',
+	dotBL: 'float',
+	dotNV: 'float',
+	dotNL: 'float',
+	return: 'float'
+} );
+
+// Microfacet Models for Refraction through Rough Surfaces - equation (33)
+// http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
+// alpha is "roughness squared" in Disney’s reparameterization
+const D_GGX = /*@__PURE__*/ Fn( ( { alpha, dotNH } ) => {
+
+	const a2 = alpha.pow2();
+
+	const denom = dotNH.pow2().mul( a2.oneMinus() ).oneMinus(); // avoid alpha = 0 with dotNH = 1
+
+	return a2.div( denom.pow2() ).mul( 1 / Math.PI );
+
+}, { alpha: 'float', dotNH: 'float', return: 'float' } ); // validated
+
+const RECIPROCAL_PI = /*@__PURE__*/ float( 1 / Math.PI );
+
+// https://google.github.io/filament/Filament.md.html#materialsystem/anisotropicmodel/anisotropicspecularbrdf
+
+const D_GGX_Anisotropic = /*@__PURE__*/ Fn( ( { alphaT, alphaB, dotNH, dotTH, dotBH } ) => {
+
+	const a2 = alphaT.mul( alphaB );
+	const v = vec3( alphaB.mul( dotTH ), alphaT.mul( dotBH ), a2.mul( dotNH ) );
+	const v2 = v.dot( v );
+	const w2 = a2.div( v2 );
+
+	return RECIPROCAL_PI.mul( a2.mul( w2.pow2() ) );
+
+}, {
+	alphaT: 'float',
+	alphaB: 'float',
+	dotNH: 'float',
+	dotTH: 'float',
+	dotBH: 'float',
+	return: 'float'
+} );
+
+// GGX Distribution, Schlick Fresnel, GGX_SmithCorrelated Visibility
+const BRDF_GGX = /*@__PURE__*/ Fn( ( { lightDirection, f0, f90, roughness, f, normalView: normalView$1 = normalView, viewDirection = positionViewDirection, USE_IRIDESCENCE, USE_ANISOTROPY } ) => {
+
+	const alpha = roughness.max( 0.045 ).pow2(); // punctual lights need a minimum roughness to show a highlight
+
+	const halfDir = lightDirection.add( viewDirection ).normalize();
+
+	const dotNL = normalView$1.dot( lightDirection ).clamp();
+	const dotNV = normalView$1.dot( viewDirection ).clamp(); // @ TODO: Move to core dotNV
+	const dotNH = normalView$1.dot( halfDir ).clamp();
+	const dotVH = viewDirection.dot( halfDir ).clamp();
+
+	let F = F_Schlick( { f0, f90, dotVH } );
+	let V, D;
+
+	if ( defined( USE_IRIDESCENCE ) ) {
+
+		F = iridescence.mix( F, f );
+
+	}
+
+	if ( defined( USE_ANISOTROPY ) ) {
+
+		const dotTL = anisotropyT.dot( lightDirection );
+		const dotTV = anisotropyT.dot( viewDirection );
+		const dotTH = anisotropyT.dot( halfDir );
+		const dotBL = anisotropyB.dot( lightDirection );
+		const dotBV = anisotropyB.dot( viewDirection );
+		const dotBH = anisotropyB.dot( halfDir );
+
+		const clampedAlphaT = alphaT.max( alpha );
+
+		V = V_GGX_SmithCorrelated_Anisotropic( { alphaT: clampedAlphaT, alphaB: alpha, dotTV, dotBV, dotTL, dotBL, dotNV, dotNL } );
+		D = D_GGX_Anisotropic( { alphaT: clampedAlphaT, alphaB: alpha, dotNH, dotTH, dotBH } );
+
+	} else {
+
+		V = V_GGX_SmithCorrelated( { alpha, dotNL, dotNV } );
+		D = D_GGX( { alpha, dotNH } );
+
+	}
+
+	return F.mul( V ).mul( D );
+
+} ); // validated
+
+/**
+ * Precomputed DFG LUT for physically based specular lighting, used by both
+ * image-based lighting and direct-light multi-scattering energy compensation
+ * Resolution: 16x16
+ * Samples: 4096 per texel
+ * Format: RG16F (2 half floats per texel: scale, bias)
+ */
+
+const DATA = new Uint16Array( [
+	0x30b5, 0x3ad1, 0x314c, 0x3a4d, 0x33d2, 0x391c, 0x35ef, 0x3828, 0x37f3, 0x36a6, 0x38d1, 0x3539, 0x3979, 0x3410, 0x39f8, 0x3252, 0x3a53, 0x30f0, 0x3a94, 0x2fc9, 0x3abf, 0x2e35, 0x3ada, 0x2d05, 0x3ae8, 0x2c1f, 0x3aed, 0x2ae0, 0x3aea, 0x29d1, 0x3ae1, 0x28ff,
+	0x3638, 0x38e4, 0x364a, 0x38ce, 0x3699, 0x385e, 0x374e, 0x372c, 0x3839, 0x35a4, 0x38dc, 0x3462, 0x396e, 0x32c4, 0x39de, 0x3134, 0x3a2b, 0x3003, 0x3a59, 0x2e3a, 0x3a6d, 0x2ce1, 0x3a6e, 0x2bba, 0x3a5f, 0x2a33, 0x3a49, 0x290a, 0x3a2d, 0x2826, 0x3a0a, 0x26e8,
+	0x3894, 0x36d7, 0x3897, 0x36c9, 0x38a3, 0x3675, 0x38bc, 0x35ac, 0x38ee, 0x349c, 0x393e, 0x3332, 0x3997, 0x3186, 0x39e2, 0x3038, 0x3a13, 0x2e75, 0x3a29, 0x2cf5, 0x3a2d, 0x2bac, 0x3a21, 0x29ff, 0x3a04, 0x28bc, 0x39dc, 0x2790, 0x39ad, 0x261a, 0x3978, 0x24fa,
+	0x39ac, 0x34a8, 0x39ac, 0x34a3, 0x39ae, 0x3480, 0x39ae, 0x3423, 0x39b1, 0x330e, 0x39c2, 0x31a9, 0x39e0, 0x3063, 0x39fc, 0x2eb5, 0x3a0c, 0x2d1d, 0x3a14, 0x2bcf, 0x3a07, 0x29ff, 0x39e9, 0x28a3, 0x39be, 0x273c, 0x3989, 0x25b3, 0x394a, 0x2488, 0x3907, 0x2345,
+	0x3a77, 0x3223, 0x3a76, 0x321f, 0x3a73, 0x3204, 0x3a6a, 0x31b3, 0x3a58, 0x3114, 0x3a45, 0x303b, 0x3a34, 0x2eb6, 0x3a26, 0x2d31, 0x3a1e, 0x2bef, 0x3a0b, 0x2a0d, 0x39ec, 0x28a1, 0x39c0, 0x271b, 0x3987, 0x2580, 0x3944, 0x2449, 0x38fa, 0x22bd, 0x38ac, 0x2155,
+	0x3b07, 0x2fca, 0x3b06, 0x2fca, 0x3b00, 0x2fb8, 0x3af4, 0x2f7c, 0x3adb, 0x2eea, 0x3ab4, 0x2e00, 0x3a85, 0x2cec, 0x3a5e, 0x2bc5, 0x3a36, 0x2a00, 0x3a0d, 0x2899, 0x39dc, 0x2707, 0x39a0, 0x2562, 0x395a, 0x2424, 0x390b, 0x2268, 0x38b7, 0x20fd, 0x385f, 0x1fd1,
+	0x3b69, 0x2cb9, 0x3b68, 0x2cbb, 0x3b62, 0x2cbb, 0x3b56, 0x2cae, 0x3b3b, 0x2c78, 0x3b0d, 0x2c0a, 0x3acf, 0x2ae3, 0x3a92, 0x2998, 0x3a54, 0x2867, 0x3a17, 0x26d0, 0x39d3, 0x253c, 0x3989, 0x2402, 0x3935, 0x2226, 0x38dc, 0x20bd, 0x387d, 0x1f54, 0x381d, 0x1db3,
+	0x3ba9, 0x296b, 0x3ba8, 0x296f, 0x3ba3, 0x297b, 0x3b98, 0x2987, 0x3b7f, 0x2976, 0x3b4e, 0x2927, 0x3b0e, 0x2895, 0x3ac2, 0x27b7, 0x3a73, 0x263b, 0x3a23, 0x24e7, 0x39d0, 0x239b, 0x3976, 0x21d9, 0x3917, 0x207e, 0x38b2, 0x1ee7, 0x384b, 0x1d53, 0x37c7, 0x1c1e,
+	0x3bd2, 0x25cb, 0x3bd1, 0x25d3, 0x3bcd, 0x25f0, 0x3bc2, 0x261f, 0x3bad, 0x2645, 0x3b7d, 0x262d, 0x3b3e, 0x25c4, 0x3aec, 0x250f, 0x3a93, 0x243a, 0x3a32, 0x22ce, 0x39d0, 0x215b, 0x3969, 0x202a, 0x38fe, 0x1e6e, 0x388f, 0x1cf1, 0x381f, 0x1b9b, 0x3762, 0x19dd,
+	0x3be9, 0x21ab, 0x3be9, 0x21b7, 0x3be5, 0x21e5, 0x3bdd, 0x2241, 0x3bc9, 0x22a7, 0x3ba0, 0x22ec, 0x3b62, 0x22cd, 0x3b0f, 0x2247, 0x3aae, 0x2175, 0x3a44, 0x2088, 0x39d4, 0x1f49, 0x3960, 0x1dbe, 0x38e9, 0x1c77, 0x3870, 0x1ae8, 0x37f1, 0x1953, 0x3708, 0x181b,
+	0x3bf6, 0x1cea, 0x3bf6, 0x1cfb, 0x3bf3, 0x1d38, 0x3bec, 0x1dbd, 0x3bda, 0x1e7c, 0x3bb7, 0x1f25, 0x3b7d, 0x1f79, 0x3b2c, 0x1f4c, 0x3ac6, 0x1ea6, 0x3a55, 0x1dbb, 0x39da, 0x1cbd, 0x395a, 0x1b9d, 0x38d8, 0x1a00, 0x3855, 0x18ac, 0x37ab, 0x173c, 0x36b7, 0x1598,
+	0x3bfc, 0x1736, 0x3bfc, 0x1759, 0x3bf9, 0x17e7, 0x3bf4, 0x1896, 0x3be4, 0x1997, 0x3bc6, 0x1aa8, 0x3b91, 0x1b84, 0x3b43, 0x1bd2, 0x3ade, 0x1b8a, 0x3a65, 0x1acd, 0x39e2, 0x19d3, 0x3957, 0x18cd, 0x38ca, 0x17b3, 0x383e, 0x1613, 0x376d, 0x14bf, 0x366f, 0x135e,
+	0x3bff, 0x101b, 0x3bff, 0x1039, 0x3bfc, 0x10c8, 0x3bf9, 0x1226, 0x3bea, 0x1428, 0x3bcf, 0x1584, 0x3b9f, 0x16c5, 0x3b54, 0x179a, 0x3af0, 0x17ce, 0x3a76, 0x1771, 0x39ea, 0x16a4, 0x3956, 0x15a7, 0x38bf, 0x14a7, 0x3829, 0x1379, 0x3735, 0x11ea, 0x362d, 0x10a1,
+	0x3c00, 0x061b, 0x3c00, 0x066a, 0x3bfe, 0x081c, 0x3bfa, 0x0a4c, 0x3bed, 0x0d16, 0x3bd5, 0x0fb3, 0x3ba9, 0x114d, 0x3b63, 0x127c, 0x3b01, 0x132f, 0x3a85, 0x1344, 0x39f4, 0x12d2, 0x3957, 0x120d, 0x38b5, 0x1122, 0x3817, 0x103c, 0x3703, 0x0ed3, 0x35f0, 0x0d6d,
+	0x3c00, 0x007a, 0x3c00, 0x0089, 0x3bfe, 0x011d, 0x3bfb, 0x027c, 0x3bf0, 0x04fa, 0x3bda, 0x0881, 0x3bb1, 0x0acd, 0x3b6f, 0x0c97, 0x3b10, 0x0d7b, 0x3a93, 0x0df1, 0x39fe, 0x0def, 0x3959, 0x0d8a, 0x38af, 0x0ce9, 0x3808, 0x0c31, 0x36d5, 0x0af0, 0x35b9, 0x09a3,
+	0x3c00, 0x0000, 0x3c00, 0x0001, 0x3bff, 0x0015, 0x3bfb, 0x0059, 0x3bf2, 0x00fd, 0x3bdd, 0x01df, 0x3bb7, 0x031c, 0x3b79, 0x047c, 0x3b1d, 0x05d4, 0x3aa0, 0x06d5, 0x3a08, 0x075a, 0x395d, 0x075e, 0x38aa, 0x06f7, 0x37f4, 0x0648, 0x36ac, 0x0576, 0x3586, 0x049f
+] );
+
+let lut = null;
+
+const DFGLUT = /*@__PURE__*/ Fn( ( { roughness, dotNV } ) => {
+
+	if ( lut === null ) {
+
+		lut = new DataTexture( DATA, 16, 16, RGFormat, HalfFloatType );
+		lut.name = 'DFG_LUT';
+		lut.minFilter = LinearFilter;
+		lut.magFilter = LinearFilter;
+		lut.wrapS = ClampToEdgeWrapping;
+		lut.wrapT = ClampToEdgeWrapping;
+		lut.generateMipmaps = false;
+		lut.needsUpdate = true;
+
+	}
+
+	const uv = vec2( roughness, dotNV );
+
+	return texture( lut, uv ).rg;
+
+} );
+
+const EnvironmentBRDF = /*@__PURE__*/ Fn( ( inputs ) => {
+
+	const { dotNV, specularColor, specularF90, roughness } = inputs;
+
+	const fab = DFGLUT( { dotNV, roughness } );
+	return specularColor.mul( fab.x ).add( specularF90.mul( fab.y ) );
+
+} );
+
+const Schlick_to_F0 = /*@__PURE__*/ Fn( ( { f, f90, dotVH } ) => {
+
+	const x = dotVH.oneMinus().saturate();
+	const x2 = x.mul( x );
+	const x5 = x.mul( x2, x2 ).clamp( 0, .9999 );
+
+	return f.sub( vec3( f90 ).mul( x5 ) ).div( x5.oneMinus() );
+
+}, { f: 'vec3', f90: 'float', dotVH: 'float', return: 'vec3' } );
+
+// https://github.com/google/filament/blob/master/shaders/src/brdf.fs
+const D_Charlie = /*@__PURE__*/ Fn( ( { roughness, dotNH } ) => {
+
+	const alpha = roughness.pow2();
+
+	// Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF"
+	const invAlpha = float( 1.0 ).div( alpha );
+	const cos2h = dotNH.pow2();
+	const sin2h = cos2h.oneMinus().max( 0.0078125 ); // 2^(-14/2), so sin2h^2 > 0 in fp16
+
+	return float( 2.0 ).add( invAlpha ).mul( sin2h.pow( invAlpha.mul( 0.5 ) ) ).div( 2.0 * Math.PI );
+
+}, { roughness: 'float', dotNH: 'float', return: 'float' } );
+
+// https://github.com/google/filament/blob/master/shaders/src/brdf.fs
+const V_Neubelt = /*@__PURE__*/ Fn( ( { dotNV, dotNL } ) => {
+
+	// Neubelt and Pettineo 2013, "Crafting a Next-gen Material Pipeline for The Order: 1886"
+	return float( 1.0 ).div( float( 4.0 ).mul( dotNL.add( dotNV ).sub( dotNL.mul( dotNV ) ) ) ).clamp();
+
+}, { dotNV: 'float', dotNL: 'float', return: 'float' } );
+
+const BRDF_Sheen = /*@__PURE__*/ Fn( ( { lightDirection } ) => {
+
+	const halfDir = lightDirection.add( positionViewDirection ).normalize();
+
+	const dotNL = normalView.dot( lightDirection ).clamp();
+	const dotNV = normalView.dot( positionViewDirection ).clamp();
+	const dotNH = normalView.dot( halfDir ).clamp();
+
+	const D = D_Charlie( { roughness: sheenRoughness, dotNH } );
+	const V = V_Neubelt( { dotNV, dotNL } );
+
+	return sheen.mul( D ).mul( V );
+
+} );
+
+// Rect Area Light
+
+// Real-Time Polygonal-Light Shading with Linearly Transformed Cosines
+// by Eric Heitz, Jonathan Dupuy, Stephen Hill and David Neubelt
+// code: https://github.com/selfshadow/ltc_code/
+
+const LTC_Uv = /*@__PURE__*/ Fn( ( { N, V, roughness } ) => {
+
+	const LUT_SIZE = 64.0;
+	const LUT_SCALE = ( LUT_SIZE - 1.0 ) / LUT_SIZE;
+	const LUT_BIAS = 0.5 / LUT_SIZE;
+
+	const dotNV = N.dot( V ).saturate();
+
+	// texture parameterized by sqrt( GGX alpha ) and sqrt( 1 - cos( theta ) )
+	const uv = vec2( roughness, dotNV.oneMinus().sqrt() );
+
+	uv.assign( uv.mul( LUT_SCALE ).add( LUT_BIAS ) );
+
+	return uv;
+
+}, { N: 'vec3', V: 'vec3', roughness: 'float', return: 'vec2' } );
+
+const LTC_ClippedSphereFormFactor = /*@__PURE__*/ Fn( ( { f } ) => {
+
+	// Real-Time Area Lighting: a Journey from Research to Production (p.102)
+	// An approximation of the form factor of a horizon-clipped rectangle.
+
+	const l = f.length();
+
+	return max( l.mul( l ).add( f.z ).div( l.add( 1.0 ) ), 0 );
+
+}, { f: 'vec3', return: 'float' } );
+
+const LTC_EdgeVectorFormFactor = /*@__PURE__*/ Fn( ( { v1, v2 } ) => {
+
+	const x = v1.dot( v2 );
+	const y = x.abs().toVar();
+
+	// rational polynomial approximation to theta / sin( theta ) / 2PI
+	const a = y.mul( 0.0145206 ).add( 0.4965155 ).mul( y ).add( 0.8543985 ).toVar();
+	const b = y.add( 4.1616724 ).mul( y ).add( 3.4175940 ).toVar();
+	const v = a.div( b );
+
+	const theta_sintheta = x.greaterThan( 0.0 ).select( v, max( x.mul( x ).oneMinus(), 1e-7 ).inverseSqrt().mul( 0.5 ).sub( v ) );
+
+	return v1.cross( v2 ).mul( theta_sintheta );
+
+}, { v1: 'vec3', v2: 'vec3', return: 'vec3' } );
+
+const LTC_Evaluate = /*@__PURE__*/ Fn( ( { N, V, P, mInv, p0, p1, p2, p3 } ) => {
+
+	// bail if point is on back side of plane of light
+	// assumes ccw winding order of light vertices
+	const v1 = p1.sub( p0 ).toVar();
+	const v2 = p3.sub( p0 ).toVar();
+
+	const lightNormal = v1.cross( v2 );
+	const result = vec3().toVar();
+
+	If( lightNormal.dot( P.sub( p0 ) ).greaterThanEqual( 0.0 ), () => {
+
+		// construct orthonormal basis around N
+		const T1 = V.sub( N.mul( V.dot( N ) ) ).normalize();
+		const T2 = N.cross( T1 ).negate(); // negated from paper; possibly due to a different handedness of world coordinate system
+
+		// compute transform
+		const mat = mInv.mul( mat3( T1, T2, N ).transpose() ).toVar();
+
+		// transform rect
+		// & project rect onto sphere
+		const coords0 = mat.mul( p0.sub( P ) ).normalize().toVar();
+		const coords1 = mat.mul( p1.sub( P ) ).normalize().toVar();
+		const coords2 = mat.mul( p2.sub( P ) ).normalize().toVar();
+		const coords3 = mat.mul( p3.sub( P ) ).normalize().toVar();
+
+		// calculate vector form factor
+		const vectorFormFactor = vec3( 0 ).toVar();
+		vectorFormFactor.addAssign( LTC_EdgeVectorFormFactor( { v1: coords0, v2: coords1 } ) );
+		vectorFormFactor.addAssign( LTC_EdgeVectorFormFactor( { v1: coords1, v2: coords2 } ) );
+		vectorFormFactor.addAssign( LTC_EdgeVectorFormFactor( { v1: coords2, v2: coords3 } ) );
+		vectorFormFactor.addAssign( LTC_EdgeVectorFormFactor( { v1: coords3, v2: coords0 } ) );
+
+		// adjust for horizon clipping
+		result.assign( vec3( LTC_ClippedSphereFormFactor( { f: vectorFormFactor } ) ) );
+
+	} );
+
+	return result;
+
+}, {
+	N: 'vec3',
+	V: 'vec3',
+	P: 'vec3',
+	mInv: 'mat3',
+	p0: 'vec3',
+	p1: 'vec3',
+	p2: 'vec3',
+	p3: 'vec3',
+	return: 'vec3'
+} );
+
+const LTC_Evaluate_Volume = /*@__PURE__*/ Fn( ( { P, p0, p1, p2, p3 } ) => {
+
+	// bail if point is on back side of plane of light
+	// assumes ccw winding order of light vertices
+	const v1 = p1.sub( p0 ).toVar();
+	const v2 = p3.sub( p0 ).toVar();
+
+	const lightNormal = v1.cross( v2 );
+	const result = vec3().toVar();
+
+	If( lightNormal.dot( P.sub( p0 ) ).greaterThanEqual( 0.0 ), () => {
+
+		// transform rect
+		// & project rect onto sphere
+		const coords0 = p0.sub( P ).normalize().toVar();
+		const coords1 = p1.sub( P ).normalize().toVar();
+		const coords2 = p2.sub( P ).normalize().toVar();
+		const coords3 = p3.sub( P ).normalize().toVar();
+
+		// calculate vector form factor
+		const vectorFormFactor = vec3( 0 ).toVar();
+		vectorFormFactor.addAssign( LTC_EdgeVectorFormFactor( { v1: coords0, v2: coords1 } ) );
+		vectorFormFactor.addAssign( LTC_EdgeVectorFormFactor( { v1: coords1, v2: coords2 } ) );
+		vectorFormFactor.addAssign( LTC_EdgeVectorFormFactor( { v1: coords2, v2: coords3 } ) );
+		vectorFormFactor.addAssign( LTC_EdgeVectorFormFactor( { v1: coords3, v2: coords0 } ) );
+
+		// adjust for horizon clipping
+		result.assign( vec3( LTC_ClippedSphereFormFactor( { f: vectorFormFactor.abs() } ) ) );
+
+	} );
+
+	return result;
+
+}, {
+	P: 'vec3',
+	p0: 'vec3',
+	p1: 'vec3',
+	p2: 'vec3',
+	p3: 'vec3',
+	return: 'vec3'
+} );
+
+/**
+ * Abstract class for implementing lighting models. The module defines
+ * multiple methods that concrete lighting models can implement. These
+ * methods are executed at different points during the light evaluation
+ * process.
+ */
+class LightingModel {
+
+	/**
+	 * This method is intended for setting up lighting model and context data
+	 * which are later used in the evaluation process.
+	 *
+	 * @abstract
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	start( builder ) {
+
+		// lights ( direct )
+
+		builder.lightsNode.setupLights( builder, builder.lightsNode.getLightNodes( builder ) );
+
+		// indirect
+
+		this.indirect( builder );
+
+	}
+
+	/**
+	 * This method is intended for executing final tasks like final updates
+	 * to the outgoing light.
+	 *
+	 * @abstract
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	finish( /*builder*/ ) { }
+
+	/**
+	 * This method is intended for implementing the direct light term and
+	 * executed during the build process of directional, point and spot light nodes.
+	 *
+	 * @abstract
+	 * @param {Object} lightData - The light data.
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	direct( /*lightData, builder*/ ) { }
+
+	/**
+	 * This method is intended for implementing the direct light term for
+	 * rect area light nodes.
+	 *
+	 * @abstract
+	 * @param {Object} lightData - The light data.
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	directRectArea( /*lightData, builder*/ ) {}
+
+	/**
+	 * This method is intended for implementing the indirect light term.
+	 *
+	 * @abstract
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	indirect( /*builder*/ ) { }
+
+	/**
+	 * This method is intended for implementing the ambient occlusion term.
+	 * Unlike other methods, this method must be called manually by the lighting
+	 * model in its indirect term.
+	 *
+	 * @abstract
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	ambientOcclusion( /*input, stack, builder*/ ) { }
+
+}
+
+//
+// Transmission
+//
+
+const getVolumeTransmissionRay = /*@__PURE__*/ Fn( ( [ n, v, thickness, ior, modelMatrix ] ) => {
+
+	// Direction of refracted light.
+	const refractionVector = vec3( refract( v.negate(), normalize( n ), div( 1.0, ior ) ) );
+
+	// Compute rotation-independent scaling of the model matrix.
+	const modelScale = vec3(
+		length( modelMatrix[ 0 ].xyz ),
+		length( modelMatrix[ 1 ].xyz ),
+		length( modelMatrix[ 2 ].xyz )
+	);
+
+	// The thickness is specified in local space.
+	return normalize( refractionVector ).mul( thickness.mul( modelScale ) );
+
+}, {
+	n: 'vec3',
+	v: 'vec3',
+	thickness: 'float',
+	ior: 'float',
+	modelMatrix: 'mat4',
+	return: 'vec3'
+} );
+
+const applyIorToRoughness = /*@__PURE__*/ Fn( ( [ roughness, ior ] ) => {
+
+	// Scale roughness with IOR so that an IOR of 1.0 results in no microfacet refraction and
+	// an IOR of 1.5 results in the default amount of microfacet refraction.
+	return roughness.mul( clamp( ior.mul( 2.0 ).sub( 2.0 ), 0.0, 1.0 ) );
+
+}, { roughness: 'float', ior: 'float', return: 'float' } );
+
+const viewportBackSideTexture = /*@__PURE__*/ viewportMipTexture();
+const viewportFrontSideTexture = /*@__PURE__*/ viewportOpaqueMipTexture();
+
+const getTransmissionSample = /*@__PURE__*/ Fn( ( [ fragCoord, roughness, ior ], { material } ) => {
+
+	const vTexture = material.side === BackSide ? viewportBackSideTexture : viewportFrontSideTexture;
+
+	const transmissionSample = vTexture.sample( fragCoord.mul( cameraViewport.zw ).add( cameraViewport.xy ).div( screenSize ) );
+	//const transmissionSample = viewportMipTexture( fragCoord );
+
+	const lod = log2( cameraViewport.z ).mul( applyIorToRoughness( roughness, ior ) );
+
+	return textureBicubicLevel( transmissionSample, lod );
+
+} );
+
+const volumeAttenuation = /*@__PURE__*/ Fn( ( [ transmissionDistance, attenuationColor, attenuationDistance ] ) => {
+
+	If( attenuationDistance.notEqual( 0 ), () => {
+
+		// Compute light attenuation using Beer's law.
+		const attenuationCoefficient = log( attenuationColor ).negate().div( attenuationDistance );
+		const transmittance = exp( attenuationCoefficient.negate().mul( transmissionDistance ) );
+
+		return transmittance;
+
+	} );
+
+	// Attenuation distance is +∞, i.e. the transmitted color is not attenuated at all.
+	return vec3( 1.0 );
+
+}, { transmissionDistance: 'float', attenuationColor: 'vec3', attenuationDistance: 'float', return: 'vec3' } );
+
+const getIBLVolumeRefraction = /*@__PURE__*/ Fn( ( [ n, v, roughness, diffuseColor, specularColor, specularF90, position, modelMatrix, viewMatrix, projMatrix, ior, thickness, attenuationColor, attenuationDistance, dispersion ] ) => {
+
+	let transmittedLight, transmittance;
+
+	if ( dispersion ) {
+
+		transmittedLight = vec4().toVar();
+		transmittance = vec3().toVar();
+
+		const halfSpread = ior.sub( 1.0 ).mul( dispersion.mul( 0.025 ) );
+		const iors = vec3( ior.sub( halfSpread ), ior, ior.add( halfSpread ) );
+
+		Loop( { start: 0, end: 3 }, ( { i } ) => {
+
+			const ior = iors.element( i );
+
+			const transmissionRay = getVolumeTransmissionRay( n, v, thickness, ior, modelMatrix );
+			const refractedRayExit = position.add( transmissionRay );
+
+			// Project refracted vector on the framebuffer, while mapping to normalized device coordinates.
+			const ndcPos = projMatrix.mul( viewMatrix.mul( vec4( refractedRayExit, 1.0 ) ) );
+			const refractionCoords = vec2( ndcPos.xy.div( ndcPos.w ) ).toVar();
+			refractionCoords.addAssign( 1.0 );
+			refractionCoords.divAssign( 2.0 );
+			refractionCoords.assign( vec2( refractionCoords.x, refractionCoords.y.oneMinus() ) ); // webgpu
+
+			// Sample framebuffer to get pixel the refracted ray hits.
+			const transmissionSample = getTransmissionSample( refractionCoords, roughness, ior );
+
+			transmittedLight.element( i ).assign( transmissionSample.element( i ) );
+			transmittedLight.a.addAssign( transmissionSample.a );
+
+			transmittance.element( i ).assign( diffuseColor.element( i ).mul( volumeAttenuation( length( transmissionRay ), attenuationColor, attenuationDistance ).element( i ) ) );
+
+		} );
+
+		transmittedLight.a.divAssign( 3.0 );
+
+	} else {
+
+		const transmissionRay = getVolumeTransmissionRay( n, v, thickness, ior, modelMatrix );
+		const refractedRayExit = position.add( transmissionRay );
+
+		// Project refracted vector on the framebuffer, while mapping to normalized device coordinates.
+		const ndcPos = projMatrix.mul( viewMatrix.mul( vec4( refractedRayExit, 1.0 ) ) );
+		const refractionCoords = vec2( ndcPos.xy.div( ndcPos.w ) ).toVar();
+		refractionCoords.addAssign( 1.0 );
+		refractionCoords.divAssign( 2.0 );
+		refractionCoords.assign( vec2( refractionCoords.x, refractionCoords.y.oneMinus() ) ); // webgpu
+
+		// Sample framebuffer to get pixel the refracted ray hits.
+		transmittedLight = getTransmissionSample( refractionCoords, roughness, ior );
+		transmittance = diffuseColor.mul( volumeAttenuation( length( transmissionRay ), attenuationColor, attenuationDistance ) );
+
+	}
+
+	const attenuatedColor = transmittance.rgb.mul( transmittedLight.rgb );
+	const dotNV = n.dot( v ).clamp();
+
+	// Get the specular component.
+	const F = vec3( EnvironmentBRDF( { // n, v, specularColor, specularF90, roughness
+		dotNV,
+		specularColor,
+		specularF90,
+		roughness
+	} ) );
+
+	// As less light is transmitted, the opacity should be increased. This simple approximation does a decent job
+	// of modulating a CSS background, and has no effect when the buffer is opaque, due to a solid object or clear color.
+	const transmittanceFactor = transmittance.r.add( transmittance.g, transmittance.b ).div( 3.0 );
+
+	return vec4( F.oneMinus().mul( attenuatedColor ), transmittedLight.a.oneMinus().mul( transmittanceFactor ).oneMinus() );
+
+} );
+
+//
+// Iridescence
+//
+
+// XYZ to linear-sRGB color space
+const XYZ_TO_REC709 = /*@__PURE__*/ mat3(
+	3.2404542, -1.5371385, -0.4985314,
+	-0.969266, 1.8760108, 0.0415560,
+	0.0556434, -0.2040259, 1.0572252
+);
+
+// Assume air interface for top
+// Note: We don't handle the case fresnel0 == 1
+const Fresnel0ToIor = ( fresnel0 ) => {
+
+	const sqrtF0 = fresnel0.sqrt();
+	return vec3( 1.0 ).add( sqrtF0 ).div( vec3( 1.0 ).sub( sqrtF0 ) );
+
+};
+
+// ior is a value between 1.0 and 3.0. 1.0 is air interface
+const IorToFresnel0 = ( transmittedIor, incidentIor ) => {
+
+	return transmittedIor.sub( incidentIor ).div( transmittedIor.add( incidentIor ) ).pow2();
+
+};
+
+// Fresnel equations for dielectric/dielectric interfaces.
+// Ref: https://belcour.github.io/blog/research/2017/05/01/brdf-thin-film.html
+// Evaluation XYZ sensitivity curves in Fourier space
+const evalSensitivity = ( OPD, shift ) => {
+
+	const phase = OPD.mul( 2.0 * Math.PI * 1.0e-9 );
+	const val = vec3( 5.4856e-13, 4.4201e-13, 5.2481e-13 );
+	const pos = vec3( 1.6810e+06, 1.7953e+06, 2.2084e+06 );
+	const VAR = vec3( 4.3278e+09, 9.3046e+09, 6.6121e+09 );
+
+	const x = float( 9.7470e-14 * Math.sqrt( 2.0 * Math.PI * 4.5282e+09 ) ).mul( phase.mul( 2.2399e+06 ).add( shift.x ).cos() ).mul( phase.pow2().mul( -45282e5 ).exp() );
+
+	let xyz = val.mul( VAR.mul( 2.0 * Math.PI ).sqrt() ).mul( pos.mul( phase ).add( shift ).cos() ).mul( phase.pow2().negate().mul( VAR ).exp() );
+	xyz = vec3( xyz.x.add( x ), xyz.y, xyz.z ).div( 1.0685e-7 );
+
+	const rgb = XYZ_TO_REC709.mul( xyz );
+
+	return rgb;
+
+};
+
+const evalIridescence = /*@__PURE__*/ Fn( ( { outsideIOR, eta2, cosTheta1, thinFilmThickness, baseF0 } ) => {
+
+	// Force iridescenceIOR -> outsideIOR when thinFilmThickness -> 0.0
+	const iridescenceIOR = mix( outsideIOR, eta2, smoothstep( 0.0, 0.03, thinFilmThickness ) );
+	// Evaluate the cosTheta on the base layer (Snell law)
+	const sinTheta2Sq = outsideIOR.div( iridescenceIOR ).pow2().mul( cosTheta1.pow2().oneMinus() );
+
+	// Handle TIR:
+	const cosTheta2Sq = sinTheta2Sq.oneMinus();
+
+	If( cosTheta2Sq.lessThan( 0 ), () => {
+
+		return vec3( 1.0 );
+
+	} );
+
+	const cosTheta2 = cosTheta2Sq.sqrt();
+
+	// First interface
+	const R0 = IorToFresnel0( iridescenceIOR, outsideIOR );
+	const R12 = F_Schlick( { f0: R0, f90: 1.0, dotVH: cosTheta1 } );
+	//const R21 = R12;
+	const T121 = R12.oneMinus();
+	const phi12 = iridescenceIOR.lessThan( outsideIOR ).select( Math.PI, 0.0 );
+	const phi21 = float( Math.PI ).sub( phi12 );
+
+	// Second interface
+	const baseIOR = Fresnel0ToIor( baseF0.clamp( 0.0, 0.9999 ) ); // guard against 1.0
+	const R1 = IorToFresnel0( baseIOR, iridescenceIOR.toVec3() );
+	const R23 = F_Schlick( { f0: R1, f90: 1.0, dotVH: cosTheta2 } );
+	const phi23 = vec3(
+		baseIOR.x.lessThan( iridescenceIOR ).select( Math.PI, 0.0 ),
+		baseIOR.y.lessThan( iridescenceIOR ).select( Math.PI, 0.0 ),
+		baseIOR.z.lessThan( iridescenceIOR ).select( Math.PI, 0.0 )
+	);
+
+	// Phase shift
+	const OPD = iridescenceIOR.mul( thinFilmThickness, cosTheta2, 2.0 );
+	const phi = vec3( phi21 ).add( phi23 );
+
+	// Compound terms
+	const R123 = R12.mul( R23 ).clamp( 1e-5, 0.9999 );
+	const r123 = R123.sqrt();
+	const Rs = T121.pow2().mul( R23 ).div( vec3( 1.0 ).sub( R123 ) );
+
+	// Reflectance term for m = 0 (DC term amplitude)
+	const C0 = R12.add( Rs );
+	const I = C0.toVar();
+
+	// Reflectance term for m > 0 (pairs of diracs)
+	const Cm = Rs.sub( T121 ).toVar();
+
+	Loop( { start: 1, end: 2, condition: '<=', name: 'm' }, ( { m } ) => {
+
+		Cm.mulAssign( r123 );
+		const Sm = evalSensitivity( float( m ).mul( OPD ), float( m ).mul( phi ) ).mul( 2.0 );
+		I.addAssign( Cm.mul( Sm ) );
+
+	} );
+
+	// Since out of gamut colors might be produced, negative color values are clamped to 0.
+	return I.max( vec3( 0.0 ) );
+
+}, {
+	outsideIOR: 'float',
+	eta2: 'float',
+	cosTheta1: 'float',
+	thinFilmThickness: 'float',
+	baseF0: 'vec3',
+	return: 'vec3'
+} );
+
+//
+//	Sheen
+//
+
+// This is a curve-fit approximation to the "Charlie sheen" BRDF integrated over the hemisphere from
+// Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF".
+const IBLSheenBRDF = /*@__PURE__*/ Fn( ( { normal, viewDir, roughness } ) => {
+
+	const dotNV = normal.dot( viewDir ).saturate();
+	const r2 = roughness.mul( roughness );
+	const rInv = roughness.add( 0.1 ).reciprocal();
+
+	const a = float( -1.9362 ).add( roughness.mul( 1.0678 ) ).add( r2.mul( 0.4573 ) ).sub( rInv.mul( 0.8469 ) );
+	const b = float( -0.6014 ).add( roughness.mul( 0.5538 ) ).sub( r2.mul( 0.4670 ) ).sub( rInv.mul( 0.1255 ) );
+
+	const DG = a.mul( dotNV ).add( b ).exp();
+
+	return DG.saturate();
+
+}, { normal: 'vec3', viewDir: 'vec3', roughness: 'float', return: 'float' } );
+
+const clearcoatF0 = vec3( 0.04 );
+const clearcoatF90 = float( 1 );
+
+
+/**
+ * Represents the lighting model for a PBR material.
+ *
+ * @augments LightingModel
+ */
+class PhysicalLightingModel extends LightingModel {
+
+	/**
+	 * Constructs a new physical lighting model.
+	 *
+	 * @param {boolean} [clearcoat=false] - Whether clearcoat is supported or not.
+	 * @param {boolean} [sheen=false] - Whether sheen is supported or not.
+	 * @param {boolean} [iridescence=false] - Whether iridescence is supported or not.
+	 * @param {boolean} [anisotropy=false] - Whether anisotropy is supported or not.
+	 * @param {boolean} [transmission=false] - Whether transmission is supported or not.
+	 * @param {boolean} [dispersion=false] - Whether dispersion is supported or not.
+	 * @param {boolean} [retroreflection=false] - Whether retroreflection is supported or not.
+	 * @param {boolean} [diffuseRoughness=false] - Whether EON rough diffuse reflection is supported or not.
+	 */
+	constructor( clearcoat = false, sheen = false, iridescence = false, anisotropy = false, transmission = false, dispersion = false, retroreflection = false, diffuseRoughness = false ) {
+
+		super();
+
+		/**
+		 * Whether clearcoat is supported or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.clearcoat = clearcoat;
+
+		/**
+		 * Whether sheen is supported or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.sheen = sheen;
+
+		/**
+		 * Whether iridescence is supported or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.iridescence = iridescence;
+
+		/**
+		 * Whether anisotropy is supported or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.anisotropy = anisotropy;
+
+		/**
+		 * Whether transmission is supported or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.transmission = transmission;
+
+		/**
+		 * Whether dispersion is supported or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.dispersion = dispersion;
+
+		/**
+		 * Whether retroreflection is supported or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.retroreflection = retroreflection;
+
+		/**
+		 * Whether EON rough diffuse reflection is supported or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.diffuseRoughness = diffuseRoughness;
+
+		/**
+		 * The clear coat radiance.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.clearcoatRadiance = null;
+
+		/**
+		 * The clear coat specular direct.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.clearcoatSpecularDirect = null;
+
+		/**
+		 * The clear coat specular indirect.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.clearcoatSpecularIndirect = null;
+
+		/**
+		 * The sheen specular direct.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.sheenSpecularDirect = null;
+
+		/**
+		 * The sheen specular indirect.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.sheenSpecularIndirect = null;
+
+		/**
+		 * The iridescence Fresnel.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.iridescenceFresnel = null;
+
+		/**
+		 * The iridescence F0 dielectric.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.iridescenceF0Dielectric = null;
+
+		/**
+		 * The iridescence F0 metallic.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.iridescenceF0Metallic = null;
+
+		/**
+		 * The sampled DFG LUT value, shared by the direct and indirect lighting paths.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.dfg = null;
+
+		/**
+		 * The EON directional albedo, shared by the indirect lighting paths.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.eonDirectionalAlbedo = null;
+
+		/**
+		 * The multi-scattering energy compensation for direct lighting.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.multiScatteringCompensation = null;
+
+		/**
+		 * The dielectric single-scattering term, shared by the indirect lighting paths.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.singleScatteringDielectric = null;
+
+		/**
+		 * The dielectric multi-scattering term, shared by the indirect lighting paths.
+		 *
+		 * @type {?Node}
+		 * @default null
+		 */
+		this.multiScatteringDielectric = null;
+
+	}
+
+	/**
+	 * Depending on what features are requested, the method prepares certain node variables
+	 * which are later used for lighting computations.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	start( builder ) {
+
+		if ( this.clearcoat === true ) {
+
+			this.clearcoatRadiance = vec3().toVar( 'clearcoatRadiance' );
+			this.clearcoatSpecularDirect = vec3().toVar( 'clearcoatSpecularDirect' );
+			this.clearcoatSpecularIndirect = vec3().toVar( 'clearcoatSpecularIndirect' );
+
+		}
+
+		if ( this.sheen === true ) {
+
+			this.sheenSpecularDirect = vec3().toVar( 'sheenSpecularDirect' );
+			this.sheenSpecularIndirect = vec3().toVar( 'sheenSpecularIndirect' );
+
+		}
+
+		if ( this.iridescence === true ) {
+
+			const dotNVi = normalView.dot( positionViewDirection ).clamp();
+
+			const iridescenceFresnelDielectric = evalIridescence( {
+				outsideIOR: float( 1.0 ),
+				eta2: iridescenceIOR,
+				cosTheta1: dotNVi,
+				thinFilmThickness: iridescenceThickness,
+				baseF0: specularColor
+			} );
+
+			const iridescenceFresnelMetallic = evalIridescence( {
+				outsideIOR: float( 1.0 ),
+				eta2: iridescenceIOR,
+				cosTheta1: dotNVi,
+				thinFilmThickness: iridescenceThickness,
+				baseF0: diffuseColor.rgb
+			} );
+
+			this.iridescenceFresnel = mix( iridescenceFresnelDielectric, iridescenceFresnelMetallic, metalness );
+
+			this.iridescenceF0Dielectric = Schlick_to_F0( { f: iridescenceFresnelDielectric, f90: 1.0, dotVH: dotNVi } );
+			this.iridescenceF0Metallic = Schlick_to_F0( { f: iridescenceFresnelMetallic, f90: 1.0, dotVH: dotNVi } );
+
+		}
+
+		if ( this.transmission === true ) {
+
+			const position = positionWorld;
+			const v = cameraPosition.sub( positionWorld ).normalize(); // TODO: Create Node for this, same issue in MaterialX
+			const n = normalWorld;
+
+			const context = builder.context;
+
+			context.backdrop = getIBLVolumeRefraction(
+				n,
+				v,
+				roughness,
+				diffuseContribution,
+				specularColorBlended,
+				specularF90, // specularF90
+				position, // positionWorld
+				modelWorldMatrix, // modelMatrix
+				cameraViewMatrix, // viewMatrix
+				cameraProjectionMatrix, // projMatrix
+				ior,
+				thickness,
+				attenuationColor,
+				attenuationDistance,
+				this.dispersion ? dispersion : null
+			);
+
+			context.backdropAlpha = transmission;
+
+			diffuseColor.a.mulAssign( mix( 1, context.backdrop.a, transmission ) );
+
+		}
+
+		//
+
+		const dotNV = normalView.dot( positionViewDirection ).clamp();
+		this.dfg = DFGLUT( { roughness, dotNV } ).toConst( 'dfg' );
+
+		// Multi-scattering energy compensation for direct lighting
+		// Based on "Practical Multiple Scattering Compensation for Microfacet Models"
+		// https://blog.selfshadow.com/publications/turquin/ms_comp_final.pdf
+
+		// Energy of the single-scattering lobe in a white furnace ( F0 = F90 = 1 )
+		const Ess = this.dfg.x.add( this.dfg.y );
+
+		// Compensate for the energy lost to multiple scattering, tinting the added term by F0 ( equation 16 )
+		this.multiScatteringCompensation = specularColorBlended.mul( Ess.reciprocal().sub( 1.0 ) ).add( 1.0 ).toConst( 'multiScatteringCompensation' );
+
+		this.singleScatteringDielectric = vec3().toVar( 'singleScatteringDielectric' );
+		this.multiScatteringDielectric = vec3().toVar( 'multiScatteringDielectric' );
+
+		this.computeMultiscattering( this.singleScatteringDielectric, this.multiScatteringDielectric, specularF90, specularColor, this.iridescenceF0Dielectric );
+
+		if ( this.diffuseRoughness === true ) {
+
+			this.eonDirectionalAlbedo = EON_DirectionalAlbedo( { diffuseColor: diffuseColor.rgb, roughness: diffuseRoughness, dotNV: dotNV } );
+
+		}
+
+		super.start( builder );
+
+	}
+
+	// Fdez-Agüera's "Multiple-Scattering Microfacet Model for Real-Time Image Based Lighting"
+	// Approximates multi-scattering in order to preserve energy.
+	// http://www.jcgt.org/published/0008/01/03/
+
+	computeMultiscattering( singleScatter, multiScatter, specularF90, f0, iridescenceF0 = null ) {
+
+		const fab = this.dfg;
+
+		const Fr = iridescenceF0 ? iridescence.mix( f0, iridescenceF0 ) : f0;
+
+		const FssEss = Fr.mul( fab.x ).add( specularF90.mul( fab.y ) );
+
+		const Ess = fab.x.add( fab.y );
+		const Ems = Ess.oneMinus();
+
+		const Favg = Fr.add( Fr.oneMinus().mul( 0.047619 ) ); // 1/21
+		const Fms = FssEss.mul( Favg ).div( Ems.mul( Favg ).oneMinus() );
+
+		singleScatter.addAssign( FssEss );
+		multiScatter.addAssign( Fms.mul( Ems ) );
+
+	}
+
+	/**
+	 * Implements the direct light.
+	 *
+	 * @param {Object} lightData - The light data.
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	direct( { lightDirection, lightColor, reflectedLight }, /* builder */ ) {
+
+		const dotNL = normalView.dot( lightDirection ).clamp();
+		const irradiance = dotNL.mul( lightColor ).toVar();
+
+		if ( this.sheen === true ) {
+
+			this.sheenSpecularDirect.addAssign( irradiance.mul( BRDF_Sheen( { lightDirection } ) ) );
+
+			const sheenAlbedoV = IBLSheenBRDF( { normal: normalView, viewDir: positionViewDirection, roughness: sheenRoughness } );
+			const sheenAlbedoL = IBLSheenBRDF( { normal: normalView, viewDir: lightDirection, roughness: sheenRoughness } );
+
+			const sheenEnergyComp = sheen.r.max( sheen.g ).max( sheen.b ).mul( sheenAlbedoV.max( sheenAlbedoL ) ).oneMinus();
+
+			irradiance.mulAssign( sheenEnergyComp );
+
+		}
+
+		if ( this.clearcoat === true ) {
+
+			const dotNLcc = clearcoatNormalView.dot( lightDirection ).clamp();
+			const ccIrradiance = dotNLcc.mul( lightColor );
+
+			this.clearcoatSpecularDirect.addAssign( ccIrradiance.mul( BRDF_GGX( { lightDirection, f0: clearcoatF0, f90: clearcoatF90, roughness: clearcoatRoughness, normalView: clearcoatNormalView } ) ) );
+
+		}
+
+		// Light reflected by the specular interface is not available to the diffuse layer ( glTF fresnel_mix )
+		const halfDir = lightDirection.add( positionViewDirection ).normalize();
+		const dotVH = positionViewDirection.dot( halfDir ).clamp();
+		let F = F_Schlick( { f0: specularColor, f90: specularF90, dotVH } );
+
+		let specularBRDF = BRDF_GGX( { lightDirection, f0: specularColorBlended, f90: specularF90, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } );
+
+		if ( this.retroreflection === true ) {
+
+			// Minimal Retroreflective Microfacet Model:
+			// https://jcgt.org/published/0015/01/04/
+			const retroViewDirection = positionViewDirection.negate().reflect( normalView );
+			const retroHalfDir = lightDirection.add( retroViewDirection ).normalize();
+			const dotRetroVH = retroViewDirection.dot( retroHalfDir ).clamp();
+			const retroF = F_Schlick( { f0: specularColor, f90: specularF90, dotVH: dotRetroVH } );
+			const retroSpecularBRDF = BRDF_GGX( { lightDirection, viewDirection: retroViewDirection, f0: specularColorBlended, f90: specularF90, roughness, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } );
+
+			F = mix( F, retroF, retroreflectivity.clamp() );
+			specularBRDF = mix( specularBRDF, retroSpecularBRDF, retroreflectivity.clamp() );
+
+		}
+
+		const diffuseBRDF = this.diffuseRoughness
+			? BRDF_EON( { lightDirection, diffuseColor: diffuseColor.rgb, roughness: diffuseRoughness } ).mul( metalness.oneMinus() )
+			: BRDF_Lambert( { diffuseColor: diffuseContribution } );
+
+		reflectedLight.directDiffuse.addAssign( irradiance.mul( diffuseBRDF ).mul( F.oneMinus() ) );
+
+		reflectedLight.directSpecular.addAssign( irradiance.mul( specularBRDF ).mul( this.multiScatteringCompensation ) );
+
+	}
+
+	/**
+	 * This method is intended for implementing the direct light term for
+	 * rect area light nodes.
+	 *
+	 * @param {Object} input - The input data.
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	directRectArea( { lightColor, lightPosition, halfWidth, halfHeight, reflectedLight, ltc_1, ltc_2 }, /* builder */ ) {
+
+		const p0 = lightPosition.add( halfWidth ).sub( halfHeight ); // counterclockwise; light shines in local neg z direction
+		const p1 = lightPosition.sub( halfWidth ).sub( halfHeight );
+		const p2 = lightPosition.sub( halfWidth ).add( halfHeight );
+		const p3 = lightPosition.add( halfWidth ).add( halfHeight );
+
+		const N = normalView;
+		const V = positionViewDirection;
+		const P = positionView.toVar();
+
+		const uv = LTC_Uv( { N, V, roughness } );
+
+		const t1 = ltc_1.sample( uv ).toVar();
+		const t2 = ltc_2.sample( uv ).toVar();
+
+		const mInv = mat3(
+			vec3( t1.x, 0, t1.y ),
+			vec3( 0, 1, 0 ),
+			vec3( t1.z, 0, t1.w )
+		).toVar();
+
+		// LTC Fresnel Approximation by Stephen Hill
+		// http://blog.selfshadow.com/publications/s2016-advances/s2016_ltc_fresnel.pdf
+		const fresnel = specularColorBlended.mul( t2.x ).add( specularF90.sub( specularColorBlended ).mul( t2.y ) ).toVar();
+
+		reflectedLight.directSpecular.addAssign( lightColor.mul( fresnel ).mul( LTC_Evaluate( { N, V, P, mInv, p0, p1, p2, p3 } ) ) );
+
+		reflectedLight.directDiffuse.addAssign( lightColor.mul( diffuseContribution ).mul( LTC_Evaluate( { N, V, P, mInv: mat3( 1, 0, 0, 0, 1, 0, 0, 0, 1 ), p0, p1, p2, p3 } ) ) );
+
+		if ( this.clearcoat === true ) {
+
+			const Ncc = clearcoatNormalView;
+
+			const uvClearcoat = LTC_Uv( { N: Ncc, V, roughness: clearcoatRoughness } );
+
+			const t1Clearcoat = ltc_1.sample( uvClearcoat );
+			const t2Clearcoat = ltc_2.sample( uvClearcoat );
+
+			const mInvClearcoat = mat3(
+				vec3( t1Clearcoat.x, 0, t1Clearcoat.y ),
+				vec3( 0, 1, 0 ),
+				vec3( t1Clearcoat.z, 0, t1Clearcoat.w )
+			);
+
+			// LTC Fresnel Approximation for clearcoat
+			const fresnelClearcoat = clearcoatF0.mul( t2Clearcoat.x ).add( clearcoatF90.sub( clearcoatF0 ).mul( t2Clearcoat.y ) );
+
+			this.clearcoatSpecularDirect.addAssign( lightColor.mul( fresnelClearcoat ).mul( LTC_Evaluate( { N: Ncc, V, P, mInv: mInvClearcoat, p0, p1, p2, p3 } ) ) );
+
+		}
+
+	}
+
+	/**
+	 * Implements the indirect lighting.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	indirect( builder ) {
+
+		this.indirectDiffuse( builder );
+		this.indirectSpecular( builder );
+		this.ambientOcclusion( builder );
+
+	}
+
+	/**
+	 * Implements the indirect diffuse term.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	indirectDiffuse( builder ) {
+
+		const { irradiance, reflectedLight } = builder.context;
+
+		// Energy reflected by the specular lobe is not available to the diffuse layer
+		const singleScattering = this.singleScatteringDielectric;
+		const multiScattering = this.multiScatteringDielectric;
+
+		const diffuseBRDF = this.diffuseRoughness
+			? this.eonDirectionalAlbedo.mul( metalness.oneMinus(), 1 / Math.PI )
+			: BRDF_Lambert( { diffuseColor: diffuseContribution } );
+
+		const diffuse = irradiance.mul( diffuseBRDF ).mul( singleScattering.add( multiScattering ).oneMinus() ).toVar();
+
+		if ( this.sheen === true ) {
+
+			const sheenAlbedo = IBLSheenBRDF( { normal: normalView, viewDir: positionViewDirection, roughness: sheenRoughness } );
+
+			this.sheenSpecularIndirect.addAssign( irradiance.mul( sheen, sheenAlbedo, 1 / Math.PI ) );
+
+			const sheenEnergyComp = sheen.r.max( sheen.g ).max( sheen.b ).mul( sheenAlbedo ).oneMinus();
+
+			diffuse.mulAssign( sheenEnergyComp );
+
+		}
+
+		reflectedLight.indirectDiffuse.addAssign( diffuse );
+
+	}
+
+	/**
+	 * Implements the indirect specular term.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	indirectSpecular( builder ) {
+
+		const { radiance, iblIrradiance, reflectedLight } = builder.context;
+
+		if ( this.sheen === true ) {
+
+			this.sheenSpecularIndirect.addAssign( iblIrradiance.mul(
+				sheen,
+				IBLSheenBRDF( {
+					normal: normalView,
+					viewDir: positionViewDirection,
+					roughness: sheenRoughness
+				} ),
+				1 / Math.PI
+			) );
+
+		}
+
+		if ( this.clearcoat === true ) {
+
+			const dotNVcc = clearcoatNormalView.dot( positionViewDirection ).clamp();
+
+			const clearcoatEnv = EnvironmentBRDF( {
+				dotNV: dotNVcc,
+				specularColor: clearcoatF0,
+				specularF90: clearcoatF90,
+				roughness: clearcoatRoughness
+			} );
+
+			this.clearcoatSpecularIndirect.addAssign( this.clearcoatRadiance.mul( clearcoatEnv ) );
+
+		}
+
+		// Both indirect specular and indirect diffuse light accumulate here
+		// Compute multiscattering separately for dielectric and metallic, then mix
+
+		const singleScatteringDielectric = this.singleScatteringDielectric;
+		const multiScatteringDielectric = this.multiScatteringDielectric;
+		const singleScatteringMetallic = vec3().toVar( 'singleScatteringMetallic' );
+		const multiScatteringMetallic = vec3().toVar( 'multiScatteringMetallic' );
+
+		this.computeMultiscattering( singleScatteringMetallic, multiScatteringMetallic, specularF90, diffuseColor.rgb, this.iridescenceF0Metallic );
+
+		// Mix based on metalness
+		const singleScattering = mix( singleScatteringDielectric, singleScatteringMetallic, metalness );
+		const multiScattering = mix( multiScatteringDielectric, multiScatteringMetallic, metalness );
+
+		// Diffuse energy conservation uses dielectric path
+		const totalScatteringDielectric = singleScatteringDielectric.add( multiScatteringDielectric );
+
+		const diffuseAlbedo = this.diffuseRoughness
+			? this.eonDirectionalAlbedo.mul( metalness.oneMinus() )
+			: diffuseContribution;
+
+		const diffuse = diffuseAlbedo.mul( totalScatteringDielectric.oneMinus() );
+
+		const cosineWeightedIrradiance = iblIrradiance.mul( 1 / Math.PI );
+
+		const indirectSpecular = radiance.mul( singleScattering ).add( multiScattering.mul( cosineWeightedIrradiance ) ).toVar();
+		const indirectDiffuse = diffuse.mul( cosineWeightedIrradiance ).toVar();
+
+		if ( this.sheen === true ) {
+
+			const sheenAlbedo = IBLSheenBRDF( { normal: normalView, viewDir: positionViewDirection, roughness: sheenRoughness } );
+
+			const sheenEnergyComp = sheen.r.max( sheen.g ).max( sheen.b ).mul( sheenAlbedo ).oneMinus();
+
+			indirectSpecular.mulAssign( sheenEnergyComp );
+			indirectDiffuse.mulAssign( sheenEnergyComp );
+
+		}
+
+		reflectedLight.indirectSpecular.addAssign( indirectSpecular );
+
+		reflectedLight.indirectDiffuse.addAssign( indirectDiffuse );
+
+	}
+
+	/**
+	 * Implements the ambient occlusion term.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	ambientOcclusion( builder ) {
+
+		const { ambientOcclusion, reflectedLight } = builder.context;
+
+		const dotNV = normalView.dot( positionViewDirection ).clamp(); // @ TODO: Move to core dotNV
+
+		const aoNV = dotNV.add( ambientOcclusion );
+		const aoExp = roughness.mul( -16 ).oneMinus().negate().exp2();
+
+		const aoNode = ambientOcclusion.sub( aoNV.pow( aoExp ).oneMinus() ).clamp();
+
+		if ( this.clearcoat === true ) {
+
+			this.clearcoatSpecularIndirect.mulAssign( ambientOcclusion );
+
+		}
+
+		if ( this.sheen === true ) {
+
+			this.sheenSpecularIndirect.mulAssign( ambientOcclusion );
+
+		}
+
+		reflectedLight.indirectDiffuse.mulAssign( ambientOcclusion );
+		reflectedLight.indirectSpecular.mulAssign( aoNode );
+
+	}
+
+	/**
+	 * Used for final lighting accumulations depending on the requested features.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	finish( { context } ) {
+
+		const { outgoingLight } = context;
+
+		if ( this.clearcoat === true ) {
+
+			const dotNVcc = clearcoatNormalView.dot( positionViewDirection ).clamp();
+
+			const Fcc = F_Schlick( {
+				dotVH: dotNVcc,
+				f0: clearcoatF0,
+				f90: clearcoatF90
+			} );
+
+			const clearcoatLight = outgoingLight.mul( clearcoat.mul( Fcc ).oneMinus() ).add( this.clearcoatSpecularDirect.add( this.clearcoatSpecularIndirect ).mul( clearcoat ) );
+
+			outgoingLight.assign( clearcoatLight );
+
+		}
+
+		if ( this.sheen === true ) {
+
+			const sheenLight = outgoingLight.add( this.sheenSpecularDirect, this.sheenSpecularIndirect );
+
+			outgoingLight.assign( sheenLight );
+
+		}
+
+	}
+
+}
+
+/**
+ * Evaluates a world-space grid of static point and spot lights.
+ *
+ * @private
+ * @augments LightingNode
+ */
+class StaticLightsNode extends LightingNode {
+
+	static get type() {
+
+		return 'StaticLightsNode';
+
+	}
+
+	/**
+	 * Constructs a static lights node.
+	 *
+	 * @param {Object} grid - The packed light grid.
+	 */
+	constructor( grid ) {
+
+		super();
+
+		this.grid = grid;
+		this.shadowNode = null;
+
+		const cellAttribute = new StorageBufferAttribute( grid.cells, 2 );
+		const indexAttribute = new StorageBufferAttribute( grid.indices, 1 );
+		const lightAttribute = new StorageBufferAttribute( grid.data, 4 );
+
+		// Stable names allow materials using the same grid to share shader programs.
+		this.cellsNode = storage( cellAttribute, 'uvec2', cellAttribute.count ).toReadOnly().setName( 'staticLightCells' );
+		this.indicesNode = storage( indexAttribute, 'uint', indexAttribute.count ).toReadOnly().setName( 'staticLightIndices' );
+		this.lightsNode = storage( lightAttribute, 'vec4', lightAttribute.count ).toReadOnly().setName( 'staticLights' );
+
+	}
+
+	/**
+	 * Whether this lighting context can use the static light grid.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {boolean} Whether static light batching is supported.
+	 */
+	static supports( builder ) {
+
+		const { context, material } = builder;
+		const model = context.lightingModel;
+
+		return builder.isAvailable( 'storageBuffer' ) === true &&
+			( material.isMeshStandardMaterial === true || material.isMeshStandardNodeMaterial === true ) &&
+			context.positionView == null && context.positionWorld == null && context.getShadow == null &&
+			model !== undefined && model !== null && model.constructor === PhysicalLightingModel &&
+			model.clearcoat === false && model.sheen === false && model.iridescence === false &&
+			model.anisotropy === false && model.transmission === false && model.dispersion === false &&
+			model.retroreflection === false && model.diffuseRoughness === false;
+
+	}
+
+	/**
+	 * Adds light contributions from the fragment's grid cell.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	setup( builder ) {
+
+		const { grid, cellsNode, indicesNode, lightsNode } = this;
+		const origin = vec3( ...grid.origin );
+		const dims = ivec3( ...grid.dims );
+		const { reflectedLight } = builder.context;
+
+		// The accumulators must be declared outside the conditional loop.
+		reflectedLight.directDiffuse.toStack();
+		reflectedLight.directSpecular.toStack();
+
+		Fn( () => {
+
+			const cell = ivec3( positionWorld.sub( origin ).div( grid.cellSize ).floor() ).toConst();
+			const inside = cell.greaterThanEqual( ivec3( 0 ) ).all().and( cell.lessThan( dims ).all() );
+
+			If( inside, () => {
+
+				const cellIndex = cell.z.mul( dims.y ).add( cell.y ).mul( dims.x ).add( cell.x );
+				const range = cellsNode.element( cellIndex ).toConst();
+				const offset = int( range.x ).toConst();
+
+				Loop( int( range.y ), ( { i } ) => {
+
+					const index = int( indicesNode.element( offset.add( i ) ) ).mul( 4 ).toConst();
+					const positionRange = lightsNode.element( index ).toConst();
+					const lightVector = cameraViewMatrix.mul( vec4( positionRange.xyz, 1 ) ).xyz.sub( positionView ).toConst();
+
+					If( dot( lightVector, lightVector ).lessThanEqual( positionRange.w.mul( positionRange.w ) ), () => {
+
+						const colorDecay = lightsNode.element( index.add( 1 ) ).toConst();
+						const parameters = lightsNode.element( index.add( 3 ) ).toConst();
+						const spotAttenuation = float( 1 ).toVar();
+
+						If( parameters.y.equal( 1 ), () => {
+
+							const directionCone = lightsNode.element( index.add( 2 ) ).toConst();
+							const directionView = cameraViewMatrix.transformDirection( directionCone.xyz );
+							const angleCos = lightVector.normalize().dot( directionView );
+
+							spotAttenuation.assign( smoothstep( directionCone.w, parameters.x, angleCos ) );
+
+						} );
+
+						builder.lightsNode.setupDirectLight( builder, this, directPointLight( {
+							color: colorDecay.rgb.mul( spotAttenuation ),
+							lightVector,
+							cutoffDistance: positionRange.w,
+							decayExponent: colorDecay.w
+						} ) );
+
+					} );
+
+				} );
+
+			} );
+
+		}, 'void' )();
+
+	}
+
+	/**
+	 * Releases the light grid's GPU buffers.
+	 */
+	dispose() {
+
+		this.cellsNode.value.dispose();
+		this.indicesNode.value.dispose();
+		this.lightsNode.value.dispose();
+
+		super.dispose();
+
+	}
+
+}
+
+// Keep GPU buffers below 11 MiB and bound the CPU work before visiting cells.
+const MAX_CELLS = 262144;
+const MAX_REFERENCES = 1048576;
+const MAX_LIGHTS = 65536;
+const MAX_CELL_VISITS = MAX_REFERENCES * 4;
+
+/**
+ * Packs static point and spot lights into a bounded world-space grid.
+ * Spotlights use their range sphere for conservative cell assignment.
+ *
+ * Each cell stores an offset and count into the light-index buffer. Each light
+ * occupies four vec4s: position/range, color/decay, direction/cone cosine and
+ * penumbra cosine/spot flag/padding. The spotlight direction points toward the
+ * light, matching the fragment-to-light direction used for lighting.
+ *
+ * The caller must update light and target world matrices before building the
+ * grid. A null result requests the ordinary individual-light rendering path.
+ *
+ * @param {Array<PointLight|SpotLight>} lights - The lights to pack.
+ * @return {?Object} The grid and its packed buffers, or null when unsupported.
+ */
+function buildStaticLightGrid( lights ) {
+
+	if ( lights.length === 0 || lights.length > MAX_LIGHTS ) return null;
+
+	const data = new Float32Array( lights.length * 16 );
+	const ranges = new Float32Array( lights.length );
+	const min = [ Infinity, Infinity, Infinity ];
+	const max = [ - Infinity, - Infinity, - Infinity ];
+
+	for ( let i = 0; i < lights.length; i ++ ) {
+
+		const light = lights[ i ];
+		if ( light.isPointLight !== true && light.isSpotLight !== true ) return null;
+
+		const offset = i * 16;
+		const position = light.matrixWorld.elements;
+
+		data[ offset ] = position[ 12 ];
+		data[ offset + 1 ] = position[ 13 ];
+		data[ offset + 2 ] = position[ 14 ];
+		data[ offset + 3 ] = light.distance;
+		data[ offset + 4 ] = light.color.r * light.intensity;
+		data[ offset + 5 ] = light.color.g * light.intensity;
+		data[ offset + 6 ] = light.color.b * light.intensity;
+		data[ offset + 7 ] = light.decay;
+
+		if ( light.isSpotLight === true ) {
+
+			if ( ! Number.isFinite( light.angle ) || ! Number.isFinite( light.penumbra ) ) return null;
+
+			const target = light.target.matrixWorld.elements;
+			const x = position[ 12 ] - target[ 12 ];
+			const y = position[ 13 ] - target[ 13 ];
+			const z = position[ 14 ] - target[ 14 ];
+			const length = Math.hypot( x, y, z ) || 1;
+
+			data[ offset + 8 ] = x / length;
+			data[ offset + 9 ] = y / length;
+			data[ offset + 10 ] = z / length;
+			data[ offset + 11 ] = Math.cos( light.angle );
+			data[ offset + 12 ] = Math.cos( light.angle * ( 1 - light.penumbra ) );
+			data[ offset + 13 ] = 1;
+
+		}
+
+		for ( let j = 0; j < 16; j ++ ) {
+
+			if ( ! Number.isFinite( data[ offset + j ] ) ) return null;
+
+		}
+
+		const radius = data[ offset + 3 ];
+		if ( radius <= 0 ) return null;
+		ranges[ i ] = radius;
+
+		for ( let axis = 0; axis < 3; axis ++ ) {
+
+			min[ axis ] = Math.min( min[ axis ], data[ offset + axis ] - radius );
+			max[ axis ] = Math.max( max[ axis ], data[ offset + axis ] + radius );
+
+		}
+
+	}
+
+	// Use a typical range so a few very large lights do not collapse the grid.
+	// Limiting the longest axis to 64 cells also bounds sparse scene allocation.
+	ranges.sort();
+	let cellSize = Math.max( ranges[ Math.floor( ranges.length / 2 ) ], ...max.map( ( value, axis ) => ( value - min[ axis ] ) / 64 ) );
+
+	// Leave room for float rounding in the fragment's world-to-cell calculation.
+	const origin = min.map( ( value, axis ) => {
+
+		const padding = Math.max( Math.abs( value ), Math.abs( max[ axis ] ), cellSize ) * 1e-6;
+		max[ axis ] += padding;
+		return Math.fround( value - padding );
+
+	} );
+
+	cellSize = Math.fround( Math.max( cellSize, ...max.map( ( value, axis ) => ( value - origin[ axis ] ) / 64 ) ) * ( 1 + 1e-6 ) );
+	if ( ! Number.isFinite( cellSize ) || cellSize <= 0 ) return null;
+
+	const dims = max.map( ( value, axis ) => Math.max( 1, Math.ceil( ( value - origin[ axis ] ) / cellSize ) ) );
+	const cellCount = dims[ 0 ] * dims[ 1 ] * dims[ 2 ];
+
+	if ( cellCount > MAX_CELLS || ! Number.isFinite( cellCount ) ) return null;
+
+	for ( let axis = 0; axis < 3; axis ++ ) {
+
+		if ( ! Number.isFinite( origin[ axis ] ) || ! Number.isFinite( Math.fround( max[ axis ] - origin[ axis ] ) ) ) return null;
+
+	}
+
+	const bounds = new Uint32Array( lights.length * 6 );
+	const cellPadding = cellSize * 1e-5;
+	let visits = 0;
+
+	for ( let i = 0; i < lights.length; i ++ ) {
+
+		const radius = data[ i * 16 + 3 ] + cellPadding;
+		let volume = 1;
+
+		for ( let axis = 0; axis < 3; axis ++ ) {
+
+			const position = data[ i * 16 + axis ];
+			const low = Math.max( 0, Math.floor( ( position - radius - origin[ axis ] ) / cellSize ) );
+			const high = Math.min( dims[ axis ] - 1, Math.floor( ( position + radius - origin[ axis ] ) / cellSize ) );
+			bounds[ i * 6 + axis ] = low;
+			bounds[ i * 6 + axis + 3 ] = high;
+			volume *= high - low + 1;
+
+		}
+
+		visits += volume;
+		if ( visits > MAX_CELL_VISITS ) return null;
+
+	}
+
+	const cells = new Uint32Array( cellCount * 2 );
+	let references = 0;
+
+	// Count first, then scatter into an exactly sized index buffer. No per-cell
+	// cap is used: exceeding the budget falls back instead of dropping lights.
+	const visitCells = ( callback ) => {
+
+		for ( let i = 0; i < lights.length; i ++ ) {
+
+			const offset = i * 16;
+			const radius = data[ offset + 3 ] + cellPadding;
+			const radiusSquared = radius * radius;
+			const bound = i * 6;
+
+			for ( let z = bounds[ bound + 2 ]; z <= bounds[ bound + 5 ]; z ++ ) {
+
+				const dz = Math.max( origin[ 2 ] + z * cellSize - data[ offset + 2 ], data[ offset + 2 ] - origin[ 2 ] - ( z + 1 ) * cellSize, 0 );
+
+				for ( let y = bounds[ bound + 1 ]; y <= bounds[ bound + 4 ]; y ++ ) {
+
+					const dy = Math.max( origin[ 1 ] + y * cellSize - data[ offset + 1 ], data[ offset + 1 ] - origin[ 1 ] - ( y + 1 ) * cellSize, 0 );
+
+					for ( let x = bounds[ bound ]; x <= bounds[ bound + 3 ]; x ++ ) {
+
+						const dx = Math.max( origin[ 0 ] + x * cellSize - data[ offset ], data[ offset ] - origin[ 0 ] - ( x + 1 ) * cellSize, 0 );
+						if ( dx * dx + dy * dy + dz * dz > radiusSquared ) continue;
+
+						const cell = ( ( z * dims[ 1 ] + y ) * dims[ 0 ] + x ) * 2;
+						if ( callback( cell, i ) === false ) return false;
+
+					}
+
+				}
+
+			}
+
+		}
+
+		return true;
+
+	};
+
+	if ( visitCells( ( cell ) => {
+
+		cells[ cell + 1 ] ++;
+		return ++ references <= MAX_REFERENCES;
+
+	} ) === false ) return null;
+
+	let offset = 0;
+
+	for ( let i = 0; i < cells.length; i += 2 ) {
+
+		cells[ i ] = offset;
+		offset += cells[ i + 1 ];
+
+	}
+
+	const indices = new Uint32Array( references );
+	const cursors = new Uint32Array( cellCount );
+
+	visitCells( ( cell, index ) => {
+
+		indices[ cells[ cell ] + cursors[ cell / 2 ] ++ ] = index;
+
+	} );
+
+	return { origin, dims, cellSize, cells, indices, data };
+
+}
+
+const canBatchStaticLight = ( light ) => {
+
+	return light.static === true && light.castShadow === false && light.colorNode == null &&
+		Number.isFinite( light.distance ) && light.distance > 0 && (
+		( light.isPointLight === true && light._lightNode === PointLightNode ) ||
+			( light.isSpotLight === true && light._lightNode === SpotLightNode && light.map === null )
+	);
+
+};
+
+/**
+ * A node representing the total diffuse light.
+ *
+ * @type {Node<vec3>}
+ */
+const totalDiffuse = property( 'vec3', 'totalDiffuse' );
+
+/**
+ * A node representing the total specular light.
+ *
+ * @type {Node<vec3>}
+ */
+const totalSpecular = property( 'vec3', 'totalSpecular' );
+
+/**
+ * A node representing the outgoing light.
+ *
+ * @type {Node<vec3>}
+ */
+const outgoingLight = property( 'vec3', 'outgoingLight' );
+
+/**
+ * Sorts an array of lights in ascending order by their IDs.
+ *
+ * @private
+ * @param {Array<Light>} lights - The array of lights to sort.
+ * @return {Array<Light>} The sorted array of lights.
+ */
+const sortLights = ( lights ) => {
+
+	return lights.sort( ( a, b ) => a.id - b.id );
+
+};
+
+/**
+ * Finds and returns a lighting node associated with a specific light ID.
+ *
+ * @private
+ * @param {number} id - The ID of the light to search for.
+ * @param {Array<LightingNode>} lightNodes - The array of lighting nodes to search within.
+ * @return {?LightingNode} The matching lighting node, or null if not found.
+ */
+const getLightNodeById = ( id, lightNodes ) => {
+
+	for ( const lightNode of lightNodes ) {
+
+		if ( lightNode.isAnalyticLightNode && lightNode.light.id === id ) {
+
+			return lightNode;
+
+		}
+
+	}
+
+	return null;
+
+};
+
+/**
+ * WeakMap cache mapping light objects to their corresponding lighting node instances.
+ *
+ * @private
+ * @type {WeakMap<Light, LightingNode>}
+ */
+const _lightsNodeRef = /*@__PURE__*/ new WeakMap();
+
+/**
+ * Array used to temporarily store light IDs and shadow casting states for hashing.
+ *
+ * @private
+ * @type {Array<number>}
+ */
+const _hashData = [];
+
+/**
+ * This node represents the scene's lighting and manages the lighting model's life cycle
+ * for the current build 3D object. It is responsible for computing the total outgoing
+ * light in a given lighting context.
+ *
+ * @augments Node
+ */
+class LightsNode extends Node {
+
+	static get type() {
+
+		return 'LightsNode';
+
+	}
+
+	/**
+	 * Constructs a new lights node.
+	 */
+	constructor() {
+
+		super( 'vec3' );
+
+		/**
+		 * A node representing the total diffuse light.
+		 *
+		 * @type {Node<vec3>}
+		 */
+		this.totalDiffuseNode = totalDiffuse;
+
+		/**
+		 * A node representing the total specular light.
+		 *
+		 * @type {Node<vec3>}
+		 */
+		this.totalSpecularNode = totalSpecular;
+
+		/**
+		 * A node representing the outgoing light.
+		 *
+		 * @type {Node<vec3>}
+		 */
+		this.outgoingLightNode = outgoingLight;
+
+		/**
+		 * An array representing the lights in the scene.
+		 *
+		 * @private
+		 * @type {Array<Light>}
+		 */
+		this._lights = [];
+
+		// Immutable batches can be shared by material builders and by cameras with
+		// the same light set. Keep a bounded cache; additional sets use normal lights.
+		this._staticLightsNodes = new Map();
+		this._staticLightsBytes = 0;
+		this._staticLightsVersion = 0;
+		this._staticLightStates = new WeakMap();
+
+		/**
+		 * `LightsNode` sets this property to `true` by default.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.global = true;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
+	/**
+	 * Overwrites the default {@link Node#customCacheKey} implementation by including
+	 * light data into the cache key.
+	 *
+	 * @return {number} The custom cache key.
+	 */
+	customCacheKey() {
+
+		const builtinLights = this.getBuiltinLights();
+		_hashData.push( this._staticLightsVersion );
+
+		for ( let i = 0; i < builtinLights.length; i ++ ) {
+
+			const light = builtinLights[ i ];
+
+			_hashData.push( light.id );
+			_hashData.push( light.castShadow ? 1 : 0 );
+			_hashData.push( canBatchStaticLight( light ) ? 1 : 0 );
+
+			if ( light.isSpotLight === true ) {
+
+				const hashMap = ( light.map !== null ) ? light.map.id : -1;
+				const hashColorNode = ( light.colorNode ) ? light.colorNode.getCacheKey() : -1;
+
+				_hashData.push( hashMap, hashColorNode );
+
+			}
+
+		}
+
+		const cacheKey = hashArray( _hashData );
+
+		_hashData.length = 0;
+
+		return cacheKey;
+
+	}
+
+	/**
+	 * Computes a hash value for identifying the current light nodes setup.
+	 *
+	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 * @return {string} The computed hash.
+	 */
+	getHash( builder ) {
+
+		const nodeData = builder.getDataFromNode( this );
+
+		if ( nodeData.lightNodesHash === undefined ) {
+
+			const lightNodes = this.setupLightsNode( builder );
+
+			nodeData.lightNodes = lightNodes;
+
+			const hash = [];
+
+			for ( const lightNode of lightNodes ) {
+
+				hash.push( lightNode.getHash() );
+
+			}
+
+			nodeData.lightNodesHash = 'lights-' + hash.join( ',' );
+
+		}
+
+		return nodeData.lightNodesHash;
+
+	}
+
+	/**
+	 * Creates lighting nodes for each scene light. This makes it possible to further
+	 * process lights in the node system.
+	 *
+	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 * @return {Array<LightingNode>} The array of lighting nodes.
+	 */
+	setupLightsNode( builder ) {
+
+		const nodeData = builder.getDataFromNode( this );
+		const lightNodes = [];
+
+		const previousLightNodes = nodeData.lightNodes || null;
+		const materialLightings = builder.context.materialLightings;
+
+		const builtinLights = this.getBuiltinLights();
+
+		const lights = sortLights( [ ...materialLightings, ...builtinLights ] );
+		const staticLights = StaticLightsNode.supports( builder ) ? lights.filter( canBatchStaticLight ) : [];
+		const staticLightsNode = this._getStaticLightsNode( staticLights );
+
+		for ( const light of lights ) {
+
+			if ( staticLightsNode !== null && canBatchStaticLight( light ) ) continue;
+
+			if ( light.isNode ) {
+
+				lightNodes.push( light );
+
+			} else {
+
+				let lightNode = null;
+
+				if ( previousLightNodes !== null ) {
+
+					lightNode = getLightNodeById( light.id, previousLightNodes );
+
+				}
+
+				if ( lightNode === null ) {
+
+					const lightNodeClass = light._lightNode;
+
+					if ( lightNodeClass === undefined ) {
+
+						warn( `LightsNode.setupNodeLights: Light node not found for ${ light.constructor.name }` );
+						continue;
+
+					}
+
+					if ( _lightsNodeRef.has( light ) === false ) {
+
+						_lightsNodeRef.set( light, new lightNodeClass( light ) );
+
+					}
+
+					lightNode = _lightsNodeRef.get( light );
+
+				}
+
+				lightNodes.push( lightNode );
+
+			}
+
+		}
+
+		if ( staticLightsNode !== null ) lightNodes.push( staticLightsNode );
+
+		return lightNodes;
+
+	}
+
+	/**
+	 * Gets an immutable grid for an already sorted set of static lights.
+	 *
+	 * @private
+	 * @param {Array<Light>} lights - The eligible lights.
+	 * @return {?StaticLightsNode} The batch, or null to use ordinary lights.
+	 */
+	_getStaticLightsNode( lights ) {
+
+		if ( lights.length === 0 ) return null;
+
+		const key = this._staticLightsVersion + ':' + lights.map( light => light.id ).join( ',' );
+		const nodes = this._staticLightsNodes;
+
+		if ( nodes.has( key ) ) return nodes.get( key );
+		if ( nodes.size >= 8 ) return null;
+
+		const grid = buildStaticLightGrid( lights );
+		let node = null;
+
+		if ( grid !== null ) {
+
+			const bytes = grid.cells.byteLength + grid.indices.byteLength + grid.data.byteLength;
+
+			if ( this._staticLightsBytes + bytes <= 16 * 1024 * 1024 ) {
+
+				node = new StaticLightsNode( grid );
+				this._staticLightsBytes += bytes;
+
+			}
+
+		}
+
+		// Cache failed builds too, so each material does not repeat the work.
+		nodes.set( key, node );
+
+		return node;
+
+	}
+
+	/**
+	 * Releases cached static light grids.
+	 */
+	dispose() {
+
+		for ( const node of this._staticLightsNodes.values() ) {
+
+			if ( node !== null ) node.dispose();
+
+		}
+
+		this._staticLightsNodes.clear();
+		this._staticLightsBytes = 0;
+		this._staticLightsVersion ++;
+
+		super.dispose();
+
+	}
+
+	/**
+	 * Sets up a direct light in the lighting model.
+	 *
+	 * @param {Object} builder - The builder object containing the context and stack.
+	 * @param {Object} lightNode - The light node.
+	 * @param {Object} lightData - The light object containing color and direction properties.
+	 */
+	setupDirectLight( builder, lightNode, lightData ) {
+
+		const { lightingModel, reflectedLight } = builder.context;
+
+		lightingModel.direct( {
+			...lightData,
+			lightNode,
+			reflectedLight
+		}, builder );
+
+	}
+
+	/**
+	 * Sets up a direct rect area light in the lighting model.
+	 *
+	 * @param {Object} builder - The builder object containing the context and stack.
+	 * @param {Object} lightNode - The light node.
+	 * @param {Object} lightData - The light object containing color and area light properties.
+	 */
+	setupDirectRectAreaLight( builder, lightNode, lightData ) {
+
+		const { lightingModel, reflectedLight } = builder.context;
+
+		lightingModel.directRectArea( {
+			...lightData,
+			lightNode,
+			reflectedLight
+		}, builder );
+
+	}
+
+	/**
+	 * Setups the internal lights by building all respective
+	 * light nodes.
+	 *
+	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 * @param {Array<LightingNode>} lightNodes - An array of lighting nodes.
+	 */
+	setupLights( builder, lightNodes ) {
+
+		for ( const lightNode of lightNodes ) {
+
+			lightNode.build( builder );
+
+		}
+
+	}
+
+	getLightNodes( builder ) {
+
+		const nodeData = builder.getDataFromNode( this );
+
+		if ( nodeData.lightNodes === undefined ) {
+
+			nodeData.lightNodes = this.setupLightsNode( builder );
+
+		}
+
+		return nodeData.lightNodes;
+
+	}
+
+	/**
+	 * The implementation makes sure that for each light in the scene
+	 * there is a corresponding light node. By building the light nodes
+	 * and evaluating the lighting model the outgoing light is computed.
+	 *
+	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 * @return {Node<vec3>} A node representing the outgoing light.
+	 */
+	setup( builder ) {
+
+		const currentLightsNode = builder.lightsNode;
+
+		builder.lightsNode = this;
+
+		let outgoingLightNode = this.outgoingLightNode;
+
+		const context = builder.context;
+		const lightingModel = context.lightingModel;
+
+		if ( lightingModel ) {
+
+			const { totalDiffuseNode, totalSpecularNode } = this;
+
+			context.outgoingLight = outgoingLightNode;
+
+			builder.addStack();
+
+			lightingModel.start( builder );
+
+			const { backdrop, backdropAlpha } = context;
+			const { directDiffuse, directSpecular, indirectDiffuse, indirectSpecular } = context.reflectedLight;
+
+			let totalDiffuse = directDiffuse.add( indirectDiffuse );
+
+			if ( backdrop !== null ) {
+
+				if ( backdropAlpha !== null ) {
+
+					totalDiffuse = vec3( backdropAlpha.mix( totalDiffuse, backdrop ) );
+
+				} else {
+
+					totalDiffuse = vec3( backdrop );
+
+				}
+
+			}
+
+			totalDiffuseNode.assign( totalDiffuse );
+			totalSpecularNode.assign( directSpecular.add( indirectSpecular ) );
+
+			outgoingLightNode.assign( totalDiffuseNode.add( totalSpecularNode ) );
+
+			lightingModel.finish( builder );
+
+			outgoingLightNode = outgoingLightNode.bypass( builder.removeStack() );
+
+		}
+
+		builder.lightsNode = currentLightsNode;
+
+		return outgoingLightNode;
+
+	}
+
+	/**
+	 * Configures this node with an array of lights.
+	 *
+	 * @param {Array<Light>} lights - An array of lights.
+	 * @return {LightsNode} A reference to this node.
+	 */
+	setLights( lights ) {
+
+		for ( const light of lights ) {
+
+			const eligible = canBatchStaticLight( light );
+			const previous = this._staticLightStates.get( light );
+
+			if ( previous !== undefined && previous !== eligible ) this._staticLightsVersion ++;
+			this._staticLightStates.set( light, eligible );
+
+		}
+
+		this._lights = lights;
+
+		return this;
+
+	}
+
+	/**
+	 * Returns an array of the scene's lights.
+	 *
+	 * @return {Array<Light>} The scene's lights.
+	 */
+	getLights() {
+
+		return this._lights;
+
+	}
+
+	/**
+	 * Returns an array of the scene's lights.
+	 *
+	 * The light variations are shader-dependent;
+	 * if this array changes, the shader needs to be recreated.
+	 *
+	 * @return {Array<Light>} The scene's lights.
+	 */
+	getBuiltinLights() {
+
+		return this._lights;
+
+	}
+
+	/**
+	 * Whether the scene has lights or not.
+	 *
+	 * @type {boolean}
+	 */
+	get hasLights() {
+
+		return this._lights.length > 0;
+
+	}
+
+}
+
+/**
+ * TSL function for creating an instance of `LightsNode` and configuring
+ * it with the given array of lights.
+ *
+ * @tsl
+ * @function
+ * @param {Array<Light>} lights - An array of lights.
+ * @return {LightsNode} The created lights node.
+ */
+const lights = ( lights = [] ) => new LightsNode().setLights( lights );
 
 const GOLDEN_ANGLE = 2.399963229728653;
 
@@ -39441,450 +41511,6 @@ const mx_heighttonormal = ( input, scale = 1, texcoord = uv$1() ) => {
 
 };
 
-const EON_EPSILON = 1e-7;
-const FON_A_COEFFICIENT = 0.5 - 2 / ( 3 * Math.PI );
-const FON_AVERAGE_ALBEDO_COEFFICIENT = 2 / 3 - 28 / ( 15 * Math.PI );
-
-const FON_DirectionalAlbedo = /*@__PURE__*/ Fn( ( { mu, roughness, A } ) => {
-
-	const muComp = mu.oneMinus();
-	const gOverPi = muComp.mul(
-		muComp.mul(
-			muComp.mul(
-				muComp.mul( 0.0714429953 ).sub( 0.332181442 )
-			).add( 0.491881867 )
-		).add( 0.0571085289 )
-	);
-
-	return A.mul( roughness.mul( gOverPi ).add( 1.0 ) );
-
-}, { mu: 'float', roughness: 'float', A: 'float', return: 'float' } );
-
-// Portsmouth et al. 2025, "EON: A Practical Energy-Preserving Rough Diffuse BRDF"
-// https://jcgt.org/published/0014/01/06/
-const BRDF_EON = /*@__PURE__*/ Fn( ( { lightDirection, diffuseColor, roughness, normalView: normalView$1 = normalView, viewDirection = positionViewDirection } ) => {
-
-	const rho = diffuseColor.clamp();
-	const dotNL = normalView$1.dot( lightDirection ).clamp();
-	const dotNV = normalView$1.dot( viewDirection ).clamp();
-	const s = lightDirection.dot( viewDirection ).sub( dotNL.mul( dotNV ) );
-	const sOverT = s.greaterThan( 0.0 ).select( s.div( dotNL.max( dotNV ).max( EON_EPSILON ) ), s );
-
-	const A = roughness.mul( FON_A_COEFFICIENT ).add( 1.0 ).reciprocal();
-	const singleScatter = rho.mul( 1 / Math.PI, A, roughness.mul( sOverT ).add( 1.0 ) );
-
-	const averageAlbedo = A.mul( roughness.mul( FON_AVERAGE_ALBEDO_COEFFICIENT ).add( 1.0 ) );
-	const albedoV = FON_DirectionalAlbedo( { mu: dotNV, roughness, A } );
-	const albedoL = FON_DirectionalAlbedo( { mu: dotNL, roughness, A } );
-	const rhoMultiScatter = rho.mul( rho, averageAlbedo ).div( rho.mul( averageAlbedo.oneMinus() ).oneMinus().max( EON_EPSILON ) );
-	const multiScatter = rhoMultiScatter.mul(
-		1 / Math.PI,
-		albedoV.oneMinus().max( EON_EPSILON ),
-		albedoL.oneMinus().max( EON_EPSILON )
-	).div( averageAlbedo.oneMinus().max( EON_EPSILON ) );
-	const eon = singleScatter.add( multiScatter );
-
-	return roughness.lessThanEqual( EON_EPSILON ).select( rho.mul( 1 / Math.PI ), eon );
-
-} );
-
-const EON_DirectionalAlbedo = /*@__PURE__*/ Fn( ( { diffuseColor, roughness, dotNV } ) => {
-
-	const rho = diffuseColor.clamp();
-	const A = roughness.mul( FON_A_COEFFICIENT ).add( 1.0 ).reciprocal();
-	const directionalAlbedo = FON_DirectionalAlbedo( { mu: dotNV.clamp(), roughness, A } );
-	const averageAlbedo = A.mul( roughness.mul( FON_AVERAGE_ALBEDO_COEFFICIENT ).add( 1.0 ) );
-	const rhoMultiScatter = rho.mul( rho, averageAlbedo ).div( rho.mul( averageAlbedo.oneMinus() ).oneMinus().max( EON_EPSILON ) );
-	const eonAlbedo = rho.mul( directionalAlbedo ).add( rhoMultiScatter.mul( directionalAlbedo.oneMinus() ) );
-
-	return roughness.lessThanEqual( EON_EPSILON ).select( rho, eonAlbedo );
-
-}, { diffuseColor: 'vec3', roughness: 'float', dotNV: 'float', return: 'vec3' } );
-
-const F_Schlick = /*@__PURE__*/ Fn( ( { f0, f90, dotVH } ) => {
-
-	// Original approximation by Christophe Schlick '94
-	// float fresnel = pow( 1.0 - dotVH, 5.0 );
-
-	// Optimized variant (presented by Epic at SIGGRAPH '13)
-	// https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf
-	const fresnel = dotVH.mul( -5.55473 ).sub( 6.98316 ).mul( dotVH ).exp2();
-
-	return f0.mul( fresnel.oneMinus() ).add( f90.mul( fresnel ) );
-
-} ); // validated
-
-// Moving Frostbite to Physically Based Rendering 3.0 - page 12, listing 2
-// https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
-const V_GGX_SmithCorrelated = /*@__PURE__*/ Fn( ( { alpha, dotNL, dotNV } ) => {
-
-	const a2 = alpha.pow2();
-
-	const gv = dotNL.mul( a2.add( a2.oneMinus().mul( dotNV.pow2() ) ).sqrt() );
-	const gl = dotNV.mul( a2.add( a2.oneMinus().mul( dotNL.pow2() ) ).sqrt() );
-
-	return div( 0.5, gv.add( gl ).max( EPSILON ) );
-
-}, { alpha: 'float', dotNL: 'float', dotNV: 'float', return: 'float' } ); // validated
-
-// https://google.github.io/filament/Filament.md.html#materialsystem/anisotropicmodel/anisotropicspecularbrdf
-
-const V_GGX_SmithCorrelated_Anisotropic = /*@__PURE__*/ Fn( ( { alphaT, alphaB, dotTV, dotBV, dotTL, dotBL, dotNV, dotNL } ) => {
-
-	const gv = dotNL.mul( vec3( alphaT.mul( dotTV ), alphaB.mul( dotBV ), dotNV ).length() );
-	const gl = dotNV.mul( vec3( alphaT.mul( dotTL ), alphaB.mul( dotBL ), dotNL ).length() );
-
-	return div( 0.5, gv.add( gl ).max( EPSILON ) );
-
-}, {
-	alphaT: 'float',
-	alphaB: 'float',
-	dotTV: 'float',
-	dotBV: 'float',
-	dotTL: 'float',
-	dotBL: 'float',
-	dotNV: 'float',
-	dotNL: 'float',
-	return: 'float'
-} );
-
-// Microfacet Models for Refraction through Rough Surfaces - equation (33)
-// http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
-// alpha is "roughness squared" in Disney’s reparameterization
-const D_GGX = /*@__PURE__*/ Fn( ( { alpha, dotNH } ) => {
-
-	const a2 = alpha.pow2();
-
-	const denom = dotNH.pow2().mul( a2.oneMinus() ).oneMinus(); // avoid alpha = 0 with dotNH = 1
-
-	return a2.div( denom.pow2() ).mul( 1 / Math.PI );
-
-}, { alpha: 'float', dotNH: 'float', return: 'float' } ); // validated
-
-const RECIPROCAL_PI = /*@__PURE__*/ float( 1 / Math.PI );
-
-// https://google.github.io/filament/Filament.md.html#materialsystem/anisotropicmodel/anisotropicspecularbrdf
-
-const D_GGX_Anisotropic = /*@__PURE__*/ Fn( ( { alphaT, alphaB, dotNH, dotTH, dotBH } ) => {
-
-	const a2 = alphaT.mul( alphaB );
-	const v = vec3( alphaB.mul( dotTH ), alphaT.mul( dotBH ), a2.mul( dotNH ) );
-	const v2 = v.dot( v );
-	const w2 = a2.div( v2 );
-
-	return RECIPROCAL_PI.mul( a2.mul( w2.pow2() ) );
-
-}, {
-	alphaT: 'float',
-	alphaB: 'float',
-	dotNH: 'float',
-	dotTH: 'float',
-	dotBH: 'float',
-	return: 'float'
-} );
-
-// GGX Distribution, Schlick Fresnel, GGX_SmithCorrelated Visibility
-const BRDF_GGX = /*@__PURE__*/ Fn( ( { lightDirection, f0, f90, roughness, f, normalView: normalView$1 = normalView, viewDirection = positionViewDirection, USE_IRIDESCENCE, USE_ANISOTROPY } ) => {
-
-	const alpha = roughness.max( 0.045 ).pow2(); // punctual lights need a minimum roughness to show a highlight
-
-	const halfDir = lightDirection.add( viewDirection ).normalize();
-
-	const dotNL = normalView$1.dot( lightDirection ).clamp();
-	const dotNV = normalView$1.dot( viewDirection ).clamp(); // @ TODO: Move to core dotNV
-	const dotNH = normalView$1.dot( halfDir ).clamp();
-	const dotVH = viewDirection.dot( halfDir ).clamp();
-
-	let F = F_Schlick( { f0, f90, dotVH } );
-	let V, D;
-
-	if ( defined( USE_IRIDESCENCE ) ) {
-
-		F = iridescence.mix( F, f );
-
-	}
-
-	if ( defined( USE_ANISOTROPY ) ) {
-
-		const dotTL = anisotropyT.dot( lightDirection );
-		const dotTV = anisotropyT.dot( viewDirection );
-		const dotTH = anisotropyT.dot( halfDir );
-		const dotBL = anisotropyB.dot( lightDirection );
-		const dotBV = anisotropyB.dot( viewDirection );
-		const dotBH = anisotropyB.dot( halfDir );
-
-		const clampedAlphaT = alphaT.max( alpha );
-
-		V = V_GGX_SmithCorrelated_Anisotropic( { alphaT: clampedAlphaT, alphaB: alpha, dotTV, dotBV, dotTL, dotBL, dotNV, dotNL } );
-		D = D_GGX_Anisotropic( { alphaT: clampedAlphaT, alphaB: alpha, dotNH, dotTH, dotBH } );
-
-	} else {
-
-		V = V_GGX_SmithCorrelated( { alpha, dotNL, dotNV } );
-		D = D_GGX( { alpha, dotNH } );
-
-	}
-
-	return F.mul( V ).mul( D );
-
-} ); // validated
-
-const BRDF_Lambert = /*@__PURE__*/ Fn( ( inputs ) => {
-
-	return inputs.diffuseColor.mul( 1 / Math.PI ); // punctual light
-
-} ); // validated
-
-// https://github.com/google/filament/blob/master/shaders/src/brdf.fs
-const D_Charlie = /*@__PURE__*/ Fn( ( { roughness, dotNH } ) => {
-
-	const alpha = roughness.pow2();
-
-	// Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF"
-	const invAlpha = float( 1.0 ).div( alpha );
-	const cos2h = dotNH.pow2();
-	const sin2h = cos2h.oneMinus().max( 0.0078125 ); // 2^(-14/2), so sin2h^2 > 0 in fp16
-
-	return float( 2.0 ).add( invAlpha ).mul( sin2h.pow( invAlpha.mul( 0.5 ) ) ).div( 2.0 * Math.PI );
-
-}, { roughness: 'float', dotNH: 'float', return: 'float' } );
-
-// https://github.com/google/filament/blob/master/shaders/src/brdf.fs
-const V_Neubelt = /*@__PURE__*/ Fn( ( { dotNV, dotNL } ) => {
-
-	// Neubelt and Pettineo 2013, "Crafting a Next-gen Material Pipeline for The Order: 1886"
-	return float( 1.0 ).div( float( 4.0 ).mul( dotNL.add( dotNV ).sub( dotNL.mul( dotNV ) ) ) ).clamp();
-
-}, { dotNV: 'float', dotNL: 'float', return: 'float' } );
-
-const BRDF_Sheen = /*@__PURE__*/ Fn( ( { lightDirection } ) => {
-
-	const halfDir = lightDirection.add( positionViewDirection ).normalize();
-
-	const dotNL = normalView.dot( lightDirection ).clamp();
-	const dotNV = normalView.dot( positionViewDirection ).clamp();
-	const dotNH = normalView.dot( halfDir ).clamp();
-
-	const D = D_Charlie( { roughness: sheenRoughness, dotNH } );
-	const V = V_Neubelt( { dotNV, dotNL } );
-
-	return sheen.mul( D ).mul( V );
-
-} );
-
-/**
- * Precomputed DFG LUT for physically based specular lighting, used by both
- * image-based lighting and direct-light multi-scattering energy compensation
- * Resolution: 16x16
- * Samples: 4096 per texel
- * Format: RG16F (2 half floats per texel: scale, bias)
- */
-
-const DATA = new Uint16Array( [
-	0x30b5, 0x3ad1, 0x314c, 0x3a4d, 0x33d2, 0x391c, 0x35ef, 0x3828, 0x37f3, 0x36a6, 0x38d1, 0x3539, 0x3979, 0x3410, 0x39f8, 0x3252, 0x3a53, 0x30f0, 0x3a94, 0x2fc9, 0x3abf, 0x2e35, 0x3ada, 0x2d05, 0x3ae8, 0x2c1f, 0x3aed, 0x2ae0, 0x3aea, 0x29d1, 0x3ae1, 0x28ff,
-	0x3638, 0x38e4, 0x364a, 0x38ce, 0x3699, 0x385e, 0x374e, 0x372c, 0x3839, 0x35a4, 0x38dc, 0x3462, 0x396e, 0x32c4, 0x39de, 0x3134, 0x3a2b, 0x3003, 0x3a59, 0x2e3a, 0x3a6d, 0x2ce1, 0x3a6e, 0x2bba, 0x3a5f, 0x2a33, 0x3a49, 0x290a, 0x3a2d, 0x2826, 0x3a0a, 0x26e8,
-	0x3894, 0x36d7, 0x3897, 0x36c9, 0x38a3, 0x3675, 0x38bc, 0x35ac, 0x38ee, 0x349c, 0x393e, 0x3332, 0x3997, 0x3186, 0x39e2, 0x3038, 0x3a13, 0x2e75, 0x3a29, 0x2cf5, 0x3a2d, 0x2bac, 0x3a21, 0x29ff, 0x3a04, 0x28bc, 0x39dc, 0x2790, 0x39ad, 0x261a, 0x3978, 0x24fa,
-	0x39ac, 0x34a8, 0x39ac, 0x34a3, 0x39ae, 0x3480, 0x39ae, 0x3423, 0x39b1, 0x330e, 0x39c2, 0x31a9, 0x39e0, 0x3063, 0x39fc, 0x2eb5, 0x3a0c, 0x2d1d, 0x3a14, 0x2bcf, 0x3a07, 0x29ff, 0x39e9, 0x28a3, 0x39be, 0x273c, 0x3989, 0x25b3, 0x394a, 0x2488, 0x3907, 0x2345,
-	0x3a77, 0x3223, 0x3a76, 0x321f, 0x3a73, 0x3204, 0x3a6a, 0x31b3, 0x3a58, 0x3114, 0x3a45, 0x303b, 0x3a34, 0x2eb6, 0x3a26, 0x2d31, 0x3a1e, 0x2bef, 0x3a0b, 0x2a0d, 0x39ec, 0x28a1, 0x39c0, 0x271b, 0x3987, 0x2580, 0x3944, 0x2449, 0x38fa, 0x22bd, 0x38ac, 0x2155,
-	0x3b07, 0x2fca, 0x3b06, 0x2fca, 0x3b00, 0x2fb8, 0x3af4, 0x2f7c, 0x3adb, 0x2eea, 0x3ab4, 0x2e00, 0x3a85, 0x2cec, 0x3a5e, 0x2bc5, 0x3a36, 0x2a00, 0x3a0d, 0x2899, 0x39dc, 0x2707, 0x39a0, 0x2562, 0x395a, 0x2424, 0x390b, 0x2268, 0x38b7, 0x20fd, 0x385f, 0x1fd1,
-	0x3b69, 0x2cb9, 0x3b68, 0x2cbb, 0x3b62, 0x2cbb, 0x3b56, 0x2cae, 0x3b3b, 0x2c78, 0x3b0d, 0x2c0a, 0x3acf, 0x2ae3, 0x3a92, 0x2998, 0x3a54, 0x2867, 0x3a17, 0x26d0, 0x39d3, 0x253c, 0x3989, 0x2402, 0x3935, 0x2226, 0x38dc, 0x20bd, 0x387d, 0x1f54, 0x381d, 0x1db3,
-	0x3ba9, 0x296b, 0x3ba8, 0x296f, 0x3ba3, 0x297b, 0x3b98, 0x2987, 0x3b7f, 0x2976, 0x3b4e, 0x2927, 0x3b0e, 0x2895, 0x3ac2, 0x27b7, 0x3a73, 0x263b, 0x3a23, 0x24e7, 0x39d0, 0x239b, 0x3976, 0x21d9, 0x3917, 0x207e, 0x38b2, 0x1ee7, 0x384b, 0x1d53, 0x37c7, 0x1c1e,
-	0x3bd2, 0x25cb, 0x3bd1, 0x25d3, 0x3bcd, 0x25f0, 0x3bc2, 0x261f, 0x3bad, 0x2645, 0x3b7d, 0x262d, 0x3b3e, 0x25c4, 0x3aec, 0x250f, 0x3a93, 0x243a, 0x3a32, 0x22ce, 0x39d0, 0x215b, 0x3969, 0x202a, 0x38fe, 0x1e6e, 0x388f, 0x1cf1, 0x381f, 0x1b9b, 0x3762, 0x19dd,
-	0x3be9, 0x21ab, 0x3be9, 0x21b7, 0x3be5, 0x21e5, 0x3bdd, 0x2241, 0x3bc9, 0x22a7, 0x3ba0, 0x22ec, 0x3b62, 0x22cd, 0x3b0f, 0x2247, 0x3aae, 0x2175, 0x3a44, 0x2088, 0x39d4, 0x1f49, 0x3960, 0x1dbe, 0x38e9, 0x1c77, 0x3870, 0x1ae8, 0x37f1, 0x1953, 0x3708, 0x181b,
-	0x3bf6, 0x1cea, 0x3bf6, 0x1cfb, 0x3bf3, 0x1d38, 0x3bec, 0x1dbd, 0x3bda, 0x1e7c, 0x3bb7, 0x1f25, 0x3b7d, 0x1f79, 0x3b2c, 0x1f4c, 0x3ac6, 0x1ea6, 0x3a55, 0x1dbb, 0x39da, 0x1cbd, 0x395a, 0x1b9d, 0x38d8, 0x1a00, 0x3855, 0x18ac, 0x37ab, 0x173c, 0x36b7, 0x1598,
-	0x3bfc, 0x1736, 0x3bfc, 0x1759, 0x3bf9, 0x17e7, 0x3bf4, 0x1896, 0x3be4, 0x1997, 0x3bc6, 0x1aa8, 0x3b91, 0x1b84, 0x3b43, 0x1bd2, 0x3ade, 0x1b8a, 0x3a65, 0x1acd, 0x39e2, 0x19d3, 0x3957, 0x18cd, 0x38ca, 0x17b3, 0x383e, 0x1613, 0x376d, 0x14bf, 0x366f, 0x135e,
-	0x3bff, 0x101b, 0x3bff, 0x1039, 0x3bfc, 0x10c8, 0x3bf9, 0x1226, 0x3bea, 0x1428, 0x3bcf, 0x1584, 0x3b9f, 0x16c5, 0x3b54, 0x179a, 0x3af0, 0x17ce, 0x3a76, 0x1771, 0x39ea, 0x16a4, 0x3956, 0x15a7, 0x38bf, 0x14a7, 0x3829, 0x1379, 0x3735, 0x11ea, 0x362d, 0x10a1,
-	0x3c00, 0x061b, 0x3c00, 0x066a, 0x3bfe, 0x081c, 0x3bfa, 0x0a4c, 0x3bed, 0x0d16, 0x3bd5, 0x0fb3, 0x3ba9, 0x114d, 0x3b63, 0x127c, 0x3b01, 0x132f, 0x3a85, 0x1344, 0x39f4, 0x12d2, 0x3957, 0x120d, 0x38b5, 0x1122, 0x3817, 0x103c, 0x3703, 0x0ed3, 0x35f0, 0x0d6d,
-	0x3c00, 0x007a, 0x3c00, 0x0089, 0x3bfe, 0x011d, 0x3bfb, 0x027c, 0x3bf0, 0x04fa, 0x3bda, 0x0881, 0x3bb1, 0x0acd, 0x3b6f, 0x0c97, 0x3b10, 0x0d7b, 0x3a93, 0x0df1, 0x39fe, 0x0def, 0x3959, 0x0d8a, 0x38af, 0x0ce9, 0x3808, 0x0c31, 0x36d5, 0x0af0, 0x35b9, 0x09a3,
-	0x3c00, 0x0000, 0x3c00, 0x0001, 0x3bff, 0x0015, 0x3bfb, 0x0059, 0x3bf2, 0x00fd, 0x3bdd, 0x01df, 0x3bb7, 0x031c, 0x3b79, 0x047c, 0x3b1d, 0x05d4, 0x3aa0, 0x06d5, 0x3a08, 0x075a, 0x395d, 0x075e, 0x38aa, 0x06f7, 0x37f4, 0x0648, 0x36ac, 0x0576, 0x3586, 0x049f
-] );
-
-let lut = null;
-
-const DFGLUT = /*@__PURE__*/ Fn( ( { roughness, dotNV } ) => {
-
-	if ( lut === null ) {
-
-		lut = new DataTexture( DATA, 16, 16, RGFormat, HalfFloatType );
-		lut.name = 'DFG_LUT';
-		lut.minFilter = LinearFilter;
-		lut.magFilter = LinearFilter;
-		lut.wrapS = ClampToEdgeWrapping;
-		lut.wrapT = ClampToEdgeWrapping;
-		lut.generateMipmaps = false;
-		lut.needsUpdate = true;
-
-	}
-
-	const uv = vec2( roughness, dotNV );
-
-	return texture( lut, uv ).rg;
-
-} );
-
-const EnvironmentBRDF = /*@__PURE__*/ Fn( ( inputs ) => {
-
-	const { dotNV, specularColor, specularF90, roughness } = inputs;
-
-	const fab = DFGLUT( { dotNV, roughness } );
-	return specularColor.mul( fab.x ).add( specularF90.mul( fab.y ) );
-
-} );
-
-const Schlick_to_F0 = /*@__PURE__*/ Fn( ( { f, f90, dotVH } ) => {
-
-	const x = dotVH.oneMinus().saturate();
-	const x2 = x.mul( x );
-	const x5 = x.mul( x2, x2 ).clamp( 0, .9999 );
-
-	return f.sub( vec3( f90 ).mul( x5 ) ).div( x5.oneMinus() );
-
-}, { f: 'vec3', f90: 'float', dotVH: 'float', return: 'vec3' } );
-
-// Rect Area Light
-
-// Real-Time Polygonal-Light Shading with Linearly Transformed Cosines
-// by Eric Heitz, Jonathan Dupuy, Stephen Hill and David Neubelt
-// code: https://github.com/selfshadow/ltc_code/
-
-const LTC_Uv = /*@__PURE__*/ Fn( ( { N, V, roughness } ) => {
-
-	const LUT_SIZE = 64.0;
-	const LUT_SCALE = ( LUT_SIZE - 1.0 ) / LUT_SIZE;
-	const LUT_BIAS = 0.5 / LUT_SIZE;
-
-	const dotNV = N.dot( V ).saturate();
-
-	// texture parameterized by sqrt( GGX alpha ) and sqrt( 1 - cos( theta ) )
-	const uv = vec2( roughness, dotNV.oneMinus().sqrt() );
-
-	uv.assign( uv.mul( LUT_SCALE ).add( LUT_BIAS ) );
-
-	return uv;
-
-}, { N: 'vec3', V: 'vec3', roughness: 'float', return: 'vec2' } );
-
-const LTC_ClippedSphereFormFactor = /*@__PURE__*/ Fn( ( { f } ) => {
-
-	// Real-Time Area Lighting: a Journey from Research to Production (p.102)
-	// An approximation of the form factor of a horizon-clipped rectangle.
-
-	const l = f.length();
-
-	return max( l.mul( l ).add( f.z ).div( l.add( 1.0 ) ), 0 );
-
-}, { f: 'vec3', return: 'float' } );
-
-const LTC_EdgeVectorFormFactor = /*@__PURE__*/ Fn( ( { v1, v2 } ) => {
-
-	const x = v1.dot( v2 );
-	const y = x.abs().toVar();
-
-	// rational polynomial approximation to theta / sin( theta ) / 2PI
-	const a = y.mul( 0.0145206 ).add( 0.4965155 ).mul( y ).add( 0.8543985 ).toVar();
-	const b = y.add( 4.1616724 ).mul( y ).add( 3.4175940 ).toVar();
-	const v = a.div( b );
-
-	const theta_sintheta = x.greaterThan( 0.0 ).select( v, max( x.mul( x ).oneMinus(), 1e-7 ).inverseSqrt().mul( 0.5 ).sub( v ) );
-
-	return v1.cross( v2 ).mul( theta_sintheta );
-
-}, { v1: 'vec3', v2: 'vec3', return: 'vec3' } );
-
-const LTC_Evaluate = /*@__PURE__*/ Fn( ( { N, V, P, mInv, p0, p1, p2, p3 } ) => {
-
-	// bail if point is on back side of plane of light
-	// assumes ccw winding order of light vertices
-	const v1 = p1.sub( p0 ).toVar();
-	const v2 = p3.sub( p0 ).toVar();
-
-	const lightNormal = v1.cross( v2 );
-	const result = vec3().toVar();
-
-	If( lightNormal.dot( P.sub( p0 ) ).greaterThanEqual( 0.0 ), () => {
-
-		// construct orthonormal basis around N
-		const T1 = V.sub( N.mul( V.dot( N ) ) ).normalize();
-		const T2 = N.cross( T1 ).negate(); // negated from paper; possibly due to a different handedness of world coordinate system
-
-		// compute transform
-		const mat = mInv.mul( mat3( T1, T2, N ).transpose() ).toVar();
-
-		// transform rect
-		// & project rect onto sphere
-		const coords0 = mat.mul( p0.sub( P ) ).normalize().toVar();
-		const coords1 = mat.mul( p1.sub( P ) ).normalize().toVar();
-		const coords2 = mat.mul( p2.sub( P ) ).normalize().toVar();
-		const coords3 = mat.mul( p3.sub( P ) ).normalize().toVar();
-
-		// calculate vector form factor
-		const vectorFormFactor = vec3( 0 ).toVar();
-		vectorFormFactor.addAssign( LTC_EdgeVectorFormFactor( { v1: coords0, v2: coords1 } ) );
-		vectorFormFactor.addAssign( LTC_EdgeVectorFormFactor( { v1: coords1, v2: coords2 } ) );
-		vectorFormFactor.addAssign( LTC_EdgeVectorFormFactor( { v1: coords2, v2: coords3 } ) );
-		vectorFormFactor.addAssign( LTC_EdgeVectorFormFactor( { v1: coords3, v2: coords0 } ) );
-
-		// adjust for horizon clipping
-		result.assign( vec3( LTC_ClippedSphereFormFactor( { f: vectorFormFactor } ) ) );
-
-	} );
-
-	return result;
-
-}, {
-	N: 'vec3',
-	V: 'vec3',
-	P: 'vec3',
-	mInv: 'mat3',
-	p0: 'vec3',
-	p1: 'vec3',
-	p2: 'vec3',
-	p3: 'vec3',
-	return: 'vec3'
-} );
-
-const LTC_Evaluate_Volume = /*@__PURE__*/ Fn( ( { P, p0, p1, p2, p3 } ) => {
-
-	// bail if point is on back side of plane of light
-	// assumes ccw winding order of light vertices
-	const v1 = p1.sub( p0 ).toVar();
-	const v2 = p3.sub( p0 ).toVar();
-
-	const lightNormal = v1.cross( v2 );
-	const result = vec3().toVar();
-
-	If( lightNormal.dot( P.sub( p0 ) ).greaterThanEqual( 0.0 ), () => {
-
-		// transform rect
-		// & project rect onto sphere
-		const coords0 = p0.sub( P ).normalize().toVar();
-		const coords1 = p1.sub( P ).normalize().toVar();
-		const coords2 = p2.sub( P ).normalize().toVar();
-		const coords3 = p3.sub( P ).normalize().toVar();
-
-		// calculate vector form factor
-		const vectorFormFactor = vec3( 0 ).toVar();
-		vectorFormFactor.addAssign( LTC_EdgeVectorFormFactor( { v1: coords0, v2: coords1 } ) );
-		vectorFormFactor.addAssign( LTC_EdgeVectorFormFactor( { v1: coords1, v2: coords2 } ) );
-		vectorFormFactor.addAssign( LTC_EdgeVectorFormFactor( { v1: coords2, v2: coords3 } ) );
-		vectorFormFactor.addAssign( LTC_EdgeVectorFormFactor( { v1: coords3, v2: coords0 } ) );
-
-		// adjust for horizon clipping
-		result.assign( vec3( LTC_ClippedSphereFormFactor( { f: vectorFormFactor.abs() } ) ) );
-
-	} );
-
-	return result;
-
-}, {
-	P: 'vec3',
-	p0: 'vec3',
-	p1: 'vec3',
-	p2: 'vec3',
-	p3: 'vec3',
-	return: 'vec3'
-} );
-
 const getGeometryRoughness = /*@__PURE__*/ Fn( ( builder ) => {
 
 	if ( builder.geometry.hasAttribute( 'normal' ) === false ) {
@@ -40662,4 +42288,4 @@ var Three_TSL = /*#__PURE__*/Object.freeze({
 	xor: xor
 });
 
-export { AONode, AnalyticLightNode, ArrayElementNode, ArrayNode, AssignNode, AtomicFunctionNode, AttributeNode, BRDF_EON, BRDF_GGX, BRDF_Lambert, BRDF_Sheen, BarrierNode, BasicPointShadowFilter, BasicShadowFilter, BitcastNode, BitcountNode, BlendMode, Break, BufferAttributeNode, BufferNode, BuiltinNode, BumpMapNode, BypassNode, ChainMap, ClippingNode, CodeNode, Color4, ColorSpaceNode, ComputeBuiltinNode, ComputeNode, ConditionalNode, Const, ConstNode, ContextNode, Continue, ConvertNode, CubeRenderTarget, CubeTextureNode, DFGLUT, D_GGX, D_GGX_Anisotropic, DebugNode, Discard, EON_DirectionalAlbedo, EPSILON, EnvironmentBRDF, EventNode, ExpressionNode, F_Schlick, FlipNode, Fn, FrontFacingNode, FunctionCallNode, FunctionNode, FunctionOverloadingNode, HALF_PI, INFINITY, If, IndexNode, InputNode, InspectorBase, InspectorNode, IrradianceNode, IsolateNode, JoinNode, LTC_Evaluate, LTC_Evaluate_Volume, LTC_Uv, LightingContextNode, LightingNode, LightsNode, Loop, LoopNode, MRTNode, MaterialNode, MaterialReferenceNode, MathNode, MaxMipLevelNode, MemberNode, ModelNode, Node, NodeAccess, NodeError, NodeMaterial, NodeMaterialObserver, NodeShaderStage, NodeType, NodeUpdateType, NodeUtils, NormalMapNode, Object3DNode, OnAfterObjectUpdate, OnAfterRenderPipeline, OnBeforeFrameUpdate, OnBeforeMaterialUpdate, OnBeforeObjectUpdate, OnBeforeRenderPipeline, OnFrameUpdate, OnMaterialUpdate, OnObjectUpdate, OperatorNode, OutputStructNode, OverrideContextNode, PCFShadowFilter, PI, PI2, PMREMGenerator, PMREMNode, PackFloatNode, Packed4x8IntegerNode, ParameterNode, PassNode, PointLightNode, PointShadowFilter, PointShadowNode, PointUVNode, PropertyNode, QuadMesh, RTTNode, RangeNode, ReferenceBaseNode, ReferenceElementNode, ReferenceNode, ReflectorNode, RenderOutputNode, RendererReferenceNode, RendererUtils, Return, RotateNode, SampleNode, Schlick_to_F0, ScreenNode, SetNode, ShaderNode, ShadowBaseNode, ShadowNode, SplitNode, Stack, StackNode, StackTrace, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture3DNode, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubgroupFunctionNode, Switch, TBNViewMatrix, TWO_PI, Texture3DNode, TextureNode, TextureSizeNode, Three_TSL, ToneMappingNode, ToonOutlinePassNode, UniformArrayNode, UniformGroupNode, UniformNode, UnpackFloatNode, UserDataNode, VSMShadowFilter, V_GGX_SmithCorrelated, V_GGX_SmithCorrelated_Anisotropic, Var, VarIntent, VarNode, VaryingNode, VelocityNode, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, WorkgroupInfoNode, abs, acesFilmicToneMapping, acos, acosh, add, addMethodChaining, addNodeElement, agxToneMapping, all, alphaT, ambientOcclusion, and, anisotropy, anisotropyB, anisotropyT, any, array, asin, asinh, assign, atan, atanh, atomicAdd, atomicAnd, atomicFunc, atomicLoad, atomicMax, atomicMin, atomicOr, atomicStore, atomicSub, atomicXor, attenuationColor, attenuationDistance, attribute, attributeArray, backgroundBlurriness, backgroundIntensity, backgroundRotation, batch, batchColor, batchIndirectIndex, bentNormalView, billboarding, bitAnd, bitNot, bitOr, bitXor, bitangentGeometry, bitangentLocal, bitangentView, bitangentViewFrame, bitangentWorld, bitcast, blendBurn, blendColor, blendDodge, blendOverlay, blendScreen, bool, buffer, bufferAttribute, builtin, builtinAOContext, builtinGIContext, builtinShadowContext, bumpMap, bvec2, bvec3, bvec4, bypass, cache, call, cameraFar, cameraIndex, cameraNear, cameraNormalMatrix, cameraPosition, cameraProjectionMatrix, cameraProjectionMatrixInverse, cameraViewMatrix, cameraViewport, cameraWorldMatrix, cbrt, cdl, ceil, checker, cineonToneMapping, clamp, clearcoat, clearcoatNormalView, clearcoatRoughness, clipSpace, clipping, clippingAlpha, code, color, colorSpaceToWorking, colorToDirection, compute, computeKernel, computeSkinning, context, convert, convertColorSpace, convertToTexture, cos, cosh, countLeadingZeros, countOneBits, countTrailingZeros, cross, cubeTexture, cubeTextureBase, dFdx, dFdy, dashSize, debug, decrement, decrementBefore, defaultBuildStages, defaultShaderStages, defined, degrees, deltaTime, densityFogFactor, depth, depthPass, determinant, difference, diffuseColor, diffuseContribution, diffuseRoughness, directPointLight, directionToColor, directionToFaceDirection, dispersion, distance, div, dot, dot4I8Packed, dot4U8Packed, drawIndex, dynamicBufferAttribute, element, emissive, equal, equirectDirection, equirectUV, exp, exp2, exponentialHeightFogFactor, expression, faceDirection, faceForward, faceforward, float, floatBitsToInt, floatBitsToUint, floor, fog, fract, frameGroup, frameId, frontFacing, fwidth, gain, gapSize, getConstNodeType, getCurrentStack, getDistanceAttenuation, getGeometryRoughness, getNormalFromDepth, getParallaxCorrectNormal, getRoughness, getScreenPosition, getScreenPositionFromClip, getShIrradianceAt, getTextureIndex, getTextureType, getTypeFromLength, getViewPosition, globalId, glsl, glslFn, grayscale, greaterThan, greaterThanEqual, hardwareClipping, hash, hashArray, hashString, highpModelNormalViewMatrix, highpModelViewMatrix, hue, increment, incrementBefore, inspect, instance, instanceColor, instanceIndex, instancedArray, instancedBufferAttribute, instancedDynamicBufferAttribute, instancedMesh, int, intBitsToFloat, interleavedGradientNoise, inverse, inverseSqrt, inversesqrt, invocationLocalIndex, invocationSubgroupIndex, ior, iridescence, iridescenceIOR, iridescenceThickness, isBackgroundDepth, isolate, ivec2, ivec3, ivec4, js, label, length, lengthSq, lessThan, lessThanEqual, lightPosition, lightProjectionUV, lightShadowMatrix, lightTargetDirection, lightTargetPosition, lightViewPosition, lightingContext, lights, linearDepth, linearToneMapping, localId, log, log2, logarithmicDepthToViewZ, luminance, mat2, mat3, mat4, matcapUV, materialAO, materialAlphaTest, materialAnisotropy, materialAnisotropyVector, materialAttenuationColor, materialAttenuationDistance, materialClearcoat, materialClearcoatNormal, materialClearcoatRoughness, materialColor, materialDiffuseRoughness, materialDispersion, materialEmissive, materialEnvIntensity, materialEnvRotation, materialIOR, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialLightMap, materialLineDashOffset, materialLineDashSize, materialLineGapSize, materialLineScale, materialLineWidth, materialMetalness, materialNormal, materialOpacity, materialPointSize, materialReference, materialReflectivity, materialRefractionRatio, materialRetroreflectivity, materialRotation, materialRoughness, materialSheen, materialSheenRoughness, materialShininess, materialSpecular, materialSpecularColor, materialSpecularIntensity, materialSpecularStrength, materialThickness, materialTransmission, max, maxMipLevel, mediumpModelViewMatrix, metalness, min, mix, mixElement, mod, modelDirection, modelNormalMatrix, modelPosition, modelRadius, modelScale, modelViewMatrix, modelViewPosition, modelViewProjection, modelWorldMatrix, modelWorldMatrixInverse, morphReference, mrt, mul, mx_aastep, mx_add, mx_atan2, mx_cell_noise_float, mx_cell_noise_vec3, mx_contrast, mx_divide, mx_fractal_noise_float, mx_fractal_noise_float_2d, mx_fractal_noise_vec2, mx_fractal_noise_vec3, mx_fractal_noise_vec4, mx_frame, mx_heighttonormal, mx_hsvtorgb, mx_ifequal, mx_ifgreater, mx_ifgreatereq, mx_invert, mx_modulo, mx_multiply, mx_noise_float, mx_noise_vec3, mx_noise_vec4, mx_place2d, mx_power, mx_ramp4, mx_ramplr, mx_ramptb, mx_rgbtohsv, mx_rotate2d, mx_rotate3d, mx_safepower, mx_separate, mx_smoothstep, mx_splitlr, mx_splittb, mx_srgb_texture_to_lin_rec709, mx_subtract, mx_timer, mx_transform_uv, mx_unifiednoise2d, mx_unifiednoise3d, mx_worley_noise_float, mx_worley_noise_float_2d, mx_worley_noise_float_3d, mx_worley_noise_vec2, mx_worley_noise_vec3, mx_worley_noise_vec3_style, negate, negateOnBackSide, neutralToneMapping, nodeArray, nodeImmutable, nodeObject, nodeObjectIntent, nodeObjects, nodeProxy, nodeProxyConstructor, nodeProxyIntent, normalFlat, normalGeometry, normalLocal, normalMap, normalView, normalViewGeometry, normalWorld, normalWorldGeometry, normalize, not, notEqual, numWorkgroups, objectDirection, objectGroup, objectPosition, objectRadius, objectScale, objectViewPosition, objectWorldMatrix, oneMinus, or, orthographicDepthToViewZ, oscSawtooth, oscSine, oscSquare, oscTriangle, output, outputStruct, overloadingFn, overrideNode, overrideNodes, pack4xI8, pack4xI8Clamp, pack4xU8, pack4xU8Clamp, packHalf2x16, packNormalToRGB, packSnorm2x16, packSnorm4x8, packUnorm2x16, packUnorm4x8, parabola, parallaxDirection, parallaxUV, parameter, pass, passTexture, pcurve, perspectiveDepthToViewZ, pmremTexture, pointShadow, pointUV, pointWidth, positionGeometry, positionLocal, positionPrevious, positionView, positionViewDirection, positionWorld, positionWorldDirection, posterize, pow, pow2, pow3, pow4, premultiplyAlpha, property, quadBroadcast, quadSwapDiagonal, quadSwapX, quadSwapY, radians, rand, range, rangeFogFactor, reciprocal, reference, reference$1, referenceBuffer, reflect, reflectVector, reflectView, reflector, refract, refractVector, refractView, reinhardToneMapping, remap, remapClamp, renderGroup, renderOutput, rendererReference, replaceDefaultUV, retroreflectivity, rotate, rotateUV, roughness, round, rtt, sRGBTransferEOTF, sRGBTransferOETF, sample, sampler, samplerComparison, saturate, saturation, screenCoordinate, screenDPR, screenSize, screenUV, select, setCurrentStack, setName, shaderStages, shadow, shadowPositionWorld, shapeCircle, sharedUniformGroup, sheen, sheenRoughness, shiftLeft, shiftRight, shininess, sign, sin, sinc, sinh, skinning, smoothstep, smoothstepElement, specularColor, specularColorBlended, specularF90, spherizeUV, split, spritesheetUV, sqrt, stack, step, stepElement, storage, storageBarrier, storageElement, storageTexture, storageTexture3D, struct, sub, subBuild, subgroupAdd, subgroupAll, subgroupAnd, subgroupAny, subgroupBallot, subgroupBroadcast, subgroupBroadcastFirst, subgroupElect, subgroupExclusiveAdd, subgroupExclusiveMul, subgroupInclusiveAdd, subgroupInclusiveMul, subgroupIndex, subgroupMax, subgroupMin, subgroupMul, subgroupOr, subgroupShuffle, subgroupShuffleDown, subgroupShuffleUp, subgroupShuffleXor, subgroupSize, subgroupXor, tan, tangentGeometry, tangentLocal, tangentView, tangentViewFrame, tangentWorld, tanh, texture, texture3D, texture3DLevel, texture3DLoad, textureBarrier, textureBicubic, textureBicubicLevel, textureLevel, textureLoad, textureSize, textureStore, thickness, time, toneMapping, toneMappingExposure, toonOutlinePass, transformDirection, transformNormal, transformNormalByInverseViewMatrix, transformNormalByViewMatrix, transformNormalToView, transmission, transpose, triNoise3D, triplanarTexture, triplanarTextures, trunc, uint, uintBitsToFloat, uniform, uniformArray, uniformCubeTexture, uniformFlow, uniformGroup, uniformTexture, unpack4xI8, unpack4xU8, unpackHalf2x16, unpackNormal, unpackRGBToNormal, unpackSnorm2x16, unpackSnorm4x8, unpackUnorm2x16, unpackUnorm4x8, unpremultiplyAlpha, userData, uv$1 as uv, uvec2, uvec3, uvec4, varying, varyingProperty, vec2, vec3, vec4, vectorComponents, velocity, vertexColor, vertexIndex, vertexStage, vibrance, viewZToLogarithmicDepth, viewZToOrthographicDepth, viewZToPerspectiveDepth, viewZToReversedOrthographicDepth, viewZToReversedPerspectiveDepth, viewport, viewportCoordinate, viewportDepthTexture, viewportLinearDepth, viewportMipTexture, viewportOpaqueMipTexture, viewportSafeUV, viewportSharedTexture, viewportSize, viewportTexture, viewportUV, vogelDiskSample, wgsl, wgslFn, workgroupArray, workgroupBarrier, workgroupId, workingToColorSpace, xor };
+export { AONode, AnalyticLightNode, ArrayElementNode, ArrayNode, AssignNode, AtomicFunctionNode, AttributeNode, BRDF_EON, BRDF_GGX, BRDF_Lambert, BRDF_Sheen, BarrierNode, BasicPointShadowFilter, BasicShadowFilter, BitcastNode, BitcountNode, BlendMode, Break, BufferAttributeNode, BufferNode, BuiltinNode, BumpMapNode, BypassNode, ChainMap, ClippingNode, CodeNode, Color4, ColorSpaceNode, ComputeBuiltinNode, ComputeNode, ConditionalNode, Const, ConstNode, ContextNode, Continue, ConvertNode, CubeRenderTarget, CubeTextureNode, DFGLUT, D_GGX, D_GGX_Anisotropic, DebugNode, Discard, EON_DirectionalAlbedo, EPSILON, EnvironmentBRDF, EventNode, ExpressionNode, F_Schlick, FlipNode, Fn, FrontFacingNode, FunctionCallNode, FunctionNode, FunctionOverloadingNode, HALF_PI, INFINITY, If, IndexNode, InputNode, InspectorBase, InspectorNode, IrradianceNode, IsolateNode, JoinNode, LTC_Evaluate, LTC_Evaluate_Volume, LTC_Uv, LightingContextNode, LightingModel, LightingNode, LightsNode, Loop, LoopNode, MRTNode, MaterialNode, MaterialReferenceNode, MathNode, MaxMipLevelNode, MemberNode, ModelNode, Node, NodeAccess, NodeError, NodeMaterial, NodeMaterialObserver, NodeShaderStage, NodeType, NodeUpdateType, NodeUtils, NormalMapNode, Object3DNode, OnAfterObjectUpdate, OnAfterRenderPipeline, OnBeforeFrameUpdate, OnBeforeMaterialUpdate, OnBeforeObjectUpdate, OnBeforeRenderPipeline, OnFrameUpdate, OnMaterialUpdate, OnObjectUpdate, OperatorNode, OutputStructNode, OverrideContextNode, PCFShadowFilter, PI, PI2, PMREMGenerator, PMREMNode, PackFloatNode, Packed4x8IntegerNode, ParameterNode, PassNode, PhysicalLightingModel, PointLightNode, PointShadowFilter, PointShadowNode, PointUVNode, PropertyNode, QuadMesh, RTTNode, RangeNode, ReferenceBaseNode, ReferenceElementNode, ReferenceNode, ReflectorNode, RenderOutputNode, RendererReferenceNode, RendererUtils, Return, RotateNode, SampleNode, Schlick_to_F0, ScreenNode, SetNode, ShaderNode, ShadowBaseNode, ShadowNode, SplitNode, SpotLightNode, Stack, StackNode, StackTrace, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture3DNode, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubgroupFunctionNode, Switch, TBNViewMatrix, TWO_PI, Texture3DNode, TextureNode, TextureSizeNode, Three_TSL, ToneMappingNode, ToonOutlinePassNode, UniformArrayNode, UniformGroupNode, UniformNode, UnpackFloatNode, UserDataNode, VSMShadowFilter, V_GGX_SmithCorrelated, V_GGX_SmithCorrelated_Anisotropic, Var, VarIntent, VarNode, VaryingNode, VelocityNode, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, WorkgroupInfoNode, abs, acesFilmicToneMapping, acos, acosh, add, addMethodChaining, addNodeElement, agxToneMapping, all, alphaT, ambientOcclusion, and, anisotropy, anisotropyB, anisotropyT, any, array, asin, asinh, assign, atan, atanh, atomicAdd, atomicAnd, atomicFunc, atomicLoad, atomicMax, atomicMin, atomicOr, atomicStore, atomicSub, atomicXor, attenuationColor, attenuationDistance, attribute, attributeArray, backgroundBlurriness, backgroundIntensity, backgroundRotation, batch, batchColor, batchIndirectIndex, bentNormalView, billboarding, bitAnd, bitNot, bitOr, bitXor, bitangentGeometry, bitangentLocal, bitangentView, bitangentViewFrame, bitangentWorld, bitcast, blendBurn, blendColor, blendDodge, blendOverlay, blendScreen, bool, buffer, bufferAttribute, builtin, builtinAOContext, builtinGIContext, builtinShadowContext, bumpMap, bvec2, bvec3, bvec4, bypass, cache, call, cameraFar, cameraIndex, cameraNear, cameraNormalMatrix, cameraPosition, cameraProjectionMatrix, cameraProjectionMatrixInverse, cameraViewMatrix, cameraViewport, cameraWorldMatrix, cbrt, cdl, ceil, checker, cineonToneMapping, clamp, clearcoat, clearcoatNormalView, clearcoatRoughness, clipSpace, clipping, clippingAlpha, code, color, colorSpaceToWorking, colorToDirection, compute, computeKernel, computeSkinning, context, convert, convertColorSpace, convertToTexture, cos, cosh, countLeadingZeros, countOneBits, countTrailingZeros, cross, cubeTexture, cubeTextureBase, dFdx, dFdy, dashSize, debug, decrement, decrementBefore, defaultBuildStages, defaultShaderStages, defined, degrees, deltaTime, densityFogFactor, depth, depthPass, determinant, difference, diffuseColor, diffuseContribution, diffuseRoughness, directPointLight, directionToColor, directionToFaceDirection, dispersion, distance, div, dot, dot4I8Packed, dot4U8Packed, drawIndex, dynamicBufferAttribute, element, emissive, equal, equirectDirection, equirectUV, exp, exp2, exponentialHeightFogFactor, expression, faceDirection, faceForward, faceforward, float, floatBitsToInt, floatBitsToUint, floor, fog, fract, frameGroup, frameId, frontFacing, fwidth, gain, gapSize, getConstNodeType, getCurrentStack, getDistanceAttenuation, getGeometryRoughness, getNormalFromDepth, getParallaxCorrectNormal, getRoughness, getScreenPosition, getScreenPositionFromClip, getShIrradianceAt, getTextureIndex, getTextureType, getTypeFromLength, getViewPosition, globalId, glsl, glslFn, grayscale, greaterThan, greaterThanEqual, hardwareClipping, hash, hashArray, hashString, highpModelNormalViewMatrix, highpModelViewMatrix, hue, increment, incrementBefore, inspect, instance, instanceColor, instanceIndex, instancedArray, instancedBufferAttribute, instancedDynamicBufferAttribute, instancedMesh, int, intBitsToFloat, interleavedGradientNoise, inverse, inverseSqrt, inversesqrt, invocationLocalIndex, invocationSubgroupIndex, ior, iridescence, iridescenceIOR, iridescenceThickness, isBackgroundDepth, isolate, ivec2, ivec3, ivec4, js, label, length, lengthSq, lessThan, lessThanEqual, lightPosition, lightProjectionUV, lightShadowMatrix, lightTargetDirection, lightTargetPosition, lightViewPosition, lightingContext, lights, linearDepth, linearToneMapping, localId, log, log2, logarithmicDepthToViewZ, luminance, mat2, mat3, mat4, matcapUV, materialAO, materialAlphaTest, materialAnisotropy, materialAnisotropyVector, materialAttenuationColor, materialAttenuationDistance, materialClearcoat, materialClearcoatNormal, materialClearcoatRoughness, materialColor, materialDiffuseRoughness, materialDispersion, materialEmissive, materialEnvIntensity, materialEnvRotation, materialIOR, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialLightMap, materialLineDashOffset, materialLineDashSize, materialLineGapSize, materialLineScale, materialLineWidth, materialMetalness, materialNormal, materialOpacity, materialPointSize, materialReference, materialReflectivity, materialRefractionRatio, materialRetroreflectivity, materialRotation, materialRoughness, materialSheen, materialSheenRoughness, materialShininess, materialSpecular, materialSpecularColor, materialSpecularIntensity, materialSpecularStrength, materialThickness, materialTransmission, max, maxMipLevel, mediumpModelViewMatrix, metalness, min, mix, mixElement, mod, modelDirection, modelNormalMatrix, modelPosition, modelRadius, modelScale, modelViewMatrix, modelViewPosition, modelViewProjection, modelWorldMatrix, modelWorldMatrixInverse, morphReference, mrt, mul, mx_aastep, mx_add, mx_atan2, mx_cell_noise_float, mx_cell_noise_vec3, mx_contrast, mx_divide, mx_fractal_noise_float, mx_fractal_noise_float_2d, mx_fractal_noise_vec2, mx_fractal_noise_vec3, mx_fractal_noise_vec4, mx_frame, mx_heighttonormal, mx_hsvtorgb, mx_ifequal, mx_ifgreater, mx_ifgreatereq, mx_invert, mx_modulo, mx_multiply, mx_noise_float, mx_noise_vec3, mx_noise_vec4, mx_place2d, mx_power, mx_ramp4, mx_ramplr, mx_ramptb, mx_rgbtohsv, mx_rotate2d, mx_rotate3d, mx_safepower, mx_separate, mx_smoothstep, mx_splitlr, mx_splittb, mx_srgb_texture_to_lin_rec709, mx_subtract, mx_timer, mx_transform_uv, mx_unifiednoise2d, mx_unifiednoise3d, mx_worley_noise_float, mx_worley_noise_float_2d, mx_worley_noise_float_3d, mx_worley_noise_vec2, mx_worley_noise_vec3, mx_worley_noise_vec3_style, negate, negateOnBackSide, neutralToneMapping, nodeArray, nodeImmutable, nodeObject, nodeObjectIntent, nodeObjects, nodeProxy, nodeProxyConstructor, nodeProxyIntent, normalFlat, normalGeometry, normalLocal, normalMap, normalView, normalViewGeometry, normalWorld, normalWorldGeometry, normalize, not, notEqual, numWorkgroups, objectDirection, objectGroup, objectPosition, objectRadius, objectScale, objectViewPosition, objectWorldMatrix, oneMinus, or, orthographicDepthToViewZ, oscSawtooth, oscSine, oscSquare, oscTriangle, output, outputStruct, overloadingFn, overrideNode, overrideNodes, pack4xI8, pack4xI8Clamp, pack4xU8, pack4xU8Clamp, packHalf2x16, packNormalToRGB, packSnorm2x16, packSnorm4x8, packUnorm2x16, packUnorm4x8, parabola, parallaxDirection, parallaxUV, parameter, pass, passTexture, pcurve, perspectiveDepthToViewZ, pmremTexture, pointShadow, pointUV, pointWidth, positionGeometry, positionLocal, positionPrevious, positionView, positionViewDirection, positionWorld, positionWorldDirection, posterize, pow, pow2, pow3, pow4, premultiplyAlpha, property, quadBroadcast, quadSwapDiagonal, quadSwapX, quadSwapY, radians, rand, range, rangeFogFactor, reciprocal, reference, reference$1, referenceBuffer, reflect, reflectVector, reflectView, reflector, refract, refractVector, refractView, reinhardToneMapping, remap, remapClamp, renderGroup, renderOutput, rendererReference, replaceDefaultUV, retroreflectivity, rotate, rotateUV, roughness, round, rtt, sRGBTransferEOTF, sRGBTransferOETF, sample, sampler, samplerComparison, saturate, saturation, screenCoordinate, screenDPR, screenSize, screenUV, select, setCurrentStack, setName, shaderStages, shadow, shadowPositionWorld, shapeCircle, sharedUniformGroup, sheen, sheenRoughness, shiftLeft, shiftRight, shininess, sign, sin, sinc, sinh, skinning, smoothstep, smoothstepElement, specularColor, specularColorBlended, specularF90, spherizeUV, split, spritesheetUV, sqrt, stack, step, stepElement, storage, storageBarrier, storageElement, storageTexture, storageTexture3D, struct, sub, subBuild, subgroupAdd, subgroupAll, subgroupAnd, subgroupAny, subgroupBallot, subgroupBroadcast, subgroupBroadcastFirst, subgroupElect, subgroupExclusiveAdd, subgroupExclusiveMul, subgroupInclusiveAdd, subgroupInclusiveMul, subgroupIndex, subgroupMax, subgroupMin, subgroupMul, subgroupOr, subgroupShuffle, subgroupShuffleDown, subgroupShuffleUp, subgroupShuffleXor, subgroupSize, subgroupXor, tan, tangentGeometry, tangentLocal, tangentView, tangentViewFrame, tangentWorld, tanh, texture, texture3D, texture3DLevel, texture3DLoad, textureBarrier, textureBicubic, textureBicubicLevel, textureLevel, textureLoad, textureSize, textureStore, thickness, time, toneMapping, toneMappingExposure, toonOutlinePass, transformDirection, transformNormal, transformNormalByInverseViewMatrix, transformNormalByViewMatrix, transformNormalToView, transmission, transpose, triNoise3D, triplanarTexture, triplanarTextures, trunc, uint, uintBitsToFloat, uniform, uniformArray, uniformCubeTexture, uniformFlow, uniformGroup, uniformTexture, unpack4xI8, unpack4xU8, unpackHalf2x16, unpackNormal, unpackRGBToNormal, unpackSnorm2x16, unpackSnorm4x8, unpackUnorm2x16, unpackUnorm4x8, unpremultiplyAlpha, userData, uv$1 as uv, uvec2, uvec3, uvec4, varying, varyingProperty, vec2, vec3, vec4, vectorComponents, velocity, vertexColor, vertexIndex, vertexStage, vibrance, viewZToLogarithmicDepth, viewZToOrthographicDepth, viewZToPerspectiveDepth, viewZToReversedOrthographicDepth, viewZToReversedPerspectiveDepth, viewport, viewportCoordinate, viewportDepthTexture, viewportLinearDepth, viewportMipTexture, viewportOpaqueMipTexture, viewportSafeUV, viewportSharedTexture, viewportSize, viewportTexture, viewportUV, vogelDiskSample, wgsl, wgslFn, workgroupArray, workgroupBarrier, workgroupId, workingToColorSpace, xor };

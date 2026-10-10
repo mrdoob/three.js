@@ -39966,6 +39966,11 @@ class ReflectorBaseNode extends Node {
 		virtualCamera.updateMatrixWorld();
 		virtualCamera.projectionMatrix.copy( camera.projectionMatrix );
 
+		// The reflection is mirrored horizontally, so the view offset must be mirrored as well.
+
+		virtualCamera.projectionMatrix.elements[ 8 ] *= -1;
+		virtualCamera.projectionMatrix.elements[ 12 ] *= -1;
+
 		// Now update projection matrix with new clip plane, implementing code from: http://www.terathon.com/code/oblique.html
 		// Paper explaining this technique: http://www.terathon.com/lengyel/Lengyel-Oblique.pdf
 		_reflectorPlane.setFromNormalAndCoplanarPoint( _normal, _reflectorWorldPosition );
@@ -46351,478 +46356,6 @@ function lightViewPosition( light ) {
  */
 const lightTargetDirection = ( light ) => cameraViewMatrix.transformDirection( lightPosition( light ).sub( lightTargetPosition( light ) ) );
 
-/**
- * A node representing the total diffuse light.
- *
- * @type {Node<vec3>}
- */
-const totalDiffuse = property( 'vec3', 'totalDiffuse' );
-
-/**
- * A node representing the total specular light.
- *
- * @type {Node<vec3>}
- */
-const totalSpecular = property( 'vec3', 'totalSpecular' );
-
-/**
- * A node representing the outgoing light.
- *
- * @type {Node<vec3>}
- */
-const outgoingLight = property( 'vec3', 'outgoingLight' );
-
-/**
- * Sorts an array of lights in ascending order by their IDs.
- *
- * @private
- * @param {Array<Light>} lights - The array of lights to sort.
- * @return {Array<Light>} The sorted array of lights.
- */
-const sortLights = ( lights ) => {
-
-	return lights.sort( ( a, b ) => a.id - b.id );
-
-};
-
-/**
- * Finds and returns a lighting node associated with a specific light ID.
- *
- * @private
- * @param {number} id - The ID of the light to search for.
- * @param {Array<LightingNode>} lightNodes - The array of lighting nodes to search within.
- * @return {?LightingNode} The matching lighting node, or null if not found.
- */
-const getLightNodeById = ( id, lightNodes ) => {
-
-	for ( const lightNode of lightNodes ) {
-
-		if ( lightNode.isAnalyticLightNode && lightNode.light.id === id ) {
-
-			return lightNode;
-
-		}
-
-	}
-
-	return null;
-
-};
-
-/**
- * WeakMap cache mapping light objects to their corresponding lighting node instances.
- *
- * @private
- * @type {WeakMap<Light, LightingNode>}
- */
-const _lightsNodeRef = /*@__PURE__*/ new WeakMap();
-
-/**
- * Array used to temporarily store light IDs and shadow casting states for hashing.
- *
- * @private
- * @type {Array<number>}
- */
-const _hashData = [];
-
-/**
- * This node represents the scene's lighting and manages the lighting model's life cycle
- * for the current build 3D object. It is responsible for computing the total outgoing
- * light in a given lighting context.
- *
- * @augments Node
- */
-class LightsNode extends Node {
-
-	static get type() {
-
-		return 'LightsNode';
-
-	}
-
-	/**
-	 * Constructs a new lights node.
-	 */
-	constructor() {
-
-		super( 'vec3' );
-
-		/**
-		 * A node representing the total diffuse light.
-		 *
-		 * @type {Node<vec3>}
-		 */
-		this.totalDiffuseNode = totalDiffuse;
-
-		/**
-		 * A node representing the total specular light.
-		 *
-		 * @type {Node<vec3>}
-		 */
-		this.totalSpecularNode = totalSpecular;
-
-		/**
-		 * A node representing the outgoing light.
-		 *
-		 * @type {Node<vec3>}
-		 */
-		this.outgoingLightNode = outgoingLight;
-
-		/**
-		 * An array representing the lights in the scene.
-		 *
-		 * @private
-		 * @type {Array<Light>}
-		 */
-		this._lights = [];
-
-		/**
-		 * `LightsNode` sets this property to `true` by default.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.global = true;
-
-	}
-
-	isCacheable( /*builder*/ ) {
-
-		return false;
-
-	}
-
-	/**
-	 * Overwrites the default {@link Node#customCacheKey} implementation by including
-	 * light data into the cache key.
-	 *
-	 * @return {number} The custom cache key.
-	 */
-	customCacheKey() {
-
-		const builtinLights = this.getBuiltinLights();
-
-		for ( let i = 0; i < builtinLights.length; i ++ ) {
-
-			const light = builtinLights[ i ];
-
-			_hashData.push( light.id );
-			_hashData.push( light.castShadow ? 1 : 0 );
-
-			if ( light.isSpotLight === true ) {
-
-				const hashMap = ( light.map !== null ) ? light.map.id : -1;
-				const hashColorNode = ( light.colorNode ) ? light.colorNode.getCacheKey() : -1;
-
-				_hashData.push( hashMap, hashColorNode );
-
-			}
-
-		}
-
-		const cacheKey = hashArray( _hashData );
-
-		_hashData.length = 0;
-
-		return cacheKey;
-
-	}
-
-	/**
-	 * Computes a hash value for identifying the current light nodes setup.
-	 *
-	 * @param {NodeBuilder} builder - A reference to the current node builder.
-	 * @return {string} The computed hash.
-	 */
-	getHash( builder ) {
-
-		const nodeData = builder.getDataFromNode( this );
-
-		if ( nodeData.lightNodesHash === undefined ) {
-
-			const lightNodes = this.setupLightsNode( builder );
-
-			nodeData.lightNodes = lightNodes;
-
-			const hash = [];
-
-			for ( const lightNode of lightNodes ) {
-
-				hash.push( lightNode.getHash() );
-
-			}
-
-			nodeData.lightNodesHash = 'lights-' + hash.join( ',' );
-
-		}
-
-		return nodeData.lightNodesHash;
-
-	}
-
-	/**
-	 * Creates lighting nodes for each scene light. This makes it possible to further
-	 * process lights in the node system.
-	 *
-	 * @param {NodeBuilder} builder - A reference to the current node builder.
-	 * @return {Array<LightingNode>} The array of lighting nodes.
-	 */
-	setupLightsNode( builder ) {
-
-		const nodeData = builder.getDataFromNode( this );
-		const lightNodes = [];
-
-		const previousLightNodes = nodeData.lightNodes || null;
-		const materialLightings = builder.context.materialLightings;
-
-		const builtinLights = this.getBuiltinLights();
-
-		const lights = sortLights( [ ...materialLightings, ...builtinLights ] );
-
-		for ( const light of lights ) {
-
-			if ( light.isNode ) {
-
-				lightNodes.push( light );
-
-			} else {
-
-				let lightNode = null;
-
-				if ( previousLightNodes !== null ) {
-
-					lightNode = getLightNodeById( light.id, previousLightNodes );
-
-				}
-
-				if ( lightNode === null ) {
-
-					const lightNodeClass = light._lightNode;
-
-					if ( lightNodeClass === undefined ) {
-
-						warn( `LightsNode.setupNodeLights: Light node not found for ${ light.constructor.name }` );
-						continue;
-
-					}
-
-					if ( _lightsNodeRef.has( light ) === false ) {
-
-						_lightsNodeRef.set( light, new lightNodeClass( light ) );
-
-					}
-
-					lightNode = _lightsNodeRef.get( light );
-
-				}
-
-				lightNodes.push( lightNode );
-
-			}
-
-		}
-
-		return lightNodes;
-
-	}
-
-	/**
-	 * Sets up a direct light in the lighting model.
-	 *
-	 * @param {Object} builder - The builder object containing the context and stack.
-	 * @param {Object} lightNode - The light node.
-	 * @param {Object} lightData - The light object containing color and direction properties.
-	 */
-	setupDirectLight( builder, lightNode, lightData ) {
-
-		const { lightingModel, reflectedLight } = builder.context;
-
-		lightingModel.direct( {
-			...lightData,
-			lightNode,
-			reflectedLight
-		}, builder );
-
-	}
-
-	/**
-	 * Sets up a direct rect area light in the lighting model.
-	 *
-	 * @param {Object} builder - The builder object containing the context and stack.
-	 * @param {Object} lightNode - The light node.
-	 * @param {Object} lightData - The light object containing color and area light properties.
-	 */
-	setupDirectRectAreaLight( builder, lightNode, lightData ) {
-
-		const { lightingModel, reflectedLight } = builder.context;
-
-		lightingModel.directRectArea( {
-			...lightData,
-			lightNode,
-			reflectedLight
-		}, builder );
-
-	}
-
-	/**
-	 * Setups the internal lights by building all respective
-	 * light nodes.
-	 *
-	 * @param {NodeBuilder} builder - A reference to the current node builder.
-	 * @param {Array<LightingNode>} lightNodes - An array of lighting nodes.
-	 */
-	setupLights( builder, lightNodes ) {
-
-		for ( const lightNode of lightNodes ) {
-
-			lightNode.build( builder );
-
-		}
-
-	}
-
-	getLightNodes( builder ) {
-
-		const nodeData = builder.getDataFromNode( this );
-
-		if ( nodeData.lightNodes === undefined ) {
-
-			nodeData.lightNodes = this.setupLightsNode( builder );
-
-		}
-
-		return nodeData.lightNodes;
-
-	}
-
-	/**
-	 * The implementation makes sure that for each light in the scene
-	 * there is a corresponding light node. By building the light nodes
-	 * and evaluating the lighting model the outgoing light is computed.
-	 *
-	 * @param {NodeBuilder} builder - A reference to the current node builder.
-	 * @return {Node<vec3>} A node representing the outgoing light.
-	 */
-	setup( builder ) {
-
-		const currentLightsNode = builder.lightsNode;
-
-		builder.lightsNode = this;
-
-		let outgoingLightNode = this.outgoingLightNode;
-
-		const context = builder.context;
-		const lightingModel = context.lightingModel;
-
-		if ( lightingModel ) {
-
-			const { totalDiffuseNode, totalSpecularNode } = this;
-
-			context.outgoingLight = outgoingLightNode;
-
-			builder.addStack();
-
-			lightingModel.start( builder );
-
-			const { backdrop, backdropAlpha } = context;
-			const { directDiffuse, directSpecular, indirectDiffuse, indirectSpecular } = context.reflectedLight;
-
-			let totalDiffuse = directDiffuse.add( indirectDiffuse );
-
-			if ( backdrop !== null ) {
-
-				if ( backdropAlpha !== null ) {
-
-					totalDiffuse = vec3( backdropAlpha.mix( totalDiffuse, backdrop ) );
-
-				} else {
-
-					totalDiffuse = vec3( backdrop );
-
-				}
-
-			}
-
-			totalDiffuseNode.assign( totalDiffuse );
-			totalSpecularNode.assign( directSpecular.add( indirectSpecular ) );
-
-			outgoingLightNode.assign( totalDiffuseNode.add( totalSpecularNode ) );
-
-			lightingModel.finish( builder );
-
-			outgoingLightNode = outgoingLightNode.bypass( builder.removeStack() );
-
-		}
-
-		builder.lightsNode = currentLightsNode;
-
-		return outgoingLightNode;
-
-	}
-
-	/**
-	 * Configures this node with an array of lights.
-	 *
-	 * @param {Array<Light>} lights - An array of lights.
-	 * @return {LightsNode} A reference to this node.
-	 */
-	setLights( lights ) {
-
-		this._lights = lights;
-
-		return this;
-
-	}
-
-	/**
-	 * Returns an array of the scene's lights.
-	 *
-	 * @return {Array<Light>} The scene's lights.
-	 */
-	getLights() {
-
-		return this._lights;
-
-	}
-
-	/**
-	 * Returns an array of the scene's lights.
-	 *
-	 * The light variations are shader-dependent;
-	 * if this array changes, the shader needs to be recreated.
-	 *
-	 * @return {Array<Light>} The scene's lights.
-	 */
-	getBuiltinLights() {
-
-		return this._lights;
-
-	}
-
-	/**
-	 * Whether the scene has lights or not.
-	 *
-	 * @type {boolean}
-	 */
-	get hasLights() {
-
-		return this._lights.length > 0;
-
-	}
-
-}
-
-/**
- * TSL function for creating an instance of `LightsNode` and configuring
- * it with the given array of lights.
- *
- * @tsl
- * @function
- * @param {Array<Light>} lights - An array of lights.
- * @return {LightsNode} The created lights node.
- */
-const lights = ( lights = [] ) => new LightsNode().setLights( lights );
-
 const _shadowMaterialLib = /*@__PURE__*/ new WeakMap();
 const _shadowRenderObjectLibrary = /*@__PURE__*/ new ChainMap();
 const _shadowRenderObjectKeys = [];
@@ -47974,319 +47507,6 @@ class ShadowNode extends ShadowBaseNode {
  */
 const shadow = ( light, shadow ) => new ShadowNode( light, shadow );
 
-const _clearColor$1 = /*@__PURE__*/ new Color();
-const _projScreenMatrix$1 = /*@__PURE__*/ new Matrix4();
-const _lightPositionWorld = /*@__PURE__*/ new Vector3();
-const _lookTarget = /*@__PURE__*/ new Vector3();
-
-// Cube map face directions and up vectors for point light shadows
-// Face order: +X, -X, +Y, -Y, +Z, -Z
-// WebGPU coordinate system - same face orientations as CubeCamera
-const _cubeDirectionsWebGPU = [
-	/*@__PURE__*/ new Vector3( -1, 0, 0 ), /*@__PURE__*/ new Vector3( 1, 0, 0 ), /*@__PURE__*/ new Vector3( 0, 1, 0 ),
-	/*@__PURE__*/ new Vector3( 0, -1, 0 ), /*@__PURE__*/ new Vector3( 0, 0, 1 ), /*@__PURE__*/ new Vector3( 0, 0, -1 )
-];
-
-const _cubeUpsWebGPU = [
-	/*@__PURE__*/ new Vector3( 0, 1, 0 ), /*@__PURE__*/ new Vector3( 0, 1, 0 ), /*@__PURE__*/ new Vector3( 0, 0, -1 ),
-	/*@__PURE__*/ new Vector3( 0, 0, 1 ), /*@__PURE__*/ new Vector3( 0, 1, 0 ), /*@__PURE__*/ new Vector3( 0, 1, 0 )
-];
-
-// WebGL coordinate system - standard OpenGL convention
-const _cubeDirectionsWebGL = [
-	/*@__PURE__*/ new Vector3( 1, 0, 0 ), /*@__PURE__*/ new Vector3( -1, 0, 0 ), /*@__PURE__*/ new Vector3( 0, 1, 0 ),
-	/*@__PURE__*/ new Vector3( 0, -1, 0 ), /*@__PURE__*/ new Vector3( 0, 0, 1 ), /*@__PURE__*/ new Vector3( 0, 0, -1 )
-];
-
-const _cubeUpsWebGL = [
-	/*@__PURE__*/ new Vector3( 0, -1, 0 ), /*@__PURE__*/ new Vector3( 0, -1, 0 ), /*@__PURE__*/ new Vector3( 0, 0, 1 ),
-	/*@__PURE__*/ new Vector3( 0, 0, -1 ), /*@__PURE__*/ new Vector3( 0, -1, 0 ), /*@__PURE__*/ new Vector3( 0, -1, 0 )
-];
-
-const BasicPointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp } ) => {
-
-	return cubeTexture( depthTexture, bd3D ).compare( dp );
-
-} );
-
-/**
- * A shadow filtering function for point lights using Vogel disk sampling and IGN.
- *
- * Uses 5 samples distributed via Vogel disk pattern in tangent space around the
- * sample direction, rotated per-pixel using Interleaved Gradient Noise (IGN).
- *
- * @method
- * @param {Object} inputs - The input parameter object.
- * @param {CubeDepthTexture} inputs.depthTexture - A reference to the shadow cube map.
- * @param {Node<vec3>} inputs.bd3D - The normalized direction from light to fragment.
- * @param {Node<float>} inputs.dp - The depth value to compare against.
- * @param {LightShadow} inputs.shadow - The light shadow.
- * @return {Node<float>} The filtering result.
- */
-const PointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp, shadow } ) => {
-
-	const radius = reference( 'radius', 'float', shadow ).setGroup( renderGroup );
-	const mapSize = reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup );
-
-	const texelSize = radius.div( mapSize.x );
-
-	// Build a tangent-space coordinate system for applying offsets
-	const absDir = abs( bd3D );
-	const tangent = normalize( cross( bd3D, absDir.x.greaterThan( absDir.z ).select( vec3( 0, 1, 0 ), vec3( 1, 0, 0 ) ) ) );
-	const bitangent = cross( bd3D, tangent );
-
-	// Use IGN to rotate sampling pattern per pixel (phi = IGN * 2π)
-	const phi = interleavedGradientNoise( screenCoordinate.xy ).mul( 6.28318530718 );
-
-	// 5 samples using Vogel disk distribution in tangent space
-	const sample0 = vogelDiskSample( 0, 5, phi );
-	const sample1 = vogelDiskSample( 1, 5, phi );
-	const sample2 = vogelDiskSample( 2, 5, phi );
-	const sample3 = vogelDiskSample( 3, 5, phi );
-	const sample4 = vogelDiskSample( 4, 5, phi );
-
-	return cubeTexture( depthTexture, bd3D.add( tangent.mul( sample0.x ).add( bitangent.mul( sample0.y ) ).mul( texelSize ) ) ).compare( dp )
-		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample1.x ).add( bitangent.mul( sample1.y ) ).mul( texelSize ) ) ).compare( dp ) )
-		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample2.x ).add( bitangent.mul( sample2.y ) ).mul( texelSize ) ) ).compare( dp ) )
-		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample3.x ).add( bitangent.mul( sample3.y ) ).mul( texelSize ) ) ).compare( dp ) )
-		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample4.x ).add( bitangent.mul( sample4.y ) ).mul( texelSize ) ) ).compare( dp ) )
-		.mul( 1.0 / 5.0 );
-
-} );
-
-const pointShadowFilter = /*@__PURE__*/ Fn( ( { filterFn, depthTexture, shadowCoord, shadow }, builder ) => {
-
-	// for point lights, the uniform @vShadowCoord is re-purposed to hold
-	// the vector from the light to the world-space position of the fragment.
-	const shadowPosition = shadowCoord.xyz.toConst();
-	const shadowPositionAbs = shadowPosition.abs().toConst();
-	const viewZ = shadowPositionAbs.x.max( shadowPositionAbs.y ).max( shadowPositionAbs.z );
-
-	const shadowCameraNear = uniform( 'float' ).setGroup( renderGroup ).onRenderUpdate( () => shadow.camera.near );
-	const shadowCameraFar = uniform( 'float' ).setGroup( renderGroup ).onRenderUpdate( () => shadow.camera.far );
-	const bias = reference( 'bias', 'float', shadow ).setGroup( renderGroup );
-
-	const result = float( 1.0 ).toVar();
-
-	If( viewZ.sub( shadowCameraFar ).lessThanEqual( 0.0 ).and( viewZ.sub( shadowCameraNear ).greaterThanEqual( 0.0 ) ), () => {
-
-		let dp;
-
-		if ( builder.renderer.reversedDepthBuffer ) {
-
-			dp = viewZToReversedPerspectiveDepth( viewZ.negate(), shadowCameraNear, shadowCameraFar );
-			dp.subAssign( bias );
-
-		} else if ( builder.renderer.logarithmicDepthBuffer ) {
-
-			dp = viewZToLogarithmicDepth( viewZ.negate(), shadowCameraNear, shadowCameraFar );
-			dp.addAssign( bias );
-
-		} else {
-
-			dp = viewZToPerspectiveDepth( viewZ.negate(), shadowCameraNear, shadowCameraFar );
-			dp.addAssign( bias );
-
-		}
-
-		// bd3D = base direction 3D (direction from light to fragment)
-		const bd3D = shadowPosition.normalize();
-
-		// percentage-closer filtering using cube texture sampling
-		result.assign( filterFn( { depthTexture, bd3D, dp, shadow } ) );
-
-	} );
-
-	return result;
-
-} );
-
-
-/**
- * Represents the shadow implementation for point light nodes.
- *
- * @augments ShadowNode
- */
-class PointShadowNode extends ShadowNode {
-
-	static get type() {
-
-		return 'PointShadowNode';
-
-	}
-
-	/**
-	 * Constructs a new point shadow node.
-	 *
-	 * @param {PointLight} light - The shadow casting point light.
-	 * @param {?PointLightShadow} [shadow=null] - An optional point light shadow.
-	 */
-	constructor( light, shadow = null ) {
-
-		super( light, shadow );
-
-	}
-
-	/**
-	 * Overwrites the default implementation to return point light shadow specific
-	 * filtering functions.
-	 *
-	 * @param {number} type - The shadow type.
-	 * @return {Function} The filtering function.
-	 */
-	getShadowFilterFn( type ) {
-
-		return type === BasicShadowMap ? BasicPointShadowFilter : PointShadowFilter;
-
-	}
-
-	/**
-	 * Overwrites the default implementation so the unaltered shadow position is used.
-	 *
-	 * @param {NodeBuilder} builder - A reference to the current node builder.
-	 * @param {Node<vec3>} shadowPosition - A node representing the shadow position.
-	 * @return {Node<vec3>} The shadow coordinates.
-	 */
-	setupShadowCoord( builder, shadowPosition ) {
-
-		return shadowPosition;
-
-	}
-
-	/**
-	 * Overwrites the default implementation to only use point light specific
-	 * shadow filter functions.
-	 *
-	 * @param {NodeBuilder} builder - A reference to the current node builder.
-	 * @param {Object} inputs - A configuration object that defines the shadow filtering.
-	 * @param {Function} inputs.filterFn - This function defines the filtering type of the shadow map e.g. PCF.
-	 * @param {DepthTexture} inputs.depthTexture - A reference to the shadow map's depth texture.
-	 * @param {Node<vec3>} inputs.shadowCoord - Shadow coordinates which are used to sample from the shadow map.
-	 * @param {LightShadow} inputs.shadow - The light shadow.
-	 * @return {Node<float>} The result node of the shadow filtering.
-	 */
-	setupShadowFilter( builder, { filterFn, depthTexture, shadowCoord, shadow } ) {
-
-		return pointShadowFilter( { filterFn, depthTexture, shadowCoord, shadow } );
-
-	}
-
-	/**
-	 * Overwrites the default implementation to create a CubeRenderTarget with CubeDepthTexture.
-	 *
-	 * @param {LightShadow} shadow - The light shadow object.
-	 * @param {NodeBuilder} builder - A reference to the current node builder.
-	 * @return {Object} An object containing the shadow map and depth texture.
-	 */
-	setupRenderTarget( shadow, builder ) {
-
-		const depthTexture = new CubeDepthTexture( shadow.mapSize.width );
-		depthTexture.name = 'PointShadowDepthTexture';
-		depthTexture.compareFunction = builder.renderer.reversedDepthBuffer ? GreaterEqualCompare : LessEqualCompare;
-
-		const shadowMap = builder.createCubeRenderTarget( shadow.mapSize.width );
-		shadowMap.texture.name = 'PointShadowMap';
-		shadowMap.depthTexture = depthTexture;
-
-		return { shadowMap, depthTexture };
-
-	}
-
-	/**
-	 * Overwrites the default implementation with point light specific
-	 * rendering code.
-	 *
-	 * @param {NodeFrame} frame - A reference to the current node frame.
-	 */
-	renderShadow( frame ) {
-
-		const { shadow, shadowMap, light } = this;
-		const { renderer, scene } = frame;
-
-		const camera = shadow.camera;
-		const shadowMatrix = shadow.matrix;
-
-		// Select cube directions/ups based on coordinate system
-		const isWebGPU = renderer.coordinateSystem === WebGPUCoordinateSystem;
-		const cubeDirections = isWebGPU ? _cubeDirectionsWebGPU : _cubeDirectionsWebGL;
-		const cubeUps = isWebGPU ? _cubeUpsWebGPU : _cubeUpsWebGL;
-
-		shadowMap.setSize( shadow.mapSize.width, shadow.mapSize.width );
-
-		//
-
-		const previousAutoClear = renderer.autoClear;
-
-		const previousClearColor = renderer.getClearColor( _clearColor$1 );
-		const previousClearAlpha = renderer.getClearAlpha();
-
-		renderer.autoClear = false;
-		renderer.setClearColor( shadow.clearColor, shadow.clearAlpha );
-
-		// Render each cube face
-		for ( let face = 0; face < 6; face ++ ) {
-
-			// Set render target to the specific cube face
-			renderer.setRenderTarget( shadowMap, face );
-			renderer.clear();
-
-			// Update shadow camera matrices for this face
-
-			const far = light.distance || camera.far;
-
-			if ( far !== camera.far ) {
-
-				camera.far = far;
-				camera.updateProjectionMatrix();
-
-			}
-
-			_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
-			camera.position.copy( _lightPositionWorld );
-
-			_lookTarget.copy( camera.position );
-			_lookTarget.add( cubeDirections[ face ] );
-			camera.up.copy( cubeUps[ face ] );
-			camera.lookAt( _lookTarget );
-			camera.updateMatrixWorld();
-
-			shadowMatrix.makeTranslation( - _lightPositionWorld.x, - _lightPositionWorld.y, - _lightPositionWorld.z );
-
-			_projScreenMatrix$1.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-			shadow._frustum.setFromProjectionMatrix( _projScreenMatrix$1, camera.coordinateSystem, camera.reversedDepth );
-
-			//
-
-			const currentSceneName = scene.name;
-
-			scene.name = `Point Light Shadow [ ${ light.name || 'ID: ' + light.id } ] - Face ${ face + 1 }`;
-
-			renderer.render( scene, camera );
-
-			scene.name = currentSceneName;
-
-		}
-
-		//
-
-		renderer.autoClear = previousAutoClear;
-		renderer.setClearColor( previousClearColor, previousClearAlpha );
-
-	}
-
-}
-
-/**
- * TSL function for creating an instance of `PointShadowNode`.
- *
- * @tsl
- * @function
- * @param {PointLight} light - The shadow casting point light.
- * @param {?PointLightShadow} [shadow=null] - An optional point light shadow.
- * @return {PointShadowNode} The created point shadow node.
- */
-const pointShadow = ( light, shadow ) => new PointShadowNode( light, shadow );
-
 /**
  * Base class for analytic light nodes.
  *
@@ -48609,6 +47829,319 @@ const getDistanceAttenuation = /*@__PURE__*/ Fn( ( { lightDistance, cutoffDistan
 
 }, { lightDistance: 'float', cutoffDistance: 'float', decayExponent: 'float', return: 'float' } ); // validated
 
+const _clearColor$1 = /*@__PURE__*/ new Color();
+const _projScreenMatrix$1 = /*@__PURE__*/ new Matrix4();
+const _lightPositionWorld = /*@__PURE__*/ new Vector3();
+const _lookTarget = /*@__PURE__*/ new Vector3();
+
+// Cube map face directions and up vectors for point light shadows
+// Face order: +X, -X, +Y, -Y, +Z, -Z
+// WebGPU coordinate system - same face orientations as CubeCamera
+const _cubeDirectionsWebGPU = [
+	/*@__PURE__*/ new Vector3( -1, 0, 0 ), /*@__PURE__*/ new Vector3( 1, 0, 0 ), /*@__PURE__*/ new Vector3( 0, 1, 0 ),
+	/*@__PURE__*/ new Vector3( 0, -1, 0 ), /*@__PURE__*/ new Vector3( 0, 0, 1 ), /*@__PURE__*/ new Vector3( 0, 0, -1 )
+];
+
+const _cubeUpsWebGPU = [
+	/*@__PURE__*/ new Vector3( 0, 1, 0 ), /*@__PURE__*/ new Vector3( 0, 1, 0 ), /*@__PURE__*/ new Vector3( 0, 0, -1 ),
+	/*@__PURE__*/ new Vector3( 0, 0, 1 ), /*@__PURE__*/ new Vector3( 0, 1, 0 ), /*@__PURE__*/ new Vector3( 0, 1, 0 )
+];
+
+// WebGL coordinate system - standard OpenGL convention
+const _cubeDirectionsWebGL = [
+	/*@__PURE__*/ new Vector3( 1, 0, 0 ), /*@__PURE__*/ new Vector3( -1, 0, 0 ), /*@__PURE__*/ new Vector3( 0, 1, 0 ),
+	/*@__PURE__*/ new Vector3( 0, -1, 0 ), /*@__PURE__*/ new Vector3( 0, 0, 1 ), /*@__PURE__*/ new Vector3( 0, 0, -1 )
+];
+
+const _cubeUpsWebGL = [
+	/*@__PURE__*/ new Vector3( 0, -1, 0 ), /*@__PURE__*/ new Vector3( 0, -1, 0 ), /*@__PURE__*/ new Vector3( 0, 0, 1 ),
+	/*@__PURE__*/ new Vector3( 0, 0, -1 ), /*@__PURE__*/ new Vector3( 0, -1, 0 ), /*@__PURE__*/ new Vector3( 0, -1, 0 )
+];
+
+const BasicPointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp } ) => {
+
+	return cubeTexture( depthTexture, bd3D ).compare( dp );
+
+} );
+
+/**
+ * A shadow filtering function for point lights using Vogel disk sampling and IGN.
+ *
+ * Uses 5 samples distributed via Vogel disk pattern in tangent space around the
+ * sample direction, rotated per-pixel using Interleaved Gradient Noise (IGN).
+ *
+ * @method
+ * @param {Object} inputs - The input parameter object.
+ * @param {CubeDepthTexture} inputs.depthTexture - A reference to the shadow cube map.
+ * @param {Node<vec3>} inputs.bd3D - The normalized direction from light to fragment.
+ * @param {Node<float>} inputs.dp - The depth value to compare against.
+ * @param {LightShadow} inputs.shadow - The light shadow.
+ * @return {Node<float>} The filtering result.
+ */
+const PointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp, shadow } ) => {
+
+	const radius = reference( 'radius', 'float', shadow ).setGroup( renderGroup );
+	const mapSize = reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup );
+
+	const texelSize = radius.div( mapSize.x );
+
+	// Build a tangent-space coordinate system for applying offsets
+	const absDir = abs( bd3D );
+	const tangent = normalize( cross( bd3D, absDir.x.greaterThan( absDir.z ).select( vec3( 0, 1, 0 ), vec3( 1, 0, 0 ) ) ) );
+	const bitangent = cross( bd3D, tangent );
+
+	// Use IGN to rotate sampling pattern per pixel (phi = IGN * 2π)
+	const phi = interleavedGradientNoise( screenCoordinate.xy ).mul( 6.28318530718 );
+
+	// 5 samples using Vogel disk distribution in tangent space
+	const sample0 = vogelDiskSample( 0, 5, phi );
+	const sample1 = vogelDiskSample( 1, 5, phi );
+	const sample2 = vogelDiskSample( 2, 5, phi );
+	const sample3 = vogelDiskSample( 3, 5, phi );
+	const sample4 = vogelDiskSample( 4, 5, phi );
+
+	return cubeTexture( depthTexture, bd3D.add( tangent.mul( sample0.x ).add( bitangent.mul( sample0.y ) ).mul( texelSize ) ) ).compare( dp )
+		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample1.x ).add( bitangent.mul( sample1.y ) ).mul( texelSize ) ) ).compare( dp ) )
+		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample2.x ).add( bitangent.mul( sample2.y ) ).mul( texelSize ) ) ).compare( dp ) )
+		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample3.x ).add( bitangent.mul( sample3.y ) ).mul( texelSize ) ) ).compare( dp ) )
+		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample4.x ).add( bitangent.mul( sample4.y ) ).mul( texelSize ) ) ).compare( dp ) )
+		.mul( 1.0 / 5.0 );
+
+} );
+
+const pointShadowFilter = /*@__PURE__*/ Fn( ( { filterFn, depthTexture, shadowCoord, shadow }, builder ) => {
+
+	// for point lights, the uniform @vShadowCoord is re-purposed to hold
+	// the vector from the light to the world-space position of the fragment.
+	const shadowPosition = shadowCoord.xyz.toConst();
+	const shadowPositionAbs = shadowPosition.abs().toConst();
+	const viewZ = shadowPositionAbs.x.max( shadowPositionAbs.y ).max( shadowPositionAbs.z );
+
+	const shadowCameraNear = uniform( 'float' ).setGroup( renderGroup ).onRenderUpdate( () => shadow.camera.near );
+	const shadowCameraFar = uniform( 'float' ).setGroup( renderGroup ).onRenderUpdate( () => shadow.camera.far );
+	const bias = reference( 'bias', 'float', shadow ).setGroup( renderGroup );
+
+	const result = float( 1.0 ).toVar();
+
+	If( viewZ.sub( shadowCameraFar ).lessThanEqual( 0.0 ).and( viewZ.sub( shadowCameraNear ).greaterThanEqual( 0.0 ) ), () => {
+
+		let dp;
+
+		if ( builder.renderer.reversedDepthBuffer ) {
+
+			dp = viewZToReversedPerspectiveDepth( viewZ.negate(), shadowCameraNear, shadowCameraFar );
+			dp.subAssign( bias );
+
+		} else if ( builder.renderer.logarithmicDepthBuffer ) {
+
+			dp = viewZToLogarithmicDepth( viewZ.negate(), shadowCameraNear, shadowCameraFar );
+			dp.addAssign( bias );
+
+		} else {
+
+			dp = viewZToPerspectiveDepth( viewZ.negate(), shadowCameraNear, shadowCameraFar );
+			dp.addAssign( bias );
+
+		}
+
+		// bd3D = base direction 3D (direction from light to fragment)
+		const bd3D = shadowPosition.normalize();
+
+		// percentage-closer filtering using cube texture sampling
+		result.assign( filterFn( { depthTexture, bd3D, dp, shadow } ) );
+
+	} );
+
+	return result;
+
+} );
+
+
+/**
+ * Represents the shadow implementation for point light nodes.
+ *
+ * @augments ShadowNode
+ */
+class PointShadowNode extends ShadowNode {
+
+	static get type() {
+
+		return 'PointShadowNode';
+
+	}
+
+	/**
+	 * Constructs a new point shadow node.
+	 *
+	 * @param {PointLight} light - The shadow casting point light.
+	 * @param {?PointLightShadow} [shadow=null] - An optional point light shadow.
+	 */
+	constructor( light, shadow = null ) {
+
+		super( light, shadow );
+
+	}
+
+	/**
+	 * Overwrites the default implementation to return point light shadow specific
+	 * filtering functions.
+	 *
+	 * @param {number} type - The shadow type.
+	 * @return {Function} The filtering function.
+	 */
+	getShadowFilterFn( type ) {
+
+		return type === BasicShadowMap ? BasicPointShadowFilter : PointShadowFilter;
+
+	}
+
+	/**
+	 * Overwrites the default implementation so the unaltered shadow position is used.
+	 *
+	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 * @param {Node<vec3>} shadowPosition - A node representing the shadow position.
+	 * @return {Node<vec3>} The shadow coordinates.
+	 */
+	setupShadowCoord( builder, shadowPosition ) {
+
+		return shadowPosition;
+
+	}
+
+	/**
+	 * Overwrites the default implementation to only use point light specific
+	 * shadow filter functions.
+	 *
+	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 * @param {Object} inputs - A configuration object that defines the shadow filtering.
+	 * @param {Function} inputs.filterFn - This function defines the filtering type of the shadow map e.g. PCF.
+	 * @param {DepthTexture} inputs.depthTexture - A reference to the shadow map's depth texture.
+	 * @param {Node<vec3>} inputs.shadowCoord - Shadow coordinates which are used to sample from the shadow map.
+	 * @param {LightShadow} inputs.shadow - The light shadow.
+	 * @return {Node<float>} The result node of the shadow filtering.
+	 */
+	setupShadowFilter( builder, { filterFn, depthTexture, shadowCoord, shadow } ) {
+
+		return pointShadowFilter( { filterFn, depthTexture, shadowCoord, shadow } );
+
+	}
+
+	/**
+	 * Overwrites the default implementation to create a CubeRenderTarget with CubeDepthTexture.
+	 *
+	 * @param {LightShadow} shadow - The light shadow object.
+	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 * @return {Object} An object containing the shadow map and depth texture.
+	 */
+	setupRenderTarget( shadow, builder ) {
+
+		const depthTexture = new CubeDepthTexture( shadow.mapSize.width );
+		depthTexture.name = 'PointShadowDepthTexture';
+		depthTexture.compareFunction = builder.renderer.reversedDepthBuffer ? GreaterEqualCompare : LessEqualCompare;
+
+		const shadowMap = builder.createCubeRenderTarget( shadow.mapSize.width );
+		shadowMap.texture.name = 'PointShadowMap';
+		shadowMap.depthTexture = depthTexture;
+
+		return { shadowMap, depthTexture };
+
+	}
+
+	/**
+	 * Overwrites the default implementation with point light specific
+	 * rendering code.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 */
+	renderShadow( frame ) {
+
+		const { shadow, shadowMap, light } = this;
+		const { renderer, scene } = frame;
+
+		const camera = shadow.camera;
+		const shadowMatrix = shadow.matrix;
+
+		// Select cube directions/ups based on coordinate system
+		const isWebGPU = renderer.coordinateSystem === WebGPUCoordinateSystem;
+		const cubeDirections = isWebGPU ? _cubeDirectionsWebGPU : _cubeDirectionsWebGL;
+		const cubeUps = isWebGPU ? _cubeUpsWebGPU : _cubeUpsWebGL;
+
+		shadowMap.setSize( shadow.mapSize.width, shadow.mapSize.width );
+
+		//
+
+		const previousAutoClear = renderer.autoClear;
+
+		const previousClearColor = renderer.getClearColor( _clearColor$1 );
+		const previousClearAlpha = renderer.getClearAlpha();
+
+		renderer.autoClear = false;
+		renderer.setClearColor( shadow.clearColor, shadow.clearAlpha );
+
+		// Render each cube face
+		for ( let face = 0; face < 6; face ++ ) {
+
+			// Set render target to the specific cube face
+			renderer.setRenderTarget( shadowMap, face );
+			renderer.clear();
+
+			// Update shadow camera matrices for this face
+
+			const far = light.distance || camera.far;
+
+			if ( far !== camera.far ) {
+
+				camera.far = far;
+				camera.updateProjectionMatrix();
+
+			}
+
+			_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
+			camera.position.copy( _lightPositionWorld );
+
+			_lookTarget.copy( camera.position );
+			_lookTarget.add( cubeDirections[ face ] );
+			camera.up.copy( cubeUps[ face ] );
+			camera.lookAt( _lookTarget );
+			camera.updateMatrixWorld();
+
+			shadowMatrix.makeTranslation( - _lightPositionWorld.x, - _lightPositionWorld.y, - _lightPositionWorld.z );
+
+			_projScreenMatrix$1.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+			shadow._frustum.setFromProjectionMatrix( _projScreenMatrix$1, camera.coordinateSystem, camera.reversedDepth );
+
+			//
+
+			const currentSceneName = scene.name;
+
+			scene.name = `Point Light Shadow [ ${ light.name || 'ID: ' + light.id } ] - Face ${ face + 1 }`;
+
+			renderer.render( scene, camera );
+
+			scene.name = currentSceneName;
+
+		}
+
+		//
+
+		renderer.autoClear = previousAutoClear;
+		renderer.setClearColor( previousClearColor, previousClearAlpha );
+
+	}
+
+}
+
+/**
+ * TSL function for creating an instance of `PointShadowNode`.
+ *
+ * @tsl
+ * @function
+ * @param {PointLight} light - The shadow casting point light.
+ * @param {?PointLightShadow} [shadow=null] - An optional point light shadow.
+ * @return {PointShadowNode} The created point shadow node.
+ */
+const pointShadow = ( light, shadow ) => new PointShadowNode( light, shadow );
+
 const directPointLight = ( { color, lightVector, cutoffDistance, decayExponent } ) => {
 
 	const lightDirection = lightVector.normalize();
@@ -48703,6 +48236,1079 @@ class PointLightNode extends AnalyticLightNode {
 	}
 
 }
+
+/**
+ * Module for representing spot lights as nodes.
+ *
+ * @augments AnalyticLightNode
+ */
+class SpotLightNode extends AnalyticLightNode {
+
+	static get type() {
+
+		return 'SpotLightNode';
+
+	}
+
+	/**
+	 * Constructs a new spot light node.
+	 *
+	 * @param {?SpotLight} [light=null] - The spot light source.
+	 */
+	constructor( light = null ) {
+
+		super( light );
+
+		/**
+		 * Uniform node representing the cone cosine.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.coneCosNode = uniform( 0 ).setGroup( renderGroup );
+
+		/**
+		 * Uniform node representing the penumbra cosine.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.penumbraCosNode = uniform( 0 ).setGroup( renderGroup );
+
+		/**
+		 * Uniform node representing the cutoff distance.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.cutoffDistanceNode = uniform( 0 ).setGroup( renderGroup );
+
+		/**
+		 * Uniform node representing the decay exponent.
+		 *
+		 * @type {UniformNode<float>}
+		 */
+		this.decayExponentNode = uniform( 0 ).setGroup( renderGroup );
+
+		/**
+		 * Uniform node representing the light color.
+		 *
+		 * @type {UniformNode<Color>}
+		 */
+		this.colorNode = uniform( this.color ).setGroup( renderGroup );
+
+	}
+
+	/**
+	 * Overwritten to updated spot light specific uniforms.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 */
+	update( frame ) {
+
+		super.update( frame );
+
+		const { light } = this;
+
+		this.coneCosNode.value = Math.cos( light.angle );
+		this.penumbraCosNode.value = Math.cos( light.angle * ( 1 - light.penumbra ) );
+
+		this.cutoffDistanceNode.value = light.distance;
+		this.decayExponentNode.value = light.decay;
+
+	}
+
+	/**
+	 * Computes the spot attenuation for the given angle.
+	 *
+	 * @param {NodeBuilder} builder - The node builder.
+	 * @param {Node<float>} angleCosine - The angle to compute the spot attenuation for.
+	 * @return {Node<float>} The spot attenuation.
+	 */
+	getSpotAttenuation( builder, angleCosine ) {
+
+		const { coneCosNode, penumbraCosNode } = this;
+
+		return smoothstep( coneCosNode, penumbraCosNode, angleCosine );
+
+	}
+
+	getLightCoord( builder ) {
+
+		const properties = builder.getNodeProperties( this );
+		let projectionUV = properties.projectionUV;
+
+		if ( projectionUV === undefined ) {
+
+			projectionUV = lightProjectionUV( this.light, builder.context.positionWorld );
+
+			properties.projectionUV = projectionUV;
+
+		}
+
+		return projectionUV;
+
+	}
+
+	setupDirect( builder ) {
+
+		const { colorNode, cutoffDistanceNode, decayExponentNode, light } = this;
+
+		const lightVector = this.getLightVector( builder );
+
+		const lightDirection = lightVector.normalize();
+		const angleCos = lightDirection.dot( lightTargetDirection( light ) );
+
+		const spotAttenuation = this.getSpotAttenuation( builder, angleCos );
+
+		const lightDistance = lightVector.length();
+
+		const lightAttenuation = getDistanceAttenuation( {
+			lightDistance,
+			cutoffDistance: cutoffDistanceNode,
+			decayExponent: decayExponentNode
+		} );
+
+		let lightColor = colorNode.mul( spotAttenuation ).mul( lightAttenuation );
+
+		let projected, lightCoord;
+
+		if ( light.colorNode ) {
+
+			lightCoord = this.getLightCoord( builder );
+			projected = light.colorNode( lightCoord );
+
+		} else if ( light.map ) {
+
+			lightCoord = this.getLightCoord( builder );
+			projected = texture( light.map, lightCoord.xy ).onRenderUpdate( () => light.map );
+
+		}
+
+		if ( projected ) {
+
+			const inSpotLightMap = lightCoord.mul( 2. ).sub( 1. ).abs().lessThan( 1. ).all();
+
+			lightColor = inSpotLightMap.select( lightColor.mul( projected ), lightColor );
+
+		}
+
+		return { lightColor, lightDirection };
+
+	}
+
+}
+
+/**
+ * Evaluates a world-space grid of static point and spot lights.
+ *
+ * @private
+ * @augments LightingNode
+ */
+class StaticLightsNode extends LightingNode {
+
+	static get type() {
+
+		return 'StaticLightsNode';
+
+	}
+
+	/**
+	 * Constructs a static lights node.
+	 *
+	 * @param {Object} grid - The packed light grid.
+	 */
+	constructor( grid ) {
+
+		super();
+
+		this.grid = grid;
+		this.shadowNode = null;
+
+		const cellAttribute = new StorageBufferAttribute( grid.cells, 2 );
+		const indexAttribute = new StorageBufferAttribute( grid.indices, 1 );
+		const lightAttribute = new StorageBufferAttribute( grid.data, 4 );
+
+		// Stable names allow materials using the same grid to share shader programs.
+		this.cellsNode = storage( cellAttribute, 'uvec2', cellAttribute.count ).toReadOnly().setName( 'staticLightCells' );
+		this.indicesNode = storage( indexAttribute, 'uint', indexAttribute.count ).toReadOnly().setName( 'staticLightIndices' );
+		this.lightsNode = storage( lightAttribute, 'vec4', lightAttribute.count ).toReadOnly().setName( 'staticLights' );
+
+	}
+
+	/**
+	 * Whether this lighting context can use the static light grid.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {boolean} Whether static light batching is supported.
+	 */
+	static supports( builder ) {
+
+		const { context, material } = builder;
+		const model = context.lightingModel;
+
+		return builder.isAvailable( 'storageBuffer' ) === true &&
+			( material.isMeshStandardMaterial === true || material.isMeshStandardNodeMaterial === true ) &&
+			context.positionView == null && context.positionWorld == null && context.getShadow == null &&
+			model !== undefined && model !== null && model.constructor === PhysicalLightingModel &&
+			model.clearcoat === false && model.sheen === false && model.iridescence === false &&
+			model.anisotropy === false && model.transmission === false && model.dispersion === false &&
+			model.retroreflection === false && model.diffuseRoughness === false;
+
+	}
+
+	/**
+	 * Adds light contributions from the fragment's grid cell.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	setup( builder ) {
+
+		const { grid, cellsNode, indicesNode, lightsNode } = this;
+		const origin = vec3( ...grid.origin );
+		const dims = ivec3( ...grid.dims );
+		const { reflectedLight } = builder.context;
+
+		// The accumulators must be declared outside the conditional loop.
+		reflectedLight.directDiffuse.toStack();
+		reflectedLight.directSpecular.toStack();
+
+		Fn( () => {
+
+			const cell = ivec3( positionWorld.sub( origin ).div( grid.cellSize ).floor() ).toConst();
+			const inside = cell.greaterThanEqual( ivec3( 0 ) ).all().and( cell.lessThan( dims ).all() );
+
+			If( inside, () => {
+
+				const cellIndex = cell.z.mul( dims.y ).add( cell.y ).mul( dims.x ).add( cell.x );
+				const range = cellsNode.element( cellIndex ).toConst();
+				const offset = int( range.x ).toConst();
+
+				Loop( int( range.y ), ( { i } ) => {
+
+					const index = int( indicesNode.element( offset.add( i ) ) ).mul( 4 ).toConst();
+					const positionRange = lightsNode.element( index ).toConst();
+					const lightVector = cameraViewMatrix.mul( vec4( positionRange.xyz, 1 ) ).xyz.sub( positionView ).toConst();
+
+					If( dot( lightVector, lightVector ).lessThanEqual( positionRange.w.mul( positionRange.w ) ), () => {
+
+						const colorDecay = lightsNode.element( index.add( 1 ) ).toConst();
+						const parameters = lightsNode.element( index.add( 3 ) ).toConst();
+						const spotAttenuation = float( 1 ).toVar();
+
+						If( parameters.y.equal( 1 ), () => {
+
+							const directionCone = lightsNode.element( index.add( 2 ) ).toConst();
+							const directionView = cameraViewMatrix.transformDirection( directionCone.xyz );
+							const angleCos = lightVector.normalize().dot( directionView );
+
+							spotAttenuation.assign( smoothstep( directionCone.w, parameters.x, angleCos ) );
+
+						} );
+
+						builder.lightsNode.setupDirectLight( builder, this, directPointLight( {
+							color: colorDecay.rgb.mul( spotAttenuation ),
+							lightVector,
+							cutoffDistance: positionRange.w,
+							decayExponent: colorDecay.w
+						} ) );
+
+					} );
+
+				} );
+
+			} );
+
+		}, 'void' )();
+
+	}
+
+	/**
+	 * Releases the light grid's GPU buffers.
+	 */
+	dispose() {
+
+		this.cellsNode.value.dispose();
+		this.indicesNode.value.dispose();
+		this.lightsNode.value.dispose();
+
+		super.dispose();
+
+	}
+
+}
+
+// Keep GPU buffers below 11 MiB and bound the CPU work before visiting cells.
+const MAX_CELLS = 262144;
+const MAX_REFERENCES = 1048576;
+const MAX_LIGHTS = 65536;
+const MAX_CELL_VISITS = MAX_REFERENCES * 4;
+
+/**
+ * Packs static point and spot lights into a bounded world-space grid.
+ * Spotlights use their range sphere for conservative cell assignment.
+ *
+ * Each cell stores an offset and count into the light-index buffer. Each light
+ * occupies four vec4s: position/range, color/decay, direction/cone cosine and
+ * penumbra cosine/spot flag/padding. The spotlight direction points toward the
+ * light, matching the fragment-to-light direction used for lighting.
+ *
+ * The caller must update light and target world matrices before building the
+ * grid. A null result requests the ordinary individual-light rendering path.
+ *
+ * @param {Array<PointLight|SpotLight>} lights - The lights to pack.
+ * @return {?Object} The grid and its packed buffers, or null when unsupported.
+ */
+function buildStaticLightGrid( lights ) {
+
+	if ( lights.length === 0 || lights.length > MAX_LIGHTS ) return null;
+
+	const data = new Float32Array( lights.length * 16 );
+	const ranges = new Float32Array( lights.length );
+	const min = [ Infinity, Infinity, Infinity ];
+	const max = [ - Infinity, - Infinity, - Infinity ];
+
+	for ( let i = 0; i < lights.length; i ++ ) {
+
+		const light = lights[ i ];
+		if ( light.isPointLight !== true && light.isSpotLight !== true ) return null;
+
+		const offset = i * 16;
+		const position = light.matrixWorld.elements;
+
+		data[ offset ] = position[ 12 ];
+		data[ offset + 1 ] = position[ 13 ];
+		data[ offset + 2 ] = position[ 14 ];
+		data[ offset + 3 ] = light.distance;
+		data[ offset + 4 ] = light.color.r * light.intensity;
+		data[ offset + 5 ] = light.color.g * light.intensity;
+		data[ offset + 6 ] = light.color.b * light.intensity;
+		data[ offset + 7 ] = light.decay;
+
+		if ( light.isSpotLight === true ) {
+
+			if ( ! Number.isFinite( light.angle ) || ! Number.isFinite( light.penumbra ) ) return null;
+
+			const target = light.target.matrixWorld.elements;
+			const x = position[ 12 ] - target[ 12 ];
+			const y = position[ 13 ] - target[ 13 ];
+			const z = position[ 14 ] - target[ 14 ];
+			const length = Math.hypot( x, y, z ) || 1;
+
+			data[ offset + 8 ] = x / length;
+			data[ offset + 9 ] = y / length;
+			data[ offset + 10 ] = z / length;
+			data[ offset + 11 ] = Math.cos( light.angle );
+			data[ offset + 12 ] = Math.cos( light.angle * ( 1 - light.penumbra ) );
+			data[ offset + 13 ] = 1;
+
+		}
+
+		for ( let j = 0; j < 16; j ++ ) {
+
+			if ( ! Number.isFinite( data[ offset + j ] ) ) return null;
+
+		}
+
+		const radius = data[ offset + 3 ];
+		if ( radius <= 0 ) return null;
+		ranges[ i ] = radius;
+
+		for ( let axis = 0; axis < 3; axis ++ ) {
+
+			min[ axis ] = Math.min( min[ axis ], data[ offset + axis ] - radius );
+			max[ axis ] = Math.max( max[ axis ], data[ offset + axis ] + radius );
+
+		}
+
+	}
+
+	// Use a typical range so a few very large lights do not collapse the grid.
+	// Limiting the longest axis to 64 cells also bounds sparse scene allocation.
+	ranges.sort();
+	let cellSize = Math.max( ranges[ Math.floor( ranges.length / 2 ) ], ...max.map( ( value, axis ) => ( value - min[ axis ] ) / 64 ) );
+
+	// Leave room for float rounding in the fragment's world-to-cell calculation.
+	const origin = min.map( ( value, axis ) => {
+
+		const padding = Math.max( Math.abs( value ), Math.abs( max[ axis ] ), cellSize ) * 1e-6;
+		max[ axis ] += padding;
+		return Math.fround( value - padding );
+
+	} );
+
+	cellSize = Math.fround( Math.max( cellSize, ...max.map( ( value, axis ) => ( value - origin[ axis ] ) / 64 ) ) * ( 1 + 1e-6 ) );
+	if ( ! Number.isFinite( cellSize ) || cellSize <= 0 ) return null;
+
+	const dims = max.map( ( value, axis ) => Math.max( 1, Math.ceil( ( value - origin[ axis ] ) / cellSize ) ) );
+	const cellCount = dims[ 0 ] * dims[ 1 ] * dims[ 2 ];
+
+	if ( cellCount > MAX_CELLS || ! Number.isFinite( cellCount ) ) return null;
+
+	for ( let axis = 0; axis < 3; axis ++ ) {
+
+		if ( ! Number.isFinite( origin[ axis ] ) || ! Number.isFinite( Math.fround( max[ axis ] - origin[ axis ] ) ) ) return null;
+
+	}
+
+	const bounds = new Uint32Array( lights.length * 6 );
+	const cellPadding = cellSize * 1e-5;
+	let visits = 0;
+
+	for ( let i = 0; i < lights.length; i ++ ) {
+
+		const radius = data[ i * 16 + 3 ] + cellPadding;
+		let volume = 1;
+
+		for ( let axis = 0; axis < 3; axis ++ ) {
+
+			const position = data[ i * 16 + axis ];
+			const low = Math.max( 0, Math.floor( ( position - radius - origin[ axis ] ) / cellSize ) );
+			const high = Math.min( dims[ axis ] - 1, Math.floor( ( position + radius - origin[ axis ] ) / cellSize ) );
+			bounds[ i * 6 + axis ] = low;
+			bounds[ i * 6 + axis + 3 ] = high;
+			volume *= high - low + 1;
+
+		}
+
+		visits += volume;
+		if ( visits > MAX_CELL_VISITS ) return null;
+
+	}
+
+	const cells = new Uint32Array( cellCount * 2 );
+	let references = 0;
+
+	// Count first, then scatter into an exactly sized index buffer. No per-cell
+	// cap is used: exceeding the budget falls back instead of dropping lights.
+	const visitCells = ( callback ) => {
+
+		for ( let i = 0; i < lights.length; i ++ ) {
+
+			const offset = i * 16;
+			const radius = data[ offset + 3 ] + cellPadding;
+			const radiusSquared = radius * radius;
+			const bound = i * 6;
+
+			for ( let z = bounds[ bound + 2 ]; z <= bounds[ bound + 5 ]; z ++ ) {
+
+				const dz = Math.max( origin[ 2 ] + z * cellSize - data[ offset + 2 ], data[ offset + 2 ] - origin[ 2 ] - ( z + 1 ) * cellSize, 0 );
+
+				for ( let y = bounds[ bound + 1 ]; y <= bounds[ bound + 4 ]; y ++ ) {
+
+					const dy = Math.max( origin[ 1 ] + y * cellSize - data[ offset + 1 ], data[ offset + 1 ] - origin[ 1 ] - ( y + 1 ) * cellSize, 0 );
+
+					for ( let x = bounds[ bound ]; x <= bounds[ bound + 3 ]; x ++ ) {
+
+						const dx = Math.max( origin[ 0 ] + x * cellSize - data[ offset ], data[ offset ] - origin[ 0 ] - ( x + 1 ) * cellSize, 0 );
+						if ( dx * dx + dy * dy + dz * dz > radiusSquared ) continue;
+
+						const cell = ( ( z * dims[ 1 ] + y ) * dims[ 0 ] + x ) * 2;
+						if ( callback( cell, i ) === false ) return false;
+
+					}
+
+				}
+
+			}
+
+		}
+
+		return true;
+
+	};
+
+	if ( visitCells( ( cell ) => {
+
+		cells[ cell + 1 ] ++;
+		return ++ references <= MAX_REFERENCES;
+
+	} ) === false ) return null;
+
+	let offset = 0;
+
+	for ( let i = 0; i < cells.length; i += 2 ) {
+
+		cells[ i ] = offset;
+		offset += cells[ i + 1 ];
+
+	}
+
+	const indices = new Uint32Array( references );
+	const cursors = new Uint32Array( cellCount );
+
+	visitCells( ( cell, index ) => {
+
+		indices[ cells[ cell ] + cursors[ cell / 2 ] ++ ] = index;
+
+	} );
+
+	return { origin, dims, cellSize, cells, indices, data };
+
+}
+
+const canBatchStaticLight = ( light ) => {
+
+	return light.static === true && light.castShadow === false && light.colorNode == null &&
+		Number.isFinite( light.distance ) && light.distance > 0 && (
+		( light.isPointLight === true && light._lightNode === PointLightNode ) ||
+			( light.isSpotLight === true && light._lightNode === SpotLightNode && light.map === null )
+	);
+
+};
+
+/**
+ * A node representing the total diffuse light.
+ *
+ * @type {Node<vec3>}
+ */
+const totalDiffuse = property( 'vec3', 'totalDiffuse' );
+
+/**
+ * A node representing the total specular light.
+ *
+ * @type {Node<vec3>}
+ */
+const totalSpecular = property( 'vec3', 'totalSpecular' );
+
+/**
+ * A node representing the outgoing light.
+ *
+ * @type {Node<vec3>}
+ */
+const outgoingLight = property( 'vec3', 'outgoingLight' );
+
+/**
+ * Sorts an array of lights in ascending order by their IDs.
+ *
+ * @private
+ * @param {Array<Light>} lights - The array of lights to sort.
+ * @return {Array<Light>} The sorted array of lights.
+ */
+const sortLights = ( lights ) => {
+
+	return lights.sort( ( a, b ) => a.id - b.id );
+
+};
+
+/**
+ * Finds and returns a lighting node associated with a specific light ID.
+ *
+ * @private
+ * @param {number} id - The ID of the light to search for.
+ * @param {Array<LightingNode>} lightNodes - The array of lighting nodes to search within.
+ * @return {?LightingNode} The matching lighting node, or null if not found.
+ */
+const getLightNodeById = ( id, lightNodes ) => {
+
+	for ( const lightNode of lightNodes ) {
+
+		if ( lightNode.isAnalyticLightNode && lightNode.light.id === id ) {
+
+			return lightNode;
+
+		}
+
+	}
+
+	return null;
+
+};
+
+/**
+ * WeakMap cache mapping light objects to their corresponding lighting node instances.
+ *
+ * @private
+ * @type {WeakMap<Light, LightingNode>}
+ */
+const _lightsNodeRef = /*@__PURE__*/ new WeakMap();
+
+/**
+ * Array used to temporarily store light IDs and shadow casting states for hashing.
+ *
+ * @private
+ * @type {Array<number>}
+ */
+const _hashData = [];
+
+/**
+ * This node represents the scene's lighting and manages the lighting model's life cycle
+ * for the current build 3D object. It is responsible for computing the total outgoing
+ * light in a given lighting context.
+ *
+ * @augments Node
+ */
+class LightsNode extends Node {
+
+	static get type() {
+
+		return 'LightsNode';
+
+	}
+
+	/**
+	 * Constructs a new lights node.
+	 */
+	constructor() {
+
+		super( 'vec3' );
+
+		/**
+		 * A node representing the total diffuse light.
+		 *
+		 * @type {Node<vec3>}
+		 */
+		this.totalDiffuseNode = totalDiffuse;
+
+		/**
+		 * A node representing the total specular light.
+		 *
+		 * @type {Node<vec3>}
+		 */
+		this.totalSpecularNode = totalSpecular;
+
+		/**
+		 * A node representing the outgoing light.
+		 *
+		 * @type {Node<vec3>}
+		 */
+		this.outgoingLightNode = outgoingLight;
+
+		/**
+		 * An array representing the lights in the scene.
+		 *
+		 * @private
+		 * @type {Array<Light>}
+		 */
+		this._lights = [];
+
+		// Immutable batches can be shared by material builders and by cameras with
+		// the same light set. Keep a bounded cache; additional sets use normal lights.
+		this._staticLightsNodes = new Map();
+		this._staticLightsBytes = 0;
+		this._staticLightsVersion = 0;
+		this._staticLightStates = new WeakMap();
+
+		/**
+		 * `LightsNode` sets this property to `true` by default.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.global = true;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
+	/**
+	 * Overwrites the default {@link Node#customCacheKey} implementation by including
+	 * light data into the cache key.
+	 *
+	 * @return {number} The custom cache key.
+	 */
+	customCacheKey() {
+
+		const builtinLights = this.getBuiltinLights();
+		_hashData.push( this._staticLightsVersion );
+
+		for ( let i = 0; i < builtinLights.length; i ++ ) {
+
+			const light = builtinLights[ i ];
+
+			_hashData.push( light.id );
+			_hashData.push( light.castShadow ? 1 : 0 );
+			_hashData.push( canBatchStaticLight( light ) ? 1 : 0 );
+
+			if ( light.isSpotLight === true ) {
+
+				const hashMap = ( light.map !== null ) ? light.map.id : -1;
+				const hashColorNode = ( light.colorNode ) ? light.colorNode.getCacheKey() : -1;
+
+				_hashData.push( hashMap, hashColorNode );
+
+			}
+
+		}
+
+		const cacheKey = hashArray( _hashData );
+
+		_hashData.length = 0;
+
+		return cacheKey;
+
+	}
+
+	/**
+	 * Computes a hash value for identifying the current light nodes setup.
+	 *
+	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 * @return {string} The computed hash.
+	 */
+	getHash( builder ) {
+
+		const nodeData = builder.getDataFromNode( this );
+
+		if ( nodeData.lightNodesHash === undefined ) {
+
+			const lightNodes = this.setupLightsNode( builder );
+
+			nodeData.lightNodes = lightNodes;
+
+			const hash = [];
+
+			for ( const lightNode of lightNodes ) {
+
+				hash.push( lightNode.getHash() );
+
+			}
+
+			nodeData.lightNodesHash = 'lights-' + hash.join( ',' );
+
+		}
+
+		return nodeData.lightNodesHash;
+
+	}
+
+	/**
+	 * Creates lighting nodes for each scene light. This makes it possible to further
+	 * process lights in the node system.
+	 *
+	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 * @return {Array<LightingNode>} The array of lighting nodes.
+	 */
+	setupLightsNode( builder ) {
+
+		const nodeData = builder.getDataFromNode( this );
+		const lightNodes = [];
+
+		const previousLightNodes = nodeData.lightNodes || null;
+		const materialLightings = builder.context.materialLightings;
+
+		const builtinLights = this.getBuiltinLights();
+
+		const lights = sortLights( [ ...materialLightings, ...builtinLights ] );
+		const staticLights = StaticLightsNode.supports( builder ) ? lights.filter( canBatchStaticLight ) : [];
+		const staticLightsNode = this._getStaticLightsNode( staticLights );
+
+		for ( const light of lights ) {
+
+			if ( staticLightsNode !== null && canBatchStaticLight( light ) ) continue;
+
+			if ( light.isNode ) {
+
+				lightNodes.push( light );
+
+			} else {
+
+				let lightNode = null;
+
+				if ( previousLightNodes !== null ) {
+
+					lightNode = getLightNodeById( light.id, previousLightNodes );
+
+				}
+
+				if ( lightNode === null ) {
+
+					const lightNodeClass = light._lightNode;
+
+					if ( lightNodeClass === undefined ) {
+
+						warn( `LightsNode.setupNodeLights: Light node not found for ${ light.constructor.name }` );
+						continue;
+
+					}
+
+					if ( _lightsNodeRef.has( light ) === false ) {
+
+						_lightsNodeRef.set( light, new lightNodeClass( light ) );
+
+					}
+
+					lightNode = _lightsNodeRef.get( light );
+
+				}
+
+				lightNodes.push( lightNode );
+
+			}
+
+		}
+
+		if ( staticLightsNode !== null ) lightNodes.push( staticLightsNode );
+
+		return lightNodes;
+
+	}
+
+	/**
+	 * Gets an immutable grid for an already sorted set of static lights.
+	 *
+	 * @private
+	 * @param {Array<Light>} lights - The eligible lights.
+	 * @return {?StaticLightsNode} The batch, or null to use ordinary lights.
+	 */
+	_getStaticLightsNode( lights ) {
+
+		if ( lights.length === 0 ) return null;
+
+		const key = this._staticLightsVersion + ':' + lights.map( light => light.id ).join( ',' );
+		const nodes = this._staticLightsNodes;
+
+		if ( nodes.has( key ) ) return nodes.get( key );
+		if ( nodes.size >= 8 ) return null;
+
+		const grid = buildStaticLightGrid( lights );
+		let node = null;
+
+		if ( grid !== null ) {
+
+			const bytes = grid.cells.byteLength + grid.indices.byteLength + grid.data.byteLength;
+
+			if ( this._staticLightsBytes + bytes <= 16 * 1024 * 1024 ) {
+
+				node = new StaticLightsNode( grid );
+				this._staticLightsBytes += bytes;
+
+			}
+
+		}
+
+		// Cache failed builds too, so each material does not repeat the work.
+		nodes.set( key, node );
+
+		return node;
+
+	}
+
+	/**
+	 * Releases cached static light grids.
+	 */
+	dispose() {
+
+		for ( const node of this._staticLightsNodes.values() ) {
+
+			if ( node !== null ) node.dispose();
+
+		}
+
+		this._staticLightsNodes.clear();
+		this._staticLightsBytes = 0;
+		this._staticLightsVersion ++;
+
+		super.dispose();
+
+	}
+
+	/**
+	 * Sets up a direct light in the lighting model.
+	 *
+	 * @param {Object} builder - The builder object containing the context and stack.
+	 * @param {Object} lightNode - The light node.
+	 * @param {Object} lightData - The light object containing color and direction properties.
+	 */
+	setupDirectLight( builder, lightNode, lightData ) {
+
+		const { lightingModel, reflectedLight } = builder.context;
+
+		lightingModel.direct( {
+			...lightData,
+			lightNode,
+			reflectedLight
+		}, builder );
+
+	}
+
+	/**
+	 * Sets up a direct rect area light in the lighting model.
+	 *
+	 * @param {Object} builder - The builder object containing the context and stack.
+	 * @param {Object} lightNode - The light node.
+	 * @param {Object} lightData - The light object containing color and area light properties.
+	 */
+	setupDirectRectAreaLight( builder, lightNode, lightData ) {
+
+		const { lightingModel, reflectedLight } = builder.context;
+
+		lightingModel.directRectArea( {
+			...lightData,
+			lightNode,
+			reflectedLight
+		}, builder );
+
+	}
+
+	/**
+	 * Setups the internal lights by building all respective
+	 * light nodes.
+	 *
+	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 * @param {Array<LightingNode>} lightNodes - An array of lighting nodes.
+	 */
+	setupLights( builder, lightNodes ) {
+
+		for ( const lightNode of lightNodes ) {
+
+			lightNode.build( builder );
+
+		}
+
+	}
+
+	getLightNodes( builder ) {
+
+		const nodeData = builder.getDataFromNode( this );
+
+		if ( nodeData.lightNodes === undefined ) {
+
+			nodeData.lightNodes = this.setupLightsNode( builder );
+
+		}
+
+		return nodeData.lightNodes;
+
+	}
+
+	/**
+	 * The implementation makes sure that for each light in the scene
+	 * there is a corresponding light node. By building the light nodes
+	 * and evaluating the lighting model the outgoing light is computed.
+	 *
+	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 * @return {Node<vec3>} A node representing the outgoing light.
+	 */
+	setup( builder ) {
+
+		const currentLightsNode = builder.lightsNode;
+
+		builder.lightsNode = this;
+
+		let outgoingLightNode = this.outgoingLightNode;
+
+		const context = builder.context;
+		const lightingModel = context.lightingModel;
+
+		if ( lightingModel ) {
+
+			const { totalDiffuseNode, totalSpecularNode } = this;
+
+			context.outgoingLight = outgoingLightNode;
+
+			builder.addStack();
+
+			lightingModel.start( builder );
+
+			const { backdrop, backdropAlpha } = context;
+			const { directDiffuse, directSpecular, indirectDiffuse, indirectSpecular } = context.reflectedLight;
+
+			let totalDiffuse = directDiffuse.add( indirectDiffuse );
+
+			if ( backdrop !== null ) {
+
+				if ( backdropAlpha !== null ) {
+
+					totalDiffuse = vec3( backdropAlpha.mix( totalDiffuse, backdrop ) );
+
+				} else {
+
+					totalDiffuse = vec3( backdrop );
+
+				}
+
+			}
+
+			totalDiffuseNode.assign( totalDiffuse );
+			totalSpecularNode.assign( directSpecular.add( indirectSpecular ) );
+
+			outgoingLightNode.assign( totalDiffuseNode.add( totalSpecularNode ) );
+
+			lightingModel.finish( builder );
+
+			outgoingLightNode = outgoingLightNode.bypass( builder.removeStack() );
+
+		}
+
+		builder.lightsNode = currentLightsNode;
+
+		return outgoingLightNode;
+
+	}
+
+	/**
+	 * Configures this node with an array of lights.
+	 *
+	 * @param {Array<Light>} lights - An array of lights.
+	 * @return {LightsNode} A reference to this node.
+	 */
+	setLights( lights ) {
+
+		for ( const light of lights ) {
+
+			const eligible = canBatchStaticLight( light );
+			const previous = this._staticLightStates.get( light );
+
+			if ( previous !== undefined && previous !== eligible ) this._staticLightsVersion ++;
+			this._staticLightStates.set( light, eligible );
+
+		}
+
+		this._lights = lights;
+
+		return this;
+
+	}
+
+	/**
+	 * Returns an array of the scene's lights.
+	 *
+	 * @return {Array<Light>} The scene's lights.
+	 */
+	getLights() {
+
+		return this._lights;
+
+	}
+
+	/**
+	 * Returns an array of the scene's lights.
+	 *
+	 * The light variations are shader-dependent;
+	 * if this array changes, the shader needs to be recreated.
+	 *
+	 * @return {Array<Light>} The scene's lights.
+	 */
+	getBuiltinLights() {
+
+		return this._lights;
+
+	}
+
+	/**
+	 * Whether the scene has lights or not.
+	 *
+	 * @type {boolean}
+	 */
+	get hasLights() {
+
+		return this._lights.length > 0;
+
+	}
+
+}
+
+/**
+ * TSL function for creating an instance of `LightsNode` and configuring
+ * it with the given array of lights.
+ *
+ * @tsl
+ * @function
+ * @param {Array<Light>} lights - An array of lights.
+ * @return {LightsNode} The created lights node.
+ */
+const lights = ( lights = [] ) => new LightsNode().setLights( lights );
 
 /**
  * Creates a 2x2 checkerboard pattern that can be used as procedural texture data.
@@ -56216,165 +56822,6 @@ class HemisphereLightNode extends AnalyticLightNode {
 }
 
 /**
- * Module for representing spot lights as nodes.
- *
- * @augments AnalyticLightNode
- */
-class SpotLightNode extends AnalyticLightNode {
-
-	static get type() {
-
-		return 'SpotLightNode';
-
-	}
-
-	/**
-	 * Constructs a new spot light node.
-	 *
-	 * @param {?SpotLight} [light=null] - The spot light source.
-	 */
-	constructor( light = null ) {
-
-		super( light );
-
-		/**
-		 * Uniform node representing the cone cosine.
-		 *
-		 * @type {UniformNode<float>}
-		 */
-		this.coneCosNode = uniform( 0 ).setGroup( renderGroup );
-
-		/**
-		 * Uniform node representing the penumbra cosine.
-		 *
-		 * @type {UniformNode<float>}
-		 */
-		this.penumbraCosNode = uniform( 0 ).setGroup( renderGroup );
-
-		/**
-		 * Uniform node representing the cutoff distance.
-		 *
-		 * @type {UniformNode<float>}
-		 */
-		this.cutoffDistanceNode = uniform( 0 ).setGroup( renderGroup );
-
-		/**
-		 * Uniform node representing the decay exponent.
-		 *
-		 * @type {UniformNode<float>}
-		 */
-		this.decayExponentNode = uniform( 0 ).setGroup( renderGroup );
-
-		/**
-		 * Uniform node representing the light color.
-		 *
-		 * @type {UniformNode<Color>}
-		 */
-		this.colorNode = uniform( this.color ).setGroup( renderGroup );
-
-	}
-
-	/**
-	 * Overwritten to updated spot light specific uniforms.
-	 *
-	 * @param {NodeFrame} frame - A reference to the current node frame.
-	 */
-	update( frame ) {
-
-		super.update( frame );
-
-		const { light } = this;
-
-		this.coneCosNode.value = Math.cos( light.angle );
-		this.penumbraCosNode.value = Math.cos( light.angle * ( 1 - light.penumbra ) );
-
-		this.cutoffDistanceNode.value = light.distance;
-		this.decayExponentNode.value = light.decay;
-
-	}
-
-	/**
-	 * Computes the spot attenuation for the given angle.
-	 *
-	 * @param {NodeBuilder} builder - The node builder.
-	 * @param {Node<float>} angleCosine - The angle to compute the spot attenuation for.
-	 * @return {Node<float>} The spot attenuation.
-	 */
-	getSpotAttenuation( builder, angleCosine ) {
-
-		const { coneCosNode, penumbraCosNode } = this;
-
-		return smoothstep( coneCosNode, penumbraCosNode, angleCosine );
-
-	}
-
-	getLightCoord( builder ) {
-
-		const properties = builder.getNodeProperties( this );
-		let projectionUV = properties.projectionUV;
-
-		if ( projectionUV === undefined ) {
-
-			projectionUV = lightProjectionUV( this.light, builder.context.positionWorld );
-
-			properties.projectionUV = projectionUV;
-
-		}
-
-		return projectionUV;
-
-	}
-
-	setupDirect( builder ) {
-
-		const { colorNode, cutoffDistanceNode, decayExponentNode, light } = this;
-
-		const lightVector = this.getLightVector( builder );
-
-		const lightDirection = lightVector.normalize();
-		const angleCos = lightDirection.dot( lightTargetDirection( light ) );
-
-		const spotAttenuation = this.getSpotAttenuation( builder, angleCos );
-
-		const lightDistance = lightVector.length();
-
-		const lightAttenuation = getDistanceAttenuation( {
-			lightDistance,
-			cutoffDistance: cutoffDistanceNode,
-			decayExponent: decayExponentNode
-		} );
-
-		let lightColor = colorNode.mul( spotAttenuation ).mul( lightAttenuation );
-
-		let projected, lightCoord;
-
-		if ( light.colorNode ) {
-
-			lightCoord = this.getLightCoord( builder );
-			projected = light.colorNode( lightCoord );
-
-		} else if ( light.map ) {
-
-			lightCoord = this.getLightCoord( builder );
-			projected = texture( light.map, lightCoord.xy ).onRenderUpdate( () => light.map );
-
-		}
-
-		if ( projected ) {
-
-			const inSpotLightMap = lightCoord.mul( 2. ).sub( 1. ).abs().lessThan( 1. ).all();
-
-			lightColor = inSpotLightMap.select( lightColor.mul( projected ), lightColor );
-
-		}
-
-		return { lightColor, lightDirection };
-
-	}
-
-}
-
-/**
  * An IES version of the default spot light node.
  *
  * @augments SpotLightNode
@@ -58853,6 +59300,16 @@ class Lighting {
 	finishRender( scene ) {
 
 		this.getNode( scene ).setLights( this._cache.pop() );
+
+	}
+
+	/**
+	 * Clears cached lighting nodes and saved light arrays.
+	 */
+	dispose() {
+
+		this._lightsNodeMap = new WeakMap();
+		this._cache.length = 0;
 
 	}
 
@@ -63923,6 +64380,7 @@ class Renderer {
 			}
 
 			this._textures.dispose();
+			this.lighting.dispose();
 			this.info.dispose();
 
 			await this.backend.dispose();
@@ -72919,9 +73377,9 @@ class WebGLTextureUtils {
 	setupRenderBufferStorage( renderbuffer, renderContext, samples, useMultisampledRTT = false ) {
 
 		const { gl } = this;
-		const renderTarget = renderContext.renderTarget;
+		const { depthTexture, renderTarget } = renderContext;
 
-		const { depthTexture, depthBuffer, stencilBuffer, width, height } = renderTarget;
+		const { depthBuffer, stencilBuffer, width, height } = renderTarget;
 
 		gl.bindRenderbuffer( gl.RENDERBUFFER, renderbuffer );
 
@@ -75242,7 +75700,7 @@ class WebGLBackend extends Backend {
 			if ( isRenderCameraDepthArray ) {
 
 				// Clear the depth texture
-				const textureData = this.get( renderTarget.depthTexture );
+				const textureData = this.get( this._currentContext.depthTexture );
 
 				if ( textureData.clearedRenderId !== this.renderer._nodes.nodeFrame.renderId ) {
 

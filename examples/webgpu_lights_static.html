@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - static lights</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - static lights">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_lights_static.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_lights_static.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Static Lights</span>
+			</div>
+
+			<small>
+				1,024 point lights + 512 spot lights.<br />
+				Neon avenue. Static lights, moving traffic. Drag to explore.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { color as tslColor, densityFogFactor, fog, mx_noise_float, normalMap, normalViewGeometry, pass, positionViewDirection, positionWorld, positionWorldDirection, uv, vec2, vec3 } from 'three/tsl';
+			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+
+			const BLOCKS = 32;
+			const SPACING = 9;
+			const LENGTH = BLOCKS * SPACING;
+			const CAR_COUNT = 48;
+			const palette = [ 0x23d9ff, 0xff527b, 0xffbe53, 0xab79ff, 0x64ffc9, 0xff71df ];
+
+			let camera, scene, renderer, renderPipeline, controls, timer;
+			let cars, carWindows, carLamps, carWheels;
+			let elapsed = 0;
+			let tour = 0.4;
+
+			const trams = [];
+			const dummy = new THREE.Object3D();
+			const color = new THREE.Color();
+			const boxGeometry = new THREE.BoxGeometry();
+			const params = { animate: true, tour: true };
+
+			init();
+
+			async function init() {
+
+				if ( WebGPU.isAvailable() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw new Error( 'No WebGPU support' );
+
+				}
+
+				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.1, 500 );
+
+				scene = new THREE.Scene();
+				const haze = positionWorld.y.smoothstep( 0, 30 ).mix( 1, 0.25 );
+				scene.backgroundNode = positionWorldDirection.y.max( 0 ).pow( 0.4 ).mix( tslColor( 0x18364a ), tslColor( 0x030712 ) );
+				scene.fogNode = fog( tslColor( 0x18364a ), densityFogFactor( 0.012 ).mul( haze ) );
+				scene.add( new THREE.HemisphereLight( 0x7189b5, 0x182038, 0.8 ) );
+
+				timer = new THREE.Timer();
+				timer.connect( document );
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.NeutralToneMapping;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				// Standard materials receive the batched lights, including moving objects.
+
+				const masonry = new THREE.MeshStandardNodeMaterial( { roughness: 0.72, metalness: 0.15 } );
+				const grain = mx_noise_float( positionWorld.mul( 28 ) ).mul( 0.15 ).add( 0.85 );
+				const joints = positionWorld.y.mul( 0.77 ).fract().smoothstep( 0, 0.035 );
+				masonry.colorNode = vec3( grain.mul( joints.mul( 0.45 ).add( 0.55 ) ) );
+
+				const metal = new THREE.MeshStandardMaterial( { roughness: 0.28, metalness: 0.65 } );
+				const paint = new THREE.MeshStandardMaterial( { roughness: 0.24, metalness: 0.35 } );
+				const glass = new THREE.MeshStandardMaterial( { color: 0x111a28, roughness: 0.12, metalness: 0.65 } );
+				const neon = new THREE.MeshBasicNodeMaterial( { color: new THREE.Color( 3, 3, 3 ) } );
+
+				// Broad puddles and fine asphalt grain vary the wet surface without image textures.
+
+				const roadUV = uv().mul( vec2( 130, LENGTH + 30 ) );
+				const puddles = mx_noise_float( roadUV.mul( 0.32 ) ).smoothstep( - 0.05, 0.3 );
+				const asphalt = mx_noise_float( roadUV.mul( 18 ) );
+				const road = new THREE.MeshStandardNodeMaterial();
+				road.colorNode = tslColor( 0x293443 ).mul( asphalt.mul( 0.15 ).add( 0.85 ) ).mul( puddles.mix( 1, 0.45 ) );
+				road.roughnessNode = puddles.mix( 0.48, 0.08 );
+				road.metalnessNode = puddles.mix( 0.2, 0.65 );
+				const roadNormal = vec2( asphalt, mx_noise_float( roadUV.mul( 18 ).add( 17 ) ) ).mul( puddles.mix( 0.18, 0.025 ) );
+				road.normalNode = normalMap( vec3( roadNormal.add( 0.5 ), 1 ) );
+
+				const paving = new THREE.MeshStandardNodeMaterial( { metalness: 0.4 } );
+				const tileEdge = positionWorld.xz.mul( 1.25 ).fract();
+				const tile = tileEdge.x.min( tileEdge.y ).smoothstep( 0, 0.035 );
+				paving.colorNode = tslColor( 0x414b5b ).mul( tile.mul( 0.7 ).add( 0.3 ) ).mul( grain );
+				paving.roughnessNode = mx_noise_float( positionWorld.xz.mul( 0.7 ) ).mul( 0.15 ).add( 0.25 );
+
+				const ground = new THREE.Mesh(
+					new THREE.PlaneGeometry( 130, LENGTH + 30 ).rotateX( - Math.PI / 2 ),
+					road
+				);
+				scene.add( ground );
+
+				const buildings = [];
+				const pavements = [];
+				const details = [];
+				const accents = [];
+				const windows = [];
+
+				// Two rows on either side of the avenue form a deep, continuous city.
+
+				const pointLights = new THREE.Group();
+				const spotLights = new THREE.Group();
+				pointLights.name = 'Static point lights';
+				spotLights.name = 'Static spot lights';
+				scene.add( pointLights, spotLights );
+
+				// Open cones approximate scattering, with soft silhouettes and fading ends.
+
+				const beamMaterial = new THREE.MeshBasicNodeMaterial( { transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, forceSinglePass: true } );
+				const edgeFade = normalViewGeometry.dot( positionViewDirection ).abs().pow( 2 );
+				beamMaterial.opacityNode = edgeFade.mul( uv().y.smoothstep( 0, 0.65 ) ).mul( uv().y.oneMinus().smoothstep( 0, 0.08 ) ).mul( 0.035 );
+				const beams = new THREE.InstancedMesh( new THREE.ConeGeometry( 1, 1, 24, 1, true ).translate( 0, - 0.5, 0 ), beamMaterial, BLOCKS * 16 );
+				beams.name = 'Spotlight beams';
+				spotLights.add( beams );
+				const beamTransform = new THREE.Object3D();
+				const down = new THREE.Vector3( 0, - 1, 0 );
+				const direction = new THREE.Vector3();
+				let beamIndex = 0;
+
+				const helpers = new THREE.Group();
+				helpers.visible = false;
+				const pointHelpers = new THREE.Group();
+				const spotHelpers = new THREE.Group();
+				helpers.name = 'Light helpers';
+				helpers.add( pointHelpers, spotHelpers );
+				scene.add( helpers );
+
+				for ( let side = - 1; side <= 1; side += 2 ) {
+
+					addBox( pavements, side * 11.5, 0.16, 0, 6.5, 0.32, LENGTH, 0xffffff );
+					addBox( accents, side * 8.3, 0.33, 0, 0.06, 0.025, LENGTH, 0x405578 );
+
+					for ( let row = 0; row < 2; row ++ ) {
+
+						for ( let i = 0; i < BLOCKS; i ++ ) {
+
+							const index = ( side + 1 ) * BLOCKS + row * BLOCKS + i;
+							const z = ( i - ( BLOCKS - 1 ) / 2 ) * SPACING;
+							const x = side * ( 20 + row * 24 );
+							const front = x - side * 5.1;
+							const height = 14 + ( i * 7 + row * 11 ) % 24;
+							const tint = palette[ ( i + row * 2 + ( side + 1 ) ) % palette.length ];
+
+							color.setHSL( ( index * 0.618 ) % 1, 0.18, 0.22 + ( i % 3 ) * 0.04 );
+							addBox( buildings, x, height / 2, z, 10, height, 8.4, color.getHex() );
+							addBox( details, x, height + 0.2, z, 10.5, 0.4, 8.8, 0x384453 );
+							addBox( buildings, x + side * 1.5, height + 1.1, z - 1.5, 3, 1.6, 3, 0x273244 );
+
+							// Shop glazing, awnings and a continuous colored canopy.
+
+							addBox( buildings, front, 1.7, z, 0.1, 2.8, 7.3, 0x182535 );
+							addBox( details, front - side * 0.8, 3.4, z, 2, 0.2, 8, 0x354559 );
+							addBox( accents, front - side * 1.8, 3.4, z, 0.08, 0.1, 7.8, tint );
+
+							for ( let floor = 0; floor < Math.floor( ( height - 5 ) / 2.6 ); floor ++ ) {
+
+								for ( let column = 0; column < 3; column ++ ) {
+
+									const lit = ( i * 3 + floor * 7 + column * 11 ) % 5 !== 0;
+									addBox( windows, front, 5.2 + floor * 2.6, z + ( column - 1 ) * 2.4,
+										0.08, 1.35, 1.4, lit ? palette[ ( i + floor + column ) % palette.length ] : 0x152037 );
+
+								}
+
+							}
+
+							// Finite ranges and light.static opt into the storage-buffer grid.
+							// Light transforms and properties remain fixed after the first render.
+
+							for ( let j = 0; j < 8; j ++ ) {
+
+								const upper = j >= 4;
+								const street = row === 0 && j < 2;
+								const light = new THREE.PointLight( palette[ ( i + j + row ) % palette.length ], street ? 55 : upper ? 10 : 24, street ? 10 : 6 );
+								light.position.set( front - side * 0.7, upper ? 7.5 : 2.3, z + ( j % 4 - 1.5 ) * 1.8 );
+								light.static = true;
+								pointLights.add( light );
+
+								const helper = new THREE.PointLightHelper( light, 0.12 );
+								helper.material.transparent = true;
+								helper.material.opacity = 0.6;
+								helper.material.depthWrite = false;
+								pointHelpers.add( helper );
+
+							}
+
+							for ( let j = 0; j < 4; j ++ ) {
+
+								const street = row === 0 && i % 2 === 0 && j === 0;
+								const light = new THREE.SpotLight( palette[ ( i + j * 2 + 2 ) % palette.length ], street ? 320 : 180, street ? 12 : 10, street ? Math.PI / 4 : Math.PI / 7, 0.45 );
+								light.position.set( street ? side * 7 : front - side * 1.75, street ? 5.7 : 3.15, z + ( street ? 0 : ( j - 1.5 ) * 1.9 ) );
+								light.target.position.set( street ? side * 5 : front - side * 3.5, street ? 0.02 : 0.34, light.position.z + ( street ? 0 : 0.8 ) );
+								light.static = true;
+
+								// A static spotlight's target stays fixed in world space too.
+								spotLights.add( light, light.target );
+
+								const length = light.position.distanceTo( light.target.position );
+								const radius = Math.tan( light.angle ) * length;
+								const inset = street ? 0.1 : 0;
+								direction.subVectors( light.target.position, light.position ).normalize();
+								beamTransform.position.copy( light.position ).addScaledVector( direction, - inset );
+								beamTransform.quaternion.setFromUnitVectors( down, direction );
+								beamTransform.scale.set( radius, length + inset, radius );
+								beamTransform.updateMatrix();
+								beams.setMatrixAt( beamIndex, beamTransform.matrix );
+								beams.setColorAt( beamIndex ++, light.color );
+
+								const helper = new THREE.SpotLightHelper( light );
+								helper.cone.material.transparent = true;
+								helper.cone.material.opacity = 0.2;
+								helper.cone.material.depthWrite = false;
+								spotHelpers.add( helper );
+
+								addBox( details, light.position.x, street ? 5.85 : 3.25, light.position.z, 0.35, street ? 0.3 : 0.1, 0.5, 0x606d81 );
+
+								if ( street ) {
+
+									addBox( details, side * 8.4, 2.95, light.position.z, 0.1, 5.9, 0.1, 0x69788c );
+									addBox( details, side * 7.7, 5.85, light.position.z, 1.4, 0.1, 0.1, 0x69788c );
+									addBox( accents, light.position.x, 5.69, light.position.z, 0.3, 0.02, 0.45, light.color.getHex() );
+
+								}
+
+							}
+
+							// Station platforms break up the street frontage.
+
+							if ( row === 0 && i % 8 === 3 ) {
+
+								addBox( buildings, side * 9.8, 0.5, z, 2.5, 0.7, 7, 0x697488 );
+								addBox( details, side * 10.5, 2.1, z - 3, 0.12, 3.3, 0.12, 0xa4b3c7 );
+								addBox( details, side * 10.5, 2.1, z + 3, 0.12, 3.3, 0.12, 0xa4b3c7 );
+								addBox( details, side * 10.1, 3.8, z, 3.2, 0.18, 7.5, 0x627187 );
+								addBox( accents, side * 8.5, 3.75, z, 0.06, 0.07, 7.5, tint );
+
+							}
+
+						}
+
+					}
+
+				}
+
+				// Tram rails and lane markings pick up the colored light on the pavement.
+
+				for ( const x of [ - 1.1, 1.1 ] ) {
+
+					addBox( details, x, 0.025, 0, 0.08, 0.05, LENGTH, 0xa5b6cb );
+
+				}
+
+				for ( let i = 0; i < LENGTH / 5; i ++ ) {
+
+					for ( const x of [ - 3, 3 ] ) {
+
+						addBox( buildings, x, 0.015, i * 5 - LENGTH / 2, 0.1, 0.03, 1.8, 0x8390a1 );
+
+					}
+
+				}
+
+				createInstances( 'Buildings and pavement', buildings, masonry );
+				createInstances( 'Pavement', pavements, paving );
+				createInstances( 'Metalwork', details, metal );
+				createInstances( 'Neon strips', accents, neon );
+				const windowMaterial = new THREE.MeshBasicNodeMaterial();
+				const windowEdge = uv().sub( 0.5 ).abs();
+				const windowFrame = windowEdge.x.max( windowEdge.y ).smoothstep( 0.42, 0.49 ).oneMinus();
+				windowMaterial.colorNode = vec3( windowFrame.mul( uv().y.mul( 12 ).fract().smoothstep( 0, 0.15 ).mul( 0.6 ).add( 0.4 ) ).mul( 1.5 ) );
+				createInstances( 'Windows', windows, windowMaterial );
+
+				cars = new THREE.InstancedMesh( boxGeometry, paint, CAR_COUNT );
+				carWindows = new THREE.InstancedMesh( boxGeometry, glass, CAR_COUNT );
+				carWheels = new THREE.InstancedMesh( boxGeometry, new THREE.MeshStandardMaterial( { color: 0x0a0c12, roughness: 0.9 } ), CAR_COUNT * 4 );
+				carLamps = new THREE.InstancedMesh( boxGeometry, neon, CAR_COUNT * 4 );
+
+				for ( const mesh of [ cars, carWindows, carWheels, carLamps ] ) {
+
+					mesh.name = 'Traffic';
+					mesh.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
+					mesh.frustumCulled = false;
+					scene.add( mesh );
+
+				}
+
+				for ( let i = 0; i < CAR_COUNT; i ++ ) {
+
+					cars.setColorAt( i, color.setHSL( i * 0.618 % 1, 0.55, 0.45 ) );
+
+					for ( let j = 0; j < 4; j ++ ) carLamps.setColorAt( i * 4 + j, color.setHex( j < 2 ? 0xb7e6ff : 0xff283e ) );
+
+				}
+
+				for ( let i = 0; i < 3; i ++ ) {
+
+					const tram = new THREE.Group();
+					tram.name = 'Tram';
+					const bodyMaterial = new THREE.MeshStandardMaterial( { color: palette[ i * 2 ], roughness: 0.3, metalness: 0.4 } );
+
+					for ( let j = 0; j < 3; j ++ ) {
+
+						const z = ( j - 1 ) * 8.6;
+						const body = new THREE.Mesh( new THREE.BoxGeometry( 2.6, 2.7, 8 ), bodyMaterial );
+						body.position.set( 0, 1.75, z );
+						const glazing = new THREE.Mesh( new THREE.BoxGeometry( 2.65, 1.2, 6.6 ), glass );
+						glazing.position.set( 0, 2.05, z );
+						const roof = new THREE.Mesh( new THREE.BoxGeometry( 2.7, 0.18, 8.1 ), metal );
+						roof.position.set( 0, 3.2, z );
+						tram.add( body, glazing, roof );
+
+						for ( const wheelZ of [ - 2.5, 2.5 ] ) {
+
+							const axle = new THREE.Mesh( new THREE.BoxGeometry( 2.3, 0.5, 0.65 ), carWheels.material );
+							axle.position.set( 0, 0.3, z + wheelZ );
+							tram.add( axle );
+
+						}
+
+					}
+
+					trams.push( tram );
+					scene.add( tram );
+
+				}
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.minDistance = 2;
+				controls.maxDistance = 160;
+				controls.maxPolarAngle = Math.PI * 0.49;
+				controls.addEventListener( 'start', () => params.tour = false );
+
+				const scenePass = pass( scene, camera );
+				const sceneColor = scenePass.getTextureNode( 'output' );
+				const glow = bloom( sceneColor, 0.3, 0.5, 1 );
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				renderPipeline.outputNode = sceneColor.add( glow );
+
+				const gui = renderer.inspector.createParameters( 'Settings' );
+				gui.add( pointLights, 'visible' ).name( 'point lights' ).onChange( value => pointHelpers.visible = value );
+				gui.add( spotLights, 'visible' ).name( 'spot lights' ).onChange( value => spotHelpers.visible = value );
+				gui.add( helpers, 'visible' ).name( 'light helpers' );
+				gui.add( beams, 'visible' ).name( 'light beams' );
+				gui.add( params, 'animate' ).name( 'animate traffic' );
+				gui.add( params, 'tour' ).name( 'camera tour' ).listen();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				renderer.setAnimationLoop( animate );
+
+			}
+
+			function addBox( boxes, x, y, z, width, height, depth, tint ) {
+
+				boxes.push( [ x, y, z, width, height, depth, tint ] );
+
+			}
+
+			function setInstance( mesh, index, x, y, z, width, height, depth ) {
+
+				dummy.position.set( x, y, z );
+				dummy.scale.set( width, height, depth );
+				dummy.updateMatrix();
+				mesh.setMatrixAt( index, dummy.matrix );
+
+			}
+
+			function createInstances( name, boxes, material ) {
+
+				const mesh = new THREE.InstancedMesh( boxGeometry, material, boxes.length );
+				mesh.name = name;
+
+				for ( let i = 0; i < boxes.length; i ++ ) {
+
+					const [ x, y, z, width, height, depth, tint ] = boxes[ i ];
+					setInstance( mesh, i, x, y, z, width, height, depth );
+					mesh.setColorAt( i, color.setHex( tint ) );
+
+				}
+
+				scene.add( mesh );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				timer.update();
+				const delta = timer.getDelta();
+
+				if ( params.animate ) elapsed += delta;
+
+				for ( let i = 0; i < CAR_COUNT; i ++ ) {
+
+					const direction = i % 2 === 0 ? 1 : - 1;
+					const x = direction * 5.4;
+					const spacing = LENGTH / ( CAR_COUNT / 2 );
+					const z = THREE.MathUtils.euclideanModulo( Math.floor( i / 2 ) * spacing + elapsed * direction * 7, LENGTH ) - LENGTH / 2;
+
+					setInstance( cars, i, x, 0.7, z, 1.85, 0.75, 3.8 );
+					setInstance( carWindows, i, x, 1.25, z - direction * 0.25, 1.6, 0.65, 2 );
+
+					for ( let j = 0; j < 4; j ++ ) {
+
+						setInstance( carWheels, i * 4 + j, x + ( j % 2 - 0.5 ) * 1.85, 0.4, z + ( j < 2 ? 1.2 : - 1.2 ), 0.22, 0.65, 0.65 );
+						setInstance( carLamps, i * 4 + j, x + ( j % 2 - 0.5 ) * 1.3, 0.75, z + ( j < 2 ? direction : - direction ) * 1.91, 0.35, 0.18, 0.04 );
+
+					}
+
+				}
+
+				for ( const mesh of [ cars, carWindows, carWheels, carLamps ] ) mesh.instanceMatrix.needsUpdate = true;
+
+				for ( let i = 0; i < trams.length; i ++ ) {
+
+					trams[ i ].position.z = ( i * 96 + elapsed * 4 + 55 ) % LENGTH - LENGTH / 2;
+
+				}
+
+				if ( params.tour ) {
+
+					tour += delta * 0.015;
+					camera.position.set( 6 * Math.sin( tour ), 5 + Math.sin( tour * 2 ) * 0.6, 120 * Math.cos( tour ) );
+					controls.target.set( 6 * Math.sin( tour + 0.2 ), 4.5, 120 * Math.cos( tour + 0.2 ) );
+
+				}
+
+				controls.update();
+				renderPipeline.render();
+
+			}
+
+		</script>
+	</body>
+</html>

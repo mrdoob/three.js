@@ -2778,6 +2778,7 @@ class Renderer {
 			}
 
 			this._textures.dispose();
+			this.lighting.dispose();
 			this.info.dispose();
 
 			await this.backend.dispose();
