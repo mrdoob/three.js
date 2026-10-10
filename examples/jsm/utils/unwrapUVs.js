@@ -117,7 +117,10 @@ function readMesh( mesh, settings ) {
 		const normal = new Vector3().subVectors( points[ vertices[ 1 ] ], points[ vertices[ 0 ] ] );
 		normal.cross( new Vector3().subVectors( points[ vertices[ 2 ] ], points[ vertices[ 0 ] ] ) );
 		const area = normal.length() * 0.5;
-		const face = { vertices, welds: vertices.map( v => welds[ v ] ), normal: normal.normalize(), area, ignored: float32TriangleArea( ...vertices.map( v => points[ v ] ) ) <= 2 ** - 23, neighbors: [] };
+		const longest = Math.max( ...[ 0, 1, 2 ].map( j => points[ vertices[ j ] ].distanceToSquared( points[ vertices[ ( j + 1 ) % 3 ] ] ) ) );
+		// slivers beyond Float32 precision are excluded from the atlas
+		const ignored = ! ( area > longest * 1e-6 );
+		const face = { vertices, welds: vertices.map( v => welds[ v ] ), normal: normal.normalize(), area, ignored, neighbors: [] };
 		const f = faces.length;
 		faces.push( face );
 		if ( face.ignored ) continue;
@@ -155,22 +158,6 @@ function readMesh( mesh, settings ) {
 	// cylinder). Keep the two coincident seam endpoints distinct in the solver.
 	const vertexKeys = welds.map( ( weld, i ) => uv && ( settings.respectUVSeams || settings.useInputUVs ) ? `${ weld },${ uv.getX( i ) },${ uv.getY( i ) }` : weld );
 	return { mesh, original: geometry, points, faces, vertexKeys, faceCharts: new Int32Array( faces.length ).fill( - 1 ) };
-
-}
-
-// xatlas tests degeneracy using Float32 geometry, before parameterization.
-function float32TriangleArea( a, b, c ) {
-
-	const ab = [ 'x', 'y', 'z' ].map( axis => Math.fround( Math.fround( b[ axis ] ) - Math.fround( a[ axis ] ) ) );
-	const ac = [ 'x', 'y', 'z' ].map( axis => Math.fround( Math.fround( c[ axis ] ) - Math.fround( a[ axis ] ) ) );
-	const cross = [ 0, 1, 2 ].map( i => {
-
-		const j = ( i + 1 ) % 3, k = ( i + 2 ) % 3;
-		return Math.fround( Math.fround( ab[ j ] * ac[ k ] ) - Math.fround( ab[ k ] * ac[ j ] ) );
-
-	} );
-	const lengthSquared = Math.fround( Math.fround( Math.fround( cross[ 0 ] ** 2 ) + Math.fround( cross[ 1 ] ** 2 ) ) + Math.fround( cross[ 2 ] ** 2 ) );
-	return Math.fround( Math.fround( Math.sqrt( lengthSquared ) ) * 0.5 );
 
 }
 

@@ -390,7 +390,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'Float32 geometry cancellation is detected before parameterization', assert => {
+			QUnit.test( 'near-degenerate slivers from large coordinates are excluded', assert => {
 
 				const geometry = new BufferGeometry();
 				geometry.setAttribute( 'position', new BufferAttribute( new Float64Array( [ 0, 0, 0, 10000, 10000, 0, 10000, 10000.0001, 0 ] ), 3 ) );
