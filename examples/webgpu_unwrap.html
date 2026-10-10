@@ -54,24 +54,7 @@
 			light.position.set( 3, 5, 4 );
 			scene.add( light );
 
-			const checkerCanvas = document.createElement( 'canvas' );
-			checkerCanvas.width = checkerCanvas.height = 1024;
-			const ctx = checkerCanvas.getContext( '2d' );
-			for ( let y = 0; y < 32; y ++ ) {
-
-				for ( let x = 0; x < 32; x ++ ) {
-
-					ctx.fillStyle = ( x + y ) % 2 ? '#e8edf7' : '#2559a0';
-					ctx.fillRect( x * 32, y * 32, 32, 32 );
-					ctx.fillStyle = '#e09028';
-					ctx.fillRect( x * 32, y * 32, 2, 32 );
-					ctx.fillRect( x * 32, y * 32, 32, 2 );
-
-				}
-
-			}
-
-			const checkerTexture = new THREE.CanvasTexture( checkerCanvas );
+			const checkerTexture = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
 			checkerTexture.channel = 1;
 			checkerTexture.colorSpace = THREE.SRGBColorSpace;
 			const atlasCanvas = document.getElementById( 'atlas' );
@@ -118,7 +101,7 @@
 				'Soldier': 'Soldier.glb', 'Xbot': 'Xbot.glb', 'Lee Perry Smith': 'LeePerrySmith/LeePerrySmith.glb',
 				'Space ship hallway': 'space_ship_hallway.glb'
 			} ).name( 'Model' ).listen().onChange( value => loadModel( value ).catch( reportError ) );
-			gui.add( params, 'view', { 'UV checker': 'checker', 'UV islands': 'islands', 'Texel density': 'density', 'Original materials': 'original' } ).name( 'View' ).onChange( updateMaterials );
+			gui.add( params, 'view', { 'UV grid': 'checker', 'UV islands': 'islands', 'Texel density': 'density', 'Original materials': 'original' } ).name( 'View' ).onChange( updateMaterials );
 			gui.add( params, 'referenceDensity' ).name( 'Target texels / unit' ).info( '0 uses the fitted atlas density. Both principal directions are compared with this target.' ).onChange( updateMaterials );
 			const inputs = gui.addFolder( 'Unwrap Input' );
 			inputs.add( params, 'mode', { 'Lightmap': 'lightmap', 'Normal bake': 'normal' } ).name( 'Method' ).onChange( unwrapAndReport );
