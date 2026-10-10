@@ -231,6 +231,7 @@ function parameterize( record, faces, settings, charts ) {
 	const axis = Math.abs( normal.x ) < 0.8 ? new Vector3( 1, 0, 0 ) : new Vector3( 0, 1, 0 );
 	const u = axis.cross( normal ).normalize(), v = new Vector3().crossVectors( normal, u );
 	const vertexMap = new Map(), positions = [], uv = [], triangles = [];
+	const useInput = settings.useInputUVs && record.original.attributes.uv;
 	const origin = record.points[ record.faces[ faces[ 0 ] ].vertices[ 0 ] ];
 	let worldArea = 0;
 	for ( const f of faces ) {
@@ -245,8 +246,7 @@ function parameterize( record, faces, settings, charts ) {
 				vertexMap.set( key, positions.length );
 				const p = record.points[ vertex ].clone().sub( origin );
 				positions.push( p );
-				const inputUV = settings.useInputUVs && record.original.attributes.uv;
-				uv.push( inputUV ? [ inputUV.getX( vertex ), inputUV.getY( vertex ) ] : [ p.dot( u ), p.dot( v ) ] );
+				uv.push( useInput ? [ useInput.getX( vertex ), useInput.getY( vertex ) ] : [ p.dot( u ), p.dot( v ) ] );
 
 			}
 
@@ -256,7 +256,6 @@ function parameterize( record, faces, settings, charts ) {
 
 	}
 
-	const useInput = settings.useInputUVs && record.original.attributes.uv;
 	if ( useInput && triangles.reduce( ( sum, tri ) => sum + cross2( ...tri.map( i => uv[ i ] ) ), 0 ) < 0 ) {
 
 		for ( const p of uv ) p[ 1 ] = - p[ 1 ];
@@ -641,7 +640,13 @@ function rebuildGeometry( record, charts, settings ) {
 
 	}
 
-	const geometry = new BufferGeometry().copy( original ), buffers = new Map();
+	const geometry = new BufferGeometry(), buffers = new Map();
+	geometry.name = original.name;
+	geometry.morphTargetsRelative = original.morphTargetsRelative;
+	geometry.userData = original.userData;
+	geometry.setDrawRange( original.drawRange.start, original.drawRange.count );
+	for ( const group of original.groups ) geometry.addGroup( group.start, group.count, group.materialIndex );
+
 	for ( const name of Object.keys( original.attributes ) ) geometry.setAttribute( name, remapAttribute( original.attributes[ name ], source, buffers ) );
 	for ( const name of Object.keys( original.morphAttributes ) ) {
 

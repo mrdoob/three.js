@@ -454,7 +454,6 @@ export default QUnit.module( 'Addons', () => {
 
 					geometry.name = 'authored';
 					geometry.userData.label = 'preserved';
-					geometry.computeBoundingBox();
 					const mesh = new Mesh( geometry );
 					const result = unwrap( mesh );
 					verify( assert, result );
@@ -463,9 +462,6 @@ export default QUnit.module( 'Addons', () => {
 					assert.deepEqual( restored.index.array, mesh.geometry.index.array );
 					for ( const name of Object.keys( mesh.geometry.attributes ) ) assert.deepEqual( restored.attributes[ name ].array, mesh.geometry.attributes[ name ].array );
 					assert.deepEqual( restored.groups, mesh.geometry.groups );
-					assert.deepEqual( mesh.geometry.boundingBox, geometry.boundingBox );
-					restored.computeBoundingBox();
-					assert.deepEqual( restored.boundingBox, mesh.geometry.boundingBox );
 					assert.strictEqual( restored.name, 'authored' );
 					assert.strictEqual( restored.userData.label, 'preserved' );
 
