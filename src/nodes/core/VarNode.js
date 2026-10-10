@@ -214,6 +214,8 @@ class VarNode extends Node {
 
 			if ( this.isAssign( builder ) !== true ) {
 
+				this._buildBeforeNodes( ...params );
+
 				return this.node.build( ...params );
 
 			}
