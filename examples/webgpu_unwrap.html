@@ -150,6 +150,7 @@
 						useInputUVs: params.useInputUVs,
 						resolution: Number( params.resolution )
 					} );
+					if ( ! result ) throw new Error( 'Charts do not fit in the atlas.' );
 					atlasSize.value = result.width;
 					const elapsed = performance.now() - start;
 					const triangles = result.meshes.reduce( ( sum, record ) => sum + record.faceCharts.length, 0 );

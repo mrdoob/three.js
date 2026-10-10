@@ -4,6 +4,7 @@ import {
 	TorusGeometry, Uint16BufferAttribute, Vector3
 } from 'three';
 import { unwrapUVs as unwrap } from '../../../../examples/jsm/utils/unwrapUVs.js';
+import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
 
 // Independent output audit. Uses polygon clipping, rather than the unwrapper's
 // separating-axis test, to detect positive-area triangle intersections.
@@ -286,14 +287,18 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'atlas overflow fails before modifying any mesh', assert => {
+			QUnit.test( 'atlas overflow returns null without modifying any mesh', assert => {
 
 				const root = new Group(), good = new Mesh( new BoxGeometry() ), other = new Mesh( new BoxGeometry() );
 				const original = good.geometry;
 				root.add( good, other );
-				assert.throws( () => unwrap( root, { resolution: 16, padding: 7 } ), /gutters/ );
-				assert.throws( () => unwrap( root, { texelsPerUnit: 100000 } ), /packing/ );
+				console.level = CONSOLE_LEVEL.OFF;
+				assert.strictEqual( unwrap( root, { resolution: 16, padding: 7 } ), null );
 				assert.strictEqual( good.geometry, original );
+				const fitted = unwrap( root, { texelsPerUnit: 100000 } );
+				console.level = CONSOLE_LEVEL.DEFAULT;
+				verify( assert, fitted );
+				assert.ok( fitted.texelsPerUnit < 100000, 'Falls back to the fitted density' );
 
 			} );
 

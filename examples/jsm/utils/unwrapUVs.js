@@ -18,8 +18,8 @@ import { potpack } from '../libs/potpack.module.js';
  * @param {number} [options.texelsPerUnit=0] - Common world density; zero fits the atlas. Must be nonnegative.
  * @param {boolean} [options.respectUVSeams] - Cut discontinuities in existing uv (normal default).
  * @param {boolean} [options.useInputUVs=false] - Preserve valid authored UV charts before trying LSCM.
- * @return {Object} Atlas dimensions, density, chart bounds and mesh vertex/face mappings.
- * @throws {Error} If the charts do not fit the atlas. Meshes are left unchanged.
+ * @return {?Object} Atlas dimensions, density, chart bounds and mesh vertex/face mappings,
+ * or null if the charts do not fit the atlas. Meshes are left unchanged in that case.
  */
 function unwrapUVs( root, options = {} ) {
 
@@ -53,6 +53,8 @@ function unwrapUVs( root, options = {} ) {
 	}
 
 	const density = packCharts( charts, settings );
+	if ( density === null ) return null;
+
 	for ( let i = charts.length - 1; i >= 0; i -- ) {
 
 		if ( ! validateFloat32Chart( charts[ i ], settings, density ) ) charts.splice( i, 1 );
@@ -279,7 +281,13 @@ function parameterize( record, faces, settings, charts ) {
 
 		}
 
-		if ( faces.length === 1 ) throw new Error( 'unwrapUVs: triangle cannot be parameterized at this precision.' );
+		if ( faces.length === 1 ) {
+
+			record.faces[ faces[ 0 ] ].ignored = true;
+			return;
+
+		}
+
 		const half = Math.floor( faces.length / 2 );
 		for ( const subset of [ faces.slice( 0, half ), faces.slice( half ) ] ) {
 
@@ -495,15 +503,11 @@ function packCharts( charts, settings ) {
 
 	}
 
-	let density = settings.texelsPerUnit, boxes;
-	if ( density > 0 ) {
+	let density = settings.texelsPerUnit, boxes = density > 0 ? pack( density ) : null;
+	if ( density > 0 && ! boxes ) console.warn( 'THREE.unwrapUVs(): Charts do not fit at the requested texelsPerUnit. Fitting the atlas instead.' );
 
-		boxes = pack( density );
-		if ( ! boxes ) throw new Error( 'unwrapUVs: no packing found for requested texelsPerUnit; increase resolution or partition the hierarchy.' );
+	if ( ! boxes ) {
 
-	} else {
-
-		if ( ! pack( 0 ) ) throw new Error( 'unwrapUVs: chart gutters do not fit; increase resolution or partition the hierarchy.' );
 		const area = charts.reduce( ( sum, chart ) => sum + chart.width * chart.height, 0 );
 		let low = 0, high = settings.resolution / Math.sqrt( area );
 		for ( let iteration = 0; iteration < 24; iteration ++ ) {
@@ -522,7 +526,12 @@ function packCharts( charts, settings ) {
 		}
 
 		density = low;
-		if ( ! boxes || density === 0 ) throw new Error( 'unwrapUVs: no positive density fits the atlas.' );
+		if ( ! boxes ) {
+
+			console.warn( 'THREE.unwrapUVs(): Charts do not fit the atlas. Increase the resolution, reduce the padding or partition the hierarchy.' );
+			return null;
+
+		}
 
 	}
 
@@ -603,7 +612,7 @@ function validateFloat32Chart( chart, settings, density ) {
 
 	}
 
-	if ( ! quality ) throw new Error( `unwrapUVs: Float32 atlas precision is insufficient for mesh "${ chart.record.mesh.name }"; repair sliver triangles or partition the hierarchy.` );
+	if ( ! quality ) console.warn( `THREE.unwrapUVs(): Float32 precision is insufficient for mesh "${ chart.record.mesh.name }". Some UVs may overlap.` );
 	return true;
 
 }
