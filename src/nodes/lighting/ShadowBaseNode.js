@@ -36,6 +36,9 @@ const _getShadowMaterial = ( light ) => {
 		material.name = 'ShadowMaterial';
 		material.blending = NoBlending;
 		material.fog = false;
+		material.polygonOffset = true;
+		material.polygonOffsetFactor = 2;
+		material.polygonOffsetUnits = 1;
 
 		_shadowMaterialLib.set( light, material );
 
