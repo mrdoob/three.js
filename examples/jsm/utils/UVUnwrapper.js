@@ -369,7 +369,7 @@ function checkChart( positions, triangles, uv, worldArea, settings ) {
 		const ux = ( q[ 0 ] - p[ 0 ] ) / length, vx = ( q[ 1 ] - p[ 1 ] ) / length;
 		const uy = ( r[ 0 ] - p[ 0 ] - ux * x ) / y, vy = ( r[ 1 ] - p[ 1 ] - vx * x ) / y;
 		const aa = ux * ux + vx * vx, bb = uy * uy + vy * vy, cc = ux * uy + vx * vy;
-		const trace = aa + bb, delta = Math.hypot( aa - bb, 2 * cc );
+		const trace = aa + bb, difference = aa - bb, delta = Math.sqrt( difference * difference + 4 * cc * cc );
 		// Use determinant for the small eigenvalue to avoid subtractive cancellation.
 		const largest = ( trace + delta ) * 0.5;
 		const jacobianDet = determinant / cross;
@@ -456,7 +456,7 @@ function overlapSAT( a, b, epsilon ) {
 
 			}
 
-			if ( Math.min( maxA, maxB ) - Math.max( minA, minB ) <= epsilon * Math.hypot( nx, ny ) ) return false;
+			if ( Math.min( maxA, maxB ) - Math.max( minA, minB ) <= epsilon * Math.sqrt( nx * nx + ny * ny ) ) return false;
 
 		}
 

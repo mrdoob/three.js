@@ -32,7 +32,8 @@ function auditAtlas( result ) {
 			const ux = ( p[ 1 ][ 0 ] - p[ 0 ][ 0 ] ) / length, vx = ( p[ 1 ][ 1 ] - p[ 0 ][ 1 ] ) / length;
 			const uy = ( p[ 2 ][ 0 ] - p[ 0 ][ 0 ] - ux * x ) / y, vy = ( p[ 2 ][ 1 ] - p[ 0 ][ 1 ] - vx * x ) / y;
 			const trace = ux * ux + vx * vx + uy * uy + vy * vy;
-			const delta = Math.hypot( ux * ux + vx * vx - uy * uy - vy * vy, 2 * ( ux * uy + vx * vy ) );
+			const difference = ux * ux + vx * vx - uy * uy - vy * vy, product = ux * uy + vx * vy;
+			const delta = Math.sqrt( difference * difference + 4 * product * product );
 			stretches.push( ( trace + delta ) / 2 / ( det / cross ) );
 			densities.push( Math.sqrt( det / cross ) * result.width );
 			worldArea += cross / 2;

@@ -10,7 +10,8 @@ function near( assert, actual, reference, tolerance = 1e-9 ) {
 	if ( actual === null ) return;
 	for ( let i = 0; i < reference.length; i ++ ) {
 
-		assert.ok( Math.hypot( actual[ i ][ 0 ] - reference[ i ][ 0 ], actual[ i ][ 1 ] - reference[ i ][ 1 ] ) <= tolerance, `Vertex ${ i } matches the analytic flattening` );
+		const du = actual[ i ][ 0 ] - reference[ i ][ 0 ], dv = actual[ i ][ 1 ] - reference[ i ][ 1 ];
+		assert.ok( du * du + dv * dv <= tolerance * tolerance, `Vertex ${ i } matches the analytic flattening` );
 
 	}
 
