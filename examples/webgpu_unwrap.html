@@ -71,6 +71,13 @@
 			const checkerTexture = new THREE.CanvasTexture( checkerCanvas );
 			checkerTexture.channel = 1;
 			checkerTexture.colorSpace = THREE.SRGBColorSpace;
+			const atlasCanvas = document.getElementById( 'atlas' );
+			const islandTexture = new THREE.CanvasTexture( atlasCanvas );
+			islandTexture.channel = 1;
+			islandTexture.colorSpace = THREE.SRGBColorSpace;
+			islandTexture.generateMipmaps = false;
+			islandTexture.minFilter = THREE.LinearFilter;
+			const islandMaterial = new THREE.MeshBasicNodeMaterial( { map: islandTexture, side: THREE.DoubleSide, toneMapped: false } );
 			const previewMaterial = new THREE.MeshStandardMaterial( { map: checkerTexture, roughness: 0.8, side: THREE.DoubleSide } );
 			const atlasSize = uniform( 2048 );
 			const densityTarget = uniform( 1 );
@@ -100,8 +107,7 @@
 			} )();
 			const params = {
 				model: 'boxes', mode: 'lightmap', resolution: 2048, useInputUVs: false,
-				view: 'checker', referenceDensity: 0, showAtlas: true,
-				unwrap: unwrapAndReport
+				view: 'checker', referenceDensity: 0, showAtlas: true
 			};
 			const gui = renderer.inspector.createParameters( 'UV unwrap' );
 			gui.add( params, 'model', {
@@ -109,13 +115,13 @@
 				'Soldier': 'Soldier.glb', 'Xbot': 'Xbot.glb', 'Lee Perry Smith': 'LeePerrySmith/LeePerrySmith.glb',
 				'Space ship hallway': 'space_ship_hallway.glb'
 			} ).name( 'Model' ).listen().onChange( value => loadModel( value ).catch( reportError ) );
-			gui.add( params, 'mode', { 'Lightmap': 'lightmap', 'Normal bake': 'normal' } ).name( 'Method' ).listen().onChange( params.unwrap );
-			gui.add( params, 'resolution', [ 1024, 2048, 4096 ] ).name( 'Atlas size' ).listen().onChange( params.unwrap );
-			gui.add( params, 'useInputUVs' ).name( 'Preserve authored islands' ).listen().onChange( params.unwrap );
-			gui.add( params, 'unwrap' ).name( 'Unwrap again' );
-			gui.add( params, 'view', { 'UV checker': 'checker', 'Texel density': 'density', 'Original materials': 'original' } ).name( 'View' ).onChange( updateMaterials );
+			gui.add( params, 'view', { 'UV checker': 'checker', 'UV islands': 'islands', 'Texel density': 'density', 'Original materials': 'original' } ).name( 'View' ).onChange( updateMaterials );
+			gui.add( params, 'showAtlas' ).name( 'Show Atlas' ).onChange( updateAtlasVisibility );
 			gui.add( params, 'referenceDensity' ).name( 'Target texels / unit' ).info( '0 uses the fitted atlas density. Both principal directions are compared with this target.' ).onChange( updateMaterials );
-			gui.add( params, 'showAtlas' ).name( 'Show atlas' ).onChange( updateAtlasVisibility );
+			const inputs = gui.addFolder( 'Unwrap Input' );
+			inputs.add( params, 'mode', { 'Lightmap': 'lightmap', 'Normal bake': 'normal' } ).name( 'Method' ).onChange( unwrapAndReport );
+			inputs.add( params, 'resolution', [ 1024, 2048, 4096 ] ).name( 'Atlas size' ).onChange( unwrapAndReport );
+			inputs.add( params, 'useInputUVs' ).name( 'Preserve authored islands' ).onChange( unwrapAndReport );
 			const draco = new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' );
 			const loader = new GLTFLoader().setDRACOLoader( draco );
 			const unwrapper = new UVUnwrapper();
@@ -130,7 +136,7 @@
 			function updateMaterials() {
 
 				if ( result ) densityTarget.value = params.referenceDensity > 0 ? params.referenceDensity : result.texelsPerUnit;
-				for ( const item of originals ) item.mesh.material = params.view === 'checker' ? previewMaterial : params.view === 'density' ? densityMaterial : item.material;
+				for ( const item of originals ) item.mesh.material = params.view === 'checker' ? previewMaterial : params.view === 'density' ? densityMaterial : params.view === 'islands' ? islandMaterial : item.material;
 
 			}
 
@@ -163,6 +169,7 @@
 					result = null;
 					const canvas = document.getElementById( 'atlas' );
 					canvas.getContext( '2d' ).clearRect( 0, 0, canvas.width, canvas.height );
+					islandTexture.needsUpdate = true;
 					for ( const item of originals ) item.mesh.material = item.material;
 					status.textContent = error.message;
 					throw error;
@@ -173,8 +180,18 @@
 
 			function drawAtlas() {
 
-				const canvas = document.getElementById( 'atlas' ), context = canvas.getContext( '2d' );
-				context.clearRect( 0, 0, canvas.width, canvas.height );
+				if ( atlasCanvas.width !== result.width || atlasCanvas.height !== result.height ) {
+
+					islandTexture.dispose();
+					atlasCanvas.width = result.width;
+					atlasCanvas.height = result.height;
+
+				}
+
+				const context = atlasCanvas.getContext( '2d' );
+				context.fillStyle = '#000';
+				context.fillRect( 0, 0, atlasCanvas.width, atlasCanvas.height );
+				const paths = result.charts.map( () => new Path2D() );
 				for ( const record of result.meshes ) {
 
 					const geometry = record.geometry, uv = geometry.attributes.uv1, index = geometry.index;
@@ -182,21 +199,32 @@
 
 						const chart = record.faceCharts[ face ];
 						if ( chart < 0 ) continue;
-						context.fillStyle = `hsl(${ chart * 137.508 % 360 },65%,60%)`;
-						context.beginPath();
+						const path = paths[ chart ];
 						for ( let j = 0; j < 3; j ++ ) {
 
-							const v = index.getX( face * 3 + j ), x = uv.getX( v ) * canvas.width, y = ( 1 - uv.getY( v ) ) * canvas.height;
-							if ( j === 0 ) context.moveTo( x, y ); else context.lineTo( x, y );
+							const v = index.getX( face * 3 + j ), x = uv.getX( v ) * atlasCanvas.width, y = ( 1 - uv.getY( v ) ) * atlasCanvas.height;
+							if ( j === 0 ) path.moveTo( x, y ); else path.lineTo( x, y );
 
 						}
 
-						context.closePath();
-						context.fill();
+						path.closePath();
 
 					}
 
 				}
+
+				// Fill the chart gutters too, so filtering at island edges does not sample black.
+				context.lineWidth = 2 * result.padding;
+				context.lineJoin = 'round';
+				for ( let chart = 0; chart < paths.length; chart ++ ) {
+
+					context.fillStyle = context.strokeStyle = `hsl(${ chart * 137.508 % 360 },65%,60%)`;
+					context.stroke( paths[ chart ] );
+					context.fill( paths[ chart ] );
+
+				}
+
+				islandTexture.needsUpdate = true;
 
 			}
 
