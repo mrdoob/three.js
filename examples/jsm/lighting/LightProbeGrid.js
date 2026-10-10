@@ -352,17 +352,6 @@ class LightProbeGrid extends Light {
 		this.boundingBox = new Box3();
 
 		/**
-		 * Distance in world units over which the grid contribution fades out
-		 * past the volume boundary. `0` applies the contribution everywhere
-		 * (clamped), which matches a single-volume setup. Use a small positive
-		 * value to blend multiple overlapping grids.
-		 *
-		 * @type {number}
-		 * @default 0
-		 */
-		this.falloff = 0;
-
-		/**
 		 * The single RGBA atlas 3D texture storing all seven packed SH
 		 * sub-volumes stacked along Z.
 		 *
@@ -636,7 +625,6 @@ class LightProbeGrid extends Light {
 		const bounceGrid = this._bounceGrid;
 		bounceGrid.boundingBox.copy( this.boundingBox );
 		bounceGrid.intensity = this.intensity;
-		bounceGrid.falloff = this.falloff;
 		scene.add( bounceGrid );
 
 	}
