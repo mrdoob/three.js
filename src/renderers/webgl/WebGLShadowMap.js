@@ -42,12 +42,10 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 		_viewport = new Vector4(),
 
 		_depthMaterial = new MeshDepthMaterial( {
-			polygonOffset: true,
 			polygonOffsetFactor: 2,
 			polygonOffsetUnits: 1
 		} ),
 		_distanceMaterial = new MeshDistanceMaterial( {
-			polygonOffset: true,
 			polygonOffsetFactor: 2,
 			polygonOffsetUnits: 1
 		} ),
@@ -498,6 +496,8 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 			result.side = ( material.shadowSide !== null ) ? material.shadowSide : shadowSide[ material.side ];
 
 		}
+
+		if ( customMaterial === undefined ) result.polygonOffset = result.side === DoubleSide;
 
 		result.alphaMap = material.alphaMap;
 		result.alphaTest = ( material.alphaToCoverage === true ) ? 0.5 : material.alphaTest; // approximate alphaToCoverage by using a fixed alphaTest value

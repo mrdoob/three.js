@@ -4,9 +4,10 @@ import ChainMap from '../../renderers/common/ChainMap.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { property, vec4 } from '../tsl/TSLBase.js';
 import { positionWorld } from '../accessors/Position.js';
-import { NoBlending, VSMShadowMap } from '../../constants.js';
+import { DoubleSide, NoBlending, VSMShadowMap } from '../../constants.js';
 
 const _shadowMaterialLib = /*@__PURE__*/ new WeakMap();
+const _defaultShadowMaterials = /*@__PURE__*/ new WeakSet();
 const _shadowRenderObjectLibrary = /*@__PURE__*/ new ChainMap();
 const _shadowRenderObjectKeys = [];
 
@@ -36,11 +37,11 @@ const _getShadowMaterial = ( light ) => {
 		material.name = 'ShadowMaterial';
 		material.blending = NoBlending;
 		material.fog = false;
-		material.polygonOffset = true;
 		material.polygonOffsetFactor = 2;
 		material.polygonOffsetUnits = 1;
 
 		_shadowMaterialLib.set( light, material );
+		_defaultShadowMaterials.add( material );
 
 	}
 
@@ -89,6 +90,12 @@ const _getShadowRenderObjectFunction = ( renderer, shadow, shadowType ) => {
 		renderObjectFunction = ( object, scene, _camera, geometry, material, group, lightsNode, clippingContext, passId ) => {
 
 			if ( object.castShadow === true || ( object.receiveShadow && shadowType === VSMShadowMap ) ) {
+
+				if ( _defaultShadowMaterials.has( scene.overrideMaterial ) ) {
+
+					scene.overrideMaterial.polygonOffset = ( material.shadowSide ?? material.side ) === DoubleSide;
+
+				}
 
 				object.onBeforeShadow( renderer, object, _camera, shadow.camera, geometry, scene.overrideMaterial, group );
 
