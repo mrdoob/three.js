@@ -319,7 +319,9 @@ function compressData( inBuffer, info ) {
 
 		const arr = inBuffer.subarray( size * i, size * ( i + 1 ) );
 
-		const block = compress( arr, tmpBuffer );
+		let block = compress( arr, tmpBuffer );
+
+		if ( block.length >= arr.length ) block = arr;
 
 		sum += block.length;
 
@@ -340,6 +342,8 @@ function compressNONE( data ) {
 }
 
 function compressZIP( data, tmpBuffer ) {
+
+	tmpBuffer = tmpBuffer.subarray( 0, data.length );
 
 	//
 	// Reorder the pixel data.
