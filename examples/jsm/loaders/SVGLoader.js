@@ -305,6 +305,7 @@ class SVGLoader extends Loader {
 			const firstPoint = new Vector2();
 			let isFirstPoint = true;
 			let doSetFirstPoint = false;
+			let isPathClosed = false;
 
 			const d = node.getAttribute( 'd' );
 
@@ -327,6 +328,17 @@ class SVGLoader extends Loader {
 					isFirstPoint = false;
 
 				}
+
+				// a closepath followed by any command other than moveto or closepath
+				// starts a new subpath at the initial point of the closed subpath
+
+				if ( isPathClosed === true && type !== 'M' && type !== 'm' && type !== 'Z' && type !== 'z' ) {
+
+					path.moveTo( firstPoint.x, firstPoint.y );
+
+				}
+
+				isPathClosed = false;
 
 				let numbers;
 
@@ -724,7 +736,7 @@ class SVGLoader extends Loader {
 							// Reset point to beginning of Path
 							point.copy( firstPoint );
 							path.currentPath.currentPoint.copy( point );
-							isFirstPoint = true;
+							isPathClosed = true;
 
 						}
 
