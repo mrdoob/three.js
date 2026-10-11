@@ -456,6 +456,8 @@ class Box3 {
 	 */
 	intersectsSphere( sphere ) {
 
+		if ( sphere.radius < 0 ) return false;
+
 		// Find the point on the AABB closest to the sphere center.
 		this.clampPoint( sphere.center, _vector );
 

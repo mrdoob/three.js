@@ -150,6 +150,8 @@ class Sphere {
 	 */
 	containsPoint( point ) {
 
+		if ( this.radius < 0 ) return false;
+
 		return ( point.distanceToSquared( this.center ) <= ( this.radius * this.radius ) );
 
 	}
@@ -175,6 +177,8 @@ class Sphere {
 	 * @return {boolean} Whether this sphere intersects with the given one or not.
 	 */
 	intersectsSphere( sphere ) {
+
+		if ( this.radius < 0 || sphere.radius < 0 ) return false;
 
 		const radiusSum = this.radius + sphere.radius;
 

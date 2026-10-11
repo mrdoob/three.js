@@ -188,6 +188,14 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( 'intersectsSphere with empty spheres', ( assert ) => {
+
+			const frustum = new Frustum().setFromProjectionMatrix( new Matrix4() );
+			assert.notOk( frustum.intersectsSphere( new Sphere() ), 'An empty sphere inside the frustum does not intersect it' );
+			assert.ok( frustum.intersectsSphere( new Sphere( zero3.clone(), 0 ) ), 'A zero-radius sphere inside the frustum intersects it' );
+
+		} );
+
 		QUnit.test( 'intersectsObject', ( assert ) => {
 
 			const m = new Matrix4().makePerspective( - 1, 1, 1, - 1, 1, 100 );

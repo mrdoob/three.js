@@ -196,6 +196,8 @@ class Frustum {
 	 */
 	intersectsSphere( sphere ) {
 
+		if ( sphere.radius < 0 ) return false;
+
 		const planes = this.planes;
 		const center = sphere.center;
 		const negRadius = - sphere.radius;

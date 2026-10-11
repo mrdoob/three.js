@@ -140,6 +140,11 @@ export default QUnit.module( 'Maths', () => {
 			a.set( zero3, 0 );
 			assert.ok( a.containsPoint( a.center ), 'Passed!' );
 
+			a.makeEmpty();
+			assert.notOk( a.containsPoint( a.center ), 'An empty sphere contains no points' );
+			a.set( one3, - 10 );
+			assert.notOk( a.containsPoint( one3 ), 'Any negative radius represents an empty sphere' );
+
 		} );
 
 		QUnit.test( 'distanceToPoint', ( assert ) => {
@@ -160,6 +165,14 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.intersectsSphere( b ), 'Passed!' );
 			assert.ok( ! a.intersectsSphere( c ), 'Passed!' );
 
+			const empty = new Sphere();
+			assert.notOk( empty.intersectsSphere( empty ), 'Empty spheres do not intersect each other' );
+			assert.notOk( empty.intersectsSphere( b ), 'An empty sphere does not intersect a nonempty sphere' );
+			assert.notOk( b.intersectsSphere( empty ), 'Intersection is symmetric for empty spheres' );
+			const point = new Sphere( zero3.clone(), 0 );
+			assert.ok( point.intersectsSphere( b ), 'A zero-radius sphere can intersect a nonempty sphere' );
+			assert.ok( point.intersectsSphere( point ), 'A zero-radius sphere intersects itself' );
+
 		} );
 
 		QUnit.test( 'intersectsBox', ( assert ) => {
@@ -170,6 +183,9 @@ export default QUnit.module( 'Maths', () => {
 
 			assert.strictEqual( a.intersectsBox( box ), true, 'Check unit sphere' );
 			assert.strictEqual( b.intersectsBox( box ), false, 'Check shifted sphere' );
+
+			assert.notOk( new Sphere().intersectsBox( box ), 'An empty sphere does not intersect a box' );
+			assert.ok( new Sphere( zero3.clone(), 0 ).intersectsBox( box ), 'A zero-radius sphere can intersect a box' );
 
 		} );
 

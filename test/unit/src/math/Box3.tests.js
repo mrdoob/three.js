@@ -467,6 +467,9 @@ export default QUnit.module( 'Maths', () => {
 			b.translate( new Vector3( 2, 2, 2 ) );
 			assert.ok( ! a.intersectsSphere( b ), 'Passed!' );
 
+			assert.notOk( a.intersectsSphere( new Sphere() ), 'A box does not intersect an empty sphere' );
+			assert.ok( a.intersectsSphere( new Sphere( zero3.clone(), 0 ) ), 'A box can intersect a zero-radius sphere' );
+
 		} );
 
 		QUnit.test( 'intersectsPlane', ( assert ) => {
