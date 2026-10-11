@@ -195,6 +195,9 @@ function subclip( sourceClip, name, startFrame, endFrame, fps = 30 ) {
 
 		const times = [];
 		const values = [];
+		const inTangents = [];
+		const outTangents = [];
+		const trackHasTangents = hasTangents( track.settings );
 
 		for ( let j = 0; j < track.times.length; ++ j ) {
 
@@ -208,6 +211,14 @@ function subclip( sourceClip, name, startFrame, endFrame, fps = 30 ) {
 
 				values.push( track.values[ j * valueSize + k ] );
 
+				if ( trackHasTangents ) {
+
+					const offset = ( j * valueSize + k ) * 2;
+					inTangents.push( track.settings.inTangents[ offset ], track.settings.inTangents[ offset + 1 ] );
+					outTangents.push( track.settings.outTangents[ offset ], track.settings.outTangents[ offset + 1 ] );
+
+				}
+
 			}
 
 		}
@@ -216,6 +227,13 @@ function subclip( sourceClip, name, startFrame, endFrame, fps = 30 ) {
 
 		track.times = convertArray( times, track.times.constructor );
 		track.values = convertArray( values, track.values.constructor );
+
+		if ( trackHasTangents ) {
+
+			track.settings.inTangents = convertArray( inTangents, track.settings.inTangents.constructor );
+			track.settings.outTangents = convertArray( outTangents, track.settings.outTangents.constructor );
+
+		}
 
 		tracks.push( track );
 
