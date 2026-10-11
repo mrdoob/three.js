@@ -27,6 +27,18 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
+			QUnit.test( 'Empty path', ( assert ) => {
+
+				const path = new CurvePath();
+				assert.strictEqual( path.getLength(), 0, 'An empty path has zero length.' );
+				assert.strictEqual( path.closePath(), path, 'Closing an empty path returns the path.' );
+				assert.deepEqual( path.getPoints(), [], 'An empty path has no points.' );
+				assert.deepEqual( path.getSpacedPoints(), [], 'An empty path has no spaced points.' );
+				path.autoClose = true;
+				assert.deepEqual( path.getSpacedPoints(), [], 'Auto-closing does not add null points.' );
+
+			} );
+
 			// PROPERTIES
 			QUnit.test( 'type', ( assert ) => {
 

@@ -55,6 +55,8 @@ class CurvePath extends Curve {
 	 */
 	closePath() {
 
+		if ( this.curves.length === 0 ) return this;
+
 		// Add a line curve if start and end of lines are not connected
 		const startPoint = this.curves[ 0 ].getPoint( 0 );
 		const endPoint = this.curves[ this.curves.length - 1 ].getPoint( 1 );
@@ -126,7 +128,7 @@ class CurvePath extends Curve {
 		// getPoint() depends on getLength
 
 		const lens = this.getCurveLengths();
-		return lens[ lens.length - 1 ];
+		return lens.length === 0 ? 0 : lens[ lens.length - 1 ];
 
 	}
 
@@ -179,6 +181,8 @@ class CurvePath extends Curve {
 	getSpacedPoints( divisions = 40 ) {
 
 		const points = [];
+
+		if ( this.curves.length === 0 ) return points;
 
 		for ( let i = 0; i <= divisions; i ++ ) {
 
