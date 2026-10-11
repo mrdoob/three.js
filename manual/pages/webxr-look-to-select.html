@@ -27,9 +27,9 @@
       <div class="lesson">
         <div class="lesson-main">
           <p><strong>NOTE: The examples on this page require a VR capable
-device. Without one they won't work. See <a href="webxr.html">previous article</a>
+device. Without one they won't work. See <a href="webxr-basics.html">previous article</a>
 as to why</strong></p>
-<p>In the <a href="webxr.html">previous article</a> we went over
+<p>In the <a href="webxr-basics.html">previous article</a> we went over
 a very simple VR example using three.js and we discussed
 the various kinds of VR systems.</p>
 <p>The simplest and possibly most common is the Google Cardboard style of VR which
@@ -40,7 +40,7 @@ input.</p>
 user points their head at something for a moment it gets
 selected.</p>
 <p>Let's implement "look to select"! We'll start with
-<a href="webxr.html">an example from the previous article</a>
+<a href="webxr-basics.html">an example from the previous article</a>
 and to do it we'll add the <code class="notranslate" translate="no">PickHelper</code> we made in
 <a href="picking.html">the article on picking</a>. Here it is.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">class PickHelper {
@@ -132,7 +132,7 @@ const camera = new THREE.OrthographicCamera(left, right, top, bottom, near, far)
 left and right.</p>
 <p>Next let's make a 2 color texture. We'll use a <a href="/docs/#api/en/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a>
 which we've used a few <a href="indexed-textures.html">other</a>
-<a href="post-processing-3dlut.html">places</a>.</p>
+places.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeDataTexture(data, width, height) {
   const texture = new THREE.DataTexture(data, width, height, THREE.RGBAFormat);
   texture.minFilter = THREE.NearestFilter;
