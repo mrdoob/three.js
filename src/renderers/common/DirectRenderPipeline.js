@@ -8,6 +8,7 @@ import RenderPipeline from './RenderPipeline.js';
  * material shaders. This avoids the intermediate framebuffer and output pass
  * used by {@link Renderer}, but changes blending and is not compatible with
  * materials that sample the framebuffer, such as transmissive materials.
+ * With the WebGL backend, `antialias` has no effect.
  *
  * ```js
  * const renderPipeline = new DirectRenderPipeline( renderer );
