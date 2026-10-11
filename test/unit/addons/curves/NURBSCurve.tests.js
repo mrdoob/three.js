@@ -1,5 +1,5 @@
 import { NURBSCurve } from '../../../../examples/jsm/curves/NURBSCurve.js';
-import { MathUtils, Vector4 } from 'three';
+import { MathUtils, Vector3, Vector4 } from 'three';
 
 export default QUnit.module( 'Extras', () => {
 
@@ -32,6 +32,41 @@ export default QUnit.module( 'Extras', () => {
 				}
 
 				 _nurbsCurve = new NURBSCurve( nurbsDegree, nurbsKnots, nurbsControlPoints );
+
+			} );
+
+			QUnit.test( 'getTangent respects the knot range', ( assert ) => {
+
+				const knots = [ 0, 0, 0, 1, 2, 3, 3, 3 ];
+				const points = [
+					new Vector4( 0, 0, 0, 1 ),
+					new Vector4( 1, 2, 0, 1 ),
+					new Vector4( 2, 0, 0, 2 ),
+					new Vector4( 3, 3, 0, 1 ),
+					new Vector4( 4, 0, 0, 1 )
+				];
+				const curves = [
+					new NURBSCurve( 2, knots, points ),
+					new NURBSCurve( 2, knots, points, 3, 4 )
+				];
+				const target = new Vector3();
+				const delta = 1e-6;
+
+				for ( const curve of curves ) {
+
+					for ( const t of [ 0, 0.25, 0.5, 0.75, 1 ] ) {
+
+						const before = curve.getPoint( Math.max( 0, t - delta ) );
+						const after = curve.getPoint( Math.min( 1, t + delta ) );
+						const expected = after.sub( before ).normalize();
+						const tangent = curve.getTangent( t, target );
+
+						assert.strictEqual( tangent, target, 'Writes to the optional target.' );
+						assert.ok( tangent.distanceTo( expected ) < 1e-4, `Tangent follows the curve at t=${t}, startKnot=${curve.startKnot}.` );
+
+					}
+
+				}
 
 			} );
 

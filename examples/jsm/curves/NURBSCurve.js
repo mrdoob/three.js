@@ -114,7 +114,7 @@ class NURBSCurve extends Curve {
 
 		const tangent = optionalTarget;
 
-		const u = this.knots[ 0 ] + t * ( this.knots[ this.knots.length - 1 ] - this.knots[ 0 ] );
+		const u = this.knots[ this.startKnot ] + t * ( this.knots[ this.endKnot ] - this.knots[ this.startKnot ] );
 		const ders = NURBSUtils.calcNURBSDerivatives( this.degree, this.knots, this.controlPoints, u, 1 );
 		tangent.copy( ders[ 1 ] ).normalize();
 
