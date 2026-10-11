@@ -2,7 +2,8 @@ import InputNode from './InputNode.js';
 import StackTrace from '../core/StackTrace.js';
 import { objectGroup } from './UniformGroupNode.js';
 import { getConstNodeType } from '../tsl/TSLCore.js';
-import { getValueFromType } from './NodeUtils.js';
+import { getValueFromType, getValueType, hashString } from './NodeUtils.js';
+import { NodeUpdateType } from './constants.js';
 import { warn } from '../../utils.js';
 
 /**
@@ -107,6 +108,33 @@ class UniformNode extends InputNode {
 	getGroup() {
 
 		return this.groupNode;
+
+	}
+
+	/**
+	 * Whether this uniform is keyed by its value type instead of its id, so materials that
+	 * only differ in uniform values share a node build. Each render object then reads the
+	 * values from its own material's uniforms, see {@link NodeMaterial#getUniformNodes}.
+	 *
+	 * @type {boolean}
+	 * @readonly
+	 */
+	get isValueKeyed() {
+
+		return this.constructor === UniformNode && this.groupNode.shared !== true && this.updateType === NodeUpdateType.NONE;
+
+	}
+
+	/**
+	 * Overwritten to key uniforms by their value type instead of their value.
+	 *
+	 * @return {number} The custom cache key.
+	 */
+	customCacheKey() {
+
+		if ( this.isValueKeyed === false ) return this.id;
+
+		return hashString( this.type + ',' + this.nodeType + ',' + getValueType( this.value ) + ',' + this.name + ',' + this.precision );
 
 	}
 

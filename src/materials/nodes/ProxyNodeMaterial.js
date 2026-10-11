@@ -74,6 +74,17 @@ class ProxyNodeMaterial extends Material {
 	}
 
 	/**
+	 * Returns the uniform nodes of the node material, see {@link NodeMaterial#getUniformNodes}.
+	 *
+	 * @return {Array<UniformNode>} The uniform nodes.
+	 */
+	getUniformNodes() {
+
+		return this.nodeMaterial.getUniformNodes();
+
+	}
+
+	/**
 	 * Builds the shader of the node material while keeping this instance
 	 * as `builder.material`.
 	 *

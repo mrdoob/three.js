@@ -455,6 +455,12 @@ class ShaderCallNodeInternal extends Node {
 
 	}
 
+	customCacheKey() {
+
+		return this.shaderNode.buildDependent === false ? super.customCacheKey() : this.id;
+
+	}
+
 	isCacheable( builder ) {
 
 		// A call is an expression unless its body has statements.
@@ -579,6 +585,8 @@ class ShaderCallNodeInternal extends Node {
 
 					} else {
 
+						shaderNode.buildDependent = true;
+
 						value = Reflect.get( target, property, receiver );
 
 					}
@@ -597,6 +605,8 @@ class ShaderCallNodeInternal extends Node {
 
 			const jsFunc = shaderNode.jsFunc;
 			const outputNode = hasParameters || jsFunc.length > 1 ? jsFunc( inputs, secureNodeBuilder ) : jsFunc( secureNodeBuilder );
+
+			if ( shaderNode.buildDependent === null ) shaderNode.buildDependent = false;
 
 			result = nodeObject( outputNode );
 
@@ -820,6 +830,10 @@ class ShaderNodeInternal extends Node {
 		this.global = true;
 
 		this.once = false;
+
+		// whether the function reads the node builder, e.g. the material being built. Unknown
+		// until the first call, then calls of the function are keyed by structure only if false.
+		this.buildDependent = null;
 
 	}
 

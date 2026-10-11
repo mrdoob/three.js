@@ -14,6 +14,9 @@ const _parentBuildStage = {
 
 let _nodeId = 0;
 
+// properties that don't influence the generated code
+const _cacheKeyIgnores = new Set( [ 'id', 'version', 'stackTrace', '_uuid', '_cacheKey', '_cacheKeyVersion' ] );
+
 /**
  * Base class for all nodes.
  *
@@ -476,13 +479,41 @@ class Node extends EventDispatcher {
 	}
 
 	/**
-	 * Generate a custom cache key for this node.
+	 * Generate a custom cache key for this node. By default, nodes are keyed by their type and
+	 * settings so structurally identical node graphs share a single node build. Nodes with update
+	 * callbacks or settings that can't be compared are keyed by their id.
 	 *
 	 * @return {number} The cache key of the node.
 	 */
 	customCacheKey() {
 
-		return this.id;
+		if ( this.updateType !== NodeUpdateType.NONE || this.updateBeforeType !== NodeUpdateType.NONE || this.updateAfterType !== NodeUpdateType.NONE ) return this.id;
+
+		const values = [ hashString( this.type ) ];
+
+		for ( const property of Object.getOwnPropertyNames( this ) ) {
+
+			if ( _cacheKeyIgnores.has( property ) ) continue;
+
+			const value = this[ property ];
+
+			if ( value === null || ( typeof value !== 'object' && typeof value !== 'function' ) ) {
+
+				values.push( hashString( property + ':' + value ) );
+
+			} else if ( typeof value.toArray === 'function' ) {
+
+				values.push( hashString( property + ':' + value.toArray() ) );
+
+			} else if ( property.startsWith( '_' ) === true || isChildNodes( value ) === false ) {
+
+				return this.id;
+
+			}
+
+		}
+
+		return hashArray( values );
 
 	}
 
@@ -1294,5 +1325,18 @@ class Node extends EventDispatcher {
  * @default false
  */
 Node.captureStackTrace = false;
+
+// whether the value only holds child nodes, which are already part of the cache key
+function isChildNodes( value ) {
+
+	if ( value.isNode === true ) return true;
+
+	if ( Array.isArray( value ) === true ) return value.every( child => child && child.isNode === true );
+
+	if ( Object.getPrototypeOf( value ) === Object.prototype ) return Object.values( value ).every( child => child && child.isNode === true );
+
+	return false;
+
+}
 
 export default Node;
