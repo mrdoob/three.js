@@ -143,13 +143,10 @@ class RenderTarget extends EventDispatcher {
 		 */
 		this.textures = [];
 
-		const image = { width: width, height: height, depth: options.depth };
-		const texture = new Texture( image );
-
 		const count = options.count;
 		for ( let i = 0; i < count; i ++ ) {
 
-			this.textures[ i ] = texture.clone();
+			this.textures[ i ] = new Texture( { width: width, height: height, depth: options.depth } );
 			this.textures[ i ].isRenderTargetTexture = true;
 			this.textures[ i ].renderTarget = this;
 
