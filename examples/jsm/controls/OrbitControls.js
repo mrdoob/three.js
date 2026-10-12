@@ -433,6 +433,7 @@ class OrbitControls extends Controls {
 		this._pointerPositions = {};
 
 		this._controlActive = false;
+		this._rootNode = null;
 
 		// event listeners
 
@@ -502,8 +503,8 @@ class OrbitControls extends Controls {
 		this.domElement.addEventListener( 'contextmenu', this._onContextMenu );
 		this.domElement.addEventListener( 'wheel', this._onMouseWheel, { passive: false } );
 
-		const document = this.domElement.getRootNode(); // offscreen canvas compatibility
-		document.addEventListener( 'keydown', this._interceptControlDown, { passive: true, capture: true } );
+		this._rootNode = this.domElement.getRootNode(); // offscreen canvas compatibility
+		this._rootNode.addEventListener( 'keydown', this._interceptControlDown, { passive: true, capture: true } );
 
 		this.domElement.style.touchAction = 'none'; // Disable touch scroll
 
@@ -523,9 +524,13 @@ class OrbitControls extends Controls {
 
 		this.stopListenToKeyEvents();
 
-		const document = this.domElement.getRootNode(); // offscreen canvas compatibility
-		document.removeEventListener( 'keydown', this._interceptControlDown, { capture: true } );
-		document.removeEventListener( 'keyup', this._interceptControlUp, { capture: true } );
+		if ( this._rootNode !== null ) {
+
+			this._rootNode.removeEventListener( 'keydown', this._interceptControlDown, { capture: true } );
+			this._rootNode.removeEventListener( 'keyup', this._interceptControlUp, { capture: true } );
+			this._rootNode = null;
+
+		}
 
 		this._controlActive = false;
 
@@ -1966,9 +1971,7 @@ function interceptControlDown( event ) {
 
 		this._controlActive = true;
 
-		const document = this.domElement.getRootNode(); // offscreen canvas compatibility
-
-		document.addEventListener( 'keyup', this._interceptControlUp, { passive: true, capture: true } );
+		this._rootNode.addEventListener( 'keyup', this._interceptControlUp, { passive: true, capture: true } );
 
 	}
 
@@ -1980,9 +1983,7 @@ function interceptControlUp( event ) {
 
 		this._controlActive = false;
 
-		const document = this.domElement.getRootNode(); // offscreen canvas compatibility
-
-		document.removeEventListener( 'keyup', this._interceptControlUp, { passive: true, capture: true } );
+		this._rootNode.removeEventListener( 'keyup', this._interceptControlUp, { passive: true, capture: true } );
 
 	}
 
