@@ -1,5 +1,5 @@
 import { DataTexture, FloatType, RGBAFormat } from 'three';
-import { EXRExporter, NO_COMPRESSION, ZIPS_COMPRESSION, ZIP_COMPRESSION } from '../../../../examples/jsm/exporters/EXRExporter.js';
+import { EXRExporter, NO_COMPRESSION, RLE_COMPRESSION, ZIPS_COMPRESSION, ZIP_COMPRESSION } from '../../../../examples/jsm/exporters/EXRExporter.js';
 import { EXRLoader } from '../../../../examples/jsm/loaders/EXRLoader.js';
 
 function createTexture( width, height, noise ) {
@@ -30,7 +30,7 @@ export default QUnit.module( 'Addons', () => {
 
 		QUnit.module( 'EXRExporter', () => {
 
-			const compressions = { NO_COMPRESSION, ZIPS_COMPRESSION, ZIP_COMPRESSION };
+			const compressions = { NO_COMPRESSION, RLE_COMPRESSION, ZIPS_COMPRESSION, ZIP_COMPRESSION };
 
 			for ( const name in compressions ) {
 
