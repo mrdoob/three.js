@@ -433,7 +433,6 @@ class OrbitControls extends Controls {
 		this._pointerPositions = {};
 
 		this._controlActive = false;
-		this._rootNode = null;
 
 		// event listeners
 
@@ -503,8 +502,7 @@ class OrbitControls extends Controls {
 		this.domElement.addEventListener( 'contextmenu', this._onContextMenu );
 		this.domElement.addEventListener( 'wheel', this._onMouseWheel, { passive: false } );
 
-		this._rootNode = this.domElement.getRootNode(); // offscreen canvas compatibility
-		this._rootNode.addEventListener( 'keydown', this._interceptControlDown, { passive: true, capture: true } );
+		this.domElement.ownerDocument.addEventListener( 'keydown', this._interceptControlDown, { passive: true, capture: true } );
 
 		this.domElement.style.touchAction = 'none'; // Disable touch scroll
 
@@ -524,13 +522,8 @@ class OrbitControls extends Controls {
 
 		this.stopListenToKeyEvents();
 
-		if ( this._rootNode !== null ) {
-
-			this._rootNode.removeEventListener( 'keydown', this._interceptControlDown, { capture: true } );
-			this._rootNode.removeEventListener( 'keyup', this._interceptControlUp, { capture: true } );
-			this._rootNode = null;
-
-		}
+		this.domElement.ownerDocument.removeEventListener( 'keydown', this._interceptControlDown, { capture: true } );
+		this.domElement.ownerDocument.removeEventListener( 'keyup', this._interceptControlUp, { capture: true } );
 
 		this._controlActive = false;
 
@@ -1971,7 +1964,7 @@ function interceptControlDown( event ) {
 
 		this._controlActive = true;
 
-		this._rootNode.addEventListener( 'keyup', this._interceptControlUp, { passive: true, capture: true } );
+		this.domElement.ownerDocument.addEventListener( 'keyup', this._interceptControlUp, { passive: true, capture: true } );
 
 	}
 
@@ -1983,7 +1976,7 @@ function interceptControlUp( event ) {
 
 		this._controlActive = false;
 
-		this._rootNode.removeEventListener( 'keyup', this._interceptControlUp, { passive: true, capture: true } );
+		this.domElement.ownerDocument.removeEventListener( 'keyup', this._interceptControlUp, { passive: true, capture: true } );
 
 	}
 
