@@ -60,6 +60,20 @@ export default QUnit.module( 'Addons', () => {
 
 			}
 
+			QUnit.test( 'round trip (PIZ_COMPRESSION, 16-bit wavelet)', async ( assert ) => {
+
+				const width = 256, height = 32;
+				const data = new Float32Array( width * height * 4 );
+
+				for ( let i = 0; i < data.length; i ++ ) data[ i ] = 1 + i * 2 ** - 23;
+
+				const texture = new DataTexture( data, width, height, RGBAFormat, FloatType );
+				const result = await roundTrip( texture, PIZ_COMPRESSION );
+
+				assert.deepEqual( Array.from( result.data ), Array.from( data ) );
+
+			} );
+
 		} );
 
 	} );
