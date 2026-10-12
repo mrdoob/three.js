@@ -1,6 +1,6 @@
 import Node from '../core/Node.js';
 import { sub, mul, div, mod } from './OperatorNode.js';
-import { addMethodChaining, nodeObject, nodeProxyIntent, float, vec2, vec3, vec4, Fn } from '../tsl/TSLCore.js';
+import { addMethodChaining, nodeObject, nodeProxyAssignable, float, vec2, vec3, vec4, Fn } from '../tsl/TSLCore.js';
 import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../../constants.js';
 import { error } from '../../utils.js';
 
@@ -474,7 +474,7 @@ export const HALF_PI = /*@__PURE__*/ float( Math.PI * 0.5 );
  * @param {Node | number} x - The parameter.
  * @returns {Node<bool>}
  */
-export const all = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ALL ).setParameterLength( 1 );
+export const all = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.ALL ).setParameterLength( 1 );
 
 /**
  * Returns `true` if any components of `x` are `true`.
@@ -484,7 +484,7 @@ export const all = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ALL ).setPa
  * @param {Node | number} x - The parameter.
  * @returns {Node<bool>}
  */
-export const any = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ANY ).setParameterLength( 1 );
+export const any = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.ANY ).setParameterLength( 1 );
 
 /**
  * Converts a quantity in degrees to radians.
@@ -494,7 +494,7 @@ export const any = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ANY ).setPa
  * @param {Node | number} x - The input in degrees.
  * @returns {Node}
  */
-export const radians = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.RADIANS ).setParameterLength( 1 );
+export const radians = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.RADIANS ).setParameterLength( 1 );
 
 /**
  * Convert a quantity in radians to degrees.
@@ -504,7 +504,7 @@ export const radians = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.RADIANS
  * @param {Node | number} x - The input in radians.
  * @returns {Node}
  */
-export const degrees = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.DEGREES ).setParameterLength( 1 );
+export const degrees = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.DEGREES ).setParameterLength( 1 );
 
 /**
  * Returns the natural exponentiation of the parameter.
@@ -514,7 +514,7 @@ export const degrees = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.DEGREES
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const exp = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.EXP ).setParameterLength( 1 );
+export const exp = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.EXP ).setParameterLength( 1 );
 
 /**
  * Returns 2 raised to the power of the parameter.
@@ -524,7 +524,7 @@ export const exp = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.EXP ).setPa
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const exp2 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.EXP2 ).setParameterLength( 1 );
+export const exp2 = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.EXP2 ).setParameterLength( 1 );
 
 /**
  * Returns the natural logarithm of the parameter.
@@ -534,7 +534,7 @@ export const exp2 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.EXP2 ).set
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const log = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.LOG ).setParameterLength( 1 );
+export const log = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.LOG ).setParameterLength( 1 );
 
 /**
  * Returns the base 2 logarithm of the parameter.
@@ -544,7 +544,7 @@ export const log = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.LOG ).setPa
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const log2 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.LOG2 ).setParameterLength( 1 );
+export const log2 = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.LOG2 ).setParameterLength( 1 );
 
 /**
  * Returns the square root of the parameter.
@@ -554,7 +554,7 @@ export const log2 = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.LOG2 ).set
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const sqrt = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.SQRT ).setParameterLength( 1 );
+export const sqrt = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.SQRT ).setParameterLength( 1 );
 
 /**
  * Returns the inverse of the square root of the parameter.
@@ -564,7 +564,7 @@ export const sqrt = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.SQRT ).set
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const inverseSqrt = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.INVERSE_SQRT ).setParameterLength( 1 );
+export const inverseSqrt = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.INVERSE_SQRT ).setParameterLength( 1 );
 
 /**
  * Finds the nearest integer less than or equal to the parameter.
@@ -574,7 +574,7 @@ export const inverseSqrt = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.INV
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const floor = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.FLOOR ).setParameterLength( 1 );
+export const floor = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.FLOOR ).setParameterLength( 1 );
 
 /**
  * Finds the nearest integer that is greater than or equal to the parameter.
@@ -584,7 +584,7 @@ export const floor = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.FLOOR ).s
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const ceil = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.CEIL ).setParameterLength( 1 );
+export const ceil = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.CEIL ).setParameterLength( 1 );
 
 /**
  * Calculates the unit vector in the same direction as the original vector.
@@ -594,7 +594,7 @@ export const ceil = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.CEIL ).set
  * @param {Node} x - The input vector.
  * @returns {Node}
  */
-export const normalize = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.NORMALIZE ).setParameterLength( 1 );
+export const normalize = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.NORMALIZE ).setParameterLength( 1 );
 
 /**
  * Computes the fractional part of the parameter.
@@ -604,7 +604,7 @@ export const normalize = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.NORMA
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const fract = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.FRACT ).setParameterLength( 1 );
+export const fract = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.FRACT ).setParameterLength( 1 );
 
 /**
  * Returns the sine of the parameter.
@@ -614,7 +614,7 @@ export const fract = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.FRACT ).s
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const sin = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.SIN ).setParameterLength( 1 );
+export const sin = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.SIN ).setParameterLength( 1 );
 
 /**
  * Returns the hyperbolic sine of the parameter.
@@ -624,7 +624,7 @@ export const sin = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.SIN ).setPa
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const sinh = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.SINH ).setParameterLength( 1 );
+export const sinh = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.SINH ).setParameterLength( 1 );
 
 /**
  * Returns the cosine of the parameter.
@@ -634,7 +634,7 @@ export const sinh = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.SINH ).set
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const cos = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.COS ).setParameterLength( 1 );
+export const cos = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.COS ).setParameterLength( 1 );
 
 /**
  * Returns the hyperbolic cosine of the parameter.
@@ -644,7 +644,7 @@ export const cos = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.COS ).setPa
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const cosh = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.COSH ).setParameterLength( 1 );
+export const cosh = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.COSH ).setParameterLength( 1 );
 
 /**
  * Returns the tangent of the parameter.
@@ -654,7 +654,7 @@ export const cosh = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.COSH ).set
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const tan = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.TAN ).setParameterLength( 1 );
+export const tan = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.TAN ).setParameterLength( 1 );
 
 /**
  * Returns the hyperbolic tangent of the parameter.
@@ -664,7 +664,7 @@ export const tan = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.TAN ).setPa
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const tanh = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.TANH ).setParameterLength( 1 );
+export const tanh = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.TANH ).setParameterLength( 1 );
 
 /**
  * Returns the arcsine of the parameter.
@@ -674,7 +674,7 @@ export const tanh = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.TANH ).set
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const asin = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ASIN ).setParameterLength( 1 );
+export const asin = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.ASIN ).setParameterLength( 1 );
 
 /**
  * Returns the inverse hyperbolic sine of the parameter.
@@ -684,7 +684,7 @@ export const asin = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ASIN ).set
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const asinh = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ASINH ).setParameterLength( 1 );
+export const asinh = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.ASINH ).setParameterLength( 1 );
 
 /**
  * Returns the arccosine of the parameter.
@@ -694,7 +694,7 @@ export const asinh = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ASINH ).s
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const acos = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ACOS ).setParameterLength( 1 );
+export const acos = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.ACOS ).setParameterLength( 1 );
 
 /**
  * Returns the inverse hyperbolic cosine of the parameter.
@@ -704,7 +704,7 @@ export const acos = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ACOS ).set
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const acosh = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ACOSH ).setParameterLength( 1 );
+export const acosh = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.ACOSH ).setParameterLength( 1 );
 
 /**
  * Returns the arc-tangent of the parameter.
@@ -716,7 +716,7 @@ export const acosh = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ACOSH ).s
  * @param {?(Node | number)} x - The x parameter.
  * @returns {Node}
  */
-export const atan = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ATAN ).setParameterLength( 1, 2 );
+export const atan = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.ATAN ).setParameterLength( 1, 2 );
 
 /**
  * Returns the inverse hyperbolic tangent of the parameter.
@@ -726,7 +726,7 @@ export const atan = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ATAN ).set
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const atanh = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ATANH ).setParameterLength( 1 );
+export const atanh = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.ATANH ).setParameterLength( 1 );
 
 /**
  * Returns the absolute value of the parameter.
@@ -736,7 +736,7 @@ export const atanh = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ATANH ).s
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const abs = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ABS ).setParameterLength( 1 );
+export const abs = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.ABS ).setParameterLength( 1 );
 
 /**
  * Extracts the sign of the parameter.
@@ -746,7 +746,7 @@ export const abs = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ABS ).setPa
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const sign = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.SIGN ).setParameterLength( 1 );
+export const sign = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.SIGN ).setParameterLength( 1 );
 
 /**
  * Calculates the length of a vector.
@@ -756,7 +756,7 @@ export const sign = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.SIGN ).set
  * @param {Node} x - The parameter.
  * @returns {Node<float>}
  */
-export const length = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.LENGTH ).setParameterLength( 1 );
+export const length = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.LENGTH ).setParameterLength( 1 );
 
 /**
  * Negates the value of the parameter (-x).
@@ -766,7 +766,7 @@ export const length = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.LENGTH )
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const negate = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.NEGATE ).setParameterLength( 1 );
+export const negate = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.NEGATE ).setParameterLength( 1 );
 
 /**
  * Return `1` minus the parameter.
@@ -776,7 +776,7 @@ export const negate = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.NEGATE )
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const oneMinus = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ONE_MINUS ).setParameterLength( 1 );
+export const oneMinus = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.ONE_MINUS ).setParameterLength( 1 );
 
 /**
  * Returns the partial derivative of the parameter with respect to x.
@@ -786,7 +786,7 @@ export const oneMinus = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ONE_MI
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const dFdx = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.DFDX ).setParameterLength( 1 );
+export const dFdx = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.DFDX ).setParameterLength( 1 );
 
 /**
  * Returns the partial derivative of the parameter with respect to y.
@@ -796,7 +796,7 @@ export const dFdx = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.DFDX ).set
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const dFdy = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.DFDY ).setParameterLength( 1 );
+export const dFdy = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.DFDY ).setParameterLength( 1 );
 
 /**
  * Rounds the parameter to the nearest integer.
@@ -806,7 +806,7 @@ export const dFdy = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.DFDY ).set
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const round = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ROUND ).setParameterLength( 1 );
+export const round = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.ROUND ).setParameterLength( 1 );
 
 /**
  * Returns the reciprocal of the parameter `(1/x)`.
@@ -816,7 +816,7 @@ export const round = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.ROUND ).s
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const reciprocal = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.RECIPROCAL ).setParameterLength( 1 );
+export const reciprocal = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.RECIPROCAL ).setParameterLength( 1 );
 
 /**
  * Truncates the parameter, removing the fractional part.
@@ -826,7 +826,7 @@ export const reciprocal = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.RECI
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const trunc = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.TRUNC ).setParameterLength( 1 );
+export const trunc = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.TRUNC ).setParameterLength( 1 );
 
 /**
  * Returns the sum of the absolute derivatives in x and y.
@@ -836,7 +836,7 @@ export const trunc = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.TRUNC ).s
  * @param {Node | number} x - The parameter.
  * @returns {Node}
  */
-export const fwidth = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.FWIDTH ).setParameterLength( 1 );
+export const fwidth = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.FWIDTH ).setParameterLength( 1 );
 
 /**
  * Returns the transpose of a matrix.
@@ -846,7 +846,7 @@ export const fwidth = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.FWIDTH )
  * @param {Node<mat2|mat3|mat4>} x - The parameter.
  * @returns {Node}
  */
-export const transpose = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.TRANSPOSE ).setParameterLength( 1 );
+export const transpose = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.TRANSPOSE ).setParameterLength( 1 );
 
 /**
  * Returns the determinant of a matrix.
@@ -856,7 +856,7 @@ export const transpose = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.TRANS
  * @param {Node<mat2|mat3|mat4>} x - The parameter.
  * @returns {Node<float>}
  */
-export const determinant = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.DETERMINANT ).setParameterLength( 1 );
+export const determinant = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.DETERMINANT ).setParameterLength( 1 );
 
 /**
  * Returns the inverse of a matrix.
@@ -866,7 +866,7 @@ export const determinant = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.DET
  * @param {Node<mat2|mat3|mat4>} x - The parameter.
  * @returns {Node<mat2|mat3|mat4>}
  */
-export const inverse = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.INVERSE ).setParameterLength( 1 );
+export const inverse = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.INVERSE ).setParameterLength( 1 );
 
 // 2 inputs
 
@@ -878,7 +878,7 @@ export const inverse = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.INVERSE
  * @param {...(Node | number)} values - The values to compare.
  * @returns {Node}
  */
-export const min = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.MIN ).setParameterLength( 2, Infinity );
+export const min = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.MIN ).setParameterLength( 2, Infinity );
 
 /**
  * Returns the greatest of the given values.
@@ -888,7 +888,7 @@ export const min = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.MIN ).setPa
  * @param {...(Node | number)} values - The values to compare.
  * @returns {Node}
  */
-export const max = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.MAX ).setParameterLength( 2, Infinity );
+export const max = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.MAX ).setParameterLength( 2, Infinity );
 
 /**
  * Generate a step function by comparing two values.
@@ -899,7 +899,7 @@ export const max = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.MAX ).setPa
  * @param {Node | number} y - The x parameter.
  * @returns {Node}
  */
-export const step = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.STEP ).setParameterLength( 2 );
+export const step = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.STEP ).setParameterLength( 2 );
 
 /**
  * Calculates the reflection direction for an incident vector.
@@ -910,7 +910,7 @@ export const step = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.STEP ).set
  * @param {Node<vec2|vec3|vec4>} N - The normal vector.
  * @returns {Node<vec2|vec3|vec4>}
  */
-export const reflect = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.REFLECT ).setParameterLength( 2 );
+export const reflect = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.REFLECT ).setParameterLength( 2 );
 
 /**
  * Calculates the distance between two points.
@@ -921,7 +921,7 @@ export const reflect = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.REFLECT
  * @param {Node<vec2|vec3|vec4>} y - The second point.
  * @returns {Node<float>}
  */
-export const distance = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.DISTANCE ).setParameterLength( 2 );
+export const distance = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.DISTANCE ).setParameterLength( 2 );
 
 /**
  * Calculates the absolute difference between two values.
@@ -932,7 +932,7 @@ export const distance = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.DISTAN
  * @param {Node | number} y - The second parameter.
  * @returns {Node}
  */
-export const difference = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.DIFFERENCE ).setParameterLength( 2 );
+export const difference = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.DIFFERENCE ).setParameterLength( 2 );
 
 /**
  * Calculates the dot product of two vectors.
@@ -943,7 +943,7 @@ export const difference = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.DIFF
  * @param {Node<vec2|vec3|vec4>} y - The second vector.
  * @returns {Node<float>}
  */
-export const dot = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.DOT ).setParameterLength( 2 );
+export const dot = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.DOT ).setParameterLength( 2 );
 
 /**
  * Calculates the cross product of two vectors.
@@ -954,7 +954,7 @@ export const dot = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.DOT ).setPa
  * @param {Node<vec2|vec3>} y - The second vector.
  * @returns {Node<float|vec3>}
  */
-export const cross = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.CROSS ).setParameterLength( 2 );
+export const cross = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.CROSS ).setParameterLength( 2 );
 
 /**
  * Return the value of the first parameter raised to the power of the second one.
@@ -965,7 +965,7 @@ export const cross = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.CROSS ).s
  * @param {Node | number} y - The second parameter.
  * @returns {Node}
  */
-export const pow = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.POW ).setParameterLength( 2 );
+export const pow = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.POW ).setParameterLength( 2 );
 
 /**
  * Returns the square of the parameter.
@@ -1006,7 +1006,7 @@ export const pow4 = ( x ) => mul( x, x, x, x );
  * @param {Node<mat2|mat3|mat4>} matrix - The transformation matrix.
  * @returns {Node}
  */
-export const transformDirection = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.TRANSFORM_DIRECTION ).setParameterLength( 2 );
+export const transformDirection = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.TRANSFORM_DIRECTION ).setParameterLength( 2 );
 
 /**
  * Transforms a normal vector by the view matrix and then normalizes the result.
@@ -1066,7 +1066,7 @@ export const lengthSq = ( a ) => dot( a, a );
  * @param {Node | number} t - The interpolation value.
  * @returns {Node}
  */
-export const mix = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.MIX ).setParameterLength( 3 );
+export const mix = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.MIX ).setParameterLength( 3 );
 
 /**
  * Constrains a value to lie between two further values.
@@ -1100,7 +1100,7 @@ export const saturate = ( value ) => clamp( value );
  * @param {Node<float>} eta - The ratio of indices of refraction.
  * @returns {Node<vec2|vec3|vec4>}
  */
-export const refract = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.REFRACT ).setParameterLength( 3 );
+export const refract = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.REFRACT ).setParameterLength( 3 );
 
 /**
  * Performs a Hermite interpolation between two values.
@@ -1112,7 +1112,7 @@ export const refract = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.REFRACT
  * @param {Node | number} x - The source value for interpolation.
  * @returns {Node}
  */
-export const smoothstep = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.SMOOTHSTEP ).setParameterLength( 3 );
+export const smoothstep = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.SMOOTHSTEP ).setParameterLength( 3 );
 
 /**
  * Returns a vector pointing in the same direction as another.
@@ -1124,7 +1124,7 @@ export const smoothstep = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.SMOO
  * @param {Node<vec2|vec3|vec4>} Nref - The reference vector.
  * @returns {Node<vec2|vec3|vec4>}
  */
-export const faceForward = /*@__PURE__*/ nodeProxyIntent( MathNode, MathNode.FACEFORWARD ).setParameterLength( 3 );
+export const faceForward = /*@__PURE__*/ nodeProxyAssignable( MathNode, MathNode.FACEFORWARD ).setParameterLength( 3 );
 
 /**
  * Returns a random value for the given uv.

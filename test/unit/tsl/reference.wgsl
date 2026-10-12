@@ -278,7 +278,7 @@ for ( var i : i32 = 0; i < 2; i ++ ) {
 
 ( nodeVar0 + externalValue )
 
-// variable intent scope
+// assignable scope
 
 var explicitGlobal : f32;
 
@@ -288,6 +288,20 @@ nodeVar0 = ( nodeVar0 + explicitGlobal );
 explicitGlobal = ( explicitGlobal + nodeVar0 );
 
 ( explicitGlobal + nodeVar0 )
+
+// assignable shared constants
+
+var nodeVar0 : f32 = 1.0;
+nodeVar0 = 2.0;
+
+vec3<f32>( nodeVar0, 1.0, 1.0 )
+
+// assignable existing assignment
+
+var nodeVar0 : f32 = 1.0;
+nodeVar0 = 2.0;
+
+nodeVar0
 
 // comparison and logic
 

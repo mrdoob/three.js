@@ -1,6 +1,6 @@
 import Node from './Node.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
-import { error, warnOnce } from '../../utils.js';
+import { error } from '../../utils.js';
 
 /**
  * Class for representing shader variables as nodes. Variables are created from
@@ -83,12 +83,12 @@ class VarNode extends Node {
 		this.parents = true;
 
 		/**
-		 * This flag is used to indicate that this node is used for intent.
+		 * Whether this node can be generated as an expression until it is assigned.
 		 *
 		 * @type {boolean}
 		 * @default false
 		 */
-		this.intent = false;
+		this.assignable = false;
 
 	}
 
@@ -99,33 +99,30 @@ class VarNode extends Node {
 	}
 
 	/**
-	 * Sets the intent flag for this node.
+	 * Sets the assignable flag for this node.
 	 *
-	 * This flag is used to indicate that this node is used for intent
-	 * and should not be built directly. Instead, it is used to indicate that
-	 * the node should be treated as a variable intent.
+	 * An assignable node is generated as an expression until it is assigned,
+	 * at which point it is declared as a variable.
 	 *
-	 * It's useful for assigning variables without needing creating a new variable node.
-	 *
-	 * @param {boolean} value - The value to set for the intent flag.
+	 * @param {boolean} value - The value to set for the assignable flag.
 	 * @returns {VarNode} This node.
 	 */
-	setIntent( value ) {
+	setAssignable( value ) {
 
-		this.intent = value;
+		this.assignable = value;
 
 		return this;
 
 	}
 
 	/**
-	 * Returns the intent flag of this node.
+	 * Returns the assignable flag of this node.
 	 *
-	 * @return {boolean} The intent flag.
+	 * @return {boolean} The assignable flag.
 	 */
-	getIntent() {
+	getAssignable() {
 
-		return this.intent;
+		return this.assignable;
 
 	}
 
@@ -153,7 +150,7 @@ class VarNode extends Node {
 
 	}
 
-	_declaresIntent() {
+	_declaresAssignable() {
 
 		return false;
 
@@ -171,10 +168,10 @@ class VarNode extends Node {
 
 		const data = builder.getDataFromNode( this );
 
-		this._updateIntent( builder, data, this.node );
+		this._updateAssignable( builder, data, this.node );
 
-		// An intent that is not assigned is just its value.
-		if ( this.intent && data.forceDeclaration !== true && data.assign !== true ) {
+		// An assignable node that is not assigned is just its value.
+		if ( this.assignable && data.forceDeclaration !== true && data.assign !== true ) {
 
 			return this.node.build( builder, output );
 
@@ -192,7 +189,7 @@ class VarNode extends Node {
 
 		if ( nodeType == 'void' ) {
 
-			if ( this.isIntent( builder ) !== true ) {
+			if ( this.isAssignable( builder ) !== true ) {
 
 				error( 'TSL: ".toVar()" can not be used with void type.', this.stackTrace );
 
@@ -207,7 +204,7 @@ class VarNode extends Node {
 		const vectorType = builder.getVectorType( nodeType );
 		const snippet = node.build( builder, vectorType );
 
-		const nodeVar = builder.getVarFromNode( this, name, vectorType, undefined, readOnly, this.intent );
+		const nodeVar = builder.getVarFromNode( this, name, vectorType, undefined, readOnly, this.assignable );
 
 		const propertyName = builder.getPropertyName( nodeVar );
 
@@ -270,28 +267,7 @@ export const Var = ( node, name = null ) => createVar( node, name ).toStack();
  */
 export const Const = ( node, name = null ) => createVar( node, name, true ).toStack();
 
-//
-//
-
-/**
- * TSL function for creating a var intent node.
- *
- * @tsl
- * @function
- * @deprecated since r187. Use {@link Node#toIntent} instead.
- * @param {Node} node - The node for which a variable should be created.
- * @returns {VarNode}
- */
-export const VarIntent = ( node ) => { // @deprecated r187
-
-	warnOnce( 'TSL: "VarIntent()" and ".toVarIntent()" have been deprecated. Use ".toIntent()" instead.' );
-
-	return createVar( node ).setIntent( true ).toStack();
-
-};
-
 // Method chaining
 
 addMethodChaining( 'toVar', Var );
 addMethodChaining( 'toConst', Const );
-addMethodChaining( 'toVarIntent', VarIntent );

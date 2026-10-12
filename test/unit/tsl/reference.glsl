@@ -262,7 +262,7 @@ for ( int i = 0; i < 2; i ++ ) {
 
 ( nodeVar0 + externalValue )
 
-// variable intent scope
+// assignable scope
 
 float explicitGlobal;
 explicitGlobal = 1.0;
@@ -271,6 +271,20 @@ nodeVar0 = ( nodeVar0 + explicitGlobal );
 explicitGlobal = ( explicitGlobal + nodeVar0 );
 
 ( explicitGlobal + nodeVar0 )
+
+// assignable shared constants
+
+float nodeVar0 = 1.0;
+nodeVar0 = 2.0;
+
+vec3( nodeVar0, 1.0, 1.0 )
+
+// assignable existing assignment
+
+float nodeVar0 = 1.0;
+nodeVar0 = 2.0;
+
+nodeVar0
 
 // comparison and logic
 

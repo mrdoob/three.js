@@ -104,13 +104,13 @@ class Node extends EventDispatcher {
 		this.parents = false;
 
 		/**
-		 * Whether this node is a variable intent. An intent is generated as an expression,
+		 * Whether this node can be assigned. It is generated as an expression,
 		 * unless it is assigned, in which case it is declared as a variable where it was created.
 		 *
 		 * @type {boolean}
 		 * @default false
 		 */
-		this.intent = false;
+		this.assignable = false;
 
 		/**
 		 * This flag can be used for type testing.
@@ -190,33 +190,33 @@ class Node extends EventDispatcher {
 	}
 
 	/**
-	 * Turns this node into a variable intent and adds it to the current stack,
+	 * Makes this node assignable and adds it to the current stack,
 	 * so it can be declared where it was created if it is assigned later.
-	 * Only use it with nodes that are not shared, see {@link Node#intent}.
+	 * Only use it with nodes that are not shared, see {@link Node#assignable}.
 	 *
 	 * @return {Node} A reference to this node.
 	 */
-	toIntent() {
+	toAssignable() {
 
-		this.intent = true;
+		this.assignable = true;
 
 		return this.toStack();
 
 	}
 
 	/**
-	 * Checks if this node is used as a variable intent.
+	 * Checks if this node is assignable without a forced declaration.
 	 *
 	 * @param {NodeBuilder} builder - The node builder.
-	 * @returns {boolean} Whether this node is used as a variable intent.
+	 * @returns {boolean} Whether this node is assignable without a forced declaration.
 	 */
-	isIntent( builder ) {
+	isAssignable( builder ) {
 
 		const data = builder.getDataFromNode( this );
 
 		if ( data.forceDeclaration === true ) return false;
 
-		return this.intent;
+		return this.assignable;
 
 	}
 
@@ -235,15 +235,15 @@ class Node extends EventDispatcher {
 	}
 
 	/**
-	 * Declares the intent where it is generated if it is created in a block, and
+	 * Declares the assignable node where it is generated if it is created in a block, and
 	 * decides if a value that cannot be cached must be evaluated once at its declaration.
 	 *
 	 * @private
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @param {Object} data - The node data.
-	 * @param {Node} [valueNode=this] - The node that defines the value of the intent.
+	 * @param {Node} [valueNode=this] - The node that defines the value of the assignable node.
 	 */
-	_updateIntent( builder, data, valueNode = this ) {
+	_updateAssignable( builder, data, valueNode = this ) {
 
 		if ( data.stack === undefined && builder.buildStage === 'setup' ) {
 
@@ -254,7 +254,7 @@ class Node extends EventDispatcher {
 
 			}
 
-		} else if ( this.intent === true && builder.context.nodeLoop && builder.buildStage === 'analyze' ) {
+		} else if ( this.assignable === true && builder.context.nodeLoop && builder.buildStage === 'analyze' ) {
 
 			if ( valueNode.isCacheable( builder ) === false && builder.isDeterministic( valueNode ) === false ) {
 
@@ -272,13 +272,13 @@ class Node extends EventDispatcher {
 	}
 
 	/**
-	 * Whether `build()` declares this node as a variable if its intent is assigned.
-	 * Nodes that wrap the value of an intent, like {@link VarNode}, declare it themselves.
+	 * Whether `build()` declares this assignable node as a variable when it is assigned.
+	 * Nodes that wrap an assignable value, like {@link VarNode}, declare it themselves.
 	 *
 	 * @private
-	 * @return {boolean} Whether `build()` declares the intent.
+	 * @return {boolean} Whether `build()` declares the assignable node.
 	 */
-	_declaresIntent() {
+	_declaresAssignable() {
 
 		return true;
 
@@ -310,13 +310,13 @@ class Node extends EventDispatcher {
 	}
 
 	/**
-	 * Whether this intent must be declared as a variable, because it is assigned
+	 * Whether this assignable node must be declared as a variable, because it is assigned
 	 * or must be evaluated once at its declaration.
 	 *
 	 * @private
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @param {Object} nodeData - The node data.
-	 * @return {boolean} Whether the intent is a variable.
+	 * @return {boolean} Whether the assignable node is a variable.
 	 */
 	_isVariable( builder, nodeData ) {
 
@@ -325,7 +325,7 @@ class Node extends EventDispatcher {
 	}
 
 	/**
-	 * Generates an intent that is a variable. The variable is declared the first
+	 * Generates an assignable node as a variable. The variable is declared the first
 	 * time it is generated, which is its stack position, and then referenced by name.
 	 *
 	 * @private
@@ -1129,7 +1129,7 @@ class Node extends EventDispatcher {
 
 		const nodeData = builder.getDataFromNode( this );
 
-		if ( this.intent === true && this._declaresIntent() ) this._updateIntent( builder, nodeData );
+		if ( this.assignable === true && this._declaresAssignable() ) this._updateAssignable( builder, nodeData );
 
 		nodeData.buildStages = nodeData.buildStages || { setup: false, analyze: false, generate: false };
 		nodeData.buildStages[ builder.buildStage ] = true;
@@ -1226,7 +1226,7 @@ class Node extends EventDispatcher {
 			const cacheResult = allowedCache && type !== 'void' && output !== 'void' && nodeData.usageCount > 1;
 			const generateOutput = cacheResult ? type : output;
 
-			if ( this.intent === true && this._declaresIntent() && this._isVariable( builder, nodeData ) ) {
+			if ( this.assignable === true && this._declaresAssignable() && this._isVariable( builder, nodeData ) ) {
 
 				result = this._buildVariable( builder, nodeData, output );
 

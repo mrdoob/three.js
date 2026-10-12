@@ -9,7 +9,7 @@ import ConstNode from '../core/ConstNode.js';
 import MemberNode from '../utils/MemberNode.js';
 import StackTrace from '../core/StackTrace.js';
 import { getValueFromType, getValueType, isArrayAsParameter } from '../core/NodeUtils.js';
-import { warn, warnOnce, error } from '../../utils.js';
+import { warn, error } from '../../utils.js';
 
 let currentStack = null;
 
@@ -82,12 +82,6 @@ Node.prototype.assign = function ( ...params ) {
 		return this.addToStack( nodeElement( ...params ) );
 
 	}
-
-};
-
-Node.prototype.toVarIntent = function () {
-
-	return this;
 
 };
 
@@ -347,9 +341,9 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, setti
 
 			Object.assign( node, settings );
 
-			if ( settings.intent === true ) {
+			if ( settings.assignable === true ) {
 
-				node = node.toIntent();
+				node = node.toAssignable();
 
 			}
 
@@ -652,7 +646,7 @@ class ShaderCallNodeInternal extends Node {
 
 	build( builder, output = null ) {
 
-		// The call does not use Node.build(), so it handles shared and overridden nodes and its intent here.
+		// The call does not use Node.build(), so it handles shared and overridden nodes and assignable state here.
 		const refNode = this.getShared( builder );
 
 		if ( this !== refNode ) {
@@ -666,9 +660,9 @@ class ShaderCallNodeInternal extends Node {
 		const buildStage = builder.getBuildStage();
 		const properties = builder.getNodeProperties( this );
 
-		const nodeData = this.intent === true ? builder.getDataFromNode( this ) : null;
+		const nodeData = this.assignable === true ? builder.getDataFromNode( this ) : null;
 
-		if ( nodeData !== null ) this._updateIntent( builder, nodeData );
+		if ( nodeData !== null ) this._updateAssignable( builder, nodeData );
 
 		const subBuildOutput = builder.getSubBuildOutput( this );
 		const outputNode = this.getOutputNode( builder );
@@ -984,7 +978,7 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 			const cached = cacheMap.get( params[ 0 ] );
 
-			return new ConstNode( cached.value, cached.nodeType ).toIntent();
+			return new ConstNode( cached.value, cached.nodeType ).toAssignable();
 
 		}
 
@@ -996,19 +990,19 @@ const ConvertType = function ( type, cacheMap = null ) {
 			if ( node.nodeType === type ) {
 
 				// A node given by the user or a shared constant must not become the variable itself.
-				if ( node === param ) return new ConvertNode( node, type ).toIntent();
-				if ( constNodesCacheMap.get( param ) === node ) return new ConstNode( node.value, node.nodeType ).toIntent();
+				if ( node === param ) return new ConvertNode( node, type ).toAssignable();
+				if ( constNodesCacheMap.get( param ) === node ) return new ConstNode( node.value, node.nodeType ).toAssignable();
 
-				return node.toIntent();
+				return node.toAssignable();
 
 			}
 
-			return new ConvertNode( node, type ).toIntent();
+			return new ConvertNode( node, type ).toAssignable();
 
 		}
 
 		const nodes = params.map( param => getConstNode( param ) );
-		return new JoinNode( nodes, type ).toIntent();
+		return new JoinNode( nodes, type ).toAssignable();
 
 	};
 
@@ -1049,11 +1043,20 @@ export function ShaderNode( jsFunc, nodeType ) {
 }
 
 export const nodeObject = ( val, altType = null ) => /* new */ ShaderNodeObject( val, altType );
-export const nodeObjectIntent = ( val, altType = null ) => { // @deprecated r187
+export const nodeObjectAssignable = ( val, altType = null ) => {
 
-	warnOnce( 'TSL: "nodeObjectIntent()" has been deprecated. Use "nodeObject().toIntent()" instead.' );
+	let node = nodeObject( val, altType );
 
-	return nodeObject( val, altType ).toVarIntent();
+	// Shared constants need their own assignable node.
+	if ( node.isConstNode === true && constNodesCacheMap.get( node.value ) === node ) {
+
+		const copy = new ConstNode( node.value, node.nodeType );
+		copy.isWeak = node.isWeak;
+		node = copy;
+
+	}
+
+	return node.toAssignable();
 
 };
 
@@ -1061,7 +1064,7 @@ export const nodeObjects = ( val, altType = null ) => new ShaderNodeObjects( val
 export const nodeArray = ( val, altType = null ) => new ShaderNodeArray( val, altType );
 export const nodeProxy = ( NodeClass, scope = null, factor = null, settings = null ) => new ShaderNodeProxy( NodeClass, scope, factor, settings );
 export const nodeImmutable = ( NodeClass, ...params ) => new ShaderNodeImmutable( NodeClass, ...params );
-export const nodeProxyIntent = ( NodeClass, scope = null, factor = null, settings = {} ) => new ShaderNodeProxy( NodeClass, scope, factor, { ...settings, intent: true } );
+export const nodeProxyAssignable = ( NodeClass, scope = null, factor = null, settings = {} ) => new ShaderNodeProxy( NodeClass, scope, factor, { ...settings, assignable: true } );
 
 export const nodeProxyConstructor = ( constructorFunction, nodeInstance ) => {
 
@@ -1181,7 +1184,7 @@ class FnNode extends Node {
 		// A call without a return value is a statement.
 		if ( this.shaderNode.nodeType === 'void' ) return fnCall.toStack();
 
-		return fnCall.toIntent();
+		return fnCall.toAssignable();
 
 	}
 

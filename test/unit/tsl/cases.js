@@ -211,7 +211,7 @@ export const cases = {
 
 	},
 
-	variableIntentScope: () => Fn( () => {
+	assignableScope: () => Fn( () => {
 
 		const explicit = float( 1 ).toVar( 'explicitGlobal' );
 		const inferred = float( 2 );
@@ -220,6 +220,28 @@ export const cases = {
 		explicit.addAssign( inferred );
 
 		return explicit.add( inferred );
+
+	} )(),
+
+	assignableSharedConstants: () => Fn( () => {
+
+		const shared = float( 1 );
+		const first = float( shared );
+		const second = float( shared );
+
+		first.assign( 2 );
+
+		return vec3( first, second, shared );
+
+	} )(),
+
+	assignableExistingAssignment: () => Fn( () => {
+
+		const value = float( 1 );
+
+		value.assign( 2 );
+
+		return value;
 
 	} )(),
 

@@ -5,17 +5,17 @@ import { ShaderNode, nodeProxy, getCurrentStack, setCurrentStack, nodeObject } f
 import { error } from '../../utils.js';
 
 /**
- * Whether the given node is a variable intent that is not assigned. It is just
+ * Whether the given node is assignable but has not been assigned. It is just
  * an expression, which is generated where it is used instead of in the stack.
  *
  * @private
  * @param {NodeBuilder} builder - The current node builder.
  * @param {Node} node - The node to check.
- * @return {boolean} Whether the node is an expression intent.
+ * @return {boolean} Whether the assignable node can be generated as an expression.
  */
-const isExpressionIntent = ( builder, node ) => {
+const isAssignableExpression = ( builder, node ) => {
 
-	if ( node.intent !== true ) return false;
+	if ( node.assignable !== true ) return false;
 
 	const data = builder.getDataFromNode( node );
 
@@ -353,7 +353,7 @@ class StackNode extends Node {
 
 		for ( const childNode of this.getChildren() ) {
 
-			if ( isExpressionIntent( builder, childNode ) ) continue;
+			if ( isAssignableExpression( builder, childNode ) ) continue;
 
 			nodeProperties[ 'node' + index ++ ] = childNode;
 
@@ -384,7 +384,7 @@ class StackNode extends Node {
 
 			this._currentNode = node;
 
-			if ( isExpressionIntent( builder, node ) ) continue;
+			if ( isAssignableExpression( builder, node ) ) continue;
 
 			if ( buildStage === 'setup' ) {
 

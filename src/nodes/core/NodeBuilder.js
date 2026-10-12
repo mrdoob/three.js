@@ -2395,7 +2395,7 @@ class NodeBuilder {
 	 */
 	isDeterministic( node ) {
 
-		if ( node.isVarNode && node.intent ) {
+		if ( node.isVarNode && node.assignable ) {
 
 			node = node.node;
 
