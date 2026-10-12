@@ -1035,3 +1035,288 @@ float fn0 ( float value ) {
 }
 
 fn0( 3.0 )
+
+// layout local variables
+
+float fn0 ( float value ) {
+
+	float nodeVar0;
+
+	nodeVar0 = value;
+	nodeVar0 = ( ( nodeVar0 * nodeVar0 ) * ( 3.0 - ( nodeVar0 * 2.0 ) ) );
+
+	return nodeVar0;
+
+}
+
+fn0( nodeVarying0.x )
+
+// layout conditional
+
+float fn0 ( float value ) {
+
+	float nodeVar0;
+
+	nodeVar0 = value;
+
+	if ( ( nodeVar0 > 0.5 ) ) {
+
+		nodeVar0 = 0.5;
+
+	} else {
+
+		nodeVar0 = ( nodeVar0 * 2.0 );
+
+	}
+
+	return nodeVar0;
+
+}
+
+fn0( nodeVarying0.x )
+
+// layout loop
+
+float fn0 ( int count ) {
+
+	float nodeVar0;
+
+	nodeVar0 = 0.0;
+
+	for ( int i = 0; i < count; i ++ ) {
+
+		nodeVar0 = ( nodeVar0 + float( i ) );
+
+	}
+
+	return nodeVar0;
+
+}
+
+fn0( 4 )
+
+// layout inside loop
+
+float fn0 ( float value ) {
+
+	return ( value * value );
+
+}
+
+float nodeVar0;
+nodeVar0 = 0.0;
+
+for ( int i = 0; i < 3; i ++ ) {
+
+	nodeVar0 = ( nodeVar0 + fn0( float( i ) ) );
+
+}
+
+nodeVar0
+
+// layout nested calls
+
+float fn0 ( float value ) {
+
+	return ( value * value );
+
+}
+
+float fn1 ( float a, float b ) {
+
+	return ( fn0( a ) + fn0( b ) );
+
+}
+
+float fn2 ( vec2 v ) {
+
+	return fn1( v.x, v.y );
+
+}
+
+( ( fn2( nodeVarying0 ) + fn1( 1.0, 2.0 ) ) + fn0( 3.0 ) )
+
+// layout shared include
+
+float fn0 ( float value ) {
+
+	return ( value * 0.5 );
+
+}
+
+float fn1 ( float value ) {
+
+	return ( fn0( value ) + fn0( ( value + 1.0 ) ) );
+
+}
+
+float fn2 ( float value ) {
+
+	return ( fn0( value ) - 1.0 );
+
+}
+
+( fn1( nodeVarying0.x ) + fn2( nodeVarying0.y ) )
+
+// layout called twice
+
+vec2 fn0 ( vec2 value, float factor ) {
+
+	return ( value * vec2( factor ) );
+
+}
+
+( fn0( nodeVarying0, 2.0 ) + fn0( nodeVarying0.yx, 0.5 ) )
+
+// layout input conversion
+
+float fn0 ( vec3 v ) {
+
+	return length( v );
+
+}
+
+( ( fn0( vec3( 2.0 ) ) + fn0( vec4( 1.0, 2.0, 3.0, 4.0 ).xyz ) ) + fn0( vec3( float( 1 ) ) ) )
+
+// layout default parameter
+
+float fn0 ( float value, float factor ) {
+
+	return ( value * factor );
+
+}
+
+( fn0( nodeVarying0.x, 2.0 ) + fn0( nodeVarying0.y, 3.0 ) )
+
+// layout default object parameter
+
+float fn0 ( float value, float factor ) {
+
+	return ( value * factor );
+
+}
+
+( fn0( nodeVarying0.x, 2.0 ) + fn0( nodeVarying0.y, 3.0 ) )
+
+// layout default builtin value
+
+vec2 fn0 ( vec2 coord, vec2 offset ) {
+
+	return ( coord + offset );
+
+}
+
+( fn0( nodeVarying0, vec2( 0.5, 0.5 ) ) + fn0( vec2( 1.0, 1.0 ), vec2( 0.5, 0.5 ) ) )
+
+// layout default shared variable
+
+float fn0 ( vec3 value, vec3 weights ) {
+
+	return dot( value, weights );
+
+}
+
+vec3 sharedWeights;
+sharedWeights = vec3( 0.2, 0.7, 0.1 );
+
+( fn0( vec3( nodeVarying0, 1.0 ), sharedWeights ) + fn0( vec3( 1.0, 1.0, 1.0 ), sharedWeights ) )
+
+// layout default depends on parameter
+
+float fn0 ( float a, float b ) {
+
+	return ( ( a + b ) * 0.5 );
+
+}
+
+( ( ( nodeVarying0.x + ( nodeVarying0.x * 2.0 ) ) * 0.5 ) + fn0( nodeVarying0.x, 1.0 ) )
+
+// layout default missing middle
+
+float fn0 ( float a, float weight, float b ) {
+
+	return ( ( a + b ) * weight );
+
+}
+
+fn0( nodeVarying0.x, 0.5, nodeVarying0.y )
+
+// layout default null
+
+float fn0 ( float value, float factor ) {
+
+	return ( value * factor );
+
+}
+
+( nodeVarying0.x + fn0( nodeVarying0.x, 3.0 ) )
+
+// layout once default parameter
+
+( nodeVarying0.x * 2.0 )
+
+// layout color adjustment defaults
+
+vec3 fn0 ( vec3 color, float adjustment, vec3 luminanceCoefficients ) {
+
+	return max( mix( vec3( dot( color, luminanceCoefficients ) ), color, adjustment ), 0.0 );
+
+}
+
+vec3 fn1 ( vec3 color, float adjustment ) {
+
+	float nodeConst0 = cos( adjustment );
+
+	return max( ( ( color * vec3( nodeConst0 ) ) + ( ( cross( vec3( 0.57735, 0.57735, 0.57735 ), color ) * vec3( sin( adjustment ) ) ) + ( vec3( 0.57735, 0.57735, 0.57735 ) * vec3( ( dot( vec3( 0.57735, 0.57735, 0.57735 ), color ) * ( 1.0 - nodeConst0 ) ) ) ) ) ), 0.0 );
+
+}
+
+float fn2 ( vec3 color, vec3 luminanceCoefficients ) {
+
+	return dot( color, luminanceCoefficients );
+
+}
+
+vec3 workingLuminanceCoefficients;
+workingLuminanceCoefficients = vec3( 0.2126, 0.7152, 0.0722 );
+
+( ( fn0( vec3( 1.0, 0.5, 0.0 ), 1.0, workingLuminanceCoefficients ) + fn1( vec3( 1.0, 0.5, 0.0 ), 1.0 ) ) + vec3( fn2( vec3( 1.0, 0.5, 0.0 ), workingLuminanceCoefficients ) ) )
+
+// layout color adjustment explicit
+
+vec3 fn0 ( vec3 color, float adjustment, vec3 luminanceCoefficients ) {
+
+	return max( mix( vec3( dot( color, luminanceCoefficients ) ), color, adjustment ), 0.0 );
+
+}
+
+vec3 fn1 ( vec3 color, float adjustment ) {
+
+	float nodeConst0 = cos( adjustment );
+
+	return max( ( ( color * vec3( nodeConst0 ) ) + ( ( cross( vec3( 0.57735, 0.57735, 0.57735 ), color ) * vec3( sin( adjustment ) ) ) + ( vec3( 0.57735, 0.57735, 0.57735 ) * vec3( ( dot( vec3( 0.57735, 0.57735, 0.57735 ), color ) * ( 1.0 - nodeConst0 ) ) ) ) ) ), 0.0 );
+
+}
+
+vec3 fn2 ( vec3 color, float adjustment ) {
+
+	float nodeConst0 = max( color.x, max( color.y, color.z ) );
+
+	return max( mix( color, vec3( nodeConst0 ), ( ( ( nodeConst0 - ( ( ( color.x + color.y ) + color.z ) / 3.0 ) ) * adjustment ) * -3.0 ) ), 0.0 );
+
+}
+
+vec3 workingLuminanceCoefficients;
+workingLuminanceCoefficients = vec3( 0.2126, 0.7152, 0.0722 );
+
+( ( fn0( vec3( 1.0, 0.5, 0.0 ), 2.0, workingLuminanceCoefficients ) + fn1( vec3( 1.0, 0.5, 0.0 ), 0.5 ) ) + fn2( vec3( 1.0, 0.5, 0.0 ), 0.5 ) )
+
+// layout overloading color
+
+float fn0 ( vec3 value ) {
+
+	return ( ( ( value.x + value.y ) + value.z ) / 3.0 );
+
+}
+
+fn0( vec3( 1.0, 0.24620132669705552, 0.0 ) )

@@ -1,4 +1,4 @@
-import { Break, Continue, Fn, If, Loop, Switch, array, bool, clamp, determinant, float, int, inverse, ivec3, mat2, mat3, mat4, mix, mul, select, time, transpose, uint, uniform, uv, vec2, vec3, vec4 } from '../../../src/Three.TSL.js';
+import { Break, Continue, Fn, If, Loop, Switch, array, bool, clamp, color, determinant, float, grayscale, hue, int, inverse, ivec3, mat2, mat3, mat4, mix, mul, overloadingFn, saturation, select, time, transpose, uint, uniform, uv, vec2, vec3, vec4, vibrance } from '../../../src/Three.TSL.js';
 
 // Create a fresh graph for every test and backend.
 export const cases = {
@@ -1053,6 +1053,221 @@ export const cases = {
 		const square = Fn( ( { value } ) => value.mul( value ), { value: 'float', return: 'float' } );
 
 		return square( float( 3 ) );
+
+	},
+
+	// Variables created in a function with layout are local to that function.
+
+	layoutLocalVariables: () => {
+
+		const smooth = Fn( ( [ value ] ) => {
+
+			const result = value.toVar();
+			result.assign( result.mul( result ).mul( float( 3 ).sub( result.mul( 2 ) ) ) );
+
+			return result;
+
+		}, { value: 'float', return: 'float' } );
+
+		return smooth( uv().x );
+
+	},
+
+	layoutConditional: () => {
+
+		const clampHalf = Fn( ( [ value ] ) => {
+
+			const result = value.toVar();
+
+			If( result.greaterThan( 0.5 ), () => {
+
+				result.assign( 0.5 );
+
+			} ).Else( () => {
+
+				result.mulAssign( 2 );
+
+			} );
+
+			return result;
+
+		}, { value: 'float', return: 'float' } );
+
+		return clampHalf( uv().x );
+
+	},
+
+	layoutLoop: () => {
+
+		const sumSteps = Fn( ( [ count ] ) => {
+
+			const sum = float( 0 ).toVar();
+
+			Loop( count, ( { i } ) => {
+
+				sum.addAssign( float( i ) );
+
+			} );
+
+			return sum;
+
+		}, { count: 'int', return: 'float' } );
+
+		return sumSteps( int( 4 ) );
+
+	},
+
+	layoutInsideLoop: () => Fn( () => {
+
+		const square = Fn( ( [ value ] ) => value.mul( value ), { value: 'float', return: 'float' } );
+		const total = float( 0 ).toVar();
+
+		Loop( 3, ( { i } ) => {
+
+			total.addAssign( square( float( i ) ) );
+
+		} );
+
+		return total;
+
+	} )(),
+
+	// A function with layout is emitted once, before the functions that call it.
+
+	layoutNestedCalls: () => {
+
+		const square = Fn( ( [ value ] ) => value.mul( value ), { value: 'float', return: 'float' } );
+		const sumOfSquares = Fn( ( [ a, b ] ) => square( a ).add( square( b ) ), { a: 'float', b: 'float', return: 'float' } );
+		const lengthSquared = Fn( ( [ v ] ) => sumOfSquares( v.x, v.y ), { v: 'vec2', return: 'float' } );
+
+		return lengthSquared( uv() ).add( sumOfSquares( 1, 2 ) ).add( square( 3 ) );
+
+	},
+
+	layoutSharedInclude: () => {
+
+		const half = Fn( ( [ value ] ) => value.mul( 0.5 ), { value: 'float', return: 'float' } );
+		const left = Fn( ( [ value ] ) => half( value ).add( half( value.add( 1 ) ) ), { value: 'float', return: 'float' } );
+		const right = Fn( ( [ value ] ) => half( value ).sub( 1 ), { value: 'float', return: 'float' } );
+
+		return left( uv().x ).add( right( uv().y ) );
+
+	},
+
+	layoutCalledTwice: () => {
+
+		const scale = Fn( ( [ value, factor ] ) => value.mul( factor ), { value: 'vec2', factor: 'float', return: 'vec2' } );
+
+		return scale( uv(), 2 ).add( scale( uv().yx, 0.5 ) );
+
+	},
+
+	// Inputs are converted to the layout types at the call site.
+
+	layoutInputConversion: () => {
+
+		const lengthOf = Fn( ( [ v ] ) => v.length(), { v: 'vec3', return: 'float' } );
+
+		return lengthOf( float( 2 ) ).add( lengthOf( vec4( 1, 2, 3, 4 ) ) ).add( lengthOf( int( 1 ) ) );
+
+	},
+
+	// Missing inputs are passed as the default values of the parameters.
+
+	layoutDefaultParameter: () => {
+
+		const scale = Fn( ( [ value, factor = float( 2 ) ] ) => value.mul( factor ), { value: 'float', factor: 'float', return: 'float' } );
+
+		return scale( uv().x ).add( scale( uv().y, 3 ) );
+
+	},
+
+	layoutDefaultObjectParameter: () => {
+
+		const scale = Fn( ( { value, factor = float( 2 ) } ) => value.mul( factor ), { value: 'float', factor: 'float', return: 'float' } );
+
+		return scale( { value: uv().x } ).add( scale( { value: uv().y, factor: 3 } ) );
+
+	},
+
+	// A default value like uv() is evaluated at the call site and passed to the function.
+
+	layoutDefaultBuiltinValue: () => {
+
+		const offsetUV = Fn( ( [ coord = uv(), offset = vec2( 0.5 ) ] ) => coord.add( offset ), { coord: 'vec2', offset: 'vec2', return: 'vec2' } );
+
+		return offsetUV().add( offsetUV( vec2( 1 ) ) );
+
+	},
+
+	// A default value shared by all calls is declared once per build, outside of the function.
+
+	layoutDefaultSharedVariable: () => {
+
+		const sharedWeights = Fn( () => vec3( 0.2, 0.7, 0.1 ) ).once()().toVar( 'sharedWeights' );
+		const weighted = Fn( ( [ value, weights = sharedWeights ] ) => value.dot( weights ), { value: 'vec3', weights: 'vec3', return: 'float' } );
+
+		return weighted( vec3( uv(), 1 ) ).add( weighted( vec3( 1 ) ) );
+
+	},
+
+	// A default value that depends on another parameter can't be passed at the call site,
+	// so that call is expanded inline.
+
+	layoutDefaultDependsOnParameter: () => {
+
+		const average = Fn( ( [ a, b = a.mul( 2 ) ] ) => a.add( b ).mul( 0.5 ), { a: 'float', b: 'float', return: 'float' } );
+
+		return average( uv().x ).add( average( uv().x, 1 ) );
+
+	},
+
+	// An input missing in the middle of the call is also completed with its default value.
+
+	layoutDefaultMissingMiddle: () => {
+
+		const weightedSum = Fn( ( [ a, weight = float( 0.5 ), b ] ) => a.add( b ).mul( weight ), { a: 'float', weight: 'float', b: 'float', return: 'float' } );
+
+		return weightedSum( uv().x, undefined, uv().y );
+
+	},
+
+	// A null default can't be passed as an argument, so that call is expanded inline.
+
+	layoutDefaultNull: () => {
+
+		const scale = Fn( ( [ value, factor = null ] ) => factor === null ? value : value.mul( factor ), { value: 'float', factor: 'float', return: 'float' } );
+
+		return scale( uv().x ).add( scale( uv().x, 3 ) );
+
+	},
+
+	// A function with layout and once() doesn't resolve defaults, a call with missing inputs is expanded inline.
+
+	layoutOnceDefaultParameter: () => {
+
+		const scale = Fn( ( [ value, factor = float( 2 ) ] ) => value.mul( factor ), { value: 'float', factor: 'float', return: 'float' } ).once();
+
+		return scale( uv().x );
+
+	},
+
+	// Built-in functions with layout, with and without their optional parameters.
+
+	layoutColorAdjustmentDefaults: () => saturation( vec3( 1, 0.5, 0 ) ).add( hue( vec3( 1, 0.5, 0 ) ) ).add( grayscale( vec3( 1, 0.5, 0 ) ) ),
+
+	layoutColorAdjustmentExplicit: () => saturation( vec3( 1, 0.5, 0 ), 2 ).add( hue( vec3( 1, 0.5, 0 ), 0.5 ) ).add( vibrance( vec3( 1, 0.5, 0 ), 0.5 ) ),
+
+	// Overloads are chosen by vector type, so a color matches a vec3 input.
+
+	layoutOverloadingColor: () => {
+
+		const brightness = overloadingFn( [
+			Fn( ( [ value ] ) => value, { value: 'float', return: 'float' } ),
+			Fn( ( [ value ] ) => value.x.add( value.y ).add( value.z ).div( 3 ), { value: 'vec3', return: 'float' } )
+		] );
+
+		return brightness( color( 0xff8800 ) );
 
 	}
 
