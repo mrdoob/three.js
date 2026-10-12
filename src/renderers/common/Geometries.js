@@ -435,7 +435,8 @@ class Geometries extends DataMap {
 
 			if ( geometry === undefined ) continue;
 
-			geometry.removeEventListener( 'dispose', this.get( geometry ).onDispose );
+			const geometryData = this.get( geometry );
+			geometryData.onDispose();
 
 		}
 
