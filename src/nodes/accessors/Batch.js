@@ -7,7 +7,7 @@ import { textureSize } from './TextureSizeNode.js';
 import { tangentLocal } from './Tangent.js';
 import { instanceIndex, drawIndex } from '../core/IndexNode.js';
 import { varyingProperty } from '../core/PropertyNode.js';
-import { OnAfterObjectUpdate } from '../utils/EventNode.js';
+import { OnObjectUpdate, OnAfterObjectUpdate } from '../utils/EventNode.js';
 import { DataTexture } from '../../textures/DataTexture.js';
 
 const _previousBatchingMatrices = /*@__PURE__*/ new WeakMap();
@@ -174,6 +174,12 @@ export const batch = /*@__PURE__*/ Fn( ( [ batchMesh ], builder ) => {
 		tangentLocal.mulAssign( bm );
 
 	}
+
+	OnObjectUpdate( ( { object, camera, material } ) => {
+
+		object._updateDrawParameters( camera, object.geometry, material );
+
+	} );
 
 }, 'void' );
 

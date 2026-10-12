@@ -150,11 +150,15 @@ class UniformsGroup extends EventDispatcher {
 
 		for ( let i = 0, l = uniformsSource.length; i < l; i ++ ) {
 
-			const uniforms = Array.isArray( uniformsSource[ i ] ) ? uniformsSource[ i ] : [ uniformsSource[ i ] ];
+			const uniform = uniformsSource[ i ];
 
-			for ( let j = 0; j < uniforms.length; j ++ ) {
+			if ( Array.isArray( uniform ) ) {
 
-				this.uniforms.push( uniforms[ j ].clone() );
+				this.uniforms.push( uniform.map( ( u ) => u.clone() ) );
+
+			} else {
+
+				this.uniforms.push( uniform.clone() );
 
 			}
 

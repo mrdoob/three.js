@@ -460,7 +460,6 @@ class TAAUNode extends Node {
 
 			const dstDepth = this._previousDepthRenderTarget.depthTexture;
 			renderer.copyTextureToTexture( currentDepth, dstDepth );
-			this._previousDepthNode.value = dstDepth;
 
 		}
 

@@ -23,8 +23,6 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 
 	const logarithmicDepthBuffer = capabilities.logarithmicDepthBuffer;
 
-	let precision = capabilities.precision;
-
 	const shaderIDs = {
 		MeshDepthMaterial: 'depth',
 		MeshDistanceMaterial: 'distance',
@@ -66,6 +64,8 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 
 		// heuristics to create shader parameters according to lights in the scene
 		// (not to blow over maxLights budget)
+
+		let precision = capabilities.precision;
 
 		if ( material.precision !== null ) {
 

@@ -8,14 +8,6 @@ const Schlick_to_F0 = /*@__PURE__*/ Fn( ( { f, f90, dotVH } ) => {
 
 	return f.sub( vec3( f90 ).mul( x5 ) ).div( x5.oneMinus() );
 
-} ).setLayout( {
-	name: 'Schlick_to_F0',
-	type: 'vec3',
-	inputs: [
-		{ name: 'f', type: 'vec3' },
-		{ name: 'f90', type: 'float' },
-		{ name: 'dotVH', type: 'float' }
-	]
-} );
+}, { f: 'vec3', f90: 'float', dotVH: 'float', return: 'vec3' } );
 
 export default Schlick_to_F0;

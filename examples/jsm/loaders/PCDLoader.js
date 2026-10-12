@@ -394,7 +394,7 @@ class PCDLoader extends Loader {
 
 				if ( lines[ i ] === '' ) continue;
 
-				const line = lines[ i ].split( ' ' );
+				const line = lines[ i ].trim().split( /\s+/ );
 
 				if ( offset.x !== undefined ) {
 

@@ -296,6 +296,8 @@ class RTTNode extends TextureNode {
 
 		resetRendererState( renderer, this._rendererState );
 
+		renderer.setClearColor( this._rendererState.clearColor, this._rendererState.clearAlpha ); // keep clear color/alpha
+
 		renderer.setRenderTarget( this.renderTarget );
 
 		this._quadMesh.render( renderer );

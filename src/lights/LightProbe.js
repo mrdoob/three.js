@@ -41,6 +41,8 @@ class LightProbe extends Light {
 		 */
 		this.isLightProbe = true;
 
+		this.type = 'LightProbe';
+
 		/**
 		 * A light probe uses spherical harmonics to encode lighting information.
 		 *

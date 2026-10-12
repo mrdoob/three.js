@@ -1141,7 +1141,7 @@ export const rand = /*@__PURE__*/ Fn( ( [ uv ] ) => {
 
 	return fract( sin( sn ).mul( c ) );
 
-} );
+}, { uv: 'vec2', return: 'float' } );
 
 /**
  * Alias for `mix()` with a different parameter order.

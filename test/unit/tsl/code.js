@@ -32,7 +32,16 @@ export function generateCode( createNode, language ) {
 
 export function normalizeCode( code ) {
 
+	// Simplified layouts use generated names whose IDs depend on module import order.
+	const functionNames = new Map();
+
 	return code
+		.replace( /\bfn\d+\b/g, name => {
+
+			if ( ! functionNames.has( name ) ) functionNames.set( name, 'fn' + functionNames.size );
+			return functionNames.get( name );
+
+		} )
 		.replace( /\r\n/g, '\n' )
 		.replace( /[ \t]+$/gm, '' )
 		.replace( /\n(?:[ \t]*\n)+/g, '\n\n' )

@@ -234,7 +234,7 @@ class TRAANode extends Node {
 		 * @private
 		 * @type {TextureNode}
 		 */
-		this._previousDepthNode = texture( new DepthTexture( 1, 1 ) );
+		this._previousDepthNode = texture( this._historyRenderTarget.depthTexture );
 
 		/**
 		 * The node used to render the scene's velocity.
@@ -407,7 +407,6 @@ class TRAANode extends Node {
 
 			const currentDepth = this.depthNode.value;
 			renderer.copyTextureToTexture( currentDepth, this._historyRenderTarget.depthTexture );
-			this._previousDepthNode.value = this._historyRenderTarget.depthTexture;
 
 		}
 
@@ -506,14 +505,7 @@ class TRAANode extends Node {
 			const weight = max( phase, phase.oneMinus() );
 			return weight.x.mul( weight.y ).oneMinus().div( 0.75 );
 
-		} ).setLayout( {
-			name: 'subpixelCorrection',
-			type: 'float',
-			inputs: [
-				{ name: 'velocityUV', type: 'vec2' },
-				{ name: 'textureSize', type: 'ivec2' }
-			]
-		} );
+		}, { velocityUV: 'vec2', textureSize: 'ivec2', return: 'float' } );
 
 		const historyNode = texture( this._historyRenderTarget.texture );
 

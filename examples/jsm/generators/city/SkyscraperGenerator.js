@@ -1536,7 +1536,7 @@ const valueNoise = /*@__PURE__*/ Fn( ( [ p ] ) => {
 	const x11 = mix( corner( 0, 1, 1 ), corner( 1, 1, 1 ), u.x );
 	return mix( mix( x00, x10, u.y ), mix( x01, x11, u.y ), u.z ).mul( 2 ).sub( 1 );
 
-} ).setLayout( { name: 'valueNoise', type: 'float', inputs: [ { name: 'p', type: 'vec3' } ] } );
+}, { p: 'vec3', return: 'float' } );
 
 // fractal ( fBm ) of valueNoise, octaves summed like mx_fractal_noise_float
 // ( amplitude halving, frequency doubling ); unrolled for a compile-time count

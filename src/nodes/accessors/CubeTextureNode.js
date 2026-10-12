@@ -110,21 +110,7 @@ class CubeTextureNode extends TextureNode {
 
 		const texture = this.value;
 
-		// Depth textures (shadow maps) - Y flip for WebGPU
-
-		if ( texture.isDepthTexture === true ) {
-
-			if ( builder.renderer.coordinateSystem === WebGPUCoordinateSystem ) {
-
-				return vec3( uvNode.x, uvNode.y.negate(), uvNode.z );
-
-			}
-
-			return uvNode;
-
-		}
-
-		if ( builder.renderer.coordinateSystem === WebGPUCoordinateSystem || ! texture.isRenderTargetTexture ) {
+		if ( builder.renderer.coordinateSystem === WebGPUCoordinateSystem || ( ! texture.isRenderTargetTexture && ! texture.isDepthTexture ) ) {
 
 			uvNode = vec3( uvNode.x.negate(), uvNode.yz );
 
@@ -181,7 +167,7 @@ export const cubeTexture = ( value = EmptyTexture, uvNode = null, levelNode = nu
 
 	if ( value && value.isCubeTextureNode === true ) {
 
-		textureNode = nodeObject( value.clone() );
+		textureNode = value.clone();
 		textureNode.referenceNode = value; // Ensure the reference is set to the original node
 
 		if ( uvNode !== null ) textureNode.uvNode = nodeObject( uvNode );

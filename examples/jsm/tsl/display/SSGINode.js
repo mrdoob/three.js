@@ -446,13 +446,7 @@ class SSGINode extends Node {
 
 			return float( 0.25 ).mul( sub( position.y, position.x ).bitAnd( 3 ) );
 
-		} ).setLayout( {
-			name: 'spatialOffsets',
-			type: 'float',
-			inputs: [
-				{ name: 'position', type: 'vec2' }
-			]
-		} );
+		}, { position: 'vec2', return: 'float' } );
 
 		const GTAOFastAcos = Fn( ( [ value ] ) => {
 
@@ -464,13 +458,7 @@ class SSGINode extends Node {
 
 			return vec2( x, y );
 
-		} ).setLayout( {
-			name: 'GTAOFastAcos',
-			type: 'vec2',
-			inputs: [
-				{ name: 'value', type: 'vec2' }
-			]
-		} );
+		}, { value: 'vec2', return: 'vec2' } );
 
 		const horizonSampling = Fn( ( [ directionIsRight, stepRadius, radiusVS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n ] ) => {
 

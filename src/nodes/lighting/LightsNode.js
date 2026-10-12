@@ -161,6 +161,17 @@ class LightsNode extends Node {
 			_hashData.push( light.id );
 			_hashData.push( light.castShadow ? 1 : 0 );
 
+			if ( light.castShadow === true ) {
+
+				// force rebuild on version change to avoid the usage of removed shadow nodes
+
+				const lightNode = _lightsNodeRef.get( light );
+				const lightVersion = ( lightNode ) ? lightNode.version : - 1;
+
+				_hashData.push( lightVersion );
+
+			}
+
 			if ( light.isSpotLight === true ) {
 
 				const hashMap = ( light.map !== null ) ? light.map.id : - 1;
