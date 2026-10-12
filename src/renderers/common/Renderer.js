@@ -2949,6 +2949,20 @@ class Renderer {
 
 		}
 
+		const computeList = Array.isArray( computeNodes ) ? computeNodes : [ computeNodes ];
+
+		if ( computeList.length === 0 || computeList.some( computeNode => computeNode?.isComputeNode !== true ) ) {
+
+			throw new Error( 'THREE.Renderer: ".compute()" expects a "ComputeNode".' );
+
+		}
+
+		if ( dispatchSize !== null && computeList.some( computeNode => computeNode.count !== null || computeNode.dispatchSize !== null ) ) {
+
+			throw new Error( 'THREE.Renderer: A dispatch size cannot be passed to "renderer.compute()" for nodes created with "compute( count )". Use "computeKernel()" instead.' );
+
+		}
+
 		//
 
 		const nodeFrame = this._nodes.nodeFrame;
@@ -2975,20 +2989,6 @@ class Renderer {
 		const pipelines = this._pipelines;
 		const bindings = this._bindings;
 		const nodes = this._nodes;
-
-		const computeList = Array.isArray( computeNodes ) ? computeNodes : [ computeNodes ];
-
-		if ( computeList[ 0 ] === undefined || computeList[ 0 ].isComputeNode !== true ) {
-
-			throw new Error( 'THREE.Renderer: .compute() expects a ComputeNode.' );
-
-		}
-
-		if ( dispatchSize !== null && computeList.some( computeNode => computeNode.count !== null || computeNode.dispatchSize !== null ) ) {
-
-			throw new Error( 'THREE.Renderer: A dispatch size cannot be passed to "renderer.compute()" for nodes created with "compute( count )".' );
-
-		}
 
 		backend.beginCompute( computeNodes );
 
