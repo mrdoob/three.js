@@ -1,5 +1,5 @@
 import { DataTexture, FloatType, RGBAFormat } from 'three';
-import { EXRExporter, NO_COMPRESSION, RLE_COMPRESSION, ZIPS_COMPRESSION, ZIP_COMPRESSION } from '../../../../examples/jsm/exporters/EXRExporter.js';
+import { EXRExporter, NO_COMPRESSION, RLE_COMPRESSION, ZIPS_COMPRESSION, ZIP_COMPRESSION, PIZ_COMPRESSION } from '../../../../examples/jsm/exporters/EXRExporter.js';
 import { EXRLoader } from '../../../../examples/jsm/loaders/EXRLoader.js';
 
 function createTexture( width, height, noise ) {
@@ -30,7 +30,7 @@ export default QUnit.module( 'Addons', () => {
 
 		QUnit.module( 'EXRExporter', () => {
 
-			const compressions = { NO_COMPRESSION, RLE_COMPRESSION, ZIPS_COMPRESSION, ZIP_COMPRESSION };
+			const compressions = { NO_COMPRESSION, RLE_COMPRESSION, ZIPS_COMPRESSION, ZIP_COMPRESSION, PIZ_COMPRESSION };
 
 			for ( const name in compressions ) {
 
@@ -39,7 +39,7 @@ export default QUnit.module( 'Addons', () => {
 					// 17 lines leaves a partial last block with ZIP_COMPRESSION (16 lines per block).
 					// Noisy data does not shrink when compressed and must be stored uncompressed.
 
-					for ( const [ width, height ] of [[ 5, 16 ], [ 5, 17 ], [ 64, 15 ]] ) {
+					for ( const [ width, height ] of [[ 5, 16 ], [ 5, 17 ], [ 64, 15 ], [ 33, 70 ]] ) {
 
 						for ( const noise of [ false, true ] ) {
 
