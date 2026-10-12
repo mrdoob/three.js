@@ -32,14 +32,7 @@ const vogelDisk = Fn( ( [ i, radius ] ) => {
 	const r = radius.mul( sqrt( i.add( 0.5 ).div( sampleCount ) ) );
 	return vec2( cos( theta ), sin( theta ) ).mul( r );
 
-} ).setLayout( {
-	name: 'vogelDisk',
-	type: 'vec2',
-	inputs: [
-		{ name: 'i', type: 'float' },
-		{ name: 'radius', type: 'float' }
-	]
-} );
+}, { i: 'float', radius: 'float', return: 'vec2' } );
 
 /**
  * Chromatic color-similarity distance between two linear base colors (albedo).
@@ -66,24 +59,9 @@ const diffuseColorDistance = Fn( ( [ a, b, compressLuma ] ) => {
 
 	return dLuma.add( dChroma.mul( DIFFUSE_CHROMA_WEIGHT ) );
 
-} ).setLayout( {
-	name: 'diffuseColorDistance',
-	type: 'float',
-	inputs: [
-		{ name: 'a', type: 'vec3' },
-		{ name: 'b', type: 'vec3' },
-		{ name: 'compressLuma', type: 'float' }
-	]
-} );
+}, { a: 'vec3', b: 'vec3', compressLuma: 'float', return: 'float' } );
 
-const _temporalWeight = Fn( ( [ x, strength ] ) => float( 1 ).div( x.pow( strength ) ) ).setLayout( {
-	name: 'temporalWeight',
-	type: 'float',
-	inputs: [
-		{ name: 'x', type: 'float' },
-		{ name: 'strength', type: 'float' }
-	]
-} );
+const _temporalWeight = Fn( ( [ x, strength ] ) => float( 1 ).div( x.pow( strength ) ), { x: 'float', strength: 'float', return: 'float' } );
 
 /**
  * Temporal accumulation variance factor in `[0, 1]`. Higher values mean more history confidence.
@@ -94,14 +72,7 @@ const getTemporalVarianceFactor = Fn( ( [ frameNum, strength ] ) => {
 
 	return _temporalWeight( frameNum, strength ).max( 0.05 );
 
-} ).setLayout( {
-	name: 'getTemporalVarianceFactor',
-	type: 'float',
-	inputs: [
-		{ name: 'frameNum', type: 'float' },
-		{ name: 'strength', type: 'float' }
-	]
-} );
+}, { frameNum: 'float', strength: 'float', return: 'float' } );
 
 /**
  * World-space frustum height at `viewZ`. Algorithm originally from REBLUR (NRD).
@@ -113,14 +84,7 @@ const computeFrustumSize = Fn( ( [ viewZ, tanHalfFovY ] ) => {
 
 	return float( 2 ).mul( viewZ ).mul( tanHalfFovY );
 
-} ).setLayout( {
-	name: 'computeFrustumSize',
-	type: 'float',
-	inputs: [
-		{ name: 'viewZ', type: 'float' },
-		{ name: 'tanHalfFovY', type: 'float' }
-	]
-} );
+}, { viewZ: 'float', tanHalfFovY: 'float', return: 'float' } );
 
 /**
  * Maps world-space SSR ray length to `[0, 1]`. Environment rays (`worldRayLength == 0`) map to `1`.
@@ -135,22 +99,14 @@ const computeHitDistFactor = Fn( ( [ worldRayLength, viewZ, tanHalfFovY ] ) => {
 
 	return factor;
 
-} ).setLayout( {
-	name: 'computeHitDistFactor',
-	type: 'float',
-	inputs: [
-		{ name: 'worldRayLength', type: 'float' },
-		{ name: 'viewZ', type: 'float' },
-		{ name: 'tanHalfFovY', type: 'float' }
-	]
-} );
+}, { worldRayLength: 'float', viewZ: 'float', tanHalfFovY: 'float', return: 'float' } );
 
 /**
  * Maps an AO factor for edge-stopping comparisons.
  *
  * @tsl
  */
-const mapAo = Fn( ( [ aoVal ] ) => aoVal.pow( 0.1 ) );
+const mapAo = Fn( ( [ aoVal ] ) => aoVal.pow( 0.1 ), { aoVal: 'float', return: 'float' } );
 
 /**
  * Specular dominant direction — smooth surfaces lean toward reflection, rough toward normal.
@@ -161,15 +117,7 @@ const getSpecularDominantDirection = Fn( ( [ N, V, roughness ] ) => {
 
 	return normalize( mix( N, reflect( V.negate(), N ), roughness.oneMinus() ) );
 
-} ).setLayout( {
-	name: 'getSpecularDominantDirection',
-	type: 'vec3',
-	inputs: [
-		{ name: 'N', type: 'vec3' },
-		{ name: 'V', type: 'vec3' },
-		{ name: 'roughness', type: 'float' }
-	]
-} );
+}, { N: 'vec3', V: 'vec3', roughness: 'float', return: 'vec3' } );
 
 /**
  * GGX inverse-CDF: half-angle tangent enclosing `percent` of the specular lobe volume.
@@ -182,14 +130,7 @@ const specularLobeTanHalfAngle = Fn( ( [ roughness, percent ] ) => {
 	const alpha = roughness.mul( roughness );
 	return alpha.mul( sqrt( percent.div( float( 1 ).sub( percent ).max( 1e-6 ) ) ) );
 
-} ).setLayout( {
-	name: 'specularLobeTanHalfAngle',
-	type: 'float',
-	inputs: [
-		{ name: 'roughness', type: 'float' },
-		{ name: 'percent', type: 'float' }
-	]
-} );
+}, { roughness: 'float', percent: 'float', return: 'float' } );
 
 const EXP_WEIGHT_SCALE = 4;
 const NORMAL_ENCODING_ERROR = 1.5 / 255;
@@ -211,15 +152,7 @@ const lobeNormalFalloff = Fn( ( [ roughness, aggressivity, invNormalPhi ] ) => {
 	const invHalfAngle = float( 1 ).div( lobeHalfAngle );
 	return invHalfAngle.mul( invHalfAngle ).mul( 2 * EXP_WEIGHT_SCALE );
 
-} ).setLayout( {
-	name: 'lobeNormalFalloff',
-	type: 'float',
-	inputs: [
-		{ name: 'roughness', type: 'float' },
-		{ name: 'aggressivity', type: 'float' },
-		{ name: 'invNormalPhi', type: 'float' }
-	]
-} );
+}, { roughness: 'float', aggressivity: 'float', invNormalPhi: 'float', return: 'float' } );
 
 /**
  * Adaptive lobe normal edge-stopping weight
@@ -237,15 +170,7 @@ const lobeNormalWeight = Fn( ( [ viewNormal, nNormalV, lobeFalloff ] ) => {
 
 	return exp( cosA.sub( 1 ).mul( lobeFalloff ) );
 
-} ).setLayout( {
-	name: 'lobeNormalWeight',
-	type: 'float',
-	inputs: [
-		{ name: 'viewNormal', type: 'vec3' },
-		{ name: 'nNormalV', type: 'vec3' },
-		{ name: 'lobeFalloff', type: 'float' }
-	]
-} );
+}, { viewNormal: 'vec3', nNormalV: 'vec3', lobeFalloff: 'float', return: 'float' } );
 
 /**
  * View-space plane distance between two surface points (edge-stopping geometry term).
@@ -256,15 +181,7 @@ const planeDistance = Fn( ( [ position, nPosition, normal ] ) => {
 
 	return abs( dot( position.sub( nPosition ), normal ) );
 
-} ).setLayout( {
-	name: 'planeDistance',
-	type: 'float',
-	inputs: [
-		{ name: 'position', type: 'vec3' },
-		{ name: 'nPosition', type: 'vec3' },
-		{ name: 'normal', type: 'vec3' },
-	]
-} );
+}, { position: 'vec3', nPosition: 'vec3', normal: 'vec3', return: 'float' } );
 
 /**
  * Inverse-luminance temporal blend with optional adaptive trust (Karis-style).
@@ -286,18 +203,6 @@ const karisTemporalBlend = Fn( ( [ denoisedRgb, denoisedRaw, a, flickerSuppressi
 	const wRaw = aTrust.div( luminance( denoisedRaw ).mul( effFlicker ).mul( 10 ).add( 1 ) );
 	return denoisedRgb.mul( wHist ).add( denoisedRaw.mul( wRaw ) ).div( wHist.add( wRaw ).max( EPSILON ) );
 
-} ).setLayout( {
-	name: 'karisTemporalBlend',
-	type: 'vec3',
-	inputs: [
-		{ name: 'denoisedRgb', type: 'vec3' },
-		{ name: 'denoisedRaw', type: 'vec3' },
-		{ name: 'a', type: 'float' },
-		{ name: 'flickerSuppression', type: 'float' },
-		{ name: 'adaptiveTrust', type: 'float' },
-		{ name: 'nbhdMeanLuma', type: 'float' },
-		{ name: 'nbhdStddevLuma', type: 'float' }
-	]
 } );
 
 const toTextureNode = ( value ) => {
@@ -522,7 +427,7 @@ class RecurrentDenoiseNode extends Node {
 			const angle = r.mul( 2 ).mul( PI );
 			return mat2( cos( angle ), sin( angle ).negate(), sin( angle ), cos( angle ) );
 
-		} );
+		}, { r: 'float', return: 'mat2' } );
 
 		const sampleTexture = ( uvCoord ) => texture( this.textureNode, uvCoord ).max( 0 );
 		const sampleRaw = ( uvCoord ) => this.rawNode?.sample( uvCoord )?.max( 0 ) ?? vec3( 0 ).max( 0 );
@@ -588,13 +493,6 @@ class RecurrentDenoiseNode extends Node {
 			// vec3( avgRayLength, meanLuma, stddevLuma )
 			return vec4( avgRayLength, meanLuma, stddevLuma, hasEnvRay.toFloat() );
 
-		} ).setLayout( {
-			name: 'getNeighborhoodStats',
-			type: 'vec4',
-			inputs: [
-				{ name: 'uvCoord', type: 'vec2' },
-				{ name: 'centerSample', type: 'vec4' }
-			]
 		} );
 
 		const denoiseFn = Fn( ( [ uvCoord ] ) => {
@@ -908,8 +806,8 @@ export default RecurrentDenoiseNode;
  * @param {RecurrentDenoiseNodeOptions} [options={}]
  * @returns {RecurrentDenoiseNode}
  */
-export const recurrentDenoise = ( inputTexture, camera, options = {} ) => nodeObject( new RecurrentDenoiseNode(
+export const recurrentDenoise = ( inputTexture, camera, options = {} ) => new RecurrentDenoiseNode(
 	toTextureNode( inputTexture ),
 	camera,
 	options
-) );
+);

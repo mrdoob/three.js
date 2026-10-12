@@ -84,6 +84,7 @@ const _frustumArray = /*@__PURE__*/ new FrustumArray();
 const _box = /*@__PURE__*/ new Box3();
 const _sphere = /*@__PURE__*/ new Sphere();
 const _vector = /*@__PURE__*/ new Vector3();
+const _cameraPosition = /*@__PURE__*/ new Vector3();
 const _forward = /*@__PURE__*/ new Vector3();
 const _temp = /*@__PURE__*/ new Vector3();
 const _renderList = /*@__PURE__*/ new MultiDrawRenderList();
@@ -1230,7 +1231,7 @@ class BatchedMesh extends Mesh {
 
 	/**
 	 * Get the range representing the subset of triangles related to the attached geometry,
-	 * indicating the starting offset and count, or `null` if invalid.
+	 * indicating the starting offset and count, or throws an error if invalid.
 	 *
 	 * @param {number} geometryId - The id of the geometry to get the range of.
 	 * @param {Object} [target] - The target object that is used to store the method's result.
@@ -1528,7 +1529,16 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	onBeforeRender( renderer, scene, camera, geometry, material/*, _group*/ ) {
+	/**
+	 * Updates the draw parameters for the next draw. Depending on {@link BatchedMesh#perObjectFrustumCulled}
+	 * and {@link BatchedMesh#sortObjects}, this includes per-object frustum culling and sorting.
+	 *
+	 * @private
+	 * @param {Camera} camera - The camera of the next draw.
+	 * @param {BufferGeometry} geometry - The batch's geometry.
+	 * @param {Material} material - The material of the next draw.
+	 */
+	_updateDrawParameters( camera, geometry, material ) {
 
 		// if visibility has not changed and frustum culling and object sorting is not required
 		// then skip iterating over all items
@@ -1592,7 +1602,7 @@ class BatchedMesh extends Mesh {
 
 			// get the camera position in the local frame
 			_matrix.copy( this.matrixWorld ).invert();
-			_vector.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _matrix );
+			_cameraPosition.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _matrix );
 			_forward.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld ).transformDirection( _matrix );
 
 			for ( let i = 0, l = instanceInfo.length; i < l; i ++ ) {
@@ -1617,7 +1627,7 @@ class BatchedMesh extends Mesh {
 
 						// get the distance from camera used for sorting
 						const geometryInfo = geometryInfoList[ geometryId ];
-						const z = _temp.subVectors( _sphere.center, _vector ).dot( _forward );
+						const z = _temp.subVectors( _sphere.center, _cameraPosition ).dot( _forward );
 						_renderList.push( geometryInfo.start, geometryInfo.count, z, i );
 
 					}
@@ -1693,9 +1703,31 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	onBeforeRender( renderer, scene, camera, geometry, material/*, _group*/ ) {
+
+		if ( renderer.isWebGPURenderer === true ) {
+
+			if ( this._visibilityChanged || this.perObjectFrustumCulled || this.sortObjects ) {
+
+				this._indirectTexture.needsUpdate = true;
+
+			}
+
+		} else {
+
+			this._updateDrawParameters( camera, geometry, material );
+
+		}
+
+	}
+
 	onBeforeShadow( renderer, object, camera, shadowCamera, geometry, depthMaterial/* , group */ ) {
 
-		this.onBeforeRender( renderer, null, shadowCamera, geometry, depthMaterial );
+		if ( renderer.isWebGPURenderer !== true ) {
+
+			this._updateDrawParameters( shadowCamera, geometry, depthMaterial );
+
+		}
 
 	}
 

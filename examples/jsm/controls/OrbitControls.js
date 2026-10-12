@@ -1096,7 +1096,7 @@ class OrbitControls extends Controls {
 
 	_handleMouseDownDolly( event ) {
 
-		this._updateZoomParameters( event.clientX, event.clientX );
+		this._updateZoomParameters( event.clientX, event.clientY );
 		this._dollyStart.set( event.clientX, event.clientY );
 
 	}
@@ -1142,6 +1142,15 @@ class OrbitControls extends Controls {
 		}
 
 		this._dollyStart.copy( this._dollyEnd );
+
+		if ( this.zoomToCursor ) {
+
+			// update() resets the cursor zoom, so keep zooming towards the position where the drag started
+
+			this._performCursorZoom = true;
+			this._dollyDirection.set( this._mouse.x, this._mouse.y, 1 ).unproject( this.object ).sub( this.object.position ).normalize();
+
+		}
 
 		this.update();
 

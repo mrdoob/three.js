@@ -1,20 +1,28 @@
 import Node from '../core/Node.js';
 import NodeError from '../core/NodeError.js';
 import { getValueType } from '../core/NodeUtils.js';
-import { buffer } from '../accessors/BufferNode.js';
-import { instancedBufferAttribute } from '../accessors/BufferAttributeNode.js';
 import { instanceIndex } from '../core/IndexNode.js';
-import { nodeProxy, float } from '../tsl/TSLBase.js';
+import { uniform } from '../core/UniformNode.js';
+import { hash } from '../math/Hash.js';
+import { mix } from '../math/MathNode.js';
+import { nodeProxy, float, uint, vec4 } from '../tsl/TSLBase.js';
 
 import { Vector4 } from '../../math/Vector4.js';
-import { lerp } from '../../math/MathUtils.js';
-import { InstancedBufferAttribute } from '../../core/InstancedBufferAttribute.js';
 
-let min = null;
-let max = null;
+let _rangeId = 0;
+
+// Per-object seed shared by all range nodes, so the values differ between objects.
+
+const objectSeed = /*@__PURE__*/ uniform( 0, 'uint' ).onObjectUpdate( ( { object } ) => {
+
+	const objectId = object !== null ? object.id : 0; // compute has no object
+
+	return Math.imul( objectId, 0x9E3779B9 ) >>> 0;
+
+} );
 
 /**
- * `RangeNode` generates random instanced attribute data in a defined range.
+ * `RangeNode` generates random per-instance values in a defined range.
  * An exemplary use case for this utility node is to generate random per-instance
  * colors:
  * ```js
@@ -58,6 +66,15 @@ class RangeNode extends Node {
 		 */
 		this.maxNode = maxNode;
 
+		/**
+		 * Salt of the random sequence. It uses a counter of range nodes instead of the
+		 * global node id, so the values only change when range nodes are added or removed.
+		 *
+		 * @private
+		 * @type {number}
+		 */
+		this._salt = Math.imul( _rangeId ++, 0x85EBCA6B ) >>> 0;
+
 	}
 
 	isCacheable( /*builder*/ ) {
@@ -92,7 +109,7 @@ class RangeNode extends Node {
 	 */
 	generateNodeType( builder ) {
 
-		return builder.object.count > 1 ? builder.getTypeFromLength( this.getVectorLength( builder ) ) : 'float';
+		return builder.getTypeFromLength( this.getVectorLength( builder ) );
 
 	}
 
@@ -128,75 +145,35 @@ class RangeNode extends Node {
 
 	setup( builder ) {
 
-		const object = builder.object;
+		const minNode = this.getConstNode( this.minNode );
+		const maxNode = this.getConstNode( this.maxNode );
 
-		let output = null;
+		const minValue = minNode.value;
+		const maxValue = maxNode.value;
 
-		if ( object.count > 1 ) {
+		const minLength = builder.getTypeLength( getValueType( minValue ) );
+		const maxLength = builder.getTypeLength( getValueType( maxValue ) );
 
-			const minNode = this.getConstNode( this.minNode );
-			const maxNode = this.getConstNode( this.maxNode );
+		const min = new Vector4();
+		const max = new Vector4();
 
-			const minValue = minNode.value;
-			const maxValue = maxNode.value;
+		if ( minLength === 1 ) min.setScalar( minValue );
+		else if ( minValue.isColor ) min.set( minValue.r, minValue.g, minValue.b, 1 );
+		else min.set( minValue.x, minValue.y, minValue.z || 0, minValue.w || 0 );
 
-			const minLength = builder.getTypeLength( getValueType( minValue ) );
-			const maxLength = builder.getTypeLength( getValueType( maxValue ) );
+		if ( maxLength === 1 ) max.setScalar( maxValue );
+		else if ( maxValue.isColor ) max.set( maxValue.r, maxValue.g, maxValue.b, 1 );
+		else max.set( maxValue.x, maxValue.y, maxValue.z || 0, maxValue.w || 0 );
 
-			min = min || new Vector4();
-			max = max || new Vector4();
+		// The values are hashed from the instance index instead of stored per object, so they work
+		// for any instance count. The salt decorrelates range nodes.
 
-			min.setScalar( 0 );
-			max.setScalar( 0 );
+		const seed = objectSeed.bitXor( uint( this._salt ) );
 
-			if ( minLength === 1 ) min.setScalar( minValue );
-			else if ( minValue.isColor ) min.set( minValue.r, minValue.g, minValue.b, 1 );
-			else min.set( minValue.x, minValue.y, minValue.z || 0, minValue.w || 0 );
+		const index = instanceIndex.mul( 4 ).add( seed );
+		const random = vec4( hash( index ), hash( index.add( 1 ) ), hash( index.add( 2 ) ), hash( index.add( 3 ) ) );
 
-			if ( maxLength === 1 ) max.setScalar( maxValue );
-			else if ( maxValue.isColor ) max.set( maxValue.r, maxValue.g, maxValue.b, 1 );
-			else max.set( maxValue.x, maxValue.y, maxValue.z || 0, maxValue.w || 0 );
-
-			const stride = 4;
-
-			const length = stride * object.count;
-			const array = new Float32Array( length );
-
-			for ( let i = 0; i < length; i ++ ) {
-
-				const index = i % stride;
-
-				const minElementValue = min.getComponent( index );
-				const maxElementValue = max.getComponent( index );
-
-				array[ i ] = lerp( minElementValue, maxElementValue, Math.random() );
-
-			}
-
-			const nodeType = this.getNodeType( builder );
-			const uniformBufferSize = object.count * 4 * 4; // count * 4 components * 4 bytes (float)
-
-			if ( uniformBufferSize <= builder.getUniformBufferLimit() ) {
-
-				output = buffer( array, 'vec4', object.count ).element( instanceIndex ).convert( nodeType );
-
-			} else {
-
-				// TODO: Improve anonymous buffer attribute creation removing this part
-				const bufferAttribute = new InstancedBufferAttribute( array, 4 );
-				builder.geometry.setAttribute( '__range' + this.id, bufferAttribute );
-
-				output = instancedBufferAttribute( bufferAttribute ).convert( nodeType );
-
-			}
-
-		} else {
-
-			output = float( 0 );
-
-		}
-
-		return output;
+		return mix( vec4( min ), vec4( max ), random ).convert( this.getNodeType( builder ) );
 
 	}
 

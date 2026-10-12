@@ -231,8 +231,8 @@ function _extract( pvrDatas ) {
 
 	while ( mipLevel < pvrDatas.numMipmaps ) {
 
-		const sWidth = pvrDatas.width >> mipLevel,
-			sHeight = pvrDatas.height >> mipLevel;
+		const sWidth = Math.max( pvrDatas.width >> mipLevel, 1 ),
+			sHeight = Math.max( pvrDatas.height >> mipLevel, 1 );
 
 		widthBlocks = sWidth / blockWidth;
 		heightBlocks = sHeight / blockHeight;

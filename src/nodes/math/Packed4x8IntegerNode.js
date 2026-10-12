@@ -244,41 +244,25 @@ const emulatedPack4xU8 = /*@__PURE__*/ Fn( ( [ v ] ) => {
 
 	return x.bitOr( y.shiftLeft( uint( 8 ) ) ).bitOr( z.shiftLeft( uint( 16 ) ) ).bitOr( w.shiftLeft( uint( 24 ) ) );
 
-} ).setLayout( {
-	name: 'tsl_packed4x8_pack4xU8',
-	type: 'uint',
-	inputs: [ { name: 'v', type: 'uvec4' } ]
-} );
+}, { v: 'uvec4', return: 'uint' } );
 
 const emulatedPack4xI8 = /*@__PURE__*/ Fn( ( [ v ] ) => {
 
 	return emulatedPack4xU8( uvec4( v ) );
 
-} ).setLayout( {
-	name: 'tsl_packed4x8_pack4xI8',
-	type: 'uint',
-	inputs: [ { name: 'v', type: 'ivec4' } ]
-} );
+}, { v: 'ivec4', return: 'uint' } );
 
 const emulatedPack4xU8Clamp = /*@__PURE__*/ Fn( ( [ v ] ) => {
 
 	return emulatedPack4xU8( clamp( v, uvec4( 0 ), uvec4( 255 ) ) );
 
-} ).setLayout( {
-	name: 'tsl_packed4x8_pack4xU8Clamp',
-	type: 'uint',
-	inputs: [ { name: 'v', type: 'uvec4' } ]
-} );
+}, { v: 'uvec4', return: 'uint' } );
 
 const emulatedPack4xI8Clamp = /*@__PURE__*/ Fn( ( [ v ] ) => {
 
 	return emulatedPack4xI8( clamp( v, ivec4( - 128 ), ivec4( 127 ) ) );
 
-} ).setLayout( {
-	name: 'tsl_packed4x8_pack4xI8Clamp',
-	type: 'uint',
-	inputs: [ { name: 'v', type: 'ivec4' } ]
-} );
+}, { v: 'ivec4', return: 'uint' } );
 
 const emulatedUnpack4xU8 = /*@__PURE__*/ Fn( ( [ v ] ) => {
 
@@ -289,11 +273,7 @@ const emulatedUnpack4xU8 = /*@__PURE__*/ Fn( ( [ v ] ) => {
 		v.shiftRight( uint( 24 ) ).bitAnd( uint( 0xff ) )
 	);
 
-} ).setLayout( {
-	name: 'tsl_packed4x8_unpack4xU8',
-	type: 'uvec4',
-	inputs: [ { name: 'v', type: 'uint' } ]
-} );
+}, { v: 'uint', return: 'uvec4' } );
 
 function signExtendByte( v, byteShift ) {
 
@@ -310,11 +290,7 @@ const emulatedUnpack4xI8 = /*@__PURE__*/ Fn( ( [ v ] ) => {
 		signExtendByte( v, 24 )
 	);
 
-} ).setLayout( {
-	name: 'tsl_packed4x8_unpack4xI8',
-	type: 'ivec4',
-	inputs: [ { name: 'v', type: 'uint' } ]
-} );
+}, { v: 'uint', return: 'ivec4' } );
 
 const emulatedDot4U8Packed = /*@__PURE__*/ Fn( ( [ a, b ] ) => {
 
@@ -323,11 +299,7 @@ const emulatedDot4U8Packed = /*@__PURE__*/ Fn( ( [ a, b ] ) => {
 
 	return ua.x.mul( ub.x ).add( ua.y.mul( ub.y ) ).add( ua.z.mul( ub.z ) ).add( ua.w.mul( ub.w ) );
 
-} ).setLayout( {
-	name: 'tsl_packed4x8_dot4U8Packed',
-	type: 'uint',
-	inputs: [ { name: 'a', type: 'uint' }, { name: 'b', type: 'uint' } ]
-} );
+}, { a: 'uint', b: 'uint', return: 'uint' } );
 
 const emulatedDot4I8Packed = /*@__PURE__*/ Fn( ( [ a, b ] ) => {
 
@@ -336,11 +308,7 @@ const emulatedDot4I8Packed = /*@__PURE__*/ Fn( ( [ a, b ] ) => {
 
 	return ia.x.mul( ib.x ).add( ia.y.mul( ib.y ) ).add( ia.z.mul( ib.z ) ).add( ia.w.mul( ib.w ) );
 
-} ).setLayout( {
-	name: 'tsl_packed4x8_dot4I8Packed',
-	type: 'int',
-	inputs: [ { name: 'a', type: 'uint' }, { name: 'b', type: 'uint' } ]
-} );
+}, { a: 'uint', b: 'uint', return: 'int' } );
 
 // exports
 

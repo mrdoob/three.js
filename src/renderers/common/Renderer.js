@@ -19,6 +19,7 @@ import Lighting from './Lighting.js';
 import XRManager from './XRManager.js';
 import InspectorBase from './InspectorBase.js';
 import CanvasTarget from './CanvasTarget.js';
+import { AttributeType } from './Constants.js';
 
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
@@ -2142,10 +2143,10 @@ class Renderer {
 	 * from the GPU to the CPU in context of compute shaders.
 	 *
 	 * @async
-	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
-	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
-	 * @param {number} offset - The storage buffer attribute.
-	 * @param {number} count - The offset from which to start reading the
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read from.
+	 * @param {?(ReadbackBuffer|ArrayBuffer)} [target=null] - The readback buffer or array buffer that receives the data. If `null`, a new array buffer is returned.
+	 * @param {number} [offset=0] - The byte offset to start reading from. Must be a multiple of 4.
+	 * @param {number} [count=-1] - The number of bytes to read. Must be a multiple of 4, or `-1` to read to the end of the buffer.
 	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
 	async getArrayBufferAsync( attribute, target = null, offset = 0, count = - 1 ) {
@@ -3028,6 +3029,8 @@ class Renderer {
 			const computeBindings = bindings.getForCompute( computeNode );
 			const computePipeline = pipelines.getForCompute( computeNode, computeBindings );
 
+			this._updateDispatchSize( computeNode, dispatchSize );
+
 			backend.compute( computeNodes, computeNode, computeBindings, computePipeline, dispatchSize );
 
 			nodes.updateAfterForCompute( computeNode );
@@ -3754,6 +3757,26 @@ class Renderer {
 		}
 
 		return camera;
+
+	}
+
+	/**
+	 * Updates the indirect storage attribute that defines the dispatch size
+	 * of the given compute node, if any.
+	 *
+	 * @private
+	 * @param {ComputeNode} computeNode - The compute node.
+	 * @param {?(number|Array<number>|IndirectStorageBufferAttribute)} dispatchSize - The dispatch size of the compute call.
+	 */
+	_updateDispatchSize( computeNode, dispatchSize ) {
+
+		const indirect = dispatchSize !== null ? dispatchSize : computeNode.dispatchSize;
+
+		if ( indirect && indirect.isIndirectStorageBufferAttribute === true ) {
+
+			this._attributes.update( indirect, AttributeType.INDIRECT );
+
+		}
 
 	}
 

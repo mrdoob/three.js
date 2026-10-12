@@ -123,7 +123,8 @@ class Textures extends DataMap {
 
 		const textures = renderTarget.textures;
 
-		const size = this.getSize( textures[ 0 ] );
+		// Depth-only render targets take their size from the depth texture.
+		const size = this.getSize( textures.length > 0 ? textures[ 0 ] : renderTarget.depthTexture );
 
 		const mipWidth = size.width >> activeMipmapLevel;
 		const mipHeight = size.height >> activeMipmapLevel;
@@ -409,7 +410,13 @@ class Textures extends DataMap {
 
 					}
 
-					if ( texture.source.dataReady === true ) backend.updateTexture( texture, options );
+					if ( texture.source.dataReady === true ) {
+
+						backend.updateTexture( texture, options );
+
+						texture.clearUpdateRanges();
+
+					}
 
 					if ( options.needsMipmaps && texture.mipmaps.length === 0 && texture.mipmapsAutoUpdate === true ) {
 

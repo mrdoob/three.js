@@ -332,10 +332,10 @@ class WebGLBackend extends Backend {
 	 * new allocation.
 	 *
 	 * @async
-	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
-	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
-	 * @param {number} offset - The storage buffer attribute.
-	 * @param {number} count - The offset from which to start reading the
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read from.
+	 * @param {?(ReadbackBuffer|ArrayBuffer)} [target=null] - The readback buffer or array buffer that receives the data. If `null`, a new array buffer is returned.
+	 * @param {number} [offset=0] - The byte offset to start reading from. Must be a multiple of 4.
+	 * @param {number} [count=-1] - The number of bytes to read. Must be a multiple of 4, or `-1` to read to the end of the buffer.
 	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
 	async getArrayBufferAsync( attribute, target = null, offset = 0, count = - 1 ) {
@@ -1257,7 +1257,7 @@ class WebGLBackend extends Backend {
 			if ( isRenderCameraDepthArray ) {
 
 				// Clear the depth texture
-				const textureData = this.get( renderTarget.depthTexture );
+				const textureData = this.get( this._currentContext.depthTexture );
 
 				if ( textureData.clearedRenderId !== this.renderer._nodes.nodeFrame.renderId ) {
 
@@ -2475,19 +2475,23 @@ class WebGLBackend extends Backend {
 
 					// rebind color
 
-					const textureData = this.get( descriptor.textures[ 0 ] );
+					if ( descriptor.textures.length > 0 ) {
 
-					if ( renderTarget.multiview ) {
+						const textureData = this.get( descriptor.textures[ 0 ] );
 
-						multiviewExt.framebufferTextureMultisampleMultiviewOVR( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, textureData.textureGPU, 0, samples, 0, 2 );
+						if ( renderTarget.multiview ) {
 
-					} else if ( useMultisampledRTT ) {
+							multiviewExt.framebufferTextureMultisampleMultiviewOVR( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, textureData.textureGPU, 0, samples, 0, 2 );
 
-						multisampledRTTExt.framebufferTexture2DMultisampleEXT( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureData.textureGPU, 0, samples );
+						} else if ( useMultisampledRTT ) {
 
-					} else {
+							multisampledRTTExt.framebufferTexture2DMultisampleEXT( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureData.textureGPU, 0, samples );
 
-						gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+						} else {
+
+							gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+
+						}
 
 					}
 
@@ -2728,8 +2732,9 @@ class WebGLBackend extends Backend {
 			if ( renderTarget.samples > 0 && renderTargetContextData.msaaFrameBuffer !== undefined && this._useMultisampledExtension( renderTarget ) === false ) {
 
 				const fb = renderTargetContextData.framebuffers[ renderContext.getCacheKey() ];
+				const textures = renderContext.textures;
 
-				let mask = renderTarget.resolveColorBuffer === false ? 0 : gl.COLOR_BUFFER_BIT;
+				let mask = renderTarget.resolveColorBuffer === false || textures.length === 0 ? 0 : gl.COLOR_BUFFER_BIT;
 
 				if ( renderTarget.resolveDepthBuffer ) {
 
@@ -2741,8 +2746,10 @@ class WebGLBackend extends Backend {
 				const msaaFrameBuffer = renderTargetContextData.msaaFrameBuffer;
 				const msaaRenderbuffers = renderTargetContextData.msaaRenderbuffers;
 
-				const textures = renderContext.textures;
 				const isMRT = textures.length > 1;
+
+				// Depth-only render targets have no color attachment but still resolve their depth.
+				const blitCount = Math.max( textures.length, 1 );
 
 				state.bindFramebuffer( gl.READ_FRAMEBUFFER, msaaFrameBuffer );
 				state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
@@ -2761,7 +2768,7 @@ class WebGLBackend extends Backend {
 
 				}
 
-				for ( let i = 0; i < textures.length; i ++ ) {
+				for ( let i = 0; i < blitCount; i ++ ) {
 
 					if ( isMRT ) {
 

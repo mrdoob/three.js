@@ -13,15 +13,7 @@ const beautyTexelFromScreen = Fn( ( [ screenTexel, beautySize, resolveSize ] ) =
 
 	return ivec2( floor( vec2( screenTexel ).mul( beautySize ).div( resolveSize ) ) );
 
-} ).setLayout( {
-	name: 'beautyTexelFromScreen',
-	type: 'ivec2',
-	inputs: [
-		{ name: 'screenTexel', type: 'ivec2' },
-		{ name: 'beautySize', type: 'vec2' },
-		{ name: 'resolveSize', type: 'vec2' }
-	]
-} );
+}, { screenTexel: 'ivec2', beautySize: 'vec2', resolveSize: 'vec2', return: 'ivec2' } );
 
 /**
  * Projects a world-space position into previous-frame UV coordinates.
@@ -45,15 +37,7 @@ const projectWorldToUV = Fn( ( [ worldPos, previousViewMatrix, previousProjectio
 
 	return resultUV;
 
-} ).setLayout( {
-	name: 'projectWorldToUV',
-	type: 'vec2',
-	inputs: [
-		{ name: 'worldPos', type: 'vec3' },
-		{ name: 'previousViewMatrix', type: 'mat4' },
-		{ name: 'previousProjectionMatrix', type: 'mat4' }
-	]
-} );
+}, { worldPos: 'vec3', previousViewMatrix: 'mat4', previousProjectionMatrix: 'mat4', return: 'vec2' } );
 
 // YCoCg variance clipping
 
@@ -112,15 +96,7 @@ const clipToAABB = Fn( ( [ history, boxMin, boxMax ] ) => {
 
 	return maxUnit.greaterThan( 1 ).select( pClip.add( vClip.div( maxUnit ) ), history );
 
-} ).setLayout( {
-	name: 'clipToAABB',
-	type: 'vec3',
-	inputs: [
-		{ name: 'history', type: 'vec3' },
-		{ name: 'boxMin', type: 'vec3' },
-		{ name: 'boxMax', type: 'vec3' }
-	]
-} );
+}, { history: 'vec3', boxMin: 'vec3', boxMax: 'vec3', return: 'vec3' } );
 
 const neighborhoodStruct = struct( {
 	mean: 'vec3',
@@ -387,7 +363,7 @@ const reprojectionStretchConfidence = Fn( ( [ historyUV, resolution ] ) => {
 
 	return sigMin.saturate();
 
-} );
+}, { historyUV: 'vec2', resolution: 'vec2', return: 'float' } );
 
 // Specular reprojection
 
@@ -409,6 +385,13 @@ const reprojectHitPoint = Fn( ( [
 
 	return projectWorldToUV( parallaxHitPoint, previousViewMatrix, previousProjectionMatrix );
 
+}, {
+	rayOrig: 'vec3',
+	rayLength: 'float',
+	cameraWorldPosition: 'vec3',
+	previousViewMatrix: 'mat4',
+	previousProjectionMatrix: 'mat4',
+	return: 'vec2'
 } );
 
 /**
@@ -420,11 +403,7 @@ const velocityToUVOffset = Fn( ( [ velocity ] ) => {
 
 	return velocity.mul( vec2( 0.5, - 0.5 ) );
 
-} ).setLayout( {
-	name: 'velocityToUVOffset',
-	type: 'vec2',
-	inputs: [ { name: 'velocity', type: 'vec2' } ]
-} );
+}, { velocity: 'vec2', return: 'vec2' } );
 
 /**
  * Current and previous-frame camera matrices for temporal reprojection passes.
@@ -660,7 +639,23 @@ class TemporalReprojectNode extends Node {
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
-		const needsRestart = this._historyRenderTarget.width !== width || this._historyRenderTarget.height !== height;
+		const currentDepth = this.depthNode.value;
+		const historyDepth = this._historyRenderTarget.depthTexture;
+
+		const depthFormatChanged = historyDepth.format !== currentDepth.format || historyDepth.type !== currentDepth.type;
+
+		// The texture copy requires matching formats, e.g. float depth with reversed depth or depth/stencil.
+		// Checked here since updateBefore() can run before setup() when driven by another node.
+
+		if ( depthFormatChanged === true ) {
+
+			historyDepth.format = currentDepth.format;
+			historyDepth.type = currentDepth.type;
+			historyDepth.needsUpdate = true;
+
+		}
+
+		const needsRestart = depthFormatChanged === true || this._historyRenderTarget.width !== width || this._historyRenderTarget.height !== height;
 		this.setSize( width, height );
 
 		let historySwappedForRestart = false;
@@ -708,16 +703,15 @@ class TemporalReprojectNode extends Node {
 
 		}
 
-		const currentDepth = this.depthNode.value;
 		const srcW = currentDepth.image !== null && currentDepth.image !== undefined ? currentDepth.image.width : 0;
 		const srcH = currentDepth.image !== null && currentDepth.image !== undefined ? currentDepth.image.height : 0;
 
 		if ( srcW > 0 && srcH > 0 ) {
 
-			renderer.copyTextureToTexture( currentDepth, this._historyRenderTarget.depthTexture );
+			renderer.copyTextureToTexture( currentDepth, historyDepth );
 			renderer.copyTextureToTexture( this.normalNode.value, this._previousNormalTexture );
 
-			this._previousDepthNode.value = this._historyRenderTarget.depthTexture;
+			this._previousDepthNode.value = historyDepth;
 
 		}
 
@@ -726,6 +720,10 @@ class TemporalReprojectNode extends Node {
 	}
 
 	setup( builder ) {
+
+		// Ensures the pass providing the depth updates before this node.
+
+		this.depthNode.build( builder );
 
 		const sharedContext = context( builder.getSharedContext() );
 
@@ -1019,11 +1017,11 @@ export default TemporalReprojectNode;
  * @param {TemporalReprojectNodeOptions} [options]
  * @returns {TemporalReprojectNode}
  */
-export const temporalReproject = ( beautyNode, depthNode, normalNode, velocityNode, camera, options = {} ) => nodeObject( new TemporalReprojectNode(
+export const temporalReproject = ( beautyNode, depthNode, normalNode, velocityNode, camera, options = {} ) => new TemporalReprojectNode(
 	convertToTexture( beautyNode ),
 	nodeObject( depthNode ),
 	nodeObject( normalNode ),
 	nodeObject( velocityNode ),
 	camera,
 	options
-) );
+);

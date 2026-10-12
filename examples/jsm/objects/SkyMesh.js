@@ -285,7 +285,7 @@ class SkyMesh extends Mesh {
 
 				return fract( p.xx.add( p.yz ).mul( p.zy ) ).mul( 2.0 ).sub( 1.0 );
 
-			} );
+			}, { i: 'vec2', return: 'vec2' } );
 
 			// 2D gradient noise: isotropic lobes like Perlin at value-noise cost
 			const noise = Fn( ( [ p ] ) => {
@@ -301,7 +301,7 @@ class SkyMesh extends Mesh {
 
 				return mix( mix( a, b, u.x ), mix( c, d, u.x ), u.y ).mul( 1.6 ); // ~[-1,1]
 
-			} );
+			}, { p: 'vec2', return: 'float' } );
 
 			// fbm; per-octave drift makes clouds billow instead of scrolling as a rigid stamp
 			const fbm = Fn( ( [ position, drift ] ) => {
@@ -320,7 +320,7 @@ class SkyMesh extends Mesh {
 
 				return result;
 
-			} );
+			}, { position: 'vec2', drift: 'vec2', return: 'float' } );
 
 			// Clouds
 			If( direction.y.greaterThan( 0.0 ).and( this.cloudCoverage.greaterThan( 0.0 ) ), () => {

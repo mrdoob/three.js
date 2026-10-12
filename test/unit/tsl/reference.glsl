@@ -1028,10 +1028,10 @@ if ( ( result > 0.5 ) ) {
 
 // function
 
-float fn3 ( float value ) {
+float fn0 ( float value ) {
 
 	return ( value * value );
 
 }
 
-fn3( 3.0 )
+fn0( 3.0 )
