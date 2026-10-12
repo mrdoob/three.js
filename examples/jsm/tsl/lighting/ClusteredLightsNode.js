@@ -64,7 +64,9 @@ class ClusteredLightsNode extends LightsNode {
 
 		this._bufferSize = null;
 		this._isWebGLBackend = false;
+		this._invocationsPerCluster = 1;
 		this._lightIndexes = null;
+		this._retiredLightIndexes = null;
 		this._screenClusterIndex = null;
 		this._compute = null;
 
@@ -330,6 +332,10 @@ class ClusteredLightsNode extends LightsNode {
 	updateBefore( frame ) {
 
 		const { renderer, camera } = frame;
+
+		// storage replaced in a previous frame: the materials have been rebuilt since
+
+		this._disposeRetiredStorage();
 
 		this._updateProgram( renderer );
 
@@ -616,27 +622,14 @@ class ClusteredLightsNode extends LightsNode {
 	 */
 	setSize( width, height ) {
 
-		width = this._getBufferFitSize( width );
-		height = this._getBufferFitSize( height );
-
-		if ( ! this._bufferSize || this._bufferSize.width !== width || this._bufferSize.height !== height ) {
-
-			const lightIndexes = this._lightIndexes;
-
-			this._create( width, height );
-
-			// dispose storage if light indices have changed
-
-			if ( lightIndexes !== null && lightIndexes !== this._lightIndexes ) lightIndexes.value.dispose();
-
-		}
+		this._resize( this._getBufferFitSize( width ), this._getBufferFitSize( height ) );
 
 		return this;
 
 	}
 
 	/**
-	 * Creates the cluster grid on first use and recreates it when the drawing buffer size changes.
+	 * Creates the cluster grid on first use and resizes it when the drawing buffer size changes.
 	 *
 	 * @private
 	 * @param {Renderer} renderer - The renderer.
@@ -645,62 +638,85 @@ class ClusteredLightsNode extends LightsNode {
 
 		renderer.getDrawingBufferSize( _size );
 
-		const width = this._getBufferFitSize( _size.width );
-		const height = this._getBufferFitSize( _size.height );
-
 		const isWebGLBackend = renderer.backend.isWebGLBackend === true;
+		const backendChanged = this._compute !== null && this._isWebGLBackend !== isWebGLBackend;
 
-		if ( this._bufferSize === null || this._isWebGLBackend !== isWebGLBackend ) {
+		this._isWebGLBackend = isWebGLBackend;
 
-			this._isWebGLBackend = isWebGLBackend;
-
-			this._create( width, height );
-
-		} else if ( this._bufferSize.width !== width || this._bufferSize.height !== height ) {
-
-			this._create( width, height );
-
-		}
+		this._resize( this._getBufferFitSize( _size.width ), this._getBufferFitSize( _size.height ), backendChanged );
 
 	}
 
 	/**
-	 * Creates the cluster grid, the light index storage and the compute node for the given size.
+	 * Resizes the cluster grid. The grid dimensions are uniforms, so resizing only updates
+	 * them and the compute count; the shaders are rebuilt only when the light index storage
+	 * has to grow.
 	 *
 	 * @private
 	 * @param {number} width - The fitted width.
 	 * @param {number} height - The fitted height.
+	 * @param {boolean} [rebuild=false] - Whether to rebuild the compute and the storage.
 	 */
-	_create( width, height ) {
+	_resize( width, height, rebuild = false ) {
+
+		if ( rebuild === false && this._bufferSize !== null && this._bufferSize.width === width && this._bufferSize.height === height ) return;
+
+		const NX = Math.floor( width / this.tileSize );
+		const NY = Math.floor( height / this.tileSize );
+		const clusterCount = NX * NY * this.zSlices;
+
+		const requiredElements = clusterCount * this._chunksPerCluster;
+
+		if ( rebuild === true || this._compute === null || this._lightIndexes.value.array.length / 4 < requiredElements ) {
+
+			this._create( clusterCount );
+
+		}
+
+		this._gridDimensions.value.set( NX, NY );
+		this._compute.count = clusterCount * this._invocationsPerCluster;
+
+		this._bufferSize = new Vector2( width, height );
+
+	}
+
+	/**
+	 * Creates the light index storage, the compute node and the fragment cluster lookup.
+	 * The storage is allocated with headroom so that most resizes do not need a rebuild.
+	 *
+	 * @private
+	 * @param {number} clusterCount - The number of clusters of the current grid.
+	 */
+	_create( clusterCount ) {
 
 		const { tileSize, zSlices, _chunksPerCluster: chunksPerCluster } = this;
 
-		const bufferSize = new Vector2( width, height );
-
-		const NX = Math.floor( bufferSize.width / tileSize );
-		const NY = Math.floor( bufferSize.height / tileSize );
 		const NZ = zSlices;
-		const clusterCount = NX * NY * NZ;
 
-		this._gridDimensions.value.set( NX, NY );
+		// grid dimensions as uniforms: shaders do not depend on the drawing buffer size
+
+		const grid = this._gridDimensions;
+		const NX = int( grid.x );
+		const NY = int( grid.y );
 
 		// release the compute pipeline and bindings built for the previous grid
 
 		if ( this._compute !== null ) this._compute.dispose();
 
-		// Per-cluster light-index storage (ivec4 chunks).
+		// Per-cluster light-index storage (ivec4 chunks), grown geometrically.
 
-		const lightIndexesLength = clusterCount * chunksPerCluster * 4;
+		const requiredElements = clusterCount * chunksPerCluster;
+		const previousElements = this._lightIndexes !== null ? this._lightIndexes.value.array.length / 4 : 0;
+		const elements = previousElements === 0 ? Math.ceil( requiredElements * 1.5 ) : Math.max( requiredElements, previousElements * 2 );
 
-		let lightIndexes = this._lightIndexes;
+		// the current storage may still be bound by materials rendered in this frame,
+		// so it is disposed in the next updateBefore()
 
-		if ( lightIndexes === null || lightIndexes.value.array.length < lightIndexesLength ) {
+		this._disposeRetiredStorage();
+		this._retiredLightIndexes = this._lightIndexes;
 
-			const lightIndexesArray = new Int32Array( lightIndexesLength );
-			// instanced storage: WebGL computes use gl_InstanceID as instanceIndex; PBO: random access in the fragment stage
-			lightIndexes = instancedArray( lightIndexesArray, 'ivec4' ).setPBO( true ).setName( 'lightIndexes' );
-
-		}
+		// instanced storage: WebGL computes use gl_InstanceID as instanceIndex; PBO: random access in the fragment stage
+		const lightIndexes = instancedArray( new Int32Array( elements * 4 ), 'ivec4' ).setPBO( true ).setName( 'lightIndexes' );
 
 		// view-space AABB of the given cluster
 
@@ -716,14 +732,14 @@ class ClusteredLightsNode extends LightsNode {
 			// 3D cluster coordinates
 			const cx = clusterIndex.mod( NX );
 			const cy = clusterIndex.div( NX ).mod( NY );
-			const cz = clusterIndex.div( NX * NY );
+			const cz = clusterIndex.div( NX.mul( NY ) );
 
 			// NDC X/Y bounds of the cluster.
 			// Y is flipped: cy=0 is the top screen row (fragment y=0), which is NDC y=+1.
-			const ndcXmin = float( cx ).mul( 2.0 / NX ).sub( 1.0 );
-			const ndcXmax = float( cx.add( int( 1 ) ) ).mul( 2.0 / NX ).sub( 1.0 );
-			const ndcYmax = float( 1 ).sub( float( cy ).mul( 2.0 / NY ) );
-			const ndcYmin = float( 1 ).sub( float( cy.add( int( 1 ) ) ).mul( 2.0 / NY ) );
+			const ndcXmin = float( cx ).mul( 2.0 ).div( grid.x ).sub( 1.0 );
+			const ndcXmax = float( cx.add( int( 1 ) ) ).mul( 2.0 ).div( grid.x ).sub( 1.0 );
+			const ndcYmax = float( 1 ).sub( float( cy ).mul( 2.0 ).div( grid.y ) );
+			const ndcYmin = float( 1 ).sub( float( cy.add( int( 1 ) ) ).mul( 2.0 ).div( grid.y ) );
 
 			// View-space Z bounds (negative, exponential slicing)
 			const farOverNear = this._cameraFar.div( this._cameraNear );
@@ -779,9 +795,11 @@ class ClusteredLightsNode extends LightsNode {
 		const chunksPerInvocation = this._isWebGLBackend ? 1 : chunksPerCluster;
 		const invocationsPerCluster = chunksPerCluster / chunksPerInvocation;
 
+		this._invocationsPerCluster = invocationsPerCluster;
+
 		const compute = Fn( () => {
 
-			const clusterIndex = instanceIndex.div( invocationsPerCluster );
+			const clusterIndex = int( instanceIndex.div( invocationsPerCluster ) );
 			const firstChunk = int( instanceIndex.mod( invocationsPerCluster ) ).mul( chunksPerInvocation );
 			const firstSlot = firstChunk.mul( 4 );
 			const lastSlot = firstSlot.add( chunksPerInvocation * 4 );
@@ -823,7 +841,7 @@ class ClusteredLightsNode extends LightsNode {
 
 			} );
 
-			const firstElement = int( clusterIndex ).mul( chunksPerCluster ).add( firstChunk );
+			const firstElement = clusterIndex.mul( chunksPerCluster ).add( firstChunk );
 
 			Loop( chunksPerInvocation, ( { i } ) => {
 
@@ -848,8 +866,8 @@ class ClusteredLightsNode extends LightsNode {
 			const zSlice = clamp( sliceFloat.floor(), float( 0 ), float( NZ - 1 ) );
 
 			return int( screenTile.x )
-				.add( int( screenTile.y ).mul( int( NX ) ) )
-				.add( int( zSlice ).mul( int( NX * NY ) ) );
+				.add( int( screenTile.y ).mul( NX ) )
+				.add( int( zSlice ).mul( NX.mul( NY ) ) );
 
 		} );
 
@@ -857,7 +875,6 @@ class ClusteredLightsNode extends LightsNode {
 
 		// assigns
 
-		this._bufferSize = bufferSize;
 		this._lightIndexes = lightIndexes;
 		this._screenClusterIndex = screenClusterIndex;
 		this._compute = compute;
@@ -865,9 +882,27 @@ class ClusteredLightsNode extends LightsNode {
 	}
 
 	/**
+	 * Disposes the light index storage replaced by the last rebuild, if any.
+	 *
+	 * @private
+	 */
+	_disposeRetiredStorage() {
+
+		if ( this._retiredLightIndexes !== null ) {
+
+			this._retiredLightIndexes.value.dispose();
+			this._retiredLightIndexes = null;
+
+		}
+
+	}
+
+	/**
 	 * Frees the GPU resources allocated by this node.
 	 */
 	dispose() {
+
+		this._disposeRetiredStorage();
 
 		if ( this._compute !== null ) this._compute.dispose();
 		if ( this._lightIndexes !== null ) this._lightIndexes.value.dispose();
