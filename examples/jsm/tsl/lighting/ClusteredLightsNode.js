@@ -1,8 +1,8 @@
 import { DataTexture, FloatType, RGBAFormat, Vector2, Vector3, LightsNode, NodeUpdateType } from 'three/webgpu';
 
 import {
-	attributeArray, nodeProxy, int, float, vec3, vec4, ivec2, ivec4, uniform, Break, Loop, positionView,
-	Fn, If, Return, textureLoad, instanceIndex, screenCoordinate, directPointLight,
+	instancedArray, nodeProxy, int, float, vec3, vec4, ivec2, ivec4, uniform, Break, Loop, positionView,
+	Fn, If, textureLoad, instanceIndex, screenCoordinate, directPointLight,
 	renderGroup,
 	min, max, pow, log, clamp, dot, smoothstep
 } from 'three/tsl';
@@ -63,6 +63,7 @@ class ClusteredLightsNode extends LightsNode {
 		this._chunksPerCluster = Math.ceil( maxLightsPerCluster / 4 );
 
 		this._bufferSize = null;
+		this._isWebGLBackend = false;
 		this._lightIndexes = null;
 		this._screenClusterIndex = null;
 		this._compute = null;
@@ -647,7 +648,11 @@ class ClusteredLightsNode extends LightsNode {
 		const width = this._getBufferFitSize( _size.width );
 		const height = this._getBufferFitSize( _size.height );
 
-		if ( this._bufferSize === null ) {
+		const isWebGLBackend = renderer.backend.isWebGLBackend === true;
+
+		if ( this._bufferSize === null || this._isWebGLBackend !== isWebGLBackend ) {
+
+			this._isWebGLBackend = isWebGLBackend;
 
 			this._create( width, height );
 
@@ -668,7 +673,7 @@ class ClusteredLightsNode extends LightsNode {
 	 */
 	_create( width, height ) {
 
-		const { tileSize, zSlices, maxLightsPerCluster, _chunksPerCluster: chunksPerCluster } = this;
+		const { tileSize, zSlices, _chunksPerCluster: chunksPerCluster } = this;
 
 		const bufferSize = new Vector2( width, height );
 
@@ -692,35 +697,14 @@ class ClusteredLightsNode extends LightsNode {
 		if ( lightIndexes === null || lightIndexes.value.array.length < lightIndexesLength ) {
 
 			const lightIndexesArray = new Int32Array( lightIndexesLength );
-			lightIndexes = attributeArray( lightIndexesArray, 'ivec4' ).setName( 'lightIndexes' );
+			// instanced storage: WebGL computes use gl_InstanceID as instanceIndex; PBO: random access in the fragment stage
+			lightIndexes = instancedArray( lightIndexesArray, 'ivec4' ).setPBO( true ).setName( 'lightIndexes' );
 
 		}
 
-		// compute-side accessors (use instanceIndex)
+		// view-space AABB of the given cluster
 
-		const getClusterChunk = ( chunkIdx ) => {
-
-			const idx = instanceIndex.mul( int( chunksPerCluster ) ).add( int( chunkIdx ) );
-
-			return lightIndexes.element( idx );
-
-		};
-
-		const getClusterSlot = ( slotIdx ) => {
-
-			slotIdx = int( slotIdx );
-
-			const stride = int( 4 );
-			const chunkOffset = slotIdx.div( stride );
-			const idx = instanceIndex.mul( int( chunksPerCluster ) ).add( chunkOffset );
-
-			return lightIndexes.element( idx ).element( slotIdx.mod( stride ) );
-
-		};
-
-		// compute: one thread per cluster
-
-		const compute = Fn( () => {
+		const getClusterBounds = ( clusterIndex ) => {
 
 			// view-space scale factors derived from the projection matrix:
 			//   view_x = ndc_x * (-view_z) / focal_x = ndc_x * (-view_z) * invFocalX
@@ -729,10 +713,10 @@ class ClusteredLightsNode extends LightsNode {
 			const invFocalX = float( 1 ).div( this._cameraProjectionMatrix.element( 0 ).element( 0 ) );
 			const invFocalY = float( 1 ).div( this._cameraProjectionMatrix.element( 1 ).element( 1 ) );
 
-			// 3D cluster coordinates from instanceIndex
-			const cx = instanceIndex.mod( NX );
-			const cy = instanceIndex.div( NX ).mod( NY );
-			const cz = instanceIndex.div( NX * NY );
+			// 3D cluster coordinates
+			const cx = clusterIndex.mod( NX );
+			const cy = clusterIndex.div( NX ).mod( NY );
+			const cz = clusterIndex.div( NX * NY );
 
 			// NDC X/Y bounds of the cluster.
 			// Y is flipped: cy=0 is the top screen row (fragment y=0), which is NDC y=+1.
@@ -770,13 +754,41 @@ class ClusteredLightsNode extends LightsNode {
 			const aabbMin = vec3( aabbMinX, aabbMinY, zFarCluster );
 			const aabbMax = vec3( aabbMaxX, aabbMaxY, zNearCluster );
 
-			// clear stale data from previous frame
-			Loop( chunksPerCluster, ( { i } ) => {
+			return { cz, aabbMin, aabbMax };
 
-				getClusterChunk( i ).assign( ivec4( 0 ) );
+		};
 
-			} );
+		// sphere-AABB intersection in view space
 
+		const intersectsCluster = ( lightIdx, aabbMin, aabbMax ) => {
+
+			const { center, radius } = this._getLightBounds( lightIdx );
+
+			const closest = max( aabbMin, min( center, aabbMax ) );
+			const diff = center.sub( closest );
+			const distSq = dot( diff, diff );
+
+			return radius.lessThan( 0 ).or( distSq.lessThanEqual( radius.mul( radius ) ) );
+
+		};
+
+		// Each invocation fills `chunksPerInvocation` ivec4 chunks of one cluster. WebGL computes
+		// run via transform feedback and can only write their own element, so there each
+		// invocation fills a single chunk; WebGPU uses one invocation per cluster.
+
+		const chunksPerInvocation = this._isWebGLBackend ? 1 : chunksPerCluster;
+		const invocationsPerCluster = chunksPerCluster / chunksPerInvocation;
+
+		const compute = Fn( () => {
+
+			const clusterIndex = instanceIndex.div( invocationsPerCluster );
+			const firstChunk = int( instanceIndex.mod( invocationsPerCluster ) ).mul( chunksPerInvocation );
+			const firstSlot = firstChunk.mul( 4 );
+			const lastSlot = firstSlot.add( chunksPerInvocation * 4 );
+
+			const { cz, aabbMin, aabbMax } = getClusterBounds( clusterIndex );
+
+			const chunks = ivec4( 0 ).toArray( chunksPerInvocation ).toVar();
 			const index = int( 0 ).toVar();
 
 			// Z-culling: only test lights that can reach this cluster's Z-slice
@@ -788,29 +800,38 @@ class ClusteredLightsNode extends LightsNode {
 
 				const lightIdx = rangeStart.add( i );
 
-				If( index.greaterThanEqual( int( maxLightsPerCluster ) ).or( lightIdx.greaterThanEqual( rangeEnd ) ), () => {
+				If( index.greaterThanEqual( lastSlot ).or( lightIdx.greaterThanEqual( rangeEnd ) ), () => {
 
-					Return();
+					Break();
 
 				} );
 
-				const { center, radius } = this._getLightBounds( lightIdx );
+				If( intersectsCluster( lightIdx, aabbMin, aabbMax ), () => {
 
-				// sphere-AABB intersection in view space
-				const closest = max( aabbMin, min( center, aabbMax ) );
-				const diff = center.sub( closest );
-				const distSq = dot( diff, diff );
+					// slots before firstSlot belong to other invocations of this cluster
+					If( index.greaterThanEqual( firstSlot ), () => {
 
-				If( radius.lessThan( 0 ).or( distSq.lessThanEqual( radius.mul( radius ) ) ), () => {
+						const slot = index.sub( firstSlot );
 
-					getClusterSlot( index ).assign( lightIdx.add( int( 1 ) ) );
+						chunks.element( slot.div( 4 ) ).element( slot.mod( 4 ) ).assign( lightIdx.add( int( 1 ) ) );
+
+					} );
+
 					index.addAssign( int( 1 ) );
 
 				} );
 
 			} );
 
-		} )().compute( clusterCount ).setName( 'Update Clustered Lights' );
+			const firstElement = int( clusterIndex ).mul( chunksPerCluster ).add( firstChunk );
+
+			Loop( chunksPerInvocation, ( { i } ) => {
+
+				lightIndexes.element( firstElement.add( i ) ).assign( chunks.element( i ) );
+
+			} );
+
+		} )().compute( clusterCount * invocationsPerCluster ).setName( 'Update Clustered Lights' );
 
 		// shading-side: fragment → cluster index
 
