@@ -162,20 +162,13 @@ function getSkinnedNormalAndTangent( boneMatrices, normal, tangent, bindMatrix, 
 }
 
 /**
- * Retrieves or initializes the previous frame skinned position node for motion vectors.
- * Uses a WeakMap to cache previous frame bone matrix arrays and their TSL buffer nodes.
+ * Returns the previous frame bone matrices of the given skeleton, creating them on first use.
+ * They are stored per skeleton, so skinned meshes that share a material keep their own data.
  *
- * @param {NodeBuilder} builder - The current node builder.
- * @param {SkinnedMesh} skinnedMesh - The skinned mesh.
- * @param {Node<mat4>} bindMatrixNode - The bind matrix node.
- * @param {Node<mat4>} bindMatrixInverseNode - The inverse bind matrix node.
- * @param {Node<uvec4>} skinIndexNode - The skin index attribute.
- * @param {Node<vec4>} skinWeightNode - The skin weight attribute.
- * @returns {Node<vec3>} The skinned position from the previous frame.
+ * @param {Skeleton} skeleton - The skeleton.
+ * @returns {{previousBoneMatrices: Float32Array, previousBoneTexture: ?DataTexture}} The previous frame bone data.
  */
-function getPreviousSkinnedPosition( builder, skinnedMesh, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode ) {
-
-	const skeleton = skinnedMesh.skeleton;
+function getPreviousBoneMatricesData( skeleton ) {
 
 	let data = _previousBoneMatricesData.get( skeleton );
 
@@ -183,41 +176,87 @@ function getPreviousSkinnedPosition( builder, skinnedMesh, bindMatrixNode, bindM
 
 		skeleton.update();
 
-		const uniformBufferSize = skeleton.bones.length * 16 * 4;
-
-		if ( uniformBufferSize <= builder.getUniformBufferLimit() ) {
-
-			const previousBoneMatrices = new Float32Array( skeleton.boneMatrices );
-
-			data = {
-				previousBoneMatrices,
-				previousBoneTexture: null,
-				node: buffer( previousBoneMatrices, 'mat4', skeleton.bones.length )
-			};
-
-		} else {
-
-			if ( skeleton.boneTexture === null ) skeleton.computeBoneTexture();
-
-			const { width, height } = skeleton.boneTexture.image;
-
-			const previousBoneMatrices = new Float32Array( skeleton.boneMatrices );
-			const previousBoneTexture = new DataTexture( previousBoneMatrices, width, height, RGBAFormat, FloatType );
-			previousBoneTexture.needsUpdate = true;
-
-			data = {
-				previousBoneMatrices,
-				previousBoneTexture,
-				node: getBoneTextureMatrices( texture( previousBoneTexture ) )
-			};
-
-		}
+		data = {
+			previousBoneMatrices: new Float32Array( skeleton.boneMatrices ),
+			previousBoneTexture: null
+		};
 
 		_previousBoneMatricesData.set( skeleton, data );
 
 	}
 
-	return getSkinnedPosition( data.node, positionPrevious, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode );
+	if ( data.previousBoneTexture === null && skeleton.boneTexture !== null ) {
+
+		const { width, height } = skeleton.boneTexture.image;
+
+		data.previousBoneTexture = new DataTexture( data.previousBoneMatrices, width, height, RGBAFormat, FloatType );
+		data.previousBoneTexture.needsUpdate = true;
+
+	}
+
+	return data;
+
+}
+
+/**
+ * Retrieves the previous frame skinned position node for motion vectors.
+ *
+ * The node of a material is shared by every skinned mesh rendered with it. With `perObject`,
+ * the previous bone matrices are bound per rendered object, like the current ones; otherwise
+ * they stay bound to the given mesh's skeleton (compute skinning).
+ *
+ * @param {NodeBuilder} builder - The current node builder.
+ * @param {SkinnedMesh} skinnedMesh - The skinned mesh.
+ * @param {Node<mat4>} bindMatrixNode - The bind matrix node.
+ * @param {Node<mat4>} bindMatrixInverseNode - The inverse bind matrix node.
+ * @param {Node<uvec4>} skinIndexNode - The skin index attribute.
+ * @param {Node<vec4>} skinWeightNode - The skin weight attribute.
+ * @param {boolean} [perObject=false] - Whether to bind the previous bone matrices of each rendered object.
+ * @returns {Node<vec3>} The skinned position from the previous frame.
+ */
+function getPreviousSkinnedPosition( builder, skinnedMesh, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode, perObject = false ) {
+
+	const skeleton = skinnedMesh.skeleton;
+
+	let previousBoneMatricesNode;
+
+	if ( skeleton.bones.length * 16 * 4 <= builder.getUniformBufferLimit() ) {
+
+		const previousBoneMatrices = buffer( getPreviousBoneMatricesData( skeleton ).previousBoneMatrices, 'mat4', skeleton.bones.length );
+
+		if ( perObject === true ) {
+
+			OnObjectUpdate( ( { object } ) => {
+
+				previousBoneMatrices.value = getPreviousBoneMatricesData( object.skeleton ).previousBoneMatrices;
+
+			} );
+
+		}
+
+		previousBoneMatricesNode = previousBoneMatrices;
+
+	} else {
+
+		if ( skeleton.boneTexture === null ) skeleton.computeBoneTexture();
+
+		const previousBoneTexture = texture( getPreviousBoneMatricesData( skeleton ).previousBoneTexture );
+
+		if ( perObject === true ) {
+
+			OnObjectUpdate( ( { object } ) => {
+
+				previousBoneTexture.value = getPreviousBoneMatricesData( object.skeleton ).previousBoneTexture;
+
+			} );
+
+		}
+
+		previousBoneMatricesNode = getBoneTextureMatrices( previousBoneTexture );
+
+	}
+
+	return getSkinnedPosition( previousBoneMatricesNode, positionPrevious, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode );
 
 }
 
@@ -237,6 +276,8 @@ export const skinning = /*@__PURE__*/ Fn( ( [ skinnedMesh ], builder ) => {
 	const bindMatrixInverseNode = reference( 'bindMatrixInverse', 'mat4' );
 	const boneMatricesNode = getBoneMatricesNode( builder, skinnedMesh.skeleton );
 
+	const needsPreviousData = builder.needsPreviousData();
+
 	OnObjectUpdate( ( { object, frameId } ) => {
 
 		const skeleton = object.skeleton;
@@ -245,7 +286,7 @@ export const skinning = /*@__PURE__*/ Fn( ( [ skinnedMesh ], builder ) => {
 
 			_skeletonsUpdated.set( skeleton, frameId );
 
-			const skeletonData = _previousBoneMatricesData.get( skeleton );
+			const skeletonData = needsPreviousData ? getPreviousBoneMatricesData( skeleton ) : _previousBoneMatricesData.get( skeleton );
 
 			if ( skeletonData !== undefined ) {
 
@@ -265,9 +306,9 @@ export const skinning = /*@__PURE__*/ Fn( ( [ skinnedMesh ], builder ) => {
 
 	} );
 
-	if ( builder.needsPreviousData() ) {
+	if ( needsPreviousData ) {
 
-		const previousSkinnedPosition = getPreviousSkinnedPosition( builder, skinnedMesh, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode );
+		const previousSkinnedPosition = getPreviousSkinnedPosition( builder, skinnedMesh, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode, true );
 
 		positionPrevious.assign( previousSkinnedPosition );
 
