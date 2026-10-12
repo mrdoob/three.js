@@ -143,6 +143,14 @@ class WebGPUTextureUtils {
 		 */
 		this._samplerCache = new Map();
 
+		/**
+		 * Canvas textures allocated directly by this utility.
+		 *
+		 * @private
+		 * @type {Set<Texture>}
+		 */
+		this._canvasTextures = new Set();
+
 	}
 
 	/**
@@ -493,6 +501,8 @@ class WebGPUTextureUtils {
 
 		}
 
+		this._canvasTextures.delete( texture );
+
 		backend.delete( texture );
 
 	}
@@ -557,6 +567,8 @@ class WebGPUTextureUtils {
 		colorTexture.samples = samples;
 
 		colorTextureData.texture = colorBuffer;
+
+		this._canvasTextures.add( colorTexture );
 
 		return colorBuffer;
 
@@ -629,6 +641,8 @@ class WebGPUTextureUtils {
 		depthTexture.samples = samples;
 
 		this.createTexture( depthTexture, { width, height } );
+
+		this._canvasTextures.add( depthTexture );
 
 		return backend.get( depthTexture ).texture;
 
@@ -871,6 +885,12 @@ class WebGPUTextureUtils {
 	 * Frees all internal resources.
 	 */
 	dispose() {
+
+		for ( const texture of this._canvasTextures ) {
+
+			this.destroyTexture( texture );
+
+		}
 
 		this._samplerCache.clear();
 
