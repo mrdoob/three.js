@@ -146,8 +146,6 @@ class RenderTarget extends EventDispatcher {
 		const count = options.count;
 		for ( let i = 0; i < count; i ++ ) {
 
-			// ensure image object is not shared, see #20328
-
 			this.textures[ i ] = new Texture( { width: width, height: height, depth: options.depth } );
 			this.textures[ i ].isRenderTargetTexture = true;
 			this.textures[ i ].renderTarget = this;
