@@ -4,17 +4,27 @@ import {
 	attributeArray, nodeProxy, int, float, vec3, vec4, ivec2, ivec4, uniform, Break, Loop, positionView,
 	Fn, If, Return, textureLoad, instanceIndex, screenCoordinate, directPointLight,
 	renderGroup,
-	min, max, pow, log, clamp, dot
+	min, max, pow, log, clamp, dot, smoothstep
 } from 'three/tsl';
 
 const _vector3 = /*@__PURE__*/ new Vector3();
+const _direction = /*@__PURE__*/ new Vector3();
+const _targetPosition = /*@__PURE__*/ new Vector3();
 const _size = /*@__PURE__*/ new Vector2();
+
+// light data texture rows
+
+const POSITION_ROW = 0; // world position, cutoff distance
+const COLOR_ROW = 1; // color * intensity, decay
+const SPOT_ROW = 2; // scaled world spot direction, scaled cone cosine
+const BOUNDS_ROW = 3; // world bounding sphere center, radius ( negative if unbounded )
+const ROWS = 4;
 
 /**
  * A custom version of `LightsNode` implementing Forward+ clustered shading:
  * the view frustum is subdivided into a 3D grid of clusters (X × Y screen tiles
  * times an exponentially-spaced set of Z depth slices), and each cluster holds
- * only the point lights whose spheres intersect it. At shading time each fragment
+ * only the point and spot lights whose bounding spheres intersect it. At shading time each fragment
  * looks up its cluster and loops over just that cluster's lights. Unlike 2D tiled
  * lighting, clustered shading culls lights that share screen pixels but lie at
  * different depths — suitable for 3D scenes with real depth complexity.
@@ -33,7 +43,7 @@ class ClusteredLightsNode extends LightsNode {
 	/**
 	 * Constructs a new clustered lights node.
 	 *
-	 * @param {number} [maxLights=1024] - Maximum number of point lights.
+	 * @param {number} [maxLights=1024] - Maximum number of point and spot lights.
 	 * @param {number} [tileSize=32] - Screen tile size in pixels (cluster XY size).
 	 * @param {number} [zSlices=24] - Number of exponential depth slices.
 	 * @param {number} [maxLightsPerCluster=64] - Per-cluster light-list capacity.
@@ -57,8 +67,8 @@ class ClusteredLightsNode extends LightsNode {
 		this._screenClusterIndex = null;
 		this._compute = null;
 
-		const lightsData = new Float32Array( maxLights * 4 * 2 );
-		this._lightsTexture = new DataTexture( lightsData, lightsData.length / 8, 2, RGBAFormat, FloatType );
+		const lightsData = new Float32Array( maxLights * 4 * ROWS );
+		this._lightsTexture = new DataTexture( lightsData, maxLights, ROWS, RGBAFormat, FloatType );
 
 		// Per Z-slice light range for Z-culling (CPU-sorted, uploaded each frame)
 
@@ -107,18 +117,18 @@ class ClusteredLightsNode extends LightsNode {
 
 		const data = lightsTexture.image.data;
 		const lineSize = lightsTexture.image.width * 4;
-		const count = clusteredLights.length;
+		const count = Math.min( clusteredLights.length, this.maxLights );
 
 		this._lightsCount.value = count;
 
-		// Sort lights by view-space depth for Z-culling
+		// Sort lights by the view-space depth of their bounding spheres for Z-culling
 
 		const viewZ = this._lightViewZ;
 		const order = this._lightSortOrder;
 
 		for ( let i = 0; i < count; i ++ ) {
 
-			_vector3.setFromMatrixPosition( clusteredLights[ i ].matrixWorld );
+			this._getBoundingSphereCenter( clusteredLights[ i ], _vector3 );
 			_vector3.applyMatrix4( camera.matrixWorldInverse );
 			viewZ[ i ] = _vector3.z;
 			order[ i ] = i;
@@ -134,19 +144,60 @@ class ClusteredLightsNode extends LightsNode {
 
 			const light = clusteredLights[ order[ i ] ];
 
-			_vector3.setFromMatrixPosition( light.matrixWorld );
-
 			const offset = i * 4;
 
-			data[ offset + 0 ] = _vector3.x;
-			data[ offset + 1 ] = _vector3.y;
-			data[ offset + 2 ] = _vector3.z;
-			data[ offset + 3 ] = light.distance;
+			_vector3.setFromMatrixPosition( light.matrixWorld );
 
-			data[ lineSize + offset + 0 ] = light.color.r * light.intensity;
-			data[ lineSize + offset + 1 ] = light.color.g * light.intensity;
-			data[ lineSize + offset + 2 ] = light.color.b * light.intensity;
-			data[ lineSize + offset + 3 ] = light.decay;
+			let rowOffset = lineSize * POSITION_ROW + offset;
+
+			data[ rowOffset + 0 ] = _vector3.x;
+			data[ rowOffset + 1 ] = _vector3.y;
+			data[ rowOffset + 2 ] = _vector3.z;
+			data[ rowOffset + 3 ] = light.distance;
+
+			rowOffset = lineSize * COLOR_ROW + offset;
+
+			data[ rowOffset + 0 ] = light.color.r * light.intensity;
+			data[ rowOffset + 1 ] = light.color.g * light.intensity;
+			data[ rowOffset + 2 ] = light.color.b * light.intensity;
+			data[ rowOffset + 3 ] = light.decay;
+
+			// The spot attenuation smoothstep( coneCos, penumbraCos, dot( L, direction ) ) is stored
+			// as smoothstep( 0, 1, dot( L, direction * scale ) - coneCos * scale ) with
+			// scale = 1 / ( penumbraCos - coneCos ). Point lights store a constant attenuation of 1.
+
+			rowOffset = lineSize * SPOT_ROW + offset;
+
+			if ( light.isSpotLight === true ) {
+
+				const coneCos = Math.cos( light.angle );
+				const penumbraCos = Math.cos( light.angle * ( 1 - light.penumbra ) );
+				const scale = 1 / Math.max( penumbraCos - coneCos, 1e-4 );
+
+				this._getSpotDirection( light, _direction ).multiplyScalar( scale );
+
+				data[ rowOffset + 0 ] = _direction.x;
+				data[ rowOffset + 1 ] = _direction.y;
+				data[ rowOffset + 2 ] = _direction.z;
+				data[ rowOffset + 3 ] = coneCos * scale;
+
+			} else {
+
+				data[ rowOffset + 0 ] = 0;
+				data[ rowOffset + 1 ] = 0;
+				data[ rowOffset + 2 ] = 0;
+				data[ rowOffset + 3 ] = - 1;
+
+			}
+
+			this._getBoundingSphereCenter( light, _vector3 );
+
+			rowOffset = lineSize * BOUNDS_ROW + offset;
+
+			data[ rowOffset + 0 ] = _vector3.x;
+			data[ rowOffset + 1 ] = _vector3.y;
+			data[ rowOffset + 2 ] = _vector3.z;
+			data[ rowOffset + 3 ] = this._getBoundingSphereRadius( light );
 
 		}
 
@@ -172,10 +223,10 @@ class ClusteredLightsNode extends LightsNode {
 			for ( let i = 0; i < count; i ++ ) {
 
 				const vz = viewZ[ order[ i ] ];
-				const r = clusteredLights[ order[ i ] ].distance;
-				const radius = r > 0 ? r : far;
+				const r = data[ lineSize * BOUNDS_ROW + i * 4 + 3 ];
+				const radius = r >= 0 ? r : far;
 
-				// Light sphere Z: [vz - radius, vz + radius]
+				// Bounding sphere Z: [vz - radius, vz + radius]
 				// Slice Z: [sliceFar, sliceNear] (both negative, sliceFar < sliceNear)
 				if ( vz + radius >= sliceFar && vz - radius <= sliceNear ) {
 
@@ -203,6 +254,74 @@ class ClusteredLightsNode extends LightsNode {
 	}
 
 	/**
+	 * Returns the normalized world-space direction pointing from the spot light's
+	 * target to the spot light.
+	 *
+	 * @private
+	 * @param {SpotLight} light - The spot light.
+	 * @param {Vector3} target - The target vector.
+	 * @return {Vector3} The direction.
+	 */
+	_getSpotDirection( light, target ) {
+
+		_targetPosition.setFromMatrixPosition( light.target.matrixWorld );
+
+		return target.setFromMatrixPosition( light.matrixWorld ).sub( _targetPosition ).normalize();
+
+	}
+
+	/**
+	 * Returns the world-space center of the light's bounding sphere. For spot lights,
+	 * this is the center of the smallest sphere enclosing the cone.
+	 *
+	 * @private
+	 * @param {PointLight|SpotLight} light - The light.
+	 * @param {Vector3} target - The target vector.
+	 * @return {Vector3} The bounding sphere center.
+	 */
+	_getBoundingSphereCenter( light, target ) {
+
+		target.setFromMatrixPosition( light.matrixWorld );
+
+		if ( light.isSpotLight === true && light.distance > 0 ) {
+
+			const angle = Math.min( light.angle, Math.PI / 2 );
+			const offset = angle > Math.PI / 4 ? light.distance * Math.cos( angle ) : light.distance / ( 2 * Math.cos( angle ) );
+
+			// _getSpotDirection() points away from the cone, so step backwards
+
+			target.addScaledVector( this._getSpotDirection( light, _direction ), - offset );
+
+		}
+
+		return target;
+
+	}
+
+	/**
+	 * Returns the radius of the light's bounding sphere.
+	 *
+	 * @private
+	 * @param {PointLight|SpotLight} light - The light.
+	 * @return {number} The bounding sphere radius. `-1` if the light has no cutoff distance.
+	 */
+	_getBoundingSphereRadius( light ) {
+
+		if ( light.distance <= 0 ) return - 1;
+
+		if ( light.isSpotLight === true ) {
+
+			const angle = Math.min( light.angle, Math.PI / 2 );
+
+			return angle > Math.PI / 4 ? light.distance * Math.sin( angle ) : light.distance / ( 2 * Math.cos( angle ) );
+
+		}
+
+		return light.distance;
+
+	}
+
+	/**
 	 * Updates the light data and assigns the lights to the clusters.
 	 *
 	 * @param {NodeFrame} frame - A reference to the current node frame.
@@ -225,8 +344,9 @@ class ClusteredLightsNode extends LightsNode {
 	}
 
 	/**
-	 * Configures this node with an array of lights. Point lights without shadows
-	 * are clustered, all other lights use the default lighting.
+	 * Configures this node with an array of lights. Point and spot lights without
+	 * shadows are clustered (except spot lights with projected textures), all other
+	 * lights use the default lighting.
 	 *
 	 * @param {Array<Light>} lights - An array of lights.
 	 * @return {ClusteredLightsNode} A reference to this node.
@@ -240,7 +360,7 @@ class ClusteredLightsNode extends LightsNode {
 
 		for ( const light of lights ) {
 
-			if ( light.isPointLight === true && light.castShadow !== true ) {
+			if ( this._isClusteredLight( light ) ) {
 
 				clusteredLights[ clusteredIndex ++ ] = light;
 
@@ -256,6 +376,23 @@ class ClusteredLightsNode extends LightsNode {
 		clusteredLights.length = clusteredIndex;
 
 		return super.setLights( lights );
+
+	}
+
+	/**
+	 * Returns `true` if the given light can be clustered.
+	 *
+	 * @private
+	 * @param {Light} light - The light.
+	 * @return {boolean} Whether the light is clustered or not.
+	 */
+	_isClusteredLight( light ) {
+
+		if ( light.castShadow === true ) return false;
+
+		if ( light.isPointLight === true ) return true;
+
+		return light.isSpotLight === true && ! light.map && ! light.colorNode;
 
 	}
 
@@ -345,37 +482,58 @@ class ClusteredLightsNode extends LightsNode {
 	}
 
 	/**
-	 * Returns the data of the light at the given index.
+	 * Returns the shading data of the light at the given index.
 	 *
 	 * @private
 	 * @param {number|Node<int>} index - The light index.
-	 * @return {Object} The light's position, view position, distance, color and decay.
+	 * @return {Object} The light's view position, distance, color, decay, view-space spot direction and spot offset.
 	 */
 	_getLightData( index ) {
 
 		index = int( index );
 
-		const dataA = textureLoad( this._lightsTexture, ivec2( index, 0 ) );
-		const dataB = textureLoad( this._lightsTexture, ivec2( index, 1 ) );
+		const dataA = textureLoad( this._lightsTexture, ivec2( index, POSITION_ROW ) );
+		const dataB = textureLoad( this._lightsTexture, ivec2( index, COLOR_ROW ) );
+		const dataC = textureLoad( this._lightsTexture, ivec2( index, SPOT_ROW ) );
 
-		const position = dataA.xyz;
-		const viewPosition = this._cameraViewMatrix.mul( vec4( position, 1.0 ) ).xyz;
+		const viewPosition = this._cameraViewMatrix.mul( vec4( dataA.xyz, 1.0 ) ).xyz;
 		const distance = dataA.w;
 		const color = dataB.rgb;
 		const decay = dataB.w;
+		const spotDirection = this._cameraViewMatrix.mul( vec4( dataC.xyz, 0.0 ) ).xyz;
+		const spotOffset = dataC.w;
 
 		return {
-			position,
 			viewPosition,
 			distance,
 			color,
-			decay
+			decay,
+			spotDirection,
+			spotOffset
 		};
 
 	}
 
 	/**
-	 * Sets up the default lights and the clustered point lights.
+	 * Returns the culling data of the light at the given index.
+	 *
+	 * @private
+	 * @param {number|Node<int>} index - The light index.
+	 * @return {Object} The view-space center and the radius of the light's bounding sphere. A negative radius marks an unbounded light.
+	 */
+	_getLightBounds( index ) {
+
+		const data = textureLoad( this._lightsTexture, ivec2( int( index ), BOUNDS_ROW ) );
+
+		const center = this._cameraViewMatrix.mul( vec4( data.xyz, 1.0 ) ).xyz;
+		const radius = data.w;
+
+		return { center, radius };
+
+	}
+
+	/**
+	 * Sets up the default lights and the clustered point and spot lights.
 	 *
 	 * @param {NodeBuilder} builder - A reference to the current node builder.
 	 * @param {Array<LightingNode>} lightNodes - An array of lighting nodes.
@@ -405,15 +563,20 @@ class ClusteredLightsNode extends LightsNode {
 
 				} );
 
-				const { color, decay, viewPosition, distance } = this._getLightData( lightIndex.sub( 1 ) );
+				const { color, decay, viewPosition, distance, spotDirection, spotOffset } = this._getLightData( lightIndex.sub( 1 ) );
 
 				const lightVector = viewPosition.sub( positionView );
 
-				// Early-out: skip full BRDF if fragment is beyond the light's cutoff
-				If( distance.equal( 0 ).or( dot( lightVector, lightVector ).lessThanEqual( distance.mul( distance ) ) ), () => {
+				// spot cone attenuation, always 1 for point lights
+				const spotAttenuation = smoothstep( 0, 1, dot( lightVector.normalize(), spotDirection ).sub( spotOffset ) ).toVar();
+
+				// Early-out: skip full BRDF if fragment is beyond the light's cutoff or outside the spot cone
+				const inRange = distance.equal( 0 ).or( dot( lightVector, lightVector ).lessThanEqual( distance.mul( distance ) ) );
+
+				If( inRange.and( spotAttenuation.greaterThan( 0 ) ), () => {
 
 					builder.lightsNode.setupDirectLight( builder, this, directPointLight( {
-						color,
+						color: color.mul( spotAttenuation ),
 						lightVector,
 						cutoffDistance: distance,
 						decayExponent: decay
@@ -631,15 +794,14 @@ class ClusteredLightsNode extends LightsNode {
 
 				} );
 
-				const { viewPosition, distance } = this._getLightData( lightIdx );
+				const { center, radius } = this._getLightBounds( lightIdx );
 
 				// sphere-AABB intersection in view space
-				const pos = viewPosition.xyz;
-				const closest = max( aabbMin, min( pos, aabbMax ) );
-				const diff = pos.sub( closest );
+				const closest = max( aabbMin, min( center, aabbMax ) );
+				const diff = center.sub( closest );
 				const distSq = dot( diff, diff );
 
-				If( distSq.lessThanEqual( distance.mul( distance ) ), () => {
+				If( radius.lessThan( 0 ).or( distSq.lessThanEqual( radius.mul( radius ) ) ), () => {
 
 					getClusterSlot( index ).assign( lightIdx.add( int( 1 ) ) );
 					index.addAssign( int( 1 ) );
@@ -705,7 +867,7 @@ export default ClusteredLightsNode;
  *
  * @tsl
  * @function
- * @param {number} [maxLights=1024] - Maximum number of point lights.
+ * @param {number} [maxLights=1024] - Maximum number of point and spot lights.
  * @param {number} [tileSize=32] - Screen tile size in pixels.
  * @param {number} [zSlices=24] - Depth slice count.
  * @param {number} [maxLightsPerCluster=64] - Per-cluster light-list capacity.
