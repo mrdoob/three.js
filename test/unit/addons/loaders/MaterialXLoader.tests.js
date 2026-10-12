@@ -1,5 +1,11 @@
 import { ClampToEdgeWrapping, CompressedTexture, DataTexture, HalfFloatType, LinearFilter, LinearSRGBColorSpace, LoadingManager, NearestFilter, RedFormat, RepeatWrapping, RGB_S3TC_DXT1_Format, SRGBColorSpace } from 'three';
+import { mul, vec3 } from 'three/tsl';
 import { MaterialXLoader } from '../../../../examples/jsm/loaders/MaterialXLoader.js';
+import { MtlXLibrary } from '../../../../examples/jsm/loaders/materialx/MaterialXNodeLibrary.js';
+import { createMaterialXCompileRegistry } from '../../../../examples/jsm/loaders/materialx/compile/MaterialXCompileRegistry.js';
+import registryData from '../../../../examples/jsm/loaders/materialx/MaterialXNodeInterfaceRegistry.js';
+import { getNodeDefNames } from '../../../../examples/jsm/loaders/materialx/MaterialXNodeDefs.js';
+import { createStrictInterfaceValidator } from '../../../../examples/jsm/loaders/materialx/MaterialXInterfaceValidation.js';
 
 const MATERIAL_X = `<?xml version="1.0"?>
 <materialx version="1.39">
@@ -100,11 +106,118 @@ function findTexture( object, image, visited = new WeakSet(), depth = 0 ) {
 
 }
 
+function collectConstValues( object, values = [], visited = new WeakSet(), depth = 0 ) {
+
+	if ( object === null || typeof object !== 'object' || depth > 24 || visited.has( object ) ) return values;
+
+	visited.add( object );
+	if ( object.isConstNode === true ) values.push( object.value );
+
+	for ( const key of Object.keys( object ) ) collectConstValues( object[ key ], values, visited, depth + 1 );
+
+	return values;
+
+}
+
+function hasNode( object, predicate, visited = new WeakSet(), depth = 0 ) {
+
+	if ( object === null || typeof object !== 'object' || depth > 24 || visited.has( object ) ) return false;
+
+	visited.add( object );
+	if ( object.isNode === true && predicate( object ) ) return true;
+
+	return Object.keys( object ).some( ( key ) => hasNode( object[ key ], predicate, visited, depth + 1 ) );
+
+}
+
+function collectFunctionLayouts( object, layouts = new Set(), visited = new WeakSet(), depth = 0 ) {
+
+	// TSL functions (Fn) are function objects that carry their layout.
+	if ( object === null || ( typeof object !== 'object' && typeof object !== 'function' ) || depth > 24 || visited.has( object ) ) return layouts;
+
+	visited.add( object );
+	if ( typeof object.layout?.type === 'string' ) layouts.add( object.layout );
+	if ( typeof object === 'function' ) collectFunctionLayouts( object.shaderNode, layouts, visited, depth + 1 );
+
+	for ( const key of Object.keys( object ) ) collectFunctionLayouts( object[ key ], layouts, visited, depth + 1 );
+
+	return layouts;
+
+}
+
+function parseNodeGraph( body, type ) {
+
+	const text = `<?xml version="1.0"?>
+<materialx version="1.39">
+	<nodegraph name="test_graph">
+		${ body }
+		<output name="out" type="${ type }" nodename="test_node" />
+	</nodegraph>
+</materialx>`;
+
+	return new MaterialXLoader().parse( text, { throwOnErrors: false } );
+
+}
+
 export default QUnit.module( 'Addons', () => {
 
 	QUnit.module( 'Loaders', () => {
 
 		QUnit.module( 'MaterialXLoader', () => {
+
+			QUnit.test( 'builds nodes of a host node library through the node resolver', ( assert ) => {
+
+				const text = `<?xml version="1.0"?>
+<materialx version="1.39">
+	<nodegraph name="test_graph">
+		<custom_double name="doubled" type="float">
+			<input name="in" type="float" value="0.25" />
+		</custom_double>
+		<add name="sum" type="float">
+			<input name="in1" type="float" nodename="doubled" />
+			<input name="in2" type="float" value="0.5" />
+		</add>
+		<output name="out" type="float" nodename="sum" />
+	</nodegraph>
+</materialx>`;
+
+				const resolved = [];
+				const nodeResolver = ( nodeX, output ) => {
+
+					resolved.push( nodeX.element );
+					if ( nodeX.element !== 'custom_double' ) return null;
+
+					assert.strictEqual( output, null, 'The resolver receives the requested output.' );
+					assert.strictEqual( nodeX.getChildByName( 'in' ).value, '0.25', 'The resolver reads the inputs.' );
+					return mul( nodeX.getNodeByName( 'in' ), 2 );
+
+				};
+
+				const loader = new MaterialXLoader();
+				const result = loader.parse( text, { nodeResolver } );
+				const values = collectConstValues( result.materials.test_graph.colorNode );
+
+				assert.strictEqual( result.errors.length, 0, 'The custom node is not unsupported.' );
+				assert.true( resolved.includes( 'add' ), 'The resolver is asked about every node.' );
+				assert.true( values.includes( 2 ) && values.includes( 0.5 ), 'The resolved node and the loader-built node are both part of the graph.' );
+
+				// A channel output takes the channel of the resolved node, as for the loader's own nodes.
+				const channelText = text.replace( '<input name="in1" type="float" nodename="doubled" />', '<input name="in1" type="float" nodename="doubled" output="outy" />' ).replace( 'name="doubled" type="float"', 'name="doubled" type="vector3"' );
+				const outputs = [];
+				const channelResult = loader.parse( channelText, { nodeResolver: ( nodeX, output ) => {
+
+					if ( nodeX.element !== 'custom_double' ) return null;
+					outputs.push( output );
+					const inNode = nodeX.getNodeByName( 'in' );
+					return vec3( inNode, mul( inNode, 2 ), mul( inNode, 3 ) );
+
+				} } );
+				assert.deepEqual( outputs, [ 'outy' ], 'The resolver receives the channel output.' );
+				assert.true( hasNode( channelResult.materials.test_graph.colorNode, ( node ) => node.isArrayElementNode === true && node.indexNode.value === 1 ), 'The loader takes the y channel of the resolved node.' );
+
+				assert.true( loader.parse( text, { throwOnErrors: false } ).errors.length > 0, 'Without the resolver the custom node is unsupported.' );
+
+			} );
 
 			QUnit.test( 'reads the first output of a separate node connected without an output', ( assert ) => {
 
@@ -138,6 +251,45 @@ export default QUnit.module( 'Addons', () => {
 				}
 
 				assert.deepEqual( messages, [], 'The separate node builds a channel instead of an incomplete element node.' );
+
+			} );
+
+			QUnit.test( 'gives vector and color noise one noise per channel', ( assert ) => {
+
+				// Function layouts are matched by return type; the TSL noise functions have generated names.
+				const usesFunction = ( category, type, returnType ) => {
+
+					const { materials } = parseNodeGraph( `<${ category } name="test_node" type="${ type }" />`, type );
+					return [ ...collectFunctionLayouts( materials.test_graph.colorNode ) ].some( layout => layout.type === returnType );
+
+				};
+
+				// MaterialX builds these variants from vec3 noise (plus an offset scalar for a fourth channel);
+				// they used to repeat the scalar noise in every channel.
+				assert.true( usesFunction( 'noise2d', 'vector2', 'vec3' ), 'noise2d vector2 samples vec3 noise.' );
+				assert.true( usesFunction( 'noise2d', 'vector4', 'vec4' ), 'noise2d vector4 samples vec4 noise.' );
+				assert.true( usesFunction( 'noise2d', 'color4', 'vec4' ), 'noise2d color4 samples vec4 noise.' );
+				assert.true( usesFunction( 'noise3d', 'vector4', 'vec4' ), 'noise3d vector4 samples vec4 noise.' );
+				assert.true( usesFunction( 'fractal3d', 'vector2', 'vec2' ), 'fractal3d vector2 uses vec2 fractal noise.' );
+				assert.true( usesFunction( 'fractal3d', 'vector4', 'vec4' ), 'fractal3d vector4 uses vec4 fractal noise.' );
+				assert.false( usesFunction( 'noise2d', 'float', 'vec3' ), 'Scalar noise stays scalar.' );
+
+			} );
+
+			QUnit.test( 'randomfloat and randomcolor', ( assert ) => {
+
+				const floatResult = parseNodeGraph( '<randomfloat name="test_node" type="float"><input name="in" type="float" value="0.5" /><input name="seed" type="integer" value="3" /></randomfloat>', 'float' );
+				assert.strictEqual( floatResult.errors.length, 0, 'randomfloat float: no errors.' );
+				assert.true( collectConstValues( floatResult.materials.test_graph.colorNode ).includes( 4096 ), 'randomfloat float: input scaled by 4096.' );
+
+				const integerResult = parseNodeGraph( '<randomfloat name="test_node" type="float"><input name="in" type="integer" value="3" /></randomfloat>', 'float' );
+				assert.strictEqual( integerResult.errors.length, 0, 'randomfloat integer: no errors.' );
+				const integerValues = collectConstValues( integerResult.materials.test_graph.colorNode );
+				assert.true( integerValues.includes( 3 ), 'randomfloat integer: input found.' );
+				assert.false( integerValues.includes( 4096 ), 'randomfloat integer: input not scaled.' );
+
+				const colorResult = parseNodeGraph( '<randomcolor name="test_node" type="color3"><input name="in" type="float" value="0.5" /></randomcolor>', 'color3' );
+				assert.strictEqual( colorResult.errors.length, 0, 'randomcolor: no errors.' );
 
 			} );
 
@@ -239,6 +391,253 @@ export default QUnit.module( 'Addons', () => {
 				URL.revokeObjectURL( documentURL );
 
 				assert.true( managerComplete, 'LoadingManager completes after the loader callback.' );
+
+			} );
+
+			QUnit.test( 'applies nodedef defaults to inputs the document omits', ( assert ) => {
+
+				const document = `<?xml version="1.0"?>
+<materialx version="1.39">
+	<constant name="test_constant" type="color3" />
+	<convert name="test_convert" type="vector3" />
+	<standard_surface name="test_surface" type="surfaceshader">
+		<input name="base_color" type="color3" nodename="test_constant" />
+		<input name="normal" type="vector3" nodename="test_convert" />
+	</standard_surface>
+	<surfacematerial name="test_material" type="material">
+		<input name="surfaceshader" type="surfaceshader" nodename="test_surface" />
+	</surfacematerial>
+</materialx>`;
+
+				const result = new MaterialXLoader().parse( document );
+
+				assert.strictEqual( result.errors.length, 0, 'Omitted inputs on constant and convert do not produce errors.' );
+				assert.strictEqual( result.warnings.length, 0, 'Omitted inputs do not produce warnings.' );
+				assert.ok( result.materials.test_material, 'The material is translated.' );
+
+			} );
+
+			QUnit.test( 'has a nodedef default for every input of every supported node', ( assert ) => {
+
+				const supported = new Set( [ ...Object.keys( MtlXLibrary ), ...createMaterialXCompileRegistry().keys(), 'ifgreater', 'ifgreatereq', 'ifequal' ] );
+				const convertible = new Set( [ 'float', 'integer', 'boolean', 'vector2', 'vector3', 'vector4', 'color3', 'color4' ] );
+				const problems = [];
+				let count = 0;
+
+				for ( const category of supported ) {
+
+					const nodedefNames = getNodeDefNames( category );
+
+					const outputTypes = new Set( nodedefNames.map( ( name ) => registryData.nodedefs[ name ].outputs.out ).filter( ( type ) => convertible.has( type ) ) );
+
+					for ( const type of outputTypes ) {
+
+						const document = `<?xml version="1.0"?>
+<materialx version="1.39">
+	<${category} name="test_node" type="${type}" />
+	<convert name="test_convert" type="color3">
+		<input name="in" type="${type}" nodename="test_node" />
+	</convert>
+	<standard_surface name="test_surface" type="surfaceshader">
+		<input name="base_color" type="color3" nodename="test_convert" />
+	</standard_surface>
+	<surfacematerial name="test_material" type="material">
+		<input name="surfaceshader" type="surfaceshader" nodename="test_surface" />
+	</surfacematerial>
+</materialx>`;
+
+						const result = new MaterialXLoader().parse( document, { throwOnErrors: false } );
+						const messages = [ ...result.errors, ...result.warnings ].map( ( entry ) => entry.message ).filter( ( message ) => /texture|file/i.test( message ) === false );
+						if ( messages.length > 0 ) problems.push( `${category} (${type}): ${messages.join( ' ' )}` );
+						count ++;
+
+					}
+
+				}
+
+				assert.ok( count > 300, `Checked ${count} node and output type combinations.` );
+				assert.deepEqual( problems, [], 'Every supported node translates with all inputs omitted.' );
+
+			} );
+
+			QUnit.test( 'surface shaders use nodedef defaults for omitted inputs', ( assert ) => {
+
+				const translate = ( shader ) => new MaterialXLoader().parse( `<?xml version="1.0"?>
+<materialx version="1.39">
+	${shader}
+	<surfacematerial name="test_material" type="material">
+		<input name="surfaceshader" type="surfaceshader" nodename="test_surface" />
+	</surfacematerial>
+</materialx>` ).materials.test_material;
+
+				const standardSurface = translate( `<standard_surface name="test_surface" type="surfaceshader">
+		<input name="emission_color" type="color3" value="1, 0, 0" />
+		<input name="coat" type="float" value="1" />
+	</standard_surface>` );
+
+				assert.strictEqual( standardSurface.emissiveNode, null, 'standard_surface: emission_color without emission (default 0) does not emit.' );
+				assert.ok( standardSurface.clearcoatRoughnessNode, 'standard_surface: coat without coat_roughness uses the nodedef default.' );
+
+				const openPbrSurface = translate( `<open_pbr_surface name="test_surface" type="surfaceshader">
+		<input name="fuzz_weight" type="float" value="1" />
+		<input name="thin_film_weight" type="float" value="1" />
+	</open_pbr_surface>` );
+
+				assert.ok( openPbrSurface.sheenRoughnessNode, 'open_pbr_surface: fuzz without fuzz_roughness uses the nodedef default.' );
+				assert.ok( openPbrSurface.iridescenceThicknessNode, 'open_pbr_surface: thin film without thickness uses the nodedef default.' );
+				assert.ok( openPbrSurface.iridescenceIORNode, 'open_pbr_surface: thin film without ior uses the nodedef default.' );
+
+				const gltfOpaque = translate( `<gltf_pbr name="test_surface" type="surfaceshader">
+		<input name="alpha" type="float" value="0.5" />
+	</gltf_pbr>` );
+
+				assert.false( gltfOpaque.transparent, 'gltf_pbr: alpha without alpha_mode (default OPAQUE) is not transparent.' );
+
+				const gltfBlend = translate( `<gltf_pbr name="test_surface" type="surfaceshader">
+		<input name="alpha" type="float" value="0.5" />
+		<input name="alpha_mode" type="integer" value="2" />
+	</gltf_pbr>` );
+
+				assert.true( gltfBlend.transparent, 'gltf_pbr: alpha with alpha_mode BLEND is transparent.' );
+
+			} );
+
+			QUnit.test( 'resolves nodedef overloads without a nodedef attribute', ( assert ) => {
+
+				const document = `<?xml version="1.0"?>
+<materialx version="1.39">
+	<texcoord name="test_uv" type="vector2" />
+	<transformmatrix name="test_transform" type="vector2">
+		<input name="in" type="vector2" nodename="test_uv" />
+		<input name="mat" type="matrix33" value="2,0,0, 0,2,0, 0.5,0.5,1" />
+	</transformmatrix>
+	<creatematrix name="test_matrix" type="matrix44">
+		<input name="in1" type="vector3" value="1,0,0" />
+	</creatematrix>
+	<transformpoint name="test_point" type="vector3" />
+	<nodegraph name="test_graph">
+		<input name="graph_normal" type="vector3" defaultgeomprop="Nworld" />
+		<input name="graph_uv" type="vector2" defaultgeomprop="UV1" />
+		<multiply name="graph_scaled" type="vector3">
+			<input name="in1" type="vector3" interfacename="graph_normal" />
+		</multiply>
+		<output name="out" type="vector3" nodename="graph_scaled" />
+	</nodegraph>
+	<convert name="test_convert" type="color3">
+		<input name="in" type="vector2" nodename="test_transform" />
+	</convert>
+	<standard_surface name="test_surface" type="surfaceshader">
+		<input name="base_color" type="color3" nodename="test_convert" />
+	</standard_surface>
+	<surfacematerial name="test_material" type="material">
+		<input name="surfaceshader" type="surfaceshader" nodename="test_surface" />
+	</surfacematerial>
+</materialx>`;
+
+				const result = new MaterialXLoader().parse( document );
+
+				assert.strictEqual( result.errors.length, 0, 'Overloads selected by input types translate without errors.' );
+				assert.strictEqual( result.warnings.length, 0, 'Overloads selected by input types translate without warnings.' );
+
+			} );
+
+			QUnit.test( 'resolves default nodedef versions and document nodedefs like MaterialX', ( assert ) => {
+
+				// Maps node names to the names of their resolved nodedefs.
+				const resolveNodeDefs = ( body ) => {
+
+					const nodeDefs = {};
+					const interfaceValidator = ( rootNode ) => {
+
+						for ( const nodeX of rootNode.children ) nodeDefs[ nodeX.name ] = nodeX.nodeDef ? nodeX.nodeDef.name : null;
+
+					};
+
+					new MaterialXLoader().parse( `<?xml version="1.0"?>\n<materialx version="1.39">${ body }</materialx>`, { throwOnErrors: false, interfaceValidator } );
+					return nodeDefs;
+
+				};
+
+				const versions = resolveNodeDefs( `
+	<UsdUVTexture name="texture" type="multioutput" />
+	<standard_surface name="default_surface" type="surfaceshader" />
+	<standard_surface name="surface_100" type="surfaceshader" version="1.0.0" />` );
+
+				assert.strictEqual( versions.texture, 'ND_UsdUVTexture_23', 'An unversioned node resolves to the default version.' );
+				assert.strictEqual( versions.default_surface, 'ND_standard_surface_surfaceshader', 'standard_surface resolves to 1.0.1.' );
+				assert.strictEqual( versions.surface_100, 'ND_standard_surface_surfaceshader_100', 'An explicit version resolves to that version.' );
+
+				const documentNodeDefs = resolveNodeDefs( `
+	<nodedef name="ND_tinted_checker" node="tinted_checker">
+		<input name="tint" type="color3" value="1, 0.45, 0.1" />
+		<output name="color" type="color3" />
+		<output name="mask" type="float" />
+	</nodedef>
+	<tinted_checker name="checker" type="multioutput" />` );
+
+				assert.strictEqual( documentNodeDefs.checker, 'ND_tinted_checker', 'Nodedefs declared in the document resolve.' );
+
+				const result = new MaterialXLoader().parse( `<?xml version="1.0"?>
+<materialx version="1.39">
+	<UsdUVTexture name="texture" type="multioutput" />
+	<convert name="texture_rgb" type="color3">
+		<input name="in" type="color4" nodename="texture" output="rgba" />
+	</convert>
+</materialx>`, { throwOnErrors: false, interfaceValidator: createStrictInterfaceValidator() } );
+
+				assert.true( result.errors.some( ( entry ) => /rgba/.test( entry.message ) ), 'The rgba output of UsdUVTexture 2.2 is not an output of the default 2.3.' );
+
+			} );
+
+			QUnit.test( 'hextilednormalmap translates with only a file input', ( assert ) => {
+
+				const manager = new LoadingManager();
+				manager.addHandler( /\.test$/i, new ControlledTextureLoader( manager ) );
+
+				const result = new MaterialXLoader( manager ).parse( `<?xml version="1.0"?>
+<materialx version="1.39">
+	<hextilednormalmap name="test_normal" type="vector3">
+		<input name="file" type="filename" value="texture.test" />
+	</hextilednormalmap>
+	<convert name="test_convert" type="color3">
+		<input name="in" type="vector3" nodename="test_normal" />
+	</convert>
+	<standard_surface name="test_surface" type="surfaceshader">
+		<input name="base_color" type="color3" nodename="test_convert" />
+	</standard_surface>
+	<surfacematerial name="test_material" type="material">
+		<input name="surfaceshader" type="surfaceshader" nodename="test_surface" />
+	</surfacematerial>
+</materialx>`, { throwOnErrors: false } );
+
+				assert.deepEqual( result.errors, [], 'hextilednormalmap does not read the hextiledimage-only inputs.' );
+
+			} );
+
+			QUnit.test( 'node library parameter names are declared by the nodedef registry', ( assert ) => {
+
+				const problems = [];
+
+				for ( const [ category, entry ] of Object.entries( MtlXLibrary ) ) {
+
+					const nodedefNames = getNodeDefNames( category );
+					if ( nodedefNames.length === 0 ) {
+
+						problems.push( `${category}: no nodedef` );
+						continue;
+
+					}
+
+					const declared = new Set( nodedefNames.flatMap( ( name ) => Object.keys( registryData.nodedefs[ name ].inputs ) ) );
+					for ( const param of entry.params ) {
+
+						if ( declared.has( param ) === false ) problems.push( `${category}: parameter "${param}" is not a nodedef input` );
+
+					}
+
+				}
+
+				assert.deepEqual( problems, [], 'Every library parameter name matches a nodedef input of its category.' );
 
 			} );
 

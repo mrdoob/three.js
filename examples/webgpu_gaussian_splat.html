@@ -171,7 +171,7 @@
 				const dx = event.clientX - pointerDownX;
 				const dy = event.clientY - pointerDownY;
 				if ( Math.sqrt( dx * dx + dy * dy ) > CLICK_DRAG_THRESHOLD ) {
-					
+			
 					return;
 
 				}
@@ -186,7 +186,7 @@
 
 					hitMarker.position.copy( hit.point );
 					hitMarker.visible = true;
-					
+			
 				} else {
 
 					hitMarker.visible = false;

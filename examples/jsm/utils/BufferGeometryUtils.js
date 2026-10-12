@@ -704,36 +704,10 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 	// attributes and new attribute arrays
 	const attributeNames = Object.keys( geometry.attributes );
-	const tmpAttributes = {};
-	const tmpMorphAttributes = {};
-	const tmpBuffers = new Map();
-	const resultBuffers = new Map();
+	const sourceIndices = [];
+	const buffers = new Map();
 	const newIndices = [];
 	const getters = [ 'getX', 'getY', 'getZ', 'getW' ];
-	const setters = [ 'setX', 'setY', 'setZ', 'setW' ];
-
-	// Initialize the arrays, allocating space conservatively. Extra
-	// space will be trimmed in the last step.
-	for ( let i = 0, l = attributeNames.length; i < l; i ++ ) {
-
-		const name = attributeNames[ i ];
-		const attr = geometry.attributes[ name ];
-
-		tmpAttributes[ name ] = createAttribute( attr, attr.count, tmpBuffers );
-
-		const morphAttributes = geometry.morphAttributes[ name ];
-		if ( morphAttributes ) {
-
-			if ( ! tmpMorphAttributes[ name ] ) tmpMorphAttributes[ name ] = [];
-			morphAttributes.forEach( ( morphAttr, i ) => {
-
-				tmpMorphAttributes[ name ][ i ] = createAttribute( morphAttr, morphAttr.count, tmpBuffers );
-
-			} );
-
-		}
-
-	}
 
 	// convert the error tolerance to an amount of decimal places to truncate to
 	const halfTolerance = tolerance * 0.5;
@@ -769,35 +743,7 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 		} else {
 
-			// copy data to the new index in the temporary attributes
-			for ( let j = 0, l = attributeNames.length; j < l; j ++ ) {
-
-				const name = attributeNames[ j ];
-				const attribute = geometry.getAttribute( name );
-				const morphAttributes = geometry.morphAttributes[ name ];
-				const itemSize = attribute.itemSize;
-				const newArray = tmpAttributes[ name ];
-				const newMorphArrays = tmpMorphAttributes[ name ];
-
-				for ( let k = 0; k < itemSize; k ++ ) {
-
-					const getterFunc = getters[ k ];
-					const setterFunc = setters[ k ];
-					newArray[ setterFunc ]( nextIndex, attribute[ getterFunc ]( index ) );
-
-					if ( morphAttributes ) {
-
-						for ( let m = 0, ml = morphAttributes.length; m < ml; m ++ ) {
-
-							newMorphArrays[ m ][ setterFunc ]( nextIndex, morphAttributes[ m ][ getterFunc ]( index ) );
-
-						}
-
-					}
-
-				}
-
-			}
+			sourceIndices.push( index );
 
 			hashToIndex[ hash ] = nextIndex;
 			newIndices.push( nextIndex );
@@ -811,19 +757,13 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 	const result = geometry.clone();
 	for ( const name in geometry.attributes ) {
 
-		const tmpAttribute = tmpAttributes[ name ];
+		result.setAttribute( name, remapAttribute( geometry.attributes[ name ], sourceIndices, buffers ) );
 
-		result.setAttribute( name, createAttribute( tmpAttribute, nextIndex, resultBuffers ) );
+	}
 
-		if ( ! ( name in tmpMorphAttributes ) ) continue;
+	for ( const name in geometry.morphAttributes ) {
 
-		for ( let j = 0; j < tmpMorphAttributes[ name ].length; j ++ ) {
-
-			const tmpMorphAttribute = tmpMorphAttributes[ name ][ j ];
-
-			result.morphAttributes[ name ][ j ] = createAttribute( tmpMorphAttribute, nextIndex, resultBuffers );
-
-		}
+		result.morphAttributes[ name ] = geometry.morphAttributes[ name ].map( attribute => remapAttribute( attribute, sourceIndices, buffers ) );
 
 	}
 
@@ -1521,25 +1461,44 @@ function toCreasedNormals( geometry, creaseAngle = Math.PI / 3 /* 60 degrees */ 
 
 }
 
-function createAttribute( attribute, count, buffers ) {
+/**
+ * Copies attribute entries in the order specified by the source vertex indices.
+ * Preserves raw values, attribute type and metadata. Reuse the same buffer map
+ * across calls to preserve shared interleaved buffers for the same mapping.
+ *
+ * @param {BufferAttribute|InterleavedBufferAttribute} attribute - The source attribute.
+ * @param {Array<number>|TypedArray} sourceIndices - The source index for each output vertex.
+ * @param {Map<InterleavedBuffer, InterleavedBuffer>} [buffers] - Shared interleaved buffer copies.
+ * @return {BufferAttribute|InterleavedBufferAttribute} The remapped attribute.
+ */
+function remapAttribute( attribute, sourceIndices, buffers = new Map() ) {
 
-	if ( attribute.isInterleavedBufferAttribute ) {
+	const interleaved = attribute.isInterleavedBufferAttribute;
+	const source = interleaved ? attribute.data : attribute;
+	const stride = interleaved ? source.stride : attribute.itemSize;
+	let data = interleaved ? buffers.get( source ) : undefined;
 
-		let data = buffers.get( attribute.data );
+	if ( data === undefined ) {
 
-		if ( data === undefined ) {
+		const array = new source.array.constructor( sourceIndices.length * stride );
+		for ( let i = 0; i < sourceIndices.length; i ++ ) {
 
-			const stride = attribute.data.stride;
-			data = new InterleavedBuffer( attribute.array.slice( 0, count * stride ), stride );
-			buffers.set( attribute.data, data );
+			for ( let j = 0; j < stride; j ++ ) array[ i * stride + j ] = source.array[ sourceIndices[ i ] * stride + j ];
 
 		}
 
-		return new InterleavedBufferAttribute( data, attribute.itemSize, attribute.offset, attribute.normalized );
+		data = interleaved
+			? new source.constructor( array, stride, source.meshPerAttribute )
+			: new attribute.constructor( array, attribute.itemSize, attribute.normalized, attribute.meshPerAttribute );
+		data.setUsage( source.usage );
+		if ( interleaved ) buffers.set( source, data );
 
 	}
 
-	return new attribute.constructor( attribute.array.slice( 0, count * attribute.itemSize ), attribute.itemSize, attribute.normalized );
+	const result = interleaved ? new attribute.constructor( data, attribute.itemSize, attribute.offset, attribute.normalized ) : data;
+	result.name = attribute.name;
+	if ( ! interleaved ) result.gpuType = attribute.gpuType;
+	return result;
 
 }
 
@@ -1553,6 +1512,7 @@ export {
 	interleaveAttributes,
 	estimateBytesUsed,
 	mergeVertices,
+	remapAttribute,
 	toTrianglesDrawMode,
 	computeMorphedAttributes,
 	mergeGroups,
