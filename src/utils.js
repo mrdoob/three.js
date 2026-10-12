@@ -349,7 +349,13 @@ function warnOnce( ...params ) {
 
 /**
  * Yields execution to the main thread to allow rendering and other tasks.
- * Uses scheduler.yield() when available (Chrome 115+), falls back to requestAnimationFrame.
+ *
+ * Uses `scheduler.yield()` when available. Otherwise it yields one macrotask:
+ * a `MessageChannel` message (the standard `scheduler.yield()` fallback, e.g.
+ * Safari), or `requestIdleCallback()` where there is no `MessageChannel`
+ * (React Native, whose `setImmediate()` is a microtask and whose `setTimeout()`
+ * and `requestAnimationFrame()` wait for the next frame). Waiting for the next
+ * animation frame is the last resort: it costs a frame per yield.
  *
  * @return {Promise<void>}
  */
@@ -358,6 +364,35 @@ function yieldToMain() {
 	if ( typeof self !== 'undefined' && typeof self.scheduler !== 'undefined' && typeof self.scheduler.yield !== 'undefined' ) {
 
 		return self.scheduler.yield();
+
+	}
+
+	if ( typeof MessageChannel !== 'undefined' ) {
+
+		return new Promise( resolve => {
+
+			const channel = new MessageChannel();
+
+			channel.port1.onmessage = () => {
+
+				channel.port1.close();
+				resolve();
+
+			};
+
+			channel.port2.postMessage( null );
+
+		} );
+
+	}
+
+	if ( typeof requestIdleCallback !== 'undefined' ) {
+
+		return new Promise( resolve => {
+
+			requestIdleCallback( () => resolve() );
+
+		} );
 
 	}
 
