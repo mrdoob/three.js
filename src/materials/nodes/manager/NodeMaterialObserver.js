@@ -270,6 +270,8 @@ class NodeMaterialObserver {
 
 			// global data
 
+			data.outputTarget = this.getOutputTarget( renderObject.renderer );
+
 			const { width, height } = renderObject.context;
 
 			data.bufferWidth = width;
@@ -287,6 +289,21 @@ class NodeMaterialObserver {
 		}
 
 		return data;
+
+	}
+
+	/**
+	 * Returns the current output target of the given renderer. That is the active
+	 * render target or, if none is set, the output render target or the canvas target.
+	 *
+	 * @param {Renderer} renderer - The renderer.
+	 * @return {RenderTarget|CanvasTarget} The output target.
+	 */
+	getOutputTarget( renderer ) {
+
+		const renderTarget = renderer.getRenderTarget();
+
+		return renderTarget !== null ? renderTarget : ( renderer.getOutputRenderTarget() || renderer.getCanvasTarget() );
 
 	}
 
@@ -945,6 +962,19 @@ class NodeMaterialObserver {
 			// no early out here. instead, use the equals() code path below so the internal cache state gets synched
 
 			refreshType = RenderObjectRefreshType.SHARED;
+
+		}
+
+		// bindings might refer to per-target resources so a target switch needs a full refresh
+
+		const renderObjectData = this.getRenderObjectData( renderObject );
+		const outputTarget = this.getOutputTarget( nodeFrame.renderer );
+
+		if ( renderObjectData.outputTarget !== outputTarget ) {
+
+			renderObjectData.outputTarget = outputTarget;
+
+			refreshType = RenderObjectRefreshType.FULL;
 
 		}
 
