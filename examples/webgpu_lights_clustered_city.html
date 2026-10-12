@@ -54,14 +54,21 @@
 
 			let camera, scene, renderer, renderPipeline, controls, timer;
 			let cars, carWindows, carLamps, carWheels;
+			let beams, helpers, pointHelpers, spotHelpers;
 			let elapsed = 0;
+			let lightTime = 0;
 			let tour = 0.4;
 
 			const trams = [];
+			const animatedPointLights = [];
+			const animatedSpotLights = [];
 			const dummy = new THREE.Object3D();
 			const color = new THREE.Color();
 			const boxGeometry = new THREE.BoxGeometry();
-			const params = { animate: true, tour: true };
+			const beamTransform = new THREE.Object3D();
+			const down = new THREE.Vector3( 0, - 1, 0 );
+			const direction = new THREE.Vector3();
+			const params = { animate: true, lights: false, tour: true };
 
 			init();
 
@@ -143,18 +150,16 @@
 				const beamMaterial = new THREE.MeshBasicNodeMaterial( { transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, forceSinglePass: true } );
 				const edgeFade = normalViewGeometry.dot( positionViewDirection ).abs().pow( 2 );
 				beamMaterial.opacityNode = edgeFade.mul( uv().y.smoothstep( 0, 0.65 ) ).mul( uv().y.oneMinus().smoothstep( 0, 0.08 ) ).mul( 0.035 );
-				const beams = new THREE.InstancedMesh( new THREE.ConeGeometry( 1, 1, 24, 1, true ).translate( 0, - 0.5, 0 ), beamMaterial, BLOCKS * 16 );
+				beams = new THREE.InstancedMesh( new THREE.ConeGeometry( 1, 1, 24, 1, true ).translate( 0, - 0.5, 0 ), beamMaterial, BLOCKS * 16 );
 				beams.name = 'Spotlight beams';
+				beams.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
 				spotLights.add( beams );
-				const beamTransform = new THREE.Object3D();
-				const down = new THREE.Vector3( 0, - 1, 0 );
-				const direction = new THREE.Vector3();
 				let beamIndex = 0;
 
-				const helpers = new THREE.Group();
+				helpers = new THREE.Group();
 				helpers.visible = false;
-				const pointHelpers = new THREE.Group();
-				const spotHelpers = new THREE.Group();
+				pointHelpers = new THREE.Group();
+				spotHelpers = new THREE.Group();
 				helpers.name = 'Light helpers';
 				helpers.add( pointHelpers, spotHelpers );
 				scene.add( helpers );
@@ -208,6 +213,8 @@
 								light.position.set( front - side * 0.7, upper ? 7.5 : 2.3, z + ( j % 4 - 1.5 ) * 1.8 );
 								pointLights.add( light );
 
+								animatedPointLights.push( { light, origin: light.position.clone(), intensity: light.intensity, phase: animatedPointLights.length * 0.37 } );
+
 								const helper = new THREE.PointLightHelper( light, 0.12 );
 								helper.material.transparent = true;
 								helper.material.opacity = 0.6;
@@ -225,16 +232,11 @@
 
 								spotLights.add( light, light.target );
 
-								const length = light.position.distanceTo( light.target.position );
-								const radius = Math.tan( light.angle ) * length;
 								const inset = street ? 0.1 : 0;
-								direction.subVectors( light.target.position, light.position ).normalize();
-								beamTransform.position.copy( light.position ).addScaledVector( direction, - inset );
-								beamTransform.quaternion.setFromUnitVectors( down, direction );
-								beamTransform.scale.set( radius, length + inset, radius );
-								beamTransform.updateMatrix();
-								beams.setMatrixAt( beamIndex, beamTransform.matrix );
-								beams.setColorAt( beamIndex ++, light.color );
+								setBeam( beamIndex, light, inset );
+								beams.setColorAt( beamIndex, light.color );
+
+								animatedSpotLights.push( { light, target: light.target.position.clone(), inset, beam: beamIndex ++, phase: animatedSpotLights.length * 0.61 } );
 
 								const helper = new THREE.SpotLightHelper( light );
 								helper.cone.material.transparent = true;
@@ -374,6 +376,7 @@
 				gui.add( helpers, 'visible' ).name( 'light helpers' );
 				gui.add( beams, 'visible' ).name( 'light beams' );
 				gui.add( params, 'animate' ).name( 'animate traffic' );
+				gui.add( params, 'lights' ).name( 'animate lights' );
 				gui.add( params, 'tour' ).name( 'camera tour' ).listen();
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -385,6 +388,55 @@
 			function addBox( boxes, x, y, z, width, height, depth, tint ) {
 
 				boxes.push( [ x, y, z, width, height, depth, tint ] );
+
+			}
+
+			function setBeam( index, light, inset ) {
+
+				// Open cone from the lamp to the spotlight target.
+
+				const length = light.position.distanceTo( light.target.position );
+				const radius = Math.tan( light.angle ) * length;
+				direction.subVectors( light.target.position, light.position ).normalize();
+				beamTransform.position.copy( light.position ).addScaledVector( direction, - inset );
+				beamTransform.quaternion.setFromUnitVectors( down, direction );
+				beamTransform.scale.set( radius, length + inset, radius );
+				beamTransform.updateMatrix();
+				beams.setMatrixAt( index, beamTransform.matrix );
+
+			}
+
+			function animateLights( delta ) {
+
+				lightTime += delta;
+
+				// Shopfront lights glide along the facades and pulse.
+
+				for ( const { light, origin, intensity, phase } of animatedPointLights ) {
+
+					light.position.z = origin.z + Math.sin( lightTime * 1.2 + phase ) * 1.5;
+					light.intensity = intensity * ( 0.55 + 0.45 * Math.sin( lightTime * 2.5 + phase * 2 ) ** 2 );
+
+				}
+
+				// Spotlights sweep their targets in circles.
+
+				for ( const { light, target, inset, beam, phase } of animatedSpotLights ) {
+
+					const angle = lightTime * 0.9 + phase;
+					light.target.position.set( target.x + Math.cos( angle ) * 1.5, target.y, target.z + Math.sin( angle ) * 1.5 );
+					setBeam( beam, light, inset );
+
+				}
+
+				beams.instanceMatrix.needsUpdate = true;
+
+				if ( helpers.visible ) {
+
+					for ( const helper of pointHelpers.children ) helper.update();
+					for ( const helper of spotHelpers.children ) helper.update();
+
+				}
 
 			}
 
@@ -429,6 +481,7 @@
 				const delta = timer.getDelta();
 
 				if ( params.animate ) elapsed += delta;
+				if ( params.lights ) animateLights( delta );
 
 				for ( let i = 0; i < CAR_COUNT; i ++ ) {
 
