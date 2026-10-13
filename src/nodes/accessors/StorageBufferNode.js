@@ -317,8 +317,7 @@ class StorageBufferNode extends BufferNode {
 	}
 
 	/**
-	 * This method is overwritten since the node type from the availability of storage buffers
-	 * and the attribute data.
+	 * This method is overwritten since the node type is inferred from the struct type if present.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The node type.
@@ -331,15 +330,7 @@ class StorageBufferNode extends BufferNode {
 
 		}
 
-		if ( builder.isAvailable( 'storageBuffer' ) || builder.isAvailable( 'indirectStorageBuffer' ) ) {
-
-			return super.generateNodeType( builder );
-
-		}
-
-		const { attribute } = this.getAttributeData();
-
-		return attribute.getNodeType( builder );
+		return super.generateNodeType( builder );
 
 	}
 
@@ -384,7 +375,7 @@ class StorageBufferNode extends BufferNode {
 
 		builder.registerTransform( output, attribute );
 
-		return output;
+		return builder.format( output, attribute.getNodeType( builder ), this.getNodeType( builder ) );
 
 	}
 

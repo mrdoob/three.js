@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>SunLight - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → <a href="Light.html">Light</a> → </p>
+	<h1 translate="no">SunLight</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A sun-like light that gets emitted in a specific direction, with rays that
+are all parallel, and casts cascaded shadow maps via <a href="SunLightShadow.html">SunLightShadow</a>,
+suited for lighting large scenes.</p>
+<p>Unlike <a href="DirectionalLight.html">DirectionalLight</a>, the light has no target: like
+<a href="HemisphereLight.html">HemisphereLight</a>, its direction is defined by its position. The
+light shines from its position towards the origin and points straight
+down by default.</p>
+<pre><code class="language-js">const sun = new SunLight( 0xfff2e3, 3 );
+sun.position.set( 1, 1, 1 );
+sun.castShadow = true;
+scene.add( sun );
+</code></pre>
+<p>When used with <code>WebGPURenderer</code>, the light must be registered with the
+renderer's node library first:</p>
+<pre><code class="language-js">renderer.library.addLight( SunLightNode, SunLight );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">SunLight</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { SunLight } from 'three/addons/lights/SunLight.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="SunLight" translate="no">new <a href="#SunLight">SunLight</a><span class="signature">( color : <span class="param-type">number | <a href="Color.html">Color</a> | string</span>, intensity : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new sun light.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">color</strong>
+									</td>
+									<td class="description last">
+										<p>The light's color.</p>
+										<p>Default is <code>0xffffff</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">intensity</strong>
+									</td>
+									<td class="description last">
+										<p>The light's strength/intensity.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isSunLight" translate="no">.<a href="#isSunLight">isSunLight</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="shadow" translate="no">.<a href="#shadow">shadow</a><span class="type-signature"> : <a href="SunLightShadow.html">SunLightShadow</a></span> </h3>
+					<div class="description">
+						<p>This property holds the light's shadow configuration.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/lights/SunLight.js" translate="no" target="_blank" rel="noopener">examples/jsm/lights/SunLight.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -84,6 +84,10 @@ Allows to configure the layer's render target.
 
 Default is `{}`.
 
+**samples**
+
+The scene MSAA sample count. Defaults to the renderer's sample count.
+
 **Returns:** A mesh representing the cylindrical XR layer. This mesh should be added to the XR scene.
 
 ### .createQuadLayer( width : number, height : number, translation : Vector3, quaternion : Quaternion, pixelwidth : number, pixelheight : number, rendercall : function, attributes : Object ) : Mesh
@@ -123,6 +127,10 @@ A callback function that renders the layer. Similar to code in the default anima
 Allows to configure the layer's render target.
 
 Default is `{}`.
+
+**samples**
+
+The scene MSAA sample count. Defaults to the renderer's sample count.
 
 **Returns:** A mesh representing the quadratic XR layer. This mesh should be added to the XR scene.
 

@@ -9,6 +9,7 @@ import * as fflate from '../libs/fflate.module.js';
 const textEncoder = new TextEncoder();
 
 const NO_COMPRESSION = 0;
+const RLE_COMPRESSION = 1;
 const ZIPS_COMPRESSION = 2;
 const ZIP_COMPRESSION = 3;
 
@@ -35,7 +36,7 @@ class EXRExporter {
 	 * This method has two variants.
 	 *
 	 * - When exporting a data texture, it receives two parameters. The texture and the exporter options.
-	 * - When exporting a render target (e.g. a PMREM), it receives three parameters. The renderer, the
+	 * - When exporting a render target, it receives three parameters. The renderer, the
 	 * render target and the exporter options.
 	 *
 	 * @async
@@ -148,6 +149,7 @@ function buildInfoRTT( renderTarget, options = {} ) {
 
 	const compressionSizes = {
 		0: 1,
+		1: 1,
 		2: 1,
 		3: 16
 	};
@@ -182,6 +184,7 @@ function buildInfoDT( texture, options = {} ) {
 
 	const compressionSizes = {
 		0: 1,
+		1: 1,
 		2: 1,
 		3: 16
 	};
@@ -302,6 +305,10 @@ function compressData( inBuffer, info ) {
 			compress = compressNONE;
 			break;
 
+		case 1:
+			compress = compressRLE;
+			break;
+
 		case 2:
 		case 3:
 			compress = compressZIP;
@@ -319,7 +326,9 @@ function compressData( inBuffer, info ) {
 
 		const arr = inBuffer.subarray( size * i, size * ( i + 1 ) );
 
-		const block = compress( arr, tmpBuffer );
+		let block = compress( arr, tmpBuffer );
+
+		if ( block.length >= arr.length ) block = arr;
 
 		sum += block.length;
 
@@ -339,7 +348,9 @@ function compressNONE( data ) {
 
 }
 
-function compressZIP( data, tmpBuffer ) {
+function reorderAndPredict( data, tmpBuffer ) {
+
+	tmpBuffer = tmpBuffer.subarray( 0, data.length );
 
 	//
 	// Reorder the pixel data.
@@ -374,6 +385,69 @@ function compressZIP( data, tmpBuffer ) {
 		tmpBuffer[ t ] = d;
 
 	}
+
+	return tmpBuffer;
+
+}
+
+function compressRLE( data, tmpBuffer ) {
+
+	tmpBuffer = reorderAndPredict( data, tmpBuffer );
+
+	const out = new Uint8Array( tmpBuffer.length * 2 );
+	const end = tmpBuffer.length;
+
+	let runs = 0, rune = 1, o = 0;
+
+	while ( runs < end ) {
+
+		let count = 0;
+
+		while ( rune < end && tmpBuffer[ runs ] === tmpBuffer[ rune ] && count < 127 ) {
+
+			rune ++;
+			count ++;
+
+		}
+
+		if ( count >= 2 ) {
+
+			out[ o ++ ] = count;
+			out[ o ++ ] = tmpBuffer[ runs ];
+
+			runs = rune;
+
+		} else {
+
+			count ++;
+
+			while ( rune < end &&
+				( ( rune + 1 >= end || tmpBuffer[ rune ] !== tmpBuffer[ rune + 1 ] ) ||
+				( rune + 2 >= end || tmpBuffer[ rune + 1 ] !== tmpBuffer[ rune + 2 ] ) ) &&
+				count < 127 ) {
+
+				count ++;
+				rune ++;
+
+			}
+
+			out[ o ++ ] = - count;
+
+			while ( runs < rune ) out[ o ++ ] = tmpBuffer[ runs ++ ];
+
+		}
+
+		rune ++;
+
+	}
+
+	return out.slice( 0, o );
+
+}
+
+function compressZIP( data, tmpBuffer ) {
+
+	tmpBuffer = reorderAndPredict( data, tmpBuffer );
 
 	const deflate = fflate.zlibSync( tmpBuffer );
 
@@ -612,7 +686,7 @@ function getFloat32( arr, i ) {
  *
  * @typedef {Object} EXRExporter~Options
  * @property {(HalfFloatType|FloatType)} [type=HalfFloatType] - Output data type.
- * @property {(NO_COMPRESSION|ZIP_COMPRESSION|ZIPS_COMPRESSION)} [type=ZIP_COMPRESSION] - The compression algorithm.
+ * @property {(NO_COMPRESSION|RLE_COMPRESSION|ZIP_COMPRESSION|ZIPS_COMPRESSION)} [compression=ZIP_COMPRESSION] - The compression algorithm.
  **/
 
-export { EXRExporter, NO_COMPRESSION, ZIP_COMPRESSION, ZIPS_COMPRESSION };
+export { EXRExporter, NO_COMPRESSION, RLE_COMPRESSION, ZIP_COMPRESSION, ZIPS_COMPRESSION };

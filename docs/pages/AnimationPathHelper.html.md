@@ -14,7 +14,7 @@ scene.add( helper );
 
 ## Import
 
-AnimationPathHelper is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+AnimationPathHelper is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { AnimationPathHelper } from 'three/addons/helpers/AnimationPathHelper.js';
@@ -113,6 +113,8 @@ The root object containing the animation clips.
 ### .dispose()
 
 Frees the GPU-related resources allocated by this instance.
+
+**Overrides:** [Object3D#dispose](Object3D.html#dispose)
 
 ### .setColor( color : number | Color | string )
 

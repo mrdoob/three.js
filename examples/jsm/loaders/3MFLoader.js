@@ -3,6 +3,7 @@ import {
 	BufferGeometry,
 	ClampToEdgeWrapping,
 	Color,
+	CylinderGeometry,
 	FileLoader,
 	Float32BufferAttribute,
 	Group,
@@ -15,13 +16,20 @@ import {
 	MeshStandardMaterial,
 	MirroredRepeatWrapping,
 	NearestFilter,
+	Quaternion,
 	RepeatWrapping,
+	SphereGeometry,
 	TextureLoader,
-	SRGBColorSpace
+	SRGBColorSpace,
+	Vector3
 } from 'three';
 import { unzipSync } from '../libs/fflate.module.js';
+import { mergeGeometries } from '../utils/BufferGeometryUtils.js';
 
 const COLOR_SPACE_3MF = SRGBColorSpace;
+
+const NS_BEAM_LATTICE = 'http://schemas.microsoft.com/3dmanufacturing/beamlattice/2017/02';
+const NS_BEAM_LATTICE_BALLS = 'http://schemas.microsoft.com/3dmanufacturing/beamlattice/balls/2020/07';
 
 /**
  * A loader for the [3D Manufacturing Format (3MF)](https://3mf.io/specification/) format.
@@ -38,6 +46,7 @@ const COLOR_SPACE_3MF = SRGBColorSpace;
  * - Texture 2D Groups
  * - Color Groups (Vertex Colors)
  * - Metallic Display Properties (PBR)
+ * - Beam Lattice
  *
  * ```js
  * const loader = new ThreeMFLoader();
@@ -604,7 +613,84 @@ class ThreeMFLoader extends Loader {
 			meshData[ 'triangleProperties' ] = triangleProperties;
 			meshData[ 'triangles' ] = new Uint32Array( triangles );
 
+			const beamLatticeNode = meshNode.getElementsByTagNameNS( NS_BEAM_LATTICE, 'beamlattice' )[ 0 ];
+
+			if ( beamLatticeNode !== undefined ) {
+
+				meshData[ 'beamlattice' ] = parseBeamLatticeNode( beamLatticeNode );
+
+			}
+
 			return meshData;
+
+		}
+
+		function parseBeamLatticeNode( beamLatticeNode ) {
+
+			const beamLatticeData = {
+				radius: parseFloat( beamLatticeNode.getAttribute( 'radius' ) ), // required
+				minLength: parseFloat( beamLatticeNode.getAttribute( 'minlength' ) ),
+				cap: beamLatticeNode.getAttribute( 'cap' ) || 'sphere',
+				ballMode: beamLatticeNode.getAttributeNS( NS_BEAM_LATTICE_BALLS, 'ballmode' ) || 'none',
+				ballRadius: parseFloat( beamLatticeNode.getAttributeNS( NS_BEAM_LATTICE_BALLS, 'ballradius' ) ),
+				beams: [],
+				balls: []
+			};
+
+			// clipping requires boolean operations which are not supported ('clipping' is a legacy name of 'clippingmode')
+
+			const clippingMode = beamLatticeNode.getAttribute( 'clippingmode' ) || beamLatticeNode.getAttribute( 'clipping' );
+
+			if ( clippingMode !== null && clippingMode !== 'none' ) {
+
+				console.warn( 'THREE.3MFLoader: Beam lattice clipping is not supported. The lattice is rendered unclipped.' );
+
+			}
+
+			const beamNodes = beamLatticeNode.getElementsByTagNameNS( NS_BEAM_LATTICE, 'beam' );
+
+			for ( let i = 0; i < beamNodes.length; i ++ ) {
+
+				const beamNode = beamNodes[ i ];
+
+				const beamData = {
+					v1: parseInt( beamNode.getAttribute( 'v1' ), 10 ), // required
+					v2: parseInt( beamNode.getAttribute( 'v2' ), 10 ) // required
+				};
+
+				// optional
+
+				const r1 = beamNode.getAttribute( 'r1' );
+				const r2 = beamNode.getAttribute( 'r2' );
+
+				if ( r1 !== null ) beamData[ 'r1' ] = parseFloat( r1 );
+				if ( r2 !== null ) beamData[ 'r2' ] = parseFloat( r2 );
+
+				beamLatticeData.beams.push( beamData );
+
+			}
+
+			const ballNodes = beamLatticeNode.getElementsByTagNameNS( NS_BEAM_LATTICE_BALLS, 'ball' );
+
+			for ( let i = 0; i < ballNodes.length; i ++ ) {
+
+				const ballNode = ballNodes[ i ];
+
+				const ballData = {
+					vindex: parseInt( ballNode.getAttribute( 'vindex' ), 10 ) // required
+				};
+
+				// optional
+
+				const r = ballNode.getAttribute( 'r' );
+
+				if ( r !== null ) ballData[ 'r' ] = parseFloat( r );
+
+				beamLatticeData.balls.push( ballData );
+
+			}
+
+			return beamLatticeData;
 
 		}
 
@@ -1211,6 +1297,111 @@ class ThreeMFLoader extends Loader {
 
 		}
 
+		function buildLatticeMesh( meshData ) {
+
+			const beamLatticeData = meshData[ 'beamlattice' ];
+			const vertices = meshData[ 'vertices' ];
+
+			const geometries = [];
+
+			const p1 = new Vector3();
+			const p2 = new Vector3();
+			const direction = new Vector3();
+			const up = new Vector3( 0, 1, 0 );
+			const quaternion = new Quaternion();
+			const matrix = new Matrix4();
+
+			// beams
+
+			const beams = beamLatticeData.beams;
+			const openEnded = beamLatticeData.cap !== 'butt';
+
+			// spheres for caps and balls are collected per vertex so joints are only built once
+
+			const sphereRadii = new Map();
+
+			for ( let i = 0; i < beams.length; i ++ ) {
+
+				const beam = beams[ i ];
+
+				p1.fromArray( vertices, beam.v1 * 3 );
+				p2.fromArray( vertices, beam.v2 * 3 );
+
+				const length = p1.distanceTo( p2 );
+
+				if ( length < beamLatticeData.minLength ) continue; // consumers must ignore beams shorter than "minlength"
+
+				const r1 = ( beam.r1 !== undefined ) ? beam.r1 : beamLatticeData.radius;
+				const r2 = ( beam.r2 !== undefined ) ? beam.r2 : r1;
+
+				const geometry = new CylinderGeometry( r2, r1, length, 8, 1, openEnded );
+
+				direction.subVectors( p2, p1 ).divideScalar( length );
+				quaternion.setFromUnitVectors( up, direction );
+
+				matrix.makeRotationFromQuaternion( quaternion );
+				matrix.setPosition( p1.add( p2 ).multiplyScalar( 0.5 ) );
+
+				geometry.applyMatrix4( matrix );
+				geometries.push( geometry );
+
+				if ( openEnded ) {
+
+					// approximate "sphere" and "hemisphere" caps with a sphere per beam end
+
+					sphereRadii.set( beam.v1, Math.max( r1, sphereRadii.get( beam.v1 ) || 0 ) );
+					sphereRadii.set( beam.v2, Math.max( r2, sphereRadii.get( beam.v2 ) || 0 ) );
+
+				}
+
+				if ( beamLatticeData.ballMode === 'all' ) {
+
+					sphereRadii.set( beam.v1, Math.max( beamLatticeData.ballRadius, sphereRadii.get( beam.v1 ) || 0 ) );
+					sphereRadii.set( beam.v2, Math.max( beamLatticeData.ballRadius, sphereRadii.get( beam.v2 ) || 0 ) );
+
+				}
+
+			}
+
+			// balls
+
+			const balls = beamLatticeData.balls;
+
+			for ( let i = 0; i < balls.length; i ++ ) {
+
+				const ball = balls[ i ];
+				const r = ( ball.r !== undefined ) ? ball.r : beamLatticeData.ballRadius;
+
+				sphereRadii.set( ball.vindex, Math.max( r, sphereRadii.get( ball.vindex ) || 0 ) );
+
+			}
+
+			for ( const [ vindex, radius ] of sphereRadii ) {
+
+				const geometry = new SphereGeometry( radius, 8, 6 );
+
+				p1.fromArray( vertices, vindex * 3 );
+				geometry.translate( p1.x, p1.y, p1.z );
+
+				geometries.push( geometry );
+
+			}
+
+			//
+
+			const geometry = mergeGeometries( geometries );
+
+			const material = new MeshPhongMaterial( {
+				name: Loader.DEFAULT_MATERIAL_NAME,
+				color: 0xffffff
+			} );
+
+			const mesh = new Mesh( geometry, material );
+
+			return mesh;
+
+		}
+
 		function buildMeshes( resourceMap, meshData, objects, modelData, textureData, objectData ) {
 
 			const keys = Object.keys( resourceMap );
@@ -1328,6 +1519,16 @@ class ThreeMFLoader extends Loader {
 
 			const resourceMap = analyzeObject( meshData, objectData );
 			const meshes = buildMeshes( resourceMap, meshData, objects, modelData, textureData, objectData );
+
+			if ( meshData[ 'beamlattice' ] !== undefined ) {
+
+				const latticeMesh = buildLatticeMesh( meshData );
+
+				if ( objectData.name ) latticeMesh.name = objectData.name;
+
+				meshes.push( latticeMesh );
+
+			}
 
 			for ( let i = 0, l = meshes.length; i < l; i ++ ) {
 

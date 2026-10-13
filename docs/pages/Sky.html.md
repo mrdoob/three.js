@@ -29,7 +29,7 @@ sky.material.uniforms.showSunDisc.value = true;
 
 ## Import
 
-Sky is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+Sky is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { Sky } from 'three/addons/objects/Sky.js';

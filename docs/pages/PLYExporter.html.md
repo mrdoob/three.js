@@ -13,7 +13,7 @@ const data = exporter.parse( scene, options );
 
 ## Import
 
-PLYExporter is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+PLYExporter is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { PLYExporter } from 'three/addons/exporters/PLYExporter.js';

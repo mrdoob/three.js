@@ -1,3 +1,5 @@
+import { RenderObjectRefreshType, DynamicDrawUsage } from '../../../constants.js';
+
 const refreshUniforms = [
 	'alphaMap',
 	'alphaTest',
@@ -9,28 +11,38 @@ const refreshUniforms = [
 	'attenuationColor',
 	'attenuationDistance',
 	'bumpMap',
+	'bumpScale',
 	'clearcoat',
 	'clearcoatMap',
 	'clearcoatNormalMap',
 	'clearcoatNormalScale',
 	'clearcoatRoughness',
 	'color',
+	'dashOffset',
+	'dashSize',
+	'diffuseRoughness',
+	'diffuseRoughnessMap',
 	'dispersion',
+	'displacementBias',
 	'displacementMap',
+	'displacementScale',
 	'emissive',
 	'emissiveIntensity',
 	'emissiveMap',
 	'envMap',
 	'envMapIntensity',
 	'envMapRotation',
+	'gapSize',
 	'gradientMap',
 	'ior',
 	'iridescence',
 	'iridescenceIOR',
 	'iridescenceMap',
+	'iridescenceThickness',
 	'iridescenceThicknessMap',
 	'lightMap',
 	'lightMapIntensity',
+	'linewidth',
 	'map',
 	'matcap',
 	'metalness',
@@ -38,23 +50,30 @@ const refreshUniforms = [
 	'normalMap',
 	'normalScale',
 	'opacity',
+	'reflectivity',
 	'retroreflectivity',
+	'rotation',
 	'roughness',
 	'roughnessMap',
+	'scale',
 	'sheen',
 	'sheenColor',
 	'sheenColorMap',
+	'sheenRoughness',
 	'sheenRoughnessMap',
 	'shininess',
+	'size',
 	'specular',
 	'specularColor',
 	'specularColorMap',
 	'specularIntensity',
 	'specularIntensityMap',
 	'specularMap',
+	'steps',
 	'thickness',
 	'transmission',
-	'transmissionMap'
+	'transmissionMap',
+	'wireframe'
 ];
 
 
@@ -82,6 +101,14 @@ const _materialCache = new WeakMap();
  * @type {WeakMap<BufferGeometry,Object>}
  */
 const _geometryCache = new WeakMap();
+
+/**
+ * Holds the texture data for comparison.
+ *
+ * @private
+ * @type {WeakMap<Texture,Object>}
+ */
+const _textureCache = new WeakMap();
 
 /**
  * This class is used by {@link WebGPURenderer} as management component.
@@ -159,6 +186,20 @@ class NodeMaterialObserver {
 	}
 
 	/**
+	 * Returns `true` if the given 3D object uses instance buffers with dynamic draw usage.
+	 * Such buffers must be uploaded once per render so the render object requires a full refresh.
+	 *
+	 * @param {Object3D} object - The 3D object.
+	 * @return {boolean} Whether the given 3D object uses instance buffers with dynamic draw usage or not.
+	 */
+	hasDynamicInstancing( object ) {
+
+		return object.isInstancedMesh === true && ( object.instanceMatrix.usage === DynamicDrawUsage ||
+			( object.instanceColor !== null && object.instanceColor.usage === DynamicDrawUsage ) );
+
+	}
+
+	/**
 	 * Returns `true` if the current rendering produces motion vectors.
 	 *
 	 * @param {Renderer} renderer - The renderer.
@@ -205,20 +246,34 @@ class NodeMaterialObserver {
 
 			}
 
+			if ( object.isInstancedMesh === true ) {
+
+				data.instanceMatrixVersion = object.instanceMatrix.version;
+				data.instanceColorVersion = object.instanceColor !== null ? object.instanceColor.version : null;
+				data.morphTextureVersion = object.morphTexture !== null ? object.morphTexture.version : null;
+
+			}
+
+			if ( object.isBatchedMesh === true ) {
+
+				data.matricesTextureVersion = object._matricesTexture.version;
+				data.colorsTextureVersion = object._colorsTexture !== null ? object._colorsTexture.version : null;
+				data.indirectTextureVersion = object._indirectTexture.version;
+
+			}
+
 			if ( renderObject.bundle !== null ) {
 
 				data.version = renderObject.bundle.version;
 
 			}
 
-			if ( renderObject.material.transmission > 0 ) {
+			// global data
 
-				const { width, height } = renderObject.context;
+			const { width, height } = renderObject.context;
 
-				data.bufferWidth = width;
-				data.bufferHeight = height;
-
-			}
+			data.bufferWidth = width;
+			data.bufferHeight = height;
 
 			const { environmentIntensity, environmentRotation } = renderObject.scene;
 
@@ -309,7 +364,56 @@ class NodeMaterialObserver {
 				drawRange: { start: geometry.drawRange.start, count: geometry.drawRange.count }
 			};
 
+			// force refresh on dispose
+
+			geometry.addEventListener( 'dispose', () => {
+
+				data._version ++;
+
+			} );
+
 			_geometryCache.set( geometry, data );
+
+		}
+
+		return data;
+
+	}
+
+	/**
+	 * Returns a texture data structure holding the texture state for
+	 * monitoring.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @return {Object} An object for monitoring the texture.
+	 */
+	getTextureData( texture ) {
+
+		let data = _textureCache.get( texture );
+
+		if ( data === undefined ) {
+
+			data = { _version: 0 };
+
+			// force refresh on dispose
+
+			const onDispose = () => {
+
+				data._version ++;
+
+			};
+
+			if ( texture.renderTarget !== null ) {
+
+				texture.renderTarget.addEventListener( 'dispose', onDispose );
+
+			} else {
+
+				texture.addEventListener( 'dispose', onDispose );
+
+			}
+
+			_textureCache.set( texture, data );
 
 		}
 
@@ -336,13 +440,17 @@ class NodeMaterialObserver {
 
 				const value = material[ property ];
 
-				if ( value === null || value === undefined ) continue;
+				if ( value === undefined ) continue;
 
-				if ( typeof value === 'object' && value.clone !== undefined ) {
+				if ( value === null ) {
+
+					data[ property ] = null; // track unset properties
+
+				} else if ( typeof value === 'object' && value.clone !== undefined ) {
 
 					if ( value.isTexture === true ) {
 
-						data[ property ] = { id: value.id, version: 0 };
+						data[ property ] = { id: value.id, version: 0, cacheVersion: this.getTextureData( value )._version };
 
 					} else {
 
@@ -410,7 +518,35 @@ class NodeMaterialObserver {
 				if ( property === '_renderId' ) continue;
 				if ( property === '_version' ) continue;
 
-				if ( value.equals !== undefined ) {
+				if ( value === null || mtlValue === null || mtlValue === undefined ) {
+
+					// a property was assigned or removed since the last observation so a new snapshot is required
+
+					if ( value !== ( mtlValue === undefined ? null : mtlValue ) ) {
+
+						if ( mtlValue === null || mtlValue === undefined ) {
+
+							materialData[ property ] = null;
+
+						} else if ( mtlValue.isTexture === true ) {
+
+							materialData[ property ] = { id: mtlValue.id, version: mtlValue.version, cacheVersion: this.getTextureData( mtlValue )._version };
+
+						} else if ( typeof mtlValue === 'object' && mtlValue.clone !== undefined ) {
+
+							materialData[ property ] = mtlValue.clone();
+
+						} else {
+
+							materialData[ property ] = mtlValue;
+
+						}
+
+						changed = true;
+
+					}
+
+				} else if ( value.equals !== undefined ) {
 
 					if ( value.equals( mtlValue ) === false ) {
 
@@ -422,10 +558,13 @@ class NodeMaterialObserver {
 
 				} else if ( mtlValue.isTexture === true ) {
 
-					if ( value.id !== mtlValue.id || value.version !== mtlValue.version ) {
+					const textureData = this.getTextureData( mtlValue );
+
+					if ( value.id !== mtlValue.id || value.version !== mtlValue.version || value.cacheVersion !== textureData._version ) {
 
 						value.id = mtlValue.id;
 						value.version = mtlValue.version;
+						value.cacheVersion = textureData._version;
 
 						changed = true;
 
@@ -455,18 +594,14 @@ class NodeMaterialObserver {
 
 		}
 
-		if ( materialData.transmission > 0 ) {
+		const { width, height } = renderObject.context;
 
-			const { width, height } = renderObject.context;
+		if ( renderObjectData.bufferWidth !== width || renderObjectData.bufferHeight !== height ) {
 
-			if ( renderObjectData.bufferWidth !== width || renderObjectData.bufferHeight !== height ) {
+			renderObjectData.bufferWidth = width;
+			renderObjectData.bufferHeight = height;
 
-				renderObjectData.bufferWidth = width;
-				renderObjectData.bufferHeight = height;
-
-				return false;
-
-			}
+			return false;
 
 		}
 
@@ -475,6 +610,8 @@ class NodeMaterialObserver {
 		if ( renderObjectData.geometryId !== geometry.id ) {
 
 			renderObjectData.geometryId = geometry.id;
+			renderObjectData.geometryVersion = this.getGeometryData( geometry )._version;
+
 			return false;
 
 		}
@@ -599,13 +736,63 @@ class NodeMaterialObserver {
 
 		}
 
+		// instancing
+
+		if ( object.isInstancedMesh === true ) {
+
+			const instanceColorVersion = object.instanceColor !== null ? object.instanceColor.version : null;
+			const morphTextureVersion = object.morphTexture !== null ? object.morphTexture.version : null;
+
+			if ( renderObjectData.instanceMatrixVersion !== object.instanceMatrix.version ||
+				renderObjectData.instanceColorVersion !== instanceColorVersion ||
+				renderObjectData.morphTextureVersion !== morphTextureVersion ) {
+
+				renderObjectData.instanceMatrixVersion = object.instanceMatrix.version;
+				renderObjectData.instanceColorVersion = instanceColorVersion;
+				renderObjectData.morphTextureVersion = morphTextureVersion;
+
+				return false;
+
+			}
+
+		}
+
+		// batching
+
+		if ( object.isBatchedMesh === true ) {
+
+			const colorsTextureVersion = object._colorsTexture !== null ? object._colorsTexture.version : null;
+
+			if ( renderObjectData.matricesTextureVersion !== object._matricesTexture.version ||
+				renderObjectData.colorsTextureVersion !== colorsTextureVersion ||
+				renderObjectData.indirectTextureVersion !== object._indirectTexture.version ) {
+
+				renderObjectData.matricesTextureVersion = object._matricesTexture.version;
+				renderObjectData.colorsTextureVersion = colorsTextureVersion;
+				renderObjectData.indirectTextureVersion = object._indirectTexture.version;
+
+				return false;
+
+			}
+
+		}
+
 		// lights
 
 		if ( renderObjectData.lights ) {
 
 			for ( let i = 0; i < lightsData.length; i ++ ) {
 
-				if ( renderObjectData.lights[ i ].map !== lightsData[ i ].map ) {
+				const lightData = renderObjectData.lights[ i ];
+				const currentLightData = lightsData[ i ];
+
+				if ( lightData.map !== currentLightData.map || lightData.cacheVersion !== currentLightData.cacheVersion ||
+					lightData.shadowMapWidth !== currentLightData.shadowMapWidth || lightData.shadowMapHeight !== currentLightData.shadowMapHeight ) {
+
+					lightData.map = currentLightData.map;
+					lightData.cacheVersion = currentLightData.cacheVersion;
+					lightData.shadowMapWidth = currentLightData.shadowMapWidth;
+					lightData.shadowMapHeight = currentLightData.shadowMapHeight;
 
 					return false;
 
@@ -671,13 +858,29 @@ class NodeMaterialObserver {
 
 		for ( const light of materialLights ) {
 
+			let data = null;
+
 			if ( light.isSpotLight === true && light.map !== null ) {
 
 				// only add lights that have a map
 
-				lights.push( { map: light.map.version } );
+				data = { map: light.map.version, cacheVersion: this.getTextureData( light.map )._version };
 
 			}
+
+			if ( light.castShadow === true && light.shadow !== undefined ) {
+
+				// resizing a shadow map recreates its textures so the bindings
+				// of all related render objects must be updated
+
+				if ( data === null ) data = {};
+
+				data.shadowMapWidth = light.shadow.mapSize.width;
+				data.shadowMapHeight = light.shadow.mapSize.height;
+
+			}
+
+			if ( data !== null ) lights.push( data );
 
 		}
 
@@ -721,16 +924,16 @@ class NodeMaterialObserver {
 	 *
 	 * @param {RenderObject} renderObject - The render object.
 	 * @param {NodeFrame} nodeFrame - The current node frame.
-	 * @return {boolean} Whether the given render object requires a refresh or not.
+	 * @return {number} The refresh type, see {@link RenderObjectRefreshType}.
 	 */
 	needsRefresh( renderObject, nodeFrame ) {
 
-		if ( this.hasNode || this.hasAnimation || this.firstInitialization( renderObject ) || this.needsVelocity( nodeFrame.renderer ) )
-			return true;
+		if ( this.hasNode || this.hasAnimation || this.hasDynamicInstancing( renderObject.object ) || this.firstInitialization( renderObject ) || this.needsVelocity( nodeFrame.renderer ) )
+			return RenderObjectRefreshType.FULL;
 
 		const { renderId } = nodeFrame;
 
-		let force = false;
+		let refreshType = RenderObjectRefreshType.NONE;
 
 		// shared UBOs are potentially never updated when objects don't change. Below block
 		// make sure these UBOs are updated at least once.
@@ -739,9 +942,9 @@ class NodeMaterialObserver {
 
 			this.renderId = renderId;
 
-			// no early out here. instead, force the render object to use the equals() code path so its internal cache state gets synched
+			// no early out here. instead, use the equals() code path below so the internal cache state gets synched
 
-			force = true;
+			refreshType = RenderObjectRefreshType.SHARED;
 
 		}
 
@@ -749,12 +952,17 @@ class NodeMaterialObserver {
 		const isBundle = renderObject.bundle !== null && renderObject.bundle.static === true && this.getRenderObjectData( renderObject ).version === renderObject.bundle.version;
 
 		if ( isStatic || isBundle )
-			return force;
+			return refreshType;
 
 		const lightsData = this.getLights( renderObject.lightsNode, renderId );
-		const notEqual = this.equals( renderObject, lightsData, renderId ) !== true;
 
-		return ( force || notEqual );
+		if ( this.equals( renderObject, lightsData, renderId ) === false ) {
+
+			refreshType = RenderObjectRefreshType.FULL;
+
+		}
+
+		return refreshType;
 
 	}
 

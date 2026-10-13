@@ -122,6 +122,18 @@ The layer index that should be updated.
 
 Resets the layer updates registry.
 
+### .copy( source : DataArrayTexture ) : DataArrayTexture
+
+Copies the values of the given texture to this instance.
+
+**source**
+
+The texture to copy.
+
+**Overrides:** [Texture#copy](Texture.html#copy)
+
+**Returns:** A reference to this instance.
+
 ## Source
 
 [src/textures/DataArrayTexture.js](https://github.com/mrdoob/three.js/blob/master/src/textures/DataArrayTexture.js)

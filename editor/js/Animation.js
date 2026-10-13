@@ -264,39 +264,17 @@ function Animation( editor ) {
 	let currentClip = null;
 	let currentRoot = null;
 
-	// Get all clips from scene animations
+	// Get all clips of the selected object
 	function getAnimationClips() {
 
-		const scene = editor.scene;
+		const object = editor.selected;
 		const clips = [];
-		const seen = new Set();
 
-		scene.traverse( function ( object ) {
+		if ( object !== null ) {
 
-			if ( object.animations && object.animations.length > 0 ) {
+			for ( const clip of object.animations ) {
 
-				for ( const clip of object.animations ) {
-
-					if ( ! seen.has( clip.uuid ) ) {
-
-						seen.add( clip.uuid );
-						clips.push( { clip: clip, root: object } );
-
-					}
-
-				}
-
-			}
-
-		} );
-
-		// Also check scene.animations directly
-		for ( const clip of scene.animations ) {
-
-			if ( ! seen.has( clip.uuid ) ) {
-
-				seen.add( clip.uuid );
-				clips.push( { clip: clip, root: scene } );
+				clips.push( { clip: clip, root: object } );
 
 			}
 
@@ -366,14 +344,6 @@ function Animation( editor ) {
 			clipRow.appendChild( clipTimeline );
 
 			clipRow.addEventListener( 'click', function () {
-
-				if ( editor.selected !== root ) {
-
-					signals.objectSelected.remove( selectDefaultClip );
-					editor.select( root );
-					signals.objectSelected.add( selectDefaultClip );
-
-				}
 
 				selectClip( clip, root );
 				update(); // Refresh to update highlighting
@@ -499,24 +469,11 @@ function Animation( editor ) {
 
 	function selectClip( clip, root ) {
 
-		// Stop current action
-		if ( currentAction ) {
+		const toggle = ( currentClip === clip );
 
-			currentAction.stop();
+		deselectClip();
 
-		}
-
-		if ( currentClip === clip ) {
-
-			// Unselect clip
-			currentAction = null;
-			currentClip = null;
-			currentRoot = null;
-
-			timeText.setValue( '0.00' );
-			durationText.setValue( '0.00' );
-
-		} else {
+		if ( toggle === false ) {
 
 			// Select clip without playing
 			currentClip = clip;
@@ -527,6 +484,26 @@ function Animation( editor ) {
 			durationText.setValue( clip.duration.toFixed( 2 ) );
 
 		}
+
+	}
+
+	function deselectClip() {
+
+		// Stop current action
+		if ( currentAction ) {
+
+			currentAction.stop();
+
+		}
+
+		currentAction = null;
+		currentClip = null;
+		currentRoot = null;
+
+		timeText.setValue( '0.00' );
+		durationText.setValue( '0.00' );
+
+		playhead.style.left = labelWidth + 'px';
 
 	}
 
@@ -557,11 +534,7 @@ function Animation( editor ) {
 
 		hidePath();
 		trackListContainer.innerHTML = '';
-		currentAction = null;
-		currentClip = null;
-		currentRoot = null;
-		timeText.setValue( '0.00' );
-		durationText.setValue( '0.00' );
+		deselectClip();
 
 	}
 
@@ -585,21 +558,24 @@ function Animation( editor ) {
 
 	}
 
-	function selectDefaultClip( object ) {
+	function onObjectSelected( object ) {
 
-		if ( object !== null && object.animations && object.animations.length > 0 ) {
+		deselectClip();
+
+		if ( object !== null && object.animations.length > 0 ) {
 
 			selectClip( object.animations[ 0 ], object );
-			update();
 
 		}
+
+		update();
 
 	}
 
 	updateTime();
 
 	// Auto-select clip when an object with animations is selected
-	signals.objectSelected.add( selectDefaultClip );
+	signals.objectSelected.add( onObjectSelected );
 
 	// Update when scene changes
 	signals.editorCleared.add( clear );

@@ -1,11 +1,11 @@
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
 import { default as TextureNode/*, texture*/ } from '../accessors/TextureNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { context } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
 import { viewZToOrthographicDepth, perspectiveDepthToViewZ } from './ViewportDepthNode.js';
 
-import { HalfFloatType, FloatType } from '../../constants.js';
+import { HalfFloatType, FloatType, DepthStencilFormat, UnsignedInt248Type } from '../../constants.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
@@ -54,6 +54,12 @@ class PassTextureNode extends TextureNode {
 		this.isPassTextureNode = true;
 
 		this.setUpdateMatrix( false );
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return true;
 
 	}
 
@@ -177,9 +183,9 @@ class PassMultipleTextureNode extends PassTextureNode {
  * postProcessing.outputNode = scenePass;
  * ```
  *
- * @augments TempNode
+ * @augments Node
  */
-class PassNode extends TempNode {
+class PassNode extends Node {
 
 	static get type() {
 
@@ -250,7 +256,23 @@ class PassNode extends TempNode {
 
 		if ( this.scope === PassNode.DEPTH || options.depthBuffer !== false ) {
 
-			depthTexture = options.depthTexture || new DepthTexture();
+			if ( options.depthTexture !== undefined ) {
+
+				depthTexture = options.depthTexture;
+
+			} else {
+
+				depthTexture = new DepthTexture();
+
+				if ( renderTarget.stencilBuffer === true ) {
+
+					depthTexture.format = DepthStencilFormat;
+					depthTexture.type = UnsignedInt248Type;
+
+				}
+
+			}
+
 			depthTexture.isRenderTargetTexture = true;
 			//depthTexture.type = FloatType;
 			depthTexture.name = 'depth';
@@ -277,7 +299,7 @@ class PassNode extends TempNode {
 		 * Whether the pass is transparent.
 		 *
 		 * @type {boolean}
-		 * @default false
+		 * @default true
 		 */
 		this.transparent = true;
 
@@ -484,6 +506,12 @@ class PassNode extends TempNode {
 		 * @default true
 		 */
 		this.global = true;
+
+	}
+
+	isCacheable( /*builder*/ ) {
+
+		return false;
 
 	}
 
@@ -1039,26 +1067,36 @@ class PassNode extends TempNode {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this.renderTarget.dispose();
 
 	}
 
 
+	/**
+	 * @static
+	 * @type {'color'}
+	 * @default 'color'
+	 */
+	static get COLOR() {
+
+		return 'color';
+
+	}
+
+	/**
+	 * @static
+	 * @type {'depth'}
+	 * @default 'depth'
+	 */
+	static get DEPTH() {
+
+		return 'depth';
+
+	}
+
 }
-
-/**
- * @static
- * @type {'color'}
- * @default 'color'
- */
-PassNode.COLOR = 'color';
-
-/**
- * @static
- * @type {'depth'}
- * @default 'depth'
- */
-PassNode.DEPTH = 'depth';
 
 export default PassNode;
 

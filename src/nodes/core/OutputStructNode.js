@@ -42,6 +42,12 @@ class OutputStructNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	generateNodeType( /*builder*/ ) {
 
 		return 'OutputType';

@@ -825,7 +825,7 @@ Default is `0`.
 
 ### .transformDirection( m : Matrix4 ) : Vector3
 
-Transforms the direction of this vector by a matrix (the upper left 3 x 3 subset of the given 4x4 matrix and then normalizes the result.
+Transforms this vector by the upper left 3x3 sub-matrix of the given 4x4 matrix, and normalizes the result.
 
 **m**
 

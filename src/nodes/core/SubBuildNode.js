@@ -46,6 +46,12 @@ class SubBuildNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	generateNodeType( builder ) {
 
 		if ( this.nodeType !== null ) return this.nodeType;

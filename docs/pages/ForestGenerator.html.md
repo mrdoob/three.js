@@ -1,8 +1,8 @@
 # ForestGenerator
 
-Carpets a [TerrainGenerator](TerrainGenerator.html) ( or anything exposing `sampleHeight`, `sampleSlope`, `minY`, `maxY` and `parameters.size` ) with a forest of hundreds of thousands of trees in a single draw call.
+Carpets a [TerrainGenerator](TerrainGenerator.html) with trees in a single instanced draw call. Each tree is a distorted icosphere with a baked crown gradient. Altitude, slope and a density mask control placement; rotation and scale vary between trees.
 
-Each tree is the cheapest thing that still reads as a tree: a ~20-face icosphere squashed into a tapered teardrop and lumped with a little noise, carrying a baked dark-base / bright-top gradient. Tens of triangles each, so a single THREE.InstancedMesh of half a million of them costs one draw call. Trees are placed by rejection sampling against ecological rules — a min/max altitude band ( above the mist floor, below the snowline ), a slope limit ( none on cliffs ) and a low-frequency density mask that opens clearings — then jittered in yaw, lean and ( squared-biased ) scale so the stand never reads as copies.
+Compatible terrain objects expose `sampleHeight`, `sampleSlope`, `minY`, `maxY` and `parameters.size`.
 
 ## Code Example
 

@@ -431,7 +431,7 @@ class NodeMaterial extends Material {
 
 		for ( const { property, childNode } of this._getNodeChildren() ) {
 
-			values.push( hashString( property.slice( 0, - 4 ) ), childNode.getCacheKey() );
+			values.push( hashString( property.slice( 0, - 4 ) ), childNode.getCacheKey( true ) );
 
 		}
 
@@ -815,7 +815,6 @@ class NodeMaterial extends Material {
 	 * Setups the computation of the material's diffuse color.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @param {BufferGeometry} geometry - The geometry.
 	 */
 	setupDiffuseColor( builder ) {
 
@@ -1013,6 +1012,18 @@ class NodeMaterial extends Material {
 		if ( builder.context.ambientOcclusion ) {
 
 			materialLightsNode.push( new AONode( builder.context.ambientOcclusion ) );
+
+		}
+
+		if ( builder.context.getGI ) {
+
+			const giNode = builder.context.getGI( null, builder );
+
+			if ( giNode !== null ) {
+
+				materialLightsNode.push( new IrradianceNode( giNode ) );
+
+			}
 
 		}
 
@@ -1309,21 +1320,25 @@ class NodeMaterial extends Material {
 	 */
 	copy( source ) {
 
-		const descriptors = Object.getOwnPropertyDescriptors( this.constructor.prototype );
+		for ( let prototype = Object.getPrototypeOf( this ); prototype !== Object.prototype; prototype = Object.getPrototypeOf( prototype ) ) {
 
-		for ( const property in descriptors ) {
+			const descriptors = Object.getOwnPropertyDescriptors( prototype );
 
-			if ( descriptors[ property ].set !== undefined && source[ property ] !== undefined ) {
+			for ( const property in descriptors ) {
 
-				const value = source[ property ];
+				if ( descriptors[ property ].set !== undefined && source[ property ] !== undefined ) {
 
-				if ( this[ property ] && this[ property ].copy !== undefined ) {
+					const value = source[ property ];
 
-					this[ property ].copy( value );
+					if ( this[ property ] && this[ property ].copy !== undefined ) {
 
-				} else {
+						this[ property ].copy( value );
 
-					this[ property ] = value;
+					} else {
+
+						this[ property ] = value;
+
+					}
 
 				}
 

@@ -10,8 +10,6 @@ import { DataTexture } from '../../../textures/DataTexture.js';
 import { error } from '../../../utils.js';
 
 const glslPolyfills = {
-	bitcast_int_uint: new CodeNode( /* glsl */'uint tsl_bitcast_int_to_uint ( int x ) { return floatBitsToUint( intBitsToFloat ( x ) ); }' ),
-	bitcast_uint_int: new CodeNode( /* glsl */'uint tsl_bitcast_uint_to_int ( uint x ) { return floatBitsToInt( uintBitsToFloat ( x ) ); }' ),
 	textureGather: new CodeNode( /* glsl */`
 vec4 tsl_textureGather( const int comp, sampler2D map, vec2 coord, ivec2 offset, bool flipY ) {
 	if ( flipY ) offset.y = - offset.y;
@@ -71,7 +69,11 @@ vec4 tsl_textureGatherCompare_array( sampler2DArrayShadow map, vec3 coord, ivec2
 	);
 	return flipY ? ret.wzyx : ret;
 }
-` )
+` ),
+	floatpack_snorm_4x8: new CodeNode( /* glsl */'uint tsl_packSnorm4x8( vec4 v ) { uvec4 u = uvec4( ivec4( round( clamp( v, -1.0, 1.0 ) * 127.0 ) ) & 0xff ); return u.x | u.y << 8 | u.z << 16 | u.w << 24; }' ),
+	floatpack_unorm_4x8: new CodeNode( /* glsl */'uint tsl_packUnorm4x8( vec4 v ) { uvec4 u = uvec4( round( clamp( v, 0.0, 1.0 ) * 255.0 ) ); return u.x | u.y << 8 | u.z << 16 | u.w << 24; }' ),
+	floatunpack_snorm_4x8: new CodeNode( /* glsl */'vec4 tsl_unpackSnorm4x8( uint x ) { return max( vec4( ivec4( x << 24, x << 16, x << 8, x ) >> 24 ) / 127.0, -1.0 ); }' ),
+	floatunpack_unorm_4x8: new CodeNode( /* glsl */'vec4 tsl_unpackUnorm4x8( uint x ) { return vec4( uvec4( x, x >> 8, x >> 16, x >> 24 ) & 0xffu ) / 255.0; }' )
 };
 
 const glslMethods = {
@@ -80,14 +82,16 @@ const glslMethods = {
 	bitcast_int_float: 'intBitsToFloat',
 	bitcast_uint_float: 'uintBitsToFloat',
 	bitcast_float_uint: 'floatBitsToUint',
-	bitcast_uint_int: 'tsl_bitcast_uint_to_int',
-	bitcast_int_uint: 'tsl_bitcast_int_to_uint',
 	floatpack_snorm_2x16: 'packSnorm2x16',
 	floatpack_unorm_2x16: 'packUnorm2x16',
 	floatpack_float16_2x16: 'packHalf2x16',
+	floatpack_snorm_4x8: 'tsl_packSnorm4x8',
+	floatpack_unorm_4x8: 'tsl_packUnorm4x8',
 	floatunpack_snorm_2x16: 'unpackSnorm2x16',
 	floatunpack_unorm_2x16: 'unpackUnorm2x16',
-	floatunpack_float16_2x16: 'unpackHalf2x16'
+	floatunpack_float16_2x16: 'unpackHalf2x16',
+	floatunpack_snorm_4x8: 'tsl_unpackSnorm4x8',
+	floatunpack_unorm_4x8: 'tsl_unpackUnorm4x8'
 };
 
 const precisionLib = {
@@ -269,7 +273,19 @@ class GLSLNodeBuilder extends NodeBuilder {
 	 */
 	getBitcastMethod( type, inputType ) {
 
-		return this.getMethod( `bitcast_${ inputType }_${ type }` );
+		const inputComponentType = this.getComponentType( inputType );
+		const componentType = this.getComponentType( type );
+
+		// integer types support bitcast implicitly via the type constructor
+
+		if ( inputComponentType !== 'float' && componentType !== 'float' &&
+			this.getTypeLength( inputType ) === this.getTypeLength( type ) ) {
+
+			return this.getType( type );
+
+		}
+
+		return this.getMethod( `bitcast_${ inputComponentType }_${ componentType }` );
 
 	}
 
@@ -277,11 +293,12 @@ class GLSLNodeBuilder extends NodeBuilder {
 	 * Returns the float packing method name for a given numeric encoding.
 	 *
 	 * @param {string} encoding - The numeric encoding that describes how the float values are mapped to the integer range.
+	 * @param {string} [layout='2x16'] - The component layout of the packed integer.
 	 * @returns {string} The resolved GLSL float packing method name.
 	 */
-	getFloatPackingMethod( encoding ) {
+	getFloatPackingMethod( encoding, layout = '2x16' ) {
 
-		return this.getMethod( `floatpack_${ encoding }_2x16` );
+		return this.getMethod( `floatpack_${ encoding }_${ layout }` );
 
 	}
 
@@ -289,11 +306,12 @@ class GLSLNodeBuilder extends NodeBuilder {
 	 * Returns the float unpacking method name for a given numeric encoding.
 	 *
 	 * @param {string} encoding - The numeric encoding that describes how the integer values are mapped to the float range.
+	 * @param {string} [layout='2x16'] - The component layout of the packed integer.
 	 * @returns {string} The resolved GLSL float unpacking method name.
 	 */
-	getFloatUnpackingMethod( encoding ) {
+	getFloatUnpackingMethod( encoding, layout = '2x16' ) {
 
-		return this.getMethod( `floatunpack_${ encoding }_2x16` );
+		return this.getMethod( `floatunpack_${ encoding }_${ layout }` );
 
 	}
 
@@ -308,6 +326,47 @@ class GLSLNodeBuilder extends NodeBuilder {
 	getTernary( condSnippet, ifSnippet, elseSnippet ) {
 
 		return `${condSnippet} ? ${ifSnippet} : ${elseSnippet}`;
+
+	}
+
+	/**
+	 * Returns the native snippet for a genuinely per-component vector select.
+	 * GLSL has no vector ternary, so `float` types use `mix()`'s `bvecN`-selector
+	 * overload; `int`/`uint`/`bool` types use an arithmetic select instead, since
+	 * that overload doesn't exist for them.
+	 *
+	 * @param {string} condSnippet - The per-component boolean (`bvecN`) condition.
+	 * @param {string} ifSnippet - The vector expression selected where `condSnippet` is `true`.
+	 * @param {string} elseSnippet - The vector expression selected where `condSnippet` is `false`.
+	 * @param {string} type - The (vector) type of `ifSnippet`/`elseSnippet`.
+	 * @return {string} The resolved method name.
+	 */
+	getVectorSelect( condSnippet, ifSnippet, elseSnippet, type ) {
+
+		const componentType = this.getComponentType( type );
+
+		if ( componentType === 'float' ) {
+
+			return `mix( ${elseSnippet}, ${ifSnippet}, ${condSnippet} )`;
+
+		}
+
+		const glslType = this.getType( type );
+
+		if ( componentType === 'bool' ) {
+
+			const intType = this.getType( this.getTypeFromLength( this.getTypeLength( type ), 'int' ) );
+			const maskSnippet = `${intType}( ${condSnippet} )`;
+			const ifIntSnippet = `${intType}( ${ifSnippet} )`;
+			const elseIntSnippet = `${intType}( ${elseSnippet} )`;
+
+			return `${glslType}( ${elseIntSnippet} + ${maskSnippet} * ( ${ifIntSnippet} - ${elseIntSnippet} ) )`;
+
+		}
+
+		const maskSnippet = `${glslType}( ${condSnippet} )`;
+
+		return `${elseSnippet} + ${maskSnippet} * ( ${ifSnippet} - ${elseSnippet} )`;
 
 	}
 
@@ -542,7 +601,10 @@ ${ flowData.code }
 
 			}
 
-			this.addLineFlowCode( `${ propertyName } = ${prefix}(${ snippet })${channel}`, storageArrayElementNode );
+			const texelType = this.getTypeFromLength( itemSize, this.getComponentType( prefix ) );
+			const elementType = storageArrayElementNode.getNodeType( this );
+
+			this.addLineFlowCode( `${ propertyName } = ${ this.format( `${prefix}(${ snippet })${channel}`, texelType, elementType ) }`, storageArrayElementNode );
 
 			elementNodeData.propertyName = propertyName;
 
@@ -863,27 +925,14 @@ ${ flowData.code }
 				const textureNode = uniform.node;
 				const texture = textureNode.value;
 
-				let typePrefix = '';
-
-				if ( texture.isDataTexture === true || texture.isData3DTexture === true ) {
-
-					if ( texture.type === UnsignedIntType ) {
-
-						typePrefix = 'u';
-
-					} else if ( texture.type === IntType ) {
-
-						typePrefix = 'i';
-
-					}
-
-				}
+				const componentType = this.getComponentTypeFromTexture( texture );
+				const typePrefix = componentType === 'float' ? '' : componentType.charAt( 0 );
 
 				if ( uniform.type === 'texture3D' && texture.isArrayTexture === false ) {
 
 					snippet = `${typePrefix}sampler3D ${ uniform.name };`;
 
-				} else if ( texture.compareFunction && textureNode.isPlainGather() === false ) {
+				} else if ( texture.compareFunction && textureNode.isSampleCompare() ) {
 
 					if ( texture.isArrayTexture === true ) {
 
@@ -1133,6 +1182,34 @@ ${ flowData.code }
 	}
 
 	/**
+	 * Returns a single const variable statement as a GLSL string for the given variable type and name.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The GLSL snippet that defines a const variable.
+	 */
+	generateConstStatement( type, name, count = null ) {
+
+		return `const ${ this.getVar( type, name, count ) }`;
+
+	}
+
+	/**
+	 * Returns a single variable statement as a GLSL string for the given variable type and name.
+	 *
+	 * @param {string} type - The variable's type.
+	 * @param {string} name - The variable's name.
+	 * @param {?number} [count=null] - The array length.
+	 * @return {string} The GLSL snippet that defines a variable.
+	 */
+	generateVarStatement( type, name, count = null ) {
+
+		return this.getVar( type, name, count );
+
+	}
+
+	/**
 	 * Returns the varyings of the given shader stage as a GLSL string.
 	 *
 	 * @param {string} shaderStage - The shader stage.
@@ -1247,7 +1324,7 @@ ${ flowData.code }
 	 */
 	getInvocationLocalIndex() {
 
-		const workgroupSize = this.object.workgroupSize;
+		const workgroupSize = this.compute.workgroupSize;
 
 		const size = workgroupSize.reduce( ( acc, curr ) => acc * curr, 1 );
 
@@ -1279,6 +1356,36 @@ ${ flowData.code }
 	getSubgroupIndex() {
 
 		error( 'GLSLNodeBuilder: WebGLBackend does not support the subgroupIndex node' );
+
+	}
+
+	/**
+	 * Enables subgroups.
+	 */
+	enableSubGroups() {
+
+		error( 'GLSLNodeBuilder: WebGLBackend does not support subgroup operations' );
+
+	}
+
+	/**
+	 * Enables 16 bit floats.
+	 */
+	enableShaderF16() {
+
+		error( 'GLSLNodeBuilder: WebGLBackend does not support 16 bit floats' );
+
+	}
+
+	/**
+	 * Enables dual source blending.
+	 *
+	 * WebGL 2 can express this through the `WEBGL_blend_func_extended` extension,
+	 * but WebGLBackend does not implement it.
+	 */
+	enableDualSourceBlending() {
+
+		error( 'GLSLNodeBuilder: WebGLBackend does not support dual source blending' );
 
 	}
 
@@ -1784,22 +1891,11 @@ void main() {
 
 			} else if ( type === 'buffer' ) {
 
+				node.name = `NodeBuffer_${ node.id }`;
 				uniformNode.name = `buffer${ node.id }`;
 
-				const sharedData = this.getSharedDataFromNode( node );
-
-				let buffer = sharedData.buffer;
-
-				if ( buffer === undefined ) {
-
-					node.name = `NodeBuffer_${ node.id }`;
-
-					buffer = new NodeUniformBuffer( node, group );
-					buffer.name = node.name;
-
-					sharedData.buffer = buffer;
-
-				}
+				const buffer = new NodeUniformBuffer( node, group );
+				buffer.name = node.name;
 
 				bindings.push( buffer );
 

@@ -6,7 +6,7 @@ A procedural roller coaster geometry.
 
 ## Import
 
-RollerCoasterGeometry is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+RollerCoasterGeometry is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { RollerCoasterGeometry } from 'three/addons/misc/RollerCoaster.js';

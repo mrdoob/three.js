@@ -58,6 +58,12 @@ class FunctionOverloadingNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * This method is overwritten since the node type is inferred from
 	 * the function's return type.
@@ -112,7 +118,7 @@ class FunctionOverloadingNode extends Node {
 						const param = params[ i ];
 						const input = inputs[ i ];
 
-						if ( param.getNodeType( builder ) === input.type ) {
+						if ( builder.getVectorType( param.getNodeType( builder ) ) === input.type ) {
 
 							currentScore ++;
 

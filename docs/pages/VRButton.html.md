@@ -10,7 +10,7 @@ document.body.appendChild( VRButton.createButton( renderer ) );
 
 ## Import
 
-VRButton is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+VRButton is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { VRButton } from 'three/addons/webxr/VRButton.js';

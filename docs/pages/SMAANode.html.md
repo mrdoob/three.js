@@ -8,7 +8,7 @@ Used Preset: SMAA 1x Medium (with color edge detection) Reference: [https://gith
 
 ## Import
 
-SMAANode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+SMAANode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { smaa } from 'three/addons/tsl/display/SMAANode.js';

@@ -50,6 +50,24 @@ class MemberNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
+	/**
+	 * Returns the scope of the struct so assignments to members
+	 * mark the underlying value as mutable.
+	 *
+	 * @return {Node} The scope of the node.
+	 */
+	getScope() {
+
+		return this.structNode.getScope();
+
+	}
+
 	hasMember( builder ) {
 
 		if ( this.structNode.isMemberNode ) {

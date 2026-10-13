@@ -7,25 +7,13 @@ const tri = /*@__PURE__*/ Fn( ( [ x ] ) => {
 
 	return x.fract().sub( .5 ).abs();
 
-} ).setLayout( {
-	name: 'tri',
-	type: 'float',
-	inputs: [
-		{ name: 'x', type: 'float' }
-	]
-} );
+}, { x: 'float', return: 'float' } );
 
 const tri3 = /*@__PURE__*/ Fn( ( [ p ] ) => {
 
 	return vec3( tri( p.z.add( tri( p.y.mul( 1. ) ) ) ), tri( p.z.add( tri( p.x.mul( 1. ) ) ) ), tri( p.y.add( tri( p.x.mul( 1. ) ) ) ) );
 
-} ).setLayout( {
-	name: 'tri3',
-	type: 'vec3',
-	inputs: [
-		{ name: 'p', type: 'vec3' }
-	]
-} );
+}, { p: 'vec3', return: 'vec3' } );
 
 /**
  * Generates a noise value from the given position, speed and time parameters.
@@ -60,12 +48,4 @@ export const triNoise3D = /*@__PURE__*/ Fn( ( [ position, speed, time ] ) => {
 
 	return rz;
 
-} ).setLayout( {
-	name: 'triNoise3D',
-	type: 'float',
-	inputs: [
-		{ name: 'position', type: 'vec3' },
-		{ name: 'speed', type: 'float' },
-		{ name: 'time', type: 'float' }
-	]
-} );
+}, { position: 'vec3', speed: 'float', time: 'float', return: 'float' } );

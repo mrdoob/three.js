@@ -223,7 +223,7 @@ class RollerCoasterGeometry extends BufferGeometry {
 
 			let headingChange = Math.atan2( sample2.x, sample2.z ) - Math.atan2( sample1.x, sample1.z );
 			if ( headingChange > Math.PI ) headingChange -= Math.PI * 2;
-			if ( headingChange < -Math.PI ) headingChange += Math.PI * 2;
+			if ( headingChange < - Math.PI ) headingChange += Math.PI * 2;
 
 			quaternion.premultiply( rollQuaternion.setFromAxisAngle( forward, - Math.atan( headingChange * 8 ) * 0.5 ) );
 
@@ -398,7 +398,7 @@ class RollerCoasterLiftersGeometry extends BufferGeometry {
 
 			let headingChange = Math.atan2( sample2.x, sample2.z ) - Math.atan2( sample1.x, sample1.z );
 			if ( headingChange > Math.PI ) headingChange -= Math.PI * 2;
-			if ( headingChange < -Math.PI ) headingChange += Math.PI * 2;
+			if ( headingChange < - Math.PI ) headingChange += Math.PI * 2;
 
 			bankedQuaternion.copy( quaternion );
 			rollQuaternion.setFromAxisAngle( tangent, - Math.atan( headingChange * 8 ) * 0.5 );

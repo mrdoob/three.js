@@ -262,7 +262,7 @@ How much the texture is rotated around the center point, in radians. Positive va
 
 Default is `0`.
 
-### .source : Source
+### .source : TextureSource
 
 The data definition of a texture. A reference to the data source can be shared across textures. This is often useful in context of spritesheets where multiple textures render the same data but with different texture transformations.
 

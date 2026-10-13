@@ -13,7 +13,7 @@ scene.add( hand );
 
 ## Import
 
-XRHandModelFactory is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+XRHandModelFactory is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { XRHandModelFactory } from 'three/addons/webxr/XRHandModelFactory.js';

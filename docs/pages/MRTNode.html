@@ -53,6 +53,12 @@ post-processing is shown below:</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="clearColors" translate="no">.<a href="#clearColors">clearColors</a><span class="type-signature"> : Object.&lt;string, <a href="Color4.html">Color4</a>></span> </h3>
+					<div class="description">
+						<p>A dictionary storing the clear colors for each output.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="isMRTNode" translate="no">.<a href="#isMRTNode">isMRTNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
 						<p>This flag can be used for type testing.</p>
@@ -108,6 +114,28 @@ the output result.</p>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The blend mode.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getClearColor" translate="no">.<a href="#getClearColor">getClearColor</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="Color4.html">Color4</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the clear color for the given output name.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the output.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The clear color. Returns <code>null</code> if no clear color is defined
+which means the renderer's default clear policy is applied.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="has" translate="no">.<a href="#has">has</a><span class="signature">( name : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="NodeBuilder.html">NodeBuilder</a></span> </h3>
@@ -173,6 +201,44 @@ the output result.</p>
 									</td>
 									<td class="description last">
 										<p>The blending mode.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The current MRT node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setClearColor" translate="no">.<a href="#setClearColor">setClearColor</a><span class="signature">( name : <span class="param-type">string</span>, color : <span class="param-type">number | string | <a href="Color.html">Color</a></span>, alpha : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="MRTNode.html">MRTNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the clear color for the given output name.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">name</strong>
+									</td>
+									<td class="description last">
+										<p>The name of the output.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">color</strong>
+									</td>
+									<td class="description last">
+										<p>The clear color.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">alpha</strong>
+									</td>
+									<td class="description last">
+										<p>The clear alpha.</p>
+										<p>Default is <code>1</code>.</p>
 									</td>
 								</tr>
 							</tbody>

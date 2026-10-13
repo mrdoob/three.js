@@ -328,16 +328,16 @@ class Color {
 
 					}
 
-					if ( color = /^\s*(\d+)\%\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
+					if ( color = /^\s*(\d*\.?\d+)\%\s*,\s*(\d*\.?\d+)\%\s*,\s*(\d*\.?\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
 
-						// rgb(100%,0%,0%) rgba(100%,0%,0%,0.5)
+						// rgb(100%,0%,0%) rgba(100%,0%,0%,0.5) rgb(50.5%,0%,0%)
 
 						handleAlpha( color[ 4 ] );
 
 						return this.setRGB(
-							Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100,
-							Math.min( 100, parseInt( color[ 2 ], 10 ) ) / 100,
-							Math.min( 100, parseInt( color[ 3 ], 10 ) ) / 100,
+							Math.min( 100, parseFloat( color[ 1 ] ) ) / 100,
+							Math.min( 100, parseFloat( color[ 2 ] ) ) / 100,
+							Math.min( 100, parseFloat( color[ 3 ] ) ) / 100,
 							colorSpace
 						);
 
@@ -348,9 +348,9 @@ class Color {
 				case 'hsl':
 				case 'hsla':
 
-					if ( color = /^\s*(\d*\.?\d+)\s*,\s*(\d*\.?\d+)\%\s*,\s*(\d*\.?\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
+					if ( color = /^\s*([+-]?\d*\.?\d+)\s*,\s*(\d*\.?\d+)\%\s*,\s*(\d*\.?\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
 
-						// hsl(120,50%,50%) hsla(120,50%,50%,0.5)
+						// hsl(120,50%,50%) hsla(120,50%,50%,0.5) hsl(-120,50%,50%)
 
 						handleAlpha( color[ 4 ] );
 

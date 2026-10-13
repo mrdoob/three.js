@@ -156,6 +156,11 @@ class Reflector extends Mesh {
 			reflectionCamera.updateMatrixWorld();
 			reflectionCamera.projectionMatrix.copy( camera.projectionMatrix );
 
+			// The reflection is mirrored horizontally, so the view offset must be mirrored as well.
+
+			reflectionCamera.projectionMatrix.elements[ 8 ] *= - 1;
+			reflectionCamera.projectionMatrix.elements[ 12 ] *= - 1;
+
 			// Update the texture matrix
 			textureMatrix.set(
 				0.5, 0.0, 0.0, 0.5,

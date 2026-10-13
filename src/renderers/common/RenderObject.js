@@ -1,7 +1,8 @@
-import { hash, hashString } from '../../nodes/core/NodeUtils.js';
+import { hashArray, hashString } from '../../nodes/core/NodeUtils.js';
 
 let _id = 0;
 const _protoKeysCache = new WeakMap();
+const _cacheKeyValues = [ 0, 0, 0, 0, 0 ];
 
 function getKeys( obj ) {
 
@@ -155,6 +156,14 @@ class RenderObject {
 		this.geometry = object.geometry;
 
 		/**
+		 * The geometry's version. Incremented whenever the geometry is updated.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.geometryVersion = 0;
+
+		/**
 		 * The render object's version.
 		 *
 		 * @type {number}
@@ -263,6 +272,13 @@ class RenderObject {
 		this.initialCacheKey = this.getCacheKey();
 
 		/**
+		 * The initial geometry cache key.
+		 *
+		 * @type {string}
+		 */
+		this.initialGeometryCacheKey = this.getGeometryCacheKey();
+
+		/**
 		 * The node builder state.
 		 *
 		 * @type {?NodeBuilderState}
@@ -336,6 +352,9 @@ class RenderObject {
 		 */
 		this.onGeometryDispose = () => {
 
+			this._geometries.deleteNodeAttributes( this );
+			this._geometries.deleteVertexState( this );
+
 			// clear geometry cache attributes
 
 			this.attributes = null;
@@ -343,6 +362,19 @@ class RenderObject {
 
 		};
 
+		/**
+		 * An event listener which is executed when `dispose()` is called on
+		 * the 3D object of this render object.
+		 *
+		 * @method
+		 */
+		this.onObjectDispose = () => {
+
+			this.dispose();
+
+		};
+
+		this.object.addEventListener( 'dispose', this.onObjectDispose );
 		this.material.addEventListener( 'dispose', this.onMaterialDispose );
 		this.geometry.addEventListener( 'dispose', this.onGeometryDispose );
 
@@ -498,9 +530,18 @@ class RenderObject {
 	 */
 	setGeometry( geometry ) {
 
+		// exchanging the geometry means we must move the dipose handler to the new geometry
+
+		this.geometry.removeEventListener( 'dispose', this.onGeometryDispose );
+
 		this.geometry = geometry;
+
+		this.geometry.addEventListener( 'dispose', this.onGeometryDispose );
+
 		this.attributes = null;
 		this.attributesId = null;
+
+		this.geometryVersion ++;
 
 	}
 
@@ -683,8 +724,6 @@ class RenderObject {
 
 			cacheKey += name + ',';
 
-			if ( attribute.data ) cacheKey += attribute.data.stride + ',';
-			if ( attribute.offset ) cacheKey += attribute.offset + ',';
 			if ( attribute.itemSize ) cacheKey += attribute.itemSize + ',';
 			if ( attribute.normalized ) cacheKey += 'n,';
 
@@ -710,12 +749,6 @@ class RenderObject {
 
 		}
 
-		if ( geometry.index ) {
-
-			cacheKey += 'index,';
-
-		}
-
 		return cacheKey;
 
 	}
@@ -729,9 +762,9 @@ class RenderObject {
 	 */
 	getMaterialCacheKey() {
 
-		const { object, material, renderer } = this;
+		const { object, material, renderer, scene } = this;
 
-		let cacheKey = material.customProgramCacheKey();
+		let cacheKey = this._nodes.getCustomProgramCacheKey( material, scene );
 
 		for ( const property of getKeys( material ) ) {
 
@@ -771,6 +804,7 @@ class RenderObject {
 					if ( value.isTexture ) {
 
 						valueKey += value.mapping;
+						valueKey += value.channel;
 
 						// WebGPU must honor the sampler data because they are part of the bindings
 
@@ -827,6 +861,12 @@ class RenderObject {
 				cacheKey += object._colorsTexture.uuid + ',';
 
 			}
+
+		}
+
+		if ( object.isInstancedMesh && object.instanceColor !== null ) {
+
+			cacheKey += object.instanceColor.id + ',';
 
 		}
 
@@ -912,32 +952,24 @@ class RenderObject {
 	 */
 	getDynamicCacheKey() {
 
-		let cacheKey = 0;
+		let environmentKey = 0;
 
 		// `Nodes.getCacheKey()` returns an environment cache key which is not relevant when
 		// the renderer is inside a shadow pass.
 
 		if ( this.material.isShadowPassMaterial !== true ) {
 
-			cacheKey = this._nodes.getCacheKey( this.scene, this.lightsNode );
+			environmentKey = this._nodes.getCacheKey( this.scene, this.lightsNode );
 
 		}
 
-		if ( this.camera.isArrayCamera ) {
+		_cacheKeyValues[ 0 ] = environmentKey;
+		_cacheKeyValues[ 1 ] = this.camera.isArrayCamera ? this.camera.cameras.length : 0;
+		_cacheKeyValues[ 2 ] = this.object.receiveShadow ? 1 : 0;
+		_cacheKeyValues[ 3 ] = this.renderer.contextNode.id;
+		_cacheKeyValues[ 4 ] = this.renderer.contextNode.version;
 
-			cacheKey = hash( cacheKey, this.camera.cameras.length );
-
-		}
-
-		if ( this.object.receiveShadow ) {
-
-			cacheKey = hash( cacheKey, 1 );
-
-		}
-
-		cacheKey = hash( cacheKey, this.renderer.contextNode.id, this.renderer.contextNode.version );
-
-		return cacheKey;
+		return hashArray( _cacheKeyValues );
 
 	}
 
@@ -957,6 +989,7 @@ class RenderObject {
 	 */
 	dispose() {
 
+		this.object.removeEventListener( 'dispose', this.onObjectDispose );
 		this.material.removeEventListener( 'dispose', this.onMaterialDispose );
 		this.geometry.removeEventListener( 'dispose', this.onGeometryDispose );
 

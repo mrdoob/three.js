@@ -2,7 +2,7 @@
 
 ## Import
 
-BufferGeometryUtils is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+BufferGeometryUtils is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
@@ -170,7 +170,7 @@ Default is `Math.PI/3`.
 
 ### .toTrianglesDrawMode( geometry : BufferGeometry, drawMode : number ) : BufferGeometry (inner)
 
-Returns a new indexed geometry based on `TrianglesDrawMode` draw mode. This mode corresponds to the `gl.TRIANGLES` primitive in WebGL.
+Converts the given geometry to the `TrianglesDrawMode` draw mode, which corresponds to the `gl.TRIANGLES` primitive in WebGL. The conversion only rewrites the index, so the geometry is modified in place and returned.
 
 **geometry**
 
@@ -180,7 +180,7 @@ The geometry to convert.
 
 The current draw mode.
 
-**Returns:** The new geometry using `TrianglesDrawMode`.
+**Returns:** The converted geometry using `TrianglesDrawMode`.
 
 ## Source
 

@@ -2,7 +2,7 @@ import { EventDispatcher } from './EventDispatcher.js';
 import { Texture } from '../textures/Texture.js';
 import { LinearFilter } from '../constants.js';
 import { Vector4 } from '../math/Vector4.js';
-import { Source } from '../textures/Source.js';
+import { TextureSource } from '../textures/TextureSource.js';
 
 /**
  * A render target is a buffer where the video card draws pixels for a scene
@@ -19,6 +19,7 @@ class RenderTarget extends EventDispatcher {
 	 *
 	 * @typedef {Object} RenderTarget~Options
 	 * @property {boolean} [generateMipmaps=false] - Whether to generate mipmaps or not.
+	 * @property {boolean} [mipmapsAutoUpdate=true] - Whether to regenerate mipmaps automatically after rendering or not.
 	 * @property {number} [magFilter=LinearFilter] - The mag filter.
 	 * @property {number} [minFilter=LinearFilter] - The min filter.
 	 * @property {number} [format=RGBAFormat] - The texture format.
@@ -38,7 +39,7 @@ class RenderTarget extends EventDispatcher {
 	 * @property {boolean} [storeMultisampledStencilBuffer=true] - Whether to store the multisampled stencil buffer or not. Setting to `false` saves memory bandwidth when the multisampled data are not needed after a render pass.
 	 * @property {?Texture} [depthTexture=null] - Reference to a depth texture.
 	 * @property {number} [samples=0] - The MSAA samples count.
-	 * @property {number} [count=1] - Defines the number of color attachments . Must be at least `1`.
+	 * @property {number} [count=1] - Defines the number of color attachments. Use `0` for a depth-only render target (WebGPURenderer).
 	 * @property {number} [depth=1] - The texture depth.
 	 * @property {boolean} [multiview=false] - Whether this target is used for multiview rendering (WebGL OVR_multiview2 extension).
 	 * @property {boolean} [useArrayDepthTexture=false] - Whether to create the depth texture as an array texture for per-layer depth testing. This is separate from multiview so layered render targets can use array depth without the multiview extension.
@@ -142,13 +143,10 @@ class RenderTarget extends EventDispatcher {
 		 */
 		this.textures = [];
 
-		const image = { width: width, height: height, depth: options.depth };
-		const texture = new Texture( image );
-
 		const count = options.count;
 		for ( let i = 0; i < count; i ++ ) {
 
-			this.textures[ i ] = texture.clone();
+			this.textures[ i ] = new Texture( { width: width, height: height, depth: options.depth } );
 			this.textures[ i ].isRenderTargetTexture = true;
 			this.textures[ i ].renderTarget = this;
 
@@ -304,6 +302,7 @@ class RenderTarget extends EventDispatcher {
 		if ( options.colorSpace !== undefined ) values.colorSpace = options.colorSpace;
 		if ( options.flipY !== undefined ) values.flipY = options.flipY;
 		if ( options.generateMipmaps !== undefined ) values.generateMipmaps = options.generateMipmaps;
+		if ( options.mipmapsAutoUpdate !== undefined ) values.mipmapsAutoUpdate = options.mipmapsAutoUpdate;
 		if ( options.internalFormat !== undefined ) values.internalFormat = options.internalFormat;
 
 		for ( let i = 0; i < this.textures.length; i ++ ) {
@@ -438,7 +437,7 @@ class RenderTarget extends EventDispatcher {
 			// ensure image object is not shared, see #20328
 
 			const image = Object.assign( {}, source.textures[ i ].image );
-			this.textures[ i ].source = new Source( image );
+			this.textures[ i ].source = new TextureSource( image );
 
 		}
 
@@ -468,6 +467,10 @@ class RenderTarget extends EventDispatcher {
 
 			}
 
+		} else {
+
+			this.depthTexture = null;
+
 		}
 
 		this.samples = source.samples;
@@ -481,6 +484,9 @@ class RenderTarget extends EventDispatcher {
 	/**
 	 * Frees the GPU-related resources allocated by this instance. Call this
 	 * method whenever this instance is no longer used in your app.
+	 *
+	 * This also frees the resources of the render target's textures. There is
+	 * no need to dispose them separately.
 	 *
 	 * @fires RenderTarget#dispose
 	 */

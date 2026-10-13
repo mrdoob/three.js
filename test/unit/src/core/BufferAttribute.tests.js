@@ -11,7 +11,7 @@ import {
 	Float32BufferAttribute
 } from '../../../../src/core/BufferAttribute.js';
 
-import { DynamicDrawUsage } from '../../../../src/constants.js';
+import { DynamicDrawUsage, StaticDrawUsage, FloatType } from '../../../../src/constants.js';
 import { toHalfFloat, fromHalfFloat } from '../../../../src/extras/DataUtils.js';
 
 export default QUnit.module( 'Core', () => {
@@ -194,7 +194,10 @@ export default QUnit.module( 'Core', () => {
 				itemSize: 3,
 				type: 'Float32Array',
 				array: [ 1, 2, 3, 4, 5, 6 ],
-				normalized: false
+				normalized: false,
+				name: '',
+				usage: StaticDrawUsage,
+				gpuType: FloatType
 			}, 'Serialized to JSON as expected' );
 
 			const attr2 = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3, true );
@@ -208,6 +211,7 @@ export default QUnit.module( 'Core', () => {
 				normalized: true,
 				name: 'attributeName',
 				usage: DynamicDrawUsage,
+				gpuType: FloatType
 			}, 'Serialized to JSON as expected with non-default values' );
 
 		} );

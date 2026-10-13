@@ -135,12 +135,6 @@ class GCodeLoader extends Loader {
 
 		}
 
-		function delta( v1, v2 ) {
-
-			return state.relative ? v2 : v2 - v1;
-
-		}
-
 		function absolute( v1, v2 ) {
 
 			return state.relative ? v1 + v2 : v2;
@@ -189,9 +183,9 @@ class GCodeLoader extends Loader {
 				if ( args.f !== undefined ) line.f = absolute( state.f, args.f );
 
 				//Layer change detection is or made by watching Z, it's made by watching when we extrude at a new Z position
-				if ( delta( state.e, line.e ) > 0 ) {
+				if ( line.e > state.e ) {
 
-					state.extruding = delta( state.e, line.e ) > 0;
+					state.extruding = true;
 
 					if ( currentLayer == undefined || line.z != currentLayer.z ) {
 

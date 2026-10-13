@@ -59,7 +59,7 @@ class PhongLightingModel extends BasicLightingModel {
 	}
 
 	/**
-	 * Implements the direct lighting. The specular portion is optional an can be controlled
+	 * Implements the direct lighting. The specular portion is optional and can be controlled
 	 * with the {@link PhongLightingModel#specular} flag.
 	 *
 	 * @param {Object} lightData - The light data.

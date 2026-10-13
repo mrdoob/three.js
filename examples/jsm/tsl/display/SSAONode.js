@@ -1,5 +1,5 @@
-import { RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
-import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getViewPosition, getScreenPositionFromClip, vogelDiskSample, interleavedGradientNoise, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec4, int, dot, max, clamp, length, screenCoordinate, PI2, texture, passTexture, context } from 'three/tsl';
+import { RenderTarget, Vector2, Node, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
+import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getViewPosition, getScreenPositionFromClip, vogelDiskSample, interleavedGradientNoise, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec4, int, dot, max, clamp, length, screenCoordinate, PI2, texture, passTexture, context, isBackgroundDepth } from 'three/tsl';
 import { depthAwareBlur } from './depthAwareBlur.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -26,10 +26,10 @@ let _rendererState;
  * renderPipeline.outputNode = scenePassColor.mul( aoPass.r );
  * ```
  *
- * @augments TempNode
+ * @augments Node
  * @three_import import { ssao } from 'three/addons/tsl/display/SSAONode.js';
  */
-class SSAONode extends TempNode {
+class SSAONode extends Node {
 
 	static get type() {
 
@@ -342,7 +342,7 @@ class SSAONode extends TempNode {
 
 			const depth = sampleDepth( uvNode ).toVar();
 
-			depth.greaterThanEqual( 1.0 ).discard();
+			isBackgroundDepth( depth ).discard();
 
 			const viewPosition = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).toVar();
 			const viewNormal = this.normalNode.sample( uvNode ).rgb.normalize().toVar();
@@ -408,6 +408,8 @@ class SSAONode extends TempNode {
 	 * when the effect is no longer required.
 	 */
 	dispose() {
+
+		super.dispose();
 
 		this._aoRenderTarget.dispose();
 		this._blurRenderTarget.dispose();

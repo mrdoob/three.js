@@ -23,14 +23,7 @@ class DualAttributeData {
 		this.version = attributeData.version;
 		this.isInteger = attributeData.isInteger;
 		this.activeBufferIndex = 0;
-		this.baseId = attributeData.id;
-
-	}
-
-
-	get id() {
-
-		return `${ this.baseId }|${ this.activeBufferIndex }`;
+		this.id = attributeData.id;
 
 	}
 
@@ -88,23 +81,14 @@ class WebGLAttributeUtils {
 		const backend = this.backend;
 		const { gl } = backend;
 
+		const bufferAttribute = backend.getBufferAttribute( attribute );
+
+		if ( backend.get( bufferAttribute ).bufferGPU !== undefined ) return;
+
 		const array = attribute.array;
 		const usage = attribute.usage || gl.STATIC_DRAW;
 
-		const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
-		const bufferData = backend.get( bufferAttribute );
-
-		let bufferGPU = bufferData.bufferGPU;
-
-		if ( bufferGPU === undefined ) {
-
-			bufferGPU = this._createBuffer( gl, bufferType, array, usage );
-
-			bufferData.bufferGPU = bufferGPU;
-			bufferData.bufferType = bufferType;
-			bufferData.version = bufferAttribute.version;
-
-		}
+		const bufferGPU = this._createBuffer( gl, bufferType, array, usage );
 
 		//attribute.onUploadCallback();
 
@@ -166,7 +150,7 @@ class WebGLAttributeUtils {
 			type,
 			byteLength: array.byteLength,
 			bytesPerElement: array.BYTES_PER_ELEMENT,
-			version: attribute.version,
+			version: bufferAttribute.version,
 			pbo: attribute.pbo,
 			isInteger: type === gl.INT || type === gl.UNSIGNED_INT || attribute.gpuType === IntType,
 			id: _id ++
@@ -180,7 +164,7 @@ class WebGLAttributeUtils {
 
 		}
 
-		backend.set( attribute, attributeData );
+		backend.set( bufferAttribute, attributeData );
 
 	}
 
@@ -195,10 +179,10 @@ class WebGLAttributeUtils {
 		const { gl } = backend;
 
 		const array = attribute.array;
-		const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
+		const bufferAttribute = backend.getBufferAttribute( attribute );
 		const bufferData = backend.get( bufferAttribute );
 		const bufferType = bufferData.bufferType;
-		const updateRanges = attribute.isInterleavedBufferAttribute ? attribute.data.updateRanges : attribute.updateRanges;
+		const updateRanges = bufferAttribute.updateRanges;
 
 		gl.bindBuffer( bufferType, bufferData.bufferGPU );
 
@@ -238,17 +222,25 @@ class WebGLAttributeUtils {
 		const backend = this.backend;
 		const { gl } = backend;
 
-		if ( attribute.isInterleavedBufferAttribute ) {
+		const bufferAttribute = backend.getBufferAttribute( attribute );
+		const attributeData = backend.get( bufferAttribute );
 
-			backend.delete( attribute.data );
+		if ( attributeData.buffers !== undefined ) {
+
+			// storage attributes hold a second buffer for transform feedback
+			for ( const buffer of attributeData.buffers ) {
+
+				gl.deleteBuffer( buffer );
+
+			}
+
+		} else {
+
+			gl.deleteBuffer( attributeData.bufferGPU );
 
 		}
 
-		const attributeData = backend.get( attribute );
-
-		gl.deleteBuffer( attributeData.bufferGPU );
-
-		backend.delete( attribute );
+		backend.delete( bufferAttribute );
 
 	}
 
@@ -259,10 +251,10 @@ class WebGLAttributeUtils {
 	 * new allocation.
 	 *
 	 * @async
-	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
-	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
-	 * @param {number} offset - The storage buffer attribute.
-	 * @param {number} count - The offset from which to start reading the
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read from.
+	 * @param {?(ReadbackBuffer|ArrayBuffer)} [target=null] - The readback buffer or array buffer that receives the data. If `null`, a new array buffer is returned.
+	 * @param {number} [offset=0] - The byte offset to start reading from. Must be a multiple of 4.
+	 * @param {number} [count=-1] - The number of bytes to read. Must be a multiple of 4, or `-1` to read to the end of the buffer.
 	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
 	async getArrayBufferAsync( attribute, target = null, offset = 0, count = - 1 ) {
@@ -270,7 +262,7 @@ class WebGLAttributeUtils {
 		const backend = this.backend;
 		const { gl } = backend;
 
-		const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
+		const bufferAttribute = backend.getBufferAttribute( attribute );
 		const attributeInfo = backend.get( bufferAttribute );
 		const { bufferGPU } = attributeInfo;
 

@@ -1,4 +1,4 @@
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
 import { error } from '../../utils.js';
 
 /**
@@ -6,9 +6,9 @@ import { error } from '../../utils.js';
  * It represents a join operation during the shader generation process.
  * For example in can compose/join two single floats into a `vec2` type.
  *
- * @augments TempNode
+ * @augments Node
  */
-class JoinNode extends TempNode {
+class JoinNode extends Node {
 
 	static get type() {
 

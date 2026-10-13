@@ -366,6 +366,7 @@ function Strings( config ) {
 			'sidebar/script/remove': 'حذف',
 
 			'sidebar/project': 'پروژه ها',
+			'sidebar/project/camera': 'دوربین',
 			'sidebar/project/renderer': 'رندرر',
 			'sidebar/project/antialias': 'آنتی الآیس',
 			'sidebar/project/shadows': 'سایه ها',
@@ -400,6 +401,9 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/scale': 'مقیاس',
 			'sidebar/settings/shortcuts/undo': 'بازگشت به عقب',
 			'sidebar/settings/shortcuts/focus': 'فوکوس',
+			'sidebar/settings/shortcuts/perspective': 'پرسپکتیو',
+			'sidebar/settings/shortcuts/orthographic': 'ارتوگرافیک',
+			'sidebar/settings/shortcuts/selectAll': 'انتخاب همه',
 
 			'sidebar/history': 'هیستوری',
 			'sidebar/history/clear': 'پاک کردن',
@@ -852,6 +856,7 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/focus': 'Focus',
 			'sidebar/settings/shortcuts/perspective': 'Perspective',
 			'sidebar/settings/shortcuts/orthographic': 'Orthographic',
+			'sidebar/settings/shortcuts/selectAll': 'Select All',
 
 			'sidebar/history': 'History',
 			'sidebar/history/clear': 'Clear',
@@ -1268,6 +1273,7 @@ function Strings( config ) {
 			'sidebar/script/remove': 'Supprimer',
 
 			'sidebar/project': 'Projet',
+			'sidebar/project/camera': 'Caméra',
 			'sidebar/project/renderer': 'Moteur',
 			'sidebar/project/antialias': 'Anticrénelage',
 			'sidebar/project/shadows': 'Ombres',
@@ -1302,6 +1308,9 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/scale': 'Échelle',
 			'sidebar/settings/shortcuts/undo': 'Annuler',
 			'sidebar/settings/shortcuts/focus': 'Focus',
+			'sidebar/settings/shortcuts/perspective': 'Perspective',
+			'sidebar/settings/shortcuts/orthographic': 'Orthographique',
+			'sidebar/settings/shortcuts/selectAll': 'Tout sélectionner',
 
 			'sidebar/history': 'Historique',
 			'sidebar/history/clear': 'Supprimer',
@@ -1718,6 +1727,7 @@ function Strings( config ) {
 			'sidebar/script/remove': '删除',
 
 			'sidebar/project': '项目',
+			'sidebar/project/camera': '摄像机',
 			'sidebar/project/renderer': '渲染器',
 			'sidebar/project/antialias': '抗锯齿',
 			'sidebar/project/shadows': '阴影',
@@ -1752,6 +1762,9 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/scale': '缩放',
 			'sidebar/settings/shortcuts/undo': '撤销',
 			'sidebar/settings/shortcuts/focus': '聚焦',
+			'sidebar/settings/shortcuts/perspective': '透视',
+			'sidebar/settings/shortcuts/orthographic': '正交',
+			'sidebar/settings/shortcuts/selectAll': '全选',
 
 			'sidebar/history': '历史记录',
 			'sidebar/history/clear': '清空',
@@ -2168,6 +2181,7 @@ function Strings( config ) {
 			'sidebar/script/remove': '削除',
 
 			'sidebar/project': 'プロジェクト',
+			'sidebar/project/camera': 'カメラ',
 			'sidebar/project/renderer': 'レンダラー',
 			'sidebar/project/antialias': 'アンチエイリアス',
 			'sidebar/project/shadows': 'シャドウ',
@@ -2202,6 +2216,9 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/scale': 'スケール',
 			'sidebar/settings/shortcuts/undo': '元に戻す',
 			'sidebar/settings/shortcuts/focus': 'フォーカス',
+			'sidebar/settings/shortcuts/perspective': '透視投影',
+			'sidebar/settings/shortcuts/orthographic': '平行投影',
+			'sidebar/settings/shortcuts/selectAll': 'すべて選択',
 
 			'sidebar/history': '履歴',
 			'sidebar/history/clear': 'クリア',
@@ -2617,6 +2634,7 @@ function Strings( config ) {
 			'sidebar/script/remove': '삭제',
 
 			'sidebar/project': '프로젝트',
+			'sidebar/project/camera': '카메라',
 			'sidebar/project/renderer': '렌더러',
 			'sidebar/project/antialias': '안티앨리어싱',
 			'sidebar/project/shadows': '그림자',
@@ -2651,6 +2669,9 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/scale': '스케일',
 			'sidebar/settings/shortcuts/undo': '되돌리기',
 			'sidebar/settings/shortcuts/focus': '포커스',
+			'sidebar/settings/shortcuts/perspective': '원근 투영',
+			'sidebar/settings/shortcuts/orthographic': '직교 투영',
+			'sidebar/settings/shortcuts/selectAll': '모두 선택',
 
 			'sidebar/history': '기록',
 			'sidebar/history/clear': '지우기',

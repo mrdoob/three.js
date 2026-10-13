@@ -124,9 +124,9 @@ class Scene extends Object3D {
 
 		super.copy( source, recursive );
 
-		if ( source.background !== null ) this.background = source.background.clone();
-		if ( source.environment !== null ) this.environment = source.environment.clone();
-		if ( source.fog !== null ) this.fog = source.fog.clone();
+		this.background = source.background !== null ? source.background.clone() : null;
+		this.environment = source.environment !== null ? source.environment.clone() : null;
+		this.fog = source.fog !== null ? source.fog.clone() : null;
 
 		this.backgroundBlurriness = source.backgroundBlurriness;
 		this.backgroundIntensity = source.backgroundIntensity;
@@ -135,7 +135,7 @@ class Scene extends Object3D {
 		this.environmentIntensity = source.environmentIntensity;
 		this.environmentRotation.copy( source.environmentRotation );
 
-		if ( source.overrideMaterial !== null ) this.overrideMaterial = source.overrideMaterial.clone();
+		this.overrideMaterial = source.overrideMaterial !== null ? source.overrideMaterial.clone() : null;
 
 		this.matrixAutoUpdate = source.matrixAutoUpdate;
 
@@ -149,11 +149,11 @@ class Scene extends Object3D {
 
 		if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
 
-		if ( this.backgroundBlurriness > 0 ) data.object.backgroundBlurriness = this.backgroundBlurriness;
-		if ( this.backgroundIntensity !== 1 ) data.object.backgroundIntensity = this.backgroundIntensity;
+		data.object.backgroundBlurriness = this.backgroundBlurriness;
+		data.object.backgroundIntensity = this.backgroundIntensity;
 		data.object.backgroundRotation = this.backgroundRotation.toArray();
 
-		if ( this.environmentIntensity !== 1 ) data.object.environmentIntensity = this.environmentIntensity;
+		data.object.environmentIntensity = this.environmentIntensity;
 		data.object.environmentRotation = this.environmentRotation.toArray();
 
 		return data;

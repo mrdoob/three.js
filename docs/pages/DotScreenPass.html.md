@@ -13,7 +13,7 @@ composer.addPass( pass );
 
 ## Import
 
-DotScreenPass is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+DotScreenPass is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { DotScreenPass } from 'three/addons/postprocessing/DotScreenPass.js';

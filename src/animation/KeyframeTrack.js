@@ -95,6 +95,15 @@ class KeyframeTrack {
 
 			}
 
+			if ( AnimationUtils.hasTangents( track.settings ) ) {
+
+				json.settings = {
+					inTangents: AnimationUtils.convertArray( track.settings.inTangents, Array ),
+					outTangents: AnimationUtils.convertArray( track.settings.outTangents, Array )
+				};
+
+			}
+
 		}
 
 		json.type = track.ValueTypeName; // mandatory
@@ -296,6 +305,13 @@ class KeyframeTrack {
 
 			}
 
+			if ( AnimationUtils.hasTangents( this.settings ) ) {
+
+				shiftTangentTimes( this.settings.inTangents, timeOffset );
+				shiftTangentTimes( this.settings.outTangents, timeOffset );
+
+			}
+
 		}
 
 		return this;
@@ -317,6 +333,13 @@ class KeyframeTrack {
 			for ( let i = 0, n = times.length; i !== n; ++ i ) {
 
 				times[ i ] *= timeScale;
+
+			}
+
+			if ( AnimationUtils.hasTangents( this.settings ) ) {
+
+				scaleTangentTimes( this.settings.inTangents, timeScale );
+				scaleTangentTimes( this.settings.outTangents, timeScale );
 
 			}
 
@@ -595,7 +618,40 @@ class KeyframeTrack {
 		// Interpolant argument to constructor is not saved, so copy the factory method directly.
 		track.createInterpolant = this.createInterpolant;
 
+		if ( AnimationUtils.hasTangents( this.settings ) ) {
+
+			track.settings = {
+				inTangents: this.settings.inTangents.slice(),
+				outTangents: this.settings.outTangents.slice()
+			};
+
+		}
+
 		return track;
+
+	}
+
+}
+
+function shiftTangentTimes( tangents, timeOffset ) {
+
+	// tangents are [ time, value ] pairs, so only every second entry is a time
+
+	for ( let i = 0, n = tangents.length; i !== n; i += 2 ) {
+
+		tangents[ i ] += timeOffset;
+
+	}
+
+}
+
+function scaleTangentTimes( tangents, timeScale ) {
+
+	// tangents are [ time, value ] pairs, so only every second entry is a time
+
+	for ( let i = 0, n = tangents.length; i !== n; i += 2 ) {
+
+		tangents[ i ] *= timeScale;
 
 	}
 

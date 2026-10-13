@@ -760,12 +760,16 @@ class SVGLoader extends Loader {
 					.filter( Boolean )
 					.map( i => i.trim() );
 
-				for ( let j = 0; j < selectorList.length; j ++ ) {
+				const definitions = {};
 
-					// Remove empty rules
-					const definitions = Object.fromEntries(
-						Object.entries( stylesheet.style ).filter( ( [ , v ] ) => v !== '' )
-					);
+				for ( let j = 0; j < stylesheet.style.length; j ++ ) {
+
+					const property = stylesheet.style[ j ];
+					definitions[ property ] = stylesheet.style.getPropertyValue( property );
+
+				}
+
+				for ( let j = 0; j < selectorList.length; j ++ ) {
 
 					stylesheets[ selectorList[ j ] ] = Object.assign(
 						stylesheets[ selectorList[ j ] ] || {},
@@ -1235,7 +1239,7 @@ class SVGLoader extends Loader {
 				};
 
 				if ( node.hasAttribute( svgName ) ) style[ jsName ] = adjustFunction( node.getAttribute( svgName ) );
-				if ( stylesheetStyles[ jsName ] ) style[ jsName ] = adjustFunction( stylesheetStyles[ jsName ] );
+				if ( stylesheetStyles[ svgName ] ) style[ jsName ] = adjustFunction( stylesheetStyles[ svgName ] );
 				if ( node.style && node.style[ svgName ] !== '' ) style[ jsName ] = adjustFunction( node.style[ svgName ] );
 
 			}

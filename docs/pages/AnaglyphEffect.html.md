@@ -8,7 +8,7 @@ Note that this class can only be used with [WebGLRenderer](WebGLRenderer.html). 
 
 ## Import
 
-AnaglyphEffect is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+AnaglyphEffect is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { AnaglyphEffect } from 'three/addons/effects/AnaglyphEffect.js';

@@ -13,6 +13,7 @@ import { Sphere } from '../../../../src/math/Sphere.js';
 import { x, y, z } from '../../utils/math-constants.js';
 import { EventDispatcher } from '../../../../src/core/EventDispatcher.js';
 import { toHalfFloat } from '../../../../src/extras/DataUtils.js';
+import { StaticDrawUsage, FloatType } from '../../../../src/constants.js';
 
 const DegToRad = Math.PI / 180;
 
@@ -566,7 +567,9 @@ export default QUnit.module( 'Core', () => {
 							'type': 'Uint16Array',
 							'array': [ 1, 3, 5, 7 ],
 							'normalized': false,
-							'name': 'attribute1'
+							'name': 'attribute1',
+							'usage': StaticDrawUsage,
+							'gpuType': FloatType
 						}
 					},
 					'index': {
@@ -599,7 +602,9 @@ export default QUnit.module( 'Core', () => {
 					'type': 'Uint16Array',
 					'array': [ 1, 3, 5, 7 ],
 					'normalized': false,
-					'name': 'attribute1'
+					'name': 'attribute1',
+					'usage': StaticDrawUsage,
+					'gpuType': FloatType
 				} ]
 			};
 			gold.data.morphTargetsRelative = false;

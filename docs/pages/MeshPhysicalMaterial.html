@@ -28,6 +28,8 @@ wings of many insects.</li>
 transparent materials are less reflective. Physically-based transmission provides a more
 realistic option for thin, transparent surfaces like glass.</li>
 <li>Advanced reflectivity: More flexible reflectivity for non-metallic materials.</li>
+<li>Retroreflection: Redirects specular light back toward the light source for
+safety materials like road markings and reflective tape.</li>
 <li>Sheen: Can be used for representing cloth and fabric materials.</li>
 </ul>
 <p>As a result of these complex shading features, <code>MeshPhysicalMaterial</code> has a
@@ -240,6 +242,16 @@ corresponds to an index-of-refraction of <code>1.5</code>.</p>
 <p>This models the reflectivity of non-metallic materials. It has no effect
 when <code>metalness</code> is <code>1.0</code></p>
 						<p>Default is <code>0.5</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="retroreflectivity" translate="no">.<a href="#retroreflectivity">retroreflectivity</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The strength of retroreflection, from <code>0.0</code> to <code>1.0</code>. A value of <code>1.0</code>
+evaluates the material's microfacet reflection with the view direction
+reflected about the surface normal, redirecting the specular lobe back
+toward the light source.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">

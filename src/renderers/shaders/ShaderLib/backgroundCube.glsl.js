@@ -17,37 +17,23 @@ void main() {
 
 export const fragment = /* glsl */`
 
-#ifdef ENVMAP_TYPE_CUBE
-
-	uniform samplerCube envMap;
-
-#elif defined( ENVMAP_TYPE_CUBE_UV )
-
-	uniform sampler2D envMap;
-
-#endif
-
 uniform float backgroundBlurriness;
 uniform float backgroundIntensity;
 uniform mat3 backgroundRotation;
 
 varying vec3 vWorldDirection;
 
-#include <cube_uv_reflection_fragment>
+#include <envmap_common_pars_fragment>
 
 void main() {
 
-	#ifdef ENVMAP_TYPE_CUBE
+	#ifdef ENVMAP_TYPE_PMREM
 
-		vec4 texColor = textureCube( envMap, backgroundRotation * vWorldDirection );
-
-	#elif defined( ENVMAP_TYPE_CUBE_UV )
-
-		vec4 texColor = textureCubeUV( envMap, backgroundRotation * vWorldDirection, backgroundBlurriness );
+		vec4 texColor = textureLod( envMap, backgroundRotation * vWorldDirection, roughnessToMip( backgroundBlurriness ) );
 
 	#else
 
-		vec4 texColor = vec4( 0.0, 0.0, 0.0, 1.0 );
+		vec4 texColor = textureCube( envMap, backgroundRotation * vWorldDirection );
 
 	#endif
 

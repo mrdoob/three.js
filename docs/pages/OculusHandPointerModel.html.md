@@ -6,7 +6,7 @@ Represents an Oculus hand pointer model.
 
 ## Import
 
-OculusHandPointerModel is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+OculusHandPointerModel is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { OculusHandPointerModel } from 'three/addons/webxr/OculusHandPointerModel.js';
@@ -101,6 +101,8 @@ Creates a pointer mesh and adds it to this model.
 ### .dispose()
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+
+**Overrides:** [Object3D#dispose](Object3D.html#dispose)
 
 ### .intersectObject( object : Object3D, recursive : boolean ) : Array.<Raycaster~Intersection>
 

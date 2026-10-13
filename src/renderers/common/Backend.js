@@ -163,6 +163,14 @@ class Backend {
 	 */
 	draw( /*renderObject, info*/ ) { }
 
+	/**
+	 * Deletes the vertex state for the given render object.
+	 *
+	 * @abstract
+	 * @param {RenderObject} renderObject - The render object.
+	 */
+	deleteVertexState( /*renderObject*/ ) { }
+
 	// compute node
 
 	/**
@@ -202,10 +210,10 @@ class Backend {
 	 * @abstract
 	 * @param {BindGroup} bindGroup - The bind group.
 	 * @param {Array<BindGroup>} bindings - Array of bind groups.
-	 * @param {number} cacheIndex - The cache index.
+	 * @param {string} cacheKey - The cache key.
 	 * @param {number} version - The version.
 	 */
-	createBindings( /*bindGroup, bindings, cacheIndex, version*/ ) { }
+	createBindings( /*bindGroup, bindings, cacheKey, version*/ ) { }
 
 	/**
 	 * Updates the given bind group definition.
@@ -213,10 +221,10 @@ class Backend {
 	 * @abstract
 	 * @param {BindGroup} bindGroup - The bind group.
 	 * @param {Array<BindGroup>} bindings - Array of bind groups.
-	 * @param {number} cacheIndex - The cache index.
+	 * @param {string} cacheKey - The cache key.
 	 * @param {number} version - The version.
 	 */
-	updateBindings( /*bindGroup, bindings, cacheIndex, version*/ ) { }
+	updateBindings( /*bindGroup, bindings, cacheKey, version*/ ) { }
 
 	/**
 	 * Updates a buffer binding.
@@ -246,6 +254,14 @@ class Backend {
 	 * @param {?Array<Promise>} [promises=null] - Optional compilation promises.
 	 */
 	createComputePipeline( /*computePipeline, bindings, promises*/ ) { }
+
+	/**
+	 * Destroys the given pipeline.
+	 *
+	 * @abstract
+	 * @param {Pipeline} pipeline - The pipeline.
+	 */
+	destroyPipeline( /*pipeline*/ ) { }
 
 	// cache key
 
@@ -407,6 +423,14 @@ class Backend {
 	createStorageAttribute( /*attribute*/ ) { }
 
 	/**
+	 * Creates the GPU buffer of an indirect storage attribute.
+	 *
+	 * @abstract
+	 * @param {BufferAttribute} attribute - The buffer attribute.
+	 */
+	createIndirectStorageAttribute( /*attribute*/ ) { }
+
+	/**
 	 * Creates a uniform buffer.
 	 *
 	 * @abstract
@@ -438,6 +462,21 @@ class Backend {
 	 */
 	destroyAttribute( /*attribute*/ ) { }
 
+	/**
+	 * Utility method for handling interleaved buffer attributes correctly.
+	 * To process them, their `InterleavedBuffer` is returned.
+	 *
+	 * @param {BufferAttribute|InterleavedBufferAttribute} attribute - The attribute.
+	 * @return {BufferAttribute|InterleavedBuffer}
+	 */
+	getBufferAttribute( attribute ) {
+
+		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
+
+		return attribute;
+
+	}
+
 	// canvas
 
 	/**
@@ -464,13 +503,21 @@ class Backend {
 	 */
 	updateViewport( /*renderContext*/ ) {}
 
+	/**
+	 * Frees the GPU resources of the given canvas target.
+	 *
+	 * @abstract
+	 * @param {CanvasTarget} canvasTarget - The canvas target.
+	 */
+	destroyCanvasTarget( /*canvasTarget*/ ) {}
+
 	// utils
 
 	/**
 	 * Updates a unique identifier for the given render context that can be used
 	 * to allocate resources like occlusion queries or timestamp queries.
 	 *
-	 * @param {RenderContext|ComputeNode} abstractRenderContext - The render context.
+	 * @param {RenderContext|ComputeNode|Array<ComputeNode>} abstractRenderContext - The render context.
 	 */
 	updateTimeStampUID( abstractRenderContext ) {
 
@@ -479,7 +526,15 @@ class Backend {
 
 		let prefix;
 
-		if ( abstractRenderContext.isComputeNode === true ) {
+		let id = abstractRenderContext.id;
+
+		if ( Array.isArray( abstractRenderContext ) ) {
+
+			id = abstractRenderContext.map( c => c.id ).join( ',' );
+
+			prefix = 'c:' + this.renderer.info.compute.frameCalls;
+
+		} else if ( abstractRenderContext.isComputeNode === true ) {
 
 			prefix = 'c:' + this.renderer.info.compute.frameCalls;
 
@@ -489,7 +544,7 @@ class Backend {
 
 		}
 
-		contextData.timestampUID = prefix + ':' + abstractRenderContext.id + ':f' + frame;
+		contextData.timestampUID = prefix + ':' + id + ':f' + frame;
 
 	}
 
@@ -625,10 +680,13 @@ class Backend {
 	 * a storage buffer attribute from the GPU to the CPU.
 	 *
 	 * @async
-	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
-	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read from.
+	 * @param {?(ReadbackBuffer|ArrayBuffer)} [target=null] - The readback buffer or array buffer that receives the data. If `null`, a new array buffer is returned.
+	 * @param {number} [offset=0] - The byte offset to start reading from. Must be a multiple of 4.
+	 * @param {number} [count=-1] - The number of bytes to read. Must be a multiple of 4, or `-1` to read to the end of the buffer.
+	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( /* attribute */ ) {}
+	async getArrayBufferAsync( /* attribute, target, offset, count */ ) {}
 
 	/**
 	 * Checks if the given feature is supported by the backend.
@@ -814,7 +872,19 @@ class Backend {
 	 *
 	 * @abstract
 	 */
-	dispose() { }
+	async dispose() {
+
+		for ( const queryPool of Object.values( this.timestampQueryPool ) ) {
+
+			if ( queryPool !== null ) {
+
+				await queryPool.dispose();
+
+			}
+
+		}
+
+	}
 
 }
 

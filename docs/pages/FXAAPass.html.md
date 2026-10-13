@@ -13,7 +13,7 @@ composer.addPass( fxaaPass );
 
 ## Import
 
-FXAAPass is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+FXAAPass is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { FXAAPass } from 'three/addons/postprocessing/FXAAPass.js';

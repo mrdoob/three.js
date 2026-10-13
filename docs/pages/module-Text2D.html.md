@@ -2,7 +2,7 @@
 
 ## Import
 
-Text2D is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+Text2D is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import * as Text2D from 'three/addons/webxr/Text2D.js';

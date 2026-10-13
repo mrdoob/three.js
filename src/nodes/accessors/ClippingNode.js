@@ -44,6 +44,12 @@ class ClippingNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Setups the node depending on the selected scope.
 	 *

@@ -1,6 +1,6 @@
 export default /* glsl */`
 
-#if ( defined( USE_SHADOWMAP ) && ( NUM_DIR_LIGHT_SHADOWS > 0 || NUM_POINT_LIGHT_SHADOWS > 0 ) ) || ( NUM_SPOT_LIGHT_COORDS > 0 )
+#if ( defined( USE_SHADOWMAP ) && ( NUM_DIR_LIGHT_SHADOWS > 0 || NUM_SUN_LIGHT_SHADOWS > 0 || NUM_POINT_LIGHT_SHADOWS > 0 ) ) || ( NUM_SPOT_LIGHT_COORDS > 0 )
 
 	#ifdef HAS_NORMAL
 
@@ -19,6 +19,13 @@ export default /* glsl */`
 #endif
 
 #if defined( USE_SHADOWMAP )
+
+	#if NUM_SUN_LIGHT_SHADOWS > 0
+
+		vSunShadowWorldPosition = vec4( worldPosition.xyz, - mvPosition.z );
+		vSunShadowWorldNormal = shadowWorldNormal;
+
+	#endif
 
 	#if NUM_DIR_LIGHT_SHADOWS > 0
 

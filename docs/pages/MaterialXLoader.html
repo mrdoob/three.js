@@ -14,15 +14,17 @@
 		<section>
 			<header>
 				<div class="class-description"><p>A loader for the MaterialX format.</p>
-<p>The node materials loaded with this loader can only be used with <a href="WebGPURenderer.html">WebGPURenderer</a>.</p></div>
+<p>The node materials loaded with this loader can only be used with <a href="WebGPURenderer.html">WebGPURenderer</a>.
+Besides plain <code>.mtlx</code> documents, the loader accepts <code>.mtlx.zip</code> archives that bundle a
+document with its textures.</p></div>
 				<h2>Code Example</h2>
 				<div translate="no"><pre><code class="language-js">const loader = new MaterialXLoader().setPath( SAMPLE_PATH );
-const materials = await loader.loadAsync( 'standard_surface_brass_tiled.mtlx' );
+const { materials } = await loader.loadAsync( 'standard_surface_brass_tiled.mtlx' );
 </code></pre></div>
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">MaterialXLoader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<p><span translate="no">MaterialXLoader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { MaterialXLoader } from 'three/addons/loaders/MaterialXLoader.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -46,7 +48,16 @@ const materials = await loader.loadAsync( 'standard_surface_brass_tiled.mtlx' );
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type"><a href="global.html#onProgressCallback">onProgressCallback</a></span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span><span class="type-signature"> : <a href="MaterialXLoader.html">MaterialXLoader</a></span> </h3>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span><span class="type-signature"> : <a href="MaterialXLoader.html">MaterialXLoader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees the resources of the last loaded archive.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type"><a href="global.html#onProgressCallback">onProgressCallback</a></span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span>, options : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="MaterialXLoader.html">MaterialXLoader</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Starts loading from the given URL and passes the loaded MaterialX asset
@@ -67,7 +78,7 @@ to the <code>onLoad()</code> callback.</p>
 										<strong translate="no">onLoad</strong>
 									</td>
 									<td class="description last">
-										<p>Executed when the loading process has been finished.</p>
+										<p>Executed when the loading process has been finished. Receives the parse result, see <a href="MaterialXLoader.html#parse">MaterialXLoader#parse</a>.</p>
 									</td>
 								</tr>
 								<tr>
@@ -86,6 +97,14 @@ to the <code>onLoad()</code> callback.</p>
 										<p>Executed when errors occur.</p>
 									</td>
 								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">options</strong>
+									</td>
+									<td class="description last">
+										<p>Parse options, see <a href="MaterialXLoader.html#parse">MaterialXLoader#parse</a>.</p>
+									</td>
+								</tr>
 							</tbody>
 						</table>
 						<dl class="details">
@@ -95,27 +114,52 @@ to the <code>onLoad()</code> callback.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this loader.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( text : <span class="param-type">string</span> )</span><span class="type-signature"> : Object.&lt;string, <a href="NodeMaterial.html">NodeMaterial</a>></span> </h3>
+					<h3 class="name name-method" id="loadAsync" translate="no">.<a href="#loadAsync">loadAsync</a><span class="signature">( url : <span class="param-type">string</span>, onProgress : <span class="param-type"><a href="global.html#onProgressCallback">onProgressCallback</a> | Object</span>, options : <span class="param-type">Object</span> )</span><span class="type-signature"> : Promise.&lt;Object></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Parses the given MaterialX data and returns the resulting materials.</p>
-<p>Supported standard_surface inputs:</p>
-<ul>
-<li>base, base_color: Base color/albedo</li>
-<li>opacity: Alpha/transparency</li>
-<li>specular_roughness: Surface roughness</li>
-<li>metalness: Metallic property</li>
-<li>specular: Specular reflection intensity</li>
-<li>specular_color: Specular reflection color</li>
-<li>ior: Index of refraction</li>
-<li>specular_anisotropy, specular_rotation: Anisotropic reflection</li>
-<li>transmission, transmission_color: Transmission properties</li>
-<li>thin_film_thickness, thin_film_ior: Thin film interference</li>
-<li>sheen, sheen_color, sheen_roughness: Sheen properties</li>
-<li>normal: Normal map</li>
-<li>coat, coat_roughness, coat_color: Clearcoat properties</li>
-<li>emission, emissionColor: Emission properties</li>
-</ul>
+							<p>Async version of <a href="MaterialXLoader.html#load">MaterialXLoader#load</a>. The progress callback can be
+omitted and the parse options passed as the second argument instead.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">url</strong>
+									</td>
+									<td class="description last">
+										<p>The path/URL of the file to be loaded. This can also be a data URI.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">onProgress</strong>
+									</td>
+									<td class="description last">
+										<p>Executed while the loading is in progress, or the parse options.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">options</strong>
+									</td>
+									<td class="description last">
+										<p>Parse options, see <a href="MaterialXLoader.html#parse">MaterialXLoader#parse</a>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Loader.html#loadAsync">Loader#loadAsync</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A Promise that resolves with the parse result.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( text : <span class="param-type">string</span>, options : <span class="param-type">Object</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Parses the given MaterialX document and returns the resulting materials
+together with the translation log.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -127,13 +171,105 @@ to the <code>onLoad()</code> callback.</p>
 										<p>The raw MaterialX data as a string.</p>
 									</td>
 								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">options</strong>
+									</td>
+									<td class="description last">
+										<p>Parse options.</p>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">path</strong>
+									</td>
+									<td class="description last">
+										<p>The base path for resolving resources like textures. Defaults to the loader's path.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">materialName</strong>
+									</td>
+									<td class="description last">
+										<p>Only translate the material with this name. Defaults to all materials.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">uvSpace</strong>
+									</td>
+									<td class="description last">
+										<p>The UV space of the document's textures, <code>'bottom-left'</code> or <code>'top-left'</code>.</p>
+										<p>Default is <code>'bottom-left'</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">interfaceValidator</strong>
+									</td>
+									<td class="description last">
+										<p>Validates node interfaces, see <code>createStrictInterfaceValidator()</code> in <code>MaterialXInterfaceValidation.js</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">throwOnErrors</strong>
+									</td>
+									<td class="description last">
+										<p>Whether translation errors throw or are only reported in the log.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+									</td>
+								</tr>
 							</tbody>
 						</table>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Loader.html#parse">Loader#parse</a></dt>
 						</dl>
 						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> A dictionary holding the parse node materials.</dt>
+							<dt class="tag-returns"><strong>Returns:</strong> The materials keyed by name and the translation log.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="parseBuffer" translate="no">.<a href="#parseBuffer">parseBuffer</a><span class="signature">( data : <span class="param-type">ArrayBuffer | Uint8Array | string</span>, url : <span class="param-type">string</span>, options : <span class="param-type">Object</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Parses a raw MaterialX document or a <code>.mtlx.zip</code> archive and returns the resulting materials.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">data</strong>
+									</td>
+									<td class="description last">
+										<p>The MaterialX document or archive.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">url</strong>
+									</td>
+									<td class="description last">
+										<p>The URL the data was loaded from, used to resolve relative resource paths.</p>
+										<p>Default is <code>''</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">options</strong>
+									</td>
+									<td class="description last">
+										<p>Parse options, see <a href="MaterialXLoader.html#parse">MaterialXLoader#parse</a>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The parse result, see <a href="MaterialXLoader.html#parse">MaterialXLoader#parse</a>.</dt>
 						</dl>
 					</div>
 				<h2 class="subsection-title">Source</h2>

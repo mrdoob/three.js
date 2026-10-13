@@ -7,13 +7,13 @@ This class represents shader indices of different types. The following predefine
 *   `vertexIndex`: The index of a vertex within a mesh.
 *   `instanceIndex`: The index of either a mesh instance or an invocation of a compute shader.
 *   `drawIndex`: The index of a draw call.
-*   `invocationLocalIndex`: The index of a compute invocation within the scope of a workgroup load.
+*   `invocationLocalIndex`: The index of a compute invocation within the scope of a workgroup.
 *   `invocationSubgroupIndex`: The index of a compute invocation within the scope of a subgroup.
 *   `subgroupIndex`: The index of a compute invocation's subgroup within its workgroup.
 
 ## Constructor
 
-### new IndexNode( scope : 'vertex' | 'instance' | 'subgroup' | 'invocationLocal' | 'invocationGlobal' | 'invocationSubgroup' | 'draw' )
+### new IndexNode( scope : 'vertex' | 'instance' | 'subgroup' | 'invocationLocal' | 'invocationSubgroup' | 'draw' )
 
 Constructs a new index node.
 

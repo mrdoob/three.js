@@ -269,7 +269,7 @@ class PCDLoader extends Loader {
 
 			// remove comments
 
-			PCDheader.str = PCDheader.str.replace( /#.*/gi, '' );
+			PCDheader.str = PCDheader.str.replace( /^#.*/gm, '' );
 
 			// parse
 
@@ -341,12 +341,14 @@ class PCDLoader extends Loader {
 			PCDheader.offset = {};
 
 			let sizeSum = 0;
+			let countSum = 0;
 
 			for ( let i = 0, l = PCDheader.fields.length; i < l; i ++ ) {
 
 				if ( PCDheader.data === 'ascii' ) {
 
-					PCDheader.offset[ PCDheader.fields[ i ] ] = i;
+					PCDheader.offset[ PCDheader.fields[ i ] ] = countSum;
+					countSum += PCDheader.count[ i ];
 
 				} else {
 
@@ -392,7 +394,7 @@ class PCDLoader extends Loader {
 
 				if ( lines[ i ] === '' ) continue;
 
-				const line = lines[ i ].split( ' ' );
+				const line = lines[ i ].trim().split( /\s+/ );
 
 				if ( offset.x !== undefined ) {
 

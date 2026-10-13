@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - post-processing fog</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - post-processing fog">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_postprocessing_fog.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_postprocessing_fog.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info" class="invert">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Volumetric Fog</span>
+			</div>
+
+			<small>
+				Post-Processing Volumetric Cloud Fog using Depth Reconstruction, JBU &amp; Gaussian Filtering in TSL.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import {
+				color,
+				exp,
+				float,
+				Fn,
+				fwidth,
+				getViewPosition,
+				interleavedGradientNoise,
+				Loop,
+				mix,
+				pass,
+				positionWorld,
+				rtt,
+				screenCoordinate,
+				screenUV,
+				smoothstep,
+				texture3D,
+				uniform,
+				vec2,
+				vec3,
+				vec4
+			} from 'three/tsl';
+
+			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			let camera, scene, renderer, renderPipeline, controls, timer;
+			let lucyMesh, cloudSpeed, cloudTimeUniform;
+
+			init();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 10, 4, 1 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
+
+				// Granite-like MeshStandardMaterial for the Lucy model
+
+				const material = new THREE.MeshStandardMaterial( {
+					color: 0xffffff,
+					roughness: 0.3,
+					metalness: 0.05
+				} );
+
+				// Prototype Developer Grid Floor with Screen-Space Derivative Anti-Aliasing (fwidth)
+
+				const groundGeometry = new THREE.PlaneGeometry( 200, 200 );
+				const groundMaterial = new THREE.MeshStandardNodeMaterial( {
+					roughness: 1.0,
+					metalness: 0.0
+				} );
+
+				const prototypeGrid = Fn( () => {
+
+					const p = positionWorld.xz;
+
+					// 1m major tile coordinates with subtle alternating grey checkerboard
+					const cell = p.floor();
+					const checker = cell.x.add( cell.y ).mod( 2.0 ).abs();
+					const tileColor = checker.greaterThan( 0.5 ).select( color( 0x3b3e46 ), color( 0x33363d ) );
+
+					// Anti-aliased grid coverage helper using screen-space derivatives (fwidth)
+					const getGridCoverage = ( coord, lineWidthInPixels ) => {
+
+						const deriv = fwidth( coord ).max( 0.0001 );
+						const distFromEdge = float( 0.5 ).sub( coord.fract().sub( 0.5 ).abs() );
+						const pixelDist = distFromEdge.div( deriv );
+
+						const lineX = smoothstep( float( lineWidthInPixels ), float( 0.0 ), pixelDist.x );
+						const lineY = smoothstep( float( lineWidthInPixels ), float( 0.0 ), pixelDist.y );
+
+						return lineX.max( lineY );
+
+					};
+
+					// Fine sub-grid lines (0.2m / 5 subdivisions per meter) with anti-aliasing
+					const fineCoverage = getGridCoverage( p.mul( 5.0 ), 0.9 );
+					const withFine = mix( tileColor, color( 0x4d515c ), fineCoverage );
+
+					// Major 1m grid boundary lines with anti-aliasing
+					const majorCoverage = getGridCoverage( p, 1.4 );
+					const withMajor = mix( withFine, color( 0xdedede ), majorCoverage );
+
+					// Intersection crosshair marks "+" with smooth anti-aliased falloff
+					const corner = p.sub( p.round() ).abs();
+					const deriv = fwidth( p ).max( 0.0001 );
+					const crossH = smoothstep( float( 0.08 ), float( 0.07 ), corner.x ).mul( smoothstep( deriv.y.mul( 1.5 ), float( 0.0 ), corner.y ) );
+					const crossV = smoothstep( float( 0.08 ), float( 0.07 ), corner.y ).mul( smoothstep( deriv.x.mul( 1.5 ), float( 0.0 ), corner.x ) );
+					const crossCoverage = crossH.max( crossV );
+
+					return mix( withMajor, color( 0xffffff ), crossCoverage );
+
+				} );
+
+				const gridNode = prototypeGrid();
+				const solidColorNode = color( 0x999999 );
+
+				groundMaterial.colorNode = solidColorNode;
+
+				const ground = new THREE.Mesh( groundGeometry, groundMaterial );
+				ground.position.set( 0, - 1, 0 );
+				ground.rotation.x = - Math.PI / 2;
+				ground.receiveShadow = true;
+				scene.add( ground );
+
+				// Load Stanford Lucy model
+
+				new PLYLoader().load( 'models/ply/binary/Lucy100k.ply', function ( geometry ) {
+
+					geometry.scale( 0.0024, 0.0024, 0.0024 );
+					geometry.computeVertexNormals();
+
+					lucyMesh = new THREE.Mesh( geometry, material );
+					lucyMesh.rotation.y = - Math.PI / 2;
+					lucyMesh.position.y = 0.8;
+					lucyMesh.castShadow = true;
+					lucyMesh.receiveShadow = true;
+					scene.add( lucyMesh );
+
+				} );
+
+				// Lights
+
+				const ambient = new THREE.HemisphereLight( 0xffffff, 0x8d8d8d, 0.5 );
+				scene.add( ambient );
+
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 2.5 );
+				dirLight.position.set( 5, 10, 5 );
+				dirLight.castShadow = true;
+				dirLight.shadow.mapSize.width = 1024;
+				dirLight.shadow.mapSize.height = 1024;
+				dirLight.shadow.camera.near = 1;
+				dirLight.shadow.camera.far = 25;
+				dirLight.shadow.camera.left = - 3;
+				dirLight.shadow.camera.right = 3;
+				dirLight.shadow.camera.top = 3;
+				dirLight.shadow.camera.bottom = - 3;
+				scene.add( dirLight );
+
+				// Renderer
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.shadowMap.enabled = true;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1.0;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				// Precomputed High-Detail Seamless 3D Fractal Tri-Noise Texture (Turbulent Wispy Cloud Structure)
+
+				function createNoise3DTexture( size = 96 ) {
+
+					const data = new Uint8Array( size * size * size );
+					let idx = 0;
+
+					const tri = ( x ) => Math.abs( ( ( x % 1.0 ) + 1.0 ) % 1.0 - 0.5 );
+
+					const tri3 = ( x, y, z ) => [
+						tri( z + tri( y ) ),
+						tri( z + tri( x ) ),
+						tri( y + tri( x ) )
+					];
+
+					const triNoise = ( x, y, z ) => {
+
+						let px = x, py = y, pz = z;
+						let bpx = x, bpy = y, bpz = z;
+						let zFactor = 1.4;
+						let rz = 0.0;
+
+						for ( let i = 0; i < 4; i ++ ) {
+
+							const [ dgx, dgy, dgz ] = tri3( bpx * 2.0, bpy * 2.0, bpz * 2.0 );
+							px += dgx;
+							py += dgy;
+							pz += dgz;
+
+							bpx = bpx * 1.8 + 0.14;
+							bpy = bpy * 1.8 + 0.14;
+							bpz = bpz * 1.8 + 0.14;
+
+							zFactor *= 1.5;
+							px *= 1.2;
+							py *= 1.2;
+							pz *= 1.2;
+
+							const t = tri( pz + tri( px + tri( py ) ) );
+							rz += t / zFactor;
+
+						}
+
+						return rz;
+
+					};
+
+					for ( let z = 0; z < size; z ++ ) {
+
+						for ( let y = 0; y < size; y ++ ) {
+
+							for ( let x = 0; x < size; x ++ ) {
+
+								const u = x / size;
+								const v = y / size;
+								const w = z / size;
+
+								// Fractal turbulent octaves with high-frequency detail
+								const n1 = triNoise( u * 4.0, v * 4.0, w * 4.0 );
+								const n2 = triNoise( u * 8.0 + 1.7, v * 8.0 + 0.9, w * 8.0 + 2.5 ) * 0.45;
+
+								const val = Math.min( Math.max( ( n1 + n2 ) * 1.15 * 255, 0 ), 255 );
+
+								data[ idx ++ ] = Math.floor( val );
+
+							}
+
+						}
+
+					}
+
+					const texture = new THREE.Data3DTexture( data, size, size, size );
+					texture.format = THREE.RedFormat;
+					texture.type = THREE.UnsignedByteType;
+					texture.minFilter = THREE.LinearFilter;
+					texture.magFilter = THREE.LinearFilter;
+					texture.wrapS = THREE.RepeatWrapping;
+					texture.wrapT = THREE.RepeatWrapping;
+					texture.wrapR = THREE.RepeatWrapping;
+					texture.unpackAlignment = 1;
+					texture.needsUpdate = true;
+
+					return texture;
+
+				}
+
+				const noise3DTexture = createNoise3DTexture( 96 );
+
+				// Post-Processing RenderPipeline
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+
+				const scenePass = pass( scene, camera );
+				const sceneColor = scenePass.getTextureNode( 'output' ).toInspector( 'scene' );
+				const sceneDepth = scenePass.getTextureNode( 'depth' );
+
+				// Camera Uniforms for Post-Processing (ensures perspective camera matrices are used instead of quad orthographic camera)
+
+				const cameraWorldMatrixUniform = uniform( camera.matrixWorld );
+				const cameraProjectionMatrixInverseUniform = uniform( camera.projectionMatrixInverse );
+				const cameraPositionUniform = uniform( camera.position );
+
+				// Volumetric Cloud Fog Uniforms
+
+				const resolutionScale = uniform( 0.4 );
+				const steps = uniform( 16 );
+				const fogDensity = uniform( 1.05 );
+				const heightFalloff = uniform( 1.2 );
+				const fogHeight = uniform( 3.5 );
+				const cloudScale = uniform( 0.019 );
+				const cloudThreshold = uniform( 0.66 );
+				const maxRayDist = uniform( 70.0 );
+				const spatialSigma = uniform( 1.2 );
+				const depthSensitivity = uniform( 30.0 );
+				const blurRadius = uniform( 0.5 );
+				cloudSpeed = uniform( 0.04 );
+				cloudTimeUniform = uniform( 0.0 );
+				timer = new THREE.Timer();
+
+				const rangeFogNear = uniform( 62.5 );
+				const rangeFogFar = uniform( 100.0 );
+
+				const groundLevelY = float( - 1.0 );
+
+				// 3D Procedural Volumetric Cloud Fog Density function (Optimized hardware-accelerated 3D texture sampling)
+
+				const sampleCloudDensity = Fn( ( [ pos ] ) => {
+
+					const t = cloudTimeUniform;
+					const p = vec3( pos.mul( cloudScale ) ).toVar();
+
+					// Primary cloud octave with forward atmospheric wind drift
+					const wind1 = vec3( t.mul( 0.3 ), t.mul( 0.05 ), t.mul( 0.2 ) );
+					const n1 = texture3D( noise3DTexture, p.add( wind1 ) ).r;
+
+					// Secondary octave warped by n1 with opposing counter-current drift for organic shape deformation
+					const wind2 = vec3( t.negate().mul( 0.15 ), t.mul( 0.1 ), t.mul( 0.08 ) );
+					const p2 = p.mul( 2.2 ).add( vec3( 1.7, 0.9, 2.5 ) ).add( wind2 ).add( n1.mul( 0.5 ) );
+					const n2 = texture3D( noise3DTexture, p2 ).r.mul( 0.5 );
+
+					const noise3D = n1.add( n2 );
+
+					// Physical height in meters relative to ground level (y = -1.0)
+					const relHeight = pos.y.sub( groundLevelY ).div( fogHeight.max( 0.01 ) );
+					const heightFactor = float( 1.0 ).sub( relHeight ).clamp( 0.0, 1.0 ).pow( heightFalloff );
+
+					// Cloud shaping via thresholding
+					const cloud = noise3D.sub( cloudThreshold ).max( 0.0 ).mul( heightFactor );
+
+					return cloud;
+
+				} );
+
+				// Post-Processing Volumetric Raymarching Pass using Scene Depth
+
+				const volumetricFogPass = Fn( () => {
+
+					const depth = sceneDepth.sample( screenUV ).r;
+					const viewPos = getViewPosition( screenUV, depth, cameraProjectionMatrixInverseUniform );
+					const targetWorldPos = cameraWorldMatrixUniform.mul( vec4( viewPos, 1.0 ) ).xyz;
+
+					const rayVector = targetWorldPos.sub( cameraPositionUniform );
+					const surfaceDist = rayVector.length();
+					const rayDir = rayVector.normalize();
+
+					// Ray-Slab: intersect ray with the physical fog layer [groundLevelY, groundLevelY + fogHeight]
+					const fogBottomY = groundLevelY;
+					const fogTopY = groundLevelY.add( fogHeight );
+
+					const dirY = rayDir.y.greaterThanEqual( 0.0 ).select( rayDir.y.max( 0.00001 ), rayDir.y.min( - 0.00001 ) );
+					const t0 = fogBottomY.sub( cameraPositionUniform.y ).div( dirY );
+					const t1 = fogTopY.sub( cameraPositionUniform.y ).div( dirY );
+
+					const tNearSlab = t0.min( t1 );
+					const tFarSlab = t0.max( t1 );
+
+					// Constrain ray range exclusively to the intersection within the fog volume
+					const tStart = tNearSlab.max( 0.0 );
+					const tEnd = tFarSlab.min( surfaceDist ).min( tStart.add( maxRayDist ) );
+					const marchDist = tEnd.sub( tStart ).max( 0.0 );
+
+					const stepSize = marchDist.div( float( steps ) );
+					const stepVector = rayDir.mul( stepSize );
+
+					const ditherOffset = interleavedGradientNoise( screenCoordinate.xy );
+					const positionRay = cameraPositionUniform.add( rayDir.mul( tStart ) ).add( stepVector.mul( ditherOffset ) ).toVar();
+
+					const accumulation = float( 0.0 ).toVar();
+
+					Loop( steps, () => {
+
+						const density = sampleCloudDensity( positionRay );
+						accumulation.addAssign( density.mul( stepSize ).mul( fogDensity ) );
+
+						positionRay.addAssign( stepVector );
+
+					} );
+
+					// Beer-Lambert transmittance: 1 - exp(-accumulation)
+					const cloudFog = float( 1.0 ).sub( accumulation.negate().exp() );
+
+					// Linear range fog based on distance from camera
+					const rangeFog = surfaceDist.sub( rangeFogNear ).div( rangeFogFar.sub( rangeFogNear ).max( 0.001 ) ).clamp( 0.0, 1.0 );
+
+					// Seamlessly blend volumetric cloud fog with distant range fog
+					return cloudFog.max( rangeFog );
+
+				} );
+
+				// Joint Bilateral Upsampling (JBU) Pass: Kopf et al. 2007
+				// Reconstructs full-resolution fog from a low-resolution buffer using high-resolution scene depth as a guide
+				// https://johanneskopf.de/publications/jbu/
+
+				const jointBilateralUpsampling = Fn( ( [ lowResTexture, depthTexture, spatialSig, depthSens ] ) => {
+
+					const centerCoord = screenUV;
+
+					// High-resolution guide: Full-resolution linear scene depth at the output pixel
+					const centerDepth = getViewPosition( centerCoord, depthTexture.sample( centerCoord ).r, cameraProjectionMatrixInverseUniform ).z.negate().max( 0.001 );
+
+					// Low-resolution texel footprint based on resolutionScale
+					const lowResTexel = fwidth( centerCoord ).div( resolutionScale );
+
+					// Precomputed Gaussian factors
+					const spatialSigmaFactor = float( - 0.5 ).div( spatialSig.mul( spatialSig ).max( 0.01 ) );
+					const depthSigmaFactor = depthSens.mul( depthSens ).mul( - 0.5 );
+
+					const sumColor = float( 0.0 ).toVar();
+					const sumWeight = float( 0.0 ).toVar();
+
+					// 5x5 spatial support over the low-resolution grid
+					for ( let y = - 2; y <= 2; y ++ ) {
+
+						for ( let x = - 2; x <= 2; x ++ ) {
+
+							const offset = vec2( float( x ), float( y ) );
+							const spatialDistSq = offset.x.mul( offset.x ).add( offset.y.mul( offset.y ) );
+							const spatialWeight = exp( spatialDistSq.mul( spatialSigmaFactor ) );
+
+							const sampleUV = centerCoord.add( offset.mul( lowResTexel ) );
+							const sampleFog = lowResTexture.sample( sampleUV );
+							const sampleDepth = getViewPosition( sampleUV, depthTexture.sample( sampleUV ).r, cameraProjectionMatrixInverseUniform ).z.negate().max( 0.001 );
+
+							// Range weight based on high-resolution depth similarity (preserves geometric edges)
+							const depthDiff = sampleDepth.sub( centerDepth ).div( centerDepth.max( 0.1 ) );
+							const rangeWeight = exp( depthDiff.mul( depthDiff ).mul( depthSigmaFactor ) );
+
+							const totalWeight = spatialWeight.mul( rangeWeight );
+
+							sumColor.addAssign( sampleFog.mul( totalWeight ) );
+							sumWeight.addAssign( totalWeight );
+
+						}
+
+					}
+
+					return sumColor.div( sumWeight.max( 0.0001 ) );
+
+				} );
+
+				// Low-Resolution Volumetric Fog Pass RTT
+
+				const lowResFogPass = rtt( volumetricFogPass(), null, null, {
+					type: THREE.UnsignedByteType,
+					format: THREE.RedFormat,
+					resolutionScale: resolutionScale.value
+				} ).setName( 'lowResFogPass' ).toInspector( 'Volumetric Fog' );
+
+				// Denoising Options: JBU, Gaussian Blur, Disabled (Raw)
+
+				const jbuFog = jointBilateralUpsampling( lowResFogPass, sceneDepth, spatialSigma, depthSensitivity );
+				const gaussianFog = gaussianBlur( lowResFogPass, blurRadius );
+				const rawFog = lowResFogPass.sample( screenUV );
+
+				const filterParams = {
+					mode: 'JBU'
+				};
+
+				function updateFilterMode() {
+
+					let selectedFog;
+
+					if ( filterParams.mode === 'JBU' ) {
+
+						selectedFog = jbuFog;
+
+					} else if ( filterParams.mode === 'Gaussian Blur' ) {
+
+						selectedFog = gaussianFog;
+
+					} else {
+
+						selectedFog = rawFog;
+
+					}
+
+					renderPipeline.outputNode = selectedFog.mix( sceneColor.rgb, color( 0xffffff ) );
+					renderPipeline.needsUpdate = true;
+
+					updateDenoiserControls();
+
+				}
+
+				function updateDenoiserControls() {
+
+					const isJBU = filterParams.mode === 'JBU';
+					const isGaussian = filterParams.mode === 'Gaussian Blur';
+
+					isJBU ? ctrlSpatialSigma.show() : ctrlSpatialSigma.hide();
+					isJBU ? ctrlDepthSensitivity.show() : ctrlDepthSensitivity.hide();
+					isGaussian ? ctrlGaussianBlur.show() : ctrlGaussianBlur.hide();
+
+				}
+
+				const groundParams = {
+					mode: 'Solid Color'
+				};
+
+				function updateGround() {
+
+					if ( groundParams.mode === 'Grid' ) {
+
+						groundMaterial.colorNode = gridNode;
+
+					} else {
+
+						groundMaterial.colorNode = solidColorNode;
+
+					}
+
+					groundMaterial.needsUpdate = true;
+
+				}
+
+				// Controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 2;
+				controls.maxDistance = 20;
+				controls.maxPolarAngle = Math.PI / 2;
+				controls.target.set( 0, 1.0, 0 );
+				controls.enableDamping = true;
+				controls.update();
+
+				// GUI
+
+				const gui = renderer.inspector.createParameters( 'Volumetric Fog' );
+				gui.add( filterParams, 'mode', [ 'JBU', 'Gaussian Blur', 'Disabled' ] ).name( 'denoiser' ).onChange( () => updateFilterMode() );
+				gui.add( resolutionScale, 'value', 0.25, 0.75, 0.05 ).name( 'resolution scale' ).onChange( ( value ) => lowResFogPass.setResolutionScale( value ) );
+				gui.add( steps, 'value', 4, 32, 1 ).name( 'steps' );
+				gui.add( cloudThreshold, 'value', 0.0, 0.8, 0.02 ).name( 'cloud threshold' );
+				gui.add( cloudScale, 'value', 0.001, 0.15, 0.001 ).name( 'cloud scale' );
+				gui.add( maxRayDist, 'value', 10.0, 70.0, 1.0 ).name( 'max ray dist' );
+				gui.add( fogDensity, 'value', 0.0, 3.0, 0.05 ).name( 'fog density' );
+				gui.add( heightFalloff, 'value', 0.2, 4.0, 0.1 ).name( 'height falloff' );
+				gui.add( fogHeight, 'value', 0.2, 8.0, 0.1 ).name( 'fog height (m)' );
+				gui.add( cloudSpeed, 'value', 0.0, 0.2, 0.005 ).name( 'cloud speed' );
+				gui.add( rangeFogNear, 'value', 0.0, 100.0, 0.5 ).name( 'range fog near' );
+				gui.add( rangeFogFar, 'value', 5.0, 150.0, 0.5 ).name( 'range fog far' );
+
+				const ctrlSpatialSigma = gui.add( spatialSigma, 'value', 0.5, 3.0, 0.1 ).name( 'spatial sigma' );
+				const ctrlDepthSensitivity = gui.add( depthSensitivity, 'value', 1.0, 100.0, 1.0 ).name( 'depth sensitivity' );
+				const ctrlGaussianBlur = gui.add( blurRadius, 'value', 0.0, 1.0, 0.01 ).name( 'gaussian blur' );
+
+				gui.add( groundParams, 'mode', [ 'Solid Color', 'Grid' ] ).name( 'ground' ).onChange( () => updateGround() );
+
+				updateFilterMode();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				timer.update();
+
+				const delta = timer.getDelta();
+
+				cloudTimeUniform.value += delta * cloudSpeed.value;
+
+				controls.update();
+
+				renderPipeline.render();
+
+			}
+
+		</script>
+	</body>
+</html>

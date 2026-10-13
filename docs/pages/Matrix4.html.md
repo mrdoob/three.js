@@ -175,8 +175,6 @@ The scale vector.
 
 Computes and returns the determinant of this matrix.
 
-Based on the method outlined [here](http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.html).
-
 **Returns:** The determinant.
 
 ### .determinantAffine() : number
@@ -201,7 +199,7 @@ The matrix to test for equality.
 
 ### .extractBasis( xAxis : Vector3, yAxis : Vector3, zAxis : Vector3 ) : Matrix4
 
-Extracts the basis of this matrix into the three axis vectors provided.
+Extracts the basis vectors of this matrix into the three vectors provided.
 
 **xAxis**
 
@@ -387,8 +385,6 @@ Default is `false`.
 
 Sets this matrix as a rotational transformation around the given axis by the given angle.
 
-This is a somewhat controversial but mathematically sound alternative to rotating via Quaternions. See the discussion [here](https://www.gamedev.net/articles/programming/math-and-physics/do-we-really-need-quaternions-r1199).
-
 **axis**
 
 The normalized rotation axis.
@@ -561,7 +557,7 @@ The matrix to multiply with.
 
 ### .scale( v : Vector3 ) : Matrix4
 
-Multiplies the columns of this matrix by the given vector.
+Scales each of the first three columns of this matrix by the corresponding component of the given vector.
 
 **v**
 

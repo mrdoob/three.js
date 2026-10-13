@@ -170,6 +170,8 @@ class Raycaster {
 	 * @property {Vector3} normal - Interpolated normal vector at point of intersection.
 	 * @property {number} instanceId - The index number of the instance where the ray
 	 * intersects the {@link InstancedMesh}.
+	 * @property {number} batchId - The index number of the instance where the ray
+	 * intersects the {@link BatchedMesh}.
 	 */
 
 	/**

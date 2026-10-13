@@ -1,15 +1,16 @@
 import { EventDispatcher } from 'three';
 import { Style } from './Style.js';
 import { Graph } from './Graph.js';
-import { getItem, setItem } from '../Inspector.js';
+import { getItem, setItem } from '../Storage.js';
 
 export class Profiler extends EventDispatcher {
 
-	constructor( inspector ) {
+	constructor( inspector, options = {} ) {
 
 		super();
 
 		this.inspector = inspector;
+		this.nonce = options.nonce ?? inspector?.nonce ?? null;
 		this.tabs = {};
 		this.activeTabId = null;
 		this.isResizing = false;
@@ -21,12 +22,12 @@ export class Profiler extends EventDispatcher {
 		this.nextTabOriginalIndex = 0; // Track the original order of tabs as they are added
 
 		this.horizontalAlign = 'right'; // 'left' or 'right'
-		this.verticalAlign = 'top';     // 'top' or 'bottom'
+		this.verticalAlign = 'top'; // 'top' or 'bottom'
 
 		this.setupShell();
 		this.setupResizing();
 
-		Style.init( this.domElement );
+		Style.init( this.domElement, this.nonce );
 
 		this.updateWidgetPosition();
 
@@ -199,6 +200,7 @@ export class Profiler extends EventDispatcher {
 			constrainDetachedWindows();
 			constrainMainPanel();
 			this.checkHeaderScroll();
+			this.notifyLayoutChange();
 
 		} );
 
@@ -273,12 +275,18 @@ export class Profiler extends EventDispatcher {
 <span class="toggle-icon">
 	<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-device-ipad-horizontal-search"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M11.5 20h-6.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v5.5" /><path d="M9 17h2" /><path d="M18 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M20.2 20.2l1.8 1.8" /></svg>
 	<span class="console-badge-container">
-		<span class="console-badge error" style="display: none;">0</span>
-		<span class="console-badge warn" style="display: none;">0</span>
+		<span class="console-badge error">0</span>
+		<span class="console-badge warn">0</span>
 	</span>
 </span>
 `;
 		this.toggleButton.onclick = () => this.togglePanel();
+
+		const errorBadge = this.toggleButton.querySelector( '.console-badge.error' );
+		errorBadge.style.display = 'none';
+
+		const warnBadge = this.toggleButton.querySelector( '.console-badge.warn' );
+		warnBadge.style.display = 'none';
 
 		this.builtinTabsContainer = this.toggleButton.querySelector( '.builtin-tabs-container' );
 
@@ -601,11 +609,18 @@ export class Profiler extends EventDispatcher {
 
 		}
 
+		// Set profiler reference
+		tab.profiler = this;
+
 		// Update panel size when tabs change
 		this.updatePanelSize();
 
-		// Set profiler reference
-		tab.profiler = this;
+		// If newly added tab matches activeTabId from saved layout, activate it
+		if ( this.activeTabId && tab.id === this.activeTabId ) {
+
+			this.setActiveTab( tab.id );
+
+		}
 
 	}
 
@@ -2004,6 +2019,9 @@ export class Profiler extends EventDispatcher {
 			// Update panel size after loading layout
 			this.updatePanelSize();
 
+			// Update widget position (toggle and mini panel alignment)
+			this.updateWidgetPosition();
+
 			// Ensure initial open state applies to mini panel as well
 			if ( this.panel.classList.contains( 'visible' ) ) {
 
@@ -2149,7 +2167,7 @@ export class Profiler extends EventDispatcher {
 		const isRight = this.position === 'right';
 
 		let horizontal = this.horizontalAlign; // 'left' or 'right'
-		let vertical = this.verticalAlign;     // 'top' or 'bottom'
+		let vertical = this.verticalAlign; // 'top' or 'bottom'
 
 		if ( isVisible ) {
 
@@ -2211,6 +2229,44 @@ export class Profiler extends EventDispatcher {
 			this.miniPanel.classList.remove( 'toggle-bottom' );
 
 		}
+
+		this.notifyLayoutChange();
+
+	}
+
+	isVertical() {
+
+		return this.position === 'left' || this.position === 'right' ||
+			( this.panel && ( this.panel.classList.contains( 'position-left' ) || this.panel.classList.contains( 'position-right' ) ) );
+
+	}
+
+	notifyLayoutChange() {
+
+		const isVert = this.isVertical();
+
+		this.dispatchEvent( { type: 'orientationchange', position: this.position, isVertical: isVert } );
+		this.dispatchEvent( { type: 'layoutchange', position: this.position, isVertical: isVert } );
+
+	}
+
+	dispose() {
+
+		for ( const tab of Object.values( this.tabs ) ) {
+
+			tab.dispose();
+
+		}
+
+		this.domElement.remove();
+
+		for ( const detachedWindow of this.detachedWindows ) {
+
+			detachedWindow.panel.remove();
+
+		}
+
+		this.toggleGraph.dispose();
 
 	}
 

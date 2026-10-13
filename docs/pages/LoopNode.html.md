@@ -38,17 +38,17 @@ Loop( value.lessThan( 10 ), () => {
 } );
 ```
 
-The module also provides `Break()` and `Continue()` TSL expression for loop control.
+The module also provides `Break()` and `Continue()` TSL expressions for loop control.
 
 ## Constructor
 
-### new LoopNode( params : Array.<any> )
+### new LoopNode( params : Array.<(LoopNode~Params|loopBodyCallback)> )
 
 Constructs a new loop node.
 
 **params**
 
-Depending on the loop type, array holds different parameterization values for the loop.
+Any number of loop parameters followed by the loop body.
 
 ## Methods
 
@@ -71,6 +71,50 @@ Returns a loop variable name based on an index. The pattern is `0` = `i`, `1`\= 
 The index.
 
 **Returns:** The loop variable name.
+
+## Type Definitions
+
+### .ObjectParams
+
+A detailed loop configuration.
+
+**start**  
+number | [Node](Node.html).<int> | [Node](Node.html).<uint>
+
+The initial value of the loop variable.
+
+Default is `0`.
+
+**end**  
+number | [Node](Node.html).<int> | [Node](Node.html).<uint>
+
+The value the loop variable is compared against. If omitted, the loop counts down from `start - 1` to `0`.
+
+**name**  
+string
+
+The name of the loop variable. Defaults to `i`, `j`, `k` and so on.
+
+**type**  
+string
+
+The data type of the loop variable.
+
+Default is `'int'`.
+
+**condition**  
+'<' | '<=' | '>' | '>='
+
+The comparison operator. The loop runs as long as the comparison is true. Inferred from `start` and `end` if not set.
+
+**update**  
+string | number | function | [Node](Node.html)
+
+Defines how the loop variable is updated after each iteration. Inferred from `condition` and `type` if not set.
+
+### .Params
+
+The parameters of a loop. A number or int/uint node defines the loop's end value, a bool node defines a `while` loop and an object allows a more detailed configuration.
 
 ## Source
 

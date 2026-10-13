@@ -95,6 +95,8 @@ class SpotLightHelper extends Object3D {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this.cone.geometry.dispose();
 		this.cone.material.dispose();
 

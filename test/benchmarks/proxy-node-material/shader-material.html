@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - material initialization benchmark</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<style>
+			body { margin: 0; background: #111; color: #fff; font: 14px monospace; }
+			#info { position: absolute; padding: 16px; background: #111e; }
+			a { color: #8cf; }
+			canvas { display: block; }
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			<strong>WebGLRenderer - MeshBasicMaterial</strong><br>
+			10,000 meshes, one material per mesh.<br>
+			<a href="node-material.html">Node Material</a> |
+			<a href="proxy-material.html">Proxy Material</a> |
+			<a href="shader-material.html">Shader Material</a>
+			<pre id="results">Initializing renderer...</pre>
+			<button id="update" disabled>Update uniforms</button>
+			<p>CPU times include command submission, not GPU completion.<br>Reload for a fresh run.</p>
+		</div>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../../../src/Three.js"
+				}
+			}
+		</script>
+		<script type="module">
+			import * as THREE from 'three';
+
+			class IDMaterial extends THREE.MeshBasicMaterial {
+
+				constructor( color ) {
+
+					super();
+
+					this.uniforms = { idColor: { value: color } };
+
+				}
+
+				onBeforeCompile( shader ) {
+
+					shader.uniforms.idColor = this.uniforms.idColor;
+					shader.fragmentShader = 'uniform vec3 idColor;\n' + shader.fragmentShader.replace(
+						'vec4( diffuse, opacity )',
+						'vec4( idColor, opacity )'
+					);
+
+				}
+
+			}
+
+			const results = document.getElementById( 'results' );
+			const button = document.getElementById( 'update' );
+			const renderer = new THREE.WebGLRenderer( { alpha: true } );
+			renderer.setPixelRatio( 1 );
+			renderer.setSize( 800, 600 );
+			document.body.appendChild( renderer.domElement );
+
+			const scene = new THREE.Scene();
+			const camera = new THREE.OrthographicCamera( - 68, 68, 51, - 51, 0.1, 100 );
+			camera.position.z = 20;
+			const geometry = new THREE.SphereGeometry( 0.45, 8, 4 );
+
+			const materials = [];
+			const start = performance.now();
+			
+
+			for ( let i = 0; i < 10000; i ++ ) {
+
+				// Use identical, deterministic values in all examples.
+				const color = new THREE.Vector3( ( i % 251 ) / 250, ( i % 127 ) / 126, ( i % 61 ) / 60 );
+				const material = new IDMaterial( color );
+				materials.push( material );
+
+			}
+
+			const creation = performance.now() - start;
+
+			for ( let i = 0; i < materials.length; i ++ ) {
+
+				const mesh = new THREE.Mesh( geometry, materials[ i ] );
+				mesh.position.set( i % 100 - 49.5, Math.floor( i / 100 ) - 49.5, 0 );
+				scene.add( mesh );
+
+			}
+
+			const firstRender = render();
+			const firstPrograms = renderer.info.programs.length;
+			const secondRender = render();
+			const metrics = {
+				backend: 'WebGLRenderer',
+				count: materials.length,
+				creation,
+				firstRender,
+				secondRender,
+				firstPrograms,
+				drawCalls: renderer.info.render.calls
+			};
+
+			// The benchmark runner reads these results after each measured render.
+			window.benchmarkResults = metrics;
+			showResults();
+			button.disabled = false;
+
+			button.addEventListener( 'click', () => {
+
+				for ( const material of materials ) {
+
+					const color = material.uniforms.idColor.value;
+					color.set( color.z, color.x, color.y );
+
+				}
+
+				metrics.uniformRender = render();
+				metrics.updatePrograms = renderer.info.programs.length - firstPrograms;
+				showResults();
+
+			} );
+
+			function render() {
+
+				renderer.info.reset();
+				const start = performance.now();
+				renderer.render( scene, camera );
+				return performance.now() - start;
+
+			}
+
+			function showResults() {
+
+				results.textContent = `Backend: ${ metrics.backend }
+Material creation: ${ metrics.creation.toFixed( 1 ) } ms
+First render: ${ metrics.firstRender.toFixed( 1 ) } ms
+Second render: ${ metrics.secondRender.toFixed( 1 ) } ms
+WebGL programs: ${ metrics.firstPrograms }
+Draw calls (including output pass): ${ metrics.drawCalls }`;
+
+				if ( metrics.uniformRender !== undefined ) {
+
+					results.textContent += `
+Uniform update render: ${ metrics.uniformRender.toFixed( 1 ) } ms
+Additional WebGL programs: ${ metrics.updatePrograms }`;
+
+				}
+
+			}
+		</script>
+	</body>
+</html>

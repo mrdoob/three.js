@@ -16,7 +16,7 @@ scene.add( model );
 
 ## Import
 
-USDLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+USDLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { USDLoader } from 'three/addons/loaders/USDLoader.js';

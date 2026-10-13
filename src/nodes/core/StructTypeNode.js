@@ -78,6 +78,12 @@ class StructTypeNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Returns the length of the struct in 4-byte elements (e.g. float or int components).
 	 * The length is calculated by summing the lengths of the struct's members, accounting for memory alignment.

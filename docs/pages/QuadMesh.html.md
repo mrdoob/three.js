@@ -10,15 +10,13 @@ Note: This module can only be used with `WebGPURenderer`.
 
 ## Constructor
 
-### new QuadMesh( material : Material )
+### new QuadMesh( material : NodeMaterial )
 
 Constructs a new quad mesh.
 
 **material**
 
 The material to render the quad mesh with.
-
-Default is `null`.
 
 ## Properties
 

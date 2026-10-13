@@ -68,9 +68,18 @@ class RenderObjects {
 		 * A dictionary that manages render contexts in chain maps
 		 * for each pass ID.
 		 *
+		 * @private
 		 * @type {Object<string,ChainMap>}
 		 */
-		this.chainMaps = {};
+		this._chainMaps = {};
+
+		/**
+		 * Stores all render objects created by this component.
+		 *
+		 * @private
+		 * @type {Set<RenderObject>}
+		 */
+		this._renderObjects = new Set();
 
 	}
 
@@ -110,11 +119,13 @@ class RenderObjects {
 
 		} else {
 
+			let force = false;
+
 			// update references
 
 			renderObject.camera = camera;
 
-			//
+			// clipping and geometry updates
 
 			renderObject.updateClipping( clippingContext );
 
@@ -122,9 +133,19 @@ class RenderObjects {
 
 				renderObject.setGeometry( object.geometry );
 
+				// structural change, force into rebuild
+
+				if ( renderObject.initialGeometryCacheKey !== renderObject.getGeometryCacheKey() ) {
+
+					force = true;
+
+				}
+
 			}
 
-			if ( renderObject.version !== material.version || renderObject.needsUpdate ) {
+			// check if a new render object (rebuild) is required
+
+			if ( renderObject.version !== material.version || renderObject.needsUpdate || force ) {
 
 				if ( renderObject.initialCacheKey !== renderObject.getCacheKey() ) {
 
@@ -163,7 +184,7 @@ class RenderObjects {
 	 */
 	getChainMap( passId = 'default' ) {
 
-		return this.chainMaps[ passId ] || ( this.chainMaps[ passId ] = new ChainMap() );
+		return this._chainMaps[ passId ] || ( this._chainMaps[ passId ] = new ChainMap() );
 
 	}
 
@@ -172,7 +193,15 @@ class RenderObjects {
 	 */
 	dispose() {
 
-		this.chainMaps = {};
+		for ( const renderObject of this._renderObjects ) {
+
+			renderObject.dispose();
+
+		}
+
+		this._renderObjects.clear();
+
+		this._chainMaps = {};
 
 	}
 
@@ -200,13 +229,18 @@ class RenderObjects {
 
 		renderObject.onDispose = () => {
 
+			this.geometries.deleteVertexState( renderObject );
 			this.pipelines.delete( renderObject );
 			this.bindings.deleteForRender( renderObject );
 			this.nodes.delete( renderObject );
 
 			chainMap.delete( renderObject.getChainArray() );
 
+			this._renderObjects.delete( renderObject );
+
 		};
+
+		this._renderObjects.add( renderObject );
 
 		return renderObject;
 

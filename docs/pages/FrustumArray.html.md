@@ -36,11 +36,11 @@ The point to test.
 
 **Returns:** Whether the point is visible in any camera.
 
-### .copy( frustumArray : FrustumArray ) : FrustumArray
+### .copy( source : FrustumArray ) : FrustumArray
 
 Copies the values of the given frustum array to this instance.
 
-**frustumArray**
+**source**
 
 The frustum array to copy.
 

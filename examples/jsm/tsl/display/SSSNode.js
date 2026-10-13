@@ -1,5 +1,5 @@
-import { RedFormat, RenderTarget, Vector2, RendererUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType, UnsignedByteType } from 'three/webgpu';
-import { reference, viewZToPerspectiveDepth, logarithmicDepthToViewZ, getScreenPosition, getViewPosition, float, Break, Loop, int, max, abs, If, interleavedGradientNoise, screenCoordinate, Fn, passTexture, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, lightPosition, lightTargetPosition, fract, rand, mix, context } from 'three/tsl';
+import { RedFormat, RenderTarget, Vector2, RendererUtils, QuadMesh, Node, NodeMaterial, NodeUpdateType, UnsignedByteType } from 'three/webgpu';
+import { reference, viewZToPerspectiveDepth, logarithmicDepthToViewZ, getScreenPosition, getViewPosition, float, Break, Loop, int, max, abs, If, interleavedGradientNoise, screenCoordinate, Fn, passTexture, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, lightPosition, lightTargetPosition, fract, rand, mix, context, isBackgroundDepth } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -40,10 +40,10 @@ let _rendererState;
  * - {@link https://panoskarabelas.com/posts/screen_space_shadows/}.
  * - {@link https://www.bendstudio.com/blog/inside-bend-screen-space-shadows/}.
  *
- * @augments TempNode
+ * @augments Node
  * @three_import import { sss } from 'three/addons/tsl/display/SSSNode.js';
  */
-class SSSNode extends TempNode {
+class SSSNode extends Node {
 
 	static get type() {
 
@@ -376,7 +376,7 @@ class SSSNode extends TempNode {
 		const sss = Fn( () => {
 
 			const depth = sampleDepth( uvNode ).toVar();
-			depth.greaterThanEqual( 1.0 ).discard();
+			isBackgroundDepth( depth ).discard();
 
 			// compute ray position and direction (in view-space)
 
@@ -467,6 +467,8 @@ class SSSNode extends TempNode {
 	 * when the effect is no longer required.
 	 */
 	dispose() {
+
+		super.dispose();
 
 		this._sssRenderTarget.dispose();
 

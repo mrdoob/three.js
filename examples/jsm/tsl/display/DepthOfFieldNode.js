@@ -1,4 +1,4 @@
-import { TempNode, NodeMaterial, NodeUpdateType, RenderTarget, Vector2, HalfFloatType, RedFormat, QuadMesh, RendererUtils } from 'three/webgpu';
+import { Node, NodeMaterial, NodeUpdateType, RenderTarget, Vector2, HalfFloatType, RedFormat, QuadMesh, RendererUtils } from 'three/webgpu';
 import { convertToTexture, nodeObject, Fn, uniform, smoothstep, step, texture, max, uniformArray, outputStruct, property, vec4, vec3, uv, Loop, min, mix, float, context } from 'three/tsl';
 import { gaussianBlur } from './GaussianBlurNode.js';
 
@@ -12,10 +12,10 @@ let _rendererState;
  * - {@link https://pixelmischiefblog.wordpress.com/2016/11/25/bokeh-depth-of-field/}
  * - {@link https://www.adriancourreges.com/blog/2016/09/09/doom-2016-graphics-study/}
  *
- * @augments TempNode
+ * @augments Node
  * @three_import import { dof } from 'three/addons/tsl/display/DepthOfFieldNode.js';
  */
-class DepthOfFieldNode extends TempNode {
+class DepthOfFieldNode extends Node {
 
 	static get type() {
 
@@ -189,6 +189,14 @@ class DepthOfFieldNode extends TempNode {
 		 * @type {TextureNode}
 		 */
 		this._CoCTextureNode = texture( this._CoCRT.texture );
+
+		/**
+		 * The Gaussian blur node used to blur the near field's circle of confusion.
+		 *
+		 * @private
+		 * @type {GaussianBlurNode}
+		 */
+		this._CoCBlurNode = gaussianBlur( this._CoCTextureNode, 1, 2 );
 
 		/**
 		 * The result of the blur64 pass as a texture node.
@@ -381,7 +389,7 @@ class DepthOfFieldNode extends TempNode {
 
 		// blurred CoC for near field
 
-		this._CoCBlurredMaterial.colorNode = gaussianBlur( this._CoCTextureNode, 1, 2 );
+		this._CoCBlurredMaterial.colorNode = this._CoCBlurNode;
 		this._CoCBlurredMaterial.needsUpdate = true;
 
 		// bokeh 64 blur pass
@@ -526,6 +534,8 @@ class DepthOfFieldNode extends TempNode {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this._CoCRT.dispose();
 		this._CoCBlurredRT.dispose();
 		this._blur64RT.dispose();
@@ -538,6 +548,8 @@ class DepthOfFieldNode extends TempNode {
 		this._blur64Material.dispose();
 		this._blur16Material.dispose();
 		this._compositeMaterial.dispose();
+
+		this._CoCBlurNode.dispose();
 
 	}
 

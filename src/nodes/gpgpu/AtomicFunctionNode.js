@@ -1,6 +1,6 @@
 import Node from '../core/Node.js';
-import { expression } from '../code/ExpressionNode.js';
 import { nodeProxy } from '../tsl/TSLCore.js';
+import { error } from '../../utils.js';
 
 /**
  * `AtomicFunctionNode` represents any function that can operate on atomic variable types
@@ -63,6 +63,12 @@ class AtomicFunctionNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Overwrites the default implementation to return the type of
 	 * the pointer node.
@@ -90,10 +96,16 @@ class AtomicFunctionNode extends Node {
 
 	generate( builder ) {
 
+		const method = this.method;
+
+		if ( builder.shaderStage === 'vertex' ) {
+
+			error( `TSL: "${this.method}" is not supported in the vertex stage.` );
+
+		}
+
 		const properties = builder.getNodeProperties( this );
 		const parents = properties.parents;
-
-		const method = this.method;
 
 		const type = this.getNodeType( builder );
 		const inputType = this.getInputType( builder );
@@ -121,29 +133,73 @@ class AtomicFunctionNode extends Node {
 
 		} else {
 
-			if ( properties.constNode === undefined ) {
+			// The result is stored in a constant, declared in the block where the operation is generated.
+			const nodeVar = builder.getVarFromNode( this, null, type, undefined, true, true );
+			const propertyName = builder.getPropertyName( nodeVar );
 
-				properties.constNode = expression( methodSnippet, type ).toConst();
+			builder.addLineFlowCode( `${ builder.generateLetStatement( type, propertyName ) } = ${ methodSnippet }`, this );
 
-			}
-
-			return properties.constNode.build( builder );
+			return propertyName;
 
 		}
 
 	}
 
-}
+	static get ATOMIC_LOAD() {
 
-AtomicFunctionNode.ATOMIC_LOAD = 'atomicLoad';
-AtomicFunctionNode.ATOMIC_STORE = 'atomicStore';
-AtomicFunctionNode.ATOMIC_ADD = 'atomicAdd';
-AtomicFunctionNode.ATOMIC_SUB = 'atomicSub';
-AtomicFunctionNode.ATOMIC_MAX = 'atomicMax';
-AtomicFunctionNode.ATOMIC_MIN = 'atomicMin';
-AtomicFunctionNode.ATOMIC_AND = 'atomicAnd';
-AtomicFunctionNode.ATOMIC_OR = 'atomicOr';
-AtomicFunctionNode.ATOMIC_XOR = 'atomicXor';
+		return 'atomicLoad';
+
+	}
+
+	static get ATOMIC_STORE() {
+
+		return 'atomicStore';
+
+	}
+
+	static get ATOMIC_ADD() {
+
+		return 'atomicAdd';
+
+	}
+
+	static get ATOMIC_SUB() {
+
+		return 'atomicSub';
+
+	}
+
+	static get ATOMIC_MAX() {
+
+		return 'atomicMax';
+
+	}
+
+	static get ATOMIC_MIN() {
+
+		return 'atomicMin';
+
+	}
+
+	static get ATOMIC_AND() {
+
+		return 'atomicAnd';
+
+	}
+
+	static get ATOMIC_OR() {
+
+		return 'atomicOr';
+
+	}
+
+	static get ATOMIC_XOR() {
+
+		return 'atomicXor';
+
+	}
+
+}
 
 export default AtomicFunctionNode;
 
@@ -157,7 +213,7 @@ export default AtomicFunctionNode;
  * @param {Node} valueNode - The value that mutates the atomic variable.
  * @returns {AtomicFunctionNode}
  */
-const atomicNode = nodeProxy( AtomicFunctionNode );
+const atomicNode = /*@__PURE__*/ nodeProxy( AtomicFunctionNode );
 
 /**
  * TSL function for appending an atomic function call into the programmatic flow of a compute shader.

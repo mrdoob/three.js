@@ -280,14 +280,14 @@ function radToDeg( radians ) {
 }
 
 /**
- * Returns `true` if the given number is a power of two.
+ * Returns `true` if the given integer is a power of two.
  *
  * @param {number} value - The value to check.
- * @return {boolean} Whether the given number is a power of two or not.
+ * @return {boolean} Whether the given integer is a power of two or not.
  */
 function isPowerOfTwo( value ) {
 
-	return ( value & ( value - 1 ) ) === 0 && value !== 0;
+	return value > 0 && Number.isInteger( value ) && 2 ** Math.round( Math.log2( value ) ) === value;
 
 }
 
@@ -402,6 +402,7 @@ function denormalize( value, array ) {
 			return value / 65535.0;
 
 		case Uint8Array:
+		case Uint8ClampedArray:
 
 			return value / 255.0;
 
@@ -449,6 +450,7 @@ function normalize( value, array ) {
 			return Math.round( value * 65535.0 );
 
 		case Uint8Array:
+		case Uint8ClampedArray:
 
 			return Math.round( value * 255.0 );
 

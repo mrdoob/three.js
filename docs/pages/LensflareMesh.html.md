@@ -19,7 +19,7 @@ light.add( lensflare );
 
 ## Import
 
-LensflareMesh is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+LensflareMesh is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { LensflareMesh } from 'three/addons/objects/LensflareMesh.js';
@@ -68,6 +68,8 @@ The element to add.
 ### .dispose()
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+
+**Overrides:** [Mesh#dispose](Mesh.html#dispose)
 
 ## Source
 

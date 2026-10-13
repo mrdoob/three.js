@@ -6,7 +6,7 @@ A heart curve.
 
 ## Import
 
-HeartCurve is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+HeartCurve is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { HeartCurve } from 'three/addons/curves/CurveExtras.js';

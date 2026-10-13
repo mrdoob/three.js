@@ -14,7 +14,7 @@ composer.addPass( cubeTexturePass );
 
 ## Import
 
-CubeTexturePass is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+CubeTexturePass is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { CubeTexturePass } from 'three/addons/postprocessing/CubeTexturePass.js';

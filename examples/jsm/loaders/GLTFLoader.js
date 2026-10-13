@@ -86,6 +86,7 @@ import { clone } from '../utils/SkeletonUtils.js';
  * - KHR_lights_punctual
  * - KHR_materials_anisotropy
  * - KHR_materials_clearcoat
+ * - KHR_materials_diffuse_roughness
  * - KHR_materials_dispersion
  * - KHR_materials_emissive_strength
  * - KHR_materials_ior
@@ -104,7 +105,8 @@ import { clone } from '../utils/SkeletonUtils.js';
  * - EXT_texture_avif
  * - EXT_texture_webp
  *
- * The following glTF 2.0 extension is supported by an external user plugin:
+ * The following glTF 2.0 extensions are supported by separately registered plugins:
+ * - KHR_gaussian_splatting
  * - [KHR_materials_variants](https://github.com/takahirox/three-gltf-extensions)
  * - [MSFT_texture_dds](https://github.com/takahirox/three-gltf-extensions)
  * - [KHR_animation_pointer](https://github.com/needle-tools/three-animation-pointer)
@@ -145,6 +147,12 @@ class GLTFLoader extends Loader {
 		this.register( function ( parser ) {
 
 			return new GLTFMaterialsClearcoatExtension( parser );
+
+		} );
+
+		this.register( function ( parser ) {
+
+			return new GLTFMaterialsDiffuseRoughnessExtension( parser );
 
 		} );
 
@@ -630,6 +638,7 @@ const EXTENSIONS = {
 	KHR_DRACO_MESH_COMPRESSION: 'KHR_draco_mesh_compression',
 	KHR_LIGHTS_PUNCTUAL: 'KHR_lights_punctual',
 	KHR_MATERIALS_CLEARCOAT: 'KHR_materials_clearcoat',
+	KHR_MATERIALS_DIFFUSE_ROUGHNESS: 'KHR_materials_diffuse_roughness',
 	KHR_MATERIALS_DISPERSION: 'KHR_materials_dispersion',
 	KHR_MATERIALS_IOR: 'KHR_materials_ior',
 	KHR_MATERIALS_SHEEN: 'KHR_materials_sheen',
@@ -945,6 +954,52 @@ class GLTFMaterialsClearcoatExtension {
 				materialParams.clearcoatNormalScale = new Vector2( scale, scale );
 
 			}
+
+		}
+
+		return Promise.all( pending );
+
+	}
+
+}
+
+/**
+ * Diffuse Roughness Materials Extension
+ *
+ * Specification: https://github.com/MiiBond/glTF/tree/mbond/EXT_materials_diffuse_roughness/extensions/2.0/Khronos/KHR_materials_diffuse_roughness
+ *
+ * @private
+ */
+class GLTFMaterialsDiffuseRoughnessExtension {
+
+	constructor( parser ) {
+
+		this.parser = parser;
+		this.name = EXTENSIONS.KHR_MATERIALS_DIFFUSE_ROUGHNESS;
+
+	}
+
+	getMaterialType( materialIndex ) {
+
+		const extension = getMaterialExtension( this.parser, materialIndex, this.name );
+
+		return extension !== null ? MeshPhysicalMaterial : null;
+
+	}
+
+	extendMaterialParams( materialIndex, materialParams ) {
+
+		const extension = getMaterialExtension( this.parser, materialIndex, this.name );
+
+		if ( extension === null ) return Promise.resolve();
+
+		const pending = [];
+
+		materialParams.diffuseRoughness = extension.diffuseRoughnessFactor !== undefined ? extension.diffuseRoughnessFactor : 0;
+
+		if ( extension.diffuseRoughnessTexture !== undefined ) {
+
+			pending.push( this.parser.assignTexture( materialParams, 'diffuseRoughnessMap', extension.diffuseRoughnessTexture ) );
 
 		}
 
@@ -3884,7 +3939,7 @@ class GLTFParser {
 
 		pending.push( parser.loadGeometries( primitives ) );
 
-		return Promise.all( pending ).then( function ( results ) {
+		return Promise.all( pending ).then( async function ( results ) {
 
 			const materials = results.slice( 0, results.length - 1 );
 			const geometries = results[ results.length - 1 ];

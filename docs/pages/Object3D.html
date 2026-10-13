@@ -445,6 +445,19 @@ transform. This method does not support scene graphs having non-uniformly-scaled
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees the GPU-related resources allocated by this instance. Call this
+method whenever this instance is no longer used in your app.</p>
+<p>Geometries, materials and textures are potentially shared with other
+3D objects and must be disposed of separately.</p>
+						</div>
+						<h5>Fires:</h5>
+						<ul>
+							<li><a href="Object3D.html#event:dispose">Object3D#event:dispose</a></li>
+						</ul>
+					</div>
 					<h3 class="name name-method" id="getObjectById" translate="no">.<a href="#getObjectById">getObjectById</a><span class="signature">( id : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Object3D.html">Object3D</a> | undefined</span> </h3>
 					<div class="method">
 						<div class="description">
@@ -639,6 +652,29 @@ itself, and returns all 3D objects with a matching property value.</p>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The 3D object's scale in world space.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="intersectsFrustum" translate="no">.<a href="#intersectsFrustum">intersectsFrustum</a><span class="signature">( frustum : <span class="param-type"><a href="Frustum.html">Frustum</a> | <a href="FrustumArray.html">FrustumArray</a></span> )</span><span class="type-signature"> : boolean | undefined</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Abstract method to test whether this 3D object intersects the given frustum.
+Renderable 3D objects such as <a href="Mesh.html">Mesh</a>, <a href="Line.html">Line</a> or <a href="Points.html">Points</a>
+implement this method in order to use frustum culling.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">frustum</strong>
+									</td>
+									<td class="description last">
+										<p>The frustum to test.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether this 3D object intersects the given frustum or not.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="localToWorld" translate="no">.<a href="#localToWorld">localToWorld</a><span class="signature">( vector : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
@@ -1515,6 +1551,18 @@ when <a href="Object3D.html#matrixWorldNeedsUpdate">Object3D#matrixWorldNeedsUpd
 					<div class="method">
 						<div class="description">
 							<p>Fires when a child object has been removed.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+					<h3 class="name name-method" id="event:dispose" translate="no">.<a href="#event:dispose">dispose</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires when the 3D object has been disposed of.</p>
 						</div>
 						<h5>Type:</h5>
 						<ul>

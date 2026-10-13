@@ -17,7 +17,7 @@
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">OculusHandPointerModel</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<p><span translate="no">OculusHandPointerModel</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { OculusHandPointerModel } from 'three/addons/webxr/OculusHandPointerModel.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -153,6 +153,9 @@ Otherwise it only checks intersection with the object.</p>
 							<p>Frees the GPU-related resources allocated by this instance. Call this
 method whenever this instance is no longer used in your app.</p>
 						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Object3D.html#dispose">Object3D#dispose</a></dt>
+						</dl>
 					</div>
 					<h3 class="name name-method" id="intersectObject" translate="no">.<a href="#intersectObject">intersectObject</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, recursive : <span class="param-type">boolean</span> )</span><span class="type-signature"> : Array.&lt;<a href="Raycaster.html#~Intersection">Raycaster~Intersection</a>></span> </h3>
 					<div class="method">

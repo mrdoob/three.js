@@ -22,7 +22,7 @@ function animate() {
 
 ## Import
 
-EffectComposer is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+EffectComposer is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';

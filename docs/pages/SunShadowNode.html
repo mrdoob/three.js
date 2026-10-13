@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>SunShadowNode - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="ShadowBaseNode.html">ShadowBaseNode</a> → <a href="ShadowNode.html">ShadowNode</a> → </p>
+	<h1 translate="no">SunShadowNode</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Represents the cascaded shadow map of a <a href="SunLight.html">SunLight</a>.</p>
+<p>The two cascade cameras are fitted by <a href="SunLightShadow.html">SunLightShadow</a> and rendered
+into the viewports of a single shadow map atlas. Each fragment walks the
+cascades back to front, blending across the fade bands between them.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">SunShadowNode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { sunShadow } from 'three/addons/lights/SunShadowNode.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="SunShadowNode" translate="no">new <a href="#SunShadowNode">SunShadowNode</a><span class="signature">( light : <span class="param-type"><a href="SunLight.html">SunLight</a></span>, shadow : <span class="param-type"><a href="SunLightShadow.html">SunLightShadow</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new sun shadow node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">light</strong>
+									</td>
+									<td class="description last">
+										<p>The shadow casting sun light.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">shadow</strong>
+									</td>
+									<td class="description last">
+										<p>An optional sun light shadow.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="renderShadow" translate="no">.<a href="#renderShadow">renderShadow</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Renders the two cascades into the viewports of the shadow map atlas.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">frame</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node frame.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="ShadowNode.html#renderShadow">ShadowNode#renderShadow</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupRenderTarget" translate="no">.<a href="#setupRenderTarget">setupRenderTarget</a><span class="signature">( shadow : <span class="param-type"><a href="SunLightShadow.html">SunLightShadow</a></span>, builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwrites the default implementation to size the render target as the cascade atlas.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">shadow</strong>
+									</td>
+									<td class="description last">
+										<p>The light shadow object.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">builder</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> An object containing the shadow map and depth texture.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupShadow" translate="no">.<a href="#setupShadow">setupShadow</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets up the atlas render target and shadow output node.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">builder</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="ShadowNode.html#setupShadow">ShadowNode#setupShadow</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The shadow output node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="vsmPass" translate="no">.<a href="#vsmPass">vsmPass</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwritten as a no-op since VSM is not supported for cascaded shadow maps.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderer</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current renderer.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="ShadowNode.html#vsmPass">ShadowNode#vsmPass</a></dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/lights/SunShadowNode.js" translate="no" target="_blank" rel="noopener">examples/jsm/lights/SunShadowNode.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

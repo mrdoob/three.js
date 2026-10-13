@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>SPZLoader - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="Loader.html">Loader</a> → </p>
+	<h1 translate="no">SPZLoader</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A loader for compressed Gaussian splat <code>.spz</code> files.</p>
+<p>This loader decodes the format into <code>BufferGeometry</code> for use with
+<code>GaussianSplat</code>. Higher-order spherical harmonics are exposed as optional
+<code>sphericalHarmonics1</code> through <code>sphericalHarmonics3</code> packed uint32 geometry
+attributes (<code>SH_BAND_WORDS[ degree ]</code> words per splat). Coefficients use the
+clamped-byte encoding <code>( value - 128 ) / 128</code>, four bytes per word.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const loader = new SPZLoader();
+const data = await loader.loadAsync( './models/gsplat/example.spz' );
+scene.add( new GaussianSplat( data ) );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">SPZLoader</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { SPZLoader } from 'three/addons/loaders/SPZLoader.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="SPZLoader" translate="no">new <a href="#SPZLoader">SPZLoader</a><span class="signature">( manager : <span class="param-type"><a href="LoadingManager.html">LoadingManager</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new Gaussian splat SPZ loader.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">manager</strong>
+									</td>
+									<td class="description last">
+										<p>The loading manager.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="load" translate="no">.<a href="#load">load</a><span class="signature">( url : <span class="param-type">string</span>, onLoad : <span class="param-type">function</span>, onProgress : <span class="param-type"><a href="global.html#onProgressCallback">onProgressCallback</a></span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Starts loading from the given URL and passes the loaded splat data to
+the <code>onLoad()</code> callback.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">url</strong>
+									</td>
+									<td class="description last">
+										<p>The path/URL of the file to be loaded. This can also be a data URI.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when the loading process has been finished.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">onProgress</strong>
+									</td>
+									<td class="description last">
+										<p>Executed while the loading is in progress.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Loader.html#load">Loader#load</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="parse" translate="no">.<a href="#parse">parse</a><span class="signature">( buffer : <span class="param-type">ArrayBuffer</span>, onLoad : <span class="param-type">function</span>, onError : <span class="param-type"><a href="global.html#onErrorCallback">onErrorCallback</a></span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a> | Promise.&lt;<a href="BufferGeometry.html">BufferGeometry</a>> | undefined</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Decompresses and parses the given <code>.spz</code> data.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">buffer</strong>
+									</td>
+									<td class="description last">
+										<p>The raw SPZ file as an array buffer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">onLoad</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when the parsing process has been finished.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">onError</strong>
+									</td>
+									<td class="description last">
+										<p>Executed when errors occur.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Loader.html#parse">Loader#parse</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The parsed splat geometry, or a promise for SPZ v4 data.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="parseRawSPZ" translate="no">.<a href="#parseRawSPZ">parseRawSPZ</a><span class="signature">( bytes : <span class="param-type">Uint8Array</span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Parses raw SPZ data after gzip decompression.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">bytes</strong>
+									</td>
+									<td class="description last">
+										<p>The decompressed SPZ data.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The parsed splat geometry.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="parseRawSPZV4" translate="no">.<a href="#parseRawSPZV4">parseRawSPZV4</a><span class="signature">( bytes : <span class="param-type">Uint8Array</span>, zstd : <span class="param-type">ZSTDDecoder</span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Parses raw SPZ v4 data.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">bytes</strong>
+									</td>
+									<td class="description last">
+										<p>The raw SPZ v4 data.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">zstd</strong>
+									</td>
+									<td class="description last">
+										<p>The initialized ZSTD decoder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The parsed splat geometry.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/SPZLoader.js" translate="no" target="_blank" rel="noopener">examples/jsm/loaders/SPZLoader.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -6,7 +6,7 @@ The base 3D object that is supported by [CSS3DRenderer](CSS3DRenderer.html).
 
 ## Import
 
-CSS3DObject is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+CSS3DObject is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { CSS3DObject } from 'three/addons/renderers/CSS3DRenderer.js';

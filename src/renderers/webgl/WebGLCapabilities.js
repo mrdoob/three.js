@@ -41,8 +41,8 @@ function WebGLCapabilities( gl, extensions, parameters, utils ) {
 
 		const halfFloatSupportedByExt = ( textureType === HalfFloatType ) && ( extensions.has( 'EXT_color_buffer_half_float' ) || extensions.has( 'EXT_color_buffer_float' ) );
 
-		if ( textureType !== UnsignedByteType && utils.convert( textureType ) !== gl.getParameter( gl.IMPLEMENTATION_COLOR_READ_TYPE ) && // Edge and Chrome Mac < 52 (#9513)
-			textureType !== FloatType && ! halfFloatSupportedByExt ) {
+		if ( textureType !== UnsignedByteType && textureType !== FloatType && ! halfFloatSupportedByExt &&
+			utils.convert( textureType ) !== gl.getParameter( gl.IMPLEMENTATION_COLOR_READ_TYPE ) ) { // Edge and Chrome Mac < 52 (#9513)
 
 			return false;
 

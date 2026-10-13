@@ -78,6 +78,18 @@ The layer index that should be updated.
 
 Resets the layer updates registry.
 
+### .copy( source : CompressedArrayTexture ) : CompressedArrayTexture
+
+Copies the values of the given texture to this instance.
+
+**source**
+
+The texture to copy.
+
+**Overrides:** [CompressedTexture#copy](CompressedTexture.html#copy)
+
+**Returns:** A reference to this instance.
+
 ## Source
 
 [src/textures/CompressedArrayTexture.js](https://github.com/mrdoob/three.js/blob/master/src/textures/CompressedArrayTexture.js)

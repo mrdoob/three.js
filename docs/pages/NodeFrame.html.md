@@ -16,6 +16,12 @@ A reference to the current camera.
 
 Default is `null`.
 
+### .compute : ComputeNode
+
+A reference to the current compute node.
+
+Default is `null`.
+
 ### .deltaTime : number
 
 The delta time in seconds.

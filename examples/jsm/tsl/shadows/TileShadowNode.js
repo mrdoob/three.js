@@ -5,16 +5,22 @@ import {
 	Plane,
 	Line3,
 	DepthTexture,
+	Compatibility,
 	LessCompare,
+	GreaterEqualCompare,
+	LinearFilter,
+	NearestFilter,
+	PCFShadowMap,
 	Vector2,
 	RedFormat,
 	ArrayCamera,
 	VSMShadowMap,
 	RendererUtils,
-	Quaternion
+	Quaternion,
+	UnsignedIntType
 } from 'three/webgpu';
 
-import { min, Fn, shadow, NodeUpdateType, getShadowMaterial, getShadowRenderObjectFunction } from 'three/tsl';
+import { Fn, int, lightShadowMatrix, mix, normalWorld, reference, renderGroup, shadow, shadowPositionWorld, texture, vec2, vec3, vec4, NodeUpdateType } from 'three/tsl';
 
 const { resetRendererAndSceneState, restoreRendererAndSceneState } = RendererUtils;
 let _rendererState;
@@ -57,6 +63,7 @@ class TileShadowNode extends ShadowBaseNode {
 	 * @param {number} [options.tilesX=2] - The number of tiles along the X-axis.
 	 * @param {number} [options.tilesY=2] - The number of tiles along the Y-axis.
 	 * @param {Object} [options.resolution] - The resolution of the shadow map.
+	 * @param {number} [options.depthType=UnsignedIntType] - The type of the tile depth texture. `UnsignedShortType` halves the memory when the depth range allows it.
 	 * @param {boolean} [options.debug=false] - Whether to enable debug mode.
 	 */
 	constructor( light, options = {} ) {
@@ -68,6 +75,7 @@ class TileShadowNode extends ShadowBaseNode {
 			tilesX: options.tilesX || 2,
 			tilesY: options.tilesY || 2,
 			resolution: options.resolution || light.shadow.mapSize,
+			depthType: options.depthType || UnsignedIntType,
 			debug: options.debug !== undefined ? options.debug : false
 		};
 
@@ -159,12 +167,14 @@ class TileShadowNode extends ShadowBaseNode {
 		// Clear existing lights/nodes if re-initializing
 		this.disposeLightsAndNodes();
 
-		const depthTexture = new DepthTexture( shadowWidth, shadowHeight, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, tileCount );
-		depthTexture.compareFunction = LessCompare;
+		const depthTexture = new DepthTexture( shadowWidth, shadowHeight, this.config.depthType, undefined, undefined, undefined, undefined, undefined, undefined, undefined, tileCount );
+		depthTexture.compareFunction = builder.renderer.reversedDepthBuffer ? GreaterEqualCompare : LessCompare;
 		depthTexture.name = 'ShadowDepthArrayTexture';
-		const shadowMap = builder.createRenderTarget( shadowWidth, shadowHeight, { format: RedFormat, depth: tileCount, useArrayDepthTexture: true } );
+		// The color attachment is only sampled for transmitted shadows.
+		const count = builder.renderer.shadowMap.transmitted === true ? 1 : 0;
+		const shadowMap = builder.createRenderTarget( shadowWidth, shadowHeight, { count, format: RedFormat, depth: tileCount, useArrayDepthTexture: true } );
 		shadowMap.depthTexture = depthTexture;
-		shadowMap.texture.name = 'ShadowTexture';
+		if ( count > 0 ) shadowMap.texture.name = 'ShadowTexture';
 		this.shadowMap = shadowMap;
 		const cameras = [];
 
@@ -221,6 +231,10 @@ class TileShadowNode extends ShadowBaseNode {
 		const cameraArray = new ArrayCamera( cameras );
 		this.cameraArray = cameraArray;
 
+		// setup() reads depth through this camera.
+		light.shadow.camera.coordinateSystem = builder.renderer.coordinateSystem;
+		light.shadow.camera._reversedDepth = builder.renderer.reversedDepthBuffer;
+
 	}
 
 	/**
@@ -259,6 +273,11 @@ class TileShadowNode extends ShadowBaseNode {
 
 		}
 
+		// The original light does not render a shadow map, but setup() uses its shadow matrix.
+
+		shadowCam.updateProjectionMatrix();
+		light.shadow.updateMatrices( light );
+
 	}
 
 	/**
@@ -270,16 +289,14 @@ class TileShadowNode extends ShadowBaseNode {
 		const { shadowMap, light } = this;
 		const { renderer, scene, camera } = frame;
 		const shadowType = renderer.shadowMap.type;
-		const depthVersion = shadowMap.depthTexture.version;
-		this._depthVersionCached = depthVersion;
 		const currentRenderObjectFunction = renderer.getRenderObjectFunction();
-		const currentMRT = renderer.getMRT();
-		const useVelocity = currentMRT ? currentMRT.has( 'velocity' ) : false;
 
 		_rendererState = resetRendererAndSceneState( renderer, scene, _rendererState );
-		scene.overrideMaterial = getShadowMaterial( light );
+		scene.overrideMaterial = this.getShadowMaterial();
 		renderer.setRenderTarget( this.shadowMap );
 
+		const cameraArrayLayers = this.cameraArray.layers.mask;
+		this.cameraArray.layers.mask = 0;
 
 		for ( let index = 0; index < this.lights.length; index ++ ) {
 
@@ -297,7 +314,10 @@ class TileShadowNode extends ShadowBaseNode {
 
 			shadow.updateMatrices( light );
 
-			renderer.setRenderObjectFunction( getShadowRenderObjectFunction( renderer, shadow, shadowType, useVelocity ) );
+			// The tiles render through the array camera, so it has to see every tile's layers.
+			this.cameraArray.layers.mask |= shadow.camera.layers.mask;
+
+			renderer.setRenderObjectFunction( this.getShadowRenderObjectFunction( renderer, shadow ) );
 			this.shadowMap.setSize( shadow.mapSize.width, shadow.mapSize.height, shadowMap.depth );
 
 		}
@@ -313,6 +333,8 @@ class TileShadowNode extends ShadowBaseNode {
 		}
 
 		restoreRendererAndSceneState( renderer, scene, _rendererState );
+
+		this.cameraArray.layers.mask = cameraArrayLayers;
 
 		for ( let index = 0; index < this.lights.length; index ++ ) {
 
@@ -355,11 +377,7 @@ class TileShadowNode extends ShadowBaseNode {
 			this.update();
 			this.updateShadow( frame );
 
-			if ( this.shadowMap.depthTexture.version === this._depthVersionCached ) {
-
-				shadow.needsUpdate = false;
-
-			}
+			shadow.needsUpdate = false;
 
 		}
 
@@ -403,10 +421,77 @@ class TileShadowNode extends ShadowBaseNode {
 
 		}
 
+		// Hardware-filtered depth comparisons for PCF, as in ShadowNode. The shadow type can change between
+		// builds, so this is checked every time; disposing the shadow map recreates it with the new filter.
+
+		const { renderer } = builder;
+		const filter = renderer.shadowMap.type === PCFShadowMap && renderer.hasCompatibility( Compatibility.TEXTURE_COMPARE ) ? LinearFilter : NearestFilter;
+		const depthTexture = this.shadowMap.depthTexture;
+
+		if ( depthTexture.magFilter !== filter ) {
+
+			depthTexture.minFilter = filter;
+			depthTexture.magFilter = filter;
+
+			this.shadowMap.dispose();
+
+		}
+
 		return Fn( ( builder ) => {
 
 			this.setupShadowPosition( builder );
-			return min( ...this._shadowNodes ).toVar( 'shadowValue' );
+
+			// The fragment's position in the full shadow camera gives its tile and the coordinate within it.
+
+			const { tilesX, tilesY } = this.config;
+			const tileShadowNode = this._shadowNodes[ 0 ];
+			const tileShadow = this.lights[ 0 ].shadow;
+			const shadow = this.originalLight.shadow;
+			const normalBias = reference( 'normalBias', 'float', shadow ).setGroup( renderGroup );
+
+			const shadowPosition = lightShadowMatrix( this.originalLight ).mul( vec4( shadowPositionWorld.add( normalWorld.mul( normalBias ) ), 1 ) );
+			const shadowCoord = tileShadowNode.setupShadowCoord( builder, shadowPosition );
+
+			const grid = shadowCoord.xy.mul( vec2( tilesX, tilesY ) ); // tiles start from the top row
+			const tile = grid.floor().clamp( vec2( 0 ), vec2( tilesX - 1, tilesY - 1 ) );
+			const depthLayer = int( tile.y.mul( tilesX ).add( tile.x ) );
+
+			const tileCoord = vec3( grid.sub( tile ), shadowCoord.z );
+
+			const filterFn = tileShadow.filterNode || tileShadowNode.getShadowFilterFn( builder.renderer.shadowMap.type );
+			const shadowValue = tileShadowNode.setupShadowFilter( builder, {
+				filterFn,
+				depthTexture,
+				shadowCoord: tileCoord,
+				shadow: tileShadow,
+				depthLayer
+			} );
+
+			const shadowIntensity = reference( 'intensity', 'float', shadow ).setGroup( renderGroup );
+
+			let shadowOutput;
+
+			if ( builder.renderer.shadowMap.transmitted === true ) {
+
+				const shadowColor = texture( this.shadowMap.texture, tileCoord ).depth( depthLayer );
+
+				shadowOutput = mix( 1, shadowValue.rgb.mix( shadowColor, 1 ), shadowIntensity.mul( shadowColor.a ) ).toVar( 'shadowValue' );
+
+			} else {
+
+				shadowOutput = mix( 1, shadowValue, shadowIntensity ).toVar( 'shadowValue' );
+
+			}
+
+			// As in ShadowNode.setup(), which the tiles no longer go through.
+
+			if ( builder.material.receivedShadowNode ) {
+
+				shadowOutput = builder.material.receivedShadowNode( shadowOutput );
+
+			}
+
+			return shadowOutput;
 
 		} )();
 
@@ -447,6 +532,7 @@ class TileShadowNode extends ShadowBaseNode {
 
 		// Dispose lights, nodes, and shadow map
 		this.disposeLightsAndNodes();
+		this.disposeShadowMaterial();
 		super.dispose();
 
 	}

@@ -306,7 +306,8 @@ each other to build complex performances from smaller re-usable assets.</p>
 				<div class="member">
 					<h3 class="name" id="DATA" translate="no">.<a href="#DATA">DATA</a> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
-						<p>Precomputed DFG LUT for Image-Based Lighting
+						<p>Precomputed DFG LUT for physically based specular lighting, used by both
+image-based lighting and direct-light multi-scattering energy compensation
 Resolution: 16x16
 Samples: 4096 per texel
 Format: RG16F (2 half floats per texel: scale, bias)</p>
@@ -1077,6 +1078,21 @@ alpha transparency.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="OnAfterObjectUpdate" translate="no">.<a href="#OnAfterObjectUpdate">OnAfterObjectUpdate</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Creates an event that triggers a function every time an object (Mesh|Sprite) has been rendered.</p>
+<p>The event will be bound to the declared TSL function <code>Fn()</code>; it must be declared within a <code>Fn()</code> or the JS function call must be inherited from one.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="OnAfterRenderPipeline" translate="no">.<a href="#OnAfterRenderPipeline">OnAfterRenderPipeline</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Creates an event that triggers a function after the render pipeline is rendered.</p>
+<p>The node must be part of a node chain that is used as the output of a <code>RenderPipeline</code>,
+otherwise the event is ignored.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="OnBeforeFrameUpdate" translate="no">.<a href="#OnBeforeFrameUpdate">OnBeforeFrameUpdate</a> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>Creates an event that triggers a function before every frame.</p>
@@ -1095,6 +1111,14 @@ alpha transparency.</p>
 					<div class="description">
 						<p>Creates an event that triggers a function before an object (Mesh|Sprite) is updated.</p>
 <p>The event will be bound to the declared TSL function <code>Fn()</code>; it must be declared within a <code>Fn()</code> or the JS function call must be inherited from one.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="OnBeforeRenderPipeline" translate="no">.<a href="#OnBeforeRenderPipeline">OnBeforeRenderPipeline</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Creates an event that triggers a function before the render pipeline is rendered.</p>
+<p>The node must be part of a node chain that is used as the output of a <code>RenderPipeline</code>,
+otherwise the event is ignored.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -1172,6 +1196,9 @@ alpha transparency.</p>
 						<p>Filters shadow maps using the Percentage-Closer Filtering (PCF) algorithm with
 better soft shadows especially when using low-resolution shadow maps.</p>
 					</div>
+						<dl class="details">
+							<dt class="important tag-deprecated"><strong>Deprecated:</strong> since r186. Use `PCFShadowMap` instead.</dt>
+						</dl>
 				</div>
 				<div class="member">
 					<h3 class="name" id="R11_EAC_Format" translate="no">.<a href="#R11_EAC_Format">R11_EAC_Format</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
@@ -1439,6 +1466,12 @@ compression in how the alpha compression is done.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="RenderObjectRefreshType" translate="no">.<a href="#RenderObjectRefreshType">RenderObjectRefreshType</a><span class="type-signature"> : <a href="global.html#ConstantsRenderObjectRefreshType">ConstantsRenderObjectRefreshType</a></span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Represents the refresh types of render objects.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="RepeatWrapping" translate="no">.<a href="#RepeatWrapping">RepeatWrapping</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>The texture will simply repeat to infinity.</p>
@@ -1597,6 +1630,13 @@ a few times by the application</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="TRIANGLE_STRIDE" translate="no">.<a href="#TRIANGLE_STRIDE">TRIANGLE_STRIDE</a> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Number of floats per triangle record: three positions (vec4 each, w unused),
+albedo (rgb + side flag) and emissive (rgb + unused).</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="TangentSpaceNormalMap" translate="no">.<a href="#TangentSpaceNormalMap">TangentSpaceNormalMap</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>Normal information is relative to the underlying surface.</p>
@@ -1747,6 +1787,12 @@ When using VSMShadowMap all shadow receivers will also cast shadows.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="batchIndirectIndex" translate="no">.<a href="#batchIndirectIndex">batchIndirectIndex</a><span class="type-signature"> : <a href="VaryingNode.html">VaryingNode</a>.&lt;uint></span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>TSL object representing a varying property for the batch indirect index (instance ID).</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="buildingPalette" translate="no">.<a href="#buildingPalette">buildingPalette</a> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>The NYC masonry palette every tower is dressed from ( hex colours ): limestone-dominant
@@ -1768,12 +1814,6 @@ Used for perspective-correct line rendering and coordinates interpolation.</p>
 This function uses a Poisson disk sampling pattern to detect depth discontinuities
 in the neighborhood of the current pixel. If an edge is detected, it shifts the
 sampling coordinate for the blend node away from the edge to prevent light leaking/haloing.</p>
-					</div>
-				</div>
-				<div class="member">
-					<h3 class="name" id="disposeShadowMaterial" translate="no">.<a href="#disposeShadowMaterial">disposeShadowMaterial</a> <span class="type-signature">(constant) </span></h3>
-					<div class="description">
-						<p>Disposes the shadow material for the given light source.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -1876,12 +1916,6 @@ Computes an interpolation factor (alpha) to clamp the segment's coordinate.</p>
 					</div>
 				</div>
 				<div class="member">
-					<h3 class="name" id="viewportResolution" translate="no">.<a href="#viewportResolution">viewportResolution</a> <span class="type-signature">(constant) </span></h3>
-						<dl class="details">
-							<dt class="important tag-deprecated"><strong>Deprecated:</strong> since r169. Use <a href="TSL.html#screenSize">screenSize</a> instead.</dt>
-						</dl>
-				</div>
-				<div class="member">
 					<h3 class="name" id="worldEnd" translate="no">.<a href="#worldEnd">worldEnd</a><span class="type-signature"> : <a href="VaryingNode.html">VaryingNode</a>.&lt;vec3></span> <span class="type-signature">(constant) </span></h3>
 					<div class="description">
 						<p>Varying node representing the world position of the segment end in view space.
@@ -1952,55 +1986,6 @@ with a binary <code>[0,1]</code> result.</p>
 <p>Uses 5 samples distributed via Vogel disk pattern, rotated per-pixel using Interleaved
 Gradient Noise (IGN) to break up banding artifacts. Combined with hardware PCF (4-tap
 filtering per sample), this effectively provides 20 filtered taps with better distribution.</p>
-						</div>
-						<table class="params">
-							<tbody>
-								<tr>
-									<td class="name">
-										<strong translate="no">inputs</strong>
-									</td>
-									<td class="description last">
-										<p>The input parameter object.</p>
-						<table class="params">
-							<tbody>
-								<tr>
-									<td class="name">
-										<strong translate="no">depthTexture</strong>
-									</td>
-									<td class="description last">
-										<p>A reference to the shadow map's texture data.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">shadowCoord</strong>
-									</td>
-									<td class="description last">
-										<p>The shadow coordinates.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">shadow</strong>
-									</td>
-									<td class="description last">
-										<p>The light shadow.</p>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> The filtering result.</dt>
-						</dl>
-					</div>
-					<h3 class="name name-method" id="PCFSoftShadowFilter" translate="no">.<a href="#PCFSoftShadowFilter">PCFSoftShadowFilter</a><span class="signature">( inputs : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
-					<div class="method">
-						<div class="description">
-							<p>A shadow filtering function performing PCF soft filtering.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -2170,8 +2155,8 @@ sample direction, rotated per-pixel using Interleaved Gradient Noise (IGN).</p>
 					<h3 class="name name-method" id="addArcade" translate="no">.<a href="#addArcade">addArcade</a><span class="signature">()</span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>The base storey: a wall pierced by tall pointed-arch openings, extruded with
-thickness so the openings read as deep recesses.</p>
+							<p>The base storey: a wall pierced by tall pointed-arch openings, built as a flat front
+face and the openings' reveals so they read as deep recesses.</p>
 						</div>
 					</div>
 					<h3 class="name name-method" id="addCornice" translate="no">.<a href="#addCornice">addCornice</a><span class="signature">()</span> </h3>
@@ -2192,6 +2177,15 @@ thickness so the openings read as deep recesses.</p>
 							<p>Horizontal terracotta bands at every floor line. Together with the projecting
 piers they form the facade grid; the gaps between them are the window
 openings, with glass set behind.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="addStorefront" translate="no">.<a href="#addStorefront">addStorefront</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>The street-level retail front: glazed shopfronts on a low bulkhead, under a
+signboard fascia, framed by the building's ground-floor piers and split by slim
+mullions, with a projecting awning over some shops. Reads as a row of NYC
+storefronts. All pieces are pushed into the caller's <code>parts</code> accumulators.</p>
 						</div>
 					</div>
 					<h3 class="name name-method" id="bakeGroups" translate="no">.<a href="#bakeGroups">bakeGroups</a><span class="signature">()</span> </h3>
@@ -2340,6 +2334,39 @@ outward to a block corner.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The generated mesh.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="buildingColorNode" translate="no">.<a href="#buildingColorNode">buildingColorNode</a><span class="signature">( layout : <span class="param-type">Object</span>, seed : <span class="param-type">number | <a href="Node.html">Node</a>.&lt;uint></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>The per-tower flat masonry colour: one palette entry per lot, picked by hashing the
+lot's grid cell from world position. Keyed off <code>positionWorld</code>, so it colours anything
+standing on the city grid identically, the towers and their <a href="CityGenerator.html#buildProxy">CityGenerator#buildProxy</a>
+boxes alike.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">layout</strong>
+									</td>
+									<td class="description last">
+										<p>The city layout.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">seed</strong>
+									</td>
+									<td class="description last">
+										<p>The city seed or a shared seed node.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The tower colour.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="ceilPowerOfTwo" translate="no">.<a href="#ceilPowerOfTwo">ceilPowerOfTwo</a><span class="signature">( value : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
 					<div class="method">
 						<div class="description">
@@ -2396,6 +2423,135 @@ outward to a block corner.</p>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The clamped value.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="collectSceneTriangles" translate="no">.<a href="#collectSceneTriangles">collectSceneTriangles</a><span class="signature">( scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, options : <span class="param-type">Object</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Collects the triangles of all meshes in the scene as flat, world-space records suitable
+for GPU voxelization. Per-triangle albedo and emissive colors are resolved on the CPU
+(material color multiplied with a texture lookup at the triangle's centroid). Large
+triangles are subdivided so every record covers a bounded number of voxels.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">options</strong>
+									</td>
+									<td class="description last">
+										<p>Options.</p>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">bounds</strong>
+									</td>
+									<td class="description last">
+										<p>Triangles outside these bounds are skipped.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">layers</strong>
+									</td>
+									<td class="description last">
+										<p>Objects must pass this layer test.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">exclude</strong>
+									</td>
+									<td class="description last">
+										<p>Objects to skip.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">subVoxelSize</strong>
+									</td>
+									<td class="description last">
+										<p>Size of a sub-voxel in world units.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">maxEdge</strong>
+									</td>
+									<td class="description last">
+										<p>Maximum triangle edge length in sub-voxels before subdivision.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">minOpacity</strong>
+									</td>
+									<td class="description last">
+										<p>Triangles with lower opacity are skipped.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The triangle records and triangle count.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="computeSceneBounds" translate="no">.<a href="#computeSceneBounds">computeSceneBounds</a><span class="signature">( scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, layers : <span class="param-type"><a href="Layers.html">Layers</a></span>, exclude : <span class="param-type">Set.&lt;<a href="Object3D.html">Object3D</a>></span>, target : <span class="param-type"><a href="Box3.html">Box3</a></span> )</span><span class="type-signature"> : <a href="Box3.html">Box3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the world-space bounding box of all voxelizable meshes.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">layers</strong>
+									</td>
+									<td class="description last">
+										<p>Only objects that pass the layer test are considered.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">exclude</strong>
+									</td>
+									<td class="description last">
+										<p>Objects to skip.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">target</strong>
+									</td>
+									<td class="description last">
+										<p>The target box.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The bounding box.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="contain" translate="no">.<a href="#contain">contain</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, aspect : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
@@ -2489,12 +2645,65 @@ Akin to CSS <code>object-fit: cover</code>.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The updated texture.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="createBuildingMaterial" translate="no">.<a href="#createBuildingMaterial">createBuildingMaterial</a><span class="signature">()</span> </h3>
+					<h3 class="name name-method" id="createBatchingMatrixNode" translate="no">.<a href="#createBatchingMatrixNode">createBatchingMatrixNode</a><span class="signature">( matricesTexture : <span class="param-type"><a href="Texture.html">Texture</a></span>, id : <span class="param-type"><a href="Node.html">Node</a>.&lt;uint></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;mat4></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>The shared material every tower in a <a href="CityGenerator.html">CityGenerator</a> is dressed with: one flat
-masonry colour per lot, picked from a palette by hashing the lot's grid cell.</p>
+							<p>Creates the node that reads a batching matrix from the given matrices texture.</p>
 						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">matricesTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The matrices texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">id</strong>
+									</td>
+									<td class="description last">
+										<p>The indirect instance ID.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The matrix node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="createBuildingMaterial" translate="no">.<a href="#createBuildingMaterial">createBuildingMaterial</a><span class="signature">( layout : <span class="param-type">Object</span>, seed : <span class="param-type">number | <a href="Node.html">Node</a>.&lt;uint></span> )</span><span class="type-signature"> : <a href="MeshStandardNodeMaterial.html">MeshStandardNodeMaterial</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>The shared material every tower in a <a href="CityGenerator.html">CityGenerator</a> is dressed with: the per-lot
+<a href="global.html#buildingColorNode">buildingColorNode</a> resolved once per vertex on a skyscraper material.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">layout</strong>
+									</td>
+									<td class="description last">
+										<p>The city layout.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">seed</strong>
+									</td>
+									<td class="description last">
+										<p>A fixed seed, or <a href="CityGenerator.html#seedNode">CityGenerator#seedNode</a> for a changing city.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The building material.</dt>
+						</dl>
 					</div>
 					<h3 class="name name-method" id="createCanvasElement" translate="no">.<a href="#createCanvasElement">createCanvasElement</a><span class="signature">()</span><span class="type-signature"> : HTMLCanvasElement</span> </h3>
 					<div class="method">
@@ -2506,6 +2715,75 @@ rendering contexts to avoid inline element spacing issues.</p>
 						</div>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> A canvas element with display set to 'block'.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="createConeTracer" translate="no">.<a href="#createConeTracer">createConeTracer</a><span class="signature">( volume : <span class="param-type"><a href="VXGIVolume.html">VXGIVolume</a></span>, options : <span class="param-type">Object</span> )</span><span class="type-signature"> : function</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates a cone tracing function for a <a href="VXGIVolume.html">VXGIVolume</a>. The returned function emits
+TSL code that marches a cone through the volume's opacity/radiance mip chain and returns the
+gathered radiance, the accumulated occlusion and a distance-weighted occlusion for AO.</p>
+<p>Implements the approximate voxel cone tracing of Crassin et al. 2011: the cone is sampled at
+the mip level matching its current diameter with quadrilinear interpolation, samples are
+composited front-to-back with the emission-absorption model, the opacity of a sample is
+corrected for the step size and the anisotropic opacity (and, if given, the directional
+radiance) is interpolated from the three directional values closest to the cone direction.
+Cones leaving the volume gather nothing.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">volume</strong>
+									</td>
+									<td class="description last">
+										<p>The volume to trace.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">options</strong>
+									</td>
+									<td class="description last">
+										<p>Options.</p>
+										<p>Default is <code>{}</code>.</p>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">radianceNode</strong>
+									</td>
+									<td class="description last">
+										<p>The radiance texture node to gather from. If <code>null</code>, only occlusion is computed.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">directionalNode</strong>
+									</td>
+									<td class="description last">
+										<p>The directional radiance texture node of the coarser levels, see <a href="VXGIVolume.html#directionalRadiance">VXGIVolume#directionalRadiance</a>. If <code>null</code>, the coarser levels are gathered from the radiance node's mips.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">maxSteps</strong>
+									</td>
+									<td class="description last">
+										<p>Upper bound of steps per cone.</p>
+										<p>Default is <code>128</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A function <code>( origin, direction, tanHalfAngle, maxDistance, aoDistance = null ) =&gt; { color, alpha, ao }</code>. AO is only computed if <code>aoDistance</code> is given.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="createEvent" translate="no">.<a href="#createEvent">createEvent</a><span class="signature">( type : <span class="param-type">string</span>, callback : <span class="param-type">function</span> )</span><span class="type-signature"> : <a href="EventNode.html">EventNode</a></span> </h3>
@@ -2567,7 +2845,56 @@ trees ( where it reads ), skipped on the far canopy ( where it is sub-pixel ).</
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="createInstanceMatrixNode" translate="no">.<a href="#createInstanceMatrixNode">createInstanceMatrixNode</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, instanceMatrix : <span class="param-type"><a href="InstancedBufferAttribute.html">InstancedBufferAttribute</a> | <a href="StorageInstancedBufferAttribute.html">StorageInstancedBufferAttribute</a></span>, count : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<h3 class="name name-method" id="createGaussianSplatGeometry" translate="no">.<a href="#createGaussianSplatGeometry">createGaussianSplatGeometry</a><span class="signature">( centers : <span class="param-type">Float32Array</span>, covariances : <span class="param-type">Float32Array</span>, colors : <span class="param-type">Uint8Array | Uint8ClampedArray</span>, sphericalHarmonics : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates Gaussian splat geometry from packed attribute arrays. Higher-order
+spherical harmonics must be supplied as packed <code>Uint32Array</code> words
+(<code>SH_BAND_WORDS[ degree ]</code> words per splat, four clamped-byte coefficients
+per word using <code>( value - 128 ) / 128</code>).</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">centers</strong>
+									</td>
+									<td class="description last">
+										<p>Splat centers.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">covariances</strong>
+									</td>
+									<td class="description last">
+										<p>Splat covariance matrices.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">colors</strong>
+									</td>
+									<td class="description last">
+										<p>RGBA colors.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">sphericalHarmonics</strong>
+									</td>
+									<td class="description last">
+										<p>Optional packed SH band arrays.</p>
+										<p>Default is <code>{}</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The Gaussian splat geometry.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="createInstanceMatrixNode" translate="no">.<a href="#createInstanceMatrixNode">createInstanceMatrixNode</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, instanceMatrix : <span class="param-type"><a href="InstancedBufferAttribute.html">InstancedBufferAttribute</a> | <a href="StorageInstancedBufferAttribute.html">StorageInstancedBufferAttribute</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Creates the appropriate node for instanced matrix transformations.
@@ -2589,14 +2916,6 @@ Depending on buffer limits and storage capability, returns either a storage, buf
 									</td>
 									<td class="description last">
 										<p>The matrix buffer attribute.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">count</strong>
-									</td>
-									<td class="description last">
-										<p>The instance count.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -2638,7 +2957,7 @@ faint, vertically-stretched grain, so trunks read near-black against bright fog.
 										<strong translate="no">parameters</strong>
 									</td>
 									<td class="description last">
-										<p><code>barkColor</code> ( a hex, THREE.Color or TSL node ).</p>
+										<p><code>barkColor</code> ( a hex, THREE.Color or TSL node ) and <code>barkScale</code> ( a THREE.Vector3 ).</p>
 									</td>
 								</tr>
 							</tbody>
@@ -3000,6 +3319,57 @@ precision floating point value (FP16).</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The UUID.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="getBoneMatricesNode" translate="no">.<a href="#getBoneMatricesNode">getBoneMatricesNode</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, skeleton : <span class="param-type"><a href="Skeleton.html">Skeleton</a></span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates the bone matrices node. Skeletons that fit within the uniform buffer limit
+use a uniform buffer, larger skeletons fall back to a bone texture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">skeleton</strong>
+									</td>
+									<td class="description last">
+										<p>The skeleton.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The bone matrices node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getBoneTextureMatrices" translate="no">.<a href="#getBoneTextureMatrices">getBoneTextureMatrices</a><span class="signature">( boneTexture : <span class="param-type"><a href="TextureNode.html">TextureNode</a></span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates an accessor for bone matrices stored in a bone texture.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">boneTexture</strong>
+									</td>
+									<td class="description last">
+										<p>The bone texture node.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> An accessor with the same <code>element()</code> interface as a buffer node.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="getByteLength" translate="no">.<a href="#getByteLength">getByteLength</a><span class="signature">( width : <span class="param-type">number</span>, height : <span class="param-type">number</span>, format : <span class="param-type">number</span>, type : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
 					<div class="method">
 						<div class="description">
@@ -3255,7 +3625,7 @@ Each member layout includes the member's name, type, and whether it is atomic.</
 							<dt class="tag-returns"><strong>Returns:</strong> An array of member layouts.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getPreviousInstance" translate="no">.<a href="#getPreviousInstance">getPreviousInstance</a><span class="signature">( instancedMesh : <span class="param-type"><a href="InstancedMesh.html">InstancedMesh</a></span>, instanceMatrix : <span class="param-type"><a href="InstancedBufferAttribute.html">InstancedBufferAttribute</a> | <a href="StorageInstancedBufferAttribute.html">StorageInstancedBufferAttribute</a></span>, builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, count : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<h3 class="name name-method" id="getPreviousInstance" translate="no">.<a href="#getPreviousInstance">getPreviousInstance</a><span class="signature">( instancedMesh : <span class="param-type"><a href="InstancedMesh.html">InstancedMesh</a></span>, instanceMatrix : <span class="param-type"><a href="InstancedBufferAttribute.html">InstancedBufferAttribute</a> | <a href="StorageInstancedBufferAttribute.html">StorageInstancedBufferAttribute</a></span>, builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Retrieves or initializes the previous frame instance matrix node for motion vectors.
@@ -3287,21 +3657,43 @@ Uses a WeakMap to cache previous frame instance matrices and their TSL nodes.</p
 										<p>The current node builder.</p>
 									</td>
 								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">count</strong>
-									</td>
-									<td class="description last">
-										<p>The instance count.</p>
-									</td>
-								</tr>
 							</tbody>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The previous frame instance matrix node.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getPreviousSkinnedPosition" translate="no">.<a href="#getPreviousSkinnedPosition">getPreviousSkinnedPosition</a><span class="signature">( skinnedMesh : <span class="param-type"><a href="SkinnedMesh.html">SkinnedMesh</a></span>, bindMatrixNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;mat4></span>, bindMatrixInverseNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;mat4></span>, skinIndexNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;uvec4></span>, skinWeightNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec4></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<h3 class="name name-method" id="getPreviousNode" translate="no">.<a href="#getPreviousNode">getPreviousNode</a><span class="signature">( batchMesh : <span class="param-type"><a href="BatchedMesh.html">BatchedMesh</a></span>, id : <span class="param-type"><a href="Node.html">Node</a>.&lt;uint></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;mat4></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Retrieves or initializes the previous frame batching matrix node for motion vectors.
+Uses a WeakMap to cache previous frame matrices textures and their TSL nodes.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">batchMesh</strong>
+									</td>
+									<td class="description last">
+										<p>The batched mesh.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">id</strong>
+									</td>
+									<td class="description last">
+										<p>The indirect instance ID.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The previous frame batching matrix node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getPreviousSkinnedPosition" translate="no">.<a href="#getPreviousSkinnedPosition">getPreviousSkinnedPosition</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, skinnedMesh : <span class="param-type"><a href="SkinnedMesh.html">SkinnedMesh</a></span>, bindMatrixNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;mat4></span>, bindMatrixInverseNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;mat4></span>, skinIndexNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;uvec4></span>, skinWeightNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec4></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Retrieves or initializes the previous frame skinned position node for motion vectors.
@@ -3309,6 +3701,14 @@ Uses a WeakMap to cache previous frame bone matrix arrays and their TSL buffer n
 						</div>
 						<table class="params">
 							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
 								<tr>
 									<td class="name">
 										<strong translate="no">skinnedMesh</strong>
@@ -3613,6 +4013,64 @@ density increases when moving away from the camera.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The viewZ node.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="hasTangents" translate="no">.<a href="#hasTangents">hasTangents</a><span class="signature">( settings : <span class="param-type">Object</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given keyframe track settings hold Bezier tangent data.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">settings</strong>
+									</td>
+									<td class="description last">
+										<p>The settings of a keyframe track.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether both tangent arrays are defined or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="intersectVolume" translate="no">.<a href="#intersectVolume">intersectVolume</a><span class="signature">( volume : <span class="param-type"><a href="VXGIVolume.html">VXGIVolume</a></span>, origin : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span>, direction : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Emits the intersection of a ray with the bounds of the given volume.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">volume</strong>
+									</td>
+									<td class="description last">
+										<p>The volume.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">origin</strong>
+									</td>
+									<td class="description last">
+										<p>The ray origin.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">direction</strong>
+									</td>
+									<td class="description last">
+										<p>The normalized ray direction.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The entry and exit distances. The ray misses the volume if <code>tExit &lt;= tEnter</code>.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="inverseLerp" translate="no">.<a href="#inverseLerp">inverseLerp</a><span class="signature">( x : <span class="param-type">number</span>, y : <span class="param-type">number</span>, value : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
 					<div class="method">
 						<div class="description">
@@ -3651,10 +4109,31 @@ between the start and end point.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The interpolation factor.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="isOITCapable" translate="no">.<a href="#isOITCapable">isOITCapable</a><span class="signature">( material : <span class="param-type"><a href="Material.html">Material</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given material qualifies for OIT.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">material</strong>
+									</td>
+									<td class="description last">
+										<p>The material to check.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the material qualifies for OIT or not.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="isPowerOfTwo" translate="no">.<a href="#isPowerOfTwo">isPowerOfTwo</a><span class="signature">( value : <span class="param-type">number</span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Returns <code>true</code> if the given number is a power of two.</p>
+							<p>Returns <code>true</code> if the given integer is a power of two.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -3669,7 +4148,7 @@ between the start and end point.</p>
 							</tbody>
 						</table>
 						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> Whether the given number is a power of two or not.</dt>
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the given integer is a power of two or not.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="isTypedArray" translate="no">.<a href="#isTypedArray">isTypedArray</a><span class="signature">( array : <span class="param-type"><a href="global.html#any">any</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
@@ -4020,6 +4499,56 @@ for the given value. <code>a2</code> must be greater than <code>a1</code>.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> A random integer.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="replaceSunLights" translate="no">.<a href="#replaceSunLights">replaceSunLights</a><span class="signature">( scene : <span class="param-type"><a href="Scene.html">Scene</a></span> )</span><span class="type-signature"> : Array.&lt;Object></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Replaces every visible, shadow-casting <code>SunLight</code> in the scene with a
+directional light fitted to the shadow casters. SunLight shadow cascades are
+fitted to the active camera every render, which the frozen shadow maps of a
+bake cannot provide.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene to bake.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The replacements to pass to <a href="global.html#restoreSunLights">restoreSunLights</a>, or <code>null</code> if the scene has no such lights.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="restoreSunLights" translate="no">.<a href="#restoreSunLights">restoreSunLights</a><span class="signature">( scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, replacements : <span class="param-type">Array.&lt;Object></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Restores the sun lights replaced by <a href="global.html#replaceSunLights">replaceSunLights</a>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">scene</strong>
+									</td>
+									<td class="description last">
+										<p>The baked scene.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">replacements</strong>
+									</td>
+									<td class="description last">
+										<p>The replacements to undo.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					<h3 class="name name-method" id="rgbToYCoCg" translate="no">.<a href="#rgbToYCoCg">rgbToYCoCg</a><span class="signature">( c : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
 					<div class="method">
 						<table class="params">
@@ -4062,6 +4591,61 @@ for the given value. <code>a2</code> must be greater than <code>a1</code>.</p>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The created SampleNode instance wrapped as a node object.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="sampleDirectional" translate="no">.<a href="#sampleDirectional">sampleDirectional</a><span class="signature">( volume : <span class="param-type"><a href="VXGIVolume.html">VXGIVolume</a></span>, directionalNode : <span class="param-type"><a href="Texture3DNode.html">Texture3DNode</a></span>, uvw : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span>, level : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, direction : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec4></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Emits a directional radiance lookup: for each axis the direction block facing the ray is
+sampled from the directional texture and the three samples are blended with the squared
+direction components. The block is selected arithmetically, so the lookup does not branch.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">volume</strong>
+									</td>
+									<td class="description last">
+										<p>The volume.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">directionalNode</strong>
+									</td>
+									<td class="description last">
+										<p>The directional radiance texture node.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">uvw</strong>
+									</td>
+									<td class="description last">
+										<p>The texture coordinates within the volume.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">level</strong>
+									</td>
+									<td class="description last">
+										<p>The mip level of the directional texture.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">direction</strong>
+									</td>
+									<td class="description last">
+										<p>The normalized ray direction.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The premultiplied radiance and its weight.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="seededRandom" translate="no">.<a href="#seededRandom">seededRandom</a><span class="signature">( s : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
@@ -4226,72 +4810,6 @@ rotation by angle <code>a</code> is applied first, then by angle <code>b</code>,
 									</td>
 									<td class="description last">
 										<p>A function that installs the new renderer in the app.</p>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-					<h3 class="name name-method" id="shadowRenderObjectFunction" translate="no">.<a href="#shadowRenderObjectFunction">shadowRenderObjectFunction</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, _camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, material : <span class="param-type"><a href="Material.html">Material</a></span>, group : <span class="param-type"><a href="Group.html">Group</a></span>, &hellip;params : <span class="param-type"><a href="global.html#any">any</a></span> )</span> </h3>
-					<div class="method">
-						<div class="description">
-							<p>Shadow Render Object Function.</p>
-						</div>
-						<table class="params">
-							<tbody>
-								<tr>
-									<td class="name">
-										<strong translate="no">object</strong>
-									</td>
-									<td class="description last">
-										<p>The 3D object to render.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">scene</strong>
-									</td>
-									<td class="description last">
-										<p>The scene containing the object.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">_camera</strong>
-									</td>
-									<td class="description last">
-										<p>The camera used for rendering.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">geometry</strong>
-									</td>
-									<td class="description last">
-										<p>The geometry of the object.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">material</strong>
-									</td>
-									<td class="description last">
-										<p>The material of the object.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">group</strong>
-									</td>
-									<td class="description last">
-										<p>The group the object belongs to.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">params</strong>
-									</td>
-									<td class="description last">
-										<p>Additional parameters for rendering.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -4792,6 +5310,46 @@ Uses scheduler.yield() when available (Chrome 115+), falls back to requestAnimat
 </table>
 				</div>
 				<div class="member">
+					<h3 class="name" id="ConstantsRenderObjectRefreshType" translate="no">.<a href="#ConstantsRenderObjectRefreshType">ConstantsRenderObjectRefreshType</a> </h3>
+					<div class="description">
+						<p>Represents the refresh types of render objects.</p>
+					</div>
+<table class="props">
+	<tbody>
+		<tr>
+				<td class="name">
+					<strong>NONE</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>No refresh required.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>SHARED</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>Only shared uniform buffers require an update.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>FULL</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>The render object requires a full refresh.</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<div class="member">
 					<h3 class="name" id="ConstantsTimestampQuery" translate="no">.<a href="#ConstantsTimestampQuery">ConstantsTimestampQuery</a> </h3>
 					<div class="description">
 						<p>This type represents the different timestamp query types.</p>
@@ -4886,6 +5444,41 @@ Uses scheduler.yield() when available (Chrome 115+), falls back to requestAnimat
 				</td>
 			<td class="description last">
 				<p>Whether shader errors should be checked or not.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>diagnostics</strong>
+						<br>
+<span class="param-type">Object</span>
+				</td>
+			<td class="description last">
+				<p>Diagnostics configuration for the shader generation.</p>
+					<h6>Properties</h6>
+<table class="props">
+	<tbody>
+		<tr>
+				<td class="name">
+					<strong>keywords</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether declaration names that collide with reserved keywords should be renamed or not.</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>onNodeBuilderCreated</strong>
+						<br>
+<span class="param-type">function</span>
+				</td>
+			<td class="description last">
+				<p>A callback function that is executed after a node builder has been created and before it is built.</p>
 			</td>
 		</tr>
 		<tr>
@@ -5211,6 +5804,24 @@ use <a href="TemporalReprojectNode.html#setHistoryTexture">TemporalReprojectNode
 	</tbody>
 </table>
 				</div>
+					<h3 class="name name-method" id="loopBodyCallback" translate="no">.<a href="#loopBodyCallback">loopBodyCallback</a><span class="signature">( inputs : <span class="param-type">Object.&lt;string, <a href="Node.html">Node</a>></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>The loop body.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">inputs</strong>
+									</td>
+									<td class="description last">
+										<p>The loop variables of the current <code>Loop()</code> call, keyed by their name.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					<h3 class="name name-method" id="onAnimationCallback" translate="no">.<a href="#onAnimationCallback">onAnimationCallback</a><span class="signature">( time : <span class="param-type">DOMHighResTimeStamp</span>, frame : <span class="param-type">XRFrame</span> )</span> </h3>
 					<div class="method">
 						<div class="description">

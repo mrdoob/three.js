@@ -29,7 +29,7 @@ renderPipeline.outputNode = scenePassColor.add( bloomPass );
 
 ## Import
 
-BloomNode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+BloomNode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { bloom } from 'three/addons/tsl/display/BloomNode.js';
@@ -64,6 +64,10 @@ The luminance threshold limits which bright areas contribute to the bloom effect
 Default is `0`.
 
 ## Properties
+
+### .bloomTintColors : Array.<Vector3>
+
+A per-mip tint color for the bloom, applied during the composite pass. Defaults to white (no tint) for each of the mips. Mutate the vectors to colorize the bloom (e.g. for a warm or anamorphic look).
 
 ### .highPassFn : function
 

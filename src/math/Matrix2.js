@@ -35,7 +35,7 @@ export class Matrix2 {
 		 * @readonly
 		 * @default true
 		 */
-		Matrix2.prototype.isMatrix2 = true;
+		this.prototype.isMatrix2 = true;
 
 	}
 

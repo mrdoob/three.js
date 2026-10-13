@@ -157,7 +157,7 @@ class WebGPUTextureUtils {
 		const texture = binding.texture;
 		const textureNode = binding.textureNode;
 
-		const isComparison = texture.isDepthTexture === true && texture.compareFunction !== null && textureNode.isPlainGather() === false && backend.hasCompatibility( Compatibility.TEXTURE_COMPARE );
+		const isComparison = texture.isDepthTexture === true && texture.compareFunction !== null && textureNode.isSampleCompare() && backend.hasCompatibility( Compatibility.TEXTURE_COMPARE );
 
 		const samplerKey = texture.minFilter + '-' + texture.magFilter + '-' +
 			texture.wrapS + '-' + texture.wrapT + '-' + ( texture.wrapR || '0' ) + '-' +
@@ -352,6 +352,20 @@ class WebGPUTextureUtils {
 		textureData.format = format;
 
 		const { samples, primarySamples, isMSAA } = backend.utils.getTextureSampleData( texture );
+		const renderTarget = texture.renderTarget;
+
+		// WebGPU multisampled 2D textures can only have a single array layer.
+		const useSeparateMSAATextures = samples > 1 && renderTarget !== null && depth > 1 && dimension === GPUTextureDimension.TwoD;
+		const supportsTransientAttachments = GPUTextureUsage.TRANSIENT_ATTACHMENT !== undefined;
+		// Layered rendering can resume after a framebuffer copy, so its attachments must support loading.
+		const useTransientAttachments = supportsTransientAttachments && useSeparateMSAATextures === false;
+		const useTransientDepthAttachment = texture.isDepthTexture === true &&
+			useTransientAttachments &&
+			renderTarget?.storeMultisampledDepthBuffer === false &&
+			( renderTarget.stencilBuffer === false || renderTarget.storeMultisampledStencilBuffer === false );
+		const useTransientColorAttachment = texture.isDepthTexture !== true &&
+			useTransientAttachments &&
+			renderTarget?.storeMultisampledColorBuffer === false;
 
 		let usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC;
 
@@ -367,17 +381,11 @@ class WebGPUTextureUtils {
 
 		}
 
-		const renderTarget = texture.renderTarget;
-
 		// when the multisampled data are discarded, try to use a transient attachment if possible
 
-		if ( texture.isDepthTexture === true && primarySamples > 1 && GPUTextureUsage.TRANSIENT_ATTACHMENT !== undefined ) {
+		if ( primarySamples > 1 && useTransientDepthAttachment ) {
 
-			if ( renderTarget?.storeMultisampledDepthBuffer === false && ( renderTarget.stencilBuffer === false || renderTarget.storeMultisampledStencilBuffer === false ) ) {
-
-				usage = GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TRANSIENT_ATTACHMENT;
-
-			}
+			usage = GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TRANSIENT_ATTACHMENT;
 
 		}
 
@@ -421,7 +429,7 @@ class WebGPUTextureUtils {
 
 		}
 
-		if ( isMSAA ) {
+		if ( isMSAA || useSeparateMSAATextures ) {
 
 			const msaaTextureDescriptorGPU = Object.assign( {}, textureDescriptorGPU );
 
@@ -431,13 +439,30 @@ class WebGPUTextureUtils {
 
 			// when the multisampled data are discarded, try to use a transient attachment if possible
 
-			if ( renderTarget?.storeMultisampledColorBuffer === false && GPUTextureUsage.TRANSIENT_ATTACHMENT !== undefined ) {
+			if ( useTransientDepthAttachment || useTransientColorAttachment ) {
 
 				msaaTextureDescriptorGPU.usage = GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TRANSIENT_ATTACHMENT;
 
 			}
 
-			textureData.msaaTexture = backend.device.createTexture( msaaTextureDescriptorGPU );
+			if ( useSeparateMSAATextures ) {
+
+				msaaTextureDescriptorGPU.size = Object.assign( {}, msaaTextureDescriptorGPU.size, { depthOrArrayLayers: 1 } );
+
+				textureData.msaaTextures = [];
+
+				for ( let i = 0; i < depth; i ++ ) {
+
+					msaaTextureDescriptorGPU.label = textureDescriptorGPU.label + '-msaa-' + i;
+					textureData.msaaTextures.push( backend.device.createTexture( msaaTextureDescriptorGPU ) );
+
+				}
+
+			} else {
+
+				textureData.msaaTexture = backend.device.createTexture( msaaTextureDescriptorGPU );
+
+			}
 
 		}
 
@@ -458,9 +483,15 @@ class WebGPUTextureUtils {
 		const backend = this.backend;
 		const textureData = backend.get( texture );
 
-		if ( textureData.texture !== undefined && isDefaultTexture === false && texture.isExternalTexture !== true ) textureData.texture.destroy();
+		if ( textureData.texture !== undefined && isDefaultTexture === false && texture.isExternalTexture !== true && textureData.externalTexture !== true ) textureData.texture.destroy();
 
 		if ( textureData.msaaTexture !== undefined ) textureData.msaaTexture.destroy();
+
+		if ( textureData.msaaTextures !== undefined ) {
+
+			for ( const msaaTexture of textureData.msaaTextures ) msaaTexture.destroy();
+
+		}
 
 		backend.delete( texture );
 
@@ -496,7 +527,7 @@ class WebGPUTextureUtils {
 		const colorTexture = canvasTarget.colorTexture;
 		const colorTextureData = backend.get( colorTexture );
 
-		if ( colorTexture.width === width && colorTexture.height === height && colorTexture.samples === samples ) {
+		if ( colorTextureData.texture !== undefined && colorTexture.width === width && colorTexture.height === height && colorTexture.samples === samples ) {
 
 			return colorTextureData.texture;
 
@@ -521,8 +552,8 @@ class WebGPUTextureUtils {
 
 		//
 
-		colorTexture.source.width = width;
-		colorTexture.source.height = height;
+		colorTexture.image.width = width;
+		colorTexture.image.height = height;
 		colorTexture.samples = samples;
 
 		colorTextureData.texture = colorBuffer;
@@ -778,10 +809,10 @@ class WebGPUTextureUtils {
 		const format = textureData.textureDescriptorGPU.format;
 		const bytesPerTexel = this._getBytesPerTexel( format );
 
-		let bytesPerRow = width * bytesPerTexel;
-		bytesPerRow = Math.ceil( bytesPerRow / 256 ) * 256; // Align to 256 bytes
+		const unpaddedBytesPerRow = width * bytesPerTexel;
+		const bytesPerRow = Math.ceil( unpaddedBytesPerRow / 256 ) * 256; // copyTextureToBuffer() requires a multiple of 256
 
-		_bufferDescriptor.size = ( ( height - 1 ) * bytesPerRow ) + ( width * bytesPerTexel ); // see https://github.com/mrdoob/three.js/issues/31658#issuecomment-3229442010
+		_bufferDescriptor.size = height * bytesPerRow; // multiple of 256, so it also meets the 4-byte size alignment required by mapAsync()
 		_bufferDescriptor.usage = GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ;
 
 		const readBuffer = device.createBuffer( _bufferDescriptor );
@@ -817,11 +848,22 @@ class WebGPUTextureUtils {
 
 		await readBuffer.mapAsync( GPUMapMode.READ );
 
-		const buffer = readBuffer.getMappedRange().slice();
+		// remove the row padding so the result is tightly packed
+
+		const paddedData = new Uint8Array( readBuffer.getMappedRange() );
+		const data = new Uint8Array( unpaddedBytesPerRow * height );
+
+		for ( let row = 0; row < height; row ++ ) {
+
+			const offset = row * bytesPerRow;
+
+			data.set( paddedData.subarray( offset, offset + unpaddedBytesPerRow ), row * unpaddedBytesPerRow );
+
+		}
 
 		readBuffer.destroy();
 
-		return new typedArrayType( buffer );
+		return new typedArrayType( data.buffer );
 
 	}
 

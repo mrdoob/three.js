@@ -4,7 +4,7 @@ This class represents a management component for animated MD2 character assets.
 
 ## Import
 
-MD2Character is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+MD2Character is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { MD2Character } from 'three/addons/misc/MD2Character.js';

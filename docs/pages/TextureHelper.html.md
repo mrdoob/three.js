@@ -8,7 +8,7 @@ This helper can only be used with [WebGLRenderer](WebGLRenderer.html). When usin
 
 ## Import
 
-TextureHelper is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+TextureHelper is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { TextureHelper } from 'three/addons/helpers/TextureHelper.js';
@@ -53,6 +53,8 @@ The texture to visualize.
 ### .dispose()
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+
+**Overrides:** [Mesh#dispose](Mesh.html#dispose)
 
 ## Source
 

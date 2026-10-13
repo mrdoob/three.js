@@ -4,7 +4,7 @@ Utility class for LDraw models.
 
 ## Import
 
-LDrawUtils is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+LDrawUtils is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { LDrawUtils } from 'three/addons/utils/LDrawUtils.js';

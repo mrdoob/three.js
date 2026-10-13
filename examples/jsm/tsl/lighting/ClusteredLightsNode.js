@@ -56,9 +56,15 @@ class ClusteredLightsNode extends LightsNode {
 		this._lightIndexes = null;
 		this._screenClusterIndex = null;
 		this._compute = null;
-		this._lightsTexture = null;
-		this._zSliceRangesTexture = null;
-		this._zSliceRangesData = null;
+
+		const lightsData = new Float32Array( maxLights * 4 * 2 );
+		this._lightsTexture = new DataTexture( lightsData, lightsData.length / 8, 2, RGBAFormat, FloatType );
+
+		// Per Z-slice light range for Z-culling (CPU-sorted, uploaded each frame)
+
+		this._zSliceRangesData = new Float32Array( zSlices * 4 );
+		this._zSliceRangesTexture = new DataTexture( this._zSliceRangesData, zSlices, 1, RGBAFormat, FloatType );
+
 		this._lightViewZ = new Float32Array( maxLights );
 		this._lightSortOrder = [];
 
@@ -77,13 +83,25 @@ class ClusteredLightsNode extends LightsNode {
 
 	}
 
+	/**
+	 * Overwrites the default {@link LightsNode#customCacheKey} implementation by
+	 * including the cluster grid into the cache key.
+	 *
+	 * @return {number} The custom cache key.
+	 */
 	customCacheKey() {
 
 		return ( this._compute ? this._compute.getCacheKey() : 0 ) + super.customCacheKey();
 
 	}
 
-	updateLightsTexture( camera ) {
+	/**
+	 * Updates the light data and the light ranges of the depth slices.
+	 *
+	 * @private
+	 * @param {Camera} camera - The camera.
+	 */
+	_updateLightsTexture( camera ) {
 
 		const { _lightsTexture: lightsTexture, clusteredLights } = this;
 
@@ -138,8 +156,6 @@ class ClusteredLightsNode extends LightsNode {
 
 		const zRanges = this._zSliceRangesData;
 
-		if ( zRanges === null ) return;
-
 		const near = camera.near;
 		const far = camera.far;
 		const NZ = this.zSlices;
@@ -186,13 +202,18 @@ class ClusteredLightsNode extends LightsNode {
 
 	}
 
+	/**
+	 * Updates the light data and assigns the lights to the clusters.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 */
 	updateBefore( frame ) {
 
 		const { renderer, camera } = frame;
 
-		this.updateProgram( renderer );
+		this._updateProgram( renderer );
 
-		this.updateLightsTexture( camera );
+		this._updateLightsTexture( camera );
 
 		this._cameraNear.value = camera.near;
 		this._cameraFar.value = camera.far;
@@ -203,6 +224,13 @@ class ClusteredLightsNode extends LightsNode {
 
 	}
 
+	/**
+	 * Configures this node with an array of lights. Point lights without shadows
+	 * are clustered, all other lights use the default lighting.
+	 *
+	 * @param {Array<Light>} lights - An array of lights.
+	 * @return {ClusteredLightsNode} A reference to this node.
+	 */
 	setLights( lights ) {
 
 		const { clusteredLights, materialLights } = this;
@@ -231,19 +259,25 @@ class ClusteredLightsNode extends LightsNode {
 
 	}
 
+	/**
+	 * Returns the lights that are not clustered.
+	 *
+	 * @return {Array<Light>} The lights using the default lighting.
+	 */
 	getBuiltinLights() {
 
 		return this.materialLights;
 
 	}
 
-	getBlock() {
-
-		return this._lightIndexes.element( this._screenClusterIndex.mul( int( this._chunksPerCluster ) ) );
-
-	}
-
-	getTile( element ) {
+	/**
+	 * Returns the light index stored at the given slot of the fragment's cluster.
+	 *
+	 * @private
+	 * @param {number|Node<int>} element - The slot.
+	 * @return {Node<int>} The 1-based light index. `0` marks the end of the list.
+	 */
+	_getTile( element ) {
 
 		element = int( element );
 
@@ -255,6 +289,12 @@ class ClusteredLightsNode extends LightsNode {
 
 	}
 
+	/**
+	 * Returns the number of lights in the fragment's cluster. Useful for debugging.
+	 *
+	 * @param {Node<int>} zSliceNode - The depth slice to inspect. A negative value selects the fragment's own cluster.
+	 * @return {Node<int>} The light count.
+	 */
 	getClusterLightCount( zSliceNode ) {
 
 		const getCount = Fn( ( [ zSliceNode ] ) => {
@@ -304,7 +344,14 @@ class ClusteredLightsNode extends LightsNode {
 
 	}
 
-	getLightData( index ) {
+	/**
+	 * Returns the data of the light at the given index.
+	 *
+	 * @private
+	 * @param {number|Node<int>} index - The light index.
+	 * @return {Object} The light's position, view position, distance, color and decay.
+	 */
+	_getLightData( index ) {
 
 		index = int( index );
 
@@ -327,9 +374,15 @@ class ClusteredLightsNode extends LightsNode {
 
 	}
 
+	/**
+	 * Sets up the default lights and the clustered point lights.
+	 *
+	 * @param {NodeBuilder} builder - A reference to the current node builder.
+	 * @param {Array<LightingNode>} lightNodes - An array of lighting nodes.
+	 */
 	setupLights( builder, lightNodes ) {
 
-		this.updateProgram( builder.renderer );
+		this._updateProgram( builder.renderer );
 
 		//
 
@@ -344,7 +397,7 @@ class ClusteredLightsNode extends LightsNode {
 
 			Loop( this.maxLightsPerCluster, ( { i } ) => {
 
-				const lightIndex = this.getTile( i );
+				const lightIndex = this._getTile( i );
 
 				If( lightIndex.equal( int( 0 ) ), () => {
 
@@ -352,7 +405,7 @@ class ClusteredLightsNode extends LightsNode {
 
 				} );
 
-				const { color, decay, viewPosition, distance } = this.getLightData( lightIndex.sub( 1 ) );
+				const { color, decay, viewPosition, distance } = this._getLightData( lightIndex.sub( 1 ) );
 
 				const lightVector = viewPosition.sub( positionView );
 
@@ -374,7 +427,14 @@ class ClusteredLightsNode extends LightsNode {
 
 	}
 
-	getBufferFitSize( value ) {
+	/**
+	 * Rounds the given size up to a multiple of the tile size.
+	 *
+	 * @private
+	 * @param {number} value - The size.
+	 * @return {number} The fitted size.
+	 */
+	_getBufferFitSize( value ) {
 
 		const multiple = this.tileSize;
 
@@ -382,14 +442,28 @@ class ClusteredLightsNode extends LightsNode {
 
 	}
 
+	/**
+	 * Sets the size of the cluster grid. Must be called with the new drawing buffer
+	 * size whenever the renderer is resized.
+	 *
+	 * @param {number} width - The drawing buffer width.
+	 * @param {number} height - The drawing buffer height.
+	 * @return {ClusteredLightsNode} A reference to this node.
+	 */
 	setSize( width, height ) {
 
-		width = this.getBufferFitSize( width );
-		height = this.getBufferFitSize( height );
+		width = this._getBufferFitSize( width );
+		height = this._getBufferFitSize( height );
 
 		if ( ! this._bufferSize || this._bufferSize.width !== width || this._bufferSize.height !== height ) {
 
-			this.create( width, height );
+			const lightIndexes = this._lightIndexes;
+
+			this._create( width, height );
+
+			// dispose storage if light indices have changed
+
+			if ( lightIndexes !== null && lightIndexes !== this._lightIndexes ) lightIndexes.value.dispose();
 
 		}
 
@@ -397,28 +471,41 @@ class ClusteredLightsNode extends LightsNode {
 
 	}
 
-	updateProgram( renderer ) {
+	/**
+	 * Creates the cluster grid on first use and recreates it when the drawing buffer size changes.
+	 *
+	 * @private
+	 * @param {Renderer} renderer - The renderer.
+	 */
+	_updateProgram( renderer ) {
 
 		renderer.getDrawingBufferSize( _size );
 
-		const width = this.getBufferFitSize( _size.width );
-		const height = this.getBufferFitSize( _size.height );
+		const width = this._getBufferFitSize( _size.width );
+		const height = this._getBufferFitSize( _size.height );
 
 		if ( this._bufferSize === null ) {
 
-			this.create( width, height );
+			this._create( width, height );
 
 		} else if ( this._bufferSize.width !== width || this._bufferSize.height !== height ) {
 
-			this.create( width, height );
+			this._create( width, height );
 
 		}
 
 	}
 
-	create( width, height ) {
+	/**
+	 * Creates the cluster grid, the light index storage and the compute node for the given size.
+	 *
+	 * @private
+	 * @param {number} width - The fitted width.
+	 * @param {number} height - The fitted height.
+	 */
+	_create( width, height ) {
 
-		const { tileSize, maxLights, zSlices, maxLightsPerCluster, _chunksPerCluster: chunksPerCluster } = this;
+		const { tileSize, zSlices, maxLightsPerCluster, _chunksPerCluster: chunksPerCluster } = this;
 
 		const bufferSize = new Vector2( width, height );
 
@@ -429,20 +516,22 @@ class ClusteredLightsNode extends LightsNode {
 
 		this._gridDimensions.value.set( NX, NY );
 
-		// Lights data texture (same layout as TiledLightsNode)
+		// release the compute pipeline and bindings built for the previous grid
 
-		const lightsData = new Float32Array( maxLights * 4 * 2 );
-		const lightsTexture = new DataTexture( lightsData, lightsData.length / 8, 2, RGBAFormat, FloatType );
+		if ( this._compute !== null ) this._compute.dispose();
 
-		// Per Z-slice light range for Z-culling (CPU-sorted, uploaded each frame)
+		// Per-cluster light-index storage (ivec4 chunks).
 
-		const zSliceRangesData = new Float32Array( NZ * 4 );
-		const zSliceRangesTexture = new DataTexture( zSliceRangesData, NZ, 1, RGBAFormat, FloatType );
+		const lightIndexesLength = clusterCount * chunksPerCluster * 4;
 
-		// Per-cluster light-index storage (ivec4 chunks)
+		let lightIndexes = this._lightIndexes;
 
-		const lightIndexesArray = new Int32Array( clusterCount * chunksPerCluster * 4 );
-		const lightIndexes = attributeArray( lightIndexesArray, 'ivec4' ).setName( 'lightIndexes' );
+		if ( lightIndexes === null || lightIndexes.value.array.length < lightIndexesLength ) {
+
+			const lightIndexesArray = new Int32Array( lightIndexesLength );
+			lightIndexes = attributeArray( lightIndexesArray, 'ivec4' ).setName( 'lightIndexes' );
+
+		}
 
 		// compute-side accessors (use instanceIndex)
 
@@ -528,7 +617,7 @@ class ClusteredLightsNode extends LightsNode {
 			const index = int( 0 ).toVar();
 
 			// Z-culling: only test lights that can reach this cluster's Z-slice
-			const zRange = textureLoad( zSliceRangesTexture, ivec2( cz, 0 ) );
+			const zRange = textureLoad( this._zSliceRangesTexture, ivec2( cz, 0 ) );
 			const rangeStart = int( zRange.x );
 			const rangeEnd = int( zRange.y );
 
@@ -542,7 +631,7 @@ class ClusteredLightsNode extends LightsNode {
 
 				} );
 
-				const { viewPosition, distance } = this.getLightData( lightIdx );
+				const { viewPosition, distance } = this._getLightData( lightIdx );
 
 				// sphere-AABB intersection in view space
 				const pos = viewPosition.xyz;
@@ -589,9 +678,21 @@ class ClusteredLightsNode extends LightsNode {
 		this._lightIndexes = lightIndexes;
 		this._screenClusterIndex = screenClusterIndex;
 		this._compute = compute;
-		this._lightsTexture = lightsTexture;
-		this._zSliceRangesTexture = zSliceRangesTexture;
-		this._zSliceRangesData = zSliceRangesData;
+
+	}
+
+	/**
+	 * Frees the GPU resources allocated by this node.
+	 */
+	dispose() {
+
+		if ( this._compute !== null ) this._compute.dispose();
+		if ( this._lightIndexes !== null ) this._lightIndexes.value.dispose();
+
+		this._lightsTexture.dispose();
+		this._zSliceRangesTexture.dispose();
+
+		super.dispose();
 
 	}
 

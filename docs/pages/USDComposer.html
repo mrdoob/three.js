@@ -118,10 +118,19 @@ while supporting USDZExporter round-trip (Xform &gt; Xform &gt; Mesh pattern).</
 							<p>Extract variant selections from a spec's fields.</p>
 						</div>
 					</div>
+					<h3 class="name name-method" id="_getMaterialBindingSpec" translate="no">.<a href="#_getMaterialBindingSpec">_getMaterialBindingSpec</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Get the material binding relationship for a prim, including overrides from
+active variants.</p>
+						</div>
+					</div>
 					<h3 class="name name-method" id="_getMaterialBindingTarget" translate="no">.<a href="#_getMaterialBindingTarget">_getMaterialBindingTarget</a><span class="signature">()</span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Get material binding target path, checking variant paths if needed.</p>
+							<p>Get the resolved material binding target for a prim. Material bindings are
+inherited, and an ancestor marked strongerThanDescendants takes precedence
+over bindings authored on its descendants.</p>
 						</div>
 					</div>
 					<h3 class="name name-method" id="_getMaterialPath" translate="no">.<a href="#_getMaterialPath">_getMaterialPath</a><span class="signature">()</span> </h3>
@@ -155,6 +164,13 @@ while supporting USDZExporter round-trip (Xform &gt; Xform &gt; Mesh pattern).</
 					<div class="method">
 						<div class="description">
 							<p>Check if a path is a direct child of parentPath.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="_resolveAttributeValue" translate="no">.<a href="#_resolveAttributeValue">_resolveAttributeValue</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Resolve an attribute's authored value, following connections before using
+local fallback values.</p>
 						</div>
 					</div>
 					<h3 class="name name-method" id="_resolveFilePath" translate="no">.<a href="#_resolveFilePath">_resolveFilePath</a><span class="signature">()</span> </h3>

@@ -14,7 +14,7 @@ import { generateUUID } from '../math/MathUtils.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Matrix3 } from '../math/Matrix3.js';
-import { Source } from './Source.js';
+import { TextureSource } from './TextureSource.js';
 import { warn } from '../utils.js';
 
 let _textureId = 0;
@@ -88,9 +88,9 @@ class Texture extends EventDispatcher {
 		 * where multiple textures render the same data but with different texture
 		 * transformations.
 		 *
-		 * @type {Source}
+		 * @type {TextureSource}
 		 */
-		this.source = new Source( image );
+		this.source = new TextureSource( image );
 
 		/**
 		 * An array holding user-defined mipmaps.
@@ -103,7 +103,7 @@ class Texture extends EventDispatcher {
 		 * How the texture is applied to the object. The value `UVMapping`
 		 * is the default, where texture or uv coordinates are used to apply the map.
 		 *
-		 * @type {(UVMapping|CubeReflectionMapping|CubeRefractionMapping|EquirectangularReflectionMapping|EquirectangularRefractionMapping|CubeUVReflectionMapping)}
+		 * @type {(UVMapping|CubeReflectionMapping|CubeRefractionMapping|EquirectangularReflectionMapping|EquirectangularRefractionMapping)}
 		 * @default UVMapping
 		*/
 		this.mapping = mapping;
@@ -257,6 +257,17 @@ class Texture extends EventDispatcher {
 		this.generateMipmaps = true;
 
 		/**
+		 * Whether the renderer regenerates the mipmaps automatically whenever the
+		 * texture is uploaded, rendered to or copied into. Set this to `false` to
+		 * pause the regeneration and write the mip levels yourself. Requires
+		 * {@link Texture#generateMipmaps}.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.mipmapsAutoUpdate = true;
+
+		/**
 		 * If set to `true`, the alpha channel, if present, is multiplied into the
 		 * color channels when the texture is uploaded to the GPU.
 		 *
@@ -367,6 +378,16 @@ class Texture extends EventDispatcher {
 		 * @default 0
 		 */
 		this.pmremVersion = 0;
+
+		/**
+		 * Indicates whether this texture is a prefiltered cube environment map generated
+		 * by {@link PMREMGenerator}.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default false
+		 */
+		this.isPMREMTexture = false;
 
 		/**
 		 * Whether the texture should use one of the 16 bit integer formats which are normalized
@@ -503,6 +524,7 @@ class Texture extends EventDispatcher {
 		this.matrix.copy( source.matrix );
 
 		this.generateMipmaps = source.generateMipmaps;
+		this.mipmapsAutoUpdate = source.mipmapsAutoUpdate;
 		this.premultiplyAlpha = source.premultiplyAlpha;
 		this.flipY = source.flipY;
 		this.unpackAlignment = source.unpackAlignment;
@@ -510,6 +532,7 @@ class Texture extends EventDispatcher {
 
 		this.renderTarget = source.renderTarget;
 		this.isRenderTargetTexture = source.isRenderTargetTexture;
+		this.isPMREMTexture = source.isPMREMTexture;
 		this.isArrayTexture = source.isArrayTexture;
 
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
@@ -621,6 +644,7 @@ class Texture extends EventDispatcher {
 			flipY: this.flipY,
 
 			generateMipmaps: this.generateMipmaps,
+			mipmapsAutoUpdate: this.mipmapsAutoUpdate,
 			premultiplyAlpha: this.premultiplyAlpha,
 			unpackAlignment: this.unpackAlignment
 
@@ -641,6 +665,10 @@ class Texture extends EventDispatcher {
 	/**
 	 * Frees the GPU-related resources allocated by this instance. Call this
 	 * method whenever this instance is no longer used in your app.
+	 *
+	 * Textures that belong to a render target are managed by the render target.
+	 * Calling this method on such a texture only dispatches the dispose event but
+	 * does not free any GPU resources. Use {@link RenderTarget#dispose} instead.
 	 *
 	 * @fires Texture#dispose
 	 */

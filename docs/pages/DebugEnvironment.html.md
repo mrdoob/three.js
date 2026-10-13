@@ -17,7 +17,7 @@ scene.environment = envMap;
 
 ## Import
 
-DebugEnvironment is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+DebugEnvironment is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { DebugEnvironment } from 'three/addons/environments/DebugEnvironment.js';
@@ -34,6 +34,8 @@ Constructs a new debug environment.
 ### .dispose()
 
 Frees internal resources. This method should be called when the environment is no longer required.
+
+**Overrides:** [Scene#dispose](Scene.html#dispose)
 
 ## Source
 

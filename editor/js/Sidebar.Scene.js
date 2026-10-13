@@ -131,11 +131,28 @@ function SidebarScene( editor ) {
 
 	const outliner = new UIOutliner( editor );
 	outliner.setId( 'outliner' );
-	outliner.onChange( function () {
+	outliner.onChange( function ( event ) {
+
+		const id = parseInt( outliner.getValue() );
+
+		if ( event.shiftKey === true && editor.selector.selection.length > 0 && editor.selected !== editor.scene && editor.selected !== editor.camera ) {
+
+			const object = ( id === editor.camera.id ) ? editor.camera : editor.scene.getObjectById( id );
+
+			// scene and main camera can't be part of a group selection
+
+			if ( object !== editor.scene && object !== editor.camera ) {
+
+				editor.selector.toggle( object );
+				return;
+
+			}
+
+		}
 
 		ignoreObjectSelectedSignal = true;
 
-		editor.selectById( parseInt( outliner.getValue() ) );
+		editor.selectById( id );
 
 		ignoreObjectSelectedSignal = false;
 
@@ -414,6 +431,18 @@ function SidebarScene( editor ) {
 
 			outliner.setValue( editor.selected.id );
 
+		} else {
+
+			const selection = editor.selector.selection;
+
+			if ( selection.length > 1 ) {
+
+				// restore highlights of a group selection (e.g. after a graph change)
+
+				outliner.setValues( selection.map( ( object ) => object.id ) );
+
+			}
+
 		}
 
 		backgroundType.setValue( editor.backgroundType );
@@ -542,29 +571,56 @@ function SidebarScene( editor ) {
 	} );
 
 
+	function expandAncestors( object ) {
+
+		let needsRefresh = false;
+		let parent = object.parent;
+
+		while ( parent !== editor.scene ) {
+
+			if ( nodeStates.get( parent ) !== true ) {
+
+				nodeStates.set( parent, true );
+				needsRefresh = true;
+
+			}
+
+			parent = parent.parent;
+
+		}
+
+		return needsRefresh;
+
+	}
+
 	signals.objectSelected.add( function ( object ) {
 
 		if ( ignoreObjectSelectedSignal === true ) return;
 
-		if ( object !== null && object.parent !== null ) {
+		const selection = editor.selector.selection;
+
+		if ( selection.length > 1 ) {
+
+			// highlight all members of a group selection
 
 			let needsRefresh = false;
-			let parent = object.parent;
 
-			while ( parent !== editor.scene ) {
+			const values = [];
 
-				if ( nodeStates.get( parent ) !== true ) {
+			for ( let i = 0; i < selection.length; i ++ ) {
 
-					nodeStates.set( parent, true );
-					needsRefresh = true;
-
-				}
-
-				parent = parent.parent;
+				values.push( selection[ i ].id );
+				needsRefresh = expandAncestors( selection[ i ] ) || needsRefresh;
 
 			}
 
 			if ( needsRefresh ) refreshUI();
+
+			outliner.setValues( values );
+
+		} else if ( object !== null && object.parent !== null ) {
+
+			if ( expandAncestors( object ) ) refreshUI();
 
 			outliner.setValue( object.id );
 

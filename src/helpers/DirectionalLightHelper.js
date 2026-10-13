@@ -103,6 +103,8 @@ class DirectionalLightHelper extends Object3D {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this.lightPlane.geometry.dispose();
 		this.lightPlane.material.dispose();
 		this.targetLine.geometry.dispose();

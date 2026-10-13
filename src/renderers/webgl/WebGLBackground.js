@@ -1,4 +1,4 @@
-import { BackSide, FrontSide, CubeUVReflectionMapping, SRGBTransfer } from '../../constants.js';
+import { BackSide, FrontSide, SRGBTransfer } from '../../constants.js';
 import { BoxGeometry } from '../../geometries/BoxGeometry.js';
 import { PlaneGeometry } from '../../geometries/PlaneGeometry.js';
 import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
@@ -89,7 +89,7 @@ function WebGLBackground( renderer, environments, state, objects, alpha, premult
 
 		const background = getBackground( scene );
 
-		if ( background && ( background.isCubeTexture || background.mapping === CubeUVReflectionMapping ) ) {
+		if ( background && background.isCubeTexture ) {
 
 			if ( boxMesh === undefined ) {
 
@@ -141,7 +141,7 @@ function WebGLBackground( renderer, environments, state, objects, alpha, premult
 			// note: since the matrix is orthonormal, we can use the more-efficient transpose() in lieu of invert()
 			boxMesh.material.uniforms.backgroundRotation.value.setFromMatrix4( _m1.makeRotationFromEuler( scene.backgroundRotation ) ).transpose();
 
-			if ( background.isCubeTexture && background.isRenderTargetTexture === false ) {
+			if ( background.isRenderTargetTexture === false ) {
 
 				boxMesh.material.uniforms.backgroundRotation.value.premultiply( _m );
 

@@ -183,6 +183,25 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.test( 'applyMatrix4 (pivot)', ( assert ) => {
+
+			const object = new Object3D();
+			object.position.set( 1, 2, 3 );
+			object.rotation.set( 0.3, - 0.7, 1.2 );
+			object.scale.set( 2, 3, 4 );
+			object.pivot = new Vector3( 1, - 2, 3 );
+			object.updateMatrix();
+
+			const m = new Matrix4().makeRotationY( 0.4 ).setPosition( 3, - 2, 1 );
+			const expectedMatrix = m.clone().multiply( object.matrix );
+
+			object.applyMatrix4( m );
+			object.updateMatrix();
+
+			assert.ok( matrixEquals4( object.matrix, expectedMatrix ), 'Transformation is applied correctly with pivot' );
+
+		} );
+
 		QUnit.test( 'applyQuaternion', ( assert ) => {
 
 			const a = new Object3D();
@@ -507,6 +526,26 @@ export default QUnit.module( 'Core', () => {
 
 			assert.ok( matrixEquals4( expectedMatrixWorld, object.matrixWorld ),
 				'object\'s world matrix is maintained even it had a parent' );
+
+		} );
+
+		QUnit.test( 'attach (pivot)', ( assert ) => {
+
+			const object = new Object3D();
+			object.position.set( 1, 2, 3 );
+			object.rotation.set( 0.3, - 0.7, 1.2 );
+			object.scale.set( 2, 3, 4 );
+			object.pivot = new Vector3( 1, - 2, 3 );
+			object.updateMatrixWorld();
+
+			const expectedMatrixWorld = object.matrixWorld.clone();
+
+			const parent = new Object3D();
+			parent.position.set( 4, 5, 6 );
+			parent.rotation.set( 0.2, 0.4, 0.6 );
+			parent.attach( object );
+
+			assert.ok( matrixEquals4( object.matrixWorld, expectedMatrixWorld ), 'World matrix is maintained with pivot' );
 
 		} );
 
@@ -1096,6 +1135,10 @@ export default QUnit.module( 'Core', () => {
 					'castShadow': true,
 					'receiveShadow': true,
 					'visible': false,
+					'frustumCulled': true,
+					'renderOrder': 0,
+					'static': false,
+					'matrixAutoUpdate': true,
 					'userData': { 'foo': 'bar' },
 					'layers': 1,
 					'matrix': [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
@@ -1103,12 +1146,28 @@ export default QUnit.module( 'Core', () => {
 						{
 							'uuid': '5D4E9AE8-DA61-4912-A575-71A5BE3D72CD',
 							'type': 'Object3D',
+							'name': '',
+							'castShadow': false,
+							'receiveShadow': false,
+							'visible': true,
+							'frustumCulled': true,
+							'renderOrder': 0,
+							'static': false,
+							'matrixAutoUpdate': true,
 							'layers': 1,
 							'matrix': [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ],
 							'children': [
 								{
 									'uuid': 'B43854B3-E970-4E85-BD41-AAF8D7BFA189',
 									'type': 'Object3D',
+									'name': '',
+									'castShadow': false,
+									'receiveShadow': false,
+									'visible': true,
+									'frustumCulled': true,
+									'renderOrder': 0,
+									'static': false,
+									'matrixAutoUpdate': true,
 									'layers': 1,
 									'matrix': [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ],
 									'up': [ 0, 1, 0 ]

@@ -269,6 +269,17 @@ export default QUnit.module( 'Maths', () => {
 
 			assert.numEqual( line1.distanceSqToLine3( line2 ), 8 );
 
+			// Both segments degenerate into points
+			line1.set( one3, one3 );
+			line2.set( two3, two3 );
+
+			const c1 = new Vector3();
+			const c2 = new Vector3();
+
+			assert.numEqual( line1.distanceSqToLine3( line2, c1, c2 ), 3 );
+			assert.ok( c1.equals( one3 ), 'Passed!' );
+			assert.ok( c2.equals( two3 ), 'Passed!' );
+
 		} );
 
 	} );

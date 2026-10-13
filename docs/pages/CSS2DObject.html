@@ -17,7 +17,7 @@
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">CSS2DObject</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<p><span translate="no">CSS2DObject</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -44,8 +44,9 @@
 				<div class="member">
 					<h3 class="name" id="center" translate="no">.<a href="#center">center</a><span class="type-signature"> : <a href="Vector2.html">Vector2</a></span> </h3>
 					<div class="description">
-						<p>The 3D objects center point.
-<code>( 0, 0 )</code> is the lower left, <code>( 1, 1 )</code> is the top right.</p>
+						<p>The object's anchor point, and the point around which the object rotates.
+A value of <code>(0.5, 0.5)</code> corresponds to the midpoint of the object. A value
+of <code>(0, 0)</code> corresponds to the upper left corner of the object.</p>
 						<p>Default is <code>(0.5,0.5)</code>.</p>
 					</div>
 				</div>
@@ -61,6 +62,13 @@
 					<div class="description">
 						<p>This flag can be used for type testing.</p>
 						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="rotation2D" translate="no">.<a href="#rotation2D">rotation2D</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The object's angle of rotation, counterclockwise, in radians.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Source</h2>

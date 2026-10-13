@@ -1,4 +1,4 @@
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
 
 import { normalView, transformNormalToView } from '../accessors/Normal.js';
 import { TBNViewMatrix } from '../accessors/AccessorsUtils.js';
@@ -16,9 +16,9 @@ import { error } from '../../utils.js';
  * material.normalNode = normalMap( texture( normalTex ) );
  * ```
  *
- * @augments TempNode
+ * @augments Node
  */
-class NormalMapNode extends TempNode {
+class NormalMapNode extends Node {
 
 	static get type() {
 

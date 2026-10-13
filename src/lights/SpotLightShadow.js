@@ -86,8 +86,8 @@ class SpotLightShadow extends LightShadow {
 
 		const object = super.toJSON();
 
-		if ( this.focus !== 1 ) object.focus = this.focus;
-		if ( this.aspect !== 1 ) object.aspect = this.aspect;
+		object.focus = this.focus;
+		object.aspect = this.aspect;
 
 		return object;
 

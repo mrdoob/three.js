@@ -97,6 +97,12 @@ class StackNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	getElementType( builder ) {
 
 		return this.outputNode ? this.outputNode.getElementType( builder ) : 'void';
@@ -233,7 +239,6 @@ class StackNode extends Node {
 	 * Represents a `switch` statement in TSL.
 	 *
 	 * @param {any} expression - Represents the expression.
-	 * @param {Function} method - TSL code which is executed if the condition evaluates to `true`.
 	 * @return {StackNode} A reference to this stack node.
 	 */
 	Switch( expression ) {

@@ -24,6 +24,18 @@ function convertArray( array, type ) {
 }
 
 /**
+ * Returns `true` if the given keyframe track settings hold Bezier tangent data.
+ *
+ * @param {?Object} settings - The settings of a keyframe track.
+ * @return {boolean} Whether both tangent arrays are defined or not.
+ */
+function hasTangents( settings ) {
+
+	return settings !== undefined && settings.inTangents !== undefined && settings.outTangents !== undefined;
+
+}
+
+/**
  * Returns an array by which times and values can be sorted.
  *
  * @param {Array<number>} times - The keyframe time values.
@@ -314,10 +326,8 @@ function makeClipAdditive( targetClip, referenceFrame = 0, referenceClip = targe
 
 			// Interpolate to the reference value
 			const interpolant = referenceTrack.createInterpolant();
-			const startIndex = referenceOffset;
-			const endIndex = referenceValueSize - referenceOffset;
 			interpolant.evaluate( referenceTime );
-			referenceValue = interpolant.resultBuffer.slice( startIndex, endIndex );
+			referenceValue = interpolant.resultBuffer.slice();
 
 		}
 
@@ -406,6 +416,19 @@ class AnimationUtils {
 	}
 
 	/**
+	 * Returns `true` if the given keyframe track settings hold Bezier tangent data.
+	 *
+	 * @static
+	 * @param {?Object} settings - The settings of a keyframe track.
+	 * @return {boolean} Whether both tangent arrays are defined or not.
+	 */
+	static hasTangents( settings ) {
+
+		return hasTangents( settings );
+
+	}
+
+	/**
 	 * Returns an array by which times and values can be sorted.
 	 *
 	 * @static
@@ -486,6 +509,7 @@ class AnimationUtils {
 export {
 	convertArray,
 	isTypedArray,
+	hasTangents,
 	getKeyframeOrder,
 	sortedArray,
 	flattenJSON,

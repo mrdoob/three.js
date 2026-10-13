@@ -1,12 +1,14 @@
 import {
 	CullFaceNone, CullFaceBack, CullFaceFront, DoubleSide, BackSide,
 	NormalBlending, NoBlending, CustomBlending, AddEquation,
-	AdditiveBlending, SubtractiveBlending, MultiplyBlending, SubtractEquation, ReverseSubtractEquation,
+	AdditiveBlending, SubtractiveBlending, MultiplyBlending, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation,
 	ZeroFactor, OneFactor, SrcColorFactor, SrcAlphaFactor, SrcAlphaSaturateFactor, DstColorFactor, DstAlphaFactor,
 	OneMinusSrcColorFactor, OneMinusSrcAlphaFactor, OneMinusDstColorFactor, OneMinusDstAlphaFactor,
+	ConstantColorFactor, OneMinusConstantColorFactor, ConstantAlphaFactor, OneMinusConstantAlphaFactor,
 	NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth,
 	MaterialBlending
 } from '../../../constants.js';
+import { Color } from '../../../math/Color.js';
 import { Vector4 } from '../../../math/Vector4.js';
 import { error, ReversedDepthFuncs, warnOnce } from '../../../utils.js';
 
@@ -62,6 +64,8 @@ class WebGLState {
 		this.currentBlendDst = null;
 		this.currentBlendSrcAlpha = null;
 		this.currentBlendDstAlpha = null;
+		this.currentBlendColor = new Color( 0, 0, 0 );
+		this.currentBlendAlpha = 0;
 		this.currentPremultipledAlpha = null;
 		this.currentPolygonOffsetFactor = null;
 		this.currentPolygonOffsetUnits = null;
@@ -108,7 +112,9 @@ class WebGLState {
 		equationToGL = {
 			[ AddEquation ]: gl.FUNC_ADD,
 			[ SubtractEquation ]: gl.FUNC_SUBTRACT,
-			[ ReverseSubtractEquation ]: gl.FUNC_REVERSE_SUBTRACT
+			[ ReverseSubtractEquation ]: gl.FUNC_REVERSE_SUBTRACT,
+			[ MinEquation ]: gl.MIN,
+			[ MaxEquation ]: gl.MAX
 		};
 
 		factorToGL = {
@@ -122,7 +128,11 @@ class WebGLState {
 			[ OneMinusSrcColorFactor ]: gl.ONE_MINUS_SRC_COLOR,
 			[ OneMinusSrcAlphaFactor ]: gl.ONE_MINUS_SRC_ALPHA,
 			[ OneMinusDstColorFactor ]: gl.ONE_MINUS_DST_COLOR,
-			[ OneMinusDstAlphaFactor ]: gl.ONE_MINUS_DST_ALPHA
+			[ OneMinusDstAlphaFactor ]: gl.ONE_MINUS_DST_ALPHA,
+			[ ConstantColorFactor ]: gl.CONSTANT_COLOR,
+			[ OneMinusConstantColorFactor ]: gl.ONE_MINUS_CONSTANT_COLOR,
+			[ ConstantAlphaFactor ]: gl.CONSTANT_ALPHA,
+			[ OneMinusConstantAlphaFactor ]: gl.ONE_MINUS_CONSTANT_ALPHA
 		};
 
 		const scissorParam = gl.getParameter( gl.SCISSOR_BOX );
@@ -424,7 +434,7 @@ class WebGLState {
 	 * Defines the blending.
 	 *
 	 * This method caches the state so `gl.blendEquation()`, `gl.blendEquationSeparate()`,
-	 * `gl.blendFunc()` and  `gl.blendFuncSeparate()` are only called when necessary.
+	 * `gl.blendFunc()`, `gl.blendFuncSeparate()` and `gl.blendColor()` are only called when necessary.
 	 *
 	 * @param {number} blending - The blending type.
 	 * @param {number} blendEquation - The blending equation.
@@ -433,9 +443,11 @@ class WebGLState {
 	 * @param {number} blendEquationAlpha - Only relevant for custom blending. The blending equation for alpha.
 	 * @param {number} blendSrcAlpha - Only relevant for custom blending. The alpha source blending factor.
 	 * @param {number} blendDstAlpha - Only relevant for custom blending. The alpha destination blending factor.
+	 * @param {Color} blendColor - Only relevant for custom blending. The RGB values of the constant blend color.
+	 * @param {number} blendAlpha - Only relevant for custom blending. The alpha value of the constant blend color.
 	 * @param {boolean} premultipliedAlpha - Whether premultiplied alpha is enabled or not.
 	 */
-	setBlending( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha, premultipliedAlpha ) {
+	setBlending( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha, blendColor, blendAlpha, premultipliedAlpha ) {
 
 		const { gl } = this;
 
@@ -563,6 +575,15 @@ class WebGLState {
 			this.currentBlendDst = blendDst;
 			this.currentBlendSrcAlpha = blendSrcAlpha;
 			this.currentBlendDstAlpha = blendDstAlpha;
+
+		}
+
+		if ( blendColor.equals( this.currentBlendColor ) === false || blendAlpha !== this.currentBlendAlpha ) {
+
+			gl.blendColor( blendColor.r, blendColor.g, blendColor.b, blendAlpha );
+
+			this.currentBlendColor.copy( blendColor );
+			this.currentBlendAlpha = blendAlpha;
 
 		}
 
@@ -915,7 +936,7 @@ class WebGLState {
 
 		( material.blending === NormalBlending && material.transparent === false )
 			? this.setBlending( NoBlending )
-			: this.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.premultipliedAlpha );
+			: this.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha, material.blendColor, material.blendAlpha, material.premultipliedAlpha );
 
 		this.setDepthFunc( material.depthFunc );
 		this.setDepthTest( material.depthTest );
@@ -938,27 +959,26 @@ class WebGLState {
 			? this.enable( gl.SAMPLE_ALPHA_TO_COVERAGE )
 			: this.disable( gl.SAMPLE_ALPHA_TO_COVERAGE );
 
-		if ( hardwareClippingPlanes > 0 ) {
 
-			if ( this.currentClippingPlanes !== hardwareClippingPlanes ) {
+		if ( this.currentClippingPlanes !== hardwareClippingPlanes ) {
 
-				const CLIP_DISTANCE0_WEBGL = 0x3000;
+			const CLIP_DISTANCE0_WEBGL = 0x3000;
 
-				for ( let i = 0; i < 8; i ++ ) {
+			for ( let i = 0; i < 8; i ++ ) {
 
-					if ( i < hardwareClippingPlanes ) {
+				if ( i < hardwareClippingPlanes ) {
 
-						this.enable( CLIP_DISTANCE0_WEBGL + i );
+					this.enable( CLIP_DISTANCE0_WEBGL + i );
 
-					} else {
+				} else {
 
-						this.disable( CLIP_DISTANCE0_WEBGL + i );
-
-					}
+					this.disable( CLIP_DISTANCE0_WEBGL + i );
 
 				}
 
 			}
+
+			this.currentClippingPlanes = hardwareClippingPlanes;
 
 		}
 
@@ -984,10 +1004,17 @@ class WebGLState {
 
 			if ( this.currentPolygonOffsetFactor !== factor || this.currentPolygonOffsetUnits !== units ) {
 
-				gl.polygonOffset( factor, units );
-
 				this.currentPolygonOffsetFactor = factor;
 				this.currentPolygonOffsetUnits = units;
+
+				if ( this.currentDepthReversed ) {
+
+					factor = - factor;
+					units = - units;
+
+				}
+
+				gl.polygonOffset( factor, units );
 
 			}
 
@@ -1140,7 +1167,7 @@ class WebGLState {
 
 			if ( drawBuffers === undefined ) {
 
-				drawBuffers = [];
+				drawBuffers = [ gl.COLOR_ATTACHMENT0 ];
 				this.currentDrawbuffers.set( framebuffer, drawBuffers );
 
 			}
@@ -1148,7 +1175,7 @@ class WebGLState {
 
 			const textures = renderContext.textures;
 
-			if ( drawBuffers.length !== textures.length || drawBuffers[ 0 ] !== gl.COLOR_ATTACHMENT0 ) {
+			if ( drawBuffers.length !== textures.length ) {
 
 				for ( let i = 0, il = textures.length; i < il; i ++ ) {
 
@@ -1320,7 +1347,7 @@ class WebGLState {
 	/**
 	 * Returns the value for the given parameter.
 	 *
-	 * @param {number} name - The paramter to get the value for.
+	 * @param {number} name - The parameter to get the value for.
 	 * @return {any} The value for the given parameter.
 	 */
 	getParameter( name ) {
@@ -1442,6 +1469,8 @@ class WebGLState {
 		this.currentBlendDst = null;
 		this.currentBlendSrcAlpha = null;
 		this.currentBlendDstAlpha = null;
+		this.currentBlendColor.set( 0, 0, 0 );
+		this.currentBlendAlpha = 0;
 		this.currentPremultipledAlpha = null;
 		this.currentPolygonOffsetFactor = null;
 		this.currentPolygonOffsetUnits = null;

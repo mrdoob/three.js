@@ -72,6 +72,15 @@ class Color4 extends Color {
 
 	}
 
+	*[ Symbol.iterator ]() {
+
+		yield this.r;
+		yield this.g;
+		yield this.b;
+		yield this.a;
+
+	}
+
 }
 
 export default Color4;

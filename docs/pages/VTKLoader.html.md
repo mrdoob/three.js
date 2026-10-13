@@ -18,7 +18,7 @@ scene.add( mesh );
 
 ## Import
 
-VTKLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+VTKLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { VTKLoader } from 'three/addons/loaders/VTKLoader.js';

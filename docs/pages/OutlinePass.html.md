@@ -14,7 +14,7 @@ composer.addPass( outlinePass );
 
 ## Import
 
-OutlinePass is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+OutlinePass is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js';

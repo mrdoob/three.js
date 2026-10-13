@@ -1,5 +1,5 @@
-import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, logarithmicDepthToViewZ, luminance, max, min, mix, mul, nodeObject, normalize, orthographicDepthToViewZ, passTexture, perspectiveDepthToViewZ, reference, reflect, sub, texture, trunc, uniform, uv, vec2, vec3, vec4, viewZToPerspectiveDepth, context } from 'three/tsl';
-import { HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, TempNode, Vector2, Vector3 } from 'three/webgpu';
+import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, logarithmicDepthToViewZ, luminance, max, min, mix, mul, nodeObject, normalize, orthographicDepthToViewZ, passTexture, perspectiveDepthToViewZ, reference, reflect, sub, texture, trunc, uniform, uv, vec2, vec3, vec4, viewZToPerspectiveDepth, context, isBackgroundDepth } from 'three/tsl';
+import { HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2, Vector3 } from 'three/webgpu';
 import { bindAnalyticNoise } from '../utils/RNoise.js';
 import { ENV_RAY_LENGTH, getSpecularDominantFactor, ggxReflectionSample } from '../utils/SpecularHelpers.js';
 import { boxBlur } from './boxBlur.js';
@@ -30,10 +30,10 @@ const MAX_STEPS = 64;
  *
  * Reference: {@link https://lettier.github.io/3d-game-shaders-for-beginners/screen-space-reflection.html}
  *
- * @augments TempNode
+ * @augments Node
  * @three_import import { ssr } from 'three/addons/tsl/display/SSRNode.js';
  */
-class SSRNode extends TempNode {
+class SSRNode extends Node {
 
 	static get type() {
 
@@ -812,7 +812,7 @@ class SSRNode extends TempNode {
 
 			return cross( point.sub( linePointA ), point.sub( linePointB ) ).length().div( linePointB.sub( linePointA ).length() );
 
-		} );
+		}, { point: 'vec3', linePointA: 'vec3', linePointB: 'vec3', return: 'float' } );
 
 		const pointPlaneDistance = Fn( ( [ point, planePoint, planeNormal ] ) => {
 
@@ -825,7 +825,7 @@ class SSRNode extends TempNode {
 			const distance = mul( planeNormal.x, point.x ).add( mul( planeNormal.y, point.y ) ).add( mul( planeNormal.z, point.z ) ).add( d );
 			return distance;
 
-		} );
+		}, { point: 'vec3', planePoint: 'vec3', planeNormal: 'vec3', return: 'float' } );
 
 		const getViewZ = Fn( ( [ depth ] ) => {
 
@@ -878,14 +878,7 @@ class SSRNode extends TempNode {
 
 			return t.smoothstep( 0, 1 ).pow( 0.125 );
 
-		} ).setLayout( {
-			name: 'computeScreenBorderFactor',
-			type: 'float',
-			inputs: [
-				{ name: 'uvCoord', type: 'vec2' },
-				{ name: 'borderWidth', type: 'float' }
-			]
-		} );
+		}, { uvCoord: 'vec2', borderWidth: 'float', return: 'float' } );
 
 		const ssr = Fn( () => {
 
@@ -895,7 +888,7 @@ class SSRNode extends TempNode {
 			const depth = sampleDepth( uvPos ).toVar();
 
 			// Skip background pixels (cleared far-plane depth); the target is cleared each frame.
-			depth.greaterThanEqual( 1.0 ).discard();
+			isBackgroundDepth( depth ).discard();
 
 			const viewPosition = getViewPosition( uvPos, depth, this._cameraProjectionMatrixInverse ).toVar();
 			const worldPosition = this._cameraWorldMatrix.mul( vec4( viewPosition, 1.0 ) ).xyz.toVar();
@@ -953,6 +946,8 @@ class SSRNode extends TempNode {
 				specDominantFactor = getSpecularDominantFactor( ggxSample.get( 'NdotV' ), roughness ).toVar();
 
 				sampleEnvReflection = () => {
+
+					if ( this._importanceEnvironment === null ) return vec3( 0 );
 
 					const envColor = vec3( 0 ).toVar();
 
@@ -1315,6 +1310,8 @@ class SSRNode extends TempNode {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this._ssrRenderTarget.dispose();
 		this._blurRenderTarget.dispose();
 
@@ -1346,9 +1343,9 @@ export default SSRNode;
  * @param {SSRNodeOptions} [options] - Optional inputs for material and environment data.
  * @returns {SSRNode}
  */
-export const ssr = ( colorNode, depthNode, normalNode, options = {} ) => nodeObject( new SSRNode(
+export const ssr = ( colorNode, depthNode, normalNode, options = {} ) => new SSRNode(
 	nodeObject( colorNode ),
 	nodeObject( depthNode ),
 	nodeObject( normalNode ),
 	options
-) );
+);

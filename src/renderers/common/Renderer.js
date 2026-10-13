@@ -19,6 +19,7 @@ import Lighting from './Lighting.js';
 import XRManager from './XRManager.js';
 import InspectorBase from './InspectorBase.js';
 import CanvasTarget from './CanvasTarget.js';
+import { AttributeType } from './Constants.js';
 
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
@@ -30,7 +31,7 @@ import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
-import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping, LinearFilter, HalfFloatType, RGBAFormat, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap } from '../../constants.js';
+import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping, LinearFilter, HalfFloatType, RGBAFormat, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap, RenderObjectRefreshType } from '../../constants.js';
 
 import { float, vec3, vec4, Fn } from '../../nodes/tsl/TSLCore.js';
 import { reference } from '../../nodes/accessors/ReferenceNode.js';
@@ -283,6 +284,14 @@ class Renderer {
 		this._onCanvasTargetResize = this._onCanvasTargetResize.bind( this );
 
 		/**
+		 * OnCanvasTargetDispose callback function.
+		 *
+		 * @private
+		 * @type {Function}
+		 */
+		this._onCanvasTargetDispose = this._onCanvasTargetDispose.bind( this );
+
+		/**
 		 * The canvas target for rendering.
 		 *
 		 * @private
@@ -290,6 +299,7 @@ class Renderer {
 		 */
 		this._canvasTarget = new CanvasTarget( backend.getDomElement() );
 		this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
+		this._canvasTarget.addEventListener( 'dispose', this._onCanvasTargetDispose );
 		this._canvasTarget.isDefaultCanvasTarget = true;
 
 		/**
@@ -662,14 +672,14 @@ class Renderer {
 		this._compilationPromises = null;
 
 		/**
-		 * Whether the renderer is currently precompiling a render object in
-		 * `compileAsync()`.
+		 * The state of the current precompilation in `compileAsync()`.
+		 * `null` when the renderer is not precompiling.
 		 *
 		 * @private
-		 * @type {boolean}
-		 * @default false
+		 * @type {?Object}
+		 * @default null
 		 */
-		this._isPreCompiling = false;
+		this._precompilationState = null;
 
 		/**
 		 * When an override material is in use, this property points to the current
@@ -828,7 +838,7 @@ class Renderer {
 			this._animation = new Animation( this, this._nodes, this.info );
 			this._attributes = new Attributes( backend, this.info );
 			this._background = new Background( this, this._nodes );
-			this._geometries = new Geometries( this._attributes, this.info );
+			this._geometries = new Geometries( backend, this._attributes, this.info );
 			this._textures = new Textures( this, backend, this.info );
 			this._pipelines = new Pipelines( backend, this._nodes, this.info );
 			this._bindings = new Bindings( backend, this._nodes, this._textures, this._attributes, this._pipelines, this.info );
@@ -841,12 +851,6 @@ class Renderer {
 
 			this._animation.start();
 			this._initialized = true;
-
-			//
-
-			this._inspector.init();
-
-			//
 
 			resolve( this );
 
@@ -936,8 +940,17 @@ class Renderer {
 		const outputRenderTarget = this._renderTarget || this._outputRenderTarget;
 		const useXRCamera = this.xr.isPresenting === true && this.isOutputTarget;
 		const renderTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : outputRenderTarget;
-		const renderContext = this._renderContexts.get( renderTarget, this._mrt );
+
+		const activeCubeFace = this._activeCubeFace;
 		const activeMipmapLevel = this._activeMipmapLevel;
+
+		// a state snapshot is taken once at the beginning and reapplied every time precompilation continues
+
+		const precompilationState = { useFrameBufferTarget, renderTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel };
+
+		this._beginPreCompile( precompilationState );
+
+		const renderContext = this._renderContexts.get( renderTarget, this._mrt, this._callDepth );
 
 		const compilationPromises = [];
 
@@ -1058,40 +1071,51 @@ class Renderer {
 		this._handleObjectFunction = previousHandleObjectFunction;
 		this._compilationPromises = previousCompilationPromises;
 
+		this._finishPreCompile();
+
 		// Process compilation work items sequentially to avoid freezing
 		// Yields between objects to keep animation smooth
 
 		const total = compilationPromises.length;
 		let loaded = 0;
 
+		const yieldPreCompile = async () => {
+
+			this._finishPreCompile();
+
+			await yieldToMain();
+
+			this._beginPreCompile( precompilationState );
+
+		};
+
 		for ( const item of compilationPromises ) {
+
+			const pipelinePromises = [];
 
 			const renderObject = this._objects.get( item.object, item.material, item.scene, item.camera, item.lightsNode, item.renderContext, item.clippingContext, item.passId );
 			renderObject.drawRange = item.object.geometry.drawRange;
 			renderObject.group = item.group;
 
-			// Use async node building to yield to main thread
-			await this._nodes.getForRenderAsync( renderObject );
+			this._beginPreCompile( precompilationState );
 
-			this._isPreCompiling = true; // note: no awaits are allowed when this flag is true otherwise the state leaks outside of this method
+			await this._nodes.getForRenderAsync( renderObject, yieldPreCompile );
 			this._nodes.updateBefore( renderObject );
 			this._geometries.updateForRender( renderObject );
 			this._nodes.updateForRender( renderObject );
 			this._bindings.updateForRender( renderObject );
-			this._isPreCompiling = false;
-
-			// Wait for pipeline creation
-			const pipelinePromises = [];
 			this._pipelines.getForRender( renderObject, pipelinePromises );
+			this._nodes.updateAfter( renderObject );
+
+			this._finishPreCompile();
+
 			if ( pipelinePromises.length > 0 ) {
+
+				// Wait for pipeline creation
 
 				await Promise.all( pipelinePromises );
 
 			}
-
-			this._isPreCompiling = true;
-			this._nodes.updateAfter( renderObject );
-			this._isPreCompiling = false;
 
 			loaded ++;
 
@@ -1105,6 +1129,43 @@ class Renderer {
 			await yieldToMain();
 
 		}
+
+	}
+
+	/**
+	 * Sets up the renderer state for precompiling in `compileAsync()`.
+	 * The state must be restored with `_finishPreCompile()` before yielding to the main thread,
+	 * otherwise it leaks into renders executed in the meantime.
+	 *
+	 * @private
+	 * @param {Object} precompilationState - The precompilation state.
+	 */
+	_beginPreCompile( precompilationState ) {
+
+		const { useFrameBufferTarget, renderTarget } = precompilationState;
+
+		if ( useFrameBufferTarget === true ) this.setRenderTarget( renderTarget );
+
+		this._callDepth ++;
+
+		this._precompilationState = precompilationState;
+
+	}
+
+	/**
+	 * Restores the renderer state after precompiling in `compileAsync()`.
+	 *
+	 * @private
+	 */
+	_finishPreCompile() {
+
+		const { useFrameBufferTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel } = this._precompilationState;
+
+		if ( useFrameBufferTarget === true ) this.setRenderTarget( outputRenderTarget, activeCubeFace, activeMipmapLevel );
+
+		this._callDepth --;
+
+		this._precompilationState = null;
 
 	}
 
@@ -1169,6 +1230,7 @@ class Renderer {
 
 			await nodes.getForComputeAsync( computeNode );
 
+			nodes.updateBeforeForCompute( computeNode );
 			nodes.updateForCompute( computeNode );
 			bindings.updateForCompute( computeNode );
 
@@ -1177,6 +1239,8 @@ class Renderer {
 
 			pipelines.getForCompute( computeNode, computeBindings, compilationPromises );
 			await Promise.all( compilationPromises );
+
+			nodes.updateAfterForCompute( computeNode );
 
 			loaded ++;
 
@@ -1450,13 +1514,24 @@ class Renderer {
 
 				const renderObject = renderObjects[ i ];
 
-				if ( this._nodes.needsRefresh( renderObject ) ) {
+				const refreshType = this._nodes.needsRefresh( renderObject );
+
+				if ( refreshType === RenderObjectRefreshType.FULL ) {
 
 					this._nodes.updateBefore( renderObject );
 
 					this._geometries.updateForRender( renderObject );
 					this._nodes.updateForRender( renderObject );
 					this._bindings.updateForRender( renderObject );
+
+					this._nodes.updateAfter( renderObject );
+
+				} else if ( refreshType === RenderObjectRefreshType.SHARED ) {
+
+					this._nodes.updateBefore( renderObject );
+
+					this._nodes.updateForRender( renderObject );
+					this._bindings.updateSharedForRender( renderObject );
 
 					this._nodes.updateAfter( renderObject );
 
@@ -1511,7 +1586,9 @@ class Renderer {
 
 	_renderOutputLayers( quad, renderTarget ) {
 
-		if ( renderTarget.texture.isArrayTexture !== true || renderTarget.texture.image.depth <= 1 ) {
+		const useMultiview = this.backend.isWebGLBackend === true && renderTarget.multiview === true;
+
+		if ( useMultiview || renderTarget.texture.isArrayTexture !== true || renderTarget.texture.image.depth <= 1 ) {
 
 			this._renderScene( quad, quad.camera, false );
 			return;
@@ -1550,12 +1627,7 @@ class Renderer {
 	 */
 	_getFrameBufferTarget() {
 
-		const { currentToneMapping, currentColorSpace } = this;
-
-		const useToneMapping = currentToneMapping !== NoToneMapping;
-		const useColorSpace = currentColorSpace !== ColorManagement.workingColorSpace;
-
-		if ( useToneMapping === false && useColorSpace === false ) return null;
+		if ( this.needsFrameBufferTarget === false ) return null;
 
 		const { width, height } = this.getDrawingBufferSize( _drawingBufferSize );
 		const { depth, stencil } = this;
@@ -1588,6 +1660,16 @@ class Renderer {
 				frameBufferTarget.dispose();
 
 				this._frameBufferTargets.delete( target );
+
+				const quadData = this._quadCache.get( frameBufferTarget );
+
+				if ( quadData !== undefined ) {
+
+					quadData.quad.material.dispose();
+
+					this._quadCache.delete( frameBufferTarget );
+
+				}
 
 			};
 
@@ -1767,10 +1849,6 @@ class Renderer {
 
 		}
 
-		this.getDrawingBufferSize( _drawingBufferSize );
-
-		_screen.set( 0, 0, _drawingBufferSize.width, _drawingBufferSize.height );
-
 		const minDepth = ( viewport.minDepth === undefined ) ? 0 : viewport.minDepth;
 		const maxDepth = ( viewport.maxDepth === undefined ) ? 1 : viewport.maxDepth;
 
@@ -1779,10 +1857,8 @@ class Renderer {
 		renderContext.viewportValue.height >>= activeMipmapLevel;
 		renderContext.viewportValue.minDepth = minDepth;
 		renderContext.viewportValue.maxDepth = maxDepth;
-		renderContext.viewport = renderContext.viewportValue.equals( _screen ) === false;
 
 		renderContext.scissorValue.copy( scissor ).multiplyScalar( pixelRatio ).floor();
-		renderContext.scissor = canvasTarget._scissorTest && renderContext.scissorValue.equals( _screen ) === false;
 		renderContext.scissorValue.width >>= activeMipmapLevel;
 		renderContext.scissorValue.height >>= activeMipmapLevel;
 
@@ -1840,6 +1916,8 @@ class Renderer {
 
 		} else {
 
+			this.getDrawingBufferSize( _drawingBufferSize );
+
 			renderContext.textures = null;
 			renderContext.depthTexture = null;
 			renderContext.width = _drawingBufferSize.width;
@@ -1871,6 +1949,11 @@ class Renderer {
 			renderContext.scissorValue.height = Math.max( renderContext.height - renderContext.scissorValue.y, 0 );
 
 		}
+
+		_screen.set( 0, 0, renderContext.width, renderContext.height );
+
+		renderContext.viewport = renderContext.viewportValue.equals( _screen ) === false;
+		renderContext.scissor = canvasTarget._scissorTest && renderContext.scissorValue.equals( _screen ) === false;
 
 		//
 
@@ -1955,7 +2038,7 @@ class Renderer {
 
 		const cacheKey = this._nodes.getOutputCacheKey();
 
-		let quadData = this._quadCache.get( renderTarget.texture );
+		let quadData = this._quadCache.get( renderTarget );
 		let quad;
 
 		if ( quadData === undefined ) {
@@ -1971,21 +2054,7 @@ class Renderer {
 				cacheKey
 			};
 
-			this._quadCache.set( renderTarget.texture, quadData );
-
-			// dispose logic
-
-			const dispose = () => {
-
-				quad.material.dispose();
-
-				this._quadCache.delete( renderTarget.texture );
-
-				renderTarget.texture.removeEventListener( 'dispose', dispose );
-
-			};
-
-			renderTarget.texture.addEventListener( 'dispose', dispose );
+			this._quadCache.set( renderTarget, quadData );
 
 		} else {
 
@@ -2083,10 +2152,10 @@ class Renderer {
 	 * from the GPU to the CPU in context of compute shaders.
 	 *
 	 * @async
-	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
-	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
-	 * @param {number} offset - The storage buffer attribute.
-	 * @param {number} count - The offset from which to start reading the
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read from.
+	 * @param {?(ReadbackBuffer|ArrayBuffer)} [target=null] - The readback buffer or array buffer that receives the data. If `null`, a new array buffer is returned.
+	 * @param {number} [offset=0] - The byte offset to start reading from. Must be a multiple of 4.
+	 * @param {number} [count=-1] - The number of bytes to read. Must be a multiple of 4, or `-1` to read to the end of the buffer.
 	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
 	async getArrayBufferAsync( attribute, target = null, offset = 0, count = - 1 ) {
@@ -2599,6 +2668,7 @@ class Renderer {
 	 * Returns `true` if a framebuffer target is needed to perform tone mapping or color space conversion.
 	 * If this is the case, the renderer allocates an internal render target for that purpose.
 	 *
+	 * @type {boolean}
 	 */
 	get needsFrameBufferTarget() {
 
@@ -2687,22 +2757,28 @@ class Renderer {
 	 * Frees all internal resources of the renderer. Call this method if the renderer
 	 * is no longer in use by your app.
 	 */
-	dispose() {
+	async dispose() {
+
+		// edge case: If dispose() is called during an init, wait for the finish
+
+		if ( this._initPromise !== null ) {
+
+			await this.init();
+
+		}
 
 		if ( this._initialized === true ) {
 
-			this.info.dispose();
-			this.backend.dispose();
-
+			this._inspector.dispose();
 			this._animation.dispose();
 			this._objects.dispose();
 			this._geometries.dispose();
+			this._attributes.dispose();
 			this._pipelines.dispose();
 			this._nodes.dispose();
 			this._bindings.dispose();
 			this._renderLists.dispose();
 			this._renderContexts.dispose();
-			this._textures.dispose();
 
 			for ( const canvasTarget of this._frameBufferTargets.keys() ) {
 
@@ -2710,16 +2786,16 @@ class Renderer {
 
 			}
 
-			Object.values( this.backend.timestampQueryPool ).forEach( queryPool => {
+			this._destroyCanvasTarget( this._canvasTarget );
 
-				if ( queryPool !== null ) queryPool.dispose();
+			this._textures.dispose();
+			this.info.dispose();
 
-			} );
+			await this.backend.dispose();
 
 		}
 
 		this.setRenderTarget( null );
-		this.setAnimationLoop( null );
 
 	}
 
@@ -2782,9 +2858,12 @@ class Renderer {
 	setCanvasTarget( canvasTarget ) {
 
 		this._canvasTarget.removeEventListener( 'resize', this._onCanvasTargetResize );
+		// keep any dispose event listener attached for later use
 
 		this._canvasTarget = canvasTarget;
+
 		this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
+		this._canvasTarget.addEventListener( 'dispose', this._onCanvasTargetDispose );
 
 	}
 
@@ -2878,9 +2957,23 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			warn( 'Renderer: .compute() called before the backend is initialized. Try using .computeAsync() instead.' );
+			warn( 'Renderer: ".compute()" called before the backend is initialized. Try using ".computeAsync()" instead.' );
 
 			return this.computeAsync( computeNodes, dispatchSize );
+
+		}
+
+		const computeList = Array.isArray( computeNodes ) ? computeNodes : [ computeNodes ];
+
+		if ( computeList.length === 0 || computeList.some( computeNode => computeNode?.isComputeNode !== true ) ) {
+
+			throw new Error( 'THREE.Renderer: ".compute()" expects a "ComputeNode".' );
+
+		}
+
+		if ( dispatchSize !== null && computeList.some( computeNode => computeNode.count !== null || computeNode.dispatchSize !== null ) ) {
+
+			throw new Error( 'THREE.Renderer: A dispatch size cannot be passed to "renderer.compute()" for nodes created with "compute( count )". Use "computeKernel()" instead.' );
 
 		}
 
@@ -2910,14 +3003,6 @@ class Renderer {
 		const pipelines = this._pipelines;
 		const bindings = this._bindings;
 		const nodes = this._nodes;
-
-		const computeList = Array.isArray( computeNodes ) ? computeNodes : [ computeNodes ];
-
-		if ( computeList[ 0 ] === undefined || computeList[ 0 ].isComputeNode !== true ) {
-
-			throw new Error( 'THREE.Renderer: .compute() expects a ComputeNode.' );
-
-		}
 
 		backend.beginCompute( computeNodes );
 
@@ -2951,13 +3036,18 @@ class Renderer {
 
 			}
 
+			nodes.updateBeforeForCompute( computeNode );
 			nodes.updateForCompute( computeNode );
 			bindings.updateForCompute( computeNode );
 
 			const computeBindings = bindings.getForCompute( computeNode );
 			const computePipeline = pipelines.getForCompute( computeNode, computeBindings );
 
+			this._updateDispatchSize( computeNode, dispatchSize );
+
 			backend.compute( computeNodes, computeNode, computeBindings, computePipeline, dispatchSize );
+
+			nodes.updateAfterForCompute( computeNode );
 
 		}
 
@@ -3685,6 +3775,26 @@ class Renderer {
 	}
 
 	/**
+	 * Updates the indirect storage attribute that defines the dispatch size
+	 * of the given compute node, if any.
+	 *
+	 * @private
+	 * @param {ComputeNode} computeNode - The compute node.
+	 * @param {?(number|Array<number>|IndirectStorageBufferAttribute)} dispatchSize - The dispatch size of the compute call.
+	 */
+	_updateDispatchSize( computeNode, dispatchSize ) {
+
+		const indirect = dispatchSize !== null ? dispatchSize : computeNode.dispatchSize;
+
+		if ( indirect && indirect.isIndirectStorageBufferAttribute === true ) {
+
+			this._attributes.update( indirect, AttributeType.INDIRECT );
+
+		}
+
+	}
+
+	/**
 	 * This method represents the default render object function that manages the render lifecycle
 	 * of the object.
 	 *
@@ -3863,9 +3973,9 @@ class Renderer {
 
 		//
 
-		const needsRefresh = this._nodes.needsRefresh( renderObject );
+		const refreshType = this._nodes.needsRefresh( renderObject );
 
-		if ( needsRefresh ) {
+		if ( refreshType === RenderObjectRefreshType.FULL ) {
 
 			this._nodes.updateBefore( renderObject );
 
@@ -3873,6 +3983,13 @@ class Renderer {
 
 			this._nodes.updateForRender( renderObject );
 			this._bindings.updateForRender( renderObject );
+
+		} else if ( refreshType === RenderObjectRefreshType.SHARED ) {
+
+			this._nodes.updateBefore( renderObject );
+
+			this._nodes.updateForRender( renderObject );
+			this._bindings.updateSharedForRender( renderObject );
 
 		}
 
@@ -3884,7 +4001,7 @@ class Renderer {
 
 			this.backend.draw( renderObject, this.info );
 
-			if ( needsRefresh ) this._nodes.updateAfter( renderObject );
+			if ( refreshType !== RenderObjectRefreshType.NONE ) this._nodes.updateAfter( renderObject );
 
 		}
 
@@ -3954,6 +4071,32 @@ class Renderer {
 	_onCanvasTargetResize() {
 
 		if ( this._initialized ) this.backend.updateSize();
+
+	}
+
+	/**
+	 * Callback when a canvas target has been disposed.
+	 *
+	 * @private
+	 * @param {Object} event - The dispose event.
+	 */
+	_onCanvasTargetDispose( event ) {
+
+		this._destroyCanvasTarget( event.target );
+
+	}
+
+	/**
+	 * Frees the GPU resources of the given canvas target.
+	 *
+	 * @private
+	 * @param {CanvasTarget} canvasTarget - The canvas target.
+	 */
+	_destroyCanvasTarget( canvasTarget ) {
+
+		canvasTarget.removeEventListener( 'dispose', this._onCanvasTargetDispose );
+
+		if ( this._initialized ) this.backend.destroyCanvasTarget( canvasTarget );
 
 	}
 
