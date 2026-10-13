@@ -1,4 +1,4 @@
-import { DataTexture, FloatType, RGBAFormat, Vector2, Vector3, LightsNode, NodeUpdateType } from 'three/webgpu';
+import { DataTexture, FloatType, RGBAFormat, Vector2, Vector3, LightsNode, NodeUpdateType, PointLightNode, SpotLightNode } from 'three/webgpu';
 
 import {
 	instancedArray, nodeProxy, int, float, vec3, vec4, ivec2, ivec4, uniform, Break, Loop, positionView,
@@ -66,7 +66,7 @@ class ClusteredLightsNode extends LightsNode {
 		this._isWebGLBackend = false;
 		this._invocationsPerCluster = 1;
 		this._lightIndexes = null;
-		this._retiredLightIndexes = null;
+		this._retired = [];
 		this._screenClusterIndex = null;
 		this._compute = null;
 
@@ -333,10 +333,6 @@ class ClusteredLightsNode extends LightsNode {
 
 		const { renderer, camera } = frame;
 
-		// storage replaced in a previous frame: the materials have been rebuilt since
-
-		this._disposeRetiredStorage();
-
 		this._updateProgram( renderer );
 
 		this._updateLightsTexture( camera );
@@ -352,8 +348,9 @@ class ClusteredLightsNode extends LightsNode {
 
 	/**
 	 * Configures this node with an array of lights. Point and spot lights without
-	 * shadows are clustered (except spot lights with projected textures), all other
-	 * lights use the default lighting.
+	 * shadows are clustered (except lights with a `colorNode`, spot lights with a
+	 * projected `map` and light types with their own light node, like `IESSpotLight`
+	 * or `ProjectorLight`), all other lights use the default lighting.
 	 *
 	 * @param {Array<Light>} lights - An array of lights.
 	 * @return {ClusteredLightsNode} A reference to this node.
@@ -395,11 +392,17 @@ class ClusteredLightsNode extends LightsNode {
 	 */
 	_isClusteredLight( light ) {
 
-		if ( light.castShadow === true ) return false;
+		// Shadows, color nodes (any light) and projected maps (spot lights) are not supported.
 
-		if ( light.isPointLight === true ) return true;
+		if ( light.castShadow === true || light.colorNode ) return false;
 
-		return light.isSpotLight === true && ! light.map && ! light.colorNode;
+		// Only lights shaded by the plain point and spot light nodes are clustered. Subclasses
+		// registered with their own light node (e.g. IESSpotLight, ProjectorLight) keep the
+		// default lighting, since clustering would shade them as plain spot lights.
+
+		if ( light._lightNode === PointLightNode ) return true;
+
+		return light._lightNode === SpotLightNode && ! light.map;
 
 	}
 
@@ -614,7 +617,8 @@ class ClusteredLightsNode extends LightsNode {
 
 	/**
 	 * Sets the size of the cluster grid. Must be called with the new drawing buffer
-	 * size whenever the renderer is resized.
+	 * size whenever the renderer is resized. Called outside of rendering, so it also
+	 * frees the resources replaced by rebuilds.
 	 *
 	 * @param {number} width - The drawing buffer width.
 	 * @param {number} height - The drawing buffer height.
@@ -624,12 +628,16 @@ class ClusteredLightsNode extends LightsNode {
 
 		this._resize( this._getBufferFitSize( width ), this._getBufferFitSize( height ) );
 
+		this._disposeRetired();
+
 		return this;
 
 	}
 
 	/**
 	 * Creates the cluster grid on first use and resizes it when the drawing buffer size changes.
+	 * Runs during rendering (possibly nested), so replaced resources are only retired here and
+	 * freed by {@link ClusteredLightsNode#setSize} or {@link ClusteredLightsNode#dispose}.
 	 *
 	 * @private
 	 * @param {Renderer} renderer - The renderer.
@@ -699,21 +707,16 @@ class ClusteredLightsNode extends LightsNode {
 		const NX = int( grid.x );
 		const NY = int( grid.y );
 
-		// release the compute pipeline and bindings built for the previous grid
-
-		if ( this._compute !== null ) this._compute.dispose();
-
 		// Per-cluster light-index storage (ivec4 chunks), grown geometrically.
 
 		const requiredElements = clusterCount * chunksPerCluster;
 		const previousElements = this._lightIndexes !== null ? this._lightIndexes.value.array.length / 4 : 0;
 		const elements = previousElements === 0 ? Math.ceil( requiredElements * 1.5 ) : Math.max( requiredElements, previousElements * 2 );
 
-		// the current storage may still be bound by materials rendered in this frame,
-		// so it is disposed in the next updateBefore()
+		// the previous compute and storage may still be in use by the current (or an outer)
+		// render, so they are retired instead of disposed
 
-		this._disposeRetiredStorage();
-		this._retiredLightIndexes = this._lightIndexes;
+		if ( this._compute !== null ) this._retired.push( this._compute, this._lightIndexes.value );
 
 		// instanced storage: WebGL computes use gl_InstanceID as instanceIndex; PBO: random access in the fragment stage
 		const lightIndexes = instancedArray( new Int32Array( elements * 4 ), 'ivec4' ).setPBO( true ).setName( 'lightIndexes' );
@@ -843,9 +846,17 @@ class ClusteredLightsNode extends LightsNode {
 
 			const firstElement = clusterIndex.mul( chunksPerCluster ).add( firstChunk );
 
-			Loop( chunksPerInvocation, ( { i } ) => {
+			// Never write past the allocated storage. The capacity constant also gives each allocation
+			// its own compute program: WebGL binds the transform feedback buffers per program, so a
+			// rebuilt compute must not share the program of a retired one that is not disposed yet.
 
-				lightIndexes.element( firstElement.add( i ) ).assign( chunks.element( i ) );
+			If( firstElement.lessThan( int( elements ) ), () => {
+
+				Loop( chunksPerInvocation, ( { i } ) => {
+
+					lightIndexes.element( firstElement.add( i ) ).assign( chunks.element( i ) );
+
+				} );
 
 			} );
 
@@ -882,18 +893,16 @@ class ClusteredLightsNode extends LightsNode {
 	}
 
 	/**
-	 * Disposes the light index storage replaced by the last rebuild, if any.
+	 * Frees the compute nodes and light index storages replaced by rebuilds.
+	 * Must only be called outside of rendering.
 	 *
 	 * @private
 	 */
-	_disposeRetiredStorage() {
+	_disposeRetired() {
 
-		if ( this._retiredLightIndexes !== null ) {
+		for ( const object of this._retired ) object.dispose();
 
-			this._retiredLightIndexes.value.dispose();
-			this._retiredLightIndexes = null;
-
-		}
+		this._retired.length = 0;
 
 	}
 
@@ -902,7 +911,7 @@ class ClusteredLightsNode extends LightsNode {
 	 */
 	dispose() {
 
-		this._disposeRetiredStorage();
+		this._disposeRetired();
 
 		if ( this._compute !== null ) this._compute.dispose();
 		if ( this._lightIndexes !== null ) this._lightIndexes.value.dispose();
