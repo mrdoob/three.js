@@ -1,7 +1,7 @@
-import { BackSide, Color, CustomBlending, DoubleSide, HalfFloatType, Mesh, MeshLambertNodeMaterial, NodeMaterial, OneFactor, OrthographicCamera, QuadMesh, RenderTarget, Scene, Vector2 } from 'three/webgpu';
+import { BackSide, CustomBlending, DoubleSide, HalfFloatType, Mesh, MeshLambertNodeMaterial, NodeMaterial, OneFactor, OrthographicCamera, QuadMesh, RendererUtils, RenderTarget, Scene, Vector2 } from 'three/webgpu';
 import { Fn, If, Loop, ivec2, lights, normalViewGeometry, normalWorldGeometry, output, positionWorld, screenCoordinate, textureLoad, uniform, uv, vec4 } from 'three/tsl';
 
-const _clearColor = /*@__PURE__*/ new Color();
+let _rendererState;
 
 /**
  * Bakes indirect diffuse irradiance into a light map. The irradiance is defined by a
@@ -41,9 +41,6 @@ class LightMapper {
 	 * @param {Array<Light>} [options.lights=[]] - Direct lights to include in the diffuse bake. Render their shadows in the source scene first and disable shadow updates during the UV bake.
 	 */
 	constructor( renderer, size, irradianceNode, { lights = [] } = {} ) {
-
-		if ( ! Number.isInteger( size ) || size <= 0 ) throw new RangeError( 'LightMapper: Size must be a positive integer.' );
-		if ( typeof irradianceNode !== 'function' ) throw new TypeError( 'LightMapper: An irradiance function is required.' );
 
 		/**
 		 * The renderer.
@@ -136,17 +133,11 @@ class LightMapper {
 
 	/**
 	 * Adds meshes to the light map. Their geometries must provide `uv1`.
+	 * Skinned and instanced meshes are not supported.
 	 *
 	 * @param {Array<Mesh>} objects - The meshes to add.
 	 */
 	addObjects( objects ) {
-
-		for ( const object of objects ) {
-
-			if ( ! object.isMesh || ! object.geometry.hasAttribute( 'uv1' ) ) throw new Error( 'LightMapper: Each mesh must have a uv1 attribute.' );
-			if ( object.isSkinnedMesh || object.isInstancedMesh ) throw new Error( 'LightMapper: Bake static meshes with unique UVs.' );
-
-		}
 
 		for ( const object of objects ) {
 
@@ -172,50 +163,36 @@ class LightMapper {
 	 */
 	update( samples = 1 ) {
 
-		if ( ! Number.isInteger( samples ) || samples < 0 ) throw new RangeError( 'LightMapper: Samples must be a non-negative integer.' );
-		if ( samples === 0 ) return;
-
 		const renderer = this.renderer;
 
-		const renderTarget = renderer.getRenderTarget();
-		const autoClear = renderer.autoClear;
-		const clearAlpha = renderer.getClearAlpha();
-		renderer.getClearColor( _clearColor );
+		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
-		try {
+		renderer.autoClear = false;
+		renderer.setClearColor( 0x000000, 0 );
+		renderer.setRenderTarget( this._accumulation );
 
-			renderer.autoClear = false;
-			renderer.setClearColor( 0x000000, 0 );
-			renderer.setRenderTarget( this._accumulation );
+		if ( this.samples === 0 ) renderer.clear();
 
-			if ( this.samples === 0 ) renderer.clear();
+		for ( let i = 0; i < this._objects.length; i ++ ) {
 
-			for ( let i = 0; i < this._objects.length; i ++ ) {
-
-				this._objects[ i ].updateWorldMatrix( true, false );
-				this._scene.children[ i ].matrix.copy( this._objects[ i ].matrixWorld );
-
-			}
-
-			for ( let i = 0; i < samples; i ++ ) {
-
-				this._jitter.value.set( halton( this.samples + 1, 2 ) - 0.5, halton( this.samples + 1, 3 ) - 0.5 ).multiplyScalar( 2 / this.size );
-
-				renderer.render( this._scene, this._camera );
-				this.samples ++;
-
-			}
-
-			renderer.setRenderTarget( this._renderTarget );
-			this._quad.render( renderer );
-
-		} finally {
-
-			renderer.setRenderTarget( renderTarget );
-			renderer.setClearColor( _clearColor, clearAlpha );
-			renderer.autoClear = autoClear;
+			this._objects[ i ].updateWorldMatrix( true, false );
+			this._scene.children[ i ].matrix.copy( this._objects[ i ].matrixWorld );
 
 		}
+
+		for ( let i = 0; i < samples; i ++ ) {
+
+			this._jitter.value.set( halton( this.samples + 1, 2 ) - 0.5, halton( this.samples + 1, 3 ) - 0.5 ).multiplyScalar( 2 / this.size );
+
+			renderer.render( this._scene, this._camera );
+			this.samples ++;
+
+		}
+
+		renderer.setRenderTarget( this._renderTarget );
+		this._quad.render( renderer );
+
+		RendererUtils.restoreRendererState( renderer, _rendererState );
 
 	}
 
@@ -269,7 +246,8 @@ class LightMapper {
 
 		if ( directLights.length > 0 ) {
 
-			// Bake diffuse irradiance with white albedo, leaving specular lighting out.
+			// bake diffuse irradiance with white albedo, leaving specular lighting out
+
 			material.lightsNode = lights( directLights );
 			material.normalNode = flipNormal ? normalViewGeometry.negate() : normalViewGeometry;
 			material.emissiveNode = irradianceNode( positionWorld, normal ).div( Math.PI );
