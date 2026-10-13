@@ -285,6 +285,13 @@ class WebGLState {
 
 	}
 
+	/**
+	 * Defines the blending for each draw buffer of a MRT-configured render target.
+	 *
+	 * @param {Array<Texture>} textures - The textures of the render target.
+	 * @param {?MRTNode} mrt - The MRT configuration.
+	 * @param {Material} material - The material whose blending is used for outputs with `MaterialBlending`.
+	 */
 	setMRTBlending( textures, mrt, material ) {
 
 		const gl = this.gl;
@@ -339,8 +346,7 @@ class WebGLState {
 
 		}
 
-		// the indexed calls above changed the blend state of all draw buffers, including the first one,
-		// so the cached state of setBlending() is invalid now
+		// invalidate cache
 
 		this.currentBlending = null;
 		this.currentBlendEquation = null;
