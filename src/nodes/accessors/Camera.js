@@ -123,6 +123,14 @@ export const cameraProjectionMatrix = /*@__PURE__*/ ( Fn( ( { camera, renderer }
 } ).once() )();
 
 /**
+ * TSL object that represents whether the camera has a perspective projection.
+ *
+ * @tsl
+ * @type {Node<bool>}
+ */
+export const cameraIsPerspective = /*@__PURE__*/ cameraProjectionMatrix.element( 2 ).element( 3 ).equal( - 1.0 );
+
+/**
  * TSL object that represents the inverse projection matrix of the camera used for the current render.
  *
  * @tsl
