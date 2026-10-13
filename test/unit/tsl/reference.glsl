@@ -262,7 +262,7 @@ for ( int i = 0; i < 2; i ++ ) {
 
 ( nodeVar0 + externalValue )
 
-// variable intent scope
+// assignable scope
 
 float explicitGlobal;
 explicitGlobal = 1.0;
@@ -271,6 +271,20 @@ nodeVar0 = ( nodeVar0 + explicitGlobal );
 explicitGlobal = ( explicitGlobal + nodeVar0 );
 
 ( explicitGlobal + nodeVar0 )
+
+// assignable shared constants
+
+float nodeVar0 = 1.0;
+nodeVar0 = 2.0;
+
+vec3( nodeVar0, 1.0, 1.0 )
+
+// assignable existing assignment
+
+float nodeVar0 = 1.0;
+nodeVar0 = 2.0;
+
+nodeVar0
 
 // comparison and logic
 
@@ -1035,6 +1049,81 @@ float fn0 ( float value ) {
 }
 
 fn0( 3.0 )
+
+// shared constant assigned
+
+float nodeVar0 = 0.0;
+nodeVar0 = 1.0;
+
+( nodeVar0 + 0.0 )
+
+// converted node assigned
+
+float nodeConst0 = ( nodeVarying0.x + 1.0 );
+float nodeVar0 = nodeConst0;
+nodeVar0 = 5.0;
+
+( nodeVar0 + nodeConst0 )
+
+// converted uniform assigned
+
+float nodeVar0 = nodeUniform0;
+nodeVar0 = ( nodeVar0 + 1.0 );
+
+( nodeVar0 + nodeUniform0 )
+
+// node outside function assigned
+
+float nodeVar0 = 2.0;
+nodeVar0 = 3.0;
+
+( nodeVar0 * 2.0 )
+
+// operation swizzle assigned
+
+vec3 nodeVar0 = ( vec3( nodeVarying0, 1.0 ) * vec3( 2.0 ) );
+nodeVar0.y = 0.0;
+nodeVar0.xz = ( nodeVar0.xz + vec2( 1.0 ) );
+
+vec4( nodeVar0, 1.0 )
+
+// operation assigned inside and outside conditional
+
+float nodeVar0 = ( 0.25 * nodeVarying0.y );
+
+if ( ( nodeVarying0.x > 0.5 ) ) {
+
+	nodeVar0 = ( nodeVar0 * 2.0 );
+
+}
+
+nodeVar0 = ( nodeVar0 + 1.0 );
+
+nodeVar0
+
+// join component assigned
+
+vec3 nodeVar0 = vec3( nodeVarying0.x, 0.0, 1.0 );
+nodeVar0.z = 2.0;
+
+nodeVar0
+
+// cached expression inside loop
+
+float nodeVar0 = 0.0;
+
+for ( int i = 0; i < 3; i ++ ) {
+
+	float nodeConst0 = ( float( i ) * 0.5 );
+	nodeVar0 = ( nodeVar0 + ( nodeConst0 * nodeConst0 ) );
+
+}
+
+nodeVar0
+
+// overridden function call
+
+( nodeVarying0.y * 2.0 )
 
 // layout local variables
 
