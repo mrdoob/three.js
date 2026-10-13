@@ -503,6 +503,14 @@ class Backend {
 	 */
 	updateViewport( /*renderContext*/ ) {}
 
+	/**
+	 * Frees the GPU resources of the given canvas target.
+	 *
+	 * @abstract
+	 * @param {CanvasTarget} canvasTarget - The canvas target.
+	 */
+	destroyCanvasTarget( /*canvasTarget*/ ) {}
+
 	// utils
 
 	/**

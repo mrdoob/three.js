@@ -3552,45 +3552,44 @@ class ShaderCallNodeInternal extends Node {
 
 		let result = null;
 
-		if ( shaderNode.layout ) {
+		// A layout call needs every input. Missing inputs are completed with the default values
+		// of the function parameters; if they can't be resolved, the function is expanded inline.
 
-			// build inputs first
+		const layoutInputs = shaderNode.layout ? builder._getLayoutInputs( shaderNode, rawInputs ) : null;
 
-			if ( rawInputs ) {
+		if ( layoutInputs !== null ) {
 
-				// use layout inputs to ensure that no extra parameters are built
+			// build inputs first, use layout inputs to ensure that no extra parameters are built
 
-				const inputs = shaderNode.layout.inputs;
+			const layoutParameters = shaderNode.layout.inputs;
 
-				if ( isArrayAsParameter( rawInputs ) ) {
+			if ( isArrayAsParameter( layoutInputs ) ) {
 
-					const rawArrayParameters = rawInputs;
+				const rawArrayParameters = layoutInputs;
 
-					for ( let i = 0; i < inputs.length; i ++ ) {
+				for ( let i = 0; i < layoutParameters.length; i ++ ) {
 
-						const rawParameter = rawArrayParameters[ i ];
+					const rawParameter = rawArrayParameters[ i ];
 
-						if ( rawParameter && rawParameter.isNode ) {
+					if ( rawParameter && rawParameter.isNode ) {
 
-							rawParameter.build( builder );
-
-						}
+						rawParameter.build( builder );
 
 					}
 
-				} else {
+				}
 
-					const rawObjectParameters = rawInputs[ 0 ];
+			} else {
 
-					for ( const param of inputs ) {
+				const rawObjectParameters = layoutInputs[ 0 ];
 
-						const rawParameter = rawObjectParameters[ param.name ];
+				for ( const param of layoutParameters ) {
 
-						if ( rawParameter && rawParameter.isNode ) {
+					const rawParameter = rawObjectParameters[ param.name ];
 
-							rawParameter.build( builder );
+					if ( rawParameter && rawParameter.isNode ) {
 
-						}
+						rawParameter.build( builder );
 
 					}
 
@@ -3604,7 +3603,7 @@ class ShaderCallNodeInternal extends Node {
 
 			//
 
-			const inputs = rawInputs ? getLayoutParameters( rawInputs ) : null;
+			const inputs = getLayoutParameters( layoutInputs );
 
 			result = functionNode.call( inputs );
 
@@ -4190,6 +4189,12 @@ function Fn( jsFunc, layout = null ) {
 
 	// Layout functions are cached across shaders of the same backend. Their bodies
 	// must depend only on explicit inputs and constants, not uniforms or material context.
+	//
+	// Parameters can have default values. A call without some inputs passes the defaults as
+	// arguments, so values like `uv()` are evaluated at the call site. The defaults are resolved
+	// once per function and shared by all calls: a value that must be evaluated per build should
+	// be a node like `Fn( ... ).once()().toVar( name )`. If a default depends on another
+	// parameter, that call is expanded inline.
 
 	const instance = new FnNode( jsFunc, layout );
 
@@ -11233,6 +11238,15 @@ class RenderOutputNode extends Node {
 		this.outputColorSpace = outputColorSpace;
 
 		/**
+		 * Whether the color node uses premultiplied alpha. The output
+		 * uses the same alpha mode.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.premultipliedAlpha = true;
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -11276,7 +11290,11 @@ class RenderOutputNode extends Node {
 		outputNode = vec4( outputNode.rgb, outputNode.a.clamp( 0.0, 1.0 ) );
 
 		// unpremultiply
-		outputNode = unpremultiplyAlpha( outputNode );
+		if ( this.premultipliedAlpha === true ) {
+
+			outputNode = unpremultiplyAlpha( outputNode );
+
+		}
 
 		// tone mapping
 		const toneMapping = ( this._toneMapping !== null ? this._toneMapping : context.toneMapping ) || NoToneMapping;
@@ -11297,7 +11315,11 @@ class RenderOutputNode extends Node {
 		}
 
 		// premultiply in output color space
-		outputNode = premultiplyAlpha( outputNode );
+		if ( this.premultipliedAlpha === true ) {
+
+			outputNode = premultiplyAlpha( outputNode );
+
+		}
 
 		return outputNode;
 
@@ -16200,28 +16222,51 @@ const viewportCoordinate = /*@__PURE__*/ screenCoordinate.sub( viewport.xy );
  */
 const viewportUV = /*@__PURE__*/ viewportCoordinate.div( viewportSize );
 
-// Cache node uniforms
+// Cache single-camera uniforms globally. Array uniforms are cached per renderer and
+// camera count so cameras with different array sizes cannot overwrite each other's
+// buffers, while builders with matching counts still share them.
+
+const _cameraArrays = /*@__PURE__*/ new WeakMap();
+
+function getCameraArray( renderer, camera, name, create ) {
+
+	let arrays = _cameraArrays.get( renderer );
+
+	if ( arrays === undefined ) {
+
+		arrays = new Map();
+		_cameraArrays.set( renderer, arrays );
+
+	}
+
+	const key = name + ':' + camera.cameras.length;
+
+	let array = arrays.get( key );
+
+	if ( array === undefined ) {
+
+		array = create( camera );
+		arrays.set( key, array );
+
+	}
+
+	return array;
+
+}
 
 let _cameraProjectionMatrixBase = null;
-let _cameraProjectionMatrixArray = null;
 
 let _cameraProjectionMatrixInverseBase = null;
-let _cameraProjectionMatrixInverseArray = null;
 
 let _cameraViewMatrixBase = null;
-let _cameraViewMatrixArray = null;
 
 let _cameraWorldMatrixBase = null;
-let _cameraWorldMatrixArray = null;
 
 let _cameraNormalMatrixBase = null;
-let _cameraNormalMatrixArray = null;
 
 let _cameraPositionBase = null;
-let _cameraPositionArray = null;
 
 let _cameraViewportBase = null;
-let _cameraViewportArray = null;
 
 /**
  * TSL object that represents the current `index` value of the camera if used ArrayCamera.
@@ -16253,31 +16298,29 @@ const cameraFar = /*@__PURE__*/ uniform( 'float' ).setName( 'cameraFar' ).setGro
  * @tsl
  * @type {UniformNode<mat4>}
  */
-const cameraProjectionMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
+const cameraProjectionMatrix = /*@__PURE__*/ ( Fn( ( { camera, renderer } ) => {
 
 	let cameraProjectionMatrix;
 
 	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
 
-		const matrices = [];
+		const cameraArray = getCameraArray( renderer, camera, 'cameraProjectionMatrices', ( camera ) => {
 
-		for ( const subCamera of camera.cameras ) {
+			const values = camera.cameras.map( ( subCamera ) => subCamera.projectionMatrix );
 
-			matrices.push( subCamera.projectionMatrix );
+			return uniformArray( values ).setGroup( renderGroup ).setName( 'cameraProjectionMatrices' ).onRenderUpdate( ( { camera }, self ) => {
 
-		}
+				for ( let i = 0; i < camera.cameras.length; i ++ ) {
 
-		if ( _cameraProjectionMatrixArray === null ) {
+					self.array[ i ] = camera.cameras[ i ].projectionMatrix;
 
-			_cameraProjectionMatrixArray = uniformArray( matrices ).setGroup( renderGroup ).setName( 'cameraProjectionMatrices' );
+				}
 
-		} else {
+			} );
 
-			_cameraProjectionMatrixArray.array = matrices;
+		} );
 
-		}
-
-		cameraProjectionMatrix = _cameraProjectionMatrixArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
+		cameraProjectionMatrix = cameraArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
 
 	} else {
 
@@ -16301,31 +16344,29 @@ const cameraProjectionMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
  * @tsl
  * @type {UniformNode<mat4>}
  */
-const cameraProjectionMatrixInverse = /*@__PURE__*/ ( Fn( ( { camera } ) => {
+const cameraProjectionMatrixInverse = /*@__PURE__*/ ( Fn( ( { camera, renderer } ) => {
 
 	let cameraProjectionMatrixInverse;
 
 	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
 
-		const matrices = [];
+		const cameraArray = getCameraArray( renderer, camera, 'cameraProjectionMatricesInverse', ( camera ) => {
 
-		for ( const subCamera of camera.cameras ) {
+			const values = camera.cameras.map( ( subCamera ) => subCamera.projectionMatrixInverse );
 
-			matrices.push( subCamera.projectionMatrixInverse );
+			return uniformArray( values ).setGroup( renderGroup ).setName( 'cameraProjectionMatricesInverse' ).onRenderUpdate( ( { camera }, self ) => {
 
-		}
+				for ( let i = 0; i < camera.cameras.length; i ++ ) {
 
-		if ( _cameraProjectionMatrixInverseArray === null ) {
+					self.array[ i ] = camera.cameras[ i ].projectionMatrixInverse;
 
-			_cameraProjectionMatrixInverseArray = uniformArray( matrices ).setGroup( renderGroup ).setName( 'cameraProjectionMatricesInverse' );
+				}
 
-		} else {
+			} );
 
-			_cameraProjectionMatrixInverseArray.array = matrices;
+		} );
 
-		}
-
-		cameraProjectionMatrixInverse = _cameraProjectionMatrixInverseArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
+		cameraProjectionMatrixInverse = cameraArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
 
 	} else {
 
@@ -16349,31 +16390,29 @@ const cameraProjectionMatrixInverse = /*@__PURE__*/ ( Fn( ( { camera } ) => {
  * @tsl
  * @type {UniformNode<mat4>}
  */
-const cameraViewMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
+const cameraViewMatrix = /*@__PURE__*/ ( Fn( ( { camera, renderer } ) => {
 
 	let cameraViewMatrix;
 
 	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
 
-		const matrices = [];
+		const cameraArray = getCameraArray( renderer, camera, 'cameraViewMatrices', ( camera ) => {
 
-		for ( const subCamera of camera.cameras ) {
+			const values = camera.cameras.map( ( subCamera ) => subCamera.matrixWorldInverse );
 
-			matrices.push( subCamera.matrixWorldInverse );
+			return uniformArray( values ).setGroup( renderGroup ).setName( 'cameraViewMatrices' ).onRenderUpdate( ( { camera }, self ) => {
 
-		}
+				for ( let i = 0; i < camera.cameras.length; i ++ ) {
 
-		if ( _cameraViewMatrixArray === null ) {
+					self.array[ i ] = camera.cameras[ i ].matrixWorldInverse;
 
-			_cameraViewMatrixArray = uniformArray( matrices ).setGroup( renderGroup ).setName( 'cameraViewMatrices' );
+				}
 
-		} else {
+			} );
 
-			_cameraViewMatrixArray.array = matrices;
+		} );
 
-		}
-
-		cameraViewMatrix = _cameraViewMatrixArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
+		cameraViewMatrix = cameraArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
 
 	} else {
 
@@ -16397,31 +16436,29 @@ const cameraViewMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
  * @tsl
  * @type {UniformNode<mat4>}
  */
-const cameraWorldMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
+const cameraWorldMatrix = /*@__PURE__*/ ( Fn( ( { camera, renderer } ) => {
 
 	let cameraWorldMatrix;
 
 	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
 
-		const matrices = [];
+		const cameraArray = getCameraArray( renderer, camera, 'cameraWorldMatrices', ( camera ) => {
 
-		for ( const subCamera of camera.cameras ) {
+			const values = camera.cameras.map( ( subCamera ) => subCamera.matrixWorld );
 
-			matrices.push( subCamera.matrixWorld );
+			return uniformArray( values ).setGroup( renderGroup ).setName( 'cameraWorldMatrices' ).onRenderUpdate( ( { camera }, self ) => {
 
-		}
+				for ( let i = 0; i < camera.cameras.length; i ++ ) {
 
-		if ( _cameraWorldMatrixArray === null ) {
+					self.array[ i ] = camera.cameras[ i ].matrixWorld;
 
-			_cameraWorldMatrixArray = uniformArray( matrices ).setGroup( renderGroup ).setName( 'cameraWorldMatrices' );
+				}
 
-		} else {
+			} );
 
-			_cameraWorldMatrixArray.array = matrices;
+		} );
 
-		}
-
-		cameraWorldMatrix = _cameraWorldMatrixArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
+		cameraWorldMatrix = cameraArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
 
 	} else {
 
@@ -16445,31 +16482,29 @@ const cameraWorldMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
  * @tsl
  * @type {UniformNode<mat3>}
  */
-const cameraNormalMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
+const cameraNormalMatrix = /*@__PURE__*/ ( Fn( ( { camera, renderer } ) => {
 
 	let cameraNormalMatrix;
 
 	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
 
-		const matrices = [];
+		const cameraArray = getCameraArray( renderer, camera, 'cameraNormalMatrices', ( camera ) => {
 
-		for ( const subCamera of camera.cameras ) {
+			const values = camera.cameras.map( ( subCamera ) => subCamera.normalMatrix );
 
-			matrices.push( subCamera.normalMatrix );
+			return uniformArray( values ).setGroup( renderGroup ).setName( 'cameraNormalMatrices' ).onRenderUpdate( ( { camera }, self ) => {
 
-		}
+				for ( let i = 0; i < camera.cameras.length; i ++ ) {
 
-		if ( _cameraNormalMatrixArray === null ) {
+					self.array[ i ] = camera.cameras[ i ].normalMatrix;
 
-			_cameraNormalMatrixArray = uniformArray( matrices ).setGroup( renderGroup ).setName( 'cameraNormalMatrices' );
+				}
 
-		} else {
+			} );
 
-			_cameraNormalMatrixArray.array = matrices;
+		} );
 
-		}
-
-		cameraNormalMatrix = _cameraNormalMatrixArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
+		cameraNormalMatrix = cameraArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
 
 	} else {
 
@@ -16493,23 +16528,23 @@ const cameraNormalMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
  * @tsl
  * @type {UniformNode<vec3>}
  */
-const cameraPosition = /*@__PURE__*/ ( Fn( ( { camera } ) => {
+const cameraPosition = /*@__PURE__*/ ( Fn( ( { camera, renderer } ) => {
 
 	let cameraPosition;
 
 	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
 
-		const positions = [];
+		const cameraArray = getCameraArray( renderer, camera, 'cameraPositions', ( camera ) => {
 
-		for ( let i = 0, l = camera.cameras.length; i < l; i ++ ) {
+			const positions = [];
 
-			positions.push( new Vector3() );
+			for ( let i = 0, l = camera.cameras.length; i < l; i ++ ) {
 
-		}
+				positions.push( new Vector3() );
 
-		if ( _cameraPositionArray === null ) {
+			}
 
-			_cameraPositionArray = uniformArray( positions ).setGroup( renderGroup ).setName( 'cameraPositions' ).onRenderUpdate( ( { camera }, self ) => {
+			return uniformArray( positions ).setGroup( renderGroup ).setName( 'cameraPositions' ).onRenderUpdate( ( { camera }, self ) => {
 
 				const subCameras = camera.cameras;
 				const array = self.array;
@@ -16522,13 +16557,9 @@ const cameraPosition = /*@__PURE__*/ ( Fn( ( { camera } ) => {
 
 			} );
 
-		} else {
+		} );
 
-			_cameraPositionArray.array = positions;
-
-		}
-
-		cameraPosition = _cameraPositionArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
+		cameraPosition = cameraArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
 
 	} else {
 
@@ -16553,31 +16584,29 @@ const cameraPosition = /*@__PURE__*/ ( Fn( ( { camera } ) => {
  * @tsl
  * @type {UniformNode<vec4>}
  */
-const cameraViewport = /*@__PURE__*/ ( Fn( ( { camera } ) => {
+const cameraViewport = /*@__PURE__*/ ( Fn( ( { camera, renderer } ) => {
 
 	let cameraViewport;
 
 	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
 
-		const viewports = [];
+		const cameraArray = getCameraArray( renderer, camera, 'cameraViewports', ( camera ) => {
 
-		for ( const subCamera of camera.cameras ) {
+			const values = camera.cameras.map( ( subCamera ) => subCamera.viewport );
 
-			viewports.push( subCamera.viewport );
+			return uniformArray( values, 'vec4' ).setGroup( renderGroup ).setName( 'cameraViewports' ).onRenderUpdate( ( { camera }, self ) => {
 
-		}
+				for ( let i = 0; i < camera.cameras.length; i ++ ) {
 
-		if ( _cameraViewportArray === null ) {
+					self.array[ i ] = camera.cameras[ i ].viewport;
 
-			_cameraViewportArray = uniformArray( viewports, 'vec4' ).setGroup( renderGroup ).setName( 'cameraViewports' );
+				}
 
-		} else {
+			} );
 
-			_cameraViewportArray.array = viewports;
+		} );
 
-		}
-
-		cameraViewport = _cameraViewportArray.element( cameraIndex );
+		cameraViewport = cameraArray.element( cameraIndex );
 
 	} else {
 
@@ -17142,7 +17171,7 @@ class FunctionOverloadingNode extends Node {
 						const param = params[ i ];
 						const input = inputs[ i ];
 
-						if ( param.getNodeType( builder ) === input.type ) {
+						if ( builder.getVectorType( param.getNodeType( builder ) ) === input.type ) {
 
 							currentScore ++;
 
@@ -17975,7 +18004,7 @@ const rotateUV = /*@__PURE__*/ Fn( ( [ uv, rotation, center = vec2( 0.5 ) ] ) =>
 
 	return rotate( uv.sub( center ), rotation ).add( center );
 
-} );
+}, { uv: 'vec2', rotation: 'float', center: 'vec2', return: 'vec2' } );
 
 /**
  * Applies a spherical warping effect to the given uv coordinates.
@@ -17996,7 +18025,7 @@ const spherizeUV = /*@__PURE__*/ Fn( ( [ uv, strength, center = vec2( 0.5 ) ] ) 
 
 	return uv.add( delta.mul( deltaOffset ) );
 
-} );
+}, { uv: 'vec2', strength: 'float', center: 'vec2', return: 'vec2' } );
 
 /**
  * This can be used to achieve a billboarding behavior for flat meshes. That means they are
@@ -20516,6 +20545,11 @@ class ReflectorBaseNode extends Node {
 
 		virtualCamera.updateMatrixWorld();
 		virtualCamera.projectionMatrix.copy( camera.projectionMatrix );
+
+		// The reflection is mirrored horizontally, so the view offset must be mirrored as well.
+
+		virtualCamera.projectionMatrix.elements[ 8 ] *= -1;
+		virtualCamera.projectionMatrix.elements[ 12 ] *= -1;
 
 		// Now update projection matrix with new clip plane, implementing code from: http://www.terathon.com/code/oblique.html
 		// Paper explaining this technique: http://www.terathon.com/lengyel/Lengyel-Oblique.pdf
@@ -23837,7 +23871,6 @@ const batch = /*@__PURE__*/ Fn( ( [ batchMesh ], builder ) => {
 }, 'void' );
 
 const _skeletonsUpdated = /*@__PURE__*/ new WeakMap();
-const _previousBoneMatricesData = /*@__PURE__*/ new WeakMap();
 
 /**
  * Creates an accessor for bone matrices stored in a bone texture.
@@ -23982,62 +24015,65 @@ function getSkinnedNormalAndTangent( boneMatrices, normal, tangent, bindMatrix, 
 }
 
 /**
- * Retrieves or initializes the previous frame skinned position node for motion vectors.
- * Uses a WeakMap to cache previous frame bone matrix arrays and their TSL buffer nodes.
+ * Creates the bone data of the previous frame if they do not exist yet.
  *
- * @param {NodeBuilder} builder - The current node builder.
- * @param {SkinnedMesh} skinnedMesh - The skinned mesh.
- * @param {Node<mat4>} bindMatrixNode - The bind matrix node.
- * @param {Node<mat4>} bindMatrixInverseNode - The inverse bind matrix node.
- * @param {Node<uvec4>} skinIndexNode - The skin index attribute.
- * @param {Node<vec4>} skinWeightNode - The skin weight attribute.
- * @returns {Node<vec3>} The skinned position from the previous frame.
+ * @param {Skeleton} skeleton - The skeleton.
  */
-function getPreviousSkinnedPosition( builder, skinnedMesh, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode ) {
+function setupPreviousBoneData( skeleton ) {
 
-	const skeleton = skinnedMesh.skeleton;
-
-	let data = _previousBoneMatricesData.get( skeleton );
-
-	if ( data === undefined ) {
+	if ( skeleton.previousBoneMatrices === null ) {
 
 		skeleton.update();
 
-		const uniformBufferSize = skeleton.bones.length * 16 * 4;
-
-		if ( uniformBufferSize <= builder.getUniformBufferLimit() ) {
-
-			const previousBoneMatrices = new Float32Array( skeleton.boneMatrices );
-
-			data = {
-				previousBoneMatrices,
-				previousBoneTexture: null,
-				node: buffer( previousBoneMatrices, 'mat4', skeleton.bones.length )
-			};
-
-		} else {
-
-			if ( skeleton.boneTexture === null ) skeleton.computeBoneTexture();
-
-			const { width, height } = skeleton.boneTexture.image;
-
-			const previousBoneMatrices = new Float32Array( skeleton.boneMatrices );
-			const previousBoneTexture = new DataTexture( previousBoneMatrices, width, height, RGBAFormat, FloatType );
-			previousBoneTexture.needsUpdate = true;
-
-			data = {
-				previousBoneMatrices,
-				previousBoneTexture,
-				node: getBoneTextureMatrices( texture( previousBoneTexture ) )
-			};
-
-		}
-
-		_previousBoneMatricesData.set( skeleton, data );
+		skeleton.previousBoneMatrices = new Float32Array( skeleton.boneMatrices );
 
 	}
 
-	return getSkinnedPosition( data.node, positionPrevious, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode );
+	if ( skeleton.previousBoneTexture === null && skeleton.boneTexture !== null ) {
+
+		const { width, height } = skeleton.boneTexture.image;
+
+		skeleton.previousBoneTexture = new DataTexture( skeleton.previousBoneMatrices, width, height, RGBAFormat, FloatType );
+		skeleton.previousBoneTexture.needsUpdate = true;
+
+	}
+
+}
+
+/**
+ * Creates the bone matrices node of the previous frame.
+ *
+ * @param {NodeBuilder} builder - The current node builder.
+ * @param {Skeleton} skeleton - The skeleton.
+ * @returns {Object} The previous bone matrices node.
+ */
+function getPreviousBoneMatricesNode( builder, skeleton ) {
+
+	let node;
+
+	setupPreviousBoneData( skeleton );
+
+	const uniformBufferSize = skeleton.bones.length * 16 * 4;
+
+	if ( uniformBufferSize <= builder.getUniformBufferLimit() ) {
+
+		node = referenceBuffer( 'skeleton.previousBoneMatrices', 'mat4', skeleton.bones.length );
+
+	} else {
+
+		const previousBoneTexture = texture( skeleton.previousBoneTexture );
+
+		OnObjectUpdate( ( { object } ) => {
+
+			previousBoneTexture.value = object.skeleton.previousBoneTexture;
+
+		} );
+
+		node = getBoneTextureMatrices( previousBoneTexture );
+
+	}
+
+	return node;
 
 }
 
@@ -24056,24 +24092,25 @@ const skinning = /*@__PURE__*/ Fn( ( [ skinnedMesh ], builder ) => {
 	const bindMatrixNode = reference( 'bindMatrix', 'mat4' );
 	const bindMatrixInverseNode = reference( 'bindMatrixInverse', 'mat4' );
 	const boneMatricesNode = getBoneMatricesNode( builder, skinnedMesh.skeleton );
+	const needsPreviousData = builder.needsPreviousData();
 
 	OnObjectUpdate( ( { object, frameId } ) => {
 
 		const skeleton = object.skeleton;
 
+		if ( needsPreviousData ) setupPreviousBoneData( skeleton );
+
 		if ( _skeletonsUpdated.get( skeleton ) !== frameId ) {
 
 			_skeletonsUpdated.set( skeleton, frameId );
 
-			const skeletonData = _previousBoneMatricesData.get( skeleton );
+			if ( skeleton.previousBoneMatrices !== null ) {
 
-			if ( skeletonData !== undefined ) {
+				skeleton.previousBoneMatrices.set( skeleton.boneMatrices );
 
-				skeletonData.previousBoneMatrices.set( skeleton.boneMatrices );
+				if ( skeleton.previousBoneTexture !== null ) {
 
-				if ( skeletonData.previousBoneTexture !== null ) {
-
-					skeletonData.previousBoneTexture.needsUpdate = true;
+					skeleton.previousBoneTexture.needsUpdate = true;
 
 				}
 
@@ -24085,9 +24122,10 @@ const skinning = /*@__PURE__*/ Fn( ( [ skinnedMesh ], builder ) => {
 
 	} );
 
-	if ( builder.needsPreviousData() ) {
+	if ( needsPreviousData ) {
 
-		const previousSkinnedPosition = getPreviousSkinnedPosition( builder, skinnedMesh, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode );
+		const previousBoneMatricesNode = getPreviousBoneMatricesNode( builder, skinnedMesh.skeleton );
+		const previousSkinnedPosition = getSkinnedPosition( previousBoneMatricesNode, positionPrevious, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode );
 
 		positionPrevious.assign( previousSkinnedPosition );
 
@@ -24138,15 +24176,13 @@ const computeSkinning = /*@__PURE__*/ Fn( ( [ skinnedMesh, toPosition = null ], 
 
 			_skeletonsUpdated.set( skeleton, frameId );
 
-			const state = _previousBoneMatricesData.get( skeleton );
+			if ( skeleton.previousBoneMatrices !== null ) {
 
-			if ( state !== undefined ) {
+				skeleton.previousBoneMatrices.set( skeleton.boneMatrices );
 
-				state.previousBoneMatrices.set( skeleton.boneMatrices );
+				if ( skeleton.previousBoneTexture !== null ) {
 
-				if ( state.previousBoneTexture !== null ) {
-
-					state.previousBoneTexture.needsUpdate = true;
+					skeleton.previousBoneTexture.needsUpdate = true;
 
 				}
 
@@ -24160,7 +24196,10 @@ const computeSkinning = /*@__PURE__*/ Fn( ( [ skinnedMesh, toPosition = null ], 
 
 	if ( builder.needsPreviousData() ) {
 
-		const previousSkinnedPosition = getPreviousSkinnedPosition( builder, skinnedMesh, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode );
+		setupPreviousBoneData( skeleton );
+
+		const previousBoneMatricesNode = buffer( skeleton.previousBoneMatrices, 'mat4', skeleton.bones.length );
+		const previousSkinnedPosition = getSkinnedPosition( previousBoneMatricesNode, positionPrevious, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode );
 
 		positionPrevious.assign( previousSkinnedPosition );
 
@@ -29734,18 +29773,29 @@ const blendColor = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 }, { base: 'vec4', blend: 'vec4', return: 'vec4' } );
 
 /**
+ * TSL object that represents the luminance coefficients of the current working color space.
+ * It is evaluated once per build, so it can also be used as the default value of a parameter
+ * of a function with layout.
+ *
+ * @tsl
+ * @type {VarNode<vec3>}
+ */
+const workingLuminanceCoefficients = /*@__PURE__*/ Fn( () => vec3( ColorManagement.getLuminanceCoefficients( new Vector3() ) ) ).once()().toVar( 'workingLuminanceCoefficients' );
+
+/**
  * Computes a grayscale value for the given RGB color value.
  *
  * @tsl
  * @function
  * @param {Node<vec3>} color - The color value to compute the grayscale for.
- * @return {Node<vec3>} The grayscale color.
+ * @param {Node<vec3>} [luminanceCoefficients] - The luminance coefficients. By default predefined values of the current working color space are used.
+ * @return {Node<float>} The grayscale value.
  */
-const grayscale = /*@__PURE__*/ Fn( ( [ color ] ) => {
+const grayscale = /*@__PURE__*/ Fn( ( [ color, luminanceCoefficients = workingLuminanceCoefficients ] ) => {
 
-	return luminance( color.rgb );
+	return luminance( color.rgb, luminanceCoefficients );
 
-} );
+}, { color: 'vec3', luminanceCoefficients: 'vec3', return: 'float' } );
 
 /**
  * Super-saturates or desaturates the given RGB color.
@@ -29754,13 +29804,14 @@ const grayscale = /*@__PURE__*/ Fn( ( [ color ] ) => {
  * @function
  * @param {Node<vec3>} color - The input color.
  * @param {Node<float>} [adjustment=1] - Specifies the amount of the conversion. A value under `1` desaturates the color, a value over `1` super-saturates it.
+ * @param {Node<vec3>} [luminanceCoefficients] - The luminance coefficients. By default predefined values of the current working color space are used.
  * @return {Node<vec3>} The saturated color.
  */
-const saturation = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
+const saturation = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ), luminanceCoefficients = workingLuminanceCoefficients ] ) => {
 
-	return adjustment.mix( luminance( color.rgb ), color.rgb ).max( 0.0 );
+	return adjustment.mix( luminance( color.rgb, luminanceCoefficients ), color.rgb ).max( 0.0 );
 
-} );
+}, { color: 'vec3', adjustment: 'float', luminanceCoefficients: 'vec3', return: 'vec3' } );
 
 /**
  * Selectively enhance the intensity of less saturated RGB colors. Can result
@@ -29782,7 +29833,7 @@ const vibrance = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 0 ) ] ) => {
 
 	return mix( color.rgb, mx, amt ).max( 0.0 );
 
-} );
+}, { color: 'vec3', adjustment: 'float', return: 'vec3' } );
 
 /**
  * Updates the hue component of the given RGB color while preserving its luminance and saturation.
@@ -29801,7 +29852,7 @@ const hue = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
 
 	return vec3( color.rgb.mul( cosAngle ).add( k.cross( color.rgb ).mul( adjustment.sin() ).add( k.mul( dot( k, color.rgb ).mul( cosAngle.oneMinus() ) ) ) ) ).max( 0.0 );
 
-} );
+}, { color: 'vec3', adjustment: 'float', return: 'vec3' } );
 
 /**
  * Computes the luminance for the given RGB color value.
@@ -29867,7 +29918,7 @@ const cdl = /*@__PURE__*/ Fn( ( [
 
 	return vec4( v.rgb, color.a );
 
-} );
+}, { color: 'vec4', slope: 'vec3', offset: 'vec3', power: 'vec3', saturation: 'float', luminanceCoefficients: 'vec3', return: 'vec4' } );
 
 /**
  * TSL function for creating a posterize effect which reduces the number of colors
@@ -31809,20 +31860,24 @@ class FunctionNode extends CodeNode {
 
 	generate( builder, output ) {
 
-		super.generate( builder );
-
 		const nodeFunction = this.getNodeFunction( builder );
+		const nodeData = builder.getDataFromNode( this );
 
-		const name = nodeFunction.name;
 		const type = nodeFunction.type;
 
-		const nodeCode = builder.getCodeFromNode( this, type );
+		let propertyName = nodeData.functionPropertyName;
 
-		if ( name !== '' ) {
+		if ( propertyName === undefined ) {
 
-			const nodeData = builder.getDataFromNode( this );
+			// The includes and the function code are generated once per builder and shader stage,
+			// further calls only need the function name.
 
-			if ( nodeData.declarationRegistered !== true ) {
+			super.generate( builder );
+
+			const name = nodeFunction.name;
+			const nodeCode = builder.getCodeFromNode( this, type );
+
+			if ( name !== '' ) {
 
 				// use a custom property name
 
@@ -31830,17 +31885,15 @@ class FunctionNode extends CodeNode {
 
 				builder.registerDeclaration( nodeCode );
 
-				nodeData.declarationRegistered = true;
-
 			}
 
+			propertyName = builder.getPropertyName( nodeCode );
+
+			nodeCode.code = nodeFunction.getCode( propertyName ) + '\n';
+
+			nodeData.functionPropertyName = propertyName;
+
 		}
-
-		const propertyName = builder.getPropertyName( nodeCode );
-
-		const code = this.getNodeFunction( builder ).getCode( propertyName );
-
-		nodeCode.code = code + '\n';
 
 		if ( output === 'property' ) {
 
@@ -33964,6 +34017,17 @@ class LightsNode extends Node {
 			_hashData.push( light.id );
 			_hashData.push( light.castShadow ? 1 : 0 );
 
+			if ( light.castShadow === true ) {
+
+				// force rebuild on version change to avoid the usage of removed shadow nodes
+
+				const lightNode = _lightsNodeRef.get( light );
+				const lightVersion = ( lightNode ) ? lightNode.version : -1;
+
+				_hashData.push( lightVersion );
+
+			}
+
 			if ( light.isSpotLight === true ) {
 
 				const hashMap = ( light.map !== null ) ? light.map.id : -1;
@@ -35982,21 +36046,16 @@ class AnalyticLightNode extends LightingNode {
 	 */
 	disposeShadow() {
 
-		if ( this.shadowNode !== null ) {
+		if ( this.shadowNode === null ) return;
 
-			this.shadowNode.dispose();
-			this.shadowNode = null;
-
-		}
-
+		this.shadowNode.dispose();
+		this.shadowNode = null;
 		this.shadowColorNode = null;
 
-		if ( this.baseColorNode !== null ) {
+		this.colorNode = this.baseColorNode;
+		this.baseColorNode = null;
 
-			this.colorNode = this.baseColorNode;
-			this.baseColorNode = null;
-
-		}
+		this.needsUpdate = true;
 
 	}
 
@@ -36121,9 +36180,7 @@ class AnalyticLightNode extends LightingNode {
 
 		} else if ( this.shadowNode !== null ) {
 
-			this.shadowNode.dispose();
-			this.shadowNode = null;
-			this.shadowColorNode = null;
+			this.disposeShadow();
 
 		}
 
@@ -37640,7 +37697,7 @@ const checker = /*@__PURE__*/ Fn( ( [ coord = uv$1() ] ) => {
 
 	return result.sign();
 
-} );
+}, { coord: 'vec2', return: 'float' } );
 
 /**
  * Generates a circle based on the uv coordinates.
@@ -40658,8 +40715,9 @@ var Three_TSL = /*#__PURE__*/Object.freeze({
 	workgroupArray: workgroupArray,
 	workgroupBarrier: workgroupBarrier,
 	workgroupId: workgroupId,
+	workingLuminanceCoefficients: workingLuminanceCoefficients,
 	workingToColorSpace: workingToColorSpace,
 	xor: xor
 });
 
-export { AONode, AnalyticLightNode, ArrayElementNode, ArrayNode, AssignNode, AtomicFunctionNode, AttributeNode, BRDF_EON, BRDF_GGX, BRDF_Lambert, BRDF_Sheen, BarrierNode, BasicPointShadowFilter, BasicShadowFilter, BitcastNode, BitcountNode, BlendMode, Break, BufferAttributeNode, BufferNode, BuiltinNode, BumpMapNode, BypassNode, ChainMap, ClippingNode, CodeNode, Color4, ColorSpaceNode, ComputeBuiltinNode, ComputeNode, ConditionalNode, Const, ConstNode, ContextNode, Continue, ConvertNode, CubeRenderTarget, CubeTextureNode, DFGLUT, D_GGX, D_GGX_Anisotropic, DebugNode, Discard, EON_DirectionalAlbedo, EPSILON, EnvironmentBRDF, EventNode, ExpressionNode, F_Schlick, FlipNode, Fn, FrontFacingNode, FunctionCallNode, FunctionNode, FunctionOverloadingNode, HALF_PI, INFINITY, If, IndexNode, InputNode, InspectorBase, InspectorNode, IrradianceNode, IsolateNode, JoinNode, LTC_Evaluate, LTC_Evaluate_Volume, LTC_Uv, LightingContextNode, LightingNode, LightsNode, Loop, LoopNode, MRTNode, MaterialNode, MaterialReferenceNode, MathNode, MaxMipLevelNode, MemberNode, ModelNode, Node, NodeAccess, NodeError, NodeMaterial, NodeMaterialObserver, NodeShaderStage, NodeType, NodeUpdateType, NodeUtils, NormalMapNode, Object3DNode, OnAfterObjectUpdate, OnAfterRenderPipeline, OnBeforeFrameUpdate, OnBeforeMaterialUpdate, OnBeforeObjectUpdate, OnBeforeRenderPipeline, OnFrameUpdate, OnMaterialUpdate, OnObjectUpdate, OperatorNode, OutputStructNode, OverrideContextNode, PCFShadowFilter, PI, PI2, PMREMGenerator, PMREMNode, PackFloatNode, Packed4x8IntegerNode, ParameterNode, PassNode, PointLightNode, PointShadowFilter, PointShadowNode, PointUVNode, PropertyNode, QuadMesh, RTTNode, RangeNode, ReferenceBaseNode, ReferenceElementNode, ReferenceNode, ReflectorNode, RenderOutputNode, RendererReferenceNode, RendererUtils, Return, RotateNode, SampleNode, Schlick_to_F0, ScreenNode, SetNode, ShaderNode, ShadowBaseNode, ShadowNode, SplitNode, Stack, StackNode, StackTrace, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture3DNode, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubgroupFunctionNode, Switch, TBNViewMatrix, TWO_PI, Texture3DNode, TextureNode, TextureSizeNode, Three_TSL, ToneMappingNode, ToonOutlinePassNode, UniformArrayNode, UniformGroupNode, UniformNode, UnpackFloatNode, UserDataNode, VSMShadowFilter, V_GGX_SmithCorrelated, V_GGX_SmithCorrelated_Anisotropic, Var, VarIntent, VarNode, VaryingNode, VelocityNode, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, WorkgroupInfoNode, abs, acesFilmicToneMapping, acos, acosh, add, addMethodChaining, addNodeElement, agxToneMapping, all, alphaT, ambientOcclusion, and, anisotropy, anisotropyB, anisotropyT, any, array, asin, asinh, assign, atan, atanh, atomicAdd, atomicAnd, atomicFunc, atomicLoad, atomicMax, atomicMin, atomicOr, atomicStore, atomicSub, atomicXor, attenuationColor, attenuationDistance, attribute, attributeArray, backgroundBlurriness, backgroundIntensity, backgroundRotation, batch, batchColor, batchIndirectIndex, bentNormalView, billboarding, bitAnd, bitNot, bitOr, bitXor, bitangentGeometry, bitangentLocal, bitangentView, bitangentViewFrame, bitangentWorld, bitcast, blendBurn, blendColor, blendDodge, blendOverlay, blendScreen, bool, buffer, bufferAttribute, builtin, builtinAOContext, builtinGIContext, builtinShadowContext, bumpMap, bvec2, bvec3, bvec4, bypass, cache, call, cameraFar, cameraIndex, cameraNear, cameraNormalMatrix, cameraPosition, cameraProjectionMatrix, cameraProjectionMatrixInverse, cameraViewMatrix, cameraViewport, cameraWorldMatrix, cbrt, cdl, ceil, checker, cineonToneMapping, clamp, clearcoat, clearcoatNormalView, clearcoatRoughness, clipSpace, clipping, clippingAlpha, code, color, colorSpaceToWorking, colorToDirection, compute, computeKernel, computeSkinning, context, convert, convertColorSpace, convertToTexture, cos, cosh, countLeadingZeros, countOneBits, countTrailingZeros, cross, cubeTexture, cubeTextureBase, dFdx, dFdy, dashSize, debug, decrement, decrementBefore, defaultBuildStages, defaultShaderStages, defined, degrees, deltaTime, densityFogFactor, depth, depthPass, determinant, difference, diffuseColor, diffuseContribution, diffuseRoughness, directPointLight, directionToColor, directionToFaceDirection, dispersion, distance, div, dot, dot4I8Packed, dot4U8Packed, drawIndex, dynamicBufferAttribute, element, emissive, equal, equirectDirection, equirectUV, exp, exp2, exponentialHeightFogFactor, expression, faceDirection, faceForward, faceforward, float, floatBitsToInt, floatBitsToUint, floor, fog, fract, frameGroup, frameId, frontFacing, fwidth, gain, gapSize, getConstNodeType, getCurrentStack, getDistanceAttenuation, getGeometryRoughness, getNormalFromDepth, getParallaxCorrectNormal, getRoughness, getScreenPosition, getScreenPositionFromClip, getShIrradianceAt, getTextureIndex, getTextureType, getTypeFromLength, getViewPosition, globalId, glsl, glslFn, grayscale, greaterThan, greaterThanEqual, hardwareClipping, hash, hashArray, hashString, highpModelNormalViewMatrix, highpModelViewMatrix, hue, increment, incrementBefore, inspect, instance, instanceColor, instanceIndex, instancedArray, instancedBufferAttribute, instancedDynamicBufferAttribute, instancedMesh, int, intBitsToFloat, interleavedGradientNoise, inverse, inverseSqrt, inversesqrt, invocationLocalIndex, invocationSubgroupIndex, ior, iridescence, iridescenceIOR, iridescenceThickness, isBackgroundDepth, isolate, ivec2, ivec3, ivec4, js, label, length, lengthSq, lessThan, lessThanEqual, lightPosition, lightProjectionUV, lightShadowMatrix, lightTargetDirection, lightTargetPosition, lightViewPosition, lightingContext, lights, linearDepth, linearToneMapping, localId, log, log2, logarithmicDepthToViewZ, luminance, mat2, mat3, mat4, matcapUV, materialAO, materialAlphaTest, materialAnisotropy, materialAnisotropyVector, materialAttenuationColor, materialAttenuationDistance, materialClearcoat, materialClearcoatNormal, materialClearcoatRoughness, materialColor, materialDiffuseRoughness, materialDispersion, materialEmissive, materialEnvIntensity, materialEnvRotation, materialIOR, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialLightMap, materialLineDashOffset, materialLineDashSize, materialLineGapSize, materialLineScale, materialLineWidth, materialMetalness, materialNormal, materialOpacity, materialPointSize, materialReference, materialReflectivity, materialRefractionRatio, materialRetroreflectivity, materialRotation, materialRoughness, materialSheen, materialSheenRoughness, materialShininess, materialSpecular, materialSpecularColor, materialSpecularIntensity, materialSpecularStrength, materialThickness, materialTransmission, max, maxMipLevel, mediumpModelViewMatrix, metalness, min, mix, mixElement, mod, modelDirection, modelNormalMatrix, modelPosition, modelRadius, modelScale, modelViewMatrix, modelViewPosition, modelViewProjection, modelWorldMatrix, modelWorldMatrixInverse, morphReference, mrt, mul, mx_aastep, mx_add, mx_atan2, mx_cell_noise_float, mx_cell_noise_vec3, mx_contrast, mx_divide, mx_fractal_noise_float, mx_fractal_noise_float_2d, mx_fractal_noise_vec2, mx_fractal_noise_vec3, mx_fractal_noise_vec4, mx_frame, mx_heighttonormal, mx_hsvtorgb, mx_ifequal, mx_ifgreater, mx_ifgreatereq, mx_invert, mx_modulo, mx_multiply, mx_noise_float, mx_noise_vec3, mx_noise_vec4, mx_place2d, mx_power, mx_ramp4, mx_ramplr, mx_ramptb, mx_rgbtohsv, mx_rotate2d, mx_rotate3d, mx_safepower, mx_separate, mx_smoothstep, mx_splitlr, mx_splittb, mx_srgb_texture_to_lin_rec709, mx_subtract, mx_timer, mx_transform_uv, mx_unifiednoise2d, mx_unifiednoise3d, mx_worley_noise_float, mx_worley_noise_float_2d, mx_worley_noise_float_3d, mx_worley_noise_vec2, mx_worley_noise_vec3, mx_worley_noise_vec3_style, negate, negateOnBackSide, neutralToneMapping, nodeArray, nodeImmutable, nodeObject, nodeObjectIntent, nodeObjects, nodeProxy, nodeProxyConstructor, nodeProxyIntent, normalFlat, normalGeometry, normalLocal, normalMap, normalView, normalViewGeometry, normalWorld, normalWorldGeometry, normalize, not, notEqual, numWorkgroups, objectDirection, objectGroup, objectPosition, objectRadius, objectScale, objectViewPosition, objectWorldMatrix, oneMinus, or, orthographicDepthToViewZ, oscSawtooth, oscSine, oscSquare, oscTriangle, output, outputStruct, overloadingFn, overrideNode, overrideNodes, pack4xI8, pack4xI8Clamp, pack4xU8, pack4xU8Clamp, packHalf2x16, packNormalToRGB, packSnorm2x16, packSnorm4x8, packUnorm2x16, packUnorm4x8, parabola, parallaxDirection, parallaxUV, parameter, pass, passTexture, pcurve, perspectiveDepthToViewZ, pmremTexture, pointShadow, pointUV, pointWidth, positionGeometry, positionLocal, positionPrevious, positionView, positionViewDirection, positionWorld, positionWorldDirection, posterize, pow, pow2, pow3, pow4, premultiplyAlpha, property, quadBroadcast, quadSwapDiagonal, quadSwapX, quadSwapY, radians, rand, range, rangeFogFactor, reciprocal, reference, reference$1, referenceBuffer, reflect, reflectVector, reflectView, reflector, refract, refractVector, refractView, reinhardToneMapping, remap, remapClamp, renderGroup, renderOutput, rendererReference, replaceDefaultUV, retroreflectivity, rotate, rotateUV, roughness, round, rtt, sRGBTransferEOTF, sRGBTransferOETF, sample, sampler, samplerComparison, saturate, saturation, screenCoordinate, screenDPR, screenSize, screenUV, select, setCurrentStack, setName, shaderStages, shadow, shadowPositionWorld, shapeCircle, sharedUniformGroup, sheen, sheenRoughness, shiftLeft, shiftRight, shininess, sign, sin, sinc, sinh, skinning, smoothstep, smoothstepElement, specularColor, specularColorBlended, specularF90, spherizeUV, split, spritesheetUV, sqrt, stack, step, stepElement, storage, storageBarrier, storageElement, storageTexture, storageTexture3D, struct, sub, subBuild, subgroupAdd, subgroupAll, subgroupAnd, subgroupAny, subgroupBallot, subgroupBroadcast, subgroupBroadcastFirst, subgroupElect, subgroupExclusiveAdd, subgroupExclusiveMul, subgroupInclusiveAdd, subgroupInclusiveMul, subgroupIndex, subgroupMax, subgroupMin, subgroupMul, subgroupOr, subgroupShuffle, subgroupShuffleDown, subgroupShuffleUp, subgroupShuffleXor, subgroupSize, subgroupXor, tan, tangentGeometry, tangentLocal, tangentView, tangentViewFrame, tangentWorld, tanh, texture, texture3D, texture3DLevel, texture3DLoad, textureBarrier, textureBicubic, textureBicubicLevel, textureLevel, textureLoad, textureSize, textureStore, thickness, time, toneMapping, toneMappingExposure, toonOutlinePass, transformDirection, transformNormal, transformNormalByInverseViewMatrix, transformNormalByViewMatrix, transformNormalToView, transmission, transpose, triNoise3D, triplanarTexture, triplanarTextures, trunc, uint, uintBitsToFloat, uniform, uniformArray, uniformCubeTexture, uniformFlow, uniformGroup, uniformTexture, unpack4xI8, unpack4xU8, unpackHalf2x16, unpackNormal, unpackRGBToNormal, unpackSnorm2x16, unpackSnorm4x8, unpackUnorm2x16, unpackUnorm4x8, unpremultiplyAlpha, userData, uv$1 as uv, uvec2, uvec3, uvec4, varying, varyingProperty, vec2, vec3, vec4, vectorComponents, velocity, vertexColor, vertexIndex, vertexStage, vibrance, viewZToLogarithmicDepth, viewZToOrthographicDepth, viewZToPerspectiveDepth, viewZToReversedOrthographicDepth, viewZToReversedPerspectiveDepth, viewport, viewportCoordinate, viewportDepthTexture, viewportLinearDepth, viewportMipTexture, viewportOpaqueMipTexture, viewportSafeUV, viewportSharedTexture, viewportSize, viewportTexture, viewportUV, vogelDiskSample, wgsl, wgslFn, workgroupArray, workgroupBarrier, workgroupId, workingToColorSpace, xor };
+export { AONode, AnalyticLightNode, ArrayElementNode, ArrayNode, AssignNode, AtomicFunctionNode, AttributeNode, BRDF_EON, BRDF_GGX, BRDF_Lambert, BRDF_Sheen, BarrierNode, BasicPointShadowFilter, BasicShadowFilter, BitcastNode, BitcountNode, BlendMode, Break, BufferAttributeNode, BufferNode, BuiltinNode, BumpMapNode, BypassNode, ChainMap, ClippingNode, CodeNode, Color4, ColorSpaceNode, ComputeBuiltinNode, ComputeNode, ConditionalNode, Const, ConstNode, ContextNode, Continue, ConvertNode, CubeRenderTarget, CubeTextureNode, DFGLUT, D_GGX, D_GGX_Anisotropic, DebugNode, Discard, EON_DirectionalAlbedo, EPSILON, EnvironmentBRDF, EventNode, ExpressionNode, F_Schlick, FlipNode, Fn, FrontFacingNode, FunctionCallNode, FunctionNode, FunctionOverloadingNode, HALF_PI, INFINITY, If, IndexNode, InputNode, InspectorBase, InspectorNode, IrradianceNode, IsolateNode, JoinNode, LTC_Evaluate, LTC_Evaluate_Volume, LTC_Uv, LightingContextNode, LightingNode, LightsNode, Loop, LoopNode, MRTNode, MaterialNode, MaterialReferenceNode, MathNode, MaxMipLevelNode, MemberNode, ModelNode, Node, NodeAccess, NodeError, NodeMaterial, NodeMaterialObserver, NodeShaderStage, NodeType, NodeUpdateType, NodeUtils, NormalMapNode, Object3DNode, OnAfterObjectUpdate, OnAfterRenderPipeline, OnBeforeFrameUpdate, OnBeforeMaterialUpdate, OnBeforeObjectUpdate, OnBeforeRenderPipeline, OnFrameUpdate, OnMaterialUpdate, OnObjectUpdate, OperatorNode, OutputStructNode, OverrideContextNode, PCFShadowFilter, PI, PI2, PMREMGenerator, PMREMNode, PackFloatNode, Packed4x8IntegerNode, ParameterNode, PassNode, PointLightNode, PointShadowFilter, PointShadowNode, PointUVNode, PropertyNode, QuadMesh, RTTNode, RangeNode, ReferenceBaseNode, ReferenceElementNode, ReferenceNode, ReflectorNode, RenderOutputNode, RendererReferenceNode, RendererUtils, Return, RotateNode, SampleNode, Schlick_to_F0, ScreenNode, SetNode, ShaderNode, ShadowBaseNode, ShadowNode, SplitNode, Stack, StackNode, StackTrace, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture3DNode, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubgroupFunctionNode, Switch, TBNViewMatrix, TWO_PI, Texture3DNode, TextureNode, TextureSizeNode, Three_TSL, ToneMappingNode, ToonOutlinePassNode, UniformArrayNode, UniformGroupNode, UniformNode, UnpackFloatNode, UserDataNode, VSMShadowFilter, V_GGX_SmithCorrelated, V_GGX_SmithCorrelated_Anisotropic, Var, VarIntent, VarNode, VaryingNode, VelocityNode, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, WorkgroupInfoNode, abs, acesFilmicToneMapping, acos, acosh, add, addMethodChaining, addNodeElement, agxToneMapping, all, alphaT, ambientOcclusion, and, anisotropy, anisotropyB, anisotropyT, any, array, asin, asinh, assign, atan, atanh, atomicAdd, atomicAnd, atomicFunc, atomicLoad, atomicMax, atomicMin, atomicOr, atomicStore, atomicSub, atomicXor, attenuationColor, attenuationDistance, attribute, attributeArray, backgroundBlurriness, backgroundIntensity, backgroundRotation, batch, batchColor, batchIndirectIndex, bentNormalView, billboarding, bitAnd, bitNot, bitOr, bitXor, bitangentGeometry, bitangentLocal, bitangentView, bitangentViewFrame, bitangentWorld, bitcast, blendBurn, blendColor, blendDodge, blendOverlay, blendScreen, bool, buffer, bufferAttribute, builtin, builtinAOContext, builtinGIContext, builtinShadowContext, bumpMap, bvec2, bvec3, bvec4, bypass, cache, call, cameraFar, cameraIndex, cameraNear, cameraNormalMatrix, cameraPosition, cameraProjectionMatrix, cameraProjectionMatrixInverse, cameraViewMatrix, cameraViewport, cameraWorldMatrix, cbrt, cdl, ceil, checker, cineonToneMapping, clamp, clearcoat, clearcoatNormalView, clearcoatRoughness, clipSpace, clipping, clippingAlpha, code, color, colorSpaceToWorking, colorToDirection, compute, computeKernel, computeSkinning, context, convert, convertColorSpace, convertToTexture, cos, cosh, countLeadingZeros, countOneBits, countTrailingZeros, cross, cubeTexture, cubeTextureBase, dFdx, dFdy, dashSize, debug, decrement, decrementBefore, defaultBuildStages, defaultShaderStages, defined, degrees, deltaTime, densityFogFactor, depth, depthPass, determinant, difference, diffuseColor, diffuseContribution, diffuseRoughness, directPointLight, directionToColor, directionToFaceDirection, dispersion, distance, div, dot, dot4I8Packed, dot4U8Packed, drawIndex, dynamicBufferAttribute, element, emissive, equal, equirectDirection, equirectUV, exp, exp2, exponentialHeightFogFactor, expression, faceDirection, faceForward, faceforward, float, floatBitsToInt, floatBitsToUint, floor, fog, fract, frameGroup, frameId, frontFacing, fwidth, gain, gapSize, getConstNodeType, getCurrentStack, getDistanceAttenuation, getGeometryRoughness, getNormalFromDepth, getParallaxCorrectNormal, getRoughness, getScreenPosition, getScreenPositionFromClip, getShIrradianceAt, getTextureIndex, getTextureType, getTypeFromLength, getViewPosition, globalId, glsl, glslFn, grayscale, greaterThan, greaterThanEqual, hardwareClipping, hash, hashArray, hashString, highpModelNormalViewMatrix, highpModelViewMatrix, hue, increment, incrementBefore, inspect, instance, instanceColor, instanceIndex, instancedArray, instancedBufferAttribute, instancedDynamicBufferAttribute, instancedMesh, int, intBitsToFloat, interleavedGradientNoise, inverse, inverseSqrt, inversesqrt, invocationLocalIndex, invocationSubgroupIndex, ior, iridescence, iridescenceIOR, iridescenceThickness, isArrayAsParameter, isBackgroundDepth, isolate, ivec2, ivec3, ivec4, js, label, length, lengthSq, lessThan, lessThanEqual, lightPosition, lightProjectionUV, lightShadowMatrix, lightTargetDirection, lightTargetPosition, lightViewPosition, lightingContext, lights, linearDepth, linearToneMapping, localId, log, log2, logarithmicDepthToViewZ, luminance, mat2, mat3, mat4, matcapUV, materialAO, materialAlphaTest, materialAnisotropy, materialAnisotropyVector, materialAttenuationColor, materialAttenuationDistance, materialClearcoat, materialClearcoatNormal, materialClearcoatRoughness, materialColor, materialDiffuseRoughness, materialDispersion, materialEmissive, materialEnvIntensity, materialEnvRotation, materialIOR, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialLightMap, materialLineDashOffset, materialLineDashSize, materialLineGapSize, materialLineScale, materialLineWidth, materialMetalness, materialNormal, materialOpacity, materialPointSize, materialReference, materialReflectivity, materialRefractionRatio, materialRetroreflectivity, materialRotation, materialRoughness, materialSheen, materialSheenRoughness, materialShininess, materialSpecular, materialSpecularColor, materialSpecularIntensity, materialSpecularStrength, materialThickness, materialTransmission, max, maxMipLevel, mediumpModelViewMatrix, metalness, min, mix, mixElement, mod, modelDirection, modelNormalMatrix, modelPosition, modelRadius, modelScale, modelViewMatrix, modelViewPosition, modelViewProjection, modelWorldMatrix, modelWorldMatrixInverse, morphReference, mrt, mul, mx_aastep, mx_add, mx_atan2, mx_cell_noise_float, mx_cell_noise_vec3, mx_contrast, mx_divide, mx_fractal_noise_float, mx_fractal_noise_float_2d, mx_fractal_noise_vec2, mx_fractal_noise_vec3, mx_fractal_noise_vec4, mx_frame, mx_heighttonormal, mx_hsvtorgb, mx_ifequal, mx_ifgreater, mx_ifgreatereq, mx_invert, mx_modulo, mx_multiply, mx_noise_float, mx_noise_vec3, mx_noise_vec4, mx_place2d, mx_power, mx_ramp4, mx_ramplr, mx_ramptb, mx_rgbtohsv, mx_rotate2d, mx_rotate3d, mx_safepower, mx_separate, mx_smoothstep, mx_splitlr, mx_splittb, mx_srgb_texture_to_lin_rec709, mx_subtract, mx_timer, mx_transform_uv, mx_unifiednoise2d, mx_unifiednoise3d, mx_worley_noise_float, mx_worley_noise_float_2d, mx_worley_noise_float_3d, mx_worley_noise_vec2, mx_worley_noise_vec3, mx_worley_noise_vec3_style, negate, negateOnBackSide, neutralToneMapping, nodeArray, nodeImmutable, nodeObject, nodeObjectIntent, nodeObjects, nodeProxy, nodeProxyConstructor, nodeProxyIntent, normalFlat, normalGeometry, normalLocal, normalMap, normalView, normalViewGeometry, normalWorld, normalWorldGeometry, normalize, not, notEqual, numWorkgroups, objectDirection, objectGroup, objectPosition, objectRadius, objectScale, objectViewPosition, objectWorldMatrix, oneMinus, or, orthographicDepthToViewZ, oscSawtooth, oscSine, oscSquare, oscTriangle, output, outputStruct, overloadingFn, overrideNode, overrideNodes, pack4xI8, pack4xI8Clamp, pack4xU8, pack4xU8Clamp, packHalf2x16, packNormalToRGB, packSnorm2x16, packSnorm4x8, packUnorm2x16, packUnorm4x8, parabola, parallaxDirection, parallaxUV, parameter, pass, passTexture, pcurve, perspectiveDepthToViewZ, pmremTexture, pointShadow, pointUV, pointWidth, positionGeometry, positionLocal, positionPrevious, positionView, positionViewDirection, positionWorld, positionWorldDirection, posterize, pow, pow2, pow3, pow4, premultiplyAlpha, property, quadBroadcast, quadSwapDiagonal, quadSwapX, quadSwapY, radians, rand, range, rangeFogFactor, reciprocal, reference, reference$1, referenceBuffer, reflect, reflectVector, reflectView, reflector, refract, refractVector, refractView, reinhardToneMapping, remap, remapClamp, renderGroup, renderOutput, rendererReference, replaceDefaultUV, retroreflectivity, rotate, rotateUV, roughness, round, rtt, sRGBTransferEOTF, sRGBTransferOETF, sample, sampler, samplerComparison, saturate, saturation, screenCoordinate, screenDPR, screenSize, screenUV, select, setCurrentStack, setName, shaderStages, shadow, shadowPositionWorld, shapeCircle, sharedUniformGroup, sheen, sheenRoughness, shiftLeft, shiftRight, shininess, sign, sin, sinc, sinh, skinning, smoothstep, smoothstepElement, specularColor, specularColorBlended, specularF90, spherizeUV, split, spritesheetUV, sqrt, stack, step, stepElement, storage, storageBarrier, storageElement, storageTexture, storageTexture3D, struct, sub, subBuild, subgroupAdd, subgroupAll, subgroupAnd, subgroupAny, subgroupBallot, subgroupBroadcast, subgroupBroadcastFirst, subgroupElect, subgroupExclusiveAdd, subgroupExclusiveMul, subgroupInclusiveAdd, subgroupInclusiveMul, subgroupIndex, subgroupMax, subgroupMin, subgroupMul, subgroupOr, subgroupShuffle, subgroupShuffleDown, subgroupShuffleUp, subgroupShuffleXor, subgroupSize, subgroupXor, tan, tangentGeometry, tangentLocal, tangentView, tangentViewFrame, tangentWorld, tanh, texture, texture3D, texture3DLevel, texture3DLoad, textureBarrier, textureBicubic, textureBicubicLevel, textureLevel, textureLoad, textureSize, textureStore, thickness, time, toneMapping, toneMappingExposure, toonOutlinePass, transformDirection, transformNormal, transformNormalByInverseViewMatrix, transformNormalByViewMatrix, transformNormalToView, transmission, transpose, triNoise3D, triplanarTexture, triplanarTextures, trunc, uint, uintBitsToFloat, uniform, uniformArray, uniformCubeTexture, uniformFlow, uniformGroup, uniformTexture, unpack4xI8, unpack4xU8, unpackHalf2x16, unpackNormal, unpackRGBToNormal, unpackSnorm2x16, unpackSnorm4x8, unpackUnorm2x16, unpackUnorm4x8, unpremultiplyAlpha, userData, uv$1 as uv, uvec2, uvec3, uvec4, varying, varyingProperty, vec2, vec3, vec4, vectorComponents, velocity, vertexColor, vertexIndex, vertexStage, vibrance, viewZToLogarithmicDepth, viewZToOrthographicDepth, viewZToPerspectiveDepth, viewZToReversedOrthographicDepth, viewZToReversedPerspectiveDepth, viewport, viewportCoordinate, viewportDepthTexture, viewportLinearDepth, viewportMipTexture, viewportOpaqueMipTexture, viewportSafeUV, viewportSharedTexture, viewportSize, viewportTexture, viewportUV, vogelDiskSample, wgsl, wgslFn, workgroupArray, workgroupBarrier, workgroupId, workingLuminanceCoefficients, workingToColorSpace, xor };

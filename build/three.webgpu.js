@@ -5,7 +5,7 @@
  */
 import { Material, LineBasicMaterial, LineDashedMaterial, NoBlending, warnOnce, MeshNormalMaterial, SRGBColorSpace, CubeTexture, EquirectangularReflectionMapping, EquirectangularRefractionMapping, CubeReflectionMapping, CubeRefractionMapping, warn, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, BackSide, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, PointsMaterial, Vector2, ShadowMaterial, DynamicDrawUsage, Uint32BufferAttribute, Uint16BufferAttribute, error, ByteType, UnsignedByteType, ShortType, UnsignedShortType, HalfFloatType, IntType, UnsignedIntType, FloatType, AlphaFormat, RedFormat, RedIntegerFormat, DepthFormat, DepthStencilFormat, RGFormat, RGIntegerFormat, RGBFormat, RGBIntegerFormat, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedInt101111Type, DoubleSide, Vector4, DepthTexture, ColorManagement, SRGBTransfer, Vector3, Mesh, SphereGeometry, Color, Matrix2, Matrix3, Matrix4, NormalBlending, RenderTarget, LinearFilter, LinearMipmapNearestFilter, NearestMipmapLinearFilter, LinearMipmapLinearFilter, Float16BufferAttribute, yieldToMain, REVISION, Plane, EventDispatcher, PerspectiveCamera, ArrayCamera, PlaneGeometry, RGBAFormat, FrontSide, CustomBlending, AddEquation, ZeroFactor, CylinderGeometry, Quaternion, WebXRController, RAD2DEG, FramebufferTexture, NoToneMapping, PCFShadowMap, PCFSoftShadowMap, Scene, FrustumArray, Frustum, RenderObjectRefreshType, VSMShadowMap, NoColorSpace, DataTexture, RGBAIntegerFormat, TimestampQuery, createCanvasElement, MaxEquation, MinEquation, ReverseSubtractEquation, SubtractEquation, OneMinusConstantAlphaFactor, ConstantAlphaFactor, OneMinusConstantColorFactor, ConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, DstAlphaFactor, DstColorFactor, SrcAlphaSaturateFactor, SrcAlphaFactor, SrcColorFactor, OneFactor, CullFaceNone, CullFaceBack, CullFaceFront, MaterialBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, ReversedDepthFuncs, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, R11_EAC_Format, SIGNED_R11_EAC_Format, RG11_EAC_Format, SIGNED_RG11_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, RED_GREEN_RGTC2_Format, SIGNED_RED_GREEN_RGTC2_Format, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, NearestMipmapNearestFilter, NearestFilter, NotEqualCompare, GreaterCompare, GreaterEqualCompare, EqualCompare, LessEqualCompare, LessCompare, AlwaysCompare, NeverCompare, LinearTransfer, getByteLength, WebGLCoordinateSystem, Compatibility, isTypedArray, Texture, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, WebGPUCoordinateSystem, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
 export { AdditiveAnimationBlendMode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BasicShadowMap, BatchedMesh, BezierInterpolant, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxGeometry, BoxHelper, BufferAttribute, BufferGeometry, BufferGeometryLoader, Cache, Camera, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, Controls, CubeCamera, CubeDepthTexture, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CustomToneMapping, Cylindrical, Data3DTexture, DataArrayTexture, DataTextureLoader, DataUtils, DefaultLoadingManager, DetachedBindMode, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, Euler, ExternalTexture, ExtrudeGeometry, Float32BufferAttribute, Fog, FogExp2, GLBufferAttribute, GLSL1, GLSL3, GridHelper, HTMLTexture, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateBezier, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InterpolationSamplingMode, InterpolationSamplingType, KeyframeTrack, LOD, LatheGeometry, Layers, Light, LightShadow, Line, Line3, LineCurve, LineCurve3, LineLoop, LineSegments, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearSRGBColorSpace, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, MathUtils, MeshDepthMaterial, MeshDistanceMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NoNormalPacking, NormalAnimationBlendMode, NormalGAPacking, NormalRGPacking, NumberKeyframeTrack, Object3D, ObjectSpaceNormalMap, OctahedronGeometry, OrthographicCamera, Path, PlaneHelper, PointLightHelper, Points, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBADepthPacking, RGBDepthPacking, RGDepthPacking, RawShaderMaterial, Ray, Raycaster, RenderTarget3D, RingGeometry, ShaderMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Sphere, Spherical, SphericalHarmonics3, SplineCurve, SpotLightHelper, Sprite, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, TOUCH, TangentSpaceNormalMap, TetrahedronGeometry, TextureLoader, TextureSource, TextureUtils, Timer, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, UVMapping, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLRenderTarget, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, getConsoleFunction, log, setConsoleFunction } from './three.core.js';
-import { NodeMaterial, float, materialLineDashOffset, materialLineScale, materialLineDashSize, materialLineGapSize, dashSize, gapSize, varying, attribute, varyingProperty, Fn, cameraProjectionMatrix, vec2, vec4, modelViewMatrix, viewport, If, positionGeometry, mix, vec3, materialLineWidth, screenDPR, uv, smoothstep, diffuseColor, viewportOpaqueMipTexture, modelWorldMatrixInverse, cameraWorldMatrix, cameraProjectionMatrixInverse, positionLocal, positionPrevious, materialOpacity, colorSpaceToWorking, packNormalToRGB, normalView, Node, cubeTexture, NodeUpdateType, CubeRenderTarget, nodeProxy, LightingNode, materialEnvRotation, materialSpecularStrength, materialReflectivity, negateOnBackSide, normalViewGeometry, materialLightMap, BRDF_Lambert, positionViewDirection, F_Schlick, specularColor, shininess, materialShininess, materialSpecular, iridescenceThickness, iridescenceIOR, metalness, Schlick_to_F0, cameraPosition, positionWorld, normalWorld, roughness, diffuseContribution, specularColorBlended, specularF90, modelWorldMatrix, cameraViewMatrix, ior, thickness, attenuationColor, attenuationDistance, dispersion, transmission, DFGLUT, EON_DirectionalAlbedo, diffuseRoughness, iridescence, BRDF_Sheen, sheenRoughness, sheen, clearcoatNormalView, BRDF_GGX, clearcoatRoughness, retroreflectivity, BRDF_EON, positionView, LTC_Uv, mat3, LTC_Evaluate, EnvironmentBRDF, clearcoat, Loop, length, refract, normalize, div, cameraViewport, screenSize, log2, textureBicubicLevel, log, exp, viewportMipTexture, clamp, pmremTexture, isolate, materialEnvIntensity, pow4, bentNormalView, materialMetalness, materialRoughness, getRoughness, materialIOR, materialSpecularColor, materialSpecularIntensity, min, pow2, materialDiffuseRoughness, materialClearcoat, materialClearcoatRoughness, materialSheen, materialSheenRoughness, materialRetroreflectivity, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialAnisotropy, anisotropy, alphaT, anisotropyT, TBNViewMatrix, anisotropyB, materialTransmission, materialThickness, materialAttenuationDistance, materialAttenuationColor, materialDispersion, materialClearcoatNormal, subBuild, materialReference, matcapUV, reference$1 as reference, materialRotation, rotate, materialPointSize, viewportSize, uniform, renderGroup, property, modelRadius, linearDepth, viewZToPerspectiveDepth, cameraFar, cameraNear, LTC_Evaluate_Volume, hashString, hashArray, ChainMap, Color4, backgroundIntensity, backgroundBlurriness, backgroundRotation, normalWorldGeometry, stack, getTextureType, shaderStages, getTypeFromLength, setCurrentStack, FunctionNode, ParameterNode, defaultBuildStages, getCurrentStack, AnalyticLightNode, lightTargetDirection, lightPosition, lightProjectionUV, getDistanceAttenuation, texture, textureSize, remap, atan, uniformArray, getShIrradianceAt, lightShadowMatrix, sub, acos, saturate, max, lightViewPosition, StackTrace, screenUV, reference as reference$1, fog, densityFogFactor, rangeFogFactor, builtin, LightsNode, context, renderOutput, InspectorBase, highpModelViewMatrix, highpModelNormalViewMatrix, QuadMesh, CodeNode, TextureNode, vectorComponents, NodeAccess, VarNode, ExpressionNode, PointLightNode, linearToneMapping, reinhardToneMapping, cineonToneMapping, acesFilmicToneMapping, agxToneMapping, neutralToneMapping, output, StorageBufferAttribute } from './three.tsl.js';
+import { NodeMaterial, float, materialLineDashOffset, materialLineScale, materialLineDashSize, materialLineGapSize, dashSize, gapSize, varying, attribute, varyingProperty, Fn, cameraProjectionMatrix, vec2, vec4, modelViewMatrix, viewport, If, positionGeometry, mix, vec3, materialLineWidth, screenDPR, uv, smoothstep, diffuseColor, viewportOpaqueMipTexture, modelWorldMatrixInverse, cameraWorldMatrix, cameraProjectionMatrixInverse, positionLocal, positionPrevious, materialOpacity, colorSpaceToWorking, packNormalToRGB, normalView, Node, cubeTexture, NodeUpdateType, CubeRenderTarget, nodeProxy, LightingNode, materialEnvRotation, materialSpecularStrength, materialReflectivity, negateOnBackSide, normalViewGeometry, materialLightMap, BRDF_Lambert, positionViewDirection, F_Schlick, specularColor, shininess, materialShininess, materialSpecular, iridescenceThickness, iridescenceIOR, metalness, Schlick_to_F0, cameraPosition, positionWorld, normalWorld, roughness, diffuseContribution, specularColorBlended, specularF90, modelWorldMatrix, cameraViewMatrix, ior, thickness, attenuationColor, attenuationDistance, dispersion, transmission, DFGLUT, EON_DirectionalAlbedo, diffuseRoughness, iridescence, BRDF_Sheen, sheenRoughness, sheen, clearcoatNormalView, BRDF_GGX, clearcoatRoughness, retroreflectivity, BRDF_EON, positionView, LTC_Uv, mat3, LTC_Evaluate, EnvironmentBRDF, clearcoat, Loop, length, refract, normalize, div, cameraViewport, screenSize, log2, textureBicubicLevel, log, exp, viewportMipTexture, clamp, pmremTexture, isolate, materialEnvIntensity, pow4, bentNormalView, materialMetalness, materialRoughness, getRoughness, materialIOR, materialSpecularColor, materialSpecularIntensity, min, pow2, materialDiffuseRoughness, materialClearcoat, materialClearcoatRoughness, materialSheen, materialSheenRoughness, materialRetroreflectivity, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialAnisotropy, anisotropy, alphaT, anisotropyT, TBNViewMatrix, anisotropyB, materialTransmission, materialThickness, materialAttenuationDistance, materialAttenuationColor, materialDispersion, materialClearcoatNormal, subBuild, materialReference, matcapUV, reference$1 as reference, materialRotation, rotate, materialPointSize, viewportSize, uniform, renderGroup, property, modelRadius, linearDepth, viewZToPerspectiveDepth, cameraFar, cameraNear, LTC_Evaluate_Volume, hashString, hashArray, ChainMap, Color4, backgroundIntensity, backgroundBlurriness, backgroundRotation, normalWorldGeometry, stack, getTextureType, shaderStages, getTypeFromLength, setCurrentStack, FunctionNode, ParameterNode, isArrayAsParameter, defaultBuildStages, getCurrentStack, AnalyticLightNode, lightTargetDirection, lightPosition, lightProjectionUV, getDistanceAttenuation, texture, textureSize, remap, atan, uniformArray, getShIrradianceAt, lightShadowMatrix, sub, acos, saturate, max, lightViewPosition, StackTrace, screenUV, reference as reference$1, fog, densityFogFactor, rangeFogFactor, builtin, LightsNode, context, renderOutput, InspectorBase, highpModelViewMatrix, highpModelNormalViewMatrix, QuadMesh, CodeNode, TextureNode, vectorComponents, NodeAccess, VarNode, ExpressionNode, PointLightNode, linearToneMapping, reinhardToneMapping, cineonToneMapping, acesFilmicToneMapping, agxToneMapping, neutralToneMapping, output, StorageBufferAttribute } from './three.tsl.js';
 export { AONode, ArrayElementNode, ArrayNode, AssignNode, AtomicFunctionNode, AttributeNode, BarrierNode, BitcastNode, BitcountNode, BlendMode, BufferAttributeNode, BufferNode, BuiltinNode, BumpMapNode, BypassNode, ClippingNode, ColorSpaceNode, ComputeBuiltinNode, ComputeNode, ConditionalNode, ConstNode, ContextNode, ConvertNode, CubeTextureNode, DebugNode, EventNode, FlipNode, FrontFacingNode, FunctionCallNode, FunctionOverloadingNode, IndexNode, InputNode, InspectorNode, IrradianceNode, IsolateNode, JoinNode, LightingContextNode, LoopNode, MRTNode, MaterialNode, MaterialReferenceNode, MathNode, MaxMipLevelNode, MemberNode, ModelNode, NodeError, NodeMaterialObserver, NodeShaderStage, NodeType, NodeUtils, NormalMapNode, Object3DNode, OperatorNode, OutputStructNode, OverrideContextNode, PMREMGenerator, PMREMNode, PackFloatNode, Packed4x8IntegerNode, PassNode, PointShadowNode, PointUVNode, PropertyNode, RTTNode, RangeNode, ReferenceBaseNode, ReferenceElementNode, ReferenceNode, ReflectorNode, RenderOutputNode, RendererReferenceNode, RendererUtils, RotateNode, SampleNode, ScreenNode, SetNode, ShadowBaseNode, ShadowNode, SplitNode, StackNode, StorageArrayElementNode, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture3DNode, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubgroupFunctionNode, Three_TSL as TSL, Texture3DNode, TextureSizeNode, ToneMappingNode, ToonOutlinePassNode, UniformArrayNode, UniformGroupNode, UniformNode, UnpackFloatNode, UserDataNode, VaryingNode, VelocityNode, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, WorkgroupInfoNode, defaultShaderStages } from './three.tsl.js';
 
 /**
@@ -7043,7 +7043,8 @@ class Geometries extends DataMap {
 
 			if ( geometry === undefined ) continue;
 
-			geometry.removeEventListener( 'dispose', this.get( geometry ).onDispose );
+			const geometryData = this.get( geometry );
+			geometryData.onDispose();
 
 		}
 
@@ -12160,6 +12161,35 @@ class Matrix4NodeUniform extends Matrix4Uniform {
 let _id$5 = 0;
 
 const _functionNodeCache = new WeakMap();
+const _layoutDefaultsCache = new WeakMap();
+
+// Inputs of a layout function call. They can be destructured as an array or as an object.
+const _createLayoutInputs = ( layout, values ) => {
+
+	const inputs = {
+		[ Symbol.iterator ]() {
+
+			let index = 0;
+			const values = Object.values( this );
+			return {
+				next: () => ( {
+					value: values[ index ],
+					done: index ++ >= values.length
+				} )
+			};
+
+		}
+	};
+
+	layout.inputs.forEach( ( input, i ) => {
+
+		inputs[ input.name ] = values[ i ];
+
+	} );
+
+	return inputs;
+
+};
 
 const typeFromArray = new Map( [
 	[ Int8Array, 'int' ],
@@ -14684,7 +14714,7 @@ class NodeBuilder {
 	 */
 	addInclude( node ) {
 
-		if ( this.currentFunctionNode !== null ) {
+		if ( this.currentFunctionNode !== null && this.currentFunctionNode.includes.includes( node ) === false ) {
 
 			this.currentFunctionNode.includes.push( node );
 
@@ -14744,26 +14774,7 @@ class NodeBuilder {
 
 		const layout = shaderNode.layout;
 
-		const inputs = {
-			[ Symbol.iterator ]() {
-
-				let index = 0;
-				const values = Object.values( this );
-				return {
-					next: () => ( {
-						value: values[ index ],
-						done: index ++ >= values.length
-					} )
-				};
-
-			}
-		};
-
-		for ( const input of layout.inputs ) {
-
-			inputs[ input.name ] = new ParameterNode( input.type, input.name );
-
-		}
+		const inputs = _createLayoutInputs( layout, layout.inputs.map( input => new ParameterNode( input.type, input.name ) ) );
 
 		//
 
@@ -14775,6 +14786,217 @@ class NodeBuilder {
 		shaderNode.layout = layout;
 
 		return flowData;
+
+	}
+
+	/**
+	 * Returns the inputs of a call to a TSL function with layout. Missing inputs are completed
+	 * with the default values of the function parameters, found by running the function once
+	 * with all inputs and once without the missing ones, and comparing both node graphs.
+	 *
+	 * @private
+	 * @param {ShaderNodeInternal} shaderNode - The shader node of the function.
+	 * @param {?Array} rawInputs - The inputs of the call.
+	 * @return {?Array} The inputs of the call, or `null` if the defaults can't be resolved and the function must be expanded inline.
+	 */
+	_getLayoutInputs( shaderNode, rawInputs ) {
+
+		const inputs = shaderNode.layout.inputs;
+
+		const firstInput = rawInputs !== null && rawInputs.length > 0 ? rawInputs[ 0 ] : null;
+		const object = firstInput !== null && firstInput !== undefined && isArrayAsParameter( rawInputs ) === false ? firstInput : null;
+		const provided = inputs.map( ( input, i ) => object !== null ? object[ input.name ] !== undefined : rawInputs !== null && rawInputs[ i ] !== undefined );
+
+		if ( provided.every( Boolean ) ) return rawInputs !== null ? rawInputs : [];
+
+		if ( shaderNode.once ) return null;
+
+		// The defaults only depend on which inputs are missing, so they are shared by all builders.
+
+		let cache = _layoutDefaultsCache.get( shaderNode );
+
+		if ( cache === undefined ) {
+
+			cache = new Map();
+			_layoutDefaultsCache.set( shaderNode, cache );
+
+		}
+
+		const key = provided.map( Number ).join( '' );
+
+		let defaults = cache.get( key );
+
+		if ( defaults === undefined ) {
+
+			defaults = this._resolveLayoutDefaults( shaderNode, provided );
+			cache.set( key, defaults );
+
+		}
+
+		if ( defaults === null ) return null;
+
+		if ( object !== null ) {
+
+			const completed = { ...object };
+
+			inputs.forEach( ( input, i ) => {
+
+				if ( provided[ i ] === false ) completed[ input.name ] = defaults[ i ];
+
+			} );
+
+			return [ completed ];
+
+		}
+
+		return provided.map( ( isProvided, i ) => isProvided ? rawInputs[ i ] : defaults[ i ] );
+
+	}
+
+	/**
+	 * Resolves the default values of the missing inputs of a TSL function with layout.
+	 *
+	 * @private
+	 * @param {ShaderNodeInternal} shaderNode - The shader node of the function.
+	 * @param {Array<boolean>} provided - Whether each input of the layout was provided.
+	 * @return {?Array<Node>} The default value of each missing input, or `null` if they could not be resolved.
+	 */
+	_resolveLayoutDefaults( shaderNode, provided ) {
+
+		const layout = shaderNode.layout;
+		const parameters = layout.inputs.map( input => new ParameterNode( input.type, input.name ) );
+
+		const fullGraph = this._getLayoutCallGraph( shaderNode, _createLayoutInputs( layout, parameters ) );
+		const partialGraph = this._getLayoutCallGraph( shaderNode, _createLayoutInputs( layout, parameters.map( ( parameter, i ) => provided[ i ] ? parameter : undefined ) ) );
+
+		// Walk both graphs together: where the full graph uses the parameter of a missing input,
+		// the partial graph uses its default value.
+
+		const missing = new Map();
+		parameters.forEach( ( parameter, i ) => {
+
+			if ( provided[ i ] === false ) missing.set( parameter, i );
+
+		} );
+
+		const defaults = [];
+		const visited = new Map();
+
+		const walk = ( a, b ) => {
+
+			if ( a === b ) return true;
+			if ( ! a || ! b || a.isNode !== true || b.isNode !== true ) return false;
+
+			const index = missing.get( a );
+
+			if ( index !== undefined ) {
+
+				if ( defaults[ index ] === undefined ) defaults[ index ] = b;
+
+				return defaults[ index ] === b;
+
+			}
+
+			if ( visited.has( a ) ) return visited.get( a ) === b;
+			if ( a.constructor !== b.constructor ) return false;
+
+			visited.set( a, b );
+
+			const childrenA = [ ...a.getChildren() ];
+			const childrenB = [ ...b.getChildren() ];
+
+			if ( childrenA.length !== childrenB.length ) return false;
+
+			for ( let i = 0; i < childrenA.length; i ++ ) {
+
+				if ( walk( childrenA[ i ], childrenB[ i ] ) === false ) return false;
+
+			}
+
+			return true;
+
+		};
+
+		// The default values are evaluated when the parameters are destructured, before the body,
+		// so the nodes they add to the stack come first. Align the body statements from the end.
+
+		const extra = partialGraph.nodes.length - fullGraph.nodes.length;
+
+		if ( extra < 0 ) return null;
+
+		visited.set( fullGraph, partialGraph );
+
+		if ( walk( fullGraph.outputNode, partialGraph.outputNode ) === false ) return null;
+
+		for ( let i = 0; i < fullGraph.nodes.length; i ++ ) {
+
+			if ( walk( fullGraph.nodes[ i ], partialGraph.nodes[ extra + i ] ) === false ) return null;
+
+		}
+
+		// Every missing input must have a default that does not depend on other parameters.
+
+		const parameterSet = new Set( parameters );
+
+		for ( const index of missing.values() ) {
+
+			const value = defaults[ index ];
+
+			if ( value === undefined ) return null;
+
+			const stack = [ value ];
+			const seen = new Set();
+
+			while ( stack.length > 0 ) {
+
+				const node = stack.pop();
+
+				if ( parameterSet.has( node ) ) return null;
+				if ( seen.has( node ) ) continue;
+
+				seen.add( node );
+
+				for ( const child of node.getChildren() ) stack.push( child );
+
+			}
+
+		}
+
+		return defaults;
+
+	}
+
+	/**
+	 * Runs a TSL function with layout as an inline call and returns the resulting stack.
+	 *
+	 * @private
+	 * @param {ShaderNodeInternal} shaderNode - The shader node of the function.
+	 * @param {Object} inputs - The inputs of the call.
+	 * @return {StackNode} The stack with the nodes of the call.
+	 */
+	_getLayoutCallGraph( shaderNode, inputs ) {
+
+		const layout = shaderNode.layout;
+
+		let graph;
+
+		shaderNode.layout = null;
+
+		this.addStack();
+
+		try {
+
+			this.stack.outputNode = shaderNode.call( inputs ).call( this );
+
+		} finally {
+
+			graph = this.removeStack();
+
+			shaderNode.layout = layout;
+
+		}
+
+		return graph;
 
 	}
 
@@ -20088,9 +20310,12 @@ class XRManager extends EventDispatcher {
 
 					contextNode = context( {
 
-						getOutput: ( outputNode ) => {
+						getOutput: ( outputNode, builder ) => {
 
-							return renderOutput( outputNode, renderer.toneMapping, renderer.outputColorSpace );
+							const renderOutputNode = renderOutput( outputNode, renderer.toneMapping, renderer.outputColorSpace );
+							renderOutputNode.premultipliedAlpha = builder.material.premultipliedAlpha;
+
+							return renderOutputNode;
 
 						},
 
@@ -21462,6 +21687,14 @@ class Renderer {
 		this._onCanvasTargetResize = this._onCanvasTargetResize.bind( this );
 
 		/**
+		 * OnCanvasTargetDispose callback function.
+		 *
+		 * @private
+		 * @type {Function}
+		 */
+		this._onCanvasTargetDispose = this._onCanvasTargetDispose.bind( this );
+
+		/**
 		 * The canvas target for rendering.
 		 *
 		 * @private
@@ -21469,6 +21702,7 @@ class Renderer {
 		 */
 		this._canvasTarget = new CanvasTarget( backend.getDomElement() );
 		this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
+		this._canvasTarget.addEventListener( 'dispose', this._onCanvasTargetDispose );
 		this._canvasTarget.isDefaultCanvasTarget = true;
 
 		/**
@@ -23321,10 +23555,10 @@ class Renderer {
 	 * from the GPU to the CPU in context of compute shaders.
 	 *
 	 * @async
-	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
-	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
-	 * @param {number} offset - The storage buffer attribute.
-	 * @param {number} count - The offset from which to start reading the
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read from.
+	 * @param {?(ReadbackBuffer|ArrayBuffer)} [target=null] - The readback buffer or array buffer that receives the data. If `null`, a new array buffer is returned.
+	 * @param {number} [offset=0] - The byte offset to start reading from. Must be a multiple of 4.
+	 * @param {number} [count=-1] - The number of bytes to read. Must be a multiple of 4, or `-1` to read to the end of the buffer.
 	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
 	async getArrayBufferAsync( attribute, target = null, offset = 0, count = -1 ) {
@@ -23955,6 +24189,8 @@ class Renderer {
 
 			}
 
+			this._destroyCanvasTarget( this._canvasTarget );
+
 			this._textures.dispose();
 			this.info.dispose();
 
@@ -24025,9 +24261,12 @@ class Renderer {
 	setCanvasTarget( canvasTarget ) {
 
 		this._canvasTarget.removeEventListener( 'resize', this._onCanvasTargetResize );
+		// keep any dispose event listener attached for later use
 
 		this._canvasTarget = canvasTarget;
+
 		this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
+		this._canvasTarget.addEventListener( 'dispose', this._onCanvasTargetDispose );
 
 	}
 
@@ -24127,6 +24366,20 @@ class Renderer {
 
 		}
 
+		const computeList = Array.isArray( computeNodes ) ? computeNodes : [ computeNodes ];
+
+		if ( computeList.length === 0 || computeList.some( computeNode => computeNode?.isComputeNode !== true ) ) {
+
+			throw new Error( 'THREE.Renderer: ".compute()" expects a "ComputeNode".' );
+
+		}
+
+		if ( dispatchSize !== null && computeList.some( computeNode => computeNode.count !== null || computeNode.dispatchSize !== null ) ) {
+
+			throw new Error( 'THREE.Renderer: A dispatch size cannot be passed to "renderer.compute()" for nodes created with "compute( count )". Use "computeKernel()" instead.' );
+
+		}
+
 		//
 
 		const nodeFrame = this._nodes.nodeFrame;
@@ -24153,14 +24406,6 @@ class Renderer {
 		const pipelines = this._pipelines;
 		const bindings = this._bindings;
 		const nodes = this._nodes;
-
-		const computeList = Array.isArray( computeNodes ) ? computeNodes : [ computeNodes ];
-
-		if ( computeList[ 0 ] === undefined || computeList[ 0 ].isComputeNode !== true ) {
-
-			throw new Error( 'THREE.Renderer: .compute() expects a ComputeNode.' );
-
-		}
 
 		backend.beginCompute( computeNodes );
 
@@ -25233,6 +25478,32 @@ class Renderer {
 	}
 
 	/**
+	 * Callback when a canvas target has been disposed.
+	 *
+	 * @private
+	 * @param {Object} event - The dispose event.
+	 */
+	_onCanvasTargetDispose( event ) {
+
+		this._destroyCanvasTarget( event.target );
+
+	}
+
+	/**
+	 * Frees the GPU resources of the given canvas target.
+	 *
+	 * @private
+	 * @param {CanvasTarget} canvasTarget - The canvas target.
+	 */
+	_destroyCanvasTarget( canvasTarget ) {
+
+		canvasTarget.removeEventListener( 'dispose', this._onCanvasTargetDispose );
+
+		if ( this._initialized ) this.backend.destroyCanvasTarget( canvasTarget );
+
+	}
+
+	/**
 	 * Alias for `compileAsync()`.
 	 *
 	 * @method
@@ -25418,7 +25689,7 @@ class Buffer extends Binding {
 	 */
 	get byteLength() {
 
-		return getFloatLength( this._buffer.byteLength );
+		return getFloatLength( this.buffer.byteLength );
 
 	}
 
@@ -25509,7 +25780,7 @@ class NodeUniformBuffer extends UniformBuffer {
 
 		const label = nodeUniform && nodeUniform.name ? nodeUniform.name : _id$4 ++;
 
-		super( 'UniformBuffer_' + label, nodeUniform ? nodeUniform.value : null );
+		super( 'UniformBuffer_' + label );
 
 		/**
 		 * The uniform buffer node.
@@ -25576,18 +25847,6 @@ class NodeUniformBuffer extends UniformBuffer {
 	clearUpdateRanges() {
 
 		this.nodeUniform.clearUpdateRanges();
-
-	}
-
-	/**
-	 * The buffer's byte length.
-	 *
-	 * @type {number}
-	 * @readonly
-	 */
-	get byteLength() {
-
-		return getFloatLength( this.buffer.byteLength );
 
 	}
 
@@ -28979,6 +29238,14 @@ class Backend {
 	 */
 	updateViewport( /*renderContext*/ ) {}
 
+	/**
+	 * Frees the GPU resources of the given canvas target.
+	 *
+	 * @abstract
+	 * @param {CanvasTarget} canvasTarget - The canvas target.
+	 */
+	destroyCanvasTarget( /*canvasTarget*/ ) {}
+
 	// utils
 
 	/**
@@ -29148,10 +29415,13 @@ class Backend {
 	 * a storage buffer attribute from the GPU to the CPU.
 	 *
 	 * @async
-	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
-	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read from.
+	 * @param {?(ReadbackBuffer|ArrayBuffer)} [target=null] - The readback buffer or array buffer that receives the data. If `null`, a new array buffer is returned.
+	 * @param {number} [offset=0] - The byte offset to start reading from. Must be a multiple of 4.
+	 * @param {number} [count=-1] - The number of bytes to read. Must be a multiple of 4, or `-1` to read to the end of the buffer.
+	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( /* attribute */ ) {}
+	async getArrayBufferAsync( /* attribute, target, offset, count */ ) {}
 
 	/**
 	 * Checks if the given feature is supported by the backend.
@@ -29604,10 +29874,10 @@ class WebGLAttributeUtils {
 	 * new allocation.
 	 *
 	 * @async
-	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
-	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
-	 * @param {number} offset - The storage buffer attribute.
-	 * @param {number} count - The offset from which to start reading the
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read from.
+	 * @param {?(ReadbackBuffer|ArrayBuffer)} [target=null] - The readback buffer or array buffer that receives the data. If `null`, a new array buffer is returned.
+	 * @param {number} [offset=0] - The byte offset to start reading from. Must be a multiple of 4.
+	 * @param {number} [count=-1] - The number of bytes to read. Must be a multiple of 4, or `-1` to read to the end of the buffer.
 	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
 	async getArrayBufferAsync( attribute, target = null, offset = 0, count = -1 ) {
@@ -32952,9 +33222,9 @@ class WebGLTextureUtils {
 	setupRenderBufferStorage( renderbuffer, renderContext, samples, useMultisampledRTT = false ) {
 
 		const { gl } = this;
-		const renderTarget = renderContext.renderTarget;
+		const { depthTexture, renderTarget } = renderContext;
 
-		const { depthTexture, depthBuffer, stencilBuffer, width, height } = renderTarget;
+		const { depthBuffer, stencilBuffer, width, height } = renderTarget;
 
 		gl.bindRenderbuffer( gl.RENDERBUFFER, renderbuffer );
 
@@ -34350,10 +34620,10 @@ class WebGLBackend extends Backend {
 	 * new allocation.
 	 *
 	 * @async
-	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
-	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
-	 * @param {number} offset - The storage buffer attribute.
-	 * @param {number} count - The offset from which to start reading the
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read from.
+	 * @param {?(ReadbackBuffer|ArrayBuffer)} [target=null] - The readback buffer or array buffer that receives the data. If `null`, a new array buffer is returned.
+	 * @param {number} [offset=0] - The byte offset to start reading from. Must be a multiple of 4.
+	 * @param {number} [count=-1] - The number of bytes to read. Must be a multiple of 4, or `-1` to read to the end of the buffer.
 	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
 	async getArrayBufferAsync( attribute, target = null, offset = 0, count = -1 ) {
@@ -35275,7 +35545,7 @@ class WebGLBackend extends Backend {
 			if ( isRenderCameraDepthArray ) {
 
 				// Clear the depth texture
-				const textureData = this.get( renderTarget.depthTexture );
+				const textureData = this.get( this._currentContext.depthTexture );
 
 				if ( textureData.clearedRenderId !== this.renderer._nodes.nodeFrame.renderId ) {
 
@@ -37352,7 +37622,7 @@ class NodeStorageBuffer extends StorageBuffer {
 
 		const label = nodeUniform && nodeUniform.name ? nodeUniform.name : _id ++;
 
-		super( 'StorageBuffer_' + label, nodeUniform ? nodeUniform.value : null );
+		super( 'StorageBuffer_' + label );
 
 		/**
 		 * The node uniform.
@@ -44631,10 +44901,10 @@ class WebGPUAttributeUtils {
 	 * new allocation.
 	 *
 	 * @async
-	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
-	 * @param {number} count - The offset from which to start reading the
-	 * @param {number} offset - The storage buffer attribute.
-	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read from.
+	 * @param {?(ReadbackBuffer|ArrayBuffer)} [target=null] - The readback buffer or array buffer that receives the data. If `null`, a new array buffer is returned.
+	 * @param {number} [offset=0] - The byte offset to start reading from. Must be a multiple of 4.
+	 * @param {number} [count=-1] - The number of bytes to read. Must be a multiple of 4, or `-1` to read to the end of the buffer.
 	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
 	async getArrayBufferAsync( attribute, target = null, offset = 0, count = -1 ) {
@@ -47497,10 +47767,10 @@ class WebGPUBackend extends Backend {
 	 * new allocation.
 	 *
 	 * @async
-	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
-	 * @param {number} count - The offset from which to start reading the
-	 * @param {number} offset - The storage buffer attribute.
-	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read from.
+	 * @param {?(ReadbackBuffer|ArrayBuffer)} [target=null] - The readback buffer or array buffer that receives the data. If `null`, a new array buffer is returned.
+	 * @param {number} [offset=0] - The byte offset to start reading from. Must be a multiple of 4.
+	 * @param {number} [count=-1] - The number of bytes to read. Must be a multiple of 4, or `-1` to read to the end of the buffer.
 	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
 	async getArrayBufferAsync( attribute, target = null, offset = 0, count = -1 ) {
@@ -50061,6 +50331,20 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	/**
+	 * Frees the GPU resources of the given canvas target.
+	 *
+	 * @param {CanvasTarget} canvasTarget - The canvas target.
+	 */
+	destroyCanvasTarget( canvasTarget ) {
+
+		this.destroyTexture( canvasTarget.colorTexture );
+		this.destroyTexture( canvasTarget.depthTexture );
+
+		this.delete( canvasTarget );
+
+	}
+
 	// utils public
 
 	/**
@@ -50982,6 +51266,7 @@ class RenderPipeline {
  * material shaders. This avoids the intermediate framebuffer and output pass
  * used by {@link Renderer}, but changes blending and is not compatible with
  * materials that sample the framebuffer, such as transmissive materials.
+ * With the WebGL backend, `antialias` has no effect.
  *
  * ```js
  * const renderPipeline = new DirectRenderPipeline( renderer );
@@ -51193,9 +51478,12 @@ class DirectRenderPipeline extends RenderPipeline {
 
 				output.assign( materialOutputNode );
 
-				return outputColorTransform === true ?
-					renderOutput( pipelineOutputNode, toneMapping, outputColorSpace ) :
-					pipelineOutputNode;
+				if ( outputColorTransform === false ) return pipelineOutputNode;
+
+				const renderOutputNode = renderOutput( pipelineOutputNode, toneMapping, outputColorSpace );
+				renderOutputNode.premultipliedAlpha = builder.material.premultipliedAlpha;
+
+				return renderOutputNode;
 
 			}
 		} );

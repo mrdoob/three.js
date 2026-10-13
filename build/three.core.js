@@ -9273,13 +9273,10 @@ class RenderTarget extends EventDispatcher {
 		 */
 		this.textures = [];
 
-		const image = { width: width, height: height, depth: options.depth };
-		const texture = new Texture( image );
-
 		const count = options.count;
 		for ( let i = 0; i < count; i ++ ) {
 
-			this.textures[ i ] = texture.clone();
+			this.textures[ i ] = new Texture( { width: width, height: height, depth: options.depth } );
 			this.textures[ i ].isRenderTargetTexture = true;
 			this.textures[ i ].renderTarget = this;
 
@@ -12260,7 +12257,7 @@ class Object3D extends EventDispatcher {
 
 		/**
 		 * Whether the 3D object is supposed to be static or not. If set to `true`, it means
-		 * the 3D object is not going to be changed after the initial renderer. This includes
+		 * the 3D object is not going to be changed after the first render. This includes
 		 * geometry and material settings. A static 3D object can be processed by the renderer
 		 * slightly faster since certain state checks can be bypassed.
 		 *
@@ -25045,6 +25042,15 @@ class Skeleton {
 		this.boneMatrices = null;
 
 		/**
+		 * An array buffer holding the bone data of the previous frame.
+		 * Required for computing velocity.
+		 *
+		 * @type {?Float32Array}
+		 * @default null
+		 */
+		this.previousBoneMatrices = null;
+
+		/**
 		 * A texture holding the bone data for use
 		 * in the vertex shader.
 		 *
@@ -25052,6 +25058,15 @@ class Skeleton {
 		 * @default null
 		 */
 		this.boneTexture = null;
+
+		/**
+		 * A texture holding the bone data of the previous frame.
+		 * Required for computing velocity.
+		 *
+		 * @type {?DataTexture}
+		 * @default null
+		 */
+		this.previousBoneTexture = null;
 
 		this.init();
 
@@ -25276,6 +25291,14 @@ class Skeleton {
 			this.boneTexture.dispose();
 
 			this.boneTexture = null;
+
+		}
+
+		if ( this.previousBoneTexture !== null ) {
+
+			this.previousBoneTexture.dispose();
+
+			this.previousBoneTexture = null;
 
 		}
 
@@ -43306,6 +43329,13 @@ class KeyframeTrack {
 
 			}
 
+			if ( hasTangents( this.settings ) ) {
+
+				shiftTangentTimes( this.settings.inTangents, timeOffset );
+				shiftTangentTimes( this.settings.outTangents, timeOffset );
+
+			}
+
 		}
 
 		return this;
@@ -43622,6 +43652,18 @@ class KeyframeTrack {
 		}
 
 		return track;
+
+	}
+
+}
+
+function shiftTangentTimes( tangents, timeOffset ) {
+
+	// tangents are [ time, value ] pairs, so only every second entry is a time
+
+	for ( let i = 0, n = tangents.length; i !== n; i += 2 ) {
+
+		tangents[ i ] += timeOffset;
 
 	}
 

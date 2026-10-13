@@ -4521,45 +4521,44 @@ class ShaderCallNodeInternal extends Node {
 
 		let result = null;
 
-		if ( shaderNode.layout ) {
+		// A layout call needs every input. Missing inputs are completed with the default values
+		// of the function parameters; if they can't be resolved, the function is expanded inline.
 
-			// build inputs first
+		const layoutInputs = shaderNode.layout ? builder._getLayoutInputs( shaderNode, rawInputs ) : null;
 
-			if ( rawInputs ) {
+		if ( layoutInputs !== null ) {
 
-				// use layout inputs to ensure that no extra parameters are built
+			// build inputs first, use layout inputs to ensure that no extra parameters are built
 
-				const inputs = shaderNode.layout.inputs;
+			const layoutParameters = shaderNode.layout.inputs;
 
-				if ( isArrayAsParameter( rawInputs ) ) {
+			if ( isArrayAsParameter( layoutInputs ) ) {
 
-					const rawArrayParameters = rawInputs;
+				const rawArrayParameters = layoutInputs;
 
-					for ( let i = 0; i < inputs.length; i ++ ) {
+				for ( let i = 0; i < layoutParameters.length; i ++ ) {
 
-						const rawParameter = rawArrayParameters[ i ];
+					const rawParameter = rawArrayParameters[ i ];
 
-						if ( rawParameter && rawParameter.isNode ) {
+					if ( rawParameter && rawParameter.isNode ) {
 
-							rawParameter.build( builder );
-
-						}
+						rawParameter.build( builder );
 
 					}
 
-				} else {
+				}
 
-					const rawObjectParameters = rawInputs[ 0 ];
+			} else {
 
-					for ( const param of inputs ) {
+				const rawObjectParameters = layoutInputs[ 0 ];
 
-						const rawParameter = rawObjectParameters[ param.name ];
+				for ( const param of layoutParameters ) {
 
-						if ( rawParameter && rawParameter.isNode ) {
+					const rawParameter = rawObjectParameters[ param.name ];
 
-							rawParameter.build( builder );
+					if ( rawParameter && rawParameter.isNode ) {
 
-						}
+						rawParameter.build( builder );
 
 					}
 
@@ -4573,7 +4572,7 @@ class ShaderCallNodeInternal extends Node {
 
 			//
 
-			const inputs = rawInputs ? getLayoutParameters( rawInputs ) : null;
+			const inputs = getLayoutParameters( layoutInputs );
 
 			result = functionNode.call( inputs );
 
@@ -5159,6 +5158,12 @@ function Fn( jsFunc, layout = null ) {
 
 	// Layout functions are cached across shaders of the same backend. Their bodies
 	// must depend only on explicit inputs and constants, not uniforms or material context.
+	//
+	// Parameters can have default values. A call without some inputs passes the defaults as
+	// arguments, so values like `uv()` are evaluated at the call site. The defaults are resolved
+	// once per function and shared by all calls: a value that must be evaluated per build should
+	// be a node like `Fn( ... ).once()().toVar( name )`. If a default depends on another
+	// parameter, that call is expanded inline.
 
 	const instance = new FnNode( jsFunc, layout );
 
@@ -12202,6 +12207,15 @@ class RenderOutputNode extends Node {
 		this.outputColorSpace = outputColorSpace;
 
 		/**
+		 * Whether the color node uses premultiplied alpha. The output
+		 * uses the same alpha mode.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.premultipliedAlpha = true;
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -12245,7 +12259,11 @@ class RenderOutputNode extends Node {
 		outputNode = vec4( outputNode.rgb, outputNode.a.clamp( 0.0, 1.0 ) );
 
 		// unpremultiply
-		outputNode = unpremultiplyAlpha( outputNode );
+		if ( this.premultipliedAlpha === true ) {
+
+			outputNode = unpremultiplyAlpha( outputNode );
+
+		}
 
 		// tone mapping
 		const toneMapping = ( this._toneMapping !== null ? this._toneMapping : context.toneMapping ) || NoToneMapping;
@@ -12266,7 +12284,11 @@ class RenderOutputNode extends Node {
 		}
 
 		// premultiply in output color space
-		outputNode = premultiplyAlpha( outputNode );
+		if ( this.premultipliedAlpha === true ) {
+
+			outputNode = premultiplyAlpha( outputNode );
+
+		}
 
 		return outputNode;
 
@@ -14913,28 +14935,51 @@ const viewportCoordinate = /*@__PURE__*/ screenCoordinate.sub( viewport.xy );
  */
 const viewportUV = /*@__PURE__*/ viewportCoordinate.div( viewportSize );
 
-// Cache node uniforms
+// Cache single-camera uniforms globally. Array uniforms are cached per renderer and
+// camera count so cameras with different array sizes cannot overwrite each other's
+// buffers, while builders with matching counts still share them.
+
+const _cameraArrays = /*@__PURE__*/ new WeakMap();
+
+function getCameraArray( renderer, camera, name, create ) {
+
+	let arrays = _cameraArrays.get( renderer );
+
+	if ( arrays === undefined ) {
+
+		arrays = new Map();
+		_cameraArrays.set( renderer, arrays );
+
+	}
+
+	const key = name + ':' + camera.cameras.length;
+
+	let array = arrays.get( key );
+
+	if ( array === undefined ) {
+
+		array = create( camera );
+		arrays.set( key, array );
+
+	}
+
+	return array;
+
+}
 
 let _cameraProjectionMatrixBase = null;
-let _cameraProjectionMatrixArray = null;
 
 let _cameraProjectionMatrixInverseBase = null;
-let _cameraProjectionMatrixInverseArray = null;
 
 let _cameraViewMatrixBase = null;
-let _cameraViewMatrixArray = null;
 
 let _cameraWorldMatrixBase = null;
-let _cameraWorldMatrixArray = null;
 
 let _cameraNormalMatrixBase = null;
-let _cameraNormalMatrixArray = null;
 
 let _cameraPositionBase = null;
-let _cameraPositionArray = null;
 
 let _cameraViewportBase = null;
-let _cameraViewportArray = null;
 
 /**
  * TSL object that represents the current `index` value of the camera if used ArrayCamera.
@@ -14966,31 +15011,29 @@ const cameraFar = /*@__PURE__*/ uniform( 'float' ).setName( 'cameraFar' ).setGro
  * @tsl
  * @type {UniformNode<mat4>}
  */
-const cameraProjectionMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
+const cameraProjectionMatrix = /*@__PURE__*/ ( Fn( ( { camera, renderer } ) => {
 
 	let cameraProjectionMatrix;
 
 	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
 
-		const matrices = [];
+		const cameraArray = getCameraArray( renderer, camera, 'cameraProjectionMatrices', ( camera ) => {
 
-		for ( const subCamera of camera.cameras ) {
+			const values = camera.cameras.map( ( subCamera ) => subCamera.projectionMatrix );
 
-			matrices.push( subCamera.projectionMatrix );
+			return uniformArray( values ).setGroup( renderGroup ).setName( 'cameraProjectionMatrices' ).onRenderUpdate( ( { camera }, self ) => {
 
-		}
+				for ( let i = 0; i < camera.cameras.length; i ++ ) {
 
-		if ( _cameraProjectionMatrixArray === null ) {
+					self.array[ i ] = camera.cameras[ i ].projectionMatrix;
 
-			_cameraProjectionMatrixArray = uniformArray( matrices ).setGroup( renderGroup ).setName( 'cameraProjectionMatrices' );
+				}
 
-		} else {
+			} );
 
-			_cameraProjectionMatrixArray.array = matrices;
+		} );
 
-		}
-
-		cameraProjectionMatrix = _cameraProjectionMatrixArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
+		cameraProjectionMatrix = cameraArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
 
 	} else {
 
@@ -15014,31 +15057,29 @@ const cameraProjectionMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
  * @tsl
  * @type {UniformNode<mat4>}
  */
-const cameraProjectionMatrixInverse = /*@__PURE__*/ ( Fn( ( { camera } ) => {
+const cameraProjectionMatrixInverse = /*@__PURE__*/ ( Fn( ( { camera, renderer } ) => {
 
 	let cameraProjectionMatrixInverse;
 
 	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
 
-		const matrices = [];
+		const cameraArray = getCameraArray( renderer, camera, 'cameraProjectionMatricesInverse', ( camera ) => {
 
-		for ( const subCamera of camera.cameras ) {
+			const values = camera.cameras.map( ( subCamera ) => subCamera.projectionMatrixInverse );
 
-			matrices.push( subCamera.projectionMatrixInverse );
+			return uniformArray( values ).setGroup( renderGroup ).setName( 'cameraProjectionMatricesInverse' ).onRenderUpdate( ( { camera }, self ) => {
 
-		}
+				for ( let i = 0; i < camera.cameras.length; i ++ ) {
 
-		if ( _cameraProjectionMatrixInverseArray === null ) {
+					self.array[ i ] = camera.cameras[ i ].projectionMatrixInverse;
 
-			_cameraProjectionMatrixInverseArray = uniformArray( matrices ).setGroup( renderGroup ).setName( 'cameraProjectionMatricesInverse' );
+				}
 
-		} else {
+			} );
 
-			_cameraProjectionMatrixInverseArray.array = matrices;
+		} );
 
-		}
-
-		cameraProjectionMatrixInverse = _cameraProjectionMatrixInverseArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
+		cameraProjectionMatrixInverse = cameraArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
 
 	} else {
 
@@ -15062,31 +15103,29 @@ const cameraProjectionMatrixInverse = /*@__PURE__*/ ( Fn( ( { camera } ) => {
  * @tsl
  * @type {UniformNode<mat4>}
  */
-const cameraViewMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
+const cameraViewMatrix = /*@__PURE__*/ ( Fn( ( { camera, renderer } ) => {
 
 	let cameraViewMatrix;
 
 	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
 
-		const matrices = [];
+		const cameraArray = getCameraArray( renderer, camera, 'cameraViewMatrices', ( camera ) => {
 
-		for ( const subCamera of camera.cameras ) {
+			const values = camera.cameras.map( ( subCamera ) => subCamera.matrixWorldInverse );
 
-			matrices.push( subCamera.matrixWorldInverse );
+			return uniformArray( values ).setGroup( renderGroup ).setName( 'cameraViewMatrices' ).onRenderUpdate( ( { camera }, self ) => {
 
-		}
+				for ( let i = 0; i < camera.cameras.length; i ++ ) {
 
-		if ( _cameraViewMatrixArray === null ) {
+					self.array[ i ] = camera.cameras[ i ].matrixWorldInverse;
 
-			_cameraViewMatrixArray = uniformArray( matrices ).setGroup( renderGroup ).setName( 'cameraViewMatrices' );
+				}
 
-		} else {
+			} );
 
-			_cameraViewMatrixArray.array = matrices;
+		} );
 
-		}
-
-		cameraViewMatrix = _cameraViewMatrixArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
+		cameraViewMatrix = cameraArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
 
 	} else {
 
@@ -15110,31 +15149,29 @@ const cameraViewMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
  * @tsl
  * @type {UniformNode<mat4>}
  */
-const cameraWorldMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
+const cameraWorldMatrix = /*@__PURE__*/ ( Fn( ( { camera, renderer } ) => {
 
 	let cameraWorldMatrix;
 
 	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
 
-		const matrices = [];
+		const cameraArray = getCameraArray( renderer, camera, 'cameraWorldMatrices', ( camera ) => {
 
-		for ( const subCamera of camera.cameras ) {
+			const values = camera.cameras.map( ( subCamera ) => subCamera.matrixWorld );
 
-			matrices.push( subCamera.matrixWorld );
+			return uniformArray( values ).setGroup( renderGroup ).setName( 'cameraWorldMatrices' ).onRenderUpdate( ( { camera }, self ) => {
 
-		}
+				for ( let i = 0; i < camera.cameras.length; i ++ ) {
 
-		if ( _cameraWorldMatrixArray === null ) {
+					self.array[ i ] = camera.cameras[ i ].matrixWorld;
 
-			_cameraWorldMatrixArray = uniformArray( matrices ).setGroup( renderGroup ).setName( 'cameraWorldMatrices' );
+				}
 
-		} else {
+			} );
 
-			_cameraWorldMatrixArray.array = matrices;
+		} );
 
-		}
-
-		cameraWorldMatrix = _cameraWorldMatrixArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
+		cameraWorldMatrix = cameraArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
 
 	} else {
 
@@ -15158,31 +15195,29 @@ const cameraWorldMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
  * @tsl
  * @type {UniformNode<mat3>}
  */
-const cameraNormalMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
+const cameraNormalMatrix = /*@__PURE__*/ ( Fn( ( { camera, renderer } ) => {
 
 	let cameraNormalMatrix;
 
 	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
 
-		const matrices = [];
+		const cameraArray = getCameraArray( renderer, camera, 'cameraNormalMatrices', ( camera ) => {
 
-		for ( const subCamera of camera.cameras ) {
+			const values = camera.cameras.map( ( subCamera ) => subCamera.normalMatrix );
 
-			matrices.push( subCamera.normalMatrix );
+			return uniformArray( values ).setGroup( renderGroup ).setName( 'cameraNormalMatrices' ).onRenderUpdate( ( { camera }, self ) => {
 
-		}
+				for ( let i = 0; i < camera.cameras.length; i ++ ) {
 
-		if ( _cameraNormalMatrixArray === null ) {
+					self.array[ i ] = camera.cameras[ i ].normalMatrix;
 
-			_cameraNormalMatrixArray = uniformArray( matrices ).setGroup( renderGroup ).setName( 'cameraNormalMatrices' );
+				}
 
-		} else {
+			} );
 
-			_cameraNormalMatrixArray.array = matrices;
+		} );
 
-		}
-
-		cameraNormalMatrix = _cameraNormalMatrixArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
+		cameraNormalMatrix = cameraArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
 
 	} else {
 
@@ -15206,23 +15241,23 @@ const cameraNormalMatrix = /*@__PURE__*/ ( Fn( ( { camera } ) => {
  * @tsl
  * @type {UniformNode<vec3>}
  */
-const cameraPosition = /*@__PURE__*/ ( Fn( ( { camera } ) => {
+const cameraPosition = /*@__PURE__*/ ( Fn( ( { camera, renderer } ) => {
 
 	let cameraPosition;
 
 	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
 
-		const positions = [];
+		const cameraArray = getCameraArray( renderer, camera, 'cameraPositions', ( camera ) => {
 
-		for ( let i = 0, l = camera.cameras.length; i < l; i ++ ) {
+			const positions = [];
 
-			positions.push( new Vector3() );
+			for ( let i = 0, l = camera.cameras.length; i < l; i ++ ) {
 
-		}
+				positions.push( new Vector3() );
 
-		if ( _cameraPositionArray === null ) {
+			}
 
-			_cameraPositionArray = uniformArray( positions ).setGroup( renderGroup ).setName( 'cameraPositions' ).onRenderUpdate( ( { camera }, self ) => {
+			return uniformArray( positions ).setGroup( renderGroup ).setName( 'cameraPositions' ).onRenderUpdate( ( { camera }, self ) => {
 
 				const subCameras = camera.cameras;
 				const array = self.array;
@@ -15235,13 +15270,9 @@ const cameraPosition = /*@__PURE__*/ ( Fn( ( { camera } ) => {
 
 			} );
 
-		} else {
+		} );
 
-			_cameraPositionArray.array = positions;
-
-		}
-
-		cameraPosition = _cameraPositionArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
+		cameraPosition = cameraArray.element( camera.isMultiViewCamera ? builtin( 'gl_ViewID_OVR' ) : cameraIndex );
 
 	} else {
 
@@ -15266,31 +15297,29 @@ const cameraPosition = /*@__PURE__*/ ( Fn( ( { camera } ) => {
  * @tsl
  * @type {UniformNode<vec4>}
  */
-const cameraViewport = /*@__PURE__*/ ( Fn( ( { camera } ) => {
+const cameraViewport = /*@__PURE__*/ ( Fn( ( { camera, renderer } ) => {
 
 	let cameraViewport;
 
 	if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
 
-		const viewports = [];
+		const cameraArray = getCameraArray( renderer, camera, 'cameraViewports', ( camera ) => {
 
-		for ( const subCamera of camera.cameras ) {
+			const values = camera.cameras.map( ( subCamera ) => subCamera.viewport );
 
-			viewports.push( subCamera.viewport );
+			return uniformArray( values, 'vec4' ).setGroup( renderGroup ).setName( 'cameraViewports' ).onRenderUpdate( ( { camera }, self ) => {
 
-		}
+				for ( let i = 0; i < camera.cameras.length; i ++ ) {
 
-		if ( _cameraViewportArray === null ) {
+					self.array[ i ] = camera.cameras[ i ].viewport;
 
-			_cameraViewportArray = uniformArray( viewports, 'vec4' ).setGroup( renderGroup ).setName( 'cameraViewports' );
+				}
 
-		} else {
+			} );
 
-			_cameraViewportArray.array = viewports;
+		} );
 
-		}
-
-		cameraViewport = _cameraViewportArray.element( cameraIndex );
+		cameraViewport = cameraArray.element( cameraIndex );
 
 	} else {
 
@@ -19527,7 +19556,6 @@ const batch = /*@__PURE__*/ Fn( ( [ batchMesh ], builder ) => {
 }, 'void' );
 
 const _skeletonsUpdated = /*@__PURE__*/ new WeakMap();
-const _previousBoneMatricesData = /*@__PURE__*/ new WeakMap();
 
 /**
  * Creates an accessor for bone matrices stored in a bone texture.
@@ -19672,62 +19700,65 @@ function getSkinnedNormalAndTangent( boneMatrices, normal, tangent, bindMatrix, 
 }
 
 /**
- * Retrieves or initializes the previous frame skinned position node for motion vectors.
- * Uses a WeakMap to cache previous frame bone matrix arrays and their TSL buffer nodes.
+ * Creates the bone data of the previous frame if they do not exist yet.
  *
- * @param {NodeBuilder} builder - The current node builder.
- * @param {SkinnedMesh} skinnedMesh - The skinned mesh.
- * @param {Node<mat4>} bindMatrixNode - The bind matrix node.
- * @param {Node<mat4>} bindMatrixInverseNode - The inverse bind matrix node.
- * @param {Node<uvec4>} skinIndexNode - The skin index attribute.
- * @param {Node<vec4>} skinWeightNode - The skin weight attribute.
- * @returns {Node<vec3>} The skinned position from the previous frame.
+ * @param {Skeleton} skeleton - The skeleton.
  */
-function getPreviousSkinnedPosition( builder, skinnedMesh, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode ) {
+function setupPreviousBoneData( skeleton ) {
 
-	const skeleton = skinnedMesh.skeleton;
-
-	let data = _previousBoneMatricesData.get( skeleton );
-
-	if ( data === undefined ) {
+	if ( skeleton.previousBoneMatrices === null ) {
 
 		skeleton.update();
 
-		const uniformBufferSize = skeleton.bones.length * 16 * 4;
-
-		if ( uniformBufferSize <= builder.getUniformBufferLimit() ) {
-
-			const previousBoneMatrices = new Float32Array( skeleton.boneMatrices );
-
-			data = {
-				previousBoneMatrices,
-				previousBoneTexture: null,
-				node: buffer( previousBoneMatrices, 'mat4', skeleton.bones.length )
-			};
-
-		} else {
-
-			if ( skeleton.boneTexture === null ) skeleton.computeBoneTexture();
-
-			const { width, height } = skeleton.boneTexture.image;
-
-			const previousBoneMatrices = new Float32Array( skeleton.boneMatrices );
-			const previousBoneTexture = new DataTexture( previousBoneMatrices, width, height, RGBAFormat, FloatType );
-			previousBoneTexture.needsUpdate = true;
-
-			data = {
-				previousBoneMatrices,
-				previousBoneTexture,
-				node: getBoneTextureMatrices( texture( previousBoneTexture ) )
-			};
-
-		}
-
-		_previousBoneMatricesData.set( skeleton, data );
+		skeleton.previousBoneMatrices = new Float32Array( skeleton.boneMatrices );
 
 	}
 
-	return getSkinnedPosition( data.node, positionPrevious, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode );
+	if ( skeleton.previousBoneTexture === null && skeleton.boneTexture !== null ) {
+
+		const { width, height } = skeleton.boneTexture.image;
+
+		skeleton.previousBoneTexture = new DataTexture( skeleton.previousBoneMatrices, width, height, RGBAFormat, FloatType );
+		skeleton.previousBoneTexture.needsUpdate = true;
+
+	}
+
+}
+
+/**
+ * Creates the bone matrices node of the previous frame.
+ *
+ * @param {NodeBuilder} builder - The current node builder.
+ * @param {Skeleton} skeleton - The skeleton.
+ * @returns {Object} The previous bone matrices node.
+ */
+function getPreviousBoneMatricesNode( builder, skeleton ) {
+
+	let node;
+
+	setupPreviousBoneData( skeleton );
+
+	const uniformBufferSize = skeleton.bones.length * 16 * 4;
+
+	if ( uniformBufferSize <= builder.getUniformBufferLimit() ) {
+
+		node = referenceBuffer( 'skeleton.previousBoneMatrices', 'mat4', skeleton.bones.length );
+
+	} else {
+
+		const previousBoneTexture = texture( skeleton.previousBoneTexture );
+
+		OnObjectUpdate( ( { object } ) => {
+
+			previousBoneTexture.value = object.skeleton.previousBoneTexture;
+
+		} );
+
+		node = getBoneTextureMatrices( previousBoneTexture );
+
+	}
+
+	return node;
 
 }
 
@@ -19746,24 +19777,25 @@ const skinning = /*@__PURE__*/ Fn( ( [ skinnedMesh ], builder ) => {
 	const bindMatrixNode = reference( 'bindMatrix', 'mat4' );
 	const bindMatrixInverseNode = reference( 'bindMatrixInverse', 'mat4' );
 	const boneMatricesNode = getBoneMatricesNode( builder, skinnedMesh.skeleton );
+	const needsPreviousData = builder.needsPreviousData();
 
 	OnObjectUpdate( ( { object, frameId } ) => {
 
 		const skeleton = object.skeleton;
 
+		if ( needsPreviousData ) setupPreviousBoneData( skeleton );
+
 		if ( _skeletonsUpdated.get( skeleton ) !== frameId ) {
 
 			_skeletonsUpdated.set( skeleton, frameId );
 
-			const skeletonData = _previousBoneMatricesData.get( skeleton );
+			if ( skeleton.previousBoneMatrices !== null ) {
 
-			if ( skeletonData !== undefined ) {
+				skeleton.previousBoneMatrices.set( skeleton.boneMatrices );
 
-				skeletonData.previousBoneMatrices.set( skeleton.boneMatrices );
+				if ( skeleton.previousBoneTexture !== null ) {
 
-				if ( skeletonData.previousBoneTexture !== null ) {
-
-					skeletonData.previousBoneTexture.needsUpdate = true;
+					skeleton.previousBoneTexture.needsUpdate = true;
 
 				}
 
@@ -19775,9 +19807,10 @@ const skinning = /*@__PURE__*/ Fn( ( [ skinnedMesh ], builder ) => {
 
 	} );
 
-	if ( builder.needsPreviousData() ) {
+	if ( needsPreviousData ) {
 
-		const previousSkinnedPosition = getPreviousSkinnedPosition( builder, skinnedMesh, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode );
+		const previousBoneMatricesNode = getPreviousBoneMatricesNode( builder, skinnedMesh.skeleton );
+		const previousSkinnedPosition = getSkinnedPosition( previousBoneMatricesNode, positionPrevious, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode );
 
 		positionPrevious.assign( previousSkinnedPosition );
 
@@ -19828,15 +19861,13 @@ const computeSkinning = /*@__PURE__*/ Fn( ( [ skinnedMesh, toPosition = null ], 
 
 			_skeletonsUpdated.set( skeleton, frameId );
 
-			const state = _previousBoneMatricesData.get( skeleton );
+			if ( skeleton.previousBoneMatrices !== null ) {
 
-			if ( state !== undefined ) {
+				skeleton.previousBoneMatrices.set( skeleton.boneMatrices );
 
-				state.previousBoneMatrices.set( skeleton.boneMatrices );
+				if ( skeleton.previousBoneTexture !== null ) {
 
-				if ( state.previousBoneTexture !== null ) {
-
-					state.previousBoneTexture.needsUpdate = true;
+					skeleton.previousBoneTexture.needsUpdate = true;
 
 				}
 
@@ -19850,7 +19881,10 @@ const computeSkinning = /*@__PURE__*/ Fn( ( [ skinnedMesh, toPosition = null ], 
 
 	if ( builder.needsPreviousData() ) {
 
-		const previousSkinnedPosition = getPreviousSkinnedPosition( builder, skinnedMesh, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode );
+		setupPreviousBoneData( skeleton );
+
+		const previousBoneMatricesNode = buffer( skeleton.previousBoneMatrices, 'mat4', skeleton.bones.length );
+		const previousSkinnedPosition = getSkinnedPosition( previousBoneMatricesNode, positionPrevious, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode );
 
 		positionPrevious.assign( previousSkinnedPosition );
 
@@ -32510,7 +32544,8 @@ class Geometries extends DataMap {
 
 			if ( geometry === undefined ) continue;
 
-			geometry.removeEventListener( 'dispose', this.get( geometry ).onDispose );
+			const geometryData = this.get( geometry );
+			geometryData.onDispose();
 
 		}
 
@@ -39071,7 +39106,7 @@ class FunctionOverloadingNode extends Node {
 						const param = params[ i ];
 						const input = inputs[ i ];
 
-						if ( param.getNodeType( builder ) === input.type ) {
+						if ( builder.getVectorType( param.getNodeType( builder ) ) === input.type ) {
 
 							currentScore ++;
 
@@ -39231,7 +39266,7 @@ const rotateUV = /*@__PURE__*/ Fn( ( [ uv, rotation, center = vec2( 0.5 ) ] ) =>
 
 	return rotate( uv.sub( center ), rotation ).add( center );
 
-} );
+}, { uv: 'vec2', rotation: 'float', center: 'vec2', return: 'vec2' } );
 
 /**
  * Applies a spherical warping effect to the given uv coordinates.
@@ -39252,7 +39287,7 @@ const spherizeUV = /*@__PURE__*/ Fn( ( [ uv, strength, center = vec2( 0.5 ) ] ) 
 
 	return uv.add( delta.mul( deltaOffset ) );
 
-} );
+}, { uv: 'vec2', strength: 'float', center: 'vec2', return: 'vec2' } );
 
 /**
  * This can be used to achieve a billboarding behavior for flat meshes. That means they are
@@ -39965,6 +40000,11 @@ class ReflectorBaseNode extends Node {
 
 		virtualCamera.updateMatrixWorld();
 		virtualCamera.projectionMatrix.copy( camera.projectionMatrix );
+
+		// The reflection is mirrored horizontally, so the view offset must be mirrored as well.
+
+		virtualCamera.projectionMatrix.elements[ 8 ] *= -1;
+		virtualCamera.projectionMatrix.elements[ 12 ] *= -1;
 
 		// Now update projection matrix with new clip plane, implementing code from: http://www.terathon.com/code/oblique.html
 		// Paper explaining this technique: http://www.terathon.com/lengyel/Lengyel-Oblique.pdf
@@ -42279,18 +42319,29 @@ const blendColor = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 }, { base: 'vec4', blend: 'vec4', return: 'vec4' } );
 
 /**
+ * TSL object that represents the luminance coefficients of the current working color space.
+ * It is evaluated once per build, so it can also be used as the default value of a parameter
+ * of a function with layout.
+ *
+ * @tsl
+ * @type {VarNode<vec3>}
+ */
+const workingLuminanceCoefficients = /*@__PURE__*/ Fn( () => vec3( ColorManagement.getLuminanceCoefficients( new Vector3() ) ) ).once()().toVar( 'workingLuminanceCoefficients' );
+
+/**
  * Computes a grayscale value for the given RGB color value.
  *
  * @tsl
  * @function
  * @param {Node<vec3>} color - The color value to compute the grayscale for.
- * @return {Node<vec3>} The grayscale color.
+ * @param {Node<vec3>} [luminanceCoefficients] - The luminance coefficients. By default predefined values of the current working color space are used.
+ * @return {Node<float>} The grayscale value.
  */
-const grayscale = /*@__PURE__*/ Fn( ( [ color ] ) => {
+const grayscale = /*@__PURE__*/ Fn( ( [ color, luminanceCoefficients = workingLuminanceCoefficients ] ) => {
 
-	return luminance( color.rgb );
+	return luminance( color.rgb, luminanceCoefficients );
 
-} );
+}, { color: 'vec3', luminanceCoefficients: 'vec3', return: 'float' } );
 
 /**
  * Super-saturates or desaturates the given RGB color.
@@ -42299,13 +42350,14 @@ const grayscale = /*@__PURE__*/ Fn( ( [ color ] ) => {
  * @function
  * @param {Node<vec3>} color - The input color.
  * @param {Node<float>} [adjustment=1] - Specifies the amount of the conversion. A value under `1` desaturates the color, a value over `1` super-saturates it.
+ * @param {Node<vec3>} [luminanceCoefficients] - The luminance coefficients. By default predefined values of the current working color space are used.
  * @return {Node<vec3>} The saturated color.
  */
-const saturation = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
+const saturation = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ), luminanceCoefficients = workingLuminanceCoefficients ] ) => {
 
-	return adjustment.mix( luminance( color.rgb ), color.rgb ).max( 0.0 );
+	return adjustment.mix( luminance( color.rgb, luminanceCoefficients ), color.rgb ).max( 0.0 );
 
-} );
+}, { color: 'vec3', adjustment: 'float', luminanceCoefficients: 'vec3', return: 'vec3' } );
 
 /**
  * Selectively enhance the intensity of less saturated RGB colors. Can result
@@ -42327,7 +42379,7 @@ const vibrance = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 0 ) ] ) => {
 
 	return mix( color.rgb, mx, amt ).max( 0.0 );
 
-} );
+}, { color: 'vec3', adjustment: 'float', return: 'vec3' } );
 
 /**
  * Updates the hue component of the given RGB color while preserving its luminance and saturation.
@@ -42346,7 +42398,7 @@ const hue = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
 
 	return vec3( color.rgb.mul( cosAngle ).add( k.cross( color.rgb ).mul( adjustment.sin() ).add( k.mul( dot( k, color.rgb ).mul( cosAngle.oneMinus() ) ) ) ) ).max( 0.0 );
 
-} );
+}, { color: 'vec3', adjustment: 'float', return: 'vec3' } );
 
 /**
  * Computes the luminance for the given RGB color value.
@@ -42412,7 +42464,7 @@ const cdl = /*@__PURE__*/ Fn( ( [
 
 	return vec4( v.rgb, color.a );
 
-} );
+}, { color: 'vec4', slope: 'vec3', offset: 'vec3', power: 'vec3', saturation: 'float', luminanceCoefficients: 'vec3', return: 'vec4' } );
 
 /**
  * TSL function for creating a posterize effect which reduces the number of colors
@@ -44354,20 +44406,24 @@ class FunctionNode extends CodeNode {
 
 	generate( builder, output ) {
 
-		super.generate( builder );
-
 		const nodeFunction = this.getNodeFunction( builder );
+		const nodeData = builder.getDataFromNode( this );
 
-		const name = nodeFunction.name;
 		const type = nodeFunction.type;
 
-		const nodeCode = builder.getCodeFromNode( this, type );
+		let propertyName = nodeData.functionPropertyName;
 
-		if ( name !== '' ) {
+		if ( propertyName === undefined ) {
 
-			const nodeData = builder.getDataFromNode( this );
+			// The includes and the function code are generated once per builder and shader stage,
+			// further calls only need the function name.
 
-			if ( nodeData.declarationRegistered !== true ) {
+			super.generate( builder );
+
+			const name = nodeFunction.name;
+			const nodeCode = builder.getCodeFromNode( this, type );
+
+			if ( name !== '' ) {
 
 				// use a custom property name
 
@@ -44375,17 +44431,15 @@ class FunctionNode extends CodeNode {
 
 				builder.registerDeclaration( nodeCode );
 
-				nodeData.declarationRegistered = true;
-
 			}
 
+			propertyName = builder.getPropertyName( nodeCode );
+
+			nodeCode.code = nodeFunction.getCode( propertyName ) + '\n';
+
+			nodeData.functionPropertyName = propertyName;
+
 		}
-
-		const propertyName = builder.getPropertyName( nodeCode );
-
-		const code = this.getNodeFunction( builder ).getCode( propertyName );
-
-		nodeCode.code = code + '\n';
 
 		if ( output === 'property' ) {
 
@@ -46509,6 +46563,17 @@ class LightsNode extends Node {
 			_hashData.push( light.id );
 			_hashData.push( light.castShadow ? 1 : 0 );
 
+			if ( light.castShadow === true ) {
+
+				// force rebuild on version change to avoid the usage of removed shadow nodes
+
+				const lightNode = _lightsNodeRef.get( light );
+				const lightVersion = ( lightNode ) ? lightNode.version : -1;
+
+				_hashData.push( lightVersion );
+
+			}
+
 			if ( light.isSpotLight === true ) {
 
 				const hashMap = ( light.map !== null ) ? light.map.id : -1;
@@ -48406,21 +48471,16 @@ class AnalyticLightNode extends LightingNode {
 	 */
 	disposeShadow() {
 
-		if ( this.shadowNode !== null ) {
+		if ( this.shadowNode === null ) return;
 
-			this.shadowNode.dispose();
-			this.shadowNode = null;
-
-		}
-
+		this.shadowNode.dispose();
+		this.shadowNode = null;
 		this.shadowColorNode = null;
 
-		if ( this.baseColorNode !== null ) {
+		this.colorNode = this.baseColorNode;
+		this.baseColorNode = null;
 
-			this.colorNode = this.baseColorNode;
-			this.baseColorNode = null;
-
-		}
+		this.needsUpdate = true;
 
 	}
 
@@ -48545,9 +48605,7 @@ class AnalyticLightNode extends LightingNode {
 
 		} else if ( this.shadowNode !== null ) {
 
-			this.shadowNode.dispose();
-			this.shadowNode = null;
-			this.shadowColorNode = null;
+			this.disposeShadow();
 
 		}
 
@@ -48722,7 +48780,7 @@ const checker = /*@__PURE__*/ Fn( ( [ coord = uv$1() ] ) => {
 
 	return result.sign();
 
-} );
+}, { coord: 'vec2', return: 'float' } );
 
 /**
  * Generates a circle based on the uv coordinates.
@@ -52127,6 +52185,35 @@ class Matrix4NodeUniform extends Matrix4Uniform {
 let _id$5 = 0;
 
 const _functionNodeCache = new WeakMap();
+const _layoutDefaultsCache = new WeakMap();
+
+// Inputs of a layout function call. They can be destructured as an array or as an object.
+const _createLayoutInputs = ( layout, values ) => {
+
+	const inputs = {
+		[ Symbol.iterator ]() {
+
+			let index = 0;
+			const values = Object.values( this );
+			return {
+				next: () => ( {
+					value: values[ index ],
+					done: index ++ >= values.length
+				} )
+			};
+
+		}
+	};
+
+	layout.inputs.forEach( ( input, i ) => {
+
+		inputs[ input.name ] = values[ i ];
+
+	} );
+
+	return inputs;
+
+};
 
 const typeFromArray = new Map( [
 	[ Int8Array, 'int' ],
@@ -54651,7 +54738,7 @@ class NodeBuilder {
 	 */
 	addInclude( node ) {
 
-		if ( this.currentFunctionNode !== null ) {
+		if ( this.currentFunctionNode !== null && this.currentFunctionNode.includes.includes( node ) === false ) {
 
 			this.currentFunctionNode.includes.push( node );
 
@@ -54711,26 +54798,7 @@ class NodeBuilder {
 
 		const layout = shaderNode.layout;
 
-		const inputs = {
-			[ Symbol.iterator ]() {
-
-				let index = 0;
-				const values = Object.values( this );
-				return {
-					next: () => ( {
-						value: values[ index ],
-						done: index ++ >= values.length
-					} )
-				};
-
-			}
-		};
-
-		for ( const input of layout.inputs ) {
-
-			inputs[ input.name ] = new ParameterNode( input.type, input.name );
-
-		}
+		const inputs = _createLayoutInputs( layout, layout.inputs.map( input => new ParameterNode( input.type, input.name ) ) );
 
 		//
 
@@ -54742,6 +54810,217 @@ class NodeBuilder {
 		shaderNode.layout = layout;
 
 		return flowData;
+
+	}
+
+	/**
+	 * Returns the inputs of a call to a TSL function with layout. Missing inputs are completed
+	 * with the default values of the function parameters, found by running the function once
+	 * with all inputs and once without the missing ones, and comparing both node graphs.
+	 *
+	 * @private
+	 * @param {ShaderNodeInternal} shaderNode - The shader node of the function.
+	 * @param {?Array} rawInputs - The inputs of the call.
+	 * @return {?Array} The inputs of the call, or `null` if the defaults can't be resolved and the function must be expanded inline.
+	 */
+	_getLayoutInputs( shaderNode, rawInputs ) {
+
+		const inputs = shaderNode.layout.inputs;
+
+		const firstInput = rawInputs !== null && rawInputs.length > 0 ? rawInputs[ 0 ] : null;
+		const object = firstInput !== null && firstInput !== undefined && isArrayAsParameter( rawInputs ) === false ? firstInput : null;
+		const provided = inputs.map( ( input, i ) => object !== null ? object[ input.name ] !== undefined : rawInputs !== null && rawInputs[ i ] !== undefined );
+
+		if ( provided.every( Boolean ) ) return rawInputs !== null ? rawInputs : [];
+
+		if ( shaderNode.once ) return null;
+
+		// The defaults only depend on which inputs are missing, so they are shared by all builders.
+
+		let cache = _layoutDefaultsCache.get( shaderNode );
+
+		if ( cache === undefined ) {
+
+			cache = new Map();
+			_layoutDefaultsCache.set( shaderNode, cache );
+
+		}
+
+		const key = provided.map( Number ).join( '' );
+
+		let defaults = cache.get( key );
+
+		if ( defaults === undefined ) {
+
+			defaults = this._resolveLayoutDefaults( shaderNode, provided );
+			cache.set( key, defaults );
+
+		}
+
+		if ( defaults === null ) return null;
+
+		if ( object !== null ) {
+
+			const completed = { ...object };
+
+			inputs.forEach( ( input, i ) => {
+
+				if ( provided[ i ] === false ) completed[ input.name ] = defaults[ i ];
+
+			} );
+
+			return [ completed ];
+
+		}
+
+		return provided.map( ( isProvided, i ) => isProvided ? rawInputs[ i ] : defaults[ i ] );
+
+	}
+
+	/**
+	 * Resolves the default values of the missing inputs of a TSL function with layout.
+	 *
+	 * @private
+	 * @param {ShaderNodeInternal} shaderNode - The shader node of the function.
+	 * @param {Array<boolean>} provided - Whether each input of the layout was provided.
+	 * @return {?Array<Node>} The default value of each missing input, or `null` if they could not be resolved.
+	 */
+	_resolveLayoutDefaults( shaderNode, provided ) {
+
+		const layout = shaderNode.layout;
+		const parameters = layout.inputs.map( input => new ParameterNode( input.type, input.name ) );
+
+		const fullGraph = this._getLayoutCallGraph( shaderNode, _createLayoutInputs( layout, parameters ) );
+		const partialGraph = this._getLayoutCallGraph( shaderNode, _createLayoutInputs( layout, parameters.map( ( parameter, i ) => provided[ i ] ? parameter : undefined ) ) );
+
+		// Walk both graphs together: where the full graph uses the parameter of a missing input,
+		// the partial graph uses its default value.
+
+		const missing = new Map();
+		parameters.forEach( ( parameter, i ) => {
+
+			if ( provided[ i ] === false ) missing.set( parameter, i );
+
+		} );
+
+		const defaults = [];
+		const visited = new Map();
+
+		const walk = ( a, b ) => {
+
+			if ( a === b ) return true;
+			if ( ! a || ! b || a.isNode !== true || b.isNode !== true ) return false;
+
+			const index = missing.get( a );
+
+			if ( index !== undefined ) {
+
+				if ( defaults[ index ] === undefined ) defaults[ index ] = b;
+
+				return defaults[ index ] === b;
+
+			}
+
+			if ( visited.has( a ) ) return visited.get( a ) === b;
+			if ( a.constructor !== b.constructor ) return false;
+
+			visited.set( a, b );
+
+			const childrenA = [ ...a.getChildren() ];
+			const childrenB = [ ...b.getChildren() ];
+
+			if ( childrenA.length !== childrenB.length ) return false;
+
+			for ( let i = 0; i < childrenA.length; i ++ ) {
+
+				if ( walk( childrenA[ i ], childrenB[ i ] ) === false ) return false;
+
+			}
+
+			return true;
+
+		};
+
+		// The default values are evaluated when the parameters are destructured, before the body,
+		// so the nodes they add to the stack come first. Align the body statements from the end.
+
+		const extra = partialGraph.nodes.length - fullGraph.nodes.length;
+
+		if ( extra < 0 ) return null;
+
+		visited.set( fullGraph, partialGraph );
+
+		if ( walk( fullGraph.outputNode, partialGraph.outputNode ) === false ) return null;
+
+		for ( let i = 0; i < fullGraph.nodes.length; i ++ ) {
+
+			if ( walk( fullGraph.nodes[ i ], partialGraph.nodes[ extra + i ] ) === false ) return null;
+
+		}
+
+		// Every missing input must have a default that does not depend on other parameters.
+
+		const parameterSet = new Set( parameters );
+
+		for ( const index of missing.values() ) {
+
+			const value = defaults[ index ];
+
+			if ( value === undefined ) return null;
+
+			const stack = [ value ];
+			const seen = new Set();
+
+			while ( stack.length > 0 ) {
+
+				const node = stack.pop();
+
+				if ( parameterSet.has( node ) ) return null;
+				if ( seen.has( node ) ) continue;
+
+				seen.add( node );
+
+				for ( const child of node.getChildren() ) stack.push( child );
+
+			}
+
+		}
+
+		return defaults;
+
+	}
+
+	/**
+	 * Runs a TSL function with layout as an inline call and returns the resulting stack.
+	 *
+	 * @private
+	 * @param {ShaderNodeInternal} shaderNode - The shader node of the function.
+	 * @param {Object} inputs - The inputs of the call.
+	 * @return {StackNode} The stack with the nodes of the call.
+	 */
+	_getLayoutCallGraph( shaderNode, inputs ) {
+
+		const layout = shaderNode.layout;
+
+		let graph;
+
+		shaderNode.layout = null;
+
+		this.addStack();
+
+		try {
+
+			this.stack.outputNode = shaderNode.call( inputs ).call( this );
+
+		} finally {
+
+			graph = this.removeStack();
+
+			shaderNode.layout = layout;
+
+		}
+
+		return graph;
 
 	}
 
@@ -60055,9 +60334,12 @@ class XRManager extends EventDispatcher {
 
 					contextNode = context( {
 
-						getOutput: ( outputNode ) => {
+						getOutput: ( outputNode, builder ) => {
 
-							return renderOutput( outputNode, renderer.toneMapping, renderer.outputColorSpace );
+							const renderOutputNode = renderOutput( outputNode, renderer.toneMapping, renderer.outputColorSpace );
+							renderOutputNode.premultipliedAlpha = builder.material.premultipliedAlpha;
+
+							return renderOutputNode;
 
 						},
 
@@ -61429,6 +61711,14 @@ class Renderer {
 		this._onCanvasTargetResize = this._onCanvasTargetResize.bind( this );
 
 		/**
+		 * OnCanvasTargetDispose callback function.
+		 *
+		 * @private
+		 * @type {Function}
+		 */
+		this._onCanvasTargetDispose = this._onCanvasTargetDispose.bind( this );
+
+		/**
 		 * The canvas target for rendering.
 		 *
 		 * @private
@@ -61436,6 +61726,7 @@ class Renderer {
 		 */
 		this._canvasTarget = new CanvasTarget( backend.getDomElement() );
 		this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
+		this._canvasTarget.addEventListener( 'dispose', this._onCanvasTargetDispose );
 		this._canvasTarget.isDefaultCanvasTarget = true;
 
 		/**
@@ -63288,10 +63579,10 @@ class Renderer {
 	 * from the GPU to the CPU in context of compute shaders.
 	 *
 	 * @async
-	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
-	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
-	 * @param {number} offset - The storage buffer attribute.
-	 * @param {number} count - The offset from which to start reading the
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read from.
+	 * @param {?(ReadbackBuffer|ArrayBuffer)} [target=null] - The readback buffer or array buffer that receives the data. If `null`, a new array buffer is returned.
+	 * @param {number} [offset=0] - The byte offset to start reading from. Must be a multiple of 4.
+	 * @param {number} [count=-1] - The number of bytes to read. Must be a multiple of 4, or `-1` to read to the end of the buffer.
 	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
 	async getArrayBufferAsync( attribute, target = null, offset = 0, count = -1 ) {
@@ -63922,6 +64213,8 @@ class Renderer {
 
 			}
 
+			this._destroyCanvasTarget( this._canvasTarget );
+
 			this._textures.dispose();
 			this.info.dispose();
 
@@ -63992,9 +64285,12 @@ class Renderer {
 	setCanvasTarget( canvasTarget ) {
 
 		this._canvasTarget.removeEventListener( 'resize', this._onCanvasTargetResize );
+		// keep any dispose event listener attached for later use
 
 		this._canvasTarget = canvasTarget;
+
 		this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
+		this._canvasTarget.addEventListener( 'dispose', this._onCanvasTargetDispose );
 
 	}
 
@@ -64094,6 +64390,20 @@ class Renderer {
 
 		}
 
+		const computeList = Array.isArray( computeNodes ) ? computeNodes : [ computeNodes ];
+
+		if ( computeList.length === 0 || computeList.some( computeNode => computeNode?.isComputeNode !== true ) ) {
+
+			throw new Error( 'THREE.Renderer: ".compute()" expects a "ComputeNode".' );
+
+		}
+
+		if ( dispatchSize !== null && computeList.some( computeNode => computeNode.count !== null || computeNode.dispatchSize !== null ) ) {
+
+			throw new Error( 'THREE.Renderer: A dispatch size cannot be passed to "renderer.compute()" for nodes created with "compute( count )". Use "computeKernel()" instead.' );
+
+		}
+
 		//
 
 		const nodeFrame = this._nodes.nodeFrame;
@@ -64120,14 +64430,6 @@ class Renderer {
 		const pipelines = this._pipelines;
 		const bindings = this._bindings;
 		const nodes = this._nodes;
-
-		const computeList = Array.isArray( computeNodes ) ? computeNodes : [ computeNodes ];
-
-		if ( computeList[ 0 ] === undefined || computeList[ 0 ].isComputeNode !== true ) {
-
-			throw new Error( 'THREE.Renderer: .compute() expects a ComputeNode.' );
-
-		}
 
 		backend.beginCompute( computeNodes );
 
@@ -65200,6 +65502,32 @@ class Renderer {
 	}
 
 	/**
+	 * Callback when a canvas target has been disposed.
+	 *
+	 * @private
+	 * @param {Object} event - The dispose event.
+	 */
+	_onCanvasTargetDispose( event ) {
+
+		this._destroyCanvasTarget( event.target );
+
+	}
+
+	/**
+	 * Frees the GPU resources of the given canvas target.
+	 *
+	 * @private
+	 * @param {CanvasTarget} canvasTarget - The canvas target.
+	 */
+	_destroyCanvasTarget( canvasTarget ) {
+
+		canvasTarget.removeEventListener( 'dispose', this._onCanvasTargetDispose );
+
+		if ( this._initialized ) this.backend.destroyCanvasTarget( canvasTarget );
+
+	}
+
+	/**
 	 * Alias for `compileAsync()`.
 	 *
 	 * @method
@@ -65385,7 +65713,7 @@ class Buffer extends Binding {
 	 */
 	get byteLength() {
 
-		return getFloatLength( this._buffer.byteLength );
+		return getFloatLength( this.buffer.byteLength );
 
 	}
 
@@ -65476,7 +65804,7 @@ class NodeUniformBuffer extends UniformBuffer {
 
 		const label = nodeUniform && nodeUniform.name ? nodeUniform.name : _id$4 ++;
 
-		super( 'UniformBuffer_' + label, nodeUniform ? nodeUniform.value : null );
+		super( 'UniformBuffer_' + label );
 
 		/**
 		 * The uniform buffer node.
@@ -65543,18 +65871,6 @@ class NodeUniformBuffer extends UniformBuffer {
 	clearUpdateRanges() {
 
 		this.nodeUniform.clearUpdateRanges();
-
-	}
-
-	/**
-	 * The buffer's byte length.
-	 *
-	 * @type {number}
-	 * @readonly
-	 */
-	get byteLength() {
-
-		return getFloatLength( this.buffer.byteLength );
 
 	}
 
@@ -68946,6 +69262,14 @@ class Backend {
 	 */
 	updateViewport( /*renderContext*/ ) {}
 
+	/**
+	 * Frees the GPU resources of the given canvas target.
+	 *
+	 * @abstract
+	 * @param {CanvasTarget} canvasTarget - The canvas target.
+	 */
+	destroyCanvasTarget( /*canvasTarget*/ ) {}
+
 	// utils
 
 	/**
@@ -69115,10 +69439,13 @@ class Backend {
 	 * a storage buffer attribute from the GPU to the CPU.
 	 *
 	 * @async
-	 * @param {StorageBufferAttribute} attribute - The storage buffer attribute.
-	 * @return {Promise<ArrayBuffer>} A promise that resolves with the buffer data when the data are ready.
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read from.
+	 * @param {?(ReadbackBuffer|ArrayBuffer)} [target=null] - The readback buffer or array buffer that receives the data. If `null`, a new array buffer is returned.
+	 * @param {number} [offset=0] - The byte offset to start reading from. Must be a multiple of 4.
+	 * @param {number} [count=-1] - The number of bytes to read. Must be a multiple of 4, or `-1` to read to the end of the buffer.
+	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
-	async getArrayBufferAsync( /* attribute */ ) {}
+	async getArrayBufferAsync( /* attribute, target, offset, count */ ) {}
 
 	/**
 	 * Checks if the given feature is supported by the backend.
@@ -69571,10 +69898,10 @@ class WebGLAttributeUtils {
 	 * new allocation.
 	 *
 	 * @async
-	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
-	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
-	 * @param {number} offset - The storage buffer attribute.
-	 * @param {number} count - The offset from which to start reading the
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read from.
+	 * @param {?(ReadbackBuffer|ArrayBuffer)} [target=null] - The readback buffer or array buffer that receives the data. If `null`, a new array buffer is returned.
+	 * @param {number} [offset=0] - The byte offset to start reading from. Must be a multiple of 4.
+	 * @param {number} [count=-1] - The number of bytes to read. Must be a multiple of 4, or `-1` to read to the end of the buffer.
 	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
 	async getArrayBufferAsync( attribute, target = null, offset = 0, count = -1 ) {
@@ -72919,9 +73246,9 @@ class WebGLTextureUtils {
 	setupRenderBufferStorage( renderbuffer, renderContext, samples, useMultisampledRTT = false ) {
 
 		const { gl } = this;
-		const renderTarget = renderContext.renderTarget;
+		const { depthTexture, renderTarget } = renderContext;
 
-		const { depthTexture, depthBuffer, stencilBuffer, width, height } = renderTarget;
+		const { depthBuffer, stencilBuffer, width, height } = renderTarget;
 
 		gl.bindRenderbuffer( gl.RENDERBUFFER, renderbuffer );
 
@@ -74317,10 +74644,10 @@ class WebGLBackend extends Backend {
 	 * new allocation.
 	 *
 	 * @async
-	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
-	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
-	 * @param {number} offset - The storage buffer attribute.
-	 * @param {number} count - The offset from which to start reading the
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read from.
+	 * @param {?(ReadbackBuffer|ArrayBuffer)} [target=null] - The readback buffer or array buffer that receives the data. If `null`, a new array buffer is returned.
+	 * @param {number} [offset=0] - The byte offset to start reading from. Must be a multiple of 4.
+	 * @param {number} [count=-1] - The number of bytes to read. Must be a multiple of 4, or `-1` to read to the end of the buffer.
 	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
 	async getArrayBufferAsync( attribute, target = null, offset = 0, count = -1 ) {
@@ -75242,7 +75569,7 @@ class WebGLBackend extends Backend {
 			if ( isRenderCameraDepthArray ) {
 
 				// Clear the depth texture
-				const textureData = this.get( renderTarget.depthTexture );
+				const textureData = this.get( this._currentContext.depthTexture );
 
 				if ( textureData.clearedRenderId !== this.renderer._nodes.nodeFrame.renderId ) {
 
@@ -77319,7 +77646,7 @@ class NodeStorageBuffer extends StorageBuffer {
 
 		const label = nodeUniform && nodeUniform.name ? nodeUniform.name : _id ++;
 
-		super( 'StorageBuffer_' + label, nodeUniform ? nodeUniform.value : null );
+		super( 'StorageBuffer_' + label );
 
 		/**
 		 * The node uniform.
@@ -84598,10 +84925,10 @@ class WebGPUAttributeUtils {
 	 * new allocation.
 	 *
 	 * @async
-	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
-	 * @param {number} count - The offset from which to start reading the
-	 * @param {number} offset - The storage buffer attribute.
-	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read from.
+	 * @param {?(ReadbackBuffer|ArrayBuffer)} [target=null] - The readback buffer or array buffer that receives the data. If `null`, a new array buffer is returned.
+	 * @param {number} [offset=0] - The byte offset to start reading from. Must be a multiple of 4.
+	 * @param {number} [count=-1] - The number of bytes to read. Must be a multiple of 4, or `-1` to read to the end of the buffer.
 	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
 	async getArrayBufferAsync( attribute, target = null, offset = 0, count = -1 ) {
@@ -87464,10 +87791,10 @@ class WebGPUBackend extends Backend {
 	 * new allocation.
 	 *
 	 * @async
-	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
-	 * @param {number} count - The offset from which to start reading the
-	 * @param {number} offset - The storage buffer attribute.
-	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read from.
+	 * @param {?(ReadbackBuffer|ArrayBuffer)} [target=null] - The readback buffer or array buffer that receives the data. If `null`, a new array buffer is returned.
+	 * @param {number} [offset=0] - The byte offset to start reading from. Must be a multiple of 4.
+	 * @param {number} [count=-1] - The number of bytes to read. Must be a multiple of 4, or `-1` to read to the end of the buffer.
 	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
 	async getArrayBufferAsync( attribute, target = null, offset = 0, count = -1 ) {
@@ -90028,6 +90355,20 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	/**
+	 * Frees the GPU resources of the given canvas target.
+	 *
+	 * @param {CanvasTarget} canvasTarget - The canvas target.
+	 */
+	destroyCanvasTarget( canvasTarget ) {
+
+		this.destroyTexture( canvasTarget.colorTexture );
+		this.destroyTexture( canvasTarget.depthTexture );
+
+		this.delete( canvasTarget );
+
+	}
+
 	// utils public
 
 	/**
@@ -90896,6 +91237,7 @@ class RenderPipeline {
  * material shaders. This avoids the intermediate framebuffer and output pass
  * used by {@link Renderer}, but changes blending and is not compatible with
  * materials that sample the framebuffer, such as transmissive materials.
+ * With the WebGL backend, `antialias` has no effect.
  *
  * ```js
  * const renderPipeline = new DirectRenderPipeline( renderer );
@@ -91107,9 +91449,12 @@ class DirectRenderPipeline extends RenderPipeline {
 
 				output.assign( materialOutputNode );
 
-				return outputColorTransform === true ?
-					renderOutput( pipelineOutputNode, toneMapping, outputColorSpace ) :
-					pipelineOutputNode;
+				if ( outputColorTransform === false ) return pipelineOutputNode;
+
+				const renderOutputNode = renderOutput( pipelineOutputNode, toneMapping, outputColorSpace );
+				renderOutputNode.premultipliedAlpha = builder.material.premultipliedAlpha;
+
+				return renderOutputNode;
 
 			}
 		} );
@@ -92529,6 +92874,7 @@ var Three_TSL = /*#__PURE__*/Object.freeze({
 	workgroupArray: workgroupArray,
 	workgroupBarrier: workgroupBarrier,
 	workgroupId: workgroupId,
+	workingLuminanceCoefficients: workingLuminanceCoefficients,
 	workingToColorSpace: workingToColorSpace,
 	xor: xor
 });

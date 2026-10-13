@@ -1,6 +1,6 @@
 import { WebGLCoordinateSystem } from '../../constants.js';
 import Node from '../core/Node.js';
-import { addMethodChaining, Fn, int, nodeProxyIntent } from '../tsl/TSLCore.js';
+import { addMethodChaining, Fn, int, nodeProxyAssignable } from '../tsl/TSLCore.js';
 
 const _vectorOperators = {
 	'==': 'equal',
@@ -423,7 +423,7 @@ export default OperatorNode;
  * @param {...Node} params - Additional input parameters.
  * @returns {OperatorNode}
  */
-export const add = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '+' ).setParameterLength( 2, Infinity ).setName( 'add' );
+export const add = /*@__PURE__*/ nodeProxyAssignable( OperatorNode, '+' ).setParameterLength( 2, Infinity ).setName( 'add' );
 
 /**
  * Returns the subtraction of two or more value.
@@ -435,7 +435,7 @@ export const add = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '+' ).setParamet
  * @param {...Node} params - Additional input parameters.
  * @returns {OperatorNode}
  */
-export const sub = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '-' ).setParameterLength( 2, Infinity ).setName( 'sub' );
+export const sub = /*@__PURE__*/ nodeProxyAssignable( OperatorNode, '-' ).setParameterLength( 2, Infinity ).setName( 'sub' );
 
 /**
  * Returns the multiplication of two or more value.
@@ -447,7 +447,7 @@ export const sub = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '-' ).setParamet
  * @param {...Node} params - Additional input parameters.
  * @returns {OperatorNode}
  */
-export const mul = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '*' ).setParameterLength( 2, Infinity ).setName( 'mul' );
+export const mul = /*@__PURE__*/ nodeProxyAssignable( OperatorNode, '*' ).setParameterLength( 2, Infinity ).setName( 'mul' );
 
 /**
  * Returns the division of two or more value.
@@ -459,7 +459,7 @@ export const mul = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '*' ).setParamet
  * @param {...Node} params - Additional input parameters.
  * @returns {OperatorNode}
  */
-export const div = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '/' ).setParameterLength( 2, Infinity ).setName( 'div' );
+export const div = /*@__PURE__*/ nodeProxyAssignable( OperatorNode, '/' ).setParameterLength( 2, Infinity ).setName( 'div' );
 
 /**
  * Computes the remainder of dividing the first node by the second one.
@@ -470,7 +470,7 @@ export const div = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '/' ).setParamet
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-export const mod = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '%' ).setParameterLength( 2 ).setName( 'mod' );
+export const mod = /*@__PURE__*/ nodeProxyAssignable( OperatorNode, '%' ).setParameterLength( 2 ).setName( 'mod' );
 
 /**
  * Checks if two nodes are equal.
@@ -481,7 +481,7 @@ export const mod = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '%' ).setParamet
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-export const equal = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '==' ).setParameterLength( 2 ).setName( 'equal' );
+export const equal = /*@__PURE__*/ nodeProxyAssignable( OperatorNode, '==' ).setParameterLength( 2 ).setName( 'equal' );
 
 /**
  * Checks if two nodes are not equal.
@@ -492,7 +492,7 @@ export const equal = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '==' ).setPara
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-export const notEqual = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '!=' ).setParameterLength( 2 ).setName( 'notEqual' );
+export const notEqual = /*@__PURE__*/ nodeProxyAssignable( OperatorNode, '!=' ).setParameterLength( 2 ).setName( 'notEqual' );
 
 /**
  * Checks if the first node is less than the second.
@@ -503,7 +503,7 @@ export const notEqual = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '!=' ).setP
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-export const lessThan = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '<' ).setParameterLength( 2 ).setName( 'lessThan' );
+export const lessThan = /*@__PURE__*/ nodeProxyAssignable( OperatorNode, '<' ).setParameterLength( 2 ).setName( 'lessThan' );
 
 /**
  * Checks if the first node is greater than the second.
@@ -514,7 +514,7 @@ export const lessThan = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '<' ).setPa
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-export const greaterThan = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '>' ).setParameterLength( 2 ).setName( 'greaterThan' );
+export const greaterThan = /*@__PURE__*/ nodeProxyAssignable( OperatorNode, '>' ).setParameterLength( 2 ).setName( 'greaterThan' );
 
 /**
  * Checks if the first node is less than or equal to the second.
@@ -525,7 +525,7 @@ export const greaterThan = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '>' ).se
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-export const lessThanEqual = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '<=' ).setParameterLength( 2 ).setName( 'lessThanEqual' );
+export const lessThanEqual = /*@__PURE__*/ nodeProxyAssignable( OperatorNode, '<=' ).setParameterLength( 2 ).setName( 'lessThanEqual' );
 
 /**
  * Checks if the first node is greater than or equal to the second.
@@ -536,7 +536,7 @@ export const lessThanEqual = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '<=' )
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-export const greaterThanEqual = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '>=' ).setParameterLength( 2 ).setName( 'greaterThanEqual' );
+export const greaterThanEqual = /*@__PURE__*/ nodeProxyAssignable( OperatorNode, '>=' ).setParameterLength( 2 ).setName( 'greaterThanEqual' );
 
 /**
  * Performs a logical AND operation on multiple nodes.
@@ -546,7 +546,7 @@ export const greaterThanEqual = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '>=
  * @param {...Node} nodes - The input nodes to be combined using AND.
  * @returns {OperatorNode}
  */
-export const and = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '&&' ).setParameterLength( 2, Infinity ).setName( 'and' );
+export const and = /*@__PURE__*/ nodeProxyAssignable( OperatorNode, '&&' ).setParameterLength( 2, Infinity ).setName( 'and' );
 
 /**
  * Performs a logical OR operation on multiple nodes.
@@ -556,7 +556,7 @@ export const and = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '&&' ).setParame
  * @param {...Node} nodes - The input nodes to be combined using OR.
  * @returns {OperatorNode}
  */
-export const or = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '||' ).setParameterLength( 2, Infinity ).setName( 'or' );
+export const or = /*@__PURE__*/ nodeProxyAssignable( OperatorNode, '||' ).setParameterLength( 2, Infinity ).setName( 'or' );
 
 /**
  * Performs logical NOT on a node.
@@ -566,7 +566,7 @@ export const or = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '||' ).setParamet
  * @param {Node} value - The value.
  * @returns {OperatorNode}
  */
-export const not = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '!' ).setParameterLength( 1 ).setName( 'not' );
+export const not = /*@__PURE__*/ nodeProxyAssignable( OperatorNode, '!' ).setParameterLength( 1 ).setName( 'not' );
 
 /**
  * Performs logical XOR on two nodes.
@@ -577,7 +577,7 @@ export const not = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '!' ).setParamet
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-export const xor = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '^^' ).setParameterLength( 2 ).setName( 'xor' );
+export const xor = /*@__PURE__*/ nodeProxyAssignable( OperatorNode, '^^' ).setParameterLength( 2 ).setName( 'xor' );
 
 /**
  * Performs bitwise AND on two nodes.
@@ -588,7 +588,7 @@ export const xor = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '^^' ).setParame
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-export const bitAnd = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '&' ).setParameterLength( 2 ).setName( 'bitAnd' );
+export const bitAnd = /*@__PURE__*/ nodeProxyAssignable( OperatorNode, '&' ).setParameterLength( 2 ).setName( 'bitAnd' );
 
 /**
  * Performs bitwise NOT on a node.
@@ -599,7 +599,7 @@ export const bitAnd = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '&' ).setPara
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-export const bitNot = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '~' ).setParameterLength( 1 ).setName( 'bitNot' );
+export const bitNot = /*@__PURE__*/ nodeProxyAssignable( OperatorNode, '~' ).setParameterLength( 1 ).setName( 'bitNot' );
 
 /**
  * Performs bitwise OR on two nodes.
@@ -610,7 +610,7 @@ export const bitNot = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '~' ).setPara
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-export const bitOr = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '|' ).setParameterLength( 2 ).setName( 'bitOr' );
+export const bitOr = /*@__PURE__*/ nodeProxyAssignable( OperatorNode, '|' ).setParameterLength( 2 ).setName( 'bitOr' );
 
 /**
  * Performs bitwise XOR on two nodes.
@@ -621,7 +621,7 @@ export const bitOr = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '|' ).setParam
  * @param {Node} b - The second input.
  * @returns {OperatorNode}
  */
-export const bitXor = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '^' ).setParameterLength( 2 ).setName( 'bitXor' );
+export const bitXor = /*@__PURE__*/ nodeProxyAssignable( OperatorNode, '^' ).setParameterLength( 2 ).setName( 'bitXor' );
 
 /**
  * Shifts a node to the left.
@@ -632,7 +632,7 @@ export const bitXor = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '^' ).setPara
  * @param {Node} b - The value to shift.
  * @returns {OperatorNode}
  */
-export const shiftLeft = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '<<' ).setParameterLength( 2 ).setName( 'shiftLeft' );
+export const shiftLeft = /*@__PURE__*/ nodeProxyAssignable( OperatorNode, '<<' ).setParameterLength( 2 ).setName( 'shiftLeft' );
 
 /**
  * Shifts a node to the right.
@@ -643,7 +643,7 @@ export const shiftLeft = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '<<' ).set
  * @param {Node} b - The value to shift.
  * @returns {OperatorNode}
  */
-export const shiftRight = /*@__PURE__*/ nodeProxyIntent( OperatorNode, '>>' ).setParameterLength( 2 ).setName( 'shiftRight' );
+export const shiftRight = /*@__PURE__*/ nodeProxyAssignable( OperatorNode, '>>' ).setParameterLength( 2 ).setName( 'shiftRight' );
 
 /**
  * Increments a node by 1.

@@ -442,6 +442,19 @@ class ReflectorBaseNode extends Node {
 
 	}
 
+	/**
+	 * Uses the virtual camera of the current camera as the update reference so
+	 * the reflection is updated for each camera that renders the reflector.
+	 *
+	 * @param {(NodeFrame|NodeBuilder)} state - The current state.
+	 * @return {Camera} The virtual camera.
+	 */
+	updateReference( state ) {
+
+		return this.getVirtualCamera( state.camera );
+
+	}
+
 	updateBefore( frame ) {
 
 		if ( this.bounces === false && _inReflector ) return false;
