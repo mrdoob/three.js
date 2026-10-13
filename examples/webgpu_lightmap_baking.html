@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - light baking</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - light baking">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_lightmap_baking.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_lightmap_baking.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Light Baking</span>
+			</div>
+
+			<small>Bake Light Probe or VXGI diffuse lighting into a UV atlas and export glTF.</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
+			import { LightMapper } from 'three/addons/lighting/LightMapper.js';
+			import { VXGIVolume } from 'three/addons/lighting/vxgi/VXGIVolume.js';
+			import { vxgiIrradiance } from 'three/addons/lighting/vxgi/VXGIIrradiance.js';
+			import { lightProbeGridIrradiance } from 'three/addons/tsl/lighting/LightProbeGridNode.js';
+			import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
+			import { readLightMap } from 'three/addons/utils/readLightMap.js';
+			import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+			import { GLTFLightMapExporterExtension } from 'three/addons/exporters/GLTFLightMapExporterExtension.js';
+
+			let camera, scene, renderer, controls;
+			let lightMapper;
+
+			const params = {
+				algorithm: 'Light Probe',
+				mode: 'Light Map',
+				exportLighting: 'Indirect Diffuse',
+				samples: 64
+			};
+
+			init();
+
+			async function init() {
+
+				// Camera
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 0, 2.5, 8 );
+
+				// Scene
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x111111 );
+
+				// Cornell box
+
+				const wallMaterial = new THREE.MeshStandardMaterial( { color: 0xcccccc } );
+				const redMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
+				const greenMaterial = new THREE.MeshStandardMaterial( { color: 0x00ff00 } );
+
+				// Floor
+				const floor = new THREE.Mesh( new THREE.PlaneGeometry( 6, 6 ), wallMaterial );
+				floor.rotation.x = - Math.PI / 2;
+				floor.receiveShadow = true;
+				scene.add( floor );
+
+				// Ceiling
+				const ceiling = new THREE.Mesh( new THREE.PlaneGeometry( 6, 6 ), wallMaterial );
+				ceiling.rotation.x = Math.PI / 2;
+				ceiling.position.y = 5;
+				ceiling.receiveShadow = true;
+				scene.add( ceiling );
+
+				// Back wall
+				const backWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), wallMaterial );
+				backWall.position.set( 0, 2.5, - 3 );
+				backWall.receiveShadow = true;
+				scene.add( backWall );
+
+				// Front wall
+				const frontWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), wallMaterial );
+				frontWall.rotation.y = Math.PI;
+				frontWall.position.set( 0, 2.5, 3 );
+				frontWall.receiveShadow = true;
+				scene.add( frontWall );
+
+				// Left wall (red)
+				const leftWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), redMaterial );
+				leftWall.rotation.y = Math.PI / 2;
+				leftWall.position.set( - 3, 2.5, 0 );
+				leftWall.receiveShadow = true;
+				scene.add( leftWall );
+
+				// Right wall (green)
+				const rightWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), greenMaterial );
+				rightWall.rotation.y = - Math.PI / 2;
+				rightWall.position.set( 3, 2.5, 0 );
+				rightWall.receiveShadow = true;
+				scene.add( rightWall );
+
+				// Objects inside the box
+
+				const objectMaterial = new THREE.MeshStandardMaterial( { color: 0xeeeeee } );
+
+				// Tall box
+				const tallBox = new THREE.Mesh( new THREE.BoxGeometry( 1.2, 2.5, 1.2 ), objectMaterial );
+				tallBox.position.set( - 0.8, 1.25, - 0.8 );
+				tallBox.rotation.y = Math.PI / 8;
+				tallBox.castShadow = true;
+				tallBox.receiveShadow = true;
+				scene.add( tallBox );
+
+				// Glossy sphere, to show direct specular lighting
+				const glossyMaterial = new THREE.MeshStandardMaterial( { color: 0x0044ff, roughness: 0.15 } );
+				const glossySphere = new THREE.Mesh( new THREE.SphereGeometry( 0.65, 32, 32 ), glossyMaterial );
+				glossySphere.position.set( 1, 0.65, 0.5 );
+				glossySphere.castShadow = true;
+				glossySphere.receiveShadow = true;
+				scene.add( glossySphere );
+
+				// Light
+				const light = new THREE.PointLight( 0xffffff, 40 );
+				light.position.set( 0, 4.5, 0 );
+				light.castShadow = true;
+				light.shadow.mapSize.setScalar( 256 );
+				light.shadow.radius = 10;
+				light.shadow.normalBias = - 0.02;
+				scene.add( light );
+
+				// Renderer
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1.0;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+				if ( renderer.backend.isWebGPUBackend !== true ) throw new Error( 'This example requires WebGPU.' );
+
+				// Controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 2.5, 0 );
+				controls.update();
+
+				// Light map UVs
+
+				const meshes = scene.children.filter( ( object ) => object.isMesh );
+				const materials = new Set( meshes.map( ( mesh ) => mesh.material ) );
+
+				const atlas = unwrapUVs( scene, { resolution: 1024, padding: 3 } );
+
+				if ( atlas === null ) throw new Error( 'Unable to pack the light map UV atlas.' );
+
+				// Both GI sources provide the same world-space irradiance callback.
+
+				let source;
+				let busy = false;
+
+				async function bake() {
+
+					if ( busy ) return;
+					busy = true;
+					renderer.setAnimationLoop( null );
+
+					try {
+
+						for ( const material of materials ) material.lightMap = null;
+						lightMapper?.dispose();
+						lightMapper = null;
+						source?.dispose();
+
+						let irradiance;
+
+						if ( params.algorithm === 'Light Probe' ) {
+
+							const probes = new LightProbeGrid( 5.6, 4.7, 5.6, 6, 6, 6 );
+							probes.position.set( 0, 2.45, 0 );
+							probes.updateBoundingBox();
+							source = probes;
+							probes.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
+							irradiance = ( position, normal ) => lightProbeGridIrradiance( probes, position, normal );
+
+						} else {
+
+							const volume = new VXGIVolume( 64 );
+							source = volume;
+							volume.update( renderer, scene );
+							irradiance = vxgiIrradiance( volume );
+
+						}
+
+						lightMapper = new LightMapper( renderer, atlas.resolution, irradiance );
+						lightMapper.addObjects( meshes );
+						for ( const material of materials ) material.lightMap = lightMapper.texture;
+						setMode( params.mode );
+
+					} finally {
+
+						busy = false;
+						renderer.setAnimationLoop( animate );
+
+					}
+
+				}
+
+				function setMode( mode ) {
+
+					for ( const material of materials ) material.lightMapIntensity = mode === 'Light Map' ? 1 : 0;
+
+				}
+
+				await bake();
+
+				// GUI
+
+				const gui = renderer.inspector.createParameters( 'Light Baking' );
+				gui.add( params, 'algorithm', [ 'Light Probe', 'VXGI' ] ).name( 'GI Algorithm' ).onChange( bake );
+				gui.add( params, 'mode', [ 'Light Map', 'None' ] ).name( 'Indirect Light' ).onChange( setMode );
+				gui.add( params, 'exportLighting', [ 'Indirect Diffuse', 'All Diffuse' ] ).name( 'Export Lighting' );
+				gui.add( { exportGLTF }, 'exportGLTF' ).name( 'Export glTF' );
+
+				async function exportGLTF() {
+
+					if ( busy || ! lightMapper ) return;
+					busy = true;
+					renderer.setAnimationLoop( null );
+
+					const lights = scene.children.filter( object => object.isLight && ! object.isLightProbeGrid );
+					const shadows = lights.filter( light => light.shadow ).map( light => ( { shadow: light.shadow, autoUpdate: light.shadow.autoUpdate, needsUpdate: light.shadow.needsUpdate } ) );
+					let diffuseMapper;
+					let exportLightMap;
+					const exportMaterials = [];
+
+					try {
+
+						if ( lightMapper.samples < params.samples ) lightMapper.update( params.samples - lightMapper.samples );
+
+						let lightMap = lightMapper.texture;
+						const indirectOnly = params.exportLighting === 'Indirect Diffuse';
+
+						if ( ! indirectOnly ) {
+
+							// Refresh shadows in world space, then reuse them during the UV bake.
+							renderer.render( scene, camera );
+							for ( const { shadow } of shadows ) {
+
+								shadow.autoUpdate = false;
+								shadow.needsUpdate = false;
+
+							}
+
+							diffuseMapper = new LightMapper( renderer, lightMapper.size, lightMapper.irradianceNode, { lights } );
+							diffuseMapper.addObjects( meshes );
+							diffuseMapper.update( params.samples );
+							lightMap = diffuseMapper.texture;
+
+						}
+
+						exportLightMap = await readLightMap( renderer, lightMap );
+
+						// Clone materials so the export ignores the preview's indirect-light toggle.
+						const objects = meshes.map( mesh => {
+
+							const copy = mesh.clone();
+							const cloneMaterial = material => {
+
+								// All diffuse is already baked: use unlit materials to avoid
+								// adding direct light again when loading into a lit scene.
+								const copy = indirectOnly ? material.clone() : new THREE.MeshBasicMaterial( {
+									color: material.color,
+									map: material.map,
+									side: material.side
+								} );
+								copy.lightMap = exportLightMap.texture;
+								copy.lightMapIntensity = exportLightMap.intensity;
+								exportMaterials.push( copy );
+								return copy;
+
+							};
+
+							copy.material = Array.isArray( mesh.material ) ? mesh.material.map( cloneMaterial ) : cloneMaterial( mesh.material );
+							return copy;
+
+						} );
+
+						if ( indirectOnly ) objects.push( ...lights );
+
+						const exporter = new GLTFExporter();
+						exporter.register( writer => new GLTFLightMapExporterExtension( writer ) );
+						const result = await exporter.parseAsync( objects, { binary: true } );
+
+						const link = document.createElement( 'a' );
+						link.href = URL.createObjectURL( new Blob( [ result ], { type: 'application/octet-stream' } ) );
+						link.download = `lightmap_cornell_${ params.algorithm.toLowerCase().replaceAll( ' ', '_' ) }_${ indirectOnly ? 'indirect' : 'diffuse' }.glb`;
+						link.click();
+						URL.revokeObjectURL( link.href );
+
+					} finally {
+
+						for ( const { shadow, autoUpdate, needsUpdate } of shadows ) {
+
+							shadow.autoUpdate = autoUpdate;
+							shadow.needsUpdate = needsUpdate;
+
+						}
+
+						exportLightMap?.texture.dispose();
+						for ( const material of exportMaterials ) material.dispose();
+						diffuseMapper?.dispose();
+						busy = false;
+						renderer.setAnimationLoop( animate );
+
+					}
+
+				}
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				if ( lightMapper && lightMapper.samples < params.samples ) lightMapper.update();
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

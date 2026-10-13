@@ -1,4 +1,4 @@
-import { Color, LinearSRGBColorSpace, NoColorSpace, RGBAFormat, Source, SRGBColorSpace, UnsignedByteType } from 'three';
+import { Color, LinearSRGBColorSpace, NoColorSpace, RGBAFormat, TextureSource, SRGBColorSpace, UnsignedByteType } from 'three';
 
 /**
  * A glTF exporter plugin for the vendor extension `MOZ_lightmap`.
@@ -119,7 +119,7 @@ class GLTFLightMapExporterExtension {
 		}
 
 		const texture = readableMap.clone();
-		texture.source = new Source( outputImage );
+		texture.source = new TextureSource( outputImage );
 		texture.colorSpace = SRGBColorSpace;
 		this.textureCache.set( map, texture );
 		return texture;
