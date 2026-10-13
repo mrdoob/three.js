@@ -19,7 +19,7 @@
 				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Light Baking</span>
 			</div>
 
-			<small>Bake Light Probe or VXGI diffuse lighting into a UV atlas and export glTF.</small>
+			<small>Progressively bake Light Probe or VXGI diffuse lighting into a UV atlas and export glTF.<br/><span id="status"></span></small>
 		</div>
 
 		<script type="importmap">
@@ -36,6 +36,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
+			import { builtinGIContext, float, normalWorld, pass, positionWorld } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
@@ -49,15 +50,21 @@
 			import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 			import { GLTFLightMapExporterExtension } from 'three/addons/exporters/GLTFLightMapExporterExtension.js';
 
-			let camera, scene, renderer, controls;
-			let lightMapper;
+			let camera, scene, renderer, controls, renderPipeline;
+			let light, meshes, materials, atlas, status;
+			let source, lightMapper, bakedPass, livePass;
+			let busy = false;
 
 			const params = {
-				algorithm: 'Light Probe',
-				mode: 'Light Map',
-				exportLighting: 'Indirect Diffuse',
-				samples: 64
+				output: 'Baked GI',
+				algorithm: 'VXGI',
+				resolution: 1024
 			};
+
+			// light probes are deterministic and only need a few samples to antialias the light map,
+			// the VXGI cones are rotated per sample and converge over more samples
+
+			const bakeSamples = { 'Light Probe': 16, 'VXGI': 64 };
 
 			init();
 
@@ -140,7 +147,7 @@
 				scene.add( glossySphere );
 
 				// Light
-				const light = new THREE.PointLight( 0xffffff, 40 );
+				light = new THREE.PointLight( 0xffffff, 40 );
 				light.position.set( 0, 4.5, 0 );
 				light.castShadow = true;
 				light.shadow.mapSize.setScalar( 256 );
@@ -155,7 +162,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.toneMappingExposure = 1.0;
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
@@ -170,177 +176,149 @@
 
 				// Light map UVs
 
-				const meshes = scene.children.filter( ( object ) => object.isMesh );
-				const materials = new Set( meshes.map( ( mesh ) => mesh.material ) );
+				meshes = scene.children.filter( ( object ) => object.isMesh );
+				materials = new Set( meshes.map( ( mesh ) => mesh.material ) );
+				atlas = unwrapUVs( scene, { resolution: params.resolution, padding: 3 } );
 
-				const atlas = unwrapUVs( scene, { resolution: 1024, padding: 3 } );
+				// "Baked GI" shows the light map while it accumulates,
+				// "Live GI" evaluates the raw irradiance per pixel every frame
 
-				// Both GI sources provide the same world-space irradiance callback.
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				bakedPass = pass( scene, camera );
 
-				let source;
-				let busy = false;
+				status = document.getElementById( 'status' );
 
-				async function bake() {
-
-					if ( busy ) return;
-					busy = true;
-					renderer.setAnimationLoop( null );
-
-					try {
-
-						for ( const material of materials ) material.lightMap = null;
-						lightMapper?.dispose();
-						lightMapper = null;
-						source?.dispose();
-
-						let irradiance;
-
-						if ( params.algorithm === 'Light Probe' ) {
-
-							const probes = new LightProbeGrid( 5.6, 4.7, 5.6, 6, 6, 6 );
-							probes.position.set( 0, 2.45, 0 );
-							probes.updateBoundingBox();
-							source = probes;
-							probes.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
-							irradiance = ( position, normal ) => lightProbeGridIrradiance( probes, position, normal );
-
-						} else {
-
-							const volume = new VXGIVolume( 64 );
-							source = volume;
-							volume.update( renderer, scene );
-							irradiance = vxgiIrradiance( volume );
-
-						}
-
-						lightMapper = new LightMapper( renderer, atlas.resolution, irradiance );
-						lightMapper.addObjects( meshes );
-						for ( const material of materials ) material.lightMap = lightMapper.texture;
-						setMode( params.mode );
-
-					} finally {
-
-						busy = false;
-						renderer.setAnimationLoop( animate );
-
-					}
-
-				}
-
-				function setMode( mode ) {
-
-					for ( const material of materials ) material.lightMapIntensity = mode === 'Light Map' ? 1 : 0;
-
-				}
-
-				await bake();
+				bake();
 
 				// GUI
 
 				const gui = renderer.inspector.createParameters( 'Light Baking' );
+				gui.add( params, 'output', [ 'Baked GI', 'Live GI' ] ).name( 'Output' ).onChange( setOutput );
 				gui.add( params, 'algorithm', [ 'Light Probe', 'VXGI' ] ).name( 'GI Algorithm' ).onChange( bake );
-				gui.add( params, 'mode', [ 'Light Map', 'None' ] ).name( 'Indirect Light' ).onChange( setMode );
-				gui.add( params, 'exportLighting', [ 'Indirect Diffuse', 'All Diffuse' ] ).name( 'Export Lighting' );
+				gui.add( params, 'resolution', [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( bake );
+				gui.add( { bake }, 'bake' ).name( 'Re-Bake GI' );
 				gui.add( { exportGLTF }, 'exportGLTF' ).name( 'Export glTF' );
 
-				async function exportGLTF() {
+				window.addEventListener( 'resize', onWindowResize );
 
-					if ( busy || ! lightMapper ) return;
-					busy = true;
-					renderer.setAnimationLoop( null );
+				renderer.setAnimationLoop( animate );
 
-					const lights = scene.children.filter( object => object.isLight && ! object.isLightProbeGrid );
-					const shadows = lights.filter( light => light.shadow ).map( light => ( { shadow: light.shadow, autoUpdate: light.shadow.autoUpdate, needsUpdate: light.shadow.needsUpdate } ) );
-					let diffuseMapper;
-					let exportLightMap;
-					const exportMaterials = [];
+			}
 
-					try {
+			function bake() {
 
-						if ( lightMapper.samples < params.samples ) lightMapper.update( params.samples - lightMapper.samples );
+				if ( busy ) return;
 
-						let lightMap = lightMapper.texture;
-						const indirectOnly = params.exportLighting === 'Indirect Diffuse';
+				for ( const material of materials ) material.lightMap = null;
 
-						if ( ! indirectOnly ) {
+				lightMapper?.dispose();
+				livePass?.dispose();
+				source?.dispose();
 
-							// Refresh shadows in world space, then reuse them during the UV bake.
-							renderer.render( scene, camera );
-							for ( const { shadow } of shadows ) {
+				if ( atlas.resolution !== params.resolution ) {
 
-								shadow.autoUpdate = false;
-								shadow.needsUpdate = false;
+					const geometries = new Set( meshes.map( ( mesh ) => mesh.geometry ) );
+					atlas = unwrapUVs( scene, { resolution: params.resolution, padding: 3 } );
 
-							}
-
-							diffuseMapper = new LightMapper( renderer, lightMapper.size, lightMapper.irradianceNode, { lights } );
-							diffuseMapper.addObjects( meshes );
-							diffuseMapper.update( params.samples );
-							lightMap = diffuseMapper.texture;
-
-						}
-
-						exportLightMap = await readLightMap( renderer, lightMap );
-
-						// Clone materials so the export ignores the preview's indirect-light toggle.
-						const objects = meshes.map( mesh => {
-
-							const copy = mesh.clone();
-							const cloneMaterial = material => {
-
-								// All diffuse is already baked: use unlit materials to avoid
-								// adding direct light again when loading into a lit scene.
-								const copy = indirectOnly ? material.clone() : new THREE.MeshBasicMaterial( {
-									color: material.color,
-									map: material.map,
-									side: material.side
-								} );
-								copy.lightMap = exportLightMap.texture;
-								copy.lightMapIntensity = exportLightMap.intensity;
-								exportMaterials.push( copy );
-								return copy;
-
-							};
-
-							copy.material = Array.isArray( mesh.material ) ? mesh.material.map( cloneMaterial ) : cloneMaterial( mesh.material );
-							return copy;
-
-						} );
-
-						if ( indirectOnly ) objects.push( ...lights );
-
-						const exporter = new GLTFExporter();
-						exporter.register( writer => new GLTFLightMapExporterExtension( writer ) );
-						const result = await exporter.parseAsync( objects, { binary: true } );
-
-						const link = document.createElement( 'a' );
-						link.href = URL.createObjectURL( new Blob( [ result ], { type: 'application/octet-stream' } ) );
-						link.download = `lightmap_cornell_${ params.algorithm.toLowerCase().replaceAll( ' ', '_' ) }_${ indirectOnly ? 'indirect' : 'diffuse' }.glb`;
-						link.click();
-						URL.revokeObjectURL( link.href );
-
-					} finally {
-
-						for ( const { shadow, autoUpdate, needsUpdate } of shadows ) {
-
-							shadow.autoUpdate = autoUpdate;
-							shadow.needsUpdate = needsUpdate;
-
-						}
-
-						exportLightMap?.texture.dispose();
-						for ( const material of exportMaterials ) material.dispose();
-						diffuseMapper?.dispose();
-						busy = false;
-						renderer.setAnimationLoop( animate );
-
-					}
+					for ( const geometry of geometries ) geometry.dispose();
 
 				}
 
-				//
+				let irradiance, liveIrradiance;
 
-				window.addEventListener( 'resize', onWindowResize );
+				if ( params.algorithm === 'Light Probe' ) {
+
+					const probes = new LightProbeGrid( 5.6, 4.7, 5.6, 6, 6, 6 );
+					probes.position.set( 0, 2.45, 0 );
+					probes.updateBoundingBox();
+					probes.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
+					irradiance = ( position, normal ) => lightProbeGridIrradiance( probes, position, normal );
+					liveIrradiance = irradiance;
+					source = probes;
+
+				} else {
+
+					const volume = new VXGIVolume( 64 );
+					volume.update( renderer, scene );
+					irradiance = vxgiIrradiance( volume );
+
+					// fewer cones per pixel keep the live view interactive
+
+					liveIrradiance = vxgiIrradiance( volume, { coneCount: 3 } );
+					source = volume;
+
+				}
+
+				// the light map accumulates one sample per frame in animate()
+
+				lightMapper = new LightMapper( renderer, atlas.resolution, irradiance );
+				lightMapper.addObjects( meshes );
+
+				for ( const material of materials ) material.lightMap = lightMapper.texture;
+
+				livePass = pass( scene, camera );
+				livePass.contextNode = builtinGIContext( float( 1 ), liveIrradiance( positionWorld, normalWorld ) );
+
+				setOutput();
+
+			}
+
+			function setOutput() {
+
+				const live = params.output === 'Live GI';
+
+				// discard accumulated samples when switching outputs; baking only runs in Baked GI
+
+				lightMapper.reset();
+
+				for ( const material of materials ) material.lightMapIntensity = live ? 0 : 1;
+
+				renderPipeline.outputNode = live ? livePass : bakedPass;
+				renderPipeline.needsUpdate = true;
+
+			}
+
+			async function exportGLTF() {
+
+				if ( busy ) return;
+
+				busy = true;
+				renderer.setAnimationLoop( null );
+
+				// finish the bake before exporting
+
+				const samples = bakeSamples[ params.algorithm ];
+				if ( lightMapper.samples < samples ) lightMapper.update( samples - lightMapper.samples );
+
+				const lightMap = await readLightMap( renderer, lightMapper.texture );
+
+				// lit materials with the baked indirect irradiance, direct lighting stays live
+
+				const objects = meshes.map( ( mesh ) => {
+
+					const copy = mesh.clone();
+					copy.material = mesh.material.clone();
+					copy.material.lightMap = lightMap.texture;
+					copy.material.lightMapIntensity = lightMap.intensity;
+					return copy;
+
+				} );
+
+				const exporter = new GLTFExporter();
+				exporter.register( ( writer ) => new GLTFLightMapExporterExtension( writer ) );
+				const result = await exporter.parseAsync( [ ...objects, light ], { binary: true } );
+
+				const link = document.createElement( 'a' );
+				link.href = URL.createObjectURL( new Blob( [ result ], { type: 'application/octet-stream' } ) );
+				link.download = `lightmap_cornell_${ params.algorithm.toLowerCase().replaceAll( ' ', '_' ) }.glb`;
+				link.click();
+				URL.revokeObjectURL( link.href );
+
+				lightMap.texture.dispose();
+				for ( const object of objects ) object.material.dispose();
+
+				busy = false;
+				renderer.setAnimationLoop( animate );
 
 			}
 
@@ -355,9 +333,24 @@
 
 			function animate() {
 
-				if ( lightMapper && lightMapper.samples < params.samples ) lightMapper.update();
+				const samples = bakeSamples[ params.algorithm ];
 
-				renderer.render( scene, camera );
+				if ( params.output === 'Live GI' ) {
+
+					status.textContent = `Live ${ params.algorithm }`;
+
+				} else if ( lightMapper.samples < samples ) {
+
+					lightMapper.update();
+					status.textContent = `Baking ${ params.algorithm }: ${ lightMapper.samples } / ${ samples } samples`;
+
+				} else {
+
+					status.textContent = `${ params.algorithm } baked: ${ samples } samples`;
+
+				}
+
+				renderPipeline.render();
 
 			}
 
