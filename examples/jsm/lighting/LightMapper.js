@@ -11,8 +11,9 @@ let _rendererState;
  *
  * Meshes need light map UVs in the `uv1` attribute, e.g. generated with {@link unwrapUVs}.
  * Each sample rasterizes the meshes in UV space with a sub-texel jitter and accumulates
- * the result. Call `update()` once per frame to bake progressively, or pass a sample
- * count to bake at once.
+ * the result. The function also receives the sample index, so stochastic sources like
+ * `vxgiIrradiance()` can vary their samples and converge as they accumulate. Call
+ * `update()` once per frame to bake progressively, or pass a sample count to bake at once.
  * Keep the source geometry and GI data static while accumulating. Call `reset()`
  * after changing transforms or lighting. Atlas charts need at least three texels
  * of padding; the resolve fills two texels around covered surfaces.
@@ -36,7 +37,7 @@ class LightMapper {
 	 *
 	 * @param {WebGPURenderer} renderer - The renderer.
 	 * @param {number} size - The light map size in texels.
-	 * @param {function(Node<vec3>, Node<vec3>): Node<vec3>} irradianceNode - Returns the irradiance for a world-space position and normal.
+	 * @param {function(Node<vec3>, Node<vec3>, Node<float>): Node<vec3>} irradianceNode - Returns the irradiance for a world-space position, normal and sample index.
 	 * @param {Object} [options] - Bake options.
 	 * @param {Array<Light>} [options.lights=[]] - Direct lights to include in the diffuse bake. Render their shadows in the source scene first and disable shadow updates during the UV bake.
 	 */
@@ -52,7 +53,7 @@ class LightMapper {
 		/**
 		 * The source of indirect irradiance.
 		 *
-		 * @type {function(Node<vec3>, Node<vec3>): Node<vec3>}
+		 * @type {function(Node<vec3>, Node<vec3>, Node<float>): Node<vec3>}
 		 */
 		this.irradianceNode = irradianceNode;
 
@@ -87,6 +88,7 @@ class LightMapper {
 		this._camera = new OrthographicCamera();
 		this._objects = [];
 		this._jitter = uniform( new Vector2() );
+		this._sample = uniform( 0 );
 
 		this._frontMaterial = this._createBakeMaterial( irradianceNode, false, lights );
 		this._backMaterial = this._createBakeMaterial( irradianceNode, true, lights );
@@ -182,6 +184,7 @@ class LightMapper {
 
 		for ( let i = 0; i < samples; i ++ ) {
 
+			this._sample.value = this.samples;
 			this._jitter.value.set( halton( this.samples + 1, 2 ) - 0.5, halton( this.samples + 1, 3 ) - 0.5 ).multiplyScalar( 2 / this.size );
 
 			renderer.render( this._scene, this._camera );
@@ -222,7 +225,7 @@ class LightMapper {
 	 * Creates a material that rasterizes meshes in UV space and outputs irradiance.
 	 *
 	 * @private
-	 * @param {function(Node<vec3>, Node<vec3>): Node<vec3>} irradianceNode - The irradiance function.
+	 * @param {function(Node<vec3>, Node<vec3>, Node<float>): Node<vec3>} irradianceNode - The irradiance function.
 	 * @param {boolean} flipNormal - Whether to flip the normal, for back-sided meshes.
 	 * @param {Array<Light>} directLights - Direct lights to include.
 	 * @return {NodeMaterial} The material.
@@ -250,12 +253,12 @@ class LightMapper {
 
 			material.lightsNode = lights( directLights );
 			material.normalNode = flipNormal ? normalViewGeometry.negate() : normalViewGeometry;
-			material.emissiveNode = irradianceNode( positionWorld, normal ).div( Math.PI );
+			material.emissiveNode = irradianceNode( positionWorld, normal, this._sample ).div( Math.PI );
 			material.outputNode = vec4( output.rgb.mul( Math.PI ), 1 );
 
 		} else {
 
-			material.fragmentNode = vec4( irradianceNode( positionWorld, normal ), 1 );
+			material.fragmentNode = vec4( irradianceNode( positionWorld, normal, this._sample ), 1 );
 
 		}
 
