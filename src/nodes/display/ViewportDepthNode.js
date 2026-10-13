@@ -1,6 +1,6 @@
 import Node from '../core/Node.js';
 import { float, Fn, log, log2, nodeImmutable, nodeProxy } from '../tsl/TSLBase.js';
-import { cameraNear, cameraFar } from '../accessors/Camera.js';
+import { cameraNear, cameraFar, cameraIsPerspective } from '../accessors/Camera.js';
 import { positionView } from '../accessors/Position.js';
 import { viewportDepthTexture } from './ViewportDepthTextureNode.js';
 
@@ -81,7 +81,7 @@ class ViewportDepthNode extends Node {
 
 	}
 
-	setup( { camera } ) {
+	setup( /*builder*/ ) {
 
 		const { scope } = this;
 		const value = this.valueNode;
@@ -98,31 +98,15 @@ class ViewportDepthNode extends Node {
 
 		} else if ( scope === ViewportDepthNode.DEPTH ) {
 
-			if ( camera.isPerspectiveCamera ) {
-
-				node = viewZToPerspectiveDepth( positionView.z, cameraNear, cameraFar );
-
-			} else {
-
-				node = viewZToOrthographicDepth( positionView.z, cameraNear, cameraFar );
-
-			}
+			node = cameraIsPerspective.select( viewZToPerspectiveDepth( positionView.z, cameraNear, cameraFar ), viewZToOrthographicDepth( positionView.z, cameraNear, cameraFar ) );
 
 		} else if ( scope === ViewportDepthNode.LINEAR_DEPTH ) {
 
 			if ( value !== null ) {
 
-				if ( camera.isPerspectiveCamera ) {
+				const viewZ = perspectiveDepthToViewZ( value, cameraNear, cameraFar );
 
-					const viewZ = perspectiveDepthToViewZ( value, cameraNear, cameraFar );
-
-					node = viewZToOrthographicDepth( viewZ, cameraNear, cameraFar );
-
-				} else {
-
-					node = value;
-
-				}
+				node = cameraIsPerspective.select( viewZToOrthographicDepth( viewZ, cameraNear, cameraFar ), value );
 
 			} else {
 

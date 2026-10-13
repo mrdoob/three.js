@@ -1,6 +1,7 @@
 import NodeMaterial from './NodeMaterial.js';
 import { materialRotation } from '../../nodes/accessors/MaterialNode.js';
 import { modelViewMatrix, modelWorldMatrix } from '../../nodes/accessors/ModelNode.js';
+import { cameraIsPerspective } from '../../nodes/accessors/Camera.js';
 import { positionGeometry } from '../../nodes/accessors/Position.js';
 import { rotate } from '../../nodes/utils/RotateNode.js';
 import { float, vec2, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
@@ -108,7 +109,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 	 */
 	setupPositionView( builder ) {
 
-		const { object, camera } = builder;
+		const { object } = builder;
 
 		const { positionNode, rotationNode, scaleNode, sizeAttenuation } = this;
 
@@ -122,9 +123,9 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		}
 
-		if ( camera.isPerspectiveCamera && sizeAttenuation === false ) {
+		if ( sizeAttenuation === false ) {
 
-			scale = scale.mul( mvPosition.z.negate() );
+			scale = cameraIsPerspective.select( scale.mul( mvPosition.z.negate() ), scale );
 
 		}
 
