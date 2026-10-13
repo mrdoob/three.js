@@ -644,7 +644,20 @@ class ClusteredLightsNode extends LightsNode {
 	 */
 	_updateProgram( renderer ) {
 
-		renderer.getDrawingBufferSize( _size );
+		// the grid must match the framebuffer being rendered: a render target (e.g. a reflector
+		// with a resolution scale) can differ from the drawing buffer
+
+		const renderTarget = renderer.getRenderTarget();
+
+		if ( renderTarget !== null ) {
+
+			_size.set( renderTarget.width, renderTarget.height );
+
+		} else {
+
+			renderer.getDrawingBufferSize( _size );
+
+		}
 
 		const isWebGLBackend = renderer.backend.isWebGLBackend === true;
 		const backendChanged = this._compute !== null && this._isWebGLBackend !== isWebGLBackend;
@@ -684,7 +697,9 @@ class ClusteredLightsNode extends LightsNode {
 		this._gridDimensions.value.set( NX, NY );
 		this._compute.count = clusterCount * this._invocationsPerCluster;
 
-		this._bufferSize = new Vector2( width, height );
+		if ( this._bufferSize === null ) this._bufferSize = new Vector2();
+
+		this._bufferSize.set( width, height );
 
 	}
 
