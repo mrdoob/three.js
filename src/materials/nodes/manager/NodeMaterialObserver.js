@@ -979,7 +979,7 @@ class NodeMaterialObserver {
 		}
 
 		const isStatic = renderObject.object.static === true;
-		const isBundle = renderObject.bundle !== null && renderObject.bundle.static === true && this.getRenderObjectData( renderObject ).version === renderObject.bundle.version;
+		const isBundle = renderObject.bundle !== null && renderObject.bundle.static === true && renderObjectData.version === renderObject.bundle.version;
 
 		if ( isStatic || isBundle )
 			return refreshType;
