@@ -101,6 +101,8 @@ export class ClusteredLighting extends Lighting {
 			node = this.createNode();
 			nodes[ nestedDepth - 1 ] = node;
 
+			this._track( node );
+
 		}
 
 		return node;
