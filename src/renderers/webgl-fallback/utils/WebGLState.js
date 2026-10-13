@@ -339,6 +339,18 @@ class WebGLState {
 
 		}
 
+		// the indexed calls above changed the blend state of all draw buffers, including the first one,
+		// so the cached state of setBlending() is invalid now
+
+		this.currentBlending = null;
+		this.currentBlendEquation = null;
+		this.currentBlendEquationAlpha = null;
+		this.currentBlendSrc = null;
+		this.currentBlendDst = null;
+		this.currentBlendSrcAlpha = null;
+		this.currentBlendDstAlpha = null;
+		this.currentPremultipledAlpha = null;
+
 	}
 
 	/**
