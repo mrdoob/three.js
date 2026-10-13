@@ -239,8 +239,8 @@ class NodeMaterial extends Material {
 
 		/**
 		 * The local vertex positions are computed based on multiple factors like the
-		 * attribute data, morphing or skinning. This node property allows to overwrite
-		 * the default and define local vertex positions with nodes instead.
+		 * attribute data, morphing, skinning, instancing or batching. This node property
+		 * allows to overwrite the default and define local vertex positions with nodes instead.
 		 *
 		 * If you don't want to overwrite the vertex positions but modify the existing
 		 * values instead, use {@link positionLocal}.
@@ -248,10 +248,6 @@ class NodeMaterial extends Material {
 		 *```js
 		 * material.positionNode = positionLocal.add( displace );
 		 * ```
-		 *
-		 * For instanced and batched meshes, {@link positionLocal} already includes the
-		 * instance transformation. Use {@link positionGeometry} to access the untransformed
-		 * vertex positions.
 		 *
 		 * @type {?Node<vec3>}
 		 * @default null
