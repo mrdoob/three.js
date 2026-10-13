@@ -180,7 +180,7 @@
 				atlas = unwrapUVs( scene, { resolution: 1024, padding: 3 } );
 
 				// "Baked GI" shows the light map while it accumulates,
-				// "Live GI" evaluates the same irradiance function per pixel
+				// "Live GI" evaluates the raw irradiance per pixel every frame
 
 				renderPipeline = new THREE.RenderPipeline( renderer );
 				bakedPass = pass( scene, camera );
@@ -213,7 +213,7 @@
 				livePass?.dispose();
 				source?.dispose();
 
-				let irradiance;
+				let irradiance, liveIrradiance;
 
 				if ( params.algorithm === 'Light Probe' ) {
 
@@ -222,6 +222,7 @@
 					probes.updateBoundingBox();
 					probes.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
 					irradiance = ( position, normal ) => lightProbeGridIrradiance( probes, position, normal );
+					liveIrradiance = irradiance;
 					source = probes;
 
 				} else {
@@ -229,6 +230,10 @@
 					const volume = new VXGIVolume( 64 );
 					volume.update( renderer, scene );
 					irradiance = vxgiIrradiance( volume );
+
+					// fewer cones per pixel keep the live view interactive
+
+					liveIrradiance = vxgiIrradiance( volume, { coneCount: 3 } );
 					source = volume;
 
 				}
@@ -241,7 +246,7 @@
 				for ( const material of materials ) material.lightMap = lightMapper.texture;
 
 				livePass = pass( scene, camera );
-				livePass.contextNode = builtinGIContext( float( 1 ), irradiance( positionWorld, normalWorld ) );
+				livePass.contextNode = builtinGIContext( float( 1 ), liveIrradiance( positionWorld, normalWorld ) );
 
 				setOutput();
 
