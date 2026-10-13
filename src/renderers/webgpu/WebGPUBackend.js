@@ -306,9 +306,11 @@ class WebGPUBackend extends Backend {
 	 *
 	 * @param {RenderTarget} renderTarget - The render target to register the textures for.
 	 * @param {GPUTexture} colorTexture - The shared XR color GPUTexture.
-	 * @param {?Array<Object>} [viewDescriptors=null] - Optional view descriptors, one per XR view.
+	 * @param {?Array<Object>} [viewDescriptors=null] - Optional color view descriptors, one per XR view.
+	 * @param {?Array<GPUTexture>} [depthTextures=null] - Optional per-eye external depth-stencil textures (foveated projection-layer depth).
+	 * @param {?Array<Object>} [depthViewDescriptors=null] - Optional per-eye depth view descriptors, one per XR view.
 	 */
-	setXRRenderTargetTextures( renderTarget, colorTexture, viewDescriptors = null ) {
+	setXRRenderTargetTextures( renderTarget, colorTexture, viewDescriptors = null, depthTextures = null, depthViewDescriptors = null ) {
 
 		// Update the external XR texture without replacing the cached MSAA attachments.
 		const textureData = this.get( renderTarget.texture );
@@ -318,6 +320,18 @@ class WebGPUBackend extends Backend {
 		textureData.externalTexture = true;
 		textureData.xrViewDescriptors = viewDescriptors;
 		textureData.initialized = true;
+
+		if ( depthTextures !== null && depthTextures.length > 0 && renderTarget.depthTexture !== null ) {
+
+			const depthTextureData = this.get( renderTarget.depthTexture );
+
+			depthTextureData.xrDepthTextures = depthTextures;
+			depthTextureData.xrDepthViewDescriptors = depthViewDescriptors;
+			depthTextureData.externalTexture = true;
+			depthTextureData.format = depthTextures[ 0 ].format;
+			depthTextureData.initialized = true;
+
+		}
 
 	}
 
@@ -821,8 +835,21 @@ class WebGPUBackend extends Backend {
 				}
 
 				const depthStencilAttachment = new GPURenderPassDepthStencilAttachment();
-				const msaaDepthTexture = depthTextureData.msaaTextures?.[ renderContext.activeCubeFace ];
-				depthStencilAttachment.view = msaaDepthTexture !== undefined ? msaaDepthTexture.createView() : depthTextureData.texture.createView( _viewDescriptor );
+
+				if ( depthTextureData.xrDepthTextures && depthTextureData.xrDepthTextures[ renderContext.activeCubeFace ] ) {
+
+					const xrDepthTexture = depthTextureData.xrDepthTextures[ renderContext.activeCubeFace ];
+					const xrDepthViewDescriptor = depthTextureData.xrDepthViewDescriptors ? depthTextureData.xrDepthViewDescriptors[ renderContext.activeCubeFace ] : undefined;
+
+					depthStencilAttachment.view = xrDepthTexture.createView( xrDepthViewDescriptor );
+
+				} else {
+
+					const msaaDepthTexture = depthTextureData.msaaTextures?.[ renderContext.activeCubeFace ];
+					depthStencilAttachment.view = msaaDepthTexture !== undefined ? msaaDepthTexture.createView() : depthTextureData.texture.createView( _viewDescriptor );
+
+				}
+
 				descriptorBase.depthStencilAttachment = depthStencilAttachment;
 
 				_viewDescriptor.reset();
@@ -1090,9 +1117,18 @@ class WebGPUBackend extends Backend {
 			// The layer descriptors hold views of the depth texture, which can be recreated (dispose, resize)
 			// or belong to another render target, since render contexts are shared by attachment state.
 
-			const depthTextureGPU = this.get( renderContext.depthTexture ).texture;
+			const depthTextureData = this.get( renderContext.depthTexture );
+			const depthTextureGPU = depthTextureData.texture;
+			let hasExternalDepth = false;
 
-			if ( ! renderContextData.layerDescriptors || renderContextData.layerDescriptors.length !== cameras.length || renderContextData.layerDepthTexture !== depthTextureGPU ) {
+			if ( depthTextureData.xrDepthTextures ) {
+
+				hasExternalDepth = true;
+				if ( depthTextureData.viewCache ) depthTextureData.viewCache.length = 0;
+
+			}
+
+			if ( hasExternalDepth === true || ! renderContextData.layerDescriptors || renderContextData.layerDescriptors.length !== cameras.length || renderContextData.layerDepthTexture !== depthTextureGPU ) {
 
 				this._createArrayCameraLayerDescriptors( renderContext, renderContextData, descriptor, cameras );
 				renderContextData.layerDepthTexture = depthTextureGPU;
@@ -1271,23 +1307,36 @@ class WebGPUBackend extends Backend {
 
 				if ( ! depthTextureData.viewCache[ layerIndex ] ) {
 
-					const msaaTexture = depthTextureData.msaaTextures?.[ layerIndex ];
+					// XR: per-eye foveated projection-layer depth instead of the engine array depth.
 
-					if ( msaaTexture !== undefined ) {
+					if ( depthTextureData.xrDepthTextures && depthTextureData.xrDepthTextures[ layerIndex ] ) {
 
-						depthTextureData.viewCache[ layerIndex ] = msaaTexture.createView();
+						const xrDepthTexture = depthTextureData.xrDepthTextures[ layerIndex ];
+						const xrDepthViewDescriptor = depthTextureData.xrDepthViewDescriptors ? depthTextureData.xrDepthViewDescriptors[ layerIndex ] : undefined;
+
+						depthTextureData.viewCache[ layerIndex ] = xrDepthTexture.createView( xrDepthViewDescriptor );
 
 					} else {
 
-						_viewDescriptor.dimension = GPUTextureViewDimension.TwoD;
-						_viewDescriptor.baseArrayLayer = i;
-						_viewDescriptor.arrayLayerCount = 1;
+						const msaaTexture = depthTextureData.msaaTextures?.[ layerIndex ];
 
-						depthTextureData.viewCache[ layerIndex ] = depthTextureData.texture.createView( _viewDescriptor );
+						if ( msaaTexture !== undefined ) {
+
+							depthTextureData.viewCache[ layerIndex ] = msaaTexture.createView();
+
+						} else {
+
+							_viewDescriptor.dimension = GPUTextureViewDimension.TwoD;
+							_viewDescriptor.baseArrayLayer = i;
+							_viewDescriptor.arrayLayerCount = 1;
+
+							depthTextureData.viewCache[ layerIndex ] = depthTextureData.texture.createView( _viewDescriptor );
+
+						}
+
+						_viewDescriptor.reset();
 
 					}
-
-					_viewDescriptor.reset();
 
 				}
 

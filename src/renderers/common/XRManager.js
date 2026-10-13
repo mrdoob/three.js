@@ -769,11 +769,25 @@ class XRManager extends EventDispatcher {
 
 		this._referenceSpace = await session.requestReferenceSpace( this.getReferenceSpaceType() );
 
+		const supplyDepth = glProjLayer.ignoreDepthValues === false;
+
+		let depthTexture = null;
+
+		if ( supplyDepth === true ) {
+
+			const depthFormat = this._renderer.stencil ? DepthStencilFormat : DepthFormat;
+			const depthType = this._renderer.stencil ? UnsignedInt248Type : UnsignedIntType;
+			depthTexture = new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat, 2 );
+			depthTexture.isArrayTexture = true;
+
+		}
+
 		this._xrRenderTarget = new RenderTarget( glProjLayer.textureWidth, glProjLayer.textureHeight, {
 			depth: 2,
 			minFilter: LinearFilter,
 			magFilter: LinearFilter,
 			depthBuffer: true,
+			depthTexture: depthTexture,
 			multiview: false,
 			useArrayDepthTexture: true,
 			storeMultisampledColorBuffer: false,
@@ -783,6 +797,17 @@ class XRManager extends EventDispatcher {
 		} );
 
 		this._xrRenderTarget.texture.isArrayTexture = true;
+
+		if ( supplyDepth === true ) {
+
+			// All attachments are external XR textures, so Textures.updateRenderTarget() must skip engine texture creation.
+			// Not set without supplied depth: that skip would also drop the engine depth texture, which is needed then.
+			this._xrRenderTarget.isXRRenderTarget = true;
+
+			// Depth comes from the projection layer, so the engine must not allocate its own depth buffer.
+			this._xrRenderTarget._autoAllocateDepthBuffer = false;
+
+		}
 
 		if ( this._useMultiviewIfPossible === true ) {
 
@@ -831,7 +856,7 @@ class XRManager extends EventDispatcher {
 	 *
 	 * @private
 	 * @param {Array<XRView>} views - The XR views for the current pose.
-	 * @return {{colorTexture:?GPUTexture, viewDescriptors:Array<Object>, viewports:Array<XRViewport>}} The WebGPU XR view data.
+	 * @return {{colorTexture:?GPUTexture, viewDescriptors:Array<Object>, viewports:Array<XRViewport>, depthTextures:Array<GPUTexture>, depthViewDescriptors:Array<Object>}} The WebGPU XR view data.
 	 */
 	_getWebGPUViewData( views ) {
 
@@ -839,8 +864,12 @@ class XRManager extends EventDispatcher {
 		const viewData = {
 			colorTexture: null,
 			viewDescriptors: [],
-			viewports: []
+			viewports: [],
+			depthTextures: [],
+			depthViewDescriptors: []
 		};
+
+		const supplyDepth = this._glProjLayer !== null && this._glProjLayer.ignoreDepthValues === false;
 
 		for ( let i = 0; i < views.length; i ++ ) {
 
@@ -857,6 +886,13 @@ class XRManager extends EventDispatcher {
 			if ( gpuSubImage.getViewDescriptor ) {
 
 				viewData.viewDescriptors.push( gpuSubImage.getViewDescriptor() );
+
+			}
+
+			if ( supplyDepth === true && gpuSubImage.depthStencilTexture ) {
+
+				viewData.depthTextures.push( gpuSubImage.depthStencilTexture );
+				viewData.depthViewDescriptors.push( gpuSubImage.getViewDescriptor() );
 
 			}
 
@@ -1875,10 +1911,36 @@ function onAnimationFrame( time, frame ) {
 
 		if ( webgpuViewData !== null && webgpuViewData.colorTexture !== null ) {
 
+			// The projection layer size can be 0x0 at session init (visionOS), so follow the layer size.
+
+			const layerWidth = this._glProjLayer.textureWidth;
+			const layerHeight = this._glProjLayer.textureHeight;
+			const xrRenderTarget = this._xrRenderTarget;
+
+			if ( layerWidth > 0 && layerHeight > 0 && ( xrRenderTarget.width !== layerWidth || xrRenderTarget.height !== layerHeight ) ) {
+
+				if ( xrRenderTarget.depthTexture !== null ) {
+
+					xrRenderTarget.depthTexture.image.width = layerWidth;
+					xrRenderTarget.depthTexture.image.height = layerHeight;
+
+				}
+
+				xrRenderTarget.setSize( layerWidth, layerHeight, 2 );
+
+			}
+
+			// The pass viewport comes from the render target viewport. Use the logical sub-image
+			// viewport: on visionOS it is larger than the foveated texture and the runtime maps it.
+			const viewport = webgpuViewData.viewports[ 0 ];
+			xrRenderTarget.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
+
 			backend.setXRRenderTargetTextures(
 				this._xrRenderTarget,
 				webgpuViewData.colorTexture,
-				webgpuViewData.viewDescriptors
+				webgpuViewData.viewDescriptors,
+				webgpuViewData.depthTextures,
+				webgpuViewData.depthViewDescriptors
 			);
 
 		}
@@ -1889,7 +1951,10 @@ function onAnimationFrame( time, frame ) {
 
 		if ( webgpuViewData !== null ) {
 
-			this._xrRenderTarget.samples = frameBufferTarget === null ? renderer.samples : 0;
+			// The supplied XR depth is single-sample, so MSAA colour cannot be used with it.
+			const useMSAA = frameBufferTarget === null && this._xrRenderTarget._autoAllocateDepthBuffer !== false;
+
+			this._xrRenderTarget.samples = useMSAA ? renderer.samples : 0;
 			this._xrRenderTarget.depthBuffer = frameBufferTarget === null;
 
 		}
