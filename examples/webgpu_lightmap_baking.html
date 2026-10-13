@@ -57,13 +57,14 @@
 
 			const params = {
 				output: 'Baked GI',
-				algorithm: 'VXGI'
+				algorithm: 'VXGI',
+				resolution: 1024
 			};
 
 			// light probes are deterministic and only need a few samples to antialias the light map,
 			// the VXGI cones are rotated per sample and converge over more samples
 
-			const bakeSamples = { 'Light Probe': 16, 'VXGI': 256 };
+			const bakeSamples = { 'Light Probe': 16, 'VXGI': 64 };
 
 			init();
 
@@ -177,7 +178,7 @@
 
 				meshes = scene.children.filter( ( object ) => object.isMesh );
 				materials = new Set( meshes.map( ( mesh ) => mesh.material ) );
-				atlas = unwrapUVs( scene, { resolution: 1024, padding: 3 } );
+				atlas = unwrapUVs( scene, { resolution: params.resolution, padding: 3 } );
 
 				// "Baked GI" shows the light map while it accumulates,
 				// "Live GI" evaluates the raw irradiance per pixel every frame
@@ -194,6 +195,7 @@
 				const gui = renderer.inspector.createParameters( 'Light Baking' );
 				gui.add( params, 'output', [ 'Baked GI', 'Live GI' ] ).name( 'Output' ).onChange( setOutput );
 				gui.add( params, 'algorithm', [ 'Light Probe', 'VXGI' ] ).name( 'GI Algorithm' ).onChange( bake );
+				gui.add( params, 'resolution', [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( bake );
 				gui.add( { bake }, 'bake' ).name( 'Re-Bake GI' );
 				gui.add( { exportGLTF }, 'exportGLTF' ).name( 'Export glTF' );
 
@@ -212,6 +214,15 @@
 				lightMapper?.dispose();
 				livePass?.dispose();
 				source?.dispose();
+
+				if ( atlas.resolution !== params.resolution ) {
+
+					const geometries = new Set( meshes.map( ( mesh ) => mesh.geometry ) );
+					atlas = unwrapUVs( scene, { resolution: params.resolution, padding: 3 } );
+
+					for ( const geometry of geometries ) geometry.dispose();
+
+				}
 
 				let irradiance, liveIrradiance;
 
@@ -255,6 +266,10 @@
 			function setOutput() {
 
 				const live = params.output === 'Live GI';
+
+				// discard accumulated samples when switching outputs; baking only runs in Baked GI
+
+				lightMapper.reset();
 
 				for ( const material of materials ) material.lightMapIntensity = live ? 0 : 1;
 
@@ -320,7 +335,11 @@
 
 				const samples = bakeSamples[ params.algorithm ];
 
-				if ( lightMapper.samples < samples ) {
+				if ( params.output === 'Live GI' ) {
+
+					status.textContent = `Live ${ params.algorithm }`;
+
+				} else if ( lightMapper.samples < samples ) {
 
 					lightMapper.update();
 					status.textContent = `Baking ${ params.algorithm }: ${ lightMapper.samples } / ${ samples } samples`;
