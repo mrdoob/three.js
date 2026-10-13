@@ -52,6 +52,15 @@ class ClusteredLightsNode extends LightsNode {
 
 		super();
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isClusteredLightsNode = true;
+
 		this.materialLights = [];
 		this.clusteredLights = [];
 
@@ -64,9 +73,10 @@ class ClusteredLightsNode extends LightsNode {
 
 		this._bufferSize = null;
 		this._isWebGLBackend = false;
+		this._needsRebuild = false;
 		this._invocationsPerCluster = 1;
 		this._lightIndexes = null;
-		this._retired = [];
+		this._renderer = null;
 		this._screenClusterIndex = null;
 		this._compute = null;
 
@@ -333,7 +343,7 @@ class ClusteredLightsNode extends LightsNode {
 
 		const { renderer, camera } = frame;
 
-		this._updateProgram( renderer );
+		this._initGrid( renderer );
 
 		this._updateLightsTexture( camera );
 
@@ -550,7 +560,7 @@ class ClusteredLightsNode extends LightsNode {
 	 */
 	setupLights( builder, lightNodes ) {
 
-		this._updateProgram( builder.renderer );
+		this._initGrid( builder.renderer );
 
 		//
 
@@ -616,9 +626,8 @@ class ClusteredLightsNode extends LightsNode {
 	}
 
 	/**
-	 * Sets the size of the cluster grid. Must be called with the new drawing buffer
-	 * size whenever the renderer is resized. Called outside of rendering, so it also
-	 * frees the resources replaced by rebuilds.
+	 * Sets the size of the cluster grid. Must be called outside of rendering. Not required
+	 * with {@link ClusteredLighting}, which fits the grid at the beginning of each render.
 	 *
 	 * @param {number} width - The drawing buffer width.
 	 * @param {number} height - The drawing buffer height.
@@ -628,21 +637,44 @@ class ClusteredLightsNode extends LightsNode {
 
 		this._resize( this._getBufferFitSize( width ), this._getBufferFitSize( height ) );
 
-		this._disposeRetired();
-
 		return this;
 
 	}
 
 	/**
-	 * Creates the cluster grid on first use and resizes it when the drawing buffer size changes.
-	 * Runs during rendering (possibly nested), so replaced resources are only retired here and
-	 * freed by {@link ClusteredLightsNode#setSize} or {@link ClusteredLightsNode#dispose}.
+	 * Fits the cluster grid to the framebuffer of the render that is about to start. Called by
+	 * {@link ClusteredLighting} before the render objects of the render are prepared. Since each
+	 * render depth has its own node, no pending command buffer uses the resources of this node at
+	 * this point, so a rebuild can free the replaced resources immediately.
+	 */
+	updateSize() {
+
+		if ( this._renderer !== null ) this._fitToRenderer( this._renderer );
+
+	}
+
+	/**
+	 * Creates the cluster grid on first use. While rendering, the grid is never rebuilt: the
+	 * replaced resources could still be used by a command buffer that was not submitted yet.
 	 *
 	 * @private
 	 * @param {Renderer} renderer - The renderer.
 	 */
-	_updateProgram( renderer ) {
+	_initGrid( renderer ) {
+
+		this._renderer = renderer;
+
+		if ( this._compute === null ) this._fitToRenderer( renderer );
+
+	}
+
+	/**
+	 * Fits the cluster grid to the framebuffer the renderer is rendering to.
+	 *
+	 * @private
+	 * @param {Renderer} renderer - The renderer.
+	 */
+	_fitToRenderer( renderer ) {
 
 		// the grid must match the framebuffer being rendered: a render target (e.g. a reflector
 		// with a resolution scale) can differ from the drawing buffer
@@ -659,28 +691,30 @@ class ClusteredLightsNode extends LightsNode {
 
 		}
 
+		// the compute differs per backend, so a backend change requires a rebuild
+
 		const isWebGLBackend = renderer.backend.isWebGLBackend === true;
-		const backendChanged = this._compute !== null && this._isWebGLBackend !== isWebGLBackend;
+
+		if ( this._compute !== null && this._isWebGLBackend !== isWebGLBackend ) this._needsRebuild = true;
 
 		this._isWebGLBackend = isWebGLBackend;
 
-		this._resize( this._getBufferFitSize( _size.width ), this._getBufferFitSize( _size.height ), backendChanged );
+		this._resize( this._getBufferFitSize( _size.width ), this._getBufferFitSize( _size.height ) );
 
 	}
 
 	/**
 	 * Resizes the cluster grid. The grid dimensions are uniforms, so resizing only updates
-	 * them and the compute count; the shaders are rebuilt only when the light index storage
-	 * has to grow.
+	 * them and the compute count; the compute and the storage are rebuilt only when the
+	 * storage has to grow (or the backend changed).
 	 *
 	 * @private
 	 * @param {number} width - The fitted width.
 	 * @param {number} height - The fitted height.
-	 * @param {boolean} [rebuild=false] - Whether to rebuild the compute and the storage.
 	 */
-	_resize( width, height, rebuild = false ) {
+	_resize( width, height ) {
 
-		if ( rebuild === false && this._bufferSize !== null && this._bufferSize.width === width && this._bufferSize.height === height ) return;
+		if ( this._needsRebuild === false && this._bufferSize !== null && this._bufferSize.width === width && this._bufferSize.height === height ) return;
 
 		const NX = Math.floor( width / this.tileSize );
 		const NY = Math.floor( height / this.tileSize );
@@ -688,7 +722,7 @@ class ClusteredLightsNode extends LightsNode {
 
 		const requiredElements = clusterCount * this._chunksPerCluster;
 
-		if ( rebuild === true || this._compute === null || this._lightIndexes.value.array.length / 4 < requiredElements ) {
+		if ( this._needsRebuild === true || this._compute === null || this._lightIndexes.value.array.length / 4 < requiredElements ) {
 
 			this._create( clusterCount );
 
@@ -728,10 +762,14 @@ class ClusteredLightsNode extends LightsNode {
 		const previousElements = this._lightIndexes !== null ? this._lightIndexes.value.array.length / 4 : 0;
 		const elements = previousElements === 0 ? Math.ceil( requiredElements * 1.5 ) : Math.max( requiredElements, previousElements * 2 );
 
-		// the previous compute and storage may still be in use by the current (or an outer)
-		// render, so they are retired instead of disposed
+		// rebuilds only happen outside of rendering (see _initGrid()), so the replaced resources can be freed
 
-		if ( this._compute !== null ) this._retired.push( this._compute, this._lightIndexes.value );
+		if ( this._compute !== null ) {
+
+			this._compute.dispose();
+			this._lightIndexes.value.dispose();
+
+		}
 
 		// instanced storage: WebGL computes use gl_InstanceID as instanceIndex; PBO: random access in the fragment stage
 		const lightIndexes = instancedArray( new Int32Array( elements * 4 ), 'ivec4' ).setPBO( true ).setName( 'lightIndexes' );
@@ -861,11 +899,7 @@ class ClusteredLightsNode extends LightsNode {
 
 			const firstElement = clusterIndex.mul( chunksPerCluster ).add( firstChunk );
 
-			// Never write past the allocated storage. The capacity constant also gives each allocation
-			// its own compute program: WebGL binds the transform feedback buffers per program, so a
-			// rebuilt compute must not share the program of a retired one that is not disposed yet.
-
-			If( firstElement.lessThan( int( elements ) ), () => {
+			const writeChunks = () => {
 
 				Loop( chunksPerInvocation, ( { i } ) => {
 
@@ -873,7 +907,21 @@ class ClusteredLightsNode extends LightsNode {
 
 				} );
 
-			} );
+			};
+
+			if ( this._isWebGLBackend === true ) {
+
+				// WebGL binds the transform feedback buffers per compute program, and programs are shared by
+				// identical code. The (always true) capacity and node id constants give each node and storage
+				// allocation its own program, so a compute never writes to the storage of another one.
+
+				If( firstElement.lessThan( int( elements ) ).and( int( this.id ).notEqual( int( - 1 ) ) ), writeChunks );
+
+			} else {
+
+				writeChunks();
+
+			}
 
 		} )().compute( clusterCount * invocationsPerCluster ).setName( 'Update Clustered Lights' );
 
@@ -904,20 +952,7 @@ class ClusteredLightsNode extends LightsNode {
 		this._lightIndexes = lightIndexes;
 		this._screenClusterIndex = screenClusterIndex;
 		this._compute = compute;
-
-	}
-
-	/**
-	 * Frees the compute nodes and light index storages replaced by rebuilds.
-	 * Must only be called outside of rendering.
-	 *
-	 * @private
-	 */
-	_disposeRetired() {
-
-		for ( const object of this._retired ) object.dispose();
-
-		this._retired.length = 0;
+		this._needsRebuild = false;
 
 	}
 
@@ -925,8 +960,6 @@ class ClusteredLightsNode extends LightsNode {
 	 * Frees the GPU resources allocated by this node.
 	 */
 	dispose() {
-
-		this._disposeRetired();
 
 		if ( this._compute !== null ) this._compute.dispose();
 		if ( this._lightIndexes !== null ) this._lightIndexes.value.dispose();
