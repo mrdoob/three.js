@@ -58,12 +58,20 @@ class FileLoader extends Loader {
 		this.responseType = '';
 
 		/**
-		 * Additional [request options](https://developer.mozilla.org/en-US/docs/Web/API/RequestInit)
-		 * passed to `fetch()`, e.g. `{ cache: 'no-cache', priority: 'high' }`.
+		 * The request priority hint passed to `fetch()`.
 		 *
-		 * @type {Object}
+		 * @type {('high'|'low'|'auto')}
+		 * @default 'auto'
 		 */
-		this.requestInit = {};
+		this.priority = 'auto';
+
+		/**
+		 * The HTTP cache mode passed to `fetch()`. This does not affect {@link Cache}.
+		 *
+		 * @type {('default'|'no-store'|'reload'|'no-cache'|'force-cache')}
+		 * @default 'default'
+		 */
+		this.cache = 'default';
 
 		/**
 		 * Used for aborting requests.
@@ -138,7 +146,8 @@ class FileLoader extends Loader {
 		const req = new Request( url, {
 			headers: new Headers( this.requestHeader ),
 			credentials: this.withCredentials ? 'include' : 'same-origin',
-			...this.requestInit,
+			priority: this.priority,
+			cache: this.cache,
 			signal: ( typeof AbortSignal.any === 'function' ) ? AbortSignal.any( [ this._abortController.signal, this.manager.abortController.signal ] ) : this._abortController.signal
 		} );
 
@@ -357,14 +366,27 @@ class FileLoader extends Loader {
 	}
 
 	/**
-	 * Sets additional request options passed to `fetch()`.
+	 * Sets the request priority hint passed to `fetch()`.
 	 *
-	 * @param {Object} value - The request options.
+	 * @param {('high'|'low'|'auto')} value - The request priority hint.
 	 * @return {FileLoader} A reference to this file loader.
 	 */
-	setRequestInit( value ) {
+	setPriority( value ) {
 
-		this.requestInit = value;
+		this.priority = value;
+		return this;
+
+	}
+
+	/**
+	 * Sets the HTTP cache mode passed to `fetch()`. This does not affect {@link Cache}.
+	 *
+	 * @param {('default'|'no-store'|'reload'|'no-cache'|'force-cache')} value - The HTTP cache mode.
+	 * @return {FileLoader} A reference to this file loader.
+	 */
+	setCache( value ) {
+
+		this.cache = value;
 		return this;
 
 	}
