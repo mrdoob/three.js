@@ -249,6 +249,10 @@ class NodeMaterial extends Material {
 		 * material.positionNode = positionLocal.add( displace );
 		 * ```
 		 *
+		 * For instanced and batched meshes, {@link positionLocal} already includes the
+		 * instance transformation. Use {@link positionGeometry} to access the untransformed
+		 * vertex positions.
+		 *
 		 * @type {?Node<vec3>}
 		 * @default null
 		 */
