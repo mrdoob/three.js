@@ -189,6 +189,23 @@ const mx_viewdirection = ( space = 'world' ) => {
 
 };
 
+const mx_hsvadjust = ( inNode, amount, nodeX ) => {
+
+	const hsv = mx_rgbtohsv( vec3( inNode ) );
+	const adjusted = mul( add( hsv, vec3( element( amount, 0 ), 0, 0 ) ), vec3( 1, element( amount, 1 ), element( amount, 2 ) ) );
+	const rgb = mx_hsvtorgb( adjusted );
+	return nodeX && nodeX.type === 'color4' ? vec4( rgb, element( vec4( inNode ), 3 ) ) : rgb;
+
+};
+
+const mx_facingratio = ( viewdirection, normal, faceforward, invert ) => {
+
+	const cosine = dot( viewdirection, normal );
+	const facing = toBooleanNode( faceforward ).select( abs( cosine ), mul( cosine, - 1 ) );
+	return toBooleanNode( invert ).select( sub( 1, facing ), facing );
+
+};
+
 const mx_blackbody = ( temperature = 5000 ) => {
 
 	const temperatureKelvin = clamp( temperature, float( 800 ), float( 25000 ) );
@@ -716,6 +733,8 @@ const MXElements = [
 	createMXElement( 'smoothstep', mx_smoothstep, [ 'in', 'low', 'high' ] ),
 	createMXElement( 'luminance', luminance, [ 'in', 'lumacoeffs' ] ),
 	createMXElement( 'rgbtohsv', mx_rgbtohsv, [ 'in' ] ),
+	createMXElement( 'hsvadjust', mx_hsvadjust, [ 'in', 'amount' ], true ),
+	createMXElement( 'facingratio', mx_facingratio, [ 'viewdirection', 'normal', 'faceforward', 'invert' ] ),
 	createMXElement( 'hsvtorgb', mx_hsvtorgb, [ 'in' ] ),
 	createMXElement( 'mix', mix, [ 'bg', 'fg', 'mix' ] ),
 	createMXElement( 'minus', mx_minus, [ 'fg', 'bg', 'mix' ] ),
