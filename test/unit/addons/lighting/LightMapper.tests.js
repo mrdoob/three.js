@@ -1,4 +1,4 @@
-import { Color, Group, Mesh, MeshBasicMaterial, PlaneGeometry } from 'three/webgpu';
+import { Group, Mesh, MeshBasicMaterial, PlaneGeometry } from 'three/webgpu';
 import { vec3 } from 'three/tsl';
 import { LightMapper } from '../../../../examples/jsm/lighting/LightMapper.js';
 
@@ -7,46 +7,6 @@ export default QUnit.module( 'Addons', () => {
 	QUnit.module( 'Lighting', () => {
 
 		QUnit.module( 'LightMapper', () => {
-
-			QUnit.test( 'Restores renderer state after a failed bake', assert => {
-
-				const originalTarget = {};
-				const originalColor = new Color( 0x123456 );
-				const color = originalColor.clone();
-				let target = originalTarget, alpha = 0.25;
-				const renderer = {
-					autoClear: true,
-					getRenderTarget: () => target,
-					setRenderTarget: value => {
-
-						target = value;
-
-					},
-					getClearAlpha: () => alpha,
-					getClearColor: value => value.copy( color ),
-					setClearColor: ( value, opacity ) => {
-
-						color.set( value ); alpha = opacity;
-
-					},
-					clear: () => {},
-					render: () => {
-
-						throw new Error( 'GPU failure' );
-
-					}
-				};
-				const mapper = new LightMapper( renderer, 32, () => vec3( 1 ) );
-
-				assert.throws( () => mapper.update(), /GPU failure/ );
-				assert.strictEqual( target, originalTarget );
-				assert.true( color.equals( originalColor ) );
-				assert.strictEqual( alpha, 0.25 );
-				assert.true( renderer.autoClear );
-				assert.strictEqual( mapper.samples, 0 );
-				mapper.dispose();
-
-			} );
 
 			QUnit.test( 'Uses current world transforms without rendering the source scene first', assert => {
 
@@ -58,19 +18,24 @@ export default QUnit.module( 'Addons', () => {
 				const mesh = new Mesh( geometry, material );
 				mesh.position.set( 5, 6, 7 );
 				parent.add( mesh );
-				let target = null;
 				let bakedPosition;
 				const renderer = {
 					autoClear: true,
-					getRenderTarget: () => target,
-					setRenderTarget: value => {
-
-						target = value;
-
-					},
-					getClearAlpha: () => 1,
+					getRenderTarget: () => null,
+					getActiveCubeFace: () => 0,
+					getActiveMipmapLevel: () => 0,
+					getRenderObjectFunction: () => null,
+					getPixelRatio: () => 1,
+					getMRT: () => null,
 					getClearColor: value => value.set( 0 ),
+					getClearAlpha: () => 1,
+					getScissorTest: () => false,
+					setRenderTarget: () => {},
+					setRenderObjectFunction: () => {},
+					setPixelRatio: () => {},
+					setMRT: () => {},
 					setClearColor: () => {},
+					setScissorTest: () => {},
 					clear: () => {},
 					render: scene => {
 

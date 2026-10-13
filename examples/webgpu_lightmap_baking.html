@@ -175,8 +175,6 @@
 
 				const atlas = unwrapUVs( scene, { resolution: 1024, padding: 3 } );
 
-				if ( atlas === null ) throw new Error( 'Unable to pack the light map UV atlas.' );
-
 				// Both GI sources provide the same world-space irradiance callback.
 
 				let source;

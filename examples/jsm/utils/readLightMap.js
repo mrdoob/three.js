@@ -15,19 +15,11 @@ async function readLightMap( renderer, map ) {
 
 	const { width, height } = map.image;
 	const target = new RenderTarget( width, height, { type: map.type, format: map.format, depthBuffer: false } );
-	let data;
 
-	try {
-
-		renderer.initRenderTarget( target );
-		renderer.copyTextureToTexture( map, target.texture );
-		data = await renderer.readRenderTargetPixelsAsync( target, 0, 0, width, height );
-
-	} finally {
-
-		target.dispose();
-
-	}
+	renderer.initRenderTarget( target );
+	renderer.copyTextureToTexture( map, target.texture );
+	const data = await renderer.readRenderTargetPixelsAsync( target, 0, 0, width, height );
+	target.dispose();
 
 	const decode = map.type === HalfFloatType ? DataUtils.fromHalfFloat : value => value;
 	let intensity = 1;
@@ -35,9 +27,7 @@ async function readLightMap( renderer, map ) {
 	for ( let i = 0; i < data.length; i ++ ) {
 
 		if ( i % 4 === 3 ) continue;
-		const value = decode( data[ i ] );
-		if ( ! Number.isFinite( value ) || value < 0 ) throw new Error( 'readLightMap: Irradiance must be finite and nonnegative.' );
-		intensity = Math.max( intensity, value );
+		intensity = Math.max( intensity, decode( data[ i ] ) );
 
 	}
 
