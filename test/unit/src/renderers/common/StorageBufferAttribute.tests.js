@@ -2,12 +2,31 @@ import StorageBufferAttribute from '../../../../../src/renderers/common/StorageB
 import StorageInstancedBufferAttribute from '../../../../../src/renderers/common/StorageInstancedBufferAttribute.js';
 import IndirectStorageBufferAttribute from '../../../../../src/renderers/common/IndirectStorageBufferAttribute.js';
 
-import { Fn, instanceIndex, instancedArray, float, vec3, vec4, struct } from 'three/tsl';
+import { Fn, instanceIndex, instancedArray, float, uint, vec3, vec4, struct, storage } from 'three/tsl';
 import { rawComputeTest } from '../../nodes/tsl/gpu-raw-test-utils.js';
 
 async function readFloats( renderer, attribute ) {
 
 	return new Float32Array( await renderer.getArrayBufferAsync( attribute ) );
+
+}
+
+// these tests need the WebGPU backend: WebGPURenderer falls back to WebGL 2 where WebGPU is unavailable
+
+function webgpuTest( name, run ) {
+
+	rawComputeTest( name, {}, async ( { assert, renderer } ) => {
+
+		if ( renderer.backend.isWebGPUBackend !== true ) {
+
+			assert.ok( true, `SKIPPED: "${ name }" requires the WebGPU backend.` );
+			return;
+
+		}
+
+		await run( { assert, renderer } );
+
+	} );
 
 }
 
@@ -76,9 +95,41 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
+			QUnit.test( 'the array type follows the assigned array', ( assert ) => {
+
+				for ( const AttributeClass of [ StorageBufferAttribute, StorageInstancedBufferAttribute ] ) {
+
+					const attribute = new AttributeClass( 4, 1 );
+
+					attribute.array = new Uint32Array( 4 );
+					attribute.array = null;
+
+					assert.strictEqual( attribute.arrayType, Uint32Array, `${ AttributeClass.name }: arrayType after replacing and releasing the array` );
+					assert.ok( attribute.array instanceof Uint32Array, `${ AttributeClass.name }: the array is allocated again with the last type` );
+
+				}
+
+			} );
+
+			QUnit.test( 'copy() keeps the array type of the source', ( assert ) => {
+
+				for ( const AttributeClass of [ StorageBufferAttribute, StorageInstancedBufferAttribute ] ) {
+
+					const source = new AttributeClass( new Uint32Array( [ 1, 2, 3, 4 ] ), 1 );
+					const attribute = new AttributeClass( 4, 1 ).copy( source );
+
+					attribute.array = null;
+
+					assert.strictEqual( attribute.arrayType, Uint32Array, `${ AttributeClass.name }: arrayType` );
+					assert.deepEqual( Array.from( attribute.array ), [ 0, 0, 0, 0 ], `${ AttributeClass.name }: a released array is allocated again zero-filled` );
+
+				}
+
+			} );
+
 			// GPU
 
-			rawComputeTest( 'compute writes into a storage buffer without CPU data are read back', {}, async ( { assert, renderer } ) => {
+			webgpuTest( 'compute writes into a storage buffer without CPU data are read back', async ( { assert, renderer } ) => {
 
 				const count = 64;
 				const buffer = instancedArray( count, 'vec4' );
@@ -106,7 +157,7 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
-			rawComputeTest( 'a storage buffer without CPU data starts zero-initialized', {}, async ( { assert, renderer } ) => {
+			webgpuTest( 'a storage buffer without CPU data starts zero-initialized', async ( { assert, renderer } ) => {
 
 				const count = 32;
 				const buffer = instancedArray( count, 'vec4' );
@@ -119,12 +170,13 @@ export default QUnit.module( 'Renderers', () => {
 
 				const result = await readFloats( renderer, buffer.value );
 
+				assert.strictEqual( result.length, count * 4, 'buffer length' );
 				assert.ok( result.every( ( value ) => value === 1 ), 'every component is 0 + 1' );
 				assert.strictEqual( buffer.value.hasCPUData, false, 'no CPU array was allocated' );
 
 			} );
 
-			rawComputeTest( 'data written into the array before first use are uploaded', {}, async ( { assert, renderer } ) => {
+			webgpuTest( 'data written into the array before first use are uploaded', async ( { assert, renderer } ) => {
 
 				const count = 16;
 				const buffer = instancedArray( count, 'float' );
@@ -143,7 +195,7 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
-			rawComputeTest( 'a vec3 storage buffer without CPU data is padded to vec4', {}, async ( { assert, renderer } ) => {
+			webgpuTest( 'a vec3 storage buffer without CPU data is padded to vec4', async ( { assert, renderer } ) => {
 
 				const count = 4;
 				const buffer = instancedArray( count, 'vec3' );
@@ -164,7 +216,7 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
-			rawComputeTest( 'a struct array without CPU data', {}, async ( { assert, renderer } ) => {
+			webgpuTest( 'a struct array without CPU data', async ( { assert, renderer } ) => {
 
 				const Item = struct( { a: 'vec4', b: 'vec4' } );
 				const count = 8;
@@ -187,7 +239,7 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
-			rawComputeTest( 'renderer.info reports the size of storage buffers without CPU data', {}, async ( { assert, renderer } ) => {
+			webgpuTest( 'renderer.info reports the size of storage buffers without CPU data', async ( { assert, renderer } ) => {
 
 				const before = renderer.info.memory.storageAttributesSize;
 				const buffer = instancedArray( 100, 'vec4' );
@@ -207,7 +259,7 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
-			rawComputeTest( 'dispose() destroys the GPU buffer of a storage buffer without CPU data', {}, async ( { assert, renderer } ) => {
+			webgpuTest( 'dispose() destroys the GPU buffer of a storage buffer without CPU data', async ( { assert, renderer } ) => {
 
 				const buffer = instancedArray( 8, 'float' );
 
@@ -240,6 +292,28 @@ export default QUnit.module( 'Renderers', () => {
 				assert.strictEqual( destroyed.length, 1, 'one GPU buffer was destroyed' );
 				assert.strictEqual( destroyed[ 0 ].size, 8 * 4, 'the destroyed buffer is the storage buffer' );
 				assert.strictEqual( buffer.value.hasCPUData, false, 'no CPU array was allocated' );
+
+			} );
+
+			webgpuTest( 'the widened type of an uploaded array is kept when the array is released', async ( { assert, renderer } ) => {
+
+				const attribute = new StorageBufferAttribute( new Uint16Array( [ 1, 2, 3, 4 ] ), 1 );
+				const buffer = storage( attribute, 'uint', 4 );
+
+				await renderer.computeAsync( Fn( () => {
+
+					buffer.element( instanceIndex ).mulAssign( uint( 2 ) );
+
+				} )().compute( 4 ) );
+
+				const result = new Uint32Array( await renderer.getArrayBufferAsync( attribute ) );
+
+				assert.deepEqual( Array.from( result ), [ 2, 4, 6, 8 ], 'values' );
+				assert.strictEqual( attribute.arrayType, Uint32Array, 'the uploaded array was widened to 32 bit' );
+
+				attribute.array = null;
+
+				assert.strictEqual( attribute.arrayType, Uint32Array, 'arrayType after releasing the array' );
 
 			} );
 

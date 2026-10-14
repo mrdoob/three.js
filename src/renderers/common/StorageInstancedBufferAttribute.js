@@ -19,9 +19,10 @@ class StorageInstancedBufferAttribute extends InstancedBufferAttribute {
 	/**
 	 * Constructs a new storage instanced buffer attribute.
 	 *
-	 * When created from an item count, the attribute holds no CPU-side data: its GPU buffer
-	 * is zero-initialized without an upload and `array` is only allocated when it is accessed,
-	 * e.g. to define initial data.
+	 * When created from an item count, the attribute holds no CPU-side data: the WebGPU backend
+	 * creates its GPU buffer zero-initialized without an upload, and `array` is only allocated
+	 * when it is accessed, e.g. to define initial data. The WebGL 2 backend allocates and
+	 * uploads `array` as before.
 	 *
 	 * @param {number|TypedArray} count - The item count. It is also valid to pass a typed array as an argument.
 	 * The subsequent parameters are then obsolete.
@@ -44,7 +45,8 @@ class StorageInstancedBufferAttribute extends InstancedBufferAttribute {
 		this.isStorageInstancedBufferAttribute = true;
 
 		/**
-		 * The typed array constructor used to allocate `array` on first access.
+		 * The typed array constructor of the attribute data. It is kept when `array`
+		 * is set to `null`, so the array can be allocated again with the same type.
 		 *
 		 * @private
 		 * @type {TypedArray.constructor}
@@ -56,8 +58,10 @@ class StorageInstancedBufferAttribute extends InstancedBufferAttribute {
 	}
 
 	/**
-	 * The attribute data. If the attribute was created from an item count,
-	 * a zero-filled array is allocated on first access.
+	 * The attribute data. If the attribute holds no CPU-side data, a zero-filled array
+	 * is allocated when it is accessed, also by methods such as `copy()`, `clone()` or
+	 * `toJSON()`. Setting it to `null` releases the CPU-side data; a later access allocates
+	 * a new zero-filled array, it does not read back the GPU buffer.
 	 *
 	 * @type {TypedArray}
 	 */
@@ -71,6 +75,8 @@ class StorageInstancedBufferAttribute extends InstancedBufferAttribute {
 
 	set array( value ) {
 
+		if ( value !== undefined && value !== null ) this._arrayType = value.constructor;
+
 		this._array = value === undefined ? null : value;
 
 	}
@@ -83,13 +89,13 @@ class StorageInstancedBufferAttribute extends InstancedBufferAttribute {
 	 */
 	get arrayType() {
 
-		return this._array !== null ? this._array.constructor : this._arrayType;
+		return this._arrayType;
 
 	}
 
 	/**
-	 * Whether the attribute holds CPU-side data. If `false`, its GPU buffer is
-	 * created zero-initialized without uploading data.
+	 * Whether the attribute holds CPU-side data. If `false`, the WebGPU backend creates
+	 * its GPU buffer zero-initialized without uploading data.
 	 *
 	 * @type {boolean}
 	 * @readonly
