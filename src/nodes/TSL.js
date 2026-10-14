@@ -82,6 +82,7 @@ export * from './accessors/Normal.js';
 export * from './accessors/Object3DNode.js';
 export * from './accessors/PointUVNode.js';
 export * from './accessors/Position.js';
+export * from './accessors/ReferenceAttributeNode.js';
 export * from './accessors/ReferenceNode.js';
 export * from './accessors/ReflectVector.js';
 export * from './accessors/Skinning.js';

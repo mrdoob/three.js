@@ -54,6 +54,7 @@ export { default as MaterialReferenceNode } from './accessors/MaterialReferenceN
 export { default as ModelNode } from './accessors/ModelNode.js';
 export { default as Object3DNode } from './accessors/Object3DNode.js';
 export { default as PointUVNode } from './accessors/PointUVNode.js';
+export { default as ReferenceAttributeNode } from './accessors/ReferenceAttributeNode.js';
 export { default as ReferenceBaseNode } from './accessors/ReferenceBaseNode.js';
 export { default as ReferenceElementNode } from './accessors/ReferenceElementNode.js';
 export { default as ReferenceNode } from './accessors/ReferenceNode.js';
