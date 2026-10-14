@@ -1,4 +1,4 @@
-import { BoxGeometry, DataTexture, Float32BufferAttribute, InstancedBufferAttribute, InstancedMesh, LinearSRGBColorSpace, Mesh, MeshBasicMaterial, MeshStandardMaterial, Scene, Vector2 } from '../../../../src/Three.js';
+import { BoxGeometry, DataTexture, Float32BufferAttribute, FloatType, InstancedBufferAttribute, InstancedMesh, LinearSRGBColorSpace, Mesh, MeshBasicMaterial, MeshStandardMaterial, Scene, SRGBColorSpace, Vector2 } from '../../../../src/Three.js';
 import { GLTFLoader } from '../../../../examples/jsm/loaders/GLTFLoader.js';
 import { GLTFExporter } from '../../../../examples/jsm/exporters/GLTFExporter.js';
 import { GLTFLightMapLoaderExtension } from '../../../../examples/jsm/loaders/GLTFLightMapLoaderExtension.js';
@@ -262,6 +262,39 @@ export default QUnit.module( 'Addons', () => {
 
 		} );
 
+
+		QUnit.test( 'HDR float textures require explicit normalization without mutating source', async assert => {
+
+			const pixels = new Float32Array( [ 4, 2, 0.5, 1 ] );
+			const texture = new DataTexture( pixels, 1, 1 );
+			texture.type = FloatType;
+			texture.colorSpace = LinearSRGBColorSpace;
+			const scene = new Scene();
+			scene.add( new Mesh( new BoxGeometry(), new MeshStandardMaterial( { lightMap: texture } ) ) );
+			const exporter = new GLTFExporter().register( writer => new GLTFLightMapExporterExtension( writer ) );
+			await assert.rejects( exporter.parseAsync( scene ), /Normalize HDR irradiance/, 'rejects lossy float conversion with normalization guidance' );
+			assert.deepEqual( Array.from( texture.image.data ), [ 4, 2, 0.5, 1 ], 'does not alter HDR source samples' );
+
+		} );
+
+		QUnit.test( 'export decodes sRGB samples into linear irradiance without mutating source', async assert => {
+
+			const texture = new DataTexture( new Uint8Array( [ 128, 64, 32, 255 ] ), 1, 1 );
+			texture.colorSpace = SRGBColorSpace;
+			const scene = new Scene();
+			scene.add( new Mesh( new BoxGeometry(), new MeshStandardMaterial( { lightMap: texture } ) ) );
+			const json = await new GLTFExporter().register( writer => new GLTFLightMapExporterExtension( writer ) ).parseAsync( scene );
+			const gltf = await load( json );
+			const canvas = document.createElement( 'canvas' );
+			canvas.width = canvas.height = 1;
+			const context = canvas.getContext( '2d' );
+			context.drawImage( gltf.scene.children[ 0 ].material.lightMap.image, 0, 0 );
+			assert.deepEqual( Array.from( context.getImageData( 0, 0, 1, 1 ).data ), [ 55, 13, 4, 255 ], 'stores decoded linear image bytes' );
+			assert.deepEqual( Array.from( texture.image.data ), [ 128, 64, 32, 255 ], 'preserves source image bytes' );
+			assert.strictEqual( texture.colorSpace, SRGBColorSpace, 'preserves source color space' );
+
+		} );
+
 		QUnit.test( 'exports lightmap instance attributes only in EXT_mesh_gpu_instancing', async assert => {
 
 			const geometry = new BoxGeometry();
@@ -286,3 +319,4 @@ export default QUnit.module( 'Addons', () => {
 	} );
 
 } );
+
