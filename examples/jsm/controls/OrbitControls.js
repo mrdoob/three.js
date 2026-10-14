@@ -1614,13 +1614,33 @@ function onPointerMove( event ) {
 
 function onPointerUp( event ) {
 
-	this._removePointer( event );
+	if ( event.pointerType !== 'touch' && this._isTrackingPointer( event ) === false ) {
+
+		// A pen can be released as a mouse event with a different pointerId.
+		const pointerIds = this._pointers.filter( ( id ) => this._pointerPositions[ id ] === undefined );
+
+		for ( const pointerId of pointerIds ) {
+
+			this._removePointer( { pointerId: pointerId } );
+			if ( this.domElement.hasPointerCapture( pointerId ) ) this.domElement.releasePointerCapture( pointerId );
+
+		}
+
+	} else {
+
+		this._removePointer( event );
+
+	}
 
 	switch ( this._pointers.length ) {
 
 		case 0:
 
-			this.domElement.releasePointerCapture( event.pointerId );
+			if ( this.domElement.hasPointerCapture( event.pointerId ) ) {
+
+				this.domElement.releasePointerCapture( event.pointerId );
+
+			}
 
 			this.domElement.ownerDocument.removeEventListener( 'pointermove', this._onPointerMove );
 			this.domElement.ownerDocument.removeEventListener( 'pointerup', this._onPointerUp );
