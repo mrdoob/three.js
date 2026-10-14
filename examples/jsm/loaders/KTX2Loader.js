@@ -384,14 +384,9 @@ class KTX2Loader extends Loader {
 
 		}
 
-		const loader = new FileLoader( this.manager );
-		loader.setPriority( this.priority );
-		loader.setCache( this.cache );
+		const loader = new FileLoader( this.manager, this );
 
-		loader.setPath( this.path );
 		loader.setCrossOrigin( this.crossOrigin );
-		loader.setWithCredentials( this.withCredentials );
-		loader.setRequestHeader( this.requestHeader );
 		loader.setResponseType( 'arraybuffer' );
 
 		loader.load( url, ( buffer ) => {

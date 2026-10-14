@@ -45,13 +45,9 @@ class DataTextureLoader extends Loader {
 
 		const texture = new DataTexture();
 
-		const loader = new FileLoader( this.manager );
-		loader.setPriority( this.priority );
-		loader.setCache( this.cache );
+		const loader = new FileLoader( this.manager, this );
 		loader.setResponseType( 'arraybuffer' );
-		loader.setRequestHeader( this.requestHeader );
-		loader.setPath( this.path );
-		loader.setWithCredentials( scope.withCredentials );
+
 		loader.load( url, function ( buffer ) {
 
 			let texData;

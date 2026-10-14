@@ -44,13 +44,9 @@ class NRRDLoader extends Loader {
 
 		const scope = this;
 
-		const loader = new FileLoader( scope.manager );
-		loader.setPriority( scope.priority );
-		loader.setCache( scope.cache );
-		loader.setPath( scope.path );
+		const loader = new FileLoader( scope.manager, scope );
 		loader.setResponseType( 'arraybuffer' );
-		loader.setRequestHeader( scope.requestHeader );
-		loader.setWithCredentials( scope.withCredentials );
+
 		loader.load( url, function ( data ) {
 
 			try {

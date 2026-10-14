@@ -63,13 +63,9 @@ class PLYLoader extends Loader {
 
 		const scope = this;
 
-		const loader = new FileLoader( this.manager );
-		loader.setPriority( this.priority );
-		loader.setCache( this.cache );
-		loader.setPath( this.path );
+		const loader = new FileLoader( this.manager, this );
 		loader.setResponseType( 'arraybuffer' );
-		loader.setRequestHeader( this.requestHeader );
-		loader.setWithCredentials( this.withCredentials );
+
 		loader.load( url, function ( text ) {
 
 			try {

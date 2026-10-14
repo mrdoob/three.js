@@ -1857,13 +1857,7 @@ class LDrawLoader extends Loader {
 	 */
 	async preloadMaterials( url ) {
 
-		const fileLoader = new FileLoader( this.manager );
-		fileLoader.setPriority( this.priority );
-		fileLoader.setCache( this.cache );
-		fileLoader.setPath( this.path );
-		fileLoader.setRequestHeader( this.requestHeader );
-		fileLoader.setWithCredentials( this.withCredentials );
-
+		const fileLoader = new FileLoader( this.manager, this );
 		const text = await fileLoader.loadAsync( url );
 		const colorLineRegex = /^0 !COLOUR/;
 		const lines = text.split( /[\n\r]/g );
@@ -1896,12 +1890,7 @@ class LDrawLoader extends Loader {
 	 */
 	load( url, onLoad, onProgress, onError ) {
 
-		const fileLoader = new FileLoader( this.manager );
-		fileLoader.setPriority( this.priority );
-		fileLoader.setCache( this.cache );
-		fileLoader.setPath( this.path );
-		fileLoader.setRequestHeader( this.requestHeader );
-		fileLoader.setWithCredentials( this.withCredentials );
+		const fileLoader = new FileLoader( this.manager, this );
 		fileLoader.load( url, text => {
 
 			// Initializes the materials library with default materials

@@ -40,12 +40,7 @@ class AnimationLoader extends Loader {
 
 		const scope = this;
 
-		const loader = new FileLoader( this.manager );
-		loader.setPriority( this.priority );
-		loader.setCache( this.cache );
-		loader.setPath( this.path );
-		loader.setRequestHeader( this.requestHeader );
-		loader.setWithCredentials( this.withCredentials );
+		const loader = new FileLoader( this.manager, this );
 		loader.load( url, function ( text ) {
 
 			try {

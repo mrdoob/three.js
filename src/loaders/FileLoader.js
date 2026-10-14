@@ -36,8 +36,17 @@ class FileLoader extends Loader {
 	 * Constructs a new file loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
+	 * @param {Object} [parameter={}] - Initial settings, copied from the defined properties.
+	 * Later changes to this object do not update the loader. Request headers are shared by reference.
+	 * @param {string} [parameter.path] - The base path for the asset.
+	 * @param {Object} [parameter.requestHeader] - The request headers.
+	 * @param {boolean} [parameter.withCredentials] - Whether to include credentials.
+	 * @param {('high'|'low'|'auto')} [parameter.priority] - The request priority hint.
+	 * @param {('default'|'no-store'|'reload'|'no-cache'|'force-cache')} [parameter.cache] - The HTTP cache mode.
+	 * @param {('arraybuffer'|'blob'|'document'|'json'|'')} [parameter.responseType] - The expected response type.
+	 * @param {string} [parameter.mimeType] - The expected MIME type.
 	 */
-	constructor( manager ) {
+	constructor( manager, parameter = {} ) {
 
 		super( manager );
 
@@ -64,6 +73,12 @@ class FileLoader extends Loader {
 		 * @type {AbortController}
 		 */
 		this._abortController = new AbortController();
+
+		for ( const property of [ 'path', 'requestHeader', 'withCredentials', 'priority', 'cache', 'responseType', 'mimeType' ] ) {
+
+			if ( parameter[ property ] !== undefined ) this[ property ] = parameter[ property ];
+
+		}
 
 	}
 

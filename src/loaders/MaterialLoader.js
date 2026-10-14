@@ -68,12 +68,7 @@ class MaterialLoader extends Loader {
 
 		const scope = this;
 
-		const loader = new FileLoader( scope.manager );
-		loader.setPriority( scope.priority );
-		loader.setCache( scope.cache );
-		loader.setPath( scope.path );
-		loader.setRequestHeader( scope.requestHeader );
-		loader.setWithCredentials( scope.withCredentials );
+		const loader = new FileLoader( scope.manager, scope );
 		loader.load( url, function ( text ) {
 
 			try {

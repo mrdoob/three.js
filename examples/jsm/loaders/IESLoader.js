@@ -160,14 +160,9 @@ class IESLoader extends Loader {
 	 */
 	load( url, onLoad, onProgress, onError ) {
 
-		const loader = new FileLoader( this.manager );
-		loader.setPriority( this.priority );
-		loader.setCache( this.cache );
+		const loader = new FileLoader( this.manager, this );
 		loader.setResponseType( 'text' );
 		loader.setCrossOrigin( this.crossOrigin );
-		loader.setWithCredentials( this.withCredentials );
-		loader.setPath( this.path );
-		loader.setRequestHeader( this.requestHeader );
 
 		loader.load( url, text => {
 

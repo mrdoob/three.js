@@ -317,14 +317,9 @@ class GLTFLoader extends Loader {
 
 		};
 
-		const loader = new FileLoader( this.manager );
-		loader.setPriority( this.priority );
-		loader.setCache( this.cache );
+		const loader = new FileLoader( this.manager, this );
 
-		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
-		loader.setRequestHeader( this.requestHeader );
-		loader.setWithCredentials( this.withCredentials );
 
 		loader.load( url, function ( data ) {
 
@@ -497,8 +492,6 @@ class GLTFLoader extends Loader {
 			meshoptDecoder: this.meshoptDecoder
 
 		} );
-
-		parser.fileLoader.setRequestHeader( this.requestHeader );
 
 		for ( let i = 0; i < this.pluginCallbacks.length; i ++ ) {
 
@@ -2726,16 +2719,14 @@ class GLTFParser {
 		this.textureLoader.setCrossOrigin( this.options.crossOrigin );
 		this.textureLoader.setRequestHeader( this.options.requestHeader );
 
-		this.fileLoader = new FileLoader( this.options.manager );
-		this.fileLoader.setPriority( this.options.priority );
-		this.fileLoader.setCache( this.options.cache );
-		this.fileLoader.setResponseType( 'arraybuffer' );
-
-		if ( this.options.crossOrigin === 'use-credentials' ) {
-
-			this.fileLoader.setWithCredentials( true );
-
-		}
+		// Buffer URLs already include the resource path, so do not inherit options.path.
+		this.fileLoader = new FileLoader( this.options.manager, {
+			priority: this.options.priority,
+			cache: this.options.cache,
+			requestHeader: this.options.requestHeader,
+			responseType: 'arraybuffer',
+			withCredentials: this.options.crossOrigin === 'use-credentials'
+		} );
 
 	}
 

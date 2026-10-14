@@ -110,12 +110,7 @@ class ObjectLoader extends Loader {
 		const path = ( this.path === '' ) ? LoaderUtils.extractUrlBase( url ) : this.path;
 		this.resourcePath = this.resourcePath || path;
 
-		const loader = new FileLoader( this.manager );
-		loader.setPriority( this.priority );
-		loader.setCache( this.cache );
-		loader.setPath( this.path );
-		loader.setRequestHeader( this.requestHeader );
-		loader.setWithCredentials( this.withCredentials );
+		const loader = new FileLoader( this.manager, this );
 		loader.load( url, function ( text ) {
 
 			let json = null;
@@ -166,13 +161,7 @@ class ObjectLoader extends Loader {
 		const path = ( this.path === '' ) ? LoaderUtils.extractUrlBase( url ) : this.path;
 		this.resourcePath = this.resourcePath || path;
 
-		const loader = new FileLoader( this.manager );
-		loader.setPriority( this.priority );
-		loader.setCache( this.cache );
-		loader.setPath( this.path );
-		loader.setRequestHeader( this.requestHeader );
-		loader.setWithCredentials( this.withCredentials );
-
+		const loader = new FileLoader( this.manager, this );
 		const text = await loader.loadAsync( url, onProgress );
 
 		let json;

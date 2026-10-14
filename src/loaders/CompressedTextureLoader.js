@@ -46,13 +46,8 @@ class CompressedTextureLoader extends Loader {
 
 		const texture = new CompressedTexture();
 
-		const loader = new FileLoader( this.manager );
-		loader.setPriority( this.priority );
-		loader.setCache( this.cache );
-		loader.setPath( this.path );
+		const loader = new FileLoader( this.manager, this );
 		loader.setResponseType( 'arraybuffer' );
-		loader.setRequestHeader( this.requestHeader );
-		loader.setWithCredentials( scope.withCredentials );
 
 		let loaded = 0;
 
