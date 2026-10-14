@@ -46,7 +46,7 @@ export default QUnit.module( 'Loaders', () => {
 
 			const defaults = new ImageLoader( undefined, { path: undefined, crossOrigin: undefined, priority: undefined, cache: undefined } );
 			assert.strictEqual( defaults.path, '' );
-			assert.strictEqual( defaults.crossOrigin, 'anonymous' );
+			assert.strictEqual( defaults.crossOrigin, undefined, 'Explicit undefined disables image CORS' );
 			assert.strictEqual( defaults.priority, 'auto' );
 			assert.strictEqual( defaults.cache, 'default' );
 			const empty = new ImageLoader( undefined, { path: '', crossOrigin: '' } );
