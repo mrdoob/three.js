@@ -1,4 +1,5 @@
 import { RenderObjectRefreshType, DynamicDrawUsage } from '../../../constants.js';
+import { Matrix3 } from '../../../math/Matrix3.js';
 
 const refreshUniforms = [
 	'alphaMap',
@@ -17,6 +18,7 @@ const refreshUniforms = [
 	'clearcoatNormalMap',
 	'clearcoatNormalScale',
 	'clearcoatRoughness',
+	'clearcoatRoughnessMap',
 	'color',
 	'dashOffset',
 	'dashSize',
@@ -40,6 +42,7 @@ const refreshUniforms = [
 	'iridescenceMap',
 	'iridescenceThickness',
 	'iridescenceThicknessMap',
+	'iridescenceThicknessRange',
 	'lightMap',
 	'lightMapIntensity',
 	'linewidth',
@@ -51,6 +54,7 @@ const refreshUniforms = [
 	'normalScale',
 	'opacity',
 	'reflectivity',
+	'refractionRatio',
 	'retroreflectivity',
 	'rotation',
 	'roughness',
@@ -71,6 +75,7 @@ const refreshUniforms = [
 	'specularMap',
 	'steps',
 	'thickness',
+	'thicknessMap',
 	'transmission',
 	'transmissionMap',
 	'wireframe'
@@ -109,6 +114,8 @@ const _geometryCache = new WeakMap();
  * @type {WeakMap<Texture,Object>}
  */
 const _textureCache = new WeakMap();
+
+const _textureMatrix = /*@__PURE__*/ new Matrix3();
 
 /**
  * This class is used by {@link WebGPURenderer} as management component.
@@ -439,6 +446,24 @@ class NodeMaterialObserver {
 	}
 
 	/**
+	 * Returns the uv transformation matrix of the given texture. With `matrixAutoUpdate`,
+	 * the matrix is computed from the transformation properties since the texture
+	 * node updates `texture.matrix` only after the refresh check.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @return {Matrix3} The uv transformation matrix.
+	 */
+	getTextureMatrix( texture ) {
+
+		if ( texture.matrixAutoUpdate !== true ) return texture.matrix;
+
+		const { offset, repeat, rotation, center } = texture;
+
+		return _textureMatrix.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, center.x, center.y );
+
+	}
+
+	/**
 	 * Returns a material data structure holding the material property values for
 	 * monitoring.
 	 *
@@ -467,13 +492,17 @@ class NodeMaterialObserver {
 
 					if ( value.isTexture === true ) {
 
-						data[ property ] = { id: value.id, version: 0, cacheVersion: this.getTextureData( value )._version };
+						data[ property ] = { id: value.id, version: 0, cacheVersion: this.getTextureData( value )._version, matrix: this.getTextureMatrix( value ).clone() };
 
 					} else {
 
 						data[ property ] = value.clone();
 
 					}
+
+				} else if ( Array.isArray( value ) ) {
+
+					data[ property ] = value.slice();
 
 				} else {
 
@@ -547,11 +576,15 @@ class NodeMaterialObserver {
 
 						} else if ( mtlValue.isTexture === true ) {
 
-							materialData[ property ] = { id: mtlValue.id, version: mtlValue.version, cacheVersion: this.getTextureData( mtlValue )._version };
+							materialData[ property ] = { id: mtlValue.id, version: mtlValue.version, cacheVersion: this.getTextureData( mtlValue )._version, matrix: this.getTextureMatrix( mtlValue ).clone() };
 
 						} else if ( typeof mtlValue === 'object' && mtlValue.clone !== undefined ) {
 
 							materialData[ property ] = mtlValue.clone();
+
+						} else if ( Array.isArray( mtlValue ) ) {
+
+							materialData[ property ] = mtlValue.slice();
 
 						} else {
 
@@ -576,12 +609,34 @@ class NodeMaterialObserver {
 				} else if ( mtlValue.isTexture === true ) {
 
 					const textureData = this.getTextureData( mtlValue );
+					const textureMatrix = this.getTextureMatrix( mtlValue );
 
-					if ( value.id !== mtlValue.id || value.version !== mtlValue.version || value.cacheVersion !== textureData._version ) {
+					if ( value.id !== mtlValue.id || value.version !== mtlValue.version || value.cacheVersion !== textureData._version || value.matrix.equals( textureMatrix ) === false ) {
 
 						value.id = mtlValue.id;
 						value.version = mtlValue.version;
 						value.cacheVersion = textureData._version;
+						value.matrix.copy( textureMatrix );
+
+						changed = true;
+
+					}
+
+				} else if ( Array.isArray( value ) && Array.isArray( mtlValue ) ) {
+
+					// arrays like iridescenceThicknessRange are usually modified in place so compare the elements
+
+					let arrayChanged = value.length !== mtlValue.length;
+
+					for ( let i = 0; arrayChanged === false && i < value.length; i ++ ) {
+
+						arrayChanged = value[ i ] !== mtlValue[ i ];
+
+					}
+
+					if ( arrayChanged === true ) {
+
+						materialData[ property ] = mtlValue.slice();
 
 						changed = true;
 
