@@ -45,8 +45,8 @@ function fixture() {
 
 	json.meshes[ 0 ].primitives[ 0 ].attributes = {
 		POSITION: accessor( [ 0, 0, 0, 1, 0, 0, 0, 1, 0 ], 'VEC3', 3 ),
-		TEXCOORD_0: accessor( [ 0, 0, 1, 0, 0, 1 ], 'VEC2', 2 ),
-		TEXCOORD_1: accessor( [ 0, 0, 1, 0, 0, 1 ], 'VEC2', 2 )
+		TEXCOORD_0: accessor( [ 0.2, 0.4, 1, 0, 0, 1 ], 'VEC2', 2 ),
+		TEXCOORD_1: accessor( [ 0.2, 0.4, 1, 0, 0, 1 ], 'VEC2', 2 )
 	};
 	return { json, accessor };
 
@@ -121,14 +121,57 @@ export default QUnit.module( 'Addons', () => {
 
 				} );
 				assert.strictEqual( meshes.length, 2, 'expands both instances' );
-				const uv = new Vector2( 0.2, 0.4 ).applyMatrix3( meshes[ 0 ].material.lightMap.matrix );
+				const map = meshes[ 0 ].material.lightMap;
+				const uv = new Vector2().fromBufferAttribute( meshes[ 0 ].geometry.getAttribute( map.channel === 0 ? 'uv' : `uv${ map.channel }` ), 0 ).applyMatrix3( map.matrix );
 				closeTo( assert, uv.x, rotation === undefined ? 0.55 : 0.3, 'binding precedes instance transform: x' );
 				closeTo( assert, uv.y, rotation === undefined ? 0.2 : 0.1, 'binding precedes instance transform: y' );
-				const identityUV = new Vector2( 0.2, 0.4 ).applyMatrix3( meshes[ 1 ].material.lightMap.matrix );
+				const identityMap = meshes[ 1 ].material.lightMap;
+				const identityUV = new Vector2().fromBufferAttribute( meshes[ 1 ].geometry.getAttribute( identityMap.channel === 0 ? 'uv' : `uv${ identityMap.channel }` ), 0 ).applyMatrix3( identityMap.matrix );
 				closeTo( assert, identityUV.x, 0.1, 'second instance identity x' );
 				closeTo( assert, identityUV.y, 0.2, 'second instance identity y' );
 
 			}
+
+		} );
+
+
+		QUnit.test( 'binding rotation follows glTF ordering with nonuniform scale', async assert => {
+
+			const { json } = fixture();
+			json.materials[ 0 ].extensions.KHR_lightmap.lightmapTexture.extensions = { KHR_texture_transform: { offset: [ 0.5, 0 ], scale: [ 0.5, 0.25 ], rotation: Math.PI / 2 } };
+			const gltf = await load( json );
+			const map = gltf.scene.children[ 0 ].material.lightMap;
+			const uv = new Vector2( 0.2, 0.4 ).applyMatrix3( map.matrix );
+			closeTo( assert, uv.x, 0.4, 'scale then rotate then translate x' );
+			closeTo( assert, uv.y, 0.1, 'scale then rotate then translate y' );
+
+		} );
+
+		QUnit.test( 'node binding supplies a lightmap to the core default material', async assert => {
+
+			const { json } = fixture();
+			delete json.meshes[ 0 ].primitives[ 0 ].material;
+			delete json.materials;
+			json.nodes[ 0 ].extensions = { KHR_lightmap: { lightmaps: [ { primitive: 0, lightmapTexture: { index: 0 } } ] } };
+			const gltf = await load( json );
+			const material = gltf.scene.children[ 0 ].material;
+			assert.ok( material.lightMap, 'node creates effective binding without explicit material' );
+			assert.strictEqual( material.lightMapIntensity, 1, 'node intensity defaults independently' );
+
+		} );
+
+		QUnit.test( 'unlit lightmap retains independent ambient occlusion binding', async assert => {
+
+			const { json } = fixture();
+			json.materials[ 0 ].extensions.KHR_materials_unlit = {};
+			json.materials[ 0 ].occlusionTexture = { index: 0, texCoord: 1, strength: 0.4 };
+			const gltf = await load( json );
+			const material = gltf.scene.children[ 0 ].material;
+			assert.ok( material.aoMap, 'unlit baked preview loads AO' );
+			assert.strictEqual( material.aoMap.channel, 1, 'AO keeps its own UV set' );
+			assert.strictEqual( material.lightMap.channel, 0, 'lightmap keeps its own UV set' );
+			assert.strictEqual( material.aoMapIntensity, 0.4, 'AO strength is retained' );
+			assert.notStrictEqual( material.aoMap, material.lightMap, 'shared image does not share slot properties' );
 
 		} );
 
