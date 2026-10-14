@@ -949,27 +949,40 @@
 				const debugArray = new Uint32Array( 1024 );
 				const debugStorage = instancedArray( debugArray, 'uint' ).setPBO( true ).setName( `Debug_${leftSideDisplay ? 'Left' : 'Right'}` );
 
-				const buffers = {
+				const storageNodes = {
 					'Input Buffer': inputStorage,
 					'Input Vectorized Buffer': inputVectorizedStorage,
 					'Workgroup Sums Buffer': workgroupSumsStorage,
 					'Debug Buffer': debugStorage,
 				};
 
+				let readbackBufferSize = 0;
+				const readbackBufferSizes = {};
+
+				for ( const [ key, storageNode ] of Object.entries( storageNodes ) ) {
+
+					const byteLength = storageNode.value.array.byteLength;
+					readbackBufferSize = Math.max( readbackBufferSize, byteLength );
+					readbackBufferSizes[ key ] = byteLength;
+
+				}
+
+				const readbackBuffer = new THREE.ReadbackBuffer( readbackBufferSize );
+
 				const logFunctionName = `Log ${leftSideDisplay ? 'Left' : 'Right'} Side`;
 				const functionObj = {};
 				functionObj[ logFunctionName ] = async() => {
 
-					const selectedBuffer = buffers[ unifiedEffectController.loggedBuffer ];
-					const readbackBuffer = new THREE.ReadbackBuffer( selectedBuffer.value );
+					const selectedStorageNode = storageNodes[ unifiedEffectController.loggedBuffer ];
+					const size = readbackBufferSizes[ unifiedEffectController.loggedBuffer ];
 
-					const result = new Uint32Array( await renderer.getArrayBufferAsync( readbackBuffer ) );
+					await renderer.getArrayBufferAsync( selectedStorageNode.value, readbackBuffer, 0, size );
 
-					console.log( result );
+					console.log( new Uint32Array( readbackBuffer.buffer ) );
 
-					// Remove GPU/CPU readback buffer from memory
+					// Release GPU/CPU readback buffer so it can be remapped for next log.
 
-					readbackBuffer.dispose();
+					readbackBuffer.release();
 
 				};
 

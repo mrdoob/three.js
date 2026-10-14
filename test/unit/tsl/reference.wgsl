@@ -278,7 +278,7 @@ for ( var i : i32 = 0; i < 2; i ++ ) {
 
 ( nodeVar0 + externalValue )
 
-// variable intent scope
+// assignable scope
 
 var explicitGlobal : f32;
 
@@ -288,6 +288,20 @@ nodeVar0 = ( nodeVar0 + explicitGlobal );
 explicitGlobal = ( explicitGlobal + nodeVar0 );
 
 ( explicitGlobal + nodeVar0 )
+
+// assignable shared constants
+
+var nodeVar0 : f32 = 1.0;
+nodeVar0 = 2.0;
+
+vec3<f32>( nodeVar0, 1.0, 1.0 )
+
+// assignable existing assignment
+
+var nodeVar0 : f32 = 1.0;
+nodeVar0 = 2.0;
+
+nodeVar0
 
 // comparison and logic
 
@@ -1108,3 +1122,371 @@ fn fn0 ( value : f32 ) -> f32 {
 }
 
 fn0( 3.0 )
+
+// shared constant assigned
+
+var nodeVar0 : f32 = 0.0;
+nodeVar0 = 1.0;
+
+( nodeVar0 + 0.0 )
+
+// converted node assigned
+
+let nodeConst0 = ( nodeVarying0.x + 1.0 );
+var nodeVar0 : f32 = nodeConst0;
+nodeVar0 = 5.0;
+
+( nodeVar0 + nodeConst0 )
+
+// converted uniform assigned
+
+var nodeVar0 : f32 = object.nodeUniform0;
+nodeVar0 = ( nodeVar0 + 1.0 );
+
+( nodeVar0 + object.nodeUniform0 )
+
+// node outside function assigned
+
+var nodeVar0 : f32 = 2.0;
+nodeVar0 = 3.0;
+
+( nodeVar0 * 2.0 )
+
+// operation swizzle assigned
+
+var nodeVar1 : vec2<f32>;
+
+var nodeVar0 : vec3<f32> = ( vec3<f32>( nodeVarying0, 1.0 ) * vec3<f32>( 2.0 ) );
+nodeVar0.y = 0.0;
+nodeVar1 = ( nodeVar0.xz + vec2<f32>( 1.0 ) );
+nodeVar0.x = nodeVar1[ 0 ];
+nodeVar0.z = nodeVar1[ 1 ];
+
+vec4<f32>( nodeVar0, 1.0 )
+
+// operation assigned inside and outside conditional
+
+var nodeVar0 : f32 = ( 0.25 * nodeVarying0.y );
+
+if ( ( nodeVarying0.x > 0.5 ) ) {
+
+	nodeVar0 = ( nodeVar0 * 2.0 );
+
+}
+
+nodeVar0 = ( nodeVar0 + 1.0 );
+
+nodeVar0
+
+// join component assigned
+
+var nodeVar0 : vec3<f32> = vec3<f32>( nodeVarying0.x, 0.0, 1.0 );
+nodeVar0.z = 2.0;
+
+nodeVar0
+
+// cached expression inside loop
+
+var nodeVar0 : f32 = 0.0;
+
+for ( var i : i32 = 0; i < 3; i ++ ) {
+
+	let nodeConst0 = ( f32( i ) * 0.5 );
+	nodeVar0 = ( nodeVar0 + ( nodeConst0 * nodeConst0 ) );
+
+}
+
+nodeVar0
+
+// overridden function call
+
+( nodeVarying0.y * 2.0 )
+
+// layout local variables
+
+fn fn0 ( value : f32 ) -> f32 {
+
+	var nodeVar0 : f32;
+
+	nodeVar0 = value;
+	nodeVar0 = ( ( nodeVar0 * nodeVar0 ) * ( 3.0 - ( nodeVar0 * 2.0 ) ) );
+
+	return nodeVar0;
+
+}
+
+fn0( nodeVarying0.x )
+
+// layout conditional
+
+fn fn0 ( value : f32 ) -> f32 {
+
+	var nodeVar0 : f32;
+
+	nodeVar0 = value;
+
+	if ( ( nodeVar0 > 0.5 ) ) {
+
+		nodeVar0 = 0.5;
+
+	} else {
+
+		nodeVar0 = ( nodeVar0 * 2.0 );
+
+	}
+
+	return nodeVar0;
+
+}
+
+fn0( nodeVarying0.x )
+
+// layout loop
+
+fn fn0 ( count : i32 ) -> f32 {
+
+	var nodeVar0 : f32;
+
+	nodeVar0 = 0.0;
+
+	for ( var i : i32 = 0; i < count; i ++ ) {
+
+		nodeVar0 = ( nodeVar0 + f32( i ) );
+
+	}
+
+	return nodeVar0;
+
+}
+
+fn0( 4 )
+
+// layout inside loop
+
+fn fn0 ( value : f32 ) -> f32 {
+
+	return ( value * value );
+
+}
+
+var nodeVar0 : f32;
+
+nodeVar0 = 0.0;
+
+for ( var i : i32 = 0; i < 3; i ++ ) {
+
+	nodeVar0 = ( nodeVar0 + fn0( f32( i ) ) );
+
+}
+
+nodeVar0
+
+// layout nested calls
+
+fn fn0 ( value : f32 ) -> f32 {
+
+	return ( value * value );
+
+}
+
+fn fn1 ( a : f32, b : f32 ) -> f32 {
+
+	return ( fn0( a ) + fn0( b ) );
+
+}
+
+fn fn2 ( v : vec2<f32> ) -> f32 {
+
+	return fn1( v.x, v.y );
+
+}
+
+( ( fn2( nodeVarying0 ) + fn1( 1.0, 2.0 ) ) + fn0( 3.0 ) )
+
+// layout shared include
+
+fn fn0 ( value : f32 ) -> f32 {
+
+	return ( value * 0.5 );
+
+}
+
+fn fn1 ( value : f32 ) -> f32 {
+
+	return ( fn0( value ) + fn0( ( value + 1.0 ) ) );
+
+}
+
+fn fn2 ( value : f32 ) -> f32 {
+
+	return ( fn0( value ) - 1.0 );
+
+}
+
+( fn1( nodeVarying0.x ) + fn2( nodeVarying0.y ) )
+
+// layout called twice
+
+fn fn0 ( value : vec2<f32>, factor : f32 ) -> vec2<f32> {
+
+	return ( value * vec2<f32>( factor ) );
+
+}
+
+( fn0( nodeVarying0, 2.0 ) + fn0( nodeVarying0.yx, 0.5 ) )
+
+// layout input conversion
+
+fn fn0 ( v : vec3<f32> ) -> f32 {
+
+	return length( v );
+
+}
+
+( ( fn0( vec3<f32>( 2.0 ) ) + fn0( vec4<f32>( 1.0, 2.0, 3.0, 4.0 ).xyz ) ) + fn0( vec3<f32>( f32( 1 ) ) ) )
+
+// layout default parameter
+
+fn fn0 ( value : f32, factor : f32 ) -> f32 {
+
+	return ( value * factor );
+
+}
+
+( fn0( nodeVarying0.x, 2.0 ) + fn0( nodeVarying0.y, 3.0 ) )
+
+// layout default object parameter
+
+fn fn0 ( value : f32, factor : f32 ) -> f32 {
+
+	return ( value * factor );
+
+}
+
+( fn0( nodeVarying0.x, 2.0 ) + fn0( nodeVarying0.y, 3.0 ) )
+
+// layout default builtin value
+
+fn fn0 ( coord : vec2<f32>, offset : vec2<f32> ) -> vec2<f32> {
+
+	return ( coord + offset );
+
+}
+
+( fn0( nodeVarying0, vec2<f32>( 0.5, 0.5 ) ) + fn0( vec2<f32>( 1.0, 1.0 ), vec2<f32>( 0.5, 0.5 ) ) )
+
+// layout default shared variable
+
+fn fn0 ( value : vec3<f32>, weights : vec3<f32> ) -> f32 {
+
+	return dot( value, weights );
+
+}
+
+var sharedWeights : vec3<f32>;
+
+sharedWeights = vec3<f32>( 0.2, 0.7, 0.1 );
+
+( fn0( vec3<f32>( nodeVarying0, 1.0 ), sharedWeights ) + fn0( vec3<f32>( 1.0, 1.0, 1.0 ), sharedWeights ) )
+
+// layout default depends on parameter
+
+fn fn0 ( a : f32, b : f32 ) -> f32 {
+
+	return ( ( a + b ) * 0.5 );
+
+}
+
+( ( ( nodeVarying0.x + ( nodeVarying0.x * 2.0 ) ) * 0.5 ) + fn0( nodeVarying0.x, 1.0 ) )
+
+// layout default missing middle
+
+fn fn0 ( a : f32, weight : f32, b : f32 ) -> f32 {
+
+	return ( ( a + b ) * weight );
+
+}
+
+fn0( nodeVarying0.x, 0.5, nodeVarying0.y )
+
+// layout default null
+
+fn fn0 ( value : f32, factor : f32 ) -> f32 {
+
+	return ( value * factor );
+
+}
+
+( nodeVarying0.x + fn0( nodeVarying0.x, 3.0 ) )
+
+// layout once default parameter
+
+( nodeVarying0.x * 2.0 )
+
+// layout color adjustment defaults
+
+fn fn0 ( color : vec3<f32>, adjustment : f32, luminanceCoefficients : vec3<f32> ) -> vec3<f32> {
+
+	return max( mix( vec3<f32>( dot( color, luminanceCoefficients ) ), color, adjustment ), vec3<f32>( 0.0 ) );
+
+}
+
+fn fn1 ( color : vec3<f32>, adjustment : f32 ) -> vec3<f32> {
+
+	let nodeConst0 = cos( adjustment );
+
+	return max( ( ( color * vec3<f32>( nodeConst0 ) ) + ( ( cross( vec3<f32>( 0.57735, 0.57735, 0.57735 ), color ) * vec3<f32>( sin( adjustment ) ) ) + ( vec3<f32>( 0.57735, 0.57735, 0.57735 ) * vec3<f32>( ( dot( vec3<f32>( 0.57735, 0.57735, 0.57735 ), color ) * ( 1.0 - nodeConst0 ) ) ) ) ) ), vec3<f32>( 0.0 ) );
+
+}
+
+fn fn2 ( color : vec3<f32>, luminanceCoefficients : vec3<f32> ) -> f32 {
+
+	return dot( color, luminanceCoefficients );
+
+}
+
+var workingLuminanceCoefficients : vec3<f32>;
+
+workingLuminanceCoefficients = vec3<f32>( 0.2126, 0.7152, 0.0722 );
+
+( ( fn0( vec3<f32>( 1.0, 0.5, 0.0 ), 1.0, workingLuminanceCoefficients ) + fn1( vec3<f32>( 1.0, 0.5, 0.0 ), 1.0 ) ) + vec3<f32>( fn2( vec3<f32>( 1.0, 0.5, 0.0 ), workingLuminanceCoefficients ) ) )
+
+// layout color adjustment explicit
+
+fn fn0 ( color : vec3<f32>, adjustment : f32, luminanceCoefficients : vec3<f32> ) -> vec3<f32> {
+
+	return max( mix( vec3<f32>( dot( color, luminanceCoefficients ) ), color, adjustment ), vec3<f32>( 0.0 ) );
+
+}
+
+fn fn1 ( color : vec3<f32>, adjustment : f32 ) -> vec3<f32> {
+
+	let nodeConst0 = cos( adjustment );
+
+	return max( ( ( color * vec3<f32>( nodeConst0 ) ) + ( ( cross( vec3<f32>( 0.57735, 0.57735, 0.57735 ), color ) * vec3<f32>( sin( adjustment ) ) ) + ( vec3<f32>( 0.57735, 0.57735, 0.57735 ) * vec3<f32>( ( dot( vec3<f32>( 0.57735, 0.57735, 0.57735 ), color ) * ( 1.0 - nodeConst0 ) ) ) ) ) ), vec3<f32>( 0.0 ) );
+
+}
+
+fn fn2 ( color : vec3<f32>, adjustment : f32 ) -> vec3<f32> {
+
+	let nodeConst0 = max( color.x, max( color.y, color.z ) );
+
+	return max( mix( color, vec3<f32>( nodeConst0 ), ( ( ( nodeConst0 - ( ( ( color.x + color.y ) + color.z ) / 3.0 ) ) * adjustment ) * -3.0 ) ), vec3<f32>( 0.0 ) );
+
+}
+
+var workingLuminanceCoefficients : vec3<f32>;
+
+workingLuminanceCoefficients = vec3<f32>( 0.2126, 0.7152, 0.0722 );
+
+( ( fn0( vec3<f32>( 1.0, 0.5, 0.0 ), 2.0, workingLuminanceCoefficients ) + fn1( vec3<f32>( 1.0, 0.5, 0.0 ), 0.5 ) ) + fn2( vec3<f32>( 1.0, 0.5, 0.0 ), 0.5 ) )
+
+// layout overloading color
+
+fn fn0 ( value : vec3<f32> ) -> f32 {
+
+	return ( ( ( value.x + value.y ) + value.z ) / 3.0 );
+
+}
+
+fn0( vec3<f32>( 1.0, 0.24620132669705552, 0.0 ) )
