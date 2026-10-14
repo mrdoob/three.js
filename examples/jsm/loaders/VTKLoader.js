@@ -58,7 +58,9 @@ class VTKLoader extends Loader {
 
 		const scope = this;
 
-		const loader = new FileLoader( scope.manager ).setPriority( scope.priority ).setCache( scope.cache );
+		const loader = new FileLoader( scope.manager );
+		loader.setPriority( scope.priority );
+		loader.setCache( scope.cache );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );

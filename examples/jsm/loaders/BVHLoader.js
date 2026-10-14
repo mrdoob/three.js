@@ -75,7 +75,9 @@ class BVHLoader extends Loader {
 
 		const scope = this;
 
-		const loader = new FileLoader( scope.manager ).setPriority( scope.priority ).setCache( scope.cache );
+		const loader = new FileLoader( scope.manager );
+		loader.setPriority( scope.priority );
+		loader.setCache( scope.cache );
 		loader.setPath( scope.path );
 		loader.setRequestHeader( scope.requestHeader );
 		loader.setWithCredentials( scope.withCredentials );

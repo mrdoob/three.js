@@ -71,7 +71,9 @@ class TDSLoader extends Loader {
 
 		const path = ( this.path === '' ) ? LoaderUtils.extractUrlBase( url ) : this.path;
 
-		const loader = new FileLoader( this.manager ).setPriority( this.priority ).setCache( this.cache );
+		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
@@ -555,7 +557,9 @@ class TDSLoader extends Loader {
 		let next = chunk.readChunk( );
 		let texture = {};
 
-		const loader = new TextureLoader( this.manager ).setPriority( this.priority ).setCache( this.cache );
+		const loader = new TextureLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
 		loader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
 		while ( next ) {

@@ -54,7 +54,9 @@ class MTLLoader extends Loader {
 
 		const path = ( this.path === '' ) ? LoaderUtils.extractUrlBase( url ) : this.path;
 
-		const loader = new FileLoader( this.manager ).setPriority( this.priority ).setCache( this.cache );
+		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
 		loader.setPath( this.path );
 		loader.setRequestHeader( this.requestHeader );
 		loader.setWithCredentials( this.withCredentials );
@@ -576,7 +578,9 @@ class MaterialCreator {
 
 		if ( loader === null ) {
 
-			loader = new TextureLoader( manager ).setPriority( this.priority || 'auto' ).setCache( this.cache || 'default' );
+			loader = new TextureLoader( manager );
+			loader.setPriority( this.priority || 'auto' );
+			loader.setCache( this.cache || 'default' );
 
 		}
 

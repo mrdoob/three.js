@@ -110,7 +110,9 @@ class ObjectLoader extends Loader {
 		const path = ( this.path === '' ) ? LoaderUtils.extractUrlBase( url ) : this.path;
 		this.resourcePath = this.resourcePath || path;
 
-		const loader = new FileLoader( this.manager ).setPriority( this.priority ).setCache( this.cache );
+		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
 		loader.setPath( this.path );
 		loader.setRequestHeader( this.requestHeader );
 		loader.setWithCredentials( this.withCredentials );
@@ -164,7 +166,9 @@ class ObjectLoader extends Loader {
 		const path = ( this.path === '' ) ? LoaderUtils.extractUrlBase( url ) : this.path;
 		this.resourcePath = this.resourcePath || path;
 
-		const loader = new FileLoader( this.manager ).setPriority( this.priority ).setCache( this.cache );
+		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
 		loader.setPath( this.path );
 		loader.setRequestHeader( this.requestHeader );
 		loader.setWithCredentials( this.withCredentials );
@@ -509,7 +513,9 @@ class ObjectLoader extends Loader {
 
 			const manager = new LoadingManager( onLoad );
 
-			loader = new ImageLoader( manager ).setPriority( this.priority ).setCache( this.cache );
+			loader = new ImageLoader( manager );
+			loader.setPriority( this.priority );
+			loader.setCache( this.cache );
 			loader.setCrossOrigin( this.crossOrigin );
 
 			for ( let i = 0, il = json.length; i < il; i ++ ) {
@@ -606,7 +612,9 @@ class ObjectLoader extends Loader {
 
 		if ( json !== undefined && json.length > 0 ) {
 
-			loader = new ImageLoader( this.manager ).setPriority( this.priority ).setCache( this.cache );
+			loader = new ImageLoader( this.manager );
+			loader.setPriority( this.priority );
+			loader.setCache( this.cache );
 			loader.setCrossOrigin( this.crossOrigin );
 
 			for ( let i = 0, il = json.length; i < il; i ++ ) {
