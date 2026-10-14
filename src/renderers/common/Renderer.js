@@ -1839,12 +1839,14 @@ class Renderer {
 
 		let viewport = canvasTarget._viewport;
 		let scissor = canvasTarget._scissor;
+		let scissorTest = canvasTarget._scissorTest;
 		let pixelRatio = canvasTarget._pixelRatio;
 
 		if ( renderTarget !== null ) {
 
 			viewport = renderTarget.viewport;
 			scissor = renderTarget.scissor;
+			scissorTest = renderTarget.scissorTest;
 			pixelRatio = 1;
 
 		}
@@ -1953,7 +1955,7 @@ class Renderer {
 		_screen.set( 0, 0, renderContext.width, renderContext.height );
 
 		renderContext.viewport = renderContext.viewportValue.equals( _screen ) === false;
-		renderContext.scissor = canvasTarget._scissorTest && renderContext.scissorValue.equals( _screen ) === false;
+		renderContext.scissor = scissorTest && renderContext.scissorValue.equals( _screen ) === false;
 
 		//
 

@@ -507,6 +507,8 @@ class WebGLBackend extends Backend {
 
 		}
 
+		state.setScissorTest( renderContext.scissor );
+
 		//
 
 		this.initTimestampQuery( TimestampQuery.RENDER, this.getTimestampUID( renderContext ) );
@@ -618,6 +620,8 @@ class WebGLBackend extends Backend {
 				state.scissor( 0, 0, width, height );
 
 			}
+
+			state.setScissorTest( previousContext.scissor );
 
 		}
 
