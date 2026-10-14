@@ -1,4 +1,4 @@
-import { LightsNode, NodeUtils } from 'three/webgpu';
+import { AmbientLight, DirectionalLight, HemisphereLight, LightsNode, NodeUtils, PointLight, SpotLight } from 'three/webgpu';
 
 import AmbientLightDataNode from './data/AmbientLightDataNode.js';
 import DirectionalLightDataNode from './data/DirectionalLightDataNode.js';
@@ -7,6 +7,16 @@ import SpotLightDataNode from './data/SpotLightDataNode.js';
 import HemisphereLightDataNode from './data/HemisphereLightDataNode.js';
 
 const _hashData = [];
+
+// Batched lights are identified by their exact class, the way `NodeLibrary` finds light nodes. A subclass with a
+// light node of its own (e.g. `IESSpotLight` or `ProjectorLight`) is left to it, and minified class names don't matter.
+const _lightClassToType = new Map( [
+	[ AmbientLight, 'AmbientLight' ],
+	[ DirectionalLight, 'DirectionalLight' ],
+	[ PointLight, 'PointLight' ],
+	[ SpotLight, 'SpotLight' ],
+	[ HemisphereLight, 'HemisphereLight' ]
+] );
 
 const _lightTypeToDataNode = {
 	AmbientLight: AmbientLightDataNode,
@@ -34,7 +44,7 @@ const canBatchLight = ( light ) => {
 	return light.isNode !== true &&
 		light.castShadow !== true &&
 		isSpecialSpotLight( light ) === false &&
-		_lightTypeToDataNode[ light.type ] !== undefined;
+		_lightClassToType.has( light.constructor );
 
 };
 
@@ -127,7 +137,7 @@ class DynamicLightsNode extends LightsNode {
 
 			}
 
-			const typeName = light.type;
+			const typeName = _lightClassToType.get( light.constructor );
 			const typeLights = lightsByType.get( typeName );
 
 			if ( typeLights === undefined ) {
