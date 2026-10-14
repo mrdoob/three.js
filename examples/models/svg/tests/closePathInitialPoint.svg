@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="400" height="220" viewBox="0 0 400 220">
+	<!-- left: subpaths after "Z" start without "M", right: same shape with explicit "M" commands. Both must look the same. -->
+	<path fill="none" stroke="#ff8800" stroke-width="4" d="M40 40 L160 40 L160 160 Z L40 160 L100 160 Z l60 20"/>
+	<path fill="none" stroke="#0088ff" stroke-width="4" d="M240 40 L360 40 L360 160 Z M240 40 L240 160 L300 160 Z M240 40 l60 20"/>
+</svg>
