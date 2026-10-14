@@ -102,9 +102,12 @@ export default QUnit.module( 'Renderers', () => {
 					const attribute = new AttributeClass( 4, 1 );
 
 					attribute.array = new Uint32Array( 4 );
+
+					assert.strictEqual( attribute.arrayType, Uint32Array, `${ AttributeClass.name }: arrayType after replacing the array` );
+
 					attribute.array = null;
 
-					assert.strictEqual( attribute.arrayType, Uint32Array, `${ AttributeClass.name }: arrayType after replacing and releasing the array` );
+					assert.strictEqual( attribute.arrayType, Uint32Array, `${ AttributeClass.name }: arrayType after releasing the array` );
 					assert.ok( attribute.array instanceof Uint32Array, `${ AttributeClass.name }: the array is allocated again with the last type` );
 
 				}
@@ -121,7 +124,7 @@ export default QUnit.module( 'Renderers', () => {
 					attribute.array = null;
 
 					assert.strictEqual( attribute.arrayType, Uint32Array, `${ AttributeClass.name }: arrayType` );
-					assert.deepEqual( Array.from( attribute.array ), [ 0, 0, 0, 0 ], `${ AttributeClass.name }: a released array is allocated again zero-filled` );
+					assert.deepEqual( attribute.array, new Uint32Array( 4 ), `${ AttributeClass.name }: a released array is allocated again zero-filled` );
 
 				}
 
