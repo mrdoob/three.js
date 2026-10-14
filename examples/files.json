@@ -123,6 +123,7 @@
 		"webgl_loader_texture_tiff",
 		"webgl_loader_ttf",
 		"webgl_loader_usdz",
+		"webgl_loader_vdb",
 		"webgl_loader_vox",
 		"webgl_loader_vrml",
 		"webgl_loader_xyz",
