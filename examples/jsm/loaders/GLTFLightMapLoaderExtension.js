@@ -25,14 +25,7 @@ class GLTFLightMapLoaderExtension {
 		if ( binding === undefined ) return null;
 		return this.parser.loadMaterial( materialIndex ).then( async material => {
 
-			await this.assignBinding( material, binding );
-			const occlusion = this.parser.json.materials[ materialIndex ].occlusionTexture;
-			if ( material.isMeshBasicMaterial && occlusion ) {
-
-				await this.parser.assignTexture( material, 'aoMap', occlusion );
-				material.aoMapIntensity = occlusion.strength ?? 1;
-
-			}
+			await this.assignBinding( material, binding, this.parser.json.materials[ materialIndex ] );
 
 			return material;
 
@@ -61,7 +54,7 @@ class GLTFLightMapLoaderExtension {
 
 	}
 
-	async assignBinding( material, binding ) {
+	async assignBinding( material, binding, materialDef ) {
 
 		await this.parser.assignTexture( material, 'lightMap', binding.lightmapTexture );
 		material.lightMap = material.lightMap.clone();
@@ -78,6 +71,13 @@ class GLTFLightMapLoaderExtension {
 		}
 
 		material.lightMapIntensity = binding.intensity ?? 1;
+		const occlusion = materialDef?.occlusionTexture;
+		if ( material.isMeshBasicMaterial && occlusion ) {
+
+			await this.parser.assignTexture( material, 'aoMap', occlusion );
+			material.aoMapIntensity = occlusion.strength ?? 1;
+
+		}
 
 	}
 
@@ -92,7 +92,18 @@ class GLTFLightMapLoaderExtension {
 		if ( nodeDef.mesh === undefined ) throw new Error( 'KHR_lightmap: Node bindings require a mesh.' );
 		return parser.loadNode( nodeIndex ).then( async node => {
 
-			const primitives = node.isMesh ? [ node ] : node.children.filter( child => child.isMesh && parser.associations.get( child )?.nodes === undefined );
+			const primitives = [];
+			const collect = object => {
+
+				// Mesh attachments can be nested under a group beside a camera/light.
+				// Descendant glTF nodes have their own bindings and are excluded.
+				if ( object !== node && parser.associations.get( object )?.nodes !== undefined ) return;
+				if ( object.isMesh ) primitives.push( object );
+				else for ( const child of object.children ) collect( child );
+
+			};
+
+			collect( node );
 			const used = new Set();
 			for ( const binding of bindings || [] ) {
 
@@ -100,7 +111,8 @@ class GLTFLightMapLoaderExtension {
 				if ( ! mesh || used.has( binding.primitive ) ) throw new Error( 'KHR_lightmap: Invalid or repeated primitive binding.' );
 				used.add( binding.primitive );
 				mesh.material = mesh.material.clone();
-				await this.assignBinding( mesh.material, binding );
+				const materialIndex = parser.json.meshes[ nodeDef.mesh ].primitives[ binding.primitive ].material;
+				await this.assignBinding( mesh.material, binding, parser.json.materials?.[ materialIndex ] );
 				this.validateUV( mesh );
 
 			}
@@ -142,8 +154,12 @@ class GLTFLightMapLoaderExtension {
 
 					} else {
 
-						node.remove( mesh );
-						node.add( replacement );
+						const parent = mesh.parent;
+						const index = parent.children.indexOf( mesh );
+						parent.remove( mesh );
+						parent.add( replacement );
+						parent.children.splice( parent.children.indexOf( replacement ), 1 );
+						parent.children.splice( index, 0, replacement );
 
 					}
 
