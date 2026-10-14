@@ -297,10 +297,16 @@ class Renderer {
 		 * @private
 		 * @type {CanvasTarget}
 		 */
-		this._canvasTarget = new CanvasTarget( backend.getDomElement() );
-		this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
-		this._canvasTarget.addEventListener( 'dispose', this._onCanvasTargetDispose );
-		this._canvasTarget.isDefaultCanvasTarget = true;
+		this._canvasTarget = null;
+
+		if ( parameters.device === undefined ) {
+
+			this._canvasTarget = new CanvasTarget( backend.getDomElement() );
+			this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
+			this._canvasTarget.addEventListener( 'dispose', this._onCanvasTargetDispose );
+			this._canvasTarget.isDefaultCanvasTarget = true;
+
+		}
 
 		/**
 		 * The inspector provides information about the internal renderer state.
@@ -1629,7 +1635,7 @@ class Renderer {
 
 		if ( this.needsFrameBufferTarget === false ) return null;
 
-		const { width, height } = this.getDrawingBufferSize( _drawingBufferSize );
+		const { width, height } = this._outputRenderTarget || this.getDrawingBufferSize( _drawingBufferSize );
 		const { depth, stencil } = this;
 
 		// TODO: Unify CanvasTarget and OutputRenderTarget
@@ -1837,17 +1843,10 @@ class Renderer {
 
 		const canvasTarget = this._canvasTarget;
 
-		let viewport = canvasTarget._viewport;
-		let scissor = canvasTarget._scissor;
-		let pixelRatio = canvasTarget._pixelRatio;
-
-		if ( renderTarget !== null ) {
-
-			viewport = renderTarget.viewport;
-			scissor = renderTarget.scissor;
-			pixelRatio = 1;
-
-		}
+		const viewport = renderTarget ? renderTarget.viewport : canvasTarget._viewport;
+		const scissor = renderTarget ? renderTarget.scissor : canvasTarget._scissor;
+		const scissorTest = renderTarget ? renderTarget.scissorTest : canvasTarget._scissorTest;
+		const pixelRatio = renderTarget ? 1 : canvasTarget._pixelRatio;
 
 		const minDepth = ( viewport.minDepth === undefined ) ? 0 : viewport.minDepth;
 		const maxDepth = ( viewport.maxDepth === undefined ) ? 1 : viewport.maxDepth;
@@ -1953,7 +1952,7 @@ class Renderer {
 		_screen.set( 0, 0, renderContext.width, renderContext.height );
 
 		renderContext.viewport = renderContext.viewportValue.equals( _screen ) === false;
-		renderContext.scissor = canvasTarget._scissorTest && renderContext.scissorValue.equals( _screen ) === false;
+		renderContext.scissor = scissorTest && renderContext.scissorValue.equals( _screen ) === false;
 
 		//
 
@@ -2786,7 +2785,11 @@ class Renderer {
 
 			}
 
-			this._destroyCanvasTarget( this._canvasTarget );
+			if ( this._canvasTarget ) {
+
+				this._destroyCanvasTarget( this._canvasTarget );
+
+			}
 
 			this._textures.dispose();
 			this.info.dispose();
