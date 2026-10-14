@@ -1,8 +1,8 @@
-import { Color, LinearSRGBColorSpace, NoColorSpace, RGBAFormat, TextureSource, SRGBColorSpace, UnsignedByteType } from 'three';
+import { Color, LinearSRGBColorSpace, NoColorSpace, RGBAFormat, Source, SRGBColorSpace, UnsignedByteType } from 'three';
 
 /**
- * A glTF exporter plugin for the vendor extension `MOZ_lightmap`.
- * Light maps are exported as sRGB-encoded RGB. Linear images are converted
+ * A glTF exporter plugin for the proposed extension `KHR_lightmap` (glTF 2.1).
+ * Light maps are exported as linear irradiance RGB. sRGB images are decoded
  * without modifying the source texture. Linear data textures must use
  * unsigned byte RGBA data, with HDR scale stored in lightMapIntensity.
  * Compressed textures require GLTFExporter.setTextureUtils().
@@ -23,7 +23,7 @@ class GLTFLightMapExporterExtension {
 	constructor( writer ) {
 
 		this.writer = writer;
-		this.name = 'MOZ_lightmap';
+		this.name = 'KHR_lightmap';
 		this.textureCache = new Map();
 
 	}
@@ -39,34 +39,68 @@ class GLTFLightMapExporterExtension {
 
 		const map = material.lightMap;
 		if ( ! map ) return;
+		if ( map.matrixAutoUpdate && map.rotation !== 0 && map.repeat.x !== map.repeat.y ) {
 
-		const extension = {
-			index: await this.writer.processTextureAsync( await this.getSRGBTextureAsync( map ) ),
-			texCoord: map.channel,
-			// Convert MeshBasicMaterial's light map intensity to MOZ_lightmap's unlit normalization.
-			intensity: material.isMeshBasicMaterial ? material.lightMapIntensity / Math.PI : material.lightMapIntensity
+			throw new Error( 'KHR_lightmap: Bake rotated nonuniform Three.js texture transforms into UVs before exporting.' );
+
+		}
+
+		const lightmapTexture = {
+			index: await this.writer.processTextureAsync( await this.getLinearTextureAsync( map ) ),
+			texCoord: map.channel
 		};
-
-		this.writer.applyTextureTransform( extension, map );
+		this.writer.applyTextureTransform( lightmapTexture, map );
+		const transform = lightmapTexture.extensions?.KHR_texture_transform;
+		if ( transform?.rotation !== undefined ) transform.rotation = - transform.rotation;
 		materialDef.extensions = materialDef.extensions || {};
-		materialDef.extensions[ this.name ] = extension;
+		materialDef.extensions[ this.name ] = { lightmapTexture, intensity: material.lightMapIntensity };
 		this.writer.extensionsUsed[ this.name ] = true;
 
 	}
 
+	writeNode( object, nodeDef ) {
+
+		if ( ! object.isInstancedMesh ) return;
+		const names = { _LIGHTMAP_OFFSET: 2, _LIGHTMAP_SCALE: 2, _LIGHTMAP_ROTATION: 1 };
+		for ( const name in names ) {
+
+			const attribute = object.geometry.getAttribute( name );
+			if ( ! attribute ) continue;
+			const materials = Array.isArray( object.material ) ? object.material : [ object.material ];
+			if ( ! materials.some( material => material.lightMap ) || ! attribute.isInstancedBufferAttribute || attribute.itemSize !== names[ name ] || attribute.normalized || ! ( attribute.array instanceof Float32Array ) || attribute.count !== object.count || attribute.meshPerAttribute !== 1 || ! attribute.array.every( Number.isFinite ) ) {
+
+				throw new Error( 'KHR_lightmap: Invalid instance atlas attribute.' );
+
+			}
+
+			nodeDef.extensions.EXT_mesh_gpu_instancing.attributes[ name ] = this.writer.processAccessor( attribute );
+			this.writer.extensionsUsed[ this.name ] = true;
+
+		}
+
+	}
+
+	afterParse() {
+
+		if ( ! this.writer.extensionsUsed[ this.name ] ) return;
+		this.writer.json.asset.version = '2.1';
+		this.writer.json.asset.minVersion = '2.1';
+
+	}
+
 	/**
-	 * Prepares an sRGB image without changing the source texture.
+	 * Prepares a linear image without changing the source texture.
 	 *
 	 * @private
 	 * @param {Texture} map - The light map.
 	 * @return {Promise<Texture>} The texture to export.
 	 */
-	async getSRGBTextureAsync( map ) {
+	async getLinearTextureAsync( map ) {
 
-		if ( map.colorSpace === SRGBColorSpace ) return map;
+		if ( map.colorSpace === LinearSRGBColorSpace || map.colorSpace === NoColorSpace ) return map;
 		if ( this.textureCache.has( map ) ) return this.textureCache.get( map );
 
-		if ( map.colorSpace !== LinearSRGBColorSpace && map.colorSpace !== NoColorSpace ) {
+		if ( map.colorSpace !== SRGBColorSpace ) {
 
 			throw new Error( 'GLTFLightMapExporterExtension: Unsupported light map color space.' );
 
@@ -105,7 +139,7 @@ class GLTFLightMapExporterExtension {
 
 		for ( let i = 0; i < data.length; i += 4 ) {
 
-			color.setRGB( data[ i ] / 255, data[ i + 1 ] / 255, data[ i + 2 ] / 255 ).convertLinearToSRGB();
+			color.setRGB( data[ i ] / 255, data[ i + 1 ] / 255, data[ i + 2 ] / 255 ).convertSRGBToLinear();
 			data[ i ] = Math.round( color.r * 255 );
 			data[ i + 1 ] = Math.round( color.g * 255 );
 			data[ i + 2 ] = Math.round( color.b * 255 );
@@ -119,8 +153,8 @@ class GLTFLightMapExporterExtension {
 		}
 
 		const texture = readableMap.clone();
-		texture.source = new TextureSource( outputImage );
-		texture.colorSpace = SRGBColorSpace;
+		texture.source = new Source( outputImage );
+		texture.colorSpace = LinearSRGBColorSpace;
 		this.textureCache.set( map, texture );
 		return texture;
 
@@ -129,3 +163,4 @@ class GLTFLightMapExporterExtension {
 }
 
 export { GLTFLightMapExporterExtension };
+
