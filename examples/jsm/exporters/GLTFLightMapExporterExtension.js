@@ -1,7 +1,7 @@
 import { Color, LinearSRGBColorSpace, NoColorSpace, RGBAFormat, SRGBColorSpace, TextureSource, UnsignedByteType } from 'three';
 
 /**
- * A glTF exporter plugin for the proposed extension `KHR_lightmap` (glTF 2.1).
+ * A glTF exporter plugin for the proposed extension `KHR_lightmap` (glTF 2.0).
  * Light maps are exported as linear irradiance RGB. sRGB images are decoded
  * without modifying the source texture. Linear data textures must use
  * unsigned byte RGBA data, with HDR scale stored in lightMapIntensity.
@@ -39,6 +39,7 @@ class GLTFLightMapExporterExtension {
 
 		const map = material.lightMap;
 		if ( ! map ) return;
+		if ( ! Number.isFinite( material.lightMapIntensity ) || material.lightMapIntensity < 0 ) throw new Error( 'KHR_lightmap: Invalid binding intensity.' );
 		if ( map.matrixAutoUpdate && map.rotation !== 0 && map.repeat.x !== map.repeat.y ) {
 
 			throw new Error( 'KHR_lightmap: Bake rotated nonuniform Three.js texture transforms into UVs before exporting.' );
@@ -58,16 +59,27 @@ class GLTFLightMapExporterExtension {
 
 	}
 
+	writeMesh( mesh ) {
+
+		for ( const name of [ '_LIGHTMAP_OFFSET', '_LIGHTMAP_SCALE', '_LIGHTMAP_ROTATION', '_LIGHTMAP_INTENSITY' ] ) {
+
+			const attribute = mesh.geometry.getAttribute( name );
+			if ( attribute && ( ! mesh.isInstancedMesh || ! attribute.isInstancedBufferAttribute ) ) throw new Error( 'KHR_lightmap: Atlas attributes cannot be vertex attributes.' );
+
+		}
+
+	}
+
 	writeNode( object, nodeDef ) {
 
 		if ( ! object.isInstancedMesh ) return;
-		const names = { _LIGHTMAP_OFFSET: 2, _LIGHTMAP_SCALE: 2, _LIGHTMAP_ROTATION: 1 };
+		const names = { _LIGHTMAP_OFFSET: 2, _LIGHTMAP_SCALE: 2, _LIGHTMAP_ROTATION: 1, _LIGHTMAP_INTENSITY: 1 };
 		for ( const name in names ) {
 
 			const attribute = object.geometry.getAttribute( name );
 			if ( ! attribute ) continue;
 			const materials = Array.isArray( object.material ) ? object.material : [ object.material ];
-			if ( ! materials.some( material => material.lightMap ) || ! attribute.isInstancedBufferAttribute || attribute.itemSize !== names[ name ] || attribute.normalized || ! ( attribute.array instanceof Float32Array ) || attribute.count !== object.count || attribute.meshPerAttribute !== 1 || ! attribute.array.every( Number.isFinite ) ) {
+			if ( ! materials.some( material => material.lightMap ) || ! attribute.isInstancedBufferAttribute || attribute.itemSize !== names[ name ] || attribute.normalized || ! ( attribute.array instanceof Float32Array ) || attribute.count !== object.count || attribute.meshPerAttribute !== 1 || ! attribute.array.every( value => Number.isFinite( value ) && ( name !== '_LIGHTMAP_INTENSITY' || value >= 0 ) ) ) {
 
 				throw new Error( 'KHR_lightmap: Invalid instance atlas attribute.' );
 
@@ -77,14 +89,6 @@ class GLTFLightMapExporterExtension {
 			this.writer.extensionsUsed[ this.name ] = true;
 
 		}
-
-	}
-
-	afterParse() {
-
-		if ( ! this.writer.extensionsUsed[ this.name ] ) return;
-		this.writer.json.asset.version = '2.1';
-		this.writer.json.asset.minVersion = '2.1';
 
 	}
 

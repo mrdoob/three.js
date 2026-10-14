@@ -1,9 +1,9 @@
 import { Color, Group, LinearSRGBColorSpace, Matrix3, Matrix4, Mesh, Object3D, Vector2 } from 'three';
 
-const instanceAttributes = { _LIGHTMAP_OFFSET: 2, _LIGHTMAP_SCALE: 2, _LIGHTMAP_ROTATION: 1 };
+const instanceAttributes = { _LIGHTMAP_OFFSET: 2, _LIGHTMAP_SCALE: 2, _LIGHTMAP_ROTATION: 1, _LIGHTMAP_INTENSITY: 1 };
 
 /**
- * Opt-in loader for the proposed KHR_lightmap extension (glTF 2.1).
+ * Opt-in loader for the proposed KHR_lightmap extension (glTF 2.0).
  * Images store linear irradiance; texCoord defaults to 0. Node bindings replace
  * material bindings per primitive. Atlas instances expand to ordinary meshes
  * with baked UVs, supporting both renderers at the cost of GPU batching.
@@ -56,6 +56,8 @@ class GLTFLightMapLoaderExtension {
 
 	async assignBinding( material, binding, materialDef ) {
 
+		const intensity = binding.intensity ?? 1;
+		if ( ! Number.isFinite( intensity ) || intensity < 0 ) throw new Error( 'KHR_lightmap: Invalid binding intensity.' );
 		await this.parser.assignTexture( material, 'lightMap', binding.lightmapTexture );
 		material.lightMap = material.lightMap.clone();
 		material.lightMap.colorSpace = LinearSRGBColorSpace;
@@ -70,7 +72,7 @@ class GLTFLightMapLoaderExtension {
 
 		}
 
-		material.lightMapIntensity = binding.intensity ?? 1;
+		material.lightMapIntensity = intensity;
 		const occlusion = materialDef?.occlusionTexture;
 		if ( material.isMeshBasicMaterial && occlusion ) {
 
@@ -88,6 +90,7 @@ class GLTFLightMapLoaderExtension {
 		const bindings = nodeDef.extensions?.[ this.name ]?.lightmaps;
 		const attributes = nodeDef.extensions?.EXT_mesh_gpu_instancing?.attributes;
 		const hasAtlas = attributes && Object.keys( instanceAttributes ).some( name => attributes[ name ] !== undefined );
+		if ( bindings !== undefined && ( ! Array.isArray( bindings ) || bindings.length === 0 ) ) throw new Error( 'KHR_lightmap: Node bindings must be nonempty.' );
 		if ( ! bindings && ! hasAtlas ) return null;
 		if ( nodeDef.mesh === undefined ) throw new Error( 'KHR_lightmap: Node bindings require a mesh.' );
 		return parser.loadNode( nodeIndex ).then( async node => {
@@ -108,7 +111,7 @@ class GLTFLightMapLoaderExtension {
 			for ( const binding of bindings || [] ) {
 
 				const mesh = primitives[ binding.primitive ];
-				if ( ! mesh || used.has( binding.primitive ) ) throw new Error( 'KHR_lightmap: Invalid or repeated primitive binding.' );
+				if ( ! Number.isInteger( binding.primitive ) || ! mesh || used.has( binding.primitive ) ) throw new Error( 'KHR_lightmap: Invalid or repeated primitive binding.' );
 				used.add( binding.primitive );
 				mesh.material = mesh.material.clone();
 				const materialIndex = parser.json.meshes[ nodeDef.mesh ].primitives[ binding.primitive ].material;
@@ -132,7 +135,8 @@ class GLTFLightMapLoaderExtension {
 
 						for ( let c = 0; c < accessor.itemSize; c ++ ) {
 
-							if ( ! Number.isFinite( accessor.getComponent( i, c ) ) ) throw new Error( 'KHR_lightmap: Nonfinite instance transform.' );
+							const value = accessor.getComponent( i, c );
+							if ( ! Number.isFinite( value ) || ( name === '_LIGHTMAP_INTENSITY' && value < 0 ) ) throw new Error( 'KHR_lightmap: Invalid instance value.' );
 
 						}
 
@@ -222,6 +226,7 @@ class GLTFLightMapLoaderExtension {
 
 			const material = mesh.material.clone();
 			material.lightMap = map.clone();
+			material.lightMapIntensity *= atlas._LIGHTMAP_INTENSITY ? atlas._LIGHTMAP_INTENSITY.getX( i ) : 1;
 			material.lightMap.channel = channel;
 			material.lightMap.offset.set( 0, 0 );
 			material.lightMap.repeat.set( 1, 1 );

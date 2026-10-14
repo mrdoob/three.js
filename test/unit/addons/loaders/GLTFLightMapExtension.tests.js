@@ -12,7 +12,7 @@ function fixture() {
 	context.fillStyle = 'rgb(128, 64, 32)';
 	context.fillRect( 0, 0, 1, 1 );
 	const json = {
-		asset: { version: '2.1', minVersion: '2.1' },
+		asset: { version: '2.0' },
 		extensionsUsed: [ 'KHR_lightmap', 'KHR_texture_transform', 'EXT_mesh_gpu_instancing', 'KHR_materials_unlit' ],
 		scene: 0,
 		scenes: [ { nodes: [ 0 ] } ],
@@ -109,7 +109,8 @@ export default QUnit.module( 'Addons', () => {
 
 				const { json, accessor } = fixture();
 				json.materials[ 0 ].extensions.KHR_lightmap.lightmapTexture.extensions = { KHR_texture_transform: { scale: [ 0.5, 0.5 ] } };
-				const attributes = { TRANSLATION: accessor( [ 0, 0, 0, 1, 0, 0 ], 'VEC3', 3 ), _LIGHTMAP_OFFSET: accessor( [ 0.5, 0, 0, 0 ], 'VEC2', 2 ) };
+				json.materials[ 0 ].extensions.KHR_lightmap.intensity = 4;
+				const attributes = { _LIGHTMAP_INTENSITY: accessor( [ 0.5, 0 ], 'SCALAR', 1 ), TRANSLATION: accessor( [ 0, 0, 0, 1, 0, 0 ], 'VEC3', 3 ), _LIGHTMAP_OFFSET: accessor( [ 0.5, 0, 0, 0 ], 'VEC2', 2 ) };
 				if ( rotation !== undefined ) attributes._LIGHTMAP_ROTATION = accessor( [ rotation, 0 ], 'SCALAR', 1 );
 				else attributes._LIGHTMAP_SCALE = accessor( [ 0.5, 1, 1, 1 ], 'VEC2', 2 );
 				json.nodes[ 0 ].extensions = { EXT_mesh_gpu_instancing: { attributes } };
@@ -121,6 +122,8 @@ export default QUnit.module( 'Addons', () => {
 
 				} );
 				assert.strictEqual( meshes.length, 2, 'expands both instances' );
+				assert.strictEqual( meshes[ 0 ].material.lightMapIntensity, 2, 'multiplies binding and instance intensity' );
+				assert.strictEqual( meshes[ 1 ].material.lightMapIntensity, 0, 'zero instance intensity disables contribution' );
 				const map = meshes[ 0 ].material.lightMap;
 				const uv = new Vector2().fromBufferAttribute( meshes[ 0 ].geometry.getAttribute( map.channel === 0 ? 'uv' : `uv${ map.channel }` ), 0 ).applyMatrix3( map.matrix );
 				closeTo( assert, uv.x, rotation === undefined ? 0.55 : 0.3, 'binding precedes instance transform: x' );
@@ -134,6 +137,43 @@ export default QUnit.module( 'Addons', () => {
 
 		} );
 
+
+		QUnit.test( 'intensity-only instances use identity UVs and reject invalid values', async assert => {
+
+			for ( const intensity of [ 0.5, - 1, Infinity ] ) {
+
+				const { json, accessor } = fixture();
+				json.materials[ 0 ].extensions.KHR_lightmap.intensity = 4;
+				json.nodes[ 0 ].extensions = { EXT_mesh_gpu_instancing: { attributes: {
+					TRANSLATION: accessor( [ 0, 0, 0 ], 'VEC3', 3 ),
+					_LIGHTMAP_INTENSITY: accessor( [ intensity ], 'SCALAR', 1 )
+				} } };
+				if ( intensity !== 0.5 ) {
+
+					await assert.rejects( load( json ), /Invalid instance value/, 'rejects negative or nonfinite intensity' );
+					continue;
+
+				}
+
+				const gltf = await load( json );
+				const mesh = gltf.scene.children[ 0 ].children[ 0 ];
+				assert.strictEqual( mesh.material.lightMapIntensity, 2, 'intensity-only attribute triggers expansion' );
+				closeTo( assert, mesh.geometry.attributes.uv.getX( 0 ), 0.2, 'identity UV transform' );
+
+			}
+
+		} );
+
+		QUnit.test( 'rejects empty node bindings and negative binding intensity', async assert => {
+
+			const { json } = fixture();
+			json.nodes[ 0 ].extensions = { KHR_lightmap: { lightmaps: [] } };
+			await assert.rejects( load( json ), /must be nonempty/, 'empty replacements are invalid' );
+			delete json.nodes[ 0 ].extensions;
+			json.materials[ 0 ].extensions.KHR_lightmap.intensity = - 1;
+			await assert.rejects( load( json ), /Invalid binding intensity/, 'negative intensity is invalid' );
+
+		} );
 
 		QUnit.test( 'binding rotation follows glTF ordering with nonuniform scale', async assert => {
 
@@ -241,8 +281,8 @@ export default QUnit.module( 'Addons', () => {
 				scene.add( new Mesh( geometry, new Material( { lightMap: texture, lightMapIntensity: 4 } ) ) );
 				const exporter = new GLTFExporter().register( writer => new GLTFLightMapExporterExtension( writer ) );
 				const json = await exporter.parseAsync( scene );
-				assert.strictEqual( json.asset.version, '2.1', 'requires glTF 2.1' );
-				assert.strictEqual( json.asset.minVersion, '2.1', 'declares minimum version' );
+				assert.strictEqual( json.asset.version, '2.0', 'uses glTF 2.0' );
+				assert.strictEqual( json.asset.minVersion, undefined, 'does not raise minimum version' );
 				const binding = json.materials[ 0 ].extensions.KHR_lightmap;
 				assert.strictEqual( binding.lightmapTexture.texCoord, 1, 'uses nested textureInfo' );
 				assert.strictEqual( binding.intensity, 4, 'keeps intensity for PBR and unlit' );
@@ -295,11 +335,28 @@ export default QUnit.module( 'Addons', () => {
 
 		} );
 
+		QUnit.test( 'rejects exporting negative instance intensity and lightmap vertex attributes', async assert => {
+
+			for ( const vertex of [ false, true ] ) {
+
+				const geometry = new BoxGeometry();
+				const texture = new DataTexture( new Uint8Array( [ 255, 255, 255, 255 ] ), 1, 1 );
+				const material = new MeshStandardMaterial( { lightMap: texture } );
+				geometry.setAttribute( '_LIGHTMAP_INTENSITY', vertex ? new Float32BufferAttribute( new Float32Array( geometry.attributes.position.count ), 1 ) : new InstancedBufferAttribute( new Float32Array( [ - 1 ] ), 1 ) );
+				const mesh = vertex ? new Mesh( geometry, material ) : new InstancedMesh( geometry, material, 1 );
+				const exporter = new GLTFExporter().register( writer => new GLTFLightMapExporterExtension( writer ) );
+				await assert.rejects( exporter.parseAsync( mesh ), /KHR_lightmap:/, 'rejects invalid attribute semantics' );
+
+			}
+
+		} );
+
 		QUnit.test( 'exports lightmap instance attributes only in EXT_mesh_gpu_instancing', async assert => {
 
 			const geometry = new BoxGeometry();
 			geometry.setAttribute( '_LIGHTMAP_OFFSET', new InstancedBufferAttribute( new Float32Array( [ 0, 0, 0.5, 0 ] ), 2 ) );
 			geometry.setAttribute( '_LIGHTMAP_SCALE', new InstancedBufferAttribute( new Float32Array( [ 0.5, 1, 0.5, 1 ] ), 2 ) );
+			geometry.setAttribute( '_LIGHTMAP_INTENSITY', new InstancedBufferAttribute( new Float32Array( [ 0, 0.5 ] ), 1 ) );
 			geometry.setAttribute( '_LIGHTMAP_ROTATION', new InstancedBufferAttribute( new Float32Array( [ 0, Math.PI / 2 ] ), 1 ) );
 			const texture = new DataTexture( new Uint8Array( [ 128, 64, 32, 255 ] ), 1, 1 );
 			texture.colorSpace = LinearSRGBColorSpace;
@@ -307,7 +364,7 @@ export default QUnit.module( 'Addons', () => {
 			scene.add( new InstancedMesh( geometry, new MeshStandardMaterial( { lightMap: texture } ), 2 ) );
 			const json = await new GLTFExporter().register( writer => new GLTFLightMapExporterExtension( writer ) ).parseAsync( scene );
 			const attributes = json.nodes.find( node => node.mesh !== undefined ).extensions.EXT_mesh_gpu_instancing.attributes;
-			for ( const name of [ '_LIGHTMAP_OFFSET', '_LIGHTMAP_SCALE', '_LIGHTMAP_ROTATION' ] ) {
+			for ( const name of [ '_LIGHTMAP_OFFSET', '_LIGHTMAP_SCALE', '_LIGHTMAP_ROTATION', '_LIGHTMAP_INTENSITY' ] ) {
 
 				assert.strictEqual( json.accessors[ attributes[ name ] ].count, 2, name + ' has instance count' );
 				assert.notOk( name in json.meshes[ 0 ].primitives[ 0 ].attributes, name + ' is not a vertex attribute' );
