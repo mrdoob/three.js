@@ -10,12 +10,8 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - loader priority<br>
 			Demonstrates priority loading of assets.<br>
-			<label for="priority">Main asset priority:</label>
-			<select id="priority">
-				<option value="high">High</option>
-				<option value="low">Low</option>
-			</select><br>
-			Changing priority reloads all assets and shows the main asset's load time.<br>
+			Main asset priority: <a href="?priority=high">High</a> | <a href="?priority=low">Low</a><br>
+			Click either priority to reload all assets and show the main asset's load time.<br>
 			<span id="status"></span>
 		</div>
 		<script type="importmap">
@@ -32,15 +28,6 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			const priority = new URLSearchParams( location.search ).get( 'priority' ) === 'low' ? 'low' : 'high';
-			const prioritySelect = document.getElementById( 'priority' );
-			prioritySelect.value = priority;
-			prioritySelect.addEventListener( 'change', () => {
-
-				const url = new URL( location.href );
-				url.searchParams.set( 'priority', prioritySelect.value );
-				location.replace( url.href );
-
-			} );
 			const status = document.getElementById( 'status' );
 			const scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0x333333 );
@@ -118,7 +105,7 @@
 
 			function updateStatus() {
 
-				status.textContent = `Main asset: ${ heroTime }; background assets: ${ backgroundCount } / ${ models.length }; errors: ${ errors }`;
+				status.textContent = `Main asset (${ priority }): ${ heroTime }; background assets: ${ backgroundCount } / ${ models.length }; errors: ${ errors }`;
 
 			}
 
