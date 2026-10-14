@@ -324,9 +324,16 @@ class Bindings extends DataMap {
 
 					} else if ( binding.isSampledTexture ) {
 
+						// node bindings are created with the texture their node held when the shader was built,
+						// so sync them with the current one before it is uploaded
+
+						binding.update();
+
 						binding.generation = this.textures.updateTexture( binding.texture );
 
 					} else if ( binding.isSampler ) {
+
+						binding.update();
 
 						binding.samplerKey = this.textures.updateSampler( binding );
 
