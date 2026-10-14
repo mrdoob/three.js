@@ -522,7 +522,11 @@ class Info {
 
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
-		if ( attribute.array ) {
+		if ( attribute.hasCPUData === false ) {
+
+			return attribute.count * attribute.itemSize * attribute.arrayType.BYTES_PER_ELEMENT;
+
+		} else if ( attribute.array ) {
 
 			return attribute.array.byteLength;
 

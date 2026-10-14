@@ -2082,7 +2082,8 @@ class WebGPUBackend extends Backend {
 			if ( currentSets.index !== index ) {
 
 				const buffer = this.get( index ).buffer;
-				const indexFormat = ( index.array instanceof Uint16Array ) ? GPUIndexFormat.Uint16 : GPUIndexFormat.Uint32;
+				const isUint16 = index.hasCPUData === false ? index.arrayType === Uint16Array : index.array instanceof Uint16Array;
+				const indexFormat = isUint16 ? GPUIndexFormat.Uint16 : GPUIndexFormat.Uint32;
 
 				passEncoderGPU.setIndexBuffer( buffer, indexFormat );
 

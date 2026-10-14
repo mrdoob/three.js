@@ -1884,7 +1884,6 @@ class NodeBuilder {
 
 		if ( attribute.isInterleavedBufferAttribute ) dataAttribute = attribute.data;
 
-		const array = dataAttribute.array;
 		const itemSize = attribute.itemSize;
 		const normalized = attribute.normalized;
 
@@ -1892,7 +1891,9 @@ class NodeBuilder {
 
 		if ( ! ( attribute instanceof Float16BufferAttribute ) && normalized !== true ) {
 
-			arrayType = this.getTypeFromArray( array );
+			// storage attributes without CPU-side data provide their array type without allocating the array
+
+			arrayType = dataAttribute.hasCPUData === false ? typeFromArray.get( dataAttribute.arrayType ) : this.getTypeFromArray( dataAttribute.array );
 
 		}
 

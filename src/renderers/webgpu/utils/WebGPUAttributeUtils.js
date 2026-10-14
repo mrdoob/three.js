@@ -73,6 +73,21 @@ function writeBufferAligned( device, buffer, array, start, count ) {
 }
 
 /**
+ * Returns the typed array constructor of the given attribute's data without
+ * allocating the array of storage attributes that hold no CPU-side data.
+ *
+ * @private
+ * @function
+ * @param {BufferAttribute|InterleavedBufferAttribute} attribute - The attribute.
+ * @return {TypedArray.constructor} The typed array constructor.
+ */
+function getArrayType( attribute ) {
+
+	return attribute.hasCPUData === false ? attribute.arrayType : attribute.array.constructor;
+
+}
+
+/**
  * A WebGPU backend utility module for managing shader attributes.
  *
  * @private
@@ -110,7 +125,59 @@ class WebGPUAttributeUtils {
 
 		let buffer = bufferData.buffer;
 
-		if ( buffer === undefined ) {
+		if ( buffer === undefined && bufferAttribute.hasCPUData === false ) {
+
+			// storage attributes without CPU data: WebGPU zero-initializes buffers, so no data are allocated
+			// or uploaded. apply the same widening and padding as the upload path so a CPU array allocated
+			// later matches the GPU layout
+
+			let ArrayType = bufferAttribute.arrayType;
+
+			if ( bufferAttribute.normalized === false ) {
+
+				if ( ArrayType === Int16Array || ArrayType === Int8Array ) {
+
+					ArrayType = Int32Array;
+
+				} else if ( ArrayType === Uint16Array || ArrayType === Uint8Array ) {
+
+					ArrayType = Uint32Array;
+
+				}
+
+			}
+
+			bufferAttribute._arrayType = ArrayType;
+
+			const bytesPerElement = ArrayType.BYTES_PER_ELEMENT;
+
+			if ( bufferAttribute.itemSize === 3 ) {
+
+				// WGSL does not support packed vec3 data in storage buffers, pad to vec4
+
+				bufferAttribute.itemSize = 4;
+
+			} else if ( bufferAttribute.itemSize > 1 && ( bufferAttribute.itemSize * bytesPerElement ) % 4 !== 0 ) {
+
+				// arrayStride must be a multiple of 4
+
+				bufferAttribute.itemSize = ( Math.floor( ( bufferAttribute.itemSize * bytesPerElement + 3 ) / 4 ) * 4 ) / bytesPerElement;
+
+			}
+
+			// total buffer size must be a multiple of 4
+			const byteLength = bufferAttribute.count * bufferAttribute.itemSize * bytesPerElement;
+			const size = byteLength + ( ( 4 - ( byteLength % 4 ) ) % 4 );
+
+			_bufferDescriptor.label = bufferAttribute.name;
+			_bufferDescriptor.size = size;
+			_bufferDescriptor.usage = usage;
+
+			bufferData.buffer = backend.device.createBuffer( _bufferDescriptor );
+
+			_bufferDescriptor.reset();
+
+		} else if ( buffer === undefined ) {
 
 			const device = backend.device;
 
@@ -346,7 +413,7 @@ class WebGPUAttributeUtils {
 		for ( let slot = 0; slot < attributes.length; slot ++ ) {
 
 			const geometryAttribute = attributes[ slot ];
-			const bytesPerElement = geometryAttribute.array.BYTES_PER_ELEMENT;
+			const bytesPerElement = getArrayType( geometryAttribute ).BYTES_PER_ELEMENT;
 			const bufferAttribute = this.backend.getBufferAttribute( geometryAttribute );
 
 			let vertexBufferLayout = vertexBuffers.get( bufferAttribute );
@@ -597,7 +664,7 @@ class WebGPUAttributeUtils {
 	_getVertexFormat( geometryAttribute ) {
 
 		const { itemSize, normalized } = geometryAttribute;
-		const ArrayType = geometryAttribute.array.constructor;
+		const ArrayType = getArrayType( geometryAttribute );
 		const AttributeType = geometryAttribute.constructor;
 
 		let format;
