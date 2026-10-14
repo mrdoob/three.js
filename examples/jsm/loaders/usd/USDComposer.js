@@ -81,12 +81,12 @@ const USD_CAMERA_DEFAULTS = {
  */
 class USDComposer {
 
-	constructor( manager = null, parameters = {} ) {
+	constructor( manager, parameters = {} ) {
 
 		this.textureCache = {};
 		this.skinnedMeshes = [];
 		this.manager = manager;
-		this.imageLoader = new ImageLoader( manager || undefined, { ...parameters, path: '' } );
+		this.imageLoader = new ImageLoader( manager, { ...parameters, path: '' } );
 		this.texturePromises = [];
 
 	}
