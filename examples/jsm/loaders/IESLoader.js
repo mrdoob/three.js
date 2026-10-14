@@ -162,7 +162,6 @@ class IESLoader extends Loader {
 	load( url, onLoad, onProgress, onError ) {
 
 		const loader = new FileLoader( this.manager, { ...this, responseType: 'text' } );
-		loader.setCrossOrigin( this.crossOrigin );
 
 		loader.load( url, text => {
 

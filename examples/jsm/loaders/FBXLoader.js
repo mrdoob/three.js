@@ -177,10 +177,7 @@ class FBXLoader extends Loader {
 
 		// console.log( fbxTree );
 
-		const textureLoader = new TextureLoader( this.manager );
-		textureLoader.setPriority( this.priority );
-		textureLoader.setCache( this.cache );
-		textureLoader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
+		const textureLoader = new TextureLoader( this.manager, { ...this, path: this.resourcePath || path } );
 
 		return new FBXTreeParser( textureLoader, this.manager, this.trimAnimationClips ).parse( fbxTree );
 
@@ -455,6 +452,7 @@ class FBXTreeParser {
 
 		const extension = textureNode.FileName.split( '.' ).pop().toLowerCase();
 
+		// Registered handlers retain their own request settings; only the resource path is temporarily adjusted.
 		let loader = this.manager.getHandler( `.${extension}` );
 		if ( loader === null ) loader = this.textureLoader;
 

@@ -81,12 +81,12 @@ const USD_CAMERA_DEFAULTS = {
  */
 class USDComposer {
 
-	constructor( manager ) {
+	constructor( manager = null, parameters = {} ) {
 
 		this.textureCache = {};
 		this.skinnedMeshes = [];
 		this.manager = manager;
-		this.imageLoader = new ImageLoader( manager );
+		this.imageLoader = new ImageLoader( manager || undefined, { ...parameters, path: '' } );
 		this.texturePromises = [];
 
 	}
@@ -896,8 +896,7 @@ class USDComposer {
 		// If it's specsByPath data, compose it
 		if ( referencedData.specsByPath ) {
 
-			const composer = new USDComposer( this.manager );
-			composer.imageLoader.setCrossOrigin( this.imageLoader.crossOrigin );
+			const composer = new USDComposer( this.manager, this.imageLoader );
 			const newBasePath = this._getBasePath( resolvedPath );
 			const composedGroup = composer.compose( referencedData, this.assets, mergedVariants, newBasePath );
 
@@ -3874,6 +3873,7 @@ class USDComposer {
 			// Try loading via LoadingManager if available
 			if ( this.manager ) {
 
+				// ImageLoader applies the manager URL modifier once, when starting the request.
 				return this._createTextureFromData( baseName, textureAttrs, transformAttrs );
 
 			}
@@ -3911,6 +3911,7 @@ class USDComposer {
 
 		}
 
+		// Use ImageLoader for CORS, loading-manager tracking and image caching.
 		this.texturePromises.push( new Promise( ( resolve ) => {
 
 			this.imageLoader.load( url, function ( image ) {

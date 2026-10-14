@@ -119,7 +119,7 @@ class NodeObjectLoader extends ObjectLoader {
 
 		if ( json !== undefined ) {
 
-			const loader = new NodeLoader();
+			const loader = new NodeLoader( this.manager, this );
 			loader.setNodes( this.nodes );
 			loader.setTextures( textures );
 
@@ -146,7 +146,7 @@ class NodeObjectLoader extends ObjectLoader {
 
 			const nodes = this.parseNodes( this._nodesJSON, textures );
 
-			const loader = new NodeMaterialLoader();
+			const loader = new NodeMaterialLoader( this.manager, this );
 			loader.setTextures( textures );
 			loader.setNodes( nodes );
 			loader.setNodeMaterials( this.nodeMaterials );

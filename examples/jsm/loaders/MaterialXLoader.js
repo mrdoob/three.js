@@ -104,12 +104,7 @@ class MaterialXLoader extends Loader {
 		// have finished, matching the lifecycle used by GLTFLoader.
 		this.manager.itemStart( url );
 
-		const loader = new FileLoader( this.manager, {
-			priority: this.priority,
-			cache: this.cache,
-			path: this.path,
-			responseType: 'arraybuffer'
-		} );
+		const loader = new FileLoader( this.manager, { ...this, responseType: 'arraybuffer' } );
 		loader.load( url, ( data ) => {
 
 			try {
@@ -244,11 +239,7 @@ class MaterialXLoader extends Loader {
 
 		const log = new MaterialXLog();
 
-		const document = new MaterialXDocument( this.manager, options.path || this.path, log, options.archiveResolver || null, options.uvSpace );
-		document.imageLoader.setPriority( this.priority );
-		document.imageLoader.setCache( this.cache );
-		document.textureLoader.setPriority( this.priority );
-		document.textureLoader.setCache( this.cache );
+		const document = new MaterialXDocument( this.manager, options.path || this.path, log, options.archiveResolver || null, options.uvSpace, this );
 		const result = document.parse( text, options.materialName || null, {
 			interfaceValidator: options.interfaceValidator,
 			nodeResolver: options.nodeResolver,

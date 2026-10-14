@@ -157,6 +157,8 @@ class MTLLoader extends Loader {
 		materialCreator.setManager( this.manager );
 		materialCreator.priority = this.priority;
 		materialCreator.cache = this.cache;
+		materialCreator.requestHeader = this.requestHeader;
+		materialCreator.withCredentials = this.withCredentials;
 		materialCreator.setMaterials( materialsInfo );
 		return materialCreator;
 
@@ -569,13 +571,13 @@ class MaterialCreator {
 	loadTexture( url, mapping, onLoad, onProgress, onError ) {
 
 		const manager = ( this.manager !== undefined ) ? this.manager : DefaultLoadingManager;
+		// Registered handlers retain their request settings, apart from the existing crossOrigin override.
 		let loader = manager.getHandler( url );
 
 		if ( loader === null ) {
 
-			loader = new TextureLoader( manager );
-			loader.setPriority( this.priority || 'auto' );
-			loader.setCache( this.cache || 'default' );
+			// MaterialCreator supplies complete URLs resolved against baseUrl, and has no loader path.
+			loader = new TextureLoader( manager, this );
 
 		}
 

@@ -353,11 +353,14 @@ class DRACOLoader extends Loader {
 
 	_loadLibrary( url, responseType ) {
 
+		// Decoder libraries use their own URLs and exclude asset request headers.
+		// Priority and cache are inherited; credentials follow the existing library policy.
+
 		const loader = new FileLoader( this.manager, {
-			priority: this.priority,
-			cache: this.cache,
-			responseType: responseType,
-			withCredentials: this.withCredentials
+			...this,
+			path: '',
+			requestHeader: {},
+			responseType: responseType
 		} );
 
 		return new Promise( ( resolve, reject ) => {

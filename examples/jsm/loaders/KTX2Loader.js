@@ -283,20 +283,21 @@ class KTX2Loader extends Loader {
 
 	init() {
 
+		// Decoder libraries use their own URLs and exclude asset request headers.
+		// Priority and cache are inherited; credentials follow the existing library policy.
+
 		if ( ! this.transcoderPending ) {
 
 			const jsLoader = new FileLoader( this.manager, {
+				...this,
 				path: this.transcoderPath,
-				priority: this.priority,
-				cache: this.cache,
-				withCredentials: this.withCredentials
+				requestHeader: {}
 			} );
 
 			const binaryLoader = new FileLoader( this.manager, {
+				...this,
 				path: this.transcoderPath,
-				priority: this.priority,
-				cache: this.cache,
-				withCredentials: this.withCredentials,
+				requestHeader: {},
 				responseType: 'arraybuffer'
 			} );
 
@@ -389,7 +390,6 @@ class KTX2Loader extends Loader {
 
 		const loader = new FileLoader( this.manager, { ...this, responseType: 'arraybuffer' } );
 
-		loader.setCrossOrigin( this.crossOrigin );
 
 		loader.load( url, ( buffer ) => {
 

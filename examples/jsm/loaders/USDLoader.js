@@ -239,8 +239,7 @@ class USDLoader extends Loader {
 
 		};
 
-		const composer = new USDComposer( scope.manager );
-		composer.imageLoader.setCrossOrigin( scope.crossOrigin );
+		const composer = new USDComposer( scope.manager, scope );
 
 		// USDA (standalone)
 

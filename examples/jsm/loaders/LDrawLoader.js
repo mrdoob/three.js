@@ -626,13 +626,8 @@ class LDrawParsedCache {
 			}
 
 			const loader = this.loader;
-			const fileLoader = new FileLoader( loader.manager, {
-				priority: loader.priority,
-				cache: loader.cache,
-				path: loader.partsLibraryPath,
-				requestHeader: loader.requestHeader,
-				withCredentials: loader.withCredentials
-			} );
+			// Part URLs are relative to the parts library rather than the model request path.
+			const fileLoader = new FileLoader( loader.manager, { ...loader, path: loader.partsLibraryPath } );
 
 			try {
 

@@ -343,7 +343,7 @@ class ObjectLoader extends Loader {
 
 		if ( json !== undefined ) {
 
-			const bufferGeometryLoader = new BufferGeometryLoader();
+			const bufferGeometryLoader = new BufferGeometryLoader( this.manager, this );
 
 			for ( let i = 0, l = json.length; i < l; i ++ ) {
 
@@ -398,7 +398,7 @@ class ObjectLoader extends Loader {
 
 		if ( json !== undefined ) {
 
-			const loader = new MaterialLoader();
+			const loader = new MaterialLoader( this.manager, this );
 			loader.setTextures( textures );
 
 			for ( let i = 0, l = json.length; i < l; i ++ ) {
@@ -503,11 +503,8 @@ class ObjectLoader extends Loader {
 
 			const manager = new LoadingManager( onLoad );
 
-			loader = new ImageLoader( manager, {
-				priority: this.priority,
-				cache: this.cache,
-				crossOrigin: this.crossOrigin
-			} );
+			// Image URLs already include resourcePath and have passed through the parent manager.
+			loader = new ImageLoader( manager, { ...this, path: '' } );
 
 			for ( let i = 0, il = json.length; i < il; i ++ ) {
 
@@ -603,11 +600,8 @@ class ObjectLoader extends Loader {
 
 		if ( json !== undefined && json.length > 0 ) {
 
-			loader = new ImageLoader( this.manager, {
-				priority: this.priority,
-				cache: this.cache,
-				crossOrigin: this.crossOrigin
-			} );
+			// Image URLs already include resourcePath; do not prepend the model request path.
+			loader = new ImageLoader( this.manager, { ...this, path: '' } );
 
 			for ( let i = 0, il = json.length; i < il; i ++ ) {
 

@@ -32,13 +32,14 @@ export default QUnit.module( 'Loaders', () => {
 
 				assert.strictEqual( options.priority, 'low' );
 				assert.strictEqual( options.cache, 'no-store' );
+				assert.strictEqual( options.credentials, 'include', 'Explicit credentials apply to image bitmap requests.' );
 				return originalFetch( url, options );
 
 			};
 
 			try {
 
-				const bitmap = await new ImageBitmapLoader().setPriority( 'low' ).setCache( 'no-store' ).loadAsync( '/examples/textures/uv_grid_opengl.jpg' );
+				const bitmap = await new ImageBitmapLoader( undefined, { withCredentials: true } ).setPriority( 'low' ).setCache( 'no-store' ).loadAsync( '/examples/textures/uv_grid_opengl.jpg' );
 				assert.ok( bitmap.width > 0 );
 				bitmap.close();
 

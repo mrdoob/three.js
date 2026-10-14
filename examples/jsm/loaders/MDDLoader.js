@@ -69,12 +69,7 @@ class MDDLoader extends Loader {
 
 		const scope = this;
 
-		const loader = new FileLoader( this.manager, {
-			priority: this.priority,
-			cache: this.cache,
-			path: this.path,
-			responseType: 'arraybuffer'
-		} );
+		const loader = new FileLoader( this.manager, { ...this, responseType: 'arraybuffer' } );
 		loader.load( url, function ( data ) {
 
 			onLoad( scope.parse( data ) );

@@ -131,7 +131,7 @@ class GaussianSplatPLYLoader extends Loader {
 
 		const degree = detectSphericalHarmonicsDegree( data );
 
-		const plyLoader = new PLYLoader( this.manager );
+		const plyLoader = new PLYLoader( this.manager, this );
 		plyLoader.setCustomPropertyNameMapping( getPropertyMapping( degree ) );
 
 		return convertPLYGeometry( plyLoader.parse( data ) );

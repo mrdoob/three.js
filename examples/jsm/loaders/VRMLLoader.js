@@ -3335,10 +3335,7 @@ class VRMLLoader extends Loader {
 
 		//
 
-		const textureLoader = new TextureLoader( this.manager );
-		textureLoader.setPriority( this.priority );
-		textureLoader.setCache( this.cache );
-		textureLoader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
+		const textureLoader = new TextureLoader( this.manager, { ...this, path: this.resourcePath || path } );
 
 		// check version (only 2.0 is supported)
 

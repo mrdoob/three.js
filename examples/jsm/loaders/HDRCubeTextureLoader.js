@@ -43,7 +43,7 @@ class HDRCubeTextureLoader extends Loader {
 		 *
          * @type {HDRLoader}
 		 */
-		this.hdrLoader = new HDRLoader();
+		this.hdrLoader = new HDRLoader( this.manager, this );
 
 		/**
 		 * The texture type.
@@ -97,13 +97,7 @@ class HDRCubeTextureLoader extends Loader {
 
 		function loadHDRData( i, onLoad, onProgress, onError ) {
 
-			const loader = new FileLoader( scope.manager, {
-				priority: scope.priority,
-				cache: scope.cache,
-				path: scope.path,
-				responseType: 'arraybuffer',
-				withCredentials: scope.withCredentials
-			} );
+			const loader = new FileLoader( scope.manager, { ...scope, responseType: 'arraybuffer' } );
 			loader.load( urls[ i ], function ( buffer ) {
 
 				loaded ++;

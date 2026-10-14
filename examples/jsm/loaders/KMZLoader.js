@@ -127,9 +127,8 @@ class KMZLoader extends Loader {
 
 			if ( model ) {
 
-				const loader = new ColladaLoader( manager );
-				loader.setPriority( this.priority );
-				loader.setCache( this.cache );
+				// The archive manager resolves internal image paths; exclude the outer archive paths.
+				const loader = new ColladaLoader( manager, { ...this, path: '', resourcePath: '' } );
 				return loader.parse( new TextDecoder().decode( zip[ model.textContent ] ) );
 
 			}
@@ -144,9 +143,8 @@ class KMZLoader extends Loader {
 
 				if ( extension === 'dae' ) {
 
-					const loader = new ColladaLoader( manager );
-					loader.setPriority( this.priority );
-					loader.setCache( this.cache );
+					// The archive manager resolves internal image paths; exclude the outer archive paths.
+					const loader = new ColladaLoader( manager, { ...this, path: '', resourcePath: '' } );
 					return loader.parse( new TextDecoder().decode( zip[ path ] ) );
 
 				}

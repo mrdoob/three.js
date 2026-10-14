@@ -129,9 +129,8 @@ class ThreeMFLoader extends Loader {
 	parse( data ) {
 
 		const scope = this;
-		const textureLoader = new TextureLoader( this.manager );
-		textureLoader.setPriority( this.priority );
-		textureLoader.setCache( this.cache );
+		// Embedded images have complete blob/data URLs; do not prepend the model path.
+		const textureLoader = new TextureLoader( this.manager, { ...this, path: '' } );
 
 		function loadDocument( data ) {
 

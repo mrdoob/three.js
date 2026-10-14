@@ -27,18 +27,17 @@ export default QUnit.module( 'Addons', () => {
 
 				try {
 
-					const composer = new USDComposer( manager );
-					composer.imageLoader.setCrossOrigin( 'use-credentials' );
+					const composer = new USDComposer( manager, { crossOrigin: 'use-credentials', priority: 'high' } );
 					const texture = composer._createTextureFromData( 'textures/image.png', null, null );
 					await Promise.all( composer.texturePromises );
 
 					assert.ok( texture.image.naturalWidth > 0 );
 					assert.strictEqual( texture.image.crossOrigin, 'use-credentials' );
+					assert.strictEqual( texture.image.fetchPriority, 'high' );
 					assert.strictEqual( completed, 1, 'The loading manager observes texture completion.' );
 					assert.strictEqual( Cache.get( `image:${ url }` ), texture.image, 'The image participates in the shared cache.' );
 
-					const secondComposer = new USDComposer( manager );
-					secondComposer.imageLoader.setCrossOrigin( 'use-credentials' );
+					const secondComposer = new USDComposer( manager, { crossOrigin: 'use-credentials', priority: 'high' } );
 					const secondTexture = secondComposer._createTextureFromData( 'textures/image.png', null, null );
 					await Promise.all( secondComposer.texturePromises );
 					assert.strictEqual( secondTexture.image, texture.image, 'Repeated texture loads reuse the cached image.' );

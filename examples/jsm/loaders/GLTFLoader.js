@@ -483,6 +483,7 @@ class GLTFLoader extends Loader {
 
 			path: path || this.resourcePath || '',
 			crossOrigin: this.crossOrigin,
+			withCredentials: this.withCredentials,
 			priority: this.priority,
 			cache: this.cache,
 			requestHeader: this.requestHeader,
@@ -1579,6 +1580,7 @@ class GLTFTextureWebPExtension {
 		let loader = parser.textureLoader;
 		if ( source.uri ) {
 
+			// Registered handlers retain their own request settings.
 			const handler = parser.options.manager.getHandler( source.uri );
 			if ( handler !== null ) loader = handler;
 
@@ -1626,6 +1628,7 @@ class GLTFTextureAVIFExtension {
 		let loader = parser.textureLoader;
 		if ( source.uri ) {
 
+			// Registered handlers retain their own request settings.
 			const handler = parser.options.manager.getHandler( source.uri );
 			if ( handler !== null ) loader = handler;
 
@@ -2703,28 +2706,23 @@ class GLTFParser {
 
 		if ( typeof createImageBitmap === 'undefined' || ( isSafari && safariVersion < 17 ) || ( isFirefox && firefoxVersion < 98 ) ) {
 
-			this.textureLoader = new TextureLoader( this.options.manager );
-			this.textureLoader.setPriority( this.options.priority );
-			this.textureLoader.setCache( this.options.cache );
+			// Texture URLs are resolved against options.path before loading.
+			this.textureLoader = new TextureLoader( this.options.manager, { ...this.options, path: '' } );
 
 		} else {
 
-			this.textureLoader = new ImageBitmapLoader( this.options.manager );
-			this.textureLoader.setPriority( this.options.priority );
-			this.textureLoader.setCache( this.options.cache );
+			// Texture URLs are resolved against options.path before loading.
+			this.textureLoader = new ImageBitmapLoader( this.options.manager, { ...this.options, path: '' } );
 
 		}
 
-		this.textureLoader.setCrossOrigin( this.options.crossOrigin );
-		this.textureLoader.setRequestHeader( this.options.requestHeader );
-
 		// Buffer URLs already include the resource path, so do not inherit options.path.
 		this.fileLoader = new FileLoader( this.options.manager, {
-			priority: this.options.priority,
-			cache: this.options.cache,
-			requestHeader: this.options.requestHeader,
+			...this.options,
+			path: '',
 			responseType: 'arraybuffer',
-			withCredentials: this.options.crossOrigin === 'use-credentials'
+			// Retain the crossOrigin credential behavior and honor explicit fetch credentials.
+			withCredentials: this.options.withCredentials || this.options.crossOrigin === 'use-credentials'
 		} );
 
 	}
@@ -3329,6 +3327,7 @@ class GLTFParser {
 
 		if ( sourceDef.uri ) {
 
+			// Registered handlers retain their own request settings.
 			const handler = options.manager.getHandler( sourceDef.uri );
 			if ( handler !== null ) loader = handler;
 

@@ -552,10 +552,7 @@ class TDSLoader extends Loader {
 		let next = chunk.readChunk( );
 		let texture = {};
 
-		const loader = new TextureLoader( this.manager );
-		loader.setPriority( this.priority );
-		loader.setCache( this.cache );
-		loader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
+		const loader = new TextureLoader( this.manager, { ...this, path: this.resourcePath || path } );
 
 		while ( next ) {
 
