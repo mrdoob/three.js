@@ -354,6 +354,18 @@ class NodeMaterialObserver {
 		if ( builder.context.modelViewMatrix || builder.context.modelNormalViewMatrix || builder.context.getAO || builder.context.getShadow )
 			return true;
 
+		const scene = builder.scene;
+
+		if ( scene ) {
+
+			if ( material.fog === true && scene.fogNode && scene.fogNode.isNode )
+				return true;
+
+			if ( scene.environmentNode && scene.environmentNode.isNode )
+				return true;
+
+		}
+
 		return false;
 
 	}
