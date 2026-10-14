@@ -10,7 +10,7 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - loader priority<br>
 			<a href="?priority=1">high / low</a> | <a href="?priority=0">auto / auto</a><br>
-			The horse is requested after six background models. Enable network throttling in DevTools.<br>
+			The horse is requested after twelve background models. Enable network throttling in DevTools.<br>
 			Priority is a browser hint; results depend on the connection and server. HTTP cache mode: reload.<br>
 			<span id="status"></span>
 		</div>
@@ -52,7 +52,9 @@
 			const hero = new GLTFLoader().setPriority( prioritized ? 'high' : 'auto' ).setCache( 'reload' );
 			const models = [
 				'BoomBox.glb', 'coffeeMug.glb', 'Stork.glb', 'Flamingo.glb',
-				'Parrot.glb', 'RobotExpressive/RobotExpressive.glb'
+				'Parrot.glb', 'RobotExpressive/RobotExpressive.glb',
+				'DiffuseRoughnessParameterSweep.glb', 'godrays_demo.glb', 'collision-world.glb',
+				'ShadowmappableMesh.glb', 'ShaderBall.glb', 'DispersionTest.glb'
 			];
 
 			for ( const model of models ) {
