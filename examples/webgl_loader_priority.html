@@ -9,9 +9,13 @@
 	<body>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - loader priority<br>
-			<a href="?priority=1">high / low</a> | <a href="?priority=0">auto / auto</a><br>
-			The horse is requested after twelve background models. Enable network throttling in DevTools.<br>
-			Priority is a browser hint; results depend on the connection and server. HTTP cache mode: reload.<br>
+			Demonstrates priority loading of assets.<br>
+			<label for="priority">Main asset priority:</label>
+			<select id="priority">
+				<option value="high">High</option>
+				<option value="low">Low</option>
+			</select><br>
+			Changing priority reloads all assets and shows the main asset's load time.<br>
 			<span id="status"></span>
 		</div>
 		<script type="importmap">
@@ -27,7 +31,16 @@
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			const prioritized = new URLSearchParams( location.search ).get( 'priority' ) !== '0';
+			const priority = new URLSearchParams( location.search ).get( 'priority' ) === 'low' ? 'low' : 'high';
+			const prioritySelect = document.getElementById( 'priority' );
+			prioritySelect.value = priority;
+			prioritySelect.addEventListener( 'change', () => {
+
+				const url = new URL( location.href );
+				url.searchParams.set( 'priority', prioritySelect.value );
+				location.replace( url.href );
+
+			} );
 			const status = document.getElementById( 'status' );
 			const scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0x333333 );
@@ -48,8 +61,8 @@
 			let heroTime = 'loading';
 			let errors = 0;
 
-			const background = new GLTFLoader().setPriority( prioritized ? 'low' : 'auto' ).setCache( 'reload' );
-			const hero = new GLTFLoader().setPriority( prioritized ? 'high' : 'auto' ).setCache( 'reload' );
+			const background = new GLTFLoader().setPriority( 'auto' ).setCache( 'reload' );
+			const hero = new GLTFLoader().setPriority( priority ).setCache( 'reload' );
 			const models = [
 				'BoomBox.glb', 'coffeeMug.glb', 'Stork.glb', 'Flamingo.glb',
 				'Parrot.glb', 'RobotExpressive/RobotExpressive.glb',
@@ -105,7 +118,7 @@
 
 			function updateStatus() {
 
-				status.textContent = `${ prioritized ? 'high / low' : 'auto / auto' }: horse ${ heroTime }; background ${ backgroundCount } / ${ models.length }; errors ${ errors }`;
+				status.textContent = `Main asset: ${ heroTime }; background assets: ${ backgroundCount } / ${ models.length }; errors: ${ errors }`;
 
 			}
 
