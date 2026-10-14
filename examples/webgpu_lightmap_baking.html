@@ -19,7 +19,7 @@
 				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Light Baking</span>
 			</div>
 
-			<small>Progressively bake Light Probe or VXGI diffuse lighting into a UV atlas and export glTF.<br/><span id="status"></span></small>
+			<small>Progressively bake Light Probe or VXGI diffuse irradiance into a UV atlas and export KHR_lightmap glTF.<br/><span id="status"></span></small>
 		</div>
 
 		<script type="importmap">
@@ -290,6 +290,8 @@
 				const samples = bakeSamples[ params.algorithm ];
 				if ( lightMapper.samples < samples ) lightMapper.update( samples - lightMapper.samples );
 
+				// KHR_lightmap stores linear irradiance. The normalization scale restores
+				// the HDR range; LightMapper already outputs irradiance without dividing by pi.
 				const lightMap = await readLightMap( renderer, lightMapper.texture );
 
 				// lit materials with the baked indirect irradiance, direct lighting stays live

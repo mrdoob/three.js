@@ -2,7 +2,8 @@ import { DataUtils, HalfFloatType, LinearSRGBColorSpace, RenderTarget, Texture }
 
 /**
  * Reads a baked GPU light map into a normalized linear canvas texture.
- * The returned intensity restores the HDR range when exporting MOZ_lightmap.
+ * The returned intensity restores the HDR irradiance range when exporting KHR_lightmap.
+ * RGB samples remain linear; no sRGB encoding or division by pi is applied.
  * The caller owns the returned texture and should dispose it after export.
  *
  * @three_import import { readLightMap } from 'three/addons/utils/readLightMap.js';

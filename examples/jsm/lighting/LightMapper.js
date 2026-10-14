@@ -78,7 +78,9 @@ class LightMapper {
 		this._renderTarget.texture.channel = 1;
 
 		/**
-		 * The baked light map. It stores irradiance and uses the `uv1` attribute.
+ * The baked light map. It stores linear diffuse irradiance, without baked
+ * albedo or display exposure, and uses the `uv1` attribute. Values are not
+ * divided by pi, matching the `KHR_lightmap` irradiance convention.
 		 *
 		 * @type {Texture}
 		 */
