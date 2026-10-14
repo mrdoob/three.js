@@ -34,10 +34,11 @@ class TDSLoader extends Loader {
 	 * Constructs a new 3DS loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
+	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager ) {
+	constructor( manager, parameters = {} ) {
 
-		super( manager );
+		super( manager, parameters );
 
 		/**
 		 * Whether debug mode should be enabled or not.

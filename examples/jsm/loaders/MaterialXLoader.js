@@ -36,10 +36,11 @@ class MaterialXLoader extends Loader {
 	 * Constructs a new MaterialX loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
+	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager ) {
+	constructor( manager, parameters = {} ) {
 
-		super( manager );
+		super( manager, parameters );
 
 		/**
 		 * Releases the resources of the last loaded archive, if any.

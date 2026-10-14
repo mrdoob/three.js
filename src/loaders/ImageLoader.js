@@ -23,22 +23,11 @@ class ImageLoader extends Loader {
 	 * Constructs a new image loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameter={}] - Initial settings, copied from the defined properties.
-	 * Later changes to this object do not update the loader.
-	 * @param {string} [parameter.path] - The base path for the image.
-	 * @param {string} [parameter.crossOrigin] - The cross-origin policy.
-	 * @param {('high'|'low'|'auto')} [parameter.priority] - The request priority hint.
-	 * @param {('default'|'no-store'|'reload'|'no-cache'|'force-cache')} [parameter.cache] - The HTTP cache mode, retained as a loader setting but not applied to image requests.
+	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameter = {} ) {
+	constructor( manager, parameters = {} ) {
 
-		super( manager );
-
-		for ( const property of [ 'path', 'crossOrigin', 'priority', 'cache' ] ) {
-
-			if ( parameter[ property ] !== undefined ) this[ property ] = parameter[ property ];
-
-		}
+		super( manager, parameters );
 
 	}
 

@@ -20,10 +20,11 @@ class AnimationLoader extends Loader {
 	 * Constructs a new animation loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
+	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager ) {
+	constructor( manager, parameters = {} ) {
 
-		super( manager );
+		super( manager, parameters );
 
 	}
 

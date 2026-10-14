@@ -33,9 +33,9 @@ import {
  */
 class MTLLoader extends Loader {
 
-	constructor( manager ) {
+	constructor( manager, parameters = {} ) {
 
-		super( manager );
+		super( manager, parameters );
 
 	}
 

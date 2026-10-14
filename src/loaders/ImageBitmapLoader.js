@@ -38,10 +38,11 @@ class ImageBitmapLoader extends Loader {
 	 * Constructs a new image bitmap loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
+	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager ) {
+	constructor( manager, parameters = {} ) {
 
-		super( manager );
+		super( manager, parameters );
 
 		/**
 		 * This flag can be used for type testing.

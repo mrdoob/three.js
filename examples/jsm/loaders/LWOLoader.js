@@ -58,11 +58,12 @@ class LWOLoader extends Loader {
 	 * Constructs a new LWO loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
+	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 * @deprecated since r185.
 	 */
-	constructor( manager ) {
+	constructor( manager, parameters = {} ) {
 
-		super( manager );
+		super( manager, parameters );
 
 		console.warn( 'THREE.LWOLoader: The loader has been deprecated and will be removed with r195. Export your LWO files to glTF before using them on the web.' ); // @deprecated, r185
 

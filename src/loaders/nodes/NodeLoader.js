@@ -15,10 +15,11 @@ class NodeLoader extends Loader {
 	 * Constructs a new node loader.
 	 *
 	 * @param {LoadingManager} [manager] - A reference to a loading manager.
+	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager ) {
+	constructor( manager, parameters = {} ) {
 
-		super( manager );
+		super( manager, parameters );
 
 		/**
 		 * Represents a dictionary of textures.

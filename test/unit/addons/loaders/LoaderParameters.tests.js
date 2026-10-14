@@ -1,3 +1,8 @@
+import { LoadingManager } from '../../../../src/loaders/LoadingManager.js';
+import { GLTFLoader } from '../../../../examples/jsm/loaders/GLTFLoader.js';
+import { HDRLoader } from '../../../../examples/jsm/loaders/HDRLoader.js';
+import { DDSLoader } from '../../../../examples/jsm/loaders/DDSLoader.js';
+import { ColladaLoader } from '../../../../examples/jsm/loaders/ColladaLoader.js';
 import { Rhino3dmLoader } from '../../../../examples/jsm/loaders/3DMLoader.js';
 import { DRACOLoader } from '../../../../examples/jsm/loaders/DRACOLoader.js';
 
@@ -6,6 +11,25 @@ export default QUnit.module( 'Addons', () => {
 	QUnit.module( 'Loaders', () => {
 
 		QUnit.module( 'Loader parameters', () => {
+
+			QUnit.test( 'subclasses forward constructor parameters', ( assert ) => {
+
+				const manager = new LoadingManager();
+				const parameters = { path: 'assets/', resourcePath: 'textures/', crossOrigin: 'use-credentials', withCredentials: true, requestHeader: { Accept: 'application/json' }, priority: 'low', cache: 'reload' };
+
+				for ( const LoaderClass of [ Rhino3dmLoader, DRACOLoader, GLTFLoader, HDRLoader, DDSLoader, ColladaLoader ] ) {
+
+					const loader = new LoaderClass( manager, parameters );
+					assert.strictEqual( loader.manager, manager, `${ LoaderClass.name }: manager` );
+					for ( const property of Object.keys( parameters ) ) {
+
+						assert.strictEqual( loader[ property ], parameters[ property ], `${ LoaderClass.name }: ${ property }` );
+
+					}
+
+				}
+
+			} );
 
 			QUnit.test( 'Rhino model requests preserve selective settings and binary decoding', async ( assert ) => {
 

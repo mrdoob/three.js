@@ -11,8 +11,17 @@ class Loader {
 	 * Constructs a new loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
+	 * @param {Object} [parameters={}] - Initial settings, copied from the defined properties.
+	 * Later changes to this object do not update the loader. Request headers are shared by reference.
+	 * @param {string} [parameters.crossOrigin] - The cross-origin policy.
+	 * @param {boolean} [parameters.withCredentials] - Whether to include credentials.
+	 * @param {string} [parameters.path] - The base path for the asset.
+	 * @param {string} [parameters.resourcePath] - The base path for additional resources.
+	 * @param {Object<string, any>} [parameters.requestHeader] - The request headers.
+	 * @param {('high'|'low'|'auto')} [parameters.priority] - The request priority hint.
+	 * @param {('default'|'no-store'|'reload'|'no-cache'|'force-cache')} [parameters.cache] - The HTTP cache mode.
 	 */
-	constructor( manager ) {
+	constructor( manager, parameters = {} ) {
 
 		/**
 		 * The loading manager.
@@ -29,7 +38,7 @@ class Loader {
 		 * @type {string}
 		 * @default 'anonymous'
 		 */
-		this.crossOrigin = 'anonymous';
+		this.crossOrigin = ( parameters.crossOrigin !== undefined ) ? parameters.crossOrigin : 'anonymous';
 
 		/**
 		 * Whether the XMLHttpRequest uses credentials.
@@ -37,21 +46,21 @@ class Loader {
 		 * @type {boolean}
 		 * @default false
 		 */
-		this.withCredentials = false;
+		this.withCredentials = ( parameters.withCredentials !== undefined ) ? parameters.withCredentials : false;
 
 		/**
 		 * The base path from which the asset will be loaded.
 		 *
 		 * @type {string}
 		 */
-		this.path = '';
+		this.path = ( parameters.path !== undefined ) ? parameters.path : '';
 
 		/**
 		 * The base path from which additional resources like textures will be loaded.
 		 *
 		 * @type {string}
 		 */
-		this.resourcePath = '';
+		this.resourcePath = ( parameters.resourcePath !== undefined ) ? parameters.resourcePath : '';
 
 		/**
 		 * The [request header](https://developer.mozilla.org/en-US/docs/Glossary/Request_header)
@@ -59,7 +68,7 @@ class Loader {
 		 *
 		 * @type {Object<string, any>}
 		 */
-		this.requestHeader = {};
+		this.requestHeader = ( parameters.requestHeader !== undefined ) ? parameters.requestHeader : {};
 
 		/**
 		 * The request priority hint. Image loaders use `HTMLImageElement.fetchPriority`.
@@ -67,7 +76,7 @@ class Loader {
 		 * @type {('high'|'low'|'auto')}
 		 * @default 'auto'
 		 */
-		this.priority = 'auto';
+		this.priority = ( parameters.priority !== undefined ) ? parameters.priority : 'auto';
 
 		/**
 		 * The HTTP cache mode passed to `fetch()`. This does not affect {@link Cache}
@@ -76,7 +85,7 @@ class Loader {
 		 * @type {('default'|'no-store'|'reload'|'no-cache'|'force-cache')}
 		 * @default 'default'
 		 */
-		this.cache = 'default';
+		this.cache = ( parameters.cache !== undefined ) ? parameters.cache : 'default';
 
 		if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
