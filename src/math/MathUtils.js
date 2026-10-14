@@ -379,6 +379,50 @@ function setQuaternionFromProperEuler( q, a, b, c, order ) {
 }
 
 /**
+ * Returns the factor used by {@link normalize} and {@link denormalize} for the given typed array,
+ * or `undefined` if the values are not scaled (float arrays) or the array type is not supported.
+ *
+ * @param {TypedArray} array - The typed array that defines the data type of the value.
+ * @return {number|undefined} The normalization factor.
+ */
+function getNormalizationScale( array ) {
+
+	switch ( array.constructor ) {
+
+		case Uint32Array:
+
+			return 4294967295.0;
+
+		case Uint16Array:
+
+			return 65535.0;
+
+		case Uint8Array:
+		case Uint8ClampedArray:
+
+			return 255.0;
+
+		case Int32Array:
+
+			return 2147483647.0;
+
+		case Int16Array:
+
+			return 32767.0;
+
+		case Int8Array:
+
+			return 127.0;
+
+		default:
+
+			return undefined;
+
+	}
+
+}
+
+/**
  * Denormalizes the given value according to the given typed array.
  *
  * @param {number} value - The value to denormalize.
@@ -749,5 +793,6 @@ export {
 	setQuaternionFromProperEuler,
 	normalize,
 	denormalize,
+	getNormalizationScale,
 	MathUtils
 };
