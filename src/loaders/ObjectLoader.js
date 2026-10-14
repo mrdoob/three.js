@@ -502,10 +502,11 @@ class ObjectLoader extends Loader {
 
 			const manager = new LoadingManager( onLoad );
 
-			loader = new ImageLoader( manager );
-			loader.setPriority( this.priority );
-			loader.setCache( this.cache );
-			loader.setCrossOrigin( this.crossOrigin );
+			loader = new ImageLoader( manager, {
+				priority: this.priority,
+				cache: this.cache,
+				crossOrigin: this.crossOrigin
+			} );
 
 			for ( let i = 0, il = json.length; i < il; i ++ ) {
 
@@ -601,10 +602,11 @@ class ObjectLoader extends Loader {
 
 		if ( json !== undefined && json.length > 0 ) {
 
-			loader = new ImageLoader( this.manager );
-			loader.setPriority( this.priority );
-			loader.setCache( this.cache );
-			loader.setCrossOrigin( this.crossOrigin );
+			loader = new ImageLoader( this.manager, {
+				priority: this.priority,
+				cache: this.cache,
+				crossOrigin: this.crossOrigin
+			} );
 
 			for ( let i = 0, il = json.length; i < il; i ++ ) {
 
