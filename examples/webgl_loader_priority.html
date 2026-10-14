@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - loader priority</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - loader priority<br>
+			<a href="?priority=1">high / low</a> | <a href="?priority=0">auto / auto</a><br>
+			The horse is requested after six background models. Enable network throttling in DevTools.<br>
+			Priority is a browser hint; results depend on the connection and server. HTTP cache mode: reload.<br>
+			<span id="status"></span>
+		</div>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+		<script type="module">
+			import * as THREE from 'three';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			const prioritized = new URLSearchParams( location.search ).get( 'priority' ) !== '0';
+			const status = document.getElementById( 'status' );
+			const scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x333333 );
+			scene.add( new THREE.HemisphereLight( 0xffffff, 0x444444, 3 ) );
+			const light = new THREE.DirectionalLight( 0xffffff, 3 );
+			light.position.set( 2, 4, 3 );
+			scene.add( light );
+			const camera = new THREE.PerspectiveCamera( 45, innerWidth / innerHeight, 0.1, 100 );
+			camera.position.set( 3, 2, 3 );
+			const renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( devicePixelRatio );
+			renderer.setSize( innerWidth, innerHeight );
+			document.body.appendChild( renderer.domElement );
+			const controls = new OrbitControls( camera, renderer.domElement );
+			controls.addEventListener( 'change', render );
+			const start = performance.now();
+			let backgroundCount = 0;
+			let heroTime = 'loading';
+			let errors = 0;
+
+			const background = new GLTFLoader().setPriority( prioritized ? 'low' : 'auto' ).setCache( 'reload' );
+			const hero = new GLTFLoader().setPriority( prioritized ? 'high' : 'auto' ).setCache( 'reload' );
+			const models = [
+				'BoomBox.glb', 'coffeeMug.glb', 'Stork.glb', 'Flamingo.glb',
+				'Parrot.glb', 'RobotExpressive/RobotExpressive.glb'
+			];
+
+			for ( const model of models ) {
+
+				background.load( 'models/gltf/' + model, gltf => {
+
+					// Background models are downloaded and parsed, but only the critical model is displayed.
+					const textures = new Set();
+					gltf.scene.traverse( object => {
+
+						if ( ! object.isMesh ) return;
+						object.geometry.dispose();
+						const materials = Array.isArray( object.material ) ? object.material : [ object.material ];
+						for ( const material of materials ) {
+
+							for ( const value of Object.values( material ) ) {
+
+								if ( value && value.isTexture ) textures.add( value );
+
+							}
+
+							material.dispose();
+
+						}
+
+					} );
+					for ( const texture of textures ) texture.dispose();
+					backgroundCount ++;
+					updateStatus();
+
+				}, undefined, onError );
+
+			}
+
+			hero.load( 'models/gltf/Horse.glb', gltf => {
+
+				heroTime = ( performance.now() - start ).toFixed( 0 ) + ' ms';
+				const box = new THREE.Box3().setFromObject( gltf.scene );
+				const size = box.getSize( new THREE.Vector3() );
+				gltf.scene.scale.setScalar( 2 / Math.max( size.x, size.y, size.z ) );
+				box.setFromObject( gltf.scene );
+				gltf.scene.position.sub( box.getCenter( new THREE.Vector3() ) );
+				scene.add( gltf.scene );
+				updateStatus();
+				render();
+
+			}, undefined, onError );
+
+			function updateStatus() {
+
+				status.textContent = `${ prioritized ? 'high / low' : 'auto / auto' }: horse ${ heroTime }; background ${ backgroundCount } / ${ models.length }; errors ${ errors }`;
+
+			}
+
+			function onError( error ) {
+
+				errors ++;
+				console.error( error );
+				updateStatus();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+			window.addEventListener( 'resize', () => {
+
+				camera.aspect = innerWidth / innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( innerWidth, innerHeight );
+				render();
+
+			} );
+			updateStatus();
+			render();
+		</script>
+	</body>
+</html>
