@@ -34,7 +34,7 @@ const canBatchLight = ( light ) => {
 	return light.isNode !== true &&
 		light.castShadow !== true &&
 		isSpecialSpotLight( light ) === false &&
-		_lightTypeToDataNode[ light.constructor.name ] !== undefined;
+		_lightTypeToDataNode[ light.type ] !== undefined;
 
 };
 
@@ -127,7 +127,7 @@ class DynamicLightsNode extends LightsNode {
 
 			}
 
-			const typeName = light.constructor.name;
+			const typeName = light.type;
 			const typeLights = lightsByType.get( typeName );
 
 			if ( typeLights === undefined ) {
