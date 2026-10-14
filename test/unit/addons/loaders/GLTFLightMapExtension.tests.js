@@ -175,6 +175,57 @@ export default QUnit.module( 'Addons', () => {
 
 		} );
 
+
+		QUnit.test( 'node-only unlit binding retains occlusion strength and UV transform', async assert => {
+
+			const { json } = fixture();
+			delete json.materials[ 0 ].extensions.KHR_lightmap;
+			json.materials[ 0 ].extensions.KHR_materials_unlit = {};
+			json.materials[ 0 ].occlusionTexture = { index: 0, texCoord: 1, strength: 0.3, extensions: { KHR_texture_transform: { offset: [ 0.25, 0.5 ], scale: [ 0.5, 0.25 ] } } };
+			json.nodes[ 0 ].extensions = { KHR_lightmap: { lightmaps: [ { primitive: 0, lightmapTexture: { index: 0 } } ] } };
+			const gltf = await load( json );
+			const material = gltf.scene.children[ 0 ].material;
+			assert.ok( material.isMeshBasicMaterial, 'keeps unlit material' );
+			assert.ok( material.aoMap, 'node-only lightmap enables unlit occlusion' );
+			assert.strictEqual( material.aoMap.channel, 1, 'keeps AO UV set' );
+			assert.strictEqual( material.aoMapIntensity, 0.3, 'keeps AO strength' );
+			assert.deepEqual( material.aoMap.offset.toArray(), [ 0.25, 0.5 ], 'keeps AO offset' );
+			assert.deepEqual( material.aoMap.repeat.toArray(), [ 0.5, 0.25 ], 'keeps AO scale' );
+			assert.deepEqual( material.lightMap.offset.toArray(), [ 0, 0 ], 'lightmap keeps independent transform' );
+
+		} );
+
+		QUnit.test( 'mesh node with camera applies primitive bindings without inheritance to children', async assert => {
+
+			const { json } = fixture();
+			delete json.materials[ 0 ].extensions.KHR_lightmap;
+			json.meshes[ 0 ].primitives.push( { ...json.meshes[ 0 ].primitives[ 0 ] } );
+			json.cameras = [ { type: 'perspective', perspective: { yfov: 1, znear: 0.1 } } ];
+			json.nodes[ 0 ].camera = 0;
+			json.nodes[ 0 ].children = [ 1 ];
+			json.nodes[ 0 ].extensions = { KHR_lightmap: { lightmaps: [ { primitive: 1, lightmapTexture: { index: 0 }, intensity: 2 } ] } };
+			json.nodes.push( { mesh: 0, name: 'unbound_child' } );
+			const gltf = await load( json );
+			const parent = gltf.scene.children[ 0 ];
+			const child = parent.getObjectByName( 'unbound_child' );
+			const parentMeshes = [];
+			parent.traverse( object => {
+
+				if ( object.isMesh && ! child.children.includes( object ) ) parentMeshes.push( object );
+
+			} );
+			assert.strictEqual( parentMeshes.length, 2, 'discovers primitives in attached mesh group' );
+			assert.notOk( parentMeshes[ 0 ].material.lightMap, 'first primitive remains unbound' );
+			assert.strictEqual( parentMeshes[ 1 ].material.lightMapIntensity, 2, 'second primitive receives node replacement' );
+			assert.ok( parent.children.some( object => object.isCamera ), 'retains camera attachment' );
+			child.traverse( object => {
+
+				if ( object.isMesh ) assert.notOk( object.material.lightMap, 'child node does not inherit parent binding' );
+
+			} );
+
+		} );
+
 		QUnit.test( 'export round trip keeps linear samples, UVs, transforms and intensity', async assert => {
 
 			for ( const Material of [ MeshStandardMaterial, MeshBasicMaterial ] ) {
