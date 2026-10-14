@@ -8,8 +8,6 @@ import HemisphereLightDataNode from './data/HemisphereLightDataNode.js';
 
 const _hashData = [];
 
-// Batched lights are identified by their exact class, the way `NodeLibrary` finds light nodes. A subclass with a
-// light node of its own (e.g. `IESSpotLight` or `ProjectorLight`) is left to it, and minified class names don't matter.
 const _lightClassToType = new Map( [
 	[ AmbientLight, 'AmbientLight' ],
 	[ DirectionalLight, 'DirectionalLight' ],
