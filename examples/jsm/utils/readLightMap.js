@@ -4,6 +4,8 @@ import { DataUtils, HalfFloatType, LinearSRGBColorSpace, RenderTarget, Texture }
  * Reads a baked GPU light map into a normalized linear canvas texture.
  * The returned intensity restores the HDR irradiance range when exporting KHR_lightmap.
  * RGB samples remain linear; no sRGB encoding or division by pi is applied.
+ * The 8-bit PNG export loses precision in dark regions; use an HDR image-format
+ * extension when this normalization does not provide sufficient bake quality.
  * The caller owns the returned texture and should dispose it after export.
  *
  * @three_import import { readLightMap } from 'three/addons/utils/readLightMap.js';
@@ -17,10 +19,19 @@ async function readLightMap( renderer, map ) {
 	const { width, height } = map.image;
 	const target = new RenderTarget( width, height, { type: map.type, format: map.format, depthBuffer: false } );
 
-	renderer.initRenderTarget( target );
-	renderer.copyTextureToTexture( map, target.texture );
-	const data = await renderer.readRenderTargetPixelsAsync( target, 0, 0, width, height );
-	target.dispose();
+	let data;
+
+	try {
+
+		renderer.initRenderTarget( target );
+		renderer.copyTextureToTexture( map, target.texture );
+		data = await renderer.readRenderTargetPixelsAsync( target, 0, 0, width, height );
+
+	} finally {
+
+		target.dispose();
+
+	}
 
 	const decode = map.type === HalfFloatType ? DataUtils.fromHalfFloat : value => value;
 	let intensity = 1;
@@ -28,7 +39,14 @@ async function readLightMap( renderer, map ) {
 	for ( let i = 0; i < data.length; i ++ ) {
 
 		if ( i % 4 === 3 ) continue;
-		intensity = Math.max( intensity, decode( data[ i ] ) );
+		const value = decode( data[ i ] );
+		if ( ! Number.isFinite( value ) || value < 0 ) {
+
+			throw new Error( 'readLightMap: KHR_lightmap irradiance must be finite and nonnegative.' );
+
+		}
+
+		intensity = Math.max( intensity, value );
 
 	}
 
@@ -42,6 +60,12 @@ async function readLightMap( renderer, map ) {
 
 	const texture = new Texture( canvas );
 	for ( const property of [ 'name', 'flipY', 'channel', 'minFilter', 'magFilter', 'wrapS', 'wrapT' ] ) texture[ property ] = map[ property ];
+	texture.offset.copy( map.offset );
+	texture.repeat.copy( map.repeat );
+	texture.center.copy( map.center );
+	texture.rotation = map.rotation;
+	texture.matrix.copy( map.matrix );
+	texture.matrixAutoUpdate = map.matrixAutoUpdate;
 	texture.colorSpace = LinearSRGBColorSpace;
 	return { texture, intensity };
 

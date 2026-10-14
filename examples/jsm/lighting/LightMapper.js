@@ -17,6 +17,10 @@ let _rendererState;
  * Keep the source geometry and GI data static while accumulating. Call `reset()`
  * after changing transforms or lighting. Atlas charts need at least three texels
  * of padding; the resolve fills two texels around covered surfaces.
+ * Irradiance uses linear BT.709/sRGB primaries in lux, following `KHR_lightmap`.
+ * Do not include material ambient occlusion, base color, or exposure in the source
+ * irradiance. Material occlusion is applied once at runtime. Keep any contributions
+ * included in the bake out of runtime diffuse lighting to avoid counting them twice.
  *
  * ```js
  * const lightMapper = new LightMapper( renderer, size, ( position, normal ) => lightProbeGridIrradiance( probes, position, normal ) );
@@ -78,9 +82,9 @@ class LightMapper {
 		this._renderTarget.texture.channel = 1;
 
 		/**
- * The baked light map. It stores linear diffuse irradiance, without baked
- * albedo or display exposure, and uses the `uv1` attribute. Values are not
- * divided by pi, matching the `KHR_lightmap` irradiance convention.
+		 * The baked light map. It stores linear diffuse irradiance in lux, without baked
+		 * albedo, material ambient occlusion, or display exposure, and uses `uv1`.
+		 * Values are not divided by pi, matching the `KHR_lightmap` convention.
 		 *
 		 * @type {Texture}
 		 */
