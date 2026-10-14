@@ -15,7 +15,6 @@ function createBuilder() {
 	return {
 		material: { isMeshStandardNodeMaterial: true },
 		context: { materialLightings: [], lightingModel: new PhysicalLightingModel() },
-		isAvailable: () => true,
 		getDataFromNode( node ) {
 
 			if ( ! data.has( node ) ) data.set( node, {} );
@@ -83,15 +82,14 @@ export default QUnit.module( 'Nodes', () => {
 
 			} );
 
-			QUnit.test( 'unsupported backends and lighting contexts use ordinary lights', ( assert ) => {
+			QUnit.test( 'unsupported lighting contexts use ordinary lights', ( assert ) => {
 
 				const light = createPoint();
 				const node = new LightsNode().setLights( [ light ] );
-				const builders = [ createBuilder(), createBuilder(), createBuilder(), createBuilder() ];
-				builders[ 0 ].isAvailable = () => false;
-				builders[ 1 ].context.lightingModel = {};
-				builders[ 2 ].context.positionView = {};
-				builders[ 3 ].context.lightingModel.clearcoat = true;
+				const builders = [ createBuilder(), createBuilder(), createBuilder() ];
+				builders[ 0 ].context.lightingModel = {};
+				builders[ 1 ].context.positionView = {};
+				builders[ 2 ].context.lightingModel.clearcoat = true;
 
 				for ( const builder of builders ) {
 

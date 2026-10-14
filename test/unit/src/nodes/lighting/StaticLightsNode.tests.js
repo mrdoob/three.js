@@ -266,6 +266,52 @@ export default QUnit.module( 'Nodes', () => {
 
 			} );
 
+			QUnit.test.if( 'WebGL rendering matches individual point and spot lights', typeof document !== 'undefined' && document.createElement( 'canvas' ).getContext( 'webgl2' ) !== null, async ( assert ) => {
+
+				assert.timeout( 60000 );
+
+				const renderer = new WebGPURenderer( { forceWebGL: true } );
+				await renderer.init();
+				assert.true( renderer.backend.isWebGLBackend, 'uses the WebGL backend' );
+
+				renderer.setSize( size, size );
+				const target = new RenderTarget( size, size, { type: FloatType, colorSpace: LinearSRGBColorSpace } );
+				renderer.setRenderTarget( target );
+
+				const reference = createFixture( false );
+				const batched = createFixture( true );
+
+				const render = async ( fixture ) => {
+
+					await new Promise( resolve => requestAnimationFrame( resolve ) );
+					renderer.render( fixture.scene, fixture.camera );
+					return renderer.readRenderTargetPixelsAsync( target, 0, 0, size, size );
+
+				};
+
+				try {
+
+					assertPixelsEqual( assert, await render( batched ), await render( reference ), 'mixed lights' );
+
+					const batches = [ ...renderer.lighting.getNode( batched.scene )._staticLightsNodes.values() ].filter( node => node !== null );
+					const textures = batches.flatMap( node => [ node.cellsNode.value.pbo, node.indicesNode.value.pbo, node.lightsNode.value.pbo ] );
+					assert.true( batches.length === 1 && textures.every( texture => texture !== undefined && renderer.backend.has( texture ) ), 'the batch is read through PBO textures' );
+
+					batched.point.static = false;
+					assertPixelsEqual( assert, await render( batched ), await render( reference ), 'mixing static and dynamic lights' );
+					assert.true( textures.every( texture => renderer.backend.has( texture ) === false ), 'leaving static mode releases the PBO textures' );
+
+				} finally {
+
+					reference.dispose();
+					batched.dispose();
+					target.dispose();
+					await renderer.dispose();
+
+				}
+
+			} );
+
 		} );
 
 	} );

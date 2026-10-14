@@ -58,8 +58,7 @@ class StaticLightsNode extends LightingNode {
 		const { context, material } = builder;
 		const model = context.lightingModel;
 
-		return builder.isAvailable( 'storageBuffer' ) === true &&
-			( material.isMeshStandardMaterial === true || material.isMeshStandardNodeMaterial === true ) &&
+		return ( material.isMeshStandardMaterial === true || material.isMeshStandardNodeMaterial === true ) &&
 			context.positionView == null && context.positionWorld == null && context.getShadow == null &&
 			model !== undefined && model !== null && model.constructor === PhysicalLightingModel &&
 			model.clearcoat === false && model.sheen === false && model.iridescence === false &&
