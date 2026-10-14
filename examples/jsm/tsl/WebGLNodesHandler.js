@@ -575,7 +575,7 @@ export class WebGLNodesHandler {
 
 				// buffer uniforms are all nested in groups
 				const group = new UniformsGroup();
-				group.name = 'NodeBuffer_' + uniform.name;
+				group.name = builder.getUniformBufferName( uniform );
 				group.uniforms = [ uniform ];
 				uniformsGroups.push( group );
 
