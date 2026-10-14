@@ -1,4 +1,4 @@
-import { LightsNode, NodeUtils } from 'three/webgpu';
+import { AmbientLight, DirectionalLight, HemisphereLight, LightsNode, NodeUtils, PointLight, SpotLight } from 'three/webgpu';
 
 import AmbientLightDataNode from './data/AmbientLightDataNode.js';
 import DirectionalLightDataNode from './data/DirectionalLightDataNode.js';
@@ -7,6 +7,14 @@ import SpotLightDataNode from './data/SpotLightDataNode.js';
 import HemisphereLightDataNode from './data/HemisphereLightDataNode.js';
 
 const _hashData = [];
+
+const _lightClassToType = new Map( [
+	[ AmbientLight, 'AmbientLight' ],
+	[ DirectionalLight, 'DirectionalLight' ],
+	[ PointLight, 'PointLight' ],
+	[ SpotLight, 'SpotLight' ],
+	[ HemisphereLight, 'HemisphereLight' ]
+] );
 
 const _lightTypeToDataNode = {
 	AmbientLight: AmbientLightDataNode,
@@ -34,7 +42,7 @@ const canBatchLight = ( light ) => {
 	return light.isNode !== true &&
 		light.castShadow !== true &&
 		isSpecialSpotLight( light ) === false &&
-		_lightTypeToDataNode[ light.constructor.name ] !== undefined;
+		_lightClassToType.has( light.constructor );
 
 };
 
@@ -127,7 +135,7 @@ class DynamicLightsNode extends LightsNode {
 
 			}
 
-			const typeName = light.constructor.name;
+			const typeName = _lightClassToType.get( light.constructor );
 			const typeLights = lightsByType.get( typeName );
 
 			if ( typeLights === undefined ) {
