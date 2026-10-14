@@ -559,7 +559,27 @@ class WebGPUAttributeUtils {
 		submit( device, gpuCommands );
 
 		// map the data to the CPU
-		await readBufferGPU.mapAsync( GPUMapMode.READ, 0, byteLength );
+		try {
+
+			await readBufferGPU.mapAsync( GPUMapMode.READ, 0, byteLength );
+
+		} catch ( e ) {
+
+			// a failed readback must not leak its temporary buffer or leave a readback buffer locked
+
+			if ( target !== null && target.isReadbackBuffer ) {
+
+				target._mapped = false;
+
+			} else {
+
+				readBufferGPU.destroy();
+
+			}
+
+			throw e;
+
+		}
 
 		if ( target === null ) {
 
