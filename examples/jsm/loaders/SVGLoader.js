@@ -303,8 +303,7 @@ class SVGLoader extends Loader {
 			const control = new Vector2();
 
 			const firstPoint = new Vector2();
-			let isFirstPoint = true;
-			let doSetFirstPoint = false;
+			let isPathClosed = false;
 
 			const d = node.getAttribute( 'd' );
 
@@ -321,10 +320,17 @@ class SVGLoader extends Loader {
 				const type = command.charAt( 0 );
 				const data = command.slice( 1 ).trim();
 
-				if ( isFirstPoint === true ) {
+				if ( isPathClosed === true ) {
 
-					doSetFirstPoint = true;
-					isFirstPoint = false;
+					// commands after Z without M start a new subpath at the initial point
+
+					if ( type !== 'M' && type !== 'm' && type !== 'Z' && type !== 'z' ) {
+
+						path.moveTo( firstPoint.x, firstPoint.y );
+
+					}
+
+					isPathClosed = false;
 
 				}
 
@@ -367,8 +373,6 @@ class SVGLoader extends Loader {
 							control.y = point.y;
 							path.lineTo( point.x, point.y );
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
-
 						}
 
 						break;
@@ -382,8 +386,6 @@ class SVGLoader extends Loader {
 							control.x = point.x;
 							control.y = point.y;
 							path.lineTo( point.x, point.y );
-
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
 
@@ -399,8 +401,6 @@ class SVGLoader extends Loader {
 							control.x = point.x;
 							control.y = point.y;
 							path.lineTo( point.x, point.y );
-
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
 
@@ -424,8 +424,6 @@ class SVGLoader extends Loader {
 							point.x = numbers[ j + 4 ];
 							point.y = numbers[ j + 5 ];
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
-
 						}
 
 						break;
@@ -448,8 +446,6 @@ class SVGLoader extends Loader {
 							point.x = numbers[ j + 2 ];
 							point.y = numbers[ j + 3 ];
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
-
 						}
 
 						break;
@@ -469,8 +465,6 @@ class SVGLoader extends Loader {
 							control.y = numbers[ j + 1 ];
 							point.x = numbers[ j + 2 ];
 							point.y = numbers[ j + 3 ];
-
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
 
@@ -494,8 +488,6 @@ class SVGLoader extends Loader {
 							point.x = numbers[ j + 0 ];
 							point.y = numbers[ j + 1 ];
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
-
 						}
 
 						break;
@@ -516,8 +508,6 @@ class SVGLoader extends Loader {
 							parseArcCommand(
 								path, numbers[ j ], numbers[ j + 1 ], numbers[ j + 2 ], numbers[ j + 3 ], numbers[ j + 4 ], start, point
 							);
-
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
 
@@ -559,8 +549,6 @@ class SVGLoader extends Loader {
 							control.y = point.y;
 							path.lineTo( point.x, point.y );
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
-
 						}
 
 						break;
@@ -574,8 +562,6 @@ class SVGLoader extends Loader {
 							control.x = point.x;
 							control.y = point.y;
 							path.lineTo( point.x, point.y );
-
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
 
@@ -591,8 +577,6 @@ class SVGLoader extends Loader {
 							control.x = point.x;
 							control.y = point.y;
 							path.lineTo( point.x, point.y );
-
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
 
@@ -616,8 +600,6 @@ class SVGLoader extends Loader {
 							point.x += numbers[ j + 4 ];
 							point.y += numbers[ j + 5 ];
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
-
 						}
 
 						break;
@@ -640,8 +622,6 @@ class SVGLoader extends Loader {
 							point.x += numbers[ j + 2 ];
 							point.y += numbers[ j + 3 ];
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
-
 						}
 
 						break;
@@ -661,8 +641,6 @@ class SVGLoader extends Loader {
 							control.y = point.y + numbers[ j + 1 ];
 							point.x += numbers[ j + 2 ];
 							point.y += numbers[ j + 3 ];
-
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
 
@@ -686,8 +664,6 @@ class SVGLoader extends Loader {
 							point.x = point.x + numbers[ j + 0 ];
 							point.y = point.y + numbers[ j + 1 ];
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
-
 						}
 
 						break;
@@ -709,8 +685,6 @@ class SVGLoader extends Loader {
 								path, numbers[ j ], numbers[ j + 1 ], numbers[ j + 2 ], numbers[ j + 3 ], numbers[ j + 4 ], start, point
 							);
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
-
 						}
 
 						break;
@@ -724,7 +698,7 @@ class SVGLoader extends Loader {
 							// Reset point to beginning of Path
 							point.copy( firstPoint );
 							path.currentPath.currentPoint.copy( point );
-							isFirstPoint = true;
+							isPathClosed = true;
 
 						}
 
@@ -736,8 +710,6 @@ class SVGLoader extends Loader {
 				}
 
 				// console.log( type, parseFloats( data ), parseFloats( data ).length  )
-
-				doSetFirstPoint = false;
 
 			}
 
