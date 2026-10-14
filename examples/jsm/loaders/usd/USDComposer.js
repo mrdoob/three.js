@@ -3874,7 +3874,6 @@ class USDComposer {
 			// Try loading via LoadingManager if available
 			if ( this.manager ) {
 
-				// ImageLoader applies the manager URL modifier once, when starting the request.
 				return this._createTextureFromData( baseName, textureAttrs, transformAttrs );
 
 			}
@@ -3912,7 +3911,6 @@ class USDComposer {
 
 		}
 
-		// Use ImageLoader for CORS, loading-manager tracking and image caching.
 		this.texturePromises.push( new Promise( ( resolve ) => {
 
 			this.imageLoader.load( url, function ( image ) {
