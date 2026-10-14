@@ -70,15 +70,17 @@ export default QUnit.module( 'Loaders', () => {
 			assert.strictEqual( loader.setPath( '' ), loader, 'Setters remain chainable.' );
 			assert.strictEqual( loader.path, '', 'Setters override constructor settings.' );
 
+			assert.strictEqual( new Loader( undefined, { crossOrigin: undefined } ).crossOrigin, undefined, 'Explicit undefined disables image CORS.' );
+
 			const defaults = new Loader();
 			const undefinedSettings = {};
 			for ( const property of [ 'crossOrigin', 'withCredentials', 'path', 'resourcePath', 'requestHeader', 'priority', 'cache' ] ) {
 
-				undefinedSettings[ property ] = undefined;
+				if ( property !== 'crossOrigin' ) undefinedSettings[ property ] = undefined;
 
 			}
 
-			assert.deepEqual( new Loader( undefined, undefinedSettings ), defaults, 'Undefined preserves all defaults.' );
+			assert.deepEqual( new Loader( undefined, undefinedSettings ), defaults, 'Undefined preserves defaults except for the image CORS policy.' );
 			assert.notStrictEqual( defaults.requestHeader, new Loader().requestHeader, 'Default headers are unique to each loader.' );
 			assert.strictEqual( new Loader( undefined, { withCredentials: false } ).withCredentials, false, 'False is retained.' );
 

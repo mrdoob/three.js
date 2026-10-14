@@ -13,7 +13,7 @@ class Loader {
 	 * @param {LoadingManager} [manager] - The loading manager.
 	 * @param {Object} [parameters={}] - Initial settings, copied from the defined properties.
 	 * Later changes to this object do not update the loader. Request headers are shared by reference.
-	 * @param {string} [parameters.crossOrigin] - The cross-origin policy.
+	 * @param {string} [parameters.crossOrigin] - The cross-origin policy. Explicit `undefined` disables CORS for image elements.
 	 * @param {boolean} [parameters.withCredentials] - Whether to include credentials.
 	 * @param {string} [parameters.path] - The base path for the asset.
 	 * @param {string} [parameters.resourcePath] - The base path for additional resources.
@@ -38,7 +38,7 @@ class Loader {
 		 * @type {string}
 		 * @default 'anonymous'
 		 */
-		this.crossOrigin = ( parameters.crossOrigin !== undefined ) ? parameters.crossOrigin : 'anonymous';
+		this.crossOrigin = ( 'crossOrigin' in parameters ) ? parameters.crossOrigin : 'anonymous';
 
 		/**
 		 * Whether the XMLHttpRequest uses credentials.
