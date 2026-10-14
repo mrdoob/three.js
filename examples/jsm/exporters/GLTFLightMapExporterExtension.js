@@ -1,4 +1,4 @@
-import { Color, LinearSRGBColorSpace, NoColorSpace, RGBAFormat, Source, SRGBColorSpace, UnsignedByteType } from 'three';
+import { Color, LinearSRGBColorSpace, NoColorSpace, RGBAFormat, SRGBColorSpace, TextureSource, UnsignedByteType } from 'three';
 
 /**
  * A glTF exporter plugin for the proposed extension `KHR_lightmap` (glTF 2.1).
@@ -159,7 +159,7 @@ class GLTFLightMapExporterExtension {
 		}
 
 		const texture = readableMap.clone();
-		texture.source = new Source( outputImage );
+		texture.source = new TextureSource( outputImage );
 		texture.colorSpace = LinearSRGBColorSpace;
 		this.textureCache.set( map, texture );
 		return texture;
