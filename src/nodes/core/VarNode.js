@@ -173,6 +173,8 @@ class VarNode extends Node {
 		// An assignable node that is not assigned is just its value.
 		if ( this.assignable && data.forceDeclaration !== true && data.assign !== true ) {
 
+			this._buildBeforeNodes( builder, output );
+
 			return this.node.build( builder, output );
 
 		}

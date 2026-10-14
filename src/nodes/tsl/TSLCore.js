@@ -646,7 +646,7 @@ class ShaderCallNodeInternal extends Node {
 
 	build( builder, output = null ) {
 
-		// The call does not use Node.build(), so it handles shared and overridden nodes and assignable state here.
+		// The call does not use Node.build(), so it handles shared and overridden nodes, before-nodes and assignable state here.
 		const refNode = this.getShared( builder );
 
 		if ( this !== refNode ) {
@@ -654,6 +654,8 @@ class ShaderCallNodeInternal extends Node {
 			return refNode.build( builder, output );
 
 		}
+
+		this._buildBeforeNodes( builder, output );
 
 		let result = null;
 
