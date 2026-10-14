@@ -9,9 +9,8 @@
 	<body>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - loader priority<br>
-			Demonstrates priority loading of assets.<br>
+			Click to reload all assets with main asset at the chosen priority:<br>
 			Main asset priority: <a href="?priority=high">High</a> | <a href="?priority=low">Low</a><br>
-			Click either priority to reload all assets and show the main asset's load time.<br>
 			<span id="status"></span>
 		</div>
 		<script type="importmap">
@@ -37,6 +36,8 @@
 			scene.add( light );
 			const camera = new THREE.PerspectiveCamera( 45, innerWidth / innerHeight, 0.1, 100 );
 			camera.position.set( 3, 2, 3 );
+			camera.zoom = 3.4;
+			camera.updateProjectionMatrix();
 			const renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( devicePixelRatio );
 			renderer.setSize( innerWidth, innerHeight );
@@ -46,7 +47,6 @@
 			const start = performance.now();
 			let backgroundCount = 0;
 			let heroTime = 'loading';
-			let errors = 0;
 
 			const background = new GLTFLoader().setPriority( 'auto' ).setCache( 'reload' );
 			const hero = new GLTFLoader().setPriority( priority ).setCache( 'reload' );
@@ -105,15 +105,13 @@
 
 			function updateStatus() {
 
-				status.textContent = `Main asset (${ priority }): ${ heroTime }; background assets: ${ backgroundCount } / ${ models.length }; errors: ${ errors }`;
+				status.textContent = `Main asset (${ priority }): ${ heroTime }; background assets: ${ backgroundCount } / ${ models.length }`;
 
 			}
 
 			function onError( error ) {
 
-				errors ++;
 				console.error( error );
-				updateStatus();
 
 			}
 
