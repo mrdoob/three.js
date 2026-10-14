@@ -319,4 +319,3 @@ export default QUnit.module( 'Addons', () => {
 	} );
 
 } );
-
