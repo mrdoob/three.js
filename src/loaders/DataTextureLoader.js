@@ -45,8 +45,7 @@ class DataTextureLoader extends Loader {
 
 		const texture = new DataTexture();
 
-		const loader = new FileLoader( this.manager, this );
-		loader.setResponseType( 'arraybuffer' );
+		const loader = new FileLoader( this.manager, { ...this, responseType: 'arraybuffer' } );
 
 		loader.load( url, function ( buffer ) {
 

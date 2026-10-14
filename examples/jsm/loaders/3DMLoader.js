@@ -146,13 +146,13 @@ class Rhino3dmLoader extends Loader {
 	 */
 	load( url, onLoad, onProgress, onError ) {
 
-		const loader = new FileLoader( this.manager );
-		loader.setPriority( this.priority );
-		loader.setCache( this.cache );
-
-		loader.setPath( this.path );
-		loader.setResponseType( 'arraybuffer' );
-		loader.setRequestHeader( this.requestHeader );
+		const loader = new FileLoader( this.manager, {
+			priority: this.priority,
+			cache: this.cache,
+			path: this.path,
+			responseType: 'arraybuffer',
+			requestHeader: this.requestHeader
+		} );
 
 		this.url = url;
 
@@ -973,10 +973,11 @@ class Rhino3dmLoader extends Loader {
 		if ( ! this.libraryPending ) {
 
 			// Load rhino3dm wrapper.
-			const jsLoader = new FileLoader( this.manager );
-			jsLoader.setPriority( this.priority );
-			jsLoader.setCache( this.cache );
-			jsLoader.setPath( this.libraryPath );
+			const jsLoader = new FileLoader( this.manager, {
+				priority: this.priority,
+				cache: this.cache,
+				path: this.libraryPath
+			} );
 			const jsContent = new Promise( ( resolve, reject ) => {
 
 				jsLoader.load( 'rhino3dm.js', resolve, undefined, reject );
@@ -984,11 +985,12 @@ class Rhino3dmLoader extends Loader {
 			} );
 
 			// Load rhino3dm WASM binary.
-			const binaryLoader = new FileLoader( this.manager );
-			binaryLoader.setPriority( this.priority );
-			binaryLoader.setCache( this.cache );
-			binaryLoader.setPath( this.libraryPath );
-			binaryLoader.setResponseType( 'arraybuffer' );
+			const binaryLoader = new FileLoader( this.manager, {
+				priority: this.priority,
+				cache: this.cache,
+				path: this.libraryPath,
+				responseType: 'arraybuffer'
+			} );
 			const binaryContent = new Promise( ( resolve, reject ) => {
 
 				binaryLoader.load( 'rhino3dm.wasm', resolve, undefined, reject );

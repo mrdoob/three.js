@@ -284,16 +284,20 @@ class KTX2Loader extends Loader {
 
 		if ( ! this.transcoderPending ) {
 
-			const jsLoader = new FileLoader( this.manager );
-			jsLoader.setPriority( this.priority );
-			jsLoader.setCache( this.cache );
-			jsLoader.setWithCredentials( this.withCredentials );
+			const jsLoader = new FileLoader( this.manager, {
+				path: this.transcoderPath,
+				priority: this.priority,
+				cache: this.cache,
+				withCredentials: this.withCredentials
+			} );
 
-			const binaryLoader = new FileLoader( this.manager );
-			binaryLoader.setPriority( this.priority );
-			binaryLoader.setCache( this.cache );
-			binaryLoader.setWithCredentials( this.withCredentials );
-			binaryLoader.setResponseType( 'arraybuffer' );
+			const binaryLoader = new FileLoader( this.manager, {
+				path: this.transcoderPath,
+				priority: this.priority,
+				cache: this.cache,
+				withCredentials: this.withCredentials,
+				responseType: 'arraybuffer'
+			} );
 
 			let jsContent, binaryContent;
 			if ( this.transcoderPath === '' ) {
@@ -304,11 +308,9 @@ class KTX2Loader extends Loader {
 			} else {
 
 				// Load transcoder wrapper.
-				jsLoader.setPath( this.transcoderPath );
 				jsContent = jsLoader.loadAsync( 'basis_transcoder.js' );
 
 				// Load transcoder WASM binary.
-				binaryLoader.setPath( this.transcoderPath );
 				binaryContent = binaryLoader.loadAsync( 'basis_transcoder.wasm' );
 
 			}
@@ -384,10 +386,9 @@ class KTX2Loader extends Loader {
 
 		}
 
-		const loader = new FileLoader( this.manager, this );
+		const loader = new FileLoader( this.manager, { ...this, responseType: 'arraybuffer' } );
 
 		loader.setCrossOrigin( this.crossOrigin );
-		loader.setResponseType( 'arraybuffer' );
 
 		loader.load( url, ( buffer ) => {
 

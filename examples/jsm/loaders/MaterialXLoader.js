@@ -103,35 +103,35 @@ class MaterialXLoader extends Loader {
 		// have finished, matching the lifecycle used by GLTFLoader.
 		this.manager.itemStart( url );
 
-		const loader = new FileLoader( this.manager );
-		loader.setPriority( this.priority );
-		loader.setCache( this.cache );
-		loader.setPath( this.path );
-		loader
-			.setResponseType( 'arraybuffer' )
-			.load( url, ( data ) => {
+		const loader = new FileLoader( this.manager, {
+			priority: this.priority,
+			cache: this.cache,
+			path: this.path,
+			responseType: 'arraybuffer'
+		} );
+		loader.load( url, ( data ) => {
 
-				try {
+			try {
 
-					const parsed = this._parseBuffer( data, url, options );
+				const parsed = this._parseBuffer( data, url, options );
 
-					parsed.document.waitForResources().then( () => {
+				parsed.document.waitForResources().then( () => {
 
-						parsed.result.errors = parsed.log.errors;
-						parsed.result.warnings = parsed.log.warnings;
-						this._throwOnErrors( parsed.log, options );
-						onLoad( parsed.result );
-						this.manager.itemEnd( url );
+					parsed.result.errors = parsed.log.errors;
+					parsed.result.warnings = parsed.log.warnings;
+					this._throwOnErrors( parsed.log, options );
+					onLoad( parsed.result );
+					this.manager.itemEnd( url );
 
-					} ).catch( _onError );
+				} ).catch( _onError );
 
-				} catch ( e ) {
+			} catch ( e ) {
 
-					_onError( e );
+				_onError( e );
 
-				}
+			}
 
-			}, onProgress, _onError );
+		}, onProgress, _onError );
 
 		return this;
 

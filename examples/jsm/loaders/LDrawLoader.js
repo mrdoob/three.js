@@ -626,12 +626,13 @@ class LDrawParsedCache {
 			}
 
 			const loader = this.loader;
-			const fileLoader = new FileLoader( loader.manager );
-			fileLoader.setPriority( loader.priority );
-			fileLoader.setCache( loader.cache );
-			fileLoader.setPath( loader.partsLibraryPath );
-			fileLoader.setRequestHeader( loader.requestHeader );
-			fileLoader.setWithCredentials( loader.withCredentials );
+			const fileLoader = new FileLoader( loader.manager, {
+				priority: loader.priority,
+				cache: loader.cache,
+				path: loader.partsLibraryPath,
+				requestHeader: loader.requestHeader,
+				withCredentials: loader.withCredentials
+			} );
 
 			try {
 

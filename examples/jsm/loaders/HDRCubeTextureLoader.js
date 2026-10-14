@@ -96,44 +96,44 @@ class HDRCubeTextureLoader extends Loader {
 
 		function loadHDRData( i, onLoad, onProgress, onError ) {
 
-			const loader = new FileLoader( scope.manager );
-			loader.setPriority( scope.priority );
-			loader.setCache( scope.cache );
-			loader
-				.setPath( scope.path )
-				.setResponseType( 'arraybuffer' )
-				.setWithCredentials( scope.withCredentials )
-				.load( urls[ i ], function ( buffer ) {
+			const loader = new FileLoader( scope.manager, {
+				priority: scope.priority,
+				cache: scope.cache,
+				path: scope.path,
+				responseType: 'arraybuffer',
+				withCredentials: scope.withCredentials
+			} );
+			loader.load( urls[ i ], function ( buffer ) {
 
-					loaded ++;
+				loaded ++;
 
-					const texData = scope.hdrLoader.parse( buffer );
+				const texData = scope.hdrLoader.parse( buffer );
 
-					if ( ! texData ) return;
+				if ( ! texData ) return;
 
-					if ( texData.data !== undefined ) {
+				if ( texData.data !== undefined ) {
 
-						const dataTexture = new DataTexture( texData.data, texData.width, texData.height );
+					const dataTexture = new DataTexture( texData.data, texData.width, texData.height );
 
-						dataTexture.type = texture.type;
-						dataTexture.colorSpace = texture.colorSpace;
-						dataTexture.format = texture.format;
-						dataTexture.minFilter = texture.minFilter;
-						dataTexture.magFilter = texture.magFilter;
-						dataTexture.generateMipmaps = texture.generateMipmaps;
+					dataTexture.type = texture.type;
+					dataTexture.colorSpace = texture.colorSpace;
+					dataTexture.format = texture.format;
+					dataTexture.minFilter = texture.minFilter;
+					dataTexture.magFilter = texture.magFilter;
+					dataTexture.generateMipmaps = texture.generateMipmaps;
 
-						texture.images[ i ] = dataTexture;
+					texture.images[ i ] = dataTexture;
 
-					}
+				}
 
-					if ( loaded === 6 ) {
+				if ( loaded === 6 ) {
 
-						texture.needsUpdate = true;
-						if ( onLoad ) onLoad( texture );
+					texture.needsUpdate = true;
+					if ( onLoad ) onLoad( texture );
 
-					}
+				}
 
-				}, onProgress, onError );
+			}, onProgress, onError );
 
 		}
 

@@ -71,8 +71,7 @@ class TDSLoader extends Loader {
 
 		const path = ( this.path === '' ) ? LoaderUtils.extractUrlBase( url ) : this.path;
 
-		const loader = new FileLoader( this.manager, this );
-		loader.setResponseType( 'arraybuffer' );
+		const loader = new FileLoader( this.manager, { ...this, responseType: 'arraybuffer' } );
 
 		loader.load( url, function ( data ) {
 

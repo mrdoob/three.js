@@ -86,11 +86,12 @@ class LWOLoader extends Loader {
 		// give the mesh a default name based on the filename
 		const modelName = url.split( path ).pop().split( '.' )[ 0 ];
 
-		const loader = new FileLoader( this.manager );
-		loader.setPriority( this.priority );
-		loader.setCache( this.cache );
-		loader.setPath( scope.path );
-		loader.setResponseType( 'arraybuffer' );
+		const loader = new FileLoader( this.manager, {
+			priority: this.priority,
+			cache: this.cache,
+			path: scope.path,
+			responseType: 'arraybuffer'
+		} );
 
 		loader.load( url, function ( buffer ) {
 

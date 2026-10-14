@@ -69,11 +69,12 @@ export class LUT3dlLoader extends Loader {
 	 */
 	load( url, onLoad, onProgress, onError ) {
 
-		const loader = new FileLoader( this.manager );
-		loader.setPriority( this.priority );
-		loader.setCache( this.cache );
-		loader.setPath( this.path );
-		loader.setResponseType( 'text' );
+		const loader = new FileLoader( this.manager, {
+			priority: this.priority,
+			cache: this.cache,
+			path: this.path,
+			responseType: 'text'
+		} );
 		loader.load( url, text => {
 
 			try {
