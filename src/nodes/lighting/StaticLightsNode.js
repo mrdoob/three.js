@@ -40,9 +40,10 @@ class StaticLightsNode extends LightingNode {
 		const lightAttribute = new StorageBufferAttribute( grid.data, 4 );
 
 		// Stable names allow materials using the same grid to share shader programs.
-		this.cellsNode = storage( cellAttribute, 'uvec2', cellAttribute.count ).toReadOnly().setName( 'staticLightCells' );
-		this.indicesNode = storage( indexAttribute, 'uint', indexAttribute.count ).toReadOnly().setName( 'staticLightIndices' );
-		this.lightsNode = storage( lightAttribute, 'vec4', lightAttribute.count ).toReadOnly().setName( 'staticLights' );
+		// PBOs let the WebGL backend read the grid without storage buffers.
+		this.cellsNode = storage( cellAttribute, 'uvec2', cellAttribute.count ).toReadOnly().setPBO( true ).setName( 'staticLightCells' );
+		this.indicesNode = storage( indexAttribute, 'uint', indexAttribute.count ).toReadOnly().setPBO( true ).setName( 'staticLightIndices' );
+		this.lightsNode = storage( lightAttribute, 'vec4', lightAttribute.count ).toReadOnly().setPBO( true ).setName( 'staticLights' );
 
 	}
 
@@ -134,13 +135,19 @@ class StaticLightsNode extends LightingNode {
 	}
 
 	/**
-	 * Releases the light grid's GPU buffers.
+	 * Releases the light grid's GPU buffers and PBO textures.
 	 */
 	dispose() {
 
-		this.cellsNode.value.dispose();
-		this.indicesNode.value.dispose();
-		this.lightsNode.value.dispose();
+		for ( const { value } of [ this.cellsNode, this.indicesNode, this.lightsNode ] ) {
+
+			// Disposing the attribute does not release the texture the WebGL backend
+			// creates for it.
+			if ( value.pbo !== undefined ) value.pbo.dispose();
+
+			value.dispose();
+
+		}
 
 		super.dispose();
 

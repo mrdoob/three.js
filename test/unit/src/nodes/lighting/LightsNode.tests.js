@@ -6,6 +6,7 @@ import Lighting from '../../../../../src/renderers/common/Lighting.js';
 import { PointLight } from '../../../../../src/lights/PointLight.js';
 import { SpotLight } from '../../../../../src/lights/SpotLight.js';
 import { Scene } from '../../../../../src/scenes/Scene.js';
+import { Texture } from '../../../../../src/textures/Texture.js';
 import '../../../../../src/renderers/webgpu/nodes/StandardNodeLibrary.js';
 
 function createBuilder() {
@@ -180,6 +181,27 @@ export default QUnit.module( 'Nodes', () => {
 
 				assert.ok( node.setupLightsNode( createBuilder() ).some( entry => entry instanceof StaticLightsNode ), 'batching keeps working' );
 				node.dispose();
+
+			} );
+
+			QUnit.test( 'batches read through PBOs and release their textures', ( assert ) => {
+
+				const node = new LightsNode().setLights( [ createPoint() ] );
+				const batch = node.setupLightsNode( createBuilder() )[ 0 ];
+				const storageNodes = [ batch.cellsNode, batch.indicesNode, batch.lightsNode ];
+				let disposed = 0;
+
+				for ( const storageNode of storageNodes ) {
+
+					// Emulates the texture the WebGL backend attaches to a PBO attribute.
+					storageNode.value.pbo = new Texture();
+					storageNode.value.pbo.addEventListener( 'dispose', () => disposed ++ );
+
+				}
+
+				assert.true( storageNodes.every( storageNode => storageNode.isPBO ), 'storage nodes use PBOs without storage buffers' );
+				node.dispose();
+				assert.strictEqual( disposed, 3, 'PBO textures are disposed with the batch' );
 
 			} );
 
