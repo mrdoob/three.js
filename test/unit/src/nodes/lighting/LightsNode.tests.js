@@ -3,10 +3,12 @@ import StaticLightsNode from '../../../../../src/nodes/lighting/StaticLightsNode
 import PointLightNode from '../../../../../src/nodes/lighting/PointLightNode.js';
 import PhysicalLightingModel from '../../../../../src/nodes/functions/PhysicalLightingModel.js';
 import Lighting from '../../../../../src/renderers/common/Lighting.js';
+import { DirectionalLight } from '../../../../../src/lights/DirectionalLight.js';
 import { PointLight } from '../../../../../src/lights/PointLight.js';
 import { SpotLight } from '../../../../../src/lights/SpotLight.js';
 import { Scene } from '../../../../../src/scenes/Scene.js';
 import { Texture } from '../../../../../src/textures/Texture.js';
+import { getConsoleFunction, setConsoleFunction } from '../../../../../src/utils.js';
 import '../../../../../src/renderers/webgpu/nodes/StandardNodeLibrary.js';
 
 function createBuilder() {
@@ -59,7 +61,7 @@ export default QUnit.module( 'Nodes', () => {
 
 			} );
 
-			QUnit.test( 'unsupported lights retain their original nodes', ( assert ) => {
+			QUnit.test( 'unsupported lights retain their original nodes and warn once', ( assert ) => {
 
 				const shadow = createPoint();
 				shadow.castShadow = true;
@@ -73,12 +75,41 @@ export default QUnit.module( 'Nodes', () => {
 				class CustomPointLightNode extends PointLightNode {}
 				const custom = createPoint();
 				custom._lightNode = CustomPointLightNode;
-				const lights = [ shadow, infinite, customColor, projected, custom ];
-				const node = new LightsNode().setLights( lights );
-				const result = node.setupLightsNode( createBuilder() );
+				const directional = new DirectionalLight();
+				directional.static = true;
+				const dynamic = new PointLight();
+				dynamic.castShadow = true;
+				const lights = [ shadow, infinite, customColor, projected, custom, directional, dynamic ];
 
-				assert.deepEqual( result.map( entry => entry.light ), lights );
-				assert.strictEqual( node._staticLightsNodes.size, 0 );
+				// Unique types keep the messages out of the global warnOnce() cache.
+				lights.forEach( ( light, i ) => light.type = 'UnsupportedLight' + i );
+
+				const warnings = [];
+				const consoleFunction = getConsoleFunction();
+				setConsoleFunction( ( type, message ) => warnings.push( message ) );
+
+				try {
+
+					const node = new LightsNode().setLights( lights );
+					const result = node.setupLightsNode( createBuilder() );
+					node.setupLightsNode( createBuilder() );
+
+					assert.deepEqual( result.map( entry => entry.light ), lights );
+					assert.strictEqual( node._staticLightsNodes.size, 0 );
+					assert.deepEqual( warnings, [
+						'THREE.LightsNode: Static UnsupportedLight0 can\'t be batched, shadows are not supported.',
+						'THREE.LightsNode: Static UnsupportedLight1 can\'t be batched, a finite `distance` is required.',
+						'THREE.LightsNode: Static UnsupportedLight2 can\'t be batched, `colorNode` is not supported.',
+						'THREE.LightsNode: Static UnsupportedLight3 can\'t be batched, `map` is not supported.',
+						'THREE.LightsNode: Static UnsupportedLight4 can\'t be batched, custom light nodes are not supported.',
+						'THREE.LightsNode: Static UnsupportedLight5 can\'t be batched, only point and spot lights are supported.'
+					], 'each unsupported static light warns once' );
+
+				} finally {
+
+					setConsoleFunction( consoleFunction );
+
+				}
 
 			} );
 

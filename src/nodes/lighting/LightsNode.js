@@ -1,21 +1,33 @@
 import Node from '../core/Node.js';
 import { property, vec3 } from '../tsl/TSLBase.js';
 import { hashArray } from '../core/NodeUtils.js';
-import { warn } from '../../utils.js';
+import { warn, warnOnce } from '../../utils.js';
 import PointLightNode from './PointLightNode.js';
 import SpotLightNode from './SpotLightNode.js';
 import StaticLightsNode from './StaticLightsNode.js';
 import { buildStaticLightGrid } from './StaticLightGrid.js';
 
-const canBatchStaticLight = ( light ) => {
+/**
+ * Returns why a light can't be batched into the static light grid.
+ *
+ * @private
+ * @param {Light} light - The light.
+ * @return {?string} The reason, or `null` if the light can be batched.
+ */
+const getStaticLightIssue = ( light ) => {
 
-	return light.static === true && light.castShadow === false && light.colorNode == null &&
-		Number.isFinite( light.distance ) && light.distance > 0 && (
-		( light.isPointLight === true && light._lightNode === PointLightNode ) ||
-			( light.isSpotLight === true && light._lightNode === SpotLightNode && light.map === null )
-	);
+	if ( light.isPointLight !== true && light.isSpotLight !== true ) return 'only point and spot lights are supported';
+	if ( light._lightNode !== ( light.isSpotLight === true ? SpotLightNode : PointLightNode ) ) return 'custom light nodes are not supported';
+	if ( light.castShadow !== false ) return 'shadows are not supported';
+	if ( Number.isFinite( light.distance ) === false || light.distance <= 0 ) return 'a finite `distance` is required';
+	if ( light.colorNode != null ) return '`colorNode` is not supported';
+	if ( light.isSpotLight === true && light.map !== null ) return '`map` is not supported';
+
+	return null;
 
 };
+
+const canBatchStaticLight = ( light ) => light.static === true && getStaticLightIssue( light ) === null;
 
 /**
  * A node representing the total diffuse light.
@@ -260,6 +272,14 @@ class LightsNode extends Node {
 		for ( const light of lights ) {
 
 			if ( staticLightsNode !== null && canBatchStaticLight( light ) ) continue;
+
+			if ( light.static === true ) {
+
+				const issue = getStaticLightIssue( light );
+
+				if ( issue !== null ) warnOnce( `LightsNode: Static ${ light.type } can't be batched, ${ issue }.` );
+
+			}
 
 			if ( light.isNode ) {
 
