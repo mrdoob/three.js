@@ -97,6 +97,11 @@ class GLTFLightMapExporterExtension {
 	 */
 	async getLinearTextureAsync( map ) {
 
+		if ( ! map.isCompressedTexture && map.image.data !== undefined && ( map.format !== RGBAFormat || map.type !== UnsignedByteType ) ) {
+
+			throw new Error( 'KHR_lightmap: Data textures must use unsigned byte RGBA data. Normalize HDR irradiance and store its scale in lightMapIntensity before exporting.' );
+
+		}
 		if ( map.colorSpace === LinearSRGBColorSpace || map.colorSpace === NoColorSpace ) return map;
 		if ( this.textureCache.has( map ) ) return this.textureCache.get( map );
 
