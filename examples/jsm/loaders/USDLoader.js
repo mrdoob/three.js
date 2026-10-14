@@ -241,11 +241,13 @@ class USDLoader extends Loader {
 
 		};
 
+		const composer = new USDComposer( scope.manager );
+		composer.imageLoader.setCrossOrigin( scope.crossOrigin );
+
 		// USDA (standalone)
 
 		if ( typeof buffer === 'string' ) {
 
-			const composer = new USDComposer( scope.manager );
 			const data = usda.parseData( buffer );
 			return finalize( composer, composer.compose( data, {}, {}, path ) );
 
@@ -255,7 +257,6 @@ class USDLoader extends Loader {
 
 		if ( isCrateFile( buffer ) ) {
 
-			const composer = new USDComposer( scope.manager );
 			const data = usdc.parseData( toArrayBuffer( buffer ) );
 			return finalize( composer, composer.compose( data, {}, {}, path ) );
 
@@ -277,7 +278,6 @@ class USDLoader extends Loader {
 
 			}
 
-			const composer = new USDComposer( scope.manager );
 			const data = assets[ filename ];
 			if ( ! data ) {
 
@@ -291,7 +291,6 @@ class USDLoader extends Loader {
 
 		// USDA (standalone, as ArrayBuffer)
 
-		const composer = new USDComposer( scope.manager );
 		const text = textDecoder.decode( bytes );
 		const data = usda.parseData( text );
 		return finalize( composer, composer.compose( data, {}, {}, path ) );
