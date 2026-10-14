@@ -146,7 +146,7 @@ class Rhino3dmLoader extends Loader {
 	 */
 	load( url, onLoad, onProgress, onError ) {
 
-		const loader = new FileLoader( this.manager );
+		const loader = new FileLoader( this.manager ).setPriority( this.priority ).setCache( this.cache );
 
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
@@ -377,7 +377,7 @@ class Rhino3dmLoader extends Loader {
 
 		}
 
-		const textureLoader = new TextureLoader();
+		const textureLoader = new TextureLoader( this.manager ).setPriority( this.priority ).setCache( this.cache );
 
 		for ( let i = 0; i < material.textures.length; i ++ ) {
 
@@ -532,7 +532,7 @@ class Rhino3dmLoader extends Loader {
 
 		if ( renderEnvironment ) {
 
-			new EXRLoader().load( renderEnvironment.image, function ( texture ) {
+			new EXRLoader( this.manager ).setPriority( this.priority ).setCache( this.cache ).load( renderEnvironment.image, function ( texture ) {
 
 				texture.mapping = EquirectangularReflectionMapping;
 				mat.envMap = texture;
@@ -966,7 +966,7 @@ class Rhino3dmLoader extends Loader {
 		if ( ! this.libraryPending ) {
 
 			// Load rhino3dm wrapper.
-			const jsLoader = new FileLoader( this.manager );
+			const jsLoader = new FileLoader( this.manager ).setPriority( this.priority ).setCache( this.cache );
 			jsLoader.setPath( this.libraryPath );
 			const jsContent = new Promise( ( resolve, reject ) => {
 
@@ -975,7 +975,7 @@ class Rhino3dmLoader extends Loader {
 			} );
 
 			// Load rhino3dm WASM binary.
-			const binaryLoader = new FileLoader( this.manager );
+			const binaryLoader = new FileLoader( this.manager ).setPriority( this.priority ).setCache( this.cache );
 			binaryLoader.setPath( this.libraryPath );
 			binaryLoader.setResponseType( 'arraybuffer' );
 			const binaryContent = new Promise( ( resolve, reject ) => {

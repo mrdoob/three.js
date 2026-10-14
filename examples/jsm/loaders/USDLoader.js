@@ -52,7 +52,7 @@ class USDLoader extends Loader {
 
 		const path = ( scope.path === '' ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
 
-		const loader = new FileLoader( scope.manager );
+		const loader = new FileLoader( scope.manager ).setPriority( scope.priority ).setCache( scope.cache );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );

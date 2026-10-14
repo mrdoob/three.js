@@ -91,7 +91,7 @@ class ThreeMFLoader extends Loader {
 	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
-		const loader = new FileLoader( scope.manager );
+		const loader = new FileLoader( scope.manager ).setPriority( scope.priority ).setCache( scope.cache );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
@@ -131,7 +131,7 @@ class ThreeMFLoader extends Loader {
 	parse( data ) {
 
 		const scope = this;
-		const textureLoader = new TextureLoader( this.manager );
+		const textureLoader = new TextureLoader( this.manager ).setPriority( this.priority ).setCache( this.cache );
 
 		function loadDocument( data ) {
 

@@ -86,7 +86,7 @@ class LWOLoader extends Loader {
 		// give the mesh a default name based on the filename
 		const modelName = url.split( path ).pop().split( '.' )[ 0 ];
 
-		const loader = new FileLoader( this.manager );
+		const loader = new FileLoader( this.manager ).setPriority( this.priority ).setCache( this.cache );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 
@@ -134,7 +134,7 @@ class LWOLoader extends Loader {
 
 		// console.log( 'lwoTree', lwoTree );
 
-		const textureLoader = new TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
+		const textureLoader = new TextureLoader( this.manager ).setPriority( this.priority ).setCache( this.cache ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
 		return new LWOTreeParser( textureLoader ).parse( modelName );
 

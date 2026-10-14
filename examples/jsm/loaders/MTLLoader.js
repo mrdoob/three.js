@@ -54,7 +54,7 @@ class MTLLoader extends Loader {
 
 		const path = ( this.path === '' ) ? LoaderUtils.extractUrlBase( url ) : this.path;
 
-		const loader = new FileLoader( this.manager );
+		const loader = new FileLoader( this.manager ).setPriority( this.priority ).setCache( this.cache );
 		loader.setPath( this.path );
 		loader.setRequestHeader( this.requestHeader );
 		loader.setWithCredentials( this.withCredentials );
@@ -158,6 +158,8 @@ class MTLLoader extends Loader {
 		const materialCreator = new MaterialCreator( this.resourcePath || path, this.materialOptions );
 		materialCreator.setCrossOrigin( this.crossOrigin );
 		materialCreator.setManager( this.manager );
+		materialCreator.priority = this.priority;
+		materialCreator.cache = this.cache;
 		materialCreator.setMaterials( materialsInfo );
 		return materialCreator;
 
@@ -574,7 +576,7 @@ class MaterialCreator {
 
 		if ( loader === null ) {
 
-			loader = new TextureLoader( manager );
+			loader = new TextureLoader( manager ).setPriority( this.priority || 'auto' ).setCache( this.cache || 'default' );
 
 		}
 

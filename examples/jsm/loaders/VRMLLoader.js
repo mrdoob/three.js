@@ -79,7 +79,7 @@ class VRMLLoader extends Loader {
 
 		const path = ( scope.path === '' ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
 
-		const loader = new FileLoader( scope.manager );
+		const loader = new FileLoader( scope.manager ).setPriority( scope.priority ).setCache( scope.cache );
 		loader.setPath( scope.path );
 		loader.setRequestHeader( scope.requestHeader );
 		loader.setWithCredentials( scope.withCredentials );
@@ -3337,7 +3337,7 @@ class VRMLLoader extends Loader {
 
 		//
 
-		const textureLoader = new TextureLoader( this.manager );
+		const textureLoader = new TextureLoader( this.manager ).setPriority( this.priority ).setCache( this.cache );
 		textureLoader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
 		// check version (only 2.0 is supported)

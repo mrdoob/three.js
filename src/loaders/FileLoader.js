@@ -58,22 +58,6 @@ class FileLoader extends Loader {
 		this.responseType = '';
 
 		/**
-		 * The request priority hint passed to `fetch()`.
-		 *
-		 * @type {('high'|'low'|'auto')}
-		 * @default 'auto'
-		 */
-		this.priority = 'auto';
-
-		/**
-		 * The HTTP cache mode passed to `fetch()`. This does not affect {@link Cache}.
-		 *
-		 * @type {('default'|'no-store'|'reload'|'no-cache'|'force-cache')}
-		 * @default 'default'
-		 */
-		this.cache = 'default';
-
-		/**
 		 * Used for aborting requests.
 		 *
 		 * @private
@@ -361,32 +345,6 @@ class FileLoader extends Loader {
 	setMimeType( value ) {
 
 		this.mimeType = value;
-		return this;
-
-	}
-
-	/**
-	 * Sets the request priority hint passed to `fetch()`.
-	 *
-	 * @param {('high'|'low'|'auto')} value - The request priority hint.
-	 * @return {FileLoader} A reference to this file loader.
-	 */
-	setPriority( value ) {
-
-		this.priority = value;
-		return this;
-
-	}
-
-	/**
-	 * Sets the HTTP cache mode passed to `fetch()`. This does not affect {@link Cache}.
-	 *
-	 * @param {('default'|'no-store'|'reload'|'no-cache'|'force-cache')} value - The HTTP cache mode.
-	 * @return {FileLoader} A reference to this file loader.
-	 */
-	setCache( value ) {
-
-		this.cache = value;
 		return this;
 
 	}

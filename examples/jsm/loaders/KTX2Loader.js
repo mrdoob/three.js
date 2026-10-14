@@ -284,10 +284,10 @@ class KTX2Loader extends Loader {
 
 		if ( ! this.transcoderPending ) {
 
-			const jsLoader = new FileLoader( this.manager );
+			const jsLoader = new FileLoader( this.manager ).setPriority( this.priority ).setCache( this.cache );
 			jsLoader.setWithCredentials( this.withCredentials );
 
-			const binaryLoader = new FileLoader( this.manager );
+			const binaryLoader = new FileLoader( this.manager ).setPriority( this.priority ).setCache( this.cache );
 			binaryLoader.setWithCredentials( this.withCredentials );
 			binaryLoader.setResponseType( 'arraybuffer' );
 
@@ -380,7 +380,7 @@ class KTX2Loader extends Loader {
 
 		}
 
-		const loader = new FileLoader( this.manager );
+		const loader = new FileLoader( this.manager ).setPriority( this.priority ).setCache( this.cache );
 
 		loader.setPath( this.path );
 		loader.setCrossOrigin( this.crossOrigin );

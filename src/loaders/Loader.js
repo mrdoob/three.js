@@ -61,6 +61,23 @@ class Loader {
 		 */
 		this.requestHeader = {};
 
+		/**
+		 * The request priority hint. Image loaders use `HTMLImageElement.fetchPriority`.
+		 *
+		 * @type {('high'|'low'|'auto')}
+		 * @default 'auto'
+		 */
+		this.priority = 'auto';
+
+		/**
+		 * The HTTP cache mode passed to `fetch()`. This does not affect {@link Cache}
+		 * or loaders using `HTMLImageElement`.
+		 *
+		 * @type {('default'|'no-store'|'reload'|'no-cache'|'force-cache')}
+		 * @default 'default'
+		 */
+		this.cache = 'default';
+
 		if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
 			__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) );
@@ -175,6 +192,34 @@ class Loader {
 	setRequestHeader( requestHeader ) {
 
 		this.requestHeader = requestHeader;
+		return this;
+
+	}
+
+	/**
+	 * Sets a browser scheduling hint. Browsers may ignore this hint.
+	 *
+	 * @param {('high'|'low'|'auto')} value - The request priority hint.
+	 * @return {Loader} A reference to this instance.
+	 */
+	setPriority( value ) {
+
+		this.priority = value;
+		return this;
+
+	}
+
+	/**
+	 * Sets the HTTP cache mode for fetch requests. `no-cache` revalidates cached
+	 * responses; `no-store` bypasses the HTTP cache. This does not affect
+	 * {@link Cache} or image element requests.
+	 *
+	 * @param {('default'|'no-store'|'reload'|'no-cache'|'force-cache')} value - The HTTP cache mode.
+	 * @return {Loader} A reference to this instance.
+	 */
+	setCache( value ) {
+
+		this.cache = value;
 		return this;
 
 	}

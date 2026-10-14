@@ -61,7 +61,7 @@ class CubeTextureLoader extends Loader {
 		const texture = new CubeTexture();
 		texture.colorSpace = SRGBColorSpace;
 
-		const loader = new ImageLoader( this.manager );
+		const loader = new ImageLoader( this.manager ).setPriority( this.priority ).setCache( this.cache );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.setPath( this.path );
 

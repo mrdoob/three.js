@@ -96,7 +96,7 @@ class HDRCubeTextureLoader extends Loader {
 
 		function loadHDRData( i, onLoad, onProgress, onError ) {
 
-			new FileLoader( scope.manager )
+			new FileLoader( scope.manager ).setPriority( scope.priority ).setCache( scope.cache )
 				.setPath( scope.path )
 				.setResponseType( 'arraybuffer' )
 				.setWithCredentials( scope.withCredentials )

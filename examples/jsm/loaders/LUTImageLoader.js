@@ -55,7 +55,7 @@ export class LUTImageLoader extends Loader {
 	 */
 	load( url, onLoad, onProgress, onError ) {
 
-		const loader = new TextureLoader( this.manager );
+		const loader = new TextureLoader( this.manager ).setPriority( this.priority ).setCache( this.cache );
 
 		loader.setCrossOrigin( this.crossOrigin );
 

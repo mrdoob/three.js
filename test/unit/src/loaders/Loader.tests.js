@@ -14,6 +14,18 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
+		QUnit.test( 'request settings', ( assert ) => {
+
+			const loader = new Loader();
+			assert.strictEqual( loader.priority, 'auto' );
+			assert.strictEqual( loader.cache, 'default' );
+			assert.strictEqual( loader.setPriority( 'high' ), loader );
+			assert.strictEqual( loader.setCache( 'no-store' ), loader );
+			assert.strictEqual( loader.priority, 'high' );
+			assert.strictEqual( loader.cache, 'no-store' );
+
+		} );
+
 		// PROPERTIES
 		QUnit.test( 'manager', ( assert ) => {
 

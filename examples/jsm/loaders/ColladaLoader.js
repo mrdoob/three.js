@@ -46,7 +46,7 @@ class ColladaLoader extends Loader {
 
 		const path = ( scope.path === '' ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
 
-		const loader = new FileLoader( scope.manager );
+		const loader = new FileLoader( scope.manager ).setPriority( scope.priority ).setCache( scope.cache );
 		loader.setPath( scope.path );
 		loader.setRequestHeader( scope.requestHeader );
 		loader.setWithCredentials( scope.withCredentials );
@@ -105,7 +105,7 @@ class ColladaLoader extends Loader {
 		const { library, asset, collada } = parseResult;
 
 		// Setup texture loaders
-		const textureLoader = new TextureLoader( this.manager );
+		const textureLoader = new TextureLoader( this.manager ).setPriority( this.priority ).setCache( this.cache );
 		textureLoader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
 		let tgaLoader;

@@ -47,7 +47,7 @@ class TextureLoader extends Loader {
 
 		const texture = new Texture();
 
-		const loader = new ImageLoader( this.manager );
+		const loader = new ImageLoader( this.manager ).setPriority( this.priority ).setCache( this.cache );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.setPath( this.path );
 
