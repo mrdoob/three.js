@@ -112,7 +112,7 @@ class ColladaLoader extends Loader {
 
 		if ( TGALoader ) {
 
-			tgaLoader = new TGALoader( this.manager );
+			tgaLoader = new TGALoader( this.manager ).setPriority( this.priority ).setCache( this.cache );
 			tgaLoader.setPath( this.resourcePath || path );
 
 		}

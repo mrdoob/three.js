@@ -156,7 +156,7 @@ class ImageLoader extends Loader {
 		Cache.add( `image:${url}`, image );
 		scope.manager.itemStart( url );
 
-		image.fetchPriority = this.priority;
+		if ( this.priority !== undefined ) image.fetchPriority = this.priority;
 		image.src = url;
 
 		return image;

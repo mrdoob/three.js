@@ -17,6 +17,13 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
+		QUnit.test( 'image request priority', async ( assert ) => {
+
+			const image = await new ImageLoader().setPriority( 'high' ).loadAsync( '/examples/textures/uv_grid_opengl.jpg' );
+			assert.strictEqual( image.fetchPriority, 'high' );
+
+		} );
+
 		// INSTANCING
 		QUnit.test( 'Instancing', ( assert ) => {
 

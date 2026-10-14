@@ -198,6 +198,8 @@ class Loader {
 
 	/**
 	 * Sets a browser scheduling hint. Browsers may ignore this hint.
+	 * Internally created loaders inherit it. Loaders supplied by the application
+	 * (for example decoder loaders or loading manager handlers) retain their own settings.
 	 *
 	 * @param {('high'|'low'|'auto')} value - The request priority hint.
 	 * @return {Loader} A reference to this instance.
