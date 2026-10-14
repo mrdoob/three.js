@@ -207,12 +207,15 @@ export default QUnit.module( 'Nodes', () => {
 					} );
 
 					// Resetting static permits an edit, and the next static render must capture it.
+					const staleAttributes = [ ...lightsNode._staticLightsNodes.values() ].flatMap( node => node === null ? [] : [ node.cellsNode.value, node.indicesNode.value, node.lightsNode.value ] );
+					assert.true( staleAttributes.length > 0 && staleAttributes.every( attribute => renderer.backend.has( attribute ) ), 'cached batches uploaded GPU buffers' );
 					batched.point.static = false;
 					await compare( 'mixing static and dynamic lights', ( fixture ) => {
 
 						fixture.point.position.x += 0.75;
 
 					} );
+					assert.true( staleAttributes.every( attribute => renderer.backend.has( attribute ) === false ), 'leaving static mode destroys the stale GPU buffers' );
 					batched.point.static = true;
 					await compare( 're-entering static mode captures the updated position' );
 					assert.true( [ ...lightsNode._staticLightsNodes.values() ].some( node => node !== null && node.grid.data.length === 48 && node.grid.data[ 0 ] === - 0.75 ), 'the edited point light enters a new storage-buffer batch' );

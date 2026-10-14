@@ -144,6 +144,7 @@ class LightsNode extends Node {
 
 		// Immutable batches can be shared by material builders and by cameras with
 		// the same light set. Keep a bounded cache; additional sets use normal lights.
+		// The cache is disposed whenever a light enters or leaves static mode.
 		this._staticLightsNodes = new Map();
 		this._staticLightsBytes = 0;
 		this._staticLightsVersion = 0;
@@ -318,7 +319,7 @@ class LightsNode extends Node {
 
 		if ( lights.length === 0 ) return null;
 
-		const key = this._staticLightsVersion + ':' + lights.map( light => light.id ).join( ',' );
+		const key = lights.map( light => light.id ).join( ',' );
 		const nodes = this._staticLightsNodes;
 
 		if ( nodes.has( key ) ) return nodes.get( key );
@@ -348,9 +349,13 @@ class LightsNode extends Node {
 	}
 
 	/**
-	 * Releases cached static light grids.
+	 * Disposes the cached static light grids. Bumping the version changes the
+	 * cache key, so render objects that still reference a disposed grid are
+	 * rebuilt before they are drawn again.
+	 *
+	 * @private
 	 */
-	dispose() {
+	_disposeStaticLightsNodes() {
 
 		for ( const node of this._staticLightsNodes.values() ) {
 
@@ -361,6 +366,15 @@ class LightsNode extends Node {
 		this._staticLightsNodes.clear();
 		this._staticLightsBytes = 0;
 		this._staticLightsVersion ++;
+
+	}
+
+	/**
+	 * Releases cached static light grids.
+	 */
+	dispose() {
+
+		this._disposeStaticLightsNodes();
 
 		super.dispose();
 
@@ -508,15 +522,21 @@ class LightsNode extends Node {
 	 */
 	setLights( lights ) {
 
+		let staticLightsChanged = false;
+
 		for ( const light of lights ) {
 
 			const eligible = canBatchStaticLight( light );
 			const previous = this._staticLightStates.get( light );
 
-			if ( previous !== undefined && previous !== eligible ) this._staticLightsVersion ++;
+			if ( previous !== undefined && previous !== eligible ) staticLightsChanged = true;
 			this._staticLightStates.set( light, eligible );
 
 		}
+
+		// Grids snapshot their lights, so none of them can be reused once a
+		// light enters or leaves static mode.
+		if ( staticLightsChanged === true ) this._disposeStaticLightsNodes();
 
 		this._lights = lights;
 

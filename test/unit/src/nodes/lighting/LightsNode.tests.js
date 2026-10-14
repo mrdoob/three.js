@@ -155,6 +155,34 @@ export default QUnit.module( 'Nodes', () => {
 
 			} );
 
+			QUnit.test( 'static mode changes dispose stale batches', ( assert ) => {
+
+				const light = createPoint();
+				const node = new LightsNode().setLights( [ light, createPoint() ] );
+
+				// Toggle more often than the cache has entries.
+				for ( let i = 0; i < 12; i ++ ) {
+
+					const batch = node.setupLightsNode( createBuilder() ).find( entry => entry instanceof StaticLightsNode );
+					let disposed = 0;
+					for ( const attribute of [ batch.cellsNode.value, batch.indicesNode.value, batch.lightsNode.value ] ) {
+
+						attribute.addEventListener( 'dispose', () => disposed ++ );
+
+					}
+
+					light.static = ! light.static;
+					node.setLights( node.getLights() );
+					assert.strictEqual( disposed, 3, 'the stale batch releases its buffers' );
+					assert.strictEqual( node._staticLightsNodes.size, 0, 'the cache is cleared' );
+
+				}
+
+				assert.ok( node.setupLightsNode( createBuilder() ).some( entry => entry instanceof StaticLightsNode ), 'batching keeps working' );
+				node.dispose();
+
+			} );
+
 			QUnit.test( 'node disposal releases buffers and lighting disposal clears cached nodes', ( assert ) => {
 
 				const lighting = new Lighting();
