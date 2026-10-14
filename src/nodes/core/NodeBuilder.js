@@ -2502,16 +2502,16 @@ class NodeBuilder {
 		const baseName = node.name;
 
 		let name = baseName;
-		let property = this.getPropertyName( node );
+		let declarationName = this.getDeclarationName( node );
 		let index = 1;
 
 		// Automatically renames the property if the name is already in use or reserved.
 
-		while ( ( checkKeywords && this.isReservedKeyword( name ) ) || declarations[ property ] !== undefined ) {
+		while ( ( checkKeywords && this.isReservedKeyword( name ) ) || declarations[ declarationName ] !== undefined ) {
 
 			name = baseName + '_' + index ++;
 			node.name = name;
-			property = this.getPropertyName( node );
+			declarationName = this.getDeclarationName( node );
 
 		}
 
@@ -2521,7 +2521,20 @@ class NodeBuilder {
 
 		}
 
-		declarations[ property ] = node;
+		declarations[ declarationName ] = node;
+
+	}
+
+	/**
+	 * Returns the identifier the given node declares in the shader. It is used
+	 * by {@link NodeBuilder#registerDeclaration} to detect name collisions.
+	 *
+	 * @param {Object} node - The node.
+	 * @return {string} The declaration name.
+	 */
+	getDeclarationName( node ) {
+
+		return this.getPropertyName( node );
 
 	}
 
