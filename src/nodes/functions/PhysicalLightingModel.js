@@ -801,7 +801,9 @@ class PhysicalLightingModel extends LightingModel {
 
 			const sheenAlbedo = IBLSheenBRDF( { normal: normalView, viewDir: positionViewDirection, roughness: sheenRoughness } );
 
-			this.sheenSpecularIndirect.addAssign( irradiance.mul( sheen, sheenAlbedo, 1 / Math.PI ) );
+			// Baked irradiance contributes only to diffuse reflection.
+			const sheenIrradiance = builder.context.irradianceLightMap ? irradiance.sub( builder.context.irradianceLightMap ) : irradiance;
+			this.sheenSpecularIndirect.addAssign( sheenIrradiance.mul( sheen, sheenAlbedo, 1 / Math.PI ) );
 
 			const sheenEnergyComp = sheen.r.max( sheen.g ).max( sheen.b ).mul( sheenAlbedo ).oneMinus();
 
