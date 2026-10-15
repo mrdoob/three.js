@@ -1,7 +1,7 @@
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 
 /**
- * InspectorBase is the base class for all inspectors.
+ * InspectorBase is the base class for all inspectors. Can only be used with {@link WebGPURenderer}.
  *
  * @augments EventDispatcher
  */
