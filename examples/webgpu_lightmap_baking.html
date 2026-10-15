@@ -19,7 +19,7 @@
 				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Light Baking</span>
 			</div>
 
-			<small>Progressively bake Light Probe or VXGI diffuse irradiance into a UV atlas and export KHR_lightmap glTF.<br/><span id="status"></span></small>
+			<small>Progressively bake Radiosity, Light Probe or VXGI diffuse irradiance into a UV atlas and export KHR_lightmap glTF.<br/><span id="status"></span></small>
 		</div>
 
 		<script type="importmap">
@@ -42,6 +42,7 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
 			import { LightMapper } from 'three/addons/lighting/LightMapper.js';
+			import { StochasticRadiosity, radiosityIrradiance } from 'three/addons/lighting/StochasticRadiosity.js';
 			import { VXGIVolume } from 'three/addons/lighting/vxgi/VXGIVolume.js';
 			import { vxgiIrradiance } from 'three/addons/lighting/vxgi/VXGIIrradiance.js';
 			import { lightProbeGridIrradiance } from 'three/addons/tsl/lighting/LightProbeGridNode.js';
@@ -57,14 +58,14 @@
 
 			const params = {
 				output: 'Baked GI',
-				algorithm: 'VXGI',
+				algorithm: 'Radiosity',
 				resolution: 1024
 			};
 
 			// light probes are deterministic and only need a few samples to antialias the light map,
-			// the VXGI cones are rotated per sample and converge over more samples
+			// the VXGI cones and the radiosity directions are rotated per sample and converge over more samples
 
-			const bakeSamples = { 'Light Probe': 16, 'VXGI': 64 };
+			const bakeSamples = { 'Radiosity': 256, 'Light Probe': 16, 'VXGI': 64 };
 
 			init();
 
@@ -194,7 +195,7 @@
 
 				const gui = renderer.inspector.createParameters( 'Light Baking' );
 				gui.add( params, 'output', [ 'Baked GI', 'Live GI' ] ).name( 'Output' ).onChange( setOutput );
-				gui.add( params, 'algorithm', [ 'Light Probe', 'VXGI' ] ).name( 'GI Algorithm' ).onChange( bake );
+				gui.add( params, 'algorithm', [ 'Radiosity', 'Light Probe', 'VXGI' ] ).name( 'GI Algorithm' ).onChange( bake );
 				gui.add( params, 'resolution', [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( bake );
 				gui.add( { bake }, 'bake' ).name( 'Re-Bake GI' );
 				gui.add( { exportGLTF }, 'exportGLTF' ).name( 'Export glTF' );
@@ -226,7 +227,17 @@
 
 				let irradiance, liveIrradiance;
 
-				if ( params.algorithm === 'Light Probe' ) {
+				if ( params.algorithm === 'Radiosity' ) {
+
+					// stochastic depth radiosity, the bounces are cached in a light map before baking
+
+					const radiosity = new StochasticRadiosity();
+					radiosity.update( renderer, scene );
+					irradiance = radiosityIrradiance( radiosity );
+					liveIrradiance = irradiance;
+					source = radiosity;
+
+				} else if ( params.algorithm === 'Light Probe' ) {
 
 					const probes = new LightProbeGrid( 5.6, 4.7, 5.6, 6, 6, 6 );
 					probes.position.set( 0, 2.45, 0 );
