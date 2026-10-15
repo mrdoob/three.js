@@ -120,14 +120,13 @@ class NodeBuilderState {
 	/**
 	 * This method is used to create a array of bind groups based
 	 * on the existing bind groups of this state. Shared groups are
-	 * not cloned. If the renderer's bindings component is given,
-	 * the shared groups of the given render context are used instead.
+	 * not cloned.
 	 *
-	 * @param {?Bindings} [bindings=null] - Renderer component for managing bindings.
-	 * @param {?RenderContext} [renderContext=null] - The render context.
+	 * @param {Bindings} bindings - Renderer component for managing bindings.
+	 * @param {RenderContext} renderContext - The render context.
 	 * @return {Array<BindGroup>} A array of bind groups.
 	 */
-	createBindings( bindings = null, renderContext = null ) {
+	createBindings( bindings, renderContext ) {
 
 		const bindGroups = [];
 
@@ -146,13 +145,9 @@ class NodeBuilderState {
 
 				}
 
-			} else if ( bindings !== null ) {
-
-				bindGroups.push( bindings.getSharedBindGroupForContext( instanceGroup, renderContext ) );
-
 			} else {
 
-				bindGroups.push( instanceGroup );
+				bindGroups.push( bindings.getSharedBindGroup( instanceGroup, renderContext ) );
 
 			}
 

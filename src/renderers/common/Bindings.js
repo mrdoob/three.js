@@ -1,5 +1,4 @@
 import DataMap from './DataMap.js';
-import BindGroup from './BindGroup.js';
 import { AttributeType } from './Constants.js';
 import { hashString } from '../../nodes/core/NodeUtils.js';
 
@@ -138,56 +137,26 @@ class Bindings extends DataMap {
 	}
 
 	/**
-	 * Returns the shared bind group for the given bindings and the current render context.
-	 * If it does not exist yet, it is created with the given name and bindings.
+	 * Returns the shared bind group of the given render context that corresponds to the given bind group.
 	 *
-	 * @param {string} name - The bind group's name.
-	 * @param {Array<Binding>} bindings - An array of bindings.
+	 * @param {BindGroup} bindGroup - The bind group.
+	 * @param {?RenderContext} [renderContext=null] - The render context. If not set, the current render context is used.
 	 * @return {BindGroup} The shared bind group.
 	 */
-	getSharedBindGroup( name, bindings ) {
+	getSharedBindGroup( bindGroup, renderContext = null ) {
 
-		const renderer = this.backend.renderer;
-		const renderContext = renderer._currentRenderContext || renderer; // use renderer as fallback until we have a compute context
+		if ( renderContext === null ) {
 
-		return this._getSharedBindGroup( name, bindings, renderContext, false );
+			const renderer = this.backend.renderer;
+			renderContext = renderer._currentRenderContext || renderer; // use renderer as fallback until we have a compute context
 
-	}
-
-	/**
-	 * Returns the shared bind group of the given render context that corresponds to the
-	 * given shared bind group of a node builder state. Render objects of different render
-	 * contexts can use the same node builder state, but nested renders can't share uniform
-	 * buffers like the camera's, so each render context has shared bind groups of its own.
-	 *
-	 * @param {BindGroup} bindGroup - A shared bind group of a node builder state.
-	 * @param {RenderContext} renderContext - The render context.
-	 * @return {BindGroup} The shared bind group of the render context.
-	 */
-	getSharedBindGroupForContext( bindGroup, renderContext ) {
-
-		return this._getSharedBindGroup( bindGroup.name, bindGroup.bindings, renderContext, true );
-
-	}
-
-	/**
-	 * Returns the shared bind group for the given bindings and render context.
-	 * If it does not exist yet, it is created with the given name and bindings.
-	 *
-	 * @private
-	 * @param {string} name - The bind group's name.
-	 * @param {Array<Binding>} bindings - An array of bindings.
-	 * @param {RenderContext|Renderer} renderContext - The render context.
-	 * @param {boolean} cloneBindings - Whether a new bind group gets clones of the bindings or not.
-	 * @return {BindGroup} The shared bind group.
-	 */
-	_getSharedBindGroup( name, bindings, renderContext, cloneBindings ) {
+		}
 
 		// build cache key
 
 		let cacheKeyString = '';
 
-		for ( const binding of bindings ) {
+		for ( const binding of bindGroup.bindings ) {
 
 			if ( binding.isNodeUniformsGroup ) {
 
@@ -223,38 +192,23 @@ class Bindings extends DataMap {
 
 		// lookup bind group
 
-		let bindGroup = bindGroupsCache.get( cacheKey );
+		let sharedBindGroup = bindGroupsCache.get( cacheKey );
 
-		if ( bindGroup === undefined ) {
+		if ( sharedBindGroup === undefined ) {
 
-			if ( cloneBindings === true ) {
+			// make sure shared bindings are cloned per render context
 
-				// the bindings belong to the shared bind group of another render context,
-				// so the clones must not share its buffers
+			sharedBindGroup = this.has( bindGroup ) ? bindGroup.clone() : bindGroup;
 
-				bindings = bindings.map( ( binding ) => {
+			bindGroupsCache.set( cacheKey, sharedBindGroup );
 
-					const clone = binding.clone();
-
-					if ( clone.isBuffer ) clone.release();
-
-					return clone;
-
-				} );
-
-			}
-
-			bindGroup = new BindGroup( name, bindings );
-
-			bindGroupsCache.set( cacheKey, bindGroup );
-
-			const groupData = this.get( bindGroup );
+			const groupData = this.get( sharedBindGroup );
 			groupData.renderContext = renderContext;
 			groupData.cacheKey = cacheKey;
 
 		}
 
-		return bindGroup;
+		return sharedBindGroup;
 
 	}
 
