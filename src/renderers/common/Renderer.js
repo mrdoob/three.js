@@ -2924,6 +2924,7 @@ class Renderer {
 
 		if ( this._initialized === true ) {
 
+			this.lighting.dispose();
 			this._inspector.dispose();
 			this._animation.dispose();
 			this._objects.dispose();
