@@ -609,22 +609,22 @@ class ObjectLoader extends Loader {
 			loader = new ImageLoader( this.manager );
 			loader.setCrossOrigin( this.crossOrigin );
 
+			const results = await Promise.all( json.map( ( image ) => Array.isArray( image.url ) ? Promise.all( image.url.map( deserializeImage ) ) : deserializeImage( image.url ) ) );
+
 			for ( let i = 0, il = json.length; i < il; i ++ ) {
 
 				const image = json[ i ];
-				const url = image.url;
 
-				if ( Array.isArray( url ) ) {
+				if ( Array.isArray( image.url ) ) {
 
 					// load array of images e.g CubeTexture
 
 					const imageArray = [];
+					const deserializedImages = results[ i ];
 
-					for ( let j = 0, jl = url.length; j < jl; j ++ ) {
+					for ( let j = 0, jl = deserializedImages.length; j < jl; j ++ ) {
 
-						const currentUrl = url[ j ];
-
-						const deserializedImage = await deserializeImage( currentUrl );
+						const deserializedImage = deserializedImages[ j ];
 
 						if ( deserializedImage !== null ) {
 
@@ -650,8 +650,7 @@ class ObjectLoader extends Loader {
 
 					// load single image
 
-					const deserializedImage = await deserializeImage( image.url );
-					images[ image.uuid ] = new TextureSource( deserializedImage );
+					images[ image.uuid ] = new TextureSource( results[ i ] );
 
 				}
 
