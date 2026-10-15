@@ -487,6 +487,7 @@ class GLTFLoader extends Loader {
 
 			path: path || this.resourcePath || '',
 			crossOrigin: this.crossOrigin,
+			withCredentials: this.withCredentials,
 			requestHeader: this.requestHeader,
 			manager: this.manager,
 			ktx2Loader: this.ktx2Loader,
@@ -2716,12 +2717,13 @@ class GLTFParser {
 		}
 
 		this.textureLoader.setCrossOrigin( this.options.crossOrigin );
+		this.textureLoader.setWithCredentials( this.options.withCredentials );
 		this.textureLoader.setRequestHeader( this.options.requestHeader );
 
 		this.fileLoader = new FileLoader( this.options.manager );
 		this.fileLoader.setResponseType( 'arraybuffer' );
 
-		if ( this.options.crossOrigin === 'use-credentials' ) {
+		if ( this.options.withCredentials || this.options.crossOrigin === 'use-credentials' ) {
 
 			this.fileLoader.setWithCredentials( true );
 
