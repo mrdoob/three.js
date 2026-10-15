@@ -1308,8 +1308,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			}
 
-			// Read-write storage textures are also allowed in the fragment stage.
-			// Write-only is not honored here since it is the default access of storage textures.
+			// Honor read-write for storage texture in the fragment stage.
 
 			if ( shaderStage === 'fragment' && node.isStorageTextureNode === true && node.access === NodeAccess.READ_WRITE ) {
 
