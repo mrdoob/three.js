@@ -55,6 +55,15 @@ class Attributes extends DataMap {
 		 */
 		this._registry = new FinalizationRegistry( ( ref ) => this._tracked.delete( ref ) );
 
+		/**
+		 * Incremented whenever the buffer of an attribute is destroyed. Render objects
+		 * only have to verify their attributes if this version has changed.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.disposeVersion = 0;
+
 	}
 
 	/**
@@ -68,6 +77,8 @@ class Attributes extends DataMap {
 		const attributeData = super.delete( attribute );
 
 		if ( attributeData !== null ) {
+
+			this.disposeVersion ++;
 
 			if ( attribute.isBufferAttribute === true ) {
 
