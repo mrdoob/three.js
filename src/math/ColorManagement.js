@@ -183,14 +183,28 @@ function createColorManagement() {
 
 export const ColorManagement = /*@__PURE__*/ createColorManagement();
 
+/**
+ * Converts an sRGB component to linear sRGB, including extended-range values.
+ *
+ * @param {number} c - The sRGB component.
+ * @return {number} The linear sRGB component.
+ */
 export function SRGBToLinear( c ) {
 
-	return ( c < 0.04045 ) ? c * 0.0773993808 : Math.pow( c * 0.9478672986 + 0.0521327014, 2.4 );
+	const magnitude = Math.abs( c );
+	return ( magnitude < 0.04045 ) ? c * 0.0773993808 : Math.sign( c ) * Math.pow( magnitude * 0.9478672986 + 0.0521327014, 2.4 );
 
 }
 
+/**
+ * Converts a linear sRGB component to sRGB, including extended-range values.
+ *
+ * @param {number} c - The linear sRGB component.
+ * @return {number} The sRGB component.
+ */
 export function LinearToSRGB( c ) {
 
-	return ( c < 0.0031308 ) ? c * 12.92 : 1.055 * ( Math.pow( c, 0.41666 ) ) - 0.055;
+	const magnitude = Math.abs( c );
+	return ( magnitude < 0.0031308 ) ? c * 12.92 : Math.sign( c ) * ( 1.055 * Math.pow( magnitude, 0.41666 ) - 0.055 );
 
 }
