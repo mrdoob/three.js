@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - native HDR loaders</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - native HDR loaders">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_loaders_native_hdr.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_loaders_native_hdr.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Native HDR loaders</span>
+			</div>
+			<small>
+				AVIF and JPEG XL emissive textures. Adjust tone mapping and exposure in the inspector.<br>
+				by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br>
+				<a href="https://polyhaven.com/a/venice_sunset" target="_blank" rel="noopener">Venice Sunset</a> by Greg Zaal / Poly Haven (CC0).
+			</small>
+		</div>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { NativeHDRLoader } from 'three/addons/loaders/NativeHDRLoader.js';
+
+			const renderer = new THREE.WebGPURenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.toneMapping = THREE.ACESFilmicToneMapping;
+			renderer.toneMappingExposure = 1;
+			renderer.inspector = new Inspector();
+			document.body.appendChild( renderer.domElement );
+			await renderer.init();
+
+			const scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x17191e );
+			const camera = new THREE.OrthographicCamera( - 4, 4, 2, - 2, 0.1, 10 );
+			camera.position.z = 2;
+			const geometry = new THREE.PlaneGeometry( 2.8, 1.4 );
+			const loader = new NativeHDRLoader().setPath( 'textures/hdr-native/' );
+
+			const gui = renderer.inspector.createParameters( 'Native HDR' );
+			gui.add( renderer, 'toneMapping', {
+				None: THREE.NoToneMapping,
+				Linear: THREE.LinearToneMapping,
+				Reinhard: THREE.ReinhardToneMapping,
+				Cineon: THREE.CineonToneMapping,
+				ACES: THREE.ACESFilmicToneMapping,
+				AgX: THREE.AgXToneMapping,
+				Neutral: THREE.NeutralToneMapping
+			} ).name( 'Tone mapping' );
+			gui.add( renderer, 'toneMappingExposure', 0, 4, 0.01 ).name( 'Exposure' );
+
+			await Promise.all( [
+				addImage( 'AVIF', 'venice_sunset_512.avif', - 1.55 ),
+				addImage( 'JPEG XL', 'venice_sunset_512.jxl', 1.55 )
+			] );
+			window.addEventListener( 'resize', onWindowResize );
+			onWindowResize();
+			renderer.setAnimationLoop( () => renderer.render( scene, camera ) );
+
+			async function addImage( name, file, x ) {
+
+				const material = new THREE.MeshStandardNodeMaterial( { color: 0x000000, emissive: 0xffffff } );
+				const mesh = new THREE.Mesh( geometry, material );
+				mesh.name = name + ' HDR';
+				mesh.position.x = x;
+				scene.add( mesh );
+
+				const caption = new THREE.Sprite( new THREE.SpriteMaterial( { map: textTexture( name, false ), toneMapped: false } ) );
+				caption.position.set( x, 1.02, 0 );
+				caption.scale.set( 2.8, 0.35, 1 );
+				scene.add( caption );
+
+				try {
+
+					material.emissiveMap = await loader.loadAsync( file );
+					// The example files encode source radiance / 64 to fit within PQ range.
+					material.emissiveIntensity = 64;
+					mesh.userData.hdrSupported = true;
+
+				} catch ( error ) {
+
+					material.emissiveMap = textTexture( name + ' HDR not supported', true );
+					material.toneMapped = false;
+					mesh.userData.hdrSupported = false;
+					console.warn( name + ' HDR not supported:', error );
+
+				}
+
+				material.needsUpdate = true;
+
+			}
+
+			function textTexture( text, panel ) {
+
+				const canvas = document.createElement( 'canvas' );
+				canvas.width = 1024;
+				canvas.height = panel ? 512 : 128;
+				const context = canvas.getContext( '2d' );
+				if ( panel ) {
+
+					context.fillStyle = '#252830';
+					context.fillRect( 0, 0, canvas.width, canvas.height );
+
+				}
+
+				context.fillStyle = '#ffffff';
+				context.font = '48px sans-serif';
+				context.textAlign = 'center';
+				context.textBaseline = 'middle';
+				context.fillText( text, canvas.width / 2, canvas.height / 2 );
+				const texture = new THREE.CanvasTexture( canvas );
+				texture.colorSpace = THREE.SRGBColorSpace;
+				return texture;
+
+			}
+
+			function onWindowResize() {
+
+				const aspect = window.innerWidth / window.innerHeight;
+				const width = Math.max( 7, aspect * 3.6 );
+				camera.left = - width / 2;
+				camera.right = width / 2;
+				camera.top = width / aspect / 2;
+				camera.bottom = - camera.top;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+		</script>
+	</body>
+</html>
