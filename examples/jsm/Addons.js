@@ -109,6 +109,7 @@ export * from './loaders/LWOLoader.js';
 export * from './loaders/MD2Loader.js';
 export * from './loaders/MDDLoader.js';
 export * from './loaders/MTLLoader.js';
+export * from './loaders/NativeHDRLoader.js';
 export * from './loaders/NRRDLoader.js';
 export * from './loaders/OBJLoader.js';
 export * from './loaders/PCDLoader.js';
