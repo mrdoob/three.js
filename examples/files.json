@@ -391,7 +391,7 @@
 		"webgpu_loader_gltf_transmission",
 		"webgpu_loader_materialx",
 		"webgpu_loader_texture_ktx2",
-		"webgpu_loaders_native_hdr",
+		"webgpu_loader_native_hdr",
 		"webgpu_materials",
 		"webgpu_materials_alphahash",
 		"webgpu_materials_arrays",

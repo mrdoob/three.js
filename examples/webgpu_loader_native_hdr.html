@@ -6,8 +6,8 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<meta property="og:title" content="three.js webgpu - native HDR loaders">
 		<meta property="og:type" content="website">
-		<meta property="og:url" content="https://threejs.org/examples/webgpu_loaders_native_hdr.html">
-		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_loaders_native_hdr.jpg">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_loader_native_hdr.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_loader_native_hdr.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
@@ -17,11 +17,11 @@
 				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Native HDR loaders</span>
 			</div>
 			<small>
-				AVIF and JPEG XL emissive textures. Adjust tone mapping and exposure in the inspector.<br>
-				by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br>
+				Natively load high dynamic range AVIF and JPEG XL images into 16-bit textures by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br>
 				<a href="https://polyhaven.com/a/venice_sunset" target="_blank" rel="noopener">Venice Sunset</a> by Greg Zaal / Poly Haven (CC0).
 			</small>
 		</div>
+
 		<script type="importmap">
 			{
 				"imports": {
@@ -32,13 +32,15 @@
 				}
 			}
 		</script>
+
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
+
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { NativeHDRLoader } from 'three/addons/loaders/NativeHDRLoader.js';
 
-			const renderer = new THREE.WebGPURenderer( { antialias: true } );
+			const renderer = new THREE.WebGPURenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -72,7 +74,13 @@
 			] );
 			window.addEventListener( 'resize', onWindowResize );
 			onWindowResize();
-			renderer.setAnimationLoop( () => renderer.render( scene, camera ) );
+			renderer.setAnimationLoop( animate );
+
+			function animate() {
+
+				renderer.render( scene, camera );
+
+			}
 
 			async function addImage( name, file, x ) {
 
@@ -92,14 +100,12 @@
 					material.emissiveMap = await loader.loadAsync( file );
 					// The example files encode source radiance / 64 to fit within PQ range.
 					material.emissiveIntensity = 64;
-					mesh.userData.hdrSupported = true;
 
 				} catch ( error ) {
 
-					const detail = error instanceof Error ? error.message.replace( /^NativeHDRLoader: /, '' ) : 'Image download failed.';
+					const detail = error.message.replace( 'NativeHDRLoader: ', '' );
 					material.emissiveMap = textTexture( name + ' HDR not supported', true, detail );
 					material.toneMapped = false;
-					mesh.userData.hdrSupported = false;
 					console.warn( name + ' HDR not supported:', error );
 
 				}

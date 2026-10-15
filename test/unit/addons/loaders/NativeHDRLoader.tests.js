@@ -35,7 +35,7 @@ QUnit.module( 'Addons > Loaders > NativeHDRLoader', () => {
 
 	} );
 
-	QUnit.test( 'Asynchronous decoder failure rejects loadAsync and completes manager', async assert => {
+	QUnit.test( 'Asynchronous decoder failure completes manager when the callback aborts', async assert => {
 
 		const manager = new LoadingManager();
 		let completed = false;
@@ -49,36 +49,52 @@ QUnit.module( 'Addons > Loaders > NativeHDRLoader', () => {
 
 		};
 
-		await assert.rejects( loader.loadAsync( './addons/loaders/fixtures/native-hdr/neutral-pq.jxl' ), /Decoder rejected HDR image/ );
+		const pending = new Promise( ( resolve, reject ) => {
+
+			loader.load( './addons/loaders/fixtures/native-hdr/neutral-pq.jxl', resolve, undefined, error => {
+
+				loader.abort();
+				reject( error );
+
+			} );
+
+		} );
+		await assert.rejects( pending, /Decoder rejected HDR image/ );
 		assert.true( completed, 'Failure does not leave manager pending' );
 		assert.strictEqual( failures.length, 1, 'Decoder failure reported once' );
 
 	} );
 
-	QUnit.test( 'abort rejects a pending decode and ignores its late result', async assert => {
+	QUnit.test( 'abort from a completion callback does not report an error', async assert => {
 
 		const manager = new LoadingManager();
 		let completed = false;
-		manager.onLoad = () => completed = true;
-		let finishDecode, startedDecode;
-		const started = new Promise( resolve => startedDecode = resolve );
-		const decoding = new Promise( resolve => finishDecode = resolve );
+		const managerComplete = new Promise( resolve => {
+
+			manager.onLoad = () => {
+
+				completed = true;
+				resolve();
+
+			};
+
+		} );
+		manager.onProgress = ( url, loaded, total ) => assert.ok( loaded <= total, 'Each item finishes once' );
 		const loader = new NativeHDRLoader( manager );
-		loader._decode = () => {
+		loader._decode = async () => ( { data: new Uint16Array( 4 ), width: 1, height: 1 } );
+		const texture = await new Promise( ( resolve, reject ) => {
 
-			startedDecode();
-			return decoding;
+			loader.load( './addons/loaders/fixtures/native-hdr/neutral-pq.avif', texture => {
 
-		};
+				loader.abort();
+				resolve( texture );
 
-		const pending = loader.loadAsync( './addons/loaders/fixtures/native-hdr/neutral-pq.avif' );
-		await started;
-		loader.abort();
-		await assert.rejects( pending, error => error.name === 'AbortError' );
-		assert.true( completed, 'Manager completes after cancellation' );
-		finishDecode( { data: new Uint16Array( 4 ), width: 1, height: 1 } );
-		await Promise.resolve();
-		assert.strictEqual( loader._requests.size, 0, 'No pending operation is retained' );
+			}, undefined, reject );
+
+		} );
+		await managerComplete;
+		assert.true( completed, 'Manager completes after decoding' );
+		texture.dispose();
 
 	} );
 
@@ -120,9 +136,9 @@ QUnit.module( 'Addons > Loaders > NativeHDRLoader', () => {
 
 			const loader = new NativeHDRLoader();
 			const buffer = new ArrayBuffer( 0 );
-			await assert.rejects( loader.parseAsync( buffer ), /16-bit float canvas storage; HDR headroom control/, 'Reports all missing extraction capabilities' );
+			await assert.rejects( loader.parseAsync( buffer ), /16-bit float canvas storage unsupported/, 'Reports unsupported float16 storage' );
 			context.getContextAttributes = () => ( { colorType: 'float16' } );
-			await assert.rejects( loader.parseAsync( buffer ), /Unavailable: HDR headroom control/, 'Identifies headroom separately from float16 storage' );
+			await assert.rejects( loader.parseAsync( buffer ), /globalHDRHeadroom unsupported/, 'Identifies headroom separately from float16 storage' );
 			context.globalHDRHeadroom = 0;
 			decodeFails = true;
 			await assert.rejects( loader.parseAsync( buffer ), /Native image decoding failed/, 'Codec failure has its own diagnostic' );
@@ -135,8 +151,6 @@ QUnit.module( 'Addons > Loaders > NativeHDRLoader', () => {
 			};
 
 			await assert.rejects( loader.parseAsync( buffer ), /16-bit float pixel readback failed/, 'Readback exceptions retain the stage' );
-			context.getImageData = () => ( { pixelFormat: 'rgba-float16', data: [ NaN ] } );
-			await assert.rejects( loader.parseAsync( buffer ), /Linear half-float conversion failed/, 'Conversion errors are distinguished from decoding' );
 
 		} finally {
 

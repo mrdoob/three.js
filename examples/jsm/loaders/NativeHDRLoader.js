@@ -10,10 +10,9 @@ import {
 } from 'three';
 
 /**
- * Experimental native AVIF/JPEG XL HDR decoder. Requires float16 Canvas2D and
- * globalHDRHeadroom. Unsupported browsers fail rather than silently return SDR.
- * Output is linear sRGB, relative to the browser's reference white, not physical
- * radiance. This loader does not define a glTF extension or parse HDR metadata.
+ * Loads HDR AVIF and JPEG XL images using the browser's native decoder.
+ * Produces linear sRGB half-float textures. Requires float16 Canvas2D and
+ * globalHDRHeadroom.
  *
  * ```js
  * const texture = await new NativeHDRLoader().loadAsync( 'image.avif' );
@@ -24,17 +23,6 @@ import {
  * @three_import import { NativeHDRLoader } from 'three/addons/loaders/NativeHDRLoader.js';
  */
 class NativeHDRLoader extends Loader {
-
-	/**
-	 * Constructs a native HDR loader.
-	 * @param {LoadingManager} [manager] - The loading manager.
-	 */
-	constructor( manager ) {
-
-		super( manager );
-		this._requests = new Set();
-
-	}
 
 	/**
 	 * Loads a native HDR image into a half-float data texture.
@@ -53,89 +41,30 @@ class NativeHDRLoader extends Loader {
 		loader.setWithCredentials( this.withCredentials );
 		loader.setResponseType( 'arraybuffer' );
 
-		// Keep LoadingManager pending during asynchronous browser decoding as well.
-		const decodeURL = this.path + url + '#native-hdr-decode';
-		this.manager.itemStart( decodeURL );
-		let finished = false;
-		const signal = this.manager.abortController.signal;
-		const request = { abort: () => {
+		// Track decoding so the manager does not finish after the download.
+		this.manager.itemStart( url );
 
-			try {
+		const onFailure = error => {
 
-				fail( new DOMException( 'Loading aborted.', 'AbortError' ), false );
+			if ( onError ) onError( error );
+			else console.error( error );
 
-			} finally {
-
-				loader.abort();
-
-			}
-
-		} };
-		const end = () => {
-
-			finished = true;
-			this._requests.delete( request );
-			signal.removeEventListener( 'abort', request.abort );
-			this.manager.itemEnd( decodeURL );
+			this.manager.itemError( url );
+			this.manager.itemEnd( url );
 
 		};
 
-		const fail = ( error, notify = true ) => {
+		loader.load( url, buffer => {
 
-			if ( finished ) return;
+			this._decode( buffer ).then( data => {
 
-			try {
+				this._applyData( texture, data );
+				if ( onLoad ) onLoad( texture );
+				this.manager.itemEnd( url );
 
-				if ( onError ) onError( error );
-				else console.error( error );
+			}, onFailure );
 
-			} finally {
-
-				try {
-
-					if ( notify ) this.manager.itemError( decodeURL );
-
-				} finally {
-
-					end();
-
-				}
-
-			}
-
-		};
-
-		this._requests.add( request );
-		signal.addEventListener( 'abort', request.abort, { once: true } );
-
-		try {
-
-			loader.load( url, ( buffer ) => {
-
-				if ( finished ) return;
-				this._decode( buffer ).then( ( data ) => {
-
-					if ( finished ) return;
-					this._applyData( texture, data );
-					try {
-
-						if ( onLoad ) onLoad( texture );
-
-					} finally {
-
-						end();
-
-					}
-
-				}, fail );
-
-			}, onProgress, error => fail( error, false ) );
-
-		} catch ( error ) {
-
-			fail( error );
-
-		}
+		}, onProgress, onFailure );
 
 		return texture;
 
@@ -167,32 +96,6 @@ class NativeHDRLoader extends Loader {
 
 	}
 
-	/**
-	 * Aborts pending loads. Native decode may finish internally; late results are ignored.
-	 * @return {NativeHDRLoader} This loader.
-	 */
-	abort() {
-
-		let error;
-		for ( const request of this._requests ) {
-
-			try {
-
-				request.abort();
-
-			} catch ( cause ) {
-
-				error = cause;
-
-			}
-
-		}
-
-		if ( error ) throw error;
-		return this;
-
-	}
-
 	_applyData( texture, { data, width, height } ) {
 
 		texture.image = { data, width, height };
@@ -207,12 +110,6 @@ class NativeHDRLoader extends Loader {
 	}
 
 	async _decode( buffer ) {
-
-		if ( typeof document === 'undefined' ) {
-
-			throw new Error( 'NativeHDRLoader: native HDR decoding requires a document.' );
-
-		}
 
 		const canvas = document.createElement( 'canvas' );
 		let context;
@@ -232,12 +129,15 @@ class NativeHDRLoader extends Loader {
 
 		}
 
-		const missing = [];
-		if ( context.getContextAttributes?.().colorType !== 'float16' ) missing.push( '16-bit float canvas storage' );
-		if ( ! ( 'globalHDRHeadroom' in context ) ) missing.push( 'HDR headroom control (globalHDRHeadroom)' );
-		if ( missing.length > 0 ) {
+		if ( context.getContextAttributes?.().colorType !== 'float16' ) {
 
-			throw new Error( 'NativeHDRLoader: Unavailable: ' + missing.join( '; ' ) + '.' );
+			throw new Error( 'NativeHDRLoader: 16-bit float canvas storage unsupported.' );
+
+		}
+
+		if ( ! ( 'globalHDRHeadroom' in context ) ) {
+
+			throw new Error( 'NativeHDRLoader: globalHDRHeadroom unsupported.' );
 
 		}
 
@@ -253,7 +153,7 @@ class NativeHDRLoader extends Loader {
 
 			} catch ( cause ) {
 
-				throw new Error( 'NativeHDRLoader: Native image decoding failed (unsupported codec or invalid image).', { cause } );
+				throw new Error( 'NativeHDRLoader: Native image decoding failed.', { cause } );
 
 			}
 
@@ -267,7 +167,7 @@ class NativeHDRLoader extends Loader {
 
 			} catch ( cause ) {
 
-				throw new Error( 'NativeHDRLoader: HDR headroom / image-to-canvas conversion failed.', { cause } );
+				throw new Error( 'NativeHDRLoader: globalHDRHeadroom not available.', { cause } );
 
 			}
 
@@ -295,23 +195,11 @@ class NativeHDRLoader extends Loader {
 			for ( let i = 0; i < data.length; i ++ ) {
 
 				let value = pixels.data[ i ];
-				if ( ! Number.isFinite( value ) ) {
-
-					throw new Error( 'NativeHDRLoader: Linear half-float conversion failed: non-finite HDR pixels.' );
-
-				}
-
 				if ( i % 4 !== 3 ) {
 
 					// Extended sRGB inverse transfer, including negative wide-gamut values.
 					const magnitude = Math.abs( value );
 					value = Math.sign( value ) * ( magnitude <= 0.04045 ? magnitude / 12.92 : Math.pow( ( magnitude + 0.055 ) / 1.055, 2.4 ) );
-
-				}
-
-				if ( Math.abs( value ) > 65504 ) {
-
-					throw new Error( 'NativeHDRLoader: Linear half-float conversion failed: pixel exceeds the half-float range.' );
 
 				}
 
