@@ -127,9 +127,10 @@
 					// Floor footprints remain readable from inside the tall influence boxes.
 					const footprint = new THREE.BufferGeometry().setFromPoints( [
 						new THREE.Vector3( x - 4, 0.04, - 7 ), new THREE.Vector3( x + 4, 0.04, - 7 ),
-						new THREE.Vector3( x + 4, 0.04, 7 ), new THREE.Vector3( x - 4, 0.04, 7 )
+						new THREE.Vector3( x + 4, 0.04, 7 ), new THREE.Vector3( x - 4, 0.04, 7 ),
+						new THREE.Vector3( x - 4, 0.04, - 7 )
 					] );
-					helpers.add( new THREE.LineLoop( footprint, new THREE.LineBasicMaterial( { color } ) ) );
+					helpers.add( new THREE.Line( footprint, new THREE.LineBasicMaterial( { color } ) ) );
 					markers.push( marker );
 
 				}
