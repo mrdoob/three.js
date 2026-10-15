@@ -107,6 +107,16 @@ class Lighting {
 
 	}
 
+	/**
+	 * Clears cached lighting nodes and saved light arrays.
+	 */
+	dispose() {
+
+		this._lightsNodeMap = new WeakMap();
+		this._cache.length = 0;
+
+	}
+
 }
 
 export default Lighting;

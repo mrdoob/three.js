@@ -1,7 +1,33 @@
 import Node from '../core/Node.js';
 import { property, vec3 } from '../tsl/TSLBase.js';
 import { hashArray } from '../core/NodeUtils.js';
-import { warn } from '../../utils.js';
+import { warn, warnOnce } from '../../utils.js';
+import PointLightNode from './PointLightNode.js';
+import SpotLightNode from './SpotLightNode.js';
+import StaticLightsNode from './StaticLightsNode.js';
+import { buildStaticLightGrid } from './StaticLightGrid.js';
+
+/**
+ * Returns why a light can't be batched into the static light grid.
+ *
+ * @private
+ * @param {Light} light - The light.
+ * @return {?string} The reason, or `null` if the light can be batched.
+ */
+const getStaticLightIssue = ( light ) => {
+
+	if ( light.isPointLight !== true && light.isSpotLight !== true ) return 'only point and spot lights are supported';
+	if ( light._lightNode !== ( light.isSpotLight === true ? SpotLightNode : PointLightNode ) ) return 'custom light nodes are not supported';
+	if ( light.castShadow !== false ) return 'shadows are not supported';
+	if ( Number.isFinite( light.distance ) === false || light.distance <= 0 ) return 'a finite `distance` is required';
+	if ( light.colorNode != null ) return '`colorNode` is not supported';
+	if ( light.isSpotLight === true && light.map !== null ) return '`map` is not supported';
+
+	return null;
+
+};
+
+const canBatchStaticLight = ( light ) => light.static === true && getStaticLightIssue( light ) === null;
 
 /**
  * A node representing the total diffuse light.
@@ -128,6 +154,14 @@ class LightsNode extends Node {
 		 */
 		this._lights = [];
 
+		// Immutable batches can be shared by material builders and by cameras with
+		// the same light set. Keep a bounded cache; additional sets use normal lights.
+		// The cache is disposed whenever a light enters or leaves static mode.
+		this._staticLightsNodes = new Map();
+		this._staticLightsBytes = 0;
+		this._staticLightsVersion = 0;
+		this._staticLightStates = new WeakMap();
+
 		/**
 		 * `LightsNode` sets this property to `true` by default.
 		 *
@@ -153,6 +187,7 @@ class LightsNode extends Node {
 	customCacheKey() {
 
 		const builtinLights = this.getBuiltinLights();
+		_hashData.push( this._staticLightsVersion );
 
 		for ( let i = 0; i < builtinLights.length; i ++ ) {
 
@@ -160,6 +195,7 @@ class LightsNode extends Node {
 
 			_hashData.push( light.id );
 			_hashData.push( light.castShadow ? 1 : 0 );
+			_hashData.push( canBatchStaticLight( light ) ? 1 : 0 );
 
 			if ( light.castShadow === true ) {
 
@@ -241,8 +277,20 @@ class LightsNode extends Node {
 		const builtinLights = this.getBuiltinLights();
 
 		const lights = sortLights( [ ...materialLightings, ...builtinLights ] );
+		const staticLights = StaticLightsNode.supports( builder ) ? lights.filter( canBatchStaticLight ) : [];
+		const staticLightsNode = this._getStaticLightsNode( staticLights );
 
 		for ( const light of lights ) {
+
+			if ( staticLightsNode !== null && canBatchStaticLight( light ) ) continue;
+
+			if ( light.static === true ) {
+
+				const issue = getStaticLightIssue( light );
+
+				if ( issue !== null ) warnOnce( `LightsNode: Static ${ light.type } can't be batched, ${ issue }.` );
+
+			}
 
 			if ( light.isNode ) {
 
@@ -285,7 +333,81 @@ class LightsNode extends Node {
 
 		}
 
+		if ( staticLightsNode !== null ) lightNodes.push( staticLightsNode );
+
 		return lightNodes;
+
+	}
+
+	/**
+	 * Gets an immutable grid for an already sorted set of static lights.
+	 *
+	 * @private
+	 * @param {Array<Light>} lights - The eligible lights.
+	 * @return {?StaticLightsNode} The batch, or null to use ordinary lights.
+	 */
+	_getStaticLightsNode( lights ) {
+
+		if ( lights.length === 0 ) return null;
+
+		const key = lights.map( light => light.id ).join( ',' );
+		const nodes = this._staticLightsNodes;
+
+		if ( nodes.has( key ) ) return nodes.get( key );
+		if ( nodes.size >= 8 ) return null;
+
+		const grid = buildStaticLightGrid( lights );
+		let node = null;
+
+		if ( grid !== null ) {
+
+			const bytes = grid.cells.byteLength + grid.indices.byteLength + grid.data.byteLength;
+
+			if ( this._staticLightsBytes + bytes <= 16 * 1024 * 1024 ) {
+
+				node = new StaticLightsNode( grid );
+				this._staticLightsBytes += bytes;
+
+			}
+
+		}
+
+		// Cache failed builds too, so each material does not repeat the work.
+		nodes.set( key, node );
+
+		return node;
+
+	}
+
+	/**
+	 * Disposes the cached static light grids. Bumping the version changes the
+	 * cache key, so render objects that still reference a disposed grid are
+	 * rebuilt before they are drawn again.
+	 *
+	 * @private
+	 */
+	_disposeStaticLightsNodes() {
+
+		for ( const node of this._staticLightsNodes.values() ) {
+
+			if ( node !== null ) node.dispose();
+
+		}
+
+		this._staticLightsNodes.clear();
+		this._staticLightsBytes = 0;
+		this._staticLightsVersion ++;
+
+	}
+
+	/**
+	 * Releases cached static light grids.
+	 */
+	dispose() {
+
+		this._disposeStaticLightsNodes();
+
+		super.dispose();
 
 	}
 
@@ -430,6 +552,22 @@ class LightsNode extends Node {
 	 * @return {LightsNode} A reference to this node.
 	 */
 	setLights( lights ) {
+
+		let staticLightsChanged = false;
+
+		for ( const light of lights ) {
+
+			const eligible = canBatchStaticLight( light );
+			const previous = this._staticLightStates.get( light );
+
+			if ( previous !== undefined && previous !== eligible ) staticLightsChanged = true;
+			this._staticLightStates.set( light, eligible );
+
+		}
+
+		// Grids snapshot their lights, so none of them can be reused once a
+		// light enters or leaves static mode.
+		if ( staticLightsChanged === true ) this._disposeStaticLightsNodes();
 
 		this._lights = lights;
 
