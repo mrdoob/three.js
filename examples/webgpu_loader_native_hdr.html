@@ -38,7 +38,8 @@
 			import * as THREE from 'three/webgpu';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
-			import { NativeHDRLoader } from 'three/addons/loaders/NativeHDRLoader.js';
+			import { AVIFLoader } from 'three/addons/loaders/AVIFLoader.js';
+			import { JXLLoader } from 'three/addons/loaders/JXLLoader.js';
 
 			const renderer = new THREE.WebGPURenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
@@ -54,7 +55,6 @@
 			const camera = new THREE.OrthographicCamera( - 4, 4, 2, - 2, 0.1, 10 );
 			camera.position.z = 2;
 			const geometry = new THREE.PlaneGeometry( 2.8, 1.4 );
-			const loader = new NativeHDRLoader().setPath( 'textures/hdr-native/' );
 
 			const gui = renderer.inspector.createParameters( 'Native HDR' );
 			gui.add( renderer, 'toneMapping', {
@@ -69,8 +69,8 @@
 			gui.add( renderer, 'toneMappingExposure', 0, 4, 0.01 ).name( 'Exposure' );
 
 			await Promise.all( [
-				addImage( 'AVIF', 'venice_sunset_512.avif', - 1.55 ),
-				addImage( 'JPEG XL', 'venice_sunset_512.jxl', 1.55 )
+				addImage( new AVIFLoader(), 'AVIF', 'venice_sunset_512.avif', - 1.55 ),
+				addImage( new JXLLoader(), 'JPEG XL', 'venice_sunset_512.jxl', 1.55 )
 			] );
 			window.addEventListener( 'resize', onWindowResize );
 			onWindowResize();
@@ -82,7 +82,7 @@
 
 			}
 
-			async function addImage( name, file, x ) {
+			async function addImage( loader, name, file, x ) {
 
 				const material = new THREE.MeshStandardNodeMaterial( { color: 0x000000, emissive: 0xffffff } );
 				const mesh = new THREE.Mesh( geometry, material );
@@ -97,14 +97,14 @@
 
 				try {
 
-					material.emissiveMap = await loader.loadAsync( file );
+					material.emissiveMap = await loader.setPath( 'textures/hdr-native/' ).loadAsync( file );
 					// The example files encode source radiance / 64 to fit within PQ range.
 					material.emissiveIntensity = 64;
 
 				} catch ( error ) {
 
-					const detail = error.message.replace( 'NativeHDRLoader: ', '' );
-					material.emissiveMap = textTexture( name + ' HDR not supported', true, detail );
+					const detail = error.message.replace( /^\w+Loader: /, '' );
+					material.emissiveMap = textTexture( 'Not supported', true, detail );
 					material.toneMapped = false;
 					console.warn( name + ' HDR not supported:', error );
 

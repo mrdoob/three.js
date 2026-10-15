@@ -1,7 +1,7 @@
 import { DataTexture, HalfFloatType, LoadingManager } from 'three';
-import { NativeHDRLoader } from '../../../../examples/jsm/loaders/NativeHDRLoader.js';
+import { AVIFLoader } from '../../../../examples/jsm/loaders/AVIFLoader.js';
 
-QUnit.module( 'Addons > Loaders > NativeHDRLoader', () => {
+QUnit.module( 'Addons > Loaders > AVIFLoader', () => {
 
 	QUnit.test( 'LoadingManager waits for asynchronous decoding', async assert => {
 
@@ -11,7 +11,7 @@ QUnit.module( 'Addons > Loaders > NativeHDRLoader', () => {
 		let finishDecode, startedDecode;
 		const started = new Promise( resolve => startedDecode = resolve );
 		const decoding = new Promise( resolve => finishDecode = resolve );
-		const loader = new NativeHDRLoader( manager );
+		const loader = new AVIFLoader( manager );
 		loader._decode = buffer => {
 
 			assert.ok( buffer.byteLength > 0, 'Download has completed' );
@@ -42,7 +42,7 @@ QUnit.module( 'Addons > Loaders > NativeHDRLoader', () => {
 		const failures = [];
 		manager.onLoad = () => completed = true;
 		manager.onError = url => failures.push( url );
-		const loader = new NativeHDRLoader( manager );
+		const loader = new AVIFLoader( manager );
 		loader._decode = async () => {
 
 			throw new Error( 'Decoder rejected HDR image' );
@@ -80,7 +80,7 @@ QUnit.module( 'Addons > Loaders > NativeHDRLoader', () => {
 
 		} );
 		manager.onProgress = ( url, loaded, total ) => assert.ok( loaded <= total, 'Each item finishes once' );
-		const loader = new NativeHDRLoader( manager );
+		const loader = new AVIFLoader( manager );
 		loader._decode = async () => ( { data: new Uint16Array( 4 ), width: 1, height: 1 } );
 		const texture = await new Promise( ( resolve, reject ) => {
 
@@ -100,7 +100,7 @@ QUnit.module( 'Addons > Loaders > NativeHDRLoader', () => {
 
 	QUnit.test( 'parse callback and parseAsync return configured HDR textures', async assert => {
 
-		const loader = new NativeHDRLoader();
+		const loader = new AVIFLoader();
 		loader._decode = async () => ( { data: new Uint16Array( [ 0x4000, 0x4000, 0x4000, 0x3c00 ] ), width: 1, height: 1 } );
 		const texture = await loader.parseAsync( new ArrayBuffer( 0 ) );
 		assert.strictEqual( texture.type, HalfFloatType );
@@ -134,7 +134,7 @@ QUnit.module( 'Addons > Loaders > NativeHDRLoader', () => {
 
 		try {
 
-			const loader = new NativeHDRLoader();
+			const loader = new AVIFLoader();
 			const buffer = new ArrayBuffer( 0 );
 			await assert.rejects( loader.parseAsync( buffer ), /16-bit float canvas storage unsupported/, 'Reports unsupported float16 storage' );
 			context.getContextAttributes = () => ( { colorType: 'float16' } );

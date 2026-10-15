@@ -6,23 +6,59 @@ import {
 	LinearFilter,
 	LinearSRGBColorSpace,
 	Loader,
-	RGBAFormat
+	RGBAFormat,
+	SRGBColorSpace
 } from 'three';
 
 /**
- * Loads HDR AVIF and JPEG XL images using the browser's native decoder.
- * Produces linear sRGB half-float textures. Requires float16 Canvas2D and
+ * Loads HDR JPEG XL images using the browser's native decoder.
+ * Produces half-float textures in linear sRGB by default. Requires float16 Canvas2D and
  * globalHDRHeadroom.
  *
  * ```js
- * const texture = await new NativeHDRLoader().loadAsync( 'image.avif' );
+ * const texture = await new JXLLoader().loadAsync( 'image.jxl' );
  * const material = new THREE.MeshStandardMaterial( { emissive: 0xffffff, emissiveMap: texture } );
  * ```
  *
  * @augments Loader
- * @three_import import { NativeHDRLoader } from 'three/addons/loaders/NativeHDRLoader.js';
+ * @three_import import { JXLLoader } from 'three/addons/loaders/JXLLoader.js';
  */
-class NativeHDRLoader extends Loader {
+class JXLLoader extends Loader {
+
+	/**
+	 * Constructs a new JXLLoader.
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
+	constructor( manager ) {
+
+		super( manager );
+
+		/**
+		 * Output color space. Use SRGBColorSpace to preserve encoded sRGB values.
+		 * @type {SRGBColorSpace|LinearSRGBColorSpace}
+		 * @default LinearSRGBColorSpace
+		 */
+		this.colorSpace = LinearSRGBColorSpace;
+
+	}
+
+	/**
+	 * Sets the output color space.
+	 * @param {SRGBColorSpace|LinearSRGBColorSpace} colorSpace - The output color space.
+	 * @return {JXLLoader} A reference to this loader.
+	 */
+	setColorSpace( colorSpace ) {
+
+		if ( colorSpace !== LinearSRGBColorSpace && colorSpace !== SRGBColorSpace ) {
+
+			throw new Error( 'JXLLoader: Unsupported color space.' );
+
+		}
+
+		this.colorSpace = colorSpace;
+		return this;
+
+	}
 
 	/**
 	 * Loads a native HDR image into a half-float data texture.
@@ -72,7 +108,7 @@ class NativeHDRLoader extends Loader {
 
 	/**
 	 * Decodes image bytes using the browser, preserving maximum HDR headroom.
-	 * @param {ArrayBuffer} buffer - AVIF or JPEG XL bytes.
+	 * @param {ArrayBuffer} buffer - JPEG XL bytes.
 	 * @param {function(DataTexture)} onLoad - Completion callback.
 	 * @param {Function} onError - Error callback.
 	 */
@@ -83,9 +119,9 @@ class NativeHDRLoader extends Loader {
 	}
 
 	/**
-	 * Async version of {@link NativeHDRLoader#parse}.
-	 * @param {ArrayBuffer} buffer - AVIF or JPEG XL bytes.
-	 * @return {Promise<DataTexture>} Linear sRGB half-float texture.
+	 * Async version of {@link JXLLoader#parse}.
+	 * @param {ArrayBuffer} buffer - JPEG XL bytes.
+	 * @return {Promise<DataTexture>} Half-float texture in the configured color space.
 	 */
 	async parseAsync( buffer ) {
 
@@ -96,12 +132,12 @@ class NativeHDRLoader extends Loader {
 
 	}
 
-	_applyData( texture, { data, width, height } ) {
+	_applyData( texture, { data, width, height, colorSpace } ) {
 
 		texture.image = { data, width, height };
 		texture.format = RGBAFormat;
 		texture.type = HalfFloatType;
-		texture.colorSpace = LinearSRGBColorSpace;
+		texture.colorSpace = colorSpace;
 		texture.minFilter = LinearFilter;
 		texture.magFilter = LinearFilter;
 		texture.flipY = true;
@@ -111,6 +147,7 @@ class NativeHDRLoader extends Loader {
 
 	async _decode( buffer ) {
 
+		const colorSpace = this.colorSpace;
 		const canvas = document.createElement( 'canvas' );
 		let context;
 		try {
@@ -119,25 +156,25 @@ class NativeHDRLoader extends Loader {
 
 		} catch ( cause ) {
 
-			throw new Error( 'NativeHDRLoader: 16-bit float Canvas2D creation failed.', { cause } );
+			throw new Error( 'JXLLoader: 16-bit float Canvas2D creation failed.', { cause } );
 
 		}
 
 		if ( ! context ) {
 
-			throw new Error( 'NativeHDRLoader: Canvas2D is unavailable.' );
+			throw new Error( 'JXLLoader: Canvas2D is unavailable.' );
 
 		}
 
 		if ( context.getContextAttributes?.().colorType !== 'float16' ) {
 
-			throw new Error( 'NativeHDRLoader: 16-bit float canvas storage unsupported.' );
+			throw new Error( 'JXLLoader: 16-bit float canvas storage unsupported.' );
 
 		}
 
 		if ( ! ( 'globalHDRHeadroom' in context ) ) {
 
-			throw new Error( 'NativeHDRLoader: globalHDRHeadroom unsupported.' );
+			throw new Error( 'JXLLoader: globalHDRHeadroom unsupported.' );
 
 		}
 
@@ -153,7 +190,7 @@ class NativeHDRLoader extends Loader {
 
 			} catch ( cause ) {
 
-				throw new Error( 'NativeHDRLoader: Native image decoding failed.', { cause } );
+				throw new Error( 'JXLLoader: Native image decoding failed.', { cause } );
 
 			}
 
@@ -167,7 +204,7 @@ class NativeHDRLoader extends Loader {
 
 			} catch ( cause ) {
 
-				throw new Error( 'NativeHDRLoader: globalHDRHeadroom not available.', { cause } );
+				throw new Error( 'JXLLoader: globalHDRHeadroom not available.', { cause } );
 
 			}
 
@@ -180,13 +217,13 @@ class NativeHDRLoader extends Loader {
 
 			} catch ( cause ) {
 
-				throw new Error( 'NativeHDRLoader: 16-bit float pixel readback failed.', { cause } );
+				throw new Error( 'JXLLoader: 16-bit float pixel readback failed.', { cause } );
 
 			}
 
 			if ( pixels.pixelFormat !== 'rgba-float16' ) {
 
-				throw new Error( 'NativeHDRLoader: 16-bit float pixel readback is unavailable.' );
+				throw new Error( 'JXLLoader: 16-bit float pixel readback is unavailable.' );
 
 			}
 
@@ -195,7 +232,7 @@ class NativeHDRLoader extends Loader {
 			for ( let i = 0; i < data.length; i ++ ) {
 
 				let value = pixels.data[ i ];
-				if ( i % 4 !== 3 ) {
+				if ( colorSpace === LinearSRGBColorSpace && i % 4 !== 3 ) {
 
 					// Extended sRGB inverse transfer, including negative wide-gamut values.
 					const magnitude = Math.abs( value );
@@ -207,7 +244,7 @@ class NativeHDRLoader extends Loader {
 
 			}
 
-			return { data, width: canvas.width, height: canvas.height };
+			return { data, width: canvas.width, height: canvas.height, colorSpace };
 
 		} finally {
 
@@ -220,4 +257,4 @@ class NativeHDRLoader extends Loader {
 
 }
 
-export { NativeHDRLoader };
+export { JXLLoader };
