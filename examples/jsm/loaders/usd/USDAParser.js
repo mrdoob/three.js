@@ -241,35 +241,20 @@ class USDAParser {
 
 		while ( i < text.length ) {
 
-			// Check for block comment start
-			if ( text[ i ] === '/' && i + 1 < text.length && text[ i + 1 ] === '*' ) {
+			const start = text.indexOf( '/*', i );
 
-				// Find the closing */
-				let j = i + 2;
+			if ( start === - 1 ) {
 
-				while ( j < text.length ) {
-
-					if ( text[ j ] === '*' && j + 1 < text.length && text[ j + 1 ] === '/' ) {
-
-						// Found closing, skip past it
-						j += 2;
-						break;
-
-					}
-
-					j ++;
-
-				}
-
-				// Move past the comment (or to end if unclosed)
-				i = j;
-
-			} else {
-
-				result += text[ i ];
-				i ++;
+				result += text.slice( i );
+				break;
 
 			}
+
+			result += text.slice( i, start );
+
+			// Move past the comment (or to end if unclosed)
+			const end = text.indexOf( '*/', start + 2 );
+			i = ( end === - 1 ) ? text.length : end + 2;
 
 		}
 
@@ -279,55 +264,37 @@ class USDAParser {
 
 	_collapseTripleQuotedStrings( text ) {
 
+		const tripleQuote = /'''|"""/g;
+
 		let result = '';
 		let i = 0;
 
 		while ( i < text.length ) {
 
-			if ( i + 2 < text.length ) {
+			tripleQuote.lastIndex = i;
+			const match = tripleQuote.exec( text );
 
-				const triple = text.slice( i, i + 3 );
+			if ( match === null ) {
 
-				if ( triple === '\'\'\'' || triple === '"""' ) {
-
-					const quoteChar = triple;
-					result += quoteChar;
-					i += 3;
-
-					while ( i < text.length ) {
-
-						if ( i + 2 < text.length && text.slice( i, i + 3 ) === quoteChar ) {
-
-							result += quoteChar;
-							i += 3;
-							break;
-
-						} else {
-
-							if ( text[ i ] === '\n' ) {
-
-								result += '\\n';
-
-							} else if ( text[ i ] !== '\r' ) {
-
-								result += text[ i ];
-
-							}
-
-							i ++;
-
-						}
-
-					}
-
-					continue;
-
-				}
+				result += text.slice( i );
+				break;
 
 			}
 
-			result += text[ i ];
-			i ++;
+			const start = match.index;
+			const quoteChar = match[ 0 ];
+
+			result += text.slice( i, start );
+
+			const end = text.indexOf( quoteChar, start + 3 );
+			const content = text.slice( start + 3, ( end === - 1 ) ? text.length : end );
+
+			result += quoteChar + content.replace( /\r/g, '' ).replace( /\n/g, '\\n' );
+
+			if ( end === - 1 ) break;
+
+			result += quoteChar;
+			i = end + 3;
 
 		}
 

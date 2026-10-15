@@ -53,6 +53,26 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
+			QUnit.test( 'strips USDA block comments', ( assert ) => {
+
+				const parser = new USDAParser();
+
+				assert.strictEqual( parser._stripBlockComments( '/* x */a/* y */b/**/c' ), 'abc', 'Multiple and empty comments are removed.' );
+				assert.strictEqual( parser._stripBlockComments( 'a */ b /*/ c */ d' ), 'a */ b  d', 'A stray closer is kept and the closer search starts after the opener.' );
+				assert.strictEqual( parser._stripBlockComments( 'a /* unclosed' ), 'a ', 'An unclosed comment extends to the end.' );
+
+			} );
+
+			QUnit.test( 'collapses USDA triple-quoted strings into single lines', ( assert ) => {
+
+				const parser = new USDAParser();
+
+				assert.strictEqual( parser._collapseTripleQuotedStrings( 'b = \'\'\'x\r\ny\'\'\' c = """z"""' ), 'b = \'\'\'x\\ny\'\'\' c = """z"""', 'Both quote types are collapsed, removing \\r and escaping \\n.' );
+				assert.strictEqual( parser._collapseTripleQuotedStrings( 'c = """ it\'s \'\'\' inside """' ), 'c = """ it\'s \'\'\' inside """', 'The other quote type does not close the string.' );
+				assert.strictEqual( parser._collapseTripleQuotedStrings( 'd = """unclosed\nend' ), 'd = """unclosed\\nend', 'An unclosed string extends to the end.' );
+
+			} );
+
 			QUnit.test( 'reads the USDC string table after its count prefix', ( assert ) => {
 
 				const parser = new USDCParser();
