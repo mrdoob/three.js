@@ -676,7 +676,7 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 
 	#endif
 
-	#if defined( USE_SHEEN ) && ! defined( ENVMAP_DIFFUSE_DISABLED )
+	#if defined( USE_SHEEN ) && defined( USE_ENVMAP_DIFFUSE )
 
 		sheenSpecularIndirect += irradiance * material.sheenColor * IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness ) * RECIPROCAL_PI;
 
@@ -740,7 +740,7 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 
 	reflectedLight.indirectSpecular += indirectSpecular;
 
-	#ifndef ENVMAP_DIFFUSE_DISABLED
+	#ifdef USE_ENVMAP_DIFFUSE
 
 		reflectedLight.indirectDiffuse += indirectDiffuse;
 

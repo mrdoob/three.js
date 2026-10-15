@@ -828,7 +828,7 @@ class Material extends EventDispatcher {
 
 		if ( this.envMapRotation !== undefined ) data.envMapRotation = this.envMapRotation.toArray();
 		if ( this.envMapIntensity !== undefined ) data.envMapIntensity = this.envMapIntensity;
-		if ( this.envMapDiffuse !== undefined ) data.envMapDiffuse = this.envMapDiffuse;
+		if ( this.envMapDiffuseEnabled !== undefined ) data.envMapDiffuseEnabled = this.envMapDiffuseEnabled;
 		if ( this.reflectivity !== undefined ) data.reflectivity = this.reflectivity;
 		if ( this.refractionRatio !== undefined ) data.refractionRatio = this.refractionRatio;
 
@@ -1076,7 +1076,7 @@ class Material extends EventDispatcher {
 		if ( json.envMap !== undefined ) this.envMap = textures[ json.envMap ] || null;
 		if ( json.envMapRotation !== undefined ) this.envMapRotation.fromArray( json.envMapRotation );
 		if ( json.envMapIntensity !== undefined ) this.envMapIntensity = json.envMapIntensity;
-		if ( json.envMapDiffuse !== undefined ) this.envMapDiffuse = json.envMapDiffuse;
+		if ( json.envMapDiffuseEnabled !== undefined ) this.envMapDiffuseEnabled = json.envMapDiffuseEnabled;
 
 		if ( json.reflectivity !== undefined ) this.reflectivity = json.reflectivity;
 		if ( json.refractionRatio !== undefined ) this.refractionRatio = json.refractionRatio;

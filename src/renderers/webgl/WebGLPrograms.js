@@ -224,7 +224,7 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
 			envMapPMREM: HAS_PMREM,
 			envMapMaxLod: HAS_PMREM ? envMapMipmaps.length - 1 : null,
 			envMapSize: HAS_PMREM ? envMapMipmaps[ 0 ].width : null,
-			envMapDiffuse: material.envMapDiffuse !== false,
+			envMapDiffuse: material.envMapDiffuseEnabled !== false,
 			aoMap: HAS_AOMAP,
 			lightMap: HAS_LIGHTMAP,
 			bumpMap: HAS_BUMPMAP,

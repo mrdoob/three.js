@@ -1,7 +1,7 @@
 export default /* glsl */`
 #if defined( RE_IndirectDiffuse )
 
-	#if defined( LAMBERT ) || defined( PHONG )
+	#if ( defined( LAMBERT ) || defined( PHONG ) ) && defined( USE_ENVMAP_DIFFUSE )
 
 		irradiance += iblIrradiance;
 

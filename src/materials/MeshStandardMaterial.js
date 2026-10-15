@@ -357,7 +357,7 @@ class MeshStandardMaterial extends Material {
 		 * @type {boolean}
 		 * @default true
 		 */
-		this.envMapDiffuse = true;
+		this.envMapDiffuseEnabled = true;
 
 		/**
 		 * Renders the geometry as a wireframe.
@@ -459,7 +459,7 @@ class MeshStandardMaterial extends Material {
 		this.envMap = source.envMap;
 		this.envMapRotation.copy( source.envMapRotation );
 		this.envMapIntensity = source.envMapIntensity;
-		this.envMapDiffuse = source.envMapDiffuse;
+		this.envMapDiffuseEnabled = source.envMapDiffuseEnabled;
 
 		this.wireframe = source.wireframe;
 		this.wireframeLinewidth = source.wireframeLinewidth;

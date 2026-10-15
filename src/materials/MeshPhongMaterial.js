@@ -332,6 +332,16 @@ class MeshPhongMaterial extends Material {
 		this.envMapIntensity = 1.0;
 
 		/**
+		 * Whether {@link Scene#environment} contributes to the indirect diffuse lighting.
+		 * Set this to `false` if another source like a light probe grid provides the
+		 * indirect diffuse lighting, so it isn't added twice.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.envMapDiffuseEnabled = true;
+
+		/**
 		 * The index of refraction (IOR) of air (approximately 1) divided by the
 		 * index of refraction of the material. It is used with environment mapping
 		 * modes {@link CubeRefractionMapping} and {@link EquirectangularRefractionMapping}.
@@ -440,6 +450,7 @@ class MeshPhongMaterial extends Material {
 		this.combine = source.combine;
 		this.reflectivity = source.reflectivity;
 		this.envMapIntensity = source.envMapIntensity;
+		this.envMapDiffuseEnabled = source.envMapDiffuseEnabled;
 		this.refractionRatio = source.refractionRatio;
 
 		this.wireframe = source.wireframe;

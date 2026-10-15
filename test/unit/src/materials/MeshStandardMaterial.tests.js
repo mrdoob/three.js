@@ -37,19 +37,19 @@ export default QUnit.module( 'Materials', () => {
 
 		} );
 
-		QUnit.test( 'envMapDiffuse', ( assert ) => {
+		QUnit.test( 'envMapDiffuseEnabled', ( assert ) => {
 
 			const object = new MeshStandardMaterial();
-			assert.strictEqual( object.envMapDiffuse, true, 'envMapDiffuse defaults to true.' );
+			assert.strictEqual( object.envMapDiffuseEnabled, true, 'envMapDiffuseEnabled defaults to true.' );
 
-			const source = new MeshStandardMaterial( { envMapDiffuse: false } );
-			assert.strictEqual( new MeshStandardMaterial().copy( source ).envMapDiffuse, false, 'copy() preserves envMapDiffuse.' );
+			const source = new MeshStandardMaterial( { envMapDiffuseEnabled: false } );
+			assert.strictEqual( new MeshStandardMaterial().copy( source ).envMapDiffuseEnabled, false, 'copy() preserves envMapDiffuseEnabled.' );
 
 			const json = source.toJSON();
 			object.fromJSON( json );
 
-			assert.strictEqual( json.envMapDiffuse, false, 'toJSON() serializes envMapDiffuse.' );
-			assert.strictEqual( object.envMapDiffuse, false, 'fromJSON() restores envMapDiffuse.' );
+			assert.strictEqual( json.envMapDiffuseEnabled, false, 'toJSON() serializes envMapDiffuseEnabled.' );
+			assert.strictEqual( object.envMapDiffuseEnabled, false, 'fromJSON() restores envMapDiffuseEnabled.' );
 
 		} );
 

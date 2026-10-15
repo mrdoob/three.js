@@ -822,9 +822,9 @@ class PhysicalLightingModel extends LightingModel {
 
 		const { radiance, iblIrradiance, reflectedLight } = builder.context;
 
-		const envMapDiffuse = builder.material.envMapDiffuse !== false;
+		const envMapDiffuseEnabled = builder.material.envMapDiffuseEnabled !== false;
 
-		if ( this.sheen === true && envMapDiffuse ) {
+		if ( this.sheen === true && envMapDiffuseEnabled ) {
 
 			this.sheenSpecularIndirect.addAssign( iblIrradiance.mul(
 				sheen,
@@ -894,7 +894,7 @@ class PhysicalLightingModel extends LightingModel {
 
 		reflectedLight.indirectSpecular.addAssign( indirectSpecular );
 
-		if ( envMapDiffuse ) {
+		if ( envMapDiffuseEnabled ) {
 
 			reflectedLight.indirectDiffuse.addAssign( indirectDiffuse );
 
