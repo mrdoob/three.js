@@ -410,15 +410,19 @@ function ParserState() {
 			const vLen = this.vertices.length;
 			const uvLen = this.uvs.length;
 
-			for ( let vi = 0, l = vertices.length; vi < l; vi ++ ) {
+			// a line statement defines a polyline, so convert it to pairs of vertices for line segments
+
+			for ( let vi = 0, l = vertices.length - 1; vi < l; vi ++ ) {
 
 				this.addVertexLine( this.parseVertexIndex( vertices[ vi ], vLen ) );
+				this.addVertexLine( this.parseVertexIndex( vertices[ vi + 1 ], vLen ) );
 
 			}
 
-			for ( let uvi = 0, l = uvs.length; uvi < l; uvi ++ ) {
+			for ( let uvi = 0, l = uvs.length - 1; uvi < l; uvi ++ ) {
 
 				this.addUVLine( this.parseUVIndex( uvs[ uvi ], uvLen ) );
+				this.addUVLine( this.parseUVIndex( uvs[ uvi + 1 ], uvLen ) );
 
 			}
 
@@ -656,7 +660,7 @@ class OBJLoader extends Loader {
 
 			} else if ( lineFirstChar === 'l' ) {
 
-				const lineParts = line.substring( 1 ).trim().split( ' ' );
+				const lineParts = line.substring( 1 ).trim().split( _face_vertex_data_separator_pattern );
 				let lineVertices = [];
 				const lineUVs = [];
 
@@ -682,7 +686,7 @@ class OBJLoader extends Loader {
 			} else if ( lineFirstChar === 'p' ) {
 
 				const lineData = line.slice( 1 ).trim();
-				const pointData = lineData.split( ' ' );
+				const pointData = lineData.split( _face_vertex_data_separator_pattern );
 
 				state.addPointGeometry( pointData );
 

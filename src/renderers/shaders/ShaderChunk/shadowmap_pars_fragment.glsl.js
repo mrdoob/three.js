@@ -171,7 +171,7 @@ export default /* glsl */`
 				// Hardware PCF with LinearFilter gives us 4-tap filtering per sample
 				// 5 samples using Vogel disk + IGN = effectively 20 filtered taps with better distribution
 				vec2 texelSize = vec2( 1.0 ) / shadowMapSize;
-				float radius = shadowRadius * texelSize.x;
+				vec2 radius = shadowRadius * texelSize;
 
 				// Use IGN to rotate sampling pattern per pixel
 				float phi = interleavedGradientNoise( gl_FragCoord.xy ) * PI2;
