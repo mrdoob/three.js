@@ -105,6 +105,8 @@ class MaterialXLoader extends Loader {
 
 		new FileLoader( this.manager )
 			.setPath( this.path )
+			.setRequestHeader( this.requestHeader )
+			.setWithCredentials( this.withCredentials )
 			.setResponseType( 'arraybuffer' )
 			.load( url, ( data ) => {
 

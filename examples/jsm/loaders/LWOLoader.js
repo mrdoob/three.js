@@ -87,6 +87,8 @@ class LWOLoader extends Loader {
 		const modelName = url.split( path ).pop().split( '.' )[ 0 ];
 
 		const loader = new FileLoader( this.manager );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 
