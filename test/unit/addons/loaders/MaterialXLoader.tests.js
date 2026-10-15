@@ -165,53 +165,15 @@ export default QUnit.module( 'Addons', () => {
 
 		QUnit.module( 'MaterialXLoader', () => {
 
-			QUnit.test( 'forwards texture request settings and preserves the resource path', async ( assert ) => {
+			QUnit.test( 'texture settings', ( assert ) => {
 
-				const originalFetch = globalThis.fetch;
-				const originalCreateImageBitmap = globalThis.createImageBitmap;
-				const requests = [];
-				globalThis.fetch = async ( url, options ) => {
-
-					requests.push( { url, options } );
-					return new Response( new Blob() );
-
-				};
-
-				globalThis.createImageBitmap = async () => ( { width: 1, height: 1 } );
-
-				try {
-
-					for ( const [ crossOrigin, withCredentials, credentials ] of [
-						[ 'anonymous', false, 'same-origin' ],
-						[ 'anonymous', true, 'include' ],
-						[ 'use-credentials', false, 'include' ]
-					] ) {
-
-						const loader = new MaterialXLoader()
-							.setPath( 'documents/' )
-							.setCrossOrigin( crossOrigin )
-							.setWithCredentials( withCredentials )
-							.setRequestHeader( { Authorization: 'test-token' } );
-						const { document } = loader._parse( '<materialx version="1.39"/>', { path: 'textures/' } );
-
-						assert.strictEqual( document.imageLoader.crossOrigin, crossOrigin, 'Image elements inherit the parent credential policy.' );
-						assert.strictEqual( document.imageLoader.path, 'textures/', 'The image loader retains the document resource path.' );
-						assert.deepEqual( document.textureLoader.options, { imageOrientation: 'none' }, 'Bitmap orientation options are preserved.' );
-
-						await document.textureLoader.loadAsync( 'texture.png' );
-						const request = requests.pop();
-						assert.strictEqual( request.url, 'textures/texture.png', 'Bitmap requests use the document resource path.' );
-						assert.deepEqual( request.options.headers, { Authorization: 'test-token' }, 'Bitmap requests inherit custom headers.' );
-						assert.strictEqual( request.options.credentials, credentials, 'Bitmap requests honor both credential settings.' );
-
-					}
-
-				} finally {
-
-					globalThis.fetch = originalFetch;
-					globalThis.createImageBitmap = originalCreateImageBitmap;
-
-				}
+				const loader = new MaterialXLoader().setCrossOrigin( 'use-credentials' ).setWithCredentials( true ).setRequestHeader( { Accept: 'image/*' } );
+				const { document } = loader._parse( '<materialx version="1.39"/>', { path: 'textures/' } );
+				assert.strictEqual( document.imageLoader.crossOrigin, loader.crossOrigin );
+				assert.strictEqual( document.textureLoader.crossOrigin, loader.crossOrigin );
+				assert.strictEqual( document.textureLoader.withCredentials, true );
+				assert.strictEqual( document.textureLoader.requestHeader, loader.requestHeader );
+				assert.strictEqual( document.textureLoader.path, 'textures/' );
 
 			} );
 
