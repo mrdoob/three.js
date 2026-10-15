@@ -20,10 +20,12 @@
 			</div>
 
 			<small>
-				Ambient Occlusion: switchable between GTAO and SSAO.<br />
+				GTAO bent normals: scalar AO (left), directional specular occlusion (right).<br />
 				Tennyson bust from <a href="https://threedscans.com/lincoln/tennyson/" target="_blank" rel="noopener">Three D Scans</a>.
 			</small>
 		</div>
+
+		<div id="comparison" style="position: fixed; left: 50%; top: 0; height: 100%; border-left: 1px dashed #fff8; pointer-events: none;"></div>
 
 		<script type="importmap">
 			{
@@ -39,8 +41,8 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { sample, pass, mrt, screenUV, normalView, velocity, vec3, vec4, packNormalToRGB, unpackRGBToNormal, colorSpaceToWorking, builtinAOContext } from 'three/tsl';
-			import { ao } from 'three/addons/tsl/display/GTAONode.js';
+			import { sample, pass, mrt, screenUV, normalView, velocity, vec3, vec4, packNormalToRGB, unpackRGBToNormal, colorSpaceToWorking, builtinAOContext, roughness, reflect, getViewPosition, uniform } from 'three/tsl';
+			import { ao, specularOcclusion } from 'three/addons/tsl/display/GTAONode.js';
 			import { ssao } from 'three/addons/tsl/display/SSAONode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
@@ -68,7 +70,8 @@
 				bias: 0.025, // SSAO
 				blurEnabled: true, // SSAO
 				blurSharpness: 2, // SSAO
-				aoOnly: false,
+				view: 'Split comparison',
+				specularOcclusion: true,
 				transparentOpacity: 0.3
 			};
 
@@ -106,7 +109,7 @@
 
 				scene.background = new THREE.Color( 0x666666 );
 				scene.environment = pmremGenerator.fromScene( environment, 0.04 ).texture;
-				scene.environmentIntensity = 0.3;
+				scene.environmentIntensity = 1;
 				environment.dispose();
 				pmremGenerator.dispose();
 
@@ -121,7 +124,7 @@
 				prePass.transparent = false;
 
 				prePass.setMRT( mrt( {
-					output: packNormalToRGB( normalView ),
+					output: vec4( packNormalToRGB( normalView ), roughness ),
 					velocity: velocity
 				} ) );
 
@@ -160,8 +163,45 @@
 
 					scenePass.options.samples = useTRAA ? 0 : 4;
 
-					renderPipeline.outputNode = params.aoOnly ? vec4( vec3( aoPass.getTextureNode().sample( screenUV ).r ), 1 ) : ( useTRAA ? traaPass : scenePass );
-					renderer.toneMapping = params.aoOnly ? THREE.NoToneMapping : THREE.NeutralToneMapping;
+					document.getElementById( 'comparison' ).style.display = params.view === 'Split comparison' && params.aoType === 'GTAO' && params.specularOcclusion ? '' : 'none';
+
+					const visibility = aoPass.getTextureNode().sample( screenUV ).r;
+					const isGTAO = params.aoType === 'GTAO';
+					const aoContext = builtinAOContext( visibility );
+					if ( isGTAO && params.specularOcclusion ) {
+
+						const gtaoContext = aoPass.getLightingContext();
+						const getSpecularOcclusion = gtaoContext.value.getSpecularOcclusion;
+						gtaoContext.value.getSpecularOcclusion = ( fallback, ...args ) => {
+
+							const directional = getSpecularOcclusion( fallback, ...args );
+							return params.view === 'Split comparison' ? screenUV.x.lessThan( 0.5 ).select( fallback, directional ) : directional;
+
+						};
+
+						scenePass.contextNode = gtaoContext;
+
+					} else {
+
+						scenePass.contextNode = aoContext;
+
+					}
+
+					scenePass.needsUpdate = true;
+
+					let output = useTRAA ? traaPass : scenePass;
+					if ( params.view === 'AO' ) output = vec4( vec3( visibility ), 1 );
+					if ( isGTAO && params.view === 'Bent normals' ) output = vec4( aoPass.getBentNormalNode().mul( 0.5 ).add( 0.5 ), 1 );
+					if ( isGTAO && params.view === 'Specular occlusion' ) {
+
+						const position = getViewPosition( screenUV, prePassDepth.sample( screenUV ).r, uniform( camera.projectionMatrixInverse ) );
+						const reflection = reflect( position.normalize(), prePassNormal.sample( screenUV ) );
+						output = vec4( vec3( specularOcclusion( visibility, aoPass.getBentNormalNode(), reflection, prePass.getTextureNode().sample( screenUV ).a ) ), 1 );
+
+					}
+
+					renderPipeline.outputNode = output;
+					renderer.toneMapping = [ 'AO', 'Bent normals', 'Specular occlusion' ].includes( params.view ) ? THREE.NoToneMapping : THREE.NeutralToneMapping;
 					renderPipeline.needsUpdate = true;
 
 				}
@@ -258,7 +298,7 @@
 
 				// central pedestal
 
-				const pedestalMat = new THREE.MeshStandardMaterial( { color: '#f0ece8', roughness: 0.4, metalness: 0.05 } );
+				const pedestalMat = new THREE.MeshStandardMaterial( { color: '#f0ece8', roughness: 0.32, metalness: 1 } );
 
 				const pedestalBase = new THREE.Mesh( new THREE.CylinderGeometry( 0.9, 1.0, 0.2, 32 ), pedestalMat );
 				pedestalBase.position.set( 0, - 1.9, 0 );
@@ -274,7 +314,7 @@
 
 				// torus knot
 
-				const knotMat = new THREE.MeshStandardMaterial( { color: '#c0a060', roughness: 0.45, metalness: 0 } );
+				const knotMat = new THREE.MeshStandardMaterial( { color: '#c0a060', roughness: 0.28, metalness: 1 } );
 				const torusKnot = new THREE.Mesh( new THREE.TorusKnotGeometry( 0.5, 0.17, 128, 32 ), knotMat );
 				torusKnot.position.set( 0, 0.82, 0 );
 				scene.add( torusKnot );
@@ -560,7 +600,8 @@
 					transparentMesh.material.opacity = value;
 
 				} );
-				gui.add( params, 'aoOnly' ).onChange( updateOutput );
+				gui.add( params, 'view', [ 'Beauty', 'Split comparison', 'AO', 'Bent normals', 'Specular occlusion' ] ).onChange( updateOutput );
+				const specularControl = gui.add( params, 'specularOcclusion' ).name( 'bent specular occlusion' ).onChange( updateOutput );
 
 				// show only the controls that apply to the active AO type
 
@@ -569,11 +610,13 @@
 					if ( params.aoType === 'GTAO' ) {
 
 						gtaoControls.forEach( ( control ) => control.show() );
+						specularControl.show();
 						ssaoControls.forEach( ( control ) => control.hide() );
 
 					} else {
 
 						gtaoControls.forEach( ( control ) => control.hide() );
+						specularControl.hide();
 						ssaoControls.forEach( ( control ) => control.show() );
 
 					}

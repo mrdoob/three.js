@@ -36,10 +36,18 @@ let _rendererState;
  *
  * // apply the ambient occlusion to the scene
  *
- * scenePass.contextNode = builtinAOContext( aoPassOutput.sample( screenUV ).r );
+ * scenePass.contextNode = aoPass.getLightingContext();
  *
  * renderPipeline.outputNode = scenePass;
  * ```
+ *
+ * The output texture contains ambient visibility in R and a view-space bent normal,
+ * encoded from [-1, 1] to [0, 1], in GBA. Use getBentNormalNode() to decode it.
+ * getLightingContext() applies visibility to indirect diffuse lighting and
+ * cone-based directional occlusion to indirect specular lighting, including clearcoat.
+ * Sheen retains scalar occlusion. Without this context, materials retain their
+ * existing scalar specular occlusion. Screen-space occlusion cannot account for
+ * off-screen or hidden geometry. Use TRAA to resolve temporal sampling noise.
  *
  * Reference: [Practical Real-Time Strategies for Accurate Indirect Occlusion](https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%20VERSION_COLOR.pdf).
  *
@@ -298,7 +306,7 @@ class GTAONode extends Node {
 	}
 
 	/**
-	 * Returns the result of the effect as a texture node.
+	 * Returns the packed result: ambient visibility in R and encoded bent normal in GBA.
 	 *
 	 * @return {PassTextureNode} A texture node that represents the result of the effect.
 	 */
