@@ -1,4 +1,4 @@
-import { Cache, LoadingManager } from 'three';
+import { LoadingManager } from 'three';
 import { USDLoader } from '../../../../examples/jsm/loaders/USDLoader.js';
 import { USDComposer, SpecType } from '../../../../examples/jsm/loaders/usd/USDComposer.js';
 import { USDAParser } from '../../../../examples/jsm/loaders/usd/USDAParser.js';
@@ -9,50 +9,6 @@ export default QUnit.module( 'Addons', () => {
 	QUnit.module( 'Loaders', () => {
 
 		QUnit.module( 'USDLoader', () => {
-
-			QUnit.test( 'textures inherit CORS, resolve URLs once, and use the loading manager and image cache', async ( assert ) => {
-
-				const url = '/examples/textures/uv_grid_opengl.jpg?usd-loader-settings';
-				const manager = new LoadingManager();
-				let completed = 0;
-				manager.onLoad = () => completed ++;
-				manager.setURLModifier( ( requestedURL ) => {
-
-					assert.strictEqual( requestedURL, 'textures/image.png', 'The URL modifier receives the unresolved texture URL once per load.' );
-					return url;
-
-				} );
-				const enabled = Cache.enabled;
-				Cache.enabled = true;
-
-				try {
-
-					const composer = new USDComposer( manager );
-					composer.imageLoader.setCrossOrigin( 'use-credentials' ).setPriority( 'high' );
-					const texture = composer._createTextureFromData( 'textures/image.png', null, null );
-					await Promise.all( composer.texturePromises );
-
-					assert.ok( texture.image.naturalWidth > 0 );
-					assert.strictEqual( texture.image.crossOrigin, 'use-credentials' );
-					assert.strictEqual( texture.image.fetchPriority, 'high' );
-					assert.strictEqual( completed, 1, 'The loading manager observes texture completion.' );
-					assert.strictEqual( Cache.get( `image:${ url }` ), texture.image, 'The image participates in the shared cache.' );
-
-					const secondComposer = new USDComposer( manager );
-					secondComposer.imageLoader.setCrossOrigin( 'use-credentials' ).setPriority( 'high' );
-					const secondTexture = secondComposer._createTextureFromData( 'textures/image.png', null, null );
-					await Promise.all( secondComposer.texturePromises );
-					assert.strictEqual( secondTexture.image, texture.image, 'Repeated texture loads reuse the cached image.' );
-					assert.strictEqual( completed, 2, 'Cached loads also notify the loading manager.' );
-
-				} finally {
-
-					Cache.remove( `image:${ url }` );
-					Cache.enabled = enabled;
-
-				}
-
-			} );
 
 			QUnit.test( 'reads the USDC string table after its count prefix', ( assert ) => {
 

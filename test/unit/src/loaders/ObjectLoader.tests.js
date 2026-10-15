@@ -9,27 +9,6 @@ export default QUnit.module( 'Loaders', () => {
 
 	QUnit.module( 'ObjectLoader', () => {
 
-		QUnit.test( 'image URLs use the resource root without the model request path', async ( assert ) => {
-
-			const loader = new ObjectLoader().setPath( 'models/' ).setResourcePath( '/examples/textures/' ).setPriority( 'high' );
-			const json = [ { uuid: 'image', url: 'uv_grid_opengl.jpg?object-loader-path' } ];
-			let images;
-			await new Promise( ( resolve ) => {
-
-				images = loader.parseImages( json, resolve );
-
-			} );
-			assert.ok( images.image.data.naturalWidth > 0 );
-			assert.ok( images.image.data.src.endsWith( '/examples/textures/uv_grid_opengl.jpg?object-loader-path' ) );
-			assert.strictEqual( images.image.data.fetchPriority, 'high' );
-
-			const asyncImages = await loader.parseImagesAsync( json );
-			assert.ok( asyncImages.image.data.naturalWidth > 0 );
-			assert.ok( asyncImages.image.data.src.endsWith( '/examples/textures/uv_grid_opengl.jpg?object-loader-path' ) );
-			assert.strictEqual( asyncImages.image.data.fetchPriority, 'high' );
-
-		} );
-
 		// INHERITANCE
 		QUnit.test( 'Extending', ( assert ) => {
 

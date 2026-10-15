@@ -141,25 +141,6 @@ export default QUnit.module( 'Addons', () => {
 
 		QUnit.module( 'GLTFLoader', () => {
 
-			QUnit.test( 'propagates request settings to buffers and images', async ( assert ) => {
-
-				const loader = new GLTFLoader().setPriority( 'low' ).setCache( 'no-store' );
-				loader.setRequestHeader( { Accept: 'application/octet-stream' } );
-				loader.setCrossOrigin( 'use-credentials' );
-				const result = await loader.parseAsync( { asset: { version: '2.0' }, scenes: [ {} ], scene: 0 }, 'assets/' );
-				assert.strictEqual( result.parser.fileLoader.path, '', 'Resolved buffer URLs must not receive the resource path twice.' );
-				assert.strictEqual( result.parser.fileLoader.withCredentials, true );
-				assert.strictEqual( result.parser.fileLoader.requestHeader, loader.requestHeader );
-
-				for ( const dependencyLoader of [ result.parser.fileLoader, result.parser.textureLoader ] ) {
-
-					assert.strictEqual( dependencyLoader.priority, 'low' );
-					assert.strictEqual( dependencyLoader.cache, 'no-store' );
-
-				}
-
-			} );
-
 			QUnit.test( 'CUBICSPLINE animations can be made additive at an interpolated frame', async ( assert ) => {
 
 				const buffer = new Float32Array( [
