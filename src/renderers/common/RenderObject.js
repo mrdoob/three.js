@@ -878,7 +878,7 @@ class RenderObject {
 
 		}
 
-		cacheKey += this.context.id + ',';
+		cacheKey += this.context.stateKey + ',';
 
 		cacheKey += object.receiveShadow + ',';
 

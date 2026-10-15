@@ -64,7 +64,11 @@ class RenderContexts {
 
 		//
 
-		const renderStateKey = attachmentState + '-' + mrtState + '-' + callDepth;
+		// each call depth has its own context so nested render calls don't overwrite the state
+		// of the outer call. the call depth isn't part of the state key since shaders don't depend on it
+
+		const stateKey = attachmentState + '-' + mrtState;
+		const renderStateKey = stateKey + '-' + callDepth;
 
 		let renderState = this._renderContexts[ renderStateKey ];
 
@@ -72,6 +76,7 @@ class RenderContexts {
 
 			renderState = new RenderContext();
 			renderState.mrt = mrt;
+			renderState.stateKey = stateKey;
 
 			this._renderContexts[ renderStateKey ] = renderState;
 
