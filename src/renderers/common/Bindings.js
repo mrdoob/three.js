@@ -485,7 +485,10 @@ class Bindings extends DataMap {
 
 				}
 
-				cacheKey += attribute.id + ':' + generation + ',';
+				// the generation is part of the version so a re-created buffer replaces the cached bind group
+
+				cacheKey += attribute.id + ',';
+				version += generation;
 
 			}
 
