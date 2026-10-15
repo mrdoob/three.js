@@ -348,6 +348,18 @@ class MeshStandardMaterial extends Material {
 		this.envMapIntensity = 1.0;
 
 		/**
+		 * Whether the environment map contributes to the indirect diffuse lighting.
+		 * Set this to `false` if another source like a light probe grid provides the
+		 * indirect diffuse lighting, so it isn't added twice. The environment map
+		 * still contributes the specular reflections. This also applies when the
+		 * environment comes from {@link Scene#environment}.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.envMapDiffuse = true;
+
+		/**
 		 * Renders the geometry as a wireframe.
 		 *
 		 * @type {boolean}
@@ -447,6 +459,7 @@ class MeshStandardMaterial extends Material {
 		this.envMap = source.envMap;
 		this.envMapRotation.copy( source.envMapRotation );
 		this.envMapIntensity = source.envMapIntensity;
+		this.envMapDiffuse = source.envMapDiffuse;
 
 		this.wireframe = source.wireframe;
 		this.wireframeLinewidth = source.wireframeLinewidth;
