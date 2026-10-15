@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - specular probes (Sponza)</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+		<style>
+			#status { position: absolute; bottom: 20px; left: 20px; padding: 10px; background: #000a; color: #fff; font: 13px monospace; pointer-events: none; }
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+			<div class="title-wrapper"><a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Specular Probes (Sponza)</span></div>
+			<small>WASD / arrow keys to move, hold mouse button to look. The mirror sphere follows you.<br>Overlapping influence volumes blend two local reflections; no probe graph is required.</small>
+		</div>
+		<div id="status">Loading Sponza…</div>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { uniform } from 'three/tsl';
+			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { SpecularProbe } from 'three/addons/lighting/SpecularProbe.js';
+			import { SpecularProbes } from 'three/addons/lighting/SpecularProbes.js';
+			import { specularProbes } from 'three/addons/tsl/lighting/SpecularProbesNode.js';
+
+			const status = document.getElementById( 'status' );
+			const params = {
+				showProbes: false,
+				boxProjection: true,
+				realtime: false,
+				updateInterval: 0.5,
+				loadedProbe: false,
+				recapture: resetCaptures
+			};
+			const roughness = uniform( 0.08 );
+			const direction = new THREE.Vector3();
+			const timer = new THREE.Timer();
+			const helpers = new THREE.Group();
+			const markers = [];
+			let bakeIndex = 0;
+			let camera, scene, renderer, controls, sphere, system, loadedTexture;
+
+			init().catch( ( error ) => {
+
+				status.textContent = `Unable to initialize: ${ error.message }`;
+				console.error( error );
+
+			} );
+
+			async function init() {
+
+				camera = new THREE.PerspectiveCamera( 60, innerWidth / innerHeight, 0.1, 200 );
+				camera.position.set( - 9, 2, 0 );
+				camera.lookAt( 8, 2, 0 );
+				scene = new THREE.Scene();
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( Math.min( devicePixelRatio, 1.5 ) );
+				renderer.setSize( innerWidth, innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.shadowMap.enabled = true;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+				await renderer.init();
+
+				controls = new FirstPersonControls( camera, renderer.domElement );
+				controls.movementSpeed = 3;
+				controls.lookSpeed = 0.12;
+				loadedTexture = await new HDRCubeTextureLoader().setPath( './textures/cube/pisaHDR/' ).loadAsync( [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ] );
+				scene.background = new THREE.Color( 0x9ab9d5 );
+				scene.environment = loadedTexture;
+				scene.environmentIntensity = 0.3;
+				scene.add( new THREE.HemisphereLight( 0xddeeff, 0x75604b, 1.5 ) );
+				const sun = new THREE.DirectionalLight( 0xfff2dc, 5 );
+				sun.position.set( - 8, 15, 5 );
+				sun.castShadow = true;
+				sun.shadow.mapSize.setScalar( 2048 );
+				Object.assign( sun.shadow.camera, { left: - 15, right: 15, top: 15, bottom: - 15, near: 0.1, far: 60 } );
+				sun.shadow.bias = - 0.0002;
+				scene.add( sun );
+
+				// The same complex Sponza asset as webgpu_lightprobes_sponza.
+				const response = await fetch( 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/model-index.json' );
+				if ( ! response.ok ) throw new Error( 'Could not load the sample asset index.' );
+				const models = await response.json();
+				const sponza = models.find( ( model ) => model.name === 'Sponza' );
+				if ( ! sponza ) throw new Error( 'Sponza is missing from the sample asset index.' );
+				const variant = sponza.variants[ 'glTF-Binary' ] || sponza.variants[ 'glTF' ];
+				const folder = variant.endsWith( '.glb' ) ? 'glTF-Binary' : 'glTF';
+				const gltf = await new GLTFLoader().loadAsync( `https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/Sponza/${ folder }/${ variant }` );
+				const embeddedLights = [];
+				gltf.scene.traverse( ( object ) => {
+
+					if ( object.isMesh ) object.castShadow = object.receiveShadow = true;
+					if ( object.isLight ) embeddedLights.push( object );
+
+				} );
+				for ( const light of embeddedLights ) light.removeFromParent();
+				scene.add( gltf.scene );
+
+				const probes = [];
+				for ( let i = 0; i < 5; i ++ ) {
+
+					const x = - 8 + i * 4;
+					const influenceBox = new THREE.Box3( new THREE.Vector3( x - 4, - 3, - 7 ), new THREE.Vector3( x + 4, 15, 7 ) );
+					const projectionBox = new THREE.Box3( new THREE.Vector3( - 11, 0, - 5 ), new THREE.Vector3( 11, 12, 5 ) );
+					const probe = new SpecularProbe( { position: new THREE.Vector3( x, 2, 0 ), influenceBox, projectionBox, blendDistance: 4, resolution: 128, near: 0.05, far: 80 } );
+					probes.push( probe );
+					const color = new THREE.Color().setHSL( i / 5, 0.8, 0.55 );
+					const marker = new THREE.Mesh( new THREE.SphereGeometry( 0.06, 12, 6 ), new THREE.MeshBasicMaterial( { color, wireframe: true } ) );
+					marker.position.copy( probe.position );
+					helpers.add( marker, new THREE.Box3Helper( influenceBox, color ) );
+					// Floor footprints remain readable from inside the tall influence boxes.
+					const footprint = new THREE.BufferGeometry().setFromPoints( [
+						new THREE.Vector3( x - 4, 0.04, - 7 ), new THREE.Vector3( x + 4, 0.04, - 7 ),
+						new THREE.Vector3( x + 4, 0.04, 7 ), new THREE.Vector3( x - 4, 0.04, 7 )
+					] );
+					helpers.add( new THREE.LineLoop( footprint, new THREE.LineBasicMaterial( { color } ) ) );
+					markers.push( marker );
+
+				}
+
+				helpers.visible = false;
+				scene.add( helpers );
+				system = new SpecularProbes( probes, loadedTexture );
+				const material = new THREE.MeshBasicNodeMaterial();
+				material.colorNode = specularProbes( system, roughness );
+				sphere = new THREE.Mesh( new THREE.SphereGeometry( 0.45, 64, 32 ), material );
+				scene.add( sphere );
+
+				const gui = renderer.inspector.createParameters( 'Specular Probes' );
+				gui.add( params, 'showProbes' ).name( 'Show influence volumes' );
+				gui.add( params, 'boxProjection' ).name( 'Box projection' );
+				gui.add( roughness, 'value', 0, 1, 0.01 ).name( 'Sphere roughness' );
+				gui.add( sun, 'intensity', 0, 10, 0.1 ).name( 'Sun intensity (then recapture)' );
+				gui.add( params, 'loadedProbe' ).name( 'Probe 1: loaded Pisa HDR' ).onChange( () => {
+
+					// The unrelated outdoor environment has no room projection proxy.
+					if ( params.loadedProbe ) {
+
+						probes[ 0 ].texture = loadedTexture;
+						probes[ 0 ].projectionBox = null;
+
+					} else {
+
+						probes[ 0 ].projectionBox = probes[ 1 ].projectionBox.clone();
+						resetCaptures();
+
+					}
+
+				} );
+				gui.add( params, 'realtime' ).name( 'Staggered realtime capture' );
+				gui.add( params, 'updateInterval', 0.1, 5, 0.1 ).name( 'Capture interval (seconds)' );
+				gui.add( params, 'recapture' ).name( 'Recapture scene' );
+
+				window.addEventListener( 'resize', () => {
+
+					camera.aspect = innerWidth / innerHeight;
+					camera.updateProjectionMatrix();
+					renderer.setSize( innerWidth, innerHeight );
+					controls.handleResize();
+
+				} );
+				renderer.setAnimationLoop( animate );
+
+			}
+
+			function resetCaptures() {
+
+				bakeIndex = 0;
+
+			}
+
+			function animate( timestamp ) {
+
+				timer.update( timestamp );
+				controls.update( Math.min( timer.getDelta(), 0.05 ) );
+				camera.getWorldDirection( direction );
+				sphere.position.copy( camera.position ).addScaledVector( direction, 2.3 );
+				system.boxProjection = params.boxProjection;
+				for ( let i = 0; i < system.probes.length; i ++ ) system.probes[ i ].realtime = params.realtime && ! ( i === 0 && params.loadedProbe );
+				// Neither the test sphere nor the debug geometry belongs in the captures.
+				sphere.visible = helpers.visible = false;
+				try {
+
+					if ( bakeIndex < system.probes.length ) {
+
+						if ( bakeIndex !== 0 || ! params.loadedProbe ) system.probes[ bakeIndex ].capture( renderer, scene );
+						bakeIndex ++;
+
+					} else {
+
+						system.updateCapture( renderer, scene, timestamp / 1000, params.updateInterval );
+
+					}
+
+				} finally {
+
+					sphere.visible = true;
+					helpers.visible = params.showProbes;
+
+				}
+
+				system.update( sphere.position );
+				for ( let i = 0; i < markers.length; i ++ ) {
+
+					const slot = system.slots.find( ( entry ) => entry.probe === system.probes[ i ] );
+					markers[ i ].scale.setScalar( slot ? 1 + slot.weight : 1 );
+
+				}
+
+				status.textContent = bakeIndex < system.probes.length ? `Capturing probe ${ bakeIndex } / ${ system.probes.length }…` : system.slots.map( ( slot ) => `Probe ${ system.probes.indexOf( slot.probe ) + 1 }: ${ ( slot.weight * 100 ).toFixed( 0 ) }%` ).join( ' | ' ) + ` | sky: ${ ( system.fallbackWeight * 100 ).toFixed( 0 ) }%`;
+				document.body.dataset.ready = String( bakeIndex === system.probes.length );
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

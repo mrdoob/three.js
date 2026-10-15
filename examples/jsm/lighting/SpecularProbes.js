@@ -18,12 +18,12 @@
  * Material envMapRotation should be left at its default identity for projection.
  *
  * Usage:
- * `js
+ * ```js
  * const system = new SpecularProbes( probes, environmentTexture );
  * const node = specularProbes( system, uniform( 0.15 ) );
  * material.colorNode = node; // MeshBasicNodeMaterial
  * system.update( sphere.position ); // each frame, before rendering
- * `
+ * ```
  *
  * @three_import import { SpecularProbes } from 'three/addons/lighting/SpecularProbes.js';
  */
