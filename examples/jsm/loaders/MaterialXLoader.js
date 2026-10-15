@@ -243,6 +243,11 @@ class MaterialXLoader extends Loader {
 		const log = new MaterialXLog();
 
 		const document = new MaterialXDocument( this.manager, options.path || this.path, log, options.archiveResolver || null, options.uvSpace );
+		document.imageLoader.setCrossOrigin( this.crossOrigin );
+		document.textureLoader.setCrossOrigin( this.crossOrigin );
+		document.textureLoader.setRequestHeader( this.requestHeader );
+		document.textureLoader.setWithCredentials( this.withCredentials );
+
 		const result = document.parse( text, options.materialName || null, {
 			interfaceValidator: options.interfaceValidator,
 			nodeResolver: options.nodeResolver,
