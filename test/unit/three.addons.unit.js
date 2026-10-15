@@ -10,6 +10,7 @@ import './addons/curves/NURBSCurve.tests.js';
 import './addons/loaders/FBXLoader.tests.js';
 import './addons/loaders/GLTFLoader.tests.js';
 import './addons/loaders/HDRLoader.tests.js';
+import './addons/loaders/LoaderForwarding.tests.js';
 import './addons/loaders/KSPLATLoader.tests.js';
 import './addons/loaders/GaussianSplatPLYLoader.tests.js';
 import './addons/loaders/MaterialXLoader.tests.js';
