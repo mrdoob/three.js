@@ -166,7 +166,7 @@ class ImageBitmapLoader extends Loader {
 		}
 
 		const fetchOptions = {};
-		fetchOptions.credentials = ( this.crossOrigin === 'anonymous' ) ? 'same-origin' : 'include';
+		fetchOptions.credentials = ( this.withCredentials || this.crossOrigin !== 'anonymous' ) ? 'include' : 'same-origin';
 		fetchOptions.headers = this.requestHeader;
 		fetchOptions.signal = ( typeof AbortSignal.any === 'function' ) ? AbortSignal.any( [ this._abortController.signal, this.manager.abortController.signal ] ) : this._abortController.signal;
 

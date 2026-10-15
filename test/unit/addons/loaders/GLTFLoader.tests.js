@@ -141,6 +141,65 @@ export default QUnit.module( 'Addons', () => {
 
 		QUnit.module( 'GLTFLoader', () => {
 
+			QUnit.test( 'forwards credentials and headers to external buffers and bitmap textures', async ( assert ) => {
+
+				const originalFetch = globalThis.fetch;
+				const originalCreateImageBitmap = globalThis.createImageBitmap;
+				const requests = [];
+
+				globalThis.fetch = async ( input, options ) => {
+
+					requests.push( new Request( input, options ) );
+					return new Response( new Uint8Array( 4 ) );
+
+				};
+
+				globalThis.createImageBitmap = async () => ( { width: 1, height: 1, close() {} } );
+
+				try {
+
+					const cases = [
+						[ 'anonymous', true, 'include' ],
+						[ 'use-credentials', false, 'include' ],
+						[ 'anonymous', false, 'same-origin' ]
+					];
+
+					for ( const [ crossOrigin, withCredentials, credentials ] of cases ) {
+
+						const loader = new GLTFLoader()
+							.setCrossOrigin( crossOrigin )
+							.setWithCredentials( withCredentials )
+							.setRequestHeader( { 'X-Asset-Token': 'test' } );
+						const json = {
+							asset: { version: '2.0' },
+							buffers: [ { uri: 'buffer-' + crossOrigin + '-' + withCredentials + '.bin', byteLength: 4 } ],
+							images: [ { uri: 'texture-' + crossOrigin + '-' + withCredentials + '.png' } ],
+							textures: [ { source: 0 } ]
+						};
+						const gltf = await loader.parseAsync( JSON.stringify( json ), 'https://example.com/assets/' );
+						await gltf.parser.getDependency( 'buffer', 0 );
+						await gltf.parser.getDependency( 'texture', 0 );
+						assert.strictEqual( requests.length, 2, 'Buffer and bitmap requests are both made' );
+
+						for ( const request of requests.splice( 0 ) ) {
+
+							assert.strictEqual( request.credentials, credentials, request.url + ' credentials' );
+							assert.strictEqual( request.headers.get( 'X-Asset-Token' ), 'test', 'Custom headers are preserved' );
+							assert.ok( request.url.startsWith( 'https://example.com/assets/' ), 'Resource path is preserved' );
+
+						}
+
+					}
+
+				} finally {
+
+					globalThis.fetch = originalFetch;
+					globalThis.createImageBitmap = originalCreateImageBitmap;
+
+				}
+
+			} );
+
 			QUnit.test( 'CUBICSPLINE animations can be made additive at an interpolated frame', async ( assert ) => {
 
 				const buffer = new Float32Array( [
