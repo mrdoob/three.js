@@ -42,11 +42,10 @@ class MaterialLoader extends Loader {
 	 * Constructs a new material loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 		/**
 		 * A dictionary holding textures used by the material.
@@ -69,7 +68,12 @@ class MaterialLoader extends Loader {
 
 		const scope = this;
 
-		const loader = new FileLoader( scope.manager, scope );
+		const loader = new FileLoader( scope.manager );
+		loader.setPriority( scope.priority );
+		loader.setCache( scope.cache );
+		loader.setPath( scope.path );
+		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
 			try {

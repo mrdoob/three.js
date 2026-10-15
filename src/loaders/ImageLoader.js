@@ -23,11 +23,10 @@ class ImageLoader extends Loader {
 	 * Constructs a new image loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 	}
 
@@ -157,7 +156,7 @@ class ImageLoader extends Loader {
 		Cache.add( `image:${url}`, image );
 		scope.manager.itemStart( url );
 
-		if ( this.priority !== undefined ) image.fetchPriority = this.priority;
+		image.fetchPriority = this.priority;
 		image.src = url;
 
 		return image;

@@ -51,9 +51,9 @@ class TSLGraphLoaderApplier {
 
 export class TSLGraphLoader extends FileLoader {
 
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 	}
 

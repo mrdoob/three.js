@@ -20,11 +20,10 @@ class DataTextureLoader extends Loader {
 	 * Constructs a new data texture loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 	}
 
@@ -46,8 +45,13 @@ class DataTextureLoader extends Loader {
 
 		const texture = new DataTexture();
 
-		const loader = new FileLoader( this.manager, { ...this, responseType: 'arraybuffer' } );
-
+		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
+		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setPath( this.path );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( buffer ) {
 
 			let texData;

@@ -23,11 +23,10 @@ class FontLoader extends Loader {
 	 * Constructs a new font loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 	}
 
@@ -44,7 +43,12 @@ class FontLoader extends Loader {
 
 		const scope = this;
 
-		const loader = new FileLoader( this.manager, this );
+		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
+		loader.setPath( this.path );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, function ( text ) {
 
 			const font = scope.parse( JSON.parse( text ) );

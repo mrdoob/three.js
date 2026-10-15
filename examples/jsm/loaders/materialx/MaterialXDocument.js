@@ -488,7 +488,6 @@ class MaterialXNode {
 		let textureURL = resolvedURI;
 		if ( resolvedURI && ! svgTexture ) {
 
-			// Registered handlers retain their own request settings and resource path policy.
 			const handler = this.materialX.manager.getHandler( resolvedURI );
 			if ( handler !== null ) {
 
@@ -956,7 +955,7 @@ class MaterialXNode {
 
 class MaterialXDocument {
 
-	constructor( manager, path, log, archiveResolver = null, uvSpace = 'bottom-left', parameters = {} ) {
+	constructor( manager, path, log, archiveResolver = null, uvSpace = 'bottom-left' ) {
 
 		this.manager = manager;
 		this.path = path;
@@ -965,10 +964,11 @@ class MaterialXDocument {
 		this.uvSpace = normalizeUvSpace( uvSpace );
 
 		this.nodesXLib = new Map();
-		// The document resource root overrides the path of the MaterialX file request.
-		this.imageLoader = new ImageLoader( manager, { ...parameters, path } );
-		this.textureLoader = new ImageBitmapLoader( manager, { ...parameters, path } );
+		this.imageLoader = new ImageLoader( manager );
+		this.imageLoader.setPath( path );
+		this.textureLoader = new ImageBitmapLoader( manager );
 		this.textureLoader.setOptions( { imageOrientation: 'none' } );
+		this.textureLoader.setPath( path );
 		this.textureCache = new Map();
 		this.pendingResources = [];
 		this.nodeResolver = null;

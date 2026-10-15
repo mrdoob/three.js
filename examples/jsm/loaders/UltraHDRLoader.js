@@ -74,11 +74,10 @@ class UltraHDRLoader extends Loader {
 	 * Constructs a new Ultra HDR loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 		/**
 		 * The texture type.
@@ -497,8 +496,13 @@ class UltraHDRLoader extends Loader {
 		texture.generateMipmaps = true;
 		texture.flipY = true;
 
-		const loader = new FileLoader( this.manager, { ...this, responseType: 'arraybuffer' } );
-
+		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
+		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setPath( this.path );
+		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, ( buffer ) => {
 
 			try {

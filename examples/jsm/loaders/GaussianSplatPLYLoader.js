@@ -68,11 +68,10 @@ class GaussianSplatPLYLoader extends Loader {
 	 * Constructs a new Gaussian splat PLY loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 	}
 
@@ -89,8 +88,13 @@ class GaussianSplatPLYLoader extends Loader {
 
 		const scope = this;
 
-		const loader = new FileLoader( this.manager, { ...this, responseType: 'arraybuffer' } );
-
+		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
+		loader.setPath( this.path );
+		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, function ( data ) {
 
 			try {
@@ -131,7 +135,7 @@ class GaussianSplatPLYLoader extends Loader {
 
 		const degree = detectSphericalHarmonicsDegree( data );
 
-		const plyLoader = new PLYLoader( this.manager, this );
+		const plyLoader = new PLYLoader( this.manager );
 		plyLoader.setCustomPropertyNameMapping( getPropertyMapping( degree ) );
 
 		return convertPLYGeometry( plyLoader.parse( data ) );

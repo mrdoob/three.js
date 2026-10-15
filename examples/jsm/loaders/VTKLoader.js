@@ -35,12 +35,11 @@ class VTKLoader extends Loader {
 	 * Constructs a new VTK loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 * @deprecated since r184.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 		console.warn( 'THREE.VTKLoader: The loader has been deprecated and will be removed with r194. Export your VTK files to glTF before using them on the web.' ); // @deprecated, r184
 
@@ -59,8 +58,13 @@ class VTKLoader extends Loader {
 
 		const scope = this;
 
-		const loader = new FileLoader( scope.manager, { ...scope, responseType: 'arraybuffer' } );
-
+		const loader = new FileLoader( scope.manager );
+		loader.setPriority( scope.priority );
+		loader.setCache( scope.cache );
+		loader.setPath( scope.path );
+		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
 			try {

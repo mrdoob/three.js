@@ -4,10 +4,10 @@ import { HDRLoader } from './HDRLoader.js';
 
 class RGBELoader extends HDRLoader {
 
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
 		console.warn( 'RGBELoader has been deprecated. Please use HDRLoader instead.' );
-		super( manager, parameters );
+		super( manager );
 
 	}
 

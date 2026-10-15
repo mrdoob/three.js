@@ -59,11 +59,10 @@ class DRACOLoader extends Loader {
 	 * Constructs a new Draco loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 		this.decoderPaths = {
 			js: WASM_JS_URL,
@@ -163,7 +162,14 @@ class DRACOLoader extends Loader {
 	 */
 	load( url, onLoad, onProgress, onError ) {
 
-		const loader = new FileLoader( this.manager, { ...this, responseType: 'arraybuffer' } );
+		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
+
+		loader.setPath( this.path );
+		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 
 		loader.load( url, ( buffer ) => {
 
@@ -353,15 +359,11 @@ class DRACOLoader extends Loader {
 
 	_loadLibrary( url, responseType ) {
 
-		// Decoder libraries use their own URLs and exclude asset request headers.
-		// Priority and cache are inherited; credentials follow the existing library policy.
-
-		const loader = new FileLoader( this.manager, {
-			...this,
-			path: '',
-			requestHeader: {},
-			responseType: responseType
-		} );
+		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
+		loader.setResponseType( responseType );
+		loader.setWithCredentials( this.withCredentials );
 
 		return new Promise( ( resolve, reject ) => {
 

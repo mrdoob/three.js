@@ -35,11 +35,10 @@ class CubeTextureLoader extends Loader {
 	 * Constructs a new cube texture loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 	}
 
@@ -62,7 +61,11 @@ class CubeTextureLoader extends Loader {
 		const texture = new CubeTexture();
 		texture.colorSpace = SRGBColorSpace;
 
-		const loader = new ImageLoader( this.manager, this );
+		const loader = new ImageLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
+		loader.setCrossOrigin( this.crossOrigin );
+		loader.setPath( this.path );
 
 		let loaded = 0;
 

@@ -38,11 +38,10 @@ class ImageBitmapLoader extends Loader {
 	 * Constructs a new image bitmap loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 		/**
 		 * This flag can be used for type testing.
@@ -167,7 +166,7 @@ class ImageBitmapLoader extends Loader {
 		}
 
 		const fetchOptions = {};
-		fetchOptions.credentials = ( this.withCredentials || this.crossOrigin !== 'anonymous' ) ? 'include' : 'same-origin';
+		fetchOptions.credentials = ( this.crossOrigin === 'anonymous' ) ? 'same-origin' : 'include';
 		fetchOptions.headers = this.requestHeader;
 		fetchOptions.priority = this.priority;
 		fetchOptions.cache = this.cache;

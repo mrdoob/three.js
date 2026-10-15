@@ -48,11 +48,10 @@ class MDDLoader extends Loader {
 	 * Constructs a new MDD loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 	}
 
@@ -69,7 +68,11 @@ class MDDLoader extends Loader {
 
 		const scope = this;
 
-		const loader = new FileLoader( this.manager, { ...this, responseType: 'arraybuffer' } );
+		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
+		loader.setPath( this.path );
+		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( data ) {
 
 			onLoad( scope.parse( data ) );

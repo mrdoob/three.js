@@ -34,11 +34,10 @@ class TDSLoader extends Loader {
 	 * Constructs a new 3DS loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 		/**
 		 * Whether debug mode should be enabled or not.
@@ -72,7 +71,13 @@ class TDSLoader extends Loader {
 
 		const path = ( this.path === '' ) ? LoaderUtils.extractUrlBase( url ) : this.path;
 
-		const loader = new FileLoader( this.manager, { ...this, responseType: 'arraybuffer' } );
+		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
+		loader.setPath( this.path );
+		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 
 		loader.load( url, function ( data ) {
 
@@ -552,7 +557,10 @@ class TDSLoader extends Loader {
 		let next = chunk.readChunk( );
 		let texture = {};
 
-		const loader = new TextureLoader( this.manager, { ...this, path: this.resourcePath || path } );
+		const loader = new TextureLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
+		loader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
 		while ( next ) {
 

@@ -36,11 +36,10 @@ class MaterialXLoader extends Loader {
 	 * Constructs a new MaterialX loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 		/**
 		 * Releases the resources of the last loaded archive, if any.
@@ -104,30 +103,34 @@ class MaterialXLoader extends Loader {
 		// have finished, matching the lifecycle used by GLTFLoader.
 		this.manager.itemStart( url );
 
-		const loader = new FileLoader( this.manager, { ...this, responseType: 'arraybuffer' } );
-		loader.load( url, ( data ) => {
+		new FileLoader( this.manager )
+			.setPriority( this.priority )
+			.setCache( this.cache )
+			.setPath( this.path )
+			.setResponseType( 'arraybuffer' )
+			.load( url, ( data ) => {
 
-			try {
+				try {
 
-				const parsed = this._parseBuffer( data, url, options );
+					const parsed = this._parseBuffer( data, url, options );
 
-				parsed.document.waitForResources().then( () => {
+					parsed.document.waitForResources().then( () => {
 
-					parsed.result.errors = parsed.log.errors;
-					parsed.result.warnings = parsed.log.warnings;
-					this._throwOnErrors( parsed.log, options );
-					onLoad( parsed.result );
-					this.manager.itemEnd( url );
+						parsed.result.errors = parsed.log.errors;
+						parsed.result.warnings = parsed.log.warnings;
+						this._throwOnErrors( parsed.log, options );
+						onLoad( parsed.result );
+						this.manager.itemEnd( url );
 
-				} ).catch( _onError );
+					} ).catch( _onError );
 
-			} catch ( e ) {
+				} catch ( e ) {
 
-				_onError( e );
+					_onError( e );
 
-			}
+				}
 
-		}, onProgress, _onError );
+			}, onProgress, _onError );
 
 		return this;
 
@@ -239,7 +242,11 @@ class MaterialXLoader extends Loader {
 
 		const log = new MaterialXLog();
 
-		const document = new MaterialXDocument( this.manager, options.path || this.path, log, options.archiveResolver || null, options.uvSpace, this );
+		const document = new MaterialXDocument( this.manager, options.path || this.path, log, options.archiveResolver || null, options.uvSpace );
+		document.imageLoader.setPriority( this.priority );
+		document.imageLoader.setCache( this.cache );
+		document.textureLoader.setPriority( this.priority );
+		document.textureLoader.setCache( this.cache );
 		const result = document.parse( text, options.materialName || null, {
 			interfaceValidator: options.interfaceValidator,
 			nodeResolver: options.nodeResolver,

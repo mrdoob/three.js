@@ -36,13 +36,10 @@ class FileLoader extends Loader {
 	 * Constructs a new file loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for shared properties.
-	 * @param {('arraybuffer'|'blob'|'document'|'json'|'')} [parameters.responseType] - The expected response type.
-	 * @param {string} [parameters.mimeType] - The expected MIME type.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 		/**
 		 * The expected mime type. Valid values can be found
@@ -50,7 +47,7 @@ class FileLoader extends Loader {
 		 *
 		 * @type {string}
 		 */
-		this.mimeType = ( parameters.mimeType !== undefined ) ? parameters.mimeType : '';
+		this.mimeType = '';
 
 		/**
 		 * The expected response type.
@@ -58,7 +55,7 @@ class FileLoader extends Loader {
 		 * @type {('arraybuffer'|'blob'|'document'|'json'|'')}
 		 * @default ''
 		 */
-		this.responseType = ( parameters.responseType !== undefined ) ? parameters.responseType : '';
+		this.responseType = '';
 
 		/**
 		 * Used for aborting requests.

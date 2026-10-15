@@ -32,11 +32,10 @@ class AMFLoader extends Loader {
 	 * Constructs a new AMF loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 	}
 
@@ -53,8 +52,13 @@ class AMFLoader extends Loader {
 
 		const scope = this;
 
-		const loader = new FileLoader( scope.manager, { ...scope, responseType: 'arraybuffer' } );
-
+		const loader = new FileLoader( scope.manager );
+		loader.setPriority( scope.priority );
+		loader.setCache( scope.cache );
+		loader.setPath( scope.path );
+		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
 			try {

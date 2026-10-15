@@ -30,11 +30,10 @@ class USDLoader extends Loader {
 	 * Constructs a new USDZ loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 	}
 
@@ -53,8 +52,13 @@ class USDLoader extends Loader {
 
 		const path = ( scope.path === '' ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
 
-		const loader = new FileLoader( scope.manager, { ...scope, responseType: 'arraybuffer' } );
-
+		const loader = new FileLoader( scope.manager );
+		loader.setPriority( scope.priority );
+		loader.setCache( scope.cache );
+		loader.setPath( scope.path );
+		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
 			try {
@@ -239,12 +243,14 @@ class USDLoader extends Loader {
 
 		};
 
-		const composer = new USDComposer( scope.manager, scope );
-
 		// USDA (standalone)
 
 		if ( typeof buffer === 'string' ) {
 
+			const composer = new USDComposer( scope.manager );
+			composer.imageLoader.setCrossOrigin( scope.crossOrigin );
+			composer.imageLoader.setPriority( scope.priority );
+			composer.imageLoader.setCache( scope.cache );
 			const data = usda.parseData( buffer );
 			return finalize( composer, composer.compose( data, {}, {}, path ) );
 
@@ -254,6 +260,10 @@ class USDLoader extends Loader {
 
 		if ( isCrateFile( buffer ) ) {
 
+			const composer = new USDComposer( scope.manager );
+			composer.imageLoader.setCrossOrigin( scope.crossOrigin );
+			composer.imageLoader.setPriority( scope.priority );
+			composer.imageLoader.setCache( scope.cache );
 			const data = usdc.parseData( toArrayBuffer( buffer ) );
 			return finalize( composer, composer.compose( data, {}, {}, path ) );
 
@@ -275,6 +285,10 @@ class USDLoader extends Loader {
 
 			}
 
+			const composer = new USDComposer( scope.manager );
+			composer.imageLoader.setCrossOrigin( scope.crossOrigin );
+			composer.imageLoader.setPriority( scope.priority );
+			composer.imageLoader.setCache( scope.cache );
 			const data = assets[ filename ];
 			if ( ! data ) {
 
@@ -288,6 +302,10 @@ class USDLoader extends Loader {
 
 		// USDA (standalone, as ArrayBuffer)
 
+		const composer = new USDComposer( scope.manager );
+		composer.imageLoader.setCrossOrigin( scope.crossOrigin );
+		composer.imageLoader.setPriority( scope.priority );
+		composer.imageLoader.setCache( scope.cache );
 		const text = textDecoder.decode( bytes );
 		const data = usda.parseData( text );
 		return finalize( composer, composer.compose( data, {}, {}, path ) );

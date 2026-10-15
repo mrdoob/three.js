@@ -626,8 +626,12 @@ class LDrawParsedCache {
 			}
 
 			const loader = this.loader;
-			// Part URLs are relative to the parts library rather than the model request path.
-			const fileLoader = new FileLoader( loader.manager, { ...loader, path: loader.partsLibraryPath } );
+			const fileLoader = new FileLoader( loader.manager );
+			fileLoader.setPriority( loader.priority );
+			fileLoader.setCache( loader.cache );
+			fileLoader.setPath( loader.partsLibraryPath );
+			fileLoader.setRequestHeader( loader.requestHeader );
+			fileLoader.setWithCredentials( loader.withCredentials );
 
 			try {
 
@@ -1774,11 +1778,10 @@ class LDrawLoader extends Loader {
 	 * Constructs a new LDraw loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 		// Array of THREE.Material
 		this.materials = [];
@@ -1854,7 +1857,13 @@ class LDrawLoader extends Loader {
 	 */
 	async preloadMaterials( url ) {
 
-		const fileLoader = new FileLoader( this.manager, this );
+		const fileLoader = new FileLoader( this.manager );
+		fileLoader.setPriority( this.priority );
+		fileLoader.setCache( this.cache );
+		fileLoader.setPath( this.path );
+		fileLoader.setRequestHeader( this.requestHeader );
+		fileLoader.setWithCredentials( this.withCredentials );
+
 		const text = await fileLoader.loadAsync( url );
 		const colorLineRegex = /^0 !COLOUR/;
 		const lines = text.split( /[\n\r]/g );
@@ -1887,7 +1896,12 @@ class LDrawLoader extends Loader {
 	 */
 	load( url, onLoad, onProgress, onError ) {
 
-		const fileLoader = new FileLoader( this.manager, this );
+		const fileLoader = new FileLoader( this.manager );
+		fileLoader.setPriority( this.priority );
+		fileLoader.setCache( this.cache );
+		fileLoader.setPath( this.path );
+		fileLoader.setRequestHeader( this.requestHeader );
+		fileLoader.setWithCredentials( this.withCredentials );
 		fileLoader.load( url, text => {
 
 			// Initializes the materials library with default materials

@@ -24,11 +24,10 @@ class TextureLoader extends Loader {
 	 * Constructs a new texture loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 	}
 
@@ -48,7 +47,11 @@ class TextureLoader extends Loader {
 
 		const texture = new Texture();
 
-		const loader = new ImageLoader( this.manager, this );
+		const loader = new ImageLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
+		loader.setCrossOrigin( this.crossOrigin );
+		loader.setPath( this.path );
 
 		loader.load( url, function ( image ) {
 

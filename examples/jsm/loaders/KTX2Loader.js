@@ -145,11 +145,10 @@ class KTX2Loader extends Loader {
 	 * Constructs a new KTX2 loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 		this.transcoderPath = '';
 		this.transcoderBinary = null;
@@ -283,23 +282,18 @@ class KTX2Loader extends Loader {
 
 	init() {
 
-		// Decoder libraries use their own URLs and exclude asset request headers.
-		// Priority and cache are inherited; credentials follow the existing library policy.
-
 		if ( ! this.transcoderPending ) {
 
-			const jsLoader = new FileLoader( this.manager, {
-				...this,
-				path: this.transcoderPath,
-				requestHeader: {}
-			} );
+			const jsLoader = new FileLoader( this.manager );
+			jsLoader.setPriority( this.priority );
+			jsLoader.setCache( this.cache );
+			jsLoader.setWithCredentials( this.withCredentials );
 
-			const binaryLoader = new FileLoader( this.manager, {
-				...this,
-				path: this.transcoderPath,
-				requestHeader: {},
-				responseType: 'arraybuffer'
-			} );
+			const binaryLoader = new FileLoader( this.manager );
+			binaryLoader.setPriority( this.priority );
+			binaryLoader.setCache( this.cache );
+			binaryLoader.setWithCredentials( this.withCredentials );
+			binaryLoader.setResponseType( 'arraybuffer' );
 
 			let jsContent, binaryContent;
 			if ( this.transcoderPath === '' ) {
@@ -310,9 +304,11 @@ class KTX2Loader extends Loader {
 			} else {
 
 				// Load transcoder wrapper.
+				jsLoader.setPath( this.transcoderPath );
 				jsContent = jsLoader.loadAsync( 'basis_transcoder.js' );
 
 				// Load transcoder WASM binary.
+				binaryLoader.setPath( this.transcoderPath );
 				binaryContent = binaryLoader.loadAsync( 'basis_transcoder.wasm' );
 
 			}
@@ -388,8 +384,15 @@ class KTX2Loader extends Loader {
 
 		}
 
-		const loader = new FileLoader( this.manager, { ...this, responseType: 'arraybuffer' } );
+		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
 
+		loader.setPath( this.path );
+		loader.setCrossOrigin( this.crossOrigin );
+		loader.setWithCredentials( this.withCredentials );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setResponseType( 'arraybuffer' );
 
 		loader.load( url, ( buffer ) => {
 

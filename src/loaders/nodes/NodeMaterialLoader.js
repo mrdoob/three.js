@@ -11,11 +11,10 @@ class NodeMaterialLoader extends MaterialLoader {
 	 * Constructs a new node material loader.
 	 *
 	 * @param {LoadingManager} [manager] - A reference to a loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 		/**
 		 * Represents a dictionary of node types.

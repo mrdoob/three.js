@@ -65,11 +65,10 @@ class ThreeMFLoader extends Loader {
 	 * Constructs a new 3MF loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 		/**
 		 * An array of available extensions.
@@ -92,8 +91,13 @@ class ThreeMFLoader extends Loader {
 	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
-		const loader = new FileLoader( scope.manager, { ...scope, responseType: 'arraybuffer' } );
-
+		const loader = new FileLoader( scope.manager );
+		loader.setPriority( scope.priority );
+		loader.setCache( scope.cache );
+		loader.setPath( scope.path );
+		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( buffer ) {
 
 			try {
@@ -129,8 +133,9 @@ class ThreeMFLoader extends Loader {
 	parse( data ) {
 
 		const scope = this;
-		// Embedded images have complete blob/data URLs; do not prepend the model path.
-		const textureLoader = new TextureLoader( this.manager, { ...this, path: '' } );
+		const textureLoader = new TextureLoader( this.manager );
+		textureLoader.setPriority( this.priority );
+		textureLoader.setCache( this.cache );
 
 		function loadDocument( data ) {
 

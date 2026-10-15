@@ -133,11 +133,10 @@ class GLTFLoader extends Loader {
 	 * Constructs a new glTF loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 		this.dracoLoader = null;
 		this.ktx2Loader = null;
@@ -318,7 +317,14 @@ class GLTFLoader extends Loader {
 
 		};
 
-		const loader = new FileLoader( this.manager, { ...this, responseType: 'arraybuffer' } );
+		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
+
+		loader.setPath( this.path );
+		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 
 		loader.load( url, function ( data ) {
 
@@ -483,7 +489,6 @@ class GLTFLoader extends Loader {
 
 			path: path || this.resourcePath || '',
 			crossOrigin: this.crossOrigin,
-			withCredentials: this.withCredentials,
 			priority: this.priority,
 			cache: this.cache,
 			requestHeader: this.requestHeader,
@@ -492,6 +497,8 @@ class GLTFLoader extends Loader {
 			meshoptDecoder: this.meshoptDecoder
 
 		} );
+
+		parser.fileLoader.setRequestHeader( this.requestHeader );
 
 		for ( let i = 0; i < this.pluginCallbacks.length; i ++ ) {
 
@@ -1580,7 +1587,6 @@ class GLTFTextureWebPExtension {
 		let loader = parser.textureLoader;
 		if ( source.uri ) {
 
-			// Registered handlers retain their own request settings.
 			const handler = parser.options.manager.getHandler( source.uri );
 			if ( handler !== null ) loader = handler;
 
@@ -1628,7 +1634,6 @@ class GLTFTextureAVIFExtension {
 		let loader = parser.textureLoader;
 		if ( source.uri ) {
 
-			// Registered handlers retain their own request settings.
 			const handler = parser.options.manager.getHandler( source.uri );
 			if ( handler !== null ) loader = handler;
 
@@ -2706,24 +2711,31 @@ class GLTFParser {
 
 		if ( typeof createImageBitmap === 'undefined' || ( isSafari && safariVersion < 17 ) || ( isFirefox && firefoxVersion < 98 ) ) {
 
-			// Texture URLs are resolved against options.path before loading.
-			this.textureLoader = new TextureLoader( this.options.manager, { ...this.options, path: '' } );
+			this.textureLoader = new TextureLoader( this.options.manager );
+			this.textureLoader.setPriority( this.options.priority );
+			this.textureLoader.setCache( this.options.cache );
 
 		} else {
 
-			// Texture URLs are resolved against options.path before loading.
-			this.textureLoader = new ImageBitmapLoader( this.options.manager, { ...this.options, path: '' } );
+			this.textureLoader = new ImageBitmapLoader( this.options.manager );
+			this.textureLoader.setPriority( this.options.priority );
+			this.textureLoader.setCache( this.options.cache );
 
 		}
 
-		// Buffer URLs already include the resource path, so do not inherit options.path.
-		this.fileLoader = new FileLoader( this.options.manager, {
-			...this.options,
-			path: '',
-			responseType: 'arraybuffer',
-			// Retain the crossOrigin credential behavior and honor explicit fetch credentials.
-			withCredentials: this.options.withCredentials || this.options.crossOrigin === 'use-credentials'
-		} );
+		this.textureLoader.setCrossOrigin( this.options.crossOrigin );
+		this.textureLoader.setRequestHeader( this.options.requestHeader );
+
+		this.fileLoader = new FileLoader( this.options.manager );
+		this.fileLoader.setPriority( this.options.priority );
+		this.fileLoader.setCache( this.options.cache );
+		this.fileLoader.setResponseType( 'arraybuffer' );
+
+		if ( this.options.crossOrigin === 'use-credentials' ) {
+
+			this.fileLoader.setWithCredentials( true );
+
+		}
 
 	}
 
@@ -3327,7 +3339,6 @@ class GLTFParser {
 
 		if ( sourceDef.uri ) {
 
-			// Registered handlers retain their own request settings.
 			const handler = options.manager.getHandler( sourceDef.uri );
 			if ( handler !== null ) loader = handler;
 

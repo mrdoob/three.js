@@ -15,11 +15,10 @@ class NodeObjectLoader extends ObjectLoader {
 	 * Constructs a new node object loader.
 	 *
 	 * @param {LoadingManager} [manager] - A reference to a loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 		/**
 		 * Represents a dictionary of node types.
@@ -119,7 +118,7 @@ class NodeObjectLoader extends ObjectLoader {
 
 		if ( json !== undefined ) {
 
-			const loader = new NodeLoader( this.manager, this );
+			const loader = new NodeLoader();
 			loader.setNodes( this.nodes );
 			loader.setTextures( textures );
 
@@ -146,7 +145,7 @@ class NodeObjectLoader extends ObjectLoader {
 
 			const nodes = this.parseNodes( this._nodesJSON, textures );
 
-			const loader = new NodeMaterialLoader( this.manager, this );
+			const loader = new NodeMaterialLoader();
 			loader.setTextures( textures );
 			loader.setNodes( nodes );
 			loader.setNodeMaterials( this.nodeMaterials );

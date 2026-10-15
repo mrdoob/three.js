@@ -33,9 +33,9 @@ import {
  */
 class MTLLoader extends Loader {
 
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 	}
 
@@ -54,7 +54,12 @@ class MTLLoader extends Loader {
 
 		const path = ( this.path === '' ) ? LoaderUtils.extractUrlBase( url ) : this.path;
 
-		const loader = new FileLoader( this.manager, this );
+		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
+		loader.setPath( this.path );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, function ( text ) {
 
 			try {
@@ -157,8 +162,6 @@ class MTLLoader extends Loader {
 		materialCreator.setManager( this.manager );
 		materialCreator.priority = this.priority;
 		materialCreator.cache = this.cache;
-		materialCreator.requestHeader = this.requestHeader;
-		materialCreator.withCredentials = this.withCredentials;
 		materialCreator.setMaterials( materialsInfo );
 		return materialCreator;
 
@@ -188,6 +191,8 @@ class MaterialCreator {
 		this.nameLookup = {};
 
 		this.crossOrigin = 'anonymous';
+		this.priority = 'auto';
+		this.cache = 'default';
 
 		this.side = ( this.options.side !== undefined ) ? this.options.side : FrontSide;
 		this.wrap = ( this.options.wrap !== undefined ) ? this.options.wrap : RepeatWrapping;
@@ -571,13 +576,13 @@ class MaterialCreator {
 	loadTexture( url, mapping, onLoad, onProgress, onError ) {
 
 		const manager = ( this.manager !== undefined ) ? this.manager : DefaultLoadingManager;
-		// Registered handlers retain their request settings, apart from the existing crossOrigin override.
 		let loader = manager.getHandler( url );
 
 		if ( loader === null ) {
 
-			// MaterialCreator supplies complete URLs resolved against baseUrl, and has no loader path.
-			loader = new TextureLoader( manager, this );
+			loader = new TextureLoader( manager );
+			loader.setPriority( this.priority );
+			loader.setCache( this.cache );
 
 		}
 

@@ -4,10 +4,10 @@ import { USDLoader } from './USDLoader.js';
 
 class USDZLoader extends USDLoader {
 
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
 		console.warn( 'USDZLoader has been deprecated. Please use USDLoader instead.' );
-		super( manager, parameters );
+		super( manager );
 
 	}
 

@@ -31,11 +31,10 @@ class HDRCubeTextureLoader extends Loader {
 	 * Constructs a new HDR cube texture loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 		/**
 		 * The internal HDR loader that loads the
@@ -43,7 +42,7 @@ class HDRCubeTextureLoader extends Loader {
 		 *
          * @type {HDRLoader}
 		 */
-		this.hdrLoader = new HDRLoader( this.manager, this );
+		this.hdrLoader = new HDRLoader();
 
 		/**
 		 * The texture type.
@@ -97,38 +96,43 @@ class HDRCubeTextureLoader extends Loader {
 
 		function loadHDRData( i, onLoad, onProgress, onError ) {
 
-			const loader = new FileLoader( scope.manager, { ...scope, responseType: 'arraybuffer' } );
-			loader.load( urls[ i ], function ( buffer ) {
+			new FileLoader( scope.manager )
+				.setPriority( scope.priority )
+				.setCache( scope.cache )
+				.setPath( scope.path )
+				.setResponseType( 'arraybuffer' )
+				.setWithCredentials( scope.withCredentials )
+				.load( urls[ i ], function ( buffer ) {
 
-				loaded ++;
+					loaded ++;
 
-				const texData = scope.hdrLoader.parse( buffer );
+					const texData = scope.hdrLoader.parse( buffer );
 
-				if ( ! texData ) return;
+					if ( ! texData ) return;
 
-				if ( texData.data !== undefined ) {
+					if ( texData.data !== undefined ) {
 
-					const dataTexture = new DataTexture( texData.data, texData.width, texData.height );
+						const dataTexture = new DataTexture( texData.data, texData.width, texData.height );
 
-					dataTexture.type = texture.type;
-					dataTexture.colorSpace = texture.colorSpace;
-					dataTexture.format = texture.format;
-					dataTexture.minFilter = texture.minFilter;
-					dataTexture.magFilter = texture.magFilter;
-					dataTexture.generateMipmaps = texture.generateMipmaps;
+						dataTexture.type = texture.type;
+						dataTexture.colorSpace = texture.colorSpace;
+						dataTexture.format = texture.format;
+						dataTexture.minFilter = texture.minFilter;
+						dataTexture.magFilter = texture.magFilter;
+						dataTexture.generateMipmaps = texture.generateMipmaps;
 
-					texture.images[ i ] = dataTexture;
+						texture.images[ i ] = dataTexture;
 
-				}
+					}
 
-				if ( loaded === 6 ) {
+					if ( loaded === 6 ) {
 
-					texture.needsUpdate = true;
-					if ( onLoad ) onLoad( texture );
+						texture.needsUpdate = true;
+						if ( onLoad ) onLoad( texture );
 
-				}
+					}
 
-			}, onProgress, onError );
+				}, onProgress, onError );
 
 		}
 

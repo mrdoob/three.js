@@ -81,12 +81,12 @@ const USD_CAMERA_DEFAULTS = {
  */
 class USDComposer {
 
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
 		this.textureCache = {};
 		this.skinnedMeshes = [];
 		this.manager = manager;
-		this.imageLoader = new ImageLoader( manager, { ...parameters, path: '' } );
+		this.imageLoader = new ImageLoader( manager );
 		this.texturePromises = [];
 
 	}
@@ -896,7 +896,10 @@ class USDComposer {
 		// If it's specsByPath data, compose it
 		if ( referencedData.specsByPath ) {
 
-			const composer = new USDComposer( this.manager, this.imageLoader );
+			const composer = new USDComposer( this.manager );
+			composer.imageLoader.setCrossOrigin( this.imageLoader.crossOrigin );
+			composer.imageLoader.setPriority( this.imageLoader.priority );
+			composer.imageLoader.setCache( this.imageLoader.cache );
 			const newBasePath = this._getBasePath( resolvedPath );
 			const composedGroup = composer.compose( referencedData, this.assets, mergedVariants, newBasePath );
 

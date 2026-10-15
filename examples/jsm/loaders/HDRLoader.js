@@ -27,11 +27,10 @@ class HDRLoader extends DataTextureLoader {
      * Constructs a new RGBE/HDR loader.
      *
      * @param {LoadingManager} [manager] - The loading manager.
-     * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
      */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 		/**
          * The texture type.

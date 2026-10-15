@@ -81,11 +81,10 @@ class FBXLoader extends Loader {
 	 * Constructs a new FBX loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 		/**
 		 * Whether to trim animation clips to the time range of their
@@ -114,7 +113,13 @@ class FBXLoader extends Loader {
 
 		const path = ( scope.path === '' ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
 
-		const loader = new FileLoader( this.manager, { ...this, responseType: 'arraybuffer' } );
+		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
+		loader.setPath( scope.path );
+		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 
 		loader.load( url, function ( buffer ) {
 
@@ -177,7 +182,9 @@ class FBXLoader extends Loader {
 
 		// console.log( fbxTree );
 
-		const textureLoader = new TextureLoader( this.manager, { ...this, path: this.resourcePath || path } );
+		const textureLoader = new TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
+		textureLoader.setPriority( this.priority );
+		textureLoader.setCache( this.cache );
 
 		return new FBXTreeParser( textureLoader, this.manager, this.trimAnimationClips ).parse( fbxTree );
 
@@ -452,7 +459,6 @@ class FBXTreeParser {
 
 		const extension = textureNode.FileName.split( '.' ).pop().toLowerCase();
 
-		// Registered handlers retain their own request settings; only the resource path is temporarily adjusted.
 		let loader = this.manager.getHandler( `.${extension}` );
 		if ( loader === null ) loader = this.textureLoader;
 

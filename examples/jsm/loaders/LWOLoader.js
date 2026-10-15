@@ -58,12 +58,11 @@ class LWOLoader extends Loader {
 	 * Constructs a new LWO loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 * @deprecated since r185.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 		console.warn( 'THREE.LWOLoader: The loader has been deprecated and will be removed with r195. Export your LWO files to glTF before using them on the web.' ); // @deprecated, r185
 
@@ -87,8 +86,11 @@ class LWOLoader extends Loader {
 		// give the mesh a default name based on the filename
 		const modelName = url.split( path ).pop().split( '.' )[ 0 ];
 
-		// The LWO payload is binary; inherit the parent request settings.
-		const loader = new FileLoader( this.manager, { ...this, responseType: 'arraybuffer' } );
+		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
+		loader.setPath( scope.path );
+		loader.setResponseType( 'arraybuffer' );
 
 		loader.load( url, function ( buffer ) {
 
@@ -134,7 +136,9 @@ class LWOLoader extends Loader {
 
 		// console.log( 'lwoTree', lwoTree );
 
-		const textureLoader = new TextureLoader( this.manager, { ...this, path: this.resourcePath || path } );
+		const textureLoader = new TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
+		textureLoader.setPriority( this.priority );
+		textureLoader.setCache( this.cache );
 
 		return new LWOTreeParser( textureLoader ).parse( modelName );
 

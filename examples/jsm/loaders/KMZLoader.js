@@ -26,11 +26,10 @@ class KMZLoader extends Loader {
 	 * Constructs a new KMZ loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 	}
 
@@ -47,8 +46,13 @@ class KMZLoader extends Loader {
 
 		const scope = this;
 
-		const loader = new FileLoader( scope.manager, { ...scope, responseType: 'arraybuffer' } );
-
+		const loader = new FileLoader( scope.manager );
+		loader.setPriority( scope.priority );
+		loader.setCache( scope.cache );
+		loader.setPath( scope.path );
+		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
 			try {
@@ -127,8 +131,9 @@ class KMZLoader extends Loader {
 
 			if ( model ) {
 
-				// The archive manager resolves internal image paths; exclude the outer archive paths.
-				const loader = new ColladaLoader( manager, { ...this, path: '', resourcePath: '' } );
+				const loader = new ColladaLoader( manager );
+				loader.setPriority( this.priority );
+				loader.setCache( this.cache );
 				return loader.parse( new TextDecoder().decode( zip[ model.textContent ] ) );
 
 			}
@@ -143,8 +148,9 @@ class KMZLoader extends Loader {
 
 				if ( extension === 'dae' ) {
 
-					// The archive manager resolves internal image paths; exclude the outer archive paths.
-					const loader = new ColladaLoader( manager, { ...this, path: '', resourcePath: '' } );
+					const loader = new ColladaLoader( manager );
+					loader.setPriority( this.priority );
+					loader.setCache( this.cache );
 					return loader.parse( new TextDecoder().decode( zip[ path ] ) );
 
 				}

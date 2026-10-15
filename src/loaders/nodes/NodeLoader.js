@@ -15,11 +15,10 @@ class NodeLoader extends Loader {
 	 * Constructs a new node loader.
 	 *
 	 * @param {LoadingManager} [manager] - A reference to a loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 		/**
 		 * Represents a dictionary of textures.
@@ -47,7 +46,12 @@ class NodeLoader extends Loader {
 	 */
 	load( url, onLoad, onProgress, onError ) {
 
-		const loader = new FileLoader( this.manager, this );
+		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
+		loader.setPath( this.path );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, ( text ) => {
 
 			try {

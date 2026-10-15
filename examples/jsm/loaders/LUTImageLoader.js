@@ -25,11 +25,10 @@ export class LUTImageLoader extends Loader {
 	 * Constructs a new LUT loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 		/**
 		 * Whether to vertically flip the LUT or not.
@@ -56,7 +55,13 @@ export class LUTImageLoader extends Loader {
 	 */
 	load( url, onLoad, onProgress, onError ) {
 
-		const loader = new TextureLoader( this.manager, this );
+		const loader = new TextureLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
+
+		loader.setCrossOrigin( this.crossOrigin );
+
+		loader.setPath( this.path );
 		loader.load( url, texture => {
 
 			try {

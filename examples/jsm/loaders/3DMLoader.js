@@ -60,11 +60,10 @@ class Rhino3dmLoader extends Loader {
 	 * Constructs a new Rhino 3DM loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 		// internals
 
@@ -147,7 +146,13 @@ class Rhino3dmLoader extends Loader {
 	 */
 	load( url, onLoad, onProgress, onError ) {
 
-		const loader = new FileLoader( this.manager, { ...this, responseType: 'arraybuffer' } );
+		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
+
+		loader.setPath( this.path );
+		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( this.requestHeader );
 
 		this.url = url;
 
@@ -374,8 +379,9 @@ class Rhino3dmLoader extends Loader {
 
 		}
 
-		// Embedded images have complete blob/data URLs; do not prepend the model path.
-		const textureLoader = new TextureLoader( this.manager, { ...this, path: '' } );
+		const textureLoader = new TextureLoader();
+		textureLoader.setPriority( this.priority );
+		textureLoader.setCache( this.cache );
 
 		for ( let i = 0; i < material.textures.length; i ++ ) {
 
@@ -530,9 +536,7 @@ class Rhino3dmLoader extends Loader {
 
 		if ( renderEnvironment ) {
 
-			// The embedded environment is a data URL, independent of the model path.
-			const environmentLoader = new EXRLoader( this.manager, { ...this, path: '' } );
-			environmentLoader.load( renderEnvironment.image, function ( texture ) {
+			new EXRLoader().setPriority( this.priority ).setCache( this.cache ).load( renderEnvironment.image, function ( texture ) {
 
 				texture.mapping = EquirectangularReflectionMapping;
 				mat.envMap = texture;
@@ -963,18 +967,13 @@ class Rhino3dmLoader extends Loader {
 
 	_initLibrary() {
 
-		// Decoder libraries use their own URLs and exclude asset request headers.
-		// Priority and cache are inherited; credentials follow the existing library policy.
-
 		if ( ! this.libraryPending ) {
 
 			// Load rhino3dm wrapper.
-			const jsLoader = new FileLoader( this.manager, {
-				...this,
-				path: this.libraryPath,
-				requestHeader: {},
-				withCredentials: false
-			} );
+			const jsLoader = new FileLoader( this.manager );
+			jsLoader.setPriority( this.priority );
+			jsLoader.setCache( this.cache );
+			jsLoader.setPath( this.libraryPath );
 			const jsContent = new Promise( ( resolve, reject ) => {
 
 				jsLoader.load( 'rhino3dm.js', resolve, undefined, reject );
@@ -982,13 +981,11 @@ class Rhino3dmLoader extends Loader {
 			} );
 
 			// Load rhino3dm WASM binary.
-			const binaryLoader = new FileLoader( this.manager, {
-				...this,
-				path: this.libraryPath,
-				requestHeader: {},
-				withCredentials: false,
-				responseType: 'arraybuffer'
-			} );
+			const binaryLoader = new FileLoader( this.manager );
+			binaryLoader.setPriority( this.priority );
+			binaryLoader.setCache( this.cache );
+			binaryLoader.setPath( this.libraryPath );
+			binaryLoader.setResponseType( 'arraybuffer' );
 			const binaryContent = new Promise( ( resolve, reject ) => {
 
 				binaryLoader.load( 'rhino3dm.wasm', resolve, undefined, reject );

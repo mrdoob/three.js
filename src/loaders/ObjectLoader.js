@@ -88,11 +88,10 @@ class ObjectLoader extends Loader {
 	 * Constructs a new object loader.
 	 *
 	 * @param {LoadingManager} [manager] - The loading manager.
-	 * @param {Object} [parameters={}] - Initial settings. See {@link Loader} for supported properties.
 	 */
-	constructor( manager, parameters = {} ) {
+	constructor( manager ) {
 
-		super( manager, parameters );
+		super( manager );
 
 	}
 
@@ -111,7 +110,12 @@ class ObjectLoader extends Loader {
 		const path = ( this.path === '' ) ? LoaderUtils.extractUrlBase( url ) : this.path;
 		this.resourcePath = this.resourcePath || path;
 
-		const loader = new FileLoader( this.manager, this );
+		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
+		loader.setPath( this.path );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, function ( text ) {
 
 			let json = null;
@@ -162,7 +166,13 @@ class ObjectLoader extends Loader {
 		const path = ( this.path === '' ) ? LoaderUtils.extractUrlBase( url ) : this.path;
 		this.resourcePath = this.resourcePath || path;
 
-		const loader = new FileLoader( this.manager, this );
+		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
+		loader.setPath( this.path );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
+
 		const text = await loader.loadAsync( url, onProgress );
 
 		let json;
@@ -343,7 +353,7 @@ class ObjectLoader extends Loader {
 
 		if ( json !== undefined ) {
 
-			const bufferGeometryLoader = new BufferGeometryLoader( this.manager, this );
+			const bufferGeometryLoader = new BufferGeometryLoader();
 
 			for ( let i = 0, l = json.length; i < l; i ++ ) {
 
@@ -398,7 +408,7 @@ class ObjectLoader extends Loader {
 
 		if ( json !== undefined ) {
 
-			const loader = new MaterialLoader( this.manager, this );
+			const loader = new MaterialLoader();
 			loader.setTextures( textures );
 
 			for ( let i = 0, l = json.length; i < l; i ++ ) {
@@ -503,8 +513,10 @@ class ObjectLoader extends Loader {
 
 			const manager = new LoadingManager( onLoad );
 
-			// Image URLs already include resourcePath and have passed through the parent manager.
-			loader = new ImageLoader( manager, { ...this, path: '' } );
+			loader = new ImageLoader( manager );
+			loader.setPriority( this.priority );
+			loader.setCache( this.cache );
+			loader.setCrossOrigin( this.crossOrigin );
 
 			for ( let i = 0, il = json.length; i < il; i ++ ) {
 
@@ -600,8 +612,10 @@ class ObjectLoader extends Loader {
 
 		if ( json !== undefined && json.length > 0 ) {
 
-			// Image URLs already include resourcePath; do not prepend the model request path.
-			loader = new ImageLoader( this.manager, { ...this, path: '' } );
+			loader = new ImageLoader( this.manager );
+			loader.setPriority( this.priority );
+			loader.setCache( this.cache );
+			loader.setCrossOrigin( this.crossOrigin );
 
 			for ( let i = 0, il = json.length; i < il; i ++ ) {
 

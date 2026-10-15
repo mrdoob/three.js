@@ -8,6 +8,32 @@ export default QUnit.module( 'Loaders', () => {
 
 	QUnit.module( 'ImageBitmapLoader', () => {
 
+		QUnit.test( 'image bitmap fetch settings', async ( assert ) => {
+
+			const originalFetch = window.fetch;
+			window.fetch = ( url, options ) => {
+
+				assert.strictEqual( options.priority, 'low' );
+				assert.strictEqual( options.cache, 'no-store' );
+				assert.strictEqual( options.credentials, 'same-origin', 'The existing credential policy is preserved.' );
+				return originalFetch( url, options );
+
+			};
+
+			try {
+
+				const bitmap = await new ImageBitmapLoader().setPriority( 'low' ).setCache( 'no-store' ).loadAsync( '/examples/textures/uv_grid_opengl.jpg' );
+				assert.ok( bitmap.width > 0 );
+				bitmap.close();
+
+			} finally {
+
+				window.fetch = originalFetch;
+
+			}
+
+		} );
+
 		// INHERITANCE
 		QUnit.test( 'Extending', ( assert ) => {
 
@@ -22,32 +48,6 @@ export default QUnit.module( 'Loaders', () => {
 				object instanceof Loader, true,
 				'ImageBitmapLoader extends from Loader'
 			);
-
-		} );
-
-		QUnit.test( 'image bitmap fetch settings', async ( assert ) => {
-
-			const originalFetch = window.fetch;
-			window.fetch = ( url, options ) => {
-
-				assert.strictEqual( options.priority, 'low' );
-				assert.strictEqual( options.cache, 'no-store' );
-				assert.strictEqual( options.credentials, 'include', 'Explicit credentials apply to image bitmap requests.' );
-				return originalFetch( url, options );
-
-			};
-
-			try {
-
-				const bitmap = await new ImageBitmapLoader( undefined, { withCredentials: true } ).setPriority( 'low' ).setCache( 'no-store' ).loadAsync( '/examples/textures/uv_grid_opengl.jpg' );
-				assert.ok( bitmap.width > 0 );
-				bitmap.close();
-
-			} finally {
-
-				window.fetch = originalFetch;
-
-			}
 
 		} );
 
