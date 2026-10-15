@@ -319,6 +319,8 @@ class MeshLambertMaterial extends Material {
 		 * Set this to `false` if another source like a light probe grid provides the
 		 * indirect diffuse lighting, so it isn't added twice.
 		 *
+		 * This property only has an effect when rendering with {@link WebGLRenderer}.
+		 *
 		 * @type {boolean}
 		 * @default true
 		 */
