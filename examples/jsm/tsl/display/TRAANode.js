@@ -1,4 +1,4 @@
-import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4, DepthTexture, FloatType } from 'three/webgpu';
+import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
 import { float, Fn, max, texture, uniform, uv, vec2, convertToTexture, passTexture, velocity, ivec2, mix, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
 import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth, samplePreviousDepth } from '../utils/TAAUtils.js';
 
@@ -234,7 +234,7 @@ class TRAANode extends Node {
 		 * @private
 		 * @type {TextureNode}
 		 */
-		this._previousDepthNode = texture( new DepthTexture( 1, 1 ) );
+		this._previousDepthNode = texture( this._historyRenderTarget.depthTexture );
 
 		/**
 		 * The node used to render the scene's velocity.
@@ -407,7 +407,6 @@ class TRAANode extends Node {
 
 			const currentDepth = this.depthNode.value;
 			renderer.copyTextureToTexture( currentDepth, this._historyRenderTarget.depthTexture );
-			this._previousDepthNode.value = this._historyRenderTarget.depthTexture;
 
 		}
 
@@ -448,11 +447,8 @@ class TRAANode extends Node {
 
 		}
 
-		if ( builder.renderer.reversedDepthBuffer === true ) {
-
-			this._historyRenderTarget.depthTexture.type = FloatType;
-
-		}
+		this._historyRenderTarget.depthTexture.format = this.depthNode.value.format;
+		this._historyRenderTarget.depthTexture.type = this.depthNode.value.type;
 
 		if ( builder.context.velocity !== undefined ) {
 
@@ -509,14 +505,7 @@ class TRAANode extends Node {
 			const weight = max( phase, phase.oneMinus() );
 			return weight.x.mul( weight.y ).oneMinus().div( 0.75 );
 
-		} ).setLayout( {
-			name: 'subpixelCorrection',
-			type: 'float',
-			inputs: [
-				{ name: 'velocityUV', type: 'vec2' },
-				{ name: 'textureSize', type: 'ivec2' }
-			]
-		} );
+		}, { velocityUV: 'vec2', textureSize: 'ivec2', return: 'float' } );
 
 		const historyNode = texture( this._historyRenderTarget.texture );
 

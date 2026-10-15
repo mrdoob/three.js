@@ -17,6 +17,7 @@ const refreshUniforms = [
 	'clearcoatNormalMap',
 	'clearcoatNormalScale',
 	'clearcoatRoughness',
+	'clearcoatRoughnessMap',
 	'color',
 	'dashOffset',
 	'dashSize',
@@ -51,6 +52,7 @@ const refreshUniforms = [
 	'normalScale',
 	'opacity',
 	'reflectivity',
+	'refractionRatio',
 	'retroreflectivity',
 	'rotation',
 	'roughness',
@@ -71,6 +73,7 @@ const refreshUniforms = [
 	'specularMap',
 	'steps',
 	'thickness',
+	'thicknessMap',
 	'transmission',
 	'transmissionMap',
 	'wireframe'
@@ -133,7 +136,7 @@ class NodeMaterialObserver {
 		this.renderObjects = new WeakMap();
 
 		/**
-		 * Whether the material uses node objects or not.
+		 * Whether the builder's context uses node objects or not.
 		 *
 		 * @type {boolean}
 		 */
@@ -270,6 +273,8 @@ class NodeMaterialObserver {
 
 			// global data
 
+			data.outputTarget = this.getOutputTarget( renderObject.renderer );
+
 			const { width, height } = renderObject.context;
 
 			data.bufferWidth = width;
@@ -287,6 +292,21 @@ class NodeMaterialObserver {
 		}
 
 		return data;
+
+	}
+
+	/**
+	 * Returns the current output target of the given renderer. That is the active
+	 * render target or, if none is set, the output render target or the canvas target.
+	 *
+	 * @param {Renderer} renderer - The renderer.
+	 * @return {RenderTarget|CanvasTarget} The output target.
+	 */
+	getOutputTarget( renderer ) {
+
+		const renderTarget = renderer.getRenderTarget();
+
+		return renderTarget !== null ? renderTarget : ( renderer.getOutputRenderTarget() || renderer.getCanvasTarget() );
 
 	}
 
@@ -317,13 +337,14 @@ class NodeMaterialObserver {
 	}
 
 	/**
-	 * Returns `true` if the node builder's material uses
-	 * node properties.
+	 * Returns `true` if the node builder's context (e.g. material, scene) uses node properties.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {boolean} Whether the node builder's material uses node properties or not.
+	 * @return {boolean} Whether the node builder's context uses node properties or not.
 	 */
 	containsNode( builder ) {
+
+		// material
 
 		const material = builder.material;
 
@@ -334,7 +355,19 @@ class NodeMaterialObserver {
 
 		}
 
-		if ( builder.context.modelViewMatrix || builder.context.modelNormalViewMatrix || builder.context.getAO || builder.context.getShadow )
+		// context
+
+		if ( builder.context.modelViewMatrix || builder.context.modelNormalViewMatrix || builder.context.getAO || builder.context.getShadow || builder.context.getGI )
+			return true;
+
+		// scene
+
+		const scene = builder.scene;
+
+		if ( material.fog === true && scene.fogNode && scene.fogNode.isNode )
+			return true;
+
+		if ( scene.environmentNode && scene.environmentNode.isNode )
 			return true;
 
 		return false;
@@ -948,8 +981,21 @@ class NodeMaterialObserver {
 
 		}
 
+		// bindings might refer to per-target resources so a target switch needs a full refresh
+
+		const renderObjectData = this.getRenderObjectData( renderObject );
+		const outputTarget = this.getOutputTarget( nodeFrame.renderer );
+
+		if ( renderObjectData.outputTarget !== outputTarget ) {
+
+			renderObjectData.outputTarget = outputTarget;
+
+			refreshType = RenderObjectRefreshType.FULL;
+
+		}
+
 		const isStatic = renderObject.object.static === true;
-		const isBundle = renderObject.bundle !== null && renderObject.bundle.static === true && this.getRenderObjectData( renderObject ).version === renderObject.bundle.version;
+		const isBundle = renderObject.bundle !== null && renderObject.bundle.static === true && renderObjectData.version === renderObject.bundle.version;
 
 		if ( isStatic || isBundle )
 			return refreshType;

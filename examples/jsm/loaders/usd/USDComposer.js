@@ -11,6 +11,7 @@ import {
 	DirectionalLight,
 	Euler,
 	Group,
+	ImageLoader,
 	LoaderUtils,
 	LinearSRGBColorSpace,
 	Matrix4,
@@ -80,11 +81,12 @@ const USD_CAMERA_DEFAULTS = {
  */
 class USDComposer {
 
-	constructor( manager = null ) {
+	constructor( manager ) {
 
 		this.textureCache = {};
 		this.skinnedMeshes = [];
 		this.manager = manager;
+		this.imageLoader = new ImageLoader( manager );
 		this.texturePromises = [];
 
 	}
@@ -895,6 +897,7 @@ class USDComposer {
 		if ( referencedData.specsByPath ) {
 
 			const composer = new USDComposer( this.manager );
+			composer.imageLoader.setCrossOrigin( this.imageLoader.crossOrigin );
 			const newBasePath = this._getBasePath( resolvedPath );
 			const composedGroup = composer.compose( referencedData, this.assets, mergedVariants, newBasePath );
 
@@ -3871,13 +3874,7 @@ class USDComposer {
 			// Try loading via LoadingManager if available
 			if ( this.manager ) {
 
-				const url = this.manager.resolveURL( baseName );
-				if ( url !== baseName ) {
-
-					// URL modifier found a match - load it
-					return this._createTextureFromData( url, textureAttrs, transformAttrs );
-
-				}
+				return this._createTextureFromData( baseName, textureAttrs, transformAttrs );
 
 			}
 
@@ -3914,11 +3911,9 @@ class USDComposer {
 
 		}
 
-		const image = new Image();
-
 		this.texturePromises.push( new Promise( ( resolve ) => {
 
-			image.onload = function () {
+			this.imageLoader.load( url, function ( image ) {
 
 				texture.image = image;
 
@@ -3940,9 +3935,7 @@ class USDComposer {
 
 				resolve();
 
-			};
-
-			image.onerror = function () {
+			}, undefined, function () {
 
 				console.warn( 'USDLoader: Failed to load texture:', url );
 
@@ -3954,11 +3947,9 @@ class USDComposer {
 
 				resolve();
 
-			};
+			} );
 
 		} ) );
-
-		image.src = url;
 
 		return texture;
 

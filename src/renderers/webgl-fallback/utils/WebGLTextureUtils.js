@@ -300,6 +300,7 @@ class WebGLTextureUtils {
 		if ( glFormat === gl.DEPTH_STENCIL ) {
 
 			if ( glType === gl.UNSIGNED_INT_24_8 ) internalFormat = gl.DEPTH24_STENCIL8;
+			if ( glType === gl.FLOAT ) internalFormat = gl.DEPTH32F_STENCIL8;
 
 		}
 
@@ -1165,9 +1166,9 @@ class WebGLTextureUtils {
 	setupRenderBufferStorage( renderbuffer, renderContext, samples, useMultisampledRTT = false ) {
 
 		const { gl } = this;
-		const renderTarget = renderContext.renderTarget;
+		const { depthTexture, renderTarget } = renderContext;
 
-		const { depthTexture, depthBuffer, stencilBuffer, width, height } = renderTarget;
+		const { depthBuffer, stencilBuffer, width, height } = renderTarget;
 
 		gl.bindRenderbuffer( gl.RENDERBUFFER, renderbuffer );
 
@@ -1185,7 +1186,7 @@ class WebGLTextureUtils {
 
 				if ( depthTexture && depthTexture.isDepthTexture ) {
 
-					if ( depthTexture.type === gl.FLOAT ) {
+					if ( depthTexture.type === FloatType ) {
 
 						glInternalFormat = gl.DEPTH_COMPONENT32F;
 
@@ -1207,7 +1208,19 @@ class WebGLTextureUtils {
 
 			if ( samples > 0 ) {
 
-				gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, gl.DEPTH24_STENCIL8, width, height );
+				let glInternalFormat = gl.DEPTH24_STENCIL8;
+
+				if ( depthTexture && depthTexture.isDepthTexture ) {
+
+					if ( depthTexture.type === FloatType ) {
+
+						glInternalFormat = gl.DEPTH32F_STENCIL8;
+
+					}
+
+				}
+
+				gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, glInternalFormat, width, height );
 
 			} else {
 
@@ -1266,6 +1279,8 @@ class WebGLTextureUtils {
 
 		const buffer = gl.createBuffer();
 
+		backend.state.pixelStorei( gl.PACK_ALIGNMENT, 1 );
+
 		gl.bindBuffer( gl.PIXEL_PACK_BUFFER, buffer );
 		gl.bufferData( gl.PIXEL_PACK_BUFFER, byteLength, gl.STREAM_READ );
 		gl.readPixels( x, y, width, height, glFormat, glType, 0 );
@@ -1300,12 +1315,17 @@ class WebGLTextureUtils {
 		const { gl } = this;
 
 		if ( glType === gl.UNSIGNED_BYTE ) return Uint8Array;
+		if ( glType === gl.BYTE ) return Int8Array;
 
 		if ( glType === gl.UNSIGNED_SHORT_4_4_4_4 ) return Uint16Array;
 		if ( glType === gl.UNSIGNED_SHORT_5_5_5_1 ) return Uint16Array;
 		if ( glType === gl.UNSIGNED_SHORT_5_6_5 ) return Uint16Array;
 		if ( glType === gl.UNSIGNED_SHORT ) return Uint16Array;
+		if ( glType === gl.SHORT ) return Int16Array;
 		if ( glType === gl.UNSIGNED_INT ) return Uint32Array;
+		if ( glType === gl.INT ) return Int32Array;
+		if ( glType === gl.UNSIGNED_INT_5_9_9_9_REV ) return Uint32Array;
+		if ( glType === gl.UNSIGNED_INT_10F_11F_11F_REV ) return Uint32Array;
 
 		if ( glType === gl.HALF_FLOAT ) return Uint16Array;
 		if ( glType === gl.FLOAT ) return Float32Array;
@@ -1326,22 +1346,32 @@ class WebGLTextureUtils {
 
 		const { gl } = this;
 
-		let bytesPerComponent = 0;
-
-		if ( glType === gl.UNSIGNED_BYTE ) bytesPerComponent = 1;
+		// packed types store all components of a texel in a single value
 
 		if ( glType === gl.UNSIGNED_SHORT_4_4_4_4 ||
 			glType === gl.UNSIGNED_SHORT_5_5_5_1 ||
-			glType === gl.UNSIGNED_SHORT_5_6_5 ||
-			glType === gl.UNSIGNED_SHORT ||
+			glType === gl.UNSIGNED_SHORT_5_6_5 ) return 2;
+
+		if ( glType === gl.UNSIGNED_INT_5_9_9_9_REV ||
+			glType === gl.UNSIGNED_INT_10F_11F_11F_REV ) return 4;
+
+		let bytesPerComponent = 0;
+
+		if ( glType === gl.UNSIGNED_BYTE ||
+			glType === gl.BYTE ) bytesPerComponent = 1;
+
+		if ( glType === gl.UNSIGNED_SHORT ||
+			glType === gl.SHORT ||
 			glType === gl.HALF_FLOAT ) bytesPerComponent = 2;
 
 		if ( glType === gl.UNSIGNED_INT ||
+			glType === gl.INT ||
 			glType === gl.FLOAT ) bytesPerComponent = 4;
 
-		if ( glFormat === gl.RGBA ) return bytesPerComponent * 4;
+		if ( glFormat === gl.RGBA || glFormat === gl.RGBA_INTEGER ) return bytesPerComponent * 4;
 		if ( glFormat === gl.RGB ) return bytesPerComponent * 3;
-		if ( glFormat === gl.ALPHA ) return bytesPerComponent;
+		if ( glFormat === gl.RG || glFormat === gl.RG_INTEGER ) return bytesPerComponent * 2;
+		if ( glFormat === gl.RED || glFormat === gl.RED_INTEGER || glFormat === gl.ALPHA ) return bytesPerComponent;
 
 	}
 

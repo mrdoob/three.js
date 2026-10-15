@@ -156,6 +156,14 @@ class RenderObject {
 		this.geometry = object.geometry;
 
 		/**
+		 * The geometry's version. Incremented whenever the geometry is updated.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.geometryVersion = 0;
+
+		/**
 		 * The render object's version.
 		 *
 		 * @type {number}
@@ -262,6 +270,13 @@ class RenderObject {
 		 * @type {number}
 		 */
 		this.initialCacheKey = this.getCacheKey();
+
+		/**
+		 * The initial geometry cache key.
+		 *
+		 * @type {string}
+		 */
+		this.initialGeometryCacheKey = this.getGeometryCacheKey();
 
 		/**
 		 * The node builder state.
@@ -526,6 +541,8 @@ class RenderObject {
 		this.attributes = null;
 		this.attributesId = null;
 
+		this.geometryVersion ++;
+
 	}
 
 	/**
@@ -707,8 +724,6 @@ class RenderObject {
 
 			cacheKey += name + ',';
 
-			if ( attribute.data ) cacheKey += attribute.data.stride + ',';
-			if ( attribute.offset ) cacheKey += attribute.offset + ',';
 			if ( attribute.itemSize ) cacheKey += attribute.itemSize + ',';
 			if ( attribute.normalized ) cacheKey += 'n,';
 
@@ -731,12 +746,6 @@ class RenderObject {
 				cacheKey += attribute.id + ',';
 
 			}
-
-		}
-
-		if ( geometry.index ) {
-
-			cacheKey += 'index,';
 
 		}
 
@@ -795,6 +804,7 @@ class RenderObject {
 					if ( value.isTexture ) {
 
 						valueKey += value.mapping;
+						valueKey += value.channel;
 
 						// WebGPU must honor the sampler data because they are part of the bindings
 
@@ -851,6 +861,12 @@ class RenderObject {
 				cacheKey += object._colorsTexture.uuid + ',';
 
 			}
+
+		}
+
+		if ( object.isInstancedMesh && object.instanceColor !== null ) {
+
+			cacheKey += object.instanceColor.id + ',';
 
 		}
 

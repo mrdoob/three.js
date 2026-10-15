@@ -106,16 +106,11 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 				for ( let k = 0; k < value.length; k ++ ) {
 
 					const val = value[ k ];
-					const info = getUniformSize( val );
+					const info = getUniformSize( val, true );
 
 					writeUniformValue( val, uniform.__data, arrayOffset );
 
-					// only toArray() values advance arrayOffset
-					if ( typeof val !== 'number' && typeof val !== 'boolean' && ! val.isMatrix3 && ! ArrayBuffer.isView( val ) ) {
-
-						arrayOffset += info.storage / Float32Array.BYTES_PER_ELEMENT;
-
-					}
+					arrayOffset += info.storage / Float32Array.BYTES_PER_ELEMENT;
 
 				}
 
@@ -136,29 +131,29 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 		// TODO add integer vector and struct support
 		if ( typeof value === 'number' || typeof value === 'boolean' ) {
 
-			data[ 0 ] = value;
+			data[ offset ] = value;
 
 		} else if ( value.isMatrix3 ) {
 
 			// manually converting 3x3 to 3x4
 
-			data[ 0 ] = value.elements[ 0 ];
-			data[ 1 ] = value.elements[ 1 ];
-			data[ 2 ] = value.elements[ 2 ];
-			data[ 3 ] = 0;
-			data[ 4 ] = value.elements[ 3 ];
-			data[ 5 ] = value.elements[ 4 ];
-			data[ 6 ] = value.elements[ 5 ];
-			data[ 7 ] = 0;
-			data[ 8 ] = value.elements[ 6 ];
-			data[ 9 ] = value.elements[ 7 ];
-			data[ 10 ] = value.elements[ 8 ];
-			data[ 11 ] = 0;
+			data[ offset ] = value.elements[ 0 ];
+			data[ offset + 1 ] = value.elements[ 1 ];
+			data[ offset + 2 ] = value.elements[ 2 ];
+			data[ offset + 3 ] = 0;
+			data[ offset + 4 ] = value.elements[ 3 ];
+			data[ offset + 5 ] = value.elements[ 4 ];
+			data[ offset + 6 ] = value.elements[ 5 ];
+			data[ offset + 7 ] = 0;
+			data[ offset + 8 ] = value.elements[ 6 ];
+			data[ offset + 9 ] = value.elements[ 7 ];
+			data[ offset + 10 ] = value.elements[ 8 ];
+			data[ offset + 11 ] = 0;
 
 		} else if ( ArrayBuffer.isView( value ) ) {
 
 			// copy the buffer data using "set"
-			data.set( new value.constructor( value.buffer, value.byteOffset, data.length ) );
+			data.set( value.subarray( 0, data.length - offset ), offset );
 
 		} else {
 
@@ -173,21 +168,47 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 		const value = uniform.value;
 		const indexString = index + '_' + indexArray;
 
-		if ( cache[ indexString ] === undefined ) {
+		if ( Array.isArray( value ) ) {
+
+			// arrays are cached per element
+
+			if ( cache[ indexString ] === undefined ) cache[ indexString ] = [];
+
+			const cachedArray = cache[ indexString ];
+
+			let changed = false;
+
+			for ( let k = 0; k < value.length; k ++ ) {
+
+				if ( hasValueChanged( value[ k ], cachedArray, k ) === true ) changed = true;
+
+			}
+
+			return changed;
+
+		}
+
+		return hasValueChanged( value, cache, indexString );
+
+	}
+
+	function hasValueChanged( value, cache, key ) {
+
+		if ( cache[ key ] === undefined ) {
 
 			// cache entry does not exist so far
 
 			if ( typeof value === 'number' || typeof value === 'boolean' ) {
 
-				cache[ indexString ] = value;
+				cache[ key ] = value;
 
 			} else if ( ArrayBuffer.isView( value ) ) {
 
-				cache[ indexString ] = value.slice();
+				cache[ key ] = value.slice();
 
 			} else {
 
-				cache[ indexString ] = value.clone();
+				cache[ key ] = value.clone();
 
 			}
 
@@ -195,7 +216,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 		} else {
 
-			const cachedObject = cache[ indexString ];
+			const cachedObject = cache[ key ];
 
 			// compare current value with cached entry
 
@@ -203,7 +224,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 				if ( cachedObject !== value ) {
 
-					cache[ indexString ] = value;
+					cache[ key ] = value;
 					return true;
 
 				}
@@ -250,11 +271,16 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 				const values = Array.isArray( uniform.value ) ? uniform.value : [ uniform.value ];
 
+				// arrays of uniforms and uniforms with array values both represent GLSL arrays
+				const isArray = Array.isArray( uniforms[ i ] ) || Array.isArray( uniform.value );
+
+				let start = offset;
+
 				for ( let k = 0, kl = values.length; k < kl; k ++ ) {
 
 					const value = values[ k ];
 
-					const info = getUniformSize( value );
+					const info = getUniformSize( value, isArray );
 
 					const chunkOffset = offset % chunkSize; // offset in the current chunk
 					const chunkPadding = chunkOffset % info.boundary; // required padding to match boundary
@@ -270,15 +296,17 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 					}
 
-					// the following two properties will be used for partial buffer updates
-					const ArrayType = uniform.type === 'int' ? Int32Array : uniform.type === 'uint' ? Uint32Array : Float32Array;
-					uniform.__data = new ArrayType( info.storage / Float32Array.BYTES_PER_ELEMENT );
-					uniform.__offset = offset;
+					if ( k === 0 ) start = offset;
 
 					// Update the global offset
 					offset += info.storage;
 
 				}
+
+				// the following two properties will be used for partial buffer updates
+				const ArrayType = uniform.type === 'int' ? Int32Array : uniform.type === 'uint' ? Uint32Array : Float32Array;
+				uniform.__data = new ArrayType( ( offset - start ) / Float32Array.BYTES_PER_ELEMENT );
+				uniform.__offset = start;
 
 			}
 
@@ -299,7 +327,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 	}
 
-	function getUniformSize( value ) {
+	function getUniformSize( value, isArrayElement ) {
 
 		const info = {
 			boundary: 0, // bytes
@@ -340,14 +368,14 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 			// mat3 (in STD140 a 3x3 matrix is represented as 3x4)
 
-			info.boundary = 48;
+			info.boundary = 16;
 			info.storage = 48;
 
 		} else if ( value.isMatrix4 ) {
 
 			// mat4
 
-			info.boundary = 64;
+			info.boundary = 16;
 			info.storage = 64;
 
 		} else if ( value.isTexture ) {
@@ -362,6 +390,15 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 		} else {
 
 			warn( 'WebGLRenderer: Unsupported uniform value type.', value );
+
+		}
+
+		if ( isArrayElement === true ) {
+
+			// the alignment and stride of array elements are rounded up to the size of a vec4
+
+			info.boundary = 16;
+			info.storage = Math.ceil( info.storage / 16 ) * 16;
 
 		}
 

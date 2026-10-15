@@ -473,7 +473,8 @@ class Triangle {
 		}
 
 		const vc = d1 * d4 - d3 * d2;
-		if ( vc <= 0 && d1 >= 0 && d3 <= 0 ) {
+
+		if ( vc <= 0 && d1 >= 0 && d3 <= 0 && d1 - d3 > 0 ) { // modification of the algorithm: d1 - d3 is the squared length of AB, so skip this region if a and b coincide
 
 			v = d1 / ( d1 - d3 );
 			// edge region of AB; barycentric coords (1-v, v, 0)

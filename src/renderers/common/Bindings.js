@@ -1,5 +1,7 @@
 import DataMap from './DataMap.js';
+import BindGroup from './BindGroup.js';
 import { AttributeType } from './Constants.js';
+import { hashString } from '../../nodes/core/NodeUtils.js';
 
 /**
  * This renderer module manages the bindings of the renderer.
@@ -65,6 +67,14 @@ class Bindings extends DataMap {
 		 */
 		this.info = info;
 
+		/**
+		 * Shared bind groups per render context.
+		 *
+		 * @private
+		 * @type {WeakMap<RenderContext|Renderer,Map<number,BindGroup>>}
+		 */
+		this._sharedBindGroups = new WeakMap();
+
 		this.pipelines.bindings = this; // assign bindings to pipelines
 
 	}
@@ -124,6 +134,77 @@ class Bindings extends DataMap {
 		}
 
 		return bindings;
+
+	}
+
+	/**
+	 * Returns the shared bind group for the given bindings and the current render context.
+	 * If it does not exist yet, it is created with the given name and bindings.
+	 *
+	 * @param {string} name - The bind group's name.
+	 * @param {Array<Binding>} bindings - An array of bindings.
+	 * @return {BindGroup} The shared bind group.
+	 */
+	getSharedBindGroup( name, bindings ) {
+
+		// build cache key
+
+		let cacheKeyString = '';
+
+		for ( const binding of bindings ) {
+
+			if ( binding.isNodeUniformsGroup ) {
+
+				binding.uniforms.sort( ( a, b ) => a.nodeUniform.node.id - b.nodeUniform.node.id );
+
+				for ( const uniform of binding.uniforms ) {
+
+					cacheKeyString += uniform.nodeUniform.node.id;
+
+				}
+
+			} else {
+
+				cacheKeyString += binding.nodeUniform.id;
+
+			}
+
+		}
+
+		const cacheKey = hashString( cacheKeyString );
+
+		// lookup bind group cache
+
+		const renderer = this.backend.renderer;
+		const renderContext = renderer._currentRenderContext || renderer; // use renderer as fallback until we have a compute context
+
+		let bindGroupsCache = this._sharedBindGroups.get( renderContext );
+
+		if ( bindGroupsCache === undefined ) {
+
+			bindGroupsCache = new Map();
+
+			this._sharedBindGroups.set( renderContext, bindGroupsCache );
+
+		}
+
+		// lookup bind group
+
+		let bindGroup = bindGroupsCache.get( cacheKey );
+
+		if ( bindGroup === undefined ) {
+
+			bindGroup = new BindGroup( name, bindings );
+
+			bindGroupsCache.set( cacheKey, bindGroup );
+
+			const groupData = this.get( bindGroup );
+			groupData.renderContext = renderContext;
+			groupData.cacheKey = cacheKey;
+
+		}
+
+		return bindGroup;
 
 	}
 
@@ -320,6 +401,13 @@ class Bindings extends DataMap {
 						binding.release();
 
 					}
+
+				}
+
+				if ( groupData.cacheKey !== undefined ) {
+
+					const bindGroupsCache = this._sharedBindGroups.get( groupData.renderContext );
+					bindGroupsCache.delete( groupData.cacheKey );
 
 				}
 

@@ -65,12 +65,37 @@ class ToonOutlinePassNode extends PassNode {
 		this.alphaNode = alphaNode;
 
 		/**
+		 * The outline material for toon materials without node modifications.
+		 *
+		 * @private
+		 * @type {NodeMaterial}
+		 */
+		this._outlineMaterial = this._createMaterial();
+
+		/**
 		 * An internal material cache.
 		 *
 		 * @private
-		 * @type {WeakMap<Material, NodeMaterial>}
+		 * @type {Map<Material, NodeMaterial>}
 		 */
-		this._materialCache = new WeakMap();
+		this._materialCache = new Map();
+
+		/**
+		 * Disposes the outline material of a disposed toon material.
+		 *
+		 * @private
+		 * @type {Function}
+		 */
+		this._onMaterialDispose = ( event ) => {
+
+			const originalMaterial = event.target;
+
+			originalMaterial.removeEventListener( 'dispose', this._onMaterialDispose );
+
+			this._materialCache.get( originalMaterial ).dispose();
+			this._materialCache.delete( originalMaterial );
+
+		};
 
 		/**
 		 * The name of this pass.
@@ -112,6 +137,27 @@ class ToonOutlinePassNode extends PassNode {
 		super.updateBefore( frame );
 
 		renderer.setRenderObjectFunction( currentRenderObjectFunction );
+
+	}
+
+	/**
+	 * Frees internal resources. Should be called when the node is no longer in use.
+	 */
+	dispose() {
+
+		super.dispose();
+
+		this._outlineMaterial.dispose();
+
+		for ( const [ originalMaterial, outlineMaterial ] of this._materialCache ) {
+
+			originalMaterial.removeEventListener( 'dispose', this._onMaterialDispose );
+
+			outlineMaterial.dispose();
+
+		}
+
+		this._materialCache.clear();
 
 	}
 
@@ -158,13 +204,31 @@ class ToonOutlinePassNode extends PassNode {
 	 */
 	_getOutlineMaterial( originalMaterial ) {
 
+		if ( ! originalMaterial.positionNode ) return this._outlineMaterial; // early out if there are no node modifications
+
+		let force = false;
 		let outlineMaterial = this._materialCache.get( originalMaterial );
+
+		// create
 
 		if ( outlineMaterial === undefined ) {
 
 			outlineMaterial = this._createMaterial();
 
 			this._materialCache.set( originalMaterial, outlineMaterial );
+
+			originalMaterial.addEventListener( 'dispose', this._onMaterialDispose );
+
+			force = true;
+
+		}
+
+		// update
+
+		if ( outlineMaterial.version !== originalMaterial.version || force === true ) {
+
+			outlineMaterial.positionNode = originalMaterial.positionNode || null;
+			outlineMaterial.version = originalMaterial.version;
 
 		}
 

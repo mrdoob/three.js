@@ -51,6 +51,48 @@ function filesize() {
 
 export default [
 	{
+		input: 'src/Three.js',
+		plugins: [
+			resolve(),
+			terser(),
+			filesize()
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'test/treeshake/three.module.bundle.min.js'
+			}
+		]
+	},
+	{
+		input: 'src/Three.WebGPU.js',
+		plugins: [
+			resolve(),
+			terser(),
+			filesize()
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'test/treeshake/three.webgpu.bundle.min.js'
+			}
+		]
+	},
+	{
+		input: 'src/Three.WebGPU.Nodes.js',
+		plugins: [
+			resolve(),
+			terser(),
+			filesize()
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'test/treeshake/three.webgpu.nodes.bundle.min.js'
+			}
+		]
+	},
+	{
 		input: 'test/treeshake/index.js',
 		plugins: [
 			resolve()

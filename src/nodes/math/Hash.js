@@ -18,4 +18,4 @@ export const hash = /*@__PURE__*/ Fn( ( [ seed ] ) => {
 
 	return result.toFloat().mul( 1 / 2 ** 32 ); // Convert to range [0, 1)
 
-} );
+}, { seed: 'uint', return: 'float' } );

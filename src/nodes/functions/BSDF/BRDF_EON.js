@@ -19,7 +19,7 @@ const FON_DirectionalAlbedo = /*@__PURE__*/ Fn( ( { mu, roughness, A } ) => {
 
 	return A.mul( roughness.mul( gOverPi ).add( 1.0 ) );
 
-} );
+}, { mu: 'float', roughness: 'float', A: 'float', return: 'float' } );
 
 // Portsmouth et al. 2025, "EON: A Practical Energy-Preserving Rough Diffuse BRDF"
 // https://jcgt.org/published/0014/01/06/
@@ -60,6 +60,6 @@ export const EON_DirectionalAlbedo = /*@__PURE__*/ Fn( ( { diffuseColor, roughne
 
 	return roughness.lessThanEqual( EON_EPSILON ).select( rho, eonAlbedo );
 
-} );
+}, { diffuseColor: 'vec3', roughness: 'float', dotNV: 'float', return: 'vec3' } );
 
 export default BRDF_EON;

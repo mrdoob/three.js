@@ -236,7 +236,7 @@ class MeshPhongMaterial extends Material {
 		 * map set, this value is not applied.
 		 *
 		 * @type {number}
-		 * @default 0
+		 * @default 1
 		 */
 		this.displacementScale = 1;
 

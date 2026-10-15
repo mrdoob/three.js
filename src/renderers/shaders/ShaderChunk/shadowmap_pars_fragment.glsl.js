@@ -152,7 +152,16 @@ export default /* glsl */`
 			float shadow = 1.0;
 
 			shadowCoord.xyz /= shadowCoord.w;
-			shadowCoord.z += shadowBias;
+
+			#ifdef USE_REVERSED_DEPTH_BUFFER
+
+				shadowCoord.z -= shadowBias;
+
+			#else
+
+				shadowCoord.z += shadowBias;
+
+			#endif
 
 			bool inFrustum = shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0;
 			bool frustumTest = inFrustum && shadowCoord.z <= 1.0;
@@ -162,7 +171,7 @@ export default /* glsl */`
 				// Hardware PCF with LinearFilter gives us 4-tap filtering per sample
 				// 5 samples using Vogel disk + IGN = effectively 20 filtered taps with better distribution
 				vec2 texelSize = vec2( 1.0 ) / shadowMapSize;
-				float radius = shadowRadius * texelSize.x;
+				vec2 radius = shadowRadius * texelSize;
 
 				// Use IGN to rotate sampling pattern per pixel
 				float phi = interleavedGradientNoise( gl_FragCoord.xy ) * PI2;

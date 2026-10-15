@@ -1,5 +1,5 @@
 import { RenderTarget, Vector2, Node, QuadMesh, NodeMaterial, RendererUtils, MathUtils, RGBFormat, RedFormat, UnsignedInt101111Type, UnsignedByteType } from 'three/webgpu';
-import { clamp, normalize, reference, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, bool, getNormalFromDepth, countOneBits, interleavedGradientNoise, property, outputStruct, context } from 'three/tsl';
+import { clamp, normalize, reference, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, bool, getNormalFromDepth, countOneBits, interleavedGradientNoise, property, outputStruct, context, isBackgroundDepth } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -446,13 +446,7 @@ class SSGINode extends Node {
 
 			return float( 0.25 ).mul( sub( position.y, position.x ).bitAnd( 3 ) );
 
-		} ).setLayout( {
-			name: 'spatialOffsets',
-			type: 'float',
-			inputs: [
-				{ name: 'position', type: 'vec2' }
-			]
-		} );
+		}, { position: 'vec2', return: 'float' } );
 
 		const GTAOFastAcos = Fn( ( [ value ] ) => {
 
@@ -464,13 +458,7 @@ class SSGINode extends Node {
 
 			return vec2( x, y );
 
-		} ).setLayout( {
-			name: 'GTAOFastAcos',
-			type: 'vec2',
-			inputs: [
-				{ name: 'value', type: 'vec2' }
-			]
-		} );
+		}, { value: 'vec2', return: 'vec2' } );
 
 		const horizonSampling = Fn( ( [ directionIsRight, stepRadius, radiusVS, viewPosition, slideDirTexelSize, initialRayStep, uvNode, viewDir, viewNormal, n ] ) => {
 
@@ -565,7 +553,7 @@ class SSGINode extends Node {
 
 			const depth = sampleDepth( uvNode ).toVar();
 
-			depth.greaterThanEqual( 1.0 ).discard();
+			isBackgroundDepth( depth ).discard();
 
 			const viewPosition = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).toVar();
 			const viewNormal = sampleNormal( uvNode ).toVar();

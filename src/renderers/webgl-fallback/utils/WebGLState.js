@@ -285,6 +285,13 @@ class WebGLState {
 
 	}
 
+	/**
+	 * Defines the blending for each draw buffer of a MRT-configured render target.
+	 *
+	 * @param {Array<Texture>} textures - The textures of the render target.
+	 * @param {?MRTNode} mrt - The MRT configuration.
+	 * @param {Material} material - The material whose blending is used for outputs with `MaterialBlending`.
+	 */
 	setMRTBlending( textures, mrt, material ) {
 
 		const gl = this.gl;
@@ -338,6 +345,17 @@ class WebGLState {
 			}
 
 		}
+
+		// invalidate cache
+
+		this.currentBlending = null;
+		this.currentBlendEquation = null;
+		this.currentBlendEquationAlpha = null;
+		this.currentBlendSrc = null;
+		this.currentBlendDst = null;
+		this.currentBlendSrcAlpha = null;
+		this.currentBlendDstAlpha = null;
+		this.currentPremultipledAlpha = null;
 
 	}
 
@@ -1167,7 +1185,7 @@ class WebGLState {
 
 			if ( drawBuffers === undefined ) {
 
-				drawBuffers = [];
+				drawBuffers = [ gl.COLOR_ATTACHMENT0 ];
 				this.currentDrawbuffers.set( framebuffer, drawBuffers );
 
 			}
@@ -1175,7 +1193,7 @@ class WebGLState {
 
 			const textures = renderContext.textures;
 
-			if ( drawBuffers.length !== textures.length || drawBuffers[ 0 ] !== gl.COLOR_ATTACHMENT0 ) {
+			if ( drawBuffers.length !== textures.length ) {
 
 				for ( let i = 0, il = textures.length; i < il; i ++ ) {
 

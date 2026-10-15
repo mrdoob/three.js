@@ -404,10 +404,10 @@ class WebGPUBackend extends Backend {
 	 * new allocation.
 	 *
 	 * @async
-	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
-	 * @param {number} count - The offset from which to start reading the
-	 * @param {number} offset - The storage buffer attribute.
-	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read from.
+	 * @param {?(ReadbackBuffer|ArrayBuffer)} [target=null] - The readback buffer or array buffer that receives the data. If `null`, a new array buffer is returned.
+	 * @param {number} [offset=0] - The byte offset to start reading from. Must be a multiple of 4.
+	 * @param {number} [count=-1] - The number of bytes to read. Must be a multiple of 4, or `-1` to read to the end of the buffer.
 	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
 	async getArrayBufferAsync( attribute, target = null, offset = 0, count = - 1 ) {
@@ -1087,9 +1087,15 @@ class WebGPUBackend extends Backend {
 
 			const cameras = renderContext.camera.cameras;
 
-			if ( ! renderContextData.layerDescriptors || renderContextData.layerDescriptors.length !== cameras.length ) {
+			// The layer descriptors hold views of the depth texture, which can be recreated (dispose, resize)
+			// or belong to another render target, since render contexts are shared by attachment state.
+
+			const depthTextureGPU = this.get( renderContext.depthTexture ).texture;
+
+			if ( ! renderContextData.layerDescriptors || renderContextData.layerDescriptors.length !== cameras.length || renderContextData.layerDepthTexture !== depthTextureGPU ) {
 
 				this._createArrayCameraLayerDescriptors( renderContext, renderContextData, descriptor, cameras );
+				renderContextData.layerDepthTexture = depthTextureGPU;
 
 			} else {
 
@@ -1237,22 +1243,27 @@ class WebGPUBackend extends Backend {
 
 		for ( let i = 0; i < cameras.length; i ++ ) {
 
-			const sourceAttachment = descriptor.colorAttachments[ 0 ];
-			const layerAttachment = descriptor.colorAttachments[ i ];
-
-			const layerColorAttachment = new GPURenderPassColorAttachment();
-			layerColorAttachment.view = layerAttachment.view;
-			layerColorAttachment.depthSlice = layerAttachment.depthSlice;
-			layerColorAttachment.resolveTarget = layerAttachment.resolveTarget;
-			layerColorAttachment.loadOp = sourceAttachment.loadOp;
-			layerColorAttachment.storeOp = sourceAttachment.storeOp;
-			layerColorAttachment.clearValue = sourceAttachment.clearValue;
-
 			const layerDescriptor = new GPURenderPassDescriptor();
 			layerDescriptor.label = descriptor.label;
 			layerDescriptor.occlusionQuerySet = descriptor.occlusionQuerySet;
 			layerDescriptor.timestampWrites = descriptor.timestampWrites;
-			layerDescriptor.colorAttachments.push( layerColorAttachment );
+
+			if ( descriptor.colorAttachments.length > 0 ) {
+
+				const sourceAttachment = descriptor.colorAttachments[ 0 ];
+				const layerAttachment = descriptor.colorAttachments[ i ];
+
+				const layerColorAttachment = new GPURenderPassColorAttachment();
+				layerColorAttachment.view = layerAttachment.view;
+				layerColorAttachment.depthSlice = layerAttachment.depthSlice;
+				layerColorAttachment.resolveTarget = layerAttachment.resolveTarget;
+				layerColorAttachment.loadOp = sourceAttachment.loadOp;
+				layerColorAttachment.storeOp = sourceAttachment.storeOp;
+				layerColorAttachment.clearValue = sourceAttachment.clearValue;
+
+				layerDescriptor.colorAttachments.push( layerColorAttachment );
+
+			}
 
 			if ( descriptor.depthStencilAttachment ) {
 
@@ -1284,7 +1295,7 @@ class WebGPUBackend extends Backend {
 				layerDepthStencilAttachment.view = depthTextureData.viewCache[ layerIndex ];
 				layerDepthStencilAttachment.depthLoadOp = depthStencilAttachment.depthLoadOp || GPULoadOp.Clear;
 				layerDepthStencilAttachment.depthStoreOp = depthStencilAttachment.depthStoreOp || GPUStoreOp.Store;
-				layerDepthStencilAttachment.depthClearValue = depthStencilAttachment.depthClearValue || 1.0;
+				layerDepthStencilAttachment.depthClearValue = depthStencilAttachment.depthClearValue ?? 1.0;
 
 				if ( renderContext.stencil ) {
 
@@ -1336,16 +1347,22 @@ class WebGPUBackend extends Backend {
 		for ( let i = 0; i < cameras.length; i ++ ) {
 
 			const layerDescriptor = renderContextData.layerDescriptors[ i ];
-			const sourceColorAttachment = descriptor.colorAttachments[ 0 ];
-			const layerColorAttachment = descriptor.colorAttachments[ i ];
-			const colorAttachment = layerDescriptor.colorAttachments[ 0 ];
+			layerDescriptor.timestampWrites = descriptor.timestampWrites;
 
-			colorAttachment.view = layerColorAttachment.view;
-			colorAttachment.resolveTarget = layerColorAttachment.resolveTarget;
-			colorAttachment.depthSlice = layerColorAttachment.depthSlice;
-			colorAttachment.loadOp = sourceColorAttachment.loadOp;
-			colorAttachment.storeOp = sourceColorAttachment.storeOp;
-			colorAttachment.clearValue = sourceColorAttachment.clearValue;
+			if ( descriptor.colorAttachments.length > 0 ) {
+
+				const sourceColorAttachment = descriptor.colorAttachments[ 0 ];
+				const layerColorAttachment = descriptor.colorAttachments[ i ];
+				const colorAttachment = layerDescriptor.colorAttachments[ 0 ];
+
+				colorAttachment.view = layerColorAttachment.view;
+				colorAttachment.resolveTarget = layerColorAttachment.resolveTarget;
+				colorAttachment.depthSlice = layerColorAttachment.depthSlice;
+				colorAttachment.loadOp = sourceColorAttachment.loadOp;
+				colorAttachment.storeOp = sourceColorAttachment.storeOp;
+				colorAttachment.clearValue = sourceColorAttachment.clearValue;
+
+			}
 
 			if ( layerDescriptor.depthStencilAttachment ) {
 
@@ -2376,7 +2393,7 @@ class WebGPUBackend extends Backend {
 
 		const data = this.get( renderObject );
 
-		const { object, material } = renderObject;
+		const { object, material, geometry } = renderObject;
 
 		const utils = this.utils;
 
@@ -2385,6 +2402,7 @@ class WebGPUBackend extends Backend {
 		const colorFormat = utils.getCurrentColorFormat( renderObject.context );
 		const depthStencilFormat = utils.getCurrentDepthStencilFormat( renderObject.context );
 		const primitiveTopology = utils.getPrimitiveTopology( object, material );
+		const stripIndexFormat = utils.getStripIndexFormat( object, geometry );
 		const frontFaceCW = ( object.isMesh && object.matrixWorld.determinantAffine() < 0 );
 
 		let needsUpdate = false;
@@ -2401,8 +2419,9 @@ class WebGPUBackend extends Backend {
 			data.side !== material.side || data.alphaToCoverage !== material.alphaToCoverage ||
 			data.sampleCount !== sampleCount || data.colorSpace !== colorSpace ||
 			data.colorFormat !== colorFormat || data.depthStencilFormat !== depthStencilFormat ||
-			data.primitiveTopology !== primitiveTopology ||
+			data.primitiveTopology !== primitiveTopology || data.stripIndexFormat !== stripIndexFormat ||
 			data.frontFaceCW !== frontFaceCW ||
+			data.geometryVersion !== renderObject.geometryVersion ||
 			data.clippingContextCacheKey !== renderObject.clippingContextCacheKey
 		) {
 
@@ -2422,7 +2441,9 @@ class WebGPUBackend extends Backend {
 			data.colorFormat = colorFormat;
 			data.depthStencilFormat = depthStencilFormat;
 			data.primitiveTopology = primitiveTopology;
+			data.stripIndexFormat = stripIndexFormat;
 			data.frontFaceCW = frontFaceCW;
+			data.geometryVersion = renderObject.geometryVersion;
 			data.clippingContextCacheKey = renderObject.clippingContextCacheKey;
 
 			needsUpdate = true;
@@ -2441,7 +2462,7 @@ class WebGPUBackend extends Backend {
 	 */
 	getRenderCacheKey( renderObject ) {
 
-		const { object, material } = renderObject;
+		const { object, material, geometry } = renderObject;
 
 		const utils = this.utils;
 		const renderContext = renderObject.context;
@@ -2465,8 +2486,8 @@ class WebGPUBackend extends Backend {
 			frontFaceCW,
 			utils.getSampleCountRenderContext( renderContext ),
 			utils.getCurrentColorSpace( renderContext ), utils.getCurrentColorFormat( renderContext ), utils.getCurrentDepthStencilFormat( renderContext ),
-			utils.getPrimitiveTopology( object, material ),
-			renderObject.getGeometryCacheKey(),
+			utils.getPrimitiveTopology( object, material ), utils.getStripIndexFormat( object, geometry ),
+			this.attributeUtils.getVertexBufferLayoutCacheKey( renderObject ),
 			renderObject.clippingContextCacheKey
 		].join();
 
@@ -2584,7 +2605,12 @@ class WebGPUBackend extends Backend {
 	 */
 	initTimestampQuery( type, uid, descriptor ) {
 
-		if ( ! this.trackTimestamp ) return;
+		if ( ! this.trackTimestamp ) {
+
+			descriptor.timestampWrites = undefined;
+			return;
+
+		}
 
 		if ( ! this.timestampQueryPool[ type ] ) {
 
@@ -2939,6 +2965,20 @@ class WebGPUBackend extends Backend {
 	updateSize() {
 
 		this.delete( this.renderer.getCanvasTarget() );
+
+	}
+
+	/**
+	 * Frees the GPU resources of the given canvas target.
+	 *
+	 * @param {CanvasTarget} canvasTarget - The canvas target.
+	 */
+	destroyCanvasTarget( canvasTarget ) {
+
+		this.destroyTexture( canvasTarget.colorTexture );
+		this.destroyTexture( canvasTarget.depthTexture );
+
+		this.delete( canvasTarget );
 
 	}
 

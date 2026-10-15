@@ -19,6 +19,9 @@ test/treeshake/index.webgpu.nodes.bundle.js
 test/treeshake/index.webgpu.nodes.bundle.min.js
 test/treeshake/index.webgpu.tsl.bundle.js
 test/treeshake/index.webgpu.tsl.bundle.min.js
+test/treeshake/three.module.bundle.min.js
+test/treeshake/three.webgpu.bundle.min.js
+test/treeshake/three.webgpu.nodes.bundle.min.js
 test/unit/build
 
 **/node_modules

@@ -19,6 +19,7 @@ import Lighting from './Lighting.js';
 import XRManager from './XRManager.js';
 import InspectorBase from './InspectorBase.js';
 import CanvasTarget from './CanvasTarget.js';
+import { AttributeType } from './Constants.js';
 
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
@@ -48,6 +49,85 @@ const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _vector4 = /*@__PURE__*/ new Vector4();
 
 const _shadowSide = { [ FrontSide ]: BackSide, [ BackSide ]: FrontSide, [ DoubleSide ]: DoubleSide };
+
+// The time in milliseconds an async compilation works before it yields to the main thread.
+const _compileYieldInterval = 8;
+
+// The maximum number of pipelines an async compilation creates at the same time.
+// Too many pipelines in flight stall the rendering of new frames.
+const _maxCompilingPipelines = 16;
+
+/**
+ * Yields to the main thread during an async compilation, but only after a time
+ * budget, so the compilation does not wait for a new task or frame after every
+ * small piece of work.
+ *
+ * @private
+ */
+class CompileScheduler {
+
+	constructor() {
+
+		this.lastYieldTime = performance.now();
+
+	}
+
+	/**
+	 * Whether the compilation worked longer than the time budget since the last yield.
+	 *
+	 * @return {boolean} Whether the compilation should yield to the main thread.
+	 */
+	needsYield() {
+
+		return performance.now() - this.lastYieldTime >= _compileYieldInterval;
+
+	}
+
+	/**
+	 * Yields to the main thread until the next frame was rendered. `scheduler.yield()`
+	 * alone is not enough, since its continuations run before the browser renders.
+	 *
+	 * @return {Promise} A promise that resolves when the compilation can continue.
+	 */
+	async yield() {
+
+		if ( typeof requestAnimationFrame === 'undefined' || ( typeof document !== 'undefined' && document.hidden === true ) ) {
+
+			// no frames are rendered
+			await yieldToMain();
+
+		} else {
+
+			await new Promise( ( resolve ) => {
+
+				let resolved = false;
+
+				const done = () => {
+
+					if ( resolved === false ) {
+
+						resolved = true;
+						resolve();
+
+					}
+
+				};
+
+				// continue in a new task after the next frame was rendered
+				requestAnimationFrame( () => setTimeout( done, 0 ) );
+
+				// requestAnimationFrame() stops if the page is hidden in the meantime
+				setTimeout( done, 100 );
+
+			} );
+
+		}
+
+		this.lastYieldTime = performance.now();
+
+	}
+
+}
 
 /**
  * Base class for renderers.
@@ -283,6 +363,14 @@ class Renderer {
 		this._onCanvasTargetResize = this._onCanvasTargetResize.bind( this );
 
 		/**
+		 * OnCanvasTargetDispose callback function.
+		 *
+		 * @private
+		 * @type {Function}
+		 */
+		this._onCanvasTargetDispose = this._onCanvasTargetDispose.bind( this );
+
+		/**
 		 * The canvas target for rendering.
 		 *
 		 * @private
@@ -290,6 +378,7 @@ class Renderer {
 		 */
 		this._canvasTarget = new CanvasTarget( backend.getDomElement() );
 		this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
+		this._canvasTarget.addEventListener( 'dispose', this._onCanvasTargetDispose );
 		this._canvasTarget.isDefaultCanvasTarget = true;
 
 		/**
@@ -934,9 +1023,10 @@ class Renderer {
 		const activeCubeFace = this._activeCubeFace;
 		const activeMipmapLevel = this._activeMipmapLevel;
 
-		// a state snapshot is taken once at the beginning and reapplied every time precompilation continues
+		// a state snapshot is taken once at the beginning and reapplied every time precompilation continues.
+		// `item` is the work item that is currently processed, see `_beginPreCompile()`
 
-		const precompilationState = { useFrameBufferTarget, renderTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel };
+		const precompilationState = { useFrameBufferTarget, renderTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel, item: null, materialSide: null };
 
 		this._beginPreCompile( precompilationState );
 
@@ -1063,17 +1153,35 @@ class Renderer {
 
 		this._finishPreCompile();
 
-		// Process compilation work items sequentially to avoid freezing
-		// Yields between objects to keep animation smooth
+		// Process compilation work items sequentially and yield to the main thread after a
+		// time budget to keep animation smooth. Pipelines are compiled in parallel while
+		// the next items are processed.
 
 		const total = compilationPromises.length;
 		let loaded = 0;
 
+		const scheduler = new CompileScheduler();
+		const compilingPipelines = new Set();
+
+		const onLoaded = () => {
+
+			loaded ++;
+
+			if ( onProgress !== null ) {
+
+				onProgress( new ProgressEvent( 'progress', { lengthComputable: true, loaded, total } ) );
+
+			}
+
+		};
+
 		const yieldPreCompile = async () => {
+
+			if ( scheduler.needsYield() === false ) return;
 
 			this._finishPreCompile();
 
-			await yieldToMain();
+			await scheduler.yield();
 
 			this._beginPreCompile( precompilationState );
 
@@ -1083,11 +1191,13 @@ class Renderer {
 
 			const pipelinePromises = [];
 
+			precompilationState.item = item;
+
+			this._beginPreCompile( precompilationState );
+
 			const renderObject = this._objects.get( item.object, item.material, item.scene, item.camera, item.lightsNode, item.renderContext, item.clippingContext, item.passId );
 			renderObject.drawRange = item.object.geometry.drawRange;
 			renderObject.group = item.group;
-
-			this._beginPreCompile( precompilationState );
 
 			await this._nodes.getForRenderAsync( renderObject, yieldPreCompile );
 			this._nodes.updateBefore( renderObject );
@@ -1099,26 +1209,32 @@ class Renderer {
 
 			this._finishPreCompile();
 
+			precompilationState.item = null;
+
 			if ( pipelinePromises.length > 0 ) {
 
-				// Wait for pipeline creation
+				const promise = Promise.all( pipelinePromises ).then( () => {
 
-				await Promise.all( pipelinePromises );
+					compilingPipelines.delete( promise );
+					onLoaded();
+
+				} );
+
+				compilingPipelines.add( promise );
+
+				while ( compilingPipelines.size >= _maxCompilingPipelines ) await Promise.race( compilingPipelines );
+
+			} else {
+
+				onLoaded();
 
 			}
 
-			loaded ++;
-
-			if ( onProgress !== null ) {
-
-				onProgress( new ProgressEvent( 'progress', { lengthComputable: true, loaded, total } ) );
-
-			}
-
-			// Yield between objects to allow animation frames
-			await yieldToMain();
+			if ( scheduler.needsYield() ) await scheduler.yield();
 
 		}
+
+		await Promise.all( compilingPipelines );
 
 	}
 
@@ -1132,9 +1248,19 @@ class Renderer {
 	 */
 	_beginPreCompile( precompilationState ) {
 
-		const { useFrameBufferTarget, renderTarget } = precompilationState;
+		const { useFrameBufferTarget, renderTarget, item } = precompilationState;
 
 		if ( useFrameBufferTarget === true ) this.setRenderTarget( renderTarget );
+
+		if ( item !== null ) {
+
+			// apply the material side the work item was queued with since the renderer changes the side
+			// temporarily, e.g. for the back and front pass of double-sided transparent materials
+
+			precompilationState.materialSide = item.material.side;
+			item.material.side = item.side;
+
+		}
 
 		this._callDepth ++;
 
@@ -1149,9 +1275,11 @@ class Renderer {
 	 */
 	_finishPreCompile() {
 
-		const { useFrameBufferTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel } = this._precompilationState;
+		const { useFrameBufferTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel, item, materialSide } = this._precompilationState;
 
 		if ( useFrameBufferTarget === true ) this.setRenderTarget( outputRenderTarget, activeCubeFace, activeMipmapLevel );
+
+		if ( item !== null ) item.material.side = materialSide;
 
 		this._callDepth --;
 
@@ -1186,6 +1314,27 @@ class Renderer {
 		const total = computeList.length;
 		let loaded = 0;
 
+		const scheduler = new CompileScheduler();
+		const compilingPipelines = new Set();
+
+		const onLoaded = () => {
+
+			loaded ++;
+
+			if ( onProgress !== null ) {
+
+				onProgress( new ProgressEvent( 'progress', { lengthComputable: true, loaded, total } ) );
+
+			}
+
+		};
+
+		const yieldCompile = async () => {
+
+			if ( scheduler.needsYield() ) await scheduler.yield();
+
+		};
+
 		//
 
 		const pipelines = this._pipelines;
@@ -1218,7 +1367,7 @@ class Renderer {
 
 			}
 
-			await nodes.getForComputeAsync( computeNode );
+			await nodes.getForComputeAsync( computeNode, yieldCompile );
 
 			nodes.updateBeforeForCompute( computeNode );
 			nodes.updateForCompute( computeNode );
@@ -1228,21 +1377,35 @@ class Renderer {
 			const compilationPromises = [];
 
 			pipelines.getForCompute( computeNode, computeBindings, compilationPromises );
-			await Promise.all( compilationPromises );
 
 			nodes.updateAfterForCompute( computeNode );
 
-			loaded ++;
+			// Pipelines are compiled in parallel while the next compute nodes are processed
 
-			if ( onProgress !== null ) {
+			if ( compilationPromises.length > 0 ) {
 
-				onProgress( new ProgressEvent( 'progress', { lengthComputable: true, loaded, total } ) );
+				const promise = Promise.all( compilationPromises ).then( () => {
+
+					compilingPipelines.delete( promise );
+					onLoaded();
+
+				} );
+
+				compilingPipelines.add( promise );
+
+				while ( compilingPipelines.size >= _maxCompilingPipelines ) await Promise.race( compilingPipelines );
+
+			} else {
+
+				onLoaded();
 
 			}
 
-			if ( loaded < total ) await yieldToMain();
+			await yieldCompile();
 
 		}
+
+		await Promise.all( compilingPipelines );
 
 	}
 
@@ -1829,19 +1992,17 @@ class Renderer {
 
 		let viewport = canvasTarget._viewport;
 		let scissor = canvasTarget._scissor;
+		let scissorTest = canvasTarget._scissorTest;
 		let pixelRatio = canvasTarget._pixelRatio;
 
 		if ( renderTarget !== null ) {
 
 			viewport = renderTarget.viewport;
 			scissor = renderTarget.scissor;
+			scissorTest = renderTarget.scissorTest;
 			pixelRatio = 1;
 
 		}
-
-		this.getDrawingBufferSize( _drawingBufferSize );
-
-		_screen.set( 0, 0, _drawingBufferSize.width, _drawingBufferSize.height );
 
 		const minDepth = ( viewport.minDepth === undefined ) ? 0 : viewport.minDepth;
 		const maxDepth = ( viewport.maxDepth === undefined ) ? 1 : viewport.maxDepth;
@@ -1851,10 +2012,8 @@ class Renderer {
 		renderContext.viewportValue.height >>= activeMipmapLevel;
 		renderContext.viewportValue.minDepth = minDepth;
 		renderContext.viewportValue.maxDepth = maxDepth;
-		renderContext.viewport = renderContext.viewportValue.equals( _screen ) === false;
 
 		renderContext.scissorValue.copy( scissor ).multiplyScalar( pixelRatio ).floor();
-		renderContext.scissor = canvasTarget._scissorTest && renderContext.scissorValue.equals( _screen ) === false;
 		renderContext.scissorValue.width >>= activeMipmapLevel;
 		renderContext.scissorValue.height >>= activeMipmapLevel;
 
@@ -1912,6 +2071,8 @@ class Renderer {
 
 		} else {
 
+			this.getDrawingBufferSize( _drawingBufferSize );
+
 			renderContext.textures = null;
 			renderContext.depthTexture = null;
 			renderContext.width = _drawingBufferSize.width;
@@ -1943,6 +2104,11 @@ class Renderer {
 			renderContext.scissorValue.height = Math.max( renderContext.height - renderContext.scissorValue.y, 0 );
 
 		}
+
+		_screen.set( 0, 0, renderContext.width, renderContext.height );
+
+		renderContext.viewport = renderContext.viewportValue.equals( _screen ) === false;
+		renderContext.scissor = scissorTest && renderContext.scissorValue.equals( _screen ) === false;
 
 		//
 
@@ -2141,10 +2307,10 @@ class Renderer {
 	 * from the GPU to the CPU in context of compute shaders.
 	 *
 	 * @async
-	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
-	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
-	 * @param {number} offset - The storage buffer attribute.
-	 * @param {number} count - The offset from which to start reading the
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read from.
+	 * @param {?(ReadbackBuffer|ArrayBuffer)} [target=null] - The readback buffer or array buffer that receives the data. If `null`, a new array buffer is returned.
+	 * @param {number} [offset=0] - The byte offset to start reading from. Must be a multiple of 4.
+	 * @param {number} [count=-1] - The number of bytes to read. Must be a multiple of 4, or `-1` to read to the end of the buffer.
 	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
 	async getArrayBufferAsync( attribute, target = null, offset = 0, count = - 1 ) {
@@ -2748,6 +2914,14 @@ class Renderer {
 	 */
 	async dispose() {
 
+		// edge case: If dispose() is called during an init, wait for the finish
+
+		if ( this._initPromise !== null ) {
+
+			await this.init();
+
+		}
+
 		if ( this._initialized === true ) {
 
 			this._inspector.dispose();
@@ -2767,6 +2941,8 @@ class Renderer {
 
 			}
 
+			this._destroyCanvasTarget( this._canvasTarget );
+
 			this._textures.dispose();
 			this.info.dispose();
 
@@ -2775,7 +2951,6 @@ class Renderer {
 		}
 
 		this.setRenderTarget( null );
-		this.setAnimationLoop( null );
 
 	}
 
@@ -2838,9 +3013,12 @@ class Renderer {
 	setCanvasTarget( canvasTarget ) {
 
 		this._canvasTarget.removeEventListener( 'resize', this._onCanvasTargetResize );
+		// keep any dispose event listener attached for later use
 
 		this._canvasTarget = canvasTarget;
+
 		this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
+		this._canvasTarget.addEventListener( 'dispose', this._onCanvasTargetDispose );
 
 	}
 
@@ -2940,6 +3118,20 @@ class Renderer {
 
 		}
 
+		const computeList = Array.isArray( computeNodes ) ? computeNodes : [ computeNodes ];
+
+		if ( computeList.length === 0 || computeList.some( computeNode => computeNode?.isComputeNode !== true ) ) {
+
+			throw new Error( 'THREE.Renderer: ".compute()" expects a "ComputeNode".' );
+
+		}
+
+		if ( dispatchSize !== null && computeList.some( computeNode => computeNode.count !== null || computeNode.dispatchSize !== null ) ) {
+
+			throw new Error( 'THREE.Renderer: A dispatch size cannot be passed to "renderer.compute()" for nodes created with "compute( count )". Use "computeKernel()" instead.' );
+
+		}
+
 		//
 
 		const nodeFrame = this._nodes.nodeFrame;
@@ -2966,14 +3158,6 @@ class Renderer {
 		const pipelines = this._pipelines;
 		const bindings = this._bindings;
 		const nodes = this._nodes;
-
-		const computeList = Array.isArray( computeNodes ) ? computeNodes : [ computeNodes ];
-
-		if ( computeList[ 0 ] === undefined || computeList[ 0 ].isComputeNode !== true ) {
-
-			throw new Error( 'THREE.Renderer: .compute() expects a ComputeNode.' );
-
-		}
 
 		backend.beginCompute( computeNodes );
 
@@ -3013,6 +3197,8 @@ class Renderer {
 
 			const computeBindings = bindings.getForCompute( computeNode );
 			const computePipeline = pipelines.getForCompute( computeNode, computeBindings );
+
+			this._updateDispatchSize( computeNode, dispatchSize );
 
 			backend.compute( computeNodes, computeNode, computeBindings, computePipeline, dispatchSize );
 
@@ -3744,6 +3930,26 @@ class Renderer {
 	}
 
 	/**
+	 * Updates the indirect storage attribute that defines the dispatch size
+	 * of the given compute node, if any.
+	 *
+	 * @private
+	 * @param {ComputeNode} computeNode - The compute node.
+	 * @param {?(number|Array<number>|IndirectStorageBufferAttribute)} dispatchSize - The dispatch size of the compute call.
+	 */
+	_updateDispatchSize( computeNode, dispatchSize ) {
+
+		const indirect = dispatchSize !== null ? dispatchSize : computeNode.dispatchSize;
+
+		if ( indirect && indirect.isIndirectStorageBufferAttribute === true ) {
+
+			this._attributes.update( indirect, AttributeType.INDIRECT );
+
+		}
+
+	}
+
+	/**
 	 * This method represents the default render object function that manages the render lifecycle
 	 * of the object.
 	 *
@@ -3975,10 +4181,12 @@ class Renderer {
 		// If in async compilation mode, queue the work for sequential execution
 		if ( this._compilationPromises !== null ) {
 
-			// Store work items instead of promises - will be processed sequentially
+			// Store work items instead of promises - will be processed sequentially.
+			// The side is stored since the renderer might have changed it temporarily.
 			this._compilationPromises.push( {
 				object,
 				material,
+				side: material.side,
 				scene,
 				camera,
 				lightsNode,
@@ -4020,6 +4228,32 @@ class Renderer {
 	_onCanvasTargetResize() {
 
 		if ( this._initialized ) this.backend.updateSize();
+
+	}
+
+	/**
+	 * Callback when a canvas target has been disposed.
+	 *
+	 * @private
+	 * @param {Object} event - The dispose event.
+	 */
+	_onCanvasTargetDispose( event ) {
+
+		this._destroyCanvasTarget( event.target );
+
+	}
+
+	/**
+	 * Frees the GPU resources of the given canvas target.
+	 *
+	 * @private
+	 * @param {CanvasTarget} canvasTarget - The canvas target.
+	 */
+	_destroyCanvasTarget( canvasTarget ) {
+
+		canvasTarget.removeEventListener( 'dispose', this._onCanvasTargetDispose );
+
+		if ( this._initialized ) this.backend.destroyCanvasTarget( canvasTarget );
 
 	}
 

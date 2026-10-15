@@ -359,7 +359,7 @@ class DDSLoader extends CompressedTextureLoader {
 
 				} else {
 
-					dataLength = Math.max( 4, width ) / 4 * Math.max( 4, height ) / 4 * blockBytes;
+					dataLength = Math.ceil( width / 4 ) * Math.ceil( height / 4 ) * blockBytes;
 					byteArray = new Uint8Array( buffer, dataOffset, dataLength );
 
 				}

@@ -1,6 +1,6 @@
 import { Vector3 } from '../math/Vector3.js';
 import { BufferAttribute } from './BufferAttribute.js';
-import { denormalize, normalize } from '../math/MathUtils.js';
+import { denormalize, normalize, getNormalizationScale } from '../math/MathUtils.js';
 import { log } from '../utils.js';
 
 const _vector = /*@__PURE__*/ new Vector3();
@@ -65,6 +65,14 @@ class InterleavedBufferAttribute {
 		 * @type {InterleavedBuffer}
 		 */
 		this.normalized = normalized;
+
+		/**
+		 * Cached normalization factor, see {@link MathUtils#getNormalizationScale}.
+		 *
+		 * @private
+		 * @type {number|undefined}
+		 */
+		this._normalizationScale = interleavedBuffer !== undefined ? getNormalizationScale( interleavedBuffer.array ) : undefined;
 
 	}
 
@@ -185,7 +193,7 @@ class InterleavedBufferAttribute {
 
 		let value = this.array[ index * this.data.stride + this.offset + component ];
 
-		if ( this.normalized ) value = denormalize( value, this.array );
+		if ( this.normalized ) value = this._denormalize( value );
 
 		return value;
 
@@ -201,7 +209,7 @@ class InterleavedBufferAttribute {
 	 */
 	setComponent( index, component, value ) {
 
-		if ( this.normalized ) value = normalize( value, this.array );
+		if ( this.normalized ) value = this._normalize( value );
 
 		this.data.array[ index * this.data.stride + this.offset + component ] = value;
 
@@ -218,7 +226,7 @@ class InterleavedBufferAttribute {
 	 */
 	setX( index, x ) {
 
-		if ( this.normalized ) x = normalize( x, this.array );
+		if ( this.normalized ) x = this._normalize( x );
 
 		this.data.array[ index * this.data.stride + this.offset ] = x;
 
@@ -235,7 +243,7 @@ class InterleavedBufferAttribute {
 	 */
 	setY( index, y ) {
 
-		if ( this.normalized ) y = normalize( y, this.array );
+		if ( this.normalized ) y = this._normalize( y );
 
 		this.data.array[ index * this.data.stride + this.offset + 1 ] = y;
 
@@ -252,7 +260,7 @@ class InterleavedBufferAttribute {
 	 */
 	setZ( index, z ) {
 
-		if ( this.normalized ) z = normalize( z, this.array );
+		if ( this.normalized ) z = this._normalize( z );
 
 		this.data.array[ index * this.data.stride + this.offset + 2 ] = z;
 
@@ -269,7 +277,7 @@ class InterleavedBufferAttribute {
 	 */
 	setW( index, w ) {
 
-		if ( this.normalized ) w = normalize( w, this.array );
+		if ( this.normalized ) w = this._normalize( w );
 
 		this.data.array[ index * this.data.stride + this.offset + 3 ] = w;
 
@@ -287,7 +295,7 @@ class InterleavedBufferAttribute {
 
 		let x = this.data.array[ index * this.data.stride + this.offset ];
 
-		if ( this.normalized ) x = denormalize( x, this.array );
+		if ( this.normalized ) x = this._denormalize( x );
 
 		return x;
 
@@ -303,7 +311,7 @@ class InterleavedBufferAttribute {
 
 		let y = this.data.array[ index * this.data.stride + this.offset + 1 ];
 
-		if ( this.normalized ) y = denormalize( y, this.array );
+		if ( this.normalized ) y = this._denormalize( y );
 
 		return y;
 
@@ -319,7 +327,7 @@ class InterleavedBufferAttribute {
 
 		let z = this.data.array[ index * this.data.stride + this.offset + 2 ];
 
-		if ( this.normalized ) z = denormalize( z, this.array );
+		if ( this.normalized ) z = this._denormalize( z );
 
 		return z;
 
@@ -335,7 +343,7 @@ class InterleavedBufferAttribute {
 
 		let w = this.data.array[ index * this.data.stride + this.offset + 3 ];
 
-		if ( this.normalized ) w = denormalize( w, this.array );
+		if ( this.normalized ) w = this._denormalize( w );
 
 		return w;
 
@@ -355,8 +363,8 @@ class InterleavedBufferAttribute {
 
 		if ( this.normalized ) {
 
-			x = normalize( x, this.array );
-			y = normalize( y, this.array );
+			x = this._normalize( x );
+			y = this._normalize( y );
 
 		}
 
@@ -382,9 +390,9 @@ class InterleavedBufferAttribute {
 
 		if ( this.normalized ) {
 
-			x = normalize( x, this.array );
-			y = normalize( y, this.array );
-			z = normalize( z, this.array );
+			x = this._normalize( x );
+			y = this._normalize( y );
+			z = this._normalize( z );
 
 		}
 
@@ -412,10 +420,10 @@ class InterleavedBufferAttribute {
 
 		if ( this.normalized ) {
 
-			x = normalize( x, this.array );
-			y = normalize( y, this.array );
-			z = normalize( z, this.array );
-			w = normalize( w, this.array );
+			x = this._normalize( x );
+			y = this._normalize( y );
+			z = this._normalize( z );
+			w = this._normalize( w );
 
 		}
 
@@ -540,6 +548,32 @@ class InterleavedBufferAttribute {
 			};
 
 		}
+
+	}
+
+	/**
+	 * Denormalizes the value using cached normalization factor.
+	 *
+	 * @private
+	 */
+	_denormalize( value ) {
+
+		const scale = this._normalizationScale;
+
+		return scale !== undefined ? Math.max( value / scale, - 1.0 ) : denormalize( value, this.data.array );
+
+	}
+
+	/**
+	 * Normalizes the value using cached normalization factor.
+	 *
+	 * @private
+	 */
+	_normalize( value ) {
+
+		const scale = this._normalizationScale;
+
+		return scale !== undefined ? Math.round( value * scale ) : normalize( value, this.data.array );
 
 	}
 
