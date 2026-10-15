@@ -1031,6 +1031,8 @@ class Renderer {
 
 		const renderContext = this._renderContexts.get( renderTarget, this._mrt, this._callDepth );
 
+		precompilationState.renderContext = renderContext;
+
 		const compilationPromises = [];
 
 		this._currentRenderContext = renderContext;
@@ -1243,11 +1245,17 @@ class Renderer {
 	 */
 	_beginPreCompile( precompilationState ) {
 
-		const { useFrameBufferTarget, renderTarget } = precompilationState;
+		const { useFrameBufferTarget, renderTarget, renderContext } = precompilationState;
 
 		if ( useFrameBufferTarget === true ) this.setRenderTarget( renderTarget );
 
 		this._callDepth ++;
+
+		// node builds take their shared bind groups from the current render context
+
+		precompilationState.previousRenderContext = this._currentRenderContext;
+
+		if ( renderContext !== undefined ) this._currentRenderContext = renderContext;
 
 		this._precompilationState = precompilationState;
 
@@ -1260,9 +1268,11 @@ class Renderer {
 	 */
 	_finishPreCompile() {
 
-		const { useFrameBufferTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel } = this._precompilationState;
+		const { useFrameBufferTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel, previousRenderContext } = this._precompilationState;
 
 		if ( useFrameBufferTarget === true ) this.setRenderTarget( outputRenderTarget, activeCubeFace, activeMipmapLevel );
+
+		this._currentRenderContext = previousRenderContext;
 
 		this._callDepth --;
 

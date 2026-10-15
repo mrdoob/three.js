@@ -147,6 +147,42 @@ class Bindings extends DataMap {
 	 */
 	getSharedBindGroup( name, bindings ) {
 
+		const renderer = this.backend.renderer;
+		const renderContext = renderer._currentRenderContext || renderer; // use renderer as fallback until we have a compute context
+
+		return this._getSharedBindGroup( name, bindings, renderContext, false );
+
+	}
+
+	/**
+	 * Returns the shared bind group of the given render context that corresponds to the
+	 * given shared bind group of a node builder state. Render objects of different render
+	 * contexts can use the same node builder state, but nested renders can't share uniform
+	 * buffers like the camera's, so each render context has shared bind groups of its own.
+	 *
+	 * @param {BindGroup} bindGroup - A shared bind group of a node builder state.
+	 * @param {RenderContext} renderContext - The render context.
+	 * @return {BindGroup} The shared bind group of the render context.
+	 */
+	getSharedBindGroupForContext( bindGroup, renderContext ) {
+
+		return this._getSharedBindGroup( bindGroup.name, bindGroup.bindings, renderContext, true );
+
+	}
+
+	/**
+	 * Returns the shared bind group for the given bindings and render context.
+	 * If it does not exist yet, it is created with the given name and bindings.
+	 *
+	 * @private
+	 * @param {string} name - The bind group's name.
+	 * @param {Array<Binding>} bindings - An array of bindings.
+	 * @param {RenderContext|Renderer} renderContext - The render context.
+	 * @param {boolean} cloneBindings - Whether a new bind group gets clones of the bindings or not.
+	 * @return {BindGroup} The shared bind group.
+	 */
+	_getSharedBindGroup( name, bindings, renderContext, cloneBindings ) {
+
 		// build cache key
 
 		let cacheKeyString = '';
@@ -175,9 +211,6 @@ class Bindings extends DataMap {
 
 		// lookup bind group cache
 
-		const renderer = this.backend.renderer;
-		const renderContext = renderer._currentRenderContext || renderer; // use renderer as fallback until we have a compute context
-
 		let bindGroupsCache = this._sharedBindGroups.get( renderContext );
 
 		if ( bindGroupsCache === undefined ) {
@@ -193,6 +226,23 @@ class Bindings extends DataMap {
 		let bindGroup = bindGroupsCache.get( cacheKey );
 
 		if ( bindGroup === undefined ) {
+
+			if ( cloneBindings === true ) {
+
+				// the bindings belong to the shared bind group of another render context,
+				// so the clones must not share its buffers
+
+				bindings = bindings.map( ( binding ) => {
+
+					const clone = binding.clone();
+
+					if ( clone.isBuffer ) clone.release();
+
+					return clone;
+
+				} );
+
+			}
 
 			bindGroup = new BindGroup( name, bindings );
 
