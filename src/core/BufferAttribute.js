@@ -690,8 +690,13 @@ class BufferAttribute extends EventDispatcher {
 
 	/**
 	 * Frees the GPU-related resources allocated by this instance. Available only in {@link WebGPURenderer}.
+	 * The attribute can still be used afterwards, its data are uploaded again.
 	 */
 	dispose() {
+
+		// the version change makes render objects using this attribute refresh and upload the data again
+
+		this.version ++;
 
 		this.dispatchEvent( { type: 'dispose' } );
 

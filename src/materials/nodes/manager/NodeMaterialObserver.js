@@ -748,20 +748,6 @@ class NodeMaterialObserver {
 
 		}
 
-		// attributes must be uploaded again if they have been disposed
-
-		const attributes = renderObject._geometries.attributes;
-
-		for ( const vertexBuffer of renderObject.getVertexBuffers() ) {
-
-			if ( attributes.has( vertexBuffer ) === false ) return false;
-
-		}
-
-		const index = renderObject.getIndex();
-
-		if ( index !== null && attributes.has( index ) === false ) return false;
-
 		// morph targets
 
 		if ( renderObjectData.morphTargetInfluences ) {
