@@ -111,9 +111,7 @@
 
 					material.emissive.set( 0x252830 );
 					material.toneMapped = false;
-					const errorLabel = addLabel( 'Not supported: ' + error.message.replace( /^\w+Loader: /, '' ), x, - 0.8 );
-					errorLabel.style.transform = 'translate( -50%, 0 )';
-					errorLabel.style.fontSize = '12px';
+					addLabel( 'Not supported: ' + error.message.replace( /^\w+Loader: /, '' ), x, 0 ).style.fontSize = '12px';
 					console.warn( name + ' HDR not supported:', error );
 
 				}
