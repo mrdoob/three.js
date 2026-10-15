@@ -1,5 +1,5 @@
-import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, Node, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
-import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand, context, isBackgroundDepth } from 'three/tsl';
+import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, Node, QuadMesh, NodeMaterial, RendererUtils, RGBAFormat } from 'three/webgpu';
+import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand, context, isBackgroundDepth, screenUV, reflect, sqrt, exp2 } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -105,7 +105,7 @@ class GTAONode extends Node {
 		 * @private
 		 * @type {RenderTarget}
 		 */
-		this._aoRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, format: RedFormat } );
+		this._aoRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, format: RGBAFormat } );
 		this._aoRenderTarget.texture.name = 'GTAONode.AO';
 
 		// uniforms
@@ -309,6 +309,48 @@ class GTAONode extends Node {
 	}
 
 	/**
+	 * Returns the view-space bent normal, pointing toward the unoccluded hemisphere.
+	 * The output texture stores AO in R and the encoded bent normal in GBA.
+	 *
+	 * @param {Node<vec2>} [uvNode=screenUV] - Sampling coordinates.
+	 * @return {Node<vec3>} The normalized bent normal.
+	 */
+	getBentNormalNode( uvNode = screenUV ) {
+
+		return this._textureNode.sample( uvNode ).gba.mul( 2 ).sub( 1 ).normalize();
+
+	}
+
+	/**
+	 * Applies GTAO to indirect lighting, using bent normals for specular occlusion.
+	 * Transparent materials retain their own occlusion. Direct lighting is unaffected.
+	 *
+	 * @param {Node<vec2>} [uvNode=screenUV] - Sampling coordinates.
+	 * @return {ContextNode} A context for a scene pass or material.
+	 */
+	getLightingContext( uvNode = screenUV ) {
+
+		const visibility = this._textureNode.sample( uvNode ).r;
+		const bentNormal = this.getBentNormalNode( uvNode );
+
+		return context( {
+			getAO: ( inputNode, { material } ) => {
+
+				if ( material.transparent === true ) return inputNode;
+				return inputNode !== null ? inputNode.mul( visibility ) : visibility;
+
+			},
+			getSpecularOcclusion: ( inputNode, normal, roughness, viewDirection, { material }, ambientVisibility ) => {
+
+				if ( material.transparent === true ) return inputNode;
+				return specularOcclusion( ambientVisibility, bentNormal, reflect( viewDirection.negate(), normal ), roughness );
+
+			}
+		} );
+
+	}
+
+	/**
 	 * Sets the size of the effect.
 	 *
 	 * @param {number} width - The width of the effect.
@@ -473,6 +515,7 @@ class GTAONode extends Node {
 			const invSteps = 1 / STEPS;
 
 			const ao = float( 0 ).toVar();
+			const bentNormal = viewNormal.toVar();
 
 			// Each iteration analyzes one vertical "slice" of the 3D space around the fragment.
 
@@ -582,12 +625,31 @@ class GTAONode extends Node {
 				// |projN| is the foreshortening weight from the per-slice normal projection.
 				ao.addAssign( projNLen.mul( a ) );
 
+				// Cosine-weighted first moment of the visible slice. Subtract the
+				// open slice to remove quadrature bias at low direction counts.
+				const moment = ( h ) => {
+
+					const c = cos( h );
+					const s = sin( h );
+					const c3 = c.mul( c ).mul( c );
+					const s3 = s.mul( s ).mul( s );
+					return viewDir.mul( nCos.mul( c3 ).negate().add( nSin.mul( s3 ) ).div( 3 ) )
+						.add( sliceTangent.mul( nCos.mul( s3 ).div( 3 ).add( nSin.mul( c.negate().add( c3.div( 3 ) ) ) ) ) );
+
+				};
+
+				const openPos = angleN.add( PI.div( 2 ) );
+				const openNeg = angleN.sub( PI.div( 2 ) );
+				bentNormal.addAssign( moment( hPos ).add( moment( hNeg ) ).sub( moment( openPos ) ).sub( moment( openNeg ) ).mul( projNLen.mul( 1.5 / DIRECTIONS ) ) );
+
 			} );
 
 			ao.assign( clamp( ao.div( DIRECTIONS ), 0, 1 ) );
 			ao.assign( pow( ao, this.scale ) );
 
-			return ao;
+			// Keep the moment in the surface hemisphere, including fully occluded pixels.
+			bentNormal.addAssign( viewNormal.mul( dot( bentNormal, viewNormal ).negate().max( 0 ).add( 0.0001 ) ) );
+			return vec4( ao, normalize( bentNormal ).mul( 0.5 ).add( 0.5 ) );
 
 		} );
 
@@ -600,7 +662,7 @@ class GTAONode extends Node {
 
 		//
 
-		return this._textureNode;
+		return this._textureNode.r;
 
 	}
 
@@ -731,3 +793,59 @@ function generateMagicSquare( size ) {
  * @returns {GTAONode}
  */
 export const ao = ( depthNode, normalNode, camera ) => new GTAONode( nodeObject( depthNode ), nodeObject( normalNode ), camera );
+
+/**
+ * Cone-cone specular visibility from GTAO (Jimenez et al., Appendix B).
+ * All directions must be normalized and in the same coordinate space.
+ * This approximates the specular lobe by a spherical cap, rather than using
+ * the paper's precomputed GGX lookup table.
+ *
+ * @tsl
+ * @function
+ * @param {Node<float>} visibility - Cosine-weighted ambient visibility in [0, 1].
+ * @param {Node<vec3>} bentNormal - Direction of the visibility cone.
+ * @param {Node<vec3>} reflectionDirection - Specular reflection direction.
+ * @param {Node<float>} roughness - Material roughness in [0, 1].
+ * @return {Node<float>} Specular visibility in [0, 1].
+ */
+export const specularOcclusion = /*@__PURE__*/ Fn( ( [ visibility, bentNormal, reflectionDirection, roughness ] ) => {
+
+	const cosV = sqrt( visibility.clamp().oneMinus() ).toConst();
+	const cosS = exp2( roughness.clamp().pow2().mul( - 3.321928 ) ).toConst();
+	const v = acos( cosV ).toConst();
+	const s = acos( cosS ).toConst();
+	const d = acos( dot( bentNormal, reflectionDirection ).clamp( - 1, 1 ) ).toConst();
+	const result = float( 0 ).toVar();
+
+	If( visibility.greaterThanEqual( 0.9999 ), () => {
+
+		result.assign( 1 );
+
+	} ).ElseIf( visibility.lessThanEqual( 0 ), () => {
+
+		result.assign( 0 );
+
+	} ).ElseIf( d.add( s ).lessThanEqual( v ), () => {
+
+		result.assign( 1 );
+
+	} ).ElseIf( d.add( v ).lessThanEqual( s ), () => {
+
+		result.assign( cosV.oneMinus().div( cosS.oneMinus().max( 1e-6 ) ) );
+
+	} ).ElseIf( d.lessThan( v.add( s ) ), () => {
+
+		const sinV = sin( v );
+		const sinS = sin( s );
+		const sinD = sin( d );
+		const cosD = cos( d );
+		const a = acos( cosS.sub( cosV.mul( cosD ) ).div( sinV.mul( sinD ).max( 1e-6 ) ).clamp( - 1, 1 ) );
+		const b = acos( cosV.sub( cosS.mul( cosD ) ).div( sinS.mul( sinD ).max( 1e-6 ) ).clamp( - 1, 1 ) );
+		const c = acos( cosD.sub( cosV.mul( cosS ) ).div( sinV.mul( sinS ).max( 1e-6 ) ).clamp( - 1, 1 ) );
+		result.assign( PI.sub( a.mul( cosV ) ).sub( b.mul( cosS ) ).sub( c ).div( PI.mul( cosS.oneMinus() ).max( 1e-6 ) ) );
+
+	} );
+
+	return result.clamp();
+
+} );
