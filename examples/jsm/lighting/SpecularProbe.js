@@ -63,10 +63,17 @@ class SpecularProbe {
 		const face = renderer.getActiveCubeFace();
 		const mip = renderer.getActiveMipmapLevel();
 		const xrEnabled = renderer.xr.enabled;
+		const autoClear = renderer.autoClear;
+		const autoClearColor = renderer.autoClearColor;
+		const autoClearDepth = renderer.autoClearDepth;
+		const autoClearStencil = renderer.autoClearStencil;
+		const mrt = renderer.getMRT();
 		const mipmapsAutoUpdate = this._renderTarget.texture.mipmapsAutoUpdate;
 
 		try {
 
+			renderer.autoClear = renderer.autoClearColor = renderer.autoClearDepth = renderer.autoClearStencil = true;
+			renderer.setMRT( null );
 			this._camera.update( renderer, scene );
 			this.texture = this._renderTarget.texture;
 
@@ -74,6 +81,11 @@ class SpecularProbe {
 
 			renderer.setRenderTarget( target, face, mip );
 			renderer.xr.enabled = xrEnabled;
+			renderer.autoClear = autoClear;
+			renderer.autoClearColor = autoClearColor;
+			renderer.autoClearDepth = autoClearDepth;
+			renderer.autoClearStencil = autoClearStencil;
+			renderer.setMRT( mrt );
 			this._renderTarget.texture.mipmapsAutoUpdate = mipmapsAutoUpdate;
 
 		}
@@ -87,6 +99,8 @@ class SpecularProbe {
 		if ( this._renderTarget !== null ) {
 
 			if ( this.texture === this._renderTarget.texture ) this.texture = null;
+			// PMREM's cache listens to source texture disposal, not target disposal.
+			this._renderTarget.texture.dispose();
 			this._renderTarget.dispose();
 			this._renderTarget = null;
 			this._camera = null;

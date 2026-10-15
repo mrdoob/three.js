@@ -22,6 +22,9 @@ class SpecularProbesNode extends Node {
 		this.updateBeforeType = 'render';
 		this._fallbackWeight = uniform( 1 );
 		this._fallback = pmremTexture( probes.fallbackTexture, reflectVector, roughnessNode );
+		// Sources can coincide at compile time and diverge later. Keep each binding
+		// independent instead of letting TextureNode merge identical PMREM uniforms.
+		this._fallback._texture.mergeable = false;
 		this._slots = probes.slots.map( () => ( {
 			weight: uniform( 0 ),
 			position: uniform( new Vector3() ),
@@ -43,6 +46,7 @@ class SpecularProbesNode extends Node {
 			const inside = positionWorld.greaterThanEqual( slot.min ).all().and( positionWorld.lessThanEqual( slot.max ).all() );
 			const corrected = slot.project.greaterThan( 0 ).and( inside ).select( projected, direction );
 			slot.sample = pmremTexture( probes.fallbackTexture, corrected, roughnessNode );
+			slot.sample._texture.mergeable = false;
 
 		}
 
@@ -97,6 +101,14 @@ class SpecularProbesNode extends Node {
 		let radiance = this._fallback.mul( this._fallbackWeight );
 		for ( const slot of this._slots ) radiance = radiance.add( slot.sample.mul( slot.weight ) );
 		return vec3( radiance );
+
+	}
+
+	dispose() {
+
+		this._fallback.dispose();
+		for ( const slot of this._slots ) slot.sample.dispose();
+		super.dispose();
 
 	}
 
