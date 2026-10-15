@@ -627,6 +627,8 @@ class LDrawParsedCache {
 
 			const loader = this.loader;
 			const fileLoader = new FileLoader( loader.manager );
+			fileLoader.setPriority( loader.priority );
+			fileLoader.setCache( loader.cache );
 			fileLoader.setPath( loader.partsLibraryPath );
 			fileLoader.setRequestHeader( loader.requestHeader );
 			fileLoader.setWithCredentials( loader.withCredentials );
@@ -1856,6 +1858,8 @@ class LDrawLoader extends Loader {
 	async preloadMaterials( url ) {
 
 		const fileLoader = new FileLoader( this.manager );
+		fileLoader.setPriority( this.priority );
+		fileLoader.setCache( this.cache );
 		fileLoader.setPath( this.path );
 		fileLoader.setRequestHeader( this.requestHeader );
 		fileLoader.setWithCredentials( this.withCredentials );
@@ -1893,6 +1897,8 @@ class LDrawLoader extends Loader {
 	load( url, onLoad, onProgress, onError ) {
 
 		const fileLoader = new FileLoader( this.manager );
+		fileLoader.setPriority( this.priority );
+		fileLoader.setCache( this.cache );
 		fileLoader.setPath( this.path );
 		fileLoader.setRequestHeader( this.requestHeader );
 		fileLoader.setWithCredentials( this.withCredentials );

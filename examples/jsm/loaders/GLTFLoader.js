@@ -318,6 +318,8 @@ class GLTFLoader extends Loader {
 		};
 
 		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
 
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
@@ -487,6 +489,8 @@ class GLTFLoader extends Loader {
 
 			path: path || this.resourcePath || '',
 			crossOrigin: this.crossOrigin,
+			priority: this.priority,
+			cache: this.cache,
 			requestHeader: this.requestHeader,
 			manager: this.manager,
 			ktx2Loader: this.ktx2Loader,
@@ -2708,10 +2712,14 @@ class GLTFParser {
 		if ( typeof createImageBitmap === 'undefined' || ( isSafari && safariVersion < 17 ) || ( isFirefox && firefoxVersion < 98 ) ) {
 
 			this.textureLoader = new TextureLoader( this.options.manager );
+			this.textureLoader.setPriority( this.options.priority );
+			this.textureLoader.setCache( this.options.cache );
 
 		} else {
 
 			this.textureLoader = new ImageBitmapLoader( this.options.manager );
+			this.textureLoader.setPriority( this.options.priority );
+			this.textureLoader.setCache( this.options.cache );
 
 		}
 
@@ -2719,6 +2727,8 @@ class GLTFParser {
 		this.textureLoader.setRequestHeader( this.options.requestHeader );
 
 		this.fileLoader = new FileLoader( this.options.manager );
+		this.fileLoader.setPriority( this.options.priority );
+		this.fileLoader.setCache( this.options.cache );
 		this.fileLoader.setResponseType( 'arraybuffer' );
 
 		if ( this.options.crossOrigin === 'use-credentials' ) {

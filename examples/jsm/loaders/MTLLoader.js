@@ -55,6 +55,8 @@ class MTLLoader extends Loader {
 		const path = ( this.path === '' ) ? LoaderUtils.extractUrlBase( url ) : this.path;
 
 		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
 		loader.setPath( this.path );
 		loader.setRequestHeader( this.requestHeader );
 		loader.setWithCredentials( this.withCredentials );
@@ -158,6 +160,8 @@ class MTLLoader extends Loader {
 		const materialCreator = new MaterialCreator( this.resourcePath || path, this.materialOptions );
 		materialCreator.setCrossOrigin( this.crossOrigin );
 		materialCreator.setManager( this.manager );
+		materialCreator.priority = this.priority;
+		materialCreator.cache = this.cache;
 		materialCreator.setMaterials( materialsInfo );
 		return materialCreator;
 
@@ -187,6 +191,8 @@ class MaterialCreator {
 		this.nameLookup = {};
 
 		this.crossOrigin = 'anonymous';
+		this.priority = 'auto';
+		this.cache = 'default';
 
 		this.side = ( this.options.side !== undefined ) ? this.options.side : FrontSide;
 		this.wrap = ( this.options.wrap !== undefined ) ? this.options.wrap : RepeatWrapping;
@@ -575,6 +581,8 @@ class MaterialCreator {
 		if ( loader === null ) {
 
 			loader = new TextureLoader( manager );
+			loader.setPriority( this.priority );
+			loader.setCache( this.cache );
 
 		}
 

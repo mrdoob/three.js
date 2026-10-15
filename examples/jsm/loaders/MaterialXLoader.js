@@ -104,6 +104,8 @@ class MaterialXLoader extends Loader {
 		this.manager.itemStart( url );
 
 		new FileLoader( this.manager )
+			.setPriority( this.priority )
+			.setCache( this.cache )
 			.setPath( this.path )
 			.setResponseType( 'arraybuffer' )
 			.load( url, ( data ) => {
@@ -241,6 +243,10 @@ class MaterialXLoader extends Loader {
 		const log = new MaterialXLog();
 
 		const document = new MaterialXDocument( this.manager, options.path || this.path, log, options.archiveResolver || null, options.uvSpace );
+		document.imageLoader.setPriority( this.priority );
+		document.imageLoader.setCache( this.cache );
+		document.textureLoader.setPriority( this.priority );
+		document.textureLoader.setCache( this.cache );
 		const result = document.parse( text, options.materialName || null, {
 			interfaceValidator: options.interfaceValidator,
 			nodeResolver: options.nodeResolver,
