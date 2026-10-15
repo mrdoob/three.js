@@ -83,11 +83,11 @@ class AttributeColumnBuffer extends InterleavedBuffer {
  *
  * @private
  * @param {BufferAttribute} attribute - The buffer attribute.
- * @param {number} itemSize - The item size of the column.
+ * @param {string} type - The type of the column (e.g. `'vec4'`).
  * @param {number} offset - The offset of the column.
  * @return {InterleavedBufferAttribute} The column.
  */
-function getAttributeColumn( attribute, itemSize, offset ) {
+function getAttributeColumn( attribute, type, offset ) {
 
 	let columns = _columns.get( attribute );
 
@@ -99,7 +99,7 @@ function getAttributeColumn( attribute, itemSize, offset ) {
 
 	}
 
-	return columns[ offset ] || ( columns[ offset ] = new InterleavedBufferAttribute( columns.buffer, itemSize, offset ) );
+	return columns[ offset ] || ( columns[ offset ] = new InterleavedBufferAttribute( columns.buffer, getLengthFromType( type ), offset ) );
 
 }
 
@@ -171,7 +171,7 @@ class ReferenceBufferAttributeNode extends BufferAttributeNode {
 
 		if ( ! attribute || this.bufferStride === 0 ) return attribute;
 
-		return getAttributeColumn( attribute, getLengthFromType( this.bufferType ), this.bufferOffset );
+		return getAttributeColumn( attribute, this.bufferType, this.bufferOffset );
 
 	}
 

@@ -933,6 +933,18 @@ class RenderObject {
 
 			}
 
+			for ( const { node } of this.getNodeBuilderState().nodeAttributes ) {
+
+				if ( node && node.attribute ) {
+
+					const attribute = node.getObjectAttribute( this.object );
+
+					if ( attribute && this.attributes.includes( attribute ) === false ) return true;
+
+				}
+
+			}
+
 		}
 
 		return false;
