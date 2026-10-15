@@ -6,8 +6,7 @@ import {
 	LinearFilter,
 	LinearSRGBColorSpace,
 	Loader,
-	RGBAFormat,
-	SRGBColorSpace
+	RGBAFormat
 } from 'three';
 
 /**
@@ -48,12 +47,6 @@ class AVIFLoader extends Loader {
 	 * @return {AVIFLoader} A reference to this loader.
 	 */
 	setColorSpace( colorSpace ) {
-
-		if ( colorSpace !== LinearSRGBColorSpace && colorSpace !== SRGBColorSpace ) {
-
-			throw new Error( 'AVIFLoader: Unsupported color space.' );
-
-		}
 
 		this.colorSpace = colorSpace;
 		return this;

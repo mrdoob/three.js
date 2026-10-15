@@ -6,8 +6,7 @@ import {
 	LinearFilter,
 	LinearSRGBColorSpace,
 	Loader,
-	RGBAFormat,
-	SRGBColorSpace
+	RGBAFormat
 } from 'three';
 
 /**
@@ -48,12 +47,6 @@ class JXLLoader extends Loader {
 	 * @return {JXLLoader} A reference to this loader.
 	 */
 	setColorSpace( colorSpace ) {
-
-		if ( colorSpace !== LinearSRGBColorSpace && colorSpace !== SRGBColorSpace ) {
-
-			throw new Error( 'JXLLoader: Unsupported color space.' );
-
-		}
 
 		this.colorSpace = colorSpace;
 		return this;
