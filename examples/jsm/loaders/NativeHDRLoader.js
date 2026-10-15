@@ -215,12 +215,29 @@ class NativeHDRLoader extends Loader {
 		}
 
 		const canvas = document.createElement( 'canvas' );
-		const context = canvas.getContext( '2d', { colorSpace: 'srgb', colorType: 'float16' } );
+		let context;
+		try {
 
-		if ( ! context || context.getContextAttributes().colorType !== 'float16' ||
-			! ( 'globalHDRHeadroom' in context ) ) {
+			context = canvas.getContext( '2d', { colorSpace: 'srgb', colorType: 'float16' } );
 
-			throw new Error( 'NativeHDRLoader: HDR-preserving native decoding requires float16 Canvas2D and experimental globalHDRHeadroom support.' );
+		} catch ( cause ) {
+
+			throw new Error( 'NativeHDRLoader: 16-bit float Canvas2D creation failed.', { cause } );
+
+		}
+
+		if ( ! context ) {
+
+			throw new Error( 'NativeHDRLoader: Canvas2D is unavailable.' );
+
+		}
+
+		const missing = [];
+		if ( context.getContextAttributes?.().colorType !== 'float16' ) missing.push( '16-bit float canvas storage' );
+		if ( ! ( 'globalHDRHeadroom' in context ) ) missing.push( 'HDR headroom control (globalHDRHeadroom)' );
+		if ( missing.length > 0 ) {
+
+			throw new Error( 'NativeHDRLoader: Unavailable: ' + missing.join( '; ' ) + '.' );
 
 		}
 
@@ -230,18 +247,46 @@ class NativeHDRLoader extends Loader {
 		try {
 
 			image.src = url;
-			await image.decode();
+			try {
+
+				await image.decode();
+
+			} catch ( cause ) {
+
+				throw new Error( 'NativeHDRLoader: Native image decoding failed (unsupported codec or invalid image).', { cause } );
+
+			}
+
 			canvas.width = image.naturalWidth;
 			canvas.height = image.naturalHeight;
-			context.globalHDRHeadroom = Infinity;
-			context.drawImage( image, 0, 0 );
+			try {
 
-			const pixels = context.getImageData( 0, 0, canvas.width, canvas.height, {
-				colorSpace: 'srgb', pixelFormat: 'rgba-float16'
-			} );
+				context.globalHDRHeadroom = Infinity;
+				if ( context.globalHDRHeadroom !== Infinity ) throw new Error( 'HDR headroom setting was not retained.' );
+				context.drawImage( image, 0, 0 );
+
+			} catch ( cause ) {
+
+				throw new Error( 'NativeHDRLoader: HDR headroom / image-to-canvas conversion failed.', { cause } );
+
+			}
+
+			let pixels;
+			try {
+
+				pixels = context.getImageData( 0, 0, canvas.width, canvas.height, {
+					colorSpace: 'srgb', pixelFormat: 'rgba-float16'
+				} );
+
+			} catch ( cause ) {
+
+				throw new Error( 'NativeHDRLoader: 16-bit float pixel readback failed.', { cause } );
+
+			}
+
 			if ( pixels.pixelFormat !== 'rgba-float16' ) {
 
-				throw new Error( 'NativeHDRLoader: float16 readback unavailable.' );
+				throw new Error( 'NativeHDRLoader: 16-bit float pixel readback is unavailable.' );
 
 			}
 
@@ -252,7 +297,7 @@ class NativeHDRLoader extends Loader {
 				let value = pixels.data[ i ];
 				if ( ! Number.isFinite( value ) ) {
 
-					throw new Error( 'NativeHDRLoader: browser returned non-finite HDR pixels.' );
+					throw new Error( 'NativeHDRLoader: Linear half-float conversion failed: non-finite HDR pixels.' );
 
 				}
 
@@ -266,7 +311,7 @@ class NativeHDRLoader extends Loader {
 
 				if ( Math.abs( value ) > 65504 ) {
 
-					throw new Error( 'NativeHDRLoader: pixel exceeds half-float range.' );
+					throw new Error( 'NativeHDRLoader: Linear half-float conversion failed: pixel exceeds the half-float range.' );
 
 				}
 

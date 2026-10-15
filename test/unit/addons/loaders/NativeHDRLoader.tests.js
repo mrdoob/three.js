@@ -95,5 +95,57 @@ QUnit.module( 'Addons > Loaders > NativeHDRLoader', () => {
 
 	} );
 
+	QUnit.test( 'Failures identify the unavailable HDR pipeline stage', async assert => {
+
+		const createElement = document.createElement;
+		const NativeImage = window.Image;
+		let decodeFails = false;
+		const context = {
+			getContextAttributes: () => ( { colorType: 'unorm8' } ),
+			drawImage: () => {},
+			getImageData: () => ( { pixelFormat: 'rgba-unorm8' } )
+		};
+		document.createElement = ( tag, options ) => tag === 'canvas' ? { getContext: () => context } : createElement.call( document, tag, options );
+		window.Image = class {
+
+			async decode() {
+
+				if ( decodeFails ) throw new Error( 'Codec rejected image' );
+
+			}
+
+		};
+
+		try {
+
+			const loader = new NativeHDRLoader();
+			const buffer = new ArrayBuffer( 0 );
+			await assert.rejects( loader.parseAsync( buffer ), /16-bit float canvas storage; HDR headroom control/, 'Reports all missing extraction capabilities' );
+			context.getContextAttributes = () => ( { colorType: 'float16' } );
+			await assert.rejects( loader.parseAsync( buffer ), /Unavailable: HDR headroom control/, 'Identifies headroom separately from float16 storage' );
+			context.globalHDRHeadroom = 0;
+			decodeFails = true;
+			await assert.rejects( loader.parseAsync( buffer ), /Native image decoding failed/, 'Codec failure has its own diagnostic' );
+			decodeFails = false;
+			await assert.rejects( loader.parseAsync( buffer ), /16-bit float pixel readback is unavailable/, 'Rejects silently downgraded readback' );
+			context.getImageData = () => {
+
+				throw new Error( 'Unsupported readback' );
+
+			};
+
+			await assert.rejects( loader.parseAsync( buffer ), /16-bit float pixel readback failed/, 'Readback exceptions retain the stage' );
+			context.getImageData = () => ( { pixelFormat: 'rgba-float16', data: [ NaN ] } );
+			await assert.rejects( loader.parseAsync( buffer ), /Linear half-float conversion failed/, 'Conversion errors are distinguished from decoding' );
+
+		} finally {
+
+			document.createElement = createElement;
+			window.Image = NativeImage;
+
+		}
+
+	} );
+
 } );
 

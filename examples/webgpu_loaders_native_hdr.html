@@ -96,7 +96,8 @@
 
 				} catch ( error ) {
 
-					material.emissiveMap = textTexture( name + ' HDR not supported', true );
+					const detail = error instanceof Error ? error.message.replace( /^NativeHDRLoader: /, '' ) : 'Image download failed.';
+					material.emissiveMap = textTexture( name + ' HDR not supported', true, detail );
 					material.toneMapped = false;
 					mesh.userData.hdrSupported = false;
 					console.warn( name + ' HDR not supported:', error );
@@ -107,7 +108,7 @@
 
 			}
 
-			function textTexture( text, panel ) {
+			function textTexture( text, panel, detail = '' ) {
 
 				const canvas = document.createElement( 'canvas' );
 				canvas.width = 1024;
@@ -124,7 +125,25 @@
 				context.font = '48px sans-serif';
 				context.textAlign = 'center';
 				context.textBaseline = 'middle';
-				context.fillText( text, canvas.width / 2, canvas.height / 2 );
+				context.fillText( text, canvas.width / 2, detail ? 190 : canvas.height / 2 );
+				if ( detail ) {
+
+					context.font = '30px sans-serif';
+					context.fillStyle = '#c8ccd4';
+					const lines = [ '' ];
+					for ( const word of detail.split( /\s+/ ) ) {
+
+						const last = lines.length - 1;
+						const line = lines[ last ] ? lines[ last ] + ' ' + word : word;
+						if ( context.measureText( line ).width > 900 && lines[ last ] ) lines.push( word );
+						else lines[ last ] = line;
+
+					}
+
+					lines.forEach( ( line, i ) => context.fillText( line, canvas.width / 2, 270 + i * 40 ) );
+
+				}
+
 				const texture = new THREE.CanvasTexture( canvas );
 				texture.colorSpace = THREE.SRGBColorSpace;
 				return texture;
