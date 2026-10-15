@@ -9,6 +9,17 @@
 		<meta property="og:url" content="https://threejs.org/examples/webgpu_loader_jpegxl.html">
 		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_loader_jpegxl.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
+		<style>
+			.lbl {
+				position: absolute;
+				transform: translate( -50%, -50% );
+				max-width: 36%;
+				color: #e0e0e0;
+				font: 400 16px 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+				text-align: center;
+				pointer-events: none;
+			}
+		</style>
 	</head>
 	<body>
 		<div id="info">
@@ -55,6 +66,7 @@
 			const camera = new THREE.OrthographicCamera( - 4, 4, 2, - 2, 0.1, 10 );
 			camera.position.z = 2;
 			const geometry = new THREE.PlaneGeometry( 2.8, 1.4 );
+			const labels = [];
 
 			const gui = renderer.inspector.createParameters( 'JPEG XL' );
 			gui.add( renderer, 'toneMapping', {
@@ -89,10 +101,7 @@
 				mesh.position.x = x;
 				scene.add( mesh );
 
-				const caption = new THREE.Sprite( new THREE.SpriteMaterial( { map: textTexture( name, false ), toneMapped: false } ) );
-				caption.position.set( x, 1.02, 0 );
-				caption.scale.set( 2.8, 0.35, 1 );
-				scene.add( caption );
+				addLabel( name, x, 0.85 );
 
 				try {
 
@@ -100,9 +109,11 @@
 
 				} catch ( error ) {
 
-					const detail = error.message.replace( /^\w+Loader: /, '' );
-					material.emissiveMap = textTexture( 'Not supported', true, detail );
+					material.emissive.set( 0x252830 );
 					material.toneMapped = false;
+					const errorLabel = addLabel( 'Not supported: ' + error.message.replace( /^\w+Loader: /, '' ), x, - 0.8 );
+					errorLabel.style.transform = 'translate( -50%, 0 )';
+					errorLabel.style.fontSize = '12px';
 					console.warn( name + ' HDR not supported:', error );
 
 				}
@@ -111,45 +122,14 @@
 
 			}
 
-			function textTexture( text, panel, detail = '' ) {
+			function addLabel( text, x, y ) {
 
-				const canvas = document.createElement( 'canvas' );
-				canvas.width = 1024;
-				canvas.height = panel ? 512 : 128;
-				const context = canvas.getContext( '2d' );
-				if ( panel ) {
-
-					context.fillStyle = '#252830';
-					context.fillRect( 0, 0, canvas.width, canvas.height );
-
-				}
-
-				context.fillStyle = '#ffffff';
-				context.font = '48px sans-serif';
-				context.textAlign = 'center';
-				context.textBaseline = 'middle';
-				context.fillText( text, canvas.width / 2, detail ? 190 : canvas.height / 2 );
-				if ( detail ) {
-
-					context.font = '30px sans-serif';
-					context.fillStyle = '#c8ccd4';
-					const lines = [ '' ];
-					for ( const word of detail.split( /\s+/ ) ) {
-
-						const last = lines.length - 1;
-						const line = lines[ last ] ? lines[ last ] + ' ' + word : word;
-						if ( context.measureText( line ).width > 900 && lines[ last ] ) lines.push( word );
-						else lines[ last ] = line;
-
-					}
-
-					lines.forEach( ( line, i ) => context.fillText( line, canvas.width / 2, 270 + i * 40 ) );
-
-				}
-
-				const texture = new THREE.CanvasTexture( canvas );
-				texture.colorSpace = THREE.SRGBColorSpace;
-				return texture;
+				const label = document.createElement( 'div' );
+				label.className = 'lbl';
+				label.textContent = text;
+				document.body.appendChild( label );
+				labels.push( { label, x, y } );
+				return label;
 
 			}
 
@@ -163,6 +143,14 @@
 				camera.bottom = - camera.top;
 				camera.updateProjectionMatrix();
 				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				for ( const { label, x, y } of labels ) {
+
+					const position = new THREE.Vector3( x, y, 0 ).project( camera );
+					label.style.left = ( position.x + 1 ) / 2 * window.innerWidth + 'px';
+					label.style.top = ( 1 - position.y ) / 2 * window.innerHeight + 'px';
+
+				}
 
 			}
 
