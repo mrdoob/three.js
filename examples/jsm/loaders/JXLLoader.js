@@ -153,13 +153,7 @@ class JXLLoader extends Loader {
 
 		}
 
-		if ( ! context ) {
-
-			throw new Error( 'JXLLoader: Canvas2D is unavailable.' );
-
-		}
-
-		if ( context.getContextAttributes?.().colorType !== 'float16' ) {
+		if ( context?.getContextAttributes?.().colorType !== 'float16' ) {
 
 			throw new Error( 'JXLLoader: 16-bit float canvas storage unsupported.' );
 

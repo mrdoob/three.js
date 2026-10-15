@@ -153,13 +153,7 @@ class AVIFLoader extends Loader {
 
 		}
 
-		if ( ! context ) {
-
-			throw new Error( 'AVIFLoader: Canvas2D is unavailable.' );
-
-		}
-
-		if ( context.getContextAttributes?.().colorType !== 'float16' ) {
+		if ( context?.getContextAttributes?.().colorType !== 'float16' ) {
 
 			throw new Error( 'AVIFLoader: 16-bit float canvas storage unsupported.' );
 
