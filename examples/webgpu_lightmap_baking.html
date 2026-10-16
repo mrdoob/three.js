@@ -19,7 +19,7 @@
 				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Light Baking</span>
 			</div>
 
-			<small>Progressively bake Radiosity, Light Probe or VXGI diffuse irradiance into a UV atlas and export KHR_lightmap glTF.<br/><span id="status"></span></small>
+			<small>Progressively bake Radiosity, Ray Radiosity (<a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">three-mesh-bvh</a>), Light Probe or VXGI diffuse irradiance into a UV atlas and export KHR_lightmap glTF.<br/><span id="status"></span></small>
 		</div>
 
 		<script type="importmap">
@@ -28,7 +28,9 @@
 					"three": "../build/three.webgpu.js",
 					"three/webgpu": "../build/three.webgpu.js",
 					"three/tsl": "../build/three.tsl.js",
-					"three/addons/": "./jsm/"
+					"three/addons/": "./jsm/",
+					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.15/src/index.js",
+					"three-mesh-bvh/webgpu": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.15/src/webgpu/index.js"
 				}
 			}
 		</script>
@@ -43,6 +45,7 @@
 			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
 			import { LightMapper } from 'three/addons/lighting/LightMapper.js';
 			import { StochasticRadiosity, radiosityIrradiance } from 'three/addons/lighting/StochasticRadiosity.js';
+			import { RayTracedRadiosity, rayTracedRadiosityIrradiance } from 'three/addons/lighting/RayTracedRadiosity.js';
 			import { VXGIVolume } from 'three/addons/lighting/vxgi/VXGIVolume.js';
 			import { vxgiIrradiance } from 'three/addons/lighting/vxgi/VXGIIrradiance.js';
 			import { lightProbeGridIrradiance } from 'three/addons/tsl/lighting/LightProbeGridNode.js';
@@ -55,6 +58,7 @@
 			let light, lightPanel, meshes, materials, atlas, status;
 			let source, lightMapper, bakedPass, livePass;
 			let busy = false;
+			let bakeStart = 0, bakeTime = 0;
 
 			const params = {
 				output: 'Baked GI',
@@ -63,11 +67,12 @@
 			};
 
 			// light probes are deterministic and only need a few samples to antialias the light map,
-			// the VXGI cones and the radiosity directions are rotated per sample and converge over more samples.
-			// Radiosity samples are cheap, so several are baked per frame
+			// the VXGI cones, the radiosity directions and rays vary per sample and converge over more samples.
+			// Radiosity samples are cheap, so several are baked per frame. Ray radiosity samples the
+			// emissive panel directly and converges with far fewer samples
 
-			const bakeSamples = { 'Radiosity': 8192, 'Light Probe': 16, 'VXGI': 64 };
-			const samplesPerFrame = { 'Radiosity': 4, 'Light Probe': 1, 'VXGI': 1 };
+			const bakeSamples = { 'Radiosity': 8192, 'Ray Radiosity': 128, 'Light Probe': 16, 'VXGI': 64 };
+			const samplesPerFrame = { 'Radiosity': 4, 'Ray Radiosity': 1, 'Light Probe': 1, 'VXGI': 1 };
 
 			init();
 
@@ -149,8 +154,8 @@
 				glossySphere.receiveShadow = true;
 				scene.add( glossySphere );
 
-				// Lights: radiosity bakes the direct light of an emissive area light panel with soft
-				// shadows, light probes and VXGI bake the indirect light of a live point light
+				// Lights: both radiosity solvers bake the direct light of an emissive area light panel with
+				// soft shadows, light probes and VXGI bake the indirect light of a live point light
 				lightPanel = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), new THREE.MeshStandardMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 20 } ) );
 				lightPanel.rotation.x = Math.PI / 2;
 				lightPanel.position.y = 4.99;
@@ -203,7 +208,7 @@
 
 				const gui = renderer.inspector.createParameters( 'Light Baking' );
 				gui.add( params, 'output', [ 'Baked GI', 'Live GI' ] ).name( 'Output' ).onChange( setOutput );
-				gui.add( params, 'algorithm', [ 'Radiosity', 'Light Probe', 'VXGI' ] ).name( 'GI Algorithm' ).onChange( bake );
+				gui.add( params, 'algorithm', [ 'Radiosity', 'Ray Radiosity', 'Light Probe', 'VXGI' ] ).name( 'GI Algorithm' ).onChange( bake );
 				gui.add( params, 'resolution', [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( bake );
 				gui.add( { bake }, 'bake' ).name( 'Re-Bake GI' );
 				gui.add( { exportGLTF }, 'exportGLTF' ).name( 'Export glTF' );
@@ -235,8 +240,10 @@
 
 				let irradiance, liveIrradiance;
 
-				lightPanel.visible = params.algorithm === 'Radiosity';
-				light.visible = params.algorithm !== 'Radiosity';
+				const emissive = params.algorithm === 'Radiosity' || params.algorithm === 'Ray Radiosity';
+
+				lightPanel.visible = emissive;
+				light.visible = emissive === false;
 
 				if ( params.algorithm === 'Radiosity' ) {
 
@@ -246,6 +253,17 @@
 					radiosity.update( renderer, scene );
 					irradiance = radiosityIrradiance( radiosity );
 					liveIrradiance = irradiance;
+					source = radiosity;
+
+				} else if ( params.algorithm === 'Ray Radiosity' ) {
+
+					// rays traced through a BVH of the scene gather the bounces from a cached light map,
+					// fewer rays per pixel keep the live view interactive
+
+					const radiosity = new RayTracedRadiosity();
+					radiosity.update( renderer, scene );
+					irradiance = rayTracedRadiosityIrradiance( radiosity );
+					liveIrradiance = rayTracedRadiosityIrradiance( radiosity, { rays: 1 } );
 					source = radiosity;
 
 				} else if ( params.algorithm === 'Light Probe' ) {
@@ -292,6 +310,7 @@
 				// discard accumulated samples when switching outputs; baking only runs in Baked GI
 
 				lightMapper.reset();
+				bakeStart = performance.now();
 
 				for ( const material of materials ) material.lightMapIntensity = live ? 0 : 1;
 
@@ -366,11 +385,12 @@
 				} else if ( lightMapper.samples < samples ) {
 
 					lightMapper.update( Math.min( samplesPerFrame[ params.algorithm ], samples - lightMapper.samples ) );
-					status.textContent = `Baking ${ params.algorithm }: ${ lightMapper.samples } / ${ samples } samples`;
+					bakeTime = ( performance.now() - bakeStart ) / 1000;
+					status.textContent = `Baking ${ params.algorithm }: ${ lightMapper.samples } / ${ samples } samples, ${ bakeTime.toFixed( 1 ) } s`;
 
 				} else {
 
-					status.textContent = `${ params.algorithm } baked: ${ samples } samples`;
+					status.textContent = `${ params.algorithm } baked: ${ samples } samples in ${ bakeTime.toFixed( 1 ) } s`;
 
 				}
 
