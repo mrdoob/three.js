@@ -5,9 +5,6 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="example.css">
-		<style>
-			#status { position: absolute; bottom: 20px; left: 20px; padding: 10px; background: #000a; color: #fff; font: 13px monospace; pointer-events: none; }
-		</style>
 	</head>
 	<body>
 		<div id="info">
@@ -15,7 +12,6 @@
 			<div class="title-wrapper"><a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Reflection Probes</span></div>
 			<small>Box-projected reflection probes blended per pixel by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a></small>
 		</div>
-		<div id="status" class="lbl">Preparing reflection probes...</div>
 		<script type="importmap">
 			{
 				"imports": {
@@ -36,18 +32,13 @@
 			import { reflectionProbes } from 'three/addons/tsl/lighting/ReflectionProbesNode.js';
 			import { ReflectionProbesHelper } from 'three/addons/helpers/ReflectionProbesHelper.js';
 
-			const status = document.getElementById( 'status' );
-			const params = { showProbes: false, dynamicObject: 'Bunny', pause: false, showGrid: false, gridResolution: 6, gridSize: 0.12, resolution: 128, boxProjection: true, capture: capture };
+			const params = { showProbes: false, dynamicObject: 'Bunny', pause: false, showGrid: false, gridResolution: 6, gridSize: 0.12, resolution: 128, boxProjection: true, capture: capture, lastCapture: '' };
 			const grid = new THREE.Group();
+			const timer = new THREE.Timer();
 			let camera, scene, renderer, controls, probes, probesHelper, gridMaterial, dynamicObject;
-			let capturing = false;
+			let animationTime = 0;
 
-			init().catch( ( error ) => {
-
-				status.textContent = `Unable to initialize: ${ error.message }`;
-				console.error( error );
-
-			} );
+			init();
 
 			async function init() {
 
@@ -298,8 +289,6 @@
 				}
 
 				scene.add( probes );
-				await capture();
-				scene.environmentNode = reflectionProbes( probes );
 
 				// Each test surface evaluates the probe blend at its own world position.
 
@@ -341,28 +330,34 @@
 				scene.add( probesHelper, grid, dynamicObject );
 				updateGrid();
 
+				// Every physical material picks up the probes, like scene.environment.
+
+				await capture();
+				scene.environmentNode = reflectionProbes( probes );
+
 				const gui = renderer.inspector.createParameters( 'Reflection Probes' );
 				gui.add( params, 'resolution', [ 64, 128, 256, 512, 1024 ] ).name( 'Capture Resolution' );
 				gui.add( params, 'capture' ).name( 'Capture' );
+				gui.add( params, 'lastCapture' ).name( 'Last capture' ).listen();
 				gui.add( params, 'boxProjection' ).name( 'Box Projection' ).onChange( ( value ) => probes.boxProjection = value );
 
 				const dynamicTest = gui.addFolder( 'Dynamic Test' );
 				dynamicTest.add( params, 'dynamicObject', [ 'None', 'Bunny', 'Sphere' ] ).name( 'Object' ).onChange( ( value ) => {
 
 					if ( value !== 'None' ) dynamicObject.geometry = dynamicGeometries[ value ];
-					dynamicObject.visible = value !== 'None' && ! capturing;
+					dynamicObject.visible = value !== 'None';
 
 				} );
 				dynamicTest.add( params, 'pause' ).name( 'Pause' );
 				dynamicTest.add( dynamicMaterial, 'roughness', 0, 1, 0.01 ).name( 'Roughness' );
 
 				const staticTest = gui.addFolder( 'Static Test' );
-				staticTest.add( params, 'showGrid' ).name( 'Grid' ).onChange( ( value ) => grid.visible = value && ! capturing );
+				staticTest.add( params, 'showGrid' ).name( 'Grid' ).onChange( ( value ) => grid.visible = value );
 				staticTest.add( params, 'gridResolution', 2, 12, 1 ).name( 'Grid resolution' ).onChange( updateGrid );
 				staticTest.add( gridMaterial, 'roughness', 0, 1, 0.01 ).name( 'Grid roughness' );
 
 				const internalStructure = gui.addFolder( 'Internal Structure' );
-				internalStructure.add( params, 'showProbes' ).name( 'Influence boxes and probes' ).onChange( ( value ) => probesHelper.visible = value && ! capturing );
+				internalStructure.add( params, 'showProbes' ).name( 'Influence boxes and probes' ).onChange( ( value ) => probesHelper.visible = value );
 				internalStructure.add( probesHelper.material, 'roughness', 0, 1, 0.01 ).name( 'Probe roughness' );
 
 				window.addEventListener( 'resize', () => {
@@ -372,28 +367,22 @@
 					renderer.setSize( window.innerWidth, window.innerHeight );
 
 				} );
-				let animationTime = 0;
-				let previousTime = null;
+				renderer.setAnimationLoop( animate );
 
-				renderer.setAnimationLoop( ( time ) => {
+			}
 
-					const delta = previousTime === null ? 0 : ( time - previousTime ) / 1000;
-					previousTime = time;
+			function animate() {
 
-					if ( ! capturing ) {
+				timer.update();
 
-						if ( ! params.pause && params.dynamicObject !== 'None' ) {
+				if ( ! params.pause && params.dynamicObject !== 'None' ) {
 
-							animationTime += delta;
-							updateDynamicObject( animationTime );
+					animationTime += timer.getDelta();
+					updateDynamicObject( animationTime );
 
-						}
+				}
 
-						renderer.render( scene, camera );
-
-					}
-
-				} );
+				renderer.render( scene, camera );
 
 			}
 
@@ -443,44 +432,28 @@
 
 				}
 
-				grid.visible = params.showGrid && ! capturing;
+				grid.visible = params.showGrid;
 
 			}
 
 			async function capture() {
 
-				if ( capturing || ! probes ) return;
-				capturing = true;
-				document.body.dataset.capturing = 'true';
-				status.textContent = 'Capturing and filtering three probes...';
-				grid.visible = false;
-				if ( probesHelper ) probesHelper.visible = false;
-				if ( dynamicObject ) dynamicObject.visible = false;
-				try {
+				// Time GPU completion, not just submission.
 
-					// Time GPU completion, not just submission.
-					const queue = renderer.backend.device.queue;
-					await queue.onSubmittedWorkDone();
-					const start = performance.now();
-					probes.bake( renderer, scene, { resolution: Number( params.resolution ), near: 0.05, far: 30 } );
-					await queue.onSubmittedWorkDone();
-					status.textContent = `Last capture: ${ ( performance.now() - start ).toFixed( 1 ) } ms`;
-					document.body.dataset.ready = 'true';
+				const queue = renderer.backend.device.queue;
+				await queue.onSubmittedWorkDone();
+				const start = performance.now();
 
-				} catch ( error ) {
+				// Keep helpers and test objects out of the reflections.
 
-					status.textContent = `Capture failed: ${ error.message }`;
-					console.error( error );
+				probesHelper.visible = grid.visible = dynamicObject.visible = false;
+				probes.bake( renderer, scene, { resolution: Number( params.resolution ), near: 0.05, far: 30 } );
+				probesHelper.visible = params.showProbes;
+				grid.visible = params.showGrid;
+				dynamicObject.visible = params.dynamicObject !== 'None';
 
-				} finally {
-
-					if ( probesHelper ) probesHelper.visible = params.showProbes;
-					if ( dynamicObject ) dynamicObject.visible = params.dynamicObject !== 'None';
-					grid.visible = params.showGrid;
-					capturing = false;
-					document.body.dataset.capturing = 'false';
-
-				}
+				await queue.onSubmittedWorkDone();
+				params.lastCapture = `${ ( performance.now() - start ).toFixed( 1 ) } ms`;
 
 			}
 
