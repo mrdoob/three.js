@@ -822,7 +822,7 @@ class PhysicalLightingModel extends LightingModel {
 
 		const { radiance, iblIrradiance, reflectedLight } = builder.context;
 
-		const envMapDiffuseEnabled = builder.material.envMapDiffuseEnabled !== false;
+		const envMapDiffuseEnabled = builder.material.envMapDiffuseEnabled;
 
 		if ( this.sheen === true && envMapDiffuseEnabled ) {
 
