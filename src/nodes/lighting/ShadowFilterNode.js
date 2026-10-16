@@ -7,6 +7,30 @@ import { renderGroup } from '../core/UniformGroupNode.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
 import { interleavedGradientNoise, vogelDiskSample } from '../utils/PostProcessingUtils.js';
 
+// the uniforms of the shadows used by the filters. the filters are called for each material, the uniforms are
+// created once per shadow so the materials share the uniforms of the render group
+
+const _shadowUniforms = /*@__PURE__*/ new WeakMap();
+
+function getShadowUniforms( shadow ) {
+
+	let uniforms = _shadowUniforms.get( shadow );
+
+	if ( uniforms === undefined ) {
+
+		uniforms = {
+			mapSize: reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup ),
+			radius: reference( 'radius', 'float', shadow ).setGroup( renderGroup )
+		};
+
+		_shadowUniforms.set( shadow, uniforms );
+
+	}
+
+	return uniforms;
+
+}
+
 /**
  * A shadow filtering function performing basic filtering. This is in fact an unfiltered version of the shadow map
  * with a binary `[0,1]` result.
@@ -61,8 +85,7 @@ export const PCFShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, 
 
 	};
 
-	const mapSize = reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup );
-	const radius = reference( 'radius', 'float', shadow ).setGroup( renderGroup );
+	const { mapSize, radius } = getShadowUniforms( shadow );
 
 	const texelSize = vec2( 1 ).div( mapSize );
 	const radiusScaled = radius.mul( texelSize );
