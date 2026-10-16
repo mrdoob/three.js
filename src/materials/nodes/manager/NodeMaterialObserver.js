@@ -354,7 +354,7 @@ class NodeMaterialObserver {
 
 		// context
 
-		if ( builder.context.modelViewMatrix || builder.context.modelNormalViewMatrix || builder.context.getAO || builder.context.getShadow || builder.context.getGI )
+		if ( builder.context.modelViewMatrix || builder.context.modelNormalViewMatrix || builder.context.getAO || builder.context.getSpecularOcclusion || builder.context.getShadow || builder.context.getGI )
 			return true;
 
 		// scene

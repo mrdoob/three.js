@@ -1129,6 +1129,7 @@ class NodeBuilder {
 		delete context.getOutput;
 		delete context.getTextureLevel;
 		delete context.getAO;
+		delete context.getSpecularOcclusion;
 		delete context.getGI;
 		delete context.getShadow;
 		delete context.nodeLoop;
