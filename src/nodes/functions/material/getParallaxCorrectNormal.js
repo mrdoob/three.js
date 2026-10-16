@@ -1,5 +1,5 @@
 import { positionWorld } from '../../accessors/Position.js';
-import { float, Fn, min, normalize, vec3 } from '../../tsl/TSLBase.js';
+import { Fn, min, normalize } from '../../tsl/TSLBase.js';
 
 /**
  * This computes a parallax corrected normal which is used for box-projected cube mapping (BPCEM).
@@ -21,16 +21,15 @@ import { float, Fn, min, normalize, vec3 } from '../../tsl/TSLBase.js';
 const getParallaxCorrectNormal = /*@__PURE__*/ Fn( ( [ normal, cubeSize, cubePos ] ) => {
 
 	const nDir = normalize( normal ).toVar();
-	const rbmax = cubeSize.mul( 0.5 ).add( cubePos ).sub( positionWorld ).div( nDir ).toVar();
-	const rbmin = cubeSize.mul( - 0.5 ).add( cubePos ).sub( positionWorld ).div( nDir ).toVar();
-	const rbminmax = vec3().toVar();
-	rbminmax.x = nDir.x.greaterThan( float( 0 ) ).select( rbmax.x, rbmin.x );
-	rbminmax.y = nDir.y.greaterThan( float( 0 ) ).select( rbmax.y, rbmin.y );
-	rbminmax.z = nDir.z.greaterThan( float( 0 ) ).select( rbmax.z, rbmin.z );
+	const positive = nDir.greaterThanEqual( 0 );
 
-	const correction = min( rbminmax.x, rbminmax.y, rbminmax.z ).toVar();
-	const boxIntersection = positionWorld.add( nDir.mul( correction ) ).toVar();
-	return boxIntersection.sub( cubePos );
+	// keep axis-aligned directions away from zero so the distances stay finite
+	const safeDir = positive.select( nDir.max( 1e-6 ), nDir.min( - 1e-6 ) );
+	const extent = cubeSize.mul( 0.5 );
+	const distances = positive.select( extent, extent.negate() ).add( cubePos ).sub( positionWorld ).div( safeDir ).toVar();
+
+	const correction = min( distances.x, distances.y, distances.z );
+	return positionWorld.add( nDir.mul( correction ) ).sub( cubePos );
 
 } );
 
