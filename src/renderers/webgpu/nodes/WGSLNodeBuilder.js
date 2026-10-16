@@ -1327,6 +1327,14 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			}
 
+			// Honor read-write for storage texture in the fragment stage.
+
+			if ( shaderStage === 'fragment' && node.isStorageTextureNode === true && node.access === NodeAccess.READ_WRITE ) {
+
+				return NodeAccess.READ_WRITE;
+
+			}
+
 			return NodeAccess.READ_ONLY;
 
 		}

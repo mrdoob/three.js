@@ -151,6 +151,7 @@ class Rhino3dmLoader extends Loader {
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 
 		this.url = url;
 
