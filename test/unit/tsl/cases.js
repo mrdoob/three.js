@@ -1190,6 +1190,15 @@ export const cases = {
 
 	},
 
+	// Nested contexts can override the same node with different nodes.
+	nestedOverrides: () => {
+
+		const value = uv().x;
+
+		return overrideNode( value, float( 1 ), value.add( overrideNode( value, float( 2 ), value ) ) );
+
+	},
+
 	// Variables created in a function with layout are local to that function.
 
 	layoutLocalVariables: () => {
