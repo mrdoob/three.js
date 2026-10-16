@@ -44,6 +44,8 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
@@ -58,7 +60,7 @@
 			async function init() {
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 50 );
-				camera.position.set( 0.3, 3.2, 4.6 );
+				camera.position.set( - 1.2, 0.4, 4.2 );
 
 				scene = new THREE.Scene();
 
@@ -78,7 +80,6 @@
 				controls.enableDamping = true;
 				controls.minDistance = 2;
 				controls.maxDistance = 10;
-				controls.target.set( 0, 0.4, 0 );
 
 				// environment
 
@@ -98,37 +99,26 @@
 				const det = dpdx.dot( r1 );
 				const bumpNormal = det.abs().mul( normalView ).sub( det.sign().mul( height.dFdx().mul( r1 ).add( height.dFdy().mul( r2 ) ) ) ).normalize();
 
-				const steel = new THREE.MeshStandardNodeMaterial( { color: '#c8c8c8', roughness: 0.35, metalness: 1 } );
-				steel.normalNode = bumpNormal;
-
 				const bronze = new THREE.MeshStandardNodeMaterial( { color: '#b08d57', roughness: 0.35, metalness: 1 } );
 				bronze.normalNode = bumpNormal;
 
-				// contact and cavities are where reflections hit nearby geometry instead of the sky
+				// polished bronze bust, so the occluded reflections in its crevices stand out
 
-				const floor = new THREE.Mesh( new THREE.BoxGeometry( 8, 0.2, 8 ), steel );
-				floor.position.y = - 0.1;
-				scene.add( floor );
+				const gltf = await new GLTFLoader().setPath( 'models/gltf/' ).setDRACOLoader( new DRACOLoader() ).loadAsync( 'tennyson-bust.glb' );
+				const bust = gltf.scene;
+				bust.rotation.y = Math.PI;
 
-				const finGeometry = new THREE.BoxGeometry( 0.08, 1.2, 1.6 );
+				bust.traverse( ( child ) => {
 
-				for ( let i = 0; i < 9; i ++ ) {
+					if ( child.isMesh ) child.material = bronze;
 
-					const fin = new THREE.Mesh( finGeometry, bronze );
-					fin.position.set( - 1.6 + i * 0.22, 0.6, - 0.6 );
-					scene.add( fin );
+				} );
 
-				}
-
-				const sphereGeometry = new THREE.SphereGeometry( 0.35, 64, 32 );
-
-				for ( let i = 0; i < 3; i ++ ) {
-
-					const sphere = new THREE.Mesh( sphereGeometry, bronze );
-					sphere.position.set( 0.6 + i * 0.75, 0.35, 0.6 );
-					scene.add( sphere );
-
-				}
+				const box = new THREE.Box3().setFromObject( bust );
+				bust.scale.setScalar( 2 / box.getSize( new THREE.Vector3() ).y );
+				box.setFromObject( bust );
+				bust.position.sub( box.getCenter( new THREE.Vector3() ) );
+				scene.add( bust );
 
 				// pre-pass
 
@@ -209,7 +199,7 @@
 				gui.add( aoPass.radius, 'value', 0.1, 2 ).name( 'radius' );
 				gui.add( aoPass.scale, 'value', 0.01, 2 ).name( 'scale' );
 				gui.add( aoPass.thickness, 'value', 0.01, 2 ).name( 'thickness' );
-				gui.add( bronze, 'roughness', 0, 1 ).onChange( ( value ) => steel.roughness = value );
+				gui.add( bronze, 'roughness', 0, 1 );
 
 			}
 
