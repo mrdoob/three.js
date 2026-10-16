@@ -15,7 +15,7 @@ const volume = ( probe ) => {
  * surface pixel. Smaller influence boxes have priority over larger boxes;
  * equal volumes retain their input order. Uncovered coverage samples the sky.
  *
- * Call capture() after changing sources, probe order, resolution, or filtering.
+ * Call capture() after changing sources, probe order, or resolution.
  * Loaded textures remain caller-owned. Cube arrays require the WebGPU backend.
  *
  * @three_import import { SpecularProbes } from 'three/addons/lighting/SpecularProbes.js';
@@ -41,12 +41,11 @@ class SpecularProbes {
 	 * including GPU completion, filtering, and packing. Drains prior GPU work
 	 * before starting; first capture includes shader/pipeline compilation.
 	 */
-	async capture( renderer, scene, { resolution = 128, filter = 'PMREM' } = {} ) {
+	async capture( renderer, scene, { resolution = 128 } = {} ) {
 
 		if ( this.capturing ) throw new Error( 'SpecularProbes: A capture is already in progress.' );
 		if ( renderer.backend.isWebGPUBackend !== true ) throw new Error( 'SpecularProbes: Cube arrays require the WebGPU backend.' );
 		if ( ! [ 64, 128, 256, 512, 1024 ].includes( resolution ) ) throw new Error( 'SpecularProbes: Resolution must be 64, 128, 256, 512, or 1024.' );
-		if ( filter !== 'PMREM' && filter !== 'LOD MIP' ) throw new Error( 'SpecularProbes: Unknown filter.' );
 		this.capturing = true;
 
 		try {
@@ -67,7 +66,7 @@ class SpecularProbes {
 
 			}
 
-			await this.atlas.update( renderer, [ ...probes.map( ( probe ) => probe.texture ), this.fallbackTexture ], { resolution, filter } );
+			await this.atlas.update( renderer, [ ...probes.map( ( probe ) => probe.texture ), this.fallbackTexture ], { resolution } );
 			await renderer.backend.device.queue.onSubmittedWorkDone();
 			this.sortedProbes = probes;
 			this.lastCaptureTime = performance.now() - start;

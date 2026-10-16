@@ -38,7 +38,7 @@
 			import { specularProbes } from 'three/addons/tsl/lighting/SpecularProbesNode.js';
 
 			const status = document.getElementById( 'status' );
-			const params = { showProbes: false, dynamicObject: 'Bunny', pause: false, showGrid: false, gridResolution: 6, gridSize: 0.12, resolution: 128, filter: 'PMREM', boxProjection: true, capture: capture };
+			const params = { showProbes: false, dynamicObject: 'Bunny', pause: false, showGrid: false, gridResolution: 6, gridSize: 0.12, resolution: 128, boxProjection: true, capture: capture };
 			const probeRoughness = uniform( 0.08 );
 			const dynamicRoughness = uniform( 0 );
 			const gridRoughness = uniform( 0.08 );
@@ -358,7 +358,6 @@
 
 				const gui = renderer.inspector.createParameters( 'Specular Probes' );
 				gui.add( params, 'resolution', [ 64, 128, 256, 512, 1024 ] ).name( 'Capture Resolution' );
-				gui.add( params, 'filter', [ 'PMREM', 'LOD MIP' ] ).name( 'Filter' );
 				gui.add( params, 'capture' ).name( 'Capture' );
 				gui.add( params, 'boxProjection' ).name( 'Box Projection' ).onChange( ( value ) => system.boxProjection = value );
 
@@ -474,8 +473,7 @@
 				try {
 
 					const resolution = Number( params.resolution );
-					const filter = params.filter;
-					const elapsed = await system.capture( renderer, scene, { resolution, filter } );
+					const elapsed = await system.capture( renderer, scene, { resolution } );
 					status.textContent = `Last capture: ${ elapsed.toFixed( 1 ) } ms`;
 					document.body.dataset.ready = 'true';
 

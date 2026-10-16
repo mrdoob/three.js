@@ -25,7 +25,6 @@ class SpecularProbeAtlas {
 
 		this.texture = null;
 		this.maxLod = 0;
-		this.filter = 'PMREM';
 		this.resolution = 128;
 		this.count = 0;
 		this._target = null;
@@ -35,16 +34,14 @@ class SpecularProbeAtlas {
 	/**
 	 * Build all cubes in source order. Call after renderer.init(). The method
 	 * submits GPU work; callers measuring completion must await the device queue.
-	 * PMREM integrates GGX; LOD MIP builds ordinary image mips, an approximation.
 	 */
-	update( renderer, sources, { resolution = 128, filter = 'PMREM' } = {} ) {
+	update( renderer, sources, { resolution = 128 } = {} ) {
 
 		if ( renderer.backend.isWebGPUBackend !== true ) throw new Error( 'SpecularProbeAtlas requires the WebGPU backend; cube arrays are unsupported by WebGL.' );
 		if ( ! [ 64, 128, 256, 512, 1024 ].includes( resolution ) ) throw new Error( 'SpecularProbeAtlas: Resolution must be a power of two from 64 to 1024.' );
-		if ( filter !== 'PMREM' && filter !== 'LOD MIP' ) throw new Error( 'SpecularProbeAtlas: Unknown filter.' );
 		if ( sources.length === 0 || sources.some( source => source === null || source === undefined ) ) throw new Error( 'SpecularProbeAtlas: Loaded source textures are required.' );
 
-		const maxLod = Math.log2( resolution ) - ( filter === 'PMREM' ? 3 : 0 );
+		const maxLod = Math.log2( resolution ) - 3;
 		const target = new RenderTarget( resolution, resolution, {
 			depth: sources.length * 6,
 			type: HalfFloatType,
@@ -66,7 +63,7 @@ class SpecularProbeAtlas {
 		} );
 		const camera = new CubeCamera( 0.1, 10, sourceTarget );
 		const scene = new Scene();
-		const generator = filter === 'PMREM' ? new ProbePMREMGenerator( renderer ) : null;
+		const generator = new ProbePMREMGenerator( renderer );
 		const region = new Box3();
 		const destination = new Vector3();
 		const previousTarget = renderer.getRenderTarget();
@@ -95,8 +92,8 @@ class SpecularProbeAtlas {
 					? cubeTexture( source, positionWorldDirection ).level( 0 )
 					: texture( source, equirectUV( positionWorldDirection ) ).level( 0 );
 				camera.update( renderer, scene );
-				if ( generator !== null ) filteredTarget = generator.fromCubemap( sourceTarget.texture );
-				const filteredTexture = filteredTarget === null ? sourceTarget.texture : filteredTarget.texture;
+				filteredTarget = generator.fromCubemap( sourceTarget.texture );
+				const filteredTexture = filteredTarget.texture;
 
 				for ( let lod = 0; lod <= maxLod; lod ++ ) {
 
@@ -139,7 +136,6 @@ class SpecularProbeAtlas {
 		this._target = target;
 		this.texture = target.texture;
 		this.maxLod = maxLod;
-		this.filter = filter;
 		this.resolution = resolution;
 		this.count = sources.length;
 		return this;

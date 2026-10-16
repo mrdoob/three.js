@@ -67,11 +67,11 @@ export default QUnit.module( 'Addons', () => {
 
 					steps.push( 'filter' );
 					assert.deepEqual( textures, [ small.texture, large.texture, system.fallbackTexture ], 'array order matches front-to-back priority, sky last' );
-					assert.deepEqual( options, { resolution: 64, filter: 'LOD MIP' }, 'requested filter and size forwarded' );
+					assert.deepEqual( options, { resolution: 64 }, 'requested size forwarded' );
 
 				};
 
-				const elapsed = await system.capture( renderer, new Scene(), { resolution: 64, filter: 'LOD MIP' } );
+				const elapsed = await system.capture( renderer, new Scene(), { resolution: 64 } );
 				assert.deepEqual( steps, [ 'complete', 'capture', 'filter', 'complete' ], 'drain, capture, filter, then completion' );
 				assert.deepEqual( system.sortedProbes, [ small, large ], 'publish sorted probes' );
 				assert.strictEqual( small.resolution, 64, 'resize capture' );

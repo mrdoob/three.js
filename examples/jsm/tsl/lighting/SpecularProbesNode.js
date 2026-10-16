@@ -25,8 +25,6 @@ class SpecularProbesNode extends Node {
 		this._array = cubeTexture( probes.atlas.texture );
 		this._array.mergeable = false;
 		this._maxLod = uniform( probes.atlas.maxLod );
-		this._resolution = uniform( probes.atlas.resolution );
-		this._pmrem = uniform( 1 );
 		this._slots = probes.sortedProbes.map( () => ( {
 			position: uniform( new Vector3() ),
 			min: uniform( new Vector3() ),
@@ -45,8 +43,6 @@ class SpecularProbesNode extends Node {
 		if ( probes.sortedProbes.length !== this._slots.length ) throw new Error( 'SpecularProbesNode: Recreate the node after changing the probe count.' );
 		this._array.value = probes.atlas.texture;
 		this._maxLod.value = probes.atlas.maxLod;
-		this._resolution.value = probes.atlas.resolution;
-		this._pmrem.value = probes.atlas.filter === 'PMREM' ? 1 : 0;
 
 		for ( let i = 0; i < this._slots.length; i ++ ) {
 
@@ -74,12 +70,7 @@ class SpecularProbesNode extends Node {
 		return Fn( () => {
 
 			const roughness = this.roughnessNode.clamp();
-			// PMREM's inverse convolution curve differs from a regular image pyramid.
-			const pmremLod = this._maxLod.mul( roughness ).mul( float( 2 ).sub( roughness ) );
-			// Ordinary box-filtered mip levels: approximate GGX alpha's angular
-			// footprint in texels. This is a diagnostic approximation, not GGX IBL.
-			const imageLod = this._resolution.mul( roughness.pow( 2 ) ).max( 1e-6 ).log2().clamp( 0, this._maxLod );
-			const lod = this._pmrem.greaterThan( 0 ).select( pmremLod, imageLod );
+			const lod = this._maxLod.mul( roughness ).mul( float( 2 ).sub( roughness ) );
 			const radiance = vec3( 0 ).toVar();
 			const remaining = float( 1 ).toVar();
 
