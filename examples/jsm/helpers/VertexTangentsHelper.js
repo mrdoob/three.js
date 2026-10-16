@@ -29,7 +29,7 @@ class VertexTangentsHelper extends LineSegments {
 	 *
 	 * @param {Object3D} object - The object for which to visualize vertex tangents.
 	 * @param {number} [size=1] - The helper's size.
-	 * @param {number|Color|string} [color=0xff0000] - The helper's color.
+	 * @param {number|Color|string} [color=0x00ffff] - The helper's color.
 	 */
 	constructor( object, size = 1, color = 0x00ffff ) {
 

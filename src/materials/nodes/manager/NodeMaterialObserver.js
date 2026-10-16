@@ -17,6 +17,7 @@ const refreshUniforms = [
 	'clearcoatNormalMap',
 	'clearcoatNormalScale',
 	'clearcoatRoughness',
+	'clearcoatRoughnessMap',
 	'color',
 	'dashOffset',
 	'dashSize',
@@ -38,8 +39,9 @@ const refreshUniforms = [
 	'iridescence',
 	'iridescenceIOR',
 	'iridescenceMap',
-	'iridescenceThickness',
 	'iridescenceThicknessMap',
+	'iridescenceThicknessMaximum',
+	'iridescenceThicknessMinimum',
 	'lightMap',
 	'lightMapIntensity',
 	'linewidth',
@@ -51,6 +53,7 @@ const refreshUniforms = [
 	'normalScale',
 	'opacity',
 	'reflectivity',
+	'refractionRatio',
 	'retroreflectivity',
 	'rotation',
 	'roughness',
@@ -71,6 +74,7 @@ const refreshUniforms = [
 	'specularMap',
 	'steps',
 	'thickness',
+	'thicknessMap',
 	'transmission',
 	'transmissionMap',
 	'wireframe'
@@ -231,6 +235,7 @@ class NodeMaterialObserver {
 				geometryId: geometry.id,
 				geometryVersion: this.getGeometryData( geometry )._version,
 				materialVersion: this.getMaterialData( renderObject.material )._version,
+				attributesDisposeVersion: renderObject._geometries.attributes.disposeVersion,
 				worldMatrix: object.matrixWorld.clone()
 			};
 
@@ -744,6 +749,26 @@ class NodeMaterialObserver {
 			renderObjectData.geometryVersion = geometryData._version;
 
 			return false;
+
+		}
+
+		// attributes must be uploaded again if they have been disposed. they are only verified after a disposal
+
+		const attributes = renderObject._geometries.attributes;
+
+		if ( renderObjectData.attributesDisposeVersion !== attributes.disposeVersion ) {
+
+			for ( const vertexBuffer of renderObject.getVertexBuffers() ) {
+
+				if ( attributes.has( vertexBuffer ) === false ) return false;
+
+			}
+
+			const index = renderObject.getIndex();
+
+			if ( index !== null && attributes.has( index ) === false ) return false;
+
+			renderObjectData.attributesDisposeVersion = attributes.disposeVersion;
 
 		}
 

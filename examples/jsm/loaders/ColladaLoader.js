@@ -114,6 +114,8 @@ class ColladaLoader extends Loader {
 
 			tgaLoader = new TGALoader( this.manager );
 			tgaLoader.setPath( this.resourcePath || path );
+			tgaLoader.setRequestHeader( this.requestHeader );
+			tgaLoader.setWithCredentials( this.withCredentials );
 
 		}
 

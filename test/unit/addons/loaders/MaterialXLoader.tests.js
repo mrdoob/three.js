@@ -165,6 +165,18 @@ export default QUnit.module( 'Addons', () => {
 
 		QUnit.module( 'MaterialXLoader', () => {
 
+			QUnit.test( 'texture settings', ( assert ) => {
+
+				const loader = new MaterialXLoader().setCrossOrigin( 'use-credentials' ).setWithCredentials( true ).setRequestHeader( { Accept: 'image/*' } );
+				const { document } = loader._parse( '<materialx version="1.39"/>', { path: 'textures/' } );
+				assert.strictEqual( document.imageLoader.crossOrigin, loader.crossOrigin );
+				assert.strictEqual( document.textureLoader.crossOrigin, loader.crossOrigin );
+				assert.strictEqual( document.textureLoader.withCredentials, true );
+				assert.strictEqual( document.textureLoader.requestHeader, loader.requestHeader );
+				assert.strictEqual( document.textureLoader.path, 'textures/' );
+
+			} );
+
 			QUnit.test( 'builds nodes of a host node library through the node resolver', ( assert ) => {
 
 				const text = `<?xml version="1.0"?>
@@ -377,6 +389,347 @@ export default QUnit.module( 'Addons', () => {
 					assert.true( values.some( ( value ) => value.isColor && value.r === 0.2 ), 'The front surface color is retained.' );
 					assert.false( values.some( ( value ) => value.isColor && value.r === 0.9 ), 'The back surface does not overwrite the front color.' );
 					assert.true( result.warnings.some( ( warning ) => warning.code === 'ignored-surface-input' && warning.message.includes( 'backsurfaceshader' ) ), 'Unsupported back-surface shading is reported.' );
+
+				}
+
+			} );
+
+			QUnit.test( 'builds nodes implemented by a nodegraph of the document', ( assert ) => {
+
+				const text = `<?xml version="1.0"?>
+<materialx version="1.39">
+	<nodedef name="ND_tint" node="tint">
+		<input name="in" type="color3" value="1, 1, 1" />
+		<input name="amount" type="float" value="0.5" />
+		<output name="out" type="color3" />
+	</nodedef>
+	<nodegraph name="NG_tint" nodedef="ND_tint">
+		<multiply name="scaled" type="color3">
+			<input name="in1" type="color3" interfacename="in" />
+			<input name="in2" type="float" interfacename="amount" />
+		</multiply>
+		<output name="out" type="color3" nodename="scaled" />
+	</nodegraph>
+	<nodedef name="ND_tinted_surface" node="tinted_surface">
+		<input name="in" type="color3" value="0, 0, 0" />
+		<output name="out" type="surfaceshader" />
+	</nodedef>
+	<nodegraph name="NG_tinted_surface" nodedef="ND_tinted_surface">
+		<tint name="inner" type="color3">
+			<input name="in" type="color3" interfacename="in" />
+			<input name="amount" type="float" value="0.25" />
+		</tint>
+		<standard_surface name="surface" type="surfaceshader">
+			<input name="base_color" type="color3" nodename="inner" />
+		</standard_surface>
+		<output name="out" type="surfaceshader" nodename="surface" />
+	</nodegraph>
+	<tinted_surface name="properties" type="surfaceshader">
+		<input name="in" type="color3" value="0.8, 0.6, 0.4" />
+	</tinted_surface>
+	<surfacematerial name="test_material" type="material">
+		<input name="surfaceshader" type="surfaceshader" nodename="properties" />
+	</surfacematerial>
+	<nodegraph name="test_graph">
+		<tint name="first" type="color3">
+			<input name="in" type="color3" value="0.2, 0.2, 0.2" />
+		</tint>
+		<tint name="second" type="color3">
+			<input name="amount" type="float" value="2" />
+		</tint>
+		<add name="sum" type="color3">
+			<input name="in1" type="color3" nodename="first" />
+			<input name="in2" type="color3" nodename="second" />
+		</add>
+		<output name="out" type="color3" nodename="sum" />
+	</nodegraph>
+</materialx>`;
+
+				const result = new MaterialXLoader().parse( text );
+				assert.strictEqual( result.errors.length, 0, 'The custom nodes are not unsupported.' );
+
+				// The outer input should reach the surface shader through both custom nodes.
+				const material = result.materials.test_material;
+				assert.true( material.isMeshPhysicalNodeMaterial, 'A custom node can produce the surface shader.' );
+				const surfaceValues = collectConstValues( material.colorNode );
+				assert.true( surfaceValues.includes( 0.25 ), 'The nested node uses the value of its own input.' );
+				assert.true( surfaceValues.some( ( value ) => value.isColor && value.r === 0.8 ), 'The instance input reaches the nested node through the graph interfaces.' );
+
+				assert.false( 'NG_tint' in result.materials, 'An implementation nodegraph is not a material.' );
+
+				const graph = new MaterialXLoader().parse( text.replace( /<surfacematerial[\s\S]*?<\/surfacematerial>/, '' ) ).materials.test_graph;
+				const graphValues = collectConstValues( graph.colorNode );
+				assert.true( graphValues.includes( 0.5 ) && graphValues.includes( 2 ), 'Each instance binds its own inputs, or the nodedef defaults.' );
+
+			} );
+
+			QUnit.test( 'binds outputs, geometric defaults and textures of implementation graphs', ( assert ) => {
+
+				const text = `<?xml version="1.0"?>
+<materialx version="1.39">
+	<nodedef name="ND_split_uv" node="split_uv">
+		<input name="texcoord" type="vector2" defaultgeomprop="UV0" />
+		<output name="outx" type="float" />
+		<output name="outy" type="float" />
+	</nodedef>
+	<nodegraph name="NG_split_uv" nodedef="ND_split_uv">
+		<separate2 name="channels" type="multioutput">
+			<input name="in" type="vector2" interfacename="texcoord" />
+		</separate2>
+		<output name="outx" type="float" nodename="channels" output="outx" />
+		<output name="outy" type="float" nodename="channels" output="outy" />
+	</nodegraph>
+	<nodedef name="ND_picture" node="picture">
+		<input name="file" type="filename" value="" />
+		<output name="out" type="color3" />
+	</nodedef>
+	<nodegraph name="NG_picture" nodedef="ND_picture">
+		<image name="sampled" type="color3">
+			<input name="file" type="filename" interfacename="file" />
+		</image>
+		<output name="out" type="color3" nodename="sampled" />
+	</nodegraph>
+	<nodegraph name="test_graph">
+		<split_uv name="uv" type="multioutput" />
+		<picture name="photo" type="color3">
+			<input name="file" type="filename" value="photo.test" />
+		</picture>
+		<combine3 name="combined" type="color3">
+			<input name="in1" type="float" nodename="uv" output="outx" />
+			<input name="in2" type="float" nodename="uv" output="outy" />
+			<input name="in3" type="float" value="0" />
+		</combine3>
+		<multiply name="test_node" type="color3">
+			<input name="in1" type="color3" nodename="combined" />
+			<input name="in2" type="color3" nodename="photo" />
+		</multiply>
+		<output name="out" type="color3" nodename="test_node" />
+	</nodegraph>
+</materialx>`;
+
+				const requested = [];
+				const manager = new LoadingManager();
+				manager.addHandler( /\.test$/, { load: ( url ) => requested.push( url ) } );
+
+				const result = new MaterialXLoader( manager ).parse( text );
+				assert.strictEqual( result.errors.length, 0, 'The document translates without errors.' );
+				assert.true( requested.some( ( url ) => url.endsWith( 'photo.test' ) ), 'A file input bound through the interface loads the instance\'s file.' );
+
+				// separate2 already extracts the channels; graph outputs should not extract them again.
+				let elementNodes = 0;
+				hasNode( result.materials.test_graph.colorNode, ( node ) => {
+
+					if ( node.isArrayElementNode === true ) elementNodes ++;
+					return false;
+
+				} );
+				assert.strictEqual( elementNodes, 2, 'Outputs named like channels are taken as they are.' );
+
+			} );
+
+			QUnit.test( 'keeps named and default implementation outputs separate', ( assert ) => {
+
+				const text = `<materialx version="1.39">
+  <nodedef name="ND_pair" node="pair">
+    <output name="out" type="float"/>
+    <output name="right" type="float"/>
+  </nodedef>
+  <nodegraph name="NG_pair" nodedef="ND_pair">
+    <constant name="a" type="float"><input name="value" type="float" value="0.2"/></constant>
+    <constant name="b" type="float"><input name="value" type="float" value="0.8"/></constant>
+    <output name="out" type="float" nodename="a"/>
+    <output name="right" type="float" nodename="b"/>
+  </nodegraph>
+  <nodegraph name="G">
+    <pair name="n" type="multioutput"/>
+    <combine3 name="combined" type="color3">
+      <input name="in1" type="float" nodename="n" output="right"/>
+      <input name="in2" type="float" nodename="n"/>
+      <input name="in3" type="float" value="0"/>
+    </combine3>
+    <output name="out" type="color3" nodename="combined"/>
+  </nodegraph>
+</materialx>`;
+
+				const result = new MaterialXLoader().parse( text );
+				const values = collectConstValues( result.materials.G.colorNode );
+				assert.true( values.includes( 0.8 ), 'The named output uses its own value.' );
+				assert.true( values.includes( 0.2 ), 'Reading the named output does not replace the default output.' );
+
+			} );
+
+			QUnit.test( 'uses nodedef output order for an omitted implementation selector', ( assert ) => {
+
+				const text = `<materialx version="1.39">
+  <nodedef name="ND_pair" node="pair">
+    <output name="right" type="float"/>
+    <output name="out" type="float"/>
+  </nodedef>
+  <nodegraph name="NG_pair" nodedef="ND_pair">
+    <constant name="a" type="float"><input name="value" type="float" value="0.2"/></constant>
+    <constant name="b" type="float"><input name="value" type="float" value="0.8"/></constant>
+    <output name="out" type="float" nodename="a"/>
+    <output name="right" type="float" nodename="b"/>
+  </nodegraph>
+  <nodegraph name="G">
+    <pair name="n" type="multioutput"/>
+    <output name="out" type="float" nodename="n"/>
+  </nodegraph>
+</materialx>`;
+
+				const result = new MaterialXLoader().parse( text );
+				const values = collectConstValues( result.materials.G.colorNode );
+				assert.true( values.includes( 0.8 ), 'The first nodedef output is the default.' );
+				assert.false( values.includes( 0.2 ), 'An output named out does not take priority over the nodedef order.' );
+
+			} );
+
+			QUnit.test( 'supports channel selectors on custom color nodes', ( assert ) => {
+
+				const text = `<materialx version="1.39">
+  <nodedef name="ND_color" node="custom_color"><output name="out" type="color3"/></nodedef>
+  <nodegraph name="NG_color" nodedef="ND_color">
+    <constant name="c" type="color3"><input name="value" type="color3" value="0.1,0.5,0.9"/></constant>
+    <output name="out" type="color3" nodename="c"/>
+  </nodegraph>
+  <nodegraph name="G">
+    <custom_color name="c" type="color3"/>
+    <output name="out" type="float" nodename="c" output="outg"/>
+  </nodegraph>
+</materialx>`;
+
+				const result = new MaterialXLoader().parse( text );
+				assert.true( hasNode( result.materials.G.colorNode, ( node ) => node.isArrayElementNode && node.indexNode.value === 1 ), 'outg reads the green channel of the default output.' );
+
+			} );
+
+			QUnit.test( 'selects versioned implementation graphs and their nodedef defaults', ( assert ) => {
+
+				const text = ( selector ) => `<materialx version="1.39">
+	<nodedef name="ND_version1" node="versioned" version="1.0">
+		<input name="amount" type="float" value="0.2" /><output name="out" type="float" />
+	</nodedef>
+	<nodedef name="ND_version2" node="versioned" version="2.0" isdefaultversion="true">
+		<input name="amount" type="float" value="0.3" /><output name="out" type="float" />
+	</nodedef>
+	<nodegraph name="NG_v1" nodedef="ND_version1">
+		<multiply name="m" type="float">
+			<input name="in1" type="float" interfacename="amount" /><input name="in2" type="float" value="2" />
+		</multiply>
+		<output name="out" type="float" nodename="m" />
+	</nodegraph>
+	<nodegraph name="NG_v2">
+		<multiply name="m" type="float">
+			<input name="in1" type="float" interfacename="amount" /><input name="in2" type="float" value="3" />
+		</multiply>
+		<output name="out" type="float" nodename="m" />
+	</nodegraph>
+	<implementation name="IM_v2" nodedef="ND_version2" nodegraph="NG_v2" />
+	<nodegraph name="test_graph">
+		<versioned name="n" type="float" ${ selector } /><output name="out" type="float" nodename="n" />
+	</nodegraph>
+</materialx>`;
+
+				for ( const [ selector, amount, multiplier ] of [[ '', 0.3, 3 ], [ 'version="1.0"', 0.2, 2 ], [ 'nodedef="ND_version1"', 0.2, 2 ]] ) {
+
+					const result = new MaterialXLoader().parse( text( selector ) );
+					assert.strictEqual( result.errors.length, 0, `${ selector }: the selected implementation binds its interface.` );
+					assert.deepEqual( Object.keys( result.materials ), [ 'test_graph' ], 'Neither implementation graph is exposed as a material.' );
+					const values = collectConstValues( result.materials.test_graph.colorNode );
+					assert.true( values.includes( amount ) && values.includes( multiplier ), `${ selector }: defaults and implementation use the same nodedef.` );
+
+				}
+
+			} );
+
+			QUnit.test( 'uses the image default for an empty filename interface', ( assert ) => {
+
+				const text = `<materialx version="1.39">
+	<nodedef name="ND_picture" node="picture">
+		<input name="file" type="filename" value=""/>
+		<output name="out" type="color3"/>
+	</nodedef>
+	<nodegraph name="NG_picture" nodedef="ND_picture">
+		<image name="image" type="color3">
+			<input name="file" type="filename" interfacename="file"/>
+			<input name="default" type="color3" value="0.2, 0.4, 0.6"/>
+		</image>
+		<output name="out" type="color3" nodename="image"/>
+	</nodegraph>
+	<nodegraph name="NG">
+		<picture name="n" type="color3"/>
+		<output name="out" type="color3" nodename="n"/>
+	</nodegraph>
+</materialx>`;
+
+				const result = new MaterialXLoader().parse( text );
+				const material = Object.values( result.materials )[ 0 ];
+				assert.strictEqual( result.errors.length, 0, 'The graph translates without errors.' );
+				assert.true( collectConstValues( material.colorNode ).some( ( value ) => value.isColor && value.r === 0.2 ), 'The image default reaches the graph output.' );
+
+			} );
+
+			QUnit.test( 'selects the first implementation when no target is specified', ( assert ) => {
+
+				const text = `<materialx version="1.39">
+	<nodedef name="ND_n" node="custom">
+		<output name="out" type="float"/>
+	</nodedef>
+	<nodegraph name="NG_first" nodedef="ND_n" target="genglsl">
+		<constant name="n" type="float">
+			<input name="value" type="float" value="0.2"/>
+		</constant>
+		<output name="out" type="float" nodename="n"/>
+	</nodegraph>
+	<nodegraph name="NG_last" nodedef="ND_n" target="genmdl">
+		<constant name="n" type="float">
+			<input name="value" type="float" value="0.8"/>
+		</constant>
+		<output name="out" type="float" nodename="n"/>
+	</nodegraph>
+	<nodegraph name="NG">
+		<custom name="n" type="float"/>
+		<output name="out" type="float" nodename="n"/>
+	</nodegraph>
+</materialx>`;
+
+				const result = new MaterialXLoader().parse( text );
+				const material = Object.values( result.materials )[ 0 ];
+				assert.strictEqual( result.errors.length, 0, 'The graph translates without errors.' );
+				assert.true( collectConstValues( material.colorNode ).includes( 0.2 ), 'The first implementation is used.' );
+				assert.false( collectConstValues( material.colorNode ).includes( 0.8 ), 'The last implementation does not replace the first.' );
+
+			} );
+
+			QUnit.test( 'resolves custom surface shaders through nodegraph outputs', ( assert ) => {
+
+				for ( const [ shader, input ] of [[ 'standard_surface', 'base_color' ], [ 'surface_unlit', 'emission_color' ]] ) {
+
+					const text = `<materialx version="1.39">
+	<nodedef name="ND_wrapped" node="wrapped">
+		<input name="tint" type="color3" value="0.2, 0.4, 0.6"/>
+		<output name="out" type="surfaceshader"/>
+	</nodedef>
+	<nodegraph name="NG_wrapped" nodedef="ND_wrapped">
+		<${ shader } name="s" type="surfaceshader">
+			<input name="${ input }" type="color3" interfacename="tint"/>
+		</${ shader }>
+		<output name="out" type="surfaceshader" nodename="s"/>
+	</nodegraph>
+	<nodegraph name="NG">
+		<wrapped name="n" type="surfaceshader"/>
+		<output name="surface" type="surfaceshader" nodename="n"/>
+	</nodegraph>
+	<surfacematerial name="M" type="material">
+		<input name="surfaceshader" type="surfaceshader" nodegraph="NG" output="surface"/>
+	</surfacematerial>
+</materialx>`;
+
+					const result = new MaterialXLoader().parse( text );
+					const material = Object.values( result.materials )[ 0 ];
+					assert.strictEqual( result.errors.length, 0, 'The graph translates without errors.' );
+					assert.strictEqual( material.isMeshBasicNodeMaterial === true, shader === 'surface_unlit', 'The implemented shader selects its material class.' );
+					assert.true( collectConstValues( material.colorNode ).some( ( value ) => value.isColor && value.r === 0.2 ), 'The implementation binds its default tint.' );
 
 				}
 

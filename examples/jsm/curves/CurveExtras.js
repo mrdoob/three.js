@@ -487,7 +487,7 @@ class DecoratedTorusKnot4a extends Curve {
 	/**
 	 * Constructs a new Decorated Torus Knot 4a.
 	 *
-	 * @param {number} [scale=1] - The curve's scale.
+	 * @param {number} [scale=40] - The curve's scale.
 	 */
 	constructor( scale = 40 ) {
 
@@ -537,7 +537,7 @@ class DecoratedTorusKnot4b extends Curve {
 	/**
 	 * Constructs a new Decorated Torus Knot 4b.
 	 *
-	 * @param {number} [scale=1] - The curve's scale.
+	 * @param {number} [scale=40] - The curve's scale.
 	 */
 	constructor( scale = 40 ) {
 
@@ -587,7 +587,7 @@ class DecoratedTorusKnot5a extends Curve {
 	/**
 	 * Constructs a new Decorated Torus Knot 5a.
 	 *
-	 * @param {number} [scale=1] - The curve's scale.
+	 * @param {number} [scale=40] - The curve's scale.
 	 */
 	constructor( scale = 40 ) {
 
@@ -637,7 +637,7 @@ class DecoratedTorusKnot5c extends Curve {
 	/**
 	 * Constructs a new Decorated Torus Knot 5c.
 	 *
-	 * @param {number} [scale=1] - The curve's scale.
+	 * @param {number} [scale=40] - The curve's scale.
 	 */
 	constructor( scale = 40 ) {
 
