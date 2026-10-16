@@ -1,5 +1,6 @@
 import { StorageBufferAttribute, DynamicDrawUsage } from 'three/webgpu';
-import { Fn, Loop, atomicAdd, atomicLoad, atomicStore, instanceIndex, storage, uint } from 'three/tsl';
+import { Fn, atomicAdd, atomicStore, instanceIndex, storage, uint } from 'three/tsl';
+import { PrefixSum } from './PrefixSum.js';
 
 /**
  * A reusable GPU counting sort.
@@ -123,6 +124,22 @@ class CountingSort {
 		 */
 		this.offsetAtomic = storage( offsetAttribute, 'uint', binCount ).toAtomic();
 
+		/**
+		 * The prefix sum turning the histogram into the per-bin write offsets. It is handed the raw
+		 * attributes rather than the atomic storage nodes above so that it can build its own vectorized
+		 * view of them.
+		 *
+		 * @private
+		 * @type {PrefixSum}
+		 */
+		this._prefixSum = new PrefixSum( histogramAttribute, {
+			outputAttribute: offsetAttribute,
+			isInclusive: false,
+			workgroupSize
+		} );
+
+		console.log( this._prefixSum );
+
 		this._webGLBuffersEnabled = false;
 
 		this._cpuBins = new Uint32Array( count );
@@ -131,7 +148,6 @@ class CountingSort {
 
 		this._resetNode = null;
 		this._histogramNode = null;
-		this._prefixNode = null;
 		this._scatterNode = null;
 
 	}
@@ -162,20 +178,6 @@ class CountingSort {
 
 		} )().compute( count, [ workgroupSize ] ).setName( 'CountingSortHistogram' );
 
-		this._prefixNode = Fn( () => {
-
-			const sum = uint( 0 ).toVar( 'sum' );
-
-			Loop( { start: 0, end: binCount, type: 'uint', name: 'bin', condition: '<' }, ( { bin } ) => {
-
-				const binCountValue = atomicLoad( this.histogramAtomic.element( bin ) ).toVar( 'count' );
-				atomicStore( this.offsetAtomic.element( bin ), sum );
-				sum.addAssign( binCountValue );
-
-			} );
-
-		} )().compute( 1 ).setName( 'CountingSortPrefix' );
-
 		this._scatterNode = Fn( () => {
 
 			const bin = this.binRead.element( instanceIndex ).toVar( 'bin' );
@@ -196,7 +198,7 @@ class CountingSort {
 
 		renderer.compute( this._resetNode );
 		renderer.compute( this._histogramNode );
-		renderer.compute( this._prefixNode );
+		this._prefixSum.compute( renderer );
 		renderer.compute( this._scatterNode );
 
 	}
