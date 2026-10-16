@@ -1,5 +1,5 @@
-import { ArrayCamera, Box3, HalfFloatType, Mesh, MeshBasicNodeMaterial, MeshLambertNodeMaterial, NearestFilter, Node, NodeUpdateType, OrthographicCamera, Quaternion, RendererUtils, RenderTarget, Scene, Vector2, Vector3, Vector4 } from 'three/webgpu';
-import { Fn, If, Loop, cameraIndex, context, dot, float, hash, int, interleavedGradientNoise, ivec2, length, lights, nodeObject, output, positionWorld, screenCoordinate, select, texture, uniform, uniformArray, vec2, vec3, vec4 } from 'three/tsl';
+import { ArrayCamera, Box3, FloatType, Mesh, MeshBasicNodeMaterial, MeshLambertNodeMaterial, NearestFilter, Node, NodeUpdateType, OrthographicCamera, Quaternion, RendererUtils, RenderTarget, Scene, Vector2, Vector3, Vector4 } from 'three/webgpu';
+import { Fn, If, Loop, cameraIndex, context, cross, dFdx, dFdy, dot, float, hash, int, interleavedGradientNoise, ivec2, length, lights, nodeObject, output, positionWorld, screenCoordinate, select, texture, uniform, uniformArray, vec2, vec3, vec4 } from 'three/tsl';
 
 import { LightMapper } from './LightMapper.js';
 
@@ -37,8 +37,9 @@ let _rendererState;
  * ```
  *
  * Call `update()` again after changing the scene or the lighting. Lights should cast shadows, and
- * `renderer.shadowMap` must be enabled; unshadowed lights shine through walls. Skinned, instanced
- * and batched meshes are ignored, and all surfaces are treated as opaque.
+ * `renderer.shadowMap` must be enabled; unshadowed lights shine through walls. Rect area lights are
+ * ignored, model area lights as emissive meshes instead, which the gather also shadows. Skinned,
+ * instanced and batched meshes are ignored, and all surfaces are treated as opaque.
  *
  * This class can only be used with {@link WebGPURenderer}.
  *
@@ -110,22 +111,22 @@ class StochasticRadiosity {
 
 		/**
 		 * Distance, in illumination map texels, that a gathered surface must lie in front of the
-		 * receiving surface. Raise it if surfaces show self-illumination acne, lower it if contact
-		 * shadows leak.
+		 * plane of the receiving face. Raise it if surfaces show self-illumination acne, lower it if
+		 * contact shadows leak, e.g. under round objects resting on the floor.
 		 *
 		 * @type {number}
-		 * @default 1.5
+		 * @default 0.05
 		 */
-		this.bias = 1.5;
+		this.bias = 0.05;
 
-		// illumination map, one tile per direction. Half floats resolve the distances far below the
-		// size of a texel at any scene scale.
+		// illumination map, one tile per direction. Float distances keep the reconstructed surfaces
+		// exact enough for a bias far below a texel, which closes contact gaps.
 
 		this._tilesX = Math.ceil( Math.sqrt( directions ) );
 		this._tilesY = Math.ceil( directions / this._tilesX );
 
 		this._illuminationMap = new RenderTarget( this._tilesX * resolution, this._tilesY * resolution, {
-			type: HalfFloatType,
+			type: FloatType,
 			minFilter: NearestFilter,
 			magFilter: NearestFilter,
 			generateMipmaps: false
@@ -272,9 +273,12 @@ class StochasticRadiosity {
 
 		scene.updateMatrixWorld();
 
+		// rect area lights are not supported, they orient themselves by the parent camera of the
+		// array camera instead of by each direction
+
 		scene.traverseVisible( ( object ) => {
 
-			if ( object.isDirectionalLight || object.isPointLight || object.isSpotLight || object.isRectAreaLight ) this._lights.push( object );
+			if ( object.isDirectionalLight || object.isPointLight || object.isSpotLight ) this._lights.push( object );
 
 		} );
 
@@ -641,6 +645,14 @@ class StochasticRadiosity {
 			const normalLength = length( normalNode ).toVar();
 			const normal = select( normalLength.greaterThan( 1e-8 ), normalNode.div( normalLength ), vec3( 0, 1, 0 ) ).toVar();
 
+			// gathered surfaces must lie in front of the plane of the receiving face rather than of the
+			// interpolated normal, so neighboring faces of a curved surface never shadow it
+
+			const face = cross( dFdx( position ), dFdy( position ) ).toVar();
+			const faceLength = length( face ).toVar();
+			const faceNormal = select( faceLength.greaterThan( 1e-12 ), face.div( faceLength ), normal ).toVar();
+			faceNormal.assign( select( dot( faceNormal, normal ).lessThan( 0 ), faceNormal.negate(), faceNormal ) );
+
 			const irradiance = vec3( 0 ).toVar();
 
 			Loop( this.directions, ( { i } ) => {
@@ -683,7 +695,7 @@ class StochasticRadiosity {
 
 								// keep the nearest surface ahead along the direction and in front of the receiver
 
-								If( distance.greaterThan( 0 ).and( distance.lessThan( nearest ) ).and( dot( delta, normal ).greaterThan( this._biasNode ) ), () => {
+								If( distance.greaterThan( 0 ).and( distance.lessThan( nearest ) ).and( dot( delta, faceNormal ).greaterThan( this._biasNode ) ), () => {
 
 									nearest.assign( distance );
 									radiance.assign( sample.rgb );

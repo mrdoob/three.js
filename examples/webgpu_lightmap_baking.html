@@ -52,7 +52,7 @@
 			import { GLTFLightMapExporterExtension } from 'three/addons/exporters/GLTFLightMapExporterExtension.js';
 
 			let camera, scene, renderer, controls, renderPipeline;
-			let light, meshes, materials, atlas, status;
+			let spotLight, lightPanel, meshes, materials, atlas, status;
 			let source, lightMapper, bakedPass, livePass;
 			let busy = false;
 
@@ -63,9 +63,11 @@
 			};
 
 			// light probes are deterministic and only need a few samples to antialias the light map,
-			// the VXGI cones and the radiosity directions are rotated per sample and converge over more samples
+			// the VXGI cones and the radiosity directions are rotated per sample and converge over more samples.
+			// Radiosity samples are cheap, so several are baked per frame
 
-			const bakeSamples = { 'Radiosity': 256, 'Light Probe': 16, 'VXGI': 64 };
+			const bakeSamples = { 'Radiosity': 8192, 'Light Probe': 16, 'VXGI': 64 };
+			const samplesPerFrame = { 'Radiosity': 4, 'Light Probe': 1, 'VXGI': 1 };
 
 			init();
 
@@ -139,7 +141,7 @@
 				tallBox.receiveShadow = true;
 				scene.add( tallBox );
 
-				// Glossy sphere, to show direct specular lighting
+				// Glossy sphere, to show direct specular lighting (Light Probe and VXGI)
 				const glossyMaterial = new THREE.MeshStandardMaterial( { color: 0x0044ff, roughness: 0.15 } );
 				const glossySphere = new THREE.Mesh( new THREE.SphereGeometry( 0.65, 32, 32 ), glossyMaterial );
 				glossySphere.position.set( 1, 0.65, 0.5 );
@@ -147,14 +149,26 @@
 				glossySphere.receiveShadow = true;
 				scene.add( glossySphere );
 
-				// Light
-				light = new THREE.PointLight( 0xffffff, 40 );
-				light.position.set( 0, 4.5, 0 );
-				light.castShadow = true;
-				light.shadow.mapSize.setScalar( 256 );
-				light.shadow.radius = 10;
-				light.shadow.normalBias = - 0.02;
-				scene.add( light );
+				// Area light: an emissive panel below the ceiling. Radiosity bakes its direct light with
+				// soft shadows. Light probes and voxels are too coarse for contact shadows, so for them a
+				// live spot light at the panel stands in for it, with a wide cone falling off roughly
+				// like the cosine of the panel and the same luminous flux.
+				lightPanel = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), new THREE.MeshStandardMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 20 } ) );
+				lightPanel.rotation.x = Math.PI / 2;
+				lightPanel.position.y = 4.99;
+				scene.add( lightPanel );
+
+				spotLight = new THREE.SpotLight( 0xffffff, 95, 0, Math.PI * 0.45, 1 );
+				spotLight.position.copy( lightPanel.position );
+				spotLight.rotation.x = - Math.PI / 2;
+				spotLight.add( spotLight.target );
+				spotLight.target.position.set( 0, 0, - 1 );
+				spotLight.castShadow = true;
+				spotLight.shadow.mapSize.setScalar( 512 );
+				spotLight.shadow.focus = 0.55; // a 90 degree shadow frustum covers the floor
+				spotLight.shadow.radius = 10;
+				spotLight.shadow.normalBias = - 0.02;
+				scene.add( spotLight );
 
 				// Renderer
 
@@ -227,6 +241,12 @@
 
 				let irradiance, liveIrradiance;
 
+				// radiosity bakes the direct light of the emissive panel, light probes and VXGI only
+				// bake the indirect light of the live spot light and must not capture the panel again
+
+				spotLight.visible = params.algorithm !== 'Radiosity';
+				lightPanel.visible = params.algorithm === 'Radiosity';
+
 				if ( params.algorithm === 'Radiosity' ) {
 
 					// stochastic depth radiosity, the bounces are cached in a light map before baking
@@ -259,6 +279,8 @@
 					source = volume;
 
 				}
+
+				lightPanel.visible = true;
 
 				// the light map accumulates one sample per frame in animate()
 
@@ -305,7 +327,7 @@
 				// the HDR range; LightMapper already outputs irradiance without dividing by pi.
 				const lightMap = await readLightMap( renderer, lightMapper.texture );
 
-				// lit materials with the baked indirect irradiance, direct lighting stays live
+				// lit materials with the baked irradiance, the spot light stays live with light probes and VXGI
 
 				const objects = meshes.map( ( mesh ) => {
 
@@ -319,7 +341,7 @@
 
 				const exporter = new GLTFExporter();
 				exporter.register( ( writer ) => new GLTFLightMapExporterExtension( writer ) );
-				const result = await exporter.parseAsync( [ ...objects, light ], { binary: true } );
+				const result = await exporter.parseAsync( spotLight.visible ? [ ...objects, spotLight ] : objects, { binary: true } );
 
 				const link = document.createElement( 'a' );
 				link.href = URL.createObjectURL( new Blob( [ result ], { type: 'application/octet-stream' } ) );
@@ -354,7 +376,7 @@
 
 				} else if ( lightMapper.samples < samples ) {
 
-					lightMapper.update();
+					lightMapper.update( Math.min( samplesPerFrame[ params.algorithm ], samples - lightMapper.samples ) );
 					status.textContent = `Baking ${ params.algorithm }: ${ lightMapper.samples } / ${ samples } samples`;
 
 				} else {
