@@ -77,11 +77,10 @@ class ReflectionProbesNode extends Node {
 			probe.getWorldPosition( slot.position.value );
 			probe.getWorldScale( _scale );
 
-			slot.extent.value.copy( probe.size ).multiply( _scale ).multiplyScalar( 0.5 );
+			slot.extent.value.copy( probe.influenceSize ).multiply( _scale ).multiplyScalar( 0.5 );
 			slot.fade.value = probe.blendDistance;
-			slot.project.value = probes.boxProjection && probe.projectionSize !== null ? 1 : 0;
-
-			if ( probe.projectionSize !== null ) slot.projectionSize.value.copy( probe.projectionSize ).multiply( _scale );
+			slot.project.value = probes.boxProjection ? 1 : 0;
+			slot.projectionSize.value.copy( probe.projectionSize ?? probe.influenceSize ).multiply( _scale );
 
 		}
 

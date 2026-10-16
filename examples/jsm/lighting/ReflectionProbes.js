@@ -53,11 +53,11 @@ class ReflectionProbe extends Object3D {
 		 *
 		 * @type {Vector3}
 		 */
-		this.size = new Vector3( width, height, depth );
+		this.influenceSize = new Vector3( width, height, depth );
 
 		/**
 		 * Size of the box that reflections are projected onto, usually the room's
-		 * walls. `null` disables box projection for this probe.
+		 * walls. `null` uses `influenceSize`.
 		 *
 		 * @type {?Vector3}
 		 * @default null
@@ -78,7 +78,7 @@ class ReflectionProbe extends Object3D {
 
 		super.copy( source, recursive );
 
-		this.size.copy( source.size );
+		this.influenceSize.copy( source.influenceSize );
 		this.projectionSize = source.projectionSize === null ? null : source.projectionSize.clone();
 		this.blendDistance = source.blendDistance;
 
@@ -99,7 +99,6 @@ class ReflectionProbe extends Object3D {
  * ```js
  * const probes = new ReflectionProbes();
  * const probe = new ReflectionProbe( 8, 5, 8 );
- * probe.projectionSize = new THREE.Vector3( 8, 5, 8 );
  * probes.add( probe );
  * scene.add( probes );
  *
@@ -131,7 +130,7 @@ class ReflectionProbes extends Object3D {
 		this.type = 'ReflectionProbes';
 
 		/**
-		 * Whether probes with a `projectionSize` use box projection.
+		 * Whether the probes use box projection.
 		 *
 		 * @type {boolean}
 		 * @default true
@@ -277,7 +276,7 @@ class ReflectionProbes extends Object3D {
 
 function volume( probe ) {
 
-	probe.getWorldScale( _size ).multiply( probe.size );
+	probe.getWorldScale( _size ).multiply( probe.influenceSize );
 
 	return _size.x * _size.y * _size.z;
 

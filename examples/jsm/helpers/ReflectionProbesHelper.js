@@ -67,7 +67,7 @@ class ReflectionProbesHelper extends Object3D {
 			if ( probe.isReflectionProbe !== true ) continue;
 
 			probe.getWorldPosition( _position );
-			probe.getWorldScale( _size ).multiply( probe.size );
+			probe.getWorldScale( _size ).multiply( probe.influenceSize );
 
 			const sphere = new Mesh( this._geometry, this.material );
 			sphere.position.copy( _position );
