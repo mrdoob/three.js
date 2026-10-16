@@ -28,6 +28,9 @@ import { warnOnce } from '../../../utils.js';
 // Smaller inputs are upsampled so that every PMREM has enough mip levels.
 const MIN_SIZE = 256;
 
+// Smallest size fromScene() accepts when one is requested explicitly.
+const MIN_SCENE_SIZE = 64;
+
 // Log2 of the face size of the roughest mip level. Smaller faces can't
 // represent the diffuse irradiance that is stored in this level.
 const LOD_MIN = 3;
@@ -96,7 +99,7 @@ class PMREMGenerator {
 	 * @param {number} [near=0.1] - The near plane distance.
 	 * @param {number} [far=100] - The far plane distance.
 	 * @param {Object} [options={}] - The configuration options.
-	 * @param {number} [options.size=256] - The texture size of the PMREM, rounded down to a power of two and at least 256.
+	 * @param {number} [options.size=256] - The texture size of the PMREM, rounded down to a power of two and at least 64.
 	 * @param {Vector3} [options.position=origin] - The position of the internal cube camera that renders the scene.
 	 * @param {?CubeRenderTarget} [options.renderTarget=null] - The render target to use.
 	 * @return {CubeRenderTarget} The resulting PMREM.
@@ -111,7 +114,7 @@ class PMREMGenerator {
 
 		const renderer = this._renderer;
 
-		this._setSize( size );
+		this._setSize( size, MIN_SCENE_SIZE );
 
 		if ( renderer.hasInitialized() === false ) {
 
@@ -176,7 +179,7 @@ class PMREMGenerator {
 	 * @param {number} [near=0.1] - The near plane distance.
 	 * @param {number} [far=100] - The far plane distance.
 	 * @param {Object} [options={}] - The configuration options.
-	 * @param {number} [options.size=256] - The texture size of the PMREM, rounded down to a power of two and at least 256.
+	 * @param {number} [options.size=256] - The texture size of the PMREM, rounded down to a power of two and at least 64.
 	 * @param {Vector3} [options.position=origin] - The position of the internal cube camera that renders the scene.
 	 * @param {?CubeRenderTarget} [options.renderTarget=null] - The render target to use.
 	 * @return {Promise<CubeRenderTarget>} A Promise that resolves with the PMREM.
@@ -235,7 +238,7 @@ class PMREMGenerator {
 
 	/**
 	 * Generates a PMREM from an LDR or HDR cubemap. The cube face size matches
-	 * the input, rounded down to a power of two and at least 256.
+	 * the input, rounded down to a power of two and at least 64.
 	 *
 	 * @param {Texture} cubemap - The cubemap texture to be converted.
 	 * @param {?CubeRenderTarget} [renderTarget=null] - The render target to use.
@@ -341,9 +344,9 @@ class PMREMGenerator {
 
 	// private interface
 
-	_setSize( cubeSize ) {
+	_setSize( cubeSize, minSize = MIN_SIZE ) {
 
-		this._cubeSize = Math.max( MIN_SIZE, floorPowerOfTwo( cubeSize ) );
+		this._cubeSize = Math.max( minSize, floorPowerOfTwo( cubeSize ) );
 
 	}
 
