@@ -56,10 +56,10 @@ class StochasticRadiosity {
 	 * @param {number} [options.gatherRadius=1] - The half width of the gathered texel neighborhood, `1` is 3x3 and `2` is 5x5.
 	 * Larger neighborhoods find more occluders and leak less light, but are slower.
 	 * @param {number} [options.bounces=16] - The number of iterations used to solve the cached bounces. Each iteration adds one bounce, `0` disables the cache.
-	 * @param {number} [options.cacheSamples=32] - The number of samples accumulated into the bounce cache after the iterations.
+	 * @param {number} [options.cacheSamples=128] - The number of samples accumulated into the bounce cache after the iterations.
 	 * @param {number} [options.cacheSize=256] - The size of the bounce cache light map in texels.
 	 */
-	constructor( { directions = 16, resolution = 256, gatherRadius = 1, bounces = 16, cacheSamples = 32, cacheSize = 256 } = {} ) {
+	constructor( { directions = 16, resolution = 256, gatherRadius = 1, bounces = 16, cacheSamples = 128, cacheSize = 256 } = {} ) {
 
 		/**
 		 * The number of directions rasterized per illumination pass.
@@ -97,7 +97,7 @@ class StochasticRadiosity {
 		 * The number of samples accumulated into the bounce cache after the iterations.
 		 *
 		 * @type {number}
-		 * @default 32
+		 * @default 128
 		 */
 		this.cacheSamples = cacheSamples;
 
@@ -408,9 +408,11 @@ class StochasticRadiosity {
 		material.outputNode = vec4( output.rgb, distance );
 
 		// a random depth per surface, offset by an animated blue noise dither shared by the pixel,
-		// shuffles overlapping surfaces and decorrelates the visible surface of neighboring texels
+		// shuffles overlapping surfaces and decorrelates the visible surface of neighboring texels.
+		// The depth slabs are hashed as signed integers, converting negative floats to uint would
+		// clamp them to zero and give half of the scene the same rank
 
-		const rank = hash( dot( positionWorld, direction ).mul( 7 ) );
+		const rank = hash( dot( positionWorld, direction ).mul( 7 ).floor().toInt().toUint() );
 		const dither = interleavedGradientNoise( screenCoordinate.xy ).add( this._seedNode.mul( 0.618034 ) );
 
 		material.depthNode = rank.add( dither ).fract();
