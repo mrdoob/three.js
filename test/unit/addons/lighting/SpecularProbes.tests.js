@@ -2,7 +2,7 @@ import { Box3, CubeTexture, Scene, Vector3, WebGPUCoordinateSystem } from 'three
 import { SpecularProbe } from '../../../../examples/jsm/lighting/SpecularProbe.js';
 import { SpecularProbes } from '../../../../examples/jsm/lighting/SpecularProbes.js';
 
-function makeProbe( minX, maxX, blendDistance = 2 ) {
+function makeProbe( minX, maxX, blendDistance = 0.5 ) {
 
 	return new SpecularProbe( {
 		influenceBox: new Box3( new Vector3( minX, - 10, - 10 ), new Vector3( maxX, 10, 10 ) ),
@@ -18,59 +18,73 @@ export default QUnit.module( 'Addons', () => {
 
 		QUnit.module( 'SpecularProbes', () => {
 
-			QUnit.test( 'face fades and continuous two-volume transitions', ( assert ) => {
+			QUnit.test( 'flat core and inward fades from every face', ( assert ) => {
 
-				const left = makeProbe( - 4, 2 );
-				const right = makeProbe( 0, 6 );
-				const system = new SpecularProbes( [ left, right ], new CubeTexture() );
+				const probe = makeProbe( - 4, 4 );
 				const position = new Vector3();
-				assert.strictEqual( left.getWeight( position.set( - 5, 0, 0 ) ), 0, 'outside' );
-				assert.strictEqual( left.getWeight( position.set( - 4, 0, 0 ) ), 0, 'boundary fades to zero' );
-				assert.strictEqual( left.getWeight( position.set( - 3, 0, 0 ) ), 0.5, 'halfway through fade' );
-				assert.strictEqual( left.getWeight( position.set( 0, 9, 0 ) ), 0.5, 'all six faces affect influence' );
-
-				for ( let x = 0; x <= 2; x += 0.125 ) {
-
-					system.update( position.set( x, 0, 0 ) );
-					const weight = ( probe ) => system.slots.find( ( slot ) => slot.probe === probe )?.weight || 0;
-					assert.strictEqual( weight( left ), 1 - x / 2, `left weight at ${ x }` );
-					assert.strictEqual( weight( right ), x / 2, `right weight at ${ x }` );
-					assert.strictEqual( system.fallbackWeight, 0, 'no sky leaks into complementary overlap' );
-
-				}
+				assert.strictEqual( probe.getWeight( position.set( - 5, 0, 0 ) ), 0, 'outside' );
+				assert.strictEqual( probe.getWeight( position.set( - 4, 0, 0 ) ), 0, 'boundary fades to zero' );
+				assert.strictEqual( probe.getWeight( position.set( - 3.75, 0, 0 ) ), 0.5, 'halfway through fade' );
+				assert.strictEqual( probe.getWeight( position.set( - 3.5, 0, 0 ) ), 1, 'full influence after fade margin' );
+				assert.strictEqual( probe.getWeight( position.set( 2, 0, 0 ) ), 1, 'flat core is not a center peak' );
+				assert.strictEqual( probe.getWeight( position.set( 0, 9.75, 0 ) ), 0.5, 'top face' );
+				assert.strictEqual( probe.getWeight( position.set( 0, - 9.75, 0 ) ), 0.5, 'bottom face' );
+				assert.strictEqual( probe.getWeight( position.set( 0, 0, 9.75 ) ), 0.5, 'front face' );
+				assert.strictEqual( probe.getWeight( position.set( 0, 0, - 9.75 ) ), 0.5, 'back face' );
 
 			} );
 
-			QUnit.test( 'normalization, fallback, and missing captures', ( assert ) => {
+			QUnit.test( 'priority fill overrides rather than averaging nested volumes', ( assert ) => {
 
-				const first = makeProbe( - 4, 4 );
-				const second = makeProbe( - 4, 4 );
-				const system = new SpecularProbes( [ first, second ], new CubeTexture() );
-				system.update( new Vector3() );
-				assert.deepEqual( system.slots.map( ( slot ) => slot.weight ), [ 0.5, 0.5 ], 'overlap greater than one is normalized' );
-				second.texture = null;
-				system.update( new Vector3( - 3, 0, 0 ) );
-				assert.strictEqual( system.slots[ 0 ].weight, 0.5, 'unavailable probe is ignored' );
-				assert.strictEqual( system.fallbackWeight, 0.5, 'uncovered influence uses global environment' );
-				system.update( new Vector3( 20, 0, 0 ) );
-				assert.strictEqual( system.fallbackWeight, 1, 'outside all volumes' );
-				assert.ok( system.slots.every( ( slot ) => slot.probe === null && slot.weight === 0 ), 'no stale selection' );
+				const large = makeProbe( - 4, 4 );
+				const small = makeProbe( - 1, 1 );
+				const system = new SpecularProbes( [ large, small ], new CubeTexture() );
+				system.sortedProbes = [ small, large ];
+				let result = system.getWeights( new Vector3() );
+				assert.deepEqual( result.weights.map( slot => slot.weight ), [ 1, 0 ], 'small core takes all coverage' );
+				assert.strictEqual( result.fallbackWeight, 0, 'large core covers the sky' );
+				result = system.getWeights( new Vector3( 0.75, 0, 0 ) );
+				assert.deepEqual( result.weights.map( slot => slot.weight ), [ 0.5, 0.5 ], 'small fade fills from the large core' );
+				result = system.getWeights( new Vector3( 3.75, 0, 0 ) );
+				assert.deepEqual( result.weights.map( slot => slot.weight ), [ 0, 0.5 ], 'outside small volume' );
+				assert.strictEqual( result.fallbackWeight, 0.5, 'sky fills remaining coverage' );
+				result = system.getWeights( new Vector3( 20, 0, 0 ) );
+				assert.strictEqual( result.fallbackWeight, 1, 'outside all volumes' );
 
 			} );
 
-			QUnit.test( 'round-robin capture is opt-in and interval limited', ( assert ) => {
+			QUnit.test( 'capture sorts by volume, respects loaded sources, and waits for GPU completion', async ( assert ) => {
 
-				const probes = [ makeProbe( - 4, 4 ), makeProbe( - 4, 4 ), makeProbe( - 4, 4 ) ];
-				const captured = [];
-				for ( const probe of probes ) probe.capture = () => captured.push( probe );
-				const system = new SpecularProbes( probes, new CubeTexture() );
-				assert.strictEqual( system.updateCapture( null, null, 0 ), null, 'capture once is the default' );
-				probes[ 0 ].realtime = probes[ 2 ].realtime = true;
-				assert.strictEqual( system.updateCapture( null, null, 0 ), probes[ 0 ], 'first realtime probe' );
-				assert.strictEqual( system.updateCapture( null, null, 0.9 ), null, 'no update inside interval' );
-				assert.strictEqual( system.updateCapture( null, null, 1 ), probes[ 2 ], 'skip loaded/static probe' );
-				assert.strictEqual( system.updateCapture( null, null, 2 ), probes[ 0 ], 'wrap around' );
-				assert.deepEqual( captured, [ probes[ 0 ], probes[ 2 ], probes[ 0 ] ], 'one whole capture per update' );
+				const large = makeProbe( - 4, 4 );
+				const small = makeProbe( - 1, 1 );
+				small.source = 'capture';
+				const steps = [];
+				small.capture = () => steps.push( 'capture' );
+				large.capture = () => assert.ok( false, 'loaded texture must not be captured' );
+				const system = new SpecularProbes( [ large, small ], new CubeTexture() );
+				const renderer = { backend: { isWebGPUBackend: true, device: { queue: { onSubmittedWorkDone: async () => steps.push( 'complete' ) } } } };
+				system.atlas.update = ( renderer, textures, options ) => {
+
+					steps.push( 'filter' );
+					assert.deepEqual( textures, [ small.texture, large.texture, system.fallbackTexture ], 'array order matches front-to-back priority, sky last' );
+					assert.deepEqual( options, { resolution: 64, filter: 'LOD MIP' }, 'requested filter and size forwarded' );
+
+				};
+
+				const elapsed = await system.capture( renderer, new Scene(), { resolution: 64, filter: 'LOD MIP' } );
+				assert.deepEqual( steps, [ 'complete', 'capture', 'filter', 'complete' ], 'drain, capture, filter, then completion' );
+				assert.deepEqual( system.sortedProbes, [ small, large ], 'publish sorted probes' );
+				assert.strictEqual( small.resolution, 64, 'resize capture' );
+				assert.ok( elapsed >= 0 && elapsed === system.lastCaptureTime, 'completed elapsed time published' );
+				assert.false( system.capturing, 'capture guard released' );
+				system.atlas.update = () => {
+
+					throw new Error( 'filter failed' );
+
+				};
+
+				await assert.rejects( system.capture( renderer, new Scene() ), /filter failed/, 'propagate errors' );
+				assert.false( system.capturing, 'capture guard released after failure' );
 
 			} );
 

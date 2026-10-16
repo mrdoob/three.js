@@ -15,7 +15,7 @@
 			<div class="title-wrapper"><a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Specular Probes (Multi-Room)</span></div>
 			<small>Orbit to explore the same scene as the diffuse light probe example.<br>Three captured reflection volumes blend per pixel across both rooms and the doorway.</small>
 		</div>
-		<div id="status">Preparing reflection probes�</div>
+		<div id="status">Preparing reflection probes...</div>
 		<script type="importmap">
 			{
 				"imports": {
@@ -295,6 +295,7 @@
 					new SpecularProbe( { position: new THREE.Vector3( 0, 2.3, 0 ), influenceBox: box( [ - 1.2, - 0.2, - 1.5 ], [ 1.2, 4, 1.5 ] ), projectionBox: box( [ - 8, 0, - 4 ], [ 8, 5, 4 ] ), blendDistance: 0.5, near: 0.05, far: 30 } )
 				];
 				system = new SpecularProbes( probes, fallbackTarget.texture );
+				await capture();
 
 				// Every sphere evaluates the same probe blend at its own surface position.
 
@@ -315,11 +316,10 @@
 
 				scene.add( helpers, grid );
 				updateGrid();
-				await capture();
 
 				const gui = renderer.inspector.createParameters( 'Specular Probes' );
-				gui.add( params, 'showProbes' ).name( 'Show Probes' ).onChange( ( value ) => helpers.visible = value );
-				gui.add( params, 'showGrid' ).name( 'Show Grid' ).onChange( ( value ) => grid.visible = value );
+				gui.add( params, 'showProbes' ).name( 'Show Probes' ).onChange( ( value ) => helpers.visible = value && ! capturing );
+				gui.add( params, 'showGrid' ).name( 'Show Grid' ).onChange( ( value ) => grid.visible = value && ! capturing );
 				gui.add( params, 'boxProjection' ).name( 'Box Projection' ).onChange( ( value ) => system.boxProjection = value );
 				gui.add( roughness, 'value', 0, 1, 0.01 ).name( 'Roughness' );
 				gui.add( params, 'gridResolution', 2, 12, 1 ).name( 'Grid Resolution' ).onChange( updateGrid );
@@ -393,7 +393,7 @@
 
 				}
 
-				grid.visible = params.showGrid;
+				grid.visible = params.showGrid && ! capturing;
 
 			}
 
@@ -401,12 +401,15 @@
 
 				if ( capturing || ! system ) return;
 				capturing = true;
-				status.textContent = 'Capturing and filtering three probes�';
+				document.body.dataset.capturing = 'true';
+				status.textContent = 'Capturing and filtering three probes...';
 				helpers.visible = grid.visible = false;
 				try {
 
-					const elapsed = await system.capture( renderer, scene, { resolution: Number( params.resolution ), filter: params.filter } );
-					status.textContent = `Last Capture: ${ elapsed.toFixed( 1 ) } ms (CPU + GPU completed; filtering, atlas copy and first-use compilation included)`;
+					const resolution = Number( params.resolution );
+					const filter = params.filter;
+					const elapsed = await system.capture( renderer, scene, { resolution, filter } );
+					status.textContent = `Last Capture: ${ elapsed.toFixed( 1 ) } ms | ${ resolution }px | ${ filter } (CPU + GPU completed, including filtering and atlas copy; first use includes compilation)`;
 					document.body.dataset.ready = 'true';
 
 				} catch ( error ) {
@@ -420,6 +423,7 @@
 					grid.visible = params.showGrid;
 					lastCapture = performance.now();
 					capturing = false;
+					document.body.dataset.capturing = 'false';
 
 				}
 

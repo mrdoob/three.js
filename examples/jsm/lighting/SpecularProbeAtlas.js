@@ -1,4 +1,4 @@
-import { Box3, CubeCamera, CubeRenderTarget, HalfFloatType, LinearMipmapLinearFilter, PMREMGenerator, RenderTarget, Scene, Vector3 } from 'three/webgpu';
+import { Box3, CubeCamera, CubeReflectionMapping, CubeRenderTarget, HalfFloatType, LinearMipmapLinearFilter, PMREMGenerator, RenderTarget, Scene, Vector3 } from 'three/webgpu';
 import { cubeTexture, equirectUV, positionWorldDirection, texture } from 'three/tsl';
 
 // The core generator clamps automatic sizes to 256. These explicitly authored
@@ -54,6 +54,7 @@ class SpecularProbeAtlas {
 		} );
 		target.texture.isArrayTexture = true;
 		target.texture.isCubeArrayTexture = true;
+		target.texture.mapping = CubeReflectionMapping;
 		target.texture.name = 'SpecularProbeAtlas';
 		for ( let lod = 0; lod <= maxLod; lod ++ ) target.texture.mipmaps.push( { width: resolution >> lod, height: resolution >> lod } );
 
@@ -72,11 +73,18 @@ class SpecularProbeAtlas {
 		const previousFace = renderer.getActiveCubeFace();
 		const previousMip = renderer.getActiveMipmapLevel();
 		const xrEnabled = renderer.xr.enabled;
+		const mrt = renderer.getMRT();
+		const autoClear = renderer.autoClear;
+		const autoClearColor = renderer.autoClearColor;
+		const autoClearDepth = renderer.autoClearDepth;
+		const autoClearStencil = renderer.autoClearStencil;
 		let filteredTarget = null;
 		let completed = false;
 
 		try {
 
+			renderer.setMRT( null );
+			renderer.autoClear = renderer.autoClearColor = renderer.autoClearDepth = renderer.autoClearStencil = true;
 			renderer.initRenderTarget( target );
 
 			for ( let index = 0; index < sources.length; index ++ ) {
@@ -115,6 +123,11 @@ class SpecularProbeAtlas {
 
 			renderer.setRenderTarget( previousTarget, previousFace, previousMip );
 			renderer.xr.enabled = xrEnabled;
+			renderer.setMRT( mrt );
+			renderer.autoClear = autoClear;
+			renderer.autoClearColor = autoClearColor;
+			renderer.autoClearDepth = autoClearDepth;
+			renderer.autoClearStencil = autoClearStencil;
 			if ( filteredTarget !== null ) filteredTarget.dispose();
 			if ( generator !== null ) generator.dispose();
 			sourceTarget.dispose();

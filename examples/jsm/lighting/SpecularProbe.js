@@ -19,10 +19,10 @@ class SpecularProbe {
 		this.projectionBox = projectionBox === null ? null : projectionBox.clone();
 		this.blendDistance = blendDistance;
 		this.texture = texture;
+		this.source = texture === null ? 'capture' : 'texture';
 		this.resolution = resolution;
 		this.near = near;
 		this.far = far;
-		this.realtime = false;
 		this._renderTarget = null;
 		this._camera = null;
 
@@ -46,11 +46,12 @@ class SpecularProbe {
 
 	/**
 	 * Captures all six faces synchronously. Hide reflective/debug objects before
-	 * calling this method to avoid self-reflections. PMREM filtering is performed
-	 * lazily by the consuming TSL node. Call after renderer initialization.
+	 * calling this method to avoid self-reflections. SpecularProbes.capture()
+	 * explicitly filters and packs the captured textures before publishing them.
 	 */
 	capture( renderer, scene ) {
 
+		if ( this._renderTarget !== null && this._renderTarget.width !== this.resolution ) this.dispose();
 		if ( this._renderTarget === null ) {
 
 			this._renderTarget = new CubeRenderTarget( this.resolution, { type: HalfFloatType } );
@@ -59,6 +60,18 @@ class SpecularProbe {
 		}
 
 		this._camera.position.copy( this.position );
+		for ( const camera of this._camera.children ) {
+
+			if ( camera.near !== this.near || camera.far !== this.far ) {
+
+				camera.near = this.near;
+				camera.far = this.far;
+				camera.updateProjectionMatrix();
+
+			}
+
+		}
+
 		const target = renderer.getRenderTarget();
 		const face = renderer.getActiveCubeFace();
 		const mip = renderer.getActiveMipmapLevel();

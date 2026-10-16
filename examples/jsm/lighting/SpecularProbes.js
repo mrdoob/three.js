@@ -1,29 +1,22 @@
+import { Vector3 } from 'three/webgpu';
+import { SpecularProbeAtlas } from './SpecularProbeAtlas.js';
+
+const _size = new Vector3();
+const volume = ( probe ) => {
+
+	probe.influenceBox.getSize( _size );
+	return _size.x * _size.y * _size.z;
+
+};
+
 /**
- * Selects at most two local reflection probes for a debug object. Probe weights
- * come from overlapping influence volumes, not a nearest-neighbor graph.
- * Author volumes so at most two overlap along the walkthrough: truncating a
- * larger overlap can cause a visible transition when the selected pair changes.
+ * A static collection of local reflection volumes, packed into one GPU cube
+ * array. The shader evaluates face fades and front-to-back coverage at every
+ * surface pixel. Smaller influence boxes have priority over larger boxes;
+ * equal volumes retain their input order. Uncovered coverage samples the sky.
  *
- * Weights sum to one including the global fallback. Sampling/blending happens
- * in linear HDR radiance, after each probe's independent box projection.
- *
- * Selection is object-wide; box projection is evaluated per fragment. This is
- * intended for the small debug sphere, not large meshes crossing several rooms.
- * The shader always samples two local PMREMs and one fallback, so sampling cost
- * is bounded while CPU selection is linear in the number of authored probes.
- *
- * Textures must use the same world-space orientation as three.js environment
- * maps. Loaded cube and equirectangular inputs are filtered by pmremTexture;
- * author HDR inputs in linear color space (and mark sRGB LDR images correctly).
- * Material envMapRotation should be left at its default identity for projection.
- *
- * Usage:
- * ```js
- * const system = new SpecularProbes( probes, environmentTexture );
- * const node = specularProbes( system, uniform( 0.15 ) );
- * material.colorNode = node; // MeshBasicNodeMaterial
- * system.update( sphere.position ); // each frame, before rendering
- * ```
+ * Call capture() after changing sources, probe order, resolution, or filtering.
+ * Loaded textures remain caller-owned. Cube arrays require the WebGPU backend.
  *
  * @three_import import { SpecularProbes } from 'three/addons/lighting/SpecularProbes.js';
  */
@@ -32,81 +25,84 @@ class SpecularProbes {
 	constructor( probes, fallbackTexture ) {
 
 		if ( ! fallbackTexture ) throw new Error( 'SpecularProbes: A global fallback texture is required.' );
-
 		this.probes = probes;
 		this.fallbackTexture = fallbackTexture;
 		this.boxProjection = true;
-		this.slots = [ { probe: null, weight: 0 }, { probe: null, weight: 0 } ];
-		this.fallbackWeight = 1;
-		this._captureIndex = 0;
-		this._lastCaptureTime = - Infinity;
-
-	}
-
-	/** Select the probes using the debug object's center, once per frame. */
-	update( position ) {
-
-		const slots = this.slots;
-		for ( const slot of slots ) {
-
-			slot.probe = null;
-			slot.weight = 0;
-
-		}
-
-		for ( const probe of this.probes ) {
-
-			if ( probe.texture === null ) continue;
-			const weight = probe.getWeight( position );
-			if ( weight > slots[ 0 ].weight ) {
-
-				slots[ 1 ].probe = slots[ 0 ].probe;
-				slots[ 1 ].weight = slots[ 0 ].weight;
-				slots[ 0 ].probe = probe;
-				slots[ 0 ].weight = weight;
-
-			} else if ( weight > slots[ 1 ].weight ) {
-
-				slots[ 1 ].probe = probe;
-				slots[ 1 ].weight = weight;
-
-			}
-
-		}
-
-		const total = slots[ 0 ].weight + slots[ 1 ].weight;
-		this.fallbackWeight = Math.max( 0, 1 - total );
-		const normalization = Math.max( total, 1 );
-		for ( const slot of slots ) slot.weight /= normalization;
-		return this;
+		this.atlas = new SpecularProbeAtlas();
+		this.sortedProbes = [];
+		this.lastCaptureTime = 0;
+		this.capturing = false;
 
 	}
 
 	/**
-	 * Capture at most one realtime probe per interval (time and interval in
-	 * seconds). Each update still renders six faces; this is amortization across
-	 * probes, not across faces. Returns the updated probe, or null.
+	 * Capture scene sources, filter every source (including loaded sources and
+	 * sky), and publish the cube array. Returns CPU wall time in milliseconds,
+	 * including GPU completion, filtering, and packing. Drains prior GPU work
+	 * before starting; first capture includes shader/pipeline compilation.
 	 */
-	updateCapture( renderer, scene, time, interval = 1 ) {
+	async capture( renderer, scene, { resolution = 128, filter = 'PMREM' } = {} ) {
 
-		if ( time - this._lastCaptureTime < interval ) return null;
+		if ( this.capturing ) throw new Error( 'SpecularProbes: A capture is already in progress.' );
+		if ( renderer.backend.isWebGPUBackend !== true ) throw new Error( 'SpecularProbes: Cube arrays require the WebGPU backend.' );
+		if ( ! [ 64, 128, 256, 512, 1024 ].includes( resolution ) ) throw new Error( 'SpecularProbes: Resolution must be 64, 128, 256, 512, or 1024.' );
+		if ( filter !== 'PMREM' && filter !== 'LOD MIP' ) throw new Error( 'SpecularProbes: Unknown filter.' );
+		this.capturing = true;
 
-		for ( let i = 0; i < this.probes.length; i ++ ) {
+		try {
 
-			const probe = this.probes[ this._captureIndex % this.probes.length ];
-			this._captureIndex ++;
-			if ( probe.realtime === false ) continue;
-			probe.capture( renderer, scene );
-			this._lastCaptureTime = time;
-			return probe;
+			await renderer.backend.device.queue.onSubmittedWorkDone();
+			const start = performance.now();
+			const probes = this.probes.slice().sort( ( a, b ) => volume( a ) - volume( b ) );
+			for ( const probe of probes ) {
+
+				if ( probe.source === 'capture' ) {
+
+					probe.resolution = resolution;
+					probe.capture( renderer, scene );
+
+				}
+
+				if ( probe.texture === null ) throw new Error( 'SpecularProbes: A loaded probe has no texture.' );
+
+			}
+
+			await this.atlas.update( renderer, [ ...probes.map( ( probe ) => probe.texture ), this.fallbackTexture ], { resolution, filter } );
+			await renderer.backend.device.queue.onSubmittedWorkDone();
+			this.sortedProbes = probes;
+			this.lastCaptureTime = performance.now() - start;
+			return this.lastCaptureTime;
+
+		} finally {
+
+			this.capturing = false;
 
 		}
 
-		return null;
+	}
+
+	/** CPU inspection of the same front-to-back combiner used per pixel. */
+	getWeights( position ) {
+
+		let remaining = 1;
+		const weights = this.sortedProbes.map( ( probe ) => {
+
+			const weight = probe.getWeight( position ) * remaining;
+			remaining -= weight;
+			return { probe, weight };
+
+		} );
+		return { weights, fallbackWeight: remaining };
+
+	}
+
+	dispose() {
+
+		this.atlas.dispose();
+		for ( const probe of this.probes ) probe.dispose();
 
 	}
 
 }
 
 export { SpecularProbes };
-
