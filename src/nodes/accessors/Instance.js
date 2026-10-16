@@ -1,6 +1,6 @@
 
 import { vec3, mat4, Fn } from '../tsl/TSLBase.js';
-import { OnAfterObjectUpdate, OnBeforeFrameUpdate } from '../utils/EventNode.js';
+import { OnAfterObjectUpdate } from '../utils/EventNode.js';
 import { normalLocal, transformNormal } from './Normal.js';
 import { positionLocal, positionPrevious } from './Position.js';
 import { varyingProperty } from '../core/PropertyNode.js';
@@ -10,12 +10,9 @@ import { buffer } from './BufferNode.js';
 import { storage } from './StorageBufferNode.js';
 import { instanceIndex } from '../core/IndexNode.js';
 
-import { InstancedInterleavedBuffer } from '../../core/InstancedInterleavedBuffer.js';
-import { InstancedBufferAttribute } from '../../core/InstancedBufferAttribute.js';
+import { InterleavedBufferAttribute } from '../../core/InterleavedBufferAttribute.js';
 import { DynamicDrawUsage } from '../../constants.js';
 
-const _matrixBuffers = /*@__PURE__*/ new WeakMap();
-const _colorBuffers = /*@__PURE__*/ new WeakMap();
 const _previousInstanceMatrices = /*@__PURE__*/ new WeakMap();
 const _previousMatrices = /*@__PURE__*/ new WeakMap();
 
@@ -51,23 +48,11 @@ function createInstanceMatrixNode( builder, instanceMatrix ) {
 
 		} else {
 
-			let interleaved = _matrixBuffers.get( instanceMatrix );
-
-			if ( ! interleaved ) {
-
-				interleaved = new InstancedInterleavedBuffer( instanceMatrix.array, 16, 1 );
-				_matrixBuffers.set( instanceMatrix, interleaved );
-
-			}
+			// the columns view the matrices, so both share the same GPU buffer which is freed via instanceMatrix.dispose()
 
 			const bufferFn = instanceMatrix.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
 
-			const instanceBuffers = [
-				bufferFn( interleaved, 'vec4', 16, 0 ),
-				bufferFn( interleaved, 'vec4', 16, 4 ),
-				bufferFn( interleaved, 'vec4', 16, 8 ),
-				bufferFn( interleaved, 'vec4', 16, 12 )
-			];
+			const instanceBuffers = [ 0, 4, 8, 12 ].map( ( offset ) => bufferFn( new InterleavedBufferAttribute( instanceMatrix, 4, offset ) ) );
 
 			instanceMatrixNode = mat4( ...instanceBuffers );
 
@@ -103,9 +88,23 @@ function getPreviousInstance( instancedMesh, instanceMatrix, builder ) {
 
 		_previousInstanceMatrices.set( instancedMesh, data );
 
+		instancedMesh.addEventListener( 'dispose', onPreviousInstanceDispose );
+
 	}
 
 	return data.node;
+
+}
+
+/**
+ * Frees the GPU buffer of the previous frame instance matrices when the mesh is disposed.
+ * The matrices are kept since the node refers to them, rendering the mesh again re-creates the buffer.
+ *
+ * @param {Object} event - The dispose event.
+ */
+function onPreviousInstanceDispose( { target: object } ) {
+
+	_previousInstanceMatrices.get( object ).previousInstanceMatrix.dispose();
 
 }
 
@@ -265,28 +264,11 @@ export const instanceColor = /*@__PURE__*/ varyingProperty( 'vec3', 'vInstanceCo
  */
 export const instance = /*@__PURE__*/ Fn( ( [ matrices, colors = null ], builder ) => {
 
-	const isStorageMatrix = matrices.isStorageInstancedBufferAttribute === true;
 	const isStorageColor = colors && colors.isStorageInstancedBufferAttribute === true;
 
 	const instanceMatrixNode = createInstanceMatrixNode( builder, matrices );
 
-	// interleaved buffer tracking for matrix
-	let interleavedMatrix = null;
-
-	if ( ! isStorageMatrix ) {
-
-		const uniformBufferSize = Math.max( matrices.count, 1 ) * 16 * 4;
-
-		if ( uniformBufferSize > builder.getUniformBufferLimit() ) {
-
-			interleavedMatrix = _matrixBuffers.get( matrices );
-
-		}
-
-	}
-
 	let instanceColorNode = null;
-	let interleavedColor = null;
 
 	if ( colors ) {
 
@@ -296,51 +278,13 @@ export const instance = /*@__PURE__*/ Fn( ( [ matrices, colors = null ], builder
 
 		} else {
 
-			let bufferAttribute = _colorBuffers.get( colors );
-
-			if ( ! bufferAttribute ) {
-
-				bufferAttribute = new InstancedBufferAttribute( colors.array, 3 );
-				_colorBuffers.set( colors, bufferAttribute );
-
-			}
-
-			interleavedColor = bufferAttribute;
+			// bound directly, so the GPU buffer is freed via instanceColor.dispose()
 
 			const bufferFn = colors.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
 
-			instanceColorNode = vec3( bufferFn( bufferAttribute, 'vec3', 3, 0 ) );
+			instanceColorNode = vec3( bufferFn( colors ) );
 
 		}
-
-	}
-
-	// Synchronization of dynamic buffer updates per frame.
-	if ( interleavedMatrix !== null || interleavedColor !== null ) {
-
-		OnBeforeFrameUpdate( () => {
-
-			if ( interleavedMatrix !== null && interleavedMatrix.version !== matrices.version ) {
-
-				interleavedMatrix.clearUpdateRanges();
-				interleavedMatrix.updateRanges.push( ...matrices.updateRanges );
-				matrices.clearUpdateRanges(); // "matrices" as the source is never uploaded directly. clear to avoid update range accumulation
-
-				interleavedMatrix.version = matrices.version;
-
-			}
-
-			if ( colors && interleavedColor !== null && interleavedColor.version !== colors.version ) {
-
-				interleavedColor.clearUpdateRanges();
-				interleavedColor.updateRanges.push( ...colors.updateRanges );
-				colors.clearUpdateRanges();
-
-				interleavedColor.version = colors.version;
-
-			}
-
-		} );
 
 	}
 
@@ -356,12 +300,6 @@ export const instance = /*@__PURE__*/ Fn( ( [ matrices, colors = null ], builder
 
 			previousInstanceMatrix.array.set( matrices.array );
 			previousInstanceMatrix.version = matrices.version;
-
-			// handle interleaved path
-
-			const previousInterleavedMatrix = _matrixBuffers.get( previousInstanceMatrix );
-
-			if ( previousInterleavedMatrix !== undefined ) previousInterleavedMatrix.version = matrices.version;
 
 		} );
 
