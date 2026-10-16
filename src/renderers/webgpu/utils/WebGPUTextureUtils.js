@@ -411,7 +411,11 @@ class WebGPUTextureUtils {
 
 		}
 
-		if ( texture.isCubeTexture ) {
+		if ( texture.isCubeArrayTexture ) {
+
+			textureDescriptorGPU.textureBindingViewDimension = GPUTextureViewDimension.CubeArray;
+
+		} else if ( texture.isCubeTexture ) {
 
 			textureDescriptorGPU.textureBindingViewDimension = GPUTextureViewDimension.Cube;
 

@@ -2238,7 +2238,11 @@ ${ flowData.code }
 
 				}
 
-				if ( texture.isCubeTexture === true && texture.isDepthTexture === true ) {
+				if ( texture.isCubeArrayTexture === true ) {
+
+					textureType = 'texture_cube_array<f32>';
+
+				} else if ( texture.isCubeTexture === true && texture.isDepthTexture === true ) {
 
 					textureType = 'texture_depth_cube';
 
