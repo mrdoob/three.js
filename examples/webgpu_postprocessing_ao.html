@@ -20,7 +20,7 @@
 			</div>
 
 			<small>
-				Ambient Occlusion: switchable between GTAO and SSAO.<br />
+				Ambient Occlusion: switchable between GTAO, GTAO with specular occlusion (GTSO) and SSAO.<br />
 				Tennyson bust from <a href="https://threedscans.com/lincoln/tennyson/" target="_blank" rel="noopener">Three D Scans</a>.
 			</small>
 		</div>
@@ -39,7 +39,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { sample, pass, mrt, screenUV, normalView, velocity, vec3, vec4, packNormalToRGB, unpackRGBToNormal, colorSpaceToWorking, builtinAOContext } from 'three/tsl';
+			import { sample, pass, mrt, screenUV, normalView, positionView, positionWorld, velocity, vec3, vec4, packNormalToRGB, unpackRGBToNormal, colorSpaceToWorking, builtinAOContext, mx_fractal_noise_float } from 'three/tsl';
 			import { ao } from 'three/addons/tsl/display/GTAONode.js';
 			import { ssao } from 'three/addons/tsl/display/SSAONode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
@@ -57,7 +57,7 @@
 			let aoPass, traaPass, transparentMesh;
 
 			const params = {
-				aoType: 'GTAO',
+				aoType: 'GTAO + GTSO',
 				samples: 16,
 				radius: 0.4,
 				resolutionScale: 0.5,
@@ -150,13 +150,14 @@
 
 				// ao: the AO node feeds the scene's ambient term via `builtinAOContext`, and
 				// can be switched between GTAO ( ground-truth, needs temporal denoise ) and the
-				// cheaper SSAO ( self-denoised )
+				// cheaper SSAO ( self-denoised ). GTSO additionally uses GTAO's bent normals to
+				// occlude indirect specular reflections
 
 				function updateOutput() {
 
 					// SSAO is self-denoised so it can skip TRAA and use MSAA for edge anti-aliasing instead
 
-					const useTRAA = ( params.aoType === 'GTAO' );
+					const useTRAA = ( params.aoType !== 'SSAO' );
 
 					scenePass.options.samples = useTRAA ? 0 : 4;
 
@@ -176,7 +177,9 @@
 
 					updateParameters();
 
-					scenePass.contextNode = builtinAOContext( aoPass.getTextureNode().sample( screenUV ).r );
+					scenePass.contextNode = ( params.aoType === 'GTAO + GTSO' )
+						? aoPass.getLightingContext()
+						: builtinAOContext( aoPass.getTextureNode().sample( screenUV ).r );
 					scenePass.needsUpdate = true;
 
 					updateOutput();
@@ -276,7 +279,6 @@
 
 				const knotMat = new THREE.MeshStandardMaterial( { color: '#c0a060', roughness: 0.45, metalness: 0 } );
 				const torusKnot = new THREE.Mesh( new THREE.TorusKnotGeometry( 0.5, 0.17, 128, 32 ), knotMat );
-				torusKnot.position.set( 0, 0.82, 0 );
 				scene.add( torusKnot );
 
 				// columns
@@ -475,22 +477,24 @@
 				addFrame( - 5.4, 2.2, - 3, 1.5, 1.1, '#d0b0d8', Math.PI / 2 );
 				addFrame( - 5.4, 1.8, 1, 1.8, 1.3, '#e0c8a0', Math.PI / 2 );
 
-				// bust pedestal
+				// knot pedestal
 
-				const bustX = - 3;
-				const bustZ = - 3.2;
+				const knotX = - 3;
+				const knotZ = - 3.2;
 
-				const bustBase = new THREE.Mesh( new THREE.CylinderGeometry( 0.6, 0.7, 0.15, 32 ), pedestalMat );
-				bustBase.position.set( bustX, - 1.925, bustZ );
-				scene.add( bustBase );
+				const knotBase = new THREE.Mesh( new THREE.CylinderGeometry( 0.6, 0.7, 0.15, 32 ), pedestalMat );
+				knotBase.position.set( knotX, - 1.925, knotZ );
+				scene.add( knotBase );
 
-				const bustShaft = new THREE.Mesh( new THREE.CylinderGeometry( 0.35, 0.42, 1, 32 ), pedestalMat );
-				bustShaft.position.set( bustX, - 1.35, bustZ );
-				scene.add( bustShaft );
+				const knotShaft = new THREE.Mesh( new THREE.CylinderGeometry( 0.35, 0.42, 1, 32 ), pedestalMat );
+				knotShaft.position.set( knotX, - 1.35, knotZ );
+				scene.add( knotShaft );
 
-				const bustTop = new THREE.Mesh( new THREE.CylinderGeometry( 0.55, 0.48, 0.15, 32 ), pedestalMat );
-				bustTop.position.set( bustX, - 0.775, bustZ );
-				scene.add( bustTop );
+				const knotTop = new THREE.Mesh( new THREE.CylinderGeometry( 0.55, 0.48, 0.15, 32 ), pedestalMat );
+				knotTop.position.set( knotX, - 0.775, knotZ );
+				scene.add( knotTop );
+
+				torusKnot.position.set( knotX, 0.175, knotZ );
 
 
 				// Transparent plane for testing
@@ -502,11 +506,30 @@
 
 				updateParameters();
 
-				// bust GLB
+				// bust GLB on the central pedestal
 
 				const gltf = await loader.loadAsync( 'tennyson-bust.glb' );
 				const bust = gltf.scene;
 				bust.rotation.y = Math.PI;
+
+				// polished bronze with fine aged bumps ( surface gradient bump mapping, Mikkelsen 2010 ),
+				// so the specular occlusion in its crevices stands out
+
+				const height = mx_fractal_noise_float( positionWorld.mul( 30 ), 3 ).mul( 0.0006 );
+				const dpdx = positionView.dFdx();
+				const dpdy = positionView.dFdy();
+				const r1 = dpdy.cross( normalView );
+				const r2 = normalView.cross( dpdx );
+				const det = dpdx.dot( r1 );
+
+				const bronze = new THREE.MeshStandardNodeMaterial( { color: '#b08d57', roughness: 0.35, metalness: 1 } );
+				bronze.normalNode = det.abs().mul( normalView ).sub( det.sign().mul( height.dFdx().mul( r1 ).add( height.dFdy().mul( r2 ) ) ) ).normalize();
+
+				bust.traverse( ( child ) => {
+
+					if ( child.isMesh ) child.material = bronze;
+
+				} );
 
 				const targetHeight = 2.64;
 				const sizeBox = new THREE.Box3().setFromObject( bust );
@@ -517,7 +540,7 @@
 				const fitBox = new THREE.Box3().setFromObject( bust );
 				const center = new THREE.Vector3();
 				fitBox.getCenter( center );
-				bust.position.set( bustX - center.x, - 0.7 - fitBox.min.y, bustZ - center.z + 0.1 );
+				bust.position.set( - center.x, - 0.055 - fitBox.min.y, - center.z );
 				scene.add( bust );
 
 				// events
@@ -527,7 +550,7 @@
 				// GUI
 
 				const gui = renderer.inspector.createParameters( 'Settings' );
-				gui.add( params, 'aoType', [ 'GTAO', 'SSAO' ] ).name( 'AO type' ).onChange( () => {
+				gui.add( params, 'aoType', [ 'GTAO + GTSO', 'GTAO', 'SSAO' ] ).name( 'AO type' ).onChange( () => {
 
 					// half resolution suffices for GTAO since TRAA smooths it, SSAO looks best at full resolution
 
@@ -566,7 +589,7 @@
 
 				function updateControls() {
 
-					if ( params.aoType === 'GTAO' ) {
+					if ( params.aoType !== 'SSAO' ) {
 
 						gtaoControls.forEach( ( control ) => control.show() );
 						ssaoControls.forEach( ( control ) => control.hide() );
