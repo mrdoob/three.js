@@ -1195,7 +1195,11 @@ export const cases = {
 
 		const value = uv().x;
 
-		return overrideNode( value, float( 1 ), value.add( overrideNode( value, float( 2 ), value ) ) );
+		// the inner context replaces value with 2, the outer context replaces value with 1: 1 + 2
+		const inner = value.overrideNode( value, float( 2 ) );
+		const outer = value.add( inner ).overrideNode( value, float( 1 ) );
+
+		return outer;
 
 	},
 
