@@ -56,8 +56,7 @@ class SpecularProbes {
 
 				if ( probe.source === 'capture' ) {
 
-					probe.resolution = resolution;
-					probe.capture( renderer, scene );
+					probe.capture( renderer, scene, resolution );
 
 				}
 
@@ -65,7 +64,7 @@ class SpecularProbes {
 
 			}
 
-			await this.atlas.update( renderer, [ ...probes.map( ( probe ) => probe.texture ), scene.environment ], { resolution } );
+			this.atlas.update( renderer, [ ...probes.map( ( probe ) => probe.texture ), scene.environment ], { resolution } );
 			await renderer.backend.device.queue.onSubmittedWorkDone();
 			this.sortedProbes = probes;
 			this.lastCaptureTime = performance.now() - start;

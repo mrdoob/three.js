@@ -84,9 +84,8 @@ class SpecularProbesNode extends Node {
 				const slot = this._slots[ i ];
 				const d = positionWorld.sub( slot.min ).min( slot.max.sub( positionWorld ) );
 				const distance = d.x.min( d.y ).min( d.z );
-				const inside = positionWorld.greaterThanEqual( slot.min ).all().and( positionWorld.lessThanEqual( slot.max ).all() );
-				const fade = slot.fade.greaterThan( 0 ).select( distance.div( slot.fade.max( 1e-6 ) ).clamp(), float( 1 ) );
-				const weight = inside.select( fade, float( 0 ) ).mul( remaining ).toVar();
+				// negative outside the box, so the clamped fade is zero there
+				const weight = distance.div( slot.fade.max( 1e-6 ) ).clamp().mul( remaining ).toVar();
 
 				If( weight.greaterThan( 0 ), () => {
 

@@ -1,4 +1,4 @@
-import { Box3, CubeCamera, CubeRenderTarget, HalfFloatType, Vector3 } from 'three/webgpu';
+import { Box3, CubeCamera, CubeRenderTarget, HalfFloatType, MathUtils, Vector3 } from 'three/webgpu';
 
 /**
  * An authored local reflection volume. Coordinates are world-space, axis-aligned.
@@ -12,7 +12,7 @@ import { Box3, CubeCamera, CubeRenderTarget, HalfFloatType, Vector3 } from 'thre
  */
 class SpecularProbe {
 
-	constructor( { position = new Vector3(), influenceBox = new Box3(), projectionBox = null, blendDistance = 1, texture = null, resolution = 128, near = 0.1, far = 100 } = {} ) {
+	constructor( { position = new Vector3(), influenceBox = new Box3(), projectionBox = null, blendDistance = 1, texture = null, near = 0.1, far = 100 } = {} ) {
 
 		this.position = position.clone();
 		this.influenceBox = influenceBox.clone();
@@ -20,7 +20,6 @@ class SpecularProbe {
 		this.blendDistance = blendDistance;
 		this.texture = texture;
 		this.source = texture === null ? 'capture' : 'texture';
-		this.resolution = resolution;
 		this.near = near;
 		this.far = far;
 		this._renderTarget = null;
@@ -32,15 +31,12 @@ class SpecularProbe {
 	getWeight( position ) {
 
 		const box = this.influenceBox;
-		if ( ! box.containsPoint( position ) ) return 0;
-		if ( this.blendDistance <= 0 ) return 1;
-
 		const distance = Math.min(
 			position.x - box.min.x, box.max.x - position.x,
 			position.y - box.min.y, box.max.y - position.y,
 			position.z - box.min.z, box.max.z - position.z
 		);
-		return Math.min( distance / this.blendDistance, 1 );
+		return MathUtils.clamp( distance / Math.max( this.blendDistance, 1e-6 ), 0, 1 );
 
 	}
 
@@ -49,12 +45,12 @@ class SpecularProbe {
 	 * calling this method to avoid self-reflections. SpecularProbes.capture()
 	 * explicitly filters and packs the captured textures before publishing them.
 	 */
-	capture( renderer, scene ) {
+	capture( renderer, scene, resolution ) {
 
-		if ( this._renderTarget !== null && this._renderTarget.width !== this.resolution ) this.dispose();
+		if ( this._renderTarget !== null && this._renderTarget.width !== resolution ) this.dispose();
 		if ( this._renderTarget === null ) {
 
-			this._renderTarget = new CubeRenderTarget( this.resolution, { type: HalfFloatType } );
+			this._renderTarget = new CubeRenderTarget( resolution, { type: HalfFloatType } );
 			this._camera = new CubeCamera( this.near, this.far, this._renderTarget );
 
 		}

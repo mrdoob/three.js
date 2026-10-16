@@ -143,13 +143,6 @@ class SpecularProbeAtlas {
 
 	}
 
-	/** Cube index is distinct from the underlying six face-layer indices. */
-	sample( directionNode, indexNode, lodNode ) {
-
-		return cubeTexture( this.texture, directionNode ).depth( indexNode ).level( lodNode );
-
-	}
-
 	dispose() {
 
 		if ( this._target !== null ) this._target.dispose();

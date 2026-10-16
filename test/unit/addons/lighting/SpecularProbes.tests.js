@@ -76,7 +76,6 @@ export default QUnit.module( 'Addons', () => {
 				const elapsed = await system.capture( renderer, scene, { resolution: 64 } );
 				assert.deepEqual( steps, [ 'complete', 'capture', 'filter', 'complete' ], 'drain, capture, filter, then completion' );
 				assert.deepEqual( system.sortedProbes, [ small, large ], 'publish sorted probes' );
-				assert.strictEqual( small.resolution, 64, 'resize capture' );
 				assert.ok( elapsed >= 0 && elapsed === system.lastCaptureTime, 'completed elapsed time published' );
 				assert.false( system.capturing, 'capture guard released' );
 				system.atlas.update = () => {
@@ -133,7 +132,7 @@ export default QUnit.module( 'Addons', () => {
 
 					}
 				};
-				assert.throws( () => probe.capture( renderer, new Scene() ), /capture failed/, 'propagates render failure' );
+				assert.throws( () => probe.capture( renderer, new Scene(), 64 ), /capture failed/, 'propagates render failure' );
 				assert.strictEqual( target, previousTarget, 'restore render target' );
 				assert.strictEqual( face, 3, 'restore active face' );
 				assert.strictEqual( mip, 2, 'restore mip level' );
@@ -151,7 +150,7 @@ export default QUnit.module( 'Addons', () => {
 
 				};
 
-				probe.capture( renderer, new Scene() );
+				probe.capture( renderer, new Scene(), 64 );
 				assert.strictEqual( count, 6, 'complete all six faces before publishing' );
 				const captured = probe.texture;
 				let captureDisposed = false;
