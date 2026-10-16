@@ -13,7 +13,8 @@ const volume = ( probe ) => {
  * A static collection of local reflection volumes, packed into one GPU cube
  * array. The shader evaluates face fades and front-to-back coverage at every
  * surface pixel. Smaller influence boxes have priority over larger boxes;
- * equal volumes retain their input order. Uncovered coverage samples the sky.
+ * equal volumes retain their input order. Uncovered coverage samples the
+ * captured `scene.environment`, or black without one.
  *
  * Call capture() after changing sources, probe order, or resolution.
  * Loaded textures remain caller-owned. Cube arrays require the WebGPU backend.
@@ -22,11 +23,9 @@ const volume = ( probe ) => {
  */
 class SpecularProbes {
 
-	constructor( probes, fallbackTexture ) {
+	constructor( probes ) {
 
-		if ( ! fallbackTexture ) throw new Error( 'SpecularProbes: A global fallback texture is required.' );
 		this.probes = probes;
-		this.fallbackTexture = fallbackTexture;
 		this.boxProjection = true;
 		this.atlas = new SpecularProbeAtlas();
 		this.sortedProbes = [];
@@ -66,7 +65,7 @@ class SpecularProbes {
 
 			}
 
-			await this.atlas.update( renderer, [ ...probes.map( ( probe ) => probe.texture ), this.fallbackTexture ], { resolution } );
+			await this.atlas.update( renderer, [ ...probes.map( ( probe ) => probe.texture ), scene.environment ], { resolution } );
 			await renderer.backend.device.queue.onSubmittedWorkDone();
 			this.sortedProbes = probes;
 			this.lastCaptureTime = performance.now() - start;

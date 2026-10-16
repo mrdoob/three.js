@@ -38,7 +38,7 @@ export default QUnit.module( 'Addons', () => {
 
 				const large = makeProbe( - 4, 4 );
 				const small = makeProbe( - 1, 1 );
-				const system = new SpecularProbes( [ large, small ], new CubeTexture() );
+				const system = new SpecularProbes( [ large, small ] );
 				system.sortedProbes = [ small, large ];
 				let result = system.getWeights( new Vector3() );
 				assert.deepEqual( result.weights.map( slot => slot.weight ), [ 1, 0 ], 'small core takes all coverage' );
@@ -61,17 +61,19 @@ export default QUnit.module( 'Addons', () => {
 				const steps = [];
 				small.capture = () => steps.push( 'capture' );
 				large.capture = () => assert.ok( false, 'loaded texture must not be captured' );
-				const system = new SpecularProbes( [ large, small ], new CubeTexture() );
+				const system = new SpecularProbes( [ large, small ] );
 				const renderer = { backend: { isWebGPUBackend: true, device: { queue: { onSubmittedWorkDone: async () => steps.push( 'complete' ) } } } };
+				const scene = new Scene();
+				scene.environment = new CubeTexture();
 				system.atlas.update = ( renderer, textures, options ) => {
 
 					steps.push( 'filter' );
-					assert.deepEqual( textures, [ small.texture, large.texture, system.fallbackTexture ], 'array order matches front-to-back priority, sky last' );
+					assert.deepEqual( textures, [ small.texture, large.texture, scene.environment ], 'array order matches front-to-back priority, environment last' );
 					assert.deepEqual( options, { resolution: 64 }, 'requested size forwarded' );
 
 				};
 
-				const elapsed = await system.capture( renderer, new Scene(), { resolution: 64 } );
+				const elapsed = await system.capture( renderer, scene, { resolution: 64 } );
 				assert.deepEqual( steps, [ 'complete', 'capture', 'filter', 'complete' ], 'drain, capture, filter, then completion' );
 				assert.deepEqual( system.sortedProbes, [ small, large ], 'publish sorted probes' );
 				assert.strictEqual( small.resolution, 64, 'resize capture' );

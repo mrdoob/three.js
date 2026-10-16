@@ -29,7 +29,6 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { uniform } from 'three/tsl';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
@@ -38,10 +37,7 @@
 			import { specularProbes } from 'three/addons/tsl/lighting/SpecularProbesNode.js';
 
 			const status = document.getElementById( 'status' );
-			const params = { showProbes: false, dynamicObject: 'Bunny', pause: false, showGrid: false, gridResolution: 6, gridSize: 0.12, resolution: 128, boxProjection: true, capture: capture };
-			const probeRoughness = uniform( 0.08 );
-			const dynamicRoughness = uniform( 0 );
-			const gridRoughness = uniform( 0.08 );
+			const params = { showProbes: false, probeRoughness: 0.08, dynamicObject: 'Bunny', pause: false, showGrid: false, gridResolution: 6, gridSize: 0.12, resolution: 128, boxProjection: true, capture: capture };
 			const helpers = new THREE.Group();
 			const grid = new THREE.Group();
 			let camera, scene, renderer, controls, system, gridMaterial, dynamicObject;
@@ -283,31 +279,20 @@
 				controls.target.set( 0, 2.5, 0 );
 				controls.update();
 
-				// A neutral background fallback, without loading external assets.
-
-				const fallbackTarget = new THREE.CubeRenderTarget( 16, { type: THREE.HalfFloatType } );
-				const fallbackScene = new THREE.Scene();
-				fallbackScene.background = scene.background;
-				new THREE.CubeCamera( 0.1, 10, fallbackTarget ).update( renderer, fallbackScene );
-
 				const box = ( min, max ) => new THREE.Box3( new THREE.Vector3( ...min ), new THREE.Vector3( ...max ) );
 				const probes = [
 					new SpecularProbe( { position: new THREE.Vector3( - 4, 2.3, 0 ), influenceBox: box( [ - 8.2, - 0.2, - 4.2 ], [ 0.4, 5.2, 4.2 ] ), projectionBox: box( [ - 8, 0, - 4 ], [ 0, 5, 4 ] ), blendDistance: 0.5, near: 0.05, far: 30 } ),
 					new SpecularProbe( { position: new THREE.Vector3( 4, 2.3, 0 ), influenceBox: box( [ - 0.4, - 0.2, - 4.2 ], [ 8.2, 5.2, 4.2 ] ), projectionBox: box( [ 0, 0, - 4 ], [ 8, 5, 4 ] ), blendDistance: 0.5, near: 0.05, far: 30 } ),
 					new SpecularProbe( { position: new THREE.Vector3( 0, 2.3, 0 ), influenceBox: box( [ - 1.2, - 0.2, - 1.5 ], [ 1.2, 4, 1.5 ] ), projectionBox: box( [ - 8, 0, - 4 ], [ 8, 5, 4 ] ), blendDistance: 0.5, near: 0.05, far: 30 } )
 				];
-				system = new SpecularProbes( probes, fallbackTarget.texture );
+				system = new SpecularProbes( probes );
 				await capture();
+				scene.environmentNode = specularProbes( system );
 
 				// Each test surface evaluates the probe blend at its own world position.
 
-				gridMaterial = new THREE.MeshStandardNodeMaterial( { metalness: 1 } );
-				gridMaterial.roughnessNode = gridRoughness;
-				gridMaterial.envNode = specularProbes( system, gridRoughness );
-
-				const dynamicMaterial = new THREE.MeshStandardNodeMaterial( { metalness: 1, roughness: 0 } );
-				dynamicMaterial.roughnessNode = dynamicRoughness;
-				dynamicMaterial.envNode = specularProbes( system, dynamicRoughness );
+				gridMaterial = new THREE.MeshStandardMaterial( { metalness: 1, roughness: 0.08 } );
+				const dynamicMaterial = new THREE.MeshStandardMaterial( { metalness: 1, roughness: 0 } );
 
 				const loader = new DRACOLoader();
 				let bunnyGeometry;
@@ -338,14 +323,13 @@
 				dynamicObject.visible = params.dynamicObject !== 'None';
 				updateDynamicObject( 0 );
 
-				const reflection = specularProbes( system, probeRoughness );
 				const colors = [ 0xffaaaa, 0xaaccff, 0xffee99 ];
 				const boxColors = [ 0xff3333, 0x3388ff, 0xffcc00 ];
+				const markerMaterials = [];
 				for ( let i = 0; i < probes.length; i ++ ) {
 
-					const tint = new THREE.Color( colors[ i ] );
-					const material = new THREE.MeshBasicNodeMaterial();
-					material.colorNode = reflection.mul( uniform( tint ) );
+					const material = new THREE.MeshStandardMaterial( { color: colors[ i ], metalness: 1, roughness: 0.08 } );
+					markerMaterials.push( material );
 					const marker = new THREE.Mesh( new THREE.SphereGeometry( 0.28, 32, 16 ), material );
 					marker.position.copy( probes[ i ].position );
 					helpers.add( marker, new THREE.Box3Helper( probes[ i ].influenceBox, boxColors[ i ] ) );
@@ -369,16 +353,16 @@
 
 				} );
 				dynamicTest.add( params, 'pause' ).name( 'Pause' );
-				dynamicTest.add( dynamicRoughness, 'value', 0, 1, 0.01 ).name( 'Roughness' );
+				dynamicTest.add( dynamicMaterial, 'roughness', 0, 1, 0.01 ).name( 'Roughness' );
 
 				const staticTest = gui.addFolder( 'Static Test' );
 				staticTest.add( params, 'showGrid' ).name( 'Grid' ).onChange( ( value ) => grid.visible = value && ! capturing );
 				staticTest.add( params, 'gridResolution', 2, 12, 1 ).name( 'Grid resolution' ).onChange( updateGrid );
-				staticTest.add( gridRoughness, 'value', 0, 1, 0.01 ).name( 'Grid roughness' );
+				staticTest.add( gridMaterial, 'roughness', 0, 1, 0.01 ).name( 'Grid roughness' );
 
 				const internalStructure = gui.addFolder( 'Internal Structure' );
 				internalStructure.add( params, 'showProbes' ).name( 'Influence boxes and probes' ).onChange( ( value ) => helpers.visible = value && ! capturing );
-				internalStructure.add( probeRoughness, 'value', 0, 1, 0.01 ).name( 'Probe roughness' );
+				internalStructure.add( params, 'probeRoughness', 0, 1, 0.01 ).name( 'Probe roughness' ).onChange( ( value ) => markerMaterials.forEach( ( material ) => material.roughness = value ) );
 
 				window.addEventListener( 'resize', () => {
 

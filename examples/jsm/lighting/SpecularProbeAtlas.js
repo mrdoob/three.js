@@ -16,7 +16,7 @@ class ProbePMREMGenerator extends PMREMGenerator {
 /**
  * WebGPU-only reflection storage: one rgba16float GPU texture, 6 array layers
  * per cube, viewed and sampled as a real cube-array. Sources remain caller-owned.
- * Resolution is common to every cube; the final cube can hold the global sky.
+ * Resolution is common to every cube; null sources leave their cube black.
  * Filtering and copying stay on the GPU, without image readback.
  */
 class SpecularProbeAtlas {
@@ -39,7 +39,6 @@ class SpecularProbeAtlas {
 
 		if ( renderer.backend.isWebGPUBackend !== true ) throw new Error( 'SpecularProbeAtlas requires the WebGPU backend; cube arrays are unsupported by WebGL.' );
 		if ( ! [ 64, 128, 256, 512, 1024 ].includes( resolution ) ) throw new Error( 'SpecularProbeAtlas: Resolution must be a power of two from 64 to 1024.' );
-		if ( sources.length === 0 || sources.some( source => source === null || source === undefined ) ) throw new Error( 'SpecularProbeAtlas: Loaded source textures are required.' );
 
 		const maxLod = Math.log2( resolution ) - 3;
 		const target = new RenderTarget( resolution, resolution, {
@@ -87,6 +86,8 @@ class SpecularProbeAtlas {
 			for ( let index = 0; index < sources.length; index ++ ) {
 
 				const source = sources[ index ];
+				if ( source === null ) continue;
+
 				// Resample both cube and equirectangular inputs to the selected size.
 				scene.backgroundNode = source.isCubeTexture === true
 					? cubeTexture( source, positionWorldDirection ).level( 0 )

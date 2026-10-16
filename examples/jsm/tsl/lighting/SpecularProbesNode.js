@@ -1,11 +1,10 @@
 import { Node, Vector3 } from 'three/webgpu';
-import { cubeTexture, float, Fn, If, int, nodeObject, positionWorld, reflectVector, uniform, vec3 } from 'three/tsl';
+import { cubeTexture, float, Fn, If, int, materialEnvRotation, nodeObject, positionWorld, reflectVector, uniform, vec3 } from 'three/tsl';
 
 /**
- * Debug reflected radiance, with per-pixel volume weights and independent box
- * projection. One cube-array binding stores all local environments plus sky.
- * Assign to MeshBasicNodeMaterial.colorNode for a white mirror, or multiply by
- * a tint for probe markers. Roughness controls filtering, without a full BRDF.
+ * Environment radiance from local probes, with per-pixel volume weights and box
+ * projection. Assign to `scene.environmentNode` so every physical material samples
+ * it with its own roughness and normal, like `scene.environment`.
  */
 class SpecularProbesNode extends Node {
 
@@ -15,16 +14,16 @@ class SpecularProbesNode extends Node {
 
 	}
 
-	constructor( probes, roughnessNode = float( 0.15 ) ) {
+	constructor( probes ) {
 
 		super( 'vec3' );
 		if ( probes.atlas.texture === null ) throw new Error( 'SpecularProbesNode: Capture and filter probes before creating the node.' );
 		this.probes = probes;
-		this.roughnessNode = float( roughnessNode );
 		this.updateBeforeType = 'render';
 		this._array = cubeTexture( probes.atlas.texture );
 		this._array.mergeable = false;
 		this._maxLod = uniform( probes.atlas.maxLod );
+		this._local = uniform( 1 );
 		this._slots = probes.sortedProbes.map( () => ( {
 			position: uniform( new Vector3() ),
 			min: uniform( new Vector3() ),
@@ -43,6 +42,8 @@ class SpecularProbesNode extends Node {
 		if ( probes.sortedProbes.length !== this._slots.length ) throw new Error( 'SpecularProbesNode: Recreate the node after changing the probe count.' );
 		this._array.value = probes.atlas.texture;
 		this._maxLod.value = probes.atlas.maxLod;
+		// captures see only the sky, so baking doesn't feed back into itself
+		this._local.value = probes.capturing ? 0 : 1;
 
 		for ( let i = 0; i < this._slots.length; i ++ ) {
 
@@ -64,15 +65,19 @@ class SpecularProbesNode extends Node {
 
 	}
 
-	setup() {
+	setup( builder ) {
 
 		this.updateBefore();
+
+		const { context } = builder;
+		const direction = context.getUV ? context.getUV( this, builder ) : reflectVector;
+		const roughness = float( context.getTextureLevel ? context.getTextureLevel( this ) : 0 ).clamp();
+
 		return Fn( () => {
 
-			const roughness = this.roughnessNode.clamp();
 			const lod = this._maxLod.mul( roughness ).mul( float( 2 ).sub( roughness ) );
 			const radiance = vec3( 0 ).toVar();
-			const remaining = float( 1 ).toVar();
+			const remaining = float( this._local ).toVar();
 
 			for ( let i = 0; i < this._slots.length; i ++ ) {
 
@@ -85,7 +90,6 @@ class SpecularProbesNode extends Node {
 
 				If( weight.greaterThan( 0 ), () => {
 
-					const direction = reflectVector;
 					const safeDirection = direction.greaterThanEqual( 0 ).select( direction.max( 1e-6 ), direction.min( - 1e-6 ) );
 					const distances = direction.greaterThanEqual( 0 ).select( slot.projectionMax, slot.projectionMin ).sub( positionWorld ).div( safeDirection );
 					const distance = distances.x.min( distances.y ).min( distances.z );
@@ -99,7 +103,7 @@ class SpecularProbesNode extends Node {
 
 			}
 
-			radiance.addAssign( this._array.sample( reflectVector ).depth( int( this._slots.length ) ).level( lod ).rgb.mul( remaining ) );
+			radiance.addAssign( this._array.sample( materialEnvRotation.mul( direction ) ).depth( int( this._slots.length ) ).level( lod ).rgb.mul( remaining.add( this._local.oneMinus() ) ) );
 			return radiance;
 
 		} )();
@@ -109,6 +113,6 @@ class SpecularProbesNode extends Node {
 }
 
 /** Per-pixel, priority-filled cube-array reflections. Capture the system first. */
-export const specularProbes = ( probes, roughnessNode = float( 0.15 ) ) => nodeObject( new SpecularProbesNode( probes, roughnessNode ) );
+export const specularProbes = ( probes ) => nodeObject( new SpecularProbesNode( probes ) );
 
 export { SpecularProbesNode };
