@@ -476,15 +476,23 @@ class Bindings extends DataMap {
 
 				this.attributes.update( attribute, attributeType );
 
-				if ( bindingData.attribute !== attribute ) {
+				// generation: a new buffer is created if the attribute has been disposed while in use
+
+				const generation = this.attributes.get( attribute ).generation;
+
+				if ( bindingData.attribute !== attribute || bindingData.generation !== generation ) {
 
 					bindingData.attribute = attribute;
+					bindingData.generation = generation;
 
 					needsBindingsUpdate = true;
 
 				}
 
+				// the generation is part of the version so a re-created buffer replaces the cached bind group
+
 				cacheKey += attribute.id + ',';
+				version += generation;
 
 			}
 

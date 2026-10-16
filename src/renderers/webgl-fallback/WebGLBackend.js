@@ -1,6 +1,7 @@
 import GLSLNodeBuilder from './nodes/GLSLNodeBuilder.js';
 import Backend from '../common/Backend.js';
 import { getCacheKey } from '../common/RenderContext.js';
+import { AttributeType } from '../common/Constants.js';
 
 import WebGLAttributeUtils from './utils/WebGLAttributeUtils.js';
 import WebGLVertexArrayUtils from './utils/WebGLVertexArrayUtils.js';
@@ -138,13 +139,6 @@ class WebGLBackend extends Backend {
 		 * @default null
 		 */
 		this.utils = null;
-
-		/**
-		 * Dictionary for caching transform feedback objects.
-		 *
-		 * @type {Object<string,WebGLTransformFeedback>}
-		 */
-		this.transformFeedbackCache = {};
 
 		/**
 		 * Controls if `gl.RASTERIZER_DISCARD` should be enabled or not.
@@ -942,7 +936,12 @@ class WebGLBackend extends Backend {
 
 		}
 
-		const { programGPU, transformBuffers, attributes } = this.get( pipeline );
+		const { programGPU, transformAttributes, attributes } = this.get( pipeline );
+
+		// the buffers are managed by the renderer's attributes so they are re-created after disposal
+
+		for ( let i = 0; i < attributes.length; i ++ ) this._updateComputeAttribute( attributes[ i ] );
+		for ( let i = 0; i < transformAttributes.length; i ++ ) this._updateComputeAttribute( transformAttributes[ i ] );
 
 		const vaoGPU = this.vertexArrayUtils.getVAO( pipeline, attributes );
 
@@ -952,9 +951,15 @@ class WebGLBackend extends Backend {
 
 		this._bindUniforms( bindings );
 
-		const transformFeedbackGPU = this._getTransformFeedback( transformBuffers );
+		// the buffers are only bound to the default transform feedback object during the dispatch so
+		// no transform feedback object keeps the memory of disposed buffers allocated
 
-		gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, transformFeedbackGPU );
+		for ( let i = 0; i < transformAttributes.length; i ++ ) {
+
+			gl.bindBufferBase( gl.TRANSFORM_FEEDBACK_BUFFER, i, this.get( transformAttributes[ i ] ).transformBuffer );
+
+		}
+
 		gl.beginTransformFeedback( gl.POINTS );
 
 		count = ( count !== null ) ? count : computeNode.count;
@@ -984,13 +989,18 @@ class WebGLBackend extends Backend {
 		}
 
 		gl.endTransformFeedback();
-		gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, null );
+
+		for ( let i = 0; i < transformAttributes.length; i ++ ) {
+
+			gl.bindBufferBase( gl.TRANSFORM_FEEDBACK_BUFFER, i, null );
+
+		}
 
 		// switch active buffers
 
-		for ( let i = 0; i < transformBuffers.length; i ++ ) {
+		for ( let i = 0; i < transformAttributes.length; i ++ ) {
 
-			const dualAttributeData = transformBuffers[ i ];
+			const dualAttributeData = this.get( transformAttributes[ i ] );
 
 			if ( dualAttributeData.pbo && this.has( dualAttributeData.pbo ) ) {
 
@@ -1002,6 +1012,22 @@ class WebGLBackend extends Backend {
 
 
 		}
+
+	}
+
+	/**
+	 * Creates or updates the GPU buffer of the given compute attribute via the renderer's
+	 * attributes so it is tracked like other attributes.
+	 *
+	 * @private
+	 * @param {BufferAttribute|InterleavedBufferAttribute} attribute - The buffer attribute.
+	 */
+	_updateComputeAttribute( attribute ) {
+
+		const bufferAttribute = this.getBufferAttribute( attribute );
+		const attributeType = ( attribute.isStorageBufferAttribute || attribute.isStorageInstancedBufferAttribute ) ? AttributeType.STORAGE : AttributeType.VERTEX;
+
+		this.renderer._attributes.update( bufferAttribute, attributeType );
 
 	}
 
@@ -1130,12 +1156,11 @@ class WebGLBackend extends Backend {
 
 		// vertex state
 
-		const vaoGPU = this.vertexArrayUtils.getVAO( renderObject, renderObject.getAttributes() );
-
 		const index = renderObject.getIndex();
-		const indexGPU = ( index !== null ) ? this.get( index ).bufferGPU : null;
 
-		state.setVertexState( vaoGPU, indexGPU );
+		const vaoGPU = this.vertexArrayUtils.getVAO( renderObject, renderObject.getAttributes(), index );
+
+		state.setVertexState( vaoGPU );
 
 		//
 
@@ -1808,29 +1833,21 @@ class WebGLBackend extends Backend {
 
 		gl.linkProgram( programGPU );
 
+		// only the attributes are stored since their buffers are re-created when they are disposed (see compute())
+
 		const attributeNodes = computePipeline.attributes;
 		const attributes = [];
-		const transformBuffers = [];
+		const transformAttributes = [];
 
 		for ( let i = 0; i < attributeNodes.length; i ++ ) {
 
-			const attribute = attributeNodes[ i ].node.attribute;
-
-			attributes.push( attribute );
-
-			if ( ! this.has( attribute ) ) this.attributeUtils.createAttribute( attribute, gl.ARRAY_BUFFER );
+			attributes.push( attributeNodes[ i ].node.attribute );
 
 		}
 
 		for ( let i = 0; i < transformAttributeNodes.length; i ++ ) {
 
-			const attribute = transformAttributeNodes[ i ].attribute;
-
-			if ( ! this.has( attribute ) ) this.attributeUtils.createAttribute( attribute, gl.ARRAY_BUFFER );
-
-			const attributeData = this.get( attribute );
-
-			transformBuffers.push( attributeData );
+			transformAttributes.push( transformAttributeNodes[ i ].attribute );
 
 		}
 
@@ -1840,7 +1857,7 @@ class WebGLBackend extends Backend {
 			programGPU,
 			fragmentShader,
 			vertexShader,
-			transformBuffers,
+			transformAttributes,
 			attributes
 		} );
 
@@ -2177,6 +2194,10 @@ class WebGLBackend extends Backend {
 	 * @param {BufferAttribute} attribute - The buffer attribute to destroy.
 	 */
 	destroyAttribute( attribute ) {
+
+		// VAOs keep the memory of attached buffers allocated
+
+		this.vertexArrayUtils.releaseBuffer( this.get( this.getBufferAttribute( attribute ) ) );
 
 		this.attributeUtils.destroyAttribute( attribute );
 
@@ -2593,55 +2614,6 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
-	 * Creates a transform feedback from the given transform buffers.
-	 *
-	 * @private
-	 * @param {Array<DualAttributeData>} transformBuffers - The transform buffers.
-	 * @return {WebGLTransformFeedback} The transform feedback.
-	 */
-	_getTransformFeedback( transformBuffers ) {
-
-		let key = '';
-
-		for ( let i = 0; i < transformBuffers.length; i ++ ) {
-
-			const dualAttributeData = transformBuffers[ i ];
-
-			key += ':' + dualAttributeData.id + '|' + dualAttributeData.activeBufferIndex;
-
-		}
-
-		let transformFeedbackGPU = this.transformFeedbackCache[ key ];
-
-		if ( transformFeedbackGPU !== undefined ) {
-
-			return transformFeedbackGPU;
-
-		}
-
-		const { gl } = this;
-
-		transformFeedbackGPU = gl.createTransformFeedback();
-
-		gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, transformFeedbackGPU );
-
-		for ( let i = 0; i < transformBuffers.length; i ++ ) {
-
-			const attributeData = transformBuffers[ i ];
-
-			gl.bindBufferBase( gl.TRANSFORM_FEEDBACK_BUFFER, i, attributeData.transformBuffer );
-
-		}
-
-		gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, null );
-
-		this.transformFeedbackCache[ key ] = transformFeedbackGPU;
-
-		return transformFeedbackGPU;
-
-	}
-
-	/**
 	 * Setups the given bindings.
 	 *
 	 * @private
@@ -2883,8 +2855,6 @@ class WebGLBackend extends Backend {
 	async dispose() {
 
 		await super.dispose();
-
-		this.transformFeedbackCache = {};
 
 		if ( this.vertexArrayUtils !== null ) this.vertexArrayUtils.dispose();
 		if ( this.textureUtils !== null ) this.textureUtils.dispose();

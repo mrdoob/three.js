@@ -3,6 +3,8 @@ import { AttributeType } from './Constants.js';
 
 import { DynamicDrawUsage } from '../../constants.js';
 
+let _generation = 0;
+
 /**
  * This renderer module manages geometry attributes.
  *
@@ -36,11 +38,11 @@ class Attributes extends DataMap {
 		this.info = info;
 
 		/**
-		 * Stores weak references to the storage attributes with attached
+		 * Stores weak references to the buffer attributes with attached
 		 * `dispose` event listeners.
 		 *
 		 * @private
-		 * @type {Set<WeakRef<StorageBufferAttribute|StorageInstancedBufferAttribute>>}
+		 * @type {Set<WeakRef<BufferAttribute>>}
 		 */
 		this._tracked = new Set();
 
@@ -52,6 +54,15 @@ class Attributes extends DataMap {
 		 * @type {FinalizationRegistry}
 		 */
 		this._registry = new FinalizationRegistry( ( ref ) => this._tracked.delete( ref ) );
+
+		/**
+		 * Incremented whenever the buffer of an attribute is destroyed. Render objects
+		 * only have to verify their attributes if this version has changed.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.disposeVersion = 0;
 
 	}
 
@@ -67,7 +78,9 @@ class Attributes extends DataMap {
 
 		if ( attributeData !== null ) {
 
-			if ( attribute.isStorageBufferAttribute === true || attribute.isStorageInstancedBufferAttribute === true ) {
+			this.disposeVersion ++;
+
+			if ( attribute.isBufferAttribute === true ) {
 
 				attribute.removeEventListener( 'dispose', attributeData.onDispose );
 
@@ -122,10 +135,11 @@ class Attributes extends DataMap {
 			}
 
 			data.version = attribute.version;
+			data.generation = _generation ++;
 
-			// only storage buffer attributes support disposal
+			// interleaved buffer attributes are not event dispatchers
 
-			if ( attribute.isStorageBufferAttribute === true || attribute.isStorageInstancedBufferAttribute === true ) {
+			if ( attribute.isBufferAttribute === true ) {
 
 				data.onDispose = () => {
 
