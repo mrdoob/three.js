@@ -13,9 +13,9 @@
 		<div id="info">
 			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
 			<div class="title-wrapper"><a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Specular Probes (Multi-Room)</span></div>
-			<small>Orbit to explore the same scene as the diffuse light probe example.<br>Three captured reflection volumes blend per pixel across both rooms and the doorway.</small>
+			<small>Specular light probes for dynamic reflections using cube-array by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a></small>
 		</div>
-		<div id="status">Preparing reflection probes...</div>
+		<div id="status" class="lbl">Preparing reflection probes...</div>
 		<script type="importmap">
 			{
 				"imports": {
@@ -31,19 +31,21 @@
 			import * as THREE from 'three/webgpu';
 			import { uniform } from 'three/tsl';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { SpecularProbe } from 'three/addons/lighting/SpecularProbe.js';
 			import { SpecularProbes } from 'three/addons/lighting/SpecularProbes.js';
 			import { specularProbes } from 'three/addons/tsl/lighting/SpecularProbesNode.js';
 
 			const status = document.getElementById( 'status' );
-			const params = { showProbes: true, showGrid: false, gridResolution: 6, gridSize: 0.12, resolution: 128, filter: 'PMREM', boxProjection: true, realtime: false, updateInterval: 1, capture: capture };
-			const roughness = uniform( 0.08 );
+			const params = { showProbes: false, dynamicObject: 'Bunny', pause: false, showGrid: false, gridResolution: 6, gridSize: 0.12, resolution: 128, filter: 'PMREM', boxProjection: true, capture: capture };
+			const probeRoughness = uniform( 0.08 );
+			const dynamicRoughness = uniform( 0 );
+			const gridRoughness = uniform( 0.08 );
 			const helpers = new THREE.Group();
 			const grid = new THREE.Group();
-			let camera, scene, renderer, controls, system, gridMaterial;
+			let camera, scene, renderer, controls, system, gridMaterial, dynamicObject;
 			let capturing = false;
-			let lastCapture = 0;
 
 			init().catch( ( error ) => {
 
@@ -297,12 +299,48 @@
 				system = new SpecularProbes( probes, fallbackTarget.texture );
 				await capture();
 
-				// Every sphere evaluates the same probe blend at its own surface position.
+				// Each test surface evaluates the probe blend at its own world position.
 
-				const reflection = specularProbes( system, roughness );
-				gridMaterial = new THREE.MeshBasicNodeMaterial();
-				gridMaterial.colorNode = reflection;
+				gridMaterial = new THREE.MeshStandardNodeMaterial( { metalness: 1 } );
+				gridMaterial.roughnessNode = gridRoughness;
+				gridMaterial.envNode = specularProbes( system, gridRoughness );
+
+				const dynamicMaterial = new THREE.MeshStandardNodeMaterial( { metalness: 1, roughness: 0 } );
+				dynamicMaterial.roughnessNode = dynamicRoughness;
+				dynamicMaterial.envNode = specularProbes( system, dynamicRoughness );
+
+				const loader = new DRACOLoader();
+				let bunnyGeometry;
+				try {
+
+					bunnyGeometry = await loader.loadAsync( 'models/draco/bunny.drc' );
+
+				} finally {
+
+					loader.dispose();
+
+				}
+
+				bunnyGeometry.computeVertexNormals();
+				bunnyGeometry.center();
+				bunnyGeometry.computeBoundingBox();
+				const bunnySize = bunnyGeometry.boundingBox.getSize( new THREE.Vector3() );
+				// The bunny's longest dimension is 4.5 times the original grid sphere diameter.
+				const bunnyScale = 4.5 * 2 * params.gridSize / Math.max( bunnySize.x, bunnySize.y, bunnySize.z );
+				bunnyGeometry.scale( bunnyScale, bunnyScale, bunnyScale );
+				const dynamicGeometries = {
+					Bunny: bunnyGeometry,
+					Sphere: new THREE.SphereGeometry( 4.5 * params.gridSize, 32, 24 )
+				};
+				dynamicObject = new THREE.Mesh( dynamicGeometries[ params.dynamicObject ], dynamicMaterial );
+				dynamicObject.castShadow = true;
+				dynamicObject.receiveShadow = true;
+				dynamicObject.visible = params.dynamicObject !== 'None';
+				updateDynamicObject( 0 );
+
+				const reflection = specularProbes( system, probeRoughness );
 				const colors = [ 0xffaaaa, 0xaaccff, 0xffee99 ];
+				const boxColors = [ 0xff3333, 0x3388ff, 0xffcc00 ];
 				for ( let i = 0; i < probes.length; i ++ ) {
 
 					const tint = new THREE.Color( colors[ i ] );
@@ -310,25 +348,38 @@
 					material.colorNode = reflection.mul( uniform( tint ) );
 					const marker = new THREE.Mesh( new THREE.SphereGeometry( 0.28, 32, 16 ), material );
 					marker.position.copy( probes[ i ].position );
-					helpers.add( marker, new THREE.Box3Helper( probes[ i ].influenceBox, tint ) );
+					helpers.add( marker, new THREE.Box3Helper( probes[ i ].influenceBox, boxColors[ i ] ) );
 
 				}
 
-				scene.add( helpers, grid );
+				helpers.visible = params.showProbes;
+				scene.add( helpers, grid, dynamicObject );
 				updateGrid();
 
 				const gui = renderer.inspector.createParameters( 'Specular Probes' );
-				gui.add( params, 'showProbes' ).name( 'Show Probes' ).onChange( ( value ) => helpers.visible = value && ! capturing );
-				gui.add( params, 'showGrid' ).name( 'Show Grid' ).onChange( ( value ) => grid.visible = value && ! capturing );
-				gui.add( params, 'boxProjection' ).name( 'Box Projection' ).onChange( ( value ) => system.boxProjection = value );
-				gui.add( roughness, 'value', 0, 1, 0.01 ).name( 'Roughness' );
-				gui.add( params, 'gridResolution', 2, 12, 1 ).name( 'Grid Resolution' ).onChange( updateGrid );
-				gui.add( params, 'gridSize', 0.05, 0.3, 0.01 ).name( 'Grid Sphere Size' ).onChange( updateGrid );
 				gui.add( params, 'resolution', [ 64, 128, 256, 512, 1024 ] ).name( 'Capture Resolution' );
 				gui.add( params, 'filter', [ 'PMREM', 'LOD MIP' ] ).name( 'Filter' );
 				gui.add( params, 'capture' ).name( 'Capture' );
-				gui.add( params, 'realtime' ).name( 'Realtime Updates' );
-				gui.add( params, 'updateInterval', 0.5, 5, 0.1 ).name( 'Update Interval (seconds)' );
+				gui.add( params, 'boxProjection' ).name( 'Box Projection' ).onChange( ( value ) => system.boxProjection = value );
+
+				const dynamicTest = gui.addFolder( 'Dynamic Test' );
+				dynamicTest.add( params, 'dynamicObject', [ 'None', 'Bunny', 'Sphere' ] ).name( 'Object' ).onChange( ( value ) => {
+
+					if ( value !== 'None' ) dynamicObject.geometry = dynamicGeometries[ value ];
+					dynamicObject.visible = value !== 'None' && ! capturing;
+
+				} );
+				dynamicTest.add( params, 'pause' ).name( 'Pause' );
+				dynamicTest.add( dynamicRoughness, 'value', 0, 1, 0.01 ).name( 'Roughness' );
+
+				const staticTest = gui.addFolder( 'Static Test' );
+				staticTest.add( params, 'showGrid' ).name( 'Grid' ).onChange( ( value ) => grid.visible = value && ! capturing );
+				staticTest.add( params, 'gridResolution', 2, 12, 1 ).name( 'Grid resolution' ).onChange( updateGrid );
+				staticTest.add( gridRoughness, 'value', 0, 1, 0.01 ).name( 'Grid roughness' );
+
+				const internalStructure = gui.addFolder( 'Internal Structure' );
+				internalStructure.add( params, 'showProbes' ).name( 'Influence boxes and probes' ).onChange( ( value ) => helpers.visible = value && ! capturing );
+				internalStructure.add( probeRoughness, 'value', 0, 1, 0.01 ).name( 'Probe roughness' );
 
 				window.addEventListener( 'resize', () => {
 
@@ -337,23 +388,38 @@
 					renderer.setSize( window.innerWidth, window.innerHeight );
 
 				} );
-				renderer.setAnimationLoop( () => {
+				let animationTime = 0;
+				let previousTime = null;
+
+				renderer.setAnimationLoop( ( time ) => {
+
+					const delta = previousTime === null ? 0 : ( time - previousTime ) / 1000;
+					previousTime = time;
 
 					if ( ! capturing ) {
 
-						if ( params.realtime && performance.now() - lastCapture >= params.updateInterval * 1000 ) {
+						if ( ! params.pause && params.dynamicObject !== 'None' ) {
 
-							capture();
-
-						} else {
-
-							renderer.render( scene, camera );
+							animationTime += delta;
+							updateDynamicObject( animationTime );
 
 						}
+
+						renderer.render( scene, camera );
 
 					}
 
 				} );
+
+			}
+
+			function updateDynamicObject( time ) {
+
+				// A figure eight around both room centers, crossing x=0 at the doorway.
+				// Stay above the table objects and inside the rows of columns at z=+/-2.5.
+				const phase = time * 0.35;
+				dynamicObject.position.set( 5.6 * Math.sin( phase ), 2.5, 1.4 * Math.sin( 2 * phase ) );
+				dynamicObject.rotation.y = Math.atan2( 5.6 * Math.cos( phase ), 2.8 * Math.cos( 2 * phase ) );
 
 			}
 
@@ -404,12 +470,13 @@
 				document.body.dataset.capturing = 'true';
 				status.textContent = 'Capturing and filtering three probes...';
 				helpers.visible = grid.visible = false;
+				if ( dynamicObject ) dynamicObject.visible = false;
 				try {
 
 					const resolution = Number( params.resolution );
 					const filter = params.filter;
 					const elapsed = await system.capture( renderer, scene, { resolution, filter } );
-					status.textContent = `Last Capture: ${ elapsed.toFixed( 1 ) } ms | ${ resolution }px | ${ filter } (CPU + GPU completed, including filtering and atlas copy; first use includes compilation)`;
+					status.textContent = `Last capture: ${ elapsed.toFixed( 1 ) } ms`;
 					document.body.dataset.ready = 'true';
 
 				} catch ( error ) {
@@ -420,8 +487,8 @@
 				} finally {
 
 					helpers.visible = params.showProbes;
+					if ( dynamicObject ) dynamicObject.visible = params.dynamicObject !== 'None';
 					grid.visible = params.showGrid;
-					lastCapture = performance.now();
 					capturing = false;
 					document.body.dataset.capturing = 'false';
 
