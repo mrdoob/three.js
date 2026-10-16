@@ -1,4 +1,4 @@
-import { BackSide, CustomBlending, DoubleSide, HalfFloatType, Mesh, MeshLambertNodeMaterial, NodeMaterial, OneFactor, OrthographicCamera, QuadMesh, RendererUtils, RenderTarget, Scene, Vector2 } from 'three/webgpu';
+import { BackSide, CustomBlending, DoubleSide, FloatType, HalfFloatType, Mesh, MeshLambertNodeMaterial, NodeMaterial, OneFactor, OrthographicCamera, QuadMesh, RendererUtils, RenderTarget, Scene, Vector2 } from 'three/webgpu';
 import { Fn, If, Loop, ivec2, lights, normalViewGeometry, normalWorldGeometry, output, positionWorld, screenCoordinate, textureLoad, uniform, uv, vec4 } from 'three/tsl';
 
 let _rendererState;
@@ -77,7 +77,14 @@ class LightMapper {
 		 */
 		this.samples = 0;
 
-		this._accumulation = new RenderTarget( size, size, { type: HalfFloatType, depthBuffer: false } );
+		// the samples are summed with additive blending, into float targets if the renderer supports
+		// 'float32-blendable'. Half floats count exactly only up to 2048 samples, more samples would
+		// stop the count while the sums keep growing
+
+		const floatBlendable = renderer.hasFeature( 'float32-blendable' );
+
+		this._accumulation = new RenderTarget( size, size, { type: floatBlendable ? FloatType : HalfFloatType, depthBuffer: false } );
+		this._maxSamples = floatBlendable ? Infinity : 2048;
 		this._renderTarget = new RenderTarget( size, size, { type: HalfFloatType, depthBuffer: false } );
 		this._renderTarget.texture.channel = 1;
 
@@ -165,13 +172,16 @@ class LightMapper {
 	}
 
 	/**
-	 * Accumulates samples into the light map.
+	 * Accumulates samples into the light map. Without the 'float32-blendable' renderer feature,
+	 * at most 2048 samples are accumulated.
 	 *
 	 * @param {number} [samples=1] - The number of samples to add.
 	 */
 	update( samples = 1 ) {
 
 		const renderer = this.renderer;
+
+		samples = Math.min( samples, this._maxSamples - this.samples );
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
