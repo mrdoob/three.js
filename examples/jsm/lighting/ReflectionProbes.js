@@ -1,5 +1,6 @@
 import {
 	Box3,
+	CubeArrayTexture,
 	CubeReflectionMapping,
 	HalfFloatType,
 	LinearMipmapLinearFilter,
@@ -193,11 +194,11 @@ class ReflectionProbes extends Object3D {
 			type: HalfFloatType,
 			depthBuffer: false,
 			generateMipmaps: false,
-			minFilter: LinearMipmapLinearFilter
+			minFilter: LinearMipmapLinearFilter,
+			mapping: CubeReflectionMapping
 		} );
 
-		renderTarget.texture.isCubeArrayTexture = true;
-		renderTarget.texture.mapping = CubeReflectionMapping;
+		renderTarget.texture = new CubeArrayTexture().copy( renderTarget.texture );
 		renderTarget.texture.name = 'ReflectionProbes';
 
 		for ( let lod = 0; lod <= maxLod; lod ++ ) {
