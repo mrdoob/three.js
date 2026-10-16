@@ -1,5 +1,4 @@
 import DataMap from './DataMap.js';
-import BindGroup from './BindGroup.js';
 import { AttributeType } from './Constants.js';
 import { hashString } from '../../nodes/core/NodeUtils.js';
 
@@ -138,20 +137,26 @@ class Bindings extends DataMap {
 	}
 
 	/**
-	 * Returns the shared bind group for the given bindings and the current render context.
-	 * If it does not exist yet, it is created with the given name and bindings.
+	 * Returns the shared bind group of the given render context that corresponds to the given bind group.
 	 *
-	 * @param {string} name - The bind group's name.
-	 * @param {Array<Binding>} bindings - An array of bindings.
+	 * @param {BindGroup} bindGroup - The bind group.
+	 * @param {?RenderContext} [renderContext=null] - The render context. If not set, the current render context is used.
 	 * @return {BindGroup} The shared bind group.
 	 */
-	getSharedBindGroup( name, bindings ) {
+	getSharedBindGroup( bindGroup, renderContext = null ) {
+
+		if ( renderContext === null ) {
+
+			const renderer = this.backend.renderer;
+			renderContext = renderer._currentRenderContext || renderer; // use renderer as fallback until we have a compute context
+
+		}
 
 		// build cache key
 
 		let cacheKeyString = '';
 
-		for ( const binding of bindings ) {
+		for ( const binding of bindGroup.bindings ) {
 
 			if ( binding.isNodeUniformsGroup ) {
 
@@ -175,9 +180,6 @@ class Bindings extends DataMap {
 
 		// lookup bind group cache
 
-		const renderer = this.backend.renderer;
-		const renderContext = renderer._currentRenderContext || renderer; // use renderer as fallback until we have a compute context
-
 		let bindGroupsCache = this._sharedBindGroups.get( renderContext );
 
 		if ( bindGroupsCache === undefined ) {
@@ -190,21 +192,23 @@ class Bindings extends DataMap {
 
 		// lookup bind group
 
-		let bindGroup = bindGroupsCache.get( cacheKey );
+		let sharedBindGroup = bindGroupsCache.get( cacheKey );
 
-		if ( bindGroup === undefined ) {
+		if ( sharedBindGroup === undefined ) {
 
-			bindGroup = new BindGroup( name, bindings );
+			// make sure shared bindings are cloned per render context
 
-			bindGroupsCache.set( cacheKey, bindGroup );
+			sharedBindGroup = this.has( bindGroup ) ? bindGroup.clone() : bindGroup;
 
-			const groupData = this.get( bindGroup );
+			bindGroupsCache.set( cacheKey, sharedBindGroup );
+
+			const groupData = this.get( sharedBindGroup );
 			groupData.renderContext = renderContext;
 			groupData.cacheKey = cacheKey;
 
 		}
 
-		return bindGroup;
+		return sharedBindGroup;
 
 	}
 
