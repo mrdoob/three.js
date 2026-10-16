@@ -766,7 +766,7 @@ class GLTFWriter {
 	/**
 	 * Serializes a userData.
 	 *
-	 * @param {THREE.Object3D|THREE.Material|THREE.BufferGeometry|THREE.AnimationClip} object
+	 * @param {THREE.Object3D|THREE.Material|THREE.BufferGeometry|THREE.AnimationClip|THREE.Texture} object
 	 * @param {Object} objectDef
 	 */
 	serializeUserData( object, objectDef ) {
@@ -1561,6 +1561,8 @@ class GLTFWriter {
 			wrapS: THREE_TO_WEBGL[ map.wrapS ],
 			wrapT: THREE_TO_WEBGL[ map.wrapT ]
 		};
+
+		this.serializeUserData( map, samplerDef );
 
 		return json.samplers.push( samplerDef ) - 1;
 
