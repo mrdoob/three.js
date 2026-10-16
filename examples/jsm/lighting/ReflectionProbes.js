@@ -74,28 +74,6 @@ class ReflectionProbe extends Object3D {
 
 	}
 
-	/**
-	 * Returns the inward face-distance fade at the given world position, or
-	 * zero outside the influence volume.
-	 *
-	 * @param {Vector3} position - The world position.
-	 * @return {number} The fade weight.
-	 */
-	getWeight( position ) {
-
-		this.getWorldPosition( _position );
-		this.getWorldScale( _size ).multiply( this.size ).multiplyScalar( 0.5 );
-
-		const distance = Math.min(
-			_size.x - Math.abs( position.x - _position.x ),
-			_size.y - Math.abs( position.y - _position.y ),
-			_size.z - Math.abs( position.z - _position.z )
-		);
-
-		return Math.min( Math.max( distance / Math.max( this.blendDistance, 1e-6 ), 0 ), 1 );
-
-	}
-
 	copy( source, recursive ) {
 
 		super.copy( source, recursive );
@@ -201,8 +179,8 @@ class ReflectionProbes extends Object3D {
 	 */
 	bake( renderer, scene, options = {} ) {
 
+		// cube arrays can't be emulated on WebGL 2
 		if ( renderer.backend.isWebGPUBackend !== true ) throw new Error( 'ReflectionProbes: .bake() requires the WebGPU backend.' );
-		if ( this.capturing ) throw new Error( 'ReflectionProbes: A bake is already in progress.' );
 
 		const { resolution = 128, near = 0.1, far = 100 } = options;
 
@@ -280,29 +258,6 @@ class ReflectionProbes extends Object3D {
 		this._renderTarget = renderTarget;
 		this.texture = renderTarget.texture;
 		this.bakedProbes = probes;
-
-	}
-
-	/**
-	 * Returns the per-probe weights at the given world position, using the same
-	 * front-to-back combination as the shader.
-	 *
-	 * @param {Vector3} position - The world position.
-	 * @return {{weights: Array<number>, environmentWeight: number}} The weights.
-	 */
-	getWeights( position ) {
-
-		let remaining = 1;
-
-		const weights = this.bakedProbes.map( ( probe ) => {
-
-			const weight = probe.getWeight( position ) * remaining;
-			remaining -= weight;
-			return weight;
-
-		} );
-
-		return { weights, environmentWeight: remaining };
 
 	}
 

@@ -6,7 +6,8 @@ const _scale = /*@__PURE__*/ new Vector3();
 /**
  * Environment radiance from a baked {@link ReflectionProbes} set, with per-pixel
  * volume weights and box projection. Assign it to `scene.environmentNode` so
- * every physical material samples it with its own roughness and normal.
+ * every physical material samples it with its own roughness and normal. Bake
+ * the probes before creating the node.
  *
  * @augments Node
  * @three_import import { reflectionProbes } from 'three/addons/tsl/lighting/ReflectionProbesNode.js';
@@ -27,8 +28,6 @@ class ReflectionProbesNode extends Node {
 	constructor( probes ) {
 
 		super( 'vec3' );
-
-		if ( probes.texture === null ) throw new Error( 'ReflectionProbesNode: Bake the probes before creating the node.' );
 
 		/**
 		 * The probe set.
@@ -82,7 +81,7 @@ class ReflectionProbesNode extends Node {
 			slot.fade.value = probe.blendDistance;
 			slot.project.value = probes.boxProjection && probe.projectionSize !== null ? 1 : 0;
 
-			if ( probe.projectionSize !== null ) slot.projectionExtent.value.copy( probe.projectionSize ).multiply( _scale ).multiplyScalar( 0.5 );
+			if ( probe.projectionSize !== null ) slot.projectionSize.value.copy( probe.projectionSize ).multiply( _scale );
 
 		}
 
@@ -94,7 +93,7 @@ class ReflectionProbesNode extends Node {
 			position: uniform( new Vector3() ),
 			extent: uniform( new Vector3() ),
 			fade: uniform( 0.5 ),
-			projectionExtent: uniform( new Vector3() ),
+			projectionSize: uniform( new Vector3() ),
 			project: uniform( 0 )
 		} ) );
 
@@ -106,6 +105,7 @@ class ReflectionProbesNode extends Node {
 
 		return Fn( () => {
 
+			// same roughness to mip mapping as PMREMNode
 			const lod = this._maxLod.mul( roughness ).mul( float( 2 ).sub( roughness ) );
 			const radiance = vec3( 0 ).toVar();
 			const remaining = float( this._local ).toVar();
@@ -121,14 +121,14 @@ class ReflectionProbesNode extends Node {
 
 				If( weight.greaterThan( 0 ), () => {
 
-					const projectionMin = slot.position.sub( slot.projectionExtent );
-					const projectionMax = slot.position.add( slot.projectionExtent );
-					const safeDirection = direction.greaterThanEqual( 0 ).select( direction.max( 1e-6 ), direction.min( - 1e-6 ) );
-					const distances = direction.greaterThanEqual( 0 ).select( projectionMax, projectionMin ).sub( positionWorld ).div( safeDirection );
-					const hit = distances.x.min( distances.y ).min( distances.z );
-					const projected = local.add( direction.mul( hit ) );
-					const insideProxy = local.abs().lessThanEqual( slot.projectionExtent ).all();
-					const corrected = slot.project.greaterThan( 0 ).and( insideProxy ).select( projected, direction );
+					// like getParallaxCorrectNormal(), but safe for the axis-aligned normals of the irradiance lookup
+					const extent = slot.projectionSize.mul( 0.5 );
+					const positive = direction.greaterThanEqual( 0 );
+					const safeDirection = positive.select( direction.max( 1e-6 ), direction.min( - 1e-6 ) );
+					const distances = positive.select( extent, extent.negate() ).sub( local ).div( safeDirection );
+					const projected = local.add( direction.mul( distances.x.min( distances.y ).min( distances.z ) ) );
+					const insideProjection = local.abs().lessThanEqual( extent ).all();
+					const corrected = slot.project.greaterThan( 0 ).and( insideProjection ).select( projected, direction );
 					radiance.addAssign( this._array.sample( corrected ).depth( int( i ) ).level( lod ).rgb.mul( weight ) );
 
 				} );
