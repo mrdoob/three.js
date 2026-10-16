@@ -1,5 +1,5 @@
 import { Node, Vector3 } from 'three/webgpu';
-import { cubeTexture, float, Fn, If, int, materialEnvRotation, nodeObject, positionWorld, reflectVector, uniform, vec3 } from 'three/tsl';
+import { cubeTexture, float, Fn, getParallaxCorrectNormal, If, int, materialEnvRotation, nodeObject, positionWorld, reflectVector, uniform, vec3 } from 'three/tsl';
 
 const _scale = /*@__PURE__*/ new Vector3();
 
@@ -120,13 +120,8 @@ class ReflectionProbesNode extends Node {
 
 				If( weight.greaterThan( 0 ), () => {
 
-					// like getParallaxCorrectNormal(), but safe for the axis-aligned normals of the irradiance lookup
-					const extent = slot.projectionSize.mul( 0.5 );
-					const positive = direction.greaterThanEqual( 0 );
-					const safeDirection = positive.select( direction.max( 1e-6 ), direction.min( - 1e-6 ) );
-					const distances = positive.select( extent, extent.negate() ).sub( local ).div( safeDirection );
-					const projected = local.add( direction.mul( distances.x.min( distances.y ).min( distances.z ) ) );
-					const insideProjection = local.abs().lessThanEqual( extent ).all();
+					const insideProjection = local.abs().lessThanEqual( slot.projectionSize.mul( 0.5 ) ).all();
+					const projected = getParallaxCorrectNormal( direction, slot.projectionSize, slot.position );
 					const corrected = slot.project.greaterThan( 0 ).and( insideProjection ).select( projected, direction );
 					radiance.addAssign( this._array.sample( corrected ).depth( int( i ) ).level( lod ).rgb.mul( weight ) );
 
