@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - specular probes (multi-room)</title>
+		<title>three.js webgpu - reflection probes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="example.css">
@@ -12,8 +12,8 @@
 	<body>
 		<div id="info">
 			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
-			<div class="title-wrapper"><a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Specular Probes (Multi-Room)</span></div>
-			<small>Specular light probes for dynamic reflections using cube-array by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a></small>
+			<div class="title-wrapper"><a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Reflection Probes</span></div>
+			<small>Box-projected reflection probes blended per pixel by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a></small>
 		</div>
 		<div id="status" class="lbl">Preparing reflection probes...</div>
 		<script type="importmap">
@@ -32,15 +32,14 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
-			import { SpecularProbe } from 'three/addons/lighting/SpecularProbe.js';
-			import { SpecularProbes } from 'three/addons/lighting/SpecularProbes.js';
-			import { specularProbes } from 'three/addons/tsl/lighting/SpecularProbesNode.js';
+			import { ReflectionProbe, ReflectionProbes } from 'three/addons/lighting/ReflectionProbes.js';
+			import { reflectionProbes } from 'three/addons/tsl/lighting/ReflectionProbesNode.js';
 
 			const status = document.getElementById( 'status' );
 			const params = { showProbes: false, probeRoughness: 0.08, dynamicObject: 'Bunny', pause: false, showGrid: false, gridResolution: 6, gridSize: 0.12, resolution: 128, boxProjection: true, capture: capture };
 			const helpers = new THREE.Group();
 			const grid = new THREE.Group();
-			let camera, scene, renderer, controls, system, gridMaterial, dynamicObject;
+			let camera, scene, renderer, controls, probes, gridMaterial, dynamicObject;
 			let capturing = false;
 
 			init().catch( ( error ) => {
@@ -279,15 +278,28 @@
 				controls.target.set( 0, 2.5, 0 );
 				controls.update();
 
-				const box = ( min, max ) => new THREE.Box3( new THREE.Vector3( ...min ), new THREE.Vector3( ...max ) );
-				const probes = [
-					new SpecularProbe( { position: new THREE.Vector3( - 4, 2.3, 0 ), influenceBox: box( [ - 8.2, - 0.2, - 4.2 ], [ 0.4, 5.2, 4.2 ] ), projectionBox: box( [ - 8, 0, - 4 ], [ 0, 5, 4 ] ), blendDistance: 0.5, near: 0.05, far: 30 } ),
-					new SpecularProbe( { position: new THREE.Vector3( 4, 2.3, 0 ), influenceBox: box( [ - 0.4, - 0.2, - 4.2 ], [ 8.2, 5.2, 4.2 ] ), projectionBox: box( [ 0, 0, - 4 ], [ 8, 5, 4 ] ), blendDistance: 0.5, near: 0.05, far: 30 } ),
-					new SpecularProbe( { position: new THREE.Vector3( 0, 2.3, 0 ), influenceBox: box( [ - 1.2, - 0.2, - 1.5 ], [ 1.2, 4, 1.5 ] ), projectionBox: box( [ - 8, 0, - 4 ], [ 8, 5, 4 ] ), blendDistance: 0.5, near: 0.05, far: 30 } )
+				// One probe per room plus a smaller doorway probe, which takes priority where they overlap.
+
+				probes = new ReflectionProbes();
+
+				const probeSetup = [
+					{ position: [ - 4, 2.5, 0 ], size: [ 8.4, 5.4, 8.4 ], projectionSize: [ 8, 5, 8 ] },
+					{ position: [ 4, 2.5, 0 ], size: [ 8.4, 5.4, 8.4 ], projectionSize: [ 8, 5, 8 ] },
+					{ position: [ 0, 2.5, 0 ], size: [ 2.4, 5.4, 3 ], projectionSize: [ 16, 5, 8 ] }
 				];
-				system = new SpecularProbes( probes );
+
+				for ( const setup of probeSetup ) {
+
+					const probe = new ReflectionProbe( ...setup.size );
+					probe.position.set( ...setup.position );
+					probe.projectionSize = new THREE.Vector3( ...setup.projectionSize );
+					probes.add( probe );
+
+				}
+
+				scene.add( probes );
 				await capture();
-				scene.environmentNode = specularProbes( system );
+				scene.environmentNode = reflectionProbes( probes );
 
 				// Each test surface evaluates the probe blend at its own world position.
 
@@ -326,13 +338,14 @@
 				const colors = [ 0xffaaaa, 0xaaccff, 0xffee99 ];
 				const boxColors = [ 0xff3333, 0x3388ff, 0xffcc00 ];
 				const markerMaterials = [];
-				for ( let i = 0; i < probes.length; i ++ ) {
+				for ( let i = 0; i < probes.children.length; i ++ ) {
 
+					const probe = probes.children[ i ];
 					const material = new THREE.MeshStandardMaterial( { color: colors[ i ], metalness: 1, roughness: 0.08 } );
 					markerMaterials.push( material );
 					const marker = new THREE.Mesh( new THREE.SphereGeometry( 0.28, 32, 16 ), material );
-					marker.position.copy( probes[ i ].position );
-					helpers.add( marker, new THREE.Box3Helper( probes[ i ].influenceBox, boxColors[ i ] ) );
+					marker.position.copy( probe.position );
+					helpers.add( marker, new THREE.Box3Helper( new THREE.Box3().setFromCenterAndSize( probe.position, probe.size ), boxColors[ i ] ) );
 
 				}
 
@@ -340,10 +353,10 @@
 				scene.add( helpers, grid, dynamicObject );
 				updateGrid();
 
-				const gui = renderer.inspector.createParameters( 'Specular Probes' );
+				const gui = renderer.inspector.createParameters( 'Reflection Probes' );
 				gui.add( params, 'resolution', [ 64, 128, 256, 512, 1024 ] ).name( 'Capture Resolution' );
 				gui.add( params, 'capture' ).name( 'Capture' );
-				gui.add( params, 'boxProjection' ).name( 'Box Projection' ).onChange( ( value ) => system.boxProjection = value );
+				gui.add( params, 'boxProjection' ).name( 'Box Projection' ).onChange( ( value ) => probes.boxProjection = value );
 
 				const dynamicTest = gui.addFolder( 'Dynamic Test' );
 				dynamicTest.add( params, 'dynamicObject', [ 'None', 'Bunny', 'Sphere' ] ).name( 'Object' ).onChange( ( value ) => {
@@ -448,7 +461,7 @@
 
 			async function capture() {
 
-				if ( capturing || ! system ) return;
+				if ( capturing || ! probes ) return;
 				capturing = true;
 				document.body.dataset.capturing = 'true';
 				status.textContent = 'Capturing and filtering three probes...';
@@ -456,9 +469,13 @@
 				if ( dynamicObject ) dynamicObject.visible = false;
 				try {
 
-					const resolution = Number( params.resolution );
-					const elapsed = await system.capture( renderer, scene, { resolution } );
-					status.textContent = `Last capture: ${ elapsed.toFixed( 1 ) } ms`;
+					// Time GPU completion, not just submission.
+					const queue = renderer.backend.device.queue;
+					await queue.onSubmittedWorkDone();
+					const start = performance.now();
+					probes.bake( renderer, scene, { resolution: Number( params.resolution ), near: 0.05, far: 30 } );
+					await queue.onSubmittedWorkDone();
+					status.textContent = `Last capture: ${ ( performance.now() - start ).toFixed( 1 ) } ms`;
 					document.body.dataset.ready = 'true';
 
 				} catch ( error ) {
