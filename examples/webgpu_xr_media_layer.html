@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js vr - 360 stereo video</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+		<div id="main-container">
+			<div id="container">
+				<video id="video" muted loop crossOrigin="anonymous" playsinline style="display:none">
+				</video>
+			</div>
+		</div>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - 360 stereo/mono video native media layers<br />
+			stereoscopic panoramic render by <a href="http://pedrofe.com/rendering-for-oculus-rift-with-arnold/" target="_blank" rel="noopener">pedrofe</a>. scene from <a href="http://www.meryproject.com/" target="_blank" rel="noopener">mery project</a>.<br />
+			Choose Layout: <select id="layout-select">
+				<option data-layout="stereo-top-bottom-360">Stereo TB 360</option>
+				<option data-layout="stereo-left-right-360">Stereo LR 360</option>
+				<option data-layout="stereo-top-bottom-180">Stereo TB 180</option>
+				<option data-layout="mono">Mono</option>
+				<option data-layout="quad">Quad</option>
+				<option data-layout="quad-stereo">Quad Stereo</option>
+			</select>
+		</div>
+
+		
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			
+
+			import * as THREE from 'three';
+			import { VRButton } from 'three/addons/webxr/VRButton.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
+
+			let camera, scene, renderer, controls, parentNode;
+
+			const isQuest = ( /Quest/i ).test( navigator.userAgent ),
+				sources = {
+					'stereo-top-bottom-360': {
+						'src': 'https://oculus-mp4.s3.amazonaws.com/immersive+video+8K+for+Oculus+Browser/everestvr_4.3k_30s_360_h264_crf23_binaural_CREDIT_JON_GRIFFITH_injected.mp4',
+						'quaternion': {},
+						'translation': {},
+						'targetXPos': 0,
+						'layout': 'stereo-top-bottom'
+					},
+					'stereo-left-right-360': {
+						'src': 'textures/MaryOculus.mp4',
+						'quaternion': { x: 0, y: .28, z: 0, w: .96 },
+						'translation': {},
+						'targetXPos': 0,
+						'layout': 'stereo-left-right'
+					},
+					'stereo-top-bottom-180': {
+						'src': 'https://oculus-mp4.s3.amazonaws.com/immersive+video+8K+for+Oculus+Browser/everestvr_6.2k_30s_180_TB_h264_crf27_CREDIT_JON_GRIFFITH-injected.mp4',
+						'quartonian': { },
+						'translation': {},
+						'targetXPos': 0,
+						'layout': 'stereo-top-bottom',
+						'is180': true
+					},
+					'mono': {
+						'src': 'textures/pano.mp4',
+						'quaternion': {},
+						'translation': {},
+						'targetXPos': - ( Math.PI / 2 ),
+						'layout': 'mono'
+					},
+					'quad': {
+						'src': 'textures/pano.mp4',
+						'quaternion': new THREE.Quaternion(),
+						'translation': new THREE.Vector3( 0, 0, - 10 ),
+						'targetXPos': 0,
+						'layout': 'mono',
+						'quad': true,
+						//width in meters
+						'quadWidth': 20.45,
+						//height by 16 x 9 ratio
+						'quadHeight': 20.45 / 1.778
+					},
+					'quad-stereo': {
+						'src': 'textures/MaryOculus.mp4',
+						'quaternion': new THREE.Quaternion(),
+						'translation': new THREE.Vector3( 0, 0, - 10 ),
+						'targetXPos': 0,
+						'layout': 'stereo-left-right',
+						'quad': true,
+						//width in meters
+						'quadWidth': 20.45,
+						//height by 16 x 9 ratio
+						'quadHeight': 20.45 / 1.778
+					}
+				};
+
+			init();
+
+			function init() {
+
+				//demo code to select media layout from a select menu or from the `layout` query
+				const layoutSelect = document.getElementById( 'layout-select' ),
+					context = ( window.parent || window ),
+					currentUrl = new URL( context.location.href ),
+					urlParams = currentUrl.searchParams,
+					selectedLayout = urlParams.get( 'layout' ) || 'stereo-top-bottom-360',
+					selectedOption = [ ...layoutSelect.options ].filter( option => option.dataset.layout === selectedLayout )[ 0 ],
+					selectedSourceOption = sources[ selectedLayout ],
+					//selectedMediaLayout = sources[ selectedLayout ].layout,
+					//is180 = sources[ selectedLayout ].is180,
+					selectedSource = selectedSourceOption.src,
+					//selectedMediaTransform = sources[ selectedLayout ].transform,
+					//selectedMediaTranslation = sources[ selectedLayout ].translation,
+					selectedTargetXPos = selectedSourceOption.targetXPos;
+
+				if ( selectedOption ) selectedOption.selected = true;
+
+				layoutSelect.addEventListener( 'change', () => {
+
+					const layout = layoutSelect.options[ layoutSelect.selectedIndex ].dataset.layout;
+					//have to hardcode a location due to how the examples work and bug with Quest starting a second XR session.
+					const path = currentUrl.hash ? `${currentUrl.pathname}webgpu_xr_media_layer.html` : currentUrl.pathname;
+
+					const newUrl = `${currentUrl.origin}${path}?layout=${layout}`;
+					context.location.replace( newUrl );
+			
+				} );
+
+				const container = document.getElementById( 'container' );
+				container.addEventListener( 'click', function () {
+
+					video.play();
+
+				} );
+
+				parentNode = container.parentNode;
+
+				camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.01, 2000 );
+				camera.layers.enable( 1 );
+				camera.rotation.reorder( 'YXZ' );
+
+				const video = document.getElementById( 'video' );
+				video.src = selectedSource;
+				video.play();
+
+				//remove video from DOM for Quest for performance reasons
+				if ( isQuest ) video.parentNode.removeChild( video );
+
+				const texture = new THREE.VideoTexture( video );
+				texture.colorSpace = THREE.SRGBColorSpace;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x505050 );
+			
+				renderer = new THREE.WebGPURenderer( { antialias: false, forceWebGL: true, multiview: false } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColor( 0x000, 1 );
+				renderer.setAnimationLoop( animate );
+				renderer.xr.enabled = true;
+				renderer.xr.setReferenceSpaceType( 'local' );
+
+				//create a native media layer and projection layer / 2D mono/stereo mesh in a group.
+				//media layer position transformation can be applied in a quaternion transformation object.
+				//extra params for the createEquirectLayer method can be applied to the createMediaLayer method.
+				//SphereGeometry is created internally. To specify radius, width and height segements, they can be configured on the createMediaLayer method.
+				//For 180 degrees video set the is180 param to true. This will create a half sphere geoemtry.
+				//Full usage: renderer.xr.createMediaLayer(texture, 'stereo-left-right', { x: 0, y: .28, z: 0, w: .96 }, false, {}, 500, 60, 40);
+				//In this example `selectedMediaLayout` defaults to `stereo-left-right` layout
+				let mediaLayer;
+
+				if ( selectedSourceOption.quad ) {
+			
+					mediaLayer = renderer.xr.createQuadMediaLayer( texture, selectedSourceOption.layout, selectedSourceOption.quadWidth, selectedSourceOption.quadHeight, selectedSourceOption.translation, selectedSourceOption.quaternion );
+			
+				} else {
+
+					mediaLayer = renderer.xr.createMediaLayer( texture, selectedSourceOption.layout, selectedSourceOption.quaternion, selectedSourceOption.is180 );
+			
+				}
+			
+				scene.add( mediaLayer );
+
+				scene.add( new THREE.HemisphereLight( 0xa5a5a5, 0x898989, 3 ) );
+
+				const light = new THREE.DirectionalLight( 0xffffff, 3 );
+				light.position.set( 1, 1, 1 ).normalize();
+				scene.add( light );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				//positions is needed to get orbit controls working
+				controls.target.x = selectedTargetXPos;
+				controls.target.z = - 0.01;
+				controls.enableDamping = true;
+				controls.dampingFactor = 0.05;
+
+				controls.update();
+
+				texture.anisotropy = renderer.backend.capabilities.getMaxAnisotropy();
+
+				container.appendChild( renderer.domElement );
+
+				document.body.appendChild( VRButton.createButton( renderer ) );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				//remove video container from DOM for Quest for performance hit fix with large videos causing crashes
+				if ( isQuest ) {
+
+					renderer.xr.addEventListener( 'sessionstart', () => {
+			
+						//remove canvas from DOM for performance reasons
+						parentNode.removeChild( container );
+
+						video.play();
+			
+					} );
+
+					renderer.xr.addEventListener( 'sessionend', () => {
+			
+						//add canvas back to the DOM
+						parentNode.appendChild( container );
+
+						video.pause();
+
+					} );
+
+				}
+			
+
+				const controller1 = renderer.xr.getController( 0 );
+
+				controller1.addEventListener( 'connected', function ( event ) {
+
+					this.add( buildController( event.data ) );
+
+				} );
+				controller1.addEventListener( 'disconnected', function () {
+
+					this.remove( this.children[ 0 ] );
+
+				} );
+
+				controller1.addEventListener( 'selectstart', () => {
+
+					renderer.xr.getSession().end();
+
+				} );
+
+				scene.add( controller1 );
+
+				const controller2 = renderer.xr.getController( 1 );
+
+				controller2.addEventListener( 'connected', function ( event ) {
+
+					this.add( buildController( event.data ) );
+
+				} );
+				controller2.addEventListener( 'disconnected', function () {
+
+					this.remove( this.children[ 0 ] );
+
+				} );
+
+				controller2.addEventListener( 'selectstart', () => {
+
+					renderer.xr.getSession().end();
+			
+				} );
+
+				scene.add( controller2 );
+
+
+				const controllerModelFactory = new XRControllerModelFactory();
+
+				const controllerGrip1 = renderer.xr.getControllerGrip( 0 );
+				controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
+				scene.add( controllerGrip1 );
+
+				const controllerGrip2 = renderer.xr.getControllerGrip( 1 );
+				controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
+				scene.add( controllerGrip2 );
+
+			}
+
+			function buildController( data ) {
+
+				let geometry, material;
+
+				switch ( data.targetRayMode ) {
+
+					case 'tracked-pointer':
+
+						geometry = new THREE.BufferGeometry();
+						geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 0, 0, - 1 ], 3 ) );
+						geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( [ 0.5, 0.5, 0.5, 0, 0, 0 ], 3 ) );
+
+						material = new THREE.LineBasicMaterial( { vertexColors: true, blending: THREE.AdditiveBlending } );
+
+						return new THREE.Line( geometry, material );
+
+					case 'gaze':
+
+						geometry = new THREE.RingGeometry( 0.02, 0.04, 32 ).translate( 0, 0, - 1 );
+						material = new THREE.MeshBasicMaterial( { opacity: 0.5, transparent: true } );
+						return new THREE.Mesh( geometry, material );
+
+				}
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				controls.update();
+				renderer.render( scene, camera );
+			
+
+			}
+
+		</script>
+	</body>
+</html>
