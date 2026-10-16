@@ -71,7 +71,7 @@
 			// Radiosity samples are cheap, so several are baked per frame. Ray radiosity samples the
 			// emissive panel directly and converges with far fewer samples
 
-			const bakeSamples = { 'Radiosity': 8192, 'Ray Radiosity': 128, 'Light Probe': 16, 'VXGI': 64 };
+			const bakeSamples = { 'Radiosity': 8192, 'Ray Radiosity': 32, 'Light Probe': 16, 'VXGI': 64 };
 			const samplesPerFrame = { 'Radiosity': 4, 'Ray Radiosity': 1, 'Light Probe': 1, 'VXGI': 1 };
 
 			init();
