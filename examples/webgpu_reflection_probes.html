@@ -32,7 +32,7 @@
 			import { reflectionProbes } from 'three/addons/tsl/lighting/ReflectionProbesNode.js';
 			import { ReflectionProbesHelper } from 'three/addons/helpers/ReflectionProbesHelper.js';
 
-			const params = { showProbes: false, dynamicObject: 'Bunny', pause: false, showGrid: false, gridResolution: 6, gridSize: 0.12, resolution: 128, boxProjection: true, capture: capture, lastCapture: '' };
+			const params = { showProbes: false, dynamicObject: 'Bunny', pause: false, showGrid: false, gridResolution: 6, gridSize: 0.12, resolution: 128, boxProjection: true, capture: capture };
 			const grid = new THREE.Group();
 			const timer = new THREE.Timer();
 			let camera, scene, renderer, controls, probes, probesHelper, gridMaterial, dynamicObject;
@@ -253,14 +253,13 @@
 				coolLight.shadow.bias = - 0.002;
 				scene.add( coolLight );
 
-				// Renderer and controls match webgpu_lightprobes_complex.
+				// Renderer
 
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.toneMappingExposure = 1.0;
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 				await renderer.init();
@@ -274,14 +273,14 @@
 				probes = new ReflectionProbes();
 
 				const probeSetup = [
-					{ position: [ - 4, 2.5, 0 ], size: [ 8.4, 5.4, 8.4 ], projectionSize: [ 8, 5, 8 ] },
-					{ position: [ 4, 2.5, 0 ], size: [ 8.4, 5.4, 8.4 ], projectionSize: [ 8, 5, 8 ] },
-					{ position: [ 0, 2.5, 0 ], size: [ 2.4, 5.4, 3 ], projectionSize: [ 16, 5, 8 ] }
+					{ position: [ - 4, 2.5, 0 ], influenceSize: [ 8.4, 5.4, 8.4 ], projectionSize: [ 8, 5, 8 ] },
+					{ position: [ 4, 2.5, 0 ], influenceSize: [ 8.4, 5.4, 8.4 ], projectionSize: [ 8, 5, 8 ] },
+					{ position: [ 0, 1.9, 0 ], influenceSize: [ 2.4, 3.8, 2.5 ], projectionSize: [ 16, 3.8, 8 ] }
 				];
 
 				for ( const setup of probeSetup ) {
 
-					const probe = new ReflectionProbe( ...setup.size );
+					const probe = new ReflectionProbe( ...setup.influenceSize );
 					probe.position.set( ...setup.position );
 					probe.projectionSize = new THREE.Vector3( ...setup.projectionSize );
 					probes.add( probe );
@@ -296,22 +295,14 @@
 				const dynamicMaterial = new THREE.MeshStandardMaterial( { metalness: 1, roughness: 0 } );
 
 				const loader = new DRACOLoader();
-				let bunnyGeometry;
-				try {
-
-					bunnyGeometry = await loader.loadAsync( 'models/draco/bunny.drc' );
-
-				} finally {
-
-					loader.dispose();
-
-				}
+				const bunnyGeometry = await loader.loadAsync( 'models/draco/bunny.drc' );
+				loader.dispose();
 
 				bunnyGeometry.computeVertexNormals();
 				bunnyGeometry.center();
 				bunnyGeometry.computeBoundingBox();
 				const bunnySize = bunnyGeometry.boundingBox.getSize( new THREE.Vector3() );
-				// The bunny's longest dimension is 4.5 times the original grid sphere diameter.
+				// The bunny's longest dimension is 4.5 times the grid sphere diameter.
 				const bunnyScale = 4.5 * 2 * params.gridSize / Math.max( bunnySize.x, bunnySize.y, bunnySize.z );
 				bunnyGeometry.scale( bunnyScale, bunnyScale, bunnyScale );
 				const dynamicGeometries = {
@@ -332,13 +323,12 @@
 
 				// Every physical material picks up the probes, like scene.environment.
 
-				await capture();
+				capture();
 				scene.environmentNode = reflectionProbes( probes );
 
 				const gui = renderer.inspector.createParameters( 'Reflection Probes' );
 				gui.add( params, 'resolution', [ 64, 128, 256, 512, 1024 ] ).name( 'Capture Resolution' );
 				gui.add( params, 'capture' ).name( 'Capture' );
-				gui.add( params, 'lastCapture' ).name( 'Last capture' ).listen();
 				gui.add( params, 'boxProjection' ).name( 'Box Projection' ).onChange( ( value ) => probes.boxProjection = value );
 
 				const dynamicTest = gui.addFolder( 'Dynamic Test' );
@@ -436,13 +426,7 @@
 
 			}
 
-			async function capture() {
-
-				// Time GPU completion, not just submission.
-
-				const queue = renderer.backend.device.queue;
-				await queue.onSubmittedWorkDone();
-				const start = performance.now();
+			function capture() {
 
 				// Keep helpers and test objects out of the reflections.
 
@@ -451,9 +435,6 @@
 				probesHelper.visible = params.showProbes;
 				grid.visible = params.showGrid;
 				dynamicObject.visible = params.dynamicObject !== 'None';
-
-				await queue.onSubmittedWorkDone();
-				params.lastCapture = `${ ( performance.now() - start ).toFixed( 1 ) } ms`;
 
 			}
 
