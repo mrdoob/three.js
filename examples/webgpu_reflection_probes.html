@@ -34,12 +34,12 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { ReflectionProbe, ReflectionProbes } from 'three/addons/lighting/ReflectionProbes.js';
 			import { reflectionProbes } from 'three/addons/tsl/lighting/ReflectionProbesNode.js';
+			import { ReflectionProbesHelper } from 'three/addons/helpers/ReflectionProbesHelper.js';
 
 			const status = document.getElementById( 'status' );
-			const params = { showProbes: false, probeRoughness: 0.08, dynamicObject: 'Bunny', pause: false, showGrid: false, gridResolution: 6, gridSize: 0.12, resolution: 128, boxProjection: true, capture: capture };
-			const helpers = new THREE.Group();
+			const params = { showProbes: false, dynamicObject: 'Bunny', pause: false, showGrid: false, gridResolution: 6, gridSize: 0.12, resolution: 128, boxProjection: true, capture: capture };
 			const grid = new THREE.Group();
-			let camera, scene, renderer, controls, probes, gridMaterial, dynamicObject;
+			let camera, scene, renderer, controls, probes, probesHelper, gridMaterial, dynamicObject;
 			let capturing = false;
 
 			init().catch( ( error ) => {
@@ -335,22 +335,10 @@
 				dynamicObject.visible = params.dynamicObject !== 'None';
 				updateDynamicObject( 0 );
 
-				const colors = [ 0xffaaaa, 0xaaccff, 0xffee99 ];
-				const boxColors = [ 0xff3333, 0x3388ff, 0xffcc00 ];
-				const markerMaterials = [];
-				for ( let i = 0; i < probes.children.length; i ++ ) {
-
-					const probe = probes.children[ i ];
-					const material = new THREE.MeshStandardMaterial( { color: colors[ i ], metalness: 1, roughness: 0.08 } );
-					markerMaterials.push( material );
-					const marker = new THREE.Mesh( new THREE.SphereGeometry( 0.28, 32, 16 ), material );
-					marker.position.copy( probe.position );
-					helpers.add( marker, new THREE.Box3Helper( new THREE.Box3().setFromCenterAndSize( probe.position, probe.size ), boxColors[ i ] ) );
-
-				}
-
-				helpers.visible = params.showProbes;
-				scene.add( helpers, grid, dynamicObject );
+				probesHelper = new ReflectionProbesHelper( probes );
+				probesHelper.material.roughness = 0.08;
+				probesHelper.visible = params.showProbes;
+				scene.add( probesHelper, grid, dynamicObject );
 				updateGrid();
 
 				const gui = renderer.inspector.createParameters( 'Reflection Probes' );
@@ -374,8 +362,8 @@
 				staticTest.add( gridMaterial, 'roughness', 0, 1, 0.01 ).name( 'Grid roughness' );
 
 				const internalStructure = gui.addFolder( 'Internal Structure' );
-				internalStructure.add( params, 'showProbes' ).name( 'Influence boxes and probes' ).onChange( ( value ) => helpers.visible = value && ! capturing );
-				internalStructure.add( params, 'probeRoughness', 0, 1, 0.01 ).name( 'Probe roughness' ).onChange( ( value ) => markerMaterials.forEach( ( material ) => material.roughness = value ) );
+				internalStructure.add( params, 'showProbes' ).name( 'Influence boxes and probes' ).onChange( ( value ) => probesHelper.visible = value && ! capturing );
+				internalStructure.add( probesHelper.material, 'roughness', 0, 1, 0.01 ).name( 'Probe roughness' );
 
 				window.addEventListener( 'resize', () => {
 
@@ -465,7 +453,8 @@
 				capturing = true;
 				document.body.dataset.capturing = 'true';
 				status.textContent = 'Capturing and filtering three probes...';
-				helpers.visible = grid.visible = false;
+				grid.visible = false;
+				if ( probesHelper ) probesHelper.visible = false;
 				if ( dynamicObject ) dynamicObject.visible = false;
 				try {
 
@@ -485,7 +474,7 @@
 
 				} finally {
 
-					helpers.visible = params.showProbes;
+					if ( probesHelper ) probesHelper.visible = params.showProbes;
 					if ( dynamicObject ) dynamicObject.visible = params.dynamicObject !== 'None';
 					grid.visible = params.showGrid;
 					capturing = false;
