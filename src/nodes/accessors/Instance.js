@@ -123,6 +123,16 @@ function getPreviousMatrix( object ) {
 
 	if ( previous === undefined || previous.count !== matrices.count ) {
 
+		if ( previous === undefined ) {
+
+			object.addEventListener( 'dispose', onPreviousMatrixDispose );
+
+		} else {
+
+			previous.dispose();
+
+		}
+
 		previous = matrices.clone();
 
 		_previousMatrices.set( object, previous );
@@ -130,6 +140,20 @@ function getPreviousMatrix( object ) {
 	}
 
 	return previous;
+
+}
+
+/**
+ * Disposes the instance matrices of the previous frame when the mesh is disposed.
+ *
+ * @param {Object} event - The dispose event.
+ */
+function onPreviousMatrixDispose( { target: object } ) {
+
+	object.removeEventListener( 'dispose', onPreviousMatrixDispose );
+
+	_previousMatrices.get( object ).dispose();
+	_previousMatrices.delete( object );
 
 }
 

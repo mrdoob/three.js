@@ -385,8 +385,6 @@ class RenderObject {
 		 */
 		this.onObjectDispose = () => {
 
-			this._geometries.deleteObjectAttributes( this );
-
 			this.dispose();
 
 		};

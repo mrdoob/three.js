@@ -397,6 +397,14 @@ class InstancedMesh extends Mesh {
 
 		super.dispose();
 
+		this.instanceMatrix.dispose();
+
+		if ( this.instanceColor !== null ) {
+
+			this.instanceColor.dispose();
+
+		}
+
 		if ( this.morphTexture !== null ) {
 
 			this.morphTexture.dispose();

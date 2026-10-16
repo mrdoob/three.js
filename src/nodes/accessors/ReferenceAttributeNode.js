@@ -5,81 +5,13 @@ import { instanceIndex, vertexIndex } from '../core/IndexNode.js';
 import { mat3, mat4 } from '../tsl/TSLBase.js';
 import { getLengthFromType } from '../core/NodeUtils.js';
 
-import { InterleavedBuffer } from '../../core/InterleavedBuffer.js';
 import { InterleavedBufferAttribute } from '../../core/InterleavedBufferAttribute.js';
 
 const _columns = /*@__PURE__*/ new WeakMap();
 
 /**
- * Exposes a buffer attribute with an item size larger than four, like the matrices of an
- * instanced mesh, as an interleaved buffer so its columns can be bound as vertex attributes.
- * The version, usage and update ranges are the ones of the attribute.
- *
- * @private
- * @augments InterleavedBuffer
- */
-class AttributeColumnBuffer extends InterleavedBuffer {
-
-	/**
-	 * Constructs a new attribute column buffer.
-	 *
-	 * @param {BufferAttribute} attribute - The buffer attribute.
-	 */
-	constructor( attribute ) {
-
-		super( attribute.array, attribute.itemSize );
-
-		/**
-		 * The buffer attribute.
-		 *
-		 * @type {BufferAttribute}
-		 */
-		this.attribute = attribute;
-
-		/**
-		 * Whether the buffer is instanced or not.
-		 *
-		 * @type {boolean}
-		 */
-		this.isInstancedInterleavedBuffer = attribute.isInstancedBufferAttribute === true;
-
-		/**
-		 * See {@link InstancedInterleavedBuffer#meshPerAttribute}.
-		 *
-		 * @type {number}
-		 */
-		this.meshPerAttribute = attribute.meshPerAttribute || 1;
-
-	}
-
-	get version() {
-
-		return this.attribute.version;
-
-	}
-
-	set version( value ) {}
-
-	get usage() {
-
-		return this.attribute.usage;
-
-	}
-
-	set usage( value ) {}
-
-	get updateRanges() {
-
-		return this.attribute.updateRanges;
-
-	}
-
-	set updateRanges( value ) {}
-
-}
-
-/**
- * Returns a column of the given buffer attribute.
+ * Returns a column of the given buffer attribute, like a column of the matrices of an
+ * instanced mesh. The column views the attribute itself, so both share the same GPU buffer.
  *
  * @private
  * @param {BufferAttribute} attribute - The buffer attribute.
@@ -91,15 +23,15 @@ function getAttributeColumn( attribute, type, offset ) {
 
 	let columns = _columns.get( attribute );
 
-	if ( columns === undefined || columns.buffer.array !== attribute.array ) {
+	if ( columns === undefined ) {
 
-		columns = { buffer: new AttributeColumnBuffer( attribute ) };
+		columns = [];
 
 		_columns.set( attribute, columns );
 
 	}
 
-	return columns[ offset ] || ( columns[ offset ] = new InterleavedBufferAttribute( columns.buffer, getLengthFromType( type ), offset ) );
+	return columns[ offset ] || ( columns[ offset ] = new InterleavedBufferAttribute( attribute, getLengthFromType( type ), offset ) );
 
 }
 

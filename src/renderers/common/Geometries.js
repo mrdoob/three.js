@@ -414,30 +414,6 @@ class Geometries extends DataMap {
 	}
 
 	/**
-	 * Deletes the attributes that belong to the 3D object of the given render object,
-	 * like instance matrices bound via {@link ReferenceAttributeNode}.
-	 *
-	 * @param {RenderObject} renderObject - The render object.
-	 */
-	deleteObjectAttributes( renderObject ) {
-
-		if ( renderObject.attributes === null ) return;
-
-		for ( const { node } of renderObject.getNodeBuilderState().nodeAttributes ) {
-
-			if ( node && node.isReferenceBufferAttributeNode === true && node.referenceNode.object === null ) {
-
-				const attribute = node.getObjectAttribute( renderObject.object );
-
-				if ( attribute ) this.attributes.delete( this.backend.getBufferAttribute( attribute ) );
-
-			}
-
-		}
-
-	}
-
-	/**
 	 * Deletes the vertex state for the given render object.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
