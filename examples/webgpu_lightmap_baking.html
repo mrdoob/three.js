@@ -52,7 +52,7 @@
 			import { GLTFLightMapExporterExtension } from 'three/addons/exporters/GLTFLightMapExporterExtension.js';
 
 			let camera, scene, renderer, controls, renderPipeline;
-			let spotLight, lightPanel, meshes, materials, atlas, status;
+			let light, lightPanel, meshes, materials, atlas, status;
 			let source, lightMapper, bakedPass, livePass;
 			let busy = false;
 
@@ -149,26 +149,20 @@
 				glossySphere.receiveShadow = true;
 				scene.add( glossySphere );
 
-				// Area light: an emissive panel below the ceiling. Radiosity bakes its direct light with
-				// soft shadows. Light probes and voxels are too coarse for contact shadows, so for them a
-				// live spot light at the panel stands in for it, with a wide cone falling off roughly
-				// like the cosine of the panel and the same luminous flux.
+				// Lights: radiosity bakes the direct light of an emissive area light panel with soft
+				// shadows, light probes and VXGI bake the indirect light of a live point light
 				lightPanel = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), new THREE.MeshStandardMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 20 } ) );
 				lightPanel.rotation.x = Math.PI / 2;
 				lightPanel.position.y = 4.99;
 				scene.add( lightPanel );
 
-				spotLight = new THREE.SpotLight( 0xffffff, 95, 0, Math.PI * 0.45, 1 );
-				spotLight.position.copy( lightPanel.position );
-				spotLight.rotation.x = - Math.PI / 2;
-				spotLight.add( spotLight.target );
-				spotLight.target.position.set( 0, 0, - 1 );
-				spotLight.castShadow = true;
-				spotLight.shadow.mapSize.setScalar( 512 );
-				spotLight.shadow.focus = 0.55; // a 90 degree shadow frustum covers the floor
-				spotLight.shadow.radius = 10;
-				spotLight.shadow.normalBias = - 0.02;
-				scene.add( spotLight );
+				light = new THREE.PointLight( 0xffffff, 40 );
+				light.position.set( 0, 4.5, 0 );
+				light.castShadow = true;
+				light.shadow.mapSize.setScalar( 256 );
+				light.shadow.radius = 10;
+				light.shadow.normalBias = - 0.02;
+				scene.add( light );
 
 				// Renderer
 
@@ -241,11 +235,8 @@
 
 				let irradiance, liveIrradiance;
 
-				// radiosity bakes the direct light of the emissive panel, light probes and VXGI only
-				// bake the indirect light of the live spot light and must not capture the panel again
-
-				spotLight.visible = params.algorithm !== 'Radiosity';
 				lightPanel.visible = params.algorithm === 'Radiosity';
+				light.visible = params.algorithm !== 'Radiosity';
 
 				if ( params.algorithm === 'Radiosity' ) {
 
@@ -279,8 +270,6 @@
 					source = volume;
 
 				}
-
-				lightPanel.visible = true;
 
 				// the light map accumulates one sample per frame in animate()
 
@@ -327,9 +316,9 @@
 				// the HDR range; LightMapper already outputs irradiance without dividing by pi.
 				const lightMap = await readLightMap( renderer, lightMapper.texture );
 
-				// lit materials with the baked irradiance, the spot light stays live with light probes and VXGI
+				// lit materials with the baked irradiance, the point light stays live with light probes and VXGI
 
-				const objects = meshes.map( ( mesh ) => {
+				const objects = meshes.filter( ( mesh ) => mesh.visible ).map( ( mesh ) => {
 
 					const copy = mesh.clone();
 					copy.material = mesh.material.clone();
@@ -341,7 +330,7 @@
 
 				const exporter = new GLTFExporter();
 				exporter.register( ( writer ) => new GLTFLightMapExporterExtension( writer ) );
-				const result = await exporter.parseAsync( spotLight.visible ? [ ...objects, spotLight ] : objects, { binary: true } );
+				const result = await exporter.parseAsync( light.visible ? [ ...objects, light ] : objects, { binary: true } );
 
 				const link = document.createElement( 'a' );
 				link.href = URL.createObjectURL( new Blob( [ result ], { type: 'application/octet-stream' } ) );
