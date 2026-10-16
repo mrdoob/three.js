@@ -26,10 +26,7 @@ import {
 import { warnOnce } from '../../../utils.js';
 
 // Smaller inputs are upsampled so that every PMREM has enough mip levels.
-const MIN_SIZE = 256;
-
-// Smallest size fromScene() accepts when one is requested explicitly.
-const MIN_SCENE_SIZE = 64;
+const MIN_SIZE = 64;
 
 // Log2 of the face size of the roughest mip level. Smaller faces can't
 // represent the diffuse irradiance that is stored in this level.
@@ -114,7 +111,7 @@ class PMREMGenerator {
 
 		const renderer = this._renderer;
 
-		this._setSize( size, MIN_SCENE_SIZE );
+		this._setSize( size );
 
 		if ( renderer.hasInitialized() === false ) {
 
@@ -198,7 +195,7 @@ class PMREMGenerator {
 	/**
 	 * Generates a PMREM from an LDR or HDR equirectangular texture. The cube face
 	 * size is one quarter of the image width, rounded down to a power of two and
-	 * at least 256.
+	 * at least 64.
 	 *
 	 * @param {Texture} equirectangular - The equirectangular texture to be converted.
 	 * @param {?CubeRenderTarget} [renderTarget=null] - The render target to use.
@@ -344,9 +341,9 @@ class PMREMGenerator {
 
 	// private interface
 
-	_setSize( cubeSize, minSize = MIN_SIZE ) {
+	_setSize( cubeSize ) {
 
-		this._cubeSize = Math.max( minSize, floorPowerOfTwo( cubeSize ) );
+		this._cubeSize = Math.max( MIN_SIZE, floorPowerOfTwo( cubeSize ) );
 
 	}
 
