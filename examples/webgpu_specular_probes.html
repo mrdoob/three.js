@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - specular probes (Sponza)</title>
+		<title>three.js webgpu - specular probes (multi-room)</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="example.css">
@@ -12,16 +12,16 @@
 	<body>
 		<div id="info">
 			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
-			<div class="title-wrapper"><a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Specular Probes (Sponza)</span></div>
-			<small>WASD / arrow keys to move, hold mouse button to look. The mirror sphere follows you.<br>Overlapping influence volumes blend two local reflections; no probe graph is required.</small>
+			<div class="title-wrapper"><a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Specular Probes (Multi-Room)</span></div>
+			<small>Orbit to explore the same scene as the diffuse light probe example.<br>Three captured reflection volumes blend per pixel across both rooms and the doorway.</small>
 		</div>
-		<div id="status">Loading Sponza…</div>
+		<div id="status">Preparing reflection probes�</div>
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.webgpu.js",
-					"three/webgpu": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.tsl.js",
+					"three": "../src/Three.WebGPU.js",
+					"three/webgpu": "../src/Three.WebGPU.js",
+					"three/tsl": "../src/Three.TSL.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -30,30 +30,20 @@
 
 			import * as THREE from 'three/webgpu';
 			import { uniform } from 'three/tsl';
-			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
-			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { SpecularProbe } from 'three/addons/lighting/SpecularProbe.js';
 			import { SpecularProbes } from 'three/addons/lighting/SpecularProbes.js';
 			import { specularProbes } from 'three/addons/tsl/lighting/SpecularProbesNode.js';
 
 			const status = document.getElementById( 'status' );
-			const params = {
-				showProbes: false,
-				boxProjection: true,
-				realtime: false,
-				updateInterval: 0.5,
-				loadedProbe: false,
-				recapture: resetCaptures
-			};
+			const params = { showProbes: true, showGrid: false, gridResolution: 6, gridSize: 0.12, resolution: 128, filter: 'PMREM', boxProjection: true, realtime: false, updateInterval: 1, capture: capture };
 			const roughness = uniform( 0.08 );
-			const direction = new THREE.Vector3();
-			const timer = new THREE.Timer();
 			const helpers = new THREE.Group();
-			const markers = [];
-			let bakeIndex = 0;
-			let camera, scene, renderer, controls, sphere, system, loadedTexture;
+			const grid = new THREE.Group();
+			let camera, scene, renderer, controls, system, gridMaterial;
+			let capturing = false;
+			let lastCapture = 0;
 
 			init().catch( ( error ) => {
 
@@ -64,169 +54,374 @@
 
 			async function init() {
 
-				camera = new THREE.PerspectiveCamera( 60, innerWidth / innerHeight, 0.1, 200 );
-				camera.position.set( - 9, 2, 0 );
-				camera.lookAt( 8, 2, 0 );
+				// Camera
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 0, 2.5, 16 );
+
+				// Scene
+
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x111111 );
+
+				// Materials
+
+				const wallMaterial = new THREE.MeshStandardMaterial( { color: 0xcccccc, side: THREE.BackSide } );
+				const whiteMat = new THREE.MeshStandardMaterial( { color: 0xeeeeee } );
+
+				// Room shell: x=-8 to 8, z=-4 to 4, y=0 to 5
+
+				const room = new THREE.Mesh( new THREE.BoxGeometry( 16, 5, 8 ), wallMaterial );
+				room.position.set( 0, 2.5, 0 );
+				room.receiveShadow = true;
+				scene.add( room );
+
+				const redWall = new THREE.Mesh(
+					new THREE.PlaneGeometry( 8, 5 ),
+					new THREE.MeshStandardMaterial( { color: 0xdd2200 } )
+				);
+				redWall.rotation.y = Math.PI / 2;
+				redWall.position.set( - 7.99, 2.5, 0 );
+				scene.add( redWall );
+
+				const blueWall = new THREE.Mesh(
+					new THREE.PlaneGeometry( 8, 5 ),
+					new THREE.MeshStandardMaterial( { color: 0x0044ff } )
+				);
+				blueWall.rotation.y = - Math.PI / 2;
+				blueWall.position.set( 7.99, 2.5, 0 );
+				scene.add( blueWall );
+
+				// Dividing wall at x=0 with doorway
+
+				const dividerMat = new THREE.MeshStandardMaterial( { color: 0xcccccc } );
+				const doorwayHalfGap = 1.25;
+
+				// Left section of divider (z = -4 to -1.25)
+				const dividerLeft = new THREE.Mesh(
+					new THREE.BoxGeometry( 0.3, 5, 4 - doorwayHalfGap ),
+					dividerMat
+				);
+				dividerLeft.position.set( 0, 2.5, - ( doorwayHalfGap + ( 4 - doorwayHalfGap ) / 2 ) );
+				dividerLeft.castShadow = true;
+				dividerLeft.receiveShadow = true;
+				scene.add( dividerLeft );
+
+				// Right section of divider (z = 1.25 to 4)
+				const dividerRight = new THREE.Mesh(
+					new THREE.BoxGeometry( 0.3, 5, 4 - doorwayHalfGap ),
+					dividerMat
+				);
+				dividerRight.position.set( 0, 2.5, doorwayHalfGap + ( 4 - doorwayHalfGap ) / 2 );
+				dividerRight.castShadow = true;
+				dividerRight.receiveShadow = true;
+				scene.add( dividerRight );
+
+				// Lintel above doorway
+				const lintel = new THREE.Mesh(
+					new THREE.BoxGeometry( 0.3, 1.2, doorwayHalfGap * 2 ),
+					dividerMat
+				);
+				lintel.position.set( 0, 4.4, 0 );
+				lintel.castShadow = true;
+				lintel.receiveShadow = true;
+				scene.add( lintel );
+
+				// Left room objects
+
+				// Columns
+				const columnGeom = new THREE.CylinderGeometry( 0.3, 0.3, 4, 16 );
+
+				for ( const x of [ - 6, - 2 ] ) {
+
+					for ( const z of [ - 2.5, 2.5 ] ) {
+
+						const col = new THREE.Mesh( columnGeom, whiteMat );
+						col.position.set( x, 2, z );
+						col.castShadow = true;
+						col.receiveShadow = true;
+						scene.add( col );
+
+					}
+
+				}
+
+				// Table with golden sphere
+				const tableTop = new THREE.Mesh(
+					new THREE.BoxGeometry( 2.4, 0.12, 1.4 ),
+					new THREE.MeshStandardMaterial( { color: 0x886644 } )
+				);
+				tableTop.position.set( - 4, 1.0, 0 );
+				tableTop.castShadow = true;
+				tableTop.receiveShadow = true;
+				scene.add( tableTop );
+
+				const legGeom = new THREE.BoxGeometry( 0.1, 1, 0.1 );
+
+				for ( const x of [ - 5.05, - 2.95 ] ) {
+
+					for ( const z of [ - 0.55, 0.55 ] ) {
+
+						const leg = new THREE.Mesh( legGeom, tableTop.material );
+						leg.position.set( x, 0.5, z );
+						leg.castShadow = true;
+						scene.add( leg );
+
+					}
+
+				}
+
+				const sphere = new THREE.Mesh(
+					new THREE.SphereGeometry( 0.35, 32, 32 ),
+					new THREE.MeshStandardMaterial( { color: 0xffd700, metalness: 0.3, roughness: 0.4 } )
+				);
+				sphere.position.set( - 4, 1.41, 0 );
+				sphere.castShadow = true;
+				sphere.receiveShadow = true;
+				scene.add( sphere );
+
+				// Stepped blocks near red wall
+				const step1 = new THREE.Mesh( new THREE.BoxGeometry( 1.5, 0.5, 1 ), whiteMat );
+				step1.position.set( - 7, 0.25, 0 );
+				step1.castShadow = true;
+				step1.receiveShadow = true;
+				scene.add( step1 );
+
+				const step2 = new THREE.Mesh( new THREE.BoxGeometry( 1.0, 1.0, 1 ), whiteMat );
+				step2.position.set( - 7, 0.5, 0 );
+				step2.castShadow = true;
+				step2.receiveShadow = true;
+				scene.add( step2 );
+
+				const step3 = new THREE.Mesh( new THREE.BoxGeometry( 0.5, 1.5, 1 ), whiteMat );
+				step3.position.set( - 7, 0.75, 0 );
+				step3.castShadow = true;
+				step3.receiveShadow = true;
+				scene.add( step3 );
+
+				// Right room objects
+
+				// Columns
+				for ( const x of [ 2, 6 ] ) {
+
+					for ( const z of [ - 2.5, 2.5 ] ) {
+
+						const col = new THREE.Mesh( columnGeom, whiteMat );
+						col.position.set( x, 2, z );
+						col.castShadow = true;
+						col.receiveShadow = true;
+						scene.add( col );
+
+					}
+
+				}
+
+				// Pedestal with torus knot
+				const pedestal = new THREE.Mesh(
+					new THREE.BoxGeometry( 0.8, 1.2, 0.8 ),
+					whiteMat
+				);
+				pedestal.position.set( 4, 0.6, 0 );
+				pedestal.castShadow = true;
+				pedestal.receiveShadow = true;
+				scene.add( pedestal );
+
+				const torusKnot = new THREE.Mesh(
+					new THREE.TorusKnotGeometry( 0.3, 0.1, 64, 16 ),
+					new THREE.MeshStandardMaterial( { color: 0xff44aa, metalness: 0.2, roughness: 0.5 } )
+				);
+				torusKnot.position.set( 4, 1.65, 0 );
+				torusKnot.castShadow = true;
+				torusKnot.receiveShadow = true;
+				scene.add( torusKnot );
+
+				// Tall cone sculpture
+				const sculpture = new THREE.Mesh(
+					new THREE.ConeGeometry( 0.4, 2.5, 5 ),
+					whiteMat
+				);
+				sculpture.position.set( 6.5, 1.25, - 1.5 );
+				sculpture.castShadow = true;
+				sculpture.receiveShadow = true;
+				scene.add( sculpture );
+
+				// Lights
+
+				// Warm point light in left room
+				const warmLight = new THREE.PointLight( 0xffaa44, 30 );
+				warmLight.position.set( - 4, 4.5, 0 );
+				warmLight.castShadow = true;
+				warmLight.shadow.mapSize.setScalar( 256 );
+				warmLight.shadow.radius = 12;
+				warmLight.shadow.bias = - 0.002;
+				scene.add( warmLight );
+
+				// Cool point light in right room
+				const coolLight = new THREE.PointLight( 0x88bbff, 30 );
+				coolLight.position.set( 4, 4.5, 0 );
+				coolLight.castShadow = true;
+				coolLight.shadow.mapSize.setScalar( 256 );
+				coolLight.shadow.radius = 12;
+				coolLight.shadow.bias = - 0.002;
+				scene.add( coolLight );
+
+				// Renderer and controls match webgpu_lightprobes_complex.
+
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
-				renderer.setPixelRatio( Math.min( devicePixelRatio, 1.5 ) );
-				renderer.setSize( innerWidth, innerHeight );
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1.0;
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 				await renderer.init();
 
-				controls = new FirstPersonControls( camera, renderer.domElement );
-				controls.movementSpeed = 3;
-				controls.lookSpeed = 0.12;
-				loadedTexture = await new HDRCubeTextureLoader().setPath( './textures/cube/pisaHDR/' ).loadAsync( [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ] );
-				scene.background = new THREE.Color( 0x9ab9d5 );
-				scene.environment = loadedTexture;
-				scene.environmentIntensity = 0.3;
-				scene.add( new THREE.HemisphereLight( 0xddeeff, 0x75604b, 1.5 ) );
-				const sun = new THREE.DirectionalLight( 0xfff2dc, 5 );
-				sun.position.set( - 8, 15, 5 );
-				sun.castShadow = true;
-				sun.shadow.mapSize.setScalar( 2048 );
-				Object.assign( sun.shadow.camera, { left: - 15, right: 15, top: 15, bottom: - 15, near: 0.1, far: 60 } );
-				sun.shadow.bias = - 0.0002;
-				scene.add( sun );
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 2.5, 0 );
+				controls.update();
 
-				// The same complex Sponza asset as webgpu_lightprobes_sponza.
-				const response = await fetch( 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/model-index.json' );
-				if ( ! response.ok ) throw new Error( 'Could not load the sample asset index.' );
-				const models = await response.json();
-				const sponza = models.find( ( model ) => model.name === 'Sponza' );
-				if ( ! sponza ) throw new Error( 'Sponza is missing from the sample asset index.' );
-				const variant = sponza.variants[ 'glTF-Binary' ] || sponza.variants[ 'glTF' ];
-				const folder = variant.endsWith( '.glb' ) ? 'glTF-Binary' : 'glTF';
-				const gltf = await new GLTFLoader().loadAsync( `https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/Sponza/${ folder }/${ variant }` );
-				const embeddedLights = [];
-				gltf.scene.traverse( ( object ) => {
+				// A neutral background fallback, without loading external assets.
 
-					if ( object.isMesh ) object.castShadow = object.receiveShadow = true;
-					if ( object.isLight ) embeddedLights.push( object );
+				const fallbackTarget = new THREE.CubeRenderTarget( 16, { type: THREE.HalfFloatType } );
+				const fallbackScene = new THREE.Scene();
+				fallbackScene.background = scene.background;
+				new THREE.CubeCamera( 0.1, 10, fallbackTarget ).update( renderer, fallbackScene );
 
-				} );
-				for ( const light of embeddedLights ) light.removeFromParent();
-				scene.add( gltf.scene );
+				const box = ( min, max ) => new THREE.Box3( new THREE.Vector3( ...min ), new THREE.Vector3( ...max ) );
+				const probes = [
+					new SpecularProbe( { position: new THREE.Vector3( - 4, 2.3, 0 ), influenceBox: box( [ - 8.2, - 0.2, - 4.2 ], [ 0.4, 5.2, 4.2 ] ), projectionBox: box( [ - 8, 0, - 4 ], [ 0, 5, 4 ] ), blendDistance: 0.5, near: 0.05, far: 30 } ),
+					new SpecularProbe( { position: new THREE.Vector3( 4, 2.3, 0 ), influenceBox: box( [ - 0.4, - 0.2, - 4.2 ], [ 8.2, 5.2, 4.2 ] ), projectionBox: box( [ 0, 0, - 4 ], [ 8, 5, 4 ] ), blendDistance: 0.5, near: 0.05, far: 30 } ),
+					new SpecularProbe( { position: new THREE.Vector3( 0, 2.3, 0 ), influenceBox: box( [ - 1.2, - 0.2, - 1.5 ], [ 1.2, 4, 1.5 ] ), projectionBox: box( [ - 8, 0, - 4 ], [ 8, 5, 4 ] ), blendDistance: 0.5, near: 0.05, far: 30 } )
+				];
+				system = new SpecularProbes( probes, fallbackTarget.texture );
 
-				const probes = [];
-				for ( let i = 0; i < 5; i ++ ) {
+				// Every sphere evaluates the same probe blend at its own surface position.
 
-					const x = - 8 + i * 4;
-					const influenceBox = new THREE.Box3( new THREE.Vector3( x - 4, - 3, - 7 ), new THREE.Vector3( x + 4, 15, 7 ) );
-					const projectionBox = new THREE.Box3( new THREE.Vector3( - 11, 0, - 5 ), new THREE.Vector3( 11, 12, 5 ) );
-					const probe = new SpecularProbe( { position: new THREE.Vector3( x, 2, 0 ), influenceBox, projectionBox, blendDistance: 4, resolution: 128, near: 0.05, far: 80 } );
-					probes.push( probe );
-					const color = new THREE.Color().setHSL( i / 5, 0.8, 0.55 );
-					const marker = new THREE.Mesh( new THREE.SphereGeometry( 0.06, 12, 6 ), new THREE.MeshBasicMaterial( { color, wireframe: true } ) );
-					marker.position.copy( probe.position );
-					helpers.add( marker, new THREE.Box3Helper( influenceBox, color ) );
-					// Floor footprints remain readable from inside the tall influence boxes.
-					const footprint = new THREE.BufferGeometry().setFromPoints( [
-						new THREE.Vector3( x - 4, 0.04, - 7 ), new THREE.Vector3( x + 4, 0.04, - 7 ),
-						new THREE.Vector3( x + 4, 0.04, 7 ), new THREE.Vector3( x - 4, 0.04, 7 ),
-						new THREE.Vector3( x - 4, 0.04, - 7 )
-					] );
-					helpers.add( new THREE.Line( footprint, new THREE.LineBasicMaterial( { color } ) ) );
-					markers.push( marker );
+				const reflection = specularProbes( system, roughness );
+				gridMaterial = new THREE.MeshBasicNodeMaterial();
+				gridMaterial.colorNode = reflection;
+				const colors = [ 0xffaaaa, 0xaaccff, 0xffee99 ];
+				for ( let i = 0; i < probes.length; i ++ ) {
+
+					const tint = new THREE.Color( colors[ i ] );
+					const material = new THREE.MeshBasicNodeMaterial();
+					material.colorNode = reflection.mul( uniform( tint ) );
+					const marker = new THREE.Mesh( new THREE.SphereGeometry( 0.28, 32, 16 ), material );
+					marker.position.copy( probes[ i ].position );
+					helpers.add( marker, new THREE.Box3Helper( probes[ i ].influenceBox, tint ) );
 
 				}
 
-				helpers.visible = false;
-				scene.add( helpers );
-				system = new SpecularProbes( probes, loadedTexture );
-				const material = new THREE.MeshBasicNodeMaterial();
-				material.colorNode = specularProbes( system, roughness );
-				sphere = new THREE.Mesh( new THREE.SphereGeometry( 0.45, 64, 32 ), material );
-				scene.add( sphere );
+				scene.add( helpers, grid );
+				updateGrid();
+				await capture();
 
 				const gui = renderer.inspector.createParameters( 'Specular Probes' );
-				gui.add( params, 'showProbes' ).name( 'Show influence volumes' );
-				gui.add( params, 'boxProjection' ).name( 'Box projection' );
-				gui.add( roughness, 'value', 0, 1, 0.01 ).name( 'Sphere roughness' );
-				gui.add( sun, 'intensity', 0, 10, 0.1 ).name( 'Sun intensity (then recapture)' );
-				gui.add( params, 'loadedProbe' ).name( 'Probe 1: loaded Pisa HDR' ).onChange( () => {
-
-					// The unrelated outdoor environment has no room projection proxy.
-					if ( params.loadedProbe ) {
-
-						probes[ 0 ].texture = loadedTexture;
-						probes[ 0 ].projectionBox = null;
-
-					} else {
-
-						probes[ 0 ].projectionBox = probes[ 1 ].projectionBox.clone();
-						resetCaptures();
-
-					}
-
-				} );
-				gui.add( params, 'realtime' ).name( 'Staggered realtime capture' );
-				gui.add( params, 'updateInterval', 0.1, 5, 0.1 ).name( 'Capture interval (seconds)' );
-				gui.add( params, 'recapture' ).name( 'Recapture scene' );
+				gui.add( params, 'showProbes' ).name( 'Show Probes' ).onChange( ( value ) => helpers.visible = value );
+				gui.add( params, 'showGrid' ).name( 'Show Grid' ).onChange( ( value ) => grid.visible = value );
+				gui.add( params, 'boxProjection' ).name( 'Box Projection' ).onChange( ( value ) => system.boxProjection = value );
+				gui.add( roughness, 'value', 0, 1, 0.01 ).name( 'Roughness' );
+				gui.add( params, 'gridResolution', 2, 12, 1 ).name( 'Grid Resolution' ).onChange( updateGrid );
+				gui.add( params, 'gridSize', 0.05, 0.3, 0.01 ).name( 'Grid Sphere Size' ).onChange( updateGrid );
+				gui.add( params, 'resolution', [ 64, 128, 256, 512, 1024 ] ).name( 'Capture Resolution' );
+				gui.add( params, 'filter', [ 'PMREM', 'LOD MIP' ] ).name( 'Filter' );
+				gui.add( params, 'capture' ).name( 'Capture' );
+				gui.add( params, 'realtime' ).name( 'Realtime Updates' );
+				gui.add( params, 'updateInterval', 0.5, 5, 0.1 ).name( 'Update Interval (seconds)' );
 
 				window.addEventListener( 'resize', () => {
 
-					camera.aspect = innerWidth / innerHeight;
+					camera.aspect = window.innerWidth / window.innerHeight;
 					camera.updateProjectionMatrix();
-					renderer.setSize( innerWidth, innerHeight );
-					controls.handleResize();
+					renderer.setSize( window.innerWidth, window.innerHeight );
 
 				} );
-				renderer.setAnimationLoop( animate );
+				renderer.setAnimationLoop( () => {
 
-			}
+					if ( ! capturing ) {
 
-			function resetCaptures() {
+						if ( params.realtime && performance.now() - lastCapture >= params.updateInterval * 1000 ) {
 
-				bakeIndex = 0;
+							capture();
 
-			}
+						} else {
 
-			function animate( timestamp ) {
+							renderer.render( scene, camera );
 
-				timer.update( timestamp );
-				controls.update( Math.min( timer.getDelta(), 0.05 ) );
-				camera.getWorldDirection( direction );
-				sphere.position.copy( camera.position ).addScaledVector( direction, 2.3 );
-				system.boxProjection = params.boxProjection;
-				for ( let i = 0; i < system.probes.length; i ++ ) system.probes[ i ].realtime = params.realtime && ! ( i === 0 && params.loadedProbe );
-				// Neither the test sphere nor the debug geometry belongs in the captures.
-				sphere.visible = helpers.visible = false;
-				try {
-
-					if ( bakeIndex < system.probes.length ) {
-
-						if ( bakeIndex !== 0 || ! params.loadedProbe ) system.probes[ bakeIndex ].capture( renderer, scene );
-						bakeIndex ++;
-
-					} else {
-
-						system.updateCapture( renderer, scene, timestamp / 1000, params.updateInterval );
+						}
 
 					}
 
+				} );
+
+			}
+
+			function updateGrid() {
+
+				for ( const mesh of [ ...grid.children ] ) {
+
+					grid.remove( mesh );
+					mesh.geometry.dispose();
+					mesh.dispose();
+
+				}
+
+				const resolution = params.gridResolution;
+				const matrix = new THREE.Matrix4();
+				for ( const centerX of [ - 3.9, 3.9 ] ) {
+
+					const mesh = new THREE.InstancedMesh( new THREE.SphereGeometry( params.gridSize, 16, 12 ), gridMaterial, resolution ** 3 );
+					let index = 0;
+					for ( let z = 0; z < resolution; z ++ ) {
+
+						for ( let y = 0; y < resolution; y ++ ) {
+
+							for ( let x = 0; x < resolution; x ++ ) {
+
+								matrix.makeTranslation( centerX - 3.9 + x * 7.8 / ( resolution - 1 ), 0.1 + y * 4.7 / ( resolution - 1 ), - 3.8 + z * 7.6 / ( resolution - 1 ) );
+								mesh.setMatrixAt( index ++, matrix );
+
+							}
+
+						}
+
+					}
+
+					mesh.instanceMatrix.needsUpdate = true;
+					grid.add( mesh );
+
+				}
+
+				grid.visible = params.showGrid;
+
+			}
+
+			async function capture() {
+
+				if ( capturing || ! system ) return;
+				capturing = true;
+				status.textContent = 'Capturing and filtering three probes�';
+				helpers.visible = grid.visible = false;
+				try {
+
+					const elapsed = await system.capture( renderer, scene, { resolution: Number( params.resolution ), filter: params.filter } );
+					status.textContent = `Last Capture: ${ elapsed.toFixed( 1 ) } ms (CPU + GPU completed; filtering, atlas copy and first-use compilation included)`;
+					document.body.dataset.ready = 'true';
+
+				} catch ( error ) {
+
+					status.textContent = `Capture failed: ${ error.message }`;
+					console.error( error );
+
 				} finally {
 
-					sphere.visible = true;
 					helpers.visible = params.showProbes;
+					grid.visible = params.showGrid;
+					lastCapture = performance.now();
+					capturing = false;
 
 				}
-
-				system.update( sphere.position );
-				for ( let i = 0; i < markers.length; i ++ ) {
-
-					const slot = system.slots.find( ( entry ) => entry.probe === system.probes[ i ] );
-					markers[ i ].scale.setScalar( slot ? 1 + slot.weight : 1 );
-
-				}
-
-				status.textContent = bakeIndex < system.probes.length ? `Capturing probe ${ bakeIndex } / ${ system.probes.length }…` : system.slots.map( ( slot ) => `Probe ${ system.probes.indexOf( slot.probe ) + 1 }: ${ ( slot.weight * 100 ).toFixed( 0 ) }%` ).join( ' | ' ) + ` | sky: ${ ( system.fallbackWeight * 100 ).toFixed( 0 ) }%`;
-				document.body.dataset.ready = String( bakeIndex === system.probes.length );
-				renderer.render( scene, camera );
 
 			}
 
