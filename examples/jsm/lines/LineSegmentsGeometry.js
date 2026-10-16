@@ -287,12 +287,6 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 	}
 
-	toJSON() {
-
-		// todo
-
-	}
-
 }
 
 export { LineSegmentsGeometry };
