@@ -19,7 +19,7 @@
 				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Light Baking</span>
 			</div>
 
-			<small>Progressively bake Radiosity, Ray Radiosity (<a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">three-mesh-bvh</a>), Light Probe or VXGI diffuse irradiance into a UV atlas and export KHR_lightmap glTF.<br/><span id="status"></span></small>
+			<small>Progressively bake Ray Radiosity (<a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">three-mesh-bvh</a>), Stochastic Radiosity, Light Probe or VXGI diffuse irradiance into a UV atlas and export KHR_lightmap glTF.<br/><span id="status"></span></small>
 		</div>
 
 		<script type="importmap">
@@ -38,7 +38,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { builtinGIContext, float, normalWorld, pass, positionWorld } from 'three/tsl';
+			import { builtinGIContext, float, ivec2, mix, normalWorld, pass, passTexture, positionWorld, screenCoordinate, texture, uniform } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
@@ -56,23 +56,101 @@
 
 			let camera, scene, renderer, controls, renderPipeline;
 			let light, lightPanel, meshes, materials, atlas, status;
-			let source, lightMapper, bakedPass, livePass;
+			let source, lightMapper, bakedPass, livePass, liveOutput;
 			let busy = false;
 			let bakeStart = 0, bakeTime = 0;
 
 			const params = {
 				output: 'Baked GI',
-				algorithm: 'Radiosity',
+				algorithm: 'Ray Radiosity',
 				resolution: 1024
 			};
 
 			// light probes are deterministic and only need a few samples to antialias the light map,
-			// the VXGI cones, the radiosity directions and rays vary per sample and converge over more samples.
-			// Radiosity samples are cheap, so several are baked per frame. Ray radiosity samples the
-			// emissive panel directly and converges with far fewer samples
+			// the rays, the VXGI cones and the stochastic radiosity directions vary per sample and converge
+			// over more samples. Ray radiosity samples the emissive panel directly and converges quickly,
+			// stochastic radiosity samples are cheap, so several are baked per frame
 
-			const bakeSamples = { 'Radiosity': 8192, 'Ray Radiosity': 32, 'Light Probe': 16, 'VXGI': 64 };
-			const samplesPerFrame = { 'Radiosity': 4, 'Ray Radiosity': 1, 'Light Probe': 1, 'VXGI': 1 };
+			const bakeSamples = { 'Ray Radiosity': 32, 'Stochastic Radiosity': 8192, 'Light Probe': 16, 'VXGI': 64 };
+			const samplesPerFrame = { 'Ray Radiosity': 1, 'Stochastic Radiosity': 4, 'Light Probe': 1, 'VXGI': 1 };
+
+			// Live GI evaluates the irradiance per pixel and frame, this averages the frames while the view
+			// is still, so the noisy irradiance of the stochastic algorithms converges like the bake
+
+			class FrameAccumulationNode extends THREE.Node {
+
+				constructor( textureNode, maxFrames = 1024 ) {
+
+					super( 'vec4' );
+
+					this.textureNode = textureNode;
+					this.maxFrames = maxFrames;
+					this.frames = 0;
+
+					this._target = new THREE.RenderTarget( 1, 1, { type: THREE.HalfFloatType, depthBuffer: false } );
+					this._history = new THREE.RenderTarget( 1, 1, { type: THREE.HalfFloatType, depthBuffer: false } );
+					this._historyNode = texture( this._history.texture );
+					this._outputNode = passTexture( this, this._target.texture );
+					this._weight = uniform( 1 );
+					this._quad = new THREE.QuadMesh( new THREE.NodeMaterial() );
+
+					this.updateBeforeType = THREE.NodeUpdateType.FRAME;
+
+				}
+
+				reset() {
+
+					this.frames = 0;
+
+				}
+
+				updateBefore( { renderer } ) {
+
+					const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
+
+					if ( size.x !== this._target.width || size.y !== this._target.height ) {
+
+						this._target.setSize( size.x, size.y );
+						this._history.setSize( size.x, size.y );
+						this.frames = 0;
+
+					}
+
+					// running mean, an exponential average after the last frame
+
+					this._weight.value = 1 / Math.min( this.frames + 1, this.maxFrames );
+					this._historyNode.value = this._history.texture;
+					this._outputNode.value = this._target.texture;
+
+					const renderTarget = renderer.getRenderTarget();
+					renderer.setRenderTarget( this._target );
+					this._quad.render( renderer );
+					renderer.setRenderTarget( renderTarget );
+
+					[ this._target, this._history ] = [ this._history, this._target ];
+					this.frames ++;
+
+				}
+
+				setup() {
+
+					const coord = ivec2( screenCoordinate );
+
+					this._quad.material.fragmentNode = mix( this._historyNode.load( coord ), this.textureNode.load( coord ), this._weight );
+
+					return this._outputNode;
+
+				}
+
+				dispose() {
+
+					this._target.dispose();
+					this._history.dispose();
+					this._quad.material.dispose();
+
+				}
+
+			}
 
 			init();
 
@@ -187,6 +265,7 @@
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 2.5, 0 );
 				controls.update();
+				controls.addEventListener( 'change', () => liveOutput?.reset() );
 
 				// Light map UVs
 
@@ -208,7 +287,7 @@
 
 				const gui = renderer.inspector.createParameters( 'Light Baking' );
 				gui.add( params, 'output', [ 'Baked GI', 'Live GI' ] ).name( 'Output' ).onChange( setOutput );
-				gui.add( params, 'algorithm', [ 'Radiosity', 'Ray Radiosity', 'Light Probe', 'VXGI' ] ).name( 'GI Algorithm' ).onChange( bake );
+				gui.add( params, 'algorithm', [ 'Ray Radiosity', 'Stochastic Radiosity', 'Light Probe', 'VXGI' ] ).name( 'GI Algorithm' ).onChange( bake );
 				gui.add( params, 'resolution', [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( bake );
 				gui.add( { bake }, 'bake' ).name( 'Re-Bake GI' );
 				gui.add( { exportGLTF }, 'exportGLTF' ).name( 'Export glTF' );
@@ -227,6 +306,7 @@
 
 				lightMapper?.dispose();
 				livePass?.dispose();
+				liveOutput?.dispose();
 				source?.dispose();
 
 				if ( atlas.resolution !== params.resolution ) {
@@ -240,12 +320,23 @@
 
 				let irradiance, liveIrradiance;
 
-				const emissive = params.algorithm === 'Radiosity' || params.algorithm === 'Ray Radiosity';
+				const emissive = params.algorithm === 'Ray Radiosity' || params.algorithm === 'Stochastic Radiosity';
 
 				lightPanel.visible = emissive;
 				light.visible = emissive === false;
 
-				if ( params.algorithm === 'Radiosity' ) {
+				if ( params.algorithm === 'Ray Radiosity' ) {
+
+					// rays traced through a BVH of the scene gather the bounces from a cached light map,
+					// one ray per pixel keeps the live view interactive
+
+					const radiosity = new RayTracedRadiosity();
+					radiosity.update( renderer, scene );
+					irradiance = rayTracedRadiosityIrradiance( radiosity );
+					liveIrradiance = rayTracedRadiosityIrradiance( radiosity, { rays: 1 } );
+					source = radiosity;
+
+				} else if ( params.algorithm === 'Stochastic Radiosity' ) {
 
 					// stochastic depth radiosity, the bounces are cached in a light map before baking
 
@@ -253,17 +344,6 @@
 					radiosity.update( renderer, scene );
 					irradiance = radiosityIrradiance( radiosity );
 					liveIrradiance = irradiance;
-					source = radiosity;
-
-				} else if ( params.algorithm === 'Ray Radiosity' ) {
-
-					// rays traced through a BVH of the scene gather the bounces from a cached light map,
-					// fewer rays per pixel keep the live view interactive
-
-					const radiosity = new RayTracedRadiosity();
-					radiosity.update( renderer, scene );
-					irradiance = rayTracedRadiosityIrradiance( radiosity );
-					liveIrradiance = rayTracedRadiosityIrradiance( radiosity, { rays: 1 } );
 					source = radiosity;
 
 				} else if ( params.algorithm === 'Light Probe' ) {
@@ -298,6 +378,7 @@
 
 				livePass = pass( scene, camera );
 				livePass.contextNode = builtinGIContext( float( 1 ), liveIrradiance( positionWorld, normalWorld ) );
+				liveOutput = new FrameAccumulationNode( livePass.getTextureNode() );
 
 				setOutput();
 
@@ -310,11 +391,12 @@
 				// discard accumulated samples when switching outputs; baking only runs in Baked GI
 
 				lightMapper.reset();
+				liveOutput.reset();
 				bakeStart = performance.now();
 
 				for ( const material of materials ) material.lightMapIntensity = live ? 0 : 1;
 
-				renderPipeline.outputNode = live ? livePass : bakedPass;
+				renderPipeline.outputNode = live ? liveOutput : bakedPass;
 				renderPipeline.needsUpdate = true;
 
 			}
@@ -380,7 +462,7 @@
 
 				if ( params.output === 'Live GI' ) {
 
-					status.textContent = `Live ${ params.algorithm }`;
+					status.textContent = `Live ${ params.algorithm }: ${ liveOutput.frames } frames`;
 
 				} else if ( lightMapper.samples < samples ) {
 
