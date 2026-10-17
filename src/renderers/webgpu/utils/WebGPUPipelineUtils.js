@@ -26,6 +26,11 @@ const _pipelineLayoutDescriptor = new GPUPipelineLayoutDescriptor();
 const _renderBundleEncoderDescriptor = new GPURenderBundleEncoderDescriptor();
 const _renderPipelineDescriptor = new GPURenderPipelineDescriptor();
 
+// Safari can reject `popErrorScope()` with an `OperationError` for a scope that
+// was just pushed. A failed pop only loses that pipeline's validation report,
+// so it reads as "no error" instead of becoming an unhandled rejection.
+const popErrorScope = ( device ) => device.popErrorScope().catch( () => null );
+
 /**
  * A WebGPU backend utility module for managing pipelines.
  *
@@ -263,7 +268,7 @@ class WebGPUPipelineUtils {
 
 			_renderPipelineDescriptor.reset();
 
-			device.popErrorScope().then( ( err ) => {
+			popErrorScope( device ).then( ( err ) => {
 
 				if ( err !== null ) {
 
@@ -300,7 +305,7 @@ class WebGPUPipelineUtils {
 
 					// Pop the error scope before awaiting the pipeline, so several pipelines
 					// can be created at the same time without mixing their error scopes.
-					const errorScopePromise = device.popErrorScope();
+					const errorScopePromise = popErrorScope( device );
 
 					if ( pipelinePromise !== null ) {
 
@@ -424,7 +429,7 @@ class WebGPUPipelineUtils {
 
 			_computePipelineDescriptor.reset();
 
-			device.popErrorScope().then( ( err ) => {
+			popErrorScope( device ).then( ( err ) => {
 
 				if ( err !== null ) {
 
@@ -461,7 +466,7 @@ class WebGPUPipelineUtils {
 
 					// Pop the error scope before awaiting the pipeline, so several pipelines
 					// can be created at the same time without mixing their error scopes.
-					const errorScopePromise = device.popErrorScope();
+					const errorScopePromise = popErrorScope( device );
 
 					if ( pipelinePromise !== null ) {
 
