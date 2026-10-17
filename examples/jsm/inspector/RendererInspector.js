@@ -69,6 +69,14 @@ class ComputeStats extends ObjectStats {
 
 }
 
+// returns true if the frame of the animation loop rendered or computed
+
+function isRenderedFrame( frame ) {
+
+	return frame.renders.length > 0 || frame.computes.length > 0;
+
+}
+
 export class RendererInspector extends InspectorBase {
 
 	constructor() {
@@ -87,6 +95,7 @@ export class RendererInspector extends InspectorBase {
 		this.maxFrames = 512;
 
 		this._lastFinishTime = 0;
+		this._lastRenderedFinishTime = 0;
 		this._resolveTimestampPromise = null;
 		this._rAFId = null;
 
@@ -123,7 +132,22 @@ export class RendererInspector extends InspectorBase {
 
 		const frame = this.currentFrame;
 		frame.finishTime = now;
-		frame.deltaTime = now - ( this._lastFinishTime > 0 ? this._lastFinishTime : now );
+
+		// frames of the animation loop which didn't render or compute, like frames skipped by the application
+		// while the GPU is busy, are not frames of the application: the time is measured since the last frame
+		// which rendered
+
+		if ( isRenderedFrame( frame ) ) {
+
+			frame.deltaTime = now - ( this._lastRenderedFinishTime > 0 ? this._lastRenderedFinishTime : now );
+
+			this._lastRenderedFinishTime = now;
+
+		} else {
+
+			frame.deltaTime = now - ( this._lastFinishTime > 0 ? this._lastFinishTime : now );
+
+		}
 
 		this.addFrame( frame );
 
@@ -187,12 +211,16 @@ export class RendererInspector extends InspectorBase {
 
 	_getFPS() {
 
+		// only the frames which rendered or computed are counted, within the last second
+
 		let frameSum = 0;
 		let timeSum = 0;
 
 		for ( let i = this.frames.length - 1; i >= 0; i -- ) {
 
 			const frame = this.frames[ i ];
+
+			if ( isRenderedFrame( frame ) === false ) continue;
 
 			frameSum ++;
 			timeSum += frame.deltaTime;
@@ -201,7 +229,7 @@ export class RendererInspector extends InspectorBase {
 
 		}
 
-		return ( frameSum * 1000 ) / timeSum;
+		return timeSum > 0 ? ( frameSum * 1000 ) / timeSum : 0;
 
 	}
 
