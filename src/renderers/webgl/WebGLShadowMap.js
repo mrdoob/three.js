@@ -43,6 +43,16 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 		_depthMaterial = new MeshDepthMaterial(),
 		_distanceMaterial = new MeshDistanceMaterial(),
+		_doubleSideDepthMaterial = new MeshDepthMaterial( {
+			polygonOffset: true,
+			polygonOffsetFactor: 2,
+			polygonOffsetUnits: 1
+		} ),
+		_doubleSideDistanceMaterial = new MeshDistanceMaterial( {
+			polygonOffset: true,
+			polygonOffsetFactor: 2,
+			polygonOffsetUnits: 1
+		} ),
 
 		_materialCache = {},
 
@@ -434,13 +444,29 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 		const customMaterial = ( light.isPointLight === true ) ? object.customDistanceMaterial : object.customDepthMaterial;
 
+		let side = material.shadowSide;
+
+		if ( side === null ) {
+
+			side = ( type === VSMShadowMap ) ? material.side : shadowSide[ material.side ];
+
+		}
+
 		if ( customMaterial !== undefined ) {
 
 			result = customMaterial;
 
 		} else {
 
-			result = ( light.isPointLight === true ) ? _distanceMaterial : _depthMaterial;
+			if ( light.isPointLight === true ) {
+
+				result = ( side === DoubleSide ) ? _doubleSideDistanceMaterial : _distanceMaterial;
+
+			} else {
+
+				result = ( side === DoubleSide ) ? _doubleSideDepthMaterial : _depthMaterial;
+
+			}
 
 			if ( ( renderer.localClippingEnabled && material.clipShadows === true && Array.isArray( material.clippingPlanes ) && material.clippingPlanes.length !== 0 ) ||
 				( material.displacementMap && material.displacementScale !== 0 ) ||
@@ -481,15 +507,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 		result.visible = material.visible;
 		result.wireframe = material.wireframe;
 
-		if ( type === VSMShadowMap ) {
-
-			result.side = ( material.shadowSide !== null ) ? material.shadowSide : material.side;
-
-		} else {
-
-			result.side = ( material.shadowSide !== null ) ? material.shadowSide : shadowSide[ material.side ];
-
-		}
+		result.side = side;
 
 		result.alphaMap = material.alphaMap;
 		result.alphaTest = ( material.alphaToCoverage === true ) ? 0.5 : material.alphaTest; // approximate alphaToCoverage by using a fixed alphaTest value
