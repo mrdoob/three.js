@@ -244,15 +244,13 @@ nodeVar0
 
 float externalValue;
 float nodeVar0 = 0.0;
+externalValue = ( 2.0 + 3.0 );
 
 for ( int i = 0; i < 0; i ++ ) {
 
-	externalValue = ( 2.0 + 3.0 );
 	nodeVar0 = ( nodeVar0 + externalValue );
 
 }
-
-externalValue = ( 2.0 + 3.0 );
 
 for ( int i = 0; i < 2; i ++ ) {
 
@@ -261,6 +259,39 @@ for ( int i = 0; i < 2; i ++ ) {
 }
 
 ( nodeVar0 + externalValue )
+
+// external variable in branch
+
+float result;
+float nodeVar0;
+float nodeVar1;
+float externalValue;
+result = 0.0;
+
+if ( ( nodeUniform0 > 0.5 ) ) {
+
+	if ( ( nodeVarying0.x > 0.5 ) ) {
+
+		nodeVar1 = 2.0;
+
+	} else {
+
+		nodeVar1 = 3.0;
+
+	}
+
+	externalValue = nodeVar1;
+	nodeVar0 = externalValue;
+
+} else {
+
+	nodeVar0 = 0.0;
+
+}
+
+result = nodeVar0;
+
+result
 
 // assignable scope
 
@@ -842,18 +873,19 @@ vec3( nodeVar0 )
 // function with loop without stack
 
 float nodeVar0 = 0.0;
+float nodeVar1 = 0.0;
+
+for ( int i = 0; i < 3; i ++ ) {
+
+	nodeVar1 = ( nodeVar1 + float( i ) );
+
+}
+
+float nodeVar2 = nodeVar1;
 
 for ( int i = 0; i < 4; i ++ ) {
 
-	float nodeVar1 = 0.0;
-
-	for ( int i = 0; i < 3; i ++ ) {
-
-		nodeVar1 = ( nodeVar1 + float( i ) );
-
-	}
-
-	nodeVar0 = ( nodeVar0 + nodeVar1 );
+	nodeVar0 = ( nodeVar0 + nodeVar2 );
 
 }
 
