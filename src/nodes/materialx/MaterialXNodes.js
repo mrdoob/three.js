@@ -14,7 +14,7 @@ import { mx_srgb_texture_to_lin_rec709 } from './MaterialXColorTransform.js';
 
 import {
 	Fn, float, vec2, vec3, vec4, int, add, sub, mul, div, atan, mix, pow, smoothstep,
-	floor, abs, max, clamp, step, cross, dot, normalize
+	floor, abs, max, clamp, step, cross, dot, normalize, EPSILON
 } from '../tsl/TSLBase.js';
 import { overloadingFn } from '../utils/FunctionOverloadingNode.js';
 import { uv } from '../accessors/UV.js';
@@ -76,7 +76,7 @@ export const mx_noise_vec4 = ( texcoord = uv(), amplitude = 1, pivot = 0 ) => mx
 export const mx_smoothstep = ( inNode, low = 0, high = 1 ) => {
 
 	const range = sub( high, low );
-	const safeRange = max( abs( range ), float( 1e-6 ) );
+	const safeRange = max( abs( range ), float( EPSILON ) );
 	const t = clamp( div( sub( inNode, low ), safeRange ), float( 0 ), float( 1 ) );
 	const hermite = mul( mul( t, t ), sub( float( 3 ), mul( float( 2 ), t ) ) );
 	const fallback = step( high, inNode );

@@ -37,7 +37,7 @@
 
 			import * as THREE from 'three/webgpu';
 
-			import { Fn, If, Return, instancedArray, instanceIndex, uniform, select, attribute, Loop, float, transformNormalToView, cross, triNoise3D, time } from 'three/tsl';
+			import { Fn, If, Return, instancedArray, instanceIndex, uniform, select, attribute, Loop, float, transformNormalToView, cross, triNoise3D, time, EPSILON } from 'three/tsl';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
@@ -318,7 +318,7 @@
 					const vertex1Position = vertexPositionBuffer.element( vertexIds.y );
 
 					const delta = vertex1Position.sub( vertex0Position ).toVar();
-					const dist = delta.length().max( 0.000001 ).toVar();
+					const dist = delta.length().max( EPSILON ).toVar();
 					const force = dist.sub( restLength ).mul( stiffnessUniform ).mul( delta ).mul( 0.5 ).div( dist );
 					springForceBuffer.element( instanceIndex ).assign( force );
 

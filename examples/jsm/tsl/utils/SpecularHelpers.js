@@ -1,4 +1,4 @@
-import { Fn, If, PI, clamp, cos, cross, dot, equirectUV, float, log, max, mix, normalize, pow, reflect, sin, sqrt, struct, vec3 } from 'three/tsl';
+import { EPSILON, Fn, If, PI, clamp, cos, cross, dot, equirectUV, float, log, max, mix, normalize, pow, reflect, sin, sqrt, struct, vec3 } from 'three/tsl';
 
 /**
  * Specular / microfacet BRDF helpers: VNDF sampling, GTR distribution, Smith geometry,
@@ -114,7 +114,7 @@ const GGXVNDFPdf = Fn( ( [ NoH, NoV, roughness ] ) => {
 	const s2 = s.mul( s ).toVar();
 	const k = float( 1.0 ).sub( a2 ).mul( s2 ).div( s2.add( a2.mul( NoV ).mul( NoV ) ) ).toVar();
 	const t = sqrt( a2.mul( sinV2 ).add( NoV.mul( NoV ) ) ).toVar();
-	return D.div( max( float( 1e-6 ), float( 2.0 ).mul( k.mul( NoV ).add( t ) ) ) ).toVar();
+	return D.div( max( float( EPSILON ), float( 2.0 ).mul( k.mul( NoV ).add( t ) ) ) ).toVar();
 
 }, { NoH: 'float', NoV: 'float', roughness: 'float', return: 'float' } );
 
@@ -276,7 +276,7 @@ export const equirectDirPdf = Fn( ( [ direction ] ) => {
 
 	const uvDir = equirectUV( direction );
 	const sinTheta = sin( uvDir.y.mul( Math.PI ) );
-	return sinTheta.abs().lessThan( float( 1e-6 ) ).select(
+	return sinTheta.abs().lessThan( float( EPSILON ) ).select(
 		float( 0 ),
 		float( 1 ).div( float( 2 * Math.PI * Math.PI ).mul( sinTheta ) )
 	);
