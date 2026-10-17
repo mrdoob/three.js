@@ -100,7 +100,7 @@ class ContextNode extends Node {
 
 		const children = [];
 
-		this.traverse( ( node ) => {
+		this._traverseFlow( ( node ) => {
 
 			if ( node.isContextNode === true ) {
 
@@ -111,6 +111,47 @@ class ContextNode extends Node {
 		} );
 
 		return Object.assign( {}, ...children );
+
+	}
+
+	/**
+	 * Executes the callback once for each node of the flow. Shared nodes are visited only once,
+	 * in the order of their last occurrence in {@link Node#traverse}, so merging the collected
+	 * values gives the same result as a full traversal.
+	 *
+	 * @private
+	 * @param {traverseCallback} callback - A callback that is executed per node.
+	 */
+	_traverseFlow( callback ) {
+
+		const visited = new Set();
+		const nodes = [];
+
+		const visit = ( node ) => {
+
+			if ( visited.has( node ) ) return;
+
+			visited.add( node );
+
+			const children = [ ...node.getChildren() ];
+
+			for ( let i = children.length - 1; i >= 0; i -- ) {
+
+				visit( children[ i ] );
+
+			}
+
+			nodes.push( node );
+
+		};
+
+		visit( this );
+
+		for ( let i = nodes.length - 1; i >= 0; i -- ) {
+
+			callback( nodes[ i ] );
+
+		}
 
 	}
 

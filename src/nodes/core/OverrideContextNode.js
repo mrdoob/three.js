@@ -65,7 +65,7 @@ class OverrideContextNode extends ContextNode {
 
 		const children = [];
 
-		this.traverse( ( node ) => {
+		this._traverseFlow( ( node ) => {
 
 			if ( node.isOverrideContextNode === true ) {
 
