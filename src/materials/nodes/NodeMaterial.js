@@ -17,7 +17,7 @@ import AONode from '../../nodes/lighting/AONode.js';
 import { lightingContext } from '../../nodes/lighting/LightingContextNode.js';
 import IrradianceNode from '../../nodes/lighting/IrradianceNode.js';
 import { depth, viewZToLogarithmicDepth, viewZToOrthographicDepth } from '../../nodes/display/ViewportDepthNode.js';
-import { cameraFar, cameraNear, cameraProjectionMatrix } from '../../nodes/accessors/Camera.js';
+import { cameraFar, cameraIsPerspective, cameraNear, cameraProjectionMatrix } from '../../nodes/accessors/Camera.js';
 import { clipping, clippingAlpha, hardwareClipping } from '../../nodes/accessors/ClippingNode.js';
 import NodeMaterialObserver from './manager/NodeMaterialObserver.js';
 import getAlphaHashThreshold from '../../nodes/functions/material/getAlphaHashThreshold.js';
@@ -676,7 +676,7 @@ class NodeMaterial extends Material {
 	 */
 	setupDepth( builder ) {
 
-		const { renderer, camera } = builder;
+		const { renderer } = builder;
 
 		// Depth
 
@@ -692,15 +692,7 @@ class NodeMaterial extends Material {
 
 			} else if ( renderer.logarithmicDepthBuffer === true ) {
 
-				if ( camera.isPerspectiveCamera ) {
-
-					depthNode = viewZToLogarithmicDepth( positionView.z, cameraNear, cameraFar );
-
-				} else {
-
-					depthNode = viewZToOrthographicDepth( positionView.z, cameraNear, cameraFar );
-
-				}
+				depthNode = cameraIsPerspective.select( viewZToLogarithmicDepth( positionView.z, cameraNear, cameraFar ), viewZToOrthographicDepth( positionView.z, cameraNear, cameraFar ) );
 
 			}
 

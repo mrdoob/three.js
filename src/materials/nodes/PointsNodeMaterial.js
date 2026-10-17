@@ -2,6 +2,7 @@ import SpriteNodeMaterial from './SpriteNodeMaterial.js';
 import { viewportSize, screenDPR } from '../../nodes/display/ScreenNode.js';
 import { positionGeometry, positionLocal, positionView } from '../../nodes/accessors/Position.js';
 import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
+import { cameraIsPerspective } from '../../nodes/accessors/Camera.js';
 import { materialPointSize } from '../../nodes/accessors/MaterialNode.js';
 import { rotate } from '../../nodes/utils/RotateNode.js';
 import { float, uniform, vec2, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
@@ -89,7 +90,7 @@ class PointsNodeMaterial extends SpriteNodeMaterial {
 
 	setupVertexSprite( builder ) {
 
-		const { material, camera } = builder;
+		const { material } = builder;
 
 		const { rotationNode, scaleNode, sizeNode, sizeAttenuation } = this;
 
@@ -111,11 +112,11 @@ class PointsNodeMaterial extends SpriteNodeMaterial {
 
 		// size attenuation
 
-		if ( camera.isPerspectiveCamera && sizeAttenuation === true ) {
+		if ( sizeAttenuation === true ) {
 
 			// follow WebGLRenderer's implementation, and scale by half the canvas height in logical units
 
-			pointSize = pointSize.mul( scale.div( positionView.z.negate() ) );
+			pointSize = cameraIsPerspective.select( pointSize.mul( scale.div( positionView.z.negate() ) ), pointSize );
 
 		}
 
