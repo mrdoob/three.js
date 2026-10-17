@@ -1605,23 +1605,26 @@ class Node extends EventDispatcher {
 
 			if ( callback ) {
 
+				// the overrides are cached per callback, nested contexts can override the same node with different nodes
+
 				const nodeData = builder.getDataFromNode( this );
+				const overrides = nodeData.overrides || ( nodeData.overrides = new Map() );
 
-				if ( nodeData.isOverwritten !== true ) {
+				if ( overrides.has( callback ) === false ) {
 
-					nodeData.isOverwritten = true;
+					// avoid recursive override calls
+
+					overrides.set( callback, null );
 
 					// cancel the override for use the same node inside the callback
 
 					sharedNode = callback( builder ).overrideNode( this, null );
 
-					nodeData.sharedNode = sharedNode;
+					overrides.set( callback, sharedNode );
 
 				} else {
 
-					// avoid recursive override calls
-
-					sharedNode = nodeData.sharedNode;
+					sharedNode = overrides.get( callback );
 
 				}
 
@@ -11631,7 +11634,7 @@ const debug = ( node, callback = null ) => new DebugNode( nodeObject( node ), ca
 addMethodChaining( 'debug', debug );
 
 /**
- * InspectorBase is the base class for all inspectors.
+ * InspectorBase is the base class for all inspectors. Can only be used with {@link WebGPURenderer}.
  *
  * @augments EventDispatcher
  */
@@ -11647,7 +11650,7 @@ class InspectorBase extends EventDispatcher {
 		/**
 		 * The renderer associated with this inspector.
 		 *
-		 * @type {WebGLRenderer}
+		 * @type {Renderer}
 		 * @private
 		 */
 		this._renderer = null;
@@ -11691,7 +11694,7 @@ class InspectorBase extends EventDispatcher {
 	/**
 	 * Sets the renderer for this inspector.
 	 *
-	 * @param {WebGLRenderer} renderer - The renderer to associate with this inspector.
+	 * @param {Renderer} renderer - The renderer to associate with this inspector.
 	 * @return {InspectorBase} This inspector instance.
 	 */
 	setRenderer( renderer ) {
@@ -11705,7 +11708,7 @@ class InspectorBase extends EventDispatcher {
 	/**
 	 * Returns the renderer associated with this inspector.
 	 *
-	 * @return {WebGLRenderer} The associated renderer.
+	 * @return {Renderer} The associated renderer.
 	 */
 	getRenderer() {
 
@@ -11768,7 +11771,7 @@ class InspectorBase extends EventDispatcher {
 	 * @param {string} uid - A unique identifier for the render context.
 	 * @param {Scene} scene - The scene being rendered.
 	 * @param {Camera} camera - The camera being used for rendering.
-	 * @param {?WebGLRenderTarget} renderTarget - The render target, if any.
+	 * @param {?RenderTarget} renderTarget - The render target, if any.
 	 */
 	beginRender( /*uid, scene, camera, renderTarget*/ ) { }
 
@@ -11987,7 +11990,40 @@ class AttributeNode extends Node {
 
 	}
 
+	/**
+	 * Returns the node which provides the value of this attribute in the current context, if any.
+	 * The context can provide attributes with a `getAttribute( name, builder )` function, e.g. if the
+	 * vertices are pulled from a storage buffer or the surface is reconstructed per fragment. The
+	 * function should return the same node for the same attribute.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {?Node} The node providing the value of the attribute.
+	 */
+	getContextAttribute( builder ) {
+
+		const getAttribute = builder.context.getAttribute;
+
+		return getAttribute ? getAttribute( this.getAttributeName( builder ), builder ) : null;
+
+	}
+
+	/**
+	 * An attribute provided by the context is replaced by the provided node, like an override.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {Node} The shared node if possible. Otherwise `this` is returned.
+	 */
+	getShared( builder ) {
+
+		return this.getContextAttribute( builder ) || super.getShared( builder );
+
+	}
+
 	generateNodeType( builder ) {
+
+		const contextAttribute = this.getContextAttribute( builder );
+
+		if ( contextAttribute ) return contextAttribute.getNodeType( builder );
 
 		let nodeType = this.nodeType;
 
@@ -22434,11 +22470,11 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.IRIDESCENCE_THICKNESS ) {
 
-			const iridescenceThicknessMaximum = reference( '1', 'float', material.iridescenceThicknessRange );
+			const iridescenceThicknessMaximum = this.getFloat( 'iridescenceThicknessMaximum' );
 
 			if ( material.iridescenceThicknessMap ) {
 
-				const iridescenceThicknessMinimum = reference( '0', 'float', material.iridescenceThicknessRange );
+				const iridescenceThicknessMinimum = this.getFloat( 'iridescenceThicknessMinimum' );
 
 				node = iridescenceThicknessMaximum.sub( iridescenceThicknessMinimum ).mul( this.getTexture( scope ).g ).add( iridescenceThicknessMinimum );
 
@@ -25246,6 +25282,7 @@ const refreshUniforms = [
 	'clearcoatNormalMap',
 	'clearcoatNormalScale',
 	'clearcoatRoughness',
+	'clearcoatRoughnessMap',
 	'color',
 	'dashOffset',
 	'dashSize',
@@ -25267,8 +25304,9 @@ const refreshUniforms = [
 	'iridescence',
 	'iridescenceIOR',
 	'iridescenceMap',
-	'iridescenceThickness',
 	'iridescenceThicknessMap',
+	'iridescenceThicknessMaximum',
+	'iridescenceThicknessMinimum',
 	'lightMap',
 	'lightMapIntensity',
 	'linewidth',
@@ -25280,6 +25318,7 @@ const refreshUniforms = [
 	'normalScale',
 	'opacity',
 	'reflectivity',
+	'refractionRatio',
 	'retroreflectivity',
 	'rotation',
 	'roughness',
@@ -25300,6 +25339,7 @@ const refreshUniforms = [
 	'specularMap',
 	'steps',
 	'thickness',
+	'thicknessMap',
 	'transmission',
 	'transmissionMap',
 	'wireframe'
@@ -25460,6 +25500,7 @@ class NodeMaterialObserver {
 				geometryId: geometry.id,
 				geometryVersion: this.getGeometryData( geometry )._version,
 				materialVersion: this.getMaterialData( renderObject.material )._version,
+				attributesDisposeVersion: renderObject._geometries.attributes.disposeVersion,
 				worldMatrix: object.matrixWorld.clone()
 			};
 
@@ -25971,6 +26012,26 @@ class NodeMaterialObserver {
 			renderObjectData.geometryVersion = geometryData._version;
 
 			return false;
+
+		}
+
+		// attributes must be uploaded again if they have been disposed. they are only verified after a disposal
+
+		const attributes = renderObject._geometries.attributes;
+
+		if ( renderObjectData.attributesDisposeVersion !== attributes.disposeVersion ) {
+
+			for ( const vertexBuffer of renderObject.getVertexBuffers() ) {
+
+				if ( attributes.has( vertexBuffer ) === false ) return false;
+
+			}
+
+			const index = renderObject.getIndex();
+
+			if ( index !== null && attributes.has( index ) === false ) return false;
+
+			renderObjectData.attributesDisposeVersion = attributes.disposeVersion;
 
 		}
 
@@ -34292,7 +34353,7 @@ class LightsNode extends Node {
 				// force rebuild on version change to avoid the usage of removed shadow nodes
 
 				const lightNode = _lightsNodeRef.get( light );
-				const lightVersion = ( lightNode ) ? lightNode.version : -1;
+				const lightVersion = ( lightNode ) ? lightNode.version : 0; // light nodes start at version 0, see #35019
 
 				_hashData.push( lightVersion );
 
@@ -34954,6 +35015,30 @@ class ShadowBaseNode extends Node {
  */
 const shadowPositionWorld = /*@__PURE__*/ property( 'vec3', 'shadowPositionWorld' );
 
+// the uniforms of the shadows used by the filters. the filters are called for each material, the uniforms are
+// created once per shadow so the materials share the uniforms of the render group
+
+const _shadowUniforms = /*@__PURE__*/ new WeakMap();
+
+function getShadowUniforms( shadow ) {
+
+	let uniforms = _shadowUniforms.get( shadow );
+
+	if ( uniforms === undefined ) {
+
+		uniforms = {
+			mapSize: reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup ),
+			radius: reference( 'radius', 'float', shadow ).setGroup( renderGroup )
+		};
+
+		_shadowUniforms.set( shadow, uniforms );
+
+	}
+
+	return uniforms;
+
+}
+
 /**
  * A shadow filtering function performing basic filtering. This is in fact an unfiltered version of the shadow map
  * with a binary `[0,1]` result.
@@ -35008,11 +35093,10 @@ const PCFShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, shadowCoord, shadow,
 
 	};
 
-	const mapSize = reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup );
-	const radius = reference( 'radius', 'float', shadow ).setGroup( renderGroup );
+	const { mapSize, radius } = getShadowUniforms( shadow );
 
 	const texelSize = vec2( 1 ).div( mapSize );
-	const radiusScaled = radius.mul( texelSize.x );
+	const radiusScaled = radius.mul( texelSize );
 
 	// Use IGN to rotate sampling pattern per pixel (phi = IGN * 2π)
 	const phi = interleavedGradientNoise( screenCoordinate.xy ).mul( 6.28318530718 );
