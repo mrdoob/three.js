@@ -20,7 +20,7 @@ import {
 } from 'three';
 
 import { MeshStandardNodeMaterial } from 'three/webgpu';
-import { attribute, cameraPosition, color, cross, dot, float, floor, Fn, fract, fwidth, hash as ihash, mix, mod, modelWorldMatrixInverse, mx_fractal_noise_float, normalLocal, normalWorldGeometry, positionLocal, positionWorld, select, smoothstep, step, uint, uv, varying, vec2, vec3, vec4 } from 'three/tsl';
+import { attribute, cameraPosition, color, cross, dot, EPSILON, float, floor, Fn, fract, fwidth, hash as ihash, mix, mod, modelWorldMatrixInverse, mx_fractal_noise_float, normalLocal, normalWorldGeometry, positionLocal, positionWorld, select, smoothstep, step, uint, uv, varying, vec2, vec3, vec4 } from 'three/tsl';
 
 import { mergeGeometries } from '../../utils/BufferGeometryUtils.js';
 import { bumpNormal } from './CityGeneratorUtils.js';
@@ -1604,8 +1604,8 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 	// would spike where the normal flips at pier edges.
 	const mU = mortar / ( 2 * brickL );
 	const mV = mortar / ( 2 * brickH );
-	const ddU = nrm.z.mul( fwidth( positionWorld.x ) ).add( nrm.x.mul( fwidth( positionWorld.z ) ) ).div( brickL ).clamp( 1e-6, 0.5 );
-	const ddV = fwidth( rowCoord ).clamp( 1e-6, 0.5 );
+	const ddU = nrm.z.mul( fwidth( positionWorld.x ) ).add( nrm.x.mul( fwidth( positionWorld.z ) ) ).div( brickL ).clamp( EPSILON, 0.5 );
+	const ddV = fwidth( rowCoord ).clamp( EPSILON, 0.5 );
 	const distU = float( 0.5 ).sub( fract( colCoord ).sub( 0.5 ).abs() );
 	const distV = float( 0.5 ).sub( fract( rowCoord ).sub( 0.5 ).abs() );
 	const drawU = ddU.max( mU );
