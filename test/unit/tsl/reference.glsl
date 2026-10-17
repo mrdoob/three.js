@@ -1125,6 +1125,10 @@ nodeVar0
 
 ( nodeVarying0.y * 2.0 )
 
+// nested overrides
+
+( 1.0 + 2.0 )
+
 // layout local variables
 
 float fn0 ( float value ) {
