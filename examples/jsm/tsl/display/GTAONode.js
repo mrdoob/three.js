@@ -229,6 +229,14 @@ class GTAONode extends Node {
 		this._cameraFar = reference( 'far', 'float', camera );
 
 		/**
+		 * A reference to the scene's camera.
+		 *
+		 * @private
+		 * @type {Camera}
+		 */
+		this._camera = camera;
+
+		/**
 		 * Temporal direction that influences the rotation angle for each slice.
 		 *
 		 * @private
@@ -452,7 +460,9 @@ class GTAONode extends Node {
 
 			const radius = this.radius;
 			const invRadius = radius.reciprocal().toConst();
-			const viewDir = normalize( viewPosition.xyz.negate() ).toConst();
+			// Orthographic cameras look down -Z everywhere, so the direction toward the
+			// camera is constant (see positionViewDirection in Position.js).
+			const viewDir = this._camera.isOrthographicCamera ? vec3( 0, 0, 1 ).toConst() : normalize( viewPosition.xyz.negate() ).toConst();
 			const clipPosition = this._cameraProjectionMatrix.mul( vec4( viewPosition, 1.0 ) ).toConst();
 
 			const noiseResolution = textureSize( this._noiseNode, 0 );
