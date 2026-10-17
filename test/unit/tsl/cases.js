@@ -3,112 +3,112 @@ import { Break, Continue, Fn, If, Loop, Switch, array, bool, clamp, color, conte
 // Create a fresh graph for every test and backend.
 export const cases = {
 
-	constants: () => vec4( vec3( 1, 0.5, 0 ), 1 ),
+	'constants': () => vec4( vec3( 1, 0.5, 0 ), 1 ),
 
-	arithmetic: () => float( 2 ).add( 3 ).mul( 4 ).div( 2 ).sub( 1 ),
+	'arithmetic': () => float( 2 ).add( 3 ).mul( 4 ).div( 2 ).sub( 1 ),
 
-	swizzle: () => vec3( 1, 2, 3 ).zyx.mul( 0.5 ),
+	'swizzle': () => vec3( 1, 2, 3 ).zyx.mul( 0.5 ),
 
 	// Explicit types promote to the broader component type in either operand order.
-	autoConvertIntToFloat: () => float( 0.5 ).mul( int( 1 ) ),
+	'auto convert int to float': () => float( 0.5 ).mul( int( 1 ) ),
 
 	// An implicit integer-valued number adapts to int; an explicit float promotes it.
-	autoConvertFloatToInt: () => int( 2 ).add( 1 ),
+	'auto convert float to int': () => int( 2 ).add( 1 ),
 
-	autoPromoteIntToFloat: () => int( 1 ).mul( float( 0.5 ) ),
+	'auto promote int to float': () => int( 1 ).mul( float( 0.5 ) ),
 
-	autoConvertUintToFloat: () => float( 0.5 ).mul( uint( 1 ) ),
+	'auto convert uint to float': () => float( 0.5 ).mul( uint( 1 ) ),
 
-	autoPromoteUintToFloat: () => uint( 1 ).mul( float( 0.5 ) ),
+	'auto promote uint to float': () => uint( 1 ).mul( float( 0.5 ) ),
 
-	autoPromoteUintToInt: () => uint( 1 ).add( int( - 1 ) ),
+	'auto promote uint to int': () => uint( 1 ).add( int( - 1 ) ),
 
-	autoPromoteIntAndUint: () => int( - 1 ).add( uint( 1 ) ),
+	'auto promote int and uint': () => int( - 1 ).add( uint( 1 ) ),
 
 	// Equality uses the same common type in either operand order.
-	equalFloatInt: () => float( 1.5 ).equal( int( 1 ) ),
+	'equal float int': () => float( 1.5 ).equal( int( 1 ) ),
 
-	equalIntFloat: () => int( 1 ).equal( float( 1.5 ) ),
+	'equal int float': () => int( 1 ).equal( float( 1.5 ) ),
 
-	equalBoolUint: () => bool( true ).equal( uint( 1 ) ),
+	'equal bool uint': () => bool( true ).equal( uint( 1 ) ),
 
-	equalUintBool: () => uint( 1 ).equal( bool( true ) ),
+	'equal uint bool': () => uint( 1 ).equal( bool( true ) ),
 
-	equalBoolFloat: () => bool( true ).equal( float( 1.5 ) ),
+	'equal bool float': () => bool( true ).equal( float( 1.5 ) ),
 
-	equalFloatBool: () => float( 1.5 ).equal( bool( true ) ),
+	'equal float bool': () => float( 1.5 ).equal( bool( true ) ),
 
-	equalFloatIntVector: () => vec3( 1.5 ).equal( ivec3( 1 ) ),
+	'equal float int vector': () => vec3( 1.5 ).equal( ivec3( 1 ) ),
 
-	equalIntFloatVector: () => ivec3( 1 ).equal( vec3( 1.5 ) ),
+	'equal int float vector': () => ivec3( 1 ).equal( vec3( 1.5 ) ),
 
 	// Explicit integer constants truncate before promotion to float, including cached values.
-	truncatedUintToFloat: () => float( 1 ).mul( uint( 0.4 ) ),
+	'truncated uint to float': () => float( 1 ).mul( uint( 0.4 ) ),
 
-	truncatedUintConstants: () => uint( 1.5 ),
+	'truncated uint constants': () => uint( 1.5 ),
 
-	truncatedIntConstants: () => int( - 1.5 ),
+	'truncated int constants': () => int( - 1.5 ),
 
-	truncatedUintFraction: () => uint( 0.6 ),
+	'truncated uint fraction': () => uint( 0.6 ),
 
-	truncatedIntFraction: () => int( - 0.6 ),
+	'truncated int fraction': () => int( - 0.6 ),
 
-	clampedNegativeUint: () => uint( - 0.4 ),
+	'clamped negative uint': () => uint( - 0.4 ),
 
-	autoConvertScalarToVector: () => vec3( 1, 2, 3 ).add( 0.5 ),
+	'auto convert scalar to vector': () => vec3( 1, 2, 3 ).add( 0.5 ),
 
-	autoConvertVectorToFloat: () => vec3( 0.5 ).add( ivec3( 1, 2, 3 ) ),
+	'auto convert vector to float': () => vec3( 0.5 ).add( ivec3( 1, 2, 3 ) ),
 
 	// A weak scalar adapts to the integer vector; an explicit float vector promotes it.
-	autoConvertVectorToInt: () => ivec3( 1, 2, 3 ).add( 1 ),
+	'auto convert vector to int': () => ivec3( 1, 2, 3 ).add( 1 ),
 
-	autoPromoteIntVectorToFloat: () => ivec3( 1, 2, 3 ).add( vec3( 0.5 ) ),
+	'auto promote int vector to float': () => ivec3( 1, 2, 3 ).add( vec3( 0.5 ) ),
 
 	// Integer-valued weak numbers keep unsigned index math in uint.
-	weakUintIndexMath: () => uint( 70 ).div( 64 ),
+	'weak uint index math': () => uint( 70 ).div( 64 ),
 
-	weakFloatDefault: () => mul( 1, 2 ),
+	'weak float default': () => mul( 1, 2 ),
 
 	// Weak numbers adopt the explicit integer type, truncated if needed; values out of its range promote it.
-	weakUintFraction: () => uint( 1 ).mul( 0.5 ),
+	'weak uint fraction': () => uint( 1 ).mul( 0.5 ),
 
-	weakIntFraction: () => int( 3 ).mul( 1.5 ),
+	'weak int fraction': () => int( 3 ).mul( 1.5 ),
 
-	weakPromoteNegative: () => uint( 1 ).add( - 1 ),
+	'weak promote negative': () => uint( 1 ).add( - 1 ),
 
-	weakPromoteOutOfRange: () => uint( 1 ).add( 0x100000000 ),
+	'weak promote out of range': () => uint( 1 ).add( 0x100000000 ),
 
 	// A shared weak constant adapts independently to each use.
-	weakSharedConstant: () => uint( 1 ).add( 1 ).add( float( 1 ).add( 1 ) ),
+	'weak shared constant': () => uint( 1 ).add( 1 ).add( float( 1 ).add( 1 ) ),
 
 	// Math functions promote across all arguments, regardless of their order.
-	weakMathFunctions: () => clamp( uint( 1 ), 0, 2 ),
+	'weak math functions': () => clamp( uint( 1 ), 0, 2 ),
 
-	weakMathFunctionsReordered: () => clamp( 0, uint( 1 ), 2 ),
+	'weak math functions reordered': () => clamp( 0, uint( 1 ), 2 ),
 
 	// Float-only math functions promote integer arguments to float.
-	floatOnlyMathFunctions: () => int( 2 ).pow( 2 ),
+	'float only math functions': () => int( 2 ).pow( 2 ),
 
 	// Integer math functions keep integer arguments.
-	integerMathFunctions: () => uint( 1 ).max( 2 ),
+	'integer math functions': () => uint( 1 ).max( 2 ),
 
 	// Matrix functions keep the matrix type.
-	squareMatrixFunctions: () => determinant( transpose( inverse( mat2( 1, 2, 3, 4 ) ) ) ),
+	'square matrix functions': () => determinant( transpose( inverse( mat2( 1, 2, 3, 4 ) ) ) ),
 
-	vectorComposition: () => vec4( vec2( 1, 2 ), int( 3 ), uint( 4 ) ),
+	'vector composition': () => vec4( vec2( 1, 2 ), int( 3 ), uint( 4 ) ),
 
-	vectorResize: () => vec4( vec2( vec3( 1, 2, 3 ) ), 0, 1 ),
+	'vector resize': () => vec4( vec2( vec3( 1, 2, 3 ) ), 0, 1 ),
 
-	conversionCache: () => {
+	'conversion cache': () => {
 
 		const value = vec3( time.mul( 0.5 ) );
 		return vec4( value.add( value ), 1 );
 
 	},
 
-	booleanConversion: () => vec2( float( bool( true ) ), float( bool( false ) ) ),
+	'boolean conversion': () => vec2( float( bool( true ) ), float( bool( false ) ) ),
 
-	localMutableCache: () => {
+	'local mutable cache': () => {
 
 		const scaledTime = vec3( time.mul( 0.5 ) );
 		const testValue = scaledTime.add( scaledTime );
@@ -123,7 +123,7 @@ export const cases = {
 
 	},
 
-	indexedMutableCache: () => Fn( () => {
+	'indexed mutable cache': () => Fn( () => {
 
 		const matrix = mat4( 1 ).mul( mat4( 2 ) );
 		const before = matrix[ 0 ][ 0 ].add( matrix[ 1 ][ 1 ] );
@@ -135,7 +135,7 @@ export const cases = {
 
 	} )(),
 
-	loopLocalCache: () => Fn( () => {
+	'loop local cache': () => Fn( () => {
 
 		const value = float( 2 ).add( 3 );
 		const matrix = mat4( vec4( value, 0, 0, 0 ), vec4( 0, value, 0, 0 ), vec4( 0, 0, 1, 0 ), vec4( 0, 0, 0, 1 ) );
@@ -157,7 +157,7 @@ export const cases = {
 
 	} )(),
 
-	sharedLocalAcrossBlocks: () => Fn( () => {
+	'shared local across blocks': () => Fn( () => {
 
 		const sum = float( 0 );
 		const shared = float( 2 ).add( 3 );
@@ -185,7 +185,7 @@ export const cases = {
 
 	} )(),
 
-	externalVariableInLoop: () => {
+	'external variable in loop': () => {
 
 		const value = float( 2 ).add( 3 ).toVar( 'externalValue' );
 
@@ -211,7 +211,7 @@ export const cases = {
 
 	},
 
-	assignableScope: () => Fn( () => {
+	'assignable scope': () => Fn( () => {
 
 		const explicit = float( 1 ).toVar( 'explicitGlobal' );
 		const inferred = float( 2 );
@@ -223,7 +223,7 @@ export const cases = {
 
 	} )(),
 
-	assignableSharedConstants: () => Fn( () => {
+	'assignable shared constants': () => Fn( () => {
 
 		const shared = float( 1 );
 		const first = float( shared );
@@ -235,7 +235,7 @@ export const cases = {
 
 	} )(),
 
-	assignableExistingAssignment: () => Fn( () => {
+	'assignable existing assignment': () => Fn( () => {
 
 		const value = float( 1 );
 
@@ -245,23 +245,23 @@ export const cases = {
 
 	} )(),
 
-	comparisonAndLogic: () => int( 3 ).greaterThan( 1 ).and( float( 0.5 ).lessThanEqual( 1 ) ).or( bool( false ).not() ),
+	'comparison and logic': () => int( 3 ).greaterThan( 1 ).and( float( 0.5 ).lessThanEqual( 1 ) ).or( bool( false ).not() ),
 
-	vectorComparison: () => vec3( 1, 2, 3 ).greaterThan( 1 ).all(),
+	'vector comparison': () => vec3( 1, 2, 3 ).greaterThan( 1 ).all(),
 
-	selectAutoConversion: () => Fn( () => select( bool( true ), vec3( 1, 2, 3 ), int( 0 ) ) )(),
+	'select auto conversion': () => Fn( () => select( bool( true ), vec3( 1, 2, 3 ), int( 0 ) ) )(),
 
-	bitwise: () => uint( 5 ).bitAnd( uint( 3 ) ).bitOr( uint( 8 ) ).bitXor( uint( 1 ) ).shiftLeft( 2 ).shiftRight( 1 ),
+	'bitwise': () => uint( 5 ).bitAnd( uint( 3 ) ).bitOr( uint( 8 ) ).bitXor( uint( 1 ) ).shiftLeft( 2 ).shiftRight( 1 ),
 
-	mathFunctions: () => mix( vec3( - 0.5, 0.25, 2 ).abs().clamp( 0, 1 ), vec3( 1 ), 0.25 ),
+	'math functions': () => mix( vec3( - 0.5, 0.25, 2 ).abs().clamp( 0, 1 ), vec3( 1 ), 0.25 ),
 
-	vectorMath: () => vec3( 1, 2, 3 ).normalize().dot( vec3( 0, 1, 0 ).cross( vec3( 1, 0, 0 ) ) ),
+	'vector math': () => vec3( 1, 2, 3 ).normalize().dot( vec3( 0, 1, 0 ).cross( vec3( 1, 0, 0 ) ) ),
 
-	matrixVector: () => mat3( 1, 2, 3, 4, 5, 6, 7, 8, 9 ).mul( vec3( 1, 2, 3 ) ),
+	'matrix vector': () => mat3( 1, 2, 3, 4, 5, 6, 7, 8, 9 ).mul( vec3( 1, 2, 3 ) ),
 
-	matrixMatrix: () => mat3( 1, 2, 3, 4, 5, 6, 7, 8, 9 ).mul( mat3( 2, 0, 0, 0, 2, 0, 0, 0, 2 ) ),
+	'matrix matrix': () => mat3( 1, 2, 3, 4, 5, 6, 7, 8, 9 ).mul( mat3( 2, 0, 0, 0, 2, 0, 0, 0, 2 ) ),
 
-	autoConvertAssignment: () => Fn( () => {
+	'auto convert assignment': () => Fn( () => {
 
 		const value = float( 0 );
 		value.assign( int( 3 ) );
@@ -271,7 +271,7 @@ export const cases = {
 
 	} )(),
 
-	autoConvertVectorAssignment: () => Fn( () => {
+	'auto convert vector assignment': () => Fn( () => {
 
 		const value = vec3( 0 );
 		value.assign( int( 2 ) );
@@ -281,7 +281,7 @@ export const cases = {
 
 	} )(),
 
-	swizzleAssignment: () => Fn( () => {
+	'swizzle assignment': () => Fn( () => {
 
 		const value = vec3( 1, 2, 3 );
 		value.xy.assign( value.yx );
@@ -291,9 +291,9 @@ export const cases = {
 
 	} )(),
 
-	arrayIndex: () => array( [ 1, 2, 3 ] ).element( int( 1 ) ),
+	'array index': () => array( [ 1, 2, 3 ] ).element( int( 1 ) ),
 
-	arrayLoop: () => Fn( () => {
+	'array loop': () => Fn( () => {
 
 		const values = array( [ 1, 2, 3 ] );
 		const sum = float( 0 );
@@ -308,7 +308,7 @@ export const cases = {
 
 	} )(),
 
-	elseIf: () => Fn( () => {
+	'else if': () => Fn( () => {
 
 		const value = float( 0.5 );
 
@@ -330,7 +330,7 @@ export const cases = {
 
 	} )(),
 
-	switchCase: () => Fn( () => {
+	'switch case': () => Fn( () => {
 
 		const value = float( 0 );
 
@@ -352,7 +352,7 @@ export const cases = {
 
 	} )(),
 
-	loopBreakContinue: () => Fn( () => {
+	'loop break continue': () => Fn( () => {
 
 		const sum = float( 0 );
 
@@ -378,7 +378,7 @@ export const cases = {
 
 	} )(),
 
-	loopDescending: () => Fn( () => {
+	'loop descending': () => Fn( () => {
 
 		const sum = float( 0 );
 
@@ -392,7 +392,7 @@ export const cases = {
 
 	} )(),
 
-	loopNested: () => Fn( () => {
+	'loop nested': () => Fn( () => {
 
 		const sum = float( 0 );
 
@@ -406,7 +406,7 @@ export const cases = {
 
 	} )(),
 
-	loopWhile: () => Fn( () => {
+	'loop while': () => Fn( () => {
 
 		const value = int( 0 );
 
@@ -420,7 +420,7 @@ export const cases = {
 
 	} )(),
 
-	functionInlineReuse: () => Fn( () => {
+	'function inline reuse': () => Fn( () => {
 
 		const square = Fn( ( [ value ] ) => value.mul( value ) );
 		const value = square( float( 3 ) );
@@ -429,7 +429,7 @@ export const cases = {
 
 	} )(),
 
-	functionInsideLoop: () => Fn( () => {
+	'function inside loop': () => Fn( () => {
 
 		const square = Fn( ( [ value ] ) => value.mul( value ) );
 		const sum = float( 0 );
@@ -444,7 +444,7 @@ export const cases = {
 
 	} )(),
 
-	functionResultConversion: () => Fn( () => {
+	'function result conversion': () => Fn( () => {
 
 		const integerResult = Fn( () => int( 3 ) );
 
@@ -452,7 +452,7 @@ export const cases = {
 
 	} )(),
 
-	complexMatrixConditional: () => Fn( () => {
+	'complex matrix conditional': () => Fn( () => {
 
 		const matrix = mat4(
 			1, 0, 0, 0,
@@ -496,7 +496,7 @@ export const cases = {
 
 	} )(),
 
-	conditional: () => Fn( () => {
+	'conditional': () => Fn( () => {
 
 		const value = float( 0.5 );
 
@@ -514,7 +514,7 @@ export const cases = {
 
 	} )(),
 
-	loop: () => Fn( () => {
+	'loop': () => Fn( () => {
 
 		const sum = float( 0 );
 
@@ -528,7 +528,7 @@ export const cases = {
 
 	} )(),
 
-	cachedFlipAfterLoop: () => Fn( () => {
+	'cached flip after loop': () => Fn( () => {
 
 		const flipped = uv().flipX();
 		const accumulate = Fn( () => {
@@ -548,7 +548,7 @@ export const cases = {
 
 	} )(),
 
-	cachedExpressionAfterLoop: () => Fn( () => {
+	'cached expression after loop': () => Fn( () => {
 
 		const value = uv().x.add( 1 );
 		const sum = float( 0 );
@@ -563,7 +563,7 @@ export const cases = {
 
 	} )(),
 
-	cachedExpressionBeforeLoop: () => Fn( () => {
+	'cached expression before loop': () => Fn( () => {
 
 		const value = uv().x.add( 1 );
 		const sum = value.mul( value );
@@ -578,7 +578,7 @@ export const cases = {
 
 	} )(),
 
-	cachedExpressionInSiblingLoops: () => Fn( () => {
+	'cached expression in sibling loops': () => Fn( () => {
 
 		const value = uv().x.add( 1 );
 		const squared = value.mul( value );
@@ -600,7 +600,7 @@ export const cases = {
 
 	} )(),
 
-	cachedBooleanUniformAfterLoop: () => Fn( () => {
+	'cached boolean uniform after loop': () => Fn( () => {
 
 		const enabled = uniform( true );
 		const sum = float( 0 );
@@ -615,7 +615,7 @@ export const cases = {
 
 	} )(),
 
-	cachedConditionalAfterLoop: () => Fn( () => {
+	'cached conditional after loop': () => Fn( () => {
 
 		const value = select( uv().x.lessThan( 0.5 ), float( 1 ), float( 2 ) );
 		const sum = float( 0 );
@@ -630,7 +630,7 @@ export const cases = {
 
 	} )(),
 
-	functionOutsideLoop: () => Fn( () => {
+	'function outside loop': () => Fn( () => {
 
 		const sumValues = Fn( () => {
 
@@ -660,7 +660,7 @@ export const cases = {
 
 	} )(),
 
-	functionOutsideSequentialLoops: () => Fn( () => {
+	'function outside sequential loops': () => Fn( () => {
 
 		const accumulate = Fn( () => {
 
@@ -695,7 +695,7 @@ export const cases = {
 
 	} )(),
 
-	functionWithLoopInsideLoop: () => Fn( () => {
+	'function with loop inside loop': () => Fn( () => {
 
 		const sumValues = Fn( ( [ value ] ) => {
 
@@ -723,7 +723,7 @@ export const cases = {
 
 	} )(),
 
-	functionOutsideConditional: () => Fn( () => {
+	'function outside conditional': () => Fn( () => {
 
 		const sumValues = Fn( () => {
 
@@ -752,7 +752,7 @@ export const cases = {
 
 	} )(),
 
-	functionWithoutStackSingleConditionalUse: () => {
+	'function without stack single conditional use': () => {
 
 		const value = Fn( () => {
 
@@ -788,7 +788,7 @@ export const cases = {
 
 	},
 
-	functionWithoutStackSharedConditionalUse: () => {
+	'function without stack shared conditional use': () => {
 
 		const value = Fn( () => {
 
@@ -824,7 +824,7 @@ export const cases = {
 
 	},
 
-	functionWithLoopWithoutStack: () => {
+	'function with loop without stack': () => {
 
 		const value = Fn( () => {
 
@@ -852,7 +852,7 @@ export const cases = {
 
 	},
 
-	wrappedFunctionOutsideLoop: () => Fn( () => {
+	'wrapped function outside loop': () => Fn( () => {
 
 		const sumValues = Fn( () => {
 
@@ -878,7 +878,7 @@ export const cases = {
 
 	} )(),
 
-	functionLoopDefaultParameter: () => Fn( () => {
+	'function loop default parameter': () => Fn( () => {
 
 		const sumValues = Fn( ( [ count = float( 5 ) ] ) => {
 
@@ -904,7 +904,7 @@ export const cases = {
 
 	} )(),
 
-	cachedValueAfterFunctionLoop: () => Fn( () => {
+	'cached value after function loop': () => Fn( () => {
 
 		const flipped = uv().flipX();
 		const accumulate = Fn( () => {
@@ -934,7 +934,7 @@ export const cases = {
 
 	} )(),
 
-	cachedValueAfterFunctionConditional: () => Fn( () => {
+	'cached value after function conditional': () => Fn( () => {
 
 		const value = uv().x.add( 1 );
 		const square = Fn( () => {
@@ -964,7 +964,7 @@ export const cases = {
 
 	} )(),
 
-	functionAssignOutsideLoop: () => Fn( () => {
+	'function assign outside loop': () => Fn( () => {
 
 		const counter = float( 0 ).toVar( 'counter' );
 		const increment = Fn( () => {
@@ -988,7 +988,7 @@ export const cases = {
 
 	} )(),
 
-	functionConditionalOutsideLoop: () => Fn( () => {
+	'function conditional outside loop': () => Fn( () => {
 
 		const counter = float( 0 ).toVar( 'counter' );
 		const pick = Fn( () => {
@@ -1019,7 +1019,7 @@ export const cases = {
 
 	} )(),
 
-	functionReadBeforeAssign: () => Fn( () => {
+	'function read before assign': () => Fn( () => {
 
 		const x = float( 1 ).toVar( 'x' );
 		const double = Fn( () => x.mul( 2 ).toVar( 'doubled' ) );
@@ -1031,7 +1031,7 @@ export const cases = {
 
 	} )(),
 
-	functionExpressionInConditional: () => Fn( () => {
+	'function expression in conditional': () => Fn( () => {
 
 		const double = Fn( () => uv().x.mul( 2 ) );
 
@@ -1048,7 +1048,7 @@ export const cases = {
 
 	} )(),
 
-	functionReturnsVariable: () => Fn( () => {
+	'function returns variable': () => Fn( () => {
 
 		const clamped = Fn( () => {
 
@@ -1070,7 +1070,7 @@ export const cases = {
 
 	} )(),
 
-	function: () => {
+	'function': () => {
 
 		const square = Fn( ( { value } ) => value.mul( value ), { value: 'float', return: 'float' } );
 
@@ -1079,7 +1079,7 @@ export const cases = {
 	},
 
 	// Assigning a constant must not change other uses of the same value.
-	sharedConstantAssigned: () => Fn( () => {
+	'shared constant assigned': () => Fn( () => {
 
 		const a = float( 0 );
 		const b = float( 0 );
@@ -1091,7 +1091,7 @@ export const cases = {
 	} )(),
 
 	// A conversion of an existing node is a copy, assigning it must not change the source.
-	convertedNodeAssigned: () => Fn( () => {
+	'converted node assigned': () => Fn( () => {
 
 		const x = uv().x.add( 1 );
 		const copy = float( x );
@@ -1102,7 +1102,7 @@ export const cases = {
 
 	} )(),
 
-	convertedUniformAssigned: () => Fn( () => {
+	'converted uniform assigned': () => Fn( () => {
 
 		const u = uniform( 1 );
 		const v = float( u );
@@ -1114,7 +1114,7 @@ export const cases = {
 	} )(),
 
 	// A node created outside of a function is declared where it is first used.
-	nodeOutsideFunctionAssigned: () => {
+	'node outside function assigned': () => {
 
 		const outside = float( 2 );
 
@@ -1128,7 +1128,7 @@ export const cases = {
 
 	},
 
-	operationSwizzleAssigned: () => Fn( () => {
+	'operation swizzle assigned': () => Fn( () => {
 
 		const v = vec3( uv(), 1 ).mul( 2 );
 
@@ -1139,7 +1139,7 @@ export const cases = {
 
 	} )(),
 
-	operationAssignedInsideAndOutsideConditional: () => Fn( () => {
+	'operation assigned inside and outside conditional': () => Fn( () => {
 
 		const r = float( 0.25 ).mul( uv().y );
 
@@ -1155,7 +1155,7 @@ export const cases = {
 
 	} )(),
 
-	joinComponentAssigned: () => Fn( () => {
+	'join component assigned': () => Fn( () => {
 
 		const v = vec3( uv().x, 0, 1 );
 
@@ -1165,7 +1165,7 @@ export const cases = {
 
 	} )(),
 
-	cachedExpressionInsideLoop: () => Fn( () => {
+	'cached expression inside loop': () => Fn( () => {
 
 		const sum = float( 0 );
 
@@ -1182,7 +1182,7 @@ export const cases = {
 	} )(),
 
 	// Overriding a function call replaces it, like any other node.
-	overriddenFunctionCall: () => {
+	'overridden function call': () => {
 
 		const value = Fn( () => uv().x.add( 1 ) )();
 
@@ -1191,7 +1191,7 @@ export const cases = {
 	},
 
 	// Nested contexts can override the same node with different nodes.
-	nestedOverrides: () => {
+	'nested overrides': () => {
 
 		const value = uv().x;
 
@@ -1204,7 +1204,7 @@ export const cases = {
 	},
 
 	// Contexts can provide the values of attributes, each context provides its own values.
-	contextAttributes: () => {
+	'context attributes': () => {
 
 		const firstUV = vec2( 1, 2 );
 		const secondUV = vec2( 3, 4 );
@@ -1218,7 +1218,7 @@ export const cases = {
 
 	// Variables created in a function with layout are local to that function.
 
-	layoutLocalVariables: () => {
+	'layout local variables': () => {
 
 		const smooth = Fn( ( [ value ] ) => {
 
@@ -1233,7 +1233,7 @@ export const cases = {
 
 	},
 
-	layoutConditional: () => {
+	'layout conditional': () => {
 
 		const clampHalf = Fn( ( [ value ] ) => {
 
@@ -1257,7 +1257,7 @@ export const cases = {
 
 	},
 
-	layoutLoop: () => {
+	'layout loop': () => {
 
 		const sumSteps = Fn( ( [ count ] ) => {
 
@@ -1277,7 +1277,7 @@ export const cases = {
 
 	},
 
-	layoutInsideLoop: () => Fn( () => {
+	'layout inside loop': () => Fn( () => {
 
 		const square = Fn( ( [ value ] ) => value.mul( value ), { value: 'float', return: 'float' } );
 		const total = float( 0 ).toVar();
@@ -1294,7 +1294,7 @@ export const cases = {
 
 	// A function with layout is emitted once, before the functions that call it.
 
-	layoutNestedCalls: () => {
+	'layout nested calls': () => {
 
 		const square = Fn( ( [ value ] ) => value.mul( value ), { value: 'float', return: 'float' } );
 		const sumOfSquares = Fn( ( [ a, b ] ) => square( a ).add( square( b ) ), { a: 'float', b: 'float', return: 'float' } );
@@ -1304,7 +1304,7 @@ export const cases = {
 
 	},
 
-	layoutSharedInclude: () => {
+	'layout shared include': () => {
 
 		const half = Fn( ( [ value ] ) => value.mul( 0.5 ), { value: 'float', return: 'float' } );
 		const left = Fn( ( [ value ] ) => half( value ).add( half( value.add( 1 ) ) ), { value: 'float', return: 'float' } );
@@ -1314,7 +1314,7 @@ export const cases = {
 
 	},
 
-	layoutCalledTwice: () => {
+	'layout called twice': () => {
 
 		const scale = Fn( ( [ value, factor ] ) => value.mul( factor ), { value: 'vec2', factor: 'float', return: 'vec2' } );
 
@@ -1324,7 +1324,7 @@ export const cases = {
 
 	// Inputs are converted to the layout types at the call site.
 
-	layoutInputConversion: () => {
+	'layout input conversion': () => {
 
 		const lengthOf = Fn( ( [ v ] ) => v.length(), { v: 'vec3', return: 'float' } );
 
@@ -1334,7 +1334,7 @@ export const cases = {
 
 	// Missing inputs are passed as the default values of the parameters.
 
-	layoutDefaultParameter: () => {
+	'layout default parameter': () => {
 
 		const scale = Fn( ( [ value, factor = float( 2 ) ] ) => value.mul( factor ), { value: 'float', factor: 'float', return: 'float' } );
 
@@ -1342,7 +1342,7 @@ export const cases = {
 
 	},
 
-	layoutDefaultObjectParameter: () => {
+	'layout default object parameter': () => {
 
 		const scale = Fn( ( { value, factor = float( 2 ) } ) => value.mul( factor ), { value: 'float', factor: 'float', return: 'float' } );
 
@@ -1352,7 +1352,7 @@ export const cases = {
 
 	// A default value like uv() is evaluated at the call site and passed to the function.
 
-	layoutDefaultBuiltinValue: () => {
+	'layout default builtin value': () => {
 
 		const offsetUV = Fn( ( [ coord = uv(), offset = vec2( 0.5 ) ] ) => coord.add( offset ), { coord: 'vec2', offset: 'vec2', return: 'vec2' } );
 
@@ -1362,7 +1362,7 @@ export const cases = {
 
 	// A default value shared by all calls is declared once per build, outside of the function.
 
-	layoutDefaultSharedVariable: () => {
+	'layout default shared variable': () => {
 
 		const sharedWeights = Fn( () => vec3( 0.2, 0.7, 0.1 ) ).once()().toVar( 'sharedWeights' );
 		const weighted = Fn( ( [ value, weights = sharedWeights ] ) => value.dot( weights ), { value: 'vec3', weights: 'vec3', return: 'float' } );
@@ -1374,7 +1374,7 @@ export const cases = {
 	// A default value that depends on another parameter can't be passed at the call site,
 	// so that call is expanded inline.
 
-	layoutDefaultDependsOnParameter: () => {
+	'layout default depends on parameter': () => {
 
 		const average = Fn( ( [ a, b = a.mul( 2 ) ] ) => a.add( b ).mul( 0.5 ), { a: 'float', b: 'float', return: 'float' } );
 
@@ -1384,7 +1384,7 @@ export const cases = {
 
 	// An input missing in the middle of the call is also completed with its default value.
 
-	layoutDefaultMissingMiddle: () => {
+	'layout default missing middle': () => {
 
 		const weightedSum = Fn( ( [ a, weight = float( 0.5 ), b ] ) => a.add( b ).mul( weight ), { a: 'float', weight: 'float', b: 'float', return: 'float' } );
 
@@ -1394,7 +1394,7 @@ export const cases = {
 
 	// A null default can't be passed as an argument, so that call is expanded inline.
 
-	layoutDefaultNull: () => {
+	'layout default null': () => {
 
 		const scale = Fn( ( [ value, factor = null ] ) => factor === null ? value : value.mul( factor ), { value: 'float', factor: 'float', return: 'float' } );
 
@@ -1404,7 +1404,7 @@ export const cases = {
 
 	// A function with layout and once() doesn't resolve defaults, a call with missing inputs is expanded inline.
 
-	layoutOnceDefaultParameter: () => {
+	'layout once default parameter': () => {
 
 		const scale = Fn( ( [ value, factor = float( 2 ) ] ) => value.mul( factor ), { value: 'float', factor: 'float', return: 'float' } ).once();
 
@@ -1414,13 +1414,13 @@ export const cases = {
 
 	// Built-in functions with layout, with and without their optional parameters.
 
-	layoutColorAdjustmentDefaults: () => saturation( vec3( 1, 0.5, 0 ) ).add( hue( vec3( 1, 0.5, 0 ) ) ).add( grayscale( vec3( 1, 0.5, 0 ) ) ),
+	'layout color adjustment defaults': () => saturation( vec3( 1, 0.5, 0 ) ).add( hue( vec3( 1, 0.5, 0 ) ) ).add( grayscale( vec3( 1, 0.5, 0 ) ) ),
 
-	layoutColorAdjustmentExplicit: () => saturation( vec3( 1, 0.5, 0 ), 2 ).add( hue( vec3( 1, 0.5, 0 ), 0.5 ) ).add( vibrance( vec3( 1, 0.5, 0 ), 0.5 ) ),
+	'layout color adjustment explicit': () => saturation( vec3( 1, 0.5, 0 ), 2 ).add( hue( vec3( 1, 0.5, 0 ), 0.5 ) ).add( vibrance( vec3( 1, 0.5, 0 ), 0.5 ) ),
 
 	// Overloads are chosen by vector type, so a color matches a vec3 input.
 
-	layoutOverloadingColor: () => {
+	'layout overloading color': () => {
 
 		const brightness = overloadingFn( [
 			Fn( ( [ value ] ) => value, { value: 'float', return: 'float' } ),
