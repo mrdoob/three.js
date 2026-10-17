@@ -20,15 +20,15 @@ import { Fn, min, normalize, EPSILON } from '../../tsl/TSLBase.js';
  */
 const getParallaxCorrectNormal = /*@__PURE__*/ Fn( ( [ normal, cubeSize, cubePos ] ) => {
 
-	const nDir = normalize( normal ).toVar();
+	const nDir = normalize( normal ).toConst();
 	const positive = nDir.greaterThanEqual( 0 );
 
 	// keep axis-aligned directions away from zero so the distances stay finite
 	const safeDir = positive.select( nDir.max( EPSILON ), nDir.min( EPSILON.negate() ) );
-	const extent = cubeSize.mul( 0.5 );
-	const distances = positive.select( extent, extent.negate() ).add( cubePos ).sub( positionWorld ).div( safeDir ).toVar();
+	const extent = cubeSize.mul( 0.5 ).toConst();
+	const distances = positive.select( extent, extent.negate() ).add( cubePos ).sub( positionWorld ).div( safeDir ).toConst();
 
-	const correction = min( distances.x, distances.y, distances.z );
+	const correction = min( distances.x, distances.y, distances.z ).toConst();
 	return positionWorld.add( nDir.mul( correction ) ).sub( cubePos );
 
 } );
