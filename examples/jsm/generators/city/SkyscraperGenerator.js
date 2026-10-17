@@ -1744,7 +1744,14 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 	const isGlazing = isGlass.or( isShopGlass ); // upper panes and shopfronts share the room compositing
 
 	const material = new MeshStandardNodeMaterial();
-	material.colorNode = select( isGlazing, glazingColor, select( isStore, storeColor, select( isAwning, awningColor, select( isFrame, frameColor, select( isOrnament, ornamentColor, select( isAC, acColor, stoneColor ) ) ) ) ) );
+	const facadeColor = select( isGlazing, glazingColor, select( isStore, storeColor, select( isAwning, awningColor, select( isFrame, frameColor, select( isOrnament, ornamentColor, select( isAC, acColor, stoneColor ) ) ) ) ) );
+
+	// The facade is opaque, so its shadow needs no procedural RGB calculations.
+	material.colorNode = Fn( ( builder ) => {
+
+		return builder.material.isShadowPassMaterial ? vec3( 1 ) : facadeColor;
+
+	} )();
 	material.roughnessNode = select( isShopGlass, float( 0.14 ), select( isAwning, float( 0.85 ), select( isStore, float( 0.6 ), select( isGlass, glassRough, select( isOrnament, float( 0.8 ), select( isAC, acRough, rough ) ) ) ) ) ); // glass roughness rides on its grime, so dirty panes scatter the reflection
 	material.metalnessNode = float( 0 ); // all dielectric — stone, glass, fabric and the plastic AC shells
 	material.emissiveNode = select( isGlazing, room.xyz.mul( room.w ).mul( glazingEmit ), color( 0x000000 ) ); // lit rooms / shops glow through the panes
