@@ -253,7 +253,9 @@ class NodeMaterialObserver {
 
 			if ( object.isInstancedMesh === true ) {
 
+				data.instanceMatrix = object.instanceMatrix;
 				data.instanceMatrixVersion = object.instanceMatrix.version;
+				data.instanceColor = object.instanceColor;
 				data.instanceColorVersion = object.instanceColor !== null ? object.instanceColor.version : null;
 				data.morphTextureVersion = object.morphTexture !== null ? object.morphTexture.version : null;
 
@@ -798,11 +800,15 @@ class NodeMaterialObserver {
 			const instanceColorVersion = object.instanceColor !== null ? object.instanceColor.version : null;
 			const morphTextureVersion = object.morphTexture !== null ? object.morphTexture.version : null;
 
-			if ( renderObjectData.instanceMatrixVersion !== object.instanceMatrix.version ||
+			if ( renderObjectData.instanceMatrix !== object.instanceMatrix ||
+				renderObjectData.instanceMatrixVersion !== object.instanceMatrix.version ||
+				renderObjectData.instanceColor !== object.instanceColor ||
 				renderObjectData.instanceColorVersion !== instanceColorVersion ||
 				renderObjectData.morphTextureVersion !== morphTextureVersion ) {
 
+				renderObjectData.instanceMatrix = object.instanceMatrix;
 				renderObjectData.instanceMatrixVersion = object.instanceMatrix.version;
+				renderObjectData.instanceColor = object.instanceColor;
 				renderObjectData.instanceColorVersion = instanceColorVersion;
 				renderObjectData.morphTextureVersion = morphTextureVersion;
 
