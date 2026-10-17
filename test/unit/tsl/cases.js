@@ -1,4 +1,4 @@
-import { Break, Continue, Fn, If, Loop, Switch, array, bool, clamp, color, determinant, float, grayscale, hue, int, inverse, ivec3, mat2, mat3, mat4, mix, mul, overloadingFn, overrideNode, saturation, select, time, transpose, uint, uniform, uv, vec2, vec3, vec4, vibrance } from '../../../src/Three.TSL.js';
+import { Break, Continue, Fn, If, Loop, Switch, array, bool, clamp, color, context, determinant, float, grayscale, hue, int, inverse, ivec3, mat2, mat3, mat4, mix, mul, overloadingFn, overrideNode, saturation, select, time, transpose, uint, uniform, uv, vec2, vec3, vec4, vibrance } from '../../../src/Three.TSL.js';
 
 // Create a fresh graph for every test and backend.
 export const cases = {
@@ -1200,6 +1200,19 @@ export const cases = {
 		const outer = value.add( inner ).overrideNode( value, float( 1 ) );
 
 		return outer;
+
+	},
+
+	// Contexts can provide the values of attributes, each context provides its own values.
+	contextAttributes: () => {
+
+		const firstUV = vec2( 1, 2 );
+		const secondUV = vec2( 3, 4 );
+
+		const first = context( uv(), { getAttribute: ( name ) => name === 'uv' ? firstUV : null } );
+		const second = context( uv(), { getAttribute: ( name ) => name === 'uv' ? secondUV : null } );
+
+		return vec4( first.add( uv() ), second );
 
 	},
 
