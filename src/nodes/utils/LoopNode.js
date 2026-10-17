@@ -113,6 +113,7 @@ class LoopNode extends Node {
 
 		properties.returnsNode = fnCall.context( { nodeLoop: this, nodeBlock: fnCall } );
 		properties.stackNode = stack;
+		properties.context = builder.context;
 
 		const baseParam = params[ 0 ];
 
@@ -149,6 +150,36 @@ class LoopNode extends Node {
 		// setup properties
 
 		this.getProperties( builder );
+
+	}
+
+	/**
+	 * Declares a node used in the loop before it if its value is the same in every iteration,
+	 * i.e. the node is not part of the active stacks and the context has no overrides made in the loop.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {Node} node - The node to declare.
+	 * @return {StackNode|undefined} The stack where the node was declared.
+	 */
+	declareBefore( builder, node ) {
+
+		const { context } = builder.getNodeProperties( this );
+		const { stack } = builder.getDataFromNode( this );
+
+		// The loop was not set up in this build, e.g. in a sub-build, or the node is generated in a block.
+		if ( context === undefined || stack === undefined || builder.flowBlock !== null ) return;
+
+		if ( builder.activeStacks.some( activeStack => activeStack.nodes.includes( node ) ) ) return;
+
+		for ( const key in builder.context ) {
+
+			if ( key !== 'nodeLoop' && key !== 'nodeBlock' && builder.context[ key ] !== context[ key ] ) return;
+
+		}
+
+		stack.addToStackBefore( node );
+
+		return stack;
 
 	}
 
