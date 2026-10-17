@@ -36,6 +36,22 @@ export default QUnit.module( 'Materials', () => {
 
 		} );
 
+		QUnit.test( 'envMapDiffuseEnabled', ( assert ) => {
+
+			const object = new MeshPhongMaterial();
+			assert.strictEqual( object.envMapDiffuseEnabled, true, 'envMapDiffuseEnabled defaults to true.' );
+
+			const source = new MeshPhongMaterial( { envMapDiffuseEnabled: false } );
+			assert.strictEqual( new MeshPhongMaterial().copy( source ).envMapDiffuseEnabled, false, 'copy() preserves envMapDiffuseEnabled.' );
+
+			const json = source.toJSON();
+			object.fromJSON( json );
+
+			assert.strictEqual( json.envMapDiffuseEnabled, false, 'toJSON() serializes envMapDiffuseEnabled.' );
+			assert.strictEqual( object.envMapDiffuseEnabled, false, 'fromJSON() restores envMapDiffuseEnabled.' );
+
+		} );
+
 		// PUBLIC
 		QUnit.test( 'isMeshPhongMaterial', ( assert ) => {
 
