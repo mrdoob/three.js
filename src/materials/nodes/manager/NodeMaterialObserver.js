@@ -457,6 +457,20 @@ class NodeMaterialObserver {
 	}
 
 	/**
+	 * Returns the uv transformation matrix of the given texture.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @return {Matrix3} The uv transformation matrix.
+	 */
+	getTextureMatrix( texture ) {
+
+		if ( texture.matrixAutoUpdate === true ) texture.updateMatrix();
+
+		return texture.matrix;
+
+	}
+
+	/**
 	 * Returns a material data structure holding the material property values for
 	 * monitoring.
 	 *
@@ -485,7 +499,7 @@ class NodeMaterialObserver {
 
 					if ( value.isTexture === true ) {
 
-						data[ property ] = { id: value.id, version: 0, cacheVersion: this.getTextureData( value )._version };
+						data[ property ] = { id: value.id, version: 0, cacheVersion: this.getTextureData( value )._version, matrix: this.getTextureMatrix( value ).clone() };
 
 					} else {
 
@@ -565,7 +579,7 @@ class NodeMaterialObserver {
 
 						} else if ( mtlValue.isTexture === true ) {
 
-							materialData[ property ] = { id: mtlValue.id, version: mtlValue.version, cacheVersion: this.getTextureData( mtlValue )._version };
+							materialData[ property ] = { id: mtlValue.id, version: mtlValue.version, cacheVersion: this.getTextureData( mtlValue )._version, matrix: this.getTextureMatrix( mtlValue ).clone() };
 
 						} else if ( typeof mtlValue === 'object' && mtlValue.clone !== undefined ) {
 
@@ -594,12 +608,14 @@ class NodeMaterialObserver {
 				} else if ( mtlValue.isTexture === true ) {
 
 					const textureData = this.getTextureData( mtlValue );
+					const textureMatrix = this.getTextureMatrix( mtlValue );
 
-					if ( value.id !== mtlValue.id || value.version !== mtlValue.version || value.cacheVersion !== textureData._version ) {
+					if ( value.id !== mtlValue.id || value.version !== mtlValue.version || value.cacheVersion !== textureData._version || value.matrix.equals( textureMatrix ) === false ) {
 
 						value.id = mtlValue.id;
 						value.version = mtlValue.version;
 						value.cacheVersion = textureData._version;
+						value.matrix.copy( textureMatrix );
 
 						changed = true;
 
