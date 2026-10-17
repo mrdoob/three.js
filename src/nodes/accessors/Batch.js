@@ -83,12 +83,16 @@ function getPreviousNode( batchMesh, id ) {
 
 	if ( data === undefined ) {
 
-		const { image, format, type } = batchMesh._matricesTexture;
+		const matricesTexture = batchMesh._matricesTexture;
+		const { image, format, type } = matricesTexture;
 
 		const previousMatricesTexture = new DataTexture( image.data.slice(), image.width, image.height, format, type );
+		previousMatricesTexture.needsUpdate = true;
 
 		data = {
 			previousMatricesTexture,
+			matricesTexture,
+			version: matricesTexture.version,
 			node: createBatchingMatrixNode( previousMatricesTexture, id )
 		};
 
@@ -152,9 +156,19 @@ export const batch = /*@__PURE__*/ Fn( ( [ batchMesh ], builder ) => {
 		OnAfterObjectUpdate( ( { object } ) => {
 
 			const previousBatchData = _previousBatchingMatrices.get( object );
+			const matricesTexture = object._matricesTexture;
 
-			previousBatchData.previousMatricesTexture.image.data.set( object._matricesTexture.image.data );
-			previousBatchData.previousMatricesTexture.needsUpdate = true;
+			// only copy the matrices when they have changed since the last copy
+
+			if ( previousBatchData.matricesTexture !== matricesTexture || previousBatchData.version !== matricesTexture.version ) {
+
+				previousBatchData.previousMatricesTexture.image.data.set( matricesTexture.image.data );
+				previousBatchData.previousMatricesTexture.needsUpdate = true;
+
+				previousBatchData.matricesTexture = matricesTexture;
+				previousBatchData.version = matricesTexture.version;
+
+			}
 
 		} );
 
