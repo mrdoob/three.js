@@ -1,8 +1,8 @@
-import { ColorManagement } from '../../../../src/math/ColorManagement.js';
+import { ColorManagement, SRGBToLinear, LinearToSRGB } from '../../../../src/math/ColorManagement.js';
 import { Color } from '../../../../src/math/Color.js';
 import { Matrix3 } from '../../../../src/math/Matrix3.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
-import { LinearSRGBColorSpace, LinearTransfer } from '../../../../src/constants.js';
+import { SRGBColorSpace, LinearSRGBColorSpace, LinearTransfer } from '../../../../src/constants.js';
 import { eps } from '../../utils/math-constants.js';
 
 export default QUnit.module( 'Maths', () => {
@@ -16,6 +16,86 @@ export default QUnit.module( 'Maths', () => {
 				ColorManagement.enabled, true,
 				'ColorManagement.enabled is true by default.'
 			);
+
+		} );
+
+		QUnit.test( 'SRGBToLinear', ( assert ) => {
+
+			const values = [
+				[ 0, 0 ],
+				[ 0.02, 0.0015479876160990713 ],
+				[ 0.04044, 0.0031300309597523217 ],
+				[ 0.04045, 0.0031308072830676845 ],
+				[ 0.04046, 0.003131594552688991 ],
+				[ 0.1, 0.010022825574869039 ],
+				[ 0.5, 0.21404114048223255 ],
+				[ 1, 1 ],
+				[ 2, 4.953845751592042 ]
+			];
+
+			for ( const [ srgb, linear ] of values ) {
+
+				for ( const sign of [ - 1, 1 ] ) {
+
+					assert.ok( Math.abs( SRGBToLinear( sign * srgb ) - sign * linear ) < 1e-8, `Converts ${ sign * srgb } to ${ sign * linear }` );
+
+				}
+
+			}
+
+			assert.ok( Object.is( SRGBToLinear( - 0 ), - 0 ), 'Preserves negative zero' );
+
+		} );
+
+		QUnit.test( 'LinearToSRGB', ( assert ) => {
+
+			const values = [
+				[ 0, 0 ],
+				[ 0.001, 0.01292 ],
+				[ 0.0031307, 0.040448644 ],
+				[ 0.0031308, 0.04044990748269014 ],
+				[ 0.0031309, 0.04045117777859802 ],
+				[ 0.01, 0.09985282273412832 ],
+				[ 0.21404114048223255, 0.5 ],
+				[ 1, 1 ],
+				[ 2, 1.3532560461493863 ]
+			];
+
+			for ( const [ linear, srgb ] of values ) {
+
+				for ( const sign of [ - 1, 1 ] ) {
+
+					assert.ok( Math.abs( LinearToSRGB( sign * linear ) - sign * srgb ) < eps, `Converts ${ sign * linear } to ${ sign * srgb }` );
+
+				}
+
+			}
+
+			assert.ok( Object.is( LinearToSRGB( - 0 ), - 0 ), 'Preserves negative zero' );
+
+		} );
+
+		QUnit.test( 'Extended sRGB round trip', ( assert ) => {
+
+			for ( const value of [ - 2, - 1, - 0.5, - 0.04, - 0.001, 0, 0.001, 0.04, 0.5, 1, 2 ] ) {
+
+				assert.ok( Math.abs( LinearToSRGB( SRGBToLinear( value ) ) - value ) < eps, `sRGB round trip for ${ value }` );
+				assert.ok( Math.abs( SRGBToLinear( LinearToSRGB( value ) ) - value ) < eps, `Linear sRGB round trip for ${ value }` );
+
+			}
+
+		} );
+
+		QUnit.test( 'convert extended sRGB', ( assert ) => {
+
+			const color = new Color().setRGB( - 0.5, 0.02, 2 );
+			ColorManagement.convert( color, SRGBColorSpace, LinearSRGBColorSpace );
+			assert.ok( Math.abs( color.r + 0.21404114048223255 ) < eps, 'Converts the negative channel' );
+			assert.ok( Math.abs( color.g - 0.0015479876160990713 ) < eps, 'Converts the linear segment' );
+			assert.ok( Math.abs( color.b - 4.953845751592042 ) < eps, 'Preserves values above one' );
+
+			ColorManagement.convert( color, LinearSRGBColorSpace, SRGBColorSpace );
+			assert.ok( Math.abs( color.r + 0.5 ) < eps && Math.abs( color.g - 0.02 ) < eps && Math.abs( color.b - 2 ) < eps, 'Restores the original color' );
 
 		} );
 
