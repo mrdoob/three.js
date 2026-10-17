@@ -474,6 +474,7 @@
 		"webgpu_procedural_texture",
 		"webgpu_reflection",
 		"webgpu_reflection_blurred",
+		"webgpu_reflection_probes",
 		"webgpu_reflection_roughness",
 		"webgpu_refraction",
 		"webgpu_renderer_pathtracer",
