@@ -1190,6 +1190,19 @@ export const cases = {
 
 	},
 
+	// Nested contexts can override the same node with different nodes.
+	nestedOverrides: () => {
+
+		const value = uv().x;
+
+		// the inner context replaces value with 2, the outer context replaces value with 1: 1 + 2
+		const inner = value.overrideNode( value, float( 2 ) );
+		const outer = value.add( inner ).overrideNode( value, float( 1 ) );
+
+		return outer;
+
+	},
+
 	// Contexts can provide the values of attributes, each context provides its own values.
 	contextAttributes: () => {
 
