@@ -260,15 +260,13 @@ nodeVar0
 var externalValue : f32;
 
 var nodeVar0 : f32 = 0.0;
+externalValue = ( 2.0 + 3.0 );
 
 for ( var i : i32 = 0; i < 0; i ++ ) {
 
-	externalValue = ( 2.0 + 3.0 );
 	nodeVar0 = ( nodeVar0 + externalValue );
 
 }
-
-externalValue = ( 2.0 + 3.0 );
 
 for ( var i : i32 = 0; i < 2; i ++ ) {
 
@@ -277,6 +275,40 @@ for ( var i : i32 = 0; i < 2; i ++ ) {
 }
 
 ( nodeVar0 + externalValue )
+
+// external variable in branch
+
+var result : f32;
+var nodeVar0 : f32;
+var nodeVar1 : f32;
+var externalValue : f32;
+
+result = 0.0;
+
+if ( ( object.nodeUniform0 > 0.5 ) ) {
+
+	if ( ( nodeVarying0.x > 0.5 ) ) {
+
+		nodeVar1 = 2.0;
+
+	} else {
+
+		nodeVar1 = 3.0;
+
+	}
+
+	externalValue = nodeVar1;
+	nodeVar0 = externalValue;
+
+} else {
+
+	nodeVar0 = 0.0;
+
+}
+
+result = nodeVar0;
+
+result
 
 // assignable scope
 
@@ -909,18 +941,19 @@ vec3<f32>( nodeVar0 )
 // function with loop without stack
 
 var nodeVar0 : f32 = 0.0;
+var nodeVar1 : f32 = 0.0;
+
+for ( var i : i32 = 0; i < 3; i ++ ) {
+
+	nodeVar1 = ( nodeVar1 + f32( i ) );
+
+}
+
+var nodeVar2 : f32 = nodeVar1;
 
 for ( var i : i32 = 0; i < 4; i ++ ) {
 
-	var nodeVar1 : f32 = 0.0;
-
-	for ( var i : i32 = 0; i < 3; i ++ ) {
-
-		nodeVar1 = ( nodeVar1 + f32( i ) );
-
-	}
-
-	nodeVar0 = ( nodeVar0 + nodeVar1 );
+	nodeVar0 = ( nodeVar0 + nodeVar2 );
 
 }
 

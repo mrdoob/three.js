@@ -211,6 +211,23 @@ export const cases = {
 
 	},
 
+	// An external variable used only in a branch is evaluated only in that branch.
+	'external variable in branch': () => {
+
+		const value = select( uv().x.greaterThan( 0.5 ), float( 2 ), float( 3 ) ).toVar( 'externalValue' );
+
+		return Fn( () => {
+
+			const result = float( 0 ).toVar( 'result' );
+
+			result.assign( select( uniform( 1 ).greaterThan( 0.5 ), value, float( 0 ) ) );
+
+			return result;
+
+		} )();
+
+	},
+
 	'assignable scope': () => Fn( () => {
 
 		const explicit = float( 1 ).toVar( 'explicitGlobal' );
