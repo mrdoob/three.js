@@ -389,6 +389,7 @@
 		"webgpu_loader_gltf_diffuse_roughness",
 		"webgpu_loader_gltf_dispersion",
 		"webgpu_loader_gltf_iridescence",
+		"webgpu_loader_gltf_lightmaps",
 		"webgpu_loader_gltf_sheen",
 		"webgpu_loader_gltf_transmission",
 		"webgpu_loader_materialx",
