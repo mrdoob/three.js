@@ -1933,6 +1933,8 @@ class GLTFWriter {
 			if ( attributeName.slice( 0, 5 ) === 'morph' ) continue;
 
 			const attribute = geometry.attributes[ attributeName ];
+			// Instance attributes belong to EXT_mesh_gpu_instancing, not primitives.
+			if ( mesh.isInstancedMesh && attribute.isInstancedBufferAttribute ) continue;
 			attributeName = nameConversion[ attributeName ] || attributeName.toUpperCase();
 
 			// Prefix all geometry attributes except the ones specifically
