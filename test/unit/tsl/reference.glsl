@@ -1125,6 +1125,10 @@ nodeVar0
 
 ( nodeVarying0.y * 2.0 )
 
+// context attributes
+
+vec4( ( vec2( 1.0, 2.0 ) + nodeVarying0 ), vec2( 3.0, 4.0 ) )
+
 // layout local variables
 
 float fn0 ( float value ) {
