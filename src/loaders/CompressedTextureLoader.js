@@ -1,4 +1,4 @@
-import { LinearFilter } from '../constants.js';
+import { CubeReflectionMapping, LinearFilter, UVMapping } from '../constants.js';
 import { FileLoader } from './FileLoader.js';
 import { CompressedTexture } from '../textures/CompressedTexture.js';
 import { Loader } from './Loader.js';
@@ -74,6 +74,7 @@ class CompressedTextureLoader extends Loader {
 					if ( texDatas.mipmapCount === 1 ) texture.minFilter = LinearFilter;
 
 					texture.image = images;
+					setCubeTexture( texture );
 					texture.format = texDatas.format;
 					texture.needsUpdate = true;
 
@@ -121,6 +122,7 @@ class CompressedTextureLoader extends Loader {
 					}
 
 					texture.image = images;
+					setCubeTexture( texture );
 
 				} else {
 
@@ -148,6 +150,18 @@ class CompressedTextureLoader extends Loader {
 		return texture;
 
 	}
+
+}
+
+// Whether the data represent a cube map is only known once they are parsed, so the texture
+// returned by `load()` becomes a compressed cube texture like `CompressedCubeTexture`.
+
+function setCubeTexture( texture ) {
+
+	texture.isCubeTexture = true;
+	texture.isCompressedCubeTexture = true;
+
+	if ( texture.mapping === UVMapping ) texture.mapping = CubeReflectionMapping;
 
 }
 
