@@ -1,4 +1,4 @@
-import { BoxGeometry, DataTexture, Float32BufferAttribute, FloatType, InstancedBufferAttribute, InstancedMesh, LinearSRGBColorSpace, Mesh, MeshBasicMaterial, MeshStandardMaterial, Scene, SRGBColorSpace, Vector2 } from '../../../../src/Three.js';
+import { BoxGeometry, DataTexture, DataUtils, Float32BufferAttribute, FloatType, HalfFloatType, InstancedBufferAttribute, InstancedMesh, LinearSRGBColorSpace, Mesh, MeshBasicMaterial, MeshStandardMaterial, NoColorSpace, Scene, SRGBColorSpace, Vector2 } from '../../../../src/Three.js';
 import { GLTFLoader } from '../../../../examples/jsm/loaders/GLTFLoader.js';
 import { GLTFExporter } from '../../../../examples/jsm/exporters/GLTFExporter.js';
 import { GLTFLightMapLoaderExtension } from '../../../../examples/jsm/loaders/GLTFLightMapLoaderExtension.js';
@@ -137,6 +137,28 @@ export default QUnit.module( 'Addons', () => {
 
 		} );
 
+
+		QUnit.test( 'keepInstances keeps instanced meshes with their atlas attributes', async assert => {
+
+			const { json, accessor } = fixture();
+			json.nodes[ 0 ].extensions = { EXT_mesh_gpu_instancing: { attributes: {
+				TRANSLATION: accessor( [ 0, 0, 0, 1, 0, 0 ], 'VEC3', 3 ),
+				_LIGHTMAP_OFFSET: accessor( [ 0.5, 0, 0, 0.5 ], 'VEC2', 2 ),
+				_LIGHTMAP_SCALE: accessor( [ 0.5, 0.5, 0.5, 0.5 ], 'VEC2', 2 )
+			} } };
+			const gltf = await new GLTFLoader().register( parser => new GLTFLightMapLoaderExtension( parser, { keepInstances: true } ) ).parseAsync( JSON.stringify( json ), '' );
+			const meshes = [];
+			gltf.scene.traverse( object => object.isMesh && meshes.push( object ) );
+			assert.strictEqual( meshes.length, 1 );
+			assert.true( meshes[ 0 ].isInstancedMesh, 'stays instanced' );
+			assert.strictEqual( meshes[ 0 ].count, 2 );
+			assert.ok( meshes[ 0 ].material.lightMap, 'keeps the shared light map' );
+			const offset = meshes[ 0 ].geometry.getAttribute( '_LIGHTMAP_OFFSET' );
+			assert.true( offset.isInstancedBufferAttribute );
+			assert.deepEqual( Array.from( offset.array ), [ 0.5, 0, 0, 0.5 ] );
+			assert.deepEqual( Array.from( meshes[ 0 ].geometry.getAttribute( '_LIGHTMAP_SCALE' ).array ), [ 0.5, 0.5, 0.5, 0.5 ] );
+
+		} );
 
 		QUnit.test( 'intensity-only instances use identity UVs and reject invalid values', async assert => {
 
@@ -303,35 +325,180 @@ export default QUnit.module( 'Addons', () => {
 		} );
 
 
-		QUnit.test( 'HDR float textures require explicit normalization without mutating source', async assert => {
+		QUnit.test( 'HDR textures export as normalized 16-bit sRGB PNGs without mutating source', async assert => {
 
-			const pixels = new Float32Array( [ 4, 2, 0.5, 1 ] );
-			const texture = new DataTexture( pixels, 1, 1 );
-			texture.type = FloatType;
-			texture.colorSpace = LinearSRGBColorSpace;
-			const scene = new Scene();
-			scene.add( new Mesh( new BoxGeometry(), new MeshStandardMaterial( { lightMap: texture } ) ) );
-			const exporter = new GLTFExporter().register( writer => new GLTFLightMapExporterExtension( writer ) );
-			await assert.rejects( exporter.parseAsync( scene ), /Normalize HDR irradiance/, 'rejects lossy float conversion with normalization guidance' );
-			assert.deepEqual( Array.from( texture.image.data ), [ 4, 2, 0.5, 1 ], 'does not alter HDR source samples' );
+			for ( const binary of [ false, true ] ) {
+
+				const pixels = new Float32Array( [ 4, 2, 0.5, 1, 0.001, 0, 0, 1 ] );
+				const texture = new DataTexture( pixels, 2, 1 );
+				texture.type = FloatType;
+				texture.colorSpace = LinearSRGBColorSpace;
+				texture.channel = 1;
+				const geometry = new BoxGeometry();
+				geometry.setAttribute( 'uv1', geometry.getAttribute( 'uv' ).clone() );
+				const scene = new Scene();
+				scene.add( new Mesh( geometry, new MeshStandardMaterial( { lightMap: texture, lightMapIntensity: 2 } ) ) );
+				const exporter = new GLTFExporter().register( writer => new GLTFLightMapExporterExtension( writer ) );
+				const result = await exporter.parseAsync( scene, { binary } );
+				assert.deepEqual( Array.from( texture.image.data ), Array.from( new Float32Array( [ 4, 2, 0.5, 1, 0.001, 0, 0, 1 ] ) ), 'does not alter HDR source samples' );
+				const gltf = await new GLTFLoader().register( parser => new GLTFLightMapLoaderExtension( parser ) ).parseAsync( binary ? result : JSON.stringify( result ), '' );
+				const json = gltf.parser.json;
+				const binding = json.materials[ 0 ].extensions.KHR_lightmap;
+				assert.strictEqual( binding.intensity, 8, 'stores the maximum times the material intensity' );
+				assert.strictEqual( binding.encoding, 'srgb', 'declares the sRGB transfer function' );
+				assert.strictEqual( json.images[ 0 ].mimeType, 'image/png', 'stores a PNG' );
+				const material = gltf.scene.children[ 0 ].material;
+				const map = material.lightMap;
+				assert.strictEqual( map.type, HalfFloatType, 'decodes the 16-bit PNG into half floats' );
+				assert.strictEqual( map.colorSpace, LinearSRGBColorSpace, 'decodes linear irradiance' );
+				assert.strictEqual( map.channel, 1, 'keeps the UV channel' );
+				assert.strictEqual( material.lightMapIntensity, 8, 'restores the scale' );
+				const decoded = Array.from( map.image.data ).map( value => DataUtils.fromHalfFloat( value ) * material.lightMapIntensity / 2 );
+				[ 4, 2, 0.5, 1, 0.001, 0, 0, 1 ].forEach( ( value, i ) => {
+
+					if ( i % 4 !== 3 ) assert.ok( Math.abs( decoded[ i ] - value ) <= value * 2e-3 + 1e-6, 'round trips irradiance ' + value + ': ' + decoded[ i ] );
+
+				} );
+
+			}
 
 		} );
 
-		QUnit.test( 'export decodes sRGB samples into linear irradiance without mutating source', async assert => {
+		QUnit.test( '8-bit HDR export and 16-bit fallback decode with the browser as sRGB', async assert => {
+
+			for ( const [ bitDepth, highPrecision ] of [[ 8, true ], [ 16, false ]] ) {
+
+				const texture = new DataTexture( new Float32Array( [ 4, 1, 0.25, 1 ] ), 1, 1 );
+				texture.type = FloatType;
+				texture.colorSpace = LinearSRGBColorSpace;
+				const scene = new Scene();
+				scene.add( new Mesh( new BoxGeometry(), new MeshStandardMaterial( { lightMap: texture } ) ) );
+				const json = await new GLTFExporter().register( writer => new GLTFLightMapExporterExtension( writer, { bitDepth } ) ).parseAsync( scene );
+				const gltf = await new GLTFLoader().register( parser => new GLTFLightMapLoaderExtension( parser, { highPrecision } ) ).parseAsync( JSON.stringify( json ), '' );
+				const map = gltf.scene.children[ 0 ].material.lightMap;
+				assert.strictEqual( map.colorSpace, SRGBColorSpace, 'samples the image as sRGB' );
+				const canvas = document.createElement( 'canvas' );
+				canvas.width = canvas.height = 1;
+				const context = canvas.getContext( '2d' );
+				context.drawImage( map.image, 0, 0 );
+				const [ r, g, b ] = context.getImageData( 0, 0, 1, 1 ).data;
+				assert.strictEqual( r, 255, bitDepth + '-bit image is normalized' );
+				assert.ok( Math.abs( g - 137 ) <= 1 && Math.abs( b - 71 ) <= 1, bitDepth + '-bit image holds sRGB encoded samples: ' + g + ', ' + b );
+
+			}
+
+		} );
+
+		QUnit.test( 'export keeps sRGB samples with the srgb encoding without mutating source', async assert => {
 
 			const texture = new DataTexture( new Uint8Array( [ 128, 64, 32, 255 ] ), 1, 1 );
 			texture.colorSpace = SRGBColorSpace;
 			const scene = new Scene();
 			scene.add( new Mesh( new BoxGeometry(), new MeshStandardMaterial( { lightMap: texture } ) ) );
 			const json = await new GLTFExporter().register( writer => new GLTFLightMapExporterExtension( writer ) ).parseAsync( scene );
+			assert.strictEqual( json.materials[ 0 ].extensions.KHR_lightmap.encoding, 'srgb', 'declares the sRGB transfer function' );
 			const gltf = await load( json );
+			const map = gltf.scene.children[ 0 ].material.lightMap;
+			assert.strictEqual( map.colorSpace, SRGBColorSpace, 'decodes sRGB when sampling' );
 			const canvas = document.createElement( 'canvas' );
 			canvas.width = canvas.height = 1;
 			const context = canvas.getContext( '2d' );
-			context.drawImage( gltf.scene.children[ 0 ].material.lightMap.image, 0, 0 );
-			assert.deepEqual( Array.from( context.getImageData( 0, 0, 1, 1 ).data ), [ 55, 13, 4, 255 ], 'stores decoded linear image bytes' );
+			context.drawImage( map.image, 0, 0 );
+			assert.deepEqual( Array.from( context.getImageData( 0, 0, 1, 1 ).data ), [ 128, 64, 32, 255 ], 'stores sRGB image bytes' );
 			assert.deepEqual( Array.from( texture.image.data ), [ 128, 64, 32, 255 ], 'preserves source image bytes' );
 			assert.strictEqual( texture.colorSpace, SRGBColorSpace, 'preserves source color space' );
+
+		} );
+
+		QUnit.test( 'direction textures export as 8-bit linear PNGs and load with the light map UVs', async assert => {
+
+			for ( const binary of [ false, true ] ) {
+
+				const lightMap = new DataTexture( new Float32Array( [ 4, 2, 0.5, 1, 1, 1, 1, 1 ] ), 2, 1 );
+				lightMap.type = FloatType;
+				lightMap.colorSpace = LinearSRGBColorSpace;
+				lightMap.channel = 1;
+				lightMap.offset.set( 0.25, 0.5 );
+				lightMap.repeat.set( 0.5, 0.25 );
+				const samples = [ 0.75, 0.5, 1, 1, 0, 0.5, 0.25, 1 ];
+				const direction = new DataTexture( new Uint16Array( samples.map( value => DataUtils.toHalfFloat( value ) ) ), 2, 1 );
+				direction.type = HalfFloatType;
+				direction.colorSpace = LinearSRGBColorSpace;
+				direction.channel = 1;
+				const geometry = new BoxGeometry();
+				geometry.setAttribute( 'uv1', geometry.getAttribute( 'uv' ).clone() );
+				const material = new MeshStandardMaterial( { lightMap, lightMapIntensity: 2 } );
+				material.lightMapDirection = direction;
+				const scene = new Scene();
+				scene.add( new Mesh( geometry, material ) );
+				const exporter = new GLTFExporter().register( writer => new GLTFLightMapExporterExtension( writer ) );
+				const result = await exporter.parseAsync( scene, { binary } );
+				assert.deepEqual( Array.from( direction.image.data ).map( value => DataUtils.fromHalfFloat( value ) ), samples, 'does not alter the direction samples' );
+				const applied = [];
+				const loader = new GLTFLoader().register( parser => new GLTFLightMapLoaderExtension( parser, { directionalLightMap: ( target, texture ) => applied.push( [ target, texture ] ) } ) );
+				const gltf = await loader.parseAsync( binary ? result : JSON.stringify( result ), '' );
+				const json = gltf.parser.json;
+				const binding = json.materials[ 0 ].extensions.KHR_lightmap;
+				assert.strictEqual( binding.directionTexture.texCoord, 1, 'uses the light map UVs' );
+				assert.deepEqual( binding.directionTexture.extensions.KHR_texture_transform, binding.lightmapTexture.extensions.KHR_texture_transform, 'uses the light map transform' );
+				assert.strictEqual( json.images[ json.textures[ binding.directionTexture.index ].source ].mimeType, 'image/png', 'stores a PNG' );
+				const loaded = gltf.scene.children[ 0 ].material;
+				const map = loaded.lightMapDirection;
+				assert.ok( map && map.isTexture, 'keeps the direction texture in lightMapDirection' );
+				assert.strictEqual( applied.length, 1, 'applies the directional light map once' );
+				assert.strictEqual( applied[ 0 ][ 0 ], loaded, 'applies it to the material' );
+				assert.strictEqual( applied[ 0 ][ 1 ], map, 'applies the direction texture' );
+				assert.strictEqual( map.colorSpace, NoColorSpace, 'decodes linear directions' );
+				assert.strictEqual( map.channel, loaded.lightMap.channel, 'shares the UV channel' );
+				assert.deepEqual( map.offset.toArray(), loaded.lightMap.offset.toArray(), 'shares the offset' );
+				assert.deepEqual( map.repeat.toArray(), loaded.lightMap.repeat.toArray(), 'shares the scale' );
+				const canvas = document.createElement( 'canvas' );
+				canvas.width = 2;
+				canvas.height = 1;
+				const context = canvas.getContext( '2d' );
+				context.drawImage( map.image, 0, 0 );
+				assert.deepEqual( Array.from( context.getImageData( 0, 0, 2, 1 ).data ), [ 191, 128, 255, 255, 0, 128, 64, 255 ], 'stores directions with 8 bits' );
+
+			}
+
+		} );
+
+		QUnit.test( 'direction textures need a light map and follow expanded instances', async assert => {
+
+			const { json, accessor } = fixture();
+			json.materials[ 0 ].extensions.KHR_lightmap.directionTexture = { index: 0 };
+			json.nodes[ 0 ].extensions = { EXT_mesh_gpu_instancing: { attributes: {
+				TRANSLATION: accessor( [ 0, 0, 0, 1, 0, 0 ], 'VEC3', 3 ),
+				_LIGHTMAP_OFFSET: accessor( [ 0.5, 0, 0, 0.5 ], 'VEC2', 2 )
+			} } };
+			const gltf = await load( json );
+			const meshes = [];
+			gltf.scene.traverse( object => object.isMesh && meshes.push( object ) );
+			assert.strictEqual( meshes.length, 2, 'expands both instances' );
+
+			for ( const mesh of meshes ) {
+
+				const { lightMap, lightMapDirection } = mesh.material;
+				assert.ok( lightMapDirection && lightMapDirection !== lightMap, 'each instance has a direction texture' );
+				assert.strictEqual( lightMapDirection.channel, lightMap.channel, 'with the UV channel of the baked instance UVs' );
+				assert.deepEqual( lightMapDirection.matrix.elements, lightMap.matrix.elements, 'and its transform' );
+
+			}
+
+			const scene = new Scene();
+			const material = new MeshStandardMaterial();
+			material.lightMapDirection = new DataTexture( new Uint8Array( [ 128, 128, 255, 255 ] ), 1, 1 );
+			scene.add( new Mesh( new BoxGeometry(), material ) );
+			const exported = await new GLTFExporter().register( writer => new GLTFLightMapExporterExtension( writer ) ).parseAsync( scene );
+			assert.notOk( exported.materials[ 0 ].extensions?.KHR_lightmap, 'writes no binding without a light map' );
+
+		} );
+
+		QUnit.test( 'rejects unknown encodings', async assert => {
+
+			const { json } = fixture();
+			json.materials[ 0 ].extensions.KHR_lightmap.encoding = 'rgbm';
+			await assert.rejects( load( json ), /Unsupported encoding/, 'rejects unknown transfer functions' );
 
 		} );
 

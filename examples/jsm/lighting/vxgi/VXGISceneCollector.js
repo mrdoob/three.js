@@ -9,9 +9,11 @@ const _uva = /*@__PURE__*/ new Vector2();
 const _uvb = /*@__PURE__*/ new Vector2();
 const _uvc = /*@__PURE__*/ new Vector2();
 const _uv = /*@__PURE__*/ new Vector2();
+const _centroid = /*@__PURE__*/ new Vector2();
 const _color = /*@__PURE__*/ new Color();
 const _albedo = /*@__PURE__*/ new Color();
 const _emissive = /*@__PURE__*/ new Color();
+const _instanceColor = /*@__PURE__*/ new Color();
 
 const IMAGE_SAMPLE_SIZE = 64;
 
@@ -272,6 +274,10 @@ export function collectSceneTriangles( scene, options ) {
 
 	const maxEdgeSq = ( maxEdge * subVoxelSize ) * ( maxEdge * subVoxelSize );
 
+	// the color of the current instance of an instanced mesh, which scales the albedo
+
+	let instanceColor = null;
+
 	// triangle emission with subdivision of large triangles
 
 	const stack = [];
@@ -327,6 +333,84 @@ export function collectSceneTriangles( scene, options ) {
 			buffer.push4( emissive.r, emissive.g, emissive.b, 0 );
 
 		}
+
+	}
+
+	// alpha tested triangles are split into pieces of a sub-voxel, so that their cut-outs are resolved
+	// per sub-voxel rather than once per triangle
+
+	const subVoxelSizeSq = subVoxelSize * subVoxelSize;
+
+	function emitCutout( a, b, c, uva, uvb, uvc, info ) {
+
+		const abSq = a.distanceToSquared( b );
+		const bcSq = b.distanceToSquared( c );
+		const caSq = c.distanceToSquared( a );
+		const longest = Math.max( abSq, bcSq, caSq );
+
+		if ( longest > subVoxelSizeSq ) {
+
+			// split along the longest edge
+
+			if ( longest === abSq ) {
+
+				const m = a.clone().lerp( b, 0.5 ), uvm = uva.clone().lerp( uvb, 0.5 );
+				emitCutout( a, m, c, uva, uvm, uvc, info );
+				emitCutout( m, b, c, uvm, uvb, uvc, info );
+
+			} else if ( longest === bcSq ) {
+
+				const m = b.clone().lerp( c, 0.5 ), uvm = uvb.clone().lerp( uvc, 0.5 );
+				emitCutout( a, b, m, uva, uvb, uvm, info );
+				emitCutout( a, m, c, uva, uvm, uvc, info );
+
+			} else {
+
+				const m = c.clone().lerp( a, 0.5 ), uvm = uvc.clone().lerp( uva, 0.5 );
+				emitCutout( a, b, m, uva, uvb, uvm, info );
+				emitCutout( m, b, c, uvm, uvb, uvc, info );
+
+			}
+
+			return;
+
+		}
+
+		_centroid.copy( uva ).add( uvb ).add( uvc ).multiplyScalar( 1 / 3 );
+
+		if ( resolveSurface( info, _centroid ) ) emit( a, b, c, _albedo, _emissive, info.side );
+
+	}
+
+	// writes the albedo, and the emission of unlit materials, at the given map uv. Returns `false` if
+	// the surface is cut out or too transparent
+
+	function resolveSurface( info, uv ) {
+
+		let alpha = info.opacity;
+
+		if ( info.color !== null ) _albedo.copy( info.color ); else _albedo.setRGB( 1, 1, 1 );
+
+		if ( uv !== null ) {
+
+			alpha *= sampleTexture( info.map, info.mapSampler, uv, _color );
+			_albedo.multiply( _color );
+
+		}
+
+		if ( instanceColor !== null ) _albedo.multiply( instanceColor );
+
+		if ( info.alphaTest > 0 && alpha < info.alphaTest ) return false;
+		if ( alpha < minOpacity ) return false;
+
+		if ( info.unlit ) {
+
+			_emissive.copy( _albedo );
+			_albedo.setRGB( 0, 0, 0 );
+
+		}
+
+		return true;
 
 	}
 
@@ -389,33 +473,9 @@ export function collectSceneTriangles( scene, options ) {
 
 				if ( _box.min.distanceToSquared( _box.max ) < 1e-14 ) continue;
 
-				// resolve colors
+				// resolve colors, the emission of lit materials once per triangle
 
-				let alpha = info.opacity;
-
-				if ( info.color !== null ) _albedo.copy( info.color ); else _albedo.setRGB( 1, 1, 1 );
-
-				if ( uvAttribute !== undefined && uvAttribute !== null ) {
-
-					_uva.fromBufferAttribute( uvAttribute, ia );
-					_uvb.fromBufferAttribute( uvAttribute, ib );
-					_uvc.fromBufferAttribute( uvAttribute, ic );
-					_uva.add( _uvb ).add( _uvc ).multiplyScalar( 1 / 3 );
-
-					alpha *= sampleTexture( info.map, info.mapSampler, _uva, _color );
-					_albedo.multiply( _color );
-
-				}
-
-				if ( info.alphaTest > 0 && alpha < info.alphaTest ) continue;
-				if ( alpha < minOpacity ) continue;
-
-				if ( info.unlit ) {
-
-					_emissive.copy( _albedo );
-					_albedo.setRGB( 0, 0, 0 );
-
-				} else {
+				if ( info.unlit === false ) {
 
 					if ( info.emissive !== null ) {
 
@@ -441,6 +501,25 @@ export function collectSceneTriangles( scene, options ) {
 
 				}
 
+				if ( uvAttribute !== undefined && uvAttribute !== null ) {
+
+					_uva.fromBufferAttribute( uvAttribute, ia );
+					_uvb.fromBufferAttribute( uvAttribute, ib );
+					_uvc.fromBufferAttribute( uvAttribute, ic );
+
+					if ( info.alphaTest > 0 ) {
+
+						emitCutout( _va, _vb, _vc, _uva, _uvb, _uvc, info );
+						continue;
+
+					}
+
+					_centroid.copy( _uva ).add( _uvb ).add( _uvc ).multiplyScalar( 1 / 3 );
+
+				}
+
+				if ( resolveSurface( info, uvAttribute !== undefined && uvAttribute !== null ? _centroid : null ) === false ) continue;
+
 				emit( _va, _vb, _vc, _albedo, _emissive, info.side );
 
 			}
@@ -459,9 +538,12 @@ export function collectSceneTriangles( scene, options ) {
 
 				object.getMatrixAt( i, _matrix );
 				_matrix.premultiply( object.matrixWorld );
+				instanceColor = object.instanceColor !== null ? _instanceColor.fromBufferAttribute( object.instanceColor, i ) : null;
 				processMesh( object, _matrix );
 
 			}
+
+			instanceColor = null;
 
 		} else {
 

@@ -1,6 +1,6 @@
 import {
-	Bone, BoxGeometry, BufferAttribute, BufferGeometry, CylinderGeometry, Float16BufferAttribute, Float32BufferAttribute,
-	Group, ObjectLoader, InterleavedBuffer, InterleavedBufferAttribute, Matrix4, Mesh, PlaneGeometry, Skeleton, SkinnedMesh, SphereGeometry,
+	Bone, BoxGeometry, BufferAttribute, BufferGeometry, Color, CylinderGeometry, Float16BufferAttribute, Float32BufferAttribute,
+	Group, InstancedBufferAttribute, InstancedMesh, ObjectLoader, InterleavedBuffer, InterleavedBufferAttribute, Matrix4, Mesh, PlaneGeometry, Skeleton, SkinnedMesh, SphereGeometry,
 	TorusGeometry, Uint16BufferAttribute, Vector3
 } from 'three';
 import { unwrapUVs as unwrap } from '../../../../examples/jsm/utils/unwrapUVs.js';
@@ -143,6 +143,22 @@ function intersectionArea( a, b ) {
 	}
 
 	return polygonArea( polygon );
+
+}
+
+// Audits each page of a multi-page atlas on its own.
+function verifyPages( assert, result, limit = 1.5 ) {
+
+	const audits = [];
+	for ( let page = 0; page < result.pages; page ++ ) {
+
+		const meshes = result.meshes.filter( record => record.page === page );
+		assert.ok( meshes.length > 0, `Page ${ page } holds meshes` );
+		audits.push( verify( assert, { ...result, meshes }, limit ) );
+
+	}
+
+	return audits;
 
 }
 
@@ -505,11 +521,180 @@ export default QUnit.module( 'Addons', () => {
 			QUnit.test( 'result retains atlas metadata and vertex and face mappings', assert => {
 
 				const result = unwrap( new Mesh( new BoxGeometry() ) );
-				assert.deepEqual( Object.keys( result ), [ 'attribute', 'resolution', 'padding', 'texelsPerUnit', 'charts', 'meshes' ] );
-				assert.deepEqual( Object.keys( result.meshes[ 0 ] ), [ 'mesh', 'sourceVertices', 'faceCharts' ] );
+				assert.deepEqual( Object.keys( result ), [ 'attribute', 'resolution', 'pages', 'padding', 'texelsPerUnit', 'charts', 'meshes', 'excluded' ] );
+				assert.deepEqual( Object.keys( result.meshes[ 0 ] ), [ 'mesh', 'page', 'sourceVertices', 'faceCharts' ] );
 				assert.strictEqual( result.meshes[ 0 ].sourceVertices.length, result.meshes[ 0 ].mesh.geometry.attributes.position.count );
 				assert.strictEqual( result.meshes[ 0 ].faceCharts.length, 12 );
-				assert.deepEqual( Object.keys( result.charts[ 0 ] ), [ 'x', 'y', 'width', 'height' ] );
+				assert.deepEqual( Object.keys( result.charts[ 0 ] ), [ 'x', 'y', 'width', 'height', 'page' ] );
+				assert.strictEqual( result.pages, 1 );
+				assert.strictEqual( result.meshes[ 0 ].mesh.userData.lightMapPage, 0, 'The page is stored on the mesh' );
+
+			} );
+
+			QUnit.test( 'multi-page atlases keep whole meshes on pages at the density of the resolution', assert => {
+
+				const build = () => {
+
+					const root = new Group();
+					for ( let i = 0; i < 12; i ++ ) {
+
+						const mesh = new Mesh( new BoxGeometry( 1 + i * 0.2, 1, 0.5 + i * 0.1 ) );
+						mesh.position.set( i * 3, 0, 0 );
+						root.add( mesh );
+
+					}
+
+					return root;
+
+				};
+
+				const single = unwrap( build(), { resolution: 512, padding: 3 } );
+				const paged = unwrap( build(), { resolution: 512, pageSize: 256, padding: 3 } );
+				assert.strictEqual( single.pages, 1 );
+				assert.ok( paged.pages >= 4, `${ paged.pages } pages of 256 for an atlas of 512` );
+				assert.strictEqual( paged.resolution, 256, 'The resolution is the page size' );
+				assert.strictEqual( paged.texelsPerUnit, single.texelsPerUnit, 'Pages keep the density of the resolution' );
+				for ( const record of paged.meshes ) {
+
+					assert.strictEqual( record.mesh.userData.lightMapPage, record.page );
+					const pages = new Set( Array.from( record.faceCharts ).filter( chart => chart >= 0 ).map( chart => paged.charts[ chart ].page ) );
+					assert.deepEqual( [ ...pages ], [ record.page ], 'All charts of a mesh are on its page' );
+
+				}
+
+				for ( const chart of paged.charts ) assert.ok( chart.x + chart.width <= 256 && chart.y + chart.height <= 256, 'Charts fit their page' );
+				verifyPages( assert, paged );
+
+			} );
+
+			QUnit.test( 'pages at a fixed density, and meshes larger than a page get a lower density', assert => {
+
+				const root = new Group();
+				for ( let i = 0; i < 6; i ++ ) root.add( new Mesh( new PlaneGeometry() ) );
+				const result = unwrap( root, { resolution: 1024, pageSize: 128, texelsPerUnit: 100, padding: 2 } );
+				assert.strictEqual( result.texelsPerUnit, 100 );
+				assert.strictEqual( result.pages, 6, 'One plane of 100 texels per page of 128' );
+				verifyPages( assert, result );
+
+				const large = new Mesh( new PlaneGeometry( 4, 4 ) );
+				console.level = CONSOLE_LEVEL.OFF;
+				const reduced = unwrap( large, { resolution: 1024, pageSize: 128, texelsPerUnit: 100, padding: 2 } );
+				console.level = CONSOLE_LEVEL.DEFAULT;
+				assert.strictEqual( reduced.pages, 1 );
+				assert.ok( reduced.charts[ 0 ].width <= 128, 'The plane shrinks to fit the page' );
+				verifyPages( assert, reduced );
+
+			} );
+
+			QUnit.test( 'lightMapScale multiplies the density of a mesh and 0 leaves it out', assert => {
+
+				const root = new Group(), normal = new Mesh( new PlaneGeometry() ), half = new Mesh( new PlaneGeometry() );
+				const excluded = new Mesh( new PlaneGeometry() );
+				half.userData.lightMapScale = 0.5;
+				excluded.userData.lightMapScale = 0;
+				excluded.geometry.setAttribute( 'uv1', excluded.geometry.getAttribute( 'uv' ).clone() );
+				excluded.userData.lightMapPage = 3;
+				const original = excluded.geometry;
+				root.add( normal, half, excluded );
+				const result = unwrap( root, { texelsPerUnit: 200, padding: 2 } );
+				verify( assert, result );
+				assert.strictEqual( result.meshes.length, 2 );
+				assert.deepEqual( result.excluded, [ excluded ] );
+				const width = record => result.charts[ record.faceCharts[ 0 ] ].width - 5;
+				assert.ok( Math.abs( width( result.meshes[ 1 ] ) / width( result.meshes[ 0 ] ) - 0.5 ) < 0.02, 'Half the texels per unit' );
+				assert.notStrictEqual( excluded.geometry, original, 'The shared geometry is not modified' );
+				assert.false( excluded.geometry.hasAttribute( 'uv1' ), 'Excluded meshes lose the light map UVs' );
+				assert.strictEqual( excluded.geometry.getAttribute( 'position' ), original.getAttribute( 'position' ) );
+				assert.strictEqual( excluded.userData.lightMapPage, undefined );
+
+			} );
+
+			QUnit.test( 'instances share the charts of their geometry and get their own regions', assert => {
+
+				const geometry = new BoxGeometry();
+				geometry.setAttribute( 'custom', new InstancedBufferAttribute( new Float32Array( 7 ), 1 ) );
+				const mesh = new InstancedMesh( geometry, undefined, 7 );
+				for ( let i = 0; i < 7; i ++ ) {
+
+					mesh.setMatrixAt( i, new Matrix4().makeTranslation( i * 2, 0, 0 ) );
+					mesh.setColorAt( i, new Color( i / 7, 0, 0 ) );
+
+				}
+
+				const plane = new Mesh( new PlaneGeometry( 3, 3 ) );
+				const root = new Group();
+				root.add( mesh, plane );
+				const result = unwrap( root, { resolution: 256, padding: 2 } );
+				const offsets = mesh.geometry.getAttribute( '_LIGHTMAP_OFFSET' ), scales = mesh.geometry.getAttribute( '_LIGHTMAP_SCALE' );
+				assert.true( offsets.isInstancedBufferAttribute && scales.isInstancedBufferAttribute, 'KHR_lightmap instance attributes' );
+				assert.strictEqual( offsets.count, 7 );
+				assert.strictEqual( mesh.geometry.getAttribute( 'custom' ), geometry.getAttribute( 'custom' ), 'Instanced attributes are kept' );
+
+				// the instance regions do not overlap each other or the plane, the shared charts fill the unit square
+
+				const uv = mesh.geometry.getAttribute( 'uv1' );
+				for ( let j = 0; j < uv.count; j ++ ) assert.ok( uv.getX( j ) > 0 && uv.getX( j ) < 1 && uv.getY( j ) > 0 && uv.getY( j ) < 1 );
+				const boxes = [];
+				for ( let i = 0; i < 7; i ++ ) boxes.push( [ offsets.getX( i ), offsets.getY( i ), offsets.getX( i ) + scales.getX( i ), offsets.getY( i ) + scales.getY( i ) ] );
+				const planeUV = plane.geometry.getAttribute( 'uv1' );
+				const planeBox = [ 1, 1, 0, 0 ];
+				for ( let j = 0; j < planeUV.count; j ++ ) {
+
+					planeBox[ 0 ] = Math.min( planeBox[ 0 ], planeUV.getX( j ) ); planeBox[ 1 ] = Math.min( planeBox[ 1 ], planeUV.getY( j ) );
+					planeBox[ 2 ] = Math.max( planeBox[ 2 ], planeUV.getX( j ) ); planeBox[ 3 ] = Math.max( planeBox[ 3 ], planeUV.getY( j ) );
+
+				}
+
+				boxes.push( planeBox );
+				let overlaps = 0;
+				for ( let a = 0; a < boxes.length; a ++ ) {
+
+					assert.ok( boxes[ a ][ 0 ] >= 0 && boxes[ a ][ 1 ] >= 0 && boxes[ a ][ 2 ] <= 1 && boxes[ a ][ 3 ] <= 1, 'Regions lie in the atlas' );
+					for ( let b = a + 1; b < boxes.length; b ++ ) {
+
+						if ( boxes[ a ][ 0 ] < boxes[ b ][ 2 ] && boxes[ b ][ 0 ] < boxes[ a ][ 2 ] && boxes[ a ][ 1 ] < boxes[ b ][ 3 ] && boxes[ b ][ 1 ] < boxes[ a ][ 3 ] ) overlaps ++;
+
+					}
+
+				}
+
+				assert.strictEqual( overlaps, 0, 'Instance regions are disjoint' );
+
+				// the instances have the density of the plane
+
+				const instanceTexels = scales.getX( 0 ) * scales.getY( 0 ) * 256 * 256;
+				assert.ok( instanceTexels > 6 * result.texelsPerUnit ** 2, 'Each region holds the six faces of a box at the atlas density' );
+
+			} );
+
+			QUnit.test( 'instanced meshes on pages and with scaled instances', assert => {
+
+				const mesh = new InstancedMesh( new SphereGeometry( 0.5, 12, 6 ), undefined, 20 );
+				for ( let i = 0; i < 20; i ++ ) mesh.setMatrixAt( i, new Matrix4().makeScale( 2, 2, 2 ).setPosition( i * 3, 0, 0 ) );
+				const reference = new InstancedMesh( new SphereGeometry( 1, 12, 6 ), undefined, 20 );
+				for ( let i = 0; i < 20; i ++ ) reference.setMatrixAt( i, new Matrix4().makeTranslation( i * 3, 0, 0 ) );
+				const a = unwrap( mesh, { resolution: 512, padding: 2, texelsPerUnit: 8 } ), b = unwrap( reference, { resolution: 512, padding: 2, texelsPerUnit: 8 } );
+				assert.deepEqual( mesh.geometry.getAttribute( '_LIGHTMAP_SCALE' ).array, reference.geometry.getAttribute( '_LIGHTMAP_SCALE' ).array, 'Instance scales count in the density' );
+				assert.strictEqual( a.pages, b.pages );
+
+				const blocks = new Group();
+				for ( let i = 0; i < 6; i ++ ) {
+
+					const instanced = new InstancedMesh( new BoxGeometry(), undefined, 8 );
+					for ( let j = 0; j < 8; j ++ ) instanced.setMatrixAt( j, new Matrix4().makeTranslation( j * 2, i * 2, 0 ) );
+					blocks.add( instanced );
+
+				}
+
+				const paged = unwrap( blocks, { resolution: 256, pageSize: 128, padding: 2 } );
+				assert.ok( paged.pages > 1 );
+				assert.ok( Math.abs( paged.texelsPerUnit - unwrap( blocks.clone(), { resolution: 256, padding: 2 } ).texelsPerUnit ) < 1e-9, 'Instanced meshes keep the density' );
+				for ( const record of paged.meshes ) {
+
+					const offsets = record.mesh.geometry.getAttribute( '_LIGHTMAP_OFFSET' ), scales = record.mesh.geometry.getAttribute( '_LIGHTMAP_SCALE' );
+					for ( let i = 0; i < 8; i ++ ) assert.ok( offsets.getX( i ) + scales.getX( i ) <= 1 && offsets.getY( i ) + scales.getY( i ) <= 1, 'Regions lie in their page' );
+
+				}
 
 			} );
 

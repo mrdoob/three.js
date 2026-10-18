@@ -1,13 +1,16 @@
-import { ArrayCamera, Box3, FloatType, Mesh, MeshBasicNodeMaterial, MeshLambertNodeMaterial, NearestFilter, Node, NodeUpdateType, OrthographicCamera, Quaternion, RendererUtils, RenderTarget, Scene, Vector2, Vector3, Vector4 } from 'three/webgpu';
-import { Fn, If, Loop, cameraIndex, context, cross, dFdx, dFdy, dot, float, hash, int, interleavedGradientNoise, ivec2, length, lights, nodeObject, output, positionWorld, screenCoordinate, select, texture, uniform, uniformArray, vec2, vec3, vec4 } from 'three/tsl';
+import { ArrayCamera, BackSide, Box3, FloatType, InstancedMesh, IrradianceNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertNodeMaterial, NearestFilter, Node, NodeUpdateType, OrthographicCamera, PlaneGeometry, Quaternion, RendererUtils, RenderTarget, Scene, Vector2, Vector3, Vector4 } from 'three/webgpu';
+import { Fn, If, Loop, cameraIndex, context, cross, dFdx, dFdy, dot, float, frontFacing, hash, int, interleavedGradientNoise, ivec2, length, lights, luminance, materialColor, materialReference, max, nodeObject, output, positionWorld, screenCoordinate, select, texture, uint, uniform, uniformArray, vec2, vec3, vec4 } from 'three/tsl';
 
 import { LightMapper } from './LightMapper.js';
+import { lightMapUV } from '../tsl/lighting/DirectionalLightMapNode.js';
 
 const _box = /*@__PURE__*/ new Box3();
 const _quaternion = /*@__PURE__*/ new Quaternion();
 const _corner = /*@__PURE__*/ new Vector3();
 const _target = /*@__PURE__*/ new Vector3();
 const _center = /*@__PURE__*/ new Vector3();
+const _position = /*@__PURE__*/ new Vector3();
+const _scale = /*@__PURE__*/ new Vector3();
 
 let _rendererState;
 
@@ -27,7 +30,10 @@ let _rendererState;
  *
  * Direct lights are evaluated analytically with their shadow maps. Further bounces are cached in a
  * light map that `update()` solves iteratively, so the meshes need light map UVs in `uv1`, e.g.
- * generated with {@link unwrapUVs}. Emissive surfaces are light sources as well.
+ * generated with {@link unwrapUVs}. Emissive surfaces are light sources as well. The views are fitted
+ * to the meshes with light map UVs, the other meshes are only seen beyond them, so a large unlit
+ * sphere around the scene, e.g. with a sky texture on the `BackSide` of a {@link MeshBasicMaterial},
+ * lights the scene like a sky. `scene.background` is ignored.
  *
  * ```js
  * const radiosity = new StochasticRadiosity();
@@ -38,8 +44,17 @@ let _rendererState;
  *
  * Call `update()` again after changing the scene or the lighting. Lights should cast shadows, and
  * `renderer.shadowMap` must be enabled; unshadowed lights shine through walls. Rect area lights are
- * ignored, model area lights as emissive meshes instead, which the gather also shadows. Skinned,
- * instanced and batched meshes are ignored, and all surfaces are treated as opaque.
+ * baked as one-sided emissive quads of the same luminance, so unlike the other lights their direct
+ * light is part of the gathered irradiance, shadowed by the gather. Hide them while the light map is
+ * displayed, otherwise their direct light is counted twice. Instanced meshes are rendered with their
+ * instance colors and look their bounces up in the atlas regions of the instances, see {@link lightMapUV}.
+ * Skinned and batched meshes are ignored. The pages of a multi-page atlas, see `mesh.userData.lightMapPage`,
+ * are tiles of the bounce cache.
+ *
+ * Alpha tested surfaces are cut out. Transparent surfaces (`transparent` or `alphaHash`) are
+ * stochastic: a surface is dropped from a direction of a pass with the probability `1 - alpha`, so on
+ * average it lets that fraction of the light through. Their shadow maps hold a hashed coverage of
+ * their alpha, which the shadow filtering and the gather average into a partial shadow.
  *
  * This class can only be used with {@link WebGPURenderer}.
  *
@@ -57,7 +72,7 @@ class StochasticRadiosity {
 	 * Larger neighborhoods find more occluders and leak less light, but are slower.
 	 * @param {number} [options.bounces=16] - The number of iterations used to solve the cached bounces. Each iteration adds one bounce, `0` disables the cache.
 	 * @param {number} [options.cacheSamples=128] - The number of samples accumulated into the bounce cache after the iterations.
-	 * @param {number} [options.cacheSize=256] - The size of the bounce cache light map in texels.
+	 * @param {number} [options.cacheSize=256] - The size of the bounce cache light map in texels, per page of the atlas.
 	 */
 	constructor( { directions = 16, resolution = 256, gatherRadius = 1, bounces = 16, cacheSamples = 128, cacheSize = 256 } = {} ) {
 
@@ -102,7 +117,8 @@ class StochasticRadiosity {
 		this.cacheSamples = cacheSamples;
 
 		/**
-		 * The size of the bounce cache light map in texels.
+		 * The size of the bounce cache light map in texels, per page of the atlas. The pages are tiles of
+		 * the cache, which is `cacheSize * Math.ceil( Math.sqrt( pages ) )` texels wide.
 		 *
 		 * @type {number}
 		 * @default 256
@@ -174,12 +190,17 @@ class StochasticRadiosity {
 		this._scene = new Scene();
 		this._proxies = [];
 		this._materials = [];
+		this._emitters = [];
 		this._lights = [];
 		this._lightMapMeshes = [];
+		this._tiles = 1;
 		this._bounds = new Box3();
+		this._depthBounds = new Box3();
 		this._radius = 1;
 		this._pass = 0;
 		this._renderId = - 1;
+		this._sampleKey = null;
+		this._cacheUpdates = 0;
 		this._rendering = false;
 		this._cache = null;
 
@@ -218,7 +239,11 @@ class StochasticRadiosity {
 
 		this._clear();
 
-		if ( this.bounces > 0 ) this._cache = new LightMapper( renderer, this.cacheSize, radiosityIrradiance( this ) );
+		// the pages of the atlas are tiles of the bounce cache
+
+		this._tiles = Math.ceil( Math.sqrt( countPages( scene ) ) );
+
+		if ( this.bounces > 0 ) this._cache = new LightMapper( renderer, this.cacheSize * this._tiles, radiosityIrradiance( this ) );
 
 		this._collect( scene );
 		this._renderShadows( renderer );
@@ -247,10 +272,13 @@ class StochasticRadiosity {
 	_clear() {
 
 		for ( const material of this._materials ) material.dispose();
+		for ( const emitter of this._emitters ) emitter.geometry.dispose();
+		for ( const light of this._lights ) light.dispose();
 
 		this._scene.clear();
 		this._proxies = [];
 		this._materials = [];
+		this._emitters = [];
 		this._lights = [];
 		this._lightMapMeshes = [];
 
@@ -273,32 +301,27 @@ class StochasticRadiosity {
 
 		scene.updateMatrixWorld();
 
-		// rect area lights are not supported, they orient themselves by the parent camera of the
-		// array camera instead of by each direction
+		const rectAreaLights = [];
 
 		scene.traverseVisible( ( object ) => {
 
-			if ( object.isDirectionalLight || object.isPointLight || object.isSpotLight ) this._lights.push( object );
+			if ( object.isDirectionalLight || object.isPointLight || object.isSpotLight ) this._lights.push( cloneLight( object ) );
+			else if ( object.isRectAreaLight && object.intensity > 0 ) rectAreaLights.push( object );
 
 		} );
 
 		const lightsNode = lights( this._lights );
 		const materials = new Map();
 
-		const getMaterials = ( source, hasLightMapUV ) => {
+		const getMaterials = ( source, hasLightMapUV, page, instanced ) => {
 
-			const key = source.uuid + hasLightMapUV;
+			const key = source.uuid + hasLightMapUV + page + instanced;
 
 			if ( materials.has( key ) === false ) {
 
-				const illumination = this._createIlluminationMaterial( source, lightsNode, hasLightMapUV );
+				const illumination = this._createIlluminationMaterial( source, lightsNode, hasLightMapUV, page, instanced );
 
-				// depth-only lit material, only used to render the shadow maps
-
-				const shadow = new MeshLambertNodeMaterial();
-				shadow.side = source.side;
-				shadow.shadowSide = source.shadowSide;
-				shadow.lightsNode = lightsNode;
+				const shadow = this._createShadowMaterial( source, lightsNode );
 
 				materials.set( key, { illumination, shadow } );
 				this._materials.push( illumination, shadow );
@@ -310,19 +333,22 @@ class StochasticRadiosity {
 		};
 
 		this._bounds.makeEmpty();
+		this._depthBounds.makeEmpty();
 
 		scene.traverseVisible( ( object ) => {
 
-			if ( object.isMesh !== true || object.isSkinnedMesh || object.isInstancedMesh || object.isBatchedMesh ) return;
+			if ( object.isMesh !== true || object.isSkinnedMesh || object.isBatchedMesh ) return;
 
 			const geometry = object.geometry;
 			const hasLightMapUV = geometry.hasAttribute( 'uv1' );
+			const page = this._tiles > 1 && hasLightMapUV ? object.userData.lightMapPage ?? 0 : 0;
+			const instanced = object.isInstancedMesh === true;
 
 			let illumination, shadow;
 
 			if ( Array.isArray( object.material ) ) {
 
-				const pairs = object.material.map( ( material ) => getMaterials( material, hasLightMapUV ) );
+				const pairs = object.material.map( ( material ) => getMaterials( material, hasLightMapUV, page, instanced ) );
 				illumination = pairs.map( ( pair ) => pair.illumination );
 				shadow = pairs.map( ( pair ) => pair.shadow );
 
@@ -330,11 +356,21 @@ class StochasticRadiosity {
 
 				if ( object.material.visible === false ) return;
 
-				( { illumination, shadow } = getMaterials( object.material, hasLightMapUV ) );
+				( { illumination, shadow } = getMaterials( object.material, hasLightMapUV, page, instanced ) );
 
 			}
 
-			const proxy = new Mesh( geometry, illumination );
+			// instances share the transforms and the colors of the mesh
+
+			const proxy = instanced ? new InstancedMesh( geometry, illumination, object.count ) : new Mesh( geometry, illumination );
+
+			if ( instanced ) {
+
+				proxy.instanceMatrix = object.instanceMatrix;
+				proxy.instanceColor = object.instanceColor;
+
+			}
+
 			proxy.matrixAutoUpdate = false;
 			proxy.matrix.copy( object.matrixWorld );
 			proxy.frustumCulled = false;
@@ -346,15 +382,116 @@ class StochasticRadiosity {
 
 			if ( hasLightMapUV ) this._lightMapMeshes.push( object );
 
-			if ( geometry.boundingBox === null ) geometry.computeBoundingBox();
+			if ( instanced ) {
 
-			this._bounds.union( _box.copy( geometry.boundingBox ).applyMatrix4( object.matrixWorld ) );
+				if ( object.boundingBox === null ) object.computeBoundingBox();
+
+				_box.copy( object.boundingBox ).applyMatrix4( object.matrixWorld );
+
+			} else {
+
+				if ( geometry.boundingBox === null ) geometry.computeBoundingBox();
+
+				_box.copy( geometry.boundingBox ).applyMatrix4( object.matrixWorld );
+
+			}
+
+			this._depthBounds.union( _box );
+			if ( hasLightMapUV ) this._bounds.union( _box );
 
 		} );
 
+		// rect area lights shine from emissive quads that the gather shadows. They cannot be evaluated
+		// analytically, they orient themselves by the parent camera of the array camera instead of by
+		// each direction, and lambert materials lack them
+
+		for ( const light of rectAreaLights ) this._addRectAreaLight( light, lightsNode );
+
 		this._scene.updateMatrixWorld();
 
+		// the views fit the meshes that gather light, the other meshes only extend their depth range,
+		// e.g. a sky sphere around the scene
+
+		if ( this._bounds.isEmpty() ) this._bounds.copy( this._depthBounds );
+
 		this._radius = this._bounds.isEmpty() ? 1 : Math.max( this._bounds.getSize( _corner ).length() / 2, 1e-3 );
+
+	}
+
+	/**
+	 * Adds the emissive quad of a rect area light to the illumination proxies.
+	 *
+	 * @private
+	 * @param {RectAreaLight} light - The light.
+	 * @param {LightsNode} lightsNode - The direct lights.
+	 */
+	_addRectAreaLight( light, lightsNode ) {
+
+		// the light emits uniformly along its -z axis, which faces the back side of a plane. Its size
+		// ignores the world scale like the light
+
+		const source = new MeshBasicMaterial( { side: BackSide } );
+		source.color.copy( light.color ).multiplyScalar( light.intensity );
+
+		const material = this._createIlluminationMaterial( source, lightsNode, false );
+		const emitter = new Mesh( new PlaneGeometry( light.width, light.height ), material );
+
+		light.matrixWorld.decompose( _position, _quaternion, _scale );
+
+		emitter.matrixAutoUpdate = false;
+		emitter.matrix.compose( _position, _quaternion, _scale.set( 1, 1, 1 ) );
+		emitter.frustumCulled = false;
+
+		this._scene.add( emitter );
+		this._emitters.push( emitter );
+		this._materials.push( material );
+
+		emitter.geometry.computeBoundingBox();
+		this._depthBounds.union( _box.copy( emitter.geometry.boundingBox ).applyMatrix4( emitter.matrix ) );
+
+	}
+
+	/**
+	 * Creates the depth-only lit material that renders the shadow maps of a surface, see
+	 * `_renderShadows()`.
+	 *
+	 * @private
+	 * @param {Material} source - The material of the mesh.
+	 * @param {LightsNode} lightsNode - The direct lights.
+	 * @return {NodeMaterial} The material.
+	 */
+	_createShadowMaterial( source, lightsNode ) {
+
+		const material = new MeshLambertNodeMaterial();
+		material.side = source.side;
+		material.shadowSide = source.shadowSide;
+		material.lightsNode = lightsNode;
+
+		// shadow passes test the alpha of the map and the alpha map
+
+		if ( source.alphaTest > 0 ) {
+
+			material.alphaTest = source.alphaTest;
+			material.alphaMap = source.alphaMap ?? null;
+			material.map = source.map ?? null;
+
+		}
+
+		// transparent surfaces cast a hashed coverage of their alpha, which the shadow filtering and the
+		// gather average into a partial shadow
+
+		if ( source.transparent === true || source.alphaHash === true ) {
+
+			let alpha = float( source.opacity );
+
+			if ( source.map ) alpha = alpha.mul( texture( source.map ).a );
+			if ( source.alphaMap ) alpha = alpha.mul( texture( source.alphaMap ).r );
+
+			material.maskShadowNode = alpha.greaterThan( interleavedGradientNoise( screenCoordinate.xy ) );
+
+		}
+
+		return material;
 
 	}
 
@@ -366,22 +503,56 @@ class StochasticRadiosity {
 	 * @param {Material} source - The material of the mesh.
 	 * @param {LightsNode} lightsNode - The direct lights.
 	 * @param {boolean} hasLightMapUV - Whether the mesh can sample the bounce cache.
+	 * @param {number} [page=0] - The page of the mesh in the atlas, a tile of the bounce cache.
+	 * @param {boolean} [instanced=false] - Whether the mesh is instanced.
 	 * @return {NodeMaterial} The material.
 	 */
-	_createIlluminationMaterial( source, lightsNode, hasLightMapUV ) {
+	_createIlluminationMaterial( source, lightsNode, hasLightMapUV, page = 0, instanced = false ) {
 
 		const unlit = source.isMeshBasicMaterial === true;
 		const material = unlit ? new MeshBasicNodeMaterial() : new MeshLambertNodeMaterial();
 
 		material.side = source.side;
 
+		// alpha tested surfaces are cut out, cut-out fragments write nothing
+
+		material.opacity = source.opacity;
+		material.alphaMap = source.alphaMap ?? null;
+		material.alphaTest = source.alphaTest;
+
+		// transparent surfaces are kept with the probability of their alpha. The threshold is shared
+		// by the object for a direction of a pass, a threshold per fragment would let the neighborhood
+		// of the gather find the surface in almost every direction and make it opaque. The faces are
+		// independent layers, e.g. of a closed double-sided object
+
+		if ( source.transparent === true || source.alphaHash === true ) {
+
+			const objectId = uniform( 0, 'uint' ).onObjectUpdate( ( { object } ) => object.id );
+			const key = uint( this._seedNode ).mul( this.directions ).add( cameraIndex ).mul( 2 ).add( select( frontFacing, uint( 0 ), uint( 1 ) ) );
+
+			material.alphaTestNode = max( hash( key.add( objectId.mul( 2654435769 ) ) ), source.alphaTest );
+
+		}
+
 		// diffuse albedo
 
 		if ( source.color !== undefined ) material.color.copy( source.color );
-		if ( source.metalness !== undefined ) material.color.multiplyScalar( 1 - source.metalness );
 		if ( source.map !== undefined ) material.map = source.map;
 		if ( source.vertexColors !== undefined ) material.vertexColors = source.vertexColors;
 		if ( source.colorNode ) material.colorNode = source.colorNode;
+
+		// metals have no diffuse albedo, the metalness map scales the metalness like in the source material
+
+		if ( source.metalnessMap ) {
+
+			const color = vec4( material.colorNode ?? materialColor );
+			material.colorNode = vec4( color.rgb.mul( texture( source.metalnessMap ).b.mul( source.metalness ).oneMinus() ), color.a );
+
+		} else if ( source.metalness !== undefined ) {
+
+			material.color.multiplyScalar( 1 - source.metalness );
+
+		}
 
 		if ( unlit === false ) {
 
@@ -397,6 +568,19 @@ class StochasticRadiosity {
 			if ( this._cache !== null && hasLightMapUV ) material.lightMap = this._cache.texture;
 			if ( source.aoMap !== undefined ) material.aoMap = source.aoMap;
 			if ( source.aoMapIntensity !== undefined ) material.aoMapIntensity = source.aoMapIntensity;
+
+			// instances and pages look the cache up in their atlas regions and tiles. The tile is a material
+			// property, since the materials of the pages can share a shader
+
+			if ( material.lightMap !== null && ( this._tiles > 1 || instanced ) ) {
+
+				const tile = materialReference( 'lightMapTile', 'vec4' );
+				const coord = lightMapUV().mul( tile.xy ).add( tile.zw );
+
+				material.lightMapTile = getTile( page, this._tiles );
+				material.setupLightMap = () => new IrradianceNode( texture( this._cache.texture, coord ).rgb, true );
+
+			}
 
 		}
 
@@ -423,7 +607,9 @@ class StochasticRadiosity {
 
 	/**
 	 * Renders the shadow maps of the lights from the collected scene. The illumination pass reuses
-	 * them, since shadow passes inherit the stochastic depth of its materials.
+	 * them, since shadow passes inherit the stochastic depth of its materials. The lights are copies
+	 * with their own shadow maps, which the scene does not replace when it renders, e.g. with full
+	 * shadows of transparent surfaces.
 	 *
 	 * @private
 	 * @param {WebGPURenderer} renderer - The renderer.
@@ -437,6 +623,7 @@ class StochasticRadiosity {
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
 		for ( const { proxy, shadow } of this._proxies ) proxy.material = shadow;
+		for ( const emitter of this._emitters ) emitter.visible = false;
 		for ( const light of casters ) light.shadow.needsUpdate = true;
 
 		const contextNode = renderer.contextNode;
@@ -448,6 +635,7 @@ class StochasticRadiosity {
 		renderer.contextNode = contextNode;
 
 		for ( const { proxy, illumination } of this._proxies ) proxy.material = illumination;
+		for ( const emitter of this._emitters ) emitter.visible = true;
 
 		RendererUtils.restoreRendererState( renderer, _rendererState );
 
@@ -463,7 +651,13 @@ class StochasticRadiosity {
 
 		const cache = this._cache;
 
-		cache.addObjects( this._lightMapMeshes );
+		for ( const mesh of this._lightMapMeshes ) {
+
+			const page = this._tiles > 1 ? mesh.userData.lightMapPage ?? 0 : 0;
+
+			cache.addObjects( [ mesh ], { page: 0, uvTransform: this._tiles > 1 ? getTile( page, this._tiles ) : null } );
+
+		}
 
 		// render targets start undefined, the first iteration must sample zero bounces
 
@@ -473,29 +667,45 @@ class StochasticRadiosity {
 
 			cache.reset();
 			cache.update();
+			this._cacheUpdates ++;
 
 		}
 
 		cache.reset();
 
-		for ( let i = 0; i < this.cacheSamples; i ++ ) cache.update();
+		for ( let i = 0; i < this.cacheSamples; i ++ ) {
+
+			cache.update();
+			this._cacheUpdates ++;
+
+		}
 
 	}
 
 	/**
 	 * Rotates the directions and renders the illumination map, once per render call of the
-	 * gathering materials.
+	 * gathering materials, or once per sample of a light mapper, whose pages share it.
 	 *
 	 * @private
 	 * @param {NodeFrame} frame - The current node frame.
+	 * @param {?Node<float>} sampleNode - The sample index of the light mapper.
 	 */
-	_renderIllumination( frame ) {
+	_renderIllumination( frame, sampleNode ) {
 
 		// nested renders restore the render id, so this skips the other gathering materials
 
 		if ( frame.renderId === this._renderId || this._rendering === true || this._proxies.length === 0 ) return;
 
 		this._renderId = frame.renderId;
+
+		// the pages of a light map render one after another with the same sample, the cache updates
+		// between samples of the same index change the illumination
+
+		const sampleKey = sampleNode != null ? `${ sampleNode.id },${ sampleNode.value },${ this._cacheUpdates }` : null;
+
+		if ( sampleKey !== null && sampleKey === this._sampleKey ) return;
+
+		this._sampleKey = sampleKey;
 		this._rendering = true;
 
 		const renderer = frame.renderer;
@@ -510,20 +720,6 @@ class StochasticRadiosity {
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
-		// keep the shadow maps, re-rendering them from here would use the stochastic depth
-
-		const shadows = [];
-
-		for ( const light of this._lights ) {
-
-			if ( light.shadow === undefined ) continue;
-
-			shadows.push( light.shadow.autoUpdate, light.shadow.needsUpdate );
-			light.shadow.autoUpdate = false;
-			light.shadow.needsUpdate = false;
-
-		}
-
 		const contextNode = renderer.contextNode;
 		renderer.contextNode = this._contextNode;
 
@@ -532,17 +728,6 @@ class StochasticRadiosity {
 		renderer.render( this._scene, this._arrayCamera );
 
 		renderer.contextNode = contextNode;
-
-		let i = 0;
-
-		for ( const light of this._lights ) {
-
-			if ( light.shadow === undefined ) continue;
-
-			light.shadow.autoUpdate = shadows[ i ++ ];
-			light.shadow.needsUpdate = shadows[ i ++ ];
-
-		}
 
 		RendererUtils.restoreRendererState( renderer, _rendererState );
 
@@ -558,6 +743,7 @@ class StochasticRadiosity {
 	_updateDirections() {
 
 		const bounds = this._bounds;
+		const depthBounds = this._depthBounds;
 		const center = bounds.getCenter( _center );
 		const margin = 4 * this._radius / this.resolution;
 
@@ -596,6 +782,16 @@ class StochasticRadiosity {
 
 			}
 
+			// the far plane includes all meshes beyond the fitted bounds
+
+			for ( let c = 0; c < 8; c ++ ) {
+
+				_corner.set( c & 1 ? depthBounds.max.x : depthBounds.min.x, c & 2 ? depthBounds.max.y : depthBounds.min.y, c & 4 ? depthBounds.max.z : depthBounds.min.z ).sub( center );
+
+				maxD = Math.max( maxD, _corner.dot( direction ) );
+
+			}
+
 			const halfU = ( maxU - minU ) / 2 + margin;
 			const halfV = ( maxV - minV ) / 2 + margin;
 			const near = minD - margin;
@@ -629,9 +825,10 @@ class StochasticRadiosity {
 	 * @private
 	 * @param {Node<vec3>} positionNode - The world-space position.
 	 * @param {Node<vec3>} normalNode - The world-space normal.
+	 * @param {?Node<vec3>} [directionNode=null] - A variable to add the luminance-weighted light directions to.
 	 * @return {Node<vec3>} The irradiance.
 	 */
-	_gather( positionNode, normalNode ) {
+	_gather( positionNode, normalNode, directionNode = null ) {
 
 		const resolution = this.resolution;
 		const radius = this.gatherRadius;
@@ -656,6 +853,7 @@ class StochasticRadiosity {
 			faceNormal.assign( select( dot( faceNormal, normal ).lessThan( 0 ), faceNormal.negate(), faceNormal ) );
 
 			const irradiance = vec3( 0 ).toVar();
+			const lightDirection = directionNode !== null ? vec3( 0 ).toVar() : null;
 
 			Loop( this.directions, ( { i } ) => {
 
@@ -710,13 +908,18 @@ class StochasticRadiosity {
 
 					}
 
-					irradiance.addAssign( radiance.mul( cosine ) );
+					radiance.mulAssign( cosine );
+					irradiance.addAssign( radiance );
+
+					if ( lightDirection !== null ) lightDirection.addAssign( direction.mul( luminance( radiance ) ) );
 
 				} );
 
 			} );
 
 			// uniformly distributed directions, so each one covers a solid angle of 4 pi / N
+
+			if ( directionNode !== null ) directionNode.addAssign( lightDirection.mul( 4 * Math.PI / this.directions ) );
 
 			return irradiance.mul( 4 * Math.PI / this.directions );
 
@@ -747,14 +950,18 @@ class RadiosityIrradianceNode extends Node {
 	 * @param {StochasticRadiosity} radiosity - The radiosity solver.
 	 * @param {Node<vec3>} positionNode - The world-space position.
 	 * @param {Node<vec3>} normalNode - The world-space normal.
+	 * @param {?Node<float>} [sampleNode=null] - The sample index of a light mapper.
+	 * @param {?Node<vec3>} [directionNode=null] - A variable to add the luminance-weighted light directions to.
 	 */
-	constructor( radiosity, positionNode, normalNode ) {
+	constructor( radiosity, positionNode, normalNode, sampleNode = null, directionNode = null ) {
 
 		super( 'vec3' );
 
 		this.radiosity = radiosity;
 		this.positionNode = positionNode;
 		this.normalNode = normalNode;
+		this.sampleNode = sampleNode;
+		this.directionNode = directionNode;
 
 		this.updateBeforeType = NodeUpdateType.RENDER;
 
@@ -762,13 +969,13 @@ class RadiosityIrradianceNode extends Node {
 
 	updateBefore( frame ) {
 
-		this.radiosity._renderIllumination( frame );
+		this.radiosity._renderIllumination( frame, this.sampleNode );
 
 	}
 
 	setup() {
 
-		return this.radiosity._gather( this.positionNode, this.normalNode );
+		return this.radiosity._gather( this.positionNode, this.normalNode, this.directionNode );
 
 	}
 
@@ -777,14 +984,79 @@ class RadiosityIrradianceNode extends Node {
 /**
  * Creates a world-space diffuse irradiance sampler for a prepared {@link StochasticRadiosity}.
  * Call `radiosity.update( renderer, scene )` before baking. Every render call that uses the sampler
- * gathers a new set of directions, so the samples of {@link LightMapper} converge.
+ * gathers a new set of directions, so the samples of {@link LightMapper} converge. The pages of a
+ * light mapper, which passes its sample index, share the directions of a sample. The sampler adds
+ * the luminance-weighted light directions to its optional fourth argument, for the directional light
+ * maps of {@link LightMapper}.
  *
  * @param {StochasticRadiosity} radiosity - The prepared radiosity solver.
- * @return {function(Node<vec3>, Node<vec3>): Node<vec3>} The irradiance sampler.
+ * @return {function(Node<vec3>, Node<vec3>, ?Node<float>, ?Node<vec3>): Node<vec3>} The irradiance sampler.
  */
 function radiosityIrradiance( radiosity ) {
 
-	return ( position, normal ) => nodeObject( new RadiosityIrradianceNode( radiosity, position, normal ) );
+	return ( position, normal, sample = null, direction = null ) => nodeObject( new RadiosityIrradianceNode( radiosity, position, normal, sample, direction ) );
+
+}
+
+/**
+ * Returns the number of pages of the light-mapped meshes of a scene, see `mesh.userData.lightMapPage`.
+ *
+ * @private
+ * @param {Scene} scene - The scene.
+ * @return {number} The number of pages.
+ */
+function countPages( scene ) {
+
+	let pages = 1;
+
+	scene.traverseVisible( ( object ) => {
+
+		if ( object.isMesh === true && object.geometry.hasAttribute( 'uv1' ) ) pages = Math.max( pages, ( object.userData.lightMapPage ?? 0 ) + 1 );
+
+	} );
+
+	return pages;
+
+}
+
+/**
+ * Returns the scale and offset of the light map UVs of a page in the tiles of the bounce cache.
+ *
+ * @private
+ * @param {number} page - The page.
+ * @param {number} tiles - The number of tiles per side.
+ * @return {Vector4} The scale in `x` and `y` and the offset in `z` and `w`.
+ */
+function getTile( page, tiles ) {
+
+	return new Vector4( 1 / tiles, 1 / tiles, ( page % tiles ) / tiles, Math.floor( page / tiles ) / tiles );
+
+}
+
+/**
+ * Copies a light in world space, with its own shadow map that only updates on demand.
+ *
+ * @private
+ * @param {Light} source - The light.
+ * @return {Light} The copy.
+ */
+function cloneLight( source ) {
+
+	const light = source.clone( false );
+	light.matrixAutoUpdate = false;
+	light.matrix.copy( source.matrixWorld );
+	light.matrixWorld.copy( source.matrixWorld );
+	light.shadow.autoUpdate = false;
+
+	if ( light.target !== undefined ) {
+
+		light.target.matrixAutoUpdate = false;
+		light.target.matrix.copy( source.target.matrixWorld );
+		light.target.matrixWorld.copy( source.target.matrixWorld );
+
+	}
+
+	return light;
 
 }
 

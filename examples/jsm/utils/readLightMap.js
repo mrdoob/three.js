@@ -1,23 +1,23 @@
-import { DataUtils, HalfFloatType, LinearSRGBColorSpace, RenderTarget, Texture } from 'three';
+import { DataTexture, FloatType, HalfFloatType, LinearSRGBColorSpace, RenderTarget, RGBAFormat } from 'three';
 
 /**
- * Reads a baked GPU light map into a normalized linear canvas texture.
- * The returned intensity restores the HDR irradiance range when exporting KHR_lightmap.
- * RGB samples remain linear; no sRGB encoding or division by pi is applied.
- * The 8-bit PNG export loses precision in dark regions; use an HDR image-format
- * extension when this normalization does not provide sufficient bake quality.
+ * Reads a baked GPU light map back into a data texture with the same half float or float samples,
+ * e.g. to export it with {@link GLTFLightMapExporterExtension}, which normalizes the irradiance and
+ * stores it as a 16-bit or 8-bit sRGB PNG with the scale in the `KHR_lightmap` intensity.
+ * RGB samples remain linear irradiance; no division by pi is applied.
  * The caller owns the returned texture and should dispose it after export.
  *
  * @three_import import { readLightMap } from 'three/addons/utils/readLightMap.js';
  *
  * @param {WebGPURenderer} renderer - The renderer owning the light map.
  * @param {Texture} map - The baked light map.
- * @return {Promise<{texture: Texture, intensity: number}>} The normalized map and HDR scale.
+ * @return {Promise<DataTexture>} The light map samples with the bindings of the map.
  */
 async function readLightMap( renderer, map ) {
 
 	const { width, height } = map.image;
-	const target = new RenderTarget( width, height, { type: map.type, format: map.format, depthBuffer: false } );
+	const type = map.type === FloatType ? FloatType : HalfFloatType;
+	const target = new RenderTarget( width, height, { type, format: RGBAFormat, depthBuffer: false } );
 
 	let data;
 
@@ -33,33 +33,18 @@ async function readLightMap( renderer, map ) {
 
 	}
 
-	const decode = map.type === HalfFloatType ? DataUtils.fromHalfFloat : value => value;
-	let intensity = 1;
+	// half floats are finite without the maximum exponent, and nonnegative without the sign bit or as negative zero
+
+	const valid = type === HalfFloatType ? ( value ) => ( value & 0x7c00 ) !== 0x7c00 && value <= 0x8000 : ( value ) => value >= 0 && value < Infinity;
 
 	for ( let i = 0; i < data.length; i ++ ) {
 
-		if ( i % 4 === 3 ) continue;
-		const value = decode( data[ i ] );
-		if ( ! Number.isFinite( value ) || value < 0 ) {
-
-			throw new Error( 'readLightMap: KHR_lightmap irradiance must be finite and nonnegative.' );
-
-		}
-
-		intensity = Math.max( intensity, value );
+		if ( i % 4 !== 3 && valid( data[ i ] ) === false ) throw new Error( 'readLightMap: KHR_lightmap irradiance must be finite and nonnegative.' );
 
 	}
 
-	const bytes = new Uint8ClampedArray( data.length );
-	for ( let i = 0; i < bytes.length; i ++ ) bytes[ i ] = i % 4 === 3 ? 255 : Math.round( decode( data[ i ] ) / intensity * 255 );
-
-	const canvas = document.createElement( 'canvas' );
-	canvas.width = width;
-	canvas.height = height;
-	canvas.getContext( '2d' ).putImageData( new ImageData( bytes, width, height ), 0, 0 );
-
-	const texture = new Texture( canvas );
-	for ( const property of [ 'name', 'flipY', 'channel', 'minFilter', 'magFilter', 'wrapS', 'wrapT' ] ) texture[ property ] = map[ property ];
+	const texture = new DataTexture( data, width, height, RGBAFormat, type );
+	for ( const property of [ 'name', 'flipY', 'channel', 'minFilter', 'magFilter', 'wrapS', 'wrapT', 'generateMipmaps' ] ) texture[ property ] = map[ property ];
 	texture.offset.copy( map.offset );
 	texture.repeat.copy( map.repeat );
 	texture.center.copy( map.center );
@@ -67,7 +52,8 @@ async function readLightMap( renderer, map ) {
 	texture.matrix.copy( map.matrix );
 	texture.matrixAutoUpdate = map.matrixAutoUpdate;
 	texture.colorSpace = LinearSRGBColorSpace;
-	return { texture, intensity };
+	texture.needsUpdate = true;
+	return texture;
 
 }
 

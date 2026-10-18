@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js light baker</title>
+		<meta charset="utf-8">
+	</head>
+	<body>
+
+		<!-- the page that utils/lightbake/bake.mjs drives in a WebGPU browser -->
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../../build/three.webgpu.js",
+					"three/webgpu": "../../build/three.webgpu.js",
+					"three/tsl": "../../build/three.tsl.js",
+					"three/addons/": "../../examples/jsm/",
+					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.15/src/index.js",
+					"three-mesh-bvh/webgpu": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.15/src/webgpu/index.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+
+			import { LightBaker } from 'three/addons/lighting/LightBaker.js';
+			import { directionalLightMap, instancedLightMap } from 'three/addons/tsl/lighting/DirectionalLightMapNode.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { GLTFLightMapLoaderExtension } from 'three/addons/loaders/GLTFLightMapLoaderExtension.js';
+			import { DRACOLoader, DRACO_GLTF_CONFIG } from 'three/addons/loaders/DRACOLoader.js';
+			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
+			import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+			import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
+
+			const toneMappings = { none: THREE.NoToneMapping, linear: THREE.LinearToneMapping, reinhard: THREE.ReinhardToneMapping, aces: THREE.ACESFilmicToneMapping, agx: THREE.AgXToneMapping, neutral: THREE.NeutralToneMapping };
+
+			let renderer = null;
+
+			async function getRenderer() {
+
+				if ( renderer === null ) {
+
+					// the ray traced radiosity can need more storage buffers per shader stage than the default eight
+
+					const adapter = await navigator.gpu?.requestAdapter();
+
+					if ( adapter === null || adapter === undefined ) throw new Error( 'The browser has no WebGPU adapter. Headless browsers often lack one, connect to a browser with a window and hardware WebGPU with --browser-url.' );
+
+					renderer = new THREE.WebGPURenderer( { requiredLimits: { maxStorageBuffersPerShaderStage: adapter.limits.maxStorageBuffersPerShaderStage } } );
+					renderer.setSize( 64, 64 );
+					renderer.shadowMap.enabled = true;
+					await renderer.init();
+
+					if ( renderer.backend.isWebGPUBackend !== true ) throw new Error( 'The browser has no WebGPU.' );
+
+				}
+
+				return renderer;
+
+			}
+
+			function createLoader( renderer, manager ) {
+
+				return new GLTFLoader( manager )
+					.setDRACOLoader( new DRACOLoader().setDecoderPath( DRACO_GLTF_CONFIG ) )
+					.setKTX2Loader( new KTX2Loader().detectSupport( renderer ) )
+					.setMeshoptDecoder( MeshoptDecoder );
+
+			}
+
+			function fitShadow( light, center, radius ) {
+
+				// a shadow camera around the model. Directional lights are moved to the model, which only changes
+				// where their shadow camera is
+
+				const shadow = light.shadow;
+				shadow.mapSize.setScalar( light.isPointLight ? 1024 : 2048 );
+				shadow.normalBias = radius * 2 / shadow.mapSize.x;
+				shadow.camera.near = radius * ( light.isDirectionalLight ? 0.5 : 0.01 );
+				shadow.camera.far = radius * ( light.isDirectionalLight ? 3.5 : 10 );
+
+				if ( light.isDirectionalLight ) {
+
+					const direction = light.target.getWorldPosition( new THREE.Vector3() ).sub( light.getWorldPosition( new THREE.Vector3() ) ).normalize();
+
+					light.position.copy( light.parent.worldToLocal( center.clone().addScaledVector( direction, - 2 * radius ) ) );
+					light.updateMatrixWorld();
+
+					shadow.camera.left = shadow.camera.bottom = - radius;
+					shadow.camera.right = shadow.camera.top = radius;
+
+				}
+
+				shadow.camera.updateProjectionMatrix();
+
+			}
+
+			async function loadSky( url ) {
+
+				const loader = /\.exr$/i.test( url ) ? new EXRLoader() : /\.hdr$/i.test( url ) ? new HDRLoader() : new THREE.TextureLoader();
+				const texture = await loader.loadAsync( url );
+
+				texture.mapping = THREE.EquirectangularReflectionMapping;
+				if ( loader instanceof THREE.TextureLoader ) texture.colorSpace = THREE.SRGBColorSpace;
+
+				return texture;
+
+			}
+
+			// bakes the glTF at options.input and posts the result to options.output
+
+			window.lightBake = async ( options ) => {
+
+				const report = ( message ) => window.lightBakeProgress?.( message );
+				const renderer = await getRenderer();
+
+				renderer.toneMapping = toneMappings[ options.toneMapping ];
+				renderer.toneMappingExposure = options.exposure;
+
+				const gltf = await createLoader( renderer ).loadAsync( options.input );
+
+				const scene = new THREE.Scene();
+				const root = new THREE.Group();
+				root.add( gltf.scene );
+				scene.add( root );
+				scene.updateMatrixWorld( true );
+
+				const lights = [];
+				let triangles = 0, skinned = 0;
+
+				root.traverse( ( object ) => {
+
+					if ( object.isLight ) lights.push( object );
+					if ( object.isMesh !== true ) return;
+
+					const geometry = object.geometry;
+					triangles += ( geometry.index ?? geometry.getAttribute( 'position' ) ).count / 3 * ( object.isInstancedMesh ? object.count : 1 );
+					if ( object.isSkinnedMesh ) skinned ++;
+
+					object.castShadow = object.receiveShadow = true;
+
+				} );
+
+				const bounds = new THREE.Box3().setFromObject( root );
+
+				if ( bounds.isEmpty() ) throw new Error( 'The file has no meshes.' );
+
+				const center = bounds.getCenter( new THREE.Vector3() );
+				const radius = Math.max( bounds.getSize( new THREE.Vector3() ).length() / 2, 1e-3 );
+
+				report( { stage: 'loaded', triangles, skinned, lights: lights.length } );
+
+				// the lights of the file cast shadows, without lights the default sky and sun light the model
+
+				for ( const light of lights ) {
+
+					light.castShadow = light.isDirectionalLight || light.isPointLight || light.isSpotLight;
+					if ( light.castShadow ) fitShadow( light, center, radius );
+
+				}
+
+				// a sky or a sun of false leaves it out, null picks the default
+
+				const sky = options.sky === false ? null : options.sky ?? ( lights.length === 0 ? options.defaultSky : null );
+				const sun = options.sun === false ? null : options.sun ?? ( lights.length === 0 && options.sky === null ? options.defaultSun : null );
+
+				if ( sky !== null ) {
+
+					scene.background = await loadSky( sky );
+					scene.backgroundIntensity = options.skyIntensity;
+
+				}
+
+				if ( sun !== null ) {
+
+					const light = new THREE.DirectionalLight( 0xfff0dd, sun.intensity );
+					light.name = 'Sun';
+					light.castShadow = true;
+					light.position.setFromSphericalCoords( 2 * radius, THREE.MathUtils.degToRad( 90 - sun.elevation ), THREE.MathUtils.degToRad( sun.azimuth ) ).add( center );
+					light.target.position.copy( center );
+					root.add( light, light.target );
+					root.updateMatrixWorld( true );
+					fitShadow( light, center, radius );
+
+				}
+
+				const baker = new LightBaker( renderer, {
+					algorithm: options.algorithm,
+					resolution: options.resolution,
+					pageSize: options.pageSize,
+					unwrap: options.keepUV1 === false,
+					directional: options.directional,
+					directLight: options.directLight,
+					denoise: options.denoise,
+					noiseTolerance: options.tolerance,
+					maxSamples: options.maxSamples
+				} );
+
+				const warnings = [];
+				const warn = console.warn;
+				console.warn = ( ...args ) => {
+
+					warnings.push( args.join( ' ' ) );
+					warn.apply( console, args );
+
+				};
+
+				try {
+
+					// batches of samples between the noise estimates, the page does not need to render
+
+					report( { stage: 'preparing' } );
+
+					await baker.bake( scene, { root, interactive: false, onProgress: ( progress ) => report( { stage: 'baking', ...progress } ) } );
+
+					const glb = await baker.export( { format: options.format, bitDepth: options.bitDepth, onProgress: report } );
+
+					const response = await fetch( options.output, { method: 'POST', body: glb } );
+					if ( response.ok === false ) throw new Error( `Writing the result failed: ${ response.status }` );
+
+					return {
+						bytes: glb.byteLength, samples: baker.samples, noise: baker.noise, time: baker.time, pages: baker.lightMapper.pages.length, size: baker.lightMapper.size,
+						resolution: baker.atlasResolution, meshes: baker.meshes.length, excluded: baker.excludedMeshes.length, triangles, warnings
+					};
+
+				} finally {
+
+					console.warn = warn;
+					baker.dispose();
+
+				}
+
+			};
+
+			// loads a result like a viewer, with the KHR_lightmap extension
+
+			window.lightBakeVerify = async ( url ) => {
+
+				const renderer = await getRenderer();
+				const loader = createLoader( renderer );
+				loader.register( ( parser ) => new GLTFLightMapLoaderExtension( parser, { directionalLightMap, keepInstances: true } ) );
+
+				const gltf = await loader.loadAsync( url );
+				const result = { meshes: 0, instancedMeshes: 0, lightMaps: new Set(), directionMaps: new Set(), vertexColors: 0, unlit: 0, emissive: 0, lights: 0, extensions: gltf.parser.json.extensionsUsed ?? [] };
+
+				gltf.scene.traverse( ( object ) => {
+
+					if ( object.isLight ) result.lights ++;
+					if ( object.isMesh !== true ) return;
+
+					result.meshes ++;
+					if ( object.isInstancedMesh ) result.instancedMeshes ++;
+					if ( object.geometry.hasAttribute( 'color' ) ) result.vertexColors ++;
+
+					for ( const material of [ object.material ].flat() ) {
+
+						if ( material.lightMap ) result.lightMaps.add( material.lightMap );
+						if ( material.lightMapDirection ) result.directionMaps.add( material.lightMapDirection );
+						if ( material.isMeshBasicMaterial ) result.unlit ++;
+						if ( material.emissiveMap ) result.emissive ++;
+						if ( object.isInstancedMesh ) instancedLightMap( material );
+
+					}
+
+				} );
+
+				// render it once, which compiles the light-mapped materials
+
+				const scene = new THREE.Scene().add( gltf.scene );
+				const camera = new THREE.PerspectiveCamera();
+				const bounds = new THREE.Box3().setFromObject( gltf.scene );
+				camera.position.copy( bounds.getCenter( new THREE.Vector3() ) ).add( new THREE.Vector3( 0, 0, bounds.getSize( new THREE.Vector3() ).length() ) );
+				camera.far = bounds.getSize( new THREE.Vector3() ).length() * 4;
+				camera.updateProjectionMatrix();
+				renderer.render( scene, camera );
+				await renderer.backend.device.queue.onSubmittedWorkDone();
+
+				return { ...result, lightMaps: result.lightMaps.size, directionMaps: result.directionMaps.size };
+
+			};
+
+			window.lightBakeReady = true;
+
+		</script>
+
+	</body>
+</html>

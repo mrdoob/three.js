@@ -1,5 +1,5 @@
-import { Box3, Vector3, Vector4, Matrix4, Layers, Storage3DTexture, StorageBufferAttribute, StorageTexture3DNode, RendererUtils, HalfFloatType, UnsignedByteType, RGBAFormat, LinearFilter, LinearMipmapLinearFilter, ClampToEdgeWrapping, MathUtils } from 'three/webgpu';
-import { Fn, If, Loop, uniform, uniformArray, storage, instanceIndex, textureStore, texture3D, texture, cubeTexture, float, int, uint, vec2, vec3, vec4, ivec3, uvec3, max, min, abs, dot, cross, normalize, floor, sign, select, countOneBits, atomicOr, smoothstep, hash, fract, sqrt, cos, sin, length, PI, getDistanceAttenuation, viewZToPerspectiveDepth, viewZToReversedPerspectiveDepth } from 'three/tsl';
+import { Box3, Vector3, Vector4, Matrix4, Layers, Storage3DTexture, StorageBufferAttribute, StorageTexture3DNode, RendererUtils, HalfFloatType, UnsignedByteType, RGBAFormat, LinearFilter, LinearMipmapLinearFilter, ClampToEdgeWrapping, RepeatWrapping, MathUtils, EquirectangularReflectionMapping, EquirectangularRefractionMapping, NodeMaterial, QuadMesh, RenderTarget } from 'three/webgpu';
+import { Fn, If, Loop, uniform, uniformArray, storage, instanceIndex, textureStore, texture3D, texture, cubeTexture, pmremTexture, equirectUV, uv, float, int, uint, vec2, vec3, vec4, ivec3, uvec3, max, min, abs, dot, cross, normalize, floor, sign, select, countOneBits, atomicOr, smoothstep, hash, fract, sqrt, cos, sin, length, PI, getDistanceAttenuation, viewZToPerspectiveDepth, viewZToReversedPerspectiveDepth } from 'three/tsl';
 
 import { collectSceneTriangles, computeSceneBounds, TRIANGLE_STRIDE } from './VXGISceneCollector.js';
 import { createConeTracer } from './VXGIConeTracer.js';
@@ -52,7 +52,8 @@ class MipStorageTexture3DNode extends StorageTexture3DNode {
  * (a dense mip chain instead of a sparse octree, which keeps cone samples to two texture fetches):
  * opacity stores visibility per major axis and is filtered directionally (volumetric integration
  * along the axis, averaging across it), radiance is stored opacity-premultiplied and indirect bounces
- * are cached in the volume via cone tracing. Only direct lights are injected.
+ * are cached in the volume via cone tracing. Only direct lights are injected, cones that leave the
+ * volume see the sky of a background texture.
  * Voxelization uses conservative rasterization along the dominant triangle axis in a compute shader.
  *
  * Direct light is injected per voxel instead of splatting photons from a light-view map as in the
@@ -202,6 +203,15 @@ class VXGIVolume {
 		this.bounceConeAngle = uniform( 60 );
 
 		/**
+		 * The sky that cones leaving the volume see, the background texture of the scene at the last
+		 * update, or `null`. Background colors are ignored.
+		 *
+		 * @type {?Texture}
+		 * @readonly
+		 */
+		this.environment = null;
+
+		/**
 		 * The minimum corner of the volume.
 		 *
 		 * @type {UniformNode<vec3>}
@@ -333,6 +343,17 @@ class VXGIVolume {
 
 		this._lightsKey = '';
 
+		this._environmentIntensity = uniform( 1 );
+		this._environmentRotation = uniform( new Matrix4() );
+
+		// the sky blurred to the width of the cones, as a small equirectangular map that compute shaders
+		// can sample, unlike PMREM textures
+
+		this._skyTarget = new RenderTarget( 64, 32, { type: HalfFloatType, depthBuffer: false } );
+		this._skyTarget.texture.wrapS = RepeatWrapping;
+		this._skyQuad = new QuadMesh( new NodeMaterial() );
+		this._skyKey = '';
+
 
 		this._exclude = new Set();
 
@@ -350,8 +371,23 @@ class VXGIVolume {
 	}
 
 	/**
+	 * Returns the radiance of {@link VXGIVolume#environment} in a world-space direction, blurred to
+	 * the width of the cones, or `null` without a sky. Call it after `update()`.
+	 *
+	 * @param {Node<vec3>} direction - The normalized direction.
+	 * @return {?Node<vec3>} The radiance.
+	 */
+	skyRadiance( direction ) {
+
+		if ( this.environment === null ) return null;
+
+		return texture( this._skyTarget.texture, equirectUV( direction ) ).level( 0 ).rgb;
+
+	}
+
+	/**
 	 * Updates the volume if required. Voxelizes the scene when `needsUpdate` is set and re-injects
-	 * lighting when `lightingNeedsUpdate` is set or a light has changed.
+	 * lighting when `lightingNeedsUpdate` is set or a light or the sky has changed.
 	 *
 	 * @param {Renderer} renderer - The renderer.
 	 * @param {Scene} scene - The scene.
@@ -373,7 +409,7 @@ class VXGIVolume {
 
 		}
 
-		const lightKey = this._collectLights( renderer, scene );
+		const lightKey = this._collectLights( renderer, scene ) + this._collectEnvironment( scene );
 
 		if ( this.lightingNeedsUpdate === true || lightKey !== this._lightKey ) {
 
@@ -394,6 +430,9 @@ class VXGIVolume {
 	dispose() {
 
 		this._disposeGrid();
+
+		this._skyTarget.dispose();
+		this._skyQuad.material.dispose();
 
 	}
 
@@ -690,10 +729,77 @@ class VXGIVolume {
 
 	}
 
+	_collectEnvironment( scene ) {
+
+		const background = scene.background;
+
+		if ( background !== null && background.isTexture === true && ( background.isCubeTexture === true || background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping ) ) {
+
+			this.environment = background;
+			this._environmentIntensity.value = scene.backgroundIntensity;
+			this._environmentRotation.value.makeRotationFromEuler( scene.backgroundRotation ).transpose();
+
+			const rotation = scene.backgroundRotation;
+
+			return `|${ background.uuid },${ scene.backgroundIntensity },${ rotation.x },${ rotation.y },${ rotation.z }`;
+
+		}
+
+		this.environment = null;
+
+		return '|-';
+
+	}
+
+	_updateSky( renderer ) {
+
+		if ( this.environment === null ) return;
+
+		if ( this._skyKey !== this.environment.uuid ) {
+
+			const direction = Fn( () => {
+
+				const phi = uv().x.sub( 0.5 ).mul( 2 * Math.PI ).toConst();
+				const theta = uv().y.sub( 0.5 ).mul( Math.PI ).toConst();
+
+				return vec3( cos( theta ).mul( cos( phi ) ), sin( theta ), cos( theta ).mul( sin( phi ) ) );
+
+			} )();
+
+			const material = new NodeMaterial();
+			material.fragmentNode = vec4( pmremTexture( this.environment, this._environmentRotation.mul( direction ), float( 0.5 ) ).mul( this._environmentIntensity ), 1 );
+
+			this._skyQuad.material.dispose();
+			this._skyQuad.material = material;
+			this._skyKey = this.environment.uuid;
+
+		}
+
+		renderer.setRenderTarget( this._skyTarget );
+		this._skyQuad.render( renderer );
+
+	}
+
 	_updateLighting( renderer ) {
 
 		const kernels = this._getKernels();
 		const bounces = Math.max( 0, Math.round( this.bounces ) );
+
+		// the bounce kernels look up the sky
+
+		this._updateSky( renderer );
+
+		const skyKey = this.environment !== null ? this.environment.uuid : '-';
+
+		if ( kernels.bounceKey !== skyKey ) {
+
+			for ( const kernel of kernels.bounce ) if ( kernel !== null ) kernel.dispose();
+
+			kernels.bounce[ 0 ] = this._createBounceKernel( 0 );
+			kernels.bounce[ 1 ] = this._createBounceKernel( 1 );
+			kernels.bounceKey = skyKey;
+
+		}
 
 		// the ping-pong order is chosen so the final result always ends up in `radianceTexture`
 
@@ -752,7 +858,8 @@ class VXGIVolume {
 			radianceMips: [[], []],
 			inject: [ null, null ],
 			injectKey: [ null, null ],
-			bounce: [ null, null ]
+			bounce: [ null, null ],
+			bounceKey: null
 		};
 
 		for ( let level = 1; level < this._levels; level ++ ) {
@@ -768,9 +875,6 @@ class VXGIVolume {
 			}
 
 		}
-
-		kernels.bounce[ 0 ] = this._createBounceKernel( 0 );
-		kernels.bounce[ 1 ] = this._createBounceKernel( 1 );
 
 		this._kernels = kernels;
 
@@ -1423,8 +1527,9 @@ class VXGIVolume {
 						const origin = position.add( normal.mul( voxelSize.mul( 1.5 ) ) ).toConst();
 
 						const cone = trace( origin, direction, tanHalfAngle, traceDistance );
+						const sky = this.skyRadiance( direction );
 
-						gathered.addAssign( cone.color );
+						gathered.addAssign( sky !== null ? cone.color.add( sky.mul( cone.visibility ) ) : cone.color );
 
 					} );
 
