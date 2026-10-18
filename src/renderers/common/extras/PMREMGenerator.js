@@ -1,11 +1,18 @@
 import NodeMaterial from '../../../materials/nodes/NodeMaterial.js';
-import { sphericalGaussianBlur, ggxConvolution, ggxIntegration } from '../../../nodes/pmrem/PMREMUtils.js';
+import { sphericalGaussianBlur, ggxConvolution, ggxIntegration, ggxIntegrationTexel } from '../../../nodes/pmrem/PMREMUtils.js';
 import { equirectUV } from '../../../nodes/utils/EquirectUV.js';
 import { positionWorldDirection } from '../../../nodes/accessors/Position.js';
 import { uniform } from '../../../nodes/core/UniformNode.js';
 import { texture } from '../../../nodes/accessors/TextureNode.js';
 import { cubeTexture } from '../../../nodes/accessors/CubeTextureNode.js';
-import { Fn, int, uint, vec4 } from '../../../nodes/tsl/TSLBase.js';
+import { storageTexture, textureStore } from '../../../nodes/accessors/StorageTextureNode.js';
+import { globalId, workgroupId } from '../../../nodes/gpgpu/ComputeBuiltinNode.js';
+import { workgroupArray } from '../../../nodes/gpgpu/WorkgroupInfoNode.js';
+import { workgroupBarrier } from '../../../nodes/gpgpu/BarrierNode.js';
+import { invocationLocalIndex } from '../../../nodes/core/IndexNode.js';
+import { select } from '../../../nodes/math/ConditionalNode.js';
+import { Loop } from '../../../nodes/utils/LoopNode.js';
+import { Fn, If, float, int, uint, vec2, vec3, vec4, uvec2 } from '../../../nodes/tsl/TSLBase.js';
 
 import { Color } from '../../../math/Color.js';
 import { floorPowerOfTwo } from '../../../math/MathUtils.js';
@@ -41,6 +48,11 @@ const GGX_SAMPLES = 256;
 // Integrate a small source mip for the rough levels to avoid sampling noise.
 const INTEGRATION_SIZE = 16;
 const INTEGRATION_LEVELS = 3;
+
+// Compute path: output texels per workgroup side for the GGX levels, and threads that
+// share the integration of one output texel for the rough levels.
+const GGX_WORKGROUP_SIZE = 8;
+const INTEGRATION_WORKGROUP_SIZE = 64;
 
 const _origin = /*@__PURE__*/ new Vector3();
 const _clearColor = /*@__PURE__*/ new Color();
@@ -84,6 +96,8 @@ class PMREMGenerator {
 		this._blurMaterial = null;
 		this._ggxMaterial = null;
 		this._integrationMaterial = null;
+
+		this._computeNodes = null;
 
 	}
 
@@ -320,6 +334,7 @@ class PMREMGenerator {
 		if ( this._blurMaterial !== null ) this._blurMaterial.dispose();
 		if ( this._ggxMaterial !== null ) this._ggxMaterial.dispose();
 		if ( this._integrationMaterial !== null ) this._integrationMaterial.dispose();
+		if ( this._computeNodes !== null ) this._disposeComputeNodes();
 
 		this._boxMesh.geometry.dispose();
 
@@ -386,6 +401,15 @@ class PMREMGenerator {
 
 		pmremTarget.texture.name = 'PMREM';
 		pmremTarget.texture.isPMREMTexture = true;
+
+		if ( this._renderer.backend.isWebGPUBackend === true ) {
+
+			// Let compute shaders write the mip levels, see _applyPMREMCompute().
+
+			pmremTarget.texture.isStorageTexture = true;
+			pmremTarget.texture.mipmapsAutoUpdate = false;
+
+		}
 
 		return pmremTarget;
 
@@ -474,10 +498,20 @@ class PMREMGenerator {
 	 * mip level of the source that matches the solid angle of each sample. The rough
 	 * levels weight every texel of a small source mip with the GGX lobe instead.
 	 *
+	 * On the WebGPU backend, PMREMs allocated by the generator are filtered with compute
+	 * shaders, see {@link PMREMGenerator#_applyPMREMCompute}.
+	 *
 	 * @private
 	 * @param {CubeRenderTarget} pmremTarget - The PMREM.
 	 */
 	_applyPMREM( pmremTarget ) {
+
+		if ( pmremTarget.texture.isStorageTexture === true && this._renderer.backend.isWebGPUBackend === true ) {
+
+			this._applyPMREMCompute( pmremTarget );
+			return;
+
+		}
 
 		if ( this._ggxMaterial === null ) {
 
@@ -521,6 +555,82 @@ class PMREMGenerator {
 			}
 
 		}
+
+	}
+
+	/**
+	 * Compute shader version of {@link PMREMGenerator#_applyPMREM} with the same filtering.
+	 * Each mip level is written directly into the PMREM, and the rough levels share the
+	 * integration of an output texel between the threads of a workgroup.
+	 *
+	 * @private
+	 * @param {CubeRenderTarget} pmremTarget - The PMREM.
+	 */
+	_applyPMREMCompute( pmremTarget ) {
+
+		const size = this._cubeSize;
+		const maxLod = pmremTarget.texture.mipmaps.length - 1;
+
+		if ( this._computeNodes === null || this._computeNodes.length !== maxLod + 1 ) {
+
+			if ( this._computeNodes !== null ) this._disposeComputeNodes();
+
+			this._computeNodes = [];
+
+			for ( let lod = 0; lod <= maxLod; lod ++ ) {
+
+				const computeNode = lod > maxLod - INTEGRATION_LEVELS ? _getIntegrationCompute( pmremTarget.texture, lod ) : _getGGXCompute( pmremTarget.texture, lod );
+
+				this._computeNodes.push( computeNode );
+
+			}
+
+		}
+
+		for ( let lod = 0; lod <= maxLod; lod ++ ) {
+
+			const computeNode = this._computeNodes[ lod ];
+			const uniforms = _uniformsMap.get( computeNode );
+
+			const roughness = PMREMGenerator.lodToRoughness( lod, maxLod );
+			const outputSize = pmremTarget.width >> lod;
+
+			uniforms.envMap.value = this._sourceTarget.texture;
+			uniforms.outputTexture.value = pmremTarget.texture;
+			uniforms.outputSize.value = outputSize;
+			uniforms.roughness.value = roughness;
+
+			if ( lod > maxLod - INTEGRATION_LEVELS ) {
+
+				uniforms.sourceLod.value = Math.log2( size / INTEGRATION_SIZE );
+
+				computeNode.dispatchSize = [ outputSize * outputSize, 6, 1 ];
+
+			} else {
+
+				// See _applyPMREM().
+				uniforms.lodBias.value = roughness > 0 ? Math.log2( size ) + 0.5 * Math.log2( 6 / ( GGX_SAMPLES * Math.pow( roughness, 4 ) ) ) + 0.5 : 0;
+
+				computeNode.dispatchSize = [ Math.ceil( outputSize / GGX_WORKGROUP_SIZE ), Math.ceil( outputSize / GGX_WORKGROUP_SIZE ), 6 ];
+
+			}
+
+		}
+
+		this._renderer.compute( this._computeNodes );
+
+	}
+
+	/**
+	 * Disposes the compute nodes of {@link PMREMGenerator#_applyPMREMCompute}.
+	 *
+	 * @private
+	 */
+	_disposeComputeNodes() {
+
+		for ( const computeNode of this._computeNodes ) computeNode.dispose();
+
+		this._computeNodes = null;
 
 	}
 
@@ -631,6 +741,137 @@ function _getIntegrationMaterial() {
 		...uniforms,
 		direction: positionWorldDirection
 	} ) );
+
+}
+
+// The world space direction through the center of a texel of a cube face, matching
+// positionWorldDirection on the faces of the cube camera (x is mirrored).
+const _getFaceDirection = /*@__PURE__*/ Fn( ( [ face, texel, size ] ) => {
+
+	const uv = vec2( texel ).add( 0.5 ).div( float( size ) ).mul( 2.0 ).sub( 1.0 ).toConst();
+	const u = uv.x;
+	const v = uv.y;
+
+	return select( face.equal( 0 ), vec3( - 1.0, v.negate(), u.negate() ),
+		select( face.equal( 1 ), vec3( 1.0, v.negate(), u ),
+			select( face.equal( 2 ), vec3( u.negate(), 1.0, v ),
+				select( face.equal( 3 ), vec3( u.negate(), - 1.0, v.negate() ),
+					select( face.equal( 4 ), vec3( u.negate(), v.negate(), 1.0 ), vec3( u, v.negate(), - 1.0 ) ) ) ) ) ).normalize();
+
+} );
+
+function _getComputeUniforms( outputTexture, lod ) {
+
+	// The environment map has an explicit uv, so building it doesn't set up its
+	// default uv, the reflect vector, which needs a camera.
+
+	return {
+		envMap: cubeTexture( undefined, vec3( 0.0 ) ),
+		outputTexture: storageTexture( outputTexture ).setMipLevel( lod ),
+		outputSize: uniform( 0, 'uint' ),
+		roughness: uniform( 0 )
+	};
+
+}
+
+// One thread per output texel, see _getGGXMaterial().
+function _getGGXCompute( outputTexture, lod ) {
+
+	const uniforms = {
+		..._getComputeUniforms( outputTexture, lod ),
+		lodBias: uniform( 0 )
+	};
+
+	const computeNode = Fn( () => {
+
+		const { envMap, roughness, lodBias, outputTexture, outputSize } = uniforms;
+
+		const texel = globalId.xy;
+		const face = globalId.z;
+
+		const color = ggxConvolution( {
+			envMap,
+			roughness,
+			lodBias,
+			direction: _getFaceDirection( face, texel, outputSize ),
+			GGX_SAMPLES: uint( GGX_SAMPLES )
+		} );
+
+		textureStore( outputTexture.depth( face ), texel, color );
+
+	} )().computeKernel( [ GGX_WORKGROUP_SIZE, GGX_WORKGROUP_SIZE, 1 ] ).setName( `PMREM_ggx_${ lod }` );
+
+	_uniformsMap.set( computeNode, uniforms );
+
+	return computeNode;
+
+}
+
+// One workgroup per output texel, see _getIntegrationMaterial(). The threads integrate
+// interleaved source texels, then sum their results in shared memory.
+function _getIntegrationCompute( outputTexture, lod ) {
+
+	const uniforms = {
+		..._getComputeUniforms( outputTexture, lod ),
+		sourceLod: uniform( 0 )
+	};
+
+	const computeNode = Fn( () => {
+
+		const { envMap, roughness, sourceLod, outputTexture, outputSize } = uniforms;
+
+		const texel = uvec2( workgroupId.x.mod( outputSize ), workgroupId.x.div( outputSize ) );
+		const face = workgroupId.y;
+		const localIndex = invocationLocalIndex;
+
+		const N = _getFaceDirection( face, texel, outputSize ).toVar();
+
+		const alpha = roughness.mul( roughness ).toConst();
+		const alpha2 = alpha.mul( alpha ).toConst();
+
+		const texelSize = float( 2.0 / INTEGRATION_SIZE ).toConst();
+
+		const prefilteredColor = vec4( 0.0 ).toVar();
+
+		// Three face pairs of INTEGRATION_SIZE² texels, see ggxIntegration().
+		Loop( { start: localIndex, end: uint( 3 * INTEGRATION_SIZE * INTEGRATION_SIZE ), update: INTEGRATION_WORKGROUP_SIZE }, ( { i } ) => {
+
+			const sourceFace = i.div( INTEGRATION_SIZE * INTEGRATION_SIZE );
+			const x = i.mod( INTEGRATION_SIZE );
+			const y = i.div( INTEGRATION_SIZE ).mod( INTEGRATION_SIZE );
+
+			prefilteredColor.addAssign( ggxIntegrationTexel( { N, alpha2, face: sourceFace, x, y, texelSize, sourceLod, envMap } ) );
+
+		} );
+
+		const sums = workgroupArray( 'vec4', INTEGRATION_WORKGROUP_SIZE );
+		sums.element( localIndex ).assign( prefilteredColor );
+
+		for ( let stride = INTEGRATION_WORKGROUP_SIZE >> 1; stride > 0; stride >>= 1 ) {
+
+			workgroupBarrier();
+
+			If( localIndex.lessThan( stride ), () => {
+
+				sums.element( localIndex ).addAssign( sums.element( localIndex.add( stride ) ) );
+
+			} );
+
+		}
+
+		If( localIndex.equal( 0 ), () => {
+
+			const sum = sums.element( uint( 0 ) );
+
+			textureStore( outputTexture.depth( face ), texel, vec4( sum.rgb.div( sum.a ), 1.0 ) );
+
+		} );
+
+	} )().computeKernel( [ INTEGRATION_WORKGROUP_SIZE ] ).setName( `PMREM_integration_${ lod }` );
+
+	_uniformsMap.set( computeNode, uniforms );
+
+	return computeNode;
 
 }
 
