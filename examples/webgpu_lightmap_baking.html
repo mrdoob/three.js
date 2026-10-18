@@ -64,6 +64,7 @@
 			let gltfLoader = null, sceneControl, gltfFolder, uv1Control;
 
 			const worlds = {};
+			const probeKeyedMaterials = new WeakSet();
 
 			// the scenes and their loaders
 
@@ -938,11 +939,12 @@
 
 				// the texel density follows the number of triangles. Huge models get larger pages, as far as the
 				// device allows, since the charts of a mesh and all its instances have to fit one page. Phones get
-				// smaller ones
+				// a single smaller page, the bake of four pages of 2048² takes more than 2 GB of GPU memory
 
 				const huge = triangles > 250000;
-				const maxPageSize = Math.min( renderer.backend.device.limits.maxTextureDimension2D, window.matchMedia( '(pointer: coarse)' ).matches ? 2048 : 4096 );
-				const resolution = THREE.MathUtils.clamp( THREE.MathUtils.ceilPowerOfTwo( Math.sqrt( triangles ) * 6 ), 1024, 4096 );
+				const phone = window.matchMedia( '(pointer: coarse)' ).matches;
+				const maxPageSize = Math.min( renderer.backend.device.limits.maxTextureDimension2D, phone ? 2048 : 4096 );
+				const resolution = THREE.MathUtils.clamp( THREE.MathUtils.ceilPowerOfTwo( Math.sqrt( triangles ) * 6 ), 1024, phone ? 2048 : 4096 );
 				const pageSize = Math.min( huge ? 4096 : 2048, maxPageSize );
 
 				const warnings = [];
@@ -1135,6 +1137,7 @@
 
 					if ( material.roughness < 0.5 ) {
 
+						keyProbeNodes( material );
 						material.envNode = world.reflectionProbes.envNode;
 						material.needsUpdate = true;
 
@@ -1143,6 +1146,21 @@
 				}
 
 				world.curve = new THREE.CatmullRomCurve3( world.path.map( ( point ) => new THREE.Vector3( ...point ) ), true );
+
+			}
+
+			function keyProbeNodes( material ) {
+
+				// the shaders of materials are cached by their properties, but the probe nodes of plain materials are
+				// left out of the cache key. Materials of different scenes, or a material that returns to the probes
+				// of an earlier scene, would share the shader and the probes that it was first built with
+
+				if ( probeKeyedMaterials.has( material ) ) return;
+
+				const programCacheKey = material.customProgramCacheKey.bind( material );
+
+				material.customProgramCacheKey = () => `${ programCacheKey() },${ material.contextNode?.id },${ material.envNode?.id }`;
+				probeKeyedMaterials.add( material );
 
 			}
 
@@ -1201,6 +1219,7 @@
 
 					for ( const object of dynamicObjects ) {
 
+						keyProbeNodes( object.material );
 						object.material.contextNode = probeLighting ? world.lightProbeContext : null;
 						object.material.envNode = world.reflectionProbes.envNode;
 						object.material.needsUpdate = true;
@@ -1209,6 +1228,7 @@
 
 					for ( const mesh of world.probeLitMeshes ) {
 
+						keyProbeNodes( mesh.material );
 						mesh.material.contextNode = probeLighting ? world.lightProbeContext : null;
 						mesh.material.needsUpdate = true;
 
