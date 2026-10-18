@@ -363,7 +363,31 @@ class Textures extends DataMap {
 
 		if ( isRenderTarget || texture.isStorageTexture === true || texture.isExternalTexture === true ) {
 
-			backend.createTexture( texture, options );
+			// The GPU texture and this record are stored separately. A shadow depth
+			// texture can already own a live GPUTexture (the shadow pass renders into
+			// it) while this record is still empty, which is what compileAsync() hits
+			// when it builds bindings. Creating it again throws in WebGPUTextureUtils.
+			// Keep that texture when it still matches; external textures are kept as-is.
+
+			const backendData = backend.get( texture );
+			const gpuTexture = backendData.texture;
+			const sizeMatches = gpuTexture !== undefined && gpuTexture.width === options.width && gpuTexture.height === options.height &&
+				gpuTexture.depthOrArrayLayers === options.depth && gpuTexture.mipLevelCount === options.levels;
+
+			const reuseGPUTexture = isRenderTarget && textureData.initialized !== true && backendData.initialized === true &&
+				gpuTexture !== undefined && ( backendData.externalTexture === true || sizeMatches === true );
+
+			if ( reuseGPUTexture === false ) {
+
+				if ( isRenderTarget && textureData.initialized !== true && backendData.initialized === true && backendData.externalTexture !== true ) {
+
+					backend.destroyTexture( texture );
+
+				}
+
+				backend.createTexture( texture, options );
+
+			}
 
 			textureData.generation = texture.version;
 
