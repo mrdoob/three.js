@@ -540,7 +540,35 @@ class WebGLTextureUtils {
 
 		this.setTextureParameters( glTextureType, texture );
 
-		if ( texture.isCompressedTexture ) {
+		if ( texture.isCompressedCubeTexture ) {
+
+			for ( let i = 0; i < 6; i ++ ) {
+
+				const mipmaps = texture.image[ i ].mipmaps;
+
+				for ( let j = 0; j < mipmaps.length; j ++ ) {
+
+					const mipmap = mipmaps[ j ];
+
+					if ( glFormat === gl.RGBA ) {
+
+						gl.texSubImage2D( gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, 0, 0, mipmap.width, mipmap.height, glFormat, glType, mipmap.data );
+
+					} else if ( glFormat !== null ) {
+
+						gl.compressedTexSubImage2D( gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, 0, 0, mipmap.width, mipmap.height, glFormat, mipmap.data );
+
+					} else {
+
+						warn( 'WebGLBackend: Unsupported compressed texture format' );
+
+					}
+
+				}
+
+			}
+
+		} else if ( texture.isCompressedTexture ) {
 
 			const mipmaps = texture.mipmaps;
 			const image = options.image;

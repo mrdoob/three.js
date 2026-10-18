@@ -57,13 +57,13 @@ const _compareToWebGPU = {
 
 const _flipMap = [ 0, 1, 3, 2, 4, 5 ];
 
-function writeTextureLayer( device, textureGPU, mipLevel, layerIndex, mipmap, bytesPerImage, bytesPerRow, rowsPerImage, textureWidth, textureHeight ) {
+function writeTextureLayer( device, textureGPU, mipLevel, layerIndex, mipmap, dataOffset, bytesPerRow, rowsPerImage, textureWidth, textureHeight ) {
 
 	_texelCopyTextureInfo.texture = textureGPU;
 	_texelCopyTextureInfo.mipLevel = mipLevel;
 	_texelCopyTextureInfo.origin.z = layerIndex;
 
-	_texelCopyBufferLayout.offset = layerIndex * bytesPerImage;
+	_texelCopyBufferLayout.offset = dataOffset;
 	_texelCopyBufferLayout.bytesPerRow = bytesPerRow;
 	_texelCopyBufferLayout.rowsPerImage = rowsPerImage;
 
@@ -695,7 +695,15 @@ class WebGPUTextureUtils {
 
 		} else if ( texture.isCompressedTexture || texture.isCompressedArrayTexture ) {
 
-			if ( texture.isCompressedArrayTexture && texture.layerUpdates.size > 0 ) {
+			if ( texture.isCompressedCubeTexture ) {
+
+				for ( let i = 0; i < 6; i ++ ) {
+
+					this._copyCompressedBufferToTexture( texture.image[ i ].mipmaps, textureData.texture, textureDescriptorGPU, null, i );
+
+				}
+
+			} else if ( texture.isCompressedArrayTexture && texture.layerUpdates.size > 0 ) {
 
 				this._copyCompressedBufferToTexture( texture.mipmaps, textureData.texture, textureDescriptorGPU, texture.layerUpdates );
 
@@ -1141,8 +1149,9 @@ class WebGPUTextureUtils {
 	 * @param {GPUTexture} textureGPU - The GPU texture.
 	 * @param {Object} textureDescriptorGPU - The GPU texture descriptor.
 	 * @param {?Set<number>} [layerUpdates=null] - The layer indices to update.
+	 * @param {number} [faceIndex=-1] - The cube face the mipmaps belong to. `-1` if they hold all layers.
 	 */
-	_copyCompressedBufferToTexture( mipmaps, textureGPU, textureDescriptorGPU, layerUpdates = null ) {
+	_copyCompressedBufferToTexture( mipmaps, textureGPU, textureDescriptorGPU, layerUpdates = null, faceIndex = - 1 ) {
 
 		// @TODO: Consider to use GPUCommandEncoder.copyBufferToTexture()
 
@@ -1166,11 +1175,15 @@ class WebGPUTextureUtils {
 			const textureWidth = Math.ceil( width / blockData.width ) * blockData.width;
 			const textureHeight = rowsPerImage * blockData.height;
 
-			if ( activeLayerUpdates !== null ) {
+			if ( faceIndex !== - 1 ) {
+
+				writeTextureLayer( device, textureGPU, i, faceIndex, mipmap, 0, bytesPerRow, rowsPerImage, textureWidth, textureHeight );
+
+			} else if ( activeLayerUpdates !== null ) {
 
 				for ( const layerIndex of activeLayerUpdates ) {
 
-					writeTextureLayer( device, textureGPU, i, layerIndex, mipmap, bytesPerImage, bytesPerRow, rowsPerImage, textureWidth, textureHeight );
+					writeTextureLayer( device, textureGPU, i, layerIndex, mipmap, layerIndex * bytesPerImage, bytesPerRow, rowsPerImage, textureWidth, textureHeight );
 
 				}
 
@@ -1178,7 +1191,7 @@ class WebGPUTextureUtils {
 
 				for ( let layerIndex = 0; layerIndex < depth; layerIndex ++ ) {
 
-					writeTextureLayer( device, textureGPU, i, layerIndex, mipmap, bytesPerImage, bytesPerRow, rowsPerImage, textureWidth, textureHeight );
+					writeTextureLayer( device, textureGPU, i, layerIndex, mipmap, layerIndex * bytesPerImage, bytesPerRow, rowsPerImage, textureWidth, textureHeight );
 
 				}
 
