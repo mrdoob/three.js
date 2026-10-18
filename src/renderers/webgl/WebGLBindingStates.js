@@ -146,6 +146,8 @@ function WebGLBindingStates( gl, attributes ) {
 
 	}
 
+	const attributeNames = new WeakMap();
+
 	function needsUpdate( object, geometry, program, index ) {
 
 		const cachedAttributes = currentState.attributes;
@@ -155,7 +157,17 @@ function WebGLBindingStates( gl, attributes ) {
 
 		const programAttributes = program.getAttributes();
 
-		for ( const name in programAttributes ) {
+		let names = attributeNames.get( programAttributes );
+		if ( names === undefined ) {
+
+			names = Object.keys( programAttributes );
+			attributeNames.set( programAttributes, names );
+
+		}
+
+		for ( let attributeIndex = 0; attributeIndex < names.length; attributeIndex ++ ) {
+
+			const name = names[ attributeIndex ];
 
 			const programAttribute = programAttributes[ name ];
 
