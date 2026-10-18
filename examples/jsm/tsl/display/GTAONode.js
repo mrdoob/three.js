@@ -460,7 +460,7 @@ class GTAONode extends Node {
 
 			const radius = this.radius;
 			const invRadius = radius.reciprocal().toConst();
-			const viewDir = ( this._camera.isOrthographicCamera === true ) ? vec3( 0, 0, 1 ).toConst() : normalize( viewPosition.xyz.negate() ).toConst();
+			const viewDir = ( this._camera.isPerspectiveCamera === true ) ? normalize( viewPosition.xyz.negate() ).toConst() : vec3( 0, 0, 1 ).toConst();
 			const clipPosition = this._cameraProjectionMatrix.mul( vec4( viewPosition, 1.0 ) ).toConst();
 
 			const noiseResolution = textureSize( this._noiseNode, 0 );
