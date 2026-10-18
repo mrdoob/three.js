@@ -1,5 +1,7 @@
 import { nodeProxy } from '../tsl/TSLBase.js';
 import ArrayElementNode from './ArrayElementNode.js';
+import IndexNode from '../core/IndexNode.js';
+import { warnOnce } from '../../utils.js';
 
 /**
  * This class enables element access on instances of {@link StorageBufferNode}.
@@ -89,6 +91,34 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 	}
 
+	/**
+	 * Without storage buffers, an element that is not read through a PBO is the attribute
+	 * value of the current vertex or instance, so the index node is not used. This method
+	 * warns when the index node is something else, since the value read would silently be
+	 * a different element.
+	 *
+	 * @private
+	 */
+	_warnIfIndexIgnored() {
+
+		let indexNode = this.indexNode;
+
+		while ( indexNode.isVarNode === true ) indexNode = indexNode.node;
+
+		if ( indexNode.isIndexNode === true && ( indexNode.scope === IndexNode.VERTEX || indexNode.scope === IndexNode.INSTANCE ) ) return;
+
+		if ( this.node.isPBO !== true ) {
+
+			warnOnce( 'TSL: The WebGL backend ignores the index of ".element()" on a storage buffer without PBO. Use ".setPBO( true )" to read other elements.', this.stackTrace );
+
+		} else {
+
+			warnOnce( 'TSL: The WebGL backend ignores the index of ".element()" in a compute shader unless the storage buffer is an "instancedArray()".', this.stackTrace );
+
+		}
+
+	}
+
 	generate( builder, output ) {
 
 		let snippet;
@@ -104,6 +134,8 @@ class StorageArrayElementNode extends ArrayElementNode {
 				snippet = builder.generatePBO( this );
 
 			} else {
+
+				if ( isAssignContext !== true ) this._warnIfIndexIgnored();
 
 				snippet = this.node.build( builder );
 
