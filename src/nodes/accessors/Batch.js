@@ -83,11 +83,9 @@ function getPreviousNode( batchMesh, id ) {
 
 	const matricesTexture = batchMesh._matricesTexture;
 
-	// the matrices texture is replaced when the instance count changes
-
 	if ( data === undefined || data.matricesTexture !== matricesTexture ) {
 
-		if ( data !== undefined ) data.previousMatricesTexture.dispose();
+		if ( data !== undefined ) data.previousMatricesTexture.dispose(); // the matrices texture is replaced when the instance count changes
 
 		const { image, format, type, version } = matricesTexture;
 
