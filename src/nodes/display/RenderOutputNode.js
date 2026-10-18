@@ -70,6 +70,15 @@ class RenderOutputNode extends Node {
 		this.outputColorSpace = outputColorSpace;
 
 		/**
+		 * Whether the color node uses premultiplied alpha. The output
+		 * uses the same alpha mode.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.premultipliedAlpha = true;
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -113,7 +122,11 @@ class RenderOutputNode extends Node {
 		outputNode = vec4( outputNode.rgb, outputNode.a.clamp( 0.0, 1.0 ) );
 
 		// unpremultiply
-		outputNode = unpremultiplyAlpha( outputNode );
+		if ( this.premultipliedAlpha === true ) {
+
+			outputNode = unpremultiplyAlpha( outputNode );
+
+		}
 
 		// tone mapping
 		const toneMapping = ( this._toneMapping !== null ? this._toneMapping : context.toneMapping ) || NoToneMapping;
@@ -134,7 +147,11 @@ class RenderOutputNode extends Node {
 		}
 
 		// premultiply in output color space
-		outputNode = premultiplyAlpha( outputNode );
+		if ( this.premultipliedAlpha === true ) {
+
+			outputNode = premultiplyAlpha( outputNode );
+
+		}
 
 		return outputNode;
 

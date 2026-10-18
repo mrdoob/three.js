@@ -22,15 +22,7 @@ const LTC_Uv = /*@__PURE__*/ Fn( ( { N, V, roughness } ) => {
 
 	return uv;
 
-} ).setLayout( {
-	name: 'LTC_Uv',
-	type: 'vec2',
-	inputs: [
-		{ name: 'N', type: 'vec3' },
-		{ name: 'V', type: 'vec3' },
-		{ name: 'roughness', type: 'float' }
-	]
-} );
+}, { N: 'vec3', V: 'vec3', roughness: 'float', return: 'vec2' } );
 
 const LTC_ClippedSphereFormFactor = /*@__PURE__*/ Fn( ( { f } ) => {
 
@@ -41,13 +33,7 @@ const LTC_ClippedSphereFormFactor = /*@__PURE__*/ Fn( ( { f } ) => {
 
 	return max( l.mul( l ).add( f.z ).div( l.add( 1.0 ) ), 0 );
 
-} ).setLayout( {
-	name: 'LTC_ClippedSphereFormFactor',
-	type: 'float',
-	inputs: [
-		{ name: 'f', type: 'vec3' }
-	]
-} );
+}, { f: 'vec3', return: 'float' } );
 
 const LTC_EdgeVectorFormFactor = /*@__PURE__*/ Fn( ( { v1, v2 } ) => {
 
@@ -63,14 +49,7 @@ const LTC_EdgeVectorFormFactor = /*@__PURE__*/ Fn( ( { v1, v2 } ) => {
 
 	return v1.cross( v2 ).mul( theta_sintheta );
 
-} ).setLayout( {
-	name: 'LTC_EdgeVectorFormFactor',
-	type: 'vec3',
-	inputs: [
-		{ name: 'v1', type: 'vec3' },
-		{ name: 'v2', type: 'vec3' }
-	]
-} );
+}, { v1: 'vec3', v2: 'vec3', return: 'vec3' } );
 
 const LTC_Evaluate = /*@__PURE__*/ Fn( ( { N, V, P, mInv, p0, p1, p2, p3 } ) => {
 
@@ -112,19 +91,16 @@ const LTC_Evaluate = /*@__PURE__*/ Fn( ( { N, V, P, mInv, p0, p1, p2, p3 } ) => 
 
 	return result;
 
-} ).setLayout( {
-	name: 'LTC_Evaluate',
-	type: 'vec3',
-	inputs: [
-		{ name: 'N', type: 'vec3' },
-		{ name: 'V', type: 'vec3' },
-		{ name: 'P', type: 'vec3' },
-		{ name: 'mInv', type: 'mat3' },
-		{ name: 'p0', type: 'vec3' },
-		{ name: 'p1', type: 'vec3' },
-		{ name: 'p2', type: 'vec3' },
-		{ name: 'p3', type: 'vec3' }
-	]
+}, {
+	N: 'vec3',
+	V: 'vec3',
+	P: 'vec3',
+	mInv: 'mat3',
+	p0: 'vec3',
+	p1: 'vec3',
+	p2: 'vec3',
+	p3: 'vec3',
+	return: 'vec3'
 } );
 
 const LTC_Evaluate_Volume = /*@__PURE__*/ Fn( ( { P, p0, p1, p2, p3 } ) => {
@@ -160,16 +136,13 @@ const LTC_Evaluate_Volume = /*@__PURE__*/ Fn( ( { P, p0, p1, p2, p3 } ) => {
 
 	return result;
 
-} ).setLayout( {
-	name: 'LTC_Evaluate_Volume',
-	type: 'vec3',
-	inputs: [
-		{ name: 'P', type: 'vec3' },
-		{ name: 'p0', type: 'vec3' },
-		{ name: 'p1', type: 'vec3' },
-		{ name: 'p2', type: 'vec3' },
-		{ name: 'p3', type: 'vec3' }
-	]
+}, {
+	P: 'vec3',
+	p0: 'vec3',
+	p1: 'vec3',
+	p2: 'vec3',
+	p3: 'vec3',
+	return: 'vec3'
 } );
 
 export { LTC_Evaluate, LTC_Evaluate_Volume, LTC_Uv };

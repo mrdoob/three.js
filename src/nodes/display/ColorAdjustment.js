@@ -6,18 +6,29 @@ import { Vector3 } from '../../math/Vector3.js';
 import { LinearSRGBColorSpace } from '../../constants.js';
 
 /**
+ * TSL object that represents the luminance coefficients of the current working color space.
+ * It is evaluated once per build, so it can also be used as the default value of a parameter
+ * of a function with layout.
+ *
+ * @tsl
+ * @type {VarNode<vec3>}
+ */
+export const workingLuminanceCoefficients = /*@__PURE__*/ Fn( () => vec3( ColorManagement.getLuminanceCoefficients( new Vector3() ) ) ).once()().toVar( 'workingLuminanceCoefficients' );
+
+/**
  * Computes a grayscale value for the given RGB color value.
  *
  * @tsl
  * @function
  * @param {Node<vec3>} color - The color value to compute the grayscale for.
- * @return {Node<vec3>} The grayscale color.
+ * @param {Node<vec3>} [luminanceCoefficients] - The luminance coefficients. By default predefined values of the current working color space are used.
+ * @return {Node<float>} The grayscale value.
  */
-export const grayscale = /*@__PURE__*/ Fn( ( [ color ] ) => {
+export const grayscale = /*@__PURE__*/ Fn( ( [ color, luminanceCoefficients = workingLuminanceCoefficients ] ) => {
 
-	return luminance( color.rgb );
+	return luminance( color.rgb, luminanceCoefficients );
 
-} );
+}, { color: 'vec3', luminanceCoefficients: 'vec3', return: 'float' } );
 
 /**
  * Super-saturates or desaturates the given RGB color.
@@ -26,13 +37,14 @@ export const grayscale = /*@__PURE__*/ Fn( ( [ color ] ) => {
  * @function
  * @param {Node<vec3>} color - The input color.
  * @param {Node<float>} [adjustment=1] - Specifies the amount of the conversion. A value under `1` desaturates the color, a value over `1` super-saturates it.
+ * @param {Node<vec3>} [luminanceCoefficients] - The luminance coefficients. By default predefined values of the current working color space are used.
  * @return {Node<vec3>} The saturated color.
  */
-export const saturation = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
+export const saturation = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ), luminanceCoefficients = workingLuminanceCoefficients ] ) => {
 
-	return adjustment.mix( luminance( color.rgb ), color.rgb ).max( 0.0 );
+	return adjustment.mix( luminance( color.rgb, luminanceCoefficients ), color.rgb ).max( 0.0 );
 
-} );
+}, { color: 'vec3', adjustment: 'float', luminanceCoefficients: 'vec3', return: 'vec3' } );
 
 /**
  * Selectively enhance the intensity of less saturated RGB colors. Can result
@@ -54,7 +66,7 @@ export const vibrance = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 0 ) ] )
 
 	return mix( color.rgb, mx, amt ).max( 0.0 );
 
-} );
+}, { color: 'vec3', adjustment: 'float', return: 'vec3' } );
 
 /**
  * Updates the hue component of the given RGB color while preserving its luminance and saturation.
@@ -73,7 +85,7 @@ export const hue = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
 
 	return vec3( color.rgb.mul( cosAngle ).add( k.cross( color.rgb ).mul( adjustment.sin() ).add( k.mul( dot( k, color.rgb ).mul( cosAngle.oneMinus() ) ) ) ) ).max( 0.0 );
 
-} );
+}, { color: 'vec3', adjustment: 'float', return: 'vec3' } );
 
 /**
  * Computes the luminance for the given RGB color value.
@@ -139,7 +151,7 @@ export const cdl = /*@__PURE__*/ Fn( ( [
 
 	return vec4( v.rgb, color.a );
 
-} );
+}, { color: 'vec4', slope: 'vec3', offset: 'vec3', power: 'vec3', saturation: 'float', luminanceCoefficients: 'vec3', return: 'vec4' } );
 
 /**
  * TSL function for creating a posterize effect which reduces the number of colors

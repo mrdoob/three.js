@@ -34,6 +34,14 @@ class ConstNode extends InputNode {
 		 */
 		this.isConstNode = true;
 
+		/**
+		 * Whether this constant is an implicit number whose type can adapt to other operands.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.isWeak = false;
+
 	}
 
 	/**
@@ -54,11 +62,33 @@ class ConstNode extends InputNode {
 
 		if ( _regNum.test( type ) && _regNum.test( output ) ) {
 
-			return builder.generateConst( output, this.value );
+			let value = this.value;
+
+			// Preserve the declared integer value before converting to the output type.
+			if ( type === 'int' ) value = Math.trunc( value );
+			else if ( type === 'uint' ) value = value >= 0 ? Math.trunc( value ) : 0;
+
+			return builder.generateConst( output, value );
 
 		}
 
 		return builder.format( this.generateConst( builder ), type, output );
+
+	}
+
+	serialize( data ) {
+
+		super.serialize( data );
+
+		data.isWeak = this.isWeak;
+
+	}
+
+	deserialize( data ) {
+
+		super.deserialize( data );
+
+		this.isWeak = data.isWeak === true;
 
 	}
 

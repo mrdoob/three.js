@@ -314,9 +314,9 @@ class Box3 {
 			const positionAttribute = geometry.getAttribute( 'position' );
 
 			// precise AABB computation based on vertex data requires at least a position attribute.
-			// instancing isn't supported so far and uses the normal (conservative) code path.
+			// instancing and batching aren't supported so far and use the normal (conservative) code path.
 
-			if ( precise === true && positionAttribute !== undefined && object.isInstancedMesh !== true ) {
+			if ( precise === true && positionAttribute !== undefined && object.isInstancedMesh !== true && object.isBatchedMesh !== true ) {
 
 				for ( let i = 0, l = positionAttribute.count; i < l; i ++ ) {
 

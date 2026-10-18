@@ -13,16 +13,13 @@ const D_GGX_Anisotropic = /*@__PURE__*/ Fn( ( { alphaT, alphaB, dotNH, dotTH, do
 
 	return RECIPROCAL_PI.mul( a2.mul( w2.pow2() ) );
 
-} ).setLayout( {
-	name: 'D_GGX_Anisotropic',
-	type: 'float',
-	inputs: [
-		{ name: 'alphaT', type: 'float', qualifier: 'in' },
-		{ name: 'alphaB', type: 'float', qualifier: 'in' },
-		{ name: 'dotNH', type: 'float', qualifier: 'in' },
-		{ name: 'dotTH', type: 'float', qualifier: 'in' },
-		{ name: 'dotBH', type: 'float', qualifier: 'in' }
-	]
+}, {
+	alphaT: 'float',
+	alphaB: 'float',
+	dotNH: 'float',
+	dotTH: 'float',
+	dotBH: 'float',
+	return: 'float'
 } );
 
 export default D_GGX_Anisotropic;

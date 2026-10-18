@@ -162,6 +162,8 @@ class Animation {
 
 		this.stop();
 
+		this._animationLoop = null;
+
 	}
 
 }

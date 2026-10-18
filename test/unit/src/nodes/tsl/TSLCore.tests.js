@@ -1,4 +1,4 @@
-import { float, int } from '../../../../../src/Three.TSL.js';
+import { float, int, nodeObject, nodeObjectAssignable } from '../../../../../src/Three.TSL.js';
 
 export default QUnit.module( 'Nodes', () => {
 
@@ -6,17 +6,43 @@ export default QUnit.module( 'Nodes', () => {
 
 		QUnit.module( 'TSLCore', () => {
 
-			QUnit.test( 'Scalar constant caching', ( assert ) => {
+			QUnit.test( 'Scalar constant independence', ( assert ) => {
 
 				for ( const value of [ 0, 1, 2, 3, - 1, - 2 ] ) {
 
-					assert.true( int( value ).node === int( value ).node, `int(${ value }) reuses its constant` );
-					assert.true( float( value ).node === float( value ).node, `float(${ value }) reuses its constant` );
+					for ( const [ name, create ] of Object.entries( { int, float } ) ) {
+
+						const first = create( value );
+						const second = create( value );
+
+						assert.notStrictEqual( first, second, `${ name }(${ value }) creates independent constants` );
+						assert.strictEqual( first.value, value, `${ name }(${ value }) preserves the value` );
+						assert.strictEqual( second.value, value, `${ name }(${ value }) preserves the second value` );
+						assert.true( first.assignable, `${ name }(${ value }) is assignable` );
+						assert.false( first.isWeak, `${ name }(${ value }) keeps its explicit type` );
+
+					}
 
 				}
 
-				assert.true( int( 1 ) !== int( 1 ), 'int() keeps separate variable intents' );
-				assert.true( float( 1 ) !== float( 1 ), 'float() keeps separate variable intents' );
+			} );
+
+			QUnit.test( 'Assignable shared constants', ( assert ) => {
+
+				const shared = nodeObject( 1 );
+				const first = nodeObjectAssignable( 1 );
+				const second = nodeObjectAssignable( shared );
+
+				assert.strictEqual( nodeObject( 1 ), shared, 'Plain constants remain cached' );
+				assert.notStrictEqual( first, shared, 'Assignable constants do not reuse the shared node' );
+				assert.notStrictEqual( second, shared, 'A shared constant passed as a node is copied' );
+				assert.notStrictEqual( first, second, 'Assignable constants remain independent' );
+				assert.false( shared.assignable, 'The cached constant remains unchanged' );
+				assert.true( first.assignable, 'The first copy is assignable' );
+				assert.true( second.assignable, 'The second copy is assignable' );
+				assert.strictEqual( first.isWeak, shared.isWeak, 'The copy preserves implicit numeric typing' );
+				assert.strictEqual( first.toAssignable(), first, 'toAssignable() preserves node identity' );
+				assert.strictEqual( nodeObjectAssignable( first ), first, 'A node outside the shared cache retains its identity' );
 
 			} );
 

@@ -27,7 +27,7 @@ class PolarGridHelper extends LineSegments {
 	 *
 	 * @param {number} [radius=10] - The radius of the polar grid. This can be any positive number.
 	 * @param {number} [sectors=16] - The number of sectors the grid will be divided into. This can be any positive integer.
-	 * @param {number} [rings=16] - The number of rings. This can be any positive integer.
+	 * @param {number} [rings=8] - The number of rings. This can be any positive integer.
 	 * @param {number} [divisions=64] - The number of line segments used for each circle. This can be any positive integer.
 	 * @param {number|Color|string} [color1=0x444444] - The first color used for grid elements.
 	 * @param {number|Color|string} [color2=0x888888] -  The second color used for grid elements.

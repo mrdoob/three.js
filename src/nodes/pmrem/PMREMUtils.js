@@ -7,22 +7,18 @@ const GOLDEN_ANGLE = 2.399963229728653;
 
 /**
  * Returns the mip level of a PMREM that has been prefiltered for the given roughness.
- * Uses the inverse of `PMREMGenerator.lodToRoughness()`, compensating for base-level filtering.
+ * Uses the inverse of `PMREMGenerator.lodToRoughness()`.
  *
  * @tsl
  * @function
  * @param {Node<float>} roughness - The roughness.
  * @param {Node<float>} maxLod - The last mip level of the PMREM.
- * @param {Node<float>} size - The width of the sharpest mip level.
  * @return {Node<float>} The mip level.
+ * @see {@link https://github.com/google/filament/blob/main/shaders/src/surface_light_indirect.fs | Filament: perceptualRoughnessToLod()}
  */
-export const roughnessToMip = ( roughness, maxLod, size ) => {
+export const roughnessToMip = ( roughness, maxLod ) => {
 
 	roughness = float( roughness ).clamp();
-
-	// Subtract the base level's texel footprint from the GGX lobe.
-	const texelAngle = float( Math.PI * 0.5 ).div( size );
-	roughness = roughness.pow2().pow2().sub( texelAngle.pow2() ).max( 0.0 ).sqrt().sqrt();
 
 	return float( maxLod ).mul( roughness ).mul( float( 2.0 ).sub( roughness ) );
 

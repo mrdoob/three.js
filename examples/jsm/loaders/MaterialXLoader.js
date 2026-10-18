@@ -105,6 +105,8 @@ class MaterialXLoader extends Loader {
 
 		new FileLoader( this.manager )
 			.setPath( this.path )
+			.setRequestHeader( this.requestHeader )
+			.setWithCredentials( this.withCredentials )
 			.setResponseType( 'arraybuffer' )
 			.load( url, ( data ) => {
 
@@ -224,6 +226,7 @@ class MaterialXLoader extends Loader {
 	 * @param {string} [options.materialName] - Only translate the material with this name. Defaults to all materials.
 	 * @param {string} [options.uvSpace='bottom-left'] - The UV space of the document's textures, `'bottom-left'` or `'top-left'`.
 	 * @param {Function} [options.interfaceValidator] - Validates node interfaces, see `createStrictInterfaceValidator()` in `MaterialXInterfaceValidation.js`.
+	 * @param {function(Object, ?string): ?Node} [options.nodeResolver] - Builds the TSL node of a MaterialX node before the built-in node library. Called with the node and the requested output (`null` for the default output); returns the node, or `null` to leave it to the loader. For channel outputs such as `outx`, the loader takes the channel of the returned node.
 	 * @param {boolean} [options.throwOnErrors=true] - Whether translation errors throw or are only reported in the log.
 	 * @return {{materials: Object<string,NodeMaterial>, log: Array<Object>, errors: Array<Object>, warnings: Array<Object>}} The materials keyed by name and the translation log.
 	 */
@@ -240,8 +243,14 @@ class MaterialXLoader extends Loader {
 		const log = new MaterialXLog();
 
 		const document = new MaterialXDocument( this.manager, options.path || this.path, log, options.archiveResolver || null, options.uvSpace );
+		document.imageLoader.setCrossOrigin( this.crossOrigin );
+		document.textureLoader.setCrossOrigin( this.crossOrigin );
+		document.textureLoader.setRequestHeader( this.requestHeader );
+		document.textureLoader.setWithCredentials( this.withCredentials );
+
 		const result = document.parse( text, options.materialName || null, {
 			interfaceValidator: options.interfaceValidator,
+			nodeResolver: options.nodeResolver,
 		} );
 
 		return { document, log, result };

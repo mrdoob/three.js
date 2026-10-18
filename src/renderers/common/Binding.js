@@ -45,17 +45,6 @@ class Binding {
 	}
 
 	/**
-	 * The shader stages in which the binding's resource is visible.
-	 *
-	 * @return {number} The visibility bitmask.
-	 */
-	getVisibility() {
-
-		return this.visibility;
-
-	}
-
-	/**
 	 * Clones the binding.
 	 *
 	 * @return {Binding} The cloned binding.

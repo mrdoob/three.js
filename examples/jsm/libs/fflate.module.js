@@ -2,7 +2,7 @@
 fflate - fast JavaScript compression/decompression
 <https://101arrowz.github.io/fflate>
 Licensed under MIT. https://github.com/101arrowz/fflate/blob/master/LICENSE
-version 0.8.2
+version 0.8.3
 */
 
 // DEFLATE is a complex format; to read this code, you should probably check the RFC first:
@@ -199,7 +199,7 @@ var ec = [
     'invalid distance',
     'stream finished',
     'no stream handler',
-    ,
+    , // determined by compression function
     'no callback',
     'invalid UTF-8 data',
     'extra field too long',
@@ -916,12 +916,12 @@ var cbify = function (dat, opts, fns, init, id, cb) {
 var astrm = function (strm) {
     strm.ondata = function (dat, final) { return postMessage([dat, final], [dat.buffer]); };
     return function (ev) {
-        if (ev.data.length) {
+        if (ev.data[0]) {
             strm.push(ev.data[0], ev.data[1]);
             postMessage([ev.data[0].length]);
         }
         else
-            strm.flush();
+            strm.flush(ev.data[1]);
     };
 };
 // async stream attach
@@ -951,17 +951,19 @@ var astrmify = function (fns, strm, opts, init, id, flush, ext) {
         if (t)
             strm.ondata(err(4, 0, 1), null, !!f);
         strm.queuedSize += d.length;
-        w.postMessage([d, t = f], [d.buffer]);
+        // can fail for cross-realm Uint8Array, but ok - only a small performance penalty
+        w.postMessage([d, t = f], d.buffer instanceof ArrayBuffer ? [d.buffer] : []);
     };
     strm.terminate = function () { w.terminate(); };
     if (flush) {
-        strm.flush = function () { w.postMessage([]); };
+        strm.flush = function (sync) { w.postMessage([0, sync]); };
     }
 };
 // read 2 bytes
 var b2 = function (d, b) { return d[b] | (d[b + 1] << 8); };
 // read 4 bytes
 var b4 = function (d, b) { return (d[b] | (d[b + 1] << 8) | (d[b + 2] << 16) | (d[b + 3] << 24)) >>> 0; };
+// read 8 bytes
 var b8 = function (d, b) { return b4(d, b) + (b4(d, b + 4) * 4294967296); };
 // write bytes
 var wbytes = function (d, b, v) {
@@ -1082,18 +1084,37 @@ var Deflate = /*#__PURE__*/ (function () {
             this.p(this.b, final || false);
             this.s.w = this.s.i, this.s.i -= 2;
         }
+        if (final) {
+            // cleanup unneeded buffers/state to reduce memory usage
+            this.s = this.o = {};
+            this.b = et;
+        }
     };
     /**
      * Flushes buffered uncompressed data. Useful to immediately retrieve the
      * deflated output for small inputs.
+     * @param sync Whether to flush to a byte boundary. A sync flush takes 4-5
+     *             extra bytes, but guarantees all pushed data is immediately
+     *             decompressible. A separate DEFLATE stream may be concatenated
+     *             with the current output after a sync flush.
      */
-    Deflate.prototype.flush = function () {
+    Deflate.prototype.flush = function (sync) {
         if (!this.ondata)
             err(5);
         if (this.s.l)
             err(4);
         this.p(this.b, false);
         this.s.w = this.s.i, this.s.i -= 2;
+        // could technically skip writing the type-0 block for (this.s.r & 7) == 0,
+        // but the deterministic trailer (00 00 FF FF) is useful in some situations
+        if (sync) {
+            var c = new u8(6);
+            c[0] = this.s.r >> 3;
+            // write empty, non-final type-0 block
+            var ep = wfblk(c, this.s.r, et);
+            this.s.r = 0;
+            this.ondata(c.subarray(0, ep >> 3), false);
+        }
     };
     return Deflate;
 }());
@@ -1204,12 +1225,6 @@ export function inflate(data, opts, cb) {
         bInflt
     ], function (ev) { return pbf(inflateSync(ev.data[0], gopt(ev.data[1]))); }, 1, cb);
 }
-/**
- * Expands DEFLATE data with no wrapper
- * @param data The data to decompress
- * @param opts The decompression options
- * @returns The decompressed version of the data
- */
 export function inflateSync(data, opts) {
     return inflt(data, { i: 2 }, opts && opts.out, opts && opts.dictionary);
 }
@@ -1245,9 +1260,12 @@ var Gzip = /*#__PURE__*/ (function () {
     /**
      * Flushes buffered uncompressed data. Useful to immediately retrieve the
      * GZIPped output for small inputs.
+     * @param sync Whether to flush to a byte boundary. A sync flush takes 4-5
+     *             extra bytes, but guarantees all pushed data is immediately
+     *             decompressible.
      */
-    Gzip.prototype.flush = function () {
-        Deflate.prototype.flush.call(this);
+    Gzip.prototype.flush = function (sync) {
+        Deflate.prototype.flush.call(this, sync);
     };
     return Gzip;
 }());
@@ -1325,13 +1343,16 @@ var Gunzip = /*#__PURE__*/ (function () {
         }
         // necessary to prevent TS from using the closure value
         // This allows for workerization to function correctly
-        Inflate.prototype.c.call(this, final);
+        Inflate.prototype.c.call(this, 0);
         // process concatenated GZIP
-        if (this.s.f && !this.s.l && !final) {
+        if (this.s.f && !this.s.l) {
             this.v = shft(this.s.p) + 9;
             this.s = { i: 0 };
             this.o = new u8(0);
             this.push(new u8(0), final);
+        }
+        else if (final) {
+            Inflate.prototype.c.call(this, final);
         }
     };
     return Gunzip;
@@ -1367,12 +1388,6 @@ export function gunzip(data, opts, cb) {
         function () { return [gunzipSync]; }
     ], function (ev) { return pbf(gunzipSync(ev.data[0], ev.data[1])); }, 3, cb);
 }
-/**
- * Expands GZIP data
- * @param data The data to decompress
- * @param opts The decompression options
- * @returns The decompressed version of the data
- */
 export function gunzipSync(data, opts) {
     var st = gzs(data);
     if (st + 8 > data.length)
@@ -1408,9 +1423,12 @@ var Zlib = /*#__PURE__*/ (function () {
     /**
      * Flushes buffered uncompressed data. Useful to immediately retrieve the
      * zlibbed output for small inputs.
+     * @param sync Whether to flush to a byte boundary. A sync flush takes 4-5
+     *             extra bytes, but guarantees all pushed data is immediately
+     *             decompressible.
      */
-    Zlib.prototype.flush = function () {
-        Deflate.prototype.flush.call(this);
+    Zlib.prototype.flush = function (sync) {
+        Deflate.prototype.flush.call(this, sync);
     };
     return Zlib;
 }());
@@ -1517,12 +1535,6 @@ export function unzlib(data, opts, cb) {
         function () { return [unzlibSync]; }
     ], function (ev) { return pbf(unzlibSync(ev.data[0], gopt(ev.data[1]))); }, 5, cb);
 }
-/**
- * Expands Zlib data
- * @param data The data to decompress
- * @param opts The decompression options
- * @returns The decompressed version of the data
- */
 export function unzlibSync(data, opts) {
     return inflt(data.subarray(zls(data, opts && opts.dictionary), -4), { i: 2 }, opts && opts.out, opts && opts.dictionary);
 }
@@ -1643,7 +1655,7 @@ var fltn = function (d, p, t, o) {
         var val = d[k], n = p + k, op = o;
         if (Array.isArray(val))
             op = mrg(o, val[1]), val = val[0];
-        if (val instanceof u8)
+        if (ArrayBuffer.isView(val))
             t[n] = [val, op];
         else {
             t[n += '/'] = [new u8(0), op];
@@ -1828,15 +1840,30 @@ var dbf = function (l) { return l == 1 ? 3 : l < 6 ? 2 : l == 9 ? 1 : 0; };
 var slzh = function (d, b) { return b + 30 + b2(d, b + 26) + b2(d, b + 28); };
 // read zip header
 var zh = function (d, b, z) {
-    var fnl = b2(d, b + 28), fn = strFromU8(d.subarray(b + 46, b + 46 + fnl), !(b2(d, b + 8) & 2048)), es = b + 46 + fnl, bs = b4(d, b + 20);
-    var _a = z && bs == 4294967295 ? z64e(d, es) : [bs, b4(d, b + 24), b4(d, b + 42)], sc = _a[0], su = _a[1], off = _a[2];
-    return [b2(d, b + 10), sc, su, fn, es + b2(d, b + 30) + b2(d, b + 32), off];
+    var fnl = b2(d, b + 28), efl = b2(d, b + 30), fn = strFromU8(d.subarray(b + 46, b + 46 + fnl), !(b2(d, b + 8) & 2048)), es = b + 46 + fnl;
+    var _a = z64hs(d, es, efl, z, b4(d, b + 20), b4(d, b + 24), b4(d, b + 42)), sc = _a[0], su = _a[1], off = _a[2];
+    return [b2(d, b + 10), sc, su, fn, es + efl + b2(d, b + 32), off];
 };
-// read zip64 extra field
-var z64e = function (d, b) {
-    for (; b2(d, b) != 1; b += 4 + b2(d, b + 2))
-        ;
-    return [b8(d, b + 12), b8(d, b + 4), b8(d, b + 20)];
+// read zip64 header sizes
+var z64hs = function (d, b, l, z, sc, su, off) {
+    var nsc = sc == 4294967295, nsu = su == 4294967295, noff = off == 4294967295, e = b + l;
+    var nf = nsc + nsu + noff;
+    if (z && nf) {
+        for (; b + 4 < e; b += 4 + b2(d, b + 2)) {
+            if (b2(d, b) == 1) {
+                return [
+                    nsc ? b8(d, b + 4 + 8 * nsu) : sc,
+                    nsu ? b8(d, b + 4) : su,
+                    noff ? b8(d, b + 4 + 8 * (nsu + nsc)) : off,
+                    1
+                ];
+            }
+        }
+        // z == 2 for unknown whether or not zip64
+        if (z < 2)
+            err(13);
+    }
+    return [sc, su, off, 0];
 };
 // extra field length
 var exfl = function (ex) {
@@ -1938,6 +1965,8 @@ var ZipPassThrough = /*#__PURE__*/ (function () {
         this.size += chunk.length;
         if (final)
             this.crc = this.c.d();
+        // we shouldn't really do this cast, but properly handling ArrayBufferLike
+        // makes the API unergonomic with Buffer
         this.process(chunk, final || false);
     };
     return ZipPassThrough;
@@ -2317,8 +2346,9 @@ export function zipSync(data, opts) {
 var UnzipPassThrough = /*#__PURE__*/ (function () {
     function UnzipPassThrough() {
     }
-    UnzipPassThrough.prototype.push = function (data, final) {
-        this.ondata(null, data, final);
+    UnzipPassThrough.prototype.push = function (chunk, final) {
+        // same as ZipPassThrough: cast to retain Buffer ergonomics
+        this.ondata(null, chunk, final);
     };
     UnzipPassThrough.compression = 0;
     return UnzipPassThrough;
@@ -2338,9 +2368,9 @@ var UnzipInflate = /*#__PURE__*/ (function () {
             _this.ondata(null, dat, final);
         });
     }
-    UnzipInflate.prototype.push = function (data, final) {
+    UnzipInflate.prototype.push = function (chunk, final) {
         try {
-            this.i.push(data, final);
+            this.i.push(chunk, final);
         }
         catch (e) {
             this.ondata(e, null, final);
@@ -2371,10 +2401,10 @@ var AsyncUnzipInflate = /*#__PURE__*/ (function () {
             this.terminate = this.i.terminate;
         }
     }
-    AsyncUnzipInflate.prototype.push = function (data, final) {
+    AsyncUnzipInflate.prototype.push = function (chunk, final) {
         if (this.i.terminate)
-            data = slc(data, 0);
-        this.i.push(data, final);
+            chunk = slc(chunk, 0);
+        this.i.push(chunk, final);
     };
     AsyncUnzipInflate.compression = 8;
     return AsyncUnzipInflate;
@@ -2431,7 +2461,6 @@ var Unzip = /*#__PURE__*/ (function () {
             }
             var l = buf.length, oc = this.c, add = oc && this.d;
             var _loop_2 = function () {
-                var _a;
                 var sig = b4(buf, i);
                 if (sig == 0x4034B50) {
                     f = 1, is = i;
@@ -2442,13 +2471,11 @@ var Unzip = /*#__PURE__*/ (function () {
                         var chks_3 = [];
                         this_1.k.unshift(chks_3);
                         f = 2;
-                        var sc_1 = b4(buf, i + 18), su_1 = b4(buf, i + 22);
+                        var lsc = b4(buf, i + 18), lsu = b4(buf, i + 22);
                         var fn_1 = strFromU8(buf.subarray(i + 30, i += 30 + fnl), !u);
-                        if (sc_1 == 4294967295) {
-                            _a = dd ? [-2] : z64e(buf, i), sc_1 = _a[0], su_1 = _a[1];
-                        }
-                        else if (dd)
-                            sc_1 = -1;
+                        var _a = z64hs(buf, i, es, 2, lsc, lsu, 0), sc_1 = _a[0], su_1 = _a[1], z64 = _a[3];
+                        if (dd)
+                            sc_1 = -1 - z64;
                         i += es;
                         this_1.c = sc_1;
                         var d_1;
@@ -2561,7 +2588,7 @@ export function unzip(data, opts, cb) {
     if (lft) {
         var c = lft;
         var o = b4(data, e + 16);
-        var z = o == 4294967295 || c == 65535;
+        var z = b4(data, e - 20) == 0x7064B50;
         if (z) {
             var ze = b4(data, e - 12);
             z = b4(data, ze) == 0x6064B50;
@@ -2641,7 +2668,7 @@ export function unzipSync(data, opts) {
     if (!c)
         return {};
     var o = b4(data, e + 16);
-    var z = o == 4294967295 || c == 65535;
+    var z = b4(data, e - 20) == 0x7064B50;
     if (z) {
         var ze = b4(data, e - 12);
         z = b4(data, ze) == 0x6064B50;

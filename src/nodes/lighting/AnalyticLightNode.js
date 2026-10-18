@@ -127,21 +127,16 @@ class AnalyticLightNode extends LightingNode {
 	 */
 	disposeShadow() {
 
-		if ( this.shadowNode !== null ) {
+		if ( this.shadowNode === null ) return;
 
-			this.shadowNode.dispose();
-			this.shadowNode = null;
-
-		}
-
+		this.shadowNode.dispose();
+		this.shadowNode = null;
 		this.shadowColorNode = null;
 
-		if ( this.baseColorNode !== null ) {
+		this.colorNode = this.baseColorNode;
+		this.baseColorNode = null;
 
-			this.colorNode = this.baseColorNode;
-			this.baseColorNode = null;
-
-		}
+		this.needsUpdate = true;
 
 	}
 
@@ -266,9 +261,7 @@ class AnalyticLightNode extends LightingNode {
 
 		} else if ( this.shadowNode !== null ) {
 
-			this.shadowNode.dispose();
-			this.shadowNode = null;
-			this.shadowColorNode = null;
+			this.disposeShadow();
 
 		}
 

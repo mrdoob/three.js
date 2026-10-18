@@ -9,8 +9,21 @@ import * as fflate from '../libs/fflate.module.js';
 const textEncoder = new TextEncoder();
 
 const NO_COMPRESSION = 0;
+const RLE_COMPRESSION = 1;
 const ZIPS_COMPRESSION = 2;
 const ZIP_COMPRESSION = 3;
+const PIZ_COMPRESSION = 4;
+
+const USHORT_RANGE = 1 << 16;
+const BITMAP_SIZE = USHORT_RANGE >> 3;
+const A_OFFSET = 1 << 15;
+const M_OFFSET = 1 << 15;
+const MOD_MASK = ( 1 << 16 ) - 1;
+const HUF_ENCSIZE = ( 1 << 16 ) + 1;
+const SHORT_ZEROCODE_RUN = 59;
+const LONG_ZEROCODE_RUN = 63;
+const SHORTEST_LONG_RUN = 2 + LONG_ZEROCODE_RUN - SHORT_ZEROCODE_RUN;
+const LONGEST_LONG_RUN = 255 + SHORTEST_LONG_RUN;
 
 /**
  * An exporter for EXR.
@@ -148,8 +161,10 @@ function buildInfoRTT( renderTarget, options = {} ) {
 
 	const compressionSizes = {
 		0: 1,
+		1: 1,
 		2: 1,
-		3: 16
+		3: 16,
+		4: 32
 	};
 
 	const WIDTH = renderTarget.width,
@@ -182,8 +197,10 @@ function buildInfoDT( texture, options = {} ) {
 
 	const compressionSizes = {
 		0: 1,
+		1: 1,
 		2: 1,
-		3: 16
+		3: 16,
+		4: 32
 	};
 
 	const WIDTH = texture.image.width,
@@ -302,9 +319,17 @@ function compressData( inBuffer, info ) {
 			compress = compressNONE;
 			break;
 
+		case 1:
+			compress = compressRLE;
+			break;
+
 		case 2:
 		case 3:
 			compress = compressZIP;
+			break;
+
+		case 4:
+			compress = compressPIZ;
 			break;
 
 	}
@@ -319,7 +344,9 @@ function compressData( inBuffer, info ) {
 
 		const arr = inBuffer.subarray( size * i, size * ( i + 1 ) );
 
-		const block = compress( arr, tmpBuffer );
+		let block = compress( arr, tmpBuffer, info );
+
+		if ( block.length >= arr.length ) block = arr;
 
 		sum += block.length;
 
@@ -339,7 +366,9 @@ function compressNONE( data ) {
 
 }
 
-function compressZIP( data, tmpBuffer ) {
+function reorderAndPredict( data, tmpBuffer ) {
+
+	tmpBuffer = tmpBuffer.subarray( 0, data.length );
 
 	//
 	// Reorder the pixel data.
@@ -375,9 +404,624 @@ function compressZIP( data, tmpBuffer ) {
 
 	}
 
+	return tmpBuffer;
+
+}
+
+function compressRLE( data, tmpBuffer ) {
+
+	tmpBuffer = reorderAndPredict( data, tmpBuffer );
+
+	const out = new Uint8Array( tmpBuffer.length * 2 );
+	const end = tmpBuffer.length;
+
+	let runs = 0, rune = 1, o = 0;
+
+	while ( runs < end ) {
+
+		let count = 0;
+
+		while ( rune < end && tmpBuffer[ runs ] === tmpBuffer[ rune ] && count < 127 ) {
+
+			rune ++;
+			count ++;
+
+		}
+
+		if ( count >= 2 ) {
+
+			out[ o ++ ] = count;
+			out[ o ++ ] = tmpBuffer[ runs ];
+
+			runs = rune;
+
+		} else {
+
+			count ++;
+
+			while ( rune < end &&
+				( ( rune + 1 >= end || tmpBuffer[ rune ] !== tmpBuffer[ rune + 1 ] ) ||
+				( rune + 2 >= end || tmpBuffer[ rune + 1 ] !== tmpBuffer[ rune + 2 ] ) ) &&
+				count < 127 ) {
+
+				count ++;
+				rune ++;
+
+			}
+
+			out[ o ++ ] = - count;
+
+			while ( runs < rune ) out[ o ++ ] = tmpBuffer[ runs ++ ];
+
+		}
+
+		rune ++;
+
+	}
+
+	return out.slice( 0, o );
+
+}
+
+function compressZIP( data, tmpBuffer ) {
+
+	tmpBuffer = reorderAndPredict( data, tmpBuffer );
+
 	const deflate = fflate.zlibSync( tmpBuffer );
 
 	return deflate;
+
+}
+
+function compressPIZ( data, tmpBuffer, info ) {
+
+	const channels = info.numOutputChannels;
+	const wcount = info.dataSize / 2;
+	const nx = info.width;
+	const bpl = nx * info.dataSize;
+	const ny = data.length / ( bpl * channels );
+	const ndata = data.length / 2;
+
+	const buffer = new Uint16Array( ndata );
+
+	for ( let y = 0; y < ny; y ++ ) {
+
+		for ( let c = 0; c < channels; c ++ ) {
+
+			const src = ( y * channels + c ) * bpl;
+			const dst = ( c * ny + y ) * bpl / 2;
+
+			for ( let i = 0; i < bpl / 2; i ++ ) {
+
+				buffer[ dst + i ] = data[ src + 2 * i ] | ( data[ src + 2 * i + 1 ] << 8 );
+
+			}
+
+		}
+
+	}
+
+	const bitmap = new Uint8Array( BITMAP_SIZE );
+
+	for ( let i = 0; i < ndata; i ++ ) {
+
+		bitmap[ buffer[ i ] >> 3 ] |= 1 << ( buffer[ i ] & 7 );
+
+	}
+
+	bitmap[ 0 ] &= ~ 1;
+
+	let minNonZero = BITMAP_SIZE - 1;
+	let maxNonZero = 0;
+
+	for ( let i = 0; i < BITMAP_SIZE; i ++ ) {
+
+		if ( bitmap[ i ] ) {
+
+			if ( minNonZero > i ) minNonZero = i;
+			if ( maxNonZero < i ) maxNonZero = i;
+
+		}
+
+	}
+
+	const lut = new Uint16Array( USHORT_RANGE );
+	let k = 0;
+
+	for ( let i = 0; i < USHORT_RANGE; i ++ ) {
+
+		if ( i === 0 || ( bitmap[ i >> 3 ] & ( 1 << ( i & 7 ) ) ) ) lut[ i ] = k ++;
+
+	}
+
+	const maxValue = k - 1;
+
+	for ( let i = 0; i < ndata; i ++ ) {
+
+		buffer[ i ] = lut[ buffer[ i ] ];
+
+	}
+
+	for ( let c = 0; c < channels; c ++ ) {
+
+		for ( let j = 0; j < wcount; j ++ ) {
+
+			wav2Encode( buffer, c * nx * ny * wcount + j, nx, wcount, ny, wcount * nx, maxValue );
+
+		}
+
+	}
+
+	const bitmapLength = ( minNonZero <= maxNonZero ) ? maxNonZero - minNonZero + 1 : 0;
+
+	const huf = hufCompress( buffer, data.length );
+
+	if ( huf === null ) return data;
+
+	const out = new Uint8Array( 8 + bitmapLength + huf.length );
+	const dv = new DataView( out.buffer );
+
+	dv.setUint16( 0, minNonZero, true );
+	dv.setUint16( 2, maxNonZero, true );
+	out.set( bitmap.subarray( minNonZero, minNonZero + bitmapLength ), 4 );
+	dv.setUint32( 4 + bitmapLength, huf.length, true );
+	out.set( huf, 8 + bitmapLength );
+
+	return out;
+
+}
+
+const _wenc = { l: 0, h: 0 };
+
+function wenc14( a, b, out ) {
+
+	const as = ( a << 16 ) >> 16;
+	const bs = ( b << 16 ) >> 16;
+
+	out.l = ( ( as + bs ) >> 1 ) & 0xffff;
+	out.h = ( as - bs ) & 0xffff;
+
+}
+
+function wenc16( a, b, out ) {
+
+	const ao = ( a + A_OFFSET ) & MOD_MASK;
+	let m = ( ao + b ) >> 1;
+	const d = ao - b;
+
+	if ( d < 0 ) m = ( m + M_OFFSET ) & MOD_MASK;
+
+	out.l = m;
+	out.h = d & MOD_MASK;
+
+}
+
+function wav2Encode( buffer, j, nx, ox, ny, oy, mx ) {
+
+	const wenc = ( mx < ( 1 << 14 ) ) ? wenc14 : wenc16;
+	const n = ( nx > ny ) ? ny : nx;
+
+	let p = 1;
+	let p2 = 2;
+
+	while ( p2 <= n ) {
+
+		let py = j;
+		const ey = j + oy * ( ny - p2 );
+		const oy1 = oy * p;
+		const oy2 = oy * p2;
+		const ox1 = ox * p;
+		const ox2 = ox * p2;
+
+		for ( ; py <= ey; py += oy2 ) {
+
+			let px = py;
+			const ex = py + ox * ( nx - p2 );
+
+			for ( ; px <= ex; px += ox2 ) {
+
+				const p01 = px + ox1;
+				const p10 = px + oy1;
+				const p11 = p10 + ox1;
+
+				wenc( buffer[ px ], buffer[ p01 ], _wenc );
+				const i00 = _wenc.l, i01 = _wenc.h;
+
+				wenc( buffer[ p10 ], buffer[ p11 ], _wenc );
+				const i10 = _wenc.l, i11 = _wenc.h;
+
+				wenc( i00, i10, _wenc );
+				buffer[ px ] = _wenc.l;
+				buffer[ p10 ] = _wenc.h;
+
+				wenc( i01, i11, _wenc );
+				buffer[ p01 ] = _wenc.l;
+				buffer[ p11 ] = _wenc.h;
+
+			}
+
+			if ( nx & p ) {
+
+				const p10 = px + oy1;
+
+				wenc( buffer[ px ], buffer[ p10 ], _wenc );
+				buffer[ px ] = _wenc.l;
+				buffer[ p10 ] = _wenc.h;
+
+			}
+
+		}
+
+		if ( ny & p ) {
+
+			let px = py;
+			const ex = py + ox * ( nx - p2 );
+
+			for ( ; px <= ex; px += ox2 ) {
+
+				const p01 = px + ox1;
+
+				wenc( buffer[ px ], buffer[ p01 ], _wenc );
+				buffer[ px ] = _wenc.l;
+				buffer[ p01 ] = _wenc.h;
+
+			}
+
+		}
+
+		p = p2;
+		p2 <<= 1;
+
+	}
+
+}
+
+function hufCompress( raw, maxLength ) {
+
+	const freq = new Float64Array( HUF_ENCSIZE );
+
+	for ( let i = 0; i < raw.length; i ++ ) freq[ raw[ i ] ] ++;
+
+	const table = hufBuildEncTable( freq );
+
+	const out = new Uint8Array( maxLength );
+	const writer = { out, offset: 20, c: 0, lc: 0, overflow: false };
+
+	hufPackEncTable( table, writer );
+
+	const tableLength = writer.offset - 20;
+	const dataStart = writer.offset;
+
+	writer.c = 0;
+	writer.lc = 0;
+
+	hufEncode( table, raw, writer );
+
+	const nBits = ( writer.offset - dataStart ) * 8 + writer.lc;
+	const length = dataStart + Math.ceil( nBits / 8 );
+
+	if ( writer.overflow || length >= maxLength ) return null;
+
+	const dv = new DataView( out.buffer );
+
+	dv.setUint32( 0, table.im, true );
+	dv.setUint32( 4, table.iM, true );
+	dv.setUint32( 8, tableLength, true );
+	dv.setUint32( 12, nBits, true );
+	dv.setUint32( 16, 0, true );
+
+	return out.subarray( 0, length );
+
+}
+
+function hufBuildEncTable( frq ) {
+
+	const hlink = new Uint32Array( HUF_ENCSIZE );
+	const heap = [];
+
+	let im = 0;
+	let iM = 0;
+
+	while ( ! frq[ im ] ) im ++;
+
+	for ( let i = im; i < HUF_ENCSIZE; i ++ ) {
+
+		hlink[ i ] = i;
+
+		if ( frq[ i ] ) {
+
+			heap.push( i );
+			iM = i;
+
+		}
+
+	}
+
+	iM ++;
+	frq[ iM ] = 1;
+	heap.push( iM );
+
+	let nf = heap.length;
+
+	const greater = ( a, b ) => frq[ a ] > frq[ b ] || ( frq[ a ] === frq[ b ] && a > b );
+
+	makeHeap( heap, nf, greater );
+
+	const lengths = new Uint8Array( HUF_ENCSIZE );
+
+	while ( nf > 1 ) {
+
+		const mm = heap[ 0 ];
+		popHeap( heap, nf, greater );
+		nf --;
+
+		const m = heap[ 0 ];
+		popHeap( heap, nf, greater );
+
+		frq[ m ] += frq[ mm ];
+		pushHeap( heap, nf, greater );
+
+		for ( let j = m; ; j = hlink[ j ] ) {
+
+			lengths[ j ] ++;
+
+			if ( hlink[ j ] === j ) {
+
+				hlink[ j ] = mm;
+				break;
+
+			}
+
+		}
+
+		for ( let j = mm; ; j = hlink[ j ] ) {
+
+			lengths[ j ] ++;
+
+			if ( hlink[ j ] === j ) break;
+
+		}
+
+	}
+
+	const n = new Float64Array( 59 );
+
+	for ( let i = 0; i < HUF_ENCSIZE; i ++ ) n[ lengths[ i ] ] ++;
+
+	let c = 0;
+
+	for ( let i = 58; i > 0; i -- ) {
+
+		const nc = Math.floor( ( c + n[ i ] ) / 2 );
+		n[ i ] = c;
+		c = nc;
+
+	}
+
+	const codes = new Float64Array( HUF_ENCSIZE );
+
+	for ( let i = 0; i < HUF_ENCSIZE; i ++ ) {
+
+		if ( lengths[ i ] > 0 ) codes[ i ] = n[ lengths[ i ] ] ++;
+
+	}
+
+	return { codes, lengths, im, iM };
+
+}
+
+function pushHeapHole( heap, holeIndex, topIndex, value, greater ) {
+
+	let parent = Math.floor( ( holeIndex - 1 ) / 2 );
+
+	while ( holeIndex > topIndex && greater( heap[ parent ], value ) ) {
+
+		heap[ holeIndex ] = heap[ parent ];
+		holeIndex = parent;
+		parent = Math.floor( ( holeIndex - 1 ) / 2 );
+
+	}
+
+	heap[ holeIndex ] = value;
+
+}
+
+function adjustHeap( heap, holeIndex, len, value, greater ) {
+
+	const topIndex = holeIndex;
+	let secondChild = holeIndex;
+
+	while ( secondChild < Math.floor( ( len - 1 ) / 2 ) ) {
+
+		secondChild = 2 * ( secondChild + 1 );
+
+		if ( greater( heap[ secondChild ], heap[ secondChild - 1 ] ) ) secondChild --;
+
+		heap[ holeIndex ] = heap[ secondChild ];
+		holeIndex = secondChild;
+
+	}
+
+	if ( ( len & 1 ) === 0 && secondChild === ( len - 2 ) / 2 ) {
+
+		secondChild = 2 * ( secondChild + 1 );
+		heap[ holeIndex ] = heap[ secondChild - 1 ];
+		holeIndex = secondChild - 1;
+
+	}
+
+	pushHeapHole( heap, holeIndex, topIndex, value, greater );
+
+}
+
+function makeHeap( heap, len, greater ) {
+
+	if ( len < 2 ) return;
+
+	for ( let parent = Math.floor( ( len - 2 ) / 2 ); parent >= 0; parent -- ) {
+
+		adjustHeap( heap, parent, len, heap[ parent ], greater );
+
+	}
+
+}
+
+function pushHeap( heap, len, greater ) {
+
+	pushHeapHole( heap, len - 1, 0, heap[ len - 1 ], greater );
+
+}
+
+function popHeap( heap, len, greater ) {
+
+	if ( len > 1 ) {
+
+		const last = len - 1;
+		const value = heap[ last ];
+
+		heap[ last ] = heap[ 0 ];
+		adjustHeap( heap, 0, last, value, greater );
+
+	}
+
+}
+
+function outputBits( writer, nBits, bits ) {
+
+	while ( nBits > 0 ) {
+
+		const k = Math.min( nBits, 16 );
+		nBits -= k;
+
+		writer.c = ( writer.c << k ) | ( Math.floor( bits / 2 ** nBits ) % ( 1 << k ) );
+		writer.lc += k;
+
+		while ( writer.lc >= 8 ) {
+
+			writer.lc -= 8;
+
+			if ( writer.offset < writer.out.length ) {
+
+				writer.out[ writer.offset ++ ] = writer.c >> writer.lc;
+
+			} else {
+
+				writer.overflow = true;
+
+			}
+
+		}
+
+		writer.c &= ( 1 << writer.lc ) - 1;
+
+	}
+
+}
+
+function hufPackEncTable( table, writer ) {
+
+	const { lengths, iM } = table;
+
+	for ( let im = table.im; im <= iM; im ++ ) {
+
+		const l = lengths[ im ];
+
+		if ( l === 0 ) {
+
+			let zerun = 1;
+
+			while ( im < iM && zerun < LONGEST_LONG_RUN ) {
+
+				if ( lengths[ im + 1 ] > 0 ) break;
+
+				im ++;
+				zerun ++;
+
+			}
+
+			if ( zerun >= 2 ) {
+
+				if ( zerun >= SHORTEST_LONG_RUN ) {
+
+					outputBits( writer, 6, LONG_ZEROCODE_RUN );
+					outputBits( writer, 8, zerun - SHORTEST_LONG_RUN );
+
+				} else {
+
+					outputBits( writer, 6, SHORT_ZEROCODE_RUN + zerun - 2 );
+
+				}
+
+				continue;
+
+			}
+
+		}
+
+		outputBits( writer, 6, l );
+
+	}
+
+	if ( writer.lc > 0 ) outputBits( writer, 8 - writer.lc, 0 );
+
+}
+
+function hufEncode( table, raw, writer ) {
+
+	const { codes, lengths, iM: rlc } = table;
+
+	const sendCode = ( s, runCount ) => {
+
+		if ( lengths[ s ] + lengths[ rlc ] + 8 < lengths[ s ] * runCount ) {
+
+			outputBits( writer, lengths[ s ], codes[ s ] );
+			outputBits( writer, lengths[ rlc ], codes[ rlc ] );
+			outputBits( writer, 8, runCount );
+
+		} else {
+
+			while ( runCount -- >= 0 ) outputBits( writer, lengths[ s ], codes[ s ] );
+
+		}
+
+	};
+
+	let s = raw[ 0 ];
+	let cs = 0;
+
+	for ( let i = 1; i < raw.length; i ++ ) {
+
+		const ns = raw[ i ];
+
+		if ( cs === 255 || s !== ns ) {
+
+			sendCode( s, cs );
+			cs = 0;
+			s = ns;
+
+		} else {
+
+			cs ++;
+
+		}
+
+	}
+
+	sendCode( s, cs );
+
+	if ( writer.lc > 0 ) {
+
+		if ( writer.offset < writer.out.length ) {
+
+			writer.out[ writer.offset ] = ( writer.c << ( 8 - writer.lc ) ) & 0xff;
+
+		} else {
+
+			writer.overflow = true;
+
+		}
+
+	}
 
 }
 
@@ -612,7 +1256,7 @@ function getFloat32( arr, i ) {
  *
  * @typedef {Object} EXRExporter~Options
  * @property {(HalfFloatType|FloatType)} [type=HalfFloatType] - Output data type.
- * @property {(NO_COMPRESSION|ZIP_COMPRESSION|ZIPS_COMPRESSION)} [type=ZIP_COMPRESSION] - The compression algorithm.
+ * @property {(NO_COMPRESSION|RLE_COMPRESSION|ZIP_COMPRESSION|ZIPS_COMPRESSION|PIZ_COMPRESSION)} [compression=ZIP_COMPRESSION] - The compression algorithm.
  **/
 
-export { EXRExporter, NO_COMPRESSION, ZIP_COMPRESSION, ZIPS_COMPRESSION };
+export { EXRExporter, NO_COMPRESSION, RLE_COMPRESSION, ZIP_COMPRESSION, ZIPS_COMPRESSION, PIZ_COMPRESSION };

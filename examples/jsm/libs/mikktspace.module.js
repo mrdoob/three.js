@@ -68,28 +68,6 @@ function isNonZero( x, y, z ) {
 
 }
 
-function projectAndNormalize( target, offset, x, y, z, nx, ny, nz ) {
-
-	const d = dot( x, y, z, nx, ny, nz );
-	x = fround( x - fround( d * nx ) );
-	y = fround( y - fround( d * ny ) );
-	z = fround( z - fround( d * nz ) );
-
-	if ( isNonZero( x, y, z ) ) {
-
-		const s = fround( 1 / vectorLength( x, y, z ) );
-		x *= s;
-		y *= s;
-		z *= s;
-
-	}
-
-	target[ offset ] = x;
-	target[ offset + 1 ] = y;
-	target[ offset + 2 ] = z;
-
-}
-
 function getHashTableSize( vertexCount ) {
 
 	let n = 16;
@@ -461,7 +439,7 @@ function generateTangentSpaces( triangleVertices, originalTriangles, triangleFla
 	let projectedDerivatives = new Float32Array( 64 * 6 );
 	let cornerAngles = new Float32Array( 64 );
 	let subgroupMembers = new Int32Array( 64 );
-	const edgeVectors = new Float32Array( 6 );
+	let memberAny = new Uint8Array( 64 );
 
 	for ( let seed = 0; seed < cornerCount; seed ++ ) {
 
@@ -525,13 +503,28 @@ function generateTangentSpaces( triangleVertices, originalTriangles, triangleFla
 		}
 
 		// Evaluation accumulates in ascending face order, as in the reference C.
-		groupMembers.subarray( 0, groupSize ).sort();
+		for ( let i = 1; i < groupSize; i ++ ) {
+
+			const corner = groupMembers[ i ];
+			let j = i - 1;
+
+			while ( j >= 0 && groupMembers[ j ] > corner ) {
+
+				groupMembers[ j + 1 ] = groupMembers[ j ];
+				j --;
+
+			}
+
+			groupMembers[ j + 1 ] = corner;
+
+		}
 
 		if ( cornerAngles.length < groupSize ) {
 
 			cornerAngles = new Float32Array( groupSize );
 			projectedDerivatives = new Float32Array( groupSize * 6 );
 			subgroupMembers = new Int32Array( groupSize );
+			memberAny = new Uint8Array( groupSize );
 
 		}
 
@@ -546,10 +539,49 @@ function generateTangentSpaces( triangleVertices, originalTriangles, triangleFla
 			const f = corner / 3 | 0;
 			const d = f * 6;
 			const p = i * 6;
-			projectAndNormalize( projectedDerivatives, p, faceDerivatives[ d ], faceDerivatives[ d + 1 ], faceDerivatives[ d + 2 ], nx, ny, nz );
-			projectAndNormalize( projectedDerivatives, p + 3, faceDerivatives[ d + 3 ], faceDerivatives[ d + 4 ], faceDerivatives[ d + 5 ], nx, ny, nz );
 
-			if ( triangleFlags[ f ] & GROUP_WITH_ANY ) {
+			// Projections are inlined: V8 boxes the arguments of calls it does not inline.
+			let sx = faceDerivatives[ d ], sy = faceDerivatives[ d + 1 ], sz = faceDerivatives[ d + 2 ];
+			const sd = fround( fround( fround( sx * nx ) + fround( sy * ny ) ) + fround( sz * nz ) );
+			sx = fround( sx - fround( sd * nx ) );
+			sy = fround( sy - fround( sd * ny ) );
+			sz = fround( sz - fround( sd * nz ) );
+
+			if ( Math.abs( sx ) > FLOAT_MIN || Math.abs( sy ) > FLOAT_MIN || Math.abs( sz ) > FLOAT_MIN ) {
+
+				const s = fround( 1 / fround( Math.sqrt( fround( fround( fround( sx * sx ) + fround( sy * sy ) ) + fround( sz * sz ) ) ) ) );
+				sx *= s;
+				sy *= s;
+				sz *= s;
+
+			}
+
+			projectedDerivatives[ p ] = sx;
+			projectedDerivatives[ p + 1 ] = sy;
+			projectedDerivatives[ p + 2 ] = sz;
+
+			let tx = faceDerivatives[ d + 3 ], ty = faceDerivatives[ d + 4 ], tz = faceDerivatives[ d + 5 ];
+			const td = fround( fround( fround( tx * nx ) + fround( ty * ny ) ) + fround( tz * nz ) );
+			tx = fround( tx - fround( td * nx ) );
+			ty = fround( ty - fround( td * ny ) );
+			tz = fround( tz - fround( td * nz ) );
+
+			if ( Math.abs( tx ) > FLOAT_MIN || Math.abs( ty ) > FLOAT_MIN || Math.abs( tz ) > FLOAT_MIN ) {
+
+				const s = fround( 1 / fround( Math.sqrt( fround( fround( fround( tx * tx ) + fround( ty * ty ) ) + fround( tz * tz ) ) ) ) );
+				tx *= s;
+				ty *= s;
+				tz *= s;
+
+			}
+
+			projectedDerivatives[ p + 3 ] = tx;
+			projectedDerivatives[ p + 4 ] = ty;
+			projectedDerivatives[ p + 5 ] = tz;
+
+			memberAny[ i ] = triangleFlags[ f ] & GROUP_WITH_ANY;
+
+			if ( memberAny[ i ] ) {
 
 				cornerAngles[ i ] = 0;
 				continue;
@@ -560,9 +592,42 @@ function generateTangentSpaces( triangleVertices, originalTriangles, triangleFla
 			const base = corner - c;
 			const prev = triangleVertices[ base + ( c + 2 ) % 3 ] * 3;
 			const after = triangleVertices[ base + ( c + 1 ) % 3 ] * 3;
-			projectAndNormalize( edgeVectors, 0, fround( position[ prev ] - position[ n ] ), fround( position[ prev + 1 ] - position[ n + 1 ] ), fround( position[ prev + 2 ] - position[ n + 2 ] ), nx, ny, nz );
-			projectAndNormalize( edgeVectors, 3, fround( position[ after ] - position[ n ] ), fround( position[ after + 1 ] - position[ n + 1 ] ), fround( position[ after + 2 ] - position[ n + 2 ] ), nx, ny, nz );
-			const cosine = dot( edgeVectors[ 0 ], edgeVectors[ 1 ], edgeVectors[ 2 ], edgeVectors[ 3 ], edgeVectors[ 4 ], edgeVectors[ 5 ] );
+
+			let ax = fround( position[ prev ] - position[ n ] );
+			let ay = fround( position[ prev + 1 ] - position[ n + 1 ] );
+			let az = fround( position[ prev + 2 ] - position[ n + 2 ] );
+			let e = fround( fround( fround( ax * nx ) + fround( ay * ny ) ) + fround( az * nz ) );
+			ax = fround( ax - fround( e * nx ) );
+			ay = fround( ay - fround( e * ny ) );
+			az = fround( az - fround( e * nz ) );
+
+			if ( Math.abs( ax ) > FLOAT_MIN || Math.abs( ay ) > FLOAT_MIN || Math.abs( az ) > FLOAT_MIN ) {
+
+				const s = fround( 1 / fround( Math.sqrt( fround( fround( fround( ax * ax ) + fround( ay * ay ) ) + fround( az * az ) ) ) ) );
+				ax = fround( ax * s );
+				ay = fround( ay * s );
+				az = fround( az * s );
+
+			}
+
+			let bx = fround( position[ after ] - position[ n ] );
+			let by = fround( position[ after + 1 ] - position[ n + 1 ] );
+			let bz = fround( position[ after + 2 ] - position[ n + 2 ] );
+			e = fround( fround( fround( bx * nx ) + fround( by * ny ) ) + fround( bz * nz ) );
+			bx = fround( bx - fround( e * nx ) );
+			by = fround( by - fround( e * ny ) );
+			bz = fround( bz - fround( e * nz ) );
+
+			if ( Math.abs( bx ) > FLOAT_MIN || Math.abs( by ) > FLOAT_MIN || Math.abs( bz ) > FLOAT_MIN ) {
+
+				const s = fround( 1 / fround( Math.sqrt( fround( fround( fround( bx * bx ) + fround( by * by ) ) + fround( bz * bz ) ) ) ) );
+				bx = fround( bx * s );
+				by = fround( by * s );
+				bz = fround( bz * s );
+
+			}
+
+			const cosine = fround( fround( fround( ax * bx ) + fround( ay * by ) ) + fround( az * bz ) );
 			cornerAngles[ i ] = Math.acos( Math.max( - 1, Math.min( 1, cosine ) ) );
 
 		}
@@ -575,21 +640,64 @@ function generateTangentSpaces( triangleVertices, originalTriangles, triangleFla
 		let tangentY = 0;
 		let tangentZ = 0;
 
+		// Usually no pair is opposed and every subgroup is the whole group.
+		let split = false;
+
+		for ( let i = 0; i < groupSize && ! split; i ++ ) {
+
+			if ( memberAny[ i ] ) {
+
+				continue;
+
+			}
+
+			const p = i * 6;
+
+			for ( let j = i + 1; j < groupSize; j ++ ) {
+
+				const q = j * 6;
+
+				if ( ! memberAny[ j ] && ! (
+					fround( fround( fround( projectedDerivatives[ p ] * projectedDerivatives[ q ] ) + fround( projectedDerivatives[ p + 1 ] * projectedDerivatives[ q + 1 ] ) ) + fround( projectedDerivatives[ p + 2 ] * projectedDerivatives[ q + 2 ] ) ) > - 1 &&
+					fround( fround( fround( projectedDerivatives[ p + 3 ] * projectedDerivatives[ q + 3 ] ) + fround( projectedDerivatives[ p + 4 ] * projectedDerivatives[ q + 4 ] ) ) + fround( projectedDerivatives[ p + 5 ] * projectedDerivatives[ q + 5 ] ) ) > - 1 ) ) {
+
+					split = true;
+					break;
+
+				}
+
+			}
+
+		}
+
+		if ( ! split ) {
+
+			for ( let j = 0; j < groupSize; j ++ ) {
+
+				subgroupMembers[ j ] = j;
+
+			}
+
+		}
+
 		for ( let i = 0; i < groupSize; i ++ ) {
 
 			const f = groupMembers[ i ] / 3 | 0;
 			const p = i * 6;
-			let subgroupSize = 0;
+			let subgroupSize = split ? 0 : groupSize;
 			let sameSubgroup = true;
 
-			for ( let j = 0; j < groupSize; j ++ ) {
+			const anyI = memberAny[ i ];
+			const sx = projectedDerivatives[ p ], sy = projectedDerivatives[ p + 1 ], sz = projectedDerivatives[ p + 2 ];
+			const tx = projectedDerivatives[ p + 3 ], ty = projectedDerivatives[ p + 4 ], tz = projectedDerivatives[ p + 5 ];
 
-				const t = groupMembers[ j ] / 3 | 0;
+			for ( let j = 0; split && j < groupSize; j ++ ) {
+
 				const q = j * 6;
 
-				if ( i === j || ( ( triangleFlags[ f ] | triangleFlags[ t ] ) & GROUP_WITH_ANY ) || (
-					dot( projectedDerivatives[ p ], projectedDerivatives[ p + 1 ], projectedDerivatives[ p + 2 ], projectedDerivatives[ q ], projectedDerivatives[ q + 1 ], projectedDerivatives[ q + 2 ] ) > - 1 &&
-					dot( projectedDerivatives[ p + 3 ], projectedDerivatives[ p + 4 ], projectedDerivatives[ p + 5 ], projectedDerivatives[ q + 3 ], projectedDerivatives[ q + 4 ], projectedDerivatives[ q + 5 ] ) > - 1 ) ) {
+				if ( i === j || anyI || memberAny[ j ] || (
+					fround( fround( fround( sx * projectedDerivatives[ q ] ) + fround( sy * projectedDerivatives[ q + 1 ] ) ) + fround( sz * projectedDerivatives[ q + 2 ] ) ) > - 1 &&
+					fround( fround( fround( tx * projectedDerivatives[ q + 3 ] ) + fround( ty * projectedDerivatives[ q + 4 ] ) ) + fround( tz * projectedDerivatives[ q + 5 ] ) ) > - 1 ) ) {
 
 					if ( subgroupMembers[ subgroupSize ] !== j ) {
 
@@ -613,7 +721,7 @@ function generateTangentSpaces( triangleVertices, originalTriangles, triangleFla
 
 					const index = subgroupMembers[ j ];
 					// Degenerate derivatives do not contribute, even if they contain NaNs.
-					if ( triangleFlags[ groupMembers[ index ] / 3 | 0 ] & GROUP_WITH_ANY ) {
+					if ( memberAny[ index ] ) {
 
 						continue;
 

@@ -281,6 +281,11 @@ export default QUnit.module( 'Maths', () => {
 			a.closestPointToPoint( new Vector3( 0, - 2, 0 ), point );
 			assert.ok( point.equals( new Vector3( 0, 0, 0 ) ), 'Passed!' );
 
+			// degenerate triangle where a and b coincide
+			a.set( zero3, zero3, new Vector3( 2, 0, 0 ) );
+			a.closestPointToPoint( new Vector3( 1, 1, 0 ), point );
+			assert.ok( point.equals( new Vector3( 1, 0, 0 ) ), 'Passed!' );
+
 		} );
 
 		QUnit.test( 'isFrontFacing', ( assert ) => {

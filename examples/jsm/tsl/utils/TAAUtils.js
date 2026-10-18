@@ -27,15 +27,12 @@ export const clipAABB = Fn( ( [ currentColor, historyColor, minColor, maxColor ]
 		historyColor
 	);
 
-} ).setLayout( {
-	name: 'clipAABB',
-	type: 'vec4',
-	inputs: [
-		{ name: 'currentColor', type: 'vec4' },
-		{ name: 'historyColor', type: 'vec4' },
-		{ name: 'minColor', type: 'vec4' },
-		{ name: 'maxColor', type: 'vec4' }
-	]
+}, {
+	currentColor: 'vec4',
+	historyColor: 'vec4',
+	minColor: 'vec4',
+	maxColor: 'vec4',
+	return: 'vec4'
 } );
 
 /**
@@ -62,14 +59,6 @@ export const flickerReduction = Fn( ( [ currentColor, historyColor, currentWeigh
 
 	return add( currentColor.mul( weightCurrent ), historyColor.mul( weightHistory ) ).div( max( weightCurrent.add( weightHistory ), 0.00001 ) );
 
-} ).setLayout( {
-	name: 'flickerReduction',
-	type: 'vec4',
-	inputs: [
-		{ name: 'currentColor', type: 'vec4' },
-		{ name: 'historyColor', type: 'vec4' },
-		{ name: 'currentWeight', type: 'float' }
-	]
 } );
 
 /**

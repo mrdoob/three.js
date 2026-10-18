@@ -5,6 +5,7 @@ import {
 	RedFormat,
 	MathUtils,
 	Loader,
+	RepeatWrapping,
 	UnsignedByteType,
 	LinearFilter,
 	HalfFloatType,
@@ -50,7 +51,7 @@ class IESLoader extends Loader {
 
 	_getIESValues( iesLamp, type ) {
 
-		const width = 360;
+		const width = iesLamp.numHorAngles === 1 ? 1 : 360;
 		const height = 180;
 		const size = width * height;
 
@@ -61,7 +62,7 @@ class IESLoader extends Loader {
 			let phiIndex = 0, thetaIndex = 0;
 			let startTheta = 0, endTheta = 0, startPhi = 0, endPhi = 0;
 
-			for ( let i = 0; i < iesLamp.numHorAngles - 1; ++ i ) { // numHorAngles = horAngles.length-1 because of extra padding, so this wont cause an out of bounds error
+			for ( let i = 0; i < iesLamp.numHorAngles - 1; ++ i ) {
 
 				if ( theta < iesLamp.horAngles[ i + 1 ] || i == iesLamp.numHorAngles - 2 ) {
 
@@ -108,23 +109,32 @@ class IESLoader extends Loader {
 
 		}
 
-		const startTheta = iesLamp.horAngles[ 0 ], endTheta = iesLamp.horAngles[ iesLamp.numHorAngles - 1 ];
+		const endTheta = iesLamp.horAngles[ iesLamp.numHorAngles - 1 ];
 
 		for ( let i = 0; i < size; ++ i ) {
 
-			let theta = i % width;
+			// the horizontal angles cover 0 to 359 degrees
+			const theta = i % width;
 			const phi = Math.floor( i / width );
 
-			if ( endTheta - startTheta !== 0 && ( theta < startTheta || theta >= endTheta ) ) { // Handle symmetry for hor angles
+			let sampleTheta = theta;
 
-				theta %= endTheta * 2;
+ 			// mirror the measured range around the cycle
+ 			if ( endTheta !== 0 && sampleTheta > endTheta ) {
 
-				if ( theta > endTheta )
-					theta = endTheta * 2 - theta;
+				sampleTheta %= endTheta * 2;
+
+				if ( sampleTheta > endTheta ) {
+
+					sampleTheta = endTheta * 2 - sampleTheta;
+
+				}
 
 			}
 
-			data[ phi + theta * height ] = interpolateCandelaValues( phi, theta );
+			// the vertical angles span [0, 180]
+			const samplePhi = phi * 180 / ( height - 1 );
+			data[ phi + theta * height ] = interpolateCandelaValues( samplePhi, sampleTheta );
 
 		}
 
@@ -178,9 +188,12 @@ class IESLoader extends Loader {
 		const iesLamp = new IESLamp( text );
 		const data = this._getIESValues( iesLamp, type );
 
-		const texture = new DataTexture( data, 180, 1, RedFormat, type );
+		// X holds the vertical angle from 0 to 180 degrees inclusively, Y holds the horizontal
+		// angle from 0 to 359 degrees and wraps around, or a single row for symmetric profiles
+		const texture = new DataTexture( data, 180, data.length / 180, RedFormat, type );
 		texture.minFilter = LinearFilter;
 		texture.magFilter = LinearFilter;
+		texture.wrapT = RepeatWrapping;
 		texture.needsUpdate = true;
 
 		return texture;
@@ -345,8 +358,14 @@ function IESLamp( text ) {
 
 	}
 
+	const baseAngle = _self.horAngles[ 0 ];
+
 	let maxVal = - 1;
 	for ( let i = 0; i < _self.numHorAngles; ++ i ) {
+
+		// Shift the measured range to start at 0 so it can be mirrored across the full
+		// cycle when sampling.
+		_self.horAngles[ i ] -= baseAngle;
 
 		for ( let j = 0; j < _self.numVerAngles; ++ j ) {
 
@@ -354,6 +373,20 @@ function IESLamp( text ) {
 			maxVal = maxVal < value ? value : maxVal;
 
 		}
+
+	}
+
+	// A range wider than a half cycle is asymmetric, so it wraps back around to the
+	// first angle. Contrary to the standard some files skip that final 360 entry
+	// because it repeats the first one, which Blender's Cycles works around the same way
+	// https://github.com/blender/blender/blob/main/intern/cycles/util/ies.cpp
+	const endAngle = _self.horAngles[ _self.numHorAngles - 1 ];
+	if ( endAngle > 180 && endAngle < 360 ) {
+
+		_self.horAngles.push( 360 );
+		_self.candelaValues.push( _self.candelaValues[ 0 ].slice() );
+
+		_self.numHorAngles = _self.horAngles.length;
 
 	}
 

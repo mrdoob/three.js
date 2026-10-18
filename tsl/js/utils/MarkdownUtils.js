@@ -1249,7 +1249,7 @@ function renderTweetGroup( tweets ) {
 
 		tweetsHtml += `
 		<div class="x-tweet-card">
-			<blockquote class="twitter-tweet" data-theme="dark" ${shortAttributes}>
+			<blockquote class="twitter-tweet" data-theme="dark" data-dnt="true" ${shortAttributes}>
 				<div class="x-tweet-fallback">
 					<div class="x-tweet-fallback-header">
 						<span class="x-tweet-author">@${safeUsername}</span>

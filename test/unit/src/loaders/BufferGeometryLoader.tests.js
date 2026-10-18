@@ -2,6 +2,8 @@ import { BufferGeometryLoader } from '../../../../src/loaders/BufferGeometryLoad
 
 import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
+import { InterleavedBuffer } from '../../../../src/core/InterleavedBuffer.js';
+import { InterleavedBufferAttribute } from '../../../../src/core/InterleavedBufferAttribute.js';
 import { DynamicDrawUsage } from '../../../../src/constants.js';
 import { Loader } from '../../../../src/loaders/Loader.js';
 
@@ -49,6 +51,26 @@ export default QUnit.module( 'Loaders', () => {
 				geometry2.getAttribute( 'attr' ),
 				'Serialized attribute can be deserialized correctly.'
 			);
+
+		} );
+
+		QUnit.test( 'parser - interleaved attributes - views into a shared array buffer', ( assert ) => {
+
+			// e.g. GLTFLoader creates interleaved buffers as views at different offsets into one array buffer
+
+			const buffer = new Float32Array( [ 1, 2, 3, 0, 4, 5, 6, 0, 7, 8, 9, 0, 10, 11, 12, 0 ] ).buffer;
+			const position = new InterleavedBufferAttribute( new InterleavedBuffer( new Float32Array( buffer, 0, 8 ), 4 ), 3, 0 );
+			const normal = new InterleavedBufferAttribute( new InterleavedBuffer( new Float32Array( buffer, 32, 8 ), 4 ), 3, 0 );
+
+			const geometry = new BufferGeometry();
+			geometry.setAttribute( 'position', position );
+			geometry.setAttribute( 'normal', normal );
+
+			const geometry2 = new BufferGeometryLoader().parse( geometry.toJSON() );
+
+			assert.deepEqual( Array.from( geometry2.getAttribute( 'position' ).data.array ), [ 1, 2, 3, 0, 4, 5, 6, 0 ], 'first view was deserialized' );
+			assert.deepEqual( Array.from( geometry2.getAttribute( 'normal' ).data.array ), [ 7, 8, 9, 0, 10, 11, 12, 0 ], 'second view was deserialized' );
+			assert.strictEqual( geometry2.getAttribute( 'normal' ).count, 2, 'count is preserved' );
 
 		} );
 

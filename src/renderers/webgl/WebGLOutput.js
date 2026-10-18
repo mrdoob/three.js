@@ -8,13 +8,16 @@ import {
 	NeutralToneMapping,
 	CustomToneMapping,
 	SRGBTransfer,
-	HalfFloatType
+	HalfFloatType,
+	DepthStencilFormat,
+	UnsignedInt248Type
 } from '../../constants.js';
 import { BufferGeometry } from '../../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../../core/BufferAttribute.js';
 import { RawShaderMaterial } from '../../materials/RawShaderMaterial.js';
 import { Mesh } from '../../objects/Mesh.js';
 import { OrthographicCamera } from '../../cameras/OrthographicCamera.js';
+import { DepthTexture } from '../../textures/DepthTexture.js';
 import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 
@@ -45,6 +48,9 @@ function WebGLOutput( type, width, height, antialias, depth, stencil ) {
 	// single-sampled ping-pong buffers for post-processing effects, allocated on demand
 	let targetA = null;
 	let targetB = null;
+
+	// scene depth for effects with needsDepthTexture set to true, allocated on demand
+	let depthTexture = null;
 
 	// create fullscreen triangle geometry
 	const geometry = new BufferGeometry();
@@ -150,10 +156,40 @@ function WebGLOutput( type, width, height, antialias, depth, stencil ) {
 
 		}
 
+		// only store and resolve the scene depth if an effect reads it
+
+		const needsDepthTexture = depth === true && _effects.some( ( effect ) => effect.needsDepthTexture === true );
+
+		if ( needsDepthTexture !== ( targetScene.depthTexture !== null ) ) {
+
+			if ( needsDepthTexture === true && depthTexture === null ) {
+
+				depthTexture = new DepthTexture( width, height );
+
+				if ( stencil === true ) {
+
+					depthTexture.format = DepthStencilFormat;
+					depthTexture.type = UnsignedInt248Type;
+
+				}
+
+			}
+
+			// release GPU resources so the scene target is rebuilt with the new depth setup
+
+			targetScene.dispose();
+
+			targetScene.depthTexture = needsDepthTexture ? depthTexture : null;
+			targetScene.resolveDepthBuffer = needsDepthTexture;
+			targetScene.storeMultisampledDepthBuffer = needsDepthTexture;
+
+		}
+
 		for ( let i = 0; i < _effects.length; i ++ ) {
 
 			const effect = _effects[ i ];
 			if ( effect.setSize ) effect.setSize( width, height );
+			if ( needsDepthTexture && effect.needsDepthTexture === true && effect.setDepthTexture ) effect.setDepthTexture( depthTexture );
 
 		}
 

@@ -1,6 +1,7 @@
 import { BatchedMesh } from '../../../../src/objects/BatchedMesh.js';
 import { BoxGeometry } from '../../../../src/geometries/BoxGeometry.js';
 import { MeshBasicMaterial } from '../../../../src/materials/MeshBasicMaterial.js';
+import { PerspectiveCamera } from '../../../../src/cameras/PerspectiveCamera.js';
 
 export default QUnit.module( 'Objects', () => {
 
@@ -32,6 +33,32 @@ export default QUnit.module( 'Objects', () => {
 			batchedMesh.setInstanceCount( 2 );
 
 			assert.ok( batchedMesh.instanceCount === 2, 'instance count unequal 2' );
+
+		} );
+
+		QUnit.test( 'setGeometrySize', ( assert ) => {
+
+			const material = new MeshBasicMaterial();
+			const camera = new PerspectiveCamera();
+			camera.updateMatrixWorld();
+
+			const batchedMesh = new BatchedMesh( 4, 1000, 2000, material );
+			batchedMesh.perObjectFrustumCulled = false;
+			batchedMesh.sortObjects = false;
+			batchedMesh.addGeometry( new BoxGeometry() );
+			const geometryId = batchedMesh.addGeometry( new BoxGeometry() );
+			batchedMesh.addInstance( geometryId );
+
+			batchedMesh.onBeforeRender( {}, null, camera, batchedMesh.geometry, material );
+
+			// growing beyond 65535 vertices switches the index buffer to 32 bit
+			batchedMesh.setGeometrySize( 70000, 2000 );
+			batchedMesh.onBeforeRender( {}, null, camera, batchedMesh.geometry, material );
+
+			const { start } = batchedMesh.getGeometryRangeAt( geometryId );
+			assert.strictEqual( batchedMesh._multiDrawStarts[ 0 ], start * 4, 'draw offsets are updated for the new index type' );
+
+			assert.throws( () => batchedMesh.setGeometrySize( 10, 2000 ), /outside the range 10\./, 'error reports the vertex limit' );
 
 		} );
 

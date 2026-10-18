@@ -24,14 +24,7 @@ const contrastCurve = /*@__PURE__*/ Fn( ( [ input, power ] ) => {
 
 	return aboveHalf.select( output.oneMinus(), output );
 
-} ).setLayout( {
-	name: 'contrastCurve',
-	type: 'float',
-	inputs: [
-		{ name: 'input', type: 'float' },
-		{ name: 'power', type: 'float' }
-	]
-} );
+}, { input: 'float', power: 'float', return: 'float' } );
 
 /**
  * Computes an opacity node for soft particles, based on the "Soft Particles" white

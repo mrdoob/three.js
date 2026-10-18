@@ -210,19 +210,15 @@ class InterleavedBuffer {
 
 		}
 
-		if ( this.array.buffer._uuid === undefined ) {
+		const key = getArrayKey( this.array );
 
-			this.array.buffer._uuid = generateUUID();
+		if ( data.arrayBuffers[ key ] === undefined ) {
 
-		}
-
-		if ( data.arrayBuffers[ this.array.buffer._uuid ] === undefined ) {
-
-			data.arrayBuffers[ this.array.buffer._uuid ] = this.array.slice( 0 ).buffer;
+			data.arrayBuffers[ key ] = this.array.slice( 0 ).buffer;
 
 		}
 
-		const array = new this.array.constructor( data.arrayBuffers[ this.array.buffer._uuid ] );
+		const array = new this.array.constructor( data.arrayBuffers[ key ] );
 
 		const ib = new this.constructor( array, this.stride );
 		ib.setUsage( this.usage );
@@ -261,17 +257,11 @@ class InterleavedBuffer {
 
 		}
 
-		// generate UUID for array buffer if necessary
+		const key = getArrayKey( this.array );
 
-		if ( this.array.buffer._uuid === undefined ) {
+		if ( data.arrayBuffers[ key ] === undefined ) {
 
-			this.array.buffer._uuid = generateUUID();
-
-		}
-
-		if ( data.arrayBuffers[ this.array.buffer._uuid ] === undefined ) {
-
-			data.arrayBuffers[ this.array.buffer._uuid ] = Array.from( new Uint32Array( this.array.buffer ) );
+			data.arrayBuffers[ key ] = Array.from( new Uint32Array( this.array.slice( 0 ).buffer ) );
 
 		}
 
@@ -279,7 +269,7 @@ class InterleavedBuffer {
 
 		const json = {
 			uuid: this.uuid,
-			buffer: this.array.buffer._uuid,
+			buffer: key,
 			type: this.array.constructor.name,
 			stride: this.stride
 		};
@@ -289,6 +279,26 @@ class InterleavedBuffer {
 		return json;
 
 	}
+
+}
+
+// Returns the key under which the data of the given typed array is shared when cloning or serializing.
+// Interleaved buffers can be views at different offsets into the same array buffer (e.g. the interleaved
+// accessors of a glTF buffer view), so only views over the same range share their data.
+
+function getArrayKey( array ) {
+
+	// generate UUID for array buffer if necessary
+
+	if ( array.buffer._uuid === undefined ) {
+
+		array.buffer._uuid = generateUUID();
+
+	}
+
+	if ( array.byteOffset === 0 && array.byteLength === array.buffer.byteLength ) return array.buffer._uuid;
+
+	return array.buffer._uuid + ':' + array.byteOffset + ':' + array.byteLength;
 
 }
 

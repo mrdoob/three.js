@@ -43,7 +43,7 @@ export const rotateUV = /*@__PURE__*/ Fn( ( [ uv, rotation, center = vec2( 0.5 )
 
 	return rotate( uv.sub( center ), rotation ).add( center );
 
-} );
+}, { uv: 'vec2', rotation: 'float', center: 'vec2', return: 'vec2' } );
 
 /**
  * Applies a spherical warping effect to the given uv coordinates.
@@ -64,4 +64,4 @@ export const spherizeUV = /*@__PURE__*/ Fn( ( [ uv, strength, center = vec2( 0.5
 
 	return uv.add( delta.mul( deltaOffset ) );
 
-} );
+}, { uv: 'vec2', strength: 'float', center: 'vec2', return: 'vec2' } );

@@ -20,19 +20,21 @@ function WebGLRenderState( extensions ) {
 
 	function pushLight( light ) {
 
-		lightsArray.push( light );
+		if ( light.isLightProbeGrid ) {
+
+			lightProbeGridArray.push( light );
+
+		} else {
+
+			lightsArray.push( light );
+
+		}
 
 	}
 
 	function pushShadow( shadowLight ) {
 
 		shadowsArray.push( shadowLight );
-
-	}
-
-	function pushLightProbeGrid( volume ) {
-
-		lightProbeGridArray.push( volume );
 
 	}
 
@@ -68,8 +70,7 @@ function WebGLRenderState( extensions ) {
 		setupLightsView: setupLightsView,
 
 		pushLight: pushLight,
-		pushShadow: pushShadow,
-		pushLightProbeGrid: pushLightProbeGrid
+		pushShadow: pushShadow
 	};
 
 }

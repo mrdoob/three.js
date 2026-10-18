@@ -7,10 +7,11 @@ material.metalness = metalnessFactor;
 vec3 dxy = max( abs( dFdx( nonPerturbedNormal ) ), abs( dFdy( nonPerturbedNormal ) ) );
 float geometryRoughness = max( max( dxy.x, dxy.y ), dxy.z );
 
-// GGX width scales with roughness squared; large normal variation needs a linear floor.
-float roughnessFloor = max( 0.4 * sqrt( geometryRoughness ), geometryRoughness );
-
-material.roughness = min( max( roughnessFactor, roughnessFloor ), 1.0 );
+// Minimum roughness, so even a perfect mirror samples a prefiltered level of the environment map.
+// Matches Filament's desktop MIN_PERCEPTUAL_ROUGHNESS: https://github.com/google/filament/blob/main/shaders/src/surface_material.fs
+material.roughness = max( roughnessFactor, 0.045 );
+material.roughness += geometryRoughness;
+material.roughness = min( material.roughness, 1.0 );
 
 #ifdef USE_DIFFUSE_ROUGHNESS
 
@@ -88,7 +89,9 @@ material.roughness = min( max( roughnessFactor, roughnessFloor ), 1.0 );
 	#endif
 
 	material.clearcoat = saturate( material.clearcoat ); // Burley clearcoat model
-	material.clearcoatRoughness = min( max( material.clearcoatRoughness, roughnessFloor ), 1.0 );
+	material.clearcoatRoughness = max( material.clearcoatRoughness, 0.045 );
+	material.clearcoatRoughness += geometryRoughness;
+	material.clearcoatRoughness = min( material.clearcoatRoughness, 1.0 );
 
 #endif
 

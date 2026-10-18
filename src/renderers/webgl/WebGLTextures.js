@@ -2571,12 +2571,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	this.useMultisampledRTT = useMultisampledRTT;
 	this.dispose = dispose;
 
-	this.isReversedDepthBuffer = function () {
-
-		return state.buffers.depth.getReversed();
-
-	};
-
 }
 
 export { WebGLTextures };

@@ -93,6 +93,37 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.test( 'clone', ( assert ) => {
+
+			const instance = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 7, 8, 9 ] ), 3 );
+			instance.setUsage( DynamicDrawUsage );
+
+			checkInstanceAgainstCopy( instance, instance.clone( {} ), assert );
+
+		} );
+
+		QUnit.test( 'clone (views into a shared array buffer)', ( assert ) => {
+
+			// e.g. GLTFLoader creates interleaved buffers as views at different offsets into one array buffer
+
+			const buffer = new Float32Array( [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ] ).buffer;
+			const a = new InterleavedBuffer( new Float32Array( buffer, 0, 4 ), 2 );
+			const b = new InterleavedBuffer( new Float32Array( buffer, 16, 8 ), 4 );
+			const c = new InterleavedBuffer( new Float32Array( buffer, 16, 8 ), 2 );
+
+			const data = {};
+			const clonedA = a.clone( data );
+			const clonedB = b.clone( data );
+			const clonedC = c.clone( data );
+
+			assert.deepEqual( Array.from( clonedA.array ), [ 1, 2, 3, 4 ], 'first view was copied' );
+			assert.deepEqual( Array.from( clonedB.array ), [ 5, 6, 7, 8, 9, 10, 11, 12 ], 'second view was copied' );
+			assert.ok( clonedA.array.buffer !== buffer, 'array buffer was copied' );
+			assert.strictEqual( clonedB.array.buffer.byteLength, 32, 'only the view was copied' );
+			assert.ok( clonedB.array.buffer === clonedC.array.buffer, 'views over the same range share their copy' );
+
+		} );
+
 		QUnit.test( 'onUpload', ( assert ) => {
 
 			const a = new InterleavedBuffer();

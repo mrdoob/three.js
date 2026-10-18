@@ -725,7 +725,7 @@ function DRACOWorker() {
 
 			let dstOffset = 0;
 
-			for ( let i = 0, il = srcArray.length; i < il; i ++ ) {
+			for ( let i = 0; i < count; i ++ ) {
 
 				for ( let j = 0; j < itemSize; j ++ ) {
 

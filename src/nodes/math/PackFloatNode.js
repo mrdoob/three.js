@@ -1,5 +1,5 @@
 import Node from '../core/Node.js';
-import { nodeProxyIntent } from '../tsl/TSLCore.js';
+import { nodeProxyAssignable } from '../tsl/TSLCore.js';
 
 /**
  * This node represents an operation that packs floating-point values of a vector into an unsigned 32-bit integer
@@ -82,7 +82,7 @@ export default PackFloatNode;
  * @param {Node<vec2>} value - The 2-component vector to be packed
  * @returns {Node}
  */
-export const packSnorm2x16 = /*@__PURE__*/ nodeProxyIntent( PackFloatNode, 'snorm' ).setParameterLength( 1 );
+export const packSnorm2x16 = /*@__PURE__*/ nodeProxyAssignable( PackFloatNode, 'snorm' ).setParameterLength( 1 );
 
 /**
  * Converts each component of the normalized float to 16-bit integer values. The results are packed into a single unsigned integer.
@@ -93,7 +93,7 @@ export const packSnorm2x16 = /*@__PURE__*/ nodeProxyIntent( PackFloatNode, 'snor
  * @param {Node<vec2>} value - The 2-component vector to be packed
  * @returns {Node}
  */
-export const packUnorm2x16 = /*@__PURE__*/ nodeProxyIntent( PackFloatNode, 'unorm' ).setParameterLength( 1 );
+export const packUnorm2x16 = /*@__PURE__*/ nodeProxyAssignable( PackFloatNode, 'unorm' ).setParameterLength( 1 );
 
 /**
  * Converts each component of the vec2 to 16-bit floating-point values. The results are packed into a single unsigned integer.
@@ -103,7 +103,7 @@ export const packUnorm2x16 = /*@__PURE__*/ nodeProxyIntent( PackFloatNode, 'unor
  * @param {Node<vec2>} value - The 2-component vector to be packed
  * @returns {Node}
  */
-export const packHalf2x16 = /*@__PURE__*/ nodeProxyIntent( PackFloatNode, 'float16' ).setParameterLength( 1 );
+export const packHalf2x16 = /*@__PURE__*/ nodeProxyAssignable( PackFloatNode, 'float16' ).setParameterLength( 1 );
 
 /**
  * Converts each component of the normalized float to 8-bit integer values. The results are packed into a single unsigned integer.
@@ -113,7 +113,7 @@ export const packHalf2x16 = /*@__PURE__*/ nodeProxyIntent( PackFloatNode, 'float
  * @param {Node<vec4>} value - The 4-component vector to be packed
  * @returns {Node}
  */
-export const packSnorm4x8 = /*@__PURE__*/ nodeProxyIntent( PackFloatNode, 'snorm', null, { layout: '4x8' } ).setParameterLength( 1 );
+export const packSnorm4x8 = /*@__PURE__*/ nodeProxyAssignable( PackFloatNode, 'snorm', null, { layout: '4x8' } ).setParameterLength( 1 );
 
 /**
  * Converts each component of the normalized float to 8-bit integer values. The results are packed into a single unsigned integer.
@@ -123,4 +123,4 @@ export const packSnorm4x8 = /*@__PURE__*/ nodeProxyIntent( PackFloatNode, 'snorm
  * @param {Node<vec4>} value - The 4-component vector to be packed
  * @returns {Node}
  */
-export const packUnorm4x8 = /*@__PURE__*/ nodeProxyIntent( PackFloatNode, 'unorm', null, { layout: '4x8' } ).setParameterLength( 1 );
+export const packUnorm4x8 = /*@__PURE__*/ nodeProxyAssignable( PackFloatNode, 'unorm', null, { layout: '4x8' } ).setParameterLength( 1 );

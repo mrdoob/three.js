@@ -23,7 +23,7 @@ const hitBox = /*@__PURE__*/ Fn( ( { orig, dir } ) => {
 
 	return vec2( t0, t1 );
 
-} );
+}, { orig: 'vec3', dir: 'vec3', return: 'vec2' } );
 
 /**
  * TSL function for performing raymarching in a box-area using the specified number of steps

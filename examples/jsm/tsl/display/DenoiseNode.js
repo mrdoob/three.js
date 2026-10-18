@@ -1,5 +1,5 @@
 import { DataTexture, RepeatWrapping, Vector2, Vector3, Node } from 'three/webgpu';
-import { texture, getNormalFromDepth, getViewPosition, convertToTexture, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, luminance, vec2, vec3, vec4, uniformArray, int, dot, max, pow, abs, If, textureSize, sin, cos, mat2, PI, property } from 'three/tsl';
+import { texture, getNormalFromDepth, getViewPosition, convertToTexture, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, luminance, vec2, vec3, vec4, uniformArray, int, dot, max, pow, abs, If, textureSize, sin, cos, mat2, PI, property, isBackgroundDepth } from 'three/tsl';
 import { SimplexNoise } from '../../math/SimplexNoise.js';
 
 /**
@@ -197,7 +197,7 @@ class DenoiseNode extends Node {
 			const texel = sampleTexture( uvNode ).toVar();
 			const result = property( 'vec4' );
 
-			If( depth.greaterThanEqual( 1.0 ).or( dot( viewNormal, viewNormal ).equal( 0.0 ) ), () => {
+			If( isBackgroundDepth( depth ).or( dot( viewNormal, viewNormal ).equal( 0.0 ) ), () => {
 
 				result.assign( texel );
 

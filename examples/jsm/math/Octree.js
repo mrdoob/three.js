@@ -222,7 +222,11 @@ class Octree {
 					box.min.copy( this.box.min ).add( v.multiply( halfsize ) );
 					box.max.copy( box.min ).add( halfsize );
 
-					subTrees.push( new Octree( box ) );
+					const subTree = new Octree( box );
+					subTree.trianglesPerLeaf = this.trianglesPerLeaf;
+					subTree.maxLevel = this.maxLevel;
+
+					subTrees.push( subTree );
 
 				}
 

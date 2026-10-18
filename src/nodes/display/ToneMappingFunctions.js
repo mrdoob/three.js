@@ -16,14 +16,7 @@ export const linearToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 	return color.mul( exposure ).clamp();
 
-} ).setLayout( {
-	name: 'linearToneMapping',
-	type: 'vec3',
-	inputs: [
-		{ name: 'color', type: 'vec3' },
-		{ name: 'exposure', type: 'float' }
-	]
-} );
+}, { color: 'vec3', exposure: 'float', return: 'vec3' } );
 
 /**
  * Reinhard tone mapping.
@@ -42,14 +35,7 @@ export const reinhardToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => 
 
 	return color.div( color.add( 1.0 ) ).clamp();
 
-} ).setLayout( {
-	name: 'reinhardToneMapping',
-	type: 'vec3',
-	inputs: [
-		{ name: 'color', type: 'vec3' },
-		{ name: 'exposure', type: 'float' }
-	]
-} );
+}, { color: 'vec3', exposure: 'float', return: 'vec3' } );
 
 /**
  * Cineon tone mapping.
@@ -73,14 +59,7 @@ export const cineonToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 	return a.div( b ).pow( 2.2 );
 
-} ).setLayout( {
-	name: 'cineonToneMapping',
-	type: 'vec3',
-	inputs: [
-		{ name: 'color', type: 'vec3' },
-		{ name: 'exposure', type: 'float' }
-	]
-} );
+}, { color: 'vec3', exposure: 'float', return: 'vec3' } );
 
 // source: https://github.com/selfshadow/ltc_code/blob/master/webgl/shaders/ltc/ltc_blit.fs
 
@@ -91,7 +70,7 @@ const RRTAndODTFit = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
 	return a.div( b );
 
-} );
+}, { color: 'vec3', return: 'vec3' } );
 
 /**
  * ACESFilmic tone mapping.
@@ -132,14 +111,7 @@ export const acesFilmicToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) =
 	// Clamp to [0, 1]
 	return color.clamp();
 
-} ).setLayout( {
-	name: 'acesFilmicToneMapping',
-	type: 'vec3',
-	inputs: [
-		{ name: 'color', type: 'vec3' },
-		{ name: 'exposure', type: 'float' }
-	]
-} );
+}, { color: 'vec3', exposure: 'float', return: 'vec3' } );
 
 const LINEAR_REC2020_TO_LINEAR_SRGB = /*@__PURE__*/ mat3( vec3( 1.6605, - 0.1246, - 0.0182 ), vec3( - 0.5876, 1.1329, - 0.1006 ), vec3( - 0.0728, - 0.0083, 1.1187 ) );
 const LINEAR_SRGB_TO_LINEAR_REC2020 = /*@__PURE__*/ mat3( vec3( 0.6274, 0.0691, 0.0164 ), vec3( 0.3293, 0.9195, 0.0880 ), vec3( 0.0433, 0.0113, 0.8956 ) );
@@ -152,7 +124,7 @@ const agxDefaultContrastApprox = /*@__PURE__*/ Fn( ( [ x_immutable ] ) => {
 
 	return float( 15.5 ).mul( x4.mul( x2 ) ).sub( mul( 40.14, x4.mul( x ) ) ).add( mul( 31.96, x4 ).sub( mul( 6.868, x2.mul( x ) ) ).add( mul( 0.4298, x2 ).add( mul( 0.1191, x ).sub( 0.00232 ) ) ) );
 
-} );
+}, { x: 'vec3', return: 'vec3' } );
 
 /**
  * AgX tone mapping.
@@ -185,14 +157,7 @@ export const agxToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 	return colortone;
 
-} ).setLayout( {
-	name: 'agxToneMapping',
-	type: 'vec3',
-	inputs: [
-		{ name: 'color', type: 'vec3' },
-		{ name: 'exposure', type: 'float' }
-	]
-} );
+}, { color: 'vec3', exposure: 'float', return: 'vec3' } );
 
 /**
  * Neutral tone mapping.
@@ -232,11 +197,4 @@ export const neutralToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 	return mix( color, vec3( newPeak ), g );
 
-} ).setLayout( {
-	name: 'neutralToneMapping',
-	type: 'vec3',
-	inputs: [
-		{ name: 'color', type: 'vec3' },
-		{ name: 'exposure', type: 'float' }
-	]
-} );
+}, { color: 'vec3', exposure: 'float', return: 'vec3' } );

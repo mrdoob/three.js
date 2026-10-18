@@ -1,5 +1,5 @@
 import Node from '../core/Node.js';
-import { nodeProxyIntent, Fn, uint, int, ivec4, uvec4 } from '../tsl/TSLCore.js';
+import { nodeProxyAssignable, Fn, uint, int, ivec4, uvec4 } from '../tsl/TSLCore.js';
 import { clamp } from './MathNode.js';
 
 /**
@@ -244,41 +244,25 @@ const emulatedPack4xU8 = /*@__PURE__*/ Fn( ( [ v ] ) => {
 
 	return x.bitOr( y.shiftLeft( uint( 8 ) ) ).bitOr( z.shiftLeft( uint( 16 ) ) ).bitOr( w.shiftLeft( uint( 24 ) ) );
 
-} ).setLayout( {
-	name: 'tsl_packed4x8_pack4xU8',
-	type: 'uint',
-	inputs: [ { name: 'v', type: 'uvec4' } ]
-} );
+}, { v: 'uvec4', return: 'uint' } );
 
 const emulatedPack4xI8 = /*@__PURE__*/ Fn( ( [ v ] ) => {
 
 	return emulatedPack4xU8( uvec4( v ) );
 
-} ).setLayout( {
-	name: 'tsl_packed4x8_pack4xI8',
-	type: 'uint',
-	inputs: [ { name: 'v', type: 'ivec4' } ]
-} );
+}, { v: 'ivec4', return: 'uint' } );
 
 const emulatedPack4xU8Clamp = /*@__PURE__*/ Fn( ( [ v ] ) => {
 
 	return emulatedPack4xU8( clamp( v, uvec4( 0 ), uvec4( 255 ) ) );
 
-} ).setLayout( {
-	name: 'tsl_packed4x8_pack4xU8Clamp',
-	type: 'uint',
-	inputs: [ { name: 'v', type: 'uvec4' } ]
-} );
+}, { v: 'uvec4', return: 'uint' } );
 
 const emulatedPack4xI8Clamp = /*@__PURE__*/ Fn( ( [ v ] ) => {
 
 	return emulatedPack4xI8( clamp( v, ivec4( - 128 ), ivec4( 127 ) ) );
 
-} ).setLayout( {
-	name: 'tsl_packed4x8_pack4xI8Clamp',
-	type: 'uint',
-	inputs: [ { name: 'v', type: 'ivec4' } ]
-} );
+}, { v: 'ivec4', return: 'uint' } );
 
 const emulatedUnpack4xU8 = /*@__PURE__*/ Fn( ( [ v ] ) => {
 
@@ -289,11 +273,7 @@ const emulatedUnpack4xU8 = /*@__PURE__*/ Fn( ( [ v ] ) => {
 		v.shiftRight( uint( 24 ) ).bitAnd( uint( 0xff ) )
 	);
 
-} ).setLayout( {
-	name: 'tsl_packed4x8_unpack4xU8',
-	type: 'uvec4',
-	inputs: [ { name: 'v', type: 'uint' } ]
-} );
+}, { v: 'uint', return: 'uvec4' } );
 
 function signExtendByte( v, byteShift ) {
 
@@ -310,11 +290,7 @@ const emulatedUnpack4xI8 = /*@__PURE__*/ Fn( ( [ v ] ) => {
 		signExtendByte( v, 24 )
 	);
 
-} ).setLayout( {
-	name: 'tsl_packed4x8_unpack4xI8',
-	type: 'ivec4',
-	inputs: [ { name: 'v', type: 'uint' } ]
-} );
+}, { v: 'uint', return: 'ivec4' } );
 
 const emulatedDot4U8Packed = /*@__PURE__*/ Fn( ( [ a, b ] ) => {
 
@@ -323,11 +299,7 @@ const emulatedDot4U8Packed = /*@__PURE__*/ Fn( ( [ a, b ] ) => {
 
 	return ua.x.mul( ub.x ).add( ua.y.mul( ub.y ) ).add( ua.z.mul( ub.z ) ).add( ua.w.mul( ub.w ) );
 
-} ).setLayout( {
-	name: 'tsl_packed4x8_dot4U8Packed',
-	type: 'uint',
-	inputs: [ { name: 'a', type: 'uint' }, { name: 'b', type: 'uint' } ]
-} );
+}, { a: 'uint', b: 'uint', return: 'uint' } );
 
 const emulatedDot4I8Packed = /*@__PURE__*/ Fn( ( [ a, b ] ) => {
 
@@ -336,11 +308,7 @@ const emulatedDot4I8Packed = /*@__PURE__*/ Fn( ( [ a, b ] ) => {
 
 	return ia.x.mul( ib.x ).add( ia.y.mul( ib.y ) ).add( ia.z.mul( ib.z ) ).add( ia.w.mul( ib.w ) );
 
-} ).setLayout( {
-	name: 'tsl_packed4x8_dot4I8Packed',
-	type: 'int',
-	inputs: [ { name: 'a', type: 'uint' }, { name: 'b', type: 'uint' } ]
-} );
+}, { a: 'uint', b: 'uint', return: 'int' } );
 
 // exports
 
@@ -356,7 +324,7 @@ export default Packed4x8IntegerNode;
  * @param {Node<uint>} b - The second packed unsigned integer vector.
  * @returns {Node<uint>} The dot product.
  */
-export const dot4U8Packed = /*@__PURE__*/ nodeProxyIntent( Packed4x8IntegerNode, Packed4x8IntegerNode.DOT4_U8_PACKED ).setParameterLength( 2 );
+export const dot4U8Packed = /*@__PURE__*/ nodeProxyAssignable( Packed4x8IntegerNode, Packed4x8IntegerNode.DOT4_U8_PACKED ).setParameterLength( 2 );
 
 /**
  * Computes the dot product of four signed 8-bit integer components packed
@@ -368,7 +336,7 @@ export const dot4U8Packed = /*@__PURE__*/ nodeProxyIntent( Packed4x8IntegerNode,
  * @param {Node<uint>} b - The second packed signed integer vector.
  * @returns {Node<int>} The dot product.
  */
-export const dot4I8Packed = /*@__PURE__*/ nodeProxyIntent( Packed4x8IntegerNode, Packed4x8IntegerNode.DOT4_I8_PACKED ).setParameterLength( 2 );
+export const dot4I8Packed = /*@__PURE__*/ nodeProxyAssignable( Packed4x8IntegerNode, Packed4x8IntegerNode.DOT4_I8_PACKED ).setParameterLength( 2 );
 
 /**
  * Packs the least significant 8 bits of four signed integers into a `uint`.
@@ -378,7 +346,7 @@ export const dot4I8Packed = /*@__PURE__*/ nodeProxyIntent( Packed4x8IntegerNode,
  * @param {Node<ivec4>} value - The signed integer vector to pack.
  * @returns {Node<uint>} The packed value.
  */
-export const pack4xI8 = /*@__PURE__*/ nodeProxyIntent( Packed4x8IntegerNode, Packed4x8IntegerNode.PACK4X_I8 ).setParameterLength( 1 );
+export const pack4xI8 = /*@__PURE__*/ nodeProxyAssignable( Packed4x8IntegerNode, Packed4x8IntegerNode.PACK4X_I8 ).setParameterLength( 1 );
 
 /**
  * Packs the least significant 8 bits of four unsigned integers into a `uint`.
@@ -388,7 +356,7 @@ export const pack4xI8 = /*@__PURE__*/ nodeProxyIntent( Packed4x8IntegerNode, Pac
  * @param {Node<uvec4>} value - The unsigned integer vector to pack.
  * @returns {Node<uint>} The packed value.
  */
-export const pack4xU8 = /*@__PURE__*/ nodeProxyIntent( Packed4x8IntegerNode, Packed4x8IntegerNode.PACK4X_U8 ).setParameterLength( 1 );
+export const pack4xU8 = /*@__PURE__*/ nodeProxyAssignable( Packed4x8IntegerNode, Packed4x8IntegerNode.PACK4X_U8 ).setParameterLength( 1 );
 
 /**
  * Clamps four signed integers to the signed 8-bit range and packs them into a
@@ -399,7 +367,7 @@ export const pack4xU8 = /*@__PURE__*/ nodeProxyIntent( Packed4x8IntegerNode, Pac
  * @param {Node<ivec4>} value - The signed integer vector to clamp and pack.
  * @returns {Node<uint>} The packed value.
  */
-export const pack4xI8Clamp = /*@__PURE__*/ nodeProxyIntent( Packed4x8IntegerNode, Packed4x8IntegerNode.PACK4X_I8_CLAMP ).setParameterLength( 1 );
+export const pack4xI8Clamp = /*@__PURE__*/ nodeProxyAssignable( Packed4x8IntegerNode, Packed4x8IntegerNode.PACK4X_I8_CLAMP ).setParameterLength( 1 );
 
 /**
  * Clamps four unsigned integers to the unsigned 8-bit range and packs them
@@ -410,7 +378,7 @@ export const pack4xI8Clamp = /*@__PURE__*/ nodeProxyIntent( Packed4x8IntegerNode
  * @param {Node<uvec4>} value - The unsigned integer vector to clamp and pack.
  * @returns {Node<uint>} The packed value.
  */
-export const pack4xU8Clamp = /*@__PURE__*/ nodeProxyIntent( Packed4x8IntegerNode, Packed4x8IntegerNode.PACK4X_U8_CLAMP ).setParameterLength( 1 );
+export const pack4xU8Clamp = /*@__PURE__*/ nodeProxyAssignable( Packed4x8IntegerNode, Packed4x8IntegerNode.PACK4X_U8_CLAMP ).setParameterLength( 1 );
 
 /**
  * Unpacks a `uint` into four sign-extended signed 8-bit integer components.
@@ -420,7 +388,7 @@ export const pack4xU8Clamp = /*@__PURE__*/ nodeProxyIntent( Packed4x8IntegerNode
  * @param {Node<uint>} value - The packed value.
  * @returns {Node<ivec4>} The unpacked signed integer vector.
  */
-export const unpack4xI8 = /*@__PURE__*/ nodeProxyIntent( Packed4x8IntegerNode, Packed4x8IntegerNode.UNPACK4X_I8 ).setParameterLength( 1 );
+export const unpack4xI8 = /*@__PURE__*/ nodeProxyAssignable( Packed4x8IntegerNode, Packed4x8IntegerNode.UNPACK4X_I8 ).setParameterLength( 1 );
 
 /**
  * Unpacks a `uint` into four zero-extended unsigned 8-bit integer components.
@@ -430,4 +398,4 @@ export const unpack4xI8 = /*@__PURE__*/ nodeProxyIntent( Packed4x8IntegerNode, P
  * @param {Node<uint>} value - The packed value.
  * @returns {Node<uvec4>} The unpacked unsigned integer vector.
  */
-export const unpack4xU8 = /*@__PURE__*/ nodeProxyIntent( Packed4x8IntegerNode, Packed4x8IntegerNode.UNPACK4X_U8 ).setParameterLength( 1 );
+export const unpack4xU8 = /*@__PURE__*/ nodeProxyAssignable( Packed4x8IntegerNode, Packed4x8IntegerNode.UNPACK4X_U8 ).setParameterLength( 1 );

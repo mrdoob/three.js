@@ -349,7 +349,7 @@ function WebGLState( gl, extensions ) {
 	const depthBuffer = new DepthBuffer();
 	const stencilBuffer = new StencilBuffer();
 
-	const uboBindings = new WeakMap();
+	let uboBindings = {};
 	const uboProgramMap = new WeakMap();
 
 	let enabledCapabilities = {};
@@ -1181,23 +1181,25 @@ function WebGLState( gl, extensions ) {
 
 			blockIndex = gl.getUniformBlockIndex( program, uniformsGroup.name );
 
+			// use the block index as the binding point
+			gl.uniformBlockBinding( program, blockIndex, blockIndex );
+
 			mapping.set( uniformsGroup, blockIndex );
 
 		}
 
 	}
 
-	function uniformBlockBinding( uniformsGroup, program ) {
+	function uniformBlockBinding( uniformsGroup, program, buffer ) {
 
 		const mapping = uboProgramMap.get( program );
 		const blockIndex = mapping.get( uniformsGroup );
 
-		if ( uboBindings.get( program ) !== blockIndex ) {
+		if ( uboBindings[ blockIndex ] !== buffer ) {
 
-			// bind shader specific block index to global block point
-			gl.uniformBlockBinding( program, blockIndex, uniformsGroup.__bindingPointIndex );
+			gl.bindBufferBase( gl.UNIFORM_BUFFER, blockIndex, buffer );
 
-			uboBindings.set( program, blockIndex );
+			uboBindings[ blockIndex ] = buffer;
 
 		}
 
@@ -1278,6 +1280,7 @@ function WebGLState( gl, extensions ) {
 		currentBoundTextures = {};
 
 		currentBoundFramebuffers = {};
+		uboBindings = {};
 		currentDrawbuffers = new WeakMap();
 		defaultDrawbuffers = [];
 

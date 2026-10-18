@@ -51,28 +51,35 @@ class SkyMesh extends Mesh {
 		super( new BoxGeometry( 1, 1, 1 ), material );
 
 		/**
-		 * The turbidity uniform.
+		 * The atmospheric turbidity which controls the amount of haze.
+		 * Higher values produce a hazier sky.
 		 *
 		 * @type {UniformNode<float>}
 		 */
 		this.turbidity = uniform( 2 );
 
 		/**
-		 * The rayleigh uniform.
+		 * The strength of Rayleigh scattering by air molecules
+		 * which is responsible for the blue color of the sky.
+		 * Higher values produce a brighter sky.
 		 *
 		 * @type {UniformNode<float>}
 		 */
 		this.rayleigh = uniform( 1 );
 
 		/**
-		 * The mieCoefficient uniform.
+		 * The strength of Mie scattering by aerosol particles
+		 * which controls the intensity of the glow around the sun.
+		 * Higher values produce a brighter glow.
 		 *
 		 * @type {UniformNode<float>}
 		 */
 		this.mieCoefficient = uniform( 0.005 );
 
 		/**
-		 * The mieDirectionalG uniform.
+		 * The directionality of Mie scattering which controls
+		 * the size of the glow around the sun. Values closer to `1`
+		 * produce a smaller and more concentrated halo.
 		 *
 		 * @type {UniformNode<float>}
 		 */
@@ -285,7 +292,7 @@ class SkyMesh extends Mesh {
 
 				return fract( p.xx.add( p.yz ).mul( p.zy ) ).mul( 2.0 ).sub( 1.0 );
 
-			} );
+			}, { i: 'vec2', return: 'vec2' } );
 
 			// 2D gradient noise: isotropic lobes like Perlin at value-noise cost
 			const noise = Fn( ( [ p ] ) => {
@@ -301,7 +308,7 @@ class SkyMesh extends Mesh {
 
 				return mix( mix( a, b, u.x ), mix( c, d, u.x ), u.y ).mul( 1.6 ); // ~[-1,1]
 
-			} );
+			}, { p: 'vec2', return: 'float' } );
 
 			// fbm; per-octave drift makes clouds billow instead of scrolling as a rigid stamp
 			const fbm = Fn( ( [ position, drift ] ) => {
@@ -320,7 +327,7 @@ class SkyMesh extends Mesh {
 
 				return result;
 
-			} );
+			}, { position: 'vec2', drift: 'vec2', return: 'float' } );
 
 			// Clouds
 			If( direction.y.greaterThan( 0.0 ).and( this.cloudCoverage.greaterThan( 0.0 ) ), () => {

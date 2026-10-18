@@ -1,6 +1,9 @@
 import './utils/console-wrapper.js';
 import './utils/qunit-utils.js';
 
+// tsl
+import './tsl/TSL.tests.js';
+
 //src
 import './src/constants.tests.js';
 import './src/utils.tests.js';
@@ -168,6 +171,7 @@ import './src/materials/MeshPhysicalMaterial.tests.js';
 import './src/materials/MeshStandardMaterial.tests.js';
 import './src/materials/MeshToonMaterial.tests.js';
 import './src/materials/PointsMaterial.tests.js';
+import './src/materials/ProxyNodeMaterial.tests.js';
 import './src/materials/RawShaderMaterial.tests.js';
 import './src/materials/ShaderMaterial.tests.js';
 import './src/materials/ShadowMaterial.tests.js';
@@ -265,5 +269,44 @@ import './src/nodes/display/ViewportDepthTextureNode.tests.js';
 
 //src/nodes/core
 import './src/nodes/core/StructTypeNode.js';
+//src/nodes/lighting
+import './src/nodes/lighting/EnvironmentNode.tests.js';
+
 //src/nodes/tsl
 import './src/nodes/tsl/TSLCore.tests.js';
+import './src/nodes/tsl/GPUTest.tests.js';
+import './src/nodes/tsl/TSLConditionalSelect.tests.js';
+import './src/nodes/tsl/GPUAtomicsStorage.tests.js';
+import './src/nodes/tsl/GPUComputeBuiltins.tests.js';
+import './src/nodes/tsl/GPUBarriers.tests.js';
+import './src/nodes/tsl/GPUSubgroup.tests.js';
+import './src/nodes/tsl/GPUWorkgroupAtomic.tests.js';
+import './src/nodes/tsl/GPUSubgroupAllAny.tests.js';
+import './src/nodes/tsl/GPUSubgroupBroadcastFirst.tests.js';
+import './src/nodes/tsl/TSLDeterminant.tests.js';
+import './src/nodes/tsl/TSLFaceForward.tests.js';
+import './src/nodes/tsl/TSLGainPcurve.tests.js';
+import './src/nodes/tsl/TSLRotate.tests.js';
+import './src/nodes/tsl/TSLSinc.tests.js';
+import './src/nodes/tsl/TSLBRDF.tests.js';
+import './src/nodes/tsl/TSLDepthConversion.tests.js';
+import './src/nodes/tsl/TSLColorSpaceConversion.tests.js';
+import './src/nodes/tsl/TSLTypeConstructors.tests.js';
+import './src/nodes/tsl/TSLBitOps.tests.js';
+import './src/nodes/tsl/TSLNoise.tests.js';
+import './src/nodes/tsl/TSLMath.tests.js';
+import './src/nodes/tsl/TSLPacking.tests.js';
+import './src/nodes/tsl/TSLPacked4x8Integer.tests.js';
+import './src/nodes/tsl/TSLConversion.tests.js';
+import './src/nodes/tsl/TSLVectorMatrix.tests.js';
+import './src/nodes/tsl/TSLMathExtra.tests.js';
+import './src/nodes/tsl/TSLLogicBitwise.tests.js';
+import './src/nodes/tsl/TSLCurveUtils.tests.js';
+import './src/nodes/tsl/TSLColorSpace.tests.js';
+import './src/nodes/tsl/TSLBlendModes.tests.js';
+import './src/nodes/tsl/TSLColorAdjustmentExtra.tests.js';
+import './src/nodes/tsl/TSLToneMapping.tests.js';
+import './src/nodes/tsl/TSLProceduralUtils.tests.js';
+import './src/nodes/tsl/TSLBSDFLightingRemainder.tests.js';
+import './src/nodes/tsl/TSL.Irradiance.tests.js';
+import './src/nodes/tsl/TSLUtilsMisc.tests.js';
