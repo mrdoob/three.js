@@ -460,9 +460,7 @@ class GTAONode extends Node {
 
 			const radius = this.radius;
 			const invRadius = radius.reciprocal().toConst();
-			// Orthographic cameras look down -Z everywhere, so the direction toward the
-			// camera is constant (see positionViewDirection in Position.js).
-			const viewDir = this._camera.isOrthographicCamera ? vec3( 0, 0, 1 ).toConst() : normalize( viewPosition.xyz.negate() ).toConst();
+			const viewDir = ( this._camera.isOrthographicCamera === true ) ? vec3( 0, 0, 1 ).toConst() : normalize( viewPosition.xyz.negate() ).toConst();
 			const clipPosition = this._cameraProjectionMatrix.mul( vec4( viewPosition, 1.0 ) ).toConst();
 
 			const noiseResolution = textureSize( this._noiseNode, 0 );
