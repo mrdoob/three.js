@@ -81,14 +81,21 @@ function getPreviousNode( batchMesh, id ) {
 
 	let data = _previousBatchingMatrices.get( batchMesh );
 
-	if ( data === undefined ) {
+	const matricesTexture = batchMesh._matricesTexture;
 
-		const { image, format, type, version } = batchMesh._matricesTexture;
+	// the matrices texture is replaced when the instance count changes
+
+	if ( data === undefined || data.matricesTexture !== matricesTexture ) {
+
+		if ( data !== undefined ) data.previousMatricesTexture.dispose();
+
+		const { image, format, type, version } = matricesTexture;
 
 		const previousMatricesTexture = new DataTexture( image.data.slice(), image.width, image.height, format, type );
 		previousMatricesTexture.needsUpdate = true;
 
 		data = {
+			matricesTexture,
 			previousMatricesTexture,
 			version,
 			node: createBatchingMatrixNode( previousMatricesTexture, id )
