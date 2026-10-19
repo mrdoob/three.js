@@ -263,7 +263,8 @@ class SunShadowNode extends ShadowNode {
 		// clear once, the cascades share the atlas
 
 		renderer.autoClear = false;
-		renderer.clear();
+
+		if ( renderer._precompilationState === null ) renderer.clear();
 
 		const cascadeCount = shadow.getViewportCount();
 
@@ -281,7 +282,15 @@ class SunShadowNode extends ShadowNode {
 				tileHeight * viewport.w
 			);
 
-			renderer.render( scene, shadow.getCamera( i ) );
+			if ( renderer._precompilationState !== null ) {
+
+				renderer.compileAsync( scene, shadow.getCamera( i ) ); // compiles the shadow pass without rendering it, see ShadowNode
+
+			} else {
+
+				renderer.render( scene, shadow.getCamera( i ) );
+
+			}
 
 		}
 
