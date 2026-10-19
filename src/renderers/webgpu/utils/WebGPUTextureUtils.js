@@ -1149,7 +1149,7 @@ class WebGPUTextureUtils {
 	 * @param {GPUTexture} textureGPU - The GPU texture.
 	 * @param {Object} textureDescriptorGPU - The GPU texture descriptor.
 	 * @param {?Set<number>} [layerUpdates=null] - The layer indices to update.
-	 * @param {number} [faceIndex=-1] - The cube face the mipmaps belong to. `-1` if they hold all layers.
+	 * @param {number} [faceIndex=-1] - The cube face the mipmaps belong to. Only relevant for compressed cube maps.
 	 */
 	_copyCompressedBufferToTexture( mipmaps, textureGPU, textureDescriptorGPU, layerUpdates = null, faceIndex = - 1 ) {
 
