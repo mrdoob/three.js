@@ -372,6 +372,16 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
+			QUnit.test( 'rejected curved authored islands retain valid conformal subset fallbacks', assert => {
+
+				const mesh = new Mesh( new TorusGeometry( 1, 0.4, 12, 36 ) );
+				const result = unwrap( mesh, { mode: 'normal', useInputUVs: true } );
+				verify( assert, result, 2 );
+				assert.false( result.meshes[ 0 ].faceCharts.includes( - 1 ), 'All curved faces receive valid UVs' );
+				assert.ok( result.charts.length < result.meshes[ 0 ].faceCharts.length / 4, 'Subset fallback avoids per-triangle fragmentation' );
+
+			} );
+
 			QUnit.test( 'unsupported mesh types are skipped without modifying their geometry', assert => {
 
 				const root = new Group(), regular = new Mesh( new BoxGeometry() );

@@ -210,7 +210,7 @@ function growCharts( record, settings ) {
 
 }
 
-function parameterize( record, faces, settings, charts ) {
+function parameterize( record, faces, settings, charts, skipLSCM = false ) {
 
 	const normal = new Vector3();
 	for ( const f of faces ) normal.addScaledVector( record.faces[ f ].normal, record.faces[ f ].area );
@@ -252,7 +252,7 @@ function parameterize( record, faces, settings, charts ) {
 	let candidate = uv;
 	const initialQuality = checkChart( positions, triangles, uv, worldArea, settings );
 	let quality = initialQuality;
-	if ( settings.mode === 'normal' && faces.length > 1 && ! ( initialQuality && ( useInput || initialQuality.maxStretch < 1.000001 ) ) ) {
+	if ( ! skipLSCM && settings.mode === 'normal' && faces.length > 1 && ! ( initialQuality && ( useInput || initialQuality.maxStretch < 1.000001 ) ) ) {
 
 		const conformal = solveLSCM( positions, triangles, uv );
 		const conformalQuality = conformal && checkChart( positions, triangles, conformal, worldArea, settings );
@@ -269,7 +269,9 @@ function parameterize( record, faces, settings, charts ) {
 
 		if ( useInput ) {
 
-			parameterize( record, faces, { ...settings, useInputUVs: false }, charts );
+			// The conformal solve already failed for these faces. Retry the whole
+			// island with planar projection, then allow fresh solves on smaller charts.
+			parameterize( record, faces, { ...settings, useInputUVs: false }, charts, true );
 			return;
 
 		}
