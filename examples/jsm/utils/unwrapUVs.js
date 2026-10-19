@@ -20,7 +20,8 @@ import { potpack } from '../libs/potpack.module.js';
  * @param {boolean} [options.respectUVSeams] - Cut discontinuities in existing uv (normal default).
  * @param {boolean} [options.useInputUVs=false] - Preserve valid authored UV charts before trying LSCM.
  * @return {?Object} Atlas size, density, chart bounds, mesh vertex/face mappings and warning
- * counts (excluded faces, and tiny faces under 0.01 atlas pixels squared), or null if the
+ * counts (excluded faces, tiny faces under 0.01 atlas pixels squared and single-triangle
+ * charts, which signal fragmentation), or null if the
  * charts do not fit or fail Float32 validation. Meshes are left unchanged in that case.
  */
 function unwrapUVs( root, options = {} ) {
@@ -92,13 +93,14 @@ function unwrapUVs( root, options = {} ) {
 	}
 
 	const excludedFaces = records.reduce( ( sum, record ) => sum + record.faceCharts.filter( chart => chart === - 1 ).length, 0 );
+	const singleTriangleCharts = charts.filter( chart => chart.faces.length === 1 ).length;
 
 	return {
 		attribute: settings.attribute, resolution: settings.resolution, padding: settings.padding,
 		texelsPerUnit: density,
 		charts: charts.map( chart => ( { x: chart.box.x, y: chart.box.y, width: chart.box.w, height: chart.box.h } ) ),
 		meshes: records.map( record => ( { mesh: record.mesh, sourceVertices: record.sourceVertices, faceCharts: record.faceCharts } ) ),
-		warnings: { excludedFaces, tinyFaces }
+		warnings: { excludedFaces, tinyFaces, singleTriangleCharts }
 	};
 
 }

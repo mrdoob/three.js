@@ -421,6 +421,7 @@ export default QUnit.module( 'Addons', () => {
 				verify( assert, result );
 				const record = result.meshes[ 0 ];
 				assert.deepEqual( record.faceCharts, new Int32Array( [ 0, - 1 ] ) );
+				assert.strictEqual( result.warnings.singleTriangleCharts, 1 );
 				assert.strictEqual( record.mesh.geometry.index.count, 6 );
 				assert.strictEqual( record.mesh.geometry.attributes.position.count, 6 );
 				const degenerate = new BufferGeometry();
@@ -518,7 +519,7 @@ export default QUnit.module( 'Addons', () => {
 
 				const result = unwrap( new Mesh( new BoxGeometry() ) );
 				assert.deepEqual( Object.keys( result ), [ 'attribute', 'resolution', 'padding', 'texelsPerUnit', 'charts', 'meshes', 'warnings' ] );
-				assert.deepEqual( result.warnings, { excludedFaces: 0, tinyFaces: 0 } );
+				assert.deepEqual( result.warnings, { excludedFaces: 0, tinyFaces: 0, singleTriangleCharts: 0 } );
 				assert.deepEqual( Object.keys( result.meshes[ 0 ] ), [ 'mesh', 'sourceVertices', 'faceCharts' ] );
 				assert.strictEqual( result.meshes[ 0 ].sourceVertices.length, result.meshes[ 0 ].mesh.geometry.attributes.position.count );
 				assert.strictEqual( result.meshes[ 0 ].faceCharts.length, 12 );

@@ -178,10 +178,11 @@
 					summary = `${ triangles.toLocaleString() } triangles / ${ result ? result.charts.length : '–' } charts\n${ elapsed.toFixed( 1 ) } ms\n${ result ? result.texelsPerUnit.toFixed( 2 ) : '–' } texels/world unit`;
 					if ( ! result ) throw new Error( 'Unwrap failed: atlas capacity or Float32 precision. Try a larger atlas or partition the model. See console for details.' );
 					atlasSize.value = result.resolution;
-					const { excludedFaces, tinyFaces } = result.warnings;
+					const { excludedFaces, tinyFaces, singleTriangleCharts } = result.warnings;
 					const warnings = [];
 					if ( excludedFaces ) warnings.push( `${ excludedFaces } degenerate or Float32-limited faces excluded from the atlas` );
 					if ( tinyFaces ) warnings.push( `${ tinyFaces } faces under 0.01 atlas pixels squared; increase the atlas size` );
+					if ( singleTriangleCharts > triangles / 2 ) warnings.push( `${ singleTriangleCharts } single-triangle charts; the mesh is fragmented (e.g. nonmanifold or duplicated faces)` );
 					if ( unsupported ) warnings.push( `${ unsupported } instanced/batched meshes skipped: unwrap each instance as a regular mesh first` );
 					status.classList.toggle( 'warning', warnings.length > 0 );
 					status.textContent = `${ summary }\n${ warnings.length ? 'Quality warnings' : 'No quality warnings' }\n${ warnings.join( '\n' ) }`;
