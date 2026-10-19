@@ -21,6 +21,7 @@ import { positionLocal } from '../accessors/Position.js';
 import { uniform } from '../core/UniformNode.js';
 import { equirectDirection } from '../utils/EquirectUV.js';
 import { context } from '../core/ContextNode.js';
+import { NodeUpdateType } from '../core/constants.js';
 
 /**
  * Represents the shader code for the first VSM render pass.
@@ -224,6 +225,14 @@ class ShadowNode extends ShadowBaseNode {
 		 * @private
 		 */
 		this._cameraFrameId = new WeakMap();
+
+		/**
+		 * The precompilations the shadow pass has been compiled for, see {@link ShadowNode#updateBefore}.
+		 *
+		 * @type {WeakSet<Object>}
+		 * @private
+		 */
+		this._precompilations = new WeakSet();
 
 		/**
 		 * This flag can be used for type testing.
@@ -652,7 +661,15 @@ class ShadowNode extends ShadowBaseNode {
 
 		scene.name = `Shadow Map [ ${ light.name || 'ID: ' + light.id } ]`;
 
-		renderer.render( scene, shadow.camera );
+		if ( renderer._precompilationState !== null ) {
+
+			renderer.compileAsync( scene, shadow.camera ); // only adds the objects to the running precompilation
+
+		} else {
+
+			renderer.render( scene, shadow.camera );
+
+		}
 
 		scene.name = currentSceneName;
 
@@ -696,7 +713,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		// vsm blur pass
 
-		if ( shadowType === VSMShadowMap && shadow.isPointLightShadow !== true ) {
+		if ( shadowType === VSMShadowMap && shadow.isPointLightShadow !== true && renderer._precompilationState === null ) {
 
 			this.vsmPass( renderer );
 
@@ -783,15 +800,44 @@ class ShadowNode extends ShadowBaseNode {
 	}
 
 	/**
+	 * During precompilation, `updateBefore()` is called for each render object since
+	 * the shadow pass must be compiled whether the shadow map was updated in the last
+	 * render or not. It is compiled only once per precompilation, see {@link ShadowNode#updateBefore}.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 * @return {NodeUpdateType} The update type.
+	 */
+	getUpdateBeforeType( frame ) {
+
+		return frame.renderer._precompilationState !== null ? NodeUpdateType.OBJECT : this.updateBeforeType;
+
+	}
+
+	/**
 	 * The implementation performs the update of the shadow map if necessary.
 	 *
 	 * @param {NodeFrame} frame - A reference to the current node frame.
 	 */
 	updateBefore( frame ) {
 
-		// do not render shadow maps during precompilation
+		const precompilationState = frame.renderer._precompilationState;
 
-		if ( frame.renderer._precompilationState !== null ) return;
+		// during precompilation, the shadow pass is compiled once but the shadow map is not rendered.
+		// The update state of the shadow is kept for the next render.
+
+		if ( precompilationState !== null ) {
+
+			if ( this._precompilations.has( precompilationState ) === false ) {
+
+				this._precompilations.add( precompilationState );
+
+				this.updateShadow( frame );
+
+			}
+
+			return;
+
+		}
 
 		const { shadow } = this;
 

@@ -57,6 +57,9 @@ const _compileYieldInterval = 8;
 // Too many pipelines in flight stall the rendering of new frames.
 const _maxCompilingPipelines = 16;
 
+// The properties `renderObject()` sets on an override material for each object and restores afterwards.
+const _overrideMaterialProperties = [ 'colorNode', 'depthNode', 'positionNode', 'alphaTest', 'alphaMap', 'displacementMap', 'displacementScale', 'displacementBias', 'transparent' ];
+
 /**
  * Yields to the main thread during an async compilation, but only after a time
  * budget, so the compilation does not wait for a new task or frame after every
@@ -1023,10 +1026,17 @@ class Renderer {
 		const activeCubeFace = this._activeCubeFace;
 		const activeMipmapLevel = this._activeMipmapLevel;
 
+		// when called while a precompilation builds its objects, e.g. by a shadow node for its shadow pass,
+		// the objects are added to the work items of that precompilation which builds them
+
+		const parentPrecompilationState = this._precompilationState;
+
+		const compilationPromises = ( parentPrecompilationState !== null ) ? parentPrecompilationState.compilationPromises : [];
+
 		// a state snapshot is taken once at the beginning and reapplied every time precompilation continues.
 		// `item` is the work item that is currently processed, see `_beginPreCompile()`
 
-		const precompilationState = { useFrameBufferTarget, renderTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel, item: null, materialSide: null };
+		const precompilationState = { useFrameBufferTarget, renderTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel, compilationPromises, item: null };
 
 		this._beginPreCompile( precompilationState );
 
@@ -1034,10 +1044,8 @@ class Renderer {
 
 		precompilationState.renderContext = renderContext;
 
-		const compilationPromises = [];
-
 		this._currentRenderContext = renderContext;
-		this._currentRenderObjectFunction = this.renderObject;
+		this._currentRenderObjectFunction = this._renderObjectFunction || this.renderObject;
 
 		this._handleObjectFunction = this._createObjectPipeline;
 
@@ -1155,11 +1163,12 @@ class Renderer {
 
 		this._finishPreCompile();
 
+		if ( parentPrecompilationState !== null ) return;
+
 		// Process compilation work items sequentially and yield to the main thread after a
 		// time budget to keep animation smooth. Pipelines are compiled in parallel while
-		// the next items are processed.
+		// the next items are processed. Processing an item can add more items, see above.
 
-		const total = compilationPromises.length;
 		let loaded = 0;
 
 		const scheduler = new CompileScheduler();
@@ -1171,7 +1180,7 @@ class Renderer {
 
 			if ( onProgress !== null ) {
 
-				onProgress( new ProgressEvent( 'progress', { lengthComputable: true, loaded, total } ) );
+				onProgress( new ProgressEvent( 'progress', { lengthComputable: true, loaded, total: compilationPromises.length } ) );
 
 			}
 
@@ -1252,15 +1261,39 @@ class Renderer {
 
 		const { useFrameBufferTarget, renderTarget, renderContext, item } = precompilationState;
 
-		if ( useFrameBufferTarget === true ) this.setRenderTarget( renderTarget );
-
 		if ( item !== null ) {
 
-			// apply the material side the work item was queued with since the renderer changes the side
-			// temporarily, e.g. for the back and front pass of double-sided transparent materials
+			// apply the state the work item was queued with since the renderer changes it temporarily,
+			// e.g. the material side for the back and front pass of double-sided transparent materials,
+			// or the render target and the override material of a shadow pass
 
-			precompilationState.materialSide = item.material.side;
-			item.material.side = item.side;
+			const { material, materialProperties } = item;
+			const previousMaterialProperties = {};
+
+			for ( const key in materialProperties ) {
+
+				previousMaterialProperties[ key ] = material[ key ];
+				material[ key ] = materialProperties[ key ];
+
+			}
+
+			precompilationState.previousItemState = {
+				renderTarget: this._renderTarget,
+				activeCubeFace: this._activeCubeFace,
+				activeMipmapLevel: this._activeMipmapLevel,
+				mrt: this._mrt,
+				sourceMaterial: this._currentSourceMaterial,
+				materialProperties: previousMaterialProperties
+			};
+
+			this.setRenderTarget( item.renderTarget );
+			this.setMRT( item.mrt );
+
+			this._currentSourceMaterial = item.sourceMaterial;
+
+		} else if ( useFrameBufferTarget === true ) {
+
+			this.setRenderTarget( renderTarget );
 
 		}
 
@@ -1270,7 +1303,19 @@ class Renderer {
 
 		precompilationState.previousRenderContext = this._currentRenderContext;
 
-		if ( renderContext !== undefined ) this._currentRenderContext = renderContext;
+		if ( item !== null ) {
+
+			this._currentRenderContext = item.renderContext;
+
+		} else if ( renderContext !== undefined ) {
+
+			this._currentRenderContext = renderContext;
+
+		}
+
+		// a precompilation can begin while another one builds its objects, see `compileAsync()`
+
+		precompilationState.parentPrecompilationState = this._precompilationState;
 
 		this._precompilationState = precompilationState;
 
@@ -1283,17 +1328,28 @@ class Renderer {
 	 */
 	_finishPreCompile() {
 
-		const { useFrameBufferTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel, previousRenderContext, item, materialSide } = this._precompilationState;
+		const { useFrameBufferTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel, previousRenderContext, item, previousItemState, parentPrecompilationState } = this._precompilationState;
 
-		if ( useFrameBufferTarget === true ) this.setRenderTarget( outputRenderTarget, activeCubeFace, activeMipmapLevel );
+		if ( item !== null ) {
 
-		if ( item !== null ) item.material.side = materialSide;
+			Object.assign( item.material, previousItemState.materialProperties );
+
+			this.setRenderTarget( previousItemState.renderTarget, previousItemState.activeCubeFace, previousItemState.activeMipmapLevel );
+			this.setMRT( previousItemState.mrt );
+
+			this._currentSourceMaterial = previousItemState.sourceMaterial;
+
+		} else if ( useFrameBufferTarget === true ) {
+
+			this.setRenderTarget( outputRenderTarget, activeCubeFace, activeMipmapLevel );
+
+		}
 
 		this._currentRenderContext = previousRenderContext;
 
 		this._callDepth --;
 
-		this._precompilationState = null;
+		this._precompilationState = parentPrecompilationState;
 
 	}
 
@@ -4193,18 +4249,30 @@ class Renderer {
 		if ( this._compilationPromises !== null ) {
 
 			// Store work items instead of promises - will be processed sequentially.
-			// The side is stored since the renderer might have changed it temporarily.
+			// The state the renderer might have changed temporarily is stored as well, see `_beginPreCompile()`.
+
+			const materialProperties = { side: material.side };
+
+			if ( material === scene.overrideMaterial ) {
+
+				for ( const key of _overrideMaterialProperties ) materialProperties[ key ] = material[ key ];
+
+			}
+
 			this._compilationPromises.push( {
 				object,
 				material,
-				side: material.side,
+				materialProperties,
 				scene,
 				camera,
 				lightsNode,
 				group,
 				clippingContext,
 				passId,
-				renderContext: this._currentRenderContext
+				renderContext: this._currentRenderContext,
+				renderTarget: this._renderTarget,
+				mrt: this._mrt,
+				sourceMaterial: this._currentSourceMaterial
 			} );
 
 			return;
