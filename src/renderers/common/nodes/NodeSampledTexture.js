@@ -67,6 +67,20 @@ class NodeSampledTexture extends SampledTexture {
 
 	}
 
+	/**
+	 * Clones the binding.
+	 *
+	 * @return {NodeSampledTexture} The cloned binding.
+	 */
+	clone() {
+
+		const binding = super.clone();
+		binding.texture = this.textureNode.value; // copy current node value to avoid stale references
+
+		return binding;
+
+	}
+
 }
 
 /**

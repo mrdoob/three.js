@@ -20,6 +20,9 @@ const exceptionList = [
 	'webgl_materials_texture_html',
 	'webgpu_materials_texture_html',
 
+	// Requires srgb-linear and float16 canvas
+	'webgpu_loader_jpegxl',
+
 	// Black screen
 	'webgpu_postprocessing_ao',
 	'webgpu_postprocessing_dof',
