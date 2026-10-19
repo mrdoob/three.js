@@ -656,11 +656,7 @@ void RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in vec3 geomet
 
 		float sheenAlbedo = IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness );
 
-		vec3 sheenIrradiance = irradiance;
-		#ifdef USE_LIGHTMAP
-			sheenIrradiance -= lightMapIrradiance;
-		#endif
-		sheenSpecularIndirect += sheenIrradiance * material.sheenColor * sheenAlbedo * RECIPROCAL_PI;
+		sheenSpecularIndirect += irradiance * material.sheenColor * sheenAlbedo * RECIPROCAL_PI;
 
 		float sheenEnergyComp = 1.0 - max3( material.sheenColor ) * sheenAlbedo;
 
