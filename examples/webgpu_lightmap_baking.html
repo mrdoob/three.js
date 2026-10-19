@@ -36,7 +36,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { builtinGIContext, float, normalWorld, pass, positionWorld, uniform } from 'three/tsl';
+			import { builtinGIContext, float, mrt, normalWorld, output, pass, positionWorld, uniform, velocity } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
@@ -45,15 +45,16 @@
 			import { VXGIVolume } from 'three/addons/lighting/vxgi/VXGIVolume.js';
 			import { vxgiIrradiance } from 'three/addons/lighting/vxgi/VXGIIrradiance.js';
 			import { lightProbeGridIrradiance } from 'three/addons/tsl/lighting/LightProbeGridNode.js';
+			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 			import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
 
 			let camera, scene, renderer, controls, renderPipeline;
 			let light, meshes, materials, atlas, status;
-			let source, lightMapper, bakedPass, livePass;
+			let source, lightMapper, bakedPass, livePass, liveOutput;
 
-			// rotates the live cones every frame so the live view shows the sampling noise
+			// shifts the per-pixel cone noise of the live view every frame, like the light map samples
 
-			const liveSample = uniform( 0 );
+			const liveFrame = uniform( 0 );
 
 			const params = {
 				output: 'Baked GI',
@@ -153,6 +154,11 @@
 				light.shadow.mapSize.setScalar( 256 );
 				light.shadow.radius = 10;
 				light.shadow.normalBias = - 0.02;
+
+				// the scene is static, so the shadow map is rendered once instead of every frame
+
+				light.shadow.autoUpdate = false;
+				light.shadow.needsUpdate = true;
 				scene.add( light );
 
 				// Renderer
@@ -209,6 +215,7 @@
 				for ( const material of materials ) material.lightMap = null;
 
 				lightMapper?.dispose();
+				if ( liveOutput !== livePass ) liveOutput?.dispose();
 				livePass?.dispose();
 				source?.dispose();
 
@@ -225,7 +232,7 @@
 
 				if ( params.algorithm === 'Light Probe' ) {
 
-					const probes = new LightProbeGrid( 5.6, 4.7, 5.6, 6, 6, 6 );
+					const probes = new LightProbeGrid( 5.6, 4.7, 5.6, 8, 8, 8 );
 					probes.position.set( 0, 2.45, 0 );
 					probes.updateBoundingBox();
 					probes.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
@@ -236,7 +243,10 @@
 
 					const volume = new VXGIVolume( 256 );
 					volume.update( renderer, scene );
-					irradiance = vxgiIrradiance( volume );
+
+					// three cones like webgpu_vxgi, shared by the live view and the light map
+
+					irradiance = vxgiIrradiance( volume, { coneCount: 3 } );
 					source = volume;
 
 				}
@@ -248,8 +258,20 @@
 
 				for ( const material of materials ) material.lightMap = lightMapper.texture;
 
-				livePass = pass( scene, camera );
-				livePass.contextNode = builtinGIContext( float( 1 ), irradiance( positionWorld, normalWorld, liveSample ) );
+				// traa needs a single-sampled depth buffer
+
+				livePass = pass( scene, camera, { samples: 0 } );
+				livePass.contextNode = builtinGIContext( float( 1 ), irradiance( positionWorld, normalWorld, liveFrame ) );
+				liveOutput = livePass;
+
+				if ( params.algorithm === 'VXGI' ) {
+
+					// traa resolves the per-pixel cone noise, like webgpu_vxgi
+
+					livePass.setMRT( mrt( { output, velocity } ) );
+					liveOutput = traa( livePass.getTextureNode( 'output' ), livePass.getTextureNode( 'depth' ), livePass.getTextureNode( 'velocity' ), camera );
+
+				}
 
 				setOutput();
 
@@ -265,7 +287,7 @@
 
 				for ( const material of materials ) material.lightMapIntensity = live ? 0 : 1;
 
-				renderPipeline.outputNode = live ? livePass : bakedPass;
+				renderPipeline.outputNode = live ? liveOutput : bakedPass;
 				renderPipeline.needsUpdate = true;
 
 			}
@@ -285,7 +307,7 @@
 
 				if ( params.output === 'Live GI' ) {
 
-					liveSample.value ++;
+					liveFrame.value = ( liveFrame.value + 1 ) % 64;
 					status.textContent = `Live ${ params.algorithm }`;
 
 				} else if ( lightMapper.samples < samples ) {
