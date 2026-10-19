@@ -613,6 +613,15 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 			console.red( e );
 			failedScreenshots.push( file );
 
+			// A timed-out page can stay wedged and time out every following file
+
+			if ( String( e ).includes( 'TimeoutError' ) ) {
+
+				console.yellow( 'Restarting browser...' );
+				await ctx.restart();
+
+			}
+
 		}
 
 	} finally {
