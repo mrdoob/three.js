@@ -544,6 +544,7 @@ class WebGLTextureUtils {
 
 			const mipmaps = texture.mipmaps;
 			const image = options.image;
+			const isCompressedFormat = ( glFormat !== null && glFormat !== gl.RGBA );
 
 			for ( let i = 0; i < mipmaps.length; i ++ ) {
 
@@ -551,55 +552,51 @@ class WebGLTextureUtils {
 
 				if ( texture.isCompressedArrayTexture ) {
 
-					if ( glFormat !== gl.RGBA ) {
+					if ( isCompressedFormat ) {
 
-						if ( glFormat !== null ) {
+						if ( texture.layerUpdates.size > 0 ) {
 
-							if ( texture.layerUpdates.size > 0 ) {
+							const layerByteLength = getByteLength( mipmap.width, mipmap.height, texture.format, texture.type );
 
-								const layerByteLength = getByteLength( mipmap.width, mipmap.height, texture.format, texture.type );
+							for ( const layerIndex of texture.layerUpdates ) {
 
-								for ( const layerIndex of texture.layerUpdates ) {
-
-									const layerData = mipmap.data.subarray(
-										layerIndex * layerByteLength / mipmap.data.BYTES_PER_ELEMENT,
-										( layerIndex + 1 ) * layerByteLength / mipmap.data.BYTES_PER_ELEMENT
-									);
-									gl.compressedTexSubImage3D( gl.TEXTURE_2D_ARRAY, i, 0, 0, layerIndex, mipmap.width, mipmap.height, 1, glFormat, layerData );
-
-								}
-
-							} else {
-
-								gl.compressedTexSubImage3D( gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, mipmap.data );
+								const layerData = mipmap.data.subarray(
+									layerIndex * layerByteLength / mipmap.data.BYTES_PER_ELEMENT,
+									( layerIndex + 1 ) * layerByteLength / mipmap.data.BYTES_PER_ELEMENT
+								);
+								gl.compressedTexSubImage3D( gl.TEXTURE_2D_ARRAY, i, 0, 0, layerIndex, mipmap.width, mipmap.height, 1, glFormat, layerData );
 
 							}
 
 						} else {
 
-							warn( 'WebGLBackend: Attempt to load unsupported compressed texture format in .uploadTexture()' );
+							gl.compressedTexSubImage3D( gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, mipmap.data );
 
 						}
 
-					} else {
+					} else if ( glFormat === gl.RGBA ) {
 
 						gl.texSubImage3D( gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, glType, mipmap.data );
+
+					} else {
+
+						warn( 'WebGLBackend: Unsupported compressed texture format.' );
 
 					}
 
 				} else {
 
-					if ( glFormat === gl.RGBA ) {
-
-						gl.texSubImage2D( gl.TEXTURE_2D, i, 0, 0, mipmap.width, mipmap.height, glFormat, glType, mipmap.data );
-
-					} else if ( glFormat !== null ) {
+					if ( isCompressedFormat ) {
 
 						gl.compressedTexSubImage2D( gl.TEXTURE_2D, i, 0, 0, mipmap.width, mipmap.height, glFormat, mipmap.data );
 
+					} else if ( glFormat === gl.RGBA ) {
+
+						gl.texSubImage2D( gl.TEXTURE_2D, i, 0, 0, mipmap.width, mipmap.height, glFormat, glType, mipmap.data );
+
 					} else {
 
-						warn( 'WebGLBackend: Unsupported compressed texture format' );
+						warn( 'WebGLBackend: Unsupported compressed texture format.' );
 
 					}
 
