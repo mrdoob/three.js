@@ -1190,8 +1190,7 @@ class WebGPUTextureUtils {
 
 	/**
 	 * This method is only relevant for compressed textures. It returns a block
-	 * data descriptor for the given GPU texture format. Uncompressed data in
-	 * compressed textures (`RGBAFormat`) uses blocks of a single texel.
+	 * data descriptor for the given GPU texture format.
 	 *
 	 * @private
 	 * @param {string} format - The GPU texture format.
@@ -1230,7 +1229,7 @@ class WebGPUTextureUtils {
 		if ( format === GPUTextureFormat.ASTC12x10Unorm || format === GPUTextureFormat.ASTC12x10UnormSRGB ) return { byteLength: 16, width: 12, height: 10 };
 		if ( format === GPUTextureFormat.ASTC12x12Unorm || format === GPUTextureFormat.ASTC12x12UnormSRGB ) return { byteLength: 16, width: 12, height: 12 };
 
-		return { byteLength: this._getBytesPerTexel( format ), width: 1, height: 1 };
+		return { byteLength: this._getBytesPerTexel( format ), width: 1, height: 1 }; // uncompressed data
 
 	}
 
