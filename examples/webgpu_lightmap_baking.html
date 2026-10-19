@@ -19,7 +19,7 @@
 				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Light Baking</span>
 			</div>
 
-			<small>Progressively bake Light Probe or VXGI diffuse irradiance into a UV atlas and export KHR_lightmap glTF.<br/><span id="status"></span></small>
+			<small>Progressively bake Light Probe or VXGI diffuse irradiance into a UV atlas.<br/><span id="status"></span></small>
 		</div>
 
 		<script type="importmap">
@@ -46,14 +46,10 @@
 			import { vxgiIrradiance } from 'three/addons/lighting/vxgi/VXGIIrradiance.js';
 			import { lightProbeGridIrradiance } from 'three/addons/tsl/lighting/LightProbeGridNode.js';
 			import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
-			import { readLightMap } from 'three/addons/utils/readLightMap.js';
-			import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
-			import { GLTFLightMapExporterExtension } from 'three/addons/exporters/GLTFLightMapExporterExtension.js';
 
 			let camera, scene, renderer, controls, renderPipeline;
 			let light, meshes, materials, atlas, status;
 			let source, lightMapper, bakedPass, livePass;
-			let busy = false;
 
 			const params = {
 				output: 'Baked GI',
@@ -197,7 +193,6 @@
 				gui.add( params, 'algorithm', [ 'Light Probe', 'VXGI' ] ).name( 'GI Algorithm' ).onChange( bake );
 				gui.add( params, 'resolution', [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( bake );
 				gui.add( { bake }, 'bake' ).name( 'Re-Bake GI' );
-				gui.add( { exportGLTF }, 'exportGLTF' ).name( 'Export glTF' );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -206,8 +201,6 @@
 			}
 
 			function bake() {
-
-				if ( busy ) return;
 
 				for ( const material of materials ) material.lightMap = null;
 
@@ -275,52 +268,6 @@
 
 				renderPipeline.outputNode = live ? livePass : bakedPass;
 				renderPipeline.needsUpdate = true;
-
-			}
-
-			async function exportGLTF() {
-
-				if ( busy ) return;
-
-				busy = true;
-				renderer.setAnimationLoop( null );
-
-				// finish the bake before exporting
-
-				const samples = bakeSamples[ params.algorithm ];
-				if ( lightMapper.samples < samples ) lightMapper.update( samples - lightMapper.samples );
-
-				// KHR_lightmap stores linear irradiance. The normalization scale restores
-				// the HDR range; LightMapper already outputs irradiance without dividing by pi.
-				const lightMap = await readLightMap( renderer, lightMapper.texture );
-
-				// lit materials with the baked indirect irradiance, direct lighting stays live
-
-				const objects = meshes.map( ( mesh ) => {
-
-					const copy = mesh.clone();
-					copy.material = mesh.material.clone();
-					copy.material.lightMap = lightMap.texture;
-					copy.material.lightMapIntensity = lightMap.intensity;
-					return copy;
-
-				} );
-
-				const exporter = new GLTFExporter();
-				exporter.register( ( writer ) => new GLTFLightMapExporterExtension( writer ) );
-				const result = await exporter.parseAsync( [ ...objects, light ], { binary: true } );
-
-				const link = document.createElement( 'a' );
-				link.href = URL.createObjectURL( new Blob( [ result ], { type: 'application/octet-stream' } ) );
-				link.download = `lightmap_cornell_${ params.algorithm.toLowerCase().replaceAll( ' ', '_' ) }.glb`;
-				link.click();
-				URL.revokeObjectURL( link.href );
-
-				lightMap.texture.dispose();
-				for ( const object of objects ) object.material.dispose();
-
-				busy = false;
-				renderer.setAnimationLoop( animate );
 
 			}
 
