@@ -2,6 +2,7 @@ import Node from '../core/Node.js';
 import { default as TextureNode/*, texture*/ } from '../accessors/TextureNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { context } from '../tsl/TSLBase.js';
+import { mergeContext } from '../core/NodeUtils.js';
 import { uniform } from '../core/UniformNode.js';
 import { viewZToOrthographicDepth, perspectiveDepthToViewZ } from './ViewportDepthNode.js';
 
@@ -922,22 +923,11 @@ class PassNode extends Node {
 
 			if ( cache === null || cache.version !== this.version || cache.rendererContextNode !== rendererContextNode || cache.rendererVersion !== rendererContextNode.version ) {
 
-				const rendererContextData = rendererContextNode.getFlowContextData();
-				const contextData = { ...rendererContextData, ...this.contextNode.getFlowContextData() };
-
-				// the node overrides of the renderer and the pass are merged, the pass overrides take precedence
-
-				if ( rendererContextData.overrideNodes !== undefined && contextData.overrideNodes !== rendererContextData.overrideNodes ) {
-
-					contextData.overrideNodes = new Map( [ ...rendererContextData.overrideNodes, ...( contextData.overrideNodes || [] ) ] );
-
-				}
-
 				this._contextNodeCache = {
 					version: this.version,
 					rendererContextNode,
 					rendererVersion: rendererContextNode.version,
-					context: context( contextData )
+					context: context( mergeContext( rendererContextNode.getFlowContextData(), this.contextNode.getFlowContextData() ) )
 				};
 
 			}
