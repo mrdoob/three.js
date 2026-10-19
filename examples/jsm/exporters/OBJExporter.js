@@ -58,6 +58,7 @@ class OBJExporter {
 			const vertices = geometry.getAttribute( 'position' );
 			const normals = geometry.getAttribute( 'normal' );
 			const uvs = geometry.getAttribute( 'uv' );
+			const colors = geometry.getAttribute( 'color' );
 			const indices = geometry.getIndex();
 
 			// name of the mesh object
@@ -82,7 +83,19 @@ class OBJExporter {
 					vertex.applyMatrix4( mesh.matrixWorld );
 
 					// transform the vertex to export format
-					output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n';
+					output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z;
+
+					if ( colors !== undefined ) {
+
+						color.fromBufferAttribute( colors, i );
+
+						ColorManagement.workingToColorSpace( color, SRGBColorSpace );
+
+						output += ' ' + color.r + ' ' + color.g + ' ' + color.b;
+
+					}
+
+					output += '\n';
 
 				}
 
