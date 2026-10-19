@@ -132,6 +132,7 @@
 				'Parrot': 'Parrot.glb', 'Robot expressive': 'RobotExpressive/RobotExpressive.glb',
 				'Nefertiti': 'Nefertiti/Nefertiti.glb', 'Ferrari': 'ferrari.glb', 'Rolex': 'rolex.glb',
 				'Sheen chair': 'SheenChair.glb', 'Steampunk camera': 'steampunk_camera.glb',
+				'Tennyson bust': 'tennyson-bust.glb', 'Venice mask': 'venice_mask.glb', 'Littlest Tokyo': 'LittlestTokyo.glb',
 				'Torus knot': 'torus-knot', 'Tube': 'tube'
 			} ).name( 'Model' ).listen().onChange( value => loadModel( value ).catch( reportError ) );
 			gui.add( params, 'view', { 'UV grid': 'checker', 'UV islands': 'islands', 'Texel density': 'density', 'Original materials': 'original' } ).name( 'View' ).onChange( updateMaterials );
