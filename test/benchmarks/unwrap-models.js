@@ -67,6 +67,31 @@ try {
 				if ( mesh.isMesh ) originals.push( [ mesh, mesh.geometry ] );
 
 			} );
+			model.updateWorldMatrix( true, true );
+			let sourceExcluded = 0;
+			for ( const [ mesh, geometry ] of originals ) {
+
+				mesh.updateMatrixWorld( true );
+				if ( mesh.isSkinnedMesh ) {
+
+					for ( const bone of mesh.skeleton.bones ) bone.updateWorldMatrix( true, false );
+					mesh.skeleton.update();
+
+				}
+
+				const points = Array.from( { length: geometry.attributes.position.count }, ( _, i ) => mesh.getVertexPosition( i, new THREE.Vector3() ).applyMatrix4( mesh.matrixWorld ) );
+				const count = geometry.index ? geometry.index.count : points.length;
+				for ( let i = 0; i < count; i += 3 ) {
+
+					const [ a, b, c ] = [ 0, 1, 2 ].map( offset => points[ geometry.index ? geometry.index.getX( i + offset ) : i + offset ] );
+					const area = new THREE.Vector3().subVectors( b, a ).cross( new THREE.Vector3().subVectors( c, a ) ).length() * 0.5;
+					const longest = Math.max( a.distanceToSquared( b ), b.distanceToSquared( c ), c.distanceToSquared( a ) );
+					if ( ! ( area > longest * 1e-6 ) ) sourceExcluded ++;
+
+				}
+
+			}
+
 			const times = []; let result;
 			for ( let run = 0; run <= runs; run ++ ) {
 
@@ -122,7 +147,7 @@ try {
 			}
 
 			times.sort( ( a, b ) => a - b );
-			return { model: name, ...options, times, medianMs: times[ Math.floor( times.length / 2 ) ], triangles, charts: counts.length, singletons: counts.filter( count => count === 1 ).length, ignored, invalid, collapsed, texelsPerUnit: result.texelsPerUnit, diagnostics };
+			return { model: name, ...options, times, medianMs: times[ Math.floor( times.length / 2 ) ], triangles, charts: counts.length, singletons: counts.filter( count => count === 1 ).length, sourceExcluded, ignored, invalid, collapsed, texelsPerUnit: result.texelsPerUnit, diagnostics };
 
 		};
 
