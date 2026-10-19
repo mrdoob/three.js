@@ -324,6 +324,16 @@ class NodeBuilder {
 		this.hardwareClipping = false;
 
 		/**
+		 * Whether the build embeds data of the 3D object it is built for, like its buffers,
+		 * instead of binding the data of the rendered object. Such builds can't be shared
+		 * with other objects, so the renderer doesn't cache them.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.objectSpecific = false;
+
+		/**
 		 * The generated vertex shader.
 		 *
 		 * @type {?string}

@@ -293,7 +293,8 @@ class WebGLVertexArrayUtils {
 		for ( let i = 0; i < attributes.length; i ++ ) {
 
 			const attribute = attributes[ i ];
-			const attributeData = this.backend.get( this.backend.getBufferAttribute( attribute ) );
+			const bufferAttribute = this.backend.getBufferAttribute( attribute );
+			const attributeData = this.backend.get( bufferAttribute );
 
 			gl.bindBuffer( gl.ARRAY_BUFFER, attributeData.bufferGPU );
 			gl.enableVertexAttribArray( i );
@@ -302,7 +303,11 @@ class WebGLVertexArrayUtils {
 
 			if ( attribute.isInterleavedBufferAttribute === true ) {
 
-				stride = attribute.data.stride * attributeData.bytesPerElement;
+				// interleaved attributes can also view a buffer attribute
+
+				const bufferStride = bufferAttribute.isInterleavedBuffer === true ? bufferAttribute.stride : bufferAttribute.itemSize;
+
+				stride = bufferStride * attributeData.bytesPerElement;
 				offset = attribute.offset * attributeData.bytesPerElement;
 
 			} else {
@@ -322,13 +327,9 @@ class WebGLVertexArrayUtils {
 
 			}
 
-			if ( attribute.isInstancedBufferAttribute && ! attribute.isInterleavedBufferAttribute ) {
+			if ( bufferAttribute.isInstancedBufferAttribute === true || bufferAttribute.isInstancedInterleavedBuffer === true ) {
 
-				gl.vertexAttribDivisor( i, attribute.meshPerAttribute );
-
-			} else if ( attribute.isInterleavedBufferAttribute && attribute.data.isInstancedInterleavedBuffer ) {
-
-				gl.vertexAttribDivisor( i, attribute.data.meshPerAttribute );
+				gl.vertexAttribDivisor( i, bufferAttribute.meshPerAttribute );
 
 			}
 
