@@ -1202,6 +1202,14 @@ nodeVar0
 
 ( nodeVarying0.y * 2.0 )
 
+// nested overrides
+
+( 1.0 + 2.0 )
+
+// context attributes
+
+vec4<f32>( ( vec2<f32>( 1.0, 2.0 ) + nodeVarying0 ), vec2<f32>( 3.0, 4.0 ) )
+
 // layout local variables
 
 fn fn0 ( value : f32 ) -> f32 {

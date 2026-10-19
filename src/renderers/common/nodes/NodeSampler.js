@@ -57,6 +57,20 @@ class NodeSampler extends Sampler {
 
 	}
 
+	/**
+	 * Clones the binding.
+	 *
+	 * @return {NodeSampler} The cloned binding.
+	 */
+	clone() {
+
+		const binding = super.clone();
+		binding.texture = this.textureNode.value; // copy current node value to avoid stale references
+
+		return binding;
+
+	}
+
 }
 
 export default NodeSampler;

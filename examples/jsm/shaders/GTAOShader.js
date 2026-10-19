@@ -207,7 +207,11 @@ const GTAOShader = {
 				vec4 sampleDir = vec4(cos(angle), sin(angle), 0., 0.5 + 0.5 * noiseTexel.w);
 				sampleDir.xyz = normalize(kernelMatrix * sampleDir.xyz);
 
-				vec3 viewDir = normalize(-viewPos.xyz);
+				#if PERSPECTIVE_CAMERA == 1
+					vec3 viewDir = normalize(-viewPos.xyz);
+				#else
+					vec3 viewDir = vec3(0., 0., 1.);
+				#endif
 				vec3 sliceBitangent = normalize(cross(sampleDir.xyz, viewDir));
 				vec3 sliceTangent = cross(sliceBitangent, viewDir);
 				vec3 normalInSlice = normalize(viewNormal - sliceBitangent * dot(viewNormal, sliceBitangent));

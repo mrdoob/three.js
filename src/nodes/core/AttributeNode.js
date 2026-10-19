@@ -49,7 +49,40 @@ class AttributeNode extends Node {
 
 	}
 
+	/**
+	 * Returns the node which provides the value of this attribute in the current context, if any.
+	 * The context can provide attributes with a `getAttribute( name, builder )` function, e.g. if the
+	 * vertices are pulled from a storage buffer or the surface is reconstructed per fragment. The
+	 * function should return the same node for the same attribute.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {?Node} The node providing the value of the attribute.
+	 */
+	getContextAttribute( builder ) {
+
+		const getAttribute = builder.context.getAttribute;
+
+		return getAttribute ? getAttribute( this.getAttributeName( builder ), builder ) : null;
+
+	}
+
+	/**
+	 * An attribute provided by the context is replaced by the provided node, like an override.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {Node} The shared node if possible. Otherwise `this` is returned.
+	 */
+	getShared( builder ) {
+
+		return this.getContextAttribute( builder ) || super.getShared( builder );
+
+	}
+
 	generateNodeType( builder ) {
+
+		const contextAttribute = this.getContextAttribute( builder );
+
+		if ( contextAttribute ) return contextAttribute.getNodeType( builder );
 
 		let nodeType = this.nodeType;
 
