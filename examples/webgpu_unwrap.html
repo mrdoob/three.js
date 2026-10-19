@@ -116,7 +116,7 @@
 			const query = new URLSearchParams( location.search );
 			if ( query.has( 'model' ) ) params.model = query.get( 'model' );
 			if ( query.get( 'mode' ) === 'normal' ) params.mode = 'normal';
-			if ( [ '1024', '2048', '4096' ].includes( query.get( 'resolution' ) ) ) params.resolution = Number( query.get( 'resolution' ) );
+			if ( [ '1024', '2048', '4096', '8192', '16384' ].includes( query.get( 'resolution' ) ) ) params.resolution = Number( query.get( 'resolution' ) );
 			params.useInputUVs = query.get( 'authored' ) === 'true';
 			const gui = renderer.inspector.createParameters( 'UV unwrap' );
 			gui.add( params, 'model', {
@@ -130,14 +130,14 @@
 				'Cerberus (OBJ)': '../obj/cerberus/Cerberus.obj',
 				'Duck': 'duck.glb', 'Horse': 'Horse.glb', 'Flamingo': 'Flamingo.glb',
 				'Parrot': 'Parrot.glb', 'Robot expressive': 'RobotExpressive/RobotExpressive.glb',
-				'Nefertiti': 'Nefertiti/Nefertiti.glb', 'Ferrari': 'ferrari.glb', 'Rolex': 'rolex.glb',
+				'Nefertiti': 'Nefertiti/Nefertiti.glb', 'Ferrari (failure case)': 'ferrari.glb', 'Rolex (failure case)': 'rolex.glb',
 				'Sheen chair': 'SheenChair.glb', 'Steampunk camera': 'steampunk_camera.glb',
 				'Torus knot': 'torus-knot', 'Tube': 'tube'
 			} ).name( 'Model' ).listen().onChange( value => loadModel( value ).catch( reportError ) );
 			gui.add( params, 'view', { 'UV grid': 'checker', 'UV islands': 'islands', 'Texel density': 'density', 'Original materials': 'original' } ).name( 'View' ).onChange( updateMaterials );
 			const inputs = gui.addFolder( 'Unwrap Input' );
 			inputs.add( params, 'mode', { 'Lightmap': 'lightmap', 'Normal bake': 'normal' } ).name( 'Method' ).info( 'Lightmap: faster, but produces more islands. Normal bake: fewer, larger islands (via LSCM) that follow the original UV seams.' ).onChange( unwrap );
-			inputs.add( params, 'resolution', [ 1024, 2048, 4096 ] ).name( 'Atlas size' ).onChange( unwrap );
+			inputs.add( params, 'resolution', [ 1024, 2048, 4096, 8192, 16384 ] ).name( 'Atlas size' ).onChange( unwrap );
 			inputs.add( params, 'useInputUVs' ).name( 'Preserve authored islands' ).info( 'Splits charts only at seams in the existing uv attribute and reuses the authored UV layout of each island, rescaled and repacked into the atlas. Islands that exceed the stretch limit are split or reprojected.' ).onChange( unwrap );
 			inputs.add( params, 'referenceDensity' ).name( 'Target texels / unit' ).info( '0 uses the fitted atlas density. Both principal directions are compared with this target.' ).onChange( updateMaterials );
 			const draco = new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' );
@@ -164,6 +164,8 @@
 
 				}
 
+				const triangles = originals.reduce( ( sum, item ) => sum + ( item.geometry.index ?? item.geometry.attributes.position ).count / 3, 0 );
+				let summary = '';
 				try {
 
 					const start = performance.now();
@@ -172,18 +174,17 @@
 						useInputUVs: params.useInputUVs,
 						resolution: Number( params.resolution )
 					} );
+					const elapsed = performance.now() - start;
+					summary = `${ triangles.toLocaleString() } triangles / ${ result ? result.charts.length : '–' } charts\n${ elapsed.toFixed( 1 ) } ms\n${ result ? result.texelsPerUnit.toFixed( 2 ) : '–' } texels/world unit`;
 					if ( ! result ) throw new Error( 'Unwrap failed: atlas capacity or Float32 precision. Try a larger atlas or partition the model. See console for details.' );
 					atlasSize.value = result.resolution;
-					const elapsed = performance.now() - start;
-					const triangles = result.meshes.reduce( ( sum, record ) => sum + record.faceCharts.length, 0 );
 					const { excludedFaces, tinyFaces } = result.warnings;
 					const warnings = [];
 					if ( excludedFaces ) warnings.push( `${ excludedFaces } degenerate or Float32-limited faces excluded from the atlas` );
 					if ( tinyFaces ) warnings.push( `${ tinyFaces } faces under 0.01 atlas pixels squared; increase the atlas size` );
 					if ( unsupported ) warnings.push( `${ unsupported } instanced/batched meshes skipped: unwrap each instance as a regular mesh first` );
-					status.textContent = `${ triangles.toLocaleString() } triangles / ${ result.charts.length } charts\n${ elapsed.toFixed( 1 ) } ms\n${ result.texelsPerUnit.toFixed( 2 ) } texels/world unit`;
 					status.classList.toggle( 'warning', warnings.length > 0 );
-					status.textContent += `\n${ warnings.length ? 'Quality warnings' : 'No quality warnings' }\n${ warnings.join( '\n' ) }`;
+					status.textContent = `${ summary }\n${ warnings.length ? 'Quality warnings' : 'No quality warnings' }\n${ warnings.join( '\n' ) }`;
 					drawAtlas();
 					updateMaterials();
 
@@ -195,6 +196,7 @@
 					islandTexture.needsUpdate = true;
 					for ( const item of originals ) item.mesh.material = item.material;
 					reportError( error );
+					if ( summary ) status.textContent = `${ summary }\n${ error.message }`;
 
 				}
 
@@ -202,10 +204,12 @@
 
 			function drawAtlas() {
 
-				if ( atlasCanvas.width !== result.resolution ) {
+				// Cap the preview canvas; 8K and 16K atlases would need up to 1 GB of canvas memory.
+				const size = Math.min( result.resolution, 4096 );
+				if ( atlasCanvas.width !== size ) {
 
 					islandTexture.dispose();
-					atlasCanvas.width = atlasCanvas.height = result.resolution;
+					atlasCanvas.width = atlasCanvas.height = size;
 
 				}
 
@@ -235,7 +239,7 @@
 				}
 
 				// Fill the chart gutters too, so filtering at island edges does not sample black.
-				context.lineWidth = 2 * result.padding;
+				context.lineWidth = 2 * result.padding * size / result.resolution;
 				context.lineJoin = 'round';
 				for ( let chart = 0; chart < paths.length; chart ++ ) {
 
