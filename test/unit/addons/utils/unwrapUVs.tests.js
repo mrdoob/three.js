@@ -403,9 +403,10 @@ export default QUnit.module( 'Addons', () => {
 					const record = result.meshes[ 1 ];
 					assert.strictEqual( record.mesh.geometry.index.count, 3 );
 					assert.deepEqual( record.faceCharts, new Int32Array( [ - 1 ] ) );
+					assert.strictEqual( result.warnings.tinyFaces, 0 );
 					assert.deepEqual( record.mesh.geometry.attributes.position.array, geometry.attributes.position.array );
 					assert.ok( record.mesh.geometry.attributes.uv1.array.every( value => value === 0 ) );
-					assert.strictEqual( result.meshes.reduce( ( sum, record ) => sum + record.faceCharts.filter( chart => chart === - 1 ).length, 0 ), 1 );
+					assert.strictEqual( result.warnings.excludedFaces, 1 );
 
 				}
 
@@ -437,7 +438,7 @@ export default QUnit.module( 'Addons', () => {
 				geometry.setAttribute( 'position', new BufferAttribute( new Float64Array( [ 0, 0, 0, 10000, 10000, 0, 10000, 10000.0001, 0 ] ), 3 ) );
 				const result = unwrap( new Mesh( geometry ) );
 				assert.strictEqual( result.charts.length, 0 );
-				assert.strictEqual( result.meshes.reduce( ( sum, record ) => sum + record.faceCharts.filter( chart => chart === - 1 ).length, 0 ), 1 );
+				assert.strictEqual( result.warnings.excludedFaces, 1 );
 				assert.ok( result.meshes[ 0 ].mesh.geometry.attributes.uv1.array.every( value => value === 0 ) );
 
 			} );
@@ -452,8 +453,9 @@ export default QUnit.module( 'Addons', () => {
 					root.add( new Mesh( new PlaneGeometry() ), new Mesh( geometry ) );
 					const result = unwrap( root, { mode, texelsPerUnit: 0.001 } );
 					verify( assert, result, mode === 'normal' ? 2 : 1.5 );
-					assert.strictEqual( result.meshes.reduce( ( sum, record ) => sum + record.faceCharts.filter( chart => chart === - 1 ).length, 0 ), 1 );
+					assert.strictEqual( result.warnings.excludedFaces, 1 );
 					assert.strictEqual( result.meshes[ 1 ].faceCharts[ 0 ], - 1 );
+					assert.strictEqual( result.warnings.tinyFaces, 2, 'Both plane faces cover under 0.01 atlas pixels squared' );
 					assert.strictEqual( result.meshes[ 1 ].mesh.geometry.index.count, 3 );
 					assert.ok( result.meshes[ 1 ].mesh.geometry.attributes.uv1.array.every( value => value === 0 ) );
 
@@ -515,7 +517,8 @@ export default QUnit.module( 'Addons', () => {
 			QUnit.test( 'result retains atlas metadata and vertex and face mappings', assert => {
 
 				const result = unwrap( new Mesh( new BoxGeometry() ) );
-				assert.deepEqual( Object.keys( result ), [ 'attribute', 'resolution', 'padding', 'texelsPerUnit', 'charts', 'meshes' ] );
+				assert.deepEqual( Object.keys( result ), [ 'attribute', 'resolution', 'padding', 'texelsPerUnit', 'charts', 'meshes', 'warnings' ] );
+				assert.deepEqual( result.warnings, { excludedFaces: 0, tinyFaces: 0 } );
 				assert.deepEqual( Object.keys( result.meshes[ 0 ] ), [ 'mesh', 'sourceVertices', 'faceCharts' ] );
 				assert.strictEqual( result.meshes[ 0 ].sourceVertices.length, result.meshes[ 0 ].mesh.geometry.attributes.position.count );
 				assert.strictEqual( result.meshes[ 0 ].faceCharts.length, 12 );

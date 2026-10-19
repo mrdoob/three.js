@@ -19,8 +19,9 @@ import { potpack } from '../libs/potpack.module.js';
  * @param {number} [options.texelsPerUnit=0] - Common world density; zero fits the atlas. Must be nonnegative.
  * @param {boolean} [options.respectUVSeams] - Cut discontinuities in existing uv (normal default).
  * @param {boolean} [options.useInputUVs=false] - Preserve valid authored UV charts before trying LSCM.
- * @return {?Object} Atlas size, density, chart bounds and mesh vertex/face mappings,
- * or null if the charts do not fit or fail Float32 validation. Meshes are left unchanged in that case.
+ * @return {?Object} Atlas size, density, chart bounds, mesh vertex/face mappings and warning
+ * counts (excluded faces, and tiny faces under 0.01 atlas pixels squared), or null if the
+ * charts do not fit or fail Float32 validation. Meshes are left unchanged in that case.
  */
 function unwrapUVs( root, options = {} ) {
 
@@ -79,11 +80,25 @@ function unwrapUVs( root, options = {} ) {
 
 	for ( const record of records ) record.mesh.geometry = rebuildGeometry( record, charts, settings );
 
+	let tinyFaces = 0;
+	for ( const chart of charts ) {
+
+		for ( const triangle of chart.triangles ) {
+
+			if ( Math.abs( cross2( ...triangle.map( i => chart.outputUV[ i ] ) ) ) * settings.resolution ** 2 / 2 < 0.01 ) tinyFaces ++;
+
+		}
+
+	}
+
+	const excludedFaces = records.reduce( ( sum, record ) => sum + record.faceCharts.filter( chart => chart === - 1 ).length, 0 );
+
 	return {
 		attribute: settings.attribute, resolution: settings.resolution, padding: settings.padding,
 		texelsPerUnit: density,
 		charts: charts.map( chart => ( { x: chart.box.x, y: chart.box.y, width: chart.box.w, height: chart.box.h } ) ),
-		meshes: records.map( record => ( { mesh: record.mesh, sourceVertices: record.sourceVertices, faceCharts: record.faceCharts } ) )
+		meshes: records.map( record => ( { mesh: record.mesh, sourceVertices: record.sourceVertices, faceCharts: record.faceCharts } ) ),
+		warnings: { excludedFaces, tinyFaces }
 	};
 
 }
@@ -579,7 +594,6 @@ function validateFloat32Chart( chart, settings, density ) {
 	if ( ! quality ) {
 
 		const faces = [], triangles = [];
-		const originalFaceCount = chart.faces.length;
 		for ( let i = 0; i < chart.triangles.length; i ++ ) {
 
 			const triangle = chart.triangles[ i ], face = chart.record.faces[ chart.faces[ i ] ];
@@ -597,7 +611,6 @@ function validateFloat32Chart( chart, settings, density ) {
 
 		}
 
-		if ( faces.length < originalFaceCount ) console.warn( `THREE.unwrapUVs(): Excluded ${ originalFaceCount - faces.length } subpixel faces that fail Float32 UV validation.` );
 		chart.faces = faces;
 		chart.triangles = triangles;
 		if ( faces.length === 0 ) return false;

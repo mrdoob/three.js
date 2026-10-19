@@ -54,7 +54,6 @@ try {
 		const { DRACOLoader } = await import( 'three/addons/loaders/DRACOLoader.js' );
 		const { OBJLoader } = await import( 'three/addons/loaders/OBJLoader.js' );
 		const { unwrapUVs } = await import( 'three/addons/utils/unwrapUVs.js' );
-		const { analyzeUVUnwrap } = await import( 'three/addons/utils/UVUnwrapDiagnostics.js' ).catch( () => ( {} ) );
 		const draco = new DRACOLoader().setDecoderPath( '/examples/jsm/libs/draco/gltf/' );
 		const gltf = new GLTFLoader().setDRACOLoader( draco );
 		window.cleanup = () => draco.dispose();
@@ -136,7 +135,6 @@ try {
 
 			}
 
-			const diagnostics = analyzeUVUnwrap ? analyzeUVUnwrap( result, { maxStretch: options.mode === 'lightmap' ? 1.501 : 2.001 } ) : undefined;
 			for ( const [ mesh, geometry ] of originals ) {
 
 				mesh.geometry.dispose(); geometry.dispose();
@@ -150,7 +148,7 @@ try {
 			}
 
 			times.sort( ( a, b ) => a - b );
-			return { model: name, ...options, times, medianMs: times[ Math.floor( times.length / 2 ) ], triangles, charts: counts.length, singletons: counts.filter( count => count === 1 ).length, sourceExcluded, ignored, invalid, collapsed, texelsPerUnit: result.texelsPerUnit, diagnostics };
+			return { model: name, ...options, times, medianMs: times[ Math.floor( times.length / 2 ) ], triangles, charts: counts.length, singletons: counts.filter( count => count === 1 ).length, sourceExcluded, ignored, invalid, collapsed, texelsPerUnit: result.texelsPerUnit, warnings: result.warnings };
 
 		};
 

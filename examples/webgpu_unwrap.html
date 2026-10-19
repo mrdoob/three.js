@@ -53,7 +53,6 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
-			import { analyzeUVUnwrap } from 'three/addons/utils/UVUnwrapDiagnostics.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 			import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
 
@@ -176,21 +175,15 @@
 					if ( ! result ) throw new Error( 'Unwrap failed: atlas capacity or Float32 precision. Try a larger atlas or partition the model. See console for details.' );
 					atlasSize.value = result.resolution;
 					const elapsed = performance.now() - start;
-					const analysisStart = performance.now();
-					const analysis = analyzeUVUnwrap( result, { maxStretch: params.mode === 'lightmap' ? 1.501 : 2.001 } );
-					if ( unsupported > 0 ) {
-
-						analysis.passed = false;
-						analysis.issues.push( { message: `${ unsupported } instanced/batched meshes skipped: unwrap each instance as a regular mesh first.` } );
-
-					}
-
-					const analysisElapsed = performance.now() - analysisStart;
 					const triangles = result.meshes.reduce( ( sum, record ) => sum + record.faceCharts.length, 0 );
-					const ignored = result.meshes.reduce( ( sum, record ) => sum + record.faceCharts.reduce( ( count, chart ) => count + ( chart === - 1 ? 1 : 0 ), 0 ), 0 );
-					status.textContent = `${ triangles.toLocaleString() } triangles / ${ result.charts.length } charts\n${ elapsed.toFixed( 1 ) } ms\n${ result.texelsPerUnit.toFixed( 2 ) } texels/world unit\n${ ignored } ignored triangles`;
-					status.classList.toggle( 'warning', ! analysis.passed );
-					status.textContent += `\n${ analysis.passed ? 'No quality warnings' : 'Quality warnings' } (${ analysisElapsed.toFixed( 1 ) } ms analysis)\n${ analysis.issues.map( issue => `${ issue.count ?? 1 }: ${ issue.message }` ).join( '\n' ) }`;
+					const { excludedFaces, tinyFaces } = result.warnings;
+					const warnings = [];
+					if ( excludedFaces ) warnings.push( `${ excludedFaces } degenerate or Float32-limited faces excluded from the atlas` );
+					if ( tinyFaces ) warnings.push( `${ tinyFaces } faces under 0.01 atlas pixels squared; increase the atlas size` );
+					if ( unsupported ) warnings.push( `${ unsupported } instanced/batched meshes skipped: unwrap each instance as a regular mesh first` );
+					status.textContent = `${ triangles.toLocaleString() } triangles / ${ result.charts.length } charts\n${ elapsed.toFixed( 1 ) } ms\n${ result.texelsPerUnit.toFixed( 2 ) } texels/world unit`;
+					status.classList.toggle( 'warning', warnings.length > 0 );
+					status.textContent += `\n${ warnings.length ? 'Quality warnings' : 'No quality warnings' }\n${ warnings.join( '\n' ) }`;
 					drawAtlas();
 					updateMaterials();
 
