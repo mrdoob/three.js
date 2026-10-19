@@ -3496,7 +3496,8 @@ class USDComposer {
 
 				// OpenPBR uses micrometers, Three.js uses nanometers
 				const thicknessNm = thinFilmThickness * 1000;
-				material.iridescenceThicknessRange = [ thicknessNm, thicknessNm ];
+				material.iridescenceThicknessMinimum = thicknessNm;
+				material.iridescenceThicknessMaximum = thicknessNm;
 
 			}
 

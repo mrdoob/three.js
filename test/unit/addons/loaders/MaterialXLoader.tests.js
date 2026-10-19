@@ -165,6 +165,18 @@ export default QUnit.module( 'Addons', () => {
 
 		QUnit.module( 'MaterialXLoader', () => {
 
+			QUnit.test( 'texture settings', ( assert ) => {
+
+				const loader = new MaterialXLoader().setCrossOrigin( 'use-credentials' ).setWithCredentials( true ).setRequestHeader( { Accept: 'image/*' } );
+				const { document } = loader._parse( '<materialx version="1.39"/>', { path: 'textures/' } );
+				assert.strictEqual( document.imageLoader.crossOrigin, loader.crossOrigin );
+				assert.strictEqual( document.textureLoader.crossOrigin, loader.crossOrigin );
+				assert.strictEqual( document.textureLoader.withCredentials, true );
+				assert.strictEqual( document.textureLoader.requestHeader, loader.requestHeader );
+				assert.strictEqual( document.textureLoader.path, 'textures/' );
+
+			} );
+
 			QUnit.test( 'builds nodes of a host node library through the node resolver', ( assert ) => {
 
 				const text = `<?xml version="1.0"?>

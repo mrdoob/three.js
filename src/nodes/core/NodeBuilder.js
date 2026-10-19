@@ -710,15 +710,11 @@ class NodeBuilder {
 
 		//
 
-		let bindGroup;
+		let bindGroup = new BindGroup( groupName, bindings );
 
 		if ( sharedGroup && this.renderer._bindings !== undefined ) {
 
-			bindGroup = this.renderer._bindings.getSharedBindGroup( groupName, bindings );
-
-		} else {
-
-			bindGroup = new BindGroup( groupName, bindings );
+			bindGroup = this.renderer._bindings.getSharedBindGroup( bindGroup );
 
 		}
 

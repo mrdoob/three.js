@@ -643,6 +643,31 @@ class Backend {
 	isOccluded( /*renderContext, object*/ ) {}
 
 	/**
+	 * Returns the occlusion query data of the given render context for its current camera.
+	 *
+	 * @param {RenderContext} renderContext - The render context.
+	 * @return {Object} The occlusion query data.
+	 */
+	getOcclusionData( renderContext ) {
+
+		const renderContextData = this.get( renderContext );
+
+		if ( renderContextData.occlusionData === undefined ) renderContextData.occlusionData = new WeakMap();
+
+		let occlusionData = renderContextData.occlusionData.get( renderContext.camera );
+
+		if ( occlusionData === undefined ) {
+
+			occlusionData = {};
+			renderContextData.occlusionData.set( renderContext.camera, occlusionData );
+
+		}
+
+		return occlusionData;
+
+	}
+
+	/**
 	 * Resolves the time stamp for the given render context and type.
 	 *
 	 * @async

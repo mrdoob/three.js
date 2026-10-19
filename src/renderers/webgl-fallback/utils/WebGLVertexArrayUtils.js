@@ -2,7 +2,8 @@
  * A WebGL 2 backend utility module for managing vertex array objects (VAOs).
  *
  * VAOs are shared between all owners (render objects and compute pipelines)
- * that use the same GPU buffers and deleted when the last owner releases them.
+ * that use the same GPU buffers and deleted when the last owner releases them
+ * or when one of their buffers is destroyed.
  *
  * @private
  */
@@ -38,14 +39,18 @@ class WebGLVertexArrayUtils {
 	 *
 	 * @param {RenderObject|ComputePipeline} owner - The render object or compute pipeline using the VAO.
 	 * @param {Array<BufferAttribute>} attributes - An array of buffer attributes.
+	 * @param {?BufferAttribute} [index=null] - The index attribute.
 	 * @return {WebGLVertexArrayObject} The VAO.
 	 */
-	getVAO( owner, attributes ) {
+	getVAO( owner, attributes, index = null ) {
 
 		const backend = this.backend;
 		const ownerData = backend.get( owner );
 
-		if ( this._needsUpdate( ownerData, attributes ) === false ) return ownerData.vaoGPU;
+		const indexData = ( index !== null ) ? backend.get( index ) : null;
+		const indexGPU = ( indexData !== null ) ? indexData.bufferGPU : null;
+
+		if ( this._needsUpdate( ownerData, attributes, indexGPU ) === false ) return ownerData.vaoGPU;
 
 		// determine key, variant and attribute buffers
 
@@ -53,6 +58,7 @@ class WebGLVertexArrayUtils {
 		let variant = '';
 
 		const buffers = [];
+		const buffersData = [];
 
 		for ( let i = 0; i < attributes.length; i ++ ) {
 
@@ -66,6 +72,17 @@ class WebGLVertexArrayUtils {
 			variant += ':' + ( attributeData.activeBufferIndex || 0 );
 
 			buffers.push( attributeData.bufferGPU );
+			buffersData.push( attributeData );
+
+		}
+
+		// the element buffer binding is part of the VAO state
+
+		if ( indexData !== null ) {
+
+			key += '|' + indexData.id;
+
+			buffersData.push( indexData );
 
 		}
 
@@ -79,9 +96,19 @@ class WebGLVertexArrayUtils {
 
 			if ( entry === undefined ) {
 
-				entry = { vaos: new Map(), usedTimes: 0 };
+				entry = { vaos: new Map(), buffersData, usedTimes: 0 };
 
 				this.cache.set( key, entry );
+
+				// each buffer knows its VAOs so they can be deleted with the buffer
+
+				for ( const bufferData of buffersData ) {
+
+					if ( bufferData.vaoKeys === undefined ) bufferData.vaoKeys = new Set();
+
+					bufferData.vaoKeys.add( key );
+
+				}
 
 			}
 
@@ -97,7 +124,7 @@ class WebGLVertexArrayUtils {
 
 		if ( vaoGPU === undefined ) {
 
-			vaoGPU = this._createVAO( attributes );
+			vaoGPU = this._createVAO( attributes, indexGPU );
 
 			entry.vaos.set( variant, vaoGPU );
 
@@ -105,6 +132,7 @@ class WebGLVertexArrayUtils {
 
 		ownerData.vaoGPU = vaoGPU;
 		ownerData.vertexBuffers = buffers;
+		ownerData.indexBuffer = indexGPU;
 
 		return vaoGPU;
 
@@ -126,6 +154,26 @@ class WebGLVertexArrayUtils {
 		ownerData.vaoKey = undefined;
 		ownerData.vaoGPU = undefined;
 		ownerData.vertexBuffers = undefined;
+		ownerData.indexBuffer = undefined;
+
+	}
+
+	/**
+	 * Deletes all VAOs referencing the given attribute buffer. Must be called
+	 * when the buffer is destroyed since VAOs keep the memory of attached buffers
+	 * allocated. Owners of deleted VAOs request a new one with their next draw.
+	 *
+	 * @param {Object} bufferData - The backend data of the attribute buffer.
+	 */
+	releaseBuffer( bufferData ) {
+
+		if ( bufferData.vaoKeys === undefined ) return;
+
+		for ( const key of bufferData.vaoKeys ) {
+
+			this._deleteEntry( key );
+
+		}
 
 	}
 
@@ -157,13 +205,14 @@ class WebGLVertexArrayUtils {
 	 * @private
 	 * @param {Object} ownerData - The backend data of the owner.
 	 * @param {Array<BufferAttribute>} attributes - An array of buffer attributes.
+	 * @param {?WebGLBuffer} indexGPU - The index buffer.
 	 * @return {boolean} Whether the owner requires a different VAO or not.
 	 */
-	_needsUpdate( ownerData, attributes ) {
+	_needsUpdate( ownerData, attributes, indexGPU ) {
 
 		const buffers = ownerData.vertexBuffers;
 
-		if ( buffers === undefined || buffers.length !== attributes.length ) return true;
+		if ( buffers === undefined || buffers.length !== attributes.length || ownerData.indexBuffer !== indexGPU ) return true;
 
 		for ( let i = 0; i < attributes.length; i ++ ) {
 
@@ -187,21 +236,41 @@ class WebGLVertexArrayUtils {
 
 		const entry = this.cache.get( key );
 
+		if ( entry === undefined ) return; // already deleted with one of its buffers
+
 		entry.usedTimes --;
 
-		if ( entry.usedTimes === 0 ) {
+		if ( entry.usedTimes === 0 ) this._deleteEntry( key );
 
-			const { gl } = this.backend;
+	}
 
-			for ( const vaoGPU of entry.vaos.values() ) {
+	/**
+	 * Deletes all VAO variants of the given cache entry.
+	 *
+	 * @private
+	 * @param {string} key - The cache key.
+	 */
+	_deleteEntry( key ) {
 
-				gl.deleteVertexArray( vaoGPU );
+		const { gl, state } = this.backend;
 
-			}
+		const entry = this.cache.get( key );
 
-			this.cache.delete( key );
+		for ( const vaoGPU of entry.vaos.values() ) {
+
+			if ( state.currentVAO === vaoGPU ) state.resetVertexState();
+
+			gl.deleteVertexArray( vaoGPU );
 
 		}
+
+		for ( const bufferData of entry.buffersData ) {
+
+			bufferData.vaoKeys.delete( key );
+
+		}
+
+		this.cache.delete( key );
 
 	}
 
@@ -210,15 +279,16 @@ class WebGLVertexArrayUtils {
 	 *
 	 * @private
 	 * @param {Array<BufferAttribute>} attributes - An array of buffer attributes.
+	 * @param {?WebGLBuffer} indexGPU - The index buffer.
 	 * @return {WebGLVertexArrayObject} The VAO.
 	 */
-	_createVAO( attributes ) {
+	_createVAO( attributes, indexGPU ) {
 
 		const { gl, state } = this.backend;
 
 		const vaoGPU = gl.createVertexArray();
 
-		state.setVertexState( vaoGPU );
+		state.setVertexState( vaoGPU, indexGPU );
 
 		for ( let i = 0; i < attributes.length; i ++ ) {
 

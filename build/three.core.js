@@ -17605,7 +17605,7 @@ class BufferAttribute extends EventDispatcher {
 	}
 
 	/**
-	 * Can be used to dispose storage buffer attributes. Available only in {@link WebGPURenderer}.
+	 * Frees the GPU-related resources allocated by this instance. Available only in {@link WebGPURenderer}.
 	 */
 	dispose() {
 
@@ -21878,7 +21878,8 @@ class Material extends EventDispatcher {
 
 		if ( this.iridescence !== undefined ) data.iridescence = this.iridescence;
 		if ( this.iridescenceIOR !== undefined ) data.iridescenceIOR = this.iridescenceIOR;
-		if ( this.iridescenceThicknessRange !== undefined ) data.iridescenceThicknessRange = this.iridescenceThicknessRange;
+		if ( this.iridescenceThicknessMinimum !== undefined ) data.iridescenceThicknessMinimum = this.iridescenceThicknessMinimum;
+		if ( this.iridescenceThicknessMaximum !== undefined ) data.iridescenceThicknessMaximum = this.iridescenceThicknessMaximum;
 
 		if ( this.iridescenceMap && this.iridescenceMap.isTexture ) {
 
@@ -22070,7 +22071,16 @@ class Material extends EventDispatcher {
 		if ( json.retroreflectivity !== undefined ) this.retroreflectivity = json.retroreflectivity;
 		if ( json.iridescence !== undefined ) this.iridescence = json.iridescence;
 		if ( json.iridescenceIOR !== undefined ) this.iridescenceIOR = json.iridescenceIOR;
-		if ( json.iridescenceThicknessRange !== undefined ) this.iridescenceThicknessRange = json.iridescenceThicknessRange;
+		if ( json.iridescenceThicknessMinimum !== undefined ) this.iridescenceThicknessMinimum = json.iridescenceThicknessMinimum;
+		if ( json.iridescenceThicknessMaximum !== undefined ) this.iridescenceThicknessMaximum = json.iridescenceThicknessMaximum;
+
+		if ( json.iridescenceThicknessRange !== undefined ) { // @deprecated r187
+
+			this.iridescenceThicknessMinimum = json.iridescenceThicknessRange[ 0 ];
+			this.iridescenceThicknessMaximum = json.iridescenceThicknessRange[ 1 ];
+
+		}
+
 		if ( json.transmission !== undefined ) this.transmission = json.transmission;
 		if ( json.thickness !== undefined ) this.thickness = json.thickness;
 		if ( json.attenuationDistance !== undefined ) this.attenuationDistance = json.attenuationDistance;
@@ -29777,8 +29787,8 @@ class DepthTexture extends Texture {
 	 * @param {number} [mapping=Texture.DEFAULT_MAPPING] - The texture mapping.
 	 * @param {number} [wrapS=ClampToEdgeWrapping] - The wrapS value.
 	 * @param {number} [wrapT=ClampToEdgeWrapping] - The wrapT value.
-	 * @param {number} [magFilter=LinearFilter] - The mag filter value.
-	 * @param {number} [minFilter=LinearFilter] - The min filter value.
+	 * @param {number} [magFilter=NearestFilter] - The mag filter value.
+	 * @param {number} [minFilter=NearestFilter] - The min filter value.
 	 * @param {number} [anisotropy=Texture.DEFAULT_ANISOTROPY] - The anisotropy value.
 	 * @param {number} [format=DepthFormat] - The texture format.
 	 * @param {number} [depth=1] - The depth of the texture.
@@ -39443,20 +39453,29 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.iridescenceIOR = 1.3;
 
 		/**
-		 *Array of exactly 2 elements, specifying minimum and maximum thickness of the iridescence layer.
-		 Thickness of iridescence layer has an equivalent effect of the one `thickness` has on `ior`.
+		 * The minimum thickness of the iridescence layer in nanometers.
 		 *
-		 * @type {Array<number,number>}
-		 * @default [100,400]
+		 * @type {number}
+		 * @default 100
 		 */
-		this.iridescenceThicknessRange = [ 100, 400 ];
+		this.iridescenceThicknessMinimum = 100;
+
+		/**
+		 * The maximum thickness of the iridescence layer in nanometers. If no
+		 * `iridescenceThicknessMap` is defined, this value is used as the thickness.
+		 *
+		 * @type {number}
+		 * @default 400
+		 */
+		this.iridescenceThicknessMaximum = 400;
 
 		/**
 		 * A texture that defines the thickness of the iridescence layer, stored in the green channel.
-		 * Minimum and maximum values of thickness are defined by `iridescenceThicknessRange` array:
-		 * - `0.0` in the green channel will result in thickness equal to first element of the array.
-		 * - `1.0` in the green channel will result in thickness equal to second element of the array.
-		 * - Values in-between will linearly interpolate between the elements of the array.
+		 * Minimum and maximum values of thickness are defined by `iridescenceThicknessMinimum` and
+		 * `iridescenceThicknessMaximum`:
+		 * - `0.0` in the green channel will result in thickness equal to `iridescenceThicknessMinimum`.
+		 * - `1.0` in the green channel will result in thickness equal to `iridescenceThicknessMaximum`.
+		 * - Values in-between will linearly interpolate between both values.
 		 *
 		 * `iridescenceThicknessMap` represents non-color data. Any texture assigned must have
 		 * `texture.colorSpace = NoColorSpace` (default).
@@ -39823,6 +39842,30 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 	}
 
+	/**
+	 * Array of exactly 2 elements, specifying minimum and maximum thickness of the iridescence layer.
+	 *
+	 * @deprecated since r187. Use {@link MeshPhysicalMaterial#iridescenceThicknessMinimum} and {@link MeshPhysicalMaterial#iridescenceThicknessMaximum} instead.
+	 * @type {Array<number,number>}
+	 * @default [100,400]
+	 */
+	get iridescenceThicknessRange() {
+
+		warnOnce( 'MeshPhysicalMaterial: The "iridescenceThicknessRange" property has been replaced by "iridescenceThicknessMinimum" and "iridescenceThicknessMaximum".' ); // @deprecated r187
+
+		return [ this.iridescenceThicknessMinimum, this.iridescenceThicknessMaximum ];
+
+	}
+
+	set iridescenceThicknessRange( value ) {
+
+		warnOnce( 'MeshPhysicalMaterial: The "iridescenceThicknessRange" property has been replaced by "iridescenceThicknessMinimum" and "iridescenceThicknessMaximum".' ); // @deprecated r187
+
+		this.iridescenceThicknessMinimum = value[ 0 ];
+		this.iridescenceThicknessMaximum = value[ 1 ];
+
+	}
+
 	copy( source ) {
 
 		super.copy( source );
@@ -39853,7 +39896,8 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.iridescence = source.iridescence;
 		this.iridescenceMap = source.iridescenceMap;
 		this.iridescenceIOR = source.iridescenceIOR;
-		this.iridescenceThicknessRange = [ ...source.iridescenceThicknessRange ];
+		this.iridescenceThicknessMinimum = source.iridescenceThicknessMinimum;
+		this.iridescenceThicknessMaximum = source.iridescenceThicknessMaximum;
 		this.iridescenceThicknessMap = source.iridescenceThicknessMap;
 
 		this.retroreflectivity = source.retroreflectivity;
@@ -50713,7 +50757,7 @@ class ImageBitmapLoader extends Loader {
 		}
 
 		const fetchOptions = {};
-		fetchOptions.credentials = ( this.crossOrigin === 'anonymous' ) ? 'same-origin' : 'include';
+		fetchOptions.credentials = ( this.withCredentials || this.crossOrigin !== 'anonymous' ) ? 'include' : 'same-origin';
 		fetchOptions.headers = this.requestHeader;
 		fetchOptions.signal = ( typeof AbortSignal.any === 'function' ) ? AbortSignal.any( [ this._abortController.signal, this.manager.abortController.signal ] ) : this._abortController.signal;
 
@@ -58927,7 +58971,7 @@ class PolarGridHelper extends LineSegments {
 	 *
 	 * @param {number} [radius=10] - The radius of the polar grid. This can be any positive number.
 	 * @param {number} [sectors=16] - The number of sectors the grid will be divided into. This can be any positive integer.
-	 * @param {number} [rings=16] - The number of rings. This can be any positive integer.
+	 * @param {number} [rings=8] - The number of rings. This can be any positive integer.
 	 * @param {number} [divisions=64] - The number of line segments used for each circle. This can be any positive integer.
 	 * @param {number|Color|string} [color1=0x444444] - The first color used for grid elements.
 	 * @param {number|Color|string} [color2=0x888888] -  The second color used for grid elements.

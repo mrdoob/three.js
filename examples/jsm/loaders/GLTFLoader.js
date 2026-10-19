@@ -491,6 +491,7 @@ class GLTFLoader extends Loader {
 			crossOrigin: this.crossOrigin,
 			priority: this.priority,
 			cache: this.cache,
+			withCredentials: this.withCredentials,
 			requestHeader: this.requestHeader,
 			manager: this.manager,
 			ktx2Loader: this.ktx2Loader,
@@ -1101,21 +1102,15 @@ class GLTFMaterialsIridescenceExtension {
 
 		}
 
-		if ( materialParams.iridescenceThicknessRange === undefined ) {
-
-			materialParams.iridescenceThicknessRange = [ 100, 400 ];
-
-		}
-
 		if ( extension.iridescenceThicknessMinimum !== undefined ) {
 
-			materialParams.iridescenceThicknessRange[ 0 ] = extension.iridescenceThicknessMinimum;
+			materialParams.iridescenceThicknessMinimum = extension.iridescenceThicknessMinimum;
 
 		}
 
 		if ( extension.iridescenceThicknessMaximum !== undefined ) {
 
-			materialParams.iridescenceThicknessRange[ 1 ] = extension.iridescenceThicknessMaximum;
+			materialParams.iridescenceThicknessMaximum = extension.iridescenceThicknessMaximum;
 
 		}
 
@@ -2724,6 +2719,7 @@ class GLTFParser {
 		}
 
 		this.textureLoader.setCrossOrigin( this.options.crossOrigin );
+		this.textureLoader.setWithCredentials( this.options.withCredentials );
 		this.textureLoader.setRequestHeader( this.options.requestHeader );
 
 		this.fileLoader = new FileLoader( this.options.manager );
@@ -2731,7 +2727,7 @@ class GLTFParser {
 		this.fileLoader.setCache( this.options.cache );
 		this.fileLoader.setResponseType( 'arraybuffer' );
 
-		if ( this.options.crossOrigin === 'use-credentials' ) {
+		if ( this.options.withCredentials || this.options.crossOrigin === 'use-credentials' ) {
 
 			this.fileLoader.setWithCredentials( true );
 

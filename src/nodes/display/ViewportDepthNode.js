@@ -1,5 +1,5 @@
 import Node from '../core/Node.js';
-import { float, Fn, log, log2, nodeImmutable, nodeProxy } from '../tsl/TSLBase.js';
+import { EPSILON, float, Fn, log, log2, nodeImmutable, nodeProxy } from '../tsl/TSLBase.js';
 import { cameraNear, cameraFar } from '../accessors/Camera.js';
 import { positionView } from '../accessors/Position.js';
 import { viewportDepthTexture } from './ViewportDepthTextureNode.js';
@@ -282,7 +282,7 @@ export const viewZToLogarithmicDepth = ( viewZ, near, far ) => {
 	//    we modify the formula here to use 'viewZ' instead of 'w'. The other functions expect a negative viewZ,
 	//    so we do the same here, hence the 'viewZ.negate()' call.
 	// For visual representation of this depth curve, see https://www.desmos.com/calculator/uyqk0vex1u
-	near = near.max( 1e-6 ).toVar();
+	near = near.max( EPSILON ).toVar();
 	const numerator = log2( viewZ.negate().div( near ) );
 	const denominator = log2( far.div( near ) );
 	return numerator.div( denominator );

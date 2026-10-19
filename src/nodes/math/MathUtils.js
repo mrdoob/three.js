@@ -1,5 +1,5 @@
 import { sub, mul, div, add } from './OperatorNode.js';
-import { PI, pow, sin, abs } from './MathNode.js';
+import { PI, pow, sin, abs, EPSILON } from './MathNode.js';
 import { select } from './ConditionalNode.js';
 
 /**
@@ -58,7 +58,7 @@ export const pcurve = ( x, a, b ) => pow( div( pow( x, a ), add( pow( x, a ), po
  */
 export const sinc = ( x, k ) => {
 
-	const arg = abs( PI.mul( k.mul( x ).sub( 1.0 ) ) ).max( 1e-6 ).toConst();
+	const arg = abs( PI.mul( k.mul( x ).sub( 1.0 ) ) ).max( EPSILON ).toConst();
 
 	return sin( arg ).div( arg );
 

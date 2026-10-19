@@ -64,7 +64,8 @@ class RenderContexts {
 
 		//
 
-		const renderStateKey = attachmentState + '-' + mrtState + '-' + callDepth;
+		const stateKey = attachmentState + '-' + mrtState;
+		const renderStateKey = stateKey + '-' + callDepth; // one render context per call depth keeps the bindings of nested renders separate
 
 		let renderState = this._renderContexts[ renderStateKey ];
 
@@ -72,6 +73,7 @@ class RenderContexts {
 
 			renderState = new RenderContext();
 			renderState.mrt = mrt;
+			renderState.stateKey = stateKey;
 
 			this._renderContexts[ renderStateKey ] = renderState;
 

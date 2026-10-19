@@ -141,6 +141,15 @@ export default QUnit.module( 'Addons', () => {
 
 		QUnit.module( 'GLTFLoader', () => {
 
+			QUnit.test( 'child credentials', async ( assert ) => {
+
+				const loader = new GLTFLoader().setWithCredentials( true );
+				const { parser } = await loader.parseAsync( { asset: { version: '2.0' } }, '' );
+				assert.strictEqual( parser.fileLoader.withCredentials, true );
+				assert.strictEqual( parser.textureLoader.withCredentials, true );
+
+			} );
+
 			QUnit.test( 'CUBICSPLINE animations can be made additive at an interpolated frame', async ( assert ) => {
 
 				const buffer = new Float32Array( [

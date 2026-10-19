@@ -1,20 +1,30 @@
-import { DataTexture, FloatType, RGBAFormat, Vector2, Vector3, LightsNode, NodeUpdateType } from 'three/webgpu';
+import { DataTexture, FloatType, RGBAFormat, Vector2, Vector3, LightsNode, NodeUpdateType, PointLightNode, SpotLightNode } from 'three/webgpu';
 
 import {
-	attributeArray, nodeProxy, int, float, vec3, vec4, ivec2, ivec4, uniform, Break, Loop, positionView,
-	Fn, If, Return, textureLoad, instanceIndex, screenCoordinate, directPointLight,
+	instancedArray, nodeProxy, int, float, vec3, vec4, ivec2, ivec4, uniform, Break, Loop, positionView,
+	Fn, If, textureLoad, instanceIndex, screenCoordinate, directPointLight,
 	renderGroup,
-	min, max, pow, log, clamp, dot
+	min, max, pow, log, clamp, dot, smoothstep
 } from 'three/tsl';
 
 const _vector3 = /*@__PURE__*/ new Vector3();
+const _direction = /*@__PURE__*/ new Vector3();
+const _targetPosition = /*@__PURE__*/ new Vector3();
 const _size = /*@__PURE__*/ new Vector2();
+
+// light data texture rows
+
+const POSITION_ROW = 0; // world position, cutoff distance
+const COLOR_ROW = 1; // color * intensity, decay
+const SPOT_ROW = 2; // scaled world spot direction, scaled cone cosine
+const BOUNDS_ROW = 3; // world bounding sphere center, radius ( negative if unbounded )
+const ROWS = 4;
 
 /**
  * A custom version of `LightsNode` implementing Forward+ clustered shading:
  * the view frustum is subdivided into a 3D grid of clusters (X × Y screen tiles
  * times an exponentially-spaced set of Z depth slices), and each cluster holds
- * only the point lights whose spheres intersect it. At shading time each fragment
+ * only the point and spot lights whose bounding spheres intersect it. At shading time each fragment
  * looks up its cluster and loops over just that cluster's lights. Unlike 2D tiled
  * lighting, clustered shading culls lights that share screen pixels but lie at
  * different depths — suitable for 3D scenes with real depth complexity.
@@ -33,7 +43,7 @@ class ClusteredLightsNode extends LightsNode {
 	/**
 	 * Constructs a new clustered lights node.
 	 *
-	 * @param {number} [maxLights=1024] - Maximum number of point lights.
+	 * @param {number} [maxLights=1024] - Maximum number of point and spot lights.
 	 * @param {number} [tileSize=32] - Screen tile size in pixels (cluster XY size).
 	 * @param {number} [zSlices=24] - Number of exponential depth slices.
 	 * @param {number} [maxLightsPerCluster=64] - Per-cluster light-list capacity.
@@ -41,6 +51,15 @@ class ClusteredLightsNode extends LightsNode {
 	constructor( maxLights = 1024, tileSize = 32, zSlices = 24, maxLightsPerCluster = 64 ) {
 
 		super();
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isClusteredLightsNode = true;
 
 		this.materialLights = [];
 		this.clusteredLights = [];
@@ -53,12 +72,16 @@ class ClusteredLightsNode extends LightsNode {
 		this._chunksPerCluster = Math.ceil( maxLightsPerCluster / 4 );
 
 		this._bufferSize = null;
+		this._isWebGLBackend = false;
+		this._needsRebuild = false;
+		this._invocationsPerCluster = 1;
 		this._lightIndexes = null;
+		this._renderer = null;
 		this._screenClusterIndex = null;
 		this._compute = null;
 
-		const lightsData = new Float32Array( maxLights * 4 * 2 );
-		this._lightsTexture = new DataTexture( lightsData, lightsData.length / 8, 2, RGBAFormat, FloatType );
+		const lightsData = new Float32Array( maxLights * 4 * ROWS );
+		this._lightsTexture = new DataTexture( lightsData, maxLights, ROWS, RGBAFormat, FloatType );
 
 		// Per Z-slice light range for Z-culling (CPU-sorted, uploaded each frame)
 
@@ -107,18 +130,18 @@ class ClusteredLightsNode extends LightsNode {
 
 		const data = lightsTexture.image.data;
 		const lineSize = lightsTexture.image.width * 4;
-		const count = clusteredLights.length;
+		const count = Math.min( clusteredLights.length, this.maxLights );
 
 		this._lightsCount.value = count;
 
-		// Sort lights by view-space depth for Z-culling
+		// Sort lights by the view-space depth of their bounding spheres for Z-culling
 
 		const viewZ = this._lightViewZ;
 		const order = this._lightSortOrder;
 
 		for ( let i = 0; i < count; i ++ ) {
 
-			_vector3.setFromMatrixPosition( clusteredLights[ i ].matrixWorld );
+			this._getBoundingSphereCenter( clusteredLights[ i ], _vector3 );
 			_vector3.applyMatrix4( camera.matrixWorldInverse );
 			viewZ[ i ] = _vector3.z;
 			order[ i ] = i;
@@ -134,19 +157,60 @@ class ClusteredLightsNode extends LightsNode {
 
 			const light = clusteredLights[ order[ i ] ];
 
-			_vector3.setFromMatrixPosition( light.matrixWorld );
-
 			const offset = i * 4;
 
-			data[ offset + 0 ] = _vector3.x;
-			data[ offset + 1 ] = _vector3.y;
-			data[ offset + 2 ] = _vector3.z;
-			data[ offset + 3 ] = light.distance;
+			_vector3.setFromMatrixPosition( light.matrixWorld );
 
-			data[ lineSize + offset + 0 ] = light.color.r * light.intensity;
-			data[ lineSize + offset + 1 ] = light.color.g * light.intensity;
-			data[ lineSize + offset + 2 ] = light.color.b * light.intensity;
-			data[ lineSize + offset + 3 ] = light.decay;
+			let rowOffset = lineSize * POSITION_ROW + offset;
+
+			data[ rowOffset + 0 ] = _vector3.x;
+			data[ rowOffset + 1 ] = _vector3.y;
+			data[ rowOffset + 2 ] = _vector3.z;
+			data[ rowOffset + 3 ] = light.distance;
+
+			rowOffset = lineSize * COLOR_ROW + offset;
+
+			data[ rowOffset + 0 ] = light.color.r * light.intensity;
+			data[ rowOffset + 1 ] = light.color.g * light.intensity;
+			data[ rowOffset + 2 ] = light.color.b * light.intensity;
+			data[ rowOffset + 3 ] = light.decay;
+
+			// The spot attenuation smoothstep( coneCos, penumbraCos, dot( L, direction ) ) is stored
+			// as smoothstep( 0, 1, dot( L, direction * scale ) - coneCos * scale ) with
+			// scale = 1 / ( penumbraCos - coneCos ). Point lights store a constant attenuation of 1.
+
+			rowOffset = lineSize * SPOT_ROW + offset;
+
+			if ( light.isSpotLight === true ) {
+
+				const coneCos = Math.cos( light.angle );
+				const penumbraCos = Math.cos( light.angle * ( 1 - light.penumbra ) );
+				const scale = 1 / Math.max( penumbraCos - coneCos, 1e-4 );
+
+				this._getSpotDirection( light, _direction ).multiplyScalar( scale );
+
+				data[ rowOffset + 0 ] = _direction.x;
+				data[ rowOffset + 1 ] = _direction.y;
+				data[ rowOffset + 2 ] = _direction.z;
+				data[ rowOffset + 3 ] = coneCos * scale;
+
+			} else {
+
+				data[ rowOffset + 0 ] = 0;
+				data[ rowOffset + 1 ] = 0;
+				data[ rowOffset + 2 ] = 0;
+				data[ rowOffset + 3 ] = - 1;
+
+			}
+
+			this._getBoundingSphereCenter( light, _vector3 );
+
+			rowOffset = lineSize * BOUNDS_ROW + offset;
+
+			data[ rowOffset + 0 ] = _vector3.x;
+			data[ rowOffset + 1 ] = _vector3.y;
+			data[ rowOffset + 2 ] = _vector3.z;
+			data[ rowOffset + 3 ] = this._getBoundingSphereRadius( light );
 
 		}
 
@@ -172,10 +236,10 @@ class ClusteredLightsNode extends LightsNode {
 			for ( let i = 0; i < count; i ++ ) {
 
 				const vz = viewZ[ order[ i ] ];
-				const r = clusteredLights[ order[ i ] ].distance;
-				const radius = r > 0 ? r : far;
+				const r = data[ lineSize * BOUNDS_ROW + i * 4 + 3 ];
+				const radius = r >= 0 ? r : far;
 
-				// Light sphere Z: [vz - radius, vz + radius]
+				// Bounding sphere Z: [vz - radius, vz + radius]
 				// Slice Z: [sliceFar, sliceNear] (both negative, sliceFar < sliceNear)
 				if ( vz + radius >= sliceFar && vz - radius <= sliceNear ) {
 
@@ -203,6 +267,74 @@ class ClusteredLightsNode extends LightsNode {
 	}
 
 	/**
+	 * Returns the normalized world-space direction pointing from the spot light's
+	 * target to the spot light.
+	 *
+	 * @private
+	 * @param {SpotLight} light - The spot light.
+	 * @param {Vector3} target - The target vector.
+	 * @return {Vector3} The direction.
+	 */
+	_getSpotDirection( light, target ) {
+
+		_targetPosition.setFromMatrixPosition( light.target.matrixWorld );
+
+		return target.setFromMatrixPosition( light.matrixWorld ).sub( _targetPosition ).normalize();
+
+	}
+
+	/**
+	 * Returns the world-space center of the light's bounding sphere. For spot lights,
+	 * this is the center of the smallest sphere enclosing the cone.
+	 *
+	 * @private
+	 * @param {PointLight|SpotLight} light - The light.
+	 * @param {Vector3} target - The target vector.
+	 * @return {Vector3} The bounding sphere center.
+	 */
+	_getBoundingSphereCenter( light, target ) {
+
+		target.setFromMatrixPosition( light.matrixWorld );
+
+		if ( light.isSpotLight === true && light.distance > 0 ) {
+
+			const angle = Math.min( light.angle, Math.PI / 2 );
+			const offset = angle > Math.PI / 4 ? light.distance * Math.cos( angle ) : light.distance / ( 2 * Math.cos( angle ) );
+
+			// _getSpotDirection() points away from the cone, so step backwards
+
+			target.addScaledVector( this._getSpotDirection( light, _direction ), - offset );
+
+		}
+
+		return target;
+
+	}
+
+	/**
+	 * Returns the radius of the light's bounding sphere.
+	 *
+	 * @private
+	 * @param {PointLight|SpotLight} light - The light.
+	 * @return {number} The bounding sphere radius. `-1` if the light has no cutoff distance.
+	 */
+	_getBoundingSphereRadius( light ) {
+
+		if ( light.distance <= 0 ) return - 1;
+
+		if ( light.isSpotLight === true ) {
+
+			const angle = Math.min( light.angle, Math.PI / 2 );
+
+			return angle > Math.PI / 4 ? light.distance * Math.sin( angle ) : light.distance / ( 2 * Math.cos( angle ) );
+
+		}
+
+		return light.distance;
+
+	}
+
+	/**
 	 * Updates the light data and assigns the lights to the clusters.
 	 *
 	 * @param {NodeFrame} frame - A reference to the current node frame.
@@ -211,7 +343,7 @@ class ClusteredLightsNode extends LightsNode {
 
 		const { renderer, camera } = frame;
 
-		this._updateProgram( renderer );
+		this._initGrid( renderer );
 
 		this._updateLightsTexture( camera );
 
@@ -225,8 +357,10 @@ class ClusteredLightsNode extends LightsNode {
 	}
 
 	/**
-	 * Configures this node with an array of lights. Point lights without shadows
-	 * are clustered, all other lights use the default lighting.
+	 * Configures this node with an array of lights. Point and spot lights without
+	 * shadows are clustered (except lights with a `colorNode`, spot lights with a
+	 * projected `map` and light types with their own light node, like `IESSpotLight`
+	 * or `ProjectorLight`), all other lights use the default lighting.
 	 *
 	 * @param {Array<Light>} lights - An array of lights.
 	 * @return {ClusteredLightsNode} A reference to this node.
@@ -240,7 +374,7 @@ class ClusteredLightsNode extends LightsNode {
 
 		for ( const light of lights ) {
 
-			if ( light.isPointLight === true && light.castShadow !== true ) {
+			if ( this._isClusteredLight( light ) ) {
 
 				clusteredLights[ clusteredIndex ++ ] = light;
 
@@ -256,6 +390,29 @@ class ClusteredLightsNode extends LightsNode {
 		clusteredLights.length = clusteredIndex;
 
 		return super.setLights( lights );
+
+	}
+
+	/**
+	 * Returns `true` if the given light can be clustered.
+	 *
+	 * @private
+	 * @param {Light} light - The light.
+	 * @return {boolean} Whether the light is clustered or not.
+	 */
+	_isClusteredLight( light ) {
+
+		// Shadows, color nodes (any light) and projected maps (spot lights) are not supported.
+
+		if ( light.castShadow === true || light.colorNode ) return false;
+
+		// Only lights shaded by the plain point and spot light nodes are clustered. Subclasses
+		// registered with their own light node (e.g. IESSpotLight, ProjectorLight) keep the
+		// default lighting, since clustering would shade them as plain spot lights.
+
+		if ( light._lightNode === PointLightNode ) return true;
+
+		return light._lightNode === SpotLightNode && ! light.map;
 
 	}
 
@@ -345,44 +502,65 @@ class ClusteredLightsNode extends LightsNode {
 	}
 
 	/**
-	 * Returns the data of the light at the given index.
+	 * Returns the shading data of the light at the given index.
 	 *
 	 * @private
 	 * @param {number|Node<int>} index - The light index.
-	 * @return {Object} The light's position, view position, distance, color and decay.
+	 * @return {Object} The light's view position, distance, color, decay, view-space spot direction and spot offset.
 	 */
 	_getLightData( index ) {
 
 		index = int( index );
 
-		const dataA = textureLoad( this._lightsTexture, ivec2( index, 0 ) );
-		const dataB = textureLoad( this._lightsTexture, ivec2( index, 1 ) );
+		const dataA = textureLoad( this._lightsTexture, ivec2( index, POSITION_ROW ) );
+		const dataB = textureLoad( this._lightsTexture, ivec2( index, COLOR_ROW ) );
+		const dataC = textureLoad( this._lightsTexture, ivec2( index, SPOT_ROW ) );
 
-		const position = dataA.xyz;
-		const viewPosition = this._cameraViewMatrix.mul( vec4( position, 1.0 ) ).xyz;
+		const viewPosition = this._cameraViewMatrix.mul( vec4( dataA.xyz, 1.0 ) ).xyz;
 		const distance = dataA.w;
 		const color = dataB.rgb;
 		const decay = dataB.w;
+		const spotDirection = this._cameraViewMatrix.mul( vec4( dataC.xyz, 0.0 ) ).xyz;
+		const spotOffset = dataC.w;
 
 		return {
-			position,
 			viewPosition,
 			distance,
 			color,
-			decay
+			decay,
+			spotDirection,
+			spotOffset
 		};
 
 	}
 
 	/**
-	 * Sets up the default lights and the clustered point lights.
+	 * Returns the culling data of the light at the given index.
+	 *
+	 * @private
+	 * @param {number|Node<int>} index - The light index.
+	 * @return {Object} The view-space center and the radius of the light's bounding sphere. A negative radius marks an unbounded light.
+	 */
+	_getLightBounds( index ) {
+
+		const data = textureLoad( this._lightsTexture, ivec2( int( index ), BOUNDS_ROW ) );
+
+		const center = this._cameraViewMatrix.mul( vec4( data.xyz, 1.0 ) ).xyz;
+		const radius = data.w;
+
+		return { center, radius };
+
+	}
+
+	/**
+	 * Sets up the default lights and the clustered point and spot lights.
 	 *
 	 * @param {NodeBuilder} builder - A reference to the current node builder.
 	 * @param {Array<LightingNode>} lightNodes - An array of lighting nodes.
 	 */
 	setupLights( builder, lightNodes ) {
 
-		this._updateProgram( builder.renderer );
+		this._initGrid( builder.renderer );
 
 		//
 
@@ -405,15 +583,20 @@ class ClusteredLightsNode extends LightsNode {
 
 				} );
 
-				const { color, decay, viewPosition, distance } = this._getLightData( lightIndex.sub( 1 ) );
+				const { color, decay, viewPosition, distance, spotDirection, spotOffset } = this._getLightData( lightIndex.sub( 1 ) );
 
 				const lightVector = viewPosition.sub( positionView );
 
-				// Early-out: skip full BRDF if fragment is beyond the light's cutoff
-				If( distance.equal( 0 ).or( dot( lightVector, lightVector ).lessThanEqual( distance.mul( distance ) ) ), () => {
+				// spot cone attenuation, always 1 for point lights
+				const spotAttenuation = smoothstep( 0, 1, dot( lightVector.normalize(), spotDirection ).sub( spotOffset ) ).toVar();
+
+				// Early-out: skip full BRDF if fragment is beyond the light's cutoff or outside the spot cone
+				const inRange = distance.equal( 0 ).or( dot( lightVector, lightVector ).lessThanEqual( distance.mul( distance ) ) );
+
+				If( inRange.and( spotAttenuation.greaterThan( 0 ) ), () => {
 
 					builder.lightsNode.setupDirectLight( builder, this, directPointLight( {
-						color,
+						color: color.mul( spotAttenuation ),
 						lightVector,
 						cutoffDistance: distance,
 						decayExponent: decay
@@ -443,8 +626,8 @@ class ClusteredLightsNode extends LightsNode {
 	}
 
 	/**
-	 * Sets the size of the cluster grid. Must be called with the new drawing buffer
-	 * size whenever the renderer is resized.
+	 * Sets the size of the cluster grid. Must be called outside of rendering. Not required
+	 * with {@link ClusteredLighting}, which fits the grid at the beginning of each render.
 	 *
 	 * @param {number} width - The drawing buffer width.
 	 * @param {number} height - The drawing buffer height.
@@ -452,112 +635,148 @@ class ClusteredLightsNode extends LightsNode {
 	 */
 	setSize( width, height ) {
 
-		width = this._getBufferFitSize( width );
-		height = this._getBufferFitSize( height );
-
-		if ( ! this._bufferSize || this._bufferSize.width !== width || this._bufferSize.height !== height ) {
-
-			const lightIndexes = this._lightIndexes;
-
-			this._create( width, height );
-
-			// dispose storage if light indices have changed
-
-			if ( lightIndexes !== null && lightIndexes !== this._lightIndexes ) lightIndexes.value.dispose();
-
-		}
+		this._resize( this._getBufferFitSize( width ), this._getBufferFitSize( height ) );
 
 		return this;
 
 	}
 
 	/**
-	 * Creates the cluster grid on first use and recreates it when the drawing buffer size changes.
-	 *
-	 * @private
-	 * @param {Renderer} renderer - The renderer.
+	 * Fits the cluster grid to the framebuffer of the render that is about to start. Called by
+	 * {@link ClusteredLighting} before the render objects of the render are prepared. Since each
+	 * render depth has its own node, no pending command buffer uses the resources of this node at
+	 * this point, so a rebuild can free the replaced resources immediately.
 	 */
-	_updateProgram( renderer ) {
+	updateSize() {
 
-		renderer.getDrawingBufferSize( _size );
-
-		const width = this._getBufferFitSize( _size.width );
-		const height = this._getBufferFitSize( _size.height );
-
-		if ( this._bufferSize === null ) {
-
-			this._create( width, height );
-
-		} else if ( this._bufferSize.width !== width || this._bufferSize.height !== height ) {
-
-			this._create( width, height );
-
-		}
+		if ( this._renderer !== null ) this._fitToRenderer( this._renderer );
 
 	}
 
 	/**
-	 * Creates the cluster grid, the light index storage and the compute node for the given size.
+	 * Creates the cluster grid on first use. While rendering, the grid is never rebuilt: the
+	 * replaced resources could still be used by a command buffer that was not submitted yet.
+	 *
+	 * @private
+	 * @param {Renderer} renderer - The renderer.
+	 */
+	_initGrid( renderer ) {
+
+		this._renderer = renderer;
+
+		if ( this._compute === null ) this._fitToRenderer( renderer );
+
+	}
+
+	/**
+	 * Fits the cluster grid to the framebuffer the renderer is rendering to.
+	 *
+	 * @private
+	 * @param {Renderer} renderer - The renderer.
+	 */
+	_fitToRenderer( renderer ) {
+
+		// the grid must match the framebuffer being rendered: a render target (e.g. a reflector
+		// with a resolution scale) can differ from the drawing buffer
+
+		const renderTarget = renderer.getRenderTarget();
+
+		if ( renderTarget !== null ) {
+
+			_size.set( renderTarget.width, renderTarget.height );
+
+		} else {
+
+			renderer.getDrawingBufferSize( _size );
+
+		}
+
+		// the compute differs per backend, so a backend change requires a rebuild
+
+		const isWebGLBackend = renderer.backend.isWebGLBackend === true;
+
+		if ( this._compute !== null && this._isWebGLBackend !== isWebGLBackend ) this._needsRebuild = true;
+
+		this._isWebGLBackend = isWebGLBackend;
+
+		this._resize( this._getBufferFitSize( _size.width ), this._getBufferFitSize( _size.height ) );
+
+	}
+
+	/**
+	 * Resizes the cluster grid. The grid dimensions are uniforms, so resizing only updates
+	 * them and the compute count; the compute and the storage are rebuilt only when the
+	 * storage has to grow (or the backend changed).
 	 *
 	 * @private
 	 * @param {number} width - The fitted width.
 	 * @param {number} height - The fitted height.
 	 */
-	_create( width, height ) {
+	_resize( width, height ) {
 
-		const { tileSize, zSlices, maxLightsPerCluster, _chunksPerCluster: chunksPerCluster } = this;
+		if ( this._needsRebuild === false && this._bufferSize !== null && this._bufferSize.width === width && this._bufferSize.height === height ) return;
 
-		const bufferSize = new Vector2( width, height );
+		const NX = Math.floor( width / this.tileSize );
+		const NY = Math.floor( height / this.tileSize );
+		const clusterCount = NX * NY * this.zSlices;
 
-		const NX = Math.floor( bufferSize.width / tileSize );
-		const NY = Math.floor( bufferSize.height / tileSize );
-		const NZ = zSlices;
-		const clusterCount = NX * NY * NZ;
+		const requiredElements = clusterCount * this._chunksPerCluster;
 
-		this._gridDimensions.value.set( NX, NY );
+		if ( this._needsRebuild === true || this._compute === null || this._lightIndexes.value.array.length / 4 < requiredElements ) {
 
-		// release the compute pipeline and bindings built for the previous grid
-
-		if ( this._compute !== null ) this._compute.dispose();
-
-		// Per-cluster light-index storage (ivec4 chunks).
-
-		const lightIndexesLength = clusterCount * chunksPerCluster * 4;
-
-		let lightIndexes = this._lightIndexes;
-
-		if ( lightIndexes === null || lightIndexes.value.array.length < lightIndexesLength ) {
-
-			const lightIndexesArray = new Int32Array( lightIndexesLength );
-			lightIndexes = attributeArray( lightIndexesArray, 'ivec4' ).setName( 'lightIndexes' );
+			this._create( clusterCount );
 
 		}
 
-		// compute-side accessors (use instanceIndex)
+		this._gridDimensions.value.set( NX, NY );
+		this._compute.count = clusterCount * this._invocationsPerCluster;
 
-		const getClusterChunk = ( chunkIdx ) => {
+		if ( this._bufferSize === null ) this._bufferSize = new Vector2();
 
-			const idx = instanceIndex.mul( int( chunksPerCluster ) ).add( int( chunkIdx ) );
+		this._bufferSize.set( width, height );
 
-			return lightIndexes.element( idx );
+	}
 
-		};
+	/**
+	 * Creates the light index storage, the compute node and the fragment cluster lookup.
+	 * The storage is allocated with headroom so that most resizes do not need a rebuild.
+	 *
+	 * @private
+	 * @param {number} clusterCount - The number of clusters of the current grid.
+	 */
+	_create( clusterCount ) {
 
-		const getClusterSlot = ( slotIdx ) => {
+		const { tileSize, zSlices, _chunksPerCluster: chunksPerCluster } = this;
 
-			slotIdx = int( slotIdx );
+		const NZ = zSlices;
 
-			const stride = int( 4 );
-			const chunkOffset = slotIdx.div( stride );
-			const idx = instanceIndex.mul( int( chunksPerCluster ) ).add( chunkOffset );
+		// grid dimensions as uniforms: shaders do not depend on the drawing buffer size
 
-			return lightIndexes.element( idx ).element( slotIdx.mod( stride ) );
+		const grid = this._gridDimensions;
+		const NX = int( grid.x );
+		const NY = int( grid.y );
 
-		};
+		// Per-cluster light-index storage (ivec4 chunks), grown geometrically.
 
-		// compute: one thread per cluster
+		const requiredElements = clusterCount * chunksPerCluster;
+		const previousElements = this._lightIndexes !== null ? this._lightIndexes.value.array.length / 4 : 0;
+		const elements = previousElements === 0 ? Math.ceil( requiredElements * 1.5 ) : Math.max( requiredElements, previousElements * 2 );
 
-		const compute = Fn( () => {
+		// rebuilds only happen outside of rendering (see _initGrid()), so the replaced resources can be freed
+
+		if ( this._compute !== null ) {
+
+			this._compute.dispose();
+			this._lightIndexes.value.dispose();
+
+		}
+
+		// instanced storage: WebGL computes use gl_InstanceID as instanceIndex; PBO: random access in the fragment stage
+		const lightIndexes = instancedArray( new Int32Array( elements * 4 ), 'ivec4' ).setPBO( true ).setName( 'lightIndexes' );
+
+		// view-space AABB of the given cluster
+
+		const getClusterBounds = ( clusterIndex ) => {
 
 			// view-space scale factors derived from the projection matrix:
 			//   view_x = ndc_x * (-view_z) / focal_x = ndc_x * (-view_z) * invFocalX
@@ -566,17 +785,17 @@ class ClusteredLightsNode extends LightsNode {
 			const invFocalX = float( 1 ).div( this._cameraProjectionMatrix.element( 0 ).element( 0 ) );
 			const invFocalY = float( 1 ).div( this._cameraProjectionMatrix.element( 1 ).element( 1 ) );
 
-			// 3D cluster coordinates from instanceIndex
-			const cx = instanceIndex.mod( NX );
-			const cy = instanceIndex.div( NX ).mod( NY );
-			const cz = instanceIndex.div( NX * NY );
+			// 3D cluster coordinates
+			const cx = clusterIndex.mod( NX );
+			const cy = clusterIndex.div( NX ).mod( NY );
+			const cz = clusterIndex.div( NX.mul( NY ) );
 
 			// NDC X/Y bounds of the cluster.
 			// Y is flipped: cy=0 is the top screen row (fragment y=0), which is NDC y=+1.
-			const ndcXmin = float( cx ).mul( 2.0 / NX ).sub( 1.0 );
-			const ndcXmax = float( cx.add( int( 1 ) ) ).mul( 2.0 / NX ).sub( 1.0 );
-			const ndcYmax = float( 1 ).sub( float( cy ).mul( 2.0 / NY ) );
-			const ndcYmin = float( 1 ).sub( float( cy.add( int( 1 ) ) ).mul( 2.0 / NY ) );
+			const ndcXmin = float( cx ).mul( 2.0 ).div( grid.x ).sub( 1.0 );
+			const ndcXmax = float( cx.add( int( 1 ) ) ).mul( 2.0 ).div( grid.x ).sub( 1.0 );
+			const ndcYmax = float( 1 ).sub( float( cy ).mul( 2.0 ).div( grid.y ) );
+			const ndcYmin = float( 1 ).sub( float( cy.add( int( 1 ) ) ).mul( 2.0 ).div( grid.y ) );
 
 			// View-space Z bounds (negative, exponential slicing)
 			const farOverNear = this._cameraFar.div( this._cameraNear );
@@ -607,13 +826,43 @@ class ClusteredLightsNode extends LightsNode {
 			const aabbMin = vec3( aabbMinX, aabbMinY, zFarCluster );
 			const aabbMax = vec3( aabbMaxX, aabbMaxY, zNearCluster );
 
-			// clear stale data from previous frame
-			Loop( chunksPerCluster, ( { i } ) => {
+			return { cz, aabbMin, aabbMax };
 
-				getClusterChunk( i ).assign( ivec4( 0 ) );
+		};
 
-			} );
+		// sphere-AABB intersection in view space
 
+		const intersectsCluster = ( lightIdx, aabbMin, aabbMax ) => {
+
+			const { center, radius } = this._getLightBounds( lightIdx );
+
+			const closest = max( aabbMin, min( center, aabbMax ) );
+			const diff = center.sub( closest );
+			const distSq = dot( diff, diff );
+
+			return radius.lessThan( 0 ).or( distSq.lessThanEqual( radius.mul( radius ) ) );
+
+		};
+
+		// Each invocation fills `chunksPerInvocation` ivec4 chunks of one cluster. WebGL computes
+		// run via transform feedback and can only write their own element, so there each
+		// invocation fills a single chunk; WebGPU uses one invocation per cluster.
+
+		const chunksPerInvocation = this._isWebGLBackend ? 1 : chunksPerCluster;
+		const invocationsPerCluster = chunksPerCluster / chunksPerInvocation;
+
+		this._invocationsPerCluster = invocationsPerCluster;
+
+		const compute = Fn( () => {
+
+			const clusterIndex = int( instanceIndex.div( invocationsPerCluster ) );
+			const firstChunk = int( instanceIndex.mod( invocationsPerCluster ) ).mul( chunksPerInvocation );
+			const firstSlot = firstChunk.mul( 4 );
+			const lastSlot = firstSlot.add( chunksPerInvocation * 4 );
+
+			const { cz, aabbMin, aabbMax } = getClusterBounds( clusterIndex );
+
+			const chunks = ivec4( 0 ).toArray( chunksPerInvocation ).toVar();
 			const index = int( 0 ).toVar();
 
 			// Z-culling: only test lights that can reach this cluster's Z-slice
@@ -625,30 +874,56 @@ class ClusteredLightsNode extends LightsNode {
 
 				const lightIdx = rangeStart.add( i );
 
-				If( index.greaterThanEqual( int( maxLightsPerCluster ) ).or( lightIdx.greaterThanEqual( rangeEnd ) ), () => {
+				If( index.greaterThanEqual( lastSlot ).or( lightIdx.greaterThanEqual( rangeEnd ) ), () => {
 
-					Return();
+					Break();
 
 				} );
 
-				const { viewPosition, distance } = this._getLightData( lightIdx );
+				If( intersectsCluster( lightIdx, aabbMin, aabbMax ), () => {
 
-				// sphere-AABB intersection in view space
-				const pos = viewPosition.xyz;
-				const closest = max( aabbMin, min( pos, aabbMax ) );
-				const diff = pos.sub( closest );
-				const distSq = dot( diff, diff );
+					// slots before firstSlot belong to other invocations of this cluster
+					If( index.greaterThanEqual( firstSlot ), () => {
 
-				If( distSq.lessThanEqual( distance.mul( distance ) ), () => {
+						const slot = index.sub( firstSlot );
 
-					getClusterSlot( index ).assign( lightIdx.add( int( 1 ) ) );
+						chunks.element( slot.div( 4 ) ).element( slot.mod( 4 ) ).assign( lightIdx.add( int( 1 ) ) );
+
+					} );
+
 					index.addAssign( int( 1 ) );
 
 				} );
 
 			} );
 
-		} )().compute( clusterCount ).setName( 'Update Clustered Lights' );
+			const firstElement = clusterIndex.mul( chunksPerCluster ).add( firstChunk );
+
+			const writeChunks = () => {
+
+				Loop( chunksPerInvocation, ( { i } ) => {
+
+					lightIndexes.element( firstElement.add( i ) ).assign( chunks.element( i ) );
+
+				} );
+
+			};
+
+			if ( this._isWebGLBackend === true ) {
+
+				// WebGL binds the transform feedback buffers per compute program, and programs are shared by
+				// identical code. The (always true) capacity and node id constants give each node and storage
+				// allocation its own program, so a compute never writes to the storage of another one.
+
+				If( firstElement.lessThan( int( elements ) ).and( int( this.id ).notEqual( int( - 1 ) ) ), writeChunks );
+
+			} else {
+
+				writeChunks();
+
+			}
+
+		} )().compute( clusterCount * invocationsPerCluster ).setName( 'Update Clustered Lights' );
 
 		// shading-side: fragment → cluster index
 
@@ -665,8 +940,8 @@ class ClusteredLightsNode extends LightsNode {
 			const zSlice = clamp( sliceFloat.floor(), float( 0 ), float( NZ - 1 ) );
 
 			return int( screenTile.x )
-				.add( int( screenTile.y ).mul( int( NX ) ) )
-				.add( int( zSlice ).mul( int( NX * NY ) ) );
+				.add( int( screenTile.y ).mul( NX ) )
+				.add( int( zSlice ).mul( NX.mul( NY ) ) );
 
 		} );
 
@@ -674,10 +949,10 @@ class ClusteredLightsNode extends LightsNode {
 
 		// assigns
 
-		this._bufferSize = bufferSize;
 		this._lightIndexes = lightIndexes;
 		this._screenClusterIndex = screenClusterIndex;
 		this._compute = compute;
+		this._needsRebuild = false;
 
 	}
 
@@ -705,7 +980,7 @@ export default ClusteredLightsNode;
  *
  * @tsl
  * @function
- * @param {number} [maxLights=1024] - Maximum number of point lights.
+ * @param {number} [maxLights=1024] - Maximum number of point and spot lights.
  * @param {number} [tileSize=32] - Screen tile size in pixels.
  * @param {number} [zSlices=24] - Depth slice count.
  * @param {number} [maxLightsPerCluster=64] - Per-cluster light-list capacity.

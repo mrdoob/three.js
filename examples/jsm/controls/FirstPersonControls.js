@@ -123,7 +123,7 @@ class FirstPersonControls extends Controls {
 		 * How far you can vertically look around, upper limit. Range is `0` to `Math.PI` in radians.
 		 *
 		 * @type {number}
-		 * @default 0
+		 * @default Math.PI
 		 */
 		this.verticalMax = Math.PI;
 

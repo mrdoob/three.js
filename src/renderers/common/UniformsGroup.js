@@ -261,6 +261,25 @@ class UniformsGroup extends UniformBuffer {
 	}
 
 	/**
+	 * Returns a clone of this uniforms group. The clone has its own buffer and update state.
+	 *
+	 * @return {UniformsGroup} The cloned uniforms group.
+	 */
+	clone() {
+
+		const clone = super.clone();
+
+		clone._buffer = null;
+		clone._values = null;
+		clone._updateRanges = [];
+		clone._updateRangeCache = new Map();
+		clone._addedIndices = new Set();
+
+		return clone;
+
+	}
+
+	/**
 	 * Updates a given uniform by calling an update method matching
 	 * the uniforms type.
 	 *

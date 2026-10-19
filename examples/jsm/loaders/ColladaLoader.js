@@ -120,6 +120,8 @@ class ColladaLoader extends Loader {
 			tgaLoader.setPriority( this.priority );
 			tgaLoader.setCache( this.cache );
 			tgaLoader.setPath( this.resourcePath || path );
+			tgaLoader.setRequestHeader( this.requestHeader );
+			tgaLoader.setWithCredentials( this.withCredentials );
 
 		}
 

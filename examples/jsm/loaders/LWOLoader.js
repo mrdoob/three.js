@@ -89,6 +89,8 @@ class LWOLoader extends Loader {
 		const loader = new FileLoader( this.manager );
 		loader.setPriority( this.priority );
 		loader.setCache( this.cache );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 
