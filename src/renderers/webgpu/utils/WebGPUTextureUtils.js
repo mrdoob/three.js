@@ -1490,9 +1490,7 @@ export function getFormat( texture, device ) {
 
 	}
 
-	// compressed textures with RGBAFormat hold uncompressed data so their format depends on the type
-
-	if ( ( texture.isCompressedTexture === true || texture.isCompressedArrayTexture === true ) && format !== RGBAFormat ) {
+	if ( texture.isCompressedTexture === true || texture.isCompressedArrayTexture === true ) {
 
 		switch ( format ) {
 
@@ -1616,6 +1614,20 @@ export function getFormat( texture, device ) {
 
 			case RGBA_ASTC_12x12_Format:
 				formatGPU = ( transfer === SRGBTransfer ) ? GPUTextureFormat.ASTC12x12UnormSRGB : GPUTextureFormat.ASTC12x12Unorm;
+				break;
+
+			case RGBAFormat:
+
+				if ( type === HalfFloatType ) {
+
+					formatGPU = GPUTextureFormat.RGBA16Float;
+
+				} else {
+
+					formatGPU = ( transfer === SRGBTransfer ) ? GPUTextureFormat.RGBA8UnormSRGB : GPUTextureFormat.RGBA8Unorm;
+
+				}
+
 				break;
 
 			default:
