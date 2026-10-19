@@ -521,7 +521,7 @@ function packCharts( charts, settings ) {
 		density = low;
 		if ( ! boxes ) {
 
-			console.warn( 'THREE.unwrapUVs(): Charts do not fit the atlas. Increase the resolution, reduce the padding or partition the hierarchy.' );
+			console.error( 'THREE.unwrapUVs(): Charts do not fit the atlas. Increase the resolution, reduce the padding or partition the hierarchy.' );
 			return null;
 
 		}

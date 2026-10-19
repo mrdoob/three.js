@@ -12,6 +12,8 @@
 			#atlas-preview { position: absolute; bottom: 20px; left: 20px; pointer-events: none; }
 			#status { position: absolute; bottom: 272px; left: 20px; pointer-events: none; color: #e0e0e0; text-shadow: 1px 1px 5px rgba(0, 0, 0, .7); font: 400 12px/20px 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; white-space: pre-wrap; }
 			#atlas { display: block; width: 240px; height: 240px; background: #080c12; }
+			#status { max-width: min( 680px, 75vw ); max-height: 40vh; overflow: auto; pointer-events: auto; }
+			#status.error { color: #ff6060; background: #230909e6; padding: 10px; }
 		</style>
 	</head>
 	<body>
@@ -48,6 +50,8 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+			import { analyzeUVUnwrap } from 'three/addons/utils/UVUnwrapDiagnostics.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 			import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
 
@@ -108,11 +112,24 @@
 				model: 'DamagedHelmet/glTF/DamagedHelmet.gltf', mode: 'lightmap', resolution: 2048, useInputUVs: false,
 				view: 'checker', referenceDensity: 0
 			};
+			const query = new URLSearchParams( location.search );
+			if ( query.has( 'model' ) ) params.model = query.get( 'model' );
+			if ( query.get( 'mode' ) === 'normal' ) params.mode = 'normal';
+			if ( [ '1024', '2048', '4096' ].includes( query.get( 'resolution' ) ) ) params.resolution = Number( query.get( 'resolution' ) );
+			params.useInputUVs = query.get( 'authored' ) === 'true';
 			const gui = renderer.inspector.createParameters( 'UV unwrap' );
 			gui.add( params, 'model', {
 				'Damaged Helmet': 'DamagedHelmet/glTF/DamagedHelmet.gltf',
 				'Soldier': 'Soldier.glb', 'Xbot': 'Xbot.glb', 'Lee Perry Smith': 'LeePerrySmith/LeePerrySmith.glb',
-				'Space ship hallway': 'space_ship_hallway.glb'
+				'Space ship hallway': 'space_ship_hallway.glb',
+				'Walt head (OBJ)': '../obj/walt/WaltHead.obj',
+				'Ninja head (OBJ)': '../obj/ninja/ninjaHead_Low.obj',
+				'Male (OBJ)': '../obj/male02/male02.obj',
+				'Female (OBJ)': '../obj/female02/female02.obj',
+				'Cerberus (OBJ)': '../obj/cerberus/Cerberus.obj',
+				'Duck': 'duck.glb', 'Horse': 'Horse.glb', 'Flamingo': 'Flamingo.glb',
+				'Parrot': 'Parrot.glb', 'Robot expressive': 'RobotExpressive/RobotExpressive.glb',
+				'Torus knot (regression)': 'torus-knot', 'Tube (regression)': 'tube'
 			} ).name( 'Model' ).listen().onChange( value => loadModel( value ).catch( reportError ) );
 			gui.add( params, 'view', { 'UV grid': 'checker', 'UV islands': 'islands', 'Texel density': 'density', 'Original materials': 'original' } ).name( 'View' ).onChange( updateMaterials );
 			const inputs = gui.addFolder( 'Unwrap Input' );
@@ -122,7 +139,8 @@
 			inputs.add( params, 'referenceDensity' ).name( 'Target texels / unit' ).info( '0 uses the fitted atlas density. Both principal directions are compared with this target.' ).onChange( updateMaterials );
 			const draco = new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' );
 			const loader = new GLTFLoader().setDRACOLoader( draco );
-			let root, originals = [], result, loadId = 0;
+			const objLoader = new OBJLoader();
+			let root, originals = [], result, loadId = 0, unsupported = 0;
 
 			function updateMaterials() {
 
@@ -135,6 +153,7 @@
 
 				if ( ! root ) return;
 				status.textContent = 'Unwrapping…';
+				status.classList.remove( 'error' );
 				for ( const item of originals ) {
 
 					if ( item.mesh.geometry !== item.geometry ) item.mesh.geometry.dispose();
@@ -150,12 +169,24 @@
 						useInputUVs: params.useInputUVs,
 						resolution: Number( params.resolution )
 					} );
-					if ( ! result ) throw new Error( 'Charts do not fit in the atlas.' );
+					if ( ! result ) throw new Error( 'Unwrap failed: atlas capacity or Float32 precision. Try a larger atlas or partition the model. See console for details.' );
 					atlasSize.value = result.resolution;
 					const elapsed = performance.now() - start;
+					const analysisStart = performance.now();
+					const analysis = analyzeUVUnwrap( result, { maxStretch: params.mode === 'lightmap' ? 1.501 : 2.001 } );
+					if ( unsupported > 0 ) {
+
+						analysis.passed = false;
+						analysis.issues.push( { message: `${ unsupported } instanced/batched meshes skipped: unwrap each instance as a regular mesh first.` } );
+
+					}
+
+					const analysisElapsed = performance.now() - analysisStart;
 					const triangles = result.meshes.reduce( ( sum, record ) => sum + record.faceCharts.length, 0 );
 					const ignored = result.meshes.reduce( ( sum, record ) => sum + record.faceCharts.reduce( ( count, chart ) => count + ( chart === - 1 ? 1 : 0 ), 0 ), 0 );
 					status.textContent = `${ triangles.toLocaleString() } triangles / ${ result.charts.length } charts\n${ elapsed.toFixed( 1 ) } ms\n${ result.texelsPerUnit.toFixed( 2 ) } texels/world unit\n${ ignored } ignored triangles`;
+					status.classList.toggle( 'error', ! analysis.passed );
+					status.textContent += `\n${ analysis.passed ? 'PASS' : 'FAIL / quality warning' } (${ analysisElapsed.toFixed( 1 ) } ms analysis)\n${ analysis.issues.map( issue => issue.message ).join( '\n' ) }`;
 					drawAtlas();
 					updateMaterials();
 
@@ -226,7 +257,18 @@
 				params.model = name;
 				const id = ++ loadId;
 				status.textContent = 'Loading model…';
-				const loaded = ( await loader.loadAsync( `models/gltf/${ name }` ) ).scene;
+				status.classList.remove( 'error' );
+				let loaded;
+				if ( name === 'torus-knot' || name === 'tube' ) {
+
+					const curve = new THREE.CatmullRomCurve3( [ new THREE.Vector3( - 2, 0, 0 ), new THREE.Vector3( - 1, 1, 0 ), new THREE.Vector3( 1, - 1, 1 ), new THREE.Vector3( 2, 0, 0 ) ] );
+					loaded = new THREE.Mesh( name === 'tube' ? new THREE.TubeGeometry( curve, 64, 0.3, 12 ) : new THREE.TorusKnotGeometry( 1, 0.3, 128, 16 ), new THREE.MeshStandardMaterial() );
+
+				} else {
+
+					loaded = name.endsWith( '.obj' ) ? await objLoader.loadAsync( `models/gltf/${ name }` ) : ( await loader.loadAsync( `models/gltf/${ name }` ) ).scene;
+
+				}
 
 				if ( id !== loadId ) {
 
@@ -251,9 +293,11 @@
 
 				root = loaded;
 				originals = [];
+				unsupported = 0;
 				root.traverse( mesh => {
 
-					if ( mesh.isMesh ) originals.push( { mesh, geometry: mesh.geometry, material: mesh.material } );
+					if ( mesh.isInstancedMesh || mesh.isBatchedMesh ) unsupported ++;
+					if ( mesh.isMesh && ! mesh.isInstancedMesh && ! mesh.isBatchedMesh ) originals.push( { mesh, geometry: mesh.geometry, material: mesh.material } );
 
 				} );
 				scene.add( root );
@@ -289,6 +333,7 @@
 
 			function reportError( error ) {
 
+				status.classList.add( 'error' );
 				status.textContent = error.message;
 				console.error( error );
 
