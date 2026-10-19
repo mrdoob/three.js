@@ -139,6 +139,17 @@ line.geometry.computeBoundingSphere();
             <p>
               [link:https://jsfiddle.net/t4m85pLr/1/ Here is a fiddle] showing an animated line which you can adapt to your use case.
             </p>
+            <p>
+              If an update exceeds the pre-allocated buffer capacity, create a new geometry instead of
+              replacing attributes with larger buffers on a geometry that has already been rendered.
+              Dispose of the old geometry when it is no longer used to release its GPU resources.
+              For example, if `newPoints` is an array of `Vector3` values for a larger line:
+            </p>
+<pre class="prettyprint notranslate lang-js" translate="no">
+const newGeometry = new THREE.BufferGeometry().setFromPoints( newPoints );
+line.geometry.dispose();
+line.geometry = newGeometry;
+</pre>
       
             <h3 id="buffergeometry-examples">Examples</h3>
       
