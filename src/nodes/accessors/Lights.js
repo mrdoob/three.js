@@ -1,7 +1,7 @@
 import { uniform } from '../core/UniformNode.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import { Vector3 } from '../../math/Vector3.js';
-import { Fn, vec4 } from '../tsl/TSLBase.js';
+import { vec4 } from '../tsl/TSLBase.js';
 import { cameraViewMatrix } from './Camera.js';
 import { positionWorld } from './Position.js';
 
@@ -118,26 +118,7 @@ export function lightViewPosition( light ) {
 
 	const data = getLightData( light );
 
-	return data.viewPosition || ( data.viewPosition = ( Fn( ( { camera } ) => {
-
-		// Each sub-camera of an array camera has its own view space.
-
-		if ( camera.isArrayCamera && camera.cameras.length > 0 ) {
-
-			return cameraViewMatrix.mul( vec4( lightPosition( light ), 1 ) ).xyz;
-
-		}
-
-		return data.viewPositionUniform || ( data.viewPositionUniform = uniform( new Vector3() ).setGroup( renderGroup ).onRenderUpdate( ( { camera }, self ) => {
-
-			self.value = self.value || new Vector3();
-			self.value.setFromMatrixPosition( light.matrixWorld );
-
-			self.value.applyMatrix4( camera.matrixWorldInverse );
-
-		} ) );
-
-	} ).once() )() );
+	return data.viewPosition || ( data.viewPosition = cameraViewMatrix.mul( vec4( lightPosition( light ), 1 ) ).xyz );
 
 }
 
