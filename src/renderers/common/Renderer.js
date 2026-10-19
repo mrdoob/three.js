@@ -1622,7 +1622,43 @@ class Renderer {
 	 */
 	_bundleNeedsUpdate( bundleGroup, renderBundleData ) {
 
-		return renderBundleData.bundleGPU === undefined || bundleGroup.version !== renderBundleData.version;
+		if ( renderBundleData.bundleGPU === undefined || bundleGroup.version !== renderBundleData.version ) return true;
+
+		// the recorded bundle references the buffers of its attributes. they are only verified after a disposal
+
+		const attributes = this._attributes;
+
+		if ( renderBundleData.attributesDisposeVersion !== attributes.disposeVersion ) {
+
+			renderBundleData.attributesDisposeVersion = attributes.disposeVersion;
+
+			for ( const renderObject of renderBundleData.renderObjects ) {
+
+				const index = renderObject.getIndex();
+
+				let disposed = index !== null && attributes.has( index ) === false;
+
+				for ( const vertexBuffer of renderObject.getVertexBuffers() ) {
+
+					if ( attributes.has( vertexBuffer ) === false ) disposed = true;
+
+				}
+
+				if ( disposed ) {
+
+					// invalidate the recorded version so the bundle is recorded again
+
+					renderBundleData.version = null;
+
+					return true;
+
+				}
+
+			}
+
+		}
+
+		return false;
 
 	}
 
