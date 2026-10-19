@@ -176,7 +176,7 @@
 					} );
 					const elapsed = performance.now() - start;
 					summary = `${ triangles.toLocaleString() } triangles / ${ result ? result.charts.length : '–' } charts\n${ elapsed.toFixed( 1 ) } ms\n${ result ? result.texelsPerUnit.toFixed( 2 ) : '–' } texels/world unit`;
-					if ( ! result ) throw new Error( 'Unwrap failed: atlas capacity or Float32 precision. Try a larger atlas or partition the model. See console for details.' );
+					if ( ! result ) throw new Error( 'Unwrap failed: the charts do not fit the atlas. Try a larger atlas or partition the model.' );
 					atlasSize.value = result.resolution;
 					const { excludedFaces, tinyFaces, singleTriangleCharts } = result.warnings;
 					const warnings = [];

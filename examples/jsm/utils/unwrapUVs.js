@@ -21,8 +21,9 @@ import { potpack } from '../libs/potpack.module.js';
  * @param {boolean} [options.useInputUVs=false] - Preserve valid authored UV charts before trying LSCM.
  * @return {?Object} Atlas size, density, chart bounds, mesh vertex/face mappings and warning
  * counts (excluded faces, tiny faces under 0.01 atlas pixels squared and single-triangle
- * charts, which signal fragmentation), or null if the
- * charts do not fit or fail Float32 validation. Meshes are left unchanged in that case.
+ * charts, which signal fragmentation), or null if the charts do not fit. Meshes are left
+ * unchanged in that case. Charts that fail Float32 validation are split and repacked;
+ * single faces that still fail are excluded.
  */
 function unwrapUVs( root, options = {} ) {
 
@@ -62,14 +63,31 @@ function unwrapUVs( root, options = {} ) {
 
 	}
 
-	const density = packCharts( charts, settings );
-	if ( density === null ) return null;
+	let density;
+	for ( ; ; ) {
 
-	for ( let i = charts.length - 1; i >= 0; i -- ) {
+		density = packCharts( charts, settings );
+		if ( density === null ) return null;
 
-		const valid = validateFloat32Chart( charts[ i ], settings, density );
-		if ( valid === null ) return null;
-		if ( ! valid ) charts.splice( i, 1 );
+		const failed = [];
+		for ( let i = charts.length - 1; i >= 0; i -- ) {
+
+			const valid = validateFloat32Chart( charts[ i ], settings, density );
+			if ( valid === true ) continue;
+			const [ chart ] = charts.splice( i, 1 );
+			if ( valid === null ) failed.push( chart );
+
+		}
+
+		if ( failed.length === 0 ) break;
+
+		// Float32 rounding broke these charts at this density; split them and repack.
+		for ( const chart of failed ) {
+
+			if ( chart.faces.length === 1 ) chart.record.faces[ chart.faces[ 0 ] ].ignored = true;
+			else splitFaces( chart.record, chart.faces, settings, charts );
+
+		}
 
 	}
 
@@ -296,13 +314,7 @@ function parameterize( record, faces, settings, charts ) {
 
 		}
 
-		const half = Math.floor( faces.length / 2 );
-		for ( const subset of [ faces.slice( 0, half ), faces.slice( half ) ] ) {
-
-			for ( const component of connectedComponents( record, subset ) ) parameterize( record, component, settings, charts );
-
-		}
-
+		splitFaces( record, faces, settings, charts );
 		return;
 
 	}
@@ -328,6 +340,17 @@ function parameterize( record, faces, settings, charts ) {
 		width: bounds.max.x - bounds.min.x, height: bounds.max.y - bounds.min.y,
 		positions, triangles
 	} );
+
+}
+
+function splitFaces( record, faces, settings, charts ) {
+
+	const half = Math.floor( faces.length / 2 );
+	for ( const subset of [ faces.slice( 0, half ), faces.slice( half ) ] ) {
+
+		for ( const component of connectedComponents( record, subset ) ) parameterize( record, component, settings, charts );
+
+	}
 
 }
 
@@ -620,14 +643,7 @@ function validateFloat32Chart( chart, settings, density ) {
 
 	}
 
-	if ( ! quality ) {
-
-		console.error( `THREE.unwrapUVs(): Float32 precision is insufficient for mesh "${ chart.record.mesh.name }". Atlas generation failed.` );
-		return null;
-
-	}
-
-	return true;
+	return quality ? true : null;
 
 }
 
