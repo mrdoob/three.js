@@ -131,7 +131,9 @@
 				'Cerberus (OBJ)': '../obj/cerberus/Cerberus.obj',
 				'Duck': 'duck.glb', 'Horse': 'Horse.glb', 'Flamingo': 'Flamingo.glb',
 				'Parrot': 'Parrot.glb', 'Robot expressive': 'RobotExpressive/RobotExpressive.glb',
-				'Torus knot (regression)': 'torus-knot', 'Tube (regression)': 'tube'
+				'Nefertiti': 'Nefertiti/Nefertiti.glb', 'Ferrari': 'ferrari.glb', 'Rolex': 'rolex.glb',
+				'Sheen chair': 'SheenChair.glb', 'Steampunk camera': 'steampunk_camera.glb',
+				'Torus knot': 'torus-knot', 'Tube': 'tube'
 			} ).name( 'Model' ).listen().onChange( value => loadModel( value ).catch( reportError ) );
 			gui.add( params, 'view', { 'UV grid': 'checker', 'UV islands': 'islands', 'Texel density': 'density', 'Original materials': 'original' } ).name( 'View' ).onChange( updateMaterials );
 			const inputs = gui.addFolder( 'Unwrap Input' );
