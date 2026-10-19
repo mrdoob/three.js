@@ -1707,6 +1707,8 @@ class WebGLRenderer {
 
 			renderListStack.push( currentRenderList );
 
+			this.info.render.frame ++;
+
 			if ( xr.enabled === true && xr.isPresenting === true ) {
 
 				const depthSensingMesh = _this.xr.getDepthSensingMesh();
@@ -1738,8 +1740,6 @@ class WebGLRenderer {
 			}
 
 			//
-
-			this.info.render.frame ++;
 
 			if ( this.info.autoReset === true ) this.info.reset();
 
