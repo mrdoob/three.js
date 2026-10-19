@@ -2,6 +2,8 @@ import AnalyticLightNode from './AnalyticLightNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { lightViewPosition } from '../accessors/Lights.js';
+import { cameraViewMatrix } from '../accessors/Camera.js';
+import { vec4 } from '../tsl/TSLBase.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 
 import { Matrix4 } from '../../math/Matrix4.js';
@@ -75,7 +77,7 @@ class RectAreaLightNode extends AnalyticLightNode {
 
 		_matrix42.identity();
 		_matrix41.copy( light.matrixWorld );
-		_matrix41.premultiply( viewMatrix );
+		if ( frame.camera.isArrayCamera !== true ) _matrix41.premultiply( viewMatrix );
 		_matrix42.extractRotation( _matrix41 );
 
 		this.halfWidth.value.set( light.width * 0.5, 0.0, 0.0 );
@@ -106,11 +108,17 @@ class RectAreaLightNode extends AnalyticLightNode {
 
 		const lightPosition = lightViewPosition( light );
 
+		// ArrayCamera uniforms are shared by all faces. Rotate world-space axes
+		// with the active sub-camera in the shader, preserving their lengths.
+		const isArrayCamera = builder.camera.isArrayCamera === true;
+		const halfWidth = isArrayCamera ? cameraViewMatrix.mul( vec4( this.halfWidth, 0 ) ).xyz : this.halfWidth;
+		const halfHeight = isArrayCamera ? cameraViewMatrix.mul( vec4( this.halfHeight, 0 ) ).xyz : this.halfHeight;
+
 		return {
 			lightColor: colorNode,
 			lightPosition,
-			halfWidth: this.halfWidth,
-			halfHeight: this.halfHeight,
+			halfWidth,
+			halfHeight,
 			ltc_1,
 			ltc_2
 		};
