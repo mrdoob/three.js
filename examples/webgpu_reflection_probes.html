@@ -32,7 +32,7 @@
 			import { reflectionProbes } from 'three/addons/tsl/lighting/ReflectionProbesNode.js';
 			import { ReflectionProbesHelper } from 'three/addons/helpers/ReflectionProbesHelper.js';
 
-			const params = { showProbes: false, dynamicObject: 'Bunny', pause: false, showGrid: false, gridResolution: 6, gridSize: 0.12, resolution: 128, boxProjection: true, capture: capture };
+			const params = { showProbes: false, dynamicObject: 'Bunny', pause: false, showGrid: false, gridResolution: 6, gridSize: 0.12, resolution: 256, boxProjection: true, capture: capture };
 			const grid = new THREE.Group();
 			const timer = new THREE.Timer();
 			let camera, scene, renderer, controls, probes, probesHelper, gridMaterial, dynamicObject;
@@ -327,7 +327,7 @@
 				scene.environmentNode = reflectionProbes( probes );
 
 				const gui = renderer.inspector.createParameters( 'Reflection Probes' );
-				gui.add( params, 'resolution', [ 64, 128, 256, 512, 1024 ] ).name( 'Capture Resolution' );
+				gui.add( params, 'resolution', [ 256, 512, 1024 ] ).name( 'Capture Resolution' );
 				gui.add( params, 'capture' ).name( 'Capture' );
 				gui.add( params, 'boxProjection' ).name( 'Box Projection' ).onChange( ( value ) => probes.boxProjection = value );
 
