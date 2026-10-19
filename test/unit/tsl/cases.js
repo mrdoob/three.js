@@ -275,6 +275,43 @@ export const cases = {
 
 	},
 
+	// An external variable used by two outputs, each in a branch on the same condition, e.g. `room` in the city generator.
+	'external variable in branches of the same condition': () => {
+
+		const march = Fn( ( [ scale ] ) => {
+
+			const sum = float( 0 ).toVar();
+
+			Loop( 4, ( { i } ) => {
+
+				sum.addAssign( scale.mul( float( i ) ) );
+
+			} );
+
+			return vec4( sum );
+
+		} );
+
+		const room = select( uv().x.greaterThan( 0.5 ), march( 1 ), march( 2 ) ).toVar( 'room' );
+		const isGlazing = uniform( 1 ).greaterThan( 0.5 );
+
+		const colorNode = select( isGlazing, room.xyz, vec3( 0 ) );
+		const emissiveNode = select( isGlazing, room.xyz.mul( room.w ), vec3( 0 ) );
+
+		return Fn( () => {
+
+			const diffuse = vec3( 1 ).toVar( 'diffuse' );
+			diffuse.assign( colorNode );
+
+			const emissive = vec3( 0 ).toVar( 'emissive' );
+			emissive.assign( emissiveNode );
+
+			return diffuse.add( emissive );
+
+		} )();
+
+	},
+
 	'assignable scope': () => Fn( () => {
 
 		const explicit = float( 1 ).toVar( 'explicitGlobal' );

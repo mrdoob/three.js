@@ -394,6 +394,75 @@ if ( ( object.nodeUniform0 > 0.5 ) ) {
 
 result
 
+// external variable in branches of the same condition
+
+var diffuse : vec3<f32>;
+var nodeVar0 : vec4<f32>;
+var nodeVar1 : f32;
+var nodeVar2 : f32;
+var room : vec4<f32>;
+var nodeVar3 : vec3<f32>;
+var emissive : vec3<f32>;
+var nodeVar4 : vec3<f32>;
+
+diffuse = vec3<f32>( 1.0, 1.0, 1.0 );
+
+if ( ( nodeVarying0.x > 0.5 ) ) {
+
+	nodeVar1 = 0.0;
+
+	for ( var i : i32 = 0; i < 4; i ++ ) {
+
+		nodeVar1 = ( nodeVar1 + ( 1.0 * f32( i ) ) );
+
+	}
+
+	nodeVar0 = vec4<f32>( nodeVar1 );
+
+} else {
+
+	nodeVar2 = 0.0;
+
+	for ( var i : i32 = 0; i < 4; i ++ ) {
+
+		nodeVar2 = ( nodeVar2 + ( 2.0 * f32( i ) ) );
+
+	}
+
+	nodeVar0 = vec4<f32>( nodeVar2 );
+
+}
+
+room = nodeVar0;
+let nodeConst0 = ( object.nodeUniform0 > 0.5 );
+
+if ( nodeConst0 ) {
+
+	nodeVar3 = room.xyz;
+
+} else {
+
+	nodeVar3 = vec3<f32>( 0.0, 0.0, 0.0 );
+
+}
+
+diffuse = nodeVar3;
+emissive = vec3<f32>( 0.0, 0.0, 0.0 );
+
+if ( nodeConst0 ) {
+
+	nodeVar4 = ( room.xyz * vec3<f32>( room.w ) );
+
+} else {
+
+	nodeVar4 = vec3<f32>( 0.0, 0.0, 0.0 );
+
+}
+
+emissive = nodeVar4;
+
+( diffuse + emissive )
+
 // assignable scope
 
 var explicitGlobal : f32;

@@ -375,6 +375,74 @@ if ( ( nodeUniform0 > 0.5 ) ) {
 
 result
 
+// external variable in branches of the same condition
+
+vec3 diffuse;
+vec4 nodeVar0;
+float nodeVar1;
+float nodeVar2;
+vec4 room;
+vec3 nodeVar3;
+vec3 emissive;
+vec3 nodeVar4;
+diffuse = vec3( 1.0, 1.0, 1.0 );
+
+if ( ( nodeVarying0.x > 0.5 ) ) {
+
+	nodeVar1 = 0.0;
+
+	for ( int i = 0; i < 4; i ++ ) {
+
+		nodeVar1 = ( nodeVar1 + ( 1.0 * float( i ) ) );
+
+	}
+
+	nodeVar0 = vec4( nodeVar1 );
+
+} else {
+
+	nodeVar2 = 0.0;
+
+	for ( int i = 0; i < 4; i ++ ) {
+
+		nodeVar2 = ( nodeVar2 + ( 2.0 * float( i ) ) );
+
+	}
+
+	nodeVar0 = vec4( nodeVar2 );
+
+}
+
+room = nodeVar0;
+bool nodeConst0 = ( nodeUniform0 > 0.5 );
+
+if ( nodeConst0 ) {
+
+	nodeVar3 = room.xyz;
+
+} else {
+
+	nodeVar3 = vec3( 0.0, 0.0, 0.0 );
+
+}
+
+diffuse = nodeVar3;
+emissive = vec3( 0.0, 0.0, 0.0 );
+
+if ( nodeConst0 ) {
+
+	nodeVar4 = ( room.xyz * vec3( room.w ) );
+
+} else {
+
+	nodeVar4 = vec3( 0.0, 0.0, 0.0 );
+
+}
+
+emissive = nodeVar4;
+
+( diffuse + emissive )
+
 // assignable scope
 
 float explicitGlobal;
