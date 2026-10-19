@@ -3,6 +3,9 @@ import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import puppeteer from 'puppeteer';
 
+// Usage: node test/benchmarks/unwrap-models.js <checkout> <output.json> [runs=3] [comma-separated models]
+// Measures synchronous CPU unwrapping, not renderer frame time. Run revisions
+// sequentially on an idle machine; loading, warm-up and diagnostics are not timed.
 const root = path.resolve( process.argv[ 2 ] || '.' );
 const output = process.argv[ 3 ] || 'unwrap-models.json';
 const repetitions = Number( process.argv[ 4 ] || 3 );

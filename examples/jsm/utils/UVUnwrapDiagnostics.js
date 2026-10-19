@@ -142,10 +142,10 @@ function analyzeUVUnwrap( result, options = {} ) {
 	metrics.singleTriangleChartRatio = metrics.faces ? chartFaces.filter( count => count === 1 ).length / metrics.faces : 0;
 	for ( const [ key, message ] of [
 		[ 'invalidFaces', 'Faces have missing, nonfinite, out-of-bounds UVs or invalid chart mappings.' ],
-		[ 'excludedFaces', 'Faces were excluded from the atlas; inspect source degeneracy or precision loss.' ],
+		[ 'excludedFaces', 'Faces were excluded from the atlas. Repair source degeneracy or increase resolution for precision loss.' ],
 		[ 'collapsedFaces', 'Faces collapsed to zero UV area after Float32 storage.' ],
 		[ 'flippedFaces', 'Faces have reversed UV winding.' ],
-		[ 'tinyFaces', `Faces occupy less than ${ limits.minTrianglePixels } atlas pixels squared.` ],
+		[ 'tinyFaces', `Faces occupy less than ${ limits.minTrianglePixels } atlas pixels squared. Increase atlas size or partition the model.` ],
 		[ 'paddingViolations', 'UV vertices intrude into chart gutters.' ],
 		[ 'overlapPairs', 'Triangle pairs overlap with positive UV area.' ]
 	] ) {
