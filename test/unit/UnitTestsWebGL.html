@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>ThreeJS WebGLRenderer Unit Test</title>
+		<link rel="icon" type="image/x-icon" href="/files/favicon.ico"/>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/qunit@2.25.0/qunit/qunit.css">
+	</head>
+	<body>
+
+		<div id="qunit"></div>
+		<div id="qunit-fixture"></div>
+
+		<script src="https://cdn.jsdelivr.net/npm/qunit@2.25.0/qunit/qunit.min.js"></script>
+		<script type="module">
+			window.QUnit.on( 'runEnd', ( runEnd ) => {
+
+				window._QUnitStats = runEnd.testCounts;
+
+			} );
+		</script>
+
+		<script type="module" src="./src/renderers/WebGLRenderer.tests.js"></script>
+	</body>
+</html>

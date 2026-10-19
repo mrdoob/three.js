@@ -65,6 +65,7 @@ function main() {
 
 		let testPage = '';
 		let testMode = '';
+		const exitAfterRun = process.argv.includes( '--exit-after-run' );
 
 		let argvIndex = 2;
 
@@ -92,7 +93,7 @@ function main() {
 			userDataDir: './.puppeteer_profile'
 		} );
 
-		if ( testMode === 'headful' ) {
+		if ( testMode === 'headful' && ! exitAfterRun ) {
 
 			browser.on( 'targetdestroyed', target => {
 
@@ -192,8 +193,9 @@ function main() {
 
 		}
 
-		// Keep the process running if testing in headful mode, otherwise close it.
-		testMode === 'headless' && close( stats.failed > 0 ? 1 : 0 );
+		// Keep the process running for local headful inspection unless the caller
+		// explicitly requests an exit after the QUnit results have been captured.
+		if ( testMode === 'headless' || exitAfterRun ) close( stats.failed > 0 ? 1 : 0 );
 
 	} )();
 

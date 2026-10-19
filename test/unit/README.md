@@ -4,13 +4,14 @@
 
 ## Run
 
-You can run the unit tests in two ways:
+You can run the unit tests in headless, headful, or focused WebGL modes:
 
 - Headless: Execute `npm run test-unit`, `npm run test-unit-addons` from the root folder.  
   In headless mode the tests will run in a headless browser.
+- Focused WebGLRenderer regression: Execute `npm run test-unit-webgl` from the root folder. It runs only the WebGLRenderer regression in a headful browser and exits with the QUnit result. On Linux, run it under Xvfb with `xvfb-run -a npm run test-unit-webgl`.
 - Headful: Execute `npm run test-unit-headful`, `npm run test-unit-addons-headful` from the root folder.  
   In headful mode, a browser window will open, and you can see the tests running.  
-  While the headful mode is running you can also use any browser to navigate to http://localhost:8080/test/unit/UnitTests.html or http://localhost:8080/test/unit/UnitTestsAddons.html to run the tests in that browser.  
+  While the headful mode is running you can also use any browser to navigate to http://localhost:8080/test/unit/UnitTests.html, http://localhost:8080/test/unit/UnitTestsAddons.html, or http://localhost:8080/test/unit/UnitTestsWebGL.html to run the tests in that browser.
   Further changes to the library will not be reflected until the page is refreshed.
 
 See [Installation](https://threejs.org/docs/#manual/introduction/Installation) for more information.
