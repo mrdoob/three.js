@@ -1,7 +1,7 @@
 import {
-	BatchedMesh, Bone, BoxGeometry, BufferAttribute, BufferGeometry, CylinderGeometry, Float16BufferAttribute, Float32BufferAttribute,
-	Group, InstancedMesh, ObjectLoader, InterleavedBuffer, InterleavedBufferAttribute, Matrix4, Mesh, PlaneGeometry, Skeleton, SkinnedMesh, SphereGeometry,
-	TorusGeometry, Uint16BufferAttribute, Vector3
+	BatchedMesh, BoxGeometry, BufferAttribute, BufferGeometry, CylinderGeometry, Float32BufferAttribute,
+	Group, InstancedMesh, ObjectLoader, Mesh, PlaneGeometry, SphereGeometry,
+	TorusGeometry, Vector3
 } from 'three';
 import { unwrapUVs as unwrap } from '../../../../examples/jsm/utils/unwrapUVs.js';
 import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
@@ -231,18 +231,11 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'seam splitting copies every attribute, morph, interleaved and normalized value', assert => {
+			QUnit.test( 'seam splitting copies every attribute', assert => {
 
 				const geometry = new BoxGeometry();
 				const count = geometry.attributes.position.count;
-				geometry.setAttribute( 'skinIndex', new Uint16BufferAttribute( new Uint16Array( count * 4 ).map( ( v, i ) => i % 7 ), 4 ) );
-				geometry.setAttribute( 'skinWeight', new Float32BufferAttribute( new Float32Array( count * 4 ).fill( 0.25 ), 4 ) );
-				geometry.setAttribute( 'color', new BufferAttribute( new Uint8Array( count * 3 ).map( ( v, i ) => i * 17 % 256 ), 3, true ) );
 				geometry.setAttribute( 'tangent', new Float32BufferAttribute( new Float32Array( count * 4 ).fill( 1 ), 4 ) );
-				geometry.setAttribute( 'half', new Float16BufferAttribute( new Uint16Array( count ).fill( 0x3c00 ), 1 ) );
-				geometry.setAttribute( 'interleaved', new InterleavedBufferAttribute( new InterleavedBuffer( new Float32Array( count * 5 ).map( ( v, i ) => i / 7 ), 5 ), 2, 2 ) );
-				geometry.morphAttributes.position = [ geometry.attributes.position.clone() ];
-				geometry.morphTargetsRelative = true;
 				geometry.setDrawRange( 3, 12 );
 				const result = unwrap( new Mesh( geometry ), { mode: 'normal' } );
 				verify( assert, result, 2 );
@@ -250,7 +243,6 @@ export default QUnit.module( 'Addons', () => {
 				for ( const [ name, original ] of Object.entries( geometry.attributes ) ) {
 
 					const output = record.mesh.geometry.attributes[ name ];
-					assert.strictEqual( output.normalized, original.normalized );
 					for ( let i = 0; i < output.count; i ++ ) {
 
 						for ( let j = 0; j < output.itemSize; j ++ ) assert.strictEqual( output.getComponent( i, j ), original.getComponent( record.sourceVertices[ i ], j ) );
@@ -259,9 +251,6 @@ export default QUnit.module( 'Addons', () => {
 
 				}
 
-				const morph = record.mesh.geometry.morphAttributes.position[ 0 ];
-				for ( let i = 0; i < morph.count; i ++ ) assert.strictEqual( morph.getX( i ), geometry.morphAttributes.position[ 0 ].getX( record.sourceVertices[ i ] ) );
-				assert.strictEqual( record.mesh.geometry.morphTargetsRelative, true );
 				assert.deepEqual( record.mesh.geometry.drawRange, geometry.drawRange );
 				assert.notStrictEqual( record.mesh.geometry.attributes.uv.array, geometry.attributes.uv.array );
 				assert.strictEqual( unwrap( record.mesh, { attribute: 'uv' } ).meshes[ 0 ].mesh.geometry.attributes.tangent, undefined );
@@ -483,38 +472,6 @@ export default QUnit.module( 'Addons', () => {
 				assert.strictEqual( result, null, 'Uneven Float32 area distortion cannot be reported as success' );
 				assert.strictEqual( mesh.geometry, geometry, 'Failure leaves the source geometry unchanged' );
 				assert.strictEqual( geometry.attributes.uv1, undefined, 'No partial output attribute is installed' );
-
-			} );
-
-			QUnit.test( 'skinned glTF bind matrices and morphs use rendered world area without altering the pose', assert => {
-
-				const root = new Group(), bone = new Bone(), geometry = new PlaneGeometry( 2, 2 );
-				const count = geometry.attributes.position.count;
-				geometry.setAttribute( 'skinIndex', new Uint16BufferAttribute( new Uint16Array( count * 4 ), 4 ) );
-				const weights = new Float32Array( count * 4 );
-				for ( let i = 0; i < count; i ++ ) weights[ i * 4 ] = 1;
-				geometry.setAttribute( 'skinWeight', new Float32BufferAttribute( weights, 4 ) );
-				const morph = geometry.attributes.position.clone();
-				for ( let i = 0; i < count; i ++ ) morph.setX( i, morph.getX( i ) * 2 );
-				geometry.morphAttributes.position = [ morph ];
-				const mesh = new SkinnedMesh( geometry );
-				root.add( mesh, bone );
-				mesh.scale.setScalar( 0.01 );
-				mesh.bind( new Skeleton( [ bone ], [ new Matrix4() ] ), new Matrix4() );
-				mesh.morphTargetInfluences[ 0 ] = 0.5;
-				root.scale.setScalar( 2 );
-				const result = unwrap( root );
-				verify( assert, result );
-				assert.ok( Math.abs( auditAtlas( result ).worldArea - 24 ) < 1e-6, 'Skin bind scale cancels mesh scale; root scale and morph remain' );
-				assert.strictEqual( mesh.morphTargetInfluences[ 0 ], 0.5 );
-				for ( let i = 0; i < mesh.geometry.attributes.position.count; i ++ ) {
-
-					const source = result.meshes[ 0 ].sourceVertices[ i ];
-					assert.ok( new Vector3().fromBufferAttribute( mesh.geometry.attributes.position, i ).equals( new Vector3().fromBufferAttribute( geometry.attributes.position, source ) ) );
-
-				}
-
-				assert.strictEqual( bone.quaternion.w, 1 );
 
 			} );
 

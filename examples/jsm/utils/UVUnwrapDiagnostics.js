@@ -81,7 +81,7 @@ function analyzeUVUnwrap( result, options = {} ) {
 
 			}
 
-			const world = ids.map( id => record.mesh.getVertexPosition( id, new Vector3() ).applyMatrix4( record.mesh.matrixWorld ) );
+			const world = ids.map( id => new Vector3().fromBufferAttribute( record.mesh.geometry.attributes.position, id ).applyMatrix4( record.mesh.matrixWorld ) );
 			const ab = world[ 1 ].sub( world[ 0 ] ), ac = world[ 2 ].sub( world[ 0 ] );
 			const cross = new Vector3().crossVectors( ab, ac ).length(), length = ab.length();
 			if ( cross > 0 && det > 0 ) {
