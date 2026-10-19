@@ -144,7 +144,7 @@
 			const draco = new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' );
 			const loader = new GLTFLoader().setDRACOLoader( draco );
 			const objLoader = new OBJLoader();
-			let root, originals = [], result, loadId = 0, unsupported = 0;
+			let root, originals = [], result, loadId = 0, unwrapId = 0, unsupported = 0;
 
 			function updateMaterials() {
 
@@ -153,11 +153,15 @@
 
 			}
 
-			function unwrap() {
+			async function unwrap() {
 
 				if ( ! root ) return;
-				status.textContent = 'Unwrapping…';
+				const id = ++ unwrapId;
+				status.textContent = 'Unwrapping model…';
 				status.classList.remove( 'error', 'warning' );
+				// Let the status paint before the synchronous unwrap blocks the main thread.
+				await new Promise( resolve => requestAnimationFrame( () => setTimeout( resolve ) ) );
+				if ( id !== unwrapId ) return;
 				for ( const item of originals ) {
 
 					if ( item.mesh.geometry !== item.geometry ) item.mesh.geometry.dispose();
@@ -321,7 +325,7 @@
 				camera.far = Math.max( size * 100, 10 );
 				camera.updateProjectionMatrix();
 				controls.update();
-				unwrap();
+				await unwrap();
 				return result;
 
 			}
