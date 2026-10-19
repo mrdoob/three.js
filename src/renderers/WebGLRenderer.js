@@ -1707,7 +1707,7 @@ class WebGLRenderer {
 
 			renderListStack.push( currentRenderList );
 
-			this.info.render.frame ++;
+			this.info.render.frame ++; // increment before projectObject(), see #35099
 
 			if ( xr.enabled === true && xr.isPresenting === true ) {
 
