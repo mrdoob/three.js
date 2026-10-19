@@ -144,7 +144,7 @@
 			const draco = new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' );
 			const loader = new GLTFLoader().setDRACOLoader( draco );
 			const objLoader = new OBJLoader();
-			let root, originals = [], result, loadId = 0, unwrapId = 0, unsupported = 0;
+			let root, originals = [], result, loadId = 0, unwrapId = 0;
 
 			function updateMaterials() {
 
@@ -188,7 +188,6 @@
 					if ( excludedFaces ) warnings.push( `${ excludedFaces } degenerate or Float32-limited faces excluded from the atlas` );
 					if ( tinyFaces ) warnings.push( `${ tinyFaces } faces under 0.01 atlas pixels squared; increase the atlas size` );
 					if ( singleTriangleCharts > triangles / 2 ) warnings.push( `${ singleTriangleCharts } single-triangle charts; the mesh is fragmented (e.g. nonmanifold or duplicated faces)` );
-					if ( unsupported ) warnings.push( `${ unsupported } instanced/batched meshes skipped: unwrap each instance as a regular mesh first` );
 					status.classList.toggle( 'warning', warnings.length > 0 );
 					status.textContent = `${ summary }\n${ warnings.length ? 'Quality warnings' : 'No quality warnings' }\n${ warnings.join( '\n' ) }`;
 					drawAtlas();
@@ -309,11 +308,9 @@
 
 				root = loaded;
 				originals = [];
-				unsupported = 0;
 				root.traverse( mesh => {
 
-					if ( mesh.isInstancedMesh || mesh.isBatchedMesh ) unsupported ++;
-					if ( mesh.isMesh && ! mesh.isInstancedMesh && ! mesh.isBatchedMesh ) originals.push( { mesh, geometry: mesh.geometry, material: mesh.material } );
+					if ( mesh.isMesh ) originals.push( { mesh, geometry: mesh.geometry, material: mesh.material } );
 
 				} );
 				scene.add( root );
