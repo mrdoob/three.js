@@ -66,8 +66,9 @@ class BumpMapNode extends Node {
 	 *
 	 * @param {Node<float>} textureNode - Represents the bump map data.
 	 * @param {?Node<float>} [scaleNode=null] - Controls the intensity of the bump effect.
+	 * @param {?Node<vec3>} [normalNode=null] - The view-space normal to perturb. Defaults to `normalView`.
 	 */
-	constructor( textureNode, scaleNode = null ) {
+	constructor( textureNode, scaleNode = null, normalNode = null ) {
 
 		super( 'vec3' );
 
@@ -86,21 +87,31 @@ class BumpMapNode extends Node {
 		 */
 		this.scaleNode = scaleNode;
 
+		/**
+		 * The view-space normal to perturb. Defaults to `normalView`.
+		 *
+		 * @type {?Node<vec3>}
+		 * @default null
+		 */
+		this.normalNode = normalNode;
+
 	}
 
 	setup( builder ) {
 
+		const normal = this.normalNode !== null ? this.normalNode : normalView;
+
 		// Screen-space derivatives are unreliable on thin lines, so the bump
 		// effect is disabled for wireframe rendering.
 
-		if ( builder.material.wireframe === true ) return normalView;
+		if ( builder.material.wireframe === true ) return normal;
 
 		const bumpScale = this.scaleNode !== null ? this.scaleNode : 1;
 		const dHdxy = dHdxy_fwd( { textureNode: this.textureNode, bumpScale } );
 
 		return perturbNormalArb( {
 			surf_pos: positionView,
-			surf_norm: normalView,
+			surf_norm: normal,
 			dHdxy
 		} );
 
@@ -117,6 +128,7 @@ export default BumpMapNode;
  * @function
  * @param {Node<float>} textureNode - Represents the bump map data.
  * @param {?Node<float>} [scaleNode=null] - Controls the intensity of the bump effect.
+ * @param {?Node<vec3>} [normalNode=null] - The view-space normal to perturb. Defaults to `normalView`.
  * @returns {BumpMapNode}
  */
-export const bumpMap = /*@__PURE__*/ nodeProxy( BumpMapNode ).setParameterLength( 1, 2 );
+export const bumpMap = /*@__PURE__*/ nodeProxy( BumpMapNode ).setParameterLength( 1, 3 );
