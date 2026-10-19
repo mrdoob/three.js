@@ -9,6 +9,20 @@ import { warn } from '../../utils.js';
 const _size = /*@__PURE__*/ new Vector3();
 
 /**
+ * Returns the mipmaps of the given texture. Compressed cube textures
+ * define them per face.
+ *
+ * @private
+ * @param {Texture} texture - The texture.
+ * @return {Array<Object>} The mipmaps.
+ */
+function getMipmaps( texture ) {
+
+	return texture.isCompressedCubeTexture === true ? texture.image[ 0 ].mipmaps : texture.mipmaps;
+
+}
+
+/**
  * This module manages the textures of the renderer.
  *
  * @private
@@ -418,7 +432,7 @@ class Textures extends DataMap {
 
 					}
 
-					if ( options.needsMipmaps && texture.mipmaps.length === 0 && texture.mipmapsAutoUpdate === true ) {
+					if ( options.needsMipmaps && getMipmaps( texture ).length === 0 && texture.mipmapsAutoUpdate === true ) {
 
 						backend.generateMipmaps( texture );
 
@@ -525,6 +539,8 @@ class Textures extends DataMap {
 
 		let image = texture.images ? texture.images[ 0 ] : texture.image;
 
+		if ( texture.isCompressedCubeTexture === true ) image = image[ 0 ];
+
 		if ( image ) {
 
 			if ( image.image !== undefined ) image = image.image;
@@ -577,9 +593,11 @@ class Textures extends DataMap {
 
 		let mipLevelCount;
 
-		if ( texture.mipmaps.length > 0 ) {
+		const mipmaps = getMipmaps( texture );
 
-			mipLevelCount = texture.mipmaps.length;
+		if ( mipmaps.length > 0 ) {
+
+			mipLevelCount = mipmaps.length;
 
 		} else {
 
@@ -611,7 +629,7 @@ class Textures extends DataMap {
 	 */
 	needsMipmaps( texture ) {
 
-		return texture.generateMipmaps === true || texture.mipmaps.length > 0;
+		return texture.generateMipmaps === true || getMipmaps( texture ).length > 0;
 
 	}
 
