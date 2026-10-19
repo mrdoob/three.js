@@ -46,6 +46,58 @@ class UITexture extends UISpan {
 		} );
 		this.dom.appendChild( canvas );
 
+
+		const urlButton = new UIButton( 'URL' );
+		urlButton.dom.title = 'Load texture from URL';
+		urlButton.dom.setAttribute( 'aria-label', 'Load texture from URL' );
+		urlButton.dom.style.padding = '0 4px';
+		urlButton.dom.style.lineHeight = '16px';
+		urlButton.dom.style.verticalAlign = 'middle';
+		urlButton.onClick( function () {
+
+			const value = window.prompt( 'Texture URL:' );
+			if ( value === null || value.trim() === '' ) return;
+
+			let url;
+			try {
+
+				url = new URL( value.trim() );
+
+			} catch ( error ) {
+
+				window.alert( 'Please enter a valid absolute URL.' );
+				return;
+
+			}
+
+			if ( url.protocol !== 'http:' && url.protocol !== 'https:' ) {
+
+				window.alert( 'Texture URLs must use HTTP or HTTPS.' );
+				return;
+
+			}
+
+			new THREE.TextureLoader().load( url.href, function ( texture ) {
+
+				texture.sourceFile = url.href;
+				texture.userData.editorSourceURL = url.href;
+				scope.setValue( texture );
+
+				if ( scope.onChangeCallback ) scope.onChangeCallback( texture );
+
+			}, undefined, function ( error ) {
+
+				console.error( 'UITexture: Unable to load texture from URL:', url.href, error );
+				window.alert( 'Unable to load texture. Check the URL and that the host allows cross-origin requests.' );
+
+			} );
+
+		} );
+		this.dom.appendChild( urlButton.dom );
+
+
+		
+
 		async function loadFile( file ) {
 
 			const extension = file.name.split( '.' ).pop().toLowerCase();
