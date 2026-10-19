@@ -797,6 +797,22 @@ Editor.prototype = {
 
 		}
 
+		const sceneJSON = this.scene.toJSON();
+
+		const images = new Map( ( sceneJSON.images || [] ).map( image => [ image.uuid, image ] ) );
+
+		for ( const texture of sceneJSON.textures || [] ) {
+
+			const sourceURL = texture.userData && texture.userData.editorSourceURL;
+
+			if ( sourceURL && images.has( texture.image ) ) {
+
+				images.get( texture.image ).url = sourceURL;
+
+			}
+
+		}
+
 		return {
 
 			metadata: {},
@@ -809,7 +825,7 @@ Editor.prototype = {
 			},
 			camera: this.viewportCamera.toJSON(),
 			controls: this.controls.toJSON(),
-			scene: this.scene.toJSON(),
+			scene: sceneJSON,
 			scripts: this.scripts,
 			history: this.history.toJSON(),
 			backgroundType: this.backgroundType,
