@@ -9,8 +9,9 @@
 	<body>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - loader priority<br>
-			Click to reload all assets with main asset at the chosen priority:<br>
-			Main asset priority: <a href="?priority=high">High</a> | <a href="?priority=low">Low</a><br>
+			Keep the main asset at default priority and lower the priority of background assets.<br>
+			Click to reload all assets. Background priority: <a href="?background=auto">Default (auto)</a> | <a href="?background=low">Low</a><br>
+			Chrome already gives default fetch requests high priority. Hints may vary by browser and network conditions.<br>
 			<span id="status"></span>
 		</div>
 
@@ -33,7 +34,7 @@
 			let camera, scene, renderer;
 			let start, heroTime = 'loading', backgroundCount = 0;
 
-			const priority = new URLSearchParams( location.search ).get( 'priority' ) === 'low' ? 'low' : 'high';
+			const backgroundPriority = new URLSearchParams( location.search ).get( 'background' ) === 'auto' ? 'auto' : 'low';
 
 			const models = [
 				'BoomBox.glb', 'coffeeMug.glb', 'Stork.glb', 'Flamingo.glb',
@@ -72,7 +73,7 @@
 
 				start = performance.now();
 
-				const background = new GLTFLoader().setPriority( 'auto' ).setCache( 'reload' );
+				const background = new GLTFLoader().setPriority( backgroundPriority ).setCache( 'reload' );
 
 				for ( const model of models ) {
 
@@ -80,7 +81,7 @@
 
 				}
 
-				const hero = new GLTFLoader().setPriority( priority ).setCache( 'reload' );
+				const hero = new GLTFLoader().setCache( 'reload' );
 				hero.load( 'models/gltf/Horse.glb', onHeroLoad, undefined, onError );
 
 				updateStatus();
@@ -145,7 +146,7 @@
 
 			function updateStatus() {
 
-				document.getElementById( 'status' ).textContent = `Main asset (${ priority }): ${ heroTime }; background assets: ${ backgroundCount } / ${ models.length }`;
+				document.getElementById( 'status' ).textContent = `Main asset (auto): ${ heroTime }; background assets (${ backgroundPriority }): ${ backgroundCount } / ${ models.length }`;
 
 			}
 
