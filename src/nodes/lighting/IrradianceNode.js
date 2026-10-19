@@ -19,9 +19,8 @@ class IrradianceNode extends LightingNode {
 	 * Constructs a new irradiance node.
 	 *
 	 * @param {Node<vec3>} node - A node contributing irradiance.
-	 * @param {boolean} [isLightMap=false] - Whether the irradiance is diffuse-only baked lighting.
 	 */
-	constructor( node, isLightMap = false ) {
+	constructor( node ) {
 
 		super();
 
@@ -32,19 +31,11 @@ class IrradianceNode extends LightingNode {
 		 */
 		this.node = node;
 
-		/**
-		 * Whether this irradiance is diffuse-only baked lighting.
-		 *
-		 * @type {boolean}
-		 */
-		this.isLightMap = isLightMap;
-
 	}
 
 	setup( builder ) {
 
 		builder.context.irradiance.addAssign( this.node );
-		if ( this.isLightMap ) builder.context.irradianceLightMap = this.node;
 
 	}
 
