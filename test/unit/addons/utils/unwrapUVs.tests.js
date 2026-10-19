@@ -1,6 +1,6 @@
 import {
-	Bone, BoxGeometry, BufferAttribute, BufferGeometry, CylinderGeometry, Float16BufferAttribute, Float32BufferAttribute,
-	Group, ObjectLoader, InterleavedBuffer, InterleavedBufferAttribute, Matrix4, Mesh, PlaneGeometry, Skeleton, SkinnedMesh, SphereGeometry,
+	BatchedMesh, Bone, BoxGeometry, BufferAttribute, BufferGeometry, CylinderGeometry, Float16BufferAttribute, Float32BufferAttribute,
+	Group, InstancedMesh, ObjectLoader, InterleavedBuffer, InterleavedBufferAttribute, Matrix4, Mesh, PlaneGeometry, Skeleton, SkinnedMesh, SphereGeometry,
 	TorusGeometry, Uint16BufferAttribute, Vector3
 } from 'three';
 import { unwrapUVs as unwrap } from '../../../../examples/jsm/utils/unwrapUVs.js';
@@ -361,6 +361,35 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
+			QUnit.test( 'reprojects rejected authored islands before splitting lightmap charts', assert => {
+
+				const geometry = new PlaneGeometry( 1, 1, 8, 8 );
+				for ( let i = 0; i < geometry.attributes.uv.count; i ++ ) geometry.attributes.uv.setX( i, geometry.attributes.uv.getX( i ) * 10 );
+				const result = unwrap( new Mesh( geometry ), { mode: 'lightmap', useInputUVs: true } );
+				verify( assert, result );
+				assert.strictEqual( result.charts.length, 1, 'A distorted authored island is reprojected as one planar chart' );
+				assert.false( result.meshes[ 0 ].faceCharts.includes( - 1 ), 'All faces receive valid UVs' );
+
+			} );
+
+			QUnit.test( 'unsupported mesh types are skipped without modifying their geometry', assert => {
+
+				const root = new Group(), regular = new Mesh( new BoxGeometry() );
+				const instanced = new InstancedMesh( new BoxGeometry(), undefined, 2 );
+				const batched = new BatchedMesh( 2, 100, 100 );
+				const originals = [ instanced.geometry, batched.geometry ];
+				root.add( regular, instanced, batched );
+				console.level = CONSOLE_LEVEL.OFF;
+				const result = unwrap( root );
+				console.level = CONSOLE_LEVEL.DEFAULT;
+				verify( assert, result );
+				assert.strictEqual( result.meshes.length, 1, 'Only supported meshes participate in the atlas' );
+				assert.strictEqual( result.meshes[ 0 ].mesh, regular );
+				assert.strictEqual( instanced.geometry, originals[ 0 ] );
+				assert.strictEqual( batched.geometry, originals[ 1 ] );
+
+			} );
+
 			QUnit.test( 'near-zero area slivers are retained but excluded from the atlas', assert => {
 
 				for ( const mode of [ 'lightmap', 'normal' ] ) {
@@ -430,6 +459,20 @@ export default QUnit.module( 'Addons', () => {
 					assert.ok( result.meshes[ 1 ].mesh.geometry.attributes.uv1.array.every( value => value === 0 ) );
 
 				}
+
+			} );
+
+			QUnit.test( 'Float32 chart failures return null without mutating the hierarchy', assert => {
+
+				const root = new Group(), mesh = new Mesh( new PlaneGeometry( 1, 1, 2, 2 ) );
+				const geometry = mesh.geometry;
+				root.add( mesh );
+				console.level = CONSOLE_LEVEL.OFF;
+				const result = unwrap( root, { texelsPerUnit: 0.0000013182567385564074 } );
+				console.level = CONSOLE_LEVEL.DEFAULT;
+				assert.strictEqual( result, null, 'Uneven Float32 area distortion cannot be reported as success' );
+				assert.strictEqual( mesh.geometry, geometry, 'Failure leaves the source geometry unchanged' );
+				assert.strictEqual( geometry.attributes.uv1, undefined, 'No partial output attribute is installed' );
 
 			} );
 

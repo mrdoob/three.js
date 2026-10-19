@@ -5,7 +5,8 @@ import { potpack } from '../libs/potpack.module.js';
 /**
  * Generates a unique UV atlas for the meshes in a hierarchy, measured in world space.
  * Each mesh receives a new geometry. Skinned and morphed meshes are unwrapped in
- * their current pose. Degenerate faces keep UV (0, 0) and a faceCharts entry of -1.
+ * their current pose. InstancedMesh and BatchedMesh are skipped with a warning.
+ * Degenerate faces keep UV (0, 0) and a faceCharts entry of -1.
  *
  * @three_import import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
  *
@@ -19,7 +20,7 @@ import { potpack } from '../libs/potpack.module.js';
  * @param {boolean} [options.respectUVSeams] - Cut discontinuities in existing uv (normal default).
  * @param {boolean} [options.useInputUVs=false] - Preserve valid authored UV charts before trying LSCM.
  * @return {?Object} Atlas size, density, chart bounds and mesh vertex/face mappings,
- * or null if the charts do not fit the atlas. Meshes are left unchanged in that case.
+ * or null if the charts do not fit or fail Float32 validation. Meshes are left unchanged in that case.
  */
 function unwrapUVs( root, options = {} ) {
 
@@ -37,6 +38,13 @@ function unwrapUVs( root, options = {} ) {
 	root.traverse( mesh => {
 
 		if ( ! mesh.isMesh ) return;
+		if ( mesh.isInstancedMesh || mesh.isBatchedMesh ) {
+
+			console.warn( 'THREE.unwrapUVs(): InstancedMesh and BatchedMesh are not supported. Skipping mesh.', mesh );
+			return;
+
+		}
+
 		records.push( readMesh( mesh, settings ) );
 
 	} );
@@ -57,7 +65,9 @@ function unwrapUVs( root, options = {} ) {
 
 	for ( let i = charts.length - 1; i >= 0; i -- ) {
 
-		if ( ! validateFloat32Chart( charts[ i ], settings, density ) ) charts.splice( i, 1 );
+		const valid = validateFloat32Chart( charts[ i ], settings, density );
+		if ( valid === null ) return null;
+		if ( ! valid ) charts.splice( i, 1 );
 
 	}
 
@@ -257,7 +267,7 @@ function parameterize( record, faces, settings, charts ) {
 
 	if ( ! quality ) {
 
-		if ( useInput && faces.length === 1 ) {
+		if ( useInput ) {
 
 			parameterize( record, faces, { ...settings, useInputUVs: false }, charts );
 			return;
@@ -571,6 +581,7 @@ function validateFloat32Chart( chart, settings, density ) {
 	if ( ! quality ) {
 
 		const faces = [], triangles = [];
+		const originalFaceCount = chart.faces.length;
 		for ( let i = 0; i < chart.triangles.length; i ++ ) {
 
 			const triangle = chart.triangles[ i ], face = chart.record.faces[ chart.faces[ i ] ];
@@ -588,6 +599,7 @@ function validateFloat32Chart( chart, settings, density ) {
 
 		}
 
+		if ( faces.length < originalFaceCount ) console.warn( `THREE.unwrapUVs(): Excluded ${ originalFaceCount - faces.length } subpixel faces that fail Float32 UV validation.` );
 		chart.faces = faces;
 		chart.triangles = triangles;
 		if ( faces.length === 0 ) return false;
@@ -595,7 +607,13 @@ function validateFloat32Chart( chart, settings, density ) {
 
 	}
 
-	if ( ! quality ) console.warn( `THREE.unwrapUVs(): Float32 precision is insufficient for mesh "${ chart.record.mesh.name }". Some UVs may overlap.` );
+	if ( ! quality ) {
+
+		console.error( `THREE.unwrapUVs(): Float32 precision is insufficient for mesh "${ chart.record.mesh.name }". Atlas generation failed.` );
+		return null;
+
+	}
+
 	return true;
 
 }
