@@ -106,7 +106,7 @@ try {
 
 			}
 
-			if ( ! result ) return { model: name, ...options, times, error: 'Atlas packing or Float32 chart validation failed' };
+			if ( ! result ) return { model: name, ...options, times, sourceExcluded, error: 'Atlas packing or Float32 chart validation failed' };
 			let triangles = 0, ignored = 0, invalid = 0, collapsed = 0;
 			const counts = new Uint32Array( result.charts.length );
 			for ( const record of result.meshes ) {
