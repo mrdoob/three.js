@@ -7,6 +7,7 @@ import { ColorManagement } from '../../math/ColorManagement.js';
 import { warn } from '../../utils.js';
 
 const _size = /*@__PURE__*/ new Vector3();
+const _allocationSize = /*@__PURE__*/ new Vector3();
 
 /**
  * This module manages the textures of the renderer.
@@ -133,6 +134,7 @@ class Textures extends DataMap {
 		const useDepthTexture = renderTarget.depthBuffer === true || renderTarget.stencilBuffer === true;
 
 		let textureNeedsUpdate = false;
+		let depthTextureNeedsUpdate = false;
 
 		const hasArrayDepthTexture = depthTexture !== undefined && depthTexture.image !== undefined && depthTexture.image.depth > 1;
 		const useArrayDepth = size.depth > 1 && ( renderTarget.useArrayDepthTexture || renderTarget.multiview || hasArrayDepthTexture );
@@ -164,7 +166,7 @@ class Textures extends DataMap {
 
 			if ( depthTexture && depthTexture.renderTarget === renderTarget ) {
 
-				depthTexture.needsUpdate = true;
+				depthTextureNeedsUpdate = true;
 				depthTexture.image.width = mipWidth;
 				depthTexture.image.height = mipHeight;
 				depthTexture.image.depth = useArrayDepth ? size.depth : 1;
@@ -187,11 +189,21 @@ class Textures extends DataMap {
 
 			if ( depthTexture && depthTexture.renderTarget === renderTarget ) {
 
-				depthTexture.needsUpdate = true;
+				depthTextureNeedsUpdate = true;
 
 			}
 
 			renderTargetData.sampleCount = sampleCount;
+
+		}
+
+		// attachments might already be allocated when the render target is used for the first time,
+		// e.g. when a shadow map is sampled before the first shadow pass. Re-creating them would
+		// invalidate the bind groups which reference them, see #35085.
+
+		if ( depthTextureNeedsUpdate && this._isAllocated( depthTexture ) === false ) {
+
+			depthTexture.needsUpdate = true;
 
 		}
 
@@ -208,7 +220,7 @@ class Textures extends DataMap {
 
 				const texture = textures[ i ];
 
-				if ( textureNeedsUpdate ) texture.needsUpdate = true;
+				if ( textureNeedsUpdate && this._isAllocated( texture ) === false ) texture.needsUpdate = true;
 
 				this.updateTexture( texture, options );
 
@@ -366,6 +378,17 @@ class Textures extends DataMap {
 			backend.createTexture( texture, options );
 
 			textureData.generation = texture.version;
+
+			if ( isRenderTarget ) {
+
+				// the allocation state of the attachment, see _isAllocated()
+
+				textureData.width = width;
+				textureData.height = height;
+				textureData.depth = depth;
+				textureData.samples = getSamples( texture );
+
+			}
 
 		} else {
 
@@ -661,6 +684,25 @@ class Textures extends DataMap {
 	}
 
 	/**
+	 * Returns `true` if the given render target attachment is already
+	 * allocated with its current size and sample count.
+	 *
+	 * @private
+	 * @param {Texture} texture - The render target attachment.
+	 * @return {boolean} Whether the attachment is allocated or not.
+	 */
+	_isAllocated( texture ) {
+
+		if ( this.has( texture ) === false ) return false;
+
+		const textureData = this.get( texture );
+		const { width, height, depth } = this.getSize( texture, _allocationSize );
+
+		return textureData.initialized === true && textureData.width === width && textureData.height === height && textureData.depth === depth && textureData.samples === getSamples( texture );
+
+	}
+
+	/**
 	 * Frees internal resource when the given texture isn't
 	 * required anymore.
 	 *
@@ -730,6 +772,19 @@ class Textures extends DataMap {
 		}
 
 	}
+
+}
+
+/**
+ * Returns the sample count of the render target the given attachment belongs to.
+ *
+ * @private
+ * @param {Texture} texture - The render target attachment.
+ * @return {number} The sample count.
+ */
+function getSamples( texture ) {
+
+	return texture.renderTarget ? texture.renderTarget.samples : 0;
 
 }
 
