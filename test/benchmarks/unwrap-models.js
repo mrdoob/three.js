@@ -51,12 +51,15 @@ try {
 		const { DRACOLoader } = await import( 'three/addons/loaders/DRACOLoader.js' );
 		const { OBJLoader } = await import( 'three/addons/loaders/OBJLoader.js' );
 		const { unwrapUVs } = await import( 'three/addons/utils/unwrapUVs.js' );
-		const gltf = new GLTFLoader().setDRACOLoader( new DRACOLoader().setDecoderPath( '/examples/jsm/libs/draco/gltf/' ) );
+		const { analyzeUVUnwrap } = await import( 'three/addons/utils/UVUnwrapDiagnostics.js' ).catch( () => ( {} ) );
+		const draco = new DRACOLoader().setDecoderPath( '/examples/jsm/libs/draco/gltf/' );
+		const gltf = new GLTFLoader().setDRACOLoader( draco );
+		window.cleanup = () => draco.dispose();
 		window.benchmark = async ( name, options, runs ) => {
 
 			let model;
 			if ( name === 'Torus knot' ) model = new THREE.Mesh( new THREE.TorusKnotGeometry( 1, 0.3, 128, 16 ) );
-			else if ( name === 'Tube' ) model = new THREE.Mesh( new THREE.TubeGeometry( new THREE.CatmullRomCurve3( [ new THREE.Vector3( - 2, 0, 0 ), new THREE.Vector3( 0, 2, 0 ), new THREE.Vector3( 2, 0, 1 ) ] ), 64, 0.3, 8, false ) );
+			else if ( name === 'Tube' ) model = new THREE.Mesh( new THREE.TubeGeometry( new THREE.CatmullRomCurve3( [ new THREE.Vector3( - 2, 0, 0 ), new THREE.Vector3( - 1, 1, 0 ), new THREE.Vector3( 1, - 1, 1 ), new THREE.Vector3( 2, 0, 0 ) ] ), 64, 0.3, 12, false ) );
 			else model = name.endsWith( '.obj' ) ? await new OBJLoader().loadAsync( '/examples/models/' + name ) : ( await gltf.loadAsync( '/examples/models/gltf/' + name ) ).scene;
 			const originals = [];
 			model.traverse( mesh => {
@@ -78,7 +81,7 @@ try {
 
 			}
 
-			if ( ! result ) return { model: name, ...options, times, error: 'Atlas packing failed' };
+			if ( ! result ) return { model: name, ...options, times, error: 'Atlas packing or Float32 chart validation failed' };
 			let triangles = 0, ignored = 0, invalid = 0, collapsed = 0;
 			const counts = new Uint32Array( result.charts.length );
 			for ( const record of result.meshes ) {
@@ -105,19 +108,26 @@ try {
 
 			}
 
+			const diagnostics = analyzeUVUnwrap ? analyzeUVUnwrap( result, { maxStretch: options.mode === 'lightmap' ? 1.501 : 2.001 } ) : undefined;
 			for ( const [ mesh, geometry ] of originals ) {
 
 				mesh.geometry.dispose(); geometry.dispose();
+				for ( const material of [].concat( mesh.material ) ) {
+
+					for ( const value of Object.values( material ) ) if ( value?.isTexture ) value.dispose();
+					material.dispose();
+
+				}
 
 			}
 
 			times.sort( ( a, b ) => a - b );
-			return { model: name, ...options, times, medianMs: times[ Math.floor( times.length / 2 ) ], triangles, charts: counts.length, singletons: counts.filter( count => count === 1 ).length, ignored, invalid, collapsed, texelsPerUnit: result.texelsPerUnit };
+			return { model: name, ...options, times, medianMs: times[ Math.floor( times.length / 2 ) ], triangles, charts: counts.length, singletons: counts.filter( count => count === 1 ).length, ignored, invalid, collapsed, texelsPerUnit: result.texelsPerUnit, diagnostics };
 
 		};
 
 	} );
-	const models = [ 'DamagedHelmet/glTF/DamagedHelmet.gltf', 'Soldier.glb', 'Xbot.glb', 'LeePerrySmith/LeePerrySmith.glb', 'space_ship_hallway.glb', 'obj/walt/WaltHead.obj', 'obj/ninja/ninjaHead_Low.obj', 'obj/male02/male02.obj', 'obj/female02/female02.obj', 'obj/cerberus/Cerberus.obj', 'duck.glb', 'Horse.glb', 'Flamingo.glb', 'Parrot.glb', 'RobotExpressive/RobotExpressive.glb', 'Torus knot', 'Tube' ];
+	const models = process.argv[ 5 ] ? process.argv[ 5 ].split( ',' ) : [ 'DamagedHelmet/glTF/DamagedHelmet.gltf', 'Soldier.glb', 'Xbot.glb', 'LeePerrySmith/LeePerrySmith.glb', 'space_ship_hallway.glb', 'obj/walt/WaltHead.obj', 'obj/ninja/ninjaHead_Low.obj', 'obj/male02/male02.obj', 'obj/female02/female02.obj', 'obj/cerberus/Cerberus.obj', 'duck.glb', 'Horse.glb', 'Flamingo.glb', 'Parrot.glb', 'RobotExpressive/RobotExpressive.glb', 'Torus knot', 'Tube' ];
 	const results = [];
 	for ( const model of models ) for ( const mode of [ 'lightmap', 'normal' ] ) for ( const useInputUVs of [ false, true ] ) {
 
@@ -135,6 +145,8 @@ try {
 		await writeFile( output, JSON.stringify( { gpu, repetitions, results }, null, 2 ) );
 
 	}
+
+	await page.evaluate( () => window.cleanup() );
 
 } finally {
 
