@@ -14,6 +14,7 @@
 			#atlas { display: block; width: 240px; height: 240px; background: #080c12; }
 			#status { max-width: min( 680px, 75vw ); max-height: 40vh; overflow: auto; pointer-events: auto; }
 			#status.error { color: #ff6060; background: #230909e6; padding: 10px; }
+			#status.warning { color: #ffe066; background: #282008e6; padding: 10px; }
 		</style>
 	</head>
 	<body>
@@ -30,7 +31,8 @@
 			</small>
 		</div>
 
-		<div id="status" class="lbl">Loading renderer...</div>
+		<!-- The standard E2E cleanup hides .lbl overlays, including timings and quality warnings. -->
+		<div id="status" class="lbl" role="status">Loading renderer...</div>
 		<div id="atlas-preview">
 			<canvas id="atlas" width="512" height="512"></canvas>
 		</div>
@@ -153,7 +155,7 @@
 
 				if ( ! root ) return;
 				status.textContent = 'Unwrapping…';
-				status.classList.remove( 'error' );
+				status.classList.remove( 'error', 'warning' );
 				for ( const item of originals ) {
 
 					if ( item.mesh.geometry !== item.geometry ) item.mesh.geometry.dispose();
@@ -185,8 +187,8 @@
 					const triangles = result.meshes.reduce( ( sum, record ) => sum + record.faceCharts.length, 0 );
 					const ignored = result.meshes.reduce( ( sum, record ) => sum + record.faceCharts.reduce( ( count, chart ) => count + ( chart === - 1 ? 1 : 0 ), 0 ), 0 );
 					status.textContent = `${ triangles.toLocaleString() } triangles / ${ result.charts.length } charts\n${ elapsed.toFixed( 1 ) } ms\n${ result.texelsPerUnit.toFixed( 2 ) } texels/world unit\n${ ignored } ignored triangles`;
-					status.classList.toggle( 'error', ! analysis.passed );
-					status.textContent += `\n${ analysis.passed ? 'PASS' : 'FAIL / quality warning' } (${ analysisElapsed.toFixed( 1 ) } ms analysis)\n${ analysis.issues.map( issue => `${ issue.count ?? 1 }: ${ issue.message }` ).join( '\n' ) }`;
+					status.classList.toggle( 'warning', ! analysis.passed );
+					status.textContent += `\n${ analysis.passed ? 'No quality warnings' : 'Quality warnings' } (${ analysisElapsed.toFixed( 1 ) } ms analysis)\n${ analysis.issues.map( issue => `${ issue.count ?? 1 }: ${ issue.message }` ).join( '\n' ) }`;
 					drawAtlas();
 					updateMaterials();
 
@@ -257,7 +259,7 @@
 				params.model = name;
 				const id = ++ loadId;
 				status.textContent = 'Loading model…';
-				status.classList.remove( 'error' );
+				status.classList.remove( 'error', 'warning' );
 				let loaded;
 				if ( name === 'torus-knot' || name === 'tube' ) {
 
@@ -342,6 +344,7 @@
 
 			function reportError( error ) {
 
+				status.classList.remove( 'warning' );
 				status.classList.add( 'error' );
 				status.textContent = error.message;
 				console.error( error );
