@@ -180,18 +180,46 @@ function readMesh( mesh, settings ) {
 	const uv = geometry.getAttribute( 'uv' );
 	for ( const edge of edges.values() ) {
 
-		if ( edge.length !== 2 ) continue; // Nonmanifold edges are seams.
-		const [ a, b ] = edge;
-		if ( a.a !== b.b || a.b !== b.a || materials[ a.f ] !== materials[ b.f ] ) continue;
-		if ( ( settings.respectUVSeams || settings.useInputUVs ) && uv ) {
+		// Pair opposite half-edges by closest normal, so duplicated double-sided shells
+		// (four faces per edge) join each side separately instead of becoming all seams.
+		const pairs = [], used = new Set();
+		for ( const x of edge ) {
 
-			const av = faces[ a.f ].vertices, bv = faces[ b.f ].vertices;
-			if ( ! equalUV( uv, av[ a.j ], bv[ ( b.j + 1 ) % 3 ] ) || ! equalUV( uv, av[ ( a.j + 1 ) % 3 ], bv[ b.j ] ) ) continue;
+			let best = null, bestDot = - Infinity;
+			for ( const y of edge ) {
+
+				if ( used.has( x ) || used.has( y ) || y.a !== x.b || y.b !== x.a || materials[ x.f ] !== materials[ y.f ] ) continue;
+				const dot = faces[ x.f ].normal.dot( faces[ y.f ].normal );
+				if ( dot > bestDot ) {
+
+					best = y; bestDot = dot;
+
+				}
+
+			}
+
+			if ( best ) {
+
+				pairs.push( [ x, best ] );
+				used.add( x ).add( best );
+
+			}
 
 		}
 
-		faces[ a.f ].neighbors.push( b.f );
-		faces[ b.f ].neighbors.push( a.f );
+		for ( const [ a, b ] of pairs ) {
+
+			if ( ( settings.respectUVSeams || settings.useInputUVs ) && uv ) {
+
+				const av = faces[ a.f ].vertices, bv = faces[ b.f ].vertices;
+				if ( ! equalUV( uv, av[ a.j ], bv[ ( b.j + 1 ) % 3 ] ) || ! equalUV( uv, av[ ( a.j + 1 ) % 3 ], bv[ b.j ] ) ) continue;
+
+			}
+
+			faces[ a.f ].neighbors.push( b.f );
+			faces[ b.f ].neighbors.push( a.f );
+
+		}
 
 	}
 
