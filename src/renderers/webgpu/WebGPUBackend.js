@@ -15,6 +15,7 @@ import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 
 import { WebGPUCoordinateSystem, TimestampQuery, REVISION, HalfFloatType, Compatibility, CustomBlending } from '../../constants.js';
 import { Color } from '../../math/Color.js';
+import { ColorManagement } from '../../math/ColorManagement.js';
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
 import { error, warnOnce } from '../../utils.js';
 
@@ -360,6 +361,7 @@ class WebGPUBackend extends Backend {
 				format: this.utils.getPreferredCanvasFormat(),
 				usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
 				alphaMode: alphaMode,
+				colorSpace: ColorManagement._getDrawingBufferColorSpace( this.renderer.outputColorSpace ),
 				toneMapping: {
 					mode: toneMappingMode
 				}
