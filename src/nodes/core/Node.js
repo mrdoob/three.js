@@ -235,7 +235,7 @@ class Node extends EventDispatcher {
 	}
 
 	/**
-	 * Declares the assignable node before the loop where it is used if it has no stack, and
+	 * Declares the assignable node before the blocks where it is used if it has no stack, and
 	 * decides if a value that cannot be cached must be evaluated once at its declaration.
 	 *
 	 * @private
@@ -247,11 +247,11 @@ class Node extends EventDispatcher {
 
 		const nodeLoop = builder.context.nodeLoop;
 
-		if ( nodeLoop && data.stack === undefined && builder.buildStage === 'setup' ) {
+		if ( data.stack === undefined && builder.buildStage === 'setup' ) {
 
-			// A node outside of the stacks of this build, e.g. created outside of a function, is declared
-			// before the loop if its value does not change in it, otherwise every iteration would repeat it.
-			data.stack = nodeLoop.declareBefore( builder, this );
+			// A node outside of the stacks of this build, e.g. created outside of a function, is declared before
+			// the blocks where it is used if they would repeat it, e.g. a loop body or more than one branch.
+			data.stack = builder.declareBeforeBlock( this, data );
 
 		} else if ( this.assignable === true && nodeLoop && builder.buildStage === 'analyze' ) {
 

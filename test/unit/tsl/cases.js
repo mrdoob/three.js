@@ -228,6 +228,53 @@ export const cases = {
 
 	},
 
+	// An external variable used in more than one branch is evaluated once before its first use.
+	'external variable in branches': () => {
+
+		const value = select( uv().x.greaterThan( 0.5 ), float( 2 ), float( 3 ) ).toVar( 'externalValue' );
+		const condition = uniform( 1 ).greaterThan( 0.5 );
+
+		return Fn( () => {
+
+			const first = float( 0 ).toVar( 'first' );
+			first.assign( select( condition, value, float( 0 ) ) );
+
+			const second = float( 0 ).toVar( 'second' );
+			second.assign( select( condition, value.mul( 2 ), float( 0 ) ) );
+
+			return first.add( second );
+
+		} )();
+
+	},
+
+	// An external variable used in a branch and in its inner branch is evaluated only in the outer branch.
+	'external variable in nested branches': () => {
+
+		const value = select( uv().x.greaterThan( 0.5 ), float( 2 ), float( 3 ) ).toVar( 'externalValue' );
+
+		return Fn( () => {
+
+			const result = float( 0 ).toVar( 'result' );
+
+			If( uniform( 1 ).greaterThan( 0.5 ), () => {
+
+				result.assign( value );
+
+				If( uniform( 2 ).greaterThan( 0.5 ), () => {
+
+					result.addAssign( value );
+
+				} );
+
+			} );
+
+			return result;
+
+		} )();
+
+	},
+
 	'assignable scope': () => Fn( () => {
 
 		const explicit = float( 1 ).toVar( 'explicitGlobal' );

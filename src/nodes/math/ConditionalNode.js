@@ -136,8 +136,8 @@ class ConditionalNode extends Node {
 
 		const properties = builder.getNodeProperties( this );
 		properties.condNode = condNode;
-		properties.ifNode = isUniformFlow ? ifNode : ifNode.context( { nodeBlock: ifNode } );
-		properties.elseNode = elseNode ? ( isUniformFlow ? elseNode : elseNode.context( { nodeBlock: elseNode } ) ) : null;
+		properties.ifNode = isUniformFlow ? ifNode : ifNode.context( { nodeBlock: builder.createBlock() } );
+		properties.elseNode = elseNode ? ( isUniformFlow ? elseNode : elseNode.context( { nodeBlock: builder.createBlock() } ) ) : null;
 
 	}
 

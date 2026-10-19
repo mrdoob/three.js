@@ -310,6 +310,90 @@ result = nodeVar0;
 
 result
 
+// external variable in branches
+
+var first : f32;
+var nodeVar0 : f32;
+var externalValue : f32;
+var nodeVar1 : f32;
+var second : f32;
+var nodeVar2 : f32;
+
+first = 0.0;
+
+if ( ( nodeVarying0.x > 0.5 ) ) {
+
+	nodeVar0 = 2.0;
+
+} else {
+
+	nodeVar0 = 3.0;
+
+}
+
+externalValue = nodeVar0;
+let nodeConst0 = ( object.nodeUniform0 > 0.5 );
+
+if ( nodeConst0 ) {
+
+	nodeVar1 = externalValue;
+
+} else {
+
+	nodeVar1 = 0.0;
+
+}
+
+first = nodeVar1;
+second = 0.0;
+
+if ( nodeConst0 ) {
+
+	nodeVar2 = ( externalValue * 2.0 );
+
+} else {
+
+	nodeVar2 = 0.0;
+
+}
+
+second = nodeVar2;
+
+( first + second )
+
+// external variable in nested branches
+
+var result : f32;
+var nodeVar0 : f32;
+var externalValue : f32;
+
+result = 0.0;
+
+if ( ( object.nodeUniform0 > 0.5 ) ) {
+
+	if ( ( nodeVarying0.x > 0.5 ) ) {
+
+		nodeVar0 = 2.0;
+
+	} else {
+
+		nodeVar0 = 3.0;
+
+	}
+
+	externalValue = nodeVar0;
+	result = externalValue;
+
+	if ( ( object.nodeUniform1 > 0.5 ) ) {
+
+		result = ( result + externalValue );
+
+	}
+
+}
+
+result
+
 // assignable scope
 
 var explicitGlobal : f32;

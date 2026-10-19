@@ -111,6 +111,8 @@ class NodeData {
 		this.readUsageCount = undefined;
 		this.writeUsageCount = undefined;
 		this.stack = undefined;
+		this.block = undefined;
+		this.blockContext = undefined;
 		this.stages = undefined;
 		this.snippet = undefined;
 		this.propertyName = undefined;
@@ -149,6 +151,34 @@ const _checkWriteUsage = ( data ) => {
 			}
 
 		}
+
+	}
+
+	return false;
+
+};
+
+const _getCommonBlock = ( blockA, blockB ) => {
+
+	for ( let block = blockA; block !== null; block = block.parent ) {
+
+		for ( let other = blockB; other !== null; other = other.parent ) {
+
+			if ( other === block ) return block;
+
+		}
+
+	}
+
+	return null;
+
+};
+
+const _hasContextOverrides = ( context, baseContext ) => {
+
+	for ( const key in context ) {
+
+		if ( key !== 'nodeBlock' && key !== 'nodeLoop' && context[ key ] !== baseContext[ key ] ) return true;
 
 	}
 
@@ -2073,6 +2103,73 @@ class NodeBuilder {
 	getBaseStack() {
 
 		return this.activeStacks[ 0 ];
+
+	}
+
+	/**
+	 * Creates a code block, e.g. a branch or a loop body, used in the current context. The block
+	 * keeps its parent block, the context and its position in the active stack.
+	 *
+	 * @param {boolean} [repeats=false] - Whether the block runs repeatedly, e.g. a loop body.
+	 * @return {Object} The code block.
+	 */
+	createBlock( repeats = false ) {
+
+		const stack = this.getActiveStack();
+
+		return {
+			parent: this.context.nodeBlock || null,
+			context: this.context,
+			stack,
+			node: stack !== undefined ? stack._currentNode : undefined,
+			repeats
+		};
+
+	}
+
+	/**
+	 * Declares a node outside of the stacks of this build, e.g. created outside of a function. The node is generated
+	 * in the block of its first use, which is visible in its inner blocks. If it is used in another block or in a block
+	 * that repeats, e.g. a loop body, it is declared once before the outermost block of its first use that does not
+	 * enclose both uses, unless it was set up with context overrides made in that block.
+	 *
+	 * @param {Node} node - The node to declare.
+	 * @param {Object} data - The node data.
+	 * @return {StackNode|undefined} The stack where the node was declared.
+	 */
+	declareBeforeBlock( node, data ) {
+
+		if ( this.flowBlock !== null ) return;
+
+		const nodeBlock = this.context.nodeBlock || null;
+
+		if ( data.block === undefined ) {
+
+			data.block = nodeBlock;
+			data.blockContext = this.context;
+
+		}
+
+		// the innermost block that encloses both uses and does not repeat
+		let scope = _getCommonBlock( data.block, nodeBlock );
+
+		while ( scope !== null && scope.repeats ) scope = scope.parent;
+
+		if ( scope === data.block ) return;
+
+		// the outermost block of the first use inside of the scope
+		let block = data.block;
+
+		while ( block.parent !== scope ) block = block.parent;
+
+		// the block is set up in the active stacks of this build, e.g. not in a sub-build
+		if ( this.activeStacks.includes( block.stack ) === false || _hasContextOverrides( data.blockContext, block.context ) ) return;
+
+		if ( this.activeStacks.some( activeStack => activeStack.nodes.includes( node ) ) ) return;
+
+		block.stack.addToStackBefore( node, block.node );
+
+		return block.stack;
 
 	}
 

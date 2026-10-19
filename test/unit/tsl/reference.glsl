@@ -293,6 +293,88 @@ result = nodeVar0;
 
 result
 
+// external variable in branches
+
+float first;
+float nodeVar0;
+float externalValue;
+float nodeVar1;
+float second;
+float nodeVar2;
+first = 0.0;
+
+if ( ( nodeVarying0.x > 0.5 ) ) {
+
+	nodeVar0 = 2.0;
+
+} else {
+
+	nodeVar0 = 3.0;
+
+}
+
+externalValue = nodeVar0;
+bool nodeConst0 = ( nodeUniform0 > 0.5 );
+
+if ( nodeConst0 ) {
+
+	nodeVar1 = externalValue;
+
+} else {
+
+	nodeVar1 = 0.0;
+
+}
+
+first = nodeVar1;
+second = 0.0;
+
+if ( nodeConst0 ) {
+
+	nodeVar2 = ( externalValue * 2.0 );
+
+} else {
+
+	nodeVar2 = 0.0;
+
+}
+
+second = nodeVar2;
+
+( first + second )
+
+// external variable in nested branches
+
+float result;
+float nodeVar0;
+float externalValue;
+result = 0.0;
+
+if ( ( nodeUniform0 > 0.5 ) ) {
+
+	if ( ( nodeVarying0.x > 0.5 ) ) {
+
+		nodeVar0 = 2.0;
+
+	} else {
+
+		nodeVar0 = 3.0;
+
+	}
+
+	externalValue = nodeVar0;
+	result = externalValue;
+
+	if ( ( nodeUniform1 > 0.5 ) ) {
+
+		result = ( result + externalValue );
+
+	}
+
+}
+
+result
+
 // assignable scope
 
 float explicitGlobal;
