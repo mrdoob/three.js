@@ -917,11 +917,27 @@ class PassNode extends Node {
 
 		if ( this.contextNode !== null ) {
 
-			if ( this._contextNodeCache === null || this._contextNodeCache.version !== this.version ) {
+			const rendererContextNode = renderer.contextNode;
+			const cache = this._contextNodeCache;
+
+			if ( cache === null || cache.version !== this.version || cache.rendererContextNode !== rendererContextNode || cache.rendererVersion !== rendererContextNode.version ) {
+
+				const rendererContextData = rendererContextNode.getFlowContextData();
+				const contextData = { ...rendererContextData, ...this.contextNode.getFlowContextData() };
+
+				// the node overrides of the renderer and the pass are merged, the pass overrides take precedence
+
+				if ( rendererContextData.overrideNodes !== undefined && contextData.overrideNodes !== rendererContextData.overrideNodes ) {
+
+					contextData.overrideNodes = new Map( [ ...rendererContextData.overrideNodes, ...( contextData.overrideNodes || [] ) ] );
+
+				}
 
 				this._contextNodeCache = {
 					version: this.version,
-					context: context( { ...renderer.contextNode.getFlowContextData(), ...this.contextNode.getFlowContextData() } )
+					rendererContextNode,
+					rendererVersion: rendererContextNode.version,
+					context: context( contextData )
 				};
 
 			}
