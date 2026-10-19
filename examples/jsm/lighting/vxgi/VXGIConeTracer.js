@@ -1,4 +1,4 @@
-import { float, vec3, vec4, If, Loop, Break, max, min, abs, dot, clamp, log2, exp2, select } from 'three/tsl';
+import { float, vec3, vec4, If, Loop, Break, max, min, abs, dot, clamp, log2, exp2, select, EPSILON } from 'three/tsl';
 
 /**
  * Emits the intersection of a ray with the bounds of the given volume.
@@ -14,9 +14,9 @@ export function intersectVolume( volume, origin, direction ) {
 	const boundsMax = boundsMin.add( volume.volumeSizeNode ).toConst();
 
 	const safeDirection = vec3(
-		select( abs( direction.x ).lessThan( 1e-6 ), 1e-6, direction.x ),
-		select( abs( direction.y ).lessThan( 1e-6 ), 1e-6, direction.y ),
-		select( abs( direction.z ).lessThan( 1e-6 ), 1e-6, direction.z )
+		select( abs( direction.x ).lessThan( EPSILON ), EPSILON, direction.x ),
+		select( abs( direction.y ).lessThan( EPSILON ), EPSILON, direction.y ),
+		select( abs( direction.z ).lessThan( EPSILON ), EPSILON, direction.z )
 	).toConst();
 
 	const invDirection = float( 1 ).div( safeDirection ).toConst();
@@ -118,7 +118,7 @@ export function createConeTracer( volume, options = {} ) {
 
 		// AO falloff 1 / ( 1 + r / aoDistance )
 
-		const aoFalloff = aoDistance !== null ? select( aoDistance.greaterThan( 0 ), float( 1 ).div( max( aoDistance, 1e-6 ) ), float( 0 ) ).toConst() : null;
+		const aoFalloff = aoDistance !== null ? select( aoDistance.greaterThan( 0 ), float( 1 ).div( max( aoDistance, EPSILON ) ), float( 0 ) ).toConst() : null;
 
 		If( tExit.greaterThan( t ), () => {
 

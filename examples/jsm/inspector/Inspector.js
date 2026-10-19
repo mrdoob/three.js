@@ -468,9 +468,9 @@ class Inspector extends RendererInspector {
 
 		data.cpu = this.getAverageDeltaTime( data, 'cpu' );
 		data.gpu = this.getAverageDeltaTime( data, 'gpu' );
-		data.total = data.cpu + data.gpu;
 
-		// children
+		// children: the CPU time of a render or compute call includes the calls nested in it, the GPU time of each
+		// pass is measured separately
 
 		for ( const child of stats.children ) {
 
@@ -478,11 +478,11 @@ class Inspector extends RendererInspector {
 
 			const childData = this.getStatsData( child.cid );
 
-			data.cpu += childData.cpu;
 			data.gpu += childData.gpu;
-			data.total += childData.total;
 
 		}
+
+		data.total = data.cpu + data.gpu;
 
 	}
 
@@ -567,9 +567,8 @@ class Inspector extends RendererInspector {
 
 		}
 
-		// improve stats using previous frame
+		// the time since the last frame which rendered, see RendererInspector.finish()
 
-		frame.deltaTime = frame.startTime - previousFrame.startTime;
 		frame.miscellaneous = frame.deltaTime - frame.total;
 
 		if ( frame.miscellaneous < 0 ) {
