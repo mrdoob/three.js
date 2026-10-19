@@ -1702,6 +1702,8 @@ class WebGLRenderer {
 			_localClippingEnabled = this.localClippingEnabled;
 			_clippingEnabled = clipping.init( this.clippingPlanes, _localClippingEnabled );
 
+			this.info.render.frame ++;
+
 			currentRenderList = renderLists.get( scene, renderListStack.length );
 			currentRenderList.init();
 
@@ -1736,10 +1738,6 @@ class WebGLRenderer {
 				background.addToRenderList( currentRenderList, scene );
 
 			}
-
-			//
-
-			this.info.render.frame ++;
 
 			if ( this.info.autoReset === true ) this.info.reset();
 
