@@ -181,7 +181,8 @@ export class XREstimatedLight extends Group {
 
 		let sessionLightProbe = null;
 		let estimationStarted = false;
-		renderer.xr.addEventListener( 'sessionstart', () => {
+
+		const onSessionStart = () => {
 
 			const session = renderer.xr.getSession();
 
@@ -192,6 +193,9 @@ export class XREstimatedLight extends Group {
 					reflectionFormat: session.preferredReflectionFormat
 
 				} ).then( ( probe ) => {
+
+					// The light may have been disposed while the probe was requested.
+					if ( this.lightProbe === null ) return;
 
 					sessionLightProbe = new SessionLightProbe( this, renderer, probe, environmentEstimation, () => {
 
@@ -206,9 +210,9 @@ export class XREstimatedLight extends Group {
 
 			}
 
-		} );
+		};
 
-		renderer.xr.addEventListener( 'sessionend', () => {
+		const onSessionEnd = () => {
 
 			if ( sessionLightProbe ) {
 
@@ -224,13 +228,19 @@ export class XREstimatedLight extends Group {
 
 			}
 
-		} );
+		};
+
+		renderer.xr.addEventListener( 'sessionstart', onSessionStart );
+		renderer.xr.addEventListener( 'sessionend', onSessionEnd );
 
 		/**
 		 * Frees the GPU-related resources allocated by this instance. Call this
 		 * method whenever this instance is no longer used in your app.
 		 */
 		this.dispose = () => {
+
+			renderer.xr.removeEventListener( 'sessionstart', onSessionStart );
+			renderer.xr.removeEventListener( 'sessionend', onSessionEnd );
 
 			if ( sessionLightProbe ) {
 
