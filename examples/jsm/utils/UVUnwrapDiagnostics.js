@@ -22,7 +22,7 @@ function analyzeUVUnwrap( result, options = {} ) {
 	const add = ( code, message, count = 1 ) => issues.push( { code, message, count } );
 	if ( ! result ) {
 
-		add( 'packing', 'Charts could not be packed into the atlas.' );
+		add( 'unwrap', 'Atlas generation failed: packing capacity or Float32 precision. See unwrapUVs console diagnostics.' );
 		return { passed: false, issues, metrics };
 
 	}

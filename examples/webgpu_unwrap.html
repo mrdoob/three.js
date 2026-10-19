@@ -186,7 +186,7 @@
 					const ignored = result.meshes.reduce( ( sum, record ) => sum + record.faceCharts.reduce( ( count, chart ) => count + ( chart === - 1 ? 1 : 0 ), 0 ), 0 );
 					status.textContent = `${ triangles.toLocaleString() } triangles / ${ result.charts.length } charts\n${ elapsed.toFixed( 1 ) } ms\n${ result.texelsPerUnit.toFixed( 2 ) } texels/world unit\n${ ignored } ignored triangles`;
 					status.classList.toggle( 'error', ! analysis.passed );
-					status.textContent += `\n${ analysis.passed ? 'PASS' : 'FAIL / quality warning' } (${ analysisElapsed.toFixed( 1 ) } ms analysis)\n${ analysis.issues.map( issue => issue.message ).join( '\n' ) }`;
+					status.textContent += `\n${ analysis.passed ? 'PASS' : 'FAIL / quality warning' } (${ analysisElapsed.toFixed( 1 ) } ms analysis)\n${ analysis.issues.map( issue => `${ issue.count ?? 1 }: ${ issue.message }` ).join( '\n' ) }`;
 					drawAtlas();
 					updateMaterials();
 
@@ -266,7 +266,16 @@
 
 				} else {
 
-					loaded = name.endsWith( '.obj' ) ? await objLoader.loadAsync( `models/gltf/${ name }` ) : ( await loader.loadAsync( `models/gltf/${ name }` ) ).scene;
+					try {
+
+						loaded = name.endsWith( '.obj' ) ? await objLoader.loadAsync( `models/gltf/${ name }` ) : ( await loader.loadAsync( `models/gltf/${ name }` ) ).scene;
+
+					} catch ( error ) {
+
+						if ( id !== loadId ) return;
+						throw error;
+
+					}
 
 				}
 
