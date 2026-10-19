@@ -1055,7 +1055,7 @@ class Renderer {
 		renderContext.stencil = this.stencil;
 
 		if ( ! renderContext.clippingContext ) renderContext.clippingContext = new ClippingContext();
-		renderContext.clippingContext.updateGlobal( sceneRef, camera );
+		renderContext.clippingContext.updateGlobal( sceneRef );
 
 		//
 
@@ -2028,7 +2028,7 @@ class Renderer {
 		renderContext.scissorValue.height >>= activeMipmapLevel;
 
 		if ( ! renderContext.clippingContext ) renderContext.clippingContext = new ClippingContext();
-		renderContext.clippingContext.updateGlobal( sceneRef, camera );
+		renderContext.clippingContext.updateGlobal( sceneRef );
 
 		//
 

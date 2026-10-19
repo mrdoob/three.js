@@ -66,9 +66,9 @@ class ClippingNode extends Node {
 
 		this.hardwareClipping = builder.hardwareClipping;
 
-		// Preserve positionView's custom vertexNode handling while matching the
-		// world-space planes shared by an ArrayCamera's sub-cameras.
-		this.position = builder.camera.isArrayCamera === true ? cameraWorldMatrix.mul( vec4( positionView, 1 ) ).xyz : positionView;
+		// Clipping planes are in world space. Reconstruct the world position from
+		// positionView so custom vertexNode positions and ArrayCamera views work.
+		this.position = cameraWorldMatrix.mul( vec4( positionView, 1 ) ).xyz;
 
 		if ( this.scope === ClippingNode.ALPHA_TO_COVERAGE ) {
 
