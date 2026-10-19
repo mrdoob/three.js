@@ -139,7 +139,7 @@ function analyzeUVUnwrap( result, options = {} ) {
 	}
 
 	if ( ! Number.isFinite( metrics.minDensity ) ) metrics.minDensity = 0;
-	metrics.singleTriangleChartRatio = chartFaces.length ? chartFaces.filter( count => count === 1 ).length / chartFaces.length : 0;
+	metrics.singleTriangleChartRatio = metrics.faces ? chartFaces.filter( count => count === 1 ).length / metrics.faces : 0;
 	for ( const [ key, message ] of [
 		[ 'invalidFaces', 'Faces have missing, nonfinite, out-of-bounds UVs or invalid chart mappings.' ],
 		[ 'excludedFaces', 'Faces were excluded from the atlas; inspect source degeneracy or precision loss.' ],
@@ -157,7 +157,7 @@ function analyzeUVUnwrap( result, options = {} ) {
 	if ( metrics.faces === 0 || triangles.length === 0 ) add( 'empty', 'No usable UV triangles were generated.' );
 	if ( metrics.maxStretch > limits.maxStretch ) add( 'stretch', `Maximum anisotropic stretch ${ metrics.maxStretch.toFixed( 2 ) } exceeds ${ limits.maxStretch }.` );
 	if ( metrics.minDensity > 0 && metrics.maxDensity / metrics.minDensity > limits.maxDensityRatio ) add( 'density', `Texel density ratio ${ ( metrics.maxDensity / metrics.minDensity ).toFixed( 2 ) } exceeds ${ limits.maxDensityRatio }.` );
-	if ( metrics.faces >= 20 && metrics.singleTriangleChartRatio > limits.maxSingleTriangleRatio ) add( 'fragmentation', `${ ( metrics.singleTriangleChartRatio * 100 ).toFixed( 1 ) }% of charts contain only one triangle.` );
+	if ( metrics.faces >= 20 && metrics.singleTriangleChartRatio > limits.maxSingleTriangleRatio ) add( 'fragmentation', `${ ( metrics.singleTriangleChartRatio * 100 ).toFixed( 1 ) }% of faces are isolated in single-triangle charts.` );
 	return { passed: issues.length === 0, issues, metrics };
 
 }
@@ -205,3 +205,4 @@ function intersectionArea( a, b ) {
 }
 
 export { analyzeUVUnwrap };
+
