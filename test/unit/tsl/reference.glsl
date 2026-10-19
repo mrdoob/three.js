@@ -297,36 +297,35 @@ result
 
 float first;
 float nodeVar0;
-float externalValue;
 float nodeVar1;
+float externalValue;
 float second;
 float nodeVar2;
 first = 0.0;
-
-if ( ( nodeVarying0.x > 0.5 ) ) {
-
-	nodeVar0 = 2.0;
-
-} else {
-
-	nodeVar0 = 3.0;
-
-}
-
-externalValue = nodeVar0;
 bool nodeConst0 = ( nodeUniform0 > 0.5 );
 
 if ( nodeConst0 ) {
 
-	nodeVar1 = externalValue;
+	if ( ( nodeVarying0.x > 0.5 ) ) {
+
+		nodeVar1 = 2.0;
+
+	} else {
+
+		nodeVar1 = 3.0;
+
+	}
+
+	externalValue = nodeVar1;
+	nodeVar0 = externalValue;
 
 } else {
 
-	nodeVar1 = 0.0;
+	nodeVar0 = 0.0;
 
 }
 
-first = nodeVar1;
+first = nodeVar0;
 second = 0.0;
 
 if ( nodeConst0 ) {
@@ -378,55 +377,54 @@ result
 // external variable in branches of the same condition
 
 vec3 diffuse;
-vec4 nodeVar0;
-float nodeVar1;
+vec3 nodeVar0;
+vec4 nodeVar1;
 float nodeVar2;
+float nodeVar3;
 vec4 room;
-vec3 nodeVar3;
 vec3 emissive;
 vec3 nodeVar4;
 diffuse = vec3( 1.0, 1.0, 1.0 );
-
-if ( ( nodeVarying0.x > 0.5 ) ) {
-
-	nodeVar1 = 0.0;
-
-	for ( int i = 0; i < 4; i ++ ) {
-
-		nodeVar1 = ( nodeVar1 + ( 1.0 * float( i ) ) );
-
-	}
-
-	nodeVar0 = vec4( nodeVar1 );
-
-} else {
-
-	nodeVar2 = 0.0;
-
-	for ( int i = 0; i < 4; i ++ ) {
-
-		nodeVar2 = ( nodeVar2 + ( 2.0 * float( i ) ) );
-
-	}
-
-	nodeVar0 = vec4( nodeVar2 );
-
-}
-
-room = nodeVar0;
 bool nodeConst0 = ( nodeUniform0 > 0.5 );
 
 if ( nodeConst0 ) {
 
-	nodeVar3 = room.xyz;
+	if ( ( nodeVarying0.x > 0.5 ) ) {
+
+		nodeVar2 = 0.0;
+
+		for ( int i = 0; i < 4; i ++ ) {
+
+			nodeVar2 = ( nodeVar2 + ( 1.0 * float( i ) ) );
+
+		}
+
+		nodeVar1 = vec4( nodeVar2 );
+
+	} else {
+
+		nodeVar3 = 0.0;
+
+		for ( int i = 0; i < 4; i ++ ) {
+
+			nodeVar3 = ( nodeVar3 + ( 2.0 * float( i ) ) );
+
+		}
+
+		nodeVar1 = vec4( nodeVar3 );
+
+	}
+
+	room = nodeVar1;
+	nodeVar0 = room.xyz;
 
 } else {
 
-	nodeVar3 = vec3( 0.0, 0.0, 0.0 );
+	nodeVar0 = vec3( 0.0, 0.0, 0.0 );
 
 }
 
-diffuse = nodeVar3;
+diffuse = nodeVar0;
 emissive = vec3( 0.0, 0.0, 0.0 );
 
 if ( nodeConst0 ) {

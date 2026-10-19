@@ -228,7 +228,7 @@ export const cases = {
 
 	},
 
-	// An external variable used in more than one branch is evaluated once before its first use.
+	// An external variable used in branches of the same immutable condition is evaluated once, in the first branch.
 	'external variable in branches': () => {
 
 		const value = select( uv().x.greaterThan( 0.5 ), float( 2 ), float( 3 ) ).toVar( 'externalValue' );

@@ -130,14 +130,10 @@ class ConditionalNode extends Node {
 
 		const { condNode, ifNode, elseNode } = this;
 
-		//
-
-		const isUniformFlow = builder.context.uniformFlow;
-
 		const properties = builder.getNodeProperties( this );
 		properties.condNode = condNode;
-		properties.ifNode = isUniformFlow ? ifNode : ifNode.context( { nodeBlock: builder.createBlock() } );
-		properties.elseNode = elseNode ? ( isUniformFlow ? elseNode : elseNode.context( { nodeBlock: builder.createBlock() } ) ) : null;
+		properties.ifNode = ifNode;
+		properties.elseNode = elseNode;
 
 	}
 
@@ -220,9 +216,13 @@ class ConditionalNode extends Node {
 
 		builder.addFlowCode( `\n${ builder.tab }if ( ${ nodeSnippet } ) {\n\n` ).addFlowTab();
 
+		// An immutable condition, i.e. a constant, is the guard of the blocks: blocks of the same parent and guard run together.
+		const condData = builder.getDataFromNode( condNode );
+		const guard = condData.propertyName === nodeSnippet && condData.assign !== true ? nodeSnippet : undefined;
+
 		const flowBlock = builder.flowBlock;
 
-		builder.flowBlock = { parent: flowBlock };
+		builder.flowBlock = { parent: flowBlock, guard };
 
 		let ifSnippet = ifNode.build( builder, type );
 
@@ -256,7 +256,7 @@ class ConditionalNode extends Node {
 
 			builder.addFlowCode( ' else {\n\n' ).addFlowTab();
 
-			builder.flowBlock = { parent: flowBlock };
+			builder.flowBlock = { parent: flowBlock, guard: guard !== undefined ? '!' + guard : undefined };
 
 			let elseSnippet = elseNode.build( builder, type );
 

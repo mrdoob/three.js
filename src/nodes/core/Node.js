@@ -235,7 +235,7 @@ class Node extends EventDispatcher {
 	}
 
 	/**
-	 * Declares the assignable node before the blocks where it is used if it has no stack, and
+	 * Declares the assignable node before the loops where it is used if it has no stack, and
 	 * decides if a value that cannot be cached must be evaluated once at its declaration.
 	 *
 	 * @private
@@ -249,9 +249,9 @@ class Node extends EventDispatcher {
 
 		if ( data.stack === undefined && builder.buildStage === 'setup' ) {
 
-			// A node outside of the stacks of this build, e.g. created outside of a function, is declared before
-			// the blocks where it is used if they would repeat it, e.g. a loop body or more than one branch.
-			data.stack = builder.declareBeforeBlock( this, data );
+			// A node outside of the stacks of this build, e.g. created outside of a function, is declared
+			// before the outermost loop where its value does not change, otherwise every iteration would repeat it.
+			data.stack = builder.declareBeforeBlock( this );
 
 		} else if ( this.assignable === true && nodeLoop && builder.buildStage === 'analyze' ) {
 
@@ -353,7 +353,22 @@ class Node extends EventDispatcher {
 	}
 
 	/**
+	 * Whether the generated value is a variable declared in the scope of the function,
+	 * so it keeps its value after the block where it was generated, e.g. a {@link VarNode}.
+	 *
+	 * @private
+	 * @return {boolean} Whether the generated value is a variable of the function scope.
+	 */
+	_isFunctionScope() {
+
+		return false;
+
+	}
+
+	/**
 	 * A generated value is only visible in the block where it was declared and in its inner blocks.
+	 * A variable of the function scope is also visible in a later block of the same parent and guard,
+	 * e.g. a second `if ( c )` of an immutable condition `c`, since that block only runs if its block ran.
 	 * This method discards the generated value if it is not visible in the current block.
 	 *
 	 * @private
@@ -364,9 +379,14 @@ class Node extends EventDispatcher {
 
 		if ( nodeData.flowBlock !== undefined ) {
 
+			const { guard, parent } = nodeData.flowBlock;
+			const isFunctionScope = guard !== undefined && this._isFunctionScope();
+
 			let flowBlock = builder.flowBlock;
 
 			while ( flowBlock !== null && flowBlock !== nodeData.flowBlock ) {
+
+				if ( isFunctionScope && flowBlock.guard === guard && flowBlock.parent === parent ) break;
 
 				flowBlock = flowBlock.parent;
 

@@ -314,37 +314,36 @@ result
 
 var first : f32;
 var nodeVar0 : f32;
-var externalValue : f32;
 var nodeVar1 : f32;
+var externalValue : f32;
 var second : f32;
 var nodeVar2 : f32;
 
 first = 0.0;
-
-if ( ( nodeVarying0.x > 0.5 ) ) {
-
-	nodeVar0 = 2.0;
-
-} else {
-
-	nodeVar0 = 3.0;
-
-}
-
-externalValue = nodeVar0;
 let nodeConst0 = ( object.nodeUniform0 > 0.5 );
 
 if ( nodeConst0 ) {
 
-	nodeVar1 = externalValue;
+	if ( ( nodeVarying0.x > 0.5 ) ) {
+
+		nodeVar1 = 2.0;
+
+	} else {
+
+		nodeVar1 = 3.0;
+
+	}
+
+	externalValue = nodeVar1;
+	nodeVar0 = externalValue;
 
 } else {
 
-	nodeVar1 = 0.0;
+	nodeVar0 = 0.0;
 
 }
 
-first = nodeVar1;
+first = nodeVar0;
 second = 0.0;
 
 if ( nodeConst0 ) {
@@ -397,56 +396,55 @@ result
 // external variable in branches of the same condition
 
 var diffuse : vec3<f32>;
-var nodeVar0 : vec4<f32>;
-var nodeVar1 : f32;
+var nodeVar0 : vec3<f32>;
+var nodeVar1 : vec4<f32>;
 var nodeVar2 : f32;
+var nodeVar3 : f32;
 var room : vec4<f32>;
-var nodeVar3 : vec3<f32>;
 var emissive : vec3<f32>;
 var nodeVar4 : vec3<f32>;
 
 diffuse = vec3<f32>( 1.0, 1.0, 1.0 );
-
-if ( ( nodeVarying0.x > 0.5 ) ) {
-
-	nodeVar1 = 0.0;
-
-	for ( var i : i32 = 0; i < 4; i ++ ) {
-
-		nodeVar1 = ( nodeVar1 + ( 1.0 * f32( i ) ) );
-
-	}
-
-	nodeVar0 = vec4<f32>( nodeVar1 );
-
-} else {
-
-	nodeVar2 = 0.0;
-
-	for ( var i : i32 = 0; i < 4; i ++ ) {
-
-		nodeVar2 = ( nodeVar2 + ( 2.0 * f32( i ) ) );
-
-	}
-
-	nodeVar0 = vec4<f32>( nodeVar2 );
-
-}
-
-room = nodeVar0;
 let nodeConst0 = ( object.nodeUniform0 > 0.5 );
 
 if ( nodeConst0 ) {
 
-	nodeVar3 = room.xyz;
+	if ( ( nodeVarying0.x > 0.5 ) ) {
+
+		nodeVar2 = 0.0;
+
+		for ( var i : i32 = 0; i < 4; i ++ ) {
+
+			nodeVar2 = ( nodeVar2 + ( 1.0 * f32( i ) ) );
+
+		}
+
+		nodeVar1 = vec4<f32>( nodeVar2 );
+
+	} else {
+
+		nodeVar3 = 0.0;
+
+		for ( var i : i32 = 0; i < 4; i ++ ) {
+
+			nodeVar3 = ( nodeVar3 + ( 2.0 * f32( i ) ) );
+
+		}
+
+		nodeVar1 = vec4<f32>( nodeVar3 );
+
+	}
+
+	room = nodeVar1;
+	nodeVar0 = room.xyz;
 
 } else {
 
-	nodeVar3 = vec3<f32>( 0.0, 0.0, 0.0 );
+	nodeVar0 = vec3<f32>( 0.0, 0.0, 0.0 );
 
 }
 
-diffuse = nodeVar3;
+diffuse = nodeVar0;
 emissive = vec3<f32>( 0.0, 0.0, 0.0 );
 
 if ( nodeConst0 ) {
