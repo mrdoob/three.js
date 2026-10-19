@@ -66,7 +66,7 @@ class BumpMapNode extends Node {
 	 *
 	 * @param {Node<float>} textureNode - Represents the bump map data.
 	 * @param {?Node<float>} [scaleNode=null] - Controls the intensity of the bump effect.
-	 * @param {?Node<vec3>} [normalNode=null] - The view-space normal to perturb. Defaults to `normalView`.
+	 * @param {?Node<vec3>} [normalNode=null] - The view-space normal to perturb.
 	 */
 	constructor( textureNode, scaleNode = null, normalNode = null ) {
 
@@ -88,7 +88,7 @@ class BumpMapNode extends Node {
 		this.scaleNode = scaleNode;
 
 		/**
-		 * The view-space normal to perturb. Defaults to `normalView`.
+		 * The view-space normal to perturb. Uses `normalView` if not set.
 		 *
 		 * @type {?Node<vec3>}
 		 * @default null
@@ -128,7 +128,7 @@ export default BumpMapNode;
  * @function
  * @param {Node<float>} textureNode - Represents the bump map data.
  * @param {?Node<float>} [scaleNode=null] - Controls the intensity of the bump effect.
- * @param {?Node<vec3>} [normalNode=null] - The view-space normal to perturb. Defaults to `normalView`.
+ * @param {?Node<vec3>} [normalNode=null] - The view-space normal to perturb.
  * @returns {BumpMapNode}
  */
 export const bumpMap = /*@__PURE__*/ nodeProxy( BumpMapNode ).setParameterLength( 1, 3 );
