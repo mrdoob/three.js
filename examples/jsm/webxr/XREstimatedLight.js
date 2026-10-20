@@ -194,9 +194,6 @@ export class XREstimatedLight extends Group {
 
 				} ).then( ( probe ) => {
 
-					// The light may have been disposed while the probe was requested.
-					if ( this.lightProbe === null ) return;
-
 					sessionLightProbe = new SessionLightProbe( this, renderer, probe, environmentEstimation, () => {
 
 						estimationStarted = true;
