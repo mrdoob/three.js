@@ -83,7 +83,6 @@ class DirectionalLightMapNode extends LightingNode {
 		const irradiance = this.lightMapNode.mul( halfLambert( normal ).div( halfLambert( geometryNormal ).max( 1e-4 ) ) ).toVar();
 
 		context.irradiance.addAssign( irradiance );
-		context.irradianceLightMap = irradiance;
 
 		if ( this.specularIntensityNode === null || context.lightingModel instanceof PhysicalLightingModel === false ) return;
 
@@ -265,7 +264,7 @@ function setupLightMap( builder ) {
 
 	}
 
-	return this.isMeshBasicNodeMaterial === true ? new BasicLightMapNode( lightMapNode ) : new IrradianceNode( lightMapNode, true );
+	return this.isMeshBasicNodeMaterial === true ? new BasicLightMapNode( lightMapNode ) : new IrradianceNode( lightMapNode );
 
 }
 

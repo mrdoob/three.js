@@ -282,9 +282,9 @@ class LightBaker {
 		 * The voxels along the longest axis of the scene for the `'vxgi'` algorithm.
 		 *
 		 * @type {number}
-		 * @default 64
+		 * @default 256
 		 */
-		this.vxgiResolution = 64;
+		this.vxgiResolution = 256;
 
 		/**
 		 * The scene of the last bake.
@@ -1351,10 +1351,10 @@ class LightBaker {
 			const volume = new VXGIVolume( this.vxgiResolution );
 			volume.update( renderer, scene );
 
-			// fewer cones per pixel keep the live view interactive
+			// three cones like webgpu_vxgi, shared by the live view and the light map
 
-			this.irradianceNode = vxgiIrradiance( volume );
-			this.liveIrradianceNode = vxgiIrradiance( volume, { coneCount: 3 } );
+			this.irradianceNode = vxgiIrradiance( volume, { coneCount: 3 } );
+			this.liveIrradianceNode = this.irradianceNode;
 			this.source = volume;
 
 		}

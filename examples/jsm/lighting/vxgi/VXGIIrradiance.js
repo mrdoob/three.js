@@ -1,4 +1,4 @@
-import { Fn, Loop, PI, abs, cos, cross, float, fract, luminance, normalize, select, sin, sqrt, vec3 } from 'three/tsl';
+import { Fn, Loop, PI, abs, cos, cross, float, fract, interleavedGradientNoise, luminance, normalize, screenCoordinate, select, sin, sqrt, vec2, vec3 } from 'three/tsl';
 import { createConeTracer } from './VXGIConeTracer.js';
 
 /**
@@ -7,9 +7,10 @@ import { createConeTracer } from './VXGIConeTracer.js';
  * cones through the volume's radiance, including cached bounces, cones that leave the volume
  * see the sky of {@link VXGIVolume#environment}.
  * It can be passed directly to {@link LightMapper}, without a screen-space pass.
- * The optional sample index rotates the cones so that accumulated samples converge. The sampler
- * adds the luminance-weighted cone directions to its optional fourth argument, for the directional
- * light maps of {@link LightMapper}.
+ * The cones are rotated per pixel with interleaved gradient noise like `VXGINode`. When baking, the
+ * pixel is the light map texel. The optional sample index shifts the noise so that accumulated
+ * samples, or a temporal filter like TRAA, converge. The sampler adds the luminance-weighted cone
+ * directions to its optional fourth argument, for the directional light maps of {@link LightMapper}.
  *
  * @param {VXGIVolume} volume - The prepared voxel volume.
  * @param {Object} [options] - Options.
@@ -27,10 +28,11 @@ function vxgiIrradiance( volume, { coneCount = 8 } = {} ) {
 
 	return ( position, normal, sample = float( 0 ), lightDirection = null ) => Fn( () => {
 
-		// R2 sequence offsets of the stratified cone set
+		// interleaved gradient noise offsets of the stratified cone set, see VXGINode
 
-		const elevation = fract( sample.mul( 0.7548777 ).add( 0.5 ) ).toConst();
-		const rotation = fract( sample.mul( 0.5698403 ) ).toConst();
+		const shift = screenCoordinate.add( sample.mul( 5.588238 ) ).toConst();
+		const elevation = interleavedGradientNoise( shift.add( vec2( 5.588238, 3.14159 ) ) ).toConst();
+		const rotation = interleavedGradientNoise( shift ).toConst();
 
 		const up = select( abs( normal.y ).lessThan( 0.99 ), vec3( 0, 1, 0 ), vec3( 1, 0, 0 ) );
 		const tangent = normalize( cross( normal, up ) ).toConst();

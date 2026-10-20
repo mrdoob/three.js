@@ -38,7 +38,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { attribute, builtinGIContext, cameraProjectionMatrix, color, float, ivec2, mix, modelViewMatrix, normalWorld, pass, passTexture, positionGeometry, positionWorld, screenCoordinate, texture, toneMappingExposure, uniform, varying, vec4 } from 'three/tsl';
+			import { attribute, builtinGIContext, cameraProjectionMatrix, color, float, ivec2, mix, modelViewMatrix, mrt, normalWorld, output, pass, passTexture, positionGeometry, positionWorld, screenCoordinate, texture, toneMappingExposure, uniform, varying, vec4, velocity } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
@@ -46,6 +46,7 @@
 			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
 			import { VertexLightBaker, vertexIrradiance } from 'three/addons/lighting/VertexLightBaker.js';
 			import { lightProbeGridIrradiance } from 'three/addons/tsl/lighting/LightProbeGridNode.js';
+			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 			import { instancedLightMap } from 'three/addons/tsl/lighting/DirectionalLightMapNode.js';
 			import { ReflectionProbes } from 'three/addons/lighting/ReflectionProbes.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -56,12 +57,16 @@
 
 			let camera, scene, renderer, controls, renderPipeline;
 			let world, meshes, materials, status, warning, credit;
-			let lightBaker, bakedPass, livePass, liveOutput;
+			let lightBaker, bakedPass, livePass, liveTRAA = null, liveOutput;
 			let busy = false, bakePending = false, bakeController = null, bakeId = 0;
 			let dynamicObjects, dynamicTime = 0, dynamicMaterialKey = '', frameTime = 0;
 			let capture = null, captureBakeId = - 1, previewBakeId = - 1, captureStatus = '';
 			let vertexPass, vertexGI = null, vertexControls = [], wireframe = null;
 			let gltfLoader = null, sceneControl, gltfFolder, uv1Control;
+
+			// shifts the per-pixel cone noise of the live VXGI view every frame, like the light map samples
+
+			const liveFrame = uniform( 0 );
 
 			const worlds = {};
 			const probeKeyedMaterials = new WeakSet();
@@ -502,7 +507,7 @@
 					camera: new THREE.Vector3( 0, 2.5, 8 ), target: new THREE.Vector3( 0, 2.5, 0 ),
 					path: [[ - 2.2, 0.55, - 2.2 ], [ - 2.3, 1.3, 0.3 ], [ - 1.1, 2.4, 1.8 ], [ 1, 1.9, 1.9 ], [ 2.3, 1.1, 0.1 ], [ 2, 0.55, - 2.1 ], [ 0.5, 1, - 2.3 ], [ - 0.9, 0.6, - 2.4 ]], objectSize: 0.3,
 					reflections: [ { position: [ 0.4, 1.6, 1.3 ], box: [ - 3, 0, - 3, 3, 5, 3 ] }, { position: [ 0.6, 1.6, - 1.9 ], box: [ - 3, 0, - 3, 3, 5, 3 ] } ],
-					probes: { size: new THREE.Vector3( 5.6, 4.7, 5.6 ), position: new THREE.Vector3( 0, 2.45, 0 ), counts: [ 6, 6, 6 ], far: 20 }
+					probes: { size: new THREE.Vector3( 5.6, 4.7, 5.6 ), position: new THREE.Vector3( 0, 2.45, 0 ), counts: [ 8, 8, 8 ], far: 20 }
 				};
 
 			}
@@ -1398,11 +1403,27 @@
 				lightBaker.apply();
 
 				livePass?.dispose();
+				liveTRAA?.dispose();
 				liveOutput?.dispose();
 
-				livePass = pass( scene, camera );
-				livePass.contextNode = builtinGIContext( float( 1 ), lightBaker.liveIrradianceNode( positionWorld, normalWorld ) );
-				liveOutput = new FrameAccumulationNode( livePass.getTextureNode() );
+				// TRAA resolves the per-pixel cone noise of VXGI while the view moves, like webgpu_vxgi. It needs a
+				// single-sampled depth buffer
+
+				const vxgi = params.algorithm === 'VXGI';
+
+				livePass = pass( scene, camera, vxgi ? { samples: 0 } : {} );
+				livePass.contextNode = builtinGIContext( float( 1 ), lightBaker.liveIrradianceNode( positionWorld, normalWorld, vxgi ? liveFrame : undefined ) );
+
+				liveTRAA = null;
+
+				if ( vxgi ) {
+
+					livePass.setMRT( mrt( { output, velocity } ) );
+					liveTRAA = traa( livePass.getTextureNode( 'output' ), livePass.getTextureNode( 'depth' ), livePass.getTextureNode( 'velocity' ), camera );
+
+				}
+
+				liveOutput = new FrameAccumulationNode( vxgi ? liveTRAA.getTextureNode() : livePass.getTextureNode() );
 
 				setOutput();
 
@@ -1828,6 +1849,7 @@
 
 				if ( params.output === 'Live GI' ) {
 
+					liveFrame.value = ( liveFrame.value + 1 ) % 64;
 					status.textContent = `Live ${ params.algorithm }: ${ liveOutput.frames } frames`;
 
 				} else if ( lightBaker.baking ) {

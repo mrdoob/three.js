@@ -31,7 +31,7 @@ let _rendererState;
  * Keep the source geometry and GI data static while accumulating. Call `reset()`
  * after changing transforms or lighting. Atlas charts need at least three texels
  * of padding; the resolve fills two texels around covered surfaces.
- * Irradiance uses linear BT.709/sRGB primaries in lux, following `KHR_lightmap`.
+ * Irradiance uses linear BT.709/sRGB primaries in lux.
  * With the `directional` option, the light mapper also bakes the dominant direction of the
  * incident light into {@link LightMapper#directionTexture}, so that normal maps show under baked
  * light, see `directionalLightMap()`.
@@ -168,7 +168,7 @@ class LightMapper {
 		/**
 		 * The baked light map. It stores linear diffuse irradiance in lux, without baked
 		 * albedo, material ambient occlusion, or display exposure, and uses `uv1`.
-		 * Values are not divided by pi, matching the `KHR_lightmap` convention.
+		 * Values are not divided by pi, matching the runtime light map input.
 		 *
 		 * @type {Texture}
 		 */

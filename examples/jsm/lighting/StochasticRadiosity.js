@@ -578,7 +578,7 @@ class StochasticRadiosity {
 				const coord = lightMapUV().mul( tile.xy ).add( tile.zw );
 
 				material.lightMapTile = getTile( page, this._tiles );
-				material.setupLightMap = () => new IrradianceNode( texture( this._cache.texture, coord ).rgb, true );
+				material.setupLightMap = () => new IrradianceNode( texture( this._cache.texture, coord ).rgb );
 
 			}
 
