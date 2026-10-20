@@ -127,21 +127,44 @@ class ValueNumber extends Value {
 
 	addDragHandler() {
 
+		const threshold = 5;
+
+		let isPressed = false;
 		let isDragging = false;
-		let startY, startValue;
+		let startX, startY, startValue;
 
 		this.input.style.touchAction = 'none';
 
 		this.input.addEventListener( 'pointerdown', ( e ) => {
 
-			isDragging = true;
+			isPressed = true;
+			startX = e.clientX;
 			startY = e.clientY;
 			startValue = parseFloat( this.input.value );
-			document.body.style.cursor = 'ns-resize';
 
 		} );
 
 		document.addEventListener( 'pointermove', ( e ) => {
+
+			if ( isPressed ) {
+
+				// start dragging only after a vertical movement, a horizontal one selects text
+
+				if ( Math.abs( e.clientY - startY ) > threshold ) {
+
+					isPressed = false;
+					isDragging = true;
+					startY = e.clientY;
+					this.input.blur();
+					document.body.style.cursor = 'ns-resize';
+
+				} else if ( Math.abs( e.clientX - startX ) > threshold ) {
+
+					isPressed = false;
+
+				}
+
+			}
 
 			if ( isDragging ) {
 
@@ -175,6 +198,8 @@ class ValueNumber extends Value {
 		} );
 
 		document.addEventListener( 'pointerup', () => {
+
+			isPressed = false;
 
 			if ( isDragging ) {
 
