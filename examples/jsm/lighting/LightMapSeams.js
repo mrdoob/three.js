@@ -126,24 +126,30 @@ class LightMapSeams {
 		this._scene = new Scene();
 		this._camera = new OrthographicCamera();
 		this._compute = null;
+		this._buffers = [];
 
 		if ( sampleCount === 0 ) return;
 
 		// the unknown texels, the constraints of the samples that involve them, and the four
 		// texels of both sides of each sample
 
-		const texels = storage( new StorageBufferAttribute( system.texels, 1 ), 'uint', unknownCount ).toReadOnly();
-		const ranges = storage( new StorageBufferAttribute( system.ranges, 2 ), 'uvec2', unknownCount ).toReadOnly();
-		const entries = storage( new StorageBufferAttribute( system.entries, 1 ), 'uint', system.entries.length ).toReadOnly();
-		const corners = storage( new StorageBufferAttribute( system.corners, 4 ), 'ivec4', sampleCount * 2 ).toReadOnly();
-		const fractions = storage( new StorageBufferAttribute( system.fractions, 4 ), 'vec4', sampleCount ).toReadOnly();
-		const weights = storage( new StorageBufferAttribute( system.weights, 1 ), 'float', sampleCount ).toReadOnly();
+		// the buffers are freed with the stitcher, not only once they are garbage collected
 
-		const valueBuffer = new StorageBufferAttribute( new Float32Array( unknownCount * 4 ), 4 );
+		const buffers = this._buffers;
+		const buffer = ( array, itemSize ) => buffers[ buffers.push( new StorageBufferAttribute( array, itemSize ) ) - 1 ];
+
+		const texels = storage( buffer( system.texels, 1 ), 'uint', unknownCount ).toReadOnly();
+		const ranges = storage( buffer( system.ranges, 2 ), 'uvec2', unknownCount ).toReadOnly();
+		const entries = storage( buffer( system.entries, 1 ), 'uint', system.entries.length ).toReadOnly();
+		const corners = storage( buffer( system.corners, 4 ), 'ivec4', sampleCount * 2 ).toReadOnly();
+		const fractions = storage( buffer( system.fractions, 4 ), 'vec4', sampleCount ).toReadOnly();
+		const weights = storage( buffer( system.weights, 1 ), 'float', sampleCount ).toReadOnly();
+
+		const valueBuffer = buffer( new Float32Array( unknownCount * 4 ), 4 );
 		const values = storage( valueBuffer, 'vec4', unknownCount );
-		const initial = storage( new StorageBufferAttribute( new Float32Array( unknownCount * 4 ), 4 ), 'vec4', unknownCount );
-		const residuals = storage( new StorageBufferAttribute( new Float32Array( sampleCount * 4 ), 4 ), 'vec4', sampleCount );
-		const bounds = storage( new StorageBufferAttribute( new Float32Array( unknownCount * 8 ), 4 ), 'vec4', unknownCount * 2 );
+		const initial = storage( buffer( new Float32Array( unknownCount * 4 ), 4 ), 'vec4', unknownCount );
+		const residuals = storage( buffer( new Float32Array( sampleCount * 4 ), 4 ), 'vec4', sampleCount );
+		const bounds = storage( buffer( new Float32Array( unknownCount * 8 ), 4 ), 'vec4', unknownCount * 2 );
 
 		const map = this._map;
 		const coverage = texture( lightMapper.pages[ page ].sampleTexture );
@@ -360,6 +366,8 @@ class LightMapSeams {
 			for ( const node of Object.values( this._compute ) ) node.dispose();
 
 		}
+
+		for ( const buffer of this._buffers ) buffer.dispose();
 
 	}
 
@@ -582,8 +590,8 @@ function findSeams( objects, size, normalThreshold ) {
 }
 
 /**
- * Returns the light map UVs of a geometry, mapped into the atlas region of an instance by the instanced
- * attributes of `KHR_lightmap`, like {@link lightMapUV}.
+ * Returns the light map UVs of a geometry, mapped into the atlas region of an instance by its instanced
+ * attributes, like {@link lightMapUV}.
  *
  * @private
  * @param {BufferGeometry} geometry - The geometry, with `uv1`.
@@ -594,23 +602,18 @@ function instanceUVs( geometry, instance ) {
 
 	const uv = geometry.getAttribute( 'uv1' );
 	const scale = geometry.getAttribute( '_LIGHTMAP_SCALE' );
-	const rotation = geometry.getAttribute( '_LIGHTMAP_ROTATION' );
 	const offset = geometry.getAttribute( '_LIGHTMAP_OFFSET' );
 
-	if ( instance < 0 || ( scale === undefined && rotation === undefined && offset === undefined ) ) return uv;
+	if ( instance < 0 || ( scale === undefined && offset === undefined ) ) return uv;
 
 	const sx = scale !== undefined ? scale.getX( instance ) : 1, sy = scale !== undefined ? scale.getY( instance ) : 1;
-	const angle = rotation !== undefined ? rotation.getX( instance ) : 0;
-	const c = Math.cos( angle ), s = Math.sin( angle );
 	const ox = offset !== undefined ? offset.getX( instance ) : 0, oy = offset !== undefined ? offset.getY( instance ) : 0;
 	const values = new Float32Array( uv.count * 2 );
 
 	for ( let i = 0; i < uv.count; i ++ ) {
 
-		const u = uv.getX( i ) * sx, v = uv.getY( i ) * sy;
-
-		values[ i * 2 ] = c * u - s * v + ox;
-		values[ i * 2 + 1 ] = s * u + c * v + oy;
+		values[ i * 2 ] = uv.getX( i ) * sx + ox;
+		values[ i * 2 + 1 ] = uv.getY( i ) * sy + oy;
 
 	}
 

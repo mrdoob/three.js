@@ -1,75 +1,13 @@
-import { BasicLightMapNode, FloatType, Group, HalfFloatType, InstancedBufferAttribute, InstancedMesh, IrradianceNode, LinearSRGBColorSpace, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, PlaneGeometry, RedFormat, Texture } from 'three/webgpu';
+import { BasicLightMapNode, Group, HalfFloatType, InstancedBufferAttribute, InstancedMesh, IrradianceNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, PlaneGeometry, RedFormat, Texture } from 'three/webgpu';
 import { materialLightMap, vec3 } from 'three/tsl';
 import { LightMapper } from '../../../../examples/jsm/lighting/LightMapper.js';
 import { DirectionalLightMapNode, directionalLightMap, instancedLightMap } from '../../../../examples/jsm/tsl/lighting/DirectionalLightMapNode.js';
-import { readLightMap } from '../../../../examples/jsm/utils/readLightMap.js';
 
 export default QUnit.module( 'Addons', () => {
 
 	QUnit.module( 'Lighting', () => {
 
 		QUnit.module( 'LightMapper', () => {
-
-			QUnit.test( 'Readback preserves linear HDR irradiance and atlas bindings', async assert => {
-
-				const map = new Texture( { width: 1, height: 1 } );
-				map.type = FloatType;
-				map.channel = 1;
-				map.offset.set( 0.25, 0.5 );
-				map.repeat.set( 0.5, 0.25 );
-				map.rotation = Math.PI / 2;
-				const renderer = {
-					initRenderTarget: () => {},
-					copyTextureToTexture: () => {},
-					readRenderTargetPixelsAsync: async () => new Float32Array( [ 4, 2, 0, NaN ] )
-				};
-				const result = await readLightMap( renderer, map );
-				assert.deepEqual( Array.from( result.image.data ).slice( 0, 3 ), [ 4, 2, 0 ], 'Irradiance above one is kept without a pi conversion, and alpha is ignored' );
-				assert.strictEqual( result.type, FloatType );
-				assert.strictEqual( result.colorSpace, LinearSRGBColorSpace );
-				assert.strictEqual( result.channel, 1 );
-				assert.deepEqual( result.offset.toArray(), map.offset.toArray() );
-				assert.deepEqual( result.repeat.toArray(), map.repeat.toArray() );
-				assert.strictEqual( result.rotation, map.rotation );
-				result.dispose();
-				map.dispose();
-
-			} );
-
-			QUnit.test( 'Readback rejects invalid irradiance and releases its render target', async assert => {
-
-				const map = new Texture( { width: 1, height: 1 } );
-				map.type = FloatType;
-				let disposed;
-				let sample;
-				const renderer = {
-					initRenderTarget: target => {
-
-						disposed = false;
-						target.addEventListener( 'dispose', () => disposed = true );
-
-					},
-					copyTextureToTexture: () => {},
-					readRenderTargetPixelsAsync: async () => new Float32Array( [ sample, 1, 1, 1 ] )
-				};
-				for ( sample of [ - 1, Infinity, NaN ] ) {
-
-					await assert.rejects( readLightMap( renderer, map ), /finite and nonnegative/ );
-					assert.true( disposed, 'Readback target is disposed before validating samples' );
-
-				}
-
-				renderer.readRenderTargetPixelsAsync = async () => {
-
-					throw new Error( 'Readback failed' );
-
-				};
-
-				await assert.rejects( readLightMap( renderer, map ), /Readback failed/ );
-				assert.true( disposed, 'Failed GPU readback also releases the target' );
-				map.dispose();
-
-			} );
 
 			QUnit.test( 'Uses current world transforms without rendering the source scene first', assert => {
 

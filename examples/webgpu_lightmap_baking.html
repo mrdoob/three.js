@@ -19,7 +19,7 @@
 				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Light Baking</span>
 			</div>
 
-			<small>Bake Stochastic Radiosity, Ray Radiosity (<a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">three-mesh-bvh</a>), Light Probe or VXGI into denoised directional light maps of these scenes or your own glTF, and export KHR_lightmap, unlit or vertex color glTF.<br/><span id="status"></span><span id="warning" style="display: block; color: #ffc040;"></span><span id="credit"></span></small>
+			<small>Bake Stochastic Radiosity, Ray Radiosity (<a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">three-mesh-bvh</a>), Light Probe or VXGI into denoised directional light maps of these scenes or your own glTF.<br/><span id="status"></span><span id="warning" style="display: block; color: #ffc040;"></span></small>
 		</div>
 
 		<script type="importmap">
@@ -38,16 +38,14 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { attribute, builtinGIContext, cameraProjectionMatrix, color, float, ivec2, mix, modelViewMatrix, mrt, normalWorld, output, pass, passTexture, positionGeometry, positionWorld, screenCoordinate, texture, toneMappingExposure, uniform, varying, vec4, velocity } from 'three/tsl';
+			import { builtinGIContext, float, ivec2, mix, mrt, normalWorld, output, pass, passTexture, positionWorld, screenCoordinate, texture, uniform, velocity } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { LightBaker } from 'three/addons/lighting/LightBaker.js';
 			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
-			import { VertexLightBaker, vertexIrradiance } from 'three/addons/lighting/VertexLightBaker.js';
 			import { lightProbeGridIrradiance } from 'three/addons/tsl/lighting/LightProbeGridNode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
-			import { instancedLightMap } from 'three/addons/tsl/lighting/DirectionalLightMapNode.js';
 			import { ReflectionProbes } from 'three/addons/lighting/ReflectionProbes.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { DRACOLoader, DRACO_GLTF_CONFIG } from 'three/addons/loaders/DRACOLoader.js';
@@ -56,13 +54,13 @@
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 			let camera, scene, renderer, controls, renderPipeline;
-			let world, meshes, materials, status, warning, credit;
+			let world, meshes, materials, status, warning;
 			let lightBaker, bakedPass, livePass, liveTRAA = null, liveOutput;
 			let busy = false, bakePending = false, bakeController = null, bakeId = 0;
 			let dynamicObjects, dynamicTime = 0, dynamicMaterialKey = '', frameTime = 0;
 			let capture = null, captureBakeId = - 1, previewBakeId = - 1, captureStatus = '';
-			let vertexPass, vertexGI = null, vertexControls = [], wireframe = null;
 			let gltfLoader = null, sceneControl, gltfFolder, uv1Control;
+			let framesInFlight = 0;
 
 			// shifts the per-pixel cone noise of the live VXGI view every frame, like the light map samples
 
@@ -73,10 +71,15 @@
 
 			// the scenes and their loaders
 
-			const scenes = { 'Cornell Box': createCornellBox, 'Ball Pool': createBallPool, 'Courtyard': loadCourtyard, 'Sponza': loadSponza, 'Littlest Tokyo': loadLittlestTokyo };
+			const scenes = { 'Cornell Box': createCornellBox, 'Courtyard': loadCourtyard };
+
+			// phones have less GPU memory and slower GPUs
+
+			const phone = window.matchMedia( '(pointer: coarse)' ).matches;
 
 			// stochastic radiosity converges in fewer samples with more directions per sample, desktop GPUs
-			// render them at almost no extra cost, but they take memory and more time per sample on phones
+			// render them at almost no extra cost, but they take memory and more time per sample on phones.
+			// A VXGI volume of 256³ takes about 700 MB of GPU memory, phones use 128³
 
 			const params = {
 				scene: 'Cornell Box',
@@ -84,17 +87,13 @@
 				algorithm: 'Stochastic Radiosity',
 				resolution: 1024,
 				pageSize: 2048,
-				directions: window.matchMedia( '(pointer: coarse)' ).matches ? 16 : 64,
+				directions: phone ? 16 : 64,
+				vxgiResolution: phone ? 128 : 256,
 				dynamicObject: true,
 				reflections: true,
-				vertexBudget: 500000,
-				wireframe: false,
-				vertexStep: 0,
 				directLight: 'Live',
 				directionalLightMap: true,
 				lightMapSpecular: true,
-				exportFormat: 'KHR_lightmap 16-bit',
-				bakeToneMapping: true,
 				denoise: true,
 				stitchSeams: true,
 				keepUV1: false,
@@ -111,17 +110,6 @@
 			// of the stochastic radiosity per frame
 
 			const algorithms = { 'Stochastic Radiosity': 'stochastic', 'Ray Radiosity': 'ray', 'Light Probe': 'probes', 'VXGI': 'vxgi' };
-
-			// KHR_lightmap needs a loader that supports it, the unlit and emissive formats show the baked
-			// light in any glTF viewer
-
-			const exportFormats = {
-				'KHR_lightmap 16-bit': { format: 'KHR_lightmap', bitDepth: 16 },
-				'KHR_lightmap 8-bit': { format: 'KHR_lightmap', bitDepth: 8 },
-				'Unlit (atlas)': { format: 'unlit' },
-				'Unlit (vertex colors)': { format: 'unlit-vertex' },
-				'Emissive (atlas)': { format: 'emissive' }
-			};
 
 			// skies for your own glTF files without lights of their own. Small bright suns in a sky converge slowly
 			// with the stochastic radiosity, the sun light of these skies is soft
@@ -224,8 +212,11 @@
 				const adapter = await navigator.gpu?.requestAdapter();
 				const requiredLimits = adapter ? { maxStorageBuffersPerShaderStage: adapter.limits.maxStorageBuffersPerShaderStage } : {};
 
+				// at most twice the resolution of the page, three times on phones would take memory and GPU time
+				// from the bake
+
 				renderer = new THREE.WebGPURenderer( { antialias: true, requiredLimits } );
-				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setPixelRatio( Math.min( window.devicePixelRatio, 2 ) );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -234,6 +225,26 @@
 
 				await renderer.init();
 				if ( renderer.backend.isWebGPUBackend !== true ) throw new Error( 'This example requires WebGPU.' );
+
+				// GPU errors show on the page. A lost device stops it, e.g. after a phone ran out of GPU memory,
+				// which can also destroy the device
+
+				renderer.backend.device.lost.then( ( info ) => {
+
+					stopBake();
+					renderer.setAnimationLoop( null );
+					warning.textContent = `The GPU device was lost, probably out of memory. Reload the page. ${ info.message }`;
+
+				} );
+
+				const onError = renderer.onError;
+
+				renderer.onError = ( info ) => {
+
+					onError.call( renderer, info );
+					if ( warning.textContent === '' ) warning.textContent = `GPU error: ${ info.message }`;
+
+				};
 
 				// Controls
 
@@ -246,17 +257,11 @@
 				renderPipeline = new THREE.RenderPipeline( renderer );
 				bakedPass = pass( scene, camera );
 
-				// "Vertex GI" shows the irradiance fitted to the vertices instead of the light map
-
-				vertexPass = pass( scene, camera );
-				vertexPass.contextNode = builtinGIContext( float( 1 ), vertexIrradiance() );
-
 				status = document.getElementById( 'status' );
 				warning = document.getElementById( 'warning' );
-				credit = document.getElementById( 'credit' );
 
 				// the light baker unwraps the light map UVs, sets up the GI source, bakes, denoises and stitches
-				// the light maps, assigns them to the materials and exports them
+				// the light maps and assigns them to the materials
 
 				lightBaker = new LightBaker( renderer );
 
@@ -272,7 +277,7 @@
 				const gui = renderer.inspector.createParameters( 'Light Baking' );
 				sceneControl = gui.add( params, 'scene', Object.keys( scenes ) ).name( 'Scene' ).onChange( setScene );
 				gui.add( { openGLTF }, 'openGLTF' ).name( 'Open glTF…' ).info( 'or drop a .glb, or a .gltf with its files, onto the page' );
-				gui.add( params, 'output', [ 'Baked GI', 'Live GI', 'Vertex GI' ] ).name( 'Output' ).onChange( setOutput );
+				gui.add( params, 'output', [ 'Baked GI', 'Live GI' ] ).name( 'Output' ).onChange( setOutput );
 				gui.add( params, 'algorithm', Object.keys( algorithms ) ).name( 'GI Algorithm' ).onChange( bake );
 				gui.add( { bake }, 'bake' ).name( 'Re-Bake GI' );
 
@@ -294,26 +299,6 @@
 				const probesFolder = gui.addFolder( 'Probes' ).close();
 				probesFolder.add( params, 'dynamicObject' ).name( 'Dynamic Objects' ).info( 'a sphere and a knot that light probes light' ).onChange( () => liveOutput.reset() );
 				probesFolder.add( params, 'reflections' ).name( 'Reflections' ).onChange( () => liveOutput.reset() );
-
-				// Vertex GI can show the edges, colored by the refinement step that created them, and every step of
-				// the refinement with its fit
-
-				const vertexFolder = gui.addFolder( 'Vertex GI' ).close();
-				vertexFolder.add( params, 'vertexBudget', [ 100000, 500000, 2000000 ] ).name( 'Vertex Budget' ).onChange( () => {
-
-					resetVertexGI();
-					showOutput();
-
-				} );
-				vertexControls = [
-					vertexFolder.add( params, 'wireframe' ).name( 'Wireframe' ).info( 'gray: original edges, blue to orange: later refinement steps' ).listen().onChange( showOutput ),
-					vertexFolder.add( params, 'vertexStep', 0, 1, 1 ).name( 'Refinement Step' ).listen().onChange( showOutput )
-				];
-
-				const exportFolder = gui.addFolder( 'Export' ).close();
-				exportFolder.add( params, 'exportFormat', Object.keys( exportFormats ) ).name( 'Format' );
-				exportFolder.add( params, 'bakeToneMapping' ).name( 'Bake Tone Mapping' ).info( 'unlit formats: viewers without tone mapping match this page, three.js viewers tone map twice' );
-				exportFolder.add( { exportGLTF }, 'exportGLTF' ).name( 'Export glTF' );
 
 				// the lighting of glTF files: their lights, or a sky and a sun
 
@@ -397,7 +382,6 @@
 				world.sourceMaterials ??= new Set( meshes.flatMap( ( mesh ) => [ mesh.material ].flat() ) );
 
 				warning.textContent = world.warnings ?? '';
-				credit.innerHTML = world.credit ?? '';
 
 				if ( world.gltf !== undefined ) Object.assign( params, world.gltf.lighting, { keepUV1: world.gltf.keepUV1, exposure: world.exposure ?? 1 } );
 
@@ -512,102 +496,6 @@
 
 			}
 
-			function createBallPool() {
-
-				// colorful balls piled in an open box, after webgpu_postprocessing_ssgi_ballpool
-
-				const root = new THREE.Group();
-
-				const white = new THREE.MeshStandardMaterial( { color: 0xeeeeee } );
-				const walls = [
-					[ new THREE.PlaneGeometry( 8, 8 ), white, [ 0, 0, 0 ], [ - Math.PI / 2, 0 ]],
-					[ new THREE.PlaneGeometry( 8, 8 ), white, [ 0, 6, 0 ], [ Math.PI / 2, 0 ]],
-					[ new THREE.PlaneGeometry( 8, 6 ), white, [ 0, 3, - 4 ], [ 0, 0 ]],
-					[ new THREE.PlaneGeometry( 8, 6 ), new THREE.MeshStandardMaterial( { color: 0xff2222 } ), [ - 4, 3, 0 ], [ 0, Math.PI / 2 ]],
-					[ new THREE.PlaneGeometry( 8, 6 ), new THREE.MeshStandardMaterial( { color: 0x22ff22 } ), [ 4, 3, 0 ], [ 0, - Math.PI / 2 ]]
-				];
-
-				for ( const [ geometry, material, position, [ x, y ]] of walls ) {
-
-					const wall = new THREE.Mesh( geometry, material );
-					wall.position.fromArray( position );
-					wall.rotation.set( x, y, 0 );
-					wall.receiveShadow = true;
-					root.add( wall );
-
-				}
-
-				// the balls settle one by one, each at the lowest of a few random spots on the floor or the balls below.
-				// They are the instances of one mesh, with their colors. Each one has its own region of the light
-				// map, the light map UVs of the instances are scaled and offset into them
-
-				const radius = 0.4;
-				const colors = [ 0xff4444, 0x44ff44, 0x4488ff, 0xffaa00, 0xff44ff, 0x44ffff, 0xffff44, 0xff8844, 0x8844ff, 0x44ff88 ].map( ( color ) => new THREE.Color( color ) );
-				const material = instancedLightMap( new THREE.MeshStandardMaterial( { roughness: 0.3 } ) );
-				const instances = new THREE.InstancedMesh( new THREE.SphereGeometry( radius, 24, 12 ), material, 160 );
-				const matrix = new THREE.Matrix4();
-				const balls = [];
-
-				let seed = 1;
-				const random = () => ( seed = seed * 16807 % 2147483647 ) / 2147483647;
-
-				for ( let i = 0; i < 160; i ++ ) {
-
-					const position = new THREE.Vector3( 0, Infinity, 0 );
-
-					for ( let j = 0; j < 40; j ++ ) {
-
-						const x = ( random() * 2 - 1 ) * ( 4 - radius );
-						const z = ( random() * 2 - 1 ) * ( 4 - radius );
-						let y = radius;
-
-						for ( const ball of balls ) {
-
-							const distanceSq = ( ball.x - x ) ** 2 + ( ball.z - z ) ** 2;
-							if ( distanceSq < 4 * radius * radius ) y = Math.max( y, ball.y + Math.sqrt( 4 * radius * radius - distanceSq ) );
-
-						}
-
-						if ( y < position.y ) position.set( x, y, z );
-
-					}
-
-					balls.push( position );
-
-					instances.setMatrixAt( i, matrix.makeTranslation( position ) );
-					instances.setColorAt( i, colors[ i % colors.length ] );
-
-				}
-
-				instances.castShadow = true;
-				instances.receiveShadow = true;
-				root.add( instances );
-
-				// both radiosity solvers bake an emissive panel, light probes and VXGI bake a live point light
-
-				const lightPanel = new THREE.Mesh( new THREE.PlaneGeometry( 3, 3 ), new THREE.MeshStandardMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 12 } ) );
-				lightPanel.rotation.x = Math.PI / 2;
-				lightPanel.position.y = 5.99;
-				root.add( lightPanel );
-
-				const light = new THREE.PointLight( 0xffffff, 80 );
-				light.position.set( 0, 5.4, 0 );
-				light.castShadow = true;
-				light.shadow.mapSize.setScalar( 512 );
-				light.shadow.radius = 10;
-				light.shadow.normalBias = - 0.02;
-				root.add( light );
-
-				return {
-					root, light, lightPanel, background: new THREE.Color( 0x111111 ), resolution: 1024, cacheSize: 256,
-					camera: new THREE.Vector3( 0, 3.2, 11 ), target: new THREE.Vector3( 0, 2.2, 0 ),
-					path: [[ - 3.2, 2.5, 1.8 ], [ - 3.2, 2.6, - 1.6 ], [ - 1.6, 2.7, - 3.2 ], [ 1, 2.5, - 3.2 ], [ 3.2, 2.3, - 1.8 ], [ 3.2, 2.2, 1.2 ], [ 1.5, 2.5, 2.8 ], [ - 1.2, 2.6, 2.6 ]], objectSize: 0.35,
-					reflections: [ { position: [ - 2, 2.8, 0.5 ], box: [ - 4, 0, - 4, 4, 6, 4 ] }, { position: [ 2, 2.8, 0.5 ], box: [ - 4, 0, - 4, 4, 6, 4 ] } ],
-					probes: { size: new THREE.Vector3( 7, 3.6, 7 ), position: new THREE.Vector3( 0, 3.8, 0 ), counts: [ 6, 4, 6 ], far: 20 }
-				};
-
-			}
-
 			async function loadCourtyard() {
 
 				// a two storey cloister at sunrise, lit by the sky. It has no outer walls, their outside would only
@@ -702,95 +590,6 @@
 					],
 					probes: { size: new THREE.Vector3( 15.5, 5.6, 15.5 ), position: new THREE.Vector3( 0, 4, 0 ), counts: [ 8, 4, 8 ], far: 40 }
 				};
-
-			}
-
-			async function loadSponza() {
-
-				// the atrium of the Crytek Sponza from the glTF sample assets, lit by the sky through its open roof
-
-				const [ gltf, sky ] = await Promise.all( [
-					new GLTFLoader().loadAsync( 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/Sponza/glTF/Sponza.gltf' ),
-					new HDRLoader().loadAsync( 'textures/equirectangular/blouberg_sunrise_2_1k.hdr' )
-				] );
-
-				const root = gltf.scene;
-				sky.mapping = THREE.EquirectangularReflectionMapping;
-
-				const bounds = new THREE.Box3().setFromObject( root );
-				root.position.sub( bounds.getCenter( new THREE.Vector3() ) );
-
-				// a steep sun lights the curtains of one side and a strip of the floor, the deep arcades only receive
-				// their bounces. Its direct light stays live with all algorithms, they bake its bounces
-
-				const sun = new THREE.DirectionalLight( 0xfff0dd, 6 );
-				sun.position.set( 2.2, 24.1, - 6.1 ).add( bounds.getCenter( new THREE.Vector3() ) );
-				sun.target.position.copy( bounds.getCenter( new THREE.Vector3() ) );
-				sun.castShadow = true;
-				sun.shadow.mapSize.setScalar( 2048 );
-				sun.shadow.camera.left = sun.shadow.camera.bottom = - 18;
-				sun.shadow.camera.right = sun.shadow.camera.top = 18;
-				sun.shadow.camera.far = 50;
-				sun.shadow.normalBias = 0.02;
-				root.add( sun, sun.target );
-
-				root.traverse( ( object ) => object.isMesh && ( object.castShadow = object.receiveShadow = true ) );
-
-				// small props get half the light map density, which the large surfaces gain. Small alpha tested plants
-				// are left out of the light map, light probes light them like the dynamic objects
-
-				root.traverse( ( object ) => {
-
-					if ( object.isMesh !== true ) return;
-
-					const size = new THREE.Box3().setFromObject( object ).getSize( new THREE.Vector3() );
-					const extent = Math.max( size.x, size.y, size.z );
-
-					if ( extent < 1.5 && object.material.alphaTest > 0 ) object.userData.lightMapScale = 0;
-					else if ( extent < 1 ) object.userData.lightMapScale = 0.5;
-
-				} );
-
-				return {
-					root, light: null, lightPanel: null, background: sky, resolution: 2048, cacheSize: 512,
-					exposure: 8, camera: new THREE.Vector3( 9.5, - 3.6, - 1 ), target: new THREE.Vector3( - 8, - 2.6, 1 ),
-					path: [[ 6, - 4.45, 0.3 ], [ 0, - 4.45, - 0.5 ], [ - 6, - 4.45, 0.3 ], [ - 8.1, - 4.45, 1.2 ], [ - 7.6, - 4.45, 3.4 ], [ - 3, - 4.45, 3.5 ], [ 3, - 4.45, 3.4 ], [ 7.6, - 4.45, 3.4 ], [ 8.1, - 4.45, 1.2 ]], objectSize: 0.45,
-					reflections: [
-						{ position: [ 0, - 3.8, 0 ], box: [ - 7.6, - 5.23, - 1.9, 7.6, 6.2, 1.9 ] },
-						{ position: [ - 9.2, - 4, 0 ], box: [ - 10.9, - 5.23, - 4.9, - 7.6, - 2.14, 4.9 ] }, { position: [ 9.2, - 4, 0 ], box: [ 7.6, - 5.23, - 4.9, 10.9, - 2.14, 4.9 ] },
-						{ position: [ 0, - 3.8, 3.4 ], box: [ - 10.9, - 5.23, 1.9, 10.9, - 2.14, 4.9 ] }, { position: [ 0, - 3.8, - 3.4 ], box: [ - 10.9, - 5.23, - 4.9, 10.9, - 2.14, - 1.9 ] }
-					],
-					dynamicProbes: { size: new THREE.Vector3( 21, 2.4, 8.4 ), position: new THREE.Vector3( 0, - 3.6, 0 ), counts: [ 10, 3, 7 ] },
-					probes: { size: new THREE.Vector3( 24, 9, 8 ), position: new THREE.Vector3( 0, - 1.5, 0 ), counts: [ 12, 4, 4 ], far: 40 }
-				};
-
-			}
-
-			async function loadLittlestTokyo() {
-
-				// Littlest Tokyo, loaded like your own glTF files with a sky and a sun. Its skinned meshes are lit
-				// by probes, the shells of its inverted hull outlines are left out of the bake
-
-				const response = await fetch( 'models/gltf/LittlestTokyo.glb' );
-				const file = new File( [ await response.blob() ], 'LittlestTokyo.glb' );
-				const tokyo = await createGLTFWorld( await parseGLTFFiles( [ file ], file ), [ file ], false );
-
-				// the dynamic objects circle the model above its streets, past four reflection probes around it
-
-				const { center } = tokyo.gltf;
-				const orbit = 400, height = - 120;
-				const around = ( x, z ) => [ center.x + x * orbit, height, center.z + z * orbit ];
-
-				tokyo.path = Array.from( { length: 12 }, ( v, i ) => around( Math.cos( i / 12 * Math.PI * 2 ), Math.sin( i / 12 * Math.PI * 2 ) ) );
-				tokyo.objectSize = 16;
-
-				const [ , bottom ] = tokyo.reflections[ 0 ].box;
-				const box = [ center.x - 2 * orbit, bottom, center.z - 2 * orbit, center.x + 2 * orbit, bottom + 4 * orbit, center.z + 2 * orbit ];
-
-				tokyo.reflections = [[ 1, 0 ], [ 0, 1 ], [ - 1, 0 ], [ 0, - 1 ]].map( ( [ x, z ] ) => ( { position: around( x, z ), box } ) );
-				tokyo.credit = 'Model: <a href="https://artstation.com/artwork/1AGwX" target="_blank" rel="noopener">Littlest Tokyo</a> by <a href="https://artstation.com/glenatron" target="_blank" rel="noopener">Glen Fox</a>, CC Attribution.';
-
-				return tokyo;
 
 			}
 
@@ -947,7 +746,6 @@
 				// a single smaller page, the bake of four pages of 2048² takes more than 2 GB of GPU memory
 
 				const huge = triangles > 250000;
-				const phone = window.matchMedia( '(pointer: coarse)' ).matches;
 				const maxPageSize = Math.min( renderer.backend.device.limits.maxTextureDimension2D, phone ? 2048 : 4096 );
 				const resolution = THREE.MathUtils.clamp( THREE.MathUtils.ceilPowerOfTwo( Math.sqrt( triangles ) * 6 ), 1024, phone ? 2048 : 4096 );
 				const pageSize = Math.min( huge ? 4096 : 2048, maxPageSize );
@@ -1123,11 +921,10 @@
 
 			function setupProbes() {
 
-				// light probes for the dynamic objects, laid out like the probes of the Light Probe algorithm unless
-				// the objects need probes closer to the floor and on both sides of walls, and box projected reflection
-				// probes for glossy materials
+				// light probes for the dynamic objects, laid out like the probes of the Light Probe algorithm, and
+				// box projected reflection probes for glossy materials
 
-				const { size, position, counts } = world.dynamicProbes ?? world.probes;
+				const { size, position, counts } = world.probes;
 
 				world.lightProbes = new LightProbeGrid( size.x, size.y, size.z, ...counts );
 				world.lightProbes.position.copy( position );
@@ -1171,11 +968,9 @@
 
 			function setProbeCapture( capturing ) {
 
-				// the dynamic objects, the reflections and the Vertex GI wireframe are left out of bakes and probe captures
+				// the dynamic objects and the reflections are left out of bakes and probe captures
 
 				for ( const object of dynamicObjects ) object.visible = capturing === false && params.dynamicObject;
-
-				if ( wireframe !== null ) wireframe.group.visible = capturing === false;
 
 				if ( world.reflectionProbes !== undefined ) world.reflectionProbes.intensity = capturing === false && params.reflections ? 1 : 0;
 
@@ -1184,8 +979,6 @@
 			function updateProbes() {
 
 				if ( world.lightProbes === undefined ) setupProbes();
-
-				// Vertex GI is fitted to the light map, the probes see the light-mapped scene in both outputs
 
 				const baked = params.output !== 'Live GI';
 
@@ -1327,10 +1120,9 @@
 				bakePending = false;
 
 				stopBake();
-				resetVertexGI();
 
-				// both radiosity solvers bake the emissive panels of the Cornell Box and the Ball Pool, light probes
-				// and VXGI their live point lights
+				// both radiosity solvers bake the emissive panel of the Cornell Box, light probes and VXGI its live
+				// point light
 
 				const emissive = params.algorithm === 'Ray Radiosity' || params.algorithm === 'Stochastic Radiosity';
 
@@ -1345,6 +1137,7 @@
 					directions: params.directions,
 					cacheSize: params.algorithm === 'Stochastic Radiosity' ? world.cacheSize : 256,
 					probes: world.probes,
+					vxgiResolution: params.vxgiResolution,
 					directLight: params.directLight === 'Baked' ? 'baked' : 'live',
 					directional: params.directionalLightMap,
 					specularIntensity: params.lightMapSpecular ? 1 : 0,
@@ -1362,7 +1155,7 @@
 
 				}
 
-				// the dynamic objects, the reflections and the Vertex GI wireframe are left out of the bake. A baked
+				// the dynamic objects and the reflections are left out of the bake. A baked
 				// direct light is added to the light map and left out of the materials, the GI sources still see
 				// it for its bounces
 
@@ -1458,11 +1251,10 @@
 				const live = params.output === 'Live GI';
 
 				// discard accumulated samples when switching to or from Live GI; baking only runs with the
-				// light map, which Baked GI and Vertex GI share
+				// light map of Baked GI
 
 				if ( live || lightBaker.samples === 0 ) {
 
-					resetVertexGI();
 					stopBake();
 					lightBaker.reset();
 					liveOutput.reset();
@@ -1498,318 +1290,12 @@
 
 			function showOutput() {
 
-				// Vertex GI shows the light map until the vertices are fitted, then their subdivided geometries
+				const live = params.output === 'Live GI';
 
-				const vertex = params.output === 'Vertex GI' && vertexGI?.geometries != null;
+				for ( const material of materials ) material.lightMapIntensity = live ? 0 : 1;
 
-				if ( vertexGI?.geometries != null ) {
-
-					const step = Math.min( params.vertexStep, vertexGI.steps.length - 1 );
-
-					vertexGI.meshes.forEach( ( mesh, i ) => mesh.geometry = vertex ? stepGeometry( i, step ) : vertexGI.originals[ i ] );
-					showWireframe( vertex && params.wireframe ? step : - 1 );
-
-				}
-
-				for ( const control of vertexControls ) {
-
-					if ( params.output === 'Vertex GI' ) control.show();
-					else control.hide();
-
-				}
-
-				// the instances of instanced meshes share their vertices, they keep their light maps
-
-				for ( const material of materials ) material.lightMapIntensity = params.output === 'Live GI' || ( vertex && vertexGI.materials.has( material ) ) ? 0 : 1;
-
-				renderPipeline.outputNode = params.output === 'Live GI' ? liveOutput : vertex ? vertexPass : bakedPass;
+				renderPipeline.outputNode = live ? liveOutput : bakedPass;
 				renderPipeline.needsUpdate = true;
-
-			}
-
-			async function fitVertexGI() {
-
-				const vertexMeshes = meshes.filter( ( mesh ) => mesh.isInstancedMesh !== true && mesh.geometry.hasAttribute( 'uv1' ) );
-				const fit = vertexGI = { meshes: vertexMeshes, materials: new Set( vertexMeshes.map( ( mesh ) => mesh.material ) ), originals: vertexMeshes.map( ( mesh ) => mesh.geometry ), geometries: null, stats: null, steps: [], levels: null, stepGeometries: [], wireframes: [] };
-				const baker = new VertexLightBaker( vertexMeshes );
-
-				// every step keeps its triangles and fit
-
-				const onStep = ( stats ) => fit.steps.push( {
-					stats,
-					geometries: baker.geometries.map( ( geometry ) => ( {
-						index: geometry.index.array,
-						groups: geometry.groups.map( ( group ) => ( { ...group } ) ),
-						irradiance: geometry.getAttribute( baker.attribute ).array,
-						count: geometry.getAttribute( 'position' ).count
-					} ) )
-				} );
-
-				status.textContent = 'Fitting Vertex GI…';
-
-				await baker.readLightMap( renderer, lightBaker.process() );
-				const stats = await refineVertices( baker, () => vertexGI === fit, onStep );
-
-				// discarded by a re-bake or a new budget
-
-				if ( stats === null ) {
-
-					disposeVertexGeometries( fit, baker.geometries );
-					return;
-
-				}
-
-				// the share of the added vertices up to the step that created each vertex, 0 for the original ones
-
-				const added = ( step ) => fit.steps[ step ].stats.vertices - fit.steps[ 0 ].stats.vertices;
-				const total = Math.max( added( fit.steps.length - 1 ), 1 );
-
-				fit.levels = baker.geometries.map( ( geometry, i ) => {
-
-					const levels = new Float32Array( geometry.getAttribute( 'position' ).count );
-
-					for ( let step = 1; step < fit.steps.length; step ++ ) levels.fill( Math.max( added( step ) / total, 1e-3 ), fit.steps[ step - 1 ].geometries[ i ].count, fit.steps[ step ].geometries[ i ].count );
-
-					return new THREE.BufferAttribute( levels, 1 );
-
-				} );
-
-				fit.geometries = baker.geometries;
-				fit.stats = stats;
-
-				const slider = vertexControls[ 1 ];
-				slider.slider.max = slider.numberInput.max = fit.steps.length - 1;
-				params.vertexStep = fit.steps.length - 1;
-
-				showOutput();
-
-			}
-
-			async function refineVertices( baker, isCurrent, onStep = null ) {
-
-				// the irradiance of the vertices is fitted to the light map with least squares, the meshes are
-				// subdivided where a linear function cannot fit the light map beyond its noise, until they fit
-				// within 2% or the vertex budget is used up. With steps, the splitting rounds are fitted one by one,
-				// later ones in groups that grow every ten steps
-
-				const start = performance.now();
-				const options = { noise: Number.isFinite( lightBaker.noise ) ? lightBaker.noise : 0 };
-				const history = [];
-
-				while ( true ) {
-
-					const stats = baker.fit();
-					history.push( stats );
-
-					if ( onStep !== null ) {
-
-						onStep( stats );
-						options.rounds = 1 + Math.floor( history.length / 10 );
-
-					}
-
-					status.textContent = `Fitting vertices: ${ stats.vertices } vertices, ${ ( stats.error * 100 ).toFixed( 1 ) }% error`;
-
-					if ( baker.refine( params.vertexBudget, options ) === 0 ) break;
-
-					await new Promise( requestAnimationFrame );
-					if ( isCurrent() === false ) return null;
-
-				}
-
-				return { ...history[ history.length - 1 ], history, time: ( performance.now() - start ) / 1000 };
-
-			}
-
-			function resetVertexGI() {
-
-				if ( vertexGI === null ) return;
-
-				if ( vertexGI.geometries !== null ) {
-
-					vertexGI.meshes.forEach( ( mesh, i ) => mesh.geometry = vertexGI.originals[ i ] );
-					disposeVertexGeometries( vertexGI, vertexGI.geometries );
-
-					for ( const geometries of [ ...vertexGI.stepGeometries, ...vertexGI.wireframes ] ) {
-
-						if ( geometries !== undefined ) disposeVertexGeometries( vertexGI, geometries );
-
-					}
-
-					showWireframe( - 1 );
-
-				}
-
-				vertexGI = null;
-
-			}
-
-			function disposeVertexGeometries( fit, geometries ) {
-
-				// geometries without subdivisions share the buffers of the originals
-
-				geometries.forEach( ( geometry, i ) => geometry.getAttribute( 'position' ) !== fit.originals[ i ].getAttribute( 'position' ) && geometry.dispose() );
-
-			}
-
-			function stepGeometry( i, step ) {
-
-				// the subdivisions only append vertices, so every step shares the vertices of the final geometry
-				// and has its own triangles and fit
-
-				const final = vertexGI.geometries[ i ];
-
-				if ( step === vertexGI.steps.length - 1 ) return final;
-
-				const geometries = vertexGI.stepGeometries[ step ] ??= [];
-
-				if ( geometries[ i ] === undefined ) {
-
-					const { index, groups, irradiance } = vertexGI.steps[ step ].geometries[ i ];
-					const geometry = new THREE.BufferGeometry();
-
-					for ( const name in final.attributes ) geometry.setAttribute( name, final.getAttribute( name ) );
-					for ( const group of groups ) geometry.addGroup( group.start, group.count, group.materialIndex );
-
-					const padded = new Float32Array( final.getAttribute( 'position' ).count * 3 );
-					padded.set( irradiance );
-
-					geometry.setAttribute( 'bakedIrradiance', new THREE.BufferAttribute( padded, 3 ) );
-					geometry.setIndex( new THREE.BufferAttribute( index, 1 ) );
-
-					geometries[ i ] = geometry;
-
-				}
-
-				return geometries[ i ];
-
-			}
-
-			function showWireframe( step ) {
-
-				if ( wireframe === null ) {
-
-					// thin lines, faint for the original edges and from blue to orange for the edges of the later
-					// refinement steps, by the share of the added vertices. An edge belongs to the step of its newer
-					// vertex, which the line takes from its first vertex with flat interpolation. The colors are divided
-					// by the exposure, which the render pipeline applies to the lines too, and the refined edges are
-					// opaque, since the HDR blending would hide them on bright surfaces. The lines are drawn slightly
-					// towards the camera so that their surfaces do not hide them
-
-					const t = varying( attribute( 'refineLevel', 'float' ) ).setInterpolation( THREE.InterpolationSamplingType.FLAT );
-					const refined = t.greaterThan( 0 );
-
-					const material = new THREE.LineBasicNodeMaterial( { transparent: true, depthWrite: false } );
-					material.colorNode = refined.select( mix( mix( color( 0x3355ff ), color( 0xee22cc ), t.mul( 2 ).clamp() ), color( 0xff7700 ), t.mul( 2 ).sub( 1 ).clamp() ), color( 0x999999 ) ).div( toneMappingExposure );
-					material.opacityNode = refined.select( 1, 0.12 );
-					material.vertexNode = cameraProjectionMatrix.mul( vec4( modelViewMatrix.mul( vec4( positionGeometry, 1 ) ).xyz.mul( 0.999 ), 1 ) );
-
-					wireframe = { group: new THREE.Group(), material };
-					scene.add( wireframe.group );
-
-				}
-
-				wireframe.group.clear();
-
-				if ( step < 0 ) return;
-
-				vertexGI.meshes.forEach( ( mesh, i ) => {
-
-					const lines = new THREE.LineSegments( wireframeGeometry( i, step ), wireframe.material );
-					lines.matrixAutoUpdate = false;
-					lines.matrix.copy( mesh.matrixWorld );
-					wireframe.group.add( lines );
-
-				} );
-
-			}
-
-			function wireframeGeometry( i, step ) {
-
-				const geometries = vertexGI.wireframes[ step ] ??= [];
-
-				if ( geometries[ i ] === undefined ) {
-
-					// the unique edges of the triangles, the newer vertex first
-
-					const index = vertexGI.steps[ step ].geometries[ i ].index;
-					const levels = vertexGI.levels[ i ].array;
-					const edges = new Set(), pairs = [];
-
-					for ( let t = 0; t < index.length; t += 3 ) {
-
-						for ( let j = 0; j < 3; j ++ ) {
-
-							const a = index[ t + j ], b = index[ t + ( j + 1 ) % 3 ];
-							const key = Math.min( a, b ) * levels.length + Math.max( a, b );
-
-							if ( edges.has( key ) ) continue;
-
-							edges.add( key );
-
-							if ( levels[ a ] >= levels[ b ] ) pairs.push( a, b );
-							else pairs.push( b, a );
-
-						}
-
-					}
-
-					const geometry = new THREE.BufferGeometry();
-					geometry.setAttribute( 'position', vertexGI.geometries[ i ].getAttribute( 'position' ) );
-					geometry.setAttribute( 'refineLevel', vertexGI.levels[ i ] );
-					geometry.setIndex( pairs );
-
-					geometries[ i ] = geometry;
-
-				}
-
-				return geometries[ i ];
-
-			}
-
-			async function exportGLTF() {
-
-				if ( busy ) return;
-
-				busy = true;
-				renderer.setAnimationLoop( null );
-				stopBake();
-
-				// export the original geometries, Vertex GI shows subdivided ones
-
-				if ( vertexGI?.geometries != null ) vertexGI.meshes.forEach( ( mesh, i ) => mesh.geometry = vertexGI.originals[ i ] );
-
-				try {
-
-					// the light baker finishes the bake before exporting
-
-					const onProgress = ( progress ) => {
-
-						if ( progress.stage === 'baking' ) status.textContent = `Finishing ${ params.algorithm }: ${ progress.samples } samples`;
-						else if ( progress.stage === 'vertices' ) status.textContent = `Fitting vertex colors: ${ progress.vertices } vertices, ${ ( progress.error * 100 ).toFixed( 1 ) }% error`;
-						else status.textContent = 'Writing glTF…';
-
-					};
-
-					const { format, bitDepth } = exportFormats[ params.exportFormat ];
-					const toneMapping = params.bakeToneMapping ? renderer.toneMapping : THREE.NoToneMapping;
-					const result = await lightBaker.export( { format, bitDepth, toneMapping, maxVertices: params.vertexBudget, onProgress } );
-
-					const name = format === 'unlit-vertex' ? `vertexcolors_${ params.scene }_${ params.algorithm }` : `lightmap_${ params.scene }_${ params.algorithm }_${ params.exportFormat }`;
-
-					const link = document.createElement( 'a' );
-					link.href = URL.createObjectURL( new Blob( [ result ], { type: 'application/octet-stream' } ) );
-					link.download = name.toLowerCase().replace( /[^a-z0-9]+/g, '_' ).replace( /_$/, '' ) + '.glb';
-					link.click();
-					URL.revokeObjectURL( link.href );
-
-				} finally {
-
-					busy = false;
-					showOutput();
-					renderer.setAnimationLoop( animate );
-
-				}
 
 			}
 
@@ -1836,6 +1322,21 @@
 
 			function animate() {
 
+				// no new frames while the GPU is more than three frames behind, slow GPUs, e.g. of phones, are not
+				// handed more frames than they render
+
+				if ( framesInFlight > 3 ) return;
+
+				framesInFlight ++;
+
+				render();
+
+				renderer.backend.device.queue.onSubmittedWorkDone().then( () => framesInFlight -- );
+
+			}
+
+			function render() {
+
 				if ( busy || lightBaker.lightMapper === null ) {
 
 					renderPipeline.render();
@@ -1855,21 +1356,6 @@
 				} else if ( lightBaker.baking ) {
 
 					status.textContent = `Baking ${ params.algorithm }: ${ lightBaker.samples } samples, ${ noiseText }, ${ bakeTime.toFixed( 1 ) } s`;
-
-				} else if ( params.output === 'Vertex GI' ) {
-
-					// fitVertexGI() reports its progress
-
-					if ( vertexGI === null ) {
-
-						fitVertexGI();
-
-					} else if ( vertexGI.stats !== null ) {
-
-						const step = Math.min( params.vertexStep, vertexGI.steps.length - 1 ), stats = vertexGI.steps[ step ].stats;
-						status.textContent = `Vertex GI baked, step ${ step } of ${ vertexGI.steps.length - 1 }: ${ stats.vertices } vertices, ${ ( stats.error * 100 ).toFixed( 1 ) }% error, fitted in ${ vertexGI.stats.time.toFixed( 1 ) } s, ${ params.algorithm }: ${ lightBaker.samples } samples in ${ bakeTime.toFixed( 1 ) } s`;
-
-					}
 
 				} else {
 

@@ -1,4 +1,4 @@
-import { BackSide, Box3, BufferAttribute, BufferGeometry, Color, EquirectangularReflectionMapping, EquirectangularRefractionMapping, FrontSide, Matrix4, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertNodeMaterial, MeshStandardMaterial, NoToneMapping, Object3D, PerspectiveCamera, Raycaster, RenderTarget, Sphere, SphereGeometry, SRGBColorSpace, LinearSRGBColorSpace, Vector3 } from 'three/webgpu';
+import { BackSide, Box3, EquirectangularReflectionMapping, EquirectangularRefractionMapping, FrontSide, Matrix4, Mesh, MeshBasicNodeMaterial, MeshLambertNodeMaterial, PerspectiveCamera, Raycaster, RenderTarget, Sphere, SphereGeometry, Vector3 } from 'three/webgpu';
 import { cubeTexture, dot, equirectUV, lights, luminance, positionWorld, texture, uniform, vec3 } from 'three/tsl';
 
 import { LightMapper } from './LightMapper.js';
@@ -6,19 +6,13 @@ import { LightMapDenoiser } from './LightMapDenoiser.js';
 import { LightMapSeams } from './LightMapSeams.js';
 import { LightProbeGrid } from './LightProbeGrid.js';
 import { StochasticRadiosity, radiosityIrradiance } from './StochasticRadiosity.js';
-import { VertexLightBaker } from './VertexLightBaker.js';
 import { VXGIVolume } from './vxgi/VXGIVolume.js';
 import { vxgiIrradiance } from './vxgi/VXGIIrradiance.js';
 import { lightProbeGridIrradiance } from '../tsl/lighting/LightProbeGridNode.js';
 import { directionalLightMap, instancedLightMap } from '../tsl/lighting/DirectionalLightMapNode.js';
 import { unwrapUVs } from '../utils/unwrapUVs.js';
-import { readLightMap } from '../utils/readLightMap.js';
-import { bakeUnlitTexture, toneMapColors } from '../utils/bakeUnlitTexture.js';
-import { GLTFExporter } from '../exporters/GLTFExporter.js';
-import { GLTFLightMapExporterExtension } from '../exporters/GLTFLightMapExporterExtension.js';
 
 const ALGORITHMS = [ 'stochastic', 'ray', 'probes', 'vxgi' ];
-const FORMATS = [ 'KHR_lightmap', 'unlit', 'unlit-vertex', 'emissive' ];
 
 // the bake stops once the estimated noise of the light map drops below the tolerance, which is checked
 // whenever the samples have grown by a quarter, or after the maximum samples. Light probes are
@@ -29,6 +23,13 @@ const FORMATS = [ 'KHR_lightmap', 'unlit', 'unlit-vertex', 'emissive' ];
 const NOISE_TOLERANCE = 0.02;
 const MAX_SAMPLES = { ray: 1024, stochastic: 8192, probes: 16, vxgi: 256 };
 const SAMPLES_PER_FRAME = { ray: 1, stochastic: 4, probes: 1, vxgi: 1 };
+
+// interactive bakes bake fewer samples per frame while frames take longer than this on average, in
+// milliseconds, and wait while the GPU is more than a few frames behind. Slow GPUs, e.g. of phones, are
+// not handed more work than they finish, the page stays responsive
+
+const FRAME_BUDGET = 30;
+const FRAMES_IN_FLIGHT = 3;
 
 // the denoiser averages the noise of similar texels, so denoised bakes can stop at a higher noise.
 // It removes the fine grain of the ray traced samples well, but noise shared by neighboring texels
@@ -66,16 +67,12 @@ let _rayTracedRadiosity = null;
  * maps visible, see {@link directionalLightMap}. Meshes on other pages than the first one, and the
  * meshes left out of the light map, get their own copies of shared materials. Instanced meshes look up
  * the atlas regions of their instances, see {@link instancedLightMap}.
- * - `export()` writes a binary glTF with `KHR_lightmap`, or with the baked light in unlit or emissive
- * textures, or in vertex colors, which any glTF viewer shows.
  *
  * ```js
  * const baker = new LightBaker( renderer, { algorithm: 'ray', resolution: 1024 } );
  *
  * await baker.bake( scene, { onProgress: ( { samples, noise } ) => console.log( samples, noise ) } );
  * baker.apply();
- *
- * const glb = await baker.export( { format: 'KHR_lightmap' } );
  * ```
  *
  * The meshes of the `root` of the bake, the scene by default, are light-mapped, visible or not. Skinned
@@ -233,7 +230,8 @@ class LightBaker {
 
 		/**
 		 * The samples per animation frame of interactive bakes. By default 4 for stochastic radiosity and
-		 * 1 for the other algorithms.
+		 * 1 for the other algorithms. Interactive bakes bake fewer, down to one, while the frames take longer
+		 * than 30 ms on average, e.g. on phones.
 		 *
 		 * @type {?number}
 		 * @default null
@@ -393,7 +391,6 @@ class LightBaker {
 		this._epoch = 0;
 		this._start = 0;
 		this._run = null;
-		this._averageColors = new WeakMap();
 
 		this.setOptions( options );
 
@@ -855,6 +852,11 @@ class LightBaker {
 		const aborted = () => signal?.aborted === true || this._run !== run;
 		const progress = () => onProgress?.( { samples: this.samples, noise: this.noise, time: this.time } );
 
+		let samplesPerFrame = this.getSamplesPerFrame();
+		let framesInFlight = 0;
+		let frameStart = performance.now();
+		let averageFrameTime = 0;
+
 		if ( this.samples === 0 ) this._renderShadowMaps( this._lightCopies );
 
 		this._start = performance.now() - this.time * 1000;
@@ -876,7 +878,7 @@ class LightBaker {
 
 					// the noise estimates read the light map back while the samples accumulate
 
-					this.lightMapper.update( Math.min( this.getSamplesPerFrame(), maxSamples - this.samples ) );
+					this.lightMapper.update( Math.min( samplesPerFrame, maxSamples - this.samples ) );
 
 					if ( this.samples >= maxSamples ) this.process();
 					else if ( this.samples >= this._noiseCheck ) this._checkNoise();
@@ -895,7 +897,21 @@ class LightBaker {
 				this.time = ( performance.now() - this._start ) / 1000;
 				progress();
 
-				if ( interactive ) await nextFrame();
+				if ( interactive ) {
+
+					framesInFlight ++;
+					this._workDone().then( () => framesInFlight -- );
+
+					do await nextFrame(); while ( framesInFlight > FRAMES_IN_FLIGHT && aborted() === false );
+
+					const frameTime = performance.now() - frameStart;
+					frameStart += frameTime;
+					averageFrameTime += ( frameTime - averageFrameTime ) * 0.2;
+
+					if ( averageFrameTime > FRAME_BUDGET ) samplesPerFrame = Math.max( Math.floor( samplesPerFrame * 0.75 ), 1 );
+					else samplesPerFrame = Math.min( samplesPerFrame + 1, this.getSamplesPerFrame() );
+
+				}
 
 			}
 
@@ -1012,70 +1028,6 @@ class LightBaker {
 
 		this._applied = true;
 		this._assignLightMaps();
-
-	}
-
-	/**
-	 * Exports the light-mapped meshes as a binary glTF, after finishing the bake. The meshes are flattened
-	 * into world space, skinned meshes are left out.
-	 *
-	 * - `'KHR_lightmap'`: the materials with the light maps in the proposed `KHR_lightmap` extension, as
-	 * normalized 16-bit or 8-bit sRGB PNGs, with the direction textures of directional light maps and the
-	 * atlas regions of instanced meshes, and the live lights in `KHR_lights_punctual`. Loaders need
-	 * {@link GLTFLightMapLoaderExtension}.
-	 * - `'unlit'`: unlit materials with the diffuse radiance, including the direct light, baked into a texture
-	 * per page on `uv1`, see {@link bakeUnlitTexture}. Any glTF viewer shows it.
-	 * - `'emissive'`: the same radiance in emissive textures of black materials, with emissive strengths that
-	 * restore values above one.
-	 * - `'unlit-vertex'`: unlit materials with the radiance in vertex colors, fitted to the light maps by
-	 * {@link VertexLightBaker}, which refines the meshes where needed. Textures multiply the vertex colors.
-	 *
-	 * Instances of instanced meshes become meshes in the unlit formats. With a tone mapping, the unlit
-	 * formats hold the tone mapped radiance, so that viewers without tone mapping match the renderer. The
-	 * meshes left out of the light map keep their materials in all formats.
-	 *
-	 * @async
-	 * @param {Object} [options] - The export options.
-	 * @param {string} [options.format='KHR_lightmap'] - `'KHR_lightmap'`, `'unlit'`, `'unlit-vertex'` or `'emissive'`.
-	 * @param {number} [options.bitDepth=16] - The bits per channel of `KHR_lightmap` light maps, 16 or 8.
-	 * @param {number} [options.toneMapping=renderer.toneMapping] - The tone mapping of the unlit formats, `NoToneMapping` keeps the linear radiance.
-	 * @param {number} [options.exposure=renderer.toneMappingExposure] - The exposure of the unlit formats.
-	 * @param {number} [options.maxVertices=500000] - The vertex budget of `'unlit-vertex'`.
-	 * @param {?function(Object)} [options.onProgress=null] - Called with the `stage` of the export, `'baking'`, `'vertices'` or `'writing'`, and its progress.
-	 * @return {Promise<ArrayBuffer>} The binary glTF.
-	 */
-	async export( { format = 'KHR_lightmap', bitDepth = 16, toneMapping = this.renderer.toneMapping, exposure = this.renderer.toneMappingExposure, maxVertices = 500000, onProgress = null } = {} ) {
-
-		if ( FORMATS.includes( format ) === false ) throw new Error( `THREE.LightBaker: Unknown export format "${ format }", use one of ${ FORMATS.join( ', ' ) }.` );
-		if ( bitDepth !== 8 && bitDepth !== 16 ) throw new Error( 'THREE.LightBaker: The bit depth must be 16 or 8.' );
-		if ( this.scene === null ) throw new Error( 'THREE.LightBaker: Call bake() first.' );
-
-		// finish the bake before exporting
-
-		if ( this.converged === false ) await this.bake( this.scene, { root: this.root, interactive: false, onProgress: ( progress ) => onProgress?.( { stage: 'baking', ...progress } ) } );
-
-		if ( format === 'unlit-vertex' ) return this._exportVertexColors( toneMapping, exposure, maxVertices, onProgress );
-
-		const unlit = format === 'unlit' || format === 'emissive';
-		const { objects, textures } = unlit ? await this._createUnlitObjects( format === 'emissive', toneMapping, exposure ) : await this._createLightMappedObjects();
-
-		if ( unlit ) objects.push( ...this._createExcludedObjects() );
-
-		onProgress?.( { stage: 'writing' } );
-
-		try {
-
-			const exporter = new GLTFExporter();
-			exporter.register( ( writer ) => new GLTFLightMapExporterExtension( writer, { bitDepth } ) );
-
-			return await exporter.parseAsync( objects, { binary: true } );
-
-		} finally {
-
-			for ( const texture of textures ) texture.dispose();
-			for ( const object of objects ) for ( const material of [ object.material ].flat() ) material?.dispose();
-
-		}
 
 	}
 
@@ -1388,6 +1340,20 @@ class LightBaker {
 	}
 
 	/**
+	 * Returns a promise that resolves when the GPU has finished the work submitted so far.
+	 *
+	 * @private
+	 * @return {Promise} The promise.
+	 */
+	_workDone() {
+
+		const queue = this.renderer.backend.device?.queue;
+
+		return queue !== undefined ? queue.onSubmittedWorkDone() : Promise.resolve();
+
+	}
+
+	/**
 	 * Estimates the noise of the light maps and processes them with the estimate.
 	 *
 	 * @private
@@ -1581,461 +1547,6 @@ class LightBaker {
 
 		target.dispose();
 		material.dispose();
-
-	}
-
-	/**
-	 * Returns copies of the meshes left out of the light map for the unlit exports, with their own
-	 * materials, which viewers light with their lights, like the `KHR_lightmap` export does. E.g. the
-	 * outlines keep their color.
-	 *
-	 * @private
-	 * @return {Array<Mesh>} The copies.
-	 */
-	_createExcludedObjects() {
-
-		return this._exportedMeshes( this._record.excluded ).map( ( mesh ) => {
-
-			const copy = mesh.clone();
-			mesh.matrixWorld.decompose( copy.position, copy.quaternion, copy.scale );
-			copy.material = Array.isArray( mesh.material ) ? mesh.material.map( ( material ) => material.clone() ) : mesh.material.clone();
-			return copy;
-
-		} );
-
-	}
-
-	/**
-	 * Returns the visible meshes to export, without skinned meshes.
-	 *
-	 * @private
-	 * @param {Array<Mesh>} meshes - The meshes.
-	 * @return {Array<Mesh>} The meshes to export.
-	 */
-	_exportedMeshes( meshes ) {
-
-		return meshes.filter( ( mesh ) => {
-
-			let visible = true;
-
-			mesh.traverseAncestors( ( object ) => visible = visible && ( object.visible || object === this.scene ) );
-
-			if ( mesh.isSkinnedMesh && mesh.visible && visible ) console.warn( `THREE.LightBaker: Skinned mesh "${ mesh.name }" is left out of the export.` );
-
-			return mesh.visible && visible && mesh.isSkinnedMesh !== true && mesh.isBatchedMesh !== true;
-
-		} );
-
-	}
-
-	/**
-	 * Creates the objects of the `'KHR_lightmap'` export: lit materials with the baked irradiance.
-	 * `KHR_lightmap` stores it normalized as a 16-bit or 8-bit sRGB PNG per page, the light map is in lux
-	 * and not divided by pi. Instanced meshes keep their instances, with the atlas regions of their light
-	 * map UVs.
-	 *
-	 * @private
-	 * @return {Promise<{objects: Array<Object3D>, textures: Array<Texture>}>} The objects and the textures to dispose.
-	 */
-	async _createLightMappedObjects() {
-
-		const renderer = this.renderer;
-		const directional = this.directional && this.lightMapper.directionTexture !== null;
-		const lightMaps = await Promise.all( this.process().map( ( texture ) => readLightMap( renderer, texture ) ) );
-		const directionMaps = directional ? await Promise.all( this.lightMapper.pages.map( ( page ) => readLightMap( renderer, page.directionTexture ) ) ) : [];
-		const materials = new Map();
-
-		const exportMaterial = ( source, page ) => {
-
-			if ( materials.has( source ) === false ) {
-
-				const material = source.clone();
-				material.lightMap = lightMaps[ page ] ?? null;
-				material.lightMapIntensity = 1;
-				if ( directionMaps[ page ] !== undefined ) directionalLightMap( material, directionMaps[ page ] );
-				materials.set( source, material );
-
-			}
-
-			return materials.get( source );
-
-		};
-
-		const objects = this._exportedMeshes( this.meshes ).map( ( mesh ) => {
-
-			const page = this._pageOf( mesh );
-			const copy = mesh.clone();
-			mesh.matrixWorld.decompose( copy.position, copy.quaternion, copy.scale );
-			copy.material = Array.isArray( mesh.material ) ? mesh.material.map( ( material ) => exportMaterial( material, page ) ) : exportMaterial( mesh.material, page );
-			return copy;
-
-		} );
-
-		// the live direct lights, baked lights are already in the light map. glTF lights shine down
-		// their -Z axis
-
-		for ( const light of this.lights ) {
-
-			if ( this.bakedLights.includes( light ) ) continue;
-
-			const copy = light.clone();
-			light.matrixWorld.decompose( copy.position, copy.quaternion, copy.scale );
-
-			if ( light.target !== undefined ) {
-
-				copy.lookAt( light.target.getWorldPosition( new Vector3() ) );
-				copy.target = new Object3D();
-				copy.target.position.set( 0, 0, - 1 );
-				copy.add( copy.target );
-
-			}
-
-			objects.push( copy );
-
-		}
-
-		return { objects, textures: [ ...lightMaps, ...directionMaps ] };
-
-	}
-
-	/**
-	 * Creates the objects of the unlit and emissive exports. Any glTF viewer shows the baked light with
-	 * unlit or emissive materials on `uv1`, so these formats include the direct light, which is baked
-	 * here if it stays live.
-	 *
-	 * @private
-	 * @param {boolean} emissive - Whether to export emissive materials instead of unlit ones.
-	 * @param {number} toneMapping - The tone mapping.
-	 * @param {number} exposure - The exposure.
-	 * @return {Promise<{objects: Array<Object3D>, textures: Array<Texture>}>} The objects and the textures to dispose.
-	 */
-	async _createUnlitObjects( emissive, toneMapping, exposure ) {
-
-		const renderer = this.renderer;
-		const meshes = expandInstances( this._exportedMeshes( this._record.lightMapped ) );
-		const liveLights = this.lights.filter( ( light ) => this.bakedLights.includes( light ) === false ).map( copyLight );
-		const processed = this.process();
-		const pages = this.lightMapper.pages.length;
-
-		let directLightMapper = null;
-
-		if ( liveLights.length > 0 ) {
-
-			this._renderShadowMaps( liveLights );
-
-			directLightMapper = new LightMapper( renderer, this.lightMapper.size, () => vec3( 0 ), { lights: liveLights, pages } );
-			directLightMapper.addObjects( meshes );
-			directLightMapper.update( 32 );
-
-		}
-
-		// the radiance with the exposure of the view, one texture per page, the emissive strength restores
-		// values above one
-
-		const textures = [], scales = [];
-
-		try {
-
-			for ( let page = 0; page < pages; page ++ ) {
-
-				const lightMaps = [ processed[ page ] ];
-				if ( directLightMapper !== null ) lightMaps.push( directLightMapper.pages[ page ].texture );
-
-				const { texture, scale } = await bakeUnlitTexture( renderer, meshes.filter( ( mesh ) => ( mesh.userData.lightMapPage ?? 0 ) === page ), lightMaps, { exposure, normalize: emissive && toneMapping === NoToneMapping, toneMapping } );
-
-				textures.push( texture );
-				scales.push( scale );
-
-			}
-
-		} finally {
-
-			directLightMapper?.dispose();
-			for ( const light of liveLights ) light.dispose();
-
-		}
-
-		const materials = new Map();
-
-		const objects = meshes.map( ( mesh ) => {
-
-			const page = mesh.userData.lightMapPage ?? 0;
-
-			const unlitMaterial = ( source ) => {
-
-				const key = source.uuid + ',' + page;
-
-				if ( materials.has( key ) === false ) {
-
-					const map = textures[ page ], scale = scales[ page ];
-					const material = emissive ? new MeshStandardMaterial( { color: 0x000000, roughness: 1, metalness: 0, emissive: new Color().setScalar( Math.min( scale, 1 ) ), emissiveMap: map, emissiveIntensity: Math.max( scale, 1 ) } ) : new MeshBasicMaterial( { map } );
-					material.name = source.name;
-					material.side = source.side;
-					materials.set( key, material );
-
-				}
-
-				return materials.get( key );
-
-			};
-
-			const copy = mesh.clone();
-			mesh.matrixWorld.decompose( copy.position, copy.quaternion, copy.scale );
-			copy.material = Array.isArray( mesh.material ) ? mesh.material.map( unlitMaterial ) : unlitMaterial( mesh.material );
-
-			// vertex colors are part of the baked texture
-
-			if ( copy.geometry.hasAttribute( 'color' ) ) {
-
-				copy.geometry = copy.geometry.clone();
-				copy.geometry.deleteAttribute( 'color' );
-
-			}
-
-			return copy;
-
-		} );
-
-		return { objects, textures };
-
-	}
-
-	/**
-	 * Exports unlit materials with the base color times the vertex colors. The vertex colors hold the
-	 * diffuse lighting, exposure * ( direct + indirect irradiance ) / PI, times the color and plus the
-	 * emission of meshes with one material, so like the unlit atlas they hold the final radiance, tone
-	 * mapped like the renderer. A texture multiplies the vertex colors after the tone mapping, so they
-	 * are tone mapped with the average color of the texture and divided by it. Viewers clamp vertex colors
-	 * and expect them as normalized RGBA, e.g. the Microsoft 3D Viewer, so tone mapped colors are clamped
-	 * to one and stored as 16-bit RGBA: textured surfaces cannot get brighter than their texture. Without
-	 * tone mapping they stay linear floats for viewers that tone map like three.js. Specular light is
-	 * lost, and metals show their base color.
-	 *
-	 * @private
-	 * @param {number} toneMapping - The tone mapping.
-	 * @param {number} exposure - The exposure.
-	 * @param {number} maxVertices - The vertex budget.
-	 * @param {?function(Object)} onProgress - The progress callback.
-	 * @return {Promise<ArrayBuffer>} The binary glTF.
-	 */
-	async _exportVertexColors( toneMapping, exposure, maxVertices, onProgress ) {
-
-		const renderer = this.renderer;
-		const vertexMeshes = expandInstances( this._record.lightMapped.filter( ( mesh ) => mesh.isSkinnedMesh !== true ) );
-		const baker = new VertexLightBaker( vertexMeshes );
-
-		await baker.readLightMap( renderer, this.process() );
-		await this._bakeDirectLight( baker );
-
-		// the irradiance of the vertices is fitted to the light map with least squares, the meshes are
-		// subdivided where a linear function cannot fit the light map beyond its noise, until they fit
-		// within 2% or the vertex budget is used up
-
-		const options = { noise: Number.isFinite( this.noise ) ? this.noise : 0 };
-
-		while ( true ) {
-
-			const stats = baker.fit();
-
-			onProgress?.( { stage: 'vertices', vertices: stats.vertices, error: stats.error } );
-
-			if ( baker.refine( maxVertices, options ) === 0 ) break;
-
-			await nextFrame();
-
-		}
-
-		baker.computeColors( exposure );
-
-		// the emission of a material with the average color of its emissive map. Bright emitters show their
-		// emission without their texture
-
-		const white = new Color( 1, 1, 1 ), black = new Color( 0, 0, 0 );
-
-		const emission = ( material ) => {
-
-			const color = ( material.emissive ?? black ).clone().multiplyScalar( ( material.emissiveIntensity ?? 1 ) * exposure );
-			if ( material.emissiveMap ) color.multiply( this._getAverageColor( material.emissiveMap ) );
-
-			return color;
-
-		};
-
-		const visible = new Set( this._exportedMeshes( vertexMeshes ) );
-		const exported = [];
-
-		vertexMeshes.forEach( ( mesh, i ) => {
-
-			if ( visible.has( mesh ) === false ) return;
-
-			const source = baker.geometries[ i ];
-			const folded = Array.isArray( mesh.material ) ? null : mesh.material;
-			const emissive = folded !== null ? emission( folded ) : black;
-			const map = folded !== null && emissive.r * 0.2126 + emissive.g * 0.7152 + emissive.b * 0.0722 < 0.1 ? folded.map : null;
-			const average = map ? this._getAverageColor( map ) : white;
-			const albedo = ( folded?.color ?? white ).clone().multiply( average );
-
-			const light = source.getAttribute( 'color' ).array;
-			const radiance = new Float32Array( light.length );
-
-			for ( let j = 0; j < light.length; j += 3 ) {
-
-				radiance[ j ] = light[ j ] * albedo.r + emissive.r;
-				radiance[ j + 1 ] = light[ j + 1 ] * albedo.g + emissive.g;
-				radiance[ j + 2 ] = light[ j + 2 ] * albedo.b + emissive.b;
-
-			}
-
-			exported.push( { mesh, source, folded, map, average, radiance } );
-
-		} );
-
-		// all vertex colors are tone mapped at once
-
-		const radiance = new Float32Array( exported.reduce( ( sum, entry ) => sum + entry.radiance.length, 0 ) );
-		exported.reduce( ( offset, entry ) => ( radiance.set( entry.radiance, offset ), offset + entry.radiance.length ), 0 );
-		const mapped = await toneMapColors( renderer, radiance, toneMapping );
-
-		const objects = [];
-		let offset = 0;
-
-		for ( const { mesh, source, folded, map, average } of exported ) {
-
-			const geometry = new BufferGeometry();
-
-			for ( const name of [ 'position', 'normal', 'uv' ] ) if ( source.hasAttribute( name ) ) geometry.setAttribute( name, source.getAttribute( name ) );
-			for ( const group of source.groups ) geometry.addGroup( group.start, group.count, group.materialIndex );
-			geometry.setIndex( source.index );
-
-			const count = source.getAttribute( 'color' ).count;
-			const normalized = toneMapping !== NoToneMapping;
-			const colors = normalized ? new Uint16Array( count * 4 ) : new Float32Array( count * 4 );
-			const scale = normalized ? 65535 : 1;
-			const divisor = [ average.r, average.g, average.b ];
-
-			for ( let j = 0; j < count; j ++, offset += 3 ) {
-
-				for ( let c = 0; c < 3; c ++ ) {
-
-					const value = Math.max( mapped[ offset + c ] / divisor[ c ], 0 );
-					colors[ j * 4 + c ] = normalized ? Math.round( Math.min( value, 1 ) * scale ) : value;
-
-				}
-
-				colors[ j * 4 + 3 ] = scale;
-
-			}
-
-			geometry.setAttribute( 'color', new BufferAttribute( colors, 4, normalized ) );
-
-			const unlit = ( material ) => new MeshBasicMaterial( {
-				name: material.name,
-				color: folded !== null ? white : material.color,
-				map: folded !== null ? map : material.map,
-				side: material.side,
-				vertexColors: true
-			} );
-
-			const object = new Mesh( geometry, folded !== null ? unlit( folded ) : mesh.material.map( unlit ) );
-			object.name = mesh.name;
-			mesh.matrixWorld.decompose( object.position, object.quaternion, object.scale );
-			objects.push( object );
-
-		}
-
-		objects.push( ...this._createExcludedObjects() );
-
-		onProgress?.( { stage: 'writing' } );
-
-		try {
-
-			return await new GLTFExporter().parseAsync( objects, { binary: true } );
-
-		} finally {
-
-			for ( const object of objects ) for ( const material of [ object.material ].flat() ) material.dispose();
-
-		}
-
-	}
-
-	/**
-	 * Adds the direct light of the live lights to the light map of a vertex light baker. The light map
-	 * leaves them out, a second light map bakes their direct light for the export. Baked lights are
-	 * already in the light map.
-	 *
-	 * @private
-	 * @param {VertexLightBaker} baker - The vertex light baker.
-	 * @return {Promise} A promise that resolves when the light is added.
-	 */
-	async _bakeDirectLight( baker ) {
-
-		const liveLights = this.lights.filter( ( light ) => this.bakedLights.includes( light ) === false ).map( copyLight );
-
-		if ( liveLights.length === 0 ) return;
-
-		this._renderShadowMaps( liveLights );
-
-		const directMapper = new LightMapper( this.renderer, this.lightMapper.size, () => vec3( 0 ), { lights: liveLights, pages: this.lightMapper.pages.length } );
-		directMapper.addObjects( baker.meshes );
-
-		// jittered samples antialias the shadow edges
-
-		directMapper.update( 32 );
-
-		try {
-
-			await baker.readLightMap( this.renderer, directMapper.pages.map( ( page ) => page.texture ), true );
-
-		} finally {
-
-			directMapper.dispose();
-			for ( const light of liveLights ) light.dispose();
-
-		}
-
-	}
-
-	/**
-	 * Returns the linear average of a color texture, from a small copy of its image.
-	 *
-	 * @private
-	 * @param {Texture} map - The texture.
-	 * @return {Color} The average color.
-	 */
-	_getAverageColor( map ) {
-
-		if ( this._averageColors.has( map ) ) return this._averageColors.get( map );
-
-		const color = new Color( 1, 1, 1 );
-		const image = map.image;
-
-		if ( image && image.width > 0 && image.data === undefined && typeof OffscreenCanvas !== 'undefined' ) {
-
-			const canvas = new OffscreenCanvas( 16, 16 );
-			const context = canvas.getContext( '2d', { willReadFrequently: true } );
-			context.drawImage( image, 0, 0, 16, 16 );
-			const data = context.getImageData( 0, 0, 16, 16 ).data;
-			const space = map.colorSpace === SRGBColorSpace ? SRGBColorSpace : LinearSRGBColorSpace;
-			const texel = new Color();
-
-			color.setRGB( 0, 0, 0 );
-
-			for ( let i = 0; i < data.length; i += 4 ) color.add( texel.setRGB( data[ i ] / 255, data[ i + 1 ] / 255, data[ i + 2 ] / 255, space ) );
-
-			color.multiplyScalar( 1 / 256 );
-
-			// a black texture would divide by zero
-
-			color.r = Math.max( color.r, 1e-3 );
-			color.g = Math.max( color.g, 1e-3 );
-			color.b = Math.max( color.b, 1e-3 );
-
-		}
-
-		this._averageColors.set( map, color );
-
-		return color;
 
 	}
 
@@ -2308,91 +1819,6 @@ function lightProbeGridDirection( probes, position, normal ) {
 	const directionalLight = ambient.mul( share ).mul( dot( dominant, normal ).max( 0 ) ).mul( 4 );
 
 	return normal.mul( uniformLight.mul( 2 / 3 ) ).add( dominant.mul( directionalLight ) ).div( uniformLight.add( directionalLight ).max( 1e-10 ) );
-
-}
-
-/**
- * Expands instanced meshes into a mesh per instance for formats without instancing, with its atlas
- * region in the light map UVs and its color in its material.
- *
- * @private
- * @param {Array<Mesh>} objects - The meshes.
- * @return {Array<Mesh>} The meshes, with the instances expanded.
- */
-function expandInstances( objects ) {
-
-	const expanded = [];
-	const materials = new Map();
-	const instanceMatrix = new Matrix4();
-	const color = new Color();
-
-	for ( const object of objects ) {
-
-		if ( object.isInstancedMesh !== true ) {
-
-			expanded.push( object );
-			continue;
-
-		}
-
-		const source = object.geometry;
-		const uv1 = source.getAttribute( 'uv1' ), offset = source.getAttribute( '_LIGHTMAP_OFFSET' ), scale = source.getAttribute( '_LIGHTMAP_SCALE' );
-
-		for ( let i = 0; i < object.count; i ++ ) {
-
-			const geometry = new BufferGeometry();
-
-			for ( const name in source.attributes ) if ( source.attributes[ name ].isInstancedBufferAttribute !== true ) geometry.setAttribute( name, source.attributes[ name ] );
-			for ( const group of source.groups ) geometry.addGroup( group.start, group.count, group.materialIndex );
-			geometry.setIndex( source.index );
-
-			if ( offset !== undefined && scale !== undefined ) {
-
-				const values = new Float32Array( uv1.count * 2 );
-
-				for ( let j = 0; j < uv1.count; j ++ ) {
-
-					values[ j * 2 ] = uv1.getX( j ) * scale.getX( i ) + offset.getX( i );
-					values[ j * 2 + 1 ] = uv1.getY( j ) * scale.getY( i ) + offset.getY( i );
-
-				}
-
-				geometry.setAttribute( 'uv1', new BufferAttribute( values, 2 ) );
-
-			}
-
-			if ( object.instanceColor !== null ) color.fromBufferAttribute( object.instanceColor, i );
-			else color.setRGB( 1, 1, 1 );
-
-			const tint = ( material ) => {
-
-				const key = material.uuid + color.getHexString();
-
-				if ( materials.has( key ) === false ) {
-
-					const copy = material.clone();
-					copy.color?.multiply( color );
-					materials.set( key, copy );
-
-				}
-
-				return materials.get( key );
-
-			};
-
-			const mesh = new Mesh( geometry, Array.isArray( object.material ) ? object.material.map( tint ) : tint( object.material ) );
-			mesh.name = object.name;
-			mesh.visible = object.visible;
-			mesh.userData.lightMapPage = object.userData.lightMapPage;
-			mesh.matrix.multiplyMatrices( object.matrixWorld, object.getMatrixAt( i, instanceMatrix ) ).decompose( mesh.position, mesh.quaternion, mesh.scale );
-			mesh.updateMatrixWorld();
-			expanded.push( mesh );
-
-		}
-
-	}
-
-	return expanded;
 
 }
 

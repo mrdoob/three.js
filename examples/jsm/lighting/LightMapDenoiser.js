@@ -249,7 +249,7 @@ class LightMapDenoiser {
 			const source = object.geometry;
 			const geometry = new BufferGeometry();
 
-			for ( const name of [ 'position', 'normal', 'uv1', '_LIGHTMAP_SCALE', '_LIGHTMAP_ROTATION', '_LIGHTMAP_OFFSET' ] ) {
+			for ( const name of [ 'position', 'normal', 'uv1', '_LIGHTMAP_SCALE', '_LIGHTMAP_OFFSET' ] ) {
 
 				if ( source.attributes[ name ] !== undefined ) geometry.setAttribute( name, source.attributes[ name ] );
 

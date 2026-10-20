@@ -1,9 +1,9 @@
 import { BackSide, BasicLightMapNode, DoubleSide, IrradianceNode, LightingNode, PhysicalLightingModel } from 'three/webgpu';
-import { BRDF_GGX, Fn, attribute, cameraViewMatrix, cos, dot, faceDirection, length, materialLightMap, materialReference, normalView, normalViewGeometry, roughness, sin, specularColorBlended, specularF90, uv, vec2, vec4 } from 'three/tsl';
+import { BRDF_GGX, Fn, attribute, cameraViewMatrix, dot, faceDirection, length, materialLightMap, materialReference, normalView, normalViewGeometry, roughness, specularColorBlended, specularF90, uv, vec4 } from 'three/tsl';
 
-// the instanced attributes of KHR_lightmap that place the light map UVs of each instance in the atlas
+// the instanced attributes that place the light map UVs of each instance in the atlas, see unwrapUVs
 
-const INSTANCE_ATTRIBUTES = [ '_LIGHTMAP_SCALE', '_LIGHTMAP_ROTATION', '_LIGHTMAP_OFFSET', '_LIGHTMAP_INTENSITY' ];
+const INSTANCE_ATTRIBUTES = [ '_LIGHTMAP_SCALE', '_LIGHTMAP_OFFSET' ];
 
 /**
  * Adds the irradiance of a directional light map to the lighting context. A directional light
@@ -114,12 +114,12 @@ class DirectionalLightMapNode extends LightingNode {
  * Shades the light map of a material with a directional light map, e.g. the
  * {@link LightMapper#directionTexture} of a directional bake, so that normal maps show under baked
  * light. The direction texture must share the UV channel and transform of `material.lightMap`.
- * It is kept in `material.lightMapDirection`, which {@link GLTFLightMapExporterExtension} exports,
- * and the scale of the specular term in `material.lightMapSpecularIntensity`. Both can change later,
- * but a change of the intensity from or to zero needs `material.needsUpdate`. The material uses
- * {@link DirectionalLightMapNode} through an override of `setupLightMap()`, unlit materials keep
- * their light map. The override is the one of {@link instancedLightMap}, so instanced meshes look both
- * textures up in the atlas regions of their instances.
+ * It is kept in `material.lightMapDirection`, and the scale of the specular term in
+ * `material.lightMapSpecularIntensity`. Both can change later, but a change of the intensity from or
+ * to zero needs `material.needsUpdate`. The material uses {@link DirectionalLightMapNode} through an
+ * override of `setupLightMap()`, unlit materials keep their light map. The override is the one of
+ * {@link instancedLightMap}, so instanced meshes look both textures up in the atlas regions of their
+ * instances.
  *
  * ```js
  * material.lightMap = lightMapper.texture;
@@ -153,9 +153,8 @@ function directionalLightMap( material, directionTexture, { specularIntensity = 
 
 /**
  * Makes a material look its light map up in the atlas region of each instance of instanced meshes,
- * e.g. unwrapped by {@link unwrapUVs}, see {@link lightMapUV}, and scales it by the instanced attribute
- * `_LIGHTMAP_INTENSITY` of `KHR_lightmap`. The texture transform of the light map applies before the
- * one of the instances, like in `KHR_lightmap`. It works with {@link directionalLightMap}, in any order.
+ * e.g. unwrapped by {@link unwrapUVs}, see {@link lightMapUV}. The texture transform of the light map
+ * applies before the one of the instances. It works with {@link directionalLightMap}, in any order.
  * Clones of the material need another call.
  *
  * ```js
@@ -178,9 +177,8 @@ function instancedLightMap( material ) {
 
 /**
  * Returns the light map UVs of the rendered mesh, `uv1` by default, mapped into the atlas region of each
- * instance by the instanced attributes `_LIGHTMAP_SCALE`, `_LIGHTMAP_ROTATION` and `_LIGHTMAP_OFFSET` of
- * `KHR_lightmap`, which {@link unwrapUVs} generates for instanced meshes. Without them, the UVs are
- * returned as they are.
+ * instance by the instanced attributes `_LIGHTMAP_SCALE` and `_LIGHTMAP_OFFSET`, which {@link unwrapUVs}
+ * generates for instanced meshes. Without them, the UVs are returned as they are.
  *
  * @tsl
  * @function
@@ -195,13 +193,6 @@ const lightMapUV = ( uvNode = uv( 1 ) ) => Fn( ( builder ) => {
 
 	if ( geometry?.hasAttribute( '_LIGHTMAP_SCALE' ) ) node = node.mul( attribute( '_LIGHTMAP_SCALE', 'vec2' ) );
 
-	if ( geometry?.hasAttribute( '_LIGHTMAP_ROTATION' ) ) {
-
-		const angle = attribute( '_LIGHTMAP_ROTATION', 'float' );
-		node = vec2( node.x.mul( cos( angle ) ).sub( node.y.mul( sin( angle ) ) ), node.x.mul( sin( angle ) ).add( node.y.mul( cos( angle ) ) ) );
-
-	}
-
 	if ( geometry?.hasAttribute( '_LIGHTMAP_OFFSET' ) ) node = node.add( attribute( '_LIGHTMAP_OFFSET', 'vec2' ) );
 
 	return node;
@@ -210,7 +201,7 @@ const lightMapUV = ( uvNode = uv( 1 ) ) => Fn( ( builder ) => {
 
 /**
  * Returns a texture of the material, sampled at the light map UVs of the instance. The texture
- * transform applies first, like the binding transform of `KHR_lightmap`.
+ * transform applies first.
  *
  * @private
  * @param {string} property - The material property of the texture.
@@ -251,9 +242,7 @@ function setupLightMap( builder ) {
 
 	if ( ! lightMap || ( instanced === false && directional === false ) ) return this.constructor.prototype.setupLightMap.call( this, builder );
 
-	let lightMapNode = instanced ? instanceTexture( 'lightMap' ).rgb.mul( materialReference( 'lightMapIntensity', 'float' ) ) : materialLightMap;
-
-	if ( geometry?.hasAttribute( '_LIGHTMAP_INTENSITY' ) ) lightMapNode = lightMapNode.mul( attribute( '_LIGHTMAP_INTENSITY', 'float' ) );
+	const lightMapNode = instanced ? instanceTexture( 'lightMap' ).rgb.mul( materialReference( 'lightMapIntensity', 'float' ) ) : materialLightMap;
 
 	if ( directional ) {
 

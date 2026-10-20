@@ -94,9 +94,6 @@ export default QUnit.module( 'Addons', () => {
 
 				assert.throws( () => baker.apply(), /prepare/ );
 				assert.throws( () => baker.process(), /prepare/ );
-				await assert.rejects( baker.export( { format: 'fbx' } ), /Unknown export format/ );
-				await assert.rejects( baker.export( { bitDepth: 12 } ), /bit depth/ );
-				await assert.rejects( baker.export(), /bake/ );
 
 				const controller = new AbortController();
 				controller.abort();

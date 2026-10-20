@@ -20,8 +20,7 @@ import { potpack } from '../libs/potpack.module.js';
  * The instances of an instanced mesh share the charts of its geometry and each one gets an
  * atlas region of the same size, at the mean scale of the instances. The attribute maps the
  * charts into a unit square, and the instanced attributes `_LIGHTMAP_SCALE` and
- * `_LIGHTMAP_OFFSET` map it into the region of each instance, like `KHR_lightmap`. Batched
- * meshes are skipped.
+ * `_LIGHTMAP_OFFSET` map it into the region of each instance. Batched meshes are skipped.
  *
  * @three_import import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
  *
@@ -843,7 +842,7 @@ function rebuildGeometry( record, charts, settings ) {
 	if ( settings.attribute === 'uv' ) geometry.deleteAttribute( 'tangent' );
 	if ( record.instances > 0 ) {
 
-		// The KHR_lightmap instance attributes map the unit square into the region of each instance.
+		// The instance attributes map the unit square into the region of each instance.
 		const offsets = new Float32Array( record.instances * 2 ), scales = new Float32Array( record.instances * 2 );
 		for ( let i = 0; record.regions !== undefined && i < record.instances; i ++ ) {
 

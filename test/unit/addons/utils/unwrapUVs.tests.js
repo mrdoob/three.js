@@ -626,7 +626,7 @@ export default QUnit.module( 'Addons', () => {
 				root.add( mesh, plane );
 				const result = unwrap( root, { resolution: 256, padding: 2 } );
 				const offsets = mesh.geometry.getAttribute( '_LIGHTMAP_OFFSET' ), scales = mesh.geometry.getAttribute( '_LIGHTMAP_SCALE' );
-				assert.true( offsets.isInstancedBufferAttribute && scales.isInstancedBufferAttribute, 'KHR_lightmap instance attributes' );
+				assert.true( offsets.isInstancedBufferAttribute && scales.isInstancedBufferAttribute, 'Instance attributes' );
 				assert.strictEqual( offsets.count, 7 );
 				assert.strictEqual( mesh.geometry.getAttribute( 'custom' ), geometry.getAttribute( 'custom' ), 'Instanced attributes are kept' );
 

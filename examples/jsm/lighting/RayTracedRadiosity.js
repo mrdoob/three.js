@@ -290,6 +290,14 @@ class RayTracedRadiosity {
 
 		}
 
+		// the storage buffers of the scene are freed now, not only once they are garbage collected
+
+		const buffers = new Set( [ this._triangles, this._materials, this._lights, this._emitters, this._lightTree?.nodes, this._meshLightTree?.nodes, this._sky ] );
+
+		for ( const buffer of buffers ) buffer?.value.dispose();
+
+		this._triangles = this._materials = this._lights = this._emitters = this._lightTree = this._meshLightTree = this._sky = null;
+
 		if ( this._textures !== null ) {
 
 			this._textures.dispose();
@@ -1791,18 +1799,15 @@ function lightMapTransform( mesh, instance, tiles ) {
 
 	const geometry = mesh.geometry;
 	const scale = mesh.isInstancedMesh === true ? geometry.getAttribute( '_LIGHTMAP_SCALE' ) : undefined;
-	const rotation = mesh.isInstancedMesh === true ? geometry.getAttribute( '_LIGHTMAP_ROTATION' ) : undefined;
 	const offset = mesh.isInstancedMesh === true ? geometry.getAttribute( '_LIGHTMAP_OFFSET' ) : undefined;
 
 	const sx = scale !== undefined ? scale.getX( instance ) : 1;
 	const sy = scale !== undefined ? scale.getY( instance ) : 1;
-	const angle = rotation !== undefined ? rotation.getX( instance ) : 0;
-	const c = Math.cos( angle ), s = Math.sin( angle );
 	const tile = getTile( tiles > 1 ? mesh.userData.lightMapPage ?? 0 : 0, tiles );
 
 	return [
-		tile.x * c * sx, - tile.x * s * sy, tile.x * ( offset !== undefined ? offset.getX( instance ) : 0 ) + tile.z,
-		tile.y * s * sx, tile.y * c * sy, tile.y * ( offset !== undefined ? offset.getY( instance ) : 0 ) + tile.w
+		tile.x * sx, 0, tile.x * ( offset !== undefined ? offset.getX( instance ) : 0 ) + tile.z,
+		0, tile.y * sy, tile.y * ( offset !== undefined ? offset.getY( instance ) : 0 ) + tile.w
 	];
 
 }
