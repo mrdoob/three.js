@@ -297,7 +297,7 @@
 
 				const resolution = probes.resolution;
 				const totalProbes = resolution.x * resolution.y * resolution.z;
-				const count = Math.min( 4, totalProbes - bakeIndex );
+				const count = Math.min( 16, totalProbes - bakeIndex );
 
 				// Keep the helper spheres out of the cubemap captures.
 				if ( probesHelper ) probesHelper.visible = false;

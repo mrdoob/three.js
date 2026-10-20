@@ -25899,6 +25899,14 @@ class InstancedMesh extends Mesh {
 
 		super.dispose();
 
+		this.instanceMatrix.dispose();
+
+		if ( this.instanceColor !== null ) {
+
+			this.instanceColor.dispose();
+
+		}
+
 		if ( this.morphTexture !== null ) {
 
 			this.morphTexture.dispose();
@@ -29364,7 +29372,7 @@ class CompressedTexture extends Texture {
 	/**
 	 * Constructs a new compressed texture.
 	 *
-	 * @param {Array<Object>} mipmaps - This array holds for all mipmaps (including the bases mip)
+	 * @param {Array<Object>} [mipmaps=[]] - This array holds for all mipmaps (including the bases mip)
 	 * the data and dimensions.
 	 * @param {number} width - The width of the texture.
 	 * @param {number} height - The height of the texture.
@@ -29378,7 +29386,7 @@ class CompressedTexture extends Texture {
 	 * @param {number} [anisotropy=Texture.DEFAULT_ANISOTROPY] - The anisotropy value.
 	 * @param {string} [colorSpace=NoColorSpace] - The color space.
 	 */
-	constructor( mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, colorSpace ) {
+	constructor( mipmaps = [], width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, colorSpace ) {
 
 		super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace );
 
