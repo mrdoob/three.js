@@ -3429,6 +3429,34 @@ class Renderer {
 
 		}
 
+		// a depth copy requires the format of the depth buffer, e.g. float depth with reversed depth or depth/stencil
+
+		if ( framebufferTexture.isDepthTexture === true ) {
+
+			let depthTexture = null;
+
+			if ( renderTarget ) {
+
+				depthTexture = renderContext.depthTexture;
+
+			} else if ( this.backend.has( this.getCanvasTarget().depthTexture ) ) {
+
+				// the canvas depth only has a texture on backends that create one for it
+
+				depthTexture = this.getCanvasTarget().depthTexture;
+
+			}
+
+			if ( depthTexture && ( framebufferTexture.format !== depthTexture.format || framebufferTexture.type !== depthTexture.type ) ) {
+
+				framebufferTexture.format = depthTexture.format;
+				framebufferTexture.type = depthTexture.type;
+				framebufferTexture.needsUpdate = true;
+
+			}
+
+		}
+
 		//
 
 		this._textures.updateTexture( framebufferTexture, { renderTarget } );
