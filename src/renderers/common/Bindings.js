@@ -2,6 +2,8 @@ import DataMap from './DataMap.js';
 import { AttributeType } from './Constants.js';
 import { hashString } from '../../nodes/core/NodeUtils.js';
 
+const _cacheKeyIds = [];
+
 /**
  * This renderer module manages the bindings of the renderer.
  *
@@ -451,7 +453,7 @@ class Bindings extends DataMap {
 
 		let needsBindingsUpdate = false;
 		let cacheBindings = true;
-		let cacheKey = '';
+		let cacheKeyLength = 0;
 		let version = 0;
 
 		// iterate over all bindings and check if buffer updates or a new binding group is required
@@ -491,7 +493,7 @@ class Bindings extends DataMap {
 
 				// the generation is part of the version so a re-created buffer replaces the cached bind group
 
-				cacheKey += attribute.id + ',';
+				_cacheKeyIds[ cacheKeyLength ++ ] = attribute.id;
 				version += generation;
 
 			}
@@ -545,7 +547,7 @@ class Bindings extends DataMap {
 
 				} else {
 
-					cacheKey += texture.id + ',';
+					_cacheKeyIds[ cacheKeyLength ++ ] = texture.id;
 					version += texture.version;
 
 				}
@@ -598,9 +600,54 @@ class Bindings extends DataMap {
 
 		if ( needsBindingsUpdate === true ) {
 
-			this.backend.updateBindings( bindGroup, bindings, cacheBindings ? cacheKey : '', version );
+			const cacheKey = cacheBindings ? this._getCacheKey( bindGroup, cacheKeyLength ) : '';
+
+			this.backend.updateBindings( bindGroup, bindings, cacheKey, version );
 
 		}
+
+	}
+
+	/**
+	 * Returns the cache key of the given bind group for the first `length` ids
+	 * collected by `_update()`. The keys are stored per bind group in a tree with
+	 * one node per id sequence, so each key string is only created once.
+	 *
+	 * @private
+	 * @param {BindGroup} bindGroup - The bind group.
+	 * @param {number} length - The number of collected ids.
+	 * @return {string} The cache key.
+	 */
+	_getCacheKey( bindGroup, length ) {
+
+		const groupData = this.get( bindGroup );
+
+		if ( groupData.cacheKeyTree === undefined ) {
+
+			groupData.cacheKeyTree = { key: '', children: new Map() };
+
+		}
+
+		let node = groupData.cacheKeyTree;
+
+		for ( let i = 0; i < length; i ++ ) {
+
+			const id = _cacheKeyIds[ i ];
+
+			let child = node.children.get( id );
+
+			if ( child === undefined ) {
+
+				child = { key: node.key + id + ',', children: new Map() };
+				node.children.set( id, child );
+
+			}
+
+			node = child;
+
+		}
+
+		return node.key;
 
 	}
 
