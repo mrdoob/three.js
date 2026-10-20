@@ -160,7 +160,7 @@
 				status.textContent = 'Unwrapping model…';
 				status.classList.remove( 'error', 'warning' );
 				// Let the status paint before the synchronous unwrap blocks the main thread.
-				await new Promise( resolve => requestAnimationFrame( () => setTimeout( resolve ) ) );
+				await new Promise( resolve => setTimeout( resolve, 20 ) );
 				if ( id !== unwrapId ) return;
 				for ( const item of originals ) {
 
