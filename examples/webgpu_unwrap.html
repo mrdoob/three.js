@@ -56,95 +56,163 @@
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 			import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
 
-			const status = document.getElementById( 'status' );
-			const scene = new THREE.Scene();
-			scene.background = new THREE.Color( 0x303b4b );
-			const camera = new THREE.PerspectiveCamera( 45, innerWidth / innerHeight, 0.01, 10000 );
-			const renderer = new THREE.WebGPURenderer( { antialias: true } );
-			renderer.inspector = new Inspector();
-			renderer.setPixelRatio( devicePixelRatio );
-			renderer.setSize( innerWidth, innerHeight );
-			document.body.appendChild( renderer.domElement );
-			const controls = new OrbitControls( camera, renderer.domElement );
-			controls.enableDamping = true;
-			scene.add( new THREE.HemisphereLight( 0xffffff, 0x667788, 3 ) );
-			const light = new THREE.DirectionalLight( 0xffffff, 3 );
-			light.position.set( 3, 5, 4 );
-			scene.add( light );
+			let camera, scene, renderer, controls;
+			let status, atlasCanvas, islandTexture;
+			let previewMaterial, islandMaterial, densityMaterial;
+			let atlasSize, densityTarget;
+			let loader, objLoader;
+			let root, result;
+			let originals = [];
+			let loadId = 0, unwrapId = 0;
 
-			const checkerTexture = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
-			checkerTexture.channel = 1;
-			checkerTexture.colorSpace = THREE.SRGBColorSpace;
-			const atlasCanvas = document.getElementById( 'atlas' );
-			const islandTexture = new THREE.CanvasTexture( atlasCanvas );
-			islandTexture.channel = 1;
-			islandTexture.colorSpace = THREE.SRGBColorSpace;
-			islandTexture.generateMipmaps = false;
-			islandTexture.minFilter = THREE.LinearFilter;
-			const islandMaterial = new THREE.MeshBasicNodeMaterial( { map: islandTexture, side: THREE.DoubleSide, toneMapped: false } );
-			const previewMaterial = new THREE.MeshStandardMaterial( { map: checkerTexture, roughness: 0.8, side: THREE.DoubleSide } );
-			const atlasSize = uniform( 2048 );
-			const densityTarget = uniform( 1 );
-			const densityMaterial = new THREE.MeshBasicNodeMaterial( { side: THREE.DoubleSide, toneMapped: false } );
-			densityMaterial.colorNode = Fn( () => {
-
-				const dx = positionWorld.dFdx(), dy = positionWorld.dFdy();
-				const texel = uv( 1 ).mul( atlasSize );
-				const tx = texel.dFdx(), ty = texel.dFdy();
-				const normal = dx.cross( dy );
-				const areaSquared = normal.dot( normal ).max( 1e-30 );
-				const a = dy.cross( normal ).div( areaSquared );
-				const b = normal.cross( dx ).div( areaSquared );
-				const gradientU = a.mul( tx.x ).add( b.mul( ty.x ) );
-				const gradientV = a.mul( tx.y ).add( b.mul( ty.y ) );
-				// Singular values measure density along both principal surface directions.
-				const trace = gradientU.dot( gradientU ).add( gradientV.dot( gradientV ) );
-				const cross = gradientU.cross( gradientV );
-				const determinant = cross.dot( cross );
-				const largest = trace.add( trace.mul( trace ).sub( determinant.mul( 4 ) ).max( 0 ).sqrt() ).mul( 0.5 );
-				const smallest = determinant.div( largest.max( 1e-30 ) );
-				const ratio = largest.sqrt().div( densityTarget ).max( densityTarget.div( smallest.max( 1e-30 ).sqrt() ) ).max( 1 );
-				const deviation = ratio.log2().clamp( 0, 1 );
-				const green = color( '#28d45c' ), yellow = color( '#ffe030' ), red = color( '#ef3028' );
-				return mix( mix( green, yellow, deviation.mul( 2 ).clamp( 0, 1 ) ), red, deviation.mul( 2 ).sub( 1 ).clamp( 0, 1 ) );
-
-			} )();
 			const params = {
-				model: 'DamagedHelmet/glTF/DamagedHelmet.gltf', mode: 'lightmap', resolution: 2048, useInputUVs: false,
-				view: 'checker', referenceDensity: 0
+				model: 'DamagedHelmet/glTF/DamagedHelmet.gltf',
+				mode: 'lightmap',
+				resolution: 2048,
+				useInputUVs: false,
+				view: 'checker',
+				referenceDensity: 0
 			};
-			const query = new URLSearchParams( location.search );
-			if ( query.has( 'model' ) ) params.model = query.get( 'model' );
-			if ( query.get( 'mode' ) === 'normal' ) params.mode = 'normal';
-			if ( [ '1024', '2048', '4096', '8192', '16384' ].includes( query.get( 'resolution' ) ) ) params.resolution = Number( query.get( 'resolution' ) );
-			params.useInputUVs = query.get( 'authored' ) === 'true';
-			const gui = renderer.inspector.createParameters( 'UV unwrap' );
-			gui.add( params, 'model', {
-				'Damaged Helmet': 'DamagedHelmet/glTF/DamagedHelmet.gltf',
-				'Soldier': 'Soldier.glb', 'Xbot': 'Xbot.glb', 'Lee Perry Smith': 'LeePerrySmith/LeePerrySmith.glb',
-				'Space ship hallway': 'space_ship_hallway.glb',
-				'Walt head (OBJ)': '../obj/walt/WaltHead.obj',
-				'Ninja head (OBJ)': '../obj/ninja/ninjaHead_Low.obj',
-				'Male (OBJ)': '../obj/male02/male02.obj',
-				'Female (OBJ)': '../obj/female02/female02.obj',
-				'Cerberus (OBJ)': '../obj/cerberus/Cerberus.obj',
-				'Duck': 'duck.glb', 'Horse': 'Horse.glb', 'Flamingo': 'Flamingo.glb',
-				'Parrot': 'Parrot.glb', 'Robot expressive': 'RobotExpressive/RobotExpressive.glb',
-				'Nefertiti': 'Nefertiti/Nefertiti.glb', 'Ferrari': 'ferrari.glb', 'Rolex': 'rolex.glb',
-				'Sheen chair': 'SheenChair.glb', 'Steampunk camera': 'steampunk_camera.glb',
-				'Tennyson bust': 'tennyson-bust.glb', 'Venice mask': 'venice_mask.glb', 'Littlest Tokyo': 'LittlestTokyo.glb',
-				'Torus knot': 'torus-knot', 'Tube': 'tube'
-			} ).name( 'Model' ).listen().onChange( value => loadModel( value ).catch( reportError ) );
-			gui.add( params, 'view', { 'UV grid': 'checker', 'UV islands': 'islands', 'Texel density': 'density', 'Original materials': 'original' } ).name( 'View' ).onChange( updateMaterials );
-			const inputs = gui.addFolder( 'Unwrap Input' );
-			inputs.add( params, 'mode', { 'Lightmap': 'lightmap', 'Normal bake': 'normal' } ).name( 'Method' ).info( 'Lightmap: faster, but produces more islands. Normal bake: fewer, larger islands (via LSCM) that follow the original UV seams.' ).onChange( unwrap );
-			inputs.add( params, 'resolution', [ 1024, 2048, 4096, 8192, 16384 ] ).name( 'Atlas size' ).onChange( unwrap );
-			inputs.add( params, 'useInputUVs' ).name( 'Preserve authored islands' ).info( 'Splits charts only at seams in the existing uv attribute and reuses the authored UV layout of each island, rescaled and repacked into the atlas. Islands that exceed the stretch limit are split or reprojected.' ).onChange( unwrap );
-			inputs.add( params, 'referenceDensity' ).name( 'Target texels / unit' ).info( '0 uses the fitted atlas density. Both principal directions are compared with this target.' ).onChange( updateMaterials );
-			const draco = new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' );
-			const loader = new GLTFLoader().setDRACOLoader( draco );
-			const objLoader = new OBJLoader();
-			let root, originals = [], result, loadId = 0, unwrapId = 0;
+
+			init().catch( reportError );
+
+			async function init() {
+
+				status = document.getElementById( 'status' );
+				atlasCanvas = document.getElementById( 'atlas' );
+
+				// scene
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x303b4b );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.01, 10000 );
+
+				scene.add( new THREE.HemisphereLight( 0xffffff, 0x667788, 3 ) );
+
+				const light = new THREE.DirectionalLight( 0xffffff, 3 );
+				light.position.set( 3, 5, 4 );
+				scene.add( light );
+
+				// renderer
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.inspector = new Inspector();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+
+				// preview materials
+
+				const checkerTexture = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
+				checkerTexture.channel = 1;
+				checkerTexture.colorSpace = THREE.SRGBColorSpace;
+
+				previewMaterial = new THREE.MeshStandardMaterial( { map: checkerTexture, roughness: 0.8, side: THREE.DoubleSide } );
+
+				islandTexture = new THREE.CanvasTexture( atlasCanvas );
+				islandTexture.channel = 1;
+				islandTexture.colorSpace = THREE.SRGBColorSpace;
+				islandTexture.generateMipmaps = false;
+				islandTexture.minFilter = THREE.LinearFilter;
+
+				islandMaterial = new THREE.MeshBasicNodeMaterial( { map: islandTexture, side: THREE.DoubleSide, toneMapped: false } );
+
+				atlasSize = uniform( 2048 );
+				densityTarget = uniform( 1 );
+
+				densityMaterial = new THREE.MeshBasicNodeMaterial( { side: THREE.DoubleSide, toneMapped: false } );
+				densityMaterial.colorNode = Fn( () => {
+
+					const dx = positionWorld.dFdx(), dy = positionWorld.dFdy();
+					const texel = uv( 1 ).mul( atlasSize );
+					const tx = texel.dFdx(), ty = texel.dFdy();
+					const normal = dx.cross( dy );
+					const areaSquared = normal.dot( normal ).max( 1e-30 );
+					const a = dy.cross( normal ).div( areaSquared );
+					const b = normal.cross( dx ).div( areaSquared );
+					const gradientU = a.mul( tx.x ).add( b.mul( ty.x ) );
+					const gradientV = a.mul( tx.y ).add( b.mul( ty.y ) );
+					// Singular values measure density along both principal surface directions.
+					const trace = gradientU.dot( gradientU ).add( gradientV.dot( gradientV ) );
+					const cross = gradientU.cross( gradientV );
+					const determinant = cross.dot( cross );
+					const largest = trace.add( trace.mul( trace ).sub( determinant.mul( 4 ) ).max( 0 ).sqrt() ).mul( 0.5 );
+					const smallest = determinant.div( largest.max( 1e-30 ) );
+					const ratio = largest.sqrt().div( densityTarget ).max( densityTarget.div( smallest.max( 1e-30 ).sqrt() ) ).max( 1 );
+					const deviation = ratio.log2().clamp( 0, 1 );
+					const green = color( '#28d45c' ), yellow = color( '#ffe030' ), red = color( '#ef3028' );
+					return mix( mix( green, yellow, deviation.mul( 2 ).clamp( 0, 1 ) ), red, deviation.mul( 2 ).sub( 1 ).clamp( 0, 1 ) );
+
+				} )();
+
+				// loaders
+
+				const draco = new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' );
+				loader = new GLTFLoader().setDRACOLoader( draco );
+				objLoader = new OBJLoader();
+
+				// parameters
+
+				const query = new URLSearchParams( location.search );
+				if ( query.has( 'model' ) ) params.model = query.get( 'model' );
+				if ( query.get( 'mode' ) === 'normal' ) params.mode = 'normal';
+				if ( [ '1024', '2048', '4096', '8192', '16384' ].includes( query.get( 'resolution' ) ) ) params.resolution = Number( query.get( 'resolution' ) );
+				params.useInputUVs = query.get( 'authored' ) === 'true';
+
+				const gui = renderer.inspector.createParameters( 'UV unwrap' );
+				gui.add( params, 'model', {
+					'Damaged Helmet': 'DamagedHelmet/glTF/DamagedHelmet.gltf',
+					'Soldier': 'Soldier.glb', 'Xbot': 'Xbot.glb', 'Lee Perry Smith': 'LeePerrySmith/LeePerrySmith.glb',
+					'Space ship hallway': 'space_ship_hallway.glb',
+					'Walt head (OBJ)': '../obj/walt/WaltHead.obj',
+					'Ninja head (OBJ)': '../obj/ninja/ninjaHead_Low.obj',
+					'Male (OBJ)': '../obj/male02/male02.obj',
+					'Female (OBJ)': '../obj/female02/female02.obj',
+					'Cerberus (OBJ)': '../obj/cerberus/Cerberus.obj',
+					'Duck': 'duck.glb', 'Horse': 'Horse.glb', 'Flamingo': 'Flamingo.glb',
+					'Parrot': 'Parrot.glb', 'Robot expressive': 'RobotExpressive/RobotExpressive.glb',
+					'Nefertiti': 'Nefertiti/Nefertiti.glb', 'Ferrari': 'ferrari.glb', 'Rolex': 'rolex.glb',
+					'Sheen chair': 'SheenChair.glb', 'Steampunk camera': 'steampunk_camera.glb',
+					'Tennyson bust': 'tennyson-bust.glb', 'Venice mask': 'venice_mask.glb', 'Littlest Tokyo': 'LittlestTokyo.glb',
+					'Torus knot': 'torus-knot', 'Tube': 'tube'
+				} ).name( 'Model' ).listen().onChange( value => loadModel( value ).catch( reportError ) );
+				gui.add( params, 'view', { 'UV grid': 'checker', 'UV islands': 'islands', 'Texel density': 'density', 'Original materials': 'original' } ).name( 'View' ).onChange( updateMaterials );
+
+				const inputs = gui.addFolder( 'Unwrap Input' );
+				inputs.add( params, 'mode', { 'Lightmap': 'lightmap', 'Normal bake': 'normal' } ).name( 'Method' ).info( 'Lightmap: faster, but produces more islands. Normal bake: fewer, larger islands (via LSCM) that follow the original UV seams.' ).onChange( unwrap );
+				inputs.add( params, 'resolution', [ 1024, 2048, 4096, 8192, 16384 ] ).name( 'Atlas size' ).onChange( unwrap );
+				inputs.add( params, 'useInputUVs' ).name( 'Preserve authored islands' ).info( 'Splits charts only at seams in the existing uv attribute and reuses the authored UV layout of each island, rescaled and repacked into the atlas. Islands that exceed the stretch limit are split or reprojected.' ).onChange( unwrap );
+				inputs.add( params, 'referenceDensity' ).name( 'Target texels / unit' ).info( '0 uses the fitted atlas density. Both principal directions are compared with this target.' ).onChange( updateMaterials );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				await renderer.init();
+				renderer.setAnimationLoop( animate );
+
+				await loadModel( params.model );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				controls.update();
+
+				renderer.render( scene, camera );
+
+			}
 
 			function updateMaterials() {
 
@@ -353,25 +421,6 @@
 
 			}
 
-			window.addEventListener( 'resize', () => {
-
-				camera.aspect = innerWidth / innerHeight;
-				camera.updateProjectionMatrix();
-				renderer.setSize( innerWidth, innerHeight );
-
-			} );
-			renderer.init().then( () => {
-
-				renderer.setAnimationLoop( animate );
-				return loadModel( params.model );
-
-			} ).catch( reportError );
-			function animate() {
-
-				controls.update();
-				renderer.render( scene, camera );
-
-			}
 		</script>
 	</body>
 </html>
