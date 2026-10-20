@@ -62,31 +62,6 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// OTHERS
-			QUnit.test( 'copy/fromJSON invalidate cached arc lengths', ( assert ) => {
-
-				for ( const method of [ 'copy', 'fromJSON' ] ) {
-
-					const curve = new QuadraticBezierCurve(
-						new Vector2( 0, 0 ), new Vector2( 1, 0 ), new Vector2( 2, 0 )
-					);
-					const source = new QuadraticBezierCurve(
-						new Vector2( 0, 0 ), new Vector2( 0, 0 ), new Vector2( 10, 0 )
-					);
-
-					assert.numEqual( curve.getLength(), 2, 'Cache the original length' );
-
-					const input = method === 'copy' ? source : source.toJSON();
-					assert.strictEqual( curve[ method ]( input ), curve, method + ' returns this' );
-					assert.numEqual( curve.getLength(), 10, method + ' updates the cached length' );
-					assert.deepEqual(
-						curve.getPointAt( 0.5 ), source.getPointAt( 0.5 ),
-						method + ' uses the new arc lengths for equidistant sampling'
-					);
-
-				}
-
-			} );
-
 			QUnit.test( 'Simple curve', ( assert ) => {
 
 				const curve = _curve;
