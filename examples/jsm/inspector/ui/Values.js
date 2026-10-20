@@ -127,7 +127,7 @@ class ValueNumber extends Value {
 
 	addDragHandler() {
 
-		const threshold = 5;
+		const threshold = 2;
 
 		let isPressed = false;
 		let isDragging = false;
