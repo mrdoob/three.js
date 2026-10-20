@@ -1,4 +1,9 @@
+import { Matrix3 } from '../../math/Matrix3.js';
+import { Matrix4 } from '../../math/Matrix4.js';
+import { Plane } from '../../math/Plane.js';
 import { Vector4 } from '../../math/Vector4.js';
+
+const _plane = /*@__PURE__*/ new Plane();
 
 let _clippingContextId = 0;
 
@@ -59,6 +64,20 @@ class ClippingContext {
 		this.shadowPass = false;
 
 		/**
+		 * The view matrix.
+		 *
+		 * @type {Matrix4}
+		 */
+		this.viewMatrix = new Matrix4();
+
+		/**
+		 * The view normal matrix.
+		 *
+		 * @type {Matrix3}
+		 */
+		this.viewNormalMatrix = new Matrix3();
+
+		/**
 		 * Internal cache for maintaining clipping contexts.
 		 *
 		 * @type {WeakMap<ClippingGroup,ClippingContext>}
@@ -89,6 +108,8 @@ class ClippingContext {
 
 		if ( parentContext !== null ) {
 
+			this.viewMatrix = parentContext.viewMatrix;
+			this.viewNormalMatrix = parentContext.viewNormalMatrix;
 			this.clippingGroupContexts = parentContext.clippingGroupContexts;
 
 			this.shadowPass = parentContext.shadowPass;
@@ -98,7 +119,8 @@ class ClippingContext {
 	}
 
 	/**
-	 * Writes the given world-space source clipping planes into the destination array.
+	 * Projects the given source clipping planes and writes the result into the
+	 * destination array.
 	 *
 	 * @param {Array<Plane>} source - The source clipping planes.
 	 * @param {Array<Vector4>} destination - The destination.
@@ -110,15 +132,15 @@ class ClippingContext {
 
 		for ( let i = 0; i < l; i ++ ) {
 
-			const plane = source[ i ];
-			const normal = plane.normal;
+			_plane.copy( source[ i ] ).applyMatrix4( this.viewMatrix, this.viewNormalMatrix );
 
 			const v = destination[ offset + i ];
+			const normal = _plane.normal;
 
 			v.x = - normal.x;
 			v.y = - normal.y;
 			v.z = - normal.z;
-			v.w = plane.constant;
+			v.w = _plane.constant;
 
 		}
 
@@ -128,10 +150,25 @@ class ClippingContext {
 	 * Updates the root clipping context of a scene.
 	 *
 	 * @param {Scene} scene - The scene.
+	 * @param {Camera} camera - The camera that is used to render the scene.
 	 */
-	updateGlobal( scene ) {
+	updateGlobal( scene, camera ) {
 
 		this.shadowPass = ( scene.overrideMaterial !== null && scene.overrideMaterial.isShadowPassMaterial );
+
+		// ArrayCamera draws share one set of planes. Keep those planes in world
+		// space and reconstruct the world position in ClippingNode per view.
+		if ( camera.isArrayCamera === true ) {
+
+			this.viewMatrix.identity();
+
+		} else {
+
+			this.viewMatrix.copy( camera.matrixWorldInverse );
+
+		}
+
+		this.viewNormalMatrix.getNormalMatrix( this.viewMatrix );
 
 	}
 
