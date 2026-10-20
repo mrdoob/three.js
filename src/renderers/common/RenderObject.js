@@ -3,6 +3,7 @@ import { hashArray, hashString } from '../../nodes/core/NodeUtils.js';
 let _id = 0;
 const _protoKeysCache = new WeakMap();
 const _cacheKeyValues = [ 0, 0, 0, 0, 0 ];
+const _enumProperties = [ 'side', 'blending', 'combine', 'normalMapType' ];
 
 function getKeys( obj ) {
 
@@ -812,7 +813,7 @@ class RenderObject {
 
 				if ( type === 'number' ) {
 
-					if ( property === 'side' || property === 'blending' || property === 'combine' ) {
+					if ( _enumProperties.includes( property ) ) {
 
 						// `side`, `blending` and `combine` are enums that change code
 						// generation, so their exact values must be preserved.
