@@ -239,6 +239,7 @@ class CurvePath extends Curve {
 		super.copy( source );
 
 		this.curves = [];
+		this.cacheLengths = null;
 
 		for ( let i = 0, l = source.curves.length; i < l; i ++ ) {
 
@@ -278,6 +279,7 @@ class CurvePath extends Curve {
 
 		this.autoClose = json.autoClose;
 		this.curves = [];
+		this.cacheLengths = null;
 
 		for ( let i = 0, l = json.curves.length; i < l; i ++ ) {
 
