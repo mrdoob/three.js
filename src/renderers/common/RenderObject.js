@@ -815,8 +815,7 @@ class RenderObject {
 
 					if ( _enumProperties.includes( property ) ) {
 
-						// `side`, `blending` and `combine` are enums that change code
-						// generation, so their exact values must be preserved.
+						// retain enums since their exact value matters
 
 						valueKey = String( value );
 
