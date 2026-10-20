@@ -812,10 +812,10 @@ class RenderObject {
 
 				if ( type === 'number' ) {
 
-					if ( property === 'side' ) {
+					if ( property === 'side' || property === 'blending' || property === 'combine' ) {
 
-						// `side` is an enum (FrontSide/BackSide/DoubleSide) that changes code
-						// generation, so its exact value must be preserved.
+						// `side`, `blending` and `combine` are enums that change code
+						// generation, so their exact values must be preserved.
 
 						valueKey = String( value );
 
