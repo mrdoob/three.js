@@ -600,54 +600,13 @@ class Bindings extends DataMap {
 
 		if ( needsBindingsUpdate === true ) {
 
-			const cacheKey = cacheBindings ? this._getCacheKey( bindGroup, cacheKeyLength ) : '';
+			_cacheKeyIds.length = cacheKeyLength;
+
+			const cacheKey = cacheBindings ? _cacheKeyIds.join( ',' ) : '';
 
 			this.backend.updateBindings( bindGroup, bindings, cacheKey, version );
 
 		}
-
-	}
-
-	/**
-	 * Returns the cache key of the given bind group for the first `length` ids
-	 * collected by `_update()`. The keys are stored per bind group in a tree with
-	 * one node per id sequence, so each key string is only created once.
-	 *
-	 * @private
-	 * @param {BindGroup} bindGroup - The bind group.
-	 * @param {number} length - The number of collected ids.
-	 * @return {string} The cache key.
-	 */
-	_getCacheKey( bindGroup, length ) {
-
-		const groupData = this.get( bindGroup );
-
-		if ( groupData.cacheKeyTree === undefined ) {
-
-			groupData.cacheKeyTree = { key: '', children: new Map() };
-
-		}
-
-		let node = groupData.cacheKeyTree;
-
-		for ( let i = 0; i < length; i ++ ) {
-
-			const id = _cacheKeyIds[ i ];
-
-			let child = node.children.get( id );
-
-			if ( child === undefined ) {
-
-				child = { key: node.key + id + ',', children: new Map() };
-				node.children.set( id, child );
-
-			}
-
-			node = child;
-
-		}
-
-		return node.key;
 
 	}
 
