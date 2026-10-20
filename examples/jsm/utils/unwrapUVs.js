@@ -13,14 +13,14 @@ import { potpack } from '../libs/potpack.module.js';
  * map, and the page of each mesh is stored in `mesh.userData.lightMapPage`. A mesh too large
  * for a page gets a lower density.
  *
- * `mesh.userData.lightMapScale` multiplies the density of a mesh, like "Scale In Lightmap" in
- * Unity, e.g. `0.5` for meshes whose lighting varies little. Meshes with a scale of `0` are left
- * out of the atlas and lose the attribute, e.g. small props that light probes light instead.
+ * `mesh.userData.lightMapScale` multiplies the density of a mesh, e.g. `0.5` for meshes whose
+ * lighting varies little. Meshes with a scale of `0` are left out of the atlas and lose the
+ * attribute, e.g. small props that light probes light instead.
  *
  * The instances of an instanced mesh share the charts of its geometry and each one gets an
  * atlas region of the same size, at the mean scale of the instances. The attribute maps the
- * charts into a unit square, and the instanced attributes `_LIGHTMAP_SCALE` and
- * `_LIGHTMAP_OFFSET` map it into the region of each instance. Batched meshes are skipped.
+ * charts into a unit square, and the instanced attributes `instanceLightMapScale` and
+ * `instanceLightMapOffset` map it into the region of each instance. Batched meshes are skipped.
  *
  * @three_import import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
  *
@@ -34,6 +34,7 @@ import { potpack } from '../libs/potpack.module.js';
  * @param {number} [options.texelsPerUnit=0] - Common world density; zero fits the atlas. Must be nonnegative.
  * @param {boolean} [options.respectUVSeams] - Cut discontinuities in existing uv (normal default).
  * @param {boolean} [options.useInputUVs=false] - Preserve valid authored UV charts before trying LSCM.
+ * @param {string} [options.inputAttribute='uv'] - The authored UVs of `respectUVSeams` and `useInputUVs`.
  * @return {?Object} Page size, page count, density, chart bounds with their pages, mesh vertex/face
  * mappings with their pages, and the meshes left out, or null if the charts do not fit the atlas.
  * Meshes are left unchanged in that case.
@@ -43,13 +44,12 @@ function unwrapUVs( root, options = {} ) {
 	const settings = {
 		attribute: 'uv1', mode: 'lightmap', resolution: 1024, padding: 4,
 		texelsPerUnit: 0,
-		useInputUVs: false,
+		useInputUVs: false, inputAttribute: 'uv',
 		...options, maxAreaRatio: 2
 	};
 	settings.maxStretch = settings.mode === 'normal' ? 2 : 1.5;
 	settings.respectUVSeams ??= settings.mode === 'normal';
-	settings.pageSize ??= settings.resolution;
-	settings.atlasSize = Math.min( settings.pageSize, settings.resolution );
+	settings.pageSize = Math.min( settings.pageSize ?? settings.resolution, settings.resolution );
 	root.updateWorldMatrix( true, true );
 
 	const records = [], excluded = [];
@@ -123,7 +123,7 @@ function unwrapUVs( root, options = {} ) {
 	}
 
 	return {
-		attribute: settings.attribute, resolution: settings.atlasSize, pages, padding: settings.padding,
+		attribute: settings.attribute, resolution: settings.pageSize, pages, padding: settings.padding,
 		texelsPerUnit: density,
 		charts: charts.map( chart => {
 
@@ -195,7 +195,7 @@ function readMesh( mesh, settings ) {
 
 	}
 
-	const uv = geometry.getAttribute( 'uv' );
+	const uv = geometry.getAttribute( settings.inputAttribute );
 	for ( const edge of edges.values() ) {
 
 		if ( edge.length !== 2 ) continue; // Nonmanifold edges are seams.
@@ -226,13 +226,20 @@ function equalUV( uv, a, b ) {
 
 }
 
-function growCharts( record, settings ) {
+function growCharts( record, settings, subset = null ) {
 
 	const assigned = new Uint8Array( record.faces.length ), charts = [];
+	if ( subset !== null ) {
+
+		assigned.fill( 1 );
+		for ( const f of subset ) assigned[ f ] = 0;
+
+	}
+
 	// Lightmap charts use planar projection; keep the costlier LSCM charts smaller.
 	const limit = settings.mode === 'lightmap' ? 8192 : 2048;
 	// Wider normal cones in normal mode give LSCM useful curved patches to solve.
-	const cosine = settings.useInputUVs && record.original.attributes.uv ? - 1 : settings.mode === 'normal' ? 0.35 : 1 / settings.maxStretch;
+	const cosine = settings.useInputUVs && record.original.attributes[ settings.inputAttribute ] ? - 1 : settings.mode === 'normal' ? 0.35 : 1 / settings.maxStretch;
 	for ( let seed = 0; seed < assigned.length; seed ++ ) {
 
 		if ( assigned[ seed ] || record.faces[ seed ].ignored ) continue;
@@ -267,7 +274,7 @@ function parameterize( record, faces, settings, charts ) {
 	const axis = Math.abs( normal.x ) < 0.8 ? new Vector3( 1, 0, 0 ) : new Vector3( 0, 1, 0 );
 	const u = axis.cross( normal ).normalize(), v = new Vector3().crossVectors( normal, u );
 	const vertexMap = new Map(), positions = [], uv = [], triangles = [];
-	const useInput = settings.useInputUVs && record.original.attributes.uv;
+	const useInput = settings.useInputUVs && record.original.attributes[ settings.inputAttribute ];
 	const origin = record.points[ record.faces[ faces[ 0 ] ].vertices[ 0 ] ];
 	let worldArea = 0;
 	for ( const f of faces ) {
@@ -319,6 +326,17 @@ function parameterize( record, faces, settings, charts ) {
 		if ( useInput && faces.length === 1 ) {
 
 			parameterize( record, faces, { ...settings, useInputUVs: false }, charts );
+			return;
+
+		}
+
+		// halving an authored light map chart until its pieces pass would leave many small charts, its faces
+		// get new charts instead
+
+		if ( useInput && settings.mode === 'lightmap' ) {
+
+			const projected = { ...settings, useInputUVs: false };
+			for ( const chart of growCharts( record, projected, faces ) ) parameterize( record, chart, projected, charts );
 			return;
 
 		}
@@ -554,31 +572,17 @@ function packCharts( records, settings ) {
 
 	}
 
-	function layout( density ) {
-
-		const boxes = [];
-		for ( const record of records ) {
-
-			for ( const box of layoutRecord( record, density ) ) boxes.push( box );
-
-		}
-
-		return boxes;
-
-	}
-
 	function pack( density ) {
 
-		const boxes = layout( density );
+		const boxes = records.flatMap( record => layoutRecord( record, density ) );
 		return fits( boxes, settings.resolution ) ? boxes : null;
 
 	}
 
-	const multiPage = settings.pageSize < settings.resolution;
-	let density = settings.texelsPerUnit, boxes = density > 0 && ! multiPage ? pack( density ) : null;
-	if ( density > 0 && ! multiPage && ! boxes ) console.warn( 'THREE.unwrapUVs(): Charts do not fit at the requested texelsPerUnit. Fitting the atlas instead.' );
+	let density = settings.texelsPerUnit, boxes = density > 0 ? pack( density ) : null;
+	if ( density > 0 && ! boxes ) console.warn( 'THREE.unwrapUVs(): Charts do not fit at the requested texelsPerUnit. Fitting the atlas instead.' );
 
-	if ( ! boxes && ! ( density > 0 && multiPage ) ) {
+	if ( ! boxes ) {
 
 		let area = 0;
 		for ( const record of records ) {
@@ -614,17 +618,18 @@ function packCharts( records, settings ) {
 	}
 
 	let pages = 1;
-	if ( multiPage ) {
+	if ( settings.pageSize < settings.resolution ) {
 
-		boxes = packPages( records, density, settings.pageSize, layoutRecord );
-		if ( boxes === null ) {
+		const paged = packPages( records, density, settings.pageSize, layoutRecord );
+		if ( paged === null ) {
 
 			console.warn( 'THREE.unwrapUVs(): Charts do not fit the pages. Increase the page size or reduce the padding.' );
 			return null;
 
 		}
 
-		pages = boxes.reduce( ( count, box ) => Math.max( count, box.page + 1 ), 1 );
+		boxes = paged.boxes;
+		pages = paged.pages;
 
 	}
 
@@ -705,7 +710,7 @@ function packPages( records, density, size, layoutRecord ) {
 
 	} );
 
-	return boxes;
+	return { boxes, pages: pages.length };
 
 }
 
@@ -751,7 +756,7 @@ function validateFloat32Chart( chart, settings, density ) {
 		Math.fround( ( chart.box.x + border + p[ 0 ] * scale ) / width ),
 		Math.fround( ( chart.box.y + border + p[ 1 ] * scale ) / height )
 	];
-	chart.outputUV = chart.uv.map( p => toUV( p, settings.atlasSize, settings.atlasSize ) );
+	chart.outputUV = chart.uv.map( p => toUV( p, settings.pageSize, settings.pageSize ) );
 	// Instanced charts map into the unit square of the instance regions, which the instance
 	// scales stretch back to the proportions validated here.
 	const outputUV = record.instances > 0 ? chart.uv.map( p => toUV( p, record.regionSize.w, record.regionSize.h ) ) : chart.outputUV;
@@ -846,15 +851,15 @@ function rebuildGeometry( record, charts, settings ) {
 		const offsets = new Float32Array( record.instances * 2 ), scales = new Float32Array( record.instances * 2 );
 		for ( let i = 0; record.regions !== undefined && i < record.instances; i ++ ) {
 
-			offsets[ i * 2 ] = record.regions[ i ].x / settings.atlasSize;
-			offsets[ i * 2 + 1 ] = record.regions[ i ].y / settings.atlasSize;
-			scales[ i * 2 ] = record.regionSize.w / settings.atlasSize;
-			scales[ i * 2 + 1 ] = record.regionSize.h / settings.atlasSize;
+			offsets[ i * 2 ] = record.regions[ i ].x / settings.pageSize;
+			offsets[ i * 2 + 1 ] = record.regions[ i ].y / settings.pageSize;
+			scales[ i * 2 ] = record.regionSize.w / settings.pageSize;
+			scales[ i * 2 + 1 ] = record.regionSize.h / settings.pageSize;
 
 		}
 
-		geometry.setAttribute( '_LIGHTMAP_OFFSET', new InstancedBufferAttribute( offsets, 2 ) );
-		geometry.setAttribute( '_LIGHTMAP_SCALE', new InstancedBufferAttribute( scales, 2 ) );
+		geometry.setAttribute( 'instanceLightMapOffset', new InstancedBufferAttribute( offsets, 2 ) );
+		geometry.setAttribute( 'instanceLightMapScale', new InstancedBufferAttribute( scales, 2 ) );
 
 	}
 

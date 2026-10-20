@@ -31,13 +31,6 @@ const SAMPLES_PER_FRAME = { ray: 1, stochastic: 4, probes: 1, vxgi: 1 };
 const FRAME_BUDGET = 30;
 const FRAMES_IN_FLIGHT = 3;
 
-// the denoiser averages the noise of similar texels, so denoised bakes can stop at a higher noise.
-// It removes the fine grain of the ray traced samples well, but noise shared by neighboring texels
-// stays as blotches: at 3% the low-frequency error of the rays matches the 2% bake without denoising.
-// The stochastic radiosity directions are shared by all texels. Light probes are deterministic
-
-const DENOISED_NOISE_TOLERANCE = { ray: 0.03, stochastic: 0.03, probes: 0.02, vxgi: 0.04 };
-
 // the first noise estimate only records the light map, the second one follows at this sample count
 
 const FIRST_NOISE_CHECK = 8;
@@ -56,12 +49,12 @@ let _rayTracedRadiosity = null;
  *
  * - {@link unwrapUVs} generates the light map UVs in `uv1`, in pages of `pageSize` if `resolution`
  * exceeds it. `mesh.userData.lightMapScale` scales the texel density of a mesh. Textures that used the
- * old `uv1`, e.g. the ambient occlusion maps of glTF files, move to `uv2`. With `unwrap` disabled, the
- * existing `uv1` is used instead.
+ * old `uv1`, e.g. the ambient occlusion maps of glTF files, move to `uv2`. See {@link LightBaker#unwrap}
+ * to keep the charts or the layout of the existing `uv1`.
  * - The source is set up for the scene. A background texture lights the scene as a sky, background
  * colors are ignored. Emissive meshes and the lights of the scene contribute their light.
  * - {@link LightMapper} accumulates samples until {@link LightMapper#estimateNoise} drops below the
- * noise tolerance, or up to the maximum samples. The light maps are denoised with
+ * noise tolerance, or up to the maximum samples. Then the light maps are denoised with
  * {@link LightMapDenoiser} and their seams stitched with {@link LightMapSeams}.
  * - `apply()` assigns the light maps to the materials, with directional light maps that keep normal
  * maps visible, see {@link directionalLightMap}. Meshes on other pages than the first one, and the
@@ -83,8 +76,9 @@ let _rayTracedRadiosity = null;
  * are left out of the bake as well, see {@link LightBaker#ignoreOutlines}.
  *
  * The bake is progressive: `bake()` adds a few samples per animation frame, so that the page keeps
- * rendering, and resolves once the light maps have converged. Applied materials show the light maps
- * while they accumulate. Abort a bake with an `AbortSignal`, call `bake()` again to continue it, or
+ * rendering, and resolves once the light maps have converged. Applied materials show the samples
+ * every frame while they accumulate, and the denoised and stitched light maps once the bake has
+ * converged. Abort a bake with an `AbortSignal`, call `bake()` again to continue it, or
  * `reset()` to start over. Call `prepare()` again after changing the scene or the lighting.
  *
  * ```js
@@ -158,10 +152,12 @@ class LightBaker {
 		this.padding = 3;
 
 		/**
-		 * Whether to generate the light map UVs. Otherwise the meshes keep their `uv1`, which must be
-		 * a unique non-overlapping layout with enough padding, and meshes without it are left out.
+		 * How the light map UVs are generated. `true` unwraps new charts. `'repack'` keeps the charts of
+		 * the existing `uv1` where they are valid and packs them at the same texel density, meshes without
+		 * `uv1` get new charts. With `false`, the meshes keep their `uv1`, which must be a unique
+		 * non-overlapping layout with enough padding, and meshes without it are left out.
 		 *
-		 * @type {boolean}
+		 * @type {boolean|string}
 		 * @default true
 		 */
 		this.unwrap = true;
@@ -195,7 +191,7 @@ class LightBaker {
 		this.specularIntensity = 1;
 
 		/**
-		 * Whether to denoise the light maps. Denoised bakes stop at a higher noise tolerance.
+		 * Whether to denoise the light maps once the bake has converged.
 		 *
 		 * @type {boolean}
 		 * @default true
@@ -211,8 +207,7 @@ class LightBaker {
 		this.stitchSeams = true;
 
 		/**
-		 * The relative noise at which the bake stops, see {@link LightMapper#estimateNoise}. By default
-		 * 2%, or with `denoise` a tolerance per algorithm, from 2% for light probes to 4% for VXGI.
+		 * The relative noise at which the bake stops, see {@link LightMapper#estimateNoise}, 2% by default.
 		 *
 		 * @type {?number}
 		 * @default null
@@ -293,14 +288,6 @@ class LightBaker {
 		this.scene = null;
 
 		/**
-		 * The root of the light-mapped meshes of the last bake.
-		 *
-		 * @type {?Object3D}
-		 * @readonly
-		 */
-		this.root = null;
-
-		/**
 		 * The light mapper, created by `prepare()`.
 		 *
 		 * @type {?LightMapper}
@@ -324,15 +311,6 @@ class LightBaker {
 		 * @readonly
 		 */
 		this.irradianceNode = null;
-
-		/**
-		 * A cheaper irradiance sampler of the source, e.g. to evaluate the indirect light per pixel and
-		 * frame with `builtinGIContext()`.
-		 *
-		 * @type {?function(Node<vec3>, Node<vec3>, ?Node<float>, ?Node<vec3>): Node<vec3>}
-		 * @readonly
-		 */
-		this.liveIrradianceNode = null;
 
 		/**
 		 * The visible directional, point and spot lights of the scene.
@@ -448,18 +426,6 @@ class LightBaker {
 	}
 
 	/**
-	 * The meshes of the root.
-	 *
-	 * @type {Array<Mesh>}
-	 * @readonly
-	 */
-	get meshes() {
-
-		return this._record !== null ? this._record.meshes : [];
-
-	}
-
-	/**
 	 * The meshes left out of the light map, without light map UVs, e.g. skinned meshes or meshes with a
 	 * `userData.lightMapScale` of 0. Light probes can light them like dynamic objects.
 	 *
@@ -541,9 +507,7 @@ class LightBaker {
 	 */
 	getNoiseTolerance() {
 
-		if ( this.noiseTolerance !== null ) return this.noiseTolerance;
-
-		return this.denoise ? DENOISED_NOISE_TOLERANCE[ this.algorithm ] : NOISE_TOLERANCE;
+		return this.noiseTolerance ?? NOISE_TOLERANCE;
 
 	}
 
@@ -583,7 +547,12 @@ class LightBaker {
 
 		if ( record === undefined ) {
 
-			record = { root, atlas: null, atlasKey: null, requested: 0, resolution: 0, size: 0, pages: 1, geometries: new Set(), sourceMaterials: new Map(), assigned: new Map(), pageMaterials: [], materialPages: new Map(), materials: new Set(), meshes: [], lightMapped: [], excluded: [], outlines: [], warned: new Set() };
+			record = {
+				atlas: null, atlasKey: null, requested: 0, resolution: 0, size: 0, pages: 1,
+				geometries: new Set(), meshes: [], lightMapped: [], excluded: [], outlines: [], warned: new Set(),
+				sourceMaterials: new Map(), assigned: new Map(), pageMaterials: [], materialPages: new Map(), materials: new Set()
+			};
+
 			this._records.set( root, record );
 
 		}
@@ -632,7 +601,7 @@ class LightBaker {
 
 			}
 
-			if ( this.unwrap ) {
+			if ( this.unwrap !== false ) {
 
 				// skinned meshes and outlines are left out, and textures that used the old light map UVs move to uv2
 
@@ -650,7 +619,7 @@ class LightBaker {
 					// the resolution grows until the charts fit, up to several pages. Beyond them, a larger resolution
 					// does not help a mesh that does not fit a page
 
-					while ( ( atlas = unwrapUVs( root, { resolution, pageSize: this.pageSize, padding: this.padding } ) ) === null ) {
+					while ( ( atlas = unwrapUVs( root, { resolution, pageSize: this.pageSize, padding: this.padding, useInputUVs: this.unwrap === 'repack', inputAttribute: 'uv1' } ) ) === null ) {
 
 						if ( resolution >= this.pageSize * 2 ) throw new Error( `THREE.LightBaker: The charts do not fit light map pages of ${ this.pageSize }², a mesh has too many charts or instances for a page. Increase the page size.` );
 
@@ -771,7 +740,6 @@ class LightBaker {
 		clearMaterials();
 
 		this.scene = scene;
-		this.root = root;
 
 		const record = this._record;
 
@@ -862,6 +830,11 @@ class LightBaker {
 		this._start = performance.now() - this.time * 1000;
 		this.baking = true;
 
+		// the light maps are only denoised once the bake has converged, so that the denoiser does not
+		// settle the errors of early estimates. Until then, the materials show the samples
+
+		if ( this.converged === false ) this._showSamples();
+
 		try {
 
 			// a noise estimate of a previous interactive bake
@@ -880,8 +853,7 @@ class LightBaker {
 
 					this.lightMapper.update( Math.min( samplesPerFrame, maxSamples - this.samples ) );
 
-					if ( this.samples >= maxSamples ) this.process();
-					else if ( this.samples >= this._noiseCheck ) this._checkNoise();
+					if ( this.samples < maxSamples && this.samples >= this._noiseCheck ) this._checkNoise();
 
 				} else {
 
@@ -902,7 +874,11 @@ class LightBaker {
 					framesInFlight ++;
 					this._workDone().then( () => framesInFlight -- );
 
-					do await nextFrame(); while ( framesInFlight > FRAMES_IN_FLIGHT && aborted() === false );
+					do {
+
+						await nextFrame();
+
+					} while ( framesInFlight > FRAMES_IN_FLIGHT && aborted() === false );
 
 					const frameTime = performance.now() - frameStart;
 					frameStart += frameTime;
@@ -914,6 +890,8 @@ class LightBaker {
 				}
 
 			}
+
+			this.process();
 
 		} finally {
 
@@ -942,19 +920,15 @@ class LightBaker {
 		this._noiseCheck = FIRST_NOISE_CHECK;
 		this._start = performance.now();
 		this._epoch ++;
-		this._lightMaps = null;
-		this._processedKey = null;
 
-		// applied materials show the raw samples until the first noise estimate
-
-		if ( this._applied ) this._assignLightMaps();
+		this._showSamples();
 
 	}
 
 	/**
 	 * Denoises and stitches the light maps with the current options, see {@link LightBaker#denoise} and
 	 * {@link LightBaker#stitchSeams}, and assigns them to the materials if they are applied. The bake does
-	 * so with each noise estimate.
+	 * so once it has converged.
 	 *
 	 * @return {Array<Texture>} The light maps, one per page.
 	 */
@@ -1000,8 +974,8 @@ class LightBaker {
 	}
 
 	/**
-	 * Assigns the light maps to the materials of the light-mapped meshes, the processed ones of the last
-	 * noise estimate or the raw samples before it, and keeps them up to date while baking. With
+	 * Assigns the light maps to the materials of the light-mapped meshes, the processed ones of a converged
+	 * bake or else the samples, which update every frame while baking. With
 	 * `directional`, the materials shade the light maps with the dominant directions of the light. With
 	 * baked direct light, the materials leave the baked lights out. Call it again after changing
 	 * `directional` or `specularIntensity`.
@@ -1065,7 +1039,7 @@ class LightBaker {
 		this._records.clear();
 		this._record = null;
 		this._lightsNodes.clear();
-		this.scene = this.root = null;
+		this.scene = null;
 
 	}
 
@@ -1079,6 +1053,7 @@ class LightBaker {
 		const integer = ( value, min ) => Number.isInteger( value ) && value >= min;
 
 		if ( ALGORITHMS.includes( this.algorithm ) === false ) throw new Error( `THREE.LightBaker: Unknown algorithm "${ this.algorithm }", use one of ${ ALGORITHMS.join( ', ' ) }.` );
+		if ( this.unwrap !== true && this.unwrap !== false && this.unwrap !== 'repack' ) throw new Error( `THREE.LightBaker: unwrap must be true, false or 'repack', not "${ this.unwrap }".` );
 		if ( this.directLight !== 'live' && this.directLight !== 'baked' ) throw new Error( `THREE.LightBaker: directLight must be 'live' or 'baked', not "${ this.directLight }".` );
 		if ( integer( this.resolution, 16 ) === false ) throw new Error( 'THREE.LightBaker: The resolution must be an integer of at least 16.' );
 		if ( integer( this.pageSize, 16 ) === false ) throw new Error( 'THREE.LightBaker: The page size must be an integer of at least 16.' );
@@ -1130,13 +1105,13 @@ class LightBaker {
 	 *
 	 * @private
 	 * @param {Mesh} mesh - The mesh.
-	 * @param {Object} [record] - The meshes of its root.
+	 * @param {Object} record - The meshes of its root.
 	 * @return {number} The page.
 	 */
-	_pageOf( mesh, record = this._record ) {
+	_pageOf( mesh, record ) {
 
 		if ( mesh.isSkinnedMesh || mesh.isBatchedMesh || mesh.geometry.hasAttribute( 'uv1' ) === false ) return - 1;
-		if ( record !== null && record.outlines.includes( mesh ) ) return - 1;
+		if ( record.outlines.includes( mesh ) ) return - 1;
 		if ( this.unwrap === false && mesh.userData.lightMapScale === 0 ) return - 1;
 
 		return mesh.userData.lightMapPage ?? 0;
@@ -1222,7 +1197,7 @@ class LightBaker {
 		if ( this.algorithm === 'ray' ) {
 
 			// rays traced through a BVH of the scene gather the bounces from a cached light map, a small
-			// cache suffices since the rays average it. One ray per pixel keeps the live view interactive
+			// cache suffices since the rays average it
 
 			const { RayTracedRadiosity, rayTracedRadiosityIrradiance } = _rayTracedRadiosity;
 
@@ -1230,15 +1205,14 @@ class LightBaker {
 			radiosity.update( renderer, scene );
 
 			this.irradianceNode = rayTracedRadiosityIrradiance( radiosity );
-			this.liveIrradianceNode = rayTracedRadiosityIrradiance( radiosity, { rays: 1 } );
 			this.source = radiosity;
 
 		} else if ( this.algorithm === 'stochastic' ) {
 
-			// stochastic depth radiosity, the bounces are cached in a light map before baking from the same
-			// number of directions. It captures a sky as a large unlit sphere around the scene
+			// stochastic depth radiosity, the bounces are cached in a light map before baking. It captures a
+			// sky as a large unlit sphere around the scene
 
-			const radiosity = new StochasticRadiosity( { directions: this.directions, cacheSamples: Math.ceil( 2048 / this.directions ), cacheSize } );
+			const radiosity = new StochasticRadiosity( { directions: this.directions, cacheSize } );
 			const sky = createSkySphere( scene );
 
 			if ( sky !== null ) scene.add( sky );
@@ -1260,7 +1234,6 @@ class LightBaker {
 			}
 
 			this.irradianceNode = radiosityIrradiance( radiosity );
-			this.liveIrradianceNode = this.irradianceNode;
 			this.source = radiosity;
 
 		} else if ( this.algorithm === 'probes' ) {
@@ -1295,7 +1268,6 @@ class LightBaker {
 
 			};
 
-			this.liveIrradianceNode = this.irradianceNode;
 			this.source = probes;
 
 		} else {
@@ -1303,10 +1275,9 @@ class LightBaker {
 			const volume = new VXGIVolume( this.vxgiResolution );
 			volume.update( renderer, scene );
 
-			// three cones like webgpu_vxgi, shared by the live view and the light map
+			// three cones like webgpu_vxgi
 
 			this.irradianceNode = vxgiIrradiance( volume, { coneCount: 3 } );
-			this.liveIrradianceNode = this.irradianceNode;
 			this.source = volume;
 
 		}
@@ -1347,9 +1318,7 @@ class LightBaker {
 	 */
 	_workDone() {
 
-		const queue = this.renderer.backend.device?.queue;
-
-		return queue !== undefined ? queue.onSubmittedWorkDone() : Promise.resolve();
+		return this.renderer.backend.device.queue.onSubmittedWorkDone();
 
 	}
 
@@ -1371,8 +1340,6 @@ class LightBaker {
 
 			this.noise = noise;
 			this._noiseCheck = Math.ceil( this.samples * 1.25 );
-
-			this.process();
 
 		} );
 
@@ -1408,7 +1375,6 @@ class LightBaker {
 		this.lightMapper = null;
 		this.source = null;
 		this.irradianceNode = null;
-		this.liveIrradianceNode = null;
 		this._denoisers = [];
 		this._stitchers = [];
 		this._lightCopies = [];
@@ -1422,7 +1388,21 @@ class LightBaker {
 	}
 
 	/**
-	 * Assigns the current light maps to the applied materials.
+	 * Discards the processed light maps, the applied materials show the samples again.
+	 *
+	 * @private
+	 */
+	_showSamples() {
+
+		this._lightMaps = null;
+		this._processedKey = null;
+
+		if ( this._applied ) this._assignLightMaps();
+
+	}
+
+	/**
+	 * Assigns the processed light maps, or else the samples, to the applied materials.
 	 *
 	 * @private
 	 */
@@ -1833,8 +1813,8 @@ function nextFrame() {
 
 	return new Promise( ( resolve ) => {
 
-		if ( typeof requestAnimationFrame === 'function' && typeof document !== 'undefined' && document.hidden !== true ) requestAnimationFrame( resolve );
-		else setTimeout( resolve, 0 );
+		if ( document.hidden ) setTimeout( resolve, 0 );
+		else requestAnimationFrame( resolve );
 
 	} );
 

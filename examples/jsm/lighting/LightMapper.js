@@ -23,11 +23,12 @@ let _rendererState;
  * Meshes need light map UVs in the `uv1` attribute, e.g. generated with {@link unwrapUVs}.
  * Atlases of several pages bake into one light map per page, `mesh.userData.lightMapPage`
  * selects the page of a mesh. Instanced meshes bake each instance into its own atlas region,
- * see {@link lightMapUV}. Each sample rasterizes the meshes in UV space with a sub-texel jitter
- * and accumulates the result. The function also receives the sample index, so stochastic sources like
+ * see {@link lightMapUV}.
+ * Each sample rasterizes the meshes in UV space with a sub-texel jitter and accumulates
+ * the result. The function also receives the sample index, so stochastic sources like
  * `vxgiIrradiance()` can vary their samples and converge as they accumulate. Call
- * `update()` once per frame to bake progressively, or pass a sample count to bake at once,
- * and `estimateNoise()` to stop once the light map has converged.
+ * `update()` once per frame to bake progressively, or pass a sample count to bake at once.
+ * Call `estimateNoise()` to stop once the light map has converged.
  * Keep the source geometry and GI data static while accumulating. Call `reset()`
  * after changing transforms or lighting. Atlas charts need at least three texels
  * of padding; the resolve fills two texels around covered surfaces.
@@ -89,7 +90,7 @@ class LightMapper {
 		this.irradianceNode = irradianceNode;
 
 		/**
-		 * The light map size in texels, the size of each page.
+		 * The light map size in texels.
 		 *
 		 * @type {number}
 		 */
@@ -129,8 +130,10 @@ class LightMapper {
 		this.momentChannel = moments && floatBlendable && directional ? 'a' : 'r';
 
 		/**
-		 * The pages of the light map, each one with its light map, directions, samples and moments like
-		 * the ones of the light mapper, which are the ones of the first page, and the meshes baked into it.
+		 * The pages of the light map, each one with its light map, directions and moments like the ones
+		 * of the light mapper, which are the ones of the first page, the meshes baked into it, and its
+		 * `sampleTexture`: the sums of the samples with their count in alpha, before the normalization
+		 * and padding of the light map. Texels without samples are zero.
 		 *
 		 * @type {Array<{texture: Texture, directionTexture: ?Texture, sampleTexture: Texture, momentTexture: ?Texture, objects: Array<Mesh>}>}
 		 * @readonly
@@ -141,16 +144,6 @@ class LightMapper {
 
 		for ( let i = 0; i < pages; i ++ ) this._createPage( floatBlendable ? FloatType : HalfFloatType, outputs, moments && floatBlendable );
 
-		this._accumulation = this._pages[ 0 ].accumulation;
-
-		/**
-		 * The sums of the samples with their count in alpha, before the normalization and padding of
-		 * {@link LightMapper#texture}. Texels without samples are zero.
-		 *
-		 * @type {Texture}
-		 */
-		this.sampleTexture = this.pages[ 0 ].sampleTexture;
-
 		/**
 		 * The sums of the squared sample luminances, with the `moments` option and the 'float32-blendable'
 		 * renderer feature, else `null`. Half floats would overflow.
@@ -158,12 +151,6 @@ class LightMapper {
 		 * @type {?Texture}
 		 */
 		this.momentTexture = this.pages[ 0 ].momentTexture;
-
-		// the luminance-weighted sums of the incident directions, for directional light maps
-
-		this._directionSums = this._pages[ 0 ].directionSums;
-
-		this._renderTarget = this._pages[ 0 ].renderTarget;
 
 		/**
 		 * The baked light map. It stores linear diffuse irradiance in lux, without baked
@@ -185,7 +172,6 @@ class LightMapper {
 		 */
 		this.directionTexture = this.pages[ 0 ].directionTexture;
 
-		this._scene = this._pages[ 0 ].scene;
 		this._camera = new OrthographicCamera();
 		this._objects = [];
 		this._proxies = [];
@@ -202,7 +188,6 @@ class LightMapper {
 
 		// noise estimation, created on first use: a luminance snapshot and its change summed per block
 
-		this._snapshot = null;
 		this._snapshotSamples = 0;
 		this._resets = 0;
 		this._variance = 0;
@@ -225,24 +210,24 @@ class LightMapper {
 		const size = this.size;
 		const directional = outputs.includes( 'direction' );
 
-		const accumulation = new RenderTarget( size, size, { type, depthBuffer: false, count: outputs.length } );
+		const accumulationTarget = new RenderTarget( size, size, { type, depthBuffer: false, count: outputs.length } );
 		const renderTarget = new RenderTarget( size, size, { type: HalfFloatType, depthBuffer: false, count: directional ? 2 : 1 } );
 		renderTarget.texture.channel = 1;
 
 		let momentTexture = null, directionSums = null, directionTexture = null;
 
-		if ( accumulation.textures.length > 1 ) {
+		if ( accumulationTarget.textures.length > 1 ) {
 
-			outputs.forEach( ( name, i ) => accumulation.textures[ i ].name = name );
+			outputs.forEach( ( name, i ) => accumulationTarget.textures[ i ].name = name );
 
 			if ( outputs.includes( 'moment' ) ) {
 
-				momentTexture = accumulation.textures[ outputs.indexOf( 'moment' ) ];
+				momentTexture = accumulationTarget.textures[ outputs.indexOf( 'moment' ) ];
 				momentTexture.format = RedFormat;
 
 			}
 
-			if ( directional ) directionSums = accumulation.textures[ outputs.indexOf( 'direction' ) ];
+			if ( directional ) directionSums = accumulationTarget.textures[ outputs.indexOf( 'direction' ) ];
 			if ( moments && directional ) momentTexture = directionSums;
 
 		}
@@ -258,6 +243,7 @@ class LightMapper {
 
 		// normalize the accumulated samples and fill the chart padding
 
+		const accumulation = accumulationTarget.texture;
 		const maxCoord = ivec2( size - 1 );
 
 		// the average direction of a texel is its luminance-weighted direction sum over its luminance sum
@@ -275,7 +261,7 @@ class LightMapper {
 		const resolve = Fn( () => {
 
 			const coord = ivec2( screenCoordinate.xy );
-			const center = textureLoad( accumulation.texture, coord ).toVar();
+			const center = textureLoad( accumulation, coord ).toVar();
 			const sum = vec4( 0 ).toVar();
 
 			if ( direction !== null ) direction.assign( texelDirection( center, coord ) );
@@ -285,7 +271,7 @@ class LightMapper {
 				Loop( { start: - 2, end: 2, condition: '<=', name: 'x' }, { start: - 2, end: 2, condition: '<=', name: 'y' }, ( { x, y } ) => {
 
 					const neighbor = coord.add( ivec2( x, y ) ).clamp( ivec2( 0 ), maxCoord ).toVar();
-					const value = textureLoad( accumulation.texture, neighbor ).toVar();
+					const value = textureLoad( accumulation, neighbor ).toVar();
 
 					If( value.a.greaterThan( 0 ), () => {
 
@@ -312,13 +298,13 @@ class LightMapper {
 		const resolveMaterial = new NodeMaterial();
 		resolveMaterial.fragmentNode = direction !== null ? mrt( { output: resolve(), direction: vec4( direction.mul( 0.5 ).add( 0.5 ), 1 ) } ) : resolve();
 
-		this.pages.push( { texture: renderTarget.texture, directionTexture, sampleTexture: accumulation.texture, momentTexture, objects: [] } );
-		this._pages.push( { accumulation, renderTarget, directionSums, quad: new QuadMesh( resolveMaterial ), scene: new Scene(), snapshot: null, noiseTarget: null, noiseQuad: null, snapshotQuad: null } );
+		this.pages.push( { texture: renderTarget.texture, directionTexture, sampleTexture: accumulation, momentTexture, objects: [] } );
+		this._pages.push( { accumulation: accumulationTarget, renderTarget, directionSums, quad: new QuadMesh( resolveMaterial ), scene: new Scene(), snapshot: null, noiseTarget: null, noiseQuad: null, snapshotQuad: null } );
 
 	}
 
 	/**
-	 * Adds meshes to the light map. Their geometries must provide `uv1`, meshes without it are skipped.
+	 * Adds meshes to the light map. Their geometries must provide `uv1`.
 	 * Each mesh is baked into the page of its `userData.lightMapPage`, or the first one. The instances
 	 * of instanced meshes are baked into the atlas regions of {@link lightMapUV}. Skinned and batched
 	 * meshes are not supported.
@@ -333,17 +319,7 @@ class LightMapper {
 
 		for ( const object of objects ) {
 
-			if ( object.geometry.hasAttribute( 'uv1' ) === false ) continue;
-
 			const index = page ?? object.userData.lightMapPage ?? 0;
-			const target = this._pages[ index ];
-
-			if ( target === undefined ) {
-
-				console.warn( `THREE.LightMapper: Mesh "${ object.name }" is on page ${ index }, which does not exist.` );
-				continue;
-
-			}
 
 			const bakeMaterial = material => material.side === BackSide ? this._backMaterial : this._frontMaterial;
 			const material = Array.isArray( object.material ) ? object.material.map( bakeMaterial ) : bakeMaterial( object.material );
@@ -358,24 +334,12 @@ class LightMapper {
 
 			if ( uvTransform !== null ) _uvTransforms.set( proxy, uvTransform.clone() );
 
-			target.scene.add( proxy );
+			this._pages[ index ].scene.add( proxy );
 			this.pages[ index ].objects.push( object );
 			this._objects.push( object );
 			this._proxies.push( proxy );
 
 		}
-
-	}
-
-	/**
-	 * The meshes added to the light map.
-	 *
-	 * @type {Array<Mesh>}
-	 * @readonly
-	 */
-	get objects() {
-
-		return this._objects;
 
 	}
 
@@ -476,11 +440,9 @@ class LightMapper {
 
 		const renderer = this.renderer;
 
-		if ( this._snapshot === null ) {
+		if ( this._pages[ 0 ].snapshot === null ) {
 
 			for ( const page of this._pages ) this._createNoiseEstimator( page );
-
-			this._snapshot = this._pages[ 0 ].snapshot;
 
 		}
 
@@ -650,7 +612,7 @@ class LightMapper {
 	 * Creates a material that rasterizes meshes in UV space and outputs irradiance.
 	 *
 	 * @private
-	 * @param {function(Node<vec3>, Node<vec3>, Node<float>): Node<vec3>} irradianceNode - The irradiance function.
+	 * @param {function(Node<vec3>, Node<vec3>, Node<float>, ?Node<vec3>): Node<vec3>} irradianceNode - The irradiance function.
 	 * @param {boolean} flipNormal - Whether to flip the normal, for back-sided meshes.
 	 * @param {Array<Light>} directLights - Direct lights to include.
 	 * @return {NodeMaterial} The material.
@@ -680,7 +642,7 @@ class LightMapper {
 		// the luminance-weighted directions of the source and of the direct lights. The variable of the
 		// source is declared before the irradiance, so that the source can add to it in its loops
 
-		const directional = this._directionSums !== null;
+		const directional = this.directionTexture !== null;
 		const direction = directional ? vec3( 0 ).toVar( 'sourceDirection' ) : null;
 		const lightDirection = directional && directLights.length > 0 ? vec3( 0 ).toVar( 'lightDirection' ) : null;
 

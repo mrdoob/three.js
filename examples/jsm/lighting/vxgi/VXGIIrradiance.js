@@ -4,8 +4,8 @@ import { createConeTracer } from './VXGIConeTracer.js';
 /**
  * Creates a world-space diffuse irradiance sampler for a prepared {@link VXGIVolume}.
  * Call `volume.update( renderer, scene )` before baking. The sampler traces cosine-weighted
- * cones through the volume's radiance, including cached bounces, cones that leave the volume
- * see the sky of {@link VXGIVolume#environment}.
+ * cones through the volume's radiance, including cached bounces, and the sky for cones that
+ * leave the volume, see {@link VXGIVolume#skyRadiance}.
  * It can be passed directly to {@link LightMapper}, without a screen-space pass.
  * The cones are rotated per pixel with interleaved gradient noise like `VXGINode`. When baking, the
  * pixel is the light map texel. The optional sample index shifts the noise so that accumulated
@@ -24,9 +24,7 @@ function vxgiIrradiance( volume, { coneCount = 8 } = {} ) {
 		directionalNode: volume.directionalRadiance ? volume.directionalNode : null
 	} );
 
-	const tanHalfAngle = float( Math.tan( Math.PI / 9 ) );
-
-	return ( position, normal, sample = float( 0 ), lightDirection = null ) => Fn( () => {
+	return ( position, normal, sample = float( 0 ), directionNode = null ) => Fn( () => {
 
 		// interleaved gradient noise offsets of the stratified cone set, see VXGINode
 
@@ -39,7 +37,7 @@ function vxgiIrradiance( volume, { coneCount = 8 } = {} ) {
 		const bitangent = cross( normal, tangent ).toConst();
 		const origin = position.add( normal.mul( volume.voxelSizeNode.mul( 1.5 ) ) ).toConst();
 		const irradiance = vec3( 0 ).toVar();
-		const directionSum = lightDirection !== null ? vec3( 0 ).toVar() : null;
+		const directionSum = directionNode !== null ? vec3( 0 ).toVar() : null;
 
 		Loop( coneCount, ( { i } ) => {
 
@@ -47,7 +45,7 @@ function vxgiIrradiance( volume, { coneCount = 8 } = {} ) {
 			const phi = fract( float( i ).mul( 0.618034 ).add( rotation ) ).mul( PI.mul( 2 ) ).toConst();
 			const radius = sqrt( u ).toConst();
 			const direction = normalize( tangent.mul( cos( phi ).mul( radius ) ).add( bitangent.mul( sin( phi ).mul( radius ) ) ).add( normal.mul( sqrt( u.oneMinus() ) ) ) ).toConst();
-			const cone = trace( origin, direction, tanHalfAngle, volume.traceDistanceNode );
+			const cone = trace( origin, direction, float( Math.tan( Math.PI / 9 ) ), volume.traceDistanceNode );
 			const sky = volume.skyRadiance( direction );
 			const radiance = ( sky !== null ? cone.color.add( sky.mul( cone.visibility ) ) : cone.color ).toConst();
 
@@ -57,7 +55,7 @@ function vxgiIrradiance( volume, { coneCount = 8 } = {} ) {
 
 		} );
 
-		if ( lightDirection !== null ) lightDirection.addAssign( directionSum.mul( PI.div( coneCount ) ) );
+		if ( directionNode !== null ) directionNode.addAssign( directionSum.mul( PI.div( coneCount ) ) );
 
 		return irradiance.mul( PI.div( coneCount ) );
 

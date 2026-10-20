@@ -1,5 +1,5 @@
 import { ArrayCamera, BackSide, Box3, FloatType, InstancedMesh, IrradianceNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertNodeMaterial, NearestFilter, Node, NodeUpdateType, OrthographicCamera, PlaneGeometry, Quaternion, RendererUtils, RenderTarget, Scene, Vector2, Vector3, Vector4 } from 'three/webgpu';
-import { Fn, If, Loop, cameraIndex, context, cross, dFdx, dFdy, dot, float, frontFacing, hash, int, interleavedGradientNoise, ivec2, length, lights, luminance, materialColor, materialReference, max, nodeObject, output, positionWorld, screenCoordinate, select, texture, uint, uniform, uniformArray, vec2, vec3, vec4 } from 'three/tsl';
+import { Fn, If, Loop, cameraIndex, cross, dFdx, dFdy, dot, float, frontFacing, hash, int, interleavedGradientNoise, ivec2, length, lights, luminance, materialColor, materialReference, max, nodeObject, output, positionWorld, screenCoordinate, select, texture, uint, uniform, uniformArray, vec2, vec3, vec4 } from 'three/tsl';
 
 import { LightMapper } from './LightMapper.js';
 import { lightMapUV } from '../tsl/lighting/DirectionalLightMapNode.js';
@@ -71,10 +71,11 @@ class StochasticRadiosity {
 	 * @param {number} [options.gatherRadius=1] - The half width of the gathered texel neighborhood, `1` is 3x3 and `2` is 5x5.
 	 * Larger neighborhoods find more occluders and leak less light, but are slower.
 	 * @param {number} [options.bounces=16] - The number of iterations used to solve the cached bounces. Each iteration adds one bounce, `0` disables the cache.
-	 * @param {number} [options.cacheSamples=128] - The number of samples accumulated into the bounce cache after the iterations.
+	 * @param {number} [options.cacheSamples] - The number of samples accumulated into the bounce cache after the iterations.
+	 * Defaults to `Math.ceil( 2048 / directions )`, so that the cache gathers about 2048 directions.
 	 * @param {number} [options.cacheSize=256] - The size of the bounce cache light map in texels, per page of the atlas.
 	 */
-	constructor( { directions = 16, resolution = 256, gatherRadius = 1, bounces = 16, cacheSamples = 128, cacheSize = 256 } = {} ) {
+	constructor( { directions = 16, resolution = 256, gatherRadius = 1, bounces = 16, cacheSamples = Math.ceil( 2048 / directions ), cacheSize = 256 } = {} ) {
 
 		/**
 		 * The number of directions rasterized per illumination pass.
@@ -112,7 +113,6 @@ class StochasticRadiosity {
 		 * The number of samples accumulated into the bounce cache after the iterations.
 		 *
 		 * @type {number}
-		 * @default 128
 		 */
 		this.cacheSamples = cacheSamples;
 
@@ -139,9 +139,9 @@ class StochasticRadiosity {
 		// exact enough for a bias far below a texel, which closes contact gaps.
 
 		this._tilesX = Math.ceil( Math.sqrt( directions ) );
-		this._tilesY = Math.ceil( directions / this._tilesX );
+		const tilesY = Math.ceil( directions / this._tilesX );
 
-		this._illuminationMap = new RenderTarget( this._tilesX * resolution, this._tilesY * resolution, {
+		this._illuminationMap = new RenderTarget( this._tilesX * resolution, tilesY * resolution, {
 			type: FloatType,
 			minFilter: NearestFilter,
 			magFilter: NearestFilter,
@@ -198,33 +198,14 @@ class StochasticRadiosity {
 		this._depthBounds = new Box3();
 		this._radius = 1;
 		this._pass = 0;
-		this._renderId = - 1;
 		this._sampleKey = null;
 		this._cacheUpdates = 0;
-		this._rendering = false;
 		this._cache = null;
-
-		// nested renders inherit the context of the outer render, e.g. a pass node that applies
-		// the gathered irradiance, so the internal renders use their own
-
-		this._contextNode = context();
 
 		// renders the shadow maps of the collected scene, see _renderShadows()
 
 		this._shadowTarget = new RenderTarget( 1, 1, { depthBuffer: false } );
 		this._shadowCamera = new OrthographicCamera();
-
-	}
-
-	/**
-	 * The cached indirect irradiance, or `null` if the cache is disabled. It uses `uv1` and the
-	 * conventions of {@link LightMapper#texture}.
-	 *
-	 * @type {?Texture}
-	 */
-	get texture() {
-
-		return this._cache !== null ? this._cache.texture : null;
 
 	}
 
@@ -341,7 +322,7 @@ class StochasticRadiosity {
 
 			const geometry = object.geometry;
 			const hasLightMapUV = geometry.hasAttribute( 'uv1' );
-			const page = this._tiles > 1 && hasLightMapUV ? object.userData.lightMapPage ?? 0 : 0;
+			const page = hasLightMapUV ? object.userData.lightMapPage ?? 0 : 0;
 			const instanced = object.isInstancedMesh === true;
 
 			let illumination, shadow;
@@ -626,13 +607,8 @@ class StochasticRadiosity {
 		for ( const emitter of this._emitters ) emitter.visible = false;
 		for ( const light of casters ) light.shadow.needsUpdate = true;
 
-		const contextNode = renderer.contextNode;
-		renderer.contextNode = this._contextNode;
-
 		renderer.setRenderTarget( this._shadowTarget );
 		renderer.render( this._scene, this._shadowCamera );
-
-		renderer.contextNode = contextNode;
 
 		for ( const { proxy, illumination } of this._proxies ) proxy.material = illumination;
 		for ( const emitter of this._emitters ) emitter.visible = true;
@@ -653,9 +629,7 @@ class StochasticRadiosity {
 
 		for ( const mesh of this._lightMapMeshes ) {
 
-			const page = this._tiles > 1 ? mesh.userData.lightMapPage ?? 0 : 0;
-
-			cache.addObjects( [ mesh ], { page: 0, uvTransform: this._tiles > 1 ? getTile( page, this._tiles ) : null } );
+			cache.addObjects( [ mesh ], { page: 0, uvTransform: getTile( mesh.userData.lightMapPage ?? 0, this._tiles ) } );
 
 		}
 
@@ -683,30 +657,23 @@ class StochasticRadiosity {
 	}
 
 	/**
-	 * Rotates the directions and renders the illumination map, once per render call of the
-	 * gathering materials, or once per sample of a light mapper, whose pages share it.
+	 * Rotates the directions and renders the illumination map once per sample of a light mapper,
+	 * which its bake materials and pages share.
 	 *
 	 * @private
 	 * @param {NodeFrame} frame - The current node frame.
-	 * @param {?Node<float>} sampleNode - The sample index of the light mapper.
+	 * @param {Node<float>} sampleNode - The sample index of the light mapper.
 	 */
 	_renderIllumination( frame, sampleNode ) {
 
-		// nested renders restore the render id, so this skips the other gathering materials
+		// the front and back bake materials and the pages of a light map render with the same sample, the
+		// cache updates between samples of the same index change the illumination
 
-		if ( frame.renderId === this._renderId || this._rendering === true || this._proxies.length === 0 ) return;
+		const sampleKey = `${ sampleNode.id },${ sampleNode.value },${ this._cacheUpdates }`;
 
-		this._renderId = frame.renderId;
-
-		// the pages of a light map render one after another with the same sample, the cache updates
-		// between samples of the same index change the illumination
-
-		const sampleKey = sampleNode != null ? `${ sampleNode.id },${ sampleNode.value },${ this._cacheUpdates }` : null;
-
-		if ( sampleKey !== null && sampleKey === this._sampleKey ) return;
+		if ( sampleKey === this._sampleKey || this._proxies.length === 0 ) return;
 
 		this._sampleKey = sampleKey;
-		this._rendering = true;
 
 		const renderer = frame.renderer;
 
@@ -720,18 +687,11 @@ class StochasticRadiosity {
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
-		const contextNode = renderer.contextNode;
-		renderer.contextNode = this._contextNode;
-
 		renderer.setClearColor( 0x000000, 0 );
 		renderer.setRenderTarget( this._illuminationMap );
 		renderer.render( this._scene, this._arrayCamera );
 
-		renderer.contextNode = contextNode;
-
 		RendererUtils.restoreRendererState( renderer, _rendererState );
-
-		this._rendering = false;
 
 	}
 
@@ -768,17 +728,27 @@ class StochasticRadiosity {
 
 			// fit the view to the corners of the bounds
 
-			let minU = Infinity, maxU = - Infinity, minV = Infinity, maxV = - Infinity, minD = Infinity, maxD = - Infinity;
+			let minU = Infinity;
+			let maxU = - Infinity;
+			let minV = Infinity;
+			let maxV = - Infinity;
+			let minD = Infinity;
+			let maxD = - Infinity;
 
 			for ( let c = 0; c < 8; c ++ ) {
 
 				_corner.set( c & 1 ? bounds.max.x : bounds.min.x, c & 2 ? bounds.max.y : bounds.min.y, c & 4 ? bounds.max.z : bounds.min.z ).sub( center );
 
-				const u = _corner.dot( basisU ), v = _corner.dot( basisV ), d = _corner.dot( direction );
+				const u = _corner.dot( basisU );
+				const v = _corner.dot( basisV );
+				const d = _corner.dot( direction );
 
-				minU = Math.min( minU, u ); maxU = Math.max( maxU, u );
-				minV = Math.min( minV, v ); maxV = Math.max( maxV, v );
-				minD = Math.min( minD, d ); maxD = Math.max( maxD, d );
+				minU = Math.min( minU, u );
+				maxU = Math.max( maxU, u );
+				minV = Math.min( minV, v );
+				maxV = Math.max( maxV, v );
+				minD = Math.min( minD, d );
+				maxD = Math.max( maxD, d );
 
 			}
 
@@ -931,7 +901,7 @@ class StochasticRadiosity {
 
 /**
  * Gathers the irradiance of a {@link StochasticRadiosity} solver and re-renders its illumination
- * map with rotated directions once per render call.
+ * map with rotated directions once per sample of a light mapper.
  *
  * @private
  * @augments Node
@@ -950,10 +920,10 @@ class RadiosityIrradianceNode extends Node {
 	 * @param {StochasticRadiosity} radiosity - The radiosity solver.
 	 * @param {Node<vec3>} positionNode - The world-space position.
 	 * @param {Node<vec3>} normalNode - The world-space normal.
-	 * @param {?Node<float>} [sampleNode=null] - The sample index of a light mapper.
+	 * @param {Node<float>} sampleNode - The sample index of the light mapper.
 	 * @param {?Node<vec3>} [directionNode=null] - A variable to add the luminance-weighted light directions to.
 	 */
-	constructor( radiosity, positionNode, normalNode, sampleNode = null, directionNode = null ) {
+	constructor( radiosity, positionNode, normalNode, sampleNode, directionNode = null ) {
 
 		super( 'vec3' );
 
@@ -983,18 +953,17 @@ class RadiosityIrradianceNode extends Node {
 
 /**
  * Creates a world-space diffuse irradiance sampler for a prepared {@link StochasticRadiosity}.
- * Call `radiosity.update( renderer, scene )` before baking. Every render call that uses the sampler
- * gathers a new set of directions, so the samples of {@link LightMapper} converge. The pages of a
- * light mapper, which passes its sample index, share the directions of a sample. The sampler adds
- * the luminance-weighted light directions to its optional fourth argument, for the directional light
- * maps of {@link LightMapper}.
+ * Call `radiosity.update( renderer, scene )` before baking. Every sample of {@link LightMapper}
+ * gathers a new set of directions, so the samples converge, and the pages of the light mapper share
+ * the directions of a sample. The sampler adds the luminance-weighted light directions to its
+ * optional fourth argument, for the directional light maps of {@link LightMapper}.
  *
  * @param {StochasticRadiosity} radiosity - The prepared radiosity solver.
- * @return {function(Node<vec3>, Node<vec3>, ?Node<float>, ?Node<vec3>): Node<vec3>} The irradiance sampler.
+ * @return {function(Node<vec3>, Node<vec3>, Node<float>, ?Node<vec3>): Node<vec3>} The irradiance sampler.
  */
 function radiosityIrradiance( radiosity ) {
 
-	return ( position, normal, sample = null, direction = null ) => nodeObject( new RadiosityIrradianceNode( radiosity, position, normal, sample, direction ) );
+	return ( position, normal, sample, direction = null ) => nodeObject( new RadiosityIrradianceNode( radiosity, position, normal, sample, direction ) );
 
 }
 

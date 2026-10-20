@@ -43,17 +43,13 @@ export default QUnit.module( 'Addons', () => {
 				assert.strictEqual( baker.samples, 0 );
 				assert.false( baker.converged, 'A bake that has not started has not converged' );
 
-				const tolerances = { stochastic: 0.03, ray: 0.03, probes: 0.02, vxgi: 0.04 };
 				const maxSamples = { stochastic: 8192, ray: 1024, probes: 16, vxgi: 256 };
 
-				for ( const algorithm in tolerances ) {
+				for ( const algorithm in maxSamples ) {
 
-					baker.setOptions( { algorithm, denoise: true } );
-					assert.strictEqual( baker.getNoiseTolerance(), tolerances[ algorithm ], `${ algorithm } stops at a higher noise when denoised` );
+					baker.setOptions( { algorithm } );
+					assert.strictEqual( baker.getNoiseTolerance(), 0.02, `${ algorithm } stops at 2% noise` );
 					assert.strictEqual( baker.getMaxSamples(), maxSamples[ algorithm ] );
-
-					baker.denoise = false;
-					assert.strictEqual( baker.getNoiseTolerance(), 0.02 );
 
 				}
 
@@ -74,6 +70,7 @@ export default QUnit.module( 'Addons', () => {
 
 				assert.throws( () => new LightBaker( renderer, { algorithm: 'path tracing' } ), /Unknown algorithm/ );
 				assert.throws( () => new LightBaker( renderer, { directLight: 'Baked' } ), /directLight/ );
+				assert.throws( () => new LightBaker( renderer, { unwrap: 'keep' } ), /unwrap/ );
 				assert.throws( () => new LightBaker( renderer, { resolution: 1000.5 } ), /resolution/ );
 				assert.throws( () => new LightBaker( renderer, { padding: 2 } ), /padding/ );
 				assert.throws( () => new LightBaker( renderer, { noiseTolerance: 0 } ), /tolerance/ );
@@ -198,7 +195,7 @@ export default QUnit.module( 'Addons', () => {
 				assert.true( mesh.geometry.hasAttribute( 'uv2' ) );
 				assert.notStrictEqual( mesh.geometry.getAttribute( 'uv1' ), mesh.geometry.getAttribute( 'uv2' ), 'uv1 holds the light map UVs' );
 
-				assert.true( instanced.geometry.hasAttribute( '_LIGHTMAP_OFFSET' ), 'Instances get atlas regions' );
+				assert.true( instanced.geometry.hasAttribute( 'instanceLightMapOffset' ), 'Instances get atlas regions' );
 				assert.strictEqual( instanced.material.lightMapInstances, true, 'Instanced materials look up the regions of their instances' );
 
 			} );
@@ -257,6 +254,55 @@ export default QUnit.module( 'Addons', () => {
 				assert.deepEqual( baker.excludedMeshes, [ unmapped ], 'Meshes without uv1 are left out' );
 				assert.strictEqual( baker.materialPages.get( mapped.material ), 0 );
 				assert.notStrictEqual( unmapped.material, mapped.material );
+
+			} );
+
+			QUnit.test( 'The charts of existing light map UVs can be repacked', assert => {
+
+				// the same uv1 on two planes of different sizes, and a plane without uv1
+
+				const small = new Mesh( new PlaneGeometry( 1, 1 ), new MeshStandardMaterial() );
+				const large = new Mesh( new PlaneGeometry( 2, 2 ), small.material );
+				const unmapped = new Mesh( new PlaneGeometry(), small.material );
+				large.position.x = 3;
+				unmapped.position.x = - 3;
+
+				for ( const mesh of [ small, large ] ) mesh.geometry.setAttribute( 'uv1', new Float32BufferAttribute( mesh.geometry.getAttribute( 'uv' ).array.map( ( v ) => v * 0.25 ), 2 ) );
+
+				const baker = new LightBaker( renderer, { unwrap: 'repack' } );
+				baker.prepareMeshes( new Group().add( small, large, unmapped ) );
+
+				// a chart keeps its shape if uv1 = uv * scale + offset
+
+				const scaleOf = ( mesh ) => {
+
+					const uv = mesh.geometry.getAttribute( 'uv' ), uv1 = mesh.geometry.getAttribute( 'uv1' );
+					const width = ( attribute ) => {
+
+						const u = attribute.array.filter( ( value, i ) => i % 2 === 0 );
+						return Math.max( ...u ) - Math.min( ...u );
+
+					};
+
+					const scale = width( uv1 ) / width( uv );
+					const offsetU = uv1.getX( 0 ) - uv.getX( 0 ) * scale, offsetV = uv1.getY( 0 ) - uv.getY( 0 ) * scale;
+
+					for ( let i = 0; i < uv.count; i ++ ) {
+
+						if ( Math.abs( uv.getX( i ) * scale + offsetU - uv1.getX( i ) ) > 1e-5 || Math.abs( uv.getY( i ) * scale + offsetV - uv1.getY( i ) ) > 1e-5 ) return NaN;
+
+					}
+
+					return scale;
+
+				};
+
+				const smallScale = scaleOf( small ), largeScale = scaleOf( large );
+
+				assert.true( smallScale > 0 && largeScale > 0, 'The charts keep their shape' );
+				assert.true( Math.abs( largeScale / smallScale - 2 ) < 1e-5, 'The charts are packed at the same texel density' );
+				assert.true( unmapped.geometry.hasAttribute( 'uv1' ), 'Meshes without uv1 get new charts' );
+				assert.deepEqual( baker.excludedMeshes, [] );
 
 			} );
 

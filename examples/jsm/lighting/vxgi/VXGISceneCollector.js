@@ -336,10 +336,10 @@ export function collectSceneTriangles( scene, options ) {
 
 	}
 
-	// alpha tested triangles are split into pieces of a sub-voxel, so that their cut-outs are resolved
-	// per sub-voxel rather than once per triangle
+	// alpha tested triangles are split into pieces of a voxel, so that their cut-outs are resolved per
+	// voxel rather than once per triangle. Smaller pieces would multiply the triangles of large surfaces
 
-	const subVoxelSizeSq = subVoxelSize * subVoxelSize;
+	const voxelSizeSq = 4 * subVoxelSize * subVoxelSize;
 
 	function emitCutout( a, b, c, uva, uvb, uvc, info ) {
 
@@ -348,7 +348,7 @@ export function collectSceneTriangles( scene, options ) {
 		const caSq = c.distanceToSquared( a );
 		const longest = Math.max( abSq, bcSq, caSq );
 
-		if ( longest > subVoxelSizeSq ) {
+		if ( longest > voxelSizeSq ) {
 
 			// split along the longest edge
 
@@ -448,6 +448,7 @@ export function collectSceneTriangles( scene, options ) {
 			if ( info.opacity < minOpacity ) continue;
 
 			const uvAttribute = info.map !== null ? geometry.getAttribute( info.map.channel > 0 ? 'uv' + info.map.channel : 'uv' ) : null;
+			const hasUV = uvAttribute !== undefined && uvAttribute !== null;
 			const emissiveUVAttribute = info.emissiveMap !== null ? geometry.getAttribute( info.emissiveMap.channel > 0 ? 'uv' + info.emissiveMap.channel : 'uv' ) : null;
 
 			const start = Math.max( group.start, rangeStart );
@@ -501,7 +502,7 @@ export function collectSceneTriangles( scene, options ) {
 
 				}
 
-				if ( uvAttribute !== undefined && uvAttribute !== null ) {
+				if ( hasUV ) {
 
 					_uva.fromBufferAttribute( uvAttribute, ia );
 					_uvb.fromBufferAttribute( uvAttribute, ib );
@@ -518,7 +519,7 @@ export function collectSceneTriangles( scene, options ) {
 
 				}
 
-				if ( resolveSurface( info, uvAttribute !== undefined && uvAttribute !== null ? _centroid : null ) === false ) continue;
+				if ( resolveSurface( info, hasUV ? _centroid : null ) === false ) continue;
 
 				emit( _va, _vb, _vc, _albedo, _emissive, info.side );
 

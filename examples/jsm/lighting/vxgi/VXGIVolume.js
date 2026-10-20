@@ -203,15 +203,6 @@ class VXGIVolume {
 		this.bounceConeAngle = uniform( 60 );
 
 		/**
-		 * The sky that cones leaving the volume see, the background texture of the scene at the last
-		 * update, or `null`. Background colors are ignored.
-		 *
-		 * @type {?Texture}
-		 * @readonly
-		 */
-		this.environment = null;
-
-		/**
 		 * The minimum corner of the volume.
 		 *
 		 * @type {UniformNode<vec3>}
@@ -343,6 +334,9 @@ class VXGIVolume {
 
 		this._lightsKey = '';
 
+		// the background texture of the scene at the last update, which cones leaving the volume see
+
+		this._environment = null;
 		this._environmentIntensity = uniform( 1 );
 		this._environmentRotation = uniform( new Matrix4() );
 
@@ -353,7 +347,6 @@ class VXGIVolume {
 		this._skyTarget.texture.wrapS = RepeatWrapping;
 		this._skyQuad = new QuadMesh( new NodeMaterial() );
 		this._skyKey = '';
-
 
 		this._exclude = new Set();
 
@@ -371,15 +364,16 @@ class VXGIVolume {
 	}
 
 	/**
-	 * Returns the radiance of {@link VXGIVolume#environment} in a world-space direction, blurred to
-	 * the width of the cones, or `null` without a sky. Call it after `update()`.
+	 * Returns the radiance of the sky in a world-space direction, blurred to the width of the cones,
+	 * or `null` without a sky. The sky is the background texture of the scene at the last update,
+	 * background colors are ignored. Call it after `update()`.
 	 *
 	 * @param {Node<vec3>} direction - The normalized direction.
 	 * @return {?Node<vec3>} The radiance.
 	 */
 	skyRadiance( direction ) {
 
-		if ( this.environment === null ) return null;
+		if ( this._environment === null ) return null;
 
 		return texture( this._skyTarget.texture, equirectUV( direction ) ).level( 0 ).rgb;
 
@@ -735,7 +729,7 @@ class VXGIVolume {
 
 		if ( background !== null && background.isTexture === true && ( background.isCubeTexture === true || background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping ) ) {
 
-			this.environment = background;
+			this._environment = background;
 			this._environmentIntensity.value = scene.backgroundIntensity;
 			this._environmentRotation.value.makeRotationFromEuler( scene.backgroundRotation ).transpose();
 
@@ -745,7 +739,7 @@ class VXGIVolume {
 
 		}
 
-		this.environment = null;
+		this._environment = null;
 
 		return '|-';
 
@@ -753,9 +747,9 @@ class VXGIVolume {
 
 	_updateSky( renderer ) {
 
-		if ( this.environment === null ) return;
+		if ( this._environment === null ) return;
 
-		if ( this._skyKey !== this.environment.uuid ) {
+		if ( this._skyKey !== this._environment.uuid ) {
 
 			const direction = Fn( () => {
 
@@ -767,11 +761,11 @@ class VXGIVolume {
 			} )();
 
 			const material = new NodeMaterial();
-			material.fragmentNode = vec4( pmremTexture( this.environment, this._environmentRotation.mul( direction ), float( 0.5 ) ).mul( this._environmentIntensity ), 1 );
+			material.fragmentNode = vec4( pmremTexture( this._environment, this._environmentRotation.mul( direction ), float( 0.5 ) ).mul( this._environmentIntensity ), 1 );
 
 			this._skyQuad.material.dispose();
 			this._skyQuad.material = material;
-			this._skyKey = this.environment.uuid;
+			this._skyKey = this._environment.uuid;
 
 		}
 
@@ -785,19 +779,19 @@ class VXGIVolume {
 		const kernels = this._getKernels();
 		const bounces = Math.max( 0, Math.round( this.bounces ) );
 
-		// the bounce kernels look up the sky
+		// the bounce kernels look up the sky, if there is one
 
 		this._updateSky( renderer );
 
-		const skyKey = this.environment !== null ? this.environment.uuid : '-';
+		const sky = this._environment !== null;
 
-		if ( kernels.bounceKey !== skyKey ) {
+		if ( kernels.bounceSky !== sky ) {
 
 			for ( const kernel of kernels.bounce ) if ( kernel !== null ) kernel.dispose();
 
 			kernels.bounce[ 0 ] = this._createBounceKernel( 0 );
 			kernels.bounce[ 1 ] = this._createBounceKernel( 1 );
-			kernels.bounceKey = skyKey;
+			kernels.bounceSky = sky;
 
 		}
 
@@ -859,7 +853,7 @@ class VXGIVolume {
 			inject: [ null, null ],
 			injectKey: [ null, null ],
 			bounce: [ null, null ],
-			bounceKey: null
+			bounceSky: null
 		};
 
 		for ( let level = 1; level < this._levels; level ++ ) {

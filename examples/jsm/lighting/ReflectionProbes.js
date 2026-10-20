@@ -1,5 +1,5 @@
 import { CubeCamera, CubeRenderTarget, HalfFloatType, Node, NodeUpdateType, PMREMGenerator, Vector3 } from 'three/webgpu';
-import { cubeTexture, float, Fn, max, min, normalWorld, positionWorld, reflectVector, uniform, vec3 } from 'three/tsl';
+import { cubeTexture, Fn, max, min, normalWorld, positionWorld, uniform, vec3 } from 'three/tsl';
 
 const _center = /*@__PURE__*/ new Vector3();
 
@@ -9,12 +9,13 @@ const _center = /*@__PURE__*/ new Vector3();
  * {@link PMREMGenerator}. Materials reflect the probe nearest to their object, corrected for the
  * parallax of a box around the probe, so reflections line up with the walls of a room.
  *
- * {@link ReflectionProbes#envNode} only adds specular radiance. The diffuse light of light-mapped
- * meshes comes from their light maps and the one of dynamic objects from light probes, so an
- * environment map would count it twice.
+ * {@link ReflectionProbes#envNode} only adds specular radiance. The diffuse light comes from the light
+ * maps, or from light probes for the meshes left out of the light map, so an environment map would
+ * count it twice.
  *
  * Capture the probes from the finished light-mapped scene, render targets are linear, so the
- * reflections have the same scale as the lit surfaces. Hide dynamic objects while capturing.
+ * reflections have the same scale as the lit surfaces. Hide the meshes left out of the light map,
+ * e.g. animated skinned meshes, while capturing.
  *
  * ```js
  * const reflections = new ReflectionProbes( [ { position: new Vector3( 0, 1, 0 ), box: new Box3( min, max ) } ] );
@@ -56,7 +57,8 @@ class ReflectionProbes {
 		this.intensity = 1;
 
 		/**
-		 * The environment node for the materials that reflect the probes, it adds no diffuse light.
+		 * The environment node for the standard and physical materials that reflect the probes, it adds
+		 * no diffuse light.
 		 *
 		 * @type {Node<vec3>}
 		 */
@@ -87,52 +89,57 @@ class ReflectionProbes {
 		const intensity = this.intensity;
 		const shadows = [];
 
-		// probes do not reflect each other, and shadow maps are rendered once instead of per cube face
+		try {
 
-		renderer.autoClear = true;
-		renderer.inspector.enabled = false;
-		this.intensity = 0;
+			// probes do not reflect each other, and shadow maps are rendered once instead of per cube face
 
-		scene.traverseVisible( ( object ) => {
+			renderer.autoClear = true;
+			renderer.inspector.enabled = false;
+			this.intensity = 0;
 
-			if ( object.isLight === true && object.castShadow === true && object.shadow ) {
+			scene.traverseVisible( ( object ) => {
 
-				shadows.push( [ object.shadow, object.shadow.autoUpdate ] );
-				object.shadow.autoUpdate = false;
-				object.shadow.needsUpdate = true;
+				if ( object.isLight === true && object.castShadow === true && object.shadow ) {
+
+					shadows.push( [ object.shadow, object.shadow.autoUpdate ] );
+					object.shadow.autoUpdate = false;
+					object.shadow.needsUpdate = true;
+
+				}
+
+			} );
+
+			for ( const probe of this.probes.slice( start, start + count ) ) {
+
+				this._camera.position.copy( probe.position );
+				this._camera.update( renderer, scene );
+
+				probe.renderTarget = this._generator.fromCubemap( this._renderTarget.texture, probe.renderTarget );
 
 			}
 
-		} );
+		} finally {
 
-		for ( const probe of this.probes.slice( start, start + count ) ) {
+			for ( const [ shadow, autoUpdate ] of shadows ) shadow.autoUpdate = autoUpdate;
 
-			this._camera.position.copy( probe.position );
-			this._camera.update( renderer, scene );
-
-			probe.renderTarget = this._generator.fromCubemap( this._renderTarget.texture, probe.renderTarget );
+			renderer.autoClear = autoClear;
+			renderer.inspector.enabled = inspectorEnabled;
+			this.intensity = intensity;
 
 		}
-
-		for ( const [ shadow, autoUpdate ] of shadows ) shadow.autoUpdate = autoUpdate;
-
-		renderer.autoClear = autoClear;
-		renderer.inspector.enabled = inspectorEnabled;
-		this.intensity = intensity;
 
 	}
 
 	/**
-	 * Returns the probe that an object reflects: the nearest one whose box contains the center of
-	 * the object's bounds, or else the nearest one. The instances of instanced meshes share the
-	 * probe of their bounds.
+	 * Returns the probe that a mesh reflects: the nearest one whose box contains the center of the
+	 * mesh's bounds, or else the nearest one. The instances of instanced meshes share the probe of
+	 * their bounds.
 	 *
-	 * @param {Object3D} object - The object.
+	 * @private
+	 * @param {Mesh} object - The mesh.
 	 * @return {?Object} The probe.
 	 */
-	getProbe( object ) {
-
-		const geometry = object.geometry;
+	_getProbe( object ) {
 
 		if ( object.isInstancedMesh === true ) {
 
@@ -140,15 +147,13 @@ class ReflectionProbes {
 
 			_center.copy( object.boundingSphere.center ).applyMatrix4( object.matrixWorld );
 
-		} else if ( geometry !== undefined ) {
+		} else {
+
+			const geometry = object.geometry;
 
 			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
 			_center.copy( geometry.boundingSphere.center ).applyMatrix4( object.matrixWorld );
-
-		} else {
-
-			_center.setFromMatrixPosition( object.matrixWorld );
 
 		}
 
@@ -258,7 +263,7 @@ class ReflectionProbesNode extends Node {
 
 	update( { object } ) {
 
-		const probe = this.reflectionProbes.getProbe( object );
+		const probe = this.reflectionProbes._getProbe( object );
 
 		if ( probe === null || probe.renderTarget === null ) {
 
@@ -288,27 +293,18 @@ class ReflectionProbesNode extends Node {
 
 	setup( builder ) {
 
+		// the contexts of EnvironmentNode provide the lookup direction and the roughness. It also looks
+		// the environment up along the normal for the diffuse irradiance, light maps and light probes
+		// provide that
+
 		const { getUV, getTextureLevel } = builder.context;
+		const direction = getUV( this, builder );
 
-		let direction = reflectVector;
-		let roughness = float( 0 );
-
-		if ( getUV !== undefined ) {
-
-			direction = getUV( this, builder );
-
-			// EnvironmentNode also looks the environment up along the normal for the diffuse irradiance,
-			// light maps and light probes provide that
-
-			if ( direction === normalWorld ) return vec3( 0 );
-
-		}
-
-		if ( getTextureLevel !== undefined ) roughness = getTextureLevel( this );
+		if ( direction === normalWorld ) return vec3( 0 );
 
 		// the mip level of the roughness, like PMREMNode
 
-		const r = roughness.clamp();
+		const r = getTextureLevel( this ).clamp();
 		const level = this._maxLevel.mul( r ).mul( r.oneMinus().add( 1 ) );
 
 		const lookup = boxProjection( direction, positionWorld, this._boxMin, this._boxMax, this._position );

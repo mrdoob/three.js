@@ -1,4 +1,4 @@
-import { Box3, BufferGeometry, Float32BufferAttribute, HalfFloatType, Matrix3, Matrix4, NodeMaterial, Points, QuadMesh, RendererUtils, RenderTarget, Scene, OrthographicCamera, StorageBufferAttribute, Vector2, Vector3 } from 'three/webgpu';
+import { Box3, BufferGeometry, Float32BufferAttribute, HalfFloatType, Matrix3, Matrix4, NodeMaterial, OrthographicCamera, Points, QuadMesh, RendererUtils, RenderTarget, Scene, StorageBufferAttribute, Vector2, Vector3 } from 'three/webgpu';
 import { Fn, If, Loop, float, instanceIndex, ivec2, positionGeometry, screenCoordinate, storage, texture, varying, vec3, vec4, vertexIndex } from 'three/tsl';
 
 const _a = /*@__PURE__*/ new Vector3();
@@ -86,22 +86,6 @@ class LightMapSeams {
 		const seams = findSeams( lightMapper.pages[ page ].objects, size, normalThreshold );
 		const system = createSystem( seams, size, samplesPerTexel );
 
-		/**
-		 * The seam edges, as light map UVs of both sides: `[ ax, ay, bx, by, cx, cy, dx, dy ]` per
-		 * edge, where `a, b` and `c, d` are the same two points of the mesh.
-		 *
-		 * @type {Float32Array}
-		 */
-		this.seams = seams;
-
-		/**
-		 * The seam constraints, as light map UVs of both sides and the seam length they stand for in
-		 * texels: `[ ax, ay, bx, by, length ]` per constraint.
-		 *
-		 * @type {Float32Array}
-		 */
-		this.samples = system.samples;
-
 		this._renderTarget = new RenderTarget( size, size, { type: HalfFloatType, depthBuffer: false } );
 		this._renderTarget.texture.channel = 1;
 
@@ -117,7 +101,6 @@ class LightMapSeams {
 		this._stitched = new RenderTarget( size, size, { type: HalfFloatType, depthBuffer: false } );
 
 		this._map = texture( lightMapper.pages[ page ].texture );
-		this._unknowns = system.unknowns;
 
 		const sampleCount = system.weights.length;
 		const unknownCount = system.unknowns;
@@ -447,7 +430,8 @@ class LightMapSeams {
  * @param {Array<Mesh>} objects - The meshes, with `uv1`.
  * @param {number} size - The light map size in texels.
  * @param {number} normalThreshold - The minimum cosine between the normals of the two sides.
- * @return {Float32Array} The UVs of both sides of each seam edge.
+ * @return {Float32Array} The UVs of both sides of each seam edge, `[ ax, ay, bx, by, cx, cy, dx, dy ]`
+ * per edge, where `a, b` and `c, d` are the same two points of the mesh.
  */
 function findSeams( objects, size, normalThreshold ) {
 
@@ -601,8 +585,8 @@ function findSeams( objects, size, normalThreshold ) {
 function instanceUVs( geometry, instance ) {
 
 	const uv = geometry.getAttribute( 'uv1' );
-	const scale = geometry.getAttribute( '_LIGHTMAP_SCALE' );
-	const offset = geometry.getAttribute( '_LIGHTMAP_OFFSET' );
+	const scale = geometry.getAttribute( 'instanceLightMapScale' );
+	const offset = geometry.getAttribute( 'instanceLightMapOffset' );
 
 	if ( instance < 0 || ( scale === undefined && offset === undefined ) ) return uv;
 
@@ -717,7 +701,6 @@ function createSystem( seams, size, samplesPerTexel ) {
 	}
 
 	return {
-		samples: new Float32Array( samples ),
 		unknowns,
 		texels: new Uint32Array( texels ),
 		ranges,

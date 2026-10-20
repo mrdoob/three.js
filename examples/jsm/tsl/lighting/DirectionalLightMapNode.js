@@ -3,7 +3,7 @@ import { BRDF_GGX, Fn, attribute, cameraViewMatrix, dot, faceDirection, length, 
 
 // the instanced attributes that place the light map UVs of each instance in the atlas, see unwrapUVs
 
-const INSTANCE_ATTRIBUTES = [ '_LIGHTMAP_SCALE', '_LIGHTMAP_OFFSET' ];
+const INSTANCE_ATTRIBUTES = [ 'instanceLightMapScale', 'instanceLightMapOffset' ];
 
 /**
  * Adds the irradiance of a directional light map to the lighting context. A directional light
@@ -177,7 +177,7 @@ function instancedLightMap( material ) {
 
 /**
  * Returns the light map UVs of the rendered mesh, `uv1` by default, mapped into the atlas region of each
- * instance by the instanced attributes `_LIGHTMAP_SCALE` and `_LIGHTMAP_OFFSET`, which {@link unwrapUVs}
+ * instance by the instanced attributes `instanceLightMapScale` and `instanceLightMapOffset`, which {@link unwrapUVs}
  * generates for instanced meshes. Without them, the UVs are returned as they are.
  *
  * @tsl
@@ -191,9 +191,9 @@ const lightMapUV = ( uvNode = uv( 1 ) ) => Fn( ( builder ) => {
 
 	let node = uvNode;
 
-	if ( geometry?.hasAttribute( '_LIGHTMAP_SCALE' ) ) node = node.mul( attribute( '_LIGHTMAP_SCALE', 'vec2' ) );
+	if ( geometry?.hasAttribute( 'instanceLightMapScale' ) ) node = node.mul( attribute( 'instanceLightMapScale', 'vec2' ) );
 
-	if ( geometry?.hasAttribute( '_LIGHTMAP_OFFSET' ) ) node = node.add( attribute( '_LIGHTMAP_OFFSET', 'vec2' ) );
+	if ( geometry?.hasAttribute( 'instanceLightMapOffset' ) ) node = node.add( attribute( 'instanceLightMapOffset', 'vec2' ) );
 
 	return node;
 

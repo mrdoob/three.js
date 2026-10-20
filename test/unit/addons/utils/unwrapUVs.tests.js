@@ -1,5 +1,5 @@
 import {
-	Bone, BoxGeometry, BufferAttribute, BufferGeometry, Color, CylinderGeometry, Float16BufferAttribute, Float32BufferAttribute,
+	Bone, BoxGeometry, BufferAttribute, BufferGeometry, CylinderGeometry, Float16BufferAttribute, Float32BufferAttribute,
 	Group, InstancedBufferAttribute, InstancedMesh, ObjectLoader, InterleavedBuffer, InterleavedBufferAttribute, Matrix4, Mesh, PlaneGeometry, Skeleton, SkinnedMesh, SphereGeometry,
 	TorusGeometry, Uint16BufferAttribute, Vector3
 } from 'three';
@@ -377,6 +377,33 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
+			QUnit.test( 'authored lightmap islands beyond the limits get new charts', assert => {
+
+				// the authored UVs of a sphere and a torus are stretched beyond the limits of light maps, halving
+				// their islands until the pieces pass would leave about a chart per face
+
+				for ( const geometry of [ new SphereGeometry( 1, 32, 16 ), new TorusGeometry( 1, 0.4, 16, 48 ) ] ) {
+
+					const fresh = unwrap( new Mesh( geometry.clone() ) );
+					const authored = unwrap( new Mesh( geometry ), { useInputUVs: true } );
+					verify( assert, authored );
+					assert.ok( authored.charts.length <= fresh.charts.length * 1.5, `${ geometry.type }: ${ authored.charts.length } charts, ${ fresh.charts.length } without the authored UVs` );
+
+				}
+
+			} );
+
+			QUnit.test( 'authored islands can come from another attribute', assert => {
+
+				const mesh = new Mesh( new CylinderGeometry( 1, 1, 6.4, 32, 1, true ) );
+				mesh.geometry.setAttribute( 'uv1', mesh.geometry.attributes.uv.clone() );
+				mesh.geometry.deleteAttribute( 'uv' );
+				const result = unwrap( mesh, { mode: 'normal', useInputUVs: true, inputAttribute: 'uv1' } );
+				verify( assert, result, 2 );
+				assert.strictEqual( result.charts.length, 1, 'The slit cylinder of uv1 stays one connected island' );
+
+			} );
+
 			QUnit.test( 'near-zero area slivers are retained but excluded from the atlas', assert => {
 
 				for ( const mode of [ 'lightmap', 'normal' ] ) {
@@ -614,18 +641,13 @@ export default QUnit.module( 'Addons', () => {
 				const geometry = new BoxGeometry();
 				geometry.setAttribute( 'custom', new InstancedBufferAttribute( new Float32Array( 7 ), 1 ) );
 				const mesh = new InstancedMesh( geometry, undefined, 7 );
-				for ( let i = 0; i < 7; i ++ ) {
-
-					mesh.setMatrixAt( i, new Matrix4().makeTranslation( i * 2, 0, 0 ) );
-					mesh.setColorAt( i, new Color( i / 7, 0, 0 ) );
-
-				}
+				for ( let i = 0; i < 7; i ++ ) mesh.setMatrixAt( i, new Matrix4().makeTranslation( i * 2, 0, 0 ) );
 
 				const plane = new Mesh( new PlaneGeometry( 3, 3 ) );
 				const root = new Group();
 				root.add( mesh, plane );
 				const result = unwrap( root, { resolution: 256, padding: 2 } );
-				const offsets = mesh.geometry.getAttribute( '_LIGHTMAP_OFFSET' ), scales = mesh.geometry.getAttribute( '_LIGHTMAP_SCALE' );
+				const offsets = mesh.geometry.getAttribute( 'instanceLightMapOffset' ), scales = mesh.geometry.getAttribute( 'instanceLightMapScale' );
 				assert.true( offsets.isInstancedBufferAttribute && scales.isInstancedBufferAttribute, 'Instance attributes' );
 				assert.strictEqual( offsets.count, 7 );
 				assert.strictEqual( mesh.geometry.getAttribute( 'custom' ), geometry.getAttribute( 'custom' ), 'Instanced attributes are kept' );
@@ -634,18 +656,9 @@ export default QUnit.module( 'Addons', () => {
 
 				const uv = mesh.geometry.getAttribute( 'uv1' );
 				for ( let j = 0; j < uv.count; j ++ ) assert.ok( uv.getX( j ) > 0 && uv.getX( j ) < 1 && uv.getY( j ) > 0 && uv.getY( j ) < 1 );
-				const boxes = [];
+				const planeCharts = new Set( result.meshes.find( record => record.mesh === plane ).faceCharts );
+				const boxes = [ ...planeCharts ].map( index => result.charts[ index ] ).map( chart => [ chart.x, chart.y, chart.x + chart.width, chart.y + chart.height ].map( value => value / 256 ) );
 				for ( let i = 0; i < 7; i ++ ) boxes.push( [ offsets.getX( i ), offsets.getY( i ), offsets.getX( i ) + scales.getX( i ), offsets.getY( i ) + scales.getY( i ) ] );
-				const planeUV = plane.geometry.getAttribute( 'uv1' );
-				const planeBox = [ 1, 1, 0, 0 ];
-				for ( let j = 0; j < planeUV.count; j ++ ) {
-
-					planeBox[ 0 ] = Math.min( planeBox[ 0 ], planeUV.getX( j ) ); planeBox[ 1 ] = Math.min( planeBox[ 1 ], planeUV.getY( j ) );
-					planeBox[ 2 ] = Math.max( planeBox[ 2 ], planeUV.getX( j ) ); planeBox[ 3 ] = Math.max( planeBox[ 3 ], planeUV.getY( j ) );
-
-				}
-
-				boxes.push( planeBox );
 				let overlaps = 0;
 				for ( let a = 0; a < boxes.length; a ++ ) {
 
@@ -674,7 +687,7 @@ export default QUnit.module( 'Addons', () => {
 				const reference = new InstancedMesh( new SphereGeometry( 1, 12, 6 ), undefined, 20 );
 				for ( let i = 0; i < 20; i ++ ) reference.setMatrixAt( i, new Matrix4().makeTranslation( i * 3, 0, 0 ) );
 				const a = unwrap( mesh, { resolution: 512, padding: 2, texelsPerUnit: 8 } ), b = unwrap( reference, { resolution: 512, padding: 2, texelsPerUnit: 8 } );
-				assert.deepEqual( mesh.geometry.getAttribute( '_LIGHTMAP_SCALE' ).array, reference.geometry.getAttribute( '_LIGHTMAP_SCALE' ).array, 'Instance scales count in the density' );
+				assert.deepEqual( mesh.geometry.getAttribute( 'instanceLightMapScale' ).array, reference.geometry.getAttribute( 'instanceLightMapScale' ).array, 'Instance scales count in the density' );
 				assert.strictEqual( a.pages, b.pages );
 
 				const blocks = new Group();
@@ -691,7 +704,7 @@ export default QUnit.module( 'Addons', () => {
 				assert.ok( Math.abs( paged.texelsPerUnit - unwrap( blocks.clone(), { resolution: 256, padding: 2 } ).texelsPerUnit ) < 1e-9, 'Instanced meshes keep the density' );
 				for ( const record of paged.meshes ) {
 
-					const offsets = record.mesh.geometry.getAttribute( '_LIGHTMAP_OFFSET' ), scales = record.mesh.geometry.getAttribute( '_LIGHTMAP_SCALE' );
+					const offsets = record.mesh.geometry.getAttribute( 'instanceLightMapOffset' ), scales = record.mesh.geometry.getAttribute( 'instanceLightMapScale' );
 					for ( let i = 0; i < 8; i ++ ) assert.ok( offsets.getX( i ) + scales.getX( i ) <= 1 && offsets.getY( i ) + scales.getY( i ) <= 1, 'Regions lie in their page' );
 
 				}

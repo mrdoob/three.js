@@ -47,13 +47,8 @@ const ALPHA_BLEND = 2;
  * Approximates diffuse global illumination with ray traced radiosity. Every sample casts
  * cosine-distributed rays from each point through a {@link https://github.com/gkjohnson/three-mesh-bvh three-mesh-bvh}
  * BVH of the scene, and looks up the light leaving the hit surfaces in a light map of the bounces.
- * Emissive surfaces are sampled directly with a shadow ray per gathering ray. A light tree, a bounding
- * volume hierarchy over the emissive triangles, proposes points by an estimate of their contribution,
- * and the shadow ray goes to one of several candidates, picked by their unshadowed contribution. A sky
- * with data on the CPU, like the textures of HDRLoader and EXRLoader, is sampled the same way, by the
- * power of its regions, and combined with the gathering rays by multiple importance sampling, so suns
- * converge quickly. If `lightSampling` is disabled, the gather is an exact ray traced counterpart of
- * {@link StochasticRadiosity}.
+ * Emissive surfaces and a sky with data on the CPU, like the textures of HDRLoader and EXRLoader, are
+ * also sampled directly with shadow rays, so small lights and suns converge quickly.
  *
  * Further bounces are cached in a light map that `update()` solves iteratively, so the meshes need
  * light map UVs in `uv1`, e.g. generated with {@link unwrapUVs}.
@@ -67,22 +62,15 @@ const ALPHA_BLEND = 2;
  *
  * The scene is collected by `update()`: call it again after changing the scene and create new
  * samplers afterwards. The direct light of directional, point, spot and rect area lights is left to
- * the materials, like with the other irradiance sources, unless the sampler adds it with its
- * `directLights` option, but the cached bounces always include it, so their indirect light is baked.
- * Directional, point and spot lights trace a shadow ray, rect area lights are sampled like emissive
- * meshes. An equirectangular or cube texture in `scene.background` lights the scene like a sky through
- * the rays that leave it, scaled by `scene.backgroundIntensity`, background colors are ignored.
+ * the materials, like with the other irradiance sources, but the cached bounces include it, so their
+ * indirect light is baked. An equirectangular or cube texture in `scene.background` lights the scene
+ * like a sky, scaled by `scene.backgroundIntensity`, background colors are ignored.
  *
- * The rays see the texels of the color, emissive, metalness and alpha maps, which are resampled into
- * the layers of a texture array of `textureSize` and sampled at a level of detail that grows with the
- * distance of the hit. Alpha tested texels below `alphaTest` let all light through, transparent
- * materials and `alphaHash` let light through by their opacity: the gathering rays pass them
- * stochastically and the shadow rays are attenuated. Maps beyond the 256 layers of the texture array
- * count with their average color. Instanced meshes are expanded into the BVH, their instance colors scale
- * the albedo and each instance looks its bounces up in its atlas region, see {@link lightMapUV}. The pages
- * of a multi-page atlas, see `mesh.userData.lightMapPage`, are tiles of the bounce cache. Skinned and
- * batched meshes, vertex colors and node materials are ignored, the textures of materials only count
- * through their `uv` channel.
+ * The rays see the color, emissive, metalness and alpha maps of the materials through their `uv`
+ * channel, resampled into a texture array of `textureSize`, up to 256 maps, the others count with
+ * their average color. Alpha tested, transparent and `alphaHash` materials let light through by
+ * their opacity. Instanced meshes and the pages of a multi-page atlas, see `mesh.userData.lightMapPage`,
+ * are supported. Skinned and batched meshes, vertex colors and node materials are ignored.
  *
  * This class can only be used with {@link WebGPURenderer} and a WebGPU backend.
  *
@@ -94,38 +82,23 @@ class RayTracedRadiosity {
 	 * Constructs a new ray traced radiosity solver.
 	 *
 	 * @param {Object} [options] - The options.
-	 * @param {number} [options.rays=8] - The default number of rays cast per point and sample.
-	 * @param {boolean} [options.lightSampling=true] - Whether emissive surfaces are sampled directly with shadow rays.
-	 * Otherwise they are only found by the gathering rays, which is much noisier for small lights. Rect area lights
-	 * are only found by light sampling.
-	 * @param {number} [options.lightCandidates=4] - The number of candidate points on emissive surfaces per shadow ray,
-	 * drawn from a light tree by an estimate of their contribution. The shadow ray goes to one of them, picked by its
-	 * unshadowed contribution.
+	 * @param {number} [options.rays=8] - The number of rays cast per point and sample.
+	 * @param {number} [options.lightCandidates=4] - The number of candidate points on emissive surfaces per shadow ray.
+	 * The shadow ray goes to one of them, picked by its unshadowed contribution.
 	 * @param {number} [options.bounces=16] - The number of iterations used to solve the cached bounces. Each iteration adds one bounce, `0` disables the cache.
 	 * @param {number} [options.cacheSamples=32] - The number of samples accumulated into the bounce cache after the iterations.
 	 * @param {number} [options.cacheSize=256] - The size of the bounce cache light map in texels, per page of the atlas.
 	 * @param {number} [options.textureSize=512] - The size in texels of the texture array layers that hold the material maps.
-	 * @param {number} [options.lightRadius=0] - The radius of point and spot lights in world units, which softens their shadows.
-	 * @param {number} [options.lightAngle=0] - The angular radius of directional lights in radians, which softens their shadows.
-	 * The sun has about `0.0047`.
 	 */
-	constructor( { rays = 8, lightSampling = true, lightCandidates = 4, bounces = 16, cacheSamples = 32, cacheSize = 256, textureSize = 512, lightRadius = 0, lightAngle = 0 } = {} ) {
+	constructor( { rays = 8, lightCandidates = 4, bounces = 16, cacheSamples = 32, cacheSize = 256, textureSize = 512 } = {} ) {
 
 		/**
-		 * The default number of rays cast per point and sample.
+		 * The number of rays cast per point and sample.
 		 *
 		 * @type {number}
 		 * @default 8
 		 */
 		this.rays = rays;
-
-		/**
-		 * Whether emissive surfaces are sampled directly with shadow rays.
-		 *
-		 * @type {boolean}
-		 * @default true
-		 */
-		this.lightSampling = lightSampling;
 
 		/**
 		 * The number of candidate points on emissive surfaces per shadow ray.
@@ -169,22 +142,6 @@ class RayTracedRadiosity {
 		this.textureSize = textureSize;
 
 		/**
-		 * The radius of point and spot lights in world units, which softens their shadows.
-		 *
-		 * @type {number}
-		 * @default 0
-		 */
-		this.lightRadius = lightRadius;
-
-		/**
-		 * The angular radius of directional lights in radians, which softens their shadows.
-		 *
-		 * @type {number}
-		 * @default 0
-		 */
-		this.lightAngle = lightAngle;
-
-		/**
 		 * World space distance that rays start above the receiving face, to avoid hitting it.
 		 *
 		 * @type {number}
@@ -215,7 +172,6 @@ class RayTracedRadiosity {
 		this._sky = null;
 		this._lights = null;
 		this._lightCount = 0;
-		this._softLights = false;
 
 		this._environmentIntensity = uniform( 1 );
 		this._environmentRotation = uniform( new Matrix4() );
@@ -224,18 +180,6 @@ class RayTracedRadiosity {
 		this._passNode = uniform( 0, 'uint' );
 		this._pass = 0;
 		this._renderId = - 1;
-
-	}
-
-	/**
-	 * The cached indirect irradiance, or `null` if the cache is disabled. It uses `uv1` and the
-	 * conventions of {@link LightMapper#texture}.
-	 *
-	 * @type {?Texture}
-	 */
-	get texture() {
-
-		return this._cache !== null ? this._cache.texture : null;
 
 	}
 
@@ -257,7 +201,7 @@ class RayTracedRadiosity {
 
 			// the cached irradiance includes the direct light of the analytic lights, for their bounces
 
-			this._cache = new LightMapper( renderer, this.cacheSize * this._tiles, ( position, normal ) => nodeObject( new RayTracedRadiosityIrradianceNode( this, position, normal, this.rays, true ) ) );
+			this._cache = new LightMapper( renderer, this.cacheSize * this._tiles, ( position, normal ) => nodeObject( new RayTracedRadiosityIrradianceNode( this, position, normal, true ) ) );
 			this._solve();
 
 		}
@@ -480,8 +424,8 @@ class RayTracedRadiosity {
 		};
 
 		// directional, point and spot lights: the direction to the light or its position and the type,
-		// the color times the intensity and the size, the cutoff distance, decay and cone of point and
-		// spot lights, and the axis of spot lights. Rect area lights are emitters
+		// the color times the intensity, the cutoff distance, decay and cone of point and spot lights,
+		// and the axis of spot lights. Rect area lights are emitters
 
 		const lights = [];
 		const areaLights = [];
@@ -502,11 +446,11 @@ class RayTracedRadiosity {
 
 					object.target.updateWorldMatrix( true, false );
 					_a.sub( _b.setFromMatrixPosition( object.target.matrixWorld ) ).normalize();
-					lights.push( _a.x, _a.y, _a.z, 0, color.r, color.g, color.b, this.lightAngle, 0, 0, 0, 0, 0, 0, 0, 0 );
+					lights.push( _a.x, _a.y, _a.z, 0, color.r, color.g, color.b, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 
 				} else if ( object.isPointLight === true ) {
 
-					lights.push( _a.x, _a.y, _a.z, 1, color.r, color.g, color.b, this.lightRadius, object.distance, object.decay, 0, 0, 0, 0, 0, 0 );
+					lights.push( _a.x, _a.y, _a.z, 1, color.r, color.g, color.b, 0, object.distance, object.decay, 0, 0, 0, 0, 0, 0 );
 
 				} else {
 
@@ -514,7 +458,7 @@ class RayTracedRadiosity {
 
 					object.target.updateWorldMatrix( true, false );
 					_b.setFromMatrixPosition( object.target.matrixWorld ).subVectors( _a, _b ).normalize();
-					lights.push( _a.x, _a.y, _a.z, 2, color.r, color.g, color.b, this.lightRadius, object.distance, object.decay, Math.cos( object.angle ), Math.cos( object.angle * ( 1 - object.penumbra ) ), _b.x, _b.y, _b.z, 0 );
+					lights.push( _a.x, _a.y, _a.z, 2, color.r, color.g, color.b, 0, object.distance, object.decay, Math.cos( object.angle ), Math.cos( object.angle * ( 1 - object.penumbra ) ), _b.x, _b.y, _b.z, 0 );
 
 				}
 
@@ -540,7 +484,7 @@ class RayTracedRadiosity {
 
 				const matrixWorld = object.isInstancedMesh === true ? _instanceMatrix.multiplyMatrices( object.matrixWorld, object.getMatrixAt( instance, _instanceMatrix ) ) : object.matrixWorld;
 				const instanceColor = object.isInstancedMesh === true && object.instanceColor !== null ? _instanceColor.fromBufferAttribute( object.instanceColor, instance ) : null;
-				const [ su, ru, ou, rv, sv, ov ] = uv1 !== undefined ? lightMapTransform( object, instance, tiles ) : [ 1, 0, 0, 0, 1, 0 ];
+				const transform = uv1 !== undefined ? lightMapTransform( object, instance, tiles ) : null;
 
 				// mirrored transforms flip the winding of the world space triangles
 
@@ -568,12 +512,12 @@ class RayTracedRadiosity {
 						for ( const v of order ) {
 
 							const vertex = index !== null ? index.getX( i + v ) : i + v;
-							const u = uv1 !== undefined ? uv1.getX( vertex ) : 0;
-							const w = uv1 !== undefined ? uv1.getY( vertex ) : 0;
+							const u = transform !== null ? uv1.getX( vertex ) * transform.x + transform.z : 0;
+							const w = transform !== null ? uv1.getY( vertex ) * transform.y + transform.w : 0;
 
 							_a.fromBufferAttribute( position, vertex ).applyMatrix4( matrixWorld );
 							positions.push( _a.x, _a.y, _a.z );
-							surfaces.push( su * u + ru * w + ou, rv * u + sv * w + ov, uv0 !== undefined ? uv0.getX( vertex ) : 0, uv0 !== undefined ? uv0.getY( vertex ) : 0 );
+							surfaces.push( u, w, uv0 !== undefined ? uv0.getX( vertex ) : 0, uv0 !== undefined ? uv0.getY( vertex ) : 0 );
 
 						}
 
@@ -663,7 +607,6 @@ class RayTracedRadiosity {
 		this._materials = vec4Storage( materials );
 		this._lights = vec4Storage( lights );
 		this._lightCount = lights.length / ( LIGHT_STRIDE * 4 );
-		this._softLights = this._lightCount > 0 && ( this.lightRadius > 0 || this.lightAngle > 0 );
 		this._createEmitters( emitters, meshEmitters );
 
 	}
@@ -1156,9 +1099,7 @@ class RayTracedRadiosity {
 
 		for ( const mesh of this._lightMapMeshes ) {
 
-			const page = this._tiles > 1 ? mesh.userData.lightMapPage ?? 0 : 0;
-
-			cache.addObjects( [ mesh ], { page: 0, uvTransform: this._tiles > 1 ? getTile( page, this._tiles ) : null } );
+			cache.addObjects( [ mesh ], { page: 0, uvTransform: getTile( mesh.userData.lightMapPage ?? 0, this._tiles ) } );
 
 		}
 
@@ -1201,22 +1142,21 @@ class RayTracedRadiosity {
 	 * @private
 	 * @param {Node<vec3>} positionNode - The world-space position.
 	 * @param {Node<vec3>} normalNode - The world-space normal.
-	 * @param {number} rays - The number of rays per sample.
 	 * @param {boolean} analyticLights - Whether to add the direct light of the analytic lights.
 	 * @param {?Node<vec3>} [directionNode=null] - A variable to add the luminance-weighted light directions to.
 	 * @return {Node<vec3>} The irradiance.
 	 */
-	_gather( positionNode, normalNode, rays, analyticLights, directionNode = null ) {
+	_gather( positionNode, normalNode, analyticLights, directionNode = null ) {
 
+		const rays = this.rays;
 		const trace = this._trace;
 		const visibility = this._visibility;
 		const materials = this._materials;
 		const triangles = this._triangles;
 		const emitters = this._emitters;
-		const lightSampling = this.lightSampling;
 		const cache = this._cache !== null ? texture( this._cache.texture ) : null;
 		const environment = this._environment;
-		const sky = lightSampling && environment !== null ? this._sky : null;
+		const sky = environment !== null ? this._sky : null;
 
 		// rect area lights are emitters, but their direct light is left to the materials like the one
 		// of the other analytic lights
@@ -1232,7 +1172,6 @@ class RayTracedRadiosity {
 		const spread = Math.log2( Math.sqrt( Math.PI / ( 32 * rays ) ) );
 
 		const albedoAt = ( entry, coord, lod ) => textured ? this._albedo( uint( entry ), coord, lod ) : materials.element( entry.mul( MATERIAL_STRIDE ) ).rgb;
-		const emissionAt = ( entry, coord, lod ) => textured ? this._emission( uint( entry ), coord, lod ) : materials.element( entry.mul( MATERIAL_STRIDE ).add( 1 ) ).rgb;
 
 		// the importance of a light tree node for a point: its power over the squared distance, bounded
 		// by the directions the node emits to and the receiver faces, see LightBounds::Importance() in pbrt-v4
@@ -1317,9 +1256,7 @@ class RayTracedRadiosity {
 			const [ tangent, bitangent ] = orthonormalBasis( normal );
 
 			// the low-discrepancy sequences continue over the samples, with one of nine random offsets per
-			// pixel: neighbouring points trace different directions, while the rays of a GPU workgroup share
-			// a few directions, which keeps them coherent and faster to trace. Fewer offsets would be faster
-			// still, but the error of the points sharing them adds up to visible projections
+			// pixel, which decorrelates neighbouring points but keeps the rays of a workgroup coherent
 
 			const pixel = uvec2( screenCoordinate.xy );
 			const offsetIndex = uint( hash( pixel.x.add( pixel.y.mul( 65536 ) ) ).mul( 9 ) ).min( 8 );
@@ -1332,84 +1269,13 @@ class RayTracedRadiosity {
 			const direct = vec3( 0 ).toVar();
 			const analytic = vec3( 0 ).toVar();
 
-			// the luminance-weighted directions of the light of the rays and of the hard analytic lights,
-			// for directional light maps
+			// the luminance-weighted directions of the light of the rays, for directional light maps
 
 			const rayDirection = directionNode !== null ? vec3( 0 ).toVar() : null;
-			const analyticDirection = directionNode !== null ? vec3( 0 ).toVar() : null;
-			const weigh = ( target, light, direction ) => target !== null && target.addAssign( direction.mul( luminance( light ) ) );
 
-			// direct light of the directional, point and spot lights with a shadow ray to each one. Lights
-			// with a size sample a direction in the cone of their angular radius or a point on a disk of
-			// their radius facing the receiver, for soft shadows
+			const weigh = ( light, direction ) => {
 
-			const addAnalyticLights = ( target, targetDirection, n ) => {
-
-				const lights = this._lights;
-				const u = n !== null ? fract( vec2( hash( seed.add( 72 ) ), hash( seed.add( 73 ) ) ).add( vec2( float( n.mul( R2[ 0 ] ) ), float( n.mul( R2[ 1 ] ) ) ).mul( 2 ** - 32 ) ) ).toVar() : null;
-
-				Loop( this._lightCount, ( { i } ) => {
-
-					const location = lights.element( i.mul( LIGHT_STRIDE ) ).toVar();
-					const emission = lights.element( i.mul( LIGHT_STRIDE ).add( 1 ) ).toVar();
-					const falloff = lights.element( i.mul( LIGHT_STRIDE ).add( 2 ) ).toVar();
-					const axis = lights.element( i.mul( LIGHT_STRIDE ).add( 3 ) ).xyz;
-
-					const isLocal = location.w.greaterThan( 0.5 );
-					const toLight = select( isLocal, location.xyz.sub( origin ), location.xyz ).toVar();
-					const distance = select( isLocal, length( toLight ), float( 0 ) ).toVar();
-					const toCenter = select( isLocal, toLight.div( distance.max( 1e-8 ) ), toLight ).toVar();
-					const direction = toCenter.toVar();
-					const shadowDistance = distance.toVar();
-
-					if ( u !== null ) {
-
-						const [ t, b ] = orthonormalBasis( toCenter );
-						const phi = u.y.mul( 2 * Math.PI ).toVar();
-
-						If( isLocal, () => {
-
-							const point = toLight.add( t.mul( cos( phi ) ).add( b.mul( sin( phi ) ) ).mul( sqrt( u.x ).mul( emission.w ) ) ).toVar();
-
-							shadowDistance.assign( length( point ) );
-							direction.assign( point.div( shadowDistance.max( 1e-8 ) ) );
-
-						} ).Else( () => {
-
-							const cosAlpha = u.x.mul( cos( emission.w ).oneMinus() ).oneMinus().toVar();
-							const sinAlpha = sqrt( cosAlpha.mul( cosAlpha ).oneMinus().max( 0 ) );
-
-							direction.assign( t.mul( cos( phi ) ).add( b.mul( sin( phi ) ) ).mul( sinAlpha ).add( toCenter.mul( cosAlpha ) ) );
-
-						} );
-
-					}
-
-					const cosReceiver = dot( normal, direction ).toVar();
-
-					If( cosReceiver.greaterThan( 0 ).and( dot( direction, faceNormal ).greaterThan( 0 ) ), () => {
-
-						const transmittance = visibility( origin, direction, shadowDistance.mul( 0.999 ) ).toVar();
-
-						If( transmittance.greaterThan( 0 ), () => {
-
-							// the distance attenuation of point and spot lights, see getDistanceAttenuation(),
-							// and the cone of spot lights, see SpotLightNode
-
-							const cutoff = select( falloff.x.greaterThan( 0 ), distance.div( falloff.x.max( 1e-8 ) ).pow( 4 ).oneMinus().clamp( 0, 1 ).pow2(), float( 1 ) );
-							const spot = select( location.w.greaterThan( 1.5 ), smoothstep( falloff.z, falloff.w, dot( toCenter, axis ) ), float( 1 ) );
-							const attenuation = select( isLocal, cutoff.mul( spot ).div( distance.pow( falloff.y ).max( 0.01 ) ), float( 1 ) );
-
-							const light = emission.rgb.mul( cosReceiver.mul( attenuation ).mul( transmittance ) ).toVar();
-
-							target.addAssign( light );
-							weigh( targetDirection, light, direction );
-
-						} );
-
-					} );
-
-				} );
+				if ( rayDirection !== null ) rayDirection.addAssign( direction.mul( luminance( light ) ) );
 
 			};
 
@@ -1419,7 +1285,7 @@ class RayTracedRadiosity {
 
 				// cosine-distributed gathering ray
 
-				if ( cache !== null || lightSampling === false || environment !== null ) {
+				if ( cache !== null || environment !== null ) {
 
 					const u = fract( offset.xy.add( vec2( float( n.mul( R2[ 0 ] ) ), float( n.mul( R2[ 1 ] ) ) ).mul( 2 ** - 32 ) ) ).toVar();
 					const radius = sqrt( u.x );
@@ -1442,11 +1308,10 @@ class RayTracedRadiosity {
 							const radiance = vec3( 0 ).toVar();
 
 							if ( cache !== null ) radiance.addAssign( albedoAt( entry, coords.zw, lod ).mul( cache.sample( coords.xy ).level( 0 ).rgb ) );
-							if ( lightSampling === false ) radiance.addAssign( emissionAt( entry, coords.zw, lod ).mul( Math.PI ) );
 
 							radiance.mulAssign( facing );
 							gathered.addAssign( radiance );
-							weigh( rayDirection, radiance, direction );
+							weigh( radiance, direction );
 
 						} );
 
@@ -1460,7 +1325,7 @@ class RayTracedRadiosity {
 								const light = skyRadiance( direction ).mul( weight ).toVar();
 
 								gathered.addAssign( light );
-								weigh( rayDirection, light, direction );
+								weigh( light, direction );
 
 							} );
 
@@ -1474,7 +1339,7 @@ class RayTracedRadiosity {
 				// points are drawn from the light tree, and one is picked by its unshadowed contribution, see
 				// "Importance Resampling for Global Illumination" (Talbot et al., 2005)
 
-				if ( lightSampling && emitterCount > 0 ) {
+				if ( emitterCount > 0 ) {
 
 					const weightSum = float( 0 ).toVar();
 					const chosenTarget = float( 0 ).toVar();
@@ -1564,11 +1429,9 @@ class RayTracedRadiosity {
 
 							If( cosReceiver.greaterThan( 0 ).and( cosLight.greaterThan( 0 ) ).and( dot( direction, faceNormal ).greaterThan( 0 ) ), () => {
 
-								// the unshadowed irradiance over the density of the candidate, its luminance is the
-								// resampling weight. The projected solid angle of the sample is clamped to the
-								// hemisphere, which bounds the samples right next to an emitter. Keeping each
-								// candidate with its share of the weight sum picks one in proportion to its weight.
-								// The weight uses the average emission of emissive maps
+								// the unshadowed irradiance over the density of the candidate, with the projected solid
+								// angle clamped to the hemisphere next to an emitter. Its luminance is the resampling
+								// weight, and each candidate is kept with its share of the weight sum
 
 								const scale = cosReceiver.mul( cosLight ).mul( corner.w ).div( distanceSq ).min( Math.PI ).div( probability ).toVar();
 								const contribution = emission.rgb.mul( scale ).toVar();
@@ -1606,7 +1469,7 @@ class RayTracedRadiosity {
 							const light = contribution.mul( transmittance.mul( weightSum ).div( chosenTarget.mul( candidates ) ) ).toVar();
 
 							direct.addAssign( light );
-							weigh( rayDirection, light, chosenDirection );
+							weigh( light, chosenDirection );
 
 						} );
 
@@ -1645,7 +1508,7 @@ class RayTracedRadiosity {
 							const light = skyRadiance( direction ).mul( cosReceiver.mul( weight ).mul( transmittance ).div( density.mul( Math.PI ) ) ).toVar();
 
 							direct.addAssign( light );
-							weigh( rayDirection, light, direction );
+							weigh( light, direction );
 
 						} );
 
@@ -1653,15 +1516,51 @@ class RayTracedRadiosity {
 
 				}
 
-				// lights with a size are sampled with every ray
-
-				if ( analyticLights && this._softLights ) addAnalyticLights( direct, rayDirection, n );
-
 			} );
 
-			if ( analyticLights && this._lightCount > 0 && this._softLights === false ) addAnalyticLights( analytic, analyticDirection, null );
+			// direct light of the directional, point and spot lights with a shadow ray to each one
 
-			if ( directionNode !== null ) directionNode.addAssign( rayDirection.div( rays ).add( analyticDirection ) );
+			if ( analyticLights && this._lightCount > 0 ) {
+
+				const lights = this._lights;
+
+				Loop( this._lightCount, ( { i } ) => {
+
+					const location = lights.element( i.mul( LIGHT_STRIDE ) ).toVar();
+					const emission = lights.element( i.mul( LIGHT_STRIDE ).add( 1 ) ).toVar();
+					const falloff = lights.element( i.mul( LIGHT_STRIDE ).add( 2 ) ).toVar();
+					const axis = lights.element( i.mul( LIGHT_STRIDE ).add( 3 ) ).xyz;
+
+					const isLocal = location.w.greaterThan( 0.5 );
+					const toLight = select( isLocal, location.xyz.sub( origin ), location.xyz ).toVar();
+					const distance = select( isLocal, length( toLight ), float( 0 ) ).toVar();
+					const direction = select( isLocal, toLight.div( distance.max( 1e-8 ) ), toLight ).toVar();
+					const cosReceiver = dot( normal, direction ).toVar();
+
+					If( cosReceiver.greaterThan( 0 ).and( dot( direction, faceNormal ).greaterThan( 0 ) ), () => {
+
+						const transmittance = visibility( origin, direction, distance.mul( 0.999 ) ).toVar();
+
+						If( transmittance.greaterThan( 0 ), () => {
+
+							// the distance attenuation of point and spot lights, see getDistanceAttenuation(),
+							// and the cone of spot lights, see SpotLightNode
+
+							const cutoff = select( falloff.x.greaterThan( 0 ), distance.div( falloff.x.max( 1e-8 ) ).pow( 4 ).oneMinus().clamp( 0, 1 ).pow2(), float( 1 ) );
+							const spot = select( location.w.greaterThan( 1.5 ), smoothstep( falloff.z, falloff.w, dot( direction, axis ) ), float( 1 ) );
+							const attenuation = select( isLocal, cutoff.mul( spot ).div( distance.pow( falloff.y ).max( 0.01 ) ), float( 1 ) );
+
+							analytic.addAssign( emission.rgb.mul( cosReceiver.mul( attenuation ).mul( transmittance ) ) );
+
+						} );
+
+					} );
+
+				} );
+
+			}
+
+			if ( directionNode !== null ) directionNode.addAssign( rayDirection.div( rays ) );
 
 			return gathered.add( direct ).div( rays ).add( analytic );
 
@@ -1692,18 +1591,16 @@ class RayTracedRadiosityIrradianceNode extends Node {
 	 * @param {RayTracedRadiosity} radiosity - The radiosity solver.
 	 * @param {Node<vec3>} positionNode - The world-space position.
 	 * @param {Node<vec3>} normalNode - The world-space normal.
-	 * @param {number} rays - The number of rays per sample.
 	 * @param {boolean} [analyticLights=false] - Whether to add the direct light of the analytic lights.
 	 * @param {?Node<vec3>} [directionNode=null] - A variable to add the luminance-weighted light directions to.
 	 */
-	constructor( radiosity, positionNode, normalNode, rays, analyticLights = false, directionNode = null ) {
+	constructor( radiosity, positionNode, normalNode, analyticLights = false, directionNode = null ) {
 
 		super( 'vec3' );
 
 		this.radiosity = radiosity;
 		this.positionNode = positionNode;
 		this.normalNode = normalNode;
-		this.rays = rays;
 		this.analyticLights = analyticLights;
 		this.directionNode = directionNode;
 
@@ -1719,7 +1616,7 @@ class RayTracedRadiosityIrradianceNode extends Node {
 
 	setup() {
 
-		return this.radiosity._gather( this.positionNode, this.normalNode, this.rays, this.analyticLights, this.directionNode );
+		return this.radiosity._gather( this.positionNode, this.normalNode, this.analyticLights, this.directionNode );
 
 	}
 
@@ -1728,25 +1625,18 @@ class RayTracedRadiosityIrradianceNode extends Node {
 /**
  * Creates a world-space diffuse irradiance sampler for a prepared {@link RayTracedRadiosity}.
  * Call `radiosity.update( renderer, scene )` before creating it. Every render call that uses the
- * sampler continues the ray sequences, so the samples of {@link LightMapper} converge.
- *
- * With `directLights`, the sampler adds the direct diffuse irradiance of the directional, point,
- * spot and rect area lights, traced with shadow rays and soft shadows by the `lightRadius` and
- * `lightAngle` of the solver. The materials must then leave the direct light out, e.g. by hiding
- * the lights after `radiosity.update()`, which collects them, so that it does not count twice.
+ * sampler continues the ray sequences, so the samples of {@link LightMapper} converge. The direct
+ * light of the analytic lights is left to the materials.
  *
  * The sampler adds the luminance-weighted light directions to its optional fourth argument, for
  * the directional light maps of {@link LightMapper}.
  *
  * @param {RayTracedRadiosity} radiosity - The prepared radiosity solver.
- * @param {Object} [options] - The options.
- * @param {number} [options.rays=radiosity.rays] - The number of rays cast per point and sample.
- * @param {boolean} [options.directLights=false] - Whether to add the direct light of the analytic lights.
  * @return {function(Node<vec3>, Node<vec3>, ?Node<float>, ?Node<vec3>): Node<vec3>} The irradiance sampler.
  */
-function rayTracedRadiosityIrradiance( radiosity, { rays = radiosity.rays, directLights = false } = {} ) {
+function rayTracedRadiosityIrradiance( radiosity ) {
 
-	return ( position, normal, sample, direction = null ) => nodeObject( new RayTracedRadiosityIrradianceNode( radiosity, position, normal, rays, directLights, direction ) );
+	return ( position, normal, sample, direction = null ) => nodeObject( new RayTracedRadiosityIrradianceNode( radiosity, position, normal, false, direction ) );
 
 }
 
@@ -1786,29 +1676,28 @@ function getTile( page, tiles ) {
 }
 
 /**
- * Returns the affine transform from the light map UVs of a mesh to the bounce cache: the atlas region of an
+ * Returns the transform from the light map UVs of a mesh to the bounce cache: the atlas region of an
  * instance, see {@link lightMapUV}, in the tile of the page of the mesh.
  *
  * @private
  * @param {Mesh} mesh - The mesh.
  * @param {number} instance - The instance.
  * @param {number} tiles - The number of tiles per side of the bounce cache.
- * @return {Array<number>} The rows of the transform, `[ a, b, c, d, e, f ]` maps `( u, v )` to `( a u + b v + c, d u + e v + f )`.
+ * @return {Vector4} The scale in `x` and `y` and the offset in `z` and `w`.
  */
 function lightMapTransform( mesh, instance, tiles ) {
 
 	const geometry = mesh.geometry;
-	const scale = mesh.isInstancedMesh === true ? geometry.getAttribute( '_LIGHTMAP_SCALE' ) : undefined;
-	const offset = mesh.isInstancedMesh === true ? geometry.getAttribute( '_LIGHTMAP_OFFSET' ) : undefined;
+	const scale = mesh.isInstancedMesh === true ? geometry.getAttribute( 'instanceLightMapScale' ) : undefined;
+	const offset = mesh.isInstancedMesh === true ? geometry.getAttribute( 'instanceLightMapOffset' ) : undefined;
+	const tile = getTile( mesh.userData.lightMapPage ?? 0, tiles );
 
 	const sx = scale !== undefined ? scale.getX( instance ) : 1;
 	const sy = scale !== undefined ? scale.getY( instance ) : 1;
-	const tile = getTile( tiles > 1 ? mesh.userData.lightMapPage ?? 0 : 0, tiles );
+	const ox = offset !== undefined ? offset.getX( instance ) : 0;
+	const oy = offset !== undefined ? offset.getY( instance ) : 0;
 
-	return [
-		tile.x * sx, 0, tile.x * ( offset !== undefined ? offset.getX( instance ) : 0 ) + tile.z,
-		0, tile.y * sy, tile.y * ( offset !== undefined ? offset.getY( instance ) : 0 ) + tile.w
-	];
+	return tile.set( tile.x * sx, tile.y * sy, tile.x * ox + tile.z, tile.y * oy + tile.w );
 
 }
 
