@@ -97,6 +97,7 @@ export * from './loaders/GLTFLoader.js';
 export * from './loaders/HDRLoader.js';
 export * from './loaders/HDRCubeTextureLoader.js';
 export * from './loaders/IESLoader.js';
+export * from './loaders/JTLoader.js';
 export * from './loaders/KMZLoader.js';
 export * from './loaders/KSPLATLoader.js';
 export * from './loaders/KTX2Loader.js';

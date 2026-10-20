@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - JT</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgl - JT">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgl_loader_jt.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgl_loader_jt.jpg">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				background-color: #333;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - JT loader<br/>
+			Drag and drop a JT 10.x file to view it.
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+			import { JTLoader } from 'three/addons/loaders/JTLoader.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			let camera, scene, renderer, controls, object;
+
+			const loader = new JTLoader();
+
+			const params = {
+				wireframe: false
+			};
+
+			init();
+
+			function init() {
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( render );
+				document.body.appendChild( renderer.domElement );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x333333 );
+
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
+
+				// JT files are usually Z-up
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 10000 );
+				camera.up.set( 0, 0, 1 );
+				camera.position.set( - 1, - 2, 1.5 );
+
+				scene.add( new THREE.HemisphereLight( 0xffffff, 0x444444, 1 ) );
+
+				const light = new THREE.DirectionalLight( 0xffffff, 2 );
+				light.position.set( - 1, - 2.5, 3 );
+				camera.add( light );
+				scene.add( camera );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+
+				loader.load( 'models/jt/model1.jt', setObject, undefined, function ( error ) {
+
+					console.error( error );
+
+				} );
+
+				const gui = new GUI();
+				gui.add( params, 'wireframe' ).onChange( updateWireframe );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				document.addEventListener( 'dragover', function ( event ) {
+
+					event.preventDefault();
+					event.dataTransfer.dropEffect = 'copy';
+
+				} );
+
+				document.addEventListener( 'drop', function ( event ) {
+
+					event.preventDefault();
+
+					const file = event.dataTransfer.files[ 0 ];
+					if ( file === undefined ) return;
+
+					file.arrayBuffer().then( function ( buffer ) {
+
+						setObject( loader.parse( buffer ) );
+
+					} ).catch( function ( error ) {
+
+						console.error( error );
+
+					} );
+
+				} );
+
+			}
+
+			function setObject( group ) {
+
+				if ( object ) {
+
+					object.traverse( function ( child ) {
+
+						if ( child.geometry ) child.geometry.dispose();
+						if ( child.material ) child.material.dispose();
+
+					} );
+
+					scene.remove( object );
+
+				}
+
+				object = group;
+				scene.add( object );
+
+				updateWireframe();
+
+				// fit the camera to the model
+
+				const box = new THREE.Box3().setFromObject( object );
+
+				if ( box.isEmpty() ) return;
+
+				const center = box.getCenter( new THREE.Vector3() );
+				const radius = box.getBoundingSphere( new THREE.Sphere() ).radius;
+				const direction = new THREE.Vector3( - 1, - 2, 1.5 ).normalize();
+
+				controls.target.copy( center );
+				camera.position.copy( center ).addScaledVector( direction, radius * 2.5 );
+				camera.near = radius / 100;
+				camera.far = radius * 100;
+				camera.updateProjectionMatrix();
+				controls.update();
+
+			}
+
+			function updateWireframe() {
+
+				if ( object === undefined ) return;
+
+				object.traverse( function ( child ) {
+
+					if ( child.isMesh ) child.material.wireframe = params.wireframe;
+
+				} );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function render() {
+
+				controls.update();
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
