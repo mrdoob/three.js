@@ -156,9 +156,9 @@ class ClippingContext {
 
 		this.shadowPass = ( scene.overrideMaterial !== null && scene.overrideMaterial.isShadowPassMaterial );
 
-		// ArrayCamera draws share one set of planes. Keep those planes in world
-		// space and reconstruct the world position in ClippingNode per view.
 		if ( camera.isArrayCamera === true ) {
+
+			// ArrayCamera sub-cameras share the planes, so keep them in world space.
 
 			this.viewMatrix.identity();
 
