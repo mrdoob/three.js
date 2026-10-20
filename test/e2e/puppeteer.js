@@ -20,6 +20,9 @@ const exceptionList = [
 	'webgl_materials_texture_html',
 	'webgpu_materials_texture_html',
 
+	// Requires srgb-linear and float16 canvas
+	'webgpu_loader_jpegxl',
+
 	// Black screen
 	'webgpu_postprocessing_ao',
 	'webgpu_postprocessing_dof',
@@ -609,6 +612,15 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 
 			console.red( e );
 			failedScreenshots.push( file );
+
+			// A timed-out page can stay wedged and time out every following file
+
+			if ( String( e ).includes( 'TimeoutError' ) ) {
+
+				console.yellow( 'Restarting browser...' );
+				await ctx.restart();
+
+			}
 
 		}
 
