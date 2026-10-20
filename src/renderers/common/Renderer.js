@@ -3859,7 +3859,7 @@ class Renderer {
 
 		const xr = this.xr;
 
-		if ( xr.isPresenting === false || useXRCamera === false ) {
+		if ( xr.enabled === false || xr.isPresenting === false || useXRCamera === false ) {
 
 			let projectionMatrixNeedsUpdate = false;
 
