@@ -18,8 +18,8 @@ let _rendererState;
  * change as little as possible, the padding texels outside the charts more freely than the covered
  * texels. The solver runs damped Jacobi iterations on the GPU and keeps each texel within the values
  * that its seams sample on both sides. The padding of the charts is filled again afterwards, like
- * {@link LightMapper} does. Finding the seams takes a moment on the CPU, so reuse the stitcher while
- * the atlas stays the same.
+ * {@link LightMapper} does. Finding the seams takes a moment on the CPU, so reuse the stitcher, or its
+ * seams, while the atlas stays the same.
  *
  * ```js
  * const seams = new LightMapSeams( renderer, lightMapper );
@@ -49,8 +49,10 @@ class LightMapSeams {
 	 * @param {number} [options.coveredWeight=0.02] - How strongly the texels with samples keep their values, relative to the seam constraints.
 	 * @param {number} [options.paddingWeight=0.002] - How strongly the padding texels keep their values.
 	 * @param {number} [options.page=0] - The page of the light mapper to stitch, see {@link LightMapper#pages}.
+	 * @param {?Object} [options.seams=null] - The {@link LightMapSeams#seams} of a stitcher of the same meshes, atlas page and
+	 * options, e.g. of a bake with another irradiance source, otherwise the seams are found.
 	 */
-	constructor( renderer, lightMapper, { iterations = 64, normalThreshold = 0.9, samplesPerTexel = 2, coveredWeight = 0.02, paddingWeight = 0.002, page = 0 } = {} ) {
+	constructor( renderer, lightMapper, { iterations = 64, normalThreshold = 0.9, samplesPerTexel = 2, coveredWeight = 0.02, paddingWeight = 0.002, page = 0, seams = null } = {} ) {
 
 		/**
 		 * The renderer.
@@ -83,8 +85,16 @@ class LightMapSeams {
 		this.iterations = iterations;
 
 		const size = lightMapper.size;
-		const seams = findSeams( lightMapper.pages[ page ].objects, size, normalThreshold );
-		const system = createSystem( seams, size, samplesPerTexel );
+
+		/**
+		 * The seams of the page and the texels around them, which another stitcher of the same atlas can reuse.
+		 *
+		 * @type {Object}
+		 * @readonly
+		 */
+		this.seams = seams ?? createSystem( findSeams( lightMapper.pages[ page ].objects, size, normalThreshold ), size, samplesPerTexel );
+
+		const system = this.seams;
 
 		this._renderTarget = new RenderTarget( size, size, { type: HalfFloatType, depthBuffer: false } );
 		this._renderTarget.texture.channel = 1;

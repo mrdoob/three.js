@@ -357,6 +357,8 @@ class LightBaker {
 		this._preparedKey = null;
 		this._denoisers = [];
 		this._stitchers = [];
+		this._seams = [];
+		this._seamsKey = null;
 		this._lightMaps = null;
 		this._processedKey = null;
 		this._applied = false;
@@ -780,10 +782,17 @@ class LightBaker {
 		this.lightMapper = new LightMapper( this.renderer, record.size, this.irradianceNode, { lights: this._lightCopies, moments: true, directional: this.directional, pages: record.pages } );
 		this.lightMapper.addObjects( record.lightMapped );
 
-		// each page has its own denoiser and seams
+		// each page has its own denoiser and seams. Finding the seams takes a while, so they are reused while
+		// the meshes and their light map UVs and transforms stay the same, e.g. for another algorithm
+
+		const seamsKey = this._getSeamsKey();
+		const seams = seamsKey === this._seamsKey ? this._seams : [];
 
 		this._denoisers = this.lightMapper.pages.map( ( page, i ) => new LightMapDenoiser( this.renderer, this.lightMapper, { page: i } ) );
-		this._stitchers = this.lightMapper.pages.map( ( page, i ) => new LightMapSeams( this.renderer, this.lightMapper, { page: i } ) );
+		this._stitchers = this.lightMapper.pages.map( ( page, i ) => new LightMapSeams( this.renderer, this.lightMapper, { page: i, seams: seams[ i ] } ) );
+
+		this._seams = this._stitchers.map( ( stitcher ) => stitcher.seams );
+		this._seamsKey = seamsKey;
 
 		this._preparedKey = this._getPrepareKey( scene, root );
 		this._applied = false;
@@ -1014,6 +1023,9 @@ class LightBaker {
 		this._stop();
 		this._disposeBake();
 
+		this._seams = [];
+		this._seamsKey = null;
+
 		for ( const record of this._records.values() ) {
 
 			for ( const mesh of record.meshes ) {
@@ -1097,6 +1109,37 @@ class LightBaker {
 	_getPrepareKey( scene, root ) {
 
 		return JSON.stringify( [ scene.uuid, root.uuid, this.algorithm, this.resolution, this.pageSize, this.padding, this.unwrap, this.ignoreOutlines, this.directLight, this.directions, this.cacheSize, this.probes, this.vxgiResolution ] );
+
+	}
+
+	/**
+	 * Returns a key of what the seams of the light mapper's atlas depend on: the size, the meshes of each
+	 * page with their geometries, light map UVs and world transforms.
+	 *
+	 * @private
+	 * @return {string} The key.
+	 */
+	_getSeamsKey() {
+
+		const key = [ this.lightMapper.size ];
+
+		for ( const page of this.lightMapper.pages ) {
+
+			key.push( '|' );
+
+			for ( const mesh of page.objects ) {
+
+				const geometry = mesh.geometry;
+
+				key.push( mesh.id, geometry.id, geometry.getAttribute( 'position' ).version, geometry.getAttribute( 'uv1' ).version, ...mesh.matrixWorld.elements );
+
+				if ( mesh.isInstancedMesh ) key.push( mesh.count, mesh.instanceMatrix.version );
+
+			}
+
+		}
+
+		return key.join();
 
 	}
 
