@@ -469,7 +469,8 @@ class Curve {
 	copy( source ) {
 
 		this.arcLengthDivisions = source.arcLengthDivisions;
-		this.needsUpdate = true;
+
+		this.cacheArcLengths = null;
 
 		return this;
 
@@ -507,7 +508,8 @@ class Curve {
 	fromJSON( json ) {
 
 		this.arcLengthDivisions = json.arcLengthDivisions;
-		this.needsUpdate = true;
+
+		this.cacheArcLengths = null;
 
 		return this;
 
