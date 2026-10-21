@@ -130,7 +130,7 @@ function main() {
 	{
 
 		const loader = new THREE.TextureLoader();
-		const texture = loader.load( 'https://threejs.org/manual/examples/resources/images/world.jpg', render );
+		const texture = loader.load( 'resources/images/world.jpg', render );
 		texture.colorSpace = THREE.SRGBColorSpace;
 		const geometry = new THREE.SphereGeometry( 1, 64, 32 );
 		const material = new THREE.MeshBasicMaterial( { map: texture } );
@@ -303,8 +303,8 @@ function main() {
 	async function loadAll() {
 
 		const fileInfos = [
-			{ name: 'men', hueRange: [ 0.7, 0.3 ], url: 'https://threejs.org/manual/examples/resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc' },
-			{ name: 'women', hueRange: [ 0.9, 1.1 ], url: 'https://threejs.org/manual/examples/resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014ft_2010_cntm_1_deg.asc' },
+			{ name: 'men', hueRange: [ 0.7, 0.3 ], url: 'resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc' },
+			{ name: 'women', hueRange: [ 0.9, 1.1 ], url: 'resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014ft_2010_cntm_1_deg.asc' },
 		];
 
 		await Promise.all( fileInfos.map( loadData ) );
@@ -520,6 +520,5 @@ function main() {
 }
 
 main();
-
 </script>
 </html>
