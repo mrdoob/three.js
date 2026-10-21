@@ -8,6 +8,9 @@ const _mvp = new Matrix4();
 const _viewport = new Matrix4();
 const _size = new Vector3();
 
+// TODO: Remove once Chrome 157.0.8080.0+ is the baseline.
+let _supportsCanvasTransform = null;
+
 /**
  * Manages interaction for 3D objects independently of the scene graph.
  *
@@ -60,9 +63,6 @@ class InteractionManager {
 
 		this._cachedCssW = - 1;
 		this._cachedCssH = - 1;
-
-		// TODO: Remove once Chromium 157.0.8081.0+ is the baseline.
-		this._supportsCanvasTransform = null;
 
 	}
 
@@ -122,7 +122,6 @@ class InteractionManager {
 
 		this.camera = camera;
 		this.element = renderer.domElement;
-		this._supportsCanvasTransform = null; // TODO: Remove once Chromium 157.0.8081.0+ is the baseline.
 
 	}
 
@@ -172,7 +171,7 @@ class InteractionManager {
 			element.style.position = 'absolute';
 			element.style.left = '0';
 			element.style.top = '0';
-			element.style.transformOrigin = '0 0'; // TODO: Remove once Chromium 157.0.8081.0+ is the baseline
+			element.style.transformOrigin = '0 0';
 
 			const elemW = element.offsetWidth;
 			const elemH = element.offsetHeight;
@@ -207,46 +206,28 @@ class InteractionManager {
 
 			if ( typeof canvas.updateElementGeometry === 'function' ) {
 
-				const initialized =
-					( canvas.hasAttribute( 'content' ) || canvas.hasAttribute( 'layoutsubtree' ) ) &&
-					element.hasAttribute( 'drawable' ) &&
-					canvas.contains( element );
+				// Chrome 154+: Wait until the renderer has made the element a drawable child of the canvas.
+				if ( element.parentNode !== canvas ) continue;
 
-				if ( initialized === false ) continue;
+				if ( _supportsCanvasTransform === null ) _supportsCanvasTransform = supportsCanvasTransform( canvas, element );
 
-				// TODO: Remove once Chromium 157.0.8081.0+ is the baseline.
-				if ( this._supportsCanvasTransform === null ) {
+				if ( _supportsCanvasTransform === true ) {
 
-					this._supportsCanvasTransform = supportsElementCanvasTransform( canvas, element );
-
-				}
-
-			}
-
-			// TODO: Remove once Chromium 157.0.8081.0+ is the baseline: drop this check and the
-			// legacy `else` branch, keeping only updateElementGeometry().
-			if ( this._supportsCanvasTransform === true ) {
-
-				// Chromium 157.0.8081.0+
-
-				canvas.updateElementGeometry( element, { canvasTransform: new DOMMatrix( _mvp.elements ) } );
-
-			} else {
-
-				// Legacy: Chromium <= 157.0.8079.0.
-
-				element.style.transform = 'matrix3d(' + _mvp.elements.join( ',' ) + ')';
-
-				// Chromium 155 - 157.0.8079.0 only hit test canvas children registered via
-				// updateElementGeometry(). Register the element without a canvas transform,
-				// since it isn't applied in these versions.
-				if ( typeof canvas.updateElementGeometry === 'function' ) {
-
-					canvas.updateElementGeometry( element );
+					// Chrome 157.0.8080.0+
+					canvas.updateElementGeometry( element, { canvasTransform: new DOMMatrix( _mvp.elements ) } );
+					continue;
 
 				}
 
+				// Chrome 154 - 157.0.8079: canvasTransform is ignored, but canvas children
+				// are only hit tested once registered via updateElementGeometry().
+				canvas.updateElementGeometry( element );
+
 			}
+
+			// The browser performs the perspective divide (by w) when applying the matrix3d.
+
+			element.style.transform = 'matrix3d(' + _mvp.elements.join( ',' ) + ')';
 
 		}
 
@@ -261,31 +242,29 @@ class InteractionManager {
 		this.element = null;
 		this._cachedCssW = - 1;
 		this._cachedCssH = - 1;
-		this._supportsCanvasTransform = null; // TODO: Remove once Chromium 157.0.8081.0+ is the baseline.
 
 	}
 
 }
 
-// TODO: Remove once Chromium 157.0.8081.0+ is the baseline.
-// Chromium builds 155.0.8059.12 - 157.0.8079.0 expose updateElementGeometry()
-// but don't apply the transform without a flag, see crrev.com/c/8489932.
+// TODO: Remove once Chrome 157.0.8080.0+ is the baseline.
+// Chrome 154 - 157.0.8079 accept but ignore canvasTransform unless the ElementCanvasTransform
+// flag is enabled. The same flag exposes the getElementTransform( element ) overload, so calling
+// it with a single argument throws a TypeError when the feature isn't available.
 
-function supportsElementCanvasTransform( canvas, element ) {
-
-	if ( typeof canvas.updateElementGeometry !== 'function' || typeof canvas.getElementTransform !== 'function' ) return false;
+function supportsCanvasTransform( canvas, element ) {
 
 	try {
 
 		canvas.getElementTransform( element );
-		return true;
 
 	} catch ( e ) {
 
-		// Any other error (e.g. InvalidStateError) means the overload exists.
 		return e.name !== 'TypeError';
 
 	}
+
+	return true;
 
 }
 

@@ -1318,29 +1318,25 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			} else if ( texture.isHTMLTexture ) {
 
-				// Chromium 155+ replaces texElementImage2D() with texElementSubImage2D().
+				// Chrome 157.0.8096.0+ removed texElementImage2D() in favor of texElementSubImage2D().
 				if ( 'texElementImage2D' in _gl || 'texElementSubImage2D' in _gl ) {
 
 					const canvas = _gl.canvas;
 
 					// Ensure the canvas supports HTML-in-Canvas and the element is a child.
-					if ( ! canvas.hasAttribute( 'content' ) && ! canvas.hasAttribute( 'layoutsubtree' ) ) {
+					if ( 'content' in canvas ) {
 
-						if ( 'content' in canvas ) {
+						// Chrome 156+: layoutsubtree was renamed to content="drawable"
+						if ( canvas.content !== 'drawable' ) canvas.setAttribute( 'content', 'drawable' );
 
-							// Chromium 155+: layoutsubtree was renamed to content="drawable"
-							canvas.setAttribute( 'content', 'drawable' );
+					} else if ( ! canvas.hasAttribute( 'layoutsubtree' ) ) {
 
-						} else {
-
-							// Chromium <= 155
-							canvas.setAttribute( 'layoutsubtree', 'true' );
-
-						}
+						// Chrome 138 - 155
+						canvas.setAttribute( 'layoutsubtree', 'true' );
 
 					}
 
-					// Chromium 155+ requires the drawable attribute on drawn canvas children.
+					// Chrome 157+ requires the drawable attribute on drawn canvas children.
 					if ( ! image.hasAttribute( 'drawable' ) ) {
 
 						image.setAttribute( 'drawable', '' );
@@ -1377,75 +1373,54 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					if ( typeof _gl.texElementSubImage2D === 'function' ) {
 
-						// Chromium 155+
-						// The texture has to be allocated first.
-						let width, height;
+						// Chrome 154+: copy into a texture allocated with the size of the element snapshot.
 
-						if ( typeof canvas.captureElementImage === 'function' ) {
+						let elementImage;
 
-							let elementImage;
+						try {
 
-							try {
+							elementImage = canvas.captureElementImage( image );
 
-								elementImage = canvas.captureElementImage( image );
+						} catch ( e ) {
 
-							} catch ( e ) {
-
-								// No paint record for the element yet. Returning early keeps the
-								// texture marked for upload, so the copy is retried on the next frame.
-								canvas.requestPaint();
-								return;
-
-							}
-
-							width = Math.ceil( elementImage.width );
-							height = Math.ceil( elementImage.height );
-
-						} else {
-
-							const dpr = window.devicePixelRatio || 1;
-
-							width = Math.max( 1, Math.round( image.offsetWidth * dpr ) );
-							height = Math.max( 1, Math.round( image.offsetHeight * dpr ) );
+							// No paint record for the element yet. Returning early keeps the
+							// texture marked for upload, so the copy is retried on the next frame.
+							canvas.requestPaint();
+							return;
 
 						}
 
-						if ( width > 0 && height > 0 ) {
+						// TODO: Remove the ElementImage fallback once Chrome 157.0.8094.0+ is the baseline.
+						// Chrome 157.0.8094.0+ moved the default size from ElementImage to the canvas.
+						const size = typeof canvas.getElementImageDefaultSize === 'function' ? canvas.getElementImageDefaultSize( elementImage ) : elementImage;
 
-							// Allocate only on first upload or when the size changes; re-allocating resets the contents.
-							if ( allocateMemory || textureProperties.__width !== width || textureProperties.__height !== height ) {
+						// Default sizes are fractional, whereas the copy is rounded up.
+						const width = Math.ceil( size.width );
+						const height = Math.ceil( size.height );
 
-								state.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA8, width, height, 0, _gl.RGBA, _gl.UNSIGNED_BYTE, null );
-								textureProperties.__width = width;
-								textureProperties.__height = height;
+						// Re-allocate only when the size changes since it resets the contents.
+						if ( textureProperties.__width !== width || textureProperties.__height !== height ) {
 
-							}
-
-							try {
-
-								// Pass the destination size. It forces the copy to exactly fill the
-								// allocated texture, independently of how the canvas is sized.
-								_gl.texElementSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, image, { width, height } );
-
-							} catch ( e ) {
-
-								// Keep the previous contents and retry on the next frame.
-								canvas.requestPaint();
-								return;
-
-							}
+							state.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA8, width, height, 0, _gl.RGBA, _gl.UNSIGNED_BYTE, null );
+							textureProperties.__width = width;
+							textureProperties.__height = height;
 
 						}
+
+						// Pass the destination size. It forces the copy to exactly fill the
+						// allocated texture, independently of how the canvas is sized.
+						_gl.texElementSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, elementImage, { width, height } );
+						elementImage.close();
 
 					} else if ( _gl.texElementImage2D.length === 3 ) {
 
-						// Chromium 150+
+						// Chrome 150+
 
 						_gl.texElementImage2D( _gl.TEXTURE_2D, _gl.RGBA8, image );
 
 					} else {
 
-						// Chromium 138 - 149
+						// Chrome 138 - 149
 
 						const level = 0;
 						const internalFormat = _gl.RGBA;

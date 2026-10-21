@@ -463,7 +463,7 @@ class WebGLTextureUtils {
 
 			} else if ( texture.isHTMLTexture && typeof gl.texElementSubImage2D === 'function' ) {
 
-				// Chromium 155+: storage is allocated in updateTexture() once the size of the
+				// Chrome 154+: storage is allocated in updateTexture() once the size of the
 				// element snapshot is known. It must stay mutable since that size can change.
 
 			} else if ( ! texture.isVideoTexture ) {
@@ -703,18 +703,19 @@ class WebGLTextureUtils {
 
 			if ( typeof gl.texElementSubImage2D === 'function' ) {
 
-				// Chromium 155+
-
-				// The snapshot is copied into an existing texture, so the texture has to be
-				// allocated first. Its size is taken from the snapshot itself.
+				// Chrome 154+: copy into a texture allocated with the size of the element snapshot.
 
 				const canvas = gl.canvas;
-				const element = options.image;
-				const textureData = this.backend.get( texture );
 
-				// No paint record for the element yet. Retry once the canvas has painted it.
-				const retry = () => {
+				let elementImage;
 
+				try {
+
+					elementImage = canvas.captureElementImage( options.image );
+
+				} catch ( e ) {
+
+					// No paint record for the element yet. Retry once the canvas has painted it.
 					canvas.addEventListener( 'paint', () => {
 
 						texture.needsUpdate = true;
@@ -722,82 +723,50 @@ class WebGLTextureUtils {
 					}, { once: true } );
 
 					canvas.requestPaint();
-
-				};
-
-				let elementWidth, elementHeight;
-
-				if ( typeof canvas.captureElementImage === 'function' ) {
-
-					let elementImage;
-
-					try {
-
-						elementImage = canvas.captureElementImage( element );
-
-					} catch ( e ) {
-
-						retry();
-						return;
-
-					}
-
-					// ElementImage sizes are fractional, whereas the copy is rounded up.
-					elementWidth = Math.ceil( elementImage.width );
-					elementHeight = Math.ceil( elementImage.height );
-
-				} else {
-
-					const dpr = window.devicePixelRatio || 1;
-
-					elementWidth = Math.max( 1, Math.round( element.offsetWidth * dpr ) );
-					elementHeight = Math.max( 1, Math.round( element.offsetHeight * dpr ) );
+					return;
 
 				}
 
-				if ( elementWidth > 0 && elementHeight > 0 ) {
+				// TODO: Remove the ElementImage fallback once Chrome 157.0.8094.0+ is the baseline.
+				// Chrome 157.0.8094.0+ moved the default size from ElementImage to the canvas.
+				const size = typeof canvas.getElementImageDefaultSize === 'function' ? canvas.getElementImageDefaultSize( elementImage ) : elementImage;
 
-					// Allocate only when the size changes, re-allocating resets the contents.
+				// Default sizes are fractional, whereas the copy is rounded up.
+				const elementWidth = Math.ceil( size.width );
+				const elementHeight = Math.ceil( size.height );
 
-					if ( textureData.htmlWidth !== elementWidth || textureData.htmlHeight !== elementHeight ) {
+				const textureData = this.backend.get( texture );
 
-						gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGBA8, elementWidth, elementHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null );
+				// Re-allocate only when the size changes since it resets the contents.
+				if ( textureData.htmlWidth !== elementWidth || textureData.htmlHeight !== elementHeight ) {
 
-						// Only level 0 is defined. Unlike immutable storage, mutable storage needs an
-						// explicit max level to stay complete with mipmap minification filters.
-						gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAX_LEVEL, 0 );
+					gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGBA8, elementWidth, elementHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null );
 
-						textureData.htmlWidth = elementWidth;
-						textureData.htmlHeight = elementHeight;
+					// Only level 0 is defined. Unlike immutable storage, mutable storage needs an
+					// explicit max level to stay complete with mipmap minification filters.
+					gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAX_LEVEL, 0 );
 
-					}
-
-					try {
-
-						// Always pass the destination size. It forces the copy to exactly fill the
-						// allocated texture, independently of how the canvas is sized.
-						gl.texElementSubImage2D( gl.TEXTURE_2D, 0, 0, 0, element, { width: elementWidth, height: elementHeight } );
-
-					} catch ( e ) {
-
-						// Keep the previous contents and retry.
-						retry();
-
-					}
+					textureData.htmlWidth = elementWidth;
+					textureData.htmlHeight = elementHeight;
 
 				}
+
+				// Always pass the destination size. It forces the copy to exactly fill the
+				// allocated texture, independently of how the canvas is sized.
+				gl.texElementSubImage2D( gl.TEXTURE_2D, 0, 0, 0, elementImage, { width: elementWidth, height: elementHeight } );
+				elementImage.close();
 
 			} else if ( typeof gl.texElementImage2D === 'function' ) {
 
 				if ( gl.texElementImage2D.length === 3 ) {
 
-					// Chromium 150+
+					// Chrome 150+
 
 					gl.texElementImage2D( gl.TEXTURE_2D, gl.RGBA8, options.image );
 
 				} else {
 
-					// Chromium 138 - 149
+					// Chrome 138 - 149
 
 					gl.texElementImage2D( gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, options.image );
 
