@@ -724,6 +724,18 @@ ${ flowData.code }
 
 		if ( depthSnippet ) uvSnippet = `vec3( ${ uvSnippet }, ${ depthSnippet } )`;
 
+		if ( texture.isDepthTexture ) {
+
+			if ( offsetSnippet ) {
+
+				return `textureLodOffset( ${ textureProperty }, ${ uvSnippet }, ${ levelSnippet }, ${ offsetSnippet } ).x`;
+
+			}
+
+			return `textureLod( ${ textureProperty }, ${ uvSnippet }, ${ levelSnippet } ).x`;
+
+		}
+
 		if ( offsetSnippet ) {
 
 			return `textureLodOffset( ${ textureProperty }, ${ uvSnippet }, ${ levelSnippet }, ${ offsetSnippet } )`;
