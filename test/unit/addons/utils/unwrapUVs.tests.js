@@ -23,7 +23,7 @@ function auditAtlas( result ) {
 			if ( p.some( v => ! Number.isFinite( v[ 0 ] + v[ 1 ] ) || v[ 0 ] < 0 || v[ 0 ] > 1 || v[ 1 ] < 0 || v[ 1 ] > 1 ) ) throw new Error( 'Invalid UV coordinate.' );
 			if ( record.faceCharts[ f ] === - 1 ) {
 
-				if ( p.some( v => v[ 0 ] !== 0 || v[ 1 ] !== 0 ) ) throw new Error( 'Ignored faces must have UV (0, 0).' );
+				if ( p.some( v => v[ 0 ] !== p[ 0 ][ 0 ] || v[ 1 ] !== p[ 0 ][ 1 ] ) ) throw new Error( 'Ignored faces must collapse to a single UV.' );
 				continue;
 
 			}
@@ -424,6 +424,13 @@ export default QUnit.module( 'Addons', () => {
 				assert.strictEqual( result.warnings.singleTriangleCharts, 1 );
 				assert.strictEqual( record.mesh.geometry.index.count, 6 );
 				assert.strictEqual( record.mesh.geometry.attributes.position.count, 6 );
+				const uv = record.mesh.geometry.attributes.uv1, index = record.mesh.geometry.index;
+				for ( let j = 3; j < 6; j ++ ) {
+
+					assert.deepEqual( [ uv.getX( index.getX( j ) ), uv.getY( index.getX( j ) ) ], [ uv.getX( index.getX( 0 ) ), uv.getY( index.getX( 0 ) ) ], 'Ignored face collapses onto the UV of its welded neighbor' );
+
+				}
+
 				const degenerate = new BufferGeometry();
 				degenerate.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ], 3 ) );
 				const allIgnored = unwrap( new Mesh( degenerate ) );

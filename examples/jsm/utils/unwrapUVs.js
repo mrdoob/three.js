@@ -6,7 +6,8 @@ import { potpack } from '../libs/potpack.module.js';
  * Generates a unique UV atlas for the meshes in a hierarchy, measured in world space.
  * Each mesh receives a new geometry. Skinned and morphed meshes are unwrapped in
  * their current pose. InstancedMesh and BatchedMesh are skipped with a warning.
- * Degenerate faces keep UV (0, 0) and a faceCharts entry of -1.
+ * Excluded faces collapse onto the UV of a neighboring chart vertex, or (0, 0) if
+ * isolated, and get a faceCharts entry of -1.
  *
  * @three_import import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
  *
@@ -680,17 +681,30 @@ function validateFloat32Chart( chart, settings, density ) {
 function rebuildGeometry( record, charts, settings ) {
 
 	const original = record.original, lookup = new Map(), source = [], values = [], indices = [];
+	const chartUV = ( chart, vertex ) => chart.outputUV[ chart.vertexMap.get( record.vertexKeys[ vertex ] ) ];
+
+	// Excluded faces collapse onto a welded neighbor's UV so they sample adjacent lighting
+	// rather than the gutter of whichever chart sits at (0, 0). Isolated ones keep (0, 0).
+	const weldUVs = new Map();
+	for ( let f = 0; f < record.faces.length; f ++ ) {
+
+		const chart = charts[ record.faceCharts[ f ] ], face = record.faces[ f ];
+		if ( chart ) for ( let j = 0; j < 3; j ++ ) weldUVs.set( face.welds[ j ], chartUV( chart, face.vertices[ j ] ) );
+
+	}
+
 	for ( let f = 0; f < record.faces.length; f ++ ) {
 
 		const chartIndex = record.faceCharts[ f ], chart = charts[ chartIndex ], face = record.faces[ f ];
+		const fallback = chart ? null : face.welds.map( weld => weldUVs.get( weld ) ).find( Boolean ) ?? [ 0, 0 ];
 		for ( let j = 0; j < 3; j ++ ) {
 
-			const vertex = face.vertices[ j ], key = `${ vertex },${ chartIndex }`;
+			const vertex = face.vertices[ j ], key = chart ? `${ vertex },${ chartIndex }` : `${ vertex },${ fallback }`;
 			if ( ! lookup.has( key ) ) {
 
 				lookup.set( key, source.length );
 				source.push( vertex );
-				const p = chart ? chart.outputUV[ chart.vertexMap.get( record.vertexKeys[ vertex ] ) ] : [ 0, 0 ];
+				const p = chart ? chartUV( chart, vertex ) : fallback;
 				values.push( p[ 0 ], p[ 1 ] );
 
 			}
