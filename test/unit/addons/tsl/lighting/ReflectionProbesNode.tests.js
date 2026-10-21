@@ -10,6 +10,30 @@ export default QUnit.module( 'Addons', () => {
 
 		QUnit.module( 'ReflectionProbesNode', () => {
 
+			QUnit.test( 'clone copies the probe settings', ( assert ) => {
+
+				const probes = new ReflectionProbes();
+				probes.boxProjection = false;
+				const probe = new ReflectionProbe( 8, 5, 8 );
+				probe.projectionSize = new Vector3( 16, 5, 8 );
+				probe.projectionOffset.set( 0, 0.6, 0 );
+				probe.blendDistance = 0.25;
+				probes.add( probe );
+
+				const clone = probes.clone();
+				const cloneProbe = clone.children[ 0 ];
+
+				assert.strictEqual( clone.boxProjection, false, 'copies boxProjection' );
+				assert.strictEqual( clone.texture, null, 'does not share the baked texture' );
+				assert.true( cloneProbe.isReflectionProbe, 'clones the probes' );
+				assert.deepEqual( cloneProbe.influenceSize.toArray(), [ 8, 5, 8 ], 'copies influenceSize' );
+				assert.deepEqual( cloneProbe.projectionSize.toArray(), [ 16, 5, 8 ], 'copies projectionSize' );
+				assert.notStrictEqual( cloneProbe.projectionSize, probe.projectionSize, 'does not share projectionSize' );
+				assert.deepEqual( cloneProbe.projectionOffset.toArray(), [ 0, 0.6, 0 ], 'copies projectionOffset' );
+				assert.strictEqual( cloneProbe.blendDistance, 0.25, 'copies blendDistance' );
+
+			} );
+
 			QUnit.test( 'updates uniforms in every material program', ( assert ) => {
 
 				const probe = new ReflectionProbe( 8, 5, 8 );

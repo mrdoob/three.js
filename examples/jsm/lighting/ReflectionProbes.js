@@ -176,6 +176,17 @@ class ReflectionProbes extends Object3D {
 
 	}
 
+	copy( source, recursive ) {
+
+		super.copy( source, recursive );
+
+		// the baked texture isn't shared, so bake the copy before use
+		this.boxProjection = source.boxProjection;
+
+		return this;
+
+	}
+
 	/**
 	 * Captures every probe and `scene.environment` into the cube array. Hide
 	 * helpers and objects that should not appear in reflections first.
