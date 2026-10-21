@@ -71,13 +71,13 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		super( light );
 
-		// Bakes change the grids between the renders of a frame, e.g. the intensity of a bounce grid.
+		// Bounce grid intensity changes between bake passes within a frame.
 
-		this._min = uniform( new Vector3() ).setGroup( renderGroup );
-		this._max = uniform( new Vector3() ).setGroup( renderGroup );
-		this._resolution = uniform( new Vector3() ).setGroup( renderGroup );
+		this._min = uniform( new Vector3() );
+		this._max = uniform( new Vector3() );
+		this._resolution = uniform( new Vector3() );
 		this._intensity = uniform( 1 ).setGroup( renderGroup );
-		this._falloff = uniform( 0 ).setGroup( renderGroup );
+		this._falloff = uniform( 0 );
 
 		this.updateType = NodeUpdateType.RENDER;
 
