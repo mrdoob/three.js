@@ -88,6 +88,39 @@ See the full documentation for LLMs at: https://threejs.org/docs/llms.txt
 For complete inline documentation including TSL: https://threejs.org/docs/llms-full.txt
 `;
 
+// Shared by llms.txt and llms-full.txt
+const cosGuideline = `### 5. Projects with a Build Tool: Use Cross-Origin Storage
+
+For a new project with npm and a build tool, start from the Vite starter:
+
+\`\`\`bash
+npx tiged mrdoob/three-starter three-starter
+cd three-starter
+npm install
+npm run dev
+\`\`\`
+
+Its production builds load three.js through Cross-Origin Storage (COS) where the browser supports it, so visitors who already have the same three.js version from another site skip the download. Browsers without COS fetch the files as usual. When adding a plain-JavaScript dependency to the starter, add its name to \`COS_PACKAGES\` in \`vite.config.js\`.
+
+To add COS to an existing Vite project:
+
+\`\`\`bash
+npm install --save-dev vite-plugin-cross-origin-storage
+\`\`\`
+
+\`\`\`js
+// vite.config.js
+import { defineConfig } from 'vite';
+import { cosPlugin } from 'vite-plugin-cross-origin-storage';
+
+export default defineConfig( {
+	plugins: [
+		// Covers \`three\` and its subpaths: \`three/addons/*\`, \`three/webgpu\`, and \`three/tsl\`.
+		cosPlugin( { packages: [ /^three(\\/|$)/ ] } )
+	]
+} );
+\`\`\``;
+
 // Docs llms.txt - main documentation index with instructions
 const docsLlms = `# Three.js
 
@@ -171,9 +204,12 @@ When using TSL, use node-based materials:
 - LineBasicNodeMaterial
 - SpriteNodeMaterial
 
+${cosGuideline}
+
 ## Getting Started
 
 - [Installation](https://threejs.org/manual/#installation)
+- [Starter Project](https://github.com/mrdoob/three-starter): Vite project with Cross-Origin Storage
 - [Creating a Scene](https://threejs.org/manual/#creating-a-scene)
 - [Fundamentals](https://threejs.org/manual/#fundamentals)
 - [Responsive Design](https://threejs.org/manual/#responsive)
@@ -332,6 +368,8 @@ When using TSL, use node-based materials:
 - MeshPhysicalNodeMaterial
 - LineBasicNodeMaterial
 - SpriteNodeMaterial
+
+${cosGuideline}
 
 ---
 

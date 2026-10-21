@@ -82,6 +82,19 @@ import * as THREE from 'three';
             Installing from the [link:https://www.npmjs.com/ npm package registry] and using a [link:https://eloquentjavascript.net/10_modules.html#h_zWTXAU93DC build tool] is the recommended approach for most users — the more dependencies your project needs, the more likely you are to run into problems that the static hosting cannot easily resolve. With a build tool, importing local JavaScript files and npm packages should work out of the box, without import maps.
           </p>
 
+          <p>
+            The quickest way to start is the [link:https://github.com/mrdoob/three-starter three.js starter], a ready-made [link:https://vite.dev/ Vite] project. With [link:https://nodejs.org/ Node.js] installed, run:
+          </p>
+<pre class="prettyprint notranslate" translate="no">
+npx tiged mrdoob/three-starter three-starter
+cd three-starter
+npm install
+npm run dev
+</pre>
+          <p>
+            Production builds of the starter load three.js through [link:https://github.com/WICG/cross-origin-storage Cross-Origin Storage] where the browser supports it, so visitors who already have the same three.js version from another site skip the download. To set up a project by hand, follow the steps below.
+          </p>
+
 
           <ol>
             <li>
