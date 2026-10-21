@@ -38,6 +38,9 @@ import { replaceSunLights, restoreSunLights } from './LightProbeGridUtils.js';
 // Probes captured per render, six sub-cameras each.
 const PROBES_PER_BATCH = 8;
 
+// Row blocks per face, so each probe's projection spreads over more fragments.
+const FACE_BLOCKS = 4;
+
 // Per-face forward, right and up vectors of the capture cameras.
 const FACE_FORWARD = [[ 1, 0, 0 ], [ - 1, 0, 0 ], [ 0, 1, 0 ], [ 0, - 1, 0 ], [ 0, 0, 1 ], [ 0, 0, - 1 ]];
 const FACE_RIGHT = [[ 0, 0, 1 ], [ 0, 0, - 1 ], [ - 1, 0, 0 ], [ - 1, 0, 0 ], [ - 1, 0, 0 ], [ 1, 0, 0 ]];
@@ -73,9 +76,9 @@ let _captureCamera = null;
 
 /**
  * Returns the output node for the spherical-harmonic projection pass. Each
- * fragment of a batch row integrates one SH coefficient over one captured cube
- * face, weighting every texel by its exact solid angle. Columns are ordered
- * `coefficient * 6 + face`; the repack pass sums the six faces.
+ * fragment of a batch row integrates one SH coefficient over one row block of a
+ * captured cube face, weighting every texel by its exact solid angle. Columns are ordered
+ * `( coefficient * 6 + face ) * FACE_BLOCKS + block`; the repack pass sums them.
  *
  * @private
  * @param {Node} faces - The face atlas texture node.
@@ -88,27 +91,30 @@ function projectSHNode( faces, size, batchStart ) {
 	return Fn( () => {
 
 		const column = int( screenCoordinate.x );
-		const coefIndex = column.div( 6 ).toVar();
-		const face = column.mod( 6 ).toVar();
+		const block = column.mod( FACE_BLOCKS );
+		const coefIndex = column.div( 6 * FACE_BLOCKS ).toVar();
+		const face = column.div( FACE_BLOCKS ).mod( 6 ).toVar();
 		const slot = int( screenCoordinate.y ).sub( batchStart );
+		const rows = size / FACE_BLOCKS;
+		const rowStart = block.mul( rows ).toVar();
 
 		const forward = array( FACE_FORWARD.map( ( v ) => vec3( ...v ) ) ).element( face ).toVar();
 		const right = array( FACE_RIGHT.map( ( v ) => vec3( ...v ) ) ).element( face ).toVar();
 		const up = array( FACE_UP.map( ( v ) => vec3( ...v ) ) ).element( face ).toVar();
 
-		const origin = ivec2( face.mul( size ), slot.mul( size ) ).toVar();
+		const origin = ivec2( face.mul( size ), slot.mul( size ).add( rowStart ) ).toVar();
 		const texelSize = 2.0 / size;
 		const accum = vec3( 0.0 ).toVar();
 
 		// Signed area of the projected face region from its center to ( x, y ).
 		const area = ( x, y ) => atan( x.mul( y ).div( x.mul( x ).add( y.mul( y ) ).add( 1.0 ).sqrt() ) );
 
-		Loop( size, size, ( { i, j } ) => {
+		Loop( size, rows, ( { i, j } ) => {
 
 			// Rows run top to bottom, so NDC y decreases with j.
 			const x0 = float( i ).mul( texelSize ).sub( 1.0 );
 			const x1 = x0.add( texelSize );
-			const y0 = float( 1.0 ).sub( float( j ).mul( texelSize ) );
+			const y0 = float( 1.0 ).sub( float( j.add( rowStart ) ).mul( texelSize ) );
 			const y1 = y0.sub( texelSize );
 
 			const solidAngle = area( x0, y0 ).sub( area( x0, y1 ) ).sub( area( x1, y0 ) ).add( area( x1, y1 ) ).abs();
@@ -168,11 +174,11 @@ function repackNode( batch, textureIndex, resolution, sliceZ ) {
 		const nz = int( resolution.z );
 		const probeIndex = ix.add( sliceZ.mul( nx ) ).add( iy.mul( nx ).mul( nz ) ).toVar();
 
-		// Sum the six face projections of each coefficient.
+		// Sum the face block projections of each coefficient.
 		const [ c0, c1, c2, c3, c4, c5, c6, c7, c8 ] = [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ].map( ( c ) => {
 
-			let sum = batch.load( ivec2( c * 6, probeIndex ) );
-			for ( let f = 1; f < 6; f ++ ) sum = sum.add( batch.load( ivec2( c * 6 + f, probeIndex ) ) );
+			let sum = batch.load( ivec2( c * 6 * FACE_BLOCKS, probeIndex ) );
+			for ( let k = 1; k < 6 * FACE_BLOCKS; k ++ ) sum = sum.add( batch.load( ivec2( c * 6 * FACE_BLOCKS + k, probeIndex ) ) );
 			return sum;
 
 		} );
@@ -274,8 +280,8 @@ function ensureBakeTargets( cubemapSize, totalProbes ) {
 
 		if ( _batchTarget !== null ) _batchTarget.dispose();
 
-		// One row per probe: 9 coefficients x 6 faces.
-		_batchTarget = new RenderTarget( 9 * 6, totalProbes, {
+		// One row per probe: 9 coefficients x 6 faces x face blocks.
+		_batchTarget = new RenderTarget( 9 * 6 * FACE_BLOCKS, totalProbes, {
 			type: FloatType,
 			format: RGBAFormat,
 			minFilter: NearestFilter,
@@ -518,7 +524,7 @@ class LightProbeGrid extends Light {
 	 * @param {WebGPURenderer} renderer - The renderer.
 	 * @param {Scene} scene - The scene to render.
 	 * @param {Object} [options] - Bake options.
-	 * @param {number} [options.cubemapSize=8] - Resolution of each cubemap face.
+	 * @param {number} [options.cubemapSize=8] - Resolution of each cubemap face. Must be a multiple of 4.
 	 * @param {number} [options.near=0.1] - Near plane for the cube camera.
 	 * @param {number} [options.far=100] - Far plane for the cube camera.
 	 * @param {number} [options.bounces=0] - Additional bounce passes. Only available when baking the whole grid.
@@ -779,7 +785,7 @@ class LightProbeGrid extends Light {
 
 			renderer.autoClear = false;
 			_batchStartUniform.value = batchStart;
-			_batchTarget.viewport.set( 0, batchStart, 9 * 6, batchCount );
+			_batchTarget.viewport.set( 0, batchStart, 9 * 6 * FACE_BLOCKS, batchCount );
 			renderer.setRenderTarget( _batchTarget );
 			_quad.material = _shMaterial;
 			_quad.render( renderer );
