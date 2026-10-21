@@ -45,6 +45,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 		_distanceMaterial = new MeshDistanceMaterial(),
 
 		_materialCache = {},
+		_variantCache = {},
 
 		_maxTextureSize = capabilities.maxTextureSize;
 
@@ -428,6 +429,44 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 	}
 
+	// A depth material is shared by every caster, but the renderer needs a different program for instanced,
+	// batched, skinned and morphed objects. Sharing one material made it switch programs (and rebuild the
+	// program cache key) whenever the next caster was a different kind, so keep one material per kind.
+
+	function getVariantMaterial( base, object ) {
+
+		const morphs = object.geometry.morphAttributes;
+		const morphAttribute = morphs.position || morphs.normal || morphs.color;
+
+		const key = ( object.isInstancedMesh ? 1 : 0 ) | ( object.isBatchedMesh ? 2 : 0 ) | ( object.isSkinnedMesh ? 4 : 0 ) |
+			( object.instanceColor ? 8 : 0 ) | ( object._colorsTexture ? 16 : 0 ) | ( object.morphTexture ? 32 : 0 ) |
+			( morphs.position ? 64 : 0 ) | ( morphs.normal ? 128 : 0 ) | ( morphs.color ? 256 : 0 ) |
+			( ( morphAttribute !== undefined ? morphAttribute.length : 0 ) << 9 );
+
+		if ( key === 0 ) return base;
+
+		let variants = _variantCache[ base.uuid ];
+
+		if ( variants === undefined ) {
+
+			variants = {};
+			_variantCache[ base.uuid ] = variants;
+
+		}
+
+		let variant = variants[ key ];
+
+		if ( variant === undefined ) {
+
+			variant = base.clone();
+			variants[ key ] = variant;
+
+		}
+
+		return variant;
+
+	}
+
 	function getDepthMaterial( object, material, light, type ) {
 
 		let result = null;
@@ -477,6 +516,8 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 			}
 
 		}
+
+		if ( customMaterial === undefined ) result = getVariantMaterial( result, object );
 
 		result.visible = material.visible;
 		result.wireframe = material.wireframe;
@@ -600,6 +641,16 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 				const shadowMaterial = cache[ uuid ];
 				shadowMaterial.dispose();
 				delete cache[ uuid ];
+
+				const variants = _variantCache[ shadowMaterial.uuid ];
+
+				if ( variants !== undefined ) {
+
+					for ( const key in variants ) variants[ key ].dispose();
+
+					delete _variantCache[ shadowMaterial.uuid ];
+
+				}
 
 			}
 
