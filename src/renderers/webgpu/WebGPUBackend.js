@@ -1085,6 +1085,20 @@ class WebGPUBackend extends Backend {
 		const encoder = device.createCommandEncoder( _commandEncoderDescriptor );
 		_commandEncoderDescriptor.reset();
 
+		// Array cameras draw each object once per sub-camera, so cull per sub-camera.
+
+		const camera = renderContext.camera;
+
+		if ( camera !== null && camera.isArrayCamera === true && camera.cameras.length > 0 ) {
+
+			this._updateArrayCameraFrustums( renderContextData, camera.cameras );
+
+		} else {
+
+			renderContextData.cameraFrustums = undefined;
+
+		}
+
 		// Layered render targets: prepare bundle encoders for each camera in the array camera.
 
 		if ( this._isRenderCameraDepthArray( renderContext ) === true ) {
@@ -1118,20 +1132,6 @@ class WebGPUBackend extends Backend {
 			renderContextData.bundleEncoders = undefined;
 			renderContextData.bundleSets = undefined;
 			renderContextData.arrayCameraRenderStages = undefined;
-
-			// Array cameras draw each object once per sub-camera, so cull per sub-camera.
-
-			const camera = renderContext.camera;
-
-			if ( camera !== null && camera.isArrayCamera === true && camera.cameras.length > 0 ) {
-
-				this._updateArrayCameraFrustums( renderContextData, camera.cameras );
-
-			} else {
-
-				renderContextData.cameraFrustums = undefined;
-
-			}
 
 			const currentPass = encoder.beginRenderPass( descriptor );
 			renderContextData.currentPass = currentPass;
