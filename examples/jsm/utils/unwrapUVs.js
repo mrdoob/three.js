@@ -5,7 +5,7 @@ import { potpack } from '../libs/potpack.module.js';
 /**
  * Generates a unique UV atlas for the meshes in a hierarchy, measured in world space.
  * Each mesh receives a new geometry. Skinned and morphed meshes are unwrapped in
- * their base pose. InstancedMesh and BatchedMesh are skipped with a warning.
+ * their current pose. InstancedMesh and BatchedMesh are skipped with a warning.
  * Degenerate faces keep UV (0, 0) and a faceCharts entry of -1.
  *
  * @three_import import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
@@ -125,22 +125,24 @@ function unwrapUVs( root, options = {} ) {
 
 function readMesh( mesh, settings ) {
 
-	mesh.updateMatrixWorld( true );
+	mesh.updateMatrixWorld( true ); // Also refresh SkinnedMesh.bindMatrixInverse.
+	if ( mesh.isSkinnedMesh ) {
 
-	// Unwrap the base pose; skinning and morph targets are ignored.
+		for ( const bone of mesh.skeleton.bones ) bone.updateWorldMatrix( true, false );
+
+	}
+
 	const geometry = mesh.geometry, position = geometry.getAttribute( 'position' );
 	const index = geometry.index;
 	const count = index ? index.count : position.count;
 	const points = [], welds = [], unique = new Map();
 	for ( let i = 0; i < position.count; i ++ ) {
 
-		const p = new Vector3().fromBufferAttribute( position, i );
 		// Exact positional welding only, for topology; output attributes keep original identity.
-		const key = `${ p.x },${ p.y },${ p.z }`;
+		const key = `${ position.getX( i ) },${ position.getY( i ) },${ position.getZ( i ) }`;
 		if ( ! unique.has( key ) ) unique.set( key, unique.size );
 		welds.push( unique.get( key ) );
-		p.applyMatrix4( mesh.matrixWorld );
-		points.push( p );
+		points.push( mesh.getVertexPosition( i, new Vector3() ).applyMatrix4( mesh.matrixWorld ) );
 
 	}
 
