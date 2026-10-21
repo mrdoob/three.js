@@ -217,7 +217,8 @@
 			function updateMaterials() {
 
 				if ( result ) densityTarget.value = params.referenceDensity > 0 ? params.referenceDensity : result.texelsPerUnit;
-				for ( const item of originals ) item.mesh.material = params.view === 'checker' ? previewMaterial : params.view === 'density' ? densityMaterial : params.view === 'islands' ? islandMaterial : item.material;
+				// Without a result the meshes have no uv1, so only the original materials apply.
+				for ( const item of originals ) item.mesh.material = ! result ? item.material : params.view === 'checker' ? previewMaterial : params.view === 'density' ? densityMaterial : params.view === 'islands' ? islandMaterial : item.material;
 
 			}
 
