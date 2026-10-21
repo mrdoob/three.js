@@ -57,6 +57,10 @@ class ReflectionProbesNode extends Node {
 
 		const probes = this.probes;
 
+		// a re-bake disposes the previous texture, so switch even before a recompile
+		this._array.value = probes.texture;
+		this._maxLod.value = probes.texture.mipmaps.length - 1;
+
 		if ( probes.bakedProbes.length !== this._slots.length ) {
 
 			// the probe count is compiled into the shader
@@ -65,8 +69,6 @@ class ReflectionProbesNode extends Node {
 
 		}
 
-		this._array.value = probes.texture;
-		this._maxLod.value = probes.texture.mipmaps.length - 1;
 		// captures see only the environment, so baking doesn't feed back into itself
 		this._local.value = probes.capturing ? 0 : 1;
 
