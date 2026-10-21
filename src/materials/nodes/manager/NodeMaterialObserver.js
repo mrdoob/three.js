@@ -1069,12 +1069,13 @@ class NodeMaterialObserver {
 
 		}
 
-		// attributes must be uploaded again if they have been disposed. they are only verified after a disposal.
-		// this check must happen before the static early out since the buffers of shared attributes can be destroyed by other geometries
+		const attributes = renderObject._geometries.attributes;
 
-		if ( this.hasDisposedAttributes( renderObject, renderObjectData ) ) {
+		// re-upload disposed attributes. checked before the static early out since other geometries can destroy shared buffers
 
-			refreshType = RenderObjectRefreshType.FULL;
+		if ( renderObjectData.attributesDisposeVersion !== attributes.disposeVersion ) {
+
+			if ( this.hasDisposedAttributes( renderObject, renderObjectData ) ) refreshType = RenderObjectRefreshType.FULL;
 
 		}
 
