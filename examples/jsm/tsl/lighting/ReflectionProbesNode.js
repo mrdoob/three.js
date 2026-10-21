@@ -1,4 +1,4 @@
-import { Node, Vector3 } from 'three/webgpu';
+import { Node, NodeUtils, Vector3 } from 'three/webgpu';
 import { cubeTexture, float, Fn, getParallaxCorrectNormal, If, int, materialEnvRotation, nodeObject, positionWorld, reflectVector, uniform, vec3 } from 'three/tsl';
 
 const _scale = /*@__PURE__*/ new Vector3();
@@ -48,7 +48,8 @@ class ReflectionProbesNode extends Node {
 
 	customCacheKey() {
 
-		return this.probes.bakedProbes.length;
+		// keep the id so separate probe sets don't share compiled uniforms
+		return NodeUtils.hash( super.customCacheKey(), this.probes.bakedProbes.length );
 
 	}
 
