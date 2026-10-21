@@ -724,13 +724,25 @@ ${ flowData.code }
 
 		if ( depthSnippet ) uvSnippet = `vec3( ${ uvSnippet }, ${ depthSnippet } )`;
 
+		let snippet;
+
 		if ( offsetSnippet ) {
 
-			return `textureLodOffset( ${ textureProperty }, ${ uvSnippet }, ${ levelSnippet }, ${ offsetSnippet } )`;
+			snippet = `textureLodOffset( ${ textureProperty }, ${ uvSnippet }, ${ levelSnippet }, ${ offsetSnippet } )`;
+
+		} else {
+
+			snippet = `textureLod( ${ textureProperty }, ${ uvSnippet }, ${ levelSnippet } )`;
 
 		}
 
-		return `textureLod( ${ textureProperty }, ${ uvSnippet }, ${ levelSnippet } )`;
+		if ( texture.isDepthTexture ) {
+
+			snippet += '.x';
+
+		}
+
+		return snippet;
 
 	}
 
@@ -749,13 +761,25 @@ ${ flowData.code }
 
 		if ( depthSnippet ) uvSnippet = `vec3( ${ uvSnippet }, ${ depthSnippet } )`;
 
+		let snippet;
+
 		if ( offsetSnippet ) {
 
-			return `textureOffset( ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet }, ${ biasSnippet } )`;
+			snippet = `textureOffset( ${ textureProperty }, ${ uvSnippet }, ${ offsetSnippet }, ${ biasSnippet } )`;
+
+		} else {
+
+			snippet = `texture( ${ textureProperty }, ${ uvSnippet }, ${ biasSnippet } )`;
 
 		}
 
-		return `texture( ${ textureProperty }, ${ uvSnippet }, ${ biasSnippet } )`;
+		if ( texture.isDepthTexture ) {
+
+			snippet += '.x';
+
+		}
+
+		return snippet;
 
 	}
 
@@ -774,13 +798,25 @@ ${ flowData.code }
 
 		if ( depthSnippet ) uvSnippet = `vec3( ${ uvSnippet }, ${ depthSnippet } )`;
 
+		let snippet;
+
 		if ( offsetSnippet ) {
 
-			return `textureGradOffset( ${ textureProperty }, ${ uvSnippet }, ${ gradSnippet[ 0 ] }, ${ gradSnippet[ 1 ] }, ${ offsetSnippet } )`;
+			snippet = `textureGradOffset( ${ textureProperty }, ${ uvSnippet }, ${ gradSnippet[ 0 ] }, ${ gradSnippet[ 1 ] }, ${ offsetSnippet } )`;
+
+		} else {
+
+			snippet = `textureGrad( ${ textureProperty }, ${ uvSnippet }, ${ gradSnippet[ 0 ] }, ${ gradSnippet[ 1 ] } )`;
 
 		}
 
-		return `textureGrad( ${ textureProperty }, ${ uvSnippet }, ${ gradSnippet[ 0 ] }, ${ gradSnippet[ 1 ] } )`;
+		if ( texture.isDepthTexture ) {
+
+			snippet += '.x';
+
+		}
+
+		return snippet;
 
 	}
 
