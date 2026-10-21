@@ -15,8 +15,6 @@ import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 
 import { WebGPUCoordinateSystem, TimestampQuery, REVISION, HalfFloatType, Compatibility, CustomBlending } from '../../constants.js';
 import { Color } from '../../math/Color.js';
-import { Frustum } from '../../math/Frustum.js';
-import { Matrix4 } from '../../math/Matrix4.js';
 import WebGPUTimestampQueryPool from './utils/WebGPUTimestampQueryPool.js';
 import { error, warnOnce } from '../../utils.js';
 
@@ -47,7 +45,6 @@ const _texelCopyTextureInfoDst = new GPUTexelCopyTextureInfo();
 const _textureDescriptor = new GPUTextureDescriptor();
 const _viewDescriptor = new GPUTextureViewDescriptor();
 const _extent3D = new GPUExtent3D();
-const _projScreenMatrix = new Matrix4();
 
 /**
  * A backend implementation targeting WebGPU.
@@ -1085,20 +1082,6 @@ class WebGPUBackend extends Backend {
 		const encoder = device.createCommandEncoder( _commandEncoderDescriptor );
 		_commandEncoderDescriptor.reset();
 
-		// Array cameras draw each object once per sub-camera, so cull per sub-camera.
-
-		const camera = renderContext.camera;
-
-		if ( camera !== null && camera.isArrayCamera === true && camera.cameras.length > 0 ) {
-
-			this._updateArrayCameraFrustums( renderContextData, camera.cameras );
-
-		} else {
-
-			renderContextData.cameraFrustums = undefined;
-
-		}
-
 		// Layered render targets: prepare bundle encoders for each camera in the array camera.
 
 		if ( this._isRenderCameraDepthArray( renderContext ) === true ) {
@@ -1178,32 +1161,6 @@ class WebGPUBackend extends Backend {
 		renderContextData.currentBlendColor.setRGB( 0, 0, 0 );
 		renderContextData.currentBlendAlpha = 0;
 		renderContextData.currentStencilRef = 0;
-
-	}
-
-	/**
-	 * Updates the per-sub-camera frustums used to cull draws of an array camera.
-	 *
-	 * @private
-	 * @param {Object} renderContextData - The render context data.
-	 * @param {Array<Camera>} cameras - The sub-cameras of the array camera.
-	 */
-	_updateArrayCameraFrustums( renderContextData, cameras ) {
-
-		const frustums = renderContextData.cameraFrustums || ( renderContextData.cameraFrustums = [] );
-
-		for ( let i = 0; i < cameras.length; i ++ ) {
-
-			const camera = cameras[ i ];
-
-			if ( frustums[ i ] === undefined ) frustums[ i ] = new Frustum();
-
-			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-			frustums[ i ].setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
-
-		}
-
-		frustums.length = cameras.length;
 
 	}
 
@@ -2327,17 +2284,17 @@ class WebGPUBackend extends Backend {
 			const pixelRatio = ( renderTarget === null || renderTarget.isPostProcessingRenderTarget === true ) ? this.renderer.getPixelRatio() : 1;
 			const indexPos = cameraIndex ? bindings.indexOf( cameraIndex ) : - 1;
 
-			// Cull against each sub-camera, matching the renderer's object culling. Render
-			// bundles can be replayed with other cameras, so their draws are never culled.
+			// Reuse the renderer's per-sub-camera frustums. Persistent render bundles
+			// can be replayed with other cameras, so do not cull while recording them.
 
-			const frustums = renderContextData.cameraFrustums;
-			const cull = frustums !== undefined && object.frustumCulled === true && ( object.isMesh === true || object.isLine === true || object.isPoints === true ) && ( renderContextData.currentPass instanceof GPURenderBundleEncoder ) === false;
+			const frustums = context.frustumArray;
+			const cull = frustums !== null && object.frustumCulled === true && ( object.isMesh === true || object.isLine === true || object.isPoints === true ) && ( renderContextData.currentPass instanceof GPURenderBundleEncoder ) === false;
 
 			for ( let i = 0, len = cameras.length; i < len; i ++ ) {
 
 				const subCamera = cameras[ i ];
 
-				if ( object.layers.test( subCamera.layers ) && ( cull === false || object.intersectsFrustum( frustums[ i ] ) ) ) {
+				if ( object.layers.test( subCamera.layers ) && ( cull === false || object.intersectsFrustum( frustums.getFrustum( i ) ) ) ) {
 
 					const vp = subCamera.viewport;
 

@@ -76,6 +76,18 @@ class FrustumArray {
 	}
 
 	/**
+	 * Returns the cached frustum for the sub-camera at the given index.
+	 *
+	 * @param {number} index - The sub-camera index.
+	 * @return {Frustum|undefined} The frustum, or undefined if the index is not active.
+	 */
+	getFrustum( index ) {
+
+		return index < this._count ? this._frustums[ index ] : undefined;
+
+	}
+
+	/**
 	 * Returns `true` if the 3D object's bounding sphere is intersecting any cached frustum.
 	 *
 	 * {@link FrustumArray#setFromArrayCamera} must be called once per render before this method.
