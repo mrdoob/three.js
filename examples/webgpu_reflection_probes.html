@@ -275,7 +275,8 @@
 				const probeSetup = [
 					{ position: [ - 4, 2.5, 0 ], influenceSize: [ 8.4, 5.4, 8.4 ], projectionSize: [ 8, 5, 8 ] },
 					{ position: [ 4, 2.5, 0 ], influenceSize: [ 8.4, 5.4, 8.4 ], projectionSize: [ 8, 5, 8 ] },
-					{ position: [ 0, 1.9, 0 ], influenceSize: [ 2.4, 3.8, 2.5 ], projectionSize: [ 16, 3.8, 8 ] }
+					// captured at doorway height, projected onto both rooms
+					{ position: [ 0, 1.9, 0 ], influenceSize: [ 2.4, 3.8, 2.5 ], projectionSize: [ 16, 5, 8 ], projectionOffset: [ 0, 0.6, 0 ] }
 				];
 
 				for ( const setup of probeSetup ) {
@@ -283,6 +284,7 @@
 					const probe = new ReflectionProbe( ...setup.influenceSize );
 					probe.position.set( ...setup.position );
 					probe.projectionSize = new THREE.Vector3( ...setup.projectionSize );
+					if ( setup.projectionOffset ) probe.projectionOffset.set( ...setup.projectionOffset );
 					probes.add( probe );
 
 				}

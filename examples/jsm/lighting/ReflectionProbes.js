@@ -66,6 +66,14 @@ class ReflectionProbe extends Object3D {
 		this.projectionSize = null;
 
 		/**
+		 * Offset of the projection box's center from the probe, in the probe's
+		 * local space. Use it when the capture point isn't at the room's center.
+		 *
+		 * @type {Vector3}
+		 */
+		this.projectionOffset = new Vector3();
+
+		/**
 		 * Distance over which the influence fades in from the volume's faces.
 		 *
 		 * @type {number}
@@ -81,6 +89,7 @@ class ReflectionProbe extends Object3D {
 
 		this.influenceSize.copy( source.influenceSize );
 		this.projectionSize = source.projectionSize === null ? null : source.projectionSize.clone();
+		this.projectionOffset.copy( source.projectionOffset );
 		this.blendDistance = source.blendDistance;
 
 		return this;

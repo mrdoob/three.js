@@ -82,6 +82,7 @@ class ReflectionProbesNode extends Node {
 			slot.fade.value = probe.blendDistance;
 			slot.project.value = probes.boxProjection ? 1 : 0;
 			slot.projectionSize.value.copy( probe.projectionSize ?? probe.influenceSize ).multiply( _scale );
+			slot.projectionOffset.value.copy( probe.projectionOffset ).multiply( _scale );
 
 		}
 
@@ -95,6 +96,7 @@ class ReflectionProbesNode extends Node {
 			extent: uniform( new Vector3() ),
 			fade: uniform( 0.5 ),
 			projectionSize: uniform( new Vector3() ),
+			projectionOffset: uniform( new Vector3() ),
 			project: uniform( 0 )
 		} ) );
 
@@ -122,8 +124,9 @@ class ReflectionProbesNode extends Node {
 
 				If( weight.greaterThan( 0 ), () => {
 
-					const insideProjection = local.abs().lessThanEqual( slot.projectionSize.mul( 0.5 ) ).all();
-					const projected = getParallaxCorrectNormal( direction, slot.projectionSize, slot.position );
+					const insideProjection = local.sub( slot.projectionOffset ).abs().lessThanEqual( slot.projectionSize.mul( 0.5 ) ).all();
+					// the box hit point, relative to the capture point rather than the box center
+					const projected = getParallaxCorrectNormal( direction, slot.projectionSize, slot.position.add( slot.projectionOffset ) ).add( slot.projectionOffset );
 					const corrected = slot.project.greaterThan( 0 ).and( insideProjection ).select( projected, direction );
 					radiance.addAssign( this._array.sample( corrected ).depth( int( i ) ).level( lod ).rgb.mul( weight ) );
 

@@ -56,6 +56,7 @@ export default QUnit.module( 'Addons', () => {
 				probe.scale.setScalar( 2 );
 				probe.blendDistance = 0.75;
 				probe.projectionSize = new Vector3( 10, 6, 10 );
+				probe.projectionOffset.set( 0, 0.5, 0 );
 				node.updateBefore();
 
 				assert.strictEqual( firstSlot.project.value, 0, 'disables projection in both programs' );
@@ -63,6 +64,7 @@ export default QUnit.module( 'Addons', () => {
 				assert.deepEqual( firstSlot.extent.value.toArray(), [ 8, 5, 8 ], 'updates the influence extent in both programs' );
 				assert.strictEqual( firstSlot.fade.value, 0.75, 'updates the fade in both programs' );
 				assert.deepEqual( firstSlot.projectionSize.value.toArray(), [ 20, 12, 20 ], 'updates the projection size in both programs' );
+				assert.deepEqual( firstSlot.projectionOffset.value.toArray(), [ 0, 1, 0 ], 'updates the projection offset in both programs' );
 
 				probes.boxProjection = true;
 				node.updateBefore();
