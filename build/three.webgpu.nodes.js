@@ -1682,6 +1682,31 @@ function arrayBufferToBase64( arrayBuffer ) {
 }
 
 /**
+ * Merges the given node build contexts into a new context, the data of the source context takes precedence.
+ * The node overrides of both contexts are merged as well, so the overrides of the target context still
+ * apply unless the source context overrides the same node.
+ *
+ * @private
+ * @method
+ * @param {Object} target - The context to merge into, e.g. the outer context.
+ * @param {Object} source - The context to merge, e.g. the inner context.
+ * @return {Object} The merged context.
+ */
+function mergeContext( target, source ) {
+
+	const context = { ...target, ...source };
+
+	if ( target.overrideNodes !== undefined && source.overrideNodes !== undefined && target.overrideNodes !== source.overrideNodes ) {
+
+		context.overrideNodes = new Map( [ ...target.overrideNodes, ...source.overrideNodes ] );
+
+	}
+
+	return context;
+
+}
+
+/**
  * Converts the given Base64 string to an array buffer.
  *
  * @private
@@ -1717,7 +1742,8 @@ var NodeUtils = /*#__PURE__*/Object.freeze({
 	hash: hash$1,
 	hashArray: hashArray,
 	hashString: hashString,
-	isArrayAsParameter: isArrayAsParameter
+	isArrayAsParameter: isArrayAsParameter,
+	mergeContext: mergeContext
 });
 
 /**
@@ -9523,19 +9549,19 @@ class ContextNode extends Node {
 	 */
 	getFlowContextData() {
 
-		const children = [];
+		let data = {};
 
 		this.traverse( ( node ) => {
 
 			if ( node.isContextNode === true ) {
 
-				children.push( node.value );
+				data = mergeContext( data, node.value );
 
 			}
 
 		} );
 
-		return Object.assign( {}, ...children );
+		return data;
 
 	}
 
@@ -10269,6 +10295,20 @@ class VaryingNode extends Node {
 
 	setup( builder ) {
 
+		// the context can evaluate varyings directly in the fragment stage, e.g. if the surface is reconstructed per fragment.
+		// indices and attributes create their own varyings in the fragment stage, so their varyings are kept unless the
+		// context provides the attribute
+
+		if ( builder.context.inlineVaryings === true && builder.shaderStage === 'fragment' ) {
+
+			let node = this.node;
+
+			while ( node.isSubBuildNode === true ) node = node.node;
+
+			if ( node.isIndexNode !== true && ( node.isAttributeNode !== true || node.getContextAttribute( builder ) ) ) return this.node;
+
+		}
+
 		this.setupVarying( builder );
 
 		builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, this.node );
@@ -10277,6 +10317,10 @@ class VaryingNode extends Node {
 
 	analyze( builder ) {
 
+		// TODO: Node.build() could pass through the output node of setup() directly, so overrides of analyze() and generate() don't need to handle it twice
+
+		if ( builder.getNodeProperties( this ).outputNode ) return super.analyze( builder );
+
 		this.setupVarying( builder );
 
 		builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, this.node );
@@ -10284,6 +10328,10 @@ class VaryingNode extends Node {
 	}
 
 	generate( builder ) {
+
+		const { outputNode } = builder.getNodeProperties( this );
+
+		if ( outputNode ) return outputNode.build( builder, this.getNodeType( builder ) );
 
 		const propertyKey = builder.getSubBuildProperty( 'property', builder.currentStack );
 		const properties = builder.getNodeProperties( this );
@@ -13765,6 +13813,31 @@ class TextureNode extends UniformNode {
 	 */
 	getTransformedUV( uvNode ) {
 
+		return this._getMatrixUniform().mul( vec3( uvNode, 1 ) ).xy;
+
+	}
+
+	/**
+	 * Transforms the given uv gradient with the linear part of the texture matrix.
+	 *
+	 * @private
+	 * @param {Node<vec2>} gradientNode - The uv gradient.
+	 * @return {Node<vec2>} The transformed gradient.
+	 */
+	_getTransformedGradient( gradientNode ) {
+
+		return this._getMatrixUniform().mul( vec3( gradientNode, 0 ) ).xy;
+
+	}
+
+	/**
+	 * Returns the uniform of the texture matrix shared by all nodes of the same base texture node.
+	 *
+	 * @private
+	 * @return {UniformNode<mat3>} The texture matrix uniform.
+	 */
+	_getMatrixUniform() {
+
 		const baseNode = this.getBase();
 
 		if ( baseNode._matrixUniform === null ) {
@@ -13781,7 +13854,7 @@ class TextureNode extends UniformNode {
 
 		}
 
-		return baseNode._matrixUniform.mul( vec3( uvNode, 1 ) ).xy;
+		return baseNode._matrixUniform;
 
 	}
 
@@ -13930,12 +14003,28 @@ class TextureNode extends UniformNode {
 
 		}
 
+		// the context can provide analytic gradients of the default uv, e.g. if the uv is reconstructed per fragment
+
+		let gradNode = this.gradNode;
+
+		if ( gradNode === null && this.uvNode === null && levelNode === null && this.biasNode === null && this.sampler === true && builder.context.getTextureGradient ) {
+
+			const gradient = builder.context.getTextureGradient( this, builder );
+
+			if ( gradient ) {
+
+				gradNode = this.updateMatrix === true ? gradient.map( ( node ) => this._getTransformedGradient( node ) ) : gradient;
+
+			}
+
+		}
+
 		properties.uvNode = uvNode;
 		properties.levelNode = levelNode;
 		properties.biasNode = this.biasNode;
 		properties.compareNode = compareNode;
 		properties.compareStepNode = compareStepNode;
-		properties.gradNode = this.gradNode;
+		properties.gradNode = gradNode;
 		properties.gatherNode = this.gatherNode;
 		properties.depthNode = this.depthNode;
 		properties.offsetNode = this.offsetNode;
@@ -22309,6 +22398,10 @@ class ClippingNode extends Node {
 
 		this.hardwareClipping = builder.hardwareClipping;
 
+		// with ArrayCamera, clipping planes are in world space
+
+		this.position = builder.camera.isArrayCamera === true ? cameraWorldMatrix.mul( vec4( positionView, 1 ) ).xyz : positionView;
+
 		if ( this.scope === ClippingNode.ALPHA_TO_COVERAGE ) {
 
 			return this.setupAlphaToCoverage( intersectionPlanes, unionPlanes );
@@ -22351,7 +22444,7 @@ class ClippingNode extends Node {
 
 					const plane = clippingPlanes.element( i );
 
-					distanceToPlane.assign( positionView.dot( plane.xyz ).negate().add( plane.w ) );
+					distanceToPlane.assign( this.position.dot( plane.xyz ).negate().add( plane.w ) );
 					distanceGradient.assign( distanceToPlane.fwidth().div( 2.0 ) );
 
 					clipOpacity.mulAssign( smoothstep( distanceGradient.negate(), distanceGradient, distanceToPlane ) );
@@ -22371,7 +22464,7 @@ class ClippingNode extends Node {
 
 					const plane = clippingPlanes.element( i );
 
-					distanceToPlane.assign( positionView.dot( plane.xyz ).negate().add( plane.w ) );
+					distanceToPlane.assign( this.position.dot( plane.xyz ).negate().add( plane.w ) );
 					distanceGradient.assign( distanceToPlane.fwidth().div( 2.0 ) );
 
 					intersectionClipOpacity.mulAssign( smoothstep( distanceGradient.negate(), distanceGradient, distanceToPlane ).oneMinus() );
@@ -22410,7 +22503,7 @@ class ClippingNode extends Node {
 				Loop( numUnionPlanes, ( { i } ) => {
 
 					const plane = clippingPlanes.element( i );
-					positionView.dot( plane.xyz ).greaterThan( plane.w ).discard();
+					this.position.dot( plane.xyz ).greaterThan( plane.w ).discard();
 
 				} );
 
@@ -22426,7 +22519,7 @@ class ClippingNode extends Node {
 				Loop( numIntersectionPlanes, ( { i } ) => {
 
 					const plane = clippingPlanes.element( i );
-					clipped.assign( positionView.dot( plane.xyz ).greaterThan( plane.w ).and( clipped ) );
+					clipped.assign( this.position.dot( plane.xyz ).greaterThan( plane.w ).and( clipped ) );
 
 				} );
 
@@ -22460,7 +22553,7 @@ class ClippingNode extends Node {
 
 				const plane = clippingPlanes.element( i );
 
-				const distance = positionView.dot( plane.xyz ).sub( plane.w ).negate();
+				const distance = this.position.dot( plane.xyz ).sub( plane.w ).negate();
 				hw_clip_distances.element( i ).assign( distance );
 
 			} );
@@ -31459,6 +31552,7 @@ class ChainMap {
 let _id$a = 0;
 const _protoKeysCache = new WeakMap();
 const _cacheKeyValues$1 = [ 0, 0, 0, 0, 0 ];
+const _enumProperties = [ 'side', 'blending', 'combine', 'normalMapType' ];
 
 function getKeys( obj ) {
 
@@ -32268,10 +32362,9 @@ class RenderObject {
 
 				if ( type === 'number' ) {
 
-					if ( property === 'side' ) {
+					if ( _enumProperties.includes( property ) ) {
 
-						// `side` is an enum (FrontSide/BackSide/DoubleSide) that changes code
-						// generation, so its exact value must be preserved.
+						// retain enums since their exact value matters
 
 						valueKey = String( value );
 
@@ -34710,6 +34803,8 @@ class Pipelines extends DataMap {
 
 }
 
+const _cacheKeyIds = [];
+
 /**
  * This renderer module manages the bindings of the renderer.
  *
@@ -35159,7 +35254,7 @@ class Bindings extends DataMap {
 
 		let needsBindingsUpdate = false;
 		let cacheBindings = true;
-		let cacheKey = '';
+		let cacheKeyLength = 0;
 		let version = 0;
 
 		// iterate over all bindings and check if buffer updates or a new binding group is required
@@ -35199,7 +35294,7 @@ class Bindings extends DataMap {
 
 				// the generation is part of the version so a re-created buffer replaces the cached bind group
 
-				cacheKey += attribute.id + ',';
+				_cacheKeyIds[ cacheKeyLength ++ ] = attribute.id;
 				version += generation;
 
 			}
@@ -35253,7 +35348,7 @@ class Bindings extends DataMap {
 
 				} else {
 
-					cacheKey += texture.id + ',';
+					_cacheKeyIds[ cacheKeyLength ++ ] = texture.id;
 					version += texture.version;
 
 				}
@@ -35306,7 +35401,11 @@ class Bindings extends DataMap {
 
 		if ( needsBindingsUpdate === true ) {
 
-			this.backend.updateBindings( bindGroup, bindings, cacheBindings ? cacheKey : '', version );
+			_cacheKeyIds.length = cacheKeyLength;
+
+			const cacheKey = cacheBindings ? _cacheKeyIds.join( ',' ) : '';
+
+			this.backend.updateBindings( bindGroup, bindings, cacheKey, version );
 
 		}
 
@@ -37167,12 +37266,17 @@ class OverrideContextNode extends ContextNode {
 	 *
 	 * @param {Map<Node, Function>} overrideNodes - A map mapping target nodes to their respective override callback functions.
 	 * @param {Node|null} [flowNode=null] - The node whose context should be modified.
+	 * @param {?string} [shaderStage=null] - The shader stage the overrides apply to, all stages by default.
 	 */
-	constructor( overrideNodes, flowNode = null ) {
+	constructor( overrideNodes, flowNode = null, shaderStage = null ) {
 
-		super( flowNode, {
-			overrideNodes
-		} );
+		const value = { overrideNodes };
+
+		// the surface is replaced per fragment, the varyings are evaluated in the fragment stage as well
+
+		if ( shaderStage === 'fragment' ) value.inlineVaryings = true;
+
+		super( flowNode, value );
 
 		/**
 		 * This flag can be used for type testing.
@@ -37182,35 +37286,6 @@ class OverrideContextNode extends ContextNode {
 		 * @default true
 		 */
 		this.isOverrideContextNode = true;
-
-	}
-
-	/**
-	 * Gathers the context data from all parent context nodes by traversing the hierarchy,
-	 * merging the `overrideNodes` maps from all encountered `OverrideContextNode` instances.
-	 *
-	 * @return {Object} The gathered context data, containing the merged `overrideNodes` map.
-	 */
-	getFlowContextData() {
-
-		const children = [];
-
-		this.traverse( ( node ) => {
-
-			if ( node.isOverrideContextNode === true ) {
-
-				children.push( node.value.overrideNodes );
-
-			}
-
-		} );
-
-		const overrideNodes = new Map( children.flatMap( ( map ) => Array.from( map.entries() ) ) );
-
-		const data = super.getFlowContextData();
-		data.overrideNodes = overrideNodes;
-
-		return data;
 
 	}
 
@@ -37260,25 +37335,50 @@ addMethodChaining( 'overrideNode', ( flowNode, node, callback ) => overrideNode(
  * @function
  * @param {Map<Node, (Function|Node)>|Array<Array<Node|Function|Node>>} overrides - The overrides mapping target nodes to callback functions or overriding nodes.
  * @param {Node|null} [flowNode=null] - The node whose context should be modified.
+ * @param {?string} [shaderStage=null] - The shader stage the overrides apply to, all stages by default. With fragment overrides,
+ * all varyings of the context are evaluated in the fragment stage, e.g. if the surface is reconstructed per fragment.
  * @return {OverrideContextNode} The created override context node.
  */
-function overrideNodes( overrides, flowNode = null ) {
+function overrideNodes( overrides, flowNode = null, shaderStage = null ) {
 
 	const overrideNodesMap = new Map();
 
 	for ( const [ node, value ] of overrides ) {
 
-		const callback = value !== null ? typeof value === 'function' ? value : () => value : null;
+		let callback = null;
+
+		if ( value !== null ) {
+
+			callback = typeof value === 'function' ? value : () => value;
+
+			if ( shaderStage !== null ) callback = getStageCallback( node, callback, shaderStage );
+
+		}
 
 		overrideNodesMap.set( node, callback );
 
 	}
 
-	return new OverrideContextNode( overrideNodesMap, flowNode );
+	return new OverrideContextNode( overrideNodesMap, flowNode, shaderStage );
 
 }
 
-addMethodChaining( 'overrideNodes', ( flowNode, overrides ) => overrideNodes( overrides, flowNode ) );
+addMethodChaining( 'overrideNodes', ( flowNode, overrides, shaderStage ) => overrideNodes( overrides, flowNode, shaderStage ) );
+
+/**
+ * Returns an override callback which only overrides the node in the given shader stage.
+ *
+ * @private
+ * @param {Node} node - The target node.
+ * @param {Function} callback - The override callback.
+ * @param {string} shaderStage - The shader stage.
+ * @return {Function} The override callback of the shader stage.
+ */
+function getStageCallback( node, callback, shaderStage ) {
+
+	return ( builder ) => builder.shaderStage === shaderStage ? callback( builder ) : node;
+
+}
 
 /**
  * Special version of {@link PropertyNode} which is used for parameters.
@@ -44401,11 +44501,16 @@ class PassNode extends Node {
 
 		if ( this.contextNode !== null ) {
 
-			if ( this._contextNodeCache === null || this._contextNodeCache.version !== this.version ) {
+			const rendererContextNode = renderer.contextNode;
+			const cache = this._contextNodeCache;
+
+			if ( cache === null || cache.version !== this.version || cache.rendererContextNode !== rendererContextNode || cache.rendererVersion !== rendererContextNode.version ) {
 
 				this._contextNodeCache = {
 					version: this.version,
-					context: context( { ...renderer.contextNode.getFlowContextData(), ...this.contextNode.getFlowContextData() } )
+					rendererContextNode,
+					rendererVersion: rendererContextNode.version,
+					context: context( mergeContext( rendererContextNode.getFlowContextData(), this.contextNode.getFlowContextData() ) )
 				};
 
 			}
@@ -44924,7 +45029,7 @@ const cineonToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 const RRTAndODTFit = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
 	const a = color.mul( color.add( 0.0245786 ) ).sub( 0.000090537 );
-	const b = color.mul( color.add( 0.4329510 ).mul( 0.983729 ) ).add( 0.238081 );
+	const b = color.mul( color.mul( 0.983729 ).add( 0.4329510 ) ).add( 0.238081 );
 
 	return a.div( b );
 
@@ -54292,7 +54397,7 @@ class NodeBuilder {
 
 		const previousContext = this.getContext();
 
-		this.setContext( { ...this.context, ...context } );
+		this.setContext( mergeContext( this.context, context ) );
 
 		return previousContext;
 
@@ -56714,7 +56819,7 @@ class NodeBuilder {
 
 		if ( renderer.contextNode.isContextNode === true ) {
 
-			this.context = { ...this.context, ...renderer.contextNode.getFlowContextData() };
+			this.addContext( renderer.contextNode.getFlowContextData() );
 
 		} else {
 
@@ -56728,7 +56833,7 @@ class NodeBuilder {
 
 			if ( material.contextNode.isContextNode === true ) {
 
-				this.context = { ...this.context, ...material.contextNode.getFlowContextData() };
+				this.addContext( material.contextNode.getFlowContextData() );
 
 			} else {
 
@@ -59765,7 +59870,18 @@ class ClippingContext {
 
 		this.shadowPass = ( scene.overrideMaterial !== null && scene.overrideMaterial.isShadowPassMaterial );
 
-		this.viewMatrix.copy( camera.matrixWorldInverse );
+		if ( camera.isArrayCamera === true ) {
+
+			// ArrayCamera sub-cameras share the planes, so keep them in world space.
+
+			this.viewMatrix.identity();
+
+		} else {
+
+			this.viewMatrix.copy( camera.matrixWorldInverse );
+
+		}
+
 		this.viewNormalMatrix.getNormalMatrix( this.viewMatrix );
 
 	}
@@ -74528,7 +74644,7 @@ class WebGLTextureUtils {
 		state.pixelStorei( gl.UNPACK_SKIP_IMAGES, minZ );
 
 		// set up the src texture
-		const isSrc3D = srcTexture.isDataArrayTexture || srcTexture.isData3DTexture || dstTexture.isArrayTexture;
+		const isSrc3D = srcTexture.isDataArrayTexture || srcTexture.isData3DTexture || srcTexture.isArrayTexture;
 		const isDst3D = dstTexture.isDataArrayTexture || dstTexture.isData3DTexture || dstTexture.isArrayTexture;
 
 		if ( srcTexture.isDepthTexture ) {
@@ -93287,6 +93403,8 @@ class NodeLoader extends Loader {
 	load( url, onLoad, onProgress, onError ) {
 
 		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
 		loader.setPath( this.path );
 		loader.setRequestHeader( this.requestHeader );
 		loader.setWithCredentials( this.withCredentials );

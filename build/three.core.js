@@ -32032,6 +32032,8 @@ class Curve {
 
 		this.arcLengthDivisions = source.arcLengthDivisions;
 
+		this.cacheArcLengths = null;
+
 		return this;
 
 	}
@@ -32068,6 +32070,8 @@ class Curve {
 	fromJSON( json ) {
 
 		this.arcLengthDivisions = json.arcLengthDivisions;
+
+		this.cacheArcLengths = null;
 
 		return this;
 
@@ -33739,6 +33743,15 @@ class CurvePath extends Curve {
 		 */
 		this.autoClose = false;
 
+		/**
+		 * An internal cache that holds precomputed curve length values.
+		 *
+		 * @private
+		 * @type {?Array<number>}
+		 * @default null
+		 */
+		this.cacheLengths = null;
+
 	}
 
 	/**
@@ -33954,6 +33967,8 @@ class CurvePath extends Curve {
 
 		this.autoClose = source.autoClose;
 
+		this.cacheLengths = null;
+
 		return this;
 
 	}
@@ -33989,6 +34004,8 @@ class CurvePath extends Curve {
 			this.curves.push( new Curves[ curve.type ]().fromJSON( curve ) );
 
 		}
+
+		this.cacheLengths = null;
 
 		return this;
 
@@ -45106,6 +45123,23 @@ class Loader {
 		 */
 		this.requestHeader = {};
 
+		/**
+		 * The request priority hint. Image loaders use `HTMLImageElement.fetchPriority`.
+		 *
+		 * @type {('high'|'low'|'auto')}
+		 * @default 'auto'
+		 */
+		this.priority = 'auto';
+
+		/**
+		 * The HTTP cache mode passed to `fetch()`. This does not affect {@link Cache}
+		 * or loaders using `HTMLImageElement`.
+		 *
+		 * @type {('default'|'no-store'|'reload'|'no-cache'|'force-cache')}
+		 * @default 'default'
+		 */
+		this.cache = 'default';
+
 		if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
 			__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) );
@@ -45220,6 +45254,36 @@ class Loader {
 	setRequestHeader( requestHeader ) {
 
 		this.requestHeader = requestHeader;
+		return this;
+
+	}
+
+	/**
+	 * Sets a browser scheduling hint. Browsers may ignore this hint.
+	 * Internally created loaders inherit it. Loaders supplied by the application
+	 * (for example decoder loaders or loading manager handlers) retain their own settings.
+	 *
+	 * @param {('high'|'low'|'auto')} value - The request priority hint.
+	 * @return {Loader} A reference to this instance.
+	 */
+	setPriority( value ) {
+
+		this.priority = value;
+		return this;
+
+	}
+
+	/**
+	 * Sets the HTTP cache mode for fetch requests. `no-cache` revalidates cached
+	 * responses; `no-store` bypasses the HTTP cache. This does not affect
+	 * {@link Cache} or image element requests.
+	 *
+	 * @param {('default'|'no-store'|'reload'|'no-cache'|'force-cache')} value - The HTTP cache mode.
+	 * @return {Loader} A reference to this instance.
+	 */
+	setCache( value ) {
+
+		this.cache = value;
 		return this;
 
 	}
@@ -45392,6 +45456,8 @@ class FileLoader extends Loader {
 		const req = new Request( url, {
 			headers: new Headers( this.requestHeader ),
 			credentials: this.withCredentials ? 'include' : 'same-origin',
+			priority: this.priority,
+			cache: this.cache,
 			signal: ( typeof AbortSignal.any === 'function' ) ? AbortSignal.any( [ this._abortController.signal, this.manager.abortController.signal ] ) : this._abortController.signal
 		} );
 
@@ -45663,6 +45729,8 @@ class AnimationLoader extends Loader {
 		const scope = this;
 
 		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
 		loader.setPath( this.path );
 		loader.setRequestHeader( this.requestHeader );
 		loader.setWithCredentials( this.withCredentials );
@@ -45760,6 +45828,8 @@ class CompressedTextureLoader extends Loader {
 		const texture = new CompressedTexture();
 
 		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
@@ -46018,6 +46088,7 @@ class ImageLoader extends Loader {
 		Cache.add( `image:${url}`, image );
 		scope.manager.itemStart( url );
 
+		image.fetchPriority = this.priority;
 		image.src = url;
 
 		return image;
@@ -46085,6 +46156,8 @@ class CubeTextureLoader extends Loader {
 		texture.colorSpace = SRGBColorSpace;
 
 		const loader = new ImageLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.setPath( this.path );
 
@@ -46164,6 +46237,8 @@ class DataTextureLoader extends Loader {
 		const texture = new DataTexture();
 
 		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
 		loader.setPath( this.path );
@@ -46345,6 +46420,8 @@ class TextureLoader extends Loader {
 		const texture = new Texture();
 
 		const loader = new ImageLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.setPath( this.path );
 
@@ -48866,6 +48943,8 @@ class MaterialLoader extends Loader {
 		const scope = this;
 
 		const loader = new FileLoader( scope.manager );
+		loader.setPriority( scope.priority );
+		loader.setCache( scope.cache );
 		loader.setPath( scope.path );
 		loader.setRequestHeader( scope.requestHeader );
 		loader.setWithCredentials( scope.withCredentials );
@@ -49159,6 +49238,8 @@ class BufferGeometryLoader extends Loader {
 		const scope = this;
 
 		const loader = new FileLoader( scope.manager );
+		loader.setPriority( scope.priority );
+		loader.setCache( scope.cache );
 		loader.setPath( scope.path );
 		loader.setRequestHeader( scope.requestHeader );
 		loader.setWithCredentials( scope.withCredentials );
@@ -49400,6 +49481,8 @@ class ObjectLoader extends Loader {
 		this.resourcePath = this.resourcePath || path;
 
 		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
 		loader.setPath( this.path );
 		loader.setRequestHeader( this.requestHeader );
 		loader.setWithCredentials( this.withCredentials );
@@ -49454,6 +49537,8 @@ class ObjectLoader extends Loader {
 		this.resourcePath = this.resourcePath || path;
 
 		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
 		loader.setPath( this.path );
 		loader.setRequestHeader( this.requestHeader );
 		loader.setWithCredentials( this.withCredentials );
@@ -49799,6 +49884,8 @@ class ObjectLoader extends Loader {
 			const manager = new LoadingManager( onLoad );
 
 			loader = new ImageLoader( manager );
+			loader.setPriority( this.priority );
+			loader.setCache( this.cache );
 			loader.setCrossOrigin( this.crossOrigin );
 
 			for ( let i = 0, il = json.length; i < il; i ++ ) {
@@ -49896,6 +49983,8 @@ class ObjectLoader extends Loader {
 		if ( json !== undefined && json.length > 0 ) {
 
 			loader = new ImageLoader( this.manager );
+			loader.setPriority( this.priority );
+			loader.setCache( this.cache );
 			loader.setCrossOrigin( this.crossOrigin );
 
 			for ( let i = 0, il = json.length; i < il; i ++ ) {
@@ -50767,6 +50856,8 @@ class ImageBitmapLoader extends Loader {
 		const fetchOptions = {};
 		fetchOptions.credentials = ( this.withCredentials || this.crossOrigin !== 'anonymous' ) ? 'include' : 'same-origin';
 		fetchOptions.headers = this.requestHeader;
+		fetchOptions.priority = this.priority;
+		fetchOptions.cache = this.cache;
 		fetchOptions.signal = ( typeof AbortSignal.any === 'function' ) ? AbortSignal.any( [ this._abortController.signal, this.manager.abortController.signal ] ) : this._abortController.signal;
 
 		const promise = fetch( url, fetchOptions ).then( function ( res ) {
@@ -50904,6 +50995,8 @@ class AudioLoader extends Loader {
 		const scope = this;
 
 		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setPath( this.path );
 		loader.setRequestHeader( this.requestHeader );
