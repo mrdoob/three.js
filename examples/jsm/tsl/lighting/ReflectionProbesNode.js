@@ -42,6 +42,7 @@ class ReflectionProbesNode extends Node {
 		this._array.mergeable = false;
 		this._maxLod = uniform( 0 );
 		this._local = uniform( 1 );
+		this._boxProjection = uniform( 1 );
 		this._slots = [];
 
 	}
@@ -71,6 +72,7 @@ class ReflectionProbesNode extends Node {
 
 		// captures see only the environment, so baking doesn't feed back into itself
 		this._local.value = probes.capturing ? 0 : 1;
+		this._boxProjection.value = probes.boxProjection ? 1 : 0;
 
 		for ( let i = 0; i < this._slots.length; i ++ ) {
 
@@ -82,7 +84,6 @@ class ReflectionProbesNode extends Node {
 
 			slot.extent.value.copy( probe.influenceSize ).multiply( _scale ).multiplyScalar( 0.5 );
 			slot.fade.value = probe.blendDistance;
-			slot.project.value = probes.boxProjection ? 1 : 0;
 			slot.projectionSize.value.copy( probe.projectionSize ?? probe.influenceSize ).multiply( _scale );
 			slot.projectionOffset.value.copy( probe.projectionOffset ).multiply( _scale );
 
@@ -98,8 +99,7 @@ class ReflectionProbesNode extends Node {
 			extent: uniform( new Vector3() ),
 			fade: uniform( 0.5 ),
 			projectionSize: uniform( new Vector3() ),
-			projectionOffset: uniform( new Vector3() ),
-			project: uniform( 0 )
+			projectionOffset: uniform( new Vector3() )
 		} ) );
 
 		this.updateBefore();
@@ -129,7 +129,7 @@ class ReflectionProbesNode extends Node {
 					const insideProjection = local.sub( slot.projectionOffset ).abs().lessThanEqual( slot.projectionSize.mul( 0.5 ) ).all();
 					// the box hit point, relative to the capture point rather than the box center
 					const projected = getParallaxCorrectNormal( direction, slot.projectionSize, slot.position.add( slot.projectionOffset ) ).add( slot.projectionOffset );
-					const corrected = slot.project.greaterThan( 0 ).and( insideProjection ).select( projected, direction );
+					const corrected = this._boxProjection.greaterThan( 0 ).and( insideProjection ).select( projected, direction );
 					radiance.addAssign( this._array.sample( corrected ).depth( int( i ) ).level( lod ).rgb.mul( weight ) );
 
 				} );

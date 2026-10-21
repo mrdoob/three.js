@@ -59,7 +59,7 @@ export default QUnit.module( 'Addons', () => {
 				probe.projectionOffset.set( 0, 0.5, 0 );
 				node.updateBefore();
 
-				assert.strictEqual( firstSlot.project.value, 0, 'disables projection in both programs' );
+				assert.strictEqual( node._boxProjection.value, 0, 'disables projection' );
 				assert.deepEqual( firstSlot.position.value.toArray(), [ 1, 2, 3 ], 'updates the world position in both programs' );
 				assert.deepEqual( firstSlot.extent.value.toArray(), [ 8, 5, 8 ], 'updates the influence extent in both programs' );
 				assert.strictEqual( firstSlot.fade.value, 0.75, 'updates the fade in both programs' );
@@ -68,7 +68,7 @@ export default QUnit.module( 'Addons', () => {
 
 				probes.boxProjection = true;
 				node.updateBefore();
-				assert.strictEqual( firstSlot.project.value, 1, 're-enables projection in both programs' );
+				assert.strictEqual( node._boxProjection.value, 1, 're-enables projection' );
 
 				geometry.dispose();
 				material.dispose();
