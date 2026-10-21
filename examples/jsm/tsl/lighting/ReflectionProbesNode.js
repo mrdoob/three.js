@@ -129,7 +129,7 @@ class ReflectionProbesNode extends Node {
 					// the box hit point, relative to the capture point rather than the box center
 					const projected = getParallaxCorrectNormal( direction, slot.projectionSize, slot.position.add( slot.projectionOffset ) ).add( slot.projectionOffset );
 					const corrected = this._boxProjection.greaterThan( 0 ).and( insideProjection ).select( projected, direction );
-					radiance.addAssign( this._array.sample( corrected ).depth( int( i ) ).level( lod ).rgb.mul( weight ) );
+					radiance.addAssign( this._array.sample( corrected ).depth( int( i + 1 ) ).level( lod ).rgb.mul( weight ) );
 
 				} );
 
@@ -138,7 +138,7 @@ class ReflectionProbesNode extends Node {
 			}
 
 			const environmentWeight = remaining.add( this._local.oneMinus() );
-			radiance.addAssign( this._array.sample( materialEnvRotation.mul( direction ) ).depth( int( this._slots.length ) ).level( lod ).rgb.mul( environmentWeight ) );
+			radiance.addAssign( this._array.sample( materialEnvRotation.mul( direction ) ).depth( int( 0 ) ).level( lod ).rgb.mul( environmentWeight ) );
 
 			return radiance;
 

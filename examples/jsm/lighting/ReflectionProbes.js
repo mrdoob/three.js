@@ -149,7 +149,7 @@ class ReflectionProbes extends Object3D {
 		this.boxProjection = true;
 
 		/**
-		 * The baked cube-array texture: one cube per probe, then the environment.
+		 * The baked cube-array texture: the environment, then one cube per probe.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -237,7 +237,28 @@ class ReflectionProbes extends Object3D {
 		const environment = new Scene();
 		environment.background = scene.environment;
 
+		const previousTexture = this.texture;
+
 		let pmrem = null;
+		let baked = false;
+
+		const capture = ( source, position, index ) => {
+
+			pmrem = generator.fromScene( source, 0, near, far, { size: resolution, position, renderTarget: pmrem } );
+
+			for ( let lod = 0; lod <= maxLod; lod ++ ) {
+
+				const size = resolution >> lod;
+
+				_region.min.set( 0, 0, 0 );
+				_region.max.set( size, size, 6 );
+				_destination.set( 0, 0, index * 6 );
+
+				renderer.copyTextureToTexture( pmrem.texture, renderTarget.texture, _region, _destination, lod, lod );
+
+			}
+
+		};
 
 		this.capturing = true;
 
@@ -245,28 +266,18 @@ class ReflectionProbes extends Object3D {
 
 			// Unfilled cubes stay black, so an empty environment needs no capture.
 
-			const count = scene.environment !== null ? probes.length + 1 : probes.length;
+			if ( scene.environment !== null ) capture( environment, _position.set( 0, 0, 0 ), 0 );
 
-			for ( let i = 0; i < count; i ++ ) {
+			// captures sample only the environment, so let them see the new one
+			this.texture = renderTarget.texture;
 
-				const probe = probes[ i ];
-				const position = probe !== undefined ? probe.getWorldPosition( _position ) : _position.set( 0, 0, 0 );
+			for ( let i = 0; i < probes.length; i ++ ) {
 
-				pmrem = generator.fromScene( probe !== undefined ? scene : environment, 0, near, far, { size: resolution, position, renderTarget: pmrem } );
-
-				for ( let lod = 0; lod <= maxLod; lod ++ ) {
-
-					const size = resolution >> lod;
-
-					_region.min.set( 0, 0, 0 );
-					_region.max.set( size, size, 6 );
-					_destination.set( 0, 0, i * 6 );
-
-					renderer.copyTextureToTexture( pmrem.texture, renderTarget.texture, _region, _destination, lod, lod );
-
-				}
+				capture( scene, probes[ i ].getWorldPosition( _position ), i + 1 );
 
 			}
+
+			baked = true;
 
 		} finally {
 
@@ -275,12 +286,18 @@ class ReflectionProbes extends Object3D {
 			if ( pmrem !== null ) pmrem.dispose();
 			generator.dispose();
 
+			if ( baked === false ) {
+
+				renderTarget.dispose();
+				this.texture = previousTexture;
+
+			}
+
 		}
 
 		if ( this._renderTarget !== null ) this._renderTarget.dispose();
 
 		this._renderTarget = renderTarget;
-		this.texture = renderTarget.texture;
 		this.bakedProbes = probes;
 
 	}
