@@ -73,28 +73,30 @@ function unwrapUVs( root, options = {} ) {
 		const failed = [];
 		for ( let i = charts.length - 1; i >= 0; i -- ) {
 
-			const valid = validateFloat32Chart( charts[ i ], settings, density );
-			if ( valid === true ) continue;
-			const [ chart ] = charts.splice( i, 1 );
-			if ( valid === null ) failed.push( chart );
+			if ( validateFloat32Chart( charts[ i ], settings, density ) === null ) failed.push( ...charts.splice( i, 1 ) );
 
 		}
 
 		if ( failed.length === 0 ) break;
 
 		// Float32 rounding broke these charts at this density; split them and repack.
-		for ( const chart of failed ) {
+		for ( const chart of failed ) splitFaces( chart.record, chart.faces, settings, charts );
 
-			if ( chart.faces.length === 1 ) chart.record.faces[ chart.faces[ 0 ] ].ignored = true;
-			else splitFaces( chart.record, chart.faces, settings, charts );
+	}
 
-		}
+	for ( let i = charts.length - 1; i >= 0; i -- ) {
+
+		if ( charts[ i ].dropped.size === charts[ i ].faces.length ) charts.splice( i, 1 );
 
 	}
 
 	for ( let i = 0; i < charts.length; i ++ ) {
 
-		for ( const face of charts[ i ].faces ) charts[ i ].record.faceCharts[ face ] = i;
+		charts[ i ].faces.forEach( ( face, t ) => {
+
+			if ( ! charts[ i ].dropped.has( t ) ) charts[ i ].record.faceCharts[ face ] = i;
+
+		} );
 
 	}
 
@@ -103,9 +105,9 @@ function unwrapUVs( root, options = {} ) {
 	let tinyFaces = 0;
 	for ( const chart of charts ) {
 
-		for ( const triangle of chart.triangles ) {
+		for ( const [ t, triangle ] of chart.triangles.entries() ) {
 
-			if ( Math.abs( cross2( ...triangle.map( i => chart.outputUV[ i ] ) ) ) * settings.resolution ** 2 / 2 < 0.01 ) tinyFaces ++;
+			if ( ! chart.dropped.has( t ) && Math.abs( cross2( ...triangle.map( i => chart.outputUV[ i ] ) ) ) * settings.resolution ** 2 / 2 < 0.01 ) tinyFaces ++;
 
 		}
 
@@ -646,35 +648,30 @@ function validateFloat32Chart( chart, settings, density ) {
 	// Validate the coordinates the GPU actually receives, not just the solver's
 	// doubles. Slivers can collapse or reverse after atlas translation/rounding.
 	const limits = { ...settings, maxStretch: settings.maxStretch * ( 1 + 5e-4 ), maxAreaRatio: settings.maxAreaRatio * ( 1 + 5e-4 ) };
-	let quality = checkChart( chart.positions, chart.triangles, chart.outputUV, chart.worldArea, limits );
-	if ( ! quality ) {
+	// Drops are recomputed on every pass, so a repack at another density can restore them.
+	chart.dropped = new Set();
+	if ( checkChart( chart.positions, chart.triangles, chart.outputUV, chart.worldArea, limits ) ) return true;
 
-		const faces = [], triangles = [];
-		for ( let i = 0; i < chart.triangles.length; i ++ ) {
+	// Drop failing single faces and subtexel faces; anything else needs a split.
+	const triangles = [];
+	let worldArea = chart.worldArea;
+	for ( let i = 0; i < chart.triangles.length; i ++ ) {
 
-			const triangle = chart.triangles[ i ], face = chart.record.faces[ chart.faces[ i ] ];
-			if ( face.area * density * density < 1 && ! checkChart( chart.positions, [ triangle ], chart.outputUV, face.area, limits ) ) {
+		const triangle = chart.triangles[ i ], face = chart.record.faces[ chart.faces[ i ] ];
+		if ( chart.triangles.length === 1 || face.area * density * density < 1 && ! checkChart( chart.positions, [ triangle ], chart.outputUV, face.area, limits ) ) {
 
-				face.ignored = true;
-				chart.worldArea -= face.area;
+			chart.dropped.add( i );
+			worldArea -= face.area;
 
-			} else {
+		} else {
 
-				faces.push( chart.faces[ i ] );
-				triangles.push( triangle );
-
-			}
+			triangles.push( triangle );
 
 		}
 
-		chart.faces = faces;
-		chart.triangles = triangles;
-		if ( faces.length === 0 ) return false;
-		quality = checkChart( chart.positions, triangles, chart.outputUV, chart.worldArea, limits );
-
 	}
 
-	return quality ? true : null;
+	return triangles.length === 0 || checkChart( chart.positions, triangles, chart.outputUV, worldArea, limits ) ? true : null;
 
 }
 

@@ -476,8 +476,9 @@ export default QUnit.module( 'Addons', () => {
 				const mesh = new Mesh( new PlaneGeometry( 1, 1, 2, 2 ) );
 				const result = unwrap( mesh, { texelsPerUnit: 0.0000013182567385564074 } );
 				verify( assert, result );
-				assert.strictEqual( result.warnings.excludedFaces, 6, 'Faces that cannot survive Float32 rounding are excluded' );
-				assert.deepEqual( result.meshes[ 0 ].faceCharts, new Int32Array( [ 0, 0, - 1, - 1, - 1, - 1, - 1, - 1 ] ) );
+				assert.strictEqual( result.warnings.excludedFaces, 5, 'Faces that cannot survive Float32 rounding are excluded' );
+				// Face 5 fails in an earlier pass but validates once repacked, so it is restored.
+				assert.deepEqual( result.meshes[ 0 ].faceCharts, new Int32Array( [ 0, 0, - 1, - 1, - 1, 1, - 1, - 1 ] ) );
 
 			} );
 
