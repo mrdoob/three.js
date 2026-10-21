@@ -2413,9 +2413,16 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 						if ( renderTarget.depthBuffer && renderTarget.storeMultisampledDepthBuffer === false ) {
 
 							invalidationArrayRead.push( depthStyle );
-							invalidationArrayDraw.push( depthStyle );
 
-							_gl.invalidateFramebuffer( _gl.DRAW_FRAMEBUFFER, invalidationArrayDraw );
+							// the draw framebuffer holds the resolved depth: only a depth renderbuffer nobody reads can be dropped
+
+							if ( renderTarget.depthTexture === null ) {
+
+								invalidationArrayDraw.push( depthStyle );
+
+								_gl.invalidateFramebuffer( _gl.DRAW_FRAMEBUFFER, invalidationArrayDraw );
+
+							}
 
 						}
 
