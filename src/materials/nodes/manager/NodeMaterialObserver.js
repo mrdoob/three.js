@@ -1009,8 +1009,6 @@ class NodeMaterialObserver {
 
 		const attributes = renderObject._geometries.attributes;
 
-		if ( renderObjectData.attributesDisposeVersion === attributes.disposeVersion ) return false;
-
 		for ( const vertexBuffer of renderObject.getVertexBuffers() ) {
 
 			if ( attributes.has( vertexBuffer ) === false ) return true;
