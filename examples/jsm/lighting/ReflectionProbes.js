@@ -4,6 +4,7 @@ import {
 	CubeReflectionMapping,
 	HalfFloatType,
 	LinearMipmapLinearFilter,
+	MathUtils,
 	Object3D,
 	PMREMGenerator,
 	RenderTarget,
@@ -182,7 +183,7 @@ class ReflectionProbes extends Object3D {
 	 * @param {WebGPURenderer} renderer - The renderer.
 	 * @param {Scene} scene - The scene to capture.
 	 * @param {Object} [options] - Bake options.
-	 * @param {number} [options.resolution=256] - Cube face size, a power of two from 256.
+	 * @param {number} [options.resolution=256] - Cube face size, rounded down to a power of two and at least 256.
 	 * @param {number} [options.near=0.1] - Near plane of the capture camera.
 	 * @param {number} [options.far=100] - Far plane of the capture camera.
 	 */
@@ -191,7 +192,10 @@ class ReflectionProbes extends Object3D {
 		// cube arrays can't be emulated on WebGL 2
 		if ( renderer.backend.isWebGPUBackend !== true ) throw new Error( 'ReflectionProbes: .bake() requires the WebGPU backend.' );
 
-		const { resolution = 256, near = 0.1, far = 100 } = options;
+		const { near = 0.1, far = 100 } = options;
+
+		// match the size PMREMGenerator renders at
+		const resolution = Math.max( 256, MathUtils.floorPowerOfTwo( options.resolution ?? 256 ) );
 
 		this.updateWorldMatrix( true, true );
 
