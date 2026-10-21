@@ -10,7 +10,7 @@ import { batch, batchColor } from '../../nodes/accessors/Batch.js';
 import { materialReference } from '../../nodes/accessors/MaterialReferenceNode.js';
 import { positionLocal, positionView } from '../../nodes/accessors/Position.js';
 import { skinning } from '../../nodes/accessors/Skinning.js';
-import { morphReference } from '../../nodes/accessors/Morph.js';
+import { morphReference, morphColor } from '../../nodes/accessors/Morph.js';
 import { fwidth, mix, smoothstep } from '../../nodes/math/MathNode.js';
 import { float, vec3, vec4, bool } from '../../nodes/tsl/TSLBase.js';
 import AONode from '../../nodes/lighting/AONode.js';
@@ -838,7 +838,7 @@ class NodeMaterial extends Material {
 
 		if ( this.vertexColors === true && geometry.hasAttribute( 'color' ) ) {
 
-			colorNode = colorNode.mul( vertexColor() );
+			colorNode = colorNode.mul( geometry.morphAttributes.color !== undefined ? morphColor : vertexColor() );
 
 		}
 

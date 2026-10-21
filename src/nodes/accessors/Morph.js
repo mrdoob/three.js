@@ -5,6 +5,8 @@ import { OnObjectUpdate } from '../utils/EventNode.js';
 import { textureLoad } from './TextureNode.js';
 import { positionLocal } from './Position.js';
 import { normalLocal } from './Normal.js';
+import { vertexColor } from './VertexColorNode.js';
+import { varyingProperty } from '../core/PropertyNode.js';
 import { instanceIndex, vertexIndex } from '../core/IndexNode.js';
 
 import { DataArrayTexture } from '../../textures/DataArrayTexture.js';
@@ -18,7 +20,7 @@ const _morphVec4 = /*@__PURE__*/ new Vector4();
 const _morphInfluencesData = /*@__PURE__*/ new WeakMap();
 
 /**
- * TSL function that retrieves and scales the morphed attribute (position or normal) texel value.
+ * TSL function that retrieves and scales the morphed attribute (position, normal or color) texel value.
  *
  * @param {Object} params - The parameter object.
  * @param {Node<texture>} params.bufferMap - The morph target data array texture.
@@ -26,8 +28,8 @@ const _morphInfluencesData = /*@__PURE__*/ new WeakMap();
  * @param {number} params.stride - The vertex data stride (e.g. 1 or 2).
  * @param {Node<int>} params.width - The texture width limit.
  * @param {Node<int>} params.depth - The target layer index (morph target index).
- * @param {Node<int>} params.offset - The texture offset (e.g. 0 for position, 1 for normal).
- * @returns {Node<vec3>} The scaled morph target translation value.
+ * @param {Node<int>} params.offset - The texture offset (e.g. 0 for position, 1 for normal, 2 for color).
+ * @returns {Node<vec4>} The scaled morph target value.
  */
 const getMorph = /*@__PURE__*/ Fn( ( { bufferMap, influence, stride, width, depth, offset } ) => {
 
@@ -36,11 +38,19 @@ const getMorph = /*@__PURE__*/ Fn( ( { bufferMap, influence, stride, width, dept
 	const y = texelIndex.div( width );
 	const x = texelIndex.sub( y.mul( width ) );
 
-	const bufferAttrib = textureLoad( bufferMap, ivec2( x, y ) ).depth( depth ).xyz;
+	const bufferAttrib = textureLoad( bufferMap, ivec2( x, y ) ).depth( depth );
 
 	return bufferAttrib.mul( influence );
 
 } );
+
+/**
+ * TSL object that represents the morphed vertex color.
+ *
+ * @tsl
+ * @type {VaryingNode<vec4>}
+ */
+export const morphColor = /*@__PURE__*/ varyingProperty( 'vec4', 'vMorphColor' );
 
 /**
  * Resolves or creates a compiled DataArrayTexture containing encoded vertex morph targets data for WebGL2/WebGPU.
@@ -188,6 +198,8 @@ export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ], builder ) => {
 
 	const hasMorphPosition = geometry.morphAttributes.position !== undefined;
 	const hasMorphNormals = geometry.hasAttribute( 'normal' ) && geometry.morphAttributes.normal !== undefined;
+	const hasMorphColors = builder.material.vertexColors === true && geometry.hasAttribute( 'color' ) && geometry.morphAttributes.color !== undefined;
+	const hasColorAlpha = hasMorphColors === true && geometry.attributes.color.itemSize === 4;
 
 	const morphAttribute = geometry.morphAttributes.position || geometry.morphAttributes.normal || geometry.morphAttributes.color;
 	const morphTargetsCount = ( morphAttribute !== undefined ) ? morphAttribute.length : 0;
@@ -221,6 +233,22 @@ export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ], builder ) => {
 	if ( hasMorphPosition === true ) positionLocal.mulAssign( base );
 	if ( hasMorphNormals === true ) normalLocal.mulAssign( base );
 
+	if ( hasMorphColors === true ) {
+
+		morphColor.assign( vertexColor() );
+
+		if ( hasColorAlpha === true ) {
+
+			morphColor.mulAssign( base );
+
+		} else {
+
+			morphColor.rgb.mulAssign( base );
+
+		}
+
+	}
+
 	const width = int( size.width );
 
 	Loop( morphTargetsCount, ( { i } ) => {
@@ -248,7 +276,7 @@ export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ], builder ) => {
 					width,
 					depth: i,
 					offset: int( 0 )
-				} ) );
+				} ).xyz );
 
 			}
 
@@ -261,7 +289,30 @@ export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ], builder ) => {
 					width,
 					depth: i,
 					offset: int( 1 )
-				} ) );
+				} ).xyz );
+
+			}
+
+			if ( hasMorphColors === true ) {
+
+				const morph = getMorph( {
+					bufferMap,
+					influence,
+					stride,
+					width,
+					depth: i,
+					offset: int( 2 )
+				} );
+
+				if ( hasColorAlpha === true ) {
+
+					morphColor.addAssign( morph );
+
+				} else {
+
+					morphColor.rgb.addAssign( morph.rgb );
+
+				}
 
 			}
 
