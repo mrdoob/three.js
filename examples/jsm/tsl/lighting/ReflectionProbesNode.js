@@ -1,5 +1,5 @@
 import { Node, NodeUtils, Vector3 } from 'three/webgpu';
-import { cubeTexture, float, Fn, getParallaxCorrectNormal, If, int, materialEnvRotation, nodeObject, positionWorld, reflectVector, uniform, vec3 } from 'three/tsl';
+import { cubeTexture, float, Fn, getParallaxCorrectNormal, If, int, materialEnvRotation, nodeObject, positionWorld, reflectVector, roughnessToMip, uniform, vec3 } from 'three/tsl';
 
 const _scale = /*@__PURE__*/ new Vector3();
 
@@ -106,12 +106,11 @@ class ReflectionProbesNode extends Node {
 
 		const { context } = builder;
 		const direction = context.getUV ? context.getUV( this, builder ) : reflectVector;
-		const roughness = float( context.getTextureLevel ? context.getTextureLevel( this ) : 0 ).clamp();
+		const roughness = context.getTextureLevel ? context.getTextureLevel( this ) : 0;
 
 		return Fn( () => {
 
-			// same roughness to mip mapping as PMREMNode
-			const lod = this._maxLod.mul( roughness ).mul( float( 2 ).sub( roughness ) );
+			const lod = roughnessToMip( roughness, this._maxLod );
 			const radiance = vec3( 0 ).toVar();
 			const remaining = float( this._local ).toVar();
 
