@@ -190,6 +190,39 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( ptOnLine.distanceTo( one3 ) < 0.0001, 'Passed!' );
 			assert.ok( distSqr < 0.0001, 'Passed!' );
 
+			//parallel segment in front of the ray, in both orientations
+			v0 = new Vector3( 1, 2, 5 );
+			v1 = new Vector3( 1, 2, 10 );
+
+			for ( const [ start, end ] of [[ v0, v1 ], [ v1, v0 ]] ) {
+
+				distSqr = a.distanceSqToSegment( start, end, ptOnLine, ptOnSegment );
+
+				assert.ok( ptOnSegment.distanceTo( v0 ) < 0.0001, 'Passed!' );
+				assert.ok( ptOnLine.distanceTo( new Vector3( 1, 1, 5 ) ) < 0.0001, 'Passed!' );
+				assert.ok( Math.abs( distSqr - 1 ) < 0.0001, 'Passed!' );
+
+			}
+
+			//parallel segment that starts behind the ray
+			v0 = new Vector3( 1, 2, - 5 );
+			v1 = new Vector3( 1, 2, 5 );
+			distSqr = a.distanceSqToSegment( v0, v1, ptOnLine, ptOnSegment );
+
+			assert.ok( ptOnSegment.distanceTo( new Vector3( 1, 2, 1 ) ) < 0.0001, 'Passed!' );
+			assert.ok( ptOnLine.distanceTo( one3 ) < 0.0001, 'Passed!' );
+			assert.ok( Math.abs( distSqr - 1 ) < 0.0001, 'Passed!' );
+
+			//parallel segment whose computed directions differ by rounding
+			const b = new Ray( zero3.clone(), new Vector3( 1, 0, 1 ).normalize() );
+			v0 = new Vector3( 1, 0, 2 );
+			v1 = new Vector3( 5, 0, 6 );
+			distSqr = b.distanceSqToSegment( v0, v1, ptOnLine, ptOnSegment );
+
+			assert.ok( ptOnSegment.distanceTo( v0 ) < 0.0001, 'Passed!' );
+			assert.ok( ptOnLine.distanceTo( new Vector3( 1.5, 0, 1.5 ) ) < 0.0001, 'Passed!' );
+			assert.ok( Math.abs( distSqr - 0.5 ) < 0.0001, 'Passed!' );
+
 		} );
 
 		QUnit.test( 'intersectSphere', ( assert ) => {

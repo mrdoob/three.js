@@ -198,7 +198,7 @@ class Ray {
 		const det = Math.abs( 1 - a01 * a01 );
 		let s0, s1, sqrDist, extDet;
 
-		if ( det > 0 ) {
+		if ( det > 1e-14 ) {
 
 			// The ray and segment are not parallel.
 
@@ -272,10 +272,11 @@ class Ray {
 
 		} else {
 
-			// Ray and segment are parallel.
+			// Ray and segment are parallel, up to rounding of det.
+			// Use the segment point closest to the ray origin.
 
-			s1 = ( a01 > 0 ) ? - segExtent : segExtent;
-			s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
+			s0 = Math.max( 0, - b0 - segExtent );
+			s1 = Math.min( Math.max( - segExtent, - a01 * ( s0 + b0 ) ), segExtent );
 			sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
 
 		}
