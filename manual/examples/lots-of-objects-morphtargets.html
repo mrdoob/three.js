@@ -51,7 +51,7 @@
 </script>
 
 <script type="module">
-import * as THREE from 'three';
+	import * as THREE from 'three';
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import TWEEN from 'three/addons/libs/tween.module.js';
@@ -130,7 +130,7 @@ function main() {
 	{
 
 		const loader = new THREE.TextureLoader();
-		const texture = loader.load( 'resources/images/world.jpg', render );
+		const texture = loader.load( 'https://threejs.org/manual/examples/resources/images/world.jpg', render );
 		texture.colorSpace = THREE.SRGBColorSpace;
 		const geometry = new THREE.SphereGeometry( 1, 64, 32 );
 		const material = new THREE.MeshBasicMaterial( { map: texture } );
@@ -266,15 +266,17 @@ function main() {
 
 				// make an array to store colors for each vertex
 				const numVerts = geometry.getAttribute( 'position' ).count;
-				const itemSize = 3; // r, g, b
+				const itemSize = 4; // r, g, b a
 				const colors = new Uint8Array( itemSize * numVerts );
 
-				// copy the color into the colors array for each vertex
-				colors.forEach( ( v, ndx ) => {
-
-					colors[ ndx ] = rgb[ ndx % 3 ];
-
-				} );
+				// fill
+				for ( let i = 0; i < numVerts; i ++ ) {
+					const offset = i * itemSize;
+					colors[ offset ]     = rgb[ 0 ]; // r
+					colors[ offset + 1 ] = rgb[ 1 ]; // g
+					colors[ offset + 2 ] = rgb[ 2 ]; // b
+					colors[ offset + 3 ] = 255;      // a 
+				}
 
 				const normalized = true;
 				const colorAttrib = new THREE.BufferAttribute( colors, itemSize, normalized );
@@ -301,8 +303,8 @@ function main() {
 	async function loadAll() {
 
 		const fileInfos = [
-			{ name: 'men', hueRange: [ 0.7, 0.3 ], url: 'resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc' },
-			{ name: 'women', hueRange: [ 0.9, 1.1 ], url: 'resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014ft_2010_cntm_1_deg.asc' },
+			{ name: 'men', hueRange: [ 0.7, 0.3 ], url: 'https://threejs.org/manual/examples/resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc' },
+			{ name: 'women', hueRange: [ 0.9, 1.1 ], url: 'https://threejs.org/manual/examples/resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014ft_2010_cntm_1_deg.asc' },
 		];
 
 		await Promise.all( fileInfos.map( loadData ) );
@@ -518,5 +520,6 @@ function main() {
 }
 
 main();
+
 </script>
 </html>
