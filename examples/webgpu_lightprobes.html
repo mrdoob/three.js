@@ -133,7 +133,7 @@
 				scene.add( sphere );
 
 				// Light
-				const light = new THREE.PointLight( 0xffffff, 40 );
+				const light = new THREE.PointLight( 0xffffff, 20 );
 				light.position.set( 0, 4.5, 0 );
 				light.castShadow = true;
 				light.shadow.mapSize.setScalar( 256 );
@@ -174,7 +174,13 @@
 
 					probes = new LightProbeGrid( 5.6, 4.7, 5.6, resolution, resolution, resolution );
 					probes.position.set( 0, 2.45, 0 );
-					await probes.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
+
+					// Keep the helper spheres out of the cubemap captures.
+					if ( probesHelper ) probesHelper.visible = false;
+
+					// Each bounce pass captures the light of the previous pass.
+					probes.multiBounce = params.multiBounce;
+					probes.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20, bounces: params.multiBounce ? 3 : 0 } );
 					probes.visible = params.enabled;
 					scene.add( probes );
 
@@ -190,6 +196,7 @@
 
 						probesHelper.probes = probes;
 						probesHelper.update();
+						probesHelper.visible = params.showProbes;
 
 					}
 
@@ -198,7 +205,8 @@
 				const params = {
 					enabled: true,
 					showProbes: false,
-					resolution: 6
+					resolution: 6,
+					multiBounce: true
 				};
 
 				await bake( params.resolution );
@@ -217,6 +225,7 @@
 					bake( value );
 
 				} ).debounce( 250 );
+				gui.add( params, 'multiBounce' ).name( 'Multi-bounce' ).onChange( () => bake( params.resolution ) );
 				gui.add( params, 'showProbes' ).name( 'Show Probes' ).onChange( ( value ) => {
 
 					probesHelper.visible = value;

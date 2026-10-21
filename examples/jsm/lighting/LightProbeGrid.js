@@ -439,6 +439,15 @@ class LightProbeGrid extends Light {
 		this.falloff = 0;
 
 		/**
+		 * Whether every bake pass, including the direct light pass, captures the previous pass,
+		 * so that bounce passes over several bakes share their shaders.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.multiBounce = false;
+
+		/**
 		 * The single RGBA atlas 3D texture storing all seven packed SH
 		 * sub-volumes stacked along Z.
 		 *
@@ -509,7 +518,8 @@ class LightProbeGrid extends Light {
 	 * Indices advance along X, then Z, then Y, filling horizontal layers from bottom
 	 * to top. For incremental indirect bounces, finish the whole grid for `pass: 0`,
 	 * then repeat with `pass: 1`, etc. Start each pass at index 0 to snapshot the
-	 * previous pass before updating its cells.
+	 * previous pass before updating its cells. Set {@link LightProbeGrid#multiBounce}
+	 * so that the passes share their shaders.
 	 *
 	 * Shadow-casting instances of `SunLight` are temporarily replaced with
 	 * equivalent directional lights, since their view-fitted shadow cascades
@@ -681,27 +691,31 @@ class LightProbeGrid extends Light {
 	 */
 	_updateBounceGrid( renderer, scene, pass, start ) {
 
-		if ( pass === 0 ) {
+		if ( pass === 0 && this.multiBounce === false ) {
 
 			if ( start === 0 ) this._bouncePass = - 1;
 			return;
 
 		}
 
-		if ( start === 0 ) {
+		if ( this._bounceGrid === null ) {
+
+			const res = this.resolution;
+			this._bounceGrid = new LightProbeGrid( this.width, this.height, this.depth, res.x, res.y, res.z );
+			this._bounceGrid._ensureTextures();
+			renderer.initRenderTarget( this._bounceGrid._renderTarget );
+
+		}
+
+		if ( pass === 0 ) {
+
+			if ( start === 0 ) this._bouncePass = - 1;
+
+		} else if ( start === 0 ) {
 
 			const renderTarget = this._renderTarget;
 
-			if ( this._bounceGrid === null ) {
-
-				const res = this.resolution;
-				this._bounceGrid = new LightProbeGrid( this.width, this.height, this.depth, res.x, res.y, res.z );
-				this._bounceGrid._ensureTextures();
-
-			}
-
 			renderer.initRenderTarget( renderTarget );
-			renderer.initRenderTarget( this._bounceGrid._renderTarget );
 			_copyRegion.min.set( 0, 0, 0 );
 			_copyRegion.max.set( renderTarget.width, renderTarget.height, renderTarget.depth );
 			renderer.copyTextureToTexture( renderTarget.texture, this._bounceGrid.texture, _copyRegion );
@@ -711,7 +725,8 @@ class LightProbeGrid extends Light {
 
 		const bounceGrid = this._bounceGrid;
 		bounceGrid.boundingBox.copy( this.boundingBox );
-		bounceGrid.intensity = this.intensity;
+		// The direct pass adds the grid unlit, so all passes share the lights and their shaders.
+		bounceGrid.intensity = pass === 0 ? 0 : this.intensity;
 		bounceGrid.falloff = this.falloff;
 		scene.add( bounceGrid );
 

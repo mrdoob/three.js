@@ -286,7 +286,8 @@
 				const params = {
 					enabled: true,
 					showProbes: false,
-					resolution: 6
+					resolution: 6,
+					multiBounce: true
 				};
 
 				async function bake( resolution ) {
@@ -307,26 +308,44 @@
 
 					}
 
-					// Bake both volumes. The `falloff` fades each volume past its
-					// boundary so the two rooms blend smoothly without bleeding into
-					// each other.
+					// The `falloff` fades each volume past its boundary so the two
+					// rooms blend smoothly without bleeding into each other.
 
 					probesLeft = new LightProbeGrid( 7.8, 4.7, 7.6, resolution, resolution, resolution );
 					probesLeft.position.set( - 3.9, 2.45, 0 );
 					probesLeft.falloff = 1.0;
-					await probesLeft.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
-					probesLeft.visible = params.enabled;
+					probesLeft.multiBounce = params.multiBounce;
 
 					probesRight = new LightProbeGrid( 7.8, 4.7, 7.6, resolution, resolution, resolution );
 					probesRight.position.set( 3.9, 2.45, 0 );
 					probesRight.falloff = 1.0;
-					await probesRight.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
+					probesRight.multiBounce = params.multiBounce;
+
+					// Keep the helper spheres out of the cubemap captures.
+
+					if ( probesHelperLeft ) probesHelperLeft.visible = probesHelperRight.visible = false;
+
+					// Add both volumes after the direct light pass, so that each bounce pass
+					// also sees the other room through the doorway.
+
+					const bounces = params.multiBounce ? 3 : 0;
+
+					for ( let pass = 0; pass <= bounces; pass ++ ) {
+
+						probesLeft.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20, pass } );
+						probesRight.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20, pass } );
+
+						if ( pass === 0 ) {
+
+							scene.add( probesLeft );
+							scene.add( probesRight );
+
+						}
+
+					}
+
+					probesLeft.visible = params.enabled;
 					probesRight.visible = params.enabled;
-
-					// Add both after baking
-
-					scene.add( probesLeft );
-					scene.add( probesRight );
 
 					// Update debug visualization
 
@@ -347,6 +366,8 @@
 
 						probesHelperRight.probes = probesRight;
 						probesHelperRight.update();
+
+						probesHelperLeft.visible = probesHelperRight.visible = params.showProbes;
 
 					}
 
@@ -369,6 +390,7 @@
 					bake( value );
 
 				} ).debounce( 250 );
+				gui.add( params, 'multiBounce' ).name( 'Multi-bounce' ).onChange( () => bake( params.resolution ) );
 				gui.add( params, 'showProbes' ).name( 'Show Probes' ).onChange( ( value ) => {
 
 					probesHelperLeft.visible = value;
