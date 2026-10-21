@@ -1583,8 +1583,7 @@ class WebGPUBackend extends Backend {
 
 		submit( this.device, renderContextData.encoder.finish() );
 
-		// the pass has ended and the encoder is finished, so they must not be used anymore. Operations outside of
-		// beginRender()/finishRender() like copyFramebufferToTexture() in compileAsync() use their own command encoder.
+		// pass and encoder are only valid between beginRender() and finishRender()
 
 		renderContextData.currentPass = null;
 		renderContextData.encoder = null;
