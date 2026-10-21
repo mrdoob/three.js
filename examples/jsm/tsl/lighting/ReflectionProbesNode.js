@@ -88,7 +88,8 @@ class ReflectionProbesNode extends Node {
 
 	setup( builder ) {
 
-		this._slots = this.probes.bakedProbes.map( () => ( {
+		// All material programs must keep referencing the uniforms updated by updateBefore().
+		this._slots = this.probes.bakedProbes.map( ( probe, i ) => this._slots[ i ] ?? ( {
 			position: uniform( new Vector3() ),
 			extent: uniform( new Vector3() ),
 			fade: uniform( 0.5 ),
