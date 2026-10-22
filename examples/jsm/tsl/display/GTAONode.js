@@ -352,9 +352,9 @@ class GTAONode extends Node {
 				return inputNode !== null ? inputNode.mul( visibility ) : visibility;
 
 			},
-			getSpecularOcclusion: ( inputNode, normal, roughness, { material, context } ) => {
+			getSpecularOcclusion: ( { node, normal, roughness }, { material, context } ) => {
 
-				if ( material.transparent === true ) return inputNode;
+				if ( material.transparent === true ) return node;
 				return specularOcclusion( context.ambientOcclusion, bentNormal, normal, reflect( positionViewDirection.negate(), normal ), roughness );
 
 			}

@@ -914,11 +914,11 @@ class PhysicalLightingModel extends LightingModel {
 
 		let aoNode = ambientOcclusion.sub( aoNV.pow( aoExp ).oneMinus() ).clamp();
 
-		if ( getSpecularOcclusion ) aoNode = getSpecularOcclusion( aoNode, normalView, roughness, builder );
+		if ( getSpecularOcclusion ) aoNode = getSpecularOcclusion( { node: aoNode, normal: normalView, roughness }, builder );
 
 		if ( this.clearcoat === true ) {
 
-			const clearcoatAO = getSpecularOcclusion ? getSpecularOcclusion( ambientOcclusion, clearcoatNormalView, clearcoatRoughness, builder ) : ambientOcclusion;
+			const clearcoatAO = getSpecularOcclusion ? getSpecularOcclusion( { node: ambientOcclusion, normal: clearcoatNormalView, roughness: clearcoatRoughness }, builder ) : ambientOcclusion;
 
 			this.clearcoatSpecularIndirect.mulAssign( clearcoatAO );
 
