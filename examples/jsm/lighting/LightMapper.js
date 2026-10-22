@@ -44,10 +44,8 @@ class LightMapper {
 	 * @param {function(Node<vec3>, Node<vec3>, Node<float>): Node<vec3>} irradianceNode - Returns the irradiance for a world-space position, normal and sample index.
 	 * @param {Object} [options] - Bake options.
 	 * @param {Array<Light>} [options.lights=[]] - Direct lights to include in the diffuse bake. Render their shadows in the source scene first and disable shadow updates during the UV bake.
-	 * @param {(HalfFloatType|FloatType)} [options.accumulationType=HalfFloatType] - Accumulation buffer type. FloatType requires the WebGPU feature `float32-blendable`. The resolved light map remains half-float.
-	 * @param {number} [options.sampleScale=1] - Positive irradiance scale applied before accumulation and undone during resolve. Smaller values reduce overflow, but do not increase accumulation precision or the resolved light map's range.
 	 */
-	constructor( renderer, size, irradianceNode, { lights = [], accumulationType = HalfFloatType, sampleScale = 1 } = {} ) {
+	constructor( renderer, size, irradianceNode, { lights = [] } = {} ) {
 
 		/**
 		 * The renderer.
@@ -79,7 +77,7 @@ class LightMapper {
 		 */
 		this.samples = 0;
 
-		this._accumulation = new RenderTarget( size, size, { type: accumulationType, minFilter: NearestFilter, magFilter: NearestFilter, depthBuffer: false } );
+		this._accumulation = new RenderTarget( size, size, { type: HalfFloatType, minFilter: NearestFilter, magFilter: NearestFilter, depthBuffer: false } );
 		this._renderTarget = new RenderTarget( size, size, { type: HalfFloatType, depthBuffer: false } );
 		this._renderTarget.texture.channel = 1;
 
@@ -98,8 +96,8 @@ class LightMapper {
 		this._jitter = uniform( new Vector2() );
 		this._sample = uniform( 0 );
 
-		this._frontMaterial = this._createBakeMaterial( irradianceNode, false, lights, sampleScale );
-		this._backMaterial = this._createBakeMaterial( irradianceNode, true, lights, sampleScale );
+		this._frontMaterial = this._createBakeMaterial( irradianceNode, false, lights );
+		this._backMaterial = this._createBakeMaterial( irradianceNode, true, lights );
 
 		// normalize the accumulated samples and fill the chart padding
 
@@ -130,7 +128,7 @@ class LightMapper {
 
 			} );
 
-			return vec4( center.rgb.div( center.a.max( 1e-4 ).mul( sampleScale ) ), 1 );
+			return vec4( center.rgb.div( center.a.max( 1e-4 ) ), 1 );
 
 		} );
 
@@ -236,10 +234,9 @@ class LightMapper {
 	 * @param {function(Node<vec3>, Node<vec3>, Node<float>): Node<vec3>} irradianceNode - The irradiance function.
 	 * @param {boolean} flipNormal - Whether to flip the normal, for back-sided meshes.
 	 * @param {Array<Light>} directLights - Direct lights to include.
-	 * @param {number} sampleScale - The irradiance scale during accumulation.
 	 * @return {NodeMaterial} The material.
 	 */
-	_createBakeMaterial( irradianceNode, flipNormal, directLights, sampleScale ) {
+	_createBakeMaterial( irradianceNode, flipNormal, directLights ) {
 
 		const material = directLights.length > 0 ? new MeshLambertNodeMaterial() : new NodeMaterial();
 		material.side = DoubleSide;
@@ -263,11 +260,11 @@ class LightMapper {
 			material.lightsNode = lights( directLights ).context( { positionView: modelViewMatrix.mul( positionLocal ).xyz.toVarying() } );
 			material.normalNode = flipNormal ? normalViewGeometry.negate() : normalViewGeometry;
 			material.emissiveNode = irradianceNode( positionWorld, normal, this._sample ).div( Math.PI );
-			material.outputNode = vec4( output.rgb.mul( Math.PI * sampleScale ), 1 );
+			material.outputNode = vec4( output.rgb.mul( Math.PI ), 1 );
 
 		} else {
 
-			material.fragmentNode = vec4( irradianceNode( positionWorld, normal, this._sample ).mul( sampleScale ), 1 );
+			material.fragmentNode = vec4( irradianceNode( positionWorld, normal, this._sample ), 1 );
 
 		}
 
