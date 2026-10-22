@@ -194,13 +194,13 @@
 
 				} );
 
-				gui.add( params, 'visbilityGridSize', [ 4, 8, 16, 32 ] ).name( 'Visibility Grid Size' ).onChange( createProbes );
-
 				gui.add( params, 'visibility' ).name( 'Visibility' ).onChange( ( value ) => {
 
 					if ( probes ) probes.visibility = value;
 
 				} );
+
+				gui.add( params, 'visbilityGridSize', [ 4, 8, 16, 32 ] ).name( 'Visibility Map Size' ).onChange( createProbes );
 
 				gui.add( params, 'lightAzimuth', - 180, 180, 1 ).name( 'Light Azimuth' ).onChange( () => {
 

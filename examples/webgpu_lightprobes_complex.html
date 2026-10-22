@@ -355,13 +355,13 @@
 
 				} );
 
-				gui.add( params, 'visbilityGridSize', [ 4, 8, 16, 32 ] ).name( 'Visibility Grid Size' ).onChange( requestBake );
-
 				gui.add( params, 'visibility' ).name( 'Visibility' ).onChange( ( value ) => {
 
 					probes.visibility = value;
 
 				} );
+
+				gui.add( params, 'visbilityGridSize', [ 4, 8, 16, 32 ] ).name( 'Visibility Map Size' ).onChange( requestBake );
 
 				gui.add( params, 'resolution', 2, 12, 1 ).name( 'Resolution' ).onChange( requestBake ).debounce( 250 );
 				gui.add( params, 'bounces', 0, 10, 1 ).name( 'Bounces' ).onChange( requestBake ).debounce( 250 );
