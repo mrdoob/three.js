@@ -1,7 +1,7 @@
 import { Box3, Vector3, Vector4, Matrix4, Layers, Storage3DTexture, StorageBufferAttribute, StorageTexture3DNode, RendererUtils, HalfFloatType, UnsignedByteType, RGBAFormat, LinearFilter, LinearMipmapLinearFilter, ClampToEdgeWrapping, MathUtils } from 'three/webgpu';
 import { Fn, If, Loop, uniform, uniformArray, storage, instanceIndex, textureStore, texture3D, texture, cubeTexture, float, int, uint, vec2, vec3, vec4, ivec3, uvec3, max, min, abs, dot, cross, normalize, floor, sign, select, countOneBits, atomicOr, smoothstep, hash, fract, sqrt, cos, sin, length, PI, getDistanceAttenuation, viewZToPerspectiveDepth, viewZToReversedPerspectiveDepth } from 'three/tsl';
 
-import { collectSceneTriangles, computeSceneBounds, TRIANGLE_STRIDE } from './VXGISceneCollector.js';
+import { collectSceneTriangles, computeSceneBounds, computeSolidVoxels, TRIANGLE_STRIDE } from './VXGISceneCollector.js';
 import { createConeTracer } from './VXGIConeTracer.js';
 
 const _box = /*@__PURE__*/ new Box3();
@@ -54,6 +54,8 @@ class MipStorageTexture3DNode extends StorageTexture3DNode {
  * along the axis, averaging across it), radiance is stored opacity-premultiplied and indirect bounces
  * are cached in the volume via cone tracing. Only direct lights are injected.
  * Voxelization uses conservative rasterization along the dominant triangle axis in a compute shader.
+ * The interiors of closed meshes are filled, so cones starting inside an object (e.g. near contact
+ * points) are blocked.
  *
  * Direct light is injected per voxel instead of splatting photons from a light-view map as in the
  * paper: the shadow maps rendered by the renderer are the light-view maps, and every occupied voxel
@@ -69,6 +71,8 @@ class MipStorageTexture3DNode extends StorageTexture3DNode {
  * - {@link https://research.nvidia.com/publication/2011-09_interactive-indirect-illumination-using-voxel-cone-tracing}:
  *   Crassin et al., Interactive Indirect Illumination Using Voxel Cone Tracing, Pacific Graphics 2011.
  * - {@link https://developer.nvidia.com/content/basics-gpu-voxelization}: Basics of GPU voxelization.
+ * - {@link https://doi.org/10.1145/1882261.1866201}: Schwarz and Seidel, Fast Parallel Surface and Solid
+ *   Voxelization on GPUs, ACM Transactions on Graphics 2010.
  *
  * Note: This class can only be used with `WebGPURenderer` and a WebGPU backend.
  *
@@ -304,6 +308,7 @@ class VXGIVolume {
 
 		this._occupancyAttribute = null;
 		this._triangleIdAttribute = null;
+		this._solidAttribute = null;
 		this._triangleAttribute = null;
 		this._trianglesNode = null;
 		this._triangleCount = 0;
@@ -459,6 +464,12 @@ class VXGIVolume {
 		this._triangleAttribute = new StorageBufferAttribute( count > 0 ? data : new Float32Array( TRIANGLE_STRIDE ), 4 );
 		this._trianglesNode = storage( this._triangleAttribute, 'vec4', this._triangleAttribute.count ).toReadOnly();
 
+		const solid = this._solidAttribute.array;
+
+		solid.fill( 0 );
+		computeSolidVoxels( scene, { boundsMin: this.boundsMinNode.value, voxelSize, gridSize, layers: this.layers, exclude: this._exclude }, new Uint8Array( solid.buffer ) );
+		this._solidAttribute.needsUpdate = true;
+
 		// kernels depend on the triangle buffer and grid
 
 		this._disposeKernels();
@@ -521,6 +532,7 @@ class VXGIVolume {
 
 		this._occupancyAttribute = new StorageBufferAttribute( this._voxelCount, 1, Uint32Array );
 		this._triangleIdAttribute = new StorageBufferAttribute( this._voxelCount, 1, Uint32Array );
+		this._solidAttribute = new StorageBufferAttribute( Math.ceil( this._voxelCount / 4 ), 1, Uint32Array );
 
 	}
 
@@ -572,9 +584,11 @@ class VXGIVolume {
 
 			this._occupancyAttribute.dispose();
 			this._triangleIdAttribute.dispose();
+			this._solidAttribute.dispose();
 
 			this._occupancyAttribute = null;
 			this._triangleIdAttribute = null;
+			this._solidAttribute = null;
 
 		}
 
@@ -943,6 +957,7 @@ class VXGIVolume {
 	_createResolveKernel() {
 
 		const occupancy = storage( this._occupancyAttribute, 'uint', this._voxelCount ).toReadOnly();
+		const solid = storage( this._solidAttribute, 'uint', this._solidAttribute.count ).toReadOnly();
 		const opacityTexture = this.opacityTexture;
 		const voxelCount = this._voxelCountNode;
 		const size = this._getLevelSize( 0 );
@@ -952,7 +967,8 @@ class VXGIVolume {
 			If( instanceIndex.lessThan( voxelCount ), () => {
 
 				const coords = this._coords( instanceIndex, size ).toConst();
-				const bits = occupancy.element( instanceIndex ).toConst();
+				const solidBits = solid.element( instanceIndex.shiftRight( uint( 2 ) ) ).shiftRight( instanceIndex.bitAnd( uint( 3 ) ).mul( uint( 8 ) ) ).bitAnd( uint( 0xFF ) );
+				const bits = occupancy.element( instanceIndex ).bitOr( solidBits ).toConst();
 
 				// per-axis coverage from the 2x2x2 sub-voxel occupancy
 
