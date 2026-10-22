@@ -19,7 +19,7 @@
 				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Light Baking</span>
 			</div>
 
-			<small>Progressively bake Light Probe or VXGI diffuse irradiance into a UV atlas.<br/><span id="status"></span></small>
+			<small>Progressively bake Light Probe or VXGI diffuse irradiance into a UV atlas by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br/><span id="status"></span></small>
 		</div>
 
 		<script type="importmap">
@@ -51,6 +51,7 @@
 			let camera, scene, renderer, controls, renderPipeline;
 			let light, meshes, materials, atlas, status;
 			let source, lightMapper, bakedPass, livePass, liveOutput;
+			let needsBake = true;
 
 			// shifts the per-pixel cone noise of the live view every frame, like the light map samples
 
@@ -59,7 +60,9 @@
 			const params = {
 				output: 'Baked GI',
 				algorithm: 'VXGI',
-				resolution: 1024
+				resolution: 1024,
+				accumulationType: THREE.HalfFloatType,
+				lightIntensity: 40
 			};
 
 			// light probes are deterministic and only need a few samples to antialias the light map,
@@ -194,15 +197,17 @@
 
 				status = document.getElementById( 'status' );
 
-				bake();
-
 				// GUI
 
 				const gui = renderer.inspector.createParameters( 'Light Baking' );
 				gui.add( params, 'output', [ 'Baked GI', 'Live GI' ] ).name( 'Output' ).onChange( setOutput );
-				gui.add( params, 'algorithm', [ 'Light Probe', 'VXGI' ] ).name( 'GI Algorithm' ).onChange( bake );
-				gui.add( params, 'resolution', [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( bake );
-				gui.add( { bake }, 'bake' ).name( 'Re-Bake GI' );
+				gui.add( params, 'algorithm', [ 'Light Probe', 'VXGI' ] ).name( 'GI Algorithm' ).onChange( requestBake );
+				gui.add( params, 'resolution', [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( requestBake );
+				const accumulationTypes = { FP16: THREE.HalfFloatType };
+				if ( renderer.hasFeature( 'float32-blendable' ) ) accumulationTypes.FP32 = THREE.FloatType;
+				gui.add( params, 'accumulationType', accumulationTypes ).name( 'Accumulation Format' ).info( 'FP32 improves precision and doubles accumulation memory. Available on supported GPUs.' ).onChange( requestBake );
+				gui.add( params, 'lightIntensity', 1, 200, 1 ).name( 'Light Intensity' ).debounce( 250 ).onChange( requestBake );
+				gui.add( { bake: requestBake }, 'bake' ).name( 'Re-Bake GI' );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -210,7 +215,15 @@
 
 			}
 
+			function requestBake() {
+
+				needsBake = true;
+
+			}
+
 			function bake() {
+
+				light.intensity = params.lightIntensity;
 
 				for ( const material of materials ) material.lightMap = null;
 
@@ -253,7 +266,7 @@
 
 				// the light map accumulates one sample per frame in animate()
 
-				lightMapper = new LightMapper( renderer, atlas.resolution, irradiance );
+				lightMapper = new LightMapper( renderer, atlas.resolution, irradiance, { accumulationType: params.accumulationType } );
 				lightMapper.addObjects( meshes );
 
 				for ( const material of materials ) material.lightMap = lightMapper.texture;
@@ -302,6 +315,15 @@
 			}
 
 			function animate() {
+
+				// rebake after the renderer advances its frame so light uniforms are refreshed
+
+				if ( needsBake ) {
+
+					bake();
+					needsBake = false;
+
+				}
 
 				const samples = bakeSamples[ params.algorithm ];
 
