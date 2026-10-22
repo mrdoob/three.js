@@ -79,11 +79,11 @@ class FrustumArray {
 	 * Returns the cached frustum for the sub-camera at the given index.
 	 *
 	 * @param {number} index - The sub-camera index.
-	 * @return {Frustum|undefined} The frustum, or undefined if the index is not active.
+	 * @return {Frustum|undefined} The cached frustum.
 	 */
 	getFrustum( index ) {
 
-		return index < this._count ? this._frustums[ index ] : undefined;
+		return this._frustums[ index ];
 
 	}
 
