@@ -1351,6 +1351,8 @@ class BufferGeometry extends EventDispatcher {
 		// reset
 
 		this.index = null;
+		this.indirect = null;
+		this.indirectOffset = 0;
 		this.attributes = {};
 		this.morphAttributes = {};
 		this.groups = [];
@@ -1372,6 +1374,18 @@ class BufferGeometry extends EventDispatcher {
 		if ( index !== null ) {
 
 			this.setIndex( index.clone() );
+
+		}
+
+		// indirect
+
+		const indirect = source.indirect;
+
+		if ( indirect !== null ) {
+
+			const indirectOffset = source.indirectOffset;
+
+			this.setIndirect( indirect.clone(), Array.isArray( indirectOffset ) ? indirectOffset.slice() : indirectOffset );
 
 		}
 

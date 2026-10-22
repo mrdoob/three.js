@@ -675,6 +675,26 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.test( 'copy/indirect', ( assert ) => {
+
+			const geometry = new BufferGeometry();
+			geometry.setIndirect( new BufferAttribute( new Uint32Array( [ 3, 1, 0, 0, 3, 1, 0, 0 ] ), 1 ), [ 0, 16 ] );
+
+			const copy = new BufferGeometry().copy( geometry );
+
+			assert.ok( copy.indirect !== null, 'indirect was copied' );
+			assert.ok( copy.indirect !== geometry.indirect, 'indirect was cloned' );
+			assert.deepEqual( Array.from( copy.indirect.array ), Array.from( geometry.indirect.array ), 'indirect values are equal' );
+			assert.deepEqual( copy.indirectOffset, [ 0, 16 ], 'indirectOffset was copied' );
+			assert.ok( copy.indirectOffset !== geometry.indirectOffset, 'indirectOffset array was cloned' );
+
+			copy.copy( new BufferGeometry() );
+
+			assert.strictEqual( copy.indirect, null, 'indirect is reset when the source has none' );
+			assert.strictEqual( copy.indirectOffset, 0, 'indirectOffset is reset when the source has none' );
+
+		} );
+
 		QUnit.test( 'dispose', ( assert ) => {
 
 			assert.expect( 0 );
