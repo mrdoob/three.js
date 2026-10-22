@@ -13,6 +13,8 @@ import {
 	SRGBColorSpace
 } from 'three';
 
+const _number_pattern = /^[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?$/;
+
 /**
  * A loader for the MTL format.
  *
@@ -529,46 +531,45 @@ class MaterialCreator {
 		 };
 
 		const items = value.split( /\s+/ );
-		let pos;
+		let pos = 0;
 
-		pos = items.indexOf( '-bm' );
+		// The options come before the file name. -o, -s and -t take u and the optional
+		// v and w, -mm takes base and gain, and the other options take one value each.
 
-		if ( pos >= 0 ) {
+		while ( pos < items.length - 1 && items[ pos ].charAt( 0 ) === '-' ) {
 
-			matParams.bumpScale = parseFloat( items[ pos + 1 ] );
-			items.splice( pos, 2 );
+			const option = items[ pos ++ ];
+
+			if ( option === '-o' || option === '-s' || option === '-t' ) {
+
+				const values = ( option === '-s' ) ? [ 1, 1, 1 ] : [ 0, 0, 0 ];
+				let count = 0;
+
+				while ( count < 3 && pos < items.length - 1 && _number_pattern.test( items[ pos ] ) ) {
+
+					values[ count ++ ] = parseFloat( items[ pos ++ ] );
+
+				}
+
+				if ( option === '-s' ) texParams.scale.set( values[ 0 ], values[ 1 ] );
+				if ( option === '-o' ) texParams.offset.set( values[ 0 ], values[ 1 ] );
+
+			} else if ( option === '-mm' ) {
+
+				matParams.displacementBias = parseFloat( items[ pos ] );
+				matParams.displacementScale = parseFloat( items[ pos + 1 ] );
+				pos += 2;
+
+			} else {
+
+				if ( option === '-bm' ) matParams.bumpScale = parseFloat( items[ pos ] );
+				pos ++;
+
+			}
 
 		}
 
-		pos = items.indexOf( '-mm' );
-
-		if ( pos >= 0 ) {
-
-			matParams.displacementBias = parseFloat( items[ pos + 1 ] );
-			matParams.displacementScale = parseFloat( items[ pos + 2 ] );
-			items.splice( pos, 3 );
-
-		}
-
-		pos = items.indexOf( '-s' );
-
-		if ( pos >= 0 ) {
-
-			texParams.scale.set( parseFloat( items[ pos + 1 ] ), parseFloat( items[ pos + 2 ] ) );
-			items.splice( pos, 4 ); // we expect 3 parameters here!
-
-		}
-
-		pos = items.indexOf( '-o' );
-
-		if ( pos >= 0 ) {
-
-			texParams.offset.set( parseFloat( items[ pos + 1 ] ), parseFloat( items[ pos + 2 ] ) );
-			items.splice( pos, 4 ); // we expect 3 parameters here!
-
-		}
-
-		texParams.url = items.join( ' ' ).trim();
+		texParams.url = items.slice( pos ).join( ' ' ).trim();
 		return texParams;
 
 	}
