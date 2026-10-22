@@ -80,8 +80,8 @@ class USDAParser {
 				const key = line.slice( 0, colonIdx ).trim();
 				const value = line.slice( colonIdx + 1 ).trim();
 
-				// Only process if key looks like a number (timeSamples frame)
-				if ( /^[\d.]+$/.test( key ) ) {
+				// Only process if key looks like a number (timeSamples frame, which can be negative)
+				if ( /^-?[\d.]+$/.test( key ) ) {
 
 					target[ key ] = value;
 
