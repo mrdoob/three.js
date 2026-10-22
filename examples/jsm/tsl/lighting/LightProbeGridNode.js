@@ -50,6 +50,66 @@ function evaluateGridIrradiance( atlas, uvw, res, normal ) {
 }
 
 /**
+ * Evaluates the irradiance of a light probe grid at the given world-space position and normal.
+ *
+ * @private
+ * @param {LightProbeGrid} light - The light probe grid.
+ * @param {Node<vec3>} min - The minimum of the grid bounds.
+ * @param {Node<vec3>} max - The maximum of the grid bounds.
+ * @param {Node<vec3>} res - The probe resolution.
+ * @param {Node<float>} intensity - The intensity.
+ * @param {Node<float>} falloff - The falloff distance.
+ * @param {Node<vec3>} position - The world-space position.
+ * @param {Node<vec3>} normal - The world-space normal.
+ * @return {Node<vec3>} The irradiance.
+ */
+function getGridIrradiance( light, min, max, res, intensity, falloff, position, normal ) {
+
+	const range = max.sub( min );
+	const resMinusOne = res.sub( 1.0 );
+	const spacing = range.div( resMinusOne );
+
+	// Offset along the normal by half a probe spacing, then remap to texel centers.
+
+	const samplePos = position.add( normal.mul( spacing ).mul( 0.5 ) );
+	const uvw = samplePos.sub( min ).div( range ).clamp( 0.0, 1.0 ).mul( resMinusOne ).div( res ).add( vec3( 0.5 ).div( res ) );
+
+	let irradiance = evaluateGridIrradiance( texture3D( light.texture ), uvw, res, normal ).mul( intensity );
+
+	// Optional smooth boundary for blending grids; falloff 0 applies everywhere.
+
+	if ( light.falloff > 0 ) {
+
+		const outside = min.sub( position ).max( 0.0 ).add( position.sub( max ).max( 0.0 ) );
+		const weight = outside.length().smoothstep( 0.0, falloff ).oneMinus();
+
+		irradiance = irradiance.mul( weight );
+
+	}
+
+	return irradiance;
+
+}
+
+/**
+ * Returns the irradiance of a baked {@link LightProbeGrid} at the given world-space
+ * position and normal. Use this to evaluate the grid outside of the lighting context,
+ * e.g. when baking light maps with {@link LightMapper}.
+ *
+ * @param {LightProbeGrid} light - The baked light probe grid.
+ * @param {Node<vec3>} position - The world-space position.
+ * @param {Node<vec3>} normal - The world-space normal.
+ * @return {Node<vec3>} The irradiance.
+ */
+export function lightProbeGridIrradiance( light, position, normal ) {
+
+	const box = light.boundingBox;
+
+	return getGridIrradiance( light, uniform( box.min ), uniform( box.max ), uniform( light.resolution ), uniform( light.intensity ), uniform( light.falloff ), position, normal );
+
+}
+
+/**
  * The light node that applies a {@link LightProbeGrid} to the scene. It samples
  * the baked L2 spherical-harmonic atlas at the surface position and adds the
  * resulting irradiance to the lighting context, so every standard node material
@@ -99,33 +159,7 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		if ( light.texture === null ) return;
 
-		const min = this._min;
-		const max = this._max;
-		const res = this._resolution;
-
-		const range = max.sub( min );
-		const resMinusOne = res.sub( 1.0 );
-		const spacing = range.div( resMinusOne );
-
-		// Offset along the normal by half a probe spacing, then remap to texel centers.
-
-		const samplePos = positionWorld.add( normalWorld.mul( spacing ).mul( 0.5 ) );
-		const uvw = samplePos.sub( min ).div( range ).clamp( 0.0, 1.0 ).mul( resMinusOne ).div( res ).add( vec3( 0.5 ).div( res ) );
-
-		const result = evaluateGridIrradiance( texture3D( light.texture ), uvw, res, normalWorld );
-
-		let irradiance = result.mul( this._intensity );
-
-		// Optional smooth boundary for blending grids; falloff 0 applies everywhere.
-
-		if ( light.falloff > 0 ) {
-
-			const outside = min.sub( positionWorld ).max( 0.0 ).add( positionWorld.sub( max ).max( 0.0 ) );
-			const weight = outside.length().smoothstep( 0.0, this._falloff ).oneMinus();
-
-			irradiance = irradiance.mul( weight );
-
-		}
+		const irradiance = getGridIrradiance( light, this._min, this._max, this._resolution, this._intensity, this._falloff, positionWorld, normalWorld );
 
 		builder.context.irradiance.addAssign( irradiance );
 
