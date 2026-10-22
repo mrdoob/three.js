@@ -313,6 +313,25 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 	}
 
+
+	/**
+	 * Returns the spatial influence, excluding intensity so overlapping grids
+	 * blend their lighting without changing the meaning of their intensities.
+	 *
+	 * @private
+	 * @return {Node<float>} The influence weight.
+	 */
+	getInfluenceWeight() {
+
+		const inside = positionWorld.greaterThanEqual( this._influenceMin ).all().and( positionWorld.lessThanEqual( this._influenceMax ).all() );
+		const outside = this._min.sub( positionWorld ).max( 0.0 ).add( positionWorld.sub( this._max ).max( 0.0 ) );
+		const fade = select( this._falloff.greaterThan( 0.0 ), outside.length().smoothstep( 0.0, this._falloff.max( 1e-6 ) ).oneMinus(), 1.0 );
+		const influence = select( this._hasInfluenceBox.equal( 1 ), select( inside, 1.0, 0.0 ), fade );
+
+		return select( this._intensity.greaterThan( 0.0 ), influence, 0.0 );
+
+	}
+
 	setup( builder ) {
 
 		const light = this.light;
@@ -362,14 +381,22 @@ class LightProbeGridNode extends AnalyticLightNode {
 		const irradianceAtlas = texture( light._irradianceTarget.texture );
 		const sampleIrradiance = ( uv ) => irradianceAtlas.sample( uv );
 
-		// Explicit influence bounds override the legacy fade outside the probe bounds.
+		const influence = this.getInfluenceWeight();
+		let totalInfluence = float( 0.0 );
 
-		const inside = positionWorld.greaterThanEqual( this._influenceMin ).all().and( positionWorld.lessThanEqual( this._influenceMax ).all() );
-		const outside = min.sub( positionWorld ).max( 0.0 ).add( positionWorld.sub( max ).max( 0.0 ) );
-		const fade = select( this._falloff.greaterThan( 0.0 ), outside.length().smoothstep( 0.0, this._falloff.max( 1e-6 ) ).oneMinus(), 1.0 );
-		let weight = this._intensity.mul( select( this._hasInfluenceBox.equal( 1 ), select( inside, 1.0, 0.0 ), fade ) );
+		for ( const node of builder.lightsNode.getLightNodes( builder ) ) {
 
-		weight = weight.toVar();
+			if ( node.light && node.light.isLightProbeGrid && node.light.texture !== null ) {
+
+				totalInfluence = totalInfluence.add( node.getInfluenceWeight() );
+
+			}
+
+		}
+
+		// Normalize overlapping coverage, preserving fades at the outer boundary.
+
+		const weight = this._intensity.mul( influence ).div( totalInfluence.max( 1.0 ) ).toVar();
 
 		// Skip lookups when the grid contributes nothing.
 
