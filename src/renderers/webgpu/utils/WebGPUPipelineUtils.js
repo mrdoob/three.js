@@ -298,6 +298,10 @@ class WebGPUPipelineUtils {
 
 					_renderPipelineDescriptor.reset();
 
+					// Pop the error scope before awaiting the pipeline, so several pipelines
+					// can be created at the same time without mixing their error scopes.
+					const errorScopePromise = device.popErrorScope();
+
 					if ( pipelinePromise !== null ) {
 
 						try {
@@ -312,7 +316,7 @@ class WebGPUPipelineUtils {
 
 					}
 
-					const errorScope = await device.popErrorScope();
+					const errorScope = await errorScopePromise;
 
 					if ( errorScope !== null || asyncError !== null ) {
 
@@ -455,6 +459,10 @@ class WebGPUPipelineUtils {
 
 					_computePipelineDescriptor.reset();
 
+					// Pop the error scope before awaiting the pipeline, so several pipelines
+					// can be created at the same time without mixing their error scopes.
+					const errorScopePromise = device.popErrorScope();
+
 					if ( pipelinePromise !== null ) {
 
 						try {
@@ -469,7 +477,7 @@ class WebGPUPipelineUtils {
 
 					}
 
-					const errorScope = await device.popErrorScope();
+					const errorScope = await errorScopePromise;
 
 					if ( errorScope !== null || asyncError !== null ) {
 

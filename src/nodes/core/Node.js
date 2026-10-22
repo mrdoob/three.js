@@ -909,23 +909,26 @@ class Node extends EventDispatcher {
 
 			if ( callback ) {
 
+				// the overrides are cached per callback, nested contexts can override the same node with different nodes
+
 				const nodeData = builder.getDataFromNode( this );
+				const overrides = nodeData.overrides || ( nodeData.overrides = new Map() );
 
-				if ( nodeData.isOverwritten !== true ) {
+				if ( overrides.has( callback ) === false ) {
 
-					nodeData.isOverwritten = true;
+					// avoid recursive override calls
+
+					overrides.set( callback, null );
 
 					// cancel the override for use the same node inside the callback
 
 					sharedNode = callback( builder ).overrideNode( this, null );
 
-					nodeData.sharedNode = sharedNode;
+					overrides.set( callback, sharedNode );
 
 				} else {
 
-					// avoid recursive override calls
-
-					sharedNode = nodeData.sharedNode;
+					sharedNode = overrides.get( callback );
 
 				}
 

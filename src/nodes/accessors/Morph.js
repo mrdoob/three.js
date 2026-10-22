@@ -182,7 +182,7 @@ function getEntry( geometry ) {
  * @function
  * @param {Mesh} mesh - The mesh.
  */
-export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ] ) => {
+export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ], builder ) => {
 
 	const { geometry } = mesh;
 
@@ -193,6 +193,8 @@ export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ] ) => {
 	const morphTargetsCount = ( morphAttribute !== undefined ) ? morphAttribute.length : 0;
 
 	if ( morphTargetsCount === 0 ) return;
+
+	if ( mesh.morphTexture ) builder.objectSpecific = true;
 
 	// Init
 

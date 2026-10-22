@@ -1,6 +1,6 @@
-import { DoubleSide } from 'three/webgpu';
+import { AddEquation, CustomBlending, DoubleSide, OneFactor, OneMinusSrcAlphaFactor } from 'three/webgpu';
 import { MaterialXLogCodes } from './MaterialXLog.js';
-import { Fn, float, vec3, mul, clamp, vec2, cos, sin, pow, mix, element, transformNormalToView, positionLocal, normalLocal, tangentLocal, bitangentLocal } from 'three/tsl';
+import { Fn, float, vec3, mul, sub, dot, clamp, vec2, cos, sin, pow, mix, element, transformNormalToView, positionLocal, normalLocal, tangentLocal, bitangentLocal } from 'three/tsl';
 
 const mappedStandardSurfaceInputs = new Set( [
 	'base',
@@ -490,7 +490,42 @@ function applyDisplacement( material, inputs, log, nodeName, authored, inputType
 
 }
 
+const mappedSurfaceUnlitInputs = new Set( [ 'emission', 'emission_color', 'transmission', 'transmission_color', 'opacity' ] );
+
+// <surface_unlit> renders without lighting (MeshBasicNodeMaterial). MaterialX computes
+// color = emission * emission_color * opacity and transparency = mix( 1, transmission * transmission_color, opacity ),
+// and the result is color + transparency * background: blending ( One, OneMinusSrcAlpha ) with
+// alpha = 1 - transparency. A colored transmission becomes grey, since blending has one alpha.
+function applySurfaceUnlit( material, inputs, log, nodeName, authored ) {
+
+	const emission = inputs.emission;
+	const emissionColor = inputs.emission_color;
+	const opacity = inputs.opacity;
+
+	material.colorNode = mul( mul( emissionColor, emission ), opacity );
+
+	if ( isMeaningfulNode( inputs.opacity, 1 ) || isEnabledWeightNode( inputs.transmission ) ) {
+
+		const transmission = inputs.transmission;
+		const transmissionColor = inputs.transmission_color;
+		const transparency = mix( vec3( 1, 1, 1 ), mul( transmissionColor, transmission ), opacity );
+
+		material.opacityNode = sub( 1, dot( transparency, vec3( 1 / 3, 1 / 3, 1 / 3 ) ) );
+		material.transparent = true;
+		// The color is already multiplied by the opacity.
+		material.blending = CustomBlending;
+		material.blendEquation = AddEquation;
+		material.blendSrc = OneFactor;
+		material.blendDst = OneMinusSrcAlphaFactor;
+
+	}
+
+	warnIgnoredInputs( authored, mappedSurfaceUnlitInputs, log, 'surface_unlit', nodeName );
+
+}
+
 const MaterialXSurfaceMappings = {
+	surface_unlit: applySurfaceUnlit,
 	standard_surface: applyStandardSurface,
 	gltf_pbr: applyGltfPbrSurface,
 	open_pbr_surface: applyOpenPbrSurface,
@@ -523,6 +558,7 @@ export {
 	applyGltfPbrSurface,
 	applyOpenPbrSurface,
 	applyDisplacement,
+	applySurfaceUnlit,
 	mappedStandardSurfaceInputs,
 	mappedGltfPbrInputs,
 	mappedOpenPbrInputs,

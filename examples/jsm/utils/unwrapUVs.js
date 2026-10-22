@@ -5,7 +5,9 @@ import { potpack } from '../libs/potpack.module.js';
 /**
  * Generates a unique UV atlas for the meshes in a hierarchy, measured in world space.
  * Each mesh receives a new geometry. Skinned and morphed meshes are unwrapped in
- * their current pose. Degenerate faces keep UV (0, 0) and a faceCharts entry of -1.
+ * their current pose. BatchedMesh is skipped with a warning.
+ * Excluded faces collapse onto the UV of a neighboring chart vertex, or (0, 0) if
+ * isolated, and get a faceCharts entry of -1.
  *
  * With a `pageSize` below the `resolution`, the charts are packed at the density of the
  * `resolution` into as many square pages of `pageSize` as they need, e.g. for devices that
@@ -20,7 +22,7 @@ import { potpack } from '../libs/potpack.module.js';
  * The instances of an instanced mesh share the charts of its geometry and each one gets an
  * atlas region of the same size, at the mean scale of the instances. The attribute maps the
  * charts into a unit square, and the instanced attributes `instanceLightMapScale` and
- * `instanceLightMapOffset` map it into the region of each instance. Batched meshes are skipped.
+ * `instanceLightMapOffset` map it into the region of each instance.
  *
  * @three_import import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
  *
@@ -36,8 +38,10 @@ import { potpack } from '../libs/potpack.module.js';
  * @param {boolean} [options.useInputUVs=false] - Preserve valid authored UV charts before trying LSCM.
  * @param {string} [options.inputAttribute='uv'] - The authored UVs of `respectUVSeams` and `useInputUVs`.
  * @return {?Object} Page size, page count, density, chart bounds with their pages, mesh vertex/face
- * mappings with their pages, and the meshes left out, or null if the charts do not fit the atlas.
- * Meshes are left unchanged in that case.
+ * mappings with their pages, the meshes left out and warning counts (excluded faces, tiny faces
+ * under 0.01 atlas pixels squared and single-triangle charts, which signal fragmentation), or null
+ * if the charts do not fit. Meshes are left unchanged in that case. Charts that fail Float32
+ * validation are split and repacked; single faces that still fail are excluded.
  */
 function unwrapUVs( root, options = {} ) {
 
@@ -55,7 +59,14 @@ function unwrapUVs( root, options = {} ) {
 	const records = [], excluded = [];
 	root.traverse( mesh => {
 
-		if ( ! mesh.isMesh || mesh.isBatchedMesh ) return;
+		if ( ! mesh.isMesh ) return;
+		if ( mesh.isBatchedMesh ) {
+
+			console.warn( 'THREE.unwrapUVs(): BatchedMesh is not supported. Skipping mesh.', mesh );
+			return;
+
+		}
+
 		let scale = mesh.userData.lightMapScale ?? 1;
 		if ( ! ( scale >= 0 && scale < Infinity ) ) {
 
@@ -74,7 +85,6 @@ function unwrapUVs( root, options = {} ) {
 		const record = readMesh( mesh, settings );
 		record.densityScale = scale * ( mesh.isInstancedMesh ? meanInstanceScale( mesh ) : 1 );
 		record.instances = mesh.isInstancedMesh ? mesh.count : 0;
-		record.charts = [];
 		records.push( record );
 
 	} );
@@ -90,21 +100,43 @@ function unwrapUVs( root, options = {} ) {
 
 	}
 
-	for ( const chart of charts ) chart.record.charts.push( chart );
+	let density, pages;
+	for ( ; ; ) {
 
-	const packed = packCharts( records, settings );
-	if ( packed === null ) return null;
-	const { density, pages } = packed;
+		for ( const record of records ) record.charts = [];
+		for ( const chart of charts ) chart.record.charts.push( chart );
+
+		const packed = packCharts( records, settings );
+		if ( packed === null ) return null;
+		( { density, pages } = packed );
+
+		const failed = [];
+		for ( let i = charts.length - 1; i >= 0; i -- ) {
+
+			if ( validateFloat32Chart( charts[ i ], settings, density ) === null ) failed.push( ...charts.splice( i, 1 ) );
+
+		}
+
+		if ( failed.length === 0 ) break;
+
+		// Float32 rounding broke these charts at this density; split them and repack.
+		for ( const chart of failed ) splitFaces( chart.record, chart.faces, settings, charts );
+
+	}
 
 	for ( let i = charts.length - 1; i >= 0; i -- ) {
 
-		if ( ! validateFloat32Chart( charts[ i ], settings, density ) ) charts.splice( i, 1 );
+		if ( charts[ i ].dropped.size === charts[ i ].faces.length ) charts.splice( i, 1 );
 
 	}
 
 	for ( let i = 0; i < charts.length; i ++ ) {
 
-		for ( const face of charts[ i ].faces ) charts[ i ].record.faceCharts[ face ] = i;
+		charts[ i ].faces.forEach( ( face, t ) => {
+
+			if ( ! charts[ i ].dropped.has( t ) ) charts[ i ].record.faceCharts[ face ] = i;
+
+		} );
 
 	}
 
@@ -122,6 +154,22 @@ function unwrapUVs( root, options = {} ) {
 
 	}
 
+	let tinyFaces = 0;
+	for ( const chart of charts ) {
+
+		// The UVs of instanced charts span an instance region rather than the page.
+		const { instances, regionSize } = chart.record, pixels = instances > 0 ? regionSize.w * regionSize.h : settings.pageSize ** 2;
+		for ( const [ t, triangle ] of chart.triangles.entries() ) {
+
+			if ( ! chart.dropped.has( t ) && Math.abs( cross2( ...triangle.map( i => chart.outputUV[ i ] ) ) ) * pixels / 2 < 0.01 ) tinyFaces ++;
+
+		}
+
+	}
+
+	const excludedFaces = records.reduce( ( sum, record ) => sum + record.faceCharts.filter( chart => chart === - 1 ).length, 0 );
+	const singleTriangleCharts = charts.filter( chart => chart.faces.length === 1 ).length;
+
 	return {
 		attribute: settings.attribute, resolution: settings.pageSize, pages, padding: settings.padding,
 		texelsPerUnit: density,
@@ -132,7 +180,8 @@ function unwrapUVs( root, options = {} ) {
 
 		} ),
 		meshes: records.map( record => ( { mesh: record.mesh, page: record.page, sourceVertices: record.sourceVertices, faceCharts: record.faceCharts } ) ),
-		excluded
+		excluded,
+		warnings: { excludedFaces, tinyFaces, singleTriangleCharts }
 	};
 
 }
@@ -152,13 +201,11 @@ function readMesh( mesh, settings ) {
 	const points = [], welds = [], unique = new Map();
 	for ( let i = 0; i < position.count; i ++ ) {
 
-		const p = mesh.getVertexPosition( i, new Vector3() );
 		// Exact positional welding only, for topology; output attributes keep original identity.
-		const key = `${ p.x },${ p.y },${ p.z }`;
+		const key = `${ position.getX( i ) },${ position.getY( i ) },${ position.getZ( i ) }`;
 		if ( ! unique.has( key ) ) unique.set( key, unique.size );
 		welds.push( unique.get( key ) );
-		p.applyMatrix4( mesh.matrixWorld );
-		points.push( p );
+		points.push( mesh.getVertexPosition( i, new Vector3() ).applyMatrix4( mesh.matrixWorld ) );
 
 	}
 
@@ -198,18 +245,46 @@ function readMesh( mesh, settings ) {
 	const uv = geometry.getAttribute( settings.inputAttribute );
 	for ( const edge of edges.values() ) {
 
-		if ( edge.length !== 2 ) continue; // Nonmanifold edges are seams.
-		const [ a, b ] = edge;
-		if ( a.a !== b.b || a.b !== b.a || materials[ a.f ] !== materials[ b.f ] ) continue;
-		if ( ( settings.respectUVSeams || settings.useInputUVs ) && uv ) {
+		// Pair opposite half-edges by closest normal, so duplicated double-sided shells
+		// (four faces per edge) join each side separately instead of becoming all seams.
+		const pairs = [], used = new Set();
+		for ( const x of edge ) {
 
-			const av = faces[ a.f ].vertices, bv = faces[ b.f ].vertices;
-			if ( ! equalUV( uv, av[ a.j ], bv[ ( b.j + 1 ) % 3 ] ) || ! equalUV( uv, av[ ( a.j + 1 ) % 3 ], bv[ b.j ] ) ) continue;
+			let best = null, bestDot = - Infinity;
+			for ( const y of edge ) {
+
+				if ( used.has( x ) || used.has( y ) || y.a !== x.b || y.b !== x.a || materials[ x.f ] !== materials[ y.f ] ) continue;
+				const dot = faces[ x.f ].normal.dot( faces[ y.f ].normal );
+				if ( dot > bestDot ) {
+
+					best = y; bestDot = dot;
+
+				}
+
+			}
+
+			if ( best ) {
+
+				pairs.push( [ x, best ] );
+				used.add( x ).add( best );
+
+			}
 
 		}
 
-		faces[ a.f ].neighbors.push( b.f );
-		faces[ b.f ].neighbors.push( a.f );
+		for ( const [ a, b ] of pairs ) {
+
+			if ( ( settings.respectUVSeams || settings.useInputUVs ) && uv ) {
+
+				const av = faces[ a.f ].vertices, bv = faces[ b.f ].vertices;
+				if ( ! equalUV( uv, av[ a.j ], bv[ ( b.j + 1 ) % 3 ] ) || ! equalUV( uv, av[ ( a.j + 1 ) % 3 ], bv[ b.j ] ) ) continue;
+
+			}
+
+			faces[ a.f ].neighbors.push( b.f );
+			faces[ b.f ].neighbors.push( a.f );
+
+		}
 
 	}
 
@@ -323,18 +398,11 @@ function parameterize( record, faces, settings, charts ) {
 
 	if ( ! quality ) {
 
-		if ( useInput && faces.length === 1 ) {
+		if ( useInput && ( settings.mode === 'lightmap' || faces.length === 1 ) ) {
 
-			parameterize( record, faces, { ...settings, useInputUVs: false }, charts );
-			return;
-
-		}
-
-		// halving an authored light map chart until its pieces pass would leave many small charts, its faces
-		// get new charts instead
-
-		if ( useInput && settings.mode === 'lightmap' ) {
-
+			// Reproject a rejected lightmap island before splitting its authored UVs
+			// into one chart per triangle. Normal mode already tries LSCM above. The island
+			// grows new charts, since halving it until the pieces pass leaves many small charts.
 			const projected = { ...settings, useInputUVs: false };
 			for ( const chart of growCharts( record, projected, faces ) ) parameterize( record, chart, projected, charts );
 			return;
@@ -348,13 +416,7 @@ function parameterize( record, faces, settings, charts ) {
 
 		}
 
-		const half = Math.floor( faces.length / 2 );
-		for ( const subset of [ faces.slice( 0, half ), faces.slice( half ) ] ) {
-
-			for ( const component of connectedComponents( record, subset ) ) parameterize( record, component, settings, charts );
-
-		}
-
+		splitFaces( record, faces, settings, charts );
 		return;
 
 	}
@@ -380,6 +442,17 @@ function parameterize( record, faces, settings, charts ) {
 		width: bounds.max.x - bounds.min.x, height: bounds.max.y - bounds.min.y,
 		positions, triangles
 	} );
+
+}
+
+function splitFaces( record, faces, settings, charts ) {
+
+	const half = Math.floor( faces.length / 2 );
+	for ( const subset of [ faces.slice( 0, half ), faces.slice( half ) ] ) {
+
+		for ( const component of connectedComponents( record, subset ) ) parameterize( record, component, settings, charts );
+
+	}
 
 }
 
@@ -610,7 +683,7 @@ function packCharts( records, settings ) {
 		density = low;
 		if ( ! boxes ) {
 
-			console.warn( 'THREE.unwrapUVs(): Charts do not fit the atlas. Increase the resolution, reduce the padding or partition the hierarchy.' );
+			console.error( 'THREE.unwrapUVs(): Charts do not fit the atlas. Increase the resolution, reduce the padding or partition the hierarchy.' );
 			return null;
 
 		}
@@ -756,61 +829,67 @@ function validateFloat32Chart( chart, settings, density ) {
 		Math.fround( ( chart.box.x + border + p[ 0 ] * scale ) / width ),
 		Math.fround( ( chart.box.y + border + p[ 1 ] * scale ) / height )
 	];
-	chart.outputUV = chart.uv.map( p => toUV( p, settings.pageSize, settings.pageSize ) );
+	const pageUV = chart.uv.map( p => toUV( p, settings.pageSize, settings.pageSize ) );
 	// Instanced charts map into the unit square of the instance regions, which the instance
 	// scales stretch back to the proportions validated here.
-	const outputUV = record.instances > 0 ? chart.uv.map( p => toUV( p, record.regionSize.w, record.regionSize.h ) ) : chart.outputUV;
+	chart.outputUV = record.instances > 0 ? chart.uv.map( p => toUV( p, record.regionSize.w, record.regionSize.h ) ) : pageUV;
 	// Validate the coordinates the GPU actually receives, not just the solver's
 	// doubles. Slivers can collapse or reverse after atlas translation/rounding.
 	const limits = { ...settings, maxStretch: settings.maxStretch * ( 1 + 5e-4 ), maxAreaRatio: settings.maxAreaRatio * ( 1 + 5e-4 ) };
-	let quality = checkChart( chart.positions, chart.triangles, chart.outputUV, chart.worldArea, limits );
-	if ( ! quality ) {
+	// Drops are recomputed on every pass, so a repack at another density can restore them.
+	chart.dropped = new Set();
+	if ( checkChart( chart.positions, chart.triangles, pageUV, chart.worldArea, limits ) ) return true;
 
-		const faces = [], triangles = [];
-		for ( let i = 0; i < chart.triangles.length; i ++ ) {
+	// Drop failing single faces and subtexel faces; anything else needs a split.
+	const triangles = [];
+	let worldArea = chart.worldArea;
+	for ( let i = 0; i < chart.triangles.length; i ++ ) {
 
-			const triangle = chart.triangles[ i ], face = chart.record.faces[ chart.faces[ i ] ];
-			if ( face.area * scale * scale < 1 && ! checkChart( chart.positions, [ triangle ], chart.outputUV, face.area, limits ) ) {
+		const triangle = chart.triangles[ i ], face = chart.record.faces[ chart.faces[ i ] ];
+		if ( chart.triangles.length === 1 || face.area * scale * scale < 1 && ! checkChart( chart.positions, [ triangle ], pageUV, face.area, limits ) ) {
 
-				face.ignored = true;
-				chart.worldArea -= face.area;
+			chart.dropped.add( i );
+			worldArea -= face.area;
 
-			} else {
+		} else {
 
-				faces.push( chart.faces[ i ] );
-				triangles.push( triangle );
-
-			}
+			triangles.push( triangle );
 
 		}
 
-		chart.faces = faces;
-		chart.triangles = triangles;
-		if ( faces.length === 0 ) return false;
-		quality = checkChart( chart.positions, triangles, chart.outputUV, chart.worldArea, limits );
-
 	}
 
-	if ( ! quality ) console.warn( `THREE.unwrapUVs(): Float32 precision is insufficient for mesh "${ chart.record.mesh.name }". Some UVs may overlap.` );
-	chart.outputUV = outputUV;
-	return true;
+	return triangles.length === 0 || checkChart( chart.positions, triangles, pageUV, worldArea, limits ) ? true : null;
 
 }
 
 function rebuildGeometry( record, charts, settings ) {
 
 	const original = record.original, lookup = new Map(), source = [], values = [], indices = [];
+	const chartUV = ( chart, vertex ) => chart.outputUV[ chart.vertexMap.get( record.vertexKeys[ vertex ] ) ];
+
+	// Excluded faces collapse onto a welded neighbor's UV so they sample adjacent lighting
+	// rather than the gutter of whichever chart sits at (0, 0). Isolated ones keep (0, 0).
+	const weldUVs = new Map();
+	for ( let f = 0; f < record.faces.length; f ++ ) {
+
+		const chart = charts[ record.faceCharts[ f ] ], face = record.faces[ f ];
+		if ( chart ) for ( let j = 0; j < 3; j ++ ) weldUVs.set( face.welds[ j ], chartUV( chart, face.vertices[ j ] ) );
+
+	}
+
 	for ( let f = 0; f < record.faces.length; f ++ ) {
 
 		const chartIndex = record.faceCharts[ f ], chart = charts[ chartIndex ], face = record.faces[ f ];
+		const fallback = chart ? null : face.welds.map( weld => weldUVs.get( weld ) ).find( Boolean ) ?? [ 0, 0 ];
 		for ( let j = 0; j < 3; j ++ ) {
 
-			const vertex = face.vertices[ j ], key = `${ vertex },${ chartIndex }`;
+			const vertex = face.vertices[ j ], key = chart ? `${ vertex },${ chartIndex }` : `${ vertex },${ fallback }`;
 			if ( ! lookup.has( key ) ) {
 
 				lookup.set( key, source.length );
 				source.push( vertex );
-				const p = chart ? chart.outputUV[ chart.vertexMap.get( record.vertexKeys[ vertex ] ) ] : [ 0, 0 ];
+				const p = chart ? chartUV( chart, vertex ) : fallback;
 				values.push( p[ 0 ], p[ 1 ] );
 
 			}

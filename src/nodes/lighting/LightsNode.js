@@ -166,7 +166,7 @@ class LightsNode extends Node {
 				// force rebuild on version change to avoid the usage of removed shadow nodes
 
 				const lightNode = _lightsNodeRef.get( light );
-				const lightVersion = ( lightNode ) ? lightNode.version : - 1;
+				const lightVersion = ( lightNode ) ? lightNode.version : 0; // light nodes start at version 0, see #35019
 
 				_hashData.push( lightVersion );
 

@@ -1,17 +1,5 @@
 import { normalizeCode } from './code.js';
 
-function getCaseName( title ) {
-
-	return title.replace( / ([a-z])/g, ( _, letter ) => letter.toUpperCase() );
-
-}
-
-function getCaseTitle( name ) {
-
-	return name.replace( /([a-z0-9])([A-Z])/g, '$1 $2' ).toLowerCase();
-
-}
-
 export function parseReferences( source ) {
 
 	const references = new Map();
@@ -19,7 +7,7 @@ export function parseReferences( source ) {
 
 	for ( let i = 1; i < sections.length; i += 2 ) {
 
-		const name = getCaseName( sections[ i ] );
+		const name = sections[ i ];
 		if ( references.has( name ) ) throw new Error( `Duplicate TSL reference: ${ name }` );
 		references.set( name, normalizeCode( sections[ i + 1 ] ) );
 
@@ -31,6 +19,6 @@ export function parseReferences( source ) {
 
 export function formatReferences( references ) {
 
-	return Array.from( references, ( [ name, code ] ) => `// ${ getCaseTitle( name ) }\n\n${ normalizeCode( code ) }` ).join( '\n' );
+	return Array.from( references, ( [ name, code ] ) => `// ${ name }\n\n${ normalizeCode( code ) }` ).join( '\n' );
 
 }

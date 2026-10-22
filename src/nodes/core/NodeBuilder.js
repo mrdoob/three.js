@@ -8,7 +8,7 @@ import ParameterNode from './ParameterNode.js';
 import StructType from './StructType.js';
 import FunctionNode from '../code/FunctionNode.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
-import { getTypeFromLength, getTextureType, isArrayAsParameter } from './NodeUtils.js';
+import { getTypeFromLength, getTextureType, isArrayAsParameter, mergeContext } from './NodeUtils.js';
 import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js';
 
 import {
@@ -322,6 +322,16 @@ class NodeBuilder {
 		 * @default false
 		 */
 		this.hardwareClipping = false;
+
+		/**
+		 * Whether the build embeds data of the 3D object it is built for, like its buffers,
+		 * instead of binding the data of the rendered object. Such builds can't be shared
+		 * with other objects, so the renderer doesn't cache them.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.objectSpecific = false;
 
 		/**
 		 * The generated vertex shader.
@@ -710,15 +720,11 @@ class NodeBuilder {
 
 		//
 
-		let bindGroup;
+		let bindGroup = new BindGroup( groupName, bindings );
 
 		if ( sharedGroup && this.renderer._bindings !== undefined ) {
 
-			bindGroup = this.renderer._bindings.getSharedBindGroup( groupName, bindings );
-
-		} else {
-
-			bindGroup = new BindGroup( groupName, bindings );
+			bindGroup = this.renderer._bindings.getSharedBindGroup( bindGroup );
 
 		}
 
@@ -1108,7 +1114,7 @@ class NodeBuilder {
 
 		const previousContext = this.getContext();
 
-		this.setContext( { ...this.context, ...context } );
+		this.setContext( mergeContext( this.context, context ) );
 
 		return previousContext;
 
@@ -2502,16 +2508,16 @@ class NodeBuilder {
 		const baseName = node.name;
 
 		let name = baseName;
-		let property = this.getPropertyName( node );
+		let declarationName = this.getDeclarationName( node );
 		let index = 1;
 
 		// Automatically renames the property if the name is already in use or reserved.
 
-		while ( ( checkKeywords && this.isReservedKeyword( name ) ) || declarations[ property ] !== undefined ) {
+		while ( ( checkKeywords && this.isReservedKeyword( name ) ) || declarations[ declarationName ] !== undefined ) {
 
 			name = baseName + '_' + index ++;
 			node.name = name;
-			property = this.getPropertyName( node );
+			declarationName = this.getDeclarationName( node );
 
 		}
 
@@ -2521,7 +2527,20 @@ class NodeBuilder {
 
 		}
 
-		declarations[ property ] = node;
+		declarations[ declarationName ] = node;
+
+	}
+
+	/**
+	 * Returns the identifier the given node declares in the shader. It is used
+	 * by {@link NodeBuilder#registerDeclaration} to detect name collisions.
+	 *
+	 * @param {Object} node - The node.
+	 * @return {string} The declaration name.
+	 */
+	getDeclarationName( node ) {
+
+		return this.getPropertyName( node );
 
 	}
 
@@ -3517,7 +3536,7 @@ class NodeBuilder {
 
 		if ( renderer.contextNode.isContextNode === true ) {
 
-			this.context = { ...this.context, ...renderer.contextNode.getFlowContextData() };
+			this.addContext( renderer.contextNode.getFlowContextData() );
 
 		} else {
 
@@ -3531,7 +3550,7 @@ class NodeBuilder {
 
 			if ( material.contextNode.isContextNode === true ) {
 
-				this.context = { ...this.context, ...material.contextNode.getFlowContextData() };
+				this.addContext( material.contextNode.getFlowContextData() );
 
 			} else {
 

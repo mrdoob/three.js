@@ -114,6 +114,8 @@ class FBXLoader extends Loader {
 		const path = ( scope.path === '' ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
 
 		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
@@ -181,6 +183,8 @@ class FBXLoader extends Loader {
 		// console.log( fbxTree );
 
 		const textureLoader = new TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
+		textureLoader.setPriority( this.priority );
+		textureLoader.setCache( this.cache );
 
 		return new FBXTreeParser( textureLoader, this.manager, this.trimAnimationClips ).parse( fbxTree );
 

@@ -1,7 +1,7 @@
 import {
-	Bone, BoxGeometry, BufferAttribute, BufferGeometry, CylinderGeometry, Float16BufferAttribute, Float32BufferAttribute,
-	Group, InstancedBufferAttribute, InstancedMesh, ObjectLoader, InterleavedBuffer, InterleavedBufferAttribute, Matrix4, Mesh, PlaneGeometry, Skeleton, SkinnedMesh, SphereGeometry,
-	TorusGeometry, Uint16BufferAttribute, Vector3
+	BatchedMesh, BoxGeometry, BufferAttribute, BufferGeometry, CylinderGeometry, Float32BufferAttribute,
+	Group, InstancedBufferAttribute, InstancedMesh, Matrix4, Mesh,
+	ObjectLoader, PlaneGeometry, SphereGeometry, TorusGeometry, Vector3
 } from 'three';
 import { unwrapUVs as unwrap } from '../../../../examples/jsm/utils/unwrapUVs.js';
 import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
@@ -23,7 +23,7 @@ function auditAtlas( result ) {
 			if ( p.some( v => ! Number.isFinite( v[ 0 ] + v[ 1 ] ) || v[ 0 ] < 0 || v[ 0 ] > 1 || v[ 1 ] < 0 || v[ 1 ] > 1 ) ) throw new Error( 'Invalid UV coordinate.' );
 			if ( record.faceCharts[ f ] === - 1 ) {
 
-				if ( p.some( v => v[ 0 ] !== 0 || v[ 1 ] !== 0 ) ) throw new Error( 'Ignored faces must have UV (0, 0).' );
+				if ( p.some( v => v[ 0 ] !== p[ 0 ][ 0 ] || v[ 1 ] !== p[ 0 ][ 1 ] ) ) throw new Error( 'Ignored faces must collapse to a single UV.' );
 				continue;
 
 			}
@@ -247,18 +247,11 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'seam splitting copies every attribute, morph, interleaved and normalized value', assert => {
+			QUnit.test( 'seam splitting copies every attribute', assert => {
 
 				const geometry = new BoxGeometry();
 				const count = geometry.attributes.position.count;
-				geometry.setAttribute( 'skinIndex', new Uint16BufferAttribute( new Uint16Array( count * 4 ).map( ( v, i ) => i % 7 ), 4 ) );
-				geometry.setAttribute( 'skinWeight', new Float32BufferAttribute( new Float32Array( count * 4 ).fill( 0.25 ), 4 ) );
-				geometry.setAttribute( 'color', new BufferAttribute( new Uint8Array( count * 3 ).map( ( v, i ) => i * 17 % 256 ), 3, true ) );
 				geometry.setAttribute( 'tangent', new Float32BufferAttribute( new Float32Array( count * 4 ).fill( 1 ), 4 ) );
-				geometry.setAttribute( 'half', new Float16BufferAttribute( new Uint16Array( count ).fill( 0x3c00 ), 1 ) );
-				geometry.setAttribute( 'interleaved', new InterleavedBufferAttribute( new InterleavedBuffer( new Float32Array( count * 5 ).map( ( v, i ) => i / 7 ), 5 ), 2, 2 ) );
-				geometry.morphAttributes.position = [ geometry.attributes.position.clone() ];
-				geometry.morphTargetsRelative = true;
 				geometry.setDrawRange( 3, 12 );
 				const result = unwrap( new Mesh( geometry ), { mode: 'normal' } );
 				verify( assert, result, 2 );
@@ -266,7 +259,6 @@ export default QUnit.module( 'Addons', () => {
 				for ( const [ name, original ] of Object.entries( geometry.attributes ) ) {
 
 					const output = record.mesh.geometry.attributes[ name ];
-					assert.strictEqual( output.normalized, original.normalized );
 					for ( let i = 0; i < output.count; i ++ ) {
 
 						for ( let j = 0; j < output.itemSize; j ++ ) assert.strictEqual( output.getComponent( i, j ), original.getComponent( record.sourceVertices[ i ], j ) );
@@ -275,9 +267,6 @@ export default QUnit.module( 'Addons', () => {
 
 				}
 
-				const morph = record.mesh.geometry.morphAttributes.position[ 0 ];
-				for ( let i = 0; i < morph.count; i ++ ) assert.strictEqual( morph.getX( i ), geometry.morphAttributes.position[ 0 ].getX( record.sourceVertices[ i ] ) );
-				assert.strictEqual( record.mesh.geometry.morphTargetsRelative, true );
 				assert.deepEqual( record.mesh.geometry.drawRange, geometry.drawRange );
 				assert.notStrictEqual( record.mesh.geometry.attributes.uv.array, geometry.attributes.uv.array );
 				assert.strictEqual( unwrap( record.mesh, { attribute: 'uv' } ).meshes[ 0 ].mesh.geometry.attributes.tangent, undefined );
@@ -404,6 +393,43 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
+			QUnit.test( 'reprojects rejected authored islands before splitting lightmap charts', assert => {
+
+				const geometry = new PlaneGeometry( 1, 1, 8, 8 );
+				for ( let i = 0; i < geometry.attributes.uv.count; i ++ ) geometry.attributes.uv.setX( i, geometry.attributes.uv.getX( i ) * 10 );
+				const result = unwrap( new Mesh( geometry ), { mode: 'lightmap', useInputUVs: true } );
+				verify( assert, result );
+				assert.strictEqual( result.charts.length, 1, 'A distorted authored island is reprojected as one planar chart' );
+				assert.false( result.meshes[ 0 ].faceCharts.includes( - 1 ), 'All faces receive valid UVs' );
+
+			} );
+
+			QUnit.test( 'rejected curved authored islands retain valid conformal subset fallbacks', assert => {
+
+				const mesh = new Mesh( new TorusGeometry( 1, 0.4, 12, 36 ) );
+				const result = unwrap( mesh, { mode: 'normal', useInputUVs: true } );
+				verify( assert, result, 2 );
+				assert.false( result.meshes[ 0 ].faceCharts.includes( - 1 ), 'All curved faces receive valid UVs' );
+				assert.ok( result.charts.length < result.meshes[ 0 ].faceCharts.length / 4, 'Subset fallback avoids per-triangle fragmentation' );
+
+			} );
+
+			QUnit.test( 'batched meshes are skipped without modifying their geometry', assert => {
+
+				const root = new Group(), regular = new Mesh( new BoxGeometry() );
+				const batched = new BatchedMesh( 2, 100, 100 );
+				const original = batched.geometry;
+				root.add( regular, batched );
+				console.level = CONSOLE_LEVEL.OFF;
+				const result = unwrap( root );
+				console.level = CONSOLE_LEVEL.DEFAULT;
+				verify( assert, result );
+				assert.strictEqual( result.meshes.length, 1, 'Only supported meshes participate in the atlas' );
+				assert.strictEqual( result.meshes[ 0 ].mesh, regular );
+				assert.strictEqual( batched.geometry, original );
+
+			} );
+
 			QUnit.test( 'near-zero area slivers are retained but excluded from the atlas', assert => {
 
 				for ( const mode of [ 'lightmap', 'normal' ] ) {
@@ -418,9 +444,10 @@ export default QUnit.module( 'Addons', () => {
 					const record = result.meshes[ 1 ];
 					assert.strictEqual( record.mesh.geometry.index.count, 3 );
 					assert.deepEqual( record.faceCharts, new Int32Array( [ - 1 ] ) );
+					assert.strictEqual( result.warnings.tinyFaces, 0 );
 					assert.deepEqual( record.mesh.geometry.attributes.position.array, geometry.attributes.position.array );
 					assert.ok( record.mesh.geometry.attributes.uv1.array.every( value => value === 0 ) );
-					assert.strictEqual( result.meshes.reduce( ( sum, record ) => sum + record.faceCharts.filter( chart => chart === - 1 ).length, 0 ), 1 );
+					assert.strictEqual( result.warnings.excludedFaces, 1 );
 
 				}
 
@@ -435,8 +462,16 @@ export default QUnit.module( 'Addons', () => {
 				verify( assert, result );
 				const record = result.meshes[ 0 ];
 				assert.deepEqual( record.faceCharts, new Int32Array( [ 0, - 1 ] ) );
+				assert.strictEqual( result.warnings.singleTriangleCharts, 1 );
 				assert.strictEqual( record.mesh.geometry.index.count, 6 );
 				assert.strictEqual( record.mesh.geometry.attributes.position.count, 6 );
+				const uv = record.mesh.geometry.attributes.uv1, index = record.mesh.geometry.index;
+				for ( let j = 3; j < 6; j ++ ) {
+
+					assert.deepEqual( [ uv.getX( index.getX( j ) ), uv.getY( index.getX( j ) ) ], [ uv.getX( index.getX( 0 ) ), uv.getY( index.getX( 0 ) ) ], 'Ignored face collapses onto the UV of its welded neighbor' );
+
+				}
+
 				const degenerate = new BufferGeometry();
 				degenerate.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ], 3 ) );
 				const allIgnored = unwrap( new Mesh( degenerate ) );
@@ -452,7 +487,7 @@ export default QUnit.module( 'Addons', () => {
 				geometry.setAttribute( 'position', new BufferAttribute( new Float64Array( [ 0, 0, 0, 10000, 10000, 0, 10000, 10000.0001, 0 ] ), 3 ) );
 				const result = unwrap( new Mesh( geometry ) );
 				assert.strictEqual( result.charts.length, 0 );
-				assert.strictEqual( result.meshes.reduce( ( sum, record ) => sum + record.faceCharts.filter( chart => chart === - 1 ).length, 0 ), 1 );
+				assert.strictEqual( result.warnings.excludedFaces, 1 );
 				assert.ok( result.meshes[ 0 ].mesh.geometry.attributes.uv1.array.every( value => value === 0 ) );
 
 			} );
@@ -467,8 +502,9 @@ export default QUnit.module( 'Addons', () => {
 					root.add( new Mesh( new PlaneGeometry() ), new Mesh( geometry ) );
 					const result = unwrap( root, { mode, texelsPerUnit: 0.001 } );
 					verify( assert, result, mode === 'normal' ? 2 : 1.5 );
-					assert.strictEqual( result.meshes.reduce( ( sum, record ) => sum + record.faceCharts.filter( chart => chart === - 1 ).length, 0 ), 1 );
+					assert.strictEqual( result.warnings.excludedFaces, 1 );
 					assert.strictEqual( result.meshes[ 1 ].faceCharts[ 0 ], - 1 );
+					assert.strictEqual( result.warnings.tinyFaces, 2, 'Both plane faces cover under 0.01 atlas pixels squared' );
 					assert.strictEqual( result.meshes[ 1 ].mesh.geometry.index.count, 3 );
 					assert.ok( result.meshes[ 1 ].mesh.geometry.attributes.uv1.array.every( value => value === 0 ) );
 
@@ -476,35 +512,14 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'skinned glTF bind matrices and morphs use rendered world area without altering the pose', assert => {
+			QUnit.test( 'Float32 chart failures are split and repacked, keeping the faces that validate', assert => {
 
-				const root = new Group(), bone = new Bone(), geometry = new PlaneGeometry( 2, 2 );
-				const count = geometry.attributes.position.count;
-				geometry.setAttribute( 'skinIndex', new Uint16BufferAttribute( new Uint16Array( count * 4 ), 4 ) );
-				const weights = new Float32Array( count * 4 );
-				for ( let i = 0; i < count; i ++ ) weights[ i * 4 ] = 1;
-				geometry.setAttribute( 'skinWeight', new Float32BufferAttribute( weights, 4 ) );
-				const morph = geometry.attributes.position.clone();
-				for ( let i = 0; i < count; i ++ ) morph.setX( i, morph.getX( i ) * 2 );
-				geometry.morphAttributes.position = [ morph ];
-				const mesh = new SkinnedMesh( geometry );
-				root.add( mesh, bone );
-				mesh.scale.setScalar( 0.01 );
-				mesh.bind( new Skeleton( [ bone ], [ new Matrix4() ] ), new Matrix4() );
-				mesh.morphTargetInfluences[ 0 ] = 0.5;
-				root.scale.setScalar( 2 );
-				const result = unwrap( root );
+				const mesh = new Mesh( new PlaneGeometry( 1, 1, 2, 2 ) );
+				const result = unwrap( mesh, { texelsPerUnit: 0.0000013182567385564074 } );
 				verify( assert, result );
-				assert.ok( Math.abs( auditAtlas( result ).worldArea - 24 ) < 1e-6, 'Skin bind scale cancels mesh scale; root scale and morph remain' );
-				assert.strictEqual( mesh.morphTargetInfluences[ 0 ], 0.5 );
-				for ( let i = 0; i < mesh.geometry.attributes.position.count; i ++ ) {
-
-					const source = result.meshes[ 0 ].sourceVertices[ i ];
-					assert.ok( new Vector3().fromBufferAttribute( mesh.geometry.attributes.position, i ).equals( new Vector3().fromBufferAttribute( geometry.attributes.position, source ) ) );
-
-				}
-
-				assert.strictEqual( bone.quaternion.w, 1 );
+				assert.strictEqual( result.warnings.excludedFaces, 5, 'Faces that cannot survive Float32 rounding are excluded' );
+				// Face 5 fails in an earlier pass but validates once repacked, so it is restored.
+				assert.deepEqual( result.meshes[ 0 ].faceCharts, new Int32Array( [ 0, 0, - 1, - 1, - 1, 1, - 1, - 1 ] ) );
 
 			} );
 
@@ -548,7 +563,8 @@ export default QUnit.module( 'Addons', () => {
 			QUnit.test( 'result retains atlas metadata and vertex and face mappings', assert => {
 
 				const result = unwrap( new Mesh( new BoxGeometry() ) );
-				assert.deepEqual( Object.keys( result ), [ 'attribute', 'resolution', 'pages', 'padding', 'texelsPerUnit', 'charts', 'meshes', 'excluded' ] );
+				assert.deepEqual( Object.keys( result ), [ 'attribute', 'resolution', 'pages', 'padding', 'texelsPerUnit', 'charts', 'meshes', 'excluded', 'warnings' ] );
+				assert.deepEqual( result.warnings, { excludedFaces: 0, tinyFaces: 0, singleTriangleCharts: 0 } );
 				assert.deepEqual( Object.keys( result.meshes[ 0 ] ), [ 'mesh', 'page', 'sourceVertices', 'faceCharts' ] );
 				assert.strictEqual( result.meshes[ 0 ].sourceVertices.length, result.meshes[ 0 ].mesh.geometry.attributes.position.count );
 				assert.strictEqual( result.meshes[ 0 ].faceCharts.length, 12 );

@@ -213,7 +213,9 @@ ShaderLib[ 'line' ] = {
 				// shift the depth of the projected points so the line
 				// segments overlap neatly
 				vec3 clipPose = ( position.y < 0.5 ) ? ndcStart : ndcEnd;
-				clip.z = clipPose.z * clip.w;
+
+				// only shift the depth of vertices in front of the camera (#35137)
+				if ( clip.w > 0.0 ) clip.z = clipPose.z * clip.w;
 
 			#else
 

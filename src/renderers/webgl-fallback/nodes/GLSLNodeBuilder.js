@@ -724,6 +724,18 @@ ${ flowData.code }
 
 		if ( depthSnippet ) uvSnippet = `vec3( ${ uvSnippet }, ${ depthSnippet } )`;
 
+		if ( texture.isDepthTexture ) {
+
+			if ( offsetSnippet ) {
+
+				return `textureLodOffset( ${ textureProperty }, ${ uvSnippet }, ${ levelSnippet }, ${ offsetSnippet } ).x`;
+
+			}
+
+			return `textureLod( ${ textureProperty }, ${ uvSnippet }, ${ levelSnippet } ).x`;
+
+		}
+
 		if ( offsetSnippet ) {
 
 			return `textureLodOffset( ${ textureProperty }, ${ uvSnippet }, ${ levelSnippet }, ${ offsetSnippet } )`;
@@ -903,6 +915,18 @@ ${ flowData.code }
 	}
 
 	/**
+	 * Returns the uniform block name of the given buffer uniform.
+	 *
+	 * @param {NodeUniform} uniform - The buffer uniform.
+	 * @return {string} The uniform block name.
+	 */
+	getUniformBufferName( uniform ) {
+
+		return 'NodeBuffer_' + uniform.name;
+
+	}
+
+	/**
 	 * Returns the uniforms of the given shader stage as a GLSL string.
 	 *
 	 * @param {string} shaderStage - The shader stage.
@@ -979,7 +1003,7 @@ ${ flowData.code }
 				const bufferCount = bufferNode.bufferCount;
 
 				const bufferCountSnippet = bufferCount > 0 ? bufferCount : '';
-				snippet = `${bufferNode.name} {\n\t${ bufferType } ${ uniform.name }[${ bufferCountSnippet }];\n};\n`;
+				snippet = `${ this.getUniformBufferName( uniform ) } {\n\t${ bufferType } ${ uniform.name }[${ bufferCountSnippet }];\n};\n`;
 
 			} else {
 
@@ -1862,7 +1886,7 @@ void main() {
 	 */
 	getUniformFromNode( node, type, shaderStage, name = null ) {
 
-		const uniformNode = super.getUniformFromNode( node, type, shaderStage, name );
+		const uniformNode = super.getUniformFromNode( node, type, shaderStage, type === 'buffer' ? null : name );
 		const nodeData = this.getDataFromNode( node, shaderStage, this.globalCache );
 
 		let uniformGPU = nodeData.uniformGPU;
@@ -1891,11 +1915,8 @@ void main() {
 
 			} else if ( type === 'buffer' ) {
 
-				node.name = `NodeBuffer_${ node.id }`;
-				uniformNode.name = `buffer${ node.id }`;
-
 				const buffer = new NodeUniformBuffer( node, group );
-				buffer.name = node.name;
+				buffer.name = this.getUniformBufferName( uniformNode );
 
 				bindings.push( buffer );
 

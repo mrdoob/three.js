@@ -51,6 +51,7 @@
 	"webgl_loader_texture_lottie": [ "community" ],
 	"webgl_loader_texture_ultrahdr": [ "jpg" ],
 	"webgl_loader_ttf": [ "font" ],
+	"webgl_loader_vdb": [ "community", "openvdb", "volume" ],
 	"webgl_lod": [ "level", "details" ],
 	"webgl_materials_blending": [ "alpha" ],
 	"webgl_materials_blending_custom": [ "alpha" ],

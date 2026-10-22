@@ -1,6 +1,7 @@
 import GLSLNodeBuilder from './nodes/GLSLNodeBuilder.js';
 import Backend from '../common/Backend.js';
 import { getCacheKey } from '../common/RenderContext.js';
+import { AttributeType } from '../common/Constants.js';
 
 import WebGLAttributeUtils from './utils/WebGLAttributeUtils.js';
 import WebGLVertexArrayUtils from './utils/WebGLVertexArrayUtils.js';
@@ -138,13 +139,6 @@ class WebGLBackend extends Backend {
 		 * @default null
 		 */
 		this.utils = null;
-
-		/**
-		 * Dictionary for caching transform feedback objects.
-		 *
-		 * @type {Object<string,WebGLTransformFeedback>}
-		 */
-		this.transformFeedbackCache = {};
 
 		/**
 		 * Controls if `gl.RASTERIZER_DISCARD` should be enabled or not.
@@ -507,6 +501,8 @@ class WebGLBackend extends Backend {
 
 		}
 
+		state.setScissorTest( renderContext.scissor );
+
 		//
 
 		this.initTimestampQuery( TimestampQuery.RENDER, this.getTimestampUID( renderContext ) );
@@ -518,24 +514,25 @@ class WebGLBackend extends Backend {
 		this.clear( renderContext.clearColor, renderContext.clearDepth, renderContext.clearStencil, renderContext, false );
 
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
+		const occlusionData = this.getOcclusionData( renderContext );
 
 		if ( occlusionQueryCount > 0 ) {
 
-			// Get a reference to the array of objects with queries. The renderContextData property
+			// Get a reference to the array of objects with queries. The occlusionData property
 			// can be changed by another render pass before the async reading of all previous queries complete
-			renderContextData.currentOcclusionQueries = renderContextData.occlusionQueries;
-			renderContextData.currentOcclusionQueryObjects = renderContextData.occlusionQueryObjects;
+			occlusionData.currentOcclusionQueries = occlusionData.occlusionQueries;
+			occlusionData.currentOcclusionQueryObjects = occlusionData.occlusionQueryObjects;
 
-			renderContextData.lastOcclusionObject = null;
-			renderContextData.occlusionQueries = new Array( occlusionQueryCount );
-			renderContextData.occlusionQueryObjects = new Array( occlusionQueryCount );
-			renderContextData.occlusionQueryIndex = 0;
+			occlusionData.lastOcclusionObject = null;
+			occlusionData.occlusionQueries = new Array( occlusionQueryCount );
+			occlusionData.occlusionQueryObjects = new Array( occlusionQueryCount );
+			occlusionData.occlusionQueryIndex = 0;
 
-		} else if ( renderContextData.lastOcclusionObject !== undefined ) {
+		} else if ( occlusionData.lastOcclusionObject !== undefined ) {
 
 			// invalidate if there is a stale query
 
-			renderContextData.lastOcclusionObject = undefined;
+			occlusionData.lastOcclusionObject = undefined;
 
 		}
 
@@ -559,7 +556,7 @@ class WebGLBackend extends Backend {
 
 		if ( occlusionQueryCount > 0 ) {
 
-			const lastOcclusionObject = renderContextData.lastOcclusionObject;
+			const lastOcclusionObject = this.getOcclusionData( renderContext ).lastOcclusionObject;
 
 			if ( lastOcclusionObject && lastOcclusionObject.occlusionTest === true ) {
 
@@ -619,6 +616,8 @@ class WebGLBackend extends Backend {
 
 			}
 
+			state.setScissorTest( previousContext.scissor );
+
 		}
 
 		this.prepareTimestampBuffer( TimestampQuery.RENDER, this.getTimestampUID( renderContext ) );
@@ -627,26 +626,26 @@ class WebGLBackend extends Backend {
 
 	/**
 	 * This method processes the result of occlusion queries and writes it
-	 * into render context data.
+	 * into the occlusion data of the render context.
 	 *
 	 * @async
 	 * @param {RenderContext} renderContext - The render context.
 	 */
 	resolveOccludedAsync( renderContext ) {
 
-		const renderContextData = this.get( renderContext );
+		const occlusionData = this.getOcclusionData( renderContext );
 
 		// handle occlusion query results
 
-		const { currentOcclusionQueries, currentOcclusionQueryObjects } = renderContextData;
+		const { currentOcclusionQueries, currentOcclusionQueryObjects } = occlusionData;
 
 		if ( currentOcclusionQueries && currentOcclusionQueryObjects ) {
 
 			const occluded = new WeakSet();
 			const { gl } = this;
 
-			renderContextData.currentOcclusionQueryObjects = null;
-			renderContextData.currentOcclusionQueries = null;
+			occlusionData.currentOcclusionQueryObjects = null;
+			occlusionData.currentOcclusionQueries = null;
 
 			const check = () => {
 
@@ -680,7 +679,7 @@ class WebGLBackend extends Backend {
 
 				} else {
 
-					renderContextData.occluded = occluded;
+					occlusionData.occluded = occluded;
 
 				}
 
@@ -702,9 +701,9 @@ class WebGLBackend extends Backend {
 	 */
 	isOccluded( renderContext, object ) {
 
-		const renderContextData = this.get( renderContext );
+		const occlusionData = this.getOcclusionData( renderContext );
 
-		return renderContextData.occluded && renderContextData.occluded.has( object );
+		return occlusionData.occluded && occlusionData.occluded.has( object );
 
 	}
 
@@ -938,7 +937,12 @@ class WebGLBackend extends Backend {
 
 		}
 
-		const { programGPU, transformBuffers, attributes } = this.get( pipeline );
+		const { programGPU, transformAttributes, attributes } = this.get( pipeline );
+
+		// the buffers are managed by the renderer's attributes so they are re-created after disposal
+
+		for ( let i = 0; i < attributes.length; i ++ ) this._updateComputeAttribute( attributes[ i ] );
+		for ( let i = 0; i < transformAttributes.length; i ++ ) this._updateComputeAttribute( transformAttributes[ i ] );
 
 		const vaoGPU = this.vertexArrayUtils.getVAO( pipeline, attributes );
 
@@ -948,9 +952,15 @@ class WebGLBackend extends Backend {
 
 		this._bindUniforms( bindings );
 
-		const transformFeedbackGPU = this._getTransformFeedback( transformBuffers );
+		// the buffers are only bound to the default transform feedback object during the dispatch so
+		// no transform feedback object keeps the memory of disposed buffers allocated
 
-		gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, transformFeedbackGPU );
+		for ( let i = 0; i < transformAttributes.length; i ++ ) {
+
+			gl.bindBufferBase( gl.TRANSFORM_FEEDBACK_BUFFER, i, this.get( transformAttributes[ i ] ).transformBuffer );
+
+		}
+
 		gl.beginTransformFeedback( gl.POINTS );
 
 		count = ( count !== null ) ? count : computeNode.count;
@@ -980,13 +990,18 @@ class WebGLBackend extends Backend {
 		}
 
 		gl.endTransformFeedback();
-		gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, null );
+
+		for ( let i = 0; i < transformAttributes.length; i ++ ) {
+
+			gl.bindBufferBase( gl.TRANSFORM_FEEDBACK_BUFFER, i, null );
+
+		}
 
 		// switch active buffers
 
-		for ( let i = 0; i < transformBuffers.length; i ++ ) {
+		for ( let i = 0; i < transformAttributes.length; i ++ ) {
 
-			const dualAttributeData = transformBuffers[ i ];
+			const dualAttributeData = this.get( transformAttributes[ i ] );
 
 			if ( dualAttributeData.pbo && this.has( dualAttributeData.pbo ) ) {
 
@@ -998,6 +1013,22 @@ class WebGLBackend extends Backend {
 
 
 		}
+
+	}
+
+	/**
+	 * Creates or updates the GPU buffer of the given compute attribute via the renderer's
+	 * attributes so it is tracked like other attributes.
+	 *
+	 * @private
+	 * @param {BufferAttribute|InterleavedBufferAttribute} attribute - The buffer attribute.
+	 */
+	_updateComputeAttribute( attribute ) {
+
+		const bufferAttribute = this.getBufferAttribute( attribute );
+		const attributeType = ( attribute.isStorageBufferAttribute || attribute.isStorageInstancedBufferAttribute ) ? AttributeType.STORAGE : AttributeType.VERTEX;
+
+		this.renderer._attributes.update( bufferAttribute, attributeType );
 
 	}
 
@@ -1102,8 +1133,6 @@ class WebGLBackend extends Backend {
 
 		const { gl, state } = this;
 
-		const contextData = this.get( context );
-
 		const drawParams = renderObject.getDrawParameters();
 
 		if ( drawParams === null ) return;
@@ -1126,39 +1155,44 @@ class WebGLBackend extends Backend {
 
 		// vertex state
 
-		const vaoGPU = this.vertexArrayUtils.getVAO( renderObject, renderObject.getAttributes() );
-
 		const index = renderObject.getIndex();
-		const indexGPU = ( index !== null ) ? this.get( index ).bufferGPU : null;
 
-		state.setVertexState( vaoGPU, indexGPU );
+		const vaoGPU = this.vertexArrayUtils.getVAO( renderObject, renderObject.getAttributes(), index );
+
+		state.setVertexState( vaoGPU );
 
 		//
 
-		const lastObject = contextData.lastOcclusionObject;
+		if ( context.occlusionQueryCount > 0 ) {
 
-		if ( lastObject !== object && lastObject !== undefined ) {
+			const occlusionData = this.getOcclusionData( context );
 
-			if ( lastObject !== null && lastObject.occlusionTest === true ) {
+			const lastObject = occlusionData.lastOcclusionObject;
 
-				gl.endQuery( gl.ANY_SAMPLES_PASSED );
+			if ( lastObject !== object ) {
 
-				contextData.occlusionQueryIndex ++;
+				if ( lastObject !== null && lastObject.occlusionTest === true ) {
+
+					gl.endQuery( gl.ANY_SAMPLES_PASSED );
+
+					occlusionData.occlusionQueryIndex ++;
+
+				}
+
+				if ( object.occlusionTest === true ) {
+
+					const query = gl.createQuery();
+
+					gl.beginQuery( gl.ANY_SAMPLES_PASSED, query );
+
+					occlusionData.occlusionQueries[ occlusionData.occlusionQueryIndex ] = query;
+					occlusionData.occlusionQueryObjects[ occlusionData.occlusionQueryIndex ] = object;
+
+				}
+
+				occlusionData.lastOcclusionObject = object;
 
 			}
-
-			if ( object.occlusionTest === true ) {
-
-				const query = gl.createQuery();
-
-				gl.beginQuery( gl.ANY_SAMPLES_PASSED, query );
-
-				contextData.occlusionQueries[ contextData.occlusionQueryIndex ] = query;
-				contextData.occlusionQueryObjects[ contextData.occlusionQueryIndex ] = object;
-
-			}
-
-			contextData.lastOcclusionObject = object;
 
 		}
 
@@ -1779,7 +1813,7 @@ class WebGLBackend extends Backend {
 		const fragmentShader = this.get( fragmentProgram ).shaderGPU;
 		const vertexShader = this.get( computeProgram ).shaderGPU;
 
-		const transforms = computeProgram.transforms;
+		const transforms = computePipeline.transforms;
 
 		const transformVaryingNames = [];
 		const transformAttributeNodes = [];
@@ -1804,29 +1838,21 @@ class WebGLBackend extends Backend {
 
 		gl.linkProgram( programGPU );
 
-		const attributeNodes = computeProgram.attributes;
+		// only the attributes are stored since their buffers are re-created when they are disposed (see compute())
+
+		const attributeNodes = computePipeline.attributes;
 		const attributes = [];
-		const transformBuffers = [];
+		const transformAttributes = [];
 
 		for ( let i = 0; i < attributeNodes.length; i ++ ) {
 
-			const attribute = attributeNodes[ i ].node.attribute;
-
-			attributes.push( attribute );
-
-			if ( ! this.has( attribute ) ) this.attributeUtils.createAttribute( attribute, gl.ARRAY_BUFFER );
+			attributes.push( attributeNodes[ i ].node.attribute );
 
 		}
 
 		for ( let i = 0; i < transformAttributeNodes.length; i ++ ) {
 
-			const attribute = transformAttributeNodes[ i ].attribute;
-
-			if ( ! this.has( attribute ) ) this.attributeUtils.createAttribute( attribute, gl.ARRAY_BUFFER );
-
-			const attributeData = this.get( attribute );
-
-			transformBuffers.push( attributeData );
+			transformAttributes.push( transformAttributeNodes[ i ].attribute );
 
 		}
 
@@ -1836,7 +1862,7 @@ class WebGLBackend extends Backend {
 			programGPU,
 			fragmentShader,
 			vertexShader,
-			transformBuffers,
+			transformAttributes,
 			attributes
 		} );
 
@@ -2173,6 +2199,10 @@ class WebGLBackend extends Backend {
 	 * @param {BufferAttribute} attribute - The buffer attribute to destroy.
 	 */
 	destroyAttribute( attribute ) {
+
+		// VAOs keep the memory of attached buffers allocated
+
+		this.vertexArrayUtils.releaseBuffer( this.get( this.getBufferAttribute( attribute ) ) );
 
 		this.attributeUtils.destroyAttribute( attribute );
 
@@ -2589,55 +2619,6 @@ class WebGLBackend extends Backend {
 	}
 
 	/**
-	 * Creates a transform feedback from the given transform buffers.
-	 *
-	 * @private
-	 * @param {Array<DualAttributeData>} transformBuffers - The transform buffers.
-	 * @return {WebGLTransformFeedback} The transform feedback.
-	 */
-	_getTransformFeedback( transformBuffers ) {
-
-		let key = '';
-
-		for ( let i = 0; i < transformBuffers.length; i ++ ) {
-
-			const dualAttributeData = transformBuffers[ i ];
-
-			key += ':' + dualAttributeData.id + '|' + dualAttributeData.activeBufferIndex;
-
-		}
-
-		let transformFeedbackGPU = this.transformFeedbackCache[ key ];
-
-		if ( transformFeedbackGPU !== undefined ) {
-
-			return transformFeedbackGPU;
-
-		}
-
-		const { gl } = this;
-
-		transformFeedbackGPU = gl.createTransformFeedback();
-
-		gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, transformFeedbackGPU );
-
-		for ( let i = 0; i < transformBuffers.length; i ++ ) {
-
-			const attributeData = transformBuffers[ i ];
-
-			gl.bindBufferBase( gl.TRANSFORM_FEEDBACK_BUFFER, i, attributeData.transformBuffer );
-
-		}
-
-		gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, null );
-
-		this.transformFeedbackCache[ key ] = transformFeedbackGPU;
-
-		return transformFeedbackGPU;
-
-	}
-
-	/**
 	 * Setups the given bindings.
 	 *
 	 * @private
@@ -2879,8 +2860,6 @@ class WebGLBackend extends Backend {
 	async dispose() {
 
 		await super.dispose();
-
-		this.transformFeedbackCache = {};
 
 		if ( this.vertexArrayUtils !== null ) this.vertexArrayUtils.dispose();
 		if ( this.textureUtils !== null ) this.textureUtils.dispose();

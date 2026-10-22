@@ -17,6 +17,7 @@ const refreshUniforms = [
 	'clearcoatNormalMap',
 	'clearcoatNormalScale',
 	'clearcoatRoughness',
+	'clearcoatRoughnessMap',
 	'color',
 	'dashOffset',
 	'dashSize',
@@ -38,8 +39,9 @@ const refreshUniforms = [
 	'iridescence',
 	'iridescenceIOR',
 	'iridescenceMap',
-	'iridescenceThickness',
 	'iridescenceThicknessMap',
+	'iridescenceThicknessMaximum',
+	'iridescenceThicknessMinimum',
 	'lightMap',
 	'lightMapIntensity',
 	'linewidth',
@@ -51,6 +53,7 @@ const refreshUniforms = [
 	'normalScale',
 	'opacity',
 	'reflectivity',
+	'refractionRatio',
 	'retroreflectivity',
 	'rotation',
 	'roughness',
@@ -71,6 +74,7 @@ const refreshUniforms = [
 	'specularMap',
 	'steps',
 	'thickness',
+	'thicknessMap',
 	'transmission',
 	'transmissionMap',
 	'wireframe'
@@ -133,7 +137,7 @@ class NodeMaterialObserver {
 		this.renderObjects = new WeakMap();
 
 		/**
-		 * Whether the material uses node objects or not.
+		 * Whether the builder's context uses node objects or not.
 		 *
 		 * @type {boolean}
 		 */
@@ -231,6 +235,7 @@ class NodeMaterialObserver {
 				geometryId: geometry.id,
 				geometryVersion: this.getGeometryData( geometry )._version,
 				materialVersion: this.getMaterialData( renderObject.material )._version,
+				attributesDisposeVersion: renderObject._geometries.attributes.disposeVersion,
 				worldMatrix: object.matrixWorld.clone()
 			};
 
@@ -248,7 +253,9 @@ class NodeMaterialObserver {
 
 			if ( object.isInstancedMesh === true ) {
 
+				data.instanceMatrix = object.instanceMatrix;
 				data.instanceMatrixVersion = object.instanceMatrix.version;
+				data.instanceColor = object.instanceColor;
 				data.instanceColorVersion = object.instanceColor !== null ? object.instanceColor.version : null;
 				data.morphTextureVersion = object.morphTexture !== null ? object.morphTexture.version : null;
 
@@ -334,13 +341,14 @@ class NodeMaterialObserver {
 	}
 
 	/**
-	 * Returns `true` if the node builder's material uses
-	 * node properties.
+	 * Returns `true` if the node builder's context (e.g. material, scene) uses node properties.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
-	 * @return {boolean} Whether the node builder's material uses node properties or not.
+	 * @return {boolean} Whether the node builder's context uses node properties or not.
 	 */
 	containsNode( builder ) {
+
+		// material
 
 		const material = builder.material;
 
@@ -351,7 +359,19 @@ class NodeMaterialObserver {
 
 		}
 
-		if ( builder.context.modelViewMatrix || builder.context.modelNormalViewMatrix || builder.context.getAO || builder.context.getShadow )
+		// context
+
+		if ( builder.context.modelViewMatrix || builder.context.modelNormalViewMatrix || builder.context.getAO || builder.context.getShadow || builder.context.getGI )
+			return true;
+
+		// scene
+
+		const scene = builder.scene;
+
+		if ( material.fog === true && scene.fogNode && scene.fogNode.isNode )
+			return true;
+
+		if ( scene.environmentNode && scene.environmentNode.isNode )
 			return true;
 
 		return false;
@@ -439,6 +459,44 @@ class NodeMaterialObserver {
 	}
 
 	/**
+	 * Returns a data structure holding the uv transformation of the given
+	 * texture for monitoring.
+	 *
+	 * @param {Texture} texture - The texture.
+	 * @return {Object} An object for monitoring the uv transformation.
+	 */
+	getTextureTransformData( texture ) {
+
+		return {
+			offset: texture.offset.clone(),
+			repeat: texture.repeat.clone(),
+			center: texture.center.clone(),
+			rotation: texture.rotation,
+			matrix: texture.matrix.clone()
+		};
+
+	}
+
+	/**
+	 * Returns `true` if the uv transformation of the given texture has not changed.
+	 *
+	 * @param {Object} transformData - The monitored uv transformation.
+	 * @param {Texture} texture - The texture.
+	 * @return {boolean} Whether the uv transformation has not changed or not.
+	 */
+	equalsTextureTransform( transformData, texture ) {
+
+		if ( texture.matrixAutoUpdate === true ) {
+
+			return transformData.rotation === texture.rotation && transformData.offset.equals( texture.offset ) && transformData.repeat.equals( texture.repeat ) && transformData.center.equals( texture.center );
+
+		}
+
+		return transformData.matrix.equals( texture.matrix );
+
+	}
+
+	/**
 	 * Returns a material data structure holding the material property values for
 	 * monitoring.
 	 *
@@ -467,7 +525,7 @@ class NodeMaterialObserver {
 
 					if ( value.isTexture === true ) {
 
-						data[ property ] = { id: value.id, version: 0, cacheVersion: this.getTextureData( value )._version };
+						data[ property ] = { id: value.id, version: 0, cacheVersion: this.getTextureData( value )._version, transform: this.getTextureTransformData( value ) };
 
 					} else {
 
@@ -547,7 +605,7 @@ class NodeMaterialObserver {
 
 						} else if ( mtlValue.isTexture === true ) {
 
-							materialData[ property ] = { id: mtlValue.id, version: mtlValue.version, cacheVersion: this.getTextureData( mtlValue )._version };
+							materialData[ property ] = { id: mtlValue.id, version: mtlValue.version, cacheVersion: this.getTextureData( mtlValue )._version, transform: this.getTextureTransformData( mtlValue ) };
 
 						} else if ( typeof mtlValue === 'object' && mtlValue.clone !== undefined ) {
 
@@ -577,11 +635,16 @@ class NodeMaterialObserver {
 
 					const textureData = this.getTextureData( mtlValue );
 
-					if ( value.id !== mtlValue.id || value.version !== mtlValue.version || value.cacheVersion !== textureData._version ) {
+					if ( value.id !== mtlValue.id || value.version !== mtlValue.version || value.cacheVersion !== textureData._version || this.equalsTextureTransform( value.transform, mtlValue ) === false ) {
 
 						value.id = mtlValue.id;
 						value.version = mtlValue.version;
 						value.cacheVersion = textureData._version;
+						value.transform.offset.copy( mtlValue.offset );
+						value.transform.repeat.copy( mtlValue.repeat );
+						value.transform.center.copy( mtlValue.center );
+						value.transform.rotation = mtlValue.rotation;
+						value.transform.matrix.copy( mtlValue.matrix );
 
 						changed = true;
 
@@ -760,11 +823,15 @@ class NodeMaterialObserver {
 			const instanceColorVersion = object.instanceColor !== null ? object.instanceColor.version : null;
 			const morphTextureVersion = object.morphTexture !== null ? object.morphTexture.version : null;
 
-			if ( renderObjectData.instanceMatrixVersion !== object.instanceMatrix.version ||
+			if ( renderObjectData.instanceMatrix !== object.instanceMatrix ||
+				renderObjectData.instanceMatrixVersion !== object.instanceMatrix.version ||
+				renderObjectData.instanceColor !== object.instanceColor ||
 				renderObjectData.instanceColorVersion !== instanceColorVersion ||
 				renderObjectData.morphTextureVersion !== morphTextureVersion ) {
 
+				renderObjectData.instanceMatrix = object.instanceMatrix;
 				renderObjectData.instanceMatrixVersion = object.instanceMatrix.version;
+				renderObjectData.instanceColor = object.instanceColor;
 				renderObjectData.instanceColorVersion = instanceColorVersion;
 				renderObjectData.morphTextureVersion = morphTextureVersion;
 
@@ -937,6 +1004,34 @@ class NodeMaterialObserver {
 	}
 
 	/**
+	 * Returns `true` if a vertex buffer or the index of the given render object
+	 * has been disposed since the last check.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @param {Object} renderObjectData - The cached render object data.
+	 * @return {boolean} Whether attributes of the render object have been disposed or not.
+	 */
+	hasDisposedAttributes( renderObject, renderObjectData ) {
+
+		const attributes = renderObject._geometries.attributes;
+
+		for ( const vertexBuffer of renderObject.getVertexBuffers() ) {
+
+			if ( attributes.has( vertexBuffer ) === false ) return true;
+
+		}
+
+		const index = renderObject.getIndex();
+
+		if ( index !== null && attributes.has( index ) === false ) return true;
+
+		renderObjectData.attributesDisposeVersion = attributes.disposeVersion;
+
+		return false;
+
+	}
+
+	/**
 	 * Checks if the given render object requires a refresh.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
@@ -975,6 +1070,16 @@ class NodeMaterialObserver {
 			renderObjectData.outputTarget = outputTarget;
 
 			refreshType = RenderObjectRefreshType.FULL;
+
+		}
+
+		const attributes = renderObject._geometries.attributes;
+
+		// re-upload disposed attributes. checked before the static early out since other geometries can destroy shared buffers
+
+		if ( renderObjectData.attributesDisposeVersion !== attributes.disposeVersion ) {
+
+			if ( this.hasDisposedAttributes( renderObject, renderObjectData ) ) refreshType = RenderObjectRefreshType.FULL;
 
 		}
 

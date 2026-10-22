@@ -57,7 +57,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 		 * particleMaterial.positionNode = positionBuffer.toAttribute();
 		 * ```
 		 *
-		 * @type {?Node<vec2>}
+		 * @type {?Node<vec3>}
 		 * @default null
 		 */
 		this.positionNode = null;
@@ -132,7 +132,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		if ( object.center && object.center.isVector2 === true ) {
 
-			const center = reference( 'center', 'vec2', object );
+			const center = reference( 'center', 'vec2' );
 
 			alignedPosition = alignedPosition.sub( center.sub( 0.5 ) );
 
