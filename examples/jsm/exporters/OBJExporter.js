@@ -215,11 +215,23 @@ class OBJExporter {
 
 				output += 'l ';
 
-				for ( let i = 0, l = ( indices !== null ) ? indices.count : vertices.count; i < l; i ++ ) {
+				if ( indices !== null ) {
 
-					const j = ( indices !== null ) ? indices.getX( i ) : i;
+					for ( let i = 0, l = indices.count; i < l; i ++ ) {
 
-					output += ( indexVertex + j + 1 ) + ' ';
+						const j = indices.getX( i ) + 1;
+
+						output += ( indexVertex + j ) + ' ';
+
+					}
+
+				} else {
+
+					for ( let j = 1, l = vertices.count; j <= l; j ++ ) {
+
+						output += ( indexVertex + j ) + ' ';
+
+					}
 
 				}
 
@@ -229,12 +241,24 @@ class OBJExporter {
 
 			if ( type === 'LineSegments' ) {
 
-				for ( let i = 0, l = ( indices !== null ) ? indices.count : vertices.count; i < l - 1; i += 2 ) {
+				if ( indices !== null ) {
 
-					const j = ( indices !== null ) ? indices.getX( i ) : i;
-					const k = ( indices !== null ) ? indices.getX( i + 1 ) : i + 1;
+					for ( let i = 0, l = indices.count - 1; i < l; i += 2 ) {
 
-					output += 'l ' + ( indexVertex + j + 1 ) + ' ' + ( indexVertex + k + 1 ) + '\n';
+						const j = indices.getX( i ) + 1;
+						const k = indices.getX( i + 1 ) + 1;
+
+						output += 'l ' + ( indexVertex + j ) + ' ' + ( indexVertex + k ) + '\n';
+
+					}
+
+				} else {
+
+					for ( let j = 1, k = j + 1, l = vertices.count; j < l; j += 2, k = j + 1 ) {
+
+						output += 'l ' + ( indexVertex + j ) + ' ' + ( indexVertex + k ) + '\n';
+
+					}
 
 				}
 
