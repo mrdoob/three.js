@@ -965,7 +965,7 @@ class WebGLTextureUtils {
 
 				}
 
-				gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, gl.DEPTH_BUFFER_BIT, gl.NEAREST );
+				gl.blitFramebuffer( minX, minY, minX + width, minY + height, dstX, dstY, dstX + width, dstY + height, gl.DEPTH_BUFFER_BIT, gl.NEAREST );
 
 			}
 
@@ -1013,7 +1013,7 @@ class WebGLTextureUtils {
 				// copy the data using the fastest function that can achieve the copy
 				if ( srcLevel !== 0 ) {
 
-					gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, gl.COLOR_BUFFER_BIT, gl.NEAREST );
+					gl.blitFramebuffer( minX, minY, minX + width, minY + height, dstX, dstY, dstX + width, dstY + height, gl.COLOR_BUFFER_BIT, gl.NEAREST );
 
 				} else if ( isDst3D ) {
 
