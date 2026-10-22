@@ -122,7 +122,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		}
 
-		if ( camera.isPerspectiveCamera && sizeAttenuation === false ) {
+		if ( camera.isOrthographicCamera !== true && sizeAttenuation === false ) {
 
 			scale = scale.mul( mvPosition.z.negate() );
 

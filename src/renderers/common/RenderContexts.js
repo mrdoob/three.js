@@ -67,13 +67,7 @@ class RenderContexts {
 
 		// materials check the camera type at build time, so camera types must not share render objects
 
-		let cameraState = 'default';
-
-		if ( camera !== null && camera.isPerspectiveCamera !== true ) {
-
-			cameraState = ( camera.isOrthographicCamera === true ) ? 'orthographic' : 'camera';
-
-		}
+		const cameraState = camera?.isOrthographicCamera === true ? 'orthographic' : 'perspective';
 
 		//
 
