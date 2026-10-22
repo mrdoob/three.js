@@ -397,7 +397,7 @@
 
 				gui.add( params, 'resolution', 2, 12, 1 ).name( 'Resolution' ).onChange( requestBake ).debounce( 250 );
 				gui.add( params, 'bounces', 0, 10, 1 ).name( 'Bounces' ).onChange( requestBake ).debounce( 250 );
-				gui.add( params, 'lightIntensity', 1, 200, 1 ).name( 'Light Intensity' ).onChange( requestBake ).debounce( 250 );
+				gui.add( params, 'lightIntensity', 1, 100, 1 ).name( 'Light Intensity' ).onChange( requestBake ).debounce( 250 );
 				gui.add( params, 'showProbes' ).name( 'Show Probes' ).onChange( ( value ) => {
 
 					probesHelperLeft.visible = value;
