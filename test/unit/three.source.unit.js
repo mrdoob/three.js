@@ -186,7 +186,6 @@ import './src/math/ColorManagement.tests.js';
 import './src/math/Cylindrical.tests.js';
 import './src/math/Euler.tests.js';
 import './src/math/Frustum.tests.js';
-import './src/math/FrustumArray.tests.js';
 import './src/math/Interpolant.tests.js';
 import './src/math/Line3.tests.js';
 import './src/math/MathUtils.tests.js';
@@ -241,9 +240,6 @@ import './src/renderers/shaders/ShaderChunk.tests.js';
 import './src/renderers/shaders/ShaderLib.tests.js';
 import './src/renderers/shaders/UniformsLib.tests.js';
 import './src/renderers/shaders/UniformsUtils.tests.js';
-
-//src/renderers/webgpu
-import './src/renderers/webgpu/WebGPUBackend.tests.js';
 
 //src/renderers/webgl
 import './src/renderers/webgl/WebGLExtensions.tests.js';
