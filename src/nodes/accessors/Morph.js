@@ -1,12 +1,12 @@
 
-import { float, Fn, ivec2, int, If, uniform } from '../tsl/TSLBase.js';
+import { float, Fn, ivec2, int, If, uniform, vec4 } from '../tsl/TSLBase.js';
 import { Loop } from '../utils/LoopNode.js';
 import { OnObjectUpdate } from '../utils/EventNode.js';
 import { textureLoad } from './TextureNode.js';
 import { positionLocal } from './Position.js';
 import { normalLocal } from './Normal.js';
-import { vertexColor } from './VertexColorNode.js';
-import { varyingProperty } from '../core/PropertyNode.js';
+import { property } from '../core/PropertyNode.js';
+import { varying } from '../core/VaryingNode.js';
 import { instanceIndex, vertexIndex } from '../core/IndexNode.js';
 
 import { DataArrayTexture } from '../../textures/DataArrayTexture.js';
@@ -45,12 +45,44 @@ const getMorph = /*@__PURE__*/ Fn( ( { bufferMap, influence, stride, width, dept
 } );
 
 /**
- * TSL object that represents the morphed vertex color.
+ * The morph target base influence. It is `1` when `morphTargetsRelative`
+ * is `true`, otherwise `1 - sum( influences )`.
+ *
+ * @type {UniformNode<float>}
+ */
+const morphBase = /*@__PURE__*/ uniform( 1 ).onObjectUpdate( ( { object } ) => {
+
+	return object.geometry.morphTargetsRelative ? 1 : 1 - object.morphTargetInfluences.reduce( ( a, b ) => a + b, 0 );
+
+} );
+
+/**
+ * The sum of the weighted color morph targets.
+ *
+ * @type {PropertyNode<vec4>}
+ */
+const morphColorSum = /*@__PURE__*/ property( 'vec4', 'morphColorSum' );
+
+/**
+ * TSL function that applies the color morph targets to the given color.
+ * The result is computed in the vertex stage.
  *
  * @tsl
- * @type {VaryingNode<vec4>}
+ * @function
+ * @param {Node<vec4>} color - The color to morph. Must be available in the vertex stage.
+ * @returns {Node<vec4>} The morphed color.
  */
-export const morphColor = /*@__PURE__*/ varyingProperty( 'vec4', 'vMorphColor' );
+export const morphColor = /*@__PURE__*/ Fn( ( [ color ], { geometry } ) => {
+
+	if ( geometry.morphAttributes.color[ 0 ].itemSize === 4 ) {
+
+		return varying( color.mul( morphBase ).add( morphColorSum ) );
+
+	}
+
+	return varying( vec4( color.rgb.mul( morphBase ).add( morphColorSum.rgb ), color.a ) );
+
+} );
 
 /**
  * Resolves or creates a compiled DataArrayTexture containing encoded vertex morph targets data for WebGL2/WebGPU.
@@ -198,8 +230,8 @@ export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ], builder ) => {
 
 	const hasMorphPosition = geometry.morphAttributes.position !== undefined;
 	const hasMorphNormals = geometry.hasAttribute( 'normal' ) && geometry.morphAttributes.normal !== undefined;
-	const hasMorphColors = builder.material.vertexColors === true && geometry.hasAttribute( 'color' ) && geometry.morphAttributes.color !== undefined;
-	const hasColorAlpha = hasMorphColors === true && geometry.attributes.color.itemSize === 4;
+	const hasMorphColors = builder.material.vertexColors === true && geometry.morphAttributes.color !== undefined;
+	const hasColorAlpha = hasMorphColors === true && geometry.morphAttributes.color[ 0 ].itemSize === 4;
 
 	const morphAttribute = geometry.morphAttributes.position || geometry.morphAttributes.normal || geometry.morphAttributes.color;
 	const morphTargetsCount = ( morphAttribute !== undefined ) ? morphAttribute.length : 0;
@@ -215,7 +247,6 @@ export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ], builder ) => {
 	if ( morphInfluenceData === undefined || morphInfluenceData.count !== morphTargetsCount ) {
 
 		morphInfluenceData = {
-			base: uniform( 1 ),
 			influences: mesh.morphTargetInfluences ? uniformArray( mesh.morphTargetInfluences, 'float' ) : null,
 			count: morphTargetsCount
 		};
@@ -224,30 +255,15 @@ export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ], builder ) => {
 
 	}
 
-	const { base, influences } = morphInfluenceData;
+	const { influences } = morphInfluenceData;
 
 	// Shader
 
 	const { texture: bufferMap, stride, size } = getEntry( geometry );
 
-	if ( hasMorphPosition === true ) positionLocal.mulAssign( base );
-	if ( hasMorphNormals === true ) normalLocal.mulAssign( base );
-
-	if ( hasMorphColors === true ) {
-
-		morphColor.assign( vertexColor() );
-
-		if ( hasColorAlpha === true ) {
-
-			morphColor.mulAssign( base );
-
-		} else {
-
-			morphColor.rgb.mulAssign( base );
-
-		}
-
-	}
+	if ( hasMorphPosition === true ) positionLocal.mulAssign( morphBase );
+	if ( hasMorphNormals === true ) normalLocal.mulAssign( morphBase );
+	if ( hasMorphColors === true ) morphColorSum.assign( 0 );
 
 	const width = int( size.width );
 
@@ -306,11 +322,11 @@ export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ], builder ) => {
 
 				if ( hasColorAlpha === true ) {
 
-					morphColor.addAssign( morph );
+					morphColorSum.addAssign( morph );
 
 				} else {
 
-					morphColor.rgb.addAssign( morph.rgb );
+					morphColorSum.rgb.addAssign( morph.rgb );
 
 				}
 
@@ -324,17 +340,7 @@ export const morphReference = /*@__PURE__*/ Fn( ( [ mesh ], builder ) => {
 
 	OnObjectUpdate( ( { object } ) => {
 
-		const { base, influences } = morphInfluenceData;
-
-		if ( object.geometry.morphTargetsRelative ) {
-
-			base.value = 1;
-
-		} else {
-
-			base.value = 1 - object.morphTargetInfluences.reduce( ( a, b ) => a + b, 0 );
-
-		}
+		const { influences } = morphInfluenceData;
 
 		if ( influences ) {
 
