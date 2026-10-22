@@ -747,18 +747,26 @@ function _getIntegrationMaterial() {
 }
 
 // The world space direction through the center of a texel of a cube face, matching
-// positionWorldDirection on the faces of the cube camera (x is mirrored).
+// positionWorldDirection on the faces of the cube camera. Faces are +X, -X, +Y, -Y, +Z, -Z,
+// so each is a major axis and a sign, and x is mirrored like three's cube textures.
 const _getFaceDirection = /*@__PURE__*/ Fn( ( [ face, texel, size ] ) => {
 
 	const uv = vec2( texel ).add( 0.5 ).div( float( size ) ).mul( 2.0 ).sub( 1.0 ).toConst();
 	const u = uv.x;
 	const v = uv.y;
 
-	return select( face.equal( 0 ), vec3( - 1.0, v.negate(), u.negate() ),
-		select( face.equal( 1 ), vec3( 1.0, v.negate(), u ),
-			select( face.equal( 2 ), vec3( u.negate(), 1.0, v ),
-				select( face.equal( 3 ), vec3( u.negate(), - 1.0, v.negate() ),
-					select( face.equal( 4 ), vec3( u.negate(), v.negate(), 1.0 ), vec3( u, v.negate(), - 1.0 ) ) ) ) ) ).normalize();
+	const axis = face.div( 2 ).toConst();
+	const sign = float( 1.0 ).sub( float( face.mod( 2 ) ).mul( 2.0 ) ).toConst();
+
+	const isX = axis.equal( 0 );
+	const isY = axis.equal( 1 );
+	const isZ = axis.equal( 2 );
+
+	const x = select( isX, 1.0, u ).mul( select( isY, 1.0, sign ) );
+	const y = select( isY, sign, v.negate() );
+	const z = select( isZ, sign, select( isX, u.negate(), v ).mul( sign ) );
+
+	return vec3( x.negate(), y, z ).normalize();
 
 } );
 
