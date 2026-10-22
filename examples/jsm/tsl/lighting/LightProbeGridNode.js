@@ -181,7 +181,10 @@ function chebyshevVisibility( moments, distance ) {
 }
 
 /**
- * Blends eight probes using trilinear, back-face and Chebyshev visibility weights.
+ * Blends eight probes using RTXGI's active-probe interpolation: trilinear,
+ * wrapped normal and Chebyshev visibility weights.
+ *
+ * @see {@link https://github.com/NVIDIAGameWorks/RTXGI-DDGI/blob/main/rtxgi-sdk/shaders/ddgi/Irradiance.hlsl}
  *
  * @private
  * @param {Object} grid - The grid parameters.
@@ -204,7 +207,6 @@ function evaluateGridIrradianceVisibility( grid, sampleIrradiance ) {
 
 	const total = vec3( 0.0 ).toVar();
 	const weights = float( 0.0 ).toVar();
-	const unoccludedWeights = float( 0.0 ).toVar();
 
 	// Every probe is sampled in the direction of the normal.
 	const normalOct = octEncode( normalWorld ).mul( IRRADIANCE_RESOLUTION ).add( 1.0 ).toVar();
@@ -226,31 +228,53 @@ function evaluateGridIrradianceVisibility( grid, sampleIrradiance ) {
 		const ix = int( cell.x ).toVar(), iy = int( cell.y ).toVar(), iz = int( cell.z ).toVar();
 		const probeIndex = ix.add( iz.mul( nx ) ).add( iy.mul( nx ).mul( nz ) ).toVar();
 		const momentsUV = octTileUV( probeIndex, direction, visibilityGridSize, momentsSize );
-		const visibility = chebyshevVisibility( moments.sample( momentsUV ).xy, distance.div( distanceScale ) );
+		const probeMoments = moments.sample( momentsUV ).xy.toVar();
 
-		// Soft backface weight: probes behind the surface count less.
+		// Inactive probes are excluded before accumulating any weights.
 
-		const toProbe = probePosition.sub( positionWorld );
-		const wrap = normalWorld.dot( toProbe.div( toProbe.length().max( 1e-6 ) ) ).mul( 0.5 ).add( 0.5 ).pow( 2.0 ).add( 0.2 );
+		If( probeMoments.x.greaterThanEqual( 0.0 ), () => {
 
-		const blend = offset.mul( alpha ).add( offset.oneMinus().mul( alpha.oneMinus() ) );
-		const unoccludedWeight = blend.x.mul( blend.y ).mul( blend.z ).mul( wrap );
-		const weight = unoccludedWeight.mul( visibility ).toVar();
+			const visibility = chebyshevVisibility( probeMoments, distance.div( distanceScale ) );
 
-		const tile = vec2( float( probeIndex.mod( DISTANCE_COLUMNS ) ), float( probeIndex.div( DISTANCE_COLUMNS ) ) );
-		const irradianceUV = tile.mul( IRRADIANCE_TILE ).add( normalOct ).div( irradianceSize );
+			// RTXGI's wrapped normal weight and visibility fallback keep active
+			// probes usable near small geometry, even when visibility is low.
 
-		total.addAssign( sampleIrradiance( irradianceUV ).rgb.mul( weight ) );
-		weights.addAssign( weight );
-		unoccludedWeights.addAssign( unoccludedWeight );
+			const toProbe = probePosition.sub( positionWorld );
+			const wrap = normalWorld.dot( toProbe.div( toProbe.length().max( 1e-6 ) ) ).mul( 0.5 ).add( 0.5 ).pow( 2.0 ).add( 0.2 );
+			const weight = wrap.mul( visibility.max( 0.05 ) ).max( 1e-6 ).toVar();
+
+			// Smoothly suppress small weights before applying trilinear filtering.
+
+			If( weight.lessThan( 0.2 ), () => {
+
+				weight.mulAssign( weight.mul( weight ).div( 0.04 ) );
+
+			} );
+
+			const blend = offset.mul( alpha ).add( offset.oneMinus().mul( alpha.oneMinus() ) ).max( vec3( 0.001 ) );
+			weight.mulAssign( blend.x.mul( blend.y ).mul( blend.z ) );
+
+			const tile = vec2( float( probeIndex.mod( DISTANCE_COLUMNS ) ), float( probeIndex.div( DISTANCE_COLUMNS ) ) );
+			const irradianceUV = tile.mul( IRRADIANCE_TILE ).add( normalOct ).div( irradianceSize );
+
+			total.addAssign( sampleIrradiance( irradianceUV ).rgb.mul( weight ) );
+			weights.addAssign( weight );
+
+		} );
 
 	} );
 
-	// Preserve attenuation when every probe has low visibility instead of
-	// normalizing tiny residual weights back to full brightness. Below 10%
-	// average visibility, fade the grid contribution toward black.
+	// Normalize only the active probes. With no active neighbors, return black.
 
-	return total.div( weights.max( unoccludedWeights.mul( 0.1 ) ).max( 1e-6 ) );
+	const result = vec3( 0.0 ).toVar();
+
+	If( weights.greaterThan( 0.0 ), () => {
+
+		result.assign( total.div( weights ) );
+
+	} );
+
+	return result;
 
 }
 
