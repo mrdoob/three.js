@@ -91,6 +91,12 @@ class STLExporter {
 			const index = geometry.index;
 			const positionAttribute = geometry.getAttribute( 'position' );
 
+			// a mirroring transform reverses the winding of every triangle, so its vertices are
+			// written the other way round to keep the side that is rendered as the front face
+
+			const second = ( object.matrixWorld.determinant() < 0 ) ? 2 : 1;
+			const third = 3 - second;
+
 			if ( index !== null ) {
 
 				// indexed geometry
@@ -98,8 +104,8 @@ class STLExporter {
 				for ( let j = 0; j < index.count; j += 3 ) {
 
 					const a = index.getX( j + 0 );
-					const b = index.getX( j + 1 );
-					const c = index.getX( j + 2 );
+					const b = index.getX( j + second );
+					const c = index.getX( j + third );
 
 					writeFace( a, b, c, positionAttribute, object );
 
@@ -112,8 +118,8 @@ class STLExporter {
 				for ( let j = 0; j < positionAttribute.count; j += 3 ) {
 
 					const a = j + 0;
-					const b = j + 1;
-					const c = j + 2;
+					const b = j + second;
+					const c = j + third;
 
 					writeFace( a, b, c, positionAttribute, object );
 

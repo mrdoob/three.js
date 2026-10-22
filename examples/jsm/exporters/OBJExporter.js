@@ -138,13 +138,18 @@ class OBJExporter {
 
 			// faces
 
+			// a mirroring transform reverses the winding of every triangle, so its vertices are
+			// written the other way round to keep the side that is rendered as the front face
+
+			const order = ( mesh.matrixWorld.determinant() < 0 ) ? [ 0, 2, 1 ] : [ 0, 1, 2 ];
+
 			if ( indices !== null ) {
 
 				for ( let i = 0, l = indices.count; i < l; i += 3 ) {
 
 					for ( let m = 0; m < 3; m ++ ) {
 
-						const j = indices.getX( i + m ) + 1;
+						const j = indices.getX( i + order[ m ] ) + 1;
 
 						face[ m ] = ( indexVertex + j ) + ( normals || uvs ? '/' + ( uvs ? ( indexVertexUvs + j ) : '' ) + ( normals ? '/' + ( indexNormals + j ) : '' ) : '' );
 
@@ -161,7 +166,7 @@ class OBJExporter {
 
 					for ( let m = 0; m < 3; m ++ ) {
 
-						const j = i + m + 1;
+						const j = i + order[ m ] + 1;
 
 						face[ m ] = ( indexVertex + j ) + ( normals || uvs ? '/' + ( uvs ? ( indexVertexUvs + j ) : '' ) + ( normals ? '/' + ( indexNormals + j ) : '' ) : '' );
 

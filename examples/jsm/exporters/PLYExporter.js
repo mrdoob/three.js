@@ -473,7 +473,12 @@ class PLYExporter {
 
 				if ( includeIndices === true ) {
 
-					// Create the face list
+					// Create the face list. A mirroring transform reverses the winding of every
+					// triangle, so its vertices are written the other way round to keep the side
+					// that is rendered as the front face.
+
+					const second = ( mesh.matrixWorld.determinant() < 0 ) ? 2 : 1;
+					const third = 3 - second;
 
 					if ( indices !== null ) {
 
@@ -485,10 +490,10 @@ class PLYExporter {
 							output.setUint32( fOffset, indices.getX( i + 0 ) + writtenVertices, options.littleEndian );
 							fOffset += indexByteCount;
 
-							output.setUint32( fOffset, indices.getX( i + 1 ) + writtenVertices, options.littleEndian );
+							output.setUint32( fOffset, indices.getX( i + second ) + writtenVertices, options.littleEndian );
 							fOffset += indexByteCount;
 
-							output.setUint32( fOffset, indices.getX( i + 2 ) + writtenVertices, options.littleEndian );
+							output.setUint32( fOffset, indices.getX( i + third ) + writtenVertices, options.littleEndian );
 							fOffset += indexByteCount;
 
 						}
@@ -503,10 +508,10 @@ class PLYExporter {
 							output.setUint32( fOffset, writtenVertices + i, options.littleEndian );
 							fOffset += indexByteCount;
 
-							output.setUint32( fOffset, writtenVertices + i + 1, options.littleEndian );
+							output.setUint32( fOffset, writtenVertices + i + second, options.littleEndian );
 							fOffset += indexByteCount;
 
-							output.setUint32( fOffset, writtenVertices + i + 2, options.littleEndian );
+							output.setUint32( fOffset, writtenVertices + i + third, options.littleEndian );
 							fOffset += indexByteCount;
 
 						}
@@ -651,16 +656,19 @@ class PLYExporter {
 
 				}
 
-				// Create the face list
+				// Create the face list, with a mirrored triangle written the other way round
 				if ( includeIndices === true ) {
+
+					const second = ( mesh.matrixWorld.determinant() < 0 ) ? 2 : 1;
+					const third = 3 - second;
 
 					if ( indices !== null ) {
 
 						for ( let i = 0, l = indices.count; i < l; i += 3 ) {
 
 							faceList += `3 ${ indices.getX( i + 0 ) + writtenVertices }`;
-							faceList += ` ${ indices.getX( i + 1 ) + writtenVertices }`;
-							faceList += ` ${ indices.getX( i + 2 ) + writtenVertices }\n`;
+							faceList += ` ${ indices.getX( i + second ) + writtenVertices }`;
+							faceList += ` ${ indices.getX( i + third ) + writtenVertices }\n`;
 
 						}
 
@@ -668,7 +676,7 @@ class PLYExporter {
 
 						for ( let i = 0, l = vertices.count; i < l; i += 3 ) {
 
-							faceList += `3 ${ writtenVertices + i } ${ writtenVertices + i + 1 } ${ writtenVertices + i + 2 }\n`;
+							faceList += `3 ${ writtenVertices + i } ${ writtenVertices + i + second } ${ writtenVertices + i + third }\n`;
 
 						}
 
