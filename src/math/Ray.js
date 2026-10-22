@@ -198,7 +198,10 @@ class Ray {
 		const det = Math.abs( 1 - a01 * a01 );
 		let s0, s1, sqrDist, extDet;
 
-		if ( det > 0 ) {
+		// det is 1 - cos^2 of the angle between both directions, so even exactly parallel
+		// directions leave a few ULPs of rounding error. Dividing by that noise gives
+		// arbitrary results, so tiny values are handled as parallel.
+		if ( det > 1e-14 ) {
 
 			// The ray and segment are not parallel.
 

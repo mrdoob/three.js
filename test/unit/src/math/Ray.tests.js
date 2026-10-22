@@ -190,6 +190,16 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( ptOnLine.distanceTo( one3 ) < 0.0001, 'Passed!' );
 			assert.ok( distSqr < 0.0001, 'Passed!' );
 
+			//segment parallel to the ray, where rounding leaves the normalized directions not exactly parallel
+			const b = new Ray( new Vector3( 0, 1, 0 ), new Vector3( 1, 2, 1 ).normalize() );
+			v0 = new Vector3( 0, 0, 0 );
+			v1 = new Vector3( 3, 6, 3 );
+			distSqr = b.distanceSqToSegment( v0, v1, ptOnLine, ptOnSegment );
+
+			// the ray runs at a distance of sqrt( 1 / 3 ) along the whole segment
+			assert.ok( Math.abs( distSqr - 1 / 3 ) < 0.0001, 'Passed!' );
+			assert.ok( Math.abs( ptOnLine.distanceToSquared( ptOnSegment ) - 1 / 3 ) < 0.0001, 'Passed!' );
+
 		} );
 
 		QUnit.test( 'intersectSphere', ( assert ) => {
