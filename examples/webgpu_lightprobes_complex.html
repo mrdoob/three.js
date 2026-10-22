@@ -19,7 +19,7 @@
 				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Light Probe Volume (Multi-Room)</span>
 			</div>
 
-			<small>Two rooms with independent probe volumes showcasing the multi-volume scene.add() API.</small>
+			<small>Two rooms lit by one probe volume spanning the entire scene.</small>
 		</div>
 
 		<script type="importmap">
@@ -44,8 +44,8 @@
 
 			let camera, scene, renderer, controls;
 			let pendingBake = null;
-			let probesLeft, probesRight;
-			let probesHelperLeft, probesHelperRight;
+			let probes;
+			let probesHelper;
 
 			init();
 
@@ -286,8 +286,9 @@
 
 				const params = {
 					enabled: true,
+					visibility: true,
 					showProbes: false,
-					resolution: 6,
+					resolution: 7,
 					bounces: 3,
 					lightIntensity: 30
 				};
@@ -297,80 +298,38 @@
 					warmLight.intensity = params.lightIntensity;
 					coolLight.intensity = params.lightIntensity;
 
-					// Remove both volumes before baking to prevent feedback
+					if ( probes ) {
 
-					if ( probesLeft ) {
-
-						scene.remove( probesLeft );
-						probesLeft.dispose();
+						scene.remove( probes );
+						probes.dispose();
 
 					}
 
-					if ( probesRight ) {
+					// One volume covers both rooms. Double the X resolution to keep
+					// the same probe count as the two room grids, without a row at x=0.
+					probes = new LightProbeGrid( 15.6, 4.7, 7.6, resolution * 2, resolution, resolution );
+					probes.position.set( 0, 2.45, 0 );
+					probes.visibility = params.visibility;
+					if ( probesHelper ) probesHelper.visible = false;
 
-						scene.remove( probesRight );
-						probesRight.dispose();
-
-					}
-
-					// The `falloff` fades each volume past its boundary so the two
-					// rooms blend smoothly without bleeding into each other.
-
-					probesLeft = new LightProbeGrid( 7.8, 4.7, 7.6, resolution, resolution, resolution );
-					probesLeft.position.set( - 3.9, 2.45, 0 );
-					probesLeft.falloff = 1.0;
-
-					probesRight = new LightProbeGrid( 7.8, 4.7, 7.6, resolution, resolution, resolution );
-					probesRight.position.set( 3.9, 2.45, 0 );
-					probesRight.falloff = 1.0;
-
-					// Keep the helper spheres out of the cubemap captures.
-
-					if ( probesHelperLeft ) probesHelperLeft.visible = probesHelperRight.visible = false;
-
-					// Add both volumes after the direct light pass, so that each bounce pass
-					// also sees the other room through the doorway.
-
-					const bounces = params.bounces;
-
-					for ( let pass = 0; pass <= bounces; pass ++ ) {
-
-						probesLeft.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20, pass } );
-						probesRight.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20, pass } );
-
-						if ( pass === 0 ) {
-
-							scene.add( probesLeft );
-							scene.add( probesRight );
-
-						}
-
-					}
-
-					probesLeft.visible = params.enabled;
-					probesRight.visible = params.enabled;
+					probes.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20, bounces: params.bounces } );
+					probes.visible = params.enabled;
+					scene.add( probes );
 
 					// Update debug visualization
 
-					if ( ! probesHelperLeft ) {
+					if ( ! probesHelper ) {
 
-						probesHelperLeft = new LightProbeGridHelper( probesLeft );
-						probesHelperLeft.visible = params.showProbes;
-						scene.add( probesHelperLeft );
-
-						probesHelperRight = new LightProbeGridHelper( probesRight );
-						probesHelperRight.visible = params.showProbes;
-						scene.add( probesHelperRight );
+						probesHelper = new LightProbeGridHelper( probes );
+						probesHelper.visible = params.showProbes;
+						scene.add( probesHelper );
 
 					} else {
 
-						probesHelperLeft.probes = probesLeft;
-						probesHelperLeft.update();
+						probesHelper.probes = probes;
+						probesHelper.update();
 
-						probesHelperRight.probes = probesRight;
-						probesHelperRight.update();
-
-						probesHelperLeft.visible = probesHelperRight.visible = params.showProbes;
+						probesHelper.visible = params.showProbes;
 
 					}
 
@@ -390,8 +349,13 @@
 				const gui = renderer.inspector.createParameters( 'Light Probes' );
 				gui.add( params, 'enabled' ).name( 'GI' ).onChange( ( value ) => {
 
-					probesLeft.visible = value;
-					probesRight.visible = value;
+					probes.visible = value;
+
+				} );
+
+				gui.add( params, 'visibility' ).name( 'Visibility' ).onChange( ( value ) => {
+
+					probes.visibility = value;
 
 				} );
 
@@ -400,8 +364,7 @@
 				gui.add( params, 'lightIntensity', 1, 100, 1 ).name( 'Light Intensity' ).onChange( requestBake ).debounce( 250 );
 				gui.add( params, 'showProbes' ).name( 'Show Probes' ).onChange( ( value ) => {
 
-					probesHelperLeft.visible = value;
-					probesHelperRight.visible = value;
+					probesHelper.visible = value;
 
 				} );
 

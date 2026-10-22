@@ -6,12 +6,15 @@ import {
 	SphereGeometry,
 	Vector3
 } from 'three/webgpu';
-import { array, attribute, Fn, getShIrradianceAt, normalWorld, texture3D, uniform, vec3, vec4 } from 'three/tsl';
+import { attribute, Discard, Fn, getShIrradianceAt, int, ivec2, normalWorld, renderGroup, texture, texture3D, uniform, vec3, vec4 } from 'three/tsl';
+
+import { DISTANCE_COLUMNS, DISTANCE_RESOLUTION, DISTANCE_TILE, sampleGridSH } from '../tsl/lighting/LightProbeGridNode.js';
 
 /**
  * Visualizes a {@link LightProbeGrid} by rendering a sphere at each probe
  * position, shaded with the probe's L2 spherical harmonics. Uses a single
- * `InstancedMesh` draw call for all probes.
+ * `InstancedMesh` draw call for all probes. With {@link LightProbeGrid#visibility},
+ * probes hidden for being inside or too close to geometry are not drawn.
  *
  * This helper can only be used with {@link WebGPURenderer}.
  * When using {@link WebGLRenderer}, import from `LightProbeGridHelperWebGL.js`.
@@ -55,35 +58,22 @@ class LightProbeGridHelper extends InstancedMesh {
 		// Atlas and resolution are swappable uniforms, so the shading node builds once.
 
 		this._atlas = texture3D( probes.texture );
+		this._distance = texture( probes._distanceTarget.texture );
 		this._resolution = uniform( new Vector3() );
-
-		const nz = this._resolution.z;
-		const paddedSlices = nz.add( 2.0 );
-		const atlasDepth = paddedSlices.mul( 7.0 );
+		this._visibility = uniform( 0, 'int' ).setGroup( renderGroup ).onRenderUpdate( () => this.probes.visibility ? 1 : 0 );
 
 		material.fragmentNode = Fn( () => {
 
-			const uvw = attribute( 'instanceUVW', 'vec3' );
-			const uvZBase = uvw.z.mul( nz ).add( 1.0 );
+			const sh = sampleGridSH( this._atlas, attribute( 'instanceUVW', 'vec3' ), this._resolution.z );
+			const irradiance = getShIrradianceAt( normalWorld, sh ).max( vec3( 0.0 ) );
 
-			const slice = ( t ) => this._atlas.sample( vec3( uvw.xy, uvZBase.add( paddedSlices.mul( t ) ).div( atlasDepth ) ) );
+			// Round the interpolated probe index before reading its distance tile.
+			const probeIndex = int( attribute( 'instanceProbeIndex', 'float' ).add( 0.5 ) );
+			const tile = ivec2( probeIndex.mod( DISTANCE_COLUMNS ), probeIndex.div( DISTANCE_COLUMNS ) );
+			const meanDistance = this._distance.load( tile.mul( DISTANCE_TILE ).add( 1 + DISTANCE_RESOLUTION / 2 ) ).x;
+			Discard( this._visibility.equal( 1 ).and( meanDistance.lessThan( 0.0 ) ) );
 
-			const s0 = slice( 0 ), s1 = slice( 1 ), s2 = slice( 2 ), s3 = slice( 3 );
-			const s4 = slice( 4 ), s5 = slice( 5 ), s6 = slice( 6 );
-
-			const sh = array( [
-				s0.xyz,
-				vec3( s0.w, s1.xy ),
-				vec3( s1.zw, s2.x ),
-				s2.yzw,
-				s3.xyz,
-				vec3( s3.w, s4.xy ),
-				vec3( s4.zw, s5.x ),
-				s5.yzw,
-				s6.xyz
-			] );
-
-			return vec4( getShIrradianceAt( normalWorld, sh ).max( vec3( 0.0 ) ), 1.0 );
+			return vec4( irradiance, 1.0 );
 
 		} )();
 
@@ -113,6 +103,7 @@ class LightProbeGridHelper extends InstancedMesh {
 		this.count = count;
 
 		const uvwArray = new Float32Array( count * 3 );
+		const indexArray = new Float32Array( count );
 		const matrix = new Matrix4();
 		const probePos = new Vector3();
 
@@ -129,6 +120,9 @@ class LightProbeGridHelper extends InstancedMesh {
 					uvwArray[ i * 3 + 1 ] = ( iy + 0.5 ) / res.y;
 					uvwArray[ i * 3 + 2 ] = ( iz + 0.5 ) / res.z;
 
+					// Index in bake order (X, then Z, then Y), as used by the distance atlas.
+					indexArray[ i ] = ix + iz * res.x + iy * res.x * res.z;
+
 					probes.getProbePosition( ix, iy, iz, probePos );
 					matrix.makeTranslation( probePos.x, probePos.y, probePos.z );
 					this.setMatrixAt( i, matrix );
@@ -144,8 +138,10 @@ class LightProbeGridHelper extends InstancedMesh {
 		this.instanceMatrix.needsUpdate = true;
 
 		this.geometry.setAttribute( 'instanceUVW', new InstancedBufferAttribute( uvwArray, 3 ) );
+		this.geometry.setAttribute( 'instanceProbeIndex', new InstancedBufferAttribute( indexArray, 1 ) );
 
 		this._atlas.value = probes.texture;
+		this._distance.value = probes._distanceTarget.texture;
 		this._resolution.value.copy( res );
 
 	}

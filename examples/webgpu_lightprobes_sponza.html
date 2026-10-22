@@ -62,6 +62,7 @@
 
 			const params = {
 				enabled: true,
+				visibility: true,
 				showProbes: false,
 				probeSize: 0.2,
 				boundsX: - 0.5,
@@ -192,6 +193,12 @@
 
 				} );
 
+				gui.add( params, 'visibility' ).name( 'Visibility' ).onChange( ( value ) => {
+
+					if ( probes ) probes.visibility = value;
+
+				} );
+
 				gui.add( params, 'lightAzimuth', - 180, 180, 1 ).name( 'Light Azimuth' ).onChange( () => {
 
 					updateLightPosition();
@@ -278,6 +285,7 @@
 				);
 				probes.position.set( params.boundsX, params.boundsY, params.boundsZ );
 				probes.visible = params.enabled;
+				probes.visibility = params.visibility;
 				scene.add( probes );
 
 				resetProbeBake();
