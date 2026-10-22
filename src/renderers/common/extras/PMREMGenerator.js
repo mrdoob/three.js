@@ -568,6 +568,8 @@ class PMREMGenerator {
 	 */
 	_applyPMREMCompute( pmremTarget ) {
 
+		this._renderer.initRenderTarget( pmremTarget );
+
 		const size = this._cubeSize;
 		const maxLod = pmremTarget.texture.mipmaps.length - 1;
 
