@@ -115,6 +115,14 @@ const _geometryCache = new WeakMap();
 const _textureCache = new WeakMap();
 
 /**
+ * Holds the output target data for comparison.
+ *
+ * @private
+ * @type {WeakMap<RenderTarget|CanvasTarget,Object>}
+ */
+const _outputTargetCache = new WeakMap();
+
+/**
  * This class is used by {@link WebGPURenderer} as management component.
  * It's primary purpose is to determine whether render objects require a
  * refresh right before they are going to be rendered or not.
@@ -278,11 +286,7 @@ class NodeMaterialObserver {
 			// global data
 
 			data.outputTarget = this.getOutputTarget( renderObject.renderer );
-
-			const { width, height } = renderObject.context;
-
-			data.bufferWidth = width;
-			data.bufferHeight = height;
+			data.outputTargetVersion = this.getOutputTargetData( data.outputTarget, renderObject.context )._version;
 
 			const { environmentIntensity, environmentRotation } = renderObject.scene;
 
@@ -311,6 +315,38 @@ class NodeMaterialObserver {
 		const renderTarget = renderer.getRenderTarget();
 
 		return renderTarget !== null ? renderTarget : ( renderer.getOutputRenderTarget() || renderer.getCanvasTarget() );
+
+	}
+
+	/**
+	 * Returns an output target data structure holding the size of the given output
+	 * target for monitoring. Its version is incremented whenever a size change is observed.
+	 *
+	 * @param {RenderTarget|CanvasTarget} outputTarget - The output target.
+	 * @param {RenderContext} renderContext - The render context.
+	 * @return {Object} An object for monitoring the output target size.
+	 */
+	getOutputTargetData( outputTarget, renderContext ) {
+
+		const { width, height } = renderContext;
+
+		let data = _outputTargetCache.get( outputTarget );
+
+		if ( data === undefined ) {
+
+			data = { _version: 0, width, height };
+
+			_outputTargetCache.set( outputTarget, data );
+
+		} else if ( data.width !== width || data.height !== height ) {
+
+			data.width = width;
+			data.height = height;
+			data._version ++;
+
+		}
+
+		return data;
 
 	}
 
@@ -674,12 +710,13 @@ class NodeMaterialObserver {
 
 		}
 
-		const { width, height } = renderObject.context;
+		const outputTargetData = this.getOutputTargetData( renderObjectData.outputTarget, renderObject.context );
 
-		if ( renderObjectData.bufferWidth !== width || renderObjectData.bufferHeight !== height ) {
+		// a version mismatch means the output target has been resized since this render object was last refreshed
 
-			renderObjectData.bufferWidth = width;
-			renderObjectData.bufferHeight = height;
+		if ( renderObjectData.outputTargetVersion !== outputTargetData._version ) {
+
+			renderObjectData.outputTargetVersion = outputTargetData._version;
 
 			return false;
 
