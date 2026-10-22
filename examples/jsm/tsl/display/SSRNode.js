@@ -16,6 +16,7 @@ const MAX_STEPS = 64;
  * @typedef {Object} SSRNodeOptions
  * @property {boolean} [stochastic=false] - When `false`, traces a single mirror reflection and softens roughness with a blur pass (first-generation SSR). When `true`, varies the reflection direction per pixel with stochastic GGX rays (second-generation SSR); higher quality on rough/glossy surfaces but noisier, so it expects a temporal/spatial denoiser downstream.
  * @property {Node<float>} [metalnessNode=null] - Per-pixel metalness. Drives GGX reflection sampling and, with `reflectNonMetals=false`, the non-metal early-out.
+ * @property {Node<vec3>} [specularNode=null] - Per-pixel normal-incidence specular reflectance for the mirror/blur path, including material IOR and metal tint. When omitted, uses metalness (or a default dielectric reflectance with `reflectNonMetals=true`).
  * @property {Node<float>} [roughnessNode=null] - Per-pixel roughness. Drives GGX sampling and the blur mip selection.
  * @property {boolean} [reflectNonMetals=false] - Only used when `stochastic=false`. When `false`, non-metallic surfaces are discarded for a noticeable performance gain; set `true` to also reflect dielectrics (e.g. marble, polished wood, plastic).
  * @property {Texture} [environmentNode=null] - Equirectangular HDR environment map with CPU-side `image.data` (e.g. from RGBELoader). Not compatible with PMREM / `scene.environment` cubemaps.
@@ -56,6 +57,7 @@ class SSRNode extends Node {
 		const {
 			stochastic = false,
 			metalnessNode = null,
+			specularNode = null,
 			roughnessNode = null,
 			reflectNonMetals = false,
 			environmentNode = null,
@@ -119,6 +121,14 @@ class SSRNode extends Node {
 		 * @type {?Node<float>}
 		 */
 		this.metalnessNode = metalnessNode;
+
+		/**
+		 * Per-pixel normal-incidence specular reflectance for the mirror/blur path.
+		 * When supplied, respects dielectric IOR, specular intensity and metal tint.
+		 *
+		 * @type {?Node<vec3>}
+		 */
+		this.specularNode = specularNode !== null ? nodeObject( specularNode ) : null;
 
 		/**
 		 * Per-pixel roughness, used to drive the GGX reflection sampling and the blur mip
@@ -921,7 +931,9 @@ class SSRNode extends Node {
 			if ( this.stochastic === false ) {
 
 				viewReflectDir = reflect( viewIncidentDir, viewNormal ).normalize().toVar();
-				finalSampleWeight = vec3( metalness );
+				// Metalness alone gives dielectrics zero weight even when they are allowed above.
+				finalSampleWeight = this.specularNode !== null ? vec3( this.specularNode ) :
+					( this._reflectNonMetals ? mix( vec3( 0.04 ), vec3( 1 ), metalness ) : vec3( metalness ) );
 				specDominantFactor = float( 1 );
 
 			} else {

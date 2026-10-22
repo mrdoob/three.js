@@ -44,7 +44,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, colorSpaceToWorking } from 'three/tsl';
+		import { pass, mrt, output, normalView, metalness, roughness, specularColorBlended, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, colorSpaceToWorking } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
@@ -54,19 +54,31 @@
 		import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 		import { Inspector } from 'three/addons/inspector/Inspector.js';
 
+		const models = {
+			'Steampunk Camera': 'steampunk_camera.glb',
+			'Primitives Floor (Color Dielectric)': 'primitives-floor-color-dielectric.glb',
+			'Primitives Floor (Color Rough)': 'primitives-floor-color-rough.glb',
+			'Primitives Floor (Metallic Mirror)': 'primitives-floor-metallic-mirror.glb',
+			'Stripped Emissive Mirror Floor': 'stripped-emissive-mirror-floor.glb'
+		};
+
 		const params = {
+			model: 'Steampunk Camera',
 			quality: 0.5,
 			blurQuality: 1,
-			maxDistance: 1,
+			maxDistance: 0.5,
 			intensity: 1,
-			thickness: 0.03,
+			thickness: 0.0035,
 			binaryRefine: false,
+			override: false,
 			roughness: 1,
 			enabled: true
 		};
 
 		let camera, scene, model, renderer, renderPipeline, ssrPass;
-		let controls;
+		let controls, floor;
+		let sceneScale = 1;
+		const originalRoughness = new WeakMap();
 
 		init();
 
@@ -78,36 +90,10 @@
 			scene = new THREE.Scene();
 			scene.backgroundNode = screenUV.distance( .5 ).remap( 0, 0.5 ).mix( color( 0x888877 ), color( 0x776666 ) );
 
-			const dracoLoader = new DRACOLoader();
+			const dracoLoader = new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' );
 
 			const loader = new GLTFLoader();
 			loader.setDRACOLoader( dracoLoader );
-			loader.load( 'models/gltf/steampunk_camera.glb', function ( gltf ) {
-
-				model = gltf.scene;
-
-				model.traverse( function ( object ) {
-
-					if ( object.material ) {
-
-						if ( object.material.name === 'Lense_Casing' ) {
-
-							object.material.transparent = true;
-
-						}
-
-						// Avoid overdrawing
-						object.material.side = THREE.FrontSide;
-
-					}
-
-				} );
-
-				model.position.y = 0.1;
-				scene.add( model );
-
-			} );
-
 			// Add a reflective plane under the camera
 
 			const floorGeometry = new THREE.CircleGeometry( 2, 64 );
@@ -116,7 +102,7 @@
 				metalness: 1,
 				roughness: 0.5
 			} );
-			const floor = new THREE.Mesh( floorGeometry, floorMaterial );
+			floor = new THREE.Mesh( floorGeometry, floorMaterial );
 			floor.rotation.x = - Math.PI / 2;
 			floor.position.y = - 0.8;
 			scene.add( floor );
@@ -126,7 +112,6 @@
 			renderer = new THREE.WebGPURenderer();
 			// renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.setAnimationLoop( animate );
 			renderer.toneMapping = THREE.ACESFilmicToneMapping;
 			renderer.inspector = new Inspector();
 			document.body.appendChild( renderer.domElement );
@@ -148,7 +133,8 @@
 			scenePass.setMRT( mrt( {
 				output: output,
 				normal: packNormalToRGB( normalView ),
-				metalrough: vec2( metalness, roughness ) // pack metalness and roughness into a single attachment
+				metalrough: vec2( metalness, roughness ), // pack metalness and roughness into a single attachment
+				specular: specularColorBlended
 			} ) );
 
 			const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
@@ -163,6 +149,7 @@
 
 			} );
 			const scenePassMetalRough = scenePass.getTextureNode( 'metalrough' ).toInspector( 'Metalness-Roughness' );
+			const scenePassSpecular = scenePass.getTextureNode( 'specular' ).toInspector( 'Specular Reflectance' );
 
 			// optional: optimize bandwidth by reducing the texture precision for normals and metal/roughness
 
@@ -182,6 +169,8 @@
 
 			ssrPass = ssr( scenePassColor, scenePassDepth, sceneNormal, {
 				metalnessNode: scenePassMetalRough.r,
+				specularNode: scenePassSpecular.rgb,
+				reflectNonMetals: true,
 				roughnessNode: scenePassMetalRough.g
 			} ).toInspector( 'SSR' );
 
@@ -201,13 +190,113 @@
 
 			// GUI
 
+			let loadId = 0;
+			let currentModel = params.model;
+
+			async function loadModel() {
+
+				const id = ++ loadId;
+				const name = params.model;
+
+				try {
+
+					const gltf = await loader.loadAsync( 'models/gltf/' + models[ name ] );
+					if ( id !== loadId ) {
+
+						disposeModel( gltf.scene );
+						return;
+
+					}
+
+					if ( model ) {
+
+						scene.remove( model );
+						disposeModel( model );
+
+					}
+
+					model = gltf.scene;
+					updateMaterialOverrides();
+					model.traverse( ( object ) => {
+
+						if ( object.isMesh ) {
+
+							object.castShadow = true;
+							object.receiveShadow = true;
+
+						}
+
+						if ( object.isLight && object.shadow ) {
+
+							object.castShadow = true;
+							object.shadow.mapSize.setScalar( 1024 );
+							object.shadow.normalBias = 0.02;
+
+						}
+
+					} );
+					const isCamera = name === 'Steampunk Camera';
+					floor.visible = isCamera;
+					if ( isCamera ) {
+
+						model.position.y = 0.1;
+						model.traverse( ( object ) => {
+
+							if ( object.material ) {
+
+								if ( object.material.name === 'Lense_Casing' ) object.material.transparent = true;
+								object.material.side = THREE.FrontSide;
+
+							}
+
+						} );
+
+					}
+
+					scene.add( model );
+					model.updateMatrixWorld( true );
+					setModelCamera( gltf );
+					if ( isCamera && gltf.cameras.length === 0 ) {
+
+						camera.fov = 35;
+						camera.near = 0.1;
+						camera.far = 50;
+						camera.position.set( 3, 2, 3 );
+						controls.target.set( 0, 0, 0 );
+						camera.updateProjectionMatrix();
+						controls.update();
+						controls.saveState();
+
+					}
+
+					// Convert the scale-relative SSR controls to world units for the loaded scene.
+					const bounds = new THREE.Box3().setFromObject( model );
+					if ( floor.visible ) bounds.expandByObject( floor );
+					sceneScale = Math.max( bounds.getSize( new THREE.Vector3() ).length(), 0.001 );
+					updateParameters();
+					currentModel = name;
+
+				} catch ( error ) {
+
+					if ( id !== loadId ) return;
+					params.model = currentModel;
+					console.error( 'Unable to load model:', error );
+
+				}
+
+			}
+
+			await loadModel();
+			renderer.setAnimationLoop( animate );
+
 			const gui = renderer.inspector.createParameters( 'Settings' );
+			gui.add( params, 'model', Object.keys( models ) ).name( 'Model' ).listen().onChange( loadModel );
 			const ssrFolder = gui.addFolder( 'SSR' );
 			ssrFolder.add( params, 'quality', 0, 1 ).onChange( updateParameters );
 			ssrFolder.add( params, 'blurQuality', 1, 3, 1 ).onChange( updateParameters );
-			ssrFolder.add( params, 'maxDistance', 0, 1 ).onChange( updateParameters );
+			ssrFolder.add( params, 'maxDistance', 0, 2 ).name( 'relative max distance' ).info( 'Fraction of the loaded scene bounding-box diagonal.' ).onChange( updateParameters );
 			ssrFolder.add( params, 'intensity', 0, 1 ).onChange( updateParameters );
-			ssrFolder.add( params, 'thickness', 0, 0.05 ).onChange( updateParameters );
+			ssrFolder.add( params, 'thickness', 0, 0.02 ).name( 'relative thickness' ).info( 'Hit tolerance as a fraction of the loaded scene bounding-box diagonal.' ).onChange( updateParameters );
 			ssrFolder.add( params, 'binaryRefine' ).name( 'binary refine' ).onChange( updateParameters );
 			ssrFolder.add( params, 'enabled' ).onChange( () => {
 
@@ -224,22 +313,31 @@
 				renderPipeline.needsUpdate = true;
 
 			} );
-			const modelFolder = gui.addFolder( 'Model' );
-			modelFolder.add( params, 'roughness', 0, 1 ).onChange( ( value ) => {
-
-				model.traverse( function ( object ) {
-
-					if ( object.material ) {
-
-						object.material.roughness = value;
-
-					}
-
-				} );
-
-			} );
+			const overridesFolder = gui.addFolder( 'Overrides' );
+			overridesFolder.add( params, 'override' ).onChange( updateMaterialOverrides );
+			overridesFolder.add( params, 'roughness', 0, 1 ).name( 'floor roughness' ).onChange( updateMaterialOverrides );
 
 			updateParameters();
+
+		}
+
+		function updateMaterialOverrides() {
+
+			if ( ! model ) return;
+
+			const target = model.getObjectByName( 'receiver-floor' ) || floor;
+			target.traverse( ( object ) => {
+
+				const materials = Array.isArray( object.material ) ? object.material : [ object.material ];
+				for ( const material of materials ) {
+
+					if ( ! material || material.roughness === undefined ) continue;
+					if ( ! originalRoughness.has( material ) ) originalRoughness.set( material, material.roughness );
+					material.roughness = params.override ? params.roughness : originalRoughness.get( material );
+
+				}
+
+			} );
 
 		}
 
@@ -249,11 +347,71 @@
 			// blurQuality is a build-time constant: assigning it recompiles the blur material
 			// (the setter no-ops when the value is unchanged).
 			ssrPass.blurQuality = params.blurQuality;
-			ssrPass.maxDistance.value = params.maxDistance;
+			ssrPass.maxDistance.value = params.maxDistance * sceneScale;
 			ssrPass.intensity.value = params.intensity;
-			ssrPass.thickness.value = params.thickness;
+			ssrPass.thickness.value = params.thickness * sceneScale;
 			// build-time constant: assigning it recompiles the SSR material (setter no-ops if unchanged)
 			ssrPass.binaryRefine = params.binaryRefine;
+
+		}
+
+		function disposeModel( model ) {
+
+			const resources = new Set();
+			model.traverse( ( object ) => {
+
+				if ( object.geometry ) resources.add( object.geometry );
+				if ( object.shadow ) resources.add( object.shadow );
+				const materials = Array.isArray( object.material ) ? object.material : [ object.material ];
+				for ( const material of materials ) {
+
+					if ( ! material ) continue;
+					resources.add( material );
+					for ( const value of Object.values( material ) ) {
+
+						if ( value && value.isTexture ) resources.add( value );
+
+					}
+
+				}
+
+			} );
+			for ( const resource of resources ) resource.dispose();
+
+		}
+
+		function setModelCamera( gltf ) {
+
+			const source = gltf.cameras[ 0 ];
+			const bounds = new THREE.Box3().setFromObject( model );
+			const center = bounds.getCenter( new THREE.Vector3() );
+
+			// Clear any orbit damping left over from the previous scene.
+			const damping = controls.enableDamping;
+			controls.enableDamping = false;
+			controls.update();
+
+			if ( source ) {
+
+				source.getWorldPosition( camera.position );
+				source.getWorldQuaternion( camera.quaternion );
+				camera.fov = source.fov;
+				camera.near = source.near;
+				camera.far = source.far;
+				controls.target.copy( camera.position ).addScaledVector( camera.getWorldDirection( new THREE.Vector3() ), camera.position.distanceTo( center ) );
+
+			} else {
+
+				controls.target.copy( center );
+				camera.position.copy( center ).add( new THREE.Vector3( 1, 0.6, 1 ).multiplyScalar( bounds.getSize( new THREE.Vector3() ).length() ) );
+
+			}
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			controls.update();
+			controls.saveState();
+			controls.enableDamping = damping;
 
 		}
 

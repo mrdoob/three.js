@@ -37,12 +37,23 @@
 
 			import * as THREE from 'three/webgpu';
 
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
 			import { LightProbeGridHelper } from 'three/addons/helpers/LightProbeGridHelper.js';
 
+			const models = {
+				'Museum': 'museum.glb',
+				'Dual Rooms': 'dual-rooms.glb',
+				'Cornell Box': 'cornell-box.glb',
+				'Cornell Box (Oblique)': 'cornell-box-oblique.glb',
+				'Cornell Box (Metallic Sphere)': 'cornell-box-metallic-sphere.glb',
+				'Cornell Box (Mirror Wall)': 'cornell-box-mirror-wall.glb'
+			};
+
 			let camera, scene, renderer, controls;
+			let model;
 			let probes, probesHelper;
 
 			init();
@@ -59,94 +70,11 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x111111 );
 
-				// Cornell box
-
-				const wallMaterial = new THREE.MeshStandardMaterial( { color: 0xcccccc } );
-				const redMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
-				const greenMaterial = new THREE.MeshStandardMaterial( { color: 0x00ff00 } );
-
-				// Floor
-				const floor = new THREE.Mesh( new THREE.PlaneGeometry( 6, 6 ), wallMaterial );
-				floor.rotation.x = - Math.PI / 2;
-				floor.receiveShadow = true;
-				scene.add( floor );
-
-				// Ceiling
-				const ceiling = new THREE.Mesh( new THREE.PlaneGeometry( 6, 6 ), wallMaterial );
-				ceiling.rotation.x = Math.PI / 2;
-				ceiling.position.y = 5;
-				ceiling.receiveShadow = true;
-				scene.add( ceiling );
-
-				// Back wall
-				const backWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), wallMaterial );
-				backWall.position.set( 0, 2.5, - 3 );
-				backWall.receiveShadow = true;
-				scene.add( backWall );
-
-				// Front wall
-				const frontWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), wallMaterial );
-				frontWall.rotation.y = Math.PI;
-				frontWall.position.set( 0, 2.5, 3 );
-				frontWall.receiveShadow = true;
-				scene.add( frontWall );
-
-				// Left wall (red)
-				const leftWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), redMaterial );
-				leftWall.rotation.y = Math.PI / 2;
-				leftWall.position.set( - 3, 2.5, 0 );
-				leftWall.receiveShadow = true;
-				scene.add( leftWall );
-
-				// Right wall (green)
-				const rightWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), greenMaterial );
-				rightWall.rotation.y = - Math.PI / 2;
-				rightWall.position.set( 3, 2.5, 0 );
-				rightWall.receiveShadow = true;
-				scene.add( rightWall );
-
-				// Objects inside the box
-
-				const objectMaterial = new THREE.MeshStandardMaterial( { color: 0xeeeeee } );
-
-				// Tall box
-				const tallBox = new THREE.Mesh( new THREE.BoxGeometry( 1.2, 2.5, 1.2 ), objectMaterial );
-				tallBox.position.set( - 0.8, 1.25, - 0.8 );
-				tallBox.rotation.y = Math.PI / 8;
-				tallBox.castShadow = true;
-				tallBox.receiveShadow = true;
-				scene.add( tallBox );
-
-				// Short box
-				const shortBox = new THREE.Mesh( new THREE.BoxGeometry( 1.2, 1.2, 1.2 ), objectMaterial );
-				shortBox.position.set( 1, 0.6, 0.5 );
-				shortBox.rotation.y = - Math.PI / 6;
-				shortBox.castShadow = true;
-				shortBox.receiveShadow = true;
-				scene.add( shortBox );
-
-				// Sphere (to show smooth GI variation)
-				const sphere = new THREE.Mesh( new THREE.SphereGeometry( 0.5, 32, 32 ), objectMaterial.clone() );
-				sphere.position.set( 1, 1.9, 0.5 );
-				sphere.castShadow = true;
-				sphere.receiveShadow = true;
-				scene.add( sphere );
-
-				// Light
-				const light = new THREE.PointLight( 0xffffff, 40 );
-				light.position.set( 0, 4.5, 0 );
-				light.castShadow = true;
-				light.shadow.mapSize.setScalar( 256 );
-				light.shadow.radius = 10;
-				light.shadow.normalBias = - 0.02;
-				scene.add( light );
-
 				// Renderer
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1.0;
@@ -163,7 +91,7 @@
 
 				// Bake light probe volume
 
-				async function bake( resolution ) {
+				function bake( resolution ) {
 
 					if ( probes ) {
 
@@ -172,9 +100,12 @@
 
 					}
 
-					probes = new LightProbeGrid( 5.6, 4.7, 5.6, resolution, resolution, resolution );
-					probes.position.set( 0, 2.45, 0 );
-					await probes.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
+					const bounds = new THREE.Box3().setFromObject( model );
+					const size = bounds.getSize( new THREE.Vector3() ).multiplyScalar( 0.95 ).max( new THREE.Vector3( 0.1, 0.1, 0.1 ) );
+					probes = new LightProbeGrid( size.x, size.y, size.z, resolution, resolution, resolution );
+					probes.position.copy( bounds.getCenter( new THREE.Vector3() ) );
+					if ( probesHelper ) probesHelper.visible = false;
+					probes.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: size.length() * 2 } );
 					probes.visible = params.enabled;
 					scene.add( probes );
 
@@ -190,22 +121,88 @@
 
 						probesHelper.probes = probes;
 						probesHelper.update();
+						probesHelper.visible = params.showProbes;
 
 					}
 
 				}
 
 				const params = {
+					model: 'Cornell Box',
 					enabled: true,
 					showProbes: false,
 					resolution: 6
 				};
 
-				await bake( params.resolution );
-
 				// GUI
 
+				const loader = new GLTFLoader();
+				let loadId = 0;
+				let currentModel = params.model;
+
+				async function loadModel() {
+
+					const id = ++ loadId;
+					const name = params.model;
+
+					try {
+
+						const gltf = await loader.loadAsync( 'models/gltf/' + models[ name ] );
+						if ( id !== loadId ) {
+
+							disposeModel( gltf.scene );
+							return;
+
+						}
+
+						if ( model ) {
+
+							scene.remove( model );
+							disposeModel( model );
+
+						}
+
+						model = gltf.scene;
+						model.traverse( ( object ) => {
+
+							if ( object.isMesh ) {
+
+								object.castShadow = true;
+								object.receiveShadow = true;
+
+							}
+
+							if ( object.isLight && object.shadow ) {
+
+								object.castShadow = true;
+								object.shadow.mapSize.setScalar( 1024 );
+								object.shadow.normalBias = 0.02;
+
+							}
+
+						} );
+
+						scene.add( model );
+						model.updateMatrixWorld( true );
+						setModelCamera( gltf );
+						bake( params.resolution );
+						currentModel = name;
+
+					} catch ( error ) {
+
+						if ( id !== loadId ) return;
+						params.model = currentModel;
+						console.error( 'Unable to load model:', error );
+
+					}
+
+				}
+
+				await loadModel();
+				renderer.setAnimationLoop( animate );
+
 				const gui = renderer.inspector.createParameters( 'Light Probes' );
+				gui.add( params, 'model', Object.keys( models ) ).name( 'Model' ).listen().onChange( loadModel );
 				gui.add( params, 'enabled' ).name( 'GI' ).onChange( ( value ) => {
 
 					probes.visible = value;
@@ -226,6 +223,66 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function disposeModel( model ) {
+
+				const resources = new Set();
+				model.traverse( ( object ) => {
+
+					if ( object.geometry ) resources.add( object.geometry );
+					if ( object.shadow ) resources.add( object.shadow );
+					const materials = Array.isArray( object.material ) ? object.material : [ object.material ];
+					for ( const material of materials ) {
+
+						if ( ! material ) continue;
+						resources.add( material );
+						for ( const value of Object.values( material ) ) {
+
+							if ( value && value.isTexture ) resources.add( value );
+
+						}
+
+					}
+
+				} );
+				for ( const resource of resources ) resource.dispose();
+
+			}
+
+			function setModelCamera( gltf ) {
+
+				const source = gltf.cameras[ 0 ];
+				const bounds = new THREE.Box3().setFromObject( model );
+				const center = bounds.getCenter( new THREE.Vector3() );
+
+				// Clear any orbit damping left over from the previous scene.
+				const damping = controls.enableDamping;
+				controls.enableDamping = false;
+				controls.update();
+
+				if ( source ) {
+
+					source.getWorldPosition( camera.position );
+					source.getWorldQuaternion( camera.quaternion );
+					camera.fov = source.fov;
+					camera.near = source.near;
+					camera.far = source.far;
+					controls.target.copy( camera.position ).addScaledVector( camera.getWorldDirection( new THREE.Vector3() ), camera.position.distanceTo( center ) );
+
+				} else {
+
+					controls.target.copy( center );
+					camera.position.copy( center ).add( new THREE.Vector3( 1, 0.6, 1 ).multiplyScalar( bounds.getSize( new THREE.Vector3() ).length() ) );
+
+				}
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				controls.update();
+				controls.saveState();
+				controls.enableDamping = damping;
 
 			}
 
