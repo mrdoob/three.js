@@ -40,6 +40,7 @@
 			import { vxgi } from 'three/addons/lighting/vxgi/VXGINode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
@@ -52,7 +53,17 @@
 
 			}
 
+			const models = {
+				'Museum': 'museum.glb',
+				'Dual Rooms': 'dual-rooms.glb',
+				'Cornell Box': 'cornell-box.glb',
+				'Cornell Box (Oblique)': 'cornell-box-oblique.glb',
+				'Cornell Box (Metallic Sphere)': 'cornell-box-metallic-sphere.glb',
+				'Cornell Box (Mirror Wall)': 'cornell-box-mirror-wall.glb'
+			};
+
 			let camera, scene, renderer, renderPipeline, controls;
+			let model;
 
 			init();
 
@@ -67,7 +78,6 @@
 				renderer = new THREE.WebGPURenderer();
 				// renderer.setPixelRatio( window.devicePixelRatio ); // probably too costly for most hardware
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
@@ -126,107 +136,90 @@
 				const traaPass = traa( scenePass, prePassDepth, prePassVelocity, camera );
 				renderPipeline.outputNode = traaPass;
 
-				// Cornell Box inspired scene
-
-				// Walls
-				const wallGeometry = new THREE.PlaneGeometry( 1, 1 );
-
-				// Left wall - red
-				const redWallMaterial = new THREE.MeshPhysicalMaterial( { color: '#ff0000' } );
-				const leftWall = new THREE.Mesh( wallGeometry, redWallMaterial );
-				leftWall.scale.set( 20, 15, 1 );
-				leftWall.rotation.y = Math.PI * 0.5;
-				leftWall.position.set( - 10, 7.5, 0 );
-				leftWall.receiveShadow = true;
-				scene.add( leftWall );
-
-				// Right wall - green
-				const greenWallMaterial = new THREE.MeshPhysicalMaterial( { color: '#00ff00' } );
-				const rightWall = new THREE.Mesh( wallGeometry, greenWallMaterial );
-				rightWall.scale.set( 20, 15, 1 );
-				rightWall.rotation.y = Math.PI * - 0.5;
-				rightWall.position.set( 9.999, 7.5, 0 );
-				rightWall.receiveShadow = true;
-				scene.add( rightWall );
-
-				// White walls and boxes
-				const whiteMaterial = new THREE.MeshPhysicalMaterial( { color: '#fff' } );
-
-				// Floor
-				const floor = new THREE.Mesh( wallGeometry, whiteMaterial );
-				floor.scale.set( 20, 20, 1 );
-				floor.rotation.x = Math.PI * - .5;
-				floor.receiveShadow = true;
-				scene.add( floor );
-
-				// Back wall
-				const backWall = new THREE.Mesh( wallGeometry, whiteMaterial );
-				backWall.scale.set( 15, 20, 1 );
-				backWall.rotation.z = Math.PI * - 0.5;
-				backWall.position.set( 0, 7.5, - 10 );
-				backWall.receiveShadow = true;
-				scene.add( backWall );
-
-				// Ceiling
-				const ceiling = new THREE.Mesh( wallGeometry, whiteMaterial );
-				ceiling.scale.set( 20, 20, 1 );
-				ceiling.rotation.x = Math.PI * 0.5;
-				ceiling.position.set( 0, 14.999, 0 );
-				ceiling.receiveShadow = true;
-				scene.add( ceiling );
-
-				// Boxes
-				const tallBoxGeometry = new THREE.BoxGeometry( 5, 7, 5 );
-				const tallBox = new THREE.Mesh( tallBoxGeometry, whiteMaterial );
-				tallBox.rotation.y = Math.PI * 0.25;
-				tallBox.position.set( - 3, 3.5, - 2 );
-				tallBox.castShadow = true;
-				tallBox.receiveShadow = true;
-				scene.add( tallBox );
-
-				const shortBoxGeometry = new THREE.BoxGeometry( 4, 4, 4 );
-				const shortBox = new THREE.Mesh( shortBoxGeometry, whiteMaterial );
-				shortBox.rotation.y = Math.PI * - 0.1;
-				shortBox.position.set( 4, 2, 4 );
-				shortBox.castShadow = true;
-				shortBox.receiveShadow = true;
-				scene.add( shortBox );
-
-				// Light source geometry (unlit materials are injected as emitters)
-				const lightSourceGeometry = new THREE.CylinderGeometry( 2.5, 2.5, 1, 64 );
-				const lightSourceMaterial = new THREE.MeshBasicMaterial();
-				const lightSource = new THREE.Mesh( lightSourceGeometry, lightSourceMaterial );
-				lightSource.position.y = 15;
-				scene.add( lightSource );
-
-				// Point light
-				const pointLight = new THREE.PointLight( '#ffffff', 100 );
-				pointLight.position.set( 0, 13, 0 );
-				pointLight.distance = 100;
-				pointLight.castShadow = true;
-				pointLight.shadow.mapSize.width = 1024;
-				pointLight.shadow.mapSize.height = 1024;
-				scene.add( pointLight );
-
-				// Ambient light
-				const ambientLight = new THREE.AmbientLight( '#0c0c0c' );
-				scene.add( ambientLight );
-
 				window.addEventListener( 'resize', onWindowResize );
 
 				//
 
 				const params = {
+					model: 'Cornell Box',
 					output: 0,
-					debug: 0,
-					lightX: 0,
-					lightZ: 0
+					debug: 0
 				};
 
 				const types = { Combined: 0, Direct: 3, AO: 1, GI: 2 };
 				const debugTypes = { Off: 0, Radiance: 1, Opacity: 2 };
 
+				await renderer.init();
+
+				const loader = new GLTFLoader();
+				let loadId = 0;
+				let currentModel = params.model;
+
+				async function loadModel() {
+
+					const id = ++ loadId;
+					const name = params.model;
+
+					try {
+
+						const gltf = await loader.loadAsync( 'models/gltf/' + models[ name ] );
+						if ( id !== loadId ) {
+
+							disposeModel( gltf.scene );
+							return;
+
+						}
+
+						if ( model ) {
+
+							scene.remove( model );
+							disposeModel( model );
+
+						}
+
+						model = gltf.scene;
+						model.traverse( ( object ) => {
+
+							if ( object.isMesh ) {
+
+								object.castShadow = true;
+								object.receiveShadow = true;
+
+							}
+
+							if ( object.isLight && object.shadow ) {
+
+								object.castShadow = true;
+								object.shadow.mapSize.setScalar( 1024 );
+								object.shadow.normalBias = 0.02;
+
+							}
+
+						} );
+
+						scene.add( model );
+						model.updateMatrixWorld( true );
+						setModelCamera( gltf );
+						// Restart temporal accumulation for the new scene.
+						traaPass.setSize( 1, 1 );
+						giPass.volume.needsUpdate = true;
+						currentModel = name;
+
+					} catch ( error ) {
+
+						if ( id !== loadId ) return;
+						params.model = currentModel;
+						console.error( 'Unable to load model:', error );
+
+					}
+
+				}
+
+				await loadModel();
+				renderer.setAnimationLoop( animate );
+
 				const gui = renderer.inspector.createParameters( 'VXGI Settings' );
+				gui.add( params, 'model', Object.keys( models ) ).name( 'Model' ).listen().onChange( loadModel );
 				gui.add( params, 'output', types ).onChange( updatePostprocessing );
 				gui.add( params, 'debug', debugTypes ).name( 'voxel view' ).onChange( updatePostprocessing );
 				gui.add( giPass.debugLevel, 'value', 0, 4, 1 ).name( 'voxel view level' );
@@ -274,6 +267,66 @@
 					renderPipeline.needsUpdate = true;
 
 				}
+
+			}
+
+			function disposeModel( model ) {
+
+				const resources = new Set();
+				model.traverse( ( object ) => {
+
+					if ( object.geometry ) resources.add( object.geometry );
+					if ( object.shadow ) resources.add( object.shadow );
+					const materials = Array.isArray( object.material ) ? object.material : [ object.material ];
+					for ( const material of materials ) {
+
+						if ( ! material ) continue;
+						resources.add( material );
+						for ( const value of Object.values( material ) ) {
+
+							if ( value && value.isTexture ) resources.add( value );
+
+						}
+
+					}
+
+				} );
+				for ( const resource of resources ) resource.dispose();
+
+			}
+
+			function setModelCamera( gltf ) {
+
+				const source = gltf.cameras[ 0 ];
+				const bounds = new THREE.Box3().setFromObject( model );
+				const center = bounds.getCenter( new THREE.Vector3() );
+
+				// Clear any orbit damping left over from the previous scene.
+				const damping = controls.enableDamping;
+				controls.enableDamping = false;
+				controls.update();
+
+				if ( source ) {
+
+					source.getWorldPosition( camera.position );
+					source.getWorldQuaternion( camera.quaternion );
+					camera.fov = source.fov;
+					camera.near = source.near;
+					camera.far = source.far;
+					controls.target.copy( camera.position ).addScaledVector( camera.getWorldDirection( new THREE.Vector3() ), camera.position.distanceTo( center ) );
+
+				} else {
+
+					controls.target.copy( center );
+					camera.position.copy( center ).add( new THREE.Vector3( 1, 0.6, 1 ).multiplyScalar( bounds.getSize( new THREE.Vector3() ).length() ) );
+
+				}
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				controls.update();
+				controls.saveState();
+				controls.enableDamping = damping;
 
 			}
 
