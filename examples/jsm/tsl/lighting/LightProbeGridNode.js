@@ -5,7 +5,7 @@ import { array, cameraPosition, float, getShIrradianceAt, If, int, Loop, normalW
 export const ATLAS_PADDING = 1;
 
 // Distance tiles have a one-texel mirrored border and follow bake order.
-export const DISTANCE_RESOLUTION = 16;
+export const DISTANCE_RESOLUTION = 8;
 export const DISTANCE_COLUMNS = 32;
 
 // Negative mean distance excludes hidden probes from lighting.
@@ -194,7 +194,7 @@ function chebyshevVisibility( moments, distance, slack = VISIBILITY_SLACK ) {
  */
 function evaluateGridIrradianceVisibility( grid, sampleIrradiance ) {
 
-	const { min, res, spacing, moments, distanceScale, normalBias, viewBias, momentsSize, irradianceSize, visbilityGridSize } = grid;
+	const { min, res, spacing, moments, distanceScale, normalBias, viewBias, momentsSize, irradianceSize, visibilityGridSize } = grid;
 
 	const nx = int( res.x ), nz = int( res.z );
 
@@ -228,7 +228,7 @@ function evaluateGridIrradianceVisibility( grid, sampleIrradiance ) {
 
 		const ix = int( cell.x ).toVar(), iy = int( cell.y ).toVar(), iz = int( cell.z ).toVar();
 		const probeIndex = ix.add( iz.mul( nx ) ).add( iy.mul( nx ).mul( nz ) ).toVar();
-		const momentsUV = octTileUV( probeIndex, direction, visbilityGridSize, momentsSize );
+		const momentsUV = octTileUV( probeIndex, direction, visibilityGridSize, momentsSize );
 		const visibility = chebyshevVisibility( moments.sample( momentsUV ).xy, distance.div( distanceScale ) );
 
 		// Soft backface weight: probes behind the surface count less.
@@ -337,7 +337,7 @@ class LightProbeGridNode extends AnalyticLightNode {
 			res,
 			spacing,
 			moments: texture( distanceTarget.texture ),
-			visbilityGridSize: light.visbilityGridSize,
+			visibilityGridSize: light.visibilityGridSize,
 			distanceScale: this._distanceScale,
 			normalBias: this._normalBias,
 			viewBias: this._viewBias,

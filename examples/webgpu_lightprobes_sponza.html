@@ -27,9 +27,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.webgpu.js",
-					"three/webgpu": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.tsl.js",
+					"three": "../src/Three.WebGPU.js",
+					"three/webgpu": "../src/Three.WebGPU.js",
+					"three/tsl": "../src/Three.TSL.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -63,7 +63,7 @@
 			const params = {
 				enabled: true,
 				visibility: true,
-				visbilityGridSize: 16,
+				visibilityGridSize: 8,
 				showProbes: false,
 				probeSize: 0.2,
 				boundsX: - 0.5,
@@ -200,7 +200,7 @@
 
 				} );
 
-				gui.add( params, 'visbilityGridSize', [ 4, 8, 16, 32 ] ).name( 'Visibility Map Size' ).onChange( createProbes );
+				gui.add( params, 'visibilityGridSize', [ 4, 8, 16, 32 ] ).name( 'Visibility Map Size' ).onChange( createProbes );
 
 				gui.add( params, 'lightAzimuth', - 180, 180, 1 ).name( 'Light Azimuth' ).onChange( () => {
 
@@ -289,7 +289,7 @@
 				probes.position.set( params.boundsX, params.boundsY, params.boundsZ );
 				probes.visible = params.enabled;
 				probes.visibility = params.visibility;
-				probes.visbilityGridSize = params.visbilityGridSize;
+				probes.visibilityGridSize = params.visibilityGridSize;
 				scene.add( probes );
 
 				resetProbeBake();

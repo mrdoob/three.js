@@ -25,9 +25,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.webgpu.js",
-					"three/webgpu": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.tsl.js",
+					"three": "../src/Three.WebGPU.js",
+					"three/webgpu": "../src/Three.WebGPU.js",
+					"three/tsl": "../src/Three.TSL.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -178,7 +178,7 @@
 					probes = new LightProbeGrid( 5.6, 4.7, 5.6, resolution, resolution, resolution );
 					probes.position.set( 0, 2.45, 0 );
 					probes.visibility = params.visibility;
-					probes.visbilityGridSize = params.visbilityGridSize;
+					probes.visibilityGridSize = params.visibilityGridSize;
 
 					// Keep the helper spheres out of the cubemap captures.
 					if ( probesHelper ) probesHelper.visible = false;
@@ -209,7 +209,7 @@
 				const params = {
 					enabled: true,
 					visibility: true,
-					visbilityGridSize: 16,
+					visibilityGridSize: 8,
 					showProbes: false,
 					resolution: 6,
 					bounces: 3,
@@ -244,7 +244,7 @@
 
 				} );
 
-				gui.add( params, 'visbilityGridSize', [ 4, 8, 16, 32 ] ).name( 'Visibility Map Size' ).onChange( requestBake );
+				gui.add( params, 'visibilityGridSize', [ 4, 8, 16, 32 ] ).name( 'Visibility Map Size' ).onChange( requestBake );
 
 				gui.add( params, 'showProbes' ).name( 'Show Probes' ).onChange( ( value ) => {
 

@@ -60,7 +60,7 @@ class LightProbeGridHelper extends InstancedMesh {
 		this._atlas = texture3D( probes.texture );
 		this._distance = texture( probes._distanceTarget.texture );
 		this._resolution = uniform( new Vector3() );
-		this._distanceResolution = uniform( 16, 'int' );
+		this._distanceResolution = uniform( 8, 'int' );
 		this._visibility = uniform( 0, 'int' ).setGroup( renderGroup ).onRenderUpdate( () => this.probes.visibility ? 1 : 0 );
 
 		material.fragmentNode = Fn( () => {
@@ -144,7 +144,7 @@ class LightProbeGridHelper extends InstancedMesh {
 
 		this._atlas.value = probes.texture;
 		this._distance.value = probes._distanceTarget.texture;
-		this._distanceResolution.value = probes.visbilityGridSize;
+		this._distanceResolution.value = probes.visibilityGridSize;
 		this._resolution.value.copy( res );
 
 	}
