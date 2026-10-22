@@ -15,9 +15,6 @@ export const HIDDEN_DISTANCE = - 1;
 export const IRRADIANCE_RESOLUTION = 8;
 export const IRRADIANCE_TILE = IRRADIANCE_RESOLUTION + 2;
 
-// Normalized distance slack reduces flickering on slanted surfaces.
-const VISIBILITY_SLACK = 0.03;
-
 const signNotZero = ( value ) => select( value.greaterThanEqual( 0.0 ), float( 1.0 ), float( - 1.0 ) );
 
 /**
@@ -172,13 +169,12 @@ export function sampleGridSH( atlas, uvw, nz ) {
  * @private
  * @param {Node<vec2>} moments - The mean and mean squared distance.
  * @param {Node<float>} distance - The distance to test, in the same units.
- * @param {number} [slack=VISIBILITY_SLACK] - Distance past the mean that still counts as visible.
  * @return {Node<float>} The visibility in [0, 1].
  */
-function chebyshevVisibility( moments, distance, slack = VISIBILITY_SLACK ) {
+function chebyshevVisibility( moments, distance ) {
 
 	const variance = moments.y.sub( moments.x.mul( moments.x ) ).max( 1e-6 );
-	const delta = distance.sub( moments.x ).sub( slack ).max( 0.0 );
+	const delta = distance.sub( moments.x ).max( 0.0 );
 
 	return variance.div( variance.add( delta.mul( delta ) ) ).pow( 3.0 );
 
@@ -208,6 +204,7 @@ function evaluateGridIrradianceVisibility( grid, sampleIrradiance ) {
 
 	const total = vec3( 0.0 ).toVar();
 	const weights = float( 0.0 ).toVar();
+	const unoccludedWeights = float( 0.0 ).toVar();
 
 	// Every probe is sampled in the direction of the normal.
 	const normalOct = octEncode( normalWorld ).mul( IRRADIANCE_RESOLUTION ).add( 1.0 ).toVar();
@@ -237,19 +234,23 @@ function evaluateGridIrradianceVisibility( grid, sampleIrradiance ) {
 		const wrap = normalWorld.dot( toProbe.div( toProbe.length().max( 1e-6 ) ) ).mul( 0.5 ).add( 0.5 ).pow( 2.0 ).add( 0.2 );
 
 		const blend = offset.mul( alpha ).add( offset.oneMinus().mul( alpha.oneMinus() ) );
-		const weight = blend.x.mul( blend.y ).mul( blend.z ).mul( wrap ).mul( visibility ).toVar();
+		const unoccludedWeight = blend.x.mul( blend.y ).mul( blend.z ).mul( wrap );
+		const weight = unoccludedWeight.mul( visibility ).toVar();
 
 		const tile = vec2( float( probeIndex.mod( DISTANCE_COLUMNS ) ), float( probeIndex.div( DISTANCE_COLUMNS ) ) );
 		const irradianceUV = tile.mul( IRRADIANCE_TILE ).add( normalOct ).div( irradianceSize );
 
 		total.addAssign( sampleIrradiance( irradianceUV ).rgb.mul( weight ) );
 		weights.addAssign( weight );
+		unoccludedWeights.addAssign( unoccludedWeight );
 
 	} );
 
-	// Fade to black when no probe sees the receiver.
+	// Preserve attenuation when every probe has low visibility instead of
+	// normalizing tiny residual weights back to full brightness. Below 10%
+	// average visibility, fade the grid contribution toward black.
 
-	return total.div( weights.max( 1e-6 ) );
+	return total.div( weights.max( unoccludedWeights.mul( 0.1 ) ).max( 1e-6 ) );
 
 }
 
