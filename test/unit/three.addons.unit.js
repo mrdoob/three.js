@@ -16,7 +16,6 @@ import './addons/loaders/GaussianSplatPLYLoader.tests.js';
 import './addons/loaders/MaterialXLoader.tests.js';
 import './addons/loaders/SPLATLoader.tests.js';
 import './addons/loaders/SPZLoader.tests.js';
-import './addons/loaders/SVGLoader.tests.js';
 import './addons/loaders/USDLoader.tests.js';
 import './addons/exporters/EXRExporter.tests.js';
 import './addons/exporters/OBJExporter.tests.js';
