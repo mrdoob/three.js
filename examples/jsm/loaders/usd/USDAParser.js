@@ -235,30 +235,77 @@ class USDAParser {
 
 	_stripBlockComments( text ) {
 
-		// Iteratively remove /* ... */ comments without regex backtracking
+		// Iteratively remove /* ... */ comments without regex backtracking. A string, an asset
+		// path or a # comment is copied as is, since a /* inside it is not a comment.
+		const tokens = /\/\*|["'@#]/g;
 		let result = '';
 		let i = 0;
 
 		while ( i < text.length ) {
 
-			const start = text.indexOf( '/*', i );
+			tokens.lastIndex = i;
+			const match = tokens.exec( text );
 
-			if ( start === - 1 ) {
+			if ( match === null ) {
 
 				result += text.slice( i );
 				break;
 
 			}
 
-			result += text.slice( i, start );
+			const start = match.index;
 
-			// Move past the comment (or to end if unclosed)
-			const end = text.indexOf( '*/', start + 2 );
-			i = ( end === - 1 ) ? text.length : end + 2;
+			if ( match[ 0 ] === '/*' ) {
+
+				result += text.slice( i, start );
+
+				// Move past the comment (or to end if unclosed)
+				const end = text.indexOf( '*/', start + 2 );
+				i = ( end === - 1 ) ? text.length : end + 2;
+
+			} else {
+
+				// Copy a # comment up to the line end, and a string or asset path to its end
+				let end = ( match[ 0 ] === '#' ) ? text.indexOf( '\n', start ) : this._literalEnd( text, start );
+				if ( end === - 1 ) end = text.length;
+
+				result += text.slice( i, end );
+				i = end;
+
+			}
 
 		}
 
 		return result;
+
+	}
+
+	_literalEnd( text, start ) {
+
+		// The index after the string or asset path at `start`: '...' or "..." with backslash
+		// escapes, ''' or """ triple-quoted, @...@ or @@@...@@@. An unclosed single-line literal
+		// ends at the line end.
+		const char = text[ start ];
+		const triple = char.repeat( 3 );
+
+		if ( text.startsWith( triple, start ) ) {
+
+			const end = text.indexOf( triple, start + 3 );
+			return ( end === - 1 ) ? text.length : end + 3;
+
+		}
+
+		for ( let i = start + 1; i < text.length; i ++ ) {
+
+			const ch = text[ i ];
+
+			if ( ch === '\\' && char !== '@' ) i ++;
+			else if ( ch === char ) return i + 1;
+			else if ( ch === '\n' ) return i;
+
+		}
+
+		return text.length;
 
 	}
 
@@ -330,7 +377,12 @@ class USDAParser {
 
 			}
 
-			if ( ! inString && ( ch === '"' || ch === '\'' ) ) {
+			if ( ! inString && ch === '@' ) {
+
+				// An asset path, which may hold a #
+				i = this._literalEnd( line, i ) - 1;
+
+			} else if ( ! inString && ( ch === '"' || ch === '\'' ) ) {
 
 				inString = true;
 				stringChar = ch;
