@@ -178,6 +178,7 @@
 					probes = new LightProbeGrid( 5.6, 4.7, 5.6, resolution, resolution, resolution );
 					probes.position.set( 0, 2.45, 0 );
 					probes.visibility = params.visibility;
+					probes.visbilityGridSize = params.visbilityGridSize;
 
 					// Keep the helper spheres out of the cubemap captures.
 					if ( probesHelper ) probesHelper.visible = false;
@@ -208,6 +209,7 @@
 				const params = {
 					enabled: true,
 					visibility: true,
+					visbilityGridSize: 16,
 					showProbes: false,
 					resolution: 6,
 					bounces: 3,
@@ -235,6 +237,8 @@
 				gui.add( params, 'resolution', 2, 12, 1 ).name( 'Resolution' ).onChange( requestBake ).debounce( 250 );
 				gui.add( params, 'bounces', 0, 10, 1 ).name( 'Bounces' ).onChange( requestBake ).debounce( 250 );
 				gui.add( params, 'lightIntensity', 1, 100, 1 ).name( 'Light Intensity' ).onChange( requestBake ).debounce( 250 );
+				gui.add( params, 'visbilityGridSize', [ 4, 8, 16, 32 ] ).name( 'Visibility Grid Size' ).onChange( requestBake );
+
 				gui.add( params, 'visibility' ).name( 'Visibility' ).onChange( ( value ) => {
 
 					probes.visibility = value;

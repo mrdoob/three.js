@@ -287,6 +287,7 @@
 				const params = {
 					enabled: true,
 					visibility: true,
+					visbilityGridSize: 16,
 					showProbes: false,
 					resolution: 7,
 					bounces: 3,
@@ -310,6 +311,7 @@
 					probes = new LightProbeGrid( 15.6, 4.7, 7.6, resolution * 2, resolution, resolution );
 					probes.position.set( 0, 2.45, 0 );
 					probes.visibility = params.visibility;
+					probes.visbilityGridSize = params.visbilityGridSize;
 					if ( probesHelper ) probesHelper.visible = false;
 
 					probes.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20, bounces: params.bounces } );
@@ -352,6 +354,8 @@
 					probes.visible = value;
 
 				} );
+
+				gui.add( params, 'visbilityGridSize', [ 4, 8, 16, 32 ] ).name( 'Visibility Grid Size' ).onChange( requestBake );
 
 				gui.add( params, 'visibility' ).name( 'Visibility' ).onChange( ( value ) => {
 

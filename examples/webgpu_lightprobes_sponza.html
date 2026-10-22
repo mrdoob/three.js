@@ -63,6 +63,7 @@
 			const params = {
 				enabled: true,
 				visibility: true,
+				visbilityGridSize: 16,
 				showProbes: false,
 				probeSize: 0.2,
 				boundsX: - 0.5,
@@ -193,6 +194,8 @@
 
 				} );
 
+				gui.add( params, 'visbilityGridSize', [ 4, 8, 16, 32 ] ).name( 'Visibility Grid Size' ).onChange( createProbes );
+
 				gui.add( params, 'visibility' ).name( 'Visibility' ).onChange( ( value ) => {
 
 					if ( probes ) probes.visibility = value;
@@ -286,6 +289,7 @@
 				probes.position.set( params.boundsX, params.boundsY, params.boundsZ );
 				probes.visible = params.enabled;
 				probes.visibility = params.visibility;
+				probes.visbilityGridSize = params.visbilityGridSize;
 				scene.add( probes );
 
 				resetProbeBake();
