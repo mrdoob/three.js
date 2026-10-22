@@ -190,6 +190,7 @@ class OBJExporter {
 
 			// shortcuts
 			const vertices = geometry.getAttribute( 'position' );
+			const indices = geometry.getIndex();
 
 			// name of the line object
 			output += 'o ' + line.name + '\n';
@@ -214,9 +215,11 @@ class OBJExporter {
 
 				output += 'l ';
 
-				for ( let j = 1, l = vertices.count; j <= l; j ++ ) {
+				for ( let i = 0, l = ( indices !== null ) ? indices.count : vertices.count; i < l; i ++ ) {
 
-					output += ( indexVertex + j ) + ' ';
+					const j = ( indices !== null ) ? indices.getX( i ) : i;
+
+					output += ( indexVertex + j + 1 ) + ' ';
 
 				}
 
@@ -226,9 +229,12 @@ class OBJExporter {
 
 			if ( type === 'LineSegments' ) {
 
-				for ( let j = 1, k = j + 1, l = vertices.count; j < l; j += 2, k = j + 1 ) {
+				for ( let i = 0, l = ( indices !== null ) ? indices.count : vertices.count; i < l - 1; i += 2 ) {
 
-					output += 'l ' + ( indexVertex + j ) + ' ' + ( indexVertex + k ) + '\n';
+					const j = ( indices !== null ) ? indices.getX( i ) : i;
+					const k = ( indices !== null ) ? indices.getX( i + 1 ) : i + 1;
+
+					output += 'l ' + ( indexVertex + j + 1 ) + ' ' + ( indexVertex + k + 1 ) + '\n';
 
 				}
 
