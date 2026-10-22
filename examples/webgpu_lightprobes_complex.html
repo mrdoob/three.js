@@ -315,19 +315,19 @@
 
 					}
 
-					// The `falloff` fades each volume past its boundary so the two
-					// rooms blend smoothly without bleeding into each other.
+					// Separate the lighting influence at the center of the divider.
+					// Probe positions remain clear of its faces.
 
 					// Keep probes 0.15 units clear of the divider faces.
 					probesLeft = new LightProbeGrid( 7.5, 4.7, 7.6, resolution, resolution, resolution );
 					probesLeft.position.set( - 4.05, 2.45, 0 );
-					probesLeft.falloff = 1.0;
+					probesLeft.influenceBox = new THREE.Box3( new THREE.Vector3( - 8, 0, - 4 ), new THREE.Vector3( 0, 5, 4 ) );
 					probesLeft.visibility = params.visibility;
 					probesLeft.visibilityGridSize = params.visibilityGridSize;
 
 					probesRight = new LightProbeGrid( 7.5, 4.7, 7.6, resolution, resolution, resolution );
 					probesRight.position.set( 4.05, 2.45, 0 );
-					probesRight.falloff = 1.0;
+					probesRight.influenceBox = new THREE.Box3( new THREE.Vector3( 0, 0, - 4 ), new THREE.Vector3( 8, 5, 4 ) );
 					probesRight.visibility = params.visibility;
 					probesRight.visibilityGridSize = params.visibilityGridSize;
 

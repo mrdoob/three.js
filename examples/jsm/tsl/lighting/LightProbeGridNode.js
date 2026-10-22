@@ -279,6 +279,9 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		this._min = uniform( new Vector3() ).setGroup( renderGroup );
 		this._max = uniform( new Vector3() ).setGroup( renderGroup );
+		this._influenceMin = uniform( new Vector3() ).setGroup( renderGroup );
+		this._influenceMax = uniform( new Vector3() ).setGroup( renderGroup );
+		this._hasInfluenceBox = uniform( 0, 'int' ).setGroup( renderGroup );
 		this._resolution = uniform( new Vector3() ).setGroup( renderGroup );
 		this._intensity = uniform( 1 ).setGroup( renderGroup );
 		this._falloff = uniform( 0 ).setGroup( renderGroup );
@@ -297,6 +300,9 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		this._min.value.copy( light.boundingBox.min );
 		this._max.value.copy( light.boundingBox.max );
+		this._influenceMin.value.copy( ( light.influenceBox || light.boundingBox ).min );
+		this._influenceMax.value.copy( ( light.influenceBox || light.boundingBox ).max );
+		this._hasInfluenceBox.value = light.influenceBox !== null ? 1 : 0;
 		this._resolution.value.copy( light.resolution );
 		this._intensity.value = light.intensity;
 		this._falloff.value = light.falloff;
@@ -356,16 +362,12 @@ class LightProbeGridNode extends AnalyticLightNode {
 		const irradianceAtlas = texture( light._irradianceTarget.texture );
 		const sampleIrradiance = ( uv ) => irradianceAtlas.sample( uv );
 
-		// Optional smooth boundary for blending grids; falloff 0 applies everywhere.
+		// Explicit influence bounds override the legacy fade outside the probe bounds.
 
-		let weight = this._intensity;
-
-		if ( light.falloff > 0 ) {
-
-			const outside = min.sub( positionWorld ).max( 0.0 ).add( positionWorld.sub( max ).max( 0.0 ) );
-			weight = weight.mul( outside.length().smoothstep( 0.0, this._falloff ).oneMinus() );
-
-		}
+		const inside = positionWorld.greaterThanEqual( this._influenceMin ).all().and( positionWorld.lessThanEqual( this._influenceMax ).all() );
+		const outside = min.sub( positionWorld ).max( 0.0 ).add( positionWorld.sub( max ).max( 0.0 ) );
+		const fade = select( this._falloff.greaterThan( 0.0 ), outside.length().smoothstep( 0.0, this._falloff.max( 1e-6 ) ).oneMinus(), 1.0 );
+		let weight = this._intensity.mul( select( this._hasInfluenceBox.equal( 1 ), select( inside, 1.0, 0.0 ), fade ) );
 
 		weight = weight.toVar();
 
