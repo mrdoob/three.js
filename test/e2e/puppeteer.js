@@ -95,6 +95,7 @@ const parseTime = 1; // 1 second per megabyte
 
 const networkTimeout = 5; // 5 minutes, set to 0 to disable
 const renderTimeout = 5; // 5 seconds, set to 0 to disable
+const maxTimeoutRetries = 2; // Retry timed-out examples in a fresh browser
 const numCIJobs = 5; // GitHub Actions run the script in 5 threads
 
 const width = 400;
@@ -443,7 +444,7 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 }
 
-async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file ) {
+async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file, timeoutRetries = 0 ) {
 
 	const page = ctx.page;
 	const pageStart = performance.now();
@@ -610,9 +611,6 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 
 		} else {
 
-			console.red( e );
-			failedScreenshots.push( file );
-
 			// A timed-out page can stay wedged and time out every following file
 
 			if ( String( e ).includes( 'TimeoutError' ) ) {
@@ -620,7 +618,18 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 				console.yellow( 'Restarting browser...' );
 				await ctx.restart();
 
+				if ( timeoutRetries < maxTimeoutRetries ) {
+
+					console.yellow( `${ e }` );
+					console.yellow( `Retrying ${ file } after timeout (${ timeoutRetries + 1 }/${ maxTimeoutRetries })...` );
+					return await checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file, timeoutRetries + 1 );
+
+				}
+
 			}
+
+			console.red( e );
+			failedScreenshots.push( file );
 
 		}
 
