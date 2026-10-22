@@ -28368,6 +28368,26 @@ class Line extends Object3D {
 
 		super.copy( source, recursive );
 
+		if ( source.morphTargetInfluences !== undefined ) {
+
+			this.morphTargetInfluences = source.morphTargetInfluences.slice();
+
+		} else {
+
+			this.morphTargetInfluences = undefined;
+
+		}
+
+		if ( source.morphTargetDictionary !== undefined ) {
+
+			this.morphTargetDictionary = Object.assign( {}, source.morphTargetDictionary );
+
+		} else {
+
+			this.morphTargetDictionary = undefined;
+
+		}
+
 		this.material = Array.isArray( source.material ) ? source.material.slice() : source.material;
 		this.geometry = source.geometry;
 
@@ -28921,6 +28941,26 @@ class Points extends Object3D {
 	copy( source, recursive ) {
 
 		super.copy( source, recursive );
+
+		if ( source.morphTargetInfluences !== undefined ) {
+
+			this.morphTargetInfluences = source.morphTargetInfluences.slice();
+
+		} else {
+
+			this.morphTargetInfluences = undefined;
+
+		}
+
+		if ( source.morphTargetDictionary !== undefined ) {
+
+			this.morphTargetDictionary = Object.assign( {}, source.morphTargetDictionary );
+
+		} else {
+
+			this.morphTargetDictionary = undefined;
+
+		}
 
 		this.material = Array.isArray( source.material ) ? source.material.slice() : source.material;
 		this.geometry = source.geometry;
@@ -36317,6 +36357,8 @@ class LatheGeometry extends BufferGeometry {
 					break;
 
 				case ( points.length - 1 ):	// special handling for last Vertex on path
+
+					prevNormal.normalize();
 
 					initNormals.push( prevNormal.x, prevNormal.y, prevNormal.z );
 
@@ -50322,6 +50364,8 @@ class ObjectLoader extends Loader {
 
 				object = new SpotLight( data.color, data.intensity, data.distance, data.angle, data.penumbra, data.decay );
 				object.target = data.target || '';
+
+				if ( data.map !== undefined ) object.map = getTexture( data.map );
 
 				break;
 
