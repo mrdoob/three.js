@@ -1116,6 +1116,8 @@ class ObjectLoader extends Loader {
 
 				object = new Sprite( getMaterial( data.material ) );
 
+				if ( data.center !== undefined ) object.center.fromArray( data.center );
+
 				break;
 
 			case 'Group':

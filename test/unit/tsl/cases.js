@@ -211,6 +211,107 @@ export const cases = {
 
 	},
 
+	// An external variable used only in a branch is evaluated only in that branch.
+	'external variable in branch': () => {
+
+		const value = select( uv().x.greaterThan( 0.5 ), float( 2 ), float( 3 ) ).toVar( 'externalValue' );
+
+		return Fn( () => {
+
+			const result = float( 0 ).toVar( 'result' );
+
+			result.assign( select( uniform( 1 ).greaterThan( 0.5 ), value, float( 0 ) ) );
+
+			return result;
+
+		} )();
+
+	},
+
+	// An external variable used in branches of the same immutable condition is evaluated once, in the first branch.
+	'external variable in branches': () => {
+
+		const value = select( uv().x.greaterThan( 0.5 ), float( 2 ), float( 3 ) ).toVar( 'externalValue' );
+		const condition = uniform( 1 ).greaterThan( 0.5 );
+
+		return Fn( () => {
+
+			const first = float( 0 ).toVar( 'first' );
+			first.assign( select( condition, value, float( 0 ) ) );
+
+			const second = float( 0 ).toVar( 'second' );
+			second.assign( select( condition, value.mul( 2 ), float( 0 ) ) );
+
+			return first.add( second );
+
+		} )();
+
+	},
+
+	// An external variable used in a branch and in its inner branch is evaluated only in the outer branch.
+	'external variable in nested branches': () => {
+
+		const value = select( uv().x.greaterThan( 0.5 ), float( 2 ), float( 3 ) ).toVar( 'externalValue' );
+
+		return Fn( () => {
+
+			const result = float( 0 ).toVar( 'result' );
+
+			If( uniform( 1 ).greaterThan( 0.5 ), () => {
+
+				result.assign( value );
+
+				If( uniform( 2 ).greaterThan( 0.5 ), () => {
+
+					result.addAssign( value );
+
+				} );
+
+			} );
+
+			return result;
+
+		} )();
+
+	},
+
+	// An external variable used by two outputs, each in a branch on the same condition, e.g. `room` in the city generator.
+	'external variable in branches of the same condition': () => {
+
+		const march = Fn( ( [ scale ] ) => {
+
+			const sum = float( 0 ).toVar();
+
+			Loop( 4, ( { i } ) => {
+
+				sum.addAssign( scale.mul( float( i ) ) );
+
+			} );
+
+			return vec4( sum );
+
+		} );
+
+		const room = select( uv().x.greaterThan( 0.5 ), march( 1 ), march( 2 ) ).toVar( 'room' );
+		const isGlazing = uniform( 1 ).greaterThan( 0.5 );
+
+		const colorNode = select( isGlazing, room.xyz, vec3( 0 ) );
+		const emissiveNode = select( isGlazing, room.xyz.mul( room.w ), vec3( 0 ) );
+
+		return Fn( () => {
+
+			const diffuse = vec3( 1 ).toVar( 'diffuse' );
+			diffuse.assign( colorNode );
+
+			const emissive = vec3( 0 ).toVar( 'emissive' );
+			emissive.assign( emissiveNode );
+
+			return diffuse.add( emissive );
+
+		} )();
+
+	},
+
 	'assignable scope': () => Fn( () => {
 
 		const explicit = float( 1 ).toVar( 'explicitGlobal' );

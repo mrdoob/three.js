@@ -2,6 +2,7 @@ import { ObjectLoader } from '../../../../src/loaders/ObjectLoader.js';
 
 import { Loader } from '../../../../src/loaders/Loader.js';
 import { Object3D } from '../../../../src/core/Object3D.js';
+import { Sprite } from '../../../../src/objects/Sprite.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
 import { eps } from '../../utils/math-constants.js';
 
@@ -42,6 +43,17 @@ export default QUnit.module( 'Loaders', () => {
 
 			assert.ok( loaded.pivot.equals( object.pivot ), 'Pivot is restored' );
 			assert.ok( loaded.position.distanceTo( object.position ) < eps, 'Position is restored' );
+
+		} );
+
+		QUnit.test( 'parse (Sprite center)', ( assert ) => {
+
+			const sprite = new Sprite();
+			sprite.center.set( 0.5, 0 );
+
+			const loaded = new ObjectLoader().parse( sprite.toJSON() );
+
+			assert.ok( loaded.center.equals( sprite.center ), 'Center is restored' );
 
 		} );
 
