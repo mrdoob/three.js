@@ -1,6 +1,7 @@
 import Node from './Node.js';
 import { addMethodChaining } from '../tsl/TSLCore.js';
 import { warn } from '../../utils.js';
+import { mergeContext } from './NodeUtils.js';
 
 /**
  * This node can be used as a context management component for another node.
@@ -98,19 +99,19 @@ class ContextNode extends Node {
 	 */
 	getFlowContextData() {
 
-		const children = [];
+		let data = {};
 
 		this.traverse( ( node ) => {
 
 			if ( node.isContextNode === true ) {
 
-				children.push( node.value );
+				data = mergeContext( data, node.value );
 
 			}
 
 		} );
 
-		return Object.assign( {}, ...children );
+		return data;
 
 	}
 

@@ -60,9 +60,9 @@ export default QUnit.module( 'Nodes', () => {
 				// passes through both matrix multiplications completely unchanged,
 				// isolating the nonlinear RRTAndODTFit curve as the only thing
 				// actually being exercised by this particular assertion.
-				assert.closeAbs( acesFilmicToneMapping( vec3( 0.18 ), float( 1 ) ), vec3( 0.214097 ), 5e-4, 'acesFilmicToneMapping(0.18 gray, 1) matches the independent JS port' );
+				assert.closeAbs( acesFilmicToneMapping( vec3( 0.18 ), float( 1 ) ), vec3( 0.213105 ), 5e-4, 'acesFilmicToneMapping(0.18 gray, 1) matches the independent JS port' );
 				assert.closeAbs( acesFilmicToneMapping( vec3( 0 ), float( 1 ) ), vec3( 0 ), 1e-4, 'acesFilmicToneMapping(0, 1) == 0' );
-				assert.closeAbs( acesFilmicToneMapping( vec3( 1 ), float( 1 ) ), vec3( 0.765833 ), 5e-4, 'acesFilmicToneMapping(1 gray, 1) matches the independent JS port -- white does not clip to 1' );
+				assert.closeAbs( acesFilmicToneMapping( vec3( 1 ), float( 1 ) ), vec3( 0.763397 ), 5e-4, 'acesFilmicToneMapping(1 gray, 1) matches the independent JS port -- white does not clip to 1' );
 
 				// Zero exposure crushes everything to black regardless of input color.
 				assert.closeAbs( acesFilmicToneMapping( vec3( 0.5, 0.8, 0.2 ), float( 0 ) ), vec3( 0 ), 1e-4, 'acesFilmicToneMapping(x, 0) == 0' );

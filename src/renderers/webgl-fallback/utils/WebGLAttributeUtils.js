@@ -181,23 +181,27 @@ class WebGLAttributeUtils {
 		const array = attribute.array;
 		const bufferAttribute = backend.getBufferAttribute( attribute );
 		const bufferData = backend.get( bufferAttribute );
-		const bufferType = bufferData.bufferType;
 		const updateRanges = bufferAttribute.updateRanges;
 
-		gl.bindBuffer( bufferType, bufferData.bufferGPU );
+		// the element buffer binding is part of the VAO state, so index buffers are updated
+		// via the copy target to keep the bound VAO intact
+
+		const target = bufferData.bufferType === gl.ELEMENT_ARRAY_BUFFER ? gl.COPY_WRITE_BUFFER : bufferData.bufferType;
+
+		gl.bindBuffer( target, bufferData.bufferGPU );
 
 		if ( updateRanges.length === 0 ) {
 
 			// Not using update ranges
 
-			gl.bufferSubData( bufferType, 0, array );
+			gl.bufferSubData( target, 0, array );
 
 		} else {
 
 			for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
 
 				const range = updateRanges[ i ];
-				gl.bufferSubData( bufferType, range.start * array.BYTES_PER_ELEMENT,
+				gl.bufferSubData( target, range.start * array.BYTES_PER_ELEMENT,
 					array, range.start, range.count );
 
 			}
@@ -206,7 +210,7 @@ class WebGLAttributeUtils {
 
 		}
 
-		gl.bindBuffer( bufferType, null );
+		gl.bindBuffer( target, null );
 
 		bufferData.version = bufferAttribute.version;
 
@@ -337,6 +341,13 @@ class WebGLAttributeUtils {
 	_createBuffer( gl, bufferType, array, usage ) {
 
 		const bufferGPU = gl.createBuffer();
+
+		// the element buffer binding is part of the VAO state, so the bound VAO must not be affected.
+		// the first binding defines the buffer type so the copy target can not be used here
+
+		const state = this.backend.state;
+
+		if ( bufferType === gl.ELEMENT_ARRAY_BUFFER && state.currentVAO !== null ) state.resetVertexState();
 
 		gl.bindBuffer( bufferType, bufferGPU );
 		gl.bufferData( bufferType, array, usage );

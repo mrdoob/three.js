@@ -1,4 +1,6 @@
 import { Object3D } from '../../../../src/core/Object3D.js';
+import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
+import { Float32BufferAttribute } from '../../../../src/core/BufferAttribute.js';
 import { Material } from '../../../../src/materials/Material.js';
 import { Points } from '../../../../src/objects/Points.js';
 
@@ -61,6 +63,24 @@ export default QUnit.module( 'Objects', () => {
 			mesh1.material = new Material();
 			const copy2 = mesh2.clone();
 			assert.strictEqual( mesh2.material, copy2.material );
+
+		} );
+
+		QUnit.test( 'copy/morphTargets', ( assert ) => {
+
+			const geometry = new BufferGeometry();
+			geometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 1, 1, 1 ], 3 ) );
+			geometry.morphAttributes.position = [ new Float32BufferAttribute( [ 1, 0, 0, 0, 1, 0 ], 3 ) ];
+			geometry.morphAttributes.position[ 0 ].name = 'target';
+
+			const points = new Points( geometry );
+			points.morphTargetInfluences[ 0 ] = 0.5;
+
+			const copy = points.clone();
+			assert.deepEqual( copy.morphTargetInfluences, [ 0.5 ], 'morphTargetInfluences are copied' );
+			assert.notStrictEqual( copy.morphTargetInfluences, points.morphTargetInfluences, 'morphTargetInfluences are not shared' );
+			assert.deepEqual( copy.morphTargetDictionary, { target: 0 }, 'morphTargetDictionary is copied' );
+			assert.notStrictEqual( copy.morphTargetDictionary, points.morphTargetDictionary, 'morphTargetDictionary is not shared' );
 
 		} );
 

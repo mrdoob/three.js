@@ -232,6 +232,9 @@ import './src/renderers/WebGLArrayRenderTarget.tests.js';
 import './src/renderers/WebGLCubeRenderTarget.tests.js';
 import './src/renderers/WebGLRenderTarget.tests.js';
 
+//src/renderers/common
+import './src/renderers/common/ClippingContext.tests.js';
+
 //src/renderers/shaders
 import './src/renderers/shaders/ShaderChunk.tests.js';
 import './src/renderers/shaders/ShaderLib.tests.js';
@@ -267,6 +270,9 @@ import './src/textures/VideoTexture.tests.js';
 //src/nodes/display
 import './src/nodes/display/ViewportTextureNode.tests.js';
 import './src/nodes/display/ViewportDepthTextureNode.tests.js';
+
+//src/nodes/lighting
+import './src/nodes/lighting/EnvironmentNode.tests.js';
 
 //src/nodes/tsl
 import './src/nodes/tsl/TSLCore.tests.js';

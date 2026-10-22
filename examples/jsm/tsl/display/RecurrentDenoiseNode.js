@@ -95,7 +95,7 @@ const computeFrustumSize = Fn( ( [ viewZ, tanHalfFovY ] ) => {
 const computeHitDistFactor = Fn( ( [ worldRayLength, viewZ, tanHalfFovY ] ) => {
 
 	const frustumSize = computeFrustumSize( viewZ, tanHalfFovY );
-	const factor = worldRayLength.div( frustumSize.max( 1e-6 ) ).clamp( 0, 1 );
+	const factor = worldRayLength.div( frustumSize.max( EPSILON ) ).clamp( 0, 1 );
 
 	return factor;
 
@@ -128,7 +128,7 @@ const getSpecularDominantDirection = Fn( ( [ N, V, roughness ] ) => {
 const specularLobeTanHalfAngle = Fn( ( [ roughness, percent ] ) => {
 
 	const alpha = roughness.mul( roughness );
-	return alpha.mul( sqrt( percent.div( float( 1 ).sub( percent ).max( 1e-6 ) ) ) );
+	return alpha.mul( sqrt( percent.div( float( 1 ).sub( percent ).max( EPSILON ) ) ) );
 
 }, { roughness: 'float', percent: 'float', return: 'float' } );
 

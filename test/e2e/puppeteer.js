@@ -20,6 +20,9 @@ const exceptionList = [
 	'webgl_materials_texture_html',
 	'webgpu_materials_texture_html',
 
+	// Requires srgb-linear and float16 canvas
+	'webgpu_loader_jpegxl',
+
 	// Black screen
 	'webgpu_postprocessing_ao',
 	'webgpu_postprocessing_dof',
@@ -92,6 +95,7 @@ const parseTime = 1; // 1 second per megabyte
 
 const networkTimeout = 5; // 5 minutes, set to 0 to disable
 const renderTimeout = 5; // 5 seconds, set to 0 to disable
+const maxTimeoutRetries = 2; // Retry timed-out examples in a fresh browser
 const numCIJobs = 5; // GitHub Actions run the script in 5 threads
 
 const width = 400;
@@ -440,7 +444,7 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 }
 
-async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file ) {
+async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file, timeoutRetries = 0 ) {
 
 	const page = ctx.page;
 	const pageStart = performance.now();
@@ -606,6 +610,23 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 			await ctx.restart();
 
 		} else {
+
+			// A timed-out page can stay wedged and time out every following file
+
+			if ( String( e ).includes( 'TimeoutError' ) ) {
+
+				console.yellow( 'Restarting browser...' );
+				await ctx.restart();
+
+				if ( timeoutRetries < maxTimeoutRetries ) {
+
+					console.yellow( `${ e }` );
+					console.yellow( `Retrying ${ file } after timeout (${ timeoutRetries + 1 }/${ maxTimeoutRetries })...` );
+					return await checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file, timeoutRetries + 1 );
+
+				}
+
+			}
 
 			console.red( e );
 			failedScreenshots.push( file );

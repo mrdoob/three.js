@@ -3,6 +3,7 @@
 import './addons/utils/BufferGeometryUtils.tests.js';
 import './addons/utils/ColorUtils.tests.js';
 import './addons/utils/GaussianSplatUtils.tests.js';
+import './addons/utils/unwrapUVs.tests.js';
 import './addons/math/ColorConverter.tests.js';
 import './addons/math/ColorSpaces.tests.js';
 import './addons/math/Octree.tests.js';
@@ -17,6 +18,7 @@ import './addons/loaders/SPLATLoader.tests.js';
 import './addons/loaders/SPZLoader.tests.js';
 import './addons/loaders/USDLoader.tests.js';
 import './addons/exporters/EXRExporter.tests.js';
+import './addons/exporters/OBJExporter.tests.js';
 import './addons/exporters/USDZExporter.tests.js';
 import './addons/tsl/WebGLNodesHandler.tests.js';
 import './addons/postprocessing/GTAOPass.tests.js';

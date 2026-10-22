@@ -3,6 +3,7 @@ import { hashArray, hashString } from '../../nodes/core/NodeUtils.js';
 let _id = 0;
 const _protoKeysCache = new WeakMap();
 const _cacheKeyValues = [ 0, 0, 0, 0, 0 ];
+const _enumProperties = [ 'side', 'blending', 'combine', 'normalMapType' ];
 
 function getKeys( obj ) {
 
@@ -42,6 +43,21 @@ function getKeys( obj ) {
 	for ( let i = 0; i < protoKeys.length; i ++ ) keys.push( protoKeys[ i ] );
 
 	return keys;
+
+}
+
+/**
+ * Returns a key for the kind of the given instance data: none, attribute or storage.
+ *
+ * @private
+ * @param {?BufferAttribute} attribute - The instance data.
+ * @return {string} The key.
+ */
+function getInstanceDataKey( attribute ) {
+
+	if ( attribute === null || attribute === undefined ) return '-';
+
+	return attribute.isStorageInstancedBufferAttribute === true ? 's' : 'a';
 
 }
 
@@ -374,9 +390,24 @@ class RenderObject {
 
 		};
 
+		/**
+		 * An event listener which is executed when `dispose()` is called on
+		 * the lights node of this render object, e.g. when the lighting system
+		 * of the renderer is disposed.
+		 *
+		 * @method
+		 */
+		this.onLightsNodeDispose = () => {
+
+			this.dispose();
+
+		};
+
 		this.object.addEventListener( 'dispose', this.onObjectDispose );
 		this.material.addEventListener( 'dispose', this.onMaterialDispose );
 		this.geometry.addEventListener( 'dispose', this.onGeometryDispose );
+
+		this.lightsNode.addEventListener( 'dispose', this.onLightsNodeDispose );
 
 		if ( this._sourceMaterial !== null ) {
 
@@ -454,7 +485,7 @@ class RenderObject {
 	 */
 	getBindings() {
 
-		return this._bindings || ( this._bindings = this.getNodeBuilderState().createBindings() );
+		return this._bindings || ( this._bindings = this.getNodeBuilderState().createBindings( this.renderer._bindings, this.context ) );
 
 	}
 
@@ -570,7 +601,7 @@ class RenderObject {
 			if ( nodeAttribute.node && nodeAttribute.node.attribute ) {
 
 				// node attribute
-				attribute = nodeAttribute.node.attribute;
+				attribute = nodeAttribute.node.getObjectAttribute( this.object );
 
 			} else {
 
@@ -768,7 +799,7 @@ class RenderObject {
 
 		for ( const property of getKeys( material ) ) {
 
-			if ( /^(is[A-Z]|_)|^(visible|version|uuid|name|opacity|userData)$/.test( property ) ) continue;
+			if ( /^(is[A-Z]|_)|^(visible|version|uuid|name|opacity|userData|iridescenceThicknessRange)$/.test( property ) ) continue;
 
 			const value = material[ property ];
 
@@ -782,10 +813,9 @@ class RenderObject {
 
 				if ( type === 'number' ) {
 
-					if ( property === 'side' ) {
+					if ( _enumProperties.includes( property ) ) {
 
-						// `side` is an enum (FrontSide/BackSide/DoubleSide) that changes code
-						// generation, so its exact value must be preserved.
+						// retain enums since their exact value matters
 
 						valueKey = String( value );
 
@@ -864,13 +894,13 @@ class RenderObject {
 
 		}
 
-		if ( object.isInstancedMesh && object.instanceColor !== null ) {
+		if ( object.isInstancedMesh ) {
 
-			cacheKey += object.instanceColor.id + ',';
+			const { instanceMatrix, instanceColor, morphTexture } = object;
 
-		}
+			cacheKey += getInstanceDataKey( instanceMatrix ) + getInstanceDataKey( instanceColor ) + ( morphTexture !== null ? 'm' : '' ) + ',';
 
-		if ( object.isInstancedMesh || object.count > 1 ) {
+		} else if ( object.count > 1 ) {
 
 			// TODO: https://github.com/mrdoob/three.js/pull/29066#issuecomment-2269400850
 
@@ -878,7 +908,7 @@ class RenderObject {
 
 		}
 
-		cacheKey += this.context.id + ',';
+		cacheKey += this.context.stateKey + ',';
 
 		cacheKey += object.receiveShadow + ',';
 
@@ -911,6 +941,18 @@ class RenderObject {
 				if ( attributesId[ name ] !== id ) {
 
 					return true;
+
+				}
+
+			}
+
+			for ( const { node } of this.getNodeBuilderState().nodeAttributes ) {
+
+				if ( node && node.attribute ) {
+
+					const attribute = node.getObjectAttribute( this.object );
+
+					if ( attribute && this.attributes.includes( attribute ) === false ) return true;
 
 				}
 
@@ -992,6 +1034,8 @@ class RenderObject {
 		this.object.removeEventListener( 'dispose', this.onObjectDispose );
 		this.material.removeEventListener( 'dispose', this.onMaterialDispose );
 		this.geometry.removeEventListener( 'dispose', this.onGeometryDispose );
+
+		this.lightsNode.removeEventListener( 'dispose', this.onLightsNodeDispose );
 
 		if ( this._sourceMaterial !== null ) {
 

@@ -423,7 +423,7 @@ class MaterialXNode {
 
 	getColorSpaceNode() {
 
-		const csSource = this.getAttribute( 'colorspace' );
+		const csSource = this.getValueInput().getAttribute( 'colorspace' ) || this.getAttribute( 'colorspace' );
 		const csTarget = this.getRoot().getAttribute( 'colorspace' );
 		if ( ! csSource || ! csTarget ) return null;
 		const nodeName = `mx_${csSource}_to_${csTarget}`;
@@ -468,10 +468,22 @@ class MaterialXNode {
 
 	}
 
+	// Follow an interfacename binding to its source input.
+	getValueInput() {
+
+		if ( this.interfaceName === null ) return this;
+		const boundInput = this.materialX.getInterfaceInput( this );
+		return boundInput !== null ? boundInput : this;
+
+	}
+
 	getTexture() {
 
-		const filePrefix = this.getRecursiveAttribute( 'fileprefix' ) || '';
-		const sourceURI = filePrefix + this.value;
+		const valueInput = this.getValueInput();
+		if ( valueInput.getValue() === '' ) return null;
+
+		const filePrefix = valueInput.getRecursiveAttribute( 'fileprefix' ) || '';
+		const sourceURI = filePrefix + valueInput.value;
 		const resolvedURI = this.materialX.resolveTextureURI( sourceURI );
 		const svgTexture = isSvgUri( resolvedURI );
 		const textureSourceNode = this.parent && typeof this.parent.getTextureAddressModes === 'function' ? this.parent : this;
@@ -564,9 +576,13 @@ class MaterialXNode {
 
 	getNode( out = null ) {
 
-		if ( this.node !== null && out === null ) return this.node;
+		// A named output must not replace the cached default output.
+		const cacheDefaultOutput = out === null;
+		const cachedNode = this.materialX.getCachedNode( this );
+		if ( cachedNode !== null && cacheDefaultOutput ) return cachedNode;
 
 		let node;
+		let implemented = false;
 
 
 		// A connection that names no output reads the first one, as in MaterialX.
@@ -597,9 +613,14 @@ class MaterialXNode {
 
 			}
 
-			const referenceNode = this.materialX.getMaterialXNode( this.referencePath );
+			const interfaceNode = this.interfaceName !== null ? this.materialX.getInterfaceNode( this ) : null;
+			const referenceNode = interfaceNode === null ? this.materialX.getMaterialXNode( this.referencePath ) : null;
 
-			if ( referenceNode ) {
+			if ( interfaceNode !== null ) {
+
+				node = interfaceNode;
+
+			} else if ( referenceNode ) {
 
 				node = referenceNode.getNode( requestedOutput );
 
@@ -622,7 +643,8 @@ class MaterialXNode {
 		} else {
 
 			const resolvedNode = this.materialX.nodeResolver !== null ? this.materialX.nodeResolver( this, out ) : null;
-			node = resolvedNode !== null && resolvedNode !== undefined ? resolvedNode : compileNodeFromRegistry( this, out, this.materialX.compileContext );
+			implemented = ( resolvedNode === null || resolvedNode === undefined ) && this.materialX.getScope( this ) !== null;
+			node = resolvedNode !== null && resolvedNode !== undefined ? resolvedNode : implemented ? this.materialX.compileImplementation( this, channelRequested ? null : out ) : compileNodeFromRegistry( this, out, this.materialX.compileContext );
 
 		}
 
@@ -676,7 +698,7 @@ class MaterialXNode {
 
 		}
 
-		this.node = node;
+		if ( cacheDefaultOutput ) this.materialX.setCachedNode( this, node );
 		return node;
 
 	}
@@ -797,7 +819,17 @@ class MaterialXNode {
 
 	}
 
-	setMaterial( material ) {
+	setMaterial( material, out = null ) {
+
+		if ( this.element === 'input' || this.element === 'output' ) {
+
+			const shader = this.getReferencedNode();
+			if ( shader !== null ) shader.setMaterial( material, this.nodeGraph !== null ? null : this.output || out );
+			return;
+
+		}
+
+		if ( this.materialX.setImplementationMaterial( this, material, out ) ) return;
 
 		const mapper = getSurfaceMapper( this.element );
 		if ( mapper ) {
@@ -837,17 +869,18 @@ class MaterialXNode {
 
 		const visited = new Set();
 		let shader = nodeX || null;
+		let out = null;
 
 		while ( shader !== null && ( shader.element === 'input' || shader.element === 'output' ) ) {
 
 			if ( visited.has( shader ) ) return null;
 			visited.add( shader );
-
+			out = shader.nodeGraph !== null ? null : shader.output;
 			shader = shader.getReferencedNode();
 
 		}
 
-		return shader;
+		return shader !== null ? this.materialX.resolveImplementationShader( shader, out ) : null;
 
 	}
 
@@ -889,7 +922,7 @@ class MaterialXNode {
 
 			}
 
-			shaderProperties.setMaterial( material );
+			nodeX.setMaterial( material );
 
 		}
 
@@ -929,7 +962,8 @@ class MaterialXNode {
 
 			for ( const nodeX of this.children ) {
 
-				if ( nodeX.element === 'nodegraph' ) {
+				// Only standalone nodegraphs should create preview materials.
+				if ( nodeX.element === 'nodegraph' && nodeX.getAttribute( 'nodedef' ) === null && this.materialX.implementationGraphNodes.has( nodeX ) === false ) {
 
 					const material = nodeX.toNodeGraphMaterial();
 					materials[ material.name ] = material;
@@ -973,6 +1007,11 @@ class MaterialXDocument {
 		this.pendingResources = [];
 		this.nodeResolver = null;
 		this.documentNodeDefs = null;
+
+		this.implementationGraphs = new Map();
+		this.implementationGraphNodes = new Set();
+		this.scope = null;
+		this.rootScopes = new Map();
 		const bottomLeftUvSpaceHelpers = getBottomLeftUvSpaceHelpers( this.uvSpace );
 
 		this.compileContext = {
@@ -1010,6 +1049,201 @@ class MaterialXDocument {
 
 	}
 
+	indexImplementations( rootNode ) {
+
+		for ( const nodeX of rootNode.children ) {
+
+			const nodeDefName = nodeX.getAttribute( 'nodedef' );
+			const graphName = nodeX.element === 'implementation' ? nodeX.getAttribute( 'nodegraph' ) : null;
+			const graph = nodeX.element === 'nodegraph' && nodeDefName !== null ? nodeX : graphName !== null ? this.getMaterialXNode( graphName ) : undefined;
+			if ( graph === undefined ) continue;
+
+			this.implementationGraphNodes.add( graph );
+			if ( this.implementationGraphs.has( nodeDefName ) === false ) this.implementationGraphs.set( nodeDefName, graph );
+
+		}
+
+	}
+
+	// Each custom node instance needs its own inputs and cached TSL nodes.
+	getScope( materialXNode ) {
+
+		const nodeDef = materialXNode.nodeDef;
+		const graph = nodeDef !== null ? this.implementationGraphs.get( nodeDef.name ) : undefined;
+		if ( graph === undefined ) return null;
+
+		for ( let parent = this.scope; parent !== null; parent = parent.parent ) {
+
+			if ( parent.graph === graph ) {
+
+				this.log.add(
+					MaterialXLogCodes.INVALID_VALUE,
+					`The nodegraph of "${ materialXNode.element }" uses the node it implements.`,
+					materialXNode.name,
+				);
+				return null;
+
+			}
+
+		}
+
+		const scopes = this.scope !== null ? this.scope.childScopes : this.rootScopes;
+		let scope = scopes.get( materialXNode );
+
+		if ( scope === undefined ) {
+
+			scope = { instance: materialXNode, nodeDef, graph, parent: this.scope, nodes: new Map(), childScopes: new Map() };
+			scopes.set( materialXNode, scope );
+
+		}
+
+		return scope;
+
+	}
+
+	withScope( scope, callback ) {
+
+		const previous = this.scope;
+		this.scope = scope;
+
+		try {
+
+			return callback();
+
+		} finally {
+
+			this.scope = previous;
+
+		}
+
+	}
+
+	isInScope( materialXNode ) {
+
+		if ( this.scope === null ) return false;
+
+		for ( let parent = materialXNode.parent; parent !== null; parent = parent.parent ) {
+
+			if ( parent === this.scope.graph ) return true;
+
+		}
+
+		return false;
+
+	}
+
+	getCachedNode( materialXNode ) {
+
+		if ( this.isInScope( materialXNode ) ) return this.scope.nodes.get( materialXNode ) ?? null;
+		return materialXNode.node;
+
+	}
+
+	setCachedNode( materialXNode, node ) {
+
+		if ( this.isInScope( materialXNode ) ) this.scope.nodes.set( materialXNode, node );
+		else materialXNode.node = node;
+
+	}
+
+	getGraphOutput( scope, out ) {
+
+		// An omitted selector uses the first output declared by the nodedef.
+		const name = out === null ? Object.keys( scope.nodeDef.outputs )[ 0 ] : out;
+		return scope.graph.children.find( ( child ) => child.element === 'output' && child.name === name ) || null;
+
+	}
+
+	compileImplementation( materialXNode, out ) {
+
+		const scope = this.getScope( materialXNode );
+		if ( scope === null ) return null;
+
+		const output = this.getGraphOutput( scope, out );
+		if ( output === null ) {
+
+			this.log.add(
+				MaterialXLogCodes.MISSING_REFERENCE,
+				`Missing output "${ out || 'out' }" in the nodegraph of "${ materialXNode.name }".`,
+				materialXNode.name,
+			);
+			return float( 0 );
+
+		}
+
+		// Use the output selector stored on the graph output.
+		return this.withScope( scope, () => output.getNode() );
+
+	}
+
+	setImplementationMaterial( materialXNode, material, out ) {
+
+		const scope = this.getScope( materialXNode );
+		if ( scope === null ) return false;
+
+		const output = this.getGraphOutput( scope, out );
+		const shaderNode = output !== null && output.hasReference ? this.getMaterialXNode( output.referencePath ) : undefined;
+		if ( shaderNode === undefined ) {
+
+			this.log.add(
+				MaterialXLogCodes.MISSING_REFERENCE,
+				`Missing shader output "${ out || 'out' }" in the nodegraph of "${ materialXNode.name }".`,
+				materialXNode.name,
+			);
+			return true;
+
+		}
+
+		this.withScope( scope, () => shaderNode.setMaterial( material, output.output ) );
+		return true;
+
+	}
+
+	resolveImplementationShader( materialXNode, out ) {
+
+		const scope = this.getScope( materialXNode );
+		if ( scope === null ) return materialXNode;
+
+		const output = this.getGraphOutput( scope, out );
+		return this.withScope( scope, () => materialXNode.resolveSurfaceShaderNode( output ) );
+
+	}
+
+	// Resolve interfacename to the node instance's input.
+	// If that input is omitted, use the nodedef default.
+	getInterfaceInput( materialXNode ) {
+
+		// Regular nodegraphs bind to their own inputs.
+		if ( ! this.isInScope( materialXNode ) ) {
+
+			const graphInput = this.getMaterialXNode( materialXNode.referencePath );
+			return graphInput !== undefined && graphInput !== materialXNode ? graphInput : null;
+
+		}
+
+		const scope = this.scope;
+		const name = materialXNode.interfaceName;
+		const input = scope.instance.getChildByName( name );
+		if ( input !== undefined ) return this.withScope( scope.parent, () => input.getValueInput() );
+		const declaration = this.getMaterialXNode( scope.nodeDef.name );
+		return declaration ? declaration.getChildByName( name ) ?? null : null;
+
+	}
+
+	getInterfaceNode( materialXNode ) {
+
+		if ( ! this.isInScope( materialXNode ) ) return null;
+
+		const scope = this.scope;
+		const name = materialXNode.interfaceName;
+		const input = scope.instance.getChildByName( name );
+		// Evaluate the instance input in the parent scope to resolve nested interface bindings.
+		if ( input !== undefined ) return this.withScope( scope.parent, () => input.getNode( input.output ) );
+
+		return this.withScope( null, () => scope.instance.getDefaultInputNode( name ) ?? null );
+
+	}
+
 	waitForResources() {
 
 		return Promise.all( this.pendingResources ).then( () => undefined );
@@ -1028,7 +1262,7 @@ class MaterialXDocument {
 
 	}
 
-	// The document's own nodedefs, in the shape of the stdlib registry entries.
+	// Convert document nodedefs to the format used by the stdlib registry.
 	getDocumentNodeDefs() {
 
 		if ( this.documentNodeDefs !== null ) return this.documentNodeDefs;
@@ -1092,6 +1326,8 @@ class MaterialXDocument {
 			( childNodeXML, childNodePath ) => new MaterialXNode( this, childNodeXML, childNodePath ),
 			( materialXNode ) => this.addMaterialXNode( materialXNode ),
 		);
+
+		this.indexImplementations( rootNode );
 
 		if ( options.interfaceValidator ) {
 

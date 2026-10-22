@@ -156,6 +156,13 @@ class VarNode extends Node {
 
 	}
 
+	_isFunctionScope() {
+
+		// see `generate()`, a read-only or local variable is declared where it is generated
+		return this.readOnly === false && this.assignable === false;
+
+	}
+
 	build( builder, output = null ) {
 
 		const refNode = this.getShared( builder );

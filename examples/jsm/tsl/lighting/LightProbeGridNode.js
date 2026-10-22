@@ -1,5 +1,5 @@
-import { AnalyticLightNode, Vector3 } from 'three/webgpu';
-import { array, getShIrradianceAt, normalWorld, positionWorld, texture3D, uniform, vec3 } from 'three/tsl';
+import { AnalyticLightNode, NodeUpdateType, Vector3 } from 'three/webgpu';
+import { array, getShIrradianceAt, normalWorld, positionWorld, renderGroup, texture3D, uniform, vec3 } from 'three/tsl';
 
 // Padding texels at each boundary of every atlas sub-volume.
 export const ATLAS_PADDING = 1;
@@ -71,11 +71,15 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		super( light );
 
+		// Bounce grid intensity changes between bake passes within a frame.
+
 		this._min = uniform( new Vector3() );
 		this._max = uniform( new Vector3() );
 		this._resolution = uniform( new Vector3() );
-		this._intensity = uniform( 1 );
+		this._intensity = uniform( 1 ).setGroup( renderGroup );
 		this._falloff = uniform( 0 );
+
+		this.updateType = NodeUpdateType.RENDER;
 
 	}
 

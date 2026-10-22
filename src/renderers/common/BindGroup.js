@@ -40,6 +40,17 @@ class BindGroup {
 
 	}
 
+	/**
+	 * Returns a new bind group with the same name and clones of the bindings.
+	 *
+	 * @return {BindGroup} A clone of this bind group.
+	 */
+	clone() {
+
+		return new BindGroup( this.name, this.bindings.map( ( binding ) => binding.clone() ) );
+
+	}
+
 }
 
 export default BindGroup;
