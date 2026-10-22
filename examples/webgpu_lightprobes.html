@@ -43,6 +43,7 @@
 			import { LightProbeGridHelper } from 'three/addons/helpers/LightProbeGridHelper.js';
 
 			let camera, scene, renderer, controls;
+			let pendingBake = null;
 			let probes, probesHelper;
 
 			init();
@@ -165,6 +166,8 @@
 
 				async function bake( resolution ) {
 
+					light.intensity = params.lightIntensity;
+
 					if ( probes ) {
 
 						scene.remove( probes );
@@ -179,8 +182,7 @@
 					if ( probesHelper ) probesHelper.visible = false;
 
 					// Each bounce pass captures the light of the previous pass.
-					probes.multiBounce = params.multiBounce;
-					probes.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20, bounces: params.multiBounce ? 3 : 0 } );
+					probes.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20, bounces: params.bounces } );
 					probes.visible = params.enabled;
 					scene.add( probes );
 
@@ -206,10 +208,18 @@
 					enabled: true,
 					showProbes: false,
 					resolution: 6,
-					multiBounce: true
+					bounces: 3,
+					lightIntensity: 20
 				};
 
 				await bake( params.resolution );
+
+				function requestBake() {
+
+					// Bake before rendering the next frame, so light uniforms use the new intensity.
+					pendingBake = () => bake( params.resolution );
+
+				}
 
 				// GUI
 
@@ -220,12 +230,9 @@
 
 				} );
 
-				gui.add( params, 'resolution', 2, 12, 1 ).name( 'Resolution' ).onChange( ( value ) => {
-
-					bake( value );
-
-				} ).debounce( 250 );
-				gui.add( params, 'multiBounce' ).name( 'Multi-bounce' ).onChange( () => bake( params.resolution ) );
+				gui.add( params, 'resolution', 2, 12, 1 ).name( 'Resolution' ).onChange( requestBake ).debounce( 250 );
+				gui.add( params, 'bounces', 0, 10, 1 ).name( 'Bounces' ).onChange( requestBake ).debounce( 250 );
+				gui.add( params, 'lightIntensity', 1, 200, 1 ).name( 'Light Intensity' ).onChange( requestBake ).debounce( 250 );
 				gui.add( params, 'showProbes' ).name( 'Show Probes' ).onChange( ( value ) => {
 
 					probesHelper.visible = value;
@@ -248,6 +255,14 @@
 			}
 
 			function animate() {
+
+				if ( pendingBake !== null ) {
+
+					const bake = pendingBake;
+					pendingBake = null;
+					bake();
+
+				}
 
 				renderer.render( scene, camera );
 

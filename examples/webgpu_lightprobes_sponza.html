@@ -305,7 +305,6 @@
 				try {
 
 					// Publish a few probes per frame, finishing each pass before the next bounce.
-					probes.multiBounce = params.bounces > 0;
 					probes.bake( renderer, scene, {
 						cubemapSize: 32,
 						near: 0.05,
