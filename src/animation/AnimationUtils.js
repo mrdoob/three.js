@@ -342,6 +342,7 @@ function makeClipAdditive( targetClip, referenceFrame = 0, referenceClip = targe
 		// Subtract the reference value from all of the track values
 
 		const numTimes = targetTrack.times.length;
+		const targetHasTangents = hasTangents( targetTrack.settings );
 		for ( let j = 0; j < numTimes; ++ j ) {
 
 			const valueStart = j * targetValueSize + targetOffset;
@@ -366,6 +367,15 @@ function makeClipAdditive( targetClip, referenceFrame = 0, referenceClip = targe
 				for ( let k = 0; k < valueEnd; ++ k ) {
 
 					targetTrack.values[ valueStart + k ] -= referenceValue[ k ];
+
+					if ( targetHasTangents ) {
+
+						// Bezier handles store absolute values, so translate them with the keyframes.
+						const tangentOffset = ( valueStart + k ) * 2 + 1;
+						targetTrack.settings.inTangents[ tangentOffset ] -= referenceValue[ k ];
+						targetTrack.settings.outTangents[ tangentOffset ] -= referenceValue[ k ];
+
+					}
 
 				}
 
