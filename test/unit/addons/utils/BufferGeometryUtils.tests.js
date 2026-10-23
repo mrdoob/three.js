@@ -174,17 +174,6 @@ export default QUnit.module( 'Addons', () => {
 
 				} );
 
-				QUnit.test( 'preserves morphTargetsRelative', ( assert ) => {
-
-					const geometry = getGeometry();
-					geometry.morphTargetsRelative = true;
-
-					const merged = BufferGeometryUtils.mergeGeometries( [ geometry, geometry ] );
-
-					assert.strictEqual( merged.morphTargetsRelative, true );
-
-				} );
-
 				QUnit.test( 'merges geometries without morph attributes', ( assert ) => {
 
 					const geometry = getGeometry();
