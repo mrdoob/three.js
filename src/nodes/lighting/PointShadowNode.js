@@ -1,5 +1,4 @@
 import ShadowNode from './ShadowNode.js';
-import { Loop } from '../utils/LoopNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { float, vec3, If, Fn } from '../tsl/TSLBase.js';
 import { reference } from '../accessors/ReferenceNode.js';
@@ -50,26 +49,6 @@ export const BasicPointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, 
 
 } );
 
-
-const pointShadowSampleDirection = /*@__PURE__*/ Fn( ( [ direction, tangent, bitangent, texelSize, phi, index ] ) => {
-
-	const sample = vogelDiskSample( index, 5, phi );
-
-	return direction.add( tangent.mul( sample.x ).add( bitangent.mul( sample.y ) ).mul( texelSize ) );
-
-} ).setLayout( {
-	name: 'pointShadowSampleDirection',
-	type: 'vec3',
-	inputs: [
-		{ name: 'direction', type: 'vec3' },
-		{ name: 'tangent', type: 'vec3' },
-		{ name: 'bitangent', type: 'vec3' },
-		{ name: 'texelSize', type: 'float' },
-		{ name: 'phi', type: 'float' },
-		{ name: 'index', type: 'int' }
-	]
-} );
-
 /**
  * A shadow filtering function for point lights using Vogel disk sampling and IGN.
  *
@@ -89,28 +68,29 @@ export const PointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp, s
 	const radius = reference( 'radius', 'float', shadow ).setGroup( renderGroup );
 	const mapSize = reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup );
 
-	const texelSize = radius.div( mapSize.x ).toConst();
+	const texelSize = radius.div( mapSize.x );
 
 	// Build a tangent-space coordinate system for applying offsets
 	const absDir = abs( bd3D );
-	const tangent = normalize( cross( bd3D, absDir.x.greaterThan( absDir.z ).select( vec3( 0, 1, 0 ), vec3( 1, 0, 0 ) ) ) ).toConst();
-	const bitangent = cross( bd3D, tangent ).toConst();
+	const tangent = normalize( cross( bd3D, absDir.x.greaterThan( absDir.z ).select( vec3( 0, 1, 0 ), vec3( 1, 0, 0 ) ) ) );
+	const bitangent = cross( bd3D, tangent );
 
 	// Use IGN to rotate sampling pattern per pixel (phi = IGN * 2π)
-	const phi = interleavedGradientNoise( screenCoordinate.xy ).mul( 6.28318530718 ).toConst();
+	const phi = interleavedGradientNoise( screenCoordinate.xy ).mul( 6.28318530718 );
 
-	// Share the sampling math across lights and keep the five taps in a loop.
+	// 5 samples using Vogel disk distribution in tangent space
+	const sample0 = vogelDiskSample( 0, 5, phi );
+	const sample1 = vogelDiskSample( 1, 5, phi );
+	const sample2 = vogelDiskSample( 2, 5, phi );
+	const sample3 = vogelDiskSample( 3, 5, phi );
+	const sample4 = vogelDiskSample( 4, 5, phi );
 
-	const result = float( 0.0 ).toVar();
-
-	Loop( 5, ( { i } ) => {
-
-		const direction = pointShadowSampleDirection( bd3D, tangent, bitangent, texelSize, phi, i );
-		result.addAssign( cubeTexture( depthTexture, direction ).compare( dp ) );
-
-	} );
-
-	return result.mul( 1.0 / 5.0 );
+	return cubeTexture( depthTexture, bd3D.add( tangent.mul( sample0.x ).add( bitangent.mul( sample0.y ) ).mul( texelSize ) ) ).compare( dp )
+		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample1.x ).add( bitangent.mul( sample1.y ) ).mul( texelSize ) ) ).compare( dp ) )
+		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample2.x ).add( bitangent.mul( sample2.y ) ).mul( texelSize ) ) ).compare( dp ) )
+		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample3.x ).add( bitangent.mul( sample3.y ) ).mul( texelSize ) ) ).compare( dp ) )
+		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample4.x ).add( bitangent.mul( sample4.y ) ).mul( texelSize ) ) ).compare( dp ) )
+		.mul( 1.0 / 5.0 );
 
 } );
 
