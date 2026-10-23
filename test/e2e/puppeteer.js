@@ -65,6 +65,7 @@ const exceptionList = [
 	'webgpu_vxgi_sponza',
 
 	// Incremental light probe baking
+	'webgpu_lightprobes_complex',
 	'webgl_lightprobes_sponza',
 	'webgpu_generator_city', // Sub-pixel coverage of thin high-contrast geometry edges differs across rasterizers #33817
 	'webgpu_lightprobes_sponza',

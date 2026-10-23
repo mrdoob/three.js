@@ -44,8 +44,9 @@
 
 			let camera, scene, renderer, controls;
 			let pendingBake = null;
+			let updateProbes = null;
 			let probesLeft, probesRight;
-			let probesHelperLeft, probesHelperRight;
+			let probesHelperLeft = null, probesHelperRight = null;
 
 			init();
 
@@ -267,7 +268,6 @@
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1.0;
@@ -294,12 +294,29 @@
 					lightIntensity: 30
 				};
 
-				async function bake( resolution ) {
+				let bakeIndex = 0, bakeGrid = 0, bakePass = 0;
+				let showInitialFrame = true;
+
+				function createProbes( resolution ) {
 
 					warmLight.intensity = params.lightIntensity;
 					coolLight.intensity = params.lightIntensity;
 
-					// Remove both volumes before baking to prevent feedback
+					if ( probesHelperLeft ) {
+
+						scene.remove( probesHelperLeft );
+						probesHelperLeft.dispose();
+						probesHelperLeft = null;
+
+					}
+
+					if ( probesHelperRight ) {
+
+						scene.remove( probesHelperRight );
+						probesHelperRight.dispose();
+						probesHelperRight = null;
+
+					}
 
 					if ( probesLeft ) {
 
@@ -315,80 +332,118 @@
 
 					}
 
-					// Separate the lighting influence at the center of the divider.
-					// Probe positions remain clear of its faces.
+					// Separate the lighting influence at the divider, keeping probes clear of its faces.
 
-					// Keep probes 0.15 units clear of the divider faces.
 					probesLeft = new LightProbeGrid( 7.5, 4.7, 7.6, resolution, resolution, resolution );
 					probesLeft.position.set( - 4.05, 2.45, 0 );
 					probesLeft.influenceBox = new THREE.Box3( new THREE.Vector3( - 8, 0, - 4 ), new THREE.Vector3( 0, 5, 4 ) );
 					probesLeft.visibility = params.visibility;
 					probesLeft.visibilityGridSize = params.visibilityGridSize;
+					probesLeft.visible = params.enabled;
 
 					probesRight = new LightProbeGrid( 7.5, 4.7, 7.6, resolution, resolution, resolution );
 					probesRight.position.set( 4.05, 2.45, 0 );
 					probesRight.influenceBox = new THREE.Box3( new THREE.Vector3( 0, 0, - 4 ), new THREE.Vector3( 8, 5, 4 ) );
 					probesRight.visibility = params.visibility;
 					probesRight.visibilityGridSize = params.visibilityGridSize;
+					probesRight.visible = params.enabled;
 
-					// Keep the helper spheres out of the cubemap captures.
+					bakeIndex = 0;
+					bakeGrid = 0;
+					bakePass = 0;
+					showInitialFrame = true;
 
-					if ( probesHelperLeft ) probesHelperLeft.visible = probesHelperRight.visible = false;
+				}
 
-					// Add both volumes after the direct light pass, so that each bounce pass
-					// also sees the other room through the doorway.
+				updateProbes = () => {
 
-					const bounces = params.bounces;
+					// Show the room with direct lighting before starting the bake.
 
-					for ( let pass = 0; pass <= bounces; pass ++ ) {
+					if ( showInitialFrame ) {
 
-						probesLeft.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20, pass } );
-						probesRight.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20, pass } );
-
-						if ( pass === 0 ) {
-
-							scene.add( probesLeft );
-							scene.add( probesRight );
-
-						}
+						showInitialFrame = false;
+						return;
 
 					}
 
-					probesLeft.visible = params.enabled;
-					probesRight.visible = params.enabled;
+					if ( bakePass > params.bounces ) return;
 
-					// Update debug visualization
+					const probes = bakeGrid === 0 ? probesLeft : probesRight;
+					const resolution = probes.resolution;
+					const totalProbes = resolution.x * resolution.y * resolution.z;
+					const count = Math.min( 16, totalProbes - bakeIndex );
 
-					if ( ! probesHelperLeft ) {
+					if ( probesHelperLeft ) probesHelperLeft.visible = false;
+					if ( probesHelperRight ) probesHelperRight.visible = false;
+
+					try {
+
+						// Both grids stay unlit during direct capture. Later passes finish
+						// the left grid before the right, preserving the coupled bounce order.
+
+						probesLeft.visible = bakePass > 0;
+						probesRight.visible = bakePass > 0;
+
+						probes.bake( renderer, scene, {
+							cubemapSize: 32,
+							near: 0.05,
+							far: 20,
+							start: bakeIndex,
+							count,
+							pass: bakePass
+						} );
+
+					} finally {
+
+						probesLeft.visible = params.enabled;
+						probesRight.visible = params.enabled;
+						if ( probesHelperLeft ) probesHelperLeft.visible = params.showProbes;
+						if ( probesHelperRight ) probesHelperRight.visible = params.showProbes;
+
+					}
+
+					// Add a grid once its textures exist, so lighting shaders include it.
+
+					if ( bakePass === 0 && bakeIndex === 0 ) scene.add( probes );
+
+					if ( bakeGrid === 0 && probesHelperLeft === null ) {
 
 						probesHelperLeft = new LightProbeGridHelper( probesLeft );
 						probesHelperLeft.visible = params.showProbes;
 						scene.add( probesHelperLeft );
 
+					} else if ( bakeGrid === 1 && probesHelperRight === null ) {
+
 						probesHelperRight = new LightProbeGridHelper( probesRight );
 						probesHelperRight.visible = params.showProbes;
 						scene.add( probesHelperRight );
 
-					} else {
+					}
 
-						probesHelperLeft.probes = probesLeft;
-						probesHelperLeft.update();
+					bakeIndex += count;
 
-						probesHelperRight.probes = probesRight;
-						probesHelperRight.update();
+					if ( bakeIndex === totalProbes ) {
 
-						probesHelperLeft.visible = probesHelperRight.visible = params.showProbes;
+						bakeIndex = 0;
+						bakeGrid ++;
+
+						if ( bakeGrid === 2 ) {
+
+							bakeGrid = 0;
+							bakePass ++;
+
+						}
 
 					}
 
-				}
+				};
 
-				await bake( params.resolution );
+				createProbes( params.resolution );
 
 				function requestBake() {
 
-					// Bake before rendering the next frame, so light uniforms use the new intensity.
-					pendingBake = () => bake( params.resolution );
+					// Restart baking with the updated settings on the next frame.
+					pendingBake = () => createProbes( params.resolution );
 
 				}
 
@@ -416,12 +471,15 @@
 				gui.add( params, 'lightIntensity', 1, 100, 1 ).name( 'Light Intensity' ).onChange( requestBake ).debounce( 250 );
 				gui.add( params, 'showProbes' ).name( 'Show Probes' ).onChange( ( value ) => {
 
-					probesHelperLeft.visible = value;
-					probesHelperRight.visible = value;
+					if ( probesHelperLeft ) probesHelperLeft.visible = value;
+					if ( probesHelperRight ) probesHelperRight.visible = value;
 
 				} );
 
 				//
+
+				await renderer.compileAsync( scene, camera );
+				renderer.setAnimationLoop( animate );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -445,6 +503,8 @@
 					bake();
 
 				}
+
+				if ( updateProbes !== null ) updateProbes();
 
 				renderer.render( scene, camera );
 
