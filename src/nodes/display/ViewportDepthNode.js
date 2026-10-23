@@ -98,7 +98,7 @@ class ViewportDepthNode extends Node {
 
 		} else if ( scope === ViewportDepthNode.DEPTH ) {
 
-			if ( camera.isPerspectiveCamera ) {
+			if ( camera.isOrthographicCamera !== true ) {
 
 				node = viewZToPerspectiveDepth( positionView.z, cameraNear, cameraFar );
 
@@ -112,7 +112,7 @@ class ViewportDepthNode extends Node {
 
 			if ( value !== null ) {
 
-				if ( camera.isPerspectiveCamera ) {
+				if ( camera.isOrthographicCamera !== true ) {
 
 					const viewZ = perspectiveDepthToViewZ( value, cameraNear, cameraFar );
 

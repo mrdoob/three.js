@@ -428,7 +428,7 @@ var metalnessmap_pars_fragment = "#ifdef USE_METALNESSMAP\n\tuniform sampler2D m
 
 var morphinstance_vertex = "#ifdef USE_INSTANCING_MORPH\n\tfloat morphTargetInfluences[ MORPHTARGETS_COUNT ];\n\tfloat morphTargetBaseInfluence = texelFetch( morphTexture, ivec2( 0, gl_InstanceID ), 0 ).r;\n\tfor ( int i = 0; i < MORPHTARGETS_COUNT; i ++ ) {\n\t\tmorphTargetInfluences[i] =  texelFetch( morphTexture, ivec2( i + 1, gl_InstanceID ), 0 ).r;\n\t}\n#endif";
 
-var morphcolor_vertex = "#if defined( USE_MORPHCOLORS )\n\tvColor *= morphTargetBaseInfluence;\n\tfor ( int i = 0; i < MORPHTARGETS_COUNT; i ++ ) {\n\t\t#if defined( USE_COLOR_ALPHA )\n\t\t\tif ( morphTargetInfluences[ i ] != 0.0 ) vColor += getMorph( gl_VertexID, i, 2 ) * morphTargetInfluences[ i ];\n\t\t#elif defined( USE_COLOR )\n\t\t\tif ( morphTargetInfluences[ i ] != 0.0 ) vColor += getMorph( gl_VertexID, i, 2 ).rgb * morphTargetInfluences[ i ];\n\t\t#endif\n\t}\n#endif";
+var morphcolor_vertex = "#if defined( USE_MORPHCOLORS )\n\t#if defined( USE_COLOR_ALPHA )\n\t\tvColor *= morphTargetBaseInfluence;\n\t#elif defined( USE_COLOR )\n\t\tvColor.rgb *= morphTargetBaseInfluence;\n\t#endif\n\tfor ( int i = 0; i < MORPHTARGETS_COUNT; i ++ ) {\n\t\t#if defined( USE_COLOR_ALPHA )\n\t\t\tif ( morphTargetInfluences[ i ] != 0.0 ) vColor += getMorph( gl_VertexID, i, 2 ) * morphTargetInfluences[ i ];\n\t\t#elif defined( USE_COLOR )\n\t\t\tif ( morphTargetInfluences[ i ] != 0.0 ) vColor.rgb += getMorph( gl_VertexID, i, 2 ).rgb * morphTargetInfluences[ i ];\n\t\t#endif\n\t}\n#endif";
 
 var morphnormal_vertex = "#ifdef USE_MORPHNORMALS\n\tobjectNormal *= morphTargetBaseInfluence;\n\tfor ( int i = 0; i < MORPHTARGETS_COUNT; i ++ ) {\n\t\tif ( morphTargetInfluences[ i ] != 0.0 ) objectNormal += getMorph( gl_VertexID, i, 1 ).xyz * morphTargetInfluences[ i ];\n\t}\n#endif";
 
@@ -13142,7 +13142,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	}
 
 	const invalidationArrayRead = [];
-	const invalidationArrayDraw = [];
 
 	function updateMultisampleRenderTarget( renderTarget ) {
 
@@ -13213,16 +13212,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 					if ( supportsInvalidateFramebuffer === true ) {
 
 						invalidationArrayRead.length = 0;
-						invalidationArrayDraw.length = 0;
 
 						invalidationArrayRead.push( _gl.COLOR_ATTACHMENT0 + i );
 
 						if ( renderTarget.depthBuffer && renderTarget.storeMultisampledDepthBuffer === false ) {
 
 							invalidationArrayRead.push( depthStyle );
-							invalidationArrayDraw.push( depthStyle );
-
-							_gl.invalidateFramebuffer( _gl.DRAW_FRAMEBUFFER, invalidationArrayDraw );
 
 						}
 
@@ -19311,7 +19306,7 @@ class WebGLRenderer {
 
 					}
 
-					_gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, _gl.DEPTH_BUFFER_BIT, _gl.NEAREST );
+					_gl.blitFramebuffer( minX, minY, minX + width, minY + height, dstX, dstY, dstX + width, dstY + height, _gl.DEPTH_BUFFER_BIT, _gl.NEAREST );
 
 				}
 
@@ -19354,7 +19349,7 @@ class WebGLRenderer {
 					// copy the data using the fastest function that can achieve the copy
 					if ( srcLevel !== 0 ) {
 
-						_gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, _gl.COLOR_BUFFER_BIT, _gl.NEAREST );
+						_gl.blitFramebuffer( minX, minY, minX + width, minY + height, dstX, dstY, dstX + width, dstY + height, _gl.COLOR_BUFFER_BIT, _gl.NEAREST );
 
 					} else if ( isDst3D ) {
 

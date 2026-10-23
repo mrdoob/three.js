@@ -849,7 +849,7 @@ class Renderer {
 				const renderTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : ( this._renderTarget || this._outputRenderTarget );
 
 				const renderList = this._renderLists.get( scene, camera, this.lighting );
-				const renderContext = this._renderContexts.get( renderTarget, this._mrt );
+				const renderContext = this._renderContexts.get( renderTarget, this._mrt, 0, camera );
 
 				const material = scene.overrideMaterial || object.material;
 
@@ -1030,7 +1030,7 @@ class Renderer {
 
 		this._beginPreCompile( precompilationState );
 
-		const renderContext = this._renderContexts.get( renderTarget, this._mrt, this._callDepth );
+		const renderContext = this._renderContexts.get( renderTarget, this._mrt, this._callDepth, camera );
 
 		precompilationState.renderContext = renderContext;
 
@@ -1622,7 +1622,43 @@ class Renderer {
 	 */
 	_bundleNeedsUpdate( bundleGroup, renderBundleData ) {
 
-		return renderBundleData.bundleGPU === undefined || bundleGroup.version !== renderBundleData.version;
+		if ( renderBundleData.bundleGPU === undefined || bundleGroup.version !== renderBundleData.version ) return true;
+
+		// the recorded bundle references the buffers of its attributes. they are only verified after a disposal
+
+		const attributes = this._attributes;
+
+		if ( renderBundleData.attributesDisposeVersion !== attributes.disposeVersion ) {
+
+			renderBundleData.attributesDisposeVersion = attributes.disposeVersion;
+
+			for ( const renderObject of renderBundleData.renderObjects ) {
+
+				const index = renderObject.getIndex();
+
+				let disposed = index !== null && attributes.has( index ) === false;
+
+				for ( const vertexBuffer of renderObject.getVertexBuffers() ) {
+
+					if ( attributes.has( vertexBuffer ) === false ) disposed = true;
+
+				}
+
+				if ( disposed ) {
+
+					// invalidate the recorded version so the bundle is recorded again
+
+					renderBundleData.version = null;
+
+					return true;
+
+				}
+
+			}
+
+		}
+
+		return false;
 
 	}
 
@@ -1970,7 +2006,7 @@ class Renderer {
 
 		//
 
-		const renderContext = this._renderContexts.get( renderTarget, this._mrt, this._callDepth );
+		const renderContext = this._renderContexts.get( renderTarget, this._mrt, this._callDepth, camera );
 
 		this._currentRenderContext = renderContext;
 		this._currentRenderObjectFunction = this._renderObjectFunction || this.renderObject;
@@ -3858,8 +3894,9 @@ class Renderer {
 	_updateCamera( camera, useXRCamera ) {
 
 		const xr = this.xr;
+		const useXR = xr.enabled === true && xr.isPresenting === true && useXRCamera === true;
 
-		if ( xr.isPresenting === false || useXRCamera === false ) {
+		if ( useXR === false ) {
 
 			let projectionMatrixNeedsUpdate = false;
 
@@ -3929,7 +3966,7 @@ class Renderer {
 
 		// handle XR
 
-		if ( useXRCamera === true && xr.enabled === true && xr.isPresenting === true ) {
+		if ( useXR === true ) {
 
 			if ( xr.cameraAutoUpdate === true ) xr.updateCamera( camera );
 			camera = xr.getCamera(); // use XR camera for rendering

@@ -121,6 +121,14 @@ const _geometryCache = new WeakMap();
 const _textureCache = new WeakMap();
 
 /**
+ * Holds the output target data for comparison.
+ *
+ * @private
+ * @type {WeakMap<RenderTarget|CanvasTarget,Object>}
+ */
+const _outputTargetCache = new WeakMap();
+
+/**
  * This class is used by {@link WebGPURenderer} as management component.
  * It's primary purpose is to determine whether render objects require a
  * refresh right before they are going to be rendered or not.
@@ -284,16 +292,13 @@ class NodeMaterialObserver {
 			// global data
 
 			data.outputTarget = this.getOutputTarget( renderObject.renderer );
+			data.outputTargetVersion = this.getOutputTargetData( data.outputTarget, renderObject.context )._version;
 
-			const { width, height } = renderObject.context;
-
-			data.bufferWidth = width;
-			data.bufferHeight = height;
-
-			const { environmentIntensity, environmentRotation } = renderObject.scene;
+			const { environment, environmentIntensity, environmentRotation } = renderObject.scene;
 
 			data.environmentIntensity = environmentIntensity;
 			data.environmentRotation = environmentRotation.clone();
+			data.environmentVersion = environment !== null ? this.getTextureData( environment )._version : null;
 
 			data.lights = this.getLightsData( renderObject.lightsNode.getBuiltinLights(), [] );
 
@@ -317,6 +322,38 @@ class NodeMaterialObserver {
 		const renderTarget = renderer.getRenderTarget();
 
 		return renderTarget !== null ? renderTarget : ( renderer.getOutputRenderTarget() || renderer.getCanvasTarget() );
+
+	}
+
+	/**
+	 * Returns an output target data structure holding the size of the given output
+	 * target for monitoring. Its version is incremented whenever a size change is observed.
+	 *
+	 * @param {RenderTarget|CanvasTarget} outputTarget - The output target.
+	 * @param {RenderContext} renderContext - The render context.
+	 * @return {Object} An object for monitoring the output target size.
+	 */
+	getOutputTargetData( outputTarget, renderContext ) {
+
+		const { width, height } = renderContext;
+
+		let data = _outputTargetCache.get( outputTarget );
+
+		if ( data === undefined ) {
+
+			data = { _version: 0, width, height };
+
+			_outputTargetCache.set( outputTarget, data );
+
+		} else if ( data.width !== width || data.height !== height ) {
+
+			data.width = width;
+			data.height = height;
+			data._version ++;
+
+		}
+
+		return data;
 
 	}
 
@@ -680,12 +717,13 @@ class NodeMaterialObserver {
 
 		}
 
-		const { width, height } = renderObject.context;
+		const outputTargetData = this.getOutputTargetData( renderObjectData.outputTarget, renderObject.context );
 
-		if ( renderObjectData.bufferWidth !== width || renderObjectData.bufferHeight !== height ) {
+		// a version mismatch means the output target has been resized since this render object was last refreshed
 
-			renderObjectData.bufferWidth = width;
-			renderObjectData.bufferHeight = height;
+		if ( renderObjectData.outputTargetVersion !== outputTargetData._version ) {
+
+			renderObjectData.outputTargetVersion = outputTargetData._version;
 
 			return false;
 
@@ -801,26 +839,6 @@ class NodeMaterialObserver {
 
 		}
 
-		// attributes must be uploaded again if they have been disposed. they are only verified after a disposal
-
-		const attributes = renderObject._geometries.attributes;
-
-		if ( renderObjectData.attributesDisposeVersion !== attributes.disposeVersion ) {
-
-			for ( const vertexBuffer of renderObject.getVertexBuffers() ) {
-
-				if ( attributes.has( vertexBuffer ) === false ) return false;
-
-			}
-
-			const index = renderObject.getIndex();
-
-			if ( index !== null && attributes.has( index ) === false ) return false;
-
-			renderObjectData.attributesDisposeVersion = attributes.disposeVersion;
-
-		}
-
 		// morph targets
 
 		if ( renderObjectData.morphTargetInfluences ) {
@@ -918,11 +936,15 @@ class NodeMaterialObserver {
 
 		if ( scene.environment !== null && material.envMap === null ) {
 
+			const environmentVersion = this.getTextureData( scene.environment )._version;
+
 			if ( renderObjectData.environmentIntensity !== scene.environmentIntensity ||
-					renderObjectData.environmentRotation.equals( scene.environmentRotation ) === false ) {
+					renderObjectData.environmentRotation.equals( scene.environmentRotation ) === false ||
+					renderObjectData.environmentVersion !== environmentVersion ) {
 
 				renderObjectData.environmentIntensity = scene.environmentIntensity;
 				renderObjectData.environmentRotation.copy( scene.environmentRotation );
+				renderObjectData.environmentVersion = environmentVersion;
 
 				return false;
 
@@ -1030,6 +1052,34 @@ class NodeMaterialObserver {
 	}
 
 	/**
+	 * Returns `true` if a vertex buffer or the index of the given render object
+	 * has been disposed since the last check.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @param {Object} renderObjectData - The cached render object data.
+	 * @return {boolean} Whether attributes of the render object have been disposed or not.
+	 */
+	hasDisposedAttributes( renderObject, renderObjectData ) {
+
+		const attributes = renderObject._geometries.attributes;
+
+		for ( const vertexBuffer of renderObject.getVertexBuffers() ) {
+
+			if ( attributes.has( vertexBuffer ) === false ) return true;
+
+		}
+
+		const index = renderObject.getIndex();
+
+		if ( index !== null && attributes.has( index ) === false ) return true;
+
+		renderObjectData.attributesDisposeVersion = attributes.disposeVersion;
+
+		return false;
+
+	}
+
+	/**
 	 * Checks if the given render object requires a refresh.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
@@ -1068,6 +1118,16 @@ class NodeMaterialObserver {
 			renderObjectData.outputTarget = outputTarget;
 
 			refreshType = RenderObjectRefreshType.FULL;
+
+		}
+
+		const attributes = renderObject._geometries.attributes;
+
+		// re-upload disposed attributes. checked before the static early out since other geometries can destroy shared buffers
+
+		if ( renderObjectData.attributesDisposeVersion !== attributes.disposeVersion ) {
+
+			if ( this.hasDisposedAttributes( renderObject, renderObjectData ) ) refreshType = RenderObjectRefreshType.FULL;
 
 		}
 
@@ -1682,6 +1742,31 @@ function arrayBufferToBase64( arrayBuffer ) {
 }
 
 /**
+ * Merges the given node build contexts into a new context, the data of the source context takes precedence.
+ * The node overrides of both contexts are merged as well, so the overrides of the target context still
+ * apply unless the source context overrides the same node.
+ *
+ * @private
+ * @method
+ * @param {Object} target - The context to merge into, e.g. the outer context.
+ * @param {Object} source - The context to merge, e.g. the inner context.
+ * @return {Object} The merged context.
+ */
+function mergeContext( target, source ) {
+
+	const context = { ...target, ...source };
+
+	if ( target.overrideNodes !== undefined && source.overrideNodes !== undefined && target.overrideNodes !== source.overrideNodes ) {
+
+		context.overrideNodes = new Map( [ ...target.overrideNodes, ...source.overrideNodes ] );
+
+	}
+
+	return context;
+
+}
+
+/**
  * Converts the given Base64 string to an array buffer.
  *
  * @private
@@ -1717,7 +1802,8 @@ var NodeUtils = /*#__PURE__*/Object.freeze({
 	hash: hash$1,
 	hashArray: hashArray,
 	hashString: hashString,
-	isArrayAsParameter: isArrayAsParameter
+	isArrayAsParameter: isArrayAsParameter,
+	mergeContext: mergeContext
 });
 
 /**
@@ -2017,7 +2103,7 @@ class Node extends EventDispatcher {
 	}
 
 	/**
-	 * Declares the assignable node where it is generated if it is created in a block, and
+	 * Declares the assignable node before the loops where it is used if it has no stack, and
 	 * decides if a value that cannot be cached must be evaluated once at its declaration.
 	 *
 	 * @private
@@ -2027,23 +2113,22 @@ class Node extends EventDispatcher {
 	 */
 	_updateAssignable( builder, data, valueNode = this ) {
 
+		const nodeLoop = builder.context.nodeLoop;
+
 		if ( data.stack === undefined && builder.buildStage === 'setup' ) {
 
-			// A node created while a block is generated is declared where it is generated.
-			if ( ( builder.context.nodeLoop || builder.context.nodeBlock ) && builder.flowBlock === null ) {
+			// A node outside of the stacks of this build, e.g. created outside of a function, is declared
+			// before the outermost loop where its value does not change, otherwise every iteration would repeat it.
+			data.stack = builder.declareBeforeBlock( this );
 
-				builder.getBaseStack().addToStack( this );
-
-			}
-
-		} else if ( this.assignable === true && builder.context.nodeLoop && builder.buildStage === 'analyze' ) {
+		} else if ( this.assignable === true && nodeLoop && builder.buildStage === 'analyze' ) {
 
 			if ( valueNode.isCacheable( builder ) === false && builder.isDeterministic( valueNode ) === false ) {
 
 				// A value that cannot be cached, e.g. a function call, is evaluated once at its declaration
 				// if it is used in a loop that runs after it, otherwise the loop would repeat it.
 				const declarationIndex = builder.activeStacks.indexOf( data.stack );
-				const loopIndex = builder.activeStacks.indexOf( builder.getDataFromNode( builder.context.nodeLoop ).stack );
+				const loopIndex = builder.activeStacks.indexOf( builder.getDataFromNode( nodeLoop ).stack );
 
 				if ( declarationIndex !== -1 && loopIndex >= declarationIndex ) data.forceDeclaration = true;
 
@@ -2136,7 +2221,22 @@ class Node extends EventDispatcher {
 	}
 
 	/**
+	 * Whether the generated value is a variable declared in the scope of the function,
+	 * so it keeps its value after the block where it was generated, e.g. a {@link VarNode}.
+	 *
+	 * @private
+	 * @return {boolean} Whether the generated value is a variable of the function scope.
+	 */
+	_isFunctionScope() {
+
+		return false;
+
+	}
+
+	/**
 	 * A generated value is only visible in the block where it was declared and in its inner blocks.
+	 * A variable of the function scope is also visible in a later block of the same parent and guard,
+	 * e.g. a second `if ( c )` of an immutable condition `c`, since that block only runs if its block ran.
 	 * This method discards the generated value if it is not visible in the current block.
 	 *
 	 * @private
@@ -2147,9 +2247,14 @@ class Node extends EventDispatcher {
 
 		if ( nodeData.flowBlock !== undefined ) {
 
+			const { guard, parent } = nodeData.flowBlock;
+			const isFunctionScope = guard !== undefined && this._isFunctionScope();
+
 			let flowBlock = builder.flowBlock;
 
 			while ( flowBlock !== null && flowBlock !== nodeData.flowBlock ) {
+
+				if ( isFunctionScope && flowBlock.guard === guard && flowBlock.parent === parent ) break;
 
 				flowBlock = flowBlock.parent;
 
@@ -9245,14 +9350,10 @@ class ConditionalNode extends Node {
 
 		const { condNode, ifNode, elseNode } = this;
 
-		//
-
-		const isUniformFlow = builder.context.uniformFlow;
-
 		const properties = builder.getNodeProperties( this );
 		properties.condNode = condNode;
-		properties.ifNode = isUniformFlow ? ifNode : ifNode.context( { nodeBlock: ifNode } );
-		properties.elseNode = elseNode ? ( isUniformFlow ? elseNode : elseNode.context( { nodeBlock: elseNode } ) ) : null;
+		properties.ifNode = ifNode;
+		properties.elseNode = elseNode;
 
 	}
 
@@ -9335,9 +9436,13 @@ class ConditionalNode extends Node {
 
 		builder.addFlowCode( `\n${ builder.tab }if ( ${ nodeSnippet } ) {\n\n` ).addFlowTab();
 
+		// An immutable condition, i.e. a constant, is the guard of the blocks: blocks of the same parent and guard run together.
+		const condData = builder.getDataFromNode( condNode );
+		const guard = condData.propertyName === nodeSnippet && condData.assign !== true ? nodeSnippet : undefined;
+
 		const flowBlock = builder.flowBlock;
 
-		builder.flowBlock = { parent: flowBlock };
+		builder.flowBlock = { parent: flowBlock, guard };
 
 		let ifSnippet = ifNode.build( builder, type );
 
@@ -9371,7 +9476,7 @@ class ConditionalNode extends Node {
 
 			builder.addFlowCode( ' else {\n\n' ).addFlowTab();
 
-			builder.flowBlock = { parent: flowBlock };
+			builder.flowBlock = { parent: flowBlock, guard: guard !== undefined ? '!' + guard : undefined };
 
 			let elseSnippet = elseNode.build( builder, type );
 
@@ -9523,19 +9628,19 @@ class ContextNode extends Node {
 	 */
 	getFlowContextData() {
 
-		const children = [];
+		let data = {};
 
 		this.traverse( ( node ) => {
 
 			if ( node.isContextNode === true ) {
 
-				children.push( node.value );
+				data = mergeContext( data, node.value );
 
 			}
 
 		} );
 
-		return Object.assign( {}, ...children );
+		return data;
 
 	}
 
@@ -9916,6 +10021,13 @@ class VarNode extends Node {
 
 	}
 
+	_isFunctionScope() {
+
+		// see `generate()`, a read-only or local variable is declared where it is generated
+		return this.readOnly === false && this.assignable === false;
+
+	}
+
 	build( builder, output = null ) {
 
 		const refNode = this.getShared( builder );
@@ -10269,6 +10381,20 @@ class VaryingNode extends Node {
 
 	setup( builder ) {
 
+		// the context can evaluate varyings directly in the fragment stage, e.g. if the surface is reconstructed per fragment.
+		// indices and attributes create their own varyings in the fragment stage, so their varyings are kept unless the
+		// context provides the attribute
+
+		if ( builder.context.inlineVaryings === true && builder.shaderStage === 'fragment' ) {
+
+			let node = this.node;
+
+			while ( node.isSubBuildNode === true ) node = node.node;
+
+			if ( node.isIndexNode !== true && ( node.isAttributeNode !== true || node.getContextAttribute( builder ) ) ) return this.node;
+
+		}
+
 		this.setupVarying( builder );
 
 		builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, this.node );
@@ -10277,6 +10403,10 @@ class VaryingNode extends Node {
 
 	analyze( builder ) {
 
+		// TODO: Node.build() could pass through the output node of setup() directly, so overrides of analyze() and generate() don't need to handle it twice
+
+		if ( builder.getNodeProperties( this ).outputNode ) return super.analyze( builder );
+
 		this.setupVarying( builder );
 
 		builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, this.node );
@@ -10284,6 +10414,10 @@ class VaryingNode extends Node {
 	}
 
 	generate( builder ) {
+
+		const { outputNode } = builder.getNodeProperties( this );
+
+		if ( outputNode ) return outputNode.build( builder, this.getNodeType( builder ) );
 
 		const propertyKey = builder.getSubBuildProperty( 'property', builder.currentStack );
 		const properties = builder.getNodeProperties( this );
@@ -13765,6 +13899,31 @@ class TextureNode extends UniformNode {
 	 */
 	getTransformedUV( uvNode ) {
 
+		return this._getMatrixUniform().mul( vec3( uvNode, 1 ) ).xy;
+
+	}
+
+	/**
+	 * Transforms the given uv gradient with the linear part of the texture matrix.
+	 *
+	 * @private
+	 * @param {Node<vec2>} gradientNode - The uv gradient.
+	 * @return {Node<vec2>} The transformed gradient.
+	 */
+	_getTransformedGradient( gradientNode ) {
+
+		return this._getMatrixUniform().mul( vec3( gradientNode, 0 ) ).xy;
+
+	}
+
+	/**
+	 * Returns the uniform of the texture matrix shared by all nodes of the same base texture node.
+	 *
+	 * @private
+	 * @return {UniformNode<mat3>} The texture matrix uniform.
+	 */
+	_getMatrixUniform() {
+
 		const baseNode = this.getBase();
 
 		if ( baseNode._matrixUniform === null ) {
@@ -13781,7 +13940,7 @@ class TextureNode extends UniformNode {
 
 		}
 
-		return baseNode._matrixUniform.mul( vec3( uvNode, 1 ) ).xy;
+		return baseNode._matrixUniform;
 
 	}
 
@@ -13930,12 +14089,28 @@ class TextureNode extends UniformNode {
 
 		}
 
+		// the context can provide analytic gradients of the default uv, e.g. if the uv is reconstructed per fragment
+
+		let gradNode = this.gradNode;
+
+		if ( gradNode === null && this.uvNode === null && levelNode === null && this.biasNode === null && this.sampler === true && builder.context.getTextureGradient ) {
+
+			const gradient = builder.context.getTextureGradient( this, builder );
+
+			if ( gradient ) {
+
+				gradNode = this.updateMatrix === true ? gradient.map( ( node ) => this._getTransformedGradient( node ) ) : gradient;
+
+			}
+
+		}
+
 		properties.uvNode = uvNode;
 		properties.levelNode = levelNode;
 		properties.biasNode = this.biasNode;
 		properties.compareNode = compareNode;
 		properties.compareStepNode = compareStepNode;
-		properties.gradNode = this.gradNode;
+		properties.gradNode = gradNode;
 		properties.gatherNode = this.gatherNode;
 		properties.depthNode = this.depthNode;
 		properties.offsetNode = this.offsetNode;
@@ -20805,7 +20980,7 @@ class LoopNode extends Node {
 
 		const fnCall = params[ params.length - 1 ]( inputs );
 
-		properties.returnsNode = fnCall.context( { nodeLoop: this, nodeBlock: fnCall } );
+		properties.returnsNode = fnCall.context( { nodeLoop: this, nodeBlock: builder.createBlock() } );
 		properties.stackNode = stack;
 
 		const baseParam = params[ 0 ];
@@ -21091,7 +21266,7 @@ const _morphVec4 = /*@__PURE__*/ new Vector4();
 const _morphInfluencesData = /*@__PURE__*/ new WeakMap();
 
 /**
- * TSL function that retrieves and scales the morphed attribute (position or normal) texel value.
+ * TSL function that retrieves and scales the morphed attribute (position, normal or color) texel value.
  *
  * @param {Object} params - The parameter object.
  * @param {Node<texture>} params.bufferMap - The morph target data array texture.
@@ -21099,8 +21274,8 @@ const _morphInfluencesData = /*@__PURE__*/ new WeakMap();
  * @param {number} params.stride - The vertex data stride (e.g. 1 or 2).
  * @param {Node<int>} params.width - The texture width limit.
  * @param {Node<int>} params.depth - The target layer index (morph target index).
- * @param {Node<int>} params.offset - The texture offset (e.g. 0 for position, 1 for normal).
- * @returns {Node<vec3>} The scaled morph target translation value.
+ * @param {Node<int>} params.offset - The texture offset (e.g. 0 for position, 1 for normal, 2 for color).
+ * @returns {Node<vec4>} The scaled morph target value.
  */
 const getMorph = /*@__PURE__*/ Fn( ( { bufferMap, influence, stride, width, depth, offset } ) => {
 
@@ -21109,9 +21284,49 @@ const getMorph = /*@__PURE__*/ Fn( ( { bufferMap, influence, stride, width, dept
 	const y = texelIndex.div( width );
 	const x = texelIndex.sub( y.mul( width ) );
 
-	const bufferAttrib = textureLoad( bufferMap, ivec2( x, y ) ).depth( depth ).xyz;
+	const bufferAttrib = textureLoad( bufferMap, ivec2( x, y ) ).depth( depth );
 
 	return bufferAttrib.mul( influence );
+
+} );
+
+/**
+ * The morph target base influence. It is `1` when `morphTargetsRelative`
+ * is `true`, otherwise `1 - sum( influences )`.
+ *
+ * @type {UniformNode<float>}
+ */
+const morphBase = /*@__PURE__*/ uniform( 1 ).onObjectUpdate( ( { object } ) => {
+
+	return object.geometry.morphTargetsRelative ? 1 : 1 - object.morphTargetInfluences.reduce( ( a, b ) => a + b, 0 );
+
+} );
+
+/**
+ * The sum of the weighted color morph targets.
+ *
+ * @type {PropertyNode<vec4>}
+ */
+const morphColorSum = /*@__PURE__*/ property( 'vec4', 'morphColorSum' );
+
+/**
+ * TSL function that applies the color morph targets to the given color.
+ * The result is computed in the vertex stage.
+ *
+ * @tsl
+ * @function
+ * @param {Node<vec4>} color - The color to morph. Must be available in the vertex stage.
+ * @returns {Node<vec4>} The morphed color.
+ */
+const morphColor = /*@__PURE__*/ Fn( ( [ color ], { geometry } ) => {
+
+	if ( geometry.morphAttributes.color[ 0 ].itemSize === 4 ) {
+
+		return varying( color.mul( morphBase ).add( morphColorSum ) );
+
+	}
+
+	return varying( vec4( color.rgb.mul( morphBase ).add( morphColorSum.rgb ), color.a ) );
 
 } );
 
@@ -21261,6 +21476,8 @@ const morphReference = /*@__PURE__*/ Fn( ( [ mesh ], builder ) => {
 
 	const hasMorphPosition = geometry.morphAttributes.position !== undefined;
 	const hasMorphNormals = geometry.hasAttribute( 'normal' ) && geometry.morphAttributes.normal !== undefined;
+	const hasMorphColors = builder.material.vertexColors === true && geometry.morphAttributes.color !== undefined;
+	const hasColorAlpha = hasMorphColors === true && geometry.morphAttributes.color[ 0 ].itemSize === 4;
 
 	const morphAttribute = geometry.morphAttributes.position || geometry.morphAttributes.normal || geometry.morphAttributes.color;
 	const morphTargetsCount = ( morphAttribute !== undefined ) ? morphAttribute.length : 0;
@@ -21276,7 +21493,6 @@ const morphReference = /*@__PURE__*/ Fn( ( [ mesh ], builder ) => {
 	if ( morphInfluenceData === undefined || morphInfluenceData.count !== morphTargetsCount ) {
 
 		morphInfluenceData = {
-			base: uniform( 1 ),
 			influences: mesh.morphTargetInfluences ? uniformArray( mesh.morphTargetInfluences, 'float' ) : null,
 			count: morphTargetsCount
 		};
@@ -21285,14 +21501,15 @@ const morphReference = /*@__PURE__*/ Fn( ( [ mesh ], builder ) => {
 
 	}
 
-	const { base, influences } = morphInfluenceData;
+	const { influences } = morphInfluenceData;
 
 	// Shader
 
 	const { texture: bufferMap, stride, size } = getEntry( geometry );
 
-	if ( hasMorphPosition === true ) positionLocal.mulAssign( base );
-	if ( hasMorphNormals === true ) normalLocal.mulAssign( base );
+	if ( hasMorphPosition === true ) positionLocal.mulAssign( morphBase );
+	if ( hasMorphNormals === true ) normalLocal.mulAssign( morphBase );
+	if ( hasMorphColors === true ) morphColorSum.assign( 0 );
 
 	const width = int( size.width );
 
@@ -21321,7 +21538,7 @@ const morphReference = /*@__PURE__*/ Fn( ( [ mesh ], builder ) => {
 					width,
 					depth: i,
 					offset: int( 0 )
-				} ) );
+				} ).xyz );
 
 			}
 
@@ -21334,7 +21551,30 @@ const morphReference = /*@__PURE__*/ Fn( ( [ mesh ], builder ) => {
 					width,
 					depth: i,
 					offset: int( 1 )
-				} ) );
+				} ).xyz );
+
+			}
+
+			if ( hasMorphColors === true ) {
+
+				const morph = getMorph( {
+					bufferMap,
+					influence,
+					stride,
+					width,
+					depth: i,
+					offset: int( 2 )
+				} );
+
+				if ( hasColorAlpha === true ) {
+
+					morphColorSum.addAssign( morph );
+
+				} else {
+
+					morphColorSum.rgb.addAssign( morph.rgb );
+
+				}
 
 			}
 
@@ -21346,17 +21586,7 @@ const morphReference = /*@__PURE__*/ Fn( ( [ mesh ], builder ) => {
 
 	OnObjectUpdate( ( { object } ) => {
 
-		const { base, influences } = morphInfluenceData;
-
-		if ( object.geometry.morphTargetsRelative ) {
-
-			base.value = 1;
-
-		} else {
-
-			base.value = 1 - object.morphTargetInfluences.reduce( ( a, b ) => a + b, 0 );
-
-		}
+		const { influences } = morphInfluenceData;
 
 		if ( influences ) {
 
@@ -22309,6 +22539,10 @@ class ClippingNode extends Node {
 
 		this.hardwareClipping = builder.hardwareClipping;
 
+		// with ArrayCamera, clipping planes are in world space
+
+		this.position = builder.camera.isArrayCamera === true ? cameraWorldMatrix.mul( vec4( positionView, 1 ) ).xyz : positionView;
+
 		if ( this.scope === ClippingNode.ALPHA_TO_COVERAGE ) {
 
 			return this.setupAlphaToCoverage( intersectionPlanes, unionPlanes );
@@ -22351,7 +22585,7 @@ class ClippingNode extends Node {
 
 					const plane = clippingPlanes.element( i );
 
-					distanceToPlane.assign( positionView.dot( plane.xyz ).negate().add( plane.w ) );
+					distanceToPlane.assign( this.position.dot( plane.xyz ).negate().add( plane.w ) );
 					distanceGradient.assign( distanceToPlane.fwidth().div( 2.0 ) );
 
 					clipOpacity.mulAssign( smoothstep( distanceGradient.negate(), distanceGradient, distanceToPlane ) );
@@ -22371,7 +22605,7 @@ class ClippingNode extends Node {
 
 					const plane = clippingPlanes.element( i );
 
-					distanceToPlane.assign( positionView.dot( plane.xyz ).negate().add( plane.w ) );
+					distanceToPlane.assign( this.position.dot( plane.xyz ).negate().add( plane.w ) );
 					distanceGradient.assign( distanceToPlane.fwidth().div( 2.0 ) );
 
 					intersectionClipOpacity.mulAssign( smoothstep( distanceGradient.negate(), distanceGradient, distanceToPlane ).oneMinus() );
@@ -22410,7 +22644,7 @@ class ClippingNode extends Node {
 				Loop( numUnionPlanes, ( { i } ) => {
 
 					const plane = clippingPlanes.element( i );
-					positionView.dot( plane.xyz ).greaterThan( plane.w ).discard();
+					this.position.dot( plane.xyz ).greaterThan( plane.w ).discard();
 
 				} );
 
@@ -22426,7 +22660,7 @@ class ClippingNode extends Node {
 				Loop( numIntersectionPlanes, ( { i } ) => {
 
 					const plane = clippingPlanes.element( i );
-					clipped.assign( positionView.dot( plane.xyz ).greaterThan( plane.w ).and( clipped ) );
+					clipped.assign( this.position.dot( plane.xyz ).greaterThan( plane.w ).and( clipped ) );
 
 				} );
 
@@ -22460,7 +22694,7 @@ class ClippingNode extends Node {
 
 				const plane = clippingPlanes.element( i );
 
-				const distance = positionView.dot( plane.xyz ).sub( plane.w ).negate();
+				const distance = this.position.dot( plane.xyz ).sub( plane.w ).negate();
 				hw_clip_distances.element( i ).assign( distance );
 
 			} );
@@ -23476,9 +23710,11 @@ class NodeMaterial extends Material {
 
 		// VERTEX COLORS
 
+		let vertexColorNode = null;
+
 		if ( this.vertexColors === true && geometry.hasAttribute( 'color' ) ) {
 
-			colorNode = colorNode.mul( vertexColor() );
+			vertexColorNode = vertexColor();
 
 		}
 
@@ -23486,13 +23722,27 @@ class NodeMaterial extends Material {
 
 		if ( object.instanceColor ) {
 
-			colorNode = instanceColor.mul( colorNode );
+			vertexColorNode = vertexColorNode !== null ? vertexColorNode.mul( instanceColor ) : instanceColor;
 
 		}
 
 		if ( object.isBatchedMesh && object._colorsTexture ) {
 
-			colorNode = batchColor.mul( colorNode );
+			vertexColorNode = vertexColorNode !== null ? vertexColorNode.mul( batchColor ) : batchColor;
+
+		}
+
+		// MORPHED COLORS
+
+		if ( this.vertexColors === true && geometry.morphAttributes.color !== undefined ) {
+
+			vertexColorNode = morphColor( vec4( vertexColorNode !== null ? vertexColorNode : 1 ) );
+
+		}
+
+		if ( vertexColorNode !== null ) {
+
+			colorNode = colorNode.mul( vertexColorNode );
 
 		}
 
@@ -24606,7 +24856,13 @@ const mvpLine = Fn( ( { material } ) => {
 		const clipPose = vec3().toVar();
 
 		clipPose.assign( positionGeometry.y.lessThan( 0.5 ).select( ndcStart, ndcEnd ) );
-		clip.z.assign( clipPose.z.mul( clip.w ) );
+
+		If( clip.w.greaterThan( 0.0 ), () => {
+
+			// only shift the depth of vertices in front of the camera (#35137)
+			clip.z.assign( clipPose.z.mul( clip.w ) );
+
+		} );
 
 	} else {
 
@@ -28571,6 +28827,7 @@ function _getPMREMFromTexture( texture, renderer, generator ) {
 
 				if ( pmrem !== undefined ) {
 
+					pmrem.texture.pmremVersion = -1;
 					pmrem.dispose();
 					cache.delete( texture );
 
@@ -31459,6 +31716,7 @@ class ChainMap {
 let _id$a = 0;
 const _protoKeysCache = new WeakMap();
 const _cacheKeyValues$1 = [ 0, 0, 0, 0, 0 ];
+const _enumProperties = [ 'side', 'blending', 'combine', 'normalMapType' ];
 
 function getKeys( obj ) {
 
@@ -32268,10 +32526,9 @@ class RenderObject {
 
 				if ( type === 'number' ) {
 
-					if ( property === 'side' ) {
+					if ( _enumProperties.includes( property ) ) {
 
-						// `side` is an enum (FrontSide/BackSide/DoubleSide) that changes code
-						// generation, so its exact value must be preserved.
+						// retain enums since their exact value matters
 
 						valueKey = String( value );
 
@@ -34710,6 +34967,8 @@ class Pipelines extends DataMap {
 
 }
 
+const _cacheKeyIds = [];
+
 /**
  * This renderer module manages the bindings of the renderer.
  *
@@ -35159,7 +35418,7 @@ class Bindings extends DataMap {
 
 		let needsBindingsUpdate = false;
 		let cacheBindings = true;
-		let cacheKey = '';
+		let cacheKeyLength = 0;
 		let version = 0;
 
 		// iterate over all bindings and check if buffer updates or a new binding group is required
@@ -35199,7 +35458,7 @@ class Bindings extends DataMap {
 
 				// the generation is part of the version so a re-created buffer replaces the cached bind group
 
-				cacheKey += attribute.id + ',';
+				_cacheKeyIds[ cacheKeyLength ++ ] = attribute.id;
 				version += generation;
 
 			}
@@ -35253,7 +35512,7 @@ class Bindings extends DataMap {
 
 				} else {
 
-					cacheKey += texture.id + ',';
+					_cacheKeyIds[ cacheKeyLength ++ ] = texture.id;
 					version += texture.version;
 
 				}
@@ -35306,7 +35565,11 @@ class Bindings extends DataMap {
 
 		if ( needsBindingsUpdate === true ) {
 
-			this.backend.updateBindings( bindGroup, bindings, cacheBindings ? cacheKey : '', version );
+			_cacheKeyIds.length = cacheKeyLength;
+
+			const cacheKey = cacheBindings ? _cacheKeyIds.join( ',' ) : '';
+
+			this.backend.updateBindings( bindGroup, bindings, cacheKey, version );
 
 		}
 
@@ -37167,12 +37430,17 @@ class OverrideContextNode extends ContextNode {
 	 *
 	 * @param {Map<Node, Function>} overrideNodes - A map mapping target nodes to their respective override callback functions.
 	 * @param {Node|null} [flowNode=null] - The node whose context should be modified.
+	 * @param {?string} [shaderStage=null] - The shader stage the overrides apply to, all stages by default.
 	 */
-	constructor( overrideNodes, flowNode = null ) {
+	constructor( overrideNodes, flowNode = null, shaderStage = null ) {
 
-		super( flowNode, {
-			overrideNodes
-		} );
+		const value = { overrideNodes };
+
+		// the surface is replaced per fragment, the varyings are evaluated in the fragment stage as well
+
+		if ( shaderStage === 'fragment' ) value.inlineVaryings = true;
+
+		super( flowNode, value );
 
 		/**
 		 * This flag can be used for type testing.
@@ -37182,35 +37450,6 @@ class OverrideContextNode extends ContextNode {
 		 * @default true
 		 */
 		this.isOverrideContextNode = true;
-
-	}
-
-	/**
-	 * Gathers the context data from all parent context nodes by traversing the hierarchy,
-	 * merging the `overrideNodes` maps from all encountered `OverrideContextNode` instances.
-	 *
-	 * @return {Object} The gathered context data, containing the merged `overrideNodes` map.
-	 */
-	getFlowContextData() {
-
-		const children = [];
-
-		this.traverse( ( node ) => {
-
-			if ( node.isOverrideContextNode === true ) {
-
-				children.push( node.value.overrideNodes );
-
-			}
-
-		} );
-
-		const overrideNodes = new Map( children.flatMap( ( map ) => Array.from( map.entries() ) ) );
-
-		const data = super.getFlowContextData();
-		data.overrideNodes = overrideNodes;
-
-		return data;
 
 	}
 
@@ -37260,25 +37499,50 @@ addMethodChaining( 'overrideNode', ( flowNode, node, callback ) => overrideNode(
  * @function
  * @param {Map<Node, (Function|Node)>|Array<Array<Node|Function|Node>>} overrides - The overrides mapping target nodes to callback functions or overriding nodes.
  * @param {Node|null} [flowNode=null] - The node whose context should be modified.
+ * @param {?string} [shaderStage=null] - The shader stage the overrides apply to, all stages by default. With fragment overrides,
+ * all varyings of the context are evaluated in the fragment stage, e.g. if the surface is reconstructed per fragment.
  * @return {OverrideContextNode} The created override context node.
  */
-function overrideNodes( overrides, flowNode = null ) {
+function overrideNodes( overrides, flowNode = null, shaderStage = null ) {
 
 	const overrideNodesMap = new Map();
 
 	for ( const [ node, value ] of overrides ) {
 
-		const callback = value !== null ? typeof value === 'function' ? value : () => value : null;
+		let callback = null;
+
+		if ( value !== null ) {
+
+			callback = typeof value === 'function' ? value : () => value;
+
+			if ( shaderStage !== null ) callback = getStageCallback( node, callback, shaderStage );
+
+		}
 
 		overrideNodesMap.set( node, callback );
 
 	}
 
-	return new OverrideContextNode( overrideNodesMap, flowNode );
+	return new OverrideContextNode( overrideNodesMap, flowNode, shaderStage );
 
 }
 
-addMethodChaining( 'overrideNodes', ( flowNode, overrides ) => overrideNodes( overrides, flowNode ) );
+addMethodChaining( 'overrideNodes', ( flowNode, overrides, shaderStage ) => overrideNodes( overrides, flowNode, shaderStage ) );
+
+/**
+ * Returns an override callback which only overrides the node in the given shader stage.
+ *
+ * @private
+ * @param {Node} node - The target node.
+ * @param {Function} callback - The override callback.
+ * @param {string} shaderStage - The shader stage.
+ * @return {Function} The override callback of the shader stage.
+ */
+function getStageCallback( node, callback, shaderStage ) {
+
+	return ( builder ) => builder.shaderStage === shaderStage ? callback( builder ) : node;
+
+}
 
 /**
  * Special version of {@link PropertyNode} which is used for parameters.
@@ -37557,14 +37821,15 @@ class StackNode extends Node {
 	}
 
 	/**
-	 * Adds a node to the stack before the current node.
+	 * Adds a node to the stack before the given node, by default the current node.
 	 *
 	 * @param {Node} node - The node to add.
+	 * @param {?Node} [beforeNode=this._currentNode] - The node of the stack that the node is added before.
 	 * @return {StackNode} A reference to this stack node.
 	 */
-	addToStackBefore( node ) {
+	addToStackBefore( node, beforeNode = this._currentNode ) {
 
-		const index = this._currentNode ? this.nodes.indexOf( this._currentNode ) : 0;
+		const index = beforeNode ? this.nodes.indexOf( beforeNode ) : 0;
 
 		return this.addToStack( node, index );
 
@@ -44297,13 +44562,25 @@ class PassNode extends Node {
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentMRT = renderer.getMRT();
 
+		const currentContextNode = renderer.contextNode;
+
+		// the render target is configured like in setup() and updateBefore(), so the pipelines match the ones of the render
+
+		this.renderTarget.samples = this.options.samples === undefined ? renderer.samples : this.options.samples;
+
+		renderer.getDrawingBufferSize( _size );
+		this.setSize( _size.width, _size.height );
+
 		renderer.setRenderTarget( this.renderTarget );
 		renderer.setMRT( this._mrt );
+
+		if ( this.contextNode !== null ) renderer.contextNode = this._getContextNode( renderer );
 
 		await renderer.compileAsync( this.scene, this.camera );
 
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setMRT( currentMRT );
+		renderer.contextNode = currentContextNode;
 
 	}
 
@@ -44401,16 +44678,7 @@ class PassNode extends Node {
 
 		if ( this.contextNode !== null ) {
 
-			if ( this._contextNodeCache === null || this._contextNodeCache.version !== this.version ) {
-
-				this._contextNodeCache = {
-					version: this.version,
-					context: context( { ...renderer.contextNode.getFlowContextData(), ...this.contextNode.getFlowContextData() } )
-				};
-
-			}
-
-			renderer.contextNode = this._contextNodeCache.context;
+			renderer.contextNode = this._getContextNode( renderer );
 
 		}
 
@@ -44435,6 +44703,33 @@ class PassNode extends Node {
 		renderer.lighting = currentLighting;
 
 		camera.layers.mask = currentMask;
+
+	}
+
+	/**
+	 * Returns the context node of the pass merged with the context node of the renderer.
+	 *
+	 * @private
+	 * @param {Renderer} renderer - The renderer.
+	 * @return {ContextNode} The context node.
+	 */
+	_getContextNode( renderer ) {
+
+		const rendererContextNode = renderer.contextNode;
+		const cache = this._contextNodeCache;
+
+		if ( cache === null || cache.version !== this.version || cache.rendererContextNode !== rendererContextNode || cache.rendererVersion !== rendererContextNode.version ) {
+
+			this._contextNodeCache = {
+				version: this.version,
+				rendererContextNode,
+				rendererVersion: rendererContextNode.version,
+				context: context( mergeContext( rendererContextNode.getFlowContextData(), this.contextNode.getFlowContextData() ) )
+			};
+
+		}
+
+		return this._contextNodeCache.context;
 
 	}
 
@@ -44924,7 +45219,7 @@ const cineonToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 const RRTAndODTFit = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
 	const a = color.mul( color.add( 0.0245786 ) ).sub( 0.000090537 );
-	const b = color.mul( color.add( 0.4329510 ).mul( 0.983729 ) ).add( 0.238081 );
+	const b = color.mul( color.mul( 0.983729 ).add( 0.4329510 ) ).add( 0.238081 );
 
 	return a.div( b );
 
@@ -53334,6 +53629,18 @@ const _checkWriteUsage = ( data ) => {
 
 };
 
+const _hasContextOverrides = ( context, baseContext ) => {
+
+	for ( const key in context ) {
+
+		if ( key !== 'nodeBlock' && key !== 'nodeLoop' && context[ key ] !== baseContext[ key ] ) return true;
+
+	}
+
+	return false;
+
+};
+
 /**
  * Base class for builders which generate a shader program based
  * on a 3D object and its node material definition.
@@ -54292,7 +54599,7 @@ class NodeBuilder {
 
 		const previousContext = this.getContext();
 
-		this.setContext( { ...this.context, ...context } );
+		this.setContext( mergeContext( this.context, context ) );
 
 		return previousContext;
 
@@ -55261,6 +55568,55 @@ class NodeBuilder {
 	getBaseStack() {
 
 		return this.activeStacks[ 0 ];
+
+	}
+
+	/**
+	 * Creates a block that repeats its code, e.g. a loop body, used in the current context.
+	 * The block keeps its parent block, the context and its position in the active stack.
+	 *
+	 * @return {Object} The code block.
+	 */
+	createBlock() {
+
+		const stack = this.getActiveStack();
+
+		return {
+			parent: this.context.nodeBlock || null,
+			context: this.context,
+			stack,
+			node: stack !== undefined ? stack._currentNode : undefined
+		};
+
+	}
+
+	/**
+	 * Declares a node outside of the stacks of this build, e.g. created outside of a function, before the outermost
+	 * block that would repeat it, e.g. a loop body. Blocks set up in another build or with context overrides of the
+	 * current one are kept, since the node could have another value in them.
+	 *
+	 * @param {Node} node - The node to declare.
+	 * @return {StackNode|undefined} The stack where the node was declared.
+	 */
+	declareBeforeBlock( node ) {
+
+		if ( this.flowBlock !== null ) return;
+
+		let block;
+
+		for ( let nodeBlock = this.context.nodeBlock; nodeBlock; nodeBlock = nodeBlock.parent ) {
+
+			if ( this.activeStacks.includes( nodeBlock.stack ) === false || _hasContextOverrides( this.context, nodeBlock.context ) ) break;
+
+			block = nodeBlock;
+
+		}
+
+		if ( block === undefined || this.activeStacks.some( activeStack => activeStack.nodes.includes( node ) ) ) return;
+
+		block.stack.addToStackBefore( node, block.node );
+
+		return block.stack;
 
 	}
 
@@ -56714,7 +57070,7 @@ class NodeBuilder {
 
 		if ( renderer.contextNode.isContextNode === true ) {
 
-			this.context = { ...this.context, ...renderer.contextNode.getFlowContextData() };
+			this.addContext( renderer.contextNode.getFlowContextData() );
 
 		} else {
 
@@ -56728,7 +57084,7 @@ class NodeBuilder {
 
 			if ( material.contextNode.isContextNode === true ) {
 
-				this.context = { ...this.context, ...material.contextNode.getFlowContextData() };
+				this.addContext( material.contextNode.getFlowContextData() );
 
 			} else {
 
@@ -59765,7 +60121,18 @@ class ClippingContext {
 
 		this.shadowPass = ( scene.overrideMaterial !== null && scene.overrideMaterial.isShadowPassMaterial );
 
-		this.viewMatrix.copy( camera.matrixWorldInverse );
+		if ( camera.isArrayCamera === true ) {
+
+			// ArrayCamera sub-cameras share the planes, so keep them in world space.
+
+			this.viewMatrix.identity();
+
+		} else {
+
+			this.viewMatrix.copy( camera.matrixWorldInverse );
+
+		}
+
 		this.viewNormalMatrix.getNormalMatrix( this.viewMatrix );
 
 	}
@@ -64227,7 +64594,43 @@ class Renderer {
 	 */
 	_bundleNeedsUpdate( bundleGroup, renderBundleData ) {
 
-		return renderBundleData.bundleGPU === undefined || bundleGroup.version !== renderBundleData.version;
+		if ( renderBundleData.bundleGPU === undefined || bundleGroup.version !== renderBundleData.version ) return true;
+
+		// the recorded bundle references the buffers of its attributes. they are only verified after a disposal
+
+		const attributes = this._attributes;
+
+		if ( renderBundleData.attributesDisposeVersion !== attributes.disposeVersion ) {
+
+			renderBundleData.attributesDisposeVersion = attributes.disposeVersion;
+
+			for ( const renderObject of renderBundleData.renderObjects ) {
+
+				const index = renderObject.getIndex();
+
+				let disposed = index !== null && attributes.has( index ) === false;
+
+				for ( const vertexBuffer of renderObject.getVertexBuffers() ) {
+
+					if ( attributes.has( vertexBuffer ) === false ) disposed = true;
+
+				}
+
+				if ( disposed ) {
+
+					// invalidate the recorded version so the bundle is recorded again
+
+					renderBundleData.version = null;
+
+					return true;
+
+				}
+
+			}
+
+		}
+
+		return false;
 
 	}
 
@@ -66463,8 +66866,9 @@ class Renderer {
 	_updateCamera( camera, useXRCamera ) {
 
 		const xr = this.xr;
+		const useXR = xr.enabled === true && xr.isPresenting === true && useXRCamera === true;
 
-		if ( xr.isPresenting === false || useXRCamera === false ) {
+		if ( useXR === false ) {
 
 			let projectionMatrixNeedsUpdate = false;
 
@@ -66534,7 +66938,7 @@ class Renderer {
 
 		// handle XR
 
-		if ( useXRCamera === true && xr.enabled === true && xr.isPresenting === true ) {
+		if ( useXR === true ) {
 
 			if ( xr.cameraAutoUpdate === true ) xr.updateCamera( camera );
 			camera = xr.getCamera(); // use XR camera for rendering
@@ -68916,6 +69320,18 @@ ${ flowData.code }
 	generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet, offsetSnippet ) {
 
 		if ( depthSnippet ) uvSnippet = `vec3( ${ uvSnippet }, ${ depthSnippet } )`;
+
+		if ( texture.isDepthTexture ) {
+
+			if ( offsetSnippet ) {
+
+				return `textureLodOffset( ${ textureProperty }, ${ uvSnippet }, ${ levelSnippet }, ${ offsetSnippet } ).x`;
+
+			}
+
+			return `textureLod( ${ textureProperty }, ${ uvSnippet }, ${ levelSnippet } ).x`;
+
+		}
 
 		if ( offsetSnippet ) {
 
@@ -74528,7 +74944,7 @@ class WebGLTextureUtils {
 		state.pixelStorei( gl.UNPACK_SKIP_IMAGES, minZ );
 
 		// set up the src texture
-		const isSrc3D = srcTexture.isDataArrayTexture || srcTexture.isData3DTexture || dstTexture.isArrayTexture;
+		const isSrc3D = srcTexture.isDataArrayTexture || srcTexture.isData3DTexture || srcTexture.isArrayTexture;
 		const isDst3D = dstTexture.isDataArrayTexture || dstTexture.isData3DTexture || dstTexture.isArrayTexture;
 
 		if ( srcTexture.isDepthTexture ) {
@@ -74558,7 +74974,7 @@ class WebGLTextureUtils {
 
 				}
 
-				gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, gl.DEPTH_BUFFER_BIT, gl.NEAREST );
+				gl.blitFramebuffer( minX, minY, minX + width, minY + height, dstX, dstY, dstX + width, dstY + height, gl.DEPTH_BUFFER_BIT, gl.NEAREST );
 
 			}
 
@@ -74606,7 +75022,7 @@ class WebGLTextureUtils {
 				// copy the data using the fastest function that can achieve the copy
 				if ( srcLevel !== 0 ) {
 
-					gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, gl.COLOR_BUFFER_BIT, gl.NEAREST );
+					gl.blitFramebuffer( minX, minY, minX + width, minY + height, dstX, dstY, dstX + width, dstY + height, gl.COLOR_BUFFER_BIT, gl.NEAREST );
 
 				} else if ( isDst3D ) {
 
@@ -84122,6 +84538,11 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		if ( shaderStage === 'fragment' ) {
 
+			// Unfilterable textures have no sampler binding. Use the same texel lookup as regular
+			// sampling, preserving nearest filtering, wrapping and offsets.
+
+			if ( this.isUnfilterable( texture ) ) return this.generateTexture( texture, textureProperty, uvSnippet, depthSnippet, offsetSnippet, shaderStage );
+
 			if ( depthSnippet ) {
 
 				if ( offsetSnippet ) {
@@ -90540,6 +90961,10 @@ class WebGPUBackend extends Backend {
 
 		submit( this.device, renderContextData.encoder.finish() );
 
+		// pass and encoder are only valid between beginRender() and finishRender()
+
+		renderContextData.currentPass = null;
+		renderContextData.encoder = null;
 
 		//
 
@@ -92111,7 +92536,7 @@ class WebGPUBackend extends Backend {
 
 		const generateMipmaps = texture.generateMipmaps === true && texture.mipmapsAutoUpdate === true && destinationGPU.mipLevelCount > 1;
 
-		if ( this._isRenderCameraDepthArray( renderContext ) === true ) {
+		if ( renderContextData.encoder && this._isRenderCameraDepthArray( renderContext ) === true ) {
 
 			// Layered draws are only executed in finishRender(), so preserve this copy as a render-stage boundary.
 			const bundles = this._finishArrayCameraBundleEncoders( renderContextData );
@@ -93287,6 +93712,8 @@ class NodeLoader extends Loader {
 	load( url, onLoad, onProgress, onError ) {
 
 		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
 		loader.setPath( this.path );
 		loader.setRequestHeader( this.requestHeader );
 		loader.setWithCredentials( this.withCredentials );
@@ -94124,6 +94551,7 @@ var Three_TSL = /*#__PURE__*/Object.freeze({
 	modelViewProjection: modelViewProjection,
 	modelWorldMatrix: modelWorldMatrix,
 	modelWorldMatrixInverse: modelWorldMatrixInverse,
+	morphColor: morphColor,
 	morphReference: morphReference,
 	mrt: mrt,
 	mul: mul,

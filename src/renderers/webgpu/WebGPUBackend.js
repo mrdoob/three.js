@@ -1583,6 +1583,10 @@ class WebGPUBackend extends Backend {
 
 		submit( this.device, renderContextData.encoder.finish() );
 
+		// pass and encoder are only valid between beginRender() and finishRender()
+
+		renderContextData.currentPass = null;
+		renderContextData.encoder = null;
 
 		//
 
@@ -3154,7 +3158,7 @@ class WebGPUBackend extends Backend {
 
 		const generateMipmaps = texture.generateMipmaps === true && texture.mipmapsAutoUpdate === true && destinationGPU.mipLevelCount > 1;
 
-		if ( this._isRenderCameraDepthArray( renderContext ) === true ) {
+		if ( renderContextData.encoder && this._isRenderCameraDepthArray( renderContext ) === true ) {
 
 			// Layered draws are only executed in finishRender(), so preserve this copy as a render-stage boundary.
 			const bundles = this._finishArrayCameraBundleEncoders( renderContextData );

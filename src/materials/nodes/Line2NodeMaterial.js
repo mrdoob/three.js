@@ -246,7 +246,13 @@ const mvpLine = Fn( ( { material } ) => {
 		const clipPose = vec3().toVar();
 
 		clipPose.assign( positionGeometry.y.lessThan( 0.5 ).select( ndcStart, ndcEnd ) );
-		clip.z.assign( clipPose.z.mul( clip.w ) );
+
+		If( clip.w.greaterThan( 0.0 ), () => {
+
+			// only shift the depth of vertices in front of the camera (#35137)
+			clip.z.assign( clipPose.z.mul( clip.w ) );
+
+		} );
 
 	} else {
 

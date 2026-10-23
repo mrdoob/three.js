@@ -260,15 +260,13 @@ nodeVar0
 var externalValue : f32;
 
 var nodeVar0 : f32 = 0.0;
+externalValue = ( 2.0 + 3.0 );
 
 for ( var i : i32 = 0; i < 0; i ++ ) {
 
-	externalValue = ( 2.0 + 3.0 );
 	nodeVar0 = ( nodeVar0 + externalValue );
 
 }
-
-externalValue = ( 2.0 + 3.0 );
 
 for ( var i : i32 = 0; i < 2; i ++ ) {
 
@@ -277,6 +275,191 @@ for ( var i : i32 = 0; i < 2; i ++ ) {
 }
 
 ( nodeVar0 + externalValue )
+
+// external variable in branch
+
+var result : f32;
+var nodeVar0 : f32;
+var nodeVar1 : f32;
+var externalValue : f32;
+
+result = 0.0;
+
+if ( ( object.nodeUniform0 > 0.5 ) ) {
+
+	if ( ( nodeVarying0.x > 0.5 ) ) {
+
+		nodeVar1 = 2.0;
+
+	} else {
+
+		nodeVar1 = 3.0;
+
+	}
+
+	externalValue = nodeVar1;
+	nodeVar0 = externalValue;
+
+} else {
+
+	nodeVar0 = 0.0;
+
+}
+
+result = nodeVar0;
+
+result
+
+// external variable in branches
+
+var first : f32;
+var nodeVar0 : f32;
+var nodeVar1 : f32;
+var externalValue : f32;
+var second : f32;
+var nodeVar2 : f32;
+
+first = 0.0;
+let nodeConst0 = ( object.nodeUniform0 > 0.5 );
+
+if ( nodeConst0 ) {
+
+	if ( ( nodeVarying0.x > 0.5 ) ) {
+
+		nodeVar1 = 2.0;
+
+	} else {
+
+		nodeVar1 = 3.0;
+
+	}
+
+	externalValue = nodeVar1;
+	nodeVar0 = externalValue;
+
+} else {
+
+	nodeVar0 = 0.0;
+
+}
+
+first = nodeVar0;
+second = 0.0;
+
+if ( nodeConst0 ) {
+
+	nodeVar2 = ( externalValue * 2.0 );
+
+} else {
+
+	nodeVar2 = 0.0;
+
+}
+
+second = nodeVar2;
+
+( first + second )
+
+// external variable in nested branches
+
+var result : f32;
+var nodeVar0 : f32;
+var externalValue : f32;
+
+result = 0.0;
+
+if ( ( object.nodeUniform0 > 0.5 ) ) {
+
+	if ( ( nodeVarying0.x > 0.5 ) ) {
+
+		nodeVar0 = 2.0;
+
+	} else {
+
+		nodeVar0 = 3.0;
+
+	}
+
+	externalValue = nodeVar0;
+	result = externalValue;
+
+	if ( ( object.nodeUniform1 > 0.5 ) ) {
+
+		result = ( result + externalValue );
+
+	}
+
+}
+
+result
+
+// external variable in branches of the same condition
+
+var diffuse : vec3<f32>;
+var nodeVar0 : vec3<f32>;
+var nodeVar1 : vec4<f32>;
+var nodeVar2 : f32;
+var nodeVar3 : f32;
+var room : vec4<f32>;
+var emissive : vec3<f32>;
+var nodeVar4 : vec3<f32>;
+
+diffuse = vec3<f32>( 1.0, 1.0, 1.0 );
+let nodeConst0 = ( object.nodeUniform0 > 0.5 );
+
+if ( nodeConst0 ) {
+
+	if ( ( nodeVarying0.x > 0.5 ) ) {
+
+		nodeVar2 = 0.0;
+
+		for ( var i : i32 = 0; i < 4; i ++ ) {
+
+			nodeVar2 = ( nodeVar2 + ( 1.0 * f32( i ) ) );
+
+		}
+
+		nodeVar1 = vec4<f32>( nodeVar2 );
+
+	} else {
+
+		nodeVar3 = 0.0;
+
+		for ( var i : i32 = 0; i < 4; i ++ ) {
+
+			nodeVar3 = ( nodeVar3 + ( 2.0 * f32( i ) ) );
+
+		}
+
+		nodeVar1 = vec4<f32>( nodeVar3 );
+
+	}
+
+	room = nodeVar1;
+	nodeVar0 = room.xyz;
+
+} else {
+
+	nodeVar0 = vec3<f32>( 0.0, 0.0, 0.0 );
+
+}
+
+diffuse = nodeVar0;
+emissive = vec3<f32>( 0.0, 0.0, 0.0 );
+
+if ( nodeConst0 ) {
+
+	nodeVar4 = ( room.xyz * vec3<f32>( room.w ) );
+
+} else {
+
+	nodeVar4 = vec3<f32>( 0.0, 0.0, 0.0 );
+
+}
+
+emissive = nodeVar4;
+
+( diffuse + emissive )
 
 // assignable scope
 
@@ -909,18 +1092,19 @@ vec3<f32>( nodeVar0 )
 // function with loop without stack
 
 var nodeVar0 : f32 = 0.0;
+var nodeVar1 : f32 = 0.0;
+
+for ( var i : i32 = 0; i < 3; i ++ ) {
+
+	nodeVar1 = ( nodeVar1 + f32( i ) );
+
+}
+
+var nodeVar2 : f32 = nodeVar1;
 
 for ( var i : i32 = 0; i < 4; i ++ ) {
 
-	var nodeVar1 : f32 = 0.0;
-
-	for ( var i : i32 = 0; i < 3; i ++ ) {
-
-		nodeVar1 = ( nodeVar1 + f32( i ) );
-
-	}
-
-	nodeVar0 = ( nodeVar0 + nodeVar1 );
+	nodeVar0 = ( nodeVar0 + nodeVar2 );
 
 }
 

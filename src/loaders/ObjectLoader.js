@@ -953,6 +953,8 @@ class ObjectLoader extends Loader {
 				object = new SpotLight( data.color, data.intensity, data.distance, data.angle, data.penumbra, data.decay );
 				object.target = data.target || '';
 
+				if ( data.map !== undefined ) object.map = getTexture( data.map );
+
 				break;
 
 			case 'HemisphereLight':
@@ -1113,6 +1115,8 @@ class ObjectLoader extends Loader {
 			case 'Sprite':
 
 				object = new Sprite( getMaterial( data.material ) );
+
+				if ( data.center !== undefined ) object.center.fromArray( data.center );
 
 				break;
 

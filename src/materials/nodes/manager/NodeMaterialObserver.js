@@ -115,6 +115,14 @@ const _geometryCache = new WeakMap();
 const _textureCache = new WeakMap();
 
 /**
+ * Holds the output target data for comparison.
+ *
+ * @private
+ * @type {WeakMap<RenderTarget|CanvasTarget,Object>}
+ */
+const _outputTargetCache = new WeakMap();
+
+/**
  * This class is used by {@link WebGPURenderer} as management component.
  * It's primary purpose is to determine whether render objects require a
  * refresh right before they are going to be rendered or not.
@@ -278,16 +286,13 @@ class NodeMaterialObserver {
 			// global data
 
 			data.outputTarget = this.getOutputTarget( renderObject.renderer );
+			data.outputTargetVersion = this.getOutputTargetData( data.outputTarget, renderObject.context )._version;
 
-			const { width, height } = renderObject.context;
-
-			data.bufferWidth = width;
-			data.bufferHeight = height;
-
-			const { environmentIntensity, environmentRotation } = renderObject.scene;
+			const { environment, environmentIntensity, environmentRotation } = renderObject.scene;
 
 			data.environmentIntensity = environmentIntensity;
 			data.environmentRotation = environmentRotation.clone();
+			data.environmentVersion = environment !== null ? this.getTextureData( environment )._version : null;
 
 			data.lights = this.getLightsData( renderObject.lightsNode.getBuiltinLights(), [] );
 
@@ -311,6 +316,38 @@ class NodeMaterialObserver {
 		const renderTarget = renderer.getRenderTarget();
 
 		return renderTarget !== null ? renderTarget : ( renderer.getOutputRenderTarget() || renderer.getCanvasTarget() );
+
+	}
+
+	/**
+	 * Returns an output target data structure holding the size of the given output
+	 * target for monitoring. Its version is incremented whenever a size change is observed.
+	 *
+	 * @param {RenderTarget|CanvasTarget} outputTarget - The output target.
+	 * @param {RenderContext} renderContext - The render context.
+	 * @return {Object} An object for monitoring the output target size.
+	 */
+	getOutputTargetData( outputTarget, renderContext ) {
+
+		const { width, height } = renderContext;
+
+		let data = _outputTargetCache.get( outputTarget );
+
+		if ( data === undefined ) {
+
+			data = { _version: 0, width, height };
+
+			_outputTargetCache.set( outputTarget, data );
+
+		} else if ( data.width !== width || data.height !== height ) {
+
+			data.width = width;
+			data.height = height;
+			data._version ++;
+
+		}
+
+		return data;
 
 	}
 
@@ -674,12 +711,13 @@ class NodeMaterialObserver {
 
 		}
 
-		const { width, height } = renderObject.context;
+		const outputTargetData = this.getOutputTargetData( renderObjectData.outputTarget, renderObject.context );
 
-		if ( renderObjectData.bufferWidth !== width || renderObjectData.bufferHeight !== height ) {
+		// a version mismatch means the output target has been resized since this render object was last refreshed
 
-			renderObjectData.bufferWidth = width;
-			renderObjectData.bufferHeight = height;
+		if ( renderObjectData.outputTargetVersion !== outputTargetData._version ) {
+
+			renderObjectData.outputTargetVersion = outputTargetData._version;
 
 			return false;
 
@@ -795,26 +833,6 @@ class NodeMaterialObserver {
 
 		}
 
-		// attributes must be uploaded again if they have been disposed. they are only verified after a disposal
-
-		const attributes = renderObject._geometries.attributes;
-
-		if ( renderObjectData.attributesDisposeVersion !== attributes.disposeVersion ) {
-
-			for ( const vertexBuffer of renderObject.getVertexBuffers() ) {
-
-				if ( attributes.has( vertexBuffer ) === false ) return false;
-
-			}
-
-			const index = renderObject.getIndex();
-
-			if ( index !== null && attributes.has( index ) === false ) return false;
-
-			renderObjectData.attributesDisposeVersion = attributes.disposeVersion;
-
-		}
-
 		// morph targets
 
 		if ( renderObjectData.morphTargetInfluences ) {
@@ -912,11 +930,15 @@ class NodeMaterialObserver {
 
 		if ( scene.environment !== null && material.envMap === null ) {
 
+			const environmentVersion = this.getTextureData( scene.environment )._version;
+
 			if ( renderObjectData.environmentIntensity !== scene.environmentIntensity ||
-					renderObjectData.environmentRotation.equals( scene.environmentRotation ) === false ) {
+					renderObjectData.environmentRotation.equals( scene.environmentRotation ) === false ||
+					renderObjectData.environmentVersion !== environmentVersion ) {
 
 				renderObjectData.environmentIntensity = scene.environmentIntensity;
 				renderObjectData.environmentRotation.copy( scene.environmentRotation );
+				renderObjectData.environmentVersion = environmentVersion;
 
 				return false;
 
@@ -1024,6 +1046,34 @@ class NodeMaterialObserver {
 	}
 
 	/**
+	 * Returns `true` if a vertex buffer or the index of the given render object
+	 * has been disposed since the last check.
+	 *
+	 * @param {RenderObject} renderObject - The render object.
+	 * @param {Object} renderObjectData - The cached render object data.
+	 * @return {boolean} Whether attributes of the render object have been disposed or not.
+	 */
+	hasDisposedAttributes( renderObject, renderObjectData ) {
+
+		const attributes = renderObject._geometries.attributes;
+
+		for ( const vertexBuffer of renderObject.getVertexBuffers() ) {
+
+			if ( attributes.has( vertexBuffer ) === false ) return true;
+
+		}
+
+		const index = renderObject.getIndex();
+
+		if ( index !== null && attributes.has( index ) === false ) return true;
+
+		renderObjectData.attributesDisposeVersion = attributes.disposeVersion;
+
+		return false;
+
+	}
+
+	/**
 	 * Checks if the given render object requires a refresh.
 	 *
 	 * @param {RenderObject} renderObject - The render object.
@@ -1062,6 +1112,16 @@ class NodeMaterialObserver {
 			renderObjectData.outputTarget = outputTarget;
 
 			refreshType = RenderObjectRefreshType.FULL;
+
+		}
+
+		const attributes = renderObject._geometries.attributes;
+
+		// re-upload disposed attributes. checked before the static early out since other geometries can destroy shared buffers
+
+		if ( renderObjectData.attributesDisposeVersion !== attributes.disposeVersion ) {
+
+			if ( this.hasDisposedAttributes( renderObject, renderObjectData ) ) refreshType = RenderObjectRefreshType.FULL;
 
 		}
 

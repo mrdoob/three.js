@@ -1725,7 +1725,7 @@ class ColladaComposer {
 									break;
 
 								case 'COLOR':
-									this.buildGeometryData( primitive, sources[ id ], input.offset, color.array );
+									this.buildGeometryData( primitive, sources[ id ], input.offset, color.array, true );
 									color.stride = sources[ id ].stride;
 									break;
 
@@ -1818,7 +1818,7 @@ class ColladaComposer {
 			if ( isColor ) {
 
 				// convert the vertex colors from srgb to linear if present
-				const startIndex = array.length - sourceStride - 1;
+				const startIndex = array.length - sourceStride;
 				tempColor.setRGB(
 					array[ startIndex + 0 ],
 					array[ startIndex + 1 ],
