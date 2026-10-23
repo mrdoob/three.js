@@ -6,6 +6,7 @@ import './addons/utils/GaussianSplatUtils.tests.js';
 import './addons/utils/unwrapUVs.tests.js';
 import './addons/math/ColorConverter.tests.js';
 import './addons/math/ColorSpaces.tests.js';
+import './addons/math/Lut.tests.js';
 import './addons/math/Octree.tests.js';
 import './addons/curves/NURBSCurve.tests.js';
 import './addons/loaders/FBXLoader.tests.js';
