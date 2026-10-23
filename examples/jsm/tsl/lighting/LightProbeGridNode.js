@@ -71,13 +71,22 @@ export function octTileTexel( texel, resolution ) {
  * @param {Node<vec2>} atlasSize - The atlas size in texels.
  * @return {Node<vec2>} The atlas UV.
  */
-function octTileUV( probeIndex, direction, resolution, atlasSize ) {
+const octTileUV = /*@__PURE__*/ Fn( ( [ probeIndex, direction, resolution, atlasSize ] ) => {
 
 	const tile = vec2( float( probeIndex.mod( DISTANCE_COLUMNS ) ), float( probeIndex.div( DISTANCE_COLUMNS ) ) );
 
-	return tile.mul( resolution + 2 ).add( 1.0 ).add( octEncode( direction ).mul( resolution ) ).div( atlasSize );
+	return tile.mul( resolution.add( 2.0 ) ).add( 1.0 ).add( octEncode( direction ).mul( resolution ) ).div( atlasSize );
 
-}
+} ).setLayout( {
+	name: 'lightProbeOctTileUV',
+	type: 'vec2',
+	inputs: [
+		{ name: 'probeIndex', type: 'int' },
+		{ name: 'direction', type: 'vec3' },
+		{ name: 'resolution', type: 'float' },
+		{ name: 'atlasSize', type: 'vec2' }
+	]
+} );
 
 /**
  * Maps octahedral coordinates in [-1, 1]² to a unit direction.
@@ -188,6 +197,38 @@ function chebyshevVisibility( moments, distance ) {
 
 }
 
+// Share the visibility and interpolation math across grids. Texture bindings
+// remain per grid, so each volume still performs its own atlas lookups.
+const probeInterpolationWeight = /*@__PURE__*/ Fn( ( [ moments, distance, normal, toProbe, offset, alpha ] ) => {
+
+	const visibility = chebyshevVisibility( moments, distance );
+	const direction = toProbe.div( toProbe.length().max( 1e-6 ) ).toConst();
+	const wrap = normal.dot( direction ).mul( 0.5 ).add( 0.5 ).pow( 2.0 ).add( 0.2 );
+	const weight = wrap.mul( visibility.max( 0.05 ) ).max( 1e-6 ).toVar();
+
+	If( weight.lessThan( 0.2 ), () => {
+
+		weight.mulAssign( weight.mul( weight ).div( 0.04 ) );
+
+	} );
+
+	const blend = offset.mul( alpha ).add( offset.oneMinus().mul( alpha.oneMinus() ) ).max( vec3( 0.001 ) ).toConst();
+
+	return weight.mul( blend.x.mul( blend.y ).mul( blend.z ) );
+
+} ).setLayout( {
+	name: 'lightProbeInterpolationWeight',
+	type: 'float',
+	inputs: [
+		{ name: 'moments', type: 'vec2' },
+		{ name: 'distance', type: 'float' },
+		{ name: 'normal', type: 'vec3' },
+		{ name: 'toProbe', type: 'vec3' },
+		{ name: 'offset', type: 'vec3' },
+		{ name: 'alpha', type: 'vec3' }
+	]
+} );
+
 /**
  * Blends eight probes using RTXGI's active-probe interpolation: trilinear,
  * wrapped normal and Chebyshev visibility weights.
@@ -229,8 +270,8 @@ function evaluateGridIrradianceVisibility( grid, sampleIrradiance ) {
 
 		// Chebyshev visibility from the probe's distance moments toward the receiver.
 
-		const toReceiver = biased.sub( probePosition );
-		const distance = toReceiver.length().max( 1e-6 );
+		const toReceiver = biased.sub( probePosition ).toConst();
+		const distance = toReceiver.length().max( 1e-6 ).toConst();
 		const direction = toReceiver.div( distance );
 
 		const ix = int( cell.x ).toVar(), iy = int( cell.y ).toVar(), iz = int( cell.z ).toVar();
@@ -242,25 +283,7 @@ function evaluateGridIrradianceVisibility( grid, sampleIrradiance ) {
 
 		If( probeMoments.x.greaterThanEqual( 0.0 ), () => {
 
-			const visibility = chebyshevVisibility( probeMoments, distance.div( distanceScale ) );
-
-			// RTXGI's wrapped normal weight and visibility fallback keep active
-			// probes usable near small geometry, even when visibility is low.
-
-			const toProbe = probePosition.sub( positionWorld );
-			const wrap = normalWorld.dot( toProbe.div( toProbe.length().max( 1e-6 ) ) ).mul( 0.5 ).add( 0.5 ).pow( 2.0 ).add( 0.2 );
-			const weight = wrap.mul( visibility.max( 0.05 ) ).max( 1e-6 ).toVar();
-
-			// Smoothly suppress small weights before applying trilinear filtering.
-
-			If( weight.lessThan( 0.2 ), () => {
-
-				weight.mulAssign( weight.mul( weight ).div( 0.04 ) );
-
-			} );
-
-			const blend = offset.mul( alpha ).add( offset.oneMinus().mul( alpha.oneMinus() ) ).max( vec3( 0.001 ) );
-			weight.mulAssign( blend.x.mul( blend.y ).mul( blend.z ) );
+			const weight = probeInterpolationWeight( probeMoments, distance.div( distanceScale ), normalWorld, probePosition.sub( positionWorld ), offset, alpha ).toConst();
 
 			const tile = vec2( float( probeIndex.mod( DISTANCE_COLUMNS ) ), float( probeIndex.div( DISTANCE_COLUMNS ) ) );
 			const irradianceUV = tile.mul( IRRADIANCE_TILE ).add( normalOct ).div( irradianceSize );
