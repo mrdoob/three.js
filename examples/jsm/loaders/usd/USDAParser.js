@@ -81,7 +81,7 @@ class USDAParser {
 				const value = line.slice( colonIdx + 1 ).trim();
 
 				// Only process if key looks like a number (timeSamples frame)
-				if ( /^[\d.]+$/.test( key ) ) {
+				if ( /^-?[\d.]+$/.test( key ) ) {
 
 					target[ key ] = value;
 
@@ -235,9 +235,10 @@ class USDAParser {
 
 	_stripBlockComments( text ) {
 
-		// Iteratively remove /* ... */ comments without regex backtracking. A string, an asset
-		// path or a # comment is copied as is, since a /* inside it is not a comment.
-		const tokens = /\/\*|["'@#]/g;
+		// Iteratively remove /* ... */ comments without regex backtracking.
+		// Strings are copied as is since they may contain /* (e.g. path expressions)
+		const tokens = /\/\*|"""|'''|["']/g;
+
 		let result = '';
 		let i = 0;
 
@@ -254,8 +255,9 @@ class USDAParser {
 			}
 
 			const start = match.index;
+			const token = match[ 0 ];
 
-			if ( match[ 0 ] === '/*' ) {
+			if ( token === '/*' ) {
 
 				result += text.slice( i, start );
 
@@ -265,9 +267,7 @@ class USDAParser {
 
 			} else {
 
-				// Copy a # comment up to the line end, and a string or asset path to its end
-				let end = ( match[ 0 ] === '#' ) ? text.indexOf( '\n', start ) : this._literalEnd( text, start );
-				if ( end === - 1 ) end = text.length;
+				const end = this._findStringEnd( text, start, token );
 
 				result += text.slice( i, end );
 				i = end;
@@ -280,27 +280,22 @@ class USDAParser {
 
 	}
 
-	_literalEnd( text, start ) {
+	_findStringEnd( text, start, quote ) {
 
-		// The index after the string or asset path at `start`: '...' or "..." with backslash
-		// escapes, ''' or """ triple-quoted, @...@ or @@@...@@@. An unclosed single-line literal
-		// ends at the line end.
-		const char = text[ start ];
-		const triple = char.repeat( 3 );
+		if ( quote.length === 3 ) {
 
-		if ( text.startsWith( triple, start ) ) {
-
-			const end = text.indexOf( triple, start + 3 );
+			const end = text.indexOf( quote, start + 3 );
 			return ( end === - 1 ) ? text.length : end + 3;
 
 		}
 
+		// Single-line string with escapes, ends at the line end if unclosed
 		for ( let i = start + 1; i < text.length; i ++ ) {
 
 			const ch = text[ i ];
 
-			if ( ch === '\\' && char !== '@' ) i ++;
-			else if ( ch === char ) return i + 1;
+			if ( ch === '\\' ) i ++;
+			else if ( ch === quote ) return i + 1;
 			else if ( ch === '\n' ) return i;
 
 		}
@@ -377,12 +372,7 @@ class USDAParser {
 
 			}
 
-			if ( ! inString && ch === '@' ) {
-
-				// An asset path, which may hold a #
-				i = this._literalEnd( line, i ) - 1;
-
-			} else if ( ! inString && ( ch === '"' || ch === '\'' ) ) {
+			if ( ! inString && ( ch === '"' || ch === '\'' ) ) {
 
 				inString = true;
 				stringChar = ch;
