@@ -114,19 +114,19 @@ class PLYExporter {
 				vertexCount += vertices.count;
 				faceCount += indices ? indices.count / 3 : vertices.count / 3;
 
-				positionType = getPlyType( vertices.array );
+				positionType = getPlyType( vertices.array, true );
 
 				if ( normals !== undefined ) {
 
 					includeNormals = true;
-					normalType = getPlyType( normals.array );
+					normalType = getPlyType( normals.array, true );
 
 				}
 
 				if ( uvs !== undefined ) {
 
 					includeUVs = true;
-					uvType = getPlyType( uvs.array );
+					uvType = getPlyType( uvs.array, uvs.normalized );
 
 				}
 
@@ -140,7 +140,7 @@ class PLYExporter {
 				for ( const name of customAttributeNames ) {
 
 					const attr = geometry.getAttribute( name );
-					if ( attr !== undefined ) customTypes[ name ] = getPlyType( attr.array );
+					if ( attr !== undefined ) customTypes[ name ] = getPlyType( attr.array, attr.normalized );
 
 				}
 
@@ -161,12 +161,12 @@ class PLYExporter {
 
 				vertexCount += vertices.count;
 
-				positionType = getPlyType( vertices.array );
+				positionType = getPlyType( vertices.array, true );
 
 				if ( normals !== undefined ) {
 
 					includeNormals = true;
-					normalType = getPlyType( normals.array );
+					normalType = getPlyType( normals.array, true );
 
 				}
 
@@ -180,7 +180,7 @@ class PLYExporter {
 				for ( const name of customAttributeNames ) {
 
 					const attr = geometry.getAttribute( name );
-					if ( attr !== undefined ) customTypes[ name ] = getPlyType( attr.array );
+					if ( attr !== undefined ) customTypes[ name ] = getPlyType( attr.array, attr.normalized );
 
 				}
 
@@ -694,7 +694,10 @@ class PLYExporter {
 
 }
 
-function getPlyType( array ) {
+function getPlyType( array, isFloat = false ) {
+
+	// positions and normals are transformed and normalized values are dequantized, so they need a float type
+	if ( isFloat ) return ( array instanceof Float64Array ) ? 'double' : 'float';
 
 	if ( array instanceof Int8Array ) return 'char';
 	if ( array instanceof Uint8Array || array instanceof Uint8ClampedArray ) return 'uchar';
