@@ -352,6 +352,7 @@
 		"webgpu_generator_building",
 		"webgpu_generator_city",
 		"webgpu_geometry_loft",
+		"webgpu_gpudriven_city",
 		"webgpu_gpudriven_ibl",
 		"webgpu_gpudriven_meshlets",
 		"webgpu_hdr",
