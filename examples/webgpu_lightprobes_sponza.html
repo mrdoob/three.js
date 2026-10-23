@@ -395,7 +395,17 @@
 
 				timer.update( timestamp );
 				controls.update( timer.getDelta() );
-				updateProbes();
+				if ( window.TESTING === true ) {
+
+					// The e2e runner renders one frame, so finish the incremental bake first.
+					while ( probes !== null && bakePass <= params.bounces ) updateProbes();
+
+				} else {
+
+					updateProbes();
+
+				}
+
 				renderer.render( scene, camera );
 
 			}
