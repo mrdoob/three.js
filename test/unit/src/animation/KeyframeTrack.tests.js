@@ -1,4 +1,6 @@
 import { NumberKeyframeTrack } from '../../../../src/animation/tracks/NumberKeyframeTrack.js';
+import { VectorKeyframeTrack } from '../../../../src/animation/tracks/VectorKeyframeTrack.js';
+import { AnimationClip } from '../../../../src/animation/AnimationClip.js';
 
 import { KeyframeTrack } from '../../../../src/animation/KeyframeTrack.js';
 import { InterpolateBezier } from '../../../../src/constants.js';
@@ -84,6 +86,67 @@ export default QUnit.module( 'Animation', () => {
 
 			assert.smartEqual( Array.from( track.times ), [ 0, 3, 4 ] );
 			assert.smartEqual( Array.from( track.values ), [ 0, 0, 1 ] );
+
+		} );
+
+		QUnit.test( 'optimize preserves Bezier curves with equal keyframe values', ( assert ) => {
+
+			const track = new NumberKeyframeTrack( '.material.opacity', [ 0, 1, 2 ], [ 0, 0, 0 ], InterpolateBezier );
+			track.settings = {
+				inTangents: new Float32Array( [ 0, 0, 0.75, 1, 1.75, - 1 ] ),
+				outTangents: new Float32Array( [ 0.25, 1, 1.25, - 1, 2, 0 ] )
+			};
+
+			const original = track.clone();
+			const clip = new AnimationClip( 'opacity', 2, [ track ] );
+			clip.optimize();
+
+			assert.smartEqual( track.times, original.times, 'Equal values do not imply redundant Bezier keys.' );
+			assert.smartEqual( track.values, original.values );
+			assert.smartEqual( track.settings.inTangents, original.settings.inTangents );
+			assert.smartEqual( track.settings.outTangents, original.settings.outTangents );
+
+			const before = original.createInterpolant();
+			const after = track.createInterpolant();
+
+			for ( const time of [ 0.25, 0.5, 0.75, 1.25, 1.5, 1.75 ] ) {
+
+				assert.smartEqual( after.evaluate( time ), before.evaluate( time ), `Curve is unchanged at ${time}.` );
+
+			}
+
+		} );
+
+		QUnit.test( 'optimize preserves Bezier tangent alignment at duplicate times', ( assert ) => {
+
+			const track = new VectorKeyframeTrack( '.position', [ 0, 1, 1, 2 ], [ 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ], InterpolateBezier );
+			track.settings = { inTangents: [], outTangents: [] };
+
+			for ( let i = 0; i < track.times.length; i ++ ) {
+
+				for ( let j = 0; j < 3; j ++ ) {
+
+					track.settings.inTangents.push( track.times[ i ] - 0.25, track.values[ i * 3 + j ] - 1 );
+					track.settings.outTangents.push( track.times[ i ] + 0.25, track.values[ i * 3 + j ] + 1 );
+
+				}
+
+			}
+
+			const original = track.clone();
+			assert.strictEqual( track.optimize(), track, 'Returns the original track.' );
+			assert.smartEqual( track.times, original.times );
+			assert.smartEqual( track.settings.inTangents, original.settings.inTangents );
+			assert.smartEqual( track.settings.outTangents, original.settings.outTangents );
+
+			const before = original.createInterpolant();
+			const after = track.createInterpolant();
+
+			for ( const time of [ 0.5, 1, 1.5 ] ) {
+
+				assert.smartEqual( after.evaluate( time ), before.evaluate( time ), `All components are unchanged at ${time}.` );
+
+			}
 
 		} );
 

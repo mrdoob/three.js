@@ -491,6 +491,10 @@ class KeyframeTrack {
 	 */
 	optimize() {
 
+		// Bezier control points can shape the curve even when neighboring values are equal.
+		// Keep the keys and their tangent data together until curve-aware optimization is supported.
+		if ( this.getInterpolation() === InterpolateBezier ) return this;
+
 		// (0,0,0,0,1,1,1,0,0,0,0,0,0,0) --> (0,0,1,1,0,0)
 
 		// times or values may be shared with other tracks, so overwriting is unsafe
