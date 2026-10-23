@@ -294,7 +294,7 @@
 					lightIntensity: 30
 				};
 
-				let bakeIndex = 0, bakeGrid = 0, bakePass = 0;
+				let bakeGrid = 0, bakePass = 0;
 				let showInitialFrame = true;
 
 				function createProbes( resolution ) {
@@ -348,7 +348,6 @@
 					probesRight.visibilityGridSize = params.visibilityGridSize;
 					probesRight.visible = params.enabled;
 
-					bakeIndex = 0;
 					bakeGrid = 0;
 					bakePass = 0;
 					showInitialFrame = true;
@@ -368,10 +367,9 @@
 
 					if ( bakePass > params.bounces ) return;
 
+					// Bake a complete room before publishing the next frame.
+
 					const probes = bakeGrid === 0 ? probesLeft : probesRight;
-					const resolution = probes.resolution;
-					const totalProbes = resolution.x * resolution.y * resolution.z;
-					const count = Math.min( 16, totalProbes - bakeIndex );
 
 					if ( probesHelperLeft ) probesHelperLeft.visible = false;
 					if ( probesHelperRight ) probesHelperRight.visible = false;
@@ -388,8 +386,6 @@
 							cubemapSize: 32,
 							near: 0.05,
 							far: 20,
-							start: bakeIndex,
-							count,
 							pass: bakePass
 						} );
 
@@ -404,7 +400,7 @@
 
 					// Add a grid once its textures exist, so lighting shaders include it.
 
-					if ( bakePass === 0 && bakeIndex === 0 ) scene.add( probes );
+					if ( bakePass === 0 ) scene.add( probes );
 
 					if ( bakeGrid === 0 && probesHelperLeft === null ) {
 
@@ -420,19 +416,12 @@
 
 					}
 
-					bakeIndex += count;
+					bakeGrid ++;
 
-					if ( bakeIndex === totalProbes ) {
+					if ( bakeGrid === 2 ) {
 
-						bakeIndex = 0;
-						bakeGrid ++;
-
-						if ( bakeGrid === 2 ) {
-
-							bakeGrid = 0;
-							bakePass ++;
-
-						}
+						bakeGrid = 0;
+						bakePass ++;
 
 					}
 
