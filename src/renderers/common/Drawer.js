@@ -39,12 +39,13 @@ class Drawer {
 		this._frustum = new Frustum();
 
 		/**
-		 * The frustum array of the current array camera.
+		 * The frustum array of the current array camera, kept by the render context.
 		 *
 		 * @protected
-		 * @type {FrustumArray}
+		 * @type {?FrustumArray}
+		 * @default null
 		 */
-		this._frustumArray = new FrustumArray();
+		this._frustumArray = null;
 
 		/**
 		 * The view projection matrix of the current camera.
@@ -85,14 +86,21 @@ class Drawer {
 	 * Prepares the drawer for projecting a scene with the given camera.
 	 *
 	 * @param {Camera} camera - The camera.
+	 * @param {RenderContext} renderContext - The render context.
 	 */
-	begin( camera ) {
+	begin( camera, renderContext ) {
 
 		this._projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 
 		if ( camera.isArrayCamera ) {
 
-			this._frustumArray.setFromArrayCamera( camera );
+			// the frustums of the sub-cameras are kept per render context, the backends cull the draws of each sub-camera with them
+
+			if ( renderContext.frustumArray === null ) renderContext.frustumArray = new FrustumArray();
+
+			renderContext.frustumArray.setFromArrayCamera( camera );
+
+			this._frustumArray = renderContext.frustumArray;
 
 		} else {
 

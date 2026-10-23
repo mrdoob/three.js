@@ -3523,9 +3523,9 @@ class GPUDrivenDrawer extends Drawer {
 
 	}
 
-	begin( camera ) {
+	begin( camera, renderContext ) {
 
-		super.begin( camera );
+		super.begin( camera, renderContext );
 		this._checkedGeometries = new WeakSet();
 
 		// the vertices of disposed geometries are reclaimed before the render call
@@ -5085,7 +5085,7 @@ class GPUDrivenDrawer extends Drawer {
 				renderer.setMRT( null );
 				const renderList = renderer._renderLists.get( scene, this._camera, renderer.lighting );
 				this._occlusionDrawer.renderer = renderer;
-				this._occlusionDrawer.begin( this._camera );
+				this._occlusionDrawer.begin( this._camera, renderContext );
 				this._occlusionDrawer.beginRenderList( renderList );
 				this._occlusionDrawer.project( scene, this._camera, 0, renderList, renderContext.clippingContext );
 				this._occlusionDrawer.finishRenderList( renderList );
