@@ -1316,11 +1316,13 @@ class WebGLBackend extends Backend {
 
 			}
 
+			const frustumArray = context.frustumArray;
+
 			for ( let i = 0, len = cameras.length; i < len; i ++ ) {
 
 				const subCamera = cameras[ i ];
 
-				if ( object.layers.test( subCamera.layers ) ) {
+				if ( object.layers.test( subCamera.layers ) && ( object.frustumCulled === false || object.intersectsFrustum( frustumArray.getFrustum( i ) ) ) ) {
 
 					if ( isRenderCameraDepthArray ) {
 
