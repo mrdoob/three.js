@@ -27,7 +27,7 @@ function compare( name, reference, actual ) {
 
 		if ( ! Number.isFinite( a ) || ! Number.isFinite( b ) || error > absoluteTolerance + relativeTolerance * Math.max( Math.abs( a ), Math.abs( b ) ) ) {
 
-			throw new Error( `${ name }: component ${ i }: raster=${ a }, compute=${ b }` );
+			throw new Error( `${ name }: component ${ i }: reference=${ a }, compute=${ b }` );
 
 		}
 
@@ -118,6 +118,48 @@ async function run() {
 
 	}
 
+	function referenceAtlas( grid, projections, start, end, sentinel = 0.125 ) {
+
+		const { x: nx, y: ny, z: nz } = grid.resolution;
+		const paddedSlices = nz + 2;
+		const atlas = new Uint16Array( nx * ny * 7 * paddedSlices * 4 );
+		atlas.fill( THREE.DataUtils.toHalfFloat( sentinel ) );
+
+		for ( let probe = start; probe < end; probe ++ ) {
+
+			const coefficients = new Float32Array( 28 );
+			for ( let c = 0; c < 9; c ++ ) {
+
+				for ( let channel = 0; channel < 3; channel ++ ) {
+
+					let sum = projections[ ( probe * 216 + c * 24 ) * 4 + channel ];
+					for ( let block = 1; block < 24; block ++ ) sum = Math.fround( sum + projections[ ( probe * 216 + c * 24 + block ) * 4 + channel ] );
+					coefficients[ c * 3 + channel ] = sum;
+
+				}
+
+			}
+
+			const x = probe % nx, z = Math.floor( probe / nx ) % nz, y = Math.floor( probe / ( nx * nz ) );
+			for ( let t = 0; t < 7; t ++ ) {
+
+				const slices = [ t * paddedSlices + 1 + z ];
+				if ( z === 0 ) slices.push( t * paddedSlices );
+				if ( z === nz - 1 ) slices.push( t * paddedSlices + 1 + nz );
+				for ( const slice of slices ) {
+
+					for ( let channel = 0; channel < 4; channel ++ ) atlas[ ( slice * nx * ny + y * nx + x ) * 4 + channel ] = THREE.DataUtils.toHalfFloat( coefficients[ t * 4 + channel ] );
+
+				}
+
+			}
+
+		}
+
+		return atlas;
+
+	}
+
 	const cases = [
 		{ model: 'room', resolution: [ 6, 6, 6 ] },
 		{ model: 'room', resolution: [ 14, 7, 7 ] },
@@ -163,12 +205,20 @@ async function run() {
 		const count = config.resolution.reduce( ( a, b ) => a * b );
 		const options = { cubemapSize: 32, near: 0.05, far: size.length() * 2 };
 
-		// A direct bake populates the same projection texture read by both paths.
-		grid.useComputeRepack = false;
+		// Observe the projection target without exposing private bake resources.
+		let projectionTarget;
+		const setRenderTarget = renderer.setRenderTarget;
+		renderer.setRenderTarget = function ( target, ...args ) {
+
+			if ( target?.width === 216 && target.height === count && target.texture.type === THREE.FloatType ) projectionTarget = target;
+			return setRenderTarget.call( this, target, ...args );
+
+		};
+
 		grid.bake( renderer, scene, options );
 		await device.queue.onSubmittedWorkDone();
-		// The bake disables clearing before packing partial atlas viewports.
 		renderer.autoClear = false;
+		const projections = await renderer.readRenderTargetPixelsAsync( projectionTarget, 0, 0, 216, count );
 
 		const nx = config.resolution[ 0 ], nz = config.resolution[ 2 ];
 		const ranges = [[ 0, count ], [ 0, 1 ], [ count - 1, count ], [ 1, count - 1 ], [ nx - 1, nx + 1 ], [ nx * nz - 1, nx * nz + 1 ], [ 0, 0 ]];
@@ -176,57 +226,44 @@ async function run() {
 		for ( const [ start, end ] of ranges ) {
 
 			fillAtlas( grid );
-			grid._repackProbesRaster( renderer, start, end );
-			const raster = await readAtlas( grid );
-			fillAtlas( grid );
-			grid._repackProbesCompute( renderer, start, end );
+			grid._repackProbes( renderer, start, end );
 			const compute = await readAtlas( grid );
-			compare( `${ name } range [${ start }, ${ end }) including padding / untouched texels`, raster, compute );
+			compare( `${ name } range [${ start }, ${ end }) including padding / untouched texels`, referenceAtlas( grid, projections, start, end ), compute );
 
 		}
 
 		renderer.setRenderTarget( null );
 
-		// Exercise the compute-written atlas as the input to later bounce passes.
-		for ( const useCompute of [ false, true ] ) {
-
-			grid.useComputeRepack = useCompute;
-			grid.bake( renderer, scene, { ...options, bounces: 3 } );
-			const atlas = await readAtlas( grid );
-			if ( useCompute === false ) config.reference = atlas;
-			else compare( `${ name } complete four-pass bake`, config.reference, atlas );
-
-		}
+		// Validate the final packed atlas after it feeds three indirect passes.
+		grid.bake( renderer, scene, { ...options, bounces: 3 } );
+		const finalProjections = await renderer.readRenderTargetPixelsAsync( projectionTarget, 0, 0, 216, count );
+		compare( `${ name } complete four-pass bake`, referenceAtlas( grid, finalProjections, 0, count, 0 ), await readAtlas( grid ) );
 
 		if ( ! config.accuracyOnly && ! new URLSearchParams( location.search ).has( 'accuracyOnly' ) ) {
 
 			for ( const kind of [ 'repack', 'bake' ] ) {
 
-				for ( const useCompute of [ false, true ] ) {
+				const operation = kind === 'repack' ? () => grid._repackProbes( renderer, 0, count ) : () => {
 
-					grid.useComputeRepack = useCompute;
-					const operation = kind === 'repack' ? () => grid._repackProbes( renderer, 0, count ) : () => {
+					// A bake is normally requested in a new animation frame. Advance
+					// frame-scoped nodes so shadow updates are included in every bake.
+					renderer._nodes.nodeFrame.update();
+					grid.bake( renderer, scene, { ...options, bounces: 3 } );
 
-						// A bake is normally requested in a new animation frame. Advance
-						// frame-scoped nodes so shadow updates are included in every bake.
-						renderer._nodes.nodeFrame.update();
-						grid.bake( renderer, scene, { ...options, bounces: 3 } );
+				};
 
-					};
-
-					await measure( operation, 1000, 1 );
-					const sample = await measure( operation, 5000, kind === 'repack' ? 8 : 1 );
-					const result = { name, kind, path: useCompute ? 'compute' : 'raster', ...sample };
-					results.throughput.push( result );
-					log( JSON.stringify( result ) );
-
-				}
+				await measure( operation, 1000, 1 );
+				const sample = await measure( operation, 5000, kind === 'repack' ? 8 : 1 );
+				const result = { name, kind, path: 'compute', ...sample };
+				results.throughput.push( result );
+				log( JSON.stringify( result ) );
 
 			}
 
 		}
 
 		renderer.setRenderTarget( null );
+		renderer.setRenderTarget = setRenderTarget;
 		grid.dispose();
 		gltf.scene.traverse( object => {
 
