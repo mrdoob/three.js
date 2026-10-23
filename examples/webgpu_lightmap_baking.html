@@ -48,6 +48,16 @@
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 			import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
 
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+
+			if ( WebGPU.isAvailable() === false ) {
+
+				document.body.appendChild( WebGPU.getErrorMessage() );
+
+				throw new Error( 'No WebGPU support' );
+
+			}
+
 			let camera, scene, renderer, controls, renderPipeline;
 			let light, meshes, materials, atlas, status;
 			let source, lightMapper, bakedPass, livePass, liveOutput;
@@ -60,8 +70,7 @@
 			const params = {
 				output: 'Baked GI',
 				algorithm: 'VXGI',
-				resolution: 1024,
-				lightIntensity: 40
+				resolution: 1024
 			};
 
 			// light probes are deterministic and only need a few samples to antialias the light map,
@@ -71,7 +80,7 @@
 
 			init();
 
-			async function init() {
+			function init() {
 
 				// Camera
 
@@ -156,11 +165,7 @@
 				light.shadow.mapSize.setScalar( 256 );
 				light.shadow.radius = 10;
 				light.shadow.normalBias = - 0.02;
-
-				// the scene is static, so the shadow map is rendered once instead of every frame
-
 				light.shadow.autoUpdate = false;
-				light.shadow.needsUpdate = true;
 				scene.add( light );
 
 				// Renderer
@@ -172,9 +177,6 @@
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
-
-				await renderer.init();
-				if ( renderer.backend.isWebGPUBackend !== true ) throw new Error( 'This example requires WebGPU.' );
 
 				// Controls
 
@@ -202,7 +204,6 @@
 				gui.add( params, 'output', [ 'Baked GI', 'Live GI' ] ).name( 'Output' ).onChange( setOutput );
 				gui.add( params, 'algorithm', [ 'Light Probe', 'VXGI' ] ).name( 'GI Algorithm' ).onChange( requestBake );
 				gui.add( params, 'resolution', [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( requestBake );
-				gui.add( params, 'lightIntensity', 1, 200, 1 ).name( 'Light Intensity' ).debounce( 250 ).onChange( requestBake );
 				gui.add( { bake: requestBake }, 'bake' ).name( 'Re-Bake GI' );
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -218,8 +219,6 @@
 			}
 
 			function bake() {
-
-				light.intensity = params.lightIntensity;
 
 				for ( const material of materials ) material.lightMap = null;
 
@@ -250,7 +249,7 @@
 
 				} else {
 
-					const volume = new VXGIVolume( 256 );
+					const volume = new VXGIVolume();
 					volume.update( renderer, scene );
 
 					// three cones like webgpu_vxgi, shared by the live view and the light map
