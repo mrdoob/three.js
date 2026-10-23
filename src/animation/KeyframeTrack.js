@@ -395,6 +395,15 @@ class KeyframeTrack {
 			this.times = times.slice( from, to );
 			this.values = this.values.slice( from * stride, to * stride );
 
+			if ( AnimationUtils.hasTangents( this.settings ) ) {
+
+				// tangents hold a [ time, value ] pair per component of each keyframe
+				const tangentStride = stride * 2;
+				this.settings.inTangents = this.settings.inTangents.slice( from * tangentStride, to * tangentStride );
+				this.settings.outTangents = this.settings.outTangents.slice( from * tangentStride, to * tangentStride );
+
+			}
+
 		}
 
 		return this;

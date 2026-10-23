@@ -61,6 +61,22 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
+		QUnit.test( 'trim', ( assert ) => {
+
+			const track = new NumberKeyframeTrack( '.material.opacity', [ 0, 1, 2 ], [ 0, 1, 0 ], InterpolateBezier );
+			track.settings = {
+				inTangents: new Float32Array( [ - 0.5, 0, 0.5, 1, 1.5, 0 ] ),
+				outTangents: new Float32Array( [ 0.5, 0, 1.5, 1, 2.5, 0 ] )
+			};
+
+			track.trim( 1, 2 );
+
+			assert.smartEqual( Array.from( track.settings.inTangents ), [ 0.5, 1, 1.5, 0 ] );
+			assert.smartEqual( Array.from( track.settings.outTangents ), [ 1.5, 1, 2.5, 0 ] );
+			assert.strictEqual( track.createInterpolant().evaluate( 1.5 )[ 0 ], 0.5, 'Trimmed curve keeps its shape.' );
+
+		} );
+
 		QUnit.test( 'validate', ( assert ) => {
 
 			const validTrack = new NumberKeyframeTrack( '.material.opacity', [ 0, 1 ], [ 0, 0.5 ] );
