@@ -64,6 +64,7 @@ const exceptionList = [
 	'webgpu_renderer_pathtracer',
 	'webgpu_vxgi',
 	'webgpu_vxgi_sponza',
+	'webgpu_gpudriven_city',
 
 	// Incremental light probe baking
 	'webgl_lightprobes_sponza',
