@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - light baking</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - light baking">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_lightmap_baking.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_lightmap_baking.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Light Baking</span>
+			</div>
+
+			<small>Progressively bake Light Probe or VXGI diffuse irradiance into a UV atlas by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br/><span id="status"></span></small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { builtinGIContext, float, mrt, normalWorld, output, pass, positionWorld, uniform, velocity } from 'three/tsl';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
+			import { LightMapper } from 'three/addons/lighting/LightMapper.js';
+			import { VXGIVolume } from 'three/addons/lighting/vxgi/VXGIVolume.js';
+			import { vxgiIrradiance } from 'three/addons/lighting/vxgi/VXGIIrradiance.js';
+			import { lightProbeGridIrradiance } from 'three/addons/tsl/lighting/LightProbeGridNode.js';
+			import { traa } from 'three/addons/tsl/display/TRAANode.js';
+			import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
+
+			let camera, scene, renderer, controls, renderPipeline;
+			let light, meshes, materials, atlas, status;
+			let source, lightMapper, bakedPass, livePass, liveOutput;
+			let needsBake = true;
+
+			// shifts the per-pixel cone noise of the live view every frame, like the light map samples
+
+			const liveFrame = uniform( 0 );
+
+			const params = {
+				output: 'Baked GI',
+				algorithm: 'VXGI',
+				resolution: 1024,
+				lightIntensity: 40
+			};
+
+			// light probes are deterministic and only need a few samples to antialias the light map,
+			// the VXGI cones are rotated per sample and converge over more samples
+
+			const bakeSamples = { 'Light Probe': 16, 'VXGI': 64 };
+
+			init();
+
+			async function init() {
+
+				// Camera
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 0, 2.5, 8 );
+
+				// Scene
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x111111 );
+
+				// Cornell box
+
+				const wallMaterial = new THREE.MeshStandardMaterial( { color: 0xcccccc } );
+				const redMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
+				const greenMaterial = new THREE.MeshStandardMaterial( { color: 0x00ff00 } );
+
+				// Floor
+				const floor = new THREE.Mesh( new THREE.PlaneGeometry( 6, 6 ), wallMaterial );
+				floor.rotation.x = - Math.PI / 2;
+				floor.receiveShadow = true;
+				scene.add( floor );
+
+				// Ceiling
+				const ceiling = new THREE.Mesh( new THREE.PlaneGeometry( 6, 6 ), wallMaterial );
+				ceiling.rotation.x = Math.PI / 2;
+				ceiling.position.y = 5;
+				ceiling.receiveShadow = true;
+				scene.add( ceiling );
+
+				// Back wall
+				const backWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), wallMaterial );
+				backWall.position.set( 0, 2.5, - 3 );
+				backWall.receiveShadow = true;
+				scene.add( backWall );
+
+				// Front wall
+				const frontWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), wallMaterial );
+				frontWall.rotation.y = Math.PI;
+				frontWall.position.set( 0, 2.5, 3 );
+				frontWall.receiveShadow = true;
+				scene.add( frontWall );
+
+				// Left wall (red)
+				const leftWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), redMaterial );
+				leftWall.rotation.y = Math.PI / 2;
+				leftWall.position.set( - 3, 2.5, 0 );
+				leftWall.receiveShadow = true;
+				scene.add( leftWall );
+
+				// Right wall (green)
+				const rightWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), greenMaterial );
+				rightWall.rotation.y = - Math.PI / 2;
+				rightWall.position.set( 3, 2.5, 0 );
+				rightWall.receiveShadow = true;
+				scene.add( rightWall );
+
+				// Objects inside the box
+
+				const objectMaterial = new THREE.MeshStandardMaterial( { color: 0xeeeeee } );
+
+				// Tall box
+				const tallBox = new THREE.Mesh( new THREE.BoxGeometry( 1.2, 2.5, 1.2 ), objectMaterial );
+				tallBox.position.set( - 0.8, 1.25, - 0.8 );
+				tallBox.rotation.y = Math.PI / 8;
+				tallBox.castShadow = true;
+				tallBox.receiveShadow = true;
+				scene.add( tallBox );
+
+				// Glossy sphere, to show direct specular lighting
+				const glossyMaterial = new THREE.MeshStandardMaterial( { color: 0x0044ff, roughness: 0.15 } );
+				const glossySphere = new THREE.Mesh( new THREE.SphereGeometry( 0.65, 32, 32 ), glossyMaterial );
+				glossySphere.position.set( 1, 0.65, 0.5 );
+				glossySphere.castShadow = true;
+				glossySphere.receiveShadow = true;
+				scene.add( glossySphere );
+
+				// Light
+				light = new THREE.PointLight( 0xffffff, 40 );
+				light.position.set( 0, 4.5, 0 );
+				light.castShadow = true;
+				light.shadow.mapSize.setScalar( 256 );
+				light.shadow.radius = 10;
+				light.shadow.normalBias = - 0.02;
+
+				// the scene is static, so the shadow map is rendered once instead of every frame
+
+				light.shadow.autoUpdate = false;
+				light.shadow.needsUpdate = true;
+				scene.add( light );
+
+				// Renderer
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+				if ( renderer.backend.isWebGPUBackend !== true ) throw new Error( 'This example requires WebGPU.' );
+
+				// Controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 2.5, 0 );
+				controls.update();
+
+				// Light map UVs
+
+				meshes = scene.children.filter( ( object ) => object.isMesh );
+				materials = new Set( meshes.map( ( mesh ) => mesh.material ) );
+				atlas = unwrapUVs( scene, { resolution: params.resolution, padding: 3 } );
+
+				// "Baked GI" shows the light map while it accumulates,
+				// "Live GI" evaluates the raw irradiance per pixel every frame
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				bakedPass = pass( scene, camera );
+
+				status = document.getElementById( 'status' );
+
+				// GUI
+
+				const gui = renderer.inspector.createParameters( 'Light Baking' );
+				gui.add( params, 'output', [ 'Baked GI', 'Live GI' ] ).name( 'Output' ).onChange( setOutput );
+				gui.add( params, 'algorithm', [ 'Light Probe', 'VXGI' ] ).name( 'GI Algorithm' ).onChange( requestBake );
+				gui.add( params, 'resolution', [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( requestBake );
+				gui.add( params, 'lightIntensity', 1, 200, 1 ).name( 'Light Intensity' ).debounce( 250 ).onChange( requestBake );
+				gui.add( { bake: requestBake }, 'bake' ).name( 'Re-Bake GI' );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				renderer.setAnimationLoop( animate );
+
+			}
+
+			function requestBake() {
+
+				needsBake = true;
+
+			}
+
+			function bake() {
+
+				light.intensity = params.lightIntensity;
+
+				for ( const material of materials ) material.lightMap = null;
+
+				lightMapper?.dispose();
+				if ( liveOutput !== livePass ) liveOutput?.dispose();
+				livePass?.dispose();
+				source?.dispose();
+
+				if ( atlas.resolution !== params.resolution ) {
+
+					const geometries = new Set( meshes.map( ( mesh ) => mesh.geometry ) );
+					atlas = unwrapUVs( scene, { resolution: params.resolution, padding: 3 } );
+
+					for ( const geometry of geometries ) geometry.dispose();
+
+				}
+
+				let irradiance;
+
+				if ( params.algorithm === 'Light Probe' ) {
+
+					const probes = new LightProbeGrid( 5.6, 4.7, 5.6, 8, 8, 8 );
+					probes.position.set( 0, 2.45, 0 );
+					probes.updateBoundingBox();
+					probes.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
+					irradiance = ( position, normal ) => lightProbeGridIrradiance( probes, position, normal );
+					source = probes;
+
+				} else {
+
+					const volume = new VXGIVolume( 256 );
+					volume.update( renderer, scene );
+
+					// three cones like webgpu_vxgi, shared by the live view and the light map
+
+					irradiance = vxgiIrradiance( volume, { coneCount: 3 } );
+					source = volume;
+
+				}
+
+				// the light map accumulates one sample per frame in animate()
+
+				lightMapper = new LightMapper( renderer, atlas.resolution, irradiance );
+				lightMapper.addObjects( meshes );
+
+				for ( const material of materials ) material.lightMap = lightMapper.texture;
+
+				// traa needs a single-sampled depth buffer
+
+				livePass = pass( scene, camera, { samples: 0 } );
+				livePass.contextNode = builtinGIContext( float( 1 ), irradiance( positionWorld, normalWorld, liveFrame ) );
+				liveOutput = livePass;
+
+				if ( params.algorithm === 'VXGI' ) {
+
+					// traa resolves the per-pixel cone noise, like webgpu_vxgi
+
+					livePass.setMRT( mrt( { output, velocity } ) );
+					liveOutput = traa( livePass.getTextureNode( 'output' ), livePass.getTextureNode( 'depth' ), livePass.getTextureNode( 'velocity' ), camera );
+
+				}
+
+				setOutput();
+
+			}
+
+			function setOutput() {
+
+				const live = params.output === 'Live GI';
+
+				// discard accumulated samples when switching outputs; baking only runs in Baked GI
+
+				lightMapper.reset();
+
+				for ( const material of materials ) material.lightMapIntensity = live ? 0 : 1;
+
+				renderPipeline.outputNode = live ? liveOutput : bakedPass;
+				renderPipeline.needsUpdate = true;
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				// rebake after the renderer advances its frame so light uniforms are refreshed
+
+				if ( needsBake ) {
+
+					bake();
+					needsBake = false;
+
+				}
+
+				const samples = bakeSamples[ params.algorithm ];
+
+				if ( params.output === 'Live GI' ) {
+
+					liveFrame.value = ( liveFrame.value + 1 ) % 64;
+					status.textContent = `Live ${ params.algorithm }`;
+
+				} else if ( lightMapper.samples < samples ) {
+
+					lightMapper.update();
+					status.textContent = `Baking ${ params.algorithm }: ${ lightMapper.samples } / ${ samples } samples`;
+
+				} else {
+
+					status.textContent = `${ params.algorithm } baked: ${ samples } samples`;
+
+				}
+
+				renderPipeline.render();
+
+			}
+
+		</script>
+	</body>
+</html>
