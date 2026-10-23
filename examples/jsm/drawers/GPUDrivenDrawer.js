@@ -2508,9 +2508,12 @@ class GPUDrivenBatch {
 		const geometry = new BufferGeometry();
 		geometry.setAttribute( 'position', _pulledPositionAttribute );
 
-		// the normals are provided by the context, the attribute enables normal based features like the geometry roughness
+		// the normals and the tangents are provided by the context, the attributes enable the features based on them like the
+		// geometry roughness or the tangents of normal maps, which are derived from the screen space without the attribute
 
 		geometry.setAttribute( 'normal', _pulledPositionAttribute );
+
+		if ( this.clusters.attributeLayout.has( 'tangent' ) ) geometry.setAttribute( 'tangent', _pulledPositionAttribute );
 		geometry.setIndirect( drawAttribute, drawOffset );
 		geometry.boundingSphere = new Sphere( new Vector3(), Infinity );
 
