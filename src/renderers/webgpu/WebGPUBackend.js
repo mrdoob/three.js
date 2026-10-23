@@ -353,6 +353,10 @@ class WebGPUBackend extends Backend {
 
 			const alphaMode = parameters.alpha ? 'premultiplied' : 'opaque';
 
+			// Before applying `outputColorSpace: LinearSRGBColorSpace` to 8-bit contexts,
+			// we must support `workingColorSpace: SRGBColorSpace` for legacy workflows. See #34914.
+			const colorSpace = parameters.outputType === HalfFloatType ? this.renderer.outputColorSpace : undefined;
+
 			const toneMappingMode = parameters.outputType === HalfFloatType ? 'extended' : 'standard';
 
 			context.configure( {
@@ -360,6 +364,7 @@ class WebGPUBackend extends Backend {
 				format: this.utils.getPreferredCanvasFormat(),
 				usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
 				alphaMode: alphaMode,
+				colorSpace: colorSpace,
 				toneMapping: {
 					mode: toneMappingMode
 				}
