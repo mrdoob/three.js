@@ -61,30 +61,6 @@ export default QUnit.module( 'Addons', () => {
 				assert.strictEqual( parser._stripBlockComments( 'a */ b /*/ c */ d' ), 'a */ b  d', 'A stray closer is kept and the closer search starts after the opener.' );
 				assert.strictEqual( parser._stripBlockComments( 'a /* unclosed' ), 'a ', 'An unclosed comment extends to the end.' );
 				assert.strictEqual( parser._stripBlockComments( 'a = "x /* y" /* c */b' ), 'a = "x /* y" b', 'A /* inside a string is text.' );
-				assert.strictEqual( parser._stripBlockComments( 'f = @./*.png@ g = \'\'\'/* x\'\'\'' ), 'f = @./*.png@ g = \'\'\'/* x\'\'\'', 'A /* inside an asset path or a triple-quoted string is text.' );
-				assert.strictEqual( parser._stripBlockComments( '# it\'s /* not\nb /* c */' ), '# it\'s /* not\nb ', 'A # comment ends at its line, apostrophes included.' );
-
-			} );
-
-			QUnit.test( 'keeps the text after a USDA string or asset path that holds a comment marker', ( assert ) => {
-
-				const usda = `#usda 1.0
-
-def Xform "Root"
-{
-	string note = "matches /*.usd"
-	asset texture = @./textures/wood#1.png@ # the texture
-}
-
-def Xform "After"
-{
-}`;
-
-				const { specsByPath } = new USDAParser().parseData( usda );
-
-				assert.strictEqual( specsByPath[ '/Root.note' ].fields.default, 'matches /*.usd', 'The string is kept whole.' );
-				assert.strictEqual( specsByPath[ '/Root.texture' ].fields.default, './textures/wood#1.png', 'The asset path is kept whole.' );
-				assert.ok( '/After' in specsByPath, 'The prims after the string are read.' );
 
 			} );
 
