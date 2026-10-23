@@ -208,15 +208,15 @@ const probeInterpolationWeight = /*@__PURE__*/ Fn( ( [ moments, distance, normal
  * @private
  * @see {@link https://github.com/NVIDIAGameWorks/RTXGI-DDGI/blob/main/rtxgi-sdk/shaders/ddgi/Irradiance.hlsl}
  */
-function evaluateGridIrradianceVisibility( grid, irradianceAtlas ) {
+function evaluateGridIrradianceVisibility( grid, irradianceAtlas, position = positionWorld, normal = normalWorld ) {
 
 	const { min, res, spacing, moments, distanceScale, normalBias, viewBias, momentsSize, irradianceSize, visibilityGridSize } = grid;
 
 	const nx = int( res.x ), nz = int( res.z );
 
 	const clearance = spacing.x.min( spacing.y ).min( spacing.z );
-	const viewDirection = cameraPosition.sub( positionWorld ).normalize();
-	const biased = positionWorld.add( normalWorld.mul( clearance.mul( normalBias ) ) ).add( viewDirection.mul( clearance.mul( viewBias ) ) ).toVar();
+	const viewDirection = cameraPosition.sub( position ).normalize();
+	const biased = position.add( normal.mul( clearance.mul( normalBias ) ) ).add( viewDirection.mul( clearance.mul( viewBias ) ) ).toVar();
 
 	const gridPosition = biased.sub( min ).div( spacing ).clamp( vec3( 0.0 ), res.sub( 1.0 ) ).toVar();
 	const base = gridPosition.floor().min( res.sub( 2.0 ) ).max( 0.0 ).toVar();
@@ -226,7 +226,7 @@ function evaluateGridIrradianceVisibility( grid, irradianceAtlas ) {
 	const weights = float( 0.0 ).toVar();
 
 	// Every probe is sampled in the direction of the normal.
-	const normalOct = octEncode( normalWorld ).mul( IRRADIANCE_RESOLUTION ).add( 1.0 ).toVar();
+	const normalOct = octEncode( normal ).mul( IRRADIANCE_RESOLUTION ).add( 1.0 ).toVar();
 
 	// Keep the node graph small with a shader loop over the corners.
 
@@ -251,7 +251,7 @@ function evaluateGridIrradianceVisibility( grid, irradianceAtlas ) {
 
 		If( probeMoments.x.greaterThanEqual( 0.0 ), () => {
 
-			const weight = probeInterpolationWeight( probeMoments, distance.div( distanceScale ), normalWorld, probePosition.sub( positionWorld ), offset, alpha ).toConst();
+			const weight = probeInterpolationWeight( probeMoments, distance.div( distanceScale ), normal, probePosition.sub( position ), offset, alpha ).toConst();
 
 			const tile = vec2( float( probeIndex.mod( DISTANCE_COLUMNS ) ), float( probeIndex.div( DISTANCE_COLUMNS ) ) );
 			const irradianceUV = tile.mul( IRRADIANCE_TILE ).add( normalOct ).div( irradianceSize );
@@ -301,6 +301,90 @@ const gridInfluence = /*@__PURE__*/ Fn( ( [ position, probeMin, probeMax, influe
 		{ name: 'intensity', type: 'float' }
 	]
 } );
+
+/**
+ * Shares atlas bindings and irradiance evaluation between live lighting and light-map baking.
+ * Intensity and spatial influence are applied by the caller.
+ *
+ * @private
+ */
+function getGridIrradiance( light, grid, position, normal, builder ) {
+
+	const { min, max, res } = grid;
+	const range = max.sub( min );
+	const resMinusOne = res.sub( 1.0 );
+	const spacing = range.div( resMinusOne );
+
+	if ( light.visibility ) {
+
+		const distanceTarget = light._distanceTarget;
+		const irradianceTarget = light._irradianceTarget;
+		builder.renderer.initRenderTarget( distanceTarget );
+		builder.renderer.initRenderTarget( irradianceTarget );
+
+		return evaluateGridIrradianceVisibility( {
+			...grid,
+			spacing,
+			moments: texture( distanceTarget.texture ),
+			visibilityGridSize: light.visibilityGridSize,
+			momentsSize: vec2( distanceTarget.width, distanceTarget.height ),
+			irradianceSize: vec2( irradianceTarget.width, irradianceTarget.height )
+		}, texture( irradianceTarget.texture ), position, normal );
+
+	}
+
+	// Offset along the normal by half a probe spacing, then remap to texel centers.
+
+	const samplePos = position.add( normal.mul( spacing ).mul( 0.5 ) );
+	const uvw = samplePos.sub( min ).div( range ).clamp( 0.0, 1.0 ).mul( resMinusOne ).div( res ).add( vec3( 0.5 ).div( res ) );
+
+	builder.renderer.initRenderTarget( light._renderTarget );
+
+	return getShIrradianceAt( normal, sampleGridSH( texture3D( light.texture ), uvw, res.z ) ).max( vec3( 0.0 ) );
+
+}
+
+/**
+ * Returns the irradiance of a baked {@link LightProbeGrid} at the given world-space
+ * position and normal. Use this to evaluate the grid outside of the lighting context,
+ * e.g. when baking light maps with {@link LightMapper}.
+ *
+ * @param {LightProbeGrid} light - The baked light probe grid.
+ * @param {Node<vec3>} position - The world-space position.
+ * @param {Node<vec3>} normal - The world-space normal.
+ * @return {Node<vec3>} The irradiance.
+ */
+export function lightProbeGridIrradiance( light, position, normal ) {
+
+	const box = light.boundingBox;
+
+	return Fn( ( inputs, builder ) => {
+
+		const min = uniform( box.min ), max = uniform( box.max );
+		const grid = {
+			min,
+			max,
+			res: uniform( light.resolution ),
+			distanceScale: uniform( light._distanceScale ),
+			normalBias: uniform( light.normalBias ),
+			// Light maps must be independent of the camera used to bake them.
+			viewBias: float( 0 )
+		};
+
+		let irradiance = getGridIrradiance( light, grid, position, normal, builder ).mul( uniform( light.intensity ) );
+
+		if ( light.falloff > 0 ) {
+
+			const outside = min.sub( position ).max( 0.0 ).add( position.sub( max ).max( 0.0 ) );
+			irradiance = irradiance.mul( outside.length().smoothstep( 0.0, uniform( light.falloff ) ).oneMinus() );
+
+		}
+
+		return irradiance;
+
+	} )();
+
+}
 
 /**
  * The light node that applies a {@link LightProbeGrid} to the scene. It samples
@@ -388,14 +472,6 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		if ( light.texture === null ) return;
 
-		const min = this._min;
-		const max = this._max;
-		const res = this._resolution;
-
-		const range = max.sub( min );
-		const resMinusOne = res.sub( 1.0 );
-		const spacing = range.div( resMinusOne );
-
 		const lightsData = builder.getDataFromNode( builder.lightsNode );
 
 		if ( lightsData.probeGridInfluenceSum === undefined ) {
@@ -426,39 +502,16 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		If( weight.greaterThan( 0.0 ), () => {
 
-			if ( light.visibility ) {
+			const grid = {
+				min: this._min,
+				max: this._max,
+				res: this._resolution,
+				distanceScale: this._distanceScale,
+				normalBias: this._normalBias,
+				viewBias: this._viewBias
+			};
 
-				const distanceTarget = light._distanceTarget;
-				const irradianceTarget = light._irradianceTarget;
-				builder.renderer.initRenderTarget( distanceTarget );
-				builder.renderer.initRenderTarget( irradianceTarget );
-
-				const grid = {
-					min,
-					res,
-					spacing,
-					moments: texture( distanceTarget.texture ),
-					visibilityGridSize: light.visibilityGridSize,
-					distanceScale: this._distanceScale,
-					normalBias: this._normalBias,
-					viewBias: this._viewBias,
-					momentsSize: vec2( distanceTarget.width, distanceTarget.height ),
-					irradianceSize: vec2( irradianceTarget.width, irradianceTarget.height )
-				};
-
-				result.assign( evaluateGridIrradianceVisibility( grid, texture( irradianceTarget.texture ) ) );
-
-			} else {
-
-				// Offset along the normal by half a probe spacing, then remap to texel centers.
-
-				const samplePos = positionWorld.add( normalWorld.mul( spacing ).mul( 0.5 ) );
-				const uvw = samplePos.sub( min ).div( range ).clamp( 0.0, 1.0 ).mul( resMinusOne ).div( res ).add( vec3( 0.5 ).div( res ) );
-
-				builder.renderer.initRenderTarget( light._renderTarget );
-				result.assign( getShIrradianceAt( normalWorld, sampleGridSH( texture3D( light.texture ), uvw, res.z ) ).max( vec3( 0.0 ) ) );
-
-			}
+			result.assign( getGridIrradiance( light, grid, positionWorld, normalWorld, builder ) );
 
 		} );
 
