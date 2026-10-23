@@ -229,6 +229,7 @@ class TileShadowNode extends ShadowBaseNode {
 		}
 
 		const cameraArray = new ArrayCamera( cameras );
+		cameraArray.perCameraFrustumCulled = true;
 		this.cameraArray = cameraArray;
 
 		// setup() reads depth through this camera.

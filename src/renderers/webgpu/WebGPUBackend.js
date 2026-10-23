@@ -2290,7 +2290,7 @@ class WebGPUBackend extends Backend {
 
 				const subCamera = cameras[ i ];
 
-				if ( object.layers.test( subCamera.layers ) && ( object.frustumCulled === false || object.intersectsFrustum( frustumArray.getFrustum( i ) ) ) ) {
+				if ( object.layers.test( subCamera.layers ) && ( renderObject.camera.perCameraFrustumCulled === false || object.frustumCulled === false || object.intersectsFrustum( frustumArray.getFrustum( i ) ) ) ) {
 
 					const vp = subCamera.viewport;
 

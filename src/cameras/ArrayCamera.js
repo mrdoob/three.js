@@ -47,6 +47,8 @@ class ArrayCamera extends PerspectiveCamera {
 		 */
 		this.cameras = array;
 
+		this.perCameraFrustumCulled = false;
+
 	}
 
 }
