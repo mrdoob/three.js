@@ -48,7 +48,7 @@ const lineRegExp = /^\n+/;
 const commentRegExp = /^\/\*[\s\S]*?\*\//;
 const inlineCommentRegExp = /^\/\/.*?(?=\n|$)/;
 
-const numberRegExp = /^((0x\w+)|((?:\d+(?:\.\d*)?|\.\d+)((e-?\d+)|\w)?))/;
+const numberRegExp = /^((0x\w+)|(\.?\d+\.?\d*((e-?\d+)|\w)?))/;
 const stringDoubleRegExp = /^(\"((?:[^"\\]|\\.)*)\")/;
 const stringSingleRegExp = /^(\'((?:[^'\\]|\\.)*)\')/;
 const literalRegExp = /^[A-Za-z](\w|\.)*/;
