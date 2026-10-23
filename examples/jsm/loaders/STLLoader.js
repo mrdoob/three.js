@@ -290,7 +290,7 @@ class STLLoader extends Loader {
 			const patternName = /solid\s(.+)/;
 			let faceCounter = 0;
 
-			const patternFloat = /[\s]+([+-]?(?:\d*)(?:\.\d*)?(?:[eE][+-]?\d+)?)/.source;
+			const patternFloat = /[\s]+([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)/.source;
 			const patternVertex = new RegExp( 'vertex' + patternFloat + patternFloat + patternFloat, 'g' );
 			const patternNormal = new RegExp( 'normal' + patternFloat + patternFloat + patternFloat, 'g' );
 
