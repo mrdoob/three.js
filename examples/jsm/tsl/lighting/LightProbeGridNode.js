@@ -1,5 +1,5 @@
 import { AnalyticLightNode, NodeUpdateType, Vector3 } from 'three/webgpu';
-import { array, cameraPosition, float, getShIrradianceAt, If, int, Loop, normalWorld, positionWorld, renderGroup, select, texture, texture3D, uniform, vec2, vec3, vec4 } from 'three/tsl';
+import { array, cameraPosition, float, Fn, getShIrradianceAt, If, int, Loop, normalWorld, positionWorld, renderGroup, select, texture, texture3D, uniform, vec2, vec3, vec4 } from 'three/tsl';
 
 // Padding texels at each boundary of every atlas sub-volume.
 export const ATLAS_PADDING = 1;
@@ -24,14 +24,18 @@ const signNotZero = ( value ) => select( value.greaterThanEqual( 0.0 ), float( 1
  * @param {Node<vec3>} direction - The direction.
  * @return {Node<vec2>} The octahedral coordinates.
  */
-export function octEncode( direction ) {
+export const octEncode = /*@__PURE__*/ Fn( ( [ direction ] ) => {
 
-	const p = direction.div( direction.abs().dot( vec3( 1.0 ) ).max( 1e-6 ) );
+	const p = direction.div( direction.abs().dot( vec3( 1.0 ) ).max( 1e-6 ) ).toConst();
 	const folded = vec2( p.y.abs().oneMinus().mul( signNotZero( p.x ) ), p.x.abs().oneMinus().mul( signNotZero( p.y ) ) );
 
 	return select( p.z.lessThan( 0.0 ), folded, p.xy ).mul( 0.5 ).add( 0.5 );
 
-}
+} ).setLayout( {
+	name: 'lightProbeOctEncode',
+	type: 'vec2',
+	inputs: [ { name: 'direction', type: 'vec3' } ]
+} );
 
 /**
  * Returns the probe index and tile texel, mirroring borders across octahedral seams.
@@ -82,14 +86,18 @@ function octTileUV( probeIndex, direction, resolution, atlasSize ) {
  * @param {Node<vec2>} e - The octahedral coordinates.
  * @return {Node<vec3>} The direction.
  */
-export function octDecode( e ) {
+export const octDecode = /*@__PURE__*/ Fn( ( [ e ] ) => {
 
-	const z = float( 1.0 ).sub( e.x.abs() ).sub( e.y.abs() );
+	const z = float( 1.0 ).sub( e.x.abs() ).sub( e.y.abs() ).toConst();
 	const folded = vec2( e.y.abs().oneMinus().mul( signNotZero( e.x ) ), e.x.abs().oneMinus().mul( signNotZero( e.y ) ) );
 
 	return vec3( select( z.lessThan( 0.0 ), folded, e ), z ).normalize();
 
-}
+} ).setLayout( {
+	name: 'lightProbeOctDecode',
+	type: 'vec3',
+	inputs: [ { name: 'e', type: 'vec2' } ]
+} );
 
 /**
  * Packs nine RGB SH coefficients into seven RGBA texels.
@@ -278,6 +286,31 @@ function evaluateGridIrradianceVisibility( grid, sampleIrradiance ) {
 
 }
 
+
+const gridInfluence = /*@__PURE__*/ Fn( ( [ position, probeMin, probeMax, influenceMin, influenceMax, hasInfluenceBox, falloff, intensity ] ) => {
+
+	const inside = position.greaterThanEqual( influenceMin ).all().and( position.lessThanEqual( influenceMax ).all() );
+	const outside = probeMin.sub( position ).max( 0.0 ).add( position.sub( probeMax ).max( 0.0 ) ).toConst();
+	const fade = select( falloff.greaterThan( 0.0 ), outside.length().smoothstep( 0.0, falloff.max( 1e-6 ) ).oneMinus(), 1.0 );
+	const influence = select( hasInfluenceBox.equal( 1 ), select( inside, 1.0, 0.0 ), fade );
+
+	return select( intensity.greaterThan( 0.0 ), influence, 0.0 );
+
+} ).setLayout( {
+	name: 'lightProbeGridInfluence',
+	type: 'float',
+	inputs: [
+		{ name: 'position', type: 'vec3' },
+		{ name: 'probeMin', type: 'vec3' },
+		{ name: 'probeMax', type: 'vec3' },
+		{ name: 'influenceMin', type: 'vec3' },
+		{ name: 'influenceMax', type: 'vec3' },
+		{ name: 'hasInfluenceBox', type: 'int' },
+		{ name: 'falloff', type: 'float' },
+		{ name: 'intensity', type: 'float' }
+	]
+} );
+
 /**
  * The light node that applies a {@link LightProbeGrid} to the scene. It samples
  * the baked L2 spherical-harmonic atlas at the surface position and adds the
@@ -344,16 +377,20 @@ class LightProbeGridNode extends AnalyticLightNode {
 	 * blend their lighting without changing the meaning of their intensities.
 	 *
 	 * @private
+	 * @param {NodeBuilder} builder - The node builder.
 	 * @return {Node<float>} The influence weight.
 	 */
-	getInfluenceWeight() {
+	getInfluenceWeight( builder ) {
 
-		const inside = positionWorld.greaterThanEqual( this._influenceMin ).all().and( positionWorld.lessThanEqual( this._influenceMax ).all() );
-		const outside = this._min.sub( positionWorld ).max( 0.0 ).add( positionWorld.sub( this._max ).max( 0.0 ) );
-		const fade = select( this._falloff.greaterThan( 0.0 ), outside.length().smoothstep( 0.0, this._falloff.max( 1e-6 ) ).oneMinus(), 1.0 );
-		const influence = select( this._hasInfluenceBox.equal( 1 ), select( inside, 1.0, 0.0 ), fade );
+		const nodeData = builder.getDataFromNode( this );
 
-		return select( this._intensity.greaterThan( 0.0 ), influence, 0.0 );
+		if ( nodeData.influenceWeight === undefined ) {
+
+			nodeData.influenceWeight = gridInfluence( positionWorld, this._min, this._max, this._influenceMin, this._influenceMax, this._hasInfluenceBox, this._falloff, this._intensity ).toVar();
+
+		}
+
+		return nodeData.influenceWeight;
 
 	}
 
@@ -406,22 +443,29 @@ class LightProbeGridNode extends AnalyticLightNode {
 		const irradianceAtlas = texture( light._irradianceTarget.texture );
 		const sampleIrradiance = ( uv ) => irradianceAtlas.sample( uv );
 
-		const influence = this.getInfluenceWeight();
-		let totalInfluence = float( 0.0 );
+		const lightsData = builder.getDataFromNode( builder.lightsNode );
 
-		for ( const node of builder.lightsNode.getLightNodes( builder ) ) {
+		if ( lightsData.probeGridInfluenceSum === undefined ) {
 
-			if ( node.light && node.light.isLightProbeGrid && node.light.texture !== null ) {
+			let totalInfluence = float( 0.0 );
 
-				totalInfluence = totalInfluence.add( node.getInfluenceWeight() );
+			for ( const node of builder.lightsNode.getLightNodes( builder ) ) {
+
+				if ( node.light && node.light.isLightProbeGrid && node.light.texture !== null ) {
+
+					totalInfluence = totalInfluence.add( node.getInfluenceWeight( builder ) );
+
+				}
 
 			}
 
+			// Share the normalization across grids, preserving outer boundary fades.
+
+			lightsData.probeGridInfluenceSum = totalInfluence.max( 1.0 ).toVar();
+
 		}
 
-		// Normalize overlapping coverage, preserving fades at the outer boundary.
-
-		const weight = this._intensity.mul( influence ).div( totalInfluence.max( 1.0 ) ).toVar();
+		const weight = this._intensity.mul( this.getInfluenceWeight( builder ) ).div( lightsData.probeGridInfluenceSum ).toVar();
 
 		// Skip lookups when the grid contributes nothing.
 
