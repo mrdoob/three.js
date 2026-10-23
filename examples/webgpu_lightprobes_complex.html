@@ -314,17 +314,17 @@
 
 					}
 
-					// Separate volumes for each room, blended across the divider.
+					// Bound each grid to its room independently of the probe positions.
 
 					probesLeft = new LightProbeGrid( 7.8, 4.7, 7.6, resolution, resolution, resolution );
 					probesLeft.position.set( - 3.9, 2.45, 0 );
-					probesLeft.falloff = 1;
+					probesLeft.influenceBox = new THREE.Box3( new THREE.Vector3( - 8, 0, - 4 ), new THREE.Vector3( 0, 5, 4 ) );
 					probesLeft.visibility = params.visibility;
 					probesLeft.visibilityGridSize = params.visibilityGridSize;
 
 					probesRight = new LightProbeGrid( 7.8, 4.7, 7.6, resolution, resolution, resolution );
 					probesRight.position.set( 3.9, 2.45, 0 );
-					probesRight.falloff = 1;
+					probesRight.influenceBox = new THREE.Box3( new THREE.Vector3( 0, 0, - 4 ), new THREE.Vector3( 8, 5, 4 ) );
 					probesRight.visibility = params.visibility;
 					probesRight.visibilityGridSize = params.visibilityGridSize;
 

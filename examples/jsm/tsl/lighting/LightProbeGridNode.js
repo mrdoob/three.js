@@ -150,7 +150,7 @@ export function sampleGridSH( atlas, uvw, nz ) {
 	const uvZBase = uvw.z.mul( nz ).add( ATLAS_PADDING );
 
 	const s = [];
-	for ( let t = 0; t < 7; t ++ ) s.push( atlas.sample( vec3( uvw.xy, uvZBase.add( paddedSlices.mul( t ) ).div( atlasDepth ) ) ) );
+	for ( let t = 0; t < 7; t ++ ) s.push( atlas.sample( vec3( uvw.xy, uvZBase.add( paddedSlices.mul( t ) ).div( atlasDepth ) ) ).level( 0 ) );
 
 	return unpackGridSH( s );
 
@@ -296,7 +296,7 @@ function evaluateGridIrradianceVisibility( grid, irradianceAtlas, position = pos
  *
  * @private
  */
-function getGridIrradiance( light, grid, position, normal, builder ) {
+function sampleGridIrradiance( light, grid, position, normal, builder ) {
 
 	const { min, max, res } = grid;
 	const range = max.sub( min );
@@ -333,6 +333,44 @@ function getGridIrradiance( light, grid, position, normal, builder ) {
 }
 
 /**
+ * Applies the same influence boundary to SH and visibility-aware sampling.
+ *
+ * @private
+ */
+function getGridIrradiance( light, grid, position, normal, builder ) {
+
+	return Fn( () => {
+
+		const { min, max, influenceMin, influenceMax, hasInfluenceBox, falloff } = grid;
+		const result = vec3( 0.0 ).toVar();
+		const inside = position.greaterThanEqual( influenceMin ).all().and( position.lessThanEqual( influenceMax ).all() );
+
+		If( hasInfluenceBox.equal( 0 ).or( inside ), () => {
+
+			result.assign( sampleGridIrradiance( light, grid, position, normal, builder ) );
+
+			// Explicit influence bounds replace the fade outside the probe bounds.
+
+			if ( light.falloff > 0 ) {
+
+				If( hasInfluenceBox.equal( 0 ), () => {
+
+					const outside = min.sub( position ).max( 0.0 ).add( position.sub( max ).max( 0.0 ) );
+					result.mulAssign( outside.length().smoothstep( 0.0, falloff ).oneMinus() );
+
+				} );
+
+			}
+
+		} );
+
+		return result;
+
+	} )();
+
+}
+
+/**
  * Returns the irradiance of a baked {@link LightProbeGrid} at the given world-space
  * position and normal. Use this to evaluate the grid outside of the lighting context,
  * e.g. when baking light maps with {@link LightMapper}.
@@ -345,6 +383,7 @@ function getGridIrradiance( light, grid, position, normal, builder ) {
 export function lightProbeGridIrradiance( light, position, normal ) {
 
 	const box = light.boundingBox;
+	const influence = light.influenceBox || box;
 
 	return Fn( ( inputs, builder ) => {
 
@@ -352,6 +391,10 @@ export function lightProbeGridIrradiance( light, position, normal ) {
 		const grid = {
 			min,
 			max,
+			influenceMin: uniform( influence.min ),
+			influenceMax: uniform( influence.max ),
+			hasInfluenceBox: uniform( light.influenceBox !== null ? 1 : 0, 'int' ),
+			falloff: uniform( light.falloff ),
 			res: uniform( light.resolution ),
 			distanceScale: uniform( light._distanceScale ),
 			normalBias: uniform( light.normalBias ),
@@ -359,16 +402,7 @@ export function lightProbeGridIrradiance( light, position, normal ) {
 			viewBias: float( 0 )
 		};
 
-		let irradiance = getGridIrradiance( light, grid, position, normal, builder ).mul( uniform( light.intensity ) );
-
-		if ( light.falloff > 0 ) {
-
-			const outside = min.sub( position ).max( 0.0 ).add( position.sub( max ).max( 0.0 ) );
-			irradiance = irradiance.mul( outside.length().smoothstep( 0.0, uniform( light.falloff ) ).oneMinus() );
-
-		}
-
-		return irradiance;
+		return getGridIrradiance( light, grid, position, normal, builder ).mul( uniform( light.intensity ) );
 
 	} )();
 
@@ -400,6 +434,9 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		this._min = uniform( new Vector3() ).setGroup( renderGroup );
 		this._max = uniform( new Vector3() ).setGroup( renderGroup );
+		this._influenceMin = uniform( new Vector3() ).setGroup( renderGroup );
+		this._influenceMax = uniform( new Vector3() ).setGroup( renderGroup );
+		this._hasInfluenceBox = uniform( 0, 'int' ).setGroup( renderGroup );
 		this._resolution = uniform( new Vector3() ).setGroup( renderGroup );
 		this._intensity = uniform( 1 ).setGroup( renderGroup );
 		this._falloff = uniform( 0 ).setGroup( renderGroup );
@@ -417,6 +454,9 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		this._min.value.copy( light.boundingBox.min );
 		this._max.value.copy( light.boundingBox.max );
+		this._influenceMin.value.copy( ( light.influenceBox || light.boundingBox ).min );
+		this._influenceMax.value.copy( ( light.influenceBox || light.boundingBox ).max );
+		this._hasInfluenceBox.value = light.influenceBox !== null ? 1 : 0;
 		this._resolution.value.copy( light.resolution );
 		this._intensity.value = light.intensity;
 		this._falloff.value = light.falloff;
@@ -444,6 +484,10 @@ class LightProbeGridNode extends AnalyticLightNode {
 			const grid = {
 				min: this._min,
 				max: this._max,
+				influenceMin: this._influenceMin,
+				influenceMax: this._influenceMax,
+				hasInfluenceBox: this._hasInfluenceBox,
+				falloff: this._falloff,
 				res: this._resolution,
 				distanceScale: this._distanceScale,
 				normalBias: this._normalBias,
@@ -454,16 +498,7 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		} );
 
-		let irradiance = result.mul( this._intensity );
-
-		if ( light.falloff > 0 ) {
-
-			const outside = this._min.sub( positionWorld ).max( 0.0 ).add( positionWorld.sub( this._max ).max( 0.0 ) );
-			irradiance = irradiance.mul( outside.length().smoothstep( 0.0, this._falloff ).oneMinus() );
-
-		}
-
-		builder.context.irradiance.addAssign( irradiance );
+		builder.context.irradiance.addAssign( result.mul( this._intensity ) );
 
 	}
 
