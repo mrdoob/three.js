@@ -45,7 +45,7 @@ try {
 
 	const result = await page.evaluate( async () => {
 
-		// the warnings of the drawer, counted in each phase
+		// the warnings of the drawer, the budgets grow silently
 
 		const warnings = [];
 		const consoleWarn = console.warn;
@@ -122,7 +122,7 @@ try {
 		const first = await renderer.readRenderTargetPixelsAsync( target, 0, 0, size, size );
 
 		// the counters are read a few projections after the culling was created, the culling is resized after. the
-		// first read of a budget calibrates it to the visible clusters and is not reported
+		// first read of a budget calibrates it to the visible clusters
 
 		await render( 8 );
 
@@ -137,9 +137,8 @@ try {
 		}
 
 		const calibratedBudget = entry.queueBudget;
-		const calibrationWarnings = warnings.length;
 
-		// more visible objects than the measured budget: the overflow is reported
+		// more visible objects than the measured budget: the budget grows
 
 		for ( let x = 0; x < 16; x ++ ) {
 
@@ -176,7 +175,6 @@ try {
 			sameCulling: record().culling === culling,
 			initialQueue,
 			calibratedBudget,
-			calibrationWarnings,
 			firstDifferent,
 			warnings: warnings.length,
 			queue: entry.batch.queueCapacity,
@@ -190,15 +188,14 @@ try {
 
 	assert.ok( result.calibratedBudget <= result.initialQueue, `The first queue must hold all visible clusters ( ${ result.initialQueue } -> ${ result.calibratedBudget } ).` );
 	assert.equal( result.firstDifferent, 0, `The first render differs from the calibrated render in ${ result.firstDifferent } pixels.` );
-	assert.equal( result.calibrationWarnings, 0, 'The calibration of a budget must not be reported.' );
 	assert.ok( result.budget > result.calibratedBudget, `The measured budget must grow after the next overflow ( ${ result.calibratedBudget } -> ${ result.budget } ).` );
-	assert.equal( result.warnings, 1, 'An overflow of a measured budget must be reported once.' );
+	assert.equal( result.warnings, 0, 'The growth of a budget must not be reported.' );
 	assert.ok( result.queue >= result.budget, 'The resized queue must hold the budget.' );
 	assert.equal( result.sameCulling, true, 'The culling must be resized, not created again.' );
 	assert.equal( result.different, 0, `The grown queue differs from the regular pipeline in ${ result.different } of ${ result.pixels } pixels.` );
 	assert.deepEqual( result.gpuErrors, [] );
 	assert.deepEqual( errors, [] );
-	console.log( `GPU-driven budget passed: queue ${ result.initialQueue } complete first render -> ${ result.calibratedBudget } calibrated silently -> ${ result.budget } reported, exact pixels.` );
+	console.log( `GPU-driven budget passed: queue ${ result.initialQueue } complete first render -> ${ result.calibratedBudget } calibrated -> ${ result.budget } grown silently, exact pixels.` );
 
 } finally {
 

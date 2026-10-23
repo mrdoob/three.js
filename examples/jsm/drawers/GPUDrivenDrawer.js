@@ -19,8 +19,7 @@ import {
 	NoBlending,
 	VSMShadowMap,
 	NodeMaterial,
-	MeshBasicNodeMaterial,
-	warnOnce
+	MeshBasicNodeMaterial
 } from 'three/webgpu';
 
 import {
@@ -4776,7 +4775,7 @@ class GPUDrivenDrawer extends Drawer {
 	 * Reads the counters of the culling of a render list every interval of projections, without waiting for the
 	 * GPU. The visible clusters of the last frame which exceeded the budget of the clusters or the queue of a batch
 	 * were not drawn: the budgets grow and the culling is resized in the next projection. The first read of a budget
-	 * calibrates its estimate, only budgets exceeded after they were measured are reported.
+	 * calibrates its estimate.
 	 *
 	 * @private
 	 * @param {Object} record - The record of the render list.
@@ -4805,18 +4804,14 @@ class GPUDrivenDrawer extends Drawer {
 
 			let exceeded = false;
 			let shrink = false;
-			let reported = false;
 			let drawn = 0;
 
 			if ( counters[ 0 ] > culling.capacity.clusters ) {
 
 				record.clusterBudget = Math.ceil( counters[ 0 ] * CULLING_GROWTH );
 				exceeded = true;
-				reported = record.clustersMeasured;
 
 			}
-
-			record.clustersMeasured = true;
 
 			for ( const [ entry, batch, index, queueCapacity ] of batches ) {
 
@@ -4828,8 +4823,6 @@ class GPUDrivenDrawer extends Drawer {
 
 					entry.queueBudget = Math.ceil( visible * CULLING_GROWTH );
 					exceeded = true;
-
-					if ( entry.queueMeasured === true ) reported = true;
 
 				} else if ( entry.queueMeasured === false ) {
 
@@ -4863,8 +4856,6 @@ class GPUDrivenDrawer extends Drawer {
 			}
 
 			if ( exceeded === true ) {
-
-				if ( reported === true ) warnOnce( 'GPUDrivenDrawer: The visible clusters exceeded the budget of the culling, the buffers are resized.' );
 
 				record.needsResize = true;
 
@@ -5154,7 +5145,7 @@ class GPUDrivenDrawer extends Drawer {
 
 		if ( record === undefined ) {
 
-			record = { entries: [], lookup: new Map(), staticGroups: new Map(), view: null, culling: null, projectionId: - 1, staticInstanceCount: 0, poolVersion: - 1, clusterBudget: 0, clustersMeasured: false, needsResize: false, readback: null, readbackProjections: 0, occlusionSkipped: false, occlusionProjections: 0, occlusionVisibility: null };
+			record = { entries: [], lookup: new Map(), staticGroups: new Map(), view: null, culling: null, projectionId: - 1, staticInstanceCount: 0, poolVersion: - 1, clusterBudget: 0, needsResize: false, readback: null, readbackProjections: 0, occlusionSkipped: false, occlusionProjections: 0, occlusionVisibility: null };
 
 			this._renderListBatches.set( renderList, record );
 			this._records.add( new WeakRef( record ) );
