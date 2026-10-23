@@ -3417,7 +3417,14 @@ class GLTFParser {
 		let sourceURI = sourceDef.uri || '';
 		let isObjectURL = false;
 
-		if ( sourceDef.bufferView !== undefined ) {
+		if ( sourceDef.bufferView !== undefined && loader === options.ktx2Loader ) {
+
+			// KTX2Loader parses the binary image data from bufferView directly. A Blob and
+			// an object URL would copy the data and read it back on the main thread.
+
+			sourceURI = parser.getDependency( 'bufferView', sourceDef.bufferView );
+
+		} else if ( sourceDef.bufferView !== undefined ) {
 
 			// Load binary image data from bufferView, if provided.
 
@@ -3455,7 +3462,15 @@ class GLTFParser {
 
 				}
 
-				loader.load( LoaderUtils.resolveURL( sourceURI, options.path ), onLoad, undefined, reject );
+				if ( sourceURI instanceof ArrayBuffer ) {
+
+					loader.parse( sourceURI, onLoad, reject );
+
+				} else {
+
+					loader.load( LoaderUtils.resolveURL( sourceURI, options.path ), onLoad, undefined, reject );
+
+				}
 
 			} );
 
