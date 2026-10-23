@@ -4,7 +4,6 @@ import { bindAnalyticNoise } from '../utils/RNoise.js';
 import { ENV_RAY_LENGTH_THRESHOLD } from '../utils/SpecularHelpers.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
-const _size = /*@__PURE__*/ new Vector2();
 
 let _rendererState;
 
@@ -238,6 +237,7 @@ const toTextureNode = ( value ) => {
 /**
  * Post processing node for denoising temporally-accumulated screen-space effects
  * such as SSGI (ambient occlusion / indirect diffuse) and SSR (specular reflections).
+ * The output and spatial sampling distances follow the input texture's resolution.
  *
  * The denoising kernel is selected at construction time via `mode`:
  * `'diffuse'` (SSGI) or `'specular'` (SSR). The kernel uses a fixed 8-sample Vogel disk.
@@ -372,9 +372,10 @@ class RecurrentDenoiseNode extends Node {
 
 		const { renderer } = frame;
 
-		const drawingBufferSize = renderer.getDrawingBufferSize( _size );
-		const width = drawingBufferSize.width;
-		const height = drawingBufferSize.height;
+		// Update the input before sizing the output, including on the first frame or after a resize.
+		if ( this.textureNode.isPassTextureNode === true ) frame.updateBeforeNode( this.textureNode.passNode );
+
+		const { width, height } = this.textureNode.value.image;
 
 		const needsRestart = this._renderTarget.width !== width || this._renderTarget.height !== height;
 		this.setSize( width, height );
@@ -390,12 +391,6 @@ class RecurrentDenoiseNode extends Node {
 		}
 
 		if ( frame.frameId !== undefined ) this._noiseIndex.value = frame.frameId;
-
-		// Denoise renders via an internal _quadMesh, not through the RenderPipeline output graph.
-		// Upstream passes (e.g. TemporalReprojectNode) referenced by a PassTextureNode input are
-		// otherwise never scheduled, their updateBefore() would not run and this pass would sample
-		// a stale/empty render target.
-		if ( this.textureNode.isPassTextureNode === true ) frame.updateBeforeNode( this.textureNode.passNode );
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
@@ -419,6 +414,8 @@ class RecurrentDenoiseNode extends Node {
 	}
 
 	setup( builder ) {
+
+		this.textureNode.build( builder );
 
 		const sampleAnalyticNoise = bindAnalyticNoise( this._resolution, NOISE_ROTATION_SEED );
 

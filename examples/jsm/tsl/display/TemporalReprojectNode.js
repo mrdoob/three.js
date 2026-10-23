@@ -457,7 +457,6 @@ function bindTemporalCameraUniforms( camera ) {
 }
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
-const _size = /*@__PURE__*/ new Vector2();
 
 let _rendererState;
 
@@ -479,6 +478,8 @@ const VARIANCE_GAMMA_MAX = 1;
 
 /**
  * Temporal reprojection pass for denoising screen-space effects (SSGI, SSR, etc.).
+ * History and output buffers follow the depth input's resolution so depth copies
+ * and reprojection use the same pixel grid.
  *
  * Both modes share geometrically-weighted 4-tap bilinear history sampling and YCoCg variance clipping.
  * Surface velocity reprojection is always sampled first. Specular mode then blends in
@@ -624,12 +625,6 @@ class TemporalReprojectNode extends Node {
 
 		const { renderer } = frame;
 
-		this._cameraUniforms.updateFromCamera( this.camera );
-
-		const drawingBufferSize = renderer.getDrawingBufferSize( _size );
-		const width = drawingBufferSize.width;
-		const height = drawingBufferSize.height;
-
 		if ( this._needsPostProcessingSync === true ) {
 
 			this.setViewOffset();
@@ -637,9 +632,15 @@ class TemporalReprojectNode extends Node {
 
 		}
 
+		if ( this.beautyNode.isPassTextureNode === true ) frame.updateBeforeNode( this.beautyNode.passNode );
+		if ( this.depthNode.isPassTextureNode === true ) frame.updateBeforeNode( this.depthNode.passNode );
+
+		this._cameraUniforms.updateFromCamera( this.camera );
+
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
 		const currentDepth = this.depthNode.value;
+		const { width, height } = currentDepth.image;
 		const historyDepth = this._historyRenderTarget.depthTexture;
 
 		const depthFormatChanged = historyDepth.format !== currentDepth.format || historyDepth.type !== currentDepth.type;
@@ -721,8 +722,9 @@ class TemporalReprojectNode extends Node {
 
 	setup( builder ) {
 
-		// Ensures the pass providing the depth updates before this node.
+		// Prepare upstream passes before updateBefore() reads their texture sizes.
 
+		this.beautyNode.build( builder );
 		this.depthNode.build( builder );
 
 		const sharedContext = context( builder.getSharedContext() );

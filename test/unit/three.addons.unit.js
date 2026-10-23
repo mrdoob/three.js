@@ -21,4 +21,5 @@ import './addons/exporters/EXRExporter.tests.js';
 import './addons/exporters/OBJExporter.tests.js';
 import './addons/exporters/USDZExporter.tests.js';
 import './addons/tsl/WebGLNodesHandler.tests.js';
+import './addons/tsl/ScreenSpaceResolution.tests.js';
 import './addons/postprocessing/GTAOPass.tests.js';

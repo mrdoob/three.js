@@ -2,7 +2,6 @@ import { RenderTarget, Vector2, Node, QuadMesh, NodeMaterial, RendererUtils, Mat
 import { clamp, normalize, reference, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, bool, getNormalFromDepth, countOneBits, interleavedGradientNoise, property, outputStruct, context, isBackgroundDepth } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
-const _size = /*@__PURE__*/ new Vector2();
 
 // From Activision GTAO paper: https://www.activision.com/cdn/research/s2016_pbs_activision_occlusion.pptx
 const _temporalRotations = [ 60, 300, 180, 240, 120, 0 ];
@@ -12,6 +11,8 @@ let _rendererState;
 
 /**
  * Post processing node for applying Screen Space Global Illumination (SSGI) to a scene.
+ * The effect runs at the depth input's resolution. Beauty, depth and normals should
+ * describe the same pixel grid; upscaling is left to the output pipeline.
  *
  * References:
  * - {@link https://github.com/cdrinmatane/SSRT3}.
@@ -358,12 +359,16 @@ class SSGINode extends Node {
 
 		const { renderer } = frame;
 
+		// Update source passes before reading their size, including on the first frame or after a resize.
+		if ( this.beautyNode.isPassTextureNode === true ) frame.updateBeforeNode( this.beautyNode.passNode );
+		if ( this.depthNode.isPassTextureNode === true ) frame.updateBeforeNode( this.depthNode.passNode );
+
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
 		//
 
-		const size = renderer.getDrawingBufferSize( _size );
-		this.setSize( size.width, size.height );
+		const { width, height } = this.depthNode.value.image;
+		this.setSize( width, height );
 
 		// update temporal uniforms
 
@@ -408,6 +413,9 @@ class SSGINode extends Node {
 	 * @return {PassTextureNode}
 	 */
 	setup( builder ) {
+
+		this.beautyNode.build( builder );
+		this.depthNode.build( builder );
 
 		const renderer = builder.renderer;
 
