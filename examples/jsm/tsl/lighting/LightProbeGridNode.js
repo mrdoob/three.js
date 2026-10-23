@@ -172,7 +172,7 @@ function chebyshevVisibility( moments, distance ) {
 
 // Share the visibility and interpolation math across grids. Texture bindings
 // remain per grid, so each volume still performs its own atlas lookups.
-const probeInterpolationWeight = /*@__PURE__*/ Fn( ( [ moments, distance, normal, toProbe, offset, alpha ] ) => {
+const probeInterpolationWeight = /*@__PURE__*/ Fn( ( [ moments, distance, normal, toProbe ] ) => {
 
 	const visibility = chebyshevVisibility( moments, distance );
 	const direction = toProbe.div( toProbe.length().max( 1e-6 ) ).toConst();
@@ -185,9 +185,7 @@ const probeInterpolationWeight = /*@__PURE__*/ Fn( ( [ moments, distance, normal
 
 	} );
 
-	const blend = offset.mul( alpha ).add( offset.oneMinus().mul( alpha.oneMinus() ) ).max( vec3( 0.001 ) ).toConst();
-
-	return weight.mul( blend.x.mul( blend.y ).mul( blend.z ) );
+	return weight;
 
 } ).setLayout( {
 	name: 'lightProbeInterpolationWeight',
@@ -196,17 +194,16 @@ const probeInterpolationWeight = /*@__PURE__*/ Fn( ( [ moments, distance, normal
 		{ name: 'moments', type: 'vec2' },
 		{ name: 'distance', type: 'float' },
 		{ name: 'normal', type: 'vec3' },
-		{ name: 'toProbe', type: 'vec3' },
-		{ name: 'offset', type: 'vec3' },
-		{ name: 'alpha', type: 'vec3' }
+		{ name: 'toProbe', type: 'vec3' }
 	]
 } );
 
 /**
- * Blends eight probes with trilinear, wrapped-normal and Chebyshev visibility weights.
+ * Blends four probes with tetrahedral, wrapped-normal and Chebyshev visibility weights.
  *
  * @private
  * @see {@link https://github.com/NVIDIAGameWorks/RTXGI-DDGI/blob/main/rtxgi-sdk/shaders/ddgi/Irradiance.hlsl}
+ * @see {@link https://diglib.eg.org/items/1059265a-b11c-41ce-b1f0-4953c34a5105}
  */
 function evaluateGridIrradianceVisibility( grid, irradianceAtlas, position = positionWorld, normal = normalWorld ) {
 
@@ -228,11 +225,23 @@ function evaluateGridIrradianceVisibility( grid, irradianceAtlas, position = pos
 	// Every probe is sampled in the direction of the normal.
 	const normalOct = octEncode( normal ).mul( IRRADIANCE_RESOLUTION ).add( 1.0 ).toVar();
 
-	// Keep the node graph small with a shader loop over the corners.
+	// Split each cell into six tetrahedra along its minimum-to-maximum diagonal.
+	// Resolve ties with opposite priorities to keep max/min axes distinct.
+	const maxAxis = select( alpha.x.greaterThanEqual( alpha.y ).and( alpha.x.greaterThanEqual( alpha.z ) ), int( 0 ), select( alpha.y.greaterThanEqual( alpha.z ), int( 1 ), int( 2 ) ) ).toConst();
+	const minAxis = select( alpha.z.lessThanEqual( alpha.x ).and( alpha.z.lessThanEqual( alpha.y ) ), int( 2 ), select( alpha.y.lessThanEqual( alpha.x ), int( 1 ), int( 0 ) ) ).toConst();
+	const maxCorner = vec3( select( maxAxis.equal( 0 ), 1.0, 0.0 ), select( maxAxis.equal( 1 ), 1.0, 0.0 ), select( maxAxis.equal( 2 ), 1.0, 0.0 ) ).toConst();
+	const minCorner = vec3( select( minAxis.equal( 0 ), 1.0, 0.0 ), select( minAxis.equal( 1 ), 1.0, 0.0 ), select( minAxis.equal( 2 ), 1.0, 0.0 ) ).toConst();
+	const alphaMax = alpha.x.max( alpha.y ).max( alpha.z ).toConst();
+	const alphaMin = alpha.x.min( alpha.y ).min( alpha.z ).toConst();
+	const alphaMid = alpha.x.add( alpha.y ).add( alpha.z ).sub( alphaMax ).sub( alphaMin ).toConst();
 
-	Loop( 8, ( { i: corner } ) => {
+	Loop( 4, ( { i: corner } ) => {
 
-		const offset = vec3( corner.bitAnd( 1 ), corner.shiftRight( 1 ).bitAnd( 1 ), corner.shiftRight( 2 ).bitAnd( 1 ) ).toVar();
+		const offset = select( corner.equal( 0 ), vec3( 0.0 ), select( corner.equal( 1 ), maxCorner, select( corner.equal( 2 ), minCorner.oneMinus(), vec3( 1.0 ) ) ) ).toVar();
+
+		// Keep zero barycentric weights at shared faces to preserve continuity.
+
+		const tetraWeight = select( corner.equal( 0 ), alphaMax.oneMinus(), select( corner.equal( 1 ), alphaMax.sub( alphaMid ), select( corner.equal( 2 ), alphaMid.sub( alphaMin ), alphaMin ) ) ).max( 0.0 ).toConst();
 		const cell = base.add( offset ).toVar();
 		const probePosition = min.add( cell.mul( spacing ) ).toVar();
 
@@ -240,23 +249,26 @@ function evaluateGridIrradianceVisibility( grid, irradianceAtlas, position = pos
 
 		const toReceiver = biased.sub( probePosition ).toConst();
 		const distance = toReceiver.length().max( 1e-6 ).toConst();
-		const direction = toReceiver.div( distance );
+
+		// Octahedral mapping is homogeneous; retain the distance only for visibility.
+
+		const direction = toReceiver;
 
 		const ix = int( cell.x ).toVar(), iy = int( cell.y ).toVar(), iz = int( cell.z ).toVar();
 		const probeIndex = ix.add( iz.mul( nx ) ).add( iy.mul( nx ).mul( nz ) ).toVar();
 		const momentsUV = octTileUV( probeIndex, direction, visibilityGridSize, momentsSize );
-		const probeMoments = moments.sample( momentsUV ).xy.toVar();
+		const probeMoments = moments.sample( momentsUV ).level( 0 ).setUpdateMatrix( false ).xy.toVar();
 
 		// Inactive probes are excluded before accumulating any weights.
 
 		If( probeMoments.x.greaterThanEqual( 0.0 ), () => {
 
-			const weight = probeInterpolationWeight( probeMoments, distance.div( distanceScale ), normal, probePosition.sub( position ), offset, alpha ).toConst();
+			const weight = probeInterpolationWeight( probeMoments, distance.div( distanceScale ), normal, probePosition.sub( position ) ).mul( tetraWeight ).toConst();
 
 			const tile = vec2( float( probeIndex.mod( DISTANCE_COLUMNS ) ), float( probeIndex.div( DISTANCE_COLUMNS ) ) );
 			const irradianceUV = tile.mul( IRRADIANCE_TILE ).add( normalOct ).div( irradianceSize );
 
-			total.addAssign( irradianceAtlas.sample( irradianceUV ).rgb.mul( weight ) );
+			total.addAssign( irradianceAtlas.sample( irradianceUV ).level( 0 ).setUpdateMatrix( false ).rgb.mul( weight ) );
 			weights.addAssign( weight );
 
 		} );

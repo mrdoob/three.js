@@ -735,9 +735,10 @@ class LightProbeGrid extends Light {
 
 		/**
 		 * Whether shading weighs each probe by whether it can see the surface, using
-		 * distance moments recorded during the bake. This keeps light from leaking
-		 * through walls between probes, at the cost of more texture reads per
-		 * fragment. Set before the first bake; recreate the grid to change it.
+		 * distance moments recorded during the bake and four-probe tetrahedral
+		 * interpolation. This keeps light from leaking through walls between probes,
+		 * at the cost of more texture reads per fragment. Set before the first bake;
+		 * recreate the grid to change it.
 		 *
 		 * @type {boolean}
 		 * @default false
