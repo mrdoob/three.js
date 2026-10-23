@@ -1,5 +1,5 @@
 import { AnalyticLightNode, NodeUpdateType, Vector3 } from 'three/webgpu';
-import { array, getShIrradianceAt, normalWorld, positionWorld, renderGroup, texture3D, uniform, vec3 } from 'three/tsl';
+import { array, Fn, getShIrradianceAt, If, normalWorld, positionWorld, renderGroup, texture3D, uniform, vec3 } from 'three/tsl';
 
 // Padding texels at each boundary of every atlas sub-volume.
 export const ATLAS_PADDING = 1;
@@ -26,7 +26,7 @@ function evaluateGridIrradiance( atlas, uvw, res, normal ) {
 	const atlasDepth = paddedSlices.mul( 7.0 );
 	const uvZBase = uvw.z.mul( nz ).add( ATLAS_PADDING );
 
-	const slice = ( t ) => atlas.sample( vec3( uvw.xy, uvZBase.add( paddedSlices.mul( t ) ).div( atlasDepth ) ) );
+	const slice = ( t ) => atlas.sample( vec3( uvw.xy, uvZBase.add( paddedSlices.mul( t ) ).div( atlasDepth ) ) ).level( 0 );
 
 	const s0 = slice( 0 ), s1 = slice( 1 ), s2 = slice( 2 ), s3 = slice( 3 );
 	const s4 = slice( 4 ), s5 = slice( 5 ), s6 = slice( 6 );
@@ -61,33 +61,49 @@ function evaluateGridIrradiance( atlas, uvw, res, normal ) {
  * @param {Node<float>} falloff - The falloff distance.
  * @param {Node<vec3>} position - The world-space position.
  * @param {Node<vec3>} normal - The world-space normal.
+ * @param {Node<vec3>} influenceMin - The minimum influence bounds.
+ * @param {Node<vec3>} influenceMax - The maximum influence bounds.
+ * @param {Node<int>} hasInfluenceBox - Whether explicit influence bounds are set.
  * @return {Node<vec3>} The irradiance.
  */
-function getGridIrradiance( light, min, max, res, intensity, falloff, position, normal ) {
+function getGridIrradiance( light, min, max, res, intensity, falloff, position, normal, influenceMin, influenceMax, hasInfluenceBox ) {
 
-	const range = max.sub( min );
-	const resMinusOne = res.sub( 1.0 );
-	const spacing = range.div( resMinusOne );
+	return Fn( () => {
 
-	// Offset along the normal by half a probe spacing, then remap to texel centers.
+		const result = vec3( 0.0 ).toVar();
+		const inside = position.greaterThanEqual( influenceMin ).all().and( position.lessThanEqual( influenceMax ).all() );
 
-	const samplePos = position.add( normal.mul( spacing ).mul( 0.5 ) );
-	const uvw = samplePos.sub( min ).div( range ).clamp( 0.0, 1.0 ).mul( resMinusOne ).div( res ).add( vec3( 0.5 ).div( res ) );
+		If( hasInfluenceBox.equal( 0 ).or( inside ), () => {
 
-	let irradiance = evaluateGridIrradiance( texture3D( light.texture ), uvw, res, normal ).mul( intensity );
+			const range = max.sub( min );
+			const resMinusOne = res.sub( 1.0 );
+			const spacing = range.div( resMinusOne );
 
-	// Optional smooth boundary for blending grids; falloff 0 applies everywhere.
+			// Offset along the normal by half a probe spacing, then remap to texel centers.
 
-	if ( light.falloff > 0 ) {
+			const samplePos = position.add( normal.mul( spacing ).mul( 0.5 ) );
+			const uvw = samplePos.sub( min ).div( range ).clamp( 0.0, 1.0 ).mul( resMinusOne ).div( res ).add( vec3( 0.5 ).div( res ) );
 
-		const outside = min.sub( position ).max( 0.0 ).add( position.sub( max ).max( 0.0 ) );
-		const weight = outside.length().smoothstep( 0.0, falloff ).oneMinus();
+			result.assign( evaluateGridIrradiance( texture3D( light.texture ), uvw, res, normal ).mul( intensity ) );
 
-		irradiance = irradiance.mul( weight );
+			// Explicit influence bounds replace the fade outside the probe bounds.
 
-	}
+			if ( light.falloff > 0 ) {
 
-	return irradiance;
+				If( hasInfluenceBox.equal( 0 ), () => {
+
+					const outside = min.sub( position ).max( 0.0 ).add( position.sub( max ).max( 0.0 ) );
+					result.mulAssign( outside.length().smoothstep( 0.0, falloff ).oneMinus() );
+
+				} );
+
+			}
+
+		} );
+
+		return result;
+
+	} )();
 
 }
 
@@ -104,8 +120,9 @@ function getGridIrradiance( light, min, max, res, intensity, falloff, position, 
 export function lightProbeGridIrradiance( light, position, normal ) {
 
 	const box = light.boundingBox;
+	const influence = light.influenceBox || box;
 
-	return getGridIrradiance( light, uniform( box.min ), uniform( box.max ), uniform( light.resolution ), uniform( light.intensity ), uniform( light.falloff ), position, normal );
+	return getGridIrradiance( light, uniform( box.min ), uniform( box.max ), uniform( light.resolution ), uniform( light.intensity ), uniform( light.falloff ), position, normal, uniform( influence.min ), uniform( influence.max ), uniform( light.influenceBox !== null ? 1 : 0, 'int' ) );
 
 }
 
@@ -135,6 +152,9 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		this._min = uniform( new Vector3() );
 		this._max = uniform( new Vector3() );
+		this._influenceMin = uniform( new Vector3() ).setGroup( renderGroup );
+		this._influenceMax = uniform( new Vector3() ).setGroup( renderGroup );
+		this._hasInfluenceBox = uniform( 0, 'int' ).setGroup( renderGroup );
 		this._resolution = uniform( new Vector3() );
 		this._intensity = uniform( 1 ).setGroup( renderGroup );
 		this._falloff = uniform( 0 );
@@ -149,6 +169,9 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		this._min.value.copy( light.boundingBox.min );
 		this._max.value.copy( light.boundingBox.max );
+		this._influenceMin.value.copy( ( light.influenceBox || light.boundingBox ).min );
+		this._influenceMax.value.copy( ( light.influenceBox || light.boundingBox ).max );
+		this._hasInfluenceBox.value = light.influenceBox !== null ? 1 : 0;
 		this._resolution.value.copy( light.resolution );
 		this._intensity.value = light.intensity;
 		this._falloff.value = light.falloff;
@@ -163,7 +186,7 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		if ( light.texture === null ) return;
 
-		const irradiance = getGridIrradiance( light, this._min, this._max, this._resolution, this._intensity, this._falloff, positionWorld, normalWorld );
+		const irradiance = getGridIrradiance( light, this._min, this._max, this._resolution, this._intensity, this._falloff, positionWorld, normalWorld, this._influenceMin, this._influenceMax, this._hasInfluenceBox );
 
 		builder.context.irradiance.addAssign( irradiance );
 
