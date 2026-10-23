@@ -22,11 +22,15 @@ import {
 	atan,
 	float,
 	Fn,
+	If,
+	instanceIndex,
 	int,
 	ivec2,
+	ivec3,
 	Loop,
 	screenCoordinate,
 	texture,
+	textureStore,
 	uniform,
 	vec3,
 	vec4
@@ -183,21 +187,105 @@ function repackNode( batch, textureIndex, resolution, sliceZ ) {
 
 		} );
 
-		let packed;
+		return packSH( [ c0, c1, c2, c3, c4, c5, c6, c7, c8 ], textureIndex );
 
-		switch ( textureIndex ) {
+	} )();
 
-			case 0: packed = vec4( c0.xyz, c1.x ); break;
-			case 1: packed = vec4( c1.yz, c2.xy ); break;
-			case 2: packed = vec4( c2.z, c3.xyz ); break;
-			case 3: packed = vec4( c4.xyz, c5.x ); break;
-			case 4: packed = vec4( c5.yz, c6.xy ); break;
-			case 5: packed = vec4( c6.z, c7.xyz ); break;
-			default: packed = vec4( c8.xyz, 0.0 ); break;
+}
+
+/**
+ * Packs nine RGB coefficients into one of the seven atlas texels.
+ *
+ * @private
+ * @param {Array<Node>} coefficients - The nine SH coefficients.
+ * @param {number} textureIndex - The packed texel index.
+ * @return {Node<vec4>} The packed texel.
+ */
+function packSH( coefficients, textureIndex ) {
+
+	const [ c0, c1, c2, c3, c4, c5, c6, c7, c8 ] = coefficients;
+
+	let packed;
+
+	switch ( textureIndex ) {
+
+		case 0: packed = vec4( c0.xyz, c1.x ); break;
+		case 1: packed = vec4( c1.yz, c2.xy ); break;
+		case 2: packed = vec4( c2.z, c3.xyz ); break;
+		case 3: packed = vec4( c4.xyz, c5.x ); break;
+		case 4: packed = vec4( c5.yz, c6.xy ); break;
+		case 5: packed = vec4( c6.z, c7.xyz ); break;
+		default: packed = vec4( c8.xyz, 0.0 ); break;
+
+	}
+
+	return packed;
+
+
+}
+
+/**
+ * Packs all seven coefficient groups and their boundary padding in one dispatch.
+ * Each invocation reduces one probe, sharing its nine coefficients across stores.
+ *
+ * @private
+ * @param {Node} batch - The projected face blocks.
+ * @param {Texture} atlas - The destination 3D atlas.
+ * @param {Vector3} resolution - The probe grid resolution.
+ * @param {Node<int>} start - The first probe index to write.
+ * @return {Node} The compute shader body.
+ */
+function repackComputeNode( batch, atlas, resolution, start ) {
+
+	const { x: nx, z: nz } = resolution;
+	const paddedSlices = nz + 2 * ATLAS_PADDING;
+
+	return Fn( () => {
+
+		const probeIndex = int( instanceIndex ).add( start ).toVar();
+		const ix = probeIndex.mod( nx ).toVar();
+		const iz = probeIndex.div( nx ).mod( nz ).toVar();
+		const iy = probeIndex.div( nx * nz ).toVar();
+		const coefficients = [];
+
+		for ( let c = 0; c < 9; c ++ ) {
+
+			coefficients.push( batch.load( ivec2( c * 6 * FACE_BLOCKS, probeIndex ) ).rgb.toVar() );
 
 		}
 
-		return packed;
+		// Keep the raster path's summation order before rounding to half float.
+
+		Loop( { start: 1, end: 6 * FACE_BLOCKS, type: 'int' }, ( { i } ) => {
+
+			for ( let c = 0; c < 9; c ++ ) {
+
+				coefficients[ c ].addAssign( batch.load( ivec2( i.add( c * 6 * FACE_BLOCKS ), probeIndex ) ).rgb );
+
+			}
+
+		} );
+
+		for ( let t = 0; t < 7; t ++ ) {
+
+			const base = t * paddedSlices;
+			const packed = packSH( coefficients, t ).toVar();
+
+			textureStore( atlas, ivec3( ix, iy, iz.add( base + ATLAS_PADDING ) ), packed );
+
+			If( iz.equal( 0 ), () => {
+
+				textureStore( atlas, ivec3( ix, iy, base ), packed );
+
+			} );
+
+			If( iz.equal( nz - 1 ), () => {
+
+				textureStore( atlas, ivec3( ix, iy, base + ATLAS_PADDING + nz ), packed );
+
+			} );
+
+		}
 
 	} )();
 
@@ -461,6 +549,9 @@ class LightProbeGrid extends Light {
 		 * @default null
 		 */
 		this._renderTarget = null;
+		this._repackCompute = null;
+		this._repackStart = null;
+		this.useComputeRepack = true;
 
 		// Indirect captures read a snapshot while the live atlas is updated in place.
 		this._bounceGrid = null;
@@ -802,6 +893,54 @@ class LightProbeGrid extends Light {
 	 */
 	_repackProbes( renderer, start, end ) {
 
+		if ( this.useComputeRepack === true && renderer.backend.isWebGPUBackend === true ) {
+
+			this._repackProbesCompute( renderer, start, end );
+			return;
+
+		}
+
+		this._repackProbesRaster( renderer, start, end );
+
+	}
+
+	/**
+	 * Packs a probe range with a single compute dispatch.
+	 *
+	 * @private
+	 * @param {WebGPURenderer} renderer - The renderer.
+	 * @param {number} start - The first probe index.
+	 * @param {number} end - The exclusive end probe index.
+	 */
+	_repackProbesCompute( renderer, start, end ) {
+
+		if ( start === end ) return;
+
+		if ( this._repackCompute === null ) {
+
+			this._repackStart = uniform( 0, 'int' );
+			this._repackCompute = repackComputeNode( _batchNode, this.texture, this.resolution, this._repackStart ).compute( end - start ).setName( 'LightProbeGrid Repack' );
+
+		}
+
+		this._repackStart.value = start;
+		this._repackCompute.count = end - start;
+		renderer.initRenderTarget( this._renderTarget );
+		renderer.compute( this._repackCompute );
+
+	}
+
+	/**
+	 * Original raster implementation, retained for comparison and WebGL fallback.
+	 *
+	 * @private
+	 * @param {WebGPURenderer} renderer - The renderer.
+	 * @param {number} start - The first probe index.
+	 * @param {number} end - The exclusive end probe index.
+	 */
+	_repackProbesRaster( renderer, start, end ) {
+
+
 		const { x: nx, y: ny, z: nz } = this.resolution;
 		const probesPerLayer = nx * nz;
 		const startY = Math.floor( start / probesPerLayer );
@@ -889,6 +1028,8 @@ class LightProbeGrid extends Light {
 			depthBuffer: false
 		} );
 
+		this._renderTarget.texture.isStorageTexture = true;
+		this._renderTarget.texture.is3DTexture = true;
 		this.texture = this._renderTarget.texture;
 
 	}
@@ -897,6 +1038,14 @@ class LightProbeGrid extends Light {
 	 * Frees GPU resources.
 	 */
 	dispose() {
+
+		if ( this._repackCompute !== null ) {
+
+			this._repackCompute.dispose();
+			this._repackCompute = null;
+			this._repackStart = null;
+
+		}
 
 		if ( this._bounceGrid !== null ) {
 
