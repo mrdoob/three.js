@@ -155,8 +155,6 @@ class GCodeLoader extends Loader {
 
 		for ( let i = 0; i < lines.length; i ++ ) {
 
-			// Trimming drops the \r of CRLF line endings, which kept commands without
-			// arguments, such as G91 or M83, from matching.
 			const tokens = lines[ i ].trim().split( /\s+/ );
 			const cmd = tokens[ 0 ].toUpperCase();
 
