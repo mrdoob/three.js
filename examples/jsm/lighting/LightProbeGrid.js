@@ -204,15 +204,11 @@ function repackNode( batch, textureIndex, resolution, sliceZ ) {
 }
 
 /**
- * Returns the capture texel and face coordinates a direction falls on.
+ * Reads the capture texel and radial distance along a unit direction.
  *
  * @private
- * @param {Node<vec3>} dir - The unit direction.
- * @param {number} size - The face resolution.
- * @param {Node<int>} slot - The probe's batch slot.
- * @return {Object} The texel `coord` and the face coordinates `fx`, `fy`.
  */
-function captureTexel( dir, size, slot ) {
+function captureDistance( depth, dir, size, slot, near, far ) {
 
 	const toVec3 = ( v ) => vec3( ...v );
 
@@ -235,26 +231,7 @@ function captureTexel( dir, size, slot ) {
 	const i = int( fx.add( 1.0 ).mul( 0.5 * size ).floor() ).clamp( 0, size - 1 );
 	const j = int( float( 1.0 ).sub( fy ).mul( 0.5 * size ).floor() ).clamp( 0, size - 1 );
 
-	return { coord: ivec2( face.mul( size ).add( i ), slot.mul( size ).add( j ) ), fx, fy };
-
-}
-
-/**
- * Returns the distance from a probe to the nearest surface in the classification
- * capture along a direction, and the capture texel it was read from.
- *
- * @private
- * @param {Node} depth - The classification capture's depth.
- * @param {Node<vec3>} dir - The unit direction.
- * @param {number} size - The face resolution.
- * @param {Node<int>} slot - The probe's batch slot.
- * @param {Node<float>} near - The capture near plane.
- * @param {Node<float>} far - The capture far plane.
- * @return {Object} The texel `coord` and the `distance`.
- */
-function captureDistance( depth, dir, size, slot, near, far ) {
-
-	const { coord, fx, fy } = captureTexel( dir, size, slot );
+	const coord = ivec2( face.mul( size ).add( i ), slot.mul( size ).add( j ) );
 	const viewZ = perspectiveDepthToViewZ( depth.load( coord ).r, near, far );
 
 	// Depth along the face axis to distance along the direction.
@@ -263,14 +240,9 @@ function captureDistance( depth, dir, size, slot, near, far ) {
 }
 
 /**
- * Samples Fibonacci directions for each probe's back-face fraction and nearest hit.
+ * Samples Fibonacci directions for each probe’s back-face fraction and nearest hit.
  *
  * @private
- * @param {Node} flags - The classification capture's back-face flags.
- * @param {Node} depth - The classification capture's depth.
- * @param {number} size - The face resolution.
- * @param {Object} uniforms - The batch and camera uniforms.
- * @return {Node<vec4>} The back-face fraction in x and the nearest hit distance in y.
  */
 function backFaceFractionNode( flags, depth, size, { batchStart, near, far } ) {
 
@@ -302,17 +274,9 @@ function backFaceFractionNode( flags, depth, size, { batchStart, near, far } ) {
 }
 
 /**
- * Averages four distance samples per octahedral texel. Probes inside or too
- * close to geometry receive a negative mean distance to exclude them from lighting.
+ * Averages four normalized distance samples per texel, marking hidden probes with a negative mean.
  *
  * @private
- * @param {Node} depth - The classification capture's depth.
- * @param {Node} batch - The batch texture holding each probe's back-face fraction.
- * @param {number} fractionColumn - The batch column of the back-face fraction.
- * @param {number} size - The face resolution.
- * @param {number} resolution - The octahedral distance resolution.
- * @param {Object} uniforms - The batch, camera and distance scale uniforms.
- * @return {Node<vec4>} The mean and mean squared normalized distance.
  */
 function distanceMomentsNode( depth, batch, fractionColumn, size, resolution, { batchStart, batchCount, near, far, distanceScale, clearance } ) {
 
@@ -357,14 +321,9 @@ function distanceMomentsNode( depth, batch, fractionColumn, size, resolution, { 
 }
 
 /**
- * Evaluates SH irradiance for each octahedral texel, including its border.
+ * Evaluates SH irradiance for octahedral tiles, including their borders.
  *
  * @private
- * @param {Node} atlas - The SH atlas texture node.
- * @param {Vector3} resolution - The probe grid resolution.
- * @param {Node<int>} start - The first probe index to write.
- * @param {Node<int>} end - The exclusive end probe index to write.
- * @return {Node<vec4>} The irradiance.
  */
 function irradianceNode( atlas, resolution, start, end ) {
 
@@ -401,8 +360,7 @@ function irradianceNode( atlas, resolution, start, end ) {
 }
 
 /**
- * Render object function of the classification capture: opaque meshes are drawn
- * with the classification material for their side, everything else is skipped.
+ * Captures opaque meshes with the classification material for their sidedness.
  *
  * @private
  */
@@ -415,13 +373,9 @@ function classifyRenderObject( object, scene, camera, geometry, material, group,
 }
 
 /**
- * Creates the material that replaces meshes of the given side in the
- * classification capture. It draws both sides and flags the side the original
- * material does not show, which is what a probe inside a closed mesh sees.
+ * Draws both sides, flagging faces hidden by the original material’s sidedness.
  *
  * @private
- * @param {number} side - The side of the replaced material.
- * @return {NodeMaterial} The classification material.
  */
 function createClassifyMaterial( side ) {
 
@@ -483,7 +437,6 @@ function ensureCaptureCamera( near, far ) {
  * Sets the near plane of every capture sub-camera.
  *
  * @private
- * @param {number} near - The near plane.
  */
 function setCaptureNear( near ) {
 
@@ -1304,12 +1257,9 @@ class LightProbeGrid extends Light {
 	}
 
 	/**
-	 * Evaluates the irradiance tiles of a probe range from the live SH atlas.
+	 * Updates a probe range’s irradiance tiles from the SH atlas.
 	 *
 	 * @private
-	 * @param {WebGPURenderer} renderer - The renderer.
-	 * @param {number} start - The first probe index.
-	 * @param {number} end - The exclusive end probe index.
 	 */
 	_updateIrradiance( renderer, start, end ) {
 

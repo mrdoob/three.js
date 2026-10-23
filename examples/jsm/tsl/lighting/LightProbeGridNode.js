@@ -21,8 +21,6 @@ const signNotZero = ( value ) => select( value.greaterThanEqual( 0.0 ), float( 1
  * Maps a direction to octahedral coordinates in [0, 1]².
  *
  * @private
- * @param {Node<vec3>} direction - The direction.
- * @return {Node<vec2>} The octahedral coordinates.
  */
 export const octEncode = /*@__PURE__*/ Fn( ( [ direction ] ) => {
 
@@ -41,9 +39,6 @@ export const octEncode = /*@__PURE__*/ Fn( ( [ direction ] ) => {
  * Returns the probe index and tile texel, mirroring borders across octahedral seams.
  *
  * @private
- * @param {Node<ivec2>} texel - The atlas texel.
- * @param {number} resolution - The octahedral resolution of a tile.
- * @return {Object} The `probeIndex` and the octahedral texel `x`, `y`.
  */
 export function octTileTexel( texel, resolution ) {
 
@@ -62,14 +57,9 @@ export function octTileTexel( texel, resolution ) {
 }
 
 /**
- * Returns the UV of a direction in a probe's tile of an octahedral atlas.
+ * Returns the atlas UV for a direction in a probe’s octahedral tile.
  *
  * @private
- * @param {Node<int>} probeIndex - The probe index in bake order.
- * @param {Node<vec3>} direction - The unit direction.
- * @param {number} resolution - The octahedral resolution of a tile.
- * @param {Node<vec2>} atlasSize - The atlas size in texels.
- * @return {Node<vec2>} The atlas UV.
  */
 const octTileUV = /*@__PURE__*/ Fn( ( [ probeIndex, direction, resolution, atlasSize ] ) => {
 
@@ -92,8 +82,6 @@ const octTileUV = /*@__PURE__*/ Fn( ( [ probeIndex, direction, resolution, atlas
  * Maps octahedral coordinates in [-1, 1]² to a unit direction.
  *
  * @private
- * @param {Node<vec2>} e - The octahedral coordinates.
- * @return {Node<vec3>} The direction.
  */
 export const octDecode = /*@__PURE__*/ Fn( ( [ e ] ) => {
 
@@ -109,12 +97,9 @@ export const octDecode = /*@__PURE__*/ Fn( ( [ e ] ) => {
 } );
 
 /**
- * Packs nine RGB SH coefficients into seven RGBA texels.
+ * Packs nine RGB SH coefficients into seven RGBA texels, requesting only the required coefficients.
  *
  * @private
- * @param {function(number): Node<vec3>} c - Returns coefficient i. Only the coefficients this texel stores are requested.
- * @param {number} textureIndex - The atlas texel (0–6).
- * @return {Node<vec4>} The packed texel.
  */
 export function packGridSH( c, textureIndex ) {
 
@@ -133,12 +118,9 @@ export function packGridSH( c, textureIndex ) {
 }
 
 /**
- * Unpacks the nine L2 SH coefficients from the seven atlas texels of a probe,
- * as packed by {@link packGridSH}.
+ * Unpacks nine RGB SH coefficients from seven RGBA texels.
  *
  * @private
- * @param {Array<Node<vec4>>} s - The seven packed texels.
- * @return {Node} The coefficient array, as expected by `getShIrradianceAt()`.
  */
 export function unpackGridSH( s ) {
 
@@ -157,14 +139,9 @@ export function unpackGridSH( s ) {
 }
 
 /**
- * Samples SH coefficients with trilinear filtering. Each of the seven
- * sub-volumes has one padding slice at each end to prevent color bleeding.
+ * Samples SH coefficients at texel-center coordinates, with padded Z slices for trilinear filtering.
  *
  * @private
- * @param {Texture3DNode} atlas - The atlas texture node.
- * @param {Node<vec3>} uvw - The probe-grid sample coordinate (texel centers).
- * @param {Node<float>} nz - The number of probes along Z.
- * @return {Node} The coefficient array, as expected by `getShIrradianceAt()`.
  */
 export function sampleGridSH( atlas, uvw, nz ) {
 
@@ -180,13 +157,9 @@ export function sampleGridSH( atlas, uvw, nz ) {
 }
 
 /**
- * Returns the cubed Chebyshev visibility bound from distance moments
- * (Majercik et al., 2019). Points nearer than the mean are fully visible.
+ * Returns the cubed Chebyshev visibility bound from distance moments (Majercik et al., 2019).
  *
  * @private
- * @param {Node<vec2>} moments - The mean and mean squared distance.
- * @param {Node<float>} distance - The distance to test, in the same units.
- * @return {Node<float>} The visibility in [0, 1].
  */
 function chebyshevVisibility( moments, distance ) {
 
@@ -230,15 +203,10 @@ const probeInterpolationWeight = /*@__PURE__*/ Fn( ( [ moments, distance, normal
 } );
 
 /**
- * Blends eight probes using RTXGI's active-probe interpolation: trilinear,
- * wrapped normal and Chebyshev visibility weights.
- *
- * @see {@link https://github.com/NVIDIAGameWorks/RTXGI-DDGI/blob/main/rtxgi-sdk/shaders/ddgi/Irradiance.hlsl}
+ * Blends eight probes with trilinear, wrapped-normal and Chebyshev visibility weights.
  *
  * @private
- * @param {Object} grid - The grid parameters.
- * @param {function(Node<vec2>): Node<vec4>} sampleIrradiance - Samples the irradiance atlas.
- * @return {Node<vec3>} The non-negative irradiance.
+ * @see {@link https://github.com/NVIDIAGameWorks/RTXGI-DDGI/blob/main/rtxgi-sdk/shaders/ddgi/Irradiance.hlsl}
  */
 function evaluateGridIrradianceVisibility( grid, sampleIrradiance ) {
 
@@ -396,12 +364,9 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 
 	/**
-	 * Returns the spatial influence, excluding intensity so overlapping grids
-	 * blend their lighting without changing the meaning of their intensities.
+	 * Returns spatial influence without intensity, for blending overlapping grids.
 	 *
 	 * @private
-	 * @param {NodeBuilder} builder - The node builder.
-	 * @return {Node<float>} The influence weight.
 	 */
 	getInfluenceWeight( builder ) {
 
