@@ -60,6 +60,7 @@ export default QUnit.module( 'Addons', () => {
 				assert.strictEqual( parser._stripBlockComments( '/* x */a/* y */b/**/c' ), 'abc', 'Multiple and empty comments are removed.' );
 				assert.strictEqual( parser._stripBlockComments( 'a */ b /*/ c */ d' ), 'a */ b  d', 'A stray closer is kept and the closer search starts after the opener.' );
 				assert.strictEqual( parser._stripBlockComments( 'a /* unclosed' ), 'a ', 'An unclosed comment extends to the end.' );
+				assert.strictEqual( parser._stripBlockComments( 'a = "x /* y" /* c */b' ), 'a = "x /* y" b', 'A /* inside a string is text.' );
 
 			} );
 

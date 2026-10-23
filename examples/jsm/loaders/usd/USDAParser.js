@@ -235,30 +235,72 @@ class USDAParser {
 
 	_stripBlockComments( text ) {
 
-		// Iteratively remove /* ... */ comments without regex backtracking
+		// Iteratively remove /* ... */ comments without regex backtracking.
+		// Strings are copied as is since they may contain /* (e.g. path expressions)
+		const tokens = /\/\*|"""|'''|["']/g;
+
 		let result = '';
 		let i = 0;
 
 		while ( i < text.length ) {
 
-			const start = text.indexOf( '/*', i );
+			tokens.lastIndex = i;
+			const match = tokens.exec( text );
 
-			if ( start === - 1 ) {
+			if ( match === null ) {
 
 				result += text.slice( i );
 				break;
 
 			}
 
-			result += text.slice( i, start );
+			const start = match.index;
+			const token = match[ 0 ];
 
-			// Move past the comment (or to end if unclosed)
-			const end = text.indexOf( '*/', start + 2 );
-			i = ( end === - 1 ) ? text.length : end + 2;
+			if ( token === '/*' ) {
+
+				result += text.slice( i, start );
+
+				// Move past the comment (or to end if unclosed)
+				const end = text.indexOf( '*/', start + 2 );
+				i = ( end === - 1 ) ? text.length : end + 2;
+
+			} else {
+
+				const end = this._findStringEnd( text, start, token );
+
+				result += text.slice( i, end );
+				i = end;
+
+			}
 
 		}
 
 		return result;
+
+	}
+
+	_findStringEnd( text, start, quote ) {
+
+		if ( quote.length === 3 ) {
+
+			const end = text.indexOf( quote, start + 3 );
+			return ( end === - 1 ) ? text.length : end + 3;
+
+		}
+
+		// Single-line string with escapes, ends at the line end if unclosed
+		for ( let i = start + 1; i < text.length; i ++ ) {
+
+			const ch = text[ i ];
+
+			if ( ch === '\\' ) i ++;
+			else if ( ch === quote ) return i + 1;
+			else if ( ch === '\n' ) return i;
+
+		}
+
+		return text.length;
 
 	}
 
