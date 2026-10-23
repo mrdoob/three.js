@@ -1,5 +1,5 @@
 import { BackSide, CustomBlending, DoubleSide, FloatType, HalfFloatType, InstancedMesh, Mesh, MeshLambertNodeMaterial, NodeMaterial, OneFactor, OrthographicCamera, PhongLightingModel, QuadMesh, RedFormat, RendererUtils, RenderTarget, Scene, Vector2, Vector4 } from 'three/webgpu';
-import { Fn, If, Loop, Stack, cameraWorldMatrix, ivec2, length, lights, luminance, mrt, normalView, normalViewGeometry, normalWorldGeometry, output, positionWorld, screenCoordinate, textureLoad, uniform, vec3, vec4 } from 'three/tsl';
+import { Fn, If, Loop, Stack, cameraWorldMatrix, ivec2, length, lights, luminance, modelViewMatrix, mrt, normalView, normalViewGeometry, normalWorldGeometry, output, positionLocal, positionWorld, screenCoordinate, textureLoad, uniform, vec3, vec4 } from 'three/tsl';
 
 import { lightMapUV } from '../tsl/lighting/DirectionalLightMapNode.js';
 
@@ -106,8 +106,7 @@ class LightMapper {
 		this.samples = 0;
 
 		// the samples are summed with additive blending, into float targets if the renderer supports
-		// 'float32-blendable'. Half floats count exactly only up to 2048 samples, more samples would
-		// stop the count while the sums keep growing
+		// 'float32-blendable'. Half float sums lose the precision of single samples beyond about 256
 
 		const floatBlendable = renderer.hasFeature( 'float32-blendable' );
 
@@ -119,7 +118,7 @@ class LightMapper {
 		if ( moments && floatBlendable && directional === false ) outputs.push( 'moment' );
 		if ( directional ) outputs.push( 'direction' );
 
-		this._maxSamples = floatBlendable ? Infinity : 2048;
+		this._maxSamples = floatBlendable ? Infinity : 256;
 
 		/**
 		 * The channel of {@link LightMapper#momentTexture} that holds the moments, `'a'` if it is shared
@@ -345,7 +344,7 @@ class LightMapper {
 
 	/**
 	 * Accumulates samples into the light map. Without the 'float32-blendable' renderer feature,
-	 * at most 2048 samples are accumulated.
+	 * at most 256 samples are accumulated.
 	 *
 	 * @param {number} [samples=1] - The number of samples to add.
 	 */
@@ -676,7 +675,7 @@ class LightMapper {
 
 			// bake diffuse irradiance with white albedo, leaving specular lighting out
 
-			material.lightsNode = lights( directLights );
+			material.lightsNode = lights( directLights ).context( { positionView: modelViewMatrix.mul( positionLocal ).xyz.toVarying() } );
 			material.normalNode = flipNormal ? normalViewGeometry.negate() : normalViewGeometry;
 			material.emissiveNode = irradiance.div( Math.PI );
 			material.outputNode = vec4( output.rgb.mul( Math.PI ), 1 );

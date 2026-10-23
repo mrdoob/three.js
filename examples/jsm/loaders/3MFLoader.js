@@ -185,7 +185,7 @@ class ThreeMFLoader extends Loader {
 
 					rootModelFile = file;
 
-				} else if ( file.match( /^3D\/.*\/.*\.model$/ ) ) {
+				} else if ( file.match( /^3D\/.*\/[^\/]*\.model$/ ) ) {
 
 					modelPartNames.push( file ); // sub models
 

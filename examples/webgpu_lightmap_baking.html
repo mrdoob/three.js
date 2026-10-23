@@ -19,7 +19,7 @@
 				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Light Baking</span>
 			</div>
 
-			<small>Bake Stochastic Radiosity, Ray Radiosity (<a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">three-mesh-bvh</a>), Light Probe or VXGI into denoised directional light maps of these scenes or your own glTF.<br/><span id="status"></span><span id="warning" style="display: block; color: #ffc040;"></span></small>
+			<small>Bake Stochastic Radiosity, Ray Radiosity (<a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">three-mesh-bvh</a>), Light Probe or VXGI into denoised directional light maps of these scenes or your own glTF, with the light mapper by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br/><span id="status"></span><span id="warning" style="display: block; color: #ffc040;"></span></small>
 		</div>
 
 		<script type="importmap">
@@ -51,6 +51,16 @@
 			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 			import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+
+			if ( WebGPU.isAvailable() === false ) {
+
+				document.body.appendChild( WebGPU.getErrorMessage() );
+
+				throw new Error( 'No WebGPU support' );
+
+			}
 
 			let camera, scene, renderer, controls;
 			let world, materials, status, warning, lightBaker;
@@ -113,7 +123,6 @@
 				document.body.appendChild( renderer.domElement );
 
 				await renderer.init();
-				if ( renderer.backend.isWebGPUBackend !== true ) throw new Error( 'This example requires WebGPU.' );
 
 				// GPU errors show on the page. A lost device stops it, e.g. after a phone ran out of GPU memory,
 				// which can also destroy the device

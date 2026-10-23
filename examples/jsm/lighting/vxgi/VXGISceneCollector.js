@@ -1,4 +1,4 @@
-import { Box3, Color, Matrix4, Vector2, Vector3, BackSide, DoubleSide, SRGBColorSpace } from 'three/webgpu';
+import { Box3, Color, MathUtils, Matrix4, Vector2, Vector3, BackSide, DoubleSide, FrontSide, SRGBColorSpace } from 'three/webgpu';
 
 const _matrix = /*@__PURE__*/ new Matrix4();
 const _box = /*@__PURE__*/ new Box3();
@@ -14,8 +14,10 @@ const _color = /*@__PURE__*/ new Color();
 const _albedo = /*@__PURE__*/ new Color();
 const _emissive = /*@__PURE__*/ new Color();
 const _instanceColor = /*@__PURE__*/ new Color();
+const _columns = /*@__PURE__*/ new Map();
 
 const IMAGE_SAMPLE_SIZE = 64;
+const POSITION_QUANTIZATION = 131072;
 
 /**
  * Number of floats per triangle record: three positions (vec4 each, w unused),
@@ -557,5 +559,318 @@ export function collectSceneTriangles( scene, options ) {
 	const data = buffer.result();
 
 	return { data, count: data.length / TRIANGLE_STRIDE };
+
+}
+
+/**
+ * Marks the sub-voxels inside closed meshes, so cones starting within an object are blocked. Only meshes
+ * with visible, opaque and single-sided materials whose geometry is closed and faces outwards are filled.
+ *
+ * @param {Scene} scene - The scene.
+ * @param {Object} options - Options.
+ * @param {Vector3} options.boundsMin - The minimum corner of the voxel grid.
+ * @param {number} options.voxelSize - The size of a voxel in world units.
+ * @param {Vector3} options.gridSize - The number of voxels per axis.
+ * @param {Layers} options.layers - Objects must pass this layer test.
+ * @param {Set<Object3D>} options.exclude - Objects to skip.
+ * @param {Uint8Array} target - One byte per voxel that receives the 2x2x2 sub-voxel bits of the interiors.
+ */
+export function computeSolidVoxels( scene, options, target ) {
+
+	const { boundsMin, voxelSize, gridSize, layers, exclude } = options;
+
+	const closedGeometries = new Map();
+
+	scene.traverseVisible( ( object ) => {
+
+		if ( isVoxelizable( object, layers, exclude ) === false || hasSolidMaterials( object ) === false ) return;
+
+		const geometry = object.geometry;
+
+		if ( closedGeometries.has( geometry ) === false ) closedGeometries.set( geometry, isClosed( geometry ) && facesOutwards( geometry ) );
+
+		if ( closedGeometries.get( geometry ) === false ) return;
+
+		if ( object.isInstancedMesh === true ) {
+
+			for ( let i = 0; i < object.count; i ++ ) {
+
+				object.getMatrixAt( i, _matrix );
+				_matrix.premultiply( object.matrixWorld );
+				fillInterior( geometry, _matrix, boundsMin, voxelSize, gridSize, target );
+
+			}
+
+		} else {
+
+			fillInterior( geometry, object.matrixWorld, boundsMin, voxelSize, gridSize, target );
+
+		}
+
+	} );
+
+}
+
+/**
+ * Returns `true` if all materials of the mesh render an opaque, single-sided surface.
+ *
+ * @private
+ */
+function hasSolidMaterials( mesh ) {
+
+	const materials = Array.isArray( mesh.material ) ? mesh.material : [ mesh.material ];
+
+	for ( const material of materials ) {
+
+		if ( material.visible === false || material.side !== FrontSide || material.transparent === true || material.alphaTest > 0 ) return false;
+
+	}
+
+	return true;
+
+}
+
+/**
+ * Returns `true` if every edge of the geometry is shared by an even number of triangles. Vertices with
+ * the same position (e.g. at uv seams) are treated as one vertex.
+ *
+ * @private
+ */
+function isClosed( geometry ) {
+
+	const position = geometry.getAttribute( 'position' );
+
+	if ( position === undefined ) return false;
+
+	const index = geometry.index;
+	const indices = index !== null ? index.array : null;
+	const count = index !== null ? index.count : position.count;
+
+	_box.setFromBufferAttribute( position );
+
+	const min = _box.min;
+	const size = _box.getSize( _vb );
+	const scaleX = POSITION_QUANTIZATION / Math.max( size.x, 1e-9 );
+	const scaleY = POSITION_QUANTIZATION / Math.max( size.y, 1e-9 );
+	const scaleZ = POSITION_QUANTIZATION / Math.max( size.z, 1e-9 );
+
+	const vertexMask = MathUtils.ceilPowerOfTwo( Math.max( position.count, 1 ) * 2 ) - 1;
+	const vertexKeys = new Int32Array( ( vertexMask + 1 ) * 3 );
+	const vertexSlots = new Int32Array( vertexMask + 1 ).fill( - 1 );
+	const vertexIds = new Int32Array( position.count );
+	let vertexCount = 0;
+
+	for ( let i = 0; i < position.count; i ++ ) {
+
+		const x = Math.round( ( position.getX( i ) - min.x ) * scaleX );
+		const y = Math.round( ( position.getY( i ) - min.y ) * scaleY );
+		const z = Math.round( ( position.getZ( i ) - min.z ) * scaleZ );
+
+		let slot = ( Math.imul( x, 73856093 ) ^ Math.imul( y, 19349663 ) ^ Math.imul( z, 83492791 ) ) & vertexMask;
+
+		while ( vertexSlots[ slot ] !== - 1 && ( vertexKeys[ slot * 3 ] !== x || vertexKeys[ slot * 3 + 1 ] !== y || vertexKeys[ slot * 3 + 2 ] !== z ) ) slot = ( slot + 1 ) & vertexMask;
+
+		if ( vertexSlots[ slot ] === - 1 ) {
+
+			vertexSlots[ slot ] = vertexCount ++;
+			vertexKeys[ slot * 3 ] = x;
+			vertexKeys[ slot * 3 + 1 ] = y;
+			vertexKeys[ slot * 3 + 2 ] = z;
+
+		}
+
+		vertexIds[ i ] = vertexSlots[ slot ];
+
+	}
+
+	const edgeMask = MathUtils.ceilPowerOfTwo( Math.max( count, 1 ) * 2 ) - 1;
+	const edgeKeys = new Int32Array( ( edgeMask + 1 ) * 2 ).fill( - 1 );
+	const edgeParity = new Uint8Array( edgeMask + 1 );
+	let openEdges = 0;
+
+	const toggleEdge = ( a, b ) => {
+
+		if ( a > b ) {
+
+			const t = a; a = b; b = t;
+
+		}
+
+		let slot = ( Math.imul( a, 73856093 ) ^ Math.imul( b, 19349663 ) ) & edgeMask;
+
+		while ( edgeKeys[ slot * 2 ] !== - 1 && ( edgeKeys[ slot * 2 ] !== a || edgeKeys[ slot * 2 + 1 ] !== b ) ) slot = ( slot + 1 ) & edgeMask;
+
+		edgeKeys[ slot * 2 ] = a;
+		edgeKeys[ slot * 2 + 1 ] = b;
+		edgeParity[ slot ] ^= 1;
+		openEdges += edgeParity[ slot ] === 1 ? 1 : - 1;
+
+	};
+
+	for ( let i = 0; i + 2 < count; i += 3 ) {
+
+		const a = vertexIds[ indices !== null ? indices[ i ] : i ];
+		const b = vertexIds[ indices !== null ? indices[ i + 1 ] : i + 1 ];
+		const c = vertexIds[ indices !== null ? indices[ i + 2 ] : i + 2 ];
+
+		if ( a === b || b === c || c === a ) continue;
+
+		toggleEdge( a, b );
+		toggleEdge( b, c );
+		toggleEdge( c, a );
+
+	}
+
+	return openEdges === 0;
+
+}
+
+/**
+ * Returns `true` if the triangles of the given closed geometry face outwards (positive signed volume).
+ *
+ * @private
+ */
+function facesOutwards( geometry ) {
+
+	const position = geometry.getAttribute( 'position' );
+	const index = geometry.index;
+	const indices = index !== null ? index.array : null;
+	const count = index !== null ? index.count : position.count;
+
+	_box.min.fromBufferAttribute( position, 0 );
+
+	let volume = 0;
+
+	for ( let i = 0; i + 2 < count; i += 3 ) {
+
+		_va.fromBufferAttribute( position, indices !== null ? indices[ i ] : i ).sub( _box.min );
+		_vb.fromBufferAttribute( position, indices !== null ? indices[ i + 1 ] : i + 1 ).sub( _box.min );
+		_vc.fromBufferAttribute( position, indices !== null ? indices[ i + 2 ] : i + 2 ).sub( _box.min );
+
+		volume += _va.dot( _vb.cross( _vc ) );
+
+	}
+
+	return volume > 0;
+
+}
+
+/**
+ * Marks the sub-voxels between pairs of surface crossings along each sub-voxel column in x.
+ *
+ * @private
+ */
+function fillInterior( geometry, matrix, boundsMin, voxelSize, gridSize, target ) {
+
+	const position = geometry.getAttribute( 'position' );
+	const index = geometry.index;
+	const count = index !== null ? index.count : position.count;
+
+	const invSubVoxel = 2 / voxelSize;
+	const columnsY = gridSize.y * 2, columnsZ = gridSize.z * 2, length = gridSize.x * 2;
+
+	_columns.clear();
+
+	for ( let i = 0; i + 2 < count; i += 3 ) {
+
+		const a = _va.fromBufferAttribute( position, index !== null ? index.getX( i ) : i ).applyMatrix4( matrix ).sub( boundsMin ).multiplyScalar( invSubVoxel );
+		let b = _vb.fromBufferAttribute( position, index !== null ? index.getX( i + 1 ) : i + 1 ).applyMatrix4( matrix ).sub( boundsMin ).multiplyScalar( invSubVoxel );
+		let c = _vc.fromBufferAttribute( position, index !== null ? index.getX( i + 2 ) : i + 2 ).applyMatrix4( matrix ).sub( boundsMin ).multiplyScalar( invSubVoxel );
+
+		const area = edgeFunction( a, b, c.y, c.z );
+
+		if ( area === 0 ) continue;
+
+		if ( area < 0 ) {
+
+			const t = b; b = c; c = t;
+
+		}
+
+		const j0 = Math.max( Math.ceil( Math.min( a.y, b.y, c.y ) - 0.5 ), 0 );
+		const j1 = Math.min( Math.floor( Math.max( a.y, b.y, c.y ) - 0.5 ), columnsY - 1 );
+		const k0 = Math.max( Math.ceil( Math.min( a.z, b.z, c.z ) - 0.5 ), 0 );
+		const k1 = Math.min( Math.floor( Math.max( a.z, b.z, c.z ) - 0.5 ), columnsZ - 1 );
+
+		for ( let k = k0; k <= k1; k ++ ) {
+
+			for ( let j = j0; j <= j1; j ++ ) {
+
+				const y = j + 0.5, z = k + 0.5;
+
+				const wa = edgeFunction( b, c, y, z );
+				const wb = edgeFunction( c, a, y, z );
+				const wc = edgeFunction( a, b, y, z );
+
+				if ( isInside( wa, b, c ) && isInside( wb, c, a ) && isInside( wc, a, b ) ) {
+
+					const column = j + k * columnsY;
+					let crossings = _columns.get( column );
+
+					if ( crossings === undefined ) {
+
+						crossings = [];
+						_columns.set( column, crossings );
+
+					}
+
+					crossings.push( ( wa * a.x + wb * b.x + wc * c.x ) / ( wa + wb + wc ) );
+
+				}
+
+			}
+
+		}
+
+	}
+
+	for ( const [ column, crossings ] of _columns ) {
+
+		if ( crossings.length % 2 !== 0 ) continue;
+
+		crossings.sort( ( p, q ) => p - q );
+
+		const j = column % columnsY, k = ( column - j ) / columnsY;
+		const offset = gridSize.x * ( ( j >> 1 ) + gridSize.y * ( k >> 1 ) );
+		const bitsYZ = ( ( j & 1 ) << 1 ) | ( ( k & 1 ) << 2 );
+
+		for ( let n = 0; n < crossings.length; n += 2 ) {
+
+			const i0 = Math.max( Math.ceil( crossings[ n ] - 0.5 ), 0 );
+			const i1 = Math.min( Math.ceil( crossings[ n + 1 ] - 0.5 ), length );
+
+			for ( let i = i0; i < i1; i ++ ) target[ offset + ( i >> 1 ) ] |= 1 << ( ( i & 1 ) | bitsYZ );
+
+		}
+
+	}
+
+}
+
+/**
+ * Edge function of the edge from `a` to `b` at the given point in the yz plane. As in the watertight
+ * ray/triangle test, the vertices are taken relative to the point, so a shared edge evaluates exactly
+ * opposite for both of its triangles.
+ *
+ * @private
+ */
+function edgeFunction( a, b, y, z ) {
+
+	return ( a.y - y ) * ( b.z - z ) - ( a.z - z ) * ( b.y - y );
+
+}
+
+/**
+ * Inside test for an edge function value. Points on an edge belong to one triangle only (top-left rule).
+ *
+ * @private
+ */
+function isInside( w, a, b ) {
+
+	if ( w !== 0 ) return w > 0;
+
+	const dz = b.z - a.z;
+
+	return dz < 0 || ( dz === 0 && b.y > a.y );
 
 }

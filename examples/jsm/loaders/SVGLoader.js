@@ -220,7 +220,7 @@ class SVGLoader extends Loader {
 				case 'use':
 					style = parseStyle( node, style );
 
-					const href = node.getAttributeNS( 'http://www.w3.org/1999/xlink', 'href' ) || '';
+					const href = node.getAttributeNS( 'http://www.w3.org/1999/xlink', 'href' ) || node.getAttribute( 'href' ) || '';
 					const usedNodeId = href.substring( 1 );
 					const usedNode = node.viewportElement.getElementById( usedNodeId );
 					if ( usedNode ) {
@@ -937,7 +937,7 @@ class SVGLoader extends Loader {
 
 			}
 
-			const regex = /([+-]?\d*\.?\d+(?:e[+-]?\d+)?)(?:,|\s)([+-]?\d*\.?\d+(?:e[+-]?\d+)?)/g;
+			const regex = /([+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:e[+-]?\d+)?)(?:,|\s)([+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:e[+-]?\d+)?)/g;
 
 			const path = new ShapePath();
 
@@ -972,7 +972,7 @@ class SVGLoader extends Loader {
 
 			}
 
-			const regex = /([+-]?\d*\.?\d+(?:e[+-]?\d+)?)(?:,|\s)([+-]?\d*\.?\d+(?:e[+-]?\d+)?)/g;
+			const regex = /([+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:e[+-]?\d+)?)(?:,|\s)([+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:e[+-]?\d+)?)/g;
 
 			const path = new ShapePath();
 

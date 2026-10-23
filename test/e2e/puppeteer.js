@@ -96,6 +96,7 @@ const parseTime = 1; // 1 second per megabyte
 
 const networkTimeout = 5; // 5 minutes, set to 0 to disable
 const renderTimeout = 5; // 5 seconds, set to 0 to disable
+const maxRetries = 2; // Retry timed-out or completely black examples in a fresh browser
 const numCIJobs = 5; // GitHub Actions run the script in 5 threads
 
 const width = 400;
@@ -444,7 +445,7 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 }
 
-async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file ) {
+async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file, retries = 0 ) {
 
 	const page = ctx.page;
 	const pageStart = performance.now();
@@ -592,6 +593,18 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 
 			} else {
 
+				const isBlack = actual.data.every( ( value, index ) => index % 4 === 3 || value === 0 );
+
+				if ( isBlack && retries < maxRetries ) {
+
+					console.yellow( 'Restarting browser...' );
+					await ctx.restart();
+
+					console.yellow( `Retrying ${ file } after black screenshot (${ retries + 1 }/${ maxRetries })...` );
+					return await checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file, retries + 1 );
+
+				}
+
 				await screenshot.write( `test/e2e/output-screenshots/${ file }-actual.jpg`, jpgQuality );
 				await expected.write( `test/e2e/output-screenshots/${ file }-expected.jpg`, jpgQuality );
 				await diff.write( `test/e2e/output-screenshots/${ file }-diff.jpg`, jpgQuality );
@@ -611,9 +624,6 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 
 		} else {
 
-			console.red( e );
-			failedScreenshots.push( file );
-
 			// A timed-out page can stay wedged and time out every following file
 
 			if ( String( e ).includes( 'TimeoutError' ) ) {
@@ -621,7 +631,18 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 				console.yellow( 'Restarting browser...' );
 				await ctx.restart();
 
+				if ( retries < maxRetries ) {
+
+					console.yellow( `${ e }` );
+					console.yellow( `Retrying ${ file } after timeout (${ retries + 1 }/${ maxRetries })...` );
+					return await checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file, retries + 1 );
+
+				}
+
 			}
+
+			console.red( e );
+			failedScreenshots.push( file );
 
 		}
 

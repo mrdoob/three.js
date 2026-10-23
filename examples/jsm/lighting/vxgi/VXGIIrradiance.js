@@ -1,5 +1,5 @@
-import { Fn, Loop, PI, abs, cos, cross, float, fract, interleavedGradientNoise, luminance, normalize, screenCoordinate, select, sin, sqrt, vec2, vec3 } from 'three/tsl';
-import { createConeTracer } from './VXGIConeTracer.js';
+import { Fn, PI, float, interleavedGradientNoise, luminance, screenCoordinate, vec2, vec3 } from 'three/tsl';
+import { createConeTracer, gather } from './VXGIConeTracer.js';
 
 /**
  * Creates a world-space diffuse irradiance sampler for a prepared {@link VXGIVolume}.
@@ -32,32 +32,27 @@ function vxgiIrradiance( volume, { coneCount = 8 } = {} ) {
 		const elevation = interleavedGradientNoise( shift.add( vec2( 5.588238, 3.14159 ) ) ).toConst();
 		const rotation = interleavedGradientNoise( shift ).toConst();
 
-		const up = select( abs( normal.y ).lessThan( 0.99 ), vec3( 0, 1, 0 ), vec3( 1, 0, 0 ) );
-		const tangent = normalize( cross( normal, up ) ).toConst();
-		const bitangent = cross( normal, tangent ).toConst();
 		const origin = position.add( normal.mul( volume.voxelSizeNode.mul( 1.5 ) ) ).toConst();
-		const irradiance = vec3( 0 ).toVar();
 		const directionSum = directionNode !== null ? vec3( 0 ).toVar() : null;
 
-		Loop( coneCount, ( { i } ) => {
+		// cones that leave the volume see the sky, and the directions are weighted by the luminance of each cone
 
-			const u = float( i ).add( elevation ).div( coneCount ).toConst();
-			const phi = fract( float( i ).mul( 0.618034 ).add( rotation ) ).mul( PI.mul( 2 ) ).toConst();
-			const radius = sqrt( u ).toConst();
-			const direction = normalize( tangent.mul( cos( phi ).mul( radius ) ).add( bitangent.mul( sin( phi ).mul( radius ) ) ).add( normal.mul( sqrt( u.oneMinus() ) ) ) ).toConst();
-			const cone = trace( origin, direction, float( Math.tan( Math.PI / 9 ) ), volume.traceDistanceNode );
+		const radiance = ( direction, cone ) => {
+
 			const sky = volume.skyRadiance( direction );
-			const radiance = ( sky !== null ? cone.color.add( sky.mul( cone.visibility ) ) : cone.color ).toConst();
+			const value = ( sky !== null ? cone.color.add( sky.mul( cone.visibility ) ) : cone.color ).toConst();
 
-			irradiance.addAssign( radiance );
+			if ( directionSum !== null ) directionSum.addAssign( direction.mul( luminance( value ) ) );
 
-			if ( directionSum !== null ) directionSum.addAssign( direction.mul( luminance( radiance ) ) );
+			return value;
 
-		} );
+		};
+
+		const { color } = gather( trace, origin, normal, coneCount, float( Math.tan( Math.PI / 9 ) ), volume.traceDistanceNode, rotation, elevation, null, radiance );
 
 		if ( directionNode !== null ) directionNode.addAssign( directionSum.mul( PI.div( coneCount ) ) );
 
-		return irradiance.mul( PI.div( coneCount ) );
+		return color.mul( PI );
 
 	} )();
 

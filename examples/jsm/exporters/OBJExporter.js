@@ -190,6 +190,7 @@ class OBJExporter {
 
 			// shortcuts
 			const vertices = geometry.getAttribute( 'position' );
+			const indices = geometry.getIndex();
 
 			// name of the line object
 			output += 'o ' + line.name + '\n';
@@ -214,9 +215,23 @@ class OBJExporter {
 
 				output += 'l ';
 
-				for ( let j = 1, l = vertices.count; j <= l; j ++ ) {
+				if ( indices !== null ) {
 
-					output += ( indexVertex + j ) + ' ';
+					for ( let i = 0, l = indices.count; i < l; i ++ ) {
+
+						const j = indices.getX( i ) + 1;
+
+						output += ( indexVertex + j ) + ' ';
+
+					}
+
+				} else {
+
+					for ( let j = 1, l = vertices.count; j <= l; j ++ ) {
+
+						output += ( indexVertex + j ) + ' ';
+
+					}
 
 				}
 
@@ -226,9 +241,24 @@ class OBJExporter {
 
 			if ( type === 'LineSegments' ) {
 
-				for ( let j = 1, k = j + 1, l = vertices.count; j < l; j += 2, k = j + 1 ) {
+				if ( indices !== null ) {
 
-					output += 'l ' + ( indexVertex + j ) + ' ' + ( indexVertex + k ) + '\n';
+					for ( let i = 0, l = indices.count - 1; i < l; i += 2 ) {
+
+						const j = indices.getX( i ) + 1;
+						const k = indices.getX( i + 1 ) + 1;
+
+						output += 'l ' + ( indexVertex + j ) + ' ' + ( indexVertex + k ) + '\n';
+
+					}
+
+				} else {
+
+					for ( let j = 1, k = j + 1, l = vertices.count; j < l; j += 2, k = j + 1 ) {
+
+						output += 'l ' + ( indexVertex + j ) + ' ' + ( indexVertex + k ) + '\n';
+
+					}
 
 				}
 
