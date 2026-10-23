@@ -1,5 +1,5 @@
 import {
-	DataTexture, EquirectangularReflectionMapping, LinearSRGBColorSpace,
+	Color, DataTexture, EquirectangularReflectionMapping, LinearSRGBColorSpace,
 	Mesh, MeshStandardMaterial, MeshPhysicalMaterial, OrthographicCamera,
 	RenderTarget, Scene, SphereGeometry
 } from '../../../../../src/Three.Core.js';
@@ -35,6 +35,75 @@ export default QUnit.module( 'Nodes', () => {
 		QUnit.module( 'EnvironmentNode', () => {
 
 			for ( const backend of [ 'webgpu', 'webgl' ] ) {
+
+				for ( const setup of [ 'scene', 'static scene', 'material' ] ) {
+
+					QUnit.test( `Reuses a disposed environment texture (${ setup }, ${ backend })`, async ( assert ) => {
+
+						const renderer = await getSharedRenderer( backend );
+
+						if ( renderer === null ) {
+
+							assert.ok( true, `SKIPPED: "${ backend }" backend is not available in this environment.` );
+							return;
+
+						}
+
+						const environment = createEnvironment( 255, 0, 32 );
+						const material = new MeshStandardMaterial( { metalness: 1, roughness: 0.15 } );
+						const geometry = new SphereGeometry( 0.8, 16, 8 );
+						const mesh = new Mesh( geometry, material );
+						mesh.static = setup === 'static scene';
+						const scene = new Scene();
+						scene.background = new Color( 0, 0, 0 );
+						scene.add( mesh );
+
+						if ( setup === 'material' ) material.envMap = environment;
+						else scene.environment = environment;
+
+						const camera = new OrthographicCamera( - 1, 1, 1, - 1, 0.1, 10 );
+						camera.position.z = 5;
+						const target = new RenderTarget( 32, 32 );
+						target.texture.colorSpace = LinearSRGBColorSpace;
+						const previousTarget = renderer.getRenderTarget();
+
+						async function checkLighting() {
+
+							renderer.render( scene, camera );
+							const pixel = await renderer.readRenderTargetPixelsAsync( target, 16, 16, 1, 1 );
+							assert.true( pixel[ 0 ] > 50 && pixel[ 2 ] < 5, `Sphere stays red: ${ Array.from( pixel ) }` );
+
+						}
+
+						try {
+
+							renderer.setRenderTarget( target );
+							await checkLighting();
+							await checkLighting(); // Populate the observer's state before disposing.
+
+							for ( let i = 0; i < 2; i ++ ) {
+
+								environment.dispose();
+								scene.background.setRGB( 0, 0, i === 0 ? 1 : 0 );
+								await checkLighting();
+								const corner = await renderer.readRenderTargetPixelsAsync( target, 0, 0, 1, 1 );
+								assert.strictEqual( corner[ 2 ], i === 0 ? 255 : 0, 'The frame is updated after disposal' );
+
+							}
+
+						} finally {
+
+							renderer.setRenderTarget( previousTarget );
+							material.dispose();
+							geometry.dispose();
+							target.dispose();
+							environment.dispose();
+
+						}
+
+					} );
+
+				}
 
 				for ( const Material of [ MeshStandardMaterial, MeshPhysicalMaterial ] ) {
 

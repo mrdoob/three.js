@@ -292,6 +292,7 @@ class NodeMaterialObserver {
 
 			data.environmentIntensity = environmentIntensity;
 			data.environmentRotation = environmentRotation.clone();
+			data.environmentVersion = renderObject.scene.environment !== null && renderObject.material.envMap === null ? this.getTextureData( renderObject.scene.environment )._version : null;
 
 			data.lights = this.getLightsData( renderObject.lightsNode.getBuiltinLights(), [] );
 
@@ -1117,6 +1118,23 @@ class NodeMaterialObserver {
 		if ( renderObjectData.attributesDisposeVersion !== attributes.disposeVersion ) {
 
 			if ( this.hasDisposedAttributes( renderObject, renderObjectData ) ) refreshType = RenderObjectRefreshType.FULL;
+
+		}
+
+		// A disposed environment needs new texture bindings, including for static objects.
+
+		const environment = renderObject.scene.environment;
+
+		if ( environment !== null && renderObject.material.envMap === null ) {
+
+			const environmentVersion = this.getTextureData( environment )._version;
+
+			if ( renderObjectData.environmentVersion !== environmentVersion ) {
+
+				renderObjectData.environmentVersion = environmentVersion;
+				refreshType = RenderObjectRefreshType.FULL;
+
+			}
 
 		}
 

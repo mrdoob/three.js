@@ -73,6 +73,9 @@ function _getPMREMFromTexture( texture, renderer, generator ) {
 
 				if ( pmrem !== undefined ) {
 
+					// Nodes still referencing this PMREM must regenerate it on their next update.
+					pmrem.texture.pmremVersion = - 1;
+
 					pmrem.dispose();
 					cache.delete( texture );
 
