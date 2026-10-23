@@ -13142,7 +13142,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	}
 
 	const invalidationArrayRead = [];
-	const invalidationArrayDraw = [];
 
 	function updateMultisampleRenderTarget( renderTarget ) {
 
@@ -13213,16 +13212,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 					if ( supportsInvalidateFramebuffer === true ) {
 
 						invalidationArrayRead.length = 0;
-						invalidationArrayDraw.length = 0;
 
 						invalidationArrayRead.push( _gl.COLOR_ATTACHMENT0 + i );
 
 						if ( renderTarget.depthBuffer && renderTarget.storeMultisampledDepthBuffer === false ) {
 
 							invalidationArrayRead.push( depthStyle );
-							invalidationArrayDraw.push( depthStyle );
-
-							_gl.invalidateFramebuffer( _gl.DRAW_FRAMEBUFFER, invalidationArrayDraw );
 
 						}
 
@@ -19311,7 +19306,7 @@ class WebGLRenderer {
 
 					}
 
-					_gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, _gl.DEPTH_BUFFER_BIT, _gl.NEAREST );
+					_gl.blitFramebuffer( minX, minY, minX + width, minY + height, dstX, dstY, dstX + width, dstY + height, _gl.DEPTH_BUFFER_BIT, _gl.NEAREST );
 
 				}
 
@@ -19354,7 +19349,7 @@ class WebGLRenderer {
 					// copy the data using the fastest function that can achieve the copy
 					if ( srcLevel !== 0 ) {
 
-						_gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, _gl.COLOR_BUFFER_BIT, _gl.NEAREST );
+						_gl.blitFramebuffer( minX, minY, minX + width, minY + height, dstX, dstY, dstX + width, dstY + height, _gl.COLOR_BUFFER_BIT, _gl.NEAREST );
 
 					} else if ( isDst3D ) {
 
