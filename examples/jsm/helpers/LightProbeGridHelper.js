@@ -6,7 +6,7 @@ import {
 	SphereGeometry,
 	Vector3
 } from 'three/webgpu';
-import { attribute, Discard, Fn, getShIrradianceAt, int, ivec2, normalWorld, renderGroup, texture, texture3D, uniform, vec3, vec4 } from 'three/tsl';
+import { attribute, Discard, Fn, getShIrradianceAt, int, ivec2, normalWorld, texture, texture3D, uniform, vec3, vec4 } from 'three/tsl';
 
 import { DISTANCE_COLUMNS, sampleGridSH } from '../tsl/lighting/LightProbeGridNode.js';
 
@@ -58,22 +58,25 @@ class LightProbeGridHelper extends InstancedMesh {
 		// Atlas and resolution are swappable uniforms, so the shading node builds once.
 
 		this._atlas = texture3D( probes.texture );
-		this._distance = texture( probes._distanceTarget.texture );
+		this._distance = probes.visibility ? texture( probes._distanceTarget.texture ) : null;
 		this._resolution = uniform( new Vector3() );
 		this._distanceResolution = uniform( 8, 'int' );
-		this._visibility = uniform( 0, 'int' ).setGroup( renderGroup ).onRenderUpdate( () => this.probes.visibility ? 1 : 0 );
 
 		material.fragmentNode = Fn( () => {
 
 			const sh = sampleGridSH( this._atlas, attribute( 'instanceUVW', 'vec3' ), this._resolution.z );
 			const irradiance = getShIrradianceAt( normalWorld, sh ).max( vec3( 0.0 ) );
 
-			// Round the interpolated probe index before reading its distance tile.
-			const probeIndex = int( attribute( 'instanceProbeIndex', 'float' ).add( 0.5 ) );
-			const tile = ivec2( probeIndex.mod( DISTANCE_COLUMNS ), probeIndex.div( DISTANCE_COLUMNS ) );
-			const distanceCoord = tile.mul( this._distanceResolution.add( 2 ) ).add( this._distanceResolution.div( 2 ).add( 1 ) );
-			const meanDistance = this._distance.load( distanceCoord ).x;
-			Discard( this._visibility.equal( 1 ).and( meanDistance.lessThan( 0.0 ) ) );
+			if ( probes.visibility ) {
+
+				// Round the interpolated probe index before reading its distance tile.
+				const probeIndex = int( attribute( 'instanceProbeIndex', 'float' ).add( 0.5 ) );
+				const tile = ivec2( probeIndex.mod( DISTANCE_COLUMNS ), probeIndex.div( DISTANCE_COLUMNS ) );
+				const distanceCoord = tile.mul( this._distanceResolution.add( 2 ) ).add( this._distanceResolution.div( 2 ).add( 1 ) );
+				const meanDistance = this._distance.load( distanceCoord ).x;
+				Discard( meanDistance.lessThan( 0.0 ) );
+
+			}
 
 			return vec4( irradiance, 1.0 );
 
@@ -86,7 +89,7 @@ class LightProbeGridHelper extends InstancedMesh {
 	/**
 	 * Rebuilds instance matrices and UVW attributes from the current probe grid,
 	 * and rebinds the shading node to its atlas. Call this after changing
-	 * `probes` or after re-baking.
+	 * `probes` or after re-baking. Recreate the helper to change visibility.
 	 */
 	update() {
 
@@ -143,8 +146,14 @@ class LightProbeGridHelper extends InstancedMesh {
 		this.geometry.setAttribute( 'instanceProbeIndex', new InstancedBufferAttribute( indexArray, 1 ) );
 
 		this._atlas.value = probes.texture;
-		this._distance.value = probes._distanceTarget.texture;
-		this._distanceResolution.value = probes.visibilityGridSize;
+
+		if ( probes.visibility ) {
+
+			this._distance.value = probes._distanceTarget.texture;
+			this._distanceResolution.value = probes.visibilityGridSize;
+
+		}
+
 		this._resolution.value.copy( res );
 
 	}

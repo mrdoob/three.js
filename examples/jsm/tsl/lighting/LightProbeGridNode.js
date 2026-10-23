@@ -337,7 +337,6 @@ class LightProbeGridNode extends AnalyticLightNode {
 		this._distanceScale = uniform( 1 ).setGroup( renderGroup );
 		this._normalBias = uniform( 0 ).setGroup( renderGroup );
 		this._viewBias = uniform( 0 ).setGroup( renderGroup );
-		this._visibility = uniform( 0, 'int' ).setGroup( renderGroup );
 
 		this.updateType = NodeUpdateType.RENDER;
 
@@ -358,7 +357,6 @@ class LightProbeGridNode extends AnalyticLightNode {
 		this._distanceScale.value = light._distanceScale;
 		this._normalBias.value = light.normalBias;
 		this._viewBias.value = light.viewBias;
-		this._visibility.value = light.visibility ? 1 : 0;
 
 	}
 
@@ -398,38 +396,6 @@ class LightProbeGridNode extends AnalyticLightNode {
 		const resMinusOne = res.sub( 1.0 );
 		const spacing = range.div( resMinusOne );
 
-		// Initialize atlases before creating texture bindings.
-
-		builder.renderer.initRenderTarget( light._renderTarget );
-
-		// Select visibility with a uniform to reuse the material.
-
-		builder.renderer.initRenderTarget( light._distanceTarget );
-
-		const distanceTarget = light._distanceTarget;
-		const grid = {
-			min,
-			res,
-			spacing,
-			moments: texture( distanceTarget.texture ),
-			visibilityGridSize: light.visibilityGridSize,
-			distanceScale: this._distanceScale,
-			normalBias: this._normalBias,
-			viewBias: this._viewBias,
-			momentsSize: vec2( distanceTarget.width, distanceTarget.height ),
-			irradianceSize: vec2( light._irradianceTarget.width, light._irradianceTarget.height )
-		};
-
-		// Without visibility: offset along the normal by half a probe spacing, then
-		// remap to texel centers for hardware trilinear filtering.
-
-		const samplePos = positionWorld.add( normalWorld.mul( spacing ).mul( 0.5 ) );
-		const uvw = samplePos.sub( min ).div( range ).clamp( 0.0, 1.0 ).mul( resMinusOne ).div( res ).add( vec3( 0.5 ).div( res ) );
-
-		const atlas = texture3D( light.texture );
-		builder.renderer.initRenderTarget( light._irradianceTarget );
-		const irradianceAtlas = texture( light._irradianceTarget.texture );
-
 		const lightsData = builder.getDataFromNode( builder.lightsNode );
 
 		if ( lightsData.probeGridInfluenceSum === undefined ) {
@@ -460,15 +426,39 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		If( weight.greaterThan( 0.0 ), () => {
 
-			If( this._visibility.equal( 1 ), () => {
+			if ( light.visibility ) {
 
-				result.assign( evaluateGridIrradianceVisibility( grid, irradianceAtlas ) );
+				const distanceTarget = light._distanceTarget;
+				const irradianceTarget = light._irradianceTarget;
+				builder.renderer.initRenderTarget( distanceTarget );
+				builder.renderer.initRenderTarget( irradianceTarget );
 
-			} ).Else( () => {
+				const grid = {
+					min,
+					res,
+					spacing,
+					moments: texture( distanceTarget.texture ),
+					visibilityGridSize: light.visibilityGridSize,
+					distanceScale: this._distanceScale,
+					normalBias: this._normalBias,
+					viewBias: this._viewBias,
+					momentsSize: vec2( distanceTarget.width, distanceTarget.height ),
+					irradianceSize: vec2( irradianceTarget.width, irradianceTarget.height )
+				};
 
-				result.assign( getShIrradianceAt( normalWorld, sampleGridSH( atlas, uvw, res.z ) ).max( vec3( 0.0 ) ) );
+				result.assign( evaluateGridIrradianceVisibility( grid, texture( irradianceTarget.texture ) ) );
 
-			} );
+			} else {
+
+				// Offset along the normal by half a probe spacing, then remap to texel centers.
+
+				const samplePos = positionWorld.add( normalWorld.mul( spacing ).mul( 0.5 ) );
+				const uvw = samplePos.sub( min ).div( range ).clamp( 0.0, 1.0 ).mul( resMinusOne ).div( res ).add( vec3( 0.5 ).div( res ) );
+
+				builder.renderer.initRenderTarget( light._renderTarget );
+				result.assign( getShIrradianceAt( normalWorld, sampleGridSH( texture3D( light.texture ), uvw, res.z ) ).max( vec3( 0.0 ) ) );
+
+			}
 
 		} );
 

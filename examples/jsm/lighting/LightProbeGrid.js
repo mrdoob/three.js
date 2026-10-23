@@ -62,6 +62,7 @@ const _copyRegion = /*@__PURE__*/ new Box3();
 let _shMaterial = null;
 let _shFaceSize = - 1;
 let _distanceResolution = - 1;
+let _distanceFaceSize = - 1;
 let _faceNode = null;
 let _batchNode = null;
 let _batchStartUniform = null;
@@ -457,8 +458,9 @@ function setCaptureNear( near ) {
  * @private
  * @param {number} cubemapSize - Resolution of each cubemap face.
  * @param {number} totalProbes - Number of probes (batch target height).
+ * @param {boolean} visibility - Whether visibility data is required.
  */
-function ensureBakeTargets( cubemapSize, totalProbes ) {
+function ensureBakeTargets( cubemapSize, totalProbes, visibility ) {
 
 	if ( _faceTarget === null || _faceSize !== cubemapSize ) {
 
@@ -478,6 +480,12 @@ function ensureBakeTargets( cubemapSize, totalProbes ) {
 
 		} );
 
+		_faceSize = cubemapSize;
+
+	}
+
+	if ( visibility && ( _classifyTarget === null || _classifyTarget.width !== 6 * cubemapSize ) ) {
+
 		// The classification capture: back-face flags and depth for visibility.
 		if ( _classifyTarget !== null ) _classifyTarget.dispose();
 
@@ -487,8 +495,6 @@ function ensureBakeTargets( cubemapSize, totalProbes ) {
 			generateMipmaps: false,
 			depthTexture: new DepthTexture( 6 * cubemapSize, PROBES_PER_BATCH * cubemapSize )
 		} );
-
-		_faceSize = cubemapSize;
 
 	}
 
@@ -520,19 +526,15 @@ function ensureBakeTargets( cubemapSize, totalProbes ) {
  * @param {number} cubemapSize - Resolution of each cubemap face.
  * @param {Texture} faceMap - The current face atlas texture.
  * @param {Texture} batchMap - The current batch render target texture.
- * @param {Texture} classifyMap - The current classification capture texture.
- * @param {DepthTexture} depthMap - The current classification capture depth texture.
  * @param {number} visibilityGridSize - The octahedral distance resolution.
+ * @param {boolean} visibility - Whether visibility data is required.
  */
-function ensureBakeMaterials( cubemapSize, faceMap, batchMap, classifyMap, depthMap, visibilityGridSize ) {
+function ensureBakeMaterials( cubemapSize, faceMap, batchMap, visibilityGridSize, visibility ) {
 
 	if ( _repackMaterials === null ) {
 
 		_faceNode = texture( faceMap );
 		_batchNode = texture( batchMap );
-		_classifyNode = texture( classifyMap );
-		_depthNode = texture( depthMap );
-		_classifyMaterials = [ FrontSide, BackSide, DoubleSide ].map( createClassifyMaterial );
 		_batchStartUniform = uniform( 0, 'int' );
 		_batchCountUniform = uniform( 0, 'int' );
 		_nearUniform = uniform( 0.1 );
@@ -557,26 +559,46 @@ function ensureBakeMaterials( cubemapSize, faceMap, batchMap, classifyMap, depth
 
 		_faceNode.value = faceMap;
 		_batchNode.value = batchMap;
-		_classifyNode.value = classifyMap;
-		_depthNode.value = depthMap;
 
 	}
 
-	if ( _shMaterial === null || _shFaceSize !== cubemapSize || _distanceResolution !== visibilityGridSize ) {
+	if ( _shMaterial === null || _shFaceSize !== cubemapSize ) {
 
-		if ( _shMaterial !== null ) {
-
-			_shMaterial.dispose();
-			_distanceMaterial.dispose();
-			_fractionMaterial.dispose();
-
-		}
+		if ( _shMaterial !== null ) _shMaterial.dispose();
 
 		_shMaterial = new NodeMaterial();
 		_shMaterial.outputNode = projectSHNode( _faceNode, cubemapSize, _batchStartUniform );
 		_shMaterial.depthTest = false;
 		_shMaterial.depthWrite = false;
 		_shFaceSize = cubemapSize;
+
+	}
+
+	if ( visibility === false ) return;
+
+	if ( _classifyNode === null ) {
+
+		_classifyNode = texture( _classifyTarget.texture );
+		_depthNode = texture( _classifyTarget.depthTexture );
+		_classifyMaterials = [ FrontSide, BackSide, DoubleSide ].map( createClassifyMaterial );
+
+	} else {
+
+		_classifyNode.value = _classifyTarget.texture;
+		_depthNode.value = _classifyTarget.depthTexture;
+
+	}
+
+	if ( _distanceMaterial === null || _distanceFaceSize !== cubemapSize || _distanceResolution !== visibilityGridSize ) {
+
+		if ( _distanceMaterial !== null ) {
+
+			_distanceMaterial.dispose();
+			_fractionMaterial.dispose();
+
+		}
+
+		_distanceFaceSize = cubemapSize;
 		_distanceResolution = visibilityGridSize;
 
 		_fractionMaterial = new NodeMaterial();
@@ -715,7 +737,7 @@ class LightProbeGrid extends Light {
 		 * Whether shading weighs each probe by whether it can see the surface, using
 		 * distance moments recorded during the bake. This keeps light from leaking
 		 * through walls between probes, at the cost of more texture reads per
-		 * fragment. It can be changed at any time.
+		 * fragment. Set before the first bake; recreate the grid to change it.
 		 *
 		 * @type {boolean}
 		 * @default false
@@ -915,8 +937,8 @@ class LightProbeGrid extends Light {
 		// Bind the pooled bake resources to the current textures.
 
 		ensureCaptureCamera( near, far );
-		ensureBakeTargets( cubemapSize, totalProbes );
-		ensureBakeMaterials( cubemapSize, _faceTarget.texture, _batchTarget.texture, _classifyTarget.texture, _classifyTarget.depthTexture, this.visibilityGridSize );
+		ensureBakeTargets( cubemapSize, totalProbes, this.visibility );
+		ensureBakeMaterials( cubemapSize, _faceTarget.texture, _batchTarget.texture, this.visibilityGridSize, this.visibility );
 
 		_nearUniform.value = near * CLASSIFY_NEAR_SCALE;
 		_clearanceUniform.value = near * CLEARANCE_NEAR_PLANES;
@@ -975,9 +997,9 @@ class LightProbeGrid extends Light {
 
 				this._updateBounceGrid( renderer, scene, pass, start );
 				// Geometry is static during the bake, so distances are recorded once.
-				this._captureProbes( renderer, scene, start, end, pass === 0 );
+				this._captureProbes( renderer, scene, start, end, this.visibility && pass === 0 );
 				this._repackProbes( renderer, start, end );
-				this._updateIrradiance( renderer, start, end );
+				if ( this.visibility ) this._updateIrradiance( renderer, start, end );
 
 			}
 
@@ -1020,6 +1042,7 @@ class LightProbeGrid extends Light {
 
 			const res = this.resolution;
 			this._bounceGrid = new LightProbeGrid( this.width, this.height, this.depth, res.x, res.y, res.z );
+			this._bounceGrid.visibility = this.visibility;
 			this._bounceGrid.visibilityGridSize = this.visibilityGridSize;
 			this._bounceGrid._ensureTextures();
 			renderer.initRenderTarget( this._bounceGrid._renderTarget );
@@ -1040,15 +1063,19 @@ class LightProbeGrid extends Light {
 			renderer.copyTextureToTexture( renderTarget.texture, this._bounceGrid.texture, _copyRegion );
 			this._bouncePass = pass;
 
-			const irradianceTarget = this._irradianceTarget;
-			_copyRegion.max.set( irradianceTarget.width, irradianceTarget.height, 1 );
-			renderer.initRenderTarget( this._bounceGrid._irradianceTarget );
-			renderer.copyTextureToTexture( irradianceTarget.texture, this._bounceGrid._irradianceTarget.texture, _copyRegion );
+			if ( this.visibility ) {
 
-			const distanceTarget = this._distanceTarget;
-			renderer.initRenderTarget( this._bounceGrid._distanceTarget );
-			_copyRegion.max.set( distanceTarget.width, distanceTarget.height, 1 );
-			renderer.copyTextureToTexture( distanceTarget.texture, this._bounceGrid._distanceTarget.texture, _copyRegion );
+				const irradianceTarget = this._irradianceTarget;
+				_copyRegion.max.set( irradianceTarget.width, irradianceTarget.height, 1 );
+				renderer.initRenderTarget( this._bounceGrid._irradianceTarget );
+				renderer.copyTextureToTexture( irradianceTarget.texture, this._bounceGrid._irradianceTarget.texture, _copyRegion );
+
+				const distanceTarget = this._distanceTarget;
+				renderer.initRenderTarget( this._bounceGrid._distanceTarget );
+				_copyRegion.max.set( distanceTarget.width, distanceTarget.height, 1 );
+				renderer.copyTextureToTexture( distanceTarget.texture, this._bounceGrid._distanceTarget.texture, _copyRegion );
+
+			}
 
 		}
 
@@ -1058,7 +1085,6 @@ class LightProbeGrid extends Light {
 		// The direct pass adds the grid unlit, so all passes share the lights and their shaders.
 		bounceGrid.intensity = pass === 0 ? 0 : this.intensity;
 		bounceGrid.falloff = this.falloff;
-		bounceGrid.visibility = this.visibility;
 		bounceGrid.normalBias = this.normalBias;
 		bounceGrid.viewBias = this.viewBias;
 		bounceGrid._distanceScale = this._distanceScale;
@@ -1315,6 +1341,10 @@ class LightProbeGrid extends Light {
 			depthBuffer: false
 		} );
 
+		this.texture = this._renderTarget.texture;
+
+		if ( this.visibility === false ) return;
+
 		// Irradiance per probe for visibility shading, as octahedral tiles in bake order.
 
 		const rows = Math.ceil( nx * ny * nz / DISTANCE_COLUMNS );
@@ -1341,8 +1371,6 @@ class LightProbeGrid extends Light {
 			depthBuffer: false
 		} );
 
-		this.texture = this._renderTarget.texture;
-
 	}
 
 	/**
@@ -1360,8 +1388,8 @@ class LightProbeGrid extends Light {
 
 		if ( this._renderTarget !== null ) {
 
-			this._distanceTarget.dispose();
-			this._irradianceTarget.dispose();
+			if ( this._distanceTarget !== null ) this._distanceTarget.dispose();
+			if ( this._irradianceTarget !== null ) this._irradianceTarget.dispose();
 			this._distanceTarget = null;
 			this._irradianceTarget = null;
 			this._renderTarget.dispose();
