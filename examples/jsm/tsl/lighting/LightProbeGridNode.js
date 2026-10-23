@@ -290,30 +290,6 @@ function evaluateGridIrradianceVisibility( grid, irradianceAtlas, position = pos
 }
 
 
-const gridInfluence = /*@__PURE__*/ Fn( ( [ position, probeMin, probeMax, influenceMin, influenceMax, hasInfluenceBox, falloff, intensity ] ) => {
-
-	const inside = position.greaterThanEqual( influenceMin ).all().and( position.lessThanEqual( influenceMax ).all() );
-	const outside = probeMin.sub( position ).max( 0.0 ).add( position.sub( probeMax ).max( 0.0 ) ).toConst();
-	const fade = select( falloff.greaterThan( 0.0 ), outside.length().smoothstep( 0.0, falloff.max( 1e-6 ) ).oneMinus(), 1.0 );
-	const influence = select( hasInfluenceBox.equal( 1 ), select( inside, 1.0, 0.0 ), fade );
-
-	return select( intensity.greaterThan( 0.0 ), influence, 0.0 );
-
-} ).setLayout( {
-	name: 'lightProbeGridInfluence',
-	type: 'float',
-	inputs: [
-		{ name: 'position', type: 'vec3' },
-		{ name: 'probeMin', type: 'vec3' },
-		{ name: 'probeMax', type: 'vec3' },
-		{ name: 'influenceMin', type: 'vec3' },
-		{ name: 'influenceMax', type: 'vec3' },
-		{ name: 'hasInfluenceBox', type: 'int' },
-		{ name: 'falloff', type: 'float' },
-		{ name: 'intensity', type: 'float' }
-	]
-} );
-
 /**
  * Shares atlas bindings and irradiance evaluation between live lighting and light-map baking.
  * Intensity and spatial influence are applied by the caller.
@@ -424,9 +400,6 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		this._min = uniform( new Vector3() ).setGroup( renderGroup );
 		this._max = uniform( new Vector3() ).setGroup( renderGroup );
-		this._influenceMin = uniform( new Vector3() ).setGroup( renderGroup );
-		this._influenceMax = uniform( new Vector3() ).setGroup( renderGroup );
-		this._hasInfluenceBox = uniform( 0, 'int' ).setGroup( renderGroup );
 		this._resolution = uniform( new Vector3() ).setGroup( renderGroup );
 		this._intensity = uniform( 1 ).setGroup( renderGroup );
 		this._falloff = uniform( 0 ).setGroup( renderGroup );
@@ -444,9 +417,6 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		this._min.value.copy( light.boundingBox.min );
 		this._max.value.copy( light.boundingBox.max );
-		this._influenceMin.value.copy( ( light.influenceBox || light.boundingBox ).min );
-		this._influenceMax.value.copy( ( light.influenceBox || light.boundingBox ).max );
-		this._hasInfluenceBox.value = light.influenceBox !== null ? 1 : 0;
 		this._resolution.value.copy( light.resolution );
 		this._intensity.value = light.intensity;
 		this._falloff.value = light.falloff;
@@ -457,25 +427,6 @@ class LightProbeGridNode extends AnalyticLightNode {
 	}
 
 
-	/**
-	 * Returns spatial influence without intensity, for blending overlapping grids.
-	 *
-	 * @private
-	 */
-	getInfluenceWeight( builder ) {
-
-		const nodeData = builder.getDataFromNode( this );
-
-		if ( nodeData.influenceWeight === undefined ) {
-
-			nodeData.influenceWeight = gridInfluence( positionWorld, this._min, this._max, this._influenceMin, this._influenceMax, this._hasInfluenceBox, this._falloff, this._intensity ).toVar();
-
-		}
-
-		return nodeData.influenceWeight;
-
-	}
-
 	setup( builder ) {
 
 		const light = this.light;
@@ -484,35 +435,11 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		if ( light.texture === null ) return;
 
-		const lightsData = builder.getDataFromNode( builder.lightsNode );
-
-		if ( lightsData.probeGridInfluenceSum === undefined ) {
-
-			let totalInfluence = float( 0.0 );
-
-			for ( const node of builder.lightsNode.getLightNodes( builder ) ) {
-
-				if ( node.light && node.light.isLightProbeGrid && node.light.texture !== null ) {
-
-					totalInfluence = totalInfluence.add( node.getInfluenceWeight( builder ) );
-
-				}
-
-			}
-
-			// Share the normalization across grids, preserving outer boundary fades.
-
-			lightsData.probeGridInfluenceSum = totalInfluence.max( 1.0 ).toVar();
-
-		}
-
-		const weight = this._intensity.mul( this.getInfluenceWeight( builder ) ).div( lightsData.probeGridInfluenceSum ).toVar();
-
 		// Skip lookups when the grid contributes nothing.
 
 		const result = vec3( 0.0 ).toVar();
 
-		If( weight.greaterThan( 0.0 ), () => {
+		If( this._intensity.greaterThan( 0.0 ), () => {
 
 			const grid = {
 				min: this._min,
@@ -527,7 +454,16 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		} );
 
-		builder.context.irradiance.addAssign( result.mul( weight ) );
+		let irradiance = result.mul( this._intensity );
+
+		if ( light.falloff > 0 ) {
+
+			const outside = this._min.sub( positionWorld ).max( 0.0 ).add( positionWorld.sub( this._max ).max( 0.0 ) );
+			irradiance = irradiance.mul( outside.length().smoothstep( 0.0, this._falloff ).oneMinus() );
+
+		}
+
+		builder.context.irradiance.addAssign( irradiance );
 
 	}
 
