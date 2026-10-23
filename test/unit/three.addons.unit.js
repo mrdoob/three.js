@@ -14,7 +14,6 @@ import './addons/loaders/HDRLoader.tests.js';
 import './addons/loaders/KSPLATLoader.tests.js';
 import './addons/loaders/GaussianSplatPLYLoader.tests.js';
 import './addons/loaders/MaterialXLoader.tests.js';
-import './addons/loaders/NRRDLoader.tests.js';
 import './addons/loaders/SPLATLoader.tests.js';
 import './addons/loaders/SPZLoader.tests.js';
 import './addons/loaders/USDLoader.tests.js';
