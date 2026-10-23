@@ -1103,7 +1103,7 @@ class Renderer {
 
 		//
 
-		this.drawer.begin( camera );
+		this.drawer.begin( camera, renderContext );
 
 		// Use sceneRef for render list to ensure lightsNode matches between compileAsync and render
 		const renderList = this._renderLists.get( sceneRef, camera, this.lighting );
@@ -2126,7 +2126,7 @@ class Renderer {
 
 		//
 
-		this.drawer.begin( camera );
+		this.drawer.begin( camera, renderContext );
 
 		this._renderLists.update( nodeFrame.frameId );
 
