@@ -1453,12 +1453,12 @@ class NodeBuilder {
 	 * Generates a texture size shader string for the given texture data.
 	 *
 	 * @abstract
-	 * @param {Texture} texture - The texture.
+	 * @param {TextureNode} textureNode - The texture node.
 	 * @param {string} textureProperty - The texture property name.
 	 * @param {string} levelSnippet - Snippet defining the mip level.
 	 * @return {string} The generated shader string.
 	 */
-	generateTextureSize( /* texture, textureProperty, levelSnippet */ ) {
+	generateTextureSize( /* textureNode, textureProperty, levelSnippet */ ) {
 
 		warn( 'Abstract function.' );
 
