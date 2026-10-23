@@ -199,7 +199,7 @@ const probeInterpolationWeight = /*@__PURE__*/ Fn( ( [ moments, distance, normal
 } );
 
 /**
- * Blends four probes with tetrahedral, wrapped-normal and Chebyshev visibility weights.
+ * Blends probes with trilinear or tetrahedral interpolation and visibility weights.
  *
  * @private
  * @see {@link https://github.com/NVIDIAGameWorks/RTXGI-DDGI/blob/main/rtxgi-sdk/shaders/ddgi/Irradiance.hlsl}
@@ -225,23 +225,42 @@ function evaluateGridIrradianceVisibility( grid, irradianceAtlas, position = pos
 	// Every probe is sampled in the direction of the normal.
 	const normalOct = octEncode( normal ).mul( IRRADIANCE_RESOLUTION ).add( 1.0 ).toVar();
 
-	// Split each cell into six tetrahedra along its minimum-to-maximum diagonal.
-	// Resolve ties with opposite priorities to keep max/min axes distinct.
-	const maxAxis = select( alpha.x.greaterThanEqual( alpha.y ).and( alpha.x.greaterThanEqual( alpha.z ) ), int( 0 ), select( alpha.y.greaterThanEqual( alpha.z ), int( 1 ), int( 2 ) ) ).toConst();
-	const minAxis = select( alpha.z.lessThanEqual( alpha.x ).and( alpha.z.lessThanEqual( alpha.y ) ), int( 2 ), select( alpha.y.lessThanEqual( alpha.x ), int( 1 ), int( 0 ) ) ).toConst();
-	const maxCorner = vec3( select( maxAxis.equal( 0 ), 1.0, 0.0 ), select( maxAxis.equal( 1 ), 1.0, 0.0 ), select( maxAxis.equal( 2 ), 1.0, 0.0 ) ).toConst();
-	const minCorner = vec3( select( minAxis.equal( 0 ), 1.0, 0.0 ), select( minAxis.equal( 1 ), 1.0, 0.0 ), select( minAxis.equal( 2 ), 1.0, 0.0 ) ).toConst();
-	const alphaMax = alpha.x.max( alpha.y ).max( alpha.z ).toConst();
-	const alphaMin = alpha.x.min( alpha.y ).min( alpha.z ).toConst();
-	const alphaMid = alpha.x.add( alpha.y ).add( alpha.z ).sub( alphaMax ).sub( alphaMin ).toConst();
+	const tetrahedral = grid.visibilityInterpolation === 'tetrahedral';
+	let maxCorner, minCorner, alphaMax, alphaMid, alphaMin;
 
-	Loop( 4, ( { i: corner } ) => {
+	if ( tetrahedral ) {
 
-		const offset = select( corner.equal( 0 ), vec3( 0.0 ), select( corner.equal( 1 ), maxCorner, select( corner.equal( 2 ), minCorner.oneMinus(), vec3( 1.0 ) ) ) ).toVar();
+		// Split each cell into six tetrahedra along its minimum-to-maximum diagonal.
+		// Resolve ties with opposite priorities to keep max/min axes distinct.
+		const maxAxis = select( alpha.x.greaterThanEqual( alpha.y ).and( alpha.x.greaterThanEqual( alpha.z ) ), int( 0 ), select( alpha.y.greaterThanEqual( alpha.z ), int( 1 ), int( 2 ) ) ).toConst();
+		const minAxis = select( alpha.z.lessThanEqual( alpha.x ).and( alpha.z.lessThanEqual( alpha.y ) ), int( 2 ), select( alpha.y.lessThanEqual( alpha.x ), int( 1 ), int( 0 ) ) ).toConst();
+		maxCorner = vec3( select( maxAxis.equal( 0 ), 1.0, 0.0 ), select( maxAxis.equal( 1 ), 1.0, 0.0 ), select( maxAxis.equal( 2 ), 1.0, 0.0 ) ).toConst();
+		minCorner = vec3( select( minAxis.equal( 0 ), 1.0, 0.0 ), select( minAxis.equal( 1 ), 1.0, 0.0 ), select( minAxis.equal( 2 ), 1.0, 0.0 ) ).toConst();
+		alphaMax = alpha.x.max( alpha.y ).max( alpha.z ).toConst();
+		alphaMin = alpha.x.min( alpha.y ).min( alpha.z ).toConst();
+		alphaMid = alpha.x.add( alpha.y ).add( alpha.z ).sub( alphaMax ).sub( alphaMin ).toConst();
 
-		// Keep zero barycentric weights at shared faces to preserve continuity.
+	}
 
-		const tetraWeight = select( corner.equal( 0 ), alphaMax.oneMinus(), select( corner.equal( 1 ), alphaMax.sub( alphaMid ), select( corner.equal( 2 ), alphaMid.sub( alphaMin ), alphaMin ) ) ).max( 0.0 ).toConst();
+	Loop( tetrahedral ? 4 : 8, ( { i: corner } ) => {
+
+		let offset, interpolationWeight;
+
+		if ( tetrahedral ) {
+
+			offset = select( corner.equal( 0 ), vec3( 0.0 ), select( corner.equal( 1 ), maxCorner, select( corner.equal( 2 ), minCorner.oneMinus(), vec3( 1.0 ) ) ) ).toVar();
+
+			// Keep zero barycentric weights at shared faces to preserve continuity.
+			interpolationWeight = select( corner.equal( 0 ), alphaMax.oneMinus(), select( corner.equal( 1 ), alphaMax.sub( alphaMid ), select( corner.equal( 2 ), alphaMid.sub( alphaMin ), alphaMin ) ) ).max( 0.0 ).toConst();
+
+		} else {
+
+			offset = vec3( corner.bitAnd( 1 ), corner.shiftRight( 1 ).bitAnd( 1 ), corner.shiftRight( 2 ).bitAnd( 1 ) ).toVar();
+			const blend = offset.mul( alpha ).add( offset.oneMinus().mul( alpha.oneMinus() ) ).max( vec3( 0.001 ) ).toConst();
+			interpolationWeight = blend.x.mul( blend.y ).mul( blend.z ).toConst();
+
+		}
+
 		const cell = base.add( offset ).toVar();
 		const probePosition = min.add( cell.mul( spacing ) ).toVar();
 
@@ -263,7 +282,7 @@ function evaluateGridIrradianceVisibility( grid, irradianceAtlas, position = pos
 
 		If( probeMoments.x.greaterThanEqual( 0.0 ), () => {
 
-			const weight = probeInterpolationWeight( probeMoments, distance.div( distanceScale ), normal, probePosition.sub( position ) ).mul( tetraWeight ).toConst();
+			const weight = probeInterpolationWeight( probeMoments, distance.div( distanceScale ), normal, probePosition.sub( position ) ).mul( interpolationWeight ).toConst();
 
 			const tile = vec2( float( probeIndex.mod( DISTANCE_COLUMNS ) ), float( probeIndex.div( DISTANCE_COLUMNS ) ) );
 			const irradianceUV = tile.mul( IRRADIANCE_TILE ).add( normalOct ).div( irradianceSize );
@@ -315,6 +334,7 @@ function sampleGridIrradiance( light, grid, position, normal, builder ) {
 			spacing,
 			moments: texture( distanceTarget.texture ),
 			visibilityGridSize: light.visibilityGridSize,
+			visibilityInterpolation: light.visibilityInterpolation,
 			momentsSize: vec2( distanceTarget.width, distanceTarget.height ),
 			irradianceSize: vec2( irradianceTarget.width, irradianceTarget.height )
 		}, texture( irradianceTarget.texture ), position, normal );

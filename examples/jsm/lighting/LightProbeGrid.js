@@ -735,7 +735,7 @@ class LightProbeGrid extends Light {
 
 		/**
 		 * Whether shading weighs each probe by whether it can see the surface, using
-		 * distance moments recorded during the bake and four-probe tetrahedral
+		 * distance moments recorded during the bake and the selected probe
 		 * interpolation. This keeps light from leaking through walls between probes,
 		 * at the cost of more texture reads per fragment. Set before the first bake;
 		 * recreate the grid to change it.
@@ -744,6 +744,16 @@ class LightProbeGrid extends Light {
 		 * @default false
 		 */
 		this.visibility = false;
+
+		/**
+		 * Interpolation used with visibility weighting. `'trilinear'` blends eight
+		 * probes; `'tetrahedral'` blends four to reduce shading costs, but can introduce
+		 * directional artifacts. Set before the first bake; recreate the grid to change it.
+		 *
+		 * @type {string}
+		 * @default 'trilinear'
+		 */
+		this.visibilityInterpolation = 'trilinear';
 
 		/**
 		 * Octahedral distance-map resolution per probe, excluding the border.
@@ -1044,6 +1054,7 @@ class LightProbeGrid extends Light {
 			const res = this.resolution;
 			this._bounceGrid = new LightProbeGrid( this.width, this.height, this.depth, res.x, res.y, res.z );
 			this._bounceGrid.visibility = this.visibility;
+			this._bounceGrid.visibilityInterpolation = this.visibilityInterpolation;
 			this._bounceGrid.visibilityGridSize = this.visibilityGridSize;
 			this._bounceGrid._ensureTextures();
 			renderer.initRenderTarget( this._bounceGrid._renderTarget );

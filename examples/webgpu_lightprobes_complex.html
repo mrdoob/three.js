@@ -286,6 +286,7 @@
 				const params = {
 					enabled: true,
 					visibility: true,
+					visibilityInterpolation: 'trilinear',
 					visibilityGridSize: 8,
 					showProbes: false,
 					resolution: 6,
@@ -320,12 +321,14 @@
 					probesLeft.position.set( - 3.9, 2.45, 0 );
 					probesLeft.influenceBox = new THREE.Box3( new THREE.Vector3( - 8, 0, - 4 ), new THREE.Vector3( 0, 5, 4 ) );
 					probesLeft.visibility = params.visibility;
+					probesLeft.visibilityInterpolation = params.visibilityInterpolation;
 					probesLeft.visibilityGridSize = params.visibilityGridSize;
 
 					probesRight = new LightProbeGrid( 7.8, 4.7, 7.6, resolution, resolution, resolution );
 					probesRight.position.set( 3.9, 2.45, 0 );
 					probesRight.influenceBox = new THREE.Box3( new THREE.Vector3( 0, 0, - 4 ), new THREE.Vector3( 8, 5, 4 ) );
 					probesRight.visibility = params.visibility;
+					probesRight.visibilityInterpolation = params.visibilityInterpolation;
 					probesRight.visibilityGridSize = params.visibilityGridSize;
 
 					// Keep the helper spheres out of the cubemap captures.
@@ -394,6 +397,8 @@
 				} );
 
 				gui.add( params, 'visibility' ).name( 'Visibility' ).onChange( requestBake );
+
+				gui.add( params, 'visibilityInterpolation', { 'Trilinear (8 probes)': 'trilinear', 'Tetrahedral (4 probes)': 'tetrahedral' } ).name( 'Interpolation' ).onChange( requestBake );
 
 				gui.add( params, 'visibilityGridSize', [ 4, 8, 16, 32 ] ).name( 'Visibility Map Size' ).onChange( requestBake );
 

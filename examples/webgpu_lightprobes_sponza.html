@@ -63,6 +63,7 @@
 			const params = {
 				enabled: true,
 				visibility: true,
+				visibilityInterpolation: 'trilinear',
 				visibilityGridSize: 8,
 				showProbes: false,
 				probeSize: 0.2,
@@ -196,6 +197,8 @@
 
 				gui.add( params, 'visibility' ).name( 'Visibility' ).onChange( createProbes );
 
+				gui.add( params, 'visibilityInterpolation', { 'Trilinear (8 probes)': 'trilinear', 'Tetrahedral (4 probes)': 'tetrahedral' } ).name( 'Interpolation' ).onChange( createProbes );
+
 				gui.add( params, 'visibilityGridSize', [ 4, 8, 16, 32 ] ).name( 'Visibility Map Size' ).onChange( createProbes );
 
 				gui.add( params, 'lightAzimuth', - 180, 180, 1 ).name( 'Light Azimuth' ).onChange( () => {
@@ -285,6 +288,7 @@
 				probes.position.set( params.boundsX, params.boundsY, params.boundsZ );
 				probes.visible = params.enabled;
 				probes.visibility = params.visibility;
+				probes.visibilityInterpolation = params.visibilityInterpolation;
 				probes.visibilityGridSize = params.visibilityGridSize;
 				scene.add( probes );
 
