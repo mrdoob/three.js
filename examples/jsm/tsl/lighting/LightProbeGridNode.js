@@ -208,7 +208,7 @@ const probeInterpolationWeight = /*@__PURE__*/ Fn( ( [ moments, distance, normal
  * @private
  * @see {@link https://github.com/NVIDIAGameWorks/RTXGI-DDGI/blob/main/rtxgi-sdk/shaders/ddgi/Irradiance.hlsl}
  */
-function evaluateGridIrradianceVisibility( grid, sampleIrradiance ) {
+function evaluateGridIrradianceVisibility( grid, irradianceAtlas ) {
 
 	const { min, res, spacing, moments, distanceScale, normalBias, viewBias, momentsSize, irradianceSize, visibilityGridSize } = grid;
 
@@ -256,7 +256,7 @@ function evaluateGridIrradianceVisibility( grid, sampleIrradiance ) {
 			const tile = vec2( float( probeIndex.mod( DISTANCE_COLUMNS ) ), float( probeIndex.div( DISTANCE_COLUMNS ) ) );
 			const irradianceUV = tile.mul( IRRADIANCE_TILE ).add( normalOct ).div( irradianceSize );
 
-			total.addAssign( sampleIrradiance( irradianceUV ).rgb.mul( weight ) );
+			total.addAssign( irradianceAtlas.sample( irradianceUV ).rgb.mul( weight ) );
 			weights.addAssign( weight );
 
 		} );
@@ -429,7 +429,6 @@ class LightProbeGridNode extends AnalyticLightNode {
 		const atlas = texture3D( light.texture );
 		builder.renderer.initRenderTarget( light._irradianceTarget );
 		const irradianceAtlas = texture( light._irradianceTarget.texture );
-		const sampleIrradiance = ( uv ) => irradianceAtlas.sample( uv );
 
 		const lightsData = builder.getDataFromNode( builder.lightsNode );
 
@@ -463,7 +462,7 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 			If( this._visibility.equal( 1 ), () => {
 
-				result.assign( evaluateGridIrradianceVisibility( grid, sampleIrradiance ) );
+				result.assign( evaluateGridIrradianceVisibility( grid, irradianceAtlas ) );
 
 			} ).Else( () => {
 
