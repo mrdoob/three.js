@@ -50,26 +50,6 @@ export const BasicPointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, 
 
 } );
 
-
-const pointShadowSampleDirection = /*@__PURE__*/ Fn( ( [ direction, tangent, bitangent, texelSize, phi, index ] ) => {
-
-	const sample = vogelDiskSample( index, 5, phi );
-
-	return direction.add( tangent.mul( sample.x ).add( bitangent.mul( sample.y ) ).mul( texelSize ) );
-
-} ).setLayout( {
-	name: 'pointShadowSampleDirection',
-	type: 'vec3',
-	inputs: [
-		{ name: 'direction', type: 'vec3' },
-		{ name: 'tangent', type: 'vec3' },
-		{ name: 'bitangent', type: 'vec3' },
-		{ name: 'texelSize', type: 'float' },
-		{ name: 'phi', type: 'float' },
-		{ name: 'index', type: 'int' }
-	]
-} );
-
 /**
  * A shadow filtering function for point lights using Vogel disk sampling and IGN.
  *
@@ -99,13 +79,14 @@ export const PointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp, s
 	// Use IGN to rotate sampling pattern per pixel (phi = IGN * 2π)
 	const phi = interleavedGradientNoise( screenCoordinate.xy ).mul( 6.28318530718 ).toConst();
 
-	// Share the sampling math across lights and keep the five taps in a loop.
+	// Accumulate five samples using Vogel disk distribution in tangent space.
 
 	const result = float( 0.0 ).toVar();
 
 	Loop( 5, ( { i } ) => {
 
-		const direction = pointShadowSampleDirection( bd3D, tangent, bitangent, texelSize, phi, i );
+		const sample = vogelDiskSample( i, 5, phi );
+		const direction = bd3D.add( tangent.mul( sample.x ).add( bitangent.mul( sample.y ) ).mul( texelSize ) );
 		result.addAssign( cubeTexture( depthTexture, direction ).compare( dp ) );
 
 	} );
@@ -160,7 +141,6 @@ const pointShadowFilter = /*@__PURE__*/ Fn( ( { filterFn, depthTexture, shadowCo
 	return result;
 
 } );
-
 
 /**
  * Represents the shadow implementation for point light nodes.
