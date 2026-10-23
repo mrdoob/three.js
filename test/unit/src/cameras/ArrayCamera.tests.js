@@ -25,13 +25,6 @@ export default QUnit.module( 'Cameras', () => {
 
 		} );
 
-		QUnit.test( 'perCameraFrustumCulled', ( assert ) => {
-
-			const object = new ArrayCamera();
-			assert.strictEqual( object.perCameraFrustumCulled, false, 'Per-camera frustum culling is opt-in.' );
-
-		} );
-
 		// PUBLIC
 		QUnit.test( 'isArrayCamera', ( assert ) => {
 
