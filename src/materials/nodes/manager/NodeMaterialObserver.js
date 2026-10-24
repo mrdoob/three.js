@@ -411,6 +411,21 @@ class NodeMaterialObserver {
 		if ( scene.environmentNode && scene.environmentNode.isNode )
 			return true;
 
+		// lights
+
+		const lightsNode = builder.lightsNode;
+
+		if ( lightsNode !== null ) {
+
+			for ( const light of lightsNode.getLights() ) {
+
+				if ( light.colorNode || ( light.shadow && light.shadow.shadowNode ) )
+					return true;
+
+			}
+
+		}
+
 		return false;
 
 	}
