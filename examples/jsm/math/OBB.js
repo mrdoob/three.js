@@ -384,7 +384,7 @@ class OBB {
 
 		// compute distance of the OBB's center from the plane
 
-		const d = plane.normal.dot( this.center ) - plane.constant;
+		const d = plane.distanceToPoint( this.center );
 
 		// Intersection occurs when distance d falls within [-r,+r] interval
 
