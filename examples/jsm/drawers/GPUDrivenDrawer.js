@@ -2732,7 +2732,7 @@ class GPUDrivenBatch {
 
 		drawMaterial.positionNode = pulled.positionNode;
 		drawMaterial.maskNode = material.maskNode || null;
-		drawMaterial.contextNode = pulled.context;
+		drawMaterial.contextNode = depthPrepass ? contextNode( pulled.context, { invariant: true } ) : pulled.context;
 
 		const mesh = new Mesh( geometry, drawMaterial );
 		mesh.frustumCulled = false;
@@ -2747,7 +2747,7 @@ class GPUDrivenBatch {
 			depthMaterial.fog = false;
 			depthMaterial.positionNode = pulled.positionNode;
 			depthMaterial.maskNode = material.maskNode || null;
-			depthMaterial.contextNode = pulled.context;
+			depthMaterial.contextNode = contextNode( pulled.context, { invariant: true } );
 
 			const depthMesh = new Mesh( geometry, depthMaterial );
 			depthMesh.frustumCulled = false;
