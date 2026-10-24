@@ -19,11 +19,104 @@
 			a {
 				color: #00f
 			}
-			#button {
+			#quick-look {
 				position: absolute;
-				bottom: 15px;
-				left: calc(50% - 40px);
-
+				bottom: max( 16px, env( safe-area-inset-bottom ) );
+				left: 50%;
+				display: flex;
+				width: min( calc( 100% - 32px ), 380px );
+				box-sizing: border-box;
+				flex-direction: column;
+				gap: 12px;
+				padding: 16px;
+				border: 1px solid rgba( 0, 0, 0, 0.12 );
+				border-radius: 16px;
+				background: rgba( 255, 255, 255, 0.92 );
+				box-shadow: 0 8px 24px rgba( 0, 0, 0, 0.15 );
+				transform: translateX(-50%);
+				z-index: 1;
+				font-family: sans-serif;
+				backdrop-filter: blur( 12px );
+			}
+			#model-picker-label {
+				color: #222;
+				font-size: 13px;
+				font-weight: 600;
+			}
+			#model-options {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 8px;
+			}
+			.model-option {
+				display: flex;
+				flex-direction: column;
+				gap: 3px;
+				min-height: 58px;
+				padding: 10px 12px;
+				border: 2px solid transparent;
+				border-radius: 10px;
+				background: #e8e8e8;
+				color: #222;
+				text-align: left;
+				cursor: pointer;
+				-webkit-tap-highlight-color: transparent;
+			}
+			.model-option:hover {
+				background: #dedede;
+			}
+			.model-option:focus-visible {
+				outline: 3px solid rgba( 0, 102, 204, 0.35 );
+				outline-offset: 2px;
+			}
+			.model-option[aria-pressed="true"] {
+				border-color: #06c;
+				background: #e5f1ff;
+			}
+			.model-name {
+				font-size: 14px;
+				font-weight: 600;
+			}
+			.model-placement {
+				font-size: 12px;
+				opacity: 0.7;
+			}
+			#quick-look-link {
+				display: flex;
+				min-height: 48px;
+				align-items: center;
+				justify-content: center;
+				gap: 8px;
+				box-sizing: border-box;
+				border-radius: 10px;
+				background: #06c;
+				color: #fff;
+				font-size: 15px;
+				font-weight: 600;
+				text-decoration: none;
+				opacity: 0.45;
+				pointer-events: none;
+			}
+			#quick-look-link.ready {
+				opacity: 1;
+				pointer-events: auto;
+			}
+			#quick-look-link:focus-visible {
+				outline: 3px solid rgba( 0, 102, 204, 0.35 );
+				outline-offset: 2px;
+			}
+			#quick-look-link img {
+				width: 24px;
+				height: 24px;
+			}
+			#quick-look-link::after {
+				content: attr( data-label );
+			}
+			#quick-look-status {
+				min-height: 14px;
+				color: #555;
+				font-size: 11px;
+				text-align: center;
 			}
 		</style>
 	</head>
@@ -35,9 +128,23 @@
 			<a href="https://sketchfab.com/prefrontalcortex" target="_blank" rel="noopener">prefrontal cortex</a>
 		</div>
 
-		<a id="link" rel="ar" href="" download="asset.usdz">
-			<img id="button" width="100" src="files/arkit.png">
-		</a>
+		<div id="quick-look" aria-labelledby="model-picker-label">
+			<span id="model-picker-label">Choose a model</span>
+			<div id="model-options">
+				<button class="model-option" type="button" data-alignment="horizontal" aria-pressed="true">
+					<span class="model-name">Bike</span>
+					<span class="model-placement">Place on floor</span>
+				</button>
+				<button class="model-option" type="button" data-alignment="vertical" aria-pressed="false">
+					<span class="model-name">Plaque</span>
+					<span class="model-placement">Place on wall</span>
+				</button>
+			</div>
+			<a id="quick-look-link" rel="ar" role="button" aria-disabled="true" data-label="View in AR">
+				<img src="files/arkit.png" alt="">
+			</a>
+			<span id="quick-look-status" role="status">Preparing bike…</span>
+		</div>
 
 		<script type="importmap">
 			{
@@ -60,13 +167,17 @@
 			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 			import { USDZExporter } from 'three/addons/exporters/USDZExporter.js';
 			import * as WebGLTextureUtils from 'three/addons/utils/WebGLTextureUtils.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
 			let camera, scene, renderer, mixer, timer, controls;
+			let selectedAlignment = 'horizontal';
 
-			const params = {
-				exportUSDZ: exportUSDZ
-			};
+			const quickLookAssets = new Map();
+			const previewModels = new Map();
+			const modelOptions = document.querySelectorAll( '.model-option' );
+			const quickLookLink = document.getElementById( 'quick-look-link' );
+			const quickLookStatus = document.getElementById( 'quick-look-status' );
+			const isAppleMobile = /iPad|iPhone|iPod/.test( navigator.userAgent ) || ( navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1 );
+			const isSafari = /Version\/[\d.]+.*Safari\//.test( navigator.userAgent );
+			const isARSupported = isAppleMobile && isSafari;
 
 			init();
 
@@ -90,6 +201,16 @@
 				scene.background = new THREE.Color( 0xf0f0f0 );
 				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
 
+				const wallPlaque = createWallPlaque();
+				wallPlaque.position.y = 0.8;
+				wallPlaque.visible = false;
+				scene.add( wallPlaque );
+				previewModels.set( 'vertical', wallPlaque );
+
+				const wallPlaqueAR = createWallPlaque();
+				wallPlaqueAR.rotation.x = - Math.PI / 2;
+				prepareQuickLookAsset( wallPlaqueAR, 'vertical' );
+
 				const ktx2loader = new KTX2Loader().detectSupport( renderer );
 				const dracoLoader = new DRACOLoader();
 				const gltfLoader = new GLTFLoader();
@@ -99,7 +220,11 @@
 				gltfLoader.setPath( 'models/gltf/' );
 				gltfLoader.load( 'CarbonFrameBike.glb', async function ( gltf ) {
 
-					scene.add( gltf.scene );
+					const bikePreview = new THREE.Group();
+					bikePreview.visible = selectedAlignment === 'horizontal';
+					bikePreview.add( gltf.scene );
+					scene.add( bikePreview );
+					previewModels.set( 'horizontal', bikePreview );
 
 					if ( gltf.animations.length > 0 ) {
 
@@ -113,13 +238,7 @@
 
 					// USDZ
 
-					const exporter = new USDZExporter();
-					exporter.setTextureUtils( WebGLTextureUtils ); // for texture decompresssing
-					const arraybuffer = await exporter.parseAsync( gltf.scene, { animations: gltf.animations } );
-					const blob = new Blob( [ arraybuffer ], { type: 'application/octet-stream' } );
-
-					const link = document.getElementById( 'link' );
-					link.href = URL.createObjectURL( blob );
+					prepareQuickLookAsset( gltf.scene, 'horizontal', gltf.animations );
 
 				} );
 
@@ -132,16 +251,19 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				const isIOS = /iPad|iPhone|iPod/.test( navigator.userAgent );
+				for ( const option of modelOptions ) {
 
-				if ( isIOS === false ) {
-
-					const gui = new GUI();
-
-					gui.add( params, 'exportUSDZ' ).name( 'Export USDZ' );
-					gui.open();
+					option.addEventListener( 'click', () => selectModel( option.dataset.alignment ) );
 
 				}
+
+				quickLookLink.addEventListener( 'click', function ( event ) {
+
+					if ( quickLookLink.classList.contains( 'ready' ) === false ) event.preventDefault();
+
+				} );
+
+				updateQuickLookLink();
 
 			}
 
@@ -154,10 +276,134 @@
 
 			}
 
-			function exportUSDZ() {
+			function createWallPlaque() {
 
-				const link = document.getElementById( 'link' );
-				link.click();
+				const plaque = new THREE.Group();
+				plaque.name = 'WallPlaque';
+
+				const panelMaterial = new THREE.MeshStandardMaterial( { color: 0x315c7d, roughness: 0.7 } );
+				const frameMaterial = new THREE.MeshStandardMaterial( { color: 0xd6a84b, roughness: 0.35, metalness: 0.6 } );
+				const accentMaterial = new THREE.MeshStandardMaterial( { color: 0xf4e8c1, roughness: 0.6 } );
+
+				const panel = new THREE.Mesh( new THREE.BoxGeometry( 1.2, 0.8, 0.06 ), panelMaterial );
+				panel.name = 'Panel';
+				panel.position.z = 0.03;
+				plaque.add( panel );
+
+				const horizontalFrameGeometry = new THREE.BoxGeometry( 1.32, 0.08, 0.1 );
+				const verticalFrameGeometry = new THREE.BoxGeometry( 0.08, 0.8, 0.1 );
+
+				for ( const y of [ - 0.44, 0.44 ] ) {
+
+					const frame = new THREE.Mesh( horizontalFrameGeometry, frameMaterial );
+					frame.position.set( 0, y, 0.05 );
+					plaque.add( frame );
+
+				}
+
+				for ( const x of [ - 0.62, 0.62 ] ) {
+
+					const frame = new THREE.Mesh( verticalFrameGeometry, frameMaterial );
+					frame.position.set( x, 0, 0.05 );
+					plaque.add( frame );
+
+				}
+
+				const accent = new THREE.Mesh( new THREE.CylinderGeometry( 0.22, 0.22, 0.08, 32 ), accentMaterial );
+				accent.name = 'Accent';
+				accent.rotation.x = Math.PI / 2;
+				accent.position.z = 0.1;
+				plaque.add( accent );
+
+				return plaque;
+
+			}
+
+			async function prepareQuickLookAsset( object, alignment, animations = [] ) {
+
+				object.updateMatrixWorld( true );
+
+				const exporter = new USDZExporter();
+				exporter.setTextureUtils( WebGLTextureUtils ); // for texture decompresssing
+
+				const arraybuffer = await exporter.parseAsync( object, {
+					animations: animations,
+					ar: {
+						anchoring: { type: 'plane' },
+						planeAnchoring: { alignment: alignment },
+					},
+				} );
+				const blob = new Blob( [ arraybuffer ], { type: 'model/vnd.usdz+zip' } );
+
+				quickLookAssets.set( alignment, {
+					href: URL.createObjectURL( blob ),
+					download: alignment === 'horizontal' ? 'horizontal-bike.usdz' : 'vertical-plaque.usdz'
+				} );
+
+				if ( selectedAlignment === alignment ) updateQuickLookLink();
+
+			}
+
+			function selectModel( alignment ) {
+
+				selectedAlignment = alignment;
+
+				for ( const [ modelAlignment, model ] of previewModels ) {
+
+					model.visible = modelAlignment === alignment;
+
+				}
+
+				for ( const option of modelOptions ) {
+
+					option.setAttribute( 'aria-pressed', option.dataset.alignment === alignment );
+
+				}
+
+				updateQuickLookLink();
+
+			}
+
+			function updateQuickLookLink() {
+
+				const asset = quickLookAssets.get( selectedAlignment );
+				const modelName = selectedAlignment === 'horizontal' ? 'bike' : 'plaque';
+
+				if ( isARSupported === false ) {
+
+					quickLookLink.removeAttribute( 'href' );
+					quickLookLink.removeAttribute( 'download' );
+					quickLookLink.classList.remove( 'ready' );
+					quickLookLink.setAttribute( 'aria-disabled', 'true' );
+					quickLookLink.setAttribute( 'aria-label', 'AR not available in this browser' );
+					quickLookLink.dataset.label = 'AR not available in this browser';
+					quickLookStatus.textContent = '';
+
+					return;
+
+				}
+
+				if ( asset === undefined ) {
+
+					quickLookLink.removeAttribute( 'href' );
+					quickLookLink.removeAttribute( 'download' );
+					quickLookLink.classList.remove( 'ready' );
+					quickLookLink.setAttribute( 'aria-disabled', 'true' );
+					quickLookLink.setAttribute( 'aria-label', `Preparing ${ modelName } for AR` );
+					quickLookLink.dataset.label = 'View in AR';
+					quickLookStatus.textContent = `Preparing ${ modelName }…`;
+
+					return;
+
+				}
+
+				quickLookLink.href = asset.href;
+				quickLookLink.download = asset.download;
+				quickLookLink.classList.add( 'ready' );
+				quickLookLink.removeAttribute( 'aria-disabled' );
+				quickLookLink.setAttribute( 'aria-label', `View ${ modelName } in AR` );
+				quickLookLink.dataset.label = 'View in AR';
+				quickLookStatus.textContent = `${ modelName[ 0 ].toUpperCase() + modelName.slice( 1 ) } ready`;
 
 			}
 
