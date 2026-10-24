@@ -1,0 +1,161 @@
+import { Node, NodeUtils, Vector3 } from 'three/webgpu';
+import { cubeTexture, float, Fn, getParallaxCorrectNormal, If, int, materialEnvRotation, nodeObject, positionWorld, reflectVector, roughnessToMip, uniform, vec3 } from 'three/tsl';
+
+const _scale = /*@__PURE__*/ new Vector3();
+
+/**
+ * Environment radiance from a baked {@link ReflectionProbes} set, with per-pixel
+ * volume weights and box projection. Assign it to `scene.environmentNode` so
+ * every physical material samples it with its own roughness and normal. Bake
+ * the probes before creating the node.
+ *
+ * @augments Node
+ * @three_import import { reflectionProbes } from 'three/addons/tsl/lighting/ReflectionProbesNode.js';
+ */
+class ReflectionProbesNode extends Node {
+
+	static get type() {
+
+		return 'ReflectionProbesNode';
+
+	}
+
+	/**
+	 * Constructs a new reflection probes node.
+	 *
+	 * @param {ReflectionProbes} probes - The baked probe set.
+	 */
+	constructor( probes ) {
+
+		super( 'vec3' );
+
+		/**
+		 * The probe set.
+		 *
+		 * @type {ReflectionProbes}
+		 */
+		this.probes = probes;
+
+		this.updateBeforeType = 'render';
+
+		this._array = cubeTexture( probes.texture );
+		this._array.mergeable = false;
+		this._maxLod = uniform( 0 );
+		this._local = uniform( 1 );
+		this._boxProjection = uniform( 1 );
+		this._slots = [];
+
+	}
+
+	customCacheKey() {
+
+		// keep the id so separate probe sets don't share compiled uniforms
+		return NodeUtils.hash( super.customCacheKey(), this.probes.bakedProbes.length );
+
+	}
+
+	updateBefore() {
+
+		const probes = this.probes;
+
+		// a re-bake disposes the previous texture, so switch even before a recompile
+		this._array.value = probes.texture;
+		this._maxLod.value = probes.texture.mipmaps.length - 1;
+
+		if ( probes.bakedProbes.length !== this._slots.length ) {
+
+			// the probe count is compiled into the shader
+			this.needsUpdate = true;
+			return;
+
+		}
+
+		// captures see only the environment, so baking doesn't feed back into itself
+		this._local.value = probes.capturing ? 0 : 1;
+		this._boxProjection.value = probes.boxProjection ? 1 : 0;
+
+		for ( let i = 0; i < this._slots.length; i ++ ) {
+
+			const slot = this._slots[ i ];
+			const probe = probes.bakedProbes[ i ];
+
+			probe.getWorldPosition( slot.position.value );
+			probe.getWorldScale( _scale );
+
+			slot.extent.value.copy( probe.influenceSize ).multiply( _scale ).multiplyScalar( 0.5 );
+			slot.fade.value = probe.blendDistance;
+			slot.projectionSize.value.copy( probe.projectionSize ?? probe.influenceSize ).multiply( _scale );
+			slot.projectionOffset.value.copy( probe.projectionOffset ).multiply( _scale );
+
+		}
+
+	}
+
+	setup( builder ) {
+
+		// All material programs must keep referencing the uniforms updated by updateBefore().
+		this._slots = this.probes.bakedProbes.map( ( probe, i ) => this._slots[ i ] ?? ( {
+			position: uniform( new Vector3() ),
+			extent: uniform( new Vector3() ),
+			fade: uniform( 0.5 ),
+			projectionSize: uniform( new Vector3() ),
+			projectionOffset: uniform( new Vector3() )
+		} ) );
+
+		this.updateBefore();
+
+		const { context } = builder;
+		const direction = context.getUV ? context.getUV( this, builder ) : reflectVector;
+		const roughness = context.getTextureLevel ? context.getTextureLevel( this ) : 0;
+
+		return Fn( () => {
+
+			const lod = roughnessToMip( roughness, this._maxLod );
+			const radiance = vec3( 0 ).toVar();
+			const remaining = float( this._local ).toVar();
+
+			for ( let i = 0; i < this._slots.length; i ++ ) {
+
+				const slot = this._slots[ i ];
+				const local = positionWorld.sub( slot.position );
+				const d = slot.extent.sub( local.abs() );
+				// negative outside the box, so the clamped fade is zero there
+				const distance = d.x.min( d.y ).min( d.z );
+				const weight = distance.div( slot.fade.max( 1e-6 ) ).clamp().mul( remaining ).toVar();
+
+				If( weight.greaterThan( 0 ), () => {
+
+					const insideProjection = local.sub( slot.projectionOffset ).abs().lessThanEqual( slot.projectionSize.mul( 0.5 ) ).all();
+					// the box hit point, relative to the capture point rather than the box center
+					const projected = getParallaxCorrectNormal( direction, slot.projectionSize, slot.position.add( slot.projectionOffset ) ).add( slot.projectionOffset );
+					const corrected = this._boxProjection.greaterThan( 0 ).and( insideProjection ).select( projected, direction );
+					radiance.addAssign( this._array.sample( corrected ).depth( int( i + 1 ) ).level( lod ).rgb.mul( weight ) );
+
+				} );
+
+				remaining.subAssign( weight );
+
+			}
+
+			const environmentWeight = remaining.add( this._local.oneMinus() );
+			radiance.addAssign( this._array.sample( materialEnvRotation.mul( direction ) ).depth( int( 0 ) ).level( lod ).rgb.mul( environmentWeight ) );
+
+			return radiance;
+
+		} )();
+
+	}
+
+}
+
+/**
+ * TSL function for creating a reflection probes node.
+ *
+ * @tsl
+ * @function
+ * @param {ReflectionProbes} probes - The baked probe set.
+ * @returns {ReflectionProbesNode}
+ */
+export const reflectionProbes = ( probes ) => nodeObject( new ReflectionProbesNode( probes ) );
+
+export { ReflectionProbesNode };
