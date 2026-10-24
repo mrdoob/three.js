@@ -12,7 +12,7 @@ import {
  * PLY (Polygon or Stanford Triangle Format) is a file format for efficient delivery and
  * loading of simple, static 3D content in a dense format. Both binary and ascii formats are
  * supported. PLY can store vertex positions, colors, normals and uv coordinates. No textures
- * or texture references are saved.
+ * or texture references are saved. Quantized attributes must be normalized.
  *
  * ```js
  * const exporter = new PLYExporter();
@@ -114,33 +114,33 @@ class PLYExporter {
 				vertexCount += vertices.count;
 				faceCount += indices ? indices.count / 3 : vertices.count / 3;
 
-				positionType = getPlyType( vertices.array, true );
+				positionType = getPlyType( vertices );
 
 				if ( normals !== undefined ) {
 
 					includeNormals = true;
-					normalType = getPlyType( normals.array, true );
+					normalType = getPlyType( normals );
 
 				}
 
 				if ( uvs !== undefined ) {
 
 					includeUVs = true;
-					uvType = getPlyType( uvs.array, uvs.normalized );
+					uvType = getPlyType( uvs );
 
 				}
 
 				if ( colors !== undefined ) {
 
 					includeColors = true;
-					colorType = getPlyType( colors.array );
+					colorType = getPlyType( colors );
 
 				}
 
 				for ( const name of customAttributeNames ) {
 
 					const attr = geometry.getAttribute( name );
-					if ( attr !== undefined ) customTypes[ name ] = getPlyType( attr.array, attr.normalized );
+					if ( attr !== undefined ) customTypes[ name ] = getPlyType( attr );
 
 				}
 
@@ -161,26 +161,26 @@ class PLYExporter {
 
 				vertexCount += vertices.count;
 
-				positionType = getPlyType( vertices.array, true );
+				positionType = getPlyType( vertices );
 
 				if ( normals !== undefined ) {
 
 					includeNormals = true;
-					normalType = getPlyType( normals.array, true );
+					normalType = getPlyType( normals );
 
 				}
 
 				if ( colors !== undefined ) {
 
 					includeColors = true;
-					colorType = getPlyType( colors.array );
+					colorType = getPlyType( colors );
 
 				}
 
 				for ( const name of customAttributeNames ) {
 
 					const attr = geometry.getAttribute( name );
-					if ( attr !== undefined ) customTypes[ name ] = getPlyType( attr.array, attr.normalized );
+					if ( attr !== undefined ) customTypes[ name ] = getPlyType( attr );
 
 				}
 
@@ -694,10 +694,11 @@ class PLYExporter {
 
 }
 
-function getPlyType( array, isFloat = false ) {
+function getPlyType( attribute ) {
 
-	// positions and normals are transformed and normalized values are dequantized, so they need a float type
-	if ( isFloat ) return ( array instanceof Float64Array ) ? 'double' : 'float';
+	const { array, normalized } = attribute;
+
+	if ( normalized === true ) return 'float';
 
 	if ( array instanceof Int8Array ) return 'char';
 	if ( array instanceof Uint8Array || array instanceof Uint8ClampedArray ) return 'uchar';
@@ -707,6 +708,7 @@ function getPlyType( array, isFloat = false ) {
 	if ( array instanceof Uint32Array ) return 'uint';
 	if ( array instanceof Float32Array ) return 'float';
 	if ( array instanceof Float64Array ) return 'double';
+
 	return 'float';
 
 }
