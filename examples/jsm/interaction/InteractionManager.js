@@ -8,6 +8,9 @@ const _mvp = new Matrix4();
 const _viewport = new Matrix4();
 const _size = new Vector3();
 
+// TODO: Remove once Chrome 157.0.8080.0+ is the baseline.
+let _supportsCanvasTransform = null;
+
 /**
  * Manages interaction for 3D objects independently of the scene graph.
  *
@@ -201,6 +204,27 @@ class InteractionManager {
 
 			_mvp.premultiply( _viewport );
 
+			if ( typeof canvas.updateElementGeometry === 'function' ) {
+
+				// Chrome 154+: Wait until the renderer has made the element a drawable child of the canvas.
+				if ( element.parentNode !== canvas ) continue;
+
+				if ( _supportsCanvasTransform === null ) _supportsCanvasTransform = supportsCanvasTransform( canvas, element );
+
+				if ( _supportsCanvasTransform === true ) {
+
+					// Chrome 157.0.8080.0+
+					canvas.updateElementGeometry( element, { canvasTransform: new DOMMatrix( _mvp.elements ) } );
+					continue;
+
+				}
+
+				// Chrome 154 - 157.0.8079: canvasTransform is ignored, but canvas children
+				// are only hit tested once registered via updateElementGeometry().
+				canvas.updateElementGeometry( element );
+
+			}
+
 			// The browser performs the perspective divide (by w) when applying the matrix3d.
 
 			element.style.transform = 'matrix3d(' + _mvp.elements.join( ',' ) + ')';
@@ -220,6 +244,27 @@ class InteractionManager {
 		this._cachedCssH = - 1;
 
 	}
+
+}
+
+// TODO: Remove once Chrome 157.0.8080.0+ is the baseline.
+// Chrome 154 - 157.0.8079 accept but ignore canvasTransform unless the ElementCanvasTransform
+// flag is enabled. The same flag exposes the getElementTransform( element ) overload, so calling
+// it with a single argument throws a TypeError when the feature isn't available.
+
+function supportsCanvasTransform( canvas, element ) {
+
+	try {
+
+		canvas.getElementTransform( element );
+
+	} catch ( e ) {
+
+		return e.name !== 'TypeError';
+
+	}
+
+	return true;
 
 }
 
