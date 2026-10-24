@@ -150,6 +150,15 @@ class KTX2Loader extends Loader {
 
 		super( manager );
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isKTX2Loader = true;
+
 		this.transcoderPath = '';
 		this.transcoderBinary = null;
 		this.transcoderPending = null;
