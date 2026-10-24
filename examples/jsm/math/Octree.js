@@ -448,8 +448,7 @@ class Octree {
 
 		if ( ! sphere.intersectsPlane( _plane ) ) return false;
 
-		const depth = Math.abs( _plane.distanceToSphere( sphere ) );
-		const r2 = sphere.radius * sphere.radius - depth * depth;
+		const r2 = sphere.radius * sphere.radius;
 
 		const plainPoint = _plane.projectPoint( sphere.center, _v1 );
 
