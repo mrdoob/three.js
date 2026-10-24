@@ -428,7 +428,7 @@ class Octree {
 		};
 
 		// project the point onto the triangle surface
-		intersection.point.addScaledVector( intersection.normal, distance );
+		intersection.point.addScaledVector( intersection.normal, - distance );
 
 		return intersection;
 
