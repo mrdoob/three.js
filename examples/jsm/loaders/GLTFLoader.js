@@ -3417,7 +3417,7 @@ class GLTFParser {
 		let sourceURI = sourceDef.uri || '';
 		let isObjectURL = false;
 
-		if ( sourceDef.bufferView !== undefined && loader === options.ktx2Loader ) {
+		if ( sourceDef.bufferView !== undefined && loader.isKTX2Loader === true ) {
 
 			// KTX2Loader parses the binary image data from bufferView directly. A Blob and
 			// an object URL would copy the data and read it back on the main thread.
