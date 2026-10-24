@@ -60,7 +60,7 @@
 				statues: 10000,
 				occlusion: true,
 				meshlets: false,
-				lod: 1,
+				lod: 3,
 				rotate: true
 			};
 
@@ -90,7 +90,7 @@
 				await renderer.init();
 
 				drawers = {
-					'GPU-driven': new GPUDrivenDrawer( { occlusionCulling: parameters.occlusion, lodThreshold: parameters.lod } ),
+					'GPU-driven': new GPUDrivenDrawer( { occlusionCulling: parameters.occlusion, lodThreshold: parameters.lod, shadowLodThreshold: parameters.lod } ),
 					'Default (slow)': renderer.drawer
 				};
 				renderer.drawer = drawers[ parameters.drawer ];

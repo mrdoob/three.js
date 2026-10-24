@@ -61,6 +61,7 @@
 			const parameters = {
 				drawer: 'GPU-driven',
 				meshlets: false,
+				lod: 3,
 				rotate: true
 			};
 
@@ -90,7 +91,7 @@
 				await renderer.init();
 
 				drawers = {
-					'GPU-driven': new GPUDrivenDrawer(),
+					'GPU-driven': new GPUDrivenDrawer( { lodThreshold: parameters.lod, shadowLodThreshold: parameters.lod } ),
 					'Default (slow)': renderer.drawer
 				};
 				renderer.drawer = drawers[ parameters.drawer ];
@@ -287,6 +288,12 @@
 
 					drawers[ 'GPU-driven' ].debug = value;
 					prepare();
+
+				} );
+				gui.add( parameters, 'lod', 1, 8, 0.5 ).name( 'LOD error (px)' ).onChange( value => {
+
+					drawers[ 'GPU-driven' ].lodThreshold = value;
+					drawers[ 'GPU-driven' ].shadowLodThreshold = value;
 
 				} );
 				gui.add( parameters, 'rotate' ).name( 'Auto rotate' ).onChange( value => controls.autoRotate = value );
