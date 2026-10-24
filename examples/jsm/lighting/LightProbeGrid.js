@@ -13,6 +13,7 @@ import {
 	RenderTarget,
 	RenderTarget3D,
 	RGBAFormat,
+	Storage3DTexture,
 	Vector3,
 	Vector4
 } from 'three/webgpu';
@@ -22,11 +23,15 @@ import {
 	atan,
 	float,
 	Fn,
+	If,
+	instanceIndex,
 	int,
 	ivec2,
+	ivec3,
 	Loop,
 	screenCoordinate,
 	texture,
+	textureStore,
 	uniform,
 	vec3,
 	vec4
@@ -150,6 +155,36 @@ function projectSHNode( faces, size, batchStart ) {
 }
 
 /**
+ * Packs nine RGB coefficients into one of the seven atlas texels.
+ *
+ * @private
+ * @param {Array<Node>} coefficients - The nine SH coefficients.
+ * @param {number} textureIndex - The packed texel index.
+ * @return {Node<vec4>} The packed texel.
+ */
+function packSH( coefficients, textureIndex ) {
+
+	const [ c0, c1, c2, c3, c4, c5, c6, c7, c8 ] = coefficients;
+
+	let packed;
+
+	switch ( textureIndex ) {
+
+		case 0: packed = vec4( c0.xyz, c1.x ); break;
+		case 1: packed = vec4( c1.yz, c2.xy ); break;
+		case 2: packed = vec4( c2.z, c3.xyz ); break;
+		case 3: packed = vec4( c4.xyz, c5.x ); break;
+		case 4: packed = vec4( c5.yz, c6.xy ); break;
+		case 5: packed = vec4( c6.z, c7.xyz ); break;
+		default: packed = vec4( c8.xyz, 0.0 ); break;
+
+	}
+
+	return packed;
+
+}
+
+/**
  * Returns the repack output node for one of the seven SH textures. It sums the
  * per-face projections of the 9 coefficients from the batch texture for the
  * probe at the current texel and packs the four floats stored by this texture
@@ -183,21 +218,74 @@ function repackNode( batch, textureIndex, resolution, sliceZ ) {
 
 		} );
 
-		let packed;
+		return packSH( [ c0, c1, c2, c3, c4, c5, c6, c7, c8 ], textureIndex );
 
-		switch ( textureIndex ) {
+	} )();
 
-			case 0: packed = vec4( c0.xyz, c1.x ); break;
-			case 1: packed = vec4( c1.yz, c2.xy ); break;
-			case 2: packed = vec4( c2.z, c3.xyz ); break;
-			case 3: packed = vec4( c4.xyz, c5.x ); break;
-			case 4: packed = vec4( c5.yz, c6.xy ); break;
-			case 5: packed = vec4( c6.z, c7.xyz ); break;
-			default: packed = vec4( c8.xyz, 0.0 ); break;
+}
+
+/**
+ * Packs all seven coefficient groups and their boundary padding in one dispatch.
+ * Each invocation reduces one probe, sharing its nine coefficients across stores.
+ *
+ * @private
+ * @param {Node} batch - The projected face blocks.
+ * @param {Storage3DTexture} atlas - The destination 3D atlas.
+ * @param {Vector3} resolution - The probe grid resolution.
+ * @param {Node<int>} start - The first probe index to write.
+ * @return {Node} The compute shader body.
+ */
+function repackComputeNode( batch, atlas, resolution, start ) {
+
+	const { x: nx, z: nz } = resolution;
+	const paddedSlices = nz + 2 * ATLAS_PADDING;
+
+	return Fn( () => {
+
+		const probeIndex = int( instanceIndex ).add( start ).toVar();
+		const ix = probeIndex.mod( nx ).toVar();
+		const iz = probeIndex.div( nx ).mod( nz ).toVar();
+		const iy = probeIndex.div( nx * nz ).toVar();
+		const coefficients = [];
+
+		for ( let c = 0; c < 9; c ++ ) {
+
+			coefficients.push( batch.load( ivec2( c * 6 * FACE_BLOCKS, probeIndex ) ).rgb.toVar() );
 
 		}
 
-		return packed;
+		// Keep the raster path's summation order before rounding to half float.
+
+		Loop( { start: 1, end: 6 * FACE_BLOCKS, type: 'int' }, ( { i } ) => {
+
+			for ( let c = 0; c < 9; c ++ ) {
+
+				coefficients[ c ].addAssign( batch.load( ivec2( i.add( c * 6 * FACE_BLOCKS ), probeIndex ) ).rgb );
+
+			}
+
+		} );
+
+		for ( let t = 0; t < 7; t ++ ) {
+
+			const base = t * paddedSlices;
+			const packed = packSH( coefficients, t ).toVar();
+
+			textureStore( atlas, ivec3( ix, iy, iz.add( base + ATLAS_PADDING ) ), packed );
+
+			If( iz.equal( 0 ), () => {
+
+				textureStore( atlas, ivec3( ix, iy, base ), packed );
+
+			} );
+
+			If( iz.equal( nz - 1 ), () => {
+
+				textureStore( atlas, ivec3( ix, iy, base + ATLAS_PADDING + nz ), packed );
+
+			} );
+
+		}
 
 	} )();
 
@@ -357,10 +445,11 @@ function ensureBakeMaterials( cubemapSize, faceMap, batchMap ) {
  * lit node material automatically. When using {@link WebGLRenderer}, import the
  * grid from `LightProbeGridWebGL.js` instead.
  *
- * The baked data is stored in a single RGBA `RenderTarget3D` atlas that packs
- * the nine L2 SH coefficients into seven sub-volumes stacked along Z. Baking is
- * fully GPU-resident: cubemap rendering, SH projection, and texture packing all
- * happen on the GPU with zero CPU readback.
+ * The baked data is stored in a single RGBA 3D atlas that packs the nine L2 SH
+ * coefficients into seven sub-volumes stacked along Z. Baking is fully
+ * GPU-resident: cubemap rendering, SH projection, and texture packing all
+ * happen on the GPU with zero CPU readback. Packing uses compute with the
+ * WebGPU backend and render passes with the WebGL backend.
  *
  * @augments Light
  * @three_import import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
@@ -449,19 +538,22 @@ class LightProbeGrid extends Light {
 		 * The single RGBA atlas 3D texture storing all seven packed SH
 		 * sub-volumes stacked along Z.
 		 *
-		 * @type {?Data3DTexture}
+		 * @type {?(Storage3DTexture|Data3DTexture)}
 		 * @default null
 		 */
 		this.texture = null;
 
 		/**
-		 * Internal render target for GPU-resident baking.
+		 * Internal render target for baking with the WebGL backend.
 		 *
 		 * @private
 		 * @type {?RenderTarget3D}
 		 * @default null
 		 */
 		this._renderTarget = null;
+
+		this._repackCompute = null;
+		this._repackStart = null;
 
 		// Indirect captures read a snapshot while the live atlas is updated in place.
 		this._bounceGrid = null;
@@ -588,7 +680,7 @@ class LightProbeGrid extends Light {
 
 		}
 
-		this._ensureTextures();
+		this._ensureTextures( renderer );
 		this.updateBoundingBox();
 
 		// Bind the pooled bake resources to the current textures.
@@ -608,8 +700,6 @@ class LightProbeGrid extends Light {
 		const currentInspectorEnabled = renderer.inspector.enabled;
 		const currentMatrixWorldAutoUpdate = scene.matrixWorldAutoUpdate;
 		const currentVisible = this.visible;
-		const renderTarget = this._renderTarget;
-		const currentViewport = renderTarget.viewport.clone();
 		const shadowStates = [];
 		let replacedSunLights = null;
 
@@ -657,7 +747,6 @@ class LightProbeGrid extends Light {
 
 			// Restore renderer / scene state (pooled targets and materials kept).
 
-			renderTarget.viewport.copy( currentViewport );
 			renderer.setRenderTarget( currentRenderTarget, currentActiveCubeFace, currentActiveMipmapLevel );
 			renderer.autoClear = currentAutoClear;
 			renderer.xr.enabled = currentXrEnabled;
@@ -692,8 +781,7 @@ class LightProbeGrid extends Light {
 
 			const res = this.resolution;
 			this._bounceGrid = new LightProbeGrid( this.width, this.height, this.depth, res.x, res.y, res.z );
-			this._bounceGrid._ensureTextures();
-			renderer.initRenderTarget( this._bounceGrid._renderTarget );
+			this._bounceGrid._ensureTextures( renderer );
 
 		}
 
@@ -703,12 +791,11 @@ class LightProbeGrid extends Light {
 
 		} else if ( start === 0 ) {
 
-			const renderTarget = this._renderTarget;
+			const { width, height, depth } = this.texture.image;
 
-			renderer.initRenderTarget( renderTarget );
 			_copyRegion.min.set( 0, 0, 0 );
-			_copyRegion.max.set( renderTarget.width, renderTarget.height, renderTarget.depth );
-			renderer.copyTextureToTexture( renderTarget.texture, this._bounceGrid.texture, _copyRegion );
+			_copyRegion.max.set( width, height, depth );
+			renderer.copyTextureToTexture( this.texture, this._bounceGrid.texture, _copyRegion );
 			this._bouncePass = pass;
 
 		}
@@ -803,6 +890,52 @@ class LightProbeGrid extends Light {
 	 */
 	_repackProbes( renderer, start, end ) {
 
+		if ( this._renderTarget === null ) {
+
+			this._repackProbesCompute( renderer, start, end );
+
+		} else {
+
+			this._repackProbesRaster( renderer, start, end );
+
+		}
+
+	}
+
+	/**
+	 * Packs a probe range with a single compute dispatch.
+	 *
+	 * @private
+	 * @param {WebGPURenderer} renderer - The renderer.
+	 * @param {number} start - The first probe index.
+	 * @param {number} end - The exclusive end probe index.
+	 */
+	_repackProbesCompute( renderer, start, end ) {
+
+		if ( this._repackCompute === null ) {
+
+			this._repackStart = uniform( 0, 'int' );
+			this._repackCompute = repackComputeNode( _batchNode, this.texture, this.resolution, this._repackStart ).compute( end - start ).setName( 'LightProbeGrid Repack' );
+
+		}
+
+		this._repackStart.value = start;
+		this._repackCompute.count = end - start;
+
+		renderer.compute( this._repackCompute );
+
+	}
+
+	/**
+	 * Packs a probe range with render passes.
+	 *
+	 * @private
+	 * @param {WebGPURenderer} renderer - The renderer.
+	 * @param {number} start - The first probe index.
+	 * @param {number} end - The exclusive end probe index.
+	 */
+	_repackProbesRaster( renderer, start, end ) {
+
 		const { x: nx, y: ny, z: nz } = this.resolution;
 		const probesPerLayer = nx * nz;
 		const startY = Math.floor( start / probesPerLayer );
@@ -864,16 +997,19 @@ class LightProbeGrid extends Light {
 
 		}
 
+		renderTarget.viewport.set( 0, 0, nx, ny );
+
 	}
 
 	/**
 	 * Ensures the atlas 3D texture exists with the correct dimensions.
 	 *
 	 * @private
+	 * @param {WebGPURenderer} renderer - The renderer.
 	 */
-	_ensureTextures() {
+	_ensureTextures( renderer ) {
 
-		if ( this._renderTarget !== null ) return;
+		if ( this.texture !== null ) return;
 
 		const res = this.resolution;
 		const nx = res.x, ny = res.y, nz = res.z;
@@ -881,16 +1017,28 @@ class LightProbeGrid extends Light {
 		// Atlas depth: 7 sub-volumes, each with ATLAS_PADDING slices at both ends.
 		const atlasDepth = 7 * ( nz + 2 * ATLAS_PADDING );
 
-		this._renderTarget = new RenderTarget3D( nx, ny, atlasDepth, {
-			type: HalfFloatType,
-			format: RGBAFormat,
-			minFilter: LinearFilter,
-			magFilter: LinearFilter,
-			generateMipmaps: false,
-			depthBuffer: false
-		} );
+		if ( renderer.backend.isWebGPUBackend === true ) {
 
-		this.texture = this._renderTarget.texture;
+			this.texture = new Storage3DTexture( nx, ny, atlasDepth );
+			this.texture.type = HalfFloatType;
+			this.texture.generateMipmaps = false;
+
+		} else {
+
+			this._renderTarget = new RenderTarget3D( nx, ny, atlasDepth, {
+				type: HalfFloatType,
+				format: RGBAFormat,
+				minFilter: LinearFilter,
+				magFilter: LinearFilter,
+				generateMipmaps: false,
+				depthBuffer: false
+			} );
+
+			renderer.initRenderTarget( this._renderTarget );
+
+			this.texture = this._renderTarget.texture;
+
+		}
 
 	}
 
@@ -898,6 +1046,14 @@ class LightProbeGrid extends Light {
 	 * Frees GPU resources.
 	 */
 	dispose() {
+
+		if ( this._repackCompute !== null ) {
+
+			this._repackCompute.dispose();
+			this._repackCompute = null;
+			this._repackStart = null;
+
+		}
 
 		if ( this._bounceGrid !== null ) {
 
@@ -911,9 +1067,16 @@ class LightProbeGrid extends Light {
 
 			this._renderTarget.dispose();
 			this._renderTarget = null;
-			this.texture = null;
 
 		}
+
+		if ( this.texture?.isStorageTexture ) {
+
+			this.texture.dispose();
+
+		}
+
+		this.texture = null;
 
 		super.dispose();
 
