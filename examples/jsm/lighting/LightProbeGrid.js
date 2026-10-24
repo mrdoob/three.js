@@ -435,6 +435,16 @@ class LightProbeGrid extends Light {
 		this.boundingBox = new Box3();
 
 		/**
+		 * Optional world-space bounds of the grid's lighting influence, independent
+		 * of probe placement. Outside this box the grid is not sampled. When set,
+		 * these bounds replace the contribution boundary defined by `falloff`.
+		 *
+		 * @type {?Box3}
+		 * @default null
+		 */
+		this.influenceBox = null;
+
+		/**
 		 * Distance in world units over which the grid contribution fades out
 		 * past the volume boundary. `0` applies the contribution everywhere
 		 * (clamped), which matches a single-volume setup. Use a small positive
@@ -715,6 +725,7 @@ class LightProbeGrid extends Light {
 
 		const bounceGrid = this._bounceGrid;
 		bounceGrid.boundingBox.copy( this.boundingBox );
+		bounceGrid.influenceBox = this.influenceBox;
 		// The direct pass adds the grid unlit, so all passes share the lights and their shaders.
 		bounceGrid.intensity = pass === 0 ? 0 : this.intensity;
 		bounceGrid.falloff = this.falloff;
