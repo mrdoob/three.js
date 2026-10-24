@@ -3416,65 +3416,72 @@ class GLTFParser {
 
 		let sourceURI = sourceDef.uri || '';
 		let isObjectURL = false;
+		let pending;
 
 		if ( sourceDef.bufferView !== undefined && loader.isKTX2Loader === true ) {
 
 			// KTX2Loader parses the binary image data from bufferView directly. A Blob and
 			// an object URL would copy the data and read it back on the main thread.
 
-			sourceURI = parser.getDependency( 'bufferView', sourceDef.bufferView );
+			pending = parser.getDependency( 'bufferView', sourceDef.bufferView ).then( function ( bufferView ) {
 
-		} else if ( sourceDef.bufferView !== undefined ) {
+				return new Promise( function ( resolve, reject ) {
 
-			// Load binary image data from bufferView, if provided.
+					loader.parse( bufferView, resolve, reject );
 
-			sourceURI = parser.getDependency( 'bufferView', sourceDef.bufferView ).then( function ( bufferView ) {
-
-				isObjectURL = true;
-				const blob = new Blob( [ bufferView ], { type: sourceDef.mimeType } );
-				sourceURI = URL.createObjectURL( blob );
-				return sourceURI;
+				} );
 
 			} );
 
-		} else if ( sourceDef.uri === undefined ) {
+		} else {
 
-			throw new Error( 'THREE.GLTFLoader: Image ' + sourceIndex + ' is missing URI and bufferView' );
+			if ( sourceDef.bufferView !== undefined ) {
 
-		}
+				// Load binary image data from bufferView, if provided.
 
-		const promise = Promise.resolve( sourceURI ).then( function ( sourceURI ) {
+				sourceURI = parser.getDependency( 'bufferView', sourceDef.bufferView ).then( function ( bufferView ) {
 
-			return new Promise( function ( resolve, reject ) {
+					isObjectURL = true;
+					const blob = new Blob( [ bufferView ], { type: sourceDef.mimeType } );
+					sourceURI = URL.createObjectURL( blob );
+					return sourceURI;
 
-				let onLoad = resolve;
+				} );
 
-				if ( loader.isImageBitmapLoader === true ) {
+			} else if ( sourceDef.uri === undefined ) {
 
-					onLoad = function ( imageBitmap ) {
+				throw new Error( 'THREE.GLTFLoader: Image ' + sourceIndex + ' is missing URI and bufferView' );
 
-						const texture = new Texture( imageBitmap );
-						texture.needsUpdate = true;
+			}
 
-						resolve( texture );
+			pending = Promise.resolve( sourceURI ).then( function ( sourceURI ) {
 
-					};
+				return new Promise( function ( resolve, reject ) {
 
-				}
+					let onLoad = resolve;
 
-				if ( sourceURI instanceof ArrayBuffer ) {
+					if ( loader.isImageBitmapLoader === true ) {
 
-					loader.parse( sourceURI, onLoad, reject );
+						onLoad = function ( imageBitmap ) {
 
-				} else {
+							const texture = new Texture( imageBitmap );
+							texture.needsUpdate = true;
+
+							resolve( texture );
+
+						};
+
+					}
 
 					loader.load( LoaderUtils.resolveURL( sourceURI, options.path ), onLoad, undefined, reject );
 
-				}
+				} );
 
 			} );
 
-		} ).then( function ( texture ) {
+		}
+
+		const promise = pending.then( function ( texture ) {
 
 			// Clean up resources and configure Texture.
 
