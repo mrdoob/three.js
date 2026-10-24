@@ -3420,8 +3420,7 @@ class GLTFParser {
 
 		if ( sourceDef.bufferView !== undefined && loader.isKTX2Loader === true ) {
 
-			// KTX2Loader parses the binary image data from bufferView directly. A Blob and
-			// an object URL would copy the data and read it back on the main thread.
+			// KTX2Loader parses the binary image data from bufferView directly (see #35193).
 
 			pending = parser.getDependency( 'bufferView', sourceDef.bufferView ).then( function ( bufferView ) {
 
