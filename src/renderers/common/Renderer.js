@@ -1005,6 +1005,13 @@ class Renderer {
 		const previousHandleObjectFunction = this._handleObjectFunction;
 		const previousCompilationPromises = this._compilationPromises;
 
+		// a shadow node calls compileAsync() for its shadow pass while a precompilation builds a
+		// shadow receiver, see ShadowNode#updateBefore(). The state of such a pass, e.g. the shadow
+		// material of each caster, is only set up during this call so the objects are built right
+		// away. Their pipelines are compiled with the pipelines of the running precompilation.
+
+		const parentPrecompilationState = this._precompilationState;
+
 		//
 
 		if ( targetScene === null ) targetScene = scene;
@@ -1023,9 +1030,13 @@ class Renderer {
 		const activeMipmapLevel = this._activeMipmapLevel;
 
 		// a state snapshot is taken once at the beginning and reapplied every time precompilation continues.
-		// `item` is the work item that is currently processed, see `_beginPreCompile()`
+		// `item` is the work item that is currently processed, see `_beginPreCompile()`. `pipelinePromises` collects its pipelines
 
-		const precompilationState = { useFrameBufferTarget, renderTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel, item: null, materialSide: null };
+		const precompilationState = {
+			useFrameBufferTarget, renderTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel, item: null, materialSide: null,
+			pipelinePromises: ( parentPrecompilationState !== null ) ? parentPrecompilationState.pipelinePromises : null,
+			parentPrecompilationState
+		};
 
 		this._beginPreCompile( precompilationState );
 
@@ -1036,17 +1047,17 @@ class Renderer {
 		const compilationPromises = [];
 
 		this._currentRenderContext = renderContext;
-		this._currentRenderObjectFunction = this.renderObject;
+		this._currentRenderObjectFunction = this._renderObjectFunction || this.renderObject;
 
 		this._handleObjectFunction = this._createObjectPipeline;
 
-		this._compilationPromises = compilationPromises;
+		this._compilationPromises = ( parentPrecompilationState !== null ) ? null : compilationPromises;
 
 		nodeFrame.renderId ++;
 
 		//
 
-		nodeFrame.update();
+		if ( parentPrecompilationState === null ) nodeFrame.update();
 
 		//
 
@@ -1156,6 +1167,8 @@ class Renderer {
 
 		this._finishPreCompile();
 
+		if ( parentPrecompilationState !== null ) return;
+
 		// Process compilation work items sequentially and yield to the main thread after a
 		// time budget to keep animation smooth. Pipelines are compiled in parallel while
 		// the next items are processed.
@@ -1195,6 +1208,7 @@ class Renderer {
 			const pipelinePromises = [];
 
 			precompilationState.item = item;
+			precompilationState.pipelinePromises = pipelinePromises;
 
 			this._beginPreCompile( precompilationState );
 
@@ -1213,6 +1227,7 @@ class Renderer {
 			this._finishPreCompile();
 
 			precompilationState.item = null;
+			precompilationState.pipelinePromises = null;
 
 			if ( pipelinePromises.length > 0 ) {
 
@@ -1284,7 +1299,7 @@ class Renderer {
 	 */
 	_finishPreCompile() {
 
-		const { useFrameBufferTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel, previousRenderContext, item, materialSide } = this._precompilationState;
+		const { useFrameBufferTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel, previousRenderContext, item, materialSide, parentPrecompilationState } = this._precompilationState;
 
 		if ( useFrameBufferTarget === true ) this.setRenderTarget( outputRenderTarget, activeCubeFace, activeMipmapLevel );
 
@@ -1294,7 +1309,7 @@ class Renderer {
 
 		this._callDepth --;
 
-		this._precompilationState = null;
+		this._precompilationState = parentPrecompilationState;
 
 	}
 
@@ -4251,7 +4266,7 @@ class Renderer {
 
 		}
 
-		// Sync path
+		// Sync path for a compileAsync() call made during a running precompilation, see compileAsync()
 		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, clippingContext, passId );
 		renderObject.drawRange = object.geometry.drawRange;
 		renderObject.group = group;
@@ -4265,7 +4280,7 @@ class Renderer {
 		this._nodes.updateForRender( renderObject );
 		this._bindings.updateForRender( renderObject );
 
-		this._pipelines.getForRender( renderObject, this._compilationPromises );
+		this._pipelines.getForRender( renderObject, this._precompilationState.pipelinePromises );
 
 		this._nodes.updateAfter( renderObject );
 
