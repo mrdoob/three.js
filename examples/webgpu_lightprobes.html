@@ -177,6 +177,9 @@
 
 					probes = new LightProbeGrid( 5.6, 4.7, 5.6, resolution, resolution, resolution );
 					probes.position.set( 0, 2.45, 0 );
+					probes.visibility = params.visibility;
+					probes.visibilityInterpolation = params.visibilityInterpolation;
+					probes.visibilityGridSize = params.visibilityGridSize;
 
 					// Keep the helper spheres out of the cubemap captures.
 					if ( probesHelper ) probesHelper.visible = false;
@@ -188,24 +191,24 @@
 
 					// Update debug visualization
 
-					if ( ! probesHelper ) {
+					if ( probesHelper ) {
 
-						probesHelper = new LightProbeGridHelper( probes );
-						probesHelper.visible = params.showProbes;
-						scene.add( probesHelper );
-
-					} else {
-
-						probesHelper.probes = probes;
-						probesHelper.update();
-						probesHelper.visible = params.showProbes;
+						scene.remove( probesHelper );
+						probesHelper.dispose();
 
 					}
+
+					probesHelper = new LightProbeGridHelper( probes );
+					probesHelper.visible = params.showProbes;
+					scene.add( probesHelper );
 
 				}
 
 				const params = {
 					enabled: true,
+					visibility: true,
+					visibilityInterpolation: 'trilinear',
+					visibilityGridSize: 8,
 					showProbes: false,
 					resolution: 6,
 					bounces: 3,
@@ -233,6 +236,13 @@
 				gui.add( params, 'resolution', 2, 12, 1 ).name( 'Resolution' ).onChange( requestBake ).debounce( 250 );
 				gui.add( params, 'bounces', 0, 10, 1 ).name( 'Bounces' ).onChange( requestBake ).debounce( 250 );
 				gui.add( params, 'lightIntensity', 1, 100, 1 ).name( 'Light Intensity' ).onChange( requestBake ).debounce( 250 );
+
+				gui.add( params, 'visibility' ).name( 'Visibility' ).onChange( requestBake );
+
+				gui.add( params, 'visibilityInterpolation', { 'Trilinear (8 probes)': 'trilinear', 'Tetrahedral (4 probes)': 'tetrahedral' } ).name( 'Interpolation' ).onChange( requestBake );
+
+				gui.add( params, 'visibilityGridSize', [ 4, 8, 16, 32 ] ).name( 'Visibility Map Size' ).onChange( requestBake );
+
 				gui.add( params, 'showProbes' ).name( 'Show Probes' ).onChange( ( value ) => {
 
 					probesHelper.visible = value;
