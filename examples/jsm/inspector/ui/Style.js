@@ -357,11 +357,6 @@ export class Style {
 			min-width: 0 !important;
 		}
 
-		.mini-panel-content .list-container.parameters .list-item-row,
-		.mini-panel-content .list-container.parameters .list-header {
-			grid-template-columns: minmax(0, .5fr) minmax(0, 1fr) !important;
-		}
-
 	}
 
 	.mini-panel-content .list-container.parameters {
@@ -1614,28 +1609,21 @@ export class Style {
 		margin-left: 2px;
 	}
 
-	@media screen and (max-width: 340px) {
+	.list-container.parameters .list-item-cell:first-child .value {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
 
-		.mini-panel-content .list-item-cell:first-child {
-			display: flex;
-			align-items: center;
-			min-width: 0;
-			overflow: hidden;
-			width: 100%;
-		}
+	.list-container.parameters .list-item-cell:first-child .value:has(> .info-icon) {
+		position: relative;
+		padding-right: 20px;
+	}
 
-		.mini-panel-content .list-item-cell:first-child .value {
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-			flex: 1 1 0%;
-			min-width: 0;
-		}
-
-		.mini-panel-content .list-item-cell:first-child .info-icon {
-			flex-shrink: 0;
-		}
-
+	.list-container.parameters .list-item-cell:first-child .value > .info-icon {
+		position: absolute;
+		top: calc(50% - 8px);
+		right: 0;
 	}
 
 	.mini-panel-content .custom-checkbox .checkmark {
