@@ -370,11 +370,6 @@ class TRAANode extends Node {
 
 		if ( needsRestart === true ) {
 
-			// make sure render targets are initialized after the resize which triggers a dispose()
-
-			renderer.initRenderTarget( this._historyRenderTarget );
-			renderer.initRenderTarget( this._resolveRenderTarget );
-
 			// make sure to reset the history with the contents of the beauty buffer otherwise subsequent frames after the
 			// resize will fade from a darker color to the correct one because the history was cleared with black.
 

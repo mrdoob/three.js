@@ -450,7 +450,6 @@ class LightProbeGrid extends Light {
 		 * sub-volumes stacked along Z.
 		 *
 		 * @type {?Data3DTexture}
-		 * @default null
 		 */
 		this.texture = null;
 
@@ -468,6 +467,7 @@ class LightProbeGrid extends Light {
 		this._bouncePass = - 1;
 
 		this.updateBoundingBox();
+		this._ensureTextures();
 
 	}
 
@@ -692,8 +692,6 @@ class LightProbeGrid extends Light {
 
 			const res = this.resolution;
 			this._bounceGrid = new LightProbeGrid( this.width, this.height, this.depth, res.x, res.y, res.z );
-			this._bounceGrid._ensureTextures();
-			renderer.initRenderTarget( this._bounceGrid._renderTarget );
 
 		}
 
@@ -704,8 +702,6 @@ class LightProbeGrid extends Light {
 		} else if ( start === 0 ) {
 
 			const renderTarget = this._renderTarget;
-
-			renderer.initRenderTarget( renderTarget );
 			_copyRegion.min.set( 0, 0, 0 );
 			_copyRegion.max.set( renderTarget.width, renderTarget.height, renderTarget.depth );
 			renderer.copyTextureToTexture( renderTarget.texture, this._bounceGrid.texture, _copyRegion );

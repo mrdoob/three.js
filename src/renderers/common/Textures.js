@@ -209,33 +209,6 @@ class Textures extends DataMap {
 
 		}
 
-		//
-
-
-		const options = { sampleCount };
-
-		// XR render targets require no texture updates
-
-		if ( renderTarget.isXRRenderTarget !== true ) {
-
-			for ( let i = 0; i < textures.length; i ++ ) {
-
-				const texture = textures[ i ];
-
-				if ( textureNeedsUpdate ) texture.needsUpdate = true;
-
-				this.updateTexture( texture, options );
-
-			}
-
-			if ( depthTexture ) {
-
-				this.updateTexture( depthTexture, options );
-
-			}
-
-		}
-
 		// dispose handler
 
 		if ( renderTargetData.initialized !== true ) {
@@ -262,6 +235,30 @@ class Textures extends DataMap {
 
 		}
 
+		const options = { sampleCount };
+
+		// XR render targets require no texture updates
+
+		if ( renderTarget.isXRRenderTarget !== true ) {
+
+			for ( let i = 0; i < textures.length; i ++ ) {
+
+				const texture = textures[ i ];
+
+				if ( textureNeedsUpdate ) texture.needsUpdate = true;
+
+				this.updateTexture( texture, options );
+
+			}
+
+			if ( depthTexture ) {
+
+				this.updateTexture( depthTexture, options );
+
+			}
+
+		}
+
 	}
 
 	/**
@@ -277,6 +274,18 @@ class Textures extends DataMap {
 
 		const textureData = this.get( texture );
 		if ( textureData.initialized === true && textureData.version === texture.version ) return textureData.generation;
+
+		// render target textures are created with their render target
+
+		const renderTarget = ( texture.isRenderTargetTexture || texture.isDepthTexture ) ? texture.renderTarget : null;
+
+		if ( renderTarget !== null && this.get( renderTarget ).initialized !== true ) {
+
+			this.updateRenderTarget( renderTarget );
+
+			return textureData.generation;
+
+		}
 
 		const isRenderTarget = texture.isRenderTargetTexture || texture.isDepthTexture || texture.isFramebufferTexture;
 		const backend = this.backend;
