@@ -124,7 +124,7 @@ function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 
 	const hardEdges = new Set();
 	const hardEdgeRays = new Map();
-	const halfEdgeList = {};
+	const halfEdgeList = new Map();
 	const normals = [];
 
 	// Save the list of hard edges by hash
@@ -243,29 +243,15 @@ function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 				index: index,
 				tri: tri
 			};
-			halfEdgeList[ hash ] = info;
+			halfEdgeList.set( hash, info );
 
 		}
 
 	}
 
 	// Iterate until we've tried to connect all faces to share normals
-	while ( true ) {
-
-		// Stop if there are no more faces left
-		let halfEdge = null;
-		for ( const key in halfEdgeList ) {
-
-			halfEdge = halfEdgeList[ key ];
-			break;
-
-		}
-
-		if ( halfEdge === null ) {
-
-			break;
-
-		}
+	// Map iterators skip entries deleted during iteration, so each face is visited once
+	for ( const halfEdge of halfEdgeList.values() ) {
 
 		// Exhaustively find all connected faces
 		const queue = [ halfEdge ];
@@ -288,10 +274,10 @@ function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 
 				// delete this triangle from the list so it won't be found again
 				const hash = hashEdge( v0, v1 );
-				delete halfEdgeList[ hash ];
+				halfEdgeList.delete( hash );
 
 				const reverseHash = hashEdge( v1, v0 );
-				const otherInfo = halfEdgeList[ reverseHash ];
+				const otherInfo = halfEdgeList.get( reverseHash );
 				if ( otherInfo ) {
 
 					const otherTri = otherInfo.tri;
@@ -312,10 +298,10 @@ function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 					// if this triangle has already been traversed then it won't be in
 					// the halfEdgeList. If it has not then add it to the queue and delete
 					// it so it won't be found again.
-					if ( reverseHash in halfEdgeList ) {
+					if ( halfEdgeList.has( reverseHash ) ) {
 
 						queue.push( otherInfo );
-						delete halfEdgeList[ reverseHash ];
+						halfEdgeList.delete( reverseHash );
 
 					}
 

@@ -407,11 +407,6 @@ class TAAUNode extends Node {
 
 		if ( needsRestart === true ) {
 
-			// make sure render targets are initialized after the resize which triggers a dispose()
-
-			renderer.initRenderTarget( this._historyRenderTarget );
-			renderer.initRenderTarget( this._resolveRenderTarget );
-
 			// Seed the history with a bilinear upscale of the current beauty
 			// buffer. Without this the first frames after a resize fade in
 			// from black because the history target was cleared. The seed
@@ -454,7 +449,6 @@ class TAAUNode extends Node {
 			if ( this._previousDepthRenderTarget.width !== srcW || this._previousDepthRenderTarget.height !== srcH ) {
 
 				this._previousDepthRenderTarget.setSize( srcW, srcH );
-				renderer.initRenderTarget( this._previousDepthRenderTarget );
 
 			}
 

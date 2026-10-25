@@ -1,8 +1,8 @@
 import { Box3, Vector3, Vector4, Matrix4, Layers, Storage3DTexture, StorageBufferAttribute, StorageTexture3DNode, RendererUtils, HalfFloatType, UnsignedByteType, RGBAFormat, LinearFilter, LinearMipmapLinearFilter, ClampToEdgeWrapping, MathUtils } from 'three/webgpu';
-import { Fn, If, Loop, uniform, uniformArray, storage, instanceIndex, textureStore, texture3D, texture, cubeTexture, float, int, uint, vec2, vec3, vec4, ivec3, uvec3, max, min, abs, dot, cross, normalize, floor, sign, select, countOneBits, atomicOr, smoothstep, hash, fract, sqrt, cos, sin, length, PI, getDistanceAttenuation, viewZToPerspectiveDepth, viewZToReversedPerspectiveDepth } from 'three/tsl';
+import { Fn, If, Loop, uniform, uniformArray, storage, instanceIndex, textureStore, texture3D, texture, cubeTexture, float, int, uint, vec2, vec3, vec4, ivec3, uvec3, max, min, abs, dot, cross, normalize, floor, sign, select, countOneBits, atomicOr, smoothstep, hash, length, PI, getDistanceAttenuation, viewZToPerspectiveDepth, viewZToReversedPerspectiveDepth } from 'three/tsl';
 
 import { collectSceneTriangles, computeSceneBounds, computeSolidVoxels, TRIANGLE_STRIDE } from './VXGISceneCollector.js';
-import { createConeTracer } from './VXGIConeTracer.js';
+import { createConeTracer, gather } from './VXGIConeTracer.js';
 
 const _box = /*@__PURE__*/ new Box3();
 const _size = /*@__PURE__*/ new Vector3();
@@ -1416,35 +1416,12 @@ class VXGIVolume {
 
 					const direct = texture3D( directTexture, vec3( coords ).add( 0.5 ).div( vec3( size[ 0 ], size[ 1 ], size[ 2 ] ) ), float( 0 ) ).toConst();
 
-					// tangent frame
-
-					const up = select( abs( normal.y ).lessThan( 0.99 ), vec3( 0, 1, 0 ), vec3( 1, 0, 0 ) );
-					const tangent = normalize( cross( normal, up ) ).toConst();
-					const bitangent = cross( normal, tangent ).toConst();
-
 					const rotation = hash( instanceIndex ).toConst();
-					const gathered = vec3( 0 ).toVar();
+					const origin = position.add( normal.mul( voxelSize.mul( 1.5 ) ) ).toConst();
 
-					Loop( { start: 0, end: BOUNCE_CONE_COUNT, type: 'int', condition: '<', name: 'c' }, ( { c } ) => {
+					const { color } = gather( trace, origin, normal, BOUNCE_CONE_COUNT, tanHalfAngle, traceDistance, rotation, 0.5 );
 
-						// cosine-weighted directions, rotated per voxel
-
-						const u1 = float( c ).add( 0.5 ).div( BOUNCE_CONE_COUNT ).toConst();
-						const u2 = fract( float( c ).mul( 0.618034 ).add( rotation ) ).toConst();
-						const sinTheta = sqrt( u1 ).toConst();
-						const cosTheta = sqrt( u1.oneMinus() ).toConst();
-						const phi = u2.mul( PI.mul( 2 ) ).toConst();
-
-						const direction = normalize( tangent.mul( cos( phi ).mul( sinTheta ) ).add( bitangent.mul( sin( phi ).mul( sinTheta ) ) ).add( normal.mul( cosTheta ) ) ).toConst();
-						const origin = position.add( normal.mul( voxelSize.mul( 1.5 ) ) ).toConst();
-
-						const cone = trace( origin, direction, tanHalfAngle, traceDistance );
-
-						gathered.addAssign( cone.color );
-
-					} );
-
-					const bounce = albedo.mul( gathered.div( BOUNCE_CONE_COUNT ) );
+					const bounce = albedo.mul( color );
 
 					result.assign( vec4( direct.rgb.add( bounce.mul( direct.a ) ), direct.a ) );
 
