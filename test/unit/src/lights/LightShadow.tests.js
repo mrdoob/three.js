@@ -1,6 +1,7 @@
 import { LightShadow } from '../../../../src/lights/LightShadow.js';
 
 import { OrthographicCamera } from '../../../../src/cameras/OrthographicCamera.js';
+import { HalfFloatType } from '../../../../src/constants.js';
 
 export default QUnit.module( 'Lights', () => {
 
@@ -45,6 +46,12 @@ export default QUnit.module( 'Lights', () => {
 
 			b.mapSize.set( 512, 512 );
 			assert.notDeepEqual( a, b, 'Shadows are different again after change' );
+
+			a.mapType = HalfFloatType;
+			assert.strictEqual( a.clone().mapType, HalfFloatType, 'mapType is preserved by clone()' );
+
+			b.copy( a );
+			assert.strictEqual( b.mapType, HalfFloatType, 'mapType is preserved by copy()' );
 
 		} );
 

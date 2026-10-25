@@ -331,6 +331,7 @@ class LightShadow {
 		this.blurSamples = source.blurSamples;
 
 		this.mapSize.copy( source.mapSize );
+		this.mapType = source.mapType;
 
 		this.biasNode = source.biasNode;
 
