@@ -38,7 +38,7 @@
 
 			import * as THREE from 'three/webgpu';
 			import {
-				vec3, vec4, uvec3, float, Fn, uniform,
+				vec3, vec4, uvec3, float, Fn, uniform, renderGroup,
 				texture3D, textureStore, instanceIndex,
 				screenCoordinate, pass,
 				smoothstep, mix, min, max, floor,
@@ -110,7 +110,7 @@
 
 			// sim uniforms
 			const uDt = uniform( 0.016 );
-			const uTime = uniform( 0 );
+			const uTime = uniform( 0 ).setGroup( renderGroup );
 
 			const uBuoyancy = uniform( 3.0 ); // hot air rises
 			const uWeight = uniform( 0.15 ); // smoke weight (pulls down)
@@ -122,43 +122,43 @@
 			const uCooling = uniform( 1.0 ); // temperature cooling /s (default for 1.0s lifespan)
 			const uDissipation = uniform( 0.4 ); // smoke dissipation /s (default for 2.5s lifespan)
 
-			const uEmitDensity = uniform( 7.0 );
-			const uEmitTemperature = uniform( 5.5 );
+			const uEmitDensity = uniform( 7.0 ).setGroup( renderGroup );
+			const uEmitTemperature = uniform( 5.5 ).setGroup( renderGroup );
 
 			const uTeapotMatrix = uniform( new THREE.Matrix4() );
 			const uTeapotSpeed = uniform( 0.0 );
 			const uMotionBoost = uniform( 0.25 ); // scales fire and smoke emission when moving
 			const uTeapotVelocity = uniform( new THREE.Vector3() );
 			const uWindStrength = uniform( 6.5 ); // strength of the wind effect when moving
-			const uTeapotPosition = uniform( new THREE.Vector3() );
+			const uTeapotPosition = uniform( new THREE.Vector3() ).setGroup( renderGroup );
 
 			// render uniforms
-			const uFireIntensity = uniform( 40.0 );
+			const uFireIntensity = uniform( 40.0 ).setGroup( renderGroup );
 			const uTeapotEmissiveIntensity = uniform( 0.2 );
 			const uFireGlowSpread = uniform( 5.0 );
 			const uShadowAbsorption = uniform( 2.0 );
 			const uShadowAmbient = uniform( 0.5 );
-			const uFireStartColor = uniform( new THREE.Color( 0xffe68c ) );
-			const uFireMidColor = uniform( new THREE.Color( 0xff7305 ) );
-			const uFireEndColor = uniform( new THREE.Color( 0xff0000 ) );
-			const uFireHue = uniform( 0.0 );
+			const uFireStartColor = uniform( new THREE.Color( 0xffe68c ) ).setGroup( renderGroup );
+			const uFireMidColor = uniform( new THREE.Color( 0xff7305 ) ).setGroup( renderGroup );
+			const uFireEndColor = uniform( new THREE.Color( 0xff0000 ) ).setGroup( renderGroup );
+			const uFireHue = uniform( 0.0 ).setGroup( renderGroup );
 			const uAsymmetry = uniform( 0.0 );
 			const uPowderStrength = uniform( 0.59 );
 			const uMultiScattering = uniform( 1.0 );
-			const uPointLightVolumeIntensity = uniform( 2.0 );
-			const uPointLightSurfaceIntensity = uniform( 10.0 );
-			const uLightNearIntensity = uniform( 10.0 );
-			const uLightFarIntensity = uniform( 15.0 );
-			const uLightFarDistance = uniform( 10.0 );
-			const uPointLightProjectionRadius = uniform( 20.0 );
-			const uPointLightProjectionFrequency = uniform( 0.2 );
-			const uPointLightProjectionNoiseFade = uniform( 17.0 );
-			const uPointLightProjectionCenterFade = uniform( 3.25 );
+			const uPointLightVolumeIntensity = uniform( 2.0 ).setGroup( renderGroup );
+			const uPointLightSurfaceIntensity = uniform( 10.0 ).setGroup( renderGroup );
+			const uLightNearIntensity = uniform( 10.0 ).setGroup( renderGroup );
+			const uLightFarIntensity = uniform( 15.0 ).setGroup( renderGroup );
+			const uLightFarDistance = uniform( 10.0 ).setGroup( renderGroup );
+			const uPointLightProjectionRadius = uniform( 20.0 ).setGroup( renderGroup );
+			const uPointLightProjectionFrequency = uniform( 0.2 ).setGroup( renderGroup );
+			const uPointLightProjectionNoiseFade = uniform( 17.0 ).setGroup( renderGroup );
+			const uPointLightProjectionCenterFade = uniform( 3.25 ).setGroup( renderGroup );
 
-			const uFlameHeight = uniform( 3.5 );
-			const uSway = uniform( new THREE.Vector3() );
-			const uFlicker = uniform( 1.0 );
-			const uColorNoise = uniform( 0.0 );
+			const uFlameHeight = uniform( 3.5 ).setGroup( renderGroup );
+			const uSway = uniform( new THREE.Vector3() ).setGroup( renderGroup );
+			const uFlicker = uniform( 1.0 ).setGroup( renderGroup );
+			const uColorNoise = uniform( 0.0 ).setGroup( renderGroup );
 			const cpuNoise = new ImprovedNoise();
 
 			init();
@@ -949,7 +949,7 @@
 				// Compose and Denoise
 
 				denoiseStrength = uniform( 0.5 );
-				const uSaturation = uniform( 1.1 );
+				const uSaturation = uniform( 1.1 ).setGroup( renderGroup );
 
 				teapot.material.emissiveNode = Fn( () => {
 
