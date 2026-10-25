@@ -4355,7 +4355,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		}
 
-		if ( camera.isPerspectiveCamera && sizeAttenuation === false ) {
+		if ( camera.isOrthographicCamera !== true && sizeAttenuation === false ) {
 
 			scale = scale.mul( mvPosition.z.negate() );
 
@@ -4507,7 +4507,7 @@ class PointsNodeMaterial extends SpriteNodeMaterial {
 
 		// size attenuation
 
-		if ( camera.isPerspectiveCamera && sizeAttenuation === true ) {
+		if ( camera.isOrthographicCamera !== true && sizeAttenuation === true ) {
 
 			// follow WebGLRenderer's implementation, and scale by half the canvas height in logical units
 
@@ -9672,6 +9672,15 @@ class RenderContext {
 		this.stateKey = '';
 
 		/**
+		 * Cached sub-camera frustums shared by render-list and backend culling.
+		 * Kept per context so nested renders do not overwrite the active frustums.
+		 *
+		 * @type {?FrustumArray}
+		 * @default null
+		 */
+		this.frustumArray = null;
+
+		/**
 		 * The MRT configuration.
 		 *
 		 * @type {?MRTNode}
@@ -9968,9 +9977,10 @@ class RenderContexts {
 	 * @param {?RenderTarget} [renderTarget=null] - The active render target.
 	 * @param {?MRTNode} [mrt=null] - The MRT configuration
 	 * @param {?number} [callDepth=0] - The call depth of the renderer.
+	 * @param {?Camera} [camera=null] - The camera of the render call.
 	 * @return {RenderContext} The render context.
 	 */
-	get( renderTarget = null, mrt = null, callDepth = 0 ) {
+	get( renderTarget = null, mrt = null, callDepth = 0, camera = null ) {
 
 		//
 
@@ -9996,7 +10006,13 @@ class RenderContexts {
 
 		//
 
-		const stateKey = attachmentState + '-' + mrtState;
+		// materials check the camera type at build time, so camera types must not share render objects
+
+		const cameraState = camera?.isOrthographicCamera === true ? 'orthographic' : 'perspective';
+
+		//
+
+		const stateKey = attachmentState + '-' + mrtState + '-' + cameraState;
 		const renderStateKey = stateKey + '-' + callDepth; // one render context per call depth keeps the bindings of nested renders separate
 
 		let renderState = this._renderContexts[ renderStateKey ];
@@ -21886,7 +21902,6 @@ const _scene = /*@__PURE__*/ new Scene();
 const _drawingBufferSize = /*@__PURE__*/ new Vector2();
 const _screen = /*@__PURE__*/ new Vector4();
 const _frustum = /*@__PURE__*/ new Frustum();
-const _frustumArray = /*@__PURE__*/ new FrustumArray();
 
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _vector4 = /*@__PURE__*/ new Vector4();
@@ -22692,7 +22707,7 @@ class Renderer {
 				const renderTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : ( this._renderTarget || this._outputRenderTarget );
 
 				const renderList = this._renderLists.get( scene, camera, this.lighting );
-				const renderContext = this._renderContexts.get( renderTarget, this._mrt );
+				const renderContext = this._renderContexts.get( renderTarget, this._mrt, 0, camera );
 
 				const material = scene.overrideMaterial || object.material;
 
@@ -22873,7 +22888,7 @@ class Renderer {
 
 		this._beginPreCompile( precompilationState );
 
-		const renderContext = this._renderContexts.get( renderTarget, this._mrt, this._callDepth );
+		const renderContext = this._renderContexts.get( renderTarget, this._mrt, this._callDepth, camera );
 
 		precompilationState.renderContext = renderContext;
 
@@ -22916,7 +22931,9 @@ class Renderer {
 
 		if ( camera.isArrayCamera ) {
 
-			_frustumArray.setFromArrayCamera( camera );
+			if ( renderContext.frustumArray === null ) renderContext.frustumArray = new FrustumArray();
+
+			renderContext.frustumArray.setFromArrayCamera( camera );
 
 		} else {
 
@@ -23849,7 +23866,7 @@ class Renderer {
 
 		//
 
-		const renderContext = this._renderContexts.get( renderTarget, this._mrt, this._callDepth );
+		const renderContext = this._renderContexts.get( renderTarget, this._mrt, this._callDepth, camera );
 
 		this._currentRenderContext = renderContext;
 		this._currentRenderObjectFunction = this._renderObjectFunction || this.renderObject;
@@ -23919,7 +23936,9 @@ class Renderer {
 
 		if ( camera.isArrayCamera ) {
 
-			_frustumArray.setFromArrayCamera( camera );
+			if ( renderContext.frustumArray === null ) renderContext.frustumArray = new FrustumArray();
+
+			renderContext.frustumArray.setFromArrayCamera( camera );
 
 		} else {
 
@@ -25393,7 +25412,7 @@ class Renderer {
 
 			} else if ( object.isSprite ) {
 
-				const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
+				const frustum = camera.isArrayCamera ? this._currentRenderContext.frustumArray : _frustum;
 
 				if ( ! object.frustumCulled || object.intersectsFrustum( frustum ) ) {
 
@@ -25419,7 +25438,7 @@ class Renderer {
 
 			} else if ( object.isMesh || object.isLine || object.isPoints ) {
 
-				const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
+				const frustum = camera.isArrayCamera ? this._currentRenderContext.frustumArray : _frustum;
 
 				if ( ! object.frustumCulled || object.intersectsFrustum( frustum ) ) {
 
@@ -36456,11 +36475,13 @@ class WebGLBackend extends Backend {
 
 			}
 
+			const frustumArray = context.frustumArray;
+
 			for ( let i = 0, len = cameras.length; i < len; i ++ ) {
 
 				const subCamera = cameras[ i ];
 
-				if ( object.layers.test( subCamera.layers ) ) {
+				if ( object.layers.test( subCamera.layers ) && ( renderObject.camera.perCameraFrustumCulled === false || object.frustumCulled === false || object.intersectsFrustum( frustumArray.getFrustum( i ) ) ) ) {
 
 					if ( isRenderCameraDepthArray ) {
 
@@ -50533,11 +50554,13 @@ class WebGPUBackend extends Backend {
 			const pixelRatio = ( renderTarget === null || renderTarget.isPostProcessingRenderTarget === true ) ? this.renderer.getPixelRatio() : 1;
 			const indexPos = cameraIndex ? bindings.indexOf( cameraIndex ) : -1;
 
+			const frustumArray = context.frustumArray;
+
 			for ( let i = 0, len = cameras.length; i < len; i ++ ) {
 
 				const subCamera = cameras[ i ];
 
-				if ( object.layers.test( subCamera.layers ) ) {
+				if ( object.layers.test( subCamera.layers ) && ( renderObject.camera.perCameraFrustumCulled === false || object.frustumCulled === false || object.intersectsFrustum( frustumArray.getFrustum( i ) ) ) ) {
 
 					const vp = subCamera.viewport;
 

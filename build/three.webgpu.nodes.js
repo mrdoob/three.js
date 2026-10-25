@@ -22236,7 +22236,7 @@ class ViewportDepthNode extends Node {
 
 		} else if ( scope === ViewportDepthNode.DEPTH ) {
 
-			if ( camera.isPerspectiveCamera ) {
+			if ( camera.isOrthographicCamera !== true ) {
 
 				node = viewZToPerspectiveDepth( positionView.z, cameraNear, cameraFar );
 
@@ -22250,7 +22250,7 @@ class ViewportDepthNode extends Node {
 
 			if ( value !== null ) {
 
-				if ( camera.isPerspectiveCamera ) {
+				if ( camera.isOrthographicCamera !== true ) {
 
 					const viewZ = perspectiveDepthToViewZ( value, cameraNear, cameraFar );
 
@@ -23566,7 +23566,7 @@ class NodeMaterial extends Material {
 
 			} else if ( renderer.logarithmicDepthBuffer === true ) {
 
-				if ( camera.isPerspectiveCamera ) {
+				if ( camera.isOrthographicCamera !== true ) {
 
 					depthNode = viewZToLogarithmicDepth( positionView.z, cameraNear, cameraFar );
 
@@ -30769,7 +30769,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		}
 
-		if ( camera.isPerspectiveCamera && sizeAttenuation === false ) {
+		if ( camera.isOrthographicCamera !== true && sizeAttenuation === false ) {
 
 			scale = scale.mul( mvPosition.z.negate() );
 
@@ -30921,7 +30921,7 @@ class PointsNodeMaterial extends SpriteNodeMaterial {
 
 		// size attenuation
 
-		if ( camera.isPerspectiveCamera && sizeAttenuation === true ) {
+		if ( camera.isOrthographicCamera !== true && sizeAttenuation === true ) {
 
 			// follow WebGLRenderer's implementation, and scale by half the canvas height in logical units
 
@@ -36207,6 +36207,15 @@ class RenderContext {
 		this.stateKey = '';
 
 		/**
+		 * Cached sub-camera frustums shared by render-list and backend culling.
+		 * Kept per context so nested renders do not overwrite the active frustums.
+		 *
+		 * @type {?FrustumArray}
+		 * @default null
+		 */
+		this.frustumArray = null;
+
+		/**
 		 * The MRT configuration.
 		 *
 		 * @type {?MRTNode}
@@ -36503,9 +36512,10 @@ class RenderContexts {
 	 * @param {?RenderTarget} [renderTarget=null] - The active render target.
 	 * @param {?MRTNode} [mrt=null] - The MRT configuration
 	 * @param {?number} [callDepth=0] - The call depth of the renderer.
+	 * @param {?Camera} [camera=null] - The camera of the render call.
 	 * @return {RenderContext} The render context.
 	 */
-	get( renderTarget = null, mrt = null, callDepth = 0 ) {
+	get( renderTarget = null, mrt = null, callDepth = 0, camera = null ) {
 
 		//
 
@@ -36531,7 +36541,13 @@ class RenderContexts {
 
 		//
 
-		const stateKey = attachmentState + '-' + mrtState;
+		// materials check the camera type at build time, so camera types must not share render objects
+
+		const cameraState = camera?.isOrthographicCamera === true ? 'orthographic' : 'perspective';
+
+		//
+
+		const stateKey = attachmentState + '-' + mrtState + '-' + cameraState;
 		const renderStateKey = stateKey + '-' + callDepth; // one render context per call depth keeps the bindings of nested renders separate
 
 		let renderState = this._renderContexts[ renderStateKey ];
@@ -49164,7 +49180,14 @@ class ShadowNode extends ShadowBaseNode {
 
 		renderer.setRenderTarget( shadowMap );
 
+		const currentMatrixWorldAutoUpdate = scene.matrixWorldAutoUpdate;
+
+		// The scene was already updated by the enclosing render.
+		scene.matrixWorldAutoUpdate = false;
+
 		this.renderShadow( frame );
+
+		scene.matrixWorldAutoUpdate = currentMatrixWorldAutoUpdate;
 
 		renderer.setRenderObjectFunction( currentRenderObjectFunction );
 
@@ -49360,29 +49383,29 @@ const PointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp, shadow }
 	const radius = reference( 'radius', 'float', shadow ).setGroup( renderGroup );
 	const mapSize = reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup );
 
-	const texelSize = radius.div( mapSize.x );
+	const texelSize = radius.div( mapSize.x ).toConst();
 
 	// Build a tangent-space coordinate system for applying offsets
 	const absDir = abs( bd3D );
-	const tangent = normalize( cross( bd3D, absDir.x.greaterThan( absDir.z ).select( vec3( 0, 1, 0 ), vec3( 1, 0, 0 ) ) ) );
-	const bitangent = cross( bd3D, tangent );
+	const tangent = normalize( cross( bd3D, absDir.x.greaterThan( absDir.z ).select( vec3( 0, 1, 0 ), vec3( 1, 0, 0 ) ) ) ).toConst();
+	const bitangent = cross( bd3D, tangent ).toConst();
 
 	// Use IGN to rotate sampling pattern per pixel (phi = IGN * 2π)
-	const phi = interleavedGradientNoise( screenCoordinate.xy ).mul( 6.28318530718 );
+	const phi = interleavedGradientNoise( screenCoordinate.xy ).mul( 6.28318530718 ).toConst();
 
-	// 5 samples using Vogel disk distribution in tangent space
-	const sample0 = vogelDiskSample( 0, 5, phi );
-	const sample1 = vogelDiskSample( 1, 5, phi );
-	const sample2 = vogelDiskSample( 2, 5, phi );
-	const sample3 = vogelDiskSample( 3, 5, phi );
-	const sample4 = vogelDiskSample( 4, 5, phi );
+	// Accumulate five samples using Vogel disk distribution in tangent space.
 
-	return cubeTexture( depthTexture, bd3D.add( tangent.mul( sample0.x ).add( bitangent.mul( sample0.y ) ).mul( texelSize ) ) ).compare( dp )
-		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample1.x ).add( bitangent.mul( sample1.y ) ).mul( texelSize ) ) ).compare( dp ) )
-		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample2.x ).add( bitangent.mul( sample2.y ) ).mul( texelSize ) ) ).compare( dp ) )
-		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample3.x ).add( bitangent.mul( sample3.y ) ).mul( texelSize ) ) ).compare( dp ) )
-		.add( cubeTexture( depthTexture, bd3D.add( tangent.mul( sample4.x ).add( bitangent.mul( sample4.y ) ).mul( texelSize ) ) ).compare( dp ) )
-		.mul( 1.0 / 5.0 );
+	const result = float( 0.0 ).toVar();
+
+	Loop( 5, ( { i } ) => {
+
+		const sample = vogelDiskSample( i, 5, phi );
+		const direction = bd3D.add( tangent.mul( sample.x ).add( bitangent.mul( sample.y ) ).mul( texelSize ) );
+		result.addAssign( cubeTexture( depthTexture, direction ).compare( dp ) );
+
+	} );
+
+	return result.mul( 1.0 / 5.0 );
 
 } );
 
@@ -49432,7 +49455,6 @@ const pointShadowFilter = /*@__PURE__*/ Fn( ( { filterFn, depthTexture, shadowCo
 	return result;
 
 } );
-
 
 /**
  * Represents the shadow implementation for point light nodes.
@@ -63015,7 +63037,6 @@ const _scene = /*@__PURE__*/ new Scene();
 const _drawingBufferSize = /*@__PURE__*/ new Vector2();
 const _screen = /*@__PURE__*/ new Vector4();
 const _frustum = /*@__PURE__*/ new Frustum();
-const _frustumArray = /*@__PURE__*/ new FrustumArray();
 
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _vector4 = /*@__PURE__*/ new Vector4();
@@ -63821,7 +63842,7 @@ class Renderer {
 				const renderTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : ( this._renderTarget || this._outputRenderTarget );
 
 				const renderList = this._renderLists.get( scene, camera, this.lighting );
-				const renderContext = this._renderContexts.get( renderTarget, this._mrt );
+				const renderContext = this._renderContexts.get( renderTarget, this._mrt, 0, camera );
 
 				const material = scene.overrideMaterial || object.material;
 
@@ -64002,7 +64023,7 @@ class Renderer {
 
 		this._beginPreCompile( precompilationState );
 
-		const renderContext = this._renderContexts.get( renderTarget, this._mrt, this._callDepth );
+		const renderContext = this._renderContexts.get( renderTarget, this._mrt, this._callDepth, camera );
 
 		precompilationState.renderContext = renderContext;
 
@@ -64045,7 +64066,9 @@ class Renderer {
 
 		if ( camera.isArrayCamera ) {
 
-			_frustumArray.setFromArrayCamera( camera );
+			if ( renderContext.frustumArray === null ) renderContext.frustumArray = new FrustumArray();
+
+			renderContext.frustumArray.setFromArrayCamera( camera );
 
 		} else {
 
@@ -64978,7 +65001,7 @@ class Renderer {
 
 		//
 
-		const renderContext = this._renderContexts.get( renderTarget, this._mrt, this._callDepth );
+		const renderContext = this._renderContexts.get( renderTarget, this._mrt, this._callDepth, camera );
 
 		this._currentRenderContext = renderContext;
 		this._currentRenderObjectFunction = this._renderObjectFunction || this.renderObject;
@@ -65048,7 +65071,9 @@ class Renderer {
 
 		if ( camera.isArrayCamera ) {
 
-			_frustumArray.setFromArrayCamera( camera );
+			if ( renderContext.frustumArray === null ) renderContext.frustumArray = new FrustumArray();
+
+			renderContext.frustumArray.setFromArrayCamera( camera );
 
 		} else {
 
@@ -66522,7 +66547,7 @@ class Renderer {
 
 			} else if ( object.isSprite ) {
 
-				const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
+				const frustum = camera.isArrayCamera ? this._currentRenderContext.frustumArray : _frustum;
 
 				if ( ! object.frustumCulled || object.intersectsFrustum( frustum ) ) {
 
@@ -66548,7 +66573,7 @@ class Renderer {
 
 			} else if ( object.isMesh || object.isLine || object.isPoints ) {
 
-				const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
+				const frustum = camera.isArrayCamera ? this._currentRenderContext.frustumArray : _frustum;
 
 				if ( ! object.frustumCulled || object.intersectsFrustum( frustum ) ) {
 
@@ -77585,11 +77610,13 @@ class WebGLBackend extends Backend {
 
 			}
 
+			const frustumArray = context.frustumArray;
+
 			for ( let i = 0, len = cameras.length; i < len; i ++ ) {
 
 				const subCamera = cameras[ i ];
 
-				if ( object.layers.test( subCamera.layers ) ) {
+				if ( object.layers.test( subCamera.layers ) && ( renderObject.camera.perCameraFrustumCulled === false || object.frustumCulled === false || object.intersectsFrustum( frustumArray.getFrustum( i ) ) ) ) {
 
 					if ( isRenderCameraDepthArray ) {
 
@@ -91662,11 +91689,13 @@ class WebGPUBackend extends Backend {
 			const pixelRatio = ( renderTarget === null || renderTarget.isPostProcessingRenderTarget === true ) ? this.renderer.getPixelRatio() : 1;
 			const indexPos = cameraIndex ? bindings.indexOf( cameraIndex ) : -1;
 
+			const frustumArray = context.frustumArray;
+
 			for ( let i = 0, len = cameras.length; i < len; i ++ ) {
 
 				const subCamera = cameras[ i ];
 
-				if ( object.layers.test( subCamera.layers ) ) {
+				if ( object.layers.test( subCamera.layers ) && ( renderObject.camera.perCameraFrustumCulled === false || object.frustumCulled === false || object.intersectsFrustum( frustumArray.getFrustum( i ) ) ) ) {
 
 					const vp = subCamera.viewport;
 
