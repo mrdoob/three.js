@@ -36785,33 +36785,6 @@ class Textures extends DataMap {
 
 		}
 
-		//
-
-
-		const options = { sampleCount };
-
-		// XR render targets require no texture updates
-
-		if ( renderTarget.isXRRenderTarget !== true ) {
-
-			for ( let i = 0; i < textures.length; i ++ ) {
-
-				const texture = textures[ i ];
-
-				if ( textureNeedsUpdate ) texture.needsUpdate = true;
-
-				this.updateTexture( texture, options );
-
-			}
-
-			if ( depthTexture ) {
-
-				this.updateTexture( depthTexture, options );
-
-			}
-
-		}
-
 		// dispose handler
 
 		if ( renderTargetData.initialized !== true ) {
@@ -36838,6 +36811,30 @@ class Textures extends DataMap {
 
 		}
 
+		const options = { sampleCount };
+
+		// XR render targets require no texture updates
+
+		if ( renderTarget.isXRRenderTarget !== true ) {
+
+			for ( let i = 0; i < textures.length; i ++ ) {
+
+				const texture = textures[ i ];
+
+				if ( textureNeedsUpdate ) texture.needsUpdate = true;
+
+				this.updateTexture( texture, options );
+
+			}
+
+			if ( depthTexture ) {
+
+				this.updateTexture( depthTexture, options );
+
+			}
+
+		}
+
 	}
 
 	/**
@@ -36853,6 +36850,18 @@ class Textures extends DataMap {
 
 		const textureData = this.get( texture );
 		if ( textureData.initialized === true && textureData.version === texture.version ) return textureData.generation;
+
+		// render target textures are created with their render target
+
+		const renderTarget = ( texture.isRenderTargetTexture || texture.isDepthTexture ) ? texture.renderTarget : null;
+
+		if ( renderTarget !== null && this.get( renderTarget ).initialized !== true ) {
+
+			this.updateRenderTarget( renderTarget );
+
+			return textureData.generation;
+
+		}
 
 		const isRenderTarget = texture.isRenderTargetTexture || texture.isDepthTexture || texture.isFramebufferTexture;
 		const backend = this.backend;
@@ -74975,33 +74984,54 @@ class WebGLTextureUtils {
 		if ( srcTexture.isDepthTexture ) {
 
 			const srcTextureData = backend.get( srcTexture );
-			const dstTextureData = backend.get( dstTexture );
 
-			const srcRenderContextData = backend.get( srcTextureData.renderTarget );
-			const dstRenderContextData = backend.get( dstTextureData.renderTarget );
+			if ( this._srcFramebuffer === null ) this._srcFramebuffer = gl.createFramebuffer();
+			if ( this._dstFramebuffer === null ) this._dstFramebuffer = gl.createFramebuffer();
 
-			const srcFramebuffer = srcRenderContextData.framebuffers[ srcTextureData.cacheKey ];
-			const dstFramebuffer = dstRenderContextData.framebuffers[ dstTextureData.cacheKey ];
+			const attachment = srcTexture.format === DepthStencilFormat ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
 
 			const prevReadFramebuffer = state.currentBoundFramebuffers[ gl.READ_FRAMEBUFFER ] ?? null;
 			const prevDrawFramebuffer = state.currentBoundFramebuffers[ gl.DRAW_FRAMEBUFFER ] ?? null;
 
-			state.bindFramebuffer( gl.READ_FRAMEBUFFER, srcFramebuffer );
-			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, dstFramebuffer );
+			state.bindFramebuffer( gl.READ_FRAMEBUFFER, this._srcFramebuffer );
+			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, this._dstFramebuffer );
+
+			// color attachments of previous copies would make the framebuffers incomplete
+
+			gl.framebufferTexture2D( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, null, 0 );
+			gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, null, 0 );
 
 			for ( let i = 0; i < depth; i ++ ) {
 
 				// if the source or destination are a 3d target then a layer needs to be bound
 				if ( isSrc3D ) {
 
-					gl.framebufferTextureLayer( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, srcTextureData.textureGPU, srcLevel, minZ + i );
-					gl.framebufferTextureLayer( gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, dstTextureGPU, dstLevel, dstZ + i );
+					gl.framebufferTextureLayer( gl.READ_FRAMEBUFFER, attachment, srcTextureData.textureGPU, srcLevel, minZ + i );
+
+				} else {
+
+					gl.framebufferTexture2D( gl.READ_FRAMEBUFFER, attachment, gl.TEXTURE_2D, srcTextureData.textureGPU, srcLevel );
+
+				}
+
+				if ( isDst3D ) {
+
+					gl.framebufferTextureLayer( gl.DRAW_FRAMEBUFFER, attachment, dstTextureGPU, dstLevel, dstZ + i );
+
+				} else {
+
+					gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, attachment, gl.TEXTURE_2D, dstTextureGPU, dstLevel );
 
 				}
 
 				gl.blitFramebuffer( minX, minY, minX + width, minY + height, dstX, dstY, dstX + width, dstY + height, gl.DEPTH_BUFFER_BIT, gl.NEAREST );
 
 			}
+
+			// detach the depth textures so subsequent color copies can reuse the framebuffers
+
+			gl.framebufferTexture2D( gl.READ_FRAMEBUFFER, attachment, gl.TEXTURE_2D, null, 0 );
+			gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, attachment, gl.TEXTURE_2D, null, 0 );
 
 			state.bindFramebuffer( gl.READ_FRAMEBUFFER, prevReadFramebuffer );
 			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, prevDrawFramebuffer );
@@ -78675,8 +78705,6 @@ class WebGLBackend extends Backend {
 
 						const texture = textures[ i ];
 						const textureData = this.get( texture );
-						textureData.renderTarget = descriptor.renderTarget;
-						textureData.cacheKey = cacheKey; // required for copyTextureToTexture()
 
 						const attachment = gl.COLOR_ATTACHMENT0 + i;
 
@@ -78731,8 +78759,6 @@ class WebGLBackend extends Backend {
 						depthInvalidationArray.push( stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT );
 
 						const textureData = this.get( descriptor.depthTexture );
-						textureData.renderTarget = descriptor.renderTarget;
-						textureData.cacheKey = cacheKey; // required for copyTextureToTexture()
 
 						if ( renderTarget.multiview ) {
 
