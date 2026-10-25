@@ -533,8 +533,6 @@ class SVGRenderer {
 
 				if ( light.isDirectionalLight ) {
 
-					// a directional light shines from its position towards its target
-
 					const lightDirection = _vector3.setFromMatrixPosition( light.matrixWorld ).sub( _vector3b.setFromMatrixPosition( light.target.matrixWorld ) ).normalize();
 
 					let amount = normal.dot( lightDirection );
