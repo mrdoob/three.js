@@ -321,7 +321,7 @@ async function RapierPhysics() {
 
 		timer.update();
 
-		world.timestep = timer.getDelta();
+		world.timestep = Math.min( timer.getDelta(), 1 / 30 );
 		world.step();
 
 		//
