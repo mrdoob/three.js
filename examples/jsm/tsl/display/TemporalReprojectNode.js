@@ -662,9 +662,6 @@ class TemporalReprojectNode extends Node {
 
 		if ( needsRestart === true ) {
 
-			renderer.initRenderTarget( this._historyRenderTarget );
-			renderer.initRenderTarget( this._resolveRenderTarget );
-
 			this._previousNormalTexture.dispose();
 			this._previousNormalTexture = this.normalNode.value.clone();
 			this._previousNormalNode.value = this._previousNormalTexture;
