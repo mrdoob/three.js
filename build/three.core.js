@@ -46990,6 +46990,7 @@ class LightShadow {
 		this.blurSamples = source.blurSamples;
 
 		this.mapSize.copy( source.mapSize );
+		this.mapType = source.mapType;
 
 		this.biasNode = source.biasNode;
 
@@ -47024,6 +47025,7 @@ class LightShadow {
 		object.radius = this.radius;
 		object.blurSamples = this.blurSamples;
 		object.mapSize = this.mapSize.toArray();
+		object.mapType = this.mapType;
 
 		object.camera = this.camera.toJSON( false ).object;
 		delete object.camera.matrix;
@@ -50622,6 +50624,7 @@ class ObjectLoader extends Loader {
 			if ( data.shadow.focus !== undefined ) object.shadow.focus = data.shadow.focus;
 			if ( data.shadow.aspect !== undefined ) object.shadow.aspect = data.shadow.aspect;
 			if ( data.shadow.mapSize !== undefined ) object.shadow.mapSize.fromArray( data.shadow.mapSize );
+			if ( data.shadow.mapType !== undefined ) object.shadow.mapType = data.shadow.mapType;
 			if ( data.shadow.camera !== undefined ) object.shadow.camera = this.parseObject( data.shadow.camera );
 
 		}

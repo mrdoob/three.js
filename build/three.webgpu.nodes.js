@@ -384,7 +384,7 @@ class NodeMaterialObserver {
 	}
 
 	/**
-	 * Returns `true` if the node builder's context (e.g. material, scene) uses node properties.
+	 * Returns `true` if the node builder's context (e.g. material) uses node properties.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {boolean} Whether the node builder's context uses node properties or not.
@@ -405,16 +405,6 @@ class NodeMaterialObserver {
 		// context
 
 		if ( builder.context.modelViewMatrix || builder.context.modelNormalViewMatrix || builder.context.getAO || builder.context.getShadow || builder.context.getGI )
-			return true;
-
-		// scene
-
-		const scene = builder.scene;
-
-		if ( material.fog === true && scene.fogNode && scene.fogNode.isNode )
-			return true;
-
-		if ( scene.environmentNode && scene.environmentNode.isNode )
 			return true;
 
 		return false;
@@ -39155,7 +39145,7 @@ class BitcountNode extends MathNode {
 
 			If( value.equal( uint( 0 ) ), () => {
 
-				return uint( 32 );
+				return outputConvertNode( 32 );
 
 			} );
 
@@ -39191,7 +39181,7 @@ class BitcountNode extends MathNode {
 
 			If( value.equal( uint( 0 ) ), () => {
 
-				return uint( 32 );
+				return outputConvertNode( 32 );
 
 			} );
 
@@ -47523,9 +47513,10 @@ const subgroupShuffleDown = /*@__PURE__*/ nodeProxyAssignable( SubgroupFunctionN
  * @tsl
  * @method
  * @param {number} e - The value to broadcast.
+ * @param {number} id - The quad invocation id to broadcast from.
  * @return {number} The broadcast value.
  */
-const quadBroadcast = /*@__PURE__*/ nodeProxyAssignable( SubgroupFunctionNode, SubgroupFunctionNode.QUAD_BROADCAST ).setParameterLength( 1 );
+const quadBroadcast = /*@__PURE__*/ nodeProxyAssignable( SubgroupFunctionNode, SubgroupFunctionNode.QUAD_BROADCAST ).setParameterLength( 2 );
 
 let uniformsLib;
 
@@ -69549,11 +69540,34 @@ ${ flowData.code }
 	 * Returns the uniform block name of the given buffer uniform.
 	 *
 	 * @param {NodeUniform} uniform - The buffer uniform.
+	 * @param {string} shaderStage - The shader stage.
 	 * @return {string} The uniform block name.
 	 */
-	getUniformBufferName( uniform ) {
+	getUniformBufferName( uniform, shaderStage ) {
 
-		return 'NodeBuffer_' + uniform.name;
+		return this.getDataFromNode( uniform.node, shaderStage, this.globalCache ).uniformGPU.name;
+
+	}
+
+	/**
+	 * Returns a bind group for the given group name and bindings. Uniform blocks are
+	 * named after their position in the group since shared bind groups are created
+	 * by one build but looked up by name in the programs of every build sharing them.
+	 *
+	 * @private
+	 * @param {string} groupName - The group name.
+	 * @param {Array<NodeUniformsGroup>} bindings - List of bindings.
+	 * @return {BindGroup} The bind group
+	 */
+	_getBindGroup( groupName, bindings ) {
+
+		for ( let i = 0; i < bindings.length; i ++ ) {
+
+			if ( bindings[ i ].isNodeUniformBuffer === true ) bindings[ i ].name = 'NodeBuffer_' + groupName + '_' + i;
+
+		}
+
+		return super._getBindGroup( groupName, bindings );
 
 	}
 
@@ -69634,7 +69648,7 @@ ${ flowData.code }
 				const bufferCount = bufferNode.bufferCount;
 
 				const bufferCountSnippet = bufferCount > 0 ? bufferCount : '';
-				snippet = `${ this.getUniformBufferName( uniform ) } {\n\t${ bufferType } ${ uniform.name }[${ bufferCountSnippet }];\n};\n`;
+				snippet = `${ this.getUniformBufferName( uniform, shaderStage ) } {\n\t${ bufferType } ${ uniform.name }[${ bufferCountSnippet }];\n};\n`;
 
 			} else {
 
@@ -70547,7 +70561,6 @@ void main() {
 			} else if ( type === 'buffer' ) {
 
 				const buffer = new NodeUniformBuffer( node, group );
-				buffer.name = this.getUniformBufferName( uniformNode );
 
 				bindings.push( buffer );
 

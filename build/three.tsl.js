@@ -14058,7 +14058,7 @@ class BitcountNode extends MathNode {
 
 			If( value.equal( uint( 0 ) ), () => {
 
-				return uint( 32 );
+				return outputConvertNode( 32 );
 
 			} );
 
@@ -14094,7 +14094,7 @@ class BitcountNode extends MathNode {
 
 			If( value.equal( uint( 0 ) ), () => {
 
-				return uint( 32 );
+				return outputConvertNode( 32 );
 
 			} );
 
@@ -26238,7 +26238,7 @@ class NodeMaterialObserver {
 	}
 
 	/**
-	 * Returns `true` if the node builder's context (e.g. material, scene) uses node properties.
+	 * Returns `true` if the node builder's context (e.g. material) uses node properties.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {boolean} Whether the node builder's context uses node properties or not.
@@ -26259,16 +26259,6 @@ class NodeMaterialObserver {
 		// context
 
 		if ( builder.context.modelViewMatrix || builder.context.modelNormalViewMatrix || builder.context.getAO || builder.context.getShadow || builder.context.getGI )
-			return true;
-
-		// scene
-
-		const scene = builder.scene;
-
-		if ( material.fog === true && scene.fogNode && scene.fogNode.isNode )
-			return true;
-
-		if ( scene.environmentNode && scene.environmentNode.isNode )
 			return true;
 
 		return false;
@@ -34790,9 +34780,10 @@ const subgroupShuffleDown = /*@__PURE__*/ nodeProxyAssignable( SubgroupFunctionN
  * @tsl
  * @method
  * @param {number} e - The value to broadcast.
+ * @param {number} id - The quad invocation id to broadcast from.
  * @return {number} The broadcast value.
  */
-const quadBroadcast = /*@__PURE__*/ nodeProxyAssignable( SubgroupFunctionNode, SubgroupFunctionNode.QUAD_BROADCAST ).setParameterLength( 1 );
+const quadBroadcast = /*@__PURE__*/ nodeProxyAssignable( SubgroupFunctionNode, SubgroupFunctionNode.QUAD_BROADCAST ).setParameterLength( 2 );
 
 let uniformsLib;
 
