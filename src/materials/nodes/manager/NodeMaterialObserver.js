@@ -378,7 +378,7 @@ class NodeMaterialObserver {
 	}
 
 	/**
-	 * Returns `true` if the node builder's context (e.g. material, scene) uses node properties.
+	 * Returns `true` if the node builder's context (e.g. material) uses node properties.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {boolean} Whether the node builder's context uses node properties or not.
@@ -399,16 +399,6 @@ class NodeMaterialObserver {
 		// context
 
 		if ( builder.context.modelViewMatrix || builder.context.modelNormalViewMatrix || builder.context.getAO || builder.context.getShadow || builder.context.getGI )
-			return true;
-
-		// scene
-
-		const scene = builder.scene;
-
-		if ( material.fog === true && scene.fogNode && scene.fogNode.isNode )
-			return true;
-
-		if ( scene.environmentNode && scene.environmentNode.isNode )
 			return true;
 
 		return false;
