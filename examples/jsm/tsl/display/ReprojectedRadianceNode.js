@@ -1,9 +1,7 @@
 import { FloatType, NearestFilter, RTTNode, WebGPUCoordinateSystem } from 'three/webgpu';
 import { Fn, If, float, getViewPosition, isBackgroundDepth, nodeObject, sample, textureSize, uniform, uv, vec2, vec3, vec4 } from 'three/tsl';
 
-// Cache on the guide's texel grid, independent of the output viewport. The
-// source is constant within each depth texel, so nearest sampling preserves
-// both validated radiance and its coverage without interpolating surfaces.
+// cached on the depth texel grid and nearest sampled
 class ReprojectedRadianceCacheNode extends RTTNode {
 
 	constructor( source, depth ) {
@@ -26,14 +24,8 @@ class ReprojectedRadianceCacheNode extends RTTNode {
 }
 
 /**
- * Reprojects radiance from static scene geometry into the previous camera.
- * Each historical texel is validated before bilinear radiance interpolation.
- * RGB is conditional linear radiance; alpha is the accepted bilinear support.
- *
- * The tolerance is independent of ray-marching thickness. A world-space floor
- * and previous-frame pixel footprint express uncertainty in the surface plane.
- * Object motion needs previous object positions or motion vectors at the hit;
- * this helper deliberately only handles camera motion and static geometry.
+ * Reprojects radiance of static geometry from the previous frame. Each history
+ * texel is validated before interpolation. Only camera motion is handled.
  *
  * @param {TextureNode} radiance - Previous resolved linear radiance.
  * @param {TextureNode} historyDepth - Previous device depth, nearest sampled.
@@ -77,15 +69,14 @@ export const reprojectedRadiance = ( radiance, historyDepth, depth, normal, came
 		let footprint;
 		if ( analyticPixelFootprint ) {
 
-			// For standard perspective and orthographic projections, clip.w is
-			// the homogeneous scale converting a pixel displacement to view space.
+			// clip.w scales a pixel displacement to view space
 			const scaling = vec2( previousProjection.element( 0 ).x.abs(), previousProjection.element( 1 ).y.abs() ).mul( resolution ).max( vec2( 1e-6 ) );
 			const pixelSize = vec2( clip.w.abs().mul( 2 ) ).div( scaling );
 			footprint = pixelSize.x.max( pixelSize.y );
 
 		} else {
 
-			// Retain the inverse-projection construction for custom cameras.
+			// custom projections
 			let expectedDepth = clip.z.div( clip.w.max( 1e-6 ) );
 			if ( builder.renderer.coordinateSystem !== WebGPUCoordinateSystem && builder.renderer.reversedDepthBuffer !== true ) expectedDepth = expectedDepth.mul( 0.5 ).add( 0.5 );
 			const pixelX = getViewPosition( previousUV.add( vec2( 1, 0 ).div( resolution ) ), expectedDepth, previousProjectionInverse ).sub( oldPosition ).length();
@@ -100,8 +91,7 @@ export const reprojectedRadiance = ( radiance, historyDepth, depth, normal, came
 		const fraction = pixel.fract();
 		const color = vec3( 0 ).toVar();
 		const support = float( 0 ).toVar();
-		// Positive w makes homogeneous bounds equivalent to NDC depth bounds.
-		// Reversed depth also uses [0,1], including the WebGL backend.
+		// depth is in [0,1] for all backends, including reversed depth
 		const minimumDepth = builder.renderer.coordinateSystem === WebGPUCoordinateSystem || builder.renderer.reversedDepthBuffer === true ? 0 : - 1;
 		const inDepthBounds = clip.z.greaterThanEqual( clip.w.mul( minimumDepth ) ).and( clip.z.lessThanEqual( clip.w ) );
 		const historyValid = valid.and( clip.w.greaterThan( 0 ) ).and( inBounds( previousUV ) ).and( inDepthBounds ).and( isBackgroundDepth( currentDepth ).not() );
@@ -135,8 +125,7 @@ export const reprojectedRadiance = ( radiance, historyDepth, depth, normal, came
 	const result = sample( coordinate => Fn( () => {
 
 		const value = vec4().toVar();
-		// Outside the current raster grid, retain the original reconstruction
-		// instead of clamping to a potentially valid edge cache texel.
+		// don't clamp to edge cache texels outside the raster grid
 		const inside = coordinate.greaterThanEqual( vec2( 0 ) ).all().and( coordinate.lessThan( vec2( 1 ) ).all() );
 		If( inside, () => {
 

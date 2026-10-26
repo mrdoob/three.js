@@ -6,22 +6,9 @@ import { ENV_RAY_LENGTH, ENV_RAY_LENGTH_THRESHOLD } from '../utils/SpecularHelpe
 const historySample = struct( { color: 'vec4', fast: 'vec4', weight: 'float', age: 'float' } );
 
 /**
- * Reconstructs sparse lighting and its coverage together. The input and output
- * are unweighted linear radiance (specular) or irradiance (diffuse) in RGB, with
- * coverage in A. Hit distance is supplied separately; alpha is never used for
- * frame count or ray length.
+ * Spatio-temporal denoiser for sparse lighting with coverage. Input and output are
+ * unweighted radiance in RGB and coverage in A, so misses never darken valid lighting.
  *
- * Spatial and temporal sums operate on (radiance * coverage, coverage), then
- * normalize RGB by accumulated coverage. Missing samples cannot darken valid
- * lighting, and a valid black sample still contributes coverage.
- *
- * Uses geometric edge stopping, depth/normal-validated surface and virtual-hit
- * reprojection, and neighborhood clipping of history. Hit distance steers
- * virtual reprojection and spatial edges, but never rejects temporal history:
- * single-ray distances are too noisy to compare between frames.
- * Inspired by the separate SSR/confidence architecture documented by Diligent
- * Engine and Forspoken; this is a small independent implementation, not a port
- * of their complete denoisers.
  * Reference: {@link https://diligentgraphics.github.io/docs/dc/dd9/DiligentFX_PostProcess_ScreenSpaceReflection_README.html}.
  *
  * @augments Node
@@ -60,27 +47,20 @@ class CoverageDenoiseNode extends Node {
 		this.roughnessThreshold = uniform( 0.04 );
 		this.radius = uniform( 1.5 );
 		this.maxFrames = uniform( 16 );
-		/**
-		 * Length of the short history that bounds the long one. Clamping to a single sparse
-		 * frame pins history near that frame's median, darkening it and freezing its noise.
-		 */
+		/** Length of the short history that bounds the long one. */
 		this.fastFrames = uniform( 6 );
 		this.depthThreshold = uniform( 0.01 );
-		/** Relative difference from the neighborhood's mean hit distance accepted by the spatial filter. */
+		/** Hit distance tolerance of the spatial filter, relative to the mean. */
 		this.hitDistancePhi = uniform( 1 );
-		/** Curvature and reflection-distance variation reduce virtual history trust. */
 		this.curvatureScale = uniform( 20 );
 		this.reflectionEdgeScale = uniform( 4 );
 		this.useStretchRejection = uniform( true );
-		// Rejected bilinear taps reduce supported history evidence even after
-		// the surviving radiance has been normalized. Disable to compare behavior.
 		this.useGatherConfidence = uniform( true );
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
 		this._spatialTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 		this._target = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, count: 4 } );
-		// Age, roughness, virtual-history share and surface identity have independent channels.
-		// Identity is compared after the same half-float rounding; point gathers need no filtering.
+		// metadata is point sampled
 		this._target.textures[ 2 ].minFilter = this._target.textures[ 2 ].magFilter = NearestFilter;
 		this._historyTarget = this._target.clone();
 		this._spatialTarget.texture.name = 'CoverageDenoise.spatial';
@@ -154,12 +134,11 @@ class CoverageDenoiseNode extends Node {
 	updateBefore( frame ) {
 
 		const { renderer } = frame;
-		// Reconstruct on the guide grid; reduced-resolution guides keep the whole filter reduced.
 		if ( this.depthNode.isPassTextureNode ) frame.updateBeforeNode( this.depthNode.passNode );
 		const { width, height } = this.depthNode.value.image;
 		this.setSize( width, height );
 
-		// Keep the previous output as history and render into the other target.
+		// swap history
 		const historyTarget = this._historyTarget;
 		this._historyTarget = this._target;
 		this._target = historyTarget;
@@ -209,8 +188,7 @@ class CoverageDenoiseNode extends Node {
 
 		this._velocityNode = builder.context.velocity || cameraVelocity;
 
-		// Radius and clipping neighborhoods are measured in input texels. Using
-		// output pixels under-filters lower-resolution inputs and clips away valid history.
+		// radius and clipping neighborhoods are measured in input texels
 		const inputResolution = this.inputNode.isTextureNode ? vec2( textureSize( this.inputNode ) ) : this._resolution;
 		const guideResolution = vec2( textureSize( this.depthNode ) );
 		const guideCoordinate = coordinate => coordinate.mul( guideResolution ).floor().add( 0.5 ).div( guideResolution );
@@ -231,9 +209,7 @@ class CoverageDenoiseNode extends Node {
 		const inputCoordinate = coordinate => coordinate.mul( inputResolution ).floor().add( 0.5 ).div( inputResolution );
 		const isHit = distance => distance.greaterThan( 0 ).and( distance.lessThan( ENV_RAY_LENGTH_THRESHOLD ) );
 
-		// Distance moments over the 3×3 input texels include contributing hits,
-		// including black ones. Reads use texel centers: filtering would blend the
-		// miss sentinel into hits. The mean replaces noisy single-ray distances.
+		// hit distance moments over 3x3 input texels, point sampled to avoid blending in misses
 		const hitMoments = coordinate => {
 
 			const moments = vec3( 0 ).toVar();
@@ -257,8 +233,7 @@ class CoverageDenoiseNode extends Node {
 
 		const momentsMean = moments => moments.z.greaterThan( 1e-6 ).select( moments.x.div( moments.z.max( 1e-6 ) ), float( ENV_RAY_LENGTH ) );
 
-		// Edge-aware 3×3 reconstruction of `read` (radiance and coverage), with taps
-		// `stride` input texels apart, point-sampled on the `grid` resolution.
+		// edge-aware 3x3 reconstruction with taps `stride` input texels apart
 		const filter = ( read, grid, coordinate, stride ) => {
 
 			const centerPosition = viewPosition( coordinate ).toConst();
@@ -266,8 +241,7 @@ class CoverageDenoiseNode extends Node {
 			const roughness = roughnessAt( coordinate ).toConst();
 			const radiance = vec4( 0 ).toVar();
 			const coverage = vec2( 0 ).toVar();
-			// Coverage uses geometry weights only. Hit-distance weights select which
-			// hits share radiance; applying them to coverage would favour misses.
+			// hit distance weights apply to radiance only, otherwise coverage would favour misses
 			const centerHit = this.hitDistanceNode !== null ? momentsMean( hitMoments( coordinate ) ).toConst() : null;
 			const tolerance = centerPosition.z.abs().mul( this.depthThreshold ).max( 0.001 );
 
@@ -275,8 +249,6 @@ class CoverageDenoiseNode extends Node {
 
 				for ( let x = - 1; x <= 1; x ++ ) {
 
-					// Point-sample source texels before premultiplication. Fractional radii
-					// select the nearest texel; guides must describe that same surface.
 					const tapUV = coordinate.add( vec2( x, y ).mul( stride ).div( inputResolution ) ).mul( grid ).floor().add( 0.5 ).div( grid ).toConst();
 					const tap = read( tapUV ).toConst();
 					const planeDistance = viewPosition( tapUV ).sub( centerPosition ).dot( centerNormal ).abs();
@@ -334,14 +306,12 @@ class CoverageDenoiseNode extends Node {
 			const previousPosition = this._previousView.mul( vec4( worldPosition, 1 ) ).xyz.toConst();
 			const previousNormal = worldNormal.transformDirection( this._previousView ).toConst();
 			const historyTolerance = previousPosition.z.abs().mul( this.depthThreshold ).max( 0.001 );
-			// Convert NDC motion to UV, then account for the previous raster grid's jitter.
 			const velocityUV = this.velocityNode.sample( coordinate ).xy.mul( vec2( 0.5, - 0.5 ) );
 			const surfaceUV = coordinate.sub( velocityUV ).add( this._jitterDelta ).toConst();
 
 			const surfaceStretch = reprojectionStretchConfidence( surfaceUV, this._resolution ).toConst();
 			const roughness = roughnessAt( coordinate ).toConst();
-			// History stores roughness from a different sub-texel point when the raster
-			// jitters, so compare against the 3×3 guide range rather than one texel.
+			// compare history roughness against the 3x3 range since the raster jitters
 			const roughnessMin = roughness.toVar();
 			const roughnessMax = roughness.toVar();
 			for ( let y = - 1; y <= 1; y ++ ) {
@@ -358,7 +328,7 @@ class CoverageDenoiseNode extends Node {
 			}
 
 			const surfaceId = this.surfaceIdNode !== null ? float( this.surfaceIdNode ).toConst() : float( 0 );
-			// Metadata is half precision: compare identity after the same rounding.
+			// metadata is half precision
 			const storedId = unpackHalf2x16( packHalf2x16( vec2( surfaceId, 0 ) ) ).x.toConst();
 			const reactive = this.reactiveNode !== null ? float( this.reactiveNode ).toConst() : float( 0 );
 			const curvature = fwidth( worldNormal ).length().mul( this.curvatureScale ).clamp().toConst();
@@ -370,8 +340,7 @@ class CoverageDenoiseNode extends Node {
 			const virtualUV = virtualClip.xy.div( virtualClip.w.max( 1e-6 ) ).mul( vec2( 0.5, - 0.5 ) ).add( 0.5 ).toConst();
 			const virtualStretch = reprojectionStretchConfidence( virtualUV, this._resolution ).toConst();
 
-			// Manual bilinear gather: geometry validation and premultiplication must
-			// happen per tap, before interpolation, to avoid bright invalid neighbors.
+			// manual bilinear gather so invalid taps are rejected before interpolation
 			const gather = Fn( ( [ historyUV ] ) => {
 
 				const pixel = historyUV.mul( this._resolution ).sub( 0.5 );
@@ -388,9 +357,7 @@ class CoverageDenoiseNode extends Node {
 						const tapUV = base.add( vec2( x, y ) ).add( 0.5 ).div( this._resolution ).toConst();
 						const geometry = this._historyGeometry.sample( tapUV ).toConst();
 						const metadata = this._historyAge.sample( tapUV ).toConst();
-						// Compare surfaces in the same view-space plane. At grazing angles,
-						// neighboring pixels on one surface can have very different Z values.
-						// A Z-only test rejects that history every time the raster grid jitters.
+						// plane distance instead of depth, which fails at grazing angles
 						const clipDepth = this._previousProjection.mul( vec4( 0, 0, geometry.w, 1 ) );
 						const tapPosition = getViewPosition( tapUV, clipDepth.z.div( clipDepth.w ), this._previousProjectionInverse );
 						const planeDistance = tapPosition.sub( previousPosition ).dot( previousNormal ).abs();
@@ -425,13 +392,11 @@ class CoverageDenoiseNode extends Node {
 					const edgeConfidence = deviation.div( mean.max( 1e-3 ) ).mul( this.reflectionEdgeScale ).negate().exp();
 					const validVirtual = rayLength.greaterThan( 0 ).and( rayLength.lessThan( ENV_RAY_LENGTH_THRESHOLD ) )
 						.and( current.a.greaterThan( 0 ) ).and( virtualClip.w.greaterThan( 0 ) ).and( inBounds( virtualUV ) );
-					// The virtual hit assumes a static receiver. Where velocity disagrees with
-					// camera-only reprojection the receiver moved, so keep only surface history.
+					// moving receivers only keep surface history
 					const cameraClip = this._previousProjection.mul( vec4( previousPosition, 1 ) );
 					const cameraUV = cameraClip.xy.div( cameraClip.w.max( 1e-6 ) ).mul( vec2( 0.5, - 0.5 ) ).add( 0.5 );
 					const receiverStatic = surfaceUV.sub( cameraUV ).mul( this._resolution ).length().smoothstep( 0.25, 0.75 ).oneMinus();
 					const trust = edgeConfidence.mul( curvature.oneMinus() ).mul( roughness.pow2().oneMinus() ).mul( validVirtual ).mul( receiverStatic ).toConst();
-					// Untrusted virtual history cannot contribute, so skip its gather.
 					const hit = historySample( vec4( 0 ), vec4( 0 ), float( 0 ), float( 0 ) ).toVar();
 					If( trust.greaterThan( 1e-3 ), () => {
 
@@ -458,9 +423,7 @@ class CoverageDenoiseNode extends Node {
 
 				}
 
-				// Bound the long history by the short one's reprojected neighborhood rather than
-				// by the current frame. A sparse frame's range misses its own mean, so clamping to
-				// it pins history near the per-frame median: darker, with frozen noise.
+				// clamp the long history to the fast history's neighborhood, not the sparse current frame
 				const fastUV = virtualField.greaterThan( 0.5 ).select( virtualUV, surfaceUV ).toConst();
 				const fastMin = vec4( 1e9 ).toVar();
 				const fastMax = vec4( - 1e9 ).toVar();
@@ -486,8 +449,6 @@ class CoverageDenoiseNode extends Node {
 				const minimum = fastMin.min( currentWeighted ).toVar();
 				const maximum = fastMax.max( currentWeighted ).toVar();
 
-				// Geometry validity is independent of coverage: a real surface with no
-				// screen-space hits still has a valid age and lighting history.
 				If( history.get( 'weight' ).greaterThan( 0 ), () => {
 
 					const previousAge = history.get( 'age' ).toVar();
@@ -498,14 +459,12 @@ class CoverageDenoiseNode extends Node {
 					} );
 					age.assign( previousAge.add( 1 ).min( this.maxFrames.max( 1 ) ) );
 					const fastAge = age.min( this.fastFrames.max( 1 ) ).toConst();
-					// The short history is clamped loosely: the current range widened by its own size
-					// rejects real changes, while sparse-frame noise rarely biases it.
+					// clamp the fast history loosely to the widened current range
 					const currentRange = currentMax.sub( currentMin );
 					fast.assign( mix( currentWeighted, history.get( 'fast' ).clamp( currentMin.sub( currentRange ), currentMax.add( currentRange ) ), fastAge.sub( 1 ).div( fastAge ) ) );
 					minimum.assign( minimum.min( fast ) );
 					maximum.assign( maximum.max( fast ) );
-					// Anti-lag, as in ReBLUR: long history further from the fast history than either
-					// neighborhood's spread is stale, not noisy, so shorten it to the fast length.
+					// anti-lag (ReBLUR): shorten stale long history to the fast length
 					const spread = fastMax.sub( fastMin ).max( currentRange ).max( fast.mul( 0.05 ) ).add( 1e-3 );
 					const excess = history.get( 'color' ).sub( fast ).abs().div( spread );
 					const lag = excess.x.max( excess.y ).max( excess.z ).max( excess.w ).smoothstep( 1, 2 );

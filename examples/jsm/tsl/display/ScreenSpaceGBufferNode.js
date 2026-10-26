@@ -4,16 +4,9 @@ import { Fn, If, Loop, context, float, ivec2, nodeObject, outputStruct, passText
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
 /**
- * Prepares a shared, nearest-sampled G-buffer for reduced-resolution screen-space
- * effects. Each footprint selects its nearest depth and copies the normal,
- * roughness and material properties from that same source texel. Depth is never
- * averaged across surfaces. Integer loads avoid ambiguous nearest filtering at
- * the boundaries between source texels.
- *
- * The depth attachment stores raw depth in R and the selected source UV in GB.
- * Use that UV when fetching full-resolution radiance so lighting and geometry
- * refer to the same surface. Full-resolution guides should still be retained for
- * temporal validation and edge-aware upsampling.
+ * Downsamples a G-buffer for reduced-resolution screen-space effects. Each texel
+ * copies depth, normal and material from the nearest source texel, so surfaces are
+ * never averaged. The depth attachment stores depth in R and the source UV in GB.
  *
  * @augments Node
  * @three_import import { screenSpaceGBuffer } from 'three/addons/tsl/display/ScreenSpaceGBufferNode.js';
@@ -91,7 +84,6 @@ class ScreenSpaceGBufferNode extends Node {
 	updateBefore( frame ) {
 
 		const { renderer } = frame;
-		// Resolve the producer before inspecting its dimensions or saving state.
 		if ( this.depthNode.isPassTextureNode ) frame.updateBeforeNode( this.depthNode.passNode );
 		const { width, height } = this.depthNode.value.image;
 		this.setSize( width, height );
@@ -118,7 +110,6 @@ class ScreenSpaceGBufferNode extends Node {
 
 			const size = vec2( textureSize( this.depthNode ) ).toConst();
 			const pixel = screenCoordinate.floor().toConst();
-			// Partition all source pixels, including odd trailing rows/columns.
 			const begin = ivec2( pixel.mul( size ).div( this._resolution ).floor() ).toConst();
 			const end = ivec2( pixel.add( 1 ).mul( size ).div( this._resolution ).floor().min( size ) ).toConst();
 			selected.assign( begin );

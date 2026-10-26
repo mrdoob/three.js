@@ -113,8 +113,7 @@ export default QUnit.module( 'Nodes', () => {
 				const guide = new DataTexture( new Uint8Array( [ 128, 0, 0, 255 ] ), 1, 1 );
 				environment.needsUpdate = guide.needsUpdate = true;
 				const material = new NodeMaterial();
-				// The environment supplies a mip context. Sampling its roughness guide
-				// in that same context would recursively ask the guide for its own mip.
+				// the roughness guide must not inherit the environment's mip context
 				const provider = environmentSpecular( pmremTexture( environment ), 1 );
 				material.fragmentNode = provider( { direction: vec3( 0, 0, 1 ), roughness: texture( guide, uv() ).r } );
 

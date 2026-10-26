@@ -188,9 +188,7 @@ const _jitteredPosition = /*@__PURE__*/ new Vector3();
 const _unjitteredPosition = /*@__PURE__*/ new Vector3();
 
 /**
- * Returns the raster displacement in UV space relative to the projection used
- * for motion vectors. Raw lighting/depth histories need previous minus current
- * jitter added to their motion reprojection; resolved AA history does not.
+ * Returns the jitter in UV space relative to the projection used for motion vectors.
  *
  * @private
  * @param {Camera} camera - The jittered camera.
@@ -212,10 +210,8 @@ export function getProjectionJitter( camera, projectionMatrix, target ) {
 }
 
 /**
- * History confidence from the smallest singular value of the screen-space
- * reprojection Jacobian. Rejects magnification along either axis, including
- * anisotropic stretching whose area determinant would otherwise look valid.
- * Evaluate outside per-pixel conditional control flow (uses derivatives).
+ * History confidence from the smallest singular value of the reprojection Jacobian.
+ * Uses derivatives, so evaluate outside conditional control flow.
  *
  * @tsl
  */

@@ -483,9 +483,7 @@ export default QUnit.module( 'Addons', () => {
 
 					}
 
-					// Exact tilted plane: n=(0.8,0,0.6), dot(n,p)=-0.6.
-					// Sampling depth at one texel but reconstructing its position at an
-					// adjacent coordinate falsely breaks this plane at half resolution.
+					// tilted plane n=(0.8,0,0.6), dot(n,p)=-0.6
 					const tanHalfFov = Math.tan( 25 * Math.PI / 180 );
 					for ( let y = 0; y < size; y ++ ) {
 
@@ -524,8 +522,7 @@ export default QUnit.module( 'Addons', () => {
 
 						for ( let x = 0; x < size; x ++ ) {
 
-							// All pixels lie on dot((0.8,0,0.6),p)=-0.6, but adjacent
-							// depths differ by much more than the 1% history threshold.
+							// adjacent depths differ by more than the 1% history threshold
 							const rayX = ( 2 * ( x + 0.5 ) / size - 1 ) * tanHalfFov;
 							const distance = 0.6 / ( 0.6 - 0.8 * rayX );
 							const i = 4 * ( x + size * y );
@@ -696,8 +693,7 @@ export default QUnit.module( 'Addons', () => {
 						await render();
 						if ( axis === 'jitter' ) {
 
-							// A one-pixel raster shift with zero physical motion. Lighting
-							// history moves with jitter even though the AA history does not.
+							// one pixel of jitter, no physical motion
 							node._velocityNode = { projectionMatrix: camera.projectionMatrix.clone() };
 							camera.projectionMatrix.premultiply( new Matrix4().makeTranslation( 2 / size, 0, 0 ) );
 							camera.projectionMatrixInverse.copy( camera.projectionMatrix ).invert();

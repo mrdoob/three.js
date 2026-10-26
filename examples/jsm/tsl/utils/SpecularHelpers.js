@@ -24,10 +24,8 @@ export const ENV_RAY_LENGTH = 1e4;
 export const ENV_RAY_LENGTH_THRESHOLD = 1e3;
 
 /**
- * Returns a screen-space hit distance only when the resolved SSR sample has
- * positive coverage and a valid distance. Fallback-only, cleared and rejected
- * samples use the environment sentinel instead of an unrelated geometry hit.
- * Partial coverage retains its screen-space distance; black hits remain valid.
+ * Returns the SSR hit distance when the sample has coverage, otherwise the
+ * environment sentinel.
  *
  * @tsl
  * @function
@@ -206,7 +204,7 @@ const ggxReflectionSampleWithReflectance = Fn( ( [ N, V, roughness, f0, f90, Xi 
 	// TBN from view-space normal
 	const up = vec3( 0, 0, 1 );
 	const T = cross( up, N ).toVar();
-	// Check the unnormalized cross product: normalize( 0 ) is undefined at either pole.
+	// normalize( 0 ) is undefined at the poles
 	If( T.length().lessThan( 1e-3 ), () => {
 
 		T.assign( cross( vec3( 0, 1, 0 ), N ) );
@@ -269,8 +267,7 @@ const ggxReflectionSampleWithReflectance = Fn( ( [ N, V, roughness, f0, f90, Xi 
 } );
 
 /**
- * Samples with actual material reflectance when supplied. The metalness/base-color
- * fallback preserves the standard-material interface for existing callers.
+ * Samples with the material's F0/F90 when supplied, otherwise derives F0 from metalness.
  *
  * @tsl
  */

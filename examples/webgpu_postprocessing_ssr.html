@@ -208,8 +208,7 @@
 			scene.environmentIntensity = 1.25;
 			pmremGenerator.dispose();
 
-			// Capture the room and display floor from a fixed position, omitting the camera model.
-			// The floor uses the original room lighting, avoiding probe feedback.
+			// fallback environment: room and floor captured from a fixed position
 			const captureFloor = floor.clone();
 			captureFloor.material = floorMaterial.clone();
 			captureFloor.material.envMap = scene.environment;
@@ -234,8 +233,7 @@
 
 			renderPipeline = new THREE.RenderPipeline( renderer );
 
-			// Geometry guides have their own pass so motion and HDR lighting fit
-			// within the standard WebGPU color attachment limit.
+			// separate geometry pass to stay within the color attachment limit
 			geometryPass = pass( scene, camera );
 			geometryPass.contextNode = context( { indirectSpecularNode: indirectSpecular( [] ) } );
 			geometryPass.setMRT( mrt( {
@@ -253,7 +251,6 @@
 			const scenePassDepth = geometryPass.getTextureNode( 'depth' ).toInspector( 'Depth', () => geometryPass.getLinearDepthNode() );
 			const scenePassMetalRough = sample( uv => vec2( albedoMetalness.sample( uv ).a, scenePassNormal.sample( uv ).a ) );
 
-			// SSR reads a fallback-only source; only the final pass consumes SSR.
 			const scenePass = pass( scene, camera );
 			scenePass.contextNode = context( { indirectSpecularNode: indirectSpecular( [ fallback ] ) } );
 			scenePass.setMRT( mrt( { output: vec4( output.rgb, 1 ) } ) );
@@ -288,7 +285,6 @@
 
 				const sourceUV = effectDepth.sample( coordinate ).gb;
 				const value = historySource.sample( sourceUV );
-				// This source validates static geometry; moving objects use fallback.
 				return vec4( value.rgb, value.a.mul( motion.sample( sourceUV ).w.oneMinus() ) );
 
 			} );
@@ -328,29 +324,25 @@
 					specularF90: f.a,
 					roughness: effectNormalRoughness.sample( uv ).a
 				} );
-				// Undo coverage and the receiver BRDF before applying material lighting once.
+				// undo coverage and BRDF weighting
 				return raw.rgb.div( c.max( 1e-4 ) ).div( modulation.max( vec3( 1e-4 ) ) );
 
 			} ).toInspector( 'SSR Incoming Radiance' );
 
-			// Reconstruct conditional radiance and coverage before filling any holes.
 			const sparseSSR = convertToTexture( vec4( incoming.sample( uv() ), coverage.sample( uv() ) ) );
-			// Reconstruct on the SSR grid, guided by the surfaces the rays were traced from.
 			const effectMotion = sample( coordinate => motion.sample( effectDepth.sample( coordinate ).gb ) );
 			ssrDenoise = coverageDenoise( sparseSSR, camera, {
 				depth: effectDepth,
 				normal: effectNormalRoughness,
 				velocity: effectMotion,
 				surfaceId: sample( coordinate => effectMotion.sample( coordinate ).z ),
-				// Moving receivers keep velocity-reprojected history; only moving hits reject it.
 				reactive: sample( coordinate => ssrPass.getCoverageNode().sample( coordinate ).g ),
 				hitDistance: sample( uv => resolveSSRHitDistance( ssrPass.getTextureNode().sample( uv ).a, coverage.sample( uv ) ) )
 			} );
 			const denoised = ssrDenoise.getTextureNode();
 			const projectionInverse = uniform( camera.projectionMatrixInverse );
 
-			// Joint bilateral upsampling: weight the four nearest SSR texels by
-			// depth and normal similarity so reflections do not bleed across edges.
+			// joint bilateral upsampling
 			const filtered = sample( coordinate => Fn( () => {
 
 				const size = vec2( textureSize( effectDepth ) );
@@ -382,7 +374,7 @@
 
 				}
 
-				// No matching texel (thin features): fall back to plain interpolation.
+				// no matching texel, use plain interpolation
 				const result = denoised.sample( coordinate ).toVar();
 				If( total.greaterThan( 1e-4 ), () => {
 
@@ -398,7 +390,6 @@
 				const baseNormal = sceneNormal.sample( screenUV ).transformDirection( cameraWorldMatrix );
 				const baseRoughness = scenePassMetalRough.sample( screenUV ).g;
 				const baseDirection = baseRoughness.pow4().mix( viewDirection.negate().reflect( baseNormal ), baseNormal ).normalize();
-				// Other lobes (clearcoat, anisotropy, broad scattering) retain fallback.
 				const matches = level.sub( baseRoughness ).abs().lessThan( 0.01 )
 					.and( normal.dot( baseNormal ).greaterThan( 0.999 ) )
 					.and( direction.dot( baseDirection ).greaterThan( 0.999 ) );
@@ -452,8 +443,7 @@
 			};
 			const updateOutput = () => {
 
-				// Debug views must still produce the beauty lighting used next frame,
-				// and run TRAA so jitter and histories match the Beauty pipeline.
+				// debug views still render the beauty lighting used by the next frame
 				const selected = views[ params.output ];
 				const traa = params.antialiasing === 'TRAA';
 				renderPipeline.outputNode = ( useHistorySource.value || traa ) && params.output !== 'Beauty' ? Fn( builder => {
@@ -589,7 +579,6 @@
 			ssrPass.useTraceMask.value = params.classify && params.effectScale === 1;
 			effectGuides.resolutionScale = params.effectScale;
 			ssrPass.resolutionScale = params.effectScale;
-			// Preserve the sparse ray grid until edge-aware reconstruction.
 			ssrDenoise.inputNode.setResolutionScale( params.effectScale );
 			ssrPass.mirrorBias.value = params.mirrorBias;
 			ssrPass.stepExponent = params.stepExponent;
@@ -600,7 +589,6 @@
 			ssrDenoise.radius.value = params.radius;
 			resetHistory();
 			ssrPass.maxDistance.value = params.maxDistance;
-			// The tracer keeps physical radiance. Strength scales resolved coverage.
 			ssrStrength.value = params.intensity;
 			ssrPass.thickness.value = params.thickness;
 			// build-time constant: assigning it recompiles the SSR material (setter no-ops if unchanged)
@@ -672,7 +660,6 @@
 
 			renderer.initRenderTarget( lightingHistory );
 			renderPipeline.render();
-			// The source is previous beauty lighting, never a same-frame feedback loop.
 			if ( useHistorySource.value ) {
 
 				renderer.copyTextureToTexture( beautyPass.getTexture( 'output' ), lightingHistory.texture );

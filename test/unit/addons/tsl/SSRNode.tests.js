@@ -49,10 +49,7 @@ export default QUnit.module( 'Addons', () => {
 				const source = makeTexture( x => [ target( x ) ? 1 : 0, 0, 0, 1 ] );
 				// Reflect (0, 0, -1) about this normal to obtain (1, 0, 0).
 				const normal = makeTexture( x => x === originX ? [ Math.SQRT1_2, 0, Math.SQRT1_2, 1 ] : [ - 1, 0, 0, 1 ] );
-				// An unrelated foreground sheet separates the origin from the red stripe.
-				// Its one-unit separation exceeds both the configured and pixel thickness.
-				// The stripe is slightly nearer than the origin to accommodate the
-				// sampler's minimum GGX alpha, which perturbs a roughness-zero ray.
+				// a foreground sheet separates the origin from the red stripe
 				const depth = makeTexture( x => [ projectDepth( x === originX ? - 2 : target( x ) ? - 1.9 : - 1 ), 0, 0, 1 ] );
 				const eligible = uniform( true );
 				const reflectance = uniform( new Vector3( 1, 1, 1 ) );

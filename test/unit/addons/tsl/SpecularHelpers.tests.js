@@ -31,9 +31,7 @@ export default QUnit.module( 'Addons', () => {
 
 					const normal = vec3( offset, 0, sign ).normalize();
 					const label = `normal pole ${ sign }, offset ${ offset }`;
-					// Xi.y = 0 selects the top of the spherical cap. With V = N the
-					// halfway vector and reflected ray must both equal N, independently
-					// of the arbitrary tangent basis orientation.
+					// Xi.y = 0 with V = N must reflect along N
 					const symmetric = ggxReflectionSample( normal, normal, float( 0.5 ), float( 0 ), vec3( 1 ), vec4( 0.37, 0, 0, 0 ) );
 					assert.closeAbs( symmetric.get( 'reflectDir' ), normal, 2e-5, `${ label }: cap-top sample reflects along N` );
 					assert.closeAbs( symmetric.get( 'sampleWeight' ), vec3( 0.04 / ( 1 + 0.25 ** 2 ) ), 2e-5, `${ label }: cap-top weight is finite and normalized` );

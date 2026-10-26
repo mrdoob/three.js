@@ -9,7 +9,6 @@ const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 let _rendererState;
 
-
 /**
  * @typedef {Object} SSRNodeOptions
  * @property {boolean} [stochastic=false] - When `false`, traces a single mirror reflection and softens roughness with a blur pass (first-generation SSR). When `true`, varies the reflection direction per pixel with stochastic GGX rays (second-generation SSR); higher quality on rough/glossy surfaces but noisier, so it expects a temporal/spatial denoiser downstream.
@@ -646,8 +645,7 @@ class SSRNode extends Node {
 	}
 
 	/**
-	 * Changes the radiance source and rebuilds its dependencies. A build-time
-	 * selection avoids rendering unused source passes behind a uniform branch.
+	 * Changes the radiance source and rebuilds the SSR material.
 	 *
 	 * @param {Node<vec4>} colorNode - Linear radiance and source validity.
 	 */
@@ -718,8 +716,7 @@ class SSRNode extends Node {
 	}
 
 	/**
-	 * Returns screen-space coverage independently of radiance and hit distance.
-	 * Requires `outputCoverage: true`. Black hits retain coverage; misses have none.
+	 * Returns the screen-space coverage texture. Requires `outputCoverage: true`.
 	 *
 	 * @return {PassTextureNode} The coverage texture.
 	 */
@@ -978,7 +975,6 @@ class SSRNode extends Node {
 
 			}
 
-			// Targets are cleared each frame, including coverage and hit distance.
 			if ( this.traceMaskNode !== null ) this.useTraceMask.and( this.traceMaskNode.not() ).discard();
 
 			const sampleIndex = this._noiseIndex.mul( this.raysPerPixel.clamp( 1, 16 ) ).add( rayIndex );
@@ -988,15 +984,14 @@ class SSRNode extends Node {
 
 				If( this.useNoiseNode, () => {
 
-					// Rotate each dimension independently; ray zero preserves the FAST
-					// sequence and all rays retain uniform marginal distributions.
+					// rotate each dimension per ray, ray zero keeps the original sequence
 					noise.assign( this.noiseNode.add( float( rayIndex ).mul( vec4( 0.7548776662, 0.5698402910, 0.4384471872, 0.3281730914 ) ) ).fract() );
 
 				} );
 
 			}
 
-			// Reconstruct at the sampled depth texel center.
+			// reconstruct at the depth texel center
 			const depthSize = vec2( textureSize( this.depthNode ) ).toConst();
 			const uvPos = uvNode.mul( depthSize ).floor().add( 0.5 ).div( depthSize ).toVar();
 
@@ -1042,8 +1037,7 @@ class SSRNode extends Node {
 			} else {
 
 				const Xi = noise.toVar();
-				// Mirror-bias: pull `Xi.y` toward the cap top to tighten the GGX lobe and cut mid-roughness
-				// noise. This truncates the lobe while retaining the original VNDF PDF, introducing bias.
+				// mirror bias: pull `Xi.y` toward the cap top to tighten the GGX lobe (biased)
 				Xi.y.assign( mix( Xi.y, 0.0, this.mirrorBias.mul( Xi.w.sqrt() ) ) );
 
 				albedo.assign( ( this.diffuseNode !== null ? this.diffuseNode.sample( uvPos ).rgb : vec3( 1 ) ) );
@@ -1161,7 +1155,7 @@ class SSRNode extends Node {
 			const d0 = uvPos.mul( this._resolution ).xy.toVar();
 			const d1 = getScreenPosition( d1viewPosition, this._cameraProjectionMatrix ).mul( this._resolution ).toVar();
 
-			// Clip the ray to the screen so the whole step budget lands on visible texels.
+			// clip the ray to the screen so all steps land on visible texels
 			const extent = d1.sub( d0 ).toVar();
 			const exitT = vec2(
 				extent.x.greaterThanEqual( 0 ).select( this._resolution.x.sub( d0.x ), d0.x ),
@@ -1172,7 +1166,6 @@ class SSRNode extends Node {
 			If( clipT.lessThan( 1 ), () => {
 
 				d1.assign( d0.add( extent.mul( clipT ) ) );
-				// Screen-space interpolation is linear in 1/z for perspective projection.
 				d1viewPosition.assign( this.camera.isPerspectiveCamera
 					? mix( viewPosition.div( viewPosition.z ), d1viewPosition.div( d1viewPosition.z ), clipT ).div( mix( viewPosition.z.reciprocal(), d1viewPosition.z.reciprocal(), clipT ) )
 					: mix( viewPosition, d1viewPosition, clipT ) );
@@ -1212,7 +1205,7 @@ class SSRNode extends Node {
 				? ( sVal ) => float( 1 ).div( recipVPZ.add( sVal.mul( recipD1VPZ.sub( recipVPZ ) ) ) )
 				: ( sVal ) => viewPosition.z.add( sVal.mul( d1viewPosition.z.sub( viewPosition.z ) ) );
 
-			// View-space point on the reflected ray at s, perspective-correct like reflectRayZAt.
+			// view-space point on the reflected ray at s
 			const rayPointAt = this.camera.isPerspectiveCamera
 				? ( sVal ) => mix( viewPosition.div( viewPosition.z ), d1viewPosition.div( d1viewPosition.z ), sVal ).mul( reflectRayZAt( sVal ) )
 				: ( sVal ) => mix( viewPosition, d1viewPosition, sVal );
@@ -1248,7 +1241,6 @@ class SSRNode extends Node {
 				// Exponentially-distributed ray parameter, shared by the sample position and ray depth.
 				const s = sampleFraction( float( i ) ).toVar();
 
-				// The stride floor must not extend short rays past their clipped endpoint.
 				If( s.greaterThan( 1 ), () => {
 
 					Break();
@@ -1279,8 +1271,7 @@ class SSRNode extends Node {
 					const uvNeighbor = uvS.add( uvPixelStepX ).toVar();
 					const vPNeighbor = getViewPosition( uvNeighbor, d, this._cameraProjectionMatrixInverse ).toVar();
 					const minThickness = vPNeighbor.x.sub( vP.x ).mul( 3 ).toVar();
-					// The ray crossed the surface somewhere within this step, so it can overshoot by up
-					// to the step's world-space length; thickness alone rejects coarse steps' real hits.
+					// the ray can overshoot by up to the step length
 					const stepLength = distance( rayPointAt( previousS ), rayPointAt( s ) );
 					const tk = max( max( minThickness, this.thickness ), stepLength ).toVar();
 
@@ -1317,7 +1308,7 @@ class SSRNode extends Node {
 
 						if ( this.binaryRefine ) {
 
-							// Refine only a genuine front-to-back bracket.
+							// refine only front-to-back crossings
 							canRefine.assign( previousInFront );
 							hitSLo.assign( previousS );
 							hitSHi.assign( s );
@@ -1361,7 +1352,7 @@ class SSRNode extends Node {
 
 						} );
 
-						// Refinement moved the crossing, so re-fetch UV/depth at the refined `s`.
+						// re-fetch UV/depth at the refined `s`
 						hitUvS.assign( screenPosAt( hitSHi ).mul( invResolution ) );
 						hitD.assign( sampleDepth( hitUvS ) );
 
@@ -1380,8 +1371,7 @@ class SSRNode extends Node {
 
 				if ( this.binaryRefine ) {
 
-					// Bisection can land on a depth discontinuity rather than geometry.
-					// Validate the final sample, not just the coarse crossing.
+					// bisection can land on a depth discontinuity, so validate the refined hit
 					const neighbor = getViewPosition( uvS.add( uvPixelStepX ), hitD, this._cameraProjectionMatrixInverse );
 					const tk = max( neighbor.x.sub( vP.x ).mul( 3 ), this.thickness );
 					withinRange.assign( withinRange.and( isBackgroundDepth( hitD ).not() )
