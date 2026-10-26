@@ -364,6 +364,23 @@ class CoverageDenoiseNode extends Node {
 
 			const surfaceStretch = reprojectionStretchConfidence( surfaceUV, this._resolution ).toConst();
 			const roughness = roughnessAt( coordinate ).toConst();
+			// History stores roughness from a different sub-texel point when the raster
+			// jitters, so compare against the 3×3 guide range rather than one texel.
+			const roughnessMin = roughness.toVar();
+			const roughnessMax = roughness.toVar();
+			for ( let y = - 1; y <= 1; y ++ ) {
+
+				for ( let x = - 1; x <= 1; x ++ ) {
+
+					if ( x === 0 && y === 0 ) continue;
+					const neighbor = roughnessAt( coordinate.add( vec2( x, y ).div( guideResolution ) ) );
+					roughnessMin.assign( roughnessMin.min( neighbor ) );
+					roughnessMax.assign( roughnessMax.max( neighbor ) );
+
+				}
+
+			}
+
 			const surfaceId = this.surfaceIdNode !== null ? float( this.surfaceIdNode ).toConst() : float( 0 );
 			const reactive = this.reactiveNode !== null ? float( this.reactiveNode ).toConst() : float( 0 );
 			const curvature = fwidth( worldNormal ).length().mul( this.curvatureScale ).clamp().toConst();
@@ -400,7 +417,8 @@ class CoverageDenoiseNode extends Node {
 						const planeDistance = tapPosition.sub( previousPosition ).dot( previousNormal ).abs();
 						const valid = inBounds( tapUV ).and( worldNormal.dot( geometry.xyz ).greaterThan( 0.9 ) )
 							.and( planeDistance.lessThanEqual( historyTolerance ) )
-							.and( roughness.sub( metadata.g ).abs().lessThanEqual( this.roughnessThreshold ) );
+							.and( metadata.g.greaterThanEqual( roughnessMin.sub( this.roughnessThreshold ) ) )
+							.and( metadata.g.lessThanEqual( roughnessMax.add( this.roughnessThreshold ) ) );
 						const identityValid = this.surfaceIdNode !== null ? metadata.a.equal( surfaceId ) : float( 1 );
 						const wx = x === 0 ? fraction.x.oneMinus() : fraction.x;
 						const wy = y === 0 ? fraction.y.oneMinus() : fraction.y;
