@@ -509,7 +509,7 @@
 				resetHistory();
 
 			} );
-			ssrFolder.add( params, 'maxFrames', 1, 32, 1 ).onChange( updateParameters );
+			ssrFolder.add( params, 'maxFrames', 1, 128, 1 ).onChange( updateParameters );
 			ssrFolder.add( params, 'radius', 0, 3 ).onChange( updateParameters );
 			ssrFolder.add( params, 'historyRadius', 0, 16 ).name( 'History blur' ).onChange( updateParameters );
 			ssrFolder.add( params, 'maxRoughness', 0.1, 1 ).onChange( updateParameters );
