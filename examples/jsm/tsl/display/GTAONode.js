@@ -1,8 +1,9 @@
-import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, Node, QuadMesh, NodeMaterial, RendererUtils, RGBAFormat } from 'three/webgpu';
+import { Color, DataTexture, HalfFloatType, RenderTarget, RepeatWrapping, Vector2, Vector3, Node, QuadMesh, NodeMaterial, RendererUtils, RGBAFormat } from 'three/webgpu';
 import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand, context, isBackgroundDepth, screenUV, reflect, sqrt, exp2, positionViewDirection } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
+const _clearColor = /*@__PURE__*/ new Color( 1, 0.5, 0.5 );
 
 // From Activision GTAO paper: https://www.activision.com/cdn/research/s2016_pbs_activision_occlusion.pptx
 const _temporalRotations = [ 60, 300, 180, 240, 120, 0 ];
@@ -41,7 +42,7 @@ let _rendererState;
  * renderPipeline.outputNode = scenePass;
  * ```
  *
- * The output texture stores visibility in R and the encoded view-space bent normal in GBA.
+ * The output texture stores visibility in R and the encoded view-space bent-normal offset in GBA.
  * getLightingContext() also uses the bent normal for indirect specular occlusion.
  *
  * Reference: [Practical Real-Time Strategies for Accurate Indirect Occlusion](https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%20VERSION_COLOR.pdf).
@@ -108,7 +109,7 @@ class GTAONode extends Node {
 		 * @private
 		 * @type {RenderTarget}
 		 */
-		this._aoRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, format: RGBAFormat } );
+		this._aoRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, format: RGBAFormat, type: HalfFloatType } );
 		this._aoRenderTarget.texture.name = 'GTAONode.AO';
 
 		// uniforms
@@ -309,7 +310,8 @@ class GTAONode extends Node {
 	}
 
 	/**
-	 * Returns the packed result: ambient visibility in R and encoded bent normal in GBA.
+	 * Returns the packed result: ambient visibility in R and bent-normal offset in GBA.
+	 * Decode with `normalize( normal + gba * 4 - 2 )` using the receiving surface normal.
 	 *
 	 * @return {PassTextureNode} A texture node that represents the result of the effect.
 	 */
@@ -321,14 +323,16 @@ class GTAONode extends Node {
 
 	/**
 	 * Returns the view-space bent normal, pointing toward the unoccluded hemisphere.
-	 * The output texture stores AO in R and the encoded bent normal in GBA.
+	 * The output texture stores AO in R and the encoded bent-normal offset in GBA.
 	 *
 	 * @param {Node<vec2>} [uvNode=screenUV] - Sampling coordinates.
+	 * @param {?Node<vec3>} [normalNode=null] - Receiving surface normal in view space. Defaults to the normal guide.
 	 * @return {Node<vec3>} The normalized bent normal.
 	 */
-	getBentNormalNode( uvNode = screenUV ) {
+	getBentNormalNode( uvNode = screenUV, normalNode = null ) {
 
-		return this._textureNode.sample( uvNode ).gba.mul( 2 ).sub( 1 ).normalize();
+		const normal = normalNode ?? ( this.normalNode !== null ? this.normalNode.sample( uvNode ).rgb.normalize() : getNormalFromDepth( uvNode, this.depthNode.value, this._cameraProjectionMatrixInverse ) );
+		return this._textureNode.sample( uvNode ).gba.sub( 0.5 ).mul( 4 ).add( normal ).normalize();
 
 	}
 
@@ -343,7 +347,6 @@ class GTAONode extends Node {
 	getLightingContext( uvNode = screenUV ) {
 
 		const visibility = this._textureNode.sample( uvNode ).r;
-		const bentNormal = this.getBentNormalNode( uvNode );
 
 		return context( {
 			getAO: ( inputNode, { material } ) => {
@@ -355,6 +358,7 @@ class GTAONode extends Node {
 			getSO: ( { node, normal, roughness }, { material, context } ) => {
 
 				if ( material.transparent === true ) return node;
+				const bentNormal = this.getBentNormalNode( uvNode, normal );
 				return specularOcclusion( context.ambientOcclusion, bentNormal, normal, reflect( positionViewDirection.negate(), normal ), roughness );
 
 			}
@@ -426,9 +430,9 @@ class GTAONode extends Node {
 		_quadMesh.material = this._material;
 		_quadMesh.name = 'AO';
 
-		// clear
+		// Clear to full visibility with a neutral bent-normal offset.
 
-		renderer.setClearColor( 0xffffff, 1 );
+		renderer.setClearColor( _clearColor, 0.5 );
 
 		// ao
 
@@ -661,7 +665,9 @@ class GTAONode extends Node {
 
 			// Keep the moment in the surface hemisphere, including fully occluded pixels.
 			bentNormal.addAssign( viewNormal.mul( dot( bentNormal, viewNormal ).negate().max( 0 ).add( 0.0001 ) ) );
-			return vec4( ao, normalize( bentNormal ).mul( 0.5 ).add( 0.5 ) );
+			// Preserve receiving surface detail when interpolating the coarse bent normal.
+			// Half float represents the neutral offset exactly.
+			return vec4( ao, normalize( bentNormal ).sub( viewNormal ).mul( 0.25 ).add( 0.5 ) );
 
 		} );
 
