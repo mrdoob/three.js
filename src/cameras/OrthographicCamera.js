@@ -8,7 +8,7 @@ import { Camera } from './Camera.js';
  * for rendering 2D scenes and UI elements, amongst other things.
  *
  * ```js
- * const camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
+ * const camera = new THREE.OrthographicCamera( width / -2, width / 2, height / 2, height / -2, 1, 1000 );
  * scene.add( camera );
  * ```
  *
