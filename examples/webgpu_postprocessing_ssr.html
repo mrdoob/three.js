@@ -44,7 +44,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec3, vec4, Fn, If, uniform, context, cameraWorldMatrix, getViewPosition, diffuseColor, specularColor, specularF90, EnvironmentBRDF, indirectSpecular, environmentSpecular, pmremTexture, colorSpaceToWorking } from 'three/tsl';
+		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec3, vec4, Fn, If, uniform, context, cameraWorldMatrix, getViewPosition, diffuseColor, specularColorBlended, specularF90, EnvironmentBRDF, indirectSpecular, environmentSpecular, pmremTexture, colorSpaceToWorking } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { fastNoise } from 'three/addons/tsl/utils/FASTNoise.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
@@ -191,7 +191,7 @@
 				output: vec4( output.rgb, 1 ),
 				normal: vec4( packNormalToRGB( normalView ), roughness ),
 				albedo: vec4( diffuseColor.rgb, metalness ),
-				reflectance: vec4( specularColor, specularF90 )
+				reflectance: vec4( specularColorBlended, specularF90 )
 			} ) );
 
 			const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
@@ -232,7 +232,7 @@
 				roughnessNode: scenePassMetalRough.g
 			} ).toInspector( 'SSR (BRDF weighted)' );
 
-			const coverage = ssrPass.getCoverageNode().r.toInspector( 'SSR Coverage' );
+			const coverage = sample( uv => ssrPass.getCoverageNode().sample( uv ).r ).toInspector( 'SSR Coverage' );
 			const incoming = sample( uv => {
 
 				const raw = ssrPass.getTextureNode().sample( uv );
@@ -260,7 +260,7 @@
 				const matches = level.sub( baseRoughness ).abs().lessThan( 0.01 )
 					.and( normal.dot( baseNormal ).greaterThan( 0.999 ) )
 					.and( direction.dot( baseDirection ).greaterThan( 0.999 ) );
-				return vec4( incoming.sample( screenUV ), coverage.mul( matches ).mul( ssrEnabled ) );
+				return vec4( incoming.sample( screenUV ), coverage.sample( screenUV ).mul( matches ).mul( ssrEnabled ) );
 
 			} )();
 
