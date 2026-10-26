@@ -201,27 +201,14 @@
 
 			} )();
 
-			const environment = new RoomEnvironment();
 			const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
-			scene.environment = pmremGenerator.fromScene( environment, 0.04 ).texture;
+			scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
 			scene.environmentIntensity = 1.25;
 			pmremGenerator.dispose();
 
-			// fallback environment: room and floor captured from a fixed position
-			const captureFloor = floor.clone();
-			captureFloor.material = floorMaterial.clone();
-			captureFloor.material.envMap = scene.environment;
-			captureFloor.material.envMapIntensity = scene.environmentIntensity;
-			captureFloor.position.sub( environment.position );
-			environment.add( captureFloor );
-
-			const cubeTarget = new THREE.CubeRenderTarget( 256, { type: THREE.HalfFloatType } );
-			const cubeCamera = new THREE.CubeCamera( 0.1, 100, cubeTarget );
-			cubeCamera.position.copy( camera.position );
-			cubeCamera.update( renderer, environment );
-			scene.environment = cubeTarget.texture;
-			const capture = environmentSpecular( pmremTexture( cubeTarget.texture ), 1.25 );
+			// the environment fills whatever SSR does not cover
+			const capture = environmentSpecular( pmremTexture( scene.environment ), 1.25 );
 			const fallback = query => {
 
 				const value = capture( query );
@@ -543,8 +530,6 @@
 			gui.add( params, 'floorRoughness', 0, 1 ).name( 'Floor roughness' ).onChange( value => {
 
 				floorMaterial.roughness = value;
-				captureFloor.material.roughness = value;
-				cubeCamera.update( renderer, environment );
 				resetHistory();
 
 			} );
