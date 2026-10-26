@@ -66,10 +66,10 @@
 			traceSteps: 128,
 			classify: true,
 			output: 'Beauty',
-			reflectionSource: 'Current frame',
+			reflectionSource: 'Previous frame',
 			antialiasing: 'TRAA',
 			renderScale: 1,
-			effectScale: 1,
+			effectScale: 0.5,
 			denoise: true,
 			maxFrames: 16,
 			radius: 1.5,
@@ -92,7 +92,7 @@
 		let camera, scene, model, renderer, renderPipeline, ssrPass, ssrDenoise;
 		let controls, geometryPass, beautyPass, lightingHistory, traaPass, effectGuides;
 		const historyValid = uniform( false );
-		const useHistorySource = uniform( false );
+		const useHistorySource = uniform( params.reflectionSource === 'Previous frame' );
 		const previousView = uniform( new THREE.Matrix4() );
 		const previousProjection = uniform( new THREE.Matrix4() );
 		const previousProjectionInverse = uniform( new THREE.Matrix4() );
@@ -292,7 +292,7 @@
 
 			} );
 
-			ssrPass = ssr( currentTraceSource, effectDepth, effectNormal, {
+			ssrPass = ssr( useHistorySource.value ? previousTraceSource : currentTraceSource, effectDepth, effectNormal, {
 				camera,
 				stochastic: true,
 				outputCoverage: true,
@@ -339,7 +339,8 @@
 				normal: scenePassNormal,
 				velocity: motion,
 				surfaceId: sample( coordinate => motion.sample( coordinate ).z ),
-				reactive: sample( coordinate => motion.sample( coordinate ).w.max( ssrPass.getCoverageNode().sample( coordinate ).g ) ),
+				// Moving receivers keep velocity-reprojected history; only moving hits reject it.
+				reactive: sample( coordinate => ssrPass.getCoverageNode().sample( coordinate ).g ),
 				hitDistance: sample( uv => resolveSSRHitDistance( ssrPass.getTextureNode().sample( uv ).a, coverage.sample( uv ) ) )
 			} );
 			const filtered = ssrDenoise.getTextureNode();

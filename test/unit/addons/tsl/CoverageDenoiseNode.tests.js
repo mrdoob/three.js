@@ -155,6 +155,29 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
+			QUnit.test( 'a moving receiver keeps surface history instead of virtual-hit history', async assert => {
+
+				await fixture( assert, async ( { node, normal, velocity, update, render } ) => {
+
+					node.radius.value = 0;
+					// Mirror receiver: virtual-hit history would otherwise dominate.
+					for ( let i = 3; i < normal.image.data.length; i += 4 ) normal.image.data[ i ] = 0;
+					normal.needsUpdate = true;
+					const center = size / 2;
+					update( x => x === center - 1 ? [ 4, 2, 1, 1 ] : [ 1, 1, 1, 1 ] );
+					await render();
+					// One pixel of receiver motion with a static camera.
+					for ( let i = 0; i < velocity.image.data.length; i += 4 ) velocity.image.data[ i ] = 2 / size;
+					velocity.needsUpdate = true;
+					update( x => x === center + 1 ? [ 4, 2, 1, 1 ] : [ 1, 1, 1, 1 ] );
+					const data = await render();
+					const i = 4 * ( center + size * center );
+					assert.ok( Math.abs( data[ i ] - 2.5 ) < 0.01, `History follows the receiver's velocity, not the camera-only virtual hit; actual=${ data[ i ] }` );
+
+				} );
+
+			} );
+
 			QUnit.test( 'hit-distance edges preserve valid black reflections on a flat receiver', async assert => {
 
 				await fixture( assert, async ( { node, hitDistance, update, render } ) => {

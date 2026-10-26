@@ -40,7 +40,7 @@ class CoverageDenoiseNode extends Node {
 	 * @param {TextureNode} options.normal - Packed view normal in RGB, roughness in A.
 	 * @param {TextureNode} options.velocity - Current-minus-previous NDC motion vectors, as produced by `velocity`.
 	 * @param {?Node<float>} [options.surfaceId=null] - Stable per-surface integer identity.
-	 * @param {?Node<float>} [options.reactive=null] - Positive values reject history for moving receivers or reflected objects.
+	 * @param {?Node<float>} [options.reactive=null] - Positive values reject history for moving reflected objects. Moving receivers are detected from velocity and keep surface history.
 	 * @param {?Node<float>} [options.hitDistance=null] - World-space SSR hit distance. Omit for diffuse surface reprojection.
 	 */
 	constructor( inputNode, camera, { depth, normal, velocity, hitDistance = null, surfaceId = null, reactive = null } ) {
@@ -367,7 +367,12 @@ class CoverageDenoiseNode extends Node {
 					const validVirtual = rayLength.greaterThan( 0 ).and( rayLength.lessThan( ENV_RAY_LENGTH_THRESHOLD ) )
 						.and( current.a.greaterThan( 0 ) ).and( virtualClip.w.greaterThan( 0 ) ).and( inBounds( virtualUV ) );
 					const hit = gather( virtualUV ).toConst();
-					const trust = edgeConfidence.mul( curvature.oneMinus() ).mul( roughness.pow2().oneMinus() ).mul( validVirtual );
+					// The virtual hit assumes a static receiver. Where velocity disagrees with
+					// camera-only reprojection the receiver moved, so keep only surface history.
+					const cameraClip = this._previousProjection.mul( vec4( previousPosition, 1 ) );
+					const cameraUV = cameraClip.xy.div( cameraClip.w.max( 1e-6 ) ).mul( vec2( 0.5, - 0.5 ) ).add( 0.5 );
+					const receiverStatic = surfaceUV.sub( cameraUV ).mul( this._resolution ).length().smoothstep( 0.25, 0.75 ).oneMinus();
+					const trust = edgeConfidence.mul( curvature.oneMinus() ).mul( roughness.pow2().oneMinus() ).mul( validVirtual ).mul( receiverStatic );
 					const hitStretch = this.useStretchRejection.select( virtualStretch.pow2(), 1 );
 					const surfStretch = this.useStretchRejection.select( surfaceStretch.pow2(), 1 );
 					const hitWeight = hit.get( 'weight' ).mul( trust ).mul( hitStretch ).toConst();
