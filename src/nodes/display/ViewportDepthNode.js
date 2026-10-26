@@ -319,7 +319,7 @@ export const logarithmicDepthToViewZ = ( depth, near, far ) => {
  * @param {Node<float>} far - The camera's far value.
  * @returns {Node<float>}
  */
-export const getProjectionDepth = /*@__PURE__*/ Fn( ( [ depth, near, far ], builder ) => {
+export const projectionDepth = /*@__PURE__*/ Fn( ( [ depth, near, far ], builder ) => {
 
 	if ( builder.renderer.logarithmicDepthBuffer === true ) {
 

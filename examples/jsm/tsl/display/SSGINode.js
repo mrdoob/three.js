@@ -1,5 +1,5 @@
 import { RenderTarget, Vector2, Node, QuadMesh, NodeMaterial, RendererUtils, MathUtils, RGBFormat, RedFormat, UnsignedInt101111Type, UnsignedByteType } from 'three/webgpu';
-import { clamp, normalize, reference, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, bool, getNormalFromDepth, countOneBits, interleavedGradientNoise, property, outputStruct, context, isBackgroundDepth, min, getProjectionDepth } from 'three/tsl';
+import { clamp, normalize, reference, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, bool, getNormalFromDepth, countOneBits, interleavedGradientNoise, property, outputStruct, context, isBackgroundDepth, min, projectionDepth } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -443,7 +443,7 @@ class SSGINode extends Node {
 		const MAX_RAY = uint( 32 );
 		const globalOccludedBitfield = uint( 0 );
 
-		const sampleDepth = ( uv ) => getProjectionDepth( this.depthNode.sample( uv ).r, this._cameraNear, this._cameraFar );
+		const sampleDepth = ( uv ) => projectionDepth( this.depthNode.sample( uv ).r, this._cameraNear, this._cameraFar );
 
 		const sampleCenterDepth = ( uv ) => {
 
@@ -452,7 +452,7 @@ class SSGINode extends Node {
 			const g = this.depthNode.gather().sample( uv );
 			const depth = builder.renderer.reversedDepthBuffer === true ? max( max( g.x, g.y ), max( g.z, g.w ) ) : min( min( g.x, g.y ), min( g.z, g.w ) );
 
-			return getProjectionDepth( depth, this._cameraNear, this._cameraFar );
+			return projectionDepth( depth, this._cameraNear, this._cameraFar );
 
 		};
 
