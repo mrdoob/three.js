@@ -47,27 +47,27 @@ function lineToLineClosestPoints( line1, line2, target1 = null, target2 = null )
 		const d1 = - d / c;
 		const d2 = ( a - d ) / c;
 
-		if ( Math.abs( d1 - 0.5 ) < Math.abs( d2 - 0.5 ) ) {
-
-			t1 = 0;
-			t2 = d1;
-
-		} else {
-
-			t1 = 1;
-			t2 = d2;
-
-		}
+		t1 = ( Math.abs( d1 - 0.5 ) < Math.abs( d2 - 0.5 ) ) ? 0 : 1;
 
 	} else {
 
-		t1 = ( d * a + e * c ) / divisor;
-		t2 = ( t1 * a - d ) / c;
+		t1 = ( e * c - d * a ) / divisor;
 
 	}
 
-	t2 = Math.max( 0, Math.min( 1, t2 ) );
+	// clamp to the segments. if the closest point on the second segment has
+	// to be clamped, the one on the first segment must be recomputed
+
 	t1 = Math.max( 0, Math.min( 1, t1 ) );
+	t2 = ( t1 * a - d ) / c;
+
+	if ( t2 < 0 || t2 > 1 ) {
+
+		t2 = Math.max( 0, Math.min( 1, t2 ) );
+
+		if ( b > EPS ) t1 = Math.max( 0, Math.min( 1, ( t2 * a + e ) / b ) );
+
+	}
 
 	if ( target1 ) {
 
