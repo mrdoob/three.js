@@ -1,9 +1,9 @@
-import { FloatType, HalfFloatType, NearestFilter, Matrix4, Node, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Vector2 } from 'three/webgpu';
-import { textureSize, fwidth, Fn, If, context, convertToTexture, float, getViewPosition, isBackgroundDepth, mix, outputStruct, passTexture, property, struct, texture, uniform, velocity as cameraVelocity, unpackRGBToNormal, uv, vec2, vec3, vec4 } from 'three/tsl';
+import { HalfFloatType, NearestFilter, Matrix4, Node, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Vector2 } from 'three/webgpu';
+import { textureSize, fwidth, Fn, If, context, convertToTexture, float, getViewPosition, isBackgroundDepth, mix, outputStruct, packHalf2x16, passTexture, property, struct, texture, uniform, unpackHalf2x16, velocity as cameraVelocity, unpackRGBToNormal, uv, vec2, vec3, vec4 } from 'three/tsl';
 import { getProjectionJitter, reprojectionStretchConfidence } from '../utils/TAAUtils.js';
 import { ENV_RAY_LENGTH, ENV_RAY_LENGTH_THRESHOLD } from '../utils/SpecularHelpers.js';
 
-const historySample = struct( { color: 'vec4', weight: 'float', age: 'float' } );
+const historySample = struct( { color: 'vec4', fast: 'vec4', weight: 'float', age: 'float' } );
 
 /**
  * Reconstructs sparse lighting and its coverage together. The input and output
@@ -65,6 +65,11 @@ class CoverageDenoiseNode extends Node {
 		 */
 		this.historyRadius = uniform( 0 );
 		this.maxFrames = uniform( 16 );
+		/**
+		 * Length of the short history that bounds the long one. Clamping to a single sparse
+		 * frame pins history near that frame's median, darkening it and freezing its noise.
+		 */
+		this.fastFrames = uniform( 6 );
 		this.depthThreshold = uniform( 0.01 );
 		/** Relative difference from the neighborhood's mean hit distance accepted by the spatial filter. */
 		this.hitDistancePhi = uniform( 1 );
@@ -78,10 +83,9 @@ class CoverageDenoiseNode extends Node {
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
 		this._spatialTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
-		this._target = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, count: 3 } );
+		this._target = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, count: 4 } );
 		// Age, roughness, virtual-history share and surface identity have independent channels.
-		// Full precision keeps identity comparisons exact; point gathers need no filtering.
-		this._target.textures[ 2 ].type = FloatType;
+		// Identity is compared after the same half-float rounding; point gathers need no filtering.
 		this._target.textures[ 2 ].minFilter = this._target.textures[ 2 ].magFilter = NearestFilter;
 		this._historyTarget = this._target.clone();
 		this._spatialTarget.texture.name = 'CoverageDenoise.spatial';
@@ -92,6 +96,7 @@ class CoverageDenoiseNode extends Node {
 			target.textures[ 0 ].name = 'CoverageDenoise.radianceCoverage';
 			target.textures[ 1 ].name = 'CoverageDenoise.geometry';
 			target.textures[ 2 ].name = 'CoverageDenoise.metadata';
+			target.textures[ 3 ].name = 'CoverageDenoise.fastHistory';
 
 		}
 
@@ -102,6 +107,7 @@ class CoverageDenoiseNode extends Node {
 		this._historyColor = texture( this._historyTarget.texture );
 		this._historyGeometry = texture( this._historyTarget.textures[ 1 ] );
 		this._historyAge = texture( this._historyTarget.textures[ 2 ] );
+		this._historyFast = texture( this._historyTarget.textures[ 3 ] );
 		this._spatialMaterial = new NodeMaterial();
 		this._blurMaterial = new NodeMaterial();
 		this._temporalMaterial = new NodeMaterial();
@@ -173,6 +179,7 @@ class CoverageDenoiseNode extends Node {
 		this._historyColor.value = this._historyTarget.texture;
 		this._historyGeometry.value = this._historyTarget.textures[ 1 ];
 		this._historyAge.value = this._historyTarget.textures[ 2 ];
+		this._historyFast.value = this._historyTarget.textures[ 3 ];
 
 		this._jitterDelta.value.copy( this._jitter );
 		getProjectionJitter( this.camera, this._velocityNode.projectionMatrix, this._jitter );
@@ -343,6 +350,7 @@ class CoverageDenoiseNode extends Node {
 		const spatialTexture = texture( this._spatialTarget.texture );
 		const colorField = property( 'vec4' );
 		const ageField = property( 'float' );
+		const fastField = property( 'vec4' );
 		const virtualField = property( 'float' );
 		const temporal = Fn( () => {
 
@@ -350,6 +358,7 @@ class CoverageDenoiseNode extends Node {
 			const current = spatialTexture.sample( coordinate ).toConst();
 			const currentWeighted = toWeighted( current ).toConst();
 			const result = currentWeighted.toVar();
+			const fast = currentWeighted.toVar();
 			const age = float( 1 ).toVar();
 			virtualField.assign( 0 );
 			const position = viewPosition( coordinate ).toConst();
@@ -382,6 +391,8 @@ class CoverageDenoiseNode extends Node {
 			}
 
 			const surfaceId = this.surfaceIdNode !== null ? float( this.surfaceIdNode ).toConst() : float( 0 );
+			// Metadata is half precision: compare identity after the same rounding.
+			const storedId = unpackHalf2x16( packHalf2x16( vec2( surfaceId, 0 ) ) ).x.toConst();
 			const reactive = this.reactiveNode !== null ? float( this.reactiveNode ).toConst() : float( 0 );
 			const curvature = fwidth( worldNormal ).length().mul( this.curvatureScale ).clamp().toConst();
 			const moments = this.hitDistanceNode !== null ? hitMoments( coordinate ).toConst() : vec3( 0 );
@@ -400,6 +411,7 @@ class CoverageDenoiseNode extends Node {
 				const base = pixel.floor();
 				const fraction = pixel.fract();
 				const sum = vec4( 0 ).toVar();
+				const fastSum = vec4( 0 ).toVar();
 				const total = float( 0 ).toVar();
 				const ageSum = float( 0 ).toVar();
 				for ( let y = 0; y <= 1; y ++ ) {
@@ -419,11 +431,12 @@ class CoverageDenoiseNode extends Node {
 							.and( planeDistance.lessThanEqual( historyTolerance ) )
 							.and( metadata.g.greaterThanEqual( roughnessMin.sub( this.roughnessThreshold ) ) )
 							.and( metadata.g.lessThanEqual( roughnessMax.add( this.roughnessThreshold ) ) );
-						const identityValid = this.surfaceIdNode !== null ? metadata.a.equal( surfaceId ) : float( 1 );
+						const identityValid = this.surfaceIdNode !== null ? metadata.a.equal( storedId ) : float( 1 );
 						const wx = x === 0 ? fraction.x.oneMinus() : fraction.x;
 						const wy = y === 0 ? fraction.y.oneMinus() : fraction.y;
 						const weight = wx.mul( wy ).mul( valid ).mul( identityValid ).toConst();
 						sum.addAssign( toWeighted( this._historyColor.sample( tapUV ) ).mul( weight ) );
+						fastSum.addAssign( toWeighted( this._historyFast.sample( tapUV ) ).mul( weight ) );
 						total.addAssign( weight );
 						ageSum.addAssign( metadata.r.mul( weight ) );
 
@@ -431,7 +444,7 @@ class CoverageDenoiseNode extends Node {
 
 				}
 
-				return historySample( sum.div( total.max( 1e-6 ) ), total, ageSum.div( total.max( 1e-6 ) ) );
+				return historySample( sum.div( total.max( 1e-6 ) ), fastSum.div( total.max( 1e-6 ) ), total, ageSum.div( total.max( 1e-6 ) ) );
 
 			} );
 
@@ -452,7 +465,7 @@ class CoverageDenoiseNode extends Node {
 					const receiverStatic = surfaceUV.sub( cameraUV ).mul( this._resolution ).length().smoothstep( 0.25, 0.75 ).oneMinus();
 					const trust = edgeConfidence.mul( curvature.oneMinus() ).mul( roughness.pow2().oneMinus() ).mul( validVirtual ).mul( receiverStatic ).toConst();
 					// Untrusted virtual history cannot contribute, so skip its gather.
-					const hit = historySample( vec4( 0 ), float( 0 ), float( 0 ) ).toVar();
+					const hit = historySample( vec4( 0 ), vec4( 0 ), float( 0 ), float( 0 ) ).toVar();
 					If( trust.greaterThan( 1e-3 ), () => {
 
 						hit.assign( gather( virtualUV ) );
@@ -465,33 +478,46 @@ class CoverageDenoiseNode extends Node {
 					const total = hitWeight.add( surfaceWeight ).toConst();
 					virtualField.assign( hitWeight.div( total.max( 1e-6 ) ) );
 					const color = history.get( 'color' ).mul( surfaceWeight ).add( hit.get( 'color' ).mul( hitWeight ) ).div( total.max( 1e-6 ) );
+					const fast = history.get( 'fast' ).mul( surfaceWeight ).add( hit.get( 'fast' ).mul( hitWeight ) ).div( total.max( 1e-6 ) );
 					const blendedAge = history.get( 'age' ).mul( surfaceWeight ).add( hit.get( 'age' ).mul( hitWeight ) ).div( total.max( 1e-6 ) );
-					history.assign( historySample( color, total, blendedAge ) );
+					history.assign( historySample( color, fast, total, blendedAge ) );
 
 				}
 
 				if ( this.hitDistanceNode === null ) {
 
 					const confidence = this.useStretchRejection.select( surfaceStretch.pow2(), 1 );
-					history.assign( historySample( history.get( 'color' ), history.get( 'weight' ).mul( confidence ), history.get( 'age' ) ) );
+					history.assign( historySample( history.get( 'color' ), history.get( 'fast' ), history.get( 'weight' ).mul( confidence ), history.get( 'age' ) ) );
 
 				}
 
-				// Clip radiance and confidence as the same premultiplied signal.
-				const minimum = currentWeighted.toVar();
-				const maximum = currentWeighted.toVar();
+				// Bound the long history by the short one's reprojected neighborhood rather than
+				// by the current frame. A sparse frame's range misses its own mean, so clamping to
+				// it pins history near the per-frame median: darker, with frozen noise.
+				const fastUV = virtualField.greaterThan( 0.5 ).select( virtualUV, surfaceUV ).toConst();
+				const fastMin = vec4( 1e9 ).toVar();
+				const fastMax = vec4( - 1e9 ).toVar();
+				const currentMin = currentWeighted.toVar();
+				const currentMax = currentWeighted.toVar();
 				for ( let y = - 1; y <= 1; y ++ ) {
 
 					for ( let x = - 1; x <= 1; x ++ ) {
 
-						const tapUV = coordinate.add( vec2( x, y ).div( inputResolution ) ).mul( this._resolution ).floor().add( 0.5 ).div( this._resolution );
-						const value = toWeighted( spatialTexture.sample( tapUV ) );
-						minimum.assign( minimum.min( value ) );
-						maximum.assign( maximum.max( value ) );
+						const currentUV = coordinate.add( vec2( x, y ).div( inputResolution ) ).mul( this._resolution ).floor().add( 0.5 ).div( this._resolution );
+						const currentValue = toWeighted( spatialTexture.sample( currentUV ) );
+						currentMin.assign( currentMin.min( currentValue ) );
+						currentMax.assign( currentMax.max( currentValue ) );
+						const tapUV = fastUV.add( vec2( x, y ).div( this._resolution ) ).mul( this._resolution ).floor().add( 0.5 ).div( this._resolution );
+						const value = toWeighted( this._historyFast.sample( tapUV ) );
+						fastMin.assign( fastMin.min( value ) );
+						fastMax.assign( fastMax.max( value ) );
 
 					}
 
 				}
+
+				const minimum = fastMin.min( currentWeighted ).toVar();
+				const maximum = fastMax.max( currentWeighted ).toVar();
 
 				// Geometry validity is independent of coverage: a real surface with no
 				// screen-space hits still has a valid age and lighting history.
@@ -504,6 +530,19 @@ class CoverageDenoiseNode extends Node {
 
 					} );
 					age.assign( previousAge.add( 1 ).min( this.maxFrames.max( 1 ) ) );
+					const fastAge = age.min( this.fastFrames.max( 1 ) ).toConst();
+					// The short history is clamped loosely: the current range widened by its own size
+					// rejects real changes, while sparse-frame noise rarely biases it.
+					const currentRange = currentMax.sub( currentMin );
+					fast.assign( mix( currentWeighted, history.get( 'fast' ).clamp( currentMin.sub( currentRange ), currentMax.add( currentRange ) ), fastAge.sub( 1 ).div( fastAge ) ) );
+					minimum.assign( minimum.min( fast ) );
+					maximum.assign( maximum.max( fast ) );
+					// Anti-lag, as in ReBLUR: long history further from the fast history than either
+					// neighborhood's spread is stale, not noisy, so shorten it to the fast length.
+					const spread = fastMax.sub( fastMin ).max( currentRange ).max( fast.mul( 0.05 ) ).add( 1e-3 );
+					const excess = history.get( 'color' ).sub( fast ).abs().div( spread );
+					const lag = excess.x.max( excess.y ).max( excess.z ).max( excess.w ).smoothstep( 1, 2 );
+					age.assign( mix( age, fastAge, lag ) );
 					const historyWeight = age.sub( 1 ).div( age );
 					result.assign( mix( currentWeighted, history.get( 'color' ).clamp( minimum, maximum ), historyWeight ) );
 
@@ -512,6 +551,7 @@ class CoverageDenoiseNode extends Node {
 			} );
 
 			colorField.assign( fromWeighted( result ) );
+			fastField.assign( fromWeighted( fast ) );
 			ageField.assign( age );
 			return colorField;
 
@@ -526,7 +566,7 @@ class CoverageDenoiseNode extends Node {
 		this._blurMaterial.needsUpdate = true;
 		this._temporalMaterial.contextNode = context( builder.getSharedContext() );
 		this._temporalMaterial.colorNode = temporal();
-		this._temporalMaterial.outputNode = outputStruct( colorField, geometry(), vec4( ageField, roughnessAt( uv() ), virtualField, this.surfaceIdNode !== null ? float( this.surfaceIdNode ) : float( 0 ) ) );
+		this._temporalMaterial.outputNode = outputStruct( colorField, geometry(), vec4( ageField, roughnessAt( uv() ), virtualField, this.surfaceIdNode !== null ? float( this.surfaceIdNode ) : float( 0 ) ), fastField );
 		this._temporalMaterial.needsUpdate = true;
 		return this._textureNode;
 
