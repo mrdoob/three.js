@@ -1826,6 +1826,7 @@ class LDrawLoader extends Loader {
 
 		this.ConditionalLineMaterial = type;
 		this.missingConditionalEdgeColorMaterial = new this.ConditionalLineMaterial( { name: Loader.DEFAULT_MATERIAL_NAME, fog: true, color: 0xFF00FF } );
+		this.conditionalEdgeMaterialCache.set( this.missingEdgeColorMaterial, this.missingConditionalEdgeColorMaterial );
 		return this;
 
 	}
