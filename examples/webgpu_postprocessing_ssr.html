@@ -456,23 +456,62 @@
 			// GUI
 
 			const gui = renderer.inspector.createParameters( 'Settings' );
-			gui.add( params, 'renderScale', { '50%': 0.5, '75%': 0.75, '100%': 1 } ).name( 'Render scale' ).onChange( () => {
+			gui.add( params, 'output', Object.keys( views ) ).name( 'Output' ).onChange( () => {
 
-				renderer.setPixelRatio( params.renderScale );
-				onWindowResize();
+				updateOutput();
 				resetHistory();
 
 			} );
-			gui.add( params, 'effectScale', { Full: 1, Half: 0.5, Quarter: 0.25 } ).name( 'SSR scale' ).onChange( updateParameters );
-			gui.add( params, 'antialiasing', [ 'SMAA', 'TRAA' ] ).onChange( value => {
+			gui.add( params, 'enabled' ).name( 'SSR' ).onChange( value => {
+
+				ssrEnabled.value = Number( value );
+				resetHistory();
+
+			} );
+			gui.add( params, 'environment' ).name( 'Environment' ).onChange( value => {
+
+				environmentEnabled.value = Number( value );
+				scene.environmentIntensity = value ? 1.25 : 0;
+				resetHistory();
+
+			} );
+			gui.add( params, 'intensity', 0, 1 ).name( 'SSR strength' ).onChange( value => {
+
+				ssrStrength.value = value;
+				resetHistory();
+
+			} );
+			gui.add( params, 'antialiasing', [ 'SMAA', 'TRAA' ] ).name( 'Antialiasing' ).onChange( value => {
 
 				views.Beauty = value === 'TRAA' ? traaPass : smaaPass;
 				updateOutput();
 				resetHistory();
 
 			} );
-			const ssrFolder = gui.addFolder( 'SSR' );
-			ssrFolder.add( params, 'reflectionSource', [ 'Current frame', 'Previous frame' ] ).name( 'Reflection source' ).onChange( value => {
+
+			const resolutionFolder = gui.addFolder( 'Resolution' );
+			resolutionFolder.add( params, 'renderScale', { '50%': 0.5, '75%': 0.75, '100%': 1 } ).name( 'Render scale' ).onChange( () => {
+
+				renderer.setPixelRatio( params.renderScale );
+				onWindowResize();
+				resetHistory();
+
+			} );
+			resolutionFolder.add( params, 'effectScale', { Full: 1, Half: 0.5, Quarter: 0.25 } ).name( 'SSR scale' ).onChange( updateParameters );
+
+			const traceFolder = gui.addFolder( 'Trace' ).close();
+			traceFolder.add( params, 'raysPerPixel', [ 1, 2, 4, 8, 16 ] ).name( 'Rays per pixel' ).onChange( updateParameters );
+			traceFolder.add( params, 'traceSteps', [ 8, 16, 32, 64, 128, 256, 512 ] ).name( 'Steps per ray' ).onChange( updateParameters );
+			traceFolder.add( params, 'maxDistance', 0, 10 ).name( 'Max distance' ).onChange( updateParameters );
+			traceFolder.add( params, 'thickness', 0, 0.05 ).name( 'Thickness' ).onChange( updateParameters );
+			traceFolder.add( params, 'quality', 0, 1 ).name( 'Quality' ).onChange( updateParameters );
+			traceFolder.add( params, 'stepExponent', 1, 4, 1 ).name( 'Step exponent' ).onChange( updateParameters );
+			traceFolder.add( params, 'mirrorBias', 0, 1 ).name( 'Mirror bias' ).onChange( updateParameters );
+			traceFolder.add( params, 'maxRoughness', 0.1, 1 ).name( 'Max roughness' ).onChange( updateParameters );
+			traceFolder.add( params, 'screenEdgeFade', 0, 0.5 ).name( 'Screen edge fade' ).onChange( updateParameters );
+			traceFolder.add( params, 'classify' ).name( 'Skip unused rays' ).onChange( updateParameters );
+			traceFolder.add( params, 'binaryRefine' ).name( 'Binary refine' ).onChange( updateParameters );
+			traceFolder.add( params, 'reflectionSource', [ 'Current frame', 'Previous frame' ] ).name( 'Reflection source' ).onChange( value => {
 
 				useHistorySource.value = value === 'Previous frame';
 				ssrPass.setColorNode( useHistorySource.value ? previousTraceSource : currentTraceSource );
@@ -480,61 +519,25 @@
 				resetHistory();
 
 			} );
-			ssrFolder.add( params, 'denoise' ).onChange( value => {
+
+			const denoiseFolder = gui.addFolder( 'Denoise' ).close();
+			denoiseFolder.add( params, 'denoise' ).name( 'Enabled' ).onChange( value => {
 
 				denoiseEnabled.value = Number( value );
 				resetHistory();
 
 			} );
-			ssrFolder.add( params, 'maxFrames', 1, 128, 1 ).onChange( updateParameters );
-			ssrFolder.add( params, 'radius', 0, 3 ).onChange( updateParameters );
-			ssrFolder.add( params, 'maxRoughness', 0.1, 1 ).onChange( updateParameters );
-			ssrFolder.add( params, 'mirrorBias', 0, 1 ).onChange( updateParameters );
-			ssrFolder.add( params, 'stepExponent', 1, 4, 1 ).onChange( updateParameters );
-			ssrFolder.add( params, 'screenEdgeFade', 0, 0.5 ).onChange( updateParameters );
-			ssrFolder.add( params, 'sampling', samplingModes ).onChange( updateParameters );
-			ssrFolder.add( params, 'classify' ).name( 'Skip unused rays' ).onChange( updateParameters );
-			ssrFolder.add( params, 'raysPerPixel', [ 1, 2, 4, 8, 16 ] ).name( 'Rays per pixel' ).onChange( updateParameters );
-			ssrFolder.add( params, 'traceSteps', [ 8, 16, 32, 64, 128, 256, 512 ] ).name( 'Steps per ray' ).onChange( updateParameters );
-			ssrFolder.add( params, 'quality', 0, 1 ).onChange( updateParameters );
-			gui.add( params, 'output', Object.keys( views ) ).onChange( () => {
+			denoiseFolder.add( params, 'radius', 0, 3 ).name( 'Radius' ).onChange( updateParameters );
+			denoiseFolder.add( params, 'sampling', samplingModes ).name( 'Sampling' ).onChange( updateParameters );
+			denoiseFolder.add( params, 'maxFrames', 1, 128, 1 ).name( 'Max frames' ).onChange( updateParameters );
 
-				updateOutput();
-
-				resetHistory();
-
-			} );
-			gui.add( params, 'environment' ).onChange( value => {
-
-				environmentEnabled.value = Number( value );
-				scene.environmentIntensity = value ? 1.25 : 0;
-				resetHistory();
-
-			} );
-			ssrFolder.add( params, 'maxDistance', 0, 10 ).onChange( updateParameters );
-			ssrFolder.add( params, 'intensity', 0, 1 ).name( 'SSR strength' ).onChange( value => {
-
-				ssrStrength.value = value;
-				resetHistory();
-
-			} );
-			ssrFolder.add( params, 'thickness', 0, 0.05 ).onChange( updateParameters );
-			ssrFolder.add( params, 'binaryRefine' ).name( 'binary refine' ).onChange( updateParameters );
-			ssrFolder.add( params, 'enabled' ).onChange( value => {
-
-				ssrEnabled.value = Number( value );
-				resetHistory();
-
-			} );
-
-			gui.add( params, 'floorRoughness', 0, 1 ).name( 'Floor roughness' ).onChange( value => {
+			const sceneFolder = gui.addFolder( 'Scene' );
+			sceneFolder.add( params, 'floorRoughness', 0, 1 ).name( 'Floor roughness' ).onChange( value => {
 
 				floorMaterial.roughness = value;
 
 			} );
-
-			const modelFolder = gui.addFolder( 'Model' );
-			modelFolder.add( params, 'roughness', 0, 1 ).onChange( ( value ) => {
+			sceneFolder.add( params, 'roughness', 0, 1 ).name( 'Model roughness' ).onChange( ( value ) => {
 
 				model?.traverse( function ( object ) {
 
