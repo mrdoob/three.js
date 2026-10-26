@@ -530,7 +530,6 @@
 			gui.add( params, 'floorRoughness', 0, 1 ).name( 'Floor roughness' ).onChange( value => {
 
 				floorMaterial.roughness = value;
-				resetHistory();
 
 			} );
 
@@ -604,20 +603,16 @@
 			scene.traverse( object => {
 
 				if ( ! object.isMesh ) return;
-				const materials = Array.isArray( object.material ) ? object.material : [ object.material ];
-				const materialState = materials.map( material => [ material.uuid, material.version, material.roughness, material.metalness, material.ior, material.specularIntensity, material.opacity, material.color?.getHex(), material.specularColor?.getHex() ].join( ':' ) ).join( ',' );
 				const previous = surfaceStates.get( object );
-				object.userData.ssrReactive = previous && previous.matrix.equals( object.matrixWorld ) ? 0 : 1;
+				object.userData.ssrReactive = previous && previous.equals( object.matrixWorld ) ? 0 : 1;
 				if ( ! previous ) {
 
 					object.userData.ssrSurfaceId = nextSurfaceId ++;
-					surfaceStates.set( object, { matrix: object.matrixWorld.clone(), materialState } );
+					surfaceStates.set( object, object.matrixWorld.clone() );
 
 				} else {
 
-					if ( previous.materialState !== materialState ) resetHistory();
-					previous.matrix.copy( object.matrixWorld );
-					previous.materialState = materialState;
+					previous.copy( object.matrixWorld );
 
 				}
 
