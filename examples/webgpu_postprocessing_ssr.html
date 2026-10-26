@@ -102,6 +102,7 @@
 		const lastCameraQuaternion = new THREE.Quaternion();
 		const lastProjection = new THREE.Matrix4();
 		let cameraHistoryValid = false;
+		let warmedUp = false;
 		const currentView = new THREE.Matrix4();
 		const currentProjection = new THREE.Matrix4();
 		const currentProjectionInverse = new THREE.Matrix4();
@@ -658,6 +659,25 @@
 		}
 
 		function animate() {
+
+			render();
+
+			// Reflections build on previous-frame lighting and history, so converge them before the first present.
+			if ( warmedUp === false ) {
+
+				warmedUp = true;
+				for ( let i = 0; i < 8; i ++ ) {
+
+					renderer._nodes.nodeFrame.update();
+					render();
+
+				}
+
+			}
+
+		}
+
+		function render() {
 
 			controls.update();
 			updateSceneHistory();
