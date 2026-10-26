@@ -59,6 +59,8 @@ class CoverageDenoiseNode extends Node {
 		this.reactiveNode = reactive;
 		this.roughnessThreshold = uniform( 0.04 );
 		this.radius = uniform( 1.5 );
+		/** Post-temporal blur radius at a history age of one frame, shrinking with the square root of age. */
+		this.historyRadius = uniform( 8 );
 		this.maxFrames = uniform( 16 );
 		this.depthThreshold = uniform( 0.01 );
 		/** Relative difference from the neighborhood's mean hit distance accepted by the spatial filter. */
@@ -80,6 +82,8 @@ class CoverageDenoiseNode extends Node {
 		this._target.textures[ 2 ].minFilter = this._target.textures[ 2 ].magFilter = NearestFilter;
 		this._historyTarget = this._target.clone();
 		this._spatialTarget.texture.name = 'CoverageDenoise.spatial';
+		this._outputTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
+		this._outputTarget.texture.name = 'CoverageDenoise.output';
 		for ( const target of [ this._target, this._historyTarget ] ) {
 
 			target.textures[ 0 ].name = 'CoverageDenoise.radianceCoverage';
@@ -88,12 +92,15 @@ class CoverageDenoiseNode extends Node {
 
 		}
 
-		this._textureNode = passTexture( this, this._target.texture );
+		this._textureNode = passTexture( this, this._outputTarget.texture );
+		this._currentColor = texture( this._target.texture );
+		this._currentMetadata = texture( this._target.textures[ 2 ] );
 		this._metadataNode = passTexture( this, this._target.textures[ 2 ] );
 		this._historyColor = texture( this._historyTarget.texture );
 		this._historyGeometry = texture( this._historyTarget.textures[ 1 ] );
 		this._historyAge = texture( this._historyTarget.textures[ 2 ] );
 		this._spatialMaterial = new NodeMaterial();
+		this._blurMaterial = new NodeMaterial();
 		this._temporalMaterial = new NodeMaterial();
 		this._quad = new QuadMesh();
 		this._size = new Vector2();
@@ -123,7 +130,7 @@ class CoverageDenoiseNode extends Node {
 	setSize( width, height ) {
 
 		if ( this._target.width === width && this._target.height === height ) return;
-		for ( const target of [ this._spatialTarget, this._target, this._historyTarget ] ) target.setSize( width, height );
+		for ( const target of [ this._spatialTarget, this._target, this._historyTarget, this._outputTarget ] ) target.setSize( width, height );
 		this._resolution.value.set( width, height );
 		this.reset();
 
@@ -156,7 +163,8 @@ class CoverageDenoiseNode extends Node {
 		const historyTarget = this._historyTarget;
 		this._historyTarget = this._target;
 		this._target = historyTarget;
-		this._textureNode.value = this._target.texture;
+		this._currentColor.value = this._target.texture;
+		this._currentMetadata.value = this._target.textures[ 2 ];
 		this._metadataNode.value = this._target.textures[ 2 ];
 		this._historyColor.value = this._historyTarget.texture;
 		this._historyGeometry.value = this._historyTarget.textures[ 1 ];
@@ -180,6 +188,11 @@ class CoverageDenoiseNode extends Node {
 			renderer.setRenderTarget( this._target );
 			this._quad.material = this._temporalMaterial;
 			this._quad.name = 'Coverage Denoise [ Temporal ]';
+			this._quad.render( renderer );
+
+			renderer.setRenderTarget( this._outputTarget );
+			this._quad.material = this._blurMaterial;
+			this._quad.name = 'Coverage Denoise [ History Blur ]';
 			this._quad.render( renderer );
 
 			this._previousView.value.copy( this.camera.matrixWorldInverse );
@@ -219,6 +232,7 @@ class CoverageDenoiseNode extends Node {
 		const fromWeighted = value => vec4( value.a.greaterThan( 1e-6 ).select( value.rgb.div( value.a.max( 1e-6 ) ), vec3( 0 ) ), value.a.clamp() );
 		const inBounds = coordinate => coordinate.x.greaterThanEqual( 0 ).and( coordinate.x.lessThanEqual( 1 ) )
 			.and( coordinate.y.greaterThanEqual( 0 ) ).and( coordinate.y.lessThanEqual( 1 ) );
+		const inputCoordinate = coordinate => coordinate.mul( inputResolution ).floor().add( 0.5 ).div( inputResolution );
 		const isHit = distance => distance.greaterThan( 0 ).and( distance.lessThan( ENV_RAY_LENGTH_THRESHOLD ) );
 
 		// Distance moments over the 3×3 input texels include contributing hits,
@@ -247,16 +261,15 @@ class CoverageDenoiseNode extends Node {
 
 		const momentsMean = moments => moments.z.greaterThan( 1e-6 ).select( moments.x.div( moments.z.max( 1e-6 ) ), float( ENV_RAY_LENGTH ) );
 
-		const spatial = Fn( () => {
+		// Edge-aware 3×3 reconstruction of `read` (radiance and coverage), with taps
+		// `stride` input texels apart, point-sampled on the `grid` resolution.
+		const filter = ( read, grid, coordinate, stride ) => {
 
-			const coordinate = uv();
-			isBackgroundDepth( this.depthNode.sample( coordinate ).r ).discard();
 			const centerPosition = viewPosition( coordinate ).toConst();
 			const centerNormal = normal( coordinate ).toConst();
 			const roughness = roughnessAt( coordinate ).toConst();
 			const radiance = vec4( 0 ).toVar();
 			const coverage = vec2( 0 ).toVar();
-			const stride = this.radius.mul( roughness.sqrt().max( 0.25 ) );
 			// Coverage uses geometry weights only. Hit-distance weights select which
 			// hits share radiance; applying them to coverage would favour misses.
 			const centerHit = this.hitDistanceNode !== null ? momentsMean( hitMoments( coordinate ) ).toConst() : null;
@@ -268,8 +281,8 @@ class CoverageDenoiseNode extends Node {
 
 					// Point-sample source texels before premultiplication. Fractional radii
 					// select the nearest texel; guides must describe that same surface.
-					const tapUV = coordinate.mul( inputResolution ).add( vec2( x, y ).mul( stride ) ).floor().add( 0.5 ).div( inputResolution ).toConst();
-					const tap = this.inputNode.sample( tapUV ).toConst();
+					const tapUV = coordinate.add( vec2( x, y ).mul( stride ).div( inputResolution ) ).mul( grid ).floor().add( 0.5 ).div( grid ).toConst();
+					const tap = read( tapUV ).toConst();
 					const planeDistance = viewPosition( tapUV ).sub( centerPosition ).dot( centerNormal ).abs();
 					const depthWeight = planeDistance.div( tolerance ).pow2().negate().exp();
 					const normalWeight = normal( tapUV ).dot( centerNormal ).max( 0 ).pow( 32 );
@@ -277,7 +290,7 @@ class CoverageDenoiseNode extends Node {
 					let hitWeight = float( 1 );
 					if ( this.hitDistanceNode !== null ) {
 
-						const tapHit = float( hitDistanceAt( tapUV ) );
+						const tapHit = float( hitDistanceAt( inputCoordinate( tapUV ) ) );
 						const bothHits = tap.a.greaterThan( 0 ).and( isHit( centerHit ) ).and( isHit( tapHit ) );
 						const scale = centerHit.min( tapHit ).mul( this.hitDistancePhi ).add( tolerance ).max( 1e-4 );
 						hitWeight = bothHits.select( tapHit.sub( centerHit ).div( scale ).pow2().negate().exp(), 1 );
@@ -293,6 +306,27 @@ class CoverageDenoiseNode extends Node {
 			}
 
 			return vec4( fromWeighted( radiance ).rgb, coverage.x.div( coverage.y.max( 1e-6 ) ) );
+
+		};
+
+		const spatial = Fn( () => {
+
+			const coordinate = uv();
+			isBackgroundDepth( this.depthNode.sample( coordinate ).r ).discard();
+			const stride = this.radius.mul( roughnessAt( coordinate ).sqrt().max( 0.25 ) );
+			return filter( tapUV => this.inputNode.sample( tapUV ), inputResolution, coordinate, stride );
+
+		} );
+
+		// Young history is blurred more, as in ReBLUR, so disocclusions and history
+		// resets are not left at the input's sample count. The blur does not feed back.
+		const historyBlur = Fn( () => {
+
+			const coordinate = uv();
+			isBackgroundDepth( this.depthNode.sample( coordinate ).r ).discard();
+			const age = this._currentMetadata.sample( coordinate ).r;
+			const stride = this.historyRadius.mul( roughnessAt( coordinate ).sqrt().max( 0.25 ) ).div( age.max( 1 ).sqrt() );
+			return filter( tapUV => this._currentColor.sample( tapUV ), this._resolution, coordinate, stride );
 
 		} );
 
@@ -453,6 +487,9 @@ class CoverageDenoiseNode extends Node {
 		this._spatialMaterial.contextNode = context( builder.getSharedContext() );
 		this._spatialMaterial.fragmentNode = spatial();
 		this._spatialMaterial.needsUpdate = true;
+		this._blurMaterial.contextNode = context( builder.getSharedContext() );
+		this._blurMaterial.fragmentNode = historyBlur();
+		this._blurMaterial.needsUpdate = true;
 		this._temporalMaterial.contextNode = context( builder.getSharedContext() );
 		this._temporalMaterial.colorNode = temporal();
 		this._temporalMaterial.outputNode = outputStruct( colorField, geometry(), vec4( ageField, roughnessAt( uv() ), virtualField, this.surfaceIdNode !== null ? float( this.surfaceIdNode ) : float( 0 ) ) );
@@ -464,8 +501,9 @@ class CoverageDenoiseNode extends Node {
 	dispose() {
 
 		super.dispose();
-		for ( const target of [ this._spatialTarget, this._target, this._historyTarget ] ) target.dispose();
+		for ( const target of [ this._spatialTarget, this._target, this._historyTarget, this._outputTarget ] ) target.dispose();
 		this._spatialMaterial.dispose();
+		this._blurMaterial.dispose();
 		this._temporalMaterial.dispose();
 
 	}
