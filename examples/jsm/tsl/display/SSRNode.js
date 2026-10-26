@@ -23,6 +23,7 @@ const MAX_STEPS = 64;
  * @property {Node} [diffuseNode=null] - Scene diffuse / base color. Defaults to `vec3(1)` in the shader when omitted.
  * @property {boolean} [binaryRefine=false] - Sub-step binary-search refinement of detected hits. Compile-time constant (baked into the shader at construction).
  * @property {boolean} [outputCoverage=false] - Stochastic tracing with external fallback. RGB is BRDF weighted and coverage premultiplied; alpha remains hit distance. Source alpha supplies validity.
+ * @property {Node<vec4>} [noiseNode=null] - Samples in [0,1): GGX in xy, march jitter in z, mirror-bias jitter in w. Evaluated at tracing resolution.
  * @property {Camera} [camera=null] - Camera the scene is rendered with. Inferred from the color pass when omitted.
  */
 
@@ -63,7 +64,8 @@ class SSRNode extends Node {
 			envImportanceSampling = false,
 			diffuseNode = null,
 			binaryRefine = false,
-			outputCoverage = false
+			outputCoverage = false,
+			noiseNode = null
 		} = options;
 
 		let camera = options.camera ?? null;
@@ -76,6 +78,10 @@ class SSRNode extends Node {
 
 		/** @type {boolean} Coverage output requires stochastic tracing and external fallback. Fixed at construction. */
 		this.outputCoverage = outputCoverage;
+		/** @type {?Node<vec4>} Custom sampling pattern, fixed at construction. */
+		this.noiseNode = noiseNode;
+		/** @type {UniformNode<bool>} False uses the original analytic pattern. */
+		this.useNoiseNode = uniform( true );
 		this._coverage = outputCoverage ? property( 'float' ) : null;
 
 		/**
@@ -914,7 +920,18 @@ class SSRNode extends Node {
 
 			if ( this.outputCoverage ) this._coverage.assign( 0 );
 
-			const noise = this.stochastic === true ? sampleMarchNoise( uvNode, this._noiseIndex ) : null;
+			const noise = this.stochastic === true ? sampleMarchNoise( uvNode, this._noiseIndex ).toVar() : null;
+
+			if ( this.stochastic === true && this.noiseNode !== null ) {
+
+				If( this.useNoiseNode, () => {
+
+					noise.assign( this.noiseNode );
+
+				} );
+
+			}
+
 			const uvPos = uvNode.toVar();
 
 			const depth = sampleDepth( uvPos ).toVar();

@@ -44,8 +44,9 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec3, vec4, Fn, uniform, context, cameraWorldMatrix, getViewPosition, diffuseColor, specularColor, specularF90, EnvironmentBRDF, indirectSpecular, environmentSpecular, pmremTexture, colorSpaceToWorking } from 'three/tsl';
+		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec3, vec4, Fn, If, uniform, context, cameraWorldMatrix, getViewPosition, diffuseColor, specularColor, specularF90, EnvironmentBRDF, indirectSpecular, environmentSpecular, pmremTexture, colorSpaceToWorking } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
+		import { fastNoise } from 'three/addons/tsl/utils/FASTNoise.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
 		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -57,6 +58,7 @@
 		const params = {
 			quality: 0.5,
 			view: 'Beauty',
+			sampling: 'FAST Separate',
 			environment: true,
 			maxDistance: 5,
 			intensity: 1,
@@ -68,6 +70,8 @@
 
 		let camera, scene, model, renderer, renderPipeline, ssrPass;
 		let controls;
+		const samplingModes = [ 'Original', 'FAST Product', 'FAST Separate' ];
+		const samplingMode = uniform( 2, 'uint' );
 		const ssrEnabled = uniform( 1 );
 		const environmentEnabled = uniform( 1 );
 
@@ -134,6 +138,26 @@
 			document.body.appendChild( renderer.domElement );
 
 			await renderer.init();
+
+			const noiseAtlases = await Promise.all( [ 'product', 'separate05' ].map( async variant => {
+
+				const atlas = await new THREE.TextureLoader().loadAsync( `textures/noises/fast/gauss1-ema01-${ variant }.png` );
+				atlas.flipY = false;
+				atlas.colorSpace = THREE.NoColorSpace;
+				atlas.generateMipmaps = false;
+				atlas.minFilter = atlas.magFilter = THREE.NearestFilter;
+				return atlas;
+
+			} ) );
+			const productNoise = fastNoise( noiseAtlases[ 0 ], new THREE.Vector2() );
+			const separateNoise = fastNoise( noiseAtlases[ 1 ], new THREE.Vector2() );
+			const samplingNoise = Fn( () => {
+
+				const value = vec4().toVar();
+				If( samplingMode.equal( 2 ), () => value.assign( separateNoise ) ).Else( () => value.assign( productNoise ) );
+				return value;
+
+			} )();
 
 			const environment = new RoomEnvironment();
 			const pmremGenerator = new THREE.PMREMGenerator( renderer );
@@ -202,6 +226,7 @@
 			ssrPass = ssr( scenePassColor, scenePassDepth, sceneNormal, {
 				stochastic: true,
 				outputCoverage: true,
+				noiseNode: samplingNoise,
 				diffuseNode: scenePass.getTextureNode( 'albedo' ),
 				metalnessNode: scenePassMetalRough.r,
 				roughnessNode: scenePassMetalRough.g
@@ -261,6 +286,7 @@
 
 			const gui = renderer.inspector.createParameters( 'Settings' );
 			const ssrFolder = gui.addFolder( 'SSR' );
+			ssrFolder.add( params, 'sampling', samplingModes ).onChange( updateParameters );
 			ssrFolder.add( params, 'quality', 0, 1 ).onChange( updateParameters );
 			gui.add( params, 'view', Object.keys( views ) ).onChange( value => {
 
@@ -297,6 +323,8 @@
 
 		function updateParameters() {
 
+			samplingMode.value = samplingModes.indexOf( params.sampling );
+			ssrPass.useNoiseNode.value = samplingMode.value !== 0;
 			ssrPass.quality.value = params.quality;
 			ssrPass.maxDistance.value = params.maxDistance;
 			ssrPass.intensity.value = params.intensity;

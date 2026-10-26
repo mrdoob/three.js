@@ -25,3 +25,4 @@ import './addons/tsl/WebGLNodesHandler.tests.js';
 import './addons/postprocessing/GTAOPass.tests.js';
 
 import './addons/tsl/SSRNode.tests.js';
+import './addons/tsl/FASTNoise.tests.js';
