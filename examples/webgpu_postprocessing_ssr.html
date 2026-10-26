@@ -44,7 +44,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, velocity, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec3, vec4, Fn, If, uv, convertToTexture, uniform, context, cameraWorldMatrix, getViewPosition, diffuseColor, specularColorBlended, specularF90, EnvironmentBRDF, indirectSpecular, environmentSpecular, pmremTexture, texture, reference, } from 'three/tsl';
+		import { pass, mrt, output, normalView, float, textureSize, velocity, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec3, vec4, Fn, If, uv, convertToTexture, uniform, context, cameraWorldMatrix, getViewPosition, diffuseColor, specularColorBlended, specularF90, EnvironmentBRDF, indirectSpecular, environmentSpecular, pmremTexture, texture, reference, } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { screenSpaceGBuffer } from 'three/addons/tsl/display/ScreenSpaceGBufferNode.js';
 		import { reprojectedRadiance } from 'three/addons/tsl/display/ReprojectedRadianceNode.js';
@@ -335,16 +335,63 @@
 
 			// Reconstruct conditional radiance and coverage before filling any holes.
 			const sparseSSR = convertToTexture( vec4( incoming.sample( uv() ), coverage.sample( uv() ) ) );
+			// Reconstruct on the SSR grid, guided by the surfaces the rays were traced from.
+			const effectMotion = sample( coordinate => motion.sample( effectDepth.sample( coordinate ).gb ) );
 			ssrDenoise = coverageDenoise( sparseSSR, camera, {
-				depth: scenePassDepth,
-				normal: scenePassNormal,
-				velocity: motion,
-				surfaceId: sample( coordinate => motion.sample( coordinate ).z ),
+				depth: effectDepth,
+				normal: effectNormalRoughness,
+				velocity: effectMotion,
+				surfaceId: sample( coordinate => effectMotion.sample( coordinate ).z ),
 				// Moving receivers keep velocity-reprojected history; only moving hits reject it.
 				reactive: sample( coordinate => ssrPass.getCoverageNode().sample( coordinate ).g ),
 				hitDistance: sample( uv => resolveSSRHitDistance( ssrPass.getTextureNode().sample( uv ).a, coverage.sample( uv ) ) )
 			} );
-			const filtered = ssrDenoise.getTextureNode();
+			const denoised = ssrDenoise.getTextureNode();
+			const projectionInverse = uniform( camera.projectionMatrixInverse );
+
+			// Joint bilateral upsampling: weight the four nearest SSR texels by
+			// depth and normal similarity so reflections do not bleed across edges.
+			const filtered = sample( coordinate => Fn( () => {
+
+				const size = vec2( textureSize( effectDepth ) );
+				const pixel = coordinate.mul( size ).sub( 0.5 );
+				const base = pixel.floor();
+				const fraction = pixel.fract();
+				const viewZ = depth => getViewPosition( coordinate, depth, projectionInverse ).z;
+				const z = viewZ( scenePassDepth.sample( coordinate ).r ).toConst();
+				const n = sceneNormal.sample( coordinate ).toConst();
+				const tolerance = z.abs().mul( 0.02 ).max( 0.001 );
+				const sum = vec4( 0 ).toVar();
+				const total = float( 0 ).toVar();
+
+				for ( let y = 0; y <= 1; y ++ ) {
+
+					for ( let x = 0; x <= 1; x ++ ) {
+
+						const tapUV = base.add( vec2( x, y ) ).add( 0.5 ).div( size ).toConst();
+						const depthWeight = viewZ( effectDepth.sample( tapUV ).r ).sub( z ).div( tolerance ).pow2().negate().exp();
+						const normalWeight = effectNormal.sample( tapUV ).dot( n ).max( 0 ).pow( 8 );
+						const wx = x === 0 ? fraction.x.oneMinus() : fraction.x;
+						const wy = y === 0 ? fraction.y.oneMinus() : fraction.y;
+						const weight = wx.mul( wy ).mul( depthWeight ).mul( normalWeight ).toConst();
+						const value = denoised.sample( tapUV );
+						sum.addAssign( vec4( value.rgb.mul( value.a ), value.a ).mul( weight ) );
+						total.addAssign( weight );
+
+					}
+
+				}
+
+				// No matching texel (thin features): fall back to plain interpolation.
+				const result = denoised.sample( coordinate ).toVar();
+				If( total.greaterThan( 1e-4 ), () => {
+
+					result.assign( vec4( sum.rgb.div( sum.a.max( 1e-6 ) ), sum.a.div( total ) ) );
+
+				} );
+				return result;
+
+			} )() );
 
 			const screenReflection = ( { normal, viewDirection, direction, roughness: level } ) => Fn( () => {
 

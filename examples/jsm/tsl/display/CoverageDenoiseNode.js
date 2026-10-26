@@ -39,7 +39,7 @@ class CoverageDenoiseNode extends Node {
 	 * @param {TextureNode} inputNode - Unweighted radiance and coverage.
 	 * @param {Camera} camera - Scene camera.
 	 * @param {Object} options - Geometry and motion guides.
-	 * @param {TextureNode} options.depth - Device depth.
+	 * @param {TextureNode} options.depth - Device depth. Its resolution sets the reconstruction resolution.
 	 * @param {TextureNode} options.normal - Packed view normal in RGB, roughness in A.
 	 * @param {TextureNode} options.velocity - Current-minus-previous NDC motion vectors, as produced by `velocity`.
 	 * @param {?Node<float>} [options.surfaceId=null] - Stable per-surface integer identity.
@@ -106,7 +106,6 @@ class CoverageDenoiseNode extends Node {
 		this._blurMaterial = new NodeMaterial();
 		this._temporalMaterial = new NodeMaterial();
 		this._quad = new QuadMesh();
-		this._size = new Vector2();
 		this._rendererState = {};
 		this._resolution = uniform( new Vector2( 1, 1 ) );
 		this._velocityNode = cameraVelocity;
@@ -159,8 +158,10 @@ class CoverageDenoiseNode extends Node {
 	updateBefore( frame ) {
 
 		const { renderer } = frame;
-		renderer.getDrawingBufferSize( this._size );
-		this.setSize( this._size.x, this._size.y );
+		// Reconstruct on the guide grid; reduced-resolution guides keep the whole filter reduced.
+		if ( this.depthNode.isPassTextureNode ) frame.updateBeforeNode( this.depthNode.passNode );
+		const { width, height } = this.depthNode.value.image;
+		this.setSize( width, height );
 
 		// Keep the previous output as history and render into the other target.
 		const historyTarget = this._historyTarget;
