@@ -1,8 +1,9 @@
-import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, Node, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
-import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand, context, isBackgroundDepth } from 'three/tsl';
+import { Color, DataTexture, HalfFloatType, RenderTarget, RepeatWrapping, Vector2, Vector3, Node, QuadMesh, NodeMaterial, RendererUtils, RGBAFormat } from 'three/webgpu';
+import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand, context, isBackgroundDepth, screenUV, reflect, sqrt, exp2, positionViewDirection } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
+const _clearColor = /*@__PURE__*/ new Color( 1, 0.5, 0.5 );
 
 // From Activision GTAO paper: https://www.activision.com/cdn/research/s2016_pbs_activision_occlusion.pptx
 const _temporalRotations = [ 60, 300, 180, 240, 120, 0 ];
@@ -36,10 +37,13 @@ let _rendererState;
  *
  * // apply the ambient occlusion to the scene
  *
- * scenePass.contextNode = builtinAOContext( aoPassOutput.sample( screenUV ).r );
+ * scenePass.contextNode = aoPass.getLightingContext();
  *
  * renderPipeline.outputNode = scenePass;
  * ```
+ *
+ * The output texture stores visibility in R and the encoded view-space bent-normal offset in GBA.
+ * getLightingContext() also uses the bent normal for indirect specular occlusion.
  *
  * Reference: [Practical Real-Time Strategies for Accurate Indirect Occlusion](https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%20VERSION_COLOR.pdf).
  *
@@ -105,7 +109,7 @@ class GTAONode extends Node {
 		 * @private
 		 * @type {RenderTarget}
 		 */
-		this._aoRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, format: RedFormat } );
+		this._aoRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, format: RGBAFormat, type: HalfFloatType } );
 		this._aoRenderTarget.texture.name = 'GTAONode.AO';
 
 		// uniforms
@@ -306,13 +310,59 @@ class GTAONode extends Node {
 	}
 
 	/**
-	 * Returns the result of the effect as a texture node.
+	 * Returns the packed result: ambient visibility in R and bent-normal offset in GBA.
+	 * Decode with `normalize( normal + gba * 4 - 2 )` using the receiving surface normal.
 	 *
 	 * @return {PassTextureNode} A texture node that represents the result of the effect.
 	 */
 	getTextureNode() {
 
 		return this._textureNode;
+
+	}
+
+	/**
+	 * Returns the view-space bent normal, pointing toward the unoccluded hemisphere.
+	 * The output texture stores AO in R and the encoded bent-normal offset in GBA.
+	 *
+	 * @param {Node<vec2>} [uvNode=screenUV] - Sampling coordinates.
+	 * @param {?Node<vec3>} [normalNode=null] - Receiving surface normal in view space. Defaults to the normal guide.
+	 * @return {Node<vec3>} The normalized bent normal.
+	 */
+	getBentNormalNode( uvNode = screenUV, normalNode = null ) {
+
+		const normal = normalNode ?? ( this.normalNode !== null ? this.normalNode.sample( uvNode ).rgb.normalize() : getNormalFromDepth( uvNode, this.depthNode.value, this._cameraProjectionMatrixInverse ) );
+		return this._textureNode.sample( uvNode ).gba.sub( 0.5 ).mul( 4 ).add( normal ).normalize();
+
+	}
+
+	/**
+	 * Applies GTAO to indirect lighting, using bent normals for specular occlusion.
+	 * Transparent materials retain their own occlusion. Direct lighting is unaffected.
+	 * The visibility cone uses the AO after `scale`, so it is cosine-weighted only when `scale` is `1`.
+	 *
+	 * @param {Node<vec2>} [uvNode=screenUV] - Sampling coordinates.
+	 * @return {ContextNode} A context for a scene pass or material.
+	 */
+	getLightingContext( uvNode = screenUV ) {
+
+		const visibility = this._textureNode.sample( uvNode ).r;
+
+		return context( {
+			getAO: ( inputNode, { material } ) => {
+
+				if ( material.transparent === true ) return inputNode;
+				return inputNode !== null ? inputNode.mul( visibility ) : visibility;
+
+			},
+			getSO: ( { node, normal, roughness }, { material, context } ) => {
+
+				if ( material.transparent === true ) return node;
+				const bentNormal = this.getBentNormalNode( uvNode, normal );
+				return specularOcclusion( context.ambientOcclusion, bentNormal, normal, reflect( positionViewDirection.negate(), normal ), roughness );
+
+			}
+		} );
 
 	}
 
@@ -380,9 +430,9 @@ class GTAONode extends Node {
 		_quadMesh.material = this._material;
 		_quadMesh.name = 'AO';
 
-		// clear
+		// Clear to full visibility with a neutral bent-normal offset.
 
-		renderer.setClearColor( 0xffffff, 1 );
+		renderer.setClearColor( _clearColor, 0.5 );
 
 		// ao
 
@@ -481,6 +531,7 @@ class GTAONode extends Node {
 			const invSteps = 1 / STEPS;
 
 			const ao = float( 0 ).toVar();
+			const bentNormal = viewNormal.toVar();
 
 			// Each iteration analyzes one vertical "slice" of the 3D space around the fragment.
 
@@ -590,12 +641,33 @@ class GTAONode extends Node {
 				// |projN| is the foreshortening weight from the per-slice normal projection.
 				ao.addAssign( projNLen.mul( a ) );
 
+				// Bent normal: cosine-weighted first moment of the visible slice (GTAO paper, Algorithm 2).
+				// Subtracting the open slice from N removes quadrature bias at low direction counts.
+				const moment = ( h ) => {
+
+					const c = cos( h );
+					const s = sin( h );
+					const c3 = c.mul( c ).mul( c );
+					const s3 = s.mul( s ).mul( s );
+					return viewDir.mul( nCos.mul( c3 ).negate().add( nSin.mul( s3 ) ).div( 3 ) )
+						.add( sliceTangent.mul( nCos.mul( s3 ).div( 3 ).add( nSin.mul( c.negate().add( c3.div( 3 ) ) ) ) ) );
+
+				};
+
+				const openPos = angleN.add( PI.div( 2 ) );
+				const openNeg = angleN.sub( PI.div( 2 ) );
+				bentNormal.addAssign( moment( hPos ).add( moment( hNeg ) ).sub( moment( openPos ) ).sub( moment( openNeg ) ).mul( projNLen.mul( 1.5 / DIRECTIONS ) ) );
+
 			} );
 
 			ao.assign( clamp( ao.div( DIRECTIONS ), 0, 1 ) );
 			ao.assign( pow( ao, this.scale ) );
 
-			return ao;
+			// Keep the moment in the surface hemisphere, including fully occluded pixels.
+			bentNormal.addAssign( viewNormal.mul( dot( bentNormal, viewNormal ).negate().max( 0 ).add( 0.0001 ) ) );
+			// Preserve receiving surface detail when interpolating the coarse bent normal.
+			// Half float represents the neutral offset exactly.
+			return vec4( ao, normalize( bentNormal ).sub( viewNormal ).mul( 0.25 ).add( 0.5 ) );
 
 		} );
 
@@ -608,7 +680,7 @@ class GTAONode extends Node {
 
 		//
 
-		return this._textureNode;
+		return this._textureNode.r;
 
 	}
 
@@ -739,3 +811,71 @@ function generateMagicSquare( size ) {
  * @returns {GTAONode}
  */
 export const ao = ( depthNode, normalNode, camera ) => new GTAONode( nodeObject( depthNode ), nodeObject( normalNode ), camera );
+
+/**
+ * Solid angle of the intersection of two spherical caps (Oat and Sander 2007, Mazonka 2012).
+ *
+ * @private
+ * @param {Node<float>} r1 - Aperture of the first cap in radians.
+ * @param {Node<float>} r2 - Aperture of the second cap in radians.
+ * @param {Node<float>} d - Angle between the cap centers in radians.
+ * @return {Node<float>} The solid angle.
+ */
+const sphericalCapIntersection = /*@__PURE__*/ Fn( ( [ r1, r2, d ] ) => {
+
+	const cos1 = cos( r1 );
+	const cos2 = cos( r2 );
+	const area = float( 0 ).toVar();
+
+	If( d.lessThanEqual( abs( r1.sub( r2 ) ) ), () => {
+
+		area.assign( max( cos1, cos2 ).oneMinus().mul( 2 * Math.PI ) );
+
+	} ).ElseIf( d.lessThan( r1.add( r2 ) ), () => {
+
+		const sin1 = sin( r1 );
+		const sin2 = sin( r2 );
+		const sinD = sin( d );
+		const cosD = cos( d );
+		const a = acos( cos2.sub( cos1.mul( cosD ) ).div( sin1.mul( sinD ).max( 1e-6 ) ).clamp( - 1, 1 ) );
+		const b = acos( cos1.sub( cos2.mul( cosD ) ).div( sin2.mul( sinD ).max( 1e-6 ) ).clamp( - 1, 1 ) );
+		const c = acos( cosD.sub( cos1.mul( cos2 ) ).div( sin1.mul( sin2 ).max( 1e-6 ) ).clamp( - 1, 1 ) );
+		area.assign( PI.sub( a.mul( cos1 ) ).sub( b.mul( cos2 ) ).sub( c ).mul( 2 ) );
+
+	} );
+
+	return area;
+
+} );
+
+/**
+ * Cone-cone specular occlusion (GTSO) from GTAO, Section 6 and Appendix B.
+ * All directions must be normalized and in the same coordinate space.
+ *
+ * Unlike the paper, the visible part of the specular cone is divided by its part above the
+ * surface rather than by the whole cone, so unoccluded surfaces keep their grazing reflections.
+ *
+ * Reference: [Practical Realtime Strategies for Accurate Indirect Occlusion](https://www.iryoku.com/downloads/Practical-Realtime-Strategies-for-Accurate-Indirect-Occlusion.pdf).
+ *
+ * @tsl
+ * @function
+ * @param {Node<float>} visibility - Cosine-weighted ambient visibility in [0, 1].
+ * @param {Node<vec3>} bentNormal - Direction of the visibility cone.
+ * @param {Node<vec3>} normal - Surface normal.
+ * @param {Node<vec3>} reflectionDirection - Specular reflection direction.
+ * @param {Node<float>} roughness - Perceptual roughness in [0, 1].
+ * @return {Node<float>} Specular visibility in [0, 1].
+ */
+export const specularOcclusion = /*@__PURE__*/ Fn( ( [ visibility, bentNormal, normal, reflectionDirection, roughness ] ) => {
+
+	// cone apertures, Eq. 18 and Eq. 26 (the paper's r is GGX alpha)
+
+	const visibilityAperture = acos( sqrt( visibility.clamp().oneMinus() ) );
+	const specularAperture = acos( exp2( roughness.clamp().pow2().pow2().mul( - 3.321928 ) ) ).max( 0.05 );
+
+	const visible = sphericalCapIntersection( visibilityAperture, specularAperture, acos( dot( bentNormal, reflectionDirection ).clamp( - 1, 1 ) ) );
+	const unoccluded = sphericalCapIntersection( PI.div( 2 ), specularAperture, acos( dot( normal, reflectionDirection ).clamp( - 1, 1 ) ) );
+
+	return visible.div( unoccluded.max( 1e-6 ) ).clamp();
+
+} );
