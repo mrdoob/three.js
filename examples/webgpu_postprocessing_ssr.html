@@ -376,7 +376,21 @@
 				'SSR Coverage Filtered': vec4( vec3( filtered.sample( screenUV ).a.mul( ssrStrength ) ), 1 ),
 				'Indirect Specular': resolvedSpecular
 			};
-			renderPipeline.outputNode = views.Beauty;
+			const updateOutput = () => {
+
+				// Debug views must still produce the beauty lighting used next frame.
+				const selected = views[ params.output ];
+				renderPipeline.outputNode = useHistorySource.value && params.output !== 'Beauty' ? Fn( builder => {
+
+					beautyPass.build( builder );
+					return selected;
+
+				} )() : selected;
+				renderPipeline.needsUpdate = true;
+
+			};
+
+			updateOutput();
 
 			//
 
@@ -400,8 +414,7 @@
 			gui.add( params, 'antialiasing', [ 'SMAA', 'TRAA' ] ).onChange( value => {
 
 				views.Beauty = value === 'TRAA' ? traaPass : smaaPass;
-				renderPipeline.outputNode = views[ params.output ];
-				renderPipeline.needsUpdate = true;
+				updateOutput();
 				resetHistory();
 
 			} );
@@ -410,7 +423,7 @@
 
 				useHistorySource.value = value === 'Previous frame';
 				ssrPass.setColorNode( useHistorySource.value ? previousTraceSource : currentTraceSource );
-				renderPipeline.needsUpdate = true;
+				updateOutput();
 				resetHistory();
 
 			} );
@@ -429,10 +442,9 @@
 			ssrFolder.add( params, 'sampling', samplingModes ).onChange( updateParameters );
 			ssrFolder.add( params, 'classify' ).name( 'Skip unused rays' ).onChange( updateParameters );
 			ssrFolder.add( params, 'quality', 0, 1 ).onChange( updateParameters );
-			gui.add( params, 'output', Object.keys( views ) ).onChange( value => {
+			gui.add( params, 'output', Object.keys( views ) ).onChange( () => {
 
-				renderPipeline.outputNode = views[ value ];
-				renderPipeline.needsUpdate = true;
+				updateOutput();
 
 				resetHistory();
 
@@ -538,7 +550,7 @@
 			renderer.initRenderTarget( lightingHistory );
 			renderPipeline.render();
 			// The source is previous beauty lighting, never a same-frame feedback loop.
-			if ( useHistorySource.value && params.output === 'Beauty' ) {
+			if ( useHistorySource.value ) {
 
 				renderer.copyTextureToTexture( beautyPass.getTexture( 'output' ), lightingHistory.texture );
 				renderer.copyTextureToTexture( geometryPass.getTexture( 'depth' ), lightingHistory.depthTexture );
