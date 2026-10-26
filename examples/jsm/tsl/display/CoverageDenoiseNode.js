@@ -217,8 +217,10 @@ class CoverageDenoiseNode extends Node {
 			const centerPosition = viewPosition( coordinate ).toConst();
 			const centerNormal = normal( coordinate ).toConst();
 			const roughness = roughnessAt( coordinate ).toConst();
-			const sum = vec4( 0 ).toVar();
-			const totalWeight = float( 0 ).toVar();
+			// Coverage uses geometry weights only. Hit-distance weights select which
+			// hits share radiance; applying them to coverage would favour misses.
+			const radiance = vec4( 0 ).toVar();
+			const coverage = vec2( 0 ).toVar();
 			const stride = this.radius.mul( roughness.sqrt().max( 0.25 ) );
 			const centerHit = this.hitDistanceNode !== null ? float( this.hitDistanceNode ).toConst() : null;
 			const centerCoverage = this.inputNode.sample( coordinate.mul( inputResolution ).floor().add( 0.5 ).div( inputResolution ) ).a;
@@ -248,15 +250,15 @@ class CoverageDenoiseNode extends Node {
 
 					}
 
-					const weight = hitWeight.mul( depthWeight ).mul( normalWeight ).mul( roughnessWeight ).mul( Math.exp( - 0.5 * ( x * x + y * y ) ) ).mul( inBounds( tapUV ) ).toConst();
-					sum.addAssign( toWeighted( vec4( tap.rgb, tap.a.clamp() ) ).mul( weight ) );
-					totalWeight.addAssign( weight );
+					const weight = depthWeight.mul( normalWeight ).mul( roughnessWeight ).mul( Math.exp( - 0.5 * ( x * x + y * y ) ) ).mul( inBounds( tapUV ) ).toConst();
+					radiance.addAssign( toWeighted( vec4( tap.rgb, tap.a.clamp() ) ).mul( weight.mul( hitWeight ) ) );
+					coverage.addAssign( vec2( tap.a.clamp(), 1 ).mul( weight ) );
 
 				}
 
 			}
 
-			return fromWeighted( sum.div( totalWeight.max( 1e-6 ) ) );
+			return vec4( fromWeighted( radiance ).rgb, coverage.x.div( coverage.y.max( 1e-6 ) ) );
 
 		} );
 
