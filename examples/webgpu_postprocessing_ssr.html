@@ -165,7 +165,7 @@
 			//
 
 			renderer = new THREE.WebGPURenderer();
-			renderer.setPixelRatio( window.devicePixelRatio * params.renderScale );
+			renderer.setPixelRatio( params.renderScale );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.toneMapping = THREE.ACESFilmicToneMapping;
 			renderer.inspector = new Inspector();
@@ -434,7 +434,7 @@
 			const gui = renderer.inspector.createParameters( 'Settings' );
 			gui.add( params, 'renderScale', { '50%': 0.5, '75%': 0.75, '100%': 1 } ).name( 'Render scale' ).onChange( () => {
 
-				renderer.setPixelRatio( window.devicePixelRatio * params.renderScale );
+				renderer.setPixelRatio( params.renderScale );
 				onWindowResize();
 				resetHistory();
 
