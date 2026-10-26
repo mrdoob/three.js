@@ -83,6 +83,7 @@
 			thickness: 0.03,
 			binaryRefine: true,
 			roughness: 1,
+			floorRoughness: 0.2,
 			enabled: true
 		};
 
@@ -144,7 +145,7 @@
 			const floorMaterial = new THREE.MeshStandardMaterial( {
 				color: 0xffffff,
 				metalness: 1,
-				roughness: 0.2
+				roughness: params.floorRoughness
 			} );
 			const floor = new THREE.Mesh( floorGeometry, floorMaterial );
 			floor.rotation.x = - Math.PI / 2;
@@ -197,7 +198,7 @@
 			scene.environmentIntensity = 1.25;
 			pmremGenerator.dispose();
 
-			// Capture the room and display floor once, omitting the camera model.
+			// Capture the room and display floor from a fixed position, omitting the camera model.
 			// The floor uses the original room lighting, avoiding probe feedback.
 			const captureFloor = floor.clone();
 			captureFloor.material = floorMaterial.clone();
@@ -271,23 +272,10 @@
 			const historySource = reprojectedRadiance( texture( lightingHistory.texture ), texture( lightingHistory.depthTexture ), scenePassDepth, sceneNormal, camera, {
 				previousView, previousProjection, previousProjectionInverse, valid: historyValid
 			} );
-			const source = sample( coordinate => Fn( () => {
+			const currentTraceSource = sample( coordinate => scenePassColor.sample( effectDepth.sample( coordinate ).gb ) );
+			const previousTraceSource = sample( coordinate => historySource.sample( effectDepth.sample( coordinate ).gb ) );
 
-				const value = vec4().toVar();
-				If( useHistorySource, () => {
-
-					value.assign( historySource.sample( coordinate ) );
-
-				} ).Else( () => {
-
-					value.assign( scenePassColor.sample( coordinate ) );
-
-				} );
-				return value;
-
-			} )() );
-
-			ssrPass = ssr( sample( coordinate => source.sample( effectDepth.sample( coordinate ).gb ) ), effectDepth, effectNormal, {
+			ssrPass = ssr( currentTraceSource, effectDepth, effectNormal, {
 				camera,
 				stochastic: true,
 				outputCoverage: true,
@@ -421,6 +409,8 @@
 			ssrFolder.add( params, 'reflectionSource', [ 'Current frame', 'Previous frame' ] ).name( 'Reflection source' ).onChange( value => {
 
 				useHistorySource.value = value === 'Previous frame';
+				ssrPass.setColorNode( useHistorySource.value ? previousTraceSource : currentTraceSource );
+				renderPipeline.needsUpdate = true;
 				resetHistory();
 
 			} );
@@ -459,6 +449,15 @@
 			ssrFolder.add( params, 'thickness', 0, 0.05 ).onChange( updateParameters );
 			ssrFolder.add( params, 'binaryRefine' ).name( 'binary refine' ).onChange( updateParameters );
 			ssrFolder.add( params, 'enabled' ).onChange( value => ssrEnabled.value = Number( value ) );
+
+			gui.add( params, 'floorRoughness', 0, 1 ).name( 'Floor roughness' ).onChange( value => {
+
+				floorMaterial.roughness = value;
+				captureFloor.material.roughness = value;
+				cubeCamera.update( renderer, environment );
+				resetHistory();
+
+			} );
 
 			const modelFolder = gui.addFolder( 'Model' );
 			modelFolder.add( params, 'roughness', 0, 1 ).onChange( ( value ) => {

@@ -642,6 +642,19 @@ class SSRNode extends Node {
 	}
 
 	/**
+	 * Changes the radiance source and rebuilds its dependencies. A build-time
+	 * selection avoids rendering unused source passes behind a uniform branch.
+	 *
+	 * @param {Node<vec4>} colorNode - Linear radiance and source validity.
+	 */
+	setColorNode( colorNode ) {
+
+		this.colorNode = nodeObject( colorNode );
+		this._buildSSRMaterial();
+
+	}
+
+	/**
 	 * Rebuilds the SSR material's node graph by re-invoking the fragment `Fn`, which
 	 * re-bakes the compile-time constants ({@link SSRNode#binaryRefine},
 	 * {@link SSRNode#stepExponent}, {@link SSRNode#screenEdgeFadeBlack}) at their current
