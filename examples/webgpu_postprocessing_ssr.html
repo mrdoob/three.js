@@ -59,6 +59,7 @@
 
 		const params = {
 			quality: 1,
+			classify: true,
 			output: 'Beauty',
 			denoise: true,
 			maxFrames: 16,
@@ -243,6 +244,7 @@
 			ssrPass = ssr( scenePassColor, scenePassDepth, sceneNormal, {
 				stochastic: true,
 				outputCoverage: true,
+				traceMaskNode: scenePassMetalRough.g.lessThan( maxRoughness ),
 				noiseNode: samplingNoise,
 				diffuseNode: albedoMetalness,
 				metalnessNode: scenePassMetalRough.r,
@@ -349,6 +351,7 @@
 			ssrFolder.add( params, 'stepExponent', 1, 4, 1 ).onChange( updateParameters );
 			ssrFolder.add( params, 'screenEdgeFade', 0, 0.5 ).onChange( updateParameters );
 			ssrFolder.add( params, 'sampling', samplingModes ).onChange( updateParameters );
+			ssrFolder.add( params, 'classify' ).name( 'Skip unused rays' ).onChange( updateParameters );
 			ssrFolder.add( params, 'quality', 0, 1 ).onChange( updateParameters );
 			gui.add( params, 'output', Object.keys( views ) ).onChange( value => {
 
@@ -396,6 +399,7 @@
 			samplingMode.value = samplingModes.indexOf( params.sampling );
 			ssrPass.useNoiseNode.value = samplingMode.value !== 0;
 			ssrPass.quality.value = params.quality;
+			ssrPass.useTraceMask.value = params.classify;
 			ssrPass.mirrorBias.value = params.mirrorBias;
 			ssrPass.stepExponent = params.stepExponent;
 			ssrPass.maxLuminance.value = params.maxLuminance;

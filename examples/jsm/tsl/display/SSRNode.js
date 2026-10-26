@@ -24,6 +24,7 @@ const MAX_STEPS = 64;
  * @property {boolean} [binaryRefine=false] - Sub-step binary-search refinement of detected hits. Compile-time constant (baked into the shader at construction).
  * @property {boolean} [outputCoverage=false] - Stochastic tracing with external fallback. RGB is BRDF weighted and coverage premultiplied; alpha remains hit distance. Source alpha supplies validity.
  * @property {Node<vec4>} [noiseNode=null] - Samples in [0,1): GGX in xy, march jitter in z, mirror-bias jitter in w. Evaluated at tracing resolution.
+ * @property {Node<bool>} [traceMaskNode=null] - Optional tracing eligibility mask. Requires outputCoverage and external fallback. Rejected texels clear to zero.
  * @property {Camera} [camera=null] - Camera the scene is rendered with. Inferred from the color pass when omitted.
  */
 
@@ -65,7 +66,8 @@ class SSRNode extends Node {
 			diffuseNode = null,
 			binaryRefine = false,
 			outputCoverage = false,
-			noiseNode = null
+			noiseNode = null,
+			traceMaskNode = null
 		} = options;
 
 		let camera = options.camera ?? null;
@@ -75,6 +77,13 @@ class SSRNode extends Node {
 			throw new Error( 'SSRNode: outputCoverage requires stochastic tracing without an environment map.' );
 
 		}
+
+		if ( traceMaskNode !== null && ! outputCoverage ) throw new Error( 'SSRNode: traceMaskNode requires outputCoverage and external fallback.' );
+
+		/** @type {?Node<bool>} Per-texel eligibility, evaluated before sampling or marching. */
+		this.traceMaskNode = traceMaskNode !== null ? nodeObject( traceMaskNode ) : null;
+		/** @type {UniformNode<bool>} Enables the supplied mask without recompilation. */
+		this.useTraceMask = uniform( true );
 
 		/** @type {boolean} Coverage output requires stochastic tracing and external fallback. Fixed at construction. */
 		this.outputCoverage = outputCoverage;
@@ -919,6 +928,9 @@ class SSRNode extends Node {
 		const ssr = Fn( () => {
 
 			if ( this.outputCoverage ) this._coverage.assign( 0 );
+
+			// Targets are cleared each frame, including coverage and hit distance.
+			if ( this.traceMaskNode !== null ) this.useTraceMask.and( this.traceMaskNode.not() ).discard();
 
 			const noise = this.stochastic === true ? sampleMarchNoise( uvNode, this._noiseIndex ).toVar() : null;
 

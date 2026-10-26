@@ -1,5 +1,5 @@
 import { DataTexture, DataUtils, FloatType, NodeMaterial, OrthographicCamera, QuadMesh, RendererUtils, Vector2, Vector3 } from 'three/webgpu';
-import { context, float, texture, vec4 } from 'three/tsl';
+import { context, float, texture, uniform, vec4 } from 'three/tsl';
 import { ssr } from '../../../../examples/jsm/tsl/display/SSRNode.js';
 import { getSharedRenderer } from '../../src/nodes/tsl/gpu-test-utils.js';
 
@@ -57,8 +57,9 @@ export default QUnit.module( 'Addons', () => {
 				// The stripe is slightly nearer than the origin to accommodate the
 				// sampler's minimum GGX alpha, which perturbs a roughness-zero ray.
 				const depth = makeTexture( x => [ projectDepth( x === originX ? - 2 : target( x ) ? - 1.9 : - 1 ), 0, 0, 1 ] );
+				const eligible = uniform( true );
 				const node = ssr( texture( source ), texture( depth ), texture( normal ), {
-					camera, stochastic: true, outputCoverage: true,
+					camera, stochastic: true, outputCoverage: true, traceMaskNode: eligible,
 					metalnessNode: float( 1 ), roughnessNode: float( 0 ), noiseNode: vec4( 0.5 )
 				} );
 				node.quality.value = 1;
@@ -99,6 +100,13 @@ export default QUnit.module( 'Addons', () => {
 					const hit = await renderOrigin();
 					assert.ok( hit[ 0 ] > 0.9 && hit[ 3 ] > 0, 'Fixture hits the lit stripe and preserves distance' );
 					assert.strictEqual( await coverageAtOrigin(), 1, 'A full-validity hit covers the pixel' );
+					eligible.value = false;
+					assert.deepEqual( await renderOrigin(), [ 0, 0, 0, 0 ], 'Masked rays clear radiance and distance' );
+					assert.strictEqual( await coverageAtOrigin(), 0, 'Masked rays clear coverage' );
+					node.useTraceMask.value = false;
+					assert.ok( ( await renderOrigin() )[ 0 ] > 0.9, 'Mask can be disabled without rebuilding' );
+					eligible.value = true;
+					node.useTraceMask.value = true;
 					for ( let i = 0; i < source.image.data.length; i += 4 ) {
 
 						source.image.data[ i ] = 0;
