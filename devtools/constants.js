@@ -13,6 +13,7 @@ Object.assign( globalThis, {
 	MESSAGE_SCROLL_TO_CANVAS: 'scroll-to-canvas',
 	MESSAGE_HIGHLIGHT_OBJECT: 'highlight-object',
 	MESSAGE_UNHIGHLIGHT_OBJECT: 'unhighlight-object',
+	MESSAGE_SELECT_OBJECTS: 'select-objects',
 
 	// Events dispatched by three.js on window.__THREE_DEVTOOLS__
 	EVENT_REGISTER: 'register',
