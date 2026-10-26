@@ -1171,6 +1171,24 @@ class SSRNode extends Node {
 			const d0 = uvPos.mul( this._resolution ).xy.toVar();
 			const d1 = getScreenPosition( d1viewPosition, this._cameraProjectionMatrix ).mul( this._resolution ).toVar();
 
+			// Clip the ray to the screen so the whole step budget lands on visible texels.
+			const extent = d1.sub( d0 ).toVar();
+			const exitT = vec2(
+				extent.x.greaterThanEqual( 0 ).select( this._resolution.x.sub( d0.x ), d0.x ),
+				extent.y.greaterThanEqual( 0 ).select( this._resolution.y.sub( d0.y ), d0.y )
+			).div( extent.abs().max( 1e-6 ) );
+			const clipT = min( exitT.x, exitT.y ).min( 1 ).toConst();
+
+			If( clipT.lessThan( 1 ), () => {
+
+				d1.assign( d0.add( extent.mul( clipT ) ) );
+				// Screen-space interpolation is linear in 1/z for perspective projection.
+				d1viewPosition.assign( this.camera.isPerspectiveCamera
+					? mix( viewPosition.div( viewPosition.z ), d1viewPosition.div( d1viewPosition.z ), clipT ).div( mix( viewPosition.z.reciprocal(), d1viewPosition.z.reciprocal(), clipT ) )
+					: mix( viewPosition, d1viewPosition, clipT ) );
+
+			} );
+
 			const xLen = d1.x.sub( d0.x ).toVar();
 			const yLen = d1.y.sub( d0.y ).toVar();
 
