@@ -519,7 +519,7 @@
 			ssrFolder.add( params, 'sampling', samplingModes ).onChange( updateParameters );
 			ssrFolder.add( params, 'classify' ).name( 'Skip unused rays' ).onChange( updateParameters );
 			ssrFolder.add( params, 'raysPerPixel', [ 1, 2, 4, 8, 16 ] ).name( 'Rays per pixel' ).onChange( updateParameters );
-			ssrFolder.add( params, 'traceSteps', [ 32, 64, 128, 256, 512 ] ).name( 'Steps per ray' ).onChange( updateParameters );
+			ssrFolder.add( params, 'traceSteps', [ 8, 16, 32, 64, 128, 256, 512 ] ).name( 'Steps per ray' ).onChange( updateParameters );
 			ssrFolder.add( params, 'quality', 0, 1 ).onChange( updateParameters );
 			gui.add( params, 'output', Object.keys( views ) ).onChange( () => {
 
