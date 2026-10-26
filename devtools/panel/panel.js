@@ -29,14 +29,35 @@ document.querySelector( '.version' ).textContent = chrome.runtime.getManifest().
 
 // --- Connection ---
 
-const port = chrome.runtime.connect();
+let port = null;
 const intervalId = setInterval( poll, STATE_POLLING_INTERVAL );
+
+// The background script is a service worker, which Chrome stops and restarts, closing the port.
+// The next message connects again, and tells the new one which tab this panel inspects.
+function getPort() {
+
+	if ( port === null ) {
+
+		port = chrome.runtime.connect();
+		port.onMessage.addListener( receive );
+		port.onDisconnect.addListener( () => {
+
+			port = null;
+
+		} );
+		port.postMessage( { name: MESSAGE_INIT, tabId: chrome.devtools.inspectedWindow.tabId } );
+
+	}
+
+	return port;
+
+}
 
 function send( name, data ) {
 
 	try {
 
-		port.postMessage( { name: name, ...data } );
+		getPort().postMessage( { name: name, ...data } );
 
 	} catch ( error ) {
 
@@ -56,18 +77,10 @@ function poll() {
 
 }
 
-send( MESSAGE_INIT, { tabId: chrome.devtools.inspectedWindow.tabId } );
 send( MESSAGE_REQUEST_STATE );
 updateNotice();
 
-port.onDisconnect.addListener( () => {
-
-	clearInterval( intervalId );
-	clearState();
-
-} );
-
-port.onMessage.addListener( ( message ) => {
+function receive( message ) {
 
 	const detail = message.detail;
 
@@ -107,7 +120,7 @@ port.onMessage.addListener( ( message ) => {
 
 	}
 
-} );
+}
 
 // Drop a scene's objects, except the ones a new batch still lists
 function forgetObjects( sceneUuid, keep = new Set() ) {
@@ -173,7 +186,7 @@ function removeFrame( frameId ) {
 
 }
 
-// Clear state when the page navigates or the connection drops
+// Clear state when the page navigates
 function clearState() {
 
 	state.scenes.clear();
