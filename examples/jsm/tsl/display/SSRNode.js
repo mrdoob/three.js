@@ -25,6 +25,7 @@ let _rendererState;
  * @property {boolean} [outputCoverage=false] - Stochastic tracing with external fallback. RGB is BRDF weighted and coverage premultiplied; alpha remains hit distance. Source alpha supplies validity.
  * @property {Node<vec4>} [noiseNode=null] - Samples in [0,1): GGX in xy, march jitter in z, mirror-bias jitter in w. Evaluated at tracing resolution.
  * @property {Node<bool>} [traceMaskNode=null] - Optional tracing eligibility mask. Requires outputCoverage and external fallback. Rejected texels clear to zero.
+ * @property {Node<float>} [hitReactiveNode=null] - Per-hit object-motion rejection mask. Written to coverage G (maximum across rays).
  * @property {Camera} [camera=null] - Camera the scene is rendered with. Inferred from the color pass when omitted.
  */
 
@@ -69,7 +70,8 @@ class SSRNode extends Node {
 			binaryRefine = false,
 			outputCoverage = false,
 			noiseNode = null,
-			traceMaskNode = null
+			traceMaskNode = null,
+			hitReactiveNode = null
 		} = options;
 
 		let camera = options.camera ?? null;
@@ -83,6 +85,8 @@ class SSRNode extends Node {
 		if ( traceMaskNode !== null && ! outputCoverage ) throw new Error( 'SSRNode: traceMaskNode requires outputCoverage and external fallback.' );
 
 		/** @type {?Node<bool>} Per-texel eligibility, evaluated before sampling or marching. */
+		this.hitReactiveNode = hitReactiveNode;
+		this._hitReactive = outputCoverage ? property( 'float' ) : null;
 		this.traceMaskNode = traceMaskNode !== null ? nodeObject( traceMaskNode ) : null;
 		/** @type {UniformNode<bool>} Enables the supplied mask without recompilation. */
 		this.useTraceMask = uniform( true );
@@ -682,22 +686,30 @@ class SSRNode extends Node {
 			const coverage = float( 0 ).toVar();
 			const hitDistance = float( 0 ).toVar();
 			const hitWeight = float( 0 ).toVar();
+			const reactive = float( 0 ).toVar();
 			Loop( { start: int( 0 ), end: count, type: 'int', condition: '<', name: 'ray' }, ( { ray } ) => {
 
 				const value = this._ssrFn( ray ).toVar();
 				const weight = this.outputCoverage ? this._coverage.toConst() : value.a.lessThan( ENV_RAY_LENGTH_THRESHOLD ).select( 1, 0 );
 				radiance.addAssign( value.rgb );
 				coverage.addAssign( weight );
+				if ( this.outputCoverage ) reactive.assign( reactive.max( this._hitReactive ) );
 				hitDistance.addAssign( value.a.min( ENV_RAY_LENGTH_THRESHOLD ).mul( weight ) );
 				hitWeight.addAssign( weight );
 
 			} );
-			if ( this.outputCoverage ) this._coverage.assign( coverage.div( float( count ) ) );
+			if ( this.outputCoverage ) {
+
+				this._coverage.assign( coverage.div( float( count ) ) );
+				this._hitReactive.assign( reactive );
+
+			}
+
 			const distance = hitWeight.greaterThan( 0 ).select( hitDistance.div( hitWeight.max( 1e-6 ) ), float( ENV_RAY_LENGTH ) );
 			return vec4( radiance.div( float( count ) ), distance );
 
 		} )() : this._ssrFn( int( 0 ) );
-		this._ssrMaterial.fragmentNode = this.outputCoverage ? outputStruct( result, vec4( this._coverage ) ) : result;
+		this._ssrMaterial.fragmentNode = this.outputCoverage ? outputStruct( result, vec4( this._coverage, this._hitReactive, 0, 0 ) ) : result;
 		this._ssrMaterial.needsUpdate = true;
 
 	}
@@ -969,7 +981,12 @@ class SSRNode extends Node {
 
 		const ssr = Fn( ( [ rayIndex ] ) => {
 
-			if ( this.outputCoverage ) this._coverage.assign( 0 );
+			if ( this.outputCoverage ) {
+
+				this._coverage.assign( 0 );
+				this._hitReactive.assign( 0 );
+
+			}
 
 			// Targets are cleared each frame, including coverage and hit distance.
 			if ( this.traceMaskNode !== null ) this.useTraceMask.and( this.traceMaskNode.not() ).discard();
@@ -1395,7 +1412,13 @@ class SSRNode extends Node {
 
 					}
 
-					if ( this.outputCoverage ) this._coverage.assign( reflectColor.a );
+					if ( this.outputCoverage ) {
+
+						this._coverage.assign( reflectColor.a );
+						if ( this.hitReactiveNode !== null ) this._hitReactive.assign( float( this.hitReactiveNode.sample( uvS ) ).mul( reflectColor.a.greaterThan( 0 ) ) );
+
+					}
+
 					hit.assign( 1 );
 					const rayLength = this.outputCoverage ? this._coverage.greaterThan( 0 ).select( worldDistance, float( ENV_RAY_LENGTH ) ) : worldDistance;
 					output.assign( vec4( weightedColor, rayLength ) );

@@ -1,4 +1,4 @@
-import { HalfFloatType, Matrix4, Node, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Vector2 } from 'three/webgpu';
+import { FloatType, HalfFloatType, NearestFilter, Matrix4, Node, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Vector2 } from 'three/webgpu';
 import { textureSize, fwidth, Fn, If, context, convertToTexture, float, getViewPosition, isBackgroundDepth, mix, outputStruct, passTexture, property, struct, texture, uniform, velocity as cameraVelocity, unpackRGBToNormal, uv, vec2, vec3, vec4 } from 'three/tsl';
 import { getProjectionJitter, reprojectionStretchConfidence } from '../utils/TAAUtils.js';
 import { ENV_RAY_LENGTH_THRESHOLD } from '../utils/SpecularHelpers.js';
@@ -39,9 +39,11 @@ class CoverageDenoiseNode extends Node {
 	 * @param {TextureNode} options.depth - Device depth.
 	 * @param {TextureNode} options.normal - Packed view normal in RGB, roughness in A.
 	 * @param {TextureNode} options.velocity - Current-minus-previous NDC motion vectors, as produced by `velocity`.
+	 * @param {?Node<float>} [options.surfaceId=null] - Stable per-surface integer identity.
+	 * @param {?Node<float>} [options.reactive=null] - Positive values reject history for moving receivers or reflected objects.
 	 * @param {?Node<float>} [options.hitDistance=null] - World-space SSR hit distance. Omit for diffuse surface reprojection.
 	 */
-	constructor( inputNode, camera, { depth, normal, velocity, hitDistance = null } ) {
+	constructor( inputNode, camera, { depth, normal, velocity, hitDistance = null, surfaceId = null, reactive = null } ) {
 
 		super( 'vec4' );
 		this.inputNode = inputNode;
@@ -50,6 +52,9 @@ class CoverageDenoiseNode extends Node {
 		this.normalNode = normal;
 		this.velocityNode = velocity;
 		this.hitDistanceNode = hitDistance;
+		this.surfaceIdNode = surfaceId;
+		this.reactiveNode = reactive;
+		this.roughnessThreshold = uniform( 0.04 );
 		this.radius = uniform( 1.5 );
 		this.maxFrames = uniform( 16 );
 		this.depthThreshold = uniform( 0.01 );
@@ -66,13 +71,17 @@ class CoverageDenoiseNode extends Node {
 
 		this._spatialTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 		this._target = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, count: 3 } );
+		// Age, roughness, distance and surface identity have independent channels.
+		// Full precision keeps identity comparisons exact; point gathers need no filtering.
+		this._target.textures[ 2 ].type = FloatType;
+		this._target.textures[ 2 ].minFilter = this._target.textures[ 2 ].magFilter = NearestFilter;
 		this._historyTarget = this._target.clone();
 		this._spatialTarget.texture.name = 'CoverageDenoise.spatial';
 		for ( const target of [ this._target, this._historyTarget ] ) {
 
 			target.textures[ 0 ].name = 'CoverageDenoise.radianceCoverage';
 			target.textures[ 1 ].name = 'CoverageDenoise.geometry';
-			target.textures[ 2 ].name = 'CoverageDenoise.age';
+			target.textures[ 2 ].name = 'CoverageDenoise.metadata';
 
 		}
 
@@ -273,6 +282,8 @@ class CoverageDenoiseNode extends Node {
 
 			const surfaceStretch = reprojectionStretchConfidence( surfaceUV, this._resolution ).toConst();
 			const roughness = roughnessAt( coordinate ).toConst();
+			const surfaceId = this.surfaceIdNode !== null ? float( this.surfaceIdNode ).toConst() : float( 0 );
+			const reactive = this.reactiveNode !== null ? float( this.reactiveNode ).toConst() : float( 0 );
 			const curvature = fwidth( worldNormal ).length().mul( this.curvatureScale ).clamp().toConst();
 			const rayLength = this.hitDistanceNode !== null ? float( this.hitDistanceNode ).toConst() : float( 0 );
 			const virtualPosition = position.add( position.normalize().mul( rayLength.min( ENV_RAY_LENGTH_THRESHOLD ) ) );
@@ -297,6 +308,7 @@ class CoverageDenoiseNode extends Node {
 
 						const tapUV = base.add( vec2( x, y ) ).add( 0.5 ).div( this._resolution ).toConst();
 						const geometry = this._historyGeometry.sample( tapUV ).toConst();
+						const metadata = this._historyAge.sample( tapUV ).toConst();
 						// Compare surfaces in the same view-space plane. At grazing angles,
 						// neighboring pixels on one surface can have very different Z values.
 						// A Z-only test rejects that history every time the raster grid jitters.
@@ -304,13 +316,20 @@ class CoverageDenoiseNode extends Node {
 						const tapPosition = getViewPosition( tapUV, clipDepth.z.div( clipDepth.w ), this._previousProjectionInverse );
 						const planeDistance = tapPosition.sub( previousPosition ).dot( previousNormal ).abs();
 						const valid = inBounds( tapUV ).and( worldNormal.dot( geometry.xyz ).greaterThan( 0.9 ) )
-							.and( planeDistance.lessThanEqual( historyTolerance ) );
+							.and( planeDistance.lessThanEqual( historyTolerance ) )
+							.and( roughness.sub( metadata.g ).abs().lessThanEqual( this.roughnessThreshold ) );
+						const identityValid = this.surfaceIdNode !== null ? metadata.a.equal( surfaceId ) : float( 1 );
 						const wx = x === 0 ? fraction.x.oneMinus() : fraction.x;
 						const wy = y === 0 ? fraction.y.oneMinus() : fraction.y;
-						const weight = wx.mul( wy ).mul( valid ).toConst();
+						const bothHits = rayLength.greaterThan( 0 ).and( rayLength.lessThan( ENV_RAY_LENGTH_THRESHOLD ) )
+							.and( metadata.b.greaterThan( 0 ) ).and( metadata.b.lessThan( ENV_RAY_LENGTH_THRESHOLD ) );
+						const distanceScale = rayLength.min( metadata.b ).mul( this.hitDistancePhi ).add( historyTolerance ).max( 1e-4 );
+						const reflectionConfidence = this.hitDistanceNode !== null ? bothHits.select(
+							metadata.b.sub( rayLength ).div( distanceScale ).mul( roughness.oneMinus() ).pow2().negate().exp(), 1 ) : float( 1 );
+						const weight = wx.mul( wy ).mul( valid ).mul( identityValid ).mul( reflectionConfidence ).toConst();
 						sum.addAssign( toWeighted( this._historyColor.sample( tapUV ) ).mul( weight ) );
 						total.addAssign( weight );
-						ageSum.addAssign( this._historyAge.sample( tapUV ).r.mul( weight ) );
+						ageSum.addAssign( metadata.r.mul( weight ) );
 
 					}
 
@@ -320,7 +339,7 @@ class CoverageDenoiseNode extends Node {
 
 			} );
 
-			If( this._historyValid, () => {
+			If( this._historyValid.and( reactive.lessThan( 0.01 ) ), () => {
 
 				const history = gather( surfaceUV ).toVar();
 				if ( this.hitDistanceNode !== null ) {
@@ -413,7 +432,7 @@ class CoverageDenoiseNode extends Node {
 		this._spatialMaterial.needsUpdate = true;
 		this._temporalMaterial.contextNode = context( builder.getSharedContext() );
 		this._temporalMaterial.colorNode = temporal();
-		this._temporalMaterial.outputNode = outputStruct( colorField, geometry(), vec4( ageField, 0, 0, 0 ) );
+		this._temporalMaterial.outputNode = outputStruct( colorField, geometry(), vec4( ageField, roughnessAt( uv() ), this.hitDistanceNode !== null ? float( this.hitDistanceNode ) : float( 0 ), this.surfaceIdNode !== null ? float( this.surfaceIdNode ) : float( 0 ) ) );
 		this._temporalMaterial.needsUpdate = true;
 		return this._textureNode;
 

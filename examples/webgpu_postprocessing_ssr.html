@@ -44,7 +44,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, velocity, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec3, vec4, Fn, If, uv, convertToTexture, uniform, context, cameraWorldMatrix, getViewPosition, diffuseColor, specularColorBlended, specularF90, EnvironmentBRDF, indirectSpecular, environmentSpecular, pmremTexture, texture, } from 'three/tsl';
+		import { pass, mrt, output, normalView, velocity, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec3, vec4, Fn, If, uv, convertToTexture, uniform, context, cameraWorldMatrix, getViewPosition, diffuseColor, specularColorBlended, specularF90, EnvironmentBRDF, indirectSpecular, environmentSpecular, pmremTexture, texture, reference, } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { screenSpaceGBuffer } from 'three/addons/tsl/display/ScreenSpaceGBufferNode.js';
 		import { reprojectedRadiance } from 'three/addons/tsl/display/ReprojectedRadianceNode.js';
@@ -96,6 +96,12 @@
 		const previousView = uniform( new THREE.Matrix4() );
 		const previousProjection = uniform( new THREE.Matrix4() );
 		const previousProjectionInverse = uniform( new THREE.Matrix4() );
+		const surfaceStates = new WeakMap();
+		let nextSurfaceId = 1;
+		const lastCameraPosition = new THREE.Vector3();
+		const lastCameraQuaternion = new THREE.Quaternion();
+		const lastProjection = new THREE.Matrix4();
+		let cameraHistoryValid = false;
 		const currentView = new THREE.Matrix4();
 		const currentProjection = new THREE.Matrix4();
 		const currentProjectionInverse = new THREE.Matrix4();
@@ -138,6 +144,7 @@
 
 				model.position.y = 0.1;
 				scene.add( model );
+				resetHistory();
 
 			} );
 
@@ -234,7 +241,7 @@
 				output: vec4( packNormalToRGB( normalView ), roughness ),
 				albedo: vec4( diffuseColor.rgb, metalness ),
 				reflectance: vec4( specularColorBlended, specularF90 ),
-				velocity
+				velocity: vec4( velocity, reference( 'userData.ssrSurfaceId', 'float' ), reference( 'userData.ssrReactive', 'float' ) )
 			} ) );
 			const scenePassNormal = geometryPass.getTextureNode().toInspector( 'Normal-Roughness' );
 			const albedoMetalness = geometryPass.getTextureNode( 'albedo' );
@@ -276,7 +283,14 @@
 				previousView, previousProjection, previousProjectionInverse, valid: historyValid
 			} );
 			const currentTraceSource = sample( coordinate => scenePassColor.sample( effectDepth.sample( coordinate ).gb ) );
-			const previousTraceSource = sample( coordinate => historySource.sample( effectDepth.sample( coordinate ).gb ) );
+			const previousTraceSource = sample( coordinate => {
+
+				const sourceUV = effectDepth.sample( coordinate ).gb;
+				const value = historySource.sample( sourceUV );
+				// This source validates static geometry; moving objects use fallback.
+				return vec4( value.rgb, value.a.mul( motion.sample( sourceUV ).w.oneMinus() ) );
+
+			} );
 
 			ssrPass = ssr( currentTraceSource, effectDepth, effectNormal, {
 				camera,
@@ -288,6 +302,7 @@
 				metalnessNode: effectMaterial.a,
 				specularNode: effectReflectance.rgb,
 				specularF90Node: effectReflectance.a,
+				hitReactiveNode: sample( coordinate => motion.sample( effectDepth.sample( coordinate ).gb ).w ),
 				roughnessNode: effectNormalRoughness.a
 			} ).toInspector( 'SSR (BRDF weighted)' );
 
@@ -323,6 +338,8 @@
 				depth: scenePassDepth,
 				normal: scenePassNormal,
 				velocity: motion,
+				surfaceId: sample( coordinate => motion.sample( coordinate ).z ),
+				reactive: sample( coordinate => motion.sample( coordinate ).w.max( ssrPass.getCoverageNode().sample( coordinate ).g ) ),
 				hitDistance: sample( uv => resolveSSRHitDistance( ssrPass.getTextureNode().sample( uv ).a, coverage.sample( uv ) ) )
 			} );
 			const filtered = ssrDenoise.getTextureNode();
@@ -465,10 +482,20 @@
 
 			} );
 			ssrFolder.add( params, 'maxDistance', 0, 10 ).onChange( updateParameters );
-			ssrFolder.add( params, 'intensity', 0, 1 ).name( 'SSR strength' ).onChange( value => ssrStrength.value = value );
+			ssrFolder.add( params, 'intensity', 0, 1 ).name( 'SSR strength' ).onChange( value => {
+
+				ssrStrength.value = value;
+				resetHistory();
+
+			} );
 			ssrFolder.add( params, 'thickness', 0, 0.05 ).onChange( updateParameters );
 			ssrFolder.add( params, 'binaryRefine' ).name( 'binary refine' ).onChange( updateParameters );
-			ssrFolder.add( params, 'enabled' ).onChange( value => ssrEnabled.value = Number( value ) );
+			ssrFolder.add( params, 'enabled' ).onChange( value => {
+
+				ssrEnabled.value = Number( value );
+				resetHistory();
+
+			} );
 
 			gui.add( params, 'floorRoughness', 0, 1 ).name( 'Floor roughness' ).onChange( value => {
 
@@ -545,9 +572,42 @@
 
 		}
 
+		function updateSceneHistory() {
+
+			scene.updateMatrixWorld();
+			scene.traverse( object => {
+
+				if ( ! object.isMesh ) return;
+				const materials = Array.isArray( object.material ) ? object.material : [ object.material ];
+				const materialState = materials.map( material => [ material.uuid, material.version, material.roughness, material.metalness, material.ior, material.specularIntensity, material.opacity, material.color?.getHex(), material.specularColor?.getHex() ].join( ':' ) ).join( ',' );
+				const previous = surfaceStates.get( object );
+				object.userData.ssrReactive = previous && previous.matrix.equals( object.matrixWorld ) ? 0 : 1;
+				if ( ! previous ) {
+
+					object.userData.ssrSurfaceId = nextSurfaceId ++;
+					surfaceStates.set( object, { matrix: object.matrixWorld.clone(), materialState } );
+
+				} else {
+
+					if ( previous.materialState !== materialState ) resetHistory();
+					previous.matrix.copy( object.matrixWorld );
+					previous.materialState = materialState;
+
+				}
+
+			} );
+			if ( cameraHistoryValid && ( camera.position.distanceTo( lastCameraPosition ) > 0.5 || camera.quaternion.angleTo( lastCameraQuaternion ) > Math.PI / 6 || ! lastProjection.equals( camera.projectionMatrix ) ) ) resetHistory();
+			lastCameraPosition.copy( camera.position );
+			lastCameraQuaternion.copy( camera.quaternion );
+			lastProjection.copy( camera.projectionMatrix );
+			cameraHistoryValid = true;
+
+		}
+
 		function animate() {
 
 			controls.update();
+			updateSceneHistory();
 
 			const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
 			if ( lightingHistory.width !== size.x || lightingHistory.height !== size.y ) {

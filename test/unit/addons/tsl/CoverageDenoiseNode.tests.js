@@ -41,12 +41,14 @@ async function fixture( assert, run ) {
 	const depth = makeTexture( () => [ 0.5, 0, 0, 0 ] );
 	const normal = makeTexture( () => [ 0.5, 0.5, 1, 1 ] );
 	const velocity = makeTexture( () => [ 0, 0, 0, 0 ] );
+	const surfaceId = makeTexture( () => [ 1, 0, 0, 0 ] );
+	const reactive = makeTexture( () => [ 0, 0, 0, 0 ] );
 	const hitDistance = makeTexture( () => [ 1, 0, 0, 0 ] );
 	const camera = new PerspectiveCamera( 50, 1, 0.1, 100 );
 	camera.coordinateSystem = renderer.coordinateSystem;
 	camera.updateProjectionMatrix();
 	camera.updateMatrixWorld();
-	const node = coverageDenoise( texture( input ), camera, { depth: texture( depth ), normal: texture( normal ), velocity: texture( velocity ), hitDistance: texture( hitDistance ) } );
+	const node = coverageDenoise( texture( input ), camera, { depth: texture( depth ), normal: texture( normal ), velocity: texture( velocity ), hitDistance: texture( hitDistance ), surfaceId: texture( surfaceId ).r, reactive: texture( reactive ).r } );
 	node.radius.value = 1;
 	const material = new NodeMaterial();
 	material.fragmentNode = node;
@@ -102,7 +104,7 @@ async function fixture( assert, run ) {
 
 		};
 
-		await run( { node, renderer, input, depth, normal, velocity, hitDistance, camera, update, render, compose } );
+		await run( { node, renderer, input, depth, normal, velocity, hitDistance, surfaceId, reactive, camera, update, render, compose } );
 
 	} finally {
 
@@ -123,6 +125,35 @@ export default QUnit.module( 'Addons', () => {
 	QUnit.module( 'TSL', () => {
 
 		QUnit.module( 'CoverageDenoiseNode', () => {
+
+			QUnit.test( 'roughness, surface identity and reactive reflected motion invalidate history', async assert => {
+
+				await fixture( assert, async ( { node, renderer, normal, surfaceId, reactive, update, render } ) => {
+
+					node.hitDistanceNode = null;
+					update( () => [ 0, 0, 0, 1 ] );
+					for ( let frame = 0; frame < 16; frame ++ ) await render();
+					const age = async () => ( await renderer.readRenderTargetPixelsAsync( node.getRenderTarget(), 8, 8, 1, 1, 2 ) )[ 0 ];
+					for ( let i = 3; i < normal.image.data.length; i += 4 ) normal.image.data[ i ] = 0.2;
+					normal.needsUpdate = true;
+					await render();
+					assert.strictEqual( await age(), 1, 'Changed roughness rejects otherwise identical geometry' );
+					await render();
+					assert.ok( Math.abs( await age() - 2 ) < 0.01, 'Stable black reflections accumulate normally' );
+					for ( let i = 0; i < surfaceId.image.data.length; i += 4 ) surfaceId.image.data[ i ] = 2;
+					surfaceId.needsUpdate = true;
+					await render();
+					assert.strictEqual( await age(), 1, 'A different coplanar surface rejects history' );
+					await render();
+					for ( let i = 0; i < reactive.image.data.length; i += 4 ) reactive.image.data[ i ] = 1;
+					reactive.needsUpdate = true;
+					const result = await render();
+					assert.strictEqual( await age(), 1, 'Moving reflected objects reject stale reflection history' );
+					assert.ok( result.every( ( value, i ) => value === ( i % 4 === 3 ? 1 : 0 ) ), 'Motion rejection preserves valid black coverage' );
+
+				} );
+
+			} );
 
 			QUnit.test( 'hit-distance edges preserve valid black reflections on a flat receiver', async assert => {
 
@@ -163,7 +194,7 @@ export default QUnit.module( 'Addons', () => {
 
 						velocity.needsUpdate = true;
 						await render();
-						const age = DataUtils.fromHalfFloat( ( await renderer.readRenderTargetPixelsAsync( node.getRenderTarget(), 8, 8, 1, 1, 2 ) )[ 0 ] );
+						const age = ( await renderer.readRenderTargetPixelsAsync( node.getRenderTarget(), 8, 8, 1, 1, 2 ) )[ 0 ];
 						assert.ok( Math.abs( age - ( enabled ? 2 : 16 ) ) < 0.03, `Magnified history carries less evidence, independently of black lighting; age=${ age }` );
 
 					} );
@@ -244,7 +275,7 @@ export default QUnit.module( 'Addons', () => {
 
 						normal.needsUpdate = velocity.needsUpdate = true;
 						const data = await render();
-						const age = DataUtils.fromHalfFloat( ( await renderer.readRenderTargetPixelsAsync( node.getRenderTarget(), 8, 8, 1, 1, 2 ) )[ 0 ] );
+						const age = ( await renderer.readRenderTargetPixelsAsync( node.getRenderTarget(), 8, 8, 1, 1, 2 ) )[ 0 ];
 						const expected = enabled ? 9 : 16;
 						assert.ok( Math.abs( age - expected ) < 0.02, `Half the bilinear support carries half the previous age when enabled; actual=${ age }` );
 						assert.ok( data.every( value => value === 0 ), 'Confidence changes age independently of zero lighting coverage' );
@@ -317,7 +348,7 @@ export default QUnit.module( 'Addons', () => {
 					const readAge = async () => {
 
 						const values = await renderer.readRenderTargetPixelsAsync( node.getRenderTarget(), 8, 8, 1, 1, 2 );
-						return DataUtils.fromHalfFloat( values[ 0 ] );
+						return values[ 0 ];
 
 					};
 
@@ -489,7 +520,7 @@ export default QUnit.module( 'Addons', () => {
 					velocity.needsUpdate = true;
 					await render();
 					const data = await renderer.readRenderTargetPixelsAsync( node.getRenderTarget(), 8, 8, 1, 1, 2 );
-					const age = DataUtils.fromHalfFloat( data[ 0 ] );
+					const age = data[ 0 ];
 					assert.ok( Math.abs( age - 16 ) < 0.02, `Both coplanar history taps retain their evidence; actual age=${ age }` );
 
 				} );
