@@ -70,7 +70,7 @@ class LightingContextNode extends ContextNode {
 	 * radiance: Node<vec3>,
 	 * irradiance: Node<vec3>,
 	 * iblIrradiance: Node<vec3>,
- * iblDiffuseIrradiance: Node<vec3>,
+	 * iblDiffuseIrradiance: Node<vec3>,
 	 * ambientOcclusion: Node<float>,
 	 * reflectedLight: {directDiffuse: Node<vec3>, directSpecular: Node<vec3>, indirectDiffuse: Node<vec3>, indirectSpecular: Node<vec3>},
 	 * backdrop: Node<vec3>,

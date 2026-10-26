@@ -64,7 +64,7 @@ export default QUnit.module( 'Nodes', () => {
 
 	QUnit.module( 'Lighting', () => {
 
-		QUnit.module( 'IndirectLightingNode', () => {
+		QUnit.module( 'IndirectSpecularNode', () => {
 
 			QUnit.test( 'Coverage composition, darkness, missing data, nesting and specular queries', async assert => {
 

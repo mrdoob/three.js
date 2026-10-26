@@ -103,13 +103,18 @@ class EnvironmentNode extends LightingNode {
 
 		}
 
-		// Resolve the broad lobe separately for specular multiple scattering.
-		// Ordinary environment diffuse lighting keeps its own irradiance.
+		// diffuse lighting keeps the environment irradiance, multiple scattering uses the specular chain
+
 		const irradiance = sampleSpecular( createIrradianceContext( normalWorld ) ).mul( Math.PI );
 		const isolateIrradiance = isolate( irradiance );
-		const diffuseIrradiance = envNode
-			? ( specular ? isolate( envNode.context( createIrradianceContext( normalWorld ) ).mul( Math.PI ).mul( materialEnvIntensity ) ) : isolateIrradiance )
-			: vec3( 0 );
+
+		let diffuseIrradiance = isolateIrradiance;
+
+		if ( specular ) {
+
+			diffuseIrradiance = envNode ? isolate( envNode.context( createIrradianceContext( normalWorld ) ).mul( Math.PI ).mul( materialEnvIntensity ) ) : vec3( 0 );
+
+		}
 
 		//
 
