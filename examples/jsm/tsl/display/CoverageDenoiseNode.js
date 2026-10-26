@@ -93,7 +93,6 @@ class CoverageDenoiseNode extends Node {
 		this._previousProjection = uniform( new Matrix4() );
 		this._previousProjectionInverse = uniform( new Matrix4() );
 		this._historyValid = uniform( false );
-		this._frames = 0;
 
 	}
 
@@ -101,7 +100,6 @@ class CoverageDenoiseNode extends Node {
 	reset() {
 
 		this._historyValid.value = false;
-		this._frames = 0;
 
 	}
 
@@ -174,7 +172,6 @@ class CoverageDenoiseNode extends Node {
 			this._previousProjection.value.copy( this.camera.projectionMatrix );
 			this._previousProjectionInverse.value.copy( this.camera.projectionMatrixInverse );
 			this._historyValid.value = true;
-			this._frames ++;
 
 		} finally {
 
