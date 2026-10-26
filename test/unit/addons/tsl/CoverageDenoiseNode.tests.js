@@ -1,5 +1,5 @@
 import { DataTexture, DataUtils, FloatType, HalfFloatType, LinearFilter, Matrix4, NodeMaterial, PerspectiveCamera, QuadMesh, RenderTarget, RendererUtils, Vector2 } from 'three/webgpu';
-import { context, float, indirectSpecular, texture, vec4 } from 'three/tsl';
+import { context, indirectSpecular, texture, vec4 } from 'three/tsl';
 import { coverageDenoise } from '../../../../examples/jsm/tsl/display/CoverageDenoiseNode.js';
 import { getSharedRenderer } from '../../src/nodes/tsl/gpu-test-utils.js';
 
@@ -41,11 +41,12 @@ async function fixture( assert, run ) {
 	const depth = makeTexture( () => [ 0.5, 0, 0, 0 ] );
 	const normal = makeTexture( () => [ 0.5, 0.5, 1, 1 ] );
 	const velocity = makeTexture( () => [ 0, 0, 0, 0 ] );
+	const hitDistance = makeTexture( () => [ 1, 0, 0, 0 ] );
 	const camera = new PerspectiveCamera( 50, 1, 0.1, 100 );
 	camera.coordinateSystem = renderer.coordinateSystem;
 	camera.updateProjectionMatrix();
 	camera.updateMatrixWorld();
-	const node = coverageDenoise( texture( input ), camera, { depth: texture( depth ), normal: texture( normal ), velocity: texture( velocity ), hitDistance: float( 1 ) } );
+	const node = coverageDenoise( texture( input ), camera, { depth: texture( depth ), normal: texture( normal ), velocity: texture( velocity ), hitDistance: texture( hitDistance ) } );
 	node.radius.value = 1;
 	const material = new NodeMaterial();
 	material.fragmentNode = node;
@@ -101,7 +102,7 @@ async function fixture( assert, run ) {
 
 		};
 
-		await run( { node, renderer, input, depth, normal, velocity, camera, update, render, compose } );
+		await run( { node, renderer, input, depth, normal, velocity, hitDistance, camera, update, render, compose } );
 
 	} finally {
 
@@ -122,6 +123,54 @@ export default QUnit.module( 'Addons', () => {
 	QUnit.module( 'TSL', () => {
 
 		QUnit.module( 'CoverageDenoiseNode', () => {
+
+			QUnit.test( 'hit-distance edges preserve valid black reflections on a flat receiver', async assert => {
+
+				await fixture( assert, async ( { node, hitDistance, update, render } ) => {
+
+					node.maxFrames.value = 1;
+					update( x => x < size / 2 ? [ 4, 2, 1, 1 ] : [ 0, 0, 0, 1 ] );
+					for ( let y = 0; y < size; y ++ ) {
+
+						for ( let x = 0; x < size; x ++ ) hitDistance.image.data[ 4 * ( x + size * y ) ] = x < size / 2 ? 1 : 8;
+
+					}
+
+					hitDistance.needsUpdate = true;
+					const data = await render();
+					const pixel = 4 * ( size / 2 + size * size / 2 );
+					assert.ok( data[ pixel ] < 0.01, 'A distant bright reflection does not bleed into a black reflection on the same plane' );
+					assert.strictEqual( data[ pixel + 3 ], 1, 'Black reflection retains full coverage' );
+
+				} );
+
+			} );
+
+			for ( const enabled of [ true, false ] ) {
+
+				QUnit.test( `anisotropic history magnification with stretch rejection ${ enabled ? 'enabled' : 'disabled' }`, async assert => {
+
+					await fixture( assert, async ( { node, renderer, velocity, render } ) => {
+
+						node.hitDistanceNode = null;
+						node.useStretchRejection.value = enabled;
+						for ( let frame = 0; frame < 16; frame ++ ) await render();
+						for ( let y = 0; y < size; y ++ ) {
+
+							for ( let x = 0; x < size; x ++ ) velocity.image.data[ 4 * ( x + size * y ) ] = ( 2 * ( x + 0.5 ) / size - 1 ) * 0.75;
+
+						}
+
+						velocity.needsUpdate = true;
+						await render();
+						const age = DataUtils.fromHalfFloat( ( await renderer.readRenderTargetPixelsAsync( node.getRenderTarget(), 8, 8, 1, 1, 2 ) )[ 0 ] );
+						assert.ok( Math.abs( age - ( enabled ? 2 : 16 ) ) < 0.03, `Magnified history carries less evidence, independently of black lighting; age=${ age }` );
+
+					} );
+
+				} );
+
+			}
 
 			QUnit.test( 'a compiled consumer follows consecutive outputs without history copies', async assert => {
 

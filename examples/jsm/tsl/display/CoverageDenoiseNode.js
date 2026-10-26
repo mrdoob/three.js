@@ -1,6 +1,6 @@
-import { HalfFloatType, Matrix4, Node, NodeMaterial, NodeUpdateType, QuadMesh, RedFormat, RenderTarget, RendererUtils, Vector2 } from 'three/webgpu';
-import { textureSize, Fn, If, context, convertToTexture, float, getViewPosition, isBackgroundDepth, mix, outputStruct, passTexture, property, struct, texture, uniform, velocity as cameraVelocity, unpackRGBToNormal, uv, vec2, vec3, vec4 } from 'three/tsl';
-import { getProjectionJitter } from '../utils/TAAUtils.js';
+import { HalfFloatType, Matrix4, Node, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Vector2 } from 'three/webgpu';
+import { textureSize, fwidth, Fn, If, context, convertToTexture, float, getViewPosition, isBackgroundDepth, mix, outputStruct, passTexture, property, struct, texture, uniform, velocity as cameraVelocity, unpackRGBToNormal, uv, vec2, vec3, vec4 } from 'three/tsl';
+import { getProjectionJitter, reprojectionStretchConfidence } from '../utils/TAAUtils.js';
 import { ENV_RAY_LENGTH_THRESHOLD } from '../utils/SpecularHelpers.js';
 
 const historySample = struct( { color: 'vec4', weight: 'float', age: 'float' } );
@@ -53,6 +53,12 @@ class CoverageDenoiseNode extends Node {
 		this.radius = uniform( 1.5 );
 		this.maxFrames = uniform( 16 );
 		this.depthThreshold = uniform( 0.01 );
+		/** Relative hit-distance difference accepted by the spatial filter. */
+		this.hitDistancePhi = uniform( 0.2 );
+		/** Curvature and reflection-distance variation reduce virtual history trust. */
+		this.curvatureScale = uniform( 20 );
+		this.reflectionEdgeScale = uniform( 4 );
+		this.useStretchRejection = uniform( true );
 		// Rejected bilinear taps reduce supported history evidence even after
 		// the surviving radiance has been normalized. Disable to compare behavior.
 		this.useGatherConfidence = uniform( true );
@@ -60,7 +66,6 @@ class CoverageDenoiseNode extends Node {
 
 		this._spatialTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 		this._target = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, count: 3 } );
-		this._target.textures[ 2 ].format = RedFormat;
 		this._historyTarget = this._target.clone();
 		this._spatialTarget.texture.name = 'CoverageDenoise.spatial';
 		for ( const target of [ this._target, this._historyTarget ] ) {
@@ -189,6 +194,7 @@ class CoverageDenoiseNode extends Node {
 		};
 
 		const normal = coordinate => unpackRGBToNormal( this.normalNode.sample( guideCoordinate( coordinate ) ).rgb );
+		const hitDistanceAt = coordinate => this.hitDistanceNode.isSampleNode || this.hitDistanceNode.isTextureNode ? this.hitDistanceNode.sample( coordinate ) : this.hitDistanceNode;
 		const roughnessAt = coordinate => this.normalNode.sample( guideCoordinate( coordinate ) ).a;
 		const toWeighted = value => vec4( value.rgb.mul( value.a ), value.a );
 		const fromWeighted = value => vec4( value.a.greaterThan( 1e-6 ).select( value.rgb.div( value.a.max( 1e-6 ) ), vec3( 0 ) ), value.a.clamp() );
@@ -205,6 +211,8 @@ class CoverageDenoiseNode extends Node {
 			const sum = vec4( 0 ).toVar();
 			const totalWeight = float( 0 ).toVar();
 			const stride = this.radius.mul( roughness.sqrt().max( 0.25 ) );
+			const centerHit = this.hitDistanceNode !== null ? float( this.hitDistanceNode ).toConst() : null;
+			const centerCoverage = this.inputNode.sample( coordinate.mul( inputResolution ).floor().add( 0.5 ).div( inputResolution ) ).a;
 			const tolerance = centerPosition.z.abs().mul( this.depthThreshold ).max( 0.001 );
 
 			for ( let y = - 1; y <= 1; y ++ ) {
@@ -219,7 +227,19 @@ class CoverageDenoiseNode extends Node {
 					const depthWeight = planeDistance.div( tolerance ).pow2().negate().exp();
 					const normalWeight = normal( tapUV ).dot( centerNormal ).max( 0 ).pow( 32 );
 					const roughnessWeight = roughnessAt( tapUV ).sub( roughness ).abs().mul( - 64 ).exp();
-					const weight = depthWeight.mul( normalWeight ).mul( roughnessWeight ).mul( Math.exp( - 0.5 * ( x * x + y * y ) ) ).mul( inBounds( tapUV ) ).toConst();
+					let hitWeight = float( 1 );
+					if ( this.hitDistanceNode !== null ) {
+
+						const tapHit = float( hitDistanceAt( tapUV ) );
+						const bothHits = centerCoverage.greaterThan( 0 ).and( tap.a.greaterThan( 0 ) )
+							.and( centerHit.greaterThan( 0 ) ).and( centerHit.lessThan( ENV_RAY_LENGTH_THRESHOLD ) )
+							.and( tapHit.greaterThan( 0 ) ).and( tapHit.lessThan( ENV_RAY_LENGTH_THRESHOLD ) );
+						const scale = centerHit.min( tapHit ).mul( this.hitDistancePhi ).add( tolerance ).max( 1e-4 );
+						hitWeight = bothHits.select( tapHit.sub( centerHit ).div( scale ).pow2().negate().exp(), 1 );
+
+					}
+
+					const weight = hitWeight.mul( depthWeight ).mul( normalWeight ).mul( roughnessWeight ).mul( Math.exp( - 0.5 * ( x * x + y * y ) ) ).mul( inBounds( tapUV ) ).toConst();
 					sum.addAssign( toWeighted( vec4( tap.rgb, tap.a.clamp() ) ).mul( weight ) );
 					totalWeight.addAssign( weight );
 
@@ -250,6 +270,16 @@ class CoverageDenoiseNode extends Node {
 			// Convert NDC motion to UV, then account for the previous raster grid's jitter.
 			const velocityUV = this.velocityNode.sample( coordinate ).xy.mul( vec2( 0.5, - 0.5 ) );
 			const surfaceUV = coordinate.sub( velocityUV ).add( this._jitterDelta ).toConst();
+
+			const surfaceStretch = reprojectionStretchConfidence( surfaceUV, this._resolution ).toConst();
+			const roughness = roughnessAt( coordinate ).toConst();
+			const curvature = fwidth( worldNormal ).length().mul( this.curvatureScale ).clamp().toConst();
+			const rayLength = this.hitDistanceNode !== null ? float( this.hitDistanceNode ).toConst() : float( 0 );
+			const virtualPosition = position.add( position.normalize().mul( rayLength.min( ENV_RAY_LENGTH_THRESHOLD ) ) );
+			const virtualPrevious = this._previousView.mul( this._world.mul( vec4( virtualPosition, 1 ) ) );
+			const virtualClip = this._previousProjection.mul( virtualPrevious );
+			const virtualUV = virtualClip.xy.div( virtualClip.w.max( 1e-6 ) ).mul( vec2( 0.5, - 0.5 ) ).add( 0.5 ).toConst();
+			const virtualStretch = reprojectionStretchConfidence( virtualUV, this._resolution ).toConst();
 
 			// Manual bilinear gather: geometry validation and premultiplication must
 			// happen per tap, before interpolation, to avoid bright invalid neighbors.
@@ -295,22 +325,45 @@ class CoverageDenoiseNode extends Node {
 				const history = gather( surfaceUV ).toVar();
 				if ( this.hitDistanceNode !== null ) {
 
-					const rayLength = float( this.hitDistanceNode ).toConst();
-					If( rayLength.greaterThan( 0 ).and( rayLength.lessThan( ENV_RAY_LENGTH_THRESHOLD ) ).and( current.a.greaterThan( 0 ) ), () => {
+					// Distance moments only include contributing hits, including black ones.
+					const moments = vec3( 0 ).toVar();
+					for ( let y = - 1; y <= 1; y ++ ) {
 
-						const virtualPosition = position.add( position.normalize().mul( rayLength ) );
-						const previousPosition = this._previousView.mul( this._world.mul( vec4( virtualPosition, 1 ) ) );
-						const clip = this._previousProjection.mul( previousPosition );
-						const hitUV = clip.xy.div( clip.w.max( 1e-6 ) ).mul( vec2( 0.5, - 0.5 ) ).add( 0.5 );
-						const hit = gather( hitUV ).toConst();
-						const error = value => fromWeighted( value ).rgb.sub( current.rgb ).length();
-						If( clip.w.greaterThan( 0 ).and( inBounds( hitUV ) ).and( hit.get( 'weight' ).greaterThan( 0 ) ).and( error( hit.get( 'color' ) ).lessThan( error( history.get( 'color' ) ) ) ), () => {
+						for ( let x = - 1; x <= 1; x ++ ) {
 
-							history.assign( hit );
+							const tapUV = coordinate.mul( inputResolution ).add( vec2( x, y ) ).floor().add( 0.5 ).div( inputResolution );
+							const distance = float( hitDistanceAt( tapUV ) );
+							const valid = distance.greaterThan( 0 ).and( distance.lessThan( ENV_RAY_LENGTH_THRESHOLD ) );
+							const weight = this.inputNode.sample( tapUV ).a.mul( valid ).mul( inBounds( tapUV ) );
+							const bounded = distance.min( ENV_RAY_LENGTH_THRESHOLD );
+							moments.addAssign( vec3( bounded, bounded.pow2(), 1 ).mul( weight ) );
 
-						} );
+						}
 
-					} );
+					}
+
+					const mean = moments.x.div( moments.z.max( 1e-6 ) );
+					const deviation = moments.y.div( moments.z.max( 1e-6 ) ).sub( mean.pow2() ).max( 0 ).sqrt();
+					const edgeConfidence = deviation.div( mean.max( 1e-3 ) ).mul( this.reflectionEdgeScale ).negate().exp();
+					const validVirtual = rayLength.greaterThan( 0 ).and( rayLength.lessThan( ENV_RAY_LENGTH_THRESHOLD ) )
+						.and( current.a.greaterThan( 0 ) ).and( virtualClip.w.greaterThan( 0 ) ).and( inBounds( virtualUV ) );
+					const hit = gather( virtualUV ).toConst();
+					const trust = edgeConfidence.mul( curvature.oneMinus() ).mul( roughness.pow2().oneMinus() ).mul( validVirtual );
+					const hitStretch = this.useStretchRejection.select( virtualStretch.pow2(), 1 );
+					const surfStretch = this.useStretchRejection.select( surfaceStretch.pow2(), 1 );
+					const hitWeight = hit.get( 'weight' ).mul( trust ).mul( hitStretch ).toConst();
+					const surfaceWeight = history.get( 'weight' ).mul( trust.oneMinus() ).mul( surfStretch ).toConst();
+					const total = hitWeight.add( surfaceWeight ).toConst();
+					const color = history.get( 'color' ).mul( surfaceWeight ).add( hit.get( 'color' ).mul( hitWeight ) ).div( total.max( 1e-6 ) );
+					const blendedAge = history.get( 'age' ).mul( surfaceWeight ).add( hit.get( 'age' ).mul( hitWeight ) ).div( total.max( 1e-6 ) );
+					history.assign( historySample( color, total, blendedAge ) );
+
+				}
+
+				if ( this.hitDistanceNode === null ) {
+
+					const confidence = this.useStretchRejection.select( surfaceStretch.pow2(), 1 );
+					history.assign( historySample( history.get( 'color' ), history.get( 'weight' ).mul( confidence ), history.get( 'age' ) ) );
 
 				}
 

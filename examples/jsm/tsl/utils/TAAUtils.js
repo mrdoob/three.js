@@ -1,5 +1,5 @@
 import { Vector3 } from 'three/webgpu';
-import { add, float, Fn, If, luminance, max, struct, vec2, vec4, getViewPosition, logarithmicDepthToViewZ, viewZToOrthographicDepth, viewZToPerspectiveDepth } from 'three/tsl';
+import { dFdx, dFdy, dot, add, float, Fn, If, luminance, max, struct, vec2, vec4, getViewPosition, logarithmicDepthToViewZ, viewZToOrthographicDepth, viewZToPerspectiveDepth } from 'three/tsl';
 
 /**
  * Optimized version of AABB clipping.
@@ -210,3 +210,22 @@ export function getProjectionJitter( camera, projectionMatrix, target ) {
 	);
 
 }
+
+/**
+ * History confidence from the smallest singular value of the screen-space
+ * reprojection Jacobian. Rejects magnification along either axis, including
+ * anisotropic stretching whose area determinant would otherwise look valid.
+ * Evaluate outside per-pixel conditional control flow (uses derivatives).
+ *
+ * @tsl
+ */
+export const reprojectionStretchConfidence = Fn( ( [ historyUV, resolution ] ) => {
+
+	const jx = dFdx( historyUV ).mul( resolution ).toConst();
+	const jy = dFdy( historyUV ).mul( resolution ).toConst();
+	const determinant = jx.x.mul( jy.y ).sub( jx.y.mul( jy.x ) );
+	const norm = dot( jx, jx ).add( dot( jy, jy ) );
+	const discriminant = norm.pow2().mul( 0.25 ).sub( determinant.pow2() ).max( 0 ).sqrt();
+	return norm.mul( 0.5 ).sub( discriminant ).max( 0 ).sqrt().clamp();
+
+}, { historyUV: 'vec2', resolution: 'vec2', return: 'float' } );
