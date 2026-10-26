@@ -601,12 +601,12 @@ function renderObjectDetails( block, details ) {
 	groups.forEach( ( [ , rows ], i ) => updatePropertyPicker( pickers[ i ], rows ) );
 
 	// A preview comes with the details when one was asked for: the image, or the reason there is
-	// none, shown in its place. An object with nothing to draw keeps no tile at all.
+	// none, shown in its place. An object with nothing to draw keeps an empty tile, so every
+	// expanded row has the same layout.
 	if ( 'preview' in details ) {
 
 		const rendered = details.preview !== null && details.preview.startsWith( 'data:' );
 
-		tile.hidden = details.preview === null;
 		tile.style.backgroundImage = rendered ? `url(${details.preview})` : '';
 		tile.textContent = rendered ? '' : details.preview;
 
