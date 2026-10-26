@@ -103,6 +103,7 @@ export { default as SubgroupFunctionNode } from './gpgpu/SubgroupFunctionNode.js
 export { default as WorkgroupInfoNode } from './gpgpu/WorkgroupInfoNode.js';
 
 // lighting
+export { IndirectSpecularNode } from './lighting/IndirectLightingNode.js';
 export { default as AmbientLightNode } from './lighting/AmbientLightNode.js';
 export { default as AnalyticLightNode } from './lighting/AnalyticLightNode.js';
 export { default as AONode } from './lighting/AONode.js';

@@ -1,4 +1,4 @@
-import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, logarithmicDepthToViewZ, luminance, max, min, mix, mul, nodeObject, normalize, orthographicDepthToViewZ, passTexture, perspectiveDepthToViewZ, reference, reflect, sub, texture, trunc, uniform, uv, vec2, vec3, vec4, viewZToPerspectiveDepth, context, isBackgroundDepth } from 'three/tsl';
+import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, logarithmicDepthToViewZ, luminance, max, min, mix, mul, nodeObject, normalize, orthographicDepthToViewZ, passTexture, perspectiveDepthToViewZ, reference, reflect, sub, texture, trunc, uniform, uv, vec2, vec3, vec4, viewZToPerspectiveDepth, context, property, outputStruct, isBackgroundDepth } from 'three/tsl';
 import { HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2, Vector3 } from 'three/webgpu';
 import { bindAnalyticNoise } from '../utils/RNoise.js';
 import { ENV_RAY_LENGTH, getSpecularDominantFactor, ggxReflectionSample } from '../utils/SpecularHelpers.js';
@@ -22,6 +22,7 @@ const MAX_STEPS = 64;
  * @property {boolean} [envImportanceSampling=false] - When `true`, precomputes env-luminance CDF tables and uses MIS for environment misses. Build-time only.
  * @property {Node} [diffuseNode=null] - Scene diffuse / base color. Defaults to `vec3(1)` in the shader when omitted.
  * @property {boolean} [binaryRefine=false] - Sub-step binary-search refinement of detected hits. Compile-time constant (baked into the shader at construction).
+ * @property {boolean} [outputCoverage=false] - Stochastic tracing with external fallback. RGB is BRDF weighted and coverage premultiplied; alpha remains hit distance. Source alpha supplies validity.
  * @property {Camera} [camera=null] - Camera the scene is rendered with. Inferred from the color pass when omitted.
  */
 
@@ -61,10 +62,21 @@ class SSRNode extends Node {
 			environmentNode = null,
 			envImportanceSampling = false,
 			diffuseNode = null,
-			binaryRefine = false
+			binaryRefine = false,
+			outputCoverage = false
 		} = options;
 
 		let camera = options.camera ?? null;
+
+		if ( outputCoverage && ( ! stochastic || environmentNode !== null ) ) {
+
+			throw new Error( 'SSRNode: outputCoverage requires stochastic tracing without an environment map.' );
+
+		}
+
+		/** @type {boolean} Coverage output requires stochastic tracing and external fallback. Fixed at construction. */
+		this.outputCoverage = outputCoverage;
+		this._coverage = outputCoverage ? property( 'float' ) : null;
 
 		/**
 		 * When `true`, the reflection direction is varied per pixel with stochastic GGX rays
@@ -397,7 +409,8 @@ class SSRNode extends Node {
 		 * @private
 		 * @type {RenderTarget}
 		 */
-		this._ssrRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
+		this._ssrRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, count: outputCoverage ? 2 : 1 } );
+		if ( outputCoverage ) this._ssrRenderTarget.textures[ 1 ].name = 'SSRNode.Coverage';
 		this._ssrRenderTarget.texture.name = 'SSRNode.SSR';
 
 		/**
@@ -626,7 +639,8 @@ class SSRNode extends Node {
 		if ( this._ssrFn === null ) return;
 
 		this._ssrMaterial.contextNode = context( this._sharedContext );
-		this._ssrMaterial.fragmentNode = this._ssrFn();
+		const result = this._ssrFn();
+		this._ssrMaterial.fragmentNode = this.outputCoverage ? outputStruct( result, vec4( this._coverage ) ) : result;
 		this._ssrMaterial.needsUpdate = true;
 
 	}
@@ -639,6 +653,20 @@ class SSRNode extends Node {
 	getTextureNode() {
 
 		return ( this.stochastic === false && this.roughnessNode !== null ) ? this._blurredTextureNode : this._textureNode;
+
+	}
+
+	/**
+	 * Returns screen-space coverage independently of radiance and hit distance.
+	 * Requires `outputCoverage: true`. Black hits retain coverage; misses have none.
+	 *
+	 * @return {PassTextureNode} The coverage texture.
+	 */
+	getCoverageNode() {
+
+		if ( ! this.outputCoverage ) throw new Error( 'SSRNode: enable outputCoverage to read coverage.' );
+
+		return this._coverageTextureNode ??= passTexture( this, this._ssrRenderTarget.textures[ 1 ] );
 
 	}
 
@@ -689,6 +717,8 @@ class SSRNode extends Node {
 	 * @see {@link https://github.com/gkjohnson/three-gpu-pathtracer}
 	 */
 	setEnvMap( hdr ) {
+
+		if ( this.outputCoverage && hdr !== null ) throw new Error( 'SSRNode: outputCoverage uses external environment fallback.' );
 
 		if ( hdr === null ) {
 
@@ -882,6 +912,8 @@ class SSRNode extends Node {
 
 		const ssr = Fn( () => {
 
+			if ( this.outputCoverage ) this._coverage.assign( 0 );
+
 			const noise = this.stochastic === true ? sampleMarchNoise( uvNode, this._noiseIndex ) : null;
 			const uvPos = uvNode.toVar();
 
@@ -1004,10 +1036,11 @@ class SSRNode extends Node {
 			// JS: fade the reflection to black, or blend it toward the environment reflection.
 			const applyHitEdgeFade = ( reflectColor, uvS, hitBorderWidth ) => {
 
-				if ( this.screenEdgeFadeBlack ) {
+				if ( this.screenEdgeFadeBlack || this.outputCoverage ) {
 
 					const hitBorderFactor = computeScreenBorderFactor( uvS, this.screenEdgeFade );
 					reflectColor.rgb.mulAssign( hitBorderFactor );
+					if ( this.outputCoverage ) reflectColor.a.mulAssign( hitBorderFactor );
 
 				} else {
 
@@ -1225,6 +1258,13 @@ class SSRNode extends Node {
 					// Multi-bounce: add the reprojected previous-frame reflection at the hit point.
 					reflectColor.rgb.assign( reprojectHitPointHistory( uvS, reflectColor.rgb ) );
 
+					if ( this.outputCoverage ) {
+
+						reflectColor.a.assign( reflectColor.a.clamp() );
+						reflectColor.rgb.mulAssign( reflectColor.a );
+
+					}
+
 					if ( this.stochastic === true ) applyHitEdgeFade( reflectColor, uvS, hitBorderWidth );
 
 					// The scatter (GGX) path bakes distance/grazing response into finalSampleWeight.
@@ -1241,8 +1281,10 @@ class SSRNode extends Node {
 
 					}
 
+					if ( this.outputCoverage ) this._coverage.assign( reflectColor.a );
 					hit.assign( 1 );
-					output.assign( vec4( weightedColor, worldDistance ) );
+					const rayLength = this.outputCoverage ? this._coverage.greaterThan( 0 ).select( worldDistance, float( ENV_RAY_LENGTH ) ) : worldDistance;
+					output.assign( vec4( weightedColor, rayLength ) );
 
 				} );
 
@@ -1251,7 +1293,7 @@ class SSRNode extends Node {
 			// Screen-space ray missed: environment fallback (MIS when CDF env is set up).
 			If( hit.equal( 0 ), () => {
 
-				if ( this.stochastic === true ) {
+				if ( this.stochastic === true && ! this.outputCoverage ) {
 
 					output.assign( vec4( sampleEnvReflection().mul( this.environmentIntensity ), float( ENV_RAY_LENGTH ) ) );
 

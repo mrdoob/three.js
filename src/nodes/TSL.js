@@ -1,3 +1,5 @@
+export * from './lighting/IndirectLightingNode.js';
+
 // constants
 export * from './core/constants.js';
 
