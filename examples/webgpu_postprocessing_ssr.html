@@ -73,7 +73,6 @@
 			denoise: true,
 			maxFrames: 16,
 			radius: 3,
-			historyRadius: 0,
 			maxRoughness: 0.8,
 			mirrorBias: 0,
 			stepExponent: 2,
@@ -512,7 +511,6 @@
 			} );
 			ssrFolder.add( params, 'maxFrames', 1, 128, 1 ).onChange( updateParameters );
 			ssrFolder.add( params, 'radius', 0, 3 ).onChange( updateParameters );
-			ssrFolder.add( params, 'historyRadius', 0, 16 ).name( 'History blur' ).onChange( updateParameters );
 			ssrFolder.add( params, 'maxRoughness', 0.1, 1 ).onChange( updateParameters );
 			ssrFolder.add( params, 'mirrorBias', 0, 1 ).onChange( updateParameters );
 			ssrFolder.add( params, 'stepExponent', 1, 4, 1 ).onChange( updateParameters );
@@ -600,7 +598,6 @@
 			maxRoughness.value = params.maxRoughness;
 			ssrDenoise.maxFrames.value = params.maxFrames;
 			ssrDenoise.radius.value = params.radius;
-			ssrDenoise.historyRadius.value = params.historyRadius;
 			resetHistory();
 			ssrPass.maxDistance.value = params.maxDistance;
 			// The tracer keeps physical radiance. Strength scales resolved coverage.
