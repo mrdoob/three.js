@@ -2,23 +2,6 @@ import { DataTexture, EquirectangularReflectionMapping, FloatType, Mesh, MeshSta
 import { context, float, indirectSpecular, environmentSpecular, pmremTexture, texture, uniform, uv, vec3, vec4 } from 'three/tsl';
 import { getSharedRenderer } from '../tsl/gpu-test-utils.js';
 
-// These tests render and read back actual shader results. Do not accept a
-// software adapter as evidence for lighting correctness.
-async function hardwareRenderer( assert ) {
-
-	const adapter = await navigator.gpu?.requestAdapter();
-	const info = adapter?.info;
-	if ( ! info || info.isFallbackAdapter || /swiftshader|llvmpipe|lavapipe|software/i.test( `${ info.vendor } ${ info.device } ${ info.description }` ) ) {
-
-		assert.ok( true, 'SKIPPED: a hardware WebGPU adapter is required.' );
-		return null;
-
-	}
-
-	return getSharedRenderer( 'webgpu' );
-
-}
-
 function fixture( renderer ) {
 
 	const previousContext = renderer.contextNode;
@@ -68,8 +51,14 @@ export default QUnit.module( 'Nodes', () => {
 
 			QUnit.test( 'Coverage composition, darkness, missing data, nesting and specular queries', async assert => {
 
-				const renderer = await hardwareRenderer( assert );
-				if ( ! renderer ) return;
+				const renderer = await getSharedRenderer( 'webgpu' );
+				if ( ! renderer ) {
+
+					assert.ok( true, 'SKIPPED: WebGPU unavailable' );
+					return;
+
+				}
+
 				const view = fixture( renderer );
 				const material = new NodeMaterial();
 				const query = { position: vec3( 0 ), normal: vec3( 0, 1, 0 ) };
@@ -108,8 +97,14 @@ export default QUnit.module( 'Nodes', () => {
 
 			QUnit.test( 'Environment query guides do not inherit their own mip context', async assert => {
 
-				const renderer = await hardwareRenderer( assert );
-				if ( ! renderer ) return;
+				const renderer = await getSharedRenderer( 'webgpu' );
+				if ( ! renderer ) {
+
+					assert.ok( true, 'SKIPPED: WebGPU unavailable' );
+					return;
+
+				}
+
 				const view = fixture( renderer );
 				const data = new Uint8Array( 16 * 8 * 4 );
 				for ( let i = 0; i < data.length; i += 4 ) data.set( [ 255, 0, 0, 255 ], i );
@@ -141,8 +136,14 @@ export default QUnit.module( 'Nodes', () => {
 
 			QUnit.test( 'Physical materials resolve once without a scene environment and observe uniform changes', async assert => {
 
-				const renderer = await hardwareRenderer( assert );
-				if ( ! renderer ) return;
+				const renderer = await getSharedRenderer( 'webgpu' );
+				if ( ! renderer ) {
+
+					assert.ok( true, 'SKIPPED: WebGPU unavailable' );
+					return;
+
+				}
+
 				const view = fixture( renderer );
 				const material = new MeshStandardNodeMaterial( { metalness: 1, roughness: 0.35 } );
 				const coverage = uniform( 1 );

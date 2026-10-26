@@ -11,10 +11,7 @@ export default QUnit.module( 'Addons', () => {
 
 			QUnit.test( 'coverage is independent of source brightness and hit distance', async assert => {
 
-				const adapter = await navigator.gpu?.requestAdapter();
-				const info = adapter?.info;
-				const hardware = info && ! info.isFallbackAdapter && ! /swiftshader|llvmpipe|lavapipe|software/i.test( `${ info.vendor } ${ info.device } ${ info.description }` );
-				const renderer = hardware ? await getSharedRenderer( 'webgpu' ) : null;
+				const renderer = await getSharedRenderer( 'webgpu' );
 				if ( ! renderer ) {
 
 					assert.ok( true, 'SKIPPED: WebGPU unavailable' );
