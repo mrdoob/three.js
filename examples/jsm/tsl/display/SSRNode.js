@@ -1,4 +1,4 @@
-import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, logarithmicDepthToViewZ, luminance, max, min, mix, mul, nodeObject, normalize, orthographicDepthToViewZ, passTexture, perspectiveDepthToViewZ, reference, reflect, sub, texture, trunc, uniform, uv, vec2, vec3, vec4, viewZToPerspectiveDepth, context, property, outputStruct, isBackgroundDepth } from 'three/tsl';
+import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, logarithmicDepthToViewZ, luminance, max, min, mix, mul, nodeObject, normalize, orthographicDepthToViewZ, passTexture, perspectiveDepthToViewZ, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, viewZToPerspectiveDepth, context, property, outputStruct, isBackgroundDepth } from 'three/tsl';
 import { HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2, Vector3 } from 'three/webgpu';
 import { bindAnalyticNoise } from '../utils/RNoise.js';
 import { ENV_RAY_LENGTH, getSpecularDominantFactor, ggxReflectionSample } from '../utils/SpecularHelpers.js';
@@ -248,13 +248,13 @@ class SSRNode extends Node {
 
 		/**
 		 * Mirror bias for the stochastic GGX sampling. Concentrates the reflected rays toward
-		 * the lobe's narrow (near-mirror) core, trading a small amount of bias for less noise.
+		 * the lobe's narrow (near-mirror) core, trading sampling bias for less noise.
 		 * `0` samples the full VNDF lobe; values toward `1` tighten the cone. Range `[0,1]`.
 		 *
 		 * @type {UniformNode<float>}
-		 * @default 0.5
+		 * @default 0
 		 */
-		this.mirrorBias = uniform( 0.5 );
+		this.mirrorBias = uniform( 0 );
 
 		/**
 		 * The quality of the blur. Must be an integer in the range `[1,3]`.
@@ -932,7 +932,9 @@ class SSRNode extends Node {
 
 			}
 
-			const uvPos = uvNode.toVar();
+			// Reconstruct at the sampled depth texel center.
+			const depthSize = vec2( textureSize( this.depthNode ) ).toConst();
+			const uvPos = uvNode.mul( depthSize ).floor().add( 0.5 ).div( depthSize ).toVar();
 
 			const depth = sampleDepth( uvPos ).toVar();
 
@@ -977,7 +979,7 @@ class SSRNode extends Node {
 
 				const Xi = noise.toVar();
 				// Mirror-bias: pull `Xi.y` toward the cap top to tighten the GGX lobe and cut mid-roughness
-				// noise. Unbiased — bounded VNDF keeps brdf·cos/pdf ~constant (EA, "Stochastic SSR").
+				// noise. This truncates the lobe while retaining the original VNDF PDF, introducing bias.
 				Xi.y.assign( mix( Xi.y, 0.0, this.mirrorBias.mul( Xi.w.sqrt() ) ) );
 
 				albedo.assign( ( this.diffuseNode !== null ? this.diffuseNode.sample( uvPos ).rgb : vec3( 1 ) ) );
@@ -1073,7 +1075,7 @@ class SSRNode extends Node {
 
 			};
 
-			const maxReflectRayLen = this.maxDistance.div( dot( viewIncidentDir.negate(), viewNormal ) ).toVar();
+			const maxReflectRayLen = this.maxDistance.div( dot( viewIncidentDir.negate(), viewNormal ).max( 1e-4 ) ).toVar();
 
 			const d1viewPosition = viewPosition.add( viewReflectDir.mul( maxReflectRayLen ) ).toVar();
 
@@ -1147,12 +1149,22 @@ class SSRNode extends Node {
 			// Carry the coarse hit's UV/depth to skip a redundant fetch when refinement is off.
 			const hitUvS = vec2( 0 ).toVar();
 			const hitD = float( 0 ).toVar();
+			const previousS = float( 0 ).toVar();
+			const previousInFront = bool( true ).toVar();
+			const canRefine = bool( false ).toVar();
 
 			// March from d0 toward d1, looking for an intersection with the depth buffer.
 			Loop( { start: int( 1 ), end: totalStep }, ( { i } ) => {
 
 				// Exponentially-distributed ray parameter, shared by the sample position and ray depth.
 				const s = sampleFraction( float( i ) ).toVar();
+
+				// The stride floor must not extend short rays past their clipped endpoint.
+				If( s.greaterThan( 1 ), () => {
+
+					Break();
+
+				} );
 
 				const xy = screenPosAt( s ).toVar();
 
@@ -1168,7 +1180,7 @@ class SSRNode extends Node {
 
 				const viewReflectRayZ = reflectRayZAt( s ).toVar();
 
-				If( viewReflectRayZ.lessThanEqual( vZ ), () => {
+				If( isBackgroundDepth( d ).not().and( viewReflectRayZ.lessThanEqual( vZ ) ), () => {
 
 					// Depth crossing: ray went behind the depth buffer. Gate by thickness before stopping
 					// so an occluder gap doesn't end the march prematurely.
@@ -1213,7 +1225,9 @@ class SSRNode extends Node {
 
 						if ( this.binaryRefine ) {
 
-							hitSLo.assign( sampleFraction( float( i ).sub( 1 ) ) );
+							// Refine only a genuine front-to-back bracket.
+							canRefine.assign( previousInFront );
+							hitSLo.assign( previousS );
 							hitSHi.assign( s );
 
 						}
@@ -1225,6 +1239,9 @@ class SSRNode extends Node {
 
 				} );
 
+				previousS.assign( s );
+				previousInFront.assign( viewReflectRayZ.greaterThan( vZ ) );
+
 			} );
 
 			If( foundHit, () => {
@@ -1233,26 +1250,30 @@ class SSRNode extends Node {
 				// nested (a loop-inside-a-loop tripped shader-compiler bugs on some drivers).
 				if ( this.binaryRefine ) {
 
-					Loop( { start: int( 0 ), end: int( 8 ), type: 'int', condition: '<' }, () => {
+					If( canRefine, () => {
 
-						const sMid = hitSLo.add( hitSHi ).mul( 0.5 ).toVar();
-						const sceneZMid = getViewZ( sampleDepth( screenPosAt( sMid ).mul( invResolution ) ) );
+						Loop( { start: int( 0 ), end: int( 8 ), type: 'int', condition: '<' }, () => {
 
-						If( reflectRayZAt( sMid ).lessThanEqual( sceneZMid ), () => {
+							const sMid = hitSLo.add( hitSHi ).mul( 0.5 ).toVar();
+							const sceneZMid = getViewZ( sampleDepth( screenPosAt( sMid ).mul( invResolution ) ) );
 
-							hitSHi.assign( sMid );
+							If( reflectRayZAt( sMid ).lessThanEqual( sceneZMid ), () => {
 
-						} ).Else( () => {
+								hitSHi.assign( sMid );
 
-							hitSLo.assign( sMid );
+							} ).Else( () => {
+
+								hitSLo.assign( sMid );
+
+							} );
 
 						} );
 
-					} );
+						// Refinement moved the crossing, so re-fetch UV/depth at the refined `s`.
+						hitUvS.assign( screenPosAt( hitSHi ).mul( invResolution ) );
+						hitD.assign( sampleDepth( hitUvS ) );
 
-					// Refinement moved the crossing, so re-fetch UV/depth at the refined `s`.
-					hitUvS.assign( screenPosAt( hitSHi ).mul( invResolution ) );
-					hitD.assign( sampleDepth( hitUvS ) );
+					} );
 
 				}
 
@@ -1263,7 +1284,24 @@ class SSRNode extends Node {
 				// In blur mode the ratio² falloff re-grows past maxDistance, so over-range hits fall back
 				// to env. The scatter path bounds reach via ray length, so every hit shades.
 				const distancePointPlane = this.stochastic === false ? pointPlaneDistance( vP, viewPosition, viewNormal ).toVar() : float( 0 );
-				const withinRange = distancePointPlane.lessThanEqual( this.maxDistance );
+				const withinRange = distancePointPlane.lessThanEqual( this.maxDistance ).toVar();
+
+				if ( this.binaryRefine ) {
+
+					// Bisection can land on a depth discontinuity rather than geometry.
+					// Validate the final sample, not just the coarse crossing.
+					const neighbor = getViewPosition( uvS.add( uvPixelStepX ), hitD, this._cameraProjectionMatrixInverse );
+					const tk = max( neighbor.x.sub( vP.x ).mul( 3 ), this.thickness );
+					withinRange.assign( withinRange.and( isBackgroundDepth( hitD ).not() )
+						.and( pointToLineDistance( vP, viewPosition, d1viewPosition ).lessThanEqual( tk ) ) );
+
+					if ( this.stochastic === false ) {
+
+						withinRange.assign( withinRange.and( dot( viewReflectDir, this.normalNode.sample( uvS ).rgb.normalize() ).lessThan( 0 ) ) );
+
+					}
+
+				}
 
 				If( withinRange, () => {
 

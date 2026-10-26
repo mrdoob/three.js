@@ -1,5 +1,5 @@
 import { DataTexture, DataUtils, FloatType, NodeMaterial, OrthographicCamera, QuadMesh, RendererUtils, Vector2, Vector3 } from 'three/webgpu';
-import { context, float, texture } from 'three/tsl';
+import { context, float, texture, vec4 } from 'three/tsl';
 import { ssr } from '../../../../examples/jsm/tsl/display/SSRNode.js';
 import { getSharedRenderer } from '../../src/nodes/tsl/gpu-test-utils.js';
 
@@ -59,7 +59,7 @@ export default QUnit.module( 'Addons', () => {
 				const depth = makeTexture( x => [ projectDepth( x === originX ? - 2 : target( x ) ? - 1.9 : - 1 ), 0, 0, 1 ] );
 				const node = ssr( texture( source ), texture( depth ), texture( normal ), {
 					camera, stochastic: true, outputCoverage: true,
-					metalnessNode: float( 1 ), roughnessNode: float( 0 )
+					metalnessNode: float( 1 ), roughnessNode: float( 0 ), noiseNode: vec4( 0.5 )
 				} );
 				node.quality.value = 1;
 				node.thickness.value = 0.01;
@@ -84,6 +84,10 @@ export default QUnit.module( 'Addons', () => {
 					renderer.setPixelRatio( 1 );
 					renderer.setSize( width, height );
 					renderer.contextNode = context();
+					node.maxDistance.value = 0.25;
+					assert.strictEqual( ( await renderOrigin() )[ 0 ], 0, 'A short ray cannot reach geometry beyond its endpoint' );
+					node.binaryRefine = true;
+					assert.strictEqual( ( await renderOrigin() )[ 0 ], 0, 'Refinement respects the clipped endpoint' );
 					node.maxDistance.value = 2;
 					const coverageAtOrigin = async () => {
 

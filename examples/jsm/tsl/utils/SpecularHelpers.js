@@ -23,6 +23,26 @@ export const ENV_RAY_LENGTH = 1e4;
  */
 export const ENV_RAY_LENGTH_THRESHOLD = 1e3;
 
+/**
+ * Returns a screen-space hit distance only when the resolved SSR sample has
+ * positive coverage and a valid distance. Fallback-only, cleared and rejected
+ * samples use the environment sentinel instead of an unrelated geometry hit.
+ * Partial coverage retains its screen-space distance; black hits remain valid.
+ *
+ * @tsl
+ * @function
+ * @param {Node<float>} rayLength - Raw SSR hit distance.
+ * @param {Node<float>} coverage - Effective screen-space coverage, after fades.
+ * @return {Node<float>} Distance suitable for specular history/reconstruction.
+ */
+export const resolveSSRHitDistance = ( rayLength, coverage ) => {
+
+	rayLength = float( rayLength );
+	return float( coverage ).greaterThan( 0 ).and( rayLength.greaterThan( 0 ) )
+		.and( rayLength.lessThan( ENV_RAY_LENGTH_THRESHOLD ) ).select( rayLength, float( ENV_RAY_LENGTH ) );
+
+};
+
 // Bounded-VNDF sampler (Eto & Tokuyoshi 2023; spherical-cap form, Dupuy & Benyoub 2023)
 const SampleGGXVNDF = Fn( ( [ V, ax, ay, r1, r2 ] ) => {
 
@@ -182,13 +202,14 @@ export const ggxReflectionSample = Fn( ( [ N, V, roughness, metalness, albedo, X
 
 	// TBN from view-space normal
 	const up = vec3( 0, 0, 1 );
-	let T = cross( up, N ).toVar();
-	T = T.normalize().toVar();
+	const T = cross( up, N ).toVar();
+	// Check the unnormalized cross product: normalize( 0 ) is undefined at either pole.
 	If( T.length().lessThan( 1e-3 ), () => {
 
-		T.assign( cross( vec3( 0, 1, 0 ), N ).normalize() );
+		T.assign( cross( vec3( 0, 1, 0 ), N ) );
 
 	} );
+	T.assign( T.normalize() );
 	const B = cross( N, T ).normalize().toVar();
 
 	// transform V to LOCAL frame (N = +Z)
