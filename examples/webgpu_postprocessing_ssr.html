@@ -84,6 +84,7 @@
 		const samplingMode = uniform( 2, 'uint' );
 		const denoiseEnabled = uniform( 1 );
 		const maxRoughness = uniform( params.maxRoughness );
+		const ssrStrength = uniform( params.intensity );
 		const ssrEnabled = uniform( 1 );
 		const environmentEnabled = uniform( 1 );
 
@@ -300,7 +301,7 @@
 					.and( direction.dot( baseDirection ).greaterThan( 0.999 ) );
 				const raw = vec4( incoming.sample( screenUV ), coverage.sample( screenUV ) );
 				const value = denoiseEnabled.mix( raw, filtered.sample( screenUV ) );
-				return vec4( value.rgb, value.a.mul( matches ).mul( ssrEnabled ) );
+				return vec4( value.rgb, value.a.mul( matches ).mul( ssrEnabled ).mul( ssrStrength ) );
 
 			} )();
 
@@ -314,17 +315,17 @@
 				const direction = level.pow4().mix( view.negate().reflect( normal ), normal ).normalize();
 				const environment = fallback( { direction, roughness: level } );
 				const value = filtered.sample( screenUV );
-				const weight = value.a.mul( ssrEnabled );
+				const weight = value.a.mul( ssrStrength ).mul( ssrEnabled );
 				return vec4( value.rgb.mul( weight ).add( environment.rgb.mul( environment.a ).mul( weight.oneMinus() ) ), 1 );
 
 			} )();
 			const views = {
 				Beauty: smaa( beautyPass ),
 				'PMREM only': smaa( scenePassColor ),
-				SSR: vec4( incoming.sample( screenUV ).mul( coverage.sample( screenUV ) ), 1 ),
-				'SSR Filtered': vec4( filtered.sample( screenUV ).rgb.mul( filtered.sample( screenUV ).a ), 1 ),
-				'SSR Coverage': vec4( vec3( coverage.sample( screenUV ) ), 1 ),
-				'SSR Coverage Filtered': vec4( vec3( filtered.sample( screenUV ).a ), 1 ),
+				SSR: vec4( incoming.sample( screenUV ).mul( coverage.sample( screenUV ) ).mul( ssrStrength ), 1 ),
+				'SSR Filtered': vec4( filtered.sample( screenUV ).rgb.mul( filtered.sample( screenUV ).a ).mul( ssrStrength ), 1 ),
+				'SSR Coverage': vec4( vec3( coverage.sample( screenUV ).mul( ssrStrength ) ), 1 ),
+				'SSR Coverage Filtered': vec4( vec3( filtered.sample( screenUV ).a.mul( ssrStrength ) ), 1 ),
 				'Indirect Specular': resolvedSpecular
 			};
 			renderPipeline.outputNode = views.Beauty;
@@ -365,7 +366,7 @@
 			} );
 			gui.add( params, 'environment' ).onChange( value => environmentEnabled.value = Number( value ) );
 			ssrFolder.add( params, 'maxDistance', 0, 10 ).onChange( updateParameters );
-			ssrFolder.add( params, 'intensity', 0, 1 ).onChange( updateParameters );
+			ssrFolder.add( params, 'intensity', 0, 1 ).name( 'SSR strength' ).onChange( value => ssrStrength.value = value );
 			ssrFolder.add( params, 'thickness', 0, 0.05 ).onChange( updateParameters );
 			ssrFolder.add( params, 'binaryRefine' ).name( 'binary refine' ).onChange( updateParameters );
 			ssrFolder.add( params, 'enabled' ).onChange( value => ssrEnabled.value = Number( value ) );
@@ -404,7 +405,8 @@
 			ssrDenoise.radius.value = params.radius;
 			ssrDenoise.reset();
 			ssrPass.maxDistance.value = params.maxDistance;
-			ssrPass.intensity.value = params.intensity;
+			// The tracer keeps physical radiance. Strength scales resolved coverage.
+			ssrStrength.value = params.intensity;
 			ssrPass.thickness.value = params.thickness;
 			// build-time constant: assigning it recompiles the SSR material (setter no-ops if unchanged)
 			ssrPass.binaryRefine = params.binaryRefine;
