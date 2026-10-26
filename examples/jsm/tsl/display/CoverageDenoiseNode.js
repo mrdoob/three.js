@@ -59,8 +59,11 @@ class CoverageDenoiseNode extends Node {
 		this.reactiveNode = reactive;
 		this.roughnessThreshold = uniform( 0.04 );
 		this.radius = uniform( 1.5 );
-		/** Post-temporal blur radius at a history age of one frame, shrinking with the square root of age. */
-		this.historyRadius = uniform( 8 );
+		/**
+		 * Opt-in post-temporal blur radius at a history age of one frame, shrinking with the
+		 * square root of age. Zero skips the pass; 8 reduces flicker at about 0.4 ms at 960×720.
+		 */
+		this.historyRadius = uniform( 0 );
 		this.maxFrames = uniform( 16 );
 		this.depthThreshold = uniform( 0.01 );
 		/** Relative difference from the neighborhood's mean hit distance accepted by the spatial filter. */
@@ -190,10 +193,16 @@ class CoverageDenoiseNode extends Node {
 			this._quad.name = 'Coverage Denoise [ Temporal ]';
 			this._quad.render( renderer );
 
-			renderer.setRenderTarget( this._outputTarget );
-			this._quad.material = this._blurMaterial;
-			this._quad.name = 'Coverage Denoise [ History Blur ]';
-			this._quad.render( renderer );
+			if ( this.historyRadius.value > 0 ) {
+
+				renderer.setRenderTarget( this._outputTarget );
+				this._quad.material = this._blurMaterial;
+				this._quad.name = 'Coverage Denoise [ History Blur ]';
+				this._quad.render( renderer );
+
+			}
+
+			this._textureNode.value = this.historyRadius.value > 0 ? this._outputTarget.texture : this._target.texture;
 
 			this._previousView.value.copy( this.camera.matrixWorldInverse );
 			this._previousProjection.value.copy( this.camera.projectionMatrix );
