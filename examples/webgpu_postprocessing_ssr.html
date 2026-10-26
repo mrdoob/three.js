@@ -44,8 +44,9 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, velocity, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec3, vec4, Fn, If, uv, convertToTexture, uniform, context, cameraWorldMatrix, getViewPosition, diffuseColor, specularColorBlended, specularF90, EnvironmentBRDF, indirectSpecular, environmentSpecular, pmremTexture, } from 'three/tsl';
+		import { pass, mrt, output, normalView, velocity, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec3, vec4, Fn, If, uv, convertToTexture, uniform, context, cameraWorldMatrix, getViewPosition, diffuseColor, specularColorBlended, specularF90, EnvironmentBRDF, indirectSpecular, environmentSpecular, pmremTexture, texture, } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
+		import { reprojectedRadiance } from 'three/addons/tsl/display/ReprojectedRadianceNode.js';
 		import { coverageDenoise } from 'three/addons/tsl/display/CoverageDenoiseNode.js';
 		import { resolveSSRHitDistance } from 'three/addons/tsl/utils/SpecularHelpers.js';
 		import { fastNoise } from 'three/addons/tsl/utils/FASTNoise.js';
@@ -61,6 +62,7 @@
 			quality: 1,
 			classify: true,
 			output: 'Beauty',
+			reflectionSource: 'Current frame',
 			denoise: true,
 			maxFrames: 16,
 			radius: 1.5,
@@ -80,7 +82,15 @@
 		};
 
 		let camera, scene, model, renderer, renderPipeline, ssrPass, ssrDenoise;
-		let controls;
+		let controls, geometryPass, beautyPass, lightingHistory;
+		const historyValid = uniform( false );
+		const useHistorySource = uniform( false );
+		const previousView = uniform( new THREE.Matrix4() );
+		const previousProjection = uniform( new THREE.Matrix4() );
+		const previousProjectionInverse = uniform( new THREE.Matrix4() );
+		const currentView = new THREE.Matrix4();
+		const currentProjection = new THREE.Matrix4();
+		const currentProjectionInverse = new THREE.Matrix4();
 		const samplingModes = [ 'Original', 'FAST Product', 'FAST Separate' ];
 		const samplingMode = uniform( 2, 'uint' );
 		const denoiseEnabled = uniform( 1 );
@@ -210,7 +220,7 @@
 
 			// Geometry guides have their own pass so motion and HDR lighting fit
 			// within the standard WebGPU color attachment limit.
-			const geometryPass = pass( scene, camera );
+			geometryPass = pass( scene, camera );
 			geometryPass.contextNode = context( { indirectSpecularNode: indirectSpecular( [] ) } );
 			geometryPass.setMRT( mrt( {
 				output: vec4( packNormalToRGB( normalView ), roughness ),
@@ -241,7 +251,32 @@
 
 			//
 
-			ssrPass = ssr( scenePassColor, scenePassDepth, sceneNormal, {
+			lightingHistory = new THREE.RenderTarget( 1, 1, { type: THREE.HalfFloatType, depthTexture: new THREE.DepthTexture() } );
+			lightingHistory.depthTexture.format = scenePassDepth.value.format;
+			lightingHistory.depthTexture.type = scenePassDepth.value.type;
+			lightingHistory.depthTexture.minFilter = THREE.NearestFilter;
+			lightingHistory.depthTexture.magFilter = THREE.NearestFilter;
+			const historySource = reprojectedRadiance( texture( lightingHistory.texture ), texture( lightingHistory.depthTexture ), scenePassDepth, sceneNormal, camera, {
+				previousView, previousProjection, previousProjectionInverse, valid: historyValid
+			} );
+			const source = sample( coordinate => Fn( () => {
+
+				const value = vec4().toVar();
+				If( useHistorySource, () => {
+
+					value.assign( historySource.sample( coordinate ) );
+
+				} ).Else( () => {
+
+					value.assign( scenePassColor.sample( coordinate ) );
+
+				} );
+				return value;
+
+			} )() );
+
+			ssrPass = ssr( source, scenePassDepth, sceneNormal, {
+				camera,
 				stochastic: true,
 				outputCoverage: true,
 				traceMaskNode: scenePassMetalRough.g.lessThan( maxRoughness ),
@@ -301,7 +336,21 @@
 
 			} )();
 
-			const beautyPass = pass( scene, camera );
+			beautyPass = pass( scene, camera );
+			const onAfterRender = scene.onAfterRender;
+			scene.onAfterRender = function ( renderer, sourceScene, sourceCamera, ...args ) {
+
+				onAfterRender.call( this, renderer, sourceScene, sourceCamera, ...args );
+				if ( sourceCamera === camera ) {
+
+					currentView.copy( camera.matrixWorldInverse );
+					currentProjection.copy( camera.projectionMatrix );
+					currentProjectionInverse.copy( camera.projectionMatrixInverse );
+
+				}
+
+			};
+
 			beautyPass.contextNode = context( { indirectSpecularNode: indirectSpecular( [ screenReflection, fallback ] ) } );
 			const resolvedSpecular = Fn( () => {
 
@@ -338,10 +387,16 @@
 
 			const gui = renderer.inspector.createParameters( 'Settings' );
 			const ssrFolder = gui.addFolder( 'SSR' );
+			ssrFolder.add( params, 'reflectionSource', [ 'Current frame', 'Previous frame' ] ).name( 'Reflection source' ).onChange( value => {
+
+				useHistorySource.value = value === 'Previous frame';
+				resetHistory();
+
+			} );
 			ssrFolder.add( params, 'denoise' ).onChange( value => {
 
 				denoiseEnabled.value = Number( value );
-				ssrDenoise.reset();
+				resetHistory();
 
 			} );
 			ssrFolder.add( params, 'maxFrames', 1, 32, 1 ).onChange( updateParameters );
@@ -358,14 +413,14 @@
 				renderPipeline.outputNode = views[ value ];
 				renderPipeline.needsUpdate = true;
 
-				ssrDenoise.reset();
+				resetHistory();
 
 			} );
 			gui.add( params, 'environment' ).onChange( value => {
 
 				environmentEnabled.value = Number( value );
 				scene.environmentIntensity = value ? 1.25 : 0;
-				ssrDenoise.reset();
+				resetHistory();
 
 			} );
 			ssrFolder.add( params, 'maxDistance', 0, 10 ).onChange( updateParameters );
@@ -407,13 +462,20 @@
 			maxRoughness.value = params.maxRoughness;
 			ssrDenoise.maxFrames.value = params.maxFrames;
 			ssrDenoise.radius.value = params.radius;
-			ssrDenoise.reset();
+			resetHistory();
 			ssrPass.maxDistance.value = params.maxDistance;
 			// The tracer keeps physical radiance. Strength scales resolved coverage.
 			ssrStrength.value = params.intensity;
 			ssrPass.thickness.value = params.thickness;
 			// build-time constant: assigning it recompiles the SSR material (setter no-ops if unchanged)
 			ssrPass.binaryRefine = params.binaryRefine;
+
+		}
+
+		function resetHistory() {
+
+			historyValid.value = false;
+			ssrDenoise?.reset();
 
 		}
 
@@ -430,7 +492,31 @@
 
 			controls.update();
 
+			const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
+			if ( lightingHistory.width !== size.x || lightingHistory.height !== size.y ) {
+
+				lightingHistory.setSize( size.x, size.y );
+				resetHistory();
+
+			}
+
+			renderer.initRenderTarget( lightingHistory );
 			renderPipeline.render();
+			// The source is previous beauty lighting, never a same-frame feedback loop.
+			if ( useHistorySource.value && params.output === 'Beauty' ) {
+
+				renderer.copyTextureToTexture( beautyPass.getTexture(), lightingHistory.texture );
+				renderer.copyTextureToTexture( geometryPass.getTexture( 'depth' ), lightingHistory.depthTexture );
+				previousView.value.copy( currentView );
+				previousProjection.value.copy( currentProjection );
+				previousProjectionInverse.value.copy( currentProjectionInverse );
+				historyValid.value = true;
+
+			} else {
+
+				historyValid.value = false;
+
+			}
 
 		}
 
