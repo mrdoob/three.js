@@ -1,5 +1,5 @@
 import { RenderTarget, Vector2, Node, QuadMesh, NodeMaterial, RendererUtils, MathUtils, RGBFormat, RedFormat, UnsignedInt101111Type, UnsignedByteType } from 'three/webgpu';
-import { clamp, normalize, reference, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, bool, getNormalFromDepth, countOneBits, interleavedGradientNoise, property, outputStruct, context, isBackgroundDepth } from 'three/tsl';
+import { clamp, normalize, reference, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, bool, getNormalFromDepth, countOneBits, interleavedGradientNoise, property, outputStruct, context, isBackgroundDepth, min, getProjectionDepth } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -82,6 +82,16 @@ class SSGINode extends Node {
 		 * @type {TextureNode}
 		 */
 		this.normalNode = normalNode;
+
+		/**
+		 * The resolution scale. Values towards `0.5` noticeably increase noise, so it's
+		 * recommended to lower the renderer's pixel ratio first. Use this property only
+		 * for fine-tuning performance.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.resolutionScale = 1;
 
 		/**
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
@@ -227,6 +237,14 @@ class SSGINode extends Node {
 		this._temporalOffset = uniform( 0 );
 
 		/**
+		 * Resolution scale uniform.
+		 *
+		 * @private
+		 * @type {UniformNode<float>}
+		 */
+		this._resolutionScale = uniform( 0 );
+
+		/**
 		 * Represents the projection matrix of the scene's camera.
 		 *
 		 * @private
@@ -342,6 +360,10 @@ class SSGINode extends Node {
 	 */
 	setSize( width, height ) {
 
+		width = Math.round( this.resolutionScale * width );
+		height = Math.round( this.resolutionScale * height );
+
+		this._resolutionScale.value = this.resolutionScale;
 		this._resolution.value.set( width, height );
 		this._ssgiRenderTarget.setSize( width, height );
 
@@ -421,19 +443,16 @@ class SSGINode extends Node {
 		const MAX_RAY = uint( 32 );
 		const globalOccludedBitfield = uint( 0 );
 
-		const sampleDepth = ( uv ) => {
+		const sampleDepth = ( uv ) => getProjectionDepth( this.depthNode.sample( uv ).r, this._cameraNear, this._cameraFar );
 
-			const depth = this.depthNode.sample( uv ).r;
+		const sampleCenterDepth = ( uv ) => {
 
-			if ( builder.renderer.logarithmicDepthBuffer === true ) {
+			// Sidestep the nearest-rounding during depth access for the unjittered center pixel to avoid banding
 
-				const viewZ = logarithmicDepthToViewZ( depth, this._cameraNear, this._cameraFar );
+			const g = this.depthNode.gather().sample( uv );
+			const depth = builder.renderer.reversedDepthBuffer === true ? max( max( g.x, g.y ), max( g.z, g.w ) ) : min( min( g.x, g.y ), min( g.z, g.w ) );
 
-				return viewZToPerspectiveDepth( viewZ, this._cameraNear, this._cameraFar );
-
-			}
-
-			return depth;
+			return getProjectionDepth( depth, this._cameraNear, this._cameraFar );
 
 		};
 
@@ -551,7 +570,7 @@ class SSGINode extends Node {
 
 		const gi = Fn( () => {
 
-			const depth = sampleDepth( uvNode ).toVar();
+			const depth = this._resolutionScale.lessThan( 1 ).select( sampleCenterDepth( uvNode ), sampleDepth( uvNode ) ).toConst();
 
 			isBackgroundDepth( depth ).discard();
 
