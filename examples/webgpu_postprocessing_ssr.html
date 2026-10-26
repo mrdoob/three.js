@@ -465,20 +465,17 @@
 			gui.add( params, 'enabled' ).name( 'SSR' ).onChange( value => {
 
 				ssrEnabled.value = Number( value );
-				resetHistory();
 
 			} );
 			gui.add( params, 'environment' ).name( 'Environment' ).onChange( value => {
 
 				environmentEnabled.value = Number( value );
 				scene.environmentIntensity = value ? 1.25 : 0;
-				resetHistory();
 
 			} );
 			gui.add( params, 'intensity', 0, 1 ).name( 'SSR strength' ).onChange( value => {
 
 				ssrStrength.value = value;
-				resetHistory();
 
 			} );
 			gui.add( params, 'antialiasing', [ 'SMAA', 'TRAA' ] ).name( 'Antialiasing' ).onChange( value => {
@@ -494,7 +491,6 @@
 
 				renderer.setPixelRatio( params.renderScale );
 				onWindowResize();
-				resetHistory();
 
 			} );
 			resolutionFolder.add( params, 'effectScale', { Full: 1, Half: 0.5, Quarter: 0.25 } ).name( 'SSR scale' ).onChange( updateParameters );
@@ -524,7 +520,6 @@
 			denoiseFolder.add( params, 'denoise' ).name( 'Enabled' ).onChange( value => {
 
 				denoiseEnabled.value = Number( value );
-				resetHistory();
 
 			} );
 			denoiseFolder.add( params, 'radius', 0, 3 ).name( 'Radius' ).onChange( updateParameters );
@@ -574,7 +569,6 @@
 			maxRoughness.value = params.maxRoughness;
 			ssrDenoise.maxFrames.value = params.maxFrames;
 			ssrDenoise.radius.value = params.radius;
-			resetHistory();
 			ssrPass.maxDistance.value = params.maxDistance;
 			ssrStrength.value = params.intensity;
 			ssrPass.thickness.value = params.thickness;
