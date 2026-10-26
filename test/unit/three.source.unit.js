@@ -271,6 +271,9 @@ import './src/textures/VideoTexture.tests.js';
 import './src/nodes/display/ViewportTextureNode.tests.js';
 import './src/nodes/display/ViewportDepthTextureNode.tests.js';
 
+//src/nodes/accessors
+import './src/nodes/accessors/VelocityNode.tests.js';
+
 //src/nodes/lighting
 import './src/nodes/lighting/EnvironmentNode.tests.js';
 import './src/nodes/lighting/IndirectLightingNode.tests.js';

@@ -27,3 +27,4 @@ import './addons/postprocessing/GTAOPass.tests.js';
 import './addons/tsl/SSRNode.tests.js';
 import './addons/tsl/FASTNoise.tests.js';
 import './addons/tsl/SpecularHelpers.tests.js';
+import './addons/tsl/CoverageDenoiseNode.tests.js';
