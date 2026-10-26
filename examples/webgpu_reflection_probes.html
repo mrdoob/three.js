@@ -29,13 +29,14 @@
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { ReflectionProbe, ReflectionProbes } from 'three/addons/lighting/ReflectionProbes.js';
-			import { reflectionProbes } from 'three/addons/tsl/lighting/ReflectionProbesNode.js';
+			import { nodeObject, vec3, vec4 } from 'three/tsl';
+			import { ReflectionProbesNode, reflectionProbes } from 'three/addons/tsl/lighting/ReflectionProbesNode.js';
 			import { ReflectionProbesHelper } from 'three/addons/helpers/ReflectionProbesHelper.js';
 
-			const params = { showProbes: false, dynamicObject: 'Bunny', pause: false, showGrid: false, gridResolution: 6, gridSize: 0.12, resolution: 256, boxProjection: true, capture: capture };
+			const params = { output: 'Beauty', showProbes: false, dynamicObject: 'Bunny', pause: false, showGrid: false, gridResolution: 6, gridSize: 0.12, resolution: 256, boxProjection: true, capture: capture };
 			const grid = new THREE.Group();
 			const timer = new THREE.Timer();
-			let camera, scene, renderer, controls, probes, probesHelper, gridMaterial, dynamicObject;
+			let camera, scene, renderer, controls, probes, probesHelper, gridMaterial, dynamicObject, dynamicMaterial, coverageMaterial, localMaterial;
 			let animationTime = 0;
 
 			init();
@@ -294,7 +295,7 @@
 				// Each test surface evaluates the probe blend at its own world position.
 
 				gridMaterial = new THREE.MeshStandardMaterial( { metalness: 1, roughness: 0.08 } );
-				const dynamicMaterial = new THREE.MeshStandardMaterial( { metalness: 1, roughness: 0 } );
+				dynamicMaterial = new THREE.MeshStandardMaterial( { metalness: 1, roughness: 0 } );
 
 				const loader = new DRACOLoader();
 				const bunnyGeometry = await loader.loadAsync( 'models/draco/bunny.drc' );
@@ -328,7 +329,14 @@
 				capture();
 				scene.environmentNode = reflectionProbes( probes );
 
+				const local = nodeObject( new ReflectionProbesNode( probes, { localOnly: true } ) );
+				coverageMaterial = new THREE.NodeMaterial();
+				coverageMaterial.fragmentNode = vec4( vec3( local.a ), 1 );
+				localMaterial = new THREE.NodeMaterial();
+				localMaterial.fragmentNode = vec4( local.rgb.mul( local.a ), 1 );
+
 				const gui = renderer.inspector.createParameters( 'Reflection Probes' );
+				gui.add( params, 'output', [ 'Beauty', 'Local Radiance', 'Coverage' ] ).name( 'Test Object Output' ).onChange( updateOutput );
 				gui.add( params, 'resolution', [ 256, 512, 1024 ] ).name( 'Capture Resolution' );
 				gui.add( params, 'capture' ).name( 'Capture' );
 				gui.add( params, 'boxProjection' ).name( 'Box Projection' ).onChange( ( value ) => probes.boxProjection = value );
@@ -425,6 +433,15 @@
 				}
 
 				grid.visible = params.showGrid;
+				updateOutput();
+
+			}
+
+			function updateOutput() {
+
+				const material = params.output === 'Coverage' ? coverageMaterial : params.output === 'Local Radiance' ? localMaterial : null;
+				dynamicObject.material = material || dynamicMaterial;
+				for ( const mesh of grid.children ) mesh.material = material || gridMaterial;
 
 			}
 

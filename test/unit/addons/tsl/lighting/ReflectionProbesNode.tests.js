@@ -1,7 +1,8 @@
-import { BoxGeometry, CubeArrayTexture, Mesh, MeshStandardNodeMaterial, Vector3, WebGPUCoordinateSystem } from 'three/webgpu';
-import { vec3 } from 'three/tsl';
+import { BackSide, DataTexture, EquirectangularReflectionMapping, FloatType, MeshBasicMaterial, NodeMaterial, OrthographicCamera, PlaneGeometry, RenderTarget, Scene, BoxGeometry, CubeArrayTexture, Mesh, MeshStandardNodeMaterial, Vector3, WebGPUCoordinateSystem } from 'three/webgpu';
+import { getParallaxCorrectNormal, nodeObject, vec3, vec4 } from 'three/tsl';
 import { ReflectionProbe, ReflectionProbes } from '../../../../../examples/jsm/lighting/ReflectionProbes.js';
-import { ReflectionProbesNode } from '../../../../../examples/jsm/tsl/lighting/ReflectionProbesNode.js';
+import { ReflectionProbesNode, reflectionProbesSpecular, reflectionProbesDiffuse, reflectionProbesEnvironment } from '../../../../../examples/jsm/tsl/lighting/ReflectionProbesNode.js';
+import { getSharedRenderer } from '../../../src/nodes/tsl/gpu-test-utils.js';
 import WGSLNodeBuilder from '../../../../../src/renderers/webgpu/nodes/WGSLNodeBuilder.js';
 
 export default QUnit.module( 'Addons', () => {
@@ -9,6 +10,105 @@ export default QUnit.module( 'Addons', () => {
 	QUnit.module( 'TSL', () => {
 
 		QUnit.module( 'ReflectionProbesNode', () => {
+
+			QUnit.test( 'local coverage preserves black samples and recomposes the legacy environment', async assert => {
+
+				const adapter = await navigator.gpu?.requestAdapter();
+				const info = adapter?.info;
+				if ( ! info || info.isFallbackAdapter || /swiftshader|llvmpipe|lavapipe|software/i.test( `${ info.vendor } ${ info.device } ${ info.description }` ) ) {
+
+					assert.ok( true, 'SKIPPED: a hardware WebGPU adapter is required.' );
+					return;
+
+				}
+
+				const renderer = await getSharedRenderer( 'webgpu' );
+				if ( ! renderer ) return;
+				const previousTarget = renderer.getRenderTarget();
+				const source = new Scene();
+				const boxGeometry = new BoxGeometry( 4, 4, 4 );
+				const boxMaterial = new MeshBasicMaterial( { side: BackSide } );
+				source.add( new Mesh( boxGeometry, boxMaterial ) );
+				const pixels = new Float32Array( 8 * 4 * 4 );
+				for ( let i = 0; i < pixels.length; i += 4 ) pixels[ i + 1 ] = pixels[ i + 3 ] = 1;
+				const environment = new DataTexture( pixels, 8, 4 );
+				environment.type = FloatType;
+				environment.mapping = EquirectangularReflectionMapping;
+				environment.needsUpdate = true;
+				source.environment = environment;
+				const probes = new ReflectionProbes();
+				const probe = new ReflectionProbe( 4, 4, 4 );
+				probe.blendDistance = 0.5;
+				probes.add( probe );
+				const view = new Scene();
+				const geometry = new PlaneGeometry( 2, 2 );
+				const material = new NodeMaterial();
+				view.add( new Mesh( geometry, material ) );
+				const camera = new OrthographicCamera( - 1, 1, 1, - 1, 0.1, 10 );
+				camera.position.z = 2;
+				const target = new RenderTarget( 8, 8, { type: FloatType } );
+				const query = { position: vec3( 0 ), direction: vec3( 0, 0, 1 ), roughness: 0 };
+				const close = ( actual, expected, message ) => assert.ok( expected.every( ( value, i ) => Math.abs( actual[ i ] - value ) < 0.01 ), `${ message }: ${ actual }` );
+				const draw = async node => {
+
+					material.fragmentNode = vec4( node );
+					material.needsUpdate = true;
+					renderer.setRenderTarget( target );
+					renderer.render( view, camera );
+					return Array.from( await renderer.readRenderTargetPixelsAsync( target, 4, 4, 1, 1 ) );
+
+				};
+
+				try {
+
+					probes.bake( renderer, source );
+					const provider = reflectionProbesSpecular( probes );
+					close( await draw( provider( query ) ), [ 1, 1, 1, 1 ], 'Interior supplies conditional white radiance' );
+					close( await draw( reflectionProbesDiffuse( probes )( { position: query.position, normal: query.direction } ) ), [ Math.PI, Math.PI, Math.PI, 1 ], 'Diffuse provider returns irradiance with the same coverage' );
+					view.environmentIntensity = 0;
+					close( await draw( provider( query ) ), [ 0, 0, 0, 1 ], 'Zero intensity retains coverage' );
+					view.environmentIntensity = 1;
+					close( await draw( provider( { ...query, position: vec3( 10 ) } ) ), [ 0, 0, 0, 0 ], 'Explicit outside position has no local coverage' );
+					const position = vec3( 1.75, 0, 0 );
+					const local = nodeObject( new ReflectionProbesNode( probes, { ...query, position, localOnly: true } ) );
+					close( await draw( local ), [ 1, 1, 1, 0.5 ], 'Fade changes coverage rather than conditional radiance' );
+					const sky = reflectionProbesEnvironment( probes ).context( { getUV: () => query.direction, getTextureLevel: () => 0 } );
+					const recomposed = local.rgb.mul( local.a ).add( sky.mul( local.a.oneMinus() ) );
+					const legacy = new ReflectionProbesNode( probes, { ...query, position } );
+					const expected = await draw( vec4( legacy, 1 ) );
+					close( await draw( vec4( recomposed, 1 ) ), expected, 'Manual fallback matches legacy sampling' );
+					close( await draw( vec4( getParallaxCorrectNormal( vec3( 1, 0, 0 ), vec3( 4 ), vec3( 0 ), vec3( 0, 1, 0 ) ), 1 ) ), [ 2, 1, 0, 1 ], 'Parallax uses explicit query position' );
+
+					const overlap = new ReflectionProbe( 4, 4, 4 );
+					overlap.blendDistance = 0.5;
+					probes.add( overlap );
+					probes.bake( renderer, source );
+					close( await draw( provider( { ...query, position } ) ), [ 1, 1, 1, 0.75 ], 'Overlapping probes consume only remaining coverage' );
+					probes.remove( overlap );
+
+					boxMaterial.color.set( 0 );
+					probes.bake( renderer, source );
+					close( await draw( local ), [ 0, 0, 0, 0.5 ], 'Rebaked valid black retains fractional coverage' );
+					// Keep this compiled graph bound across the next bake.
+					boxMaterial.color.set( 0xffffff );
+					source.environment = null;
+					probes.bake( renderer, source );
+					renderer.setRenderTarget( target );
+					renderer.render( view, camera );
+					close( Array.from( await renderer.readRenderTargetPixelsAsync( target, 4, 4, 1, 1 ) ), [ 1, 1, 1, 0.5 ], 'Existing local bindings follow a replacement texture' );
+					close( await draw( vec4( sky, 1 ) ), [ 0, 0, 0, 1 ], 'Removed environment leaves cached fallback black' );
+					probes.capturing = true;
+					close( await draw( local ), [ 0, 0, 0, 0 ], 'Capture suppresses local coverage' );
+
+				} finally {
+
+					probes.capturing = false;
+					renderer.setRenderTarget( previousTarget );
+					for ( const resource of [ boxGeometry, boxMaterial, geometry, material, target, environment, probes ] ) resource.dispose();
+
+				}
+
+			} );
 
 			QUnit.test( 'clone copies the probe settings', ( assert ) => {
 
