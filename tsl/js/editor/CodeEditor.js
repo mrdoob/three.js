@@ -164,7 +164,6 @@ const ADDONS_TSL_IMPORTS = {
 	outline: 'three/addons/tsl/display/OutlineNode.js',
 	parallaxBarrierPass: 'three/addons/tsl/display/ParallaxBarrierPassNode.js',
 	pixelationPass: 'three/addons/tsl/display/PixelationPassNode.js',
-	recurrentDenoise: 'three/addons/tsl/display/RecurrentDenoiseNode.js',
 	retroPass: 'three/addons/tsl/display/RetroPassNode.js',
 	rgbShift: 'three/addons/tsl/display/RGBShiftNode.js',
 	sepia: 'three/addons/tsl/display/Sepia.js',
@@ -180,7 +179,6 @@ const ADDONS_TSL_IMPORTS = {
 	stereoCompositePass: 'three/addons/tsl/display/StereoCompositePassNode.js',
 	stereoPass: 'three/addons/tsl/display/StereoPassNode.js',
 	taau: 'three/addons/tsl/display/TAAUNode.js',
-	temporalReproject: 'three/addons/tsl/display/TemporalReprojectNode.js',
 	traa: 'three/addons/tsl/display/TRAANode.js',
 	transition: 'three/addons/tsl/display/TransitionNode.js',
 
