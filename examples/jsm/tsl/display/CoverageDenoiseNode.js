@@ -74,7 +74,7 @@ class CoverageDenoiseNode extends Node {
 
 		this._spatialTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 		this._target = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, count: 3 } );
-		// Age, roughness and surface identity have independent channels; B is unused.
+		// Age, roughness, virtual-history share and surface identity have independent channels.
 		// Full precision keeps identity comparisons exact; point gathers need no filtering.
 		this._target.textures[ 2 ].type = FloatType;
 		this._target.textures[ 2 ].minFilter = this._target.textures[ 2 ].magFilter = NearestFilter;
@@ -89,6 +89,7 @@ class CoverageDenoiseNode extends Node {
 		}
 
 		this._textureNode = passTexture( this, this._target.texture );
+		this._metadataNode = passTexture( this, this._target.textures[ 2 ] );
 		this._historyColor = texture( this._historyTarget.texture );
 		this._historyGeometry = texture( this._historyTarget.textures[ 1 ] );
 		this._historyAge = texture( this._historyTarget.textures[ 2 ] );
@@ -128,9 +129,14 @@ class CoverageDenoiseNode extends Node {
 
 	}
 
-	getTextureNode() {
+	/**
+	 * @param {'output'|'metadata'} [name='output'] - Reconstructed radiance and coverage, or
+	 * diagnostics: history age in R, roughness in G, virtual-hit share of history in B, surface identity in A.
+	 * @return {PassTextureNode} The texture node.
+	 */
+	getTextureNode( name = 'output' ) {
 
-		return this._textureNode;
+		return name === 'metadata' ? this._metadataNode : this._textureNode;
 
 	}
 
@@ -151,6 +157,7 @@ class CoverageDenoiseNode extends Node {
 		this._historyTarget = this._target;
 		this._target = historyTarget;
 		this._textureNode.value = this._target.texture;
+		this._metadataNode.value = this._target.textures[ 2 ];
 		this._historyColor.value = this._historyTarget.texture;
 		this._historyGeometry.value = this._historyTarget.textures[ 1 ];
 		this._historyAge.value = this._historyTarget.textures[ 2 ];
@@ -292,6 +299,7 @@ class CoverageDenoiseNode extends Node {
 		const spatialTexture = texture( this._spatialTarget.texture );
 		const colorField = property( 'vec4' );
 		const ageField = property( 'float' );
+		const virtualField = property( 'float' );
 		const temporal = Fn( () => {
 
 			const coordinate = uv();
@@ -299,6 +307,7 @@ class CoverageDenoiseNode extends Node {
 			const currentWeighted = toWeighted( current ).toConst();
 			const result = currentWeighted.toVar();
 			const age = float( 1 ).toVar();
+			virtualField.assign( 0 );
 			const position = viewPosition( coordinate ).toConst();
 			const worldPosition = this._world.mul( vec4( position, 1 ) ).xyz.toConst();
 			const worldNormal = normal( coordinate ).transformDirection( this._world ).toConst();
@@ -386,6 +395,7 @@ class CoverageDenoiseNode extends Node {
 					const hitWeight = hit.get( 'weight' ).mul( trust ).mul( hitStretch ).toConst();
 					const surfaceWeight = history.get( 'weight' ).mul( trust.oneMinus() ).mul( surfStretch ).toConst();
 					const total = hitWeight.add( surfaceWeight ).toConst();
+					virtualField.assign( hitWeight.div( total.max( 1e-6 ) ) );
 					const color = history.get( 'color' ).mul( surfaceWeight ).add( hit.get( 'color' ).mul( hitWeight ) ).div( total.max( 1e-6 ) );
 					const blendedAge = history.get( 'age' ).mul( surfaceWeight ).add( hit.get( 'age' ).mul( hitWeight ) ).div( total.max( 1e-6 ) );
 					history.assign( historySample( color, total, blendedAge ) );
@@ -445,7 +455,7 @@ class CoverageDenoiseNode extends Node {
 		this._spatialMaterial.needsUpdate = true;
 		this._temporalMaterial.contextNode = context( builder.getSharedContext() );
 		this._temporalMaterial.colorNode = temporal();
-		this._temporalMaterial.outputNode = outputStruct( colorField, geometry(), vec4( ageField, roughnessAt( uv() ), 0, this.surfaceIdNode !== null ? float( this.surfaceIdNode ) : float( 0 ) ) );
+		this._temporalMaterial.outputNode = outputStruct( colorField, geometry(), vec4( ageField, roughnessAt( uv() ), virtualField, this.surfaceIdNode !== null ? float( this.surfaceIdNode ) : float( 0 ) ) );
 		this._temporalMaterial.needsUpdate = true;
 		return this._textureNode;
 

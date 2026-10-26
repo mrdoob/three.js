@@ -398,15 +398,19 @@
 				'SSR Filtered': vec4( filtered.sample( screenUV ).rgb.mul( filtered.sample( screenUV ).a ).mul( ssrStrength ), 1 ),
 				'SSR Coverage': vec4( vec3( coverage.sample( screenUV ).mul( ssrStrength ) ), 1 ),
 				'SSR Coverage Filtered': vec4( vec3( filtered.sample( screenUV ).a.mul( ssrStrength ) ), 1 ),
+				'History age': vec4( vec3( ssrDenoise.getTextureNode( 'metadata' ).sample( screenUV ).r.div( ssrDenoise.maxFrames ) ), 1 ),
+				'Virtual history': vec4( vec3( ssrDenoise.getTextureNode( 'metadata' ).sample( screenUV ).b ), 1 ),
 				'Indirect Specular': resolvedSpecular
 			};
 			const updateOutput = () => {
 
-				// Debug views must still produce the beauty lighting used next frame.
+				// Debug views must still produce the beauty lighting used next frame,
+				// and run TRAA so jitter and histories match the Beauty pipeline.
 				const selected = views[ params.output ];
-				renderPipeline.outputNode = useHistorySource.value && params.output !== 'Beauty' ? Fn( builder => {
+				const traa = params.antialiasing === 'TRAA';
+				renderPipeline.outputNode = ( useHistorySource.value || traa ) && params.output !== 'Beauty' ? Fn( builder => {
 
-					beautyPass.build( builder );
+					( traa ? traaPass : beautyPass ).build( builder );
 					return selected;
 
 				} )() : selected;
