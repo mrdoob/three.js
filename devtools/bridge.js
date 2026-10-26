@@ -24,26 +24,7 @@
 	Object.defineProperty( window, '__THREE_DEVTOOLS__', { value: devTools, enumerable: true } );
 
 	// Shared with highlight.js and preview.js, which add their own functions here
-	devTools.utils = { findObjectInScenes, unobserved, getSceneView };
-
-	// Create an object without reporting it to the panel, for the renderer and scene of preview.js
-	let observing = true;
-
-	function unobserved( create ) {
-
-		observing = false;
-
-		try {
-
-			return create();
-
-		} finally {
-
-			observing = true;
-
-		}
-
-	}
+	devTools.utils = { findObjectInScenes, getSceneView };
 
 	// Send a message to the panel (relayed by the content script)
 	function postToPanel( name, detail ) {
@@ -317,8 +298,6 @@
 
 	devTools.addEventListener( EVENT_OBSERVE, ( event ) => {
 
-		if ( observing === false ) return;
-
 		const object = event.detail;
 
 		if ( object.isWebGLRenderer || object.isWebGPURenderer ) {
@@ -454,7 +433,7 @@
 
 	}
 
-	async function sendObjectDetails( uuid, preview ) {
+	function sendObjectDetails( uuid, preview ) {
 
 		const object = findObjectInScenes( uuid );
 		if ( object === null ) return;
@@ -469,8 +448,8 @@
 			light: object.isLight ? getLightData( object ) : null
 		};
 
-		// A preview costs the page a frame, so it comes along only when asked for
-		if ( preview ) details.preview = await devTools.utils.renderPreview( object );
+		// Drawing a preview takes the page time for large geometries, so it comes along only when asked for
+		if ( preview ) details.preview = devTools.utils.renderPreview( object );
 
 		postToPanel( EVENT_OBJECT_DETAILS, details );
 

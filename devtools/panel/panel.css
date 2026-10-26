@@ -177,8 +177,8 @@ details[open] > summary .tree-toggle::before {
 	font: inherit;
 	max-width: 80px; /* as wide as its longest option otherwise */
 }
-/* The tile is the placeholder too, so the size lives here and preview.js renders to match.
-   It holds the render as its background, or the reason there is none as text. */
+/* The tile is the placeholder too, so the size lives here and preview.js draws to match.
+   It holds the drawing as its background, or the reason there is none as text. */
 .preview {
 	display: flex;
 	align-items: center;

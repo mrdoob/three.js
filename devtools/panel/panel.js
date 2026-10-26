@@ -51,7 +51,7 @@ function poll() {
 
 	send( MESSAGE_REQUEST_STATE );
 
-	// A preview costs the page a frame, so it is only asked for on expand and when the geometry or material changes
+	// Drawing a preview takes the page time, so it is only asked for on expand and when the geometry or material changes
 	for ( const uuid of expanded.keys() ) send( MESSAGE_REQUEST_OBJECT_DETAILS, { uuid: uuid, preview: false } );
 
 }
