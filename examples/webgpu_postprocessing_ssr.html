@@ -186,12 +186,20 @@
 			scene.environmentIntensity = 1.25;
 			pmremGenerator.dispose();
 
-			// One fixed probe, captured at the initial viewer position. The room omits
-			// the Steampunk Camera model and cannot sample the reflection being written.
+			// Capture the room and display floor once, omitting the camera model.
+			// The floor uses the original room lighting, avoiding probe feedback.
+			const captureFloor = floor.clone();
+			captureFloor.material = floorMaterial.clone();
+			captureFloor.material.envMap = scene.environment;
+			captureFloor.material.envMapIntensity = scene.environmentIntensity;
+			captureFloor.position.sub( environment.position );
+			environment.add( captureFloor );
+
 			const cubeTarget = new THREE.CubeRenderTarget( 256, { type: THREE.HalfFloatType } );
 			const cubeCamera = new THREE.CubeCamera( 0.1, 100, cubeTarget );
 			cubeCamera.position.copy( camera.position );
 			cubeCamera.update( renderer, environment );
+			scene.environment = cubeTarget.texture;
 			const capture = environmentSpecular( pmremTexture( cubeTarget.texture ), 1.25 );
 			const fallback = query => {
 
