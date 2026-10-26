@@ -44,8 +44,10 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec3, vec4, Fn, If, uniform, context, cameraWorldMatrix, getViewPosition, diffuseColor, specularColorBlended, specularF90, EnvironmentBRDF, indirectSpecular, environmentSpecular, pmremTexture, colorSpaceToWorking } from 'three/tsl';
+		import { pass, mrt, output, normalView, velocity, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec3, vec4, Fn, If, uv, convertToTexture, uniform, context, cameraWorldMatrix, getViewPosition, diffuseColor, specularColorBlended, specularF90, EnvironmentBRDF, indirectSpecular, environmentSpecular, pmremTexture, } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
+		import { coverageDenoise } from 'three/addons/tsl/display/CoverageDenoiseNode.js';
+		import { resolveSSRHitDistance } from 'three/addons/tsl/utils/SpecularHelpers.js';
 		import { fastNoise } from 'three/addons/tsl/utils/FASTNoise.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
@@ -56,22 +58,32 @@
 		import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 		const params = {
-			quality: 0.5,
-			view: 'Beauty',
+			quality: 1,
+			output: 'Beauty',
+			denoise: true,
+			maxFrames: 16,
+			radius: 1.5,
+			maxRoughness: 0.8,
+			mirrorBias: 0,
+			stepExponent: 3,
+			maxLuminance: 35,
+			screenEdgeFade: 0.1,
 			sampling: 'FAST Separate',
 			environment: true,
 			maxDistance: 5,
 			intensity: 1,
 			thickness: 0.03,
-			binaryRefine: false,
+			binaryRefine: true,
 			roughness: 1,
 			enabled: true
 		};
 
-		let camera, scene, model, renderer, renderPipeline, ssrPass;
+		let camera, scene, model, renderer, renderPipeline, ssrPass, ssrDenoise;
 		let controls;
 		const samplingModes = [ 'Original', 'FAST Product', 'FAST Separate' ];
 		const samplingMode = uniform( 2, 'uint' );
+		const denoiseEnabled = uniform( 1 );
+		const maxRoughness = uniform( params.maxRoughness );
 		const ssrEnabled = uniform( 1 );
 		const environmentEnabled = uniform( 1 );
 
@@ -154,7 +166,15 @@
 			const samplingNoise = Fn( () => {
 
 				const value = vec4().toVar();
-				If( samplingMode.equal( 2 ), () => value.assign( separateNoise ) ).Else( () => value.assign( productNoise ) );
+				If( samplingMode.equal( 2 ), () => {
+
+					value.assign( separateNoise );
+
+				} ).Else( () => {
+
+					value.assign( productNoise );
+
+				} );
 				return value;
 
 			} )();
@@ -184,36 +204,30 @@
 
 			renderPipeline = new THREE.RenderPipeline( renderer );
 
+			// Geometry guides have their own pass so motion and HDR lighting fit
+			// within the standard WebGPU color attachment limit.
+			const geometryPass = pass( scene, camera );
+			geometryPass.contextNode = context( { indirectSpecularNode: indirectSpecular( [] ) } );
+			geometryPass.setMRT( mrt( {
+				output: vec4( packNormalToRGB( normalView ), roughness ),
+				albedo: vec4( diffuseColor.rgb, metalness ),
+				reflectance: vec4( specularColorBlended, specularF90 ),
+				velocity
+			} ) );
+			const scenePassNormal = geometryPass.getTextureNode().toInspector( 'Normal-Roughness' );
+			const albedoMetalness = geometryPass.getTextureNode( 'albedo' );
+			const reflectance = geometryPass.getTextureNode( 'reflectance' );
+			const motion = geometryPass.getTextureNode( 'velocity' );
+			geometryPass.getTexture( 'albedo' ).type = THREE.UnsignedByteType;
+			geometryPass.getTexture( 'reflectance' ).type = THREE.UnsignedByteType;
+			const scenePassDepth = geometryPass.getTextureNode( 'depth' ).toInspector( 'Depth', () => geometryPass.getLinearDepthNode() );
+			const scenePassMetalRough = sample( uv => vec2( albedoMetalness.sample( uv ).a, scenePassNormal.sample( uv ).a ) );
+
 			// SSR reads a fallback-only source; only the final pass consumes SSR.
 			const scenePass = pass( scene, camera );
 			scenePass.contextNode = context( { indirectSpecularNode: indirectSpecular( [ fallback ] ) } );
-			scenePass.setMRT( mrt( {
-				output: vec4( output.rgb, 1 ),
-				normal: vec4( packNormalToRGB( normalView ), roughness ),
-				albedo: vec4( diffuseColor.rgb, metalness ),
-				reflectance: vec4( specularColorBlended, specularF90 )
-			} ) );
-
-			const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
-			const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal', ( node ) => {
-
-				return colorSpaceToWorking( node, THREE.SRGBColorSpace );
-
-			} );
-			const scenePassDepth = scenePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => {
-
-				return scenePass.getLinearDepthNode();
-
-			} );
-			const scenePassMetalRough = sample( uv => vec2( scenePass.getTextureNode( 'albedo' ).sample( uv ).a, scenePassNormal.sample( uv ).a ) );
-
-			// optional: optimize bandwidth by reducing the texture precision for normals and metal/roughness
-
-			scenePass.getTexture( 'albedo' ).type = THREE.UnsignedByteType;
-			scenePass.getTexture( 'reflectance' ).type = THREE.UnsignedByteType;
-
-			const normalTexture = scenePass.getTexture( 'normal' );
-			normalTexture.type = THREE.UnsignedByteType;
+			scenePass.setMRT( mrt( { output: vec4( output.rgb, 1 ) } ) );
+			const scenePassColor = scenePass.getTextureNode().toInspector( 'Source Color' );
 
 			const sceneNormal = sample( ( uv ) => {
 
@@ -227,19 +241,25 @@
 				stochastic: true,
 				outputCoverage: true,
 				noiseNode: samplingNoise,
-				diffuseNode: scenePass.getTextureNode( 'albedo' ),
+				diffuseNode: albedoMetalness,
 				metalnessNode: scenePassMetalRough.r,
 				roughnessNode: scenePassMetalRough.g
 			} ).toInspector( 'SSR (BRDF weighted)' );
 
-			const coverage = sample( uv => ssrPass.getCoverageNode().sample( uv ).r ).toInspector( 'SSR Coverage' );
+			const coverage = sample( uv => {
+
+				const level = scenePassNormal.sample( uv ).a;
+				const roughnessFade = level.smoothstep( maxRoughness.sub( 0.1 ), maxRoughness ).oneMinus();
+				return ssrPass.getCoverageNode().sample( uv ).r.mul( roughnessFade );
+
+			} ).toInspector( 'SSR Coverage' );
 			const incoming = sample( uv => {
 
 				const raw = ssrPass.getTextureNode().sample( uv );
 				const c = ssrPass.getCoverageNode().sample( uv ).r;
 				const n = sceneNormal.sample( uv );
 				const v = getViewPosition( uv, scenePassDepth.sample( uv ).r, uniform( camera.projectionMatrixInverse ) ).negate().normalize();
-				const f = scenePass.getTextureNode( 'reflectance' ).sample( uv );
+				const f = reflectance.sample( uv );
 				const modulation = EnvironmentBRDF( {
 					dotNV: n.dot( v ).clamp(),
 					specularColor: f.rgb,
@@ -251,6 +271,16 @@
 
 			} ).toInspector( 'SSR Incoming Radiance' );
 
+			// Reconstruct conditional radiance and coverage before filling any holes.
+			const sparseSSR = convertToTexture( vec4( incoming.sample( uv() ), coverage.sample( uv() ) ) );
+			ssrDenoise = coverageDenoise( sparseSSR, camera, {
+				depth: scenePassDepth,
+				normal: scenePassNormal,
+				velocity: motion,
+				hitDistance: sample( uv => resolveSSRHitDistance( ssrPass.getTextureNode().sample( uv ).a, coverage.sample( uv ) ) )
+			} );
+			const filtered = ssrDenoise.getTextureNode();
+
 			const screenReflection = ( { normal, viewDirection, direction, roughness: level } ) => Fn( () => {
 
 				const baseNormal = sceneNormal.sample( screenUV ).transformDirection( cameraWorldMatrix );
@@ -260,17 +290,34 @@
 				const matches = level.sub( baseRoughness ).abs().lessThan( 0.01 )
 					.and( normal.dot( baseNormal ).greaterThan( 0.999 ) )
 					.and( direction.dot( baseDirection ).greaterThan( 0.999 ) );
-				return vec4( incoming.sample( screenUV ), coverage.sample( screenUV ).mul( matches ).mul( ssrEnabled ) );
+				const raw = vec4( incoming.sample( screenUV ), coverage.sample( screenUV ) );
+				const value = denoiseEnabled.mix( raw, filtered.sample( screenUV ) );
+				return vec4( value.rgb, value.a.mul( matches ).mul( ssrEnabled ) );
 
 			} )();
 
 			const beautyPass = pass( scene, camera );
 			beautyPass.contextNode = context( { indirectSpecularNode: indirectSpecular( [ screenReflection, fallback ] ) } );
+			const resolvedSpecular = Fn( () => {
+
+				const normal = sceneNormal.sample( screenUV ).transformDirection( uniform( camera.matrixWorld ) );
+				const level = scenePassNormal.sample( screenUV ).a;
+				const view = getViewPosition( screenUV, scenePassDepth.sample( screenUV ).r, uniform( camera.projectionMatrixInverse ) ).negate().normalize().transformDirection( uniform( camera.matrixWorld ) );
+				const direction = level.pow4().mix( view.negate().reflect( normal ), normal ).normalize();
+				const environment = fallback( { direction, roughness: level } );
+				const value = filtered.sample( screenUV );
+				const weight = value.a.mul( ssrEnabled );
+				return vec4( value.rgb.mul( weight ).add( environment.rgb.mul( environment.a ).mul( weight.oneMinus() ) ), 1 );
+
+			} )();
 			const views = {
 				Beauty: smaa( beautyPass ),
-				'Environment only': smaa( scenePassColor ),
-				'SSR incoming radiance': vec4( incoming.sample( screenUV ), 1 ),
-				'SSR coverage': vec4( vec3( coverage ), 1 )
+				'PMREM only': smaa( scenePassColor ),
+				SSR: vec4( incoming.sample( screenUV ).mul( coverage.sample( screenUV ) ), 1 ),
+				'SSR Filtered': vec4( filtered.sample( screenUV ).rgb.mul( filtered.sample( screenUV ).a ), 1 ),
+				'SSR Coverage': vec4( vec3( coverage.sample( screenUV ) ), 1 ),
+				'SSR Coverage Filtered': vec4( vec3( filtered.sample( screenUV ).a ), 1 ),
+				'Indirect Specular': resolvedSpecular
 			};
 			renderPipeline.outputNode = views.Beauty;
 
@@ -286,12 +333,26 @@
 
 			const gui = renderer.inspector.createParameters( 'Settings' );
 			const ssrFolder = gui.addFolder( 'SSR' );
+			ssrFolder.add( params, 'denoise' ).onChange( value => {
+
+				denoiseEnabled.value = Number( value );
+				ssrDenoise.reset();
+
+			} );
+			ssrFolder.add( params, 'maxFrames', 1, 32, 1 ).onChange( updateParameters );
+			ssrFolder.add( params, 'radius', 0, 3 ).onChange( updateParameters );
+			ssrFolder.add( params, 'maxRoughness', 0.1, 1 ).onChange( updateParameters );
+			ssrFolder.add( params, 'mirrorBias', 0, 1 ).onChange( updateParameters );
+			ssrFolder.add( params, 'stepExponent', 1, 4, 1 ).onChange( updateParameters );
+			ssrFolder.add( params, 'screenEdgeFade', 0, 0.5 ).onChange( updateParameters );
 			ssrFolder.add( params, 'sampling', samplingModes ).onChange( updateParameters );
 			ssrFolder.add( params, 'quality', 0, 1 ).onChange( updateParameters );
-			gui.add( params, 'view', Object.keys( views ) ).onChange( value => {
+			gui.add( params, 'output', Object.keys( views ) ).onChange( value => {
 
 				renderPipeline.outputNode = views[ value ];
 				renderPipeline.needsUpdate = true;
+
+				ssrDenoise.reset();
 
 			} );
 			gui.add( params, 'environment' ).onChange( value => environmentEnabled.value = Number( value ) );
@@ -326,6 +387,14 @@
 			samplingMode.value = samplingModes.indexOf( params.sampling );
 			ssrPass.useNoiseNode.value = samplingMode.value !== 0;
 			ssrPass.quality.value = params.quality;
+			ssrPass.mirrorBias.value = params.mirrorBias;
+			ssrPass.stepExponent = params.stepExponent;
+			ssrPass.maxLuminance.value = params.maxLuminance;
+			ssrPass.screenEdgeFade.value = params.screenEdgeFade;
+			maxRoughness.value = params.maxRoughness;
+			ssrDenoise.maxFrames.value = params.maxFrames;
+			ssrDenoise.radius.value = params.radius;
+			ssrDenoise.reset();
 			ssrPass.maxDistance.value = params.maxDistance;
 			ssrPass.intensity.value = params.intensity;
 			ssrPass.thickness.value = params.thickness;
