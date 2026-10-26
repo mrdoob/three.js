@@ -46,6 +46,7 @@
 		import * as THREE from 'three/webgpu';
 		import { pass, mrt, output, normalView, velocity, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec3, vec4, Fn, If, uv, convertToTexture, uniform, context, cameraWorldMatrix, getViewPosition, diffuseColor, specularColorBlended, specularF90, EnvironmentBRDF, indirectSpecular, environmentSpecular, pmremTexture, texture, } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
+		import { screenSpaceGBuffer } from 'three/addons/tsl/display/ScreenSpaceGBufferNode.js';
 		import { reprojectedRadiance } from 'three/addons/tsl/display/ReprojectedRadianceNode.js';
 		import { coverageDenoise } from 'three/addons/tsl/display/CoverageDenoiseNode.js';
 		import { resolveSSRHitDistance } from 'three/addons/tsl/utils/SpecularHelpers.js';
@@ -65,6 +66,8 @@
 			output: 'Beauty',
 			reflectionSource: 'Current frame',
 			antialiasing: 'TRAA',
+			renderScale: 1,
+			effectScale: 1,
 			denoise: true,
 			maxFrames: 16,
 			radius: 1.5,
@@ -84,7 +87,7 @@
 		};
 
 		let camera, scene, model, renderer, renderPipeline, ssrPass, ssrDenoise;
-		let controls, geometryPass, beautyPass, lightingHistory, traaPass;
+		let controls, geometryPass, beautyPass, lightingHistory, traaPass, effectGuides;
 		const historyValid = uniform( false );
 		const useHistorySource = uniform( false );
 		const previousView = uniform( new THREE.Matrix4() );
@@ -151,7 +154,7 @@
 			//
 
 			renderer = new THREE.WebGPURenderer();
-			// renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setPixelRatio( window.devicePixelRatio * params.renderScale );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.toneMapping = THREE.ACESFilmicToneMapping;
 			renderer.inspector = new Inspector();
@@ -253,6 +256,13 @@
 
 			//
 
+			effectGuides = screenSpaceGBuffer( scenePassDepth, scenePassNormal, albedoMetalness );
+			effectGuides.resolutionScale = params.effectScale;
+			const effectDepth = effectGuides.getTextureNode();
+			const effectNormalRoughness = effectGuides.getTextureNode( 'normal' );
+			const effectMaterial = effectGuides.getTextureNode( 'material' );
+			const effectNormal = sample( coordinate => unpackRGBToNormal( effectNormalRoughness.sample( coordinate ).rgb ).normalize() );
+
 			lightingHistory = new THREE.RenderTarget( 1, 1, { type: THREE.HalfFloatType, depthTexture: new THREE.DepthTexture() } );
 			lightingHistory.depthTexture.format = scenePassDepth.value.format;
 			lightingHistory.depthTexture.type = scenePassDepth.value.type;
@@ -277,15 +287,15 @@
 
 			} )() );
 
-			ssrPass = ssr( source, scenePassDepth, sceneNormal, {
+			ssrPass = ssr( sample( coordinate => source.sample( effectDepth.sample( coordinate ).gb ) ), effectDepth, effectNormal, {
 				camera,
 				stochastic: true,
 				outputCoverage: true,
-				traceMaskNode: scenePassMetalRough.g.lessThan( maxRoughness ),
+				traceMaskNode: effectNormalRoughness.a.lessThan( maxRoughness ),
 				noiseNode: samplingNoise,
-				diffuseNode: albedoMetalness,
-				metalnessNode: scenePassMetalRough.r,
-				roughnessNode: scenePassMetalRough.g
+				diffuseNode: effectMaterial,
+				metalnessNode: effectMaterial.a,
+				roughnessNode: effectNormalRoughness.a
 			} ).toInspector( 'SSR (BRDF weighted)' );
 
 			const coverage = sample( uv => {
@@ -391,6 +401,14 @@
 			// GUI
 
 			const gui = renderer.inspector.createParameters( 'Settings' );
+			gui.add( params, 'renderScale', { '50%': 0.5, '75%': 0.75, '100%': 1 } ).name( 'Render scale' ).onChange( () => {
+
+				renderer.setPixelRatio( window.devicePixelRatio * params.renderScale );
+				onWindowResize();
+				resetHistory();
+
+			} );
+			gui.add( params, 'effectScale', { Full: 1, Half: 0.5, Quarter: 0.25 } ).name( 'SSR scale' ).onChange( updateParameters );
 			gui.add( params, 'antialiasing', [ 'SMAA', 'TRAA' ] ).onChange( value => {
 
 				views.Beauty = value === 'TRAA' ? traaPass : smaaPass;
@@ -467,7 +485,11 @@
 			samplingMode.value = samplingModes.indexOf( params.sampling );
 			ssrPass.useNoiseNode.value = samplingMode.value !== 0;
 			ssrPass.quality.value = params.quality;
-			ssrPass.useTraceMask.value = params.classify;
+			ssrPass.useTraceMask.value = params.classify && params.effectScale === 1;
+			effectGuides.resolutionScale = params.effectScale;
+			ssrPass.resolutionScale = params.effectScale;
+			// Preserve the sparse ray grid until edge-aware reconstruction.
+			ssrDenoise.inputNode.setResolutionScale( params.effectScale );
 			ssrPass.mirrorBias.value = params.mirrorBias;
 			ssrPass.stepExponent = params.stepExponent;
 			ssrPass.maxLuminance.value = params.maxLuminance;
