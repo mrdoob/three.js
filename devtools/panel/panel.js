@@ -1,4 +1,4 @@
-/* global chrome, MESSAGE_INIT, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, EVENT_REGISTER, EVENT_RENDERER, EVENT_OBJECT_DETAILS, EVENT_SCENE, EVENT_SCENE_REMOVED, EVENT_COMMITTED */
+/* global chrome, MESSAGE_INIT, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, MESSAGE_SELECT_OBJECTS, EVENT_REGISTER, EVENT_RENDERER, EVENT_OBJECT_DETAILS, EVENT_SCENE, EVENT_SCENE_REMOVED, EVENT_COMMITTED */
 
 const STATE_POLLING_INTERVAL = 1000;
 
@@ -549,6 +549,15 @@ function toggleDetails( uuid ) {
 
 	}
 
+	sendSelection();
+
+}
+
+// The expanded objects stay drawn over the page
+function sendSelection() {
+
+	send( MESSAGE_SELECT_OBJECTS, { uuids: [ ...expanded.keys() ] } );
+
 }
 
 // The object rendered with its own material in one column, its transform, geometry and materials, or light, in the other.
@@ -672,5 +681,6 @@ function updateSceneTree() {
 	treeRows.clear();
 	renderSection( scenesSection, 'Scenes', state.scenes, renderObject );
 	updateNotice();
+	sendSelection();
 
 }

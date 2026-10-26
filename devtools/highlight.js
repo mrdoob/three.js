@@ -1,5 +1,6 @@
-// Draws the object hovered in the panel over the page's canvas: a box around anything with a geometry,
-// and for a light where it is, where it shines and the frustum of a directional shadow
+// Draws the objects expanded in the panel over the page's canvas in white, and the hovered one in yellow
+// unless it is expanded: a box around anything with a geometry, and for a light where it is, where it
+// shines and the frustum of a directional shadow
 
 ( function () {
 
@@ -12,21 +13,31 @@
 	const MARKER_RADIUS = 4; // In pixels, around a light's position
 
 	let overlay = null;
-	let path = null;
-	let object = null;
+	let selectedPath = null;
+	let hoveredPath = null;
+	let selected = [];
+	let hovered = null;
 	let frame = null;
 
 	function createOverlay() {
 
 		overlay = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' );
 		overlay.style.cssText = 'position: fixed; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999999;';
-
-		path = document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
-		path.setAttribute( 'stroke', '#ffff00' );
-		path.setAttribute( 'fill', 'none' );
-
-		overlay.appendChild( path );
 		document.documentElement.appendChild( overlay );
+
+		selectedPath = createPath( '#ffffff' );
+		hoveredPath = createPath( '#ffff00' );
+
+	}
+
+	function createPath( color ) {
+
+		const path = document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
+		path.setAttribute( 'stroke', color );
+		path.setAttribute( 'fill', 'none' );
+		overlay.appendChild( path );
+
+		return path;
 
 	}
 
@@ -296,16 +307,6 @@
 
 	}
 
-	function update() {
-
-		frame = requestAnimationFrame( update );
-
-		const view = object === null ? null : utils.getSceneView( object );
-
-		path.setAttribute( 'd', view === null ? '' : draw( object, view ) );
-
-	}
-
 	function isVisible( object ) {
 
 		for ( let parent = object; parent !== null; parent = parent.parent ) {
@@ -318,31 +319,82 @@
 
 	}
 
+	// The shapes of the objects the page draws: the ones in a scene that has been shown, and not hidden
+	function getPath( objects ) {
+
+		let d = '';
+
+		for ( const object of objects ) {
+
+			const view = utils.getSceneView( object );
+			if ( view !== null && isVisible( object ) ) d += draw( object, view );
+
+		}
+
+		return d;
+
+	}
+
+	function update() {
+
+		frame = requestAnimationFrame( update );
+
+		selectedPath.setAttribute( 'd', getPath( selected ) );
+		// An expanded object stays white while hovered, so expanding a row turns it white right away
+		hoveredPath.setAttribute( 'd', hovered === null || selected.includes( hovered ) ? '' : getPath( [ hovered ] ) );
+
+	}
+
+	// Draw on every frame while there is something to draw
+	function refresh() {
+
+		const active = selected.length > 0 || hovered !== null;
+
+		if ( active && overlay === null ) createOverlay();
+		if ( overlay !== null ) overlay.style.display = active ? '' : 'none';
+
+		if ( active && frame === null ) update();
+
+		if ( ! active && frame !== null ) {
+
+			cancelAnimationFrame( frame );
+			frame = null;
+
+		}
+
+	}
+
+	// Helpers are left out, and only objects with a geometry, and lights, have a shape
+	function findShapedObject( uuid ) {
+
+		const object = utils.findObjectInScenes( uuid );
+
+		return object !== null && ! object.type.includes( 'Helper' ) && ( object.geometry !== undefined || object.isLight ) ? object : null;
+
+	}
+
 	function highlight( uuid ) {
 
-		const target = utils.findObjectInScenes( uuid );
-
-		// Helpers and hidden objects are left out, and only objects with a geometry, and lights, have a shape
-		object = target !== null && ! target.type.includes( 'Helper' ) && ( target.geometry !== undefined || target.isLight ) && isVisible( target ) ? target : null;
-
-		if ( overlay === null ) createOverlay();
-		if ( frame === null ) update();
-
-		overlay.style.display = '';
+		hovered = findShapedObject( uuid );
+		refresh();
 
 	}
 
 	function unhighlight() {
 
-		object = null;
-		cancelAnimationFrame( frame );
-		frame = null;
+		hovered = null;
+		refresh();
 
-		if ( overlay !== null ) overlay.style.display = 'none';
+	}
+
+	function select( uuids ) {
+
+		selected = uuids.map( ( uuid ) => findShapedObject( uuid ) ).filter( ( object ) => object !== null );
+		refresh();
 
 	}
 
 	// bridge.js calls these when the panel asks
-	Object.assign( utils, { highlight, unhighlight } );
+	Object.assign( utils, { highlight, unhighlight, select } );
 
 } )();

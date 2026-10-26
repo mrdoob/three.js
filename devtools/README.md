@@ -13,8 +13,8 @@ The toolbar icon shows the three.js revision found on the page. Clicking it scro
 ## Features
 
 - **Scenes**: a collapsible tree of every scene and its objects, with geometry and material types for meshes, and object and light counts per scene.
-- **Objects**: click an object to expand it: a preview of the object rendered with its own material, its position, rotation and scale, and a dropdown of properties for its geometry and each material. Hovering draws a box around it over the page.
-- **Lights**: an expanded light lists the properties of its type (color, intensity, distance, angle...) and, when it casts shadows, its shadow settings and shadow camera bounds. Hovering draws where it is and how it shines: the direction to its target, the cone of a spot light, the reach of a point light, the rectangle of an area light, the volume of a probe grid and the frustum of a directional shadow (one per cascade for a sun).
+- **Objects**: click an object to expand it: a preview of the object rendered with its own material, its position, rotation and scale, and a dropdown of properties for its geometry and each material. Expanded objects get a white box around them over the page, and hovering any other object draws its box in yellow.
+- **Lights**: an expanded light lists the properties of its type (color, intensity, distance, angle...) and, when it casts shadows, its shadow settings and shadow camera bounds. Instead of a box, a light is drawn as its position and the way it shines: the direction to its target, the cone of a spot light, the reach of a point light, the rectangle of an area light, the volume of a probe grid and the frustum of a directional shadow (one per cascade for a sun).
 - **Renderers**: properties, render stats and memory usage of every `WebGLRenderer` and `WebGPURenderer`, with a button to scroll to its canvas.
 
 ## How it works
@@ -25,7 +25,7 @@ three.js has built-in support for the extension: when `window.__THREE_DEVTOOLS__
 
 - `manifest.json`: injects the page scripts into every frame at `document_start`.
 - `bridge.js`: runs in the page's main world. Creates `window.__THREE_DEVTOOLS__`, collects data from the observed renderers and scenes, and answers the panel's requests.
-- `highlight.js`: runs alongside the bridge. Draws a box around the hovered object, or the shape of a hovered light, in an overlay above the page, projected through the camera and viewport the scene is shown with (one per sub camera of an ArrayCamera) and clipped at its near plane.
+- `highlight.js`: runs alongside the bridge. Draws a box around the expanded and hovered objects, or the shape of a light, in an overlay above the page, projected through the camera and viewport the scene is shown with (one per sub camera of an ArrayCamera) and clipped at its near plane.
 - `preview.js`: runs alongside the bridge. Renders an expanded object with its own material, using a renderer created from the page's own three.js, lit by the page's environment and by studio lights of its own (the page's lights on WebGPU). Materials with custom shaders are skipped, their uniforms belong to the page's renderer.
 - `content-script.js`: runs in the isolated world. Relays messages between the bridge and the background script.
 - `background.js`: service worker. Routes messages between the panel and the content script of the inspected tab, and manages the toolbar badge.
@@ -42,7 +42,7 @@ three.js ──dispatchEvent──▶ bridge.js ──postMessage──▶ conte
 
 The panel opens a port to the background script and identifies the inspected tab (`init`); the background script forwards its requests to that tab's content script.
 
-Events from the page: `register`, `renderer`, `scene`, `scene-removed`, `object-details`. Requests from the panel: `request-state`, `request-object-details`, `scroll-to-canvas`, `highlight-object`, `unhighlight-object`.
+Events from the page: `register`, `renderer`, `scene`, `scene-removed`, `object-details`. Requests from the panel: `request-state`, `request-object-details`, `scroll-to-canvas`, `highlight-object`, `unhighlight-object`, `select-objects` (the expanded objects, cleared by the background script when the panel closes).
 
 ### Views
 
