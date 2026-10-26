@@ -3421,14 +3421,12 @@ class GLTFParser {
 		if ( loader.isKTX2Loader === true && sourceDef.bufferView !== undefined ) {
 
 			// KTX2Loader parses the binary image data from bufferView directly (see #35193).
-			// KTX2Loader transfers the buffer to a worker and caches the result by buffer, so each
-			// image gets its own copy. Otherwise images that share a bufferView would share one texture.
 
 			pending = parser.getDependency( 'bufferView', sourceDef.bufferView ).then( function ( bufferView ) {
 
 				return new Promise( function ( resolve, reject ) {
 
-					loader.parse( bufferView.slice( 0 ), resolve, reject );
+					loader.parse( bufferView, resolve, reject );
 
 				} );
 
