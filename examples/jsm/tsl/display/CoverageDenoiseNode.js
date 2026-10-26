@@ -427,13 +427,19 @@ class CoverageDenoiseNode extends Node {
 					const edgeConfidence = deviation.div( mean.max( 1e-3 ) ).mul( this.reflectionEdgeScale ).negate().exp();
 					const validVirtual = rayLength.greaterThan( 0 ).and( rayLength.lessThan( ENV_RAY_LENGTH_THRESHOLD ) )
 						.and( current.a.greaterThan( 0 ) ).and( virtualClip.w.greaterThan( 0 ) ).and( inBounds( virtualUV ) );
-					const hit = gather( virtualUV ).toConst();
 					// The virtual hit assumes a static receiver. Where velocity disagrees with
 					// camera-only reprojection the receiver moved, so keep only surface history.
 					const cameraClip = this._previousProjection.mul( vec4( previousPosition, 1 ) );
 					const cameraUV = cameraClip.xy.div( cameraClip.w.max( 1e-6 ) ).mul( vec2( 0.5, - 0.5 ) ).add( 0.5 );
 					const receiverStatic = surfaceUV.sub( cameraUV ).mul( this._resolution ).length().smoothstep( 0.25, 0.75 ).oneMinus();
-					const trust = edgeConfidence.mul( curvature.oneMinus() ).mul( roughness.pow2().oneMinus() ).mul( validVirtual ).mul( receiverStatic );
+					const trust = edgeConfidence.mul( curvature.oneMinus() ).mul( roughness.pow2().oneMinus() ).mul( validVirtual ).mul( receiverStatic ).toConst();
+					// Untrusted virtual history cannot contribute, so skip its gather.
+					const hit = historySample( vec4( 0 ), float( 0 ), float( 0 ) ).toVar();
+					If( trust.greaterThan( 1e-3 ), () => {
+
+						hit.assign( gather( virtualUV ) );
+
+					} );
 					const hitStretch = this.useStretchRejection.select( virtualStretch.pow2(), 1 );
 					const surfStretch = this.useStretchRejection.select( surfaceStretch.pow2(), 1 );
 					const hitWeight = hit.get( 'weight' ).mul( trust ).mul( hitStretch ).toConst();
