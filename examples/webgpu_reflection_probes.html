@@ -29,8 +29,8 @@
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { ReflectionProbe, ReflectionProbes } from 'three/addons/lighting/ReflectionProbes.js';
-			import { nodeObject, vec3, vec4 } from 'three/tsl';
-			import { ReflectionProbesNode, reflectionProbes } from 'three/addons/tsl/lighting/ReflectionProbesNode.js';
+			import { vec3, vec4 } from 'three/tsl';
+			import { reflectionProbes } from 'three/addons/tsl/lighting/ReflectionProbesNode.js';
 			import { ReflectionProbesHelper } from 'three/addons/helpers/ReflectionProbesHelper.js';
 
 			const params = { output: 'Beauty', showProbes: false, dynamicObject: 'Bunny', pause: false, showGrid: false, gridResolution: 6, gridSize: 0.12, resolution: 256, boxProjection: true, capture: capture };
@@ -324,12 +324,11 @@
 				scene.add( probesHelper, grid, dynamicObject );
 				updateGrid();
 
-				// Every physical material picks up the probes, like scene.environment.
+				// Materials receive only the covered local probe contribution.
 
 				capture();
-				scene.environmentNode = reflectionProbes( probes );
-
-				const local = nodeObject( new ReflectionProbesNode( probes, { localOnly: true } ) );
+				const local = reflectionProbes( probes );
+				scene.environmentNode = local.rgb.mul( local.a );
 				coverageMaterial = new THREE.NodeMaterial();
 				coverageMaterial.fragmentNode = vec4( vec3( local.a ), 1 );
 				localMaterial = new THREE.NodeMaterial();

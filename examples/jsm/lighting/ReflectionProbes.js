@@ -8,7 +8,6 @@ import {
 	Object3D,
 	PMREMGenerator,
 	RenderTarget,
-	Scene,
 	Vector3
 } from 'three/webgpu';
 
@@ -102,10 +101,9 @@ class ReflectionProbe extends Object3D {
 /**
  * A set of {@link ReflectionProbe} children baked into one cube-array texture.
  *
- * Assign `reflectionProbes( probes )` to `scene.environmentNode` and every
- * physical material samples the probes with its own roughness and normal.
- * Smaller volumes take priority over larger ones; uncovered surfaces fall
- * back to `scene.environment`. Requires the WebGPU backend.
+ * Use `reflectionProbes( probes )` to sample local radiance and coverage.
+ * Smaller volumes take priority over larger ones. Environment fallback is
+ * composed separately by the application. Requires the WebGPU backend.
  *
  * ```js
  * const probes = new ReflectionProbes();
@@ -114,7 +112,8 @@ class ReflectionProbe extends Object3D {
  * scene.add( probes );
  *
  * probes.bake( renderer, scene );
- * scene.environmentNode = reflectionProbes( probes ); // from three/addons/tsl/lighting/ReflectionProbesNode.js
+ * const local = reflectionProbes( probes ); // from three/addons/tsl/lighting/ReflectionProbesNode.js
+ * scene.environmentNode = local.rgb.mul( local.a );
  * ```
  *
  * @augments Object3D
@@ -149,7 +148,7 @@ class ReflectionProbes extends Object3D {
 		this.boxProjection = true;
 
 		/**
-		 * The baked cube-array texture: the environment, then one cube per probe.
+		 * The baked cube-array texture, containing one cube per local probe.
 		 *
 		 * @type {?Texture}
 		 * @default null
@@ -164,7 +163,7 @@ class ReflectionProbes extends Object3D {
 		this.bakedProbes = [];
 
 		/**
-		 * Whether a bake is in progress. Probes then contribute only the environment.
+		 * Whether a bake is in progress. Local probe sampling is suppressed during capture.
 		 *
 		 * @type {boolean}
 		 * @readonly
@@ -188,8 +187,8 @@ class ReflectionProbes extends Object3D {
 	}
 
 	/**
-	 * Captures every probe and `scene.environment` into the cube array. Hide
-	 * helpers and objects that should not appear in reflections first.
+	 * Captures the scene at each local probe into the cube array. Hide helpers
+	 * and objects that should not appear in reflections first.
 	 *
 	 * @param {WebGPURenderer} renderer - The renderer.
 	 * @param {Scene} scene - The scene to capture.
@@ -211,10 +210,18 @@ class ReflectionProbes extends Object3D {
 		this.updateWorldMatrix( true, true );
 
 		const probes = this.children.filter( ( child ) => child.isReflectionProbe ).sort( ( a, b ) => volume( a ) - volume( b ) );
+
+		if ( probes.length === 0 ) {
+
+			this.dispose();
+			return;
+
+		}
+
 		const maxLod = Math.log2( resolution ) - 3;
 
 		const renderTarget = new RenderTarget( resolution, resolution, {
-			depth: ( probes.length + 1 ) * 6,
+			depth: probes.length * 6,
 			type: HalfFloatType,
 			depthBuffer: false,
 			generateMipmaps: false,
@@ -234,10 +241,7 @@ class ReflectionProbes extends Object3D {
 		renderer.initRenderTarget( renderTarget );
 
 		const generator = new PMREMGenerator( renderer );
-		const environment = new Scene();
-		environment.background = scene.environment;
-
-		const previousTexture = this.texture;
+		const previousEnvironmentNode = scene.environmentNode;
 
 		let pmrem = null;
 		let baked = false;
@@ -262,6 +266,7 @@ class ReflectionProbes extends Object3D {
 		};
 
 		this.capturing = true;
+		scene.environmentNode = null;
 
 		try {
 
@@ -285,16 +290,9 @@ class ReflectionProbes extends Object3D {
 
 			} );
 
-			// Unfilled cubes stay black, so an empty environment needs no capture.
-
-			if ( scene.environment !== null ) capture( environment, _position.set( 0, 0, 0 ), 0 );
-
-			// captures sample only the environment, so let them see the new one
-			this.texture = renderTarget.texture;
-
 			for ( let i = 0; i < probes.length; i ++ ) {
 
-				capture( scene, probes[ i ].getWorldPosition( _position ), i + 1 );
+				capture( scene, probes[ i ].getWorldPosition( _position ), i );
 
 			}
 
@@ -305,6 +303,7 @@ class ReflectionProbes extends Object3D {
 			for ( const shadow of shadowStates ) shadow.autoUpdate = true;
 
 			this.capturing = false;
+			scene.environmentNode = previousEnvironmentNode;
 
 			if ( pmrem !== null ) pmrem.dispose();
 			generator.dispose();
@@ -312,7 +311,6 @@ class ReflectionProbes extends Object3D {
 			if ( baked === false ) {
 
 				renderTarget.dispose();
-				this.texture = previousTexture;
 
 			}
 
@@ -321,6 +319,7 @@ class ReflectionProbes extends Object3D {
 		if ( this._renderTarget !== null ) this._renderTarget.dispose();
 
 		this._renderTarget = renderTarget;
+		this.texture = renderTarget.texture;
 		this.bakedProbes = probes;
 
 	}
@@ -334,6 +333,7 @@ class ReflectionProbes extends Object3D {
 
 		this._renderTarget = null;
 		this.texture = null;
+		this.bakedProbes = [];
 
 	}
 

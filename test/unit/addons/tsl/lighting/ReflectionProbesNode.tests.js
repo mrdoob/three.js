@@ -1,7 +1,7 @@
 import { BackSide, DataTexture, EquirectangularReflectionMapping, FloatType, MeshBasicMaterial, NodeMaterial, OrthographicCamera, PlaneGeometry, RenderTarget, Scene, BoxGeometry, CubeArrayTexture, Mesh, MeshStandardNodeMaterial, Vector3, WebGPUCoordinateSystem } from 'three/webgpu';
-import { getParallaxCorrectNormal, nodeObject, vec3, vec4 } from 'three/tsl';
+import { getParallaxCorrectNormal, nodeObject, pmremTexture, vec3, vec4 } from 'three/tsl';
 import { ReflectionProbe, ReflectionProbes } from '../../../../../examples/jsm/lighting/ReflectionProbes.js';
-import { ReflectionProbesNode, reflectionProbesSpecular, reflectionProbesDiffuse, reflectionProbesEnvironment } from '../../../../../examples/jsm/tsl/lighting/ReflectionProbesNode.js';
+import { ReflectionProbesNode, reflectionProbesSpecular, reflectionProbesDiffuse } from '../../../../../examples/jsm/tsl/lighting/ReflectionProbesNode.js';
 import { getSharedRenderer } from '../../../src/nodes/tsl/gpu-test-utils.js';
 import WGSLNodeBuilder from '../../../../../src/renderers/webgpu/nodes/WGSLNodeBuilder.js';
 
@@ -11,7 +11,7 @@ export default QUnit.module( 'Addons', () => {
 
 		QUnit.module( 'ReflectionProbesNode', () => {
 
-			QUnit.test( 'local coverage preserves black samples and recomposes the legacy environment', async assert => {
+			QUnit.test( 'local coverage remains independent of environment fallback', async assert => {
 
 				const adapter = await navigator.gpu?.requestAdapter();
 				const info = adapter?.info;
@@ -36,6 +36,12 @@ export default QUnit.module( 'Addons', () => {
 				environment.mapping = EquirectangularReflectionMapping;
 				environment.needsUpdate = true;
 				source.environment = environment;
+				const redPixels = new Float32Array( pixels.length );
+				for ( let i = 0; i < redPixels.length; i += 4 ) redPixels[ i ] = redPixels[ i + 3 ] = 1;
+				const alternateEnvironment = new DataTexture( redPixels, 8, 4 );
+				alternateEnvironment.type = FloatType;
+				alternateEnvironment.mapping = EquirectangularReflectionMapping;
+				alternateEnvironment.needsUpdate = true;
 				const probes = new ReflectionProbes();
 				const probe = new ReflectionProbe( 4, 4, 4 );
 				probe.blendDistance = 0.5;
@@ -61,7 +67,11 @@ export default QUnit.module( 'Addons', () => {
 
 				try {
 
+					const environmentNode = vec3( 0.25 );
+					source.environmentNode = environmentNode;
 					probes.bake( renderer, source );
+					assert.strictEqual( source.environmentNode, environmentNode, 'Capture restores the application lighting node' );
+					assert.strictEqual( probes.texture.image.depth, 6, 'One probe allocates exactly six layers' );
 					const provider = reflectionProbesSpecular( probes );
 					close( await draw( provider( query ) ), [ 1, 1, 1, 1 ], 'Interior supplies conditional white radiance' );
 					close( await draw( reflectionProbesDiffuse( probes )( { position: query.position, normal: query.direction } ) ), [ Math.PI, Math.PI, Math.PI, 1 ], 'Diffuse provider returns irradiance with the same coverage' );
@@ -70,19 +80,22 @@ export default QUnit.module( 'Addons', () => {
 					view.environmentIntensity = 1;
 					close( await draw( provider( { ...query, position: vec3( 10 ) } ) ), [ 0, 0, 0, 0 ], 'Explicit outside position has no local coverage' );
 					const position = vec3( 1.75, 0, 0 );
-					const local = nodeObject( new ReflectionProbesNode( probes, { ...query, position, localOnly: true } ) );
+					const local = nodeObject( new ReflectionProbesNode( probes, { ...query, position } ) );
 					close( await draw( local ), [ 1, 1, 1, 0.5 ], 'Fade changes coverage rather than conditional radiance' );
-					const sky = reflectionProbesEnvironment( probes ).context( { getUV: () => query.direction, getTextureLevel: () => 0 } );
+					const sky = pmremTexture( environment ).context( { getUV: () => query.direction, getTextureLevel: () => 0 } );
 					const recomposed = local.rgb.mul( local.a ).add( sky.mul( local.a.oneMinus() ) );
-					const legacy = new ReflectionProbesNode( probes, { ...query, position } );
-					const expected = await draw( vec4( legacy, 1 ) );
-					close( await draw( vec4( recomposed, 1 ) ), expected, 'Manual fallback matches legacy sampling' );
+					close( await draw( vec4( recomposed, 1 ) ), [ 0.5, 1, 0.5, 1 ], 'Caller supplies independent PMREM fallback' );
+					const bakedTexture = probes.texture;
+					sky.node.value = alternateEnvironment;
+					close( await draw( vec4( recomposed, 1 ) ), [ 1, 0.5, 0.5, 1 ], 'Fallback can change without rebaking probes' );
+					assert.strictEqual( probes.texture, bakedTexture, 'Fallback replacement keeps the local capture' );
 					close( await draw( vec4( getParallaxCorrectNormal( vec3( 1, 0, 0 ), vec3( 4 ), vec3( 0 ), vec3( 0, 1, 0 ) ), 1 ) ), [ 2, 1, 0, 1 ], 'Parallax uses explicit query position' );
 
 					const overlap = new ReflectionProbe( 4, 4, 4 );
 					overlap.blendDistance = 0.5;
 					probes.add( overlap );
 					probes.bake( renderer, source );
+					assert.strictEqual( probes.texture.image.depth, 12, 'Two probes allocate twelve layers without an environment cube' );
 					close( await draw( provider( { ...query, position } ) ), [ 1, 1, 1, 0.75 ], 'Overlapping probes consume only remaining coverage' );
 					probes.remove( overlap );
 
@@ -96,15 +109,25 @@ export default QUnit.module( 'Addons', () => {
 					renderer.setRenderTarget( target );
 					renderer.render( view, camera );
 					close( Array.from( await renderer.readRenderTargetPixelsAsync( target, 4, 4, 1, 1 ) ), [ 1, 1, 1, 0.5 ], 'Existing local bindings follow a replacement texture' );
-					close( await draw( vec4( sky, 1 ) ), [ 0, 0, 0, 1 ], 'Removed environment leaves cached fallback black' );
 					probes.capturing = true;
 					close( await draw( local ), [ 0, 0, 0, 0 ], 'Capture suppresses local coverage' );
+					probes.capturing = false;
+					probes.remove( probe );
+					source.environment = environment;
+					probes.bake( renderer, source );
+					assert.strictEqual( probes.texture, null, 'An empty bake has no texture' );
+					assert.strictEqual( probes._renderTarget, null, 'An empty bake allocates no environment-only render target' );
+					assert.deepEqual( probes.bakedProbes, [], 'An empty bake has no captured probes' );
+					close( await draw( local ), [ 0, 0, 0, 0 ], 'Rebuilt material handles an empty probe set' );
+					probes.add( probe );
+					probes.bake( renderer, source );
+					close( await draw( local ), [ 1, 1, 1, 0.5 ], 'Rebuilt material samples returning probes' );
 
 				} finally {
 
 					probes.capturing = false;
 					renderer.setRenderTarget( previousTarget );
-					for ( const resource of [ boxGeometry, boxMaterial, geometry, material, target, environment, probes ] ) resource.dispose();
+					for ( const resource of [ boxGeometry, boxMaterial, geometry, material, target, environment, alternateEnvironment, probes ] ) resource.dispose();
 
 				}
 
