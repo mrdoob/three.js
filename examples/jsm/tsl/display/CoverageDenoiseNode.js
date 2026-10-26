@@ -1,7 +1,7 @@
 import { FloatType, HalfFloatType, NearestFilter, Matrix4, Node, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Vector2 } from 'three/webgpu';
 import { textureSize, fwidth, Fn, If, context, convertToTexture, float, getViewPosition, isBackgroundDepth, mix, outputStruct, passTexture, property, struct, texture, uniform, velocity as cameraVelocity, unpackRGBToNormal, uv, vec2, vec3, vec4 } from 'three/tsl';
 import { getProjectionJitter, reprojectionStretchConfidence } from '../utils/TAAUtils.js';
-import { ENV_RAY_LENGTH_THRESHOLD } from '../utils/SpecularHelpers.js';
+import { ENV_RAY_LENGTH, ENV_RAY_LENGTH_THRESHOLD } from '../utils/SpecularHelpers.js';
 
 const historySample = struct( { color: 'vec4', weight: 'float', age: 'float' } );
 
@@ -16,9 +16,12 @@ const historySample = struct( { color: 'vec4', weight: 'float', age: 'float' } )
  * lighting, and a valid black sample still contributes coverage.
  *
  * Uses geometric edge stopping, depth/normal-validated surface and virtual-hit
- * reprojection, and neighborhood clipping of history. Inspired by the separate
- * SSR/confidence architecture documented by Diligent Engine and Forspoken; this
- * is a small independent implementation, not a port of their complete denoisers.
+ * reprojection, and neighborhood clipping of history. Hit distance steers
+ * virtual reprojection and spatial edges, but never rejects temporal history:
+ * single-ray distances are too noisy to compare between frames.
+ * Inspired by the separate SSR/confidence architecture documented by Diligent
+ * Engine and Forspoken; this is a small independent implementation, not a port
+ * of their complete denoisers.
  * Reference: {@link https://diligentgraphics.github.io/docs/dc/dd9/DiligentFX_PostProcess_ScreenSpaceReflection_README.html}.
  *
  * @augments Node
@@ -58,8 +61,8 @@ class CoverageDenoiseNode extends Node {
 		this.radius = uniform( 1.5 );
 		this.maxFrames = uniform( 16 );
 		this.depthThreshold = uniform( 0.01 );
-		/** Relative hit-distance difference accepted by the spatial filter. */
-		this.hitDistancePhi = uniform( 0.2 );
+		/** Relative difference from the neighborhood's mean hit distance accepted by the spatial filter. */
+		this.hitDistancePhi = uniform( 1 );
 		/** Curvature and reflection-distance variation reduce virtual history trust. */
 		this.curvatureScale = uniform( 20 );
 		this.reflectionEdgeScale = uniform( 4 );
@@ -71,7 +74,7 @@ class CoverageDenoiseNode extends Node {
 
 		this._spatialTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 		this._target = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, count: 3 } );
-		// Age, roughness, distance and surface identity have independent channels.
+		// Age, roughness and surface identity have independent channels; B is unused.
 		// Full precision keeps identity comparisons exact; point gathers need no filtering.
 		this._target.textures[ 2 ].type = FloatType;
 		this._target.textures[ 2 ].minFilter = this._target.textures[ 2 ].magFilter = NearestFilter;
@@ -209,6 +212,33 @@ class CoverageDenoiseNode extends Node {
 		const fromWeighted = value => vec4( value.a.greaterThan( 1e-6 ).select( value.rgb.div( value.a.max( 1e-6 ) ), vec3( 0 ) ), value.a.clamp() );
 		const inBounds = coordinate => coordinate.x.greaterThanEqual( 0 ).and( coordinate.x.lessThanEqual( 1 ) )
 			.and( coordinate.y.greaterThanEqual( 0 ) ).and( coordinate.y.lessThanEqual( 1 ) );
+		const isHit = distance => distance.greaterThan( 0 ).and( distance.lessThan( ENV_RAY_LENGTH_THRESHOLD ) );
+
+		// Distance moments over the 3×3 input texels include contributing hits,
+		// including black ones. Reads use texel centers: filtering would blend the
+		// miss sentinel into hits. The mean replaces noisy single-ray distances.
+		const hitMoments = coordinate => {
+
+			const moments = vec3( 0 ).toVar();
+			for ( let y = - 1; y <= 1; y ++ ) {
+
+				for ( let x = - 1; x <= 1; x ++ ) {
+
+					const tapUV = coordinate.mul( inputResolution ).add( vec2( x, y ) ).floor().add( 0.5 ).div( inputResolution );
+					const distance = float( hitDistanceAt( tapUV ) );
+					const weight = this.inputNode.sample( tapUV ).a.mul( isHit( distance ) ).mul( inBounds( tapUV ) );
+					const bounded = distance.min( ENV_RAY_LENGTH_THRESHOLD );
+					moments.addAssign( vec3( bounded, bounded.pow2(), 1 ).mul( weight ) );
+
+				}
+
+			}
+
+			return moments;
+
+		};
+
+		const momentsMean = moments => moments.z.greaterThan( 1e-6 ).select( moments.x.div( moments.z.max( 1e-6 ) ), float( ENV_RAY_LENGTH ) );
 
 		const spatial = Fn( () => {
 
@@ -217,13 +247,12 @@ class CoverageDenoiseNode extends Node {
 			const centerPosition = viewPosition( coordinate ).toConst();
 			const centerNormal = normal( coordinate ).toConst();
 			const roughness = roughnessAt( coordinate ).toConst();
-			// Coverage uses geometry weights only. Hit-distance weights select which
-			// hits share radiance; applying them to coverage would favour misses.
 			const radiance = vec4( 0 ).toVar();
 			const coverage = vec2( 0 ).toVar();
 			const stride = this.radius.mul( roughness.sqrt().max( 0.25 ) );
-			const centerHit = this.hitDistanceNode !== null ? float( this.hitDistanceNode ).toConst() : null;
-			const centerCoverage = this.inputNode.sample( coordinate.mul( inputResolution ).floor().add( 0.5 ).div( inputResolution ) ).a;
+			// Coverage uses geometry weights only. Hit-distance weights select which
+			// hits share radiance; applying them to coverage would favour misses.
+			const centerHit = this.hitDistanceNode !== null ? momentsMean( hitMoments( coordinate ) ).toConst() : null;
 			const tolerance = centerPosition.z.abs().mul( this.depthThreshold ).max( 0.001 );
 
 			for ( let y = - 1; y <= 1; y ++ ) {
@@ -242,9 +271,7 @@ class CoverageDenoiseNode extends Node {
 					if ( this.hitDistanceNode !== null ) {
 
 						const tapHit = float( hitDistanceAt( tapUV ) );
-						const bothHits = centerCoverage.greaterThan( 0 ).and( tap.a.greaterThan( 0 ) )
-							.and( centerHit.greaterThan( 0 ) ).and( centerHit.lessThan( ENV_RAY_LENGTH_THRESHOLD ) )
-							.and( tapHit.greaterThan( 0 ) ).and( tapHit.lessThan( ENV_RAY_LENGTH_THRESHOLD ) );
+						const bothHits = tap.a.greaterThan( 0 ).and( isHit( centerHit ) ).and( isHit( tapHit ) );
 						const scale = centerHit.min( tapHit ).mul( this.hitDistancePhi ).add( tolerance ).max( 1e-4 );
 						hitWeight = bothHits.select( tapHit.sub( centerHit ).div( scale ).pow2().negate().exp(), 1 );
 
@@ -287,7 +314,8 @@ class CoverageDenoiseNode extends Node {
 			const surfaceId = this.surfaceIdNode !== null ? float( this.surfaceIdNode ).toConst() : float( 0 );
 			const reactive = this.reactiveNode !== null ? float( this.reactiveNode ).toConst() : float( 0 );
 			const curvature = fwidth( worldNormal ).length().mul( this.curvatureScale ).clamp().toConst();
-			const rayLength = this.hitDistanceNode !== null ? float( this.hitDistanceNode ).toConst() : float( 0 );
+			const moments = this.hitDistanceNode !== null ? hitMoments( coordinate ).toConst() : vec3( 0 );
+			const rayLength = momentsMean( moments ).toConst();
 			const virtualPosition = position.add( position.normalize().mul( rayLength.min( ENV_RAY_LENGTH_THRESHOLD ) ) );
 			const virtualPrevious = this._previousView.mul( this._world.mul( vec4( virtualPosition, 1 ) ) );
 			const virtualClip = this._previousProjection.mul( virtualPrevious );
@@ -323,12 +351,7 @@ class CoverageDenoiseNode extends Node {
 						const identityValid = this.surfaceIdNode !== null ? metadata.a.equal( surfaceId ) : float( 1 );
 						const wx = x === 0 ? fraction.x.oneMinus() : fraction.x;
 						const wy = y === 0 ? fraction.y.oneMinus() : fraction.y;
-						const bothHits = rayLength.greaterThan( 0 ).and( rayLength.lessThan( ENV_RAY_LENGTH_THRESHOLD ) )
-							.and( metadata.b.greaterThan( 0 ) ).and( metadata.b.lessThan( ENV_RAY_LENGTH_THRESHOLD ) );
-						const distanceScale = rayLength.min( metadata.b ).mul( this.hitDistancePhi ).add( historyTolerance ).max( 1e-4 );
-						const reflectionConfidence = this.hitDistanceNode !== null ? bothHits.select(
-							metadata.b.sub( rayLength ).div( distanceScale ).mul( roughness.oneMinus() ).pow2().negate().exp(), 1 ) : float( 1 );
-						const weight = wx.mul( wy ).mul( valid ).mul( identityValid ).mul( reflectionConfidence ).toConst();
+						const weight = wx.mul( wy ).mul( valid ).mul( identityValid ).toConst();
 						sum.addAssign( toWeighted( this._historyColor.sample( tapUV ) ).mul( weight ) );
 						total.addAssign( weight );
 						ageSum.addAssign( metadata.r.mul( weight ) );
@@ -345,23 +368,6 @@ class CoverageDenoiseNode extends Node {
 
 				const history = gather( surfaceUV ).toVar();
 				if ( this.hitDistanceNode !== null ) {
-
-					// Distance moments only include contributing hits, including black ones.
-					const moments = vec3( 0 ).toVar();
-					for ( let y = - 1; y <= 1; y ++ ) {
-
-						for ( let x = - 1; x <= 1; x ++ ) {
-
-							const tapUV = coordinate.mul( inputResolution ).add( vec2( x, y ) ).floor().add( 0.5 ).div( inputResolution );
-							const distance = float( hitDistanceAt( tapUV ) );
-							const valid = distance.greaterThan( 0 ).and( distance.lessThan( ENV_RAY_LENGTH_THRESHOLD ) );
-							const weight = this.inputNode.sample( tapUV ).a.mul( valid ).mul( inBounds( tapUV ) );
-							const bounded = distance.min( ENV_RAY_LENGTH_THRESHOLD );
-							moments.addAssign( vec3( bounded, bounded.pow2(), 1 ).mul( weight ) );
-
-						}
-
-					}
 
 					const mean = moments.x.div( moments.z.max( 1e-6 ) );
 					const deviation = moments.y.div( moments.z.max( 1e-6 ) ).sub( mean.pow2() ).max( 0 ).sqrt();
@@ -439,7 +445,7 @@ class CoverageDenoiseNode extends Node {
 		this._spatialMaterial.needsUpdate = true;
 		this._temporalMaterial.contextNode = context( builder.getSharedContext() );
 		this._temporalMaterial.colorNode = temporal();
-		this._temporalMaterial.outputNode = outputStruct( colorField, geometry(), vec4( ageField, roughnessAt( uv() ), this.hitDistanceNode !== null ? float( this.hitDistanceNode ) : float( 0 ), this.surfaceIdNode !== null ? float( this.surfaceIdNode ) : float( 0 ) ) );
+		this._temporalMaterial.outputNode = outputStruct( colorField, geometry(), vec4( ageField, roughnessAt( uv() ), 0, this.surfaceIdNode !== null ? float( this.surfaceIdNode ) : float( 0 ) ) );
 		this._temporalMaterial.needsUpdate = true;
 		return this._textureNode;
 
