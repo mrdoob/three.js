@@ -67,7 +67,7 @@ class EXRExporter {
 
 			const renderer = arg1, renderTarget = arg2, options = arg3;
 
-			supportedRTT( renderTarget );
+			supportedRTT( renderTarget, options );
 
 			const info = buildInfoRTT( renderTarget, options ),
 				dataBuffer = await getPixelData( renderer, renderTarget, info ),
@@ -95,11 +95,20 @@ class EXRExporter {
 
 }
 
-function supportedRTT( renderTarget ) {
+function supportedRTT( renderTarget, options = {} ) {
 
 	if ( ! renderTarget || ! renderTarget.isRenderTarget ) {
 
 		throw Error( 'EXRExporter.parse: Unsupported second parameter, expected instance of WebGLRenderTarget.' );
+
+	}
+
+	const textureIndex = ( options.textureIndex !== undefined ) ? options.textureIndex : 0;
+	const texture = renderTarget.textures[ textureIndex ];
+
+	if ( texture === undefined ) {
+
+		throw Error( 'EXRExporter.parse: Invalid textureIndex, the render target has ' + renderTarget.textures.length + ' texture(s).' );
 
 	}
 
@@ -109,13 +118,13 @@ function supportedRTT( renderTarget ) {
 
 	}
 
-	if ( renderTarget.texture.type !== FloatType && renderTarget.texture.type !== HalfFloatType ) {
+	if ( texture.type !== FloatType && texture.type !== HalfFloatType ) {
 
 		throw Error( 'EXRExporter.parse: Unsupported WebGLRenderTarget texture type.' );
 
 	}
 
-	if ( renderTarget.texture.format !== RGBAFormat ) {
+	if ( texture.format !== RGBAFormat ) {
 
 		throw Error( 'EXRExporter.parse: Unsupported WebGLRenderTarget texture format, expected RGBAFormat.' );
 
@@ -167,10 +176,12 @@ function buildInfoRTT( renderTarget, options = {} ) {
 		4: 32
 	};
 
-	const WIDTH = renderTarget.width,
+	const TEXTURE_INDEX = ( options.textureIndex !== undefined ) ? options.textureIndex : 0,
+		TEXTURE = renderTarget.textures[ TEXTURE_INDEX ],
+		WIDTH = renderTarget.width,
 		HEIGHT = renderTarget.height,
-		TYPE = renderTarget.texture.type,
-		FORMAT = renderTarget.texture.format,
+		TYPE = TEXTURE.type,
+		FORMAT = TEXTURE.format,
 		COMPRESSION = ( options.compression !== undefined ) ? options.compression : ZIP_COMPRESSION,
 		EXPORTER_TYPE = ( options.type !== undefined ) ? options.type : HalfFloatType,
 		OUT_TYPE = ( EXPORTER_TYPE === FloatType ) ? 2 : 1,
@@ -189,6 +200,7 @@ function buildInfoRTT( renderTarget, options = {} ) {
 		numBlocks: Math.ceil( HEIGHT / COMPRESSION_SIZE ),
 		numInputChannels: 4,
 		numOutputChannels: NUM_CHANNELS,
+		textureIndex: TEXTURE_INDEX,
 	};
 
 }
@@ -245,11 +257,11 @@ async function getPixelData( renderer, rtt, info ) {
 
 		}
 
-		await renderer.readRenderTargetPixelsAsync( rtt, 0, 0, info.width, info.height, dataBuffer );
+		await renderer.readRenderTargetPixelsAsync( rtt, 0, 0, info.width, info.height, dataBuffer, undefined, info.textureIndex );
 
 	} else {
 
-		dataBuffer = await renderer.readRenderTargetPixelsAsync( rtt, 0, 0, info.width, info.height );
+		dataBuffer = await renderer.readRenderTargetPixelsAsync( rtt, 0, 0, info.width, info.height, info.textureIndex );
 
 	}
 
@@ -1257,6 +1269,7 @@ function getFloat32( arr, i ) {
  * @typedef {Object} EXRExporter~Options
  * @property {(HalfFloatType|FloatType)} [type=HalfFloatType] - Output data type.
  * @property {(NO_COMPRESSION|RLE_COMPRESSION|ZIP_COMPRESSION|ZIPS_COMPRESSION|PIZ_COMPRESSION)} [compression=ZIP_COMPRESSION] - The compression algorithm.
+ * @property {number} [textureIndex=0] - When exporting a render target with multiple textures (MRT), the index of the texture to export.
  **/
 
 export { EXRExporter, NO_COMPRESSION, RLE_COMPRESSION, ZIP_COMPRESSION, ZIPS_COMPRESSION, PIZ_COMPRESSION };
