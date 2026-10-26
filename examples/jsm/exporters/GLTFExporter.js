@@ -2265,8 +2265,8 @@ class GLTFWriter {
 		if ( isOrtho ) {
 
 			cameraDef.orthographic = {
-				xmag: camera.right * 2,
-				ymag: camera.top * 2,
+				xmag: camera.right,
+				ymag: camera.top,
 				zfar: camera.far <= 0 ? 0.001 : camera.far,
 				znear: camera.near < 0 ? 0 : camera.near
 			};
