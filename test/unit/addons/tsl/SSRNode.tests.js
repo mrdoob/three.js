@@ -58,8 +58,11 @@ export default QUnit.module( 'Addons', () => {
 				// sampler's minimum GGX alpha, which perturbs a roughness-zero ray.
 				const depth = makeTexture( x => [ projectDepth( x === originX ? - 2 : target( x ) ? - 1.9 : - 1 ), 0, 0, 1 ] );
 				const eligible = uniform( true );
+				const reflectance = uniform( new Vector3( 1, 1, 1 ) );
+				const grazingReflectance = uniform( 1 );
 				const node = ssr( texture( source ), texture( depth ), texture( normal ), {
 					camera, stochastic: true, outputCoverage: true, traceMaskNode: eligible,
+					specularNode: reflectance, specularF90Node: grazingReflectance,
 					metalnessNode: float( 1 ), roughnessNode: float( 0 ), noiseNode: vec4( 0.5 )
 				} );
 				node.quality.value = 1;
@@ -100,6 +103,13 @@ export default QUnit.module( 'Addons', () => {
 					const hit = await renderOrigin();
 					assert.ok( hit[ 0 ] > 0.9 && hit[ 3 ] > 0, 'Fixture hits the lit stripe and preserves distance' );
 					assert.strictEqual( await coverageAtOrigin(), 1, 'A full-validity hit covers the pixel' );
+					reflectance.value.setScalar( 0.2 );
+					grazingReflectance.value = 0.2;
+					const tinted = await renderOrigin();
+					assert.ok( Math.abs( tinted[ 0 ] / hit[ 0 ] - 0.2 ) < 0.005, 'Actual material reflectance controls stochastic sample weighting' );
+					grazingReflectance.value = 1;
+					assert.ok( ( await renderOrigin() )[ 0 ] > tinted[ 0 ], 'Grazing F90 is evaluated independently of F0' );
+					reflectance.value.setScalar( 1 );
 					eligible.value = false;
 					assert.deepEqual( await renderOrigin(), [ 0, 0, 0, 0 ], 'Masked rays clear radiance and distance' );
 					assert.strictEqual( await coverageAtOrigin(), 0, 'Masked rays clear coverage' );

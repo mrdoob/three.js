@@ -141,14 +141,16 @@ const GGXVNDFPdf = Fn( ( [ NoH, NoV, roughness ] ) => {
 /**
  * Fresnel reflectance for the Schlick approximation.
  */
-export const F_Schlick = Fn( ( [ f0, theta ] ) => {
+const fresnelSchlick = Fn( ( [ f0, theta, f90 ] ) => {
 
 	const oneMinus = float( 1.0 ).sub( theta ).toVar();
 	const oneMinus2 = oneMinus.mul( oneMinus ).toVar();
 	const oneMinus5 = oneMinus2.mul( oneMinus2 ).mul( oneMinus ).toVar();
-	return f0.add( vec3( 1.0 ).sub( f0 ).mul( oneMinus5 ) ).toVar(); // vec3
+	return f0.add( vec3( f90 ).sub( f0 ).mul( oneMinus5 ) ).toVar(); // vec3
 
-}, { f0: 'vec3', theta: 'float', return: 'vec3' } );
+}, { f0: 'vec3', theta: 'float', f90: 'float', return: 'vec3' } );
+
+export const F_Schlick = ( f0, theta, f90 = 1 ) => fresnelSchlick( f0, theta, float( f90 ) );
 
 /**
  * Specular dominant factor for parallax-corrected ray length.
@@ -177,6 +179,7 @@ const ggxReflectionStruct = struct( {
 	pdf: 'float', // VNDF direction pdf (for MIS against the env CDF)
 	NdotV: 'float',
 	alpha: 'float', // GGX alpha (roughness²), clamped
+	f90: 'float',
 	f0: 'vec3' // Fresnel reflectance at normal incidence
 } );
 
@@ -193,7 +196,7 @@ const ggxReflectionStruct = struct( {
  * @param {Node<vec4>} Xi - Per-pixel random numbers; only `.xy` are used.
  * @return {ggxReflectionStruct}
  */
-export const ggxReflectionSample = Fn( ( [ N, V, roughness, metalness, albedo, Xi ] ) => {
+const ggxReflectionSampleWithReflectance = Fn( ( [ N, V, roughness, f0, f90, Xi ] ) => {
 
 	// GGX alpha (use r^2, clamp to avoid degenerate)
 	const a = roughness.mul( roughness ).max( 0.001 ).toVar();
@@ -239,10 +242,9 @@ export const ggxReflectionSample = Fn( ( [ N, V, roughness, metalness, albedo, X
 	const NdotH = max( float( 0.0 ), dot( N, H ) ).toVar();
 	const VdotH = max( float( 0.0 ), dot( V, H ) ).toVar();
 
-	const f0 = mix( vec3( 0.04 ), albedo, metalness ).toVar();
 	// Chromatic Fresnel reflectance: for metals f0 = albedo, so the reflection is tinted and desaturates
 	// toward white at grazing angles. Kept as vec3 so colored metals reflect with the correct chroma.
-	const fresnelWeight = F_Schlick( f0, VdotH ).toVar(); // vec3
+	const fresnelWeight = F_Schlick( f0, VdotH, f90 ).toVar(); // vec3
 
 	// Bounded-VNDF direction pdf — still needed for the env-miss MIS path.
 	const pdf = GGXVNDFPdf( NdotH, NdotV, ax ).toVar();
@@ -262,9 +264,18 @@ export const ggxReflectionSample = Fn( ( [ N, V, roughness, metalness, albedo, X
 		.mul( kB.mul( NdotV ).add( tB ) )
 		.div( float( 2.0 ).mul( NdotV ).max( 1e-4 ) ).toVar();
 
-	return ggxReflectionStruct( viewReflectDir, glossyWeight, pdf, NdotV, ax, f0 );
+	return ggxReflectionStruct( viewReflectDir, glossyWeight, pdf, NdotV, ax, f90, f0 );
 
 } );
+
+/**
+ * Samples with actual material reflectance when supplied. The metalness/base-color
+ * fallback preserves the standard-material interface for existing callers.
+ *
+ * @tsl
+ */
+export const ggxReflectionSample = ( N, V, roughness, metalness, albedo, Xi, f0 = null, f90 = 1 ) =>
+	ggxReflectionSampleWithReflectance( N, V, roughness, f0 ?? mix( vec3( 0.04 ), albedo, metalness ), float( f90 ), Xi );
 
 // Equirectangular environment sampling
 

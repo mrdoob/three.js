@@ -239,7 +239,7 @@
 			const reflectance = geometryPass.getTextureNode( 'reflectance' );
 			const motion = geometryPass.getTextureNode( 'velocity' );
 			geometryPass.getTexture( 'albedo' ).type = THREE.UnsignedByteType;
-			geometryPass.getTexture( 'reflectance' ).type = THREE.UnsignedByteType;
+			geometryPass.getTexture( 'reflectance' ).type = THREE.HalfFloatType;
 			const scenePassDepth = geometryPass.getTextureNode( 'depth' ).toInspector( 'Depth', () => geometryPass.getLinearDepthNode() );
 			const scenePassMetalRough = sample( uv => vec2( albedoMetalness.sample( uv ).a, scenePassNormal.sample( uv ).a ) );
 
@@ -262,6 +262,7 @@
 			const effectDepth = effectGuides.getTextureNode();
 			const effectNormalRoughness = effectGuides.getTextureNode( 'normal' );
 			const effectMaterial = effectGuides.getTextureNode( 'material' );
+			const effectReflectance = sample( coordinate => reflectance.sample( effectDepth.sample( coordinate ).gb ) );
 			const effectNormal = sample( coordinate => unpackRGBToNormal( effectNormalRoughness.sample( coordinate ).rgb ).normalize() );
 
 			lightingHistory = new THREE.RenderTarget( 1, 1, { type: THREE.HalfFloatType, depthTexture: new THREE.DepthTexture() } );
@@ -283,12 +284,14 @@
 				noiseNode: samplingNoise,
 				diffuseNode: effectMaterial,
 				metalnessNode: effectMaterial.a,
+				specularNode: effectReflectance.rgb,
+				specularF90Node: effectReflectance.a,
 				roughnessNode: effectNormalRoughness.a
 			} ).toInspector( 'SSR (BRDF weighted)' );
 
 			const coverage = sample( uv => {
 
-				const level = scenePassNormal.sample( uv ).a;
+				const level = effectNormalRoughness.sample( uv ).a;
 				const roughnessFade = level.smoothstep( maxRoughness.sub( 0.1 ), maxRoughness ).oneMinus();
 				return ssrPass.getCoverageNode().sample( uv ).r.mul( roughnessFade );
 
@@ -297,14 +300,15 @@
 
 				const raw = ssrPass.getTextureNode().sample( uv );
 				const c = ssrPass.getCoverageNode().sample( uv ).r;
-				const n = sceneNormal.sample( uv );
-				const v = getViewPosition( uv, scenePassDepth.sample( uv ).r, uniform( camera.projectionMatrixInverse ) ).negate().normalize();
-				const f = reflectance.sample( uv );
+				const sourceUV = effectDepth.sample( uv ).gb;
+				const n = effectNormal.sample( uv );
+				const v = getViewPosition( sourceUV, effectDepth.sample( uv ).r, uniform( camera.projectionMatrixInverse ) ).negate().normalize();
+				const f = effectReflectance.sample( uv );
 				const modulation = EnvironmentBRDF( {
 					dotNV: n.dot( v ).clamp(),
 					specularColor: f.rgb,
 					specularF90: f.a,
-					roughness: scenePassMetalRough.sample( uv ).g
+					roughness: effectNormalRoughness.sample( uv ).a
 				} );
 				// Undo coverage and the receiver BRDF before applying material lighting once.
 				return raw.rgb.div( c.max( 1e-4 ) ).div( modulation.max( vec3( 1e-4 ) ) );
