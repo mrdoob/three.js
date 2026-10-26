@@ -62,8 +62,8 @@
 
 		const params = {
 			quality: 1,
-			raysPerPixel: 4,
-			traceSteps: 64,
+			raysPerPixel: 2,
+			traceSteps: 16,
 			classify: true,
 			output: 'Beauty',
 			reflectionSource: 'Previous frame',
@@ -85,8 +85,8 @@
 			intensity: 1,
 			thickness: 0.03,
 			binaryRefine: true,
-			roughness: 1,
-			floorRoughness: 0.2,
+			roughness: 0,
+			floorRoughness: 0,
 			enabled: true
 		};
 
@@ -138,6 +138,7 @@
 
 						// Avoid overdrawing
 						object.material.side = THREE.FrontSide;
+						object.material.roughness = params.roughness;
 
 					}
 
