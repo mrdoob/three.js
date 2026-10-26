@@ -233,13 +233,14 @@ function createLabel( name, details ) {
 
 }
 
-function formatValue( value ) {
+function formatValue( value, inList = false ) {
 
 	if ( value === undefined || value === null ) return '–';
-	if ( Array.isArray( value ) ) return value.map( formatValue ).join( ', ' );
+	if ( Array.isArray( value ) ) return value.map( item => formatValue( item, true ) ).join( ', ' );
 
-	// Small values like a shadow bias keep the digits that tell them apart from zero
-	if ( typeof value === 'number' ) return value.toLocaleString( undefined, { maximumFractionDigits: Math.abs( value ) < 0.01 ? 5 : 3, signDisplay: 'negative' } );
+	// Small values like a shadow bias keep the digits that tell them apart from zero. In a list, numbers are
+	// written like code, so no thousands separator or decimal comma can be taken for the commas between them.
+	if ( typeof value === 'number' ) return value.toLocaleString( inList ? 'en-US' : undefined, { maximumFractionDigits: Math.abs( value ) < 0.01 ? 5 : 3, signDisplay: 'negative', useGrouping: ! inList } );
 
 	return value;
 
