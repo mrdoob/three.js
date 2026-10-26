@@ -16,7 +16,10 @@ import { Fn, frameId, ivec2, screenCoordinate, textureLoad, uint, vec4 } from 't
  */
 export const fastNoise = ( atlas, offset, index = frameId ) => Fn( () => {
 
-	const pixel = ivec2( screenCoordinate ).add( ivec2( offset.x, offset.y ) ).mod( 128 );
+	// The volume repeats every 32 frames, capping long histories at 32 samples. Shifting the
+	// tile once per cycle keeps the in-cycle correlations and gives each pixel new samples.
+	const cycle = uint( index ).div( 32 ).mod( 128 ).toInt();
+	const pixel = ivec2( screenCoordinate ).add( ivec2( offset.x, offset.y ) ).add( ivec2( 37, 71 ).mul( cycle ) ).mod( 128 );
 	const coordinate = ivec2( pixel.x, pixel.y.add( uint( index ).mod( 32 ).mul( 128 ).toInt() ) );
 	// Decode byte bin centers, avoiding exact 0/1 at GGX singularities.
 	return vec4( textureLoad( atlas, coordinate ).rgb, textureLoad( atlas, coordinate.add( ivec2( 128, 0 ) ) ).r ).mul( 255 ).add( 0.5 ).div( 256 );
