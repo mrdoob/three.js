@@ -234,7 +234,10 @@ function formatValue( value ) {
 
 	if ( value === undefined || value === null ) return '–';
 	if ( Array.isArray( value ) ) return value.map( formatValue ).join( ', ' );
-	if ( typeof value === 'number' ) return value.toLocaleString();
+
+	// Small values like a shadow bias keep the digits that tell them apart from zero
+	if ( typeof value === 'number' ) return value.toLocaleString( undefined, { maximumFractionDigits: Math.abs( value ) < 0.01 ? 5 : 3, signDisplay: 'negative' } );
+
 	return value;
 
 }
@@ -251,9 +254,40 @@ function createPropertyRow( label, value ) {
 	valueSpan.className = 'property-value';
 	valueSpan.textContent = formatValue( value );
 
+	// Colors come as hex strings, shown after a swatch
+	if ( /^#[0-9a-f]{6}$/.test( value ) ) {
+
+		const swatch = document.createElement( 'span' );
+		swatch.className = 'swatch';
+		swatch.style.background = value;
+		valueSpan.prepend( swatch );
+
+	}
+
 	row.append( labelSpan, valueSpan );
 
 	return row;
+
+}
+
+// A light's properties and its shadow's, listed in full since there are only a few
+function createLightRows( light ) {
+
+	const rows = [];
+
+	for ( const [ title, properties ] of [[ light.type, light.properties ], [ 'Shadow', light.shadow ]] ) {
+
+		if ( properties === undefined ) continue;
+
+		const heading = document.createElement( 'h4' );
+		heading.textContent = title;
+		rows.push( heading );
+
+		for ( const [ label, value ] of Object.entries( properties ) ) rows.push( createPropertyRow( label, value ) );
+
+	}
+
+	return rows;
 
 }
 
@@ -505,7 +539,7 @@ function toggleDetails( uuid ) {
 
 }
 
-// The object rendered with its own material in one column, its transform, geometry and materials in the other.
+// The object rendered with its own material in one column, its transform, geometry and materials, or light, in the other.
 // Built once, then only refreshed, so the selections stay and the image does not flicker.
 function renderObjectDetails( block, details ) {
 
@@ -530,9 +564,12 @@ function renderObjectDetails( block, details ) {
 		const transform = document.createElement( 'div' );
 		transform.className = 'transform';
 
+		const light = document.createElement( 'div' );
+		light.className = 'light';
+
 		const column = document.createElement( 'div' );
 		column.className = 'property-group object-properties';
-		column.appendChild( transform );
+		column.append( transform, light );
 
 		for ( const [ item, rows ] of groups ) {
 
@@ -569,6 +606,8 @@ function renderObjectDetails( block, details ) {
 		createPropertyRow( 'Rotation', details.rotation ),
 		createPropertyRow( 'Scale', details.scale )
 	);
+
+	block.querySelector( '.light' ).replaceChildren( ...( details.light === null ? [] : createLightRows( details.light ) ) );
 
 }
 

@@ -197,7 +197,7 @@
 
 			if ( HIDDEN_MATERIAL_PROPERTIES.test( name ) ) continue;
 
-			const formatted = formatMaterialValue( value );
+			const formatted = formatPropertyValue( value );
 			if ( formatted !== undefined ) properties[ name ] = formatted;
 
 		}
@@ -206,8 +206,60 @@
 
 	}
 
+	// What the light classes add to Object3D, listed for the lights that have them
+	const LIGHT_PROPERTIES = [ 'color', 'groundColor', 'intensity', 'distance', 'decay', 'angle', 'penumbra', 'width', 'height', 'depth', 'resolution', 'falloff', 'map', 'iesMap' ];
+
+	// The shadow settings, and the bounds of the camera the shadow map is rendered from. A spot or point
+	// light sets the field of view itself, so it is left out.
+	const SHADOW_PROPERTIES = [ 'bias', 'normalBias', 'radius', 'blurSamples', 'intensity', 'focus', 'autoUpdate' ];
+	const SHADOW_CAMERA_PROPERTIES = [ 'left', 'right', 'top', 'bottom', 'near', 'far' ];
+
+	function pickProperties( item, names, prefix = '' ) {
+
+		const properties = {};
+
+		for ( const name of names ) {
+
+			const formatted = name in item ? formatPropertyValue( item[ name ] ) : undefined;
+			if ( formatted !== undefined ) properties[ prefix + name ] = formatted;
+
+		}
+
+		return properties;
+
+	}
+
+	function getLightData( light ) {
+
+		const properties = pickProperties( light, LIGHT_PROPERTIES );
+
+		// Where the renderer aims the light, which is the target's position only once its world matrix is updated
+		if ( light.target ) properties.target = light.target.matrixWorld.elements.slice( 12, 15 );
+		if ( light.shadow ) properties.castShadow = light.castShadow;
+
+		const data = { type: light.type, properties: properties };
+
+		if ( light.castShadow && light.shadow ) {
+
+			const shadow = light.shadow;
+
+			// A sun fits its cascades to the view, only the depth range is its own
+			const cameraProperties = light.isSunLight ? [ 'near', 'far' ] : SHADOW_CAMERA_PROPERTIES;
+
+			data.shadow = {
+				mapSize: `${shadow.mapSize.x} × ${shadow.mapSize.y}`,
+				...pickProperties( shadow, SHADOW_PROPERTIES ),
+				...pickProperties( shadow.camera, cameraProperties, 'camera.' )
+			};
+
+		}
+
+		return data;
+
+	}
+
 	// Plain values pass through, colors, textures, nodes and math objects are summarized, everything else is skipped
-	function formatMaterialValue( value ) {
+	function formatPropertyValue( value ) {
 
 		if ( value === null || typeof value === 'function' ) return undefined;
 		if ( typeof value !== 'object' ) return value;
@@ -407,7 +459,8 @@
 			rotation: object.rotation.toArray(),
 			scale: object.scale.toArray(),
 			geometry: object.geometry ? getGeometryData( object.geometry ) : null,
-			materials: object.material ? [].concat( object.material ).map( getMaterialData ) : []
+			materials: object.material ? [].concat( object.material ).map( getMaterialData ) : [],
+			light: object.isLight ? getLightData( object ) : null
 		};
 
 		// A preview costs the page a frame, so it comes along only when asked for

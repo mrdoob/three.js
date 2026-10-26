@@ -138,19 +138,29 @@ details[open] > summary .tree-toggle::before {
 	grid-column: 1 / -1;
 	margin: 12px 0 4px;
 }
-.property-group h4:first-child {
+.property-group > h4:first-child {
 	margin-top: 0;
 }
 .property-column .property-group + .property-group {
 	margin-top: 12px;
 }
 .property-row,
-.transform {
+.transform,
+.light {
 	display: contents;
 }
 .property-value {
 	text-align: right;
 	overflow-wrap: anywhere;
+}
+.swatch {
+	display: inline-block;
+	width: 0.9em;
+	height: 0.9em;
+	margin-right: 4px;
+	border-radius: 2px;
+	vertical-align: -0.1em;
+	box-shadow: inset 0 0 0 1px light-dark( rgba(0,0,0,0.2), rgba(255,255,255,0.2) );
 }
 
 /* The type headings are wider than their rows, so the value column takes the extra width
