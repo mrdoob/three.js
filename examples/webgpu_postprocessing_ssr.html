@@ -62,6 +62,8 @@
 
 		const params = {
 			quality: 1,
+			raysPerPixel: 2,
+			traceSteps: 128,
 			classify: true,
 			output: 'Beauty',
 			reflectionSource: 'Current frame',
@@ -445,6 +447,8 @@
 			ssrFolder.add( params, 'screenEdgeFade', 0, 0.5 ).onChange( updateParameters );
 			ssrFolder.add( params, 'sampling', samplingModes ).onChange( updateParameters );
 			ssrFolder.add( params, 'classify' ).name( 'Skip unused rays' ).onChange( updateParameters );
+			ssrFolder.add( params, 'raysPerPixel', [ 1, 2, 4, 8, 16 ] ).name( 'Rays per pixel' ).onChange( updateParameters );
+			ssrFolder.add( params, 'traceSteps', [ 32, 64, 128, 256, 512 ] ).name( 'Steps per ray' ).onChange( updateParameters );
 			ssrFolder.add( params, 'quality', 0, 1 ).onChange( updateParameters );
 			gui.add( params, 'output', Object.keys( views ) ).onChange( () => {
 
@@ -500,6 +504,8 @@
 			samplingMode.value = samplingModes.indexOf( params.sampling );
 			ssrPass.useNoiseNode.value = samplingMode.value !== 0;
 			ssrPass.quality.value = params.quality;
+			ssrPass.raysPerPixel.value = params.raysPerPixel;
+			ssrPass.maxSteps.value = params.traceSteps;
 			ssrPass.useTraceMask.value = params.classify && params.effectScale === 1;
 			effectGuides.resolutionScale = params.effectScale;
 			ssrPass.resolutionScale = params.effectScale;

@@ -1,7 +1,7 @@
 import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, logarithmicDepthToViewZ, luminance, max, min, mix, mul, nodeObject, normalize, orthographicDepthToViewZ, passTexture, perspectiveDepthToViewZ, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, viewZToPerspectiveDepth, context, property, outputStruct, isBackgroundDepth } from 'three/tsl';
 import { HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2, Vector3 } from 'three/webgpu';
 import { bindAnalyticNoise } from '../utils/RNoise.js';
-import { ENV_RAY_LENGTH, getSpecularDominantFactor, ggxReflectionSample } from '../utils/SpecularHelpers.js';
+import { ENV_RAY_LENGTH, ENV_RAY_LENGTH_THRESHOLD, getSpecularDominantFactor, ggxReflectionSample } from '../utils/SpecularHelpers.js';
 import { boxBlur } from './boxBlur.js';
 import ImportanceSampledEnvironment from './ImportanceSampledEnvironment.js';
 
@@ -9,8 +9,6 @@ const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 let _rendererState;
 
-// Maximum ray-march step count; `quality` (0..1) scales it to a fixed per-ray count.
-const MAX_STEPS = 64;
 
 /**
  * @typedef {Object} SSRNodeOptions
@@ -88,6 +86,10 @@ class SSRNode extends Node {
 		this.traceMaskNode = traceMaskNode !== null ? nodeObject( traceMaskNode ) : null;
 		/** @type {UniformNode<bool>} Enables the supplied mask without recompilation. */
 		this.useTraceMask = uniform( true );
+		/** Independent stochastic rays per pixel, clamped to 1–16. */
+		this.raysPerPixel = uniform( 1, 'int' );
+		/** Per-ray march budget at quality one, clamped to 1–512. */
+		this.maxSteps = uniform( 64 );
 
 		/** @type {boolean} Coverage output requires stochastic tracing and external fallback. Fixed at construction. */
 		this.outputCoverage = outputCoverage;
@@ -673,7 +675,28 @@ class SSRNode extends Node {
 		if ( this._ssrFn === null ) return;
 
 		this._ssrMaterial.contextNode = context( this._sharedContext );
-		const result = this._ssrFn();
+		const result = this.stochastic ? Fn( () => {
+
+			const count = this.raysPerPixel.clamp( 1, 16 ).toConst();
+			const radiance = vec3( 0 ).toVar();
+			const coverage = float( 0 ).toVar();
+			const hitDistance = float( 0 ).toVar();
+			const hitWeight = float( 0 ).toVar();
+			Loop( { start: int( 0 ), end: count, type: 'int', condition: '<', name: 'ray' }, ( { ray } ) => {
+
+				const value = this._ssrFn( ray ).toVar();
+				const weight = this.outputCoverage ? this._coverage.toConst() : value.a.lessThan( ENV_RAY_LENGTH_THRESHOLD ).select( 1, 0 );
+				radiance.addAssign( value.rgb );
+				coverage.addAssign( weight );
+				hitDistance.addAssign( value.a.min( ENV_RAY_LENGTH_THRESHOLD ).mul( weight ) );
+				hitWeight.addAssign( weight );
+
+			} );
+			if ( this.outputCoverage ) this._coverage.assign( coverage.div( float( count ) ) );
+			const distance = hitWeight.greaterThan( 0 ).select( hitDistance.div( hitWeight.max( 1e-6 ) ), float( ENV_RAY_LENGTH ) );
+			return vec4( radiance.div( float( count ) ), distance );
+
+		} )() : this._ssrFn( int( 0 ) );
 		this._ssrMaterial.fragmentNode = this.outputCoverage ? outputStruct( result, vec4( this._coverage ) ) : result;
 		this._ssrMaterial.needsUpdate = true;
 
@@ -944,20 +967,23 @@ class SSRNode extends Node {
 
 		}, { uvCoord: 'vec2', borderWidth: 'float', return: 'float' } );
 
-		const ssr = Fn( () => {
+		const ssr = Fn( ( [ rayIndex ] ) => {
 
 			if ( this.outputCoverage ) this._coverage.assign( 0 );
 
 			// Targets are cleared each frame, including coverage and hit distance.
 			if ( this.traceMaskNode !== null ) this.useTraceMask.and( this.traceMaskNode.not() ).discard();
 
-			const noise = this.stochastic === true ? sampleMarchNoise( uvNode, this._noiseIndex ).toVar() : null;
+			const sampleIndex = this._noiseIndex.mul( this.raysPerPixel.clamp( 1, 16 ) ).add( rayIndex );
+			const noise = this.stochastic === true ? sampleMarchNoise( uvNode, sampleIndex ).toVar() : null;
 
 			if ( this.stochastic === true && this.noiseNode !== null ) {
 
 				If( this.useNoiseNode, () => {
 
-					noise.assign( this.noiseNode );
+					// Rotate each dimension independently; ray zero preserves the FAST
+					// sequence and all rays retain uniform marginal distributions.
+					noise.assign( this.noiseNode.add( float( rayIndex ).mul( vec4( 0.7548776662, 0.5698402910, 0.4384471872, 0.3281730914 ) ) ).fract() );
 
 				} );
 
@@ -1035,7 +1061,7 @@ class SSRNode extends Node {
 
 					if ( this.envImportanceSampling ) {
 
-						const Xi2 = bindAnalyticNoise( this._resolution, 59 )( uvPos, this._noiseIndex );
+						const Xi2 = bindAnalyticNoise( this._resolution, 59 )( uvPos, sampleIndex );
 
 						envColor.assign( this._importanceEnvironment.sampleEnvironmentMIS( {
 							cameraWorldMatrix: this._cameraWorldMatrix,
@@ -1139,7 +1165,7 @@ class SSRNode extends Node {
 			// coherent stochastic sampling; each step then spans the whole ray as rayVec / totalStep.
 			const totalStep = int( this.stochastic === false
 				? trunc( max( abs( xLen ), abs( yLen ) ).mul( this.quality.clamp() ) ).max( int( 1 ) ).toConst()
-				: this.quality.clamp().mul( MAX_STEPS ).max( float( 1 ) ) ).toConst();
+				: this.quality.clamp().mul( this.maxSteps.clamp( 1, 512 ) ).max( float( 1 ) ) ).toConst();
 
 			const xSpan = xLen.div( totalStep ).toVar();
 			const ySpan = yLen.div( totalStep ).toVar();

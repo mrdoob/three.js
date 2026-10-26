@@ -129,6 +129,13 @@ export default QUnit.module( 'Addons', () => {
 					assert.strictEqual( black[ 0 ], 0, 'Black hits remain black' );
 					assert.strictEqual( await coverageAtOrigin(), 0.25, 'Black hits still consume fractional source coverage' );
 					assert.ok( Math.abs( black[ 3 ] - hit[ 3 ] ) < 0.01, 'Source coverage does not change geometric distance' );
+					node.raysPerPixel.value = 4;
+					node.maxSteps.value = 128;
+					const multiple = await renderOrigin();
+					assert.strictEqual( multiple[ 0 ], 0, 'Multiple rays preserve valid black radiance' );
+					assert.strictEqual( await coverageAtOrigin(), 0.25, 'Coverage is averaged across rays independently of radiance' );
+					assert.ok( multiple[ 3 ] > 0 && multiple[ 3 ] < 1000, 'Only contributing hits enter the averaged distance' );
+					node.raysPerPixel.value = 1;
 					node.screenEdgeFade.value = 0.5;
 					await renderOrigin();
 					const faded = await coverageAtOrigin();
