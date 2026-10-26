@@ -434,15 +434,17 @@
 
 	}
 
-	// Send a scene batch when its object count changed (a hidden scene has no count, so it comes back)
+	// Send a scene batch when its object count changed (a hidden scene has no count, so it comes back).
+	// Counting is cheap, so the data of every object is only collected for a batch.
 	function sendSceneObjects( scene ) {
 
-		const objects = collectSceneObjects( scene );
+		let count = 0;
+		scene.traverse( () => count ++ );
 
-		if ( objects.length !== sceneObjectCountCache.get( scene.uuid ) ) {
+		if ( count !== sceneObjectCountCache.get( scene.uuid ) ) {
 
-			sceneObjectCountCache.set( scene.uuid, objects.length );
-			postToPanel( EVENT_SCENE, { sceneUuid: scene.uuid, objects: objects } );
+			sceneObjectCountCache.set( scene.uuid, count );
+			postToPanel( EVENT_SCENE, { sceneUuid: scene.uuid, objects: collectSceneObjects( scene ) } );
 
 		}
 

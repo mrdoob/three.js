@@ -17,6 +17,9 @@ const openState = new Map();
 // Objects expanded in the tree (uuid -> its details block, kept across rebuilds so the selection and the image survive)
 const expanded = new Map();
 
+// The row of each object in the tree (uuid -> element), so expanding one leaves the others alone
+const treeRows = new Map();
+
 // Static DOM from panel.html
 const renderersSection = document.getElementById( 'renderers' );
 const scenesSection = document.getElementById( 'scenes' );
@@ -467,6 +470,7 @@ function renderObject( object, container, level = 0, parentInvisible = false ) {
 	if ( invisible ) item.classList.add( 'invisible' );
 	if ( expanded.has( object.uuid ) ) item.classList.add( 'expanded' );
 	item.append( toggle, icon, createLabel( name, details ), type );
+	treeRows.set( object.uuid, item );
 
 	// The arrow toggles the children, the rest of the row toggles the details
 	item.addEventListener( 'click', ( event ) => {
@@ -514,12 +518,17 @@ function renderObject( object, container, level = 0, parentInvisible = false ) {
 
 }
 
-// Expand or collapse an object's details under its row
+// Expand or collapse an object's details under its row. A scene can have thousands of rows,
+// so only this one changes, the tree is not rebuilt.
 function toggleDetails( uuid ) {
+
+	const item = treeRows.get( uuid );
 
 	if ( expanded.has( uuid ) ) {
 
+		expanded.get( uuid ).remove();
 		expanded.delete( uuid );
+		item.classList.remove( 'expanded' );
 
 	} else {
 
@@ -533,9 +542,11 @@ function toggleDetails( uuid ) {
 		expanded.set( uuid, block );
 		send( MESSAGE_REQUEST_OBJECT_DETAILS, { uuid: uuid, preview: true } );
 
-	}
+		block.style.marginLeft = item.style.paddingLeft;
+		item.classList.add( 'expanded' );
+		item.after( block );
 
-	updateSceneTree();
+	}
 
 }
 
@@ -657,6 +668,7 @@ function updateSceneTree() {
 
 	}
 
+	treeRows.clear();
 	renderSection( scenesSection, 'Scenes', state.scenes, renderObject );
 	updateNotice();
 

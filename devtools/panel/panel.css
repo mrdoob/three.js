@@ -74,6 +74,8 @@ details > summary {
 	cursor: pointer;
 	display: flex;
 	align-items: center;
+	content-visibility: auto; /* a scene can have thousands of rows, the ones off screen skip layout */
+	contain-intrinsic-size: auto 28px;
 }
 .tree-item:hover {
 	background: light-dark( #f0f0f0, #555 );
