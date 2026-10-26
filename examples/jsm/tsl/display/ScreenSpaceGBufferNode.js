@@ -80,8 +80,8 @@ class ScreenSpaceGBufferNode extends Node {
 	 */
 	setSize( width, height ) {
 
-		width = Math.max( 1, Math.round( width * this.resolutionScale ) );
-		height = Math.max( 1, Math.round( height * this.resolutionScale ) );
+		width = Math.max( 1, Math.floor( width * this.resolutionScale ) );
+		height = Math.max( 1, Math.floor( height * this.resolutionScale ) );
 		this._resolution.value.set( width, height );
 		this._target.setSize( width, height );
 
