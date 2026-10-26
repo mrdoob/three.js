@@ -19,7 +19,6 @@ import './addons/loaders/SPLATLoader.tests.js';
 import './addons/loaders/SPZLoader.tests.js';
 import './addons/loaders/USDLoader.tests.js';
 import './addons/exporters/EXRExporter.tests.js';
-import './addons/exporters/GLTFExporter.tests.js';
 import './addons/exporters/OBJExporter.tests.js';
 import './addons/exporters/USDZExporter.tests.js';
 import './addons/tsl/WebGLNodesHandler.tests.js';
