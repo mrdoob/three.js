@@ -1300,13 +1300,13 @@ class SSRNode extends Node {
 
 						// the reflected ray is pointing towards the same side as the fragment's normal (current ray position),
 						// which means it wouldn't reflect off the surface. The loop continues to the next step for the next ray sample.
+						If( dot( viewReflectDir, vN ).greaterThanEqual( 0 ), () => {
+
+							Continue();
+
+						} );
+
 						if ( this.stochastic === false ) {
-
-							If( dot( viewReflectDir, vN ).greaterThanEqual( 0 ), () => {
-
-								Continue();
-
-							} );
 
 							// this distance represents the depth of the intersection point between the reflected ray and the scene.
 							const distance = pointPlaneDistance( vP, viewPosition, viewNormal ).toVar();
@@ -1397,11 +1397,7 @@ class SSRNode extends Node {
 					withinRange.assign( withinRange.and( isBackgroundDepth( hitD ).not() )
 						.and( pointToLineDistance( vP, viewPosition, d1viewPosition ).lessThanEqual( tk ) ) );
 
-					if ( this.stochastic === false ) {
-
-						withinRange.assign( withinRange.and( dot( viewReflectDir, this.normalNode.sample( uvS ).rgb.normalize() ).lessThan( 0 ) ) );
-
-					}
+					withinRange.assign( withinRange.and( dot( viewReflectDir, this.normalNode.sample( uvS ).rgb.normalize() ).lessThan( 0 ) ) );
 
 				}
 
