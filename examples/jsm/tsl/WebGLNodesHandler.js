@@ -568,16 +568,19 @@ export class WebGLNodesHandler {
 		}
 
 		// init uniforms
-		const builderUniforms = [ ...builder.uniforms.vertex, ...builder.uniforms.fragment ];
-		for ( const uniform of builderUniforms ) {
+		for ( const shaderStage of [ 'vertex', 'fragment' ] ) {
 
-			if ( uniform.type === 'buffer' ) {
+			for ( const uniform of builder.uniforms[ shaderStage ] ) {
 
-				// buffer uniforms are all nested in groups
-				const group = new UniformsGroup();
-				group.name = builder.getUniformBufferName( uniform );
-				group.uniforms = [ uniform ];
-				uniformsGroups.push( group );
+				if ( uniform.type === 'buffer' ) {
+
+					// buffer uniforms are all nested in groups
+					const group = new UniformsGroup();
+					group.name = builder.getUniformBufferName( uniform, shaderStage );
+					group.uniforms = [ uniform ];
+					uniformsGroups.push( group );
+
+				}
 
 			}
 
