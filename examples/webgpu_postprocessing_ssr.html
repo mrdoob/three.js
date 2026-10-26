@@ -50,6 +50,7 @@
 		import { coverageDenoise } from 'three/addons/tsl/display/CoverageDenoiseNode.js';
 		import { resolveSSRHitDistance } from 'three/addons/tsl/utils/SpecularHelpers.js';
 		import { fastNoise } from 'three/addons/tsl/utils/FASTNoise.js';
+		import { traa } from 'three/addons/tsl/display/TRAANode.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
 		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -63,6 +64,7 @@
 			classify: true,
 			output: 'Beauty',
 			reflectionSource: 'Current frame',
+			antialiasing: 'TRAA',
 			denoise: true,
 			maxFrames: 16,
 			radius: 1.5,
@@ -82,7 +84,7 @@
 		};
 
 		let camera, scene, model, renderer, renderPipeline, ssrPass, ssrDenoise;
-		let controls, geometryPass, beautyPass, lightingHistory;
+		let controls, geometryPass, beautyPass, lightingHistory, traaPass;
 		const historyValid = uniform( false );
 		const useHistorySource = uniform( false );
 		const previousView = uniform( new THREE.Matrix4() );
@@ -364,8 +366,11 @@
 				return vec4( value.rgb.mul( weight ).add( environment.rgb.mul( environment.a ).mul( weight.oneMinus() ) ), 1 );
 
 			} )();
+			traaPass = traa( beautyPass, scenePassDepth, motion, camera );
+			traaPass.useSubpixelCorrection = false;
+			const smaaPass = smaa( beautyPass );
 			const views = {
-				Beauty: smaa( beautyPass ),
+				Beauty: traaPass,
 				'PMREM only': smaa( scenePassColor ),
 				SSR: vec4( incoming.sample( screenUV ).mul( coverage.sample( screenUV ) ).mul( ssrStrength ), 1 ),
 				'SSR Filtered': vec4( filtered.sample( screenUV ).rgb.mul( filtered.sample( screenUV ).a ).mul( ssrStrength ), 1 ),
@@ -386,6 +391,14 @@
 			// GUI
 
 			const gui = renderer.inspector.createParameters( 'Settings' );
+			gui.add( params, 'antialiasing', [ 'SMAA', 'TRAA' ] ).onChange( value => {
+
+				views.Beauty = value === 'TRAA' ? traaPass : smaaPass;
+				renderPipeline.outputNode = views[ params.output ];
+				renderPipeline.needsUpdate = true;
+				resetHistory();
+
+			} );
 			const ssrFolder = gui.addFolder( 'SSR' );
 			ssrFolder.add( params, 'reflectionSource', [ 'Current frame', 'Previous frame' ] ).name( 'Reflection source' ).onChange( value => {
 
@@ -476,6 +489,7 @@
 
 			historyValid.value = false;
 			ssrDenoise?.reset();
+			traaPass?.setSize( 1, 1 );
 
 		}
 

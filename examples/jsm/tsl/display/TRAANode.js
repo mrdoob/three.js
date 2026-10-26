@@ -1,8 +1,9 @@
 import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
 import { float, Fn, max, texture, uniform, uv, vec2, convertToTexture, passTexture, velocity, ivec2, mix, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
-import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth, samplePreviousDepth } from '../utils/TAAUtils.js';
+import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth, samplePreviousDepth, getProjectionJitter } from '../utils/TAAUtils.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
+const _jitterMatrix = /*@__PURE__*/ new Matrix4();
 const _size = /*@__PURE__*/ new Vector2();
 
 let _rendererState;
@@ -145,6 +146,7 @@ class TRAANode extends Node {
 		 */
 		this._historyRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, depthTexture: new DepthTexture() } );
 		this._historyRenderTarget.texture.name = 'TRAANode.history';
+		this._historyTextureNode = texture( this._historyRenderTarget.texture );
 
 		/**
 		 * The render target for the resolve.
@@ -179,6 +181,9 @@ class TRAANode extends Node {
 		 * @type {Matrix4}
 		 */
 		this._originalProjectionMatrix = new Matrix4();
+		this._viewOffsetApplied = false;
+		this._jitter = new Vector2();
+		this._jitterDelta = uniform( new Vector2() );
 
 		/**
 		 * A uniform node holding the camera's near and far.
@@ -283,35 +288,23 @@ class TRAANode extends Node {
 
 		// save original/unjittered projection matrix for velocity pass
 
-		this.camera.updateProjectionMatrix();
 		this._originalProjectionMatrix.copy( this.camera.projectionMatrix );
+		this._viewOffsetApplied = true;
 
 		this._velocityNode.setProjectionMatrix( this._originalProjectionMatrix );
 
 		//
 
-		const viewOffset = {
-
-			fullWidth: width,
-			fullHeight: height,
-			offsetX: 0,
-			offsetY: 0,
-			width: width,
-			height: height
-
-		};
-
 		const jitterOffset = _haltonOffsets[ this._jitterIndex ];
 
-		this.camera.setViewOffset(
-
-			viewOffset.fullWidth, viewOffset.fullHeight,
-
-			viewOffset.offsetX + jitterOffset[ 0 ] - 0.5, viewOffset.offsetY + jitterOffset[ 1 ] - 0.5,
-
-			viewOffset.width, viewOffset.height
-
-		);
+		// Translate clip space so custom projections and existing tiled view
+		// offsets survive jittering. Keep the inverse in sync for all depth users.
+		this.camera.projectionMatrix.premultiply( _jitterMatrix.makeTranslation(
+			- 2 * ( jitterOffset[ 0 ] - 0.5 ) / width,
+			2 * ( jitterOffset[ 1 ] - 0.5 ) / height,
+			0
+		) );
+		this.camera.projectionMatrixInverse.copy( this.camera.projectionMatrix ).invert();
 
 	}
 
@@ -320,7 +313,12 @@ class TRAANode extends Node {
 	 */
 	clearViewOffset() {
 
-		this.camera.clearViewOffset();
+		// On the compilation frame only the after-pipeline callback runs.
+		if ( this._viewOffsetApplied === false ) return;
+		this._viewOffsetApplied = false;
+
+		this.camera.projectionMatrix.copy( this._originalProjectionMatrix );
+		this.camera.projectionMatrixInverse.copy( this.camera.projectionMatrix ).invert();
 
 		this._velocityNode.setProjectionMatrix( null );
 
@@ -339,6 +337,10 @@ class TRAANode extends Node {
 	updateBefore( frame ) {
 
 		const { renderer } = frame;
+
+		this._jitterDelta.value.copy( this._jitter );
+		getProjectionJitter( this.camera, this._velocityNode.projectionMatrix, this._jitter );
+		this._jitterDelta.value.sub( this._jitter );
 
 		// store previous frame matrices before updating current ones
 
@@ -366,9 +368,22 @@ class TRAANode extends Node {
 		const needsRestart = this._historyRenderTarget.width !== width || this._historyRenderTarget.height !== height;
 		this.setSize( width, height );
 
+		// Keep last frame's resolve as history without copying its color buffer.
+		// Depth stays attached to the history target and is updated independently.
+		const historyTexture = this._historyRenderTarget.texture;
+		this._historyRenderTarget.texture = this._resolveRenderTarget.texture;
+		this._resolveRenderTarget.texture = historyTexture;
+		this._historyTextureNode.value = this._historyRenderTarget.texture;
+		this._textureNode.value = this._resolveRenderTarget.texture;
+
 		// every time when the dimensions change we need fresh history data
 
 		if ( needsRestart === true ) {
+
+			// make sure render targets are initialized after the resize which triggers a dispose()
+
+			renderer.initRenderTarget( this._historyRenderTarget );
+			renderer.initRenderTarget( this._resolveRenderTarget );
 
 			// make sure to reset the history with the contents of the beauty buffer otherwise subsequent frames after the
 			// resize will fade from a darker color to the correct one because the history was cleared with black.
@@ -384,10 +399,6 @@ class TRAANode extends Node {
 		_quadMesh.name = 'TRAA';
 		_quadMesh.render( renderer );
 		renderer.setRenderTarget( null );
-
-		// update history
-
-		renderer.copyTextureToTexture( this._resolveRenderTarget.texture, this._historyRenderTarget.texture );
 
 		// Copy current depth to previous depth buffer
 
@@ -419,10 +430,6 @@ class TRAANode extends Node {
 	 */
 	setup( builder ) {
 
-		this.depthNode.build( builder );
-		this.velocityNode.build( builder );
-		this.beautyNode.build( builder );
-
 		if ( builder.renderPipeline && ! builder.context.renderPipelineState.viewOffsetOwner ) {
 
 			builder.context.renderPipelineState.viewOffsetOwner = this;
@@ -441,6 +448,10 @@ class TRAANode extends Node {
 			} );
 
 		}
+
+		this.depthNode.build( builder );
+		this.velocityNode.build( builder );
+		this.beautyNode.build( builder );
 
 		this._historyRenderTarget.depthTexture.format = this.depthNode.value.format;
 		this._historyRenderTarget.depthTexture.type = this.depthNode.value.type;
@@ -502,7 +513,7 @@ class TRAANode extends Node {
 
 		}, { velocityUV: 'vec2', textureSize: 'ivec2', return: 'float' } );
 
-		const historyNode = texture( this._historyRenderTarget.texture );
+		const historyNode = this._historyTextureNode;
 
 		const resolve = Fn( () => {
 
@@ -524,7 +535,7 @@ class TRAANode extends Node {
 			// sample the previous depth
 
 			const historyUV = uvNode.sub( offsetUV );
-			const previousDepth = samplePreviousDepth( this._previousDepthNode, historyUV, this._previousCameraProjectionMatrixInverse, this._previousCameraWorldMatrix, this._cameraWorldMatrixInverse, this._cameraNearFar, this.camera );
+			const previousDepth = samplePreviousDepth( this._previousDepthNode, historyUV.add( this._jitterDelta ), this._previousCameraProjectionMatrixInverse, this._previousCameraWorldMatrix, this._cameraWorldMatrixInverse, this._cameraNearFar, this.camera );
 
 			// history is considered valid when the UV is in range and there's no disocclusion except on edges
 
