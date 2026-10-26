@@ -285,6 +285,7 @@ import './src/nodes/tsl/GPUSubgroup.tests.js';
 import './src/nodes/tsl/GPUWorkgroupAtomic.tests.js';
 import './src/nodes/tsl/GPUSubgroupAllAny.tests.js';
 import './src/nodes/tsl/GPUSubgroupBroadcastFirst.tests.js';
+import './src/nodes/tsl/GPUSubgroupQuadBroadcast.tests.js';
 import './src/nodes/tsl/TSLDeterminant.tests.js';
 import './src/nodes/tsl/TSLFaceForward.tests.js';
 import './src/nodes/tsl/TSLGainPcurve.tests.js';
