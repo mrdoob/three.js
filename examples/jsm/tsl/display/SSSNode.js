@@ -79,6 +79,15 @@ class SSSNode extends Node {
 		this.maxDistance = uniform( 0.1, 'float' );
 
 		/**
+		 * Ray start bias in world units. A positive value moves the ray start
+		 * toward the light to reduce self-intersection artifacts.
+		 *
+		 * @type {UniformNode<float>}
+		 * @default 0
+		 */
+		this.rayStartBias = uniform( 0, 'float' );
+
+		/**
 		 * Depth testing thickness.
 		 *
 		 * @type {UniformNode<float>}
@@ -380,8 +389,8 @@ class SSSNode extends Node {
 
 			// compute ray position and direction (in view-space)
 
-			const rayStartPosition = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).toVar( 'rayStartPosition' );
 			const rayDirection = this._cameraViewMatrix.transformDirection( lightPosition( this._mainLight ).sub( lightTargetPosition( this._mainLight ) ) ).toConst( 'rayDirection' );
+			const rayStartPosition = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).add( rayDirection.mul( this.rayStartBias ) ).toVar( 'rayStartPosition' );
 			const rayEndPosition = rayStartPosition.add( rayDirection.mul( this.maxDistance ) ).toConst( 'rayEndPosition' );
 
 			// d0 and d1 are the start and maximum points of the ray in screen space
