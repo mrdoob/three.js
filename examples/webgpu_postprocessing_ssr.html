@@ -541,7 +541,7 @@
 			// The source is previous beauty lighting, never a same-frame feedback loop.
 			if ( useHistorySource.value && params.output === 'Beauty' ) {
 
-				renderer.copyTextureToTexture( beautyPass.getTexture(), lightingHistory.texture );
+				renderer.copyTextureToTexture( beautyPass.getTexture( 'output' ), lightingHistory.texture );
 				renderer.copyTextureToTexture( geometryPass.getTexture( 'depth' ), lightingHistory.depthTexture );
 				previousView.value.copy( currentView );
 				previousProjection.value.copy( currentProjection );
