@@ -1222,6 +1222,11 @@ class SSRNode extends Node {
 				? ( sVal ) => float( 1 ).div( recipVPZ.add( sVal.mul( recipD1VPZ.sub( recipVPZ ) ) ) )
 				: ( sVal ) => viewPosition.z.add( sVal.mul( d1viewPosition.z.sub( viewPosition.z ) ) );
 
+			// View-space point on the reflected ray at s, perspective-correct like reflectRayZAt.
+			const rayPointAt = this.camera.isPerspectiveCamera
+				? ( sVal ) => mix( viewPosition.div( viewPosition.z ), d1viewPosition.div( d1viewPosition.z ), sVal ).mul( reflectRayZAt( sVal ) )
+				: ( sVal ) => mix( viewPosition, d1viewPosition, sVal );
+
 			// Screen-space position along the ray for a given s ∈ [0,1].
 			const screenPosAt = ( sVal ) => d0.add( stepVec.mul( sVal.mul( totalStep ) ) );
 
@@ -1284,7 +1289,10 @@ class SSRNode extends Node {
 					const uvNeighbor = uvS.add( uvPixelStepX ).toVar();
 					const vPNeighbor = getViewPosition( uvNeighbor, d, this._cameraProjectionMatrixInverse ).toVar();
 					const minThickness = vPNeighbor.x.sub( vP.x ).mul( 3 ).toVar();
-					const tk = max( minThickness, this.thickness ).toVar();
+					// The ray crossed the surface somewhere within this step, so it can overshoot by up
+					// to the step's world-space length; thickness alone rejects coarse steps' real hits.
+					const stepLength = distance( rayPointAt( previousS ), rayPointAt( s ) );
+					const tk = max( max( minThickness, this.thickness ), stepLength ).toVar();
 
 					If( away.lessThanEqual( tk ), () => {
 
