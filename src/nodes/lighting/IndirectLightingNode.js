@@ -127,4 +127,14 @@ export const indirectSpecular = providers => nodeObject( new IndirectSpecularNod
  * @param {Node<float>|number} [intensity=materialEnvIntensity] - Lighting intensity.
  * @return {Function} A radiance provider.
  */
-export const environmentSpecular = ( environment, intensity = materialEnvIntensity ) => ( { direction, roughness: level } ) => vec4( environment.context( { getUV: () => direction, getTextureLevel: () => level } ).rgb.mul( intensity ), 1 );
+export const environmentSpecular = ( environment, intensity = materialEnvIntensity ) => ( { direction, roughness: level } ) => {
+
+	// Query inputs can read screen-space guides. Those reads must not inherit
+	// the environment's direction or mip context (including their own roughness).
+	const queryContext = { getUV: null, getTextureLevel: null };
+	return vec4( environment.context( {
+		getUV: () => nodeObject( direction ).context( queryContext ),
+		getTextureLevel: () => float( level ).context( queryContext )
+	} ).rgb.mul( intensity ), 1 );
+
+};

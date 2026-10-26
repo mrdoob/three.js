@@ -1,5 +1,5 @@
-import { FloatType, Mesh, MeshStandardNodeMaterial, NodeMaterial, OrthographicCamera, PlaneGeometry, RenderTarget, Scene } from 'three/webgpu';
-import { context, float, indirectSpecular, uniform, vec3, vec4 } from 'three/tsl';
+import { DataTexture, EquirectangularReflectionMapping, FloatType, Mesh, MeshStandardNodeMaterial, NodeMaterial, OrthographicCamera, PlaneGeometry, RenderTarget, Scene } from 'three/webgpu';
+import { context, float, indirectSpecular, environmentSpecular, pmremTexture, texture, uniform, uv, vec3, vec4 } from 'three/tsl';
 import { getSharedRenderer } from '../tsl/gpu-test-utils.js';
 
 // These tests render and read back actual shader results. Do not accept a
@@ -100,6 +100,39 @@ export default QUnit.module( 'Nodes', () => {
 				} finally {
 
 					material.dispose();
+					view.dispose();
+
+				}
+
+			} );
+
+			QUnit.test( 'Environment query guides do not inherit their own mip context', async assert => {
+
+				const renderer = await hardwareRenderer( assert );
+				if ( ! renderer ) return;
+				const view = fixture( renderer );
+				const data = new Uint8Array( 16 * 8 * 4 );
+				for ( let i = 0; i < data.length; i += 4 ) data.set( [ 255, 0, 0, 255 ], i );
+				const environment = new DataTexture( data, 16, 8 );
+				environment.mapping = EquirectangularReflectionMapping;
+				const guide = new DataTexture( new Uint8Array( [ 128, 0, 0, 255 ] ), 1, 1 );
+				environment.needsUpdate = guide.needsUpdate = true;
+				const material = new NodeMaterial();
+				// The environment supplies a mip context. Sampling its roughness guide
+				// in that same context would recursively ask the guide for its own mip.
+				const provider = environmentSpecular( pmremTexture( environment ), 1 );
+				material.fragmentNode = provider( { direction: vec3( 0, 0, 1 ), roughness: texture( guide, uv() ).r } );
+
+				try {
+
+					const value = await view.draw( material );
+					assert.ok( value[ 0 ] > 0.99 && value[ 1 ] === 0 && value[ 2 ] === 0 && value[ 3 ] === 1, 'Texture-driven query compiles and preserves radiance' );
+
+				} finally {
+
+					material.dispose();
+					environment.dispose();
+					guide.dispose();
 					view.dispose();
 
 				}
