@@ -80,7 +80,7 @@
 
 			init();
 
-			function init() {
+			async function init() {
 
 				// Camera
 
@@ -173,10 +173,13 @@
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
 
 				// Controls
 
@@ -208,7 +211,7 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				renderer.setAnimationLoop( animate );
+				renderer.render( scene, camera ); // one manual render call to prepare shadows
 
 			}
 

@@ -182,10 +182,6 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		const light = this.light;
 
-		// No baked data yet: contribute nothing.
-
-		if ( light.texture === null ) return;
-
 		const irradiance = getGridIrradiance( light, this._min, this._max, this._resolution, this._intensity, this._falloff, positionWorld, normalWorld, this._influenceMin, this._influenceMax, this._hasInfluenceBox );
 
 		builder.context.irradiance.addAssign( irradiance );

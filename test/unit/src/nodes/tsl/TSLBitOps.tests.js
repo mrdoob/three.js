@@ -98,6 +98,10 @@ export default QUnit.module( 'Nodes', () => {
 				assert.eq( countLeadingZeros( uint( 0xF0 ) ), uint( Math.clz32( 0xF0 ) ), 'countLeadingZeros(0xF0) == 24' );
 				assert.eq( countLeadingZeros( uint( 0xFFFFFFFF ) ), uint( Math.clz32( 0xFFFFFFFF ) ), 'countLeadingZeros(0xFFFFFFFF) == 0' );
 
+				// int inputs return an int count, including the all-zero case.
+				assert.eq( countLeadingZeros( int( 0 ) ), int( Math.clz32( 0 ) ), 'countLeadingZeros(int(0)) == 32' );
+				assert.eq( countLeadingZeros( int( 0xF0 ) ), int( Math.clz32( 0xF0 ) ), 'countLeadingZeros(int(0xF0)) == 24' );
+
 			} );
 
 			gpuTest( 'countTrailingZeros() matches a hand-computed trailing-zero count', ( { assert } ) => {
@@ -126,6 +130,10 @@ export default QUnit.module( 'Nodes', () => {
 				assert.eq( countTrailingZeros( uint( 8 ) ), uint( ctz( 8 ) ), 'countTrailingZeros(8) == 3' );
 				assert.eq( countTrailingZeros( uint( 0xF0 ) ), uint( ctz( 0xF0 ) ), 'countTrailingZeros(0xF0) == 4' );
 				assert.eq( countTrailingZeros( uint( 1 ) ), uint( ctz( 1 ) ), 'countTrailingZeros(1) == 0' );
+
+				// int inputs return an int count, including the all-zero case.
+				assert.eq( countTrailingZeros( int( 0 ) ), int( ctz( 0 ) ), 'countTrailingZeros(int(0)) == 32' );
+				assert.eq( countTrailingZeros( int( 8 ) ), int( ctz( 8 ) ), 'countTrailingZeros(int(8)) == 3' );
 
 			} );
 
