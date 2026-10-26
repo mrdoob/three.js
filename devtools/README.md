@@ -14,7 +14,7 @@ The toolbar icon shows the three.js revision found on the page. Clicking it scro
 
 - **Scenes**: a collapsible tree of every scene and its objects, with geometry and material types for meshes, and object and light counts per scene.
 - **Objects**: click an object to expand it: a drawing of its geometry in its material's color, its position, rotation and scale, and a dropdown of properties for its geometry and each material. Expanded objects get a white box around them over the page, and hovering any other object draws its box in yellow.
-- **Lights**: an expanded light lists the properties of its type (color, intensity, distance, angle...) and, when it casts shadows, its shadow settings and shadow camera bounds. Instead of a box, a light is drawn as its position and the way it shines: the direction to its target, the cone of a spot light, the reach of a point light, the rectangle of an area light, the volume of a probe grid and the frustum of a directional shadow (one per cascade for a sun).
+- **Lights**: an expanded light lists the properties of its type (color, intensity, distance, angle...) and, when it casts shadows, its shadow settings and shadow camera bounds. Instead of a box, a light is drawn as its position and the way it shines: the direction to its target, the cone of a spot light, the reach of a point light, the rectangle of an area light, the volume and probes of a probe grid and the frustum of a directional shadow (one per cascade for a sun).
 - **Renderers**: properties, render stats and memory usage of every `WebGLRenderer` and `WebGPURenderer`, with a button to scroll to its canvas.
 
 ## How it works

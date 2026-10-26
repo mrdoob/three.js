@@ -138,6 +138,7 @@
 		const Vector3 = light.position.constructor;
 		const position = new Vector3().setFromMatrixPosition( light.matrixWorld );
 		const lines = [];
+		let points = [ position ];
 
 		if ( light.isSpotLight ) {
 
@@ -189,6 +190,12 @@
 			// Already in world space
 			addBox( lines, getBoxCorners( light.boundingBox, new light.matrixWorld.constructor() ) );
 
+			// A circle on every probe instead of one in the middle
+			const { x, y, z } = light.resolution;
+			points = [];
+
+			for ( let iz = 0; iz < z; iz ++ ) for ( let iy = 0; iy < y; iy ++ ) for ( let ix = 0; ix < x; ix ++ ) points.push( light.getProbePosition( ix, iy, iz, new Vector3() ) );
+
 		}
 
 		// The box a directional shadow map covers, placed by the renderer as it draws it. A spot light's
@@ -200,7 +207,9 @@
 		}
 
 		// A sun's position is only the direction it shines from, so it shows its cascades alone
-		return { lines: lines, points: light.isSunLight ? [] : [ position ] };
+		if ( light.isSunLight ) points = [];
+
+		return { lines: lines, points: points };
 
 	}
 
