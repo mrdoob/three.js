@@ -22,7 +22,7 @@ let _rendererState;
  * @property {boolean} [envImportanceSampling=false] - When `true`, precomputes env-luminance CDF tables and uses MIS for environment misses. Build-time only.
  * @property {Node} [diffuseNode=null] - Scene diffuse / base color. Defaults to `vec3(1)` in the shader when omitted.
  * @property {boolean} [binaryRefine=false] - Sub-step binary-search refinement of detected hits. Compile-time constant (baked into the shader at construction).
- * @property {boolean} [outputCoverage=false] - Stochastic tracing with external fallback. RGB is BRDF weighted and coverage premultiplied; alpha remains hit distance. Source alpha supplies validity.
+ * @property {boolean} [outputCoverage=false] - Stochastic tracing with external fallback. Requires `stochastic=true` and no `environmentNode`. RGB is BRDF weighted and coverage premultiplied; alpha remains hit distance. Source alpha supplies validity.
  * @property {Node<vec4>} [noiseNode=null] - Samples in [0,1): GGX in xy, march jitter in z, mirror-bias jitter in w. Evaluated at tracing resolution.
  * @property {Node<bool>} [traceMaskNode=null] - Optional tracing eligibility mask. Requires outputCoverage and external fallback. Rejected texels clear to zero.
  * @property {Node<float>} [hitReactiveNode=null] - Per-hit object-motion rejection mask. Written to coverage G (maximum across rays).
@@ -75,14 +75,6 @@ class SSRNode extends Node {
 		} = options;
 
 		let camera = options.camera ?? null;
-
-		if ( outputCoverage && ( ! stochastic || environmentNode !== null ) ) {
-
-			throw new Error( 'SSRNode: outputCoverage requires stochastic tracing without an environment map.' );
-
-		}
-
-		if ( traceMaskNode !== null && ! outputCoverage ) throw new Error( 'SSRNode: traceMaskNode requires outputCoverage and external fallback.' );
 
 		/** @type {?Node<bool>} Per-texel eligibility, evaluated before sampling or marching. */
 		this.hitReactiveNode = hitReactiveNode;
@@ -733,8 +725,6 @@ class SSRNode extends Node {
 	 */
 	getCoverageNode() {
 
-		if ( ! this.outputCoverage ) throw new Error( 'SSRNode: enable outputCoverage to read coverage.' );
-
 		return this._coverageTextureNode ??= passTexture( this, this._ssrRenderTarget.textures[ 1 ] );
 
 	}
@@ -782,12 +772,12 @@ class SSRNode extends Node {
 	 * Uses {@link ImportanceSampledEnvironment} (CDF + MIS adapted from
 	 * [three-gpu-pathtracer](https://github.com/gkjohnson/three-gpu-pathtracer)).
 	 *
+	 * Not supported with `outputCoverage`.
+	 *
 	 * @param {Texture|null} hdr - The equirectangular HDR environment map, or null to disable.
 	 * @see {@link https://github.com/gkjohnson/three-gpu-pathtracer}
 	 */
 	setEnvMap( hdr ) {
-
-		if ( this.outputCoverage && hdr !== null ) throw new Error( 'SSRNode: outputCoverage uses external environment fallback.' );
 
 		if ( hdr === null ) {
 
