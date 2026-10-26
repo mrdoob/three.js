@@ -133,7 +133,7 @@ export default QUnit.module( 'Addons', () => {
 					node.hitDistanceNode = null;
 					update( () => [ 0, 0, 0, 1 ] );
 					for ( let frame = 0; frame < 16; frame ++ ) await render();
-					const age = async () => ( await renderer.readRenderTargetPixelsAsync( node.getRenderTarget(), 8, 8, 1, 1, 2 ) )[ 0 ];
+					const age = async () => DataUtils.fromHalfFloat( ( await renderer.readRenderTargetPixelsAsync( node.getRenderTarget(), 8, 8, 1, 1, 2 ) )[ 0 ] );
 					for ( let i = 3; i < normal.image.data.length; i += 4 ) normal.image.data[ i ] = 0.2;
 					normal.needsUpdate = true;
 					await render();
@@ -217,7 +217,7 @@ export default QUnit.module( 'Addons', () => {
 
 						velocity.needsUpdate = true;
 						await render();
-						const age = ( await renderer.readRenderTargetPixelsAsync( node.getRenderTarget(), 8, 8, 1, 1, 2 ) )[ 0 ];
+						const age = DataUtils.fromHalfFloat( ( await renderer.readRenderTargetPixelsAsync( node.getRenderTarget(), 8, 8, 1, 1, 2 ) )[ 0 ] );
 						assert.ok( Math.abs( age - ( enabled ? 2 : 16 ) ) < 0.03, `Magnified history carries less evidence, independently of black lighting; age=${ age }` );
 
 					} );
@@ -298,7 +298,7 @@ export default QUnit.module( 'Addons', () => {
 
 						normal.needsUpdate = velocity.needsUpdate = true;
 						const data = await render();
-						const age = ( await renderer.readRenderTargetPixelsAsync( node.getRenderTarget(), 8, 8, 1, 1, 2 ) )[ 0 ];
+						const age = DataUtils.fromHalfFloat( ( await renderer.readRenderTargetPixelsAsync( node.getRenderTarget(), 8, 8, 1, 1, 2 ) )[ 0 ] );
 						const expected = enabled ? 9 : 16;
 						assert.ok( Math.abs( age - expected ) < 0.02, `Half the bilinear support carries half the previous age when enabled; actual=${ age }` );
 						assert.ok( data.every( value => value === 0 ), 'Confidence changes age independently of zero lighting coverage' );
@@ -370,7 +370,7 @@ export default QUnit.module( 'Addons', () => {
 					for ( let frame = 0; frame < 16; frame ++ ) await render();
 					const readAge = async () => {
 
-						const values = await renderer.readRenderTargetPixelsAsync( node.getRenderTarget(), 8, 8, 1, 1, 2 );
+						const values = Array.from( await renderer.readRenderTargetPixelsAsync( node.getRenderTarget(), 8, 8, 1, 1, 2 ), DataUtils.fromHalfFloat );
 						return values[ 0 ];
 
 					};
@@ -542,7 +542,7 @@ export default QUnit.module( 'Addons', () => {
 					for ( let i = 0; i < velocity.image.data.length; i += 4 ) velocity.image.data[ i ] = 1 / size;
 					velocity.needsUpdate = true;
 					await render();
-					const data = await renderer.readRenderTargetPixelsAsync( node.getRenderTarget(), 8, 8, 1, 1, 2 );
+					const data = Array.from( await renderer.readRenderTargetPixelsAsync( node.getRenderTarget(), 8, 8, 1, 1, 2 ), DataUtils.fromHalfFloat );
 					const age = data[ 0 ];
 					assert.ok( Math.abs( age - 16 ) < 0.02, `Both coplanar history taps retain their evidence; actual age=${ age }` );
 
@@ -583,11 +583,12 @@ export default QUnit.module( 'Addons', () => {
 
 			QUnit.test( 'valid black and fractional coverage survive normalization', async assert => {
 
-				await fixture( assert, async ( { update, render } ) => {
+				await fixture( assert, async ( { node, update, render } ) => {
 
 					update( () => [ 0, 0, 0, 0.25 ] );
 					const black = await render();
 					assert.ok( black.every( ( v, i ) => Math.abs( v - ( i % 4 === 3 ? 0.25 : 0 ) ) < 0.001 ), 'Black reflections consume their coverage' );
+					node.reset();
 					update( () => [ 8, 4, 2, 0.25 ] );
 					const hdr = await render();
 					const expected = [ 8, 4, 2, 0.25 ];
@@ -750,14 +751,15 @@ export default QUnit.module( 'Addons', () => {
 
 			QUnit.test( 'resize restarts temporal accumulation', async assert => {
 
-				await fixture( assert, async ( { node, renderer, update, render } ) => {
+				await fixture( assert, async ( { node, depth, update, render } ) => {
 
 					update( () => [ 8, 4, 2, 1 ] );
 					await render();
-					renderer.setSize( 8, 8 );
+					depth.image = { width: 8, height: 8, data: new Float32Array( 8 * 8 * 4 ).fill( 0.5 ) };
+					depth.needsUpdate = true;
 					update( () => [ 0, 0, 0, 0 ] );
 					const data = await render();
-					assert.strictEqual( node.getRenderTarget().width, 8, 'Output follows the drawing buffer' );
+					assert.strictEqual( node.getRenderTarget().width, 8, 'Output follows the depth guide' );
 					assert.ok( data.every( v => v === 0 ), 'Resized buffers do not reuse stale reflections' );
 
 				} );
