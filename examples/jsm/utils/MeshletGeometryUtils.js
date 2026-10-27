@@ -13,12 +13,12 @@ import { MeshoptSimplifier } from '../libs/meshopt_simplifier.module.js';
  */
 
 /**
- * The number of triangles of a cluster. Clusters are padded with degenerate triangles to this size.
+ * The number of triangles of a meshlet. Meshlets are padded with degenerate triangles to this size.
  *
  * @type {number}
  * @constant
  */
-export const CLUSTER_SIZE = 64;
+export const MESHLET_SIZE = 64;
 
 /**
  * Resolves when the meshoptimizer modules are ready to process geometries.
@@ -56,24 +56,24 @@ const SLOPPY_ERROR_SCALE = 4;
 
 // the clusters are drawn by pulling the vertices with their global index, so the vertices per cluster are
 // not limited by a local vertex buffer. faceted geometries share few vertices between triangles, a limit of
-// 64 vertices would end clusters at ~32 triangles and pad the rest with degenerate triangles
+// 64 vertices would end meshlets at ~32 triangles and pad the rest with degenerate triangles
 
-const MAX_CLUSTER_VERTICES = CLUSTER_SIZE * 3;
+const MAX_MESHLET_VERTICES = MESHLET_SIZE * 3;
 
 // returns the components of a vec4 node used by an attribute of the given item size
 
 const swizzle = ( node, itemSize ) => itemSize === 1 ? node.x : itemSize === 2 ? node.xy : itemSize === 3 ? node.xyz : node;
 
 /**
- * Builds clusters of 64 triangles and a chain of simplified levels of detail for the given geometry.
+ * Builds meshlets of 64 triangles and a chain of simplified levels of detail for the given geometry.
  * Identical vertices are welded first and all levels index the same vertices. The vertex data is
  * interleaved into one storage buffer and accessed through the returned functions.
  *
  * @param {BufferGeometry} geometry - The geometry, with position and normal attributes.
  * @param {?Object} [group=null] - An optional material group whose triangles are processed independently.
- * @return {Object} The cluster data.
+ * @return {Object} The meshlet data.
  */
-export function createClusters( geometry, group = null ) {
+export function createMeshlets( geometry, group = null ) {
 
 	const positionAttribute = geometry.attributes.position;
 	const normalAttribute = geometry.attributes.normal;
@@ -265,17 +265,17 @@ export function createClusters( geometry, group = null ) {
 
 		previousError = error;
 
-		const meshlets = MeshoptClusterizer.buildMeshlets( indices, positions, 3, MAX_CLUSTER_VERTICES, CLUSTER_SIZE, 0.25 );
+		const meshlets = MeshoptClusterizer.buildMeshlets( indices, positions, 3, MAX_MESHLET_VERTICES, MESHLET_SIZE, 0.25 );
 
 		const bounds = MeshoptClusterizer.computeMeshletBounds( meshlets, positions, 3 );
 
-		lods.push( { meshlets, bounds, error, numChunks: meshlets.meshletCount, numTriangles: meshlets.meshletCount * CLUSTER_SIZE } );
+		lods.push( { meshlets, bounds, error, numChunks: meshlets.meshletCount, numTriangles: meshlets.meshletCount * MESHLET_SIZE } );
 
 		totalChunks += meshlets.meshletCount;
 
 	}
 
-	const totalTriangles = totalChunks * CLUSTER_SIZE;
+	const totalTriangles = totalChunks * MESHLET_SIZE;
 
 	const indexArray = new Uint32Array( totalTriangles * 3 );
 	// the bounding sphere and the normal cone of each cluster, interleaved to save storage buffer bindings
@@ -297,9 +297,9 @@ export function createClusters( geometry, group = null ) {
 
 			// pad to exactly 64 triangles with degenerate triangles
 
-			for ( let t = 0; t < CLUSTER_SIZE; t ++ ) {
+			for ( let t = 0; t < MESHLET_SIZE; t ++ ) {
 
-				const triangle = triangleOffset + m * CLUSTER_SIZE + t;
+				const triangle = triangleOffset + m * MESHLET_SIZE + t;
 
 				for ( let k = 0; k < 3; k ++ ) {
 

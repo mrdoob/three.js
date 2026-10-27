@@ -30,7 +30,7 @@ import {
 	cameraViewMatrix, atomicAdd, atomicStore, atomicLoad, workgroupId, localId, floatBitsToUint, workgroupArray, workgroupBarrier, packHalf2x16, unpackHalf2x16
 } from 'three/tsl';
 
-import { createClusters, ready as clusterProcessingReady, CLUSTER_SIZE, MAX_LODS } from '../utils/MeshletGeometryUtils.js';
+import { createMeshlets, ready as clusterProcessingReady, MESHLET_SIZE, MAX_LODS } from '../utils/MeshletGeometryUtils.js';
 
 // the offsets of the objects are stored as 32-bit floats in the batch table, which represent integers up to 2^24
 
@@ -1010,7 +1010,7 @@ class GPUDrivenCulling {
 
 					// the clusters of the level
 
-					clusterCount.assign( uint( geometryRow( geometryIndex, lodLevel.add( GEOMETRY_LOD_ROW ) ).y ).div( CLUSTER_SIZE ) );
+					clusterCount.assign( uint( geometryRow( geometryIndex, lodLevel.add( GEOMETRY_LOD_ROW ) ).y ).div( MESHLET_SIZE ) );
 
 					// the far material beyond the switch distance
 
@@ -1117,7 +1117,7 @@ class GPUDrivenCulling {
 			const lodNumTriangles = uint( lodData.y );
 			const chunkIndex = geometryLevels.z.add( uint( lodData.z ) ).add( chunk );
 
-			If( chunk.lessThan( lodNumTriangles.div( CLUSTER_SIZE ) ), () => {
+			If( chunk.lessThan( lodNumTriangles.div( MESHLET_SIZE ) ), () => {
 
 				// the clusters of objects occluded as a whole are not visible, without testing each of them
 
@@ -1247,7 +1247,7 @@ class GPUDrivenCulling {
 			const queueCapacity = rowBits( batch, 0 ).w;
 			const base = prepass === true ? instanceIndex.mul( 4 ).add( this.prepassArgsBase ) : instanceIndex.mul( 4 );
 
-			args.element( base ).assign( uint( CLUSTER_SIZE * 3 ) );
+			args.element( base ).assign( uint( MESHLET_SIZE * 3 ) );
 			args.element( base.add( 1 ) ).assign( min( countersRead.element( instanceIndex.add( 1 ) ), queueCapacity ) );
 			args.element( base.add( 2 ) ).assign( uint( 0 ) );
 			args.element( base.add( 3 ) ).assign( uint( 0 ) );
@@ -1913,7 +1913,7 @@ function writeLevel( array, index, level ) {
 /**
  * The vertices and the triangles of the geometries drawn by the GPU-driven pipeline, in one storage buffer each,
  * so the objects of several geometries sharing a material are drawn by one draw. The vertex data of a geometry
- * is interleaved ( see createClusters() ), the triangles store the address of the first element of each vertex.
+ * is interleaved ( see createMeshlets() ), the triangles store the address of the first element of each vertex.
  * The buffers grow when geometries are added, the nodes reading them stay valid.
  *
  * @private
@@ -2381,7 +2381,7 @@ class GPUDrivenBatch {
 
 			return {
 				instance: workItem.x,
-				triangle: workItem.y.add( workItem.w.mul( CLUSTER_SIZE ) ).add( vertexIndex.div( 3 ) ),
+				triangle: workItem.y.add( workItem.w.mul( MESHLET_SIZE ) ).add( vertexIndex.div( 3 ) ),
 				corner: vertexIndex.mod( 3 )
 			};
 
@@ -2718,7 +2718,7 @@ class GPUDrivenBatch {
 
 			// clusters are stored as blocks of 64 triangles, so the cluster of a triangle is its index divided by 64
 
-			drawMaterial = createDebugMaterial( varying( source.triangle.div( CLUSTER_SIZE ) ), varying( source.instance ) );
+			drawMaterial = createDebugMaterial( varying( source.triangle.div( MESHLET_SIZE ) ), varying( source.instance ) );
 
 		} else {
 
@@ -4843,7 +4843,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 			if ( culling.shadow === false ) {
 
 				this.info.clusters = drawn;
-				this.info.triangles = drawn * CLUSTER_SIZE;
+				this.info.triangles = drawn * MESHLET_SIZE;
 
 			}
 
@@ -5408,7 +5408,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 
 			this._pendingGeometry = this._gpuProjectionId;
 
-			clusters = createClusters( geometry, group );
+			clusters = createMeshlets( geometry, group );
 
 			cache.set( key, clusters );
 

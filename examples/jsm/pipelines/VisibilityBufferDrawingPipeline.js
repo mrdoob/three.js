@@ -16,7 +16,7 @@ import {
 } from 'three/tsl';
 
 import { MeshletDrawingPipeline, GPUDrivenBatch, cacheAttributes, createDebugMaterial, createDrawMaterial, createOcclusion } from './MeshletDrawingPipeline.js';
-import { CLUSTER_SIZE } from '../utils/MeshletGeometryUtils.js';
+import { MESHLET_SIZE } from '../utils/MeshletGeometryUtils.js';
 
 // visibility buffer packing — the depth occupies the bits above each payload
 
@@ -297,17 +297,17 @@ class VisibilityBufferBatch extends GPUDrivenBatch {
 
 		const computeRasterize = Fn( () => {
 
-			const totalThreads = min( workQueueCountRead.element( 0 ), maxWorkItems ).mul( CLUSTER_SIZE );
+			const totalThreads = min( workQueueCountRead.element( 0 ), maxWorkItems ).mul( MESHLET_SIZE );
 
 			If( instanceIndex.lessThan( totalThreads ), () => {
 
-				const workItem = workQueue.element( instanceIndex.div( CLUSTER_SIZE ) );
+				const workItem = workQueue.element( instanceIndex.div( MESHLET_SIZE ) );
 				const instId = workItem.x;
 				const lodTriangleStart = workItem.y;
 				const lodNumTriangles = workItem.z;
 				const chunk = workItem.w;
 
-				const lodTriangle = chunk.mul( CLUSTER_SIZE ).add( instanceIndex.mod( CLUSTER_SIZE ) );
+				const lodTriangle = chunk.mul( MESHLET_SIZE ).add( instanceIndex.mod( MESHLET_SIZE ) );
 
 				If( lodTriangle.lessThan( lodNumTriangles ), () => {
 
@@ -685,7 +685,7 @@ class VisibilityBufferBatch extends GPUDrivenBatch {
 
 			if ( debug === true ) {
 
-				resolveMaterial = createDebugMaterial( megaTriangleIndex.div( CLUSTER_SIZE ), instId );
+				resolveMaterial = createDebugMaterial( megaTriangleIndex.div( MESHLET_SIZE ), instId );
 
 			} else {
 
