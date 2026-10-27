@@ -59,13 +59,14 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			const modes = { 'Sphere': 0, 'Uniform': 1 };
-			const params = { mode: 'Sphere', pixelSize: 2, frames: 1, animated: true };
+			const params = { mode: 'Sphere', pixelSize: 2, frames: 0, animated: true };
 
 			let renderer, computeQuad, displayQuad, targets, history, current;
+			let samples = 0;
 
 			const mode = uniform( modes[ params.mode ] );
 			const index = uniform( 0, 'uint' );
-			const blend = uniform( 1 ); // 1 resets the history
+			const blend = uniform( 1 );
 
 			init();
 
@@ -122,12 +123,12 @@
 				gui.add( params, 'mode', Object.keys( modes ) ).onChange( ( value ) => {
 
 					mode.value = modes[ value ];
-					blend.value = 1;
+					samples = 0;
 
 				} );
 				gui.add( params, 'pixelSize', 1, 8, 1 ).name( 'pixel size' ).onChange( onWindowResize );
-				gui.add( params, 'frames', 1, 200, 1 ).name( 'history frames' );
-				gui.add( params, 'animated' );
+				gui.add( params, 'frames', [ 0, 4, 8, 16, 32, 64, 128 ] ).name( 'history frames' ).onChange( () => samples = 0 );
+				gui.add( params, 'animated' ).onChange( () => samples = 0 );
 
 				onWindowResize();
 				window.addEventListener( 'resize', onWindowResize );
@@ -140,7 +141,7 @@
 
 				const size = renderer.getDrawingBufferSize( new THREE.Vector2() ).divideScalar( params.pixelSize ).ceil();
 				for ( const target of targets ) target.setSize( size.x, size.y );
-				blend.value = 1;
+				samples = 0;
 
 			}
 
@@ -150,6 +151,11 @@
 
 				if ( params.animated ) index.value ++;
 
+				// plain average of the first N samples, then an EMA with the same variance as an N frame average
+
+				samples ++;
+				blend.value = samples < params.frames ? 1 / samples : Math.min( 1, 2 / ( params.frames + 1 ) );
+
 				renderer.setRenderTarget( targets[ 0 ] );
 				computeQuad.render( renderer );
 				renderer.setRenderTarget( null );
@@ -158,7 +164,6 @@
 				targets.reverse();
 				history.value = targets[ 1 ].texture;
 				current.value = targets[ 0 ].texture;
-				blend.value = 2 / ( params.frames + 1 ); // EMA with the variance of an N frame average, 19 frames = FAST's α = 0.1
 
 			}
 
