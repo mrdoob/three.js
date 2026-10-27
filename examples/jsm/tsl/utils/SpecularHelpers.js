@@ -273,16 +273,18 @@ const ggxReflectionSampleWithReflectance = Fn( ( [ N, V, roughness, f0, f90, Xi 
 } );
 
 /**
- * Samples with the material's F0/F90 when supplied, otherwise derives F0 from metalness.
+ * Importance-samples the GGX/VNDF specular lobe for one pixel and returns the reflected
+ * ray direction plus the Monte-Carlo weight to apply to the gathered radiance, along with
+ * the GGX terms the SSR env-miss MIS fallback needs.
  *
  * @tsl
- * @param {Node<vec3>} N - View-space shading normal.
- * @param {Node<vec3>} V - Surface-to-camera direction.
- * @param {Node<float>} roughness - Perceptual roughness.
- * @param {Node<float>} metalness - Metalness used when F0 is omitted.
- * @param {Node<vec3>} albedo - Base color used when F0 is omitted.
- * @param {Node<vec4>} Xi - Random sample.
- * @param {?Node<vec3>} [f0=null] - Normal-incidence reflectance.
+ * @param {Node<vec3>} N - View-space shading normal (normalized).
+ * @param {Node<vec3>} V - View-space surface→camera direction (normalized).
+ * @param {Node<float>} roughness - Perceptual roughness in `[0,1]`.
+ * @param {Node<float>} metalness - Metalness in `[0,1]`; only used when `f0` is omitted.
+ * @param {Node<vec3>} albedo - Surface base color; tints the metal F0 when `f0` is omitted.
+ * @param {Node<vec4>} Xi - Per-pixel random numbers; only `.xy` are used.
+ * @param {?Node<vec3>} [f0=null] - Normal-incidence reflectance. Defaults to `mix( 0.04, albedo, metalness )`.
  * @param {Node<float>|number} [f90=1] - Grazing reflectance.
  * @return {ggxReflectionStruct}
  */
