@@ -820,11 +820,12 @@ class PhysicalLightingModel extends LightingModel {
 	 */
 	indirectSpecular( builder ) {
 
-		const { radiance, iblIrradiance, reflectedLight } = builder.context;
+		const { radiance, iblIrradiance, iblDiffuseIrradiance, reflectedLight } = builder.context;
+		const diffuseIrradiance = builder.context.indirectSpecularNode ? iblDiffuseIrradiance : iblIrradiance;
 
 		if ( this.sheen === true ) {
 
-			this.sheenSpecularIndirect.addAssign( iblIrradiance.mul(
+			this.sheenSpecularIndirect.addAssign( diffuseIrradiance.mul(
 				sheen,
 				IBLSheenBRDF( {
 					normal: normalView,
@@ -877,7 +878,7 @@ class PhysicalLightingModel extends LightingModel {
 		const cosineWeightedIrradiance = iblIrradiance.mul( 1 / Math.PI );
 
 		const indirectSpecular = radiance.mul( singleScattering ).add( multiScattering.mul( cosineWeightedIrradiance ) ).toVar();
-		const indirectDiffuse = diffuse.mul( cosineWeightedIrradiance ).toVar();
+		const indirectDiffuse = diffuse.mul( diffuseIrradiance.mul( 1 / Math.PI ) ).toVar();
 
 		if ( this.sheen === true ) {
 

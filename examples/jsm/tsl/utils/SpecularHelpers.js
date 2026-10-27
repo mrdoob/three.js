@@ -23,6 +23,24 @@ export const ENV_RAY_LENGTH = 1e4;
  */
 export const ENV_RAY_LENGTH_THRESHOLD = 1e3;
 
+/**
+ * Returns the SSR hit distance when the sample has coverage, otherwise the
+ * environment sentinel.
+ *
+ * @tsl
+ * @function
+ * @param {Node<float>} rayLength - Raw SSR hit distance.
+ * @param {Node<float>} coverage - Effective screen-space coverage, after fades.
+ * @return {Node<float>} Distance suitable for specular history/reconstruction.
+ */
+export const resolveSSRHitDistance = ( rayLength, coverage ) => {
+
+	rayLength = float( rayLength );
+	return float( coverage ).greaterThan( 0 ).and( rayLength.greaterThan( 0 ) )
+		.and( rayLength.lessThan( ENV_RAY_LENGTH_THRESHOLD ) ).select( rayLength, float( ENV_RAY_LENGTH ) );
+
+};
+
 // Bounded-VNDF sampler (Eto & Tokuyoshi 2023; spherical-cap form, Dupuy & Benyoub 2023)
 const SampleGGXVNDF = Fn( ( [ V, ax, ay, r1, r2 ] ) => {
 
@@ -121,14 +139,14 @@ const GGXVNDFPdf = Fn( ( [ NoH, NoV, roughness ] ) => {
 /**
  * Fresnel reflectance for the Schlick approximation.
  */
-export const F_Schlick = Fn( ( [ f0, theta ] ) => {
+export const F_Schlick = Fn( ( [ f0, theta, f90 = float( 1 ) ] ) => {
 
 	const oneMinus = float( 1.0 ).sub( theta ).toVar();
 	const oneMinus2 = oneMinus.mul( oneMinus ).toVar();
 	const oneMinus5 = oneMinus2.mul( oneMinus2 ).mul( oneMinus ).toVar();
-	return f0.add( vec3( 1.0 ).sub( f0 ).mul( oneMinus5 ) ).toVar(); // vec3
+	return f0.add( vec3( f90 ).sub( f0 ).mul( oneMinus5 ) ).toVar(); // vec3
 
-}, { f0: 'vec3', theta: 'float', return: 'vec3' } );
+}, { f0: 'vec3', theta: 'float', f90: 'float', return: 'vec3' } );
 
 /**
  * Specular dominant factor for parallax-corrected ray length.
@@ -157,23 +175,21 @@ const ggxReflectionStruct = struct( {
 	pdf: 'float', // VNDF direction pdf (for MIS against the env CDF)
 	NdotV: 'float',
 	alpha: 'float', // GGX alpha (roughness²), clamped
+	f90: 'float',
 	f0: 'vec3' // Fresnel reflectance at normal incidence
 } );
 
 /**
- * Importance-samples the GGX/VNDF specular lobe for one pixel and returns the reflected
- * ray direction plus the Monte-Carlo weight to apply to the gathered radiance, along with
- * the GGX terms the SSR env-miss MIS fallback needs.
+ * Samples a GGX/VNDF reflection direction without evaluating material reflectance.
  *
- * @param {Node<vec3>} N - View-space shading normal (normalized).
- * @param {Node<vec3>} V - View-space surface→camera direction (normalized).
- * @param {Node<float>} roughness - Perceptual roughness in `[0,1]`.
- * @param {Node<float>} metalness - Metalness in `[0,1]`.
- * @param {Node<vec3>} albedo - Surface base color; tints the metal Fresnel reflectance (`f0`).
- * @param {Node<vec4>} Xi - Per-pixel random numbers; only `.xy` are used.
- * @return {ggxReflectionStruct}
+ * @tsl
+ * @param {Node<vec3>} N - Normalized view-space shading normal.
+ * @param {Node<vec3>} V - Normalized view-space surface-to-camera direction.
+ * @param {Node<float>} roughness - Perceptual roughness.
+ * @param {Node<vec4>} Xi - Random numbers; only xy are used.
+ * @return {Node<vec3>} Reflection direction.
  */
-export const ggxReflectionSample = Fn( ( [ N, V, roughness, metalness, albedo, Xi ] ) => {
+export const ggxReflectionDirection = Fn( ( [ N, V, roughness, Xi ] ) => {
 
 	// GGX alpha (use r^2, clamp to avoid degenerate)
 	const a = roughness.mul( roughness ).max( 0.001 ).toVar();
@@ -200,7 +216,25 @@ export const ggxReflectionSample = Fn( ( [ N, V, roughness, metalness, albedo, X
 	const h = normalize( T.mul( Hlocal.x ).add( B.mul( Hlocal.y ) ).add( N.mul( Hlocal.z ) ) ).toVar();
 
 	// reflect with V (surface->camera) and H
-	const viewReflectDir = reflect( V.negate(), h ).normalize().toVar();
+	return reflect( V.negate(), h ).normalize();
+
+}, { N: 'vec3', V: 'vec3', roughness: 'float', Xi: 'vec4', return: 'vec3' } );
+
+/**
+ * Samples a GGX reflection direction and evaluates its Monte Carlo weight.
+ *
+ * @param {Node<vec3>} N - Normalized view-space shading normal.
+ * @param {Node<vec3>} V - Normalized view-space surface-to-camera direction.
+ * @param {Node<float>} roughness - Perceptual roughness.
+ * @param {Node<vec3>} f0 - Normal-incidence reflectance.
+ * @param {Node<float>} f90 - Grazing reflectance.
+ * @param {Node<vec4>} Xi - Random numbers; only xy are used.
+ * @return {ggxReflectionStruct}
+ */
+const ggxReflectionSampleWithReflectance = Fn( ( [ N, V, roughness, f0, f90, Xi ] ) => {
+
+	const ax = roughness.mul( roughness ).max( 0.001 ).toVar();
+	const viewReflectDir = ggxReflectionDirection( N, V, roughness, Xi ).toVar();
 
 	// BRDF/PDF evaluation for the sampled direction
 	// V: surface -> camera, L: reflected direction, N: normal, H: half-vector
@@ -212,10 +246,9 @@ export const ggxReflectionSample = Fn( ( [ N, V, roughness, metalness, albedo, X
 	const NdotH = max( float( 0.0 ), dot( N, H ) ).toVar();
 	const VdotH = max( float( 0.0 ), dot( V, H ) ).toVar();
 
-	const f0 = mix( vec3( 0.04 ), albedo, metalness ).toVar();
 	// Chromatic Fresnel reflectance: for metals f0 = albedo, so the reflection is tinted and desaturates
 	// toward white at grazing angles. Kept as vec3 so colored metals reflect with the correct chroma.
-	const fresnelWeight = F_Schlick( f0, VdotH ).toVar(); // vec3
+	const fresnelWeight = F_Schlick( f0, VdotH, f90 ).toVar(); // vec3
 
 	// Bounded-VNDF direction pdf — still needed for the env-miss MIS path.
 	const pdf = GGXVNDFPdf( NdotH, NdotV, ax ).toVar();
@@ -235,9 +268,29 @@ export const ggxReflectionSample = Fn( ( [ N, V, roughness, metalness, albedo, X
 		.mul( kB.mul( NdotV ).add( tB ) )
 		.div( float( 2.0 ).mul( NdotV ).max( 1e-4 ) ).toVar();
 
-	return ggxReflectionStruct( viewReflectDir, glossyWeight, pdf, NdotV, ax, f0 );
+	return ggxReflectionStruct( viewReflectDir, glossyWeight, pdf, NdotV, ax, f90, f0 );
 
 } );
+
+/**
+ * Importance-samples the GGX/VNDF specular lobe for one pixel and returns the reflected
+ * ray direction plus the Monte-Carlo weight to apply to the gathered radiance, along with
+ * the GGX terms the SSR env-miss MIS fallback needs.
+ *
+ * @tsl
+ * @param {Node<vec3>} N - View-space shading normal (normalized).
+ * @param {Node<vec3>} V - View-space surface→camera direction (normalized).
+ * @param {Node<float>} roughness - Perceptual roughness in `[0,1]`.
+ * @param {Node<float>} metalness - Metalness in `[0,1]`; only used when `f0` is omitted.
+ * @param {Node<vec3>} albedo - Surface base color; tints the metal F0 when `f0` is omitted.
+ * @param {Node<vec4>} Xi - Per-pixel random numbers; only `.xy` are used.
+ * @param {?Node<vec3>} [f0=null] - Normal-incidence reflectance. Defaults to `mix( 0.04, albedo, metalness )`.
+ * @param {Node<float>|number} [f90=1] - Grazing reflectance.
+ * @return {ggxReflectionStruct}
+ */
+export const ggxReflectionSample = ( N, V, roughness, metalness, albedo, Xi, f0 = null, f90 = 1 ) =>
+
+	ggxReflectionSampleWithReflectance( N, V, roughness, f0 ?? mix( vec3( 0.04 ), albedo, metalness ), float( f90 ), Xi );
 
 // Equirectangular environment sampling
 

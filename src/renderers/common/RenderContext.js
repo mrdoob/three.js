@@ -293,7 +293,7 @@ class RenderContext {
  */
 export function getCacheKey( renderContext ) {
 
-	const { textures, activeCubeFace, activeMipmapLevel } = renderContext;
+	const { textures, depthTexture, activeCubeFace, activeMipmapLevel } = renderContext;
 
 	const values = [ activeCubeFace, activeMipmapLevel ];
 
@@ -302,6 +302,8 @@ export function getCacheKey( renderContext ) {
 		values.push( texture.id );
 
 	}
+
+	if ( depthTexture ) values.push( depthTexture.id );
 
 	return hashArray( values );
 

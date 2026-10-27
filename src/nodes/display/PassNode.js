@@ -667,7 +667,10 @@ class PassNode extends Node {
 
 		if ( texture === undefined ) {
 
-			texture = this.getTexture( name ).clone();
+			const current = this.getTexture( name );
+
+			texture = current.clone();
+			texture.source = current.source; // keep sizes in sync, DepthTexture.clone() copies its image
 
 			this._previousTextures[ name ] = texture;
 
@@ -690,8 +693,16 @@ class PassNode extends Node {
 
 			const texture = this._textures[ name ];
 
-			const index = this.renderTarget.textures.indexOf( texture );
-			this.renderTarget.textures[ index ] = prevTexture;
+			if ( texture === this.renderTarget.depthTexture ) {
+
+				this.renderTarget.depthTexture = prevTexture;
+
+			} else {
+
+				const index = this.renderTarget.textures.indexOf( texture );
+				this.renderTarget.textures[ index ] = prevTexture;
+
+			}
 
 			this._textures[ name ] = prevTexture;
 			this._previousTextures[ name ] = texture;
@@ -845,6 +856,12 @@ class PassNode extends Node {
 		if ( renderer.reversedDepthBuffer === true && this.renderTarget.depthTexture !== null ) {
 
 			this.renderTarget.depthTexture.type = FloatType;
+
+		}
+
+		for ( const name in this._previousTextures ) {
+
+			this._previousTextures[ name ].type = this._textures[ name ].type;
 
 		}
 

@@ -112,6 +112,7 @@ export { default as DirectionalLightNode } from './lighting/DirectionalLightNode
 export { default as EnvironmentNode } from './lighting/EnvironmentNode.js';
 export { default as HemisphereLightNode } from './lighting/HemisphereLightNode.js';
 export { default as IESSpotLightNode } from './lighting/IESSpotLightNode.js';
+export { default as IndirectSpecularNode } from './lighting/IndirectSpecularNode.js';
 export { default as IrradianceNode } from './lighting/IrradianceNode.js';
 export { default as LightingContextNode } from './lighting/LightingContextNode.js';
 export { default as LightingNode } from './lighting/LightingNode.js';

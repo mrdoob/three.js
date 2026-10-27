@@ -1,4 +1,5 @@
-import { add, float, Fn, If, luminance, max, struct, vec2, vec4, getViewPosition, logarithmicDepthToViewZ, viewZToOrthographicDepth, viewZToPerspectiveDepth } from 'three/tsl';
+import { Vector3 } from 'three/webgpu';
+import { dFdx, dFdy, dot, add, float, Fn, If, luminance, max, struct, vec2, vec4, getViewPosition, logarithmicDepthToViewZ, viewZToOrthographicDepth, viewZToPerspectiveDepth } from 'three/tsl';
 
 /**
  * Optimized version of AABB clipping.
@@ -182,3 +183,45 @@ function halton( index, base ) {
 	return result;
 
 }
+
+const _jitteredPosition = /*@__PURE__*/ new Vector3();
+const _unjitteredPosition = /*@__PURE__*/ new Vector3();
+
+/**
+ * Returns the jitter in UV space relative to the projection used for motion vectors.
+ *
+ * @private
+ * @param {Camera} camera - The jittered camera.
+ * @param {?Matrix4} projectionMatrix - The projection used for velocity (null means jittered).
+ * @param {Vector2} target - Receives the UV displacement.
+ * @return {Vector2} The UV displacement.
+ */
+export function getProjectionJitter( camera, projectionMatrix, target ) {
+
+	if ( projectionMatrix === null ) return target.set( 0, 0 );
+
+	_jitteredPosition.set( 0, 0, - 1 ).applyMatrix4( camera.projectionMatrix );
+	_unjitteredPosition.set( 0, 0, - 1 ).applyMatrix4( projectionMatrix );
+	return target.set(
+		( _jitteredPosition.x - _unjitteredPosition.x ) * 0.5,
+		( _jitteredPosition.y - _unjitteredPosition.y ) * - 0.5
+	);
+
+}
+
+/**
+ * History confidence from the smallest singular value of the reprojection Jacobian.
+ * Uses derivatives, so evaluate outside conditional control flow.
+ *
+ * @tsl
+ */
+export const reprojectionStretchConfidence = Fn( ( [ historyUV, resolution ] ) => {
+
+	const jx = dFdx( historyUV ).mul( resolution ).toConst();
+	const jy = dFdy( historyUV ).mul( resolution ).toConst();
+	const determinant = jx.x.mul( jy.y ).sub( jx.y.mul( jy.x ) );
+	const norm = dot( jx, jx ).add( dot( jy, jy ) );
+	const discriminant = norm.pow2().mul( 0.25 ).sub( determinant.pow2() ).max( 0 ).sqrt();
+	return norm.mul( 0.5 ).sub( discriminant ).max( 0 ).sqrt().clamp();
+
+}, { historyUV: 'vec2', resolution: 'vec2', return: 'float' } );

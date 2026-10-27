@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - blue noise</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - blue noise">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_tsl_blue_noise.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_tsl_blue_noise.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+		<style>
+			.label {
+				position: absolute;
+				bottom: 20px;
+				width: 50%;
+				text-align: center;
+				color: #fff;
+				font: 600 14px 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+				text-shadow: 0 0 4px #000, 0 0 4px #000;
+				pointer-events: none;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Blue Noise</span>
+			</div>
+
+			<small>
+				White noise vs. <a href="https://github.com/electronicarts/fastnoise" target="_blank" rel="noopener">FAST</a> spatiotemporal blue noise by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br/>A 1-bit dithered sphere or a uniform noise field, accumulated over time.
+			</small>
+		</div>
+
+		<div class="label" style="left: 0;">White Noise</div>
+		<div class="label" style="right: 0;">FAST Blue Noise</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { Fn, float, hash, mix, screenCoordinate, screenSize, screenUV, texture, uint, uniform, vec2, vec3, vec4 } from 'three/tsl';
+
+			import { fastNoise, loadFASTNoise } from 'three/addons/tsl/utils/FASTNoise.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			const modes = { 'Sphere': 0, 'Uniform': 1 };
+			const params = { mode: 'Sphere', pixelSize: 2, frames: 1, animated: true };
+
+			let renderer, computeQuad, displayQuad, targets, history, current;
+
+			const mode = uniform( modes[ params.mode ] );
+			const index = uniform( 0, 'uint' );
+			const blend = uniform( 1 ); // 1 resets the history
+
+			init();
+
+			async function init() {
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				const atlas = await loadFASTNoise( 'textures/noises/fast/gauss1-ema01-product.png' );
+
+				targets = [ 0, 1 ].map( () => new THREE.RenderTarget( 1, 1, { type: THREE.HalfFloatType, minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, depthBuffer: false } ) );
+				history = texture( targets[ 1 ].texture );
+				current = texture( targets[ 0 ].texture );
+
+				// noise
+
+				const left = screenUV.x.lessThan( 0.5 );
+				const white = hash( uint( screenCoordinate.x ).add( uint( screenCoordinate.y ).mul( 4096 ) ).add( index.mul( 16777259 ) ) );
+				const blue = fastNoise( atlas, new THREE.Vector2(), index ).x;
+				const noise = left.select( white, blue );
+
+				// the same shaded sphere over a gradient in each half
+
+				const image = Fn( () => {
+
+					const p = vec2( screenUV.x.mul( 2 ).fract().sub( 0.5 ).mul( screenSize.x.div( screenSize.y ).mul( 0.5 ) ), screenUV.y.sub( 0.5 ) );
+					const r = float( 0.3 );
+					const z = r.mul( r ).sub( p.dot( p ) );
+					const normal = vec3( p.x, p.y.negate(), z.max( 0 ).sqrt() ).div( r );
+					const shading = normal.dot( vec3( - 0.5, 0.6, 0.6 ).normalize() ).max( 0 ).mul( 0.9 ).add( 0.03 );
+					return z.greaterThan( 0 ).select( shading, screenUV.x.mul( 2 ).fract().mul( 0.5 ) );
+
+				} )();
+
+				// 1 sample per frame, accumulated with an exponential moving average
+
+				const sample = mode.equal( 0 ).select( noise.lessThan( image ).select( 1, 0 ), noise );
+				const accumulated = mix( history.sample( screenUV ).r, sample, blend );
+
+				computeQuad = new THREE.QuadMesh( new THREE.NodeMaterial() );
+				computeQuad.material.fragmentNode = vec4( accumulated, 0, 0, 1 );
+
+				const channel = current.sample( screenUV ).r;
+				const divider = screenCoordinate.x.sub( screenSize.x.mul( 0.5 ) ).abs().lessThan( 1 );
+
+				displayQuad = new THREE.QuadMesh( new THREE.NodeMaterial() );
+				displayQuad.material.fragmentNode = divider.select( vec4( 1, 0.3, 0.1, 1 ), vec4( vec3( channel ), 1 ) );
+
+				const gui = renderer.inspector.createParameters( 'Settings' );
+				gui.add( params, 'mode', Object.keys( modes ) ).onChange( ( value ) => {
+
+					mode.value = modes[ value ];
+					blend.value = 1;
+
+				} );
+				gui.add( params, 'pixelSize', 1, 8, 1 ).name( 'pixel size' ).onChange( onWindowResize );
+				gui.add( params, 'frames', 1, 200, 1 ).name( 'history frames' );
+				gui.add( params, 'animated' );
+
+				onWindowResize();
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				const size = renderer.getDrawingBufferSize( new THREE.Vector2() ).divideScalar( params.pixelSize ).ceil();
+				for ( const target of targets ) target.setSize( size.x, size.y );
+				blend.value = 1;
+
+			}
+
+			function animate() {
+
+				if ( computeQuad === undefined ) return;
+
+				if ( params.animated ) index.value ++;
+
+				renderer.setRenderTarget( targets[ 0 ] );
+				computeQuad.render( renderer );
+				renderer.setRenderTarget( null );
+				displayQuad.render( renderer );
+
+				targets.reverse();
+				history.value = targets[ 1 ].texture;
+				current.value = targets[ 0 ].texture;
+				blend.value = 2 / ( params.frames + 1 ); // EMA with the variance of an N frame average, 19 frames = FAST's α = 0.1
+
+			}
+
+		</script>
+
+	</body>
+</html>
