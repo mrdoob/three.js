@@ -46,6 +46,7 @@
 		import * as THREE from 'three/webgpu';
 		import { pass, mrt, output, normalView, velocity, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec3, vec4, Fn, If, uniform, context, cameraWorldMatrix, getViewPosition, diffuseColor, indirectSpecular, environmentSpecular, pmremTexture, reference, } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
+		import { hiZ } from 'three/addons/tsl/display/HiZNode.js';
 		import { screenSpaceGBuffer } from 'three/addons/tsl/display/ScreenSpaceGBufferNode.js';
 		import { reprojectedRadiance } from 'three/addons/tsl/display/ReprojectedRadianceNode.js';
 		import { coverageDenoise } from 'three/addons/tsl/display/CoverageDenoiseNode.js';
@@ -85,6 +86,7 @@
 			intensity: 1,
 			thickness: 0.03,
 			binaryRefine: true,
+			traversal: 'Adaptive Hi-Z',
 			roughness: 0,
 			floorRoughness: 0,
 			enabled: true
@@ -257,6 +259,9 @@
 				outputCoverage: true,
 				traceMaskNode: effectNormalRoughness.a.lessThan( maxRoughness ),
 				noiseNode: samplingNoise,
+				// the depth hierarchy is built with compute shaders
+				hiZ: renderer.backend.isWebGPUBackend ? hiZ( effectDepth ) : null,
+				hiZTraversal: 'adaptive',
 				hitReactiveNode: sample( coordinate => effectMotion.sample( coordinate ).w ),
 				roughnessNode: effectNormalRoughness.a
 			} ).toInspector( 'SSR' );
@@ -404,6 +409,7 @@
 			traceFolder.add( params, 'screenEdgeFade', 0, 0.5 ).name( 'Screen edge fade' ).onChange( updateParameters );
 			traceFolder.add( params, 'classify' ).name( 'Skip unused rays' ).onChange( updateParameters );
 			traceFolder.add( params, 'binaryRefine' ).name( 'Binary refine' ).onChange( updateParameters );
+			traceFolder.add( params, 'traversal', [ 'Linear', 'Conservative Hi-Z', 'Adaptive Hi-Z' ] ).name( 'Traversal' ).onChange( updateParameters );
 			traceFolder.add( params, 'reflectionSource', [ 'Current frame', 'Previous frame' ] ).name( 'Reflection source' ).onChange( value => {
 
 				useHistorySource.value = value === 'Previous frame';
@@ -470,6 +476,8 @@
 			ssrPass.thickness.value = params.thickness;
 			// build-time constant: assigning it recompiles the SSR material (setter no-ops if unchanged)
 			ssrPass.binaryRefine = params.binaryRefine;
+			ssrPass.hiZEnabled = params.traversal !== 'Linear';
+			ssrPass.hiZTraversal = params.traversal === 'Adaptive Hi-Z' ? 'adaptive' : 'conservative';
 
 		}
 
