@@ -1,5 +1,5 @@
 import { FloatType, NearestFilter, Node, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, UnsignedByteType, Vector2 } from 'three/webgpu';
-import { Fn, If, Loop, context, float, ivec2, nodeObject, outputStruct, passTexture, property, screenCoordinate, textureLoad, textureSize, uniform, vec2, vec4 } from 'three/tsl';
+import { Fn, If, Loop, context, float, ivec2, nodeObject, outputStruct, passTexture, property, sample, screenCoordinate, textureLoad, textureSize, uniform, unpackRGBToNormal, vec2, vec4 } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
@@ -57,6 +57,25 @@ class ScreenSpaceGBufferNode extends Node {
 	getTextureNode( name = 'depth' ) {
 
 		return this._textures[ { depth: 0, normal: 1, material: 2 }[ name ] ];
+
+	}
+
+	/**
+	 * Samples a full resolution node at the source texel each effect texel was copied from.
+	 *
+	 * @param {Node} node - Full resolution texture or sample node.
+	 * @return {SampleNode} The node at the effect resolution.
+	 */
+	resample( node ) {
+
+		return sample( coordinate => node.sample( this.getTextureNode().sample( coordinate ).gb ) );
+
+	}
+
+	/** @return {SampleNode} Unpacked, normalized view-space normals at the effect resolution. */
+	getViewNormalNode() {
+
+		return this._viewNormalNode ??= sample( coordinate => unpackRGBToNormal( this.getTextureNode( 'normal' ).sample( coordinate ).rgb ).normalize() );
 
 	}
 

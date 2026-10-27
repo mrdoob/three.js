@@ -241,12 +241,13 @@
 			const effectDepth = effectGuides.getTextureNode();
 			const effectNormalRoughness = effectGuides.getTextureNode( 'normal' );
 			const effectMaterial = effectGuides.getTextureNode( 'material' );
-			const effectReflectance = sample( coordinate => reflectance.sample( effectDepth.sample( coordinate ).gb ) );
-			const effectNormal = sample( coordinate => unpackRGBToNormal( effectNormalRoughness.sample( coordinate ).rgb ).normalize() );
+			const effectReflectance = effectGuides.resample( reflectance );
+			const effectNormal = effectGuides.getViewNormalNode();
+			const effectMotion = effectGuides.resample( motion );
 
 			beautyPass = pass( scene, camera );
 			historySource = reprojectedRadiance( beautyPass, scenePassDepth, sceneNormal, camera );
-			const currentTraceSource = sample( coordinate => scenePassColor.sample( effectDepth.sample( coordinate ).gb ) );
+			const currentTraceSource = effectGuides.resample( scenePassColor );
 			const previousTraceSource = sample( coordinate => {
 
 				const sourceUV = effectDepth.sample( coordinate ).gb;
@@ -265,7 +266,7 @@
 				metalnessNode: effectMaterial.a,
 				specularNode: effectReflectance.rgb,
 				specularF90Node: effectReflectance.a,
-				hitReactiveNode: sample( coordinate => motion.sample( effectDepth.sample( coordinate ).gb ).w ),
+				hitReactiveNode: sample( coordinate => effectMotion.sample( coordinate ).w ),
 				roughnessNode: effectNormalRoughness.a
 			} ).toInspector( 'SSR' );
 
@@ -279,7 +280,6 @@
 			const incoming = sample( uv => ssrPass.getTextureNode().sample( uv ).rgb );
 
 			const sparseSSR = convertToTexture( vec4( incoming.sample( uv() ), coverage.sample( uv() ) ) );
-			const effectMotion = sample( coordinate => motion.sample( effectDepth.sample( coordinate ).gb ) );
 			ssrDenoise = coverageDenoise( sparseSSR, camera, {
 				depth: effectDepth,
 				normal: effectNormalRoughness,
