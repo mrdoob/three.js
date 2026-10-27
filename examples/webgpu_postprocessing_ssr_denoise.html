@@ -59,7 +59,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, roughness, metalness, diffuseColor, specularColorBlended, specularF90, screenUV, sample, packNormalToRGB, unpackRGBToNormal, vec3, vec4, velocity, uniform, mix, step, abs, float, Fn, If, uv, texture, context, cameraWorldMatrix, getViewPosition, convertToTexture, renderOutput, saturation, indirectSpecular, environmentSpecular, pmremTexture } from 'three/tsl';
+		import { pass, mrt, output, normalView, roughness, metalness, diffuseColor, specularColorBlended, specularF90, screenUV, sample, packNormalToRGB, unpackRGBToNormal, vec3, vec4, velocity, uniform, mix, step, abs, float, Fn, If, uv, context, cameraWorldMatrix, getViewPosition, convertToTexture, renderOutput, saturation, indirectSpecular, environmentSpecular, pmremTexture } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { screenSpaceGBuffer } from 'three/addons/tsl/display/ScreenSpaceGBufferNode.js';
 		import { reprojectedRadiance } from 'three/addons/tsl/display/ReprojectedRadianceNode.js';
@@ -122,16 +122,9 @@
 		const grading = { exposure: 1.57, gamma: 0.89, contrast: 1.31, saturation: 1 };
 
 		let camera, scene, renderer, renderPipeline, ssrPass, ssrDenoise, effectGuides, traaPass, views;
-		let controls, geometryPass, beautyPass, lightingHistory;
+		let controls, geometryPass, beautyPass, historySource;
 
-		const historyValid = uniform( false );
 		const useHistorySource = uniform( params.reflectionSource === 'Previous frame' );
-		const previousView = uniform( new THREE.Matrix4() );
-		const previousProjection = uniform( new THREE.Matrix4() );
-		const previousProjectionInverse = uniform( new THREE.Matrix4() );
-		const currentView = new THREE.Matrix4();
-		const currentProjection = new THREE.Matrix4();
-		const currentProjectionInverse = new THREE.Matrix4();
 		const samplingModes = [ 'Original', 'FAST Product', 'FAST Separate' ];
 		const samplingMode = uniform( 2, 'uint' );
 		const denoiseEnabled = uniform( 1 );
@@ -278,14 +271,8 @@
 			const effectMotion = sample( coordinate => motion.sample( effectDepth.sample( coordinate ).gb ) );
 
 			// tracing the previous frame's lighting gives multiple bounces
-			lightingHistory = new THREE.RenderTarget( 1, 1, { type: THREE.HalfFloatType, depthTexture: new THREE.DepthTexture() } );
-			lightingHistory.depthTexture.format = depth.value.format;
-			lightingHistory.depthTexture.type = depth.value.type;
-			lightingHistory.depthTexture.minFilter = THREE.NearestFilter;
-			lightingHistory.depthTexture.magFilter = THREE.NearestFilter;
-			const historySource = reprojectedRadiance( texture( lightingHistory.texture ), texture( lightingHistory.depthTexture ), depth, sceneNormal, camera, {
-				previousView, previousProjection, previousProjectionInverse, valid: historyValid
-			} );
+			beautyPass = pass( scene, camera );
+			historySource = reprojectedRadiance( beautyPass, depth, sceneNormal, camera );
 			const currentTraceSource = sample( coordinate => scenePassColor.sample( effectDepth.sample( coordinate ).gb ) );
 			const previousTraceSource = sample( coordinate => historySource.sample( effectDepth.sample( coordinate ).gb ) );
 
@@ -336,22 +323,7 @@
 
 			} )();
 
-			beautyPass = pass( scene, camera );
 			beautyPass.contextNode = context( { indirectSpecularNode: indirectSpecular( [ screenReflection, fallback ] ) } );
-
-			const onAfterRender = scene.onAfterRender;
-			scene.onAfterRender = function ( renderer, sourceScene, sourceCamera, ...args ) {
-
-				onAfterRender.call( this, renderer, sourceScene, sourceCamera, ...args );
-				if ( sourceCamera === camera ) {
-
-					currentView.copy( camera.matrixWorldInverse );
-					currentProjection.copy( camera.projectionMatrix );
-					currentProjectionInverse.copy( camera.projectionMatrixInverse );
-
-				}
-
-			};
 
 			const resolvedSpecular = Fn( () => {
 
@@ -547,12 +519,14 @@
 			// debug views still render the beauty lighting used by the next frame
 			const selected = views[ params.output ];
 			const traa = params.antialiasing === 'TRAA';
-			renderPipeline.outputNode = ( useHistorySource.value || traa ) && params.output !== 'Beauty' ? Fn( builder => {
+			renderPipeline.outputNode = Fn( builder => {
 
-				( traa ? traaPass : beautyPass ).build( builder );
+				// built first so the history is captured before TRAA clears its jitter
+				if ( useHistorySource.value ) historySource.build( builder );
+				if ( traa ) traaPass.build( builder );
 				return selected;
 
-			} )() : selected;
+			} )();
 			renderPipeline.needsUpdate = true;
 
 			compareHint.hidden = ! isCompareMode();
@@ -562,7 +536,7 @@
 
 		function resetHistory() {
 
-			historyValid.value = false;
+			historySource?.reset();
 			ssrDenoise?.reset();
 			traaPass?.setSize( 1, 1 );
 
@@ -574,6 +548,7 @@
 			camera.updateProjectionMatrix();
 
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			resetHistory();
 			compareResolution.value.set( window.innerWidth, window.innerHeight );
 
 		}
@@ -601,30 +576,7 @@
 
 			controls.update();
 
-			const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
-			if ( lightingHistory.width !== size.x || lightingHistory.height !== size.y ) {
-
-				lightingHistory.setSize( size.x, size.y );
-				resetHistory();
-
-			}
-
-			renderer.initRenderTarget( lightingHistory );
 			renderPipeline.render();
-			if ( useHistorySource.value ) {
-
-				renderer.copyTextureToTexture( beautyPass.getTexture( 'output' ), lightingHistory.texture );
-				renderer.copyTextureToTexture( geometryPass.getTexture( 'depth' ), lightingHistory.depthTexture );
-				previousView.value.copy( currentView );
-				previousProjection.value.copy( currentProjection );
-				previousProjectionInverse.value.copy( currentProjectionInverse );
-				historyValid.value = true;
-
-			} else {
-
-				historyValid.value = false;
-
-			}
 
 		}
 
