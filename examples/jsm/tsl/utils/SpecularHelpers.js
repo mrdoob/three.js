@@ -182,13 +182,14 @@ export const ggxReflectionSample = Fn( ( [ N, V, roughness, metalness, albedo, X
 
 	// TBN from view-space normal
 	const up = vec3( 0, 0, 1 );
-	let T = cross( up, N ).toVar();
-	T = T.normalize().toVar();
+	const T = cross( up, N ).toVar();
+	// Test the unnormalized tangent: normalize( 0 ) is undefined at the poles.
 	If( T.length().lessThan( 1e-3 ), () => {
 
-		T.assign( cross( vec3( 0, 1, 0 ), N ).normalize() );
+		T.assign( cross( vec3( 0, 1, 0 ), N ) );
 
 	} );
+	T.assign( T.normalize() );
 	const B = cross( N, T ).normalize().toVar();
 
 	// transform V to LOCAL frame (N = +Z)
