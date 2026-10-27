@@ -1,7 +1,8 @@
 import ChainMap from './ChainMap.js';
 import RenderObject from './RenderObject.js';
 
-const _chainKeys = [];
+const _chainKeys = [ null, null, null, null ];
+const _overrideChainKeys = [ null, null, null, null, null ];
 
 /**
  * This module manages the render objects of the renderer.
@@ -105,22 +106,24 @@ class RenderObjects {
 
 		// set chain keys
 
-		_chainKeys[ 0 ] = object;
-		_chainKeys[ 1 ] = material;
-		_chainKeys[ 2 ] = renderContext;
-		_chainKeys[ 3 ] = lightsNode;
+		const chainKeys = sourceMaterial !== null ? _overrideChainKeys : _chainKeys;
 
-		if ( sourceMaterial !== null ) _chainKeys[ 4 ] = sourceMaterial;
+		chainKeys[ 0 ] = object;
+		chainKeys[ 1 ] = material;
+		chainKeys[ 2 ] = renderContext;
+		chainKeys[ 3 ] = lightsNode;
+
+		if ( sourceMaterial !== null ) chainKeys[ 4 ] = sourceMaterial;
 
 		//
 
-		let renderObject = chainMap.get( _chainKeys );
+		let renderObject = chainMap.get( chainKeys );
 
 		if ( renderObject === undefined ) {
 
 			renderObject = this.createRenderObject( this.nodes, this.geometries, this.renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext, passId );
 
-			chainMap.set( _chainKeys, renderObject );
+			chainMap.set( chainKeys, renderObject );
 
 		} else {
 
@@ -171,11 +174,12 @@ class RenderObjects {
 
 		// reset chain array
 
-		_chainKeys[ 0 ] = null;
-		_chainKeys[ 1 ] = null;
-		_chainKeys[ 2 ] = null;
-		_chainKeys[ 3 ] = null;
-		_chainKeys.length = 4;
+		chainKeys[ 0 ] = null;
+		chainKeys[ 1 ] = null;
+		chainKeys[ 2 ] = null;
+		chainKeys[ 3 ] = null;
+
+		if ( sourceMaterial !== null ) chainKeys[ 4 ] = null;
 
 		//
 
