@@ -181,14 +181,8 @@ export const ggxReflectionSample = Fn( ( [ N, V, roughness, metalness, albedo, X
 	const ay = a.toVar();
 
 	// TBN from view-space normal
-	const up = vec3( 0, 0, 1 );
-	let T = cross( up, N ).toVar();
-	T = T.normalize().toVar();
-	If( T.length().lessThan( 1e-3 ), () => {
-
-		T.assign( cross( vec3( 0, 1, 0 ), N ).normalize() );
-
-	} );
+	const up = N.z.abs().lessThan( 0.999 ).select( vec3( 0, 0, 1 ), vec3( 1, 0, 0 ) );
+	const T = cross( up, N ).normalize().toVar();
 	const B = cross( N, T ).normalize().toVar();
 
 	// transform V to LOCAL frame (N = +Z)
