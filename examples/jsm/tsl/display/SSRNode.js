@@ -984,6 +984,7 @@ class SSRNode extends Node {
 			}
 
 			// reconstruct at the depth texel center
+
 			const depthSize = vec2( textureSize( this.depthNode ) ).toConst();
 			const uvPos = uvNode.mul( depthSize ).floor().add( 0.5 ).div( depthSize ).toVar();
 
@@ -1315,6 +1316,7 @@ class SSRNode extends Node {
 						if ( this.binaryRefine ) {
 
 							// refine only front-to-back crossings
+
 							canRefine.assign( previousInFront );
 							hitSLo.assign( previousS );
 							hitSHi.assign( s );
@@ -1359,6 +1361,7 @@ class SSRNode extends Node {
 						} );
 
 						// re-fetch UV/depth at the refined `s`
+
 						hitUvS.assign( screenPosAt( hitSHi ).mul( invResolution ) );
 						hitD.assign( sampleDepth( hitUvS ) );
 
@@ -1378,6 +1381,7 @@ class SSRNode extends Node {
 				if ( this.binaryRefine ) {
 
 					// bisection can land on a depth discontinuity, so validate the refined hit
+
 					const neighbor = getViewPosition( uvS.add( uvPixelStepX ), hitD, this._cameraProjectionMatrixInverse );
 					const tk = max( neighbor.x.sub( vP.x ).mul( 3 ), this.thickness );
 					withinRange.assign( withinRange.and( isBackgroundDepth( hitD ).not() )
