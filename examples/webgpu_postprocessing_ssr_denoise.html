@@ -59,13 +59,14 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, roughness, metalness, diffuseColor, specularColorBlended, specularF90, screenUV, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec3, vec4, velocity, uniform, mix, step, abs, float, Fn, If, uv, textureSize, texture, context, cameraWorldMatrix, getViewPosition, convertToTexture, renderOutput, saturation, EnvironmentBRDF, indirectSpecular, environmentSpecular, pmremTexture } from 'three/tsl';
+		import { pass, mrt, output, normalView, roughness, metalness, diffuseColor, specularColorBlended, specularF90, screenUV, sample, packNormalToRGB, unpackRGBToNormal, vec3, vec4, velocity, uniform, mix, step, abs, float, Fn, If, uv, texture, context, cameraWorldMatrix, getViewPosition, convertToTexture, renderOutput, saturation, EnvironmentBRDF, indirectSpecular, environmentSpecular, pmremTexture } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { screenSpaceGBuffer } from 'three/addons/tsl/display/ScreenSpaceGBufferNode.js';
 		import { reprojectedRadiance } from 'three/addons/tsl/display/ReprojectedRadianceNode.js';
 		import { coverageDenoise } from 'three/addons/tsl/display/CoverageDenoiseNode.js';
 		import { resolveSSRHitDistance } from 'three/addons/tsl/utils/SpecularHelpers.js';
 		import { fastNoise } from 'three/addons/tsl/utils/FASTNoise.js';
+		import { jointBilateralUpsample } from 'three/addons/tsl/display/JointBilateralUpsample.js';
 		import { traa } from 'three/addons/tsl/display/TRAANode.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
@@ -333,50 +334,7 @@
 				hitDistance: sample( uv => resolveSSRHitDistance( ssrPass.getTextureNode().sample( uv ).a, coverage.sample( uv ) ) )
 			} );
 			const denoised = ssrDenoise.getTextureNode();
-			const projectionInverse = uniform( camera.projectionMatrixInverse );
-
-			// joint bilateral upsampling
-			const filtered = sample( coordinate => Fn( () => {
-
-				const size = vec2( textureSize( effectDepth ) );
-				const pixel = coordinate.mul( size ).sub( 0.5 );
-				const base = pixel.floor();
-				const fraction = pixel.fract();
-				const viewZ = value => getViewPosition( coordinate, value, projectionInverse ).z;
-				const z = viewZ( depth.sample( coordinate ).r ).toConst();
-				const n = sceneNormal.sample( coordinate ).toConst();
-				const tolerance = z.abs().mul( 0.02 ).max( 0.001 );
-				const sum = vec4( 0 ).toVar();
-				const total = float( 0 ).toVar();
-
-				for ( let y = 0; y <= 1; y ++ ) {
-
-					for ( let x = 0; x <= 1; x ++ ) {
-
-						const tapUV = base.add( vec2( x, y ) ).add( 0.5 ).div( size ).toConst();
-						const depthWeight = viewZ( effectDepth.sample( tapUV ).r ).sub( z ).div( tolerance ).pow2().negate().exp();
-						const normalWeight = effectNormal.sample( tapUV ).dot( n ).max( 0 ).pow( 8 );
-						const wx = x === 0 ? fraction.x.oneMinus() : fraction.x;
-						const wy = y === 0 ? fraction.y.oneMinus() : fraction.y;
-						const weight = wx.mul( wy ).mul( depthWeight ).mul( normalWeight ).toConst();
-						const value = denoised.sample( tapUV );
-						sum.addAssign( vec4( value.rgb.mul( value.a ), value.a ).mul( weight ) );
-						total.addAssign( weight );
-
-					}
-
-				}
-
-				// no matching texel, use plain interpolation
-				const result = denoised.sample( coordinate ).toVar();
-				If( total.greaterThan( 1e-4 ), () => {
-
-					result.assign( vec4( sum.rgb.div( sum.a.max( 1e-6 ) ), sum.a.div( total ) ) );
-
-				} );
-				return result;
-
-			} )() );
+			const filtered = jointBilateralUpsample( denoised, effectDepth, effectNormal, depth, sceneNormal, camera );
 
 			const raw = sample( uv => vec4( incoming.sample( uv ), coverage.sample( uv ) ) );
 
@@ -415,7 +373,7 @@
 
 				const normal = sceneNormal.sample( screenUV ).transformDirection( uniform( camera.matrixWorld ) );
 				const level = normalRoughness.sample( screenUV ).a;
-				const view = getViewPosition( screenUV, depth.sample( screenUV ).r, projectionInverse ).negate().normalize().transformDirection( uniform( camera.matrixWorld ) );
+				const view = getViewPosition( screenUV, depth.sample( screenUV ).r, uniform( camera.projectionMatrixInverse ) ).negate().normalize().transformDirection( uniform( camera.matrixWorld ) );
 				const direction = level.pow4().mix( view.negate().reflect( normal ), normal ).normalize();
 				const environment = fallback( { direction, roughness: level } );
 				const value = filtered.sample( screenUV );
