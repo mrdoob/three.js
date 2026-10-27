@@ -230,13 +230,13 @@ class SSRNode extends Node {
 
 		/**
 		 * Mirror bias for the stochastic GGX sampling. Concentrates the reflected rays toward
-		 * the lobe's narrow (near-mirror) core, trading a small amount of bias for less noise.
+		 * the lobe's narrow (near-mirror) core, trading sampling bias for less noise.
 		 * `0` samples the full VNDF lobe; values toward `1` tighten the cone. Range `[0,1]`.
 		 *
 		 * @type {UniformNode<float>}
-		 * @default 0.5
+		 * @default 0
 		 */
-		this.mirrorBias = uniform( 0.5 );
+		this.mirrorBias = uniform( 0 );
 
 		/**
 		 * The quality of the blur. Must be an integer in the range `[1,3]`.
@@ -913,8 +913,7 @@ class SSRNode extends Node {
 			} else {
 
 				const Xi = noise.toVar();
-				// Mirror-bias: pull `Xi.y` toward the cap top to tighten the GGX lobe and cut mid-roughness
-				// noise. Unbiased — bounded VNDF keeps brdf·cos/pdf ~constant (EA, "Stochastic SSR").
+				// mirror bias trades the unbiased GGX lobe for lower variance
 				Xi.y.assign( mix( Xi.y, 0.0, this.mirrorBias.mul( Xi.w.sqrt() ) ) );
 
 				albedo.assign( ( this.diffuseNode !== null ? this.diffuseNode.sample( uvPos ).rgb : vec3( 1 ) ) );
