@@ -87,6 +87,7 @@
 			thickness: 0.03,
 			binaryRefine: true,
 			traversal: 'Adaptive Hi-Z',
+			hiZSteps: 64,
 			roughness: 0,
 			floorRoughness: 0,
 			enabled: true
@@ -410,6 +411,7 @@
 			traceFolder.add( params, 'classify' ).name( 'Skip unused rays' ).onChange( updateParameters );
 			traceFolder.add( params, 'binaryRefine' ).name( 'Binary refine' ).onChange( updateParameters );
 			traceFolder.add( params, 'traversal', [ 'Linear', 'Conservative Hi-Z', 'Adaptive Hi-Z' ] ).name( 'Traversal' ).onChange( updateParameters );
+			traceFolder.add( params, 'hiZSteps', [ 8, 16, 32, 64, 128, 256, 512 ] ).name( 'Adaptive Hi-Z steps' ).onChange( updateParameters );
 			traceFolder.add( params, 'reflectionSource', [ 'Current frame', 'Previous frame' ] ).name( 'Reflection source' ).onChange( value => {
 
 				useHistorySource.value = value === 'Previous frame';
@@ -478,6 +480,7 @@
 			ssrPass.binaryRefine = params.binaryRefine;
 			ssrPass.hiZEnabled = params.traversal !== 'Linear';
 			ssrPass.hiZTraversal = params.traversal === 'Adaptive Hi-Z' ? 'adaptive' : 'conservative';
+			ssrPass.hiZMaxSteps.value = params.hiZSteps;
 
 		}
 
