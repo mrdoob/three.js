@@ -201,7 +201,8 @@ export const ggxReflectionDirection = Fn( ( [ N, V, roughness, Xi ] ) => {
 	// TBN from view-space normal
 	const up = vec3( 0, 0, 1 );
 	const T = cross( up, N ).toVar();
-	// normalize( 0 ) is undefined at the poles
+	// Test the unnormalized tangent: normalize( 0 ) is undefined at the poles.
+
 	If( T.length().lessThan( 1e-3 ), () => {
 
 		T.assign( cross( vec3( 0, 1, 0 ), N ) );
