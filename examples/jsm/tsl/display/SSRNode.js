@@ -1209,10 +1209,24 @@ class SSRNode extends Node {
 
 						} );
 
-						// re-fetch UV/depth at the refined `s`
+						// bisection can land on a depth discontinuity, so keep the coarse hit unless the refined one is valid
 
-						hitUvS.assign( screenPosAt( hitSHi ).mul( invResolution ) );
-						hitD.assign( sampleDepth( hitUvS ) );
+						const refinedUvS = screenPosAt( hitSHi ).mul( invResolution ).toConst();
+						const refinedD = sampleDepth( refinedUvS ).toConst();
+						const refinedVP = getViewPosition( refinedUvS, refinedD, this._cameraProjectionMatrixInverse );
+						const neighbor = getViewPosition( refinedUvS.add( uvPixelStepX ), refinedD, this._cameraProjectionMatrixInverse );
+						const tk = max( neighbor.x.sub( refinedVP.x ).mul( 3 ), this.thickness );
+
+						const valid = isBackgroundDepth( refinedD ).not()
+							.and( pointToLineDistance( refinedVP, viewPosition, d1viewPosition ).lessThanEqual( tk ) )
+							.and( dot( viewReflectDir, this.normalNode.sample( refinedUvS ).rgb.normalize() ).lessThan( 0 ) );
+
+						If( valid, () => {
+
+							hitUvS.assign( refinedUvS );
+							hitD.assign( refinedD );
+
+						} );
 
 					} );
 
@@ -1225,20 +1239,7 @@ class SSRNode extends Node {
 				// In blur mode the ratio² falloff re-grows past maxDistance, so over-range hits fall back
 				// to env. The scatter path bounds reach via ray length, so every hit shades.
 				const distancePointPlane = this.stochastic === false ? pointPlaneDistance( vP, viewPosition, viewNormal ).toVar() : float( 0 );
-				const withinRange = distancePointPlane.lessThanEqual( this.maxDistance ).toVar();
-
-				if ( this.binaryRefine ) {
-
-					// bisection can land on a depth discontinuity, so validate the refined hit
-
-					const neighbor = getViewPosition( uvS.add( uvPixelStepX ), hitD, this._cameraProjectionMatrixInverse );
-					const tk = max( neighbor.x.sub( vP.x ).mul( 3 ), this.thickness );
-					withinRange.assign( withinRange.and( isBackgroundDepth( hitD ).not() )
-						.and( pointToLineDistance( vP, viewPosition, d1viewPosition ).lessThanEqual( tk ) ) );
-
-					withinRange.assign( withinRange.and( dot( viewReflectDir, this.normalNode.sample( uvS ).rgb.normalize() ).lessThan( 0 ) ) );
-
-				}
+				const withinRange = distancePointPlane.lessThanEqual( this.maxDistance );
 
 				If( withinRange, () => {
 
