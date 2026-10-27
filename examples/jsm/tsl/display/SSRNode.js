@@ -1116,6 +1116,12 @@ class SSRNode extends Node {
 
 				const viewReflectRayZ = reflectRayZAt( s ).toVar();
 
+				// Advance the previous sample before any Continue() so rejected samples still bound the next bracket.
+				const lastS = previousS.toVar();
+				const lastInFront = previousInFront.toVar();
+				previousS.assign( s );
+				previousInFront.assign( viewReflectRayZ.greaterThan( vZ ) );
+
 				If( isBackgroundDepth( d ).not().and( viewReflectRayZ.lessThanEqual( vZ ) ), () => {
 
 					// Depth crossing: ray went behind the depth buffer. Gate by thickness before stopping
@@ -1163,8 +1169,8 @@ class SSRNode extends Node {
 
 							// refine only front-to-back crossings
 
-							canRefine.assign( previousInFront );
-							hitSLo.assign( previousS );
+							canRefine.assign( lastInFront );
+							hitSLo.assign( lastS );
 							hitSHi.assign( s );
 
 						}
@@ -1175,9 +1181,6 @@ class SSRNode extends Node {
 					} );
 
 				} );
-
-				previousS.assign( s );
-				previousInFront.assign( viewReflectRayZ.greaterThan( vZ ) );
 
 			} );
 
