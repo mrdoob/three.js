@@ -16,6 +16,8 @@ const MAX_STEPS = 64;
  * @typedef {Object} SSRNodeOptions
  * @property {boolean} [stochastic=false] - When `false`, traces a single mirror reflection and softens roughness with a blur pass (first-generation SSR). When `true`, varies the reflection direction per pixel with stochastic GGX rays (second-generation SSR); higher quality on rough/glossy surfaces but noisier, so it expects a temporal/spatial denoiser downstream.
  * @property {Node<float>} [metalnessNode=null] - Per-pixel metalness. Drives GGX reflection sampling and, with `reflectNonMetals=false`, the non-metal early-out.
+ * @property {Node<vec3>} [specularNode=null] - Stochastic mode only: sampled material normal-incidence reflectance (F0). Defaults to the metalness/base-color approximation.
+ * @property {Node<float>} [specularF90Node=null] - Stochastic mode only: sampled material grazing reflectance. Defaults to one.
  * @property {Node<float>} [roughnessNode=null] - Per-pixel roughness. Drives GGX sampling and the blur mip selection.
  * @property {boolean} [reflectNonMetals=false] - Only used when `stochastic=false`. When `false`, non-metallic surfaces are discarded for a noticeable performance gain; set `true` to also reflect dielectrics (e.g. marble, polished wood, plastic).
  * @property {Texture} [environmentNode=null] - Equirectangular HDR environment map with CPU-side `image.data` (e.g. from RGBELoader). Not compatible with PMREM / `scene.environment` cubemaps.
@@ -56,6 +58,8 @@ class SSRNode extends Node {
 		const {
 			stochastic = false,
 			metalnessNode = null,
+			specularNode = null,
+			specularF90Node = null,
 			roughnessNode = null,
 			reflectNonMetals = false,
 			environmentNode = null,
@@ -119,6 +123,8 @@ class SSRNode extends Node {
 		 * @type {?Node<float>}
 		 */
 		this.metalnessNode = metalnessNode;
+		this.specularNode = specularNode;
+		this.specularF90Node = specularF90Node;
 
 		/**
 		 * Per-pixel roughness, used to drive the GGX reflection sampling and the blur mip
@@ -920,12 +926,12 @@ class SSRNode extends Node {
 				Xi.y.assign( mix( Xi.y, 0.0, this.mirrorBias.mul( Xi.w.sqrt() ) ) );
 
 				albedo.assign( ( this.diffuseNode !== null ? this.diffuseNode.sample( uvPos ).rgb : vec3( 1 ) ) );
-				const ggxSample = ggxReflectionSample( viewNormal, V, roughness, metalness, albedo, Xi ).toVar();
+				const ggxSample = ggxReflectionSample( viewNormal, V, roughness, metalness, albedo, Xi, this.specularNode, this.specularF90Node ?? 1 ).toVar();
 
 				// Sometimes the GGX sample is facing away from the surface, so we need to re-sample.
 				If( ggxSample.get( 'reflectDir' ).dot( viewNormal ).lessThan( 0 ), () => {
 
-					ggxSample.assign( ggxReflectionSample( viewNormal, V, roughness, metalness, albedo, Xi.add( Xi.mul( 7 ) ).fract() ) );
+					ggxSample.assign( ggxReflectionSample( viewNormal, V, roughness, metalness, albedo, Xi.add( Xi.mul( 7 ) ).fract(), this.specularNode, this.specularF90Node ?? 1 ) );
 
 				} );
 
@@ -950,6 +956,7 @@ class SSRNode extends Node {
 							V,
 							alpha: ggxSample.get( 'alpha' ),
 							f0: ggxSample.get( 'f0' ),
+							f90: ggxSample.get( 'f90' ),
 							Xi2
 						} ) );
 
@@ -961,7 +968,8 @@ class SSRNode extends Node {
 							N: viewNormal,
 							V,
 							alpha: ggxSample.get( 'alpha' ),
-							f0: ggxSample.get( 'f0' )
+							f0: ggxSample.get( 'f0' ),
+							f90: ggxSample.get( 'f90' )
 						} ) );
 
 					}
