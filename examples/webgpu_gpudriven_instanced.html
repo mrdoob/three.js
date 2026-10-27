@@ -264,6 +264,7 @@
 				gui.add( parameters, 'meshlets' ).name( 'Show meshlets' ).onChange( value => {
 
 					pipeline.debug = value;
+					renderer.toneMapping = value ? THREE.NoToneMapping : THREE.ACESFilmicToneMapping;
 					prepare();
 
 				} );

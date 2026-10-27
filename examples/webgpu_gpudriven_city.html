@@ -110,7 +110,7 @@
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( Math.min( window.devicePixelRatio, 1.5 ) ); // limit the pixel ratio to improve performance on high-DPI displays
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMapping = parameters.meshlets ? THREE.NoToneMapping : THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 0.13;
 				renderer.shadowMap.enabled = true;
 				renderer.inspector = new Inspector();
@@ -319,6 +319,7 @@
 
 					pipelines[ 'gpu-driven' ].debug = value;
 					pipelines[ 'visibility-buffer' ].debug = value;
+					renderer.toneMapping = value ? THREE.NoToneMapping : THREE.ACESFilmicToneMapping;
 
 				} );
 
