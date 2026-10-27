@@ -74,7 +74,7 @@ class DRACOExporter {
 			dracoObject = new dracoEncoder.Mesh();
 
 			const vertices = geometry.getAttribute( 'position' );
-			builder.AddFloatAttributeToMesh( dracoObject, dracoEncoder.POSITION, vertices.count, vertices.itemSize, vertices.array );
+			builder.AddFloatAttributeToMesh( dracoObject, dracoEncoder.POSITION, vertices.count, vertices.itemSize, getFloatArray( vertices ) );
 
 			const faces = geometry.getIndex();
 
@@ -102,7 +102,7 @@ class DRACOExporter {
 
 				if ( normals !== undefined ) {
 
-					builder.AddFloatAttributeToMesh( dracoObject, dracoEncoder.NORMAL, normals.count, normals.itemSize, normals.array );
+					builder.AddFloatAttributeToMesh( dracoObject, dracoEncoder.NORMAL, normals.count, normals.itemSize, getFloatArray( normals ) );
 
 				}
 
@@ -114,7 +114,7 @@ class DRACOExporter {
 
 				if ( uvs !== undefined ) {
 
-					builder.AddFloatAttributeToMesh( dracoObject, dracoEncoder.TEX_COORD, uvs.count, uvs.itemSize, uvs.array );
+					builder.AddFloatAttributeToMesh( dracoObject, dracoEncoder.TEX_COORD, uvs.count, uvs.itemSize, getFloatArray( uvs ) );
 
 				}
 
@@ -140,7 +140,7 @@ class DRACOExporter {
 			dracoObject = new dracoEncoder.PointCloud();
 
 			const vertices = geometry.getAttribute( 'position' );
-			builder.AddFloatAttribute( dracoObject, dracoEncoder.POSITION, vertices.count, vertices.itemSize, vertices.array );
+			builder.AddFloatAttribute( dracoObject, dracoEncoder.POSITION, vertices.count, vertices.itemSize, getFloatArray( vertices ) );
 
 			if ( options.exportColor === true ) {
 
@@ -242,6 +242,35 @@ class DRACOExporter {
 		throw new Error( 'THREE.DRACOExporter: parse() has been replaced by parseAsync().' );
 
 	}
+
+}
+
+function getFloatArray( attribute ) {
+
+	// Draco expects the values of the attribute as a tightly packed float array, so
+	// interleaved and normalized (quantized) attributes have to be unpacked first.
+
+	if ( attribute.isInterleavedBufferAttribute !== true && attribute.normalized !== true && attribute.array instanceof Float32Array ) {
+
+		return attribute.array;
+
+	}
+
+	const count = attribute.count;
+	const itemSize = attribute.itemSize;
+	const array = new Float32Array( count * itemSize );
+
+	for ( let i = 0; i < count; i ++ ) {
+
+		for ( let j = 0; j < itemSize; j ++ ) {
+
+			array[ i * itemSize + j ] = attribute.getComponent( i, j );
+
+		}
+
+	}
+
+	return array;
 
 }
 
