@@ -667,10 +667,7 @@ class PassNode extends Node {
 
 		if ( texture === undefined ) {
 
-			const current = this.getTexture( name );
-
-			texture = current.clone();
-			texture.source = current.source; // keep sizes in sync, DepthTexture.clone() copies its image
+			texture = this.getTexture( name ).clone();
 
 			this._previousTextures[ name ] = texture;
 
