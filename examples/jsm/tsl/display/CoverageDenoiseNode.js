@@ -461,11 +461,12 @@ class CoverageDenoiseNode extends Node {
 					fast.assign( mix( currentWeighted, history.get( 'fast' ).clamp( currentMin.sub( currentRange ), currentMax.add( currentRange ) ), fastAge.sub( 1 ).div( fastAge ) ) );
 					minimum.assign( minimum.min( fast ) );
 					maximum.assign( maximum.max( fast ) );
-					// anti-lag (ReBLUR): shorten stale long history to the fast length
+					// anti-lag: discard long history that left the fast history's range
 					const spread = fastMax.sub( fastMin ).max( currentRange ).max( fast.mul( 0.05 ) ).add( 1e-3 );
 					const excess = history.get( 'color' ).sub( fast ).abs().div( spread );
-					const lag = excess.x.max( excess.y ).max( excess.z ).max( excess.w ).smoothstep( 1, 2 );
-					age.assign( mix( age, fastAge, lag ) );
+					const lag = excess.x.max( excess.y ).max( excess.z ).max( excess.w ).smoothstep( 1, 2 ).toConst();
+					age.assign( mix( age, 1, lag ) );
+					fast.assign( mix( fast, currentWeighted, lag ) );
 					const historyWeight = age.sub( 1 ).div( age );
 					result.assign( mix( currentWeighted, history.get( 'color' ).clamp( minimum, maximum ), historyWeight ) );
 
