@@ -16,8 +16,8 @@ const MAX_STEPS = 64;
  * @typedef {Object} SSRNodeOptions
  * @property {boolean} [stochastic=false] - When `false`, traces a single mirror reflection and softens roughness with a blur pass (first-generation SSR). When `true`, varies the reflection direction per pixel with stochastic GGX rays (second-generation SSR); higher quality on rough/glossy surfaces but noisier, so it expects a temporal/spatial denoiser downstream.
  * @property {Node<float>} [metalnessNode=null] - Per-pixel metalness. Drives GGX reflection sampling and, with `reflectNonMetals=false`, the non-metal early-out.
- * @property {Node<vec3>} [specularNode=null] - Stochastic mode only: sampled material normal-incidence reflectance (F0). Defaults to the metalness/base-color approximation.
- * @property {Node<float>} [specularF90Node=null] - Stochastic mode only: sampled material grazing reflectance. Defaults to one.
+ * @property {Node<vec3>} [specularNode=null] - Stochastic mode only: material normal-incidence reflectance (F0), typically an MRT `specularColorBlended` attachment (it already includes IOR, specular intensity and metalness; raw `material.specularColor` reflects too brightly). Defaults to the metalness/base-color approximation.
+ * @property {Node<float>} [specularF90Node=null] - Stochastic mode only: material grazing reflectance, typically an MRT `specularF90` attachment. Defaults to one.
  * @property {Node<float>} [roughnessNode=null] - Per-pixel roughness. Drives GGX sampling and the blur mip selection.
  * @property {boolean} [reflectNonMetals=false] - Only used when `stochastic=false`. When `false`, non-metallic surfaces are discarded for a noticeable performance gain; set `true` to also reflect dielectrics (e.g. marble, polished wood, plastic).
  * @property {Texture} [environmentNode=null] - Equirectangular HDR environment map with CPU-side `image.data` (e.g. from RGBELoader). Not compatible with PMREM / `scene.environment` cubemaps.
@@ -123,7 +123,25 @@ class SSRNode extends Node {
 		 * @type {?Node<float>}
 		 */
 		this.metalnessNode = metalnessNode;
+
+		/**
+		 * Stochastic mode only: per-pixel normal-incidence reflectance (F0), typically an MRT
+		 * `specularColorBlended` attachment, which already includes IOR, specular intensity and
+		 * metalness (raw `material.specularColor` reflects too brightly). When `null`, F0 is
+		 * derived from metalness and the diffuse color.
+		 *
+		 * @type {?Node<vec3>}
+		 * @default null
+		 */
 		this.specularNode = specularNode;
+
+		/**
+		 * Stochastic mode only: per-pixel grazing reflectance (F90), typically an MRT
+		 * `specularF90` attachment. When `null`, the shader uses `1`.
+		 *
+		 * @type {?Node<float>}
+		 * @default null
+		 */
 		this.specularF90Node = specularF90Node;
 
 		/**
@@ -910,7 +928,6 @@ class SSRNode extends Node {
 			const V = viewIncidentDir.negate().normalize().toVar();
 
 			let viewReflectDir, finalSampleWeight, specDominantFactor;
-			const albedo = vec3( 1 ).toVar();
 			let sampleEnvReflection = null;
 
 			if ( this.stochastic === false ) {
@@ -925,7 +942,8 @@ class SSRNode extends Node {
 				// mirror bias trades the unbiased GGX lobe for lower variance
 				Xi.y.assign( mix( Xi.y, 0.0, this.mirrorBias.mul( Xi.w.sqrt() ) ) );
 
-				albedo.assign( ( this.diffuseNode !== null ? this.diffuseNode.sample( uvPos ).rgb : vec3( 1 ) ) );
+				// The base color only feeds the metalness F0 fallback.
+				const albedo = ( this.specularNode === null && this.diffuseNode !== null ? this.diffuseNode.sample( uvPos ).rgb : vec3( 1 ) ).toVar();
 				const ggxSample = ggxReflectionSample( viewNormal, V, roughness, metalness, albedo, Xi, this.specularNode, this.specularF90Node ?? 1 ).toVar();
 
 				// Sometimes the GGX sample is facing away from the surface, so we need to re-sample.
