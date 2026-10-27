@@ -139,7 +139,7 @@ const GGXVNDFPdf = Fn( ( [ NoH, NoV, roughness ] ) => {
 /**
  * Fresnel reflectance for the Schlick approximation.
  */
-const fresnelSchlick = Fn( ( [ f0, theta, f90 ] ) => {
+export const F_Schlick = Fn( ( [ f0, theta, f90 = float( 1 ) ] ) => {
 
 	const oneMinus = float( 1.0 ).sub( theta ).toVar();
 	const oneMinus2 = oneMinus.mul( oneMinus ).toVar();
@@ -147,8 +147,6 @@ const fresnelSchlick = Fn( ( [ f0, theta, f90 ] ) => {
 	return f0.add( vec3( f90 ).sub( f0 ).mul( oneMinus5 ) ).toVar(); // vec3
 
 }, { f0: 'vec3', theta: 'float', f90: 'float', return: 'vec3' } );
-
-export const F_Schlick = ( f0, theta, f90 = 1 ) => fresnelSchlick( f0, theta, float( f90 ) );
 
 /**
  * Specular dominant factor for parallax-corrected ray length.
@@ -286,8 +284,18 @@ const ggxReflectionSampleWithReflectance = Fn( ( [ N, V, roughness, f0, f90, Xi 
  * Samples with the material's F0/F90 when supplied, otherwise derives F0 from metalness.
  *
  * @tsl
+ * @param {Node<vec3>} N - View-space shading normal.
+ * @param {Node<vec3>} V - Surface-to-camera direction.
+ * @param {Node<float>} roughness - Perceptual roughness.
+ * @param {Node<float>} metalness - Metalness used when F0 is omitted.
+ * @param {Node<vec3>} albedo - Base color used when F0 is omitted.
+ * @param {Node<vec4>} Xi - Random sample.
+ * @param {?Node<vec3>} [f0=null] - Normal-incidence reflectance.
+ * @param {Node<float>|number} [f90=1] - Grazing reflectance.
+ * @return {ggxReflectionStruct}
  */
 export const ggxReflectionSample = ( N, V, roughness, metalness, albedo, Xi, f0 = null, f90 = 1 ) =>
+
 	ggxReflectionSampleWithReflectance( N, V, roughness, f0 ?? mix( vec3( 0.04 ), albedo, metalness ), float( f90 ), Xi );
 
 // Equirectangular environment sampling
