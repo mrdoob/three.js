@@ -1642,6 +1642,10 @@ export class Style {
 		margin-bottom: 2px;
 	}
 
+	.mini-panel-content .list-container.parameters .list-item-wrapper:has(> .list-children-container.closed) + .list-item-wrapper {
+		margin-top: 2px;
+	}
+
 	.mini-panel-content .list-container.parameters .list-children-container > .list-item-wrapper:first-child:has(> .list-item-row:not(.collapsible)) {
 		margin-top: 2px;
 	}
