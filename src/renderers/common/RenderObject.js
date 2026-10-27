@@ -556,13 +556,7 @@ class RenderObject {
 	 */
 	getChainArray() {
 
-		if ( this._sourceMaterial !== null ) {
-
-			return [ this.object, this.material, this.context, this.lightsNode, this._sourceMaterial ];
-
-		}
-
-		return [ this.object, this.material, this.context, this.lightsNode ];
+		return [ this.object, this.material, this.context, this.lightsNode, this._sourceMaterial !== null ? this._sourceMaterial : this.material ];
 
 	}
 
