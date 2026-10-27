@@ -303,7 +303,7 @@ export function getCacheKey( renderContext ) {
 
 	}
 
-	if ( depthTexture ) values.push( depthTexture.id );
+	if ( depthTexture !== null ) values.push( depthTexture.id );
 
 	return hashArray( values );
 
