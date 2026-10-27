@@ -1,8 +1,26 @@
+import { NearestFilter, NoColorSpace, TextureLoader } from 'three/webgpu';
 import { Fn, frameId, ivec2, screenCoordinate, textureLoad, uint, vec4 } from 'three/tsl';
 
 /**
- * Reads a 128×128×32 FAST blue noise volume packed as an RGB atlas. The texture
- * must use `flipY = false` and `NoColorSpace`.
+ * Loads a FAST noise atlas with the sampling settings {@link fastNoise} requires.
+ *
+ * @param {string} url - The atlas URL.
+ * @return {Promise<Texture>} The configured atlas.
+ */
+export const loadFASTNoise = async ( url ) => {
+
+	const atlas = await new TextureLoader().loadAsync( url );
+	atlas.flipY = false;
+	atlas.colorSpace = NoColorSpace;
+	atlas.generateMipmaps = false;
+	atlas.minFilter = atlas.magFilter = NearestFilter;
+	return atlas;
+
+};
+
+/**
+ * Reads a 128×128×32 FAST blue noise volume packed as an RGB atlas. Load the
+ * atlas with {@link loadFASTNoise}, or use `flipY = false` and `NoColorSpace`.
  *
  * @param {Texture} atlas - The 256×4096 noise atlas.
  * @param {Vector2} offset - Fixed integer offset in tracing pixels.

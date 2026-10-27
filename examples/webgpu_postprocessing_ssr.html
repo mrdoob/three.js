@@ -50,7 +50,7 @@
 		import { reprojectedRadiance } from 'three/addons/tsl/display/ReprojectedRadianceNode.js';
 		import { coverageDenoise } from 'three/addons/tsl/display/CoverageDenoiseNode.js';
 		import { resolveSSRHitDistance } from 'three/addons/tsl/utils/SpecularHelpers.js';
-		import { fastNoise } from 'three/addons/tsl/utils/FASTNoise.js';
+		import { fastNoise, loadFASTNoise } from 'three/addons/tsl/utils/FASTNoise.js';
 		import { jointBilateralUpsample } from 'three/addons/tsl/display/JointBilateralUpsample.js';
 		import { traa } from 'three/addons/tsl/display/TRAANode.js';
 		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
@@ -167,16 +167,7 @@
 
 			await renderer.init();
 
-			const noiseAtlases = await Promise.all( [ 'product', 'separate05' ].map( async variant => {
-
-				const atlas = await new THREE.TextureLoader().loadAsync( `textures/noises/fast/gauss1-ema01-${ variant }.png` );
-				atlas.flipY = false;
-				atlas.colorSpace = THREE.NoColorSpace;
-				atlas.generateMipmaps = false;
-				atlas.minFilter = atlas.magFilter = THREE.NearestFilter;
-				return atlas;
-
-			} ) );
+			const noiseAtlases = await Promise.all( [ 'product', 'separate05' ].map( variant => loadFASTNoise( `textures/noises/fast/gauss1-ema01-${ variant }.png` ) ) );
 			const productNoise = fastNoise( noiseAtlases[ 0 ], new THREE.Vector2() );
 			const separateNoise = fastNoise( noiseAtlases[ 1 ], new THREE.Vector2() );
 			const samplingNoise = Fn( () => {
