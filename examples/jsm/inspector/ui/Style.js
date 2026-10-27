@@ -1633,6 +1633,11 @@ export class Style {
 		will-change: transform;
 	}
 
+	.mini-panel-content .custom-checkbox .checkmark::after {
+		width: 6px;
+		height: 6px;
+	}
+
 	.mini-panel-content .list-container.parameters .list-item-row:not(.collapsible) {
 		margin-bottom: 2px;
 	}
