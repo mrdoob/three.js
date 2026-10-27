@@ -110,7 +110,16 @@ class VelocityNode extends Node {
 	 */
 	update( { frameId, camera, object } ) {
 
+		const objectData = getData( object );
 		const previousModelMatrix = getPreviousMatrix( object );
+
+		if ( objectData.frameId !== frameId ) {
+
+			objectData.frameId = frameId;
+			// Keep the previous transform unchanged across all velocity passes in this frame.
+			previousModelMatrix.copy( getPreviousMatrix( object, 1 ) );
+
+		}
 
 		this.previousModelWorldMatrix.value.copy( previousModelMatrix );
 
@@ -158,7 +167,7 @@ class VelocityNode extends Node {
 	 */
 	updateAfter( { object } ) {
 
-		getPreviousMatrix( object ).copy( object.matrixWorld );
+		getPreviousMatrix( object, 1 ).copy( object.matrixWorld );
 
 	}
 
