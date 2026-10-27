@@ -1163,6 +1163,7 @@ class SSRNode extends Node {
 			const d1 = getScreenPosition( d1viewPosition, this._cameraProjectionMatrix ).mul( this._resolution ).toVar();
 
 			// clip the ray to the screen so all steps land on visible texels
+
 			const extent = d1.sub( d0 ).toVar();
 			const exitT = vec2(
 				extent.x.greaterThanEqual( 0 ).select( this._resolution.x.sub( d0.x ), d0.x ),
@@ -1213,6 +1214,7 @@ class SSRNode extends Node {
 				: ( sVal ) => viewPosition.z.add( sVal.mul( d1viewPosition.z.sub( viewPosition.z ) ) );
 
 			// view-space point on the reflected ray at s
+
 			const rayPointAt = this.camera.isPerspectiveCamera
 				? ( sVal ) => mix( viewPosition.div( viewPosition.z ), d1viewPosition.div( d1viewPosition.z ), sVal ).mul( reflectRayZAt( sVal ) )
 				: ( sVal ) => mix( viewPosition, d1viewPosition, sVal );
@@ -1278,9 +1280,10 @@ class SSRNode extends Node {
 					const uvNeighbor = uvS.add( uvPixelStepX ).toVar();
 					const vPNeighbor = getViewPosition( uvNeighbor, d, this._cameraProjectionMatrixInverse ).toVar();
 					const minThickness = vPNeighbor.x.sub( vP.x ).mul( 3 ).toVar();
-					// the ray can overshoot by up to the step length
+					// Only refinement may use a wider coarse tolerance.
+
 					const stepLength = distance( rayPointAt( previousS ), rayPointAt( s ) );
-					const tk = max( max( minThickness, this.thickness ), stepLength ).toVar();
+					const tk = ( this.binaryRefine ? max( max( minThickness, this.thickness ), stepLength ) : max( minThickness, this.thickness ) ).toVar();
 
 					If( away.lessThanEqual( tk ), () => {
 
