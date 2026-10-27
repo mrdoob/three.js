@@ -368,6 +368,7 @@ class TRAANode extends Node {
 		this.setSize( width, height );
 
 		// swap history instead of copying
+
 		const historyTexture = this._historyRenderTarget.texture;
 		this._historyRenderTarget.texture = this._resolveRenderTarget.texture;
 		this._resolveRenderTarget.texture = historyTexture;
