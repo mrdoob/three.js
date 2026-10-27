@@ -44,7 +44,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, velocity, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec3, vec4, Fn, If, uv, convertToTexture, uniform, context, cameraWorldMatrix, getViewPosition, diffuseColor, specularColorBlended, specularF90, EnvironmentBRDF, indirectSpecular, environmentSpecular, pmremTexture, texture, reference, } from 'three/tsl';
+		import { pass, mrt, output, normalView, velocity, metalness, roughness, screenUV, color, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec3, vec4, Fn, If, uv, convertToTexture, uniform, context, cameraWorldMatrix, getViewPosition, diffuseColor, specularColorBlended, specularF90, indirectSpecular, environmentSpecular, pmremTexture, texture, reference, } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { screenSpaceGBuffer } from 'three/addons/tsl/display/ScreenSpaceGBufferNode.js';
 		import { reprojectedRadiance } from 'three/addons/tsl/display/ReprojectedRadianceNode.js';
@@ -289,33 +289,16 @@
 				specularF90Node: effectReflectance.a,
 				hitReactiveNode: sample( coordinate => motion.sample( effectDepth.sample( coordinate ).gb ).w ),
 				roughnessNode: effectNormalRoughness.a
-			} ).toInspector( 'SSR (BRDF weighted)' );
+			} ).toInspector( 'SSR' );
 
 			const coverage = sample( uv => {
 
 				const level = effectNormalRoughness.sample( uv ).a;
 				const roughnessFade = level.smoothstep( maxRoughness.sub( 0.1 ), maxRoughness ).oneMinus();
-				return ssrPass.getCoverageNode().sample( uv ).r.mul( roughnessFade );
+				return ssrPass.getTextureNode().sample( uv ).a.mul( roughnessFade );
 
 			} ).toInspector( 'SSR Coverage' );
-			const incoming = sample( uv => {
-
-				const raw = ssrPass.getTextureNode().sample( uv );
-				const c = ssrPass.getCoverageNode().sample( uv ).r;
-				const sourceUV = effectDepth.sample( uv ).gb;
-				const n = effectNormal.sample( uv );
-				const v = getViewPosition( sourceUV, effectDepth.sample( uv ).r, uniform( camera.projectionMatrixInverse ) ).negate().normalize();
-				const f = effectReflectance.sample( uv );
-				const modulation = EnvironmentBRDF( {
-					dotNV: n.dot( v ).clamp(),
-					specularColor: f.rgb,
-					specularF90: f.a,
-					roughness: effectNormalRoughness.sample( uv ).a
-				} );
-				// undo coverage and BRDF weighting
-				return raw.rgb.div( c.max( 1e-4 ) ).div( modulation.max( vec3( 1e-4 ) ) );
-
-			} ).toInspector( 'SSR Incoming Radiance' );
+			const incoming = sample( uv => ssrPass.getTextureNode().sample( uv ).rgb );
 
 			const sparseSSR = convertToTexture( vec4( incoming.sample( uv() ), coverage.sample( uv() ) ) );
 			const effectMotion = sample( coordinate => motion.sample( effectDepth.sample( coordinate ).gb ) );
@@ -324,8 +307,8 @@
 				normal: effectNormalRoughness,
 				velocity: effectMotion,
 				surfaceId: sample( coordinate => effectMotion.sample( coordinate ).z ),
-				reactive: sample( coordinate => ssrPass.getCoverageNode().sample( coordinate ).g ),
-				hitDistance: sample( uv => resolveSSRHitDistance( ssrPass.getTextureNode().sample( uv ).a, coverage.sample( uv ) ) )
+				reactive: sample( coordinate => ssrPass.getHitNode().sample( coordinate ).g ),
+				hitDistance: sample( uv => resolveSSRHitDistance( ssrPass.getHitNode().sample( uv ).r, coverage.sample( uv ) ) )
 			} );
 			const denoised = ssrDenoise.getTextureNode();
 			const filtered = jointBilateralUpsample( denoised, effectDepth, effectNormal, scenePassDepth, sceneNormal, camera );

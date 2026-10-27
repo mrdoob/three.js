@@ -1,4 +1,4 @@
-import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, logarithmicDepthToViewZ, luminance, max, min, mix, mul, nodeObject, normalize, orthographicDepthToViewZ, passTexture, perspectiveDepthToViewZ, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, viewZToPerspectiveDepth, context, property, outputStruct, isBackgroundDepth } from 'three/tsl';
+import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, logarithmicDepthToViewZ, luminance, max, min, mix, mul, nodeObject, normalize, orthographicDepthToViewZ, passTexture, perspectiveDepthToViewZ, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, viewZToPerspectiveDepth, context, property, outputStruct, isBackgroundDepth, EnvironmentBRDF } from 'three/tsl';
 import { HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2, Vector3 } from 'three/webgpu';
 import { bindAnalyticNoise } from '../utils/RNoise.js';
 import { ENV_RAY_LENGTH, ENV_RAY_LENGTH_THRESHOLD, getSpecularDominantFactor, ggxReflectionSample } from '../utils/SpecularHelpers.js';
@@ -21,10 +21,10 @@ let _rendererState;
  * @property {boolean} [envImportanceSampling=false] - When `true`, precomputes env-luminance CDF tables and uses MIS for environment misses. Build-time only.
  * @property {Node} [diffuseNode=null] - Scene diffuse / base color. Defaults to `vec3(1)` in the shader when omitted.
  * @property {boolean} [binaryRefine=false] - Sub-step binary-search refinement of detected hits. Compile-time constant (baked into the shader at construction).
- * @property {boolean} [outputCoverage=false] - Stochastic tracing with external fallback. Requires `stochastic=true` and no `environmentNode`. RGB is BRDF weighted and coverage premultiplied; alpha remains hit distance. Source alpha supplies validity.
+ * @property {boolean} [outputCoverage=false] - Stochastic tracing with external fallback. Requires `stochastic=true` and no `environmentNode`. RGB is incoming radiance with the BRDF and coverage weighting divided out; alpha is coverage. Hit distance and the reactive mask are in {@link SSRNode#getHitNode}. Source alpha supplies validity.
  * @property {Node<vec4>} [noiseNode=null] - Samples in [0,1): GGX in xy, march jitter in z, mirror-bias jitter in w. Evaluated at tracing resolution.
  * @property {Node<bool>} [traceMaskNode=null] - Optional tracing eligibility mask. Requires outputCoverage and external fallback. Rejected texels clear to zero.
- * @property {Node<float>} [hitReactiveNode=null] - Per-hit object-motion rejection mask. Written to coverage G (maximum across rays).
+ * @property {Node<float>} [hitReactiveNode=null] - Per-hit object-motion rejection mask. Written to the hit texture G (maximum across rays).
  * @property {Camera} [camera=null] - Camera the scene is rendered with. Inferred from the color pass when omitted.
  */
 
@@ -93,6 +93,8 @@ class SSRNode extends Node {
 		/** @type {UniformNode<bool>} False uses the original analytic pattern. */
 		this.useNoiseNode = uniform( true );
 		this._coverage = outputCoverage ? property( 'float' ) : null;
+		this._brdf = outputCoverage ? property( 'vec3' ) : null;
+		this._hitDistance = outputCoverage ? property( 'float' ) : null;
 
 		/**
 		 * When `true`, the reflection direction is varied per pixel with stochastic GGX rays
@@ -428,7 +430,7 @@ class SSRNode extends Node {
 		 * @type {RenderTarget}
 		 */
 		this._ssrRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, count: outputCoverage ? 2 : 1 } );
-		if ( outputCoverage ) this._ssrRenderTarget.textures[ 1 ].name = 'SSRNode.Coverage';
+		if ( outputCoverage ) this._ssrRenderTarget.textures[ 1 ].name = 'SSRNode.Hit';
 		this._ssrRenderTarget.texture.name = 'SSRNode.SSR';
 
 		/**
@@ -688,18 +690,22 @@ class SSRNode extends Node {
 				hitWeight.addAssign( weight );
 
 			} );
+			const distance = hitWeight.greaterThan( 0 ).select( hitDistance.div( hitWeight.max( 1e-6 ) ), float( ENV_RAY_LENGTH ) );
+
 			if ( this.outputCoverage ) {
 
-				this._coverage.assign( coverage.div( float( count ) ) );
+				// divide out coverage and the expected BRDF weight, leaving incoming radiance
+				const averageCoverage = coverage.div( float( count ) ).toConst();
 				this._hitReactive.assign( reactive );
+				this._hitDistance.assign( distance );
+				return vec4( radiance.div( float( count ) ).div( averageCoverage.max( 1e-4 ) ).div( this._brdf.max( vec3( 1e-4 ) ) ), averageCoverage );
 
 			}
 
-			const distance = hitWeight.greaterThan( 0 ).select( hitDistance.div( hitWeight.max( 1e-6 ) ), float( ENV_RAY_LENGTH ) );
 			return vec4( radiance.div( float( count ) ), distance );
 
 		} )() : this._ssrFn( int( 0 ) );
-		this._ssrMaterial.fragmentNode = this.outputCoverage ? outputStruct( result, vec4( this._coverage, this._hitReactive, 0, 0 ) ) : result;
+		this._ssrMaterial.fragmentNode = this.outputCoverage ? outputStruct( result, vec4( this._hitDistance, this._hitReactive, 0, 0 ) ) : result;
 		this._ssrMaterial.needsUpdate = true;
 
 	}
@@ -716,13 +722,14 @@ class SSRNode extends Node {
 	}
 
 	/**
-	 * Returns the screen-space coverage texture. Requires `outputCoverage: true`.
+	 * Returns the hit texture: world-space hit distance in R ({@link ENV_RAY_LENGTH} for misses)
+	 * and the reactive mask in G. Requires `outputCoverage: true`.
 	 *
-	 * @return {PassTextureNode} The coverage texture.
+	 * @return {PassTextureNode} The hit texture.
 	 */
-	getCoverageNode() {
+	getHitNode() {
 
-		return this._coverageTextureNode ??= passTexture( this, this._ssrRenderTarget.textures[ 1 ] );
+		return this._hitTextureNode ??= passTexture( this, this._ssrRenderTarget.textures[ 1 ] );
 
 	}
 
@@ -1053,6 +1060,12 @@ class SSRNode extends Node {
 				viewReflectDir = ggxSample.get( 'reflectDir' ).toVar();
 				finalSampleWeight = ggxSample.get( 'sampleWeight' ).toVar();
 				specDominantFactor = getSpecularDominantFactor( ggxSample.get( 'NdotV' ), roughness ).toVar();
+
+				if ( this.outputCoverage ) {
+
+					this._brdf.assign( EnvironmentBRDF( { dotNV: ggxSample.get( 'NdotV' ), specularColor: ggxSample.get( 'f0' ), specularF90: ggxSample.get( 'f90' ), roughness } ) );
+
+				}
 
 				sampleEnvReflection = () => {
 
