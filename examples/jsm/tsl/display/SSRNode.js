@@ -1030,7 +1030,8 @@ class SSRNode extends Node {
 			} else {
 
 				const Xi = noise.toVar();
-				// mirror bias: pull `Xi.y` toward the cap top to tighten the GGX lobe (biased)
+				// mirror bias changes the sampling distribution without updating the PDF
+
 				Xi.y.assign( mix( Xi.y, 0.0, this.mirrorBias.mul( Xi.w.sqrt() ) ) );
 
 				if ( this.outputCoverage ) {
