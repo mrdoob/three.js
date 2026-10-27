@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - SSGI denoise</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - SSGI denoise">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_postprocessing_denoise.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_postprocessing_denoise.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>SSGI denoise</span>
+			</div>
+
+			<small>
+				Room scene with real-time indirect illumination plus spatial and temporal denoising techniques.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec3, vec4, packNormalToRGB, unpackRGBToNormal, sample } from 'three/tsl';
+			import { ssgi } from 'three/addons/tsl/display/SSGINode.js';
+			import { denoise } from 'three/addons/tsl/display/DenoiseNode.js';
+			import { traa } from 'three/addons/tsl/display/TRAANode.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			const ROOM_X = 6;
+			const ROOM_Y = 3;
+			const ROOM_Z = 10;
+
+			const SUN_BASE_Y = 7; // resting height of the sun, oscillated around when animated
+
+			let camera, scene, renderer, renderPipeline, controls;
+			let sun, mixer;
+			let sunTime = 0; // accumulated only while animating, so toggling pauses and resumes the arc
+
+			const timer = new THREE.Timer();
+			timer.connect( document );
+			const materials = {
+				wall: new THREE.MeshStandardMaterial( { color: '#e6e6e6', roughness: 0.9, metalness: 0 } ),
+				floor: new THREE.MeshStandardMaterial( { color: '#dcdcdc', roughness: 0.85, metalness: 0 } ),
+				ceiling: new THREE.MeshStandardMaterial( { color: '#ededed', roughness: 0.95, metalness: 0 } ),
+				windowFrame: new THREE.MeshStandardMaterial( { color: '#15171c', roughness: 0.6, metalness: 0.2 } ),
+				carpet: new THREE.MeshStandardMaterial( { color: '#c41f1f', roughness: 0.95, metalness: 0 } ),
+				sofa: new THREE.MeshStandardMaterial( { color: '#1b3be0', roughness: 0.6, metalness: 0 } ),
+				pillow: new THREE.MeshStandardMaterial( { color: '#37d13a', roughness: 0.8, metalness: 0 } ),
+				coffeeTable: new THREE.MeshStandardMaterial( { color: '#cdab6d', roughness: 0.7, metalness: 0 } ),
+				vase: new THREE.MeshStandardMaterial( { color: '#ff2db5', roughness: 0.35, metalness: 0 } ),
+				plantPot: new THREE.MeshStandardMaterial( { color: '#33302c', roughness: 0.8, metalness: 0 } ),
+				plantTrunk: new THREE.MeshStandardMaterial( { color: '#5b4a32', roughness: 0.85, metalness: 0 } ),
+				plantLeaves: new THREE.MeshStandardMaterial( { color: '#3ad13f', roughness: 0.7, metalness: 0 } ),
+				lampMetal: new THREE.MeshStandardMaterial( { color: '#2a2a2a', roughness: 0.4, metalness: 0.8 } ),
+				lampShade: new THREE.MeshStandardMaterial( { color: '#ffc72e', emissive: '#ffc72e', emissiveIntensity: 3, roughness: 0.6, metalness: 0 } ),
+				grass: new THREE.MeshStandardMaterial( { color: '#71955f', roughness: 1, metalness: 0 } )
+			};
+
+			// thin wall/ceiling planes must cast from either face without a double-sided visible material
+			materials.wall.shadowSide = THREE.DoubleSide;
+			materials.ceiling.shadowSide = THREE.DoubleSide;
+
+			const params = {
+				ssgi: true,
+				denoise: true,
+				output: 0,
+				animateSun: false
+			};
+
+			init();
+
+			async function init() {
+
+				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.1, 300 );
+				camera.position.set( 1.2, 1.65, 4.6 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( '#a9d2ff' );
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.NeutralToneMapping;
+				renderer.toneMappingExposure = 1;
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				// controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.target.set( 0, 1.1, - 0.5 );
+				controls.minDistance = 1;
+				controls.maxDistance = 30;
+				controls.maxPolarAngle = Math.PI * 0.52;
+				controls.update();
+
+				// post-processing
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+
+				const scenePass = pass( scene, camera );
+				scenePass.setMRT( mrt( {
+					output: output,
+					diffuseColor: diffuseColor,
+					normal: packNormalToRGB( normalView ),
+					velocity: velocity
+				} ) );
+
+				const scenePassColor = scenePass.getTextureNode( 'output' );
+				const scenePassDiffuse = scenePass.getTextureNode( 'diffuseColor' ).toInspector( 'Diffuse Color' );
+				const scenePassDepth = scenePass.getTextureNode( 'depth' ).toInspector( 'Depth', () => scenePass.getLinearDepthNode() );
+				const scenePassNormal = scenePass.getTextureNode( 'normal' ).toInspector( 'Normal' );
+				const scenePassVelocity = scenePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
+
+				// bandwidth optimization
+
+				const diffuseTexture = scenePass.getTexture( 'diffuseColor' );
+				diffuseTexture.type = THREE.UnsignedByteType;
+
+				const normalTexture = scenePass.getTexture( 'normal' );
+				normalTexture.type = THREE.UnsignedByteType;
+
+				const sceneNormal = sample( ( uv ) => {
+
+					return unpackRGBToNormal( scenePassNormal.sample( uv ) );
+
+				} );
+
+				// gi - SSGI produces noisy indirect light ( rgb ) + AO ( alpha ). it is denoised temporally
+				// with TRAA ( always on, which needs the per-frame jitter enabled by useTemporalFiltering )
+				// and optionally also spatially with DenoiseNode ( GUI toggle ).
+
+				const giPass = ssgi( scenePassColor, scenePassDepth, sceneNormal, camera );
+				giPass.useTemporalFiltering = true;
+				giPass.sliceCount.value = 2;
+				giPass.thickness.value = 0.5;
+				giPass.backfaceLighting.value = 0.3;
+				giPass.giIntensity.value = 6;
+
+				const giRaw = giPass.getTextureNode();
+
+				// denoise - spatial ( edge-aware ) filtering of the noisy SSGI buffer
+
+				const denoisePass = denoise( giRaw, scenePassDepth, sceneNormal, camera );
+				denoisePass.radius.value = 8;
+
+				const giDenoised = denoisePass.toInspector( 'Denoised SSGI' );
+
+				// composite - direct light modulated by AO ( alpha, preserved by the denoiser ) plus albedo modulated by GI ( rgb, denoised )
+
+				const composite = ( gi ) => vec4( add( scenePassColor.rgb.mul( gi.a ), scenePassDiffuse.rgb.mul( gi.rgb ) ), scenePassColor.a );
+
+				const compositeRaw = composite( giRaw );
+				const compositeDenoised = composite( giDenoised );
+
+				// traa - temporal accumulation, doubling as the final anti-aliasing pass
+
+				const traaRaw = traa( compositeRaw, scenePassDepth, scenePassVelocity, camera );
+				const traaDenoised = traa( compositeDenoised, scenePassDepth, scenePassVelocity, camera );
+
+				// direct-only beauty ( SSGI disabled ) - still anti-aliased by TRAA
+
+				const traaDirect = traa( scenePassColor, scenePassDepth, scenePassVelocity, camera );
+
+				renderPipeline.outputNode = traaDenoised;
+
+				// scene content
+
+				createRoom();
+				createWindowWall();
+				createCarpet();
+				scene.add( createSofa( new THREE.Vector3( 2.5, 0, - 1 ), Math.PI * 0.5 ) );
+				scene.add( createCoffeeTable( new THREE.Vector3( 1, 0, - 1 ) ) );
+				scene.add( createPlant( new THREE.Vector3( - 2.3, 0, - 4.4 ) ) );
+				scene.add( createFloorLamp( new THREE.Vector3( 2.55, 0, - 4.4 ) ) );
+				loadCharacter();
+				createExterior();
+				createLights();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				// GUI
+
+				const types = { Combined: 0, Direct: 3, AO: 1, GI: 2 };
+
+				const gui = renderer.inspector.createParameters( 'SSGI denoise' );
+
+				gui.add( params, 'output', types ).onChange( updateOutput );
+				gui.add( params, 'animateSun' ).name( 'animate sun' );
+				gui.add( sun, 'intensity', 0, 10 ).name( 'sun intensity' );
+
+				const ssgiFolder = gui.addFolder( 'SSGI' );
+				ssgiFolder.add( params, 'ssgi' ).name( 'enabled' ).onChange( updateOutput );
+				ssgiFolder.add( giPass.sliceCount, 'value', 1, 4, 1 ).name( 'slice count' );
+				ssgiFolder.add( giPass.stepCount, 'value', 1, 32, 1 ).name( 'step count' );
+				ssgiFolder.add( giPass.radius, 'value', 1, 25 ).name( 'radius' );
+				ssgiFolder.add( giPass.expFactor, 'value', 1, 3 ).name( 'exp factor' );
+				ssgiFolder.add( giPass.thickness, 'value', 0.01, 10 ).name( 'thickness' );
+				ssgiFolder.add( giPass.backfaceLighting, 'value', 0, 1 ).name( 'backface lighting' );
+				ssgiFolder.add( giPass.aoIntensity, 'value', 0, 4 ).name( 'AO intensity' );
+				ssgiFolder.add( giPass.giIntensity, 'value', 0, 100 ).name( 'GI intensity' );
+				ssgiFolder.add( giPass.useLinearThickness, 'value' ).name( 'use linear thickness' );
+				ssgiFolder.add( giPass.useScreenSpaceSampling, 'value' ).name( 'screen-space sampling' );
+				ssgiFolder.add( giPass, 'useTemporalFiltering' ).name( 'temporal filtering' ).onChange( updateOutput );
+
+				const denoiseFolder = gui.addFolder( 'Denoise' );
+				denoiseFolder.add( params, 'denoise' ).name( 'enabled' ).onChange( updateOutput );
+				denoiseFolder.add( denoisePass.radius, 'value', 1, 16 ).name( 'radius' );
+				denoiseFolder.add( denoisePass.lumaPhi, 'value', 0, 20 ).name( 'luma phi' );
+				denoiseFolder.add( denoisePass.depthPhi, 'value', 0, 20 ).name( 'depth phi' );
+				denoiseFolder.add( denoisePass.normalPhi, 'value', 0, 20 ).name( 'normal phi' );
+
+				function updateOutput() {
+
+					const gi = params.denoise ? giDenoised : giRaw;
+					const output = Number( params.output );
+
+					if ( output === 1 ) {
+
+						renderPipeline.outputNode = vec4( vec3( gi.a ), 1 );
+
+					} else if ( output === 2 ) {
+
+						renderPipeline.outputNode = vec4( gi.rgb, 1 );
+
+					} else if ( output === 3 ) {
+
+						renderPipeline.outputNode = scenePassColor;
+
+					} else if ( params.ssgi === false ) {
+
+						renderPipeline.outputNode = traaDirect;
+
+					} else {
+
+						renderPipeline.outputNode = params.denoise ? traaDenoised : traaRaw;
+
+					}
+
+					renderPipeline.needsUpdate = true;
+
+				}
+
+			}
+
+			// off-white interior surfaces - walls, ceiling, floor and the enclosing front wall
+
+			function createRoom() {
+
+				const floor = new THREE.Mesh( new THREE.PlaneGeometry( ROOM_X, ROOM_Z ), materials.floor );
+				floor.rotation.x = - Math.PI * 0.5;
+				floor.receiveShadow = true;
+				scene.add( floor );
+
+				const ceiling = new THREE.Mesh( new THREE.PlaneGeometry( ROOM_X, ROOM_Z ), materials.ceiling );
+				ceiling.rotation.x = Math.PI * 0.5;
+				ceiling.position.y = ROOM_Y;
+				ceiling.castShadow = true;
+				ceiling.receiveShadow = true;
+				scene.add( ceiling );
+
+				const backWall = new THREE.Mesh( new THREE.PlaneGeometry( ROOM_X, ROOM_Y ), materials.wall );
+				backWall.position.set( 0, ROOM_Y * 0.5, - ROOM_Z * 0.5 );
+				backWall.castShadow = true;
+				backWall.receiveShadow = true;
+				scene.add( backWall );
+
+				const rightWall = new THREE.Mesh( new THREE.PlaneGeometry( ROOM_Z, ROOM_Y ), materials.wall );
+				rightWall.rotation.y = - Math.PI * 0.5;
+				rightWall.position.set( ROOM_X * 0.5, ROOM_Y * 0.5, 0 );
+				rightWall.castShadow = true;
+				rightWall.receiveShadow = true;
+				scene.add( rightWall );
+
+				// front wall ( behind the camera ) - normal faces into the room
+
+				const frontWall = new THREE.Mesh( new THREE.PlaneGeometry( ROOM_X, ROOM_Y ), materials.wall );
+				frontWall.rotation.y = Math.PI;
+				frontWall.position.set( 0, ROOM_Y * 0.5, ROOM_Z * 0.5 );
+				frontWall.castShadow = true;
+				frontWall.receiveShadow = true;
+				scene.add( frontWall );
+
+			}
+
+			// full-height windows on the left wall
+
+			function createWindowWall() {
+
+				const x = - ROOM_X * 0.5;
+				const group = new THREE.Group();
+
+				const panelCount = 6;
+
+				for ( let i = 0; i <= panelCount; i ++ ) {
+
+					const z = - ROOM_Z * 0.5 + i * ( ROOM_Z / panelCount );
+					const mullion = new THREE.Mesh( new THREE.BoxGeometry( 0.12, ROOM_Y, 0.1 ), materials.windowFrame );
+					mullion.position.set( x, ROOM_Y * 0.5, z );
+					group.add( mullion );
+
+				}
+
+				const sill = new THREE.Mesh( new THREE.BoxGeometry( 0.2, 0.12, ROOM_Z ), materials.windowFrame );
+				sill.position.set( x, 0.06, 0 );
+				group.add( sill );
+
+				const head = new THREE.Mesh( new THREE.BoxGeometry( 0.16, 0.14, ROOM_Z ), materials.windowFrame );
+				head.position.set( x, ROOM_Y - 0.07, 0 );
+				group.add( head );
+
+				const transom = new THREE.Mesh( new THREE.BoxGeometry( 0.12, 0.09, ROOM_Z ), materials.windowFrame );
+				transom.position.set( x, ROOM_Y * 0.68, 0 );
+				group.add( transom );
+
+				group.traverse( ( object ) => {
+
+					if ( object.isMesh ) object.castShadow = true;
+
+				} );
+
+				scene.add( group );
+
+			}
+
+			// red carpet around the seating area
+
+			function createCarpet() {
+
+				const carpet = new THREE.Mesh( new THREE.BoxGeometry( 2.9, 0.04, 3 ), materials.carpet );
+				carpet.position.set( 1.05, 0.02, - 1 );
+				carpet.receiveShadow = true;
+				scene.add( carpet );
+
+			}
+
+			// blue sofa assembled from rounded boxes, built facing - z and rotated into place
+
+			function createSofa( position, rotationY ) {
+
+				const group = new THREE.Group();
+
+				const width = 2.2;
+				const depth = 0.95;
+				const baseHeight = 0.35;
+
+				const base = new THREE.Mesh( new RoundedBoxGeometry( width, baseHeight, depth, 4, 0.06 ), materials.sofa );
+				base.position.set( 0, baseHeight * 0.5, 0 );
+				group.add( base );
+
+				const backrest = new THREE.Mesh( new RoundedBoxGeometry( width, 0.7, 0.22, 4, 0.06 ), materials.sofa );
+				backrest.position.set( 0, baseHeight + 0.2, depth * 0.5 - 0.11 );
+				group.add( backrest );
+
+				for ( const side of [ - 1, 1 ] ) {
+
+					const armrest = new THREE.Mesh( new RoundedBoxGeometry( 0.22, 0.5, depth, 4, 0.06 ), materials.sofa );
+					armrest.position.set( side * ( width * 0.5 - 0.11 ), baseHeight + 0.05, 0 );
+					group.add( armrest );
+
+					const seatCushion = new THREE.Mesh( new RoundedBoxGeometry( width * 0.5 - 0.18, 0.18, depth - 0.34, 5, 0.05 ), materials.sofa );
+					seatCushion.position.set( side * ( width * 0.25 - 0.08 ), baseHeight + 0.09, - 0.05 );
+					group.add( seatCushion );
+
+					const backCushion = new THREE.Mesh( new RoundedBoxGeometry( width * 0.5 - 0.2, 0.42, 0.16, 5, 0.05 ), materials.sofa );
+					backCushion.position.set( side * ( width * 0.25 - 0.09 ), baseHeight + 0.34, depth * 0.5 - 0.26 );
+					backCushion.rotation.x = Math.PI * 0.04;
+					group.add( backCushion );
+
+				}
+
+				// green throw pillow ( extra bright-green decoration )
+
+				const pillow = new THREE.Mesh( new RoundedBoxGeometry( 0.42, 0.42, 0.16, 5, 0.06 ), materials.pillow );
+				pillow.position.set( - 0.7, baseHeight + 0.4, depth * 0.5 - 0.43 );
+				pillow.rotation.set( Math.PI * 0.1, 0, Math.PI * 0.16 );
+				group.add( pillow );
+
+				group.traverse( ( object ) => {
+
+					if ( object.isMesh ) {
+
+						object.castShadow = true;
+						object.receiveShadow = true;
+
+					}
+
+				} );
+
+				group.position.copy( position );
+				group.rotation.y = rotationY;
+
+				return group;
+
+			}
+
+			function createCoffeeTable( position ) {
+
+				const group = new THREE.Group();
+
+				const top = new THREE.Mesh( new RoundedBoxGeometry( 0.65, 0.06, 1.3, 3, 0.02 ), materials.coffeeTable );
+				top.position.y = 0.4;
+				group.add( top );
+
+				for ( const sx of [ - 1, 1 ] ) {
+
+					for ( const sz of [ - 1, 1 ] ) {
+
+						const leg = new THREE.Mesh( new THREE.CylinderGeometry( 0.03, 0.035, 0.4, 12 ), materials.coffeeTable );
+						leg.position.set( sx * 0.26, 0.2, sz * 0.58 );
+						group.add( leg );
+
+					}
+
+				}
+
+				// bright-pink vase ( closed top )
+
+				const vaseProfile = [
+					new THREE.Vector2( 0, 0 ),
+					new THREE.Vector2( 0.09, 0 ),
+					new THREE.Vector2( 0.12, 0.06 ),
+					new THREE.Vector2( 0.16, 0.16 ),
+					new THREE.Vector2( 0.17, 0.24 ),
+					new THREE.Vector2( 0.13, 0.33 ),
+					new THREE.Vector2( 0.08, 0.4 ),
+					new THREE.Vector2( 0.09, 0.45 ),
+					new THREE.Vector2( 0, 0.45 )
+				];
+
+				const vase = new THREE.Mesh( new THREE.LatheGeometry( vaseProfile, 24 ), materials.vase );
+				vase.position.set( - 0.15, 0.43, 0 );
+				group.add( vase );
+
+				group.traverse( ( object ) => {
+
+					if ( object.isMesh ) {
+
+						object.castShadow = true;
+						object.receiveShadow = true;
+
+					}
+
+				} );
+
+				group.position.copy( position );
+
+				return group;
+
+			}
+
+			// potted plant with bright-green foliage
+
+			function createPlant( position ) {
+
+				const group = new THREE.Group();
+
+				const pot = new THREE.Mesh( new THREE.CylinderGeometry( 0.24, 0.17, 0.42, 20 ), materials.plantPot );
+				pot.position.y = 0.21;
+				group.add( pot );
+
+				const trunk = new THREE.Mesh( new THREE.CylinderGeometry( 0.04, 0.05, 0.6, 8 ), materials.plantTrunk );
+				trunk.position.y = 0.7;
+				group.add( trunk );
+
+				const leafClusters = [
+					{ position: new THREE.Vector3( 0, 1.25, 0 ), radius: 0.42 },
+					{ position: new THREE.Vector3( 0.28, 1.05, 0.05 ), radius: 0.32 },
+					{ position: new THREE.Vector3( - 0.26, 1.1, - 0.08 ), radius: 0.34 },
+					{ position: new THREE.Vector3( 0.05, 1.45, - 0.1 ), radius: 0.3 },
+					{ position: new THREE.Vector3( - 0.1, 0.95, 0.22 ), radius: 0.28 }
+				];
+
+				for ( const cluster of leafClusters ) {
+
+					const foliage = new THREE.Mesh( new THREE.IcosahedronGeometry( cluster.radius, 1 ), materials.plantLeaves );
+					foliage.position.copy( cluster.position );
+					group.add( foliage );
+
+				}
+
+				group.traverse( ( object ) => {
+
+					if ( object.isMesh ) {
+
+						object.castShadow = true;
+						object.receiveShadow = true;
+
+					}
+
+				} );
+
+				group.position.copy( position );
+
+				return group;
+
+			}
+
+			// yellow/orange floor lamp - the emissive drum shade seeds warm light into the corner via SSGI
+
+			function createFloorLamp( position ) {
+
+				const group = new THREE.Group();
+
+				const base = new THREE.Mesh( new THREE.CylinderGeometry( 0.26, 0.3, 0.05, 32 ), materials.lampMetal );
+				base.position.y = 0.025;
+				group.add( base );
+
+				const pole = new THREE.Mesh( new THREE.CylinderGeometry( 0.025, 0.025, 1.5, 16 ), materials.lampMetal );
+				pole.position.y = 0.78;
+				group.add( pole );
+
+				// cylindrical drum shade - emissive
+
+				const shade = new THREE.Mesh( new THREE.CylinderGeometry( 0.24, 0.28, 0.42, 48 ), materials.lampShade );
+				shade.position.y = 1.55;
+				group.add( shade );
+
+				// details - a metal rim around the base of the shade and a finial on top
+
+				const rim = new THREE.Mesh( new THREE.TorusGeometry( 0.28, 0.012, 12, 48 ), materials.lampMetal );
+				rim.rotation.x = Math.PI * 0.5;
+				rim.position.y = 1.34;
+				group.add( rim );
+
+				const finial = new THREE.Mesh( new THREE.SphereGeometry( 0.035, 16, 12 ), materials.lampMetal );
+				finial.position.y = 1.79;
+				group.add( finial );
+
+				group.traverse( ( object ) => {
+
+					if ( object.isMesh ) {
+
+						object.castShadow = true;
+						object.receiveShadow = true;
+
+					}
+
+				} );
+
+				group.position.copy( position );
+
+				return group;
+
+			}
+
+			// grass field visible through the windows
+
+			function createExterior() {
+
+				const grass = new THREE.Mesh( new THREE.CircleGeometry( 20, 32 ), materials.grass );
+				grass.rotation.x = - Math.PI * 0.5;
+				grass.position.set( 0, - 0.05, 0 );
+				grass.receiveShadow = true;
+				scene.add( grass );
+
+			}
+
+			// animated character playing its skeletal animation
+
+			async function loadCharacter() {
+
+				const loader = new GLTFLoader();
+				const gltf = await loader.loadAsync( 'models/gltf/Michelle.glb' );
+
+				const model = gltf.scene;
+				model.position.set( - 1.45, 0, 1.7 );
+
+				model.traverse( ( object ) => {
+
+					if ( object.isMesh ) {
+
+						object.castShadow = true;
+						object.receiveShadow = true;
+
+					}
+
+				} );
+
+				scene.add( model );
+
+				mixer = new THREE.AnimationMixer( model );
+				mixer.clipAction( gltf.animations[ 0 ] ).play();
+
+			}
+
+			function createLights() {
+
+				sun = new THREE.DirectionalLight( '#fff4e6', 3.6 );
+				sun.position.set( - 9, SUN_BASE_Y, 4.5 );
+				sun.target.position.set( 0.5, 0.2, - 1 );
+				sun.castShadow = true;
+				sun.shadow.mapSize.set( 2048, 2048 );
+				sun.shadow.camera.near = 0.5;
+				sun.shadow.camera.far = 45;
+				sun.shadow.camera.left = - 9;
+				sun.shadow.camera.right = 9;
+				sun.shadow.camera.top = 9;
+				sun.shadow.camera.bottom = - 9;
+				sun.shadow.bias = 0.0002;
+				sun.shadow.normalBias = 0.03;
+				scene.add( sun );
+				scene.add( sun.target );
+
+				const environment = new RoomEnvironment();
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+				scene.environment = pmremGenerator.fromScene( environment, 0.04 ).texture;
+				scene.environmentIntensity = 0.1;
+				environment.dispose();
+
+			}
+
+			function onWindowResize() {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+			}
+
+			function animate() {
+
+				timer.update();
+
+				const delta = timer.getDelta();
+
+				if ( params.animateSun ) {
+
+					sunTime += delta;
+					sun.position.y = SUN_BASE_Y + Math.sin( sunTime * 0.5 ) * 5;
+
+				}
+
+				if ( mixer ) mixer.update( delta );
+
+				controls.update();
+
+				renderPipeline.render();
+
+			}
+
+		</script>
+	</body>
+</html>
