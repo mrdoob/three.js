@@ -1,3 +1,4 @@
+import { Vector3 } from 'three/webgpu';
 import { add, float, Fn, If, luminance, max, struct, vec2, vec4, getViewPosition, logarithmicDepthToViewZ, viewZToOrthographicDepth, viewZToPerspectiveDepth } from 'three/tsl';
 
 /**
@@ -180,5 +181,30 @@ function halton( index, base ) {
 	}
 
 	return result;
+
+}
+
+const _jitteredPosition = /*@__PURE__*/ new Vector3();
+const _unjitteredPosition = /*@__PURE__*/ new Vector3();
+
+/**
+ * Returns the jitter in UV space relative to the projection used for motion vectors.
+ *
+ * @private
+ * @param {Camera} camera - The jittered camera.
+ * @param {?Matrix4} projectionMatrix - The projection used for velocity (null means jittered).
+ * @param {Vector2} target - Receives the UV displacement.
+ * @return {Vector2} The UV displacement.
+ */
+export function getProjectionJitter( camera, projectionMatrix, target ) {
+
+	if ( projectionMatrix === null ) return target.set( 0, 0 );
+
+	_jitteredPosition.set( 0, 0, - 1 ).applyMatrix4( camera.projectionMatrix );
+	_unjitteredPosition.set( 0, 0, - 1 ).applyMatrix4( projectionMatrix );
+	return target.set(
+		( _jitteredPosition.x - _unjitteredPosition.x ) * 0.5,
+		( _jitteredPosition.y - _unjitteredPosition.y ) * - 0.5
+	);
 
 }
