@@ -100,12 +100,20 @@ class RenderObjects {
 
 		const chainMap = this.getChainMap( passId );
 
+		// When drawing with an override material (e.g. in shadow passes), the program also depends on the
+		// object's own material (nodes, alpha test, side...) so it is part of the key and its version is tracked.
+
+		const sourceMaterial = this.renderer._currentSourceMaterial;
+		const sourceMaterialVersion = sourceMaterial !== null ? sourceMaterial.version : 0;
+
 		// set chain keys
 
 		_chainKeys[ 0 ] = object;
 		_chainKeys[ 1 ] = material;
 		_chainKeys[ 2 ] = renderContext;
 		_chainKeys[ 3 ] = lightsNode;
+
+		if ( sourceMaterial !== null ) _chainKeys[ 4 ] = sourceMaterial;
 
 		//
 
@@ -145,7 +153,7 @@ class RenderObjects {
 
 			// check if a new render object (rebuild) is required
 
-			if ( renderObject.version !== material.version || renderObject.needsUpdate || force ) {
+			if ( renderObject.version !== material.version || renderObject.sourceMaterialVersion !== sourceMaterialVersion || renderObject.needsUpdate || force ) {
 
 				if ( renderObject.initialCacheKey !== renderObject.getCacheKey() ) {
 
@@ -156,6 +164,7 @@ class RenderObjects {
 				} else {
 
 					renderObject.version = material.version;
+					renderObject.sourceMaterialVersion = sourceMaterialVersion;
 
 				}
 
@@ -169,6 +178,7 @@ class RenderObjects {
 		_chainKeys[ 1 ] = null;
 		_chainKeys[ 2 ] = null;
 		_chainKeys[ 3 ] = null;
+		_chainKeys.length = 4;
 
 		//
 
