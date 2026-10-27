@@ -7,7 +7,7 @@ import { textureSize } from './TextureSizeNode.js';
 import { tangentLocal } from './Tangent.js';
 import { instanceIndex, drawIndex } from '../core/IndexNode.js';
 import { varyingProperty } from '../core/PropertyNode.js';
-import { OnObjectUpdate, OnBeforeObjectUpdate } from '../utils/EventNode.js';
+import { OnObjectUpdate, OnAfterObjectUpdate } from '../utils/EventNode.js';
 import { DataTexture } from '../../textures/DataTexture.js';
 
 const _previousBatchingMatrices = /*@__PURE__*/ new WeakMap();
@@ -95,10 +95,7 @@ function getPreviousNode( batchMesh, id ) {
 		data = {
 			matricesTexture,
 			previousMatricesTexture,
-			currentMatrices: image.data.slice(),
-			currentVersion: version,
 			version,
-			frameId: null,
 			node: createBatchingMatrixNode( previousMatricesTexture, id )
 		};
 
@@ -159,30 +156,17 @@ export const batch = /*@__PURE__*/ Fn( ( [ batchMesh ], builder ) => {
 
 	if ( builder.needsPreviousData() ) {
 
-		OnBeforeObjectUpdate( ( { object, frameId } ) => {
+		OnAfterObjectUpdate( ( { object } ) => {
 
 			const previousBatchData = _previousBatchingMatrices.get( object );
 			const matricesTexture = object._matricesTexture;
 
-			// keep the previous matrices unchanged across all velocity passes in this frame
+			if ( previousBatchData.version !== matricesTexture.version ) {
 
-			if ( previousBatchData.frameId === frameId ) return;
-
-			previousBatchData.frameId = frameId;
-
-			if ( previousBatchData.version !== previousBatchData.currentVersion ) {
-
-				previousBatchData.previousMatricesTexture.image.data.set( previousBatchData.currentMatrices );
+				previousBatchData.previousMatricesTexture.image.data.set( matricesTexture.image.data );
 				previousBatchData.previousMatricesTexture.needsUpdate = true;
 
-				previousBatchData.version = previousBatchData.currentVersion;
-
-			}
-
-			if ( previousBatchData.currentVersion !== matricesTexture.version ) {
-
-				previousBatchData.currentMatrices.set( matricesTexture.image.data );
-				previousBatchData.currentVersion = matricesTexture.version;
+				previousBatchData.version = matricesTexture.version;
 
 			}
 

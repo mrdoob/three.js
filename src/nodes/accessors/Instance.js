@@ -1,6 +1,6 @@
 
 import { vec3, mat4, Fn } from '../tsl/TSLBase.js';
-import { OnBeforeObjectUpdate } from '../utils/EventNode.js';
+import { OnAfterObjectUpdate } from '../utils/EventNode.js';
 import { normalLocal, transformNormal } from './Normal.js';
 import { positionLocal, positionPrevious } from './Position.js';
 import { varyingProperty } from '../core/PropertyNode.js';
@@ -83,9 +83,6 @@ function getPreviousInstance( instancedMesh, instanceMatrix, builder ) {
 
 		data = {
 			previousInstanceMatrix,
-			currentMatrix: instanceMatrix.array.slice(),
-			version: instanceMatrix.version,
-			frameId: null,
 			node: createInstanceMatrixNode( builder, previousInstanceMatrix )
 		};
 
@@ -112,63 +109,36 @@ function onPreviousInstanceDispose( { target: object } ) {
 }
 
 /**
- * Updates the previous frame instance matrices once per frame, so all velocity passes
- * of a frame use the same previous matrices.
- *
- * @param {Object} data - The previous instance data.
- * @param {InstancedBufferAttribute|StorageInstancedBufferAttribute} matrices - The current matrix buffer attribute.
- * @param {number} frameId - The current frame ID.
- */
-function updatePreviousInstance( data, matrices, frameId ) {
-
-	if ( data.frameId === frameId ) return;
-
-	data.frameId = frameId;
-
-	data.previousInstanceMatrix.array.set( data.currentMatrix );
-	data.previousInstanceMatrix.version = data.version;
-
-	data.currentMatrix.set( matrices.array );
-	data.version = matrices.version;
-
-}
-
-/**
- * Returns the previous frame instance data of the given mesh, for motion vectors.
+ * Returns the instance matrices of the previous frame of the given mesh, for motion vectors.
  *
  * @param {InstancedMesh} object - The instanced mesh.
- * @returns {Object} The previous instance data.
+ * @returns {InstancedBufferAttribute} The matrices of the previous frame.
  */
-function getPreviousMatrixData( object ) {
+function getPreviousMatrix( object ) {
 
 	const matrices = object.instanceMatrix;
 
-	let data = _previousMatrices.get( object );
+	let previous = _previousMatrices.get( object );
 
-	if ( data === undefined || data.previousInstanceMatrix.count !== matrices.count ) {
+	if ( previous === undefined || previous.count !== matrices.count ) {
 
-		if ( data === undefined ) {
+		if ( previous === undefined ) {
 
 			object.addEventListener( 'dispose', onPreviousMatrixDispose );
 
 		} else {
 
-			data.previousInstanceMatrix.dispose();
+			previous.dispose();
 
 		}
 
-		data = {
-			previousInstanceMatrix: matrices.clone(),
-			currentMatrix: matrices.array.slice(),
-			version: matrices.version,
-			frameId: null
-		};
+		previous = matrices.clone();
 
-		_previousMatrices.set( object, data );
+		_previousMatrices.set( object, previous );
 
 	}
 
-	return data;
+	return previous;
 
 }
 
@@ -181,7 +151,7 @@ function onPreviousMatrixDispose( { target: object } ) {
 
 	object.removeEventListener( 'dispose', onPreviousMatrixDispose );
 
-	_previousMatrices.get( object ).previousInstanceMatrix.dispose();
+	_previousMatrices.get( object ).dispose();
 	_previousMatrices.delete( object );
 
 }
@@ -217,7 +187,7 @@ class PreviousInstanceMatrixNode extends ReferenceAttributeNode {
 	 */
 	getValueFromReference( object ) {
 
-		return getPreviousMatrixData( object ).previousInstanceMatrix;
+		return getPreviousMatrix( object );
 
 	}
 
@@ -324,9 +294,12 @@ export const instance = /*@__PURE__*/ Fn( ( [ matrices, colors = null ], builder
 
 		const instancedMesh = builder.object;
 
-		OnBeforeObjectUpdate( ( { object, frameId } ) => {
+		OnAfterObjectUpdate( ( { object } ) => {
 
-			updatePreviousInstance( _previousInstanceMatrices.get( object ), matrices, frameId );
+			const { previousInstanceMatrix } = _previousInstanceMatrices.get( object );
+
+			previousInstanceMatrix.array.set( matrices.array );
+			previousInstanceMatrix.version = matrices.version;
 
 		} );
 
@@ -364,9 +337,12 @@ export const instancedMesh = /*@__PURE__*/ Fn( ( [ instancedMesh ], builder ) =>
 
 		if ( builder.needsPreviousData() ) {
 
-			OnBeforeObjectUpdate( ( { object, frameId } ) => {
+			OnAfterObjectUpdate( ( { object } ) => {
 
-				updatePreviousInstance( getPreviousMatrixData( object ), object.instanceMatrix, frameId );
+				const previous = getPreviousMatrix( object );
+
+				previous.array.set( object.instanceMatrix.array );
+				previous.version = object.instanceMatrix.version;
 
 			} );
 
