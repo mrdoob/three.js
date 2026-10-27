@@ -182,19 +182,16 @@ const ggxReflectionStruct = struct( {
 } );
 
 /**
- * Importance-samples the GGX/VNDF specular lobe for one pixel and returns the reflected
- * ray direction plus the Monte-Carlo weight to apply to the gathered radiance, along with
- * the GGX terms the SSR env-miss MIS fallback needs.
+ * Samples a GGX/VNDF reflection direction without evaluating material reflectance.
  *
- * @param {Node<vec3>} N - View-space shading normal (normalized).
- * @param {Node<vec3>} V - View-space surface→camera direction (normalized).
- * @param {Node<float>} roughness - Perceptual roughness in `[0,1]`.
- * @param {Node<float>} metalness - Metalness in `[0,1]`.
- * @param {Node<vec3>} albedo - Surface base color; tints the metal Fresnel reflectance (`f0`).
- * @param {Node<vec4>} Xi - Per-pixel random numbers; only `.xy` are used.
- * @return {ggxReflectionStruct}
+ * @tsl
+ * @param {Node<vec3>} N - Normalized view-space shading normal.
+ * @param {Node<vec3>} V - Normalized view-space surface-to-camera direction.
+ * @param {Node<float>} roughness - Perceptual roughness.
+ * @param {Node<vec4>} Xi - Random numbers; only xy are used.
+ * @return {Node<vec3>} Reflection direction.
  */
-const ggxReflectionSampleWithReflectance = Fn( ( [ N, V, roughness, f0, f90, Xi ] ) => {
+export const ggxReflectionDirection = Fn( ( [ N, V, roughness, Xi ] ) => {
 
 	// GGX alpha (use r^2, clamp to avoid degenerate)
 	const a = roughness.mul( roughness ).max( 0.001 ).toVar();
@@ -228,7 +225,25 @@ const ggxReflectionSampleWithReflectance = Fn( ( [ N, V, roughness, f0, f90, Xi 
 	const h = normalize( T.mul( Hlocal.x ).add( B.mul( Hlocal.y ) ).add( N.mul( Hlocal.z ) ) ).toVar();
 
 	// reflect with V (surface->camera) and H
-	const viewReflectDir = reflect( V.negate(), h ).normalize().toVar();
+	return reflect( V.negate(), h ).normalize();
+
+}, { N: 'vec3', V: 'vec3', roughness: 'float', Xi: 'vec4', return: 'vec3' } );
+
+/**
+ * Samples a GGX reflection direction and evaluates its Monte Carlo weight.
+ *
+ * @param {Node<vec3>} N - Normalized view-space shading normal.
+ * @param {Node<vec3>} V - Normalized view-space surface-to-camera direction.
+ * @param {Node<float>} roughness - Perceptual roughness.
+ * @param {Node<vec3>} f0 - Normal-incidence reflectance.
+ * @param {Node<float>} f90 - Grazing reflectance.
+ * @param {Node<vec4>} Xi - Random numbers; only xy are used.
+ * @return {ggxReflectionStruct}
+ */
+const ggxReflectionSampleWithReflectance = Fn( ( [ N, V, roughness, f0, f90, Xi ] ) => {
+
+	const ax = roughness.mul( roughness ).max( 0.001 ).toVar();
+	const viewReflectDir = ggxReflectionDirection( N, V, roughness, Xi ).toVar();
 
 	// BRDF/PDF evaluation for the sampled direction
 	// V: surface -> camera, L: reflected direction, N: normal, H: half-vector

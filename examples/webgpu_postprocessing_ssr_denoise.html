@@ -59,7 +59,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, roughness, metalness, diffuseColor, specularColorBlended, specularF90, screenUV, sample, packNormalToRGB, unpackRGBToNormal, vec3, vec4, velocity, uniform, mix, step, abs, float, Fn, If, uv, context, cameraWorldMatrix, getViewPosition, convertToTexture, renderOutput, saturation, indirectSpecular, environmentSpecular, pmremTexture } from 'three/tsl';
+		import { pass, mrt, output, normalView, roughness, metalness, diffuseColor, screenUV, sample, packNormalToRGB, unpackRGBToNormal, vec3, vec4, velocity, uniform, mix, step, abs, float, Fn, If, uv, context, cameraWorldMatrix, getViewPosition, convertToTexture, renderOutput, saturation, indirectSpecular, environmentSpecular, pmremTexture } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { screenSpaceGBuffer } from 'three/addons/tsl/display/ScreenSpaceGBufferNode.js';
 		import { reprojectedRadiance } from 'three/addons/tsl/display/ReprojectedRadianceNode.js';
@@ -233,14 +233,11 @@
 			geometryPass.setMRT( mrt( {
 				output: vec4( packNormalToRGB( normalView ), roughness ),
 				albedo: vec4( diffuseColor.rgb, metalness ),
-				reflectance: vec4( specularColorBlended, specularF90 ),
 				velocity: velocity
 			} ) );
 			geometryPass.getTexture( 'albedo' ).type = THREE.UnsignedByteType;
-			geometryPass.getTexture( 'reflectance' ).type = THREE.HalfFloatType;
 			const normalRoughness = geometryPass.getTextureNode().toInspector( 'Normal-Roughness' );
 			const albedoMetalness = geometryPass.getTextureNode( 'albedo' );
-			const reflectance = geometryPass.getTextureNode( 'reflectance' );
 			const motion = geometryPass.getTextureNode( 'velocity' );
 			const depth = geometryPass.getTextureNode( 'depth' ).toInspector( 'Depth', () => geometryPass.getLinearDepthNode() );
 			const sceneNormal = sample( uv => unpackRGBToNormal( normalRoughness.sample( uv ).rgb ).normalize() );
@@ -256,8 +253,6 @@
 			effectGuides.resolutionScale = params.effectScale;
 			const effectDepth = effectGuides.getTextureNode();
 			const effectNormalRoughness = effectGuides.getTextureNode( 'normal' );
-			const effectMaterial = effectGuides.getTextureNode( 'material' );
-			const effectReflectance = effectGuides.resample( reflectance );
 			const effectNormal = effectGuides.getViewNormalNode();
 			const effectMotion = effectGuides.resample( motion );
 
@@ -273,10 +268,6 @@
 				outputCoverage: true,
 				traceMaskNode: effectNormalRoughness.a.lessThan( maxRoughness ),
 				noiseNode: samplingNoise,
-				diffuseNode: effectMaterial,
-				metalnessNode: effectMaterial.a,
-				specularNode: effectReflectance.rgb,
-				specularF90Node: effectReflectance.a,
 				roughnessNode: effectNormalRoughness.a
 			} ).toInspector( 'SSR' );
 
