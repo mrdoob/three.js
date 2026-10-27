@@ -28696,6 +28696,11 @@ function saveRendererState( renderer, state = {} ) {
 	state.clearColor = renderer.getClearColor( state.clearColor || new Color() );
 	state.clearAlpha = renderer.getClearAlpha();
 	state.autoClear = renderer.autoClear;
+	state.autoClearColor = renderer.autoClearColor;
+	state.autoClearDepth = renderer.autoClearDepth;
+	state.autoClearStencil = renderer.autoClearStencil;
+	state.opaque = renderer.opaque;
+	state.transparent = renderer.transparent;
 	state.scissorTest = renderer.getScissorTest();
 
 	return state;
@@ -28722,6 +28727,11 @@ function resetRendererState( renderer, state ) {
 	renderer.setRenderObjectFunction( null );
 	renderer.setClearColor( 0x000000, 1 );
 	renderer.autoClear = true;
+	renderer.autoClearColor = true;
+	renderer.autoClearDepth = true;
+	renderer.autoClearStencil = true;
+	renderer.opaque = true;
+	renderer.transparent = true;
 
 	return state;
 
@@ -28746,6 +28756,11 @@ function restoreRendererState( renderer, state ) {
 	renderer.setMRT( state.mrt );
 	renderer.setClearColor( state.clearColor, state.clearAlpha );
 	renderer.autoClear = state.autoClear;
+	renderer.autoClearColor = state.autoClearColor;
+	renderer.autoClearDepth = state.autoClearDepth;
+	renderer.autoClearStencil = state.autoClearStencil;
+	renderer.opaque = state.opaque;
+	renderer.transparent = state.transparent;
 	renderer.setScissorTest( state.scissorTest );
 
 }
