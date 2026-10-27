@@ -298,6 +298,7 @@ class TRAANode extends Node {
 		const jitterOffset = _haltonOffsets[ this._jitterIndex ];
 
 		// jitter in clip space so custom projections and view offsets are preserved
+
 		this.camera.projectionMatrix.premultiply( _jitterMatrix.makeTranslation(
 			- 2 * ( jitterOffset[ 0 ] - 0.5 ) / width,
 			2 * ( jitterOffset[ 1 ] - 0.5 ) / height,
@@ -313,6 +314,7 @@ class TRAANode extends Node {
 	clearViewOffset() {
 
 		// On the compilation frame only the after-pipeline callback runs.
+
 		if ( this._viewOffsetApplied === false ) return;
 		this._viewOffsetApplied = false;
 
