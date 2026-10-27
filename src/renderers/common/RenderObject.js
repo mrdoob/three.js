@@ -332,6 +332,13 @@ class RenderObject {
 		this._sourceMaterial = renderer._currentSourceMaterial;
 
 		/**
+		 * The version of the source material this render object was validated against.
+		 *
+		 * @type {number}
+		 */
+		this.sourceMaterialVersion = this._sourceMaterial !== null ? this._sourceMaterial.version : 0;
+
+		/**
 		 * An event listener which is defined by `RenderObjects`. It performs
 		 * clean up tasks when `dispose()` on this render object.
 		 *
@@ -548,6 +555,12 @@ class RenderObject {
 	 * @return {Array<Object>} An array with object references.
 	 */
 	getChainArray() {
+
+		if ( this._sourceMaterial !== null ) {
+
+			return [ this.object, this.material, this.context, this.lightsNode, this._sourceMaterial ];
+
+		}
 
 		return [ this.object, this.material, this.context, this.lightsNode ];
 

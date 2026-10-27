@@ -1,4 +1,4 @@
-import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, logarithmicDepthToViewZ, luminance, max, min, mix, mul, nodeObject, normalize, orthographicDepthToViewZ, passTexture, perspectiveDepthToViewZ, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, viewZToPerspectiveDepth, context, property, outputStruct, isBackgroundDepth } from 'three/tsl';
+import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, orthographicDepthToViewZ, passTexture, perspectiveDepthToViewZ, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, context, property, outputStruct, isBackgroundDepth, projectionDepth } from 'three/tsl';
 import { HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2, Vector3 } from 'three/webgpu';
 import { bindAnalyticNoise } from '../utils/RNoise.js';
 import { ENV_RAY_LENGTH, ENV_RAY_LENGTH_THRESHOLD, getSpecularDominantFactor, ggxReflectionDirection, ggxReflectionSample } from '../utils/SpecularHelpers.js';
@@ -937,21 +937,7 @@ class SSRNode extends Node {
 
 		} );
 
-		const sampleDepth = ( uv ) => {
-
-			const depth = this.depthNode.sample( uv ).r;
-
-			if ( builder.renderer.logarithmicDepthBuffer === true ) {
-
-				const viewZ = logarithmicDepthToViewZ( depth, this._cameraNear, this._cameraFar );
-
-				return viewZToPerspectiveDepth( viewZ, this._cameraNear, this._cameraFar );
-
-			}
-
-			return depth;
-
-		};
+		const sampleDepth = ( uv ) => projectionDepth( this.depthNode.sample( uv ).r, this._cameraNear, this._cameraFar );
 
 		const sampleMarchNoise = this.stochastic === true ? bindAnalyticNoise( this._resolution, 47 ) : null;
 

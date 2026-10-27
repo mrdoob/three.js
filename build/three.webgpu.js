@@ -5510,6 +5510,13 @@ class RenderObject {
 		this._sourceMaterial = renderer._currentSourceMaterial;
 
 		/**
+		 * The version of the source material this render object was validated against.
+		 *
+		 * @type {number}
+		 */
+		this.sourceMaterialVersion = this._sourceMaterial !== null ? this._sourceMaterial.version : 0;
+
+		/**
 		 * An event listener which is defined by `RenderObjects`. It performs
 		 * clean up tasks when `dispose()` on this render object.
 		 *
@@ -5726,6 +5733,12 @@ class RenderObject {
 	 * @return {Array<Object>} An array with object references.
 	 */
 	getChainArray() {
+
+		if ( this._sourceMaterial !== null ) {
+
+			return [ this.object, this.material, this.context, this.lightsNode, this._sourceMaterial ];
+
+		}
 
 		return [ this.object, this.material, this.context, this.lightsNode ];
 
@@ -6227,7 +6240,8 @@ class RenderObject {
 
 }
 
-const _chainKeys$3 = [];
+const _chainKeys$3 = [ null, null, null, null ];
+const _overrideChainKeys = [ null, null, null, null, null ];
 
 /**
  * This module manages the render objects of the renderer.
@@ -6326,22 +6340,29 @@ class RenderObjects {
 
 		const chainMap = this.getChainMap( passId );
 
+		const sourceMaterial = this.renderer._currentSourceMaterial;
+		const sourceMaterialVersion = sourceMaterial !== null ? sourceMaterial.version : 0;
+
 		// set chain keys
 
-		_chainKeys$3[ 0 ] = object;
-		_chainKeys$3[ 1 ] = material;
-		_chainKeys$3[ 2 ] = renderContext;
-		_chainKeys$3[ 3 ] = lightsNode;
+		const chainKeys = sourceMaterial !== null ? _overrideChainKeys : _chainKeys$3;
+
+		chainKeys[ 0 ] = object;
+		chainKeys[ 1 ] = material;
+		chainKeys[ 2 ] = renderContext;
+		chainKeys[ 3 ] = lightsNode;
+
+		if ( sourceMaterial !== null ) chainKeys[ 4 ] = sourceMaterial;
 
 		//
 
-		let renderObject = chainMap.get( _chainKeys$3 );
+		let renderObject = chainMap.get( chainKeys );
 
 		if ( renderObject === undefined ) {
 
 			renderObject = this.createRenderObject( this.nodes, this.geometries, this.renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext, passId );
 
-			chainMap.set( _chainKeys$3, renderObject );
+			chainMap.set( chainKeys, renderObject );
 
 		} else {
 
@@ -6371,7 +6392,7 @@ class RenderObjects {
 
 			// check if a new render object (rebuild) is required
 
-			if ( renderObject.version !== material.version || renderObject.needsUpdate || force ) {
+			if ( renderObject.version !== material.version || renderObject.sourceMaterialVersion !== sourceMaterialVersion || renderObject.needsUpdate || force ) {
 
 				if ( renderObject.initialCacheKey !== renderObject.getCacheKey() ) {
 
@@ -6382,6 +6403,7 @@ class RenderObjects {
 				} else {
 
 					renderObject.version = material.version;
+					renderObject.sourceMaterialVersion = sourceMaterialVersion;
 
 				}
 
@@ -6391,10 +6413,12 @@ class RenderObjects {
 
 		// reset chain array
 
-		_chainKeys$3[ 0 ] = null;
-		_chainKeys$3[ 1 ] = null;
-		_chainKeys$3[ 2 ] = null;
-		_chainKeys$3[ 3 ] = null;
+		chainKeys[ 0 ] = null;
+		chainKeys[ 1 ] = null;
+		chainKeys[ 2 ] = null;
+		chainKeys[ 3 ] = null;
+
+		if ( sourceMaterial !== null ) chainKeys[ 4 ] = null;
 
 		//
 
@@ -8596,13 +8620,13 @@ class Bindings extends DataMap {
 
 				for ( const uniform of binding.uniforms ) {
 
-					cacheKeyString += uniform.nodeUniform.node.id;
+					cacheKeyString += uniform.nodeUniform.node.id + ',';
 
 				}
 
 			} else {
 
-				cacheKeyString += binding.nodeUniform.id;
+				cacheKeyString += binding.nodeUniform.id + ',';
 
 			}
 
@@ -25924,7 +25948,7 @@ class Renderer {
 
 			}
 
-			overrideMaterial.alphaTest = material.alphaTest;
+			overrideMaterial._alphaTest = material.alphaTest; // bypass the setter so the version doesn't change
 			overrideMaterial.alphaMap = material.alphaMap;
 			overrideMaterial.displacementMap = material.displacementMap;
 			overrideMaterial.displacementScale = material.displacementScale;

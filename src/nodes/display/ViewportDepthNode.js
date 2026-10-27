@@ -310,6 +310,30 @@ export const logarithmicDepthToViewZ = ( depth, near, far ) => {
 };
 
 /**
+ * TSL function for retrieving the depth value as produced by the camera's projection matrix.
+ *
+ * @tsl
+ * @function
+ * @param {Node<float>} depth - The depth value.
+ * @param {Node<float>} near - The camera's near value.
+ * @param {Node<float>} far - The camera's far value.
+ * @returns {Node<float>}
+ */
+export const projectionDepth = /*@__PURE__*/ Fn( ( [ depth, near, far ], builder ) => {
+
+	if ( builder.renderer.logarithmicDepthBuffer === true ) {
+
+		const viewZ = logarithmicDepthToViewZ( depth, near, far );
+
+		return viewZToPerspectiveDepth( viewZ, near, far );
+
+	}
+
+	return depth;
+
+} );
+
+/**
  * TSL function for defining a value for the current fragment's depth.
  *
  * @tsl

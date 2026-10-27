@@ -1,5 +1,5 @@
 import { RenderTarget, Vector2, Vector3, Node, QuadMesh, NodeMaterial, RendererUtils, HalfFloatType, RGBAFormat, RedFormat, UnsignedByteType } from 'three/webgpu';
-import { Fn, NodeUpdateType, uniform, reference, vec2, vec4, float, uv, mix, passTexture, getViewPosition, getNormalFromDepth, logarithmicDepthToViewZ, viewZToPerspectiveDepth, screenCoordinate, interleavedGradientNoise, normalize, floor, exp2, pow, PI, Loop, If, Break, property, outputStruct, context } from 'three/tsl';
+import { Fn, NodeUpdateType, uniform, reference, vec2, vec4, float, uv, mix, passTexture, getViewPosition, getNormalFromDepth, screenCoordinate, interleavedGradientNoise, normalize, floor, exp2, pow, PI, Loop, If, Break, property, outputStruct, context, projectionDepth } from 'three/tsl';
 
 import { VXGIVolume } from './VXGIVolume.js';
 import { createConeTracer, gather, intersectVolume, sampleDirectional } from './VXGIConeTracer.js';
@@ -380,7 +380,7 @@ class VXGINode extends Node {
 
 		if ( this._sharedContext !== null && this._directional !== this.volume.directionalRadiance ) {
 
-			this._setupMaterial( renderer );
+			this._setupMaterial();
 
 		}
 
@@ -425,7 +425,7 @@ class VXGINode extends Node {
 	setup( builder ) {
 
 		this._sharedContext = builder.getSharedContext();
-		this._setupMaterial( builder.renderer );
+		this._setupMaterial();
 
 		return this._aoNode;
 
@@ -435,29 +435,14 @@ class VXGINode extends Node {
 	 * Builds the TSL code of the effect into the internal pass material.
 	 *
 	 * @private
-	 * @param {Renderer} renderer - The renderer.
 	 */
-	_setupMaterial( renderer ) {
+	_setupMaterial() {
 
 		const volume = this.volume;
 		const directional = this._directional = volume.directionalRadiance;
 		const uvNode = uv();
 
-		const sampleDepth = ( uv ) => {
-
-			const depth = this.depthNode.sample( uv ).r;
-
-			if ( renderer.logarithmicDepthBuffer === true ) {
-
-				const viewZ = logarithmicDepthToViewZ( depth, this._cameraNear, this._cameraFar );
-
-				return viewZToPerspectiveDepth( viewZ, this._cameraNear, this._cameraFar );
-
-			}
-
-			return depth;
-
-		};
+		const sampleDepth = ( uv ) => projectionDepth( this.depthNode.sample( uv ).r, this._cameraNear, this._cameraFar );
 
 		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.sample( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this._cameraProjectionMatrixInverse );
 
