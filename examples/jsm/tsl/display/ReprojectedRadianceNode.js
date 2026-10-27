@@ -1,5 +1,5 @@
-import { DepthTexture, FloatType, HalfFloatType, Matrix4, NearestFilter, Node, RenderTarget, RTTNode, WebGPUCoordinateSystem } from 'three/webgpu';
-import { Fn, If, OnAfterRenderPipeline, float, getViewPosition, isBackgroundDepth, nodeObject, sample, texture, textureSize, uniform, uv, vec2, vec3, vec4 } from 'three/tsl';
+import { FloatType, Matrix4, NearestFilter, Node, RTTNode, Vector2, WebGPUCoordinateSystem } from 'three/webgpu';
+import { Fn, If, OnAfterRenderPipeline, float, getViewPosition, isBackgroundDepth, nodeObject, sample, textureSize, uniform, uv, vec2, vec3, vec4 } from 'three/tsl';
 
 // cached on the depth texel grid and nearest sampled
 class ReprojectedRadianceCacheNode extends RTTNode {
@@ -25,9 +25,9 @@ class ReprojectedRadianceCacheNode extends RTTNode {
 
 /**
  * Reprojects the previous frame's lighting of static geometry into the current
- * frame. The node owns its history: after every render pipeline frame it copies
- * the beauty pass color and depth along with the camera matrices they were
- * rendered with. Each history texel is validated before interpolation. Only
+ * frame. The beauty pass keeps its previous color and depth by swapping textures,
+ * and after every render pipeline frame the node captures the camera matrices
+ * they were rendered with. Each history texel is validated before interpolation. Only
  * camera motion is handled.
  *
  * Like {@link TRAANode}, the history is captured from a render pipeline callback,
@@ -67,18 +67,16 @@ class ReprojectedRadianceNode extends Node {
 		this.beautyNode = beautyNode;
 		this.camera = camera;
 
-		this._historyRenderTarget = new RenderTarget( 1, 1, { type: HalfFloatType, depthTexture: new DepthTexture() } );
-		this._historyRenderTarget.texture.name = 'ReprojectedRadianceNode.history';
-		this._historyRenderTarget.depthTexture.minFilter = NearestFilter;
-		this._historyRenderTarget.depthTexture.magFilter = NearestFilter;
-
 		this._previousView = uniform( new Matrix4() );
 		this._previousProjection = uniform( new Matrix4() );
 		this._previousProjectionInverse = uniform( new Matrix4() );
 		this._valid = uniform( false );
+		// history resized textures hold no data until the pass renders into them
+		this._capturedSize = uniform( new Vector2() );
 
-		const radiance = texture( this._historyRenderTarget.texture );
-		const historyDepth = texture( this._historyRenderTarget.depthTexture );
+		// the pass swaps current and previous textures before rendering, so no copy is needed
+		const radiance = beautyNode.getPreviousTextureNode( 'output' );
+		const historyDepth = beautyNode.getPreviousTextureNode( 'depth' );
 		const previousView = this._previousView;
 		const previousProjection = this._previousProjection;
 		const previousProjectionInverse = this._previousProjectionInverse;
@@ -127,7 +125,7 @@ class ReprojectedRadianceNode extends Node {
 			// depth is in [0,1] for all backends, including reversed depth
 			const minimumDepth = builder.renderer.coordinateSystem === WebGPUCoordinateSystem || builder.renderer.reversedDepthBuffer === true ? 0 : - 1;
 			const inDepthBounds = clip.z.greaterThanEqual( clip.w.mul( minimumDepth ) ).and( clip.z.lessThanEqual( clip.w ) );
-			const historyValid = this._valid.and( clip.w.greaterThan( 0 ) ).and( inBounds( previousUV ) ).and( inDepthBounds ).and( isBackgroundDepth( currentDepth ).not() );
+			const historyValid = this._valid.and( resolution.equal( this._capturedSize ).all() ).and( clip.w.greaterThan( 0 ) ).and( inBounds( previousUV ) ).and( inDepthBounds ).and( isBackgroundDepth( currentDepth ).not() );
 
 			for ( let y = 0; y <= 1; y ++ ) {
 
@@ -194,35 +192,20 @@ class ReprojectedRadianceNode extends Node {
 
 	}
 
-	setup( builder ) {
-
-		const depthTexture = this.beautyNode.getTexture( 'depth' );
-		this._historyRenderTarget.depthTexture.format = depthTexture.format;
-		this._historyRenderTarget.depthTexture.type = depthTexture.type;
+	setup() {
 
 		// runs before callbacks registered later, e.g. TRAA clearing its jitter, so the
 		// captured projection matches the depth that was rendered
-		OnAfterRenderPipeline( () => this._capture( builder.renderer ) );
+		OnAfterRenderPipeline( () => this._capture() );
 
 		return this.beautyNode;
 
 	}
 
-	_capture( renderer ) {
+	_capture() {
 
-		const color = this.beautyNode.getTexture( 'output' );
-		const depth = this.beautyNode.getTexture( 'depth' );
-		const { width, height } = color.image;
-
-		if ( this._historyRenderTarget.width !== width || this._historyRenderTarget.height !== height ) {
-
-			this._historyRenderTarget.setSize( width, height );
-			renderer.initRenderTarget( this._historyRenderTarget );
-
-		}
-
-		renderer.copyTextureToTexture( color, this._historyRenderTarget.texture );
-		renderer.copyTextureToTexture( depth, this._historyRenderTarget.depthTexture );
+		const { width, height } = this.beautyNode.getTexture( 'depth' ).image;
+		this._capturedSize.value.set( width, height );
 		this._previousView.value.copy( this.camera.matrixWorldInverse );
 		this._previousProjection.value.copy( this.camera.projectionMatrix );
 		this._previousProjectionInverse.value.copy( this.camera.projectionMatrixInverse );
@@ -234,7 +217,6 @@ class ReprojectedRadianceNode extends Node {
 
 		super.dispose();
 
-		this._historyRenderTarget.dispose();
 		if ( this._cache !== null ) this._cache.dispose();
 
 	}

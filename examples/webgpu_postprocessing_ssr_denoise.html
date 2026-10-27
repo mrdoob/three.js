@@ -59,7 +59,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, roughness, metalness, diffuseColor, screenUV, sample, packNormalToRGB, unpackRGBToNormal, vec3, vec4, velocity, uniform, mix, step, abs, float, Fn, If, uv, context, cameraWorldMatrix, getViewPosition, convertToTexture, renderOutput, saturation, indirectSpecular, environmentSpecular, pmremTexture } from 'three/tsl';
+		import { pass, mrt, output, normalView, roughness, metalness, diffuseColor, screenUV, sample, packNormalToRGB, unpackRGBToNormal, vec3, vec4, velocity, uniform, mix, step, abs, float, Fn, If, context, cameraWorldMatrix, getViewPosition, renderOutput, saturation, indirectSpecular, environmentSpecular, pmremTexture } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { screenSpaceGBuffer } from 'three/addons/tsl/display/ScreenSpaceGBufferNode.js';
 		import { reprojectedRadiance } from 'three/addons/tsl/display/ReprojectedRadianceNode.js';
@@ -280,7 +280,7 @@
 
 			const incoming = sample( uv => ssrPass.getTextureNode().sample( uv ).rgb );
 
-			ssrDenoise = coverageDenoise( convertToTexture( vec4( incoming.sample( uv() ), coverage.sample( uv() ) ) ), camera, {
+			ssrDenoise = coverageDenoise( sample( coordinate => vec4( incoming.sample( coordinate ), coverage.sample( coordinate ) ) ), camera, {
 				depth: effectDepth,
 				normal: effectNormalRoughness,
 				velocity: effectMotion,
@@ -461,7 +461,6 @@
 			ssrPass.useTraceMask.value = params.classify && params.effectScale === 1;
 			effectGuides.resolutionScale = params.effectScale;
 			ssrPass.resolutionScale = params.effectScale;
-			ssrDenoise.inputNode.setResolutionScale( params.effectScale );
 			ssrPass.mirrorBias.value = params.mirrorBias;
 			ssrPass.stepExponent = params.stepExponent;
 			ssrPass.maxLuminance.value = params.maxLuminance;
