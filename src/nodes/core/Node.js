@@ -1131,7 +1131,9 @@ class Node extends EventDispatcher {
 
 		//
 
-		if ( this._beforeNodes !== null ) {
+		// before nodes only need the setup stage, their results are discarded
+
+		if ( this._beforeNodes !== null && builder.buildStage === 'setup' ) {
 
 			const currentBeforeNodes = this._beforeNodes;
 
