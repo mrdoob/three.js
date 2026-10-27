@@ -59,7 +59,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, normalView, roughness, metalness, diffuseColor, specularColorBlended, specularF90, screenUV, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec3, vec4, velocity, uniform, mix, step, abs, float, Fn, If, uv, textureSize, texture, context, cameraWorldMatrix, getViewPosition, convertToTexture, renderOutput, saturation, EnvironmentBRDF, indirectSpecular, environmentSpecular, pmremTexture } from 'three/tsl';
+		import { pass, mrt, output, normalView, roughness, metalness, diffuseColor, specularColorBlended, specularF90, screenUV, sample, packNormalToRGB, unpackRGBToNormal, vec2, vec3, vec4, velocity, uniform, mix, step, abs, float, Fn, If, uv, textureSize, texture, context, cameraWorldMatrix, getViewPosition, convertToTexture, renderOutput, saturation, EnvironmentBRDF, indirectSpecular, environmentSpecular, pmremTexture } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { screenSpaceGBuffer } from 'three/addons/tsl/display/ScreenSpaceGBufferNode.js';
 		import { reprojectedRadiance } from 'three/addons/tsl/display/ReprojectedRadianceNode.js';
@@ -67,6 +67,7 @@
 		import { resolveSSRHitDistance } from 'three/addons/tsl/utils/SpecularHelpers.js';
 		import { fastNoise } from 'three/addons/tsl/utils/FASTNoise.js';
 		import { traa } from 'three/addons/tsl/display/TRAANode.js';
+		import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
 		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -88,49 +89,58 @@
 
 		}
 
+		// same settings as webgpu_postprocessing_ssr, scaled for this smaller scene
 		const params = {
-			output: 'Combined',
+			quality: 0.5,
+			raysPerPixel: 1,
+			traceSteps: 32,
+			classify: true,
+			output: 'Beauty',
+			reflectionSource: 'Previous frame',
+			antialiasing: 'TRAA',
+			renderScale: 1,
+			effectScale: 0.5,
+			denoise: true,
+			maxFrames: 16,
+			radius: 3,
+			maxRoughness: 0.8,
+			mirrorBias: 0,
+			stepExponent: 2,
+			maxLuminance: 10,
+			screenEdgeFade: 0.2,
+			sampling: 'FAST Separate',
+			environment: true,
+			maxDistance: 0.4,
+			intensity: 1,
+			thickness: 0.1,
+			binaryRefine: true,
 			roughness: 0.3,
-
-			ssr: {
-				enabled: true,
-				effectScale: 0.5,
-				raysPerPixel: 2,
-				traceSteps: 32,
-				maxRoughness: 0.8,
-				maxDistance: 0.4,
-				thickness: 0.1,
-				intensity: 1,
-				binaryRefine: true,
-				screenEdgeFade: 0.2
-			},
-
-			denoise: {
-				enabled: true,
-				maxFrames: 16,
-				radius: 3
-			},
-
-			post: {
-				grading: { exposure: 1.57, gamma: 0.89, contrast: 1.31, saturation: 1 },
-			},
+			enabled: true
 		};
+
+		const grading = { exposure: 1.57, gamma: 0.89, contrast: 1.31, saturation: 1 };
 
 		let camera, scene, renderer, renderPipeline, ssrPass, ssrDenoise, effectGuides, traaPass, views;
 		let controls, geometryPass, beautyPass, lightingHistory;
-		let gammaUniform, contrastUniform, saturationUniform;
 
 		const historyValid = uniform( false );
+		const useHistorySource = uniform( params.reflectionSource === 'Previous frame' );
 		const previousView = uniform( new THREE.Matrix4() );
 		const previousProjection = uniform( new THREE.Matrix4() );
 		const previousProjectionInverse = uniform( new THREE.Matrix4() );
 		const currentView = new THREE.Matrix4();
 		const currentProjection = new THREE.Matrix4();
 		const currentProjectionInverse = new THREE.Matrix4();
-		const ssrEnabled = uniform( 1 );
-		const ssrStrength = uniform( params.ssr.intensity );
+		const samplingModes = [ 'Original', 'FAST Product', 'FAST Separate' ];
+		const samplingMode = uniform( 2, 'uint' );
 		const denoiseEnabled = uniform( 1 );
-		const maxRoughness = uniform( params.ssr.maxRoughness );
+		const maxRoughness = uniform( params.maxRoughness );
+		const ssrStrength = uniform( params.intensity );
+		const ssrEnabled = uniform( 1 );
+		const environmentEnabled = uniform( 1 );
+		const gammaUniform = uniform( grading.gamma );
+		const contrastUniform = uniform( grading.contrast );
+		const saturationUniform = uniform( grading.saturation );
 
 		init();
 
@@ -163,9 +173,10 @@
 
 			renderer = new THREE.WebGPURenderer();
 			renderer.inspector = new Inspector();
+			renderer.setPixelRatio( params.renderScale );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.toneMapping = THREE.AgXToneMapping;
-			renderer.toneMappingExposure = params.post.grading.exposure;
+			renderer.toneMappingExposure = grading.exposure;
 			renderer.shadowMap.enabled = true;
 			document.body.appendChild( renderer.domElement );
 
@@ -192,14 +203,42 @@
 
 			await renderer.init();
 
-			const noiseAtlas = await new THREE.TextureLoader().loadAsync( 'textures/noises/fast/gauss1-ema01-separate05.png' );
-			noiseAtlas.flipY = false;
-			noiseAtlas.colorSpace = THREE.NoColorSpace;
-			noiseAtlas.generateMipmaps = false;
-			noiseAtlas.minFilter = noiseAtlas.magFilter = THREE.NearestFilter;
+			const noiseAtlases = await Promise.all( [ 'product', 'separate05' ].map( async variant => {
+
+				const atlas = await new THREE.TextureLoader().loadAsync( `textures/noises/fast/gauss1-ema01-${ variant }.png` );
+				atlas.flipY = false;
+				atlas.colorSpace = THREE.NoColorSpace;
+				atlas.generateMipmaps = false;
+				atlas.minFilter = atlas.magFilter = THREE.NearestFilter;
+				return atlas;
+
+			} ) );
+			const productNoise = fastNoise( noiseAtlases[ 0 ], new THREE.Vector2() );
+			const separateNoise = fastNoise( noiseAtlases[ 1 ], new THREE.Vector2() );
+			const samplingNoise = Fn( () => {
+
+				const value = vec4().toVar();
+				If( samplingMode.equal( 2 ), () => {
+
+					value.assign( separateNoise );
+
+				} ).Else( () => {
+
+					value.assign( productNoise );
+
+				} );
+				return value;
+
+			} )();
 
 			// the environment fills whatever SSR does not cover
-			const fallback = environmentSpecular( pmremTexture( hdrTexture ) );
+			const capture = environmentSpecular( pmremTexture( hdrTexture ) );
+			const fallback = query => {
+
+				const value = capture( query );
+				return vec4( value.rgb, environmentEnabled );
+
+			};
 
 			renderPipeline = new THREE.RenderPipeline( renderer );
 
@@ -221,8 +260,15 @@
 			const depth = geometryPass.getTextureNode( 'depth' ).toInspector( 'Depth', () => geometryPass.getLinearDepthNode() );
 			const sceneNormal = sample( uv => unpackRGBToNormal( normalRoughness.sample( uv ).rgb ).normalize() );
 
+			// lighting without SSR, traced when the reflection source is the current frame
+			const scenePass = pass( scene, camera );
+			scenePass.contextNode = context( { indirectSpecularNode: indirectSpecular( [ fallback ] ) } );
+			scenePass.setMRT( mrt( { output: vec4( output.rgb, 1 ) } ) );
+			const scenePassColor = scenePass.getTextureNode().toInspector( 'Source Color' );
+
 			// reduced resolution guides
 			effectGuides = screenSpaceGBuffer( depth, normalRoughness, albedoMetalness );
+			effectGuides.resolutionScale = params.effectScale;
 			const effectDepth = effectGuides.getTextureNode();
 			const effectNormalRoughness = effectGuides.getTextureNode( 'normal' );
 			const effectMaterial = effectGuides.getTextureNode( 'material' );
@@ -230,7 +276,7 @@
 			const effectNormal = sample( coordinate => unpackRGBToNormal( effectNormalRoughness.sample( coordinate ).rgb ).normalize() );
 			const effectMotion = sample( coordinate => motion.sample( effectDepth.sample( coordinate ).gb ) );
 
-			// SSR traces the previous frame's lighting, which gives multiple bounces
+			// tracing the previous frame's lighting gives multiple bounces
 			lightingHistory = new THREE.RenderTarget( 1, 1, { type: THREE.HalfFloatType, depthTexture: new THREE.DepthTexture() } );
 			lightingHistory.depthTexture.format = depth.value.format;
 			lightingHistory.depthTexture.type = depth.value.type;
@@ -239,14 +285,15 @@
 			const historySource = reprojectedRadiance( texture( lightingHistory.texture ), texture( lightingHistory.depthTexture ), depth, sceneNormal, camera, {
 				previousView, previousProjection, previousProjectionInverse, valid: historyValid
 			} );
-			const traceSource = sample( coordinate => historySource.sample( effectDepth.sample( coordinate ).gb ) );
+			const currentTraceSource = sample( coordinate => scenePassColor.sample( effectDepth.sample( coordinate ).gb ) );
+			const previousTraceSource = sample( coordinate => historySource.sample( effectDepth.sample( coordinate ).gb ) );
 
-			ssrPass = ssr( traceSource, effectDepth, effectNormal, {
+			ssrPass = ssr( useHistorySource.value ? previousTraceSource : currentTraceSource, effectDepth, effectNormal, {
 				camera,
 				stochastic: true,
 				outputCoverage: true,
 				traceMaskNode: effectNormalRoughness.a.lessThan( maxRoughness ),
-				noiseNode: fastNoise( noiseAtlas, new THREE.Vector2() ),
+				noiseNode: samplingNoise,
 				diffuseNode: effectMaterial,
 				metalnessNode: effectMaterial.a,
 				specularNode: effectReflectance.rgb,
@@ -364,22 +411,37 @@
 
 			};
 
-			gammaUniform = uniform( params.post.grading.gamma );
-			contrastUniform = uniform( params.post.grading.contrast );
-			saturationUniform = uniform( params.post.grading.saturation );
+			const resolvedSpecular = Fn( () => {
+
+				const normal = sceneNormal.sample( screenUV ).transformDirection( uniform( camera.matrixWorld ) );
+				const level = normalRoughness.sample( screenUV ).a;
+				const view = getViewPosition( screenUV, depth.sample( screenUV ).r, projectionInverse ).negate().normalize().transformDirection( uniform( camera.matrixWorld ) );
+				const direction = level.pow4().mix( view.negate().reflect( normal ), normal ).normalize();
+				const environment = fallback( { direction, roughness: level } );
+				const value = filtered.sample( screenUV );
+				const weight = value.a.mul( ssrStrength ).mul( ssrEnabled );
+				return vec4( value.rgb.mul( weight ).add( environment.rgb.mul( environment.a ).mul( weight.oneMinus() ) ), 1 );
+
+			} )();
 
 			traaPass = traa( beautyPass, depth, motion, camera );
 			traaPass.useSubpixelCorrection = false;
+			const smaaPass = smaa( beautyPass );
+			const beautyViews = { TRAA: applyGrading( traaPass ), SMAA: applyGrading( smaaPass ) };
 
 			const reflections = value => applyGrading( vec4( value.rgb.mul( value.a ).mul( ssrStrength ), 1 ) );
 
 			views = {
-				Combined: applyGrading( traaPass ),
-				'Denoised SSR': reflections( filtered.sample( screenUV ) ),
-				'SSR (Raw)': reflections( raw.sample( screenUV ) ),
-				'SSR Coverage': vec4( vec3( filtered.sample( screenUV ).a ), 1 ),
-				'Compare (Denoise)': buildCompareNode( reflections( raw.sample( screenUV ) ), reflections( filtered.sample( screenUV ) ) ),
-				'History Age': vec4( vec3( ssrDenoise.getTextureNode( 'metadata' ).sample( screenUV ).r.div( ssrDenoise.maxFrames ) ), 1 )
+				Beauty: beautyViews[ params.antialiasing ],
+				'PMREM only': applyGrading( smaa( scenePassColor ) ),
+				SSR: reflections( raw.sample( screenUV ) ),
+				'SSR Filtered': reflections( filtered.sample( screenUV ) ),
+				'SSR Coverage': vec4( vec3( coverage.sample( screenUV ).mul( ssrStrength ) ), 1 ),
+				'SSR Coverage Filtered': vec4( vec3( filtered.sample( screenUV ).a.mul( ssrStrength ) ), 1 ),
+				'History age': vec4( vec3( ssrDenoise.getTextureNode( 'metadata' ).sample( screenUV ).r.div( ssrDenoise.maxFrames ) ), 1 ),
+				'Virtual history': vec4( vec3( ssrDenoise.getTextureNode( 'metadata' ).sample( screenUV ).b ), 1 ),
+				'Indirect Specular': applyGrading( resolvedSpecular ),
+				'Compare (Denoise)': buildCompareNode( reflections( raw.sample( screenUV ) ), reflections( filtered.sample( screenUV ) ) )
 			};
 
 			renderPipeline.outputColorTransform = false;
@@ -394,18 +456,82 @@
 			window.addEventListener( 'resize', onWindowResize );
 			renderer.domElement.addEventListener( 'pointermove', onComparePointerMove );
 
-			const ssrGui = renderer.inspector.createParameters( 'SSR settings' );
-			ssrGui.add( params, 'output', Object.keys( views ) ).onChange( updateOutput );
-			ssrGui.add( params.ssr, 'enabled' ).onChange( applyParams );
-			ssrGui.add( params.ssr, 'effectScale', { Full: 1, Half: 0.5, Quarter: 0.25 } ).name( 'resolution' ).onChange( applyParams );
-			ssrGui.add( params.ssr, 'raysPerPixel', [ 1, 2, 4, 8 ] ).name( 'rays per pixel' ).onChange( applyParams );
-			ssrGui.add( params.ssr, 'traceSteps', [ 8, 16, 32, 64, 128 ] ).name( 'steps per ray' ).onChange( applyParams );
-			ssrGui.add( params.ssr, 'maxRoughness', 0.1, 1 ).name( 'max roughness' ).onChange( applyParams );
-			ssrGui.add( params.ssr, 'maxDistance', 0, 5 ).name( 'max distance' ).onChange( applyParams );
-			ssrGui.add( params.ssr, 'thickness', 0, 0.25 ).onChange( applyParams );
-			ssrGui.add( params.ssr, 'intensity', 0, 1 ).onChange( applyParams );
-			ssrGui.add( params.ssr, 'binaryRefine' ).name( 'binary refine' ).onChange( applyParams );
-			ssrGui.add( params, 'roughness', 0, 1 ).onChange( value => {
+			// GUI
+
+			const gui = renderer.inspector.createParameters( 'Settings' );
+			gui.add( params, 'output', Object.keys( views ) ).name( 'Output' ).onChange( () => {
+
+				updateOutput();
+				resetHistory();
+
+			} );
+			gui.add( params, 'enabled' ).name( 'SSR' ).onChange( value => {
+
+				ssrEnabled.value = Number( value );
+
+			} );
+			gui.add( params, 'environment' ).name( 'Environment' ).onChange( value => {
+
+				environmentEnabled.value = Number( value );
+				scene.environmentIntensity = value ? 1 : 0;
+				scene.backgroundIntensity = value ? 1 : 0;
+
+			} );
+			gui.add( params, 'intensity', 0, 1 ).name( 'SSR strength' ).onChange( value => {
+
+				ssrStrength.value = value;
+
+			} );
+			gui.add( params, 'antialiasing', [ 'SMAA', 'TRAA' ] ).name( 'Antialiasing' ).onChange( value => {
+
+				views.Beauty = beautyViews[ value ];
+				updateOutput();
+				resetHistory();
+
+			} );
+
+			const resolutionFolder = gui.addFolder( 'Resolution' );
+			resolutionFolder.add( params, 'renderScale', { '50%': 0.5, '75%': 0.75, '100%': 1 } ).name( 'Render scale' ).onChange( () => {
+
+				renderer.setPixelRatio( params.renderScale );
+				onWindowResize();
+
+			} );
+			resolutionFolder.add( params, 'effectScale', { Full: 1, Half: 0.5, Quarter: 0.25 } ).name( 'SSR scale' ).onChange( updateParameters );
+
+			const traceFolder = gui.addFolder( 'Trace' ).close();
+			traceFolder.add( params, 'raysPerPixel', [ 1, 2, 4, 8, 16 ] ).name( 'Rays per pixel' ).onChange( updateParameters );
+			traceFolder.add( params, 'traceSteps', [ 8, 16, 32, 64, 128, 256, 512 ] ).name( 'Steps per ray' ).onChange( updateParameters );
+			traceFolder.add( params, 'maxDistance', 0, 5 ).name( 'Max distance' ).onChange( updateParameters );
+			traceFolder.add( params, 'thickness', 0, 0.25 ).name( 'Thickness' ).onChange( updateParameters );
+			traceFolder.add( params, 'quality', 0, 1 ).name( 'Quality' ).onChange( updateParameters );
+			traceFolder.add( params, 'stepExponent', 1, 4, 1 ).name( 'Step exponent' ).onChange( updateParameters );
+			traceFolder.add( params, 'mirrorBias', 0, 1 ).name( 'Mirror bias' ).onChange( updateParameters );
+			traceFolder.add( params, 'maxRoughness', 0.1, 1 ).name( 'Max roughness' ).onChange( updateParameters );
+			traceFolder.add( params, 'screenEdgeFade', 0, 0.5 ).name( 'Screen edge fade' ).onChange( updateParameters );
+			traceFolder.add( params, 'classify' ).name( 'Skip unused rays' ).onChange( updateParameters );
+			traceFolder.add( params, 'binaryRefine' ).name( 'Binary refine' ).onChange( updateParameters );
+			traceFolder.add( params, 'reflectionSource', [ 'Current frame', 'Previous frame' ] ).name( 'Reflection source' ).onChange( value => {
+
+				useHistorySource.value = value === 'Previous frame';
+				ssrPass.setColorNode( useHistorySource.value ? previousTraceSource : currentTraceSource );
+				updateOutput();
+				resetHistory();
+
+			} );
+
+			const denoiseFolder = gui.addFolder( 'Denoise' ).close();
+			denoiseFolder.add( params, 'denoise' ).name( 'Enabled' ).onChange( value => {
+
+				denoiseEnabled.value = Number( value );
+
+			} );
+			denoiseFolder.add( params, 'radius', 0, 3 ).name( 'Radius' ).onChange( updateParameters );
+			denoiseFolder.add( params, 'sampling', samplingModes ).name( 'Sampling' ).onChange( updateParameters );
+			denoiseFolder.add( params, 'maxFrames', 1, 128, 1 ).name( 'Max frames' ).onChange( updateParameters );
+
+			const sceneFolder = gui.addFolder( 'Scene' );
+			sceneFolder.add( params, 'roughness', 0, 1 ).name( 'Model roughness' ).onChange( value => {
 
 				scene.traverse( object => {
 
@@ -414,49 +540,44 @@
 				} );
 
 			} );
-
-			const denoiseGui = renderer.inspector.createParameters( 'Denoise settings' );
-			denoiseGui.add( params.denoise, 'enabled' ).onChange( applyParams );
-			denoiseGui.add( params.denoise, 'maxFrames', 1, 128, 1 ).name( 'max frames' ).onChange( applyParams );
-			denoiseGui.add( params.denoise, 'radius', 0, 3 ).onChange( applyParams );
-
-			const lightGui = renderer.inspector.createParameters( 'Light' ).close();
 			[ 'x', 'y', 'z' ].forEach( axis => {
 
-				lightGui.add( directionalLight.position, axis, - 30, 30 ).name( axis.toUpperCase() )
+				sceneFolder.add( directionalLight.position, axis, - 30, 30 ).name( `Light ${ axis.toUpperCase() }` )
 					.onChange( () => directionalLight.shadow.needsUpdate = true );
 
 			} );
-			lightGui.add( directionalLight, 'intensity', 0, 50 ).name( 'Intensity' );
+			sceneFolder.add( directionalLight, 'intensity', 0, 50 ).name( 'Light intensity' );
 
-			applyParams();
-			applyPost();
+			updateParameters();
 			updateOutput();
 
 			renderer.setAnimationLoop( animate );
 
 		}
 
-		function applyParams() {
+		function updateParameters() {
 
-			ssrEnabled.value = Number( params.ssr.enabled );
-			ssrStrength.value = params.ssr.intensity;
-			maxRoughness.value = params.ssr.maxRoughness;
-			denoiseEnabled.value = Number( params.denoise.enabled );
-
-			effectGuides.resolutionScale = params.ssr.effectScale;
-			ssrPass.resolutionScale = params.ssr.effectScale;
-			ssrDenoise.inputNode.setResolutionScale( params.ssr.effectScale );
-			ssrPass.raysPerPixel.value = params.ssr.raysPerPixel;
-			ssrPass.maxSteps.value = params.ssr.traceSteps;
-			ssrPass.useTraceMask.value = params.ssr.effectScale === 1;
-			ssrPass.maxDistance.value = params.ssr.maxDistance;
-			ssrPass.thickness.value = params.ssr.thickness;
-			ssrPass.screenEdgeFade.value = params.ssr.screenEdgeFade;
-			ssrPass.binaryRefine = params.ssr.binaryRefine;
-
-			ssrDenoise.maxFrames.value = params.denoise.maxFrames;
-			ssrDenoise.radius.value = params.denoise.radius;
+			samplingMode.value = samplingModes.indexOf( params.sampling );
+			ssrPass.useNoiseNode.value = samplingMode.value !== 0;
+			ssrPass.quality.value = params.quality;
+			ssrPass.raysPerPixel.value = params.raysPerPixel;
+			ssrPass.maxSteps.value = params.traceSteps;
+			ssrPass.useTraceMask.value = params.classify && params.effectScale === 1;
+			effectGuides.resolutionScale = params.effectScale;
+			ssrPass.resolutionScale = params.effectScale;
+			ssrDenoise.inputNode.setResolutionScale( params.effectScale );
+			ssrPass.mirrorBias.value = params.mirrorBias;
+			ssrPass.stepExponent = params.stepExponent;
+			ssrPass.maxLuminance.value = params.maxLuminance;
+			ssrPass.screenEdgeFade.value = params.screenEdgeFade;
+			maxRoughness.value = params.maxRoughness;
+			ssrDenoise.maxFrames.value = params.maxFrames;
+			ssrDenoise.radius.value = params.radius;
+			ssrPass.maxDistance.value = params.maxDistance;
+			ssrStrength.value = params.intensity;
+			ssrPass.thickness.value = params.thickness;
+			// build-time constant: assigning it recompiles the SSR material (setter no-ops if unchanged)
+			ssrPass.binaryRefine = params.binaryRefine;
 
 		}
 
@@ -473,16 +594,6 @@
 
 		}
 
-		function applyPost() {
-
-			const g = params.post.grading;
-			gammaUniform.value = g.gamma;
-			contrastUniform.value = g.contrast;
-			saturationUniform.value = g.saturation;
-			renderer.toneMappingExposure = g.exposure;
-
-		}
-
 		function isCompareMode() {
 
 			return params.output.startsWith( 'Compare' );
@@ -493,12 +604,13 @@
 
 			// debug views still render the beauty lighting used by the next frame
 			const selected = views[ params.output ];
-			renderPipeline.outputNode = params.output === 'Combined' ? selected : Fn( builder => {
+			const traa = params.antialiasing === 'TRAA';
+			renderPipeline.outputNode = ( useHistorySource.value || traa ) && params.output !== 'Beauty' ? Fn( builder => {
 
-				traaPass.build( builder );
+				( traa ? traaPass : beautyPass ).build( builder );
 				return selected;
 
-			} )();
+			} )() : selected;
 			renderPipeline.needsUpdate = true;
 
 			compareHint.hidden = ! isCompareMode();
@@ -510,6 +622,7 @@
 
 			historyValid.value = false;
 			ssrDenoise?.reset();
+			traaPass?.setSize( 1, 1 );
 
 		}
 
@@ -556,13 +669,20 @@
 
 			renderer.initRenderTarget( lightingHistory );
 			renderPipeline.render();
+			if ( useHistorySource.value ) {
 
-			renderer.copyTextureToTexture( beautyPass.getTexture( 'output' ), lightingHistory.texture );
-			renderer.copyTextureToTexture( geometryPass.getTexture( 'depth' ), lightingHistory.depthTexture );
-			previousView.value.copy( currentView );
-			previousProjection.value.copy( currentProjection );
-			previousProjectionInverse.value.copy( currentProjectionInverse );
-			historyValid.value = true;
+				renderer.copyTextureToTexture( beautyPass.getTexture( 'output' ), lightingHistory.texture );
+				renderer.copyTextureToTexture( geometryPass.getTexture( 'depth' ), lightingHistory.depthTexture );
+				previousView.value.copy( currentView );
+				previousProjection.value.copy( currentProjection );
+				previousProjectionInverse.value.copy( currentProjectionInverse );
+				historyValid.value = true;
+
+			} else {
+
+				historyValid.value = false;
+
+			}
 
 		}
 
