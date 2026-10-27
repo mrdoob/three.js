@@ -758,8 +758,8 @@ class SSRNode extends Node {
 	 */
 	setSize( width, height ) {
 
-		width = Math.floor( this.resolutionScale * width );
-		height = Math.floor( this.resolutionScale * height );
+		width = Math.round( this.resolutionScale * width );
+		height = Math.round( this.resolutionScale * height );
 
 		this._resolution.value.set( width, height );
 		this._ssrRenderTarget.setSize( width, height );
