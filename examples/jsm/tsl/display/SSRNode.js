@@ -1289,7 +1289,7 @@ class SSRNode extends Node {
 					const minThickness = vPNeighbor.x.sub( vP.x ).mul( 3 ).toVar();
 					// Only refinement may use a wider coarse tolerance.
 
-					const stepLength = distance( rayPointAt( previousS ), rayPointAt( s ) );
+					const stepLength = distance( rayPointAt( lastS ), rayPointAt( s ) );
 					const tk = ( this.binaryRefine ? max( max( minThickness, this.thickness ), stepLength ) : max( minThickness, this.thickness ) ).toVar();
 
 					If( away.lessThanEqual( tk ), () => {
