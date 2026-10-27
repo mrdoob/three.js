@@ -370,6 +370,7 @@ class TRAANode extends Node {
 		this.setSize( width, height );
 
 		// swap history instead of copying
+
 		const historyTexture = this._historyRenderTarget.texture;
 		this._historyRenderTarget.texture = this._resolveRenderTarget.texture;
 		this._resolveRenderTarget.texture = historyTexture;
@@ -380,7 +381,7 @@ class TRAANode extends Node {
 
 		if ( needsRestart === true ) {
 
-			// make sure render targets are initialized after the resize which triggers a dispose()
+			// initialize both targets after a resize disposes their GPU resources
 
 			renderer.initRenderTarget( this._historyRenderTarget );
 			renderer.initRenderTarget( this._resolveRenderTarget );
