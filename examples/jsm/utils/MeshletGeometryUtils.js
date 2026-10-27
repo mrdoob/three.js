@@ -6,10 +6,10 @@ import { MeshoptSimplifier } from '../libs/meshopt_simplifier.module.js';
 
 /**
  * Utilities to process geometries into clusters (meshlets) of 64 triangles with a chain of simplified
- * levels of detail, used by GPU-driven drawers.
+ * levels of detail, used by the meshlet drawing pipelines.
  *
- * @module ClusterGeometryUtils
- * @three_import import * as ClusterGeometryUtils from 'three/addons/utils/ClusterGeometryUtils.js';
+ * @module MeshletGeometryUtils
+ * @three_import import * as MeshletGeometryUtils from 'three/addons/utils/MeshletGeometryUtils.js';
  */
 
 /**

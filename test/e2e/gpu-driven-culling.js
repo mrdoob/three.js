@@ -45,15 +45,15 @@ try {
 	await page.evaluate( async () => {
 
 		const THREE = await import( 'three/webgpu' );
-		const { GPUDrivenDrawer } = await import( 'three/addons/drawers/GPUDrivenDrawer.js' );
-		const { ready } = await import( 'three/addons/utils/ClusterGeometryUtils.js' );
+		const { MeshletDrawingPipeline } = await import( 'three/addons/pipelines/MeshletDrawingPipeline.js' );
+		const { ready } = await import( 'three/addons/utils/MeshletGeometryUtils.js' );
 		await ready;
 		const renderer = new THREE.WebGPURenderer( { requiredLimits: { maxUniformBufferBindingSize: 65536, maxStorageBuffersPerShaderStage: 8 } } );
 		await renderer.init();
 		window.gpuErrors = [];
 		renderer.backend.device.addEventListener( 'uncapturederror', event => window.gpuErrors.push( event.error.message ) );
 		renderer.setSize( 32, 32 );
-		renderer.drawer = new GPUDrivenDrawer( { lodThreshold: 0 } );
+		renderer.drawingPipeline = new MeshletDrawingPipeline( { lodThreshold: 0 } );
 		await Promise.resolve();
 		const scene = new THREE.Scene();
 		const camera = new THREE.PerspectiveCamera( 50, 1, 0.1, 100 );
@@ -77,7 +77,7 @@ try {
 
 			renderer.render( scene, camera );
 			await renderer.backend.device.queue.onSubmittedWorkDone();
-			const records = [ ...renderer._renderLists._activeLists ].map( list => renderer.drawer._renderListBatches.get( list ) ).filter( Boolean );
+			const records = [ ...renderer._renderLists._activeLists ].map( list => renderer.drawingPipeline._renderListBatches.get( list ) ).filter( Boolean );
 			const record = records.find( record => record.culling !== null );
 			const center = await renderer.readRenderTargetPixelsAsync( target, 16, 16, 1, 1 );
 			const args = new Uint32Array( await renderer.getArrayBufferAsync( record.culling.argsAttribute ) );
@@ -123,7 +123,7 @@ try {
 	await page.evaluate( () => {
 
 		window.testCulling.meshes[ 0 ].visible = true;
-		window.testCulling.renderer.drawer.debug = true;
+		window.testCulling.renderer.drawingPipeline.debug = true;
 
 	} );
 	result = await page.evaluate( () => window.captureCulling() );
@@ -131,7 +131,7 @@ try {
 
 	await page.evaluate( () => {
 
-		window.testCulling.renderer.drawer.occlusionCulling = false;
+		window.testCulling.renderer.drawingPipeline.occlusionCulling = false;
 
 	} );
 	result = await page.evaluate( () => window.captureCulling() );

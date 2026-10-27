@@ -20,7 +20,7 @@
 			</div>
 
 			<small>
-				<span id="stats"></span> drawn with GPUDrivenDrawer or VisibilityBufferDrawer.<br />
+				<span id="stats"></span> drawn with MeshletDrawingPipeline or VisibilityBufferDrawingPipeline.<br />
 				Walk: click to look around, WASD to move, Shift to run. Fly: steer with the mouse, WASD to move.
 			</small>
 		</div>
@@ -48,13 +48,13 @@
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 			import { CityGenerator, createBuildingMaterial, createRoadMaterial } from 'three/addons/generators/CityGenerator.js';
-			import { GPUDrivenDrawer } from 'three/addons/drawers/GPUDrivenDrawer.js';
-			import { VisibilityBufferDrawer } from 'three/addons/drawers/VisibilityBufferDrawer.js';
+			import { MeshletDrawingPipeline } from 'three/addons/pipelines/MeshletDrawingPipeline.js';
+			import { VisibilityBufferDrawingPipeline } from 'three/addons/pipelines/VisibilityBufferDrawingPipeline.js';
 
 			let camera, scene, renderer, controls, timer;
 			let cityGroup, tilesGroup, ground, materials, city, renderPipeline;
 			let sky, sun, sunLight, pmremGenerator, envScene, envRenderTarget, cityBounds;
-			let drawers, hazeDensity, postProcessing = [];
+			let pipelines, hazeDensity, postProcessing = [];
 			let curvedWorld, curvatureNode;
 
 			const keys = {};
@@ -70,7 +70,7 @@
 				tiles: parseInt( search.get( 'tiles' ) || '6' ), // the generated city is repeated on a tiles x tiles grid
 				timeOfDay: 9, // hours: 6 sunrise, 12 noon, 18 sunset
 				shadows: search.get( 'shadows' ) !== '0',
-				drawer: search.get( 'drawer' ) || 'gpu-driven',
+				pipeline: search.get( 'pipeline' ) || 'gpu-driven',
 				static: search.get( 'static' ) !== '0',
 				occlusion: search.get( 'occlusion' ) !== '0',
 				prepass: search.get( 'prepass' ) !== '0',
@@ -116,15 +116,15 @@
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
-				// the GPU-driven drawers draw the towers, the default drawer of the renderer draws every object on its own, for comparison
+				// the meshlet drawing pipelines draw the towers, the standard drawing pipeline of the renderer draws every object on its own, for comparison
 
-				drawers = {
-					'gpu-driven': new GPUDrivenDrawer( { debug: parameters.meshlets, occlusionCulling: parameters.occlusion, depthPrepass: parameters.prepass, lodThreshold: parameters.lod, shadowLodThreshold: parameters.shadowLod } ),
-					'visibility-buffer': new VisibilityBufferDrawer( { debug: parameters.meshlets, occlusionCulling: parameters.occlusion, lodThreshold: parameters.lod, shadowLodThreshold: parameters.shadowLod } ),
-					'default': renderer.drawer
+				pipelines = {
+					'gpu-driven': new MeshletDrawingPipeline( { debug: parameters.meshlets, occlusionCulling: parameters.occlusion, depthPrepass: parameters.prepass, lodThreshold: parameters.lod, shadowLodThreshold: parameters.shadowLod } ),
+					'visibility-buffer': new VisibilityBufferDrawingPipeline( { debug: parameters.meshlets, occlusionCulling: parameters.occlusion, lodThreshold: parameters.lod, shadowLodThreshold: parameters.shadowLod } ),
+					'default': renderer.drawingPipeline
 				};
 
-				renderer.drawer = drawers[ parameters.drawer ];
+				renderer.drawingPipeline = pipelines[ parameters.pipeline ];
 
 				await renderer.init();
 
@@ -224,7 +224,7 @@
 
 				};
 
-				// the bounds of the curved positions, for the culling of the GPU-driven drawers: a sphere at the horizontal
+				// the bounds of the curved positions, for the culling of the meshlet drawing pipelines: a sphere at the horizontal
 				// distance d rises by the curvature times d², the rise inside of the sphere of radius r varies by at most
 				// the curvature times 2dr + r²
 
@@ -274,12 +274,12 @@
 
 				} );
 				gui.add( parameters, 'camera', [ 'walk', 'fly' ] ).onChange( setCameraMode );
-				gui.add( parameters, 'drawer', Object.keys( drawers ) ).onChange( ( value ) => {
+				gui.add( parameters, 'pipeline', Object.keys( pipelines ) ).onChange( ( value ) => {
 
-					renderer.drawer = drawers[ value ];
+					renderer.drawingPipeline = pipelines[ value ];
 					sunLight.shadow.needsUpdate = true;
 
-					// the static bundle group is only used by the GPU-driven drawers
+					// the static bundle group is only used by the meshlet drawing pipelines
 
 					if ( parameters.static ) generateCity();
 
@@ -287,21 +287,21 @@
 				gui.add( parameters, 'static' ).name( 'static bundle' ).onChange( generateCity );
 				gui.add( parameters, 'occlusion' ).name( 'occlusion culling' ).onChange( ( value ) => {
 
-					drawers[ 'gpu-driven' ].occlusionCulling = value;
-					drawers[ 'visibility-buffer' ].occlusionCulling = value;
+					pipelines[ 'gpu-driven' ].occlusionCulling = value;
+					pipelines[ 'visibility-buffer' ].occlusionCulling = value;
 
 				} );
-				gui.add( drawers[ 'gpu-driven' ], 'depthPrepass' ).name( 'depth prepass' );
+				gui.add( pipelines[ 'gpu-driven' ], 'depthPrepass' ).name( 'depth prepass' );
 				gui.add( parameters, 'lod', 0, 8, 0.1 ).name( 'lod (pixels)' ).onChange( ( value ) => {
 
-					drawers[ 'gpu-driven' ].lodThreshold = value;
-					drawers[ 'visibility-buffer' ].lodThreshold = value;
+					pipelines[ 'gpu-driven' ].lodThreshold = value;
+					pipelines[ 'visibility-buffer' ].lodThreshold = value;
 
 				} );
 				gui.add( parameters, 'shadowLod', 0, 8, 0.5 ).name( 'shadow lod (texels)' ).onChange( ( value ) => {
 
-					drawers[ 'gpu-driven' ].shadowLodThreshold = value;
-					drawers[ 'visibility-buffer' ].shadowLodThreshold = value;
+					pipelines[ 'gpu-driven' ].shadowLodThreshold = value;
+					pipelines[ 'visibility-buffer' ].shadowLodThreshold = value;
 					sunLight.shadow.needsUpdate = true;
 
 				} );
@@ -317,14 +317,14 @@
 				gui.add( parameters, 'furniture' ).name( 'street furniture' ).onChange( updateProps );
 				gui.add( parameters, 'meshlets' ).name( 'show meshlets' ).onChange( ( value ) => {
 
-					drawers[ 'gpu-driven' ].debug = value;
-					drawers[ 'visibility-buffer' ].debug = value;
+					pipelines[ 'gpu-driven' ].debug = value;
+					pipelines[ 'visibility-buffer' ].debug = value;
 
 				} );
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				// the geometry of the GPU-driven drawers is processed and the pipelines are compiled before the first frame
+				// the geometry of the meshlet drawing pipelines is processed and the pipelines are compiled before the first frame
 
 				await postProcessing[ 0 ].compileAsync( renderer );
 
@@ -553,18 +553,18 @@
 
 				// repeat the city on a grid. the tile span is a whole number of block periods, so
 				// the streets of neighbouring tiles line up. tiles share the geometries of the towers,
-				// which lets the GPU-driven drawer draw all copies of a tower in one batch
+				// which lets the meshlet drawing pipeline draw all copies of a tower in one batch
 
 				const { cityW, cityD, street } = city.layout;
 				const spanX = cityW + street;
 				const spanZ = cityD + street;
 				const tiles = parameters.tiles;
 
-				// a static bundle group is kept on the GPU by the GPU-driven drawers, so the city is not traversed every
-				// frame. the other drawers record it as a render bundle, which draws all objects without frustum culling,
+				// a static bundle group is kept on the GPU by the meshlet drawing pipelines, so the city is not traversed every
+				// frame. the other pipelines record it as a render bundle, which draws all objects without frustum culling,
 				// so they draw a regular group
 
-				const gpuDriven = parameters.drawer === 'gpu-driven' || parameters.drawer === 'visibility-buffer';
+				const gpuDriven = parameters.pipeline === 'gpu-driven' || parameters.pipeline === 'visibility-buffer';
 
 				tilesGroup = parameters.static && gpuDriven ? new THREE.BundleGroup() : new THREE.Group();
 

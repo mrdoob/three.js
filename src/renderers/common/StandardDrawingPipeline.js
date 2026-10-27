@@ -9,21 +9,21 @@ const _vector4 = /*@__PURE__*/ new Vector4();
 /**
  * Decides which objects of a scene are rendered and how they are submitted to the render list.
  * The default implementation performs frustum culling and pushes every renderable object as a
- * separate render item. Subclasses can override the hooks {@link Drawer#isCulled} and
- * {@link Drawer#pushRenderItem} to implement other strategies like GPU-driven rendering.
+ * separate render item. Subclasses can override the hooks {@link StandardDrawingPipeline#isCulled} and
+ * {@link StandardDrawingPipeline#pushRenderItem} to implement other strategies like GPU-driven rendering.
  *
  * This class is experimental and its interface might change.
  */
-class Drawer {
+class StandardDrawingPipeline {
 
 	/**
-	 * Constructs a new drawer.
+	 * Constructs a new standard drawing pipeline.
 	 */
 	constructor() {
 
 		/**
-		 * The renderer this drawer is assigned to. It is set when
-		 * the drawer is assigned via {@link Renderer#drawer}.
+		 * The renderer this pipeline is assigned to. It is set when
+		 * the pipeline is assigned via {@link Renderer#drawingPipeline}.
 		 *
 		 * @type {?Renderer}
 		 * @default null
@@ -77,13 +77,13 @@ class Drawer {
 	prepareAsync( /* scene, camera */ ) {}
 
 	/**
-	 * Frees the resources of the drawer. Called by {@link Renderer#dispose}, subclasses holding GPU
+	 * Frees the resources of the pipeline. Called by {@link Renderer#dispose}, subclasses holding GPU
 	 * resources release them here.
 	 */
 	dispose() {}
 
 	/**
-	 * Prepares the drawer for projecting a scene with the given camera.
+	 * Prepares the pipeline for projecting a scene with the given camera.
 	 *
 	 * @param {Camera} camera - The camera.
 	 * @param {RenderContext} renderContext - The render context.
@@ -171,7 +171,7 @@ class Drawer {
 
 	/**
 	 * This method is used to traverse the scene graph and collect all renderable objects
-	 * and lights into the given render list. Call {@link Drawer#begin} before.
+	 * and lights into the given render list. Call {@link StandardDrawingPipeline#begin} before.
 	 *
 	 * @param {Object3D} object - The 3D object to process (usually a scene).
 	 * @param {Camera} camera - The camera the object should be rendered with.
@@ -340,4 +340,4 @@ class Drawer {
 
 }
 
-export default Drawer;
+export default StandardDrawingPipeline;

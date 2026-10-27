@@ -43,7 +43,7 @@
 			import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
-			import { GPUDrivenDrawer } from 'three/addons/drawers/GPUDrivenDrawer.js';
+			import { MeshletDrawingPipeline } from 'three/addons/pipelines/MeshletDrawingPipeline.js';
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
 			if ( WebGPU.isAvailable() === false ) {
@@ -56,7 +56,7 @@
 			const SPACING = 3;
 
 			const parameters = {
-				drawer: 'GPU-driven',
+				pipeline: 'GPU-driven',
 				statues: 10000,
 				occlusion: true,
 				meshlets: false,
@@ -69,7 +69,7 @@
 			const stats = document.getElementById( 'stats' );
 			const timer = new THREE.Timer();
 
-			let renderer, scene, camera, controls, drawers, sunLight;
+			let renderer, scene, camera, controls, pipelines, sunLight;
 			let geometry, materials, statues = null;
 
 			init().catch( error => {
@@ -90,11 +90,11 @@
 				document.body.appendChild( renderer.domElement );
 				await renderer.init();
 
-				drawers = {
-					'GPU-driven': new GPUDrivenDrawer( { occlusionCulling: parameters.occlusion, lodThreshold: parameters.lod, shadowLodThreshold: parameters.lod } ),
-					'Default (slow)': renderer.drawer
+				pipelines = {
+					'GPU-driven': new MeshletDrawingPipeline( { occlusionCulling: parameters.occlusion, lodThreshold: parameters.lod, shadowLodThreshold: parameters.lod } ),
+					'Default (slow)': renderer.drawingPipeline
 				};
-				renderer.drawer = drawers[ parameters.drawer ];
+				renderer.drawingPipeline = pipelines[ parameters.pipeline ];
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x2e2a33 );
@@ -209,7 +209,7 @@
 
 			function createGroup() {
 
-				// a regular group is traversed every frame. a static bundle group is captured once: the drawer uploads
+				// a regular group is traversed every frame. a static bundle group is captured once: the pipeline uploads
 				// the transforms of its meshes once and doesn't traverse it again until needsUpdate is set. a bundle
 				// group which isn't static is drawn like a regular group
 
@@ -243,7 +243,7 @@
 
 				try {
 
-					renderer.drawer = drawers[ parameters.drawer ];
+					renderer.drawingPipeline = pipelines[ parameters.pipeline ];
 					sunLight.shadow.needsUpdate = true;
 					await renderer.compileAsync( scene, camera );
 					status.textContent = '';
@@ -263,10 +263,10 @@
 
 			function createGUI() {
 
-				const drawer = drawers[ 'GPU-driven' ];
+				const pipeline = pipelines[ 'GPU-driven' ];
 
 				const gui = renderer.inspector.createParameters( 'Settings' );
-				gui.add( parameters, 'drawer', Object.keys( drawers ) ).name( 'Drawer' ).onChange( prepare );
+				gui.add( parameters, 'pipeline', Object.keys( pipelines ) ).name( 'Pipeline' ).onChange( prepare );
 				gui.add( parameters, 'statues', { '1,000': 1000, '4,000': 4000, '10,000': 10000 } ).name( 'Statues' ).onChange( () => {
 
 					createStatues();
@@ -275,20 +275,20 @@
 				} );
 				gui.add( parameters, 'lod', 1, 8, 0.5 ).name( 'LOD error (px)' ).onChange( value => {
 
-					drawer.lodThreshold = value;
-					drawer.shadowLodThreshold = value;
+					pipeline.lodThreshold = value;
+					pipeline.shadowLodThreshold = value;
 					sunLight.shadow.needsUpdate = true;
 
 				} );
 				gui.add( parameters, 'occlusion' ).name( 'Occlusion culling' ).onChange( value => {
 
-					drawer.occlusionCulling = value;
+					pipeline.occlusionCulling = value;
 					prepare();
 
 				} );
 				gui.add( parameters, 'meshlets' ).name( 'Show meshlets' ).onChange( value => {
 
-					drawer.debug = value;
+					pipeline.debug = value;
 					prepare();
 
 				} );
@@ -351,9 +351,9 @@
 
 				let text = `${ formatCount( parameters.statues * geometry.index.count / 3 ) } triangles in the scene`;
 
-				if ( renderer.drawer === drawers[ 'GPU-driven' ] ) {
+				if ( renderer.drawingPipeline === pipelines[ 'GPU-driven' ] ) {
 
-					const info = drawers[ 'GPU-driven' ].info;
+					const info = pipelines[ 'GPU-driven' ].info;
 					text += ` | ${ formatCount( info.triangles ) } drawn in ${ formatCount( info.clusters ) } clusters`;
 
 				}

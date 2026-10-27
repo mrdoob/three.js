@@ -46,8 +46,8 @@ try {
 	const result = await page.evaluate( async () => {
 
 		const THREE = await import( 'three/webgpu' );
-		const { GPUDrivenDrawer } = await import( 'three/addons/drawers/GPUDrivenDrawer.js' );
-		const { VisibilityBufferDrawer } = await import( 'three/addons/drawers/VisibilityBufferDrawer.js' );
+		const { MeshletDrawingPipeline } = await import( 'three/addons/pipelines/MeshletDrawingPipeline.js' );
+		const { VisibilityBufferDrawingPipeline } = await import( 'three/addons/pipelines/VisibilityBufferDrawingPipeline.js' );
 		const renderer = new THREE.WebGPURenderer();
 		await renderer.init();
 		const gpuErrors = [];
@@ -116,17 +116,17 @@ try {
 				if ( layout === 'plain-first' ) scene.add( plain, root, background );
 				else scene.add( root, plain, background );
 
-				const drawer = mode === 'visibility' ? new VisibilityBufferDrawer( { lodThreshold: 0, maxRasterSize: 64 } ) : new GPUDrivenDrawer( { lodThreshold: 0, depthPrepass: mode === 'depth-prepass' } );
-				renderer.drawer = drawer;
+				const pipeline = mode === 'visibility' ? new VisibilityBufferDrawingPipeline( { lodThreshold: 0, maxRasterSize: 64 } ) : new MeshletDrawingPipeline( { lodThreshold: 0, depthPrepass: mode === 'depth-prepass' } );
+				renderer.drawingPipeline = pipeline;
 				await renderer.compileAsync( scene, camera );
 				const first = await capture( scene );
 				let settled;
 				for ( let i = 0; i < 3; i ++ ) settled = await capture( scene );
 				const list = renderer._renderLists.get( scene, camera, renderer.lighting );
-				const record = drawer._renderListBatches.get( list );
+				const record = pipeline._renderListBatches.get( list );
 				const entries = record ? [ ...record.entries, ...[ ...record.staticGroups.values() ].flatMap( data => data.entries ) ] : [];
 				const batched = object => entries.some( entry => entry.batch !== null && entry.objects.includes( object ) );
-				renderer.drawer = new THREE.Drawer();
+				renderer.drawingPipeline = new THREE.StandardDrawingPipeline();
 				const expected = await capture( scene );
 				let maxError = 0;
 
@@ -152,7 +152,7 @@ try {
 				}
 
 				scenarios.push( { mode, layout, maxError, plainBatched: batched( plain ), clippedBatched: batched( clipped ) } );
-				drawer.dispose();
+				pipeline.dispose();
 
 			}
 

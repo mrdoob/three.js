@@ -46,8 +46,8 @@ try {
 	const result = await page.evaluate( async () => {
 
 		const THREE = await import( 'three/webgpu' );
-		const { GPUDrivenDrawer } = await import( 'three/addons/drawers/GPUDrivenDrawer.js' );
-		const { ready } = await import( 'three/addons/utils/ClusterGeometryUtils.js' );
+		const { MeshletDrawingPipeline } = await import( 'three/addons/pipelines/MeshletDrawingPipeline.js' );
+		const { ready } = await import( 'three/addons/utils/MeshletGeometryUtils.js' );
 		await ready;
 
 		const size = 64;
@@ -74,8 +74,8 @@ try {
 		const target = new THREE.RenderTarget( size, size );
 		renderer.setRenderTarget( target );
 
-		const drawer = new GPUDrivenDrawer( { lodThreshold: 0 } );
-		const records = () => [ ...renderer._renderLists._activeLists ].map( list => drawer._renderListBatches.get( list ) ).filter( record => record && record.culling );
+		const pipeline = new MeshletDrawingPipeline( { lodThreshold: 0 } );
+		const records = () => [ ...renderer._renderLists._activeLists ].map( list => pipeline._renderListBatches.get( list ) ).filter( record => record && record.culling );
 
 		const render = async ( frames ) => {
 
@@ -88,7 +88,7 @@ try {
 
 		};
 
-		renderer.drawer = drawer;
+		renderer.drawingPipeline = pipeline;
 		await renderer.compileAsync( scene, camera );
 		await render( 3 );
 
@@ -115,7 +115,7 @@ try {
 		const after = records()[ 0 ];
 		const actual = await renderer.readRenderTargetPixelsAsync( target, 0, 0, size, size );
 
-		renderer.drawer = new THREE.Drawer();
+		renderer.drawingPipeline = new THREE.StandardDrawingPipeline();
 		await render( 1 );
 		const expected = await renderer.readRenderTargetPixelsAsync( target, 0, 0, size, size );
 

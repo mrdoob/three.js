@@ -45,7 +45,7 @@ try {
 	const result = await page.evaluate( async () => {
 
 		const THREE = await import( 'three/webgpu' );
-		const { GPUDrivenDrawer } = await import( 'three/addons/drawers/GPUDrivenDrawer.js' );
+		const { MeshletDrawingPipeline } = await import( 'three/addons/pipelines/MeshletDrawingPipeline.js' );
 		const renderer = new THREE.WebGPURenderer( { requiredLimits: { maxStorageBuffersPerShaderStage: 8 } } );
 		await renderer.init();
 		const gpuErrors = [];
@@ -140,9 +140,9 @@ try {
 			}
 
 			if ( name === 'draw-range' ) source.setDrawRange( 6, 6 );
-			renderer.drawer = new THREE.Drawer();
+			renderer.drawingPipeline = new THREE.StandardDrawingPipeline();
 			const reference = await capture( scene );
-			const drawer = name === 'static-overflow' ? new class extends GPUDrivenDrawer {
+			const pipeline = name === 'static-overflow' ? new class extends MeshletDrawingPipeline {
 
 				get maxInstances() {
 
@@ -150,19 +150,19 @@ try {
 
 				}
 
-			}( { lodThreshold: 0 } ) : new GPUDrivenDrawer( { lodThreshold: 0 } );
-			renderer.drawer = drawer;
+			}( { lodThreshold: 0 } ) : new MeshletDrawingPipeline( { lodThreshold: 0 } );
+			renderer.drawingPipeline = pipeline;
 			await renderer.compileAsync( scene, camera );
 			const compiledPipelines = { ...pipelines };
 			const pixels = await capture( scene );
 			const renderedPipelines = { ...pipelines };
 			const list = renderer._renderLists.get( scene, camera, renderer.lighting );
-			const record = drawer._renderListBatches.get( list );
+			const record = pipeline._renderListBatches.get( list );
 			const entries = record ? [ ...record.entries, ...[ ...record.staticGroups.values() ].flatMap( data => data.entries ) ] : [];
 			const activeBatches = record?.culling?.batches.filter( batch => batch.count > 0 ).length ?? 0;
 			let maxError = 0;
 			for ( let i = 0; i < pixels.length; i ++ ) maxError = Math.max( maxError, Math.abs( pixels[ i ] - reference[ i ] ) );
-			scenarios.push( { name, maxError, activeBatches, entries: entries.length, compiledPipelines, renderedPipelines, cachedGroups: drawer._groupClusters.get( source )?.size ?? 0 } );
+			scenarios.push( { name, maxError, activeBatches, entries: entries.length, compiledPipelines, renderedPipelines, cachedGroups: pipeline._groupClusters.get( source )?.size ?? 0 } );
 			source.setDrawRange( 0, Infinity );
 			if ( mesh.isInstancedMesh ) mesh.dispose();
 

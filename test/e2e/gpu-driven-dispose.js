@@ -81,8 +81,8 @@ try {
 		};
 
 		const THREE = await import( 'three/webgpu' );
-		const { GPUDrivenDrawer } = await import( 'three/addons/drawers/GPUDrivenDrawer.js' );
-		const { ready } = await import( 'three/addons/utils/ClusterGeometryUtils.js' );
+		const { MeshletDrawingPipeline } = await import( 'three/addons/pipelines/MeshletDrawingPipeline.js' );
+		const { ready } = await import( 'three/addons/utils/MeshletGeometryUtils.js' );
 		await ready;
 
 		const size = 64;
@@ -92,8 +92,8 @@ try {
 		renderer.backend.device.addEventListener( 'uncapturederror', event => gpuErrors.push( event.error.message ) );
 		renderer.setSize( size, size );
 
-		const drawer = new GPUDrivenDrawer( { lodThreshold: 0 } );
-		renderer.drawer = drawer;
+		const pipeline = new MeshletDrawingPipeline( { lodThreshold: 0 } );
+		renderer.drawingPipeline = pipeline;
 
 		const scene = new THREE.Scene();
 		const camera = new THREE.PerspectiveCamera( 50, 1, 0.1, 100 );
@@ -118,13 +118,13 @@ try {
 
 		};
 
-		const record = () => [ ...renderer._renderLists._activeLists ].map( list => drawer._renderListBatches.get( list ) ).find( record => record && record.culling );
+		const record = () => [ ...renderer._renderLists._activeLists ].map( list => pipeline._renderListBatches.get( list ) ).find( record => record && record.culling );
 
 		const state = async () => ( {
 			bytes: buffers.bytes,
 			materials: record().lookup.size,
-			poolGeometries: drawer._geometryPool.geometries.size,
-			poolVersion: drawer._geometryPool.version,
+			poolGeometries: pipeline._geometryPool.geometries.size,
+			poolVersion: pipeline._geometryPool.version,
 			center: Array.from( await renderer.readRenderTargetPixelsAsync( target, size / 2, size / 2, 1, 1 ) )
 		} );
 
@@ -199,34 +199,34 @@ try {
 
 		};
 
-		window.disposeDrawer = async () => {
+		window.disposePipeline = async () => {
 
 			scene.remove( anchor );
 			anchor.geometry.dispose();
 			anchor.material.dispose();
 			await render( 2 );
 
-			drawer.dispose();
+			pipeline.dispose();
 			target.dispose();
 			await render( 1 );
 
 			const bytes = buffers.bytes;
 
-			// the renderer disposes its drawer
+			// the renderer disposes its pipeline
 
-			let drawerDisposed = 0;
-			const dispose = drawer.dispose.bind( drawer );
+			let pipelineDisposed = 0;
+			const dispose = pipeline.dispose.bind( pipeline );
 
-			drawer.dispose = () => {
+			pipeline.dispose = () => {
 
-				drawerDisposed ++;
+				pipelineDisposed ++;
 				dispose();
 
 			};
 
 			await renderer.dispose();
 
-			return { bytes, drawerDisposed, gpuErrors };
+			return { bytes, pipelineDisposed, gpuErrors };
 
 		};
 
@@ -235,7 +235,7 @@ try {
 	for ( let cycle = 0; cycle < 4; cycle ++ ) await page.evaluate( ( cycle ) => window.runCycle( cycle ), cycle );
 
 	const cycles = await page.evaluate( () => window.cycles );
-	const disposed = await page.evaluate( () => window.disposeDrawer() );
+	const disposed = await page.evaluate( () => window.disposePipeline() );
 
 	const cdp = await page.createCDPSession();
 
@@ -256,11 +256,11 @@ try {
 	assert.ok( cycles.at( - 1 ).poolVersion > cycles[ 0 ].poolVersion, 'The geometry pool must reclaim the vertices of disposed geometries.' );
 	assert.ok( cycles[ 0 ].center[ 0 ] > 0, 'The remaining object must be drawn.' );
 	assert.equal( collected, references, `The disposed objects must be collected ( ${ collected } of ${ references } ).` );
-	assert.equal( disposed.bytes, 0, 'The disposed drawer must not keep GPU buffers.' );
-	assert.equal( disposed.drawerDisposed, 1, 'Renderer.dispose() must dispose the drawer.' );
+	assert.equal( disposed.bytes, 0, 'The disposed pipeline must not keep GPU buffers.' );
+	assert.equal( disposed.pipelineDisposed, 1, 'Renderer.dispose() must dispose the pipeline.' );
 	assert.deepEqual( disposed.gpuErrors, [] );
 	assert.deepEqual( errors, [] );
-	console.log( `GPU-driven dispose passed: ${ cycles.length } cycles at ${ ( cycles[ 0 ].bytes / 1024 ).toFixed( 0 ) } KiB, ${ collected } disposed objects collected, no buffers after drawer.dispose(), disposed by Renderer.dispose().` );
+	console.log( `GPU-driven dispose passed: ${ cycles.length } cycles at ${ ( cycles[ 0 ].bytes / 1024 ).toFixed( 0 ) } KiB, ${ collected } disposed objects collected, no buffers after pipeline.dispose(), disposed by Renderer.dispose().` );
 
 } finally {
 

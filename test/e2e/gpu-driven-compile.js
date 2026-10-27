@@ -45,7 +45,7 @@ try {
 	const result = await page.evaluate( async () => {
 
 		const THREE = await import( 'three/webgpu' );
-		const { GPUDrivenDrawer } = await import( 'three/addons/drawers/GPUDrivenDrawer.js' );
+		const { MeshletDrawingPipeline } = await import( 'three/addons/pipelines/MeshletDrawingPipeline.js' );
 		const { mrt, output, vec4 } = await import( 'three/tsl' );
 		const renderer = new THREE.WebGPURenderer( { requiredLimits: { maxUniformBufferBindingSize: 65536, maxStorageBuffersPerShaderStage: 8 } } );
 		await renderer.init();
@@ -96,8 +96,8 @@ try {
 
 		for ( const options of [ {}, { occlusionCulling: false }, { debug: true, depthPrepass: true }, { nested: true } ] ) {
 
-			const drawer = new GPUDrivenDrawer( { lodThreshold: 0, ...options } );
-			renderer.drawer = drawer;
+			const pipeline = new MeshletDrawingPipeline( { lodThreshold: 0, ...options } );
+			renderer.drawingPipeline = pipeline;
 			const contexts = renderer._renderContexts;
 			const getContext = contexts.get;
 
@@ -119,10 +119,10 @@ try {
 			await renderer.compileAsync( scene, camera, null, event => progress.push( [ event.loaded, event.total ] ) );
 			const compiled = { ...counts };
 			const renderList = renderer._renderLists.get( scene, camera, renderer.lighting );
-			const record = drawer._renderListBatches.get( renderList );
+			const record = pipeline._renderListBatches.get( renderList );
 			const culling = record.culling;
 			const batches = record.entries.map( entry => entry.batch );
-			const preparedGeometries = [ ...geometries, dormantGeometry ].every( geometry => drawer._clusters.has( geometry ) );
+			const preparedGeometries = [ ...geometries, dormantGeometry ].every( geometry => pipeline._clusters.has( geometry ) );
 			if ( options.nested ) renderer._callDepth = 1;
 			renderer.render( scene, camera );
 			renderer._callDepth = initialCallDepth;
@@ -134,13 +134,13 @@ try {
 				options, before, compiled, rendered, recompiled: { ...counts }, center, progress, preparedGeometries,
 				batchCount: batches.length,
 				reused: record.culling === culling && record.entries.every( ( entry, i ) => entry.batch === batches[ i ] ),
-				stateRestored: renderer.getRenderTarget() === target && renderer.drawer === drawer && renderer.getMRT() === attachments && renderer._callDepth === initialCallDepth && renderer._precompilationState === null
+				stateRestored: renderer.getRenderTarget() === target && renderer.drawingPipeline === pipeline && renderer.getMRT() === attachments && renderer._callDepth === initialCallDepth && renderer._precompilationState === null
 			} );
 			contexts.get = getContext;
 
 		}
 
-		renderer.drawer = new THREE.Drawer();
+		renderer.drawingPipeline = new THREE.StandardDrawingPipeline();
 		const beforeDefault = { ...counts };
 		await renderer.compileAsync( scene, camera );
 		const compiledDefault = { ...counts };
@@ -179,8 +179,8 @@ try {
 	assert.deepEqual( result.gpuErrors, [] );
 	assert.deepEqual( errors, [] );
 	assert.equal( result.compiledDefault.draws, result.beforeDefault.draws );
-	assert.equal( result.renderedDefault.render, result.compiledDefault.render, 'The default Drawer must still reuse its compiled pipelines.' );
-	console.log( 'GPU-driven compileAsync passed: multiple geometries, shared geometry, instancing, MRT, occlusion, debug, depth prepass, nested passes, no draws/dispatches and pipeline reuse. The default Drawer also passed.' );
+	assert.equal( result.renderedDefault.render, result.compiledDefault.render, 'The standard drawing pipeline must still reuse its compiled pipelines.' );
+	console.log( 'GPU-driven compileAsync passed: multiple geometries, shared geometry, instancing, MRT, occlusion, debug, depth prepass, nested passes, no draws/dispatches and pipeline reuse. The default StandardDrawingPipeline also passed.' );
 
 } finally {
 

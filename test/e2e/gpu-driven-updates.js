@@ -47,8 +47,8 @@ try {
 
 		const THREE = await import( 'three/webgpu' );
 		const { attribute, materialReference, normalLocal, vec3 } = await import( 'three/tsl' );
-		const { GPUDrivenDrawer } = await import( 'three/addons/drawers/GPUDrivenDrawer.js' );
-		const { VisibilityBufferDrawer } = await import( 'three/addons/drawers/VisibilityBufferDrawer.js' );
+		const { MeshletDrawingPipeline } = await import( 'three/addons/pipelines/MeshletDrawingPipeline.js' );
+		const { VisibilityBufferDrawingPipeline } = await import( 'three/addons/pipelines/VisibilityBufferDrawingPipeline.js' );
 		const renderer = new THREE.WebGPURenderer();
 		await renderer.init();
 		const gpuErrors = [];
@@ -74,9 +74,9 @@ try {
 
 		}
 
-		const capture = async ( drawer, scene, frames = 1, sample = false ) => {
+		const capture = async ( pipeline, scene, frames = 1, sample = false ) => {
 
-			renderer.drawer = drawer;
+			renderer.drawingPipeline = pipeline;
 
 			for ( let i = 0; i < frames; i ++ ) {
 
@@ -96,20 +96,20 @@ try {
 			const geometry = new THREE.PlaneGeometry( 2, 2 );
 			const material = new Material( { color: 0xff0000, emissive: 0x0000ff, emissiveIntensity: 0.1 } );
 			scene.add( new THREE.Mesh( geometry, material ) );
-			const drawer = new GPUDrivenDrawer( { lodThreshold: 0 } );
-			renderer.drawer = drawer;
+			const pipeline = new MeshletDrawingPipeline( { lodThreshold: 0 } );
+			renderer.drawingPipeline = pipeline;
 			await renderer.compileAsync( scene, camera );
-			const previous = await capture( drawer, scene );
+			const previous = await capture( pipeline, scene );
 			const beforePipelines = { ...pipelines };
 			material.color = new THREE.Color( 0x00ff00 );
 			material.emissiveIntensity = 0.8;
-			const actual = await capture( drawer, scene );
+			const actual = await capture( pipeline, scene );
 			const afterPipelines = { ...pipelines };
-			const expected = await capture( new THREE.Drawer(), scene );
+			const expected = await capture( new THREE.StandardDrawingPipeline(), scene );
 			let maxError = 0;
 			for ( let i = 0; i < actual.length; i ++ ) maxError = Math.max( maxError, Math.abs( actual[ i ] - expected[ i ] ) );
 			scenarios.push( { mode: Material.name, name: 'lit color and emissive intensity', maxError, changed: actual.some( ( value, i ) => value !== previous[ i ] ), stablePipelines: true, beforePipelines, afterPipelines } );
-			drawer.dispose();
+			pipeline.dispose();
 			geometry.dispose();
 			material.dispose();
 
@@ -117,27 +117,27 @@ try {
 
 		for ( const mode of [ 'hardware', 'depth-prepass', 'visibility' ] ) {
 
-			const drawer = mode === 'visibility' ? new VisibilityBufferDrawer( { lodThreshold: 0, maxRasterSize: 64 } ) : new GPUDrivenDrawer( { lodThreshold: 0, depthPrepass: mode === 'depth-prepass' } );
+			const pipeline = mode === 'visibility' ? new VisibilityBufferDrawingPipeline( { lodThreshold: 0, maxRasterSize: 64 } ) : new MeshletDrawingPipeline( { lodThreshold: 0, depthPrepass: mode === 'depth-prepass' } );
 			const sample = mode === 'visibility';
 			const scene = new THREE.Scene();
 			const geometry = new THREE.PlaneGeometry( 2, 2, 4, 4 );
 			const material = new THREE.MeshBasicNodeMaterial( { color: 0xff0000 } );
 			const mesh = new THREE.Mesh( geometry, material );
 			scene.add( mesh );
-			renderer.drawer = drawer;
+			renderer.drawingPipeline = pipeline;
 			await renderer.compileAsync( scene, camera );
-			let previous = await capture( drawer, scene, 3, sample );
+			let previous = await capture( pipeline, scene, 3, sample );
 
 			const check = async ( name, mutate, stablePipelines = false, compile = false, nearest = false ) => {
 
 				mutate();
-				renderer.drawer = drawer;
+				renderer.drawingPipeline = pipeline;
 				if ( compile ) await renderer.compileAsync( scene, camera );
 				const beforePipelines = { ...pipelines };
-				const actual = await capture( drawer, scene, 1, sample );
+				const actual = await capture( pipeline, scene, 1, sample );
 				const afterPipelines = { ...pipelines };
-				const settled = await capture( drawer, scene, 3, sample );
-				const expected = await capture( new THREE.Drawer(), scene, 1, sample );
+				const settled = await capture( pipeline, scene, 3, sample );
+				const expected = await capture( new THREE.StandardDrawingPipeline(), scene, 1, sample );
 				let maxError = 0;
 
 				for ( let i = 0; i < actual.length; i ++ ) maxError = Math.max( maxError, Math.abs( actual[ i ] - expected[ i ] ), Math.abs( settled[ i ] - expected[ i ] ) );
@@ -163,9 +163,9 @@ try {
 			instanced.instanceMatrix.needsUpdate = true;
 			const matrices = instanced.instanceMatrix.array.slice();
 			scene.add( instanced );
-			renderer.drawer = drawer;
+			renderer.drawingPipeline = pipeline;
 			await renderer.compileAsync( scene, camera );
-			previous = await capture( drawer, scene, 3, sample );
+			previous = await capture( pipeline, scene, 3, sample );
 			await check( 'instanceMatrix replacement at the same version', () => {
 
 				const replacement = new THREE.InstancedBufferAttribute( matrices.slice(), 16 );
@@ -187,9 +187,9 @@ try {
 			instanced.setColorAt( 1, new THREE.Color( 0x0000ff ) );
 			instanced.instanceColor.needsUpdate = true;
 			material.needsUpdate = true;
-			renderer.drawer = drawer;
+			renderer.drawingPipeline = pipeline;
 			await renderer.compileAsync( scene, camera );
-			previous = await capture( drawer, scene, 3, sample );
+			previous = await capture( pipeline, scene, 3, sample );
 			await check( 'instanceColor replacement at the same version', () => {
 
 				instanced.instanceColor = new THREE.InstancedBufferAttribute( new Float32Array( [ 0, 1, 0, 0, 1, 0 ] ), 3 );
@@ -200,9 +200,9 @@ try {
 			const instanceGroup = new THREE.BundleGroup();
 			instanceGroup.add( instanced );
 			scene.add( instanceGroup );
-			renderer.drawer = drawer;
+			renderer.drawingPipeline = pipeline;
 			await renderer.compileAsync( scene, camera );
-			previous = await capture( drawer, scene, 3, sample );
+			previous = await capture( pipeline, scene, 3, sample );
 			await check( 'static group instanceMatrix replacement', () => {
 
 				const replacement = new THREE.InstancedBufferAttribute( matrices.slice(), 16 );
@@ -231,9 +231,9 @@ try {
 			geometry.attributes.instanceTint.needsUpdate = true;
 			material.colorNode = attribute( 'instanceTint', 'vec3' );
 			material.needsUpdate = true;
-			renderer.drawer = drawer;
+			renderer.drawingPipeline = pipeline;
 			await renderer.compileAsync( scene, camera );
-			previous = await capture( drawer, scene, 3, sample );
+			previous = await capture( pipeline, scene, 3, sample );
 			await check( 'instanced attribute replacement at the same version', () => {
 
 				const replacement = new THREE.InstancedBufferAttribute( new Float32Array( [ 0, 1, 0, 0, 1, 0 ] ), 3 );
@@ -249,7 +249,7 @@ try {
 			material.color.set( 0xff0000 );
 			material.needsUpdate = true;
 			scene.add( mesh );
-			previous = await capture( drawer, scene, 1, sample );
+			previous = await capture( pipeline, scene, 1, sample );
 
 			await check( 'color mutation', () => material.color.set( 0x00ff00 ), true );
 			await check( 'color replacement', () => material.color = new THREE.Color( 0x0000ff ), true );
@@ -257,7 +257,7 @@ try {
 			material.roughness = 1;
 			material.colorNode = vec3( materialReference( 'roughness', 'float' ) );
 			material.needsUpdate = true;
-			previous = await capture( drawer, scene, 1, sample );
+			previous = await capture( pipeline, scene, 1, sample );
 			await check( 'scalar uniform', () => material.roughness = 0.2, true );
 
 			const maps = [ 0xff0000, 0x00ff00 ].map( color => {
@@ -273,7 +273,7 @@ try {
 			material.color.set( 0xffffff );
 			material.map = maps[ 0 ];
 			material.needsUpdate = true;
-			previous = await capture( drawer, scene, 1, sample );
+			previous = await capture( pipeline, scene, 1, sample );
 			await check( 'texture replacement', () => material.map = maps[ 1 ], true );
 
 			for ( const type of [ THREE.UnsignedByteType, THREE.FloatType ] ) {
@@ -311,9 +311,9 @@ try {
 				maps.push( ...nearestMaps );
 				material.map = nearestMaps[ 0 ];
 				material.needsUpdate = true;
-				renderer.drawer = drawer;
+				renderer.drawingPipeline = pipeline;
 				await renderer.compileAsync( scene, camera );
-				previous = await capture( drawer, scene, 1, sample );
+				previous = await capture( pipeline, scene, 1, sample );
 				await check( `nearest ${ type === THREE.FloatType ? 'float' : 'byte' } texture replacement`, () => material.map = nearestMaps[ 1 ], true, false, true );
 
 			}
@@ -321,14 +321,14 @@ try {
 			material.map = null;
 			material.alphaTest = 0.5;
 			material.needsUpdate = true;
-			previous = await capture( drawer, scene, 3, sample );
+			previous = await capture( pipeline, scene, 3, sample );
 			await check( 'alpha opacity', () => material.opacity = 0.2, true );
 			await check( 'alpha threshold', () => material.alphaTest = 0.1, true );
 
 			material.opacity = 1;
 			material.alphaTest = 0;
 			material.needsUpdate = true;
-			previous = await capture( drawer, scene, 1, sample );
+			previous = await capture( pipeline, scene, 1, sample );
 			await check( 'translate out of view', () => geometry.translate( 10, 0, 0 ) );
 			await check( 'translate into view', () => geometry.translate( - 10, 0, 0 ), false, true );
 
@@ -361,7 +361,7 @@ try {
 			const interleaved = new THREE.InterleavedBufferAttribute( data, 3, 0 );
 			for ( let i = 0; i < positions.count; i ++ ) interleaved.setXYZ( i, positions.getX( i ), positions.getY( i ), positions.getZ( i ) );
 			geometry.setAttribute( 'position', interleaved );
-			previous = await capture( drawer, scene, 1, sample );
+			previous = await capture( pipeline, scene, 1, sample );
 			await check( 'interleaved position mutation', () => {
 
 				for ( let i = 0; i < interleaved.count; i ++ ) interleaved.setX( i, interleaved.getX( i ) + 10 );
@@ -380,7 +380,7 @@ try {
 			geometry.setAttribute( 'tint', tint );
 			material.colorNode = attribute( 'tint', 'vec3' );
 			material.needsUpdate = true;
-			previous = await capture( drawer, scene, 1, sample );
+			previous = await capture( pipeline, scene, 1, sample );
 			await check( 'custom attribute mutation', () => {
 
 				for ( let i = 0; i < tint.count; i ++ ) tint.setXYZ( i, 0, 1, 0 );
@@ -390,7 +390,7 @@ try {
 
 			material.colorNode = normalLocal.mul( 0.5 ).add( 0.5 );
 			material.needsUpdate = true;
-			previous = await capture( drawer, scene, 1, sample );
+			previous = await capture( pipeline, scene, 1, sample );
 			await check( 'normal attribute mutation', () => {
 
 				const normals = geometry.attributes.normal;
@@ -406,18 +406,18 @@ try {
 			const grouped = new THREE.Mesh( geometry, [ material, material ] );
 			grouped.position.z = 0.1;
 			scene.add( grouped );
-			previous = await capture( drawer, scene, 4, sample );
+			previous = await capture( pipeline, scene, 4, sample );
 			await check( 'shared geometry and material groups', () => geometry.translate( 10, 0, 0 ), false, true );
 			await check( 'restore shared geometry', () => geometry.translate( - 10, 0, 0 ), false, true );
 
-			drawer.dispose();
+			pipeline.dispose();
 			geometry.dispose();
 			material.dispose();
 			for ( const map of maps ) map.dispose();
 
 		}
 
-		renderer.drawer = new THREE.Drawer();
+		renderer.drawingPipeline = new THREE.StandardDrawingPipeline();
 		target.dispose();
 		renderer.dispose();
 		return { scenarios, gpuErrors };

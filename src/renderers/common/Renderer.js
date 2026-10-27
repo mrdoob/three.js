@@ -20,7 +20,7 @@ import XRManager from './XRManager.js';
 import InspectorBase from './InspectorBase.js';
 import CanvasTarget from './CanvasTarget.js';
 import { AttributeType } from './Constants.js';
-import Drawer from './Drawer.js';
+import StandardDrawingPipeline from './StandardDrawingPipeline.js';
 
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
@@ -338,14 +338,14 @@ class Renderer {
 		this.lighting = new Lighting();
 
 		/**
-		 * The current drawer. See {@link Renderer#drawer}.
+		 * The current drawing pipeline. See {@link Renderer#drawingPipeline}.
 		 *
 		 * @private
-		 * @type {Drawer}
+		 * @type {StandardDrawingPipeline}
 		 */
-		this._drawer = null;
+		this._drawingPipeline = null;
 
-		this.drawer = new Drawer();
+		this.drawingPipeline = new StandardDrawingPipeline();
 
 		// internals
 
@@ -870,22 +870,22 @@ class Renderer {
 
 	/**
 	 * Decides which objects of a scene are rendered and how they are submitted
-	 * to the render list. Assigning a drawer binds it to this renderer.
-	 * The default is a {@link Drawer}. This property is experimental.
+	 * to the render list. Assigning a drawing pipeline binds it to this renderer.
+	 * The default is a {@link StandardDrawingPipeline}. This property is experimental.
 	 *
-	 * @type {Drawer}
+	 * @type {StandardDrawingPipeline}
 	 */
-	set drawer( drawer ) {
+	set drawingPipeline( pipeline ) {
 
-		drawer.renderer = this;
+		pipeline.renderer = this;
 
-		this._drawer = drawer;
+		this._drawingPipeline = pipeline;
 
 	}
 
-	get drawer() {
+	get drawingPipeline() {
 
-		return this._drawer;
+		return this._drawingPipeline;
 
 	}
 
@@ -995,7 +995,7 @@ class Renderer {
 	 * Compiles all materials in the given scene. This can be useful to avoid a
 	 * phenomenon which is called "shader compilation stutter", which occurs when
 	 * rendering an object with a new shader for the first time.
-	 * The active drawer also prepares its geometry resources and compute pipelines.
+	 * The active drawing pipeline also prepares its geometry resources and compute pipelines.
 	 *
 	 * If you want to add a 3D object to an existing scene, use the third optional
 	 * parameter for applying the target scene. Note that the (target) scene's lighting
@@ -1014,9 +1014,9 @@ class Renderer {
 
 		if ( this._initialized === false ) await this.init();
 
-		// only awaited when the drawer prepares something, so the state below is still taken synchronously
+		// only awaited when the drawing pipeline prepares something, so the state below is still taken synchronously
 
-		const prepare = this.drawer.prepareAsync( scene, camera );
+		const prepare = this.drawingPipeline.prepareAsync( scene, camera );
 
 		if ( prepare !== undefined ) await prepare;
 
@@ -1103,13 +1103,13 @@ class Renderer {
 
 		//
 
-		this.drawer.begin( camera, renderContext );
+		this.drawingPipeline.begin( camera, renderContext );
 
 		// Use sceneRef for render list to ensure lightsNode matches between compileAsync and render
 		const renderList = this._renderLists.get( sceneRef, camera, this.lighting );
-		this.drawer.beginRenderList( renderList );
+		this.drawingPipeline.beginRenderList( renderList );
 
-		this.drawer.project( scene, camera, 0, renderList, renderContext.clippingContext );
+		this.drawingPipeline.project( scene, camera, 0, renderList, renderContext.clippingContext );
 
 		// include lights from target scene
 		if ( targetScene !== scene ) {
@@ -1126,7 +1126,7 @@ class Renderer {
 
 		}
 
-		this.drawer.finishRenderList( renderList );
+		this.drawingPipeline.finishRenderList( renderList );
 
 		//
 
@@ -1219,7 +1219,7 @@ class Renderer {
 
 			if ( item.computeNodes !== undefined ) {
 
-				// compute work queued by the drawer, e.g. its culling
+				// compute work queued by the drawing pipeline, e.g. its culling
 
 				await this.compileComputeAsync( item.computeNodes );
 
@@ -1654,8 +1654,8 @@ class Renderer {
 
 	/**
 	 * Returns `true` if the cached GPU render bundle for the given bundle group is
-	 * out-of-date and must be recorded again. The drawer decides which objects are
-	 * recorded, so bundles recorded by another drawer are recorded again.
+	 * out-of-date and must be recorded again. The drawing pipeline decides which objects are
+	 * recorded, so bundles recorded by another drawing pipeline are recorded again.
 	 *
 	 * @private
 	 * @param {BundleGroup} bundleGroup - The bundle group.
@@ -1664,7 +1664,7 @@ class Renderer {
 	 */
 	_bundleNeedsUpdate( bundleGroup, renderBundleData ) {
 
-		if ( renderBundleData.bundleGPU === undefined || bundleGroup.version !== renderBundleData.version || renderBundleData.drawer !== this.drawer ) return true;
+		if ( renderBundleData.bundleGPU === undefined || bundleGroup.version !== renderBundleData.version || renderBundleData.drawingPipeline !== this.drawingPipeline ) return true;
 
 		// the recorded bundle references the buffers of its attributes. they are only verified after a disposal
 
@@ -1737,7 +1737,7 @@ class Renderer {
 			// objects whose pipelines are not ready yet reset the version, so the bundle is recorded again
 
 			renderBundleData.version = bundleGroup.version;
-			renderBundleData.drawer = this.drawer;
+			renderBundleData.drawingPipeline = this.drawingPipeline;
 
 			const {
 				transparentDoublePass: transparentDoublePassObjects,
@@ -2126,16 +2126,16 @@ class Renderer {
 
 		//
 
-		this.drawer.begin( camera, renderContext );
+		this.drawingPipeline.begin( camera, renderContext );
 
 		this._renderLists.update( nodeFrame.frameId );
 
 		const renderList = this._renderLists.get( scene, camera, this.lighting );
-		this.drawer.beginRenderList( renderList );
+		this.drawingPipeline.beginRenderList( renderList );
 
-		this.drawer.project( scene, camera, 0, renderList, renderContext.clippingContext );
+		this.drawingPipeline.project( scene, camera, 0, renderList, renderContext.clippingContext );
 
-		this.drawer.finishRenderList( renderList );
+		this.drawingPipeline.finishRenderList( renderList );
 
 		if ( this.sortObjects === true ) {
 
@@ -3015,9 +3015,9 @@ class Renderer {
 
 		if ( this._initialized === true ) {
 
-			// the drawer frees its resources while the managers of the renderer still track them
+			// the drawing pipeline frees its resources while the managers of the renderer still track them
 
-			this.drawer.dispose();
+			this.drawingPipeline.dispose();
 
 			this.lighting.dispose();
 			this._inspector.dispose();

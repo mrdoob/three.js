@@ -44,7 +44,7 @@
 			import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
-			import { GPUDrivenDrawer } from 'three/addons/drawers/GPUDrivenDrawer.js';
+			import { MeshletDrawingPipeline } from 'three/addons/pipelines/MeshletDrawingPipeline.js';
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
 			if ( WebGPU.isAvailable() === false ) {
@@ -59,7 +59,7 @@
 			const ROWS = 8;
 
 			const parameters = {
-				drawer: 'GPU-driven',
+				pipeline: 'GPU-driven',
 				meshlets: false,
 				lod: 3,
 				rotate: true
@@ -69,7 +69,7 @@
 			const stats = document.getElementById( 'stats' );
 			const timer = new THREE.Timer();
 
-			let renderer, scene, camera, controls, drawers;
+			let renderer, scene, camera, controls, pipelines;
 			let geometry, statueCount = 0;
 
 			init().catch( error => {
@@ -90,11 +90,11 @@
 				document.body.appendChild( renderer.domElement );
 				await renderer.init();
 
-				drawers = {
-					'GPU-driven': new GPUDrivenDrawer( { lodThreshold: parameters.lod, shadowLodThreshold: parameters.lod } ),
-					'Default (slow)': renderer.drawer
+				pipelines = {
+					'GPU-driven': new MeshletDrawingPipeline( { lodThreshold: parameters.lod, shadowLodThreshold: parameters.lod } ),
+					'Default (slow)': renderer.drawingPipeline
 				};
-				renderer.drawer = drawers[ parameters.drawer ];
+				renderer.drawingPipeline = pipelines[ parameters.pipeline ];
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x1d1b24 );
@@ -263,7 +263,7 @@
 
 				try {
 
-					renderer.drawer = drawers[ parameters.drawer ];
+					renderer.drawingPipeline = pipelines[ parameters.pipeline ];
 					await renderer.compileAsync( scene, camera );
 					status.textContent = '';
 
@@ -283,17 +283,17 @@
 			function createGUI() {
 
 				const gui = renderer.inspector.createParameters( 'Settings' );
-				gui.add( parameters, 'drawer', Object.keys( drawers ) ).name( 'Drawer' ).onChange( prepare );
+				gui.add( parameters, 'pipeline', Object.keys( pipelines ) ).name( 'Pipeline' ).onChange( prepare );
 				gui.add( parameters, 'meshlets' ).name( 'Show meshlets' ).onChange( value => {
 
-					drawers[ 'GPU-driven' ].debug = value;
+					pipelines[ 'GPU-driven' ].debug = value;
 					prepare();
 
 				} );
 				gui.add( parameters, 'lod', 1, 8, 0.5 ).name( 'LOD error (px)' ).onChange( value => {
 
-					drawers[ 'GPU-driven' ].lodThreshold = value;
-					drawers[ 'GPU-driven' ].shadowLodThreshold = value;
+					pipelines[ 'GPU-driven' ].lodThreshold = value;
+					pipelines[ 'GPU-driven' ].shadowLodThreshold = value;
 
 				} );
 				gui.add( parameters, 'rotate' ).name( 'Auto rotate' ).onChange( value => controls.autoRotate = value );
@@ -325,9 +325,9 @@
 
 				let text = `${ statueCount } statues | ${ formatCount( statueCount * geometry.index.count / 3 ) } triangles in the scene`;
 
-				if ( renderer.drawer === drawers[ 'GPU-driven' ] ) {
+				if ( renderer.drawingPipeline === pipelines[ 'GPU-driven' ] ) {
 
-					const info = drawers[ 'GPU-driven' ].info;
+					const info = pipelines[ 'GPU-driven' ].info;
 					text += ` | ${ formatCount( info.triangles ) } drawn in ${ formatCount( info.clusters ) } clusters`;
 
 				}

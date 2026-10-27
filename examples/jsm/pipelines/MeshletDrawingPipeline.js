@@ -1,5 +1,5 @@
 import {
-	Drawer,
+	StandardDrawingPipeline,
 	IndexNode,
 	RenderTarget,
 	DepthTexture,
@@ -30,7 +30,7 @@ import {
 	cameraViewMatrix, atomicAdd, atomicStore, atomicLoad, workgroupId, localId, floatBitsToUint, workgroupArray, workgroupBarrier, packHalf2x16, unpackHalf2x16
 } from 'three/tsl';
 
-import { createClusters, ready as clusterProcessingReady, CLUSTER_SIZE, MAX_LODS } from '../utils/ClusterGeometryUtils.js';
+import { createClusters, ready as clusterProcessingReady, CLUSTER_SIZE, MAX_LODS } from '../utils/MeshletGeometryUtils.js';
 
 // the offsets of the objects are stored as 32-bit floats in the batch table, which represent integers up to 2^24
 
@@ -105,7 +105,7 @@ const FLAG_CONE = 1;
 const FLAG_FAR = 2;
 const MAX_UNUSED_PROJECTIONS = 60;
 
-// the shared attribute of the vertex pulling geometries, the number of vertices limits the hardware draws of the visibility buffer drawer
+// the shared attribute of the vertex pulling geometries, the number of vertices limits the hardware draws of the visibility buffer drawing pipeline
 
 const PULLED_VERTICES = 65536 * 3;
 
@@ -664,7 +664,7 @@ function createOcclusion( width, height ) {
 
 			} );
 
-		} )().compute( level.width * level.height ).setName( 'GPUDrivenDrawer HZB' );
+		} )().compute( level.width * level.height ).setName( 'MeshletDrawingPipeline HZB' );
 
 	} );
 
@@ -888,7 +888,7 @@ class GPUDrivenCulling {
 
 			atomicStore( counters.element( instanceIndex ), uint( 0 ) );
 
-		} )().compute( this.countersAttribute.count ).setName( 'GPUDrivenDrawer Reset' );
+		} )().compute( this.countersAttribute.count ).setName( 'MeshletDrawingPipeline Reset' );
 
 		this.computeReset = computeReset;
 
@@ -1060,7 +1060,7 @@ class GPUDrivenCulling {
 
 			} );
 
-		} )().compute( capacity.objects ).setName( 'GPUDrivenDrawer Cull' );
+		} )().compute( capacity.objects ).setName( 'MeshletDrawingPipeline Cull' );
 
 		// the dispatch of one thread per cluster, in rows of MAX_WORKGROUPS workgroups
 
@@ -1072,7 +1072,7 @@ class GPUDrivenCulling {
 			clusterDispatch.element( 1 ).assign( workgroups.add( MAX_WORKGROUPS - 1 ).div( MAX_WORKGROUPS ) );
 			clusterDispatch.element( 2 ).assign( uint( 1 ) );
 
-		} )().compute( 1 ).setName( 'GPUDrivenDrawer Cluster Args' );
+		} )().compute( 1 ).setName( 'MeshletDrawingPipeline Cluster Args' );
 
 		// occlusion culling in two phases: the first phase draws the clusters visible in the last frame, which
 		// are rendered into the depth of the occlusion view. the second phase tests all clusters against the
@@ -1237,7 +1237,7 @@ class GPUDrivenCulling {
 
 			} );
 
-		} )().compute( clusterDispatchAttribute, [ WORKGROUP_SIZE ] ).setName( 'GPUDrivenDrawer Cluster Cull' );
+		} )().compute( clusterDispatchAttribute, [ WORKGROUP_SIZE ] ).setName( 'MeshletDrawingPipeline Cluster Cull' );
 
 		// one thread per queue writes the indirect draw arguments
 
@@ -1254,7 +1254,7 @@ class GPUDrivenCulling {
 
 		} )().compute( capacity.batches * 2 ).setName( name );
 
-		const computeDrawArgs = createArgs( false, 'GPUDrivenDrawer Draw Args' );
+		const computeDrawArgs = createArgs( false, 'MeshletDrawingPipeline Draw Args' );
 
 		if ( occlusion === null ) {
 
@@ -1287,9 +1287,9 @@ class GPUDrivenCulling {
 
 				} );
 
-			} )().compute( capacity.objects ).setName( 'GPUDrivenDrawer Object Occlusion' );
+			} )().compute( capacity.objects ).setName( 'MeshletDrawingPipeline Object Occlusion' );
 
-			this.cullNodes = [ computeReset, computeCull, computeClusterArgs, createClusterCull( 'first' ), createArgs( true, 'GPUDrivenDrawer Occlusion Args' ) ];
+			this.cullNodes = [ computeReset, computeCull, computeClusterArgs, createClusterCull( 'first' ), createArgs( true, 'MeshletDrawingPipeline Occlusion Args' ) ];
 			this.computeNodes = [ computeObjectOcclusion, createClusterCull( 'second' ), computeDrawArgs ];
 
 			// the culling without the occlusion, while it culls few clusters
@@ -1301,7 +1301,7 @@ class GPUDrivenCulling {
 		}
 
 		this.computeCull = computeCull;
-		this.argsNodes = this.cullNodes.concat( this.computeNodes ).filter( ( node ) => node.name === 'GPUDrivenDrawer Draw Args' || node.name === 'GPUDrivenDrawer Occlusion Args' );
+		this.argsNodes = this.cullNodes.concat( this.computeNodes ).filter( ( node ) => node.name === 'MeshletDrawingPipeline Draw Args' || node.name === 'MeshletDrawingPipeline Occlusion Args' );
 
 	}
 
@@ -2353,7 +2353,7 @@ class GPUDrivenBatch {
 
 				} );
 
-			} )().compute( capacity ).setName( 'GPUDrivenDrawer Instances' );
+			} )().compute( capacity ).setName( 'MeshletDrawingPipeline Instances' );
 
 			this.computeNodesBefore.push( this.transformNode );
 
@@ -2769,12 +2769,12 @@ class GPUDrivenBatch {
 	 * the objects of another batch only update their number of objects, the other batch writes the values.
 	 *
 	 * @param {Array<Object3D>} objects - The objects of the batch.
-	 * @param {GPUDrivenDrawer} drawer - The drawer.
+	 * @param {MeshletDrawingPipeline} pipeline - The pipeline.
 	 * @param {boolean} [upload=true] - Whether the transforms of the objects can have changed and must be compared.
 	 * @param {?Array<?Object>} [levels=null] - The distance ranges of the objects which are levels of LOD objects.
 	 * @param {?Array<number>} [geometries=null] - The indices of the geometries of the objects in the culling.
 	 */
-	update( objects, drawer, upload = true, levels = null, geometries = null ) {
+	update( objects, pipeline, upload = true, levels = null, geometries = null ) {
 
 		const culling = this.culling;
 
@@ -3221,7 +3221,7 @@ class GPUDrivenBatch {
 }
 
 /**
- * A drawer that renders compatible meshes with a GPU-driven pipeline. Geometries are processed once into
+ * A GPU-driven drawing pipeline that renders compatible meshes as meshlets. Geometries are processed once into
  * clusters (meshlets) of 64 triangles with a chain of simplified levels of detail. Every frame, compute
  * shaders select the level of detail per object and cull the objects and clusters against the frustum,
  * and the visible clusters of all objects sharing geometry and material are drawn in one indirect draw
@@ -3243,7 +3243,7 @@ class GPUDrivenBatch {
  * uploaded once.
  *
  * The transforms of the objects are compared with the last upload, only the objects and instances which changed
- * are uploaded. Objects exceeding {@link GPUDrivenDrawer#maxInstances} are drawn by the regular pipeline: static
+ * are uploaded. Objects exceeding {@link MeshletDrawingPipeline#maxInstances} are drawn by the regular pipeline: static
  * bundle groups and the objects drawn by the GPU-driven pipeline in the last frames have precedence.
  *
  * Positions deformed by the context of the render call, like a curved world in the context of a pass, are culled
@@ -3267,7 +3267,7 @@ class GPUDrivenBatch {
  * Changes inside of the group, like transforms or added objects, require `needsUpdate` as with render bundles.
  *
  * ```js
- * renderer.drawer = new GPUDrivenDrawer();
+ * renderer.drawingPipeline = new MeshletDrawingPipeline();
  *
  * const city = new BundleGroup();
  * city.add( ...buildings );
@@ -3276,12 +3276,12 @@ class GPUDrivenBatch {
  *
  * This class is experimental and its interface might change.
  *
- * @augments Drawer
+ * @augments StandardDrawingPipeline
  */
-class GPUDrivenDrawer extends Drawer {
+class MeshletDrawingPipeline extends StandardDrawingPipeline {
 
 	/**
-	 * Constructs a new GPU-driven drawer.
+	 * Constructs a new meshlet drawing pipeline.
 	 *
 	 * @param {Object} [parameters] - The configuration parameter.
 	 * @param {number} [parameters.lodThreshold=1] - The projected error in pixels below which a simpler level of detail is selected.
@@ -3303,7 +3303,7 @@ class GPUDrivenDrawer extends Drawer {
 		 * @readonly
 		 * @default true
 		 */
-		this.isGPUDrivenDrawer = true;
+		this.isMeshletDrawingPipeline = true;
 
 		/**
 		 * The projected error in pixels below which a simpler level of detail is selected.
@@ -3382,7 +3382,7 @@ class GPUDrivenDrawer extends Drawer {
 		 */
 		this.depthPrepass = depthPrepass;
 
-		this._occlusionDrawer = new Drawer();
+		this._occlusionPipeline = new StandardDrawingPipeline();
 		this._boundsNode = null;
 
 		this._ready = false;
@@ -4204,7 +4204,7 @@ class GPUDrivenDrawer extends Drawer {
 	}
 
 	/**
-	 * Prepares the view of the given render list, for drawers using screen-space resources.
+	 * Prepares the view of the given render list, for pipelines using screen-space resources.
 	 *
 	 * @param {Object} record - The record of the render list.
 	 * @param {number} width - The width of the view in pixels.
@@ -5084,11 +5084,11 @@ class GPUDrivenDrawer extends Drawer {
 				renderer.setRenderTarget( target );
 				renderer.setMRT( null );
 				const renderList = renderer._renderLists.get( scene, this._camera, renderer.lighting );
-				this._occlusionDrawer.renderer = renderer;
-				this._occlusionDrawer.begin( this._camera, renderContext );
-				this._occlusionDrawer.beginRenderList( renderList );
-				this._occlusionDrawer.project( scene, this._camera, 0, renderList, renderContext.clippingContext );
-				this._occlusionDrawer.finishRenderList( renderList );
+				this._occlusionPipeline.renderer = renderer;
+				this._occlusionPipeline.begin( this._camera, renderContext );
+				this._occlusionPipeline.beginRenderList( renderList );
+				this._occlusionPipeline.project( scene, this._camera, 0, renderList, renderContext.clippingContext );
+				this._occlusionPipeline.finishRenderList( renderList );
 				renderer._renderObjects( renderList.opaque, this._camera, scene, renderList.lightsNode );
 
 			} finally {
@@ -5104,7 +5104,7 @@ class GPUDrivenDrawer extends Drawer {
 
 		}
 
-		const currentDrawer = renderer.drawer;
+		const currentPipeline = renderer.drawingPipeline;
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentActiveCubeFace = renderer.getActiveCubeFace();
 		const currentActiveMipmapLevel = renderer.getActiveMipmapLevel();
@@ -5114,7 +5114,7 @@ class GPUDrivenDrawer extends Drawer {
 
 		// the meshes are drawn as they are, without the GPU-driven pipeline
 
-		renderer.drawer = this._occlusionDrawer;
+		renderer.drawingPipeline = this._occlusionPipeline;
 		renderer.setMRT( null );
 		renderer.autoClear = true;
 		renderer.autoClearDepth = true;
@@ -5126,7 +5126,7 @@ class GPUDrivenDrawer extends Drawer {
 		renderer.autoClear = currentAutoClear;
 		renderer.autoClearDepth = currentAutoClearDepth;
 		renderer.setMRT( currentMRT );
-		renderer.drawer = currentDrawer;
+		renderer.drawingPipeline = currentPipeline;
 
 		scene.children.length = 0;
 
@@ -5283,8 +5283,8 @@ class GPUDrivenDrawer extends Drawer {
 	}
 
 	/**
-	 * Frees the GPU-related resources of the drawer: the cullings, batches and views of all render lists and the
-	 * geometry pool. Called by {@link Renderer#dispose}. The drawer can be used again, the resources are created again.
+	 * Frees the GPU-related resources of the pipeline: the cullings, batches and views of all render lists and the
+	 * geometry pool. Called by {@link Renderer#dispose}. The pipeline can be used again, the resources are created again.
 	 */
 	dispose() {
 
@@ -5568,4 +5568,4 @@ function isSameObjects( a, b ) {
 
 }
 
-export { GPUDrivenDrawer, GPUDrivenBatch, cacheAttributes, createDebugMaterial, createDrawMaterial, createOcclusion };
+export { MeshletDrawingPipeline, GPUDrivenBatch, cacheAttributes, createDebugMaterial, createDrawMaterial, createOcclusion };

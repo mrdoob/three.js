@@ -15,8 +15,8 @@ import {
 	normalLocal, normalViewGeometry, normalWorldGeometry, tangentViewFrame, bitangentViewFrame, modelWorldMatrix, modelViewMatrix, modelPosition, atomicMax, atomicAdd, atomicStore, atomicLoad
 } from 'three/tsl';
 
-import { GPUDrivenDrawer, GPUDrivenBatch, cacheAttributes, createDebugMaterial, createDrawMaterial, createOcclusion } from './GPUDrivenDrawer.js';
-import { CLUSTER_SIZE } from '../utils/ClusterGeometryUtils.js';
+import { MeshletDrawingPipeline, GPUDrivenBatch, cacheAttributes, createDebugMaterial, createDrawMaterial, createOcclusion } from './MeshletDrawingPipeline.js';
+import { CLUSTER_SIZE } from '../utils/MeshletGeometryUtils.js';
 
 // visibility buffer packing — the depth occupies the bits above each payload
 
@@ -190,7 +190,7 @@ function createView( width, height ) {
 		atomicStore( screenTriAtomic.element( instanceIndex ), uint( 0 ) );
 		atomicStore( screenInstAtomic.element( instanceIndex ), uint( 0 ) );
 
-	} )().compute( pixels, [ 256 ] ).setName( 'VisibilityBufferDrawer Clear' );
+	} )().compute( pixels, [ 256 ] ).setName( 'VisibilityBufferDrawingPipeline Clear' );
 
 	return {
 		width,
@@ -278,7 +278,7 @@ class VisibilityBufferBatch extends GPUDrivenBatch {
 
 			atomicStore( hwQueueAtomic.element( 0 ), uint( 0 ) );
 
-		} )().compute( 1 ).setName( 'VisibilityBufferDrawer Reset' );
+		} )().compute( 1 ).setName( 'VisibilityBufferDrawingPipeline Reset' );
 
 		// indirect dispatch arguments, split into 2D if exceeding 65535 workgroups
 
@@ -291,7 +291,7 @@ class VisibilityBufferBatch extends GPUDrivenBatch {
 			dispatchBuffer.element( 1 ).assign( workgroups.add( maxDimension ).sub( 1 ).div( maxDimension ) );
 			dispatchBuffer.element( 2 ).assign( 1 );
 
-		} )().compute( 1 ).setName( 'VisibilityBufferDrawer Dispatch' );
+		} )().compute( 1 ).setName( 'VisibilityBufferDrawingPipeline Dispatch' );
 
 		// software rasterizer — one thread per triangle of a cluster
 
@@ -471,7 +471,7 @@ class VisibilityBufferBatch extends GPUDrivenBatch {
 
 			} );
 
-		} )().compute( dispatchAttribute ).setName( 'VisibilityBufferDrawer Rasterize' );
+		} )().compute( dispatchAttribute ).setName( 'VisibilityBufferDrawingPipeline Rasterize' );
 
 		// indirect draw arguments of the hardware path
 
@@ -482,7 +482,7 @@ class VisibilityBufferBatch extends GPUDrivenBatch {
 			hwDrawBuffer.element( 2 ).assign( uint( 0 ) );
 			hwDrawBuffer.element( 3 ).assign( uint( 0 ) );
 
-		} )().compute( 1 ).setName( 'VisibilityBufferDrawer HW Args' );
+		} )().compute( 1 ).setName( 'VisibilityBufferDrawingPipeline HW Args' );
 
 
 		this.computeNodes.push( computeHWReset, computeDispatch, computeRasterize, computeHWArgs );
@@ -755,9 +755,9 @@ class VisibilityBufferBatch extends GPUDrivenBatch {
 
 		this.triangleBase.value = this.pool.add( this.clusters );
 
-		const drawer = parameters[ 1 ];
+		const pipeline = parameters[ 1 ];
 
-		this.maxRasterSize.value = drawer.maxRasterSize;
+		this.maxRasterSize.value = pipeline.maxRasterSize;
 		this.resolveCount.value = this.count;
 
 	}
@@ -765,7 +765,7 @@ class VisibilityBufferBatch extends GPUDrivenBatch {
 }
 
 /**
- * A GPU-driven drawer with a hybrid rasterizer. Like {@link GPUDrivenDrawer}, compute shaders select the
+ * A meshlet drawing pipeline with a hybrid rasterizer. Like {@link MeshletDrawingPipeline}, compute shaders select the
  * level of detail and cull objects and clusters, but the visible clusters are rasterized into a visibility
  * buffer: small triangles in software by a compute shader, large triangles by the hardware rasterizer. A
  * resolve pass shades the visibility buffer with the material of the meshes: its node graph is evaluated on
@@ -775,22 +775,22 @@ class VisibilityBufferBatch extends GPUDrivenBatch {
  *
  * The visibility buffer stores the triangle in 16 bits, so only the levels of detail whose triangles fit
  * into this range are used. Geometries whose most detailed level doesn't fit are drawn by the hardware
- * pipeline of {@link GPUDrivenDrawer}. The resolve only writes the color, so render calls with MRT, like the
+ * pipeline of {@link MeshletDrawingPipeline}. The resolve only writes the color, so render calls with MRT, like the
  * velocity of TRAA, draw all clusters with the hardware pipeline. The position node of the material is evaluated
  * per corner of the triangles by the software rasterizer and by the resolve.
  *
  * ```js
- * renderer.drawer = new VisibilityBufferDrawer();
+ * renderer.drawingPipeline = new VisibilityBufferDrawingPipeline();
  * ```
  *
  * This class is experimental and its interface might change.
  *
- * @augments GPUDrivenDrawer
+ * @augments MeshletDrawingPipeline
  */
-class VisibilityBufferDrawer extends GPUDrivenDrawer {
+class VisibilityBufferDrawingPipeline extends MeshletDrawingPipeline {
 
 	/**
-	 * Constructs a new visibility buffer drawer.
+	 * Constructs a new visibility buffer drawing pipeline.
 	 *
 	 * @param {Object} [parameters] - The configuration parameter.
 	 * @param {number} [parameters.lodThreshold=1] - The projected error in pixels below which a simpler level of detail is selected.
@@ -832,7 +832,7 @@ class VisibilityBufferDrawer extends GPUDrivenDrawer {
 
 	updateView( record, width, height ) {
 
-		// shadow passes are drawn by the hardware rasterizer of the base drawer
+		// shadow passes are drawn by the hardware rasterizer of the base pipeline
 
 		if ( this._shadowPass === true ) return null;
 
@@ -951,4 +951,4 @@ class VisibilityBufferDrawer extends GPUDrivenDrawer {
 
 }
 
-export { VisibilityBufferDrawer };
+export { VisibilityBufferDrawingPipeline };
