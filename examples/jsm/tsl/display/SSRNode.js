@@ -913,8 +913,8 @@ class SSRNode extends Node {
 			} else {
 
 				const Xi = noise.toVar();
-				// Mirror-bias: pull `Xi.y` toward the cap top to tighten the GGX lobe and cut mid-roughness
-				// noise. This changes the sampling distribution without updating the PDF, introducing bias.
+				// mirror bias changes the sampling distribution without updating the PDF
+
 				Xi.y.assign( mix( Xi.y, 0.0, this.mirrorBias.mul( Xi.w.sqrt() ) ) );
 
 				albedo.assign( ( this.diffuseNode !== null ? this.diffuseNode.sample( uvPos ).rgb : vec3( 1 ) ) );
