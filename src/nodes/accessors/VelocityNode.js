@@ -117,6 +117,7 @@ class VelocityNode extends Node {
 
 			objectData.frameId = frameId;
 			// Keep the previous transform unchanged across all velocity passes in this frame.
+
 			previousModelMatrix.copy( getPreviousMatrix( object, 1 ) );
 
 		}
