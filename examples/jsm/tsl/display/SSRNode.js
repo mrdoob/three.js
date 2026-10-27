@@ -1029,6 +1029,23 @@ class SSRNode extends Node {
 			const d0 = uvPos.mul( this._resolution ).xy.toVar();
 			const d1 = getScreenPosition( d1viewPosition, this._cameraProjectionMatrix ).mul( this._resolution ).toVar();
 
+			// clip the ray to the screen so all steps land on visible texels
+			const extent = d1.sub( d0 ).toVar();
+			const exitT = vec2(
+				extent.x.greaterThanEqual( 0 ).select( this._resolution.x.sub( d0.x ), d0.x ),
+				extent.y.greaterThanEqual( 0 ).select( this._resolution.y.sub( d0.y ), d0.y )
+			).div( extent.abs().max( 1e-6 ) );
+			const clipT = min( exitT.x, exitT.y ).min( 1 ).toConst();
+
+			If( clipT.lessThan( 1 ), () => {
+
+				d1.assign( d0.add( extent.mul( clipT ) ) );
+				d1viewPosition.assign( this.camera.isPerspectiveCamera
+					? mix( viewPosition.div( viewPosition.z ), d1viewPosition.div( d1viewPosition.z ), clipT ).div( mix( viewPosition.z.reciprocal(), d1viewPosition.z.reciprocal(), clipT ) )
+					: mix( viewPosition, d1viewPosition, clipT ) );
+
+			} );
+
 			const xLen = d1.x.sub( d0.x ).toVar();
 			const yLen = d1.y.sub( d0.y ).toVar();
 
@@ -1062,6 +1079,11 @@ class SSRNode extends Node {
 				? ( sVal ) => float( 1 ).div( recipVPZ.add( sVal.mul( recipD1VPZ.sub( recipVPZ ) ) ) )
 				: ( sVal ) => viewPosition.z.add( sVal.mul( d1viewPosition.z.sub( viewPosition.z ) ) );
 
+			// view-space point on the reflected ray at s
+			const rayPointAt = this.camera.isPerspectiveCamera
+				? ( sVal ) => mix( viewPosition.div( viewPosition.z ), d1viewPosition.div( d1viewPosition.z ), sVal ).mul( reflectRayZAt( sVal ) )
+				: ( sVal ) => mix( viewPosition, d1viewPosition, sVal );
+
 			// Screen-space position along the ray for a given s ∈ [0,1].
 			const screenPosAt = ( sVal ) => d0.add( stepVec.mul( sVal.mul( totalStep ) ) );
 
@@ -1083,6 +1105,7 @@ class SSRNode extends Node {
 			// Carry the coarse hit's UV/depth to skip a redundant fetch when refinement is off.
 			const hitUvS = vec2( 0 ).toVar();
 			const hitD = float( 0 ).toVar();
+			const previousS = float( 0 ).toVar();
 
 			// March from d0 toward d1, looking for an intersection with the depth buffer.
 			Loop( { start: int( 1 ), end: totalStep }, ( { i } ) => {
@@ -1114,7 +1137,9 @@ class SSRNode extends Node {
 					const uvNeighbor = uvS.add( uvPixelStepX ).toVar();
 					const vPNeighbor = getViewPosition( uvNeighbor, d, this._cameraProjectionMatrixInverse ).toVar();
 					const minThickness = vPNeighbor.x.sub( vP.x ).mul( 3 ).toVar();
-					const tk = max( minThickness, this.thickness ).toVar();
+					// Only refinement may use a wider coarse tolerance.
+					const stepLength = distance( rayPointAt( previousS ), rayPointAt( s ) );
+					const tk = ( this.binaryRefine ? max( max( minThickness, this.thickness ), stepLength ) : max( minThickness, this.thickness ) ).toVar();
 
 					If( away.lessThanEqual( tk ), () => {
 
@@ -1161,6 +1186,8 @@ class SSRNode extends Node {
 
 				} );
 
+				previousS.assign( s );
+
 			} );
 
 			If( foundHit, () => {
@@ -1199,7 +1226,19 @@ class SSRNode extends Node {
 				// In blur mode the ratio² falloff re-grows past maxDistance, so over-range hits fall back
 				// to env. The scatter path bounds reach via ray length, so every hit shades.
 				const distancePointPlane = this.stochastic === false ? pointPlaneDistance( vP, viewPosition, viewNormal ).toVar() : float( 0 );
-				const withinRange = distancePointPlane.lessThanEqual( this.maxDistance );
+				const withinRange = distancePointPlane.lessThanEqual( this.maxDistance ).toVar();
+
+				if ( this.binaryRefine ) {
+
+					// bisection can land on a depth discontinuity, so validate the refined hit
+					const neighbor = getViewPosition( uvS.add( uvPixelStepX ), hitD, this._cameraProjectionMatrixInverse );
+					const tk = max( neighbor.x.sub( vP.x ).mul( 3 ), this.thickness );
+					withinRange.assign( withinRange.and( isBackgroundDepth( hitD ).not() )
+						.and( pointToLineDistance( vP, viewPosition, d1viewPosition ).lessThanEqual( tk ) ) );
+
+					withinRange.assign( withinRange.and( dot( viewReflectDir, this.normalNode.sample( uvS ).rgb.normalize() ).lessThan( 0 ) ) );
+
+				}
 
 				If( withinRange, () => {
 
