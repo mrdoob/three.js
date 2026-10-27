@@ -116,7 +116,9 @@ class VelocityNode extends Node {
 		if ( objectData.frameId !== frameId ) {
 
 			objectData.frameId = frameId;
-			// Freeze the last rendered transform for all velocity passes in this frame.
+			// Keep the previous transform unchanged across all velocity passes in this frame.
+
+
 			previousModelMatrix.copy( getPreviousMatrix( object, 1 ) );
 
 		}
