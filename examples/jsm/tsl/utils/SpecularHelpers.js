@@ -184,6 +184,7 @@ export const ggxReflectionSample = Fn( ( [ N, V, roughness, metalness, albedo, X
 	const up = vec3( 0, 0, 1 );
 	const T = cross( up, N ).toVar();
 	// Test the unnormalized tangent: normalize( 0 ) is undefined at the poles.
+
 	If( T.length().lessThan( 1e-3 ), () => {
 
 		T.assign( cross( vec3( 0, 1, 0 ), N ) );
