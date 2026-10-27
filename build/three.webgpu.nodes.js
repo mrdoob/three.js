@@ -22436,6 +22436,30 @@ const logarithmicDepthToViewZ = ( depth, near, far ) => {
 };
 
 /**
+ * TSL function for retrieving the depth value as produced by the camera's projection matrix.
+ *
+ * @tsl
+ * @function
+ * @param {Node<float>} depth - The depth value.
+ * @param {Node<float>} near - The camera's near value.
+ * @param {Node<float>} far - The camera's far value.
+ * @returns {Node<float>}
+ */
+const projectionDepth = /*@__PURE__*/ Fn( ( [ depth, near, far ], builder ) => {
+
+	if ( builder.renderer.logarithmicDepthBuffer === true ) {
+
+		const viewZ = logarithmicDepthToViewZ( depth, near, far );
+
+		return viewZToPerspectiveDepth( viewZ, near, far );
+
+	}
+
+	return depth;
+
+} );
+
+/**
  * TSL function for defining a value for the current fragment's depth.
  *
  * @tsl
@@ -35121,13 +35145,13 @@ class Bindings extends DataMap {
 
 				for ( const uniform of binding.uniforms ) {
 
-					cacheKeyString += uniform.nodeUniform.node.id;
+					cacheKeyString += uniform.nodeUniform.node.id + ',';
 
 				}
 
 			} else {
 
-				cacheKeyString += binding.nodeUniform.id;
+				cacheKeyString += binding.nodeUniform.id + ',';
 
 			}
 
@@ -94749,6 +94773,7 @@ var Three_TSL = /*#__PURE__*/Object.freeze({
 	pow3: pow3,
 	pow4: pow4,
 	premultiplyAlpha: premultiplyAlpha,
+	projectionDepth: projectionDepth,
 	property: property,
 	quadBroadcast: quadBroadcast,
 	quadSwapDiagonal: quadSwapDiagonal,

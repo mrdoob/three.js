@@ -1968,11 +1968,13 @@ function WebGLBindingStates( gl, attributes ) {
 
 					if ( geometryAttribute.isInterleavedBufferAttribute ) {
 
+						// interleaved attributes can also view a buffer attribute, e.g. the columns of instance matrices
+
 						const data = geometryAttribute.data;
-						const stride = data.stride;
+						const stride = data.isInterleavedBuffer === true ? data.stride : data.itemSize;
 						const offset = geometryAttribute.offset;
 
-						if ( data.isInstancedInterleavedBuffer ) {
+						if ( data.isInstancedInterleavedBuffer || data.isInstancedBufferAttribute ) {
 
 							for ( let i = 0; i < programAttribute.locationSize; i ++ ) {
 
