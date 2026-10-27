@@ -32,7 +32,7 @@
 			</div>
 
 			<small>
-				White noise vs. <a href="https://github.com/electronicarts/fastnoise" target="_blank" rel="noopener">FAST</a> spatiotemporal blue noise: raw, 1-bit dithered and accumulated over time.
+				White noise vs. <a href="https://github.com/electronicarts/fastnoise" target="_blank" rel="noopener">FAST</a> spatiotemporal blue noise by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br/>A 1-bit dithered sphere or a uniform noise field, accumulated over time.
 			</small>
 		</div>
 
@@ -58,12 +58,12 @@
 			import { fastNoise, loadFASTNoise } from 'three/addons/tsl/utils/FASTNoise.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			const views = { 'Noise': 0, 'Dithered': 1, 'Accumulated': 2 };
-			const params = { view: 'Dithered', pixelSize: 3, animated: true };
+			const modes = { 'Sphere': 0, 'Uniform': 1 };
+			const params = { mode: 'Sphere', pixelSize: 2, frames: 1, animated: true };
 
 			let renderer, computeQuad, displayQuad, targets, history, current;
 
-			const view = uniform( views[ params.view ] );
+			const mode = uniform( modes[ params.mode ] );
 			const index = uniform( 0, 'uint' );
 			const blend = uniform( 1 ); // 1 resets the history
 
@@ -106,26 +106,27 @@
 
 				// 1 sample per frame, accumulated with an exponential moving average
 
-				const dithered = noise.lessThan( image ).select( 1, 0 );
-				const accumulated = mix( history.sample( screenUV ).b, dithered, blend );
+				const sample = mode.equal( 0 ).select( noise.lessThan( image ).select( 1, 0 ), noise );
+				const accumulated = mix( history.sample( screenUV ).r, sample, blend );
 
 				computeQuad = new THREE.QuadMesh( new THREE.NodeMaterial() );
-				computeQuad.material.fragmentNode = vec4( noise, dithered, accumulated, 1 );
+				computeQuad.material.fragmentNode = vec4( accumulated, 0, 0, 1 );
 
-				const value = current.sample( screenUV );
-				const channel = view.equal( 0 ).select( value.r, view.equal( 1 ).select( value.g, value.b ) );
+				const channel = current.sample( screenUV ).r;
 				const divider = screenCoordinate.x.sub( screenSize.x.mul( 0.5 ) ).abs().lessThan( 1 );
 
 				displayQuad = new THREE.QuadMesh( new THREE.NodeMaterial() );
 				displayQuad.material.fragmentNode = divider.select( vec4( 1, 0.3, 0.1, 1 ), vec4( vec3( channel ), 1 ) );
 
 				const gui = renderer.inspector.createParameters( 'Settings' );
-				gui.add( params, 'view', Object.keys( views ) ).onChange( ( value ) => {
+				gui.add( params, 'mode', Object.keys( modes ) ).onChange( ( value ) => {
 
-					view.value = views[ value ];
+					mode.value = modes[ value ];
+					blend.value = 1;
 
 				} );
 				gui.add( params, 'pixelSize', 1, 8, 1 ).name( 'pixel size' ).onChange( onWindowResize );
+				gui.add( params, 'frames', 1, 200, 1 ).name( 'history frames' );
 				gui.add( params, 'animated' );
 
 				onWindowResize();
@@ -157,7 +158,7 @@
 				targets.reverse();
 				history.value = targets[ 1 ].texture;
 				current.value = targets[ 0 ].texture;
-				blend.value = 0.1;
+				blend.value = 2 / ( params.frames + 1 ); // EMA with the variance of an N frame average, 19 frames = FAST's α = 0.1
 
 			}
 
