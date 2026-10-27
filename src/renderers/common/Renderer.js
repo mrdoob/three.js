@@ -4039,13 +4039,6 @@ class Renderer {
 
 			const overrideMaterial = scene.overrideMaterial;
 
-			// The state copied below comes from the object's own material, whose version render objects
-			// track separately (see RenderObjects.get()). It must not count as a change of the shared override
-			// material: otherwise a single alpha-tested object would invalidate the render objects of every
-			// object drawn with the override material, forcing a full cache key computation for each of them.
-
-			const overrideMaterialVersion = overrideMaterial.version;
-
 			materialOverride = true;
 
 			// store original nodes
@@ -4063,7 +4056,9 @@ class Renderer {
 
 			}
 
-			overrideMaterial.alphaTest = material.alphaTest;
+			// not the setter: it would bump the version of the shared override material and invalidate the render
+			// objects of every object drawn with it, which track their own material's version instead
+			overrideMaterial._alphaTest = material.alphaTest;
 			overrideMaterial.alphaMap = material.alphaMap;
 			overrideMaterial.displacementMap = material.displacementMap;
 			overrideMaterial.displacementScale = material.displacementScale;
@@ -4091,8 +4086,6 @@ class Renderer {
 				if ( positionNode !== null ) overrideMaterial.positionNode = positionNode;
 
 			}
-
-			overrideMaterial.version = overrideMaterialVersion;
 
 			material = overrideMaterial;
 
