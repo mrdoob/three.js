@@ -4056,7 +4056,7 @@ class Renderer {
 
 			}
 
-			overrideMaterial.alphaTest = material.alphaTest;
+			overrideMaterial._alphaTest = material.alphaTest; // bypass the setter so the version doesn't change
 			overrideMaterial.alphaMap = material.alphaMap;
 			overrideMaterial.displacementMap = material.displacementMap;
 			overrideMaterial.displacementScale = material.displacementScale;
