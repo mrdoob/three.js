@@ -1047,8 +1047,7 @@ class SSRNode extends Node {
 			} else {
 
 				const Xi = noise.toVar();
-				// mirror bias changes the sampling distribution without updating the PDF
-
+				// mirror bias trades the unbiased GGX lobe for lower variance
 				Xi.y.assign( mix( Xi.y, 0.0, this.mirrorBias.mul( Xi.w.sqrt() ) ) );
 
 				if ( this.outputCoverage ) {
