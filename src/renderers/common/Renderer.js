@@ -4056,9 +4056,7 @@ class Renderer {
 
 			}
 
-			// not the setter: it would bump the version of the shared override material and invalidate the render
-			// objects of every object drawn with it, which track their own material's version instead
-			overrideMaterial._alphaTest = material.alphaTest;
+			overrideMaterial._alphaTest = material.alphaTest; // bypass the setter so the version doesn't change
 			overrideMaterial.alphaMap = material.alphaMap;
 			overrideMaterial.displacementMap = material.displacementMap;
 			overrideMaterial.displacementScale = material.displacementScale;

@@ -332,7 +332,7 @@ class RenderObject {
 		this._sourceMaterial = renderer._currentSourceMaterial;
 
 		/**
-		 * The version of the source material (see `_sourceMaterial`) this render object was validated against.
+		 * The version of the source material this render object was validated against.
 		 *
 		 * @type {number}
 		 */

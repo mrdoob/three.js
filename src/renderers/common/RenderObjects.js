@@ -100,9 +100,6 @@ class RenderObjects {
 
 		const chainMap = this.getChainMap( passId );
 
-		// When drawing with an override material (e.g. in shadow passes), the program also depends on the
-		// object's own material (nodes, alpha test, side...) so it is part of the key and its version is tracked.
-
 		const sourceMaterial = this.renderer._currentSourceMaterial;
 		const sourceMaterialVersion = sourceMaterial !== null ? sourceMaterial.version : 0;
 
