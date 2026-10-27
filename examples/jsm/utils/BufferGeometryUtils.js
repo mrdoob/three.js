@@ -710,6 +710,16 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 	const newIndices = [];
 	const getters = [ 'getX', 'getY', 'getZ', 'getW' ];
 
+	// vertices are only merged if their morph targets match as well, otherwise
+	// vertices that only share their base attributes would be welded together
+	const hashAttributes = attributeNames.map( name => geometry.getAttribute( name ) );
+
+	for ( const name in geometry.morphAttributes ) {
+
+		hashAttributes.push( ...geometry.morphAttributes[ name ] );
+
+	}
+
 	// convert the error tolerance to an amount of decimal places to truncate to
 	const halfTolerance = tolerance * 0.5;
 	const exponent = Math.log10( 1 / tolerance );
@@ -721,10 +731,9 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 		// Generate a hash for the vertex attributes at the current index 'i'
 		let hash = '';
-		for ( let j = 0, l = attributeNames.length; j < l; j ++ ) {
+		for ( let j = 0, l = hashAttributes.length; j < l; j ++ ) {
 
-			const name = attributeNames[ j ];
-			const attribute = geometry.getAttribute( name );
+			const attribute = hashAttributes[ j ];
 			const itemSize = attribute.itemSize;
 
 			for ( let k = 0; k < itemSize; k ++ ) {

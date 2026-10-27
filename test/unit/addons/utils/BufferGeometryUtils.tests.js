@@ -79,7 +79,7 @@ export default QUnit.module( 'Addons', () => {
 
 				const geometry = new BufferGeometry();
 				geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( [ 1, 0, 0, 2, 0, 0, 1, 0, 0 ] ), 3 ) );
-				const morph = new Float16BufferAttribute( [ 0x8000, 0x0001, 0x3c00, 0x4000, 0x4200, 0x4400, 0, 0, 0 ], 3 );
+				const morph = new Float16BufferAttribute( [ 0x8000, 0x0001, 0x3c00, 0x4000, 0x4200, 0x4400, 0x8000, 0x0001, 0x3c00 ], 3 );
 				morph.name = 'pose';
 				morph.setUsage( DynamicDrawUsage );
 				geometry.morphAttributes.position = [ morph ];
@@ -210,6 +210,31 @@ export default QUnit.module( 'Addons', () => {
 
 					assert.deepEqual( geometry.morphAttributes.position[ 0 ], indexedGeometry.morphAttributes.position[ 0 ], 'morphAttributes were handled' );
 					assert.ok( indexedGeometry.index, 'has index' );
+
+				} );
+
+				QUnit.test( 'keeps vertices apart whose morph targets differ', ( assert ) => {
+
+					// vertices 0 and 2 share their position, but move apart in the morph target
+					const geometry = new BufferGeometry();
+					geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( [
+						0, 0, 0,
+						1, 0, 0,
+						0, 0, 0,
+						0, 0, 0
+					] ), 3 ) );
+					geometry.morphAttributes.position = [ new BufferAttribute( new Float32Array( [
+						0, 1, 0,
+						1, 0, 0,
+						0, - 1, 0,
+						0, 1, 0
+					] ), 3 ) ];
+
+					const indexedGeometry = BufferGeometryUtils.mergeVertices( geometry );
+
+					assert.strictEqual( indexedGeometry.getAttribute( 'position' ).count, 3, 'merges only vertices with matching morph targets' );
+					assert.deepEqual( Array.from( indexedGeometry.index.array ), [ 0, 1, 2, 0 ], 'keeps the morphed vertex apart' );
+					assert.deepEqual( Array.from( indexedGeometry.morphAttributes.position[ 0 ].array ), [ 0, 1, 0, 1, 0, 0, 0, - 1, 0 ], 'keeps both morph targets' );
 
 				} );
 
