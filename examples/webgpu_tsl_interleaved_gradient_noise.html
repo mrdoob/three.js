@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - blue noise</title>
+		<title>three.js webgpu - interleaved gradient noise</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<meta property="og:title" content="three.js webgpu - blue noise">
+		<meta property="og:title" content="three.js webgpu - interleaved gradient noise">
 		<meta property="og:type" content="website">
-		<meta property="og:url" content="https://threejs.org/examples/webgpu_tsl_blue_noise.html">
-		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_tsl_blue_noise.jpg">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_tsl_interleaved_gradient_noise.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_tsl_interleaved_gradient_noise.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
 		<style>
 			.label {
@@ -28,16 +28,16 @@
 			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
 
 			<div class="title-wrapper">
-				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Blue Noise</span>
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Interleaved Gradient Noise</span>
 			</div>
 
 			<small>
-				White noise vs. <a href="https://github.com/electronicarts/fastnoise" target="_blank" rel="noopener">FAST</a> spatiotemporal blue noise by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br/>A 1-bit dithered sphere or a uniform noise field, accumulated over time.<br/>Frames accumulated: <span id="frames">0</span>
+				White noise vs. animated <a href="https://www.iryoku.com/next-generation-post-processing-in-call-of-duty-advanced-warfare/" target="_blank" rel="noopener">interleaved gradient noise</a> (Jorge Jimenez) by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br/>A 1-bit dithered sphere or a uniform noise field, accumulated over time.<br/>Frames accumulated: <span id="frames">0</span>
 			</small>
 		</div>
 
 		<div class="label" style="left: 0;">White Noise</div>
-		<div class="label" id="blueLabel" style="right: 0;">FAST Spatio-Temporal Blue Noise</div>
+		<div class="label" style="right: 0;">Animated IGN</div>
 
 		<script type="importmap">
 			{
@@ -55,13 +55,12 @@
 			import * as THREE from 'three/webgpu';
 			import { Fn, float, hash, mix, screenCoordinate, screenSize, screenUV, texture, uint, uniform, vec2, vec3, vec4 } from 'three/tsl';
 
-			import { fastNoise, loadFASTNoise } from 'three/addons/tsl/utils/FASTNoise.js';
+			import { animatedIGN } from 'three/addons/tsl/utils/IGN.js';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			const modes = { 'Sphere': 0, 'Uniform': 1 };
-			const noises = { 'FAST Spatio-Temporal': 0, 'FAST Spatial': 1, 'Golden Ratio': 2 };
-			const params = { mode: 'Sphere', noise: 'FAST Spatio-Temporal', pixelSize: 2, temporalBlur: true, spatialBlur: true, animate: true };
+			const params = { mode: 'Sphere', pixelSize: 2, temporalBlur: true, spatialBlur: true, animate: true };
 
 			let renderer, computeQuad, displayQuad, targets, history, current, display, blurredDisplay;
 			let samples = 0;
@@ -69,7 +68,6 @@
 			const framesElement = document.getElementById( 'frames' );
 
 			const mode = uniform( modes[ params.mode ] );
-			const noiseType = uniform( noises[ params.noise ] );
 			const index = uniform( 0, 'uint' );
 			const blend = uniform( 1 );
 
@@ -84,13 +82,6 @@
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
-				// both optimized for a sigma = 1 gaussian in space and an alpha = 0.1 EMA in time. spatial is blue noise
-				// in space only, spatio-temporal is also blue noise in time per pixel so it converges faster when accumulated
-				const [ spatioTemporal, spatial ] = await Promise.all( [
-					loadFASTNoise( 'textures/noises/fast/gauss1-ema01-spatio-temporal.png' ),
-					loadFASTNoise( 'textures/noises/fast/gauss1-ema01-spatial.png' )
-				] );
-
 				targets = [ 0, 1 ].map( () => new THREE.RenderTarget( 1, 1, { type: THREE.FloatType, minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, depthBuffer: false } ) );
 				history = texture( targets[ 1 ].texture );
 				current = texture( targets[ 0 ].texture );
@@ -99,13 +90,7 @@
 
 				const left = screenUV.x.lessThan( 0.5 );
 				const white = hash( uint( screenCoordinate.x ).add( uint( screenCoordinate.y ).mul( 4096 ) ).add( index.mul( 16777259 ) ) );
-				const fastSpatioTemporal = fastNoise( spatioTemporal, new THREE.Vector2(), index ).x;
-				const fastSpatial = fastNoise( spatial, new THREE.Vector2(), index ).x;
-
-				// a single spatial blue noise slice rotated by the golden ratio each frame, so every pixel gets a low discrepancy sequence in time
-				const golden = fastNoise( spatial, new THREE.Vector2(), uint( 0 ) ).x.add( index.mul( uint( 2654435769 ) ).shiftRight( 8 ).toFloat().div( 16777216 ) ).fract();
-
-				const noise = left.select( white, noiseType.equal( 0 ).select( fastSpatioTemporal, noiseType.equal( 1 ).select( fastSpatial, golden ) ) );
+				const noise = left.select( white, animatedIGN( screenCoordinate, index ) );
 
 				// the same shaded sphere over a gradient in each half
 
@@ -120,7 +105,7 @@
 
 				} )();
 
-				// 1 sample per frame, accumulated with an exponential moving average
+				// 1 sample per frame, accumulated with a running average
 
 				const sample = mode.equal( 0 ).select( noise.lessThan( image ).select( 1, 0 ), noise );
 				const accumulated = mix( history.sample( screenUV ).r, sample, blend );
@@ -128,7 +113,7 @@
 				computeQuad = new THREE.QuadMesh( new THREE.NodeMaterial() );
 				computeQuad.material.fragmentNode = vec4( accumulated, 0, 0, 1 );
 
-				// the FAST atlases are optimized for a sigma = 1 gaussian, which GaussianBlurNode uses for sigma = 0 ( kernel radius 3 )
+				// sigma = 0 selects a sigma = 1 Gaussian with kernel radius 3
 
 				const divider = screenCoordinate.x.sub( screenSize.x.mul( 0.5 ) ).abs().lessThan( 1 );
 				const output = ( channel ) => divider.select( vec4( 1, 0.3, 0.1, 1 ), vec4( vec3( channel ), 1 ) );
@@ -143,13 +128,6 @@
 				gui.add( params, 'mode', Object.keys( modes ) ).onChange( ( value ) => {
 
 					mode.value = modes[ value ];
-					samples = 0;
-
-				} );
-				gui.add( params, 'noise', Object.keys( noises ) ).onChange( ( value ) => {
-
-					noiseType.value = noises[ value ];
-					document.getElementById( 'blueLabel' ).textContent = value + ' Blue Noise';
 					samples = 0;
 
 				} );
@@ -182,7 +160,8 @@
 
 				if ( computeQuad === undefined ) return;
 
-				if ( params.animate ) index.value ++;
+				if ( samples === 0 ) index.value = 0;
+				else if ( params.animate ) index.value ++;
 
 				// temporal blur is a running average of every sample since the last reset
 
