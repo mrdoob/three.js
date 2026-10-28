@@ -123,7 +123,7 @@ class Node extends EventDispatcher {
 
 		// private
 
-		this._beforeNodes = null;
+		this._inspectorNode = null;
 
 		/**
 		 * The cache key of this node.
@@ -1099,13 +1099,20 @@ class Node extends EventDispatcher {
 
 	}
 
-	before( node ) {
+	/**
+	 * Registers the inspector node added with `toInspector()` in the builder, so it is updated every frame.
+	 * Nodes that override `build()` without always calling `super.build()` must call this method.
+	 *
+	 * @private
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	_setupInspector( builder ) {
 
-		if ( this._beforeNodes === null ) this._beforeNodes = [];
+		if ( this._inspectorNode !== null && builder.buildStage === 'setup' ) {
 
-		this._beforeNodes.push( node );
+			builder.addNode( this._inspectorNode );
 
-		return this;
+		}
 
 	}
 
@@ -1121,31 +1128,13 @@ class Node extends EventDispatcher {
 	 */
 	build( builder, output = null ) {
 
+		this._setupInspector( builder );
+
 		const refNode = this.getShared( builder );
 
 		if ( this !== refNode ) {
 
 			return refNode.build( builder, output );
-
-		}
-
-		//
-
-		// before nodes only need the setup stage, their results are discarded
-
-		if ( this._beforeNodes !== null && builder.buildStage === 'setup' ) {
-
-			const currentBeforeNodes = this._beforeNodes;
-
-			this._beforeNodes = null;
-
-			for ( const beforeNode of currentBeforeNodes ) {
-
-				beforeNode.build( builder, output );
-
-			}
-
-			this._beforeNodes = currentBeforeNodes;
 
 		}
 

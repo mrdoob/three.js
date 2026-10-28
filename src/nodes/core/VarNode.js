@@ -165,6 +165,8 @@ class VarNode extends Node {
 
 	build( builder, output = null ) {
 
+		this._setupInspector( builder );
+
 		const refNode = this.getShared( builder );
 
 		if ( this !== refNode ) {

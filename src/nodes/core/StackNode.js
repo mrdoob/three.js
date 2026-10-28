@@ -368,6 +368,8 @@ class StackNode extends Node {
 
 	build( builder, ...params ) {
 
+		this._setupInspector( builder );
+
 		const previousStack = getCurrentStack();
 
 		const buildStage = builder.buildStage;
