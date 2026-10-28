@@ -37,7 +37,7 @@
 		</div>
 
 		<div class="label" style="left: 0;">White Noise</div>
-		<div class="label" id="blueLabel" style="right: 0;">FAST Separate Blue Noise</div>
+		<div class="label" id="blueLabel" style="right: 0;">FAST Spatio-Temporal Blue Noise</div>
 
 		<script type="importmap">
 			{
@@ -60,8 +60,8 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			const modes = { 'Sphere': 0, 'Uniform': 1 };
-			const noises = { 'FAST Separate': 0, 'FAST Product': 1, 'Golden Ratio': 2 };
-			const params = { mode: 'Sphere', noise: 'FAST Separate', pixelSize: 2, temporalBlur: true, spatialBlur: true, animate: true };
+			const noises = { 'FAST Spatio-Temporal': 0, 'FAST Spatial': 1, 'Golden Ratio': 2 };
+			const params = { mode: 'Sphere', noise: 'FAST Spatio-Temporal', pixelSize: 2, temporalBlur: true, spatialBlur: true, animate: true };
 
 			let renderer, computeQuad, displayQuad, targets, history, current, display, blurredDisplay;
 			let samples = 0;
@@ -82,11 +82,11 @@
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
-				// both optimized for a sigma = 1 gaussian in space and an alpha = 0.1 EMA in time. product scores the
-				// combined filter, separate scores each filter on its own, which also makes every pixel blue noise in time
-				const [ separate, product ] = await Promise.all( [
-					loadFASTNoise( 'textures/noises/fast/gauss1-ema01-separate.png' ),
-					loadFASTNoise( 'textures/noises/fast/gauss1-ema01-product.png' )
+				// both optimized for a sigma = 1 gaussian in space and an alpha = 0.1 EMA in time. spatial is blue noise
+				// in space only, spatio-temporal is also blue noise in time per pixel so it converges faster when accumulated
+				const [ spatioTemporal, spatial ] = await Promise.all( [
+					loadFASTNoise( 'textures/noises/fast/gauss1-ema01-spatio-temporal.png' ),
+					loadFASTNoise( 'textures/noises/fast/gauss1-ema01-spatial.png' )
 				] );
 
 				targets = [ 0, 1 ].map( () => new THREE.RenderTarget( 1, 1, { type: THREE.FloatType, minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, depthBuffer: false } ) );
@@ -97,13 +97,13 @@
 
 				const left = screenUV.x.lessThan( 0.5 );
 				const white = hash( uint( screenCoordinate.x ).add( uint( screenCoordinate.y ).mul( 4096 ) ).add( index.mul( 16777259 ) ) );
-				const fastSeparate = fastNoise( separate, new THREE.Vector2(), index ).x;
-				const fastProduct = fastNoise( product, new THREE.Vector2(), index ).x;
+				const fastSpatioTemporal = fastNoise( spatioTemporal, new THREE.Vector2(), index ).x;
+				const fastSpatial = fastNoise( spatial, new THREE.Vector2(), index ).x;
 
 				// a single spatial blue noise slice rotated by the golden ratio each frame, so every pixel gets a low discrepancy sequence in time
-				const golden = fastNoise( product, new THREE.Vector2(), uint( 0 ) ).x.add( index.mul( uint( 2654435769 ) ).shiftRight( 8 ).toFloat().div( 16777216 ) ).fract();
+				const golden = fastNoise( spatial, new THREE.Vector2(), uint( 0 ) ).x.add( index.mul( uint( 2654435769 ) ).shiftRight( 8 ).toFloat().div( 16777216 ) ).fract();
 
-				const noise = left.select( white, noiseType.equal( 0 ).select( fastSeparate, noiseType.equal( 1 ).select( fastProduct, golden ) ) );
+				const noise = left.select( white, noiseType.equal( 0 ).select( fastSpatioTemporal, noiseType.equal( 1 ).select( fastSpatial, golden ) ) );
 
 				// the same shaded sphere over a gradient in each half
 
