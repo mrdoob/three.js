@@ -1,0 +1,12 @@
+FAST spatiotemporal blue noise by Electronic Arts, https://github.com/electronicarts/fastnoise (see LICENSE.txt)
+
+Source: noise.zip in that repository, 128x128x32 textures optimized for a sigma = 1 gaussian
+spatially and an alpha = 0.1 exponential moving average temporally, using EA's "product" filter combine.
+It scores the combined space x time filter, so the noise is blue in space but close to white over time per pixel.
+It is the best choice for a single spatially blurred frame; under accumulation use gauss1-ema01-spatio-temporal.
+
+Packing: 256x4096 RGB PNG, 32 slices of 128 rows stacked vertically (slice t at y = t * 128).
+Left 128 columns: R, G = noise/vector2/temporal/exp/vector2_uniform_gauss1_0_exp0101_product_t.png channels R, G
+                  B = noise/real/temporal/exp/real_uniform_gauss1_0_exp0101_product_t.png channel R
+Right 128 columns: R = G = B = the same real texture, circularly shifted 83 rows down and 49 columns right
+Read with examples/jsm/tsl/utils/FASTNoise.js as fastNoise().xyzw.
