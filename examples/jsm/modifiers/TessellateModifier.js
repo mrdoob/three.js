@@ -101,11 +101,11 @@ class TessellateModifier {
 		const hasUVs = attributes.uv !== undefined;
 		const hasUV1s = attributes.uv1 !== undefined;
 
-		let positions = attributes.position.array;
-		let normals = hasNormals ? attributes.normal.array : null;
-		let colors = hasColors ? attributes.color.array : null;
-		let uvs = hasUVs ? attributes.uv.array : null;
-		let uv1s = hasUV1s ? attributes.uv1.array : null;
+		let positions = getFloatArray( attributes.position, 3 );
+		let normals = hasNormals ? getFloatArray( attributes.normal, 3 ) : null;
+		let colors = hasColors ? getFloatArray( attributes.color, 3 ) : null;
+		let uvs = hasUVs ? getFloatArray( attributes.uv, 2 ) : null;
+		let uv1s = hasUV1s ? getFloatArray( attributes.uv1, 2 ) : null;
 
 		let positions2 = positions;
 		let normals2 = normals;
@@ -334,6 +334,27 @@ class TessellateModifier {
 		return geometry2;
 
 	}
+
+}
+
+// Returns the first itemSize components of each item as plain floats, so
+// interleaved and normalized (quantized) attributes can be read with a fixed
+// stride.
+function getFloatArray( attribute, itemSize ) {
+
+	const array = new Float32Array( attribute.count * itemSize );
+
+	for ( let i = 0; i < attribute.count; i ++ ) {
+
+		for ( let j = 0; j < itemSize; j ++ ) {
+
+			array[ i * itemSize + j ] = attribute.getComponent( i, j );
+
+		}
+
+	}
+
+	return array;
 
 }
 
