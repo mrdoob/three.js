@@ -539,6 +539,7 @@ export class WebGLNodesHandler {
 			fogColor: { value: new Color() },
 			fogNear: { value: 0 },
 			fogFar: { value: 0 },
+			fogDensity: { value: 0 },
 			envMapIntensity: { value: 0 },
 			...UniformsUtils.clone( UniformsLib.lights )
 		};
