@@ -1,7 +1,7 @@
 import { BackSide, Box3, BufferAttribute, BufferGeometry, ClampToEdgeWrapping, Color, DoubleSide, EquirectangularReflectionMapping, EquirectangularRefractionMapping, FloatType, FrontSide, LinearMipmapLinearFilter, Matrix4, MirroredRepeatWrapping, Node, NodeMaterial, NodeUpdateType, QuadMesh, RendererUtils, RenderTarget, RepeatWrapping, SRGBColorSpace, StorageBufferAttribute, StructTypeNode, Vector3, Vector4 } from 'three/webgpu';
 import { Fn, If, Loop, abs, asin, atan, cos, cross, dFdx, dFdy, dot, float, fract, hash, instanceIndex, int, length, luminance, mix, nodeObject, normalize, pmremTexture, screenCoordinate, select, sin, smoothstep, sqrt, storage, texture, textureLoad, uint, uniform, uv, uvec2, vec2, vec3, vec4 } from 'three/tsl';
 import { MeshBVH, SAH } from 'three-mesh-bvh';
-import { BVHComputeData, bvhNodeBoundsStruct, bvhNodeStruct, intersectRayTriangle, rayIntersectionResultStruct, rayStruct, wgslTagCode, wgslTagFn } from 'three-mesh-bvh/webgpu';
+import { BVHComputeData, bvhNodeBoundsStruct, intersectRayTriangle, rayIntersectionResultStruct, rayStruct, wgslTagCode, wgslTagFn } from 'three-mesh-bvh/webgpu';
 
 import { LightMapper } from './LightMapper.js';
 
@@ -36,6 +36,10 @@ const SKY_GRID = 8;
 
 const MATERIAL_STRIDE = 11;
 const EMITTER_STRIDE = 6;
+
+// the depth of the traversal stacks, at least the maximum depth of the BVH
+
+const STACK_DEPTH = 48;
 const LIGHT_STRIDE = 4;
 
 // the layers of the texture array that holds the material maps, every WebGPU device supports 256
@@ -818,7 +822,7 @@ class RayTracedRadiosity {
 	_createTrace() {
 
 		const bvh = this._bvh;
-		const { index } = bvh.storage;
+		const { index, nodes } = bvh.storage;
 		const { sampleTrianglePoint } = bvh.fns;
 		const materials = this._materials;
 		const triangles = this._triangles;
@@ -980,32 +984,21 @@ class RayTracedRadiosity {
 		// rays, which stops at the first opaque hit. The geometry is in world space, so the rays are not
 		// transformed. Alpha tested and transparent triangles are skipped like an any-hit shader would
 
-		const boundsOrder = wgslTagFn/* wgsl */`
-			// fn
-			fn rayTracedRadiosityBoundsOrder( ray: ${ rayStruct }, splitAxis: u32, node: ${ bvhNodeStruct } ) -> bool {
-
-				return ray.direction[ splitAxis ] >= 0.0;
-
-			}
-		`;
+		// the distance to the entry of a ray into a node, or -1 if it misses the node within a distance
 
 		const boundsDistance = wgslTagFn/* wgsl */`
 			// fn
-			fn rayTracedRadiosityBoundsDistance( ray: ${ rayStruct }, bounds: ${ bvhNodeBoundsStruct } ) -> f32 {
+			fn rayTracedRadiosityBoundsDistance( origin: vec3f, invDir: vec3f, bounds: ${ bvhNodeBoundsStruct }, limit: f32 ) -> f32 {
 
-				let boundsMin = vec3f( bounds.min[ 0 ], bounds.min[ 1 ], bounds.min[ 2 ] );
-				let boundsMax = vec3f( bounds.max[ 0 ], bounds.max[ 1 ], bounds.max[ 2 ] );
-
-				let invDir = 1.0 / ray.direction;
-				let tMinPlane = ( boundsMin - ray.origin ) * invDir;
-				let tMaxPlane = ( boundsMax - ray.origin ) * invDir;
+				let tMinPlane = ( vec3f( bounds.min[ 0 ], bounds.min[ 1 ], bounds.min[ 2 ] ) - origin ) * invDir;
+				let tMaxPlane = ( vec3f( bounds.max[ 0 ], bounds.max[ 1 ], bounds.max[ 2 ] ) - origin ) * invDir;
 				let tMin = min( tMinPlane, tMaxPlane );
 				let tMax = max( tMinPlane, tMaxPlane );
 
 				let near = max( max( max( tMin.x, tMin.y ), tMin.z ), 0.0 );
 				let far = min( min( tMax.x, tMax.y ), tMax.z );
 
-				return select( - 1.0, near, far >= near && ( ray.maxDist <= 0.0 || near < ray.maxDist ) );
+				return select( - 1.0, near, far >= near && near <= limit );
 
 			}
 		`;
@@ -1032,22 +1025,7 @@ class RayTracedRadiosity {
 			}
 		`;
 
-		const closestHit = bvh.getShapecastFn( {
-			name: 'rayTracedRadiosityClosestHit',
-			shapeStruct: rayStruct,
-			resultStruct: rayIntersectionResultStruct,
-			boundsOrderFn: boundsOrder,
-			intersectsBoundsFn: wgslTagFn/* wgsl */`
-				// fn
-				fn rayTracedRadiosityClosestBounds( ray: ${ rayStruct }, bounds: ${ bvhNodeBoundsStruct }, result: ptr<function, ${ rayIntersectionResultStruct }> ) -> u32 {
-
-					let dist = ${ boundsDistance }( ray, bounds );
-
-					return select( 0u, 1u, dist >= 0.0 && ( ! result.didHit || dist < result.dist ) );
-
-				}
-			`,
-			intersectRangeFn: wgslTagFn/* wgsl */`
+		const closestRange = wgslTagFn/* wgsl */`
 				// fn
 				fn rayTracedRadiosityClosestRange( ray: ${ rayStruct }, offset: u32, count: u32, result: ptr<function, ${ rayIntersectionResultStruct }> ) -> bool {
 
@@ -1057,7 +1035,7 @@ class RayTracedRadiosity {
 
 						${ triangleHit }
 
-						if ( hit.didHit && ( ray.maxDist <= 0.0 || hit.dist < ray.maxDist ) && ( ! result.didHit || hit.dist < result.dist ) ) {
+						if ( hit.didHit && ( ray.maxDist <= 0.0 || hit.dist < ray.maxDist ) && ( ! result.didHit || hit.dist < result.dist || ( hit.dist == result.dist && ti < result.indices.w ) ) ) {
 
 							${ this._alpha ? wgslTagCode/* wgsl */`
 
@@ -1089,25 +1067,11 @@ class RayTracedRadiosity {
 					return didHit;
 
 				}
-			`
-		} );
+			`;
 
 		const shadowStruct = new StructTypeNode( { transmittance: 'float' }, 'RayTracedRadiosityShadow' );
 
-		const anyHit = bvh.getShapecastFn( {
-			name: 'rayTracedRadiosityAnyHit',
-			shapeStruct: rayStruct,
-			resultStruct: shadowStruct,
-			boundsOrderFn: boundsOrder,
-			intersectsBoundsFn: wgslTagFn/* wgsl */`
-				// fn
-				fn rayTracedRadiosityShadowBounds( ray: ${ rayStruct }, bounds: ${ bvhNodeBoundsStruct }, result: ptr<function, ${ shadowStruct }> ) -> u32 {
-
-					return select( 0u, 1u, result.transmittance > 0.0 && ${ boundsDistance }( ray, bounds ) >= 0.0 );
-
-				}
-			`,
-			intersectRangeFn: wgslTagFn/* wgsl */`
+		const shadowRange = wgslTagFn/* wgsl */`
 				// fn
 				fn rayTracedRadiosityShadowRange( ray: ${ rayStruct }, offset: u32, count: u32, result: ptr<function, ${ shadowStruct }> ) -> bool {
 
@@ -1128,8 +1092,136 @@ class RayTracedRadiosity {
 					return result.transmittance < 1.0;
 
 				}
-			`
-		} );
+			`;
+
+		// the merged geometry is one cluster, so the top level of the BVH is a single leaf that points to
+		// the root of the triangles. The traversal tests both children of a node, descends into the
+		// nearer one and pushes the other one with its entry distance, which is skipped once a closer
+		// hit is found, see "Understanding the Efficiency of Ray Traversal on GPUs" (Aila and Laine, 2009).
+		// Hits at the same distance, e.g. of coplanar triangles, go to the first triangle, so the result
+		// does not depend on the order of the traversal
+
+		const nodeArray = nodes.proxyNode.value.array;
+		const root = ( nodeArray[ 7 ] & 0xffff0000 ) !== 0 ? nodeArray[ 6 ] : 0;
+
+		const traverse = ( name, resultStruct, range, closest ) => wgslTagFn/* wgsl */`
+			// fn
+			fn ${ name }( ray: ${ rayStruct }, result: ptr<function, ${ resultStruct }> ) -> bool {
+
+				let invDir = 1.0 / ray.direction;
+				var limit = select( 3.4e38, ray.maxDist, ray.maxDist > 0.0 );
+
+				var stackNode: array<u32, ${ STACK_DEPTH }>;
+				var stackDistance: array<f32, ${ STACK_DEPTH }>;
+				var pointer = 0u;
+
+				var current = ${ root }u;
+				var pop = ${ boundsDistance }( ray.origin, invDir, ${ nodes }[ current ].bounds, limit ) < 0.0;
+
+				loop {
+
+					if ( ! pop ) {
+
+						let node = ${ nodes }[ current ];
+						let info = node.splitAxisOrTriangleCount;
+
+						if ( ( info & 0xffff0000u ) != 0u ) {
+
+							${ closest ? wgslTagCode/* wgsl */`
+
+								if ( ${ range }( ray, node.rightChildOrTriangleOffset, info & 0xffffu, result ) ) {
+
+									limit = result.dist;
+
+								}
+
+							` : wgslTagCode/* wgsl */`
+
+								${ range }( ray, node.rightChildOrTriangleOffset, info & 0xffffu, result );
+
+								if ( result.transmittance <= 0.0 ) {
+
+									return true;
+
+								}
+
+							` }
+
+							pop = true;
+
+						} else {
+
+							let left = current + 1u;
+							let right = current + node.rightChildOrTriangleOffset;
+							let leftDistance = ${ boundsDistance }( ray.origin, invDir, ${ nodes }[ left ].bounds, limit );
+							let rightDistance = ${ boundsDistance }( ray.origin, invDir, ${ nodes }[ right ].bounds, limit );
+
+							if ( leftDistance >= 0.0 && rightDistance >= 0.0 ) {
+
+								let leftFirst = leftDistance <= rightDistance;
+
+								current = select( right, left, leftFirst );
+
+								if ( pointer < ${ STACK_DEPTH }u ) {
+
+									stackNode[ pointer ] = select( left, right, leftFirst );
+									stackDistance[ pointer ] = max( leftDistance, rightDistance );
+									pointer += 1u;
+
+								}
+
+							} else if ( leftDistance >= 0.0 ) {
+
+								current = left;
+
+							} else if ( rightDistance >= 0.0 ) {
+
+								current = right;
+
+							} else {
+
+								pop = true;
+
+							}
+
+						}
+
+					}
+
+					if ( pop ) {
+
+						// the pushed nodes behind the closest hit are skipped
+
+						loop {
+
+							if ( pointer == 0u ) {
+
+								return ${ closest ? 'result.didHit' : 'result.transmittance < 1.0' };
+
+							}
+
+							pointer -= 1u;
+
+							if ( stackDistance[ pointer ] <= limit ) {
+
+								break;
+
+							}
+
+						}
+
+						current = stackNode[ pointer ];
+						pop = false;
+
+					}
+
+				}
+
+			}
+		`;
+
+		const closestHit = traverse( 'rayTracedRadiosityClosestHit', rayIntersectionResultStruct, closestRange, true );
+		const anyHit = traverse( 'rayTracedRadiosityAnyHit', shadowStruct, shadowRange, false );
 
 		// traces a ray and returns the barycentric coordinates of the hit, the triangle plus one, negated
 		// for back faces, and the log2 of the hit distance over the uv0 texel density, for the level of
