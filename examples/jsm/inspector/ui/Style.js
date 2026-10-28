@@ -2109,6 +2109,8 @@ export class Style {
 		width: 1px;
 		left: 50%;
 		background-color: transparent;
+		/*background-color: rgba(255, 255, 255, 0.25);
+		box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);*/
 		cursor: ew-resize;
 		pointer-events: auto !important;
 		z-index: 10;
@@ -2131,32 +2133,6 @@ export class Style {
 		width: 25px;
 		background: transparent;
 		cursor: ew-resize;
-	}
-
-	.split-screen-line::after {
-		content: '';
-		position: absolute;
-		top: -1px;
-		bottom: -1px;
-		left: -5px;
-		width: 11px;
-		pointer-events: none;
-		background-image:
-			url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M-0.5 -1 L5.5 7 L11.5 -1 Z' fill='rgba(30,30,36,0.85)' stroke='%234a4a5a' stroke-width='1' stroke-linejoin='round'/%3E%3C/svg%3E"),
-			url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M-0.5 8 L5.5 0 L11.5 8 Z' fill='rgba(30,30,36,0.85)' stroke='%234a4a5a' stroke-width='1' stroke-linejoin='round'/%3E%3C/svg%3E");
-		background-position: top center, bottom center;
-		background-repeat: no-repeat;
-		opacity: 1;
-		transition: opacity 0.15s ease-out;
-	}
-
-	.split-screen-line:hover::after,
-	.split-screen-line:active::after,
-	.split-screen-line.active::after {
-		opacity: 1;
-		background-image:
-			url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M-0.5 -1 L5.5 7 L11.5 -1 Z' fill='%2300aaff' stroke='%2300aaff' stroke-width='1' stroke-linejoin='round'/%3E%3C/svg%3E"),
-			url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M-0.5 8 L5.5 0 L11.5 8 Z' fill='%2300aaff' stroke='%2300aaff' stroke-width='1' stroke-linejoin='round'/%3E%3C/svg%3E");
 	}
 
 	/* Grid Mode styles for List component */
