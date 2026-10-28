@@ -19,6 +19,12 @@ class LightingModel {
 
 		builder.lightsNode.setupLights( builder, builder.lightsNode.getLightNodes( builder ) );
 
+		if ( builder.context.lightProbeIrradiance !== undefined ) {
+
+			builder.context.irradiance.addAssign( builder.context.lightProbeIrradiance );
+
+		}
+
 		// indirect
 
 		this.indirect( builder );

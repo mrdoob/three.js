@@ -1,5 +1,5 @@
-import { AnalyticLightNode } from 'three/webgpu';
-import { If, array, getShIrradianceAt, normalWorld, positionWorld, reference, renderGroup, texture3D, uniform, vec3 } from 'three/tsl';
+import { AnalyticLightNode, NodeUpdateType, Vector3 } from 'three/webgpu';
+import { If, array, getShIrradianceAt, normalWorld, positionWorld, renderGroup, texture3D, uniform, vec3 } from 'three/tsl';
 
 // Padding texels at each boundary of every atlas sub-volume.
 export const ATLAS_PADDING = 1;
@@ -114,48 +114,52 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 	}
 
+	constructor( light = null ) {
+
+		super( light );
+
+		// Bounce grid intensity changes between bake passes within a frame.
+
+		this._min = uniform( new Vector3() );
+		this._max = uniform( new Vector3() );
+		this._resolution = uniform( new Vector3() );
+		this._intensity = uniform( 1 ).setGroup( renderGroup );
+
+		this.updateType = NodeUpdateType.RENDER;
+
+	}
+
+	update( /* frame */ ) {
+
+		const light = this.light;
+
+		this._min.value.copy( light.boundingBox.min );
+		this._max.value.copy( light.boundingBox.max );
+		this._resolution.value.copy( light.resolution );
+		this._intensity.value = light.intensity;
+
+	}
+
 	setup( builder ) {
 
-		// The first grid samples the last grid whose cells contain the fragment.
+		const light = this.light;
 
-		const grids = builder.lightsNode.getLights().filter( light => light.isLightProbeGrid && light.texture !== null );
+		const min = this._min;
+		const max = this._max;
+		const res = this._resolution;
 
-		if ( grids[ 0 ] !== this.light ) return;
+		const spacing = max.sub( min ).div( res );
+		const samplePos = positionWorld.add( normalWorld.mul( spacing ).mul( 0.5 ) );
+		const inside = samplePos.greaterThanEqual( min ).all().and( samplePos.lessThanEqual( max ).all() );
 
-		const irradiance = vec3( 0 ).toVar( 'lightProbeGridIrradiance' );
+		builder.context.lightProbeIrradiance ||= vec3().toVar( 'lightProbeIrradiance' );
 
-		const nodes = grids.map( ( light ) => {
+		If( inside, () => {
 
-			const min = reference( 'boundingBox.min', 'vec3', light ).setGroup( renderGroup );
-			const max = reference( 'boundingBox.max', 'vec3', light ).setGroup( renderGroup );
-			const res = reference( 'resolution', 'vec3', light ).setGroup( renderGroup );
-			const intensity = reference( 'intensity', 'float', light ).setGroup( renderGroup );
-			const range = max.sub( min );
-			const spacing = range.div( res.sub( 1.0 ) );
+			const irradiance = getGridIrradiance( light, min, max, res, this._intensity, positionWorld, normalWorld ).toConst();
+			builder.context.lightProbeIrradiance.assign( irradiance );
 
-			const samplePos = positionWorld.add( normalWorld.mul( spacing ).mul( 0.5 ) );
-			const cell = spacing.mul( 0.5 );
-			const inside = samplePos.greaterThanEqual( min.sub( cell ) ).all().and( samplePos.lessThanEqual( max.add( cell ) ).all() );
-
-			const sample = () => {
-
-				irradiance.assign( getGridIrradiance( light, min, max, res, intensity, positionWorld, normalWorld ) );
-
-			};
-
-			return { inside, sample };
-
-		} ).reverse();
-
-		let chain = If( nodes[ 0 ].inside, nodes[ 0 ].sample );
-
-		for ( let i = 1; i < nodes.length; i ++ ) {
-
-			chain = chain.ElseIf( nodes[ i ].inside, nodes[ i ].sample );
-
-		}
-
-		builder.context.irradiance.addAssign( irradiance );
+		} );
 
 	}
 
