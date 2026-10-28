@@ -536,7 +536,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		if ( shadowColor ) {
 
-			shadowOutput.toInspector( `${ inspectName } / Color`, () => {
+			shadowColor.toInspector( `${ inspectName } / Color`, () => {
 
 				if ( this.shadowMap.texture.isCubeTexture ) {
 

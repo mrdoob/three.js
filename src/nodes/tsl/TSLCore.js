@@ -666,7 +666,9 @@ class ShaderCallNodeInternal extends Node {
 
 	build( builder, output = null ) {
 
-		// The call does not use Node.build(), so it handles shared and overridden nodes and assignable state here.
+		// The call does not use Node.build(), so it handles the inspector node, shared and overridden nodes and assignable state here.
+		this._setupInspector( builder );
+
 		const refNode = this.getShared( builder );
 
 		if ( this !== refNode ) {
