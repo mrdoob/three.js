@@ -29,12 +29,12 @@ export const loadFASTNoise = async ( url ) => {
  */
 export const fastNoise = ( atlas, offset, index = frameId ) => Fn( () => {
 
-	// shift the tile and rotate the values (golden ratio, mod 1) once per 32 frame cycle so the loop doesn't repeat
+	// shift the tile once per 32 frame cycle so the loop doesn't repeat. the values are not rotated,
+	// since wrapping them mod 1 breaks the per pixel stratification of temporally optimized noise
 	const cycle = uint( index ).div( 32 );
 	const pixel = ivec2( screenCoordinate ).add( ivec2( offset.x, offset.y ) ).add( ivec2( 37, 71 ).mul( cycle.mod( 128 ).toInt() ) ).mod( 128 );
 	const coordinate = ivec2( pixel.x, pixel.y.add( uint( index ).mod( 32 ).mul( 128 ).toInt() ) );
-	const rotation = cycle.mul( uint( 2654435769 ) ).shiftRight( 24 ).toFloat(); // fract( cycle * φ ) in 1/256 bins
 	// bin centers avoid exact 0 and 1
-	return vec4( textureLoad( atlas, coordinate ).rgb, textureLoad( atlas, coordinate.add( ivec2( 128, 0 ) ) ).r ).mul( 255 ).add( rotation ).round().mod( 256 ).add( 0.5 ).div( 256 );
+	return vec4( textureLoad( atlas, coordinate ).rgb, textureLoad( atlas, coordinate.add( ivec2( 128, 0 ) ) ).r ).mul( 255 ).add( 0.5 ).div( 256 );
 
 } )();

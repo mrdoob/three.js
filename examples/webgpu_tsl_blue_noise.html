@@ -37,7 +37,7 @@
 		</div>
 
 		<div class="label" style="left: 0;">White Noise</div>
-		<div class="label" style="right: 0;">FAST Blue Noise</div>
+		<div class="label" id="blueLabel" style="right: 0;">FAST Separate Blue Noise</div>
 
 		<script type="importmap">
 			{
@@ -56,15 +56,18 @@
 			import { Fn, float, hash, mix, screenCoordinate, screenSize, screenUV, texture, uint, uniform, vec2, vec3, vec4 } from 'three/tsl';
 
 			import { fastNoise, loadFASTNoise } from 'three/addons/tsl/utils/FASTNoise.js';
+			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			const modes = { 'Sphere': 0, 'Uniform': 1 };
-			const params = { mode: 'Sphere', pixelSize: 2, frames: 0, animated: true };
+			const noises = { 'FAST Separate': 0, 'FAST Product': 1, 'Golden Ratio': 2 };
+			const params = { mode: 'Sphere', noise: 'FAST Separate', pixelSize: 2, temporalBlur: true, spatialBlur: true, animate: true };
 
-			let renderer, computeQuad, displayQuad, targets, history, current;
+			let renderer, computeQuad, displayQuad, targets, history, current, display, blurredDisplay;
 			let samples = 0;
 
 			const mode = uniform( modes[ params.mode ] );
+			const noiseType = uniform( noises[ params.noise ] );
 			const index = uniform( 0, 'uint' );
 			const blend = uniform( 1 );
 
@@ -79,9 +82,14 @@
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
-				const atlas = await loadFASTNoise( 'textures/noises/fast/gauss1-ema01-product.png' );
+				// both optimized for a sigma = 1 gaussian in space and an alpha = 0.1 EMA in time. product scores the
+				// combined filter, separate scores each filter on its own, which also makes every pixel blue noise in time
+				const [ separate, product ] = await Promise.all( [
+					loadFASTNoise( 'textures/noises/fast/gauss1-ema01-separate.png' ),
+					loadFASTNoise( 'textures/noises/fast/gauss1-ema01-product.png' )
+				] );
 
-				targets = [ 0, 1 ].map( () => new THREE.RenderTarget( 1, 1, { type: THREE.HalfFloatType, minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, depthBuffer: false } ) );
+				targets = [ 0, 1 ].map( () => new THREE.RenderTarget( 1, 1, { type: THREE.FloatType, minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, depthBuffer: false } ) );
 				history = texture( targets[ 1 ].texture );
 				current = texture( targets[ 0 ].texture );
 
@@ -89,8 +97,13 @@
 
 				const left = screenUV.x.lessThan( 0.5 );
 				const white = hash( uint( screenCoordinate.x ).add( uint( screenCoordinate.y ).mul( 4096 ) ).add( index.mul( 16777259 ) ) );
-				const blue = fastNoise( atlas, new THREE.Vector2(), index ).x;
-				const noise = left.select( white, blue );
+				const fastSeparate = fastNoise( separate, new THREE.Vector2(), index ).x;
+				const fastProduct = fastNoise( product, new THREE.Vector2(), index ).x;
+
+				// a single spatial blue noise slice rotated by the golden ratio each frame, so every pixel gets a low discrepancy sequence in time
+				const golden = fastNoise( product, new THREE.Vector2(), uint( 0 ) ).x.add( index.mul( uint( 2654435769 ) ).shiftRight( 8 ).toFloat().div( 16777216 ) ).fract();
+
+				const noise = left.select( white, noiseType.equal( 0 ).select( fastSeparate, noiseType.equal( 1 ).select( fastProduct, golden ) ) );
 
 				// the same shaded sphere over a gradient in each half
 
@@ -113,11 +126,16 @@
 				computeQuad = new THREE.QuadMesh( new THREE.NodeMaterial() );
 				computeQuad.material.fragmentNode = vec4( accumulated, 0, 0, 1 );
 
-				const channel = current.sample( screenUV ).r;
+				// the FAST atlases are optimized for a sigma = 1 gaussian, which GaussianBlurNode uses for sigma = 0 ( kernel radius 3 )
+
 				const divider = screenCoordinate.x.sub( screenSize.x.mul( 0.5 ) ).abs().lessThan( 1 );
+				const output = ( channel ) => divider.select( vec4( 1, 0.3, 0.1, 1 ), vec4( vec3( channel ), 1 ) );
+
+				display = output( current.sample( screenUV ).r );
+				blurredDisplay = output( gaussianBlur( current, null, 0 ).r );
 
 				displayQuad = new THREE.QuadMesh( new THREE.NodeMaterial() );
-				displayQuad.material.fragmentNode = divider.select( vec4( 1, 0.3, 0.1, 1 ), vec4( vec3( channel ), 1 ) );
+				displayQuad.material.fragmentNode = params.spatialBlur ? blurredDisplay : display;
 
 				const gui = renderer.inspector.createParameters( 'Settings' );
 				gui.add( params, 'mode', Object.keys( modes ) ).onChange( ( value ) => {
@@ -126,9 +144,22 @@
 					samples = 0;
 
 				} );
+				gui.add( params, 'noise', Object.keys( noises ) ).onChange( ( value ) => {
+
+					noiseType.value = noises[ value ];
+					document.getElementById( 'blueLabel' ).textContent = value + ' Blue Noise';
+					samples = 0;
+
+				} );
 				gui.add( params, 'pixelSize', 1, 8, 1 ).name( 'pixel size' ).onChange( onWindowResize );
-				gui.add( params, 'frames', [ 0, 4, 8, 16, 32, 64, 128 ] ).name( 'history frames' ).onChange( () => samples = 0 );
-				gui.add( params, 'animated' ).onChange( () => samples = 0 );
+				gui.add( params, 'temporalBlur' ).name( 'temporal blur' ).onChange( () => samples = 0 );
+				gui.add( params, 'spatialBlur' ).name( 'spatial blur' ).onChange( ( value ) => {
+
+					displayQuad.material.fragmentNode = value ? blurredDisplay : display;
+					displayQuad.material.needsUpdate = true;
+
+				} );
+				gui.add( params, 'animate' ).onChange( () => samples = 0 );
 
 				onWindowResize();
 				window.addEventListener( 'resize', onWindowResize );
@@ -149,12 +180,12 @@
 
 				if ( computeQuad === undefined ) return;
 
-				if ( params.animated ) index.value ++;
+				if ( params.animate ) index.value ++;
 
-				// plain average of the first N samples, then an EMA with the same variance as an N frame average
+				// temporal blur is a running average of every sample since the last reset
 
 				samples ++;
-				blend.value = samples < params.frames ? 1 / samples : Math.min( 1, 2 / ( params.frames + 1 ) );
+				blend.value = params.temporalBlur ? 1 / samples : 1;
 
 				renderer.setRenderTarget( targets[ 0 ] );
 				computeQuad.render( renderer );
