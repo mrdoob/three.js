@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { CodeCompiler } from '../code/CodeCompiler.js';
+import { formatCode } from '../code/CodeFormatter.js';
 import { parseScript, isStandardModule, resolvePath } from '../code/CodeRunner.js';
 import { compressString, decompressString } from '../utils/GuideUtils.js';
 
@@ -900,7 +900,7 @@ class PlaygroundManager {
 		if ( ! this.guide.codeEditor || ( activeTab && activeTab.readOnly ) ) return;
 
 		const code = this.guide.codeEditor.getValue();
-		const formatted = await CodeCompiler.format( code );
+		const formatted = formatCode( code );
 
 		// Set the new formatted value in the editor and update state/hash
 		const currentVal = this.guide.codeEditor.getValue();

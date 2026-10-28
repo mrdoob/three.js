@@ -5,7 +5,6 @@ import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 import { parseGuide, parse, tokenizeCodeToElement } from './utils/MarkdownUtils.js';
 import { CodeRunner } from './code/CodeRunner.js';
-import { CodeCompiler } from './code/CodeCompiler.js';
 import { CodeEditor } from './editor/CodeEditor.js';
 import { SearchManager } from './managers/SearchManager.js';
 import { HistoryManager } from './managers/HistoryManager.js';
@@ -258,7 +257,6 @@ class Guide {
 			previewFullscreen: document.getElementById( 'preview-fullscreen' ),
 			previewRefresh: document.getElementById( 'preview-refresh' ),
 			previewPlayground: document.getElementById( 'preview-playground' ),
-			previewCopy: document.getElementById( 'preview-copy' ),
 			editorConsole: document.getElementById( 'editor-console' ),
 			consoleHeader: document.getElementById( 'console-header' ),
 			consoleClearBtn: document.getElementById( 'console-clear-btn' ),
@@ -869,66 +867,6 @@ class Guide {
 			}
 
 			this.createIcons( this.dom.previewFullscreen );
-
-		};
-
-		this.dom.previewCopy.onclick = async () => {
-
-			let code = '';
-			if ( this.playgroundManager.playgroundTabs ) {
-
-				const mainTab = this.playgroundManager.playgroundTabs.find( t => t.name === 'main' );
-				if ( mainTab ) {
-
-					code = mainTab.code;
-
-				}
-
-			}
-
-			if ( ! code && this.codeEditor ) {
-
-				code = this.codeEditor.getValue();
-
-			}
-
-			// Ensure all virtual tabs are in this.runner.scripts before compiling
-			if ( this.playgroundManager.playgroundTabs ) {
-
-				this.playgroundManager.playgroundTabs.forEach( tab => {
-
-					if ( tab.name !== 'main' ) {
-
-						this.runner.scripts[ tab.name ] = {
-							url: null,
-							text: tab.code,
-							instance: this.runner.scripts[ tab.name ] ? this.runner.scripts[ tab.name ].instance : null,
-							promise: this.runner.scripts[ tab.name ] ? this.runner.scripts[ tab.name ].promise : null
-						};
-
-					}
-
-				} );
-
-			}
-
-			const compiler = new CodeCompiler();
-			const compiledCode = await compiler.compile( code, this.runner.scripts );
-
-			navigator.clipboard.writeText( compiledCode ).then( () => {
-
-				this.dom.previewCopy.classList.add( 'success' );
-				this.dom.previewCopy.innerHTML = '<i data-icon="check" style="width: 1.15rem; height: 1.15rem;"></i>';
-				this.createIcons( this.dom.previewCopy );
-
-				setTimeout( () => {
-
-					this.dom.previewCopy.classList.remove( 'success' );
-					this.dom.previewCopy.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-codeblock" style="width: 1.15rem; height: 1.15rem; display: block;"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M5 4l-2 2l2 2" /><path d="M12 4l2 2l-2 2" /><path d="M8 8l1 -4" /><path d="M17 6a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-7" /></svg>';
-
-				}, 2000 );
-
-			} );
 
 		};
 
