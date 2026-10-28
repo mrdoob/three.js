@@ -3319,13 +3319,18 @@ function imprintGeometry( geometry, meshes, bvh, scene, tolerance, gap ) {
 			v1.subVectors( wc, wa );
 			normal.crossVectors( v0, v1 );
 
-			if ( normal.lengthSq() === 0 ) continue;
+			// the denominator of the barycentric coordinates, d00 d11 - d01², from the cross product: the
+			// difference cancels to zero or below for slivers
+
+			const denominator = normal.lengthSq();
+
+			if ( denominator === 0 ) continue;
 
 			// back-sided materials receive light on the back of the faces
 
 			normal.normalize().multiplyScalar( flips[ k ] );
 
-			const d00 = v0.dot( v0 ), d01 = v0.dot( v1 ), d11 = v1.dot( v1 ), denominator = d00 * d11 - d01 * d01;
+			const d00 = v0.dot( v0 ), d01 = v0.dot( v1 ), d11 = v1.dot( v1 );
 
 			// a point in the plane of the triangle to its frame, by its barycentric coordinates
 
@@ -3432,6 +3437,8 @@ function imprintGeometry( geometry, meshes, bvh, scene, tolerance, gap ) {
 		for ( const segment of segments ) {
 
 			// clipped at the edges themselves, so that the triangles on both sides find the same points on them
+
+			if ( [ ...segment.p, ...segment.q ].every( Number.isFinite ) === false ) continue;
 
 			const ends = clipToTriangle( corners, segment.p, segment.q, delta * 1e-6 );
 
