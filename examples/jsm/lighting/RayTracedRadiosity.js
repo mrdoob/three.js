@@ -586,27 +586,36 @@ class RayTracedRadiosity {
 
 		geometry.boundsTree = new MeshBVH( geometry, { strategy: SAH, targetLeafSize: 4 } );
 
-		const bvh = new BVHComputeData( geometry, { attributes: { position: 'vec4f', surface: 'vec4f' } } );
+		const bvh = new BVHComputeData( geometry, { attributes: { surface: 'vec4f' } } );
 		bvh.update();
 
-		// the BVH sorts the triangles of the index, the per triangle data follows their order
+		// the BVH sorts the triangles of the index, the per triangle data follows their order. The
+		// corners are copied next to it, so the intersection tests read one buffer without indirection
 
 		const sorted = geometry.getIndex().array;
-		const triangleData = new Float32Array( Math.max( sorted.length / 3, 2 ) * 2 );
+		const triangleData = new Float32Array( Math.max( sorted.length / 3, 1 ) * 12 );
 
 		for ( let i = 0; i < sorted.length / 3; i ++ ) {
 
 			const triangle = sorted[ i * 3 ] / 3;
 
-			triangleData[ i * 2 ] = triangles[ triangle * 2 ];
-			triangleData[ i * 2 + 1 ] = triangles[ triangle * 2 + 1 ];
+			for ( let k = 0; k < 3; k ++ ) {
+
+				const vertex = sorted[ i * 3 + k ];
+
+				triangleData.set( positions.slice( vertex * 3, vertex * 3 + 3 ), i * 12 + k * 4 );
+
+			}
+
+			triangleData[ i * 12 + 3 ] = triangles[ triangle * 2 ];
+			triangleData[ i * 12 + 7 ] = triangles[ triangle * 2 + 1 ];
 
 		}
 
 		this._geometry = geometry;
 		this._bvh = bvh;
 		this._lightMapMeshes = lightMapMeshes;
-		this._triangles = storage( new StorageBufferAttribute( triangleData, 2 ), 'vec2', triangleData.length / 2 ).toReadOnly();
+		this._triangles = storage( new StorageBufferAttribute( triangleData, 4 ), 'vec4', triangleData.length / 4 ).toReadOnly();
 		this._textureList = Array.from( textures.keys() );
 
 		// the materials, emitters, light trees and lights share one storage buffer, the gathering shaders
@@ -809,7 +818,7 @@ class RayTracedRadiosity {
 	_createTrace() {
 
 		const bvh = this._bvh;
-		const { index, attributes } = bvh.storage;
+		const { index } = bvh.storage;
 		const { sampleTrianglePoint } = bvh.fns;
 		const materials = this._materials;
 		const triangles = this._triangles;
@@ -1002,19 +1011,23 @@ class RayTracedRadiosity {
 		`;
 
 		const triangleHit = wgslTagCode/* wgsl */`
-			let i0 = ${ index }[ ti * 3u ];
-			let i1 = ${ index }[ ti * 3u + 1u ];
-			let i2 = ${ index }[ ti * 3u + 2u ];
-			let hit = ${ intersectRayTriangle }( ray, ${ attributes }[ i0 ].position.xyz, ${ attributes }[ i1 ].position.xyz, ${ attributes }[ i2 ].position.xyz, 0.0 );
+			let corner = ${ triangles }[ ti * 3u ];
+			let hit = ${ intersectRayTriangle }( ray, corner.xyz, ${ triangles }[ ti * 3u + 1u ].xyz, ${ triangles }[ ti * 3u + 2u ].xyz, 0.0 );
+		`;
+
+		const triangleIndices = wgslTagCode/* wgsl */`
+			let indices = vec3u( ${ index }[ ti * 3u ], ${ index }[ ti * 3u + 1u ], ${ index }[ ti * 3u + 2u ] );
 		`;
 
 		const triangleCoverage = wgslTagCode/* wgsl */`
-			let entry = u32( ${ triangles }[ ti ].x );
+			let entry = u32( corner.w );
 			var opacity = 1.0;
 
 			if ( ${ materials }[ entry * ${ MATERIAL_STRIDE }u + 2u ].w != 0.0 ) {
 
-				opacity = ${ coverage }( entry, ${ sampleTrianglePoint }( hit.barycoord, vec3u( i0, i1, i2 ) ).surface.zw, 0.0 );
+				${ triangleIndices }
+
+				opacity = ${ coverage }( entry, ${ sampleTrianglePoint }( hit.barycoord, indices ).surface.zw, 0.0 );
 
 			}
 		`;
@@ -1063,7 +1076,9 @@ class RayTracedRadiosity {
 							result.normal = hit.normal;
 							result.side = hit.side;
 							result.barycoord = hit.barycoord;
-							result.indices = vec4u( i0, i1, i2, ti );
+							${ triangleIndices }
+
+							result.indices = vec4u( indices, ti );
 
 							didHit = true;
 
@@ -1138,7 +1153,7 @@ class RayTracedRadiosity {
 
 				}
 
-				let footprint = ${ triangles }[ hit.indices.w ].y + log2( max( hit.dist, 1e-6 ) ) - 0.5 * log2( max( abs( dot( hit.normal, direction ) ), 1e-4 ) );
+				let footprint = ${ triangles }[ hit.indices.w * 3u + 1u ].w + log2( max( hit.dist, 1e-6 ) ) - 0.5 * log2( max( abs( dot( hit.normal, direction ) ), 1e-4 ) );
 
 				return vec4f( hit.barycoord.yz, hit.side * ( f32( hit.indices.w ) + 1.0 ), footprint );
 
@@ -1473,7 +1488,7 @@ class RayTracedRadiosity {
 
 						const surface = If( hit.z.notEqual( 0 ), () => {
 
-							const entry = int( triangles.element( int( abs( hit.z ) ).sub( 1 ) ).x ).toVar();
+							const entry = int( triangles.element( int( abs( hit.z ) ).sub( 1 ).mul( 3 ) ).w ).toVar();
 							const coords = this._surface( hit ).toVar();
 							const lod = hit.w.add( spread ).toVar();
 
