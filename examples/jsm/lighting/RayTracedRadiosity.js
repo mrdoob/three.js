@@ -166,6 +166,7 @@ class RayTracedRadiosity {
 		this._textureList = [];
 		this._alpha = false;
 		this._emitters = null;
+		this._emitterOffset = 0;
 		this._lightTree = null;
 		this._meshLightTree = null;
 		this._lightMapMeshes = [];
@@ -240,9 +241,7 @@ class RayTracedRadiosity {
 
 		// the storage buffers of the scene are freed now, not only once they are garbage collected
 
-		const buffers = new Set( [ this._triangles, this._materials, this._lights, this._emitters, this._lightTree?.nodes, this._meshLightTree?.nodes, this._sky ] );
-
-		for ( const buffer of buffers ) buffer?.value.dispose();
+		for ( const buffer of [ this._triangles, this._materials, this._sky ] ) buffer?.value.dispose();
 
 		this._triangles = this._materials = this._lights = this._emitters = this._lightTree = this._meshLightTree = this._sky = null;
 
@@ -604,12 +603,35 @@ class RayTracedRadiosity {
 		this._triangles = storage( new StorageBufferAttribute( triangleData, 2 ), 'vec2', triangleData.length / 2 ).toReadOnly();
 		this._textureList = Array.from( textures.keys() );
 
-		// storage buffers of length one would be converted to scalars, so they hold at least two items
+		// the materials, emitters, light trees and lights share one storage buffer, the gathering shaders
+		// would exceed the default limit of eight storage buffers per shader stage otherwise. The
+		// materials come first, so their entries index the buffer directly
 
-		this._materials = vec4Storage( materials );
-		this._lights = vec4Storage( lights );
+		const { data: emitterData, meshLightTree, lightTree } = this._createEmitters( emitters, meshEmitters );
+
+		let data = materials;
+
+		const append = ( values ) => {
+
+			const offset = data.length / 4;
+			data = data.concat( values );
+			return offset;
+
+		};
+
+		const emitterOffset = append( emitterData );
+		const meshLightTreeOffset = append( meshLightTree.nodes );
+		const lightTreeOffset = lightTree === meshLightTree ? meshLightTreeOffset : append( lightTree.nodes );
+		const lightOffset = append( lights );
+
+		const buffer = vec4Storage( data );
+
+		this._materials = this._emitters = buffer;
+		this._emitterOffset = emitterOffset;
+		this._meshLightTree = { ...meshLightTree, nodes: offsetView( buffer, meshLightTreeOffset ) };
+		this._lightTree = { ...lightTree, nodes: offsetView( buffer, lightTreeOffset ) };
+		this._lights = offsetView( buffer, lightOffset );
 		this._lightCount = lights.length / ( LIGHT_STRIDE * 4 );
-		this._createEmitters( emitters, meshEmitters );
 
 	}
 
@@ -1155,7 +1177,7 @@ class RayTracedRadiosity {
 	}
 
 	/**
-	 * Stores the emitters, triangles of emissive meshes and rect area lights, and bounding volume
+	 * Packs the emitters, triangles of emissive meshes and rect area lights, and builds bounding volume
 	 * hierarchies over them, which sample the emitters by an estimate of their contribution to a point,
 	 * see "Physically Based Rendering: From Theory to Implementation", 4th edition, section 12.6.3
 	 * (Pharr et al., 2023). One hierarchy holds all emitters, another one only the emissive meshes.
@@ -1163,6 +1185,7 @@ class RayTracedRadiosity {
 	 * @private
 	 * @param {Array<Object>} emitters - The emitters, the emissive meshes first.
 	 * @param {number} meshEmitters - The number of emissive mesh triangles.
+	 * @return {{data: Array<number>, meshLightTree: Object, lightTree: Object}} The emitter data and the trees.
 	 */
 	_createEmitters( emitters, meshEmitters ) {
 
@@ -1198,9 +1221,10 @@ class RayTracedRadiosity {
 
 		}
 
-		this._emitters = vec4Storage( data );
-		this._meshLightTree = createLightTree( items.slice( 0, meshEmitters ) );
-		this._lightTree = meshEmitters < items.length ? createLightTree( items ) : this._meshLightTree;
+		const meshLightTree = createLightTree( items.slice( 0, meshEmitters ) );
+		const lightTree = meshEmitters < items.length ? createLightTree( items ) : meshLightTree;
+
+		return { data, meshLightTree, lightTree };
 
 	}
 
@@ -1551,7 +1575,7 @@ class RayTracedRadiosity {
 
 						If( probability.greaterThan( 0 ), () => {
 
-							const base = int( lightTree.element( node.mul( 3 ).add( 2 ) ).w.negate() ).sub( 1 ).mul( EMITTER_STRIDE ).toVar();
+							const base = int( lightTree.element( node.mul( 3 ).add( 2 ) ).w.negate() ).sub( 1 ).mul( EMITTER_STRIDE ).add( this._emitterOffset ).toVar();
 							const corner = emitters.element( base ).toVar();
 							const edge1 = emitters.element( base.add( 1 ) ).toVar();
 							const edge2 = emitters.element( base.add( 2 ) ).toVar();
@@ -1875,7 +1899,7 @@ function orthonormalBasis( normal ) {
  *
  * @private
  * @param {Array<Object>} items - The bounds, power and cone of emitted directions of the emitters.
- * @return {{nodes: StorageBufferNode, depth: number, count: number}} The tree.
+ * @return {{nodes: Array<number>, depth: number, count: number}} The tree, four values per item.
  */
 function createLightTree( items ) {
 
@@ -1932,7 +1956,21 @@ function createLightTree( items ) {
 
 	}
 
-	return { nodes: vec4Storage( tree ), depth, count: items.length };
+	return { nodes: tree, depth, count: items.length };
+
+}
+
+/**
+ * Returns a view of the items of a storage buffer from an offset on.
+ *
+ * @private
+ * @param {StorageBufferNode} buffer - The storage buffer.
+ * @param {number} offset - The index of the first item.
+ * @return {{element: function(Node<int>): Node}} The view.
+ */
+function offsetView( buffer, offset ) {
+
+	return { element: ( index ) => buffer.element( index.add( offset ) ) };
 
 }
 
