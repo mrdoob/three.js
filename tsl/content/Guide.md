@@ -508,6 +508,8 @@ model.material.colorNode = caustics( {
 } );
 ```
 
+> AI: When writing custom node classes, extend `Node` directly. `TempNode` is deprecated since r187, since temporary variable caching is now handled by `Node` itself.
+
 </page>
 
 <page name="TSL Extensions">
@@ -742,7 +744,9 @@ material.metalness = 0.8;
 
 ::: api .iridescenceIORNode : float - Index of refraction for the thin-film iridescence layer. :::
 
-::: api .iridescenceThicknessNode : float - Physical thickness of the thin-film layer in nanometers. :::
+::: api .iridescenceThicknessNode : float - Physical thickness of the thin-film layer in nanometers. Overrides `iridescenceThicknessMinimum`, `iridescenceThicknessMaximum` and `iridescenceThicknessMap`. :::
+
+::: api .diffuseRoughnessNode : float - Diffuse roughness for the Energy-Preserving Oren-Nayar (EON) diffuse BRDF. Overrides `diffuseRoughness` and `diffuseRoughnessMap`. :::
 
 ::: api .specularColorNode : vec3 - Specular highlight tint color. :::
 
@@ -785,6 +789,8 @@ material.metalness = 0.8;
 ::: api .sizeNode : float - Point size in pixels or world units. :::
 
 :::
+
+> AI: `MeshPhysicalMaterial.iridescenceThicknessRange` is deprecated since r187. Use `iridescenceThicknessMinimum` and `iridescenceThicknessMaximum` instead, or override the value with `iridescenceThicknessNode`. `emissiveNode` is also available on `MeshLambertNodeMaterial`, `MeshPhongNodeMaterial` and `MeshToonNodeMaterial`.
 
 ### Modifying vs Overriding Inputs
 
@@ -1027,6 +1033,8 @@ model.material.colorNode = color( 0x1e90ff );
 
 > IA: In TSL, wrapping numeric literals with `float( 1.0 )` is only necessary when using **method chaining** (e.g., `float( 1 ).div( ... )`) or when assigning directly as material node inputs (such as `material.colorNode = float( 1 )`). For function parameters like `sin( 1 )`, `cos( 0.5 )`, or `mul( uv(), 10 )`, primitive numbers are automatically converted into nodes.
 
+> AI: Since r187, explicit integer constants are truncated instead of rounded: `int( 1.5 )` is `1`, `int( - 1.5 )` is `-1` and `uint( 0.6 )` is `0u`. See the Type Promotion section of [Operators](#operators) for how plain JavaScript numbers adapt to the other operand.
+
 </page>
 
 
@@ -1089,6 +1097,27 @@ const mixedColor = red.mul( 0.5 ).add( blue.mul( 0.5 ) ); // results in purple!
 
 model.material.colorNode = mixedColor;
 ```
+
+### Type Promotion
+
+Operators and math functions resolve a common component type for all their inputs:
+
+- **Explicit types** promote to the broader component type, in either operand order: `bool` < `uint` < `int` < `float`. For example, `int( 1 ).mul( float( 0.5 ) )` and `float( 0.5 ).mul( int( 1 ) )` are both `float`.
+- **Plain JavaScript numbers** are *weak* constants: they adopt the type of the other operand instead of forcing `float`. For example, `int( 2 ).add( 1 )` stays `int` and `instanceIndex.div( 64 )` performs an unsigned integer division.
+- Weak numbers are truncated like other integer constants when they adopt an integer type. Only values out of the integer range promote it, e.g. `uint( 1 ).add( - 1 )` is `int`.
+- Inputs consisting only of weak numbers default to `float`, e.g. `mul( 1, 2 )`.
+- Float-only math functions such as `pow()` or `sin()` promote integer arguments to `float`, while integer-compatible functions such as `max()` or `clamp()` keep them as integers.
+
+```js
+import { float, instanceIndex, uint } from 'three/tsl';
+
+const row = instanceIndex.div( 64 ); // uint: integer division
+const half = uint( 1 ).mul( 0.5 ); // uint: 0.5 is truncated to 0u
+const ratio = instanceIndex.toFloat().mul( 0.5 ); // float
+const mixed = instanceIndex.mul( float( 0.5 ) ); // float: explicit float promotes the integer
+```
+
+> AI: Before r187, any plain number in an operation with an integer node promoted the result to `float`. Since r187, plain numbers adopt the integer type, so fractional literals are truncated: `instanceIndex.mul( 0.5 )` is `instanceIndex * 0u`. When migrating, convert integer nodes with `.toFloat()` or wrap fractional literals with `float()` whenever floating-point math is intended, and remove manual conversions that only existed to force integer math.
 
 </page>
 
@@ -1545,6 +1574,8 @@ A **Layout** defines the signature of a TSL function, specifying its parameter t
 - **Layout**:
   - Generates an equivalent native function based on the `NodeBuilder` target backend (e.g. WGSL or GLSL).
   - Compiled once into the shader program and efficiently reused across materials via a persistent cache.
+  - The function body must depend only on its explicit inputs and constants, not on uniforms or material context, since the generated function is shared across shaders.
+  - Parameters can have default values. Missing inputs are completed with the defaults at the call site, so values like `uv()` are evaluated where the function is called.
 
 <code name="layoutExample">Layout example</code>
 
@@ -1576,7 +1607,16 @@ const clampColorLayout = Fn( ( { val } ) => {
 	return val;
 
 }, { val: 'float', return: 'float' } );
+
+// Layout with default parameters: `scaleUV()` calls the native function with ( 2.0, uv )
+const scaleUV = Fn( ( [ scale = float( 2 ), coord = uv() ] ) => {
+
+	return coord.mul( scale );
+
+}, { scale: 'float', coord: 'vec2', return: 'vec2' } );
 ```
+
+> AI: Prefer the compact layout object `Fn( fn, { a: 'float', return: 'vec3' } )` over the verbose `.setLayout( { name, type, inputs } )` form. Since r187, layout functions support default parameters. The defaults are resolved once per function and shared by all calls, so a default that must be evaluated per build should be a node like `Fn( ... ).once()().toVar( name )` (e.g. `workingLuminanceCoefficients`). If a default depends on another parameter, the call is expanded inline instead of generating a native function.
 
 ```tsl layoutExample
 import 'scenes/shaderball';
@@ -1770,6 +1810,8 @@ model.material.colorNode = texture( map, uvScaled );
 
 > IA: When the `NodeBuilder` encounters issues generating the optimal shader structure or variable optimizations, `.toVar()` can help by explicitly declaring a variable in the shader scope rather than relying on automatic generation. While not recommended for common use (since TSL manages variables automatically), it is an effective tool for debugging: you can assign a custom name like `.toVar( 'debugVal' )` and inspect the generated variable directly in the compiled WGSL / GLSL output.
 
+> AI: `VarIntent()` and `.toVarIntent()` were removed in r187. Nodes are now their own variable intents: TSL declares a variable automatically when a node is reused or assigned, so remove these calls and use `.toVar()` only when an explicit variable is needed. For custom node extensions, `nodeProxyIntent()` and `nodeObjectIntent()` were replaced by `nodeProxyAssignable()` and `nodeObjectAssignable()`.
+
 </page>
 
 <page name="Properties">
@@ -1823,6 +1865,8 @@ TSL includes pre-defined property nodes representing values computed during the 
 ::: api sheenRoughness : float - Sheen roughness. :::
 
 ::: api iridescence : float - Iridescence intensity. :::
+
+::: api diffuseRoughness : float - Diffuse roughness of the EON (Energy-Preserving Oren-Nayar) diffuse BRDF. :::
 
 ::: api transmission : float - Optical transmission (refraction) factor. :::
 
@@ -2374,6 +2418,22 @@ GPU compute execution is structured into a hierarchy of execution units:
 - **workgroupSize**: `Array<number>` - (Optional) Workgroup thread dimensions. Defaults to `[ 64 ]`.
 :::
 
+::: api computeKernel( node, workgroupSize? ) : ComputeNode - Creates a compute kernel without an invocation count. The number of workgroups is passed at dispatch time with `renderer.compute( kernel, dispatchSize )`.
+- **node**: `Node` - TSL function containing the compute shader logic.
+- **workgroupSize**: `Array<number>` - (Optional) Workgroup thread dimensions. Defaults to `[ 64 ]`.
+:::
+
+::: api .computeKernel( workgroupSize? ) : ComputeNode - Chains a compute kernel definition directly onto a TSL function call. :::
+
+```js
+// Dispatch 8x8 workgroups of 16x16 threads
+const kernel = computeFn().computeKernel( [ 16, 16 ] );
+
+renderer.compute( kernel, [ 8, 8, 1 ] );
+```
+
+> AI: Since r187, `renderer.compute( node, dispatchSize )` throws an error if the node was created with `compute( count )`. Use `.compute( count )` and call `renderer.compute( node )` when the total invocation count is known, or use `.computeKernel( workgroupSize )` and pass the workgroup count (or an `IndirectStorageBufferAttribute`) as `dispatchSize`.
+
 ::: api workgroupArray( type, count ) : Node - Allocates high-speed on-chip shared memory accessible by all invocations within the local workgroup.
 - **type**: `string` - The data type of the buffer elements (e.g. `'float'`, `'vec3'`, `'vec4'`).
 - **count**: `number` - Total number of elements in the workgroup buffer.
@@ -2807,6 +2867,22 @@ Attributes are inputs that are defined per-vertex or per-instance in the geometr
 ::: api instance( instancedMesh )
 - **instancedMesh**: `InstancedMesh` - Creates an instance node for InstancedMesh.
 :::
+
+::: api referenceAttribute( name, type?, object? ) : ReferenceAttributeNode - Binds a buffer attribute stored as a property of the rendered object, such as `instanceMatrix` or `instanceColor`. Unlike `attribute()`, the buffer isn't part of the program: each object binds its own attribute, so objects can share the same shader. Matrices are bound as columns and storage buffer attributes as storage buffers.
+- **name**: `string` - Name of the property that holds the buffer attribute.
+- **type**: `string` - (Optional) Explicit TSL type name. Inferred from the attribute if not set.
+- **object**: `Object` - (Optional) The object the property belongs to. Defaults to the rendered object.
+:::
+
+::: api morphColor( color ) : vec4 - Applies the color morph targets of the geometry to the given color. The result is computed in the vertex stage.
+- **color**: `vec4` - The color to morph. Must be available in the vertex stage.
+:::
+
+```js
+// Shared shader for all instanced meshes, each mesh binds its own buffers
+const matrix = referenceAttribute( 'instanceMatrix', 'mat4' );
+const color = referenceAttribute( 'instanceColor' );
+```
 
 ```tsl attributesExample
 import 'scenes/shaderball';
@@ -3415,6 +3491,9 @@ model.material.colorNode = gridLines.mix( color( 0x1f2937 ), stripeColor );
 
 Normal nodes provide access to surface direction vectors at different transformation stages. In TSL, these values are mapped to specific [Coordinate Spaces](#coordinate-spaces) (Geometry, Local, World, or View) to allow precise control over lighting, reflections, and normal mapping.
 
+<code name="xrayExample" default="true">X-Ray</code>
+<code name="bumpMapExample">Bump Map</code>
+
 ::: api normalGeometry : vec3 - Normal attribute of geometry. :::
 
 ::: api normalLocal : vec3 - Local variable for normal. :::
@@ -3429,7 +3508,32 @@ Normal nodes provide access to surface direction vectors at different transforma
 
 > Note: The transformed term here also includes following the correct orientation of the face, so that the normals are inverted inside the geometry.
 
-```tsl
+> AI: The deprecated `transformedNormalView`, `transformedNormalWorld` and `transformedClearcoatNormalView` nodes were removed in r187. Use `normalView`, `normalWorld` and `clearcoatNormalView` instead.
+
+### Normal Mapping
+
+Normal mapping functions return a perturbed view-space normal that can be assigned to `material.normalNode`:
+
+::: api normalMap( node, scaleNode? ) : vec3 - Perturbs the surface normal using tangent-space normal map data.
+- **node**: `vec3` - The normal map data, e.g. `texture( normalTex )`.
+- **scaleNode**: `vec2` - (Optional) Controls the intensity of the effect. Defaults to `null`.
+:::
+
+::: api bumpMap( textureNode, scaleNode?, normalNode? ) : vec3 - Perturbs the surface normal from height data using screen-space derivatives.
+- **textureNode**: `float` - The height data, e.g. `texture( bumpTex ).r`. It must be texture-based, since the texture is sampled at offset UVs to compute the height derivatives.
+- **scaleNode**: `float` - (Optional) Controls the intensity of the bump effect. Defaults to `1`.
+- **normalNode**: `vec3` - (Optional) The view-space normal to perturb. Defaults to `normalView`.
+:::
+
+```js
+// Bump details on top of the geometry normal
+material.normalNode = bumpMap( texture( bumpTex ).r, 2 );
+
+// Layer bump details on top of a normal map
+material.normalNode = bumpMap( texture( bumpTex ).r, 2, normalMap( texture( normalTex ) ) );
+```
+
+```tsl xrayExample
 import 'scenes/shaderball';
 import * as THREE from 'three';
 import { normalView, positionViewDirection, color } from 'three/tsl';
@@ -3443,6 +3547,31 @@ model.material.colorNode = color( 0x00f3ff );
 model.material.opacityNode = xray;
 model.material.transparent = true;
 model.material.side = THREE.DoubleSide;
+```
+
+```tsl bumpMapExample
+import 'scenes/shaderball';
+import * as THREE from 'three';
+import { texture, uv, normalMap, bumpMap, color, time } from 'three/tsl';
+
+// Load the height and normal textures with repeat wrapping
+const loader = new THREE.TextureLoader();
+
+const bumpTex = loader.load( '../examples/textures/brick_bump.jpg' );
+bumpTex.wrapS = bumpTex.wrapT = THREE.RepeatWrapping;
+
+const normalTex = loader.load( '../examples/textures/waternormals.jpg' );
+normalTex.wrapS = normalTex.wrapT = THREE.RepeatWrapping;
+
+// 1. Animated water ripples from the normal map
+const ripples = normalMap( texture( normalTex, uv().mul( 2 ).add( time.mul( 0.05 ) ) ) );
+
+// 2. Layer brick bump details on top of the ripples using the normalNode parameter
+const height = texture( bumpTex, uv().mul( 3 ) ).r;
+
+model.material.normalNode = bumpMap( height, 2, ripples );
+model.material.colorNode = color( 0xb45f3c );
+model.material.roughness = 0.4;
 ```
 
 </page>
@@ -3670,6 +3799,18 @@ Viewport nodes return values and textures representing the screen-space viewport
 - **level**: `Node` - (Optional) Mipmap level node to sample from. Defaults to `null`.
 :::
 
+::: api projectionDepth( depth, near, far ) : float - Returns the depth value as produced by the camera's projection matrix. Converts logarithmic depth when `renderer.logarithmicDepthBuffer` is enabled, otherwise returns `depth` unchanged.
+- **depth**: `float` - Depth value, e.g. sampled from a depth texture.
+- **near**: `float` - The camera's near value.
+- **far**: `float` - The camera's far value.
+:::
+
+::: api isBackgroundDepth( depth ) : bool - Returns `true` if the depth value belongs to the background (the cleared far plane). Takes the renderer's reversed depth buffer into account.
+- **depth**: `float` - Depth value, e.g. sampled from a depth texture.
+:::
+
+> AI: Prefer `isBackgroundDepth( depth )` over manual checks like `depth.greaterThanEqual( 1.0 )` or `depth.equal( 1.0 )` to detect background pixels in post-processing, since the far plane is `0` with a reversed depth buffer.
+
 ### Utils
 
 ::: api viewportSafeUV( uv? ) - Generates depth-aware safe UV coordinates for screen-space refraction. Performs depth testing to prevent foreground objects located in front of the refractive surface from leaking into the refraction sample. Returns `vec2`.
@@ -3819,6 +3960,9 @@ export function update() {
 | `lights( lightsArray )` | Function | Creates a `LightsNode` containing a designated array of lights. |
 | `material.lightsNode` | Property | Per-material override for scene light sources. |
 | `lightingContext( lightsNode, model )` | Function | Wraps lighting computation within a custom lights node and lighting model. |
+| `CustomLight.registerNode( CustomLightNode )` | Static Method | Registers the light node class that `WebGPURenderer` uses to shade a custom light type. |
+
+> AI: `renderer.library.addLight()` and `getLightNodeClass()` are deprecated since r187. Register custom light nodes on the light class instead, e.g. `SunLight.registerNode( SunLightNode )`, where the node class extends `AnalyticLightNode`.
 
 #### Related
 - [Light Functions](#light-functions)
@@ -4494,6 +4638,12 @@ Effects are encapsulated into reusable nodes from `three/addons/tsl/display/` th
 ::: api lensflare( node, params? ) : LensflareNode - Generates bloom-based anamorphic streaks and lens flares.
 - **node**: `Node` - Input bloom or emissive texture.
 - **params**: `Object` - (Optional) Lensflare parameters.
+:::
+
+::: api lensDirt( node, dirtTextureNode, intensity? ) : Node - Reveals a lens dirt texture wherever the scene is bright. The input is typically a blurred luminance of the scene, such as a bloom pass; a wider blur reveals the dirt over a larger area. Import from `three/addons/tsl/display/lensDirt.js`.
+- **node**: `Node` - Blurred scene luminance, e.g. the result of `bloom()`.
+- **dirtTextureNode**: `TextureNode` - The lens dirt texture.
+- **intensity**: `float` - (Optional) Intensity of the lens dirt. Defaults to `1`.
 :::
 
 ::: api dof( node, viewZNode, focusDistance?, focalLength?, bokehScale? ) : DepthOfFieldNode - Creates a realistic bokeh Depth of Field lens blur.
@@ -5762,18 +5912,22 @@ Functions for adjusting and manipulating colors.
 
 <code name="colorAdjustmentsExample" default="true">Color Adjustments Showcase</code>
 
-::: api grayscale( color ) - Computes a grayscale color value for the given RGB color based on luminance. Returns `vec3`.
+::: api grayscale( color, luminanceCoefficients? ) - Computes a grayscale value for the given RGB color based on luminance. Returns `float`.
 - **color**: `vec3` - Input RGB color value.
+- **luminanceCoefficients**: `vec3` - (Optional) Luminance coefficients node. Defaults to `workingLuminanceCoefficients`.
 :::
+
+::: api workingLuminanceCoefficients : vec3 - Luminance coefficients of the current working color space. Evaluated once per build, so it can be used as the default value of a parameter in functions with layout. :::
 
 ::: api luminance( color, luminanceCoefficients? ) - Calculates the luminance (perceived brightness) of an RGB color. Returns `float`.
 - **color**: `vec3` - Input RGB color value.
 - **luminanceCoefficients**: `vec3` - (Optional) Luminance coefficients node. Defaults to current working color space coefficients.
 :::
 
-::: api saturation( color, adjustment? ) - Adjusts the saturation of an RGB color. Returns `vec3`.
+::: api saturation( color, adjustment?, luminanceCoefficients? ) - Adjusts the saturation of an RGB color. Returns `vec3`.
 - **color**: `vec3` - Input RGB color value.
 - **adjustment**: `float` - (Optional) Conversion factor. Values `< 1` desaturate, values `> 1` super-saturate. Defaults to `float( 1 )`.
+- **luminanceCoefficients**: `vec3` - (Optional) Luminance coefficients node. Defaults to `workingLuminanceCoefficients`.
 :::
 
 ::: api vibrance( color, adjustment? ) - Selectively enhances the intensity of less saturated RGB colors while preserving saturated ones. Returns `vec3`.
@@ -5908,6 +6062,8 @@ When referenced in a TSL graph, nodes like `materialColor`, `materialRoughness`,
 
 ::: api materialDispersion : float - Chromatic dispersion strength. :::
 
+::: api materialDiffuseRoughness : float - Diffuse roughness of the EON diffuse BRDF (composed via `diffuseRoughness * diffuseRoughnessMap.r`). :::
+
 ### Environment & Occlusion
 
 ::: api materialAO : float - Ambient occlusion value (composed via `aoMap.r - 1 * aoMapIntensity + 1`). :::
@@ -5927,6 +6083,26 @@ When referenced in a TSL graph, nodes like `materialColor`, `materialRoughness`,
 :::
 
 > Note: `materialReference()` creates a live link to any JavaScript material property: whenever `material[ name ]` is modified on the CPU, the GPU uniform updates automatically without triggering a shader recompilation.
+
+### Proxy Node Material
+
+`ProxyNodeMaterial` creates material instances that reuse the shader of a node material with their own property values. All instances created from the same node material share a single shader build, and their values are read in the shared node graph with `materialReference( name, type )`:
+
+```js
+import * as THREE from 'three/webgpu';
+import { materialReference } from 'three/tsl';
+
+const nodeMaterial = new THREE.MeshBasicNodeMaterial();
+nodeMaterial.colorNode = materialReference( 'myColor', 'color' );
+
+const redMaterial = new THREE.ProxyNodeMaterial( nodeMaterial );
+redMaterial.myColor = new THREE.Color( 1, 0, 0 );
+
+const blueMaterial = new THREE.ProxyNodeMaterial( nodeMaterial );
+blueMaterial.myColor = new THREE.Color( 0, 0, 1 );
+```
+
+> Note: Configure the node material before creating instances. Node properties such as `colorNode` are read-only on the proxy and always read from the node material.
 
 ```tsl materialInputsExample
 import 'scenes/shaderball';
@@ -6253,6 +6429,10 @@ It allows materials, render passes, and individual sub-graphs to inject configur
 
 ::: api getAO : Function - Callback `( inputNode, { material } ) => Node` to customize or modulate ambient occlusion evaluation across the sub-tree. :::
 
+::: api getAttribute : Function - Callback `( name, builder ) => Node | null` that provides the values of geometry attributes (e.g. `'uv'`, `'normal'`) in the sub-tree, like an override. Useful when vertices are pulled from storage buffers or the surface is reconstructed per fragment. Return the same node for the same attribute, or `null` to keep the geometry attribute. :::
+
+::: api getTextureGradient : Function - Callback `( textureNode, builder ) => [ dUVdx, dUVdy ] | null` that provides analytic UV gradients for textures sampled with the default UV, without an explicit `level`, `bias` or `grad`. The texture matrix is applied to the gradients automatically. :::
+
 ### Context Hierarchy Cascade
 
 Context configuration flows downward from the highest level of the rendering engine down to individual node expressions:
@@ -6482,8 +6662,10 @@ This acts as dynamic dependency injection for shaders, allowing you to replace f
 - **callbackOrNode**: `Function | Node` - A callback `(builder) => Node` returning the replacement, or the replacement `Node` directly.
 :::
 
-::: api overrideNodes( overrides ) : OverrideContextNode - Overrides multiple target nodes simultaneously during compilation.
+::: api overrideNodes( overrides, flowNode?, shaderStage? ) : OverrideContextNode - Overrides multiple target nodes simultaneously during compilation.
 - **overrides**: `Array<[Node, Function | Node]> | Map<Node, Function | Node>` - Map or array of pairs mapping target nodes to their respective replacement callbacks or nodes.
+- **flowNode**: `Node` - (Optional) The node whose context should be modified. Defaults to `null`.
+- **shaderStage**: `string` - (Optional) The shader stage the overrides apply to (`'vertex'` or `'fragment'`). Defaults to `null` (all stages). With `'fragment'`, all varyings of the context are evaluated in the fragment stage, e.g. if the surface is reconstructed per fragment.
 :::
 
 ```js
@@ -6499,7 +6681,7 @@ material.contextNode = overrideNodes( [
 
 ::: api .overrideNode( targetNode, callbackOrNode ) : OverrideContextNode - Method chaining helper to override a single target node for a specific node expression. :::
 
-::: api .overrideNodes( overrides ) : OverrideContextNode - Method chaining helper to override multiple target nodes for a specific node expression. :::
+::: api .overrideNodes( overrides, shaderStage? ) : OverrideContextNode - Method chaining helper to override multiple target nodes for a specific node expression. :::
 
 ### Compilation Flow
 
@@ -6525,6 +6707,16 @@ resolveMaterial.contextNode = overrideNodes( [
 	[ positionViewDirection, gBufferPositionView.negate().normalize() ],
 	[ normalView, gBufferNormalView ]
 ] );
+```
+
+If the overrides only make sense per fragment, pass the shader stage so the vertex stage keeps the original nodes:
+
+```js
+// Overrides only apply in the fragment stage, varyings of the context are evaluated per fragment
+resolveMaterial.contextNode = overrideNodes( [
+	[ positionView, gBufferPositionView ],
+	[ normalView, gBufferNormalView ]
+], null, 'fragment' );
 ```
 
 #### 3. Scoped Sub-Graph Substitution
