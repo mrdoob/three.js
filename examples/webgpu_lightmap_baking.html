@@ -19,7 +19,7 @@
 				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Light Baking</span>
 			</div>
 
-			<small>Progressively bake Light Probe or VXGI diffuse irradiance into a UV atlas by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br/><span id="status"></span></small>
+			<small>Bake Stochastic Radiosity, Ray Radiosity (<a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">three-mesh-bvh</a>), Light Probe or VXGI into denoised directional light maps of these scenes or your own glTF, with the light mapper by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br/><span id="status"></span><span id="warning" style="display: block; color: #ffc040;"></span></small>
 		</div>
 
 		<script type="importmap">
@@ -28,7 +28,9 @@
 					"three": "../build/three.webgpu.js",
 					"three/webgpu": "../build/three.webgpu.js",
 					"three/tsl": "../build/three.tsl.js",
-					"three/addons/": "./jsm/"
+					"three/addons/": "./jsm/",
+					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.15/src/index.js",
+					"three-mesh-bvh/webgpu": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.15/src/webgpu/index.js"
 				}
 			}
 		</script>
@@ -36,17 +38,19 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { builtinGIContext, float, mrt, normalWorld, output, pass, positionWorld, uniform, velocity } from 'three/tsl';
+			import { builtinGIContext, float, normalWorld, positionWorld } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { LightBaker } from 'three/addons/lighting/LightBaker.js';
 			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
-			import { LightMapper } from 'three/addons/lighting/LightMapper.js';
-			import { VXGIVolume } from 'three/addons/lighting/vxgi/VXGIVolume.js';
-			import { vxgiIrradiance } from 'three/addons/lighting/vxgi/VXGIIrradiance.js';
 			import { lightProbeGridIrradiance } from 'three/addons/tsl/lighting/LightProbeGridNode.js';
-			import { traa } from 'three/addons/tsl/display/TRAANode.js';
-			import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
+			import { ReflectionProbes } from 'three/addons/lighting/ReflectionProbes.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { DRACOLoader, DRACO_GLTF_CONFIG } from 'three/addons/loaders/DRACOLoader.js';
+			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
+			import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
@@ -58,25 +62,36 @@
 
 			}
 
-			let camera, scene, renderer, controls, renderPipeline;
-			let light, meshes, materials, atlas, status;
-			let source, lightMapper, bakedPass, livePass, liveOutput;
-			let needsBake = true;
+			let camera, scene, renderer, controls;
+			let world, materials, status, warning, lightBaker;
+			let busy = false, bakePending = false, bakeController = null, bakeId = 0;
+			let capture = null, captureBakeId = - 1, previewBakeId = - 1, captureStatus = '', probeMaterialKey = '';
+			let gltfLoader = null, gltfSky = null, sceneControl;
+			let framesInFlight = 0;
 
-			// shifts the per-pixel cone noise of the live view every frame, like the light map samples
+			const worlds = {};
+			const probeKeyedMaterials = new WeakSet();
 
-			const liveFrame = uniform( 0 );
+			// the scenes and their loaders
+
+			const scenes = { 'Cornell Box': createCornellBox, 'Courtyard': loadCourtyard };
+
+			// phones have less GPU memory and slower GPUs
+
+			const phone = window.matchMedia( '(pointer: coarse)' ).matches;
 
 			const params = {
-				output: 'Baked GI',
-				algorithm: 'VXGI',
-				resolution: 1024
+				scene: 'Cornell Box',
+				algorithm: 'Ray Radiosity',
+				resolution: 1024,
+				denoise: true
 			};
 
-			// light probes are deterministic and only need a few samples to antialias the light map,
-			// the VXGI cones are rotated per sample and converge over more samples
+			// the algorithms of LightBaker. It stops the bake once the estimated noise of the light map drops
+			// below 2%, or after a maximum of samples per algorithm, and bakes several cheap samples of the
+			// stochastic radiosity per frame
 
-			const bakeSamples = { 'Light Probe': 16, 'VXGI': 64 };
+			const algorithms = { 'Stochastic Radiosity': 'stochastic', 'Ray Radiosity': 'ray', 'Light Probe': 'probes', 'VXGI': 'vxgi' };
 
 			init();
 
@@ -85,14 +100,146 @@
 				// Camera
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
-				camera.position.set( 0, 2.5, 8 );
 
 				// Scene
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x111111 );
 
-				// Cornell box
+				// Renderer. The ray traced radiosity can need more storage buffers per shader stage than the default
+				// eight, e.g. for a sky, lights and emissive meshes together
+
+				const adapter = await navigator.gpu?.requestAdapter();
+				const requiredLimits = adapter ? { maxStorageBuffersPerShaderStage: adapter.limits.maxStorageBuffersPerShaderStage } : {};
+
+				// at most twice the resolution of the page, three times on phones would take memory and GPU time
+				// from the bake
+
+				renderer = new THREE.WebGPURenderer( { antialias: true, requiredLimits } );
+				renderer.setPixelRatio( Math.min( window.devicePixelRatio, 2 ) );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				// GPU errors show on the page. A lost device stops it, e.g. after a phone ran out of GPU memory,
+				// which can also destroy the device
+
+				renderer.backend.device.lost.then( ( info ) => {
+
+					stopBake();
+					renderer.setAnimationLoop( null );
+					warning.textContent = `The GPU device was lost, probably out of memory. Reload the page. ${ info.message }`;
+
+				} );
+
+				const onError = renderer.onError;
+
+				renderer.onError = ( info ) => {
+
+					onError.call( renderer, info );
+					if ( warning.textContent === '' ) warning.textContent = `GPU error: ${ info.message }`;
+
+				};
+
+				// Controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+
+				status = document.getElementById( 'status' );
+				warning = document.getElementById( 'warning' );
+
+				// the light baker unwraps the light map UVs, sets up the GI source, bakes, denoises and stitches
+				// the light maps and assigns them to the materials
+
+				lightBaker = new LightBaker( renderer );
+
+				await setScene();
+
+				// GUI
+
+				const gui = renderer.inspector.createParameters( 'Light Baking' );
+				gui.add( { openGLTF }, 'openGLTF' ).name( 'Open glTF…' ).info( 'or drop a .glb, or a .gltf with its files, onto the page' );
+				sceneControl = gui.add( params, 'scene', Object.keys( scenes ) ).name( 'Scene' ).onChange( setScene );
+				gui.add( params, 'algorithm', Object.keys( algorithms ) ).name( 'GI Algorithm' ).onChange( bake );
+				gui.add( params, 'resolution', [ 256, 1024, 2048, 4096 ] ).name( 'Resolution' ).listen().onChange( bake );
+				gui.add( params, 'denoise' ).name( 'Denoise' ).onChange( setDenoise );
+				gui.add( { bake }, 'bake' ).name( 'Re-Bake GI' );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				// drop a .glb, or a .gltf with its buffers and textures, onto the page
+
+				window.addEventListener( 'dragover', ( event ) => event.preventDefault() );
+				window.addEventListener( 'drop', ( event ) => {
+
+					event.preventDefault();
+
+					if ( event.dataTransfer.files.length > 0 ) loadGLTFFiles( event.dataTransfer.files );
+
+				} );
+
+				renderer.setAnimationLoop( animate );
+
+			}
+
+			async function setScene() {
+
+				if ( busy ) return;
+
+				busy = true;
+
+				try {
+
+					if ( worlds[ params.scene ] === undefined ) {
+
+						status.textContent = `Loading ${ params.scene }…`;
+						worlds[ params.scene ] = await scenes[ params.scene ]();
+
+					}
+
+				} finally {
+
+					busy = false;
+
+				}
+
+				showWorld( worlds[ params.scene ] );
+
+				await bake();
+
+			}
+
+			function showWorld( next ) {
+
+				if ( world !== undefined ) scene.remove( world.root );
+
+				world = next;
+				scene.add( world.root );
+				scene.background = world.background;
+
+				params.resolution = world.atlasResolution ?? world.resolution;
+
+				camera.near = world.near ?? 0.1;
+				camera.far = world.far ?? 100;
+				camera.updateProjectionMatrix();
+				camera.position.copy( world.camera );
+				controls.target.copy( world.target );
+				controls.update();
+
+				const meshes = [];
+				world.root.traverse( ( object ) => object.isMesh && meshes.push( object ) );
+				world.sourceMaterials ??= new Set( meshes.flatMap( ( mesh ) => [ mesh.material ].flat() ) );
+
+				warning.textContent = world.warnings ?? '';
+
+			}
+
+			function createCornellBox() {
+
+				const root = new THREE.Group();
 
 				const wallMaterial = new THREE.MeshStandardMaterial( { color: 0xcccccc } );
 				const redMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
@@ -102,41 +249,41 @@
 				const floor = new THREE.Mesh( new THREE.PlaneGeometry( 6, 6 ), wallMaterial );
 				floor.rotation.x = - Math.PI / 2;
 				floor.receiveShadow = true;
-				scene.add( floor );
+				root.add( floor );
 
 				// Ceiling
 				const ceiling = new THREE.Mesh( new THREE.PlaneGeometry( 6, 6 ), wallMaterial );
 				ceiling.rotation.x = Math.PI / 2;
 				ceiling.position.y = 5;
 				ceiling.receiveShadow = true;
-				scene.add( ceiling );
+				root.add( ceiling );
 
 				// Back wall
 				const backWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), wallMaterial );
 				backWall.position.set( 0, 2.5, - 3 );
 				backWall.receiveShadow = true;
-				scene.add( backWall );
+				root.add( backWall );
 
 				// Front wall
 				const frontWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), wallMaterial );
 				frontWall.rotation.y = Math.PI;
 				frontWall.position.set( 0, 2.5, 3 );
 				frontWall.receiveShadow = true;
-				scene.add( frontWall );
+				root.add( frontWall );
 
 				// Left wall (red)
 				const leftWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), redMaterial );
 				leftWall.rotation.y = Math.PI / 2;
 				leftWall.position.set( - 3, 2.5, 0 );
 				leftWall.receiveShadow = true;
-				scene.add( leftWall );
+				root.add( leftWall );
 
 				// Right wall (green)
 				const rightWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), greenMaterial );
 				rightWall.rotation.y = - Math.PI / 2;
 				rightWall.position.set( 3, 2.5, 0 );
 				rightWall.receiveShadow = true;
-				scene.add( rightWall );
+				root.add( rightWall );
 
 				// Objects inside the box
 
@@ -148,158 +295,682 @@
 				tallBox.rotation.y = Math.PI / 8;
 				tallBox.castShadow = true;
 				tallBox.receiveShadow = true;
-				scene.add( tallBox );
+				root.add( tallBox );
 
-				// Glossy sphere, to show direct specular lighting
+				// Glossy sphere, to show direct specular lighting (Light Probe and VXGI)
 				const glossyMaterial = new THREE.MeshStandardMaterial( { color: 0x0044ff, roughness: 0.15 } );
 				const glossySphere = new THREE.Mesh( new THREE.SphereGeometry( 0.65, 32, 32 ), glossyMaterial );
 				glossySphere.position.set( 1, 0.65, 0.5 );
 				glossySphere.castShadow = true;
 				glossySphere.receiveShadow = true;
-				scene.add( glossySphere );
+				root.add( glossySphere );
 
-				// Light
-				light = new THREE.PointLight( 0xffffff, 40 );
+				// Lights: both radiosity solvers bake the direct light of an emissive area light panel with
+				// soft shadows, light probes and VXGI bake the indirect light of a live point light
+				const lightPanel = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), new THREE.MeshStandardMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 20 } ) );
+				lightPanel.rotation.x = Math.PI / 2;
+				lightPanel.position.y = 4.99;
+				root.add( lightPanel );
+
+				const light = new THREE.PointLight( 0xffffff, 40 );
 				light.position.set( 0, 4.5, 0 );
 				light.castShadow = true;
 				light.shadow.mapSize.setScalar( 256 );
 				light.shadow.radius = 10;
 				light.shadow.normalBias = - 0.02;
-				light.shadow.autoUpdate = false;
-				scene.add( light );
+				root.add( light );
 
-				// Renderer
-
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
-				renderer.shadowMap.enabled = true;
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.inspector = new Inspector();
-				document.body.appendChild( renderer.domElement );
-
-				await renderer.init();
-
-				// Controls
-
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 2.5, 0 );
-				controls.update();
-
-				// Light map UVs
-
-				meshes = scene.children.filter( ( object ) => object.isMesh );
-				materials = new Set( meshes.map( ( mesh ) => mesh.material ) );
-				atlas = unwrapUVs( scene, { resolution: params.resolution, padding: 3 } );
-
-				// "Baked GI" shows the light map while it accumulates,
-				// "Live GI" evaluates the raw irradiance per pixel every frame
-
-				renderPipeline = new THREE.RenderPipeline( renderer );
-				bakedPass = pass( scene, camera );
-
-				status = document.getElementById( 'status' );
-
-				// GUI
-
-				const gui = renderer.inspector.createParameters( 'Light Baking' );
-				gui.add( params, 'output', [ 'Baked GI', 'Live GI' ] ).name( 'Output' ).onChange( setOutput );
-				gui.add( params, 'algorithm', [ 'Light Probe', 'VXGI' ] ).name( 'GI Algorithm' ).onChange( requestBake );
-				gui.add( params, 'resolution', [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( requestBake );
-				gui.add( { bake: requestBake }, 'bake' ).name( 'Re-Bake GI' );
-
-				window.addEventListener( 'resize', onWindowResize );
-
-				renderer.render( scene, camera ); // one manual render call to prepare shadows
+				return {
+					root, light, lightPanel, background: new THREE.Color( 0x111111 ), resolution: 1024, cacheSize: 256,
+					camera: new THREE.Vector3( 0, 2.5, 8 ), target: new THREE.Vector3( 0, 2.5, 0 ),
+					reflections: [ { position: [ 0.4, 1.6, 1.3 ], box: [ - 3, 0, - 3, 3, 5, 3 ] }, { position: [ 0.6, 1.6, - 1.9 ], box: [ - 3, 0, - 3, 3, 5, 3 ] } ],
+					probes: { size: new THREE.Vector3( 5.6, 4.7, 5.6 ), position: new THREE.Vector3( 0, 2.45, 0 ), counts: [ 8, 8, 8 ], far: 20 }
+				};
 
 			}
 
-			function requestBake() {
+			async function loadCourtyard() {
 
-				needsBake = true;
+				// a two storey cloister at sunrise, lit by the sky. It has no outer walls, their outside would only
+				// take light map space and bake time
+
+				const sky = await new HDRLoader().loadAsync( 'textures/equirectangular/blouberg_sunrise_2_1k.hdr' );
+				sky.mapping = THREE.EquirectangularReflectionMapping;
+
+				const root = new THREE.Group();
+
+				const stone = new THREE.MeshStandardMaterial( { color: 0xddd0b8 } );
+				const plaster = new THREE.MeshStandardMaterial( { color: 0xd9a066 } );
+				const tiles = new THREE.MeshStandardMaterial( { color: 0xb59a7e } );
+				const water = new THREE.MeshStandardMaterial( { color: 0x3c7a8a } );
+				const leaves = new THREE.MeshStandardMaterial( { color: 0x4a7a32 } );
+				const banners = [ 0xb02a20, 0x2a4ab0, 0xd8a020, 0x2a8a50 ].map( ( color ) => new THREE.MeshStandardMaterial( { color } ) );
+
+				function add( parent, geometry, material, x, y, z ) {
+
+					const mesh = new THREE.Mesh( geometry, material );
+					mesh.position.set( x, y, z );
+					parent.add( mesh );
+					return mesh;
+
+				}
+
+				// the courtyard facade of a wing in one piece, so that no seams show: arches down to the floor below,
+				// and above a parapet upstairs
+
+				const arches = [ - 4.5, - 1.5, 1.5, 4.5 ];
+				const facadeShape = new THREE.Shape().moveTo( - 6.5, 0 );
+
+				for ( const x of arches ) facadeShape.lineTo( x - 1, 0 ).lineTo( x - 1, 2.4 ).absarc( x, 2.4, 1, Math.PI, 0, true ).lineTo( x + 1, 0 );
+
+				facadeShape.lineTo( 6, 0 ).lineTo( 6, 7.5 ).lineTo( - 6.5, 7.5 ).closePath();
+
+				for ( const x of arches ) facadeShape.holes.push( new THREE.Path().moveTo( x + 0.9, 5.2 ).lineTo( x + 0.9, 5.8 ).absarc( x, 5.8, 0.9, 0, Math.PI ).lineTo( x - 0.9, 5.2 ).closePath() );
+
+				const facade = new THREE.ExtrudeGeometry( facadeShape, { depth: 0.5, bevelEnabled: false, curveSegments: 16 } );
+				const floorSlab = new THREE.BoxGeometry( 15.5, 0.3, 2.5 );
+				const roof = new THREE.BoxGeometry( 15.2, 0.3, 3.8 );
+				const banner = new THREE.PlaneGeometry( 0.7, 2.4 );
+
+				// four wings, each one covers the corner on its left so that the walls do not overlap
+
+				for ( let i = 0; i < 4; i ++ ) {
+
+					const wing = new THREE.Group();
+					wing.rotation.y = - i * Math.PI / 2;
+					root.add( wing );
+
+					add( wing, facade, stone, 0, 0, - 6.5 );
+					add( wing, floorSlab, stone, - 1.25, 4.15, - 7.75 );
+					add( wing, roof, stone, - 1.9, 7.65, - 7.6 );
+
+					for ( const x of [ - 3, 0, 3 ] ) add( wing, banner, banners[ i ], x, 6.25, - 5.95 );
+
+				}
+
+				add( root, new THREE.PlaneGeometry( 19, 19 ), tiles, 0, 0, 0 ).rotation.x = - Math.PI / 2;
+
+				// fountain
+
+				const octagon = ( radius ) => Array.from( { length: 8 }, ( v, i ) => new THREE.Vector2( radius, 0 ).rotateAround( new THREE.Vector2(), ( i + 0.5 ) * Math.PI / 4 ) );
+
+				const basin = new THREE.Shape( octagon( 1.9 ) );
+				basin.holes.push( new THREE.Path( octagon( 1.6 ) ) );
+
+				add( root, new THREE.ExtrudeGeometry( basin, { depth: 0.55, bevelEnabled: false } ), stone, 0, 0, 0 ).rotation.x = - Math.PI / 2;
+				add( root, new THREE.ShapeGeometry( new THREE.Shape( octagon( 1.6 ) ) ), water, 0, 0.4, 0 ).rotation.x = - Math.PI / 2;
+				add( root, new THREE.CylinderGeometry( 0.2, 0.3, 1.3, 16 ), stone, 0, 0.65, 0 );
+				add( root, new THREE.CylinderGeometry( 0.8, 0.3, 0.3, 16 ), stone, 0, 1.45, 0 );
+				add( root, new THREE.SphereGeometry( 0.25, 16, 12 ), stone, 0, 1.85, 0 );
+
+				// cypresses in planters
+
+				for ( const [ x, z ] of [[ - 4.6, - 4.6 ], [ 4.6, - 4.6 ], [ 4.6, 4.6 ], [ - 4.6, 4.6 ]] ) {
+
+					add( root, new THREE.BoxGeometry( 1.2, 0.6, 1.2 ), plaster, x, 0.3, z );
+					add( root, new THREE.ConeGeometry( 0.55, 3.2, 12 ), leaves, x, 2.2, z );
+
+				}
+
+				return {
+					root, light: null, lightPanel: null, background: sky, resolution: 1024, cacheSize: 512,
+					camera: new THREE.Vector3( - 5.6, 1.6, 1.5 ), target: new THREE.Vector3( 3, 3.4, - 2.5 ),
+					reflections: [
+						{ position: [ 2.8, 2, 2.8 ], box: [ - 6, 0, - 6, 6, 40, 6 ] },
+						{ position: [ 0, 1.8, - 7.75 ], box: [ - 9.5, 0, - 9.5, 9.5, 4, - 6 ] }, { position: [ 7.75, 1.8, 0 ], box: [ 6, 0, - 9.5, 9.5, 4, 9.5 ] },
+						{ position: [ 0, 1.8, 7.75 ], box: [ - 9.5, 0, 6, 9.5, 4, 9.5 ] }, { position: [ - 7.75, 1.8, 0 ], box: [ - 9.5, 0, - 9.5, - 6, 4, 9.5 ] }
+					],
+					probes: { size: new THREE.Vector3( 15.5, 5.6, 15.5 ), position: new THREE.Vector3( 0, 4, 0 ), counts: [ 8, 4, 8 ], far: 40 }
+				};
 
 			}
 
-			function bake() {
+			function openGLTF() {
 
-				for ( const material of materials ) material.lightMap = null;
+				// a file input opens the file picker on phones too. It accepts any file, since phones do not
+				// know the glTF file types
 
-				lightMapper?.dispose();
-				if ( liveOutput !== livePass ) liveOutput?.dispose();
-				livePass?.dispose();
-				source?.dispose();
-
-				if ( atlas.resolution !== params.resolution ) {
-
-					const geometries = new Set( meshes.map( ( mesh ) => mesh.geometry ) );
-					atlas = unwrapUVs( scene, { resolution: params.resolution, padding: 3 } );
-
-					for ( const geometry of geometries ) geometry.dispose();
-
-				}
-
-				let irradiance;
-
-				if ( params.algorithm === 'Light Probe' ) {
-
-					const probes = new LightProbeGrid( 5.6, 4.7, 5.6, 8, 8, 8 );
-					probes.position.set( 0, 2.45, 0 );
-					probes.updateBoundingBox();
-					probes.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
-					irradiance = ( position, normal ) => lightProbeGridIrradiance( probes, position, normal );
-					source = probes;
-
-				} else {
-
-					const volume = new VXGIVolume();
-					volume.update( renderer, scene );
-
-					// three cones like webgpu_vxgi, shared by the live view and the light map
-
-					irradiance = vxgiIrradiance( volume, { coneCount: 3 } );
-					source = volume;
-
-				}
-
-				// the light map accumulates one sample per frame in animate()
-
-				lightMapper = new LightMapper( renderer, atlas.resolution, irradiance );
-				lightMapper.addObjects( meshes );
-
-				for ( const material of materials ) material.lightMap = lightMapper.texture;
-
-				// traa needs a single-sampled depth buffer
-
-				livePass = pass( scene, camera, { samples: 0 } );
-				livePass.contextNode = builtinGIContext( float( 1 ), irradiance( positionWorld, normalWorld, liveFrame ) );
-				liveOutput = livePass;
-
-				if ( params.algorithm === 'VXGI' ) {
-
-					// traa resolves the per-pixel cone noise, like webgpu_vxgi
-
-					livePass.setMRT( mrt( { output, velocity } ) );
-					liveOutput = traa( livePass.getTextureNode( 'output' ), livePass.getTextureNode( 'depth' ), livePass.getTextureNode( 'velocity' ), camera );
-
-				}
-
-				setOutput();
+				const input = document.createElement( 'input' );
+				input.type = 'file';
+				input.multiple = true;
+				input.addEventListener( 'change', () => input.files.length > 0 && loadGLTFFiles( input.files ) );
+				input.click();
 
 			}
 
-			function setOutput() {
+			async function loadGLTFFiles( fileList ) {
 
-				const live = params.output === 'Live GI';
+				const files = [ ...fileList ];
+				const file = files.find( ( file ) => /\.(glb|gltf)$/i.test( file.name ) );
 
-				// discard accumulated samples when switching outputs; baking only runs in Baked GI
+				if ( file === undefined ) {
 
-				lightMapper.reset();
+					warning.textContent = 'Open a .glb file, or a .gltf file together with its buffers and textures.';
+					return;
 
-				for ( const material of materials ) material.lightMapIntensity = live ? 0 : 1;
+				}
 
-				renderPipeline.outputNode = live ? liveOutput : bakedPass;
-				renderPipeline.needsUpdate = true;
+				if ( busy ) return;
+
+				busy = true;
+				stopBake();
+				status.textContent = `Loading ${ file.name }…`;
+
+				let next = null;
+
+				try {
+
+					next = await createGLTFWorld( await parseGLTFFiles( files, file ) );
+
+				} catch ( error ) {
+
+					console.error( error );
+					warning.textContent = `${ file.name } could not be loaded: ${ error.message }`;
+
+				} finally {
+
+					busy = false;
+
+				}
+
+				if ( next === null ) {
+
+					bake();
+					return;
+
+				}
+
+				// a reloaded file replaces its world
+
+				const name = `glTF: ${ file.name }`;
+
+				if ( worlds[ name ] !== undefined ) disposeWorld( worlds[ name ] );
+
+				worlds[ name ] = next;
+
+				if ( sceneControl.options.includes( name ) === false ) {
+
+					const option = document.createElement( 'option' );
+					option.value = option.textContent = name;
+					sceneControl.select.appendChild( option );
+					sceneControl.options.push( name );
+
+				}
+
+				sceneControl.setValue( name );
+
+			}
+
+			async function parseGLTFFiles( files, file ) {
+
+				// the buffers and textures of a .gltf file are looked up among the files by their names
+
+				const urls = new Map( files.map( ( file ) => [ file.name, URL.createObjectURL( file ) ] ) );
+				const manager = new THREE.LoadingManager();
+				manager.setURLModifier( ( url ) => urls.get( decodeURIComponent( url.split( /[\\/]/ ).pop() ) ) ?? url );
+
+				try {
+
+					if ( gltfLoader === null ) {
+
+						gltfLoader = { draco: new DRACOLoader().setDecoderPath( DRACO_GLTF_CONFIG ), ktx2: new KTX2Loader().detectSupport( renderer ) };
+
+					}
+
+					const loader = new GLTFLoader( manager ).setDRACOLoader( gltfLoader.draco ).setKTX2Loader( gltfLoader.ktx2 ).setMeshoptDecoder( MeshoptDecoder );
+
+					return await loader.parseAsync( await file.arrayBuffer(), '' );
+
+				} finally {
+
+					for ( const url of urls.values() ) URL.revokeObjectURL( url );
+
+				}
+
+			}
+
+			async function createGLTFWorld( gltf ) {
+
+				const root = new THREE.Group();
+				root.add( gltf.scene );
+				root.updateMatrixWorld( true );
+
+				// what the light baker has to deal with: skinned meshes are lit by probes, instances get their own
+				// atlas regions. The charts of the light map UVs of the file are kept, files without them are
+				// unwrapped. Either way, the charts are packed at the same texel density
+
+				let triangles = 0, skinned = 0, withUV1 = 0;
+				const fileLights = [];
+
+				root.traverse( ( object ) => {
+
+					if ( object.isLight ) fileLights.push( object );
+					if ( object.isMesh !== true ) return;
+
+					const geometry = object.geometry;
+					triangles += ( geometry.index ?? geometry.getAttribute( 'position' ) ).count / 3 * ( object.isInstancedMesh ? object.count : 1 );
+
+					if ( object.isSkinnedMesh ) skinned ++;
+					else if ( geometry.hasAttribute( 'uv1' ) ) withUV1 ++;
+
+					object.castShadow = object.receiveShadow = true;
+
+				} );
+
+				const bounds = new THREE.Box3().setFromObject( root );
+
+				if ( bounds.isEmpty() ) throw new Error( 'The file has no meshes.' );
+
+				const center = bounds.getCenter( new THREE.Vector3() );
+				const size = bounds.getSize( new THREE.Vector3() );
+				const radius = Math.max( size.length() / 2, 1e-3 );
+				const unwrap = withUV1 > 0 ? 'repack' : true;
+
+				// the texel density follows the number of triangles. Huge models get larger pages, as far as the
+				// device allows, since the charts of a mesh and all its instances have to fit one page. Phones get
+				// a single smaller page, the bake of four pages of 2048² takes more than 2 GB of GPU memory
+
+				const huge = triangles > 250000;
+				const maxPageSize = Math.min( renderer.backend.device.limits.maxTextureDimension2D, phone ? 2048 : 4096 );
+				const resolution = THREE.MathUtils.clamp( THREE.MathUtils.ceilPowerOfTwo( Math.sqrt( triangles ) * 6 ), 1024, phone ? 2048 : 4096 );
+				const pageSize = Math.min( huge ? 4096 : 2048, maxPageSize );
+
+				const warnings = [];
+
+				if ( skinned > 0 ) warnings.push( `${ skinned } skinned mesh${ skinned > 1 ? 'es are' : ' is' } left out of the light map and lit by probes` );
+				if ( huge ) warnings.push( `${ ( triangles / 1e6 ).toFixed( 2 ) }M triangles: the bake takes a while, the light map has pages of up to ${ pageSize }²` );
+
+				// the lights of the file cast shadows over the model
+
+				for ( const light of fileLights ) {
+
+					light.castShadow = light.isDirectionalLight || light.isPointLight || light.isSpotLight;
+
+					if ( light.castShadow ) fitShadow( light, center, radius );
+
+				}
+
+				// without lights of its own the model gets a sky and a sun, whose direct light stays live and whose
+				// bounces are baked. Small bright suns in a sky converge slowly with the stochastic radiosity, the sun
+				// of this sky is soft
+
+				let background = new THREE.Color( 0x111111 );
+
+				if ( fileLights.length === 0 ) {
+
+					const sun = new THREE.DirectionalLight( 0xfff0dd, 3 );
+					sun.position.setFromSphericalCoords( 2 * radius, THREE.MathUtils.degToRad( 40 ), THREE.MathUtils.degToRad( 30 ) ).add( center );
+					sun.target.position.copy( center );
+					sun.castShadow = true;
+					root.add( sun, sun.target );
+					fitShadow( sun, center, radius );
+
+					gltfSky ??= new HDRLoader().loadAsync( 'textures/equirectangular/venice_sunset_1k.hdr' );
+					background = await gltfSky;
+					background.mapping = THREE.EquirectangularReflectionMapping;
+
+				}
+
+				// light probes over the bounds, for the Light Probe algorithm and the meshes left out of the light
+				// map, and a reflection probe
+
+				const counts = size.toArray().map( ( length ) => THREE.MathUtils.clamp( Math.round( length / Math.max( size.x, size.y, size.z ) * 7 ) + 1, 2, 16 ) );
+				const direction = new THREE.Vector3( 0.6, 0.35, 1 ).normalize();
+
+				return {
+					root, light: null, lightPanel: null, background, resolution, pageSize, cacheSize: 256, unwrap,
+					camera: center.clone().addScaledVector( direction, radius / Math.sin( THREE.MathUtils.degToRad( camera.fov / 2 ) ) ), target: center.clone(), near: radius / 500, far: radius * 50,
+					reflections: [ { position: center.toArray(), box: bounds.min.toArray().concat( bounds.max.toArray() ) } ],
+					probes: { size: size.clone(), position: center.clone(), counts, far: radius * 4 },
+					warnings: warnings.join( ', ' )
+				};
+
+			}
+
+			function fitShadow( light, center, radius ) {
+
+				// a shadow camera around the model. Directional lights are moved to the model, which only changes
+				// where their shadow camera is
+
+				const shadow = light.shadow;
+				shadow.mapSize.setScalar( light.isPointLight ? 1024 : 2048 );
+				shadow.normalBias = radius * 2 / shadow.mapSize.x;
+				shadow.camera.near = radius * ( light.isDirectionalLight ? 0.5 : 0.01 );
+				shadow.camera.far = radius * ( light.isDirectionalLight ? 3.5 : 10 );
+
+				if ( light.isDirectionalLight ) {
+
+					const direction = light.target.getWorldPosition( new THREE.Vector3() ).sub( light.getWorldPosition( new THREE.Vector3() ) ).normalize();
+					const position = center.clone().addScaledVector( direction, - 2 * radius );
+
+					light.position.copy( light.parent.worldToLocal( position ) );
+					light.updateMatrixWorld();
+
+					if ( light.target.parent === null ) light.target.position.copy( center );
+
+					shadow.camera.left = shadow.camera.bottom = - radius;
+					shadow.camera.right = shadow.camera.top = radius;
+
+				}
+
+				shadow.camera.updateProjectionMatrix();
+
+			}
+
+			function disposeWorld( target ) {
+
+				target.root.traverse( ( object ) => {
+
+					if ( object.isMesh !== true ) return;
+
+					object.geometry.dispose();
+
+					for ( const material of [ object.material ].flat() ) {
+
+						for ( const value of Object.values( material ) ) if ( value?.isTexture ) value.dispose();
+
+						material.dispose();
+
+					}
+
+				} );
+
+				target.lightProbes?.dispose();
+				target.reflectionProbes?.dispose();
+
+			}
+
+			function setupProbes() {
+
+				// box projected reflection probes for glossy materials, and light probes for the meshes left out
+				// of the light map, e.g. the skinned meshes of glTF files
+
+				const reflections = world.reflections.map( ( { position, box } ) => ( { position: new THREE.Vector3( ...position ), box: new THREE.Box3().setFromArray( box ) } ) );
+				world.reflectionProbes = new ReflectionProbes( reflections, { far: world.probes.far * 2 } );
+
+				if ( world.probeLitMeshes.length > 0 ) {
+
+					const { size, position, counts } = world.probes;
+
+					world.lightProbes = new LightProbeGrid( size.x, size.y, size.z, ...counts );
+					world.lightProbes.position.copy( position );
+					world.lightProbes.updateBoundingBox();
+
+				}
+
+				// the probes only add specular light to glossy materials, their light maps provide the diffuse light
+
+				for ( const material of new Set( [ ...materials, ...world.sourceMaterials.values() ] ) ) {
+
+					if ( material.roughness < 0.5 ) {
+
+						keyProbeNodes( material );
+						material.envNode = world.reflectionProbes.envNode;
+						material.needsUpdate = true;
+
+					}
+
+				}
+
+			}
+
+			function keyProbeNodes( material ) {
+
+				// the shaders of materials are cached by their properties, but the probe nodes of plain materials are
+				// left out of the cache key. Materials of different scenes, or a material that returns to the probes
+				// of an earlier scene, would share the shader and the probes that it was first built with
+
+				if ( probeKeyedMaterials.has( material ) ) return;
+
+				const programCacheKey = material.customProgramCacheKey.bind( material );
+
+				material.customProgramCacheKey = () => `${ programCacheKey() },${ material.contextNode?.id },${ material.envNode?.id }`;
+				probeKeyedMaterials.add( material );
+
+			}
+
+			function setProbeCapture( capturing ) {
+
+				// the reflections are left out of bakes and probe captures
+
+				if ( world.reflectionProbes !== undefined ) world.reflectionProbes.intensity = capturing ? 0 : 1;
+
+			}
+
+			function updateProbes() {
+
+				if ( world.reflectionProbes === undefined ) setupProbes();
+
+				// the probes capture the light-mapped scene when a bake has finished, and once while baking a
+				// scene or algorithm for the first time, so that the reflections are lit in the meantime
+
+				if ( capture?.bakeId !== bakeId ) capture = null;
+
+				if ( lightBaker.baking === false && captureBakeId !== bakeId ) {
+
+					captureBakeId = bakeId;
+					capture = { bakeId, probe: 0, count: 1, reflection: 0, time: 0 };
+
+				} else if ( lightBaker.baking && previewBakeId !== bakeId && world.capturedAlgorithm !== params.algorithm && lightBaker.samples >= 8 ) {
+
+					previewBakeId = bakeId;
+					capture = { bakeId, probe: 0, count: 1, reflection: 0, time: 0 };
+
+				}
+
+				if ( capture !== null ) captureProbes();
+
+				// the meshes left out of the light map are lit by the light probes once they are captured
+
+				const probeLighting = world.lightProbes !== undefined && world.lightProbes.texture !== null;
+				const materialKey = `${ params.scene },${ probeLighting }`;
+
+				if ( probeMaterialKey !== materialKey ) {
+
+					probeMaterialKey = materialKey;
+
+					if ( probeLighting ) world.lightProbeContext ??= builtinGIContext( float( 1 ), lightProbeGridIrradiance( world.lightProbes, positionWorld, normalWorld ) );
+
+					for ( const mesh of world.probeLitMeshes ) {
+
+						keyProbeNodes( mesh.material );
+						mesh.material.contextNode = probeLighting ? world.lightProbeContext : null;
+						mesh.material.needsUpdate = true;
+
+					}
+
+				}
+
+				if ( lightBaker.baking === false ) status.textContent += capture !== null ? ', capturing probes' : captureStatus;
+
+			}
+
+			function captureProbes() {
+
+				// a few probes per frame keep the view responsive, the light probes first, as many per frame as fit
+				// in a few milliseconds, then one reflection probe per frame
+
+				const { lightProbes, reflectionProbes } = world;
+				const total = lightProbes !== undefined ? lightProbes.resolution.x * lightProbes.resolution.y * lightProbes.resolution.z : 0;
+				const background = scene.background;
+				const start = performance.now();
+
+				// background colors are not part of the bake
+
+				if ( background !== null && background.isColor ) scene.background = null;
+
+				setProbeCapture( true );
+
+				// meshes lit by the probes would light them
+
+				for ( const mesh of world.probeLitMeshes ) mesh.visible = false;
+
+				if ( capture.probe < total ) {
+
+					const count = Math.min( capture.count, total - capture.probe );
+
+					lightProbes.bake( renderer, scene, { cubemapSize: 16, near: 0.05, far: world.probes.far, start: capture.probe, count } );
+
+					capture.probe += count;
+					capture.count = THREE.MathUtils.clamp( Math.round( count * 6 / Math.max( performance.now() - start, 0.1 ) ), 1, 64 );
+
+				} else if ( capture.reflection < reflectionProbes.probes.length ) {
+
+					reflectionProbes.capture( renderer, scene, { start: capture.reflection, count: 1 } );
+					capture.reflection ++;
+
+				}
+
+				setProbeCapture( false );
+
+				for ( const mesh of world.probeLitMeshes ) mesh.visible = true;
+
+				scene.background = background;
+
+				capture.time += performance.now() - start;
+
+				if ( capture.probe === total && capture.reflection === reflectionProbes.probes.length ) {
+
+					world.capturedAlgorithm = params.algorithm;
+					captureStatus = `, probes captured in ${ capture.time.toFixed( 0 ) } ms`;
+					capture = null;
+
+				}
+
+			}
+
+			async function bake() {
+
+				if ( busy ) {
+
+					bakePending = true;
+					return;
+
+				}
+
+				busy = true;
+				bakePending = false;
+
+				stopBake();
+
+				// both radiosity solvers bake the emissive panel of the Cornell Box, light probes and VXGI its live
+				// point light
+
+				const emissive = params.algorithm === 'Ray Radiosity' || params.algorithm === 'Stochastic Radiosity';
+
+				if ( world.lightPanel !== null ) world.lightPanel.visible = emissive;
+				if ( world.light !== null ) world.light.visible = emissive === false;
+
+				// stochastic radiosity converges in fewer samples with more directions per sample, desktop GPUs
+				// render them at almost no extra cost, but they take memory and more time per sample on phones.
+				// A VXGI volume of 256³ takes about 700 MB of GPU memory, phones use 128³. The emissive panel is
+				// small and bright, few of the directions that all texels of a stochastic radiosity sample share
+				// find it, so its blotchy noise bakes to a lower tolerance
+
+				const panelRadiosity = params.algorithm === 'Stochastic Radiosity' && world.lightPanel !== null;
+
+				lightBaker.setOptions( {
+					algorithm: algorithms[ params.algorithm ],
+					resolution: params.resolution,
+					pageSize: world.pageSize ?? 2048,
+					unwrap: world.unwrap ?? true,
+					directions: phone ? 16 : 64,
+					cacheSize: params.algorithm === 'Stochastic Radiosity' ? world.cacheSize : 256,
+					probes: world.probes,
+					vxgiResolution: phone ? 128 : 256,
+					noiseTolerance: panelRadiosity ? 0.014 : null
+				} );
+
+				// unwrapping a large model takes a moment
+
+				if ( world.atlasResolution === undefined ) {
+
+					status.textContent = 'Unwrapping light map UVs…';
+					await new Promise( requestAnimationFrame );
+					await new Promise( requestAnimationFrame );
+
+				}
+
+				// the reflections are left out of the bake
+
+				setProbeCapture( true );
+
+				try {
+
+					await lightBaker.prepare( scene, world.root );
+
+				} catch ( error ) {
+
+					console.error( error );
+					warning.textContent = `The bake failed: ${ error.message }`;
+					return;
+
+				} finally {
+
+					setProbeCapture( false );
+					busy = false;
+
+				}
+
+				// light map UVs, the resolution grows until the charts fit. Resolutions above the page size give
+				// several pages at the density of the resolution. Meshes on other pages than the first one get
+				// copies of their materials, meshes left out of the light map are lit by probes
+
+				params.resolution = world.atlasResolution = lightBaker.atlasResolution;
+				materials = lightBaker.materials;
+				world.probeLitMeshes = lightBaker.excludedMeshes;
+
+				// the shells of inverted hull outlines would enclose and shadow the surfaces that they outline
+
+				const outlines = lightBaker.outlineMeshes.length;
+				warning.textContent = [ world.warnings, outlines > 0 ? `${ outlines } outline shell${ outlines > 1 ? 's are' : ' is' } left out of the bake` : '' ].filter( Boolean ).join( ', ' );
+				probeMaterialKey = '';
+
+				// the light maps show while they accumulate
+
+				lightBaker.apply();
+
+				bakeId ++;
+				startBake();
+
+				if ( bakePending ) bake();
+
+			}
+
+			function startBake() {
+
+				// the light baker accumulates a few samples per frame until the noise of the light map drops below
+				// its tolerance. The light maps show the samples every frame, and are denoised and stitched once
+				// the bake has finished
+
+				const controller = bakeController = new AbortController();
+
+				lightBaker.bake( scene, { root: world.root, signal: controller.signal } ).catch( ( error ) => {
+
+					if ( error.name !== 'AbortError' ) console.error( error );
+
+				} );
+
+			}
+
+			function stopBake() {
+
+				bakeController?.abort();
+				bakeController = null;
+
+			}
+
+			function setDenoise() {
+
+				lightBaker.denoise = params.denoise;
+
+				// a running bake denoises once it has finished, a finished one at once. The probes capture the
+				// light maps again
+
+				if ( lightBaker.baking ) return;
+
+				lightBaker.process();
+				captureBakeId = - 1;
 
 			}
 
@@ -314,34 +985,47 @@
 
 			function animate() {
 
-				// rebake after the renderer advances its frame so light uniforms are refreshed
+				// no new frames while the GPU is more than three frames behind, slow GPUs, e.g. of phones, are not
+				// handed more frames than they render
 
-				if ( needsBake ) {
+				if ( framesInFlight > 3 ) return;
 
-					bake();
-					needsBake = false;
+				framesInFlight ++;
+
+				render();
+
+				renderer.backend.device.queue.onSubmittedWorkDone().then( () => framesInFlight -- );
+
+			}
+
+			function render() {
+
+				if ( busy || lightBaker.lightMapper === null ) {
+
+					renderer.render( scene, camera );
+					return;
 
 				}
 
-				const samples = bakeSamples[ params.algorithm ];
+				const noise = lightBaker.noise;
+				const noiseText = noise === Infinity ? 'estimating noise' : `${ ( noise * 100 ).toFixed( 1 ) }% noise`;
+				const bakeTime = lightBaker.time;
 
-				if ( params.output === 'Live GI' ) {
+				if ( lightBaker.baking ) {
 
-					liveFrame.value = ( liveFrame.value + 1 ) % 64;
-					status.textContent = `Live ${ params.algorithm }`;
-
-				} else if ( lightMapper.samples < samples ) {
-
-					lightMapper.update();
-					status.textContent = `Baking ${ params.algorithm }: ${ lightMapper.samples } / ${ samples } samples`;
+					status.textContent = `Baking ${ params.algorithm }: ${ lightBaker.samples } samples, ${ noiseText }, ${ bakeTime.toFixed( 1 ) } s`;
 
 				} else {
 
-					status.textContent = `${ params.algorithm } baked: ${ samples } samples`;
+					const pages = lightBaker.lightMapper.pages.length;
+
+					status.textContent = `${ params.algorithm } baked: ${ lightBaker.samples } samples, ${ noiseText }, in ${ bakeTime.toFixed( 1 ) } s` + ( pages > 1 ? `, ${ pages } pages of ${ lightBaker.lightMapper.size }²` : '' );
 
 				}
 
-				renderPipeline.render();
+				updateProbes();
+
+				renderer.render( scene, camera );
 
 			}
 
