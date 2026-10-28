@@ -74,7 +74,7 @@
 
 			// the scenes and their loaders
 
-			const scenes = { 'Cornell Box': createCornellBox, 'Courtyard': loadCourtyard };
+			const scenes = { 'Cornell Box': createCornellBox, 'Courtyard': loadCourtyard, 'Space Ship Hallway': loadSpaceShipHallway };
 
 			// phones have less GPU memory and slower GPUs
 
@@ -435,6 +435,28 @@
 				input.multiple = true;
 				input.addEventListener( 'change', () => input.files.length > 0 && loadGLTFFiles( input.files ) );
 				input.click();
+
+			}
+
+			async function loadSpaceShipHallway() {
+
+				// a long hallway seen from one end, as in webgpu_interior. Its light comes in through the windows, which
+				// takes many more samples to converge than the open scenes
+
+				const response = await fetch( 'models/gltf/space_ship_hallway.glb' );
+				const file = new File( [ await response.arrayBuffer() ], 'space_ship_hallway.glb' );
+				const hallway = await createGLTFWorld( await parseGLTFFiles( [ file ], file ) );
+
+				const bounds = new THREE.Box3().setFromObject( hallway.root );
+				const center = bounds.getCenter( new THREE.Vector3() );
+				const size = bounds.getSize( new THREE.Vector3() );
+				const eyeHeight = bounds.min.y + size.y * 0.35;
+
+				hallway.camera = new THREE.Vector3( center.x, eyeHeight, bounds.max.z - size.z * 0.08 );
+				hallway.target = new THREE.Vector3( center.x, eyeHeight, bounds.min.z + size.z * 0.08 );
+				hallway.near = 0.05;
+
+				return hallway;
 
 			}
 
