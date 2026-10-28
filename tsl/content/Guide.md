@@ -915,45 +915,85 @@ Input functions can be used to create constants and do explicit conversions.
 
 > Note: Conversions are also performed automatically if the output and input are of different types.
 
-::: api float( value: Node | number ) : float - Convert or create a float node. :::
+::: api float( value ) : float - Convert or create a float node.
+- **value**: `Node | number`
+:::
 
-::: api int( value: Node | number ) : int - Convert or create an integer node. :::
+::: api int( value ) : int - Convert or create an integer node.
+- **value**: `Node | number`
+:::
 
-::: api uint( value: Node | number ) : uint - Convert or create an unsigned integer node. :::
+::: api uint( value ) : uint - Convert or create an unsigned integer node.
+- **value**: `Node | number`
+:::
 
-::: api bool( value: Node | boolean ) : bool - Convert or create a boolean node. :::
+::: api bool( value ) : bool - Convert or create a boolean node.
+- **value**: `Node | boolean`
+:::
 
-::: api color( ...value: Node | Color | string | number ) : color - Convert or create a color node. :::
+::: api color( ...value ) : color - Convert or create a color node.
+- **...value**: `Node | Color | string | number`
+:::
 
-::: api vec2( ...value: Node | Vector2 | number ) : vec2 - Convert or create a Vector2 node. :::
+::: api vec2( ...value ) : vec2 - Convert or create a Vector2 node.
+- **...value**: `Node | Vector2 | number`
+:::
 
-::: api vec3( ...value: Node | Vector3 | number ) : vec3 - Convert or create a Vector3 node. :::
+::: api vec3( ...value ) : vec3 - Convert or create a Vector3 node.
+- **...value**: `Node | Vector3 | number`
+:::
 
-::: api vec4( ...value: Node | Vector4 | number ) : vec4 - Convert or create a Vector4 node. :::
+::: api vec4( ...value ) : vec4 - Convert or create a Vector4 node.
+- **...value**: `Node | Vector4 | number`
+:::
 
-::: api mat2( ...value: Node | Matrix2 | number ) : mat2 - Convert or create a Matrix2 node. :::
+::: api mat2( ...value ) : mat2 - Convert or create a Matrix2 node.
+- **...value**: `Node | Matrix2 | number`
+:::
 
-::: api mat3( ...value: Node | Matrix3 | number ) : mat3 - Convert or create a Matrix3 node. :::
+::: api mat3( ...value ) : mat3 - Convert or create a Matrix3 node.
+- **...value**: `Node | Matrix3 | number`
+:::
 
-::: api mat4( ...value: Node | Matrix4 | number ) : mat4 - Convert or create a Matrix4 node. :::
+::: api mat4( ...value ) : mat4 - Convert or create a Matrix4 node.
+- **...value**: `Node | Matrix4 | number`
+:::
 
-::: api ivec2( ...value: Node | number ) : ivec2 - Convert or create an integer Vector2 node. :::
+::: api ivec2( ...value ) : ivec2 - Convert or create an integer Vector2 node.
+- **...value**: `Node | number`
+:::
 
-::: api ivec3( ...value: Node | number ) : ivec3 - Convert or create an integer Vector3 node. :::
+::: api ivec3( ...value ) : ivec3 - Convert or create an integer Vector3 node.
+- **...value**: `Node | number`
+:::
 
-::: api ivec4( ...value: Node | number ) : ivec4 - Convert or create an integer Vector4 node. :::
+::: api ivec4( ...value ) : ivec4 - Convert or create an integer Vector4 node.
+- **...value**: `Node | number`
+:::
 
-::: api uvec2( ...value: Node | number ) : uvec2 - Convert or create an unsigned integer Vector2 node. :::
+::: api uvec2( ...value ) : uvec2 - Convert or create an unsigned integer Vector2 node.
+- **...value**: `Node | number`
+:::
 
-::: api uvec3( ...value: Node | number ) : uvec3 - Convert or create an unsigned integer Vector3 node. :::
+::: api uvec3( ...value ) : uvec3 - Convert or create an unsigned integer Vector3 node.
+- **...value**: `Node | number`
+:::
 
-::: api uvec4( ...value: Node | number ) : uvec4 - Convert or create an unsigned integer Vector4 node. :::
+::: api uvec4( ...value ) : uvec4 - Convert or create an unsigned integer Vector4 node.
+- **...value**: `Node | number`
+:::
 
-::: api bvec2( ...value: Node | boolean ) : bvec2 - Convert or create a boolean Vector2 node. :::
+::: api bvec2( ...value ) : bvec2 - Convert or create a boolean Vector2 node.
+- **...value**: `Node | boolean`
+:::
 
-::: api bvec3( ...value: Node | boolean ) : bvec3 - Convert or create a boolean Vector3 node. :::
+::: api bvec3( ...value ) : bvec3 - Convert or create a boolean Vector3 node.
+- **...value**: `Node | boolean`
+:::
 
-::: api bvec4( ...value: Node | boolean ) : bvec4 - Convert or create a boolean Vector4 node. :::
+::: api bvec4( ...value ) : bvec4 - Convert or create a boolean Vector4 node.
+- **...value**: `Node | boolean`
+:::
 
 Example:
 
@@ -1042,47 +1082,89 @@ model.material.colorNode = color( 0x1e90ff );
 
 TSL nodes support all standard mathematical, logical, and bitwise operators as chainable methods:
 
-::: api .add( ...value: Node | number ) : Node - Return the addition of two or more values. :::
+::: api .add( ...value ) : Node - Return the addition of two or more values.
+- **...value**: `Node | number`
+:::
 
-::: api .sub( value: Node | number ) : Node - Return the subtraction of two or more values. :::
+::: api .sub( value ) : Node - Return the subtraction of two or more values.
+- **value**: `Node | number`
+:::
 
-::: api .mul( value: Node | number ) : Node - Return the multiplication of two or more values. :::
+::: api .mul( value ) : Node - Return the multiplication of two or more values.
+- **value**: `Node | number`
+:::
 
-::: api .div( value: Node | number ) : Node - Return the division of two or more values. :::
+::: api .div( value ) : Node - Return the division of two or more values.
+- **value**: `Node | number`
+:::
 
-::: api .mod( value: Node | number ) : Node - Computes the remainder of dividing the first node by the second. :::
+::: api .mod( value ) : Node - Computes the remainder of dividing the first node by the second.
+- **value**: `Node | number`
+:::
 
-::: api .equal( value: Node | number | boolean ) : bool - Checks if two nodes are equal. :::
+::: api .equal( value ) : bool - Checks if two nodes are equal.
+- **value**: `Node | number | boolean`
+:::
 
-::: api .notEqual( value: Node | number | boolean ) : bool - Checks if two nodes are not equal. :::
+::: api .notEqual( value ) : bool - Checks if two nodes are not equal.
+- **value**: `Node | number | boolean`
+:::
 
-::: api .lessThan( value: Node | number | boolean ) : bool - Checks if the first node is less than the second. :::
+::: api .lessThan( value ) : bool - Checks if the first node is less than the second.
+- **value**: `Node | number | boolean`
+:::
 
-::: api .greaterThan( value: Node | number | boolean ) : bool - Checks if the first node is greater than the second. :::
+::: api .greaterThan( value ) : bool - Checks if the first node is greater than the second.
+- **value**: `Node | number | boolean`
+:::
 
-::: api .lessThanEqual( value: Node | number | boolean ) : bool - Checks if the first node is less than or equal to the second. :::
+::: api .lessThanEqual( value ) : bool - Checks if the first node is less than or equal to the second.
+- **value**: `Node | number | boolean`
+:::
 
-::: api .greaterThanEqual( value: Node | number | boolean ) : bool - Checks if the first node is greater than or equal to the second. :::
+::: api .greaterThanEqual( value ) : bool - Checks if the first node is greater than or equal to the second.
+- **value**: `Node | number | boolean`
+:::
 
-::: api .and( value: Node | boolean ) : bool - Performs logical AND on two nodes. :::
+::: api .and( value ) : bool - Performs logical AND on two nodes.
+- **value**: `Node | boolean`
+:::
 
-::: api .or( value: Node | boolean ) : bool - Performs logical OR on two nodes. :::
+::: api .or( value ) : bool - Performs logical OR on two nodes.
+- **value**: `Node | boolean`
+:::
 
-::: api .not( value: Node | boolean ) : bool - Performs logical NOT on a node. :::
+::: api .not( value ) : bool - Performs logical NOT on a node.
+- **value**: `Node | boolean`
+:::
 
-::: api .xor( value: Node | boolean ) : bool - Performs logical XOR on two nodes. :::
+::: api .xor( value ) : bool - Performs logical XOR on two nodes.
+- **value**: `Node | boolean`
+:::
 
-::: api .bitAnd( value: Node | number ) : Node - Performs bitwise AND on two nodes. :::
+::: api .bitAnd( value ) : Node - Performs bitwise AND on two nodes.
+- **value**: `Node | number`
+:::
 
-::: api .bitNot( value: Node | number ) : Node - Performs bitwise NOT on a node. :::
+::: api .bitNot( value ) : Node - Performs bitwise NOT on a node.
+- **value**: `Node | number`
+:::
 
-::: api .bitOr( value: Node | number ) : Node - Performs bitwise OR on two nodes. :::
+::: api .bitOr( value ) : Node - Performs bitwise OR on two nodes.
+- **value**: `Node | number`
+:::
 
-::: api .bitXor( value: Node | number ) : Node - Performs bitwise XOR on two nodes. :::
+::: api .bitXor( value ) : Node - Performs bitwise XOR on two nodes.
+- **value**: `Node | number`
+:::
 
-::: api .shiftLeft( value: Node | number ) : Node - Shifts a node to the left. :::
+::: api .shiftLeft( value ) : Node - Shifts a node to the left.
+- **value**: `Node | number`
+:::
 
-::: api .shiftRight( value: Node | number ) : Node - Shifts a node to the right. :::
+::: api .shiftRight( value ) : Node - Shifts a node to the right.
+- **value**: `Node | number`
+:::
 
 ```tsl
 import 'scenes/shaderball';
@@ -1711,27 +1793,49 @@ model.material.colorNode = createChecker( 8.0 );
 <page name="Assignments">
 
 TSL variables and parameters inside a custom function `Fn` can be updated dynamically using assignment methods:
-::: api .assign( value: Node | number ) : Node - Assigns a value and returns the node. :::
+::: api .assign( value ) : Node - Assigns a value and returns the node.
+- **value**: `Node | number`
+:::
 
-::: api .addAssign( value: Node | number ) : Node - Adds a value and assigns the result. :::
+::: api .addAssign( value ) : Node - Adds a value and assigns the result.
+- **value**: `Node | number`
+:::
 
-::: api .subAssign( value: Node | number ) : Node - Subtracts a value and assigns the result. :::
+::: api .subAssign( value ) : Node - Subtracts a value and assigns the result.
+- **value**: `Node | number`
+:::
 
-::: api .mulAssign( value: Node | number ) : Node - Multiplies a value and assigns the result. :::
+::: api .mulAssign( value ) : Node - Multiplies a value and assigns the result.
+- **value**: `Node | number`
+:::
 
-::: api .divAssign( value: Node | number ) : Node - Divides a value and assigns the result. :::
+::: api .divAssign( value ) : Node - Divides a value and assigns the result.
+- **value**: `Node | number`
+:::
 
-::: api .modAssign( value: Node | number ) : Node - Computes the remainder and assigns the result. :::
+::: api .modAssign( value ) : Node - Computes the remainder and assigns the result.
+- **value**: `Node | number`
+:::
 
-::: api .bitAndAssign( value: Node | number ) : Node - Performs bitwise AND and assigns the result. :::
+::: api .bitAndAssign( value ) : Node - Performs bitwise AND and assigns the result.
+- **value**: `Node | number`
+:::
 
-::: api .bitOrAssign( value: Node | number ) : Node - Performs bitwise OR and assigns the result. :::
+::: api .bitOrAssign( value ) : Node - Performs bitwise OR and assigns the result.
+- **value**: `Node | number`
+:::
 
-::: api .bitXorAssign( value: Node | number ) : Node - Performs bitwise XOR and assigns the result. :::
+::: api .bitXorAssign( value ) : Node - Performs bitwise XOR and assigns the result.
+- **value**: `Node | number`
+:::
 
-::: api .shiftLeftAssign( value: Node | number ) : Node - Shifts left and assigns the result. :::
+::: api .shiftLeftAssign( value ) : Node - Shifts left and assigns the result.
+- **value**: `Node | number`
+:::
 
-::: api .shiftRightAssign( value: Node | number ) : Node - Shifts right and assigns the result. :::
+::: api .shiftRightAssign( value ) : Node - Shifts right and assigns the result.
+- **value**: `Node | number`
+:::
 
 ```tsl
 import 'scenes/shaderball';
@@ -2718,23 +2822,41 @@ Events are registered directly inside a TSL function `Fn()` using event function
 
 <code name="eventsExample" default="true">Centralized Material Updates</code>
 
-::: api OnFrameUpdate( callback: Function ) : EventNode - Executes a callback once per animation frame on the CPU. :::
+::: api OnFrameUpdate( callback ) : EventNode - Executes a callback once per animation frame on the CPU.
+- **callback**: `Function`
+:::
 
-::: api OnBeforeFrameUpdate( callback: Function ) : EventNode - Executes a callback before frame node updates begin. :::
+::: api OnBeforeFrameUpdate( callback ) : EventNode - Executes a callback before frame node updates begin.
+- **callback**: `Function`
+:::
 
-::: api OnMaterialUpdate( callback: Function ) : EventNode - Executes a callback when the material is rendered. :::
+::: api OnMaterialUpdate( callback ) : EventNode - Executes a callback when the material is rendered.
+- **callback**: `Function`
+:::
 
-::: api OnBeforeMaterialUpdate( callback: Function ) : EventNode - Executes a callback before the material is updated. :::
+::: api OnBeforeMaterialUpdate( callback ) : EventNode - Executes a callback before the material is updated.
+- **callback**: `Function`
+:::
 
-::: api OnObjectUpdate( callback: Function ) : EventNode - Executes a callback each time an individual object using the material is rendered. :::
+::: api OnObjectUpdate( callback ) : EventNode - Executes a callback each time an individual object using the material is rendered.
+- **callback**: `Function`
+:::
 
-::: api OnBeforeObjectUpdate( callback: Function ) : EventNode - Executes a callback before each individual object is rendered. :::
+::: api OnBeforeObjectUpdate( callback ) : EventNode - Executes a callback before each individual object is rendered.
+- **callback**: `Function`
+:::
 
-::: api OnAfterObjectUpdate( callback: Function ) : EventNode - Executes a callback after an individual object finishes rendering. :::
+::: api OnAfterObjectUpdate( callback ) : EventNode - Executes a callback after an individual object finishes rendering.
+- **callback**: `Function`
+:::
 
-::: api OnBeforeRenderPipeline( callback: Function ) : EventNode - Executes a callback before the post-processing render pipeline starts. :::
+::: api OnBeforeRenderPipeline( callback ) : EventNode - Executes a callback before the post-processing render pipeline starts.
+- **callback**: `Function`
+:::
 
-::: api OnAfterRenderPipeline( callback: Function ) : EventNode - Executes a callback after the post-processing render pipeline completes. :::
+::: api OnAfterRenderPipeline( callback ) : EventNode - Executes a callback after the post-processing render pipeline completes.
+- **callback**: `Function`
+:::
 
 ```tsl eventsExample
 import 'scenes/shaderball';
@@ -2963,17 +3085,29 @@ In TSL, `texture( map, uv? )` samples a 2D texture with automatic filtering, mip
 
 ### Methods
 
-::: api .uv( uvNode: vec2 ) : Node - Returns a sample of the texture using new UV coordinates. :::
+::: api .uv( uvNode ) : Node - Returns a sample of the texture using new UV coordinates.
+- **uvNode**: `vec2`
+:::
 
-::: api .level( levelNode: int ) : Node - Explicitly selects the mipmap level for sampling. :::
+::: api .level( levelNode ) : Node - Explicitly selects the mipmap level for sampling.
+- **levelNode**: `int`
+:::
 
-::: api .bias( biasNode: float ) : Node - Applies a level-of-detail bias to mipmap selection. :::
+::: api .bias( biasNode ) : Node - Applies a level-of-detail bias to mipmap selection.
+- **biasNode**: `float`
+:::
 
-::: api .size( level?: int ) : uvec2 - Returns the dimensions of the texture at the specified mip level. :::
+::: api .size( level? ) : uvec2 - Returns the dimensions of the texture at the specified mip level.
+- **level**: `int` - (Optional) The mip level to query. Defaults to `0`.
+:::
 
-::: api .sample( uvNode: vec2 ) : vec4 - Samples the texture with filtering at the given UV coordinates. :::
+::: api .sample( uvNode ) : vec4 - Samples the texture with filtering at the given UV coordinates.
+- **uvNode**: `vec2`
+:::
 
-::: api .load( uvNode: ivec2 ) : vec4 - Loads the texel at the given pixel coordinates without filtering. :::
+::: api .load( uvNode ) : vec4 - Loads the texel at the given pixel coordinates without filtering.
+- **uvNode**: `ivec2`
+:::
 
 ```tsl textureExample
 import 'scenes/shaderball';
@@ -3012,11 +3146,17 @@ Uniforms are useful to update values of variables like colors, lighting, or tran
 
 It is also possible to create update events on `uniforms`, which can be defined by the user:
 
-::: api .onObjectUpdate( callback: Function ) - It will be updated every time an object like `Mesh` is rendered with this `Node` in `Material`. :::
+::: api .onObjectUpdate( callback ) - It will be updated every time an object like `Mesh` is rendered with this `Node` in `Material`.
+- **callback**: `Function`
+:::
 
-::: api .onRenderUpdate( callback: Function ) - It will be updated once per render, common and shared materials, fog, tone mapping, etc. :::
+::: api .onRenderUpdate( callback ) - It will be updated once per render, common and shared materials, fog, tone mapping, etc.
+- **callback**: `Function`
+:::
 
-::: api .onFrameUpdate( callback: Function ) - It will be updated only once per frame, regardless of when `render-pass` the frame has, cases like `time` for example. :::
+::: api .onFrameUpdate( callback ) - It will be updated only once per frame, regardless of when `render-pass` the frame has, cases like `time` for example.
+- **callback**: `Function`
+:::
 
 ```tsl uniformEventUpdate
 import 'scenes/shaderball';
@@ -3182,7 +3322,9 @@ Unlike standard uniforms, storage buffers can be modified directly on the GPU â€
 
 ### Methods
 
-::: api .element( index: int ) : Node - Accesses an element in the storage buffer at the specified index. :::
+::: api .element( index ) : Node - Accesses an element in the storage buffer at the specified index.
+- **index**: `int`
+:::
 
 ::: api .toAttribute() : Node - Converts the storage buffer into an attribute node for vertex or instance rendering. :::
 
@@ -3273,7 +3415,9 @@ They are ideal for procedural texture generation, image processing filters, flui
 
 ::: api .toReadWrite() : Node - Sets the storage texture access mode to read-write. :::
 
-::: api .setMipLevel( level: int ) : Node - Sets the mipmap level to write to. :::
+::: api .setMipLevel( level ) : Node - Sets the mipmap level to write to.
+- **level**: `int`
+:::
 
 ```tsl storageTextureExample
 import 'scenes/shaderball';
@@ -3912,15 +4056,15 @@ You can decouple an individual material from global scene lights by assigning a 
 
 <code name="tslLightingSystem" default="true">TSL Lighting System</code>
 
-::: api lights( lights: Array<Light> = [] ) : LightsNode - Creates a lighting node that manages a specific set of lights and their shadow evaluations.
-- **lights**: `Array<Light>` - (Optional) Array of Three.js light instances to include in the lighting group.
+::: api lights( lights? ) : LightsNode - Creates a lighting node that manages a specific set of lights and their shadow evaluations.
+- **lights**: `Array<Light>` - (Optional) Array of Three.js light instances to include in the lighting group. Defaults to `[]`.
 :::
 
 ::: api material.lightsNode : LightsNode - Property on NodeMaterial to override or isolate the lights illuminating the material. :::
 
-::: api lightingContext( lightsNode: LightsNode, lightingModel: LightingModel = null ) : LightingContextNode - Wraps lighting execution within a custom lights node and optional lighting model.
+::: api lightingContext( lightsNode, lightingModel? ) : LightingContextNode - Wraps lighting execution within a custom lights node and optional lighting model.
 - **lightsNode**: `LightsNode` - The target lights node to evaluate.
-- **lightingModel**: `LightingModel` - (Optional) Custom lighting model (e.g. Lambert, Phong, Standard, Physical, Toon).
+- **lightingModel**: `LightingModel` - (Optional) Custom lighting model (e.g. Lambert, Phong, Standard, Physical, Toon). Defaults to `null`.
 :::
 
 ```tsl tslLightingSystem
@@ -3980,27 +4124,27 @@ These functions return uniform nodes that update automatically when light object
 
 <code name="lightFunctionsExample" default="true">Light Functions</code>
 
-::: api lightPosition( light: Light ) : vec3 - Returns a uniform node representing the light source's position in world space.
+::: api lightPosition( light ) : vec3 - Returns a uniform node representing the light source's position in world space.
 - **light**: `Light` - The light instance to access.
 :::
 
-::: api lightTargetPosition( light: Light ) : vec3 - Returns a uniform node for the target position of a directional or spot light in world space.
+::: api lightTargetPosition( light ) : vec3 - Returns a uniform node for the target position of a directional or spot light in world space.
 - **light**: `Light` - The light instance to access.
 :::
 
-::: api lightViewPosition( light: Light ) : vec3 - Returns a uniform node representing the light source's position in camera view space.
+::: api lightViewPosition( light ) : vec3 - Returns a uniform node representing the light source's position in camera view space.
 - **light**: `Light` - The light instance to access.
 :::
 
-::: api lightTargetDirection( light: Light ) : vec3 - Returns the normalized target direction vector of the light in camera view space.
+::: api lightTargetDirection( light ) : vec3 - Returns the normalized target direction vector of the light in camera view space.
 - **light**: `Light` - The light instance to access.
 :::
 
-::: api lightShadowMatrix( light: Light ) : mat4 - Returns the shadow projection matrix uniform node for the specified light.
+::: api lightShadowMatrix( light ) : mat4 - Returns the shadow projection matrix uniform node for the specified light.
 - **light**: `Light` - The light source whose shadow matrix to retrieve.
 :::
 
-::: api lightProjectionUV( light: Light, position: vec3 = null ) : vec3 - Computes projected UV coordinates from a light's shadow projection matrix for spotlights and projector effects.
+::: api lightProjectionUV( light, position? ) : vec3 - Computes projected UV coordinates from a light's shadow projection matrix for spotlights and projector effects.
 - **light**: `Light` - The light source used for projection.
 - **position**: `vec3` - (Optional) The world-space position to project. Defaults to `positionWorld`.
 :::
@@ -4058,12 +4202,12 @@ Beyond standard shadow mapping, [Node Material](#node-material) provides dedicat
 <code name="castShadowNode" default="true">Cast Shadow Node</code>
 <code name="displacedShadowPosition">Displaced Shadow Position</code>
 
-::: api shadow( light: Light, shadow?: LightShadow ) : ShadowNode - Creates a shadow node for directional or spot lights.
+::: api shadow( light, shadow? ) : ShadowNode - Creates a shadow node for directional or spot lights.
 - **light**: `Light` - The shadow casting light.
 - **shadow**: `LightShadow` - (Optional) The light shadow instance. Defaults to `light.shadow`.
 :::
 
-::: api pointShadow( light: PointLight, shadow?: LightShadow ) : PointShadowNode - Creates an omnidirectional point shadow node.
+::: api pointShadow( light, shadow? ) : PointShadowNode - Creates an omnidirectional point shadow node.
 - **light**: `PointLight` - The shadow casting point light.
 - **shadow**: `LightShadow` - (Optional) The point light shadow instance.
 :::
@@ -5116,13 +5260,16 @@ Rotation functions allow you to rotate 2D coordinates or 3D positions/vectors. T
 
 <code name="teapotEmitter" default="true">Teapot Emitter</code>
 
-::: api rotate( position, rotation, order='XYZ' ) : Node - Applies a rotation to the given position or vector node.
+::: api rotate( position, rotation, order? ) : Node - Applies a rotation to the given position or vector node.
 - **position**: `vec2 | vec3` - The 2D or 3D vector to rotate.
 - **rotation**: `float | vec3` - For 2D positions, a single float angle (in radians). For 3D positions, a Euler rotation vector containing rotation angles for the X, Y, and Z axes.
-- **order**: `string` - The Euler rotation order (e.g. `'XYZ'`, `'YZX'`, `'ZXY'`, `'XZY'`, `'YXZ'`, `'ZYX'`). Only used for 3D rotation. Defaults to `'XYZ'`.
+- **order**: `string` - (Optional) The Euler rotation order (e.g. `'XYZ'`, `'YZX'`, `'ZXY'`, `'XZY'`, `'YXZ'`, `'ZYX'`). Only used for 3D rotation. Defaults to `'XYZ'`.
 :::
 
-::: api .rotate( rotation, order='XYZ' ) : Node - Method chaining helper to rotate the current position or vector node. :::
+::: api .rotate( rotation, order? ) : Node - Method chaining helper to rotate the current position or vector node.
+- **rotation**: `float | vec3` - Rotation angle in radians for 2D positions, or Euler rotation angles for 3D positions.
+- **order**: `string` - (Optional) The Euler rotation order. Only used for 3D rotation. Defaults to `'XYZ'`.
+:::
 
 ```tsl teapotEmitter
 import 'scenes/empty';
@@ -5216,9 +5363,9 @@ TSL provides dedicated utility functions for transforming 2D UV texture coordina
 
 <code name="replaceDefaultUVExample">Replace Default UV</code>
 
-::: api replaceDefaultUV( callback, node = null ) : ContextNode - Replaces the default UV coordinates used in texture lookups across a material or sub-graph.
+::: api replaceDefaultUV( callback, node? ) : ContextNode - Replaces the default UV coordinates used in texture lookups across a material or sub-graph.
 - **callback**: `Function(Node): Node<vec2> | Node<vec2>` - A callback receiving the texture node and returning the new UV coordinates, or a replacement UV node directly.
-- **node**: `Node` - (Optional) An optional target node to which the context will be applied. Defaults to `null`.
+- **node**: `Node` - (Optional) Target node to which the context will be applied. Defaults to `null`.
 :::
 
 ### Example
@@ -6623,17 +6770,17 @@ plane.material.colorNode = finalColor.debug();
 
 TSL provides pre-built context helpers such as **`builtinAOContext()`** and **`builtinShadowContext()`** to quickly modify ambient occlusion and lighting shadow behavior across a material or node sub-graph without manually writing custom `getAO` or `getShadow` context handler objects.
 
-::: api builtinAOContext( aoNode, node = null ) : ContextNode - Intercepts `getAO` to modulate ambient occlusion for non-transparent materials by `aoNode`.
+::: api builtinAOContext( aoNode, node? ) : ContextNode - Intercepts `getAO` to modulate ambient occlusion for non-transparent materials by `aoNode`.
 - **aoNode**: `Node` - The ambient occlusion node to multiply.
-- **node**: `Node` - Optional node expression to wrap with this AO context. Defaults to `null`.
+- **node**: `Node` - (Optional) Node expression to wrap with this AO context. Defaults to `null`.
 :::
 
 ::: api .builtinAOContext( aoNode ) : ContextNode - Method chaining helper to wrap the current node expression with a built-in AO context. :::
 
-::: api builtinShadowContext( shadowNode, light, node = null ) : ContextNode - Intercepts `getShadow` to modulate the shadow color of a specific light by `shadowNode`.
+::: api builtinShadowContext( shadowNode, light, node? ) : ContextNode - Intercepts `getShadow` to modulate the shadow color of a specific light by `shadowNode`.
 - **shadowNode**: `Node` - The shadow modulation node.
 - **light**: `Light` - The target light whose shadow should be modulated.
-- **node**: `Node` - Optional node expression to wrap with this shadow context. Defaults to `null`.
+- **node**: `Node` - (Optional) Node expression to wrap with this shadow context. Defaults to `null`.
 :::
 
 ::: api .builtinShadowContext( shadowNode, light ) : ContextNode - Method chaining helper to wrap the current node expression with a built-in shadow context. :::
@@ -6790,7 +6937,7 @@ However, if you want to evaluate the **same node** under different parameters (s
 
 `isolate( node )` or `.isolate()` tells TSL to create an **isolated cache scope**, forcing the node to be evaluated fresh without reusing or overwriting existing cache data.
 
-::: api isolate( node: Node ) : IsolateNode - Creates an isolated cache wrapper for a node.
+::: api isolate( node ) : IsolateNode - Creates an isolated cache wrapper for a node.
 - **node**: `Node` - The node whose evaluation cache should be isolated.
 :::
 
@@ -6859,19 +7006,19 @@ Calling `.once()` on a `Fn()` creates a **singleton function**: TSL evaluates it
 
 **Sub-Builds** solve this by creating scoped compilation layers (like `'POSITION'` or `'NORMAL'`). Passing `.once( [ 'POSITION' ] )` tells TSL to maintain a separate cache for that specific stage instead of reusing a single global value.
 
-::: api fn.once( subBuilds: Array<string> = null ) : FunctionNode - Configures a TSL function, `fn`, to execute and cache its output node once per build, with optional isolated caching across specified sub-build layers.
-- **subBuilds**: `Array<string>` - (Optional) Array of sub-build layer names (e.g. `[ 'NORMAL', 'VERTEX' ]`) under which the function is cached independently.
+::: api fn.once( subBuilds? ) : FunctionNode - Configures a TSL function, `fn`, to execute and cache its output node once per build, with optional isolated caching across specified sub-build layers.
+- **subBuilds**: `Array<string>` - (Optional) Array of sub-build layer names (e.g. `[ 'NORMAL', 'VERTEX' ]`) under which the function is cached independently. Defaults to `null`.
 :::
 
-::: api subBuild( node: Node, name: string, type: string = null ) : SubBuildNode - Wraps a node to be built within an isolated sub-build scope (e.g. `'VERTEX'`, `'NORMAL'`, `'POSITION'`).
+::: api subBuild( node, name, type? ) : SubBuildNode - Wraps a node to be built within an isolated sub-build scope (e.g. `'VERTEX'`, `'NORMAL'`, `'POSITION'`).
 - **node**: `Node` - The target node to evaluate inside the sub-build layer.
 - **name**: `string` - The name of the sub-build compilation layer.
-- **type**: `string` - (Optional) The output type of the node.
+- **type**: `string` - (Optional) The output type of the node. Defaults to `null`.
 :::
 
-::: api builder.getSubBuildProperty( property: string = '', node: Node = null ) : string - Returns a sub-build prefixed property or varying identifier (e.g. `'POSITION_v_positionWorld'`).
-- **property**: `string` - The base property or varying name to prefix.
-- **node**: `Node` - (Optional) Target node used to resolve the closest sub-build scope.
+::: api builder.getSubBuildProperty( property?, node? ) : string - Returns a sub-build prefixed property or varying identifier (e.g. `'POSITION_v_positionWorld'`).
+- **property**: `string` - (Optional) The base property or varying name to prefix. Defaults to `''`.
+- **node**: `Node` - (Optional) Target node used to resolve the closest sub-build scope. Defaults to `null`.
 :::
 
 ### How `positionWorld` Works

@@ -2970,6 +2970,13 @@ body.preview-maximized .preview-hide-btn {
 	font-weight: 300;
 }
 
+.tsl-api-card:not(.tsl-api-card-inline) .tsl-api-sig-desc,
+.tsl-api-table-row-robust .tsl-api-sig-desc {
+	flex-basis: 100%;
+	margin-left: 0;
+	margin-top: 0.35rem;
+}
+
 /* Guide Important Callout Block */
 .guide-important-block {
 	margin: 1.5rem 0;
