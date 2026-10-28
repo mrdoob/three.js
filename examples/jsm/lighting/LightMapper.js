@@ -118,7 +118,14 @@ class LightMapper {
 		if ( moments && floatBlendable && directional === false ) outputs.push( 'moment' );
 		if ( directional ) outputs.push( 'direction' );
 
-		this._maxSamples = floatBlendable ? Infinity : 256;
+		/**
+		 * The most samples that the mapper accumulates: 256 without the 'float32-blendable' renderer feature,
+		 * since half float sums lose the precision of single samples beyond, else `Infinity`.
+		 *
+		 * @type {number}
+		 * @readonly
+		 */
+		this.maxSamples = floatBlendable ? Infinity : 256;
 
 		/**
 		 * The channel of {@link LightMapper#momentTexture} that holds the moments, `'a'` if it is shared
@@ -352,7 +359,7 @@ class LightMapper {
 
 		const renderer = this.renderer;
 
-		samples = Math.min( samples, this._maxSamples - this.samples );
+		samples = Math.min( samples, this.maxSamples - this.samples );
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 

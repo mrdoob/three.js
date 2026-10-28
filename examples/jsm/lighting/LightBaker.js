@@ -1,18 +1,21 @@
-import { BackSide, Box3, EquirectangularReflectionMapping, EquirectangularRefractionMapping, FrontSide, Matrix4, Mesh, MeshBasicNodeMaterial, MeshLambertNodeMaterial, PerspectiveCamera, Raycaster, RenderTarget, Sphere, SphereGeometry, Vector3 } from 'three/webgpu';
+import { BackSide, Box3, BufferAttribute, DoubleSide, EquirectangularReflectionMapping, EquirectangularRefractionMapping, FrontSide, Matrix4, Mesh, MeshBasicNodeMaterial, MeshLambertNodeMaterial, PerspectiveCamera, Raycaster, RenderTarget, Sphere, SphereGeometry, Vector3 } from 'three/webgpu';
 import { cubeTexture, dot, equirectUV, lights, luminance, positionWorld, texture, uniform, vec3 } from 'three/tsl';
 
 import { LightMapper } from './LightMapper.js';
 import { LightMapDenoiser } from './LightMapDenoiser.js';
 import { LightMapSeams } from './LightMapSeams.js';
 import { LightProbeGrid } from './LightProbeGrid.js';
+import { VertexLightMapper, imprintContacts, refineContacts, simplifyGeometry, subdivideGeometry, vertexLightMap } from './VertexLightMapper.js';
 import { StochasticRadiosity, radiosityIrradiance } from './StochasticRadiosity.js';
 import { VXGIVolume } from './vxgi/VXGIVolume.js';
 import { vxgiIrradiance } from './vxgi/VXGIIrradiance.js';
 import { lightProbeGridIrradiance } from '../tsl/lighting/LightProbeGridNode.js';
 import { directionalLightMap, instancedLightMap } from '../tsl/lighting/DirectionalLightMapNode.js';
 import { unwrapUVs } from '../utils/unwrapUVs.js';
+import { mergeVertices } from '../utils/BufferGeometryUtils.js';
 
 const ALGORITHMS = [ 'stochastic', 'ray', 'probes', 'vxgi' ];
+const TARGETS = [ 'lightMap', 'vertex' ];
 
 // the bake stops once the estimated noise of the light map drops below the tolerance, which is checked
 // whenever the samples have grown by a quarter, or after the maximum samples. Light probes are
@@ -21,8 +24,17 @@ const ALGORITHMS = [ 'stochastic', 'ray', 'probes', 'vxgi' ];
 // radiosity samples are cheap, so several are baked per frame
 
 const NOISE_TOLERANCE = 0.02;
+
+// vertex bakes stop at a lower noise: a vertex spreads its noise over its triangles, where it shows as
+// blotches, and vertex bakes need far fewer samples than light maps
+
+const VERTEX_NOISE_TOLERANCE = 0.01;
 const MAX_SAMPLES = { ray: 1024, stochastic: 8192, probes: 16, vxgi: 256 };
 const SAMPLES_PER_FRAME = { ray: 1, stochastic: 4, probes: 1, vxgi: 1 };
+
+// a sample of a vertex bake gathers at far fewer points than one of a light map
+
+const VERTEX_SAMPLES_PER_FRAME = { ray: 4, stochastic: 16, probes: 1, vxgi: 1 };
 
 // interactive bakes bake fewer samples per frame while frames take longer than this on average, in
 // milliseconds, and wait while the GPU is more than a few frames behind. Slow GPUs, e.g. of phones, are
@@ -35,7 +47,19 @@ const FRAMES_IN_FLIGHT = 3;
 
 const FIRST_NOISE_CHECK = 8;
 
-const OPTIONS = [ 'algorithm', 'resolution', 'pageSize', 'padding', 'unwrap', 'ignoreOutlines', 'directional', 'specularIntensity', 'denoise', 'stitchSeams', 'noiseTolerance', 'maxSamples', 'samplesPerFrame', 'directLight', 'directions', 'cacheSize', 'probes', 'vxgiResolution' ];
+// the rays and the bounce cache of subdivided vertex bakes use a coarser subdivision, by this factor of the
+// maximum edge length, with edges of at most this share of the size of the meshes. Coarser bounce caches
+// interpolate the bounces into blotches
+
+const VERTEX_CACHE_EDGE = 4;
+const VERTEX_CACHE_MAX_EDGE = 0.04;
+
+// the refinement of vertex bakes splits the edges whose ends differ more in luminance, relative to the
+// brighter end, down to the maximum edge length halved by the number of refinements
+
+const REFINE_CONTRAST = 0.1;
+
+const OPTIONS = [ 'algorithm', 'target', 'maxEdgeLength', 'refine', 'simplify', 'resolution', 'pageSize', 'padding', 'unwrap', 'ignoreOutlines', 'directional', 'specularIntensity', 'denoise', 'stitchSeams', 'noiseTolerance', 'maxSamples', 'samplesPerFrame', 'directLight', 'directions', 'cacheSize', 'probes', 'vxgiResolution' ];
 
 // the ray traced source needs three-mesh-bvh, so it is loaded on demand
 
@@ -126,6 +150,61 @@ class LightBaker {
 		this.algorithm = 'stochastic';
 
 		/**
+		 * What the light is baked into: `'lightMap'` for light maps, `'vertex'` for the vertices of the
+		 * meshes, see {@link VertexLightMapper}. Vertex bakes need no light map UVs, so they skip the
+		 * unwrapping, the atlas, the denoising and the seams. The radiosity solvers also cache their bounces
+		 * in the vertices then, and only the `'ray'` algorithm bakes the direct light of a vertex bake, see
+		 * {@link LightBaker#directLight}. The light of a vertex bake is as detailed as the meshes: big
+		 * triangles can not show shadows within them.
+		 *
+		 * @type {string}
+		 * @default 'lightMap'
+		 */
+		this.target = 'lightMap';
+
+		/**
+		 * The maximum edge length of the triangles of vertex bakes in world units, longer edges are split
+		 * by {@link subdivideGeometry}, so that the vertices can show the light within big triangles. The
+		 * meshes render the subdivided geometries while the vertex bake is applied, and get their own back
+		 * for light map bakes and on `dispose()`. `null` keeps the meshes as they are.
+		 *
+		 * @type {?number}
+		 * @default null
+		 */
+		this.maxEdgeLength = null;
+
+		/**
+		 * The number of refinements of vertex bakes. Before the bake, also without refinements, the subdivided
+		 * meshes are cut along the contacts of surfaces and the triangles inside other meshes are left out, see
+		 * {@link imprintContacts}. Once a bake has converged, the edges whose ends differ by more than a tenth
+		 * in luminance are split, and all vertices are baked again until they converge. Each refinement halves
+		 * the edges at the shadows and other changes of the light, down to the maximum edge length, or a
+		 * hundredth of the size of the meshes, halved by the number of refinements. The triangles that split an
+		 * edge split their longest edge too, and so do their neighbours, so the triangles keep their shapes
+		 * and the refinement grades into the larger triangles around it. The rays and the bounces
+		 * keep their geometry, so a refinement only bakes the vertices again. {@link LightBaker#simplify} removes
+		 * the vertices that the light does not need afterwards. Instanced meshes are not refined.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.refine = 0;
+
+		/**
+		 * The error of the simplification of vertex bakes, or `null` to keep all their vertices. Once a vertex
+		 * bake has converged after its refinements, the meshes are simplified where the baked light allows it,
+		 * with meshoptimizer, down to the vertices of the meshes before their subdivision, and the vertices that
+		 * remain keep their light: baked over the smaller triangles, it is closer to the light at the vertices
+		 * than a bake over the larger ones, which would flatten curved light. The error is relative to the size
+		 * of each mesh, and for the light to its mean, e.g. `0.0005`: larger errors lose small features like
+		 * contact shadows.
+		 *
+		 * @type {?number}
+		 * @default null
+		 */
+		this.simplify = null;
+
+		/**
 		 * The resolution of the light map atlas, which sets the texel density. It doubles until the
 		 * charts fit, see {@link LightBaker#atlasResolution}.
 		 *
@@ -191,7 +270,8 @@ class LightBaker {
 		this.specularIntensity = 1;
 
 		/**
-		 * Whether to denoise the light maps once the bake has converged.
+		 * Whether to denoise the light maps once the bake has converged, also the light of vertex bakes, see
+		 * {@link VertexLightMapper#denoise}.
 		 *
 		 * @type {boolean}
 		 * @default true
@@ -207,7 +287,8 @@ class LightBaker {
 		this.stitchSeams = true;
 
 		/**
-		 * The relative noise at which the bake stops, see {@link LightMapper#estimateNoise}, 2% by default.
+		 * The relative noise at which the bake stops, see {@link LightMapper#estimateNoise}, by default 2% for
+		 * light maps and 1% for vertex bakes.
 		 *
 		 * @type {?number}
 		 * @default null
@@ -225,8 +306,9 @@ class LightBaker {
 
 		/**
 		 * The samples per animation frame of interactive bakes. By default 4 for stochastic radiosity and
-		 * 1 for the other algorithms. Interactive bakes bake fewer, down to one, while the frames take longer
-		 * than 30 ms on average, e.g. on phones.
+		 * 1 for the other algorithms, and for vertex bakes 16 for stochastic radiosity and 4 for ray traced
+		 * radiosity. Interactive bakes bake fewer, down to one, while the frames take longer than 30 ms on
+		 * average, e.g. on phones.
 		 *
 		 * @type {?number}
 		 * @default null
@@ -235,7 +317,7 @@ class LightBaker {
 
 		/**
 		 * Whether the direct light of directional, point and spot lights stays `'live'`, or is `'baked'`
-		 * into the light maps.
+		 * into the light maps. Vertex bakes only bake it with the `'ray'` algorithm.
 		 *
 		 * @type {string}
 		 * @default 'live'
@@ -371,6 +453,29 @@ class LightBaker {
 		this._epoch = 0;
 		this._start = 0;
 		this._run = null;
+		this._refinements = 0;
+		this._simplified = false;
+		this._refineContrast = null;
+		this._refineKeep = false;
+		this._simplifyRebake = false;
+		this._cacheEdge = VERTEX_CACHE_EDGE;
+		this._vertexDenoise = {};
+		this._contacts = 'imprint';
+		this._contactRays = 8;
+		this._lightSamples = 0;
+		this._bounces = null;
+		this._lightShape = null;
+		this._ambientOcclusion = null;
+		this._contactOcclusion = null;
+		this._seed = 0;
+
+		// where vertex bakes sample the light, see VertexLightMapper's sampling option
+
+		this._sampling = 'triangles';
+
+		// the offset of the rays from the surface, see RayTracedRadiosity's bias (null: its default)
+
+		this._bias = null;
 
 		this.setOptions( options );
 
@@ -424,6 +529,18 @@ class LightBaker {
 	get atlas() {
 
 		return this._record !== null ? this._record.atlas : null;
+
+	}
+
+	/**
+	 * The meshes in the light map, or in the vertex bake.
+	 *
+	 * @type {Array<Mesh>}
+	 * @readonly
+	 */
+	get lightMappedMeshes() {
+
+		return this._record !== null ? this._record.lightMapped : [];
 
 	}
 
@@ -491,6 +608,18 @@ class LightBaker {
 	}
 
 	/**
+	 * The refinements of the current vertex bake so far, see {@link LightBaker#refine}.
+	 *
+	 * @type {number}
+	 * @readonly
+	 */
+	get refinements() {
+
+		return this._refinements;
+
+	}
+
+	/**
 	 * Whether the bake has reached the noise tolerance or the maximum samples.
 	 *
 	 * @type {boolean}
@@ -509,18 +638,19 @@ class LightBaker {
 	 */
 	getNoiseTolerance() {
 
-		return this.noiseTolerance ?? NOISE_TOLERANCE;
+		return this.noiseTolerance ?? ( this.target === 'vertex' ? VERTEX_NOISE_TOLERANCE : NOISE_TOLERANCE );
 
 	}
 
 	/**
-	 * Returns the maximum number of samples, see {@link LightBaker#maxSamples}.
+	 * Returns the maximum number of samples, see {@link LightBaker#maxSamples}, at most the samples that the
+	 * light mapper accumulates on the device, see {@link LightMapper#maxSamples}.
 	 *
 	 * @return {number} The maximum number of samples.
 	 */
 	getMaxSamples() {
 
-		return this.maxSamples ?? MAX_SAMPLES[ this.algorithm ];
+		return Math.min( this.maxSamples ?? MAX_SAMPLES[ this.algorithm ], this.lightMapper?.maxSamples ?? Infinity );
 
 	}
 
@@ -531,7 +661,7 @@ class LightBaker {
 	 */
 	getSamplesPerFrame() {
 
-		return this.samplesPerFrame ?? SAMPLES_PER_FRAME[ this.algorithm ];
+		return this.samplesPerFrame ?? ( this.target === 'vertex' ? VERTEX_SAMPLES_PER_FRAME : SAMPLES_PER_FRAME )[ this.algorithm ];
 
 	}
 
@@ -550,8 +680,8 @@ class LightBaker {
 		if ( record === undefined ) {
 
 			record = {
-				atlas: null, atlasKey: null, requested: 0, resolution: 0, size: 0, pages: 1,
-				geometries: new Set(), meshes: [], lightMapped: [], excluded: [], outlines: [], warned: new Set(),
+				atlas: null, atlasKey: null, vertexKey: null, target: null, requested: 0, resolution: 0, size: 0, pages: 1,
+				geometries: new Set(), meshes: [], lightMapped: [], excluded: [], outlines: [], warned: new Set(), subdivided: new Map(),
 				sourceMaterials: new Map(), assigned: new Map(), pageMaterials: [], materialPages: new Map(), materials: new Set()
 			};
 
@@ -581,6 +711,49 @@ class LightBaker {
 				record.warned.add( mesh );
 
 			}
+
+		}
+
+		// vertex bakes keep the meshes as they are, or subdivided, the light map atlas stays for later light
+		// map bakes. The meshes get their own geometries back for light maps
+
+		this._subdivide( record, this.target === 'vertex' ? this.maxEdgeLength : null );
+
+		if ( this.target === 'vertex' ) {
+
+			const original = ( mesh ) => record.subdivided.get( mesh )?.original ?? mesh.geometry;
+			const vertexKey = JSON.stringify( [ this.ignoreOutlines, meshes.map( ( mesh ) => original( mesh ).id ) ] );
+
+			if ( record.vertexKey !== vertexKey ) {
+
+				root.updateWorldMatrix( true, true );
+
+				record.outlines = this.ignoreOutlines ? findOutlineShells( meshes ) : [];
+				record.vertexKey = vertexKey;
+
+				for ( const mesh of record.outlines ) {
+
+					if ( record.warned.has( mesh ) ) continue;
+
+					console.warn( `THREE.LightBaker: Mesh "${ mesh.name }" looks like the shell of an outline and is left out of the bake.` );
+					record.warned.add( mesh );
+
+				}
+
+			}
+
+			if ( record.target !== 'vertex' || materialsChanged || record.meshes.length !== meshes.length ) {
+
+				record.meshes = meshes;
+				record.target = 'vertex';
+				this._setPageMaterials( record );
+
+			}
+
+			this._subdivide( record, this.maxEdgeLength );
+			this._record = record;
+
+			return;
 
 		}
 
@@ -682,10 +855,14 @@ class LightBaker {
 			record.atlasKey = atlasKey;
 			record.geometries = new Set( meshes.map( ( mesh ) => mesh.geometry ) );
 			record.meshes = meshes;
+			record.target = 'lightMap';
 
 			this._setPageMaterials( record );
 
-		} else if ( materialsChanged ) {
+		} else if ( materialsChanged || record.target !== 'lightMap' ) {
+
+			record.meshes = meshes;
+			record.target = 'lightMap';
 
 			this._setPageMaterials( record );
 
@@ -729,6 +906,8 @@ class LightBaker {
 				material.lightsNode = null;
 				material.needsUpdate = true;
 
+				vertexLightMap( material, null );
+
 			}
 
 		};
@@ -740,6 +919,10 @@ class LightBaker {
 		this.prepareMeshes( root );
 
 		clearMaterials();
+
+		// vertex bakes split the edges at the contacts of surfaces first, which only depend on the geometry
+
+		if ( this.target === 'vertex' ) await this._refineContacts( this._record );
 
 		this.scene = scene;
 
@@ -755,8 +938,11 @@ class LightBaker {
 
 		scene.traverseVisible( ( object ) => {
 
+			// (vertex bakes of the ray traced radiosity bake hemisphere lights too)
+
 			if ( object.isDirectionalLight || object.isPointLight || object.isSpotLight ) this.lights.push( object );
-			else if ( object.isRectAreaLight && algorithm === 'stochastic' ) this._areaLights.push( object );
+			else if ( object.isHemisphereLight && algorithm === 'ray' && this.target === 'vertex' ) this.lights.push( object );
+			else if ( object.isRectAreaLight && ( algorithm === 'stochastic' || ( this.target === 'vertex' && this.directLight === 'baked' ) ) ) this._areaLights.push( object );
 
 		} );
 
@@ -774,7 +960,34 @@ class LightBaker {
 
 		} );
 
-		this._lightCopies = this.bakedLights.map( copyLight );
+		// vertex bakes gather the baked lights with shadow rays, they need no copies
+
+		this._lightCopies = this.target === 'vertex' ? [] : this.bakedLights.map( copyLight );
+
+		if ( this.target === 'vertex' ) {
+
+			// the vertices accumulate the samples, with the layout of the bounce cache if it has the same meshes and
+			// geometries, and records of the back of the faces of the same meshes: the files keep the light of the
+			// back of double-sided meshes, the cache of open ones too
+
+			const meshes = record.lightMapped;
+			const layout = this.source.layout ?? null;
+			const doubleSided = this._doubleSided();
+			const hasBack = ( mesh ) => doubleSided && [ mesh.material ].flat().some( ( material ) => material !== undefined && material.side === DoubleSide );
+			const shared = layout !== null && layout.meshes.length === meshes.length && meshes.every( ( mesh ) => layout.hasMesh( mesh ) && layout.getGeometry( mesh ) === mesh.geometry && layout.hasBack( mesh ) === hasBack( mesh ) );
+
+			this.lightMapper = new VertexLightMapper( this.renderer, this.irradianceNode, { meshes, layout: shared ? layout : null, directional: this.directional, doubleSided, sampling: this._sampling, smoothNormals: this._contactOcclusion?.smooth === true } );
+
+			this._preparedKey = this._getPrepareKey( scene, root );
+			this._applied = false;
+			this._refinements = 0;
+			this._simplified = false;
+
+			this.reset();
+
+			return;
+
+		}
 
 		// the light map accumulates the samples. A directional light map also bakes the dominant
 		// direction of the light, so that normal maps show under baked light
@@ -853,53 +1066,65 @@ class LightBaker {
 
 			if ( interactive === false ) await this._noisePromise;
 
-			while ( this.converged === false ) {
+			while ( true ) {
 
-				if ( aborted() ) throw signal?.aborted ? signal.reason : new DOMException( 'The bake was superseded by another one.', 'AbortError' );
+				while ( this.converged === false ) {
 
-				const maxSamples = this.getMaxSamples();
+					if ( aborted() ) throw signal?.aborted ? signal.reason : new DOMException( 'The bake was superseded by another one.', 'AbortError' );
 
-				if ( interactive ) {
+					const maxSamples = this.getMaxSamples();
 
-					// the noise estimates read the light map back while the samples accumulate
+					if ( interactive ) {
 
-					this.lightMapper.update( Math.min( samplesPerFrame, maxSamples - this.samples ) );
+						// the noise estimates read the light map back while the samples accumulate
 
-					if ( this.samples < maxSamples && this.samples >= this._noiseCheck ) this._checkNoise();
+						this.lightMapper.update( Math.min( samplesPerFrame, maxSamples - this.samples ) );
 
-				} else {
+						if ( this.samples < maxSamples && this.samples >= this._noiseCheck ) this._checkNoise();
 
-					// the same noise estimates as an interactive bake
+					} else {
 
-					const target = this.samples < FIRST_NOISE_CHECK ? FIRST_NOISE_CHECK : Math.ceil( this.samples * 1.25 );
+						// the same noise estimates as an interactive bake
 
-					this.lightMapper.update( Math.max( Math.min( target, maxSamples ) - this.samples, 1 ) );
-					await this._checkNoise();
+						const target = this.samples < FIRST_NOISE_CHECK ? FIRST_NOISE_CHECK : Math.ceil( this.samples * 1.25 );
+
+						this.lightMapper.update( Math.max( Math.min( target, maxSamples ) - this.samples, 1 ) );
+						await this._checkNoise();
+
+					}
+
+					this.time = ( performance.now() - this._start ) / 1000;
+					progress();
+
+					if ( interactive ) {
+
+						framesInFlight ++;
+						this._workDone().then( () => framesInFlight -- );
+
+						do {
+
+							await nextFrame();
+
+						} while ( framesInFlight > FRAMES_IN_FLIGHT && aborted() === false );
+
+						const frameTime = performance.now() - frameStart;
+						frameStart += frameTime;
+						averageFrameTime += ( frameTime - averageFrameTime ) * 0.2;
+
+						if ( averageFrameTime > FRAME_BUDGET ) samplesPerFrame = Math.max( Math.floor( samplesPerFrame * 0.75 ), 1 );
+						else samplesPerFrame = Math.min( samplesPerFrame + 1, this.getSamplesPerFrame() );
+
+					}
 
 				}
 
-				this.time = ( performance.now() - this._start ) / 1000;
-				progress();
+				// vertex bakes are refined at the changes of the light and baked again, then simplified where the
+				// light is smooth and baked once more
 
-				if ( interactive ) {
+				if ( this.target === 'vertex' && this._refinements < this.refine && await this._refineVertices() ) continue;
+				if ( this.target === 'vertex' && this.simplify !== null && this._simplified === false && await this._simplifyVertices() ) continue;
 
-					framesInFlight ++;
-					this._workDone().then( () => framesInFlight -- );
-
-					do {
-
-						await nextFrame();
-
-					} while ( framesInFlight > FRAMES_IN_FLIGHT && aborted() === false );
-
-					const frameTime = performance.now() - frameStart;
-					frameStart += frameTime;
-					averageFrameTime += ( frameTime - averageFrameTime ) * 0.2;
-
-					if ( averageFrameTime > FRAME_BUDGET ) samplesPerFrame = Math.max( Math.floor( samplesPerFrame * 0.75 ), 1 );
-					else samplesPerFrame = Math.min( samplesPerFrame + 1, this.getSamplesPerFrame() );
-
-				}
+				break;
 
 			}
 
@@ -960,6 +1185,34 @@ class LightBaker {
 
 		if ( this.lightMapper === null ) throw new Error( 'THREE.LightBaker: Call prepare() or bake() first.' );
 
+		// vertex bakes are denoised between the vertices, the stochastic radiosity with its noise that the
+		// vertices share like the light maps
+
+		if ( this.target === 'vertex' ) {
+
+			const key = `${ this._epoch },${ this.samples },${ this.noise },${ this.denoise }`;
+
+			if ( key !== this._processedKey ) {
+
+				this._processedKey = key;
+
+				if ( this.denoise && this.noise < Infinity ) {
+
+					const options = this.algorithm === 'stochastic' ? { correlation: 1, luminancePhi: 2 } : {};
+					this.lightMapper.denoise( { ...options, ...this._vertexDenoise, relativeNoise: this.noise } );
+
+				} else {
+
+					this.lightMapper.update( 0 );
+
+				}
+
+			}
+
+			return [ this.lightMapper.texture ];
+
+		}
+
 		const key = `${ this._epoch },${ this.samples },${ this.noise },${ this.denoise },${ this.stitchSeams }`;
 
 		if ( key !== this._processedKey ) {
@@ -1017,6 +1270,17 @@ class LightBaker {
 
 			if ( page < 0 ) continue;
 
+			if ( this.target === 'vertex' ) {
+
+				vertexLightMap( material, this.lightMapper, { directional, specularIntensity: this.specularIntensity } );
+
+				material.lightsNode = lightsNode;
+				material.needsUpdate = true;
+
+				continue;
+
+			}
+
 			directionalLightMap( material, directional ? this.lightMapper.pages[ page ].directionTexture : null, { specularIntensity: this.specularIntensity } );
 
 			material.lightsNode = lightsNode;
@@ -1043,6 +1307,8 @@ class LightBaker {
 
 		for ( const record of this._records.values() ) {
 
+			this._subdivide( record, null );
+
 			for ( const mesh of record.meshes ) {
 
 				if ( mesh.material === record.assigned.get( mesh ) ) mesh.material = record.sourceMaterials.get( mesh );
@@ -1056,6 +1322,7 @@ class LightBaker {
 				material.lightMap = null;
 				material.lightsNode = null;
 				directionalLightMap( material, null );
+				vertexLightMap( material, null );
 
 			}
 
@@ -1080,6 +1347,11 @@ class LightBaker {
 		const integer = ( value, min ) => Number.isInteger( value ) && value >= min;
 
 		if ( ALGORITHMS.includes( this.algorithm ) === false ) throw new Error( `THREE.LightBaker: Unknown algorithm "${ this.algorithm }", use one of ${ ALGORITHMS.join( ', ' ) }.` );
+		if ( TARGETS.includes( this.target ) === false ) throw new Error( `THREE.LightBaker: Unknown target "${ this.target }", use one of ${ TARGETS.join( ', ' ) }.` );
+		if ( this.target === 'vertex' && this.directLight === 'baked' && this.algorithm !== 'ray' ) throw new Error( 'THREE.LightBaker: Vertex bakes only bake the direct light with the \'ray\' algorithm.' );
+		if ( this.maxEdgeLength !== null && ! ( this.maxEdgeLength > 0 ) ) throw new Error( 'THREE.LightBaker: The maximum edge length must be positive or null.' );
+		if ( integer( this.refine, 0 ) === false ) throw new Error( 'THREE.LightBaker: The refinements must be an integer of at least 0.' );
+		if ( this.simplify !== null && ! ( this.simplify > 0 ) ) throw new Error( 'THREE.LightBaker: The simplification error must be positive or null.' );
 		if ( this.unwrap !== true && this.unwrap !== false && this.unwrap !== 'repack' ) throw new Error( `THREE.LightBaker: unwrap must be true, false or 'repack', not "${ this.unwrap }".` );
 		if ( this.directLight !== 'live' && this.directLight !== 'baked' ) throw new Error( `THREE.LightBaker: directLight must be 'live' or 'baked', not "${ this.directLight }".` );
 		if ( integer( this.resolution, 16 ) === false ) throw new Error( 'THREE.LightBaker: The resolution must be an integer of at least 16.' );
@@ -1123,7 +1395,7 @@ class LightBaker {
 	 */
 	_getPrepareKey( scene, root ) {
 
-		return JSON.stringify( [ scene.uuid, root.uuid, this.algorithm, this.resolution, this.pageSize, this.padding, this.unwrap, this.ignoreOutlines, this.directLight, this.directions, this.cacheSize, this.probes, this.vxgiResolution ] );
+		return JSON.stringify( [ scene.uuid, root.uuid, this.algorithm, this.target, this.maxEdgeLength, this.refine, this.simplify, this.resolution, this.pageSize, this.padding, this.unwrap, this.ignoreOutlines, this.directLight, this.directions, this.cacheSize, this.probes, this.vxgiResolution ] );
 
 	}
 
@@ -1168,11 +1440,421 @@ class LightBaker {
 	 */
 	_pageOf( mesh, record ) {
 
-		if ( mesh.isSkinnedMesh || mesh.isBatchedMesh || mesh.geometry.hasAttribute( 'uv1' ) === false ) return - 1;
+		if ( mesh.isSkinnedMesh || mesh.isBatchedMesh ) return - 1;
 		if ( record.outlines.includes( mesh ) ) return - 1;
+		if ( record.target === 'vertex' ) return mesh.userData.lightMapScale === 0 ? - 1 : 0;
+		if ( mesh.geometry.hasAttribute( 'uv1' ) === false ) return - 1;
 		if ( this.unwrap === false && mesh.userData.lightMapScale === 0 ) return - 1;
 
 		return mesh.userData.lightMapPage ?? 0;
+
+	}
+
+	/**
+	 * Subdivides the light-mapped meshes of a root for a maximum edge length, or restores their geometries
+	 * with `null`. The subdivided geometries are reused while the length stays the same.
+	 *
+	 * @private
+	 * @param {Object} record - The meshes of a root.
+	 * @param {?number} maxEdgeLength - The maximum edge length.
+	 */
+	_subdivide( record, maxEdgeLength ) {
+
+		const subdivided = record.subdivided;
+		const geometriesOf = ( entries ) => new Set( [ ...entries ].flatMap( ( entry ) => [ entry.geometry, entry.subdivided, entry.cacheGeometry, entry.uniform ?? entry.subdivided ] ) );
+		const previous = geometriesOf( subdivided.values() );
+
+		for ( const [ mesh, previousEntry ] of subdivided ) {
+
+			let entry = previousEntry;
+
+			// refinements are undone, the mesh gets its subdivision back
+
+			if ( mesh.geometry === entry.geometry && entry.geometry !== entry.subdivided ) {
+
+				mesh.geometry = entry.subdivided;
+				entry = { ...entry, geometry: entry.subdivided };
+				subdivided.set( mesh, entry );
+
+			}
+
+			if ( entry.maxEdgeLength === maxEdgeLength && mesh.geometry === entry.geometry && entry.geometry !== entry.original ) continue;
+
+			if ( mesh.geometry === entry.geometry ) mesh.geometry = entry.original;
+
+			subdivided.delete( mesh );
+
+		}
+
+		if ( maxEdgeLength !== null ) {
+
+			// meshes that share a geometry share its subdivisions, split by the transform of the first one. The
+			// rays and the bounce cache use a coarser subdivision, with the same surfaces, which is faster to trace
+
+			const geometries = new Map( [ ...subdivided.values() ].map( ( entry ) => [ entry.original, entry ] ) );
+
+			const bounds = new Box3();
+			for ( const mesh of record.lightMapped ) bounds.expandByObject( mesh );
+
+			const size = bounds.isEmpty() ? 0 : bounds.getSize( new Vector3() ).length();
+			const cacheEdgeLength = Math.max( maxEdgeLength, Math.min( maxEdgeLength * this._cacheEdge, size * VERTEX_CACHE_MAX_EDGE ) );
+
+			for ( const mesh of record.lightMapped ) {
+
+				if ( subdivided.has( mesh ) ) continue;
+
+				const original = mesh.geometry;
+
+				if ( geometries.has( original ) === false ) {
+
+					mesh.updateWorldMatrix( true, false );
+
+					const geometry = subdivideGeometry( original, maxEdgeLength, { matrix: mesh.matrixWorld } );
+					const cacheGeometry = geometry !== original ? subdivideGeometry( original, cacheEdgeLength, { matrix: mesh.matrixWorld } ) : original;
+
+					geometries.set( original, { original, geometry, subdivided: geometry, cacheGeometry, maxEdgeLength } );
+
+				}
+
+				const entry = geometries.get( original );
+
+				if ( entry.geometry === original ) continue;
+
+				mesh.geometry = entry.geometry;
+				subdivided.set( mesh, entry );
+
+			}
+
+		}
+
+		const current = geometriesOf( subdivided.values() );
+
+		for ( const geometry of previous ) {
+
+			if ( current.has( geometry ) === false && [ ...subdivided.values() ].every( ( entry ) => entry.original !== geometry ) && record.meshes.every( ( mesh ) => mesh.geometry !== geometry ) ) geometry.dispose();
+
+		}
+
+	}
+
+	/**
+	 * Cuts the subdivided meshes of a vertex bake along the contacts of surfaces, see {@link imprintContacts},
+	 * or with `_contacts` set to `'rays'`, splits their edges at the contacts with rays, see
+	 * {@link refineContacts}, down to the maximum edge length halved by the number of refinements. The cut
+	 * geometries replace the subdivisions, so the refinements at the changes of the light start from them,
+	 * and they are kept while the maximum edge length, and for rays the refinements, stay.
+	 *
+	 * @private
+	 * @async
+	 * @param {Object} record - The meshes of a root.
+	 * @return {Promise} A promise that resolves once the meshes are split.
+	 */
+	async _refineContacts( record ) {
+
+		const imprint = this._contacts === 'imprint';
+		const enabled = this.maxEdgeLength !== null && ( imprint || ( this._contacts === 'rays' && this.refine > 0 && this._contactRays > 0 ) );
+		const key = enabled ? ( imprint ? `${ this.maxEdgeLength },imprint` : `${ this.maxEdgeLength },${ this.refine },rays` ) : null;
+
+		// the meshes that share a subdivision are split together, from the uniform subdivision. Without
+		// refinements, the meshes get the uniform subdivision back
+
+		const groups = new Map();
+		const replaced = new Set();
+
+		for ( const [ mesh, entry ] of record.subdivided ) {
+
+			if ( mesh.isInstancedMesh || ( entry.contacts ?? null ) === key ) continue;
+
+			const uniform = entry.uniform ?? entry.subdivided;
+
+			if ( key === null ) {
+
+				if ( entry.subdivided !== uniform ) replaced.add( entry.subdivided );
+
+				record.subdivided.set( mesh, { ...entry, subdivided: uniform, geometry: uniform, contacts: null } );
+				mesh.geometry = uniform;
+
+				continue;
+
+			}
+
+			if ( groups.has( uniform ) === false ) groups.set( uniform, { geometry: uniform, meshes: [] } );
+
+			groups.get( uniform ).meshes.push( mesh );
+
+		}
+
+		const free = () => {
+
+			for ( const geometry of replaced ) {
+
+				if ( record.meshes.every( ( mesh ) => mesh.geometry !== geometry ) ) geometry.dispose();
+
+			}
+
+		};
+
+		if ( groups.size === 0 ) {
+
+			free();
+			return;
+
+		}
+
+		const occluders = record.meshes.filter( ( mesh ) => mesh.isSkinnedMesh !== true && mesh.isBatchedMesh !== true && record.outlines.includes( mesh ) === false );
+		const list = [ ...groups.values() ];
+		// the occluders cut with their own geometries, not their subdivisions
+
+		const originals = new Map( occluders.map( ( mesh ) => [ mesh, record.subdivided.get( mesh )?.original ?? mesh.geometry ] ) );
+		const geometries = imprint
+			? await imprintContacts( list, occluders, { geometries: originals } )
+			: await refineContacts( list, occluders, { minEdgeLength: this.maxEdgeLength / 2 ** this.refine, rounds: this.refine, rays: this._contactRays } );
+
+		// the previous splits of other refinements are freed
+
+		list.forEach( ( group, g ) => {
+
+			for ( const mesh of group.meshes ) {
+
+				const entry = record.subdivided.get( mesh );
+
+				if ( entry.subdivided !== group.geometry ) replaced.add( entry.subdivided );
+
+				record.subdivided.set( mesh, { ...entry, uniform: group.geometry, subdivided: geometries[ g ], geometry: geometries[ g ], contacts: key } );
+				mesh.geometry = geometries[ g ];
+
+			}
+
+		} );
+
+		free();
+
+	}
+
+	/**
+	 * Refines the meshes of a converged vertex bake at the changes of the light: the edges whose ends differ
+	 * more in luminance are split once, with the longest edges of their triangles, and the vertices of the refined meshes get a new mapper, which bakes
+	 * them all again. Keeping the light of the vertices of unchanged triangles, `_refineKeep`, needs about as
+	 * long, since the changed vertices are the noisiest, and gives the same light. The source, with its rays
+	 * and bounce cache, stays.
+	 *
+	 * @private
+	 * @async
+	 * @return {Promise<boolean>} A promise that resolves with whether any mesh was refined.
+	 */
+	async _refineVertices() {
+
+		const record = this._record;
+		const mapper = this.lightMapper;
+		const layout = mapper.layout;
+		const irradiance = await mapper.readIrradiance();
+		const directions = this._refineKeep ? await mapper.readDirections() : null;
+
+		// the luminance of the records, the contrast of dark ends is relative to a twentieth of the mean
+
+		const luminance = new Float32Array( layout.recordCount );
+		let sum = 0, mass = 0;
+
+		for ( let i = 0; i < layout.recordCount; i ++ ) {
+
+			luminance[ i ] = 0.2126 * irradiance[ i * 3 ] + 0.7152 * irradiance[ i * 3 + 1 ] + 0.0722 * irradiance[ i * 3 + 2 ];
+			sum += luminance[ i ] * layout.masses[ i ];
+			mass += layout.masses[ i ];
+
+		}
+
+		const floor = mass > 0 ? 0.05 * sum / mass : 0;
+		const bounds = new Box3();
+
+		for ( const mesh of record.lightMapped ) bounds.expandByObject( mesh );
+
+		const minLength = ( this.maxEdgeLength ?? bounds.getSize( new Vector3() ).length() * 0.01 ) / 2 ** this.refine;
+		const contrast = this._refineContrast ?? REFINE_CONTRAST;
+		let refined = false;
+
+		for ( const mesh of record.lightMapped ) {
+
+			if ( mesh.isInstancedMesh ) continue;
+
+			const geometry = mesh.geometry;
+			const at = ( vertex, back ) => luminance[ layout.getRecord( mesh, 0, vertex, back ) ] ?? 0;
+
+			// the vertices inside other meshes have no light, see imprintContacts. The light of both sides of
+			// double-sided meshes counts
+
+			const known = ( vertex, back ) => layout.masses[ layout.getRecord( mesh, 0, vertex, back ) ] > 0;
+			const sides = layout.hasBack( mesh ) ? [ false, true ] : [ false ];
+
+			const split = ( i, j, lengthSq ) => {
+
+				if ( lengthSq <= minLength * minLength ) return false;
+
+				return sides.some( ( back ) => {
+
+					if ( known( i, back ) === false || known( j, back ) === false ) return false;
+
+					const a = at( i, back ), b = at( j, back );
+
+					return Math.abs( a - b ) > contrast * Math.max( a, b, floor );
+
+				} );
+
+			};
+
+			const refinedGeometry = subdivideGeometry( geometry, 0, { matrix: mesh.matrixWorld, rounds: 1, split, longest: true } );
+
+			if ( refinedGeometry === geometry ) continue;
+
+			// the refinement of each mesh is its own, the previous one is replaced
+
+			const entry = record.subdivided.get( mesh ) ?? { original: geometry, geometry, subdivided: geometry, cacheGeometry: geometry, maxEdgeLength: this.maxEdgeLength };
+
+			if ( entry.geometry !== entry.subdivided ) entry.geometry.dispose();
+
+			record.subdivided.set( mesh, { ...entry, geometry: refinedGeometry } );
+			mesh.geometry = refinedGeometry;
+			refined = true;
+
+		}
+
+		if ( refined === false ) return false;
+
+		const previous = this._refineKeep ? { layout, irradiance, directions } : null;
+
+		this.lightMapper = new VertexLightMapper( this.renderer, this.irradianceNode, { meshes: record.lightMapped, directional: this.directional, doubleSided: this._doubleSided(), previous, sampling: this._sampling, smoothNormals: this._contactOcclusion?.smooth === true } );
+		mapper.dispose();
+
+		// the bake time continues
+
+		const start = this._start;
+
+		this._refinements ++;
+		this.reset();
+
+		this._start = start;
+
+		if ( this._applied ) this.apply();
+
+		return true;
+
+	}
+
+	/**
+	 * Simplifies the meshes of a converged vertex bake where the light is smooth, with the
+	 * `simplifyWithAttributes` of meshoptimizer and the luminance of the vertices relative to its mean as
+	 * an attribute, and gives the vertices that remain a new mapper, which keeps their light, see
+	 * {@link LightBaker#simplify}.
+	 *
+	 * @private
+	 * @async
+	 * @return {Promise<boolean>} A promise that resolves with whether any mesh was simplified.
+	 */
+	async _simplifyVertices() {
+
+		this._simplified = true;
+
+		const record = this._record;
+		const mapper = this.lightMapper;
+		const layout = mapper.layout;
+		const irradiance = await mapper.readIrradiance();
+
+		// the luminance of the records relative to their mean
+
+		const luminance = new Float32Array( layout.recordCount );
+		let sum = 0, mass = 0;
+
+		for ( let i = 0; i < layout.recordCount; i ++ ) {
+
+			luminance[ i ] = 0.2126 * irradiance[ i * 3 ] + 0.7152 * irradiance[ i * 3 + 1 ] + 0.0722 * irradiance[ i * 3 + 2 ];
+			sum += luminance[ i ] * layout.masses[ i ];
+			mass += layout.masses[ i ];
+
+		}
+
+		const mean = mass > 0 && sum > 0 ? sum / mass : 1;
+		let simplified = false;
+
+		for ( const mesh of record.lightMapped ) {
+
+			if ( mesh.isInstancedMesh ) continue;
+
+			const geometry = mesh.geometry;
+			const count = geometry.getAttribute( 'position' ).count;
+
+			// the light of both sides of double-sided meshes
+
+			const sides = layout.hasBack( mesh ) ? [ false, true ] : [ false ];
+			const light = new Float32Array( count * sides.length );
+
+			for ( let v = 0; v < count; v ++ ) {
+
+				sides.forEach( ( back, k ) => {
+
+					const r = layout.getRecord( mesh, 0, v, back );
+					light[ v * sides.length + k ] = r >= 0 ? luminance[ r ] / mean : 0;
+
+				} );
+
+			}
+
+			// meshoptimizer needs shared vertices, the light keeps vertices with different light apart
+
+			let source = geometry;
+
+			if ( source.index === null ) {
+
+				source = geometry.clone();
+				source.setAttribute( 'simplifyLight', new BufferAttribute( light, sides.length ) );
+				source = mergeVertices( source );
+
+			}
+
+			const values = source.hasAttribute( 'simplifyLight' ) ? new Float32Array( source.getAttribute( 'simplifyLight' ).array ) : light;
+			if ( source !== geometry ) source.deleteAttribute( 'simplifyLight' );
+
+			// the vertices of the mesh before its subdivision stay
+
+			const keep = record.subdivided.get( mesh )?.original ?? geometry;
+			const simplification = await simplifyGeometry( source, values, { error: this.simplify, keep, stride: sides.length } );
+
+			if ( source !== geometry ) source.dispose();
+			if ( simplification === null ) continue;
+
+			const result = simplification.geometry;
+
+			// the simplification replaces the refinement of the mesh
+
+			const entry = record.subdivided.get( mesh ) ?? { original: geometry, geometry, subdivided: geometry, cacheGeometry: geometry, maxEdgeLength: this.maxEdgeLength };
+
+			if ( entry.geometry !== entry.subdivided && entry.geometry !== entry.original ) entry.geometry.dispose();
+
+			record.subdivided.set( mesh, { ...entry, geometry: result } );
+			mesh.geometry = result;
+			simplified = true;
+
+		}
+
+		if ( simplified === false ) return false;
+
+		// the vertices that remain keep the light of the bake, which meshoptimizer interpolates within the error,
+		// unless they are baked again
+
+		const previous = this._simplifyRebake ? null : { layout, irradiance, directions: await mapper.readDirections(), all: true };
+
+		this.lightMapper = new VertexLightMapper( this.renderer, this.irradianceNode, { meshes: record.lightMapped, directional: this.directional, doubleSided: this._doubleSided(), previous, sampling: this._sampling, smoothNormals: this._contactOcclusion?.smooth === true } );
+		mapper.dispose();
+
+		// the bake time continues
+
+		const start = this._start;
+
+		this.reset();
+
+		this._start = start;
+
+		if ( this._applied ) this.apply();
+
+		return true;
 
 	}
 
@@ -1202,7 +1884,7 @@ class LightBaker {
 
 			const pageMaterial = ( material ) => {
 
-				if ( page === 0 ) return mesh.isInstancedMesh ? instancedLightMap( material ) : material;
+				if ( page === 0 ) return mesh.isInstancedMesh && record.target !== 'vertex' ? instancedLightMap( material ) : material;
 
 				const key = material.uuid + ',' + page;
 
@@ -1242,6 +1924,19 @@ class LightBaker {
 	 * @private
 	 * @param {Scene} scene - The scene.
 	 */
+	/**
+	 * Returns whether vertex bakes give the meshes with double-sided materials records for the back of their
+	 * faces: the rays of the ray traced radiosity see the light of the side they hit.
+	 *
+	 * @private
+	 * @return {boolean} Whether double-sided meshes get records for both sides.
+	 */
+	_doubleSided() {
+
+		return this.algorithm === 'ray';
+
+	}
+
 	_createSource( scene ) {
 
 		const renderer = this.renderer;
@@ -1250,7 +1945,7 @@ class LightBaker {
 		// the bounce caches of the radiosity solvers keep their texel density with several pages, their
 		// size is per page
 
-		const cacheSize = this.cacheSize * record.size / record.resolution;
+		const cacheSize = this.target === 'vertex' ? this.cacheSize : this.cacheSize * record.size / record.resolution;
 
 		if ( this.algorithm === 'ray' ) {
 
@@ -1259,10 +1954,27 @@ class LightBaker {
 
 			const { RayTracedRadiosity, rayTracedRadiosityIrradiance } = _rayTracedRadiosity;
 
-			const radiosity = new RayTracedRadiosity( { cacheSize } );
+			// vertex bakes cache the bounces in the vertices too, and gather the baked lights with shadow rays
+
+			const vertex = this.target === 'vertex';
+			const geometries = new Map();
+
+			if ( vertex ) for ( const [ mesh, entry ] of record.subdivided ) geometries.set( mesh, entry.cacheGeometry );
+
+			const radiosity = new RayTracedRadiosity( { cacheSize, cache: vertex ? 'vertex' : 'lightMap', geometries } );
+			radiosity.lightSamples = this._lightSamples;
+			radiosity.lightShape = this._lightShape;
+			if ( this._bias !== null ) radiosity.bias = this._bias;
+			radiosity.ambientOcclusion = this._ambientOcclusion;
+			radiosity.contactOcclusion = this._contactOcclusion;
+			if ( this._bounces !== null ) radiosity.bounces = this._bounces;
+
+			// another seed starts the sample sequences elsewhere, e.g. to measure the noise of a bake
+
+			radiosity._pass = ( this._seed * 65536 ) >>> 0;
 			radiosity.update( renderer, scene );
 
-			this.irradianceNode = rayTracedRadiosityIrradiance( radiosity );
+			this.irradianceNode = rayTracedRadiosityIrradiance( radiosity, { analyticLights: vertex && this.directLight === 'baked' } );
 			this.source = radiosity;
 
 		} else if ( this.algorithm === 'stochastic' ) {
@@ -1270,7 +1982,14 @@ class LightBaker {
 			// stochastic depth radiosity, the bounces are cached in a light map before baking. It captures a
 			// sky as a large unlit sphere around the scene
 
-			const radiosity = new StochasticRadiosity( { directions: this.directions, cacheSize } );
+			// vertex bakes cache the bounces in the vertices too, rendered with the geometries of the cache
+
+			const vertex = this.target === 'vertex';
+			const geometries = new Map();
+
+			if ( vertex ) for ( const [ mesh, entry ] of record.subdivided ) geometries.set( mesh, entry.cacheGeometry );
+
+			const radiosity = new StochasticRadiosity( { directions: this.directions, cacheSize, cache: vertex ? 'vertex' : 'lightMap', meshes: vertex ? record.lightMapped : null, geometries } );
 			const sky = createSkySphere( scene );
 
 			if ( sky !== null ) scene.add( sky );
@@ -1465,6 +2184,10 @@ class LightBaker {
 	 * @private
 	 */
 	_assignLightMaps() {
+
+		// the materials of vertex bakes look the vertices up
+
+		if ( this.target === 'vertex' ) return;
 
 		const lightMaps = this._lightMaps ?? this.lightMapper.pages.map( ( page ) => page.texture );
 

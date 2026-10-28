@@ -56,6 +56,11 @@ export default QUnit.module( 'Addons', () => {
 				assert.strictEqual( new LightBaker( renderer, { algorithm: 'stochastic' } ).getSamplesPerFrame(), 4 );
 				assert.strictEqual( new LightBaker( renderer, { algorithm: 'ray' } ).getSamplesPerFrame(), 1 );
 
+				baker.setOptions( { target: 'vertex', algorithm: 'ray' } );
+				assert.strictEqual( baker.getNoiseTolerance(), 0.01, 'Vertex bakes stop at 1% noise' );
+				assert.strictEqual( baker.getSamplesPerFrame(), 4, 'Vertex bakes bake more samples per frame' );
+				baker.setOptions( { target: 'lightMap' } );
+
 				baker.setOptions( { noiseTolerance: 0.05, maxSamples: 100, samplesPerFrame: 3 } );
 				assert.strictEqual( baker.getNoiseTolerance(), 0.05, 'An explicit tolerance overrides the defaults' );
 				assert.strictEqual( baker.getMaxSamples(), 100 );
@@ -75,6 +80,8 @@ export default QUnit.module( 'Addons', () => {
 				assert.throws( () => new LightBaker( renderer, { padding: 2 } ), /padding/ );
 				assert.throws( () => new LightBaker( renderer, { noiseTolerance: 0 } ), /tolerance/ );
 				assert.throws( () => new LightBaker( renderer, { maxSamples: - 1 } ), /maximum samples/ );
+				assert.throws( () => new LightBaker( renderer, { target: 'vertex', algorithm: 'stochastic', directLight: 'baked' } ), /direct light/ );
+				assert.ok( new LightBaker( renderer, { target: 'vertex', algorithm: 'stochastic' } ), 'All algorithms bake into vertices' );
 
 				const baker = new LightBaker( renderer );
 				const warnings = captureWarnings( () => baker.setOptions( { tolerance: 0.1, resolution: 512 } ) );

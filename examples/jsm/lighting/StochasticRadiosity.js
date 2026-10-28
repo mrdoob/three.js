@@ -2,6 +2,7 @@ import { ArrayCamera, BackSide, Box3, FloatType, InstancedMesh, IrradianceNode, 
 import { Fn, If, Loop, cameraIndex, cross, dFdx, dFdy, dot, float, frontFacing, hash, int, interleavedGradientNoise, ivec2, length, lights, luminance, materialColor, materialReference, max, nodeObject, output, positionWorld, screenCoordinate, select, texture, uint, uniform, uniformArray, vec2, vec3, vec4 } from 'three/tsl';
 
 import { LightMapper } from './LightMapper.js';
+import { VertexLayout, VertexLightMapper, vertexLightMap } from './VertexLightMapper.js';
 import { lightMapUV } from '../tsl/lighting/DirectionalLightMapNode.js';
 
 const _box = /*@__PURE__*/ new Box3();
@@ -30,8 +31,10 @@ let _rendererState;
  *
  * Direct lights are evaluated analytically with their shadow maps. Further bounces are cached in a
  * light map that `update()` solves iteratively, so the meshes need light map UVs in `uv1`, e.g.
- * generated with {@link unwrapUVs}. Emissive surfaces are light sources as well. The views are fitted
- * to the meshes with light map UVs, the other meshes are only seen beyond them, so a large unlit
+ * generated with {@link unwrapUVs}. With the `cache` option `'vertex'`, the bounces are cached in the
+ * vertices of the meshes instead, see {@link VertexLightMapper}, and no light map UVs are needed.
+ * Emissive surfaces are light sources as well. The views are fitted to the meshes with light map UVs,
+ * or to the meshes of the vertex cache, the other meshes are only seen beyond them, so a large unlit
  * sphere around the scene, e.g. with a sky texture on the `BackSide` of a {@link MeshBasicMaterial},
  * lights the scene like a sky. `scene.background` is ignored.
  *
@@ -73,9 +76,12 @@ class StochasticRadiosity {
 	 * @param {number} [options.bounces=16] - The number of iterations used to solve the cached bounces. Each iteration adds one bounce, `0` disables the cache.
 	 * @param {number} [options.cacheSamples] - The number of samples accumulated into the bounce cache after the iterations.
 	 * Defaults to `Math.ceil( 2048 / directions )`, so that the cache gathers about 2048 directions.
-	 * @param {number} [options.cacheSize=256] - The size of the bounce cache light map in texels, per page of the atlas.
+	 * @param {number} [options.cacheSize=256] - The size of the bounce cache light map in texels, per page of the atlas. The vertex cache gathers as many points per sample.
+	 * @param {string} [options.cache='lightMap'] - Where the bounces are cached, `'lightMap'` in a light map of the meshes with light map UVs, `'vertex'` in the vertices of the meshes.
+	 * @param {?Array<Mesh>} [options.meshes=null] - The meshes of the vertex cache, which the views are fitted to. Defaults to all visible meshes.
+	 * @param {?Map<Mesh, BufferGeometry>} [options.geometries=null] - Geometries that the illumination pass and the vertex cache use in place of the ones of some meshes, with the same surfaces, e.g. less subdivided ones.
 	 */
-	constructor( { directions = 16, resolution = 256, gatherRadius = 1, bounces = 16, cacheSamples = Math.ceil( 2048 / directions ), cacheSize = 256 } = {} ) {
+	constructor( { directions = 16, resolution = 256, gatherRadius = 1, bounces = 16, cacheSamples = Math.ceil( 2048 / directions ), cacheSize = 256, cache = 'lightMap', meshes = null, geometries = null } = {} ) {
 
 		/**
 		 * The number of directions rasterized per illumination pass.
@@ -124,6 +130,40 @@ class StochasticRadiosity {
 		 * @default 256
 		 */
 		this.cacheSize = cacheSize;
+
+		/**
+		 * Where the bounces are cached, `'lightMap'` or `'vertex'`.
+		 *
+		 * @type {string}
+		 * @default 'lightMap'
+		 */
+		this.cache = cache;
+
+		/**
+		 * The meshes of the vertex cache, or `null` for all visible meshes.
+		 *
+		 * @type {?Array<Mesh>}
+		 * @default null
+		 */
+		this.meshes = meshes;
+
+		/**
+		 * Geometries that the illumination pass and the vertex cache use in place of the ones of some meshes.
+		 * They must have the same surfaces, e.g. the geometries before a {@link subdivideGeometry}.
+		 *
+		 * @type {?Map<Mesh, BufferGeometry>}
+		 * @default null
+		 */
+		this.geometries = geometries;
+
+		/**
+		 * The vertex layout of the vertex cache, else `null`. A {@link VertexLightMapper} of the same
+		 * meshes can share it.
+		 *
+		 * @type {?VertexLayout}
+		 * @readonly
+		 */
+		this.layout = null;
 
 		/**
 		 * Distance, in illumination map texels, that a gathered surface must lie in front of the
@@ -193,6 +233,7 @@ class StochasticRadiosity {
 		this._emitters = [];
 		this._lights = [];
 		this._lightMapMeshes = [];
+		this._receivers = null;
 		this._tiles = 1;
 		this._bounds = new Box3();
 		this._depthBounds = new Box3();
@@ -220,11 +261,44 @@ class StochasticRadiosity {
 
 		this._clear();
 
-		// the pages of the atlas are tiles of the bounce cache
+		// the pages of the atlas are tiles of the bounce cache. A vertex cache holds the light of its meshes,
+		// in records of their welded vertices
 
 		this._tiles = Math.ceil( Math.sqrt( countPages( scene ) ) );
 
-		if ( this.bounces > 0 ) this._cache = new LightMapper( renderer, this.cacheSize * this._tiles, radiosityIrradiance( this ) );
+		if ( this.cache === 'vertex' ) {
+
+			let meshes = this.meshes;
+
+			if ( meshes === null ) {
+
+				meshes = [];
+				scene.traverseVisible( ( object ) => object.isMesh === true && ! object.isSkinnedMesh && ! object.isBatchedMesh && meshes.push( object ) );
+
+			}
+
+			this._receivers = new Set( meshes );
+
+			if ( this.bounces > 0 ) {
+
+				// as many points per sample as texels of a light map cache, spread over the area of the scenes with
+				// more triangles
+
+				const pointCount = this.cacheSize * this.cacheSize;
+
+				this.layout = new VertexLayout( meshes, { geometries: this.geometries } );
+
+				const sampling = this.layout.triangleCount > pointCount ? 'area' : 'triangles';
+
+				this._cache = new VertexLightMapper( renderer, radiosityIrradiance( this ), { layout: this.layout, sampling, pointCount, maxPoints: 16 } );
+
+			}
+
+		} else if ( this.bounces > 0 ) {
+
+			this._cache = new LightMapper( renderer, this.cacheSize * this._tiles, radiosityIrradiance( this ) );
+
+		}
 
 		this._collect( scene );
 		this._renderShadows( renderer );
@@ -262,11 +336,19 @@ class StochasticRadiosity {
 		this._emitters = [];
 		this._lights = [];
 		this._lightMapMeshes = [];
+		this._receivers = null;
 
 		if ( this._cache !== null ) {
 
 			this._cache.dispose();
 			this._cache = null;
+
+		}
+
+		if ( this.layout !== null ) {
+
+			this.layout.dispose();
+			this.layout = null;
 
 		}
 
@@ -320,9 +402,13 @@ class StochasticRadiosity {
 
 			if ( object.isMesh !== true || object.isSkinnedMesh || object.isBatchedMesh ) return;
 
-			const geometry = object.geometry;
-			const hasLightMapUV = geometry.hasAttribute( 'uv1' );
-			const page = hasLightMapUV ? object.userData.lightMapPage ?? 0 : 0;
+			// the meshes of a vertex cache gather light instead of the ones with light map UVs, and are
+			// rendered with the geometries of the cache
+
+			const receivers = this._receivers;
+			const geometry = receivers !== null ? this.geometries?.get( object ) ?? object.geometry : object.geometry;
+			const hasLightMapUV = receivers !== null ? receivers.has( object ) : geometry.hasAttribute( 'uv1' );
+			const page = hasLightMapUV && receivers === null ? object.userData.lightMapPage ?? 0 : 0;
 			const instanced = object.isInstancedMesh === true;
 
 			let illumination, shadow;
@@ -360,6 +446,10 @@ class StochasticRadiosity {
 
 			this._scene.add( proxy );
 			this._proxies.push( { proxy, illumination, shadow } );
+
+			// the proxies read the vertex cache of their meshes
+
+			if ( this.layout !== null && hasLightMapUV ) this.layout.addProxy( proxy, object );
 
 			if ( hasLightMapUV ) this._lightMapMeshes.push( object );
 
@@ -483,7 +573,7 @@ class StochasticRadiosity {
 	 * @private
 	 * @param {Material} source - The material of the mesh.
 	 * @param {LightsNode} lightsNode - The direct lights.
-	 * @param {boolean} hasLightMapUV - Whether the mesh can sample the bounce cache.
+	 * @param {boolean} hasLightMapUV - Whether the mesh can sample the bounce cache, its light map or its vertices.
 	 * @param {number} [page=0] - The page of the mesh in the atlas, a tile of the bounce cache.
 	 * @param {boolean} [instanced=false] - Whether the mesh is instanced.
 	 * @return {NodeMaterial} The material.
@@ -546,7 +636,13 @@ class StochasticRadiosity {
 
 			// the cached bounces are applied like a light map, including the material's occlusion
 
-			if ( this._cache !== null && hasLightMapUV ) material.lightMap = this._cache.texture;
+			if ( this._cache !== null && hasLightMapUV ) {
+
+				if ( this.cache === 'vertex' ) vertexLightMap( material, this._cache, { directional: false } );
+				else material.lightMap = this._cache.texture;
+
+			}
+
 			if ( source.aoMap !== undefined ) material.aoMap = source.aoMap;
 			if ( source.aoMapIntensity !== undefined ) material.aoMapIntensity = source.aoMapIntensity;
 
@@ -627,9 +723,13 @@ class StochasticRadiosity {
 
 		const cache = this._cache;
 
-		for ( const mesh of this._lightMapMeshes ) {
+		if ( this.cache !== 'vertex' ) {
 
-			cache.addObjects( [ mesh ], { page: 0, uvTransform: getTile( mesh.userData.lightMapPage ?? 0, this._tiles ) } );
+			for ( const mesh of this._lightMapMeshes ) {
+
+				cache.addObjects( [ mesh ], { page: 0, uvTransform: getTile( mesh.userData.lightMapPage ?? 0, this._tiles ) } );
+
+			}
 
 		}
 
@@ -796,9 +896,10 @@ class StochasticRadiosity {
 	 * @param {Node<vec3>} positionNode - The world-space position.
 	 * @param {Node<vec3>} normalNode - The world-space normal.
 	 * @param {?Node<vec3>} [directionNode=null] - A variable to add the luminance-weighted light directions to.
+	 * @param {?Node<vec3>} [faceNormalNode=null] - The world-space normal of the receiving face, by default from the derivatives of the position.
 	 * @return {Node<vec3>} The irradiance.
 	 */
-	_gather( positionNode, normalNode, directionNode = null ) {
+	_gather( positionNode, normalNode, directionNode = null, faceNormalNode = null ) {
 
 		const resolution = this.resolution;
 		const radius = this.gatherRadius;
@@ -817,7 +918,7 @@ class StochasticRadiosity {
 			// gathered surfaces must lie in front of the plane of the receiving face rather than of the
 			// interpolated normal, so neighboring faces of a curved surface never shadow it
 
-			const face = cross( dFdx( position ), dFdy( position ) ).toVar();
+			const face = ( faceNormalNode ?? cross( dFdx( position ), dFdy( position ) ) ).toVar();
 			const faceLength = length( face ).toVar();
 			const faceNormal = select( faceLength.greaterThan( 1e-12 ), face.div( faceLength ), normal ).toVar();
 			faceNormal.assign( select( dot( faceNormal, normal ).lessThan( 0 ), faceNormal.negate(), faceNormal ) );
@@ -922,8 +1023,9 @@ class RadiosityIrradianceNode extends Node {
 	 * @param {Node<vec3>} normalNode - The world-space normal.
 	 * @param {Node<float>} sampleNode - The sample index of the light mapper.
 	 * @param {?Node<vec3>} [directionNode=null] - A variable to add the luminance-weighted light directions to.
+	 * @param {?Node<vec3>} [faceNormalNode=null] - The world-space normal of the receiving face.
 	 */
-	constructor( radiosity, positionNode, normalNode, sampleNode, directionNode = null ) {
+	constructor( radiosity, positionNode, normalNode, sampleNode, directionNode = null, faceNormalNode = null ) {
 
 		super( 'vec3' );
 
@@ -932,6 +1034,7 @@ class RadiosityIrradianceNode extends Node {
 		this.normalNode = normalNode;
 		this.sampleNode = sampleNode;
 		this.directionNode = directionNode;
+		this.faceNormalNode = faceNormalNode;
 
 		this.updateBeforeType = NodeUpdateType.RENDER;
 
@@ -945,7 +1048,7 @@ class RadiosityIrradianceNode extends Node {
 
 	setup() {
 
-		return this.radiosity._gather( this.positionNode, this.normalNode, this.directionNode );
+		return this.radiosity._gather( this.positionNode, this.normalNode, this.directionNode, this.faceNormalNode );
 
 	}
 
@@ -956,14 +1059,15 @@ class RadiosityIrradianceNode extends Node {
  * Call `radiosity.update( renderer, scene )` before baking. Every sample of {@link LightMapper}
  * gathers a new set of directions, so the samples converge, and the pages of the light mapper share
  * the directions of a sample. The sampler adds the luminance-weighted light directions to its
- * optional fourth argument, for the directional light maps of {@link LightMapper}.
+ * optional fourth argument, for the directional light maps of {@link LightMapper}. The points of a
+ * {@link VertexLightMapper} pass the normal of their face in the `faceNormal` of a fifth argument.
  *
  * @param {StochasticRadiosity} radiosity - The prepared radiosity solver.
- * @return {function(Node<vec3>, Node<vec3>, Node<float>, ?Node<vec3>): Node<vec3>} The irradiance sampler.
+ * @return {function(Node<vec3>, Node<vec3>, Node<float>, ?Node<vec3>, Object): Node<vec3>} The irradiance sampler.
  */
 function radiosityIrradiance( radiosity ) {
 
-	return ( position, normal, sample, direction = null ) => nodeObject( new RadiosityIrradianceNode( radiosity, position, normal, sample, direction ) );
+	return ( position, normal, sample, direction = null, { faceNormal = null } = {} ) => nodeObject( new RadiosityIrradianceNode( radiosity, position, normal, sample, direction, faceNormal ) );
 
 }
 

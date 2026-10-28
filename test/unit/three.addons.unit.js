@@ -7,6 +7,7 @@ import './addons/utils/unwrapUVs.tests.js';
 import './addons/lighting/LightMapper.tests.js';
 import './addons/lighting/LightBaker.tests.js';
 import './addons/lighting/LightMapSeams.tests.js';
+import './addons/lighting/VertexLightMapper.tests.js';
 import './addons/tsl/lighting/DirectionalLightMapNode.tests.js';
 import './addons/math/ColorConverter.tests.js';
 import './addons/math/ColorSpaces.tests.js';
