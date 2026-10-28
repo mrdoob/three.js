@@ -40,7 +40,6 @@
 
 		<small>
 			Screen Space Reflections with Spatiotemporal Denoising by <a href="https://x.com/0beqz" target="_blank" rel="noopener">0beqz</a>.<br />
-			IOR 2.0 materials demonstrate material-aware SSR reflectance.<br />
 			Dungeon - Low Poly Game Level Challenge by
 			Warkarma.<br />
 		</small>
@@ -60,7 +59,7 @@
 	<script type="module">
 
 		import * as THREE from 'three/webgpu';
-		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, specularColorBlended, specularF90, screenUV, sample, packNormalToRGB, unpackRGBToNormal, vec2, velocity, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation } from 'three/tsl';
+		import { pass, mrt, output, normalView, materialMetalness, materialRoughness, screenUV, sample, packNormalToRGB, unpackRGBToNormal, vec2, velocity, diffuseColor, vec3, vec4, uniform, mix, step, abs, float, renderOutput, saturation } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 		import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
 		import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
@@ -190,27 +189,13 @@
 
 				gltf.scene.scale.multiplyScalar( 0.1 );
 
-				const materials = new Map();
-
 				gltf.scene.traverse( function ( object ) {
 
 					if ( ! object.material ) return;
 
 					object.castShadow = true;
 					object.receiveShadow = true;
-					if ( ! materials.has( object.material ) ) {
-
-						const material = new THREE.MeshPhysicalMaterial();
-						THREE.MeshStandardMaterial.prototype.copy.call( material, object.material );
-						material.defines.PHYSICAL = '';
-						// IOR 2.0 gives dielectric F0 = 1/9, rather than the default 0.04.
-						material.ior = 2.0;
-						materials.set( object.material, material );
-
-					}
-
-					object.material = materials.get( object.material );
-					object.material.roughness = params.roughness;
+					object.material.roughness = 0.3;
 					object.material.normalMap = null;
 
 				} );
@@ -262,12 +247,13 @@
 			scenePassNode = scenePass;
 			scenePass.setMRT( mrt( {
 				output: output,
+				// Store base color (albedo) in RGB + metalness in alpha. The albedo is needed for
+				// metal Fresnel f0; do NOT bake in the (1-metalness) diffuse attenuation here, as
+				// that zeroes metals and destroys their specular tint (f0 would become 0 → black).
+				diffuseColor: vec4( diffuseColor.rgb, materialMetalness ),
 				// Pack roughness into normal alpha channel to save MRT bandwidth
 				normal: vec4( packNormalToRGB( normalView ).rgb, materialRoughness ),
-				// Preserve material F0 and F90, including IOR and specular intensity.
-				specular: vec4( specularColorBlended, specularF90 ),
-				// Pack metalness alongside velocity for the denoiser.
-				velocity: vec4( velocity, materialMetalness, 0 )
+				velocity: velocity
 			} ) );
 
 			const scenePassColor = scenePass.getTextureNode( 'output' ).toInspector( 'Color' );
@@ -278,25 +264,26 @@
 
 			} );
 			scenePassVelocity = scenePass.getTextureNode( 'velocity' ).toInspector( 'Velocity' );
-
-			const scenePassSpecular = scenePass.getTextureNode( 'specular' ).toInspector( 'Specular F0/F90' );
+			const scenePassDiffuseColor = scenePass.getTextureNode( 'diffuseColor' ).toInspector( 'Diffuse Color' );
 
 			const normalTexture = scenePass.getTexture( 'normal' );
 			normalTexture.type = THREE.UnsignedByteType;
 
+			const diffuseTexture = scenePass.getTexture( 'diffuseColor' );
+			diffuseTexture.type = THREE.UnsignedByteType;
+
 			const sceneNormal = sample( ( uv ) => unpackRGBToNormal( scenePassNormal.sample( uv ).rgb ) );
 
-			// Metalness in velocity.b, roughness in normal.a (no separate metalrough MRT)
+			// metalness in diffuseColor.a, roughness in normal.a (no separate metalrough MRT)
 			const scenePassMetalRough = sample( ( uv ) => vec2(
-				scenePassVelocity.sample( uv ).b,
+				scenePassDiffuseColor.sample( uv ).a,
 				scenePassNormal.sample( uv ).a
 			) ).toInspector( 'Metalness/Roughness' );
 
 			ssrNode = ssr( scenePassColor, scenePassDepth, sceneNormal, {
 				stochastic: true,
-				specularNode: scenePassSpecular.rgb,
-				specularF90Node: scenePassSpecular.a,
-				metalnessNode: scenePassVelocity.b,
+				diffuseNode: scenePassDiffuseColor,
+				metalnessNode: scenePassDiffuseColor.a,
 				roughnessNode: scenePassNormal.a,
 				environmentNode: hdrTexture,
 				envImportanceSampling: params.ssr.envImportanceSampling,
