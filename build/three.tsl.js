@@ -845,7 +845,7 @@ class Node extends EventDispatcher {
 
 		// private
 
-		this._beforeNodes = null;
+		this._inspectorNode = null;
 
 		/**
 		 * The cache key of this node.
@@ -1821,13 +1821,20 @@ class Node extends EventDispatcher {
 
 	}
 
-	before( node ) {
+	/**
+	 * Registers the inspector node added with `toInspector()` in the builder, so it is updated every frame.
+	 * Nodes that override `build()` without always calling `super.build()` must call this method.
+	 *
+	 * @private
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	_setupInspector( builder ) {
 
-		if ( this._beforeNodes === null ) this._beforeNodes = [];
+		if ( this._inspectorNode !== null && builder.buildStage === 'setup' ) {
 
-		this._beforeNodes.push( node );
+			builder.addNode( this._inspectorNode );
 
-		return this;
+		}
 
 	}
 
@@ -1843,29 +1850,13 @@ class Node extends EventDispatcher {
 	 */
 	build( builder, output = null ) {
 
+		this._setupInspector( builder );
+
 		const refNode = this.getShared( builder );
 
 		if ( this !== refNode ) {
 
 			return refNode.build( builder, output );
-
-		}
-
-		//
-
-		if ( this._beforeNodes !== null ) {
-
-			const currentBeforeNodes = this._beforeNodes;
-
-			this._beforeNodes = null;
-
-			for ( const beforeNode of currentBeforeNodes ) {
-
-				beforeNode.build( builder, output );
-
-			}
-
-			this._beforeNodes = currentBeforeNodes;
 
 		}
 
@@ -3399,6 +3390,26 @@ Node.prototype.get = function ( value ) {
 
 const proto = {};
 
+// Cache of the swizzle and element nodes, a proxy of a node has its own cache
+
+const _swizzleCache = new WeakMap();
+
+function getSwizzleCache( node ) {
+
+	let cache = _swizzleCache.get( node );
+
+	if ( cache === undefined ) {
+
+		cache = {};
+
+		_swizzleCache.set( node, cache );
+
+	}
+
+	return cache;
+
+}
+
 // Set swizzle properties for xyzw, rgba, and stpq.
 
 function setProtoSwizzle( property, altA, altB ) {
@@ -3409,17 +3420,17 @@ function setProtoSwizzle( property, altA, altB ) {
 
 		get() {
 
-			this._cache = this._cache || {};
+			const cache = getSwizzleCache( this );
 
 			//
 
-			let split = this._cache[ property ];
+			let split = cache[ property ];
 
 			if ( split === undefined ) {
 
 				split = new SplitNode( this, property );
 
-				this._cache[ property ] = split;
+				cache[ property ] = split;
 
 			}
 
@@ -3515,17 +3526,17 @@ for ( let i = 0; i < 32; i ++ ) {
 
 		get() {
 
-			this._cache = this._cache || {};
+			const cache = getSwizzleCache( this );
 
 			//
 
-			let element = this._cache[ i ];
+			let element = cache[ i ];
 
 			if ( element === undefined ) {
 
 				element = new ArrayElementNode( this, new ConstNode( i, 'uint' ) );
 
-				this._cache[ i ] = element;
+				cache[ i ] = element;
 
 			}
 
@@ -3552,17 +3563,17 @@ function setProtoProperty( property, target ) {
 
 		get() {
 
-			this._cache = this._cache || {};
+			const cache = getSwizzleCache( this );
 
 			//
 
-			let split = this._cache[ target ];
+			let split = cache[ target ];
 
 			if ( split === undefined ) {
 
 				split = new SplitNode( this, target );
 
-				this._cache[ target ] = split;
+				cache[ target ] = split;
 
 			}
 
@@ -3950,7 +3961,9 @@ class ShaderCallNodeInternal extends Node {
 
 	build( builder, output = null ) {
 
-		// The call does not use Node.build(), so it handles shared and overridden nodes and assignable state here.
+		// The call does not use Node.build(), so it handles the inspector node, shared and overridden nodes and assignable state here.
+		this._setupInspector( builder );
+
 		const refNode = this.getShared( builder );
 
 		if ( this !== refNode ) {
@@ -8884,6 +8897,8 @@ class VarNode extends Node {
 
 	build( builder, output = null ) {
 
+		this._setupInspector( builder );
+
 		const refNode = this.getShared( builder );
 
 		if ( this !== refNode ) {
@@ -9062,6 +9077,8 @@ class SubBuildNode extends Node {
 	}
 
 	build( builder, ...params ) {
+
+		this._setupInspector( builder );
 
 		builder.addSubBuild( this.name );
 
@@ -11150,6 +11167,8 @@ class IsolateNode extends Node {
 
 	build( builder, ...params ) {
 
+		this._setupInspector( builder );
+
 		const previousCache = builder.getCache();
 		const cache = builder.getCacheFromNode( this, this.parent );
 
@@ -11908,6 +11927,8 @@ class InspectorBase extends EventDispatcher {
  * InspectorNode is a wrapper node that allows inspection of node values during rendering.
  * It can be used to debug or analyze node outputs in the rendering pipeline.
  *
+ * The inspector node is registered by the inspected node when it is built, see {@link Node#_setupInspector}.
+ *
  * @augments Node
  */
 class InspectorNode extends Node {
@@ -11928,7 +11949,7 @@ class InspectorNode extends Node {
 	 *
 	 * @param {Node} node - The node to inspect.
 	 * @param {string} [name=''] - Optional name for the inspector node.
-	 * @param {Function|null} [callback=null] - Optional callback to modify the node during setup.
+	 * @param {Function|null} [callback=null] - Optional callback to modify the node presented by the inspector.
 	 */
 	constructor( node, name = '', callback = null ) {
 
@@ -11941,12 +11962,6 @@ class InspectorNode extends Node {
 		this.updateType = NodeUpdateType.FRAME;
 
 		this.isInspectorNode = true;
-
-	}
-
-	isCacheable( /*builder*/ ) {
-
-		return false;
 
 	}
 
@@ -11968,7 +11983,15 @@ class InspectorNode extends Node {
 	 */
 	update( frame ) {
 
-		frame.renderer.inspector.inspect( this );
+		const { renderer } = frame;
+
+		if ( renderer.backend.isWebGPUBackend !== true && renderer.inspector.constructor !== InspectorBase ) {
+
+			warnOnce( 'TSL: ".toInspector()" is only available with WebGPU.' );
+
+		}
+
+		renderer.inspector.inspect( this );
 
 	}
 
@@ -11984,32 +12007,6 @@ class InspectorNode extends Node {
 
 	}
 
-	/**
-	 * Sets up the inspector node.
-	 *
-	 * @param {NodeBuilder} builder - The node builder.
-	 * @returns {Node} The setup node.
-	 */
-	setup( builder ) {
-
-		let node = this.node;
-
-		if ( builder.context.inspector === true && this.callback !== null ) {
-
-			node = this.callback( node );
-
-		}
-
-		if ( builder.renderer.backend.isWebGPUBackend !== true && builder.renderer.inspector.constructor !== InspectorBase ) {
-
-			warnOnce( 'TSL: ".toInspector()" is only available with WebGPU.' );
-
-		}
-
-		return node;
-
-	}
-
 }
 
 /**
@@ -12018,14 +12015,16 @@ class InspectorNode extends Node {
  * @tsl
  * @param {Node} node - The node to inspect.
  * @param {string} [name=''] - Optional name for the inspector node.
- * @param {Function|null} [callback=null] - Optional callback to modify the node during setup.
- * @returns {Node} The inspector node.
+ * @param {Function|null} [callback=null] - Optional callback to modify the node presented by the inspector.
+ * @returns {Node} The inspected node.
  */
 function inspect( node, name = '', callback = null ) {
 
 	node = nodeObject( node );
 
-	return node.before( new InspectorNode( node, name, callback ) );
+	node._inspectorNode = new InspectorNode( node, name, callback );
+
+	return node;
 
 }
 
@@ -12841,6 +12840,8 @@ class StackNode extends Node {
 	}
 
 	build( builder, ...params ) {
+
+		this._setupInspector( builder );
 
 		const previousStack = getCurrentStack();
 
@@ -36452,7 +36453,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		if ( shadowColor ) {
 
-			shadowOutput.toInspector( `${ inspectName } / Color`, () => {
+			shadowColor.toInspector( `${ inspectName } / Color`, () => {
 
 				if ( this.shadowMap.texture.isCubeTexture ) {
 
