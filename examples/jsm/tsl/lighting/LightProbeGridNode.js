@@ -157,6 +157,9 @@ class LightProbeGridNode extends AnalyticLightNode {
 		If( inside, () => {
 
 			const irradiance = getGridIrradiance( light, min, max, res, this._intensity, positionWorld, normalWorld ).toConst();
+
+			// fragments can be located in multiple grids but only the most recently created one defines the irradiance, see #34798
+
 			builder.context.lightProbeIrradiance.assign( irradiance );
 
 		} );
