@@ -846,6 +846,8 @@ class VertexLightMapper {
 		 */
 		this.fixedCount = this._fixed !== null ? this._fixed.count : 0;
 
+		this._neighborSize = 0;
+
 		this._createPoints();
 		this._createTargets();
 		this._createPasses();
@@ -1391,6 +1393,21 @@ class VertexLightMapper {
 		}
 
 		if ( this._ownsLayout ) this.layout.dispose();
+
+	}
+
+	/**
+	 * Returns the size in bytes of the largest storage buffer of the mapper: the topology of the points, the
+	 * records, the record of each vertex or the neighbors of the records.
+	 *
+	 * @private
+	 * @return {number} The size in bytes.
+	 */
+	_storageSize() {
+
+		const layout = this.layout;
+
+		return Math.max( this._indexBuffer.value.array.byteLength, Math.max( layout.recordCount, 1 ) * 32, layout.vertexRecords.length * 4, this._neighborSize );
 
 	}
 
@@ -1989,6 +2006,7 @@ class VertexLightMapper {
 		for ( const neighbors of lists ) for ( const n of neighbors ) data[ k ++ ] = n;
 
 		const neighborBuffer = storage( new StorageBufferAttribute( data, 1 ), 'uint', data.length ).toReadOnly();
+		this._neighborSize = data.byteLength;
 
 		// the noise of each record relative to the noise of the bake: a record averages the points of its
 		// triangles, weighted by their area and barycentric coordinates, so it has an effective number of

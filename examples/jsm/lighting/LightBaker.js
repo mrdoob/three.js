@@ -1119,9 +1119,9 @@ class LightBaker {
 				}
 
 				// vertex bakes are refined at the changes of the light and baked again, then simplified where the
-				// light is smooth and baked once more
+				// light is smooth and baked once more. Simplified meshes are not refined again
 
-				if ( this.target === 'vertex' && this._refinements < this.refine && await this._refineVertices() ) continue;
+				if ( this.target === 'vertex' && this._simplified === false && this._refinements < this.refine && await this._refineVertices() ) continue;
 				if ( this.target === 'vertex' && this.simplify !== null && this._simplified === false && await this._simplifyVertices() ) continue;
 
 				break;
@@ -1633,10 +1633,11 @@ class LightBaker {
 
 	/**
 	 * Refines the meshes of a converged vertex bake at the changes of the light: the edges whose ends differ
-	 * more in luminance are split once, with the longest edges of their triangles, and the vertices of the refined meshes get a new mapper, which bakes
-	 * them all again. Keeping the light of the vertices of unchanged triangles, `_refineKeep`, needs about as
-	 * long, since the changed vertices are the noisiest, and gives the same light. The source, with its rays
-	 * and bounce cache, stays.
+	 * more in luminance are split once, with the longest edges of their triangles, and the vertices of the
+	 * refined meshes get a new mapper, which bakes them all again. A refinement whose triangles would not fit
+	 * the storage buffers of the device is left out, and ends the refinements. Keeping the light of the
+	 * vertices of unchanged triangles, `_refineKeep`, needs about as long, since the changed vertices are the
+	 * noisiest, and gives the same light. The source, with its rays and bounce cache, stays.
 	 *
 	 * @private
 	 * @async
@@ -1670,7 +1671,7 @@ class LightBaker {
 
 		const minLength = ( this.maxEdgeLength ?? bounds.getSize( new Vector3() ).length() * 0.01 ) / 2 ** this.refine;
 		const contrast = this._refineContrast ?? REFINE_CONTRAST;
-		let refined = false;
+		const refinements = [];
 
 		for ( const mesh of record.lightMapped ) {
 
@@ -1703,25 +1704,54 @@ class LightBaker {
 
 			const refinedGeometry = subdivideGeometry( geometry, 0, { matrix: mesh.matrixWorld, rounds: 1, split, longest: true } );
 
-			if ( refinedGeometry === geometry ) continue;
+			if ( refinedGeometry !== geometry ) refinements.push( { mesh, geometry: refinedGeometry } );
 
-			// the refinement of each mesh is its own, the previous one is replaced
+		}
 
+		if ( refinements.length === 0 ) return false;
+
+		// the refined meshes get a mapper, which is left out with the refinement if its storage buffers exceed what
+		// a binding of the device holds
+
+		const geometries = refinements.map( ( { mesh } ) => mesh.geometry );
+
+		for ( const { mesh, geometry } of refinements ) mesh.geometry = geometry;
+
+		const previous = this._refineKeep ? { layout, irradiance, directions } : null;
+		const refinedMapper = new VertexLightMapper( this.renderer, this.irradianceNode, { meshes: record.lightMapped, directional: this.directional, doubleSided: this._doubleSided(), previous, sampling: this._sampling, smoothNormals: this._contactOcclusion?.smooth === true } );
+		const limit = this.renderer.backend.device?.limits.maxStorageBufferBindingSize ?? 134217728;
+
+		if ( refinedMapper._storageSize() > limit ) {
+
+			refinedMapper.dispose();
+
+			refinements.forEach( ( { mesh, geometry }, i ) => {
+
+				mesh.geometry = geometries[ i ];
+				geometry.dispose();
+
+			} );
+
+			console.warn( `THREE.LightBaker: The refinements stopped after ${ this._refinements } of ${ this.refine }, the next one needs more than the ${ Math.round( limit / 1048576 ) } MB that a storage buffer binding of this device holds.` );
+
+			return false;
+
+		}
+
+		// the refinement of each mesh is its own, the previous one is replaced
+
+		refinements.forEach( ( { mesh, geometry: refinedGeometry }, i ) => {
+
+			const geometry = geometries[ i ];
 			const entry = record.subdivided.get( mesh ) ?? { original: geometry, geometry, subdivided: geometry, cacheGeometry: geometry, maxEdgeLength: this.maxEdgeLength };
 
 			if ( entry.geometry !== entry.subdivided ) entry.geometry.dispose();
 
 			record.subdivided.set( mesh, { ...entry, geometry: refinedGeometry } );
-			mesh.geometry = refinedGeometry;
-			refined = true;
 
-		}
+		} );
 
-		if ( refined === false ) return false;
-
-		const previous = this._refineKeep ? { layout, irradiance, directions } : null;
-
-		this.lightMapper = new VertexLightMapper( this.renderer, this.irradianceNode, { meshes: record.lightMapped, directional: this.directional, doubleSided: this._doubleSided(), previous, sampling: this._sampling, smoothNormals: this._contactOcclusion?.smooth === true } );
+		this.lightMapper = refinedMapper;
 		mapper.dispose();
 
 		// the bake time continues
