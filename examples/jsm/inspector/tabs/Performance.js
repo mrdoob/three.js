@@ -80,7 +80,7 @@ class Performance extends Tab {
 
 	}
 
-	resolveStats( inspector, stats ) {
+	resolveStats( inspector, stats, budget = Infinity ) {
 
 		const data = inspector.getStatsData( stats.cid );
 
@@ -139,10 +139,15 @@ class Performance extends Tab {
 
 		}
 
+		// A row never shows more GPU time than its parent, see updateText()
+
+		const displayGpu = stats.gpuNotAvailable === true ? 0 : Math.min( data.gpu, budget );
+		const displayTotal = data.cpu + displayGpu;
+
 		setText( item.data[ 0 ], name );
 		setText( item.data[ 1 ], data.cpu.toFixed( 2 ) );
-		setText( item.data[ 2 ], stats.gpuNotAvailable === true ? '-' : data.gpu.toFixed( 2 ) );
-		setText( item.data[ 3 ], data.total.toFixed( 2 ) );
+		setText( item.data[ 2 ], stats.gpuNotAvailable === true ? '-' : displayGpu.toFixed( 2 ) );
+		setText( item.data[ 3 ], displayTotal.toFixed( 2 ) );
 
 		//
 
@@ -150,9 +155,11 @@ class Performance extends Tab {
 
 		this.currentItem = item;
 
+		const childBudget = stats.gpuNotAvailable === true ? budget : displayGpu;
+
 		for ( const child of stats.children ) {
 
-			this.resolveStats( inspector, child );
+			this.resolveStats( inspector, child, childBudget );
 
 		}
 
@@ -226,11 +233,19 @@ class Performance extends Tab {
 		const oldFrameItems = new Map( this.frameItems );
 
 		this.frameItems.clear();
+
+		// GPU timestamps can sum to more than the frame time when the GPU overlaps passes, so cap the display at
+		// the frame time, and cap each row at its parent's value
+
+		const hasTimestamp = inspector.getRenderer().backend.hasTimestamp;
+		const gpuBudget = hasTimestamp ? Math.min( frame.gpu, frame.deltaTime ) : 0;
+		const totalDisplay = frame.cpu + gpuBudget;
+
 		this.currentItem = this.frameStats;
 
 		for ( const child of frame.children ) {
 
-			this.resolveStats( inspector, child );
+			this.resolveStats( inspector, child, gpuBudget );
 
 		}
 
@@ -263,8 +278,8 @@ class Performance extends Tab {
 		//
 
 		setText( this.frameStats.data[ 1 ], frame.cpu.toFixed( 2 ) );
-		setText( this.frameStats.data[ 2 ], inspector.getRenderer().backend.hasTimestamp ? frame.gpu.toFixed( 2 ) : '-' );
-		setText( this.frameStats.data[ 3 ], frame.total.toFixed( 2 ) );
+		setText( this.frameStats.data[ 2 ], hasTimestamp ? gpuBudget.toFixed( 2 ) : '-' );
+		setText( this.frameStats.data[ 3 ], totalDisplay.toFixed( 2 ) );
 
 		//
 

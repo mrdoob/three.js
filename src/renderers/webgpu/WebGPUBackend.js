@@ -2189,9 +2189,9 @@ class WebGPUBackend extends Backend {
 
 				passEncoderGPU.drawIndexed( indexCount, instanceCount, firstIndex, 0, 0 );
 
-			}
+				info.update( object, indexCount, instanceCount );
 
-			info.update( object, indexCount, instanceCount );
+			}
 
 		} else {
 
@@ -2211,14 +2211,13 @@ class WebGPUBackend extends Backend {
 
 				}
 
-
 			} else {
 
 				passEncoderGPU.draw( vertexCount, instanceCount, firstVertex, 0 );
 
-			}
+				info.update( object, vertexCount, instanceCount );
 
-			info.update( object, vertexCount, instanceCount );
+			}
 
 		}
 
