@@ -12,7 +12,6 @@ import { HistoryManager } from './managers/HistoryManager.js';
 import { LayoutManager } from './managers/LayoutManager.js';
 import { ConsoleManager } from './managers/ConsoleManager.js';
 import { PlaygroundManager } from './managers/PlaygroundManager.js';
-import { ProjectsManager } from './managers/ProjectsManager.js';
 import { getSVG, compressString } from './utils/GuideUtils.js';
 import mermaid from 'mermaid';
 
@@ -54,7 +53,6 @@ class Guide {
 	constructor( title = '*TSL* Guide' ) {
 
 		this.guideTitle = title;
-		this.onEmptyProject = null;
 		this.pages = [];
 		this.pageTree = [];
 		this.currentPageIndex = 0;
@@ -84,7 +82,6 @@ class Guide {
 		this.layoutManager = new LayoutManager( this );
 		this.consoleManager = new ConsoleManager( this );
 		this.playgroundManager = new PlaygroundManager( this );
-		this.projectsManager = new ProjectsManager( this );
 
 		this.lastGuidePageHash = '';
 		this.lastHandledHash = initialHash;
@@ -207,18 +204,6 @@ class Guide {
 		document.title = cleanTitle;
 
 		return this;
-
-	}
-
-	getEmptyProjectCode() {
-
-		if ( typeof this.onEmptyProject === 'function' ) {
-
-			return this.onEmptyProject();
-
-		}
-
-		return '// TSL Guide\n';
 
 	}
 
@@ -957,7 +942,6 @@ class Guide {
 
 			const activePage = this.pages[ this.currentPageIndex ];
 			let currentCode = '// TSL Guide\n';
-			const exampleTitle = activePage?.title || activePage?.name || 'Example';
 
 			if ( activePage && activePage.hasCode ) {
 
@@ -965,7 +949,7 @@ class Guide {
 
 			}
 
-			this.playgroundManager.loadExampleIntoPlayground( currentCode, exampleTitle );
+			this.playgroundManager.loadExampleIntoPlayground( currentCode );
 
 		};
 
