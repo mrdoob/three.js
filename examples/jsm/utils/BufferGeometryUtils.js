@@ -1227,9 +1227,7 @@ function mergeGroups( geometry ) {
 
 		const group = groups[ i ];
 
-		// the count of a group can be Infinity which means all remaining indices
-
-		group.count = Math.min( group.count, index.count - group.start );
+		if ( group.count === Infinity ) group.count = index.count - group.start;
 
 		const groupStart = group.start;
 		const groupLength = groupStart + group.count;
