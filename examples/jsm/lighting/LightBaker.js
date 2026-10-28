@@ -216,7 +216,7 @@ class LightBaker {
 
 		/**
 		 * The maximum number of samples. By default 1024 for rays, 8192 for stochastic radiosity, 16 for
-		 * light probes and 256 for VXGI.
+		 * light probes and 256 for VXGI. The bake warns when it stops at the maximum above the noise tolerance.
 		 *
 		 * @type {?number}
 		 * @default null
@@ -900,6 +900,18 @@ class LightBaker {
 					else samplesPerFrame = Math.min( samplesPerFrame + 1, this.getSamplesPerFrame() );
 
 				}
+
+			}
+
+			// at the maximum samples, the last noise estimate is from fewer samples
+
+			const tolerance = this.getNoiseTolerance();
+
+			if ( this.noise >= tolerance ) {
+
+				await this._checkNoise();
+
+				if ( this.noise >= tolerance && Number.isFinite( this.noise ) ) console.warn( `THREE.LightBaker: The bake reached the maximum of ${ this.samples } samples at ${ ( this.noise * 100 ).toFixed( 1 ) }% noise, above the noise tolerance of ${ ( tolerance * 100 ).toFixed( 1 ) }%.` );
 
 			}
 
