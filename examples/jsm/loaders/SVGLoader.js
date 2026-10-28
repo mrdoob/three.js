@@ -918,12 +918,16 @@ class SVGLoader extends Loader {
 
 		function parsePolygonNode( node ) {
 
-			function iterator( match, a, b ) {
+			const numbers = parseFloats( node.getAttribute( 'points' ) );
 
-				const x = parseFloatWithUnits( a );
-				const y = parseFloatWithUnits( b );
+			const path = new ShapePath();
 
-				if ( index === 0 ) {
+			for ( let i = 0; i + 1 < numbers.length; i += 2 ) {
+
+				const x = parseFloatWithUnits( numbers[ i ] );
+				const y = parseFloatWithUnits( numbers[ i + 1 ] );
+
+				if ( i === 0 ) {
 
 					path.moveTo( x, y );
 
@@ -933,17 +937,7 @@ class SVGLoader extends Loader {
 
 				}
 
-				index ++;
-
 			}
-
-			const regex = /([+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:e[+-]?\d+)?)(?:,|\s)([+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:e[+-]?\d+)?)/g;
-
-			const path = new ShapePath();
-
-			let index = 0;
-
-			node.getAttribute( 'points' ).replace( regex, iterator );
 
 			path.currentPath.autoClose = true;
 
@@ -953,12 +947,16 @@ class SVGLoader extends Loader {
 
 		function parsePolylineNode( node ) {
 
-			function iterator( match, a, b ) {
+			const numbers = parseFloats( node.getAttribute( 'points' ) );
 
-				const x = parseFloatWithUnits( a );
-				const y = parseFloatWithUnits( b );
+			const path = new ShapePath();
 
-				if ( index === 0 ) {
+			for ( let i = 0; i + 1 < numbers.length; i += 2 ) {
+
+				const x = parseFloatWithUnits( numbers[ i ] );
+				const y = parseFloatWithUnits( numbers[ i + 1 ] );
+
+				if ( i === 0 ) {
 
 					path.moveTo( x, y );
 
@@ -968,17 +966,7 @@ class SVGLoader extends Loader {
 
 				}
 
-				index ++;
-
 			}
-
-			const regex = /([+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:e[+-]?\d+)?)(?:,|\s)([+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:e[+-]?\d+)?)/g;
-
-			const path = new ShapePath();
-
-			let index = 0;
-
-			node.getAttribute( 'points' ).replace( regex, iterator );
 
 			path.currentPath.autoClose = false;
 
