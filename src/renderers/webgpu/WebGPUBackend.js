@@ -2151,19 +2151,36 @@ class WebGPUBackend extends Backend {
 			const drawCount = object._multiDrawCount;
 			const bytesPerElement = object._multiDrawBytesPerElement;
 
-			for ( let i = 0; i < drawCount; i ++ ) {
+			let i = 0;
 
-				if ( hasIndex === true ) {
+			while ( i < drawCount ) {
 
-					passEncoderGPU.drawIndexed( counts[ i ], 1, starts[ i ] / bytesPerElement, 0, i );
+				const start = starts[ i ];
+				const count = counts[ i ];
 
-				} else {
+				// merge consecutive draws of the same geometry range into one instanced draw
 
-					passEncoderGPU.draw( counts[ i ], 1, starts[ i ], i );
+				let instanceCount = 1;
+
+				while ( i + instanceCount < drawCount && starts[ i + instanceCount ] === start && counts[ i + instanceCount ] === count ) {
+
+					instanceCount ++;
 
 				}
 
-				info.update( object, counts[ i ], 1 );
+				if ( hasIndex === true ) {
+
+					passEncoderGPU.drawIndexed( count, instanceCount, start / bytesPerElement, 0, i );
+
+				} else {
+
+					passEncoderGPU.draw( count, instanceCount, start, i );
+
+				}
+
+				info.update( object, count, instanceCount );
+
+				i += instanceCount;
 
 			}
 
