@@ -32,7 +32,7 @@
 			</div>
 
 			<small>
-				White noise vs. <a href="https://github.com/electronicarts/fastnoise" target="_blank" rel="noopener">FAST</a> spatiotemporal blue noise by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br/>A 1-bit dithered sphere or a uniform noise field, accumulated over time.
+				White noise vs. <a href="https://github.com/electronicarts/fastnoise" target="_blank" rel="noopener">FAST</a> spatiotemporal blue noise by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br/>A 1-bit dithered sphere or a uniform noise field, accumulated over time.<br/>Frames accumulated: <span id="frames">0</span>
 			</small>
 		</div>
 
@@ -65,6 +65,8 @@
 
 			let renderer, computeQuad, displayQuad, targets, history, current, display, blurredDisplay;
 			let samples = 0;
+
+			const framesElement = document.getElementById( 'frames' );
 
 			const mode = uniform( modes[ params.mode ] );
 			const noiseType = uniform( noises[ params.noise ] );
@@ -186,6 +188,7 @@
 
 				samples ++;
 				blend.value = params.temporalBlur ? 1 / samples : 1;
+				framesElement.textContent = params.temporalBlur ? samples : 1;
 
 				renderer.setRenderTarget( targets[ 0 ] );
 				computeQuad.render( renderer );
