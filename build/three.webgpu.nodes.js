@@ -3,7 +3,7 @@
  * Copyright 2010-2026 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-import { DynamicDrawUsage, RenderObjectRefreshType, Color, Vector2, Vector3, Vector4, Matrix2, Matrix3, Matrix4, error, UnsignedIntType, IntType, RedFormat, RedIntegerFormat, DepthFormat, DepthStencilFormat, AlphaFormat, RGFormat, RGIntegerFormat, RGBFormat, RGBIntegerFormat, EventDispatcher, generateUUID, warn, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBufferAttribute, InterleavedBuffer, NoColorSpace, log as log$1, warnOnce, Texture, Compatibility, LessCompare, LessEqualCompare, GreaterCompare, GreaterEqualCompare, NearestFilter, Sphere, BackSide, DoubleSide, CubeTexture, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, NoNormalPacking, NormalRGPacking, NormalGAPacking, ObjectSpaceNormalMap, RED_GREEN_RGTC2_Format, RG11_EAC_Format, DataTexture, RGBAFormat, FloatType, InstancedBufferAttribute, DataArrayTexture, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, LineBasicMaterial, LineDashedMaterial, NoBlending, MeshNormalMaterial, SRGBColorSpace, RenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, HalfFloatType, ClampToEdgeWrapping, floorPowerOfTwo, LinearSRGBColorSpace, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, PointsMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, ByteType, UnsignedByteType, ShortType, UnsignedShortType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedInt101111Type, NormalBlending, SrcAlphaFactor, OneMinusSrcAlphaFactor, AddEquation, MaterialBlending, Object3D, LinearMipMapLinearFilter, Plane, OrthographicCamera, BufferGeometry, Float32BufferAttribute, BufferAttribute, UVMapping, VSMShadowMap, PCFShadowMap, BasicShadowMap, CubeDepthTexture, SphereGeometry, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, yieldToMain, REVISION, PerspectiveCamera, ArrayCamera, PlaneGeometry, FrontSide, CustomBlending, ZeroFactor, CylinderGeometry, Quaternion, WebXRController, RAD2DEG, PCFSoftShadowMap, FrustumArray, Frustum, RGBAIntegerFormat, TimestampQuery, createCanvasElement, MaxEquation, MinEquation, ReverseSubtractEquation, SubtractEquation, OneMinusConstantAlphaFactor, ConstantAlphaFactor, OneMinusConstantColorFactor, ConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcColorFactor, DstAlphaFactor, DstColorFactor, SrcAlphaSaturateFactor, SrcColorFactor, OneFactor, CullFaceNone, CullFaceBack, CullFaceFront, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, ReversedDepthFuncs, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, R11_EAC_Format, SIGNED_R11_EAC_Format, SIGNED_RG11_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, SIGNED_RED_GREEN_RGTC2_Format, MirroredRepeatWrapping, RepeatWrapping, NearestMipmapNearestFilter, NotEqualCompare, EqualCompare, AlwaysCompare, NeverCompare, LinearTransfer, getByteLength, isTypedArray, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
+import { DynamicDrawUsage, RenderObjectRefreshType, Color, Vector2, Vector3, Vector4, Matrix2, Matrix3, Matrix4, error, UnsignedIntType, IntType, RedFormat, RedIntegerFormat, DepthFormat, DepthStencilFormat, AlphaFormat, RGFormat, RGIntegerFormat, RGBFormat, RGBIntegerFormat, EventDispatcher, generateUUID, warn, WebGLCoordinateSystem, WebGPUCoordinateSystem, ColorManagement, SRGBTransfer, NoToneMapping, StaticDrawUsage, InterleavedBufferAttribute, InterleavedBuffer, NoColorSpace, log as log$1, warnOnce, Texture, Compatibility, LessCompare, LessEqualCompare, GreaterCompare, GreaterEqualCompare, NearestFilter, Sphere, BackSide, DoubleSide, CubeTexture, CubeReflectionMapping, CubeRefractionMapping, TangentSpaceNormalMap, NoNormalPacking, NormalRGPacking, NormalGAPacking, ObjectSpaceNormalMap, RED_GREEN_RGTC2_Format, RG11_EAC_Format, DataTexture, RGBAFormat, FloatType, InstancedBufferAttribute, DataArrayTexture, FramebufferTexture, LinearMipmapLinearFilter, DepthTexture, Material, LineBasicMaterial, LineDashedMaterial, NoBlending, MeshNormalMaterial, SRGBColorSpace, RenderTarget, BoxGeometry, Mesh, Scene, LinearFilter, CubeCamera, EquirectangularReflectionMapping, EquirectangularRefractionMapping, AddOperation, MixOperation, MultiplyOperation, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, HalfFloatType, ClampToEdgeWrapping, floorPowerOfTwo, LinearSRGBColorSpace, MeshStandardMaterial, MeshPhysicalMaterial, MeshToonMaterial, MeshMatcapMaterial, SpriteMaterial, PointsMaterial, ShadowMaterial, Uint32BufferAttribute, Uint16BufferAttribute, ByteType, UnsignedByteType, ShortType, UnsignedShortType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedInt101111Type, NormalBlending, SrcAlphaFactor, OneMinusSrcAlphaFactor, AddEquation, MaterialBlending, Object3D, LinearMipMapLinearFilter, Plane, OrthographicCamera, BufferGeometry, Float32BufferAttribute, BufferAttribute, UVMapping, VSMShadowMap, PCFShadowMap, BasicShadowMap, CubeDepthTexture, SphereGeometry, LinearMipmapNearestFilter, NearestMipmapLinearFilter, Float16BufferAttribute, yieldToMain, REVISION, PerspectiveCamera, ArrayCamera, PlaneGeometry, FrontSide, CustomBlending, ZeroFactor, CylinderGeometry, Quaternion, WebXRController, RAD2DEG, Frustum, FrustumArray, PCFSoftShadowMap, RGBAIntegerFormat, TimestampQuery, createCanvasElement, MaxEquation, MinEquation, ReverseSubtractEquation, SubtractEquation, OneMinusConstantAlphaFactor, ConstantAlphaFactor, OneMinusConstantColorFactor, ConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcColorFactor, DstAlphaFactor, DstColorFactor, SrcAlphaSaturateFactor, SrcColorFactor, OneFactor, CullFaceNone, CullFaceBack, CullFaceFront, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, ReversedDepthFuncs, RGB_S3TC_DXT1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGB_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_PVRTC_2BPPV1_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, R11_EAC_Format, SIGNED_R11_EAC_Format, SIGNED_RG11_EAC_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_BPTC_Format, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RED_RGTC1_Format, SIGNED_RED_RGTC1_Format, SIGNED_RED_GREEN_RGTC2_Format, MirroredRepeatWrapping, RepeatWrapping, NearestMipmapNearestFilter, NotEqualCompare, EqualCompare, AlwaysCompare, NeverCompare, LinearTransfer, getByteLength, isTypedArray, NotEqualStencilFunc, GreaterStencilFunc, GreaterEqualStencilFunc, EqualStencilFunc, LessEqualStencilFunc, LessStencilFunc, AlwaysStencilFunc, NeverStencilFunc, DecrementWrapStencilOp, IncrementWrapStencilOp, DecrementStencilOp, IncrementStencilOp, InvertStencilOp, ReplaceStencilOp, ZeroStencilOp, KeepStencilOp, SpotLight, PointLight, DirectionalLight, RectAreaLight, AmbientLight, HemisphereLight, LightProbe, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, Group, Loader, FileLoader, MaterialLoader, ObjectLoader } from './three.core.js';
 export { AdditiveAnimationBlendMode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrowHelper, AttachedBindMode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BasicDepthPacking, BatchedMesh, BezierInterpolant, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxHelper, BufferGeometryLoader, Cache, Camera, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Clock, ColorKeyframeTrack, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ConeGeometry, Controls, CubeTextureLoader, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceFrontBack, Curve, CurvePath, CustomToneMapping, Cylindrical, Data3DTexture, DataTextureLoader, DataUtils, DefaultLoadingManager, DetachedBindMode, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry, DynamicCopyUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, Euler, ExternalTexture, ExtrudeGeometry, Fog, FogExp2, GLBufferAttribute, GLSL1, GLSL3, GridHelper, HTMLTexture, HemisphereLightHelper, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, Interpolant, InterpolateBezier, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InterpolationSamplingMode, InterpolationSamplingType, KeyframeTrack, LOD, LatheGeometry, Layers, Light, LightShadow, Line, Line3, LineCurve, LineCurve3, LineLoop, LineSegments, LinearInterpolant, LinearMipMapNearestFilter, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, MOUSE, MathUtils, MeshDepthMaterial, MeshDistanceMaterial, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NormalAnimationBlendMode, NumberKeyframeTrack, OctahedronGeometry, Path, PlaneHelper, PointLightHelper, Points, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RGBADepthPacking, RGBDepthPacking, RGDepthPacking, RawShaderMaterial, Ray, Raycaster, RenderTarget3D, RingGeometry, ShaderMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, Skeleton, SkeletonHelper, SkinnedMesh, Source, Spherical, SphericalHarmonics3, SplineCurve, SpotLightHelper, Sprite, StaticCopyUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, TOUCH, TetrahedronGeometry, TextureLoader, TextureSource, TextureUtils, Timer, TorusGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, VectorKeyframeTrack, VideoFrameTexture, VideoTexture, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLRenderTarget, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, getConsoleFunction, setConsoleFunction } from './three.core.js';
 
 const refreshUniforms = [
@@ -49402,7 +49402,7 @@ class ShadowNode extends ShadowBaseNode {
 const shadow = ( light, shadow ) => new ShadowNode( light, shadow );
 
 const _clearColor$1 = /*@__PURE__*/ new Color();
-const _projScreenMatrix$1 = /*@__PURE__*/ new Matrix4();
+const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _lightPositionWorld = /*@__PURE__*/ new Vector3();
 const _lookTarget = /*@__PURE__*/ new Vector3();
 
@@ -49678,8 +49678,8 @@ class PointShadowNode extends ShadowNode {
 
 			shadowMatrix.makeTranslation( - _lightPositionWorld.x, - _lightPositionWorld.y, - _lightPositionWorld.z );
 
-			_projScreenMatrix$1.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-			shadow._frustum.setFromProjectionMatrix( _projScreenMatrix$1, camera.coordinateSystem, camera.reversedDepth );
+			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+			shadow._frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
 
 			//
 
@@ -63105,12 +63105,345 @@ class CanvasTarget extends EventDispatcher {
 
 }
 
+const _vector4$1 = /*@__PURE__*/ new Vector4();
+
+/**
+ * Decides which objects of a scene are rendered and how they are submitted to the render list.
+ * The default implementation performs frustum culling and pushes every renderable object as a
+ * separate render item. Subclasses can override the hooks {@link StandardDrawingPipeline#isCulled} and
+ * {@link StandardDrawingPipeline#pushRenderItem} to implement other strategies like GPU-driven rendering.
+ *
+ * This class is experimental and its interface might change.
+ */
+class StandardDrawingPipeline {
+
+	/**
+	 * Constructs a new standard drawing pipeline.
+	 */
+	constructor() {
+
+		/**
+		 * The renderer this pipeline is assigned to. It is set when
+		 * the pipeline is assigned via {@link Renderer#drawingPipeline}.
+		 *
+		 * @type {?Renderer}
+		 * @default null
+		 */
+		this.renderer = null;
+
+		/**
+		 * The frustum of the current camera.
+		 *
+		 * @protected
+		 * @type {Frustum}
+		 */
+		this._frustum = new Frustum();
+
+		/**
+		 * The frustum array of the current array camera, kept by the render context.
+		 *
+		 * @protected
+		 * @type {?FrustumArray}
+		 * @default null
+		 */
+		this._frustumArray = null;
+
+		/**
+		 * The view projection matrix of the current camera.
+		 *
+		 * @protected
+		 * @type {Matrix4}
+		 */
+		this._projScreenMatrix = new Matrix4();
+
+		/**
+		 * The number of render bundles being recorded in the current projection.
+		 *
+		 * @protected
+		 * @type {number}
+		 * @default 0
+		 */
+		this._bundleDepth = 0;
+
+	}
+
+	/**
+	 * Prepares resources needed to precompile the given scene. Subclasses can use this
+	 * hook to process geometry before the synchronous projection in `Renderer.compileAsync()`.
+	 *
+	 * @param {Object3D} scene - The scene or object to precompile.
+	 * @param {Camera} camera - The camera.
+	 * @return {Promise|undefined} Resolves when the resources are ready.
+	 */
+	prepareAsync( /* scene, camera */ ) {}
+
+	/**
+	 * Frees the resources of the pipeline. Called by {@link Renderer#dispose}, subclasses holding GPU
+	 * resources release them here.
+	 */
+	dispose() {}
+
+	/**
+	 * Prepares the pipeline for projecting a scene with the given camera.
+	 *
+	 * @param {Camera} camera - The camera.
+	 * @param {RenderContext} renderContext - The render context.
+	 */
+	begin( camera, renderContext ) {
+
+		this._projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+
+		if ( camera.isArrayCamera ) {
+
+			// the frustums of the sub-cameras are kept per render context, the backends cull the draws of each sub-camera with them
+
+			if ( renderContext.frustumArray === null ) renderContext.frustumArray = new FrustumArray();
+
+			renderContext.frustumArray.setFromArrayCamera( camera );
+
+			this._frustumArray = renderContext.frustumArray;
+
+		} else {
+
+			this._frustum.setFromProjectionMatrix( this._projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
+
+		}
+
+	}
+
+	/**
+	 * Begins the projection into the given render list.
+	 *
+	 * @param {RenderList} renderList - The render list.
+	 */
+	beginRenderList( renderList ) {
+
+		renderList.begin();
+
+	}
+
+	/**
+	 * Finishes the projection into the given render list.
+	 *
+	 * @param {RenderList} renderList - The render list.
+	 */
+	finishRenderList( renderList ) {
+
+		renderList.finish();
+
+	}
+
+	/**
+	 * Returns `true` if the given object is culled by the camera and should not be rendered.
+	 * Objects of render bundles are not culled, a bundle is recorded once and drawn with
+	 * any camera.
+	 *
+	 * @param {Object3D} object - The 3D object.
+	 * @param {Camera} camera - The camera.
+	 * @return {boolean} Whether the object is culled or not.
+	 */
+	isCulled( object, camera ) {
+
+		if ( ! object.frustumCulled || this._bundleDepth > 0 ) return false;
+
+		const frustum = camera.isArrayCamera ? this._frustumArray : this._frustum;
+
+		return ! object.intersectsFrustum( frustum );
+
+	}
+
+	/**
+	 * Pushes a render item to the render list.
+	 *
+	 * @param {RenderList} renderList - The current render list.
+	 * @param {Object3D} object - The 3D object.
+	 * @param {BufferGeometry} geometry - The 3D object's geometry.
+	 * @param {Material} material - The 3D object's material.
+	 * @param {number} groupOrder - The current group order.
+	 * @param {number} z - The 3D object's depth value (z value in clip space).
+	 * @param {?Object} group - Only relevant for objects using multiple materials. This represents a group entry from the respective `BufferGeometry`.
+	 * @param {ClippingContext} clippingContext - The current clipping context.
+	 */
+	pushRenderItem( renderList, object, geometry, material, groupOrder, z, group, clippingContext ) {
+
+		renderList.push( object, geometry, material, groupOrder, z, group, clippingContext );
+
+	}
+
+	/**
+	 * This method is used to traverse the scene graph and collect all renderable objects
+	 * and lights into the given render list. Call {@link StandardDrawingPipeline#begin} before.
+	 *
+	 * @param {Object3D} object - The 3D object to process (usually a scene).
+	 * @param {Camera} camera - The camera the object should be rendered with.
+	 * @param {number} groupOrder - The group order is derived from the `renderOrder` of groups and is used to group 3D objects within groups.
+	 * @param {RenderList} renderList - The current render list.
+	 * @param {ClippingContext} clippingContext - The current clipping context.
+	 */
+	project( object, camera, groupOrder, renderList, clippingContext ) {
+
+		if ( object.visible === false ) return;
+
+		const renderer = this.renderer;
+		const visible = object.layers.test( camera.layers );
+
+		if ( visible ) {
+
+			if ( object.isGroup ) {
+
+				groupOrder = object.renderOrder;
+
+				if ( object.isClippingGroup && object.enabled ) clippingContext = clippingContext.getGroupContext( object );
+
+			} else if ( object.isLOD ) {
+
+				if ( object.autoUpdate === true ) object.update( camera );
+
+			} else if ( object.isLight ) {
+
+				renderList.pushLight( object );
+
+			} else if ( object.isSprite ) {
+
+				if ( this.isCulled( object, camera ) === false ) {
+
+					if ( renderer.sortObjects === true ) {
+
+						_vector4$1.setFromMatrixPosition( object.matrixWorld ).applyMatrix4( this._projScreenMatrix );
+
+					}
+
+					const { geometry, material } = object;
+
+					if ( material.visible ) {
+
+						this.pushRenderItem( renderList, object, geometry, material, groupOrder, _vector4$1.z, null, clippingContext );
+
+					}
+
+				}
+
+			} else if ( object.isLineLoop ) {
+
+				error( 'Renderer: Objects of type THREE.LineLoop are not supported. Please use THREE.Line or THREE.LineSegments.' );
+
+			} else if ( object.isMesh || object.isLine || object.isPoints ) {
+
+				if ( this.isCulled( object, camera ) === false ) {
+
+					const { geometry, material } = object;
+
+					if ( renderer.sortObjects === true ) {
+
+						if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+
+						_vector4$1
+							.copy( geometry.boundingSphere.center )
+							.applyMatrix4( object.matrixWorld )
+							.applyMatrix4( this._projScreenMatrix );
+
+					}
+
+					if ( Array.isArray( material ) ) {
+
+						const groups = geometry.groups;
+
+						for ( let i = 0, l = groups.length; i < l; i ++ ) {
+
+							const group = groups[ i ];
+							const groupMaterial = material[ group.materialIndex ];
+
+							if ( groupMaterial && groupMaterial.visible ) {
+
+								this.pushRenderItem( renderList, object, geometry, groupMaterial, groupOrder, _vector4$1.z, group, clippingContext );
+
+							}
+
+						}
+
+					} else if ( material.visible ) {
+
+						this.pushRenderItem( renderList, object, geometry, material, groupOrder, _vector4$1.z, null, clippingContext );
+
+					}
+
+				}
+
+			}
+
+		}
+
+		if ( object.isBundleGroup === true && renderer.backend.beginBundle !== undefined ) {
+
+			const baseRenderList = renderList;
+
+			// replace render list
+
+			renderList = renderer._renderLists.get( object, camera, renderer.lighting );
+
+			const renderBundle = renderer._bundles.get( object, camera, renderer._currentRenderContext );
+			const renderBundleData = renderer.backend.get( renderBundle );
+			const renderBundleNeedsUpdate = renderer._bundleNeedsUpdate( object, renderBundleData );
+
+			if ( renderBundleNeedsUpdate ) {
+
+				// update render list if necessary
+
+				this.beginRenderList( renderList );
+
+				if ( renderBundleData.renderObjects === undefined ) {
+
+					renderBundleData.renderObjects = [];
+
+				} else {
+
+					renderBundleData.renderObjects.length = 0;
+
+				}
+
+				const children = object.children;
+
+				this._bundleDepth ++;
+
+				for ( let i = 0, l = children.length; i < l; i ++ ) {
+
+					this.project( children[ i ], camera, groupOrder, renderList, clippingContext );
+
+				}
+
+				this._bundleDepth --;
+
+				this.finishRenderList( renderList );
+
+			}
+
+			baseRenderList.pushBundle( {
+				bundleGroup: object,
+				camera,
+				renderList,
+			} );
+
+			return;
+
+		}
+
+		//
+
+		const children = object.children;
+
+		for ( let i = 0, l = children.length; i < l; i ++ ) {
+
+			this.project( children[ i ], camera, groupOrder, renderList, clippingContext );
+
+		}
+
+	}
+
+}
+
 const _scene = /*@__PURE__*/ new Scene();
 const _drawingBufferSize = /*@__PURE__*/ new Vector2();
 const _screen = /*@__PURE__*/ new Vector4();
-const _frustum = /*@__PURE__*/ new Frustum();
-
-const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _vector4 = /*@__PURE__*/ new Vector4();
 
 const _shadowSide = { [ FrontSide ]: BackSide, [ BackSide ]: FrontSide, [ DoubleSide ]: DoubleSide };
@@ -63407,6 +63740,16 @@ class Renderer {
 		 * @type {Lighting}
 		 */
 		this.lighting = new Lighting();
+
+		/**
+		 * The current drawing pipeline. See {@link Renderer#drawingPipeline}.
+		 *
+		 * @private
+		 * @type {StandardDrawingPipeline}
+		 */
+		this._drawingPipeline = null;
+
+		this.drawingPipeline = new StandardDrawingPipeline();
 
 		// internals
 
@@ -63807,10 +64150,10 @@ class Renderer {
 		this._initPromise = null;
 
 		/**
-		 * An array of compilation promises which are used in `compileAsync()`.
+		 * Render and compute work items processed sequentially by `compileAsync()`.
 		 *
 		 * @private
-		 * @type {?Array<Promise>}
+		 * @type {?Array<Object>}
 		 * @default null
 		 */
 		this._compilationPromises = null;
@@ -63930,6 +64273,27 @@ class Renderer {
 	}
 
 	/**
+	 * Decides which objects of a scene are rendered and how they are submitted
+	 * to the render list. Assigning a drawing pipeline binds it to this renderer.
+	 * The default is a {@link StandardDrawingPipeline}. This property is experimental.
+	 *
+	 * @type {StandardDrawingPipeline}
+	 */
+	set drawingPipeline( pipeline ) {
+
+		pipeline.renderer = this;
+
+		this._drawingPipeline = pipeline;
+
+	}
+
+	get drawingPipeline() {
+
+		return this._drawingPipeline;
+
+	}
+
+	/**
 	 * Initializes the renderer so it is ready for usage.
 	 *
 	 * @async
@@ -64035,6 +64399,7 @@ class Renderer {
 	 * Compiles all materials in the given scene. This can be useful to avoid a
 	 * phenomenon which is called "shader compilation stutter", which occurs when
 	 * rendering an object with a new shader for the first time.
+	 * The active drawing pipeline also prepares its geometry resources and compute pipelines.
 	 *
 	 * If you want to add a 3D object to an existing scene, use the third optional
 	 * parameter for applying the target scene. Note that the (target) scene's lighting
@@ -64052,6 +64417,12 @@ class Renderer {
 		if ( this._isDeviceLost === true ) return;
 
 		if ( this._initialized === false ) await this.init();
+
+		// only awaited when the drawing pipeline prepares something, so the state below is still taken synchronously
+
+		const prepare = this.drawingPipeline.prepareAsync( scene, camera );
+
+		if ( prepare !== undefined ) await prepare;
 
 		if ( this.shadowMap.type === PCFSoftShadowMap ) {
 
@@ -64091,7 +64462,9 @@ class Renderer {
 		// a state snapshot is taken once at the beginning and reapplied every time precompilation continues.
 		// `item` is the work item that is currently processed, see `_beginPreCompile()`
 
-		const precompilationState = { useFrameBufferTarget, renderTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel, item: null, materialSide: null };
+		// the work items always set their render target, without the frame buffer target the current one is restored
+
+		const precompilationState = { useFrameBufferTarget, renderTarget, outputRenderTarget: useFrameBufferTarget ? outputRenderTarget : this._renderTarget, activeCubeFace, activeMipmapLevel, item: null, materialSide: null, mrt: this._mrt, outputMRT: this._mrt };
 
 		this._beginPreCompile( precompilationState );
 
@@ -64134,25 +64507,13 @@ class Renderer {
 
 		//
 
-		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-
-		if ( camera.isArrayCamera ) {
-
-			if ( renderContext.frustumArray === null ) renderContext.frustumArray = new FrustumArray();
-
-			renderContext.frustumArray.setFromArrayCamera( camera );
-
-		} else {
-
-			_frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
-
-		}
+		this.drawingPipeline.begin( camera, renderContext );
 
 		// Use sceneRef for render list to ensure lightsNode matches between compileAsync and render
 		const renderList = this._renderLists.get( sceneRef, camera, this.lighting );
-		renderList.begin();
+		this.drawingPipeline.beginRenderList( renderList );
 
-		this._projectObject( scene, camera, 0, renderList, renderContext.clippingContext );
+		this.drawingPipeline.project( scene, camera, 0, renderList, renderContext.clippingContext );
 
 		// include lights from target scene
 		if ( targetScene !== scene ) {
@@ -64169,7 +64530,7 @@ class Renderer {
 
 		}
 
-		renderList.finish();
+		this.drawingPipeline.finishRenderList( renderList );
 
 		//
 
@@ -64201,7 +64562,7 @@ class Renderer {
 
 		}
 
-		// process render lists - _createObjectPipeline will push async promises to _compilationPromises
+		// process render lists - _createObjectPipeline queues work in _compilationPromises
 
 		const opaqueObjects = renderList.opaque;
 		const transparentObjects = renderList.transparent;
@@ -64248,21 +64609,38 @@ class Renderer {
 
 			if ( scheduler.needsYield() === false ) return;
 
+			const activePrecompilationState = this._precompilationState;
+
 			this._finishPreCompile();
 
 			await scheduler.yield();
 
-			this._beginPreCompile( precompilationState );
+			this._beginPreCompile( activePrecompilationState );
 
 		};
 
 		for ( const item of compilationPromises ) {
 
+			if ( item.computeNodes !== undefined ) {
+
+				// compute work queued by the drawing pipeline, e.g. its culling
+
+				await this.compileComputeAsync( item.computeNodes );
+
+				onLoaded();
+
+				continue;
+
+			}
+
 			const pipelinePromises = [];
 
-			precompilationState.item = item;
+			// each item is compiled with the state of the render call that queued it, e.g. a nested render into another target
 
-			this._beginPreCompile( precompilationState );
+			const itemPrecompilationState = item.precompilationState;
+			itemPrecompilationState.item = item;
+
+			this._beginPreCompile( itemPrecompilationState );
 
 			const renderObject = this._objects.get( item.object, item.material, item.scene, item.camera, item.lightsNode, item.renderContext, item.clippingContext, item.passId );
 			renderObject.drawRange = item.object.geometry.drawRange;
@@ -64277,8 +64655,6 @@ class Renderer {
 			this._nodes.updateAfter( renderObject );
 
 			this._finishPreCompile();
-
-			precompilationState.item = null;
 
 			if ( pipelinePromises.length > 0 ) {
 
@@ -64317,9 +64693,10 @@ class Renderer {
 	 */
 	_beginPreCompile( precompilationState ) {
 
-		const { useFrameBufferTarget, renderTarget, renderContext, item } = precompilationState;
+		const { useFrameBufferTarget, renderTarget, mrt, renderContext, item } = precompilationState;
 
 		if ( useFrameBufferTarget === true ) this.setRenderTarget( renderTarget );
+		this.setMRT( mrt );
 
 		if ( item !== null ) {
 
@@ -64350,9 +64727,10 @@ class Renderer {
 	 */
 	_finishPreCompile() {
 
-		const { useFrameBufferTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel, previousRenderContext, item, materialSide } = this._precompilationState;
+		const { useFrameBufferTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel, outputMRT, previousRenderContext, item, materialSide } = this._precompilationState;
 
 		if ( useFrameBufferTarget === true ) this.setRenderTarget( outputRenderTarget, activeCubeFace, activeMipmapLevel );
+		this.setMRT( outputMRT );
 
 		if ( item !== null ) item.material.side = materialSide;
 
@@ -64680,7 +65058,8 @@ class Renderer {
 
 	/**
 	 * Returns `true` if the cached GPU render bundle for the given bundle group is
-	 * out-of-date and must be recorded again.
+	 * out-of-date and must be recorded again. The drawing pipeline decides which objects are
+	 * recorded, so bundles recorded by another drawing pipeline are recorded again.
 	 *
 	 * @private
 	 * @param {BundleGroup} bundleGroup - The bundle group.
@@ -64689,7 +65068,7 @@ class Renderer {
 	 */
 	_bundleNeedsUpdate( bundleGroup, renderBundleData ) {
 
-		if ( renderBundleData.bundleGPU === undefined || bundleGroup.version !== renderBundleData.version ) return true;
+		if ( renderBundleData.bundleGPU === undefined || bundleGroup.version !== renderBundleData.version || renderBundleData.drawingPipeline !== this.drawingPipeline ) return true;
 
 		// the recorded bundle references the buffers of its attributes. they are only verified after a disposal
 
@@ -64753,7 +65132,16 @@ class Renderer {
 
 			this.backend.beginBundle( renderContext );
 
+			// nested renders, like shadow maps updated by the objects of the bundle, record their own bundles
+
+			const previousRenderBundle = this._currentRenderBundle;
+
 			this._currentRenderBundle = renderBundle;
+
+			// objects whose pipelines are not ready yet reset the version, so the bundle is recorded again
+
+			renderBundleData.version = bundleGroup.version;
+			renderBundleData.drawingPipeline = this.drawingPipeline;
 
 			const {
 				transparentDoublePass: transparentDoublePassObjects,
@@ -64764,13 +65152,11 @@ class Renderer {
 			if ( this.opaque === true && opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
 			if ( this.transparent === true && transparentObjects.length > 0 ) this._renderTransparents( transparentObjects, transparentDoublePassObjects, camera, sceneRef, lightsNode );
 
-			this._currentRenderBundle = null;
+			this._currentRenderBundle = previousRenderBundle;
 
 			//
 
 			this.backend.finishBundle( renderContext, renderBundle );
-
-			renderBundleData.version = bundleGroup.version;
 
 		} else {
 
@@ -65018,6 +65404,11 @@ class Renderer {
 		const previousRenderContext = this._currentRenderContext;
 		const previousRenderObjectFunction = this._currentRenderObjectFunction;
 		const previousHandleObjectFunction = this._handleObjectFunction;
+		const previousRenderBundle = this._currentRenderBundle;
+
+		// a render nested in the recording of a render bundle draws its objects directly
+
+		this._currentRenderBundle = null;
 
 		this.lighting.beginRender( scene );
 
@@ -65139,28 +65530,16 @@ class Renderer {
 
 		//
 
-		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-
-		if ( camera.isArrayCamera ) {
-
-			if ( renderContext.frustumArray === null ) renderContext.frustumArray = new FrustumArray();
-
-			renderContext.frustumArray.setFromArrayCamera( camera );
-
-		} else {
-
-			_frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
-
-		}
+		this.drawingPipeline.begin( camera, renderContext );
 
 		this._renderLists.update( nodeFrame.frameId );
 
 		const renderList = this._renderLists.get( scene, camera, this.lighting );
-		renderList.begin();
+		this.drawingPipeline.beginRenderList( renderList );
 
-		this._projectObject( scene, camera, 0, renderList, renderContext.clippingContext );
+		this.drawingPipeline.project( scene, camera, 0, renderList, renderContext.clippingContext );
 
-		renderList.finish();
+		this.drawingPipeline.finishRenderList( renderList );
 
 		if ( this.sortObjects === true ) {
 
@@ -65258,6 +65637,7 @@ class Renderer {
 		this._currentRenderContext = previousRenderContext;
 		this._currentRenderObjectFunction = previousRenderObjectFunction;
 		this._handleObjectFunction = previousHandleObjectFunction;
+		this._currentRenderBundle = previousRenderBundle;
 
 		this.lighting.finishRender( scene );
 
@@ -66039,6 +66419,10 @@ class Renderer {
 
 		if ( this._initialized === true ) {
 
+			// the drawing pipeline frees its resources while the managers of the renderer still track them
+
+			this.drawingPipeline.dispose();
+
 			this.lighting.dispose();
 			this._inspector.dispose();
 			this._animation.dispose();
@@ -66585,175 +66969,6 @@ class Renderer {
 	}
 
 	/**
-	 * Analyzes the given 3D object's hierarchy and builds render lists from the
-	 * processed hierarchy.
-	 *
-	 * @private
-	 * @param {Object3D} object - The 3D object to process (usually a scene).
-	 * @param {Camera} camera - The camera the object is rendered with.
-	 * @param {number} groupOrder - The group order is derived from the `renderOrder` of groups and is used to group 3D objects within groups.
-	 * @param {RenderList} renderList - The current render list.
-	 * @param {ClippingContext} clippingContext - The current clipping context.
-	 */
-	_projectObject( object, camera, groupOrder, renderList, clippingContext ) {
-
-		if ( object.visible === false ) return;
-
-		const visible = object.layers.test( camera.layers );
-
-		if ( visible ) {
-
-			if ( object.isGroup ) {
-
-				groupOrder = object.renderOrder;
-
-				if ( object.isClippingGroup && object.enabled ) clippingContext = clippingContext.getGroupContext( object );
-
-			} else if ( object.isLOD ) {
-
-				if ( object.autoUpdate === true ) object.update( camera );
-
-			} else if ( object.isLight ) {
-
-				renderList.pushLight( object );
-
-			} else if ( object.isSprite ) {
-
-				const frustum = camera.isArrayCamera ? this._currentRenderContext.frustumArray : _frustum;
-
-				if ( ! object.frustumCulled || object.intersectsFrustum( frustum ) ) {
-
-					if ( this.sortObjects === true ) {
-
-						_vector4.setFromMatrixPosition( object.matrixWorld ).applyMatrix4( _projScreenMatrix );
-
-					}
-
-					const { geometry, material } = object;
-
-					if ( material.visible ) {
-
-						renderList.push( object, geometry, material, groupOrder, _vector4.z, null, clippingContext );
-
-					}
-
-				}
-
-			} else if ( object.isLineLoop ) {
-
-				error( 'Renderer: Objects of type THREE.LineLoop are not supported. Please use THREE.Line or THREE.LineSegments.' );
-
-			} else if ( object.isMesh || object.isLine || object.isPoints ) {
-
-				const frustum = camera.isArrayCamera ? this._currentRenderContext.frustumArray : _frustum;
-
-				if ( ! object.frustumCulled || object.intersectsFrustum( frustum ) ) {
-
-					const { geometry, material } = object;
-
-					if ( this.sortObjects === true ) {
-
-						if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
-
-						_vector4
-							.copy( geometry.boundingSphere.center )
-							.applyMatrix4( object.matrixWorld )
-							.applyMatrix4( _projScreenMatrix );
-
-					}
-
-					if ( Array.isArray( material ) ) {
-
-						const groups = geometry.groups;
-
-						for ( let i = 0, l = groups.length; i < l; i ++ ) {
-
-							const group = groups[ i ];
-							const groupMaterial = material[ group.materialIndex ];
-
-							if ( groupMaterial && groupMaterial.visible ) {
-
-								renderList.push( object, geometry, groupMaterial, groupOrder, _vector4.z, group, clippingContext );
-
-							}
-
-						}
-
-					} else if ( material.visible ) {
-
-						renderList.push( object, geometry, material, groupOrder, _vector4.z, null, clippingContext );
-
-					}
-
-				}
-
-			}
-
-		}
-
-		if ( object.isBundleGroup === true && this.backend.beginBundle !== undefined ) {
-
-			const baseRenderList = renderList;
-
-			// replace render list
-
-			renderList = this._renderLists.get( object, camera, this.lighting );
-
-			const renderBundle = this._bundles.get( object, camera, this._currentRenderContext );
-			const renderBundleData = this.backend.get( renderBundle );
-			const renderBundleNeedsUpdate = this._bundleNeedsUpdate( object, renderBundleData );
-
-			if ( renderBundleNeedsUpdate ) {
-
-				// update render list if necessary
-
-				renderList.begin();
-
-				if ( renderBundleData.renderObjects === undefined ) {
-
-					renderBundleData.renderObjects = [];
-
-				} else {
-
-					renderBundleData.renderObjects.length = 0;
-
-				}
-
-				const children = object.children;
-
-				for ( let i = 0, l = children.length; i < l; i ++ ) {
-
-					this._projectObject( children[ i ], camera, groupOrder, renderList, clippingContext );
-
-				}
-
-				renderList.finish();
-
-			}
-
-			baseRenderList.pushBundle( {
-				bundleGroup: object,
-				camera,
-				renderList,
-			} );
-
-			return;
-
-		}
-
-		//
-
-		const children = object.children;
-
-		for ( let i = 0, l = children.length; i < l; i ++ ) {
-
-			this._projectObject( children[ i ], camera, groupOrder, renderList, clippingContext );
-
-		}
-
-	}
-
-	/**
 	 * Renders the given render bundles.
 	 *
 	 * @private
@@ -67275,6 +67490,10 @@ class Renderer {
 
 			if ( refreshType !== RenderObjectRefreshType.NONE ) this._nodes.updateAfter( renderObject );
 
+		} else if ( this._currentRenderBundle !== null ) {
+
+			this.backend.get( this._currentRenderBundle ).version = -1;
+
 		}
 
 	}
@@ -67310,7 +67529,14 @@ class Renderer {
 				group,
 				clippingContext,
 				passId,
-				renderContext: this._currentRenderContext
+				renderContext: this._currentRenderContext,
+				precompilationState: {
+					...this._precompilationState,
+					useFrameBufferTarget: true,
+					renderTarget: this.getRenderTarget(),
+					mrt: this.getMRT(),
+					renderContext: this._currentRenderContext
+				}
 			} );
 
 			return;
@@ -69958,7 +70184,7 @@ ${ flowData.code }
 	 */
 	getVaryings( shaderStage ) {
 
-		let snippet = '';
+		let snippet = shaderStage === 'vertex' && this.context.invariant === true ? 'invariant gl_Position;\n' : '';
 
 		const varyings = this.varyings;
 
@@ -85602,7 +85828,9 @@ ${ flowData.code }
 
 			for ( const { name, property, type } of builtins.values() ) {
 
-				snippets.push( `@builtin( ${name} ) ${property} : ${type}` );
+				const invariant = this.context.invariant === true && shaderStage === 'vertex' && name === 'position' ? '@invariant ' : '';
+
+				snippets.push( `${ invariant }@builtin( ${name} ) ${property} : ${type}` );
 
 			}
 
@@ -91712,9 +91940,9 @@ class WebGPUBackend extends Backend {
 
 				passEncoderGPU.drawIndexed( indexCount, instanceCount, firstIndex, 0, 0 );
 
-			}
+				info.update( object, indexCount, instanceCount );
 
-			info.update( object, indexCount, instanceCount );
+			}
 
 		} else {
 
@@ -91734,14 +91962,13 @@ class WebGPUBackend extends Backend {
 
 				}
 
-
 			} else {
 
 				passEncoderGPU.draw( vertexCount, instanceCount, firstVertex, 0 );
 
-			}
+				info.update( object, vertexCount, instanceCount );
 
-			info.update( object, vertexCount, instanceCount );
+			}
 
 		}
 
@@ -95029,4 +95256,4 @@ var Three_TSL = /*#__PURE__*/Object.freeze({
 	xor: xor
 });
 
-export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AtomicFunctionNode, AttributeNode, BackSide, BarrierNode, BasicEnvironmentNode, BasicLightMapNode, BasicShadowMap, BitcastNode, BitcountNode, BlendMode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BuiltinNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CanvasTarget, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, ClippingNode, CodeNode, Color, ColorManagement, ColorSpaceNode, Compatibility, ComputeBuiltinNode, ComputeNode, ConditionalNode, ConstNode, ConstantAlphaFactor, ConstantColorFactor, ContextNode, ConvertNode, CubeCamera, CubeDepthTexture, CubeMapNode, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CylinderGeometry, DataArrayTexture, DataTexture, DebugNode, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectRenderPipeline, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, EventDispatcher, EventNode, ExpressionNode, FileLoader, FlipNode, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FrustumArray, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InputNode, InspectorBase, InspectorNode, InstancedBufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, IsolateNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoopNode, MRTNode, Material, MaterialBlending, MaterialLoader, MaterialNode, MaterialReferenceNode, MathNode, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoNormalPacking, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeError, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalGAPacking, NormalMapNode, NormalRGPacking, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OperatorNode, OrthographicCamera, OutputStructNode, OverrideContextNode, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, PMREMNode, PackFloatNode, Packed4x8IntegerNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PlaneGeometry, PointLight, PointLightNode, PointShadowNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, ProjectorLight, ProjectorLightNode, PropertyNode, ProxyNodeMaterial, QuadMesh, Quaternion, R11_EAC_Format, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RG11_EAC_Format, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, ReadbackBuffer, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceAttributeNode, ReferenceBaseNode, ReferenceElementNode, ReferenceNode, ReflectorNode, ReinhardToneMapping, RenderObjectRefreshType, RenderOutputNode, RenderPipeline, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_R11_EAC_Format, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SIGNED_RG11_EAC_Format, SRGBColorSpace, SRGBTransfer, SampleNode, Scene, ScreenNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, Sphere, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StackTrace, StaticDrawUsage, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTexture3DNode, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubgroupFunctionNode, SubtractEquation, SubtractiveBlending, Three_TSL as TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, TimestampQuery, ToneMappingNode, ToonOutlinePassNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnpackFloatNode, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VelocityNode, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLBackend, WebGLCoordinateSystem, WebGPUBackend, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, WorkgroupInfoNode, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, error, log$1 as log, shaderStages, vectorComponents, warn, warnOnce };
+export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveBlending, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnalyticLightNode, ArrayCamera, ArrayElementNode, ArrayNode, AssignNode, AtomicFunctionNode, AttributeNode, BackSide, BarrierNode, BasicEnvironmentNode, BasicLightMapNode, BasicShadowMap, BitcastNode, BitcountNode, BlendMode, BoxGeometry, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferNode, BuiltinNode, BumpMapNode, BundleGroup, BypassNode, ByteType, CanvasTarget, CineonToneMapping, ClampToEdgeWrapping, ClippingGroup, ClippingNode, CodeNode, Color, ColorManagement, ColorSpaceNode, Compatibility, ComputeBuiltinNode, ComputeNode, ConditionalNode, ConstNode, ConstantAlphaFactor, ConstantColorFactor, ContextNode, ConvertNode, CubeCamera, CubeDepthTexture, CubeMapNode, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureNode, CullFaceBack, CullFaceFront, CullFaceNone, CustomBlending, CylinderGeometry, DataArrayTexture, DataTexture, DebugNode, DecrementStencilOp, DecrementWrapStencilOp, DepthFormat, DepthStencilFormat, DepthTexture, DirectRenderPipeline, DirectionalLight, DirectionalLightNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicDrawUsage, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, EventDispatcher, EventNode, ExpressionNode, FileLoader, FlipNode, Float16BufferAttribute, Float32BufferAttribute, FloatType, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FrustumArray, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLSLNodeParser, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, Group, HalfFloatType, HemisphereLight, HemisphereLightNode, IESSpotLight, IESSpotLightNode, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, IndirectStorageBufferAttribute, InputNode, InspectorBase, InspectorNode, InstancedBufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, InvertStencilOp, IrradianceNode, IsolateNode, JoinNode, KeepStencilOp, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, LightProbe, LightProbeNode, Lighting, LightingContextNode, LightingModel, LightingNode, LightsNode, Line2NodeMaterial, LineBasicMaterial, LineBasicNodeMaterial, LineDashedMaterial, LineDashedNodeMaterial, LinearFilter, LinearMipMapLinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoopNode, MRTNode, Material, MaterialBlending, MaterialLoader, MaterialNode, MaterialReferenceNode, MathNode, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, MemberNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoNormalPacking, NoToneMapping, Node, NodeAccess, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeError, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeMaterialObserver, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalBlending, NormalGAPacking, NormalMapNode, NormalRGPacking, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OneFactor, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OperatorNode, OrthographicCamera, OutputStructNode, OverrideContextNode, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, PMREMNode, PackFloatNode, Packed4x8IntegerNode, ParameterNode, PassNode, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, Plane, PlaneGeometry, PointLight, PointLightNode, PointShadowNode, PointUVNode, PointsMaterial, PointsNodeMaterial, PostProcessing, ProjectorLight, ProjectorLightNode, PropertyNode, ProxyNodeMaterial, QuadMesh, Quaternion, R11_EAC_Format, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RG11_EAC_Format, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGBIntegerFormat, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RTTNode, RangeNode, ReadbackBuffer, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceAttributeNode, ReferenceBaseNode, ReferenceElementNode, ReferenceNode, ReflectorNode, ReinhardToneMapping, RenderObjectRefreshType, RenderOutputNode, RenderPipeline, RenderTarget, RendererReferenceNode, RendererUtils, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RotateNode, SIGNED_R11_EAC_Format, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SIGNED_RG11_EAC_Format, SRGBColorSpace, SRGBTransfer, SampleNode, Scene, ScreenNode, SetNode, ShadowBaseNode, ShadowMaterial, ShadowNode, ShadowNodeMaterial, ShortType, Sphere, SphereGeometry, SplitNode, SpotLight, SpotLightNode, SpriteMaterial, SpriteNodeMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StackTrace, StandardDrawingPipeline, StaticDrawUsage, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTexture3DNode, StorageTextureNode, StructNode, StructTypeNode, SubBuildNode, SubgroupFunctionNode, SubtractEquation, SubtractiveBlending, Three_TSL as TSL, TangentSpaceNormalMap, TempNode, Texture, Texture3DNode, TextureNode, TextureSizeNode, TimestampQuery, ToneMappingNode, ToonOutlinePassNode, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, UniformArrayNode, UniformGroupNode, UniformNode, UnpackFloatNode, UnsignedByteType, UnsignedInt101111Type, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, VarNode, VaryingNode, Vector2, Vector3, Vector4, VelocityNode, VertexColorNode, ViewportDepthNode, ViewportDepthTextureNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGLBackend, WebGLCoordinateSystem, WebGPUBackend, WebGPUCoordinateSystem, WebGPURenderer, WebXRController, WorkgroupInfoNode, ZeroFactor, ZeroStencilOp, createCanvasElement, defaultBuildStages, defaultShaderStages, error, log$1 as log, shaderStages, vectorComponents, warn, warnOnce };
