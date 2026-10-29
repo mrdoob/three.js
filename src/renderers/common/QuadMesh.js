@@ -121,6 +121,26 @@ class QuadMesh extends Mesh {
 
 	}
 
+	/**
+	 * Compiles the quad mesh without rendering it, see {@link Renderer#compileAsync}.
+	 *
+	 * @async
+	 * @param {Renderer} renderer - The renderer.
+	 * @return {Promise} A Promise that resolves when the compilation has been finished.
+	 */
+	async compileAsync( renderer ) {
+
+		const material = this.material;
+		const previousVertexNode = material.vertexNode;
+
+		material.vertexNode = _vertexNode;
+
+		await renderer.compileAsync( this, _camera );
+
+		material.vertexNode = previousVertexNode;
+
+	}
+
 }
 
 export default QuadMesh;

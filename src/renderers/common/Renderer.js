@@ -1062,9 +1062,6 @@ class Renderer {
 
 		//
 
-		renderContext.depth = this.depth;
-		renderContext.stencil = this.stencil;
-
 		if ( ! renderContext.clippingContext ) renderContext.clippingContext = new ClippingContext();
 		renderContext.clippingContext.updateGlobal( sceneRef, camera );
 
@@ -1092,8 +1089,9 @@ class Renderer {
 
 		}
 
-		// Use sceneRef for render list to ensure lightsNode matches between compileAsync and render
-		const renderList = this._renderLists.get( sceneRef, camera, this.lighting );
+		// Use the same render list as render() to ensure lightsNode matches between compileAsync and render,
+		// sceneRef provides the lights when compiling individual objects of a target scene
+		const renderList = this._renderLists.get( targetScene !== scene ? sceneRef : scene, camera, this.lighting );
 		renderList.begin();
 
 		this._projectObject( scene, camera, 0, renderList, renderContext.clippingContext );
@@ -1125,11 +1123,15 @@ class Renderer {
 
 			renderContext.textures = renderTargetData.textures;
 			renderContext.depthTexture = renderTargetData.depthTexture;
+			renderContext.depth = renderTarget.depthBuffer;
+			renderContext.stencil = renderTarget.stencilBuffer;
 
 		} else {
 
 			renderContext.textures = null;
 			renderContext.depthTexture = null;
+			renderContext.depth = this.depth;
+			renderContext.stencil = this.stencil;
 
 		}
 

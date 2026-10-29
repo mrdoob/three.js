@@ -714,7 +714,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		// vsm blur pass
 
-		if ( shadowType === VSMShadowMap && shadow.isPointLightShadow !== true && renderer._precompilationState === null ) {
+		if ( shadowType === VSMShadowMap && shadow.isPointLightShadow !== true ) {
 
 			this.vsmPass( renderer );
 
@@ -739,13 +739,17 @@ class ShadowNode extends ShadowBaseNode {
 		this.vsmShadowMapVertical.setSize( shadow.mapSize.width, shadow.mapSize.height, depth );
 		this.vsmShadowMapHorizontal.setSize( shadow.mapSize.width, shadow.mapSize.height, depth );
 
+		// during precompilation, the blur passes are compiled without rendering them, see updateBefore()
+
+		const precompile = renderer._precompilationState !== null;
+
 		renderer.setRenderTarget( this.vsmShadowMapVertical );
 		_quadMesh.material = this.vsmMaterialVertical;
-		_quadMesh.render( renderer );
+		precompile ? _quadMesh.compileAsync( renderer ) : _quadMesh.render( renderer );
 
 		renderer.setRenderTarget( this.vsmShadowMapHorizontal );
 		_quadMesh.material = this.vsmMaterialHorizontal;
-		_quadMesh.render( renderer );
+		precompile ? _quadMesh.compileAsync( renderer ) : _quadMesh.render( renderer );
 
 	}
 
