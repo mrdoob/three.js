@@ -1264,7 +1264,7 @@ ${ flowData.code }
 	 */
 	getVaryings( shaderStage ) {
 
-		let snippet = '';
+		let snippet = shaderStage === 'vertex' && this.context.invariant === true ? 'invariant gl_Position;\n' : '';
 
 		const varyings = this.varyings;
 
