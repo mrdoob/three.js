@@ -152,7 +152,12 @@ class LightProbeGridNode extends AnalyticLightNode {
 
 		const spacing = max.sub( min ).div( res );
 		const samplePos = positionWorld.add( normalWorld.mul( spacing ).mul( 0.5 ) );
-		const inside = samplePos.greaterThanEqual( min ).all().and( samplePos.lessThanEqual( max ).all() );
+
+		// Grow the bounds by 1% of a cell, so fragments on the bounds aren't left out by
+		// precision errors or samples outside of the triangle.
+
+		const margin = spacing.mul( 0.01 );
+		const inside = samplePos.greaterThanEqual( min.sub( margin ) ).all().and( samplePos.lessThanEqual( max.add( margin ) ).all() );
 
 		builder.context.lightProbeIrradiance ||= vec3().toVar( 'lightProbeIrradiance' );
 		builder.context.lightProbePriority ||= INFINITY.negate().toVar( 'lightProbePriority' );
