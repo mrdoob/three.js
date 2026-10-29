@@ -269,7 +269,7 @@ class PointShadowNode extends ShadowNode {
 			// Set render target to the specific cube face
 			renderer.setRenderTarget( shadowMap, face );
 
-			if ( renderer._precompilationState === null ) renderer.clear();
+			if ( renderer.isCompiling === false ) renderer.clear();
 
 			// Update shadow camera matrices for this face
 
@@ -302,7 +302,7 @@ class PointShadowNode extends ShadowNode {
 
 			scene.name = `Point Light Shadow [ ${ light.name || 'ID: ' + light.id } ] - Face ${ face + 1 }`;
 
-			if ( renderer._precompilationState !== null ) {
+			if ( renderer.isCompiling ) {
 
 				renderer.compileAsync( scene, camera ); // compiles the shadow pass without rendering it, see ShadowNode
 

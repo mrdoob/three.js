@@ -264,7 +264,7 @@ class SunShadowNode extends ShadowNode {
 
 		renderer.autoClear = false;
 
-		if ( renderer._precompilationState === null ) renderer.clear();
+		if ( renderer.isCompiling === false ) renderer.clear();
 
 		const cascadeCount = shadow.getViewportCount();
 
@@ -282,7 +282,7 @@ class SunShadowNode extends ShadowNode {
 				tileHeight * viewport.w
 			);
 
-			if ( renderer._precompilationState !== null ) {
+			if ( renderer.isCompiling ) {
 
 				renderer.compileAsync( scene, shadow.getCamera( i ) ); // compiles the shadow pass without rendering it, see ShadowNode
 
