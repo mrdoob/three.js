@@ -42,7 +42,7 @@ function WebGLRenderState( extensions ) {
 
 		lights.setup( lightsArray );
 
-		lightProbeGridArray.sort( ( a, b ) => a.id - b.id );
+		lightProbeGridArray.sort( ( a, b ) => a.priority - b.priority || a.id - b.id );
 
 	}
 

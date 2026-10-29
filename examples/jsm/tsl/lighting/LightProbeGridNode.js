@@ -1,5 +1,5 @@
 import { AnalyticLightNode, NodeUpdateType, Vector3 } from 'three/webgpu';
-import { If, array, getShIrradianceAt, normalWorld, positionWorld, renderGroup, texture3D, uniform, vec3 } from 'three/tsl';
+import { INFINITY, If, array, getShIrradianceAt, normalWorld, positionWorld, renderGroup, texture3D, uniform, vec3 } from 'three/tsl';
 
 // Padding texels at each boundary of every atlas sub-volume.
 export const ATLAS_PADDING = 1;
@@ -124,6 +124,7 @@ class LightProbeGridNode extends AnalyticLightNode {
 		this._max = uniform( new Vector3() );
 		this._resolution = uniform( new Vector3() );
 		this._intensity = uniform( 1 ).setGroup( renderGroup );
+		this._priority = uniform( 0 );
 
 		this.updateType = NodeUpdateType.RENDER;
 
@@ -137,6 +138,7 @@ class LightProbeGridNode extends AnalyticLightNode {
 		this._max.value.copy( light.boundingBox.max );
 		this._resolution.value.copy( light.resolution );
 		this._intensity.value = light.intensity;
+		this._priority.value = light.priority;
 
 	}
 
@@ -153,14 +155,19 @@ class LightProbeGridNode extends AnalyticLightNode {
 		const inside = samplePos.greaterThanEqual( min ).all().and( samplePos.lessThanEqual( max ).all() );
 
 		builder.context.lightProbeIrradiance ||= vec3().toVar( 'lightProbeIrradiance' );
+		builder.context.lightProbePriority ||= INFINITY.negate().toVar( 'lightProbePriority' );
 
-		If( inside, () => {
+		const prioritized = this._priority.greaterThanEqual( builder.context.lightProbePriority );
+
+		If( inside.and( prioritized ), () => {
 
 			const irradiance = getGridIrradiance( light, min, max, res, this._intensity, positionWorld, normalWorld ).toConst();
 
-			// fragments can be located in multiple grids but only the most recently created one defines the irradiance, see #34798
+			// fragments can be located in multiple grids but only the one with the highest priority defines the irradiance,
+			// on ties the most recently created grid wins, see #34798
 
 			builder.context.lightProbeIrradiance.assign( irradiance );
+			builder.context.lightProbePriority.assign( this._priority );
 
 		} );
 
