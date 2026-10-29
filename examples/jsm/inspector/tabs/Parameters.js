@@ -103,7 +103,11 @@ class ParametersGroup {
 
 	_addParameter( object, property, editor, subItem ) {
 
+		subItem.data[ 0 ].title = property;
+
 		editor.name = ( name ) => {
+
+			subItem.data[ 0 ].title = name;
 
 			if ( subItem.data[ 0 ].childNodes.length > 0 && subItem.data[ 0 ].firstChild.nodeType === 3 /* Node.TEXT_NODE */ ) {
 
@@ -410,7 +414,7 @@ class Parameters extends Tab {
 
 		const paramList = new List( 'Property', 'Value' );
 		paramList.domElement.classList.add( 'parameters' );
-		paramList.setGridStyle( '.5fr 1fr' );
+		paramList.setGridStyle( 'minmax(0, .5fr) minmax(0, 1fr)' );
 		paramList.domElement.style.minWidth = '300px';
 
 		const scrollWrapper = document.createElement( 'div' );

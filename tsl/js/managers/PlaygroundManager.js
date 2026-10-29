@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { CodeCompiler } from '../code/CodeCompiler.js';
+import { formatCode } from '../code/CodeFormatter.js';
 import { parseScript, isStandardModule, resolvePath } from '../code/CodeRunner.js';
 import { compressString, decompressString } from '../utils/GuideUtils.js';
 
@@ -10,8 +10,6 @@ class PlaygroundManager {
 		this.guide = guide;
 		this.playgroundTabs = null;
 		this.activePlaygroundTabName = null;
-		this.currentExampleName = null;
-		this.initialTabsSnapshot = null;
 
 	}
 
@@ -242,12 +240,6 @@ class PlaygroundManager {
 
 		}
 
-		if ( ! this.initialTabsSnapshot ) {
-
-			this.initialTabsSnapshot = JSON.stringify( this.playgroundTabs );
-
-		}
-
 		// Render the playground tabs UI
 		this.renderPlaygroundTabs();
 
@@ -389,7 +381,6 @@ class PlaygroundManager {
 
 			this.playgroundTabs = [ { name: 'main', code: '// Play here!\n' } ];
 			this.activePlaygroundTabName = 'main';
-			this.initialTabsSnapshot = JSON.stringify( this.playgroundTabs );
 
 		}
 
@@ -579,18 +570,6 @@ class PlaygroundManager {
 		const actionsContainer = document.createElement( 'div' );
 		actionsContainer.className = 'playground-tabs-actions';
 
-		// Create Projects button
-		const projectsBtn = document.createElement( 'button' );
-		projectsBtn.className = 'playground-tab-btn playground-projects-btn';
-		projectsBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; display: block;"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><polyline points="10 11 8 13 10 15"/><polyline points="14 11 16 13 14 15"/></svg>';
-		projectsBtn.title = 'Playground Projects (Save, Load & JSON)';
-		projectsBtn.onclick = ( e ) => {
-
-			e.stopPropagation();
-			this.guide.projectsManager.openProjectsModal();
-
-		};
-
 		// Create Imported Files button
 		const importedFilesBtn = document.createElement( 'button' );
 		importedFilesBtn.className = 'playground-tab-btn playground-imported-files-btn';
@@ -652,7 +631,6 @@ class PlaygroundManager {
 
 		};
 
-		actionsContainer.appendChild( projectsBtn );
 		actionsContainer.appendChild( importedFilesBtn );
 		actionsContainer.appendChild( cleanBtn );
 		actionsContainer.appendChild( undoBtn );
@@ -879,8 +857,6 @@ class PlaygroundManager {
 
 		if ( ! this.playgroundTabs ) return;
 
-		this.guide.projectsManager.autoSaveCurrentProject();
-
 		const persistTabs = this.playgroundTabs.filter( t => ! t.readOnly );
 		const encoded = await compressString( JSON.stringify( {
 			tabs: persistTabs
@@ -924,7 +900,7 @@ class PlaygroundManager {
 		if ( ! this.guide.codeEditor || ( activeTab && activeTab.readOnly ) ) return;
 
 		const code = this.guide.codeEditor.getValue();
-		const formatted = await CodeCompiler.format( code );
+		const formatted = formatCode( code );
 
 		// Set the new formatted value in the editor and update state/hash
 		const currentVal = this.guide.codeEditor.getValue();
@@ -1260,23 +1236,6 @@ class PlaygroundManager {
 
 	}
 
-	hasUnsavedChanges() {
-
-		if ( this.guide.projectsManager.currentProjectId ) return false;
-		if ( ! this.playgroundTabs || this.playgroundTabs.length === 0 ) return false;
-		if ( ! this.initialTabsSnapshot ) return false;
-
-		const persistTabs = this.playgroundTabs.filter( t => ! t.readOnly );
-		return JSON.stringify( persistTabs ) !== this.initialTabsSnapshot;
-
-	}
-
-	hasActiveCustomProject() {
-
-		return this.hasUnsavedChanges();
-
-	}
-
 	async openExistingPlayground() {
 
 		if ( ! this.playgroundTabs || this.playgroundTabs.length === 0 ) {
@@ -1292,8 +1251,6 @@ class PlaygroundManager {
 
 			this.playgroundTabs = [ { name: 'main', code: currentCode } ];
 			this.activePlaygroundTabName = 'main';
-			this.currentExampleName = activePage?.title || activePage?.name || 'Example';
-			this.initialTabsSnapshot = JSON.stringify( this.playgroundTabs );
 
 		}
 
@@ -1313,15 +1270,11 @@ class PlaygroundManager {
 
 	}
 
-	async loadExampleIntoPlayground( code, name = null ) {
-
-		this.guide.projectsManager.setCurrentProjectId( null );
-		this.currentExampleName = name;
+	async loadExampleIntoPlayground( code ) {
 
 		const newCode = code || '// TSL Guide\n';
 		this.playgroundTabs = [ { name: 'main', code: newCode } ];
 		this.activePlaygroundTabName = 'main';
-		this.initialTabsSnapshot = JSON.stringify( this.playgroundTabs );
 
 		this.togglePlayground( true );
 		this.renderPlaygroundTabs();

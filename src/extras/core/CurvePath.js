@@ -35,6 +35,15 @@ class CurvePath extends Curve {
 		 */
 		this.autoClose = false;
 
+		/**
+		 * An internal cache that holds precomputed curve length values.
+		 *
+		 * @private
+		 * @type {?Array<number>}
+		 * @default null
+		 */
+		this.cacheLengths = null;
+
 	}
 
 	/**
@@ -250,6 +259,8 @@ class CurvePath extends Curve {
 
 		this.autoClose = source.autoClose;
 
+		this.cacheLengths = null;
+
 		return this;
 
 	}
@@ -285,6 +296,8 @@ class CurvePath extends Curve {
 			this.curves.push( new Curves[ curve.type ]().fromJSON( curve ) );
 
 		}
+
+		this.cacheLengths = null;
 
 		return this;
 

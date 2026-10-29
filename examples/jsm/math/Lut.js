@@ -143,7 +143,7 @@ class Lut {
 
 		// sample at 0
 
-		this.lut.push( new Color( this.map[ 0 ][ 1 ] ) );
+		this.lut.push( new Color().setHex( this.map[ 0 ][ 1 ], LinearSRGBColorSpace ) );
 
 		// sample at 1/n, ..., (n-1)/n
 
@@ -173,7 +173,7 @@ class Lut {
 
 		// sample at 1
 
-		this.lut.push( new Color( this.map[ this.map.length - 1 ][ 1 ] ) );
+		this.lut.push( new Color().setHex( this.map[ this.map.length - 1 ][ 1 ], LinearSRGBColorSpace ) );
 
 		return this;
 

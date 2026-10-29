@@ -318,6 +318,8 @@ class GLTFLoader extends Loader {
 		};
 
 		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
 
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
@@ -487,6 +489,8 @@ class GLTFLoader extends Loader {
 
 			path: path || this.resourcePath || '',
 			crossOrigin: this.crossOrigin,
+			priority: this.priority,
+			cache: this.cache,
 			withCredentials: this.withCredentials,
 			requestHeader: this.requestHeader,
 			manager: this.manager,
@@ -2703,10 +2707,14 @@ class GLTFParser {
 		if ( typeof createImageBitmap === 'undefined' || ( isSafari && safariVersion < 17 ) || ( isFirefox && firefoxVersion < 98 ) ) {
 
 			this.textureLoader = new TextureLoader( this.options.manager );
+			this.textureLoader.setPriority( this.options.priority );
+			this.textureLoader.setCache( this.options.cache );
 
 		} else {
 
 			this.textureLoader = new ImageBitmapLoader( this.options.manager );
+			this.textureLoader.setPriority( this.options.priority );
+			this.textureLoader.setCache( this.options.cache );
 
 		}
 
@@ -2715,6 +2723,8 @@ class GLTFParser {
 		this.textureLoader.setRequestHeader( this.options.requestHeader );
 
 		this.fileLoader = new FileLoader( this.options.manager );
+		this.fileLoader.setPriority( this.options.priority );
+		this.fileLoader.setCache( this.options.cache );
 		this.fileLoader.setResponseType( 'arraybuffer' );
 
 		if ( this.options.withCredentials || this.options.crossOrigin === 'use-credentials' ) {
@@ -3406,50 +3416,71 @@ class GLTFParser {
 
 		let sourceURI = sourceDef.uri || '';
 		let isObjectURL = false;
+		let pending;
 
-		if ( sourceDef.bufferView !== undefined ) {
+		if ( loader.isKTX2Loader === true && sourceDef.bufferView !== undefined ) {
 
-			// Load binary image data from bufferView, if provided.
+			// KTX2Loader parses the binary image data from bufferView directly (see #35193).
 
-			sourceURI = parser.getDependency( 'bufferView', sourceDef.bufferView ).then( function ( bufferView ) {
+			pending = parser.getDependency( 'bufferView', sourceDef.bufferView ).then( function ( bufferView ) {
 
-				isObjectURL = true;
-				const blob = new Blob( [ bufferView ], { type: sourceDef.mimeType } );
-				sourceURI = URL.createObjectURL( blob );
-				return sourceURI;
+				return new Promise( function ( resolve, reject ) {
+
+					loader.parse( bufferView, resolve, reject );
+
+				} );
 
 			} );
 
-		} else if ( sourceDef.uri === undefined ) {
+		} else {
 
-			throw new Error( 'THREE.GLTFLoader: Image ' + sourceIndex + ' is missing URI and bufferView' );
+			if ( sourceDef.bufferView !== undefined ) {
+
+				// Load binary image data from bufferView, if provided.
+
+				sourceURI = parser.getDependency( 'bufferView', sourceDef.bufferView ).then( function ( bufferView ) {
+
+					isObjectURL = true;
+					const blob = new Blob( [ bufferView ], { type: sourceDef.mimeType } );
+					sourceURI = URL.createObjectURL( blob );
+					return sourceURI;
+
+				} );
+
+			} else if ( sourceDef.uri === undefined ) {
+
+				throw new Error( 'THREE.GLTFLoader: Image ' + sourceIndex + ' is missing URI and bufferView' );
+
+			}
+
+			pending = Promise.resolve( sourceURI ).then( function ( sourceURI ) {
+
+				return new Promise( function ( resolve, reject ) {
+
+					let onLoad = resolve;
+
+					if ( loader.isImageBitmapLoader === true ) {
+
+						onLoad = function ( imageBitmap ) {
+
+							const texture = new Texture( imageBitmap );
+							texture.needsUpdate = true;
+
+							resolve( texture );
+
+						};
+
+					}
+
+					loader.load( LoaderUtils.resolveURL( sourceURI, options.path ), onLoad, undefined, reject );
+
+				} );
+
+			} );
 
 		}
 
-		const promise = Promise.resolve( sourceURI ).then( function ( sourceURI ) {
-
-			return new Promise( function ( resolve, reject ) {
-
-				let onLoad = resolve;
-
-				if ( loader.isImageBitmapLoader === true ) {
-
-					onLoad = function ( imageBitmap ) {
-
-						const texture = new Texture( imageBitmap );
-						texture.needsUpdate = true;
-
-						resolve( texture );
-
-					};
-
-				}
-
-				loader.load( LoaderUtils.resolveURL( sourceURI, options.path ), onLoad, undefined, reject );
-
-			} );
-
-		} ).then( function ( texture ) {
+		const promise = pending.then( function ( texture ) {
 
 			// Clean up resources and configure Texture.
 

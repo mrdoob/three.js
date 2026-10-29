@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - gpu-driven ibl</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - gpu-driven ibl">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_gpudriven_ibl.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_gpudriven_ibl.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>GPU-Driven Compute Rasterizer — IBL</span>
+			</div>
+
+			<small>Rendering <span id="triangleCount"></span> triangles with meshlet drawing pipelines.<br/>Battle Damaged Sci-fi Helmet by theblueturtle_</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { Fn, vec3, vec4, float, uniform, uv, texture, normalMap, normalWorldGeometry, cameraWorldMatrix, colorSpaceToWorking, instanceIndex, positionLocal, positionGeometry, normalLocal, rotate } from 'three/tsl';
+
+			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
+			import { MeshletDrawingPipeline } from 'three/addons/pipelines/MeshletDrawingPipeline.js';
+			import { VisibilityBufferDrawingPipeline } from 'three/addons/pipelines/VisibilityBufferDrawingPipeline.js';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+
+			if ( WebGPU.isAvailable() === false ) {
+
+				document.body.appendChild( WebGPU.getErrorMessage() );
+
+				throw new Error( 'No WebGPU support' );
+
+			}
+
+			let camera, scene, renderer, controls, timer;
+			let pipelines, standardPipeline, helmets, shadedMaterial, visMaterial, visNodes;
+
+			const instanceCount = 15625; // 125x125 plane or 25x25x25 volume
+
+			const options = { Output: 'Default', Rasterizer: 'Hardware', Grid: 'XZ', 'LOD Threshold': 1, 'Occlusion Culling': false, 'Animation Speed': 1 };
+
+			const matrix = new THREE.Matrix4();
+
+			const animationTime = uniform( 0 );
+
+			init();
+
+			async function init() {
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				// the visibility buffer drawing pipeline rasterizes small triangles in a compute shader and large ones in hardware,
+				// the meshlet drawing pipeline rasterizes all triangles in hardware. both cull and select the LOD on the GPU
+
+				// the objects are spread out and hardly occlude each other, so occlusion culling costs more than it saves
+
+				pipelines = {
+					'Hybrid': new VisibilityBufferDrawingPipeline( { maxRasterSize: 32, occlusionCulling: false } ),
+					'Hardware': new MeshletDrawingPipeline( { occlusionCulling: false } )
+				};
+
+				// the standard drawing pipeline of the renderer draws every object on its own, for comparison
+
+				standardPipeline = renderer.drawingPipeline;
+
+				renderer.drawingPipeline = pipelines[ options.Rasterizer ];
+
+				await renderer.init();
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, .25, 1000000 );
+
+				timer = new THREE.Timer();
+
+				controls = new FirstPersonControls( camera, renderer.domElement );
+				controls.movementSpeed = 10;
+				controls.lookSpeed = 0.2;
+
+				// Load assets
+				const [ gltf, envTexture ] = await Promise.all( [
+					new GLTFLoader().loadAsync( 'models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf' ),
+					new UltraHDRLoader().loadAsync( 'textures/equirectangular/royal_esplanade_2k.hdr.jpg' )
+				] );
+
+				envTexture.mapping = THREE.EquirectangularReflectionMapping;
+
+				let sourceMesh;
+				gltf.scene.traverse( ( child ) => {
+
+					if ( child.isMesh ) sourceMesh = child;
+
+				} );
+
+				// Bake the glTF node transform into the geometry (the helmet is authored z-up)
+				gltf.scene.updateMatrixWorld( true );
+				sourceMesh.geometry.applyMatrix4( sourceMesh.matrixWorld );
+
+				const geometry = sourceMesh.geometry;
+				const sourceMaterial = sourceMesh.material;
+
+				shadedMaterial = new THREE.MeshStandardNodeMaterial( {
+					map: sourceMaterial.map,
+					normalMap: sourceMaterial.normalMap,
+					normalScale: sourceMaterial.normalScale,
+					roughnessMap: sourceMaterial.roughnessMap,
+					metalnessMap: sourceMaterial.metalnessMap,
+					aoMap: sourceMaterial.aoMap,
+					emissiveMap: sourceMaterial.emissiveMap,
+					emissive: sourceMaterial.emissive,
+					roughness: sourceMaterial.roughness,
+					metalness: sourceMaterial.metalness
+				} );
+
+				// The instance matrices only translate the helmets, the position node rotates each one and its normal around
+				// the vertical axis. The pipelines evaluate the position node on the GPU for the culling and the software rasterizer
+				const rotation = vec3( 0, animationTime.add( float( instanceIndex ) ), 0 );
+
+				shadedMaterial.positionNode = Fn( () => {
+
+					normalLocal.assign( rotate( normalLocal, rotation ) );
+
+					return positionLocal.add( rotate( positionGeometry, rotation ).sub( positionGeometry ) );
+
+				} )();
+
+				// Vis material: unlit visualization of one channel. The pipeline feeds the surface of each pixel into the
+				// node graph, like for the shaded material
+				const sampleMap = ( map ) => texture( map, uv() );
+				const metalRough = sampleMap( shadedMaterial.roughnessMap ); // glTF packs roughness (g) and metalness (b) in one texture
+				const mappedNormal = normalMap( sampleMap( shadedMaterial.normalMap ), uniform( shadedMaterial.normalScale ) ).transformDirection( cameraWorldMatrix );
+
+				visNodes = {
+					'Geometry Normal': vec4( normalWorldGeometry.mul( 0.5 ).add( 0.5 ), 1.0 ),
+					'Normal Map': vec4( mappedNormal.mul( 0.5 ).add( 0.5 ), 1.0 ),
+					'UV': vec4( uv(), 0.0, 1.0 ),
+					'Roughness': vec4( metalRough.ggg, 1.0 ),
+					'Metalness': vec4( metalRough.bbb, 1.0 ),
+					'AO': vec4( sampleMap( shadedMaterial.aoMap ).rrr, 1.0 ),
+					'Emissive': vec4( sampleMap( shadedMaterial.emissiveMap ).rgb, 1.0 )
+				};
+
+				visMaterial = new THREE.NodeMaterial();
+				visMaterial.positionNode = shadedMaterial.positionNode;
+
+				scene = new THREE.Scene();
+				scene.background = envTexture;
+				scene.backgroundBlurriness = 0.5;
+				scene.environment = envTexture;
+
+				helmets = new THREE.InstancedMesh( geometry, shadedMaterial, instanceCount );
+				helmets.frustumCulled = false; // culled per instance by the pipeline
+				scene.add( helmets );
+
+				updateGrid();
+
+				const totalTriangles = instanceCount * geometry.index.count / 3;
+				document.getElementById( 'triangleCount' ).innerText = new Intl.NumberFormat().format( totalTriangles );
+
+				const parameterGroup = renderer.inspector.createParameters( 'Parameters' );
+
+				parameterGroup.add( options, 'Output', {
+					'Default': 'Default',
+					'Meshlet Debug': 'Meshlet Debug',
+					'Geometry Normal': 'Geometry Normal',
+					'Normal Map': 'Normal Map',
+					'UV': 'UV',
+					'Roughness': 'Roughness',
+					'Metalness': 'Metalness',
+					'AO': 'AO',
+					'Emissive': 'Emissive'
+				} ).onChange( updateMode );
+
+				parameterGroup.add( options, 'Rasterizer', { 'Hybrid': 'Hybrid', 'Hardware': 'Hardware', 'Basic': 'Basic' } ).onChange( updateRasterizer );
+
+				const maxRasterSize = parameterGroup.add( pipelines[ 'Hybrid' ], 'maxRasterSize', 1, 64, 1 ).name( 'Max Raster Size' );
+
+				parameterGroup.add( options, 'Grid', { 'XZ': 'XZ', 'XYZ': 'XYZ' } ).onChange( updateGrid );
+
+				const lodThreshold = parameterGroup.add( options, 'LOD Threshold', 1, 15, 0.1 ).onChange( ( value ) => {
+
+					for ( const pipeline of Object.values( pipelines ) ) pipeline.lodThreshold = value;
+
+				} );
+
+				const occlusionCulling = parameterGroup.add( options, 'Occlusion Culling' ).onChange( ( value ) => {
+
+					for ( const pipeline of Object.values( pipelines ) ) pipeline.occlusionCulling = value;
+
+				} );
+
+				parameterGroup.add( options, 'Animation Speed', 0, 1 );
+
+				// only the parameters of the selected rasterizer are shown
+
+				function updateRasterizer() {
+
+					const rasterizer = options.Rasterizer;
+					const gpuDriven = rasterizer !== 'Basic';
+
+					renderer.drawingPipeline = gpuDriven ? pipelines[ rasterizer ] : standardPipeline;
+
+					rasterizer === 'Hybrid' ? maxRasterSize.show() : maxRasterSize.hide();
+					gpuDriven ? lodThreshold.show() : lodThreshold.hide();
+					gpuDriven ? occlusionCulling.show() : occlusionCulling.hide();
+
+				}
+
+				updateRasterizer();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function updateMode() {
+
+				const output = options.Output;
+
+				for ( const pipeline of Object.values( pipelines ) ) pipeline.debug = output === 'Meshlet Debug';
+
+				renderer.toneMapping = output === 'Default' ? THREE.ACESFilmicToneMapping : THREE.NoToneMapping;
+
+				if ( visNodes[ output ] !== undefined ) {
+
+					// the values are shown as they are, without the conversion to the output color space
+
+					visMaterial.colorNode = colorSpaceToWorking( visNodes[ output ], THREE.SRGBColorSpace );
+					visMaterial.needsUpdate = true;
+
+					helmets.material = visMaterial;
+
+				} else {
+
+					helmets.material = shadedMaterial;
+
+				}
+
+			}
+
+			// Lay the instances out as a plane or a volume (same instance count)
+			function updateGrid() {
+
+				let index = 0;
+
+				const setPosition = ( x, y, z ) => helmets.setMatrixAt( index ++, matrix.makeTranslation( x, y, z ) );
+
+				if ( options.Grid === 'XZ' ) {
+
+					for ( let x = 0; x < 125; x ++ ) {
+
+						for ( let z = 0; z < 125; z ++ ) {
+
+							setPosition( ( x - 62 ) * 4.0, - 1, ( z - 62 ) * 4.0 );
+
+						}
+
+					}
+
+					camera.position.set( 0, 8, 30 );
+					controls.lookAt( 0, - 1, 0 );
+
+				} else {
+
+					for ( let x = 0; x < 25; x ++ ) {
+
+						for ( let y = 0; y < 25; y ++ ) {
+
+							for ( let z = 0; z < 25; z ++ ) {
+
+								setPosition( ( x - 12 ) * 4.0, ( y - 12 ) * 4.0, ( z - 12 ) * 4.0 );
+
+							}
+
+						}
+
+					}
+
+					camera.position.set( 2, 2, 40 );
+					controls.lookAt( 0, 0, 0 );
+
+				}
+
+				helmets.instanceMatrix.needsUpdate = true;
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				timer.update();
+
+				if ( scene === undefined ) return; // still loading
+
+				const delta = timer.getDelta();
+
+				controls.update( delta );
+
+				animationTime.value += delta * options[ 'Animation Speed' ];
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

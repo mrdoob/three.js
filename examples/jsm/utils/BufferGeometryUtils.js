@@ -166,6 +166,7 @@ function mergeGeometries( geometries, useGroups = false ) {
 	const morphTargetsRelative = geometries[ 0 ].morphTargetsRelative;
 
 	const mergedGeometry = new BufferGeometry();
+	mergedGeometry.morphTargetsRelative = morphTargetsRelative;
 
 	let offset = 0;
 
@@ -1225,6 +1226,8 @@ function mergeGroups( geometry ) {
 	for ( let i = 0; i < groups.length; i ++ ) {
 
 		const group = groups[ i ];
+
+		if ( group.count === Infinity ) group.count = index.count - group.start;
 
 		const groupStart = group.start;
 		const groupLength = groupStart + group.count;

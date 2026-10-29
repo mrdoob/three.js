@@ -38,6 +38,15 @@ class RenderContext {
 		this.stateKey = '';
 
 		/**
+		 * Cached sub-camera frustums shared by render-list and backend culling.
+		 * Kept per context so nested renders do not overwrite the active frustums.
+		 *
+		 * @type {?FrustumArray}
+		 * @default null
+		 */
+		this.frustumArray = null;
+
+		/**
 		 * The MRT configuration.
 		 *
 		 * @type {?MRTNode}

@@ -243,11 +243,30 @@ IncidentLight directLight;
 
 	#endif
 
-	#ifdef USE_LIGHT_PROBES_GRID
+	#if NUM_LIGHT_PROBE_GRIDS > 0
 
 		vec3 probeWorldPos = ( ( vec4( geometryPosition, 1.0 ) - viewMatrix[ 3 ] ) * viewMatrix ).xyz;
 		vec3 probeWorldNormal = transformNormalByInverseViewMatrix( geometryNormal, viewMatrix );
-		irradiance += getLightProbeGridIrradiance( probeWorldPos, probeWorldNormal );
+
+		// Sample the last grid whose cells contain the fragment.
+
+		int probeGrid = - 1;
+
+		#pragma unroll_loop_start
+		for ( int i = 0; i < NUM_LIGHT_PROBE_GRIDS; i ++ ) {
+
+			if ( isInsideLightProbeGrid( probeWorldPos, probeWorldNormal, probesMin[ i ], probesMax[ i ], probesResolution[ i ] ) ) probeGrid = UNROLLED_LOOP_INDEX;
+
+		}
+		#pragma unroll_loop_end
+
+		#pragma unroll_loop_start
+		for ( int i = 0; i < NUM_LIGHT_PROBE_GRIDS; i ++ ) {
+
+			if ( probeGrid == UNROLLED_LOOP_INDEX ) irradiance += getLightProbeGridIrradiance( probesSH[ i ], probesMin[ i ], probesMax[ i ], probesResolution[ i ], probeWorldPos, probeWorldNormal );
+
+		}
+		#pragma unroll_loop_end
 
 	#endif
 

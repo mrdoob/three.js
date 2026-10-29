@@ -42,6 +42,8 @@ function WebGLRenderState( extensions ) {
 
 		lights.setup( lightsArray );
 
+		lightProbeGridArray.sort( ( a, b ) => a.priority - b.priority || a.id - b.id );
+
 	}
 
 	function setupLightsView( camera ) {

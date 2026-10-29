@@ -401,7 +401,6 @@ class RecurrentDenoiseNode extends Node {
 
 		if ( needsRestart === true ) {
 
-			renderer.initRenderTarget( this._renderTarget );
 			renderer.setRenderTarget( this._renderTarget );
 			renderer.clear();
 			renderer.setRenderTarget( null );

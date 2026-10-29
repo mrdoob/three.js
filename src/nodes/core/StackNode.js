@@ -192,14 +192,15 @@ class StackNode extends Node {
 	}
 
 	/**
-	 * Adds a node to the stack before the current node.
+	 * Adds a node to the stack before the given node, by default the current node.
 	 *
 	 * @param {Node} node - The node to add.
+	 * @param {?Node} [beforeNode=this._currentNode] - The node of the stack that the node is added before.
 	 * @return {StackNode} A reference to this stack node.
 	 */
-	addToStackBefore( node ) {
+	addToStackBefore( node, beforeNode = this._currentNode ) {
 
-		const index = this._currentNode ? this.nodes.indexOf( this._currentNode ) : 0;
+		const index = beforeNode ? this.nodes.indexOf( beforeNode ) : 0;
 
 		return this.addToStack( node, index );
 
@@ -366,6 +367,8 @@ class StackNode extends Node {
 	}
 
 	build( builder, ...params ) {
+
+		this._setupInspector( builder );
 
 		const previousStack = getCurrentStack();
 

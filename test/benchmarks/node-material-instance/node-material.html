@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - proxy node material after</title>
+		<title>three.js webgpu - node material instance before</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<style>
@@ -13,10 +13,10 @@
 	</head>
 	<body>
 		<div id="info">
-			<strong>ProxyNodeMaterial - after</strong><br>
+			<strong>NodeMaterialInstance - before</strong><br>
 			10,000 meshes, one material per mesh.<br>
 			<a href="node-material.html">Node Material</a> |
-			<a href="proxy-material.html">Proxy Material</a> |
+			<a href="material-instance.html">Material Instance</a> |
 			<a href="shader-material.html">Shader Material</a>
 			<pre id="results">Initializing renderer...</pre>
 			<button id="update" disabled>Update uniforms</button>
@@ -32,7 +32,7 @@
 		</script>
 		<script type="module">
 			import * as THREE from 'three/webgpu';
-			import { materialReference } from 'three/tsl';
+			import { uniform } from 'three/tsl';
 
 			const results = document.getElementById( 'results' );
 			const button = document.getElementById( 'update' );
@@ -55,14 +55,13 @@
 
 			const materials = [];
 			const start = performance.now();
-			const baseMaterial = new THREE.MeshBasicNodeMaterial( { colorNode: materialReference( 'myColor' ) } );
+			
 
 			for ( let i = 0; i < 10000; i ++ ) {
 
 				// Use identical, deterministic values in all examples.
 				const color = new THREE.Vector3( ( i % 251 ) / 250, ( i % 127 ) / 126, ( i % 61 ) / 60 );
-				const material = new THREE.ProxyNodeMaterial( baseMaterial );
-				material.myColor = color;
+				const material = new THREE.MeshBasicNodeMaterial( { colorNode: uniform( color ) } );
 				materials.push( material );
 
 			}
@@ -99,7 +98,7 @@
 
 				for ( const material of materials ) {
 
-					const color = material.myColor;
+					const color = material.colorNode.value;
 					color.set( color.z, color.x, color.y );
 
 				}

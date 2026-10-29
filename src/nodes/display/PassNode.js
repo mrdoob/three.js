@@ -2,6 +2,7 @@ import Node from '../core/Node.js';
 import { default as TextureNode/*, texture*/ } from '../accessors/TextureNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { context } from '../tsl/TSLBase.js';
+import { mergeContext } from '../core/NodeUtils.js';
 import { uniform } from '../core/UniformNode.js';
 import { viewZToOrthographicDepth, perspectiveDepthToViewZ } from './ViewportDepthNode.js';
 
@@ -813,13 +814,25 @@ class PassNode extends Node {
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentMRT = renderer.getMRT();
 
+		const currentContextNode = renderer.contextNode;
+
+		// the render target is configured like in setup() and updateBefore(), so the pipelines match the ones of the render
+
+		this.renderTarget.samples = this.options.samples === undefined ? renderer.samples : this.options.samples;
+
+		renderer.getDrawingBufferSize( _size );
+		this.setSize( _size.width, _size.height );
+
 		renderer.setRenderTarget( this.renderTarget );
 		renderer.setMRT( this._mrt );
+
+		if ( this.contextNode !== null ) renderer.contextNode = this._getContextNode( renderer );
 
 		await renderer.compileAsync( this.scene, this.camera );
 
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setMRT( currentMRT );
+		renderer.contextNode = currentContextNode;
 
 	}
 
@@ -917,16 +930,7 @@ class PassNode extends Node {
 
 		if ( this.contextNode !== null ) {
 
-			if ( this._contextNodeCache === null || this._contextNodeCache.version !== this.version ) {
-
-				this._contextNodeCache = {
-					version: this.version,
-					context: context( { ...renderer.contextNode.getFlowContextData(), ...this.contextNode.getFlowContextData() } )
-				};
-
-			}
-
-			renderer.contextNode = this._contextNodeCache.context;
+			renderer.contextNode = this._getContextNode( renderer );
 
 		}
 
@@ -951,6 +955,33 @@ class PassNode extends Node {
 		renderer.lighting = currentLighting;
 
 		camera.layers.mask = currentMask;
+
+	}
+
+	/**
+	 * Returns the context node of the pass merged with the context node of the renderer.
+	 *
+	 * @private
+	 * @param {Renderer} renderer - The renderer.
+	 * @return {ContextNode} The context node.
+	 */
+	_getContextNode( renderer ) {
+
+		const rendererContextNode = renderer.contextNode;
+		const cache = this._contextNodeCache;
+
+		if ( cache === null || cache.version !== this.version || cache.rendererContextNode !== rendererContextNode || cache.rendererVersion !== rendererContextNode.version ) {
+
+			this._contextNodeCache = {
+				version: this.version,
+				rendererContextNode,
+				rendererVersion: rendererContextNode.version,
+				context: context( mergeContext( rendererContextNode.getFlowContextData(), this.contextNode.getFlowContextData() ) )
+			};
+
+		}
+
+		return this._contextNodeCache.context;
 
 	}
 

@@ -5,7 +5,7 @@ import { splitPath, splitCamelCase } from '../ui/utils.js';
 import { getItem, setItem } from '../Storage.js';
 
 import { RendererUtils, NoToneMapping, LinearSRGBColorSpace, QuadMesh, NodeMaterial, CanvasTarget, Vector2, Color } from 'three/webgpu';
-import { renderOutput, vec2, vec3, vec4, Fn, screenUV, step, OnMaterialUpdate, uniform, float } from 'three/tsl';
+import { renderOutput, rtt, vec2, vec3, vec4, Fn, screenUV, step, OnMaterialUpdate, uniform, float } from 'three/tsl';
 
 const _size = /*@__PURE__*/ new Vector2();
 
@@ -746,16 +746,14 @@ class Viewer extends Tab {
 		this.splitUniforms.viewportWidth.value = rect.width;
 
 		// Recreate or setup material for split screen comparison
-		const node = canvasData.node;
-		const target = node.context( { getUV: () => screenUV } );
+		const target = canvasData.inspectNode.context( { getUV: () => screenUV } );
 		const targetColor = renderOutput( vec4( vec3( target ), 1 ), NoToneMapping, renderer.outputColorSpace );
-		const targetColorCtx = targetColor.context( { inspector: true } );
 
 		let finalColor;
 
 		if ( this.splitFullscreen ) {
 
-			finalColor = targetColorCtx;
+			finalColor = targetColor;
 
 		} else {
 
@@ -763,7 +761,7 @@ class Viewer extends Tab {
 
 				screenUV.x.lessThan( this.splitUniforms.splitX ).discard();
 
-				return targetColorCtx;
+				return targetColor;
 
 			} )();
 
@@ -901,7 +899,21 @@ class Viewer extends Tab {
 			const canvasAspect = uniform( 1 );
 			const mask = float( 1 );
 
-			const target = node.context( { getUV: ( textureNode ) => {
+			let inspectNode = node.callback !== null ? node.callback( node.node ) : node.node;
+			let rttNode = null;
+
+			if ( inspectNode.isTextureNode !== true && inspectNode.isPassNode !== true ) {
+
+				// render other nodes in the resolution of the renderer, e.g. screen-space nodes
+
+				rttNode = rtt( inspectNode );
+				rttNode.uvNode = null; // use the aspect ratio corrected uv of the viewer
+
+				inspectNode = rttNode;
+
+			}
+
+			const target = inspectNode.context( { getUV: ( textureNode ) => {
 
 				const uvData = aspectRatioUV( screenUV, textureNode, canvasAspect );
 				const correctedUV = uvData.xy;
@@ -913,7 +925,6 @@ class Viewer extends Tab {
 
 			let output = vec4( vec3( target ), 1 ).mul( mask );
 			output = renderOutput( output, NoToneMapping, renderer.outputColorSpace );
-			output = output.context( { inspector: true } );
 
 			const material = new NodeMaterial();
 			material.outputNode = output;
@@ -926,6 +937,8 @@ class Viewer extends Tab {
 				name,
 				path,
 				node,
+				inspectNode,
+				rttNode,
 				quad,
 				canvasTarget,
 				material,
@@ -1240,7 +1253,7 @@ class Viewer extends Tab {
 
 			const mainSize = previousCanvasTarget.getDrawingBufferSize( _size );
 
-			canvasData.node.traverse( ( child ) => {
+			canvasData.inspectNode.traverse( ( child ) => {
 
 				if ( child.isRTTNode && child.autoResize === true ) {
 
@@ -1360,6 +1373,8 @@ class Viewer extends Tab {
 
 			canvasData.canvasTarget.dispose();
 			canvasData.material.dispose();
+
+			if ( canvasData.rttNode !== null ) canvasData.rttNode.dispose();
 
 		}
 

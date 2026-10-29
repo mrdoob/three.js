@@ -331,6 +331,7 @@ class LightShadow {
 		this.blurSamples = source.blurSamples;
 
 		this.mapSize.copy( source.mapSize );
+		this.mapType = source.mapType;
 
 		this.biasNode = source.biasNode;
 
@@ -365,6 +366,7 @@ class LightShadow {
 		object.radius = this.radius;
 		object.blurSamples = this.blurSamples;
 		object.mapSize = this.mapSize.toArray();
+		object.mapType = this.mapType;
 
 		object.camera = this.camera.toJSON( false ).object;
 		delete object.camera.matrix;

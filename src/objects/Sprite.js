@@ -225,6 +225,16 @@ class Sprite extends Object3D {
 
 	}
 
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		data.object.center = this.center.toArray();
+
+		return data;
+
+	}
+
 }
 
 function transformVertex( vertexPosition, mvPosition, center, scale, sin, cos ) {

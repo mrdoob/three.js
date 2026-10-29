@@ -121,14 +121,14 @@ const GGXVNDFPdf = Fn( ( [ NoH, NoV, roughness ] ) => {
 /**
  * Fresnel reflectance for the Schlick approximation.
  */
-export const F_Schlick = Fn( ( [ f0, theta ] ) => {
+export const F_Schlick = Fn( ( [ f0, theta, f90 = float( 1 ) ] ) => {
 
 	const oneMinus = float( 1.0 ).sub( theta ).toVar();
 	const oneMinus2 = oneMinus.mul( oneMinus ).toVar();
 	const oneMinus5 = oneMinus2.mul( oneMinus2 ).mul( oneMinus ).toVar();
-	return f0.add( vec3( 1.0 ).sub( f0 ).mul( oneMinus5 ) ).toVar(); // vec3
+	return f0.add( vec3( f90 ).sub( f0 ).mul( oneMinus5 ) ).toVar(); // vec3
 
-}, { f0: 'vec3', theta: 'float', return: 'vec3' } );
+}, { f0: 'vec3', theta: 'float', f90: 'float', return: 'vec3' } );
 
 /**
  * Specular dominant factor for parallax-corrected ray length.
@@ -157,23 +157,12 @@ const ggxReflectionStruct = struct( {
 	pdf: 'float', // VNDF direction pdf (for MIS against the env CDF)
 	NdotV: 'float',
 	alpha: 'float', // GGX alpha (roughness²), clamped
+	f90: 'float',
 	f0: 'vec3' // Fresnel reflectance at normal incidence
 } );
 
-/**
- * Importance-samples the GGX/VNDF specular lobe for one pixel and returns the reflected
- * ray direction plus the Monte-Carlo weight to apply to the gathered radiance, along with
- * the GGX terms the SSR env-miss MIS fallback needs.
- *
- * @param {Node<vec3>} N - View-space shading normal (normalized).
- * @param {Node<vec3>} V - View-space surface→camera direction (normalized).
- * @param {Node<float>} roughness - Perceptual roughness in `[0,1]`.
- * @param {Node<float>} metalness - Metalness in `[0,1]`.
- * @param {Node<vec3>} albedo - Surface base color; tints the metal Fresnel reflectance (`f0`).
- * @param {Node<vec4>} Xi - Per-pixel random numbers; only `.xy` are used.
- * @return {ggxReflectionStruct}
- */
-export const ggxReflectionSample = Fn( ( [ N, V, roughness, metalness, albedo, Xi ] ) => {
+// Core of `ggxReflectionSample()` with explicit F0/F90.
+const ggxReflectionSampleWithReflectance = Fn( ( [ N, V, roughness, f0, f90, Xi ] ) => {
 
 	// GGX alpha (use r^2, clamp to avoid degenerate)
 	const a = roughness.mul( roughness ).max( 0.001 ).toVar();
@@ -181,14 +170,8 @@ export const ggxReflectionSample = Fn( ( [ N, V, roughness, metalness, albedo, X
 	const ay = a.toVar();
 
 	// TBN from view-space normal
-	const up = vec3( 0, 0, 1 );
-	let T = cross( up, N ).toVar();
-	T = T.normalize().toVar();
-	If( T.length().lessThan( 1e-3 ), () => {
-
-		T.assign( cross( vec3( 0, 1, 0 ), N ).normalize() );
-
-	} );
+	const up = N.z.abs().lessThan( 0.999 ).select( vec3( 0, 0, 1 ), vec3( 1, 0, 0 ) );
+	const T = cross( up, N ).normalize().toVar();
 	const B = cross( N, T ).normalize().toVar();
 
 	// transform V to LOCAL frame (N = +Z)
@@ -218,10 +201,9 @@ export const ggxReflectionSample = Fn( ( [ N, V, roughness, metalness, albedo, X
 	const NdotH = max( float( 0.0 ), dot( N, H ) ).toVar();
 	const VdotH = max( float( 0.0 ), dot( V, H ) ).toVar();
 
-	const f0 = mix( vec3( 0.04 ), albedo, metalness ).toVar();
 	// Chromatic Fresnel reflectance: for metals f0 = albedo, so the reflection is tinted and desaturates
 	// toward white at grazing angles. Kept as vec3 so colored metals reflect with the correct chroma.
-	const fresnelWeight = F_Schlick( f0, VdotH ).toVar(); // vec3
+	const fresnelWeight = F_Schlick( f0, VdotH, f90 ).toVar(); // vec3
 
 	// Bounded-VNDF direction pdf — still needed for the env-miss MIS path.
 	const pdf = GGXVNDFPdf( NdotH, NdotV, ax ).toVar();
@@ -241,9 +223,29 @@ export const ggxReflectionSample = Fn( ( [ N, V, roughness, metalness, albedo, X
 		.mul( kB.mul( NdotV ).add( tB ) )
 		.div( float( 2.0 ).mul( NdotV ).max( 1e-4 ) ).toVar();
 
-	return ggxReflectionStruct( viewReflectDir, glossyWeight, pdf, NdotV, ax, f0 );
+	return ggxReflectionStruct( viewReflectDir, glossyWeight, pdf, NdotV, ax, f90, f0 );
 
 } );
+
+/**
+ * Importance-samples the GGX/VNDF specular lobe for one pixel and returns the reflected
+ * ray direction plus the Monte-Carlo weight to apply to the gathered radiance, along with
+ * the GGX terms the SSR env-miss MIS fallback needs.
+ *
+ * @tsl
+ * @param {Node<vec3>} N - View-space shading normal (normalized).
+ * @param {Node<vec3>} V - View-space surface→camera direction (normalized).
+ * @param {Node<float>} roughness - Perceptual roughness in `[0,1]`.
+ * @param {Node<float>} metalness - Metalness in `[0,1]`; only used when `f0` is omitted.
+ * @param {Node<vec3>} albedo - Surface base color; tints the metal F0 when `f0` is omitted.
+ * @param {Node<vec4>} Xi - Per-pixel random numbers; only `.xy` are used.
+ * @param {?Node<vec3>} [f0=null] - Normal-incidence reflectance. Defaults to `mix( 0.04, albedo, metalness )`.
+ * @param {Node<float>|number} [f90=1] - Grazing reflectance.
+ * @return {ggxReflectionStruct}
+ */
+export const ggxReflectionSample = ( N, V, roughness, metalness, albedo, Xi, f0 = null, f90 = 1 ) =>
+
+	ggxReflectionSampleWithReflectance( N, V, roughness, f0 ?? mix( vec3( 0.04 ), albedo, metalness ), float( f90 ), Xi );
 
 // Equirectangular environment sampling
 
