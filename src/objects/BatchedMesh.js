@@ -279,6 +279,12 @@ class BatchedMesh extends Mesh {
 		this._multiDrawCount = 0;
 		this._multiDrawBytesPerElement = 1;
 
+		// consecutive multi draw entries sharing the same range, merged into instanced draws
+		this._mergedDrawCounts = new Int32Array( maxInstanceCount );
+		this._mergedDrawStarts = new Int32Array( maxInstanceCount );
+		this._mergedDrawInstanceCounts = new Int32Array( maxInstanceCount );
+		this._mergedDrawCount = 0;
+
 		// Local matrix per geometry by using data texture
 		this._matricesTexture = null;
 		this._indirectTexture = null;
@@ -1296,6 +1302,17 @@ class BatchedMesh extends Mesh {
 
 		this._multiDrawCounts = multiDrawCounts;
 		this._multiDrawStarts = multiDrawStarts;
+
+		const mergedDrawCounts = new Int32Array( maxInstanceCount );
+		const mergedDrawStarts = new Int32Array( maxInstanceCount );
+		const mergedDrawInstanceCounts = new Int32Array( maxInstanceCount );
+		copyArrayContents( this._mergedDrawCounts, mergedDrawCounts );
+		copyArrayContents( this._mergedDrawStarts, mergedDrawStarts );
+		copyArrayContents( this._mergedDrawInstanceCounts, mergedDrawInstanceCounts );
+
+		this._mergedDrawCounts = mergedDrawCounts;
+		this._mergedDrawStarts = mergedDrawStarts;
+		this._mergedDrawInstanceCounts = mergedDrawInstanceCounts;
 		this._maxInstanceCount = maxInstanceCount;
 
 		// update texture data for instance sampling
@@ -1483,6 +1500,9 @@ class BatchedMesh extends Mesh {
 		this._multiDrawCounts = source._multiDrawCounts.slice();
 		this._multiDrawStarts = source._multiDrawStarts.slice();
 		this._multiDrawBytesPerElement = source._multiDrawBytesPerElement;
+		this._mergedDrawCounts = source._mergedDrawCounts.slice();
+		this._mergedDrawStarts = source._mergedDrawStarts.slice();
+		this._mergedDrawInstanceCounts = source._mergedDrawInstanceCounts.slice();
 
 		this._indirectTexture = source._indirectTexture.clone();
 		this._indirectTexture.image.data = this._indirectTexture.image.data.slice();
@@ -1570,6 +1590,9 @@ class BatchedMesh extends Mesh {
 		const instanceInfo = this._instanceInfo;
 		const multiDrawStarts = this._multiDrawStarts;
 		const multiDrawCounts = this._multiDrawCounts;
+		const mergedDrawStarts = this._mergedDrawStarts;
+		const mergedDrawCounts = this._mergedDrawCounts;
+		const mergedDrawInstanceCounts = this._mergedDrawInstanceCounts;
 		const geometryInfoList = this._geometryInfo;
 		const perObjectFrustumCulled = this.perObjectFrustumCulled;
 		const indirectTexture = this._indirectTexture;
@@ -1698,8 +1721,32 @@ class BatchedMesh extends Mesh {
 
 		}
 
+		// merge consecutive draws of the same range into instanced draws
+
+		let mergedDrawCount = 0;
+		for ( let i = 0; i < multiDrawCount; i ++ ) {
+
+			const start = multiDrawStarts[ i ];
+			const count = multiDrawCounts[ i ];
+
+			if ( mergedDrawCount > 0 && mergedDrawStarts[ mergedDrawCount - 1 ] === start && mergedDrawCounts[ mergedDrawCount - 1 ] === count ) {
+
+				mergedDrawInstanceCounts[ mergedDrawCount - 1 ] ++;
+
+			} else {
+
+				mergedDrawStarts[ mergedDrawCount ] = start;
+				mergedDrawCounts[ mergedDrawCount ] = count;
+				mergedDrawInstanceCounts[ mergedDrawCount ] = 1;
+				mergedDrawCount ++;
+
+			}
+
+		}
+
 		indirectTexture.needsUpdate = true;
 		this._multiDrawCount = multiDrawCount;
+		this._mergedDrawCount = mergedDrawCount;
 		this._multiDrawBytesPerElement = bytesPerElement;
 		this._visibilityChanged = false;
 
