@@ -12,7 +12,7 @@ import { BasicShadowMap, GreaterEqualCompare, LessEqualCompare, WebGPUCoordinate
 import { CubeDepthTexture } from '../../textures/CubeDepthTexture.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
 import { interleavedGradientNoise, vogelDiskSample } from '../utils/PostProcessingUtils.js';
-import { abs, normalize, cross } from '../math/MathNode.js';
+import { abs, normalize, cross, max } from '../math/MathNode.js';
 import { viewZToLogarithmicDepth } from '../display/ViewportDepthNode.js';
 
 const _clearColor = /*@__PURE__*/ new Color();
@@ -46,9 +46,9 @@ const _cubeUpsWebGL = [
 
 /**
  * Returns a function that gives the depth the cube shadow map stores for the point at
- * `direction * distance`. Each face stores the depth along its own axis, which for that
- * point is `distance * max( |x|, |y|, |z| )` of the direction. Perspective depth is
- * `a + b / z`, so everything but the division is computed once.
+ * `direction * distance`, from the largest absolute component of the direction. Each face
+ * stores the depth along its own axis, and perspective depth is `depthA + depthB / max( |x|, |y|, |z| )`,
+ * so everything but the division is computed once.
  *
  * @private
  * @param {Node<float>} distance - The distance from the light to the fragment.
@@ -56,38 +56,36 @@ const _cubeUpsWebGL = [
  * @param {Node<float>} far - The far plane of the shadow camera.
  * @param {Node<float>} bias - The shadow bias.
  * @param {Renderer} renderer - The renderer.
- * @return {function(Node<vec3>):Node<float>} The function, which takes a direction from the light.
+ * @return {function(Node<float>):Node<float>} The function, which takes the largest absolute component of the direction.
  */
 const getPointShadowDepthFn = ( distance, near, far, bias, renderer ) => {
 
-	const maxComponent = ( direction ) => {
+	const { reversedDepthBuffer, logarithmicDepthBuffer } = renderer;
 
-		const directionAbs = abs( direction );
+	if ( logarithmicDepthBuffer === true ) {
 
-		return directionAbs.x.max( directionAbs.y ).max( directionAbs.z );
-
-	};
-
-	if ( renderer.logarithmicDepthBuffer && ! renderer.reversedDepthBuffer ) {
-
-		return ( direction ) => viewZToLogarithmicDepth( maxComponent( direction ).mul( distance ).negate(), near, far ).add( bias );
+		return ( maxAbs ) => viewZToLogarithmicDepth( maxAbs.mul( distance ).negate(), near, far ).add( bias );
 
 	}
 
-	const range = far.sub( near );
-	const b = near.mul( far ).div( range.mul( distance ) ).toConst();
+	const depthRange = far.sub( near );
+	const nearFar = near.mul( far ).div( depthRange.mul( distance ) );
 
-	if ( renderer.reversedDepthBuffer ) {
+	let depthA, depthB;
 
-		const a = near.div( range ).add( bias ).toConst();
+	if ( reversedDepthBuffer === true ) {
 
-		return ( direction ) => b.div( maxComponent( direction ) ).sub( a );
+		depthA = near.div( depthRange ).add( bias ).negate().toConst();
+		depthB = nearFar.toConst();
+
+	} else {
+
+		depthA = far.div( depthRange ).add( bias ).toConst();
+		depthB = nearFar.negate().toConst();
 
 	}
 
-	const a = far.div( range ).add( bias ).toConst();
-
-	return ( direction ) => a.sub( b.div( maxComponent( direction ) ) );
+	return ( maxAbs ) => depthA.add( depthB.div( maxAbs ) );
 
 };
 
@@ -141,8 +139,10 @@ export const PointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dista
 
 		const sample = vogelDiskSample( i, 5, phi );
 		const direction = bd3D.add( tangent.mul( sample.x ).add( bitangent.mul( sample.y ) ).mul( texelSize ) ).toConst();
+		const absDirection = abs( direction ).toConst();
+		const maxAbs = max( absDirection.x, absDirection.y, absDirection.z ).toConst();
 
-		result.addAssign( cubeTexture( depthTexture, direction ).compare( getDepth( direction ) ) );
+		result.addAssign( cubeTexture( depthTexture, direction ).compare( getDepth( maxAbs ) ) );
 
 	} );
 
@@ -170,7 +170,8 @@ const pointShadowFilter = /*@__PURE__*/ Fn( ( { filterFn, depthTexture, shadowCo
 		const bd3D = shadowPosition.normalize();
 		const distance = shadowPosition.length();
 
-		const dp = getPointShadowDepthFn( distance, shadowCameraNear, shadowCameraFar, bias, builder.renderer )( bd3D );
+		const getDepth = getPointShadowDepthFn( distance, shadowCameraNear, shadowCameraFar, bias, builder.renderer );
+		const dp = getDepth( viewZ.div( distance ) );
 
 		// percentage-closer filtering using cube texture sampling
 		result.assign( filterFn( { depthTexture, bd3D, dp, distance, shadow } ) );
