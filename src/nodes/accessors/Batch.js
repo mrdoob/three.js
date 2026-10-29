@@ -12,6 +12,17 @@ import { DataTexture } from '../../textures/DataTexture.js';
 
 const _previousBatchingMatrices = /*@__PURE__*/ new WeakMap();
 
+function onDispose( event ) {
+
+	const batchMesh = event.target;
+	const data = _previousBatchingMatrices.get( batchMesh );
+
+	batchMesh.removeEventListener( 'dispose', onDispose );
+	_previousBatchingMatrices.delete( batchMesh );
+	data.previousMatricesTexture.dispose();
+
+}
+
 /**
  * TSL function that retrieves the batching color for a given instance ID from a colors texture.
  *
@@ -100,6 +111,7 @@ function getPreviousNode( batchMesh, id ) {
 		};
 
 		_previousBatchingMatrices.set( batchMesh, data );
+		batchMesh.addEventListener( 'dispose', onDispose );
 
 	}
 
