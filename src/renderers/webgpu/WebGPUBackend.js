@@ -2146,24 +2146,31 @@ class WebGPUBackend extends Backend {
 
 		if ( object.isBatchedMesh === true ) {
 
-			const starts = object._multiDrawStarts;
-			const counts = object._multiDrawCounts;
-			const drawCount = object._multiDrawCount;
+			const starts = object._mergedDrawStarts;
+			const counts = object._mergedDrawCounts;
+			const instanceCounts = object._mergedDrawInstanceCounts;
+			const drawCount = object._mergedDrawCount;
 			const bytesPerElement = object._multiDrawBytesPerElement;
+
+			let firstInstance = 0;
 
 			for ( let i = 0; i < drawCount; i ++ ) {
 
+				const instanceCount = instanceCounts[ i ];
+
 				if ( hasIndex === true ) {
 
-					passEncoderGPU.drawIndexed( counts[ i ], 1, starts[ i ] / bytesPerElement, 0, i );
+					passEncoderGPU.drawIndexed( counts[ i ], instanceCount, starts[ i ] / bytesPerElement, 0, firstInstance );
 
 				} else {
 
-					passEncoderGPU.draw( counts[ i ], 1, starts[ i ], i );
+					passEncoderGPU.draw( counts[ i ], instanceCount, starts[ i ], firstInstance );
 
 				}
 
-				info.update( object, counts[ i ], 1 );
+				info.update( object, counts[ i ], instanceCount );
+
+				firstInstance += instanceCount;
 
 			}
 
@@ -2189,9 +2196,9 @@ class WebGPUBackend extends Backend {
 
 				passEncoderGPU.drawIndexed( indexCount, instanceCount, firstIndex, 0, 0 );
 
-			}
+				info.update( object, indexCount, instanceCount );
 
-			info.update( object, indexCount, instanceCount );
+			}
 
 		} else {
 
@@ -2211,14 +2218,13 @@ class WebGPUBackend extends Backend {
 
 				}
 
-
 			} else {
 
 				passEncoderGPU.draw( vertexCount, instanceCount, firstVertex, 0 );
 
-			}
+				info.update( object, vertexCount, instanceCount );
 
-			info.update( object, vertexCount, instanceCount );
+			}
 
 		}
 

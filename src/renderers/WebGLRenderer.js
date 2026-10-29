@@ -131,7 +131,7 @@ class WebGLRenderer {
 
 		const uintClearColor = new Uint32Array( 4 );
 		const intClearColor = new Int32Array( 4 );
-		const objectPosition = new Vector3();
+		const lightProbeGridUniforms = { textures: [], min: [], max: [], resolution: [] };
 
 		let currentRenderList = null;
 		let currentRenderState = null;
@@ -2197,6 +2197,16 @@ class WebGLRenderer {
 
 		}
 
+		function countLightProbeGrids( grids ) {
+
+			let count = 0;
+
+			for ( const grid of grids ) if ( grid.texture !== null ) count ++;
+
+			return count;
+
+		}
+
 		function getProgram( material, scene, object ) {
 
 			if ( scene.isScene !== true ) scene = _emptyScene; // scene could be a Mesh, Line, Points, ...
@@ -2312,7 +2322,7 @@ class WebGLRenderer {
 
 			}
 
-			materialProperties.lightProbeGrid = currentRenderState.state.lightProbeGridArray.length > 0;
+			materialProperties.numLightProbeGrids = countLightProbeGrids( currentRenderState.state.lightProbeGridArray );
 
 			materialProperties.currentProgram = program;
 			materialProperties.uniformsList = null;
@@ -2381,30 +2391,6 @@ class WebGLRenderer {
 			materialProperties.vertexAlphas = parameters.vertexAlphas;
 			materialProperties.vertexTangents = parameters.vertexTangents;
 			materialProperties.toneMapping = parameters.toneMapping;
-
-		}
-
-		function findLightProbeGrid( volumes, object ) {
-
-			if ( volumes.length === 0 ) return null;
-
-			if ( volumes.length === 1 ) {
-
-				return volumes[ 0 ].texture !== null ? volumes[ 0 ] : null;
-
-			}
-
-			objectPosition.setFromMatrixPosition( object.matrixWorld );
-
-			for ( let i = 0, l = volumes.length; i < l; i ++ ) {
-
-				const v = volumes[ i ];
-
-				if ( v.texture !== null && v.boundingBox.containsPoint( objectPosition ) ) return v;
-
-			}
-
-			return null;
 
 		}
 
@@ -2557,7 +2543,7 @@ class WebGLRenderer {
 
 					needsProgramChange = true;
 
-				} else if ( !! materialProperties.lightProbeGrid !== ( currentRenderState.state.lightProbeGridArray.length > 0 ) ) {
+				} else if ( materialProperties.numLightProbeGrids !== countLightProbeGrids( currentRenderState.state.lightProbeGridArray ) ) {
 
 					needsProgramChange = true;
 
@@ -2612,19 +2598,6 @@ class WebGLRenderer {
 				_currentMaterialId = material.id;
 
 				refreshMaterial = true;
-
-			}
-
-			if ( materialProperties.needsLights ) {
-
-				const objectVolume = findLightProbeGrid( currentRenderState.state.lightProbeGridArray, object );
-
-				if ( materialProperties.lightProbeGrid !== objectVolume ) {
-
-					materialProperties.lightProbeGrid = objectVolume;
-					refreshMaterial = true;
-
-				}
 
 			}
 
@@ -2815,14 +2788,29 @@ class WebGLRenderer {
 
 				// light probe volume
 
-				if ( materialProperties.needsLights && materialProperties.lightProbeGrid ) {
+				if ( materialProperties.needsLights && materialProperties.numLightProbeGrids > 0 ) {
 
-					const volume = materialProperties.lightProbeGrid;
+					const grids = lightProbeGridUniforms;
+					let count = 0;
 
-					m_uniforms.probesSH.value = volume.texture;
-					m_uniforms.probesMin.value.copy( volume.boundingBox.min );
-					m_uniforms.probesMax.value.copy( volume.boundingBox.max );
-					m_uniforms.probesResolution.value.copy( volume.resolution );
+					for ( const grid of currentRenderState.state.lightProbeGridArray ) {
+
+						if ( grid.texture === null ) continue;
+
+						grids.textures[ count ] = grid.texture;
+						grids.min[ count ] = grid.boundingBox.min;
+						grids.max[ count ] = grid.boundingBox.max;
+						grids.resolution[ count ] = grid.resolution;
+						count ++;
+
+					}
+
+					for ( const key in grids ) grids[ key ].length = count;
+
+					m_uniforms.probesSH.value = grids.textures;
+					m_uniforms.probesMin.value = grids.min;
+					m_uniforms.probesMax.value = grids.max;
+					m_uniforms.probesResolution.value = grids.resolution;
 
 				}
 

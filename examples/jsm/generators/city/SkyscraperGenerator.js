@@ -1105,6 +1105,10 @@ function buildFinialGeometry( p ) {
 
 // --- material ------------------------------------------------------------
 
+// the room behind a pane, shared by the room functions so the material carries it in one varying. flat so
+// floor() can't split one pane across two cell ids ( the centre is per-room )
+const roomCenter = /*@__PURE__*/ varying( attribute( 'roomCenter', 'vec3' ) ).setInterpolation( InterpolationSamplingType.FLAT, InterpolationSamplingMode.EITHER );
+
 // interior mapping: fakes a furnished room behind each glass pane in the fragment
 // shader — no geometry, no texture. every pane carries the room it looks into ( centre +
 // size, baked per window by addWindows ), so neighbouring panes share one interior. the
@@ -1112,8 +1116,6 @@ function buildFinialGeometry( p ) {
 // it meets are shaded procedurally, keyed off a per-room hash. returns vec4( colour, lit ).
 const interior = /*@__PURE__*/ Fn( () => {
 
-	// flat so floor() below can't split one pane across two cell ids ( centre is per-room )
-	const roomCenter = varying( attribute( 'roomCenter', 'vec3' ) ).setInterpolation( InterpolationSamplingType.FLAT, InterpolationSamplingMode.EITHER );
 	const roomSize = attribute( 'roomSize', 'vec2' );
 
 	// a per-face frame from the geometry normal ( holds on every facade, including the
@@ -1297,6 +1299,33 @@ const interior = /*@__PURE__*/ Fn( () => {
 
 } );
 
+// the room of interior() seen from far away: the average colour of its plaster and its lights, without
+// the raymarch. the room hash matches interior(), so the same rooms are lit. returns vec4( colour, lit ).
+const roomAverage = /*@__PURE__*/ Fn( () => {
+
+	const cell = floor( roomCenter.mul( 2.0 ) );
+	const ckey = uint( cell.x.add( 1 << 21 ) ).mul( uint( 73856093 ) )
+		.bitXor( uint( cell.y.add( 1 << 21 ) ).mul( uint( 19349663 ) ) )
+		.bitXor( uint( cell.z.add( 1 << 21 ) ).mul( uint( 83492791 ) ) ).toVar();
+	const hash = ( kx, ky, kz ) => ihash( ckey.add( uint( Math.round( ( kx + ky * 7 + kz * 13 ) * 100 ) ) ) );
+	const seed = hash( 12.9898, 78.233, 37.719 );
+	const seed2 = hash( 39.346, 11.135, 83.155 );
+	const lit = step( 0.8, hash( 63.21, 9.17, 51.43 ) );
+
+	const warmLight = mix( color( 0xffb845 ), color( 0xffe49c ), hash( 27.1, 4.9, 61.7 ) );
+	const coolLight = mix( color( 0xdfe8ff ), color( 0x9fb6ff ), hash( 8.3, 51.2, 17.6 ) );
+	const lightCol = select( hash( 44.7, 19.3, 6.1 ).greaterThan( 0.88 ), coolLight, warmLight );
+
+	// the plaster darkened by the depth falloff and the corners, plus the share of the lamp
+	let wall = mix( color( 0x9a8b73 ), color( 0x6f7a82 ), seed );
+	wall = mix( wall, color( 0xb9ad97 ), seed2.mul( 0.6 ) );
+	const average = wall.mul( 0.62 ).add( lightCol.mul( lit.mul( 0.25 ) ) );
+
+	const warmth = mix( vec3( 1.0, 1.0, 1.0 ), lightCol, lit.mul( 0.85 ) );
+	return vec4( average.mul( warmth ).mul( mix( float( 1.0 ), float( 1.3 ), lit ) ), lit );
+
+} );
+
 // the ground-floor shops' interior mapping: the same box raymarch as interior(), but
 // dressed as retail space ( tile floor, troffer-lit ceiling, stocked shelving, a sales
 // counter and a window display ), so storefronts read as shops rather than living rooms.
@@ -1304,8 +1333,6 @@ const interior = /*@__PURE__*/ Fn( () => {
 // returns vec4( colour, lit ), like interior().
 const shopInterior = /*@__PURE__*/ Fn( () => {
 
-	// flat for the same reason as interior(): floor() must not split a pane across cells
-	const roomCenter = varying( attribute( 'roomCenter', 'vec3' ) ).setInterpolation( InterpolationSamplingType.FLAT, InterpolationSamplingMode.EITHER );
 	const roomSize = attribute( 'roomSize', 'vec2' );
 
 	// the per-face frame and the view ray in room space ( across, up, depth ), as interior()
@@ -1565,18 +1592,30 @@ const valueFractal = ( p, octaves ) => {
  * what makes it compute-rasterizer friendly. `buildingBase` is the tower's flat
  * masonry colour as a TSL node: pass a `uniform( Color )` for a single tower, or a
  * per-fragment palette pick for a city, so the same material dresses both.
+ *
+ * @param {Node<vec3>} [buildingBase] - The flat masonry colour of the tower.
+ * @param {Object} [options] - The features of the material, cheaper materials leave some out.
+ * @param {boolean|string} [options.interiors=true] - Whether the windows show raymarched rooms, `'average'` shows the average
+ * colour and the light of each room without the raymarch, for distant towers. `false` shows dark glass.
+ * @param {boolean} [options.weathering=true] - Whether the surfaces are weathered by noise ( tone, soot, grime, dust ).
+ * @param {boolean} [options.relief=true] - Whether the brickwork and the AC louvers have a bump relief.
+ * @return {MeshStandardNodeMaterial} The facade material.
  */
-function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
+function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ), { interiors = true, weathering = true, relief = true } = {} ) {
 
 	const soot = color( 0x4a4236 );
+
+	// the weathering noise, about zero on average
+
+	const weatherNoise = ( node ) => weathering ? node : float( 0 );
 
 	// broad weathering, all driven from world position so it reads consistently
 	// across instanced and merged meshes: a slow tonal drift, a fine clay mottle,
 	// and sooty vertical streaks that pool low down
 
-	const tone = varying( mx_fractal_noise_float( positionWorld.mul( 0.03 ), 2 ) ).mul( 0.18 ); // very low frequency: evaluate per-vertex and interpolate over the facade's fine tessellation
-	const mottle = valueNoise( positionWorld.mul( 0.7 ) ).mul( 0.06 );
-	const streak = mx_fractal_noise_float( vec3( positionWorld.x.mul( 1.5 ), positionWorld.y.mul( 0.04 ), positionWorld.z.mul( 1.5 ) ), 2 );
+	const tone = weathering ? varying( mx_fractal_noise_float( positionWorld.mul( 0.03 ), 2 ) ).mul( 0.18 ) : float( 0 ); // very low frequency: evaluate per-vertex and interpolate over the facade's fine tessellation
+	const mottle = weatherNoise( valueNoise( positionWorld.mul( 0.7 ) ) ).mul( 0.06 );
+	const streak = weathering ? weatherNoise( mx_fractal_noise_float( vec3( positionWorld.x.mul( 1.5 ), positionWorld.y.mul( 0.04 ), positionWorld.z.mul( 1.5 ) ), 2 ) ) : float( - 1 );
 	const dirt = smoothstep( - 0.1, 0.45, streak ).mul( smoothstep( 210, 0, positionWorld.y ) ).mul( 0.6 );
 
 	// procedural terracotta brickwork in running bond, keyed off the BUILDING-LOCAL position
@@ -1629,7 +1668,7 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 	const lodBevel = texel.mul( 1.5 ).max( bevel );
 	const brickFace = smoothstep( 0, lodBevel, distU.mul( brickL ) ).mul( smoothstep( 0, lodBevel, distV.mul( brickH ) ) ).mul( wallFacing );
 	const reliefHeight = brickFace.mul( 0.003 );
-	const rough = valueNoise( positionWorld.mul( 0.5 ) ).mul( 0.08 ).add( 0.82 ).add( joint.mul( 0.12 ) );
+	const rough = weatherNoise( valueNoise( positionWorld.mul( 0.5 ) ) ).mul( 0.08 ).add( 0.82 ).add( joint.mul( 0.12 ) );
 
 	// the merged geometry carries a per-vertex partId; this material reads it and
 	// branches to reproduce each zone — no per-part materials, compute-raster friendly
@@ -1657,24 +1696,27 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 	// larger-scale grime instead of the wall's streaky soot — confined to those surfaces by a
 	// branch ( roofMask > 0 ), so the fractal never runs on the vertical facade
 	const roofMask = wallFacing.oneMinus();
-	const roofGrime = select( roofMask.greaterThan( 0 ), smoothstep( 0.0, 0.55, valueFractal( positionWorld.mul( 0.025 ), 3 ) ).mul( 0.22 ), float( 0 ) );
+	const roofGrime = weathering ? select( roofMask.greaterThan( 0 ), smoothstep( 0.0, 0.55, valueFractal( positionWorld.mul( 0.025 ), 3 ) ).mul( 0.22 ), float( 0 ) ) : float( 0 );
 	const stoneColor = mix( masonry, soot, mix( dirt, roofGrime, roofMask ) );
 
 	// glass: the interior-mapped room is the base colour; the smooth, low-roughness
 	// surface still lets a faint sky reflection ride over it, and lit rooms glow ( emissive ).
 	// shopfronts march their own retail interior ( select compiles to a branch, so only one
 	// raymarch runs per fragment ). toVar so the result is shared by colour and emissive
-	const room = select( isShopGlass, shopInterior(), interior() ).toVar();
+	let room = vec4( color( 0x1d2328 ), 0 );
+
+	if ( interiors === true ) room = select( isShopGlass, shopInterior(), interior() ).toVar();
+	else if ( interiors === 'average' ) room = roomAverage().toVar();
 
 	// grimy glazing: the room shows through, but muted by a dusty film and dirt pooled
 	// along the bottom of each pane, plus a baseline haze, so the panes read as old
 	// glass rather than open holes. the streaks run down the facade ( world Y barely
 	// scaled ); the pooled dirt uses the pane's own UV ( y = 0 at the sill ).
-	const filmNoise = mx_fractal_noise_float( vec3( positionWorld.x.mul( 1.3 ), positionWorld.y.mul( 0.06 ), positionWorld.z.mul( 1.3 ) ), 2 );
+	const filmNoise = weatherNoise( mx_fractal_noise_float( vec3( positionWorld.x.mul( 1.3 ), positionWorld.y.mul( 0.06 ), positionWorld.z.mul( 1.3 ) ), 2 ) );
 	const dustStreak = smoothstep( - 0.15, 0.5, filmNoise ).mul( 0.45 );
 	const pooled = smoothstep( 0.32, 0.0, uv().y ).mul( 0.4 );
 	const grime = float( 0.64 ).add( dustStreak ).add( pooled ).clamp( 0, 0.95 ); // baseline haze so the panes read as dirty glass, not open holes
-	const glassMottle = valueFractal( positionWorld.mul( 0.3 ), 2 ).mul( 0.5 ).add( 0.5 ); // shared by the upper dirty glass and the shop glazing, so the fractal runs once
+	const glassMottle = weatherNoise( valueFractal( positionWorld.mul( 0.3 ), 2 ) ).mul( 0.5 ).add( 0.5 ); // shared by the upper dirty glass and the shop glazing, so the fractal runs once
 	const dirtyGlass = mix( color( 0x13161a ), color( 0x232b31 ), glassMottle );
 
 	// dirt scatters the reflection too: rougher where grime pools at the sills, so the
@@ -1694,9 +1736,9 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 	const acLouver = acVent.mul( acDetail );
 
 	// plastic shell: off-white, some units dingier / yellowed than others
-	const acDinge = valueNoise( positionWorld.mul( 0.4 ) ).mul( 0.5 ).add( 0.5 ); // ~per-unit
+	const acDinge = weatherNoise( valueNoise( positionWorld.mul( 0.4 ) ) ).mul( 0.5 ).add( 0.5 ); // ~per-unit
 	const acPaint = mix( color( 0xf2f1ec ), color( 0xcfccc2 ), acDinge ) // bright white → light dingy grey, both lighter than the wall
-		.add( valueNoise( positionWorld.mul( 5 ) ).mul( 0.04 ) );
+		.add( weatherNoise( valueNoise( positionWorld.mul( 5 ) ) ).mul( 0.04 ) );
 
 	// a darker recessed grille panel inset into the lighter cabinet, with horizontal louvers
 	// inside it ( the front vents ) — the white plastic reads as a thin border frame
@@ -1707,7 +1749,7 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 	const acBody = acPaint.mul( mix( float( 1 ), acFin.mul( 0.42 ), acGrille ) ); // cabinet stays light; recessed grille goes dark grey
 
 	// grey-brown condensate grime streaking the lower edge ( plastic doesn't rust ); dirtier units streak more
-	const acStreak = valueFractal( vec3( positionWorld.x.mul( 6 ), positionWorld.y.mul( 0.5 ), positionWorld.z.mul( 6 ) ), 3 ).mul( 0.5 ).add( 0.5 );
+	const acStreak = weatherNoise( valueFractal( vec3( positionWorld.x.mul( 6 ), positionWorld.y.mul( 0.5 ), positionWorld.z.mul( 6 ) ), 3 ) ).mul( 0.5 ).add( 0.5 );
 	const acGrime = smoothstep( 0.4, 0.0, acUv.y ).mul( acStreak ).mul( acDinge.add( 0.3 ) );
 	const acColor = mix( acBody, color( 0x6f685a ), acGrime.mul( 0.5 ) );
 
@@ -1748,7 +1790,7 @@ function createSkyscraperMaterial( buildingBase = color( 0xc6c0b2 ) ) {
 	material.roughnessNode = select( isShopGlass, float( 0.14 ), select( isAwning, float( 0.85 ), select( isStore, float( 0.6 ), select( isGlass, glassRough, select( isOrnament, float( 0.8 ), select( isAC, acRough, rough ) ) ) ) ) ); // glass roughness rides on its grime, so dirty panes scatter the reflection
 	material.metalnessNode = float( 0 ); // all dielectric — stone, glass, fabric and the plastic AC shells
 	material.emissiveNode = select( isGlazing, room.xyz.mul( room.w ).mul( glazingEmit ), color( 0x000000 ) ); // lit rooms / shops glow through the panes
-	material.normalNode = bumpNormal( select( isGlass.or( isFrame ).or( isOrnament ).or( isShopGlass ).or( isStore ).or( isAwning ), float( 0 ), select( isAC, acRelief, reliefHeight ) ) ); // glass / frames / ornament / storefronts stay flat; AC has its own louvers
+	if ( relief ) material.normalNode = bumpNormal( select( isGlass.or( isFrame ).or( isOrnament ).or( isShopGlass ).or( isStore ).or( isAwning ), float( 0 ), select( isAC, acRelief, reliefHeight ) ) ); // glass / frames / ornament / storefronts stay flat; AC has its own louvers
 
 	return material;
 

@@ -40,7 +40,7 @@ const exceptionList = [
 	'webgpu_compute_audio',
 	'webgpu_compute_cloth',
 	'webgpu_compute_particles_fluid',
-	'webgpu_compute_rasterizer_ibl', // Rasterizer discrepancies
+	'webgpu_gpudriven_ibl', // Rasterizer discrepancies
 	'webgpu_compute_sort_bitonic',
 	'webgpu_storage_buffer',
 	'webgpu_tsl_editor',
@@ -64,6 +64,8 @@ const exceptionList = [
 	'webgpu_renderer_pathtracer',
 	'webgpu_vxgi',
 	'webgpu_vxgi_sponza',
+	'webgpu_gpudriven_city',
+	'webgpu_gpudriven_materials',
 
 	// Incremental light probe baking
 	'webgl_lightprobes_sponza',

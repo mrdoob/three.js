@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - color grading</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="example.css">
+		<link rel="icon" href="../files/favicon.ico">
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+			<div class="title-wrapper"><a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Color Grading</span></div>
+			<small>Use the GUI to compare Exported CUBE with Inspector Live. The exported LUT updates automatically when selected. Export from the Color Grading menu.</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { pass, renderOutput, texture3D } from 'three/tsl';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { LUTCubeLoader } from 'three/addons/loaders/LUTCubeLoader.js';
+			import { lut3D } from 'three/addons/tsl/display/Lut3DNode.js';
+			import { LUT_PRESETS, exportCubeFormat } from 'three/addons/inspector/extensions/color-grading/LUTMath.js';
+
+			const params = { preset: 'Cinematic Teal & Orange', mode: 'cube' };
+			let grading, exportedLUT;
+			let mode = 'original';
+
+			const renderer = new THREE.WebGPURenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.toneMapping = THREE.ACESFilmicToneMapping;
+			const inspector = new Inspector();
+			renderer.inspector = inspector;
+			document.body.appendChild( renderer.domElement );
+
+			const scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x404040 );
+			const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 100 );
+			camera.position.set( 0, 1.6, 12 );
+			const controls = new OrbitControls( camera, renderer.domElement );
+			controls.target.set( 0, 1.6, 0 );
+			controls.update();
+
+			scene.add( new THREE.HemisphereLight( 0xffffff, 0x303030, 2 ) );
+			const light = new THREE.DirectionalLight( 0xffffff, 4 );
+			light.position.set( - 3, 6, 5 );
+			scene.add( light );
+
+			const geometry = new THREE.SphereGeometry( 0.5, 32, 24 );
+			for ( const [ index, color ] of [ 0xe4523d, 0x3fbd80, 0x367de0, 0xf0c44a, 0xc368cb ].entries() ) {
+
+				const sphere = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial( { color, roughness: index / 6 + 0.15 } ) );
+				sphere.position.set( ( index - 2 ) * 1.45, 0.65, 0 );
+				scene.add( sphere );
+
+			}
+
+			// Unlit gradients make changes to brightness and color easier to compare.
+			const chart = document.createElement( 'canvas' );
+			chart.width = 512;
+			chart.height = 192;
+			const context = chart.getContext( '2d' );
+			for ( let x = 0; x < chart.width; x ++ ) {
+
+				const level = Math.round( x / ( chart.width - 1 ) * 255 );
+				context.fillStyle = `rgb(${level},${level},${level})`;
+				context.fillRect( x, 0, 1, 64 );
+				context.fillStyle = `hsl(${x / chart.width * 360},80%,50%)`;
+				context.fillRect( x, 64, 1, 64 );
+				context.fillStyle = `hsl(${x / chart.width * 360},45%,65%)`;
+				context.fillRect( x, 128, 1, 64 );
+
+			}
+
+			const chartTexture = new THREE.CanvasTexture( chart );
+			chartTexture.colorSpace = THREE.SRGBColorSpace;
+			const chartMesh = new THREE.Mesh( new THREE.PlaneGeometry( 6.8, 2.55 ), new THREE.MeshBasicMaterial( { map: chartTexture } ) );
+			chartMesh.position.set( 0, 2.6, - 1.7 );
+			scene.add( chartMesh );
+
+			const scenePass = pass( scene, camera );
+			const pipeline = new THREE.RenderPipeline( renderer, scenePass );
+
+			function setBasePipeline() {
+
+				pipeline.outputNode = scenePass;
+				pipeline.outputColorTransform = true;
+				pipeline.needsUpdate = true;
+
+			}
+
+			function setMode( nextMode ) {
+
+				// Remove Live Preview before applying the exported LUT.
+				if ( grading.sceneGradingEnabled ) grading.gradingBtn.click();
+				setBasePipeline();
+				mode = params.mode = nextMode;
+				const rendererSettings = grading.modulesMap.get( 'renderer' ).params;
+				renderer.toneMapping = rendererSettings.toneMapping;
+				renderer.toneMappingExposure = rendererSettings.exposure;
+
+				if ( mode === 'live' ) {
+
+					grading.gradingBtn.click();
+
+				} else if ( mode === 'cube' ) {
+
+					const previousLUT = exportedLUT;
+					const cube = exportCubeFormat( grading.generate3DLUTData(), grading.lutSize );
+					exportedLUT = new LUTCubeLoader().setType( THREE.FloatType ).parse( cube );
+
+					// Exported LUTs operate on display colors, after tone mapping.
+					pipeline.outputNode = lut3D( renderOutput( scenePass, rendererSettings.toneMapping ), texture3D( exportedLUT.texture3D ), exportedLUT.size, 1 );
+					pipeline.outputColorTransform = false;
+					previousLUT?.texture3D.dispose();
+
+				}
+
+			}
+
+			function loadPreset() {
+
+				grading.load( { params: LUT_PRESETS[ params.preset ] } );
+				setMode( mode );
+
+			}
+
+			async function init() {
+
+				await renderer.init();
+				pipeline.render();
+				inspector.updateTabs();
+				await Promise.resolve();
+				await inspector.settings.setActiveExtension( 'Color Grading', true );
+				grading = inspector.settings.extensions[ 'Color Grading' ].tab;
+				inspector.updateTabs();
+
+				// The native Live Preview button switches away from the exported LUT too.
+				grading.gradingBtn.addEventListener( 'click', () => {
+
+					if ( ! grading.sceneGradingEnabled ) setBasePipeline();
+
+				}, true );
+				grading.gradingBtn.addEventListener( 'click', () => {
+
+					mode = params.mode = grading.sceneGradingEnabled ? 'live' : 'original';
+
+				} );
+
+				loadPreset();
+				setMode( 'cube' );
+
+				const gui = inspector.createParameters( 'Color Grading' );
+				gui.add( params, 'preset', Object.keys( LUT_PRESETS ) ).name( 'Preset' ).onChange( loadPreset );
+				gui.add( params, 'mode', { Original: 'original', 'Exported CUBE': 'cube', 'Inspector Live': 'live' } ).name( 'View' ).listen().onChange( value => {
+
+					if ( value !== mode ) setMode( value );
+
+				} );
+				inspector.setActiveTab( grading );
+				if ( ! inspector.profiler.panel.classList.contains( 'visible' ) ) inspector.profiler.togglePanel();
+				renderer.setAnimationLoop( () => pipeline.render() );
+
+			}
+
+			window.addEventListener( 'resize', () => {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			} );
+
+			init().catch( error => {
+
+				document.querySelector( '#info small' ).textContent = `Unable to start: ${error.message}`;
+				console.error( error );
+
+			} );
+
+		</script>
+	</body>
+</html>

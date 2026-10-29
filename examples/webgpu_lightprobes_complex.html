@@ -313,16 +313,13 @@
 
 					}
 
-					// The `falloff` fades each volume past its boundary so the two
-					// rooms blend smoothly without bleeding into each other.
+					// Each volume lights its own room.
 
-					probesLeft = new LightProbeGrid( 7.8, 4.7, 7.6, resolution, resolution, resolution );
-					probesLeft.position.set( - 3.9, 2.45, 0 );
-					probesLeft.falloff = 1.0;
+					probesLeft = new LightProbeGrid( 8, 5, 8, resolution, resolution, resolution );
+					probesLeft.position.set( - 4, 2.5, 0 );
 
-					probesRight = new LightProbeGrid( 7.8, 4.7, 7.6, resolution, resolution, resolution );
-					probesRight.position.set( 3.9, 2.45, 0 );
-					probesRight.falloff = 1.0;
+					probesRight = new LightProbeGrid( 8, 5, 8, resolution, resolution, resolution );
+					probesRight.position.set( 4, 2.5, 0 );
 
 					// Keep the helper spheres out of the cubemap captures.
 

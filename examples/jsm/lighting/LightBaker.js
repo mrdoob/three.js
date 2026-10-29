@@ -2593,7 +2593,7 @@ function createSkySphere( scene ) {
  */
 function lightProbeGridDirection( probes, position, normal ) {
 
-	const offset = uniform( probes.boundingBox.getSize( new Vector3() ).divide( probes.resolution.clone().subScalar( 1 ) ).multiplyScalar( 0.5 ) );
+	const offset = uniform( probes.boundingBox.getSize( new Vector3() ).divide( probes.resolution ).multiplyScalar( 0.5 ) );
 	const axes = [[ 1, 0, 0 ], [ - 1, 0, 0 ], [ 0, 1, 0 ], [ 0, - 1, 0 ], [ 0, 0, 1 ], [ 0, 0, - 1 ]];
 	const [ px, nx, py, ny, pz, nz ] = axes.map( ( axis ) => luminance( lightProbeGridIrradiance( probes, position.add( normal.sub( vec3( ...axis ) ).mul( offset ) ), vec3( ...axis ) ) ) );
 

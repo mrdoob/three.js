@@ -564,12 +564,13 @@ function buildingColorNode( layout, seed = 0 ) {
  *
  * @param {Object} layout - The city layout.
  * @param {number|Node<uint>} [seed=0] - A fixed seed, or {@link CityGenerator#seedNode} for a changing city.
+ * @param {Object} [options] - The features of the material, see {@link createSkyscraperMaterial}.
  * @return {MeshStandardNodeMaterial} The building material.
  */
-function createBuildingMaterial( layout, seed = 0 ) {
+function createBuildingMaterial( layout, seed = 0, options = {} ) {
 
 	// the pick is constant across a tower, so resolve it once per vertex ( varying )
-	return createSkyscraperMaterial( varying( buildingColorNode( layout, seed ) ) );
+	return createSkyscraperMaterial( varying( buildingColorNode( layout, seed ) ), options );
 
 }
 
