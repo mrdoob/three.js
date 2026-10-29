@@ -384,7 +384,6 @@ class GodraysNode extends Node {
 
 				const lightToPos = worldPos.sub( lightPos ).toConst();
 
-				// Point light shadow maps store the distance to the light as depth.
 				const viewZ = lightToPos.length().negate();
 
 				const depth = viewZToPerspectiveDepth( viewZ, this._shadowCameraNear, this._shadowCameraFar );
