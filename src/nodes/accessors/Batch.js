@@ -10,8 +10,6 @@ import { varyingProperty } from '../core/PropertyNode.js';
 import { OnObjectUpdate, OnAfterObjectUpdate } from '../utils/EventNode.js';
 import { DataTexture } from '../../textures/DataTexture.js';
 
-const _previousMatricesVersions = /*@__PURE__*/ new WeakMap();
-
 /**
  * TSL function that retrieves the batching color for a given instance ID from a colors texture.
  *
@@ -85,9 +83,7 @@ function getPreviousMatricesTexture( batchMesh ) {
 		const { image, format, type, version } = batchMesh._matricesTexture;
 
 		previousMatricesTexture = new DataTexture( image.data.slice(), image.width, image.height, format, type );
-		previousMatricesTexture.needsUpdate = true;
-
-		_previousMatricesVersions.set( previousMatricesTexture, version );
+		previousMatricesTexture.version = version;
 
 		batchMesh._previousMatricesTexture = previousMatricesTexture;
 
@@ -151,12 +147,10 @@ export const batch = /*@__PURE__*/ Fn( ( [ batchMesh ], builder ) => {
 			const previousMatricesTexture = getPreviousMatricesTexture( object );
 			const matricesTexture = object._matricesTexture;
 
-			if ( _previousMatricesVersions.get( previousMatricesTexture ) !== matricesTexture.version ) {
+			if ( previousMatricesTexture.version !== matricesTexture.version ) {
 
 				previousMatricesTexture.image.data.set( matricesTexture.image.data );
-				previousMatricesTexture.needsUpdate = true;
-
-				_previousMatricesVersions.set( previousMatricesTexture, matricesTexture.version );
+				previousMatricesTexture.version = matricesTexture.version;
 
 			}
 
