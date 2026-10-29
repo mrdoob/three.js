@@ -521,13 +521,6 @@ export class ColorGrading extends Extension {
 				this.selectedToneMapping = comp.params.toneMapping;
 				if ( this.sceneGradingEnabled ) {
 
-					const renderer = this.inspector ? this.inspector.getRenderer() : null;
-					if ( renderer ) {
-
-						renderer.toneMappingExposure = comp.params.exposure;
-
-					}
-
 					this._applyLiveGrading();
 
 				}
@@ -1616,7 +1609,7 @@ export class ColorGrading extends Extension {
 
 	generate3DLUTData( size = this.lutSize, buffer = null ) {
 
-		if ( buffer === null ) {
+		if ( buffer === null || buffer.length !== size * size * size * 4 ) {
 
 			buffer = new Float32Array( size * size * size * 4 );
 
@@ -1656,9 +1649,10 @@ export class ColorGrading extends Extension {
 
 					}
 
-					buffer[ idx ++ ] = _pixel[ 0 ];
-					buffer[ idx ++ ] = _pixel[ 1 ];
-					buffer[ idx ++ ] = _pixel[ 2 ];
+					// Share the same output range with the 8-bit PNG export.
+					buffer[ idx ++ ] = Math.max( 0, Math.min( 1, _pixel[ 0 ] ) );
+					buffer[ idx ++ ] = Math.max( 0, Math.min( 1, _pixel[ 1 ] ) );
+					buffer[ idx ++ ] = Math.max( 0, Math.min( 1, _pixel[ 2 ] ) );
 					buffer[ idx ++ ] = 1.0;
 
 				}
@@ -1785,6 +1779,7 @@ export class ColorGrading extends Extension {
 			modulesData[ id ] = {
 				type: modType,
 				mode: mode,
+				enabled: comp.enabled,
 				params: JSON.parse( JSON.stringify( comp.params ) )
 			};
 
@@ -1926,6 +1921,7 @@ export class ColorGrading extends Extension {
 
 		if ( typeof json.lutSize === 'number' ) {
 
+			this._lutSizeChanged = this._lutSizeChanged || this.lutSize !== json.lutSize;
 			this.lutSize = json.lutSize;
 			if ( this.lutSizeSelect ) {
 
@@ -1955,6 +1951,8 @@ export class ColorGrading extends Extension {
 		}
 
 		if ( json.modules && typeof json.modules === 'object' ) {
+
+			const pipelineOrder = [ ...this.pipelineOrder ];
 
 			this.modulesMap.forEach( ( comp, id ) => {
 
@@ -2008,7 +2006,13 @@ export class ColorGrading extends Extension {
 
 				}
 
+				const comp = this.modulesMap.get( id );
+				if ( comp ) comp.enabled = mData.enabled !== false;
+
 			} );
+
+			// Creating missing cards must not append duplicate or inactive steps.
+			this.pipelineOrder = pipelineOrder;
 
 		} else if ( params ) {
 
@@ -2297,8 +2301,6 @@ export class ColorGrading extends Extension {
 
 	init( inspector ) {
 
-		super.init( inspector );
-
 		LUT3DStyle.init( inspector.nonce );
 
 		const renderer = inspector.getRenderer();
@@ -2313,9 +2315,13 @@ export class ColorGrading extends Extension {
 			rendererComp.defaultExposure = defaultExp;
 			rendererComp.params.toneMapping = defaultTM;
 			rendererComp.params.exposure = defaultExp;
+			this.selectedToneMapping = defaultTM;
 			rendererComp.updateUI();
 
 		}
+
+		// Restore saved settings after initializing the renderer defaults.
+		super.init( inspector );
 
 		this.onOrientationChange();
 		this.onLayoutChange();
@@ -2403,6 +2409,8 @@ export class ColorGrading extends Extension {
 
 	_applyLiveGrading() {
 
+		this._lutSizeChanged = this._lutSizeChanged || ( this.lutTexture !== null && this.lutTexture.image.width !== this.lutSize );
+
 		if ( ! this.lutTexture || this._lutSizeChanged || this._lutNeedsUpdate ) {
 
 			const buffer = ( this.lutTexture && this.lutTexture.image && ! this._lutSizeChanged ) ? this.lutTexture.image.data : null;
@@ -2485,24 +2493,15 @@ export class ColorGrading extends Extension {
 			this._originalPipelineSettings = {
 				outputNode: renderPipeline.outputNode,
 				outputColorTransform: renderPipeline.outputColorTransform,
-				rendererToneMapping: renderer.toneMapping
+				rendererToneMapping: renderer.toneMapping,
+				rendererExposure: renderer.toneMappingExposure
 			};
-
-			if ( renderer.toneMapping !== undefined ) {
-
-				this.selectedToneMapping = renderer.toneMapping;
-				const rendererComp = this.modulesMap.get( 'renderer' );
-				if ( rendererComp ) {
-
-					rendererComp.fromJSON( { params: { toneMapping: this.selectedToneMapping } } );
-
-				}
-
-			}
 
 		}
 
 		renderer.toneMapping = this.selectedToneMapping;
+		const rendererComp = this.modulesMap.get( 'renderer' );
+		if ( rendererComp ) renderer.toneMappingExposure = rendererComp.params.exposure;
 		renderPipeline.outputColorTransform = false;
 
 		let inputNode = this._originalPipelineSettings.outputNode;
@@ -2515,7 +2514,7 @@ export class ColorGrading extends Extension {
 
 		if ( inputNode ) {
 
-			const outputPass = renderOutput( inputNode, this.selectedToneMapping );
+			const outputPass = this._originalPipelineSettings.outputColorTransform ? renderOutput( inputNode, this.selectedToneMapping ) : inputNode;
 			this.lutPassNode = lut3D( outputPass, texture3D( this.lutTexture ), this.lutSize, 1.0 );
 
 			renderPipeline.outputNode = this.lutPassNode;
@@ -2543,6 +2542,12 @@ export class ColorGrading extends Extension {
 			if ( renderer && this._originalPipelineSettings.rendererToneMapping !== undefined ) {
 
 				renderer.toneMapping = this._originalPipelineSettings.rendererToneMapping;
+
+			}
+
+			if ( renderer && this._originalPipelineSettings.rendererExposure !== undefined ) {
+
+				renderer.toneMappingExposure = this._originalPipelineSettings.rendererExposure;
 
 			}
 
