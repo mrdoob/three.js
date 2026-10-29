@@ -655,7 +655,7 @@ class ShadowNode extends ShadowBaseNode {
 
 		if ( renderer.isCompiling ) {
 
-			renderer.compileAsync( scene, shadow.camera ); // compiles the shadow pass without rendering it, see updateBefore()
+			renderer.compileAsync( scene, shadow.camera );
 
 		} else {
 
@@ -736,8 +736,6 @@ class ShadowNode extends ShadowBaseNode {
 		const depth = this.shadowMap.depth;
 		this.vsmShadowMapVertical.setSize( shadow.mapSize.width, shadow.mapSize.height, depth );
 		this.vsmShadowMapHorizontal.setSize( shadow.mapSize.width, shadow.mapSize.height, depth );
-
-		// during precompilation, the blur passes are compiled without rendering them, see updateBefore()
 
 		const precompile = renderer.isCompiling;
 

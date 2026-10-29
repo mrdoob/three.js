@@ -324,7 +324,7 @@ class TileShadowNode extends ShadowBaseNode {
 
 		if ( renderer.isCompiling ) {
 
-			renderer.compileAsync( scene, this.cameraArray ); // compiles the shadow pass without rendering it, see updateBefore()
+			renderer.compileAsync( scene, this.cameraArray );
 
 		} else {
 

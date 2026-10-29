@@ -304,7 +304,7 @@ class PointShadowNode extends ShadowNode {
 
 			if ( renderer.isCompiling ) {
 
-				renderer.compileAsync( scene, camera ); // compiles the shadow pass without rendering it, see ShadowNode
+				renderer.compileAsync( scene, camera );
 
 			} else {
 

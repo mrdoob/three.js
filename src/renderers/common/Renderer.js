@@ -1041,10 +1041,7 @@ class Renderer {
 		const previousHandleObjectFunction = this._handleObjectFunction;
 		const previousCompilationPromises = this._compilationPromises;
 
-		// a shadow node calls compileAsync() for its shadow pass while a precompilation builds a
-		// shadow receiver, see ShadowNode#updateBefore(). The state of such a pass, e.g. the shadow
-		// material of each caster, is only set up during this call so the objects are built right
-		// away. Their pipelines are compiled with the pipelines of the running precompilation.
+		// nested calls, e.g. from shadow nodes, build their objects right away and add their pipelines to the running precompilation
 
 		const parentPrecompilationState = this._precompilationState;
 
@@ -1066,8 +1063,6 @@ class Renderer {
 		const activeMipmapLevel = this._activeMipmapLevel;
 
 		// a state snapshot is taken once at the beginning and reapplied every time precompilation continues.
-		// `item` is the work item that is currently processed, see `_beginPreCompile()`. `pipelinePromises` collects its pipelines.
-		// `renderId` is shared by the whole compilation so `RENDER` updates of nodes, e.g. shadows, run once
 
 		// the work items always set their render target, without the frame buffer target the current one is restored
 
@@ -1118,12 +1113,14 @@ class Renderer {
 
 		// Use the same render list as render() to ensure lightsNode matches between compileAsync and render,
 		// sceneRef provides the lights when compiling individual objects of a target scene
+
 		const renderList = this._renderLists.get( targetScene !== scene ? sceneRef : scene, camera, this.lighting );
 		this.drawingPipeline.beginRenderList( renderList );
 
 		this.drawingPipeline.project( scene, camera, 0, renderList, renderContext.clippingContext );
 
 		// include lights from target scene
+
 		if ( targetScene !== scene ) {
 
 			targetScene.traverseVisible( function ( object ) {

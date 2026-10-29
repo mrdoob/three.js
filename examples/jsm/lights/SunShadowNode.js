@@ -284,7 +284,7 @@ class SunShadowNode extends ShadowNode {
 
 			if ( renderer.isCompiling ) {
 
-				renderer.compileAsync( scene, shadow.getCamera( i ) ); // compiles the shadow pass without rendering it, see ShadowNode
+				renderer.compileAsync( scene, shadow.getCamera( i ) );
 
 			} else {
 
