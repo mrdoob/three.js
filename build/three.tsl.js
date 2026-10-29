@@ -24684,9 +24684,11 @@ const batch = /*@__PURE__*/ Fn( ( [ batchMesh ], builder ) => {
 
 	}
 
+	const drawFormat = builder.renderer.backend.isWebGPUBackend === true ? 'merged' : 'multiDraw';
+
 	OnObjectUpdate( ( { object, camera, material } ) => {
 
-		object._updateDrawParameters( camera, object.geometry, material );
+		object._updateDrawParameters( camera, object.geometry, material, drawFormat );
 
 	} );
 
@@ -35307,6 +35309,12 @@ class LightsNode extends Node {
 		for ( const lightNode of lightNodes ) {
 
 			lightNode.build( builder );
+
+		}
+
+		if ( builder.context.lightProbeIrradiance !== undefined ) {
+
+			builder.context.irradiance.addAssign( builder.context.lightProbeIrradiance );
 
 		}
 
