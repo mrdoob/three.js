@@ -353,25 +353,6 @@ export default /* glsl */`
 
 	#if defined( SHADOWMAP_TYPE_PCF )
 
-	// Depth stored in the cube shadow map for a position relative to the light. Each face stores
-	// the depth along its own axis, which is the largest component of the position.
-	float getPointShadowDepth( vec3 position, float shadowBias, float shadowCameraNear, float shadowCameraFar ) {
-
-		vec3 absVec = abs( position );
-		float viewSpaceZ = max( max( absVec.x, absVec.y ), absVec.z );
-
-		#ifdef USE_REVERSED_DEPTH_BUFFER
-
-			return ( shadowCameraNear * ( shadowCameraFar - viewSpaceZ ) ) / ( viewSpaceZ * ( shadowCameraFar - shadowCameraNear ) ) - shadowBias;
-
-		#else
-
-			return ( shadowCameraFar * ( viewSpaceZ - shadowCameraNear ) ) / ( viewSpaceZ * ( shadowCameraFar - shadowCameraNear ) ) + shadowBias;
-
-		#endif
-
-	}
-
 	float getPointShadow( samplerCubeShadow shadowMap, vec2 shadowMapSize, float shadowIntensity, float shadowBias, float shadowRadius, vec4 shadowCoord, float shadowCameraNear, float shadowCameraFar ) {
 
 		float shadow = 1.0;
@@ -390,7 +371,24 @@ export default /* glsl */`
 
 		if ( viewSpaceZ - shadowCameraFar <= 0.0 && viewSpaceZ - shadowCameraNear >= 0.0 ) {
 
+			// Each sample is compared against the depth of the point next to the fragment in its direction,
+			// on whichever face of the cube it falls, so the comparison is the same on every face. A face
+			// stores the depth along its own axis, which for the point at direction * lightDistance is
+			// lightDistance * max( |x|, |y|, |z| ) of the direction, and perspective depth is a + b / z.
 			float lightDistance = length( lightToPosition );
+			float depthRange = shadowCameraFar - shadowCameraNear;
+
+			#ifdef USE_REVERSED_DEPTH_BUFFER
+
+				float depthA = - shadowCameraNear / depthRange - shadowBias;
+				float depthB = shadowCameraNear * shadowCameraFar / ( depthRange * lightDistance );
+
+			#else
+
+				float depthA = shadowCameraFar / depthRange + shadowBias;
+				float depthB = - shadowCameraNear * shadowCameraFar / ( depthRange * lightDistance );
+
+			#endif
 
 			// Hardware PCF with LinearFilter gives us 4-tap filtering per sample
 			// Use Vogel disk + IGN sampling for better quality
@@ -411,10 +409,9 @@ export default /* glsl */`
 
 				vec2 offset = vogelDiskSample( i, 5, phi );
 				vec3 direction = bd3D + ( tangent * offset.x + bitangent * offset.y ) * texelSize;
+				vec3 absDirection = abs( direction );
 
-				// The sample can fall on a different face of the cube, so compare against the depth
-				// that face stores for a point at the fragment's distance in the sample direction.
-				float dp = getPointShadowDepth( normalize( direction ) * lightDistance, shadowBias, shadowCameraNear, shadowCameraFar );
+				float dp = depthA + depthB / max( max( absDirection.x, absDirection.y ), absDirection.z );
 
 				shadow += texture( shadowMap, vec4( direction, dp ) );
 
