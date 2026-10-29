@@ -1194,9 +1194,11 @@ class SSRNode extends Node {
 						Loop( { start: int( 0 ), end: int( 8 ), type: 'int', condition: '<' }, () => {
 
 							const sMid = hitSLo.add( hitSHi ).mul( 0.5 ).toVar();
-							const sceneZMid = getViewZ( sampleDepth( screenPosAt( sMid ).mul( invResolution ) ) );
+							const uvMid = screenPosAt( sMid ).mul( invResolution ).toConst();
+							const sceneZMid = getViewZ( sampleDepth( uvMid ) );
+							const frontFacing = dot( viewReflectDir, this.normalNode.sample( uvMid ).rgb.normalize() ).lessThan( 0 );
 
-							If( reflectRayZAt( sMid ).lessThanEqual( sceneZMid ), () => {
+							If( reflectRayZAt( sMid ).lessThanEqual( sceneZMid ).and( frontFacing ), () => {
 
 								hitSHi.assign( sMid );
 
