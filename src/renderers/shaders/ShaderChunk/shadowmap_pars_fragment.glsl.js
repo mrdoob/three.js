@@ -364,10 +364,9 @@ export default /* glsl */`
 		// Direction from light to fragment
 		vec3 bd3D = normalize( lightToPosition );
 
-		// For cube shadow maps, depth is stored as distance along each face's view axis, not radial distance
-		// The view-space depth is the maximum component of the direction vector (which face is sampled)
-		vec3 absVec = abs( lightToPosition );
-		float viewSpaceZ = max( max( absVec.x, absVec.y ), absVec.z );
+		// Cube shadow maps store the distance to the light as perspective depth, so the depth
+		// of a point is the same on every face
+		float viewSpaceZ = length( lightToPosition );
 
 		if ( viewSpaceZ - shadowCameraFar <= 0.0 && viewSpaceZ - shadowCameraNear >= 0.0 ) {
 
@@ -428,10 +427,9 @@ export default /* glsl */`
 		// the vector from the light to the world-space position of the fragment.
 		vec3 lightToPosition = shadowCoord.xyz;
 
-		// For cube shadow maps, depth is stored as distance along each face's view axis, not radial distance
-		// The view-space depth is the maximum component of the direction vector (which face is sampled)
-		vec3 absVec = abs( lightToPosition );
-		float viewSpaceZ = max( max( absVec.x, absVec.y ), absVec.z );
+		// Cube shadow maps store the distance to the light as perspective depth, so the depth
+		// of a point is the same on every face
+		float viewSpaceZ = length( lightToPosition );
 
 		if ( viewSpaceZ - shadowCameraFar <= 0.0 && viewSpaceZ - shadowCameraNear >= 0.0 ) {
 

@@ -14,11 +14,33 @@ import { screenCoordinate } from '../display/ScreenNode.js';
 import { interleavedGradientNoise, vogelDiskSample } from '../utils/PostProcessingUtils.js';
 import { abs, normalize, cross } from '../math/MathNode.js';
 import { viewZToLogarithmicDepth, viewZToPerspectiveDepth, viewZToReversedPerspectiveDepth } from '../display/ViewportDepthNode.js';
+import { positionWorld } from '../accessors/Position.js';
 
 const _clearColor = /*@__PURE__*/ new Color();
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _lightPositionWorld = /*@__PURE__*/ new Vector3();
 const _lookTarget = /*@__PURE__*/ new Vector3();
+
+/**
+ * Converts a distance to the light into the depth stored in the cube shadow map. Storing the
+ * distance instead of the depth along each face's axis makes the depth of a point the same on
+ * every face, so surfaces don't need more bias near the edges of a face.
+ *
+ * @private
+ * @param {Node<float>} distance - The distance to the light.
+ * @param {Node<float>} near - The near plane of the shadow camera.
+ * @param {Node<float>} far - The far plane of the shadow camera.
+ * @param {Renderer} renderer - The renderer.
+ * @return {Node<float>} The depth.
+ */
+const distanceToDepth = ( distance, near, far, renderer ) => {
+
+	if ( renderer.reversedDepthBuffer ) return viewZToReversedPerspectiveDepth( distance.negate(), near, far );
+	if ( renderer.logarithmicDepthBuffer ) return viewZToLogarithmicDepth( distance.negate(), near, far );
+
+	return viewZToPerspectiveDepth( distance.negate(), near, far );
+
+};
 
 // Cube map face directions and up vectors for point light shadows
 // Face order: +X, -X, +Y, -Y, +Z, -Z
@@ -100,8 +122,7 @@ const pointShadowFilter = /*@__PURE__*/ Fn( ( { filterFn, depthTexture, shadowCo
 	// for point lights, the uniform @vShadowCoord is re-purposed to hold
 	// the vector from the light to the world-space position of the fragment.
 	const shadowPosition = shadowCoord.xyz.toConst();
-	const shadowPositionAbs = shadowPosition.abs().toConst();
-	const viewZ = shadowPositionAbs.x.max( shadowPositionAbs.y ).max( shadowPositionAbs.z );
+	const viewZ = shadowPosition.length().toConst();
 
 	const shadowCameraNear = uniform( 'float' ).setGroup( renderGroup ).onRenderUpdate( () => shadow.camera.near );
 	const shadowCameraFar = uniform( 'float' ).setGroup( renderGroup ).onRenderUpdate( () => shadow.camera.far );
@@ -111,21 +132,14 @@ const pointShadowFilter = /*@__PURE__*/ Fn( ( { filterFn, depthTexture, shadowCo
 
 	If( viewZ.sub( shadowCameraFar ).lessThanEqual( 0.0 ).and( viewZ.sub( shadowCameraNear ).greaterThanEqual( 0.0 ) ), () => {
 
-		let dp;
+		const dp = distanceToDepth( viewZ, shadowCameraNear, shadowCameraFar, builder.renderer ).toVar();
 
 		if ( builder.renderer.reversedDepthBuffer ) {
 
-			dp = viewZToReversedPerspectiveDepth( viewZ.negate(), shadowCameraNear, shadowCameraFar );
 			dp.subAssign( bias );
-
-		} else if ( builder.renderer.logarithmicDepthBuffer ) {
-
-			dp = viewZToLogarithmicDepth( viewZ.negate(), shadowCameraNear, shadowCameraFar );
-			dp.addAssign( bias );
 
 		} else {
 
-			dp = viewZToPerspectiveDepth( viewZ.negate(), shadowCameraNear, shadowCameraFar );
 			dp.addAssign( bias );
 
 		}
@@ -229,6 +243,37 @@ class PointShadowNode extends ShadowNode {
 		shadowMap.depthTexture = depthTexture;
 
 		return { shadowMap, depthTexture };
+
+	}
+
+	/**
+	 * Overwrites the default implementation so the shadow pass stores the distance to
+	 * the light as depth, see `distanceToDepth()`.
+	 *
+	 * @return {NodeMaterial} The shadow material.
+	 */
+	getShadowMaterial() {
+
+		const material = super.getShadowMaterial();
+
+		if ( material.depthNode === null ) {
+
+			const { light, shadow } = this;
+			const lightPosition = new Vector3();
+
+			const lightPositionWorld = uniform( lightPosition ).setGroup( renderGroup ).onRenderUpdate( () => lightPosition.setFromMatrixPosition( light.matrixWorld ) );
+			const near = reference( 'near', 'float', shadow.camera ).setGroup( renderGroup );
+			const far = reference( 'far', 'float', shadow.camera ).setGroup( renderGroup );
+
+			material.depthNode = Fn( ( inputs, builder ) => {
+
+				return distanceToDepth( positionWorld.sub( lightPositionWorld ).length(), near, far, builder.renderer );
+
+			} )();
+
+		}
+
+		return material;
 
 	}
 
