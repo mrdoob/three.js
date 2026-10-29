@@ -66,13 +66,14 @@ function evaluateGridIrradiance( atlas, uvw, res, normal ) {
 function getGridIrradiance( light, min, max, res, intensity, falloff, position, normal ) {
 
 	const range = max.sub( min );
-	const resMinusOne = res.sub( 1.0 );
-	const spacing = range.div( resMinusOne );
+	const spacing = range.div( res );
 
-	// Offset along the normal by half a probe spacing, then remap to texel centers.
+	// Offset along the normal by half a probe spacing. The bounds hold one cell per
+	// probe, so they map directly to the probe grid; clamp to the outermost texel centers.
 
 	const samplePos = position.add( normal.mul( spacing ).mul( 0.5 ) );
-	const uvw = samplePos.sub( min ).div( range ).clamp( 0.0, 1.0 ).mul( resMinusOne ).div( res ).add( vec3( 0.5 ).div( res ) );
+	const halfTexel = vec3( 0.5 ).div( res );
+	const uvw = samplePos.sub( min ).div( range ).clamp( halfTexel, halfTexel.oneMinus() );
 
 	let irradiance = evaluateGridIrradiance( texture3D( light.texture ), uvw, res, normal ).mul( intensity );
 

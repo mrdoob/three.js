@@ -16,15 +16,14 @@ vec3 getLightProbeGridIrradiance( vec3 worldPos, vec3 worldNormal ) {
 
 	vec3 res = probesResolution;
 	vec3 gridRange = probesMax - probesMin;
-	vec3 resMinusOne = res - 1.0;
-	vec3 probeSpacing = gridRange / resMinusOne;
+	vec3 probeSpacing = gridRange / res;
 
 	// Offset sample position along normal by half a probe spacing
 	vec3 samplePos = worldPos + worldNormal * probeSpacing * 0.5;
-	vec3 uvw = clamp( ( samplePos - probesMin ) / gridRange, 0.0, 1.0 );
 
-	// Remap to texel centers of the probe grid (XY and Z)
-	uvw = uvw * resMinusOne / res + 0.5 / res;
+	// The bounds hold one cell per probe, so they map directly to the probe grid.
+	// Clamp to the texel centers of the outermost probes (XY and Z).
+	vec3 uvw = clamp( ( samplePos - probesMin ) / gridRange, 0.5 / res, 1.0 - 0.5 / res );
 
 	// Atlas UV mapping along Z:
 	//   paddedSlices = nz + 2  (1 padding texel at each end of every sub-volume)
