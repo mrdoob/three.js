@@ -62,11 +62,15 @@ const getPointShadowDepthFn = ( distance, near, far, bias, renderer ) => {
 
 	const { reversedDepthBuffer, logarithmicDepthBuffer } = renderer;
 
+	// logarithmic depth gets a separate depth function
+
 	if ( logarithmicDepthBuffer === true ) {
 
 		return ( maxAbs ) => viewZToLogarithmicDepth( maxAbs.mul( distance ).negate(), near, far ).add( bias );
 
 	}
+
+	// default and reverse depth share one
 
 	const depthRange = far.sub( near );
 	const nearFar = near.mul( far ).div( depthRange.mul( distance ) );
