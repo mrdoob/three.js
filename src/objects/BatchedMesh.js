@@ -1559,8 +1559,9 @@ class BatchedMesh extends Mesh {
 	 * @param {Camera} camera - The camera of the next draw.
 	 * @param {BufferGeometry} geometry - The batch's geometry.
 	 * @param {Material} material - The material of the next draw.
+	 * @param {('multiDraw'|'merged')} [drawFormat='multiDraw'] - The format of the draw parameters.
 	 */
-	_updateDrawParameters( camera, geometry, material ) {
+	_updateDrawParameters( camera, geometry, material, drawFormat = 'multiDraw' ) {
 
 		// if visibility has not changed and frustum culling and object sorting is not required
 		// then skip iterating over all items
@@ -1623,6 +1624,7 @@ class BatchedMesh extends Mesh {
 		}
 
 		let multiDrawCount = 0;
+		let mergedDrawCount = 0;
 		if ( this.sortObjects ) {
 
 			// get the camera position in the local frame
@@ -1677,8 +1679,31 @@ class BatchedMesh extends Mesh {
 			for ( let i = 0, l = list.length; i < l; i ++ ) {
 
 				const item = list[ i ];
-				multiDrawStarts[ multiDrawCount ] = item.start * bytesPerElement * multiDrawMultiplier;
-				multiDrawCounts[ multiDrawCount ] = item.count * multiDrawMultiplier;
+				const start = item.start * bytesPerElement * multiDrawMultiplier;
+				const count = item.count * multiDrawMultiplier;
+
+				if ( drawFormat === 'merged' ) {
+
+					if ( mergedDrawCount > 0 && mergedDrawStarts[ mergedDrawCount - 1 ] === start && mergedDrawCounts[ mergedDrawCount - 1 ] === count ) {
+
+						mergedDrawInstanceCounts[ mergedDrawCount - 1 ] ++;
+
+					} else {
+
+						mergedDrawStarts[ mergedDrawCount ] = start;
+						mergedDrawCounts[ mergedDrawCount ] = count;
+						mergedDrawInstanceCounts[ mergedDrawCount ] = 1;
+						mergedDrawCount ++;
+
+					}
+
+				} else {
+
+					multiDrawStarts[ multiDrawCount ] = start;
+					multiDrawCounts[ multiDrawCount ] = count;
+
+				}
+
 				indirectArray[ multiDrawCount ] = item.index;
 				multiDrawCount ++;
 
@@ -1708,37 +1733,37 @@ class BatchedMesh extends Mesh {
 					if ( ! culled ) {
 
 						const geometryInfo = geometryInfoList[ geometryId ];
-						multiDrawStarts[ multiDrawCount ] = geometryInfo.start * bytesPerElement * multiDrawMultiplier;
-						multiDrawCounts[ multiDrawCount ] = geometryInfo.count * multiDrawMultiplier;
+						const start = geometryInfo.start * bytesPerElement * multiDrawMultiplier;
+						const count = geometryInfo.count * multiDrawMultiplier;
+
+						if ( drawFormat === 'merged' ) {
+
+							if ( mergedDrawCount > 0 && mergedDrawStarts[ mergedDrawCount - 1 ] === start && mergedDrawCounts[ mergedDrawCount - 1 ] === count ) {
+
+								mergedDrawInstanceCounts[ mergedDrawCount - 1 ] ++;
+
+							} else {
+
+								mergedDrawStarts[ mergedDrawCount ] = start;
+								mergedDrawCounts[ mergedDrawCount ] = count;
+								mergedDrawInstanceCounts[ mergedDrawCount ] = 1;
+								mergedDrawCount ++;
+
+							}
+
+						} else {
+
+							multiDrawStarts[ multiDrawCount ] = start;
+							multiDrawCounts[ multiDrawCount ] = count;
+
+						}
+
 						indirectArray[ multiDrawCount ] = i;
 						multiDrawCount ++;
 
 					}
 
 				}
-
-			}
-
-		}
-
-		// merge consecutive draws of the same range into instanced draws
-
-		let mergedDrawCount = 0;
-		for ( let i = 0; i < multiDrawCount; i ++ ) {
-
-			const start = multiDrawStarts[ i ];
-			const count = multiDrawCounts[ i ];
-
-			if ( mergedDrawCount > 0 && mergedDrawStarts[ mergedDrawCount - 1 ] === start && mergedDrawCounts[ mergedDrawCount - 1 ] === count ) {
-
-				mergedDrawInstanceCounts[ mergedDrawCount - 1 ] ++;
-
-			} else {
-
-				mergedDrawStarts[ mergedDrawCount ] = start;
-				mergedDrawCounts[ mergedDrawCount ] = count;
-				mergedDrawInstanceCounts[ mergedDrawCount ] = 1;
-				mergedDrawCount ++;
 
 			}
 

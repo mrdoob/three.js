@@ -189,9 +189,11 @@ export const batch = /*@__PURE__*/ Fn( ( [ batchMesh ], builder ) => {
 
 	}
 
+	const drawFormat = builder.renderer.backend.isWebGPUBackend === true ? 'merged' : 'multiDraw';
+
 	OnObjectUpdate( ( { object, camera, material } ) => {
 
-		object._updateDrawParameters( camera, object.geometry, material );
+		object._updateDrawParameters( camera, object.geometry, material, drawFormat );
 
 	} );
 
