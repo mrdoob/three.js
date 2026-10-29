@@ -438,15 +438,13 @@ class LightProbeGrid extends Light {
 		this.boundingBox = new Box3();
 
 		/**
-		 * Distance in world units over which the grid contribution fades out
-		 * past the volume boundary. `0` applies the contribution everywhere
-		 * (clamped), which matches a single-volume setup. Use a small positive
-		 * value to blend multiple overlapping grids.
+		 * Where grids overlap, the grid with the highest priority lights the
+		 * fragment. On ties, the most recently created grid wins.
 		 *
 		 * @type {number}
 		 * @default 0
 		 */
-		this.falloff = 0;
+		this.priority = 0;
 
 		/**
 		 * The single RGBA atlas 3D texture storing all seven packed SH
@@ -716,7 +714,7 @@ class LightProbeGrid extends Light {
 		bounceGrid.boundingBox.copy( this.boundingBox );
 		// The direct pass adds the grid unlit, so all passes share the lights and their shaders.
 		bounceGrid.intensity = pass === 0 ? 0 : this.intensity;
-		bounceGrid.falloff = this.falloff;
+		bounceGrid.priority = this.priority;
 		scene.add( bounceGrid );
 
 	}

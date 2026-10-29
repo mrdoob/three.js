@@ -158,6 +158,15 @@ class LightProbeGridWebGL extends Light {
 		this.boundingBox = new Box3();
 
 		/**
+		 * Where grids overlap, the grid with the highest priority lights the
+		 * fragment. On ties, the most recently created grid wins.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.priority = 0;
+
+		/**
 		 * The single RGBA atlas 3D texture storing all seven packed SH sub-volumes.
 		 *
 		 * @type {?Data3DTexture}
