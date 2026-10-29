@@ -279,7 +279,7 @@ class BatchedMesh extends Mesh {
 		this._multiDrawCount = 0;
 		this._multiDrawBytesPerElement = 1;
 
-		// consecutive multi draw entries sharing the same range, merged into instanced draws
+		// buffers for instanced draws, consecutive draws with the same range are merged
 		this._mergedDrawCounts = new Int32Array( maxInstanceCount );
 		this._mergedDrawStarts = new Int32Array( maxInstanceCount );
 		this._mergedDrawInstanceCounts = new Int32Array( maxInstanceCount );
