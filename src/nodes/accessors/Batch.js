@@ -10,7 +10,7 @@ import { varyingProperty } from '../core/PropertyNode.js';
 import { OnObjectUpdate, OnAfterObjectUpdate } from '../utils/EventNode.js';
 import { DataTexture } from '../../textures/DataTexture.js';
 
-const _previousBatchingMatrices = /*@__PURE__*/ new WeakMap();
+const _previousMatricesVersions = /*@__PURE__*/ new WeakMap();
 
 /**
  * TSL function that retrieves the batching color for a given instance ID from a colors texture.
@@ -70,40 +70,30 @@ function createBatchingMatrixNode( matricesTexture, id ) {
 }
 
 /**
- * Retrieves or initializes the previous frame batching matrix node for motion vectors.
- * Uses a WeakMap to cache previous frame matrices textures and their TSL nodes.
+ * Returns the batching matrices texture of the previous frame for motion vectors.
+ * It is created on first use and again after the batched mesh released it.
  *
  * @param {BatchedMesh} batchMesh - The batched mesh.
- * @param {Node<uint>} id - The indirect instance ID.
- * @returns {Node<mat4>} The previous frame batching matrix node.
+ * @returns {DataTexture} The previous frame matrices texture.
  */
-function getPreviousNode( batchMesh, id ) {
+function getPreviousMatricesTexture( batchMesh ) {
 
-	let data = _previousBatchingMatrices.get( batchMesh );
+	let previousMatricesTexture = batchMesh._previousMatricesTexture;
 
-	const matricesTexture = batchMesh._matricesTexture;
+	if ( previousMatricesTexture === null ) {
 
-	if ( data === undefined || data.matricesTexture !== matricesTexture ) {
+		const { image, format, type, version } = batchMesh._matricesTexture;
 
-		if ( data !== undefined ) data.previousMatricesTexture.dispose(); // the matrices texture is replaced when the instance count changes
-
-		const { image, format, type, version } = matricesTexture;
-
-		const previousMatricesTexture = new DataTexture( image.data.slice(), image.width, image.height, format, type );
+		previousMatricesTexture = new DataTexture( image.data.slice(), image.width, image.height, format, type );
 		previousMatricesTexture.needsUpdate = true;
 
-		data = {
-			matricesTexture,
-			previousMatricesTexture,
-			version,
-			node: createBatchingMatrixNode( previousMatricesTexture, id )
-		};
+		_previousMatricesVersions.set( previousMatricesTexture, version );
 
-		_previousBatchingMatrices.set( batchMesh, data );
+		batchMesh._previousMatricesTexture = previousMatricesTexture;
 
 	}
 
-	return data.node;
+	return previousMatricesTexture;
 
 }
 
@@ -158,21 +148,21 @@ export const batch = /*@__PURE__*/ Fn( ( [ batchMesh ], builder ) => {
 
 		OnAfterObjectUpdate( ( { object } ) => {
 
-			const previousBatchData = _previousBatchingMatrices.get( object );
+			const previousMatricesTexture = getPreviousMatricesTexture( object );
 			const matricesTexture = object._matricesTexture;
 
-			if ( previousBatchData.version !== matricesTexture.version ) {
+			if ( _previousMatricesVersions.get( previousMatricesTexture ) !== matricesTexture.version ) {
 
-				previousBatchData.previousMatricesTexture.image.data.set( matricesTexture.image.data );
-				previousBatchData.previousMatricesTexture.needsUpdate = true;
+				previousMatricesTexture.image.data.set( matricesTexture.image.data );
+				previousMatricesTexture.needsUpdate = true;
 
-				previousBatchData.version = matricesTexture.version;
+				_previousMatricesVersions.set( previousMatricesTexture, matricesTexture.version );
 
 			}
 
 		} );
 
-		const previousBatchingMatrixNode = getPreviousNode( batchMesh, indirectId );
+		const previousBatchingMatrixNode = createBatchingMatrixNode( getPreviousMatricesTexture( batchMesh ), indirectId );
 		positionPrevious.assign( previousBatchingMatrixNode.mul( positionPrevious ).xyz );
 
 	}
