@@ -68,20 +68,6 @@ void main() {
 	#include <alphahash_fragment>
 
 	float dist = length( vWorldPosition - referencePosition );
-
-	// Store the distance to the light as perspective depth, so the depth of a point
-	// is the same on every face of the cube shadow map.
-
-	#ifdef USE_REVERSED_DEPTH_BUFFER
-
-		gl_FragDepth = ( nearDistance * ( farDistance - dist ) ) / ( dist * ( farDistance - nearDistance ) );
-
-	#else
-
-		gl_FragDepth = ( farDistance * ( dist - nearDistance ) ) / ( dist * ( farDistance - nearDistance ) );
-
-	#endif
-
 	dist = ( dist - nearDistance ) / ( farDistance - nearDistance );
 	dist = saturate( dist ); // clamp to [ 0, 1 ]
 

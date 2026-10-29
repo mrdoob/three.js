@@ -384,7 +384,8 @@ class GodraysNode extends Node {
 
 				const lightToPos = worldPos.sub( lightPos ).toConst();
 
-				const viewZ = lightToPos.length().negate();
+				const shadowPositionAbs = lightToPos.abs().toConst();
+				const viewZ = shadowPositionAbs.x.max( shadowPositionAbs.y ).max( shadowPositionAbs.z ).negate();
 
 				const depth = viewZToPerspectiveDepth( viewZ, this._shadowCameraNear, this._shadowCameraFar );
 
@@ -549,8 +550,7 @@ class GodraysNode extends Node {
 					const shadowInfo = inShadow( samplePos );
 					const shadowAmount = shadowInfo.x.oneMinus().toConst();
 
-					const attenuation = shadowInfo.y.lessThan( this._shadowCameraFar ).select( pow( shadowInfo.y.div( this._shadowCameraFar ).oneMinus(), this.distanceAttenuation ), 0 ).toConst();
-					illum.addAssign( shadowAmount.mul( distance( startPosition, worldPosition ).mul( this.density.div( 100 ) ) ).mul( attenuation ) );
+					illum.addAssign( shadowAmount.mul( distance( startPosition, worldPosition ).mul( this.density.div( 100 ) ) ).mul( pow( shadowInfo.y.div( this._shadowCameraFar ).oneMinus(), this.distanceAttenuation ) ) );
 
 				} );
 

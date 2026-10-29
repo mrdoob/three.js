@@ -1308,7 +1308,8 @@ class VXGIVolume {
 								const bias = params.x, near = params.y, far = params.z;
 
 								const lightToVoxel = shadowPosition.sub( l0.xyz ).toConst();
-								const viewZ = length( lightToVoxel ).toConst();
+								const absVector = abs( lightToVoxel ).toConst();
+								const viewZ = max( max( absVector.x, absVector.y ), absVector.z ).toConst();
 
 								If( viewZ.greaterThanEqual( near ).and( viewZ.lessThanEqual( far ) ), () => {
 
