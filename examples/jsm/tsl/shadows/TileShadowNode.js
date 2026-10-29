@@ -90,6 +90,8 @@ class TileShadowNode extends ShadowBaseNode {
 
 		this._cameraFrameId = new WeakMap();
 
+		this._precompilations = new WeakSet();
+
 		this.shadowSize = {
 			top: light.shadow.camera.top,
 			bottom: light.shadow.camera.bottom,
@@ -322,7 +324,16 @@ class TileShadowNode extends ShadowBaseNode {
 
 		}
 
-		renderer.render( scene, this.cameraArray );
+		if ( renderer._precompilationState !== null ) {
+
+			renderer.compileAsync( scene, this.cameraArray ); // compiles the shadow pass without rendering it, see updateBefore()
+
+		} else {
+
+			renderer.render( scene, this.cameraArray );
+
+		}
+
 		renderer.setRenderObjectFunction( currentRenderObjectFunction );
 
 		if ( light.isPointLight !== true && shadowType === VSMShadowMap ) {
@@ -350,11 +361,43 @@ class TileShadowNode extends ShadowBaseNode {
 	}
 
 	/**
+	 * Returns the update type of {@link TileShadowNode#updateBefore}. During precompilation,
+	 * the render ID is the one of the last render, so a `RENDER` update would be skipped.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 * @return {NodeUpdateType} The update type.
+	 */
+	getUpdateBeforeType( frame ) {
+
+		return frame.renderer._precompilationState !== null ? NodeUpdateType.OBJECT : this.updateBeforeType;
+
+	}
+
+	/**
 	 * The implementation performs the update of the shadow map if necessary.
 	 *
 	 * @param {NodeFrame} frame - A reference to the current node frame.
 	 */
 	updateBefore( frame ) {
+
+		// during precompilation, compile the shadow pass once but do not render the shadow map
+
+		const precompilationState = frame.renderer._precompilationState;
+
+		if ( precompilationState !== null ) {
+
+			if ( this._precompilations.has( precompilationState ) === false ) {
+
+				this._precompilations.add( precompilationState );
+
+				this.update();
+				this.updateShadow( frame );
+
+			}
+
+			return;
+
+		}
 
 		const shadow = this.originalLight.shadow;
 
