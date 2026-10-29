@@ -6231,9 +6231,9 @@ When referenced in a TSL graph, nodes like `materialColor`, `materialRoughness`,
 
 > Note: `materialReference()` creates a live link to any JavaScript material property: whenever `material[ name ]` is modified on the CPU, the GPU uniform updates automatically without triggering a shader recompilation.
 
-### Proxy Node Material
+### Node Material Instance
 
-`ProxyNodeMaterial` creates material instances that reuse the shader of a node material with their own property values. All instances created from the same node material share a single shader build, and their values are read in the shared node graph with `materialReference( name, type )`:
+`NodeMaterialInstance` creates material instances that reuse the shader of a node material with their own property values. All instances created from the same node material share a single shader build, and their values are read in the shared node graph with `materialReference( name, type )`:
 
 ```js
 import * as THREE from 'three/webgpu';
@@ -6242,14 +6242,14 @@ import { materialReference } from 'three/tsl';
 const nodeMaterial = new THREE.MeshBasicNodeMaterial();
 nodeMaterial.colorNode = materialReference( 'myColor', 'color' );
 
-const redMaterial = new THREE.ProxyNodeMaterial( nodeMaterial );
+const redMaterial = new THREE.NodeMaterialInstance( nodeMaterial );
 redMaterial.myColor = new THREE.Color( 1, 0, 0 );
 
-const blueMaterial = new THREE.ProxyNodeMaterial( nodeMaterial );
+const blueMaterial = new THREE.NodeMaterialInstance( nodeMaterial );
 blueMaterial.myColor = new THREE.Color( 0, 0, 1 );
 ```
 
-> Note: Configure the node material before creating instances. Node properties such as `colorNode` are read-only on the proxy and always read from the node material.
+> Note: Configure the node material before creating instances. Node properties such as `colorNode` are read-only on the instance and always read from the node material.
 
 ```tsl materialInputsExample
 import 'scenes/shaderball';

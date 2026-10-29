@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - proxy node material</title>
+		<title>three.js webgpu - node material instance</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<meta property="og:title" content="three.js webgpu - proxy node material">
+		<meta property="og:title" content="three.js webgpu - node material instance">
 		<meta property="og:type" content="website">
-		<meta property="og:url" content="https://threejs.org/examples/webgpu_materials_node_proxy.html">
-		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_materials_node_proxy.jpg">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_materials_node_instance.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_materials_node_instance.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
@@ -16,7 +16,7 @@
 			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
 
 			<div class="title-wrapper">
-				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Proxy Node Material</span>
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Node Material Instance</span>
 			</div>
 
 			<small id="stats">Compiling...</small>
@@ -54,7 +54,7 @@
 			const phases = [];
 
 			const params = {
-				material: 'Proxy Node Material',
+				material: 'Node Material Instance',
 				randomize: randomizeColors
 			};
 
@@ -126,7 +126,7 @@
 
 				const gui = renderer.inspector.createParameters( 'Settings' );
 
-				gui.add( params, 'material', [ 'Proxy Node Material', 'Node Material per Mesh' ] ).onChange( setMaterials );
+				gui.add( params, 'material', [ 'Node Material Instance', 'Node Material per Mesh' ] ).onChange( setMaterials );
 				gui.add( params, 'randomize' ).name( 'randomize colors' );
 
 				await setMaterials();
@@ -160,7 +160,7 @@
 
 				for ( const mesh of meshes ) {
 
-					if ( mesh.material.isProxyNodeMaterial ) disposed.add( mesh.material.nodeMaterial );
+					if ( mesh.material.isNodeMaterialInstance ) disposed.add( mesh.material.nodeMaterial );
 
 					disposed.add( mesh.material );
 
@@ -178,15 +178,15 @@
 
 				} else {
 
-					// one node material defines the shader, each proxy only stores its values
+					// one node material defines the shader, each instance only stores its values
 
 					const nodeMaterial = new THREE.MeshStandardNodeMaterial( createNodes( materialReference( 'myColor' ), materialReference( 'userData.phase' ) ) );
 
 					for ( let i = 0; i < meshes.length; i ++ ) {
 
-						// values read by materialReference(), userData is independent for each proxy
+						// values read by materialReference(), userData is independent for each instance
 
-						const material = new THREE.ProxyNodeMaterial( nodeMaterial );
+						const material = new THREE.NodeMaterialInstance( nodeMaterial );
 						material.myColor = colors[ i ];
 						material.userData.phase = phases[ i ];
 
