@@ -124,7 +124,7 @@ class LightProbeGridNode extends AnalyticLightNode {
 		this._max = uniform( new Vector3() );
 		this._resolution = uniform( new Vector3() );
 		this._intensity = uniform( 1 ).setGroup( renderGroup );
-		this._priority = uniform( 0 );
+		this._priority = uniform( 0 ).setGroup( renderGroup );
 
 		this.updateType = NodeUpdateType.RENDER;
 
