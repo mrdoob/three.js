@@ -44,6 +44,30 @@ const _cubeUpsWebGL = [
 	/*@__PURE__*/ new Vector3( 0, 0, - 1 ), /*@__PURE__*/ new Vector3( 0, - 1, 0 ), /*@__PURE__*/ new Vector3( 0, - 1, 0 )
 ];
 
+/**
+ * Returns the depth the cube shadow map stores for a position relative to the light. Each face
+ * stores the depth along its own axis, which is the largest component of the position.
+ *
+ * @private
+ * @param {Node<vec3>} position - The position relative to the light.
+ * @param {Node<float>} near - The near plane of the shadow camera.
+ * @param {Node<float>} far - The far plane of the shadow camera.
+ * @param {Node<float>} bias - The shadow bias.
+ * @param {Renderer} renderer - The renderer.
+ * @return {Node<float>} The depth to compare against.
+ */
+const getPointShadowDepth = ( position, near, far, bias, renderer ) => {
+
+	const positionAbs = abs( position );
+	const viewZ = positionAbs.x.max( positionAbs.y ).max( positionAbs.z ).negate();
+
+	if ( renderer.reversedDepthBuffer ) return viewZToReversedPerspectiveDepth( viewZ, near, far ).sub( bias );
+	if ( renderer.logarithmicDepthBuffer ) return viewZToLogarithmicDepth( viewZ, near, far ).add( bias );
+
+	return viewZToPerspectiveDepth( viewZ, near, far ).add( bias );
+
+};
+
 export const BasicPointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp } ) => {
 
 	return cubeTexture( depthTexture, bd3D ).compare( dp );
@@ -60,14 +84,17 @@ export const BasicPointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, 
  * @param {Object} inputs - The input parameter object.
  * @param {CubeDepthTexture} inputs.depthTexture - A reference to the shadow cube map.
  * @param {Node<vec3>} inputs.bd3D - The normalized direction from light to fragment.
- * @param {Node<float>} inputs.dp - The depth value to compare against.
+ * @param {Node<float>} inputs.distance - The distance from the light to the fragment.
  * @param {LightShadow} inputs.shadow - The light shadow.
  * @return {Node<float>} The filtering result.
  */
-export const PointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp, shadow } ) => {
+export const PointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, distance, shadow }, builder ) => {
 
 	const radius = reference( 'radius', 'float', shadow ).setGroup( renderGroup );
 	const mapSize = reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup );
+	const near = reference( 'near', 'float', shadow.camera ).setGroup( renderGroup );
+	const far = reference( 'far', 'float', shadow.camera ).setGroup( renderGroup );
+	const bias = reference( 'bias', 'float', shadow ).setGroup( renderGroup );
 
 	const texelSize = radius.div( mapSize.x ).toConst();
 
@@ -86,7 +113,12 @@ export const PointShadowFilter = /*@__PURE__*/ Fn( ( { depthTexture, bd3D, dp, s
 	Loop( 5, ( { i } ) => {
 
 		const sample = vogelDiskSample( i, 5, phi );
-		const direction = bd3D.add( tangent.mul( sample.x ).add( bitangent.mul( sample.y ) ).mul( texelSize ) );
+		const direction = bd3D.add( tangent.mul( sample.x ).add( bitangent.mul( sample.y ) ).mul( texelSize ) ).toConst();
+
+		// The sample can fall on a different face of the cube, so compare against the depth
+		// that face stores for a point at the fragment's distance in the sample direction.
+		const dp = getPointShadowDepth( normalize( direction ).mul( distance ), near, far, bias, builder.renderer );
+
 		result.addAssign( cubeTexture( depthTexture, direction ).compare( dp ) );
 
 	} );
@@ -111,30 +143,14 @@ const pointShadowFilter = /*@__PURE__*/ Fn( ( { filterFn, depthTexture, shadowCo
 
 	If( viewZ.sub( shadowCameraFar ).lessThanEqual( 0.0 ).and( viewZ.sub( shadowCameraNear ).greaterThanEqual( 0.0 ) ), () => {
 
-		let dp;
-
-		if ( builder.renderer.reversedDepthBuffer ) {
-
-			dp = viewZToReversedPerspectiveDepth( viewZ.negate(), shadowCameraNear, shadowCameraFar );
-			dp.subAssign( bias );
-
-		} else if ( builder.renderer.logarithmicDepthBuffer ) {
-
-			dp = viewZToLogarithmicDepth( viewZ.negate(), shadowCameraNear, shadowCameraFar );
-			dp.addAssign( bias );
-
-		} else {
-
-			dp = viewZToPerspectiveDepth( viewZ.negate(), shadowCameraNear, shadowCameraFar );
-			dp.addAssign( bias );
-
-		}
+		const dp = getPointShadowDepth( shadowPosition, shadowCameraNear, shadowCameraFar, bias, builder.renderer );
 
 		// bd3D = base direction 3D (direction from light to fragment)
 		const bd3D = shadowPosition.normalize();
+		const distance = shadowPosition.length();
 
 		// percentage-closer filtering using cube texture sampling
-		result.assign( filterFn( { depthTexture, bd3D, dp, shadow } ) );
+		result.assign( filterFn( { depthTexture, bd3D, dp, distance, shadow } ) );
 
 	} );
 
