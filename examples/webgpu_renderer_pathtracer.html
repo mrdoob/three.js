@@ -91,6 +91,7 @@
 				await renderer.init();
 
 				pathTracer = new WebGPUPathTracer( renderer );
+				pathTracer.useMegakernel( true ); // TODO: Remove once the wavefront backend supports array-bound struct buffers.
 				pathTracer.filterGlossyFactor = 1;
 				pathTracer.minSamples = 3;
 				pathTracer.maxSamples = 32;
