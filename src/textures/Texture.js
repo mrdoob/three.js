@@ -457,10 +457,9 @@ class Texture extends EventDispatcher {
 	/**
 	 * Adds a range of data in the data texture to be updated on the GPU.
 	 *
-	 * `start` and `count` are measured in elements of the texture's data array, not in texels.
 	 * Update ranges assume four components per texel, so they currently only work with `RGBAFormat`.
 	 * Each range must stay within a single row of the texture. To update several rows, add one
-	 * range per row.
+	 * range per row. Update ranges are only supported in `WebGLRenderer`.
 	 *
 	 * @param {number} start - Index of the first array element to update.
 	 * @param {number} count - The number of array elements to update.
