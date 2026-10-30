@@ -690,8 +690,16 @@ class PassNode extends Node {
 
 			const texture = this._textures[ name ];
 
-			const index = this.renderTarget.textures.indexOf( texture );
-			this.renderTarget.textures[ index ] = prevTexture;
+			if ( texture === this.renderTarget.depthTexture ) {
+
+				this.renderTarget.depthTexture = prevTexture;
+
+			} else {
+
+				const index = this.renderTarget.textures.indexOf( texture );
+				this.renderTarget.textures[ index ] = prevTexture;
+
+			}
 
 			this._textures[ name ] = prevTexture;
 			this._previousTextures[ name ] = texture;
@@ -845,6 +853,12 @@ class PassNode extends Node {
 		if ( renderer.reversedDepthBuffer === true && this.renderTarget.depthTexture !== null ) {
 
 			this.renderTarget.depthTexture.type = FloatType;
+
+		}
+
+		for ( const name in this._previousTextures ) {
+
+			this._previousTextures[ name ].type = this._textures[ name ].type;
 
 		}
 
