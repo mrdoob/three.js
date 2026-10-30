@@ -440,7 +440,7 @@
 				timer.update();
 
 				// compute particles
-				renderer.compute( [updateParticles, spawnParticles] );
+				renderer.compute( [ updateParticles, spawnParticles ] );
 
 				// update particle index for next spawn
 				spawnIndex.value = ( spawnIndex.value + nbToSpawn.value ) % nbParticles;
