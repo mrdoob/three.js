@@ -737,15 +737,15 @@ class ShadowNode extends ShadowBaseNode {
 		this.vsmShadowMapVertical.setSize( shadow.mapSize.width, shadow.mapSize.height, depth );
 		this.vsmShadowMapHorizontal.setSize( shadow.mapSize.width, shadow.mapSize.height, depth );
 
-		const precompile = renderer.isCompiling;
+		const isCompiling = renderer.isCompiling;
 
 		renderer.setRenderTarget( this.vsmShadowMapVertical );
 		_quadMesh.material = this.vsmMaterialVertical;
-		precompile ? _quadMesh.compileAsync( renderer ) : _quadMesh.render( renderer );
+		isCompiling ? _quadMesh.compileAsync( renderer ) : _quadMesh.render( renderer );
 
 		renderer.setRenderTarget( this.vsmShadowMapHorizontal );
 		_quadMesh.material = this.vsmMaterialHorizontal;
-		precompile ? _quadMesh.compileAsync( renderer ) : _quadMesh.render( renderer );
+		isCompiling ? _quadMesh.compileAsync( renderer ) : _quadMesh.render( renderer );
 
 	}
 
