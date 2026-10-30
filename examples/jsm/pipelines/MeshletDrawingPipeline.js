@@ -715,7 +715,7 @@ function createOcclusion( width, height ) {
  *
  * @private
  */
-class GPUDrivenCulling {
+class MeshletCulling {
 
 	/**
 	 * Constructs a new culling.
@@ -931,7 +931,7 @@ class GPUDrivenCulling {
 				const dataFar = instanceLevel.element( data.mul( 2 ).add( 1 ) );
 				const matrixWorld = instanceWorld.element( data ).toVar();
 
-				// the scale of the object and the margin of positions deformed by its position node, see GPUDrivenBatch
+				// the scale of the object and the margin of positions deformed by its position node, see MeshletBatch
 
 				const bounds = instanceBounds.element( data );
 				const center = matrixWorld.mul( vec4( geometryBounds.xyz, 1.0 ) ).xyz.toVar();
@@ -1414,7 +1414,7 @@ class GPUDrivenCulling {
 	 * Allocates the ranges of a batch in the shared buffers and writes its parameters into the table.
 	 * Returns `false` if the buffers are full.
 	 *
-	 * @param {GPUDrivenBatch} batch - The batch.
+	 * @param {MeshletBatch} batch - The batch.
 	 * @return {boolean} Whether the batch was added.
 	 */
 	add( batch ) {
@@ -1482,7 +1482,7 @@ class GPUDrivenCulling {
 	/**
 	 * Removes a batch, its ranges are reused after a rebuild of the culling.
 	 *
-	 * @param {GPUDrivenBatch} batch - The batch.
+	 * @param {MeshletBatch} batch - The batch.
 	 */
 	remove( batch ) {
 
@@ -1568,7 +1568,7 @@ class GPUDrivenCulling {
 	/**
 	 * Sets the number of objects of a batch drawn in this projection.
 	 *
-	 * @param {GPUDrivenBatch} batch - The batch.
+	 * @param {MeshletBatch} batch - The batch.
 	 * @param {number} count - The number of objects.
 	 */
 	setObjectCount( batch, count ) {
@@ -1918,7 +1918,7 @@ function writeLevel( array, index, level ) {
  *
  * @private
  */
-class GPUDrivenGeometryPool {
+class MeshletGeometryPool {
 
 	constructor() {
 
@@ -2089,12 +2089,12 @@ class GPUDrivenGeometryPool {
 
 /**
  * All objects of one render list sharing geometry and material, drawn by one indirect draw of their visible
- * clusters through the hardware rasterizer. The objects are culled by the {@link GPUDrivenCulling} of the render
+ * clusters through the hardware rasterizer. The objects are culled by the {@link MeshletCulling} of the render
  * list, the batch owns a range of its buffers. Subclasses can replace the draw by overriding `setupDraw()`.
  *
  * @private
  */
-class GPUDrivenBatch {
+class MeshletBatch {
 
 	/**
 	 * Constructs a new batch.
@@ -2104,7 +2104,7 @@ class GPUDrivenBatch {
 	 * @param {boolean} receiveShadow - Whether the objects receive shadows.
 	 * @param {number} capacity - The maximum number of objects.
 	 * @param {Renderer} renderer - The renderer.
-	 * @param {GPUDrivenCulling} culling - The culling of the render list.
+	 * @param {MeshletCulling} culling - The culling of the render list.
 	 * @param {Object} [parameters] - The configuration parameter.
 	 * @param {boolean} [parameters.debug=false] - Whether the clusters are shown instead of the material.
 	 * @param {number} [parameters.lodCount=clusters.lodCount] - The number of levels of detail used.
@@ -2114,7 +2114,7 @@ class GPUDrivenBatch {
 	 * @param {boolean} [parameters.instanceColor=false] - Whether the instanced meshes have instance colors.
 	 * @param {?Material} [parameters.farMaterial=null] - The material of the objects beyond their switch distance, the levels of
 	 * LOD objects sharing the geometry. Shadow casters ignore it.
-	 * @param {?GPUDrivenBatch} [parameters.source=null] - A batch of the same culling and capacity drawing the same objects, like
+	 * @param {?MeshletBatch} [parameters.source=null] - A batch of the same culling and capacity drawing the same objects, like
 	 * another group of the objects. The transforms, bounds and instance data of the objects are read from this batch, which
 	 * uploads them, instead of being stored again.
 	 * @param {number} [parameters.queueBudget=0] - The minimum number of work items of a queue of the batch, see getQueueCapacity().
@@ -2412,7 +2412,7 @@ class GPUDrivenBatch {
 	}
 
 	/**
-	 * Adds the batch to its resized culling, see {@link GPUDrivenCulling#resize}. The nodes and materials of the batch
+	 * Adds the batch to its resized culling, see {@link MeshletCulling#resize}. The nodes and materials of the batch
 	 * stay valid: the range of the batch and its indirect draws are updated, and the data of the objects is written
 	 * again in the next update.
 	 *
@@ -2553,7 +2553,7 @@ class GPUDrivenBatch {
 
 		// the object of the vertex, the fragments read it through a flat varying
 
-		const instance = varying( source.instance, 'vGPUDrivenInstance' );
+		const instance = varying( source.instance, 'vMeshletInstance' );
 
 		let matrixWorld = instanceWorld.element( instance );
 		let previousMatrixWorld = this.history === true ? instanceWorld.previous( instance ) : matrixWorld;
@@ -3386,7 +3386,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 		this._boundsNode = null;
 
 		this._ready = false;
-		this._gpuDrivenEnabled = false;
+		this._meshletsEnabled = false;
 		this._camera = null;
 		this._depth = 0;
 		this._gpuProjectionId = 0;
@@ -3394,7 +3394,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 		this._clusters = new WeakMap();
 		this._geometryStates = new WeakMap();
 		this._checkedGeometries = new WeakSet();
-		this._geometryPool = new GPUDrivenGeometryPool();
+		this._geometryPool = new MeshletGeometryPool();
 		this._records = new Set();
 
 		// the meshlets of disposed geometries are removed, they are processed again if the geometry is drawn again
@@ -3408,7 +3408,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 		this._capture = null;
 		this._lodRange = null;
 		this._lodRanges = new WeakMap();
-		this._gpuDrivenSupported = false;
+		this._meshletsSupported = false;
 		this._shadowPass = false;
 		this._sceneProjected = false;
 		this._lodView = { position: new Vector3(), scale: 1, perspective: 1, threshold: 1, minScreenRadius: 0, coarseScreenRadius: 0 };
@@ -3535,7 +3535,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 		const renderer = this.renderer;
 		const renderTarget = renderer.getRenderTarget();
 
-		this._gpuDrivenSupported = this._ready === true &&
+		this._meshletsSupported = this._ready === true &&
 			renderer.backend.isWebGPUBackend === true &&
 			renderer.logarithmicDepthBuffer !== true &&
 			renderer.reversedDepthBuffer !== true &&
@@ -3546,7 +3546,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 
 		// render calls with a custom render object function are only supported for shadow passes, see project()
 
-		this._gpuDrivenEnabled = this._gpuDrivenSupported === true && renderer.getRenderObjectFunction() === null && camera.isPerspectiveCamera === true;
+		this._meshletsEnabled = this._meshletsSupported === true && renderer.getRenderObjectFunction() === null && camera.isPerspectiveCamera === true;
 		this._shadowPass = false;
 		this._sceneProjected = false;
 
@@ -3581,11 +3581,11 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 			const renderer = this.renderer;
 			const overrideMaterial = object.overrideMaterial;
 
-			if ( this._gpuDrivenSupported === true && renderer.getRenderObjectFunction() !== null &&
+			if ( this._meshletsSupported === true && renderer.getRenderObjectFunction() !== null &&
 				overrideMaterial !== null && overrideMaterial.isShadowPassMaterial === true && renderer.shadowMap.type !== VSMShadowMap &&
 				( camera.isPerspectiveCamera === true || camera.isOrthographicCamera === true ) ) {
 
-				this._gpuDrivenEnabled = true;
+				this._meshletsEnabled = true;
 				this._shadowPass = true;
 
 			}
@@ -3594,7 +3594,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 
 		// the levels of LOD objects are selected per object on the GPU
 
-		if ( object.isLOD === true && this._gpuDrivenEnabled === true && object.levels.length > 0 ) {
+		if ( object.isLOD === true && this._meshletsEnabled === true && object.levels.length > 0 ) {
 
 			if ( object.visible === false ) return;
 
@@ -3608,7 +3608,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 
 			// static bundle groups keep the supported meshes on the GPU and the other objects in the render bundle
 
-			if ( this._capture === null && object.static === true && this._gpuDrivenEnabled === true && this._depth === 1 && this.renderer.backend.beginBundle !== undefined ) {
+			if ( this._capture === null && object.static === true && this._meshletsEnabled === true && this._depth === 1 && this.renderer.backend.beginBundle !== undefined ) {
 
 				if ( object.visible === false ) return;
 
@@ -3621,7 +3621,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 			// bundle groups inside of a captured group are part of it. non-static bundle groups are projected like groups,
 			// a render bundle would draw their meshes without the GPU-driven pipeline
 
-			if ( this._capture !== null || ( object.static !== true && this._gpuDrivenEnabled === true && this._depth === 1 ) ) {
+			if ( this._capture !== null || ( object.static !== true && this._meshletsEnabled === true && this._depth === 1 ) ) {
 
 				if ( object.visible === false ) return;
 
@@ -3742,7 +3742,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 			level.geometry === next.geometry && level.material !== next.material && Array.isArray( next.material ) === false &&
 			level.receiveShadow === next.receiveShadow && level.castShadow === next.castShadow && next.children.length === 0 &&
 			level.layers.mask === next.layers.mask && level.matrixWorld.equals( next.matrixWorld ) &&
-			this._isGPUDriven( level, level.geometry, level.material, null ) === true && this._isGPUDriven( next, next.geometry, next.material, null ) === true;
+			this._isMeshlet( level, level.geometry, level.material, null ) === true && this._isMeshlet( next, next.geometry, next.material, null ) === true;
 
 	}
 
@@ -3775,11 +3775,11 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 
 				const material = object.material[ group.materialIndex ];
 
-				if ( material && material.visible && this._isGPUDriven( object, object.geometry, material, group ) && ( this._capture !== null || this._hasClusters( object.geometry, group ) ) ) return false;
+				if ( material && material.visible && this._isMeshlet( object, object.geometry, material, group ) && ( this._capture !== null || this._hasClusters( object.geometry, group ) ) ) return false;
 
 			}
 
-		} else if ( this._isGPUDriven( object, object.geometry, object.material, null ) === true && ( this._capture !== null || this._hasClusters( object.geometry, null ) ) ) {
+		} else if ( this._isMeshlet( object, object.geometry, object.material, null ) === true && ( this._capture !== null || this._hasClusters( object.geometry, null ) ) ) {
 
 			return false;
 
@@ -3812,7 +3812,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 
 		}
 
-		if ( hasClipping === false && this._capture === null && this._isGPUDriven( object, geometry, material, group ) === true ) {
+		if ( hasClipping === false && this._capture === null && this._isMeshlet( object, geometry, material, group ) === true ) {
 
 			const clusters = this._getClusters( geometry, group );
 
@@ -3974,7 +3974,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 
 		// objects inside of clipping groups are clipped by the regular pipeline
 
-		if ( clippingContext !== this._capture.clippingContext || this._isGPUDriven( object, geometry, material, group ) === false ) return false;
+		if ( clippingContext !== this._capture.clippingContext || this._isMeshlet( object, geometry, material, group ) === false ) return false;
 
 		const clusters = this._getClusters( geometry, group );
 
@@ -4161,9 +4161,9 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 	 * @param {?Object} group - The geometry group.
 	 * @return {boolean} Whether the object can be drawn by the GPU-driven pipeline or not.
 	 */
-	_isGPUDriven( object, geometry, material, group ) {
+	_isMeshlet( object, geometry, material, group ) {
 
-		return this._gpuDrivenEnabled === true && ( this._depth === 1 || this._capture !== null ) && ( this._shadowPass === false || object.castShadow === true ) && isSupportedObject( object, geometry, group ) && this._isSupportedMaterial( material );
+		return this._meshletsEnabled === true && ( this._depth === 1 || this._capture !== null ) && ( this._shadowPass === false || object.castShadow === true ) && isSupportedObject( object, geometry, group ) && this._isSupportedMaterial( material );
 
 	}
 
@@ -4266,12 +4266,12 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 	 * @param {Object} entry - The objects sharing geometry, material and shadow state.
 	 * @param {number} capacity - The maximum number of objects.
 	 * @param {?Object} view - The view of the render list.
-	 * @param {GPUDrivenCulling} culling - The culling of the render list.
-	 * @return {GPUDrivenBatch} The batch.
+	 * @param {MeshletCulling} culling - The culling of the render list.
+	 * @return {MeshletBatch} The batch.
 	 */
 	createBatch( entry, capacity, view, culling ) {
 
-		return new GPUDrivenBatch( entry.clusters, entry.material, entry.receiveShadow, capacity, this.renderer, culling, {
+		return new MeshletBatch( entry.clusters, entry.material, entry.receiveShadow, capacity, this.renderer, culling, {
 			debug: this.debug,
 			depthPrepass: this._usesDepthPrepass(),
 			instanced: entry.instanced,
@@ -4613,7 +4613,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 
 			if ( record.culling === null ) {
 
-				record.culling = new GPUDrivenCulling( capacity, { shadow: this._shadowPass, occlusion, boundsNode, view } );
+				record.culling = new MeshletCulling( capacity, { shadow: this._shadowPass, occlusion, boundsNode, view } );
 
 			} else {
 
@@ -5310,7 +5310,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 		this._renderListBatches = new WeakMap();
 
 		this._geometryPool.dispose();
-		this._geometryPool = new GPUDrivenGeometryPool();
+		this._geometryPool = new MeshletGeometryPool();
 
 		super.dispose();
 
@@ -5333,7 +5333,7 @@ class MeshletDrawingPipeline extends StandardDrawingPipeline {
 	 * Adds the geometries of the given entries to the table of the culling and to the geometry pool.
 	 *
 	 * @private
-	 * @param {GPUDrivenCulling} culling - The culling.
+	 * @param {MeshletCulling} culling - The culling.
 	 * @param {Array<Object>} entries - The entries.
 	 * @return {boolean} Whether all geometries were added, `false` if the culling is full.
 	 */
@@ -5568,4 +5568,4 @@ function isSameObjects( a, b ) {
 
 }
 
-export { MeshletDrawingPipeline, GPUDrivenBatch, cacheAttributes, createDebugMaterial, createDrawMaterial, createOcclusion };
+export { MeshletDrawingPipeline, MeshletBatch, cacheAttributes, createDebugMaterial, createDrawMaterial, createOcclusion };

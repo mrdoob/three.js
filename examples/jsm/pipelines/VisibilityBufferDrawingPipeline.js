@@ -15,7 +15,7 @@ import {
 	normalLocal, normalViewGeometry, normalWorldGeometry, tangentViewFrame, bitangentViewFrame, modelWorldMatrix, modelViewMatrix, modelPosition, atomicMax, atomicAdd, atomicStore, atomicLoad
 } from 'three/tsl';
 
-import { MeshletDrawingPipeline, GPUDrivenBatch, cacheAttributes, createDebugMaterial, createDrawMaterial, createOcclusion } from './MeshletDrawingPipeline.js';
+import { MeshletDrawingPipeline, MeshletBatch, cacheAttributes, createDebugMaterial, createDrawMaterial, createOcclusion } from './MeshletDrawingPipeline.js';
 import { MESHLET_SIZE } from '../utils/MeshletGeometryUtils.js';
 
 // visibility buffer packing — the depth occupies the bits above each payload
@@ -218,9 +218,9 @@ function createView( width, height ) {
  * box of each object and shades the fragments whose visible triangle belongs to the object.
  *
  * @private
- * @augments GPUDrivenBatch
+ * @augments MeshletBatch
  */
-class VisibilityBufferBatch extends GPUDrivenBatch {
+class VisibilityBufferBatch extends MeshletBatch {
 
 	/**
 	 * Creates the software rasterizer, the hardware path of the large triangles and the resolve.
