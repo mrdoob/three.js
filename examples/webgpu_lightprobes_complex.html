@@ -91,7 +91,7 @@
 
 				// Dividing wall at x=0 with doorway
 
-				const dividerMat = new THREE.MeshStandardMaterial( { color: 0xcccccc } );
+				const dividerMat = new THREE.MeshStandardMaterial( { color: 0xcccccc, shadowSide: THREE.FrontSide } );
 				const doorwayHalfGap = 1.25;
 
 				// Left section of divider (z = -4 to -1.25)
@@ -170,7 +170,7 @@
 
 				const sphere = new THREE.Mesh(
 					new THREE.SphereGeometry( 0.35, 32, 32 ),
-					new THREE.MeshStandardMaterial( { color: 0xffd700, metalness: 0.3, roughness: 0.4 } )
+					new THREE.MeshStandardMaterial( { color: 0xffd700, metalness: 0.3, roughness: 0.4, shadowSide: THREE.FrontSide } )
 				);
 				sphere.position.set( - 4, 1.41, 0 );
 				sphere.castShadow = true;
@@ -249,8 +249,9 @@
 				warmLight.position.set( - 4, 4.5, 0 );
 				warmLight.castShadow = true;
 				warmLight.shadow.mapSize.setScalar( 256 );
-				warmLight.shadow.radius = 12;
+				warmLight.shadow.radius = 6;
 				warmLight.shadow.bias = - 0.002;
+				warmLight.shadow.normalBias = 0.05;
 				scene.add( warmLight );
 
 				// Cool point light in right room
@@ -258,8 +259,9 @@
 				coolLight.position.set( 4, 4.5, 0 );
 				coolLight.castShadow = true;
 				coolLight.shadow.mapSize.setScalar( 256 );
-				coolLight.shadow.radius = 12;
+				coolLight.shadow.radius = 6;
 				coolLight.shadow.bias = - 0.002;
+				coolLight.shadow.normalBias = 0.05;
 				scene.add( coolLight );
 
 				// Renderer
