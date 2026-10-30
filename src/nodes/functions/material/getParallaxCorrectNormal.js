@@ -16,9 +16,10 @@ import { Fn, min, normalize, EPSILON } from '../../tsl/TSLBase.js';
  * @param {Node<vec3>} normal - The normal to correct.
  * @param {Node<vec3>} cubeSize - The cube size should reflect the size of the environment (BPCEM is usually applied in closed environments like rooms).
  * @param {Node<vec3>} cubePos - The cube position.
+ * @param {Node<vec3>} [position=positionWorld] - The world-space query position.
  * @return {Node<vec3>} The parallax corrected normal.
  */
-const getParallaxCorrectNormal = /*@__PURE__*/ Fn( ( [ normal, cubeSize, cubePos ] ) => {
+const getParallaxCorrectNormal = /*@__PURE__*/ Fn( ( [ normal, cubeSize, cubePos, position = positionWorld ] ) => {
 
 	const nDir = normalize( normal ).toConst();
 	const positive = nDir.greaterThanEqual( 0 );
@@ -26,10 +27,10 @@ const getParallaxCorrectNormal = /*@__PURE__*/ Fn( ( [ normal, cubeSize, cubePos
 	// keep axis-aligned directions away from zero so the distances stay finite
 	const safeDir = positive.select( nDir.max( EPSILON ), nDir.min( EPSILON.negate() ) );
 	const extent = cubeSize.mul( 0.5 ).toConst();
-	const distances = positive.select( extent, extent.negate() ).add( cubePos ).sub( positionWorld ).div( safeDir ).toConst();
+	const distances = positive.select( extent, extent.negate() ).add( cubePos ).sub( position ).div( safeDir ).toConst();
 
 	const correction = min( distances.x, distances.y, distances.z ).toConst();
-	return positionWorld.add( nDir.mul( correction ) ).sub( cubePos );
+	return position.add( nDir.mul( correction ) ).sub( cubePos );
 
 } );
 
