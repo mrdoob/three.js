@@ -1012,13 +1012,22 @@ class Renderer {
 
 		if ( this._isDeviceLost === true ) return;
 
-		if ( this._initialized === false ) await this.init();
+		// nested calls, e.g. from shadow nodes, build their objects right away and add their pipelines to the running precompilation.
+		// They must not await anything, the running precompilation already prepared the scene
 
-		// only awaited when the drawing pipeline prepares something, so the state below is still taken synchronously
+		const parentPrecompilationState = this._precompilationState;
 
-		const prepare = this.drawingPipeline.prepareAsync( scene, camera );
+		if ( parentPrecompilationState === null ) {
 
-		if ( prepare !== undefined ) await prepare;
+			if ( this._initialized === false ) await this.init();
+
+			// only awaited when the drawing pipeline prepares something, so the state below is still taken synchronously
+
+			const prepare = this.drawingPipeline.prepareAsync( scene, camera );
+
+			if ( prepare !== undefined ) await prepare;
+
+		}
 
 		if ( this.shadowMap.type === PCFSoftShadowMap ) {
 
@@ -1038,10 +1047,6 @@ class Renderer {
 		const previousHandleObjectFunction = this._handleObjectFunction;
 		const previousCompilationPromises = this._compilationPromises;
 
-		// nested calls, e.g. from shadow nodes, build their objects right away and add their pipelines to the running precompilation
-
-		const parentPrecompilationState = this._precompilationState;
-
 		//
 
 		if ( targetScene === null ) targetScene = scene;
@@ -1059,6 +1064,10 @@ class Renderer {
 		const activeCubeFace = this._activeCubeFace;
 		const activeMipmapLevel = this._activeMipmapLevel;
 
+		// nested calls queue their work, e.g. compute of the drawing pipeline, in the running precompilation
+
+		const compilationPromises = ( parentPrecompilationState !== null ) ? parentPrecompilationState.compilationPromises : [];
+
 		// a state snapshot is taken once at the beginning and reapplied every time precompilation continues.
 
 		// the work items always set their render target, without the frame buffer target the current one is restored
@@ -1066,7 +1075,7 @@ class Renderer {
 		const precompilationState = {
 			useFrameBufferTarget, renderTarget, outputRenderTarget: useFrameBufferTarget ? outputRenderTarget : this._renderTarget, activeCubeFace, activeMipmapLevel, item: null, materialSide: null, mrt: this._mrt, outputMRT: this._mrt,
 			pipelinePromises: ( parentPrecompilationState !== null ) ? parentPrecompilationState.pipelinePromises : null,
-			parentPrecompilationState
+			compilationPromises, parentPrecompilationState
 		};
 
 		this._beginPreCompile( precompilationState );
@@ -1075,14 +1084,12 @@ class Renderer {
 
 		precompilationState.renderContext = renderContext;
 
-		const compilationPromises = [];
-
 		this._currentRenderContext = renderContext;
 		this._currentRenderObjectFunction = this._renderObjectFunction || this.renderObject;
 
 		this._handleObjectFunction = this._createObjectPipeline;
 
-		this._compilationPromises = ( parentPrecompilationState !== null ) ? null : compilationPromises;
+		this._compilationPromises = compilationPromises;
 
 		nodeFrame.renderId ++;
 
@@ -1194,9 +1201,8 @@ class Renderer {
 
 		// Process compilation work items sequentially and yield to the main thread after a
 		// time budget to keep animation smooth. Pipelines are compiled in parallel while
-		// the next items are processed.
+		// the next items are processed. Nested calls can add items while they are processed.
 
-		const total = compilationPromises.length;
 		let loaded = 0;
 
 		const scheduler = new CompileScheduler();
@@ -1208,7 +1214,7 @@ class Renderer {
 
 			if ( onProgress !== null ) {
 
-				onProgress( new ProgressEvent( 'progress', { lengthComputable: true, loaded, total } ) );
+				onProgress( new ProgressEvent( 'progress', { lengthComputable: true, loaded, total: compilationPromises.length } ) );
 
 			}
 
@@ -1257,7 +1263,13 @@ class Renderer {
 			renderObject.group = item.group;
 
 			await this._nodes.getForRenderAsync( renderObject, yieldPreCompile );
+
+			// nested compilations, e.g. shadows, see the material with its own side
+
+			item.material.side = itemPrecompilationState.materialSide;
 			this._nodes.updateBefore( renderObject );
+			item.material.side = item.side;
+
 			this._geometries.updateForRender( renderObject );
 			this._nodes.updateForRender( renderObject );
 			this._bindings.updateForRender( renderObject );
@@ -4137,8 +4149,9 @@ class Renderer {
 	 */
 	_createObjectPipeline( object, material, scene, camera, lightsNode, group, clippingContext, passId ) {
 
-		// If in async compilation mode, queue the work for sequential execution
-		if ( this._compilationPromises !== null ) {
+		// If in async compilation mode, queue the work for sequential execution.
+		// Nested calls build their objects right away since their state, e.g. a shadow material, is only set up during the call
+		if ( this._compilationPromises !== null && this._precompilationState.parentPrecompilationState === null ) {
 
 			// Store work items instead of promises - will be processed sequentially.
 			// The side is stored since the renderer might have changed it temporarily.
