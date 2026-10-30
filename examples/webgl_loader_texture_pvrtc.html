@@ -51,8 +51,8 @@
 
 					texture.magFilter = THREE.LinearFilter;
 					texture.minFilter = THREE.LinearFilter;
-					texture.mapping = THREE.CubeReflectionMapping;
 					texture.colorSpace = THREE.SRGBColorSpace;
+					material6.envMap = texture;
 					material6.needsUpdate = true;
 
 				};
@@ -62,8 +62,8 @@
 					texture.magFilter = THREE.LinearFilter;
 					// texture.minFilter = LinearMipmapNearestFilter;
 					texture.minFilter = THREE.LinearFilter;
-					texture.mapping = THREE.CubeReflectionMapping;
 					texture.colorSpace = THREE.SRGBColorSpace;
+					material8.envMap = texture;
 					material8.needsUpdate = true;
 
 				};
@@ -78,8 +78,8 @@
 				const disturb_2bpp_rgb = loader.load( 'textures/compressed/disturb_2bpp_rgb.pvr' );
 				const flare_4bpp_rgba = loader.load( 'textures/compressed/flare_4bpp_rgba.pvr' );
 				const flare_2bpp_rgba = loader.load( 'textures/compressed/flare_2bpp_rgba.pvr' );
-				const park3_cube_nomip_4bpp_rgb = loader.load( 'textures/compressed/park3_cube_nomip_4bpp_rgb.pvr', onCube1Loaded );
-				const park3_cube_mip_2bpp_rgb_v3 = loader.load( 'textures/compressed/park3_cube_mip_2bpp_rgb_v3.pvr', onCube2Loaded );
+				loader.loadAsync( 'textures/compressed/park3_cube_nomip_4bpp_rgb.pvr' ).then( onCube1Loaded );
+				loader.loadAsync( 'textures/compressed/park3_cube_mip_2bpp_rgb_v3.pvr' ).then( onCube2Loaded );
 
 				disturb_2bpp_rgb.minFilter =
 				disturb_2bpp_rgb.magFilter =
@@ -103,8 +103,8 @@
 				const material3 = new THREE.MeshBasicMaterial( { map: disturb_2bpp_rgb } );
 				const material4 = new THREE.MeshBasicMaterial( { map: flare_4bpp_rgba, side: THREE.DoubleSide, depthTest: false, transparent: true } );
 				const material5 = new THREE.MeshBasicMaterial( { map: flare_2bpp_rgba, side: THREE.DoubleSide, depthTest: false, transparent: true } );
-				const material6 = new THREE.MeshBasicMaterial( { envMap: park3_cube_nomip_4bpp_rgb } );
-				const material8 = new THREE.MeshBasicMaterial( { envMap: park3_cube_mip_2bpp_rgb_v3 } );
+				const material6 = new THREE.MeshBasicMaterial();
+				const material8 = new THREE.MeshBasicMaterial();
 
 				const material7 = new THREE.MeshBasicMaterial( { map: disturb_4bpp_rgb_v3 } );
 
