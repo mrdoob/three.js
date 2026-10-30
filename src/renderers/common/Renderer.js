@@ -2390,7 +2390,7 @@ class Renderer {
 
 		// started before assigning the callback, so it first runs on the next frame
 
-		this._animation.start();
+		if ( callback !== null ) this._animation.start();
 		this._animation.setAnimationLoop( callback );
 
 	}
