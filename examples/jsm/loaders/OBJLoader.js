@@ -563,7 +563,7 @@ class OBJLoader extends Loader {
 
 		for ( let i = 0, l = lines.length; i < l; i ++ ) {
 
-			const line = lines[ i ].trimStart();
+			let line = lines[ i ].trimStart();
 
 			if ( line.length === 0 ) continue;
 
@@ -571,6 +571,15 @@ class OBJLoader extends Loader {
 
 			// @todo invoke passed in handler if any
 			if ( lineFirstChar === '#' ) continue; // skip comments
+
+			// remove trailing comments from lines with numeric data. Names (o, g, usemtl...) can contain '#'
+
+			if ( lineFirstChar === 'v' || lineFirstChar === 'f' || lineFirstChar === 'l' || lineFirstChar === 'p' ) {
+
+				const commentIndex = line.indexOf( '#' );
+				if ( commentIndex !== - 1 ) line = line.slice( 0, commentIndex ).trimEnd();
+
+			}
 
 			if ( lineFirstChar === 'v' ) {
 
