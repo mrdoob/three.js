@@ -21,6 +21,8 @@ as observable with brushed metals.</li>
 <li>Clearcoat: Some materials — like car paints, carbon fiber, and wet surfaces — require
 a clear, reflective layer on top of another layer that may be irregular or rough.
 Clearcoat approximates this effect, without the need for a separate transparent surface.</li>
+<li>Diffuse roughness: Produces the flatter appearance and enhanced backscattering of
+rough diffuse surfaces such as clay, concrete, and unpolished materials.</li>
 <li>Iridescence: Allows to render the effect where hue varies  depending on the viewing
 angle and illumination angle. This can be seen on soap bubbles, oil films, or on the
 wings of many insects.</li>
@@ -89,7 +91,7 @@ contains strength as <code>[0, 1]</code> to be multiplied by <code>anisotropy</c
 						<p>The rotation of the anisotropy in tangent, bitangent space, measured in radians
 counter-clockwise from the tangent. When <code>anisotropyMap</code> is present, this
 property provides additional rotation to the vectors in the texture.</p>
-						<p>Default is <code>1</code>.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -163,6 +165,25 @@ for per-pixel control over a coating's intensity.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="diffuseRoughness" translate="no">.<a href="#diffuseRoughness">diffuseRoughness</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Roughness of the diffuse layer, from <code>0.0</code> to <code>1.0</code>. A value of <code>0.0</code>
+uses Lambertian diffuse reflection. Values above <code>0.0</code> use the EON
+energy-preserving rough diffuse model.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="diffuseRoughnessMap" translate="no">.<a href="#diffuseRoughnessMap">diffuseRoughnessMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="description">
+						<p>The red channel of this texture is multiplied against <code>diffuseRoughness</code>,
+for per-pixel control over the diffuse roughness.</p>
+<p><code>diffuseRoughnessMap</code> represents non-color data. Any texture assigned must have
+<code>texture.colorSpace = NoColorSpace</code> (default).</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="dispersion" translate="no">.<a href="#dispersion">dispersion</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>Defines the strength of the angular separation of colors (chromatic aberration) transmitting
@@ -208,11 +229,12 @@ control over iridescence.</p>
 					<h3 class="name" id="iridescenceThicknessMap" translate="no">.<a href="#iridescenceThicknessMap">iridescenceThicknessMap</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
 					<div class="description">
 						<p>A texture that defines the thickness of the iridescence layer, stored in the green channel.
-Minimum and maximum values of thickness are defined by <code>iridescenceThicknessRange</code> array:</p>
+Minimum and maximum values of thickness are defined by <code>iridescenceThicknessMinimum</code> and
+<code>iridescenceThicknessMaximum</code>:</p>
 <ul>
-<li><code>0.0</code> in the green channel will result in thickness equal to first element of the array.</li>
-<li><code>1.0</code> in the green channel will result in thickness equal to second element of the array.</li>
-<li>Values in-between will linearly interpolate between the elements of the array.</li>
+<li><code>0.0</code> in the green channel will result in thickness equal to <code>iridescenceThicknessMinimum</code>.</li>
+<li><code>1.0</code> in the green channel will result in thickness equal to <code>iridescenceThicknessMaximum</code>.</li>
+<li>Values in-between will linearly interpolate between both values.</li>
 </ul>
 <p><code>iridescenceThicknessMap</code> represents non-color data. Any texture assigned must have
 <code>texture.colorSpace = NoColorSpace</code> (default).</p>
@@ -220,12 +242,29 @@ Minimum and maximum values of thickness are defined by <code>iridescenceThicknes
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="iridescenceThicknessMaximum" translate="no">.<a href="#iridescenceThicknessMaximum">iridescenceThicknessMaximum</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The maximum thickness of the iridescence layer in nanometers. If no
+<code>iridescenceThicknessMap</code> is defined, this value is used as the thickness.</p>
+						<p>Default is <code>400</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="iridescenceThicknessMinimum" translate="no">.<a href="#iridescenceThicknessMinimum">iridescenceThicknessMinimum</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The minimum thickness of the iridescence layer in nanometers.</p>
+						<p>Default is <code>100</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="iridescenceThicknessRange" translate="no">.<a href="#iridescenceThicknessRange">iridescenceThicknessRange</a><span class="type-signature"> : Array.&lt;number, number></span> </h3>
 					<div class="description">
-						<p>Array of exactly 2 elements, specifying minimum and maximum thickness of the iridescence layer.
-Thickness of iridescence layer has an equivalent effect of the one <code>thickness</code> has on <code>ior</code>.</p>
+						<p>Array of exactly 2 elements, specifying minimum and maximum thickness of the iridescence layer.</p>
 						<p>Default is <code>[100,400]</code>.</p>
 					</div>
+						<dl class="details">
+							<dt class="important tag-deprecated"><strong>Deprecated:</strong> since r187. Use <a href="MeshPhysicalMaterial.html#iridescenceThicknessMinimum">MeshPhysicalMaterial#iridescenceThicknessMinimum</a> and <a href="MeshPhysicalMaterial.html#iridescenceThicknessMaximum">MeshPhysicalMaterial#iridescenceThicknessMaximum</a> instead.</dt>
+						</dl>
 				</div>
 				<div class="member">
 					<h3 class="name" id="isMeshPhysicalMaterial" translate="no">.<a href="#isMeshPhysicalMaterial">isMeshPhysicalMaterial</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>

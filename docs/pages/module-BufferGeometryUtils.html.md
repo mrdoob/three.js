@@ -16,7 +16,7 @@ Computes vertex tangents using the MikkTSpace algorithm. MikkTSpace generates th
 
 In comparison to this method, [BufferGeometry#computeTangents](BufferGeometry.html#computeTangents) (a custom algorithm) generates tangents that probably will not match the tangents in other software. The custom algorithm is sufficient for general use with a custom material, and may be faster than MikkTSpace.
 
-Returns the original BufferGeometry. Indexed geometries will be de-indexed. Requires position, normal, and uv attributes.
+Returns the original BufferGeometry. Indexed geometries will be de-indexed. Requires position, normal, and uv attributes. Tangents are stored like the normals: normalized Int8 or Int16 when the normals are, Float32 otherwise.
 
 **geometry**
 
@@ -24,7 +24,7 @@ The geometry to compute tangents for.
 
 **MikkTSpace**
 
-Instance of `examples/jsm/libs/mikktspace.module.js`, or `mikktspace` npm package. Await `MikkTSpace.ready` before use.
+Instance of `examples/jsm/libs/mikktspace.module.js`, or `mikktspace` npm package. The bundled JavaScript implementation is ready immediately. Await `MikkTSpace.ready` before using a WebAssembly implementation.
 
 **negateSign**
 
@@ -149,6 +149,24 @@ Default is `1e-4`.
 **Returns:**
 
 *   The new geometry with merged vertices.
+
+### .remapAttribute( attribute : BufferAttribute | InterleavedBufferAttribute, sourceIndices : Array.<number> | TypedArray, buffers : Map.<InterleavedBuffer, InterleavedBuffer> ) : BufferAttribute | InterleavedBufferAttribute (inner)
+
+Copies attribute entries in the order specified by the source vertex indices. Preserves raw values, attribute type and metadata. Reuse the same buffer map across calls to preserve shared interleaved buffers for the same mapping.
+
+**attribute**
+
+The source attribute.
+
+**sourceIndices**
+
+The source index for each output vertex.
+
+**buffers**
+
+Shared interleaved buffer copies.
+
+**Returns:** The remapped attribute.
 
 ### .toCreasedNormals( geometry : BufferGeometry, creaseAngle : number ) : BufferGeometry (inner)
 

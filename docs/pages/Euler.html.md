@@ -76,6 +76,8 @@ The angle of the z axis in radians.
 
 Default is `0`.
 
+## Static Properties
+
 ### .DEFAULT_ORDER : string
 
 The default Euler angle order.

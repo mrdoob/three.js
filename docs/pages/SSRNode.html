@@ -9,7 +9,7 @@
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
-		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="TempNode.html">TempNode</a> → </p>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → </p>
 	<h1 translate="no">SSRNode</h1>
 		<section>
 			<header>
@@ -224,9 +224,9 @@ early-out. When <code>null</code>, the shader treats surfaces as non-metallic.</
 					<h3 class="name" id="mirrorBias" translate="no">.<a href="#mirrorBias">mirrorBias</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;float></span> </h3>
 					<div class="description">
 						<p>Mirror bias for the stochastic GGX sampling. Concentrates the reflected rays toward
-the lobe's narrow (near-mirror) core, trading a small amount of bias for less noise.
+the lobe's narrow (near-mirror) core, trading sampling bias for less noise.
 <code>0</code> samples the full VNDF lobe; values toward <code>1</code> tighten the cone. Range <code>[0,1]</code>.</p>
-						<p>Default is <code>0.5</code>.</p>
+						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -288,6 +288,24 @@ a new value recompiles the SSR material.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="specularF90Node" translate="no">.<a href="#specularF90Node">specularF90Node</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="description">
+						<p>Stochastic mode only: per-pixel grazing reflectance (F90), typically an MRT
+<code>specularF90</code> attachment. When <code>null</code>, the shader uses <code>1</code>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="specularNode" translate="no">.<a href="#specularNode">specularNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="description">
+						<p>Stochastic mode only: per-pixel normal-incidence reflectance (F0), typically an MRT
+<code>specularColorBlended</code> attachment, which already includes IOR, specular intensity and
+metalness (raw <code>material.specularColor</code> reflects too brightly). When <code>null</code>, F0 is
+derived from metalness and the diffuse color.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="stepExponent" translate="no">.<a href="#stepExponent">stepExponent</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>Non-linear step distribution exponent (compile-time constant). See the backing
@@ -316,7 +334,7 @@ its effect once per frame in <code>updateBefore()</code>.</p>
 						<p>Default is <code>'frame'</code>.</p>
 					</div>
 						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateBeforeType">TempNode#updateBeforeType</a></dt>
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#updateBeforeType">Node#updateBeforeType</a></dt>
 						</dl>
 				</div>
 				<div class="member">
@@ -333,7 +351,7 @@ its effect once per frame in <code>updateBefore()</code>.</p>
 when the effect is no longer required.</p>
 						</div>
 						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#dispose">TempNode#dispose</a></dt>
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#dispose">Node#dispose</a></dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="getTextureNode" translate="no">.<a href="#getTextureNode">getTextureNode</a><span class="signature">()</span><span class="type-signature"> : <a href="PassTextureNode.html">PassTextureNode</a></span> </h3>
@@ -446,7 +464,7 @@ texture. Pass <code>null</code> for both to disable multi-bounce.</p>
 							</tbody>
 						</table>
 						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#setup">TempNode#setup</a></dt>
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#setup">Node#setup</a></dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="updateBefore" translate="no">.<a href="#updateBefore">updateBefore</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
@@ -467,7 +485,7 @@ texture. Pass <code>null</code> for both to disable multi-bounce.</p>
 							</tbody>
 						</table>
 						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateBefore">TempNode#updateBefore</a></dt>
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#updateBefore">Node#updateBefore</a></dt>
 						</dl>
 					</div>
 				<h2 class="subsection-title">Source</h2>

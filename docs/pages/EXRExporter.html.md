@@ -30,7 +30,7 @@ import { EXRExporter } from 'three/addons/exporters/EXRExporter.js';
 This method has two variants.
 
 *   When exporting a data texture, it receives two parameters. The texture and the exporter options.
-*   When exporting a render target (e.g. a PMREM), it receives three parameters. The renderer, the render target and the exporter options.
+*   When exporting a render target, it receives three parameters. The renderer, the render target and the exporter options.
 
 **arg1**
 
@@ -59,12 +59,19 @@ Output data type.
 
 Default is `HalfFloatType`.
 
-**type**  
-NO\_COMPRESSION | ZIP\_COMPRESSION | ZIPS\_COMPRESSION
+**compression**  
+NO\_COMPRESSION | RLE\_COMPRESSION | ZIP\_COMPRESSION | ZIPS\_COMPRESSION | PIZ\_COMPRESSION
 
 The compression algorithm.
 
 Default is `ZIP_COMPRESSION`.
+
+**textureIndex**  
+number
+
+When exporting a render target with multiple textures (MRT), the index of the texture to export.
+
+Default is `0`.
 
 ## Source
 

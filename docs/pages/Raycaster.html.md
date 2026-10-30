@@ -219,6 +219,11 @@ number
 
 The index number of the instance where the ray intersects the [InstancedMesh](InstancedMesh.html).
 
+**batchId**  
+number
+
+The index number of the instance where the ray intersects the [BatchedMesh](BatchedMesh.html).
+
 ## Source
 
 [src/core/Raycaster.js](https://github.com/mrdoob/three.js/blob/master/src/core/Raycaster.js)

@@ -9,7 +9,7 @@
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
-		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="TempNode.html">TempNode</a> → </p>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → </p>
 	<h1 translate="no">PMREMNode</h1>
 		<section>
 			<header>
@@ -23,10 +23,10 @@ material.envNode = pmremTexture( envMap );
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="PMREMNode" translate="no">new <a href="#PMREMNode">PMREMNode</a><span class="signature">( value : <span class="param-type"><a href="Texture.html">Texture</a></span>, uvNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec2></span>, levelNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span> </h3>
+					<h3 class="name name-method" id="PMREMNode" translate="no">new <a href="#PMREMNode">PMREMNode</a><span class="signature">( value : <span class="param-type"><a href="Texture.html">Texture</a></span>, uvNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span>, levelNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Constructs a new function overloading node.</p>
+							<p>Constructs a new PMREM node.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -74,11 +74,11 @@ material.envNode = pmremTexture( envMap );
 						<p>Default is <code>'render'</code>.</p>
 					</div>
 						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateBeforeType">TempNode#updateBeforeType</a></dt>
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#updateBeforeType">Node#updateBeforeType</a></dt>
 						</dl>
 				</div>
 				<div class="member">
-					<h3 class="name" id="uvNode" translate="no">.<a href="#uvNode">uvNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec2></span> </h3>
+					<h3 class="name" id="uvNode" translate="no">.<a href="#uvNode">uvNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
 					<div class="description">
 						<p>The uv node.</p>
 					</div>

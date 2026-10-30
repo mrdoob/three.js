@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>MeshletDrawingPipeline - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="StandardDrawingPipeline.html">StandardDrawingPipeline</a> → </p>
+	<h1 translate="no">MeshletDrawingPipeline</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A GPU-driven drawing pipeline that renders compatible meshes as meshlets. Geometries are processed once into
+clusters (meshlets) of 64 triangles with a chain of simplified levels of detail. Every frame, compute
+shaders select the level of detail per object and cull the objects and clusters against the frustum,
+and the visible clusters of all objects sharing geometry and material are drawn in one indirect draw
+through the hardware rasterizer.</p>
+<p>The node graph of the material is evaluated on the pulled vertices (position, normal, model matrices and
+the attributes of the geometry), so custom nodes, lights, shadows and the environment work as usual.
+Supported are opaque and alpha-tested meshes using front side rendering whose material nodes don't change the geometry,
+the coverage or the output of the draw. All other objects, and all objects in render calls using a custom
+render object function like shadow passes, are drawn by the regular pipeline. Objects are drawn by the
+regular pipeline until their geometry is processed.
+Objects affected by clipping planes use the regular pipeline, including their depth-only passes.
+Material properties are read from the source material, so uniform changes do not require rebuilding the
+batches. Meshlets are regenerated when geometry attributes or indices are replaced or marked <code>needsUpdate</code>.
+Meshes with an array of materials are processed per geometry group, with separate meshlets and levels of
+detail for each index range. Compatible groups use the GPU-driven pipeline while the other groups use
+the regular pipeline. Meshlets of a group are shared by all meshes using the same geometry and range. The
+batches of the groups of the same objects share the transforms and instance data of the objects, which are
+uploaded once.</p>
+<p>The transforms of the objects are compared with the last upload, only the objects and instances which changed
+are uploaded. Objects exceeding <a href="MeshletDrawingPipeline.html#maxInstances">MeshletDrawingPipeline#maxInstances</a> are drawn by the regular pipeline: static
+bundle groups and the objects drawn by the GPU-driven pipeline in the last frames have precedence.</p>
+<p>Positions deformed by the context of the render call, like a curved world in the context of a pass, are culled
+by the bounds of the deformed positions which the context provides with a <code>getBoundingSphere( sphere, cameraPosition )</code>
+function: it receives the bounding sphere in world space ( <code>vec4</code> center and radius ) and returns the bounding
+sphere of the deformed positions. Cone culling is disabled, shadow passes use the real positions.</p>
+<pre><code class="language-js">scenePass.contextNode = overrideNodes( [ [ modelViewProjection, curvedProjection ] ], context( {
+	getBoundingSphere: ( sphere, cameraPosition ) => curvedSphere( sphere, cameraPosition )
+} ) );
+</code></pre>
+<p>MRT outputs of the render call and of the materials are evaluated like for the regular meshes. The matrices
+of the objects in the previous frame are kept on the GPU, so the velocity of temporal effects like TRAA
+includes the motion of the objects and the instances.</p>
+<p>Objects are culled on the GPU, but the CPU still traverses the scene and uploads the transforms every frame.
+The content of a static <a href="BundleGroup.html">BundleGroup</a> is kept on the GPU instead: the group is captured once, the
+transforms of its meshes are uploaded once and the group is not traversed again until <code>needsUpdate</code> is set.
+Changes inside of the group, like transforms or added objects, require <code>needsUpdate</code> as with render bundles.</p>
+<pre><code class="language-js">renderer.drawingPipeline = new MeshletDrawingPipeline();
+const city = new BundleGroup();
+city.add( ...buildings );
+scene.add( city );
+</code></pre>
+<p>This class is experimental and its interface might change.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="MeshletDrawingPipeline" translate="no">new <a href="#MeshletDrawingPipeline">MeshletDrawingPipeline</a><span class="signature">( parameters : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new meshlet drawing pipeline.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">parameters</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration parameter.</p>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">lodThreshold</strong>
+									</td>
+									<td class="description last">
+										<p>The projected error in pixels below which a simpler level of detail is selected.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">shadowLodThreshold</strong>
+									</td>
+									<td class="description last">
+										<p>The projected error in shadow map texels below which a simpler level of detail is selected for shadow casters.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">minScreenRadius</strong>
+									</td>
+									<td class="description last">
+										<p>The radius in pixels below which objects are not drawn, <code>0</code> draws all objects.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">coarseScreenRadius</strong>
+									</td>
+									<td class="description last">
+										<p>The radius in pixels below which objects are drawn with their simplest level of detail.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">debug</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the clusters should be shown with a flat color each instead of the material.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">occlusionCulling</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the clusters hidden by other clusters should be culled.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">depthPrepass</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the depth of the clusters should be drawn before their material.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="coarseScreenRadius" translate="no">.<a href="#coarseScreenRadius">coarseScreenRadius</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The radius of the bounding sphere of objects on the screen in pixels, or in shadow map texels for shadow
+casters, below which they are drawn with their simplest level of detail, independent of the projected
+error. <code>0</code> selects the level by the projected error only.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="debug" translate="no">.<a href="#debug">debug</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the clusters (meshlets) of the objects drawn by the GPU-driven pipeline should be shown
+with a flat color each, instead of shading them with their material. Each object uses different
+colors, and the clusters of all levels of detail are distinct.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="depthPrepass" translate="no">.<a href="#depthPrepass">depthPrepass</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the depth of the clusters drawn by the hardware rasterizer should be drawn before their material,
+so the material is only evaluated once per pixel. Reduces the overdraw of expensive materials at the cost
+of drawing the clusters twice.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="info" translate="no">.<a href="#info">info</a><span class="type-signature"> : Object</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The clusters and triangles drawn by the GPU-driven pipeline in the main view, read from the counters of the
+culling without waiting for the GPU. The values are updated every interval of frames, the triangles include the degenerate triangles which pad the clusters.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isMeshletDrawingPipeline" translate="no">.<a href="#isMeshletDrawingPipeline">isMeshletDrawingPipeline</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="lodThreshold" translate="no">.<a href="#lodThreshold">lodThreshold</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The projected error in pixels below which a simpler level of detail is selected.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="maxInstances" translate="no">.<a href="#maxInstances">maxInstances</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The maximum number of objects drawn by the GPU-driven pipeline per render list. The instances of instanced
+meshes count as objects, once per geometry group. Limited by the maximum size of a storage buffer binding:
+the world matrices of the objects and of the last frame use 128 bytes per object.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="minScreenRadius" translate="no">.<a href="#minScreenRadius">minScreenRadius</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The radius of the bounding sphere of objects on the screen in pixels, or in shadow map texels for shadow
+casters, below which they are not drawn. Small objects contribute few pixels, culling them saves the work of
+their clusters. <code>0</code> draws all objects.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="occlusionCulling" translate="no">.<a href="#occlusionCulling">occlusionCulling</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the clusters hidden by other clusters of the GPU-driven pipeline should be culled. The clusters
+visible in the last frame are rendered into a depth buffer first, the other clusters are tested
+against its hierarchical depth. Shadow passes are not occlusion culled.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="shadowLodThreshold" translate="no">.<a href="#shadowLodThreshold">shadowLodThreshold</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The projected error in shadow map texels below which a simpler level of detail is selected for the
+shadow casters. The level of detail of shadow passes doesn't depend on the camera, so shadow maps
+which are not updated every frame stay valid when the camera moves.</p>
+						<p>Default is <code>1</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="_getBatchKey" translate="no">.<a href="#_getBatchKey">_getBatchKey</a><span class="signature">( clusters : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="global.html#any">any</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the key of the batch drawing objects of the given geometry: the geometries with the same layout of
+the vertex data share the batches of a material, their vertices are read from the geometry pool.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">clusters</strong>
+									</td>
+									<td class="description last">
+										<p>The cluster data of the geometry.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The key.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="createBatch" translate="no">.<a href="#createBatch">createBatch</a><span class="signature">( entry : <span class="param-type">Object</span>, capacity : <span class="param-type">number</span>, view : <span class="param-type">Object</span>, culling : <span class="param-type"><a href="MeshletCulling.html">MeshletCulling</a></span> )</span><span class="type-signature"> : <a href="MeshletBatch.html">MeshletBatch</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates the batch drawing the objects of the given entry.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">entry</strong>
+									</td>
+									<td class="description last">
+										<p>The objects sharing geometry, material and shadow state.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">capacity</strong>
+									</td>
+									<td class="description last">
+										<p>The maximum number of objects.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">view</strong>
+									</td>
+									<td class="description last">
+										<p>The view of the render list.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">culling</strong>
+									</td>
+									<td class="description last">
+										<p>The culling of the render list.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The batch.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="createView" translate="no">.<a href="#createView">createView</a><span class="signature">( width : <span class="param-type">number</span>, height : <span class="param-type">number</span>, occlusion : <span class="param-type">boolean</span>, shadow : <span class="param-type">boolean</span>, clusterBudget : <span class="param-type">number</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates the view of a render list.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the view in pixels.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the view in pixels.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">occlusion</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the clusters are occlusion culled.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">shadow</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the culling draws a shadow map.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">clusterBudget</strong>
+									</td>
+									<td class="description last">
+										<p>The measured number of clusters of the visible objects.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The view, or <code>null</code> if the draw doesn't need one.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees the GPU-related resources of the pipeline: the cullings, batches and views of all render lists and the
+geometry pool. Called by <a href="Renderer.html#dispose">Renderer#dispose</a>. The pipeline can be used again, the resources are created again.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="StandardDrawingPipeline.html#dispose">StandardDrawingPipeline#dispose</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="prepareAsync" translate="no">.<a href="#prepareAsync">prepareAsync</a><span class="signature">( scene : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span><span class="type-signature"> : Promise</span> <span class="type-signature">(async) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Prepares the meshlets and geometry LODs before <code>Renderer.compileAsync()</code> projects
+the scene. Shared geometries are processed once, including meshes outside the frustum.
+Batches and their render and compute pipelines are then prepared by the renderer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene or object to precompile.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="StandardDrawingPipeline.html#prepareAsync">StandardDrawingPipeline#prepareAsync</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Resolves when the meshlets are ready.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="updateView" translate="no">.<a href="#updateView">updateView</a><span class="signature">( record : <span class="param-type">Object</span>, width : <span class="param-type">number</span>, height : <span class="param-type">number</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Prepares the view of the given render list, for pipelines using screen-space resources.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">record</strong>
+									</td>
+									<td class="description last">
+										<p>The record of the render list.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">width</strong>
+									</td>
+									<td class="description last">
+										<p>The width of the view in pixels.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">height</strong>
+									</td>
+									<td class="description last">
+										<p>The height of the view in pixels.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The view, or <code>null</code> if the draw doesn't need one.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/pipelines/MeshletDrawingPipeline.js" translate="no" target="_blank" rel="noopener">examples/jsm/pipelines/MeshletDrawingPipeline.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

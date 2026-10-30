@@ -93,7 +93,7 @@ Default is `null`.
 
 How much the displacement map affects the mesh (where black is no displacement, and white is maximum displacement). Without a displacement map set, this value is not applied.
 
-Default is `0`.
+Default is `1`.
 
 ### .emissive : Color
 

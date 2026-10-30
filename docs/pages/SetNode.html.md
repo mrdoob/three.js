@@ -1,4 +1,4 @@
-*Inheritance: EventDispatcher → Node → TempNode →*
+*Inheritance: EventDispatcher → Node →*
 
 # SetNode
 
@@ -52,7 +52,7 @@ This method is overwritten since the node type is inferred from [SetNode#sourceN
 
 The current node builder.
 
-**Overrides:** [TempNode#generateNodeType](TempNode.html#generateNodeType)
+**Overrides:** [Node#generateNodeType](Node.html#generateNodeType)
 
 **Returns:** The node type.
 

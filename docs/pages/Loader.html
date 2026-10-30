@@ -38,6 +38,14 @@
 				</div>
 				<h2 class="subsection-title">Properties</h2>
 				<div class="member">
+					<h3 class="name" id="cache" translate="no">.<a href="#cache">cache</a><span class="type-signature"> : 'default' | 'no-store' | 'reload' | 'no-cache' | 'force-cache'</span> </h3>
+					<div class="description">
+						<p>The HTTP cache mode passed to <code>fetch()</code>. This does not affect <a href="Cache.html">Cache</a>
+or loaders using <code>HTMLImageElement</code>.</p>
+						<p>Default is <code>'default'</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="crossOrigin" translate="no">.<a href="#crossOrigin">crossOrigin</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
 						<p>The crossOrigin string to implement CORS for loading the url from a
@@ -56,6 +64,13 @@ different domain that allows CORS.</p>
 					<h3 class="name" id="path" translate="no">.<a href="#path">path</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
 						<p>The base path from which the asset will be loaded.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="priority" translate="no">.<a href="#priority">priority</a><span class="type-signature"> : 'high' | 'low' | 'auto'</span> </h3>
+					<div class="description">
+						<p>The request priority hint. Image loaders use <code>HTMLImageElement.fetchPriority</code>.</p>
+						<p>Default is <code>'auto'</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -78,6 +93,7 @@ used in HTTP request.</p>
 						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
+				<h2 class="subsection-title">Static Properties</h2>
 				<div class="member">
 					<h3 class="name" id=".DEFAULT_MATERIAL_NAME" translate="no">.<a href="#.DEFAULT_MATERIAL_NAME">DEFAULT_MATERIAL_NAME</a><span class="type-signature"> : string</span> </h3>
 					<div class="description">
@@ -188,6 +204,29 @@ logic for parsing the asset into three.js entities.</p>
 							</tbody>
 						</table>
 					</div>
+					<h3 class="name name-method" id="setCache" translate="no">.<a href="#setCache">setCache</a><span class="signature">( value : <span class="param-type">'default' | 'no-store' | 'reload' | 'no-cache' | 'force-cache'</span> )</span><span class="type-signature"> : <a href="Loader.html">Loader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the HTTP cache mode for fetch requests. <code>no-cache</code> revalidates cached
+responses; <code>no-store</code> bypasses the HTTP cache. This does not affect
+<a href="Cache.html">Cache</a> or image element requests.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">value</strong>
+									</td>
+									<td class="description last">
+										<p>The HTTP cache mode.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="setCrossOrigin" translate="no">.<a href="#setCrossOrigin">setCrossOrigin</a><span class="signature">( crossOrigin : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="Loader.html">Loader</a></span> </h3>
 					<div class="method">
 						<div class="description">
@@ -223,6 +262,29 @@ from a different domain that allows CORS.</p>
 									</td>
 									<td class="description last">
 										<p>The base path.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this instance.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setPriority" translate="no">.<a href="#setPriority">setPriority</a><span class="signature">( value : <span class="param-type">'high' | 'low' | 'auto'</span> )</span><span class="type-signature"> : <a href="Loader.html">Loader</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets a browser scheduling hint. Browsers may ignore this hint.
+Internally created loaders inherit it. Loaders supplied by the application
+(for example decoder loaders or loading manager handlers) retain their own settings.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">value</strong>
+									</td>
+									<td class="description last">
+										<p>The request priority hint.</p>
 									</td>
 								</tr>
 							</tbody>

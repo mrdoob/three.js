@@ -217,7 +217,7 @@ render order.</p>
 					<h3 class="name" id="static" translate="no">.<a href="#static">static</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
 						<p>Whether the 3D object is supposed to be static or not. If set to <code>true</code>, it means
-the 3D object is not going to be changed after the initial renderer. This includes
+the 3D object is not going to be changed after the first render. This includes
 geometry and material settings. A static 3D object can be processed by the renderer
 slightly faster since certain state checks can be bypassed.</p>
 <p>Only relevant in context of <a href="WebGPURenderer.html">WebGPURenderer</a>.</p>
@@ -259,6 +259,7 @@ should not hold references to functions as these will not be cloned.</p>
 						<p>Default is <code>true</code>.</p>
 					</div>
 				</div>
+				<h2 class="subsection-title">Static Properties</h2>
 				<div class="member">
 					<h3 class="name" id=".DEFAULT_MATRIX_AUTO_UPDATE" translate="no">.<a href="#.DEFAULT_MATRIX_AUTO_UPDATE">DEFAULT_MATRIX_AUTO_UPDATE</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
@@ -654,12 +655,12 @@ itself, and returns all 3D objects with a matching property value.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The 3D object's scale in world space.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="intersectsFrustum" translate="no">.<a href="#intersectsFrustum">intersectsFrustum</a><span class="signature">( frustum : <span class="param-type"><a href="Frustum.html">Frustum</a> | <a href="FrustumArray.html">FrustumArray</a></span> )</span><span class="type-signature"> : boolean | undefined</span> <span class="type-signature">(abstract) </span></h3>
+					<h3 class="name name-method" id="intersectsFrustum" translate="no">.<a href="#intersectsFrustum">intersectsFrustum</a><span class="signature">( frustum : <span class="param-type"><a href="Frustum.html">Frustum</a> | <a href="FrustumArray.html">FrustumArray</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Abstract method to test whether this 3D object intersects the given frustum.
-Renderable 3D objects such as <a href="Mesh.html">Mesh</a>, <a href="Line.html">Line</a> or <a href="Points.html">Points</a>
-implement this method in order to use frustum culling.</p>
+							<p>Returns <code>true</code> if this 3D object intersects the given frustum. Renderable 3D objects
+such as <a href="Mesh.html">Mesh</a>, <a href="Line.html">Line</a> or <a href="Points.html">Points</a> override this method in order
+to use frustum culling. The default implementation always returns <code>true</code>.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -733,7 +734,7 @@ implement this method in order to use frustum culling.</p>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="onAfterRender" translate="no">.<a href="#onAfterRender">onAfterRender</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a> | <a href="WebGLRenderer.html">WebGLRenderer</a></span>, object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, material : <span class="param-type"><a href="Material.html">Material</a></span>, group : <span class="param-type">Object</span> )</span> </h3>
+					<h3 class="name name-method" id="onAfterRender" translate="no">.<a href="#onAfterRender">onAfterRender</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a> | <a href="WebGLRenderer.html">WebGLRenderer</a></span>, scene : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, material : <span class="param-type"><a href="Material.html">Material</a></span>, group : <span class="param-type">Object</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>A callback that is executed immediately after a 3D object is rendered.</p>
@@ -750,10 +751,10 @@ implement this method in order to use frustum culling.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong translate="no">object</strong>
+										<strong translate="no">scene</strong>
 									</td>
 									<td class="description last">
-										<p>The 3D object.</p>
+										<p>The scene.</p>
 									</td>
 								</tr>
 								<tr>
@@ -857,7 +858,7 @@ implement this method in order to use frustum culling.</p>
 							</tbody>
 						</table>
 					</div>
-					<h3 class="name name-method" id="onBeforeRender" translate="no">.<a href="#onBeforeRender">onBeforeRender</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a> | <a href="WebGLRenderer.html">WebGLRenderer</a></span>, object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, material : <span class="param-type"><a href="Material.html">Material</a></span>, group : <span class="param-type">Object</span> )</span> </h3>
+					<h3 class="name name-method" id="onBeforeRender" translate="no">.<a href="#onBeforeRender">onBeforeRender</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a> | <a href="WebGLRenderer.html">WebGLRenderer</a></span>, scene : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, material : <span class="param-type"><a href="Material.html">Material</a></span>, group : <span class="param-type">Object</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>A callback that is executed immediately before a 3D object is rendered.</p>
@@ -874,10 +875,10 @@ implement this method in order to use frustum culling.</p>
 								</tr>
 								<tr>
 									<td class="name">
-										<strong translate="no">object</strong>
+										<strong translate="no">scene</strong>
 									</td>
 									<td class="description last">
-										<p>The 3D object.</p>
+										<p>The scene.</p>
 									</td>
 								</tr>
 								<tr>

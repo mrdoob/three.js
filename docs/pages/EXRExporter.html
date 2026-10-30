@@ -41,7 +41,7 @@ const result = await exporter.parse( renderer, options );
 							<p>This method has two variants.</p>
 <ul>
 <li>When exporting a data texture, it receives two parameters. The texture and the exporter options.</li>
-<li>When exporting a render target (e.g. a PMREM), it receives three parameters. The renderer, the
+<li>When exporting a render target, it receives three parameters. The renderer, the
 render target and the exporter options.</li>
 </ul>
 						</div>
@@ -100,17 +100,32 @@ render target and the exporter options.</li>
 		</tr>
 		<tr>
 				<td class="name">
-					<strong>type</strong>
+					<strong>compression</strong>
 						<br>
 <span class="param-type">NO_COMPRESSION</span>
+|
+<span class="param-type">RLE_COMPRESSION</span>
 |
 <span class="param-type">ZIP_COMPRESSION</span>
 |
 <span class="param-type">ZIPS_COMPRESSION</span>
+|
+<span class="param-type">PIZ_COMPRESSION</span>
 				</td>
 			<td class="description last">
 				<p>The compression algorithm.</p>
 						<p>Default is <code>ZIP_COMPRESSION</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>textureIndex</strong>
+						<br>
+<span class="param-type">number</span>
+				</td>
+			<td class="description last">
+				<p>When exporting a render target with multiple textures (MRT), the index of the texture to export.</p>
+						<p>Default is <code>0</code>.</p>
 			</td>
 		</tr>
 	</tbody>

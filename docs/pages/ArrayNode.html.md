@@ -1,4 +1,4 @@
-*Inheritance: EventDispatcher → Node → TempNode →*
+*Inheritance: EventDispatcher → Node →*
 
 # ArrayNode
 
@@ -61,7 +61,7 @@ This method builds the output node and returns the resulting array as a shader s
 
 The current node builder.
 
-**Overrides:** [TempNode#generate](TempNode.html#generate)
+**Overrides:** [Node#generate](Node.html#generate)
 
 **Returns:** The generated shader string.
 
@@ -73,7 +73,7 @@ Returns the node's type.
 
 The current node builder.
 
-**Overrides:** [TempNode#generateNodeType](TempNode.html#generateNodeType)
+**Overrides:** [Node#generateNodeType](Node.html#generateNodeType)
 
 **Returns:** The type of the node.
 
@@ -85,7 +85,7 @@ Returns the number of elements in the node array.
 
 The current node builder.
 
-**Overrides:** [TempNode#getArrayCount](TempNode.html#getArrayCount)
+**Overrides:** [Node#getArrayCount](Node.html#getArrayCount)
 
 **Returns:** The number of elements in the node array.
 
@@ -97,7 +97,7 @@ Returns the node's type.
 
 The current node builder.
 
-**Overrides:** [TempNode#getElementType](TempNode.html#getElementType)
+**Overrides:** [Node#getElementType](Node.html#getElementType)
 
 **Returns:** The type of the node.
 
@@ -113,7 +113,7 @@ The current node builder.
 
 The name of the member variable.
 
-**Overrides:** [TempNode#getMemberType](TempNode.html#getMemberType)
+**Overrides:** [Node#getMemberType](Node.html#getMemberType)
 
 **Returns:** The type of the member variable.
 
