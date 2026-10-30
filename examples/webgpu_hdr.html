@@ -71,8 +71,6 @@
 			import { afterImage } from 'three/addons/tsl/display/AfterImageNode.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			import { ExtendedSRGBColorSpace, ExtendedSRGBColorSpaceImpl } from 'three/addons/math/ColorSpaces.js';
-
 			const params = {
 				intensity: uniform( 4.0, 'float' ).setName( 'intensity' ),
 				hardness: uniform( 0.4, 'float' ).setName( 'hardness' ),
@@ -99,16 +97,13 @@
 
 			}
 
-			// Enable Extended sRGB output color space for HDR presentation
-			THREE.ColorManagement.define( { [ ExtendedSRGBColorSpace ]: ExtendedSRGBColorSpaceImpl } );
-
-			// Renderer (HalfFloat output + Extended sRGB)
+			// Renderer (HalfFloat output + Linear sRGB)
 			const renderer = new THREE.WebGPURenderer( {
 				antialias: true,
 				outputType: THREE.HalfFloatType,
 			} );
 
-			renderer.outputColorSpace = ExtendedSRGBColorSpace;
+			renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.inspector = new Inspector();
@@ -129,7 +124,7 @@
 
 			const renderPipeline = new THREE.RenderPipeline( renderer );
 			const brushPass = pass( brushScene, camera, { type: THREE.HalfFloatType } );
-			brushPass.renderTarget.texture.colorSpace = ExtendedSRGBColorSpace;
+			brushPass.renderTarget.texture.colorSpace = THREE.LinearSRGBColorSpace;
 
 			renderPipeline.outputNode = afterImage( brushPass, params.afterImageDecay );
 
