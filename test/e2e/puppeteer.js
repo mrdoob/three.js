@@ -65,7 +65,6 @@ const exceptionList = [
 	'webgpu_vxgi',
 	'webgpu_vxgi_sponza',
 	'webgpu_gpudriven_city',
-	'webgpu_gpudriven_materials',
 
 	// Incremental light probe baking
 	'webgl_lightprobes_sponza',
