@@ -218,29 +218,20 @@ class USDZExporter {
 		options.animationTracks = animationTracks;
 
 		const root = new USDNode( 'Root', 'Xform' );
-		const scenesNode = new USDNode( 'Scenes', 'Scope' );
-		scenesNode.addMetadata( 'kind', '"sceneLibrary"' );
-		root.addChild( scenesNode );
-
-		const sceneName = 'Scene';
-		const sceneNode = new USDNode( sceneName, 'Xform' );
-		sceneNode.addMetadata( 'customData', [
-			'bool preliminary_collidesWithEnvironment = 0',
-			`string sceneName = "${sceneName}"`,
-		] );
-		sceneNode.addMetadata( 'sceneName', `"${sceneName}"` );
 		if ( options.includeAnchoringProperties ) {
 
-			sceneNode.addProperty(
-				`token preliminary:anchoring:type = "${options.ar.anchoring.type}"`
+			root.addMetadata(
+				'prepend apiSchemas',
+				'["Preliminary_AnchoringAPI"]'
 			);
-			sceneNode.addProperty(
-				`token preliminary:planeAnchoring:alignment = "${options.ar.planeAnchoring.alignment}"`
+			root.addProperty(
+				`uniform token preliminary:anchoring:type = "${options.ar.anchoring.type}"`
+			);
+			root.addProperty(
+				`uniform token preliminary:planeAnchoring:alignment = "${options.ar.planeAnchoring.alignment}"`
 			);
 
 		}
-
-		scenesNode.addChild( sceneNode );
 
 		let output;
 
@@ -249,11 +240,11 @@ class USDZExporter {
 
 		if ( scene.isScene ) {
 
-			buildHierarchy( scene, sceneNode, materials, usedNames, files, options );
+			buildHierarchy( scene, root, materials, usedNames, files, options );
 
 		} else {
 
-			buildNode( scene, sceneNode, materials, usedNames, files, options );
+			buildNode( scene, root, materials, usedNames, files, options );
 
 		}
 
