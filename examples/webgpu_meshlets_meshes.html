@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - gpu-driven meshes</title>
+		<title>three.js webgpu - meshlets meshes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<meta property="og:title" content="three.js webgpu - gpu-driven meshes">
+		<meta property="og:title" content="three.js webgpu - meshlets meshes">
 		<meta property="og:type" content="website">
-		<meta property="og:url" content="https://threejs.org/examples/webgpu_gpudriven_meshes.html">
-		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_gpudriven_meshes.jpg">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_meshlets_meshes.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_meshlets_meshes.jpg">
 		<link rel="icon" href="data:,">
 		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
@@ -16,7 +16,7 @@
 		<div id="info">
 			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
 			<div class="title-wrapper">
-				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>GPU-Driven Meshes</span>
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Meshlets Meshes</span>
 			</div>
 			<small>
 				Individual meshes of Lucy statues of 100k triangles each, culled and simplified per cluster on the GPU.<br />
@@ -56,7 +56,7 @@
 			const SPACING = 3;
 
 			const parameters = {
-				pipeline: 'GPU-driven',
+				pipeline: 'Meshlet',
 				statues: 10000,
 				occlusion: true,
 				meshlets: false,
@@ -91,7 +91,7 @@
 				await renderer.init();
 
 				pipelines = {
-					'GPU-driven': new MeshletDrawingPipeline( { occlusionCulling: parameters.occlusion, lodThreshold: parameters.lod, shadowLodThreshold: parameters.lod } ),
+					'Meshlet': new MeshletDrawingPipeline( { occlusionCulling: parameters.occlusion, lodThreshold: parameters.lod, shadowLodThreshold: parameters.lod } ),
 					'Default (slow)': renderer.drawingPipeline
 				};
 				renderer.drawingPipeline = pipelines[ parameters.pipeline ];
@@ -263,7 +263,7 @@
 
 			function createGUI() {
 
-				const pipeline = pipelines[ 'GPU-driven' ];
+				const pipeline = pipelines[ 'Meshlet' ];
 
 				const gui = renderer.inspector.createParameters( 'Settings' );
 				gui.add( parameters, 'pipeline', Object.keys( pipelines ) ).name( 'Pipeline' ).onChange( prepare );
@@ -352,9 +352,9 @@
 
 				let text = `${ formatCount( parameters.statues * geometry.index.count / 3 ) } triangles in the scene`;
 
-				if ( renderer.drawingPipeline === pipelines[ 'GPU-driven' ] ) {
+				if ( renderer.drawingPipeline === pipelines[ 'Meshlet' ] ) {
 
-					const info = pipelines[ 'GPU-driven' ].info;
+					const info = pipelines[ 'Meshlet' ].info;
 					text += ` | ${ formatCount( info.triangles ) } drawn in ${ formatCount( info.clusters ) } clusters`;
 
 				}

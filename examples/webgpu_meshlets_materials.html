@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - gpu-driven materials</title>
+		<title>three.js webgpu - meshlets materials</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<meta property="og:title" content="three.js webgpu - gpu-driven materials">
+		<meta property="og:title" content="three.js webgpu - meshlets materials">
 		<meta property="og:type" content="website">
-		<meta property="og:url" content="https://threejs.org/examples/webgpu_gpudriven_materials.html">
-		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_gpudriven_materials.jpg">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_meshlets_materials.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_meshlets_materials.jpg">
 		<link rel="icon" href="data:,">
 		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
@@ -16,7 +16,7 @@
 		<div id="info">
 			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
 			<div class="title-wrapper">
-				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>GPU-Driven Materials</span>
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Meshlets Materials</span>
 			</div>
 			<small>
 				Built-in and custom TSL materials drawn by the GPU-driven pipeline, one sector of statues per material.<br />
@@ -59,7 +59,7 @@
 			const ROWS = 8;
 
 			const parameters = {
-				pipeline: 'GPU-driven',
+				pipeline: 'Meshlet',
 				meshlets: false,
 				lod: 3,
 				rotate: true
@@ -91,7 +91,7 @@
 				await renderer.init();
 
 				pipelines = {
-					'GPU-driven': new MeshletDrawingPipeline( { lodThreshold: parameters.lod, shadowLodThreshold: parameters.lod } ),
+					'Meshlet': new MeshletDrawingPipeline( { lodThreshold: parameters.lod, shadowLodThreshold: parameters.lod } ),
 					'Default (slow)': renderer.drawingPipeline
 				};
 				renderer.drawingPipeline = pipelines[ parameters.pipeline ];
@@ -286,15 +286,15 @@
 				gui.add( parameters, 'pipeline', Object.keys( pipelines ) ).name( 'Pipeline' ).onChange( prepare );
 				gui.add( parameters, 'meshlets' ).name( 'Show meshlets' ).onChange( value => {
 
-					pipelines[ 'GPU-driven' ].debug = value;
+					pipelines[ 'Meshlet' ].debug = value;
 					renderer.toneMapping = value ? THREE.NoToneMapping : THREE.ACESFilmicToneMapping;
 					prepare();
 
 				} );
 				gui.add( parameters, 'lod', 1, 8, 0.5 ).name( 'LOD error (px)' ).onChange( value => {
 
-					pipelines[ 'GPU-driven' ].lodThreshold = value;
-					pipelines[ 'GPU-driven' ].shadowLodThreshold = value;
+					pipelines[ 'Meshlet' ].lodThreshold = value;
+					pipelines[ 'Meshlet' ].shadowLodThreshold = value;
 
 				} );
 				gui.add( parameters, 'rotate' ).name( 'Auto rotate' ).onChange( value => controls.autoRotate = value );
@@ -326,9 +326,9 @@
 
 				let text = `${ statueCount } statues | ${ formatCount( statueCount * geometry.index.count / 3 ) } triangles in the scene`;
 
-				if ( renderer.drawingPipeline === pipelines[ 'GPU-driven' ] ) {
+				if ( renderer.drawingPipeline === pipelines[ 'Meshlet' ] ) {
 
-					const info = pipelines[ 'GPU-driven' ].info;
+					const info = pipelines[ 'Meshlet' ].info;
 					text += ` | ${ formatCount( info.triangles ) } drawn in ${ formatCount( info.clusters ) } clusters`;
 
 				}

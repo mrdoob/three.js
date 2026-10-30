@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - city generator - gpu-driven</title>
+		<title>three.js webgpu - meshlets city</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<meta property="og:title" content="three.js webgpu - city generator - gpu-driven">
+		<meta property="og:title" content="three.js webgpu - meshlets city">
 		<meta property="og:type" content="website">
-		<meta property="og:url" content="https://threejs.org/examples/webgpu_gpudriven_city.html">
-		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_gpudriven_city.jpg">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_meshlets_city.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_meshlets_city.jpg">
 		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
 	<body>
@@ -16,7 +16,7 @@
 			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
 
 			<div class="title-wrapper">
-				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>City Generator — GPU-Driven</span>
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Meshlets City</span>
 			</div>
 
 			<small>
@@ -70,7 +70,7 @@
 				tiles: parseInt( search.get( 'tiles' ) || '6' ), // the generated city is repeated on a tiles x tiles grid
 				timeOfDay: 9, // hours: 6 sunrise, 12 noon, 18 sunset
 				shadows: search.get( 'shadows' ) !== '0',
-				pipeline: search.get( 'pipeline' ) || 'gpu-driven',
+				pipeline: search.get( 'pipeline' ) || 'meshlet',
 				static: search.get( 'static' ) !== '0',
 				occlusion: search.get( 'occlusion' ) !== '0',
 				prepass: search.get( 'prepass' ) !== '0',
@@ -119,7 +119,7 @@
 				// the meshlet drawing pipelines draw the towers, the standard drawing pipeline of the renderer draws every object on its own, for comparison
 
 				pipelines = {
-					'gpu-driven': new MeshletDrawingPipeline( { debug: parameters.meshlets, occlusionCulling: parameters.occlusion, depthPrepass: parameters.prepass, lodThreshold: parameters.lod, shadowLodThreshold: parameters.shadowLod } ),
+					'meshlet': new MeshletDrawingPipeline( { debug: parameters.meshlets, occlusionCulling: parameters.occlusion, depthPrepass: parameters.prepass, lodThreshold: parameters.lod, shadowLodThreshold: parameters.shadowLod } ),
 					'visibility-buffer': new VisibilityBufferDrawingPipeline( { debug: parameters.meshlets, occlusionCulling: parameters.occlusion, lodThreshold: parameters.lod, shadowLodThreshold: parameters.shadowLod } ),
 					'default': renderer.drawingPipeline
 				};
@@ -287,20 +287,20 @@
 				gui.add( parameters, 'static' ).name( 'static bundle' ).onChange( generateCity );
 				gui.add( parameters, 'occlusion' ).name( 'occlusion culling' ).onChange( ( value ) => {
 
-					pipelines[ 'gpu-driven' ].occlusionCulling = value;
+					pipelines[ 'meshlet' ].occlusionCulling = value;
 					pipelines[ 'visibility-buffer' ].occlusionCulling = value;
 
 				} );
-				gui.add( pipelines[ 'gpu-driven' ], 'depthPrepass' ).name( 'depth prepass' );
+				gui.add( pipelines[ 'meshlet' ], 'depthPrepass' ).name( 'depth prepass' );
 				gui.add( parameters, 'lod', 0, 8, 0.1 ).name( 'lod (pixels)' ).onChange( ( value ) => {
 
-					pipelines[ 'gpu-driven' ].lodThreshold = value;
+					pipelines[ 'meshlet' ].lodThreshold = value;
 					pipelines[ 'visibility-buffer' ].lodThreshold = value;
 
 				} );
 				gui.add( parameters, 'shadowLod', 0, 8, 0.5 ).name( 'shadow lod (texels)' ).onChange( ( value ) => {
 
-					pipelines[ 'gpu-driven' ].shadowLodThreshold = value;
+					pipelines[ 'meshlet' ].shadowLodThreshold = value;
 					pipelines[ 'visibility-buffer' ].shadowLodThreshold = value;
 					sunLight.shadow.needsUpdate = true;
 
@@ -317,7 +317,7 @@
 				gui.add( parameters, 'furniture' ).name( 'street furniture' ).onChange( updateProps );
 				gui.add( parameters, 'meshlets' ).name( 'show meshlets' ).onChange( ( value ) => {
 
-					pipelines[ 'gpu-driven' ].debug = value;
+					pipelines[ 'meshlet' ].debug = value;
 					pipelines[ 'visibility-buffer' ].debug = value;
 					renderer.toneMapping = value ? THREE.NoToneMapping : THREE.ACESFilmicToneMapping;
 
@@ -565,7 +565,7 @@
 				// frame. the other pipelines record it as a render bundle, which draws all objects without frustum culling,
 				// so they draw a regular group
 
-				const gpuDriven = parameters.pipeline === 'gpu-driven' || parameters.pipeline === 'visibility-buffer';
+				const gpuDriven = parameters.pipeline === 'meshlet' || parameters.pipeline === 'visibility-buffer';
 
 				tilesGroup = parameters.static && gpuDriven ? new THREE.BundleGroup() : new THREE.Group();
 
