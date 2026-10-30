@@ -568,8 +568,8 @@
 					timestamp += timePerStep;
 					timeSinceLastStep -= timePerStep;
 					updateSphere();
-					renderer.compute( computeSpringForces );
-					renderer.compute( computeVertexForces );
+
+					renderer.compute([computeSpringForces, computeVertexForces]);
 
 				}
 

@@ -94,6 +94,7 @@
 			let denoiseStrength;
 			let params;
 			let uKeyLightPos;
+			let computeNodes = [];
 
 			let teapotVerticesBuffer, vertexCount;
 			const prevTeapotPos = new THREE.Vector3();
@@ -1269,18 +1270,19 @@
 
 						// --- fluid simulation steps (compute shaders) ---
 
-						renderer.compute( advectVelocityPass ); // reads dyeTexNode, writes velTexB
-						renderer.compute( divergencePass ); // velB -> div
+						computeNodes.push(advectVelocityPass, divergenePass);
 
 						for ( let i = 0; i < PRESSURE_ITERATIONS; i ++ ) {
 
-							renderer.compute( ( i % 2 === 0 ) ? jacobiPassAB : jacobiPassBA );
+							computeNodes.push(( i % 2 === 0 ) ? jacobiPassAB : jacobiPassBA );
 
 						}
 
-						renderer.compute( projectPass ); // velB - grad(p) -> velA
-						renderer.compute( advectDyePass ); // reads dyeTexNode, writes dyeTexWriteNode
-						renderer.compute( emitTeapotPass ); // inject from teapot vertices -> dyeTexWriteNode
+						// Project: velB - grad(p) -> velA
+						// Advect Dye: reads dyeTexNode, writes dyeTexWriteNode
+						// Emit Teapot: inject from teapot vertices -> dyeTexWriteNode
+
+						computeNodes.push( projectPass, advectDyePass, emitTeapotPass ); 
 
 						// Ping-pong dye textures
 						const temp = dyeTexNode.value;
