@@ -953,7 +953,6 @@ class Renderer {
 
 			//
 
-			this._animation.start();
 			this._initialized = true;
 
 			resolve( this );
@@ -1816,6 +1815,8 @@ class Renderer {
 
 		}
 
+		this._animation.start();
+
 		this._renderScene( scene, camera );
 
 	}
@@ -2378,6 +2379,9 @@ class Renderer {
 
 		if ( this._initialized === false ) await this.init();
 
+		// started before assigning the callback, so it first runs on the next frame
+
+		this._animation.start();
 		this._animation.setAnimationLoop( callback );
 
 	}
@@ -3229,6 +3233,8 @@ class Renderer {
 		}
 
 		//
+
+		this._animation.start();
 
 		const nodeFrame = this._nodes.nodeFrame;
 
