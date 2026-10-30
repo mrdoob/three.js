@@ -92,12 +92,18 @@ function WebGLCapabilities( gl, extensions, parameters, utils ) {
 
 	}
 
-	const logarithmicDepthBuffer = parameters.logarithmicDepthBuffer === true;
 	const reversedDepthBuffer = parameters.reversedDepthBuffer === true && extensions.has( 'EXT_clip_control' );
+	const logarithmicDepthBuffer = parameters.logarithmicDepthBuffer === true && reversedDepthBuffer === false;
 
 	if ( parameters.reversedDepthBuffer === true && reversedDepthBuffer === false ) {
 
 		warn( 'WebGLRenderer: Unable to use reversed depth buffer due to missing EXT_clip_control extension. Fallback to default depth buffer.' );
+
+	}
+
+	if ( parameters.logarithmicDepthBuffer === true && reversedDepthBuffer === true ) {
+
+		warn( 'WebGLRenderer: Logarithmic depth buffer is ignored when reversed depth buffer is enabled.' );
 
 	}
 
