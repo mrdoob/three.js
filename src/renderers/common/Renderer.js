@@ -51,10 +51,6 @@ const _compileYieldInterval = 8;
 // Too many pipelines in flight stall the rendering of new frames.
 const _maxCompilingPipelines = 16;
 
-// Async compilations use negative render IDs so they never match the ones of render calls.
-// They start below -1 since caches use it as initial render ID, see NodeMaterialObserver.
-let _compileRenderId = - 1;
-
 /**
  * Yields to the main thread during an async compilation, but only after a time
  * budget, so the compilation does not wait for a new task or frame after every
@@ -1036,6 +1032,7 @@ class Renderer {
 
 		const nodeFrame = this._nodes.nodeFrame;
 
+		const previousRenderId = nodeFrame.renderId;
 		const previousRenderContext = this._currentRenderContext;
 		const previousRenderObjectFunction = this._currentRenderObjectFunction;
 		const previousHandleObjectFunction = this._handleObjectFunction;
@@ -1068,7 +1065,6 @@ class Renderer {
 
 		const precompilationState = {
 			useFrameBufferTarget, renderTarget, outputRenderTarget: useFrameBufferTarget ? outputRenderTarget : this._renderTarget, activeCubeFace, activeMipmapLevel, item: null, materialSide: null, mrt: this._mrt, outputMRT: this._mrt,
-			renderId: ( parentPrecompilationState !== null ) ? parentPrecompilationState.renderId : -- _compileRenderId,
 			pipelinePromises: ( parentPrecompilationState !== null ) ? parentPrecompilationState.pipelinePromises : null,
 			parentPrecompilationState
 		};
@@ -1087,6 +1083,8 @@ class Renderer {
 		this._handleObjectFunction = this._createObjectPipeline;
 
 		this._compilationPromises = ( parentPrecompilationState !== null ) ? null : compilationPromises;
+
+		nodeFrame.renderId ++;
 
 		//
 
@@ -1182,6 +1180,8 @@ class Renderer {
 		if ( this.transparent === true && transparentObjects.length > 0 ) this._renderTransparents( transparentObjects, transparentDoublePassObjects, camera, sceneRef, lightsNode );
 
 		// restore render tree
+
+		nodeFrame.renderId = previousRenderId;
 
 		this._currentRenderContext = previousRenderContext;
 		this._currentRenderObjectFunction = previousRenderObjectFunction;
@@ -1303,7 +1303,7 @@ class Renderer {
 	 */
 	_beginPreCompile( precompilationState ) {
 
-		const { useFrameBufferTarget, renderTarget, mrt, renderContext, renderId, item } = precompilationState;
+		const { useFrameBufferTarget, renderTarget, mrt, renderContext, item } = precompilationState;
 
 		if ( useFrameBufferTarget === true ) this.setRenderTarget( renderTarget );
 		this.setMRT( mrt );
@@ -1326,9 +1326,6 @@ class Renderer {
 
 		if ( renderContext !== undefined ) this._currentRenderContext = renderContext;
 
-		precompilationState.previousRenderId = this._nodes.nodeFrame.renderId;
-		this._nodes.nodeFrame.renderId = renderId;
-
 		this._precompilationState = precompilationState;
 
 	}
@@ -1340,7 +1337,7 @@ class Renderer {
 	 */
 	_finishPreCompile() {
 
-		const { useFrameBufferTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel, outputMRT, previousRenderContext, previousRenderId, item, materialSide, parentPrecompilationState } = this._precompilationState;
+		const { useFrameBufferTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel, outputMRT, previousRenderContext, item, materialSide, parentPrecompilationState } = this._precompilationState;
 
 		if ( useFrameBufferTarget === true ) this.setRenderTarget( outputRenderTarget, activeCubeFace, activeMipmapLevel );
 		this.setMRT( outputMRT );
@@ -1348,7 +1345,6 @@ class Renderer {
 		if ( item !== null ) item.material.side = materialSide;
 
 		this._currentRenderContext = previousRenderContext;
-		this._nodes.nodeFrame.renderId = previousRenderId;
 
 		this._callDepth --;
 

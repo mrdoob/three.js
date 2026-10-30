@@ -359,6 +359,20 @@ class TileShadowNode extends ShadowBaseNode {
 	}
 
 	/**
+	 * Returns the update type of {@link TileShadowNode#updateBefore}. During precompilation, the
+	 * shadow pass is compiled once per frame, a `RENDER` update would be skipped since the
+	 * precompilation reuses the render ID of the last render.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 * @return {NodeUpdateType} The update type.
+	 */
+	getUpdateBeforeType( frame ) {
+
+		return frame.renderer.isCompiling ? NodeUpdateType.FRAME : this.updateBeforeType;
+
+	}
+
+	/**
 	 * The implementation performs the update of the shadow map if necessary.
 	 *
 	 * @param {NodeFrame} frame - A reference to the current node frame.

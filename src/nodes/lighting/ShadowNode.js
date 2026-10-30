@@ -21,6 +21,7 @@ import { positionLocal } from '../accessors/Position.js';
 import { uniform } from '../core/UniformNode.js';
 import { equirectDirection } from '../utils/EquirectUV.js';
 import { context } from '../core/ContextNode.js';
+import { NodeUpdateType } from '../core/constants.js';
 
 /**
  * Represents the shader code for the first VSM render pass.
@@ -797,6 +798,20 @@ class ShadowNode extends ShadowBaseNode {
 			this.vsmMaterialHorizontal = null;
 
 		}
+
+	}
+
+	/**
+	 * Returns the update type of {@link ShadowNode#updateBefore}. During precompilation, the
+	 * shadow pass is compiled once per frame, a `RENDER` update would be skipped since the
+	 * precompilation reuses the render ID of the last render.
+	 *
+	 * @param {NodeFrame} frame - A reference to the current node frame.
+	 * @return {NodeUpdateType} The update type.
+	 */
+	getUpdateBeforeType( frame ) {
+
+		return frame.renderer.isCompiling ? NodeUpdateType.FRAME : this.updateBeforeType;
 
 	}
 
