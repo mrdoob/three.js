@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - gpu-driven meshes</title>
+		<title>three.js webgpu - meshlets instanced</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<meta property="og:title" content="three.js webgpu - gpu-driven meshes">
+		<meta property="og:title" content="three.js webgpu - meshlets instanced">
 		<meta property="og:type" content="website">
-		<meta property="og:url" content="https://threejs.org/examples/webgpu_gpudriven_meshes.html">
-		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_gpudriven_meshes.jpg">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_meshlets_instanced.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_meshlets_instanced.jpg">
 		<link rel="icon" href="data:,">
 		<link type="text/css" rel="stylesheet" href="example.css">
 	</head>
@@ -16,10 +16,10 @@
 		<div id="info">
 			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
 			<div class="title-wrapper">
-				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>GPU-Driven Meshes</span>
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Meshlets Instanced</span>
 			</div>
 			<small>
-				Individual meshes of Lucy statues of 100k triangles each, culled and simplified per cluster on the GPU.<br />
+				Instanced Lucy statues of 100k triangles each, culled and simplified per cluster on the GPU.<br />
 				<span id="status" role="status">Loading...</span><br />
 				<span id="stats"></span>
 			</small>
@@ -61,8 +61,7 @@
 				occlusion: true,
 				meshlets: false,
 				lod: 3,
-				rotate: true,
-				mode: 'Static'
+				rotate: true
 			};
 
 			const status = document.getElementById( 'status' );
@@ -70,7 +69,7 @@
 			const timer = new THREE.Timer();
 
 			let renderer, scene, camera, controls, pipelines, sunLight;
-			let geometry, materials, statues = null;
+			let geometry, material, statues = null;
 
 			init().catch( error => {
 
@@ -143,9 +142,7 @@
 				geometry.translate( - ( box.min.x + box.max.x ) / 2, - box.min.y, - ( box.min.z + box.max.z ) / 2 );
 				geometry.scale( 4 / size.y, 4 / size.y, 4 / size.y );
 
-				// marble, sandstone and bronze. the meshes of each material are drawn together
-
-				materials = [ 0xc2b9ad, 0xb0a597, 0xd3cbc0, 0xb59a74, 0xa6855c, 0x7a4f24 ].map( color => new THREE.MeshStandardNodeMaterial( { color, roughness: 0.45, metalness: 0.1 } ) );
+				material = new THREE.MeshStandardNodeMaterial( { roughness: 0.45, metalness: 0.1 } );
 
 				createStatues();
 				createGUI();
@@ -156,43 +153,50 @@
 
 			function createStatues() {
 
-				// the meshes share the geometry and the materials, the previous statues are just removed
-
 				if ( statues !== null ) {
 
 					scene.remove( statues );
-					statues = null;
+					statues.dispose();
 
 				}
 
-				const group = createGroup();
-
-				// a square grid around the center, each statue with its own rotation, scale and material
+				// a square grid around the center, each statue with its own rotation, scale and tint
 
 				const count = parameters.statues;
 				const side = Math.ceil( Math.sqrt( count ) );
+				const matrix = new THREE.Matrix4();
+				const position = new THREE.Vector3();
+				const quaternion = new THREE.Quaternion();
+				const scale = new THREE.Vector3();
+				const color = new THREE.Color();
+				const up = new THREE.Vector3( 0, 1, 0 );
+
+				statues = new THREE.InstancedMesh( geometry, material, count );
+				statues.castShadow = true;
+				statues.receiveShadow = true;
 
 				for ( let i = 0; i < count; i ++ ) {
 
 					const x = ( i % side - ( side - 1 ) / 2 ) * SPACING;
 					const z = ( Math.floor( i / side ) - ( side - 1 ) / 2 ) * SPACING;
 
-					const tone = Math.random();
-					const material = tone < 0.6 ? materials[ Math.floor( Math.random() * 3 ) ] : tone < 0.9 ? materials[ 3 + Math.floor( Math.random() * 2 ) ] : materials[ 5 ];
+					position.set( x + ( Math.random() - 0.5 ) * SPACING * 0.4, 0, z + ( Math.random() - 0.5 ) * SPACING * 0.4 );
+					quaternion.setFromAxisAngle( up, Math.random() * Math.PI * 2 );
+					scale.setScalar( 0.8 + Math.random() * 0.4 );
+					statues.setMatrixAt( i, matrix.compose( position, quaternion, scale ) );
 
-					const statue = new THREE.Mesh( geometry, material );
-					statue.position.set( x + ( Math.random() - 0.5 ) * SPACING * 0.4, 0, z + ( Math.random() - 0.5 ) * SPACING * 0.4 );
-					statue.rotation.y = Math.random() * Math.PI * 2;
-					statue.scale.setScalar( 0.8 + Math.random() * 0.4 );
-					statue.userData.distance = Math.hypot( x, z );
-					statue.userData.spin = ( Math.random() - 0.5 ) * 2;
-					statue.castShadow = true;
-					statue.receiveShadow = true;
-					group.add( statue );
+					// marble, sandstone and bronze
+
+					const tone = Math.random();
+					if ( tone < 0.6 ) color.setHSL( 0.1, 0.12, 0.6 + Math.random() * 0.15 );
+					else if ( tone < 0.9 ) color.setHSL( 0.08, 0.35, 0.55 + Math.random() * 0.1 );
+					else color.setHSL( 0.07, 0.6, 0.3 );
+					statues.setColorAt( i, color );
 
 				}
 
-				setGroup( group );
+				statues.computeBoundingSphere();
+				scene.add( statues );
 
 				// fit the shadow camera to the grid
 
@@ -204,35 +208,6 @@
 				shadowCamera.far = sunLight.position.length() + extent * 1.5;
 				shadowCamera.updateProjectionMatrix();
 				sunLight.shadow.needsUpdate = true;
-
-			}
-
-			function createGroup() {
-
-				// a regular group is traversed every frame. a static bundle group is captured once: the pipeline uploads
-				// the transforms of its meshes once and doesn't traverse it again until needsUpdate is set. a bundle
-				// group which isn't static is drawn like a regular group
-
-				if ( parameters.mode === 'Default' || parameters.mode === 'Animate' ) return new THREE.Group();
-
-				const group = new THREE.BundleGroup();
-				group.static = parameters.mode === 'Static';
-
-				return group;
-
-			}
-
-			function setGroup( group ) {
-
-				if ( statues !== null ) {
-
-					scene.remove( statues );
-					group.add( ...statues.children );
-
-				}
-
-				statues = group;
-				scene.add( statues );
 
 			}
 
@@ -294,18 +269,6 @@
 
 				} );
 				gui.add( parameters, 'rotate' ).name( 'Auto rotate' ).onChange( value => controls.autoRotate = value );
-				gui.add( parameters, 'mode', [ 'Default', 'Animate', 'Static', 'Bundle Group' ] ).name( 'Mode' ).onChange( value => {
-
-					// the shadow map follows the animated statues, the others stand on the ground again
-
-					sunLight.shadow.autoUpdate = value === 'Animate';
-
-					if ( value !== 'Animate' ) for ( const statue of statues.children ) statue.position.y = 0;
-
-					setGroup( createGroup() );
-					prepare();
-
-				} );
 
 			}
 
@@ -329,25 +292,7 @@
 			function animate( time ) {
 
 				timer.update( time );
-				const delta = timer.getDelta();
-
-				controls.update( delta );
-
-				if ( parameters.mode === 'Animate' ) {
-
-					// the statues spin and hop in a wave from the center, the transforms of all meshes are uploaded every frame
-
-					const elapsed = timer.getElapsed();
-
-					for ( const statue of statues.children ) {
-
-						statue.rotation.y += statue.userData.spin * delta;
-						statue.position.y = Math.max( 0, Math.sin( elapsed * 3 - statue.userData.distance * 0.15 ) ) * 1.5;
-
-					}
-
-				}
-
+				controls.update( timer.getDelta() );
 				renderer.render( scene, camera );
 
 				let text = `${ formatCount( parameters.statues * geometry.index.count / 3 ) } triangles in the scene`;
