@@ -211,7 +211,7 @@ class OBJExporter {
 
 			}
 
-			if ( type === 'Line' ) {
+			if ( type === 'Line' || type === 'LineLoop' ) {
 
 				output += 'l ';
 
@@ -225,6 +225,10 @@ class OBJExporter {
 
 					}
 
+					// close the loop by going back to the first vertex
+
+					if ( type === 'LineLoop' && indices.count > 0 ) output += ( indexVertex + indices.getX( 0 ) + 1 ) + ' ';
+
 				} else {
 
 					for ( let j = 1, l = vertices.count; j <= l; j ++ ) {
@@ -232,6 +236,8 @@ class OBJExporter {
 						output += ( indexVertex + j ) + ' ';
 
 					}
+
+					if ( type === 'LineLoop' && vertices.count > 0 ) output += ( indexVertex + 1 ) + ' ';
 
 				}
 

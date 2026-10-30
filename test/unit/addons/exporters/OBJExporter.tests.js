@@ -1,4 +1,4 @@
-import { BufferGeometry, Float32BufferAttribute, Line, LineSegments } from 'three';
+import { BufferGeometry, Float32BufferAttribute, Line, LineLoop, LineSegments } from 'three';
 import { OBJExporter } from '../../../../examples/jsm/exporters/OBJExporter.js';
 
 function createSquare( index ) {
@@ -32,6 +32,24 @@ export default QUnit.module( 'Addons', () => {
 				const result = new OBJExporter().parse( object );
 
 				assert.deepEqual( result.match( /^l .*$/gm ), [ 'l 1 2 3 4 1 ' ], 'line element follows the index' );
+
+			} );
+
+			QUnit.test( 'line loop', ( assert ) => {
+
+				const object = new LineLoop( createSquare( null ) );
+				const result = new OBJExporter().parse( object );
+
+				assert.deepEqual( result.match( /^l .*$/gm ), [ 'l 1 2 3 4 1 ' ], 'line element goes back to the first vertex' );
+
+			} );
+
+			QUnit.test( 'indexed line loop', ( assert ) => {
+
+				const object = new LineLoop( createSquare( [ 3, 2, 1, 0 ] ) );
+				const result = new OBJExporter().parse( object );
+
+				assert.deepEqual( result.match( /^l .*$/gm ), [ 'l 4 3 2 1 4 ' ], 'line element follows the index and goes back to the first vertex' );
 
 			} );
 
