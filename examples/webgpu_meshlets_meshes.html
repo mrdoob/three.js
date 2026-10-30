@@ -56,7 +56,7 @@
 			const SPACING = 3;
 
 			const parameters = {
-				pipeline: 'GPU-driven',
+				pipeline: 'Meshlet',
 				statues: 10000,
 				occlusion: true,
 				meshlets: false,
@@ -91,7 +91,7 @@
 				await renderer.init();
 
 				pipelines = {
-					'GPU-driven': new MeshletDrawingPipeline( { occlusionCulling: parameters.occlusion, lodThreshold: parameters.lod, shadowLodThreshold: parameters.lod } ),
+					'Meshlet': new MeshletDrawingPipeline( { occlusionCulling: parameters.occlusion, lodThreshold: parameters.lod, shadowLodThreshold: parameters.lod } ),
 					'Default (slow)': renderer.drawingPipeline
 				};
 				renderer.drawingPipeline = pipelines[ parameters.pipeline ];
@@ -263,7 +263,7 @@
 
 			function createGUI() {
 
-				const pipeline = pipelines[ 'GPU-driven' ];
+				const pipeline = pipelines[ 'Meshlet' ];
 
 				const gui = renderer.inspector.createParameters( 'Settings' );
 				gui.add( parameters, 'pipeline', Object.keys( pipelines ) ).name( 'Pipeline' ).onChange( prepare );
@@ -352,9 +352,9 @@
 
 				let text = `${ formatCount( parameters.statues * geometry.index.count / 3 ) } triangles in the scene`;
 
-				if ( renderer.drawingPipeline === pipelines[ 'GPU-driven' ] ) {
+				if ( renderer.drawingPipeline === pipelines[ 'Meshlet' ] ) {
 
-					const info = pipelines[ 'GPU-driven' ].info;
+					const info = pipelines[ 'Meshlet' ].info;
 					text += ` | ${ formatCount( info.triangles ) } drawn in ${ formatCount( info.clusters ) } clusters`;
 
 				}
