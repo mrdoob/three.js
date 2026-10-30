@@ -132,7 +132,7 @@ class Renderer {
 	 * Renderer options.
 	 *
 	 * @typedef {Object} Renderer~Options
-	 * @property {boolean} [logarithmicDepthBuffer=false] - Whether logarithmic depth buffer is enabled or not.
+	 * @property {boolean} [logarithmicDepthBuffer=false] - Whether logarithmic depth buffer is enabled or not. Ignored when a reversed depth buffer is in use.
 	 * @property {boolean} [reversedDepthBuffer=false] - Whether reversed depth buffer is enabled or not.
 	 * @property {boolean} [alpha=true] - Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.
 	 * @property {boolean} [depth=true] - Whether the default framebuffer should have a depth buffer or not.
@@ -232,7 +232,8 @@ class Renderer {
 		this.alpha = alpha;
 
 		/**
-		 * Whether logarithmic depth buffer is enabled or not.
+		 * Whether logarithmic depth buffer is enabled or not. It is disabled
+		 * on initialization when a reversed depth buffer is in use.
 		 *
 		 * @type {boolean}
 		 * @default false
@@ -938,6 +939,14 @@ class Renderer {
 
 			}
 
+			if ( this.logarithmicDepthBuffer === true && this.reversedDepthBuffer === true ) {
+
+				warn( 'WebGPURenderer: Logarithmic depth buffer is ignored when reversed depth buffer is enabled.' );
+
+				this.logarithmicDepthBuffer = false;
+
+			}
+
 			this._nodes = new NodeManager( this, backend );
 			this._animation = new Animation( this, this._nodes, this.info );
 			this._attributes = new Attributes( backend, this.info );
@@ -953,7 +962,6 @@ class Renderer {
 
 			//
 
-			this._animation.start();
 			this._initialized = true;
 
 			resolve( this );
@@ -1842,6 +1850,8 @@ class Renderer {
 
 		}
 
+		this._animation.start();
+
 		this._renderScene( scene, camera );
 
 	}
@@ -2417,6 +2427,9 @@ class Renderer {
 
 		if ( this._initialized === false ) await this.init();
 
+		// started before assigning the callback, so it first runs on the next frame
+
+		if ( callback !== null ) this._animation.start();
 		this._animation.setAnimationLoop( callback );
 
 	}
@@ -3268,6 +3281,8 @@ class Renderer {
 		}
 
 		//
+
+		this._animation.start();
 
 		const nodeFrame = this._nodes.nodeFrame;
 

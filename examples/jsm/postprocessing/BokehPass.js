@@ -17,7 +17,7 @@ import { BokehShader } from '../shaders/BokehShader.js';
  *
  * ```js
  * const bokehPass = new BokehPass( scene, camera, {
- * 	focus: 500
+ * 	focus: 500,
  * 	aperture: 5,
  * 	maxblur: 0.01
  * } );
