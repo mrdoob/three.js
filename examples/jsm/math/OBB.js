@@ -384,7 +384,7 @@ class OBB {
 
 		// compute distance of the OBB's center from the plane
 
-		const d = plane.normal.dot( this.center ) - plane.constant;
+		const d = plane.distanceToPoint( this.center );
 
 		// Intersection occurs when distance d falls within [-r,+r] interval
 
@@ -515,9 +515,9 @@ class OBB {
 		rotationMatrix.elements[ 7 ] *= invSZ;
 		rotationMatrix.elements[ 8 ] *= invSZ;
 
-		this.rotation.multiply( rotationMatrix );
+		this.rotation.premultiply( rotationMatrix );
 
-		this.halfSize.x *= sx;
+		this.halfSize.x *= Math.abs( sx );
 		this.halfSize.y *= sy;
 		this.halfSize.z *= sz;
 

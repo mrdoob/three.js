@@ -9,6 +9,7 @@ import { Settings } from './tabs/Settings.js';
 import { Viewer } from './tabs/Viewer.js';
 import { Timeline } from './tabs/Timeline.js';
 import { setText } from './ui/utils.js';
+import { getItem, setItem } from './Storage.js';
 
 import { setConsoleFunction, getConsoleFunction, REVISION } from 'three/webgpu';
 
@@ -467,9 +468,9 @@ class Inspector extends RendererInspector {
 
 		data.cpu = this.getAverageDeltaTime( data, 'cpu' );
 		data.gpu = this.getAverageDeltaTime( data, 'gpu' );
-		data.total = data.cpu + data.gpu;
 
-		// children
+		// children: the CPU time of a render or compute call includes the calls nested in it, the GPU time of each
+		// pass is measured separately
 
 		for ( const child of stats.children ) {
 
@@ -477,11 +478,11 @@ class Inspector extends RendererInspector {
 
 			const childData = this.getStatsData( child.cid );
 
-			data.cpu += childData.cpu;
 			data.gpu += childData.gpu;
-			data.total += childData.total;
 
 		}
+
+		data.total = data.cpu + data.gpu;
 
 	}
 
@@ -566,9 +567,8 @@ class Inspector extends RendererInspector {
 
 		}
 
-		// improve stats using previous frame
+		// the time since the last frame which rendered, see RendererInspector.finish()
 
-		frame.deltaTime = frame.startTime - previousFrame.startTime;
 		frame.miscellaneous = frame.deltaTime - frame.total;
 
 		if ( frame.miscellaneous < 0 ) {
@@ -638,46 +638,6 @@ class Inspector extends RendererInspector {
 		this.setRenderer( null );
 
 	}
-
-}
-
-function getItem( id ) {
-
-	const data = JSON.parse( localStorage.getItem( 'threejs-inspector' ) || '{}' );
-
-	if ( data.version !== REVISION ||
-		 data.settings && ( data.settings.storage === 'url' && data.settings.url !== location.href ) ) {
-
-		localStorage.removeItem( 'threejs-inspector' );
-
-		return {};
-
-	}
-
-	return data[ id ] || {};
-
-}
-
-function setItem( id, state ) {
-
-	const data = JSON.parse( localStorage.getItem( 'threejs-inspector' ) || '{}' );
-
-	if ( state === null ) {
-
-		delete data[ id ];
-
-	} else {
-
-		data[ id ] = state;
-
-	}
-
-	data.settings = data.settings || {};
-	data.settings.url = data.settings.url || location.href;
-	data.settings.storage = data.settings.storage || 'url';
-	data.version = REVISION;
-
-	localStorage.setItem( 'threejs-inspector', JSON.stringify( data ) );
 
 }
 

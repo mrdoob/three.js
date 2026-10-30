@@ -1,5 +1,5 @@
-import { Frustum, Matrix4, RenderTarget, Vector2, RendererUtils, QuadMesh, TempNode, NodeMaterial, NodeUpdateType, Vector3, Plane } from 'three/webgpu';
-import { cubeTexture, clamp, viewZToPerspectiveDepth, logarithmicDepthToViewZ, float, Loop, max, Fn, passTexture, uv, dot, uniformArray, If, getViewPosition, uniform, vec4, add, interleavedGradientNoise, screenCoordinate, round, mul, uint, mix, exp, vec3, distance, pow, reference, lightPosition, vec2, bool, texture, perspectiveDepthToViewZ, lightShadowMatrix, context } from 'three/tsl';
+import { Frustum, Matrix4, RenderTarget, Vector2, RendererUtils, QuadMesh, Node, NodeMaterial, NodeUpdateType, Vector3, Plane } from 'three/webgpu';
+import { cubeTexture, clamp, viewZToPerspectiveDepth, float, Loop, max, Fn, passTexture, uv, dot, uniformArray, If, getViewPosition, uniform, vec4, add, interleavedGradientNoise, screenCoordinate, round, mul, uint, mix, exp, vec3, distance, pow, reference, lightPosition, vec2, bool, texture, perspectiveDepthToViewZ, lightShadowMatrix, context, projectionDepth } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -45,10 +45,10 @@ let _rendererState;
  *
  * Reference: This Node is a part of [three-good-godrays](https://github.com/Ameobea/three-good-godrays).
  *
- * @augments TempNode
+ * @augments Node
  * @three_import import { godrays } from 'three/addons/tsl/display/GodraysNode.js';
  */
-class GodraysNode extends TempNode {
+class GodraysNode extends Node {
 
 	static get type() {
 
@@ -354,21 +354,7 @@ class GodraysNode extends TempNode {
 		const uvNode = uv();
 		const lightPos = lightPosition( this._light );
 
-		const sampleDepth = ( uv ) => {
-
-			const depth = this.depthNode.sample( uv ).r;
-
-			if ( builder.renderer.logarithmicDepthBuffer === true ) {
-
-				const viewZ = logarithmicDepthToViewZ( depth, this._cameraNear, this._cameraFar );
-
-				return viewZToPerspectiveDepth( viewZ, this._cameraNear, this._cameraFar );
-
-			}
-
-			return depth;
-
-		};
+		const sampleDepth = ( uv ) => projectionDepth( this.depthNode.sample( uv ).r, this._cameraNear, this._cameraFar );
 
 		const sdPlane = ( p, n, h ) => {
 

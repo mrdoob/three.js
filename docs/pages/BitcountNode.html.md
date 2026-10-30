@@ -1,4 +1,4 @@
-*Inheritance: EventDispatcher → Node → TempNode → MathNode →*
+*Inheritance: EventDispatcher → Node → MathNode →*
 
 # BitcountNode
 

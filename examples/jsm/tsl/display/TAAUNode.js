@@ -1,4 +1,4 @@
-import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, TempNode, NodeUpdateType, Matrix4, DepthTexture, FloatType } from 'three/webgpu';
+import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
 import { exp, float, Fn, max, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, ivec2, mix, property, outputStruct, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
 import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth, samplePreviousDepth } from '../utils/TAAUtils.js';
 
@@ -27,10 +27,10 @@ let _rendererState;
  *
  * Note: MSAA must be disabled when TAAU is in use.
  *
- * @augments TempNode
+ * @augments Node
  * @three_import import { taau } from 'three/addons/tsl/display/TAAUNode.js';
  */
-class TAAUNode extends TempNode {
+class TAAUNode extends Node {
 
 	static get type() {
 
@@ -280,14 +280,6 @@ class TAAUNode extends TempNode {
 		 */
 		this._previousDepthNode = texture( this._previousDepthRenderTarget.depthTexture );
 
-		/**
-		 * Sync the post processing stack with the TAAU node.
-		 *
-		 * @private
-		 * @type {boolean}
-		 */
-		this._needsPostProcessingSync = false;
-
 	}
 
 	/**
@@ -393,13 +385,7 @@ class TAAUNode extends TempNode {
 		this._cameraWorldMatrixInverse.value.copy( this.camera.matrixWorldInverse );
 		this._cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
 
-		// extract input dimensions from the beauty buffer and output
-		// dimensions from the renderer's drawing buffer
-
-		const beautyRenderTarget = ( this.beautyNode.isRTTNode ) ? this.beautyNode.renderTarget : this.beautyNode.passNode.renderTarget;
-
-		const inputWidth = beautyRenderTarget.texture.width;
-		const inputHeight = beautyRenderTarget.texture.height;
+		// the output dimensions are derived from the renderer's drawing buffer
 
 		const drawingBufferSize = renderer.getDrawingBufferSize( _size );
 		const outputWidth = drawingBufferSize.width;
@@ -421,11 +407,6 @@ class TAAUNode extends TempNode {
 
 		if ( needsRestart === true ) {
 
-			// make sure render targets are initialized after the resize which triggers a dispose()
-
-			renderer.initRenderTarget( this._historyRenderTarget );
-			renderer.initRenderTarget( this._resolveRenderTarget );
-
 			// Seed the history with a bilinear upscale of the current beauty
 			// buffer. Without this the first frames after a resize fade in
 			// from black because the history target was cleared. The seed
@@ -437,16 +418,6 @@ class TAAUNode extends TempNode {
 			_quadMesh.name = 'TAAU.seed';
 			_quadMesh.render( renderer );
 			renderer.setRenderTarget( null );
-
-		}
-
-		// must run after needsRestart so it does not affect the seed reset
-
-		if ( this._needsPostProcessingSync === true ) {
-
-			this.setViewOffset( inputWidth, inputHeight );
-
-			this._needsPostProcessingSync = false;
 
 		}
 
@@ -478,13 +449,11 @@ class TAAUNode extends TempNode {
 			if ( this._previousDepthRenderTarget.width !== srcW || this._previousDepthRenderTarget.height !== srcH ) {
 
 				this._previousDepthRenderTarget.setSize( srcW, srcH );
-				renderer.initRenderTarget( this._previousDepthRenderTarget );
 
 			}
 
 			const dstDepth = this._previousDepthRenderTarget.depthTexture;
 			renderer.copyTextureToTexture( currentDepth, dstDepth );
-			this._previousDepthNode.value = dstDepth;
 
 		}
 
@@ -502,11 +471,13 @@ class TAAUNode extends TempNode {
 	 */
 	setup( builder ) {
 
+		this.depthNode.build( builder );
+		this.velocityNode.build( builder );
+		this.beautyNode.build( builder );
+
 		if ( builder.renderPipeline && ! builder.context.renderPipelineState.viewOffsetOwner ) {
 
 			builder.context.renderPipelineState.viewOffsetOwner = this;
-
-			this._needsPostProcessingSync = true;
 
 			OnBeforeRenderPipeline( () => {
 
@@ -527,11 +498,8 @@ class TAAUNode extends TempNode {
 
 		}
 
-		if ( builder.renderer.reversedDepthBuffer === true ) {
-
-			this._previousDepthRenderTarget.depthTexture.type = FloatType;
-
-		}
+		this._previousDepthRenderTarget.depthTexture.format = this.depthNode.value.format;
+		this._previousDepthRenderTarget.depthTexture.type = this.depthNode.value.type;
 
 		const historyNode = texture( this._historyRenderTarget.textures[ 0 ] );
 		const lockNode = texture( this._historyRenderTarget.textures[ 1 ] );

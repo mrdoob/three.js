@@ -11,7 +11,9 @@ import {
 	DirectionalLight,
 	Euler,
 	Group,
+	ImageLoader,
 	LoaderUtils,
+	LinearSRGBColorSpace,
 	Matrix4,
 	Mesh,
 	MeshPhysicalMaterial,
@@ -79,11 +81,12 @@ const USD_CAMERA_DEFAULTS = {
  */
 class USDComposer {
 
-	constructor( manager = null ) {
+	constructor( manager ) {
 
 		this.textureCache = {};
 		this.skinnedMeshes = [];
 		this.manager = manager;
+		this.imageLoader = new ImageLoader( manager );
 		this.texturePromises = [];
 
 	}
@@ -894,6 +897,9 @@ class USDComposer {
 		if ( referencedData.specsByPath ) {
 
 			const composer = new USDComposer( this.manager );
+			composer.imageLoader.setCrossOrigin( this.imageLoader.crossOrigin );
+			composer.imageLoader.setPriority( this.imageLoader.priority );
+			composer.imageLoader.setCache( this.imageLoader.cache );
 			const newBasePath = this._getBasePath( resolvedPath );
 			const composedGroup = composer.compose( referencedData, this.assets, mergedVariants, newBasePath );
 
@@ -1330,7 +1336,7 @@ class USDComposer {
 
 				if ( mat.color && mat.color.r === 1 && mat.color.g === 1 && mat.color.b === 1 && ! mat.map ) {
 
-					mat.color.setRGB( displayColor[ 0 ], displayColor[ 1 ], displayColor[ 2 ], SRGBColorSpace );
+					mat.color.setRGB( displayColor[ 0 ], displayColor[ 1 ], displayColor[ 2 ], LinearSRGBColorSpace );
 
 				}
 
@@ -3107,7 +3113,7 @@ class USDComposer {
 
 				if ( Array.isArray( color ) && color.length >= 3 ) {
 
-					material.color.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
+					material.color.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], LinearSRGBColorSpace );
 
 				}
 
@@ -3120,7 +3126,7 @@ class USDComposer {
 			const scale = material.map.userData.scale;
 			if ( Array.isArray( scale ) && scale.length >= 3 ) {
 
-				material.color.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], SRGBColorSpace );
+				material.color.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], LinearSRGBColorSpace );
 
 			}
 
@@ -3135,7 +3141,7 @@ class USDComposer {
 
 				if ( Array.isArray( color ) && color.length >= 3 ) {
 
-					material.emissive.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
+					material.emissive.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], LinearSRGBColorSpace );
 
 				}
 
@@ -3149,7 +3155,7 @@ class USDComposer {
 				const scale = material.emissiveMap.userData.scale;
 				if ( Array.isArray( scale ) && scale.length >= 3 ) {
 
-					material.emissive.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], SRGBColorSpace );
+					material.emissive.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], LinearSRGBColorSpace );
 
 				}
 
@@ -3228,7 +3234,7 @@ class USDComposer {
 
 				if ( Array.isArray( color ) && color.length >= 3 ) {
 
-					material.specularColor.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
+					material.specularColor.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], LinearSRGBColorSpace );
 
 				}
 
@@ -3241,7 +3247,7 @@ class USDComposer {
 			const scale = material.specularColorMap.userData.scale;
 			if ( Array.isArray( scale ) && scale.length >= 3 ) {
 
-				material.specularColor.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], SRGBColorSpace );
+				material.specularColor.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], LinearSRGBColorSpace );
 
 			}
 
@@ -3322,7 +3328,7 @@ class USDComposer {
 
 				if ( Array.isArray( color ) && color.length >= 3 ) {
 
-					material.color.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
+					material.color.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], LinearSRGBColorSpace );
 
 				}
 
@@ -3335,7 +3341,7 @@ class USDComposer {
 			const scale = material.map.userData.scale;
 			if ( Array.isArray( scale ) && scale.length >= 3 ) {
 
-				material.color.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], SRGBColorSpace );
+				material.color.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], LinearSRGBColorSpace );
 
 			}
 
@@ -3382,7 +3388,7 @@ class USDComposer {
 
 				if ( Array.isArray( color ) && color.length >= 3 ) {
 
-					material.emissive.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
+					material.emissive.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], LinearSRGBColorSpace );
 
 				}
 
@@ -3426,7 +3432,7 @@ class USDComposer {
 
 			if ( transmissionColor !== undefined && Array.isArray( transmissionColor ) ) {
 
-				material.attenuationColor.setRGB( transmissionColor[ 0 ], transmissionColor[ 1 ], transmissionColor[ 2 ] );
+				material.attenuationColor.setRGB( transmissionColor[ 0 ], transmissionColor[ 1 ], transmissionColor[ 2 ], LinearSRGBColorSpace );
 				material.attenuationDistance = transmissionDepth || 1.0;
 
 			}
@@ -3490,7 +3496,8 @@ class USDComposer {
 
 				// OpenPBR uses micrometers, Three.js uses nanometers
 				const thicknessNm = thinFilmThickness * 1000;
-				material.iridescenceThicknessRange = [ thicknessNm, thicknessNm ];
+				material.iridescenceThicknessMinimum = thicknessNm;
+				material.iridescenceThicknessMaximum = thicknessNm;
 
 			}
 
@@ -3509,7 +3516,7 @@ class USDComposer {
 
 		if ( specularColor !== undefined && Array.isArray( specularColor ) ) {
 
-			material.specularColor.setRGB( specularColor[ 0 ], specularColor[ 1 ], specularColor[ 2 ] );
+			material.specularColor.setRGB( specularColor[ 0 ], specularColor[ 1 ], specularColor[ 2 ], LinearSRGBColorSpace );
 
 		}
 
@@ -3870,13 +3877,7 @@ class USDComposer {
 			// Try loading via LoadingManager if available
 			if ( this.manager ) {
 
-				const url = this.manager.resolveURL( baseName );
-				if ( url !== baseName ) {
-
-					// URL modifier found a match - load it
-					return this._createTextureFromData( url, textureAttrs, transformAttrs );
-
-				}
+				return this._createTextureFromData( baseName, textureAttrs, transformAttrs );
 
 			}
 
@@ -3913,11 +3914,9 @@ class USDComposer {
 
 		}
 
-		const image = new Image();
-
 		this.texturePromises.push( new Promise( ( resolve ) => {
 
-			image.onload = function () {
+			this.imageLoader.load( url, function ( image ) {
 
 				texture.image = image;
 
@@ -3939,9 +3938,7 @@ class USDComposer {
 
 				resolve();
 
-			};
-
-			image.onerror = function () {
+			}, undefined, function () {
 
 				console.warn( 'USDLoader: Failed to load texture:', url );
 
@@ -3953,11 +3950,9 @@ class USDComposer {
 
 				resolve();
 
-			};
+			} );
 
 		} ) );
-
-		image.src = url;
 
 		return texture;
 

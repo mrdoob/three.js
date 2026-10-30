@@ -18,6 +18,12 @@ Default is `null`.
 
 ## Properties
 
+### .assignable : boolean
+
+Whether this node can be assigned. It is generated as an expression, unless it is assigned, in which case it is declared as a variable where it was created.
+
+Default is `false`.
+
 ### .global : boolean
 
 Whether this node is global or not. This property is relevant for the internal node caching system. All nodes which should be declared just once should set this flag to `true` (a typical example is [AttributeNode](AttributeNode.html)).
@@ -95,6 +101,8 @@ The UUID of the node.
 The version of the node. The version automatically is increased when [Node#needsUpdate](Node.html#needsUpdate) is set to `true`.
 
 Default is `0`.
+
+## Static Properties
 
 ### .captureStackTrace : boolean
 
@@ -214,13 +222,11 @@ Default is `null`.
 
 **Returns:** The cache key of the node.
 
-### .getChildren() : Node (generator)
+### .getChildren() : Array.<Node>
 
-Generator function that can be used to iterate over the child nodes.
+Returns the child nodes of this node.
 
-##### Yields:
-
-A child node.
+**Returns:** The child nodes.
 
 ### .getElementType( builder : NodeBuilder ) : string
 
@@ -324,6 +330,36 @@ The current node frame.
 
 **Returns:** The update type.
 
+### .isAssign( builder : NodeBuilder ) : boolean
+
+Checks if this node is the target of an assignment.
+
+**builder**
+
+The node builder.
+
+**Returns:** Whether this node is assigned.
+
+### .isAssignable( builder : NodeBuilder ) : boolean
+
+Checks if this node is assignable without a forced declaration.
+
+**builder**
+
+The node builder.
+
+**Returns:** Whether this node is assignable without a forced declaration.
+
+### .isCacheable( builder : NodeBuilder ) : boolean
+
+Whether this node allows caching its result in a temporary variable. Caching is enabled by default. Override this method to disable it.
+
+**builder**
+
+The current node builder.
+
+**Returns:** Whether temporary caching is allowed.
+
 ### .isGlobal( builder : NodeBuilder ) : boolean
 
 By default this method returns the value of the [Node#global](Node.html#global) flag. This method can be overwritten in derived classes if an analytical way is required to determine the global cache referring to the current shader-stage.
@@ -405,6 +441,12 @@ Represents the setup stage which is the first step of the build process, see [No
 The current node builder.
 
 **Returns:** The output node.
+
+### .toAssignable() : Node
+
+Makes this node assignable and adds it to the current stack, so it can be declared where it was created if it is assigned later. Only use it with nodes that are not shared, see [Node#assignable](Node.html#assignable).
+
+**Returns:** A reference to this node.
 
 ### .toJSON( meta : Object ) : Object
 

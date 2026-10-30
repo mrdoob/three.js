@@ -16,7 +16,7 @@ VRButton is an addon, and must be imported explicitly, see [Installation#Addons]
 import { VRButton } from 'three/addons/webxr/VRButton.js';
 ```
 
-## Properties
+## Static Properties
 
 ### .xrSessionIsGranted : boolean
 

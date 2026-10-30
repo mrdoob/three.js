@@ -35,6 +35,14 @@
 
 	<body class="app-container loading">
 
+		<script async src="https://www.googletagmanager.com/gtag/js?id=G-JPPX9MZGZ4"></script>
+		<script>
+			window.dataLayer = window.dataLayer || [];
+			function gtag(){dataLayer.push(arguments);}
+			gtag('js', new Date());
+			gtag('config', 'G-JPPX9MZGZ4');
+		</script>
+
 		<!-- Loading Screen -->
 		<div id="loading-screen" class="loading-screen">
 			<div class="loading-spinner-container">
@@ -164,15 +172,6 @@
 									<i data-icon="terminal" style="width: 1.15rem; height: 1.15rem;"></i>
 								</button>
 							</div>
-							<button id="preview-copy" class="preview-copy-btn" title="Copy standalone code">
-								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-codeblock" style="width: 1.15rem; height: 1.15rem; display: block;">
-									<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-									<path d="M5 4l-2 2l2 2" />
-									<path d="M12 4l2 2l-2 2" />
-									<path d="M8 8l1 -4" />
-									<path d="M17 6a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-7" />
-								</svg>
-							</button>
 						</div>
 
 						<!-- Vertical Resizer Container -->
@@ -237,12 +236,6 @@
 			import { Guide } from './js/Guide.js';
 
 			const guide = new Guide();
-			guide.onEmptyProject = () => {
-
-				return 'import \'scenes/empty\';\n';
-
-			};
-
 			guide.load( 'content/Guide.md' );
 
 		</script>

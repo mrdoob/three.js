@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - JPEG XL loader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - JPEG XL loader">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_loader_jpegxl.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_loader_jpegxl.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+		<style>
+			.lbl {
+				position: absolute;
+				transform: translate( -50%, -50% );
+				max-width: 36%;
+				color: #e0e0e0;
+				font: 400 16px 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+				text-align: center;
+				pointer-events: none;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>JPEG XL loader</span>
+			</div>
+			<small>
+				Natively load a 32-bit float linear JPEG XL image into a 16-bit float texture, compared with its Radiance HDR source, by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br>
+				<a href="https://polyhaven.com/a/venice_sunset" target="_blank" rel="noopener">Venice Sunset</a> by Greg Zaal / Poly Haven (CC0).
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+			import { JXLLoader } from 'three/addons/loaders/JXLLoader.js';
+
+			const renderer = new THREE.WebGPURenderer();
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.toneMapping = THREE.ACESFilmicToneMapping;
+			renderer.toneMappingExposure = 1;
+			renderer.inspector = new Inspector();
+			document.body.appendChild( renderer.domElement );
+			await renderer.init();
+
+			const scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x17191e );
+			const camera = new THREE.OrthographicCamera( - 4, 4, 2, - 2, 0.1, 10 );
+			camera.position.z = 2;
+			const geometry = new THREE.PlaneGeometry( 2.8, 1.4 );
+			const labels = [];
+
+			const gui = renderer.inspector.createParameters( 'JPEG XL' );
+			gui.add( renderer, 'toneMapping', {
+				Linear: THREE.LinearToneMapping,
+				Reinhard: THREE.ReinhardToneMapping,
+				Cineon: THREE.CineonToneMapping,
+				ACES: THREE.ACESFilmicToneMapping,
+				AgX: THREE.AgXToneMapping,
+				Neutral: THREE.NeutralToneMapping
+			} ).name( 'Tone mapping' );
+			gui.add( renderer, 'toneMappingExposure', 0, 2, 0.01 ).name( 'Exposure' );
+
+			await Promise.all( [
+				addImage( new HDRLoader(), 'Radiance HDR (source)', 'textures/equirectangular/venice_sunset_1k.hdr', - 1.55 ),
+				addImage( new JXLLoader(), 'JPEG XL', 'textures/hdr-native/venice_sunset_512.jxl', 1.55 )
+			] );
+			window.addEventListener( 'resize', onWindowResize );
+			onWindowResize();
+			renderer.setAnimationLoop( animate );
+
+			function animate() {
+
+				renderer.render( scene, camera );
+
+			}
+
+			async function addImage( loader, name, url, x ) {
+
+				const material = new THREE.MeshStandardNodeMaterial( { color: 0x000000, emissive: 0xffffff } );
+				const mesh = new THREE.Mesh( geometry, material );
+				mesh.name = name + ' HDR';
+				mesh.position.x = x;
+				scene.add( mesh );
+
+				addLabel( name, x, 0.85 );
+
+				try {
+
+					material.emissiveMap = await loader.loadAsync( url );
+
+				} catch ( error ) {
+
+					material.emissive.set( 0x252830 );
+					material.toneMapped = false;
+					addLabel( 'Not supported: ' + error.message.replace( /^\w+Loader: /, '' ), x, 0 ).style.fontSize = '12px';
+					console.warn( name + ' HDR not supported:', error );
+
+				}
+
+				material.needsUpdate = true;
+
+			}
+
+			function addLabel( text, x, y ) {
+
+				const label = document.createElement( 'div' );
+				label.className = 'lbl';
+				label.textContent = text;
+				document.body.appendChild( label );
+				labels.push( { label, x, y } );
+				return label;
+
+			}
+
+			function onWindowResize() {
+
+				const aspect = window.innerWidth / window.innerHeight;
+				const width = Math.max( 7, aspect * 3.6 );
+				camera.left = - width / 2;
+				camera.right = width / 2;
+				camera.top = width / aspect / 2;
+				camera.bottom = - camera.top;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				for ( const { label, x, y } of labels ) {
+
+					const position = new THREE.Vector3( x, y, 0 ).project( camera );
+					label.style.left = ( position.x + 1 ) / 2 * window.innerWidth + 'px';
+					label.style.top = ( 1 - position.y ) / 2 * window.innerHeight + 'px';
+
+				}
+
+			}
+
+		</script>
+	</body>
+</html>

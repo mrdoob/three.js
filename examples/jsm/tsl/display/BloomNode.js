@@ -1,4 +1,4 @@
-import { HalfFloatType, RenderTarget, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils, NodeUpdateType } from 'three/webgpu';
+import { HalfFloatType, RenderTarget, Vector2, Vector3, Node, QuadMesh, NodeMaterial, RendererUtils, NodeUpdateType } from 'three/webgpu';
 import { nodeObject, Fn, float, uv, passTexture, uniform, Loop, texture, luminance, smoothstep, mix, vec4, uniformArray, add, int, array, context } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -48,10 +48,10 @@ const luminosityHighPass = Fn( ( { input, threshold, smoothWidth } ) => {
  * const bloomPass = bloom( emissivePass );
  * renderPipeline.outputNode = scenePassColor.add( bloomPass );
  * ```
- * @augments TempNode
+ * @augments Node
  * @three_import import { bloom } from 'three/addons/tsl/display/BloomNode.js';
  */
-class BloomNode extends TempNode {
+class BloomNode extends Node {
 
 	static get type() {
 

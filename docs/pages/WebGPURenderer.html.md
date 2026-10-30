@@ -37,7 +37,7 @@ WebGPURenderer options.
 **logarithmicDepthBuffer**  
 boolean
 
-Whether logarithmic depth buffer is enabled or not.
+Whether logarithmic depth buffer is enabled or not. Ignored when a reversed depth buffer is in use.
 
 Default is `false`.
 

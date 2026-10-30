@@ -14,7 +14,8 @@
 		<section>
 			<header>
 				<div class="class-description"><p>InspectorNode is a wrapper node that allows inspection of node values during rendering.
-It can be used to debug or analyze node outputs in the rendering pipeline.</p></div>
+It can be used to debug or analyze node outputs in the rendering pipeline.</p>
+<p>The inspector node is registered by the inspected node when it is built, see Node#_setupInspector.</p></div>
 			</header>
 			<article>
 				<div class="container-overview">
@@ -48,7 +49,7 @@ It can be used to debug or analyze node outputs in the rendering pipeline.</p></
 										<strong translate="no">callback</strong>
 									</td>
 									<td class="description last">
-										<p>Optional callback to modify the node during setup.</p>
+										<p>Optional callback to modify the node presented by the inspector.</p>
 										<p>Default is <code>null</code>.</p>
 									</td>
 								</tr>
@@ -56,7 +57,7 @@ It can be used to debug or analyze node outputs in the rendering pipeline.</p></
 						</table>
 					</div>
 				</div>
-				<h2 class="subsection-title">Properties</h2>
+				<h2 class="subsection-title">Static Properties</h2>
 				<div class="member">
 					<h3 class="name" id=".type" translate="no">.<a href="#.type">type</a> </h3>
 					<div class="description">
@@ -90,30 +91,6 @@ It can be used to debug or analyze node outputs in the rendering pipeline.</p></
 						<div class="description">
 							<p>Returns the name of the inspector node.</p>
 						</div>
-					</div>
-					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
-					<div class="method">
-						<div class="description">
-							<p>Sets up the inspector node.</p>
-						</div>
-						<table class="params">
-							<tbody>
-								<tr>
-									<td class="name">
-										<strong translate="no">builder</strong>
-									</td>
-									<td class="description last">
-										<p>The node builder.</p>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#setup">Node#setup</a></dt>
-						</dl>
-						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> The setup node.</dt>
-						</dl>
 					</div>
 					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
 					<div class="method">

@@ -158,9 +158,9 @@ Whether masking is active or not.
 
 **Overrides:** [Pass#render](Pass.html#render)
 
-### .setGBuffer( depthTexture : DepthTexture, normalTexture : DepthTexture )
+### .setGBuffer( depthTexture : DepthTexture, normalTexture : Texture )
 
-Configures the GBuffer of this pass. If no arguments are passed, the pass creates an internal render target for holding depth and normal data.
+Configures the GBuffer of this pass. If no arguments are passed, the pass creates an internal render target for holding depth and normal data. External depth and normal data must use separate textures and remain owned by the caller. If no normal texture is supplied, normals are reconstructed from depth for AO and denoising, and the normal output displays black.
 
 **depthTexture**
 

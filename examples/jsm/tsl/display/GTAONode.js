@@ -1,5 +1,5 @@
-import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
-import { reference, logarithmicDepthToViewZ, viewZToPerspectiveDepth, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand, context } from 'three/tsl';
+import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, Node, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
+import { reference, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand, context, isBackgroundDepth, projectionDepth } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -43,10 +43,10 @@ let _rendererState;
  *
  * Reference: [Practical Real-Time Strategies for Accurate Indirect Occlusion](https://www.activision.com/cdn/research/Practical_Real_Time_Strategies_for_Accurate_Indirect_Occlusion_NEW%20VERSION_COLOR.pdf).
  *
- * @augments TempNode
+ * @augments Node
  * @three_import import { ao } from 'three/addons/tsl/display/GTAONode.js';
  */
-class GTAONode extends TempNode {
+class GTAONode extends Node {
 
 	static get type() {
 
@@ -229,6 +229,14 @@ class GTAONode extends TempNode {
 		this._cameraFar = reference( 'far', 'float', camera );
 
 		/**
+		 * A reference to the scene's camera.
+		 *
+		 * @private
+		 * @type {Camera}
+		 */
+		this._camera = camera;
+
+		/**
 		 * Temporal direction that influences the rotation angle for each slice.
 		 *
 		 * @private
@@ -397,48 +405,48 @@ class GTAONode extends TempNode {
 
 		const uvNode = uv();
 
-		const linearizeDepth = ( depth ) => {
-
-			if ( builder.renderer.logarithmicDepthBuffer === true ) {
-
-				const viewZ = logarithmicDepthToViewZ( depth, this._cameraNear, this._cameraFar );
-
-				return viewZToPerspectiveDepth( viewZ, this._cameraNear, this._cameraFar );
-
-			}
-
-			return depth;
-
-		};
-
-		const sampleDepth = ( uv ) => linearizeDepth( this.depthNode.sample( uv ).r );
+		const sampleDepth = ( uv ) => projectionDepth( this.depthNode.sample( uv ).r, this._cameraNear, this._cameraFar );
 
 		const sampleCenterDepth = ( uv ) => {
 
 			// Sidestep the nearest-rounding during depth access for the unjittered center pixel to avoid banding
 
 			const g = this.depthNode.gather().sample( uv );
-			const depth = min( min( g.x, g.y ), min( g.z, g.w ) );
+			const depth = builder.renderer.reversedDepthBuffer === true ? max( max( g.x, g.y ), max( g.z, g.w ) ) : min( min( g.x, g.y ), min( g.z, g.w ) );
 
-			return linearizeDepth( depth );
+			return projectionDepth( depth, this._cameraNear, this._cameraFar );
 
 		};
 
 		const sampleNoise = ( uv ) => this._noiseNode.sample( uv );
 		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.sample( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this._cameraProjectionMatrixInverse );
 
+		const isValidSample = Fn( ( [ uv, centerTexel, size ] ) => {
+
+			const texel = uv.mul( size ).floor().toConst();
+
+			// rejects off-screen samples and samples that fall into the center texel
+
+			return uv.x.greaterThan( 0 ).and( uv.x.lessThan( 1 ) ).and( uv.y.greaterThan( 0 ) ).and( uv.y.lessThan( 1 ) )
+				.and( texel.x.notEqual( centerTexel.x ).or( texel.y.notEqual( centerTexel.y ) ) );
+
+		}, { uv: 'vec2', centerTexel: 'vec2', size: 'vec2', return: 'bool' } );
+
 		this._ao = Fn( () => {
 
 			const depth = this._resolutionScale.lessThan( 1 ).select( sampleCenterDepth( uvNode ), sampleDepth( uvNode ) ).toConst();
 
-			depth.greaterThanEqual( 1.0 ).discard();
+			isBackgroundDepth( depth ).discard();
+
+			const depthSize = vec2( textureSize( this.depthNode, 0 ) ).toConst();
+			const centerTexel = uvNode.mul( depthSize ).floor().toConst();
 
 			const viewPosition = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).toConst();
 			const viewNormal = sampleNormal( uvNode ).toConst();
 
 			const radius = this.radius;
 			const invRadius = radius.reciprocal().toConst();
-			const viewDir = normalize( viewPosition.xyz.negate() ).toConst();
+			const viewDir = ( this._camera.isPerspectiveCamera === true ) ? normalize( viewPosition.xyz.negate() ).toConst() : vec3( 0, 0, 1 ).toConst();
 			const clipPosition = this._cameraProjectionMatrix.mul( vec4( viewPosition, 1.0 ) ).toConst();
 
 			const noiseResolution = textureSize( this._noiseNode, 0 );
@@ -522,7 +530,7 @@ class GTAONode extends TempNode {
 					const distFacX = min( lenX.mul( invRadius ), 1 );
 					const distFacSqX = distFacX.mul( distFacX );
 
-					If( abs( viewDeltaX.z ).lessThan( this.thickness ), () => {
+					If( isValidSample( sampleScreenPositionX, centerTexel, depthSize ).and( abs( viewDeltaX.z ).lessThan( this.thickness ) ), () => {
 
 						cosHorizons.x.assign( mix( max( cosHorizons.x, sHX ), cosHorizons.x, distFacSqX ) );
 
@@ -541,7 +549,7 @@ class GTAONode extends TempNode {
 					const distFacY = min( lenY.mul( invRadius ), 1 );
 					const distFacSqY = distFacY.mul( distFacY );
 
-					If( abs( viewDeltaY.z ).lessThan( this.thickness ), () => {
+					If( isValidSample( sampleScreenPositionY, centerTexel, depthSize ).and( abs( viewDeltaY.z ).lessThan( this.thickness ) ), () => {
 
 						cosHorizons.y.assign( mix( max( cosHorizons.y, sHY ), cosHorizons.y, distFacSqY ) );
 

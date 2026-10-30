@@ -110,7 +110,8 @@ class SceneOptimizer {
 			'ior',
 			'iridescence',
 			'iridescenceIOR',
-			'iridescenceThicknessRange',
+			'iridescenceThicknessMinimum',
+			'iridescenceThicknessMaximum',
 			'reflectivity',
 		]
 			.map( ( prop ) => {

@@ -81,7 +81,7 @@ class USDAParser {
 				const value = line.slice( colonIdx + 1 ).trim();
 
 				// Only process if key looks like a number (timeSamples frame)
-				if ( /^[\d.]+$/.test( key ) ) {
+				if ( /^-?[\d.]+$/.test( key ) ) {
 
 					target[ key ] = value;
 
@@ -235,39 +235,42 @@ class USDAParser {
 
 	_stripBlockComments( text ) {
 
-		// Iteratively remove /* ... */ comments without regex backtracking
+		// Iteratively remove /* ... */ comments without regex backtracking.
+		// Strings are copied as is since they may contain /* (e.g. path expressions)
+		const tokens = /\/\*|"""|'''|["']/g;
+
 		let result = '';
 		let i = 0;
 
 		while ( i < text.length ) {
 
-			// Check for block comment start
-			if ( text[ i ] === '/' && i + 1 < text.length && text[ i + 1 ] === '*' ) {
+			tokens.lastIndex = i;
+			const match = tokens.exec( text );
 
-				// Find the closing */
-				let j = i + 2;
+			if ( match === null ) {
 
-				while ( j < text.length ) {
+				result += text.slice( i );
+				break;
 
-					if ( text[ j ] === '*' && j + 1 < text.length && text[ j + 1 ] === '/' ) {
+			}
 
-						// Found closing, skip past it
-						j += 2;
-						break;
+			const start = match.index;
+			const token = match[ 0 ];
 
-					}
+			if ( token === '/*' ) {
 
-					j ++;
-
-				}
+				result += text.slice( i, start );
 
 				// Move past the comment (or to end if unclosed)
-				i = j;
+				const end = text.indexOf( '*/', start + 2 );
+				i = ( end === - 1 ) ? text.length : end + 2;
 
 			} else {
 
-				result += text[ i ];
-				i ++;
+				const end = this._findStringEnd( text, start, token );
+
+				result += text.slice( i, end );
+				i = end;
 
 			}
 
@@ -277,57 +280,63 @@ class USDAParser {
 
 	}
 
+	_findStringEnd( text, start, quote ) {
+
+		if ( quote.length === 3 ) {
+
+			const end = text.indexOf( quote, start + 3 );
+			return ( end === - 1 ) ? text.length : end + 3;
+
+		}
+
+		// Single-line string with escapes, ends at the line end if unclosed
+		for ( let i = start + 1; i < text.length; i ++ ) {
+
+			const ch = text[ i ];
+
+			if ( ch === '\\' ) i ++;
+			else if ( ch === quote ) return i + 1;
+			else if ( ch === '\n' ) return i;
+
+		}
+
+		return text.length;
+
+	}
+
 	_collapseTripleQuotedStrings( text ) {
+
+		const tripleQuote = /'''|"""/g;
 
 		let result = '';
 		let i = 0;
 
 		while ( i < text.length ) {
 
-			if ( i + 2 < text.length ) {
+			tripleQuote.lastIndex = i;
+			const match = tripleQuote.exec( text );
 
-				const triple = text.slice( i, i + 3 );
+			if ( match === null ) {
 
-				if ( triple === '\'\'\'' || triple === '"""' ) {
-
-					const quoteChar = triple;
-					result += quoteChar;
-					i += 3;
-
-					while ( i < text.length ) {
-
-						if ( i + 2 < text.length && text.slice( i, i + 3 ) === quoteChar ) {
-
-							result += quoteChar;
-							i += 3;
-							break;
-
-						} else {
-
-							if ( text[ i ] === '\n' ) {
-
-								result += '\\n';
-
-							} else if ( text[ i ] !== '\r' ) {
-
-								result += text[ i ];
-
-							}
-
-							i ++;
-
-						}
-
-					}
-
-					continue;
-
-				}
+				result += text.slice( i );
+				break;
 
 			}
 
-			result += text[ i ];
-			i ++;
+			const start = match.index;
+			const quoteChar = match[ 0 ];
+
+			result += text.slice( i, start );
+
+			const end = text.indexOf( quoteChar, start + 3 );
+			const content = text.slice( start + 3, ( end === - 1 ) ? text.length : end );
+
+			result += quoteChar + content.replace( /\r/g, '' ).replace( /\n/g, '\\n' );
+
+			if ( end === - 1 ) break;
+
+			result += quoteChar;
+			i = end + 3;
 
 		}
 

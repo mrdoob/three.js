@@ -1,6 +1,6 @@
 import { Tab } from '../ui/Tab.js';
 import { Graph } from '../ui/Graph.js';
-import { getItem, setItem } from '../Inspector.js';
+import { getItem, setItem } from '../Storage.js';
 import { info } from '../ui/utils.js';
 import {
 	ByteType,
@@ -618,6 +618,8 @@ class Timeline extends Tab {
 
 						if ( this.currentFrame ) {
 
+							this.resolveIndirectTriangles( this.currentFrame );
+
 							this.currentFrame.fps = this.renderer.inspector ? this.renderer.inspector.fps : 0;
 
 							if ( ! isFinite( this.currentFrame.fps ) ) {
@@ -657,7 +659,7 @@ class Timeline extends Tab {
 
 						}
 
-						this.currentFrame = { id: frameNumber, calls: [], fps: 0, triangles: 0 };
+						this.currentFrame = { id: frameNumber, calls: [], fps: 0, triangles: 0, indirectDraws: [] };
 						this.frames.push( this.currentFrame );
 
 						if ( this.frames.length > LIMIT ) {
@@ -680,6 +682,16 @@ class Timeline extends Tab {
 						if ( details.triangles !== undefined ) {
 
 							this.currentFrame.triangles += details.triangles;
+
+						} else if ( details.indirect === true ) {
+
+							const renderObject = args[ 0 ];
+
+							this.currentFrame.indirectDraws.push( {
+								details,
+								attribute: renderObject.getIndirect(),
+								offset: renderObject.getIndirectOffset()
+							} );
 
 						}
 
@@ -713,11 +725,65 @@ class Timeline extends Tab {
 
 			if ( this.currentFrame ) {
 
+				this.resolveIndirectTriangles( this.currentFrame );
+
 				this.currentFrame.fps = this.renderer.inspector ? this.renderer.inspector.fps : 0;
 
 			}
 
 		}
+
+	}
+
+	resolveIndirectTriangles( frame ) {
+
+		const draws = frame.indirectDraws;
+
+		if ( ! draws || draws.length === 0 ) return;
+
+		frame.indirectDraws = null;
+
+		// the draw arguments live on the GPU: [ vertexCount | indexCount, instanceCount, ... ]. the buffer is read
+		// once per frame, after the frame was submitted and before the next one changes it
+
+		const readbacks = new Map();
+
+		for ( const draw of draws ) {
+
+			if ( readbacks.has( draw.attribute ) === false ) {
+
+				readbacks.set( draw.attribute, this.renderer.getArrayBufferAsync( draw.attribute ) );
+
+			}
+
+		}
+
+		Promise.all( draws.map( ( draw ) => readbacks.get( draw.attribute ) ) ).then( ( buffers ) => {
+
+			for ( let i = 0; i < draws.length; i ++ ) {
+
+				const draw = draws[ i ];
+				const data = new Uint32Array( buffers[ i ] );
+				const offsets = Array.isArray( draw.offset ) ? draw.offset : [ draw.offset ];
+
+				let triangles = 0;
+
+				for ( const offset of offsets ) {
+
+					const index = offset / 4;
+
+					triangles += Math.floor( data[ index ] / 3 ) * data[ index + 1 ];
+
+				}
+
+				draw.details.triangles = triangles;
+				frame.triangles += triangles;
+
+			}
+
+			if ( this.isRecording === false && this.frames.includes( frame ) ) this.renderSlider();
+
+		} );
 
 	}
 
@@ -871,14 +937,24 @@ class Timeline extends Tab {
 
 						if ( renderObject.object.isMesh || renderObject.object.isSprite ) {
 
-							details.triangles = drawParams.vertexCount / 3;
+							// the WebGL backend doesn't support indirect draws, it draws with the parameters of the geometry
 
-							if ( renderObject.object.count > 1 ) {
+							if ( this.renderer.backend.isWebGPUBackend === true && renderObject.getIndirect() !== null ) {
 
-								details.instance = renderObject.object.count;
+								details.indirect = true;
 
-								details[ 'triangles per instance' ] = details.triangles;
-								details.triangles *= details.instance;
+							} else {
+
+								details.triangles = drawParams.vertexCount / 3;
+
+								if ( renderObject.object.count > 1 ) {
+
+									details.instance = renderObject.object.count;
+
+									details[ 'triangles per instance' ] = details.triangles;
+									details.triangles *= details.instance;
+
+								}
 
 							}
 

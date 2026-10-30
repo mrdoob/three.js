@@ -12,26 +12,19 @@ import { Fn, float, positionView, viewportDepthTexture, perspectiveDepthToViewZ,
  * @tsl
  * @function
  * @private
- * @param {Node<float>} input - The value to remap, expected in the `[0, 1]` range.
+ * @param {Node<float>} value - The value to remap, expected in the `[0, 1]` range.
  * @param {Node<float>} power - The contrast power. `1` is linear, higher values sharpen the transition.
  * @return {Node<float>} The remapped value.
  */
-const contrastCurve = /*@__PURE__*/ Fn( ( [ input, power ] ) => {
+const contrastCurve = /*@__PURE__*/ Fn( ( [ value, power ] ) => {
 
-	const aboveHalf = input.greaterThan( 0.5 ).toConst();
-	const folded = aboveHalf.select( input.oneMinus(), input ).toConst();
+	const aboveHalf = value.greaterThan( 0.5 ).toConst();
+	const folded = aboveHalf.select( value.oneMinus(), value ).toConst();
 	const output = folded.mul( 2 ).saturate().pow( power ).mul( 0.5 ).toConst();
 
 	return aboveHalf.select( output.oneMinus(), output );
 
-} ).setLayout( {
-	name: 'contrastCurve',
-	type: 'float',
-	inputs: [
-		{ name: 'input', type: 'float' },
-		{ name: 'power', type: 'float' }
-	]
-} );
+}, { value: 'float', power: 'float', return: 'float' } );
 
 /**
  * Computes an opacity node for soft particles, based on the "Soft Particles" white

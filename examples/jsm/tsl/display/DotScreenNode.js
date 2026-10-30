@@ -1,13 +1,13 @@
-import { TempNode } from 'three/webgpu';
+import { Node } from 'three/webgpu';
 import { nodeObject, Fn, uv, vec2, vec3, sin, cos, add, vec4, screenSize } from 'three/tsl';
 
 /**
  * Post processing node for creating dot-screen effect.
  *
- * @augments TempNode
+ * @augments Node
  * @three_import import { dotScreen } from 'three/addons/tsl/display/DotScreenNode.js';
  */
-class DotScreenNode extends TempNode {
+class DotScreenNode extends Node {
 
 	static get type() {
 

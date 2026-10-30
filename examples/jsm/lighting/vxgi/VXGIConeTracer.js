@@ -1,4 +1,4 @@
-import { float, vec3, vec4, If, Loop, Break, max, min, abs, dot, clamp, log2, exp2, select } from 'three/tsl';
+import { float, vec3, vec4, If, Loop, Break, max, min, abs, dot, cross, normalize, clamp, log2, exp2, fract, sqrt, cos, sin, select, EPSILON, PI } from 'three/tsl';
 
 /**
  * Emits the intersection of a ray with the bounds of the given volume.
@@ -14,9 +14,9 @@ export function intersectVolume( volume, origin, direction ) {
 	const boundsMax = boundsMin.add( volume.volumeSizeNode ).toConst();
 
 	const safeDirection = vec3(
-		select( abs( direction.x ).lessThan( 1e-6 ), 1e-6, direction.x ),
-		select( abs( direction.y ).lessThan( 1e-6 ), 1e-6, direction.y ),
-		select( abs( direction.z ).lessThan( 1e-6 ), 1e-6, direction.z )
+		select( abs( direction.x ).lessThan( EPSILON ), EPSILON, direction.x ),
+		select( abs( direction.y ).lessThan( EPSILON ), EPSILON, direction.y ),
+		select( abs( direction.z ).lessThan( EPSILON ), EPSILON, direction.z )
 	).toConst();
 
 	const invDirection = float( 1 ).div( safeDirection ).toConst();
@@ -118,7 +118,7 @@ export function createConeTracer( volume, options = {} ) {
 
 		// AO falloff 1 / ( 1 + r / aoDistance )
 
-		const aoFalloff = aoDistance !== null ? select( aoDistance.greaterThan( 0 ), float( 1 ).div( max( aoDistance, 1e-6 ) ), float( 0 ) ).toConst() : null;
+		const aoFalloff = aoDistance !== null ? select( aoDistance.greaterThan( 0 ), float( 1 ).div( max( aoDistance, EPSILON ) ), float( 0 ) ).toConst() : null;
 
 		If( tExit.greaterThan( t ), () => {
 
@@ -190,5 +190,54 @@ export function createConeTracer( volume, options = {} ) {
 		return { color, alpha, ao };
 
 	};
+
+}
+
+/**
+ * Emits a diffuse gather: Traces stratified cosine-weighted cones around the normal and averages them.
+ *
+ * @param {Function} trace - The cone tracing function, see {@link createConeTracer}.
+ * @param {Node<vec3>} origin - The origin of the cones.
+ * @param {Node<vec3>} normal - The normalized surface normal.
+ * @param {Node<uint>|number} coneCount - The number of cones.
+ * @param {Node<float>} tanHalfAngle - The tangent of half the cone angle.
+ * @param {Node<float>} maxDistance - The maximum trace distance.
+ * @param {Node<float>|number} rotation - Rotation of the cones around the normal in `[0, 1)`.
+ * @param {Node<float>|number} elevation - Offset of the cones within their elevation strata in `[0, 1)`.
+ * @param {?Node<float>} [aoDistance=null] - The AO falloff distance. AO is only computed if given.
+ * @return {{color: Node<vec3>, ao: Node<float>}} The mean radiance and the mean AO of the cones.
+ */
+export function gather( trace, origin, normal, coneCount, tanHalfAngle, maxDistance, rotation, elevation, aoDistance = null ) {
+
+	// tangent frame
+
+	const up = select( abs( normal.y ).lessThan( 0.99 ), vec3( 0, 1, 0 ), vec3( 1, 0, 0 ) );
+	const tangent = normalize( cross( normal, up ) ).toConst();
+	const bitangent = cross( normal, tangent ).toConst();
+
+	const color = vec3( 0 ).toVar();
+	const ao = float( 0 ).toVar();
+
+	Loop( { start: 0, end: coneCount, type: 'uint', condition: '<', name: 'c' }, ( { c } ) => {
+
+		// stratified cosine-weighted directions
+
+		const u1 = float( c ).add( elevation ).div( float( coneCount ) ).toConst();
+		const u2 = fract( float( c ).mul( 0.618034 ).add( rotation ) ).toConst();
+		const sinTheta = sqrt( u1 ).toConst();
+		const cosTheta = sqrt( u1.oneMinus() ).toConst();
+		const phi = u2.mul( PI.mul( 2 ) ).toConst();
+
+		const direction = normalize( tangent.mul( cos( phi ).mul( sinTheta ) ).add( bitangent.mul( sin( phi ).mul( sinTheta ) ) ).add( normal.mul( cosTheta ) ) ).toConst();
+
+		const cone = trace( origin, direction, tanHalfAngle, maxDistance, aoDistance );
+
+		color.addAssign( cone.color );
+
+		if ( aoDistance !== null ) ao.addAssign( cone.ao );
+
+	} );
+
+	return { color: color.div( float( coneCount ) ), ao: ao.div( float( coneCount ) ) };
 
 }

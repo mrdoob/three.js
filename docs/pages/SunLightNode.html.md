@@ -2,12 +2,12 @@
 
 # SunLightNode
 
-Module for representing sun lights as nodes. Register it with the renderer's node library to use [SunLight](SunLight.html) with `WebGPURenderer`:
+Module for representing sun lights as nodes. Register it with [SunLight](SunLight.html) to use the light with `WebGPURenderer`:
 
 ## Code Example
 
 ```js
-renderer.library.addLight( SunLightNode, SunLight );
+SunLight.registerNode( SunLightNode );
 ```
 
 ## Import

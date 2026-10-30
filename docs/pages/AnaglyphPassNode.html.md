@@ -1,4 +1,4 @@
-*Inheritance: EventDispatcher → Node → TempNode → PassNode → StereoCompositePassNode →*
+*Inheritance: EventDispatcher → Node → PassNode → StereoCompositePassNode →*
 
 # AnaglyphPassNode
 

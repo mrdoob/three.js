@@ -37,7 +37,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { cos, float, output, positionView, rangeFogFactor, reference, step, vec3, vec4 } from 'three/tsl';
+			import { cos, float, output, positionView, rangeFogFactor, reference, renderGroup, step, vec3, vec4 } from 'three/tsl';
 
 			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
@@ -62,7 +62,7 @@
 
 			function tintCascades() {
 
-				const cascadeData = reference( '_cascadeData', 'vec4', sunLight.shadow );
+				const cascadeData = reference( '_cascadeData', 'vec4', sunLight.shadow ).setGroup( renderGroup );
 				const viewDepth = positionView.z.negate();
 
 				let cascade = float( 0 );
@@ -77,8 +77,10 @@
 
 				// tint before the fog by wrapping the scene fog
 
-				const fogColor = reference( 'color', 'color', scene.fog );
-				const fogFactor = rangeFogFactor( reference( 'near', 'float', scene.fog ), reference( 'far', 'float', scene.fog ) );
+				const fogColor = reference( 'color', 'color', scene.fog ).setGroup( renderGroup );
+				const fogNear = reference( 'near', 'float', scene.fog ).setGroup( renderGroup );
+				const fogFar = reference( 'far', 'float', scene.fog ).setGroup( renderGroup );
+				const fogFactor = rangeFogFactor( fogNear, fogFar );
 
 				return vec4( fogFactor.mix( output.rgb.mul( tint ), fogColor ), output.a );
 
@@ -124,7 +126,7 @@
 				camera.lookAt( - 60, 8, 0 );
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
-				renderer.library.addLight( SunLightNode, SunLight );
+				SunLight.registerNode( SunLightNode );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );

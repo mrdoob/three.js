@@ -167,8 +167,11 @@ This ensures the same binding index is used across all shader stages.</p>
 					<h3 class="name name-method" id="enableDualSourceBlending" translate="no">.<a href="#enableDualSourceBlending">enableDualSourceBlending</a><span class="signature">()</span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Enables the 'dual_source_blending' directive.</p>
+							<p>Enables dual source blending.</p>
 						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#enableDualSourceBlending">NodeBuilder#enableDualSourceBlending</a></dt>
+						</dl>
 					</div>
 					<h3 class="name name-method" id="enableHardwareClipping" translate="no">.<a href="#enableHardwareClipping">enableHardwareClipping</a><span class="signature">( planeCount : <span class="param-type">string</span> )</span> </h3>
 					<div class="method">
@@ -191,20 +194,20 @@ This ensures the same binding index is used across all shader stages.</p>
 					<h3 class="name name-method" id="enableShaderF16" translate="no">.<a href="#enableShaderF16">enableShaderF16</a><span class="signature">()</span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Enables the 'f16' directive.</p>
+							<p>Enables 16 bit floats.</p>
 						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#enableShaderF16">NodeBuilder#enableShaderF16</a></dt>
+						</dl>
 					</div>
 					<h3 class="name name-method" id="enableSubGroups" translate="no">.<a href="#enableSubGroups">enableSubGroups</a><span class="signature">()</span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Enables the 'subgroups' directive.</p>
+							<p>Enables subgroups.</p>
 						</div>
-					</div>
-					<h3 class="name name-method" id="enableSubgroupsF16" translate="no">.<a href="#enableSubgroupsF16">enableSubgroupsF16</a><span class="signature">()</span> </h3>
-					<div class="method">
-						<div class="description">
-							<p>Enables the 'subgroups-f16' directive.</p>
-						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#enableSubGroups">NodeBuilder#enableSubGroups</a></dt>
+						</dl>
 					</div>
 					<h3 class="name name-method" id="generateArrayDeclaration" translate="no">.<a href="#generateArrayDeclaration">generateArrayDeclaration</a><span class="signature">( type : <span class="param-type">string</span>, count : <span class="param-type">number</span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
@@ -236,6 +239,47 @@ This ensures the same binding index is used across all shader stages.</p>
 						</dl>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The generated value as a shader string.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="generateConstStatement" translate="no">.<a href="#generateConstStatement">generateConstStatement</a><span class="signature">( type : <span class="param-type">string</span>, name : <span class="param-type">string</span>, count : <span class="param-type">number</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a single const variable statement as a WGSL string for the given variable type and name.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">type</strong>
+									</td>
+									<td class="description last">
+										<p>The variable's type.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">name</strong>
+									</td>
+									<td class="description last">
+										<p>The variable's name.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">count</strong>
+									</td>
+									<td class="description last">
+										<p>The array length.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#generateConstStatement">NodeBuilder#generateConstStatement</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet that defines a const variable.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="generateFilteredTexture" translate="no">.<a href="#generateFilteredTexture">generateFilteredTexture</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span>, levelSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
@@ -298,6 +342,47 @@ This ensures the same binding index is used across all shader stages.</p>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="generateLetStatement" translate="no">.<a href="#generateLetStatement">generateLetStatement</a><span class="signature">( type : <span class="param-type">string</span>, name : <span class="param-type">string</span>, count : <span class="param-type">number</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a runtime read-only variable statement as a WGSL string.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">type</strong>
+									</td>
+									<td class="description last">
+										<p>The variable's type.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">name</strong>
+									</td>
+									<td class="description last">
+										<p>The variable's name.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">count</strong>
+									</td>
+									<td class="description last">
+										<p>The array length.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#generateLetStatement">NodeBuilder#generateLetStatement</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet that defines a let variable.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="generateStorageTextureLoad" translate="no">.<a href="#generateStorageTextureLoad">generateStorageTextureLoad</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span>, textureProperty : <span class="param-type">string</span>, uvIndexSnippet : <span class="param-type">string</span>, levelSnippet : <span class="param-type">string</span>, depthSnippet : <span class="param-type">string</span>, offsetSnippet : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
@@ -1079,6 +1164,47 @@ Since it's a lookup, no sampling or filtering is applied.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="generateVarStatement" translate="no">.<a href="#generateVarStatement">generateVarStatement</a><span class="signature">( type : <span class="param-type">string</span>, name : <span class="param-type">string</span>, count : <span class="param-type">number</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a single variable statement as a WGSL string for the given variable type and name.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">type</strong>
+									</td>
+									<td class="description last">
+										<p>The variable's type.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">name</strong>
+									</td>
+									<td class="description last">
+										<p>The variable's name.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">count</strong>
+									</td>
+									<td class="description last">
+										<p>The array length.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#generateVarStatement">NodeBuilder#generateVarStatement</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The WGSL snippet that defines a variable.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="generateWrapFunction" translate="no">.<a href="#generateWrapFunction">generateWrapFunction</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
 						<div class="description">
@@ -1221,6 +1347,31 @@ defined in the WGSL source.</p>
 						</div>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The clip distances builtin.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getDeclarationName" translate="no">.<a href="#getDeclarationName">getDeclarationName</a><span class="signature">( node : <span class="param-type">Object</span> )</span><span class="type-signature"> : string</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the identifier the given node declares in the shader. Buffers are
+accessed via <code>name.value</code> but declare <code>name</code> in the module scope.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">node</strong>
+									</td>
+									<td class="description last">
+										<p>The node.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#getDeclarationName">NodeBuilder#getDeclarationName</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The declaration name.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="getDirectives" translate="no">.<a href="#getDirectives">getDirectives</a><span class="signature">( shaderStage : <span class="param-type">string</span> )</span><span class="type-signature"> : string</span> </h3>
@@ -1400,6 +1551,9 @@ or the linearized index of an compute invocation within a grid of workgroups.</p
 						<div class="description">
 							<p>Returns a builtin representing the index of a compute invocation within the scope of a subgroup.</p>
 						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#getInvocationSubgroupIndex">NodeBuilder#getInvocationSubgroupIndex</a></dt>
+						</dl>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The invocation subgroup index.</dt>
 						</dl>
@@ -1665,6 +1819,9 @@ Returns <code>undefined</code> when used in the vertex or fragment stage.</dt>
 							<p>Returns a builtin representing the index of a compute invocation's subgroup within its workgroup.</p>
 						</div>
 						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#getSubgroupIndex">NodeBuilder#getSubgroupIndex</a></dt>
+						</dl>
+						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The subgroup index.</dt>
 						</dl>
 					</div>
@@ -1673,6 +1830,9 @@ Returns <code>undefined</code> when used in the vertex or fragment stage.</dt>
 						<div class="description">
 							<p>Returns a builtin representing the size of a subgroup within the current shader.</p>
 						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="NodeBuilder.html#getSubgroupSize">NodeBuilder#getSubgroupSize</a></dt>
+						</dl>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The subgroup size.</dt>
 						</dl>

@@ -26,6 +26,12 @@ class AmbientLightDataNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	setLights( lights ) {
 
 		this._lights = lights;

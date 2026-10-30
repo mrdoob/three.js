@@ -1,4 +1,4 @@
-import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, TempNode, NodeUpdateType, Matrix4, DepthTexture, FloatType } from 'three/webgpu';
+import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
 import { float, Fn, max, texture, uniform, uv, vec2, convertToTexture, passTexture, velocity, ivec2, mix, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
 import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth, samplePreviousDepth } from '../utils/TAAUtils.js';
 
@@ -17,10 +17,10 @@ let _rendererState;
  *
  * Note: MSAA must be disabled when TRAA is in use.
  *
- * @augments TempNode
+ * @augments Node
  * @three_import import { traa } from 'three/addons/tsl/display/TRAANode.js';
  */
-class TRAANode extends TempNode {
+class TRAANode extends Node {
 
 	static get type() {
 
@@ -234,15 +234,7 @@ class TRAANode extends TempNode {
 		 * @private
 		 * @type {TextureNode}
 		 */
-		this._previousDepthNode = texture( new DepthTexture( 1, 1 ) );
-
-		/**
-		 * Sync the post processing stack with the TRAA node.
-		 *
-		 * @private
-		 * @type {boolean}
-		 */
-		this._needsPostProcessingSync = false;
+		this._previousDepthNode = texture( this._historyRenderTarget.depthTexture );
 
 		/**
 		 * The node used to render the scene's velocity.
@@ -367,16 +359,6 @@ class TRAANode extends TempNode {
 		const width = beautyRenderTarget.texture.width;
 		const height = beautyRenderTarget.texture.height;
 
-		//
-
-		if ( this._needsPostProcessingSync === true ) {
-
-			this.setViewOffset( width, height );
-
-			this._needsPostProcessingSync = false;
-
-		}
-
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
 
 		//
@@ -387,11 +369,6 @@ class TRAANode extends TempNode {
 		// every time when the dimensions change we need fresh history data
 
 		if ( needsRestart === true ) {
-
-			// make sure render targets are initialized after the resize which triggers a dispose()
-
-			renderer.initRenderTarget( this._historyRenderTarget );
-			renderer.initRenderTarget( this._resolveRenderTarget );
 
 			// make sure to reset the history with the contents of the beauty buffer otherwise subsequent frames after the
 			// resize will fade from a darker color to the correct one because the history was cleared with black.
@@ -425,7 +402,6 @@ class TRAANode extends TempNode {
 
 			const currentDepth = this.depthNode.value;
 			renderer.copyTextureToTexture( currentDepth, this._historyRenderTarget.depthTexture );
-			this._previousDepthNode.value = this._historyRenderTarget.depthTexture;
 
 		}
 
@@ -443,11 +419,13 @@ class TRAANode extends TempNode {
 	 */
 	setup( builder ) {
 
+		this.depthNode.build( builder );
+		this.velocityNode.build( builder );
+		this.beautyNode.build( builder );
+
 		if ( builder.renderPipeline && ! builder.context.renderPipelineState.viewOffsetOwner ) {
 
 			builder.context.renderPipelineState.viewOffsetOwner = this;
-
-			this._needsPostProcessingSync = true;
 
 			OnBeforeRenderPipeline( () => {
 
@@ -464,11 +442,8 @@ class TRAANode extends TempNode {
 
 		}
 
-		if ( builder.renderer.reversedDepthBuffer === true ) {
-
-			this._historyRenderTarget.depthTexture.type = FloatType;
-
-		}
+		this._historyRenderTarget.depthTexture.format = this.depthNode.value.format;
+		this._historyRenderTarget.depthTexture.type = this.depthNode.value.type;
 
 		if ( builder.context.velocity !== undefined ) {
 
@@ -525,14 +500,7 @@ class TRAANode extends TempNode {
 			const weight = max( phase, phase.oneMinus() );
 			return weight.x.mul( weight.y ).oneMinus().div( 0.75 );
 
-		} ).setLayout( {
-			name: 'subpixelCorrection',
-			type: 'float',
-			inputs: [
-				{ name: 'velocityUV', type: 'vec2' },
-				{ name: 'textureSize', type: 'ivec2' }
-			]
-		} );
+		}, { velocityUV: 'vec2', textureSize: 'ivec2', return: 'float' } );
 
 		const historyNode = texture( this._historyRenderTarget.texture );
 

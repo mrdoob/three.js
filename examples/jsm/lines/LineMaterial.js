@@ -179,7 +179,7 @@ ShaderLib[ 'line' ] = {
 			#ifdef WORLD_UNITS
 
 				vec3 worldDir = normalize( end.xyz - start.xyz );
-				vec3 tmpFwd = normalize( mix( start.xyz, end.xyz, 0.5 ) );
+				vec3 tmpFwd = perspective ? normalize( mix( start.xyz, end.xyz, 0.5 ) ) : vec3( 0.0, 0.0, - 1.0 );
 				vec3 worldUp = normalize( cross( worldDir, tmpFwd ) );
 				vec3 worldFwd = cross( worldDir, worldUp );
 				worldPos = position.y < 0.5 ? start: end;
@@ -213,7 +213,9 @@ ShaderLib[ 'line' ] = {
 				// shift the depth of the projected points so the line
 				// segments overlap neatly
 				vec3 clipPose = ( position.y < 0.5 ) ? ndcStart : ndcEnd;
-				clip.z = clipPose.z * clip.w;
+
+				// only shift the depth of vertices in front of the camera (#35137)
+				if ( clip.w > 0.0 ) clip.z = clipPose.z * clip.w;
 
 			#else
 
@@ -349,15 +351,29 @@ ShaderLib[ 'line' ] = {
 
 			#ifdef WORLD_UNITS
 
-				// Find the closest points on the view ray and the line segment
-				vec3 rayEnd = normalize( worldPos.xyz ) * 1e5;
-				vec3 lineDir = worldEnd - worldStart;
-				vec2 params = closestLineToLine( worldStart, worldEnd, vec3( 0.0, 0.0, 0.0 ), rayEnd );
+				float len;
 
-				vec3 p1 = worldStart + lineDir * params.x;
-				vec3 p2 = rayEnd * params.y;
-				vec3 delta = p1 - p2;
-				float len = length( delta );
+				if ( isOrthographic ) {
+
+					// View rays are parallel to the z axis so the distance reduces to camera-space XY
+					vec2 lineDir = worldEnd.xy - worldStart.xy;
+					float t = clamp( dot( worldPos.xy - worldStart.xy, lineDir ) / dot( lineDir, lineDir ), 0.0, 1.0 );
+					len = length( worldStart.xy + lineDir * t - worldPos.xy );
+
+				} else {
+
+					// Find the closest points on the view ray and the line segment
+					vec3 rayEnd = normalize( worldPos.xyz ) * 1e5;
+					vec3 lineDir = worldEnd - worldStart;
+					vec2 params = closestLineToLine( worldStart, worldEnd, vec3( 0.0, 0.0, 0.0 ), rayEnd );
+
+					vec3 p1 = worldStart + lineDir * params.x;
+					vec3 p2 = rayEnd * params.y;
+					vec3 delta = p1 - p2;
+					len = length( delta );
+
+				}
+
 				float norm = len / linewidth;
 
 				#ifndef USE_DASH

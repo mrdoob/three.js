@@ -27,7 +27,10 @@ class ColorConverter {
 		s = MathUtils.clamp( s, 0, 1 );
 		v = MathUtils.clamp( v, 0, 1 );
 
-		return color.setHSL( h, ( s * v ) / ( ( h = ( 2 - s ) * v ) < 1 ? h : ( 2 - h ) ), h * 0.5 );
+		const l = ( 2 - s ) * v;
+		const saturation = ( l === 0 || l === 2 ) ? 0 : ( s * v ) / ( l < 1 ? l : ( 2 - l ) );
+
+		return color.setHSL( h, saturation, l * 0.5 );
 
 	}
 
@@ -44,10 +47,11 @@ class ColorConverter {
 
 		// based on https://gist.github.com/xpansive/1337890#file-index-js
 		_hsl.s *= ( _hsl.l < 0.5 ) ? _hsl.l : ( 1 - _hsl.l );
+		const v = _hsl.l + _hsl.s;
 
 		target.h = _hsl.h;
-		target.s = 2 * _hsl.s / ( _hsl.l + _hsl.s );
-		target.v = _hsl.l + _hsl.s;
+		target.s = v === 0 ? 0 : 2 * _hsl.s / v;
+		target.v = v;
 
 		return target;
 

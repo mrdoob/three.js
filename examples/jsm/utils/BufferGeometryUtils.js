@@ -5,6 +5,7 @@ import {
 	InstancedBufferAttribute,
 	InterleavedBuffer,
 	InterleavedBufferAttribute,
+	MathUtils,
 	TriangleFanDrawMode,
 	TriangleStripDrawMode,
 	TrianglesDrawMode,
@@ -27,10 +28,11 @@ import {
  * custom material, and may be faster than MikkTSpace.
  *
  * Returns the original BufferGeometry. Indexed geometries will be de-indexed. Requires position, normal, and uv attributes.
+ * Tangents are stored like the normals: normalized Int8 or Int16 when the normals are, Float32 otherwise.
  *
  * @param {BufferGeometry} geometry - The geometry to compute tangents for.
  * @param {Object} MikkTSpace - Instance of `examples/jsm/libs/mikktspace.module.js`, or `mikktspace` npm package.
- * Await `MikkTSpace.ready` before use.
+ * The bundled JavaScript implementation is ready immediately. Await `MikkTSpace.ready` before using a WebAssembly implementation.
  * @param {boolean} [negateSign=true] - Whether to negate the sign component (.w) of each tangent.
  * Required for normal map conventions in some formats, including glTF.
  * @return {BufferGeometry} The updated geometry.
@@ -111,7 +113,28 @@ function computeMikkTSpaceTangents( geometry, MikkTSpace, negateSign = true ) {
 
 	//
 
-	_geometry.setAttribute( 'tangent', new BufferAttribute( tangents, 4 ) );
+	// Quantized normals get tangents of the same precision.
+
+	const normal = _geometry.attributes.normal;
+	const normalArray = normal.array;
+
+	if ( normal.normalized && ( normalArray instanceof Int8Array || normalArray instanceof Int16Array ) ) {
+
+		const quantized = new normalArray.constructor( tangents.length );
+
+		for ( let i = 0; i < tangents.length; i ++ ) {
+
+			quantized[ i ] = MathUtils.normalize( tangents[ i ], quantized );
+
+		}
+
+		_geometry.setAttribute( 'tangent', new BufferAttribute( quantized, 4, true ) );
+
+	} else {
+
+		_geometry.setAttribute( 'tangent', new BufferAttribute( tangents, 4 ) );
+
+	}
 
 	if ( geometry !== _geometry ) {
 
@@ -143,6 +166,7 @@ function mergeGeometries( geometries, useGroups = false ) {
 	const morphTargetsRelative = geometries[ 0 ].morphTargetsRelative;
 
 	const mergedGeometry = new BufferGeometry();
+	mergedGeometry.morphTargetsRelative = morphTargetsRelative;
 
 	let offset = 0;
 
@@ -150,6 +174,7 @@ function mergeGeometries( geometries, useGroups = false ) {
 
 		const geometry = geometries[ i ];
 		let attributesCount = 0;
+		let morphAttributesCount = 0;
 
 		// ensure that all geometries are indexed, or none
 
@@ -206,9 +231,27 @@ function mergeGeometries( geometries, useGroups = false ) {
 
 			}
 
+			if ( geometry.morphAttributes[ name ].length !== geometries[ 0 ].morphAttributes[ name ].length ) {
+
+				console.error( 'THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index ' + i + '. All geometries must have the same number of morph targets for the "' + name + '" morph attribute.' );
+				return null;
+
+			}
+
 			if ( morphAttributes[ name ] === undefined ) morphAttributes[ name ] = [];
 
 			morphAttributes[ name ].push( geometry.morphAttributes[ name ] );
+
+			morphAttributesCount ++;
+
+		}
+
+		// ensure geometries have the same number of morph attributes
+
+		if ( morphAttributesCount !== morphAttributesUsed.size ) {
+
+			console.error( 'THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index ' + i + '. Make sure all geometries have the same number of morph attributes.' );
+			return null;
 
 		}
 
@@ -569,7 +612,7 @@ function deinterleaveAttribute( attribute ) {
 function deinterleaveGeometry( geometry ) {
 
 	const attributes = geometry.attributes;
-	const morphTargets = geometry.morphTargets;
+	const morphAttributes = geometry.morphAttributes;
 	const attrMap = new Map();
 
 	for ( const key in attributes ) {
@@ -589,18 +632,24 @@ function deinterleaveGeometry( geometry ) {
 
 	}
 
-	for ( const key in morphTargets ) {
+	for ( const key in morphAttributes ) {
 
-		const attr = morphTargets[ key ];
-		if ( attr.isInterleavedBufferAttribute ) {
+		const morphAttribute = morphAttributes[ key ];
 
-			if ( ! attrMap.has( attr ) ) {
+		for ( let i = 0, l = morphAttribute.length; i < l; i ++ ) {
 
-				attrMap.set( attr, deinterleaveAttribute( attr ) );
+			const attr = morphAttribute[ i ];
+			if ( attr.isInterleavedBufferAttribute ) {
+
+				if ( ! attrMap.has( attr ) ) {
+
+					attrMap.set( attr, deinterleaveAttribute( attr ) );
+
+				}
+
+				morphAttribute[ i ] = attrMap.get( attr );
 
 			}
-
-			morphTargets[ key ] = attrMap.get( attr );
 
 		}
 
@@ -656,39 +705,10 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 	// attributes and new attribute arrays
 	const attributeNames = Object.keys( geometry.attributes );
-	const tmpAttributes = {};
-	const tmpMorphAttributes = {};
+	const sourceIndices = [];
+	const buffers = new Map();
 	const newIndices = [];
 	const getters = [ 'getX', 'getY', 'getZ', 'getW' ];
-	const setters = [ 'setX', 'setY', 'setZ', 'setW' ];
-
-	// Initialize the arrays, allocating space conservatively. Extra
-	// space will be trimmed in the last step.
-	for ( let i = 0, l = attributeNames.length; i < l; i ++ ) {
-
-		const name = attributeNames[ i ];
-		const attr = geometry.attributes[ name ];
-
-		tmpAttributes[ name ] = new attr.constructor(
-			new attr.array.constructor( attr.count * attr.itemSize ),
-			attr.itemSize,
-			attr.normalized
-		);
-
-		const morphAttributes = geometry.morphAttributes[ name ];
-		if ( morphAttributes ) {
-
-			if ( ! tmpMorphAttributes[ name ] ) tmpMorphAttributes[ name ] = [];
-			morphAttributes.forEach( ( morphAttr, i ) => {
-
-				const array = new morphAttr.array.constructor( morphAttr.count * morphAttr.itemSize );
-				tmpMorphAttributes[ name ][ i ] = new morphAttr.constructor( array, morphAttr.itemSize, morphAttr.normalized );
-
-			} );
-
-		}
-
-	}
 
 	// convert the error tolerance to an amount of decimal places to truncate to
 	const halfTolerance = tolerance * 0.5;
@@ -724,35 +744,7 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 		} else {
 
-			// copy data to the new index in the temporary attributes
-			for ( let j = 0, l = attributeNames.length; j < l; j ++ ) {
-
-				const name = attributeNames[ j ];
-				const attribute = geometry.getAttribute( name );
-				const morphAttributes = geometry.morphAttributes[ name ];
-				const itemSize = attribute.itemSize;
-				const newArray = tmpAttributes[ name ];
-				const newMorphArrays = tmpMorphAttributes[ name ];
-
-				for ( let k = 0; k < itemSize; k ++ ) {
-
-					const getterFunc = getters[ k ];
-					const setterFunc = setters[ k ];
-					newArray[ setterFunc ]( nextIndex, attribute[ getterFunc ]( index ) );
-
-					if ( morphAttributes ) {
-
-						for ( let m = 0, ml = morphAttributes.length; m < ml; m ++ ) {
-
-							newMorphArrays[ m ][ setterFunc ]( nextIndex, morphAttributes[ m ][ getterFunc ]( index ) );
-
-						}
-
-					}
-
-				}
-
-			}
+			sourceIndices.push( index );
 
 			hashToIndex[ hash ] = nextIndex;
 			newIndices.push( nextIndex );
@@ -766,27 +758,13 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 	const result = geometry.clone();
 	for ( const name in geometry.attributes ) {
 
-		const tmpAttribute = tmpAttributes[ name ];
+		result.setAttribute( name, remapAttribute( geometry.attributes[ name ], sourceIndices, buffers ) );
 
-		result.setAttribute( name, new tmpAttribute.constructor(
-			tmpAttribute.array.slice( 0, nextIndex * tmpAttribute.itemSize ),
-			tmpAttribute.itemSize,
-			tmpAttribute.normalized,
-		) );
+	}
 
-		if ( ! ( name in tmpMorphAttributes ) ) continue;
+	for ( const name in geometry.morphAttributes ) {
 
-		for ( let j = 0; j < tmpMorphAttributes[ name ].length; j ++ ) {
-
-			const tmpMorphAttribute = tmpMorphAttributes[ name ][ j ];
-
-			result.morphAttributes[ name ][ j ] = new tmpMorphAttribute.constructor(
-				tmpMorphAttribute.array.slice( 0, nextIndex * tmpMorphAttribute.itemSize ),
-				tmpMorphAttribute.itemSize,
-				tmpMorphAttribute.normalized,
-			);
-
-		}
+		result.morphAttributes[ name ] = geometry.morphAttributes[ name ].map( attribute => remapAttribute( attribute, sourceIndices, buffers ) );
 
 	}
 
@@ -1249,6 +1227,8 @@ function mergeGroups( geometry ) {
 
 		const group = groups[ i ];
 
+		if ( group.count === Infinity ) group.count = index.count - group.start;
+
 		const groupStart = group.start;
 		const groupLength = groupStart + group.count;
 
@@ -1484,6 +1464,47 @@ function toCreasedNormals( geometry, creaseAngle = Math.PI / 3 /* 60 degrees */ 
 
 }
 
+/**
+ * Copies attribute entries in the order specified by the source vertex indices.
+ * Preserves raw values, attribute type and metadata. Reuse the same buffer map
+ * across calls to preserve shared interleaved buffers for the same mapping.
+ *
+ * @param {BufferAttribute|InterleavedBufferAttribute} attribute - The source attribute.
+ * @param {Array<number>|TypedArray} sourceIndices - The source index for each output vertex.
+ * @param {Map<InterleavedBuffer, InterleavedBuffer>} [buffers] - Shared interleaved buffer copies.
+ * @return {BufferAttribute|InterleavedBufferAttribute} The remapped attribute.
+ */
+function remapAttribute( attribute, sourceIndices, buffers = new Map() ) {
+
+	const interleaved = attribute.isInterleavedBufferAttribute;
+	const source = interleaved ? attribute.data : attribute;
+	const stride = interleaved ? source.stride : attribute.itemSize;
+	let data = interleaved ? buffers.get( source ) : undefined;
+
+	if ( data === undefined ) {
+
+		const array = new source.array.constructor( sourceIndices.length * stride );
+		for ( let i = 0; i < sourceIndices.length; i ++ ) {
+
+			for ( let j = 0; j < stride; j ++ ) array[ i * stride + j ] = source.array[ sourceIndices[ i ] * stride + j ];
+
+		}
+
+		data = interleaved
+			? new source.constructor( array, stride, source.meshPerAttribute )
+			: new attribute.constructor( array, attribute.itemSize, attribute.normalized, attribute.meshPerAttribute );
+		data.setUsage( source.usage );
+		if ( interleaved ) buffers.set( source, data );
+
+	}
+
+	const result = interleaved ? new attribute.constructor( data, attribute.itemSize, attribute.offset, attribute.normalized ) : data;
+	result.name = attribute.name;
+	if ( ! interleaved ) result.gpuType = attribute.gpuType;
+	return result;
+
+}
+
 export {
 	computeMikkTSpaceTangents,
 	mergeGeometries,
@@ -1494,6 +1515,7 @@ export {
 	interleaveAttributes,
 	estimateBytesUsed,
 	mergeVertices,
+	remapAttribute,
 	toTrianglesDrawMode,
 	computeMorphedAttributes,
 	mergeGroups,

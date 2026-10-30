@@ -81,6 +81,54 @@ analytically.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The attribute name.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="getContextAttribute" translate="no">.<a href="#getContextAttribute">getContextAttribute</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the node which provides the value of this attribute in the current context, if any.
+The context can provide attributes with a <code>getAttribute( name, builder )</code> function, e.g. if the
+vertices are pulled from a storage buffer or the surface is reconstructed per fragment. The
+function should return the same node for the same attribute.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The node providing the value of the attribute.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getShared" translate="no">.<a href="#getShared">getShared</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>An attribute provided by the context is replaced by the provided node, like an override.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#getShared">Node#getShared</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The shared node if possible. Otherwise <code>this</code> is returned.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="setAttributeName" translate="no">.<a href="#setAttributeName">setAttributeName</a><span class="signature">( attributeName : <span class="param-type">string</span> )</span><span class="type-signature"> : <a href="AttributeNode.html">AttributeNode</a></span> </h3>
 					<div class="method">
 						<div class="description">

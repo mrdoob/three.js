@@ -1,4 +1,4 @@
-*Inheritance: EventDispatcher → Node → TempNode → PassNode →*
+*Inheritance: EventDispatcher → Node → PassNode →*
 
 # ToonOutlinePassNode
 
@@ -59,6 +59,14 @@ Default is `'Outline Pass'`.
 ### .thicknessNode : Node
 
 Defines the outline's thickness.
+
+## Methods
+
+### .dispose()
+
+Frees internal resources. Should be called when the node is no longer in use.
+
+**Overrides:** [PassNode#dispose](PassNode.html#dispose)
 
 ## Source
 

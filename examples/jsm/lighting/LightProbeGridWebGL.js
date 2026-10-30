@@ -4,11 +4,11 @@ import {
 	Data3DTexture,
 	FloatType,
 	HalfFloatType,
+	Light,
 	LinearFilter,
 	MathUtils,
 	Mesh,
 	NearestFilter,
-	Object3D,
 	OrthographicCamera,
 	PlaneGeometry,
 	RGBAFormat,
@@ -85,23 +85,25 @@ const ATLAS_PADDING = 1;
  *
  * @three_import import { LightProbeGridWebGL } from 'three/addons/lighting/LightProbeGridWebGL.js';
  */
-class LightProbeGridWebGL extends Object3D {
+class LightProbeGridWebGL extends Light {
 
 	/**
 	 * Constructs a new irradiance probe grid.
 	 *
-	 * The volume is centered at the object's position.
+	 * The volume is centered at the object's position. It is split into one cell
+	 * per probe, with each probe at the center of its cell, so the probes sit half
+	 * a cell inside the volume.
 	 *
 	 * @param {number} [width=1] - Full width of the volume along X.
 	 * @param {number} [height=1] - Full height of the volume along Y.
 	 * @param {number} [depth=1] - Full depth of the volume along Z.
-	 * @param {number} [widthProbes] - Number of probes along X. Defaults to `Math.max( 2, Math.round( width ) + 1 )`.
-	 * @param {number} [heightProbes] - Number of probes along Y. Defaults to `Math.max( 2, Math.round( height ) + 1 )`.
-	 * @param {number} [depthProbes] - Number of probes along Z. Defaults to `Math.max( 2, Math.round( depth ) + 1 )`.
+	 * @param {number} [widthProbes] - Number of probes along X. Defaults to `Math.max( 1, Math.round( width ) )`.
+	 * @param {number} [heightProbes] - Number of probes along Y. Defaults to `Math.max( 1, Math.round( height ) )`.
+	 * @param {number} [depthProbes] - Number of probes along Z. Defaults to `Math.max( 1, Math.round( depth ) )`.
 	 */
 	constructor( width = 1, height = 1, depth = 1, widthProbes, heightProbes, depthProbes ) {
 
-		super();
+		super( 0xffffff, 1 );
 
 		/**
 		 * This flag can be used for type testing.
@@ -111,6 +113,8 @@ class LightProbeGridWebGL extends Object3D {
 		 * @default true
 		 */
 		this.isLightProbeGrid = true;
+
+		this.type = 'LightProbeGridWebGL';
 
 		/**
 		 * The full width of the volume along X.
@@ -139,18 +143,28 @@ class LightProbeGridWebGL extends Object3D {
 		 * @type {Vector3}
 		 */
 		this.resolution = new Vector3(
-			widthProbes !== undefined ? widthProbes : Math.max( 2, Math.round( width ) + 1 ),
-			heightProbes !== undefined ? heightProbes : Math.max( 2, Math.round( height ) + 1 ),
-			depthProbes !== undefined ? depthProbes : Math.max( 2, Math.round( depth ) + 1 )
+			widthProbes !== undefined ? widthProbes : Math.max( 1, Math.round( width ) ),
+			heightProbes !== undefined ? heightProbes : Math.max( 1, Math.round( height ) ),
+			depthProbes !== undefined ? depthProbes : Math.max( 1, Math.round( depth ) )
 		);
 
 		/**
-		 * The world-space bounding box for the grid. Updated automatically
+		 * The world-space bounding box for the grid. This is the volume the grid
+		 * lights, with the probes half a cell inside it. Updated automatically
 		 * by {@link LightProbeGridWebGL#bake}.
 		 *
 		 * @type {Box3}
 		 */
 		this.boundingBox = new Box3();
+
+		/**
+		 * Where grids overlap, the grid with the highest priority lights the
+		 * fragment. On ties, the most recently created grid wins.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.priority = 0;
 
 		/**
 		 * The single RGBA atlas 3D texture storing all seven packed SH sub-volumes.
@@ -193,9 +207,9 @@ class LightProbeGridWebGL extends Object3D {
 		const w = this.width, h = this.height, d = this.depth;
 
 		target.set(
-			res.x > 1 ? pos.x - w / 2 + ix * w / ( res.x - 1 ) : pos.x,
-			res.y > 1 ? pos.y - h / 2 + iy * h / ( res.y - 1 ) : pos.y,
-			res.z > 1 ? pos.z - d / 2 + iz * d / ( res.z - 1 ) : pos.z
+			pos.x - w / 2 + ( ix + 0.5 ) * w / res.x,
+			pos.y - h / 2 + ( iy + 0.5 ) * h / res.y,
+			pos.z - d / 2 + ( iz + 0.5 ) * d / res.z
 		);
 
 		return target;
@@ -552,6 +566,8 @@ class LightProbeGridWebGL extends Object3D {
 			this.texture = null;
 
 		}
+
+		super.dispose();
 
 	}
 

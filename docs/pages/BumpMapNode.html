@@ -9,7 +9,7 @@
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
-		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="TempNode.html">TempNode</a> → </p>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → </p>
 	<h1 translate="no">BumpMapNode</h1>
 		<section>
 			<header>
@@ -21,7 +21,7 @@
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="BumpMapNode" translate="no">new <a href="#BumpMapNode">BumpMapNode</a><span class="signature">( textureNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, scaleNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span> </h3>
+					<h3 class="name name-method" id="BumpMapNode" translate="no">new <a href="#BumpMapNode">BumpMapNode</a><span class="signature">( textureNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, scaleNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span>, normalNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new bump map node.</p>
@@ -45,11 +45,27 @@
 										<p>Default is <code>null</code>.</p>
 									</td>
 								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">normalNode</strong>
+									</td>
+									<td class="description last">
+										<p>The view-space normal to perturb.</p>
+										<p>Default is <code>normalView</code>.</p>
+									</td>
+								</tr>
 							</tbody>
 						</table>
 					</div>
 				</div>
 				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="normalNode" translate="no">.<a href="#normalNode">normalNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="description">
+						<p>The view-space normal to perturb.</p>
+						<p>Default is <code>normalView</code>.</p>
+					</div>
+				</div>
 				<div class="member">
 					<h3 class="name" id="scaleNode" translate="no">.<a href="#scaleNode">scaleNode</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
 					<div class="description">

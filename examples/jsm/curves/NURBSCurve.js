@@ -122,6 +122,20 @@ class NURBSCurve extends Curve {
 
 	}
 
+	copy( source ) {
+
+		super.copy( source );
+
+		this.degree = source.degree;
+		this.knots = [ ...source.knots ];
+		this.controlPoints = source.controlPoints.map( p => p.clone() );
+		this.startKnot = source.startKnot;
+		this.endKnot = source.endKnot;
+
+		return this;
+
+	}
+
 	toJSON() {
 
 		const data = super.toJSON();

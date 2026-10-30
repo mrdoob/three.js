@@ -163,6 +163,8 @@ class DRACOLoader extends Loader {
 	load( url, onLoad, onProgress, onError ) {
 
 		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
 
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
@@ -358,6 +360,8 @@ class DRACOLoader extends Loader {
 	_loadLibrary( url, responseType ) {
 
 		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
 		loader.setResponseType( responseType );
 		loader.setWithCredentials( this.withCredentials );
 
@@ -725,7 +729,7 @@ function DRACOWorker() {
 
 			let dstOffset = 0;
 
-			for ( let i = 0, il = srcArray.length; i < il; i ++ ) {
+			for ( let i = 0; i < count; i ++ ) {
 
 				for ( let j = 0; j < itemSize; j ++ ) {
 

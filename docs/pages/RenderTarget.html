@@ -276,6 +276,8 @@ all MRT textures and the depth texture.</p>
 						<div class="description">
 							<p>Frees the GPU-related resources allocated by this instance. Call this
 method whenever this instance is no longer used in your app.</p>
+<p>This also frees the resources of the render target's textures. There is
+no need to dispose them separately.</p>
 						</div>
 						<h5>Fires:</h5>
 						<ul>
@@ -334,6 +336,17 @@ method whenever this instance is no longer used in your app.</p>
 			<td class="description last">
 				<p>Whether to generate mipmaps or not.</p>
 						<p>Default is <code>false</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>mipmapsAutoUpdate</strong>
+						<br>
+<span class="param-type">boolean</span>
+				</td>
+			<td class="description last">
+				<p>Whether to regenerate mipmaps automatically after rendering or not.</p>
+						<p>Default is <code>true</code>.</p>
 			</td>
 		</tr>
 		<tr>
@@ -552,7 +565,7 @@ method whenever this instance is no longer used in your app.</p>
 <span class="param-type">number</span>
 				</td>
 			<td class="description last">
-				<p>Defines the number of color attachments . Must be at least <code>1</code>.</p>
+				<p>Defines the number of color attachments. Use <code>0</code> for a depth-only render target (WebGPURenderer).</p>
 						<p>Default is <code>1</code>.</p>
 			</td>
 		</tr>

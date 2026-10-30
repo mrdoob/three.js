@@ -1,3 +1,5 @@
+/* global THREE */ /* assigned at ./app/index.html */
+
 const APP = {
 
 	Player: function () {

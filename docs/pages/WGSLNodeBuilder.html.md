@@ -94,7 +94,9 @@ Default is `this.shaderStage`.
 
 ### .enableDualSourceBlending()
 
-Enables the 'dual\_source\_blending' directive.
+Enables dual source blending.
+
+**Overrides:** [NodeBuilder#enableDualSourceBlending](NodeBuilder.html#enableDualSourceBlending)
 
 ### .enableHardwareClipping( planeCount : string )
 
@@ -106,15 +108,15 @@ The clipping plane count.
 
 ### .enableShaderF16()
 
-Enables the 'f16' directive.
+Enables 16 bit floats.
+
+**Overrides:** [NodeBuilder#enableShaderF16](NodeBuilder.html#enableShaderF16)
 
 ### .enableSubGroups()
 
-Enables the 'subgroups' directive.
+Enables subgroups.
 
-### .enableSubgroupsF16()
-
-Enables the 'subgroups-f16' directive.
+**Overrides:** [NodeBuilder#enableSubGroups](NodeBuilder.html#enableSubGroups)
 
 ### .generateArrayDeclaration( type : string, count : number ) : string
 
@@ -131,6 +133,28 @@ The count.
 **Overrides:** [NodeBuilder#generateArrayDeclaration](NodeBuilder.html#generateArrayDeclaration)
 
 **Returns:** The generated value as a shader string.
+
+### .generateConstStatement( type : string, name : string, count : number ) : string
+
+Returns a single const variable statement as a WGSL string for the given variable type and name.
+
+**type**
+
+The variable's type.
+
+**name**
+
+The variable's name.
+
+**count**
+
+The array length.
+
+Default is `null`.
+
+**Overrides:** [NodeBuilder#generateConstStatement](NodeBuilder.html#generateConstStatement)
+
+**Returns:** The WGSL snippet that defines a const variable.
 
 ### .generateFilteredTexture( texture : Texture, textureProperty : string, uvSnippet : string, offsetSnippet : string, levelSnippet : string, depthSnippet : string ) : string
 
@@ -163,6 +187,28 @@ Default is `'0u'`.
 A WGSL snippet that represents 0-based texture array index to sample.
 
 **Returns:** The WGSL snippet.
+
+### .generateLetStatement( type : string, name : string, count : number ) : string
+
+Returns a runtime read-only variable statement as a WGSL string.
+
+**type**
+
+The variable's type.
+
+**name**
+
+The variable's name.
+
+**count**
+
+The array length.
+
+Default is `null`.
+
+**Overrides:** [NodeBuilder#generateLetStatement](NodeBuilder.html#generateLetStatement)
+
+**Returns:** The WGSL snippet that defines a let variable.
 
 ### .generateStorageTextureLoad( texture : Texture, textureProperty : string, uvIndexSnippet : string, levelSnippet : string, depthSnippet : string, offsetSnippet : string ) : string
 
@@ -554,6 +600,28 @@ A WGSL snippet that represent the new texel value.
 
 **Returns:** The WGSL snippet.
 
+### .generateVarStatement( type : string, name : string, count : number ) : string
+
+Returns a single variable statement as a WGSL string for the given variable type and name.
+
+**type**
+
+The variable's type.
+
+**name**
+
+The variable's name.
+
+**count**
+
+The array length.
+
+Default is `null`.
+
+**Overrides:** [NodeBuilder#generateVarStatement](NodeBuilder.html#generateVarStatement)
+
+**Returns:** The WGSL snippet that defines a variable.
+
 ### .generateWrapFunction( texture : Texture ) : string
 
 Generates a wrap function used in context of textures.
@@ -625,6 +693,18 @@ The shader stage.
 Returns the clip distances builtin.
 
 **Returns:** The clip distances builtin.
+
+### .getDeclarationName( node : Object ) : string
+
+Returns the identifier the given node declares in the shader. Buffers are accessed via `name.value` but declare `name` in the module scope.
+
+**node**
+
+The node.
+
+**Overrides:** [NodeBuilder#getDeclarationName](NodeBuilder.html#getDeclarationName)
+
+**Returns:** The declaration name.
 
 ### .getDirectives( shaderStage : string ) : string
 
@@ -727,6 +807,8 @@ Returns a builtin representing the index of a compute invocation within the scop
 ### .getInvocationSubgroupIndex() : string
 
 Returns a builtin representing the index of a compute invocation within the scope of a subgroup.
+
+**Overrides:** [NodeBuilder#getInvocationSubgroupIndex](NodeBuilder.html#getInvocationSubgroupIndex)
 
 **Returns:** The invocation subgroup index.
 
@@ -862,11 +944,15 @@ The shader stage.
 
 Returns a builtin representing the index of a compute invocation's subgroup within its workgroup.
 
+**Overrides:** [NodeBuilder#getSubgroupIndex](NodeBuilder.html#getSubgroupIndex)
+
 **Returns:** The subgroup index.
 
 ### .getSubgroupSize() : string
 
 Returns a builtin representing the size of a subgroup within the current shader.
+
+**Overrides:** [NodeBuilder#getSubgroupSize](NodeBuilder.html#getSubgroupSize)
 
 **Returns:** The subgroup size.
 

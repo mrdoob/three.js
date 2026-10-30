@@ -1,8 +1,8 @@
-import { Box3, Vector3, Vector4, Matrix4, Layers, Storage3DTexture, StorageBufferAttribute, StorageTexture3DNode, CubeTextureNode, RendererUtils, HalfFloatType, UnsignedByteType, RGBAFormat, LinearFilter, LinearMipmapLinearFilter, ClampToEdgeWrapping, MathUtils } from 'three/webgpu';
-import { Fn, If, Loop, nodeObject, uniform, uniformArray, storage, instanceIndex, textureStore, texture3D, texture, float, int, uint, vec2, vec3, vec4, ivec3, uvec3, max, min, abs, dot, cross, normalize, floor, sign, select, countOneBits, atomicOr, smoothstep, hash, fract, sqrt, cos, sin, length, PI, getDistanceAttenuation, viewZToPerspectiveDepth, viewZToReversedPerspectiveDepth } from 'three/tsl';
+import { Box3, Vector3, Vector4, Matrix4, Layers, Storage3DTexture, StorageBufferAttribute, StorageTexture3DNode, RendererUtils, HalfFloatType, UnsignedByteType, RGBAFormat, LinearFilter, LinearMipmapLinearFilter, ClampToEdgeWrapping, MathUtils } from 'three/webgpu';
+import { Fn, If, Loop, uniform, uniformArray, storage, instanceIndex, textureStore, texture3D, texture, cubeTexture, float, int, uint, vec2, vec3, vec4, ivec3, uvec3, max, min, abs, dot, cross, normalize, floor, sign, select, countOneBits, atomicOr, smoothstep, hash, length, PI, getDistanceAttenuation, viewZToPerspectiveDepth, viewZToReversedPerspectiveDepth } from 'three/tsl';
 
-import { collectSceneTriangles, computeSceneBounds, TRIANGLE_STRIDE } from './VXGISceneCollector.js';
-import { createConeTracer } from './VXGIConeTracer.js';
+import { collectSceneTriangles, computeSceneBounds, computeSolidVoxels, TRIANGLE_STRIDE } from './VXGISceneCollector.js';
+import { createConeTracer, gather } from './VXGIConeTracer.js';
 
 const _box = /*@__PURE__*/ new Box3();
 const _size = /*@__PURE__*/ new Vector3();
@@ -45,28 +45,6 @@ class MipStorageTexture3DNode extends StorageTexture3DNode {
 }
 
 /**
- * Cube texture node without the material's environment rotation, which requires a material and
- * scene context that compute passes lack. Used for point light shadow maps.
- *
- * @private
- */
-class PlainCubeTextureNode extends CubeTextureNode {
-
-	setupUV( builder, uvNode ) {
-
-		if ( this.value.isDepthTexture === true ) {
-
-			return vec3( uvNode.x, uvNode.y.negate(), uvNode.z );
-
-		}
-
-		return vec3( uvNode.x.negate(), uvNode.yz );
-
-	}
-
-}
-
-/**
  * Holds the voxel representation of a scene for {@link VXGINode}: an anisotropic opacity
  * mip chain, a direct radiance volume and a radiance volume with cached bounces.
  *
@@ -76,6 +54,8 @@ class PlainCubeTextureNode extends CubeTextureNode {
  * along the axis, averaging across it), radiance is stored opacity-premultiplied and indirect bounces
  * are cached in the volume via cone tracing. Only direct lights are injected.
  * Voxelization uses conservative rasterization along the dominant triangle axis in a compute shader.
+ * The interiors of closed meshes are filled, so cones starting inside an object (e.g. near contact
+ * points) are blocked.
  *
  * Direct light is injected per voxel instead of splatting photons from a light-view map as in the
  * paper: the shadow maps rendered by the renderer are the light-view maps, and every occupied voxel
@@ -91,6 +71,8 @@ class PlainCubeTextureNode extends CubeTextureNode {
  * - {@link https://research.nvidia.com/publication/2011-09_interactive-indirect-illumination-using-voxel-cone-tracing}:
  *   Crassin et al., Interactive Indirect Illumination Using Voxel Cone Tracing, Pacific Graphics 2011.
  * - {@link https://developer.nvidia.com/content/basics-gpu-voxelization}: Basics of GPU voxelization.
+ * - {@link https://doi.org/10.1145/1882261.1866201}: Schwarz and Seidel, Fast Parallel Surface and Solid
+ *   Voxelization on GPUs, ACM Transactions on Graphics 2010.
  *
  * Note: This class can only be used with `WebGPURenderer` and a WebGPU backend.
  *
@@ -326,6 +308,7 @@ class VXGIVolume {
 
 		this._occupancyAttribute = null;
 		this._triangleIdAttribute = null;
+		this._solidAttribute = null;
 		this._triangleAttribute = null;
 		this._trianglesNode = null;
 		this._triangleCount = 0;
@@ -453,7 +436,7 @@ class VXGIVolume {
 		this.voxelSizeNode.value = voxelSize;
 		this.maxLevelNode.value = levels - 1;
 
-		if ( gridSize.equals( this._gridSize ) === false || levels !== this._levels || this._directional !== this.directionalRadiance ) {
+		if ( this._allocated === false || gridSize.equals( this._gridSize ) === false || levels !== this._levels || this._directional !== this.directionalRadiance ) {
 
 			this._allocateGrid( gridSize, levels );
 
@@ -475,12 +458,21 @@ class VXGIVolume {
 
 		this._triangleCount = count;
 		this._triangleCountNode.value = count;
+
+		if ( this._triangleAttribute !== null ) this._triangleAttribute.dispose();
+
 		this._triangleAttribute = new StorageBufferAttribute( count > 0 ? data : new Float32Array( TRIANGLE_STRIDE ), 4 );
 		this._trianglesNode = storage( this._triangleAttribute, 'vec4', this._triangleAttribute.count ).toReadOnly();
 
+		const solid = this._solidAttribute.array;
+
+		solid.fill( 0 );
+		computeSolidVoxels( scene, { boundsMin: this.boundsMinNode.value, voxelSize, gridSize, layers: this.layers, exclude: this._exclude }, new Uint8Array( solid.buffer ) );
+		this._solidAttribute.needsUpdate = true;
+
 		// kernels depend on the triangle buffer and grid
 
-		this._kernels = null;
+		this._disposeKernels();
 		const kernels = this._getKernels();
 
 		renderer.compute( kernels.clear );
@@ -540,6 +532,7 @@ class VXGIVolume {
 
 		this._occupancyAttribute = new StorageBufferAttribute( this._voxelCount, 1, Uint32Array );
 		this._triangleIdAttribute = new StorageBufferAttribute( this._voxelCount, 1, Uint32Array );
+		this._solidAttribute = new StorageBufferAttribute( Math.ceil( this._voxelCount / 4 ), 1, Uint32Array );
 
 	}
 
@@ -560,6 +553,8 @@ class VXGIVolume {
 	}
 
 	_disposeGrid() {
+
+		this._disposeKernels();
 
 		this.opacityTexture.dispose();
 		this.radianceTexture.dispose();
@@ -585,9 +580,27 @@ class VXGIVolume {
 
 		}
 
-		this._occupancyAttribute = null;
-		this._triangleIdAttribute = null;
-		this._kernels = null;
+		if ( this._occupancyAttribute !== null ) {
+
+			this._occupancyAttribute.dispose();
+			this._triangleIdAttribute.dispose();
+			this._solidAttribute.dispose();
+
+			this._occupancyAttribute = null;
+			this._triangleIdAttribute = null;
+			this._solidAttribute = null;
+
+		}
+
+		if ( this._triangleAttribute !== null ) {
+
+			this._triangleAttribute.dispose();
+
+			this._triangleAttribute = null;
+			this._trianglesNode = null;
+
+		}
+
 		this._allocated = false;
 
 	}
@@ -702,6 +715,8 @@ class VXGIVolume {
 
 		if ( kernels.inject[ index ] === null || kernels.injectKey[ index ] !== this._lightsKey ) {
 
+			if ( kernels.inject[ index ] !== null ) kernels.inject[ index ].dispose();
+
 			kernels.inject[ index ] = this._createInjectKernel( renderer, index );
 			kernels.injectKey[ index ] = this._lightsKey;
 
@@ -774,6 +789,22 @@ class VXGIVolume {
 		this._kernels = kernels;
 
 		return kernels;
+
+	}
+
+	_disposeKernels() {
+
+		if ( this._kernels === null ) return;
+
+		const { clear, voxelize, resolve, opacityMips, radianceMips, inject, bounce } = this._kernels;
+
+		for ( const kernel of [ clear, voxelize, resolve, ...opacityMips, ...radianceMips.flat(), ...inject, ...bounce ] ) {
+
+			if ( kernel !== null ) kernel.dispose();
+
+		}
+
+		this._kernels = null;
 
 	}
 
@@ -926,6 +957,7 @@ class VXGIVolume {
 	_createResolveKernel() {
 
 		const occupancy = storage( this._occupancyAttribute, 'uint', this._voxelCount ).toReadOnly();
+		const solid = storage( this._solidAttribute, 'uint', this._solidAttribute.count ).toReadOnly();
 		const opacityTexture = this.opacityTexture;
 		const voxelCount = this._voxelCountNode;
 		const size = this._getLevelSize( 0 );
@@ -935,7 +967,8 @@ class VXGIVolume {
 			If( instanceIndex.lessThan( voxelCount ), () => {
 
 				const coords = this._coords( instanceIndex, size ).toConst();
-				const bits = occupancy.element( instanceIndex ).toConst();
+				const solidBits = solid.element( instanceIndex.shiftRight( uint( 2 ) ) ).shiftRight( instanceIndex.bitAnd( uint( 3 ) ).mul( uint( 8 ) ) ).bitAnd( uint( 0xFF ) );
+				const bits = occupancy.element( instanceIndex ).bitOr( solidBits ).toConst();
 
 				// per-axis coverage from the 2x2x2 sub-voxel occupancy
 
@@ -1280,7 +1313,7 @@ class VXGIVolume {
 
 								If( viewZ.greaterThanEqual( near ).and( viewZ.lessThanEqual( far ) ), () => {
 
-									const depth = nodeObject( new PlainCubeTextureNode( shadowTexture, normalize( lightToVoxel ) ) ).r; // depth cubes need an integer level, which the compute path emits by default
+									const depth = cubeTexture( shadowTexture, normalize( lightToVoxel ) ).r; // depth cubes need an integer level, which the compute path emits by default
 
 									if ( reversedDepth ) {
 
@@ -1383,35 +1416,12 @@ class VXGIVolume {
 
 					const direct = texture3D( directTexture, vec3( coords ).add( 0.5 ).div( vec3( size[ 0 ], size[ 1 ], size[ 2 ] ) ), float( 0 ) ).toConst();
 
-					// tangent frame
-
-					const up = select( abs( normal.y ).lessThan( 0.99 ), vec3( 0, 1, 0 ), vec3( 1, 0, 0 ) );
-					const tangent = normalize( cross( normal, up ) ).toConst();
-					const bitangent = cross( normal, tangent ).toConst();
-
 					const rotation = hash( instanceIndex ).toConst();
-					const gathered = vec3( 0 ).toVar();
+					const origin = position.add( normal.mul( voxelSize.mul( 1.5 ) ) ).toConst();
 
-					Loop( { start: 0, end: BOUNCE_CONE_COUNT, type: 'int', condition: '<', name: 'c' }, ( { c } ) => {
+					const { color } = gather( trace, origin, normal, BOUNCE_CONE_COUNT, tanHalfAngle, traceDistance, rotation, 0.5 );
 
-						// cosine-weighted directions, rotated per voxel
-
-						const u1 = float( c ).add( 0.5 ).div( BOUNCE_CONE_COUNT ).toConst();
-						const u2 = fract( float( c ).mul( 0.618034 ).add( rotation ) ).toConst();
-						const sinTheta = sqrt( u1 ).toConst();
-						const cosTheta = sqrt( u1.oneMinus() ).toConst();
-						const phi = u2.mul( PI.mul( 2 ) ).toConst();
-
-						const direction = normalize( tangent.mul( cos( phi ).mul( sinTheta ) ).add( bitangent.mul( sin( phi ).mul( sinTheta ) ) ).add( normal.mul( cosTheta ) ) ).toConst();
-						const origin = position.add( normal.mul( voxelSize.mul( 1.5 ) ) ).toConst();
-
-						const cone = trace( origin, direction, tanHalfAngle, traceDistance );
-
-						gathered.addAssign( cone.color );
-
-					} );
-
-					const bounce = albedo.mul( gathered.div( BOUNCE_CONE_COUNT ) );
+					const bounce = albedo.mul( color );
 
 					result.assign( vec4( direct.rgb.add( bounce.mul( direct.a ) ), direct.a ) );
 

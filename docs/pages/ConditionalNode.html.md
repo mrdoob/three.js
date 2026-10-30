@@ -6,10 +6,15 @@ Represents a logical `if/else` statement. Can be used as an alternative to the `
 
 The `select()` method is called in a chaining fashion on a condition. The parameter nodes of `select()` determine the outcome of the entire statement.
 
-## Code Example
-
 ```js
 velocity = position.greaterThanEqual( limit ).select( velocity.negate(), velocity );
+```
+
+When the condition is itself a vector (e.g. the `bvec4` produced by `someVec4.greaterThanEqual( someOtherVec4 )`), `select()` resolves per-component - each output lane picks independently based on its own condition component, the same way WGSL's native `select()` and GLSL's `mix( x, y, bvecN )` do - rather than picking one branch for the whole vector. The condition and values are converted to the largest vector width, with the condition converted to boolean components. Scalar values are broadcast.
+
+```js
+// per-component: each channel picks independently
+const clamped = value.greaterThan( vec3( 1.0 ) ).select( vec3( 1.0 ), value );
 ```
 
 ## Constructor

@@ -41,7 +41,7 @@ Default is `1`.
 
 The helper's color.
 
-Default is `0xff0000`.
+Default is `0x00ffff`.
 
 ## Properties
 

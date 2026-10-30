@@ -1,8 +1,8 @@
-import { RenderTarget, Vector2, Vector3, TempNode, QuadMesh, NodeMaterial, RendererUtils, HalfFloatType, RGBAFormat, RedFormat, UnsignedByteType } from 'three/webgpu';
-import { Fn, NodeUpdateType, uniform, reference, vec2, vec3, vec4, float, uint, uv, mix, passTexture, getViewPosition, getNormalFromDepth, logarithmicDepthToViewZ, viewZToPerspectiveDepth, screenCoordinate, interleavedGradientNoise, normalize, cross, abs, select, sqrt, fract, floor, cos, sin, exp2, pow, PI, Loop, If, Break, property, outputStruct, context } from 'three/tsl';
+import { RenderTarget, Vector2, Vector3, Node, QuadMesh, NodeMaterial, RendererUtils, HalfFloatType, RGBAFormat, RedFormat, UnsignedByteType } from 'three/webgpu';
+import { Fn, NodeUpdateType, uniform, reference, vec2, vec4, float, uv, mix, passTexture, getViewPosition, getNormalFromDepth, screenCoordinate, interleavedGradientNoise, normalize, floor, exp2, pow, PI, Loop, If, Break, property, outputStruct, context, projectionDepth } from 'three/tsl';
 
 import { VXGIVolume } from './VXGIVolume.js';
-import { createConeTracer, intersectVolume, sampleDirectional } from './VXGIConeTracer.js';
+import { createConeTracer, gather, intersectVolume, sampleDirectional } from './VXGIConeTracer.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -40,10 +40,10 @@ const _neutralContext = /*@__PURE__*/ context();
  *
  * Note: This node can only be used with `WebGPURenderer` and a WebGPU backend.
  *
- * @augments TempNode
+ * @augments Node
  * @three_import import { vxgi } from 'three/addons/lighting/vxgi/VXGINode.js';
  */
-class VXGINode extends TempNode {
+class VXGINode extends Node {
 
 	static get type() {
 
@@ -380,7 +380,7 @@ class VXGINode extends TempNode {
 
 		if ( this._sharedContext !== null && this._directional !== this.volume.directionalRadiance ) {
 
-			this._setupMaterial( renderer );
+			this._setupMaterial();
 
 		}
 
@@ -425,7 +425,7 @@ class VXGINode extends TempNode {
 	setup( builder ) {
 
 		this._sharedContext = builder.getSharedContext();
-		this._setupMaterial( builder.renderer );
+		this._setupMaterial();
 
 		return this._aoNode;
 
@@ -435,29 +435,14 @@ class VXGINode extends TempNode {
 	 * Builds the TSL code of the effect into the internal pass material.
 	 *
 	 * @private
-	 * @param {Renderer} renderer - The renderer.
 	 */
-	_setupMaterial( renderer ) {
+	_setupMaterial() {
 
 		const volume = this.volume;
 		const directional = this._directional = volume.directionalRadiance;
 		const uvNode = uv();
 
-		const sampleDepth = ( uv ) => {
-
-			const depth = this.depthNode.sample( uv ).r;
-
-			if ( renderer.logarithmicDepthBuffer === true ) {
-
-				const viewZ = logarithmicDepthToViewZ( depth, this._cameraNear, this._cameraFar );
-
-				return viewZToPerspectiveDepth( viewZ, this._cameraNear, this._cameraFar );
-
-			}
-
-			return depth;
-
-		};
+		const sampleDepth = ( uv ) => projectionDepth( this.depthNode.sample( uv ).r, this._cameraNear, this._cameraFar );
 
 		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.sample( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this._cameraProjectionMatrixInverse );
 
@@ -491,47 +476,19 @@ class VXGINode extends TempNode {
 			const rotationNoise = interleavedGradientNoise( screenCoordinate.add( temporalShift ) ).toConst();
 			const elevationNoise = interleavedGradientNoise( screenCoordinate.add( temporalShift ).add( vec2( 5.588238, 3.14159 ) ) ).toConst();
 
-			// tangent frame
-
-			const up = select( abs( worldNormal.y ).lessThan( 0.99 ), vec3( 0, 1, 0 ), vec3( 1, 0, 0 ) );
-			const tangent = normalize( cross( worldNormal, up ) ).toConst();
-			const bitangent = cross( worldNormal, tangent ).toConst();
-
 			const CONE_COUNT = this.coneCount.toConst();
 			const tanHalfAngle = this.coneAngle.mul( 0.5 ).radians().tan().toConst();
 			const traceDistance = volume.traceDistanceNode;
 			const aoDistance = this.aoDistance;
-			const originOffset = worldNormal.mul( voxelSize.mul( this.normalOffset ) ).toConst();
+			const origin = worldPosition.add( worldNormal.mul( voxelSize.mul( this.normalOffset ) ) ).toConst();
 
-			const color = vec3( 0 ).toVar();
-			const occlusion = float( 0 ).toVar();
-
-			Loop( { start: uint( 0 ), end: CONE_COUNT, type: 'uint', condition: '<', name: 'c' }, ( { c } ) => {
-
-				// stratified cosine-weighted directions
-
-				const u1 = float( c ).add( elevationNoise ).div( float( CONE_COUNT ) ).toConst();
-				const u2 = fract( float( c ).mul( 0.618034 ).add( rotationNoise ) ).toConst();
-				const sinTheta = sqrt( u1 ).toConst();
-				const cosTheta = sqrt( u1.oneMinus() ).toConst();
-				const phi = u2.mul( PI.mul( 2 ) ).toConst();
-
-				const direction = normalize( tangent.mul( cos( phi ).mul( sinTheta ) ).add( bitangent.mul( sin( phi ).mul( sinTheta ) ) ).add( worldNormal.mul( cosTheta ) ) ).toConst();
-				const origin = worldPosition.add( originOffset ).toConst();
-
-				const cone = trace( origin, direction, tanHalfAngle, traceDistance, aoDistance );
-
-				color.addAssign( cone.color );
-				occlusion.addAssign( cone.ao );
-
-			} );
+			const { color: radiance, ao: occlusion } = gather( trace, origin, worldNormal, CONE_COUNT, tanHalfAngle, traceDistance, rotationNoise, elevationNoise, aoDistance );
 
 			// the mean radiance over the cosine-weighted hemisphere times PI is the irradiance
 
-			color.divAssign( float( CONE_COUNT ) );
-			color.mulAssign( this.giIntensity.mul( PI ) );
+			const color = radiance.mul( this.giIntensity.mul( PI ) ).toVar();
 
-			const ao = mix( this.aoMinVisibility, float( 1 ), pow( occlusion.div( float( CONE_COUNT ) ).oneMinus().clamp(), this.aoIntensity ) ).toVar();
+			const ao = mix( this.aoMinVisibility, float( 1 ), pow( occlusion.oneMinus().clamp(), this.aoIntensity ) ).toVar();
 
 			// debug visualization: march the voxels from the camera
 

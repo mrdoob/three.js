@@ -13,10 +13,10 @@
 	<h1 translate="no">SunLightNode</h1>
 		<section>
 			<header>
-				<div class="class-description"><p>Module for representing sun lights as nodes. Register it with the
-renderer's node library to use <a href="SunLight.html">SunLight</a> with <code>WebGPURenderer</code>:</p></div>
+				<div class="class-description"><p>Module for representing sun lights as nodes. Register it with <a href="SunLight.html">SunLight</a>
+to use the light with <code>WebGPURenderer</code>:</p></div>
 				<h2>Code Example</h2>
-				<div translate="no"><pre><code class="language-js">renderer.library.addLight( SunLightNode, SunLight );
+				<div translate="no"><pre><code class="language-js">SunLight.registerNode( SunLightNode );
 </code></pre></div>
 			</header>
 			<article>

@@ -16,7 +16,8 @@
 				<div class="class-description"><p>An alternative render pipeline that applies output processing directly in
 material shaders. This avoids the intermediate framebuffer and output pass
 used by <a href="Renderer.html">Renderer</a>, but changes blending and is not compatible with
-materials that sample the framebuffer, such as transmissive materials.</p>
+materials that sample the framebuffer, such as transmissive materials.
+With the WebGL backend, <code>antialias</code> has no effect.</p>
 <p>Note: This module can only be used with <code>WebGPURenderer</code>.</p></div>
 				<h2>Code Example</h2>
 				<div translate="no"><pre><code class="language-js">const renderPipeline = new DirectRenderPipeline( renderer );

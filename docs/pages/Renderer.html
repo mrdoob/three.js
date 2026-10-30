@@ -165,6 +165,14 @@ the renderer.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="drawingPipeline" translate="no">.<a href="#drawingPipeline">drawingPipeline</a><span class="type-signature"> : <a href="StandardDrawingPipeline.html">StandardDrawingPipeline</a></span> </h3>
+					<div class="description">
+						<p>Decides which objects of a scene are rendered and how they are submitted
+to the render list. Assigning a drawing pipeline binds it to this renderer.
+The default is a <a href="StandardDrawingPipeline.html">StandardDrawingPipeline</a>. This property is experimental.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="highPrecision" translate="no">.<a href="#highPrecision">highPrecision</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
 						<p>Enables or disables high precision for model-view and normal-view matrices.
@@ -229,7 +237,8 @@ further processing.</p>
 				<div class="member">
 					<h3 class="name" id="logarithmicDepthBuffer" translate="no">.<a href="#logarithmicDepthBuffer">logarithmicDepthBuffer</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
 					<div class="description">
-						<p>Whether logarithmic depth buffer is enabled or not.</p>
+						<p>Whether logarithmic depth buffer is enabled or not. It is disabled
+on initialization when a reversed depth buffer is in use.</p>
 						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
@@ -520,7 +529,8 @@ e.g. manually determining each object's rendering order.</p>
 						<div class="description">
 							<p>Compiles all materials in the given scene. This can be useful to avoid a
 phenomenon which is called &quot;shader compilation stutter&quot;, which occurs when
-rendering an object with a new shader for the first time.</p>
+rendering an object with a new shader for the first time.
+The active drawing pipeline also prepares its geometry resources and compute pipelines.</p>
 <p>If you want to add a 3D object to an existing scene, use the third optional
 parameter for applying the target scene. Note that the (target) scene's lighting
 and environment must be configured before calling this method.</p>
@@ -804,7 +814,7 @@ from the GPU to the CPU in context of compute shaders.</p>
 										<strong translate="no">attribute</strong>
 									</td>
 									<td class="description last">
-										<p>The storage buffer attribute to read frm.</p>
+										<p>The storage buffer attribute to read from.</p>
 									</td>
 								</tr>
 								<tr>
@@ -812,7 +822,7 @@ from the GPU to the CPU in context of compute shaders.</p>
 										<strong translate="no">target</strong>
 									</td>
 									<td class="description last">
-										<p>The storage buffer attribute.</p>
+										<p>The readback buffer or array buffer that receives the data. If <code>null</code>, a new array buffer is returned.</p>
 										<p>Default is <code>null</code>.</p>
 									</td>
 								</tr>
@@ -821,7 +831,7 @@ from the GPU to the CPU in context of compute shaders.</p>
 										<strong translate="no">offset</strong>
 									</td>
 									<td class="description last">
-										<p>The storage buffer attribute.</p>
+										<p>The byte offset to start reading from. Must be a multiple of 4.</p>
 										<p>Default is <code>0</code>.</p>
 									</td>
 								</tr>
@@ -830,7 +840,8 @@ from the GPU to the CPU in context of compute shaders.</p>
 										<strong translate="no">count</strong>
 									</td>
 									<td class="description last">
-										<p>The offset from which to start reading the</p>
+										<p>The number of bytes to read. Must be a multiple of 4, or <code>-1</code> to read to the end of the buffer.</p>
+										<p>Default is <code>-1</code>.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -1975,7 +1986,7 @@ the CPU waits for the GPU to complete its operation (e.g. a compute task).</p>
 <span class="param-type">boolean</span>
 				</td>
 			<td class="description last">
-				<p>Whether logarithmic depth buffer is enabled or not.</p>
+				<p>Whether logarithmic depth buffer is enabled or not. Ignored when a reversed depth buffer is in use.</p>
 						<p>Default is <code>false</code>.</p>
 			</td>
 		</tr>

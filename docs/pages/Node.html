@@ -40,6 +40,14 @@
 				</div>
 				<h2 class="subsection-title">Properties</h2>
 				<div class="member">
+					<h3 class="name" id="assignable" translate="no">.<a href="#assignable">assignable</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether this node can be assigned. It is generated as an expression,
+unless it is assigned, in which case it is declared as a variable where it was created.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="global" translate="no">.<a href="#global">global</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
 						<p>Whether this node is global or not. This property is relevant for the internal
@@ -136,6 +144,7 @@ set this flag to <code>true</code> (a typical example is <a href="AttributeNode.
 						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
+				<h2 class="subsection-title">Static Properties</h2>
 				<div class="member">
 					<h3 class="name" id=".captureStackTrace" translate="no">.<a href="#.captureStackTrace">captureStackTrace</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
@@ -353,13 +362,14 @@ This state builds the output node and returns the resulting shader string.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The cache key of the node.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getChildren" translate="no">.<a href="#getChildren">getChildren</a><span class="signature">()</span><span class="type-signature"> : <a href="Node.html">Node</a></span> <span class="type-signature">(generator) </span></h3>
+					<h3 class="name name-method" id="getChildren" translate="no">.<a href="#getChildren">getChildren</a><span class="signature">()</span><span class="type-signature"> : Array.&lt;<a href="Node.html">Node</a>></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Generator function that can be used to iterate over the child nodes.</p>
+							<p>Returns the child nodes of this node.</p>
 						</div>
-						<h5>Yields:</h5>
-							A child node.
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The child nodes.</dt>
+						</dl>
 					</div>
 					<h3 class="name name-method" id="getElementType" translate="no">.<a href="#getElementType">getElementType</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : string</span> </h3>
 					<div class="method">
@@ -572,6 +582,70 @@ node overrides if an override context is set.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The update type.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="isAssign" translate="no">.<a href="#isAssign">isAssign</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Checks if this node is the target of an assignment.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">builder</strong>
+									</td>
+									<td class="description last">
+										<p>The node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether this node is assigned.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="isAssignable" translate="no">.<a href="#isAssignable">isAssignable</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Checks if this node is assignable without a forced declaration.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">builder</strong>
+									</td>
+									<td class="description last">
+										<p>The node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether this node is assignable without a forced declaration.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="isCacheable" translate="no">.<a href="#isCacheable">isCacheable</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Whether this node allows caching its result in a temporary variable.
+Caching is enabled by default. Override this method to disable it.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">builder</strong>
+									</td>
+									<td class="description last">
+										<p>The current node builder.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether temporary caching is allowed.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="isGlobal" translate="no">.<a href="#isGlobal">isGlobal</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
@@ -750,6 +824,17 @@ If an output node is prepared, then it must be returned in the <code>return</cod
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The output node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="toAssignable" translate="no">.<a href="#toAssignable">toAssignable</a><span class="signature">()</span><span class="type-signature"> : <a href="Node.html">Node</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Makes this node assignable and adds it to the current stack,
+so it can be declared where it was created if it is assigned later.
+Only use it with nodes that are not shared, see <a href="Node.html#assignable">Node#assignable</a>.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="toJSON" translate="no">.<a href="#toJSON">toJSON</a><span class="signature">( meta : <span class="param-type">Object</span> )</span><span class="type-signature"> : Object</span> </h3>

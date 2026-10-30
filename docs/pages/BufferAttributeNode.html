@@ -32,7 +32,7 @@ compute shaders. The below line converts a storage buffer into an attribute node
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="BufferAttributeNode" translate="no">new <a href="#BufferAttributeNode">BufferAttributeNode</a><span class="signature">( value : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a> | <a href="InterleavedBuffer.html">InterleavedBuffer</a> | TypedArray</span>, bufferType : <span class="param-type">string</span>, bufferStride : <span class="param-type">number</span>, bufferOffset : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="BufferAttributeNode" translate="no">new <a href="#BufferAttributeNode">BufferAttributeNode</a><span class="signature">( value : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a> | <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a> | <a href="InterleavedBuffer.html">InterleavedBuffer</a> | TypedArray</span>, bufferType : <span class="param-type">string</span>, bufferStride : <span class="param-type">number</span>, bufferOffset : <span class="param-type">number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new buffer attribute node.</p>
@@ -236,6 +236,28 @@ and thus the hash should be shared as well.</p>
 						</dl>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The input type.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getObjectAttribute" translate="no">.<a href="#getObjectAttribute">getObjectAttribute</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a> | <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the buffer attribute to bind when rendering the given object. Nodes that
+bind attributes of the rendered object, like <a href="ReferenceAttributeNode.html">ReferenceAttributeNode</a>, overwrite it.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">object</strong>
+									</td>
+									<td class="description last">
+										<p>The rendered object.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The buffer attribute.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="setInstanced" translate="no">.<a href="#setInstanced">setInstanced</a><span class="signature">( value : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="BufferAttributeNode.html">BufferAttributeNode</a></span> </h3>

@@ -22,7 +22,7 @@ import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
 
 Constructs a new irradiance probe grid.
 
-The volume is centered at the object's position.
+The volume is centered at the object's position. It is split into one cell per probe, with each probe at the center of its cell, so the probes sit half a cell inside the volume.
 
 **width**
 
@@ -44,31 +44,25 @@ Default is `1`.
 
 **widthProbes**
 
-Number of probes along X. Defaults to `Math.max( 2, Math.round( width ) + 1 )`.
+Number of probes along X. Defaults to `Math.max( 1, Math.round( width ) )`.
 
 **heightProbes**
 
-Number of probes along Y. Defaults to `Math.max( 2, Math.round( height ) + 1 )`.
+Number of probes along Y. Defaults to `Math.max( 1, Math.round( height ) )`.
 
 **depthProbes**
 
-Number of probes along Z. Defaults to `Math.max( 2, Math.round( depth ) + 1 )`.
+Number of probes along Z. Defaults to `Math.max( 1, Math.round( depth ) )`.
 
 ## Properties
 
 ### .boundingBox : Box3
 
-The world-space bounding box for the grid. Updated automatically by [LightProbeGrid#bake](LightProbeGrid.html#bake).
+The world-space bounding box for the grid. This is the volume the grid lights, with the probes half a cell inside it. Updated automatically by [LightProbeGrid#bake](LightProbeGrid.html#bake).
 
 ### .depth : number
 
 The full depth of the volume along Z.
-
-### .falloff : number
-
-Distance in world units over which the grid contribution fades out past the volume boundary. `0` applies the contribution everywhere (clamped), which matches a single-volume setup. Use a small positive value to blend multiple overlapping grids.
-
-Default is `0`.
 
 ### .height : number
 
@@ -80,6 +74,12 @@ This flag can be used for type testing.
 
 Default is `true`.
 
+### .priority : number
+
+Where grids overlap, the grid with the highest priority lights the fragment. On ties, the most recently created grid wins.
+
+Default is `0`.
+
 ### .resolution : Vector3
 
 The number of probes along each axis.
@@ -87,8 +87,6 @@ The number of probes along each axis.
 ### .texture : Data3DTexture
 
 The single RGBA atlas 3D texture storing all seven packed SH sub-volumes stacked along Z.
-
-Default is `null`.
 
 ### .width : number
 
@@ -118,7 +116,7 @@ Bake options.
 
 **cubemapSize**
 
-Resolution of each cubemap face.
+Resolution of each cubemap face. Must be a multiple of 4.
 
 Default is `8`.
 
@@ -139,12 +137,6 @@ Default is `100`.
 Additional bounce passes. Only available when baking the whole grid.
 
 Default is `0`.
-
-**sampleCount**
-
-Directions integrated when projecting each cubemap to SH.
-
-Default is `512`.
 
 **start**
 

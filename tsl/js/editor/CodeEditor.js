@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import * as TSL from 'three/tsl';
 import { EventDispatcher } from 'three';
 import { generateDeclarations } from '../utils/CodeEditorUtils.js';
-import { CodeCompiler } from '../code/CodeCompiler.js';
+import { formatCode } from '../code/CodeFormatter.js';
 
 let _monaco;
 let _monacoConfigured = false;
@@ -643,9 +643,9 @@ class CodeEditor extends EventDispatcher {
 				// Register formatting provider
 				_monaco.languages.registerDocumentFormattingEditProvider( 'javascript', {
 
-					provideDocumentFormattingEdits: async ( model ) => {
+					provideDocumentFormattingEdits: ( model ) => {
 
-						const formatted = await CodeCompiler.format( model.getValue() );
+						const formatted = formatCode( model.getValue() );
 
 						return [
 							{

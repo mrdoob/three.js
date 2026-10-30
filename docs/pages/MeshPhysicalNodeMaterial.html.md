@@ -64,6 +64,14 @@ If you don't want to overwrite the clearcoat roughness but modify the existing v
 
 Default is `null`.
 
+### .diffuseRoughnessNode : Node.<float>
+
+The diffuse roughness of physical materials is by default inferred from the `diffuseRoughness` and `diffuseRoughnessMap` properties. This node property allows to overwrite the default and define the diffuse roughness with a node instead.
+
+If you don't want to overwrite the diffuse roughness but modify the existing value instead, use [materialDiffuseRoughness](TSL.html#materialDiffuseRoughness).
+
+Default is `null`.
+
 ### .dispersionNode : Node.<float>
 
 The dispersion of physical materials is by default inferred from the `dispersion` property. This node property allows to overwrite the default and define the dispersion with a node instead.
@@ -98,7 +106,7 @@ Default is `null`.
 
 ### .iridescenceThicknessNode : Node.<float>
 
-The iridescence thickness of physical materials is by default inferred from the `iridescenceThicknessRange` and `iridescenceThicknessMap` properties. This node property allows to overwrite the default and define the iridescence thickness with a node instead.
+The iridescence thickness of physical materials is by default inferred from the `iridescenceThicknessMinimum`, `iridescenceThicknessMaximum` and `iridescenceThicknessMap` properties. This node property allows to overwrite the default and define the iridescence thickness with a node instead.
 
 If you don't want to overwrite the iridescence thickness but modify the existing value instead, use [materialIridescenceThickness](TSL.html#materialIridescenceThickness).
 
@@ -177,6 +185,12 @@ Default is `true`.
 Whether the lighting model should use clearcoat or not.
 
 Default is `true`.
+
+### .useDiffuseRoughness : boolean
+
+Whether the lighting model should use EON rough diffuse reflection or not.
+
+Default is `false`.
 
 ### .useDispersion : boolean
 

@@ -100,7 +100,7 @@ Default is `1`.
 
 How far you can vertically look around, upper limit. Range is `0` to `Math.PI` in radians.
 
-Default is `0`.
+Default is `Math.PI`.
 
 ### .verticalMin : number
 

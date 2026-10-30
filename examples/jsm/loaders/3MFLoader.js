@@ -92,6 +92,8 @@ class ThreeMFLoader extends Loader {
 
 		const scope = this;
 		const loader = new FileLoader( scope.manager );
+		loader.setPriority( scope.priority );
+		loader.setCache( scope.cache );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
@@ -132,6 +134,8 @@ class ThreeMFLoader extends Loader {
 
 		const scope = this;
 		const textureLoader = new TextureLoader( this.manager );
+		textureLoader.setPriority( this.priority );
+		textureLoader.setCache( this.cache );
 
 		function loadDocument( data ) {
 
@@ -181,7 +185,7 @@ class ThreeMFLoader extends Loader {
 
 					rootModelFile = file;
 
-				} else if ( file.match( /^3D\/.*\/.*\.model$/ ) ) {
+				} else if ( file.match( /^3D\/.*\/[^\/]*\.model$/ ) ) {
 
 					modelPartNames.push( file ); // sub models
 

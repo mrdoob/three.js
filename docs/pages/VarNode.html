@@ -61,6 +61,16 @@ existing nodes like the following:</p></div>
 				</div>
 				<h2 class="subsection-title">Properties</h2>
 				<div class="member">
+					<h3 class="name" id="assignable" translate="no">.<a href="#assignable">assignable</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether this node can be generated as an expression until it is assigned.</p>
+						<p>Default is <code>false</code>.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#assignable">Node#assignable</a></dt>
+						</dl>
+				</div>
+				<div class="member">
 					<h3 class="name" id="global" translate="no">.<a href="#global">global</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
 						<p><code>VarNode</code> sets this property to <code>true</code> by default.</p>
@@ -69,13 +79,6 @@ existing nodes like the following:</p></div>
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#global">Node#global</a></dt>
 						</dl>
-				</div>
-				<div class="member">
-					<h3 class="name" id="intent" translate="no">.<a href="#intent">intent</a><span class="type-signature"> : boolean</span> </h3>
-					<div class="description">
-						<p>This flag is used to indicate that this node is used for intent.</p>
-						<p>Default is <code>false</code>.</p>
-					</div>
 				</div>
 				<div class="member">
 					<h3 class="name" id="isVarNode" translate="no">.<a href="#isVarNode">isVarNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
@@ -119,44 +122,21 @@ the node system auto-generates one.</p>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
-					<h3 class="name name-method" id="getIntent" translate="no">.<a href="#getIntent">getIntent</a><span class="signature">()</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="getAssignable" translate="no">.<a href="#getAssignable">getAssignable</a><span class="signature">()</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Returns the intent flag of this node.</p>
+							<p>Returns the assignable flag of this node.</p>
 						</div>
 						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> The intent flag.</dt>
+							<dt class="tag-returns"><strong>Returns:</strong> The assignable flag.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="isIntent" translate="no">.<a href="#isIntent">isIntent</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<h3 class="name name-method" id="setAssignable" translate="no">.<a href="#setAssignable">setAssignable</a><span class="signature">( value : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="VarNode.html">VarNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Checks if this node is used for intent.</p>
-						</div>
-						<table class="params">
-							<tbody>
-								<tr>
-									<td class="name">
-										<strong translate="no">builder</strong>
-									</td>
-									<td class="description last">
-										<p>The node builder.</p>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> Whether this node is used for intent.</dt>
-						</dl>
-					</div>
-					<h3 class="name name-method" id="setIntent" translate="no">.<a href="#setIntent">setIntent</a><span class="signature">( value : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="VarNode.html">VarNode</a></span> </h3>
-					<div class="method">
-						<div class="description">
-							<p>Sets the intent flag for this node.</p>
-<p>This flag is used to indicate that this node is used for intent
-and should not be built directly. Instead, it is used to indicate that
-the node should be treated as a variable intent.</p>
-<p>It's useful for assigning variables without needing creating a new variable node.</p>
+							<p>Sets the assignable flag for this node.</p>
+<p>An assignable node is generated as an expression until it is assigned,
+at which point it is declared as a variable.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -165,7 +145,7 @@ the node should be treated as a variable intent.</p>
 										<strong translate="no">value</strong>
 									</td>
 									<td class="description last">
-										<p>The value to set for the intent flag.</p>
+										<p>The value to set for the assignable flag.</p>
 									</td>
 								</tr>
 							</tbody>

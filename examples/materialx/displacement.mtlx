@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<materialx version="1.39" colorspace="lin_rec709">
+  <nodegraph name="NG_brick">
+    <image name="base_color" type="color3">
+      <input name="file" type="filename" value="../textures/brick_diffuse.jpg" colorspace="srgb_texture" />
+    </image>
+    <image name="roughness" type="float">
+      <input name="file" type="filename" value="../textures/brick_roughness.jpg" />
+    </image>
+    <image name="height" type="float">
+      <input name="file" type="filename" value="../textures/brick_bump.jpg" />
+    </image>
+    <output name="base_color_out" type="color3" nodename="base_color" />
+    <output name="roughness_out" type="float" nodename="roughness" />
+    <output name="height_out" type="float" nodename="height" />
+  </nodegraph>
+  <displacement name="brick_displacement" type="displacementshader" nodedef="ND_displacement_float">
+    <input name="displacement" type="float" output="height_out" nodegraph="NG_brick" />
+    <input name="scale" type="float" value="0.05" />
+  </displacement>
+  <standard_surface name="brick_surface" type="surfaceshader" nodedef="ND_standard_surface_surfaceshader">
+    <input name="base_color" type="color3" output="base_color_out" nodegraph="NG_brick" />
+    <input name="specular_roughness" type="float" output="roughness_out" nodegraph="NG_brick" />
+  </standard_surface>
+  <surfacematerial name="brick_displacement_material" type="material" nodedef="ND_surfacematerial">
+    <input name="surfaceshader" type="surfaceshader" nodename="brick_surface" />
+    <input name="displacementshader" type="displacementshader" nodename="brick_displacement" />
+  </surfacematerial>
+</materialx>
