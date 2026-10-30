@@ -40,8 +40,8 @@ const exceptionList = [
 	'webgpu_compute_audio',
 	'webgpu_compute_cloth',
 	'webgpu_compute_particles_fluid',
-	'webgpu_meshlets_ibl', // Rasterizer discrepancies
 	'webgpu_compute_sort_bitonic',
+	'webgpu_meshlets_ibl', // Rasterizer discrepancies
 	'webgpu_storage_buffer',
 	'webgpu_tsl_editor',
 	'webgpu_tsl_graph',
@@ -57,6 +57,8 @@ const exceptionList = [
 	'webgl_morphtargets_face',
 	'webgl_shadowmap_progressive',
 	'webgpu_materials_matcap',
+	'webgpu_meshlets_city',
+	'webgpu_meshlets_materials',
 	'webgpu_morphtargets_face',
 	'webgpu_shadowmap_progressive',
 	'webgpu_lightmap_baking',
@@ -64,8 +66,6 @@ const exceptionList = [
 	'webgpu_renderer_pathtracer',
 	'webgpu_vxgi',
 	'webgpu_vxgi_sponza',
-	'webgpu_meshlets_city',
-	'webgpu_meshlets_materials',
 
 	// Incremental light probe baking
 	'webgl_lightprobes_sponza',
