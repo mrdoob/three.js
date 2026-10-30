@@ -61,7 +61,7 @@
 
 			const instanceCount = 15625; // 125x125 plane or 25x25x25 volume
 
-			const options = { Output: 'Default', Rasterizer: 'Hardware', Grid: 'XZ', 'LOD Threshold': 1, 'Occlusion Culling': false, 'Animation Speed': 1 };
+			const options = { Output: 'Default', Rasterizer: 'Meshlet', Grid: 'XZ', 'LOD Threshold': 1, 'Occlusion Culling': false, 'Animation Speed': 1 };
 
 			const matrix = new THREE.Matrix4();
 
@@ -85,8 +85,8 @@
 				// the objects are spread out and hardly occlude each other, so occlusion culling costs more than it saves
 
 				pipelines = {
-					'Hybrid': new VisibilityBufferDrawingPipeline( { maxRasterSize: 32, occlusionCulling: false } ),
-					'Hardware': new MeshletDrawingPipeline( { occlusionCulling: false } )
+					'Visibility Buffer': new VisibilityBufferDrawingPipeline( { maxRasterSize: 32, occlusionCulling: false } ),
+					'Meshlet': new MeshletDrawingPipeline( { occlusionCulling: false } )
 				};
 
 				// the standard drawing pipeline of the renderer draws every object on its own, for comparison
@@ -199,9 +199,9 @@
 					'Emissive': 'Emissive'
 				} ).onChange( updateMode );
 
-				parameterGroup.add( options, 'Rasterizer', { 'Hybrid': 'Hybrid', 'Hardware': 'Hardware', 'Basic': 'Basic' } ).onChange( updateRasterizer );
+				parameterGroup.add( options, 'Rasterizer', { 'Visibility Buffer': 'Visibility Buffer', 'Meshlet': 'Meshlet', 'Basic': 'Basic' } ).onChange( updateRasterizer );
 
-				const maxRasterSize = parameterGroup.add( pipelines[ 'Hybrid' ], 'maxRasterSize', 1, 64, 1 ).name( 'Max Raster Size' );
+				const maxRasterSize = parameterGroup.add( pipelines[ 'Visibility Buffer' ], 'maxRasterSize', 1, 64, 1 ).name( 'Max Raster Size' );
 
 				parameterGroup.add( options, 'Grid', { 'XZ': 'XZ', 'XYZ': 'XYZ' } ).onChange( updateGrid );
 
@@ -228,7 +228,7 @@
 
 					renderer.drawingPipeline = gpuDriven ? pipelines[ rasterizer ] : standardPipeline;
 
-					rasterizer === 'Hybrid' ? maxRasterSize.show() : maxRasterSize.hide();
+					rasterizer === 'Visibility Buffer' ? maxRasterSize.show() : maxRasterSize.hide();
 					gpuDriven ? lodThreshold.show() : lodThreshold.hide();
 					gpuDriven ? occlusionCulling.show() : occlusionCulling.hide();
 
