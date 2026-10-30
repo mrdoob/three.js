@@ -50,6 +50,39 @@
 
 	};
 
+	/* Deterministic WebGPU initialization */
+
+	// Each renderer requests a frame once initialized, so rendering starts after all of them are.
+
+	let pendingGPURequests = 0;
+
+	function trackGPURequest( object, name ) {
+
+		const request = object[ name ];
+
+		object[ name ] = function () {
+
+			pendingGPURequests ++;
+
+			return request.apply( this, arguments ).finally( () => pendingGPURequests -- );
+
+		};
+
+	}
+
+	if ( 'gpu' in navigator ) {
+
+		trackGPURequest( GPU.prototype, 'requestAdapter' );
+		trackGPURequest( GPUAdapter.prototype, 'requestDevice' );
+
+	}
+
+	window._gpuReady = function () {
+
+		return pendingGPURequests === 0;
+
+	};
+
 	/* Deterministic video */
 
 	const play = HTMLVideoElement.prototype.play;

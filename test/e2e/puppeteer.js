@@ -489,6 +489,11 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 				timeout: renderTimeout * 1000
 			} );
 
+			await page.waitForFunction( () => window._gpuReady(), {
+				polling: 100,
+				timeout: renderTimeout * 1000
+			} );
+
 			await page.evaluate( async ( renderTimeout, parseTime ) => {
 
 				await new Promise( resolve => setTimeout( resolve, parseTime ) );
