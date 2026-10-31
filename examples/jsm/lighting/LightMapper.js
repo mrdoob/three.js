@@ -1,5 +1,5 @@
-import { BackSide, CustomBlending, DoubleSide, HalfFloatType, Mesh, MeshLambertNodeMaterial, NearestFilter, NodeMaterial, OneFactor, OrthographicCamera, QuadMesh, RendererUtils, RenderTarget, Scene, Vector2 } from 'three/webgpu';
-import { Fn, If, Loop, ivec2, lights, modelViewMatrix, normalViewGeometry, normalWorldGeometry, output, positionLocal, positionWorld, screenCoordinate, textureLoad, uniform, uv, vec4 } from 'three/tsl';
+import { BackSide, CustomBlending, DoubleSide, FloatType, HalfFloatType, Mesh, MeshLambertNodeMaterial, NearestFilter, NodeMaterial, OneFactor, OrthographicCamera, QuadMesh, RedFormat, RendererUtils, RenderTarget, Scene, Vector2 } from 'three/webgpu';
+import { Fn, If, Loop, ivec2, lights, luminance, modelViewMatrix, mrt, normalViewGeometry, normalWorldGeometry, output, positionLocal, positionWorld, screenCoordinate, textureLoad, uniform, uv, vec4 } from 'three/tsl';
 
 let _rendererState;
 
@@ -15,7 +15,8 @@ let _rendererState;
  * the result. The function also receives the sample index, so stochastic sources like
  * `vxgiIrradiance()` can vary their samples and converge as they accumulate. Call
  * `update()` once per frame to bake progressively, or pass a sample count to bake at once.
- * Bake at most 256 samples, since samples accumulate in half float precision.
+ * Bake at most 256 samples, since samples accumulate in half float precision, unless they
+ * accumulate in float precision with the `moments` option.
  * Keep the source geometry and GI data static while accumulating. Call `reset()`
  * after changing transforms or lighting. Atlas charts need at least three texels
  * of padding; the resolve fills two texels around covered surfaces.
@@ -46,8 +47,9 @@ class LightMapper {
 	 * @param {function(Node<vec3>, Node<vec3>, Node<float>): Node<vec3>} irradianceNode - Returns the irradiance for a world-space position, normal and sample index.
 	 * @param {Object} [options] - Bake options.
 	 * @param {Array<Light>} [options.lights=[]] - Direct lights to include in the diffuse bake. Render their shadows in the source scene first and disable shadow updates during the UV bake.
+	 * @param {boolean} [options.moments=false] - Whether to also sum the squared luminances of the samples into {@link LightMapper#momentTexture}, e.g. for a {@link LightMapDenoiser}. Requires the 'float32-blendable' renderer feature.
 	 */
-	constructor( renderer, size, irradianceNode, { lights = [] } = {} ) {
+	constructor( renderer, size, irradianceNode, { lights = [], moments = false } = {} ) {
 
 		/**
 		 * The renderer.
@@ -79,7 +81,39 @@ class LightMapper {
 		 */
 		this.samples = 0;
 
-		this._accumulation = new RenderTarget( size, size, { type: HalfFloatType, minFilter: NearestFilter, magFilter: NearestFilter, depthBuffer: false } );
+		// the squared luminances of the samples accumulate in a second target of float sums, half floats
+		// would overflow
+
+		const accumulateMoments = moments && renderer.hasFeature( 'float32-blendable' );
+
+		this._accumulation = new RenderTarget( size, size, { type: accumulateMoments ? FloatType : HalfFloatType, minFilter: NearestFilter, magFilter: NearestFilter, depthBuffer: false, count: accumulateMoments ? 2 : 1 } );
+
+		if ( accumulateMoments ) {
+
+			this._accumulation.textures[ 0 ].name = 'output';
+			this._accumulation.textures[ 1 ].name = 'moment';
+			this._accumulation.textures[ 1 ].format = RedFormat;
+
+		}
+
+		/**
+		 * The sums of the samples with their count in alpha, before the normalization and the
+		 * padding of the light map. Texels without samples are zero.
+		 *
+		 * @type {Texture}
+		 * @readonly
+		 */
+		this.sampleTexture = this._accumulation.texture;
+
+		/**
+		 * The sums of the squared luminances of the samples, with the `moments` option and the
+		 * 'float32-blendable' renderer feature, else `null`.
+		 *
+		 * @type {?Texture}
+		 * @readonly
+		 */
+		this.momentTexture = accumulateMoments ? this._accumulation.textures[ 1 ] : null;
+
 		this._renderTarget = new RenderTarget( size, size, { type: HalfFloatType, depthBuffer: false } );
 		this._renderTarget.texture.channel = 1;
 
@@ -94,7 +128,15 @@ class LightMapper {
 
 		this._scene = new Scene();
 		this._camera = new OrthographicCamera();
-		this._objects = [];
+
+		/**
+		 * The meshes baked into the light map.
+		 *
+		 * @type {Array<Mesh>}
+		 * @readonly
+		 */
+		this.objects = [];
+
 		this._jitter = uniform( new Vector2() );
 		this._sample = uniform( 0 );
 
@@ -160,7 +202,7 @@ class LightMapper {
 			proxy.receiveShadow = object.receiveShadow;
 
 			this._scene.add( proxy );
-			this._objects.push( object );
+			this.objects.push( object );
 
 		}
 
@@ -183,10 +225,10 @@ class LightMapper {
 
 		if ( this.samples === 0 ) renderer.clear();
 
-		for ( let i = 0; i < this._objects.length; i ++ ) {
+		for ( let i = 0; i < this.objects.length; i ++ ) {
 
-			this._objects[ i ].updateWorldMatrix( true, false );
-			this._scene.children[ i ].matrix.copy( this._objects[ i ].matrixWorld );
+			this.objects[ i ].updateWorldMatrix( true, false );
+			this._scene.children[ i ].matrix.copy( this.objects[ i ].matrixWorld );
 
 		}
 
@@ -255,6 +297,10 @@ class LightMapper {
 
 		const normal = flipNormal ? normalWorldGeometry.negate() : normalWorldGeometry;
 
+		// with moments, the squared luminance of each sample accumulates in the second target
+
+		const outputs = ( value ) => this.momentTexture !== null ? mrt( { output: value, moment: luminance( value.rgb ).pow2() } ) : value;
+
 		if ( directLights.length > 0 ) {
 
 			// bake diffuse irradiance with white albedo, leaving specular lighting out
@@ -263,10 +309,11 @@ class LightMapper {
 			material.normalNode = flipNormal ? normalViewGeometry.negate() : normalViewGeometry;
 			material.emissiveNode = irradianceNode( positionWorld, normal, this._sample ).div( Math.PI );
 			material.outputNode = vec4( output.rgb.mul( Math.PI ), 1 );
+			if ( this.momentTexture !== null ) material.mrtNode = outputs( material.outputNode );
 
 		} else {
 
-			material.fragmentNode = vec4( irradianceNode( positionWorld, normal, this._sample ), 1 );
+			material.fragmentNode = outputs( vec4( irradianceNode( positionWorld, normal, this._sample ), 1 ) );
 
 		}
 

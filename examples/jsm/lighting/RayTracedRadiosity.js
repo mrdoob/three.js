@@ -1,5 +1,5 @@
-import { BackSide, BufferAttribute, BufferGeometry, Color, EquirectangularReflectionMapping, EquirectangularRefractionMapping, FrontSide, Matrix4, StorageBufferAttribute, StructTypeNode, Vector3 } from 'three/webgpu';
-import { Fn, If, Loop, abs, cos, cross, dFdx, dFdy, dot, float, fract, hash, int, length, pmremTexture, screenCoordinate, select, sin, smoothstep, sqrt, storage, texture, uint, uniform, uvec2, vec2, vec3 } from 'three/tsl';
+import { BackSide, BufferAttribute, BufferGeometry, Color, DoubleSide, EquirectangularReflectionMapping, EquirectangularRefractionMapping, FrontSide, Matrix4, StorageBufferAttribute, StructTypeNode, Vector3 } from 'three/webgpu';
+import { Fn, If, Loop, abs, cos, cross, dFdx, dFdy, dot, float, fract, hash, int, length, normalize, pmremTexture, screenCoordinate, select, sin, smoothstep, sqrt, storage, texture, uint, uniform, uvec2, vec2, vec3 } from 'three/tsl';
 import { MeshBVH, SAH } from 'three-mesh-bvh';
 import { BVHComputeData, bvhNodeBoundsStruct, intersectRayTriangle, rayIntersectionResultStruct, rayStruct, wgslTagCode, wgslTagFn } from 'three-mesh-bvh/webgpu';
 
@@ -7,16 +7,20 @@ import { LightMapper } from './LightMapper.js';
 
 const _a = /*@__PURE__*/ new Vector3();
 const _b = /*@__PURE__*/ new Vector3();
+const _c = /*@__PURE__*/ new Vector3();
+const _normal = /*@__PURE__*/ new Vector3();
 const _color = /*@__PURE__*/ new Color();
 
-// fixed point increments of the R2 low-discrepancy sequence, see
+// fixed point increments of the R2 and R3 low-discrepancy sequences, see
 // https://extremelearning.com.au/unreasonable-effectiveness-of-quasirandom-sequences/
 
 const R2 = [ 3242174889, 2447445414 ];
+const R3 = [ 3518319154, 2882110346, 2360945575 ];
 
-// vec4 items per material and light
+// vec4 items per material, emitter and light
 
 const MATERIAL_STRIDE = 2;
+const EMITTER_STRIDE = 4;
 const LIGHT_STRIDE = 4;
 
 // the traversal stack holds the far children along the path to a leaf, the trees of three-mesh-bvh
@@ -28,7 +32,8 @@ const STACK_DEPTH = 48;
  * Approximates diffuse global illumination with ray traced radiosity, as a source of irradiance for
  * {@link LightMapper}. Every sample casts cosine-distributed rays from each point through a
  * {@link https://github.com/gkjohnson/three-mesh-bvh three-mesh-bvh} BVH of the scene, and looks up
- * the light leaving the hit surfaces in a light map of the bounces.
+ * the light leaving the hit surfaces in a light map of the bounces. Emissive surfaces are sampled
+ * directly with shadow rays, so small area lights converge quickly.
  *
  * The bounces are cached in a light map that `update()` solves iteratively, so the meshes need light
  * map UVs in `uv1`, e.g. generated with {@link unwrapUVs}. Meshes without them block light but do not
@@ -44,10 +49,11 @@ const STACK_DEPTH = 48;
  * The scene is collected by `update()`: call it again after changing the scene or the lighting and
  * create new samplers afterwards. The direct light of directional, point and spot lights is left to
  * the materials, like with the other irradiance sources, but the cached bounces include it with shadow
- * rays, so their indirect light is baked. Emissive materials light the scene, and so does an
- * equirectangular or cube texture in `scene.background`, scaled by `scene.backgroundIntensity`.
- * Background colors are ignored. Only the colors of the materials are used, texture maps are ignored
- * and all surfaces are opaque. Other lights, and skinned, instanced and batched meshes are ignored.
+ * rays, so their indirect light is baked. The light of emissive surfaces is baked, since materials do
+ * not light each other, and so is the light of an equirectangular or cube texture in `scene.background`,
+ * scaled by `scene.backgroundIntensity`; background colors are ignored. Only the colors of the
+ * materials are used, texture maps are ignored and all surfaces are opaque. Other lights, and skinned,
+ * instanced and batched meshes are ignored.
  *
  * This class can only be used with {@link WebGPURenderer} and a WebGPU backend.
  *
@@ -115,6 +121,8 @@ class RayTracedRadiosity {
 		this._materials = null;
 		this._lights = null;
 		this._lightCount = 0;
+		this._emitters = null;
+		this._emitterCount = 0;
 		this._lightMapMeshes = [];
 		this._cache = null;
 		this._environment = null;
@@ -180,9 +188,9 @@ class RayTracedRadiosity {
 
 		}
 
-		for ( const buffer of [ this._triangles, this._materials, this._lights ] ) buffer?.value.dispose();
+		for ( const buffer of [ this._triangles, this._materials, this._lights, this._emitters ] ) buffer?.value.dispose();
 
-		this._triangles = this._materials = this._lights = null;
+		this._triangles = this._materials = this._lights = this._emitters = null;
 
 		if ( this._cache !== null ) {
 
@@ -195,7 +203,7 @@ class RayTracedRadiosity {
 
 	/**
 	 * Merges the visible meshes into one world space geometry, builds its BVH and stores the
-	 * materials and lights.
+	 * materials, emissive triangles and lights.
 	 *
 	 * @private
 	 * @param {Scene} scene - The scene.
@@ -225,6 +233,7 @@ class RayTracedRadiosity {
 		const triangles = [];
 		const materials = [];
 		const lights = [];
+		const emitters = [];
 		const entries = new Map();
 		const lightMapMeshes = [];
 
@@ -259,7 +268,7 @@ class RayTracedRadiosity {
 				const front = material.side !== BackSide ? 1 : 0;
 				const back = material.side !== FrontSide ? 1 : 0;
 
-				entries.set( key, entries.size );
+				entries.set( key, { index: entries.size, emission, side: material.side } );
 				materials.push( color.r, color.g, color.b, front, emission.r, emission.g, emission.b, back );
 
 			}
@@ -327,6 +336,7 @@ class RayTracedRadiosity {
 				if ( material === undefined || material.visible === false ) continue;
 
 				const entry = getEntry( material, uv1 !== undefined );
+				const emissive = entry.emission.r + entry.emission.g + entry.emission.b > 0;
 
 				const start = Math.max( drawStart, group.start );
 				const end = Math.min( drawEnd, group.start + group.count );
@@ -343,7 +353,23 @@ class RayTracedRadiosity {
 
 					}
 
-					triangles.push( entry );
+					triangles.push( entry.index );
+
+					// emissive triangles are sampled with shadow rays
+
+					if ( emissive ) {
+
+						const p = positions.length - 9;
+
+						_a.fromArray( positions, p );
+						_b.fromArray( positions, p + 3 ).sub( _a );
+						_c.fromArray( positions, p + 6 ).sub( _a );
+
+						const area = _normal.crossVectors( _b, _c ).length() / 2;
+
+						if ( area > 0 ) emitters.push( { a: _a.clone(), e1: _b.clone(), e2: _c.clone(), area, emission: entry.emission, side: entry.side } );
+
+					}
 
 				}
 
@@ -393,6 +419,8 @@ class RayTracedRadiosity {
 		this._materials = vec4Storage( materials );
 		this._lights = vec4Storage( lights );
 		this._lightCount = lights.length / ( LIGHT_STRIDE * 4 );
+		this._emitters = vec4Storage( createEmitters( emitters ) );
+		this._emitterCount = emitters.length;
 
 	}
 
@@ -728,6 +756,8 @@ class RayTracedRadiosity {
 			const materials = this._materials;
 			const triangles = this._triangles;
 			const lights = this._lights;
+			const emitters = this._emitters;
+			const emitterCount = this._emitterCount;
 			const cache = this._cache !== null ? texture( this._cache.texture ) : null;
 			const environment = this._environment;
 
@@ -750,12 +780,13 @@ class RayTracedRadiosity {
 
 			const [ tangent, bitangent ] = orthonormalBasis( normal );
 
-			// the low-discrepancy sequence continues over the samples, with one of nine random offsets per
+			// the low-discrepancy sequences continue over the samples, with one of nine random offsets per
 			// pixel, which decorrelates neighbouring pixels but keeps the rays of a workgroup coherent
 
 			const pixel = uvec2( screenCoordinate.xy );
-			const seed = uint( hash( pixel.x.add( pixel.y.mul( 65536 ) ) ).mul( 9 ) ).min( 8 ).mul( 2 ).toVar();
+			const seed = uint( hash( pixel.x.add( pixel.y.mul( 65536 ) ) ).mul( 9 ) ).min( 8 ).mul( 5 ).toVar();
 			const offset = vec2( hash( seed ), hash( seed.add( 1 ) ) ).toVar();
+			const emitterOffset = vec3( hash( seed.add( 2 ) ), hash( seed.add( 3 ) ), hash( seed.add( 4 ) ) ).toVar();
 
 			const gathered = vec3( 0 ).toVar();
 
@@ -776,19 +807,18 @@ class RayTracedRadiosity {
 
 					const surface = If( hit.z.notEqual( 0 ), () => {
 
-						// light leaving the visible sides of the hit surface, times pi: the emitted light, and the
-						// cached bounces reflected by the diffuse color
+						// light leaving the visible sides of the hit surface, times pi: the cached bounces reflected
+						// by the diffuse color. The emitted light is sampled with the shadow rays below
 
-						const base = int( triangles.element( int( abs( hit.z ) ).sub( 1 ).mul( 3 ) ).w ).mul( MATERIAL_STRIDE ).toVar();
-						const diffuse = materials.element( base ).toVar();
-						const emissive = materials.element( base.add( 1 ) ).toVar();
-						const facing = select( hit.z.lessThan( 0 ), emissive.w, diffuse.w );
+						if ( cache !== null ) {
 
-						const radiance = emissive.rgb.mul( Math.PI ).toVar();
+							const base = int( triangles.element( int( abs( hit.z ) ).sub( 1 ).mul( 3 ) ).w ).mul( MATERIAL_STRIDE ).toVar();
+							const front = materials.element( base ).toVar();
+							const facing = select( hit.z.lessThan( 0 ), materials.element( base.add( 1 ) ).w, front.w );
 
-						if ( cache !== null ) radiance.addAssign( diffuse.rgb.mul( cache.sample( this._surface( hit ) ).level( 0 ).rgb ) );
+							gathered.addAssign( front.rgb.mul( cache.sample( this._surface( hit ) ).level( 0 ).rgb ).mul( facing ) );
 
-						gathered.addAssign( radiance.mul( facing ) );
+						}
 
 					} );
 
@@ -805,6 +835,65 @@ class RayTracedRadiosity {
 					}
 
 				} );
+
+				// shadow ray to a random point on an emitter, picked by its power with a binary search of the
+				// cumulative powers
+
+				if ( emitterCount > 0 ) {
+
+					const v = fract( emitterOffset.add( vec3( float( n.mul( R3[ 0 ] ) ), float( n.mul( R3[ 1 ] ) ), float( n.mul( R3[ 2 ] ) ) ).mul( 2 ** - 32 ) ) ).toVar();
+
+					const low = int( 0 ).toVar();
+					const high = int( emitterCount - 1 ).toVar();
+
+					Loop( Math.ceil( Math.log2( emitterCount ) ), () => {
+
+						const middle = low.add( high ).shiftRight( 1 ).toVar();
+
+						If( emitters.element( middle.mul( EMITTER_STRIDE ) ).w.lessThan( v.x ), () => {
+
+							low.assign( middle.add( 1 ) );
+
+						} ).Else( () => {
+
+							high.assign( middle );
+
+						} );
+
+					} );
+
+					const base = low.mul( EMITTER_STRIDE ).toVar();
+					const corner = emitters.element( base ).toVar();
+					const edge1 = emitters.element( base.add( 1 ) ).toVar();
+					const edge2 = emitters.element( base.add( 2 ) ).toVar();
+					const emission = emitters.element( base.add( 3 ) ).toVar();
+
+					const s = sqrt( v.y );
+					const point = corner.xyz.add( edge1.xyz.mul( s.mul( v.z.oneMinus() ) ) ).add( edge2.xyz.mul( s.mul( v.z ) ) );
+					const toLight = point.sub( origin ).toVar();
+					const distanceSq = dot( toLight, toLight ).max( 1e-8 ).toVar();
+					const distance = sqrt( distanceSq ).toVar();
+					const direction = toLight.div( distance ).toVar();
+
+					// the cosine at the emitter, by its emitting sides
+
+					const cosLight = dot( normalize( cross( edge1.xyz, edge2.xyz ) ), direction ).negate().toVar();
+					cosLight.assign( select( edge2.w.equal( 2 ), abs( cosLight ), select( edge2.w.equal( 1 ), cosLight.negate(), cosLight ) ) );
+
+					const cosReceiver = dot( normal, direction ).toVar();
+
+					If( cosReceiver.greaterThan( 0 ).and( cosLight.greaterThan( 0 ) ).and( dot( direction, faceNormal ).greaterThan( 0 ) ), () => {
+
+						// the irradiance over the probability of the point, with the projected solid angle clamped to
+						// the hemisphere next to an emitter
+
+						const scale = cosReceiver.mul( cosLight ).mul( edge1.w ).div( distanceSq ).min( Math.PI ).div( emission.w );
+
+						gathered.addAssign( emission.rgb.mul( scale ).mul( visibility( origin, direction, distance.mul( 0.999 ) ) ) );
+
+					} );
+
+				}
 
 			} );
 
@@ -873,6 +962,42 @@ class RayTracedRadiosity {
 function rayTracedRadiosityIrradiance( radiosity, { analyticLights = false } = {} ) {
 
 	return ( position, normal ) => radiosity._gather( position, normal, analyticLights );
+
+}
+
+/**
+ * Packs the emissive triangles for sampling by their power: the corner and the cumulative share of
+ * the power, the edges with the area and the emitting sides, and the emission with the share of the
+ * power of the triangle.
+ *
+ * @private
+ * @param {Array<Object>} emitters - The emissive triangles.
+ * @return {Array<number>} The emitters, four vectors per triangle.
+ */
+function createEmitters( emitters ) {
+
+	const powers = emitters.map( ( { area, emission, side } ) => area * ( 0.2126 * emission.r + 0.7152 * emission.g + 0.0722 * emission.b ) * ( side === DoubleSide ? 2 : 1 ) );
+	const total = powers.reduce( ( sum, power ) => sum + power, 0 );
+	const data = [];
+
+	let cumulative = 0;
+
+	for ( let i = 0; i < emitters.length; i ++ ) {
+
+		const { a, e1, e2, area, emission, side } = emitters[ i ];
+
+		cumulative += powers[ i ];
+
+		data.push(
+			a.x, a.y, a.z, i === emitters.length - 1 ? 1 : cumulative / total,
+			e1.x, e1.y, e1.z, area,
+			e2.x, e2.y, e2.z, side === DoubleSide ? 2 : ( side === BackSide ? 1 : 0 ),
+			emission.r, emission.g, emission.b, powers[ i ] / total
+		);
+
+	}
+
+	return data;
 
 }
 

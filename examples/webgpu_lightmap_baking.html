@@ -19,7 +19,7 @@
 				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Light Baking</span>
 			</div>
 
-			<small>Progressively bake Ray Radiosity (<a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">three-mesh-bvh</a>), Light Probe or VXGI diffuse irradiance into a UV atlas by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br/><span id="status"></span></small>
+			<small>Progressively bake and denoise Ray Radiosity (<a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">three-mesh-bvh</a>), Light Probe or VXGI diffuse irradiance into a UV atlas by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br/><span id="status"></span></small>
 		</div>
 
 		<script type="importmap">
@@ -44,6 +44,7 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
 			import { LightMapper } from 'three/addons/lighting/LightMapper.js';
+			import { LightMapDenoiser } from 'three/addons/lighting/LightMapDenoiser.js';
 			import { RayTracedRadiosity, rayTracedRadiosityIrradiance } from 'three/addons/lighting/RayTracedRadiosity.js';
 			import { VXGIVolume } from 'three/addons/lighting/vxgi/VXGIVolume.js';
 			import { vxgiIrradiance } from 'three/addons/lighting/vxgi/VXGIIrradiance.js';
@@ -62,9 +63,9 @@
 			}
 
 			let camera, scene, renderer, controls, renderPipeline;
-			let light, meshes, materials, atlas, status;
-			let source, lightMapper, bakedPass, livePass, liveOutput;
-			let needsBake = true;
+			let light, lightPanel, meshes, materials, atlas, status;
+			let source, lightMapper, denoiser, bakedPass, livePass, liveOutput;
+			let needsBake = true, denoised = false;
 
 			// shifts the per-pixel cone noise of the live view every frame, like the light map samples
 
@@ -73,14 +74,15 @@
 			const params = {
 				output: 'Baked GI',
 				algorithm: 'Ray Radiosity',
-				resolution: 1024
+				resolution: 1024,
+				denoise: true
 			};
 
 			// light probes are deterministic and only need a few samples to antialias the light map,
 			// the VXGI cones are rotated per sample and the radiosity rays continue their sequences, so
-			// they converge over more samples
+			// they converge over more samples. The denoiser removes the remaining noise
 
-			const bakeSamples = { 'Ray Radiosity': 256, 'Light Probe': 16, 'VXGI': 64 };
+			const bakeSamples = { 'Ray Radiosity': 64, 'Light Probe': 16, 'VXGI': 64 };
 
 			init();
 
@@ -154,7 +156,7 @@
 				tallBox.receiveShadow = true;
 				scene.add( tallBox );
 
-				// Glossy sphere, to show direct specular lighting
+				// Glossy sphere, to show direct specular lighting (Light Probe and VXGI)
 				const glossyMaterial = new THREE.MeshStandardMaterial( { color: 0x0044ff, roughness: 0.15 } );
 				const glossySphere = new THREE.Mesh( new THREE.SphereGeometry( 0.65, 32, 32 ), glossyMaterial );
 				glossySphere.position.set( 1, 0.65, 0.5 );
@@ -162,7 +164,13 @@
 				glossySphere.receiveShadow = true;
 				scene.add( glossySphere );
 
-				// Light
+				// Lights: ray radiosity bakes the direct light of an emissive area light panel with soft
+				// shadows, light probes and VXGI bake the indirect light of a live point light
+				lightPanel = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), new THREE.MeshStandardMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 20 } ) );
+				lightPanel.rotation.x = Math.PI / 2;
+				lightPanel.position.y = 4.99;
+				scene.add( lightPanel );
+
 				light = new THREE.PointLight( 0xffffff, 40 );
 				light.position.set( 0, 4.5, 0 );
 				light.castShadow = true;
@@ -211,6 +219,7 @@
 				gui.add( params, 'output', [ 'Baked GI', 'Live GI' ] ).name( 'Output' ).onChange( setOutput );
 				gui.add( params, 'algorithm', [ 'Ray Radiosity', 'Light Probe', 'VXGI' ] ).name( 'GI Algorithm' ).onChange( requestBake );
 				gui.add( params, 'resolution', [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( requestBake );
+				gui.add( params, 'denoise' ).name( 'Denoise' ).onChange( setLightMap );
 				gui.add( { bake: requestBake }, 'bake' ).name( 'Re-Bake GI' );
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -230,6 +239,7 @@
 				for ( const material of materials ) material.lightMap = null;
 
 				lightMapper?.dispose();
+				denoiser?.dispose();
 				if ( liveOutput !== livePass ) liveOutput?.dispose();
 				livePass?.dispose();
 				source?.dispose();
@@ -242,6 +252,11 @@
 					for ( const geometry of geometries ) geometry.dispose();
 
 				}
+
+				// ray radiosity bakes the emissive panel, light probes and VXGI the live point light
+
+				lightPanel.visible = params.algorithm === 'Ray Radiosity';
+				light.visible = lightPanel.visible === false;
 
 				let irradiance;
 
@@ -275,12 +290,13 @@
 
 				}
 
-				// the light map accumulates one sample per frame in animate()
+				// the light map accumulates one sample per frame in animate(), with the variance of the samples
+				// for the denoiser
 
-				lightMapper = new LightMapper( renderer, atlas.resolution, irradiance );
+				lightMapper = new LightMapper( renderer, atlas.resolution, irradiance, { moments: true } );
 				lightMapper.addObjects( meshes );
 
-				for ( const material of materials ) material.lightMap = lightMapper.texture;
+				denoiser = new LightMapDenoiser( renderer, lightMapper );
 
 				// traa needs a single-sampled depth buffer
 
@@ -308,11 +324,23 @@
 				// discard accumulated samples when switching outputs; baking only runs in Baked GI
 
 				lightMapper.reset();
+				denoised = false;
+				setLightMap();
 
 				for ( const material of materials ) material.lightMapIntensity = live ? 0 : 1;
 
 				renderPipeline.outputNode = live ? liveOutput : bakedPass;
 				renderPipeline.needsUpdate = true;
+
+			}
+
+			function setLightMap() {
+
+				// the denoised light map once the bake has finished
+
+				const lightMap = params.denoise && denoised ? denoiser.texture : lightMapper.texture;
+
+				for ( const material of materials ) material.lightMap = lightMap;
 
 			}
 
@@ -350,7 +378,15 @@
 
 				} else {
 
-					status.textContent = `${ params.algorithm } baked: ${ samples } samples`;
+					if ( denoised === false ) {
+
+						denoiser.update();
+						denoised = true;
+						setLightMap();
+
+					}
+
+					status.textContent = `${ params.algorithm } baked: ${ samples } samples${ params.denoise ? ', denoised' : '' }`;
 
 				}
 
