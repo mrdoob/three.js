@@ -8,7 +8,7 @@ npm run test-e2e -- webgl_geometry_cube
 
 # Check all examples, or only WebGPU examples.
 npm run test-e2e
-npm run test-e2e-webgpu
+npm run test-e2e -- --webgpu
 
 # Deliberately update thumbnails after reviewing a rendering change.
 npm run make-screenshot -- webgl_geometry_cube

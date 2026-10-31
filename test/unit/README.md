@@ -8,26 +8,25 @@ Use Node 24 and install dependencies with `npm ci`. Tests import current source 
 | `npm run test-unit-addons` | CPU addon tests in Node |
 | `npm run test-unit-browser` | Image, loader and WebGL postprocessing tests in Chromium |
 | `npm run test-unit-gpu` | Native hardware WebGL and WebGPU tests using vitest-gpu |
-| `npm run test-unit-all` | CPU, browser and native GPU projects in parallel |
 | `npm test` | Core lint and all unit projects, including native GPU |
 
-Install Chromium once with `npx playwright install chromium` for browser tests. `npm run test-unit-headful` starts interactive browser tests. Vitest discovers `*.tests.js` automatically; GPU suites use a glob entry point rather than a manual import list. Use `npx vitest run --project unit test/unit/src/math/Vector3.tests.js` to select a CPU file. Use `npx vitest run --project webgpu` to select a GPU backend.
+Install Chromium once with `npx playwright install chromium` for browser tests. Test commands run once by default and forward Vitest arguments after `--`: use `npm test -- --watch`, `npm run test-unit -- --watch test/unit/src/math/Vector3.tests.js`, or `npm run test-unit-browser -- --watch --browser.headless=false`. Use `npm test -- --project webgpu` to select one GPU backend. Vitest discovers `*.tests.js` automatically; GPU suites use a glob entry point rather than a manual import list.
 
 Tests use native Vitest `describe`, `test`, hooks and assertions. Existing numerical and geometry comparisons remain in `utils/test-utils.js`. An unfinished behavior can use `test.fails` when it should execute and report an unexpected pass; use `test.skip` for an explicitly unsupported case.
 
-GPU tests use the WebGL and WebGPU Node environments from [vitest-gpu](https://github.com/bhouston/vitest-gpu). They test real shader results and renderer pixels through completed GPU readbacks. Missing contexts or software adapters fail hardware verification. WebGL skips tests requiring WebGPU-only workgroups, barriers or atomics; unsupported optional adapter features are reported as skips. CPU-only commands work without a GPU; `npm test` and `test-unit-all` require hardware and Chromium. CI runs both native backends on macOS using Metal and checks the actual adapter identity. Node 24 satisfies Vitest and the native environments.
+GPU tests use the WebGL and WebGPU Node environments from [vitest-gpu](https://github.com/bhouston/vitest-gpu). They test real shader results and renderer pixels through completed GPU readbacks. Missing contexts or software adapters fail hardware verification. WebGL skips tests requiring WebGPU-only workgroups, barriers or atomics; unsupported optional adapter features are reported as skips. CPU-only commands work without a GPU; the full `npm test` requires hardware and Chromium. CI runs both native backends on macOS using Metal and checks the actual adapter identity. Node 24 satisfies Vitest and the native environments.
 
 Browser tests cover APIs such as DOMParser, image decoding, HTTP loader integration and WebGL postprocessing. Browser examples and screenshot maintenance are documented in [../e2e/README.md](../e2e/README.md). Use `debugger` with Vitest's browser UI or Playwright traces to inspect a failure.
 
 ## Development workflow
 
-`npm run test-unit-watch` runs core and addon files in parallel (up to four workers) and reruns affected tests as source changes. Select a file with `npm run test-unit-watch -- test/unit/src/math/Vector3.tests.js`. CPU files share worker environments; tests must restore changes to shared globals. Tests within each file remain sequential. Each native GPU backend runs one automatically discovered suite in its own environment, sharing imports and a renderer until suite cleanup. All projects use the same four-worker limit so CPU, browser and GPU work can overlap. Browser units reuse one browser process. Example tests default to one worker and CI uses five Playwright shards.
+`npm run test-unit -- --watch --project addons` watches core and addon files and reruns affected tests as source changes. CPU files share worker environments; tests must restore changes to shared globals. Tests within each file remain sequential. Each native GPU backend runs one automatically discovered suite in its own environment, sharing imports and a renderer until suite cleanup. All projects inherit one worker limit: 75% of available logical CPUs rounded down, with a minimum of one. CPU, browser and GPU projects can overlap. Browser units reuse one browser process. Example tests default to one worker and CI uses five Playwright shards.
 
 CI screenshot shards wait for CPU checks and run independently of native GPU and browser unit jobs.
 
 The [official Vitest VS Code extension](https://github.com/vitest-dev/vscode) provides Test Explorer discovery, individual test runs and debugging using the Vitest configurations. No repository-specific editor integration is needed. Browser and native GPU projects still require their documented browser/hardware prerequisites.
 
-The migration removes the custom QUnit HTML/import manifests and Puppeteer test lifecycle. Vitest supplies file discovery, filtering, watch mode, assertion diffs, source locations and per-test results. Playwright supplies browser lifecycle, retries, sharding and traces. CPU tests run without starting a browser or server. Shared CPU workers and one GPU suite per backend avoid repeated imports and renderer startup; `test-unit-all` runs all projects in one invocation.
+The migration removes the custom QUnit HTML/import manifests and Puppeteer test lifecycle. Vitest supplies file discovery, filtering, watch mode, assertion diffs, source locations and per-test results. Playwright supplies browser lifecycle, retries, sharding and traces. CPU tests run without starting a browser or server. Shared CPU workers and one GPU suite per backend avoid repeated imports and renderer startup; `npm test` runs all projects in one invocation after lint. Example commands forward Playwright arguments separately; they do not use Vitest watch mode.
 
 ## Async failures and diagnostics
 

@@ -1,4 +1,5 @@
 import { fileURLToPath } from 'node:url';
+import { availableParallelism } from 'node:os';
 import { defineConfig } from 'vitest/config';
 import { playwright } from '@vitest/browser-playwright';
 
@@ -18,51 +19,51 @@ const alias = {
 	three: source( 'Three.js' )
 };
 const setupFiles = [ './test/unit/utils/console-wrapper.js' ];
+const maxWorkers = Math.max( 1, Math.floor( availableParallelism() * 0.75 ) );
 const gpuProjects = [ 'webgl', 'webgpu' ].map( backend => ( {
-	resolve: { alias },
+	extends: true,
 	test: {
 		name: backend,
 		include: [ 'test/gpu/suite.tests.js' ],
 		environment: `${ backend }-node`,
 		env: { THREE_GPU_BACKEND: backend },
-		maxWorkers: 4,
 		testTimeout: 30000,
 		hookTimeout: 30000
 	}
 } ) );
 
 export default defineConfig( {
+	resolve: { alias },
 	test: {
+		watch: false,
+		maxWorkers,
 		projects: [
 			{
-				resolve: { alias },
+				extends: true,
 				test: {
 					name: 'unit',
 					environment: 'node',
 					isolate: false,
-					maxWorkers: 4,
 					include: [ 'test/unit/src/**/*.tests.js', 'test/unit/tsl/*.tests.js' ],
 					exclude: [ ...browserTests, 'test/unit/src/nodes/tsl/!(TSLCore).tests.js', 'test/unit/src/nodes/lighting/EnvironmentNode.tests.js' ],
 					setupFiles
 				}
 			},
 			{
-				resolve: { alias },
+				extends: true,
 				test: {
 					name: 'addons',
 					environment: 'node',
 					isolate: false,
-					maxWorkers: 4,
 					include: [ 'test/unit/addons/**/*.tests.js' ],
 					exclude: browserTests,
 					setupFiles
 				}
 			},
 			{
-				resolve: { alias },
+				extends: true,
 				test: {
 					name: 'browser',
-					maxWorkers: 4,
 					include: browserTests,
 					setupFiles,
 					browser: {
