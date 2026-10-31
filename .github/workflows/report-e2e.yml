@@ -223,7 +223,7 @@ jobs:
                 filter: 'latest',
               });
 
-              const e2eJobs = jobs.filter((job) => job.name.startsWith('E2E testing'));
+              const e2eJobs = jobs.filter((job) => job.name.startsWith('Example screenshots'));
               if (e2eJobs.length === 0 || !e2eJobs.every((job) => job.conclusion === 'success')) return;
 
               body = `${marker}\n### 🖼️ E2E screenshot tests\n\n✅ All examples render correctly again ([run](${runUrl})).`;
