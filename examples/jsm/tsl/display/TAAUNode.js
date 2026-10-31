@@ -181,7 +181,7 @@ class TAAUNode extends Node {
 		 * @private
 		 * @type {RenderTarget}
 		 */
-		this._previousDepthRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, depthTexture: new DepthTexture() } );
+		this._previousDepthRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, depthTexture: new DepthTexture(), count: 0 } );
 		this._previousDepthRenderTarget.depthTexture.name = 'TAAUNode.previousDepth';
 
 		/**
@@ -443,13 +443,16 @@ class TAAUNode extends Node {
 
 		if ( srcW > 0 && srcH > 0 ) {
 
-			if ( this._previousDepthRenderTarget.width !== srcW || this._previousDepthRenderTarget.height !== srcH ) {
+			const dstDepth = this._previousDepthRenderTarget.depthTexture;
 
-				this._previousDepthRenderTarget.setSize( srcW, srcH );
+			if ( dstDepth.image.width !== srcW || dstDepth.image.height !== srcH ) {
+
+				dstDepth.image.width = srcW;
+				dstDepth.image.height = srcH;
+				dstDepth.needsUpdate = true;
 
 			}
 
-			const dstDepth = this._previousDepthRenderTarget.depthTexture;
 			renderer.copyTextureToTexture( currentDepth, dstDepth );
 
 		}
