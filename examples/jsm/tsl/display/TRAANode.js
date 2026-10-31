@@ -145,6 +145,7 @@ class TRAANode extends Node {
 		 */
 		this._historyRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, depthTexture: new DepthTexture() } );
 		this._historyRenderTarget.texture.name = 'TRAANode.history';
+		this._historyTextureNode = texture( this._historyRenderTarget.texture );
 
 		/**
 		 * The render target for the resolve.
@@ -366,9 +367,22 @@ class TRAANode extends Node {
 		const needsRestart = this._historyRenderTarget.width !== width || this._historyRenderTarget.height !== height;
 		this.setSize( width, height );
 
+		// swap history instead of copying
+
+		const historyTexture = this._historyRenderTarget.texture;
+		this._historyRenderTarget.texture = this._resolveRenderTarget.texture;
+		this._resolveRenderTarget.texture = historyTexture;
+		this._historyTextureNode.value = this._historyRenderTarget.texture;
+		this._textureNode.value = this._resolveRenderTarget.texture;
+
 		// every time when the dimensions change we need fresh history data
 
 		if ( needsRestart === true ) {
+
+			// initialize both targets after a resize disposes their GPU resources
+
+			renderer.initRenderTarget( this._historyRenderTarget );
+			renderer.initRenderTarget( this._resolveRenderTarget );
 
 			// make sure to reset the history with the contents of the beauty buffer otherwise subsequent frames after the
 			// resize will fade from a darker color to the correct one because the history was cleared with black.
@@ -384,10 +398,6 @@ class TRAANode extends Node {
 		_quadMesh.name = 'TRAA';
 		_quadMesh.render( renderer );
 		renderer.setRenderTarget( null );
-
-		// update history
-
-		renderer.copyTextureToTexture( this._resolveRenderTarget.texture, this._historyRenderTarget.texture );
 
 		// Copy current depth to previous depth buffer
 
@@ -502,7 +512,7 @@ class TRAANode extends Node {
 
 		}, { velocityUV: 'vec2', textureSize: 'ivec2', return: 'float' } );
 
-		const historyNode = texture( this._historyRenderTarget.texture );
+		const historyNode = this._historyTextureNode;
 
 		const resolve = Fn( () => {
 
