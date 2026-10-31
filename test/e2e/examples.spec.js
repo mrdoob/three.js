@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import * as fs from 'node:fs/promises';
 import { Image } from './image.js';
 import { exceptionList } from './exceptions.js';
+import { gotoWithLegacyNetworkIdle, waitForLegacyNetworkIdle, renderOnce } from './legacy-readiness.js';
 
 const exact = JSON.parse( process.env.THREE_EXAMPLES || '[]' );
 const files = ( await fs.readdir( 'examples' ) )
@@ -66,17 +67,14 @@ for ( const file of files ) {
 		let pageError;
 		const messages = [];
 		const pendingRequests = new Set();
-		let lastNetworkActivity = Date.now();
 		page.on( 'request', request => {
 
 			pendingRequests.add( request );
-			lastNetworkActivity = Date.now();
 
 		} );
 		const finishRequest = request => {
 
 			pendingRequests.delete( request );
-			lastNetworkActivity = Date.now();
 
 		};
 
@@ -115,22 +113,11 @@ for ( const file of files ) {
 		}
 
 		await client.send( 'Input.setIgnoreInputEvents', { ignore: true } );
-		await page.goto( `/examples/${ file }.html`, { waitUntil: 'networkidle', timeout: 300000 } );
+		await gotoWithLegacyNetworkIdle( page, client, `/examples/${ file }.html` );
 		await page.evaluate( cleanPage );
-		lastNetworkActivity = Date.now();
-		await expect.poll( () => pendingRequests.size === 0 && Date.now() - lastNetworkActivity >= 2000, {
-			message: 'Network remains idle for two seconds',
-			timeout: 300000,
-			intervals: [ 100 ]
-		} ).toBe( true );
+		await waitForLegacyNetworkIdle( page, pendingRequests );
 		await page.waitForFunction( () => window._videosReady(), null, { polling: 100, timeout: 5000 } );
-		await page.evaluate( () => window._renderStarted = true );
-		// Some examples render once without requestAnimationFrame; preserve that support.
-		await page.waitForFunction( () => window._renderFinished, null, { polling: 100, timeout: 5000 } ).catch( error => {
-
-			if ( error.name !== 'TimeoutError' ) throw error;
-
-		} );
+		await renderOnce( page );
 
 		const screenshot = ( await Image.read( await page.screenshot() ) ).scale( 0.5 );
 		await testInfo.attach( 'browser-console', { body: messages.join( '\n' ), contentType: 'text/plain' } );

@@ -16,6 +16,9 @@ npm run make-screenshot -- webgl_geometry_cube
 # Native Playwright selection, workers and sharding are available.
 npm run test-e2e -- --list
 npm run test-e2e -- --shard=1/5 --workers=1
+
+# Check runner option parsing and readiness without a browser.
+node --test test/e2e/*.tests.js
 ```
 
 Run `npm run build` before example tests. Install the browser with `npx playwright install chromium`, or set `THREE_BROWSER_CHANNEL=chrome` to use an installed Google Chrome. `VISIBLE=1` opens a visible browser. Windows uses ANGLE's hardware D3D11 backend. Browser and driver differences can affect pixel comparisons; review mismatch artifacts before updating a thumbnail.
@@ -23,6 +26,8 @@ Run `npm run build` before example tests. Install the browser with `npx playwrig
 A physical WebGL2 renderer is required. WebGPU examples additionally require a physical adapter and successful device creation. Software renderers fail the check. If the bundled Chromium cannot create a WebGPU device on Windows, try an installed Chrome channel. No software fallback is configured.
 
 One worker runs by default to avoid GPU contention. Playwright handles retries and replaces a failed worker's browser. Each example has its own context, console error checks and trace on failure. Increase workers explicitly when the hardware has enough capacity. CI uses Playwright's native sharding, independent of the `CI` environment variable.
+
+The readiness helper preserves the original Puppeteer boundaries: Chromium's navigation `networkIdle` lifecycle, two continuous seconds without requests, and browser-side render polling. The frozen clock does not stop real-time intervals, so changing these boundaries can change scenes such as Jolt physics before the captured frame.
 
 Failures retain `<example>-actual.jpg`, `-expected.jpg` and `-diff.jpg` in `test/e2e/output-screenshots` for the existing CI screenshot report. Playwright attaches the GPU identity, browser console and images to its test result. Traces are in `test/e2e/results`; inspect one with `npx playwright show-trace <trace.zip>`.
 
