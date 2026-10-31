@@ -1,14 +1,10 @@
 import { BackSide, BufferAttribute, BufferGeometry, DoubleSide, FloatType, HalfFloatType, Mesh, NodeMaterial, NoBlending, OrthographicCamera, QuadMesh, RendererUtils, RenderTarget, Scene, Vector2 } from 'three/webgpu';
-import { Fn, If, abs, attribute, dot, exp, float, ivec2, length, luminance, max, mrt, normalWorldGeometry, positionWorld, pow, round, screenCoordinate, sqrt, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl';
+import { Fn, If, Loop, abs, attribute, dot, exp, float, ivec2, length, luminance, max, mrt, normalWorldGeometry, positionWorld, pow, round, screenCoordinate, sqrt, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl';
 
 // the surface buffer is rasterized with these jitters, so that it covers the texels that
 // the first samples of the light mapper cover
 
 const SURFACE_JITTERS = 16;
-
-// weights of the 5x5 B3 spline kernel of the à-trous wavelet transform
-
-const KERNEL = [ 1 / 16, 1 / 4, 3 / 8, 1 / 4, 1 / 16 ];
 
 let _rendererState;
 
@@ -404,21 +400,21 @@ class LightMapDenoiser {
 
 				const variance = vec2( 0 ).toVar();
 
-				for ( let y = - 1; y <= 1; y ++ ) {
+				// the taps are loops, unrolled ones would make shaders that take seconds to compile on some platforms
 
-					for ( let x = - 1; x <= 1; x ++ ) {
+				Loop( { start: - 1, end: 1, condition: '<=', name: 'y' }, { start: - 1, end: 1, condition: '<=', name: 'x' }, ( { x, y } ) => {
 
-						const weight = [ 0.25, 0.5, 0.25 ][ x + 1 ] * [ 0.25, 0.5, 0.25 ][ y + 1 ];
+					// the weights of the 3x3 kernel are 1/4, 1/2 and 1/4 along each axis
 
-						tap( ivec2( x, y ), ( q, other, value ) => {
+					const weight = float( 2 ).sub( abs( float( x ) ) ).mul( float( 2 ).sub( abs( float( y ) ) ) ).div( 16 ).toVar();
 
-							variance.addAssign( vec2( value.a.pow2().mul( weight ), weight ) );
+					tap( ivec2( x, y ), ( q, other, value ) => {
 
-						} );
+						variance.addAssign( vec2( value.a.pow2().mul( weight ), weight ) );
 
-					}
+					} );
 
-				}
+				} );
 
 				const deviation = sqrt( variance.x.div( variance.y ) );
 				const luminanceScale = float( 1 ).div( luminancePhi.mul( deviation ).add( 1e-6 ) ).toVar();
@@ -434,32 +430,37 @@ class LightMapDenoiser {
 				const noise = vec3( 0 ).toVar(); // sums of w w s s, times 1, x, y
 				const noiseSpread = vec3( 0 ).toVar(); // times x x, x y, y y
 
-				for ( let y = - 2; y <= 2; y ++ ) {
+				// the weights of the 5x5 B3 spline kernel of the à-trous wavelet transform are 3/8, 1/4 and 1/16
+				// at distances of 0, 1 and 2 along each axis
 
-					for ( let x = - 2; x <= 2; x ++ ) {
+				const kernel = ( t ) => float( 12 ).sub( t.mul( 3 ) ).sub( t.mul( t ) ).div( 32 );
 
-						tap( ivec2( x, y ).mul( step ), ( q, other, value ) => {
+				Loop( { start: - 2, end: 2, condition: '<=', name: 'y' }, { start: - 2, end: 2, condition: '<=', name: 'x' }, ( { x, y } ) => {
 
-							const offset = other.xyz.sub( surface.xyz );
-							const plane = abs( dot( normal, offset ) ).div( length( offset ).add( 1e-9 ) );
-							const similarity = pow( max( dot( normal, normals.load( q ).xyz ), 0 ), normalPhi );
-							const difference = abs( luminance( value.rgb ).sub( centerLuminance ) ).mul( luminanceScale );
-							const weight = similarity.mul( exp( plane.div( planePhi ).add( difference ).negate() ) ).mul( KERNEL[ x + 2 ] * KERNEL[ y + 2 ] ).toVar();
-							const deviation2 = weight.pow2().mul( value.a.pow2() );
+					const fx = float( x ).toVar();
+					const fy = float( y ).toVar();
+					const kernelWeight = kernel( abs( fx ) ).mul( kernel( abs( fy ) ) ).toVar();
 
-							moments.addAssign( vec3( weight, weight.mul( x ), weight.mul( y ) ) );
-							spread.addAssign( vec3( weight.mul( x * x ), weight.mul( x * y ), weight.mul( y * y ) ) );
-							sum.addAssign( value.rgb.mul( weight ) );
-							sumX.addAssign( value.rgb.mul( weight.mul( x ) ) );
-							sumY.addAssign( value.rgb.mul( weight.mul( y ) ) );
-							noise.addAssign( vec3( deviation2, deviation2.mul( x ), deviation2.mul( y ) ) );
-							noiseSpread.addAssign( vec3( deviation2.mul( x * x ), deviation2.mul( x * y ), deviation2.mul( y * y ) ) );
+					tap( ivec2( x, y ).mul( step ), ( q, other, value ) => {
 
-						} );
+						const offset = other.xyz.sub( surface.xyz );
+						const plane = abs( dot( normal, offset ) ).div( length( offset ).add( 1e-9 ) );
+						const similarity = pow( max( dot( normal, normals.load( q ).xyz ), 0 ), normalPhi );
+						const difference = abs( luminance( value.rgb ).sub( centerLuminance ) ).mul( luminanceScale );
+						const weight = similarity.mul( exp( plane.div( planePhi ).add( difference ).negate() ) ).mul( kernelWeight ).toVar();
+						const deviation2 = weight.pow2().mul( value.a.pow2() ).toVar();
 
-					}
+						moments.addAssign( vec3( weight, weight.mul( fx ), weight.mul( fy ) ) );
+						spread.addAssign( vec3( weight.mul( fx.mul( fx ) ), weight.mul( fx.mul( fy ) ), weight.mul( fy.mul( fy ) ) ) );
+						sum.addAssign( value.rgb.mul( weight ) );
+						sumX.addAssign( value.rgb.mul( weight.mul( fx ) ) );
+						sumY.addAssign( value.rgb.mul( weight.mul( fy ) ) );
+						noise.addAssign( vec3( deviation2, deviation2.mul( fx ), deviation2.mul( fy ) ) );
+						noiseSpread.addAssign( vec3( deviation2.mul( fx.mul( fx ) ), deviation2.mul( fx.mul( fy ) ), deviation2.mul( fy.mul( fy ) ) ) );
 
-				}
+					} );
+
+				} );
 
 				// the first row of the inverse of the regularized normal matrix
 
@@ -514,21 +515,17 @@ class LightMapDenoiser {
 
 				const sum = vec4( 0 ).toVar();
 
-				for ( let y = - 2; y <= 2; y ++ ) {
+				Loop( { start: - 2, end: 2, condition: '<=', name: 'y' }, { start: - 2, end: 2, condition: '<=', name: 'x' }, ( { x, y } ) => {
 
-					for ( let x = - 2; x <= 2; x ++ ) {
+					const value = input.load( coord.add( ivec2( x, y ) ).clamp( ivec2( 0 ), maxCoord ) ).toVar();
 
-						const value = input.load( coord.add( ivec2( x, y ) ).clamp( ivec2( 0 ), maxCoord ) );
+					If( value.a.greaterThanEqual( 0 ), () => {
 
-						If( value.a.greaterThanEqual( 0 ), () => {
+						sum.addAssign( vec4( value.rgb, 1 ) );
 
-							sum.addAssign( vec4( value.rgb, 1 ) );
+					} );
 
-						} );
-
-					}
-
-				}
+				} );
 
 				result.assign( vec4( sum.rgb.div( sum.a.max( 1e-4 ) ), 1 ) );
 
