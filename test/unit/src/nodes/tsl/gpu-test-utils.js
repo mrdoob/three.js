@@ -422,14 +422,7 @@ function buildAssertAPI( makeNode ) {
 function declareTest( name, backends, run ) {
 
 	const backend = process.env.THREE_GPU_BACKEND;
-	if ( ! backends.includes( backend ) ) {
-
-		test.skip( name );
-		return;
-
-	}
-
-	test( name, async () => {
+	test.runIf( backends.includes( backend ) )( name, async () => {
 
 		await run( assert, await getSharedRenderer( backend ) );
 

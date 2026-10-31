@@ -4,7 +4,7 @@ export function assertHardwareRenderer( renderer, backend ) {
 
 	if ( backend === 'webgl' ) {
 
-		const gl = renderer.backend?.gl || renderer.getContext();
+		const gl = renderer.backend.gl;
 		const extension = gl.getExtension( 'WEBGL_debug_renderer_info' );
 		const name = extension && gl.getParameter( extension.UNMASKED_RENDERER_WEBGL );
 		if ( ! name || software.test( name ) ) throw new Error( `Hardware WebGL verification blocked: ${ name || 'renderer identity unavailable' }` );
