@@ -19,7 +19,10 @@ test.beforeAll( async () => {
 	for ( const name of [ 'three.core.js', 'three.module.js', 'three.webgpu.js' ] ) {
 
 		const code = await fs.readFile( `build/${ name }`, 'utf8' );
-		builds.set( name, injection + '\n' + code.replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' ) );
+		builds.set( name, injection + '\n' + code
+			.replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' )
+			// Preserve the legacy runner's suppression, including Inspector's later writes.
+			.replace( /this\.trackTimestamp\s*=\s*\(\s*parameters\.trackTimestamp\s*===\s*true\s*\);/g, 'Object.defineProperty(this, \'trackTimestamp\', { get: () => false, set: () => {} });' ) );
 
 	}
 
