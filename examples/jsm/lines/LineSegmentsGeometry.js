@@ -108,10 +108,21 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 		}
 
-		const instanceBuffer = new InstancedInterleavedBuffer( lineSegments, 6, 1 ); // xyz, xyz
+		const instanceStart = this.attributes.instanceStart;
 
-		this.setAttribute( 'instanceStart', new InterleavedBufferAttribute( instanceBuffer, 3, 0 ) ); // xyz
-		this.setAttribute( 'instanceEnd', new InterleavedBufferAttribute( instanceBuffer, 3, 3 ) ); // xyz
+		if ( instanceStart !== undefined && instanceStart.isInterleavedBufferAttribute === true && instanceStart.count === lineSegments.length / 6 ) {
+
+			instanceStart.data.array = lineSegments;
+			instanceStart.data.needsUpdate = true;
+
+		} else {
+
+			const instanceBuffer = new InstancedInterleavedBuffer( lineSegments, 6, 1 ); // xyz, xyz
+
+			this.setAttribute( 'instanceStart', new InterleavedBufferAttribute( instanceBuffer, 3, 0 ) ); // xyz
+			this.setAttribute( 'instanceEnd', new InterleavedBufferAttribute( instanceBuffer, 3, 3 ) ); // xyz
+
+		}
 
 		this.instanceCount = this.attributes.instanceStart.count;
 
@@ -145,10 +156,21 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 		}
 
-		const instanceColorBuffer = new InstancedInterleavedBuffer( colors, 6, 1 ); // rgb, rgb
+		const instanceColorStart = this.attributes.instanceColorStart;
 
-		this.setAttribute( 'instanceColorStart', new InterleavedBufferAttribute( instanceColorBuffer, 3, 0 ) ); // rgb
-		this.setAttribute( 'instanceColorEnd', new InterleavedBufferAttribute( instanceColorBuffer, 3, 3 ) ); // rgb
+		if ( instanceColorStart !== undefined && instanceColorStart.isInterleavedBufferAttribute === true && instanceColorStart.count === colors.length / 6 ) {
+
+			instanceColorStart.data.array = colors;
+			instanceColorStart.data.needsUpdate = true;
+
+		} else {
+
+			const instanceColorBuffer = new InstancedInterleavedBuffer( colors, 6, 1 ); // rgb, rgb
+
+			this.setAttribute( 'instanceColorStart', new InterleavedBufferAttribute( instanceColorBuffer, 3, 0 ) ); // rgb
+			this.setAttribute( 'instanceColorEnd', new InterleavedBufferAttribute( instanceColorBuffer, 3, 3 ) ); // rgb
+
+		}
 
 		return this;
 
