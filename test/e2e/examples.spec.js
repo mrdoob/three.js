@@ -104,6 +104,16 @@ for ( const file of files ) {
 		} );
 
 		const client = await context.newCDPSession( page );
+		// Playwright overrides Chromium's native macOS fonts in headless mode.
+		// Keep visible example text identical to the legacy Puppeteer runner.
+		if ( process.platform === 'darwin' ) {
+
+			await client.send( 'Page.setFontFamilies', { fontFamilies: {
+				standard: 'Times New Roman', fixed: 'Menlo', serif: 'Times New Roman', sansSerif: 'Arial'
+			} } );
+
+		}
+
 		await client.send( 'Input.setIgnoreInputEvents', { ignore: true } );
 		await page.goto( `/examples/${ file }.html`, { waitUntil: 'networkidle', timeout: 300000 } );
 		await page.evaluate( cleanPage );
