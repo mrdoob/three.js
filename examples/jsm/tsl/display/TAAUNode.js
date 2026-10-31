@@ -174,12 +174,9 @@ class TAAUNode extends Node {
 
 		/**
 		 * Render target whose depth attachment holds the previous frame's
-		 * depth buffer. The depth texture must be owned by a render target
-		 * so that `copyTextureToTexture` can copy into it on the WebGL
-		 * backend, which uses a framebuffer blit and therefore needs the
-		 * destination depth texture to be attached to a framebuffer. This
-		 * render target is sized independently of the history target so it
-		 * can match the (lower-resolution) input depth texture.
+		 * depth buffer. This render target is sized independently of the
+		 * history target so it can match the (lower-resolution) input depth
+		 * texture.
 		 *
 		 * @private
 		 * @type {RenderTarget}
