@@ -6,8 +6,9 @@ let _rendererState;
 /**
  * Bakes indirect diffuse irradiance into a light map. The irradiance is defined by a
  * function that returns a TSL node for a world-space position and normal, so any
- * global illumination technique can be baked, e.g. a {@link LightProbeGrid} via
- * `lightProbeGridIrradiance()` or a prepared {@link VXGIVolume} via `vxgiIrradiance()`.
+ * global illumination technique can be baked, e.g. a prepared {@link RayTracedRadiosity} via
+ * `rayTracedRadiosityIrradiance()`, a {@link LightProbeGrid} via `lightProbeGridIrradiance()`
+ * or a prepared {@link VXGIVolume} via `vxgiIrradiance()`.
  *
  * Meshes need light map UVs in the `uv1` attribute, e.g. generated with {@link unwrapUVs}.
  * Each sample rasterizes the meshes in UV space with a sub-texel jitter and accumulates

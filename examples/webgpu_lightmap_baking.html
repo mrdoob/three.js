@@ -19,7 +19,7 @@
 				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Light Baking</span>
 			</div>
 
-			<small>Progressively bake Light Probe or VXGI diffuse irradiance into a UV atlas by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br/><span id="status"></span></small>
+			<small>Progressively bake Ray Radiosity (<a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">three-mesh-bvh</a>), Light Probe or VXGI diffuse irradiance into a UV atlas by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br/><span id="status"></span></small>
 		</div>
 
 		<script type="importmap">
@@ -28,7 +28,9 @@
 					"three": "../build/three.webgpu.js",
 					"three/webgpu": "../build/three.webgpu.js",
 					"three/tsl": "../build/three.tsl.js",
-					"three/addons/": "./jsm/"
+					"three/addons/": "./jsm/",
+					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.15/src/index.js",
+					"three-mesh-bvh/webgpu": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.15/src/webgpu/index.js"
 				}
 			}
 		</script>
@@ -42,6 +44,7 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
 			import { LightMapper } from 'three/addons/lighting/LightMapper.js';
+			import { RayTracedRadiosity, rayTracedRadiosityIrradiance } from 'three/addons/lighting/RayTracedRadiosity.js';
 			import { VXGIVolume } from 'three/addons/lighting/vxgi/VXGIVolume.js';
 			import { vxgiIrradiance } from 'three/addons/lighting/vxgi/VXGIIrradiance.js';
 			import { lightProbeGridIrradiance } from 'three/addons/tsl/lighting/LightProbeGridNode.js';
@@ -69,14 +72,15 @@
 
 			const params = {
 				output: 'Baked GI',
-				algorithm: 'VXGI',
+				algorithm: 'Ray Radiosity',
 				resolution: 1024
 			};
 
 			// light probes are deterministic and only need a few samples to antialias the light map,
-			// the VXGI cones are rotated per sample and converge over more samples
+			// the VXGI cones are rotated per sample and the radiosity rays continue their sequences, so
+			// they converge over more samples
 
-			const bakeSamples = { 'Light Probe': 16, 'VXGI': 64 };
+			const bakeSamples = { 'Ray Radiosity': 256, 'Light Probe': 16, 'VXGI': 64 };
 
 			init();
 
@@ -205,7 +209,7 @@
 
 				const gui = renderer.inspector.createParameters( 'Light Baking' );
 				gui.add( params, 'output', [ 'Baked GI', 'Live GI' ] ).name( 'Output' ).onChange( setOutput );
-				gui.add( params, 'algorithm', [ 'Light Probe', 'VXGI' ] ).name( 'GI Algorithm' ).onChange( requestBake );
+				gui.add( params, 'algorithm', [ 'Ray Radiosity', 'Light Probe', 'VXGI' ] ).name( 'GI Algorithm' ).onChange( requestBake );
 				gui.add( params, 'resolution', [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( requestBake );
 				gui.add( { bake: requestBake }, 'bake' ).name( 'Re-Bake GI' );
 
@@ -241,7 +245,16 @@
 
 				let irradiance;
 
-				if ( params.algorithm === 'Light Probe' ) {
+				if ( params.algorithm === 'Ray Radiosity' ) {
+
+					// rays through a BVH of the scene, with the bounces cached in a light map of their own
+
+					const radiosity = new RayTracedRadiosity();
+					radiosity.update( renderer, scene );
+					irradiance = rayTracedRadiosityIrradiance( radiosity );
+					source = radiosity;
+
+				} else if ( params.algorithm === 'Light Probe' ) {
 
 					const probes = new LightProbeGrid( 6, 5, 6, 8, 8, 8 );
 					probes.position.set( 0, 2.5, 0 );
@@ -275,9 +288,9 @@
 				livePass.contextNode = builtinGIContext( float( 1 ), irradiance( positionWorld, normalWorld, liveFrame ) );
 				liveOutput = livePass;
 
-				if ( params.algorithm === 'VXGI' ) {
+				if ( params.algorithm !== 'Light Probe' ) {
 
-					// traa resolves the per-pixel cone noise, like webgpu_vxgi
+					// traa resolves the per-pixel noise of the cones and rays, like webgpu_vxgi
 
 					livePass.setMRT( mrt( { output, velocity } ) );
 					liveOutput = traa( livePass.getTextureNode( 'output' ), livePass.getTextureNode( 'depth' ), livePass.getTextureNode( 'velocity' ), camera );
