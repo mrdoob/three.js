@@ -208,6 +208,7 @@ class WebGPUBackend extends Backend {
 
 		// create the device if it is not passed with parameters
 
+		/** @type {GPUDevice} */
 		let device;
 
 		if ( parameters.device === undefined ) {
