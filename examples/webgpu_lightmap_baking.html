@@ -38,10 +38,10 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
-			import { builtinGIContext, float, mrt, normalWorld, output, pass, positionWorld, uniform, velocity } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
 			import { LightMapper } from 'three/addons/lighting/LightMapper.js';
 			import { LightMapDenoiser } from 'three/addons/lighting/LightMapDenoiser.js';
@@ -49,7 +49,6 @@
 			import { VXGIVolume } from 'three/addons/lighting/vxgi/VXGIVolume.js';
 			import { vxgiIrradiance } from 'three/addons/lighting/vxgi/VXGIIrradiance.js';
 			import { lightProbeGridIrradiance } from 'three/addons/tsl/lighting/LightProbeGridNode.js';
-			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 			import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
@@ -62,21 +61,20 @@
 
 			}
 
-			let camera, scene, renderer, controls, renderPipeline;
-			let light, lightPanel, meshes, materials, atlas, status;
-			let source, lightMapper, denoiser, bakedPass, livePass, liveOutput;
-			let needsBake = true, denoised = false;
-
-			// shifts the per-pixel cone noise of the live view every frame, like the light map samples
-
-			const liveFrame = uniform( 0 );
+			let camera, scene, renderer, controls, status, algorithmControl;
+			let world, meshes, materials;
+			let source, lightMapper, denoiser;
+			let needsBake = false, denoised = false;
 
 			const params = {
-				output: 'Baked GI',
+				scene: 'Cornell Box',
 				algorithm: 'Ray Radiosity',
 				resolution: 1024,
 				denoise: true
 			};
+
+			const scenes = { 'Cornell Box': createCornellBox, 'Courtyard': loadCourtyard };
+			const worlds = {};
 
 			// light probes are deterministic and only need a few samples to antialias the light map,
 			// the VXGI cones are rotated per sample and the radiosity rays continue their sequences, so
@@ -88,17 +86,87 @@
 
 			async function init() {
 
-				// Camera
-
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
-				camera.position.set( 0, 2.5, 8 );
-
-				// Scene
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x111111 );
 
-				// Cornell box
+				// Renderer
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				// Controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+
+				status = document.getElementById( 'status' );
+
+				// GUI
+
+				const gui = renderer.inspector.createParameters( 'Light Baking' );
+				gui.add( params, 'scene', Object.keys( scenes ) ).name( 'Scene' ).onChange( setScene );
+				algorithmControl = gui.add( params, 'algorithm', [ 'Ray Radiosity', 'Light Probe', 'VXGI' ] ).name( 'GI Algorithm' ).onChange( requestBake );
+				gui.add( params, 'resolution', [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( requestBake );
+				gui.add( params, 'denoise' ).name( 'Denoise' ).onChange( setLightMap );
+				gui.add( { bake: requestBake }, 'bake' ).name( 'Re-Bake GI' );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				await setScene();
+
+				renderer.setAnimationLoop( animate );
+
+			}
+
+			async function setScene() {
+
+				const name = params.scene;
+
+				worlds[ name ] ??= await scenes[ name ]();
+
+				// another scene was picked while this one loaded
+
+				if ( name !== params.scene ) return;
+
+				if ( world !== undefined ) scene.remove( world.root );
+
+				world = worlds[ name ];
+				scene.add( world.root );
+				scene.background = world.background;
+
+				camera.position.copy( world.camera );
+				controls.target.copy( world.target );
+				controls.update();
+
+				meshes = [];
+				world.root.traverse( ( object ) => object.isMesh && meshes.push( object ) );
+				materials = new Set( meshes.map( ( mesh ) => mesh.material ) );
+
+				// VXGI only sees the light of lights, not the sky that lights the Courtyard
+
+				for ( const option of algorithmControl.select.options ) option.disabled = world.algorithms.includes( option.value ) === false;
+
+				if ( world.algorithms.includes( params.algorithm ) === false ) {
+
+					params.algorithm = world.algorithms[ 0 ];
+					algorithmControl.setValue( params.algorithm );
+
+				}
+
+				requestBake();
+
+			}
+
+			function createCornellBox() {
+
+				const root = new THREE.Group();
 
 				const wallMaterial = new THREE.MeshStandardMaterial( { color: 0xcccccc } );
 				const redMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
@@ -108,41 +176,41 @@
 				const floor = new THREE.Mesh( new THREE.PlaneGeometry( 6, 6 ), wallMaterial );
 				floor.rotation.x = - Math.PI / 2;
 				floor.receiveShadow = true;
-				scene.add( floor );
+				root.add( floor );
 
 				// Ceiling
 				const ceiling = new THREE.Mesh( new THREE.PlaneGeometry( 6, 6 ), wallMaterial );
 				ceiling.rotation.x = Math.PI / 2;
 				ceiling.position.y = 5;
 				ceiling.receiveShadow = true;
-				scene.add( ceiling );
+				root.add( ceiling );
 
 				// Back wall
 				const backWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), wallMaterial );
 				backWall.position.set( 0, 2.5, - 3 );
 				backWall.receiveShadow = true;
-				scene.add( backWall );
+				root.add( backWall );
 
 				// Front wall
 				const frontWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), wallMaterial );
 				frontWall.rotation.y = Math.PI;
 				frontWall.position.set( 0, 2.5, 3 );
 				frontWall.receiveShadow = true;
-				scene.add( frontWall );
+				root.add( frontWall );
 
 				// Left wall (red)
 				const leftWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), redMaterial );
 				leftWall.rotation.y = Math.PI / 2;
 				leftWall.position.set( - 3, 2.5, 0 );
 				leftWall.receiveShadow = true;
-				scene.add( leftWall );
+				root.add( leftWall );
 
 				// Right wall (green)
 				const rightWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), greenMaterial );
 				rightWall.rotation.y = - Math.PI / 2;
 				rightWall.position.set( 3, 2.5, 0 );
 				rightWall.receiveShadow = true;
-				scene.add( rightWall );
+				root.add( rightWall );
 
 				// Objects inside the box
 
@@ -154,7 +222,7 @@
 				tallBox.rotation.y = Math.PI / 8;
 				tallBox.castShadow = true;
 				tallBox.receiveShadow = true;
-				scene.add( tallBox );
+				root.add( tallBox );
 
 				// Glossy sphere, to show direct specular lighting (Light Probe and VXGI)
 				const glossyMaterial = new THREE.MeshStandardMaterial( { color: 0x0044ff, roughness: 0.15 } );
@@ -162,69 +230,120 @@
 				glossySphere.position.set( 1, 0.65, 0.5 );
 				glossySphere.castShadow = true;
 				glossySphere.receiveShadow = true;
-				scene.add( glossySphere );
+				root.add( glossySphere );
 
 				// Lights: ray radiosity bakes the direct light of an emissive area light panel with soft
 				// shadows, light probes and VXGI bake the indirect light of a live point light
-				lightPanel = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), new THREE.MeshStandardMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 20 } ) );
+				const lightPanel = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), new THREE.MeshStandardMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 20 } ) );
 				lightPanel.rotation.x = Math.PI / 2;
 				lightPanel.position.y = 4.99;
-				scene.add( lightPanel );
+				root.add( lightPanel );
 
-				light = new THREE.PointLight( 0xffffff, 40 );
+				const light = new THREE.PointLight( 0xffffff, 40 );
 				light.position.set( 0, 4.5, 0 );
 				light.castShadow = true;
 				light.shadow.mapSize.setScalar( 256 );
 				light.shadow.radius = 10;
 				light.shadow.normalBias = - 0.02;
 				light.shadow.autoUpdate = false;
-				scene.add( light );
+				root.add( light );
 
-				// Renderer
+				return {
+					root, light, lightPanel, background: new THREE.Color( 0x111111 ), cacheSize: 256, algorithms: [ 'Ray Radiosity', 'Light Probe', 'VXGI' ],
+					camera: new THREE.Vector3( 0, 2.5, 8 ), target: new THREE.Vector3( 0, 2.5, 0 ),
+					probes: { size: new THREE.Vector3( 6, 5, 6 ), position: new THREE.Vector3( 0, 2.5, 0 ), counts: [ 8, 8, 8 ], far: 20 }
+				};
 
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
-				renderer.shadowMap.enabled = true;
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.inspector = new Inspector();
-				document.body.appendChild( renderer.domElement );
+			}
 
-				await renderer.init();
+			async function loadCourtyard() {
 
-				// Controls
+				// a two storey cloister at sunrise, lit by the sky. It has no outer walls, their outside would only
+				// take light map space and bake time
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 2.5, 0 );
-				controls.update();
+				const sky = await new HDRLoader().loadAsync( 'textures/equirectangular/blouberg_sunrise_2_1k.hdr' );
+				sky.mapping = THREE.EquirectangularReflectionMapping;
 
-				// Light map UVs
+				const root = new THREE.Group();
 
-				meshes = scene.children.filter( ( object ) => object.isMesh );
-				materials = new Set( meshes.map( ( mesh ) => mesh.material ) );
-				atlas = unwrapUVs( scene, { resolution: params.resolution, padding: 3 } );
+				const stone = new THREE.MeshStandardMaterial( { color: 0xddd0b8 } );
+				const plaster = new THREE.MeshStandardMaterial( { color: 0xd9a066 } );
+				const tiles = new THREE.MeshStandardMaterial( { color: 0xb59a7e } );
+				const water = new THREE.MeshStandardMaterial( { color: 0x3c7a8a } );
+				const leaves = new THREE.MeshStandardMaterial( { color: 0x4a7a32 } );
+				const banners = [ 0xb02a20, 0x2a4ab0, 0xd8a020, 0x2a8a50 ].map( ( color ) => new THREE.MeshStandardMaterial( { color } ) );
 
-				// "Baked GI" shows the light map while it accumulates,
-				// "Live GI" evaluates the raw irradiance per pixel every frame
+				function add( parent, geometry, material, x, y, z ) {
 
-				renderPipeline = new THREE.RenderPipeline( renderer );
-				bakedPass = pass( scene, camera );
+					const mesh = new THREE.Mesh( geometry, material );
+					mesh.position.set( x, y, z );
+					parent.add( mesh );
+					return mesh;
 
-				status = document.getElementById( 'status' );
+				}
 
-				// GUI
+				// the courtyard facade of a wing in one piece, so that no seams show: arches down to the floor below,
+				// and above a parapet upstairs
 
-				const gui = renderer.inspector.createParameters( 'Light Baking' );
-				gui.add( params, 'output', [ 'Baked GI', 'Live GI' ] ).name( 'Output' ).onChange( setOutput );
-				gui.add( params, 'algorithm', [ 'Ray Radiosity', 'Light Probe', 'VXGI' ] ).name( 'GI Algorithm' ).onChange( requestBake );
-				gui.add( params, 'resolution', [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( requestBake );
-				gui.add( params, 'denoise' ).name( 'Denoise' ).onChange( setLightMap );
-				gui.add( { bake: requestBake }, 'bake' ).name( 'Re-Bake GI' );
+				const arches = [ - 4.5, - 1.5, 1.5, 4.5 ];
+				const facadeShape = new THREE.Shape().moveTo( - 6.5, 0 );
 
-				window.addEventListener( 'resize', onWindowResize );
+				for ( const x of arches ) facadeShape.lineTo( x - 1, 0 ).lineTo( x - 1, 2.4 ).absarc( x, 2.4, 1, Math.PI, 0, true ).lineTo( x + 1, 0 );
 
-				renderer.render( scene, camera ); // one manual render call to prepare shadows
+				facadeShape.lineTo( 6, 0 ).lineTo( 6, 7.5 ).lineTo( - 6.5, 7.5 ).closePath();
+
+				for ( const x of arches ) facadeShape.holes.push( new THREE.Path().moveTo( x + 0.9, 5.2 ).lineTo( x + 0.9, 5.8 ).absarc( x, 5.8, 0.9, 0, Math.PI ).lineTo( x - 0.9, 5.2 ).closePath() );
+
+				const facade = new THREE.ExtrudeGeometry( facadeShape, { depth: 0.5, bevelEnabled: false, curveSegments: 16 } );
+				const floorSlab = new THREE.BoxGeometry( 15.5, 0.3, 2.5 );
+				const roof = new THREE.BoxGeometry( 15.2, 0.3, 3.8 );
+				const banner = new THREE.PlaneGeometry( 0.7, 2.4 );
+
+				// four wings, each one covers the corner on its left so that the walls do not overlap
+
+				for ( let i = 0; i < 4; i ++ ) {
+
+					const wing = new THREE.Group();
+					wing.rotation.y = - i * Math.PI / 2;
+					root.add( wing );
+
+					add( wing, facade, stone, 0, 0, - 6.5 );
+					add( wing, floorSlab, stone, - 1.25, 4.15, - 7.75 );
+					add( wing, roof, stone, - 1.9, 7.65, - 7.6 );
+
+					for ( const x of [ - 3, 0, 3 ] ) add( wing, banner, banners[ i ], x, 6.25, - 5.95 );
+
+				}
+
+				add( root, new THREE.PlaneGeometry( 19, 19 ), tiles, 0, 0, 0 ).rotation.x = - Math.PI / 2;
+
+				// fountain
+
+				const octagon = ( radius ) => Array.from( { length: 8 }, ( v, i ) => new THREE.Vector2( radius, 0 ).rotateAround( new THREE.Vector2(), ( i + 0.5 ) * Math.PI / 4 ) );
+
+				const basin = new THREE.Shape( octagon( 1.9 ) );
+				basin.holes.push( new THREE.Path( octagon( 1.6 ) ) );
+
+				add( root, new THREE.ExtrudeGeometry( basin, { depth: 0.55, bevelEnabled: false } ), stone, 0, 0, 0 ).rotation.x = - Math.PI / 2;
+				add( root, new THREE.ShapeGeometry( new THREE.Shape( octagon( 1.6 ) ) ), water, 0, 0.4, 0 ).rotation.x = - Math.PI / 2;
+				add( root, new THREE.CylinderGeometry( 0.2, 0.3, 1.3, 16 ), stone, 0, 0.65, 0 );
+				add( root, new THREE.CylinderGeometry( 0.8, 0.3, 0.3, 16 ), stone, 0, 1.45, 0 );
+				add( root, new THREE.SphereGeometry( 0.25, 16, 12 ), stone, 0, 1.85, 0 );
+
+				// cypresses in planters
+
+				for ( const [ x, z ] of [[ - 4.6, - 4.6 ], [ 4.6, - 4.6 ], [ 4.6, 4.6 ], [ - 4.6, 4.6 ]] ) {
+
+					add( root, new THREE.BoxGeometry( 1.2, 0.6, 1.2 ), plaster, x, 0.3, z );
+					add( root, new THREE.ConeGeometry( 0.55, 3.2, 12 ), leaves, x, 2.2, z );
+
+				}
+
+				return {
+					root, light: null, lightPanel: null, background: sky, cacheSize: 512, algorithms: [ 'Ray Radiosity', 'Light Probe' ],
+					camera: new THREE.Vector3( - 5.6, 1.6, 1.5 ), target: new THREE.Vector3( 3, 3.4, - 2.5 ),
+					probes: { size: new THREE.Vector3( 17.7, 7.5, 17.7 ), position: new THREE.Vector3( 0, 4, 0 ), counts: [ 8, 4, 8 ], far: 40 }
+				};
 
 			}
 
@@ -240,23 +359,35 @@
 
 				lightMapper?.dispose();
 				denoiser?.dispose();
-				if ( liveOutput !== livePass ) liveOutput?.dispose();
-				livePass?.dispose();
 				source?.dispose();
 
-				if ( atlas.resolution !== params.resolution ) {
+				// each mesh gets a new geometry with light map UVs, also for another resolution
+
+				if ( world.atlas?.resolution !== params.resolution ) {
 
 					const geometries = new Set( meshes.map( ( mesh ) => mesh.geometry ) );
-					atlas = unwrapUVs( scene, { resolution: params.resolution, padding: 3 } );
+					world.atlas = unwrapUVs( world.root, { resolution: params.resolution, padding: 3 } );
 
 					for ( const geometry of geometries ) geometry.dispose();
 
 				}
 
-				// ray radiosity bakes the emissive panel, light probes and VXGI the live point light
+				// in the Cornell Box, ray radiosity bakes the emissive panel, light probes and VXGI the live point
+				// light, whose shadows are rendered once for them. The Courtyard is lit by the sky
 
-				lightPanel.visible = params.algorithm === 'Ray Radiosity';
-				light.visible = lightPanel.visible === false;
+				if ( world.light !== null ) {
+
+					world.lightPanel.visible = params.algorithm === 'Ray Radiosity';
+					world.light.visible = world.lightPanel.visible === false;
+
+					if ( world.light.visible ) {
+
+						world.light.shadow.needsUpdate = true;
+						renderer.render( scene, camera );
+
+					}
+
+				}
 
 				let irradiance;
 
@@ -264,17 +395,19 @@
 
 					// rays through a BVH of the scene, with the bounces cached in a light map of their own
 
-					const radiosity = new RayTracedRadiosity();
+					const radiosity = new RayTracedRadiosity( { cacheSize: world.cacheSize } );
 					radiosity.update( renderer, scene );
 					irradiance = rayTracedRadiosityIrradiance( radiosity );
 					source = radiosity;
 
 				} else if ( params.algorithm === 'Light Probe' ) {
 
-					const probes = new LightProbeGrid( 6, 5, 6, 8, 8, 8 );
-					probes.position.set( 0, 2.5, 0 );
+					const { size, position, counts, far } = world.probes;
+
+					const probes = new LightProbeGrid( size.x, size.y, size.z, ...counts );
+					probes.position.copy( position );
 					probes.updateBoundingBox();
-					probes.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 } );
+					probes.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far } );
 					irradiance = ( position, normal ) => lightProbeGridIrradiance( probes, position, normal );
 					source = probes;
 
@@ -283,7 +416,7 @@
 					const volume = new VXGIVolume();
 					volume.update( renderer, scene );
 
-					// three cones like webgpu_vxgi, shared by the live view and the light map
+					// three cones like webgpu_vxgi
 
 					irradiance = vxgiIrradiance( volume, { coneCount: 3 } );
 					source = volume;
@@ -293,44 +426,13 @@
 				// the light map accumulates one sample per frame in animate(), with the variance of the samples
 				// for the denoiser
 
-				lightMapper = new LightMapper( renderer, atlas.resolution, irradiance, { moments: true } );
+				lightMapper = new LightMapper( renderer, world.atlas.resolution, irradiance, { moments: true } );
 				lightMapper.addObjects( meshes );
 
 				denoiser = new LightMapDenoiser( renderer, lightMapper );
-
-				// traa needs a single-sampled depth buffer
-
-				livePass = pass( scene, camera, { samples: 0 } );
-				livePass.contextNode = builtinGIContext( float( 1 ), irradiance( positionWorld, normalWorld, liveFrame ) );
-				liveOutput = livePass;
-
-				if ( params.algorithm !== 'Light Probe' ) {
-
-					// traa resolves the per-pixel noise of the cones and rays, like webgpu_vxgi
-
-					livePass.setMRT( mrt( { output, velocity } ) );
-					liveOutput = traa( livePass.getTextureNode( 'output' ), livePass.getTextureNode( 'depth' ), livePass.getTextureNode( 'velocity' ), camera );
-
-				}
-
-				setOutput();
-
-			}
-
-			function setOutput() {
-
-				const live = params.output === 'Live GI';
-
-				// discard accumulated samples when switching outputs; baking only runs in Baked GI
-
-				lightMapper.reset();
 				denoised = false;
+
 				setLightMap();
-
-				for ( const material of materials ) material.lightMapIntensity = live ? 0 : 1;
-
-				renderPipeline.outputNode = live ? liveOutput : bakedPass;
-				renderPipeline.needsUpdate = true;
 
 			}
 
@@ -366,12 +468,7 @@
 
 				const samples = bakeSamples[ params.algorithm ];
 
-				if ( params.output === 'Live GI' ) {
-
-					liveFrame.value = ( liveFrame.value + 1 ) % 64;
-					status.textContent = `Live ${ params.algorithm }`;
-
-				} else if ( lightMapper.samples < samples ) {
+				if ( lightMapper.samples < samples ) {
 
 					lightMapper.update();
 					status.textContent = `Baking ${ params.algorithm }: ${ lightMapper.samples } / ${ samples } samples`;
@@ -390,7 +487,7 @@
 
 				}
 
-				renderPipeline.render();
+				renderer.render( scene, camera );
 
 			}
 

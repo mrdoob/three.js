@@ -1,5 +1,5 @@
-import { BackSide, BufferAttribute, BufferGeometry, Color, DoubleSide, EquirectangularReflectionMapping, EquirectangularRefractionMapping, FrontSide, Matrix4, StorageBufferAttribute, StructTypeNode, Vector3 } from 'three/webgpu';
-import { Fn, If, Loop, abs, cos, cross, dFdx, dFdy, dot, float, fract, hash, int, length, normalize, pmremTexture, screenCoordinate, select, sin, smoothstep, sqrt, storage, texture, uint, uniform, uvec2, vec2, vec3 } from 'three/tsl';
+import { BackSide, BufferAttribute, BufferGeometry, Color, DoubleSide, EquirectangularReflectionMapping, EquirectangularRefractionMapping, FloatType, FrontSide, Matrix4, NodeMaterial, QuadMesh, RendererUtils, RenderTarget, StorageBufferAttribute, StructTypeNode, Vector3 } from 'three/webgpu';
+import { Fn, If, Loop, abs, asin, atan, cos, cross, dFdx, dFdy, dot, float, fract, hash, instanceIndex, int, length, luminance, mix, normalize, pmremTexture, screenCoordinate, select, sin, smoothstep, sqrt, storage, texture, textureLoad, uint, uniform, uvec2, vec2, vec3, vec4 } from 'three/tsl';
 import { MeshBVH, SAH } from 'three-mesh-bvh';
 import { BVHComputeData, bvhNodeBoundsStruct, intersectRayTriangle, rayIntersectionResultStruct, rayStruct, wgslTagCode, wgslTagFn } from 'three-mesh-bvh/webgpu';
 
@@ -9,6 +9,8 @@ const _a = /*@__PURE__*/ new Vector3();
 const _b = /*@__PURE__*/ new Vector3();
 const _c = /*@__PURE__*/ new Vector3();
 const _normal = /*@__PURE__*/ new Vector3();
+
+let _rendererState;
 const _color = /*@__PURE__*/ new Color();
 
 // fixed point increments of the R2 and R3 low-discrepancy sequences, see
@@ -16,6 +18,14 @@ const _color = /*@__PURE__*/ new Color();
 
 const R2 = [ 3242174889, 2447445414 ];
 const R3 = [ 3518319154, 2882110346, 2360945575 ];
+
+// latitude-longitude cells of the sky, sampled by their power, which is measured with a grid of
+// directions per cell
+
+const SKY_COLUMNS = 128;
+const SKY_ROWS = 64;
+const SKY_CELLS = SKY_COLUMNS * SKY_ROWS;
+const SKY_GRID = 8;
 
 // vec4 items per material, emitter and light
 
@@ -32,8 +42,8 @@ const STACK_DEPTH = 48;
  * Approximates diffuse global illumination with ray traced radiosity, as a source of irradiance for
  * {@link LightMapper}. Every sample casts cosine-distributed rays from each point through a
  * {@link https://github.com/gkjohnson/three-mesh-bvh three-mesh-bvh} BVH of the scene, and looks up
- * the light leaving the hit surfaces in a light map of the bounces. Emissive surfaces are sampled
- * directly with shadow rays, so small area lights converge quickly.
+ * the light leaving the hit surfaces in a light map of the bounces. Emissive surfaces and the sky are
+ * also sampled directly with shadow rays, so small area lights and suns converge quickly.
  *
  * The bounces are cached in a light map that `update()` solves iteratively, so the meshes need light
  * map UVs in `uv1`, e.g. generated with {@link unwrapUVs}. Meshes without them block light but do not
@@ -126,9 +136,11 @@ class RayTracedRadiosity {
 		this._lightMapMeshes = [];
 		this._cache = null;
 		this._environment = null;
+		this._sky = null;
 
 		this._environmentIntensity = uniform( 1 );
 		this._environmentRotation = uniform( new Matrix4() );
+		this._environmentInverseRotation = uniform( new Matrix4() );
 
 		// the sample sequences continue with every render call of the gathering materials
 
@@ -149,6 +161,7 @@ class RayTracedRadiosity {
 
 		this._clear();
 		this._collect( scene );
+		this._createSky( renderer );
 		this._createTrace();
 
 		if ( this.bounces > 0 ) {
@@ -188,9 +201,9 @@ class RayTracedRadiosity {
 
 		}
 
-		for ( const buffer of [ this._triangles, this._materials, this._lights, this._emitters ] ) buffer?.value.dispose();
+		for ( const buffer of [ this._triangles, this._materials, this._lights, this._emitters, this._sky ] ) buffer?.value.dispose();
 
-		this._triangles = this._materials = this._lights = this._emitters = null;
+		this._triangles = this._materials = this._lights = this._emitters = this._sky = null;
 
 		if ( this._cache !== null ) {
 
@@ -220,7 +233,8 @@ class RayTracedRadiosity {
 
 			this._environment = background;
 			this._environmentIntensity.value = scene.backgroundIntensity;
-			this._environmentRotation.value.makeRotationFromEuler( scene.backgroundRotation ).transpose();
+			this._environmentInverseRotation.value.makeRotationFromEuler( scene.backgroundRotation );
+			this._environmentRotation.value.copy( this._environmentInverseRotation.value ).transpose();
 
 		} else {
 
@@ -421,6 +435,121 @@ class RayTracedRadiosity {
 		this._lightCount = lights.length / ( LIGHT_STRIDE * 4 );
 		this._emitters = vec4Storage( createEmitters( emitters ) );
 		this._emitterCount = emitters.length;
+
+	}
+
+	/**
+	 * Builds the table that samples the sky by the power of its latitude-longitude cells, measured on
+	 * the GPU from the radiance that the rays see. So any equirectangular or cube texture works, also
+	 * without data on the CPU, like the textures of TextureLoader and CubeTextureLoader, and render
+	 * targets. A cell stores its power and the sum of the powers of its row up to it. Then an item per
+	 * row stores the power of the row, the sum of the powers of the rows up to it, and the factor that
+	 * turns the power of a cell of the row into its density over the solid angle.
+	 *
+	 * @private
+	 * @param {WebGPURenderer} renderer - The renderer.
+	 */
+	_createSky( renderer ) {
+
+		const environment = this._environment;
+
+		if ( environment === null ) return;
+
+		const attribute = new StorageBufferAttribute( new Float32Array( ( SKY_CELLS + SKY_ROWS ) * 4 ), 4 );
+		const table = storage( attribute, 'vec4', SKY_CELLS + SKY_ROWS );
+
+		// the power of a cell is its mean luminance times its solid angle, from a grid of directions that
+		// are distributed over the solid angle like the shadow rays, see _gather()
+
+		const target = new RenderTarget( SKY_COLUMNS, SKY_ROWS, { type: FloatType, depthBuffer: false } );
+		const material = new NodeMaterial();
+
+		material.fragmentNode = Fn( () => {
+
+			const cell = vec2( uvec2( screenCoordinate.xy ) ).toVar();
+			const lower = sin( cell.y.div( SKY_ROWS ).sub( 0.5 ).mul( Math.PI ) ).toVar();
+			const upper = sin( cell.y.add( 1 ).div( SKY_ROWS ).sub( 0.5 ).mul( Math.PI ) ).toVar();
+			const sum = float( 0 ).toVar();
+
+			Loop( SKY_GRID, SKY_GRID, ( { i, j } ) => {
+
+				const phi = cell.x.add( float( i ).add( 0.5 ).div( SKY_GRID ) ).div( SKY_COLUMNS ).sub( 0.5 ).mul( 2 * Math.PI ).toVar();
+				const z = mix( lower, upper, float( j ).add( 0.5 ).div( SKY_GRID ) ).toVar();
+				const r = sqrt( z.mul( z ).oneMinus().max( 0 ) );
+
+				sum.addAssign( luminance( pmremTexture( environment, vec3( r.mul( cos( phi ) ), z, r.mul( sin( phi ) ) ), float( 0 ) ).rgb ) );
+
+			} );
+
+			return vec4( sum.mul( upper.sub( lower ).mul( 2 * Math.PI / ( SKY_COLUMNS * SKY_GRID * SKY_GRID ) ) ), 0, 0, 1 );
+
+		} )();
+
+		const quad = new QuadMesh( material );
+
+		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
+
+		renderer.setRenderTarget( target );
+		quad.render( renderer );
+
+		RendererUtils.restoreRendererState( renderer, _rendererState );
+
+		// the sums of the powers along the rows, then over the rows. Invalid and infinite powers count as none
+
+		const sumRows = Fn( () => {
+
+			const row = instanceIndex;
+			const sum = float( 0 ).toVar();
+
+			Loop( SKY_COLUMNS, ( { i } ) => {
+
+				const power = textureLoad( target.texture, uvec2( i, row ) ).x.toVar();
+				const value = select( power.greaterThan( 0 ).and( power.lessThan( 1e30 ) ), power, float( 0 ) ).toVar();
+
+				sum.addAssign( value );
+				table.element( row.mul( SKY_COLUMNS ).add( uint( i ) ) ).assign( vec4( value, sum, 0, 0 ) );
+
+			} );
+
+			table.element( row.add( SKY_CELLS ) ).assign( vec4( sum, 0, 0, 0 ) );
+
+		} )().compute( SKY_ROWS );
+
+		const sumSky = Fn( () => {
+
+			const total = float( 0 ).toVar();
+
+			Loop( SKY_ROWS, ( { i } ) => {
+
+				const item = table.element( uint( i ).add( SKY_CELLS ) );
+
+				total.addAssign( item.x );
+				item.assign( vec4( item.x, total, 0, 0 ) );
+
+			} );
+
+			// the density of a cell is its share of the total power over its solid angle
+
+			Loop( SKY_ROWS, ( { i } ) => {
+
+				const item = table.element( uint( i ).add( SKY_CELLS ) );
+				const row = float( i );
+				const solidAngle = sin( row.add( 1 ).div( SKY_ROWS ).sub( 0.5 ).mul( Math.PI ) ).sub( sin( row.div( SKY_ROWS ).sub( 0.5 ).mul( Math.PI ) ) ).mul( 2 * Math.PI / SKY_COLUMNS );
+
+				item.assign( vec4( item.xy, select( total.greaterThan( 0 ), float( 1 ).div( total.mul( solidAngle ) ), float( 0 ) ), 0 ) );
+
+			} );
+
+		} )().compute( 1 );
+
+		renderer.compute( [ sumRows, sumSky ] );
+
+		sumRows.dispose();
+		sumSky.dispose();
+		material.dispose();
+		target.dispose();
+
+		this._sky = storage( attribute, 'vec4', SKY_CELLS + SKY_ROWS ).toReadOnly();
 
 	}
 
@@ -760,6 +889,53 @@ class RayTracedRadiosity {
 			const emitterCount = this._emitterCount;
 			const cache = this._cache !== null ? texture( this._cache.texture ) : null;
 			const environment = this._environment;
+			const sky = this._sky;
+
+			// the sky radiance in a world direction, times pi, and the density of sampling it by the sky table
+
+			const skyRadiance = ( direction ) => pmremTexture( environment, this._environmentRotation.mul( direction ), float( 0 ) ).rgb.mul( this._environmentIntensity.mul( Math.PI ) );
+
+			const skyDensity = ( direction ) => {
+
+				const local = this._environmentRotation.mul( direction ).xyz.toVar();
+				const column = int( atan( local.z, local.x ).div( 2 * Math.PI ).add( 0.5 ).mul( SKY_COLUMNS ) ).clamp( 0, SKY_COLUMNS - 1 );
+				const row = int( asin( local.y.clamp( - 1, 1 ) ).div( Math.PI ).add( 0.5 ).mul( SKY_ROWS ) ).clamp( 0, SKY_ROWS - 1 );
+
+				return sky.element( row.mul( SKY_COLUMNS ).add( column ) ).x.mul( sky.element( row.add( SKY_CELLS ) ).z );
+
+			};
+
+			// the first of the items of the sky table from an offset whose sum of powers exceeds a target, by
+			// a binary search of a power of two items
+
+			const searchSky = ( offset, count, target ) => {
+
+				const low = int( 0 ).toVar();
+				const high = int( count - 1 ).toVar();
+
+				Loop( Math.log2( count ), () => {
+
+					const middle = low.add( high ).shiftRight( 1 ).toVar();
+
+					If( sky.element( middle.add( offset ) ).y.greaterThan( target ), () => {
+
+						high.assign( middle );
+
+					} ).Else( () => {
+
+						low.assign( middle.add( 1 ) );
+
+					} );
+
+				} );
+
+				return low;
+
+			};
+
+			// power heuristic of two strategies with one sample each
+
+			const misWeight = ( density, otherDensity ) => density.mul( density ).div( density.mul( density ).add( otherDensity.mul( otherDensity ) ).max( 1e-20 ) );
 
 			const position = positionNode.toVar();
 
@@ -784,9 +960,10 @@ class RayTracedRadiosity {
 			// pixel, which decorrelates neighbouring pixels but keeps the rays of a workgroup coherent
 
 			const pixel = uvec2( screenCoordinate.xy );
-			const seed = uint( hash( pixel.x.add( pixel.y.mul( 65536 ) ) ).mul( 9 ) ).min( 8 ).mul( 5 ).toVar();
+			const seed = uint( hash( pixel.x.add( pixel.y.mul( 65536 ) ) ).mul( 9 ) ).min( 8 ).mul( 8 ).toVar();
 			const offset = vec2( hash( seed ), hash( seed.add( 1 ) ) ).toVar();
 			const emitterOffset = vec3( hash( seed.add( 2 ) ), hash( seed.add( 3 ) ), hash( seed.add( 4 ) ) ).toVar();
+			const skyOffset = vec3( hash( seed.add( 5 ) ), hash( seed.add( 6 ) ), hash( seed.add( 7 ) ) ).toVar();
 
 			const gathered = vec3( 0 ).toVar();
 
@@ -822,13 +999,13 @@ class RayTracedRadiosity {
 
 					} );
 
-					// rays that leave the scene see the sky
+					// rays that leave the scene see the sky, weighted against sampling it with the shadow rays
 
 					if ( environment !== null ) {
 
 						surface.Else( () => {
 
-							gathered.addAssign( pmremTexture( environment, this._environmentRotation.mul( direction ), float( 0 ) ).rgb.mul( this._environmentIntensity.mul( Math.PI ) ) );
+							gathered.addAssign( skyRadiance( direction ).mul( misWeight( dot( normal, direction ).div( Math.PI ), skyDensity( direction ) ) ) );
 
 						} );
 
@@ -890,6 +1067,40 @@ class RayTracedRadiosity {
 						const scale = cosReceiver.mul( cosLight ).mul( edge1.w ).div( distanceSq ).min( Math.PI ).div( emission.w );
 
 						gathered.addAssign( emission.rgb.mul( scale ).mul( visibility( origin, direction, distance.mul( 0.999 ) ) ) );
+
+					} );
+
+				}
+
+				// shadow ray to the sky, to a cell picked by its power, first its row and then its column by the
+				// sums of the powers, and a uniformly distributed direction in the cell
+
+				if ( sky !== null ) {
+
+					const v = fract( skyOffset.add( vec3( float( n.mul( R3[ 0 ] ) ), float( n.mul( R3[ 1 ] ) ), float( n.mul( R3[ 2 ] ) ) ).mul( 2 ** - 32 ) ) ).toVar();
+
+					const target = v.x.mul( sky.element( SKY_CELLS + SKY_ROWS - 1 ).y ).toVar();
+					const rowIndex = searchSky( SKY_CELLS, SKY_ROWS, target ).toVar();
+					const rowItem = sky.element( rowIndex.add( SKY_CELLS ) ).toVar();
+
+					target.subAssign( rowItem.y.sub( rowItem.x ) );
+
+					const columnIndex = searchSky( rowIndex.mul( SKY_COLUMNS ), SKY_COLUMNS, target ).toVar();
+					const density = sky.element( rowIndex.mul( SKY_COLUMNS ).add( columnIndex ) ).x.mul( rowItem.z ).toVar();
+
+					const column = float( columnIndex );
+					const row = float( rowIndex );
+					const phi = column.add( v.y ).div( SKY_COLUMNS ).sub( 0.5 ).mul( 2 * Math.PI ).toVar();
+					const z = mix( sin( row.div( SKY_ROWS ).sub( 0.5 ).mul( Math.PI ) ), sin( row.add( 1 ).div( SKY_ROWS ).sub( 0.5 ).mul( Math.PI ) ), v.z ).toVar();
+					const r = sqrt( z.mul( z ).oneMinus().max( 0 ) );
+					const direction = normalize( this._environmentInverseRotation.mul( vec3( r.mul( cos( phi ) ), z, r.mul( sin( phi ) ) ) ).xyz ).toVar();
+					const cosReceiver = dot( normal, direction ).toVar();
+
+					If( cosReceiver.greaterThan( 0 ).and( density.greaterThan( 0 ) ).and( dot( direction, faceNormal ).greaterThan( 0 ) ), () => {
+
+						const weight = misWeight( density, cosReceiver.div( Math.PI ) );
+
+						gathered.addAssign( skyRadiance( direction ).mul( cosReceiver.mul( weight ).mul( visibility( origin, direction, float( 0 ) ) ).div( density.mul( Math.PI ) ) ) );
 
 					} );
 
