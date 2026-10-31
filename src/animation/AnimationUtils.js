@@ -348,15 +348,22 @@ function makeClipAdditive( targetClip, referenceFrame = 0, referenceClip = targe
 
 			if ( referenceTrackType === 'quaternion' ) {
 
-				// Multiply the conjugate for quaternion track types
-				Quaternion.multiplyQuaternionsFlat(
-					targetTrack.values,
-					valueStart,
-					referenceValue,
-					0,
-					targetTrack.values,
-					valueStart
-				);
+				// Transform both the keyframe and any cubic spline tangents.
+				// Tangents are derivatives, so their magnitudes must be preserved.
+				for ( let k = 0; k < targetValueSize; k += 4 ) {
+
+					const offset = j * targetValueSize + k;
+
+					Quaternion.multiplyQuaternionsFlat(
+						targetTrack.values,
+						offset,
+						referenceValue,
+						0,
+						targetTrack.values,
+						offset
+					);
+
+				}
 
 			} else {
 
