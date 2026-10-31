@@ -110,7 +110,7 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 		const instanceStart = this.attributes.instanceStart;
 
-		if ( instanceStart !== undefined && instanceStart.isInterleavedBufferAttribute === true && instanceStart.count === lineSegments.length / 6 ) {
+		if ( instanceStart !== undefined && instanceStart.count === lineSegments.length / 6 ) {
 
 			instanceStart.data.array = lineSegments;
 			instanceStart.data.needsUpdate = true;
@@ -158,7 +158,7 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 		const instanceColorStart = this.attributes.instanceColorStart;
 
-		if ( instanceColorStart !== undefined && instanceColorStart.isInterleavedBufferAttribute === true && instanceColorStart.count === colors.length / 6 ) {
+		if ( instanceColorStart !== undefined && instanceColorStart.count === colors.length / 6 ) {
 
 			instanceColorStart.data.array = colors;
 			instanceColorStart.data.needsUpdate = true;

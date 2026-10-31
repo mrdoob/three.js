@@ -302,7 +302,7 @@ class LineSegments2 extends Mesh {
 
 		const instanceDistanceStart = geometry.attributes.instanceDistanceStart;
 
-		if ( instanceDistanceStart !== undefined && instanceDistanceStart.isInterleavedBufferAttribute === true && instanceDistanceStart.count === instanceStart.count ) {
+		if ( instanceDistanceStart !== undefined && instanceDistanceStart.count === instanceStart.count ) {
 
 			instanceDistanceStart.data.array = lineDistances;
 			instanceDistanceStart.data.needsUpdate = true;
