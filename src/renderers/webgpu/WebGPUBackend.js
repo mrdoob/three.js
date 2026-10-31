@@ -202,59 +202,10 @@ class WebGPUBackend extends Backend {
 
 		await super.init( renderer );
 
-		//
-
+		/** @type {WebGPUBackend~Options} */
 		const parameters = this.parameters;
 
-		// create the device if it is not passed with parameters
-
-		/** @type {GPUDevice} */
-		let device;
-
-		if ( parameters.device === undefined ) {
-
-			const adapterOptions = {
-				powerPreference: parameters.powerPreference,
-				featureLevel: 'compatibility',
-				xrCompatible: renderer.xr.enabled
-			};
-
-			const adapter = ( typeof navigator !== 'undefined' ) ? await navigator.gpu.requestAdapter( adapterOptions ) : null;
-
-			if ( adapter === null ) {
-
-				throw new Error( 'THREE.WebGPUBackend: Unable to create WebGPU adapter.' );
-
-			}
-
-			// feature support
-
-			const features = Object.values( GPUFeatureName );
-
-			const supportedFeatures = [];
-
-			for ( const name of features ) {
-
-				if ( adapter.features.has( name ) ) {
-
-					supportedFeatures.push( name );
-
-				}
-
-			}
-
-			const deviceDescriptor = {
-				requiredFeatures: supportedFeatures,
-				requiredLimits: parameters.requiredLimits
-			};
-
-			device = await adapter.requestDevice( deviceDescriptor );
-
-		} else {
-
-			device = parameters.device;
-
-		}
+		const device = parameters.device !== undefined ? parameters.device : await this._requestDevice( renderer );
 
 		this.compatibilityMode = ! device.features.has( 'core-features-and-limits' );
 
@@ -299,6 +250,59 @@ class WebGPUBackend extends Backend {
 		this.trackTimestamp = this.trackTimestamp && this.hasFeature( GPUFeatureName.TimestampQuery );
 
 		this.updateSize();
+
+	}
+
+	/**
+	 * Requests a WebGPU adapter and creates a new device from it.
+	 *
+	 * @private
+	 * @param {Renderer} renderer - The renderer, used to determine XR compatibility.
+	 * @return {Promise<GPUDevice>} A Promise that resolves with the created device.
+	 * @throws {Error} If no WebGPU adapter is available.
+	 */
+	async _requestDevice( renderer ) {
+
+		const parameters = this.parameters;
+
+		const adapterOptions = {
+			powerPreference: parameters.powerPreference,
+			featureLevel: 'compatibility',
+			xrCompatible: renderer.xr.enabled
+		};
+
+		const adapter = ( typeof navigator !== 'undefined' ) ? await navigator.gpu.requestAdapter( adapterOptions ) : null;
+
+		if ( adapter === null ) {
+
+			throw new Error( 'THREE.WebGPUBackend: Unable to create WebGPU adapter.' );
+
+		}
+
+		// feature support
+
+		const features = Object.values( GPUFeatureName );
+
+		const supportedFeatures = [];
+
+		for ( const name of features ) {
+
+			if ( adapter.features.has( name ) ) {
+
+				supportedFeatures.push( name );
+
+			}
+
+		}
+
+		const deviceDescriptor = {
+			requiredFeatures: supportedFeatures,
+			requiredLimits: parameters.requiredLimits
+		};
+
+		const device = await adapter.requestDevice( deviceDescriptor );
+
+		return device;
 
 	}
 
