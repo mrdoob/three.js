@@ -83,7 +83,13 @@ class FileLoader extends Loader {
 
 		url = this.manager.resolveURL( url );
 
-		const cached = Cache.get( `file:${url}` );
+		// Record the response format before checking cached or duplicate requests.
+		const mimeType = this.mimeType;
+		const responseType = this.responseType || 'text';
+		const key = ( responseType === 'text' && mimeType === '' ) ? `file:${url}` :
+			`file-${encodeURIComponent( JSON.stringify( [ responseType, mimeType ] ) )}:${url}`;
+
+		const cached = Cache.get( key );
 
 		if ( cached !== undefined ) {
 
@@ -103,9 +109,9 @@ class FileLoader extends Loader {
 
 		// Check if request is duplicate
 
-		if ( loading[ url ] !== undefined ) {
+		if ( loading[ key ] !== undefined ) {
 
-			loading[ url ].push( {
+			loading[ key ].push( {
 
 				onLoad: onLoad,
 				onProgress: onProgress,
@@ -118,9 +124,9 @@ class FileLoader extends Loader {
 		}
 
 		// Initialise array for duplicate requests
-		loading[ url ] = [];
+		loading[ key ] = [];
 
-		loading[ url ].push( {
+		loading[ key ].push( {
 			onLoad: onLoad,
 			onProgress: onProgress,
 			onError: onError,
@@ -134,10 +140,6 @@ class FileLoader extends Loader {
 			cache: this.cache,
 			signal: ( typeof AbortSignal.any === 'function' ) ? AbortSignal.any( [ this._abortController.signal, this.manager.abortController.signal ] ) : this._abortController.signal
 		} );
-
-		// record states ( avoid data race )
-		const mimeType = this.mimeType;
-		const responseType = this.responseType;
 
 		// start the fetch
 		fetch( req )
@@ -162,7 +164,7 @@ class FileLoader extends Loader {
 
 					}
 
-					const callbacks = loading[ url ];
+					const callbacks = loading[ key ];
 					const reader = response.body.getReader();
 
 					// Nginx needs X-File-Size check
@@ -274,10 +276,10 @@ class FileLoader extends Loader {
 
 				// Add to cache only on HTTP success, so that we do not cache
 				// error response bodies as proper responses to requests.
-				Cache.add( `file:${url}`, data );
+				Cache.add( key, data );
 
-				const callbacks = loading[ url ];
-				delete loading[ url ];
+				const callbacks = loading[ key ];
+				delete loading[ key ];
 
 				for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
 
@@ -291,17 +293,17 @@ class FileLoader extends Loader {
 
 				// Abort errors and other errors are handled the same
 
-				const callbacks = loading[ url ];
+				const callbacks = loading[ key ];
 
 				if ( callbacks === undefined ) {
 
-					// When onLoad was called and url was deleted in `loading`
+					// When onLoad was called and key was deleted in `loading`
 					this.manager.itemError( url );
 					throw err;
 
 				}
 
-				delete loading[ url ];
+				delete loading[ key ];
 
 				for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
 
