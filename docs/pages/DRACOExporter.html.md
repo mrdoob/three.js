@@ -28,7 +28,7 @@ import { DRACOExporter } from 'three/addons/exporters/DRACOExporter.js';
 
 ### new DRACOExporter()
 
-## Properties
+## Static Properties
 
 ### .MESH_EDGEBREAKER_ENCODING : number (constant)
 

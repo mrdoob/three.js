@@ -22,7 +22,7 @@ Constructs a new Decorated Torus Knot 4b.
 
 The curve's scale.
 
-Default is `1`.
+Default is `40`.
 
 ## Properties
 

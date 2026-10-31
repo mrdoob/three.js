@@ -241,10 +241,10 @@ The last parameter must be the callback method that should be executed in the <c
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this stack node.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="addToStackBefore" translate="no">.<a href="#addToStackBefore">addToStackBefore</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="StackNode.html">StackNode</a></span> </h3>
+					<h3 class="name name-method" id="addToStackBefore" translate="no">.<a href="#addToStackBefore">addToStackBefore</a><span class="signature">( node : <span class="param-type"><a href="Node.html">Node</a></span>, beforeNode : <span class="param-type"><a href="Node.html">Node</a></span> )</span><span class="type-signature"> : <a href="StackNode.html">StackNode</a></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Adds a node to the stack before the current node.</p>
+							<p>Adds a node to the stack before the given node, by default the current node.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -254,6 +254,15 @@ The last parameter must be the callback method that should be executed in the <c
 									</td>
 									<td class="description last">
 										<p>The node to add.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">beforeNode</strong>
+									</td>
+									<td class="description last">
+										<p>The node of the stack that the node is added before.</p>
+										<p>Default is <code>this._currentNode</code>.</p>
 									</td>
 								</tr>
 							</tbody>

@@ -19,7 +19,9 @@ mip chain, a direct radiance volume and a radiance volume with cached bounces.</
 opacity stores visibility per major axis and is filtered directionally (volumetric integration
 along the axis, averaging across it), radiance is stored opacity-premultiplied and indirect bounces
 are cached in the volume via cone tracing. Only direct lights are injected.
-Voxelization uses conservative rasterization along the dominant triangle axis in a compute shader.</p>
+Voxelization uses conservative rasterization along the dominant triangle axis in a compute shader.
+The interiors of closed meshes are filled, so cones starting inside an object (e.g. near contact
+points) are blocked.</p>
 <p>Direct light is injected per voxel instead of splatting photons from a light-view map as in the
 paper: the shadow maps rendered by the renderer are the light-view maps, and every occupied voxel
 pulls its visibility from them (2D maps for directional and spot lights, cube maps for point
@@ -34,6 +36,8 @@ is stored (no incoming direction distribution for glossy cones).</p>
 <li><a href="https://research.nvidia.com/publication/2011-09_interactive-indirect-illumination-using-voxel-cone-tracing" target="_blank" rel="noopener">https://research.nvidia.com/publication/2011-09_interactive-indirect-illumination-using-voxel-cone-tracing</a>:
 Crassin et al., Interactive Indirect Illumination Using Voxel Cone Tracing, Pacific Graphics 2011.</li>
 <li><a href="https://developer.nvidia.com/content/basics-gpu-voxelization" target="_blank" rel="noopener">https://developer.nvidia.com/content/basics-gpu-voxelization</a>: Basics of GPU voxelization.</li>
+<li><a href="https://doi.org/10.1145/1882261.1866201" target="_blank" rel="noopener">https://doi.org/10.1145/1882261.1866201</a>: Schwarz and Seidel, Fast Parallel Surface and Solid
+Voxelization on GPUs, ACM Transactions on Graphics 2010.</li>
 </ul>
 <p>Note: This class can only be used with <code>WebGPURenderer</code> and a WebGPU backend.</p></div>
 			</header>

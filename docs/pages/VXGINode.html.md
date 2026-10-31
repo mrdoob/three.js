@@ -1,4 +1,4 @@
-*Inheritance: EventDispatcher → Node → TempNode →*
+*Inheritance: EventDispatcher → Node →*
 
 # VXGINode
 
@@ -131,7 +131,7 @@ Set to `true` to re-inject lighting in the next frame.
 
 Set to `true` to re-voxelize the scene in the next frame.
 
-**Overrides:** [TempNode#needsUpdate](TempNode.html#needsUpdate)
+**Overrides:** [Node#needsUpdate](Node.html#needsUpdate)
 
 ### .normalNode : TextureNode
 
@@ -153,7 +153,7 @@ The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders i
 
 Default is `'frame'`.
 
-**Overrides:** [TempNode#updateBeforeType](TempNode.html#updateBeforeType)
+**Overrides:** [Node#updateBeforeType](Node.html#updateBeforeType)
 
 ### .useTemporalFiltering : boolean
 
@@ -171,7 +171,7 @@ The voxel volume. Use it to configure bounds, layers and bounces.
 
 Frees internal resources. This method should be called when the effect is no longer required.
 
-**Overrides:** [TempNode#dispose](TempNode.html#dispose)
+**Overrides:** [Node#dispose](Node.html#dispose)
 
 ### .getAONode() : PassTextureNode
 
@@ -205,7 +205,7 @@ This method is used to setup the effect's TSL code.
 
 The current node builder.
 
-**Overrides:** [TempNode#setup](TempNode.html#setup)
+**Overrides:** [Node#setup](Node.html#setup)
 
 ### .updateBefore( frame : NodeFrame )
 
@@ -215,7 +215,7 @@ This method is used to render the effect once per frame.
 
 The current node frame.
 
-**Overrides:** [TempNode#updateBefore](TempNode.html#updateBefore)
+**Overrides:** [Node#updateBefore](Node.html#updateBefore)
 
 ## Source
 

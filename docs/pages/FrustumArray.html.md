@@ -46,6 +46,16 @@ The frustum array to copy.
 
 **Returns:** A reference to this frustum array.
 
+### .getFrustum( index : number ) : Frustum | undefined
+
+Returns the cached frustum for the sub-camera at the given index.
+
+**index**
+
+The sub-camera index.
+
+**Returns:** The cached frustum.
+
 ### .intersectsBox( box : Box3 ) : boolean
 
 Returns `true` if the given bounding box is intersecting any cached frustum.

@@ -1,4 +1,4 @@
-import { DataTexture, FloatType, RGBAFormat, Vector2, Vector3, LightsNode, NodeUpdateType, PointLightNode, SpotLightNode } from 'three/webgpu';
+import { DataTexture, FloatType, RGBAFormat, Vector2, Vector3, LightsNode, NodeUpdateType, NodeUtils, PointLightNode, SpotLightNode } from 'three/webgpu';
 
 import {
 	instancedArray, nodeProxy, int, float, vec3, vec4, ivec2, ivec4, uniform, Break, Loop, positionView,
@@ -108,13 +108,15 @@ class ClusteredLightsNode extends LightsNode {
 
 	/**
 	 * Overwrites the default {@link LightsNode#customCacheKey} implementation by
-	 * including the cluster grid into the cache key.
+	 * including the node identity and resource version into the cache key.
 	 *
 	 * @return {number} The custom cache key.
 	 */
 	customCacheKey() {
 
-		return ( this._compute ? this._compute.getCacheKey() : 0 ) + super.customCacheKey();
+		// First use allocates the grid after material cache keys have been computed.
+		// Keep that allocation stable, but never share bindings between lights nodes.
+		return NodeUtils.hash( this.id, this.version, super.customCacheKey() );
 
 	}
 
@@ -765,6 +767,9 @@ class ClusteredLightsNode extends LightsNode {
 		// rebuilds only happen outside of rendering (see _initGrid()), so the replaced resources can be freed
 
 		if ( this._compute !== null ) {
+
+			// Replacing storage requires new material bindings. The initial allocation does not.
+			this.needsUpdate = true;
 
 			this._compute.dispose();
 			this._lightIndexes.value.dispose();

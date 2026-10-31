@@ -17,7 +17,10 @@
 this class if you have to render a large number of objects with the same
 material but with different geometries or world transformations. The usage of
 <code>BatchedMesh</code> will help you to reduce the number of draw calls and thus improve the overall
-rendering performance in your application.</p></div>
+rendering performance in your application.</p>
+<p>The first geometry added defines the layout of the batch. All subsequent geometries must
+match its index usage and provide its attributes with the same itemSize and normalized
+values. Additional attributes are ignored.</p></div>
 				<h2>Code Example</h2>
 				<div translate="no"><pre><code class="language-js">const box = new THREE.BoxGeometry( 1, 1, 1 );
 const sphere = new THREE.SphereGeometry( 1, 12, 12 );
@@ -231,15 +234,15 @@ a new id referring to the new instance to be used by other functions.</p>
 						<div class="description">
 							<p>Computes the bounding box, updating <a href="BatchedMesh.html#boundingBox">BatchedMesh#boundingBox</a>.
 Bounding boxes aren't computed by default. They need to be explicitly computed,
-otherwise they are <code>null</code>.</p>
+otherwise they are <code>null</code>. Must be recomputed when instances change.</p>
 						</div>
 					</div>
 					<h3 class="name name-method" id="computeBoundingSphere" translate="no">.<a href="#computeBoundingSphere">computeBoundingSphere</a><span class="signature">()</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Computes the bounding sphere, updating <a href="BatchedMesh.html#boundingSphere">BatchedMesh#boundingSphere</a>.
-Bounding spheres aren't computed by default. They need to be explicitly computed,
-otherwise they are <code>null</code>.</p>
+The engine computes the bounding sphere once when it is needed. Must be
+recomputed when instances change.</p>
 						</div>
 					</div>
 					<h3 class="name name-method" id="deleteGeometry" translate="no">.<a href="#deleteGeometry">deleteGeometry</a><span class="signature">( geometryId : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BatchedMesh.html">BatchedMesh</a></span> </h3>
@@ -407,7 +410,7 @@ method whenever this instance is no longer used in your app.</p>
 					<div class="method">
 						<div class="description">
 							<p>Get the range representing the subset of triangles related to the attached geometry,
-indicating the starting offset and count, or <code>null</code> if invalid.</p>
+indicating the starting offset and count, or throws an error if invalid.</p>
 						</div>
 						<table class="params">
 							<tbody>

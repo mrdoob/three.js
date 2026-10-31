@@ -30,7 +30,8 @@ UV seams.</p>
 <p>In comparison to this method, <a href="BufferGeometry.html#computeTangents">BufferGeometry#computeTangents</a> (a custom algorithm) generates tangents that
 probably will not match the tangents in other software. The custom algorithm is sufficient for general use with a
 custom material, and may be faster than MikkTSpace.</p>
-<p>Returns the original BufferGeometry. Indexed geometries will be de-indexed. Requires position, normal, and uv attributes.</p>
+<p>Returns the original BufferGeometry. Indexed geometries will be de-indexed. Requires position, normal, and uv attributes.
+Tangents are stored like the normals: normalized Int8 or Int16 when the normals are, Float32 otherwise.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -48,7 +49,7 @@ custom material, and may be faster than MikkTSpace.</p>
 									</td>
 									<td class="description last">
 										<p>Instance of <code>examples/jsm/libs/mikktspace.module.js</code>, or <code>mikktspace</code> npm package.
-Await <code>MikkTSpace.ready</code> before use.</p>
+The bundled JavaScript implementation is ready immediately. Await <code>MikkTSpace.ready</code> before using a WebAssembly implementation.</p>
 									</td>
 								</tr>
 								<tr>
@@ -299,6 +300,45 @@ Instances of <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribut
 							<dt class="tag-returns"><strong>Returns:</strong> <ul>
 <li>The new geometry with merged vertices.</li>
 </ul></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="~remapAttribute" translate="no">.<a href="#~remapAttribute">remapAttribute</a><span class="signature">( attribute : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a> | <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a></span>, sourceIndices : <span class="param-type">Array.&lt;number> | TypedArray</span>, buffers : <span class="param-type">Map.&lt;<a href="InterleavedBuffer.html">InterleavedBuffer</a>, <a href="InterleavedBuffer.html">InterleavedBuffer</a>></span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a> | <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a></span> <span class="type-signature">(inner) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies attribute entries in the order specified by the source vertex indices.
+Preserves raw values, attribute type and metadata. Reuse the same buffer map
+across calls to preserve shared interleaved buffers for the same mapping.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">attribute</strong>
+									</td>
+									<td class="description last">
+										<p>The source attribute.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">sourceIndices</strong>
+									</td>
+									<td class="description last">
+										<p>The source index for each output vertex.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">buffers</strong>
+									</td>
+									<td class="description last">
+										<p>Shared interleaved buffer copies.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The remapped attribute.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="~toCreasedNormals" translate="no">.<a href="#~toCreasedNormals">toCreasedNormals</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, creaseAngle : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> <span class="type-signature">(inner) </span></h3>

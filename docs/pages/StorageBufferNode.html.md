@@ -108,7 +108,7 @@ The current node builder.
 
 ### .generateNodeType( builder : NodeBuilder ) : string
 
-This method is overwritten since the node type from the availability of storage buffers and the attribute data.
+This method is overwritten since the node type is inferred from the struct type if present.
 
 **builder**
 

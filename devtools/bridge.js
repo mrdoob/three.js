@@ -1,4 +1,4 @@
-/* global MESSAGE_ID, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, EVENT_REGISTER, EVENT_OBSERVE, EVENT_RENDERER, EVENT_SCENE, EVENT_SCENE_REMOVED, EVENT_OBJECT_DETAILS */
+/* global MESSAGE_ID, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, MESSAGE_SELECT_OBJECTS, EVENT_REGISTER, EVENT_OBSERVE, EVENT_RENDERER, EVENT_SCENE, EVENT_SCENE_REMOVED, EVENT_OBJECT_DETAILS */
 
 /**
  * Injected into the page by the three.js DevTools extension. Exposes
@@ -24,26 +24,7 @@
 	Object.defineProperty( window, '__THREE_DEVTOOLS__', { value: devTools, enumerable: true } );
 
 	// Shared with highlight.js and preview.js, which add their own functions here
-	devTools.utils = { findObjectInScenes, unobserved, getSceneView };
-
-	// Create an object without reporting it to the panel, for the renderer and scene of preview.js
-	let observing = true;
-
-	function unobserved( create ) {
-
-		observing = false;
-
-		try {
-
-			return create();
-
-		} finally {
-
-			observing = true;
-
-		}
-
-	}
+	devTools.utils = { findObjectInScenes, getSceneView };
 
 	// Send a message to the panel (relayed by the content script)
 	function postToPanel( name, detail ) {
@@ -197,7 +178,7 @@
 
 			if ( HIDDEN_MATERIAL_PROPERTIES.test( name ) ) continue;
 
-			const formatted = formatMaterialValue( value );
+			const formatted = formatPropertyValue( value );
 			if ( formatted !== undefined ) properties[ name ] = formatted;
 
 		}
@@ -206,8 +187,60 @@
 
 	}
 
+	// What the light classes add to Object3D, listed for the lights that have them
+	const LIGHT_PROPERTIES = [ 'color', 'groundColor', 'intensity', 'distance', 'decay', 'angle', 'penumbra', 'width', 'height', 'depth', 'resolution', 'falloff', 'map', 'iesMap' ];
+
+	// The shadow settings, and the bounds of the camera the shadow map is rendered from. A spot or point
+	// light sets the field of view itself, so it is left out.
+	const SHADOW_PROPERTIES = [ 'bias', 'normalBias', 'radius', 'blurSamples', 'intensity', 'focus', 'autoUpdate' ];
+	const SHADOW_CAMERA_PROPERTIES = [ 'left', 'right', 'top', 'bottom', 'near', 'far' ];
+
+	function pickProperties( item, names, prefix = '' ) {
+
+		const properties = {};
+
+		for ( const name of names ) {
+
+			const formatted = name in item ? formatPropertyValue( item[ name ] ) : undefined;
+			if ( formatted !== undefined ) properties[ prefix + name ] = formatted;
+
+		}
+
+		return properties;
+
+	}
+
+	function getLightData( light ) {
+
+		const properties = pickProperties( light, LIGHT_PROPERTIES );
+
+		// Where the renderer aims the light, which is the target's position only once its world matrix is updated
+		if ( light.target ) properties.target = light.target.matrixWorld.elements.slice( 12, 15 );
+		if ( light.shadow ) properties.castShadow = light.castShadow;
+
+		const data = { type: light.type, properties: properties };
+
+		if ( light.castShadow && light.shadow ) {
+
+			const shadow = light.shadow;
+
+			// A sun fits its cascades to the view, only the depth range is its own
+			const cameraProperties = light.isSunLight ? [ 'near', 'far' ] : SHADOW_CAMERA_PROPERTIES;
+
+			data.shadow = {
+				mapSize: `${shadow.mapSize.x} × ${shadow.mapSize.y}`,
+				...pickProperties( shadow, SHADOW_PROPERTIES ),
+				...pickProperties( shadow.camera, cameraProperties, 'camera.' )
+			};
+
+		}
+
+		return data;
+
+	}
+
 	// Plain values pass through, colors, textures, nodes and math objects are summarized, everything else is skipped
-	function formatMaterialValue( value ) {
+	function formatPropertyValue( value ) {
 
 		if ( value === null || typeof value === 'function' ) return undefined;
 		if ( typeof value !== 'object' ) return value;
@@ -264,8 +297,6 @@
 	devTools.addEventListener( EVENT_REGISTER, ( event ) => register( event.detail.revision ) );
 
 	devTools.addEventListener( EVENT_OBSERVE, ( event ) => {
-
-		if ( observing === false ) return;
 
 		const object = event.detail;
 
@@ -326,6 +357,10 @@
 				devTools.utils.unhighlight();
 				break;
 
+			case MESSAGE_SELECT_OBJECTS:
+				devTools.utils.select( message.uuids );
+				break;
+
 		}
 
 	} );
@@ -382,21 +417,23 @@
 
 	}
 
-	// Send a scene batch when its object count changed (a hidden scene has no count, so it comes back)
+	// Send a scene batch when its object count changed (a hidden scene has no count, so it comes back).
+	// Counting is cheap, so the data of every object is only collected for a batch.
 	function sendSceneObjects( scene ) {
 
-		const objects = collectSceneObjects( scene );
+		let count = 0;
+		scene.traverse( () => count ++ );
 
-		if ( objects.length !== sceneObjectCountCache.get( scene.uuid ) ) {
+		if ( count !== sceneObjectCountCache.get( scene.uuid ) ) {
 
-			sceneObjectCountCache.set( scene.uuid, objects.length );
-			postToPanel( EVENT_SCENE, { sceneUuid: scene.uuid, objects: objects } );
+			sceneObjectCountCache.set( scene.uuid, count );
+			postToPanel( EVENT_SCENE, { sceneUuid: scene.uuid, objects: collectSceneObjects( scene ) } );
 
 		}
 
 	}
 
-	async function sendObjectDetails( uuid, preview ) {
+	function sendObjectDetails( uuid, preview ) {
 
 		const object = findObjectInScenes( uuid );
 		if ( object === null ) return;
@@ -407,11 +444,12 @@
 			rotation: object.rotation.toArray(),
 			scale: object.scale.toArray(),
 			geometry: object.geometry ? getGeometryData( object.geometry ) : null,
-			materials: object.material ? [].concat( object.material ).map( getMaterialData ) : []
+			materials: object.material ? [].concat( object.material ).map( getMaterialData ) : [],
+			light: object.isLight ? getLightData( object ) : null
 		};
 
-		// A preview costs the page a frame, so it comes along only when asked for
-		if ( preview ) details.preview = await devTools.utils.renderPreview( object );
+		// Drawing a preview takes the page time for large geometries, so it comes along only when asked for
+		if ( preview ) details.preview = devTools.utils.renderPreview( object );
 
 		postToPanel( EVENT_OBJECT_DETAILS, details );
 

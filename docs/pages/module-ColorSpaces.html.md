@@ -1,6 +1,6 @@
 # ColorSpaces
 
-## Properties
+## Static Properties
 
 ### .DisplayP3ColorSpace : string (constant)
 

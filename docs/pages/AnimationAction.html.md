@@ -76,7 +76,7 @@ The local time of this action (in seconds, starting with `0`).
 
 The value gets clamped or wrapped to `[0,clip.duration]` (according to the loop state).
 
-Default is `Infinity`.
+Default is `0`.
 
 ### .timeScale : number
 

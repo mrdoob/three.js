@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>StandardDrawingPipeline - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">StandardDrawingPipeline</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Decides which objects of a scene are rendered and how they are submitted to the render list.
+The default implementation performs frustum culling and pushes every renderable object as a
+separate render item. Subclasses can override the hooks <a href="StandardDrawingPipeline.html#isCulled">StandardDrawingPipeline#isCulled</a> and
+<a href="StandardDrawingPipeline.html#pushRenderItem">StandardDrawingPipeline#pushRenderItem</a> to implement other strategies like GPU-driven rendering.</p>
+<p>This class is experimental and its interface might change.</p></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="StandardDrawingPipeline" translate="no">new <a href="#StandardDrawingPipeline">StandardDrawingPipeline</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new standard drawing pipeline.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="_bundleDepth" translate="no">.<a href="#_bundleDepth">_bundleDepth</a><span class="type-signature"> : number</span> <span class="type-signature">(protected) </span></h3>
+					<div class="description">
+						<p>The number of render bundles being recorded in the current projection.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="_frustum" translate="no">.<a href="#_frustum">_frustum</a><span class="type-signature"> : <a href="Frustum.html">Frustum</a></span> <span class="type-signature">(protected) </span></h3>
+					<div class="description">
+						<p>The frustum of the current camera.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="_frustumArray" translate="no">.<a href="#_frustumArray">_frustumArray</a><span class="type-signature"> : <a href="FrustumArray.html">FrustumArray</a></span> <span class="type-signature">(protected) </span></h3>
+					<div class="description">
+						<p>The frustum array of the current array camera, kept by the render context.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="_projScreenMatrix" translate="no">.<a href="#_projScreenMatrix">_projScreenMatrix</a><span class="type-signature"> : <a href="Matrix4.html">Matrix4</a></span> <span class="type-signature">(protected) </span></h3>
+					<div class="description">
+						<p>The view projection matrix of the current camera.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="renderer" translate="no">.<a href="#renderer">renderer</a><span class="type-signature"> : <a href="Renderer.html">Renderer</a></span> </h3>
+					<div class="description">
+						<p>The renderer this pipeline is assigned to. It is set when
+the pipeline is assigned via <a href="Renderer.html#drawingPipeline">Renderer#drawingPipeline</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="begin" translate="no">.<a href="#begin">begin</a><span class="signature">( camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, renderContext : <span class="param-type"><a href="RenderContext.html">RenderContext</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Prepares the pipeline for projecting a scene with the given camera.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderContext</strong>
+									</td>
+									<td class="description last">
+										<p>The render context.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="beginRenderList" translate="no">.<a href="#beginRenderList">beginRenderList</a><span class="signature">( renderList : <span class="param-type"><a href="RenderList.html">RenderList</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Begins the projection into the given render list.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderList</strong>
+									</td>
+									<td class="description last">
+										<p>The render list.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees the resources of the pipeline. Called by <a href="Renderer.html#dispose">Renderer#dispose</a>, subclasses holding GPU
+resources release them here.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="finishRenderList" translate="no">.<a href="#finishRenderList">finishRenderList</a><span class="signature">( renderList : <span class="param-type"><a href="RenderList.html">RenderList</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Finishes the projection into the given render list.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderList</strong>
+									</td>
+									<td class="description last">
+										<p>The render list.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="isCulled" translate="no">.<a href="#isCulled">isCulled</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the given object is culled by the camera and should not be rendered.
+Objects of render bundles are not culled, a bundle is recorded once and drawn with
+any camera.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the object is culled or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="prepareAsync" translate="no">.<a href="#prepareAsync">prepareAsync</a><span class="signature">( scene : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span><span class="type-signature"> : Promise | undefined</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Prepares resources needed to precompile the given scene. Subclasses can use this
+hook to process geometry before the synchronous projection in <code>Renderer.compileAsync()</code>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">scene</strong>
+									</td>
+									<td class="description last">
+										<p>The scene or object to precompile.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Resolves when the resources are ready.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="project" translate="no">.<a href="#project">project</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, groupOrder : <span class="param-type">number</span>, renderList : <span class="param-type"><a href="RenderList.html">RenderList</a></span>, clippingContext : <span class="param-type"><a href="ClippingContext.html">ClippingContext</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>This method is used to traverse the scene graph and collect all renderable objects
+and lights into the given render list. Call <a href="StandardDrawingPipeline.html#begin">StandardDrawingPipeline#begin</a> before.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object to process (usually a scene).</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera the object should be rendered with.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">groupOrder</strong>
+									</td>
+									<td class="description last">
+										<p>The group order is derived from the <code>renderOrder</code> of groups and is used to group 3D objects within groups.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderList</strong>
+									</td>
+									<td class="description last">
+										<p>The current render list.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">clippingContext</strong>
+									</td>
+									<td class="description last">
+										<p>The current clipping context.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="pushRenderItem" translate="no">.<a href="#pushRenderItem">pushRenderItem</a><span class="signature">( renderList : <span class="param-type"><a href="RenderList.html">RenderList</a></span>, object : <span class="param-type"><a href="Object3D.html">Object3D</a></span>, geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, material : <span class="param-type"><a href="Material.html">Material</a></span>, groupOrder : <span class="param-type">number</span>, z : <span class="param-type">number</span>, group : <span class="param-type">Object</span>, clippingContext : <span class="param-type"><a href="ClippingContext.html">ClippingContext</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Pushes a render item to the render list.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderList</strong>
+									</td>
+									<td class="description last">
+										<p>The current render list.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">object</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object's geometry.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">material</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object's material.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">groupOrder</strong>
+									</td>
+									<td class="description last">
+										<p>The current group order.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">z</strong>
+									</td>
+									<td class="description last">
+										<p>The 3D object's depth value (z value in clip space).</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">group</strong>
+									</td>
+									<td class="description last">
+										<p>Only relevant for objects using multiple materials. This represents a group entry from the respective <code>BufferGeometry</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">clippingContext</strong>
+									</td>
+									<td class="description last">
+										<p>The current clipping context.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/src/renderers/common/StandardDrawingPipeline.js" translate="no" target="_blank" rel="noopener">src/renderers/common/StandardDrawingPipeline.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

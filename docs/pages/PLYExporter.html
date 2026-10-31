@@ -16,7 +16,7 @@
 <p>PLY (Polygon or Stanford Triangle Format) is a file format for efficient delivery and
 loading of simple, static 3D content in a dense format. Both binary and ascii formats are
 supported. PLY can store vertex positions, colors, normals and uv coordinates. No textures
-or texture references are saved.</p></div>
+or texture references are saved. Quantized attributes must be normalized.</p></div>
 				<h2>Code Example</h2>
 				<div translate="no"><pre><code class="language-js">const exporter = new PLYExporter();
 const data = exporter.parse( scene, options );

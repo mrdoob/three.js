@@ -6,6 +6,7 @@ An extension of the [MeshStandardMaterial](MeshStandardMaterial.html), providing
 
 *   Anisotropy: Ability to represent the anisotropic property of materials as observable with brushed metals.
 *   Clearcoat: Some materials — like car paints, carbon fiber, and wet surfaces — require a clear, reflective layer on top of another layer that may be irregular or rough. Clearcoat approximates this effect, without the need for a separate transparent surface.
+*   Diffuse roughness: Produces the flatter appearance and enhanced backscattering of rough diffuse surfaces such as clay, concrete, and unpolished materials.
 *   Iridescence: Allows to render the effect where hue varies depending on the viewing angle and illumination angle. This can be seen on soap bubbles, oil films, or on the wings of many insects.
 *   Physically-based transparency: One limitation of [Material#opacity](Material.html#opacity) is that highly transparent materials are less reflective. Physically-based transmission provides a more realistic option for thin, transparent surfaces like glass.
 *   Advanced reflectivity: More flexible reflectivity for non-metallic materials.
@@ -44,7 +45,7 @@ Default is `null`.
 
 The rotation of the anisotropy in tangent, bitangent space, measured in radians counter-clockwise from the tangent. When `anisotropyMap` is present, this property provides additional rotation to the vectors in the texture.
 
-Default is `1`.
+Default is `0`.
 
 ### .attenuationColor : Color
 
@@ -100,6 +101,20 @@ The green channel of this texture is multiplied against `clearcoatRoughness`, fo
 
 Default is `null`.
 
+### .diffuseRoughness : number
+
+Roughness of the diffuse layer, from `0.0` to `1.0`. A value of `0.0` uses Lambertian diffuse reflection. Values above `0.0` use the EON energy-preserving rough diffuse model.
+
+Default is `0`.
+
+### .diffuseRoughnessMap : Texture
+
+The red channel of this texture is multiplied against `diffuseRoughness`, for per-pixel control over the diffuse roughness.
+
+`diffuseRoughnessMap` represents non-color data. Any texture assigned must have `texture.colorSpace = NoColorSpace` (default).
+
+Default is `null`.
+
 ### .dispersion : number
 
 Defines the strength of the angular separation of colors (chromatic aberration) transmitting through a relatively clear volume. Any value zero or larger is valid, the typical range of realistic values is `[0, 1]`. This property can be only be used with transmissive objects.
@@ -134,21 +149,35 @@ Default is `null`.
 
 ### .iridescenceThicknessMap : Texture
 
-A texture that defines the thickness of the iridescence layer, stored in the green channel. Minimum and maximum values of thickness are defined by `iridescenceThicknessRange` array:
+A texture that defines the thickness of the iridescence layer, stored in the green channel. Minimum and maximum values of thickness are defined by `iridescenceThicknessMinimum` and `iridescenceThicknessMaximum`:
 
-*   `0.0` in the green channel will result in thickness equal to first element of the array.
-*   `1.0` in the green channel will result in thickness equal to second element of the array.
-*   Values in-between will linearly interpolate between the elements of the array.
+*   `0.0` in the green channel will result in thickness equal to `iridescenceThicknessMinimum`.
+*   `1.0` in the green channel will result in thickness equal to `iridescenceThicknessMaximum`.
+*   Values in-between will linearly interpolate between both values.
 
 `iridescenceThicknessMap` represents non-color data. Any texture assigned must have `texture.colorSpace = NoColorSpace` (default).
 
 Default is `null`.
 
+### .iridescenceThicknessMaximum : number
+
+The maximum thickness of the iridescence layer in nanometers. If no `iridescenceThicknessMap` is defined, this value is used as the thickness.
+
+Default is `400`.
+
+### .iridescenceThicknessMinimum : number
+
+The minimum thickness of the iridescence layer in nanometers.
+
+Default is `100`.
+
 ### .iridescenceThicknessRange : Array.<number, number>
 
-Array of exactly 2 elements, specifying minimum and maximum thickness of the iridescence layer. Thickness of iridescence layer has an equivalent effect of the one `thickness` has on `ior`.
+Array of exactly 2 elements, specifying minimum and maximum thickness of the iridescence layer.
 
 Default is `[100,400]`.
+
+**Deprecated:** since r187. Use [MeshPhysicalMaterial#iridescenceThicknessMinimum](MeshPhysicalMaterial.html#iridescenceThicknessMinimum) and [MeshPhysicalMaterial#iridescenceThicknessMaximum](MeshPhysicalMaterial.html#iridescenceThicknessMaximum) instead.
 
 ### .isMeshPhysicalMaterial : boolean (readonly)
 

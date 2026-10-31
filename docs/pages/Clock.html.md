@@ -40,7 +40,7 @@ Default is `0`.
 
 Whether the clock is running or not.
 
-Default is `true`.
+Default is `false`.
 
 ### .startTime : number
 

@@ -488,6 +488,24 @@ as a placeholder until the actual texture is ready for usage.</p>
 							</tbody>
 						</table>
 					</div>
+					<h3 class="name name-method" id="createIndirectStorageAttribute" translate="no">.<a href="#createIndirectStorageAttribute">createIndirectStorageAttribute</a><span class="signature">( attribute : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Creates the GPU buffer of an indirect storage attribute.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">attribute</strong>
+									</td>
+									<td class="description last">
+										<p>The buffer attribute.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					<h3 class="name name-method" id="createNodeBuilder" translate="no">.<a href="#createNodeBuilder">createNodeBuilder</a><span class="signature">( renderObject : <span class="param-type"><a href="RenderObject.html">RenderObject</a></span>, renderer : <span class="param-type"><a href="Renderer.html">Renderer</a></span> )</span><span class="type-signature"> : <a href="NodeBuilder.html">NodeBuilder</a></span> <span class="type-signature">(abstract) </span></h3>
 					<div class="method">
 						<div class="description">
@@ -660,6 +678,24 @@ as a placeholder until the actual texture is ready for usage.</p>
 							</tbody>
 						</table>
 					</div>
+					<h3 class="name name-method" id="deleteVertexState" translate="no">.<a href="#deleteVertexState">deleteVertexState</a><span class="signature">( renderObject : <span class="param-type"><a href="RenderObject.html">RenderObject</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Deletes the vertex state for the given render object.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderObject</strong>
+									</td>
+									<td class="description last">
+										<p>The render object.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					<h3 class="name name-method" id="destroyAttribute" translate="no">.<a href="#destroyAttribute">destroyAttribute</a><span class="signature">( attribute : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
 					<div class="method">
 						<div class="description">
@@ -673,6 +709,42 @@ as a placeholder until the actual texture is ready for usage.</p>
 									</td>
 									<td class="description last">
 										<p>The buffer attribute to destroy.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="destroyCanvasTarget" translate="no">.<a href="#destroyCanvasTarget">destroyCanvasTarget</a><span class="signature">( canvasTarget : <span class="param-type"><a href="CanvasTarget.html">CanvasTarget</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees the GPU resources of the given canvas target.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">canvasTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The canvas target.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="destroyPipeline" translate="no">.<a href="#destroyPipeline">destroyPipeline</a><span class="signature">( pipeline : <span class="param-type"><a href="Pipeline.html">Pipeline</a></span> )</span> <span class="type-signature">(abstract) </span></h3>
+					<div class="method">
+						<div class="description">
+							<p>Destroys the given pipeline.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">pipeline</strong>
+									</td>
+									<td class="description last">
+										<p>The pipeline.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -870,7 +942,7 @@ calls.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The object's dictionary.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="getArrayBufferAsync" translate="no">.<a href="#getArrayBufferAsync">getArrayBufferAsync</a><span class="signature">( attribute : <span class="param-type"><a href="StorageBufferAttribute.html">StorageBufferAttribute</a></span> )</span><span class="type-signature"> : Promise.&lt;ArrayBuffer></span> <span class="type-signature">(async) </span></h3>
+					<h3 class="name name-method" id="getArrayBufferAsync" translate="no">.<a href="#getArrayBufferAsync">getArrayBufferAsync</a><span class="signature">( attribute : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a></span>, target : <span class="param-type"><a href="ReadbackBuffer.html">ReadbackBuffer</a> | ArrayBuffer</span>, offset : <span class="param-type">number</span>, count : <span class="param-type">number</span> )</span><span class="type-signature"> : Promise.&lt;(ArrayBuffer|<a href="ReadbackBuffer.html">ReadbackBuffer</a>)></span> <span class="type-signature">(async) </span></h3>
 					<div class="method">
 						<div class="description">
 							<p>This method performs a readback operation by moving buffer data from
@@ -883,7 +955,34 @@ a storage buffer attribute from the GPU to the CPU.</p>
 										<strong translate="no">attribute</strong>
 									</td>
 									<td class="description last">
-										<p>The storage buffer attribute.</p>
+										<p>The storage buffer attribute to read from.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">target</strong>
+									</td>
+									<td class="description last">
+										<p>The readback buffer or array buffer that receives the data. If <code>null</code>, a new array buffer is returned.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">offset</strong>
+									</td>
+									<td class="description last">
+										<p>The byte offset to start reading from. Must be a multiple of 4.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">count</strong>
+									</td>
+									<td class="description last">
+										<p>The number of bytes to read. Must be a multiple of 4, or <code>-1</code> to read to the end of the buffer.</p>
+										<p>Default is <code>-1</code>.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -891,6 +990,25 @@ a storage buffer attribute from the GPU to the CPU.</p>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> A promise that resolves with the buffer data when the data are ready.</dt>
 						</dl>
+					</div>
+					<h3 class="name name-method" id="getBufferAttribute" translate="no">.<a href="#getBufferAttribute">getBufferAttribute</a><span class="signature">( attribute : <span class="param-type"><a href="BufferAttribute.html">BufferAttribute</a> | <a href="InterleavedBufferAttribute.html">InterleavedBufferAttribute</a></span> )</span><span class="type-signature"> : <a href="BufferAttribute.html">BufferAttribute</a> | <a href="InterleavedBuffer.html">InterleavedBuffer</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Utility method for handling interleaved buffer attributes correctly.
+To process them, their <code>InterleavedBuffer</code> is returned.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">attribute</strong>
+									</td>
+									<td class="description last">
+										<p>The attribute.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
 					</div>
 					<h3 class="name name-method" id="getClearColor" translate="no">.<a href="#getClearColor">getClearColor</a><span class="signature">()</span><span class="type-signature"> : <a href="Color4.html">Color4</a></span> </h3>
 					<div class="method">
@@ -928,6 +1046,27 @@ creates a new one.</p>
 						</div>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The drawing buffer size.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getOcclusionData" translate="no">.<a href="#getOcclusionData">getOcclusionData</a><span class="signature">( renderContext : <span class="param-type"><a href="RenderContext.html">RenderContext</a></span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the occlusion query data of the given render context for its current camera.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderContext</strong>
+									</td>
+									<td class="description last">
+										<p>The render context.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The occlusion query data.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="getRenderCacheKey" translate="no">.<a href="#getRenderCacheKey">getRenderCacheKey</a><span class="signature">( renderObject : <span class="param-type"><a href="RenderObject.html">RenderObject</a></span> )</span><span class="type-signature"> : string</span> <span class="type-signature">(abstract) </span></h3>

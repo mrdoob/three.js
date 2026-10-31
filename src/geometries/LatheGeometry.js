@@ -103,6 +103,8 @@ class LatheGeometry extends BufferGeometry {
 
 				case ( points.length - 1 ):	// special handling for last Vertex on path
 
+					prevNormal.normalize();
+
 					initNormals.push( prevNormal.x, prevNormal.y, prevNormal.z );
 
 					break;

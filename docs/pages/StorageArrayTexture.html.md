@@ -56,6 +56,16 @@ The default `minFilter` for storage textures is `THREE.LinearFilter`.
 
 **Overrides:** [Texture#minFilter](Texture.html#minFilter)
 
+### .mipmapsAutoUpdate : boolean
+
+Whether the renderer regenerates the mipmaps automatically.
+
+Overwritten and set to `false` by default.
+
+Default is `false`.
+
+**Overrides:** [Texture#mipmapsAutoUpdate](Texture.html#mipmapsAutoUpdate)
+
 ## Methods
 
 ### .setSize( width : number, height : number, depth : number )

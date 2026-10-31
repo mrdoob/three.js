@@ -48,7 +48,7 @@ refresh right before they are going to be rendered or not.</p></div>
 				<div class="member">
 					<h3 class="name" id="hasNode" translate="no">.<a href="#hasNode">hasNode</a><span class="type-signature"> : boolean</span> </h3>
 					<div class="description">
-						<p>Whether the material uses node objects or not.</p>
+						<p>Whether the builder's context uses node objects or not.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -75,8 +75,7 @@ monitor must maintain a list of render objects.</p>
 					<h3 class="name name-method" id="containsNode" translate="no">.<a href="#containsNode">containsNode</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Returns <code>true</code> if the node builder's material uses
-node properties.</p>
+							<p>Returns <code>true</code> if the node builder's context (e.g. material) uses node properties.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -91,7 +90,7 @@ node properties.</p>
 							</tbody>
 						</table>
 						<dl class="details">
-							<dt class="tag-returns"><strong>Returns:</strong> Whether the node builder's material uses node properties or not.</dt>
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the node builder's context uses node properties or not.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="equals" translate="no">.<a href="#equals">equals</a><span class="signature">( renderObject : <span class="param-type"><a href="RenderObject.html">RenderObject</a></span>, lightsData : <span class="param-type">Array.&lt;<a href="Light.html">Light</a>></span>, renderId : <span class="param-type">number</span> )</span><span class="type-signature"> : boolean</span> </h3>
@@ -129,6 +128,35 @@ node properties.</p>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> Whether the given render object is equal to its cached state or not.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="equalsTextureTransform" translate="no">.<a href="#equalsTextureTransform">equalsTextureTransform</a><span class="signature">( transformData : <span class="param-type">Object</span>, texture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if the uv transformation of the given texture has not changed.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">transformData</strong>
+									</td>
+									<td class="description last">
+										<p>The monitored uv transformation.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the uv transformation has not changed or not.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="firstInitialization" translate="no">.<a href="#firstInitialization">firstInitialization</a><span class="signature">( renderObject : <span class="param-type"><a href="RenderObject.html">RenderObject</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
@@ -268,6 +296,58 @@ monitoring.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> An object for monitoring material properties.</dt>
 						</dl>
 					</div>
+					<h3 class="name name-method" id="getOutputTarget" translate="no">.<a href="#getOutputTarget">getOutputTarget</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a></span> )</span><span class="type-signature"> : <a href="RenderTarget.html">RenderTarget</a> | <a href="CanvasTarget.html">CanvasTarget</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the current output target of the given renderer. That is the active
+render target or, if none is set, the output render target or the canvas target.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The output target.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getOutputTargetData" translate="no">.<a href="#getOutputTargetData">getOutputTargetData</a><span class="signature">( outputTarget : <span class="param-type"><a href="RenderTarget.html">RenderTarget</a> | <a href="CanvasTarget.html">CanvasTarget</a></span>, renderContext : <span class="param-type"><a href="RenderContext.html">RenderContext</a></span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns an output target data structure holding the size of the given output
+target for monitoring. Its version is incremented whenever a size change is observed.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">outputTarget</strong>
+									</td>
+									<td class="description last">
+										<p>The output target.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderContext</strong>
+									</td>
+									<td class="description last">
+										<p>The render context.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> An object for monitoring the output target size.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="getRenderObjectData" translate="no">.<a href="#getRenderObjectData">getRenderObjectData</a><span class="signature">( renderObject : <span class="param-type"><a href="RenderObject.html">RenderObject</a></span> )</span><span class="type-signature"> : Object</span> </h3>
 					<div class="method">
 						<div class="description">
@@ -309,6 +389,58 @@ monitoring.</p>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> An object for monitoring the texture.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getTextureTransformData" translate="no">.<a href="#getTextureTransformData">getTextureTransformData</a><span class="signature">( texture : <span class="param-type"><a href="Texture.html">Texture</a></span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a data structure holding the uv transformation of the given
+texture for monitoring.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">texture</strong>
+									</td>
+									<td class="description last">
+										<p>The texture.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> An object for monitoring the uv transformation.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="hasDisposedAttributes" translate="no">.<a href="#hasDisposedAttributes">hasDisposedAttributes</a><span class="signature">( renderObject : <span class="param-type"><a href="RenderObject.html">RenderObject</a></span>, renderObjectData : <span class="param-type">Object</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns <code>true</code> if a vertex buffer or the index of the given render object
+has been disposed since the last check.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderObject</strong>
+									</td>
+									<td class="description last">
+										<p>The render object.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderObjectData</strong>
+									</td>
+									<td class="description last">
+										<p>The cached render object data.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether attributes of the render object have been disposed or not.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="hasDynamicInstancing" translate="no">.<a href="#hasDynamicInstancing">hasDynamicInstancing</a><span class="signature">( object : <span class="param-type"><a href="Object3D.html">Object3D</a></span> )</span><span class="type-signature"> : boolean</span> </h3>

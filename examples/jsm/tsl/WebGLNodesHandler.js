@@ -539,6 +539,7 @@ export class WebGLNodesHandler {
 			fogColor: { value: new Color() },
 			fogNear: { value: 0 },
 			fogFar: { value: 0 },
+			fogDensity: { value: 0 },
 			envMapIntensity: { value: 0 },
 			...UniformsUtils.clone( UniformsLib.lights )
 		};
@@ -568,16 +569,19 @@ export class WebGLNodesHandler {
 		}
 
 		// init uniforms
-		const builderUniforms = [ ...builder.uniforms.vertex, ...builder.uniforms.fragment ];
-		for ( const uniform of builderUniforms ) {
+		for ( const shaderStage of [ 'vertex', 'fragment' ] ) {
 
-			if ( uniform.type === 'buffer' ) {
+			for ( const uniform of builder.uniforms[ shaderStage ] ) {
 
-				// buffer uniforms are all nested in groups
-				const group = new UniformsGroup();
-				group.name = builder.getUniformBufferName( uniform );
-				group.uniforms = [ uniform ];
-				uniformsGroups.push( group );
+				if ( uniform.type === 'buffer' ) {
+
+					// buffer uniforms are all nested in groups
+					const group = new UniformsGroup();
+					group.name = builder.getUniformBufferName( uniform, shaderStage );
+					group.uniforms = [ uniform ];
+					uniformsGroups.push( group );
+
+				}
 
 			}
 

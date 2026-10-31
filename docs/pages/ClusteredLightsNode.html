@@ -16,7 +16,7 @@
 				<div class="class-description"><p>A custom version of <code>LightsNode</code> implementing Forward+ clustered shading:
 the view frustum is subdivided into a 3D grid of clusters (X × Y screen tiles
 times an exponentially-spaced set of Z depth slices), and each cluster holds
-only the point lights whose spheres intersect it. At shading time each fragment
+only the point and spot lights whose bounding spheres intersect it. At shading time each fragment
 looks up its cluster and loops over just that cluster's lights. Unlike 2D tiled
 lighting, clustered shading culls lights that share screen pixels but lie at
 different depths — suitable for 3D scenes with real depth complexity.</p></div>
@@ -39,7 +39,7 @@ different depths — suitable for 3D scenes with real depth complexity.</p></div
 										<strong translate="no">maxLights</strong>
 									</td>
 									<td class="description last">
-										<p>Maximum number of point lights.</p>
+										<p>Maximum number of point and spot lights.</p>
 										<p>Default is <code>1024</code>.</p>
 									</td>
 								</tr>
@@ -74,7 +74,28 @@ different depths — suitable for 3D scenes with real depth complexity.</p></div
 						</table>
 					</div>
 				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isClusteredLightsNode" translate="no">.<a href="#isClusteredLightsNode">isClusteredLightsNode</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
 				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="customCacheKey" translate="no">.<a href="#customCacheKey">customCacheKey</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Overwrites the default <a href="LightsNode.html#customCacheKey">LightsNode#customCacheKey</a> implementation by
+including the node identity and resource version into the cache key.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="LightsNode.html#customCacheKey">LightsNode#customCacheKey</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The custom cache key.</dt>
+						</dl>
+					</div>
 					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
 					<div class="method">
 						<div class="description">
@@ -83,6 +104,155 @@ different depths — suitable for 3D scenes with real depth complexity.</p></div
 						<dl class="details">
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="LightsNode.html#dispose">LightsNode#dispose</a></dt>
 						</dl>
+					</div>
+					<h3 class="name name-method" id="getBuiltinLights" translate="no">.<a href="#getBuiltinLights">getBuiltinLights</a><span class="signature">()</span><span class="type-signature"> : Array.&lt;<a href="Light.html">Light</a>></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the lights that are not clustered.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="LightsNode.html#getBuiltinLights">LightsNode#getBuiltinLights</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The lights using the default lighting.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getClusterLightCount" translate="no">.<a href="#getClusterLightCount">getClusterLightCount</a><span class="signature">( zSliceNode : <span class="param-type"><a href="Node.html">Node</a>.&lt;int></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;int></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the number of lights in the fragment's cluster. Useful for debugging.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">zSliceNode</strong>
+									</td>
+									<td class="description last">
+										<p>The depth slice to inspect. A negative value selects the fragment's own cluster.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The light count.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setLights" translate="no">.<a href="#setLights">setLights</a><span class="signature">( lights : <span class="param-type">Array.&lt;<a href="Light.html">Light</a>></span> )</span><span class="type-signature"> : <a href="ClusteredLightsNode.html">ClusteredLightsNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Configures this node with an array of lights. Point and spot lights without
+shadows are clustered (except lights with a <code>colorNode</code>, spot lights with a
+projected <code>map</code> and light types with their own light node, like <code>IESSpotLight</code>
+or <code>ProjectorLight</code>), all other lights use the default lighting.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">lights</strong>
+									</td>
+									<td class="description last">
+										<p>An array of lights.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="LightsNode.html#setLights">LightsNode#setLights</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setSize" translate="no">.<a href="#setSize">setSize</a><span class="signature">( width : <span class="param-type">number</span>, height : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="ClusteredLightsNode.html">ClusteredLightsNode</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the size of the cluster grid. Must be called outside of rendering. Not required
+with <a href="ClusteredLighting.html">ClusteredLighting</a>, which fits the grid at the beginning of each render.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">width</strong>
+									</td>
+									<td class="description last">
+										<p>The drawing buffer width.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">height</strong>
+									</td>
+									<td class="description last">
+										<p>The drawing buffer height.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this node.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setupLights" translate="no">.<a href="#setupLights">setupLights</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span>, lightNodes : <span class="param-type">Array.&lt;<a href="LightingNode.html">LightingNode</a>></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets up the default lights and the clustered point and spot lights.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">builder</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node builder.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">lightNodes</strong>
+									</td>
+									<td class="description last">
+										<p>An array of lighting nodes.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="LightsNode.html#setupLights">LightsNode#setupLights</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="updateBefore" translate="no">.<a href="#updateBefore">updateBefore</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the light data and assigns the lights to the clusters.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">frame</strong>
+									</td>
+									<td class="description last">
+										<p>A reference to the current node frame.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="LightsNode.html#updateBefore">LightsNode#updateBefore</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="updateSize" translate="no">.<a href="#updateSize">updateSize</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fits the cluster grid to the framebuffer of the render that is about to start. Called by
+<a href="ClusteredLighting.html">ClusteredLighting</a> before the render objects of the render are prepared. Since each
+render depth has its own node, no pending command buffer uses the resources of this node at
+this point, so a rebuild can free the replaced resources immediately.</p>
+						</div>
 					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>

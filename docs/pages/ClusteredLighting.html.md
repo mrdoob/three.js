@@ -2,7 +2,7 @@
 
 # ClusteredLighting
 
-A custom lighting implementation based on Forward+ Clustered Shading that overwrites the default lighting system in [WebGPURenderer](WebGPURenderer.html). Suitable for 3D scenes with many point lights and real depth complexity — the view frustum is partitioned into a 3D cluster grid so only the lights actually reaching each fragment are evaluated.
+A custom lighting implementation based on Forward+ Clustered Shading that overwrites the default lighting system in [WebGPURenderer](WebGPURenderer.html). Suitable for 3D scenes with many point and spot lights and real depth complexity — the view frustum is partitioned into a 3D cluster grid so only the lights actually reaching each fragment are evaluated.
 
 ## Code Example
 
@@ -27,7 +27,7 @@ Constructs a new clustered lighting system.
 
 **maxLights**
 
-Maximum number of point lights.
+Maximum number of point and spot lights.
 
 Default is `1024`.
 
@@ -55,6 +55,16 @@ Default is `64`.
 
 ## Methods
 
+### .beginRender( scene : Scene )
+
+Saves the lights of the scene's lights node and fits its cluster grid to the framebuffer of the render. This happens before any render object of the render is prepared, and the node of this depth is not used by any pending command buffer, so resources replaced by a rebuild are freed immediately.
+
+**scene**
+
+The scene.
+
+**Overrides:** [Lighting#beginRender](Lighting.html#beginRender)
+
 ### .createNode( lights : Array.<Light> ) : ClusteredLightsNode
 
 Creates a new clustered lights node for the given array of lights.
@@ -68,6 +78,28 @@ The lights.
 **Overrides:** [Lighting#createNode](Lighting.html#createNode)
 
 **Returns:** The clustered lights node.
+
+### .finishRender( scene : Scene )
+
+Restores the lights of the scene's lights node.
+
+**scene**
+
+The scene.
+
+**Overrides:** [Lighting#finishRender](Lighting.html#finishRender)
+
+### .getNode( scene : Scene ) : LightsNode
+
+Returns the lights node of the given scene for the current render depth of that scene. A scene rendered inside one of its own renders uses another node, so it never modifies the cluster data of the outer render, which has not been submitted yet.
+
+**scene**
+
+The scene.
+
+**Overrides:** [Lighting#getNode](Lighting.html#getNode)
+
+**Returns:** The lights node.
 
 ## Source
 

@@ -79,7 +79,7 @@
 
 			async function init() {
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.01, 100 );
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -91,6 +91,7 @@
 				await renderer.init();
 
 				pathTracer = new WebGPUPathTracer( renderer );
+				pathTracer.useMegakernel( true ); // TODO: Remove once the wavefront backend supports array-bound struct buffers.
 				pathTracer.filterGlossyFactor = 1;
 				pathTracer.minSamples = 3;
 				pathTracer.maxSamples = 32;

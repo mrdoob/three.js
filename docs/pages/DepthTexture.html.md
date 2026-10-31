@@ -46,13 +46,13 @@ Default is `ClampToEdgeWrapping`.
 
 The mag filter value.
 
-Default is `LinearFilter`.
+Default is `NearestFilter`.
 
 **minFilter**
 
 The min filter value.
 
-Default is `LinearFilter`.
+Default is `NearestFilter`.
 
 **anisotropy**
 

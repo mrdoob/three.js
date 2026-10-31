@@ -2,7 +2,7 @@
 
 Holds the voxel representation of a scene for [VXGINode](VXGINode.html): an anisotropic opacity mip chain, a direct radiance volume and a radiance volume with cached bounces.
 
-The representation is a dense variant of the pre-filtered voxel hierarchy of Crassin et al. 2011 (a dense mip chain instead of a sparse octree, which keeps cone samples to two texture fetches): opacity stores visibility per major axis and is filtered directionally (volumetric integration along the axis, averaging across it), radiance is stored opacity-premultiplied and indirect bounces are cached in the volume via cone tracing. Only direct lights are injected. Voxelization uses conservative rasterization along the dominant triangle axis in a compute shader.
+The representation is a dense variant of the pre-filtered voxel hierarchy of Crassin et al. 2011 (a dense mip chain instead of a sparse octree, which keeps cone samples to two texture fetches): opacity stores visibility per major axis and is filtered directionally (volumetric integration along the axis, averaging across it), radiance is stored opacity-premultiplied and indirect bounces are cached in the volume via cone tracing. Only direct lights are injected. Voxelization uses conservative rasterization along the dominant triangle axis in a compute shader. The interiors of closed meshes are filled, so cones starting inside an object (e.g. near contact points) are blocked.
 
 Direct light is injected per voxel instead of splatting photons from a light-view map as in the paper: the shadow maps rendered by the renderer are the light-view maps, and every occupied voxel pulls its visibility from them (2D maps for directional and spot lights, cube maps for point lights) and evaluates its irradiance analytically. This reuses the existing shadow passes, makes the injected shadows match the direct lighting exactly and needs neither atomics nor a normalization by photon density. Lights without a shadow map fall back to a visibility cone traced through the volume. The trade-off is a cost proportional to the number of occupied voxels times lights rather than to the light-view resolution, and that only outgoing diffuse radiance is stored (no incoming direction distribution for glossy cones).
 
@@ -10,6 +10,7 @@ References:
 
 *   [https://research.nvidia.com/publication/2011-09\_interactive-indirect-illumination-using-voxel-cone-tracing](https://research.nvidia.com/publication/2011-09_interactive-indirect-illumination-using-voxel-cone-tracing): Crassin et al., Interactive Indirect Illumination Using Voxel Cone Tracing, Pacific Graphics 2011.
 *   [https://developer.nvidia.com/content/basics-gpu-voxelization](https://developer.nvidia.com/content/basics-gpu-voxelization): Basics of GPU voxelization.
+*   [https://doi.org/10.1145/1882261.1866201](https://doi.org/10.1145/1882261.1866201): Schwarz and Seidel, Fast Parallel Surface and Solid Voxelization on GPUs, ACM Transactions on Graphics 2010.
 
 Note: This class can only be used with `WebGPURenderer` and a WebGPU backend.
 

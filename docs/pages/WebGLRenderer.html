@@ -1332,7 +1332,8 @@ Or alternatively a four-component vector specifying all the parameters of the vi
 <span class="param-type">boolean</span>
 				</td>
 			<td class="description last">
-				<p><code>true</code> if <code>logarithmicDepthBuffer</code> was set to <code>true</code> in the constructor.</p>
+				<p><code>true</code> if <code>logarithmicDepthBuffer</code> was set to <code>true</code> in the constructor
+and no reversed depth buffer is in use.</p>
 			</td>
 		</tr>
 		<tr>
@@ -1746,7 +1747,8 @@ and the rendering context supports <code>EXT_clip_control</code>.</p>
 				</td>
 			<td class="description last">
 				<p>Whether to use a logarithmic depth buffer. It may be necessary to use this if dealing with huge differences in scale in a single scene.
-Note that this setting uses <code>gl_FragDepth</code> if available which disables the Early Fragment Test optimization and can cause a decrease in performance.</p>
+Note that this setting uses <code>gl_FragDepth</code> if available which disables the Early Fragment Test optimization and can cause a decrease in performance.
+It is ignored when a reversed depth buffer is in use.</p>
 						<p>Default is <code>false</code>.</p>
 			</td>
 		</tr>

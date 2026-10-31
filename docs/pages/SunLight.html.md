@@ -2,7 +2,9 @@
 
 # SunLight
 
-A sun-like light that gets emitted in a specific direction, with rays that are all parallel, and casts cascaded shadow maps via [SunLightShadow](SunLightShadow.html), suited for lighting large scenes.
+A sun-like light that gets emitted in a specific direction, with rays that are all parallel, and casts Cascaded Shadow Maps (CSM) via [SunLightShadow](SunLightShadow.html), suited for lighting large scenes.
+
+Please be aware that `SunLight` is not a good fit for small, bounded scenes like dioramas, single rooms or model-viewers. Small scenes don't benefit from CSM because most content will be located in the last shadow cascade with the lowest shadow map resolution.
 
 Unlike [DirectionalLight](DirectionalLight.html), the light has no target: like [HemisphereLight](HemisphereLight.html), its direction is defined by its position. The light shines from its position towards the origin and points straight down by default.
 
@@ -13,10 +15,10 @@ sun.castShadow = true;
 scene.add( sun );
 ```
 
-When used with `WebGPURenderer`, the light must be registered with the renderer's node library first:
+When used with `WebGPURenderer`, the light must be assigned its node implementation first:
 
 ```js
-renderer.library.addLight( SunLightNode, SunLight );
+SunLight.registerNode( SunLightNode );
 ```
 
 ## Import
