@@ -24,6 +24,8 @@ const _morphA = /*@__PURE__*/ new Vector3();
 const _intersectionPoint = /*@__PURE__*/ new Vector3();
 const _intersectionPointWorld = /*@__PURE__*/ new Vector3();
 
+const _drawRange = { start: 0, count: Infinity };
+
 /**
  * Class representing triangular polygon mesh based objects.
  *
@@ -103,7 +105,31 @@ class Mesh extends Object3D {
 		 */
 		this.count = 1;
 
+		/**
+		 * Determines the part of the geometry rendered by this mesh. When
+		 * {@link BufferGeometry#drawRange} is also set, only the intersection
+		 * is drawn. This should not be set directly, instead use `setDrawRange()`.
+		 *
+		 * @type {{start:number,count:number}}
+		 * @default {start:0,count:Infinity}
+		 */
+		this.drawRange = { start: 0, count: Infinity };
+
 		this.updateMorphTargets();
+
+	}
+
+	/**
+	 * Sets the draw range for this mesh. When {@link BufferGeometry#drawRange}
+	 * is also set, only the intersection is drawn.
+	 *
+	 * @param {number} start - The first vertex for non-indexed geometry, otherwise the first triangle index.
+	 * @param {number} count - For non-indexed geometry, the number of vertices to render, otherwise the number of indices.
+	 */
+	setDrawRange( start, count ) {
+
+		this.drawRange.start = start;
+		this.drawRange.count = count;
 
 	}
 
@@ -133,6 +159,9 @@ class Mesh extends Object3D {
 
 		this.material = Array.isArray( source.material ) ? source.material.slice() : source.material;
 		this.geometry = source.geometry;
+
+		this.drawRange.start = source.drawRange.start;
+		this.drawRange.count = source.drawRange.count;
 
 		return this;
 
@@ -302,7 +331,10 @@ class Mesh extends Object3D {
 		const uv1 = geometry.attributes.uv1;
 		const normal = geometry.attributes.normal;
 		const groups = geometry.groups;
-		const drawRange = geometry.drawRange;
+
+		const drawRange = _drawRange;
+		drawRange.start = Math.max( geometry.drawRange.start, this.drawRange.start );
+		drawRange.count = Math.min( geometry.drawRange.start + geometry.drawRange.count, this.drawRange.start + this.drawRange.count ) - drawRange.start;
 
 		if ( index !== null ) {
 
