@@ -1424,6 +1424,8 @@ class WGSLNodeBuilder extends NodeBuilder {
 				// Also textureGather always need sampler.
 				const needsSampler = node.value.isCubeTexture === true || ( this.isUnfilterable( node.value ) === false && texture.store === false ) || node.gatherNode !== null;
 
+				nodeData.needsSampler = needsSampler;
+
 				if ( needsSampler ) {
 
 					const sampler = new NodeSampler( `${ uniformNode.name }_sampler`, uniformNode.node, group );
@@ -2223,9 +2225,9 @@ ${ flowData.code }
 				const textureNode = uniform.node;
 				const texture = textureNode.value;
 
-				// Cube textures always need samplers (they use textureSampleLevel, not textureLoad)
-				// Also textureGather always need sampler.
-				const needsSampler = texture.isCubeTexture === true || ( this.isUnfilterable( texture ) === false && textureNode.isStorageTextureNode !== true ) || textureNode.gatherNode !== null;
+				// Use the sampler decision made when the texture code was generated. The value of
+				// a shared texture node can change while buildAsync() yields to the main thread.
+				const { needsSampler } = this.getDataFromNode( textureNode, shaderStage, this.globalCache );
 
 				if ( needsSampler ) {
 
