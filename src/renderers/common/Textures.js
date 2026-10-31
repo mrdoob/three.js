@@ -481,7 +481,7 @@ class Textures extends DataMap {
 
 			//
 
-			this.info.createTexture( texture );
+			this.info.createTexture( texture, options );
 
 			//
 
@@ -510,6 +510,10 @@ class Textures extends DataMap {
 
 			this._tracked.add( textureData.ref );
 			this._registry.register( texture, textureData.ref, textureData.ref );
+
+		} else {
+
+			this.info.updateTexture( texture, options );
 
 		}
 
