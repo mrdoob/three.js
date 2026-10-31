@@ -347,6 +347,8 @@ class WebGPUBindingUtils {
 
 					propertyName += `-${ mipLevelCount }-${ baseMipLevel }`;
 
+					if ( binding.store && binding.texture.isCubeTexture ) propertyName += '-array';
+
 					resourceGPU = textureData[ propertyName ];
 
 					if ( resourceGPU === undefined ) {
@@ -359,10 +361,11 @@ class WebGPUBindingUtils {
 
 							dimensionViewGPU = GPUTextureViewDimension.Cube;
 
-						} else if ( binding.texture.isArrayTexture || binding.texture.isDataArrayTexture || binding.texture.isCompressedArrayTexture ) {
+						} else if ( binding.texture.isArrayTexture || binding.texture.isDataArrayTexture || binding.texture.isCompressedArrayTexture || ( binding.store && binding.texture.isCubeTexture ) ) {
 
 							// Prefer the texture's actual array flag over the cached 3D binding type.
 							// Layered render targets can become array textures after shader compilation.
+							// Cube textures are written as 2D arrays.
 							dimensionViewGPU = GPUTextureViewDimension.TwoDArray;
 
 						} else if ( binding.isSampledTexture3D ) {
@@ -488,7 +491,7 @@ class WebGPUBindingUtils {
 
 				}
 
-				if ( binding.texture.isArrayTexture ) {
+				if ( binding.texture.isArrayTexture || binding.texture.isCubeTexture ) {
 
 					storageTexture.viewDimension = GPUTextureViewDimension.TwoDArray;
 
