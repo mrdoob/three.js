@@ -476,8 +476,7 @@
 				effectController.rayOrigin.value.copy( raycaster.ray.origin );
 				effectController.rayDirection.value.copy( raycaster.ray.direction );
 
-				renderer.compute( computeVelocity );
-				renderer.compute( computePosition );
+				renderer.compute( [ computeVelocity, computePosition ] );
 
 				renderer.render( scene, camera );
 
