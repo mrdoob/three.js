@@ -810,6 +810,8 @@ class RenderObject {
 
 		let cacheKey = this._nodes.getCustomProgramCacheKey( material, scene );
 
+		const textures = [];
+
 		for ( const property of getKeys( material ) ) {
 
 			if ( /^(is[A-Z]|_)|^(visible|version|uuid|name|opacity|userData|iridescenceThicknessRange)$/.test( property ) ) continue;
@@ -846,6 +848,19 @@ class RenderObject {
 
 					if ( value.isTexture ) {
 
+						// texture nodes of the same texture share a single uniform,
+						// so the shader depends on which properties use the same texture
+
+						let textureIndex = textures.indexOf( value );
+
+						if ( textureIndex === - 1 ) {
+
+							textureIndex = textures.length;
+							textures.push( value );
+
+						}
+
+						valueKey += textureIndex + ',';
 						valueKey += value.mapping;
 						valueKey += value.channel;
 
