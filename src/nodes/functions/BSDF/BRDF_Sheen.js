@@ -3,7 +3,7 @@ import { positionViewDirection } from '../../accessors/Position.js';
 import { sheen, sheenRoughness } from '../../core/PropertyNode.js';
 import { Fn, float } from '../../tsl/TSLBase.js';
 
-// https://github.com/google/filament/blob/master/shaders/src/brdf.fs
+// https://github.com/google/filament/blob/main/shaders/src/surface_brdf.fs
 const D_Charlie = /*@__PURE__*/ Fn( ( { roughness, dotNH } ) => {
 
 	const alpha = roughness.pow2();
@@ -17,7 +17,7 @@ const D_Charlie = /*@__PURE__*/ Fn( ( { roughness, dotNH } ) => {
 
 }, { roughness: 'float', dotNH: 'float', return: 'float' } );
 
-// https://github.com/google/filament/blob/master/shaders/src/brdf.fs
+// https://github.com/google/filament/blob/main/shaders/src/surface_brdf.fs
 const V_Neubelt = /*@__PURE__*/ Fn( ( { dotNV, dotNL } ) => {
 
 	// Neubelt and Pettineo 2013, "Crafting a Next-gen Material Pipeline for The Order: 1886"
