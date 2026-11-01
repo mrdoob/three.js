@@ -42,7 +42,7 @@ import {
 } from '../../../constants.js';
 import { CubeTexture } from '../../../textures/CubeTexture.js';
 import { Texture } from '../../../textures/Texture.js';
-import { warn, error } from '../../../utils.js';
+import { warn, warnOnce, error } from '../../../utils.js';
 
 const _compareToWebGPU = {
 	[ NeverCompare ]: 'never',
@@ -56,6 +56,17 @@ const _compareToWebGPU = {
 };
 
 const _flipMap = [ 0, 1, 3, 2, 4, 5 ];
+
+// TODO: Remove once Chrome 155+ is the baseline, keeping only drawElementImageToTexture().
+// HTML-in-Canvas drawElementImageToTexture method signatures, newest first.
+const _elementImageCopyMethodVariants = [
+	// Chrome 155+
+	( queue, source, texture, width, height ) => queue.drawElementImageToTexture( { source }, { texture, size: { width, height } } ),
+	// Chrome 150 - 154
+	( queue, source, texture, width, height ) => queue.copyElementImageToTexture( { source }, { destination: { texture }, width, height } ),
+	// Chrome 138 - 149
+	( queue, source, texture, width, height ) => queue.copyElementImageToTexture( source, width, height, { texture } )
+];
 
 function writeTextureLayer( device, textureGPU, mipLevel, layerIndex, mipmap, dataOffset, bytesPerRow, rowsPerImage, textureWidth, textureHeight ) {
 
@@ -142,6 +153,17 @@ class WebGPUTextureUtils {
 		 * @type {Map<string, Object>}
 		 */
 		this._samplerCache = new Map();
+
+		// TODO: Remove once Chrome 155+ is the baseline.
+		/**
+		 * The index of the HTML-in-Canvas copy signature supported by the browser.
+		 * See `_copyElementImageToTexture()`.
+		 *
+		 * @private
+		 * @type {number}
+		 * @default 0
+		 */
+		this._elementImageCopyVariant = 0;
 
 	}
 
@@ -725,7 +747,8 @@ class WebGPUTextureUtils {
 			const canvas = this.backend.renderer.domElement;
 			const image = texture.image;
 
-			if ( typeof device.queue.copyElementImageToTexture !== 'function' ) return;
+			// TODO: Remove the copyElementImageToTexture() check once Chrome 155+ is the baseline.
+			if ( typeof device.queue.drawElementImageToTexture !== 'function' && typeof device.queue.copyElementImageToTexture !== 'function' ) return;
 
 			// Skip the first frame — the element needs a paint record first.
 			if ( ! textureData.hasPaintCallback ) {
@@ -739,27 +762,21 @@ class WebGPUTextureUtils {
 			const width = textureDescriptorGPU.size.width;
 			const height = textureDescriptorGPU.size.height;
 
-			if ( device.queue.copyElementImageToTexture.length === 2 ) {
+			try {
 
-				// Chrome 150+
+				if ( this._copyElementImageToTexture( image, textureData.texture, width, height ) === false ) return;
 
-				device.queue.copyElementImageToTexture(
-					{ source: image },
-					{
-						destination: { texture: textureData.texture },
-						width: width,
-						height: height
-					}
-				);
+			} catch ( e ) {
 
-			} else {
+				// No paint record for the element yet. Retry once the canvas has painted it.
+				canvas.addEventListener( 'paint', () => {
 
-				// Chrome 138 - 149
+					texture.needsUpdate = true;
 
-				device.queue.copyElementImageToTexture(
-					image, width, height,
-					{ texture: textureData.texture }
-				);
+				}, { once: true } );
+
+				canvas.requestPaint();
+				return;
 
 			}
 
@@ -986,6 +1003,45 @@ class WebGPUTextureUtils {
 			}
 
 		}
+
+	}
+
+	// TODO: Remove once Chrome 155+ is the baseline, calling drawElementImageToTexture() directly instead.
+
+	/**
+	 * Copies an HTML element into the given GPU texture (HTML-in-Canvas).
+	 *
+	 * @private
+	 * @param {HTMLElement} element - The source element.
+	 * @param {GPUTexture} textureGPU - The GPU texture.
+	 * @param {number} width - The destination width.
+	 * @param {number} height - The destination height.
+	 * @return {boolean} Whether the copy was issued. `false` if no known signature is supported.
+	 */
+	_copyElementImageToTexture( element, textureGPU, width, height ) {
+
+		const queue = this.backend.device.queue;
+
+		for ( let i = this._elementImageCopyVariant; i < _elementImageCopyMethodVariants.length; i ++ ) {
+
+			try {
+
+				_elementImageCopyMethodVariants[ i ]( queue, element, textureGPU, width, height );
+				this._elementImageCopyVariant = i;
+				return true;
+
+			} catch ( e ) {
+
+				// A TypeError means the signature isn't supported, so try the next one.
+				// Any other error (e.g. no paint record yet) is passed on to the caller.
+				if ( e.name !== 'TypeError' ) throw e;
+
+			}
+
+		}
+
+		warnOnce( 'WebGPURenderer: Unsupported HTML-in-Canvas API.' );
+		return false;
 
 	}
 
