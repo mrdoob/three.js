@@ -38,6 +38,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
+			import { builtinGIContext, float, mrt, normalWorld, output, pass, positionWorld, uniform, velocity } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
@@ -49,6 +50,7 @@
 			import { VXGIVolume } from 'three/addons/lighting/vxgi/VXGIVolume.js';
 			import { vxgiIrradiance } from 'three/addons/lighting/vxgi/VXGIIrradiance.js';
 			import { lightProbeGridIrradiance } from 'three/addons/tsl/lighting/LightProbeGridNode.js';
+			import { traa } from 'three/addons/tsl/display/TRAANode.js';
 			import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
@@ -61,14 +63,20 @@
 
 			}
 
-			let camera, scene, renderer, controls, status, algorithmControl;
+			let camera, scene, renderer, controls, renderPipeline, status;
 			let world, meshes, materials;
-			let source, lightMapper, denoiser;
+			let source, lightMapper, denoiser, bakedPass, livePass, liveOutput;
+			let algorithmControl, outputControl, denoiseControl;
 			let needsBake = false, denoised = false;
+
+			// shifts the per-pixel cone noise of the live view every frame, like the light map samples
+
+			const liveFrame = uniform( 0 );
 
 			const params = {
 				scene: 'Cornell Box',
 				algorithm: 'Ray Radiosity',
+				output: 'Baked GI',
 				resolution: 1024,
 				denoise: true
 			};
@@ -78,7 +86,7 @@
 
 			// light probes are deterministic and only need a few samples to antialias the light map,
 			// the VXGI cones are rotated per sample and the radiosity rays continue their sequences, so
-			// they converge over more samples. The denoiser removes the remaining noise
+			// they converge over more samples. The denoiser removes the remaining noise of the radiosity
 
 			const bakeSamples = { 'Ray Radiosity': 64, 'Light Probe': 16, 'VXGI': 64 };
 
@@ -106,16 +114,25 @@
 
 				controls = new OrbitControls( camera, renderer.domElement );
 
+				// "Baked GI" shows the light map while it accumulates,
+				// "Live GI" evaluates the raw irradiance of light probes and VXGI per pixel every frame
+
+				renderPipeline = new THREE.RenderPipeline( renderer );
+				bakedPass = pass( scene, camera );
+
 				status = document.getElementById( 'status' );
 
 				// GUI
 
 				const gui = renderer.inspector.createParameters( 'Light Baking' );
 				gui.add( params, 'scene', Object.keys( scenes ) ).name( 'Scene' ).onChange( setScene );
-				algorithmControl = gui.add( params, 'algorithm', [ 'Ray Radiosity', 'Light Probe', 'VXGI' ] ).name( 'GI Algorithm' ).onChange( requestBake );
+				algorithmControl = gui.add( params, 'algorithm', [ 'Ray Radiosity', 'Light Probe', 'VXGI' ] ).name( 'GI Algorithm' ).onChange( setAlgorithm );
+				outputControl = gui.add( params, 'output', [ 'Baked GI', 'Live GI' ] ).name( 'Output' ).onChange( setOutput );
 				gui.add( params, 'resolution', [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( requestBake );
-				gui.add( params, 'denoise' ).name( 'Denoise' ).onChange( setLightMap );
+				denoiseControl = gui.add( params, 'denoise' ).name( 'Denoise' ).onChange( setLightMap );
 				gui.add( { bake: requestBake }, 'bake' ).name( 'Re-Bake GI' );
+
+				updateControls();
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -146,7 +163,7 @@
 				controls.update();
 
 				meshes = [];
-				world.root.traverse( ( object ) => object.isMesh && meshes.push( object ) );
+				world.lightMapped.traverse( ( object ) => object.isMesh && meshes.push( object ) );
 				materials = new Set( meshes.map( ( mesh ) => mesh.material ) );
 
 				// VXGI only sees the light of lights, not the sky that lights the Courtyard
@@ -157,6 +174,7 @@
 
 					params.algorithm = world.algorithms[ 0 ];
 					algorithmControl.setValue( params.algorithm );
+					updateControls();
 
 				}
 
@@ -164,9 +182,38 @@
 
 			}
 
+			function setAlgorithm() {
+
+				updateControls();
+				requestBake();
+
+			}
+
+			function updateControls() {
+
+				// light probes and VXGI can be evaluated live, ray radiosity bakes are denoised
+
+				const radiosity = params.algorithm === 'Ray Radiosity';
+
+				if ( radiosity && params.output !== 'Baked GI' ) {
+
+					params.output = 'Baked GI';
+					outputControl.setValue( params.output );
+
+				}
+
+				radiosity ? outputControl.hide() : outputControl.show();
+				radiosity ? denoiseControl.show() : denoiseControl.hide();
+
+			}
+
 			function createCornellBox() {
 
+				// the panel is an emitter without light map, the room holds the light-mapped meshes
+
 				const root = new THREE.Group();
+				const room = new THREE.Group();
+				root.add( room );
 
 				const wallMaterial = new THREE.MeshStandardMaterial( { color: 0xcccccc } );
 				const redMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
@@ -176,41 +223,41 @@
 				const floor = new THREE.Mesh( new THREE.PlaneGeometry( 6, 6 ), wallMaterial );
 				floor.rotation.x = - Math.PI / 2;
 				floor.receiveShadow = true;
-				root.add( floor );
+				room.add( floor );
 
 				// Ceiling
 				const ceiling = new THREE.Mesh( new THREE.PlaneGeometry( 6, 6 ), wallMaterial );
 				ceiling.rotation.x = Math.PI / 2;
 				ceiling.position.y = 5;
 				ceiling.receiveShadow = true;
-				root.add( ceiling );
+				room.add( ceiling );
 
 				// Back wall
 				const backWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), wallMaterial );
 				backWall.position.set( 0, 2.5, - 3 );
 				backWall.receiveShadow = true;
-				root.add( backWall );
+				room.add( backWall );
 
 				// Front wall
 				const frontWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), wallMaterial );
 				frontWall.rotation.y = Math.PI;
 				frontWall.position.set( 0, 2.5, 3 );
 				frontWall.receiveShadow = true;
-				root.add( frontWall );
+				room.add( frontWall );
 
 				// Left wall (red)
 				const leftWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), redMaterial );
 				leftWall.rotation.y = Math.PI / 2;
 				leftWall.position.set( - 3, 2.5, 0 );
 				leftWall.receiveShadow = true;
-				root.add( leftWall );
+				room.add( leftWall );
 
 				// Right wall (green)
 				const rightWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), greenMaterial );
 				rightWall.rotation.y = - Math.PI / 2;
 				rightWall.position.set( 3, 2.5, 0 );
 				rightWall.receiveShadow = true;
-				root.add( rightWall );
+				room.add( rightWall );
 
 				// Objects inside the box
 
@@ -222,7 +269,7 @@
 				tallBox.rotation.y = Math.PI / 8;
 				tallBox.castShadow = true;
 				tallBox.receiveShadow = true;
-				root.add( tallBox );
+				room.add( tallBox );
 
 				// Glossy sphere, to show direct specular lighting (Light Probe and VXGI)
 				const glossyMaterial = new THREE.MeshStandardMaterial( { color: 0x0044ff, roughness: 0.15 } );
@@ -230,7 +277,7 @@
 				glossySphere.position.set( 1, 0.65, 0.5 );
 				glossySphere.castShadow = true;
 				glossySphere.receiveShadow = true;
-				root.add( glossySphere );
+				room.add( glossySphere );
 
 				// Lights: ray radiosity bakes the direct light of an emissive area light panel with soft
 				// shadows, light probes and VXGI bake the indirect light of a live point light
@@ -249,7 +296,7 @@
 				root.add( light );
 
 				return {
-					root, light, lightPanel, background: new THREE.Color( 0x111111 ), cacheSize: 256, algorithms: [ 'Ray Radiosity', 'Light Probe', 'VXGI' ],
+					root, lightMapped: room, light, lightPanel, background: new THREE.Color( 0x111111 ), cacheSize: 256, algorithms: [ 'Ray Radiosity', 'Light Probe', 'VXGI' ],
 					camera: new THREE.Vector3( 0, 2.5, 8 ), target: new THREE.Vector3( 0, 2.5, 0 ),
 					probes: { size: new THREE.Vector3( 6, 5, 6 ), position: new THREE.Vector3( 0, 2.5, 0 ), counts: [ 8, 8, 8 ], far: 20 }
 				};
@@ -340,7 +387,7 @@
 				}
 
 				return {
-					root, light: null, lightPanel: null, background: sky, cacheSize: 512, algorithms: [ 'Ray Radiosity', 'Light Probe' ],
+					root, lightMapped: root, light: null, lightPanel: null, background: sky, cacheSize: 512, algorithms: [ 'Ray Radiosity', 'Light Probe' ],
 					camera: new THREE.Vector3( - 5.6, 1.6, 1.5 ), target: new THREE.Vector3( 3, 3.4, - 2.5 ),
 					probes: { size: new THREE.Vector3( 17.7, 7.5, 17.7 ), position: new THREE.Vector3( 0, 4, 0 ), counts: [ 8, 4, 8 ], far: 40 }
 				};
@@ -359,6 +406,8 @@
 
 				lightMapper?.dispose();
 				denoiser?.dispose();
+				if ( liveOutput !== livePass ) liveOutput?.dispose();
+				livePass?.dispose();
 				source?.dispose();
 
 				// each mesh gets a new geometry with light map UVs, also for another resolution
@@ -366,7 +415,7 @@
 				if ( world.atlas?.resolution !== params.resolution ) {
 
 					const geometries = new Set( meshes.map( ( mesh ) => mesh.geometry ) );
-					world.atlas = unwrapUVs( world.root, { resolution: params.resolution, padding: 3 } );
+					world.atlas = unwrapUVs( world.lightMapped, { resolution: params.resolution, padding: 3 } );
 
 					for ( const geometry of geometries ) geometry.dispose();
 
@@ -389,9 +438,11 @@
 
 				}
 
+				const radiosity = params.algorithm === 'Ray Radiosity';
+
 				let irradiance;
 
-				if ( params.algorithm === 'Ray Radiosity' ) {
+				if ( radiosity ) {
 
 					// rays through a BVH of the scene, with the bounces cached in a light map of their own
 
@@ -423,16 +474,53 @@
 
 				}
 
-				// the light map accumulates one sample per frame in animate(), with the variance of the samples
-				// for the denoiser
+				// the light map accumulates one sample per frame in animate(). Ray radiosity bakes are denoised,
+				// with the variance of their samples
 
-				lightMapper = new LightMapper( renderer, world.atlas.resolution, irradiance, { moments: true } );
+				lightMapper = new LightMapper( renderer, world.atlas.resolution, irradiance, { moments: radiosity } );
 				lightMapper.addObjects( meshes );
 
-				denoiser = new LightMapDenoiser( renderer, lightMapper );
-				denoised = false;
+				denoiser = radiosity ? new LightMapDenoiser( renderer, lightMapper ) : null;
 
+				livePass = liveOutput = null;
+
+				if ( radiosity === false ) {
+
+					// traa needs a single-sampled depth buffer
+
+					livePass = pass( scene, camera, { samples: 0 } );
+					livePass.contextNode = builtinGIContext( float( 1 ), irradiance( positionWorld, normalWorld, liveFrame ) );
+					liveOutput = livePass;
+
+					if ( params.algorithm === 'VXGI' ) {
+
+						// traa resolves the per-pixel cone noise, like webgpu_vxgi
+
+						livePass.setMRT( mrt( { output, velocity } ) );
+						liveOutput = traa( livePass.getTextureNode( 'output' ), livePass.getTextureNode( 'depth' ), livePass.getTextureNode( 'velocity' ), camera );
+
+					}
+
+				}
+
+				setOutput();
+
+			}
+
+			function setOutput() {
+
+				const live = params.output === 'Live GI';
+
+				// discard accumulated samples when switching outputs; baking only runs in Baked GI
+
+				lightMapper.reset();
+				denoised = false;
 				setLightMap();
+
+				for ( const material of materials ) material.lightMapIntensity = live ? 0 : 1;
+
+				renderPipeline.outputNode = live ? liveOutput : bakedPass;
+				renderPipeline.needsUpdate = true;
 
 			}
 
@@ -440,7 +528,7 @@
 
 				// the denoised light map once the bake has finished
 
-				const lightMap = params.denoise && denoised ? denoiser.texture : lightMapper.texture;
+				const lightMap = denoiser !== null && params.denoise && denoised ? denoiser.texture : lightMapper.texture;
 
 				for ( const material of materials ) material.lightMap = lightMap;
 
@@ -468,12 +556,17 @@
 
 				const samples = bakeSamples[ params.algorithm ];
 
-				if ( lightMapper.samples < samples ) {
+				if ( params.output === 'Live GI' ) {
+
+					liveFrame.value = ( liveFrame.value + 1 ) % 64;
+					status.textContent = `Live ${ params.algorithm }`;
+
+				} else if ( lightMapper.samples < samples ) {
 
 					lightMapper.update();
 					status.textContent = `Baking ${ params.algorithm }: ${ lightMapper.samples } / ${ samples } samples`;
 
-				} else {
+				} else if ( denoiser !== null ) {
 
 					if ( denoised === false ) {
 
@@ -485,9 +578,13 @@
 
 					status.textContent = `${ params.algorithm } baked: ${ samples } samples${ params.denoise ? ', denoised' : '' }`;
 
+				} else {
+
+					status.textContent = `${ params.algorithm } baked: ${ samples } samples`;
+
 				}
 
-				renderer.render( scene, camera );
+				renderPipeline.render();
 
 			}
 
