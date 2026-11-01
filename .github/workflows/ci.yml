@@ -80,7 +80,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y mesa-vulkan-drivers xvfb
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install chromium
       - run: npm run build
       - run: xvfb-run -a npm run test-e2e -- --shard=${{ matrix.shard }}/5
       - name: Upload output screenshots
