@@ -241,7 +241,7 @@ class Info {
 	}
 
 	/**
-	 * Updates the tracked memory of a texture, e.g. when its data has been uploaded or resized.
+	 * Updates the tracked memory of a texture when its default texture is replaced with the loaded one.
 	 *
 	 * @param {Texture} texture
 	 * @param {Object} options - The texture's size and level information.
@@ -249,7 +249,7 @@ class Info {
 	updateTexture( texture, options ) {
 
 		const size = this._getTextureMemorySize( texture, options );
-		const delta = size - ( this.memoryMap.get( texture ) || 0 );
+		const delta = size - this.memoryMap.get( texture );
 		this.memoryMap.set( texture, size );
 
 		this.memory.total += delta;

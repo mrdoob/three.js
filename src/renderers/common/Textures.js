@@ -435,6 +435,8 @@ class Textures extends DataMap {
 
 						backend.createTexture( texture, options );
 
+						if ( textureData.isDefaultTexture === true ) this.info.updateTexture( texture, options );
+
 						textureData.isDefaultTexture = false;
 						textureData.generation = texture.version;
 
@@ -510,10 +512,6 @@ class Textures extends DataMap {
 
 			this._tracked.add( textureData.ref );
 			this._registry.register( texture, textureData.ref, textureData.ref );
-
-		} else {
-
-			this.info.updateTexture( texture, options );
 
 		}
 
