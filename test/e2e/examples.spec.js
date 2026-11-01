@@ -37,8 +37,10 @@ for ( const file of files ) {
 	test( file, async ( { page, context }, testInfo ) => {
 
 		// A screenshot from a software renderer cannot verify hardware rendering.
+		// THREE_SOFTWARE_GPU opts in for GPU-less CI, whose thumbnails come from Mesa lavapipe.
+		const allowSoftware = !! process.env.THREE_SOFTWARE_GPU;
 		await page.goto( '/test/e2e/gpu-probe.html' );
-		const renderer = await page.evaluate( async ( webgpu ) => {
+		const renderer = await page.evaluate( async ( { webgpu, allowSoftware } ) => {
 
 			const canvas = document.createElement( 'canvas' );
 			const gl = canvas.getContext( 'webgl2' );
@@ -50,7 +52,7 @@ for ( const file of files ) {
 			if ( webgpu ) {
 
 				const adapter = await navigator.gpu?.requestAdapter();
-				if ( ! adapter || adapter.info?.isFallbackAdapter || adapter.isFallbackAdapter ) throw new Error( 'Hardware WebGPU adapter unavailable' );
+				if ( ! adapter || ( ! allowSoftware && ( adapter.info?.isFallbackAdapter || adapter.isFallbackAdapter ) ) ) throw new Error( 'Hardware WebGPU adapter unavailable' );
 				const device = await adapter.requestDevice();
 				device.destroy();
 				const info = adapter.info;
@@ -60,8 +62,8 @@ for ( const file of files ) {
 
 			return name;
 
-		}, file.startsWith( 'webgpu_' ) );
-		expect( renderer, 'A physical GPU is required' ).not.toMatch( /swiftshader|llvmpipe|lavapipe|software|microsoft basic render/i );
+		}, { webgpu: file.startsWith( 'webgpu_' ), allowSoftware } );
+		if ( ! allowSoftware ) expect( renderer, 'A physical GPU is required' ).not.toMatch( /swiftshader|llvmpipe|lavapipe|software|microsoft basic render/i );
 		await testInfo.attach( 'gpu', { body: renderer, contentType: 'text/plain' } );
 
 		let pageError;

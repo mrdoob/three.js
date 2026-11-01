@@ -3,6 +3,10 @@ import { fileURLToPath } from 'node:url';
 
 const angleBackend = { win32: 'd3d11', darwin: 'metal' }[ process.platform ];
 
+// Ubuntu CI has no GPU; match the legacy runner's Mesa lavapipe setup the thumbnails were made with.
+const linux = process.platform === 'linux';
+const linuxArgs = [ '--enable-features=Vulkan', '--disable-vulkan-surface', '--ignore-gpu-blocklist', '--disable-gpu-driver-bug-workarounds', '--disable-gpu-watchdog' ];
+
 export default defineConfig( {
 
 	testDir: '.',
@@ -21,7 +25,8 @@ export default defineConfig( {
 		viewport: { width: 800, height: 500 },
 		baseURL: 'http://localhost:1234',
 		launchOptions: {
-			args: [ '--hide-scrollbars', '--enable-unsafe-webgpu', ...( angleBackend ? [ `--use-angle=${ angleBackend }` ] : [] ) ]
+			args: [ '--hide-scrollbars', '--enable-unsafe-webgpu', ...( angleBackend ? [ `--use-angle=${ angleBackend }` ] : [] ), ...( linux ? linuxArgs : [] ) ],
+			env: linux ? { ...process.env, VK_DRIVER_FILES: '/usr/share/vulkan/icd.d/lvp_icd.x86_64.json' } : undefined
 		},
 		trace: 'retain-on-failure'
 	},

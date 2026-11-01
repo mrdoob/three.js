@@ -61,8 +61,11 @@ jobs:
   e2e:
     name: Example screenshots
     needs: [test]
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 60
+    env:
+      VISIBLE: 1
+      THREE_SOFTWARE_GPU: 1
     strategy:
       fail-fast: false
       matrix:
@@ -73,22 +76,25 @@ jobs:
         with:
           node-version: 24
           cache: npm
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y mesa-vulkan-drivers xvfb
       - run: npm ci
-      - run: npx playwright install chromium
+      - run: npx playwright install --with-deps chromium
       - run: npm run build
-      - run: npm run test-e2e -- --shard=${{ matrix.shard }}/5
+      - run: xvfb-run -a npm run test-e2e -- --shard=${{ matrix.shard }}/5
       - name: Upload output screenshots
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: always()
         with:
-          name: Output screenshots-macos-${{ matrix.shard }}
+          name: Output screenshots-ubuntu-${{ matrix.shard }}
           path: test/e2e/output-screenshots
           if-no-files-found: ignore
       - name: Upload Playwright diagnostics
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: failure()
         with:
-          name: Playwright diagnostics-macos-${{ matrix.shard }}
+          name: Playwright diagnostics-ubuntu-${{ matrix.shard }}
           path: test/e2e/results
           retention-days: 3
           if-no-files-found: ignore
