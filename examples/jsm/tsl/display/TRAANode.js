@@ -1,8 +1,9 @@
 import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
 import { float, Fn, max, texture, uniform, uv, vec2, convertToTexture, passTexture, velocity, ivec2, mix, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
-import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth, samplePreviousDepth } from '../utils/TAAUtils.js';
+import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth, samplePreviousDepth, getProjectionJitter } from '../utils/TAAUtils.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
+const _jitterMatrix = /*@__PURE__*/ new Matrix4();
 const _size = /*@__PURE__*/ new Vector2();
 
 let _rendererState;
@@ -188,6 +189,9 @@ class TRAANode extends Node {
 		 * @type {Matrix4}
 		 */
 		this._originalProjectionMatrix = new Matrix4();
+		this._viewOffsetApplied = false;
+		this._jitter = new Vector2();
+		this._jitterDelta = uniform( new Vector2() );
 
 		/**
 		 * A uniform node holding the camera's near and far.
@@ -310,35 +314,23 @@ class TRAANode extends Node {
 
 		// save original/unjittered projection matrix for velocity pass
 
-		this.camera.updateProjectionMatrix();
 		this._originalProjectionMatrix.copy( this.camera.projectionMatrix );
+		this._viewOffsetApplied = true;
 
 		this._velocityNode.setProjectionMatrix( this._originalProjectionMatrix );
 
 		//
 
-		const viewOffset = {
-
-			fullWidth: width,
-			fullHeight: height,
-			offsetX: 0,
-			offsetY: 0,
-			width: width,
-			height: height
-
-		};
-
 		const jitterOffset = _haltonOffsets[ this._jitterIndex ];
 
-		this.camera.setViewOffset(
+		// jitter in clip space so custom projections and view offsets are preserved
 
-			viewOffset.fullWidth, viewOffset.fullHeight,
-
-			viewOffset.offsetX + jitterOffset[ 0 ] - 0.5, viewOffset.offsetY + jitterOffset[ 1 ] - 0.5,
-
-			viewOffset.width, viewOffset.height
-
-		);
+		this.camera.projectionMatrix.premultiply( _jitterMatrix.makeTranslation(
+			- 2 * ( jitterOffset[ 0 ] - 0.5 ) / width,
+			2 * ( jitterOffset[ 1 ] - 0.5 ) / height,
+			0
+		) );
+		this.camera.projectionMatrixInverse.copy( this.camera.projectionMatrix ).invert();
 
 	}
 
@@ -347,7 +339,13 @@ class TRAANode extends Node {
 	 */
 	clearViewOffset() {
 
-		this.camera.clearViewOffset();
+		// On the compilation frame only the after-pipeline callback runs.
+
+		if ( this._viewOffsetApplied === false ) return;
+		this._viewOffsetApplied = false;
+
+		this.camera.projectionMatrix.copy( this._originalProjectionMatrix );
+		this.camera.projectionMatrixInverse.copy( this.camera.projectionMatrix ).invert();
 
 		this._velocityNode.setProjectionMatrix( null );
 
@@ -366,6 +364,10 @@ class TRAANode extends Node {
 	updateBefore( frame ) {
 
 		const { renderer } = frame;
+
+		this._jitterDelta.value.copy( this._jitter );
+		getProjectionJitter( this.camera, this._velocityNode.projectionMatrix, this._jitter );
+		this._jitterDelta.value.sub( this._jitter );
 
 		// store previous frame matrices before updating current ones
 
@@ -556,7 +558,7 @@ class TRAANode extends Node {
 			// sample the previous depth
 
 			const historyUV = uvNode.sub( offsetUV );
-			const previousDepth = samplePreviousDepth( this._previousDepthNode, historyUV, this._previousCameraProjectionMatrixInverse, this._previousCameraWorldMatrix, this._cameraWorldMatrixInverse, this._cameraNearFar, this.camera );
+			const previousDepth = samplePreviousDepth( this._previousDepthNode, historyUV.add( this._jitterDelta ), this._previousCameraProjectionMatrixInverse, this._previousCameraWorldMatrix, this._cameraWorldMatrixInverse, this._cameraNearFar, this.camera );
 
 			// history is considered valid when the UV is in range and there's no disocclusion except on edges
 
