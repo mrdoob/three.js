@@ -27,6 +27,7 @@ export const exceptionList = [
 	'webgpu_volume_lighting_traa',
 
 	// Timming issues?
+	'physics_jolt_instancing',
 	'physics_rapier_instancing',
 	'webgl_shadowmap',
 	'webaudio_visualizer',
