@@ -1,6 +1,9 @@
 import { GLTFLoader } from '../../../../examples/jsm/loaders/GLTFLoader.js';
 import { GLTFGaussianSplatLoaderExtension } from '../../../../examples/jsm/loaders/GLTFGaussianSplatLoaderExtension.js';
 import { makeClipAdditive } from '../../../../src/animation/AnimationUtils.js';
+import { AnimationClip } from '../../../../src/animation/AnimationClip.js';
+import { QuaternionKeyframeTrack } from '../../../../src/animation/tracks/QuaternionKeyframeTrack.js';
+import { Quaternion } from '../../../../src/math/Quaternion.js';
 import { unpackSphericalHarmonicsBand } from '../utils/GaussianSplatTestUtils.js';
 
 const EPS = 1e-6;
@@ -182,6 +185,89 @@ export default QUnit.module( 'Addons', () => {
 					0, 0, 0, - 1, - 1, - 1, 0, 0, 0,
 					0, 0, 0, 1, 1, 1, 0, 0, 0
 				], 'Subtracts the interpolated reference value and preserves tangents' );
+
+			} );
+
+			QUnit.test( 'quaternion animations preserve their relative rotation curve when made additive', async ( assert ) => {
+
+				const h = Math.SQRT1_2;
+
+				for ( const interpolation of [ 'CUBICSPLINE', 'LINEAR' ] ) {
+
+					const values = interpolation === 'CUBICSPLINE' ? [
+						0, 0, 0, 0, h, 0, 0, h, 0, 0, 2, 0,
+						0, 0, - 3, 0, 0, h, 0, h, 0, 0, 0, 0
+					] : [ h, 0, 0, h, 0, h, 0, h ];
+					const buffer = new Float32Array( [ 0, 1, ...values ] );
+					const json = {
+						asset: { version: '2.0' },
+						scene: 0,
+						scenes: [ { nodes: [ 0 ] } ],
+						nodes: [ {} ],
+						buffers: [ { byteLength: buffer.byteLength, uri: 'data:application/octet-stream;base64,' + arrayBufferToBase64( buffer.buffer ) } ],
+						bufferViews: [ { buffer: 0, byteLength: 8 }, { buffer: 0, byteOffset: 8, byteLength: values.length * 4 } ],
+						accessors: [
+							{ bufferView: 0, componentType: FLOAT, count: 2, type: 'SCALAR', min: [ 0 ], max: [ 1 ] },
+							{ bufferView: 1, componentType: FLOAT, count: values.length / 4, type: 'VEC4' }
+						],
+						animations: [ {
+							samplers: [ { input: 0, output: 1, interpolation } ],
+							channels: [ { sampler: 0, target: { node: 0, path: 'rotation' } } ]
+						} ]
+					};
+					const gltf = await new GLTFLoader().parseAsync( JSON.stringify( json ), '' );
+					const original = gltf.animations[ 0 ];
+					const originalTrack = original.tracks[ 0 ];
+					const originalInterpolant = originalTrack.createInterpolant();
+					const referenceTrack = new QuaternionKeyframeTrack( originalTrack.name, [ 0, 1 ], [ 0, 0, h, h, 0, 0, 1, 0 ] );
+					const reference = new AnimationClip( 'reference', 1, [ referenceTrack ] );
+					const referenceValues = referenceTrack.values.slice();
+
+					for ( const separateReference of [ false, true ] ) {
+
+						for ( const referenceTime of [ 0, 0.5, 1 ] ) {
+
+							const clip = original.clone();
+							const referenceClip = separateReference ? reference : clip;
+							const referenceInterpolant = referenceClip.tracks[ 0 ].createInterpolant();
+							const inverseReference = new Quaternion().fromArray( referenceInterpolant.evaluate( referenceTime ) ).normalize().conjugate();
+
+							makeClipAdditive( clip, referenceTime * 30, referenceClip, 30 );
+
+							const track = clip.tracks[ 0 ];
+							const interpolant = track.createInterpolant();
+							const context = `${ interpolation }, separate reference: ${ separateReference }, reference time: ${ referenceTime }`;
+
+							for ( const time of [ 0, 0.25, 0.5, 0.75, 1 ] ) {
+
+								const originalValue = new Quaternion().fromArray( originalInterpolant.evaluate( time ) );
+								const expected = inverseReference.clone().multiply( originalValue ).normalize();
+								const actual = new Quaternion().fromArray( interpolant.evaluate( time ) ).normalize();
+
+								assert.ok( actual.angleTo( expected ) < EPS, `${ context }, sample time: ${ time }` );
+
+							}
+
+							if ( interpolation === 'CUBICSPLINE' ) {
+
+								for ( const offset of [ 0, 8, 12, 20 ] ) {
+
+									const originalLength = new Quaternion().fromArray( originalTrack.values, offset ).length();
+									const actualLength = new Quaternion().fromArray( track.values, offset ).length();
+
+									closeTo( assert, actualLength, originalLength, `${ context }, preserves tangent magnitude at ${ offset }` );
+
+								}
+
+							}
+
+						}
+
+					}
+
+					assert.deepEqual( referenceTrack.values, referenceValues, 'Does not modify a separate reference clip' );
+
+				}
 
 			} );
 
