@@ -3383,9 +3383,10 @@ class WebGLRenderer {
 			} else {
 
 				const levelScale = Math.pow( 2, - srcLevel );
-				const size = srcTexture.isCompressedTexture ? image : srcTexture;
-				width = Math.floor( size.width * levelScale );
-				height = Math.floor( size.height * levelScale );
+				const srcWidth = srcTexture.isCompressedTexture ? image.width : srcTexture.width;
+				const srcHeight = srcTexture.isCompressedTexture ? image.height : srcTexture.height;
+				width = Math.floor( srcWidth * levelScale );
+				height = Math.floor( srcHeight * levelScale );
 				if ( srcTexture.isDataArrayTexture ) {
 
 					depth = image.depth;
