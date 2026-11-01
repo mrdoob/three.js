@@ -316,6 +316,10 @@ class VXGIVolume {
 
 		this._kernels = null;
 
+		// the kernels of an update, dispatched together in one compute pass
+
+		this._computeNodes = [];
+
 		this._lightsArray = [];
 		for ( let i = 0; i < this.maxLights * 4; i ++ ) this._lightsArray.push( new Vector4() );
 		this._lightsNode = uniformArray( this._lightsArray, 'vec4' );
@@ -371,7 +375,7 @@ class VXGIVolume {
 
 		if ( this.needsUpdate === true || this._allocated === false || this._directional !== this.directionalRadiance ) {
 
-			this._voxelize( renderer, scene );
+			this._voxelize( scene );
 
 			this.needsUpdate = false;
 			this.lightingNeedsUpdate = true;
@@ -386,6 +390,14 @@ class VXGIVolume {
 			this._updateLighting( renderer );
 
 			this.lightingNeedsUpdate = false;
+
+		}
+
+		if ( this._computeNodes.length > 0 ) {
+
+			renderer.compute( this._computeNodes );
+
+			this._computeNodes.length = 0;
 
 		}
 
@@ -404,7 +416,7 @@ class VXGIVolume {
 
 	// geometry
 
-	_voxelize( renderer, scene ) {
+	_voxelize( scene ) {
 
 		this._exclude.clear();
 
@@ -475,13 +487,11 @@ class VXGIVolume {
 		this._disposeKernels();
 		const kernels = this._getKernels();
 
-		renderer.compute( kernels.clear );
+		this._computeNodes.push( kernels.clear );
 
-		if ( count > 0 ) renderer.compute( kernels.voxelize );
+		if ( count > 0 ) this._computeNodes.push( kernels.voxelize );
 
-		renderer.compute( kernels.resolve );
-
-		for ( const kernel of kernels.opacityMips ) renderer.compute( kernel );
+		this._computeNodes.push( kernels.resolve, ...kernels.opacityMips );
 
 	}
 
@@ -722,17 +732,13 @@ class VXGIVolume {
 
 		}
 
-		renderer.compute( kernels.inject[ index ] );
-
-		for ( const kernel of kernels.radianceMips[ index ] ) renderer.compute( kernel );
+		this._computeNodes.push( kernels.inject[ index ], ...kernels.radianceMips[ index ] );
 
 		for ( let i = 0; i < bounces; i ++ ) {
 
 			const target = 1 - index;
 
-			renderer.compute( kernels.bounce[ target ] );
-
-			for ( const kernel of kernels.radianceMips[ target ] ) renderer.compute( kernel );
+			this._computeNodes.push( kernels.bounce[ target ], ...kernels.radianceMips[ target ] );
 
 			index = target;
 

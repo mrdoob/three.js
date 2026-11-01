@@ -566,18 +566,20 @@
 
 					if ( currentStep !== MAX_STEPS ) {
 
-						renderer.compute( computeBitonicStep );
-
-						renderer.compute( computeAlignCurrent );
-
-						renderer.compute( computeSetAlgo );
+						renderer.compute( [
+							computeBitonicStep,
+							computeAlignCurrent,
+							computeSetAlgo
+						] );
 
 						currentStep ++;
 
 					} else {
 
-						renderer.compute( computeResetBuffers );
-						renderer.compute( computeResetAlgo );
+						renderer.compute( [
+							computeResetBuffers,
+							computeResetAlgo
+						] );
 
 						currentStep = 0;
 
