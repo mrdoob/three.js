@@ -79,24 +79,6 @@ function getGridIrradiance( light, min, max, res, intensity, position, normal ) 
 }
 
 /**
- * Returns the irradiance of a baked {@link LightProbeGrid} at the given world-space
- * position and normal. Use this to evaluate the grid outside of the lighting context,
- * e.g. when baking light maps with {@link LightMapper}.
- *
- * @param {LightProbeGrid} light - The baked light probe grid.
- * @param {Node<vec3>} position - The world-space position.
- * @param {Node<vec3>} normal - The world-space normal.
- * @return {Node<vec3>} The irradiance.
- */
-export function lightProbeGridIrradiance( light, position, normal ) {
-
-	const box = light.boundingBox;
-
-	return getGridIrradiance( light, uniform( box.min ), uniform( box.max ), uniform( light.resolution ), uniform( light.intensity ), position, normal );
-
-}
-
-/**
  * The light node that applies a {@link LightProbeGrid} to the scene. It samples
  * the baked L2 spherical-harmonic atlas at the surface position and adds the
  * resulting irradiance to the lighting context, so every standard node material
