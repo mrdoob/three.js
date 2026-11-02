@@ -74,7 +74,7 @@
 			const liveFrame = uniform( 0 );
 
 			const params = {
-				scene: 'Cornell Box',
+				scene: 'Cornell Box + Point',
 				algorithm: 'Ray Radiosity',
 				output: 'Baked GI',
 				resolution: 1024,
@@ -83,7 +83,7 @@
 				denoise: true
 			};
 
-			const scenes = { 'Cornell Box': createCornellBox, 'Courtyard': loadCourtyard };
+			const scenes = { 'Cornell Box + Point': () => createCornellBox( false ), 'Cornell Box + Emissive': () => createCornellBox( true ), 'Courtyard': loadCourtyard };
 			const worlds = {};
 
 			// light probes are deterministic and only need a few samples to antialias the light map,
@@ -212,9 +212,10 @@
 
 			}
 
-			function createCornellBox() {
+			function createCornellBox( emissive ) {
 
-				// the room holds the light-mapped meshes; all GI modes use the same point light
+				// the room holds the light-mapped meshes, lit by a live point light or an emissive area light
+				// panel without light map, whose direct light with soft shadows is baked by every GI mode
 
 				const root = new THREE.Group();
 				const room = new THREE.Group();
@@ -284,14 +285,27 @@
 				glossySphere.receiveShadow = true;
 				room.add( glossySphere );
 
-				const light = new THREE.PointLight( 0xffffff, 40 );
-				light.position.set( 0, 4.5, 0 );
-				light.castShadow = true;
-				light.shadow.mapSize.setScalar( 256 );
-				light.shadow.radius = 10;
-				light.shadow.normalBias = - 0.02;
-				light.shadow.autoUpdate = false;
-				root.add( light );
+				let light = null;
+
+				if ( emissive ) {
+
+					const lightPanel = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), new THREE.MeshStandardMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 20 } ) );
+					lightPanel.rotation.x = Math.PI / 2;
+					lightPanel.position.y = 4.99;
+					root.add( lightPanel );
+
+				} else {
+
+					light = new THREE.PointLight( 0xffffff, 40 );
+					light.position.set( 0, 4.5, 0 );
+					light.castShadow = true;
+					light.shadow.mapSize.setScalar( 256 );
+					light.shadow.radius = 10;
+					light.shadow.normalBias = - 0.02;
+					light.shadow.autoUpdate = false;
+					root.add( light );
+
+				}
 
 				return {
 					root, lightMapped: room, light, background: new THREE.Color( 0x111111 ), cacheSize: 256, algorithms: [ 'Ray Radiosity', 'Light Probe', 'VXGI' ],
