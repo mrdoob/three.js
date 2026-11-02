@@ -406,7 +406,7 @@ class RayTracedRadiosity {
 		this._geometry = geometry;
 		this._bvh = bvh;
 		this._lightMapMeshes = lightMapMeshes;
-		this._triangles = storage( new StorageBufferAttribute( triangleMaterials, 1 ), 'uint', triangleMaterials.length ).toReadOnly();
+		this._triangles = storage( new StorageBufferAttribute( triangleMaterials, 1 ), 'uint' ).toReadOnly();
 		this._materials = vec4Storage( materials );
 		this._lights = vec4Storage( lights );
 		this._lightCount = lights.length / ( LIGHT_STRIDE * 4 );
@@ -433,7 +433,7 @@ class RayTracedRadiosity {
 		if ( environment === null ) return;
 
 		const attribute = new StorageBufferAttribute( new Float32Array( ( SKY_CELLS + SKY_ROWS ) * 4 ), 4 );
-		const table = storage( attribute, 'vec4', SKY_CELLS + SKY_ROWS );
+		const table = storage( attribute, 'vec4' );
 
 		// the power of a cell is its mean luminance times its solid angle, from a grid of directions that
 		// are distributed over the solid angle like the shadow rays, see _gather()
@@ -526,7 +526,7 @@ class RayTracedRadiosity {
 		material.dispose();
 		target.dispose();
 
-		this._sky = storage( attribute, 'vec4', SKY_CELLS + SKY_ROWS ).toReadOnly();
+		this._sky = storage( attribute, 'vec4' ).toReadOnly();
 
 	}
 
@@ -1005,7 +1005,7 @@ function vec4Storage( data ) {
 	const array = new Float32Array( Math.max( data.length, 4 ) );
 	array.set( data );
 
-	return storage( new StorageBufferAttribute( array, 4 ), 'vec4', array.length / 4 ).toReadOnly();
+	return storage( new StorageBufferAttribute( array, 4 ), 'vec4' ).toReadOnly();
 
 }
 
