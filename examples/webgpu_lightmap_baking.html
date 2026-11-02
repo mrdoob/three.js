@@ -78,6 +78,7 @@
 				algorithm: 'Ray Radiosity',
 				output: 'Baked GI',
 				resolution: 1024,
+				bounces: 6,
 				bakeDirect: false,
 				denoise: true
 			};
@@ -130,6 +131,7 @@
 				algorithmControl = gui.add( params, 'algorithm', [ 'Ray Radiosity', 'Light Probe', 'VXGI' ] ).name( 'GI Algorithm' ).onChange( setAlgorithm );
 				outputControl = gui.add( params, 'output', [ 'Baked GI', 'Live GI' ] ).name( 'Output' ).onChange( setOutput );
 				gui.add( params, 'resolution', [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( requestBake );
+				gui.add( params, 'bounces', 0, 16, 1 ).name( 'Bounces' ).onChange( requestBake );
 				directLightControl = gui.add( params, 'bakeDirect' ).name( 'Bake direct diffuse' ).onChange( requestBake );
 				denoiseControl = gui.add( params, 'denoise' ).name( 'Denoise' ).onChange( setLightMap );
 				gui.add( { bake: requestBake }, 'bake' ).name( 'Re-Bake GI' );
@@ -437,7 +439,7 @@
 
 					// rays through a BVH of the scene, with the bounces cached in a light map of their own
 
-					const radiosity = new RayTracedRadiosity( { cacheSize: world.cacheSize } );
+					const radiosity = new RayTracedRadiosity( { cacheSize: world.cacheSize, bounces: params.bounces } );
 					radiosity.update( renderer, scene );
 					irradiance = rayTracedRadiosityIrradiance( radiosity, { analyticLights: bakeDirect } );
 					source = radiosity;
@@ -449,13 +451,14 @@
 					const probes = new LightProbeGrid( size.x, size.y, size.z, ...counts );
 					probes.position.copy( position );
 					probes.updateBoundingBox();
-					probes.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far } );
+					probes.bake( renderer, scene, { cubemapSize: 32, near: 0.05, far, bounces: params.bounces } );
 					irradiance = ( position, normal ) => lightProbeGridIrradiance( probes, position, normal );
 					source = probes;
 
 				} else {
 
 					const volume = new VXGIVolume();
+					volume.bounces = params.bounces;
 					volume.update( renderer, scene );
 
 					// three cones like webgpu_vxgi
