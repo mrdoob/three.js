@@ -4,6 +4,7 @@ import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth, s
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
+const _jitterMatrix = /*@__PURE__*/ new Matrix4();
 
 let _rendererState;
 
@@ -190,6 +191,15 @@ class TRAANode extends Node {
 		this._originalProjectionMatrix = new Matrix4();
 
 		/**
+		 * Whether the jitter is currently applied to the camera.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._viewOffsetEnabled = false;
+
+		/**
 		 * A uniform node holding the camera's near and far.
 		 *
 		 * @private
@@ -300,8 +310,8 @@ class TRAANode extends Node {
 	}
 
 	/**
-	 * Defines the TRAA's current jitter as a view offset
-	 * to the scene's camera.
+	 * Applies the TRAA's current jitter to the projection
+	 * matrix of the scene's camera.
 	 *
 	 * @param {number} width - The width of the effect.
 	 * @param {number} height - The height of the effect.
@@ -310,44 +320,38 @@ class TRAANode extends Node {
 
 		// save original/unjittered projection matrix for velocity pass
 
-		this.camera.updateProjectionMatrix();
 		this._originalProjectionMatrix.copy( this.camera.projectionMatrix );
+		this._viewOffsetEnabled = true;
 
 		this._velocityNode.setProjectionMatrix( this._originalProjectionMatrix );
 
 		//
 
-		const viewOffset = {
-
-			fullWidth: width,
-			fullHeight: height,
-			offsetX: 0,
-			offsetY: 0,
-			width: width,
-			height: height
-
-		};
-
 		const jitterOffset = _haltonOffsets[ this._jitterIndex ];
 
-		this.camera.setViewOffset(
+		this.camera.projectionMatrix.premultiply( _jitterMatrix.makeTranslation(
 
-			viewOffset.fullWidth, viewOffset.fullHeight,
+			- 2 * ( jitterOffset[ 0 ] - 0.5 ) / width,
+			2 * ( jitterOffset[ 1 ] - 0.5 ) / height,
+			0
 
-			viewOffset.offsetX + jitterOffset[ 0 ] - 0.5, viewOffset.offsetY + jitterOffset[ 1 ] - 0.5,
+		) );
 
-			viewOffset.width, viewOffset.height
-
-		);
+		this.camera.projectionMatrixInverse.copy( this.camera.projectionMatrix ).invert();
 
 	}
 
 	/**
-	 * Clears the view offset from the scene's camera.
+	 * Restores the original projection matrix of the scene's camera.
 	 */
 	clearViewOffset() {
 
-		this.camera.clearViewOffset();
+		if ( this._viewOffsetEnabled === false ) return;
+
+		this._viewOffsetEnabled = false;
+
+		this.camera.projectionMatrix.copy( this._originalProjectionMatrix );
+		this.camera.projectionMatrixInverse.copy( this._originalProjectionMatrix ).invert();
 
 		this._velocityNode.setProjectionMatrix( null );
 
