@@ -632,7 +632,7 @@ function createOcclusion( width, height ) {
 	} while ( levelWidth > 1 || levelHeight > 1 );
 
 	const hzbAttribute = new StorageBufferAttribute( new Float32Array( size ), 1 );
-	const hzbWrite = storage( hzbAttribute, 'float', size );
+	const hzbWrite = storage( hzbAttribute, 'float' );
 
 	// the texels at the border cover the remaining pixels, so odd sizes stay conservative
 
@@ -681,7 +681,7 @@ function createOcclusion( width, height ) {
 	return {
 		target,
 		scene: new Scene(),
-		hzb: storage( hzbAttribute, 'float', size ).toReadOnly(),
+		hzb: storage( hzbAttribute, 'float' ).toReadOnly(),
 		hzbLevels: uniformArray( levelData, 'vec4' ),
 		hzbLevelCount: uniform( levels.length, 'uint' ),
 		hzbSize: uniform( new Vector2( width, height ) ),
@@ -836,7 +836,7 @@ class MeshletCulling {
 		this.clusterDispatchAttribute = new IndirectStorageBufferAttribute( new Uint32Array( [ 0, 1, 1, 0 ] ), 4 );
 
 		const clusterDispatchAttribute = this.clusterDispatchAttribute;
-		const clusterDispatch = storage( clusterDispatchAttribute, 'uint', 4 );
+		const clusterDispatch = storage( clusterDispatchAttribute, 'uint' );
 
 		// the indirect draw arguments of the queues of the batches, followed by the arguments of the occlusion prepass
 
@@ -2249,8 +2249,8 @@ class MeshletBatch {
 			this.instanceAttribute = createAttribute( instanceArray, 4 );
 			this.instanceLayout = { local: worldCapacity * 16, data: worldCapacity * 32 };
 
-			const instanceRead = storage( this.instanceAttribute, 'vec4', instanceArray.length / 4 ).toReadOnly();
-			const instanceWrite = storage( this.instanceAttribute, 'vec4', instanceArray.length / 4 );
+			const instanceRead = storage( this.instanceAttribute, 'vec4' ).toReadOnly();
+			const instanceWrite = storage( this.instanceAttribute, 'vec4' );
 
 			objectWorld = createMatrices( instanceRead, 0 );
 			instanceLocal = createMatrices( instanceRead, worldCapacity * 4 );
@@ -2265,8 +2265,8 @@ class MeshletBatch {
 			const instanceDataWrite = { element: ( index ) => instanceWrite.element( uint( index ).add( worldCapacity * 8 ) ) };
 			const cullingWorld = culling.worldWrite;
 			const cullingBounds = culling.boundsWrite;
-			const lastObjectWorld = history === true ? storage( createAttribute( new Float32Array( capacity * 16 ), 16 ), 'mat4', capacity ) : null;
-			const lastInstanceLocal = history === true ? storage( createAttribute( new Float32Array( capacity * 16 ), 16 ), 'mat4', capacity ) : null;
+			const lastObjectWorld = history === true ? storage( createAttribute( new Float32Array( capacity * 16 ), 16 ), 'mat4' ) : null;
+			const lastInstanceLocal = history === true ? storage( createAttribute( new Float32Array( capacity * 16 ), 16 ), 'mat4' ) : null;
 
 			const transformCount = uniform( 0, 'uint' );
 			const transformPreviousCount = uniform( 0, 'uint' );

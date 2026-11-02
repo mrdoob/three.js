@@ -360,11 +360,11 @@ export function createMeshlets( geometry, group = null ) {
 
 	// per-geometry values are uniforms, so the batches of all geometries share their shaders and pipelines
 
-	const vertexBuffer = storage( new StorageBufferAttribute( vertexArray, 4 ), 'vec4', vertexCount * stride ).toReadOnly();
+	const vertexBuffer = storage( new StorageBufferAttribute( vertexArray, 4 ), 'vec4' ).toReadOnly();
 	const strideNode = uniform( stride, 'uint' );
 	const element = ( vertex, offset ) => vertexBuffer.element( vertex.mul( strideNode ).add( offset ) );
 
-	const chunkBuffer = storage( new StorageBufferAttribute( chunkArray, 4 ), 'vec4', totalChunks * 2 ).toReadOnly();
+	const chunkBuffer = storage( new StorageBufferAttribute( chunkArray, 4 ), 'vec4' ).toReadOnly();
 
 	const lodOffsets = LOD_TARGETS.map( ( target, i ) => {
 
@@ -391,7 +391,7 @@ export function createMeshlets( geometry, group = null ) {
 		uv: ( vertex ) => vec2( element( vertex, 0 ).w, element( vertex, 1 ).w ),
 		hasAttribute: ( name ) => attributes.has( name ),
 		attribute: ( name, vertex ) => swizzle( element( vertex, attributes.get( name ).offset ), attributes.get( name ).itemSize ),
-		indexBuffer: storage( new StorageBufferAttribute( indexArray, 1 ), 'uint', totalTriangles * 3 ).toReadOnly(),
+		indexBuffer: storage( new StorageBufferAttribute( indexArray, 1 ), 'uint' ).toReadOnly(),
 		chunkBounds: ( chunk ) => chunkBuffer.element( chunk.mul( 2 ) ),
 		chunkCone: ( chunk ) => chunkBuffer.element( chunk.mul( 2 ).add( 1 ) ),
 		chunkArray,

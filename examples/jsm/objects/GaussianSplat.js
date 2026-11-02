@@ -669,10 +669,10 @@ function createStorageBuffers( count, centers, covariances, colors, sphericalHar
 		count,
 		sphericalHarmonicsDegree,
 		webGLBuffersEnabled: false,
-		centerRead: storage( centerAttribute, 'vec4', count ).toReadOnly(),
-		covarianceARead: storage( covarianceAAttribute, 'vec4', count ).toReadOnly(),
-		covarianceBRead: storage( covarianceBAttribute, 'vec4', count ).toReadOnly(),
-		colorRead: storage( colorAttribute, 'uint', count ).toReadOnly()
+		centerRead: storage( centerAttribute, 'vec4' ).toReadOnly(),
+		covarianceARead: storage( covarianceAAttribute, 'vec4' ).toReadOnly(),
+		covarianceBRead: storage( covarianceBAttribute, 'vec4' ).toReadOnly(),
+		colorRead: storage( colorAttribute, 'uint' ).toReadOnly()
 	};
 
 	for ( let degree = 1; degree <= sphericalHarmonicsDegree; degree ++ ) {
@@ -681,7 +681,7 @@ function createStorageBuffers( count, centers, covariances, colors, sphericalHar
 		const attribute = new StorageBufferAttribute( sphericalHarmonics[ `sh${ degree }` ], 1 );
 
 		buffers[ `sphericalHarmonics${ degree }Attribute` ] = attribute;
-		buffers[ `sphericalHarmonics${ degree }Read` ] = storage( attribute, 'uint', count * words ).toReadOnly();
+		buffers[ `sphericalHarmonics${ degree }Read` ] = storage( attribute, 'uint' ).toReadOnly();
 		buffers[ `sphericalHarmonics${ degree }Words` ] = words;
 
 	}
@@ -700,8 +700,8 @@ function ensureSphericalHarmonicsContributionBuffer( buffers ) {
 	// this additional buffer lazily only when the WebGPU pre-pass runs.
 	const attribute = new StorageBufferAttribute( new Float32Array( buffers.count * 4 ), 4 );
 
-	buffers.sphericalHarmonicsContributionRead = storage( attribute, 'vec4', buffers.count ).toReadOnly();
-	buffers.sphericalHarmonicsContributionWrite = storage( attribute, 'vec4', buffers.count );
+	buffers.sphericalHarmonicsContributionRead = storage( attribute, 'vec4' ).toReadOnly();
+	buffers.sphericalHarmonicsContributionWrite = storage( attribute, 'vec4' );
 
 }
 

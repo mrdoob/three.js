@@ -937,7 +937,7 @@
 				const inputStorage = instancedArray( array, 'uint' ).setPBO( true ).setName( `Current_${leftSideDisplay ? 'Left' : 'Right'}` );
 				// Represents array of data as vec4s in compute shader;
 				const inputVec4BufferAttribute = new THREE.StorageInstancedBufferAttribute( array, 4 );
-				const inputVectorizedStorage = storage( inputVec4BufferAttribute, 'uvec4', vecSize ).setPBO( true ).setName( `CurrentVectorized_${leftSideDisplay ? 'Left' : 'Right'}` );
+				const inputVectorizedStorage = storage( inputVec4BufferAttribute, 'uvec4' ).setPBO( true ).setName( `CurrentVectorized_${leftSideDisplay ? 'Left' : 'Right'}` );
 
 				// Reduce 3 Calculations
 				const workPerThread = 4;

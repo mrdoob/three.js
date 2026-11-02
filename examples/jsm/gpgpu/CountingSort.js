@@ -85,35 +85,35 @@ class CountingSort {
 		 *
 		 * @type {StorageBufferNode}
 		 */
-		this.orderRead = storage( this.orderAttribute, 'uint', count ).toReadOnly();
+		this.orderRead = storage( this.orderAttribute, 'uint' ).toReadOnly();
 
 		/**
 		 * A writable storage node for the sorted order buffer.
 		 *
 		 * @type {StorageBufferNode}
 		 */
-		this.orderWrite = storage( this.orderAttribute, 'uint', count );
+		this.orderWrite = storage( this.orderAttribute, 'uint' );
 
 		/**
 		 * A read-only storage node holding each element's bin, computed during the histogram pass.
 		 *
 		 * @type {StorageBufferNode}
 		 */
-		this.binRead = storage( binAttribute, 'uint', count ).toReadOnly();
+		this.binRead = storage( binAttribute, 'uint' ).toReadOnly();
 
 		/**
 		 * A writable storage node holding each element's bin.
 		 *
 		 * @type {StorageBufferNode}
 		 */
-		this.binWrite = storage( binAttribute, 'uint', count );
+		this.binWrite = storage( binAttribute, 'uint' );
 
 		/**
 		 * An atomic storage node used to accumulate the per-bin histogram.
 		 *
 		 * @type {StorageBufferNode}
 		 */
-		this.histogramAtomic = storage( histogramAttribute, 'uint', binCount ).toAtomic();
+		this.histogramAtomic = storage( histogramAttribute, 'uint' ).toAtomic();
 
 		/**
 		 * An atomic storage node used both for the exclusive prefix sum of the histogram and, during
@@ -121,7 +121,7 @@ class CountingSort {
 		 *
 		 * @type {StorageBufferNode}
 		 */
-		this.offsetAtomic = storage( offsetAttribute, 'uint', binCount ).toAtomic();
+		this.offsetAtomic = storage( offsetAttribute, 'uint' ).toAtomic();
 
 		this._webGLBuffersEnabled = false;
 

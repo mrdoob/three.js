@@ -142,7 +142,7 @@
 					offset: 'uint'
 				}, 'DrawBuffer' );
 
-				const drawStorage = storage( drawBuffer, drawBufferStruct, drawBuffer.count );
+				const drawStorage = storage( drawBuffer, drawBufferStruct );
 
 				computeDrawBuffer = Fn( () => {
 
