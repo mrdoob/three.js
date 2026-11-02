@@ -395,6 +395,7 @@
 		"webgpu_loader_jpegxl",
 		"webgpu_loader_materialx",
 		"webgpu_loader_texture_ktx2",
+		"webgpu_loader_vdb",
 		"webgpu_materials",
 		"webgpu_materials_alphahash",
 		"webgpu_materials_arrays",
