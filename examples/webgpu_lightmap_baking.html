@@ -19,7 +19,7 @@
 				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Light Baking</span>
 			</div>
 
-			<small>Progressively bake and denoise Ray Radiosity (<a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">three-mesh-bvh</a>), Light Probe or VXGI diffuse irradiance into a UV atlas by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br/><span id="status"></span></small>
+			<small>Progressively bake Ray Radiosity (<a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">three-mesh-bvh</a>), Light Probe or VXGI diffuse irradiance into a UV atlas by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br/><span id="status"></span></small>
 		</div>
 
 		<script type="importmap">
@@ -45,7 +45,6 @@
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 			import { LightProbeGrid } from 'three/addons/lighting/LightProbeGrid.js';
 			import { LightMapper } from 'three/addons/lighting/LightMapper.js';
-			import { LightMapDenoiser } from 'three/addons/lighting/LightMapDenoiser.js';
 			import { RayTracedRadiosity, rayTracedRadiosityIrradiance } from 'three/addons/lighting/RayTracedRadiosity.js';
 			import { VXGIVolume } from 'three/addons/lighting/vxgi/VXGIVolume.js';
 			import { vxgiIrradiance } from 'three/addons/lighting/vxgi/VXGIIrradiance.js';
@@ -65,9 +64,9 @@
 
 			let camera, scene, renderer, controls, renderPipeline, status;
 			let world, meshes, materials;
-			let source, lightMapper, denoiser, bakedPass, livePass, liveOutput;
-			let algorithmControl, outputControl, denoiseControl, directLightControl;
-			let needsBake = false, denoised = false;
+			let source, lightMapper, bakedPass, livePass, liveOutput;
+			let algorithmControl, outputControl, directLightControl;
+			let needsBake = false;
 
 			// shifts the per-pixel cone noise of the live view every frame, like the light map samples
 
@@ -79,8 +78,7 @@
 				output: 'Baked GI',
 				resolution: 1024,
 				bounces: 6,
-				bakeDirect: false,
-				denoise: true
+				bakeDirect: false
 			};
 
 			const scenes = { 'Cornell Box + Point': () => createCornellBox( false ), 'Cornell Box + Emissive': () => createCornellBox( true ), 'Courtyard': loadCourtyard };
@@ -88,7 +86,7 @@
 
 			// light probes are deterministic and only need a few samples to antialias the light map,
 			// the VXGI cones are rotated per sample and the radiosity rays continue their sequences, so
-			// they converge over more samples. The denoiser removes the remaining noise of the radiosity
+			// they converge over more samples
 
 			const bakeSamples = { 'Ray Radiosity': 64, 'Light Probe': 16, 'VXGI': 64 };
 
@@ -133,7 +131,6 @@
 				gui.add( params, 'resolution', [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( requestBake );
 				gui.add( params, 'bounces', 0, 16, 1 ).name( 'Bounces' ).onChange( requestBake );
 				directLightControl = gui.add( params, 'bakeDirect' ).name( 'Bake direct diffuse' ).onChange( requestBake );
-				denoiseControl = gui.add( params, 'denoise' ).name( 'Denoise' ).onChange( setLightMap );
 				gui.add( { bake: requestBake }, 'bake' ).name( 'Re-Bake GI' );
 
 				updateControls();
@@ -195,7 +192,7 @@
 
 			function updateControls() {
 
-				// light probes and VXGI can be evaluated live, ray radiosity bakes are denoised
+				// light probes and VXGI can be evaluated live, ray radiosity is only baked
 
 				const radiosity = params.algorithm === 'Ray Radiosity';
 
@@ -207,7 +204,6 @@
 				}
 
 				outputControl.select.disabled = radiosity;
-				radiosity ? denoiseControl.show() : denoiseControl.hide();
 				world?.light != null && params.output === 'Baked GI' ? directLightControl.show() : directLightControl.hide();
 
 			}
@@ -416,7 +412,6 @@
 				for ( const material of materials ) material.lightMap = null;
 
 				lightMapper?.dispose();
-				denoiser?.dispose();
 				if ( liveOutput !== livePass ) liveOutput?.dispose();
 				livePass?.dispose();
 				source?.dispose();
@@ -480,13 +475,10 @@
 
 				}
 
-				// the light map accumulates one sample per frame in animate(). Ray radiosity bakes are denoised,
-				// with the variance of their samples
+				// the light map accumulates one sample per frame in animate()
 
-				lightMapper = new LightMapper( renderer, world.atlas.resolution, irradiance, { moments: radiosity, lights: bakeDirect && radiosity === false ? [ world.light ] : [] } );
+				lightMapper = new LightMapper( renderer, world.atlas.resolution, irradiance, { lights: bakeDirect && radiosity === false ? [ world.light ] : [] } );
 				lightMapper.addObjects( meshes );
-
-				denoiser = radiosity ? new LightMapDenoiser( renderer, lightMapper ) : null;
 
 				livePass = liveOutput = null;
 
@@ -525,23 +517,16 @@
 				// discard accumulated samples when switching outputs; baking only runs in Baked GI
 
 				lightMapper.reset();
-				denoised = false;
-				setLightMap();
 
-				for ( const material of materials ) material.lightMapIntensity = live ? 0 : 1;
+				for ( const material of materials ) {
+
+					material.lightMap = lightMapper.texture;
+					material.lightMapIntensity = live ? 0 : 1;
+
+				}
 
 				renderPipeline.outputNode = live ? liveOutput : bakedPass;
 				renderPipeline.needsUpdate = true;
-
-			}
-
-			function setLightMap() {
-
-				// the denoised light map once the bake has finished
-
-				const lightMap = denoiser !== null && params.denoise && denoised ? denoiser.texture : lightMapper.texture;
-
-				for ( const material of materials ) material.lightMap = lightMap;
 
 			}
 
@@ -576,18 +561,6 @@
 
 					lightMapper.update();
 					status.textContent = `Baking ${ params.algorithm }: ${ lightMapper.samples } / ${ samples } samples`;
-
-				} else if ( denoiser !== null ) {
-
-					if ( denoised === false ) {
-
-						denoiser.update();
-						denoised = true;
-						setLightMap();
-
-					}
-
-					status.textContent = `${ params.algorithm } baked: ${ samples } samples${ params.denoise ? ', denoised' : '' }`;
 
 				} else {
 
