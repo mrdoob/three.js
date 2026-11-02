@@ -1,6 +1,5 @@
 import { BackSide, BufferAttribute, BufferGeometry, Color, DoubleSide, EquirectangularReflectionMapping, EquirectangularRefractionMapping, FloatType, FrontSide, Matrix4, NodeMaterial, QuadMesh, RendererUtils, RenderTarget, StorageBufferAttribute, Vector3 } from 'three/webgpu';
 import { Fn, If, Loop, abs, asin, atan, cos, cross, dFdx, dFdy, dot, float, fract, hash, instanceIndex, int, length, luminance, mix, normalize, pmremTexture, screenCoordinate, select, sin, smoothstep, sqrt, storage, texture, textureLoad, uint, uniform, uvec2, vec2, vec3, vec4 } from 'three/tsl';
-import { MeshBVH, SAH } from 'three-mesh-bvh';
 import { BVHComputeData, rayIntersectionResultStruct, rayStruct, wgslTagFn } from 'three-mesh-bvh/webgpu';
 
 import { LightMapper } from './LightMapper.js';
@@ -394,11 +393,6 @@ class RayTracedRadiosity {
 		geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( positions ), 3 ) );
 		geometry.setAttribute( 'uv1', new BufferAttribute( new Float32Array( uvs ), 2 ) );
 		geometry.setIndex( new BufferAttribute( new Uint32Array( positions.length / 3 ).map( ( value, i ) => i ), 1 ) );
-
-		// a SAH tree with small leaves traces the rays faster than the default one, which splits at the
-		// centers and is built a little faster
-
-		geometry.boundsTree = new MeshBVH( geometry, { strategy: SAH, targetLeafSize: 4 } );
 
 		const bvh = new BVHComputeData( geometry, { attributes: { position: 'vec4f', uv1: 'vec2f' } } );
 		bvh.update();
