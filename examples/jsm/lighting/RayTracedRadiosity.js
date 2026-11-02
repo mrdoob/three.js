@@ -341,7 +341,9 @@ class RayTracedRadiosity {
 			const count = index !== null ? index.count : position.count;
 			const drawStart = Math.max( 0, geometry.drawRange.start );
 			const drawEnd = Math.min( count, geometry.drawRange.start + geometry.drawRange.count );
-			const groups = geometry.groups.length > 0 ? geometry.groups : [ { start: 0, count: Infinity, materialIndex: 0 } ];
+			// like the renderer, only use geometry groups for meshes with a material array
+
+			const groups = Array.isArray( object.material ) ? geometry.groups : [ { start: 0, count: Infinity, materialIndex: 0 } ];
 
 			for ( const group of groups ) {
 
