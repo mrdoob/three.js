@@ -19,7 +19,7 @@
 				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Light Baking</span>
 			</div>
 
-			<small>Progressively bake ray traced radiosity (<a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">three-mesh-bvh</a>) diffuse irradiance into a UV atlas by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br/><span id="status"></span></small>
+			<small>Progressively bake and denoise ray traced radiosity (<a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">three-mesh-bvh</a>) diffuse irradiance into a UV atlas by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br/><span id="status"></span></small>
 		</div>
 
 		<script type="importmap">
@@ -42,6 +42,7 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 			import { LightMapper } from 'three/addons/lighting/LightMapper.js';
+			import { LightMapDenoiser } from 'three/addons/lighting/LightMapDenoiser.js';
 			import { RayTracedRadiosity, rayTracedRadiosityIrradiance } from 'three/addons/lighting/RayTracedRadiosity.js';
 			import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
 
@@ -57,12 +58,13 @@
 
 			let camera, scene, renderer, controls, status;
 			let world, meshes, materials;
-			let radiosity, lightMapper;
-			let needsBake = false;
+			let radiosity, lightMapper, denoiser;
+			let needsBake = false, denoisedSamples = 0;
 
 			const params = {
 				scene: 'Cornell Box',
-				resolution: 1024
+				resolution: 1024,
+				denoise: false
 			};
 
 			const scenes = { 'Cornell Box': createCornellBox, 'Courtyard': loadCourtyard };
@@ -102,6 +104,7 @@
 				const gui = renderer.inspector.createParameters( 'Light Baking' );
 				gui.add( params, 'scene', Object.keys( scenes ) ).name( 'Scene' ).onChange( setScene );
 				gui.add( params, 'resolution', [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( requestBake );
+				gui.add( params, 'denoise' ).name( 'Denoise' ).onChange( setLightMap );
 				gui.add( { bake: requestBake }, 'bake' ).name( 'Re-Bake GI' );
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -316,6 +319,7 @@
 				for ( const material of materials ) material.lightMap = null;
 
 				lightMapper?.dispose();
+				denoiser?.dispose();
 				radiosity?.dispose();
 
 				// each mesh gets a new geometry with light map UVs, also for another resolution
@@ -336,10 +340,24 @@
 
 				// the light map accumulates one sample per frame in animate()
 
-				lightMapper = new LightMapper( renderer, world.atlas.resolution, rayTracedRadiosityIrradiance( radiosity ) );
+				// the moments of the samples let the denoiser estimate the noise of each texel
+
+				lightMapper = new LightMapper( renderer, world.atlas.resolution, rayTracedRadiosityIrradiance( radiosity ), { moments: true } );
 				lightMapper.addObjects( meshes );
 
-				for ( const material of materials ) material.lightMap = lightMapper.texture;
+				denoiser = new LightMapDenoiser( renderer, lightMapper );
+				denoiser.addObjects( meshes );
+				denoisedSamples = 0;
+
+				setLightMap();
+
+			}
+
+			function setLightMap() {
+
+				const lightMap = params.denoise && denoisedSamples > 0 ? denoiser.texture : lightMapper.texture;
+
+				for ( const material of materials ) material.lightMap = lightMap;
 
 			}
 
@@ -368,7 +386,20 @@
 
 				} else {
 
-					status.textContent = `Baked: ${ samples } samples`;
+					status.textContent = `Baked: ${ samples } samples${ params.denoise ? ', denoised' : '' }`;
+
+				}
+
+				// denoise whenever the samples have doubled, which adds a few percent to the bake: half of the
+				// samples denoised are less noisy than all of them. The noise estimate needs two samples
+
+				const count = lightMapper.samples;
+
+				if ( params.denoise && count > 1 && count !== denoisedSamples && ( count >= denoisedSamples * 2 || count === samples ) ) {
+
+					denoiser.update();
+					denoisedSamples = count;
+					setLightMap();
 
 				}
 

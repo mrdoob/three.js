@@ -1,4 +1,4 @@
-import { Group, Mesh, MeshBasicMaterial, PlaneGeometry } from 'three/webgpu';
+import { FloatType, Group, HalfFloatType, Mesh, MeshBasicMaterial, PlaneGeometry } from 'three/webgpu';
 import { vec3 } from 'three/tsl';
 import { LightMapper } from '../../../../examples/jsm/lighting/LightMapper.js';
 
@@ -50,6 +50,25 @@ export default QUnit.module( 'Addons', () => {
 				mapper.dispose();
 				geometry.dispose();
 				material.dispose();
+
+			} );
+
+			QUnit.test( 'Accumulates moments in float targets with float32-blendable', assert => {
+
+				for ( const blendable of [ false, true ] ) {
+
+					const renderer = { hasFeature: name => name === 'float32-blendable' && blendable };
+					const mapper = new LightMapper( renderer, 32, () => vec3( 1 ), { moments: true } );
+
+					assert.strictEqual( mapper.momentTexture !== null, blendable, 'moment texture' );
+					assert.strictEqual( mapper.sampleTexture.type, blendable ? FloatType : HalfFloatType, 'sample type' );
+					mapper.dispose();
+
+				}
+
+				const mapper = new LightMapper( {}, 32, () => vec3( 1 ) );
+				assert.strictEqual( mapper.momentTexture, null, 'no moments by default' );
+				mapper.dispose();
 
 			} );
 
