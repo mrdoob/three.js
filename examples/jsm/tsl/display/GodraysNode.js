@@ -1,5 +1,5 @@
 import { Frustum, Matrix4, RenderTarget, Vector2, RendererUtils, QuadMesh, Node, NodeMaterial, NodeUpdateType, Vector3, Plane } from 'three/webgpu';
-import { cubeTexture, clamp, viewZToPerspectiveDepth, float, Loop, max, Fn, passTexture, uv, dot, uniformArray, If, getViewPosition, uniform, vec4, add, interleavedGradientNoise, screenCoordinate, round, mul, uint, mix, exp, vec3, distance, pow, reference, lightPosition, vec2, bool, texture, perspectiveDepthToViewZ, lightShadowMatrix, context, projectionDepth } from 'three/tsl';
+import { cubeTexture, clamp, viewZToPerspectiveDepth, float, Loop, max, Fn, passTexture, uv, dot, uniformArray, If, getViewPosition, uniform, vec4, add, interleavedGradientNoise, screenCoordinate, round, mul, uint, mix, exp, vec3, distance, pow, reference, lightPosition, vec2, bool, texture, orthographicDepthToViewZ, lightShadowMatrix, context, projectionDepth } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -410,7 +410,7 @@ class GodraysNode extends Node {
 
 					const result = texture( this._light.shadow.map.depthTexture, shadowCoord.xy ).compare( shadowCoord.z ).r;
 
-					const viewZ = perspectiveDepthToViewZ( shadowCoord.z, this._shadowCameraNear, this._shadowCameraFar );
+					const viewZ = orthographicDepthToViewZ( shadowCoord.z, this._shadowCameraNear, this._shadowCameraFar );
 
 					output.assign( vec2( result.oneMinus(), viewZ.negate() ) );
 
