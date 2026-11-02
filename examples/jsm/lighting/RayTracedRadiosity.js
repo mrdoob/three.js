@@ -1061,10 +1061,10 @@ class RayTracedRadiosity {
 
 					If( cosReceiver.greaterThan( 0 ).and( cosLight.greaterThan( 0 ) ).and( dot( direction, faceNormal ).greaterThan( 0 ) ), () => {
 
-						// the irradiance over the probability of the point, with the projected solid angle clamped to
-						// the hemisphere next to an emitter
+						// the irradiance over the probability of the point. Individual sample contributions may
+						// exceed pi near an emitter; clamping them would bias the integral
 
-						const scale = cosReceiver.mul( cosLight ).mul( edge1.w ).div( distanceSq ).min( Math.PI ).div( emission.w );
+						const scale = cosReceiver.mul( cosLight ).mul( edge1.w ).div( distanceSq ).div( emission.w );
 
 						gathered.addAssign( emission.rgb.mul( scale ).mul( visibility( origin, direction, distance.mul( 0.999 ) ) ) );
 
