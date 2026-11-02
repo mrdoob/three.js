@@ -4,6 +4,7 @@ import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth, s
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
+const _jitterMatrix = /*@__PURE__*/ new Matrix4();
 
 let _rendererState;
 
@@ -222,6 +223,15 @@ class TAAUNode extends Node {
 		this._originalProjectionMatrix = new Matrix4();
 
 		/**
+		 * Whether the jitter is currently applied to the camera.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._viewOffsetEnabled = false;
+
+		/**
 		 * A uniform node holding the camera's near and far.
 		 *
 		 * @private
@@ -306,8 +316,8 @@ class TAAUNode extends Node {
 	}
 
 	/**
-	 * Defines the TAAU's current jitter as a view offset to the scene's
-	 * camera. The jitter is shrunk to one *output* pixel (rather than one
+	 * Applies the TAAU's current jitter to the projection matrix of the
+	 * scene's camera. The jitter is shrunk to one *output* pixel (rather than one
 	 * input pixel) so that the halton sequence gradually fills the output
 	 * sub-pixel grid over multiple frames.
 	 *
@@ -318,8 +328,8 @@ class TAAUNode extends Node {
 
 		// save original/unjittered projection matrix for velocity pass
 
-		this.camera.updateProjectionMatrix();
 		this._originalProjectionMatrix.copy( this.camera.projectionMatrix );
+		this._viewOffsetEnabled = true;
 
 		velocity.setProjectionMatrix( this._originalProjectionMatrix );
 
@@ -333,24 +343,29 @@ class TAAUNode extends Node {
 
 		this._jitterOffset.value.set( jitterX, jitterY );
 
-		this.camera.setViewOffset(
+		this.camera.projectionMatrix.premultiply( _jitterMatrix.makeTranslation(
 
-			inputWidth, inputHeight,
+			- 2 * jitterX / inputWidth,
+			2 * jitterY / inputHeight,
+			0
 
-			jitterX, jitterY,
+		) );
 
-			inputWidth, inputHeight
-
-		);
+		this.camera.projectionMatrixInverse.copy( this.camera.projectionMatrix ).invert();
 
 	}
 
 	/**
-	 * Clears the view offset from the scene's camera.
+	 * Restores the original projection matrix of the scene's camera.
 	 */
 	clearViewOffset() {
 
-		this.camera.clearViewOffset();
+		if ( this._viewOffsetEnabled === false ) return;
+
+		this._viewOffsetEnabled = false;
+
+		this.camera.projectionMatrix.copy( this._originalProjectionMatrix );
+		this.camera.projectionMatrixInverse.copy( this._originalProjectionMatrix ).invert();
 
 		velocity.setProjectionMatrix( null );
 
