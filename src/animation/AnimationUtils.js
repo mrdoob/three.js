@@ -300,6 +300,10 @@ function makeClipAdditive( targetClip, referenceFrame = 0, referenceClip = targe
 
 		if ( targetTrack.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline ) {
 
+			// Cubic spline tracks store an in-tangent, the value and an out-tangent per keyframe.
+			// Subtracting a constant does not change the tangents of numeric tracks, but removing
+			// a rotation from quaternion tracks has to rotate the tangents as well.
+
 			targetOffset = targetValueSize / 3;
 
 		}
@@ -344,11 +348,8 @@ function makeClipAdditive( targetClip, referenceFrame = 0, referenceClip = targe
 		const numTimes = targetTrack.times.length;
 		for ( let j = 0; j < numTimes; ++ j ) {
 
-			const valueStart = j * targetValueSize + targetOffset;
-
 			if ( referenceTrackType === 'quaternion' ) {
 
-				// Multiply the conjugate for quaternion track types
 				for ( let k = 0; k < targetValueSize; k += 4 ) {
 
 					const offset = j * targetValueSize + k;
@@ -366,9 +367,9 @@ function makeClipAdditive( targetClip, referenceFrame = 0, referenceClip = targe
 
 			} else {
 
+				const valueStart = j * targetValueSize + targetOffset;
 				const valueEnd = targetValueSize - targetOffset * 2;
 
-				// Subtract each value for all other numeric track types
 				for ( let k = 0; k < valueEnd; ++ k ) {
 
 					targetTrack.values[ valueStart + k ] -= referenceValue[ k ];
