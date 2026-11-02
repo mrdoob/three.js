@@ -1,7 +1,7 @@
-import { BackSide, BufferAttribute, BufferGeometry, Color, DoubleSide, EquirectangularReflectionMapping, EquirectangularRefractionMapping, FloatType, FrontSide, Matrix4, NodeMaterial, QuadMesh, RendererUtils, RenderTarget, StorageBufferAttribute, StructTypeNode, Vector3 } from 'three/webgpu';
+import { BackSide, BufferAttribute, BufferGeometry, Color, DoubleSide, EquirectangularReflectionMapping, EquirectangularRefractionMapping, FloatType, FrontSide, Matrix4, NodeMaterial, QuadMesh, RendererUtils, RenderTarget, StorageBufferAttribute, Vector3 } from 'three/webgpu';
 import { Fn, If, Loop, abs, asin, atan, cos, cross, dFdx, dFdy, dot, float, fract, hash, instanceIndex, int, length, luminance, mix, normalize, pmremTexture, screenCoordinate, select, sin, smoothstep, sqrt, storage, texture, textureLoad, uint, uniform, uvec2, vec2, vec3, vec4 } from 'three/tsl';
 import { MeshBVH, SAH } from 'three-mesh-bvh';
-import { BVHComputeData, bvhNodeBoundsStruct, intersectRayTriangle, rayIntersectionResultStruct, rayStruct, wgslTagCode, wgslTagFn } from 'three-mesh-bvh/webgpu';
+import { BVHComputeData, rayIntersectionResultStruct, rayStruct, wgslTagFn } from 'three-mesh-bvh/webgpu';
 
 import { LightMapper } from './LightMapper.js';
 
@@ -32,11 +32,6 @@ const SKY_GRID = 8;
 const MATERIAL_STRIDE = 2;
 const EMITTER_STRIDE = 4;
 const LIGHT_STRIDE = 4;
-
-// the traversal stack holds the far children along the path to a leaf, the trees of three-mesh-bvh
-// are at most 40 levels deep
-
-const STACK_DEPTH = 48;
 
 /**
  * Approximates diffuse global illumination with ray traced radiosity, as a source of irradiance for
@@ -400,38 +395,24 @@ class RayTracedRadiosity {
 		geometry.setAttribute( 'uv1', new BufferAttribute( new Float32Array( uvs ), 2 ) );
 		geometry.setIndex( new BufferAttribute( new Uint32Array( positions.length / 3 ).map( ( value, i ) => i ), 1 ) );
 
-		// a SAH tree with small leaves traces the rays about 1.7 times faster than the default one, which
-		// splits at the centers and is built a little faster
+		// a SAH tree with small leaves traces the rays faster than the default one, which splits at the
+		// centers and is built a little faster
 
 		geometry.boundsTree = new MeshBVH( geometry, { strategy: SAH, targetLeafSize: 4 } );
 
-		const bvh = new BVHComputeData( geometry, { attributes: { uv1: 'vec2f' } } );
+		const bvh = new BVHComputeData( geometry, { attributes: { position: 'vec4f', uv1: 'vec2f' } } );
 		bvh.update();
 
-		// the BVH sorts the triangles of the index, the per triangle data follows their order. The
-		// corners are copied next to it, so the intersection tests read one buffer without indirection
+		// the material of each triangle. The BVH sorts the triangles of its index but the vertices keep
+		// their order, so the first vertex of a hit gives its triangle
 
-		const sorted = geometry.getIndex().array;
-		const triangleData = new Float32Array( Math.max( sorted.length / 3, 1 ) * 12 );
-
-		for ( let i = 0; i < sorted.length / 3; i ++ ) {
-
-			for ( let k = 0; k < 3; k ++ ) {
-
-				const vertex = sorted[ i * 3 + k ];
-
-				triangleData.set( positions.slice( vertex * 3, vertex * 3 + 3 ), i * 12 + k * 4 );
-
-			}
-
-			triangleData[ i * 12 + 3 ] = triangles[ sorted[ i * 3 ] / 3 ];
-
-		}
+		const triangleMaterials = new Uint32Array( Math.max( triangles.length, 1 ) );
+		triangleMaterials.set( triangles );
 
 		this._geometry = geometry;
 		this._bvh = bvh;
 		this._lightMapMeshes = lightMapMeshes;
-		this._triangles = vec4Storage( triangleData );
+		this._triangles = storage( new StorageBufferAttribute( triangleMaterials, 1 ), 'uint', triangleMaterials.length ).toReadOnly();
 		this._materials = vec4Storage( materials );
 		this._lights = vec4Storage( lights );
 		this._lightCount = lights.length / ( LIGHT_STRIDE * 4 );
@@ -562,221 +543,10 @@ class RayTracedRadiosity {
 	 */
 	_createTrace() {
 
-		const bvh = this._bvh;
-		const { index, nodes } = bvh.storage;
-		const { sampleTrianglePoint } = bvh.fns;
-		const triangles = this._triangles;
+		const { raycastFirstHit, sampleTrianglePoint } = this._bvh.fns;
 
-		// the BVH traversal: the closest hit for the gathering rays and any hit for the shadow rays. The
-		// geometry is in world space, so the rays are not transformed
-
-		// the distance to the entry of a ray into a node, or -1 if it misses the node within a distance
-
-		const boundsDistance = wgslTagFn/* wgsl */`
-			// fn
-			fn rayTracedRadiosityBoundsDistance( origin: vec3f, invDir: vec3f, bounds: ${ bvhNodeBoundsStruct }, limit: f32 ) -> f32 {
-
-				let tMinPlane = ( vec3f( bounds.min[ 0 ], bounds.min[ 1 ], bounds.min[ 2 ] ) - origin ) * invDir;
-				let tMaxPlane = ( vec3f( bounds.max[ 0 ], bounds.max[ 1 ], bounds.max[ 2 ] ) - origin ) * invDir;
-				let tMin = min( tMinPlane, tMaxPlane );
-				let tMax = max( tMinPlane, tMaxPlane );
-
-				let near = max( max( max( tMin.x, tMin.y ), tMin.z ), 0.0 );
-				let far = min( min( tMax.x, tMax.y ), tMax.z );
-
-				return select( - 1.0, near, far >= near && near <= limit );
-
-			}
-		`;
-
-		const triangleHit = wgslTagCode/* wgsl */`
-			let hit = ${ intersectRayTriangle }( ray, ${ triangles }[ ti * 3u ].xyz, ${ triangles }[ ti * 3u + 1u ].xyz, ${ triangles }[ ti * 3u + 2u ].xyz, 0.0 );
-		`;
-
-		// hits at the same distance, e.g. of coplanar triangles, go to the first triangle, so the result
-		// does not depend on the order of the traversal
-
-		const closestRange = wgslTagFn/* wgsl */`
-			// fn
-			fn rayTracedRadiosityClosestRange( ray: ${ rayStruct }, offset: u32, count: u32, result: ptr<function, ${ rayIntersectionResultStruct }> ) -> bool {
-
-				var didHit = false;
-
-				for ( var ti = offset; ti < offset + count; ti = ti + 1u ) {
-
-					${ triangleHit }
-
-					if ( hit.didHit && ( ray.maxDist <= 0.0 || hit.dist < ray.maxDist ) && ( ! result.didHit || hit.dist < result.dist || ( hit.dist == result.dist && ti < result.indices.w ) ) ) {
-
-						result.didHit = true;
-						result.dist = hit.dist;
-						result.side = hit.side;
-						result.barycoord = hit.barycoord;
-						result.indices = vec4u( ${ index }[ ti * 3u ], ${ index }[ ti * 3u + 1u ], ${ index }[ ti * 3u + 2u ], ti );
-
-						didHit = true;
-
-					}
-
-				}
-
-				return didHit;
-
-			}
-		`;
-
-		const shadowStruct = new StructTypeNode( { blocked: 'bool' }, 'RayTracedRadiosityShadow' );
-
-		const shadowRange = wgslTagFn/* wgsl */`
-			// fn
-			fn rayTracedRadiosityShadowRange( ray: ${ rayStruct }, offset: u32, count: u32, result: ptr<function, ${ shadowStruct }> ) -> bool {
-
-				for ( var ti = offset; ti < offset + count; ti = ti + 1u ) {
-
-					${ triangleHit }
-
-					if ( hit.didHit && ( ray.maxDist <= 0.0 || hit.dist < ray.maxDist ) ) {
-
-						result.blocked = true;
-
-						return true;
-
-					}
-
-				}
-
-				return false;
-
-			}
-		`;
-
-		// the merged geometry is one cluster, so the top level of the BVH is a single leaf that points to
-		// the root of the triangles. The traversal tests both children of a node, descends into the
-		// nearer one and pushes the other one with its entry distance, which is skipped once a closer
-		// hit is found, see "Understanding the Efficiency of Ray Traversal on GPUs" (Aila and Laine, 2009)
-
-		const nodeArray = nodes.proxyNode.value.array;
-		const root = ( nodeArray[ 7 ] & 0xffff0000 ) !== 0 ? nodeArray[ 6 ] : 0;
-
-		const traverse = ( name, resultStruct, range, closest ) => wgslTagFn/* wgsl */`
-			// fn
-			fn ${ name }( ray: ${ rayStruct }, result: ptr<function, ${ resultStruct }> ) -> bool {
-
-				let invDir = 1.0 / ray.direction;
-				var limit = select( 3.4e38, ray.maxDist, ray.maxDist > 0.0 );
-
-				var stackNode: array<u32, ${ STACK_DEPTH }>;
-				var stackDistance: array<f32, ${ STACK_DEPTH }>;
-				var pointer = 0u;
-
-				var current = ${ root }u;
-				var pop = ${ boundsDistance }( ray.origin, invDir, ${ nodes }[ current ].bounds, limit ) < 0.0;
-
-				loop {
-
-					if ( ! pop ) {
-
-						let node = ${ nodes }[ current ];
-						let info = node.splitAxisOrTriangleCount;
-
-						if ( ( info & 0xffff0000u ) != 0u ) {
-
-							${ closest ? wgslTagCode/* wgsl */`
-
-								if ( ${ range }( ray, node.rightChildOrTriangleOffset, info & 0xffffu, result ) ) {
-
-									limit = result.dist;
-
-								}
-
-							` : wgslTagCode/* wgsl */`
-
-								if ( ${ range }( ray, node.rightChildOrTriangleOffset, info & 0xffffu, result ) ) {
-
-									return true;
-
-								}
-
-							` }
-
-							pop = true;
-
-						} else {
-
-							let left = current + 1u;
-							let right = current + node.rightChildOrTriangleOffset;
-							let leftDistance = ${ boundsDistance }( ray.origin, invDir, ${ nodes }[ left ].bounds, limit );
-							let rightDistance = ${ boundsDistance }( ray.origin, invDir, ${ nodes }[ right ].bounds, limit );
-
-							if ( leftDistance >= 0.0 && rightDistance >= 0.0 ) {
-
-								let leftFirst = leftDistance <= rightDistance;
-
-								current = select( right, left, leftFirst );
-
-								if ( pointer < ${ STACK_DEPTH }u ) {
-
-									stackNode[ pointer ] = select( left, right, leftFirst );
-									stackDistance[ pointer ] = max( leftDistance, rightDistance );
-									pointer += 1u;
-
-								}
-
-							} else if ( leftDistance >= 0.0 ) {
-
-								current = left;
-
-							} else if ( rightDistance >= 0.0 ) {
-
-								current = right;
-
-							} else {
-
-								pop = true;
-
-							}
-
-						}
-
-					}
-
-					if ( pop ) {
-
-						// the pushed nodes behind the closest hit are skipped
-
-						loop {
-
-							if ( pointer == 0u ) {
-
-								return ${ closest ? 'result.didHit' : 'false' };
-
-							}
-
-							pointer -= 1u;
-
-							if ( stackDistance[ pointer ] <= limit ) {
-
-								break;
-
-							}
-
-						}
-
-						current = stackNode[ pointer ];
-						pop = false;
-
-					}
-
-				}
-
-			}
-		`;
-
-		const closestHit = traverse( 'rayTracedRadiosityClosestHit', rayIntersectionResultStruct, closestRange, true );
-		const anyHit = traverse( 'rayTracedRadiosityAnyHit', shadowStruct, shadowRange, false );
-
-		// traces a ray and returns the barycentric coordinates of the hit and the triangle plus one,
-		// negated for back faces, or zeros if nothing is hit
+		// traces a ray and returns the barycentric coordinates of the closest hit and its triangle plus
+		// one, negated for back faces, or zeros if nothing is hit
 
 		this._trace = wgslTagFn/* wgsl */`
 			// fn
@@ -788,7 +558,7 @@ class RayTracedRadiosity {
 				ray.maxDist = 0.0;
 
 				var hit: ${ rayIntersectionResultStruct };
-				${ closestHit }( ray, &hit );
+				${ raycastFirstHit }( ray, &hit );
 
 				if ( ! hit.didHit ) {
 
@@ -796,7 +566,7 @@ class RayTracedRadiosity {
 
 				}
 
-				return vec3f( hit.barycoord.yz, hit.side * ( f32( hit.indices.w ) + 1.0 ) );
+				return vec3f( hit.barycoord.yz, hit.side * ( f32( hit.indices.x / 3u ) + 1.0 ) );
 
 			}
 		`;
@@ -807,10 +577,9 @@ class RayTracedRadiosity {
 			// fn
 			fn rayTracedRadiositySurface( hit: vec3f ) -> vec2f {
 
-				let ti = u32( abs( hit.z ) ) - 1u;
-				let indices = vec3u( ${ index }[ ti * 3u ], ${ index }[ ti * 3u + 1u ], ${ index }[ ti * 3u + 2u ] );
+				let vertex = ( u32( abs( hit.z ) ) - 1u ) * 3u;
 
-				return ${ sampleTrianglePoint }( vec3f( 1.0 - hit.x - hit.y, hit.xy ), indices ).uv1;
+				return ${ sampleTrianglePoint }( vec3f( 1.0 - hit.x - hit.y, hit.xy ), vec3u( vertex, vertex + 1u, vertex + 2u ) ).uv1;
 
 			}
 		`;
@@ -826,12 +595,9 @@ class RayTracedRadiosity {
 				ray.direction = direction;
 				ray.maxDist = maxDist;
 
-				var shadow: ${ shadowStruct };
-				shadow.blocked = false;
+				var hit: ${ rayIntersectionResultStruct };
 
-				${ anyHit }( ray, &shadow );
-
-				return select( 1.0, 0.0, shadow.blocked );
+				return select( 1.0, 0.0, ${ raycastFirstHit }( ray, &hit ) );
 
 			}
 		`;
@@ -991,7 +757,7 @@ class RayTracedRadiosity {
 
 						if ( cache !== null ) {
 
-							const base = int( triangles.element( int( abs( hit.z ) ).sub( 1 ).mul( 3 ) ).w ).mul( MATERIAL_STRIDE ).toVar();
+							const base = int( triangles.element( int( abs( hit.z ) ).sub( 1 ) ) ).mul( MATERIAL_STRIDE ).toVar();
 							const front = materials.element( base ).toVar();
 							const facing = select( hit.z.lessThan( 0 ), materials.element( base.add( 1 ) ).w, front.w );
 
