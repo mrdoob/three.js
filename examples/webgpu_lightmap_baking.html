@@ -206,7 +206,7 @@
 
 				}
 
-				radiosity ? outputControl.hide() : outputControl.show();
+				outputControl.select.disabled = radiosity;
 				radiosity ? denoiseControl.show() : denoiseControl.hide();
 				world?.light != null && params.output === 'Baked GI' ? directLightControl.show() : directLightControl.hide();
 
