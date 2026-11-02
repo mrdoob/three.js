@@ -66,7 +66,7 @@
 			let camera, scene, renderer, controls, renderPipeline, status;
 			let world, meshes, materials;
 			let source, lightMapper, denoiser, bakedPass, livePass, liveOutput;
-			let algorithmControl, outputControl, denoiseControl;
+			let algorithmControl, outputControl, denoiseControl, directLightControl;
 			let needsBake = false, denoised = false;
 
 			// shifts the per-pixel cone noise of the live view every frame, like the light map samples
@@ -78,6 +78,7 @@
 				algorithm: 'Ray Radiosity',
 				output: 'Baked GI',
 				resolution: 1024,
+				bakeDirect: false,
 				denoise: true
 			};
 
@@ -129,6 +130,7 @@
 				algorithmControl = gui.add( params, 'algorithm', [ 'Ray Radiosity', 'Light Probe', 'VXGI' ] ).name( 'GI Algorithm' ).onChange( setAlgorithm );
 				outputControl = gui.add( params, 'output', [ 'Baked GI', 'Live GI' ] ).name( 'Output' ).onChange( setOutput );
 				gui.add( params, 'resolution', [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( requestBake );
+				directLightControl = gui.add( params, 'bakeDirect' ).name( 'Bake direct diffuse' ).onChange( requestBake );
 				denoiseControl = gui.add( params, 'denoise' ).name( 'Denoise' ).onChange( setLightMap );
 				gui.add( { bake: requestBake }, 'bake' ).name( 'Re-Bake GI' );
 
@@ -174,10 +176,10 @@
 
 					params.algorithm = world.algorithms[ 0 ];
 					algorithmControl.setValue( params.algorithm );
-					updateControls();
 
 				}
 
+				updateControls();
 				requestBake();
 
 			}
@@ -204,12 +206,13 @@
 
 				radiosity ? outputControl.hide() : outputControl.show();
 				radiosity ? denoiseControl.show() : denoiseControl.hide();
+				world?.light != null && params.output === 'Baked GI' ? directLightControl.show() : directLightControl.hide();
 
 			}
 
 			function createCornellBox() {
 
-				// the panel is an emitter without light map, the room holds the light-mapped meshes
+				// the room holds the light-mapped meshes; all GI modes use the same point light
 
 				const root = new THREE.Group();
 				const room = new THREE.Group();
@@ -271,20 +274,13 @@
 				tallBox.receiveShadow = true;
 				room.add( tallBox );
 
-				// Glossy sphere, to show direct specular lighting (Light Probe and VXGI)
+				// Glossy sphere, to show direct specular lighting when the point light stays live
 				const glossyMaterial = new THREE.MeshStandardMaterial( { color: 0x0044ff, roughness: 0.15 } );
 				const glossySphere = new THREE.Mesh( new THREE.SphereGeometry( 0.65, 32, 32 ), glossyMaterial );
 				glossySphere.position.set( 1, 0.65, 0.5 );
 				glossySphere.castShadow = true;
 				glossySphere.receiveShadow = true;
 				room.add( glossySphere );
-
-				// Lights: ray radiosity bakes the direct light of an emissive area light panel with soft
-				// shadows, light probes and VXGI bake the indirect light of a live point light
-				const lightPanel = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), new THREE.MeshStandardMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 20 } ) );
-				lightPanel.rotation.x = Math.PI / 2;
-				lightPanel.position.y = 4.99;
-				root.add( lightPanel );
 
 				const light = new THREE.PointLight( 0xffffff, 40 );
 				light.position.set( 0, 4.5, 0 );
@@ -296,7 +292,7 @@
 				root.add( light );
 
 				return {
-					root, lightMapped: room, light, lightPanel, background: new THREE.Color( 0x111111 ), cacheSize: 256, algorithms: [ 'Ray Radiosity', 'Light Probe', 'VXGI' ],
+					root, lightMapped: room, light, background: new THREE.Color( 0x111111 ), cacheSize: 256, algorithms: [ 'Ray Radiosity', 'Light Probe', 'VXGI' ],
 					camera: new THREE.Vector3( 0, 2.5, 8 ), target: new THREE.Vector3( 0, 2.5, 0 ),
 					probes: { size: new THREE.Vector3( 6, 5, 6 ), position: new THREE.Vector3( 0, 2.5, 0 ), counts: [ 8, 8, 8 ], far: 20 }
 				};
@@ -387,7 +383,7 @@
 				}
 
 				return {
-					root, lightMapped: root, light: null, lightPanel: null, background: sky, cacheSize: 512, algorithms: [ 'Ray Radiosity', 'Light Probe' ],
+					root, lightMapped: root, light: null, background: sky, cacheSize: 512, algorithms: [ 'Ray Radiosity', 'Light Probe' ],
 					camera: new THREE.Vector3( - 5.6, 1.6, 1.5 ), target: new THREE.Vector3( 3, 3.4, - 2.5 ),
 					probes: { size: new THREE.Vector3( 17.7, 7.5, 17.7 ), position: new THREE.Vector3( 0, 4, 0 ), counts: [ 8, 4, 8 ], far: 40 }
 				};
@@ -421,23 +417,18 @@
 
 				}
 
-				// in the Cornell Box, ray radiosity bakes the emissive panel, light probes and VXGI the live point
-				// light, whose shadows are rendered once for them. The Courtyard is lit by the sky
+				// Keep the point light visible while capturing the GI, including when its direct diffuse
+				// light will be baked. Render its shadows once before the UV bake.
 
 				if ( world.light !== null ) {
 
-					world.lightPanel.visible = params.algorithm === 'Ray Radiosity';
-					world.light.visible = world.lightPanel.visible === false;
-
-					if ( world.light.visible ) {
-
-						world.light.shadow.needsUpdate = true;
-						renderer.render( scene, camera );
-
-					}
+					world.light.visible = true;
+					world.light.shadow.needsUpdate = true;
+					renderer.render( scene, camera );
 
 				}
 
+				const bakeDirect = params.bakeDirect && world.light !== null;
 				const radiosity = params.algorithm === 'Ray Radiosity';
 
 				let irradiance;
@@ -448,7 +439,7 @@
 
 					const radiosity = new RayTracedRadiosity( { cacheSize: world.cacheSize } );
 					radiosity.update( renderer, scene );
-					irradiance = rayTracedRadiosityIrradiance( radiosity );
+					irradiance = rayTracedRadiosityIrradiance( radiosity, { analyticLights: bakeDirect } );
 					source = radiosity;
 
 				} else if ( params.algorithm === 'Light Probe' ) {
@@ -477,7 +468,7 @@
 				// the light map accumulates one sample per frame in animate(). Ray radiosity bakes are denoised,
 				// with the variance of their samples
 
-				lightMapper = new LightMapper( renderer, world.atlas.resolution, irradiance, { moments: radiosity } );
+				lightMapper = new LightMapper( renderer, world.atlas.resolution, irradiance, { moments: radiosity, lights: bakeDirect && radiosity === false ? [ world.light ] : [] } );
 				lightMapper.addObjects( meshes );
 
 				denoiser = radiosity ? new LightMapDenoiser( renderer, lightMapper ) : null;
@@ -510,6 +501,11 @@
 			function setOutput() {
 
 				const live = params.output === 'Live GI';
+
+				// The baked direct diffuse replaces the live light, including its specular highlight.
+
+				if ( world.light !== null ) world.light.visible = live || params.bakeDirect === false;
+				updateControls();
 
 				// discard accumulated samples when switching outputs; baking only runs in Baked GI
 
