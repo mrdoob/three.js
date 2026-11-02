@@ -57,17 +57,16 @@
 
 			let camera, scene, renderer, controls, status;
 			let world, meshes, materials;
-			let radiosity, lightMapper, directLightControl;
+			let radiosity, lightMapper;
 			let needsBake = false;
 
 			const params = {
-				scene: 'Cornell Box + Point',
+				scene: 'Cornell Box',
 				resolution: 1024,
-				bounces: 6,
-				bakeDirect: false
+				bounces: 6
 			};
 
-			const scenes = { 'Cornell Box + Point': () => createCornellBox( false ), 'Cornell Box + Emissive': () => createCornellBox( true ), 'Courtyard': loadCourtyard };
+			const scenes = { 'Cornell Box': createCornellBox, 'Courtyard': loadCourtyard };
 			const worlds = {};
 
 			// every sample continues the ray sequences of the texels
@@ -87,7 +86,6 @@
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.shadowMap.enabled = true;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
@@ -106,7 +104,6 @@
 				gui.add( params, 'scene', Object.keys( scenes ) ).name( 'Scene' ).onChange( setScene );
 				gui.add( params, 'resolution', [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( requestBake );
 				gui.add( params, 'bounces', 0, 16, 1 ).name( 'Bounces' ).onChange( requestBake );
-				directLightControl = gui.add( params, 'bakeDirect' ).name( 'Bake direct diffuse' ).onChange( requestBake );
 				gui.add( { bake: requestBake }, 'bake' ).name( 'Re-Bake GI' );
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -141,13 +138,11 @@
 				world.lightMapped.traverse( ( object ) => object.isMesh && meshes.push( object ) );
 				materials = new Set( meshes.map( ( mesh ) => mesh.material ) );
 
-				world.light !== null ? directLightControl.show() : directLightControl.hide();
-
 				requestBake();
 
 			}
 
-			function createCornellBox( emissive ) {
+			function createCornellBox() {
 
 				// keep the light source outside the light-mapped room
 
@@ -162,41 +157,35 @@
 				// Floor
 				const floor = new THREE.Mesh( new THREE.PlaneGeometry( 6, 6 ), wallMaterial );
 				floor.rotation.x = - Math.PI / 2;
-				floor.receiveShadow = true;
 				room.add( floor );
 
 				// Ceiling
 				const ceiling = new THREE.Mesh( new THREE.PlaneGeometry( 6, 6 ), wallMaterial );
 				ceiling.rotation.x = Math.PI / 2;
 				ceiling.position.y = 5;
-				ceiling.receiveShadow = true;
 				room.add( ceiling );
 
 				// Back wall
 				const backWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), wallMaterial );
 				backWall.position.set( 0, 2.5, - 3 );
-				backWall.receiveShadow = true;
 				room.add( backWall );
 
 				// Front wall
 				const frontWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), wallMaterial );
 				frontWall.rotation.y = Math.PI;
 				frontWall.position.set( 0, 2.5, 3 );
-				frontWall.receiveShadow = true;
 				room.add( frontWall );
 
 				// Left wall (red)
 				const leftWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), redMaterial );
 				leftWall.rotation.y = Math.PI / 2;
 				leftWall.position.set( - 3, 2.5, 0 );
-				leftWall.receiveShadow = true;
 				room.add( leftWall );
 
 				// Right wall (green)
 				const rightWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), greenMaterial );
 				rightWall.rotation.y = - Math.PI / 2;
 				rightWall.position.set( 3, 2.5, 0 );
-				rightWall.receiveShadow = true;
 				room.add( rightWall );
 
 				// Objects inside the box
@@ -207,41 +196,22 @@
 				const tallBox = new THREE.Mesh( new THREE.BoxGeometry( 1.2, 2.5, 1.2 ), objectMaterial );
 				tallBox.position.set( - 0.8, 1.25, - 0.8 );
 				tallBox.rotation.y = Math.PI / 8;
-				tallBox.castShadow = true;
-				tallBox.receiveShadow = true;
 				room.add( tallBox );
 
-				// glossy sphere shows live direct specular lighting
-				const glossyMaterial = new THREE.MeshStandardMaterial( { color: 0x0044ff, roughness: 0.15 } );
-				const glossySphere = new THREE.Mesh( new THREE.SphereGeometry( 0.65, 32, 32 ), glossyMaterial );
-				glossySphere.position.set( 1, 0.65, 0.5 );
-				glossySphere.castShadow = true;
-				glossySphere.receiveShadow = true;
-				room.add( glossySphere );
+				// Sphere
+				const sphereMaterial = new THREE.MeshStandardMaterial( { color: 0x0044ff, roughness: 0.15 } );
+				const sphere = new THREE.Mesh( new THREE.SphereGeometry( 0.65, 32, 32 ), sphereMaterial );
+				sphere.position.set( 1, 0.65, 0.5 );
+				room.add( sphere );
 
-				let light = null;
-
-				if ( emissive ) {
-
-					const lightPanel = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), new THREE.MeshStandardMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 20 } ) );
-					lightPanel.rotation.x = Math.PI / 2;
-					lightPanel.position.y = 4.99;
-					root.add( lightPanel );
-
-				} else {
-
-					light = new THREE.PointLight( 0xffffff, 32 );
-					light.position.set( 0, 4.5, 0 );
-					light.castShadow = true;
-					light.shadow.mapSize.setScalar( 256 );
-					light.shadow.radius = 10;
-					light.shadow.normalBias = - 0.02;
-					root.add( light );
-
-				}
+				// Emissive light panel, ray radiosity bakes its direct light with soft shadows
+				const lightPanel = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), new THREE.MeshStandardMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 20 } ) );
+				lightPanel.rotation.x = Math.PI / 2;
+				lightPanel.position.y = 4.99;
+				root.add( lightPanel );
 
 				return {
-					root, lightMapped: room, light, background: new THREE.Color( 0x111111 ), cacheSize: 256,
+					root, lightMapped: room, background: new THREE.Color( 0x111111 ), cacheSize: 256,
 					camera: new THREE.Vector3( 0, 2.5, 8 ), target: new THREE.Vector3( 0, 2.5, 0 )
 				};
 
@@ -331,7 +301,7 @@
 				}
 
 				return {
-					root, lightMapped: root, light: null, background: sky, cacheSize: 512,
+					root, lightMapped: root, background: sky, cacheSize: 512,
 					camera: new THREE.Vector3( - 5.6, 1.6, 1.5 ), target: new THREE.Vector3( 3, 3.4, - 2.5 )
 				};
 
@@ -361,26 +331,17 @@
 
 				}
 
-				// rays through a BVH of the scene, with the bounces cached in a light map of their own.
-				// The solver only collects visible lights
-
-				const bakeDirect = params.bakeDirect && world.light !== null;
-
-				if ( world.light !== null ) world.light.visible = true;
+				// rays through a BVH of the scene, with the bounces cached in a light map of their own
 
 				radiosity = new RayTracedRadiosity( { cacheSize: world.cacheSize, bounces: params.bounces } );
 				radiosity.update( renderer, scene );
 
 				// the light map accumulates one sample per frame in animate()
 
-				lightMapper = new LightMapper( renderer, world.atlas.resolution, rayTracedRadiosityIrradiance( radiosity, { analyticLights: bakeDirect } ) );
+				lightMapper = new LightMapper( renderer, world.atlas.resolution, rayTracedRadiosityIrradiance( radiosity ) );
 				lightMapper.addObjects( meshes );
 
 				for ( const material of materials ) material.lightMap = lightMapper.texture;
-
-				// baked direct diffuse replaces live lighting, including specular
-
-				if ( world.light !== null ) world.light.visible = bakeDirect === false;
 
 			}
 
