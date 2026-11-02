@@ -341,7 +341,7 @@ class RayTracedRadiosity {
 			const count = index !== null ? index.count : position.count;
 			const drawStart = Math.max( 0, geometry.drawRange.start );
 			const drawEnd = Math.min( count, geometry.drawRange.start + geometry.drawRange.count );
-			// like the renderer, only use geometry groups for meshes with a material array
+			// geometry groups only apply to material arrays
 
 			const groups = Array.isArray( object.material ) ? geometry.groups : [ { start: 0, count: Infinity, materialIndex: 0 } ];
 
@@ -1063,8 +1063,7 @@ class RayTracedRadiosity {
 
 					If( cosReceiver.greaterThan( 0 ).and( cosLight.greaterThan( 0 ) ).and( dot( direction, faceNormal ).greaterThan( 0 ) ), () => {
 
-						// the irradiance over the probability of the point. Individual sample contributions may
-						// exceed pi near an emitter; clamping them would bias the integral
+						// keep sample contributions unclamped to avoid bias
 
 						const scale = cosReceiver.mul( cosLight ).mul( edge1.w ).div( distanceSq ).div( emission.w );
 

@@ -214,8 +214,7 @@
 
 			function createCornellBox( emissive ) {
 
-				// the room holds the light-mapped meshes, lit by a live point light or an emissive area light
-				// panel without light map, whose direct light with soft shadows is baked by every GI mode
+				// keep the light source outside the light-mapped room
 
 				const root = new THREE.Group();
 				const room = new THREE.Group();
@@ -277,7 +276,7 @@
 				tallBox.receiveShadow = true;
 				room.add( tallBox );
 
-				// Glossy sphere, to show direct specular lighting when the point light stays live
+				// glossy sphere shows live direct specular lighting
 				const glossyMaterial = new THREE.MeshStandardMaterial( { color: 0x0044ff, roughness: 0.15 } );
 				const glossySphere = new THREE.Mesh( new THREE.SphereGeometry( 0.65, 32, 32 ), glossyMaterial );
 				glossySphere.position.set( 1, 0.65, 0.5 );
@@ -433,8 +432,7 @@
 
 				}
 
-				// Keep the point light visible while capturing the GI, including when its direct diffuse
-				// light will be baked. Render its shadows once before the UV bake.
+				// capture GI and shadows with the point light enabled
 
 				if ( world.light !== null ) {
 
@@ -519,7 +517,7 @@
 
 				const live = params.output === 'Live GI';
 
-				// The baked direct diffuse replaces the live light, including its specular highlight.
+				// baked direct diffuse replaces live lighting, including specular
 
 				if ( world.light !== null ) world.light.visible = live || params.bakeDirect === false;
 				updateControls();
