@@ -674,7 +674,8 @@
 
 				const fnDef = Fn( () => {
 
-					const inputSize = uint( inputBuffer.bufferCount );
+					// TODO: read the length in the shader once TSL supports WGSL's "arrayLength"
+					const inputSize = uint( inputBuffer.value.count );
 					const rowOffset = workgroupId.x.mul( rowSize );
 
 					// If the current rows elements exceed the bounds of the input
