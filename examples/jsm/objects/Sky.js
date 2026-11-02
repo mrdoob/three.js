@@ -143,7 +143,16 @@ Sky.SkyShader = {
 			vWorldPosition = worldPosition.xyz;
 
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-			gl_Position.z = gl_Position.w; // set z to camera.far
+
+			#ifdef USE_REVERSED_DEPTH_BUFFER
+
+				gl_Position.z = 0.0; // set z to camera.far
+
+			#else
+
+				gl_Position.z = gl_Position.w; // set z to camera.far
+
+			#endif
 
 			vSunDirection = normalize( sunPosition );
 
