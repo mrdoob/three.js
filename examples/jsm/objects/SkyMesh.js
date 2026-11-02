@@ -160,7 +160,7 @@ class SkyMesh extends Mesh {
 		const vBetaR = varyingProperty( 'vec3' );
 		const vBetaM = varyingProperty( 'vec3' );
 
-		const vertexNode = /*@__PURE__*/ Fn( () => {
+		const vertexNode = /*@__PURE__*/ Fn( ( builder ) => {
 
 			// constants for atmospheric scattering
 			const e = float( 2.718281828459045 );
@@ -219,7 +219,7 @@ class SkyMesh extends Mesh {
 			// position
 
 			const position = modelViewProjection;
-			position.z.assign( position.w ); // set z to camera.far
+			position.z.assign( builder.renderer.reversedDepthBuffer === true ? 0 : position.w ); // set z to camera.far
 
 			return position;
 
