@@ -1043,6 +1043,16 @@ class LightBaker {
 
 		const run = this._run = {};
 		const aborted = () => signal?.aborted === true || this._run !== run;
+
+		// a bake that another one superseded stops before it changes the light mapper, also after the
+		// readbacks of the vertex passes
+
+		const throwIfAborted = () => {
+
+			if ( aborted() ) throw signal?.aborted ? signal.reason : new DOMException( 'The bake was superseded by another one.', 'AbortError' );
+
+		};
+
 		const progress = () => onProgress?.( { samples: this.samples, noise: this.noise, time: this.time } );
 
 		let samplesPerFrame = this.getSamplesPerFrame();
@@ -1070,7 +1080,7 @@ class LightBaker {
 
 				while ( this.converged === false ) {
 
-					if ( aborted() ) throw signal?.aborted ? signal.reason : new DOMException( 'The bake was superseded by another one.', 'AbortError' );
+					throwIfAborted();
 
 					const maxSamples = this.getMaxSamples();
 
@@ -1118,11 +1128,13 @@ class LightBaker {
 
 				}
 
+				throwIfAborted();
+
 				// vertex bakes are refined at the changes of the light and baked again, then simplified where the
 				// light is smooth and baked once more. Simplified meshes are not refined again
 
-				if ( this.target === 'vertex' && this._simplified === false && this._refinements < this.refine && await this._refineVertices() ) continue;
-				if ( this.target === 'vertex' && this.simplify !== null && this._simplified === false && await this._simplifyVertices() ) continue;
+				if ( this.target === 'vertex' && this._simplified === false && this._refinements < this.refine && await this._refineVertices( throwIfAborted ) ) continue;
+				if ( this.target === 'vertex' && this.simplify !== null && this._simplified === false && await this._simplifyVertices( throwIfAborted ) ) continue;
 
 				break;
 
@@ -1140,6 +1152,7 @@ class LightBaker {
 
 			}
 
+			throwIfAborted();
 			this.process();
 
 		} finally {
@@ -1641,15 +1654,18 @@ class LightBaker {
 	 *
 	 * @private
 	 * @async
+	 * @param {function()} throwIfAborted - Throws if the bake was aborted while a readback was pending.
 	 * @return {Promise<boolean>} A promise that resolves with whether any mesh was refined.
 	 */
-	async _refineVertices() {
+	async _refineVertices( throwIfAborted ) {
 
 		const record = this._record;
 		const mapper = this.lightMapper;
 		const layout = mapper.layout;
 		const irradiance = await mapper.readIrradiance();
+		throwIfAborted();
 		const directions = this._refineKeep ? await mapper.readDirections() : null;
+		throwIfAborted();
 
 		// the luminance of the records, the contrast of dark ends is relative to a twentieth of the mean
 
@@ -1777,9 +1793,10 @@ class LightBaker {
 	 *
 	 * @private
 	 * @async
+	 * @param {function()} throwIfAborted - Throws if the bake was aborted while a readback was pending.
 	 * @return {Promise<boolean>} A promise that resolves with whether any mesh was simplified.
 	 */
-	async _simplifyVertices() {
+	async _simplifyVertices( throwIfAborted ) {
 
 		this._simplified = true;
 
@@ -1787,6 +1804,7 @@ class LightBaker {
 		const mapper = this.lightMapper;
 		const layout = mapper.layout;
 		const irradiance = await mapper.readIrradiance();
+		throwIfAborted();
 
 		// the luminance of the records relative to their mean
 
@@ -1846,6 +1864,7 @@ class LightBaker {
 
 			const keep = record.subdivided.get( mesh )?.original ?? geometry;
 			const simplification = await simplifyGeometry( source, values, { error: this.simplify, keep, stride: sides.length } );
+			throwIfAborted();
 
 			if ( source !== geometry ) source.dispose();
 			if ( simplification === null ) continue;
@@ -1870,6 +1889,7 @@ class LightBaker {
 		// unless they are baked again
 
 		const previous = this._simplifyRebake ? null : { layout, irradiance, directions: await mapper.readDirections(), all: true };
+		throwIfAborted();
 
 		this.lightMapper = new VertexLightMapper( this.renderer, this.irradianceNode, { meshes: record.lightMapped, directional: this.directional, doubleSided: this._doubleSided(), previous, sampling: this._sampling, smoothNormals: this._contactOcclusion?.smooth === true } );
 		mapper.dispose();
