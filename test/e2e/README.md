@@ -27,7 +27,11 @@ The runner records the WebGL renderer and, for WebGPU examples, adapter identity
 
 One worker runs by default to avoid GPU contention. Playwright handles retries and replaces a failed worker's browser. Each example has its own context, console error checks and trace on failure. Increase workers explicitly when the hardware has enough capacity. CI uses Playwright's native sharding, independent of the `CI` environment variable.
 
-The readiness helper preserves the original Puppeteer boundaries: Chromium's navigation `networkIdle` lifecycle, two continuous seconds without requests, and browser-side render polling. The frozen clock does not stop real-time intervals, so changing these boundaries can change scenes such as Jolt physics before the captured frame.
+Screenshot comparisons navigate with Playwright's native `networkidle` boundary, wait for the deterministic video/render hooks, and use `expect.poll` to recapture until the existing JPEG comparison passes (at most five seconds). This experiment removes the additional two-second quiet period on successful comparisons. It retains the 0.1 per-pixel threshold, fewer than 0.1% differing pixels, and all existing JPEG baselines. Permanent differences still fail and retain the final actual/expected/diff images.
+
+DOM actionability and a stable canvas rectangle do not establish GPU or asset readiness. Native `networkidle` remains a 500 ms heuristic; screenshot polling can observe late rendering but cannot make a missed one-shot animation callback run again. The frozen clock does not stop real-time intervals, so shorter waits can also change physics scenes. CI failure counts and images must be compared with the parent branch before adopting this experiment.
+
+Thumbnail generation (`make-screenshot`) keeps the original Puppeteer boundaries: Chromium's navigation `networkIdle` lifecycle, two continuous seconds without requests, and browser-side render polling. A new thumbnail has no expected image against which to retry.
 
 Failures retain `<example>-actual.jpg`, `-expected.jpg` and `-diff.jpg` in `test/e2e/output-screenshots` for the existing CI screenshot report. Playwright attaches the GPU identity, browser console and images to its test result. Traces are in `test/e2e/results`; inspect one with `npx playwright show-trace <trace.zip>`.
 
