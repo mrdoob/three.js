@@ -766,6 +766,16 @@ class Renderer {
 		this._precompilationState = null;
 
 		/**
+		 * A promise which resolves when the work items of the last `compileAsync()` call
+		 * have been processed. Concurrent calls process their work items one after another
+		 * since the renderer only holds the precompilation state of one call.
+		 *
+		 * @private
+		 * @type {Promise}
+		 */
+		this._precompilationPromise = Promise.resolve();
+
+		/**
 		 * When an override material is in use, this property points to the current
 		 * source material during the rendering of a render object.
 		 *
@@ -1036,6 +1046,12 @@ class Renderer {
 
 		}
 
+		// a previous call might be in the middle of a work item, its state is set aside until the work items of this call are queued
+
+		const activePrecompilationState = this._precompilationState;
+
+		if ( activePrecompilationState !== null ) this._finishPreCompile();
+
 		// preserve render tree
 
 		const nodeFrame = this._nodes.nodeFrame;
@@ -1187,6 +1203,17 @@ class Renderer {
 
 		this._finishPreCompile();
 
+		if ( activePrecompilationState !== null ) this._beginPreCompile( activePrecompilationState );
+
+		// wait for the work items of previous calls, otherwise their precompilation states interleave
+
+		const previousPrecompilationPromise = this._precompilationPromise;
+
+		let finishPrecompilation;
+		this._precompilationPromise = new Promise( ( resolve ) => finishPrecompilation = resolve );
+
+		await previousPrecompilationPromise;
+
 		// Process compilation work items sequentially and yield to the main thread after a
 		// time budget to keep animation smooth. Pipelines are compiled in parallel while
 		// the next items are processed.
@@ -1223,63 +1250,73 @@ class Renderer {
 
 		};
 
-		for ( const item of compilationPromises ) {
+		try {
 
-			if ( item.computeNodes !== undefined ) {
+			for ( const item of compilationPromises ) {
 
-				// compute work queued by the drawing pipeline, e.g. its culling
+				if ( item.computeNodes !== undefined ) {
 
-				await this.compileComputeAsync( item.computeNodes );
+					// compute work queued by the drawing pipeline, e.g. its culling
 
-				onLoaded();
+					await this.compileComputeAsync( item.computeNodes );
 
-				continue;
-
-			}
-
-			const pipelinePromises = [];
-
-			// each item is compiled with the state of the render call that queued it, e.g. a nested render into another target
-
-			const itemPrecompilationState = item.precompilationState;
-			itemPrecompilationState.item = item;
-
-			this._beginPreCompile( itemPrecompilationState );
-
-			const renderObject = this._objects.get( item.object, item.material, item.scene, item.camera, item.lightsNode, item.renderContext, item.clippingContext, item.passId );
-			renderObject.drawRange = item.object.geometry.drawRange;
-			renderObject.group = item.group;
-
-			await this._nodes.getForRenderAsync( renderObject, yieldPreCompile );
-			this._nodes.updateBefore( renderObject );
-			this._geometries.updateForRender( renderObject );
-			this._nodes.updateForRender( renderObject );
-			this._bindings.updateForRender( renderObject );
-			this._pipelines.getForRender( renderObject, pipelinePromises );
-			this._nodes.updateAfter( renderObject );
-
-			this._finishPreCompile();
-
-			if ( pipelinePromises.length > 0 ) {
-
-				const promise = Promise.all( pipelinePromises ).then( () => {
-
-					compilingPipelines.delete( promise );
 					onLoaded();
 
-				} );
+					continue;
 
-				compilingPipelines.add( promise );
+				}
 
-				while ( compilingPipelines.size >= _maxCompilingPipelines ) await Promise.race( compilingPipelines );
+				const pipelinePromises = [];
 
-			} else {
+				// each item is compiled with the state of the render call that queued it, e.g. a nested render into another target
 
-				onLoaded();
+				const itemPrecompilationState = item.precompilationState;
+				itemPrecompilationState.item = item;
+
+				this._beginPreCompile( itemPrecompilationState );
+
+				const renderObject = this._objects.get( item.object, item.material, item.scene, item.camera, item.lightsNode, item.renderContext, item.clippingContext, item.passId );
+				renderObject.drawRange = item.object.geometry.drawRange;
+				renderObject.group = item.group;
+
+				await this._nodes.getForRenderAsync( renderObject, yieldPreCompile );
+				this._nodes.updateBefore( renderObject );
+				this._geometries.updateForRender( renderObject );
+				this._nodes.updateForRender( renderObject );
+				this._bindings.updateForRender( renderObject );
+				this._pipelines.getForRender( renderObject, pipelinePromises );
+				this._nodes.updateAfter( renderObject );
+
+				this._finishPreCompile();
+
+				if ( pipelinePromises.length > 0 ) {
+
+					const promise = Promise.all( pipelinePromises ).then( () => {
+
+						compilingPipelines.delete( promise );
+						onLoaded();
+
+					} );
+
+					compilingPipelines.add( promise );
+
+					while ( compilingPipelines.size >= _maxCompilingPipelines ) await Promise.race( compilingPipelines );
+
+				} else {
+
+					onLoaded();
+
+				}
+
+				if ( scheduler.needsYield() ) await scheduler.yield();
 
 			}
 
-			if ( scheduler.needsYield() ) await scheduler.yield();
+		} finally {
+
+			// the pipelines don't depend on the precompilation state, so the next call can continue
+
+			finishPrecompilation();
 
 		}
 
