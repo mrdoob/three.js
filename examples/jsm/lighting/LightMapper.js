@@ -1,5 +1,5 @@
-import { BackSide, BufferAttribute, BufferGeometry, CustomBlending, DoubleSide, FloatType, HalfFloatType, Mesh, MeshLambertNodeMaterial, NearestFilter, NoBlending, NodeMaterial, OneFactor, OrthographicCamera, QuadMesh, RedFormat, RendererUtils, RenderTarget, Scene, Vector2 } from 'three/webgpu';
-import { Fn, If, Loop, attribute, ivec2, lights, luminance, modelViewMatrix, mrt, normalViewGeometry, normalWorldGeometry, output, positionLocal, positionWorld, round, screenCoordinate, texture, textureLoad, uniform, uv, vec4 } from 'three/tsl';
+import { BackSide, BufferAttribute, BufferGeometry, CustomBlending, DoubleSide, FloatType, HalfFloatType, Mesh, MeshLambertNodeMaterial, NearestFilter, NoBlending, NodeMaterial, OneFactor, OrthographicCamera, QuadMesh, RedFormat, RGFormat, RendererUtils, RenderTarget, Scene, Vector2 } from 'three/webgpu';
+import { Fn, If, Loop, attribute, ivec2, lights, luminance, modelViewMatrix, mrt, normalViewGeometry, normalWorldGeometry, output, positionLocal, positionWorld, round, screenCoordinate, texture, textureLoad, uniform, uv, vec2, vec4 } from 'three/tsl';
 
 let _rendererState;
 
@@ -86,12 +86,13 @@ class LightMapper {
 		 */
 		this.samples = 0;
 
-		// for the variance, the squared luminances of the samples accumulate in a second target of float
-		// sums, half floats would overflow
+		// for the variance, the luminances of the samples and their squares accumulate in a second target of
+		// float sums: half floats would overflow, and the variance of a mean from half floats would be lost
+		// in their rounding
 
 		const accumulateMoments = variance && renderer.hasFeature( 'float32-blendable' );
 
-		this._accumulation = new RenderTarget( size, size, { type: accumulateMoments ? FloatType : HalfFloatType, minFilter: NearestFilter, magFilter: NearestFilter, depthBuffer: false, count: accumulateMoments ? 2 : 1 } );
+		this._accumulation = new RenderTarget( size, size, { type: HalfFloatType, minFilter: NearestFilter, magFilter: NearestFilter, depthBuffer: false, count: accumulateMoments ? 2 : 1 } );
 
 		this._renderTarget = new RenderTarget( size, size, { type: HalfFloatType, depthBuffer: false, count: accumulateMoments ? 2 : 1 } );
 		this._renderTarget.texture.channel = 1;
@@ -100,7 +101,8 @@ class LightMapper {
 
 			this._accumulation.textures[ 0 ].name = 'output';
 			this._accumulation.textures[ 1 ].name = 'moment';
-			this._accumulation.textures[ 1 ].format = RedFormat;
+			this._accumulation.textures[ 1 ].type = FloatType;
+			this._accumulation.textures[ 1 ].format = RGFormat;
 
 			this._renderTarget.textures[ 0 ].name = 'output';
 			this._renderTarget.textures[ 1 ].name = 'variance';
@@ -216,10 +218,9 @@ class LightMapper {
 		const estimateVariance = Fn( () => {
 
 			const coord = ivec2( screenCoordinate.xy );
-			const sum = textureLoad( accumulation, coord );
-			const count = sum.a;
-			const mean = luminance( sum.rgb.div( count.max( 1 ) ) );
-			const variance = textureLoad( moments, coord ).r.div( count.max( 1 ) ).sub( mean.pow2() ).max( 0 ).div( count.sub( 1 ).max( 1 ) );
+			const count = textureLoad( accumulation, coord ).a;
+			const moment = textureLoad( moments, coord ).rg.div( count.max( 1 ) );
+			const variance = moment.y.sub( moment.x.pow2() ).max( 0 ).div( count.sub( 1 ).max( 1 ) );
 
 			return count.greaterThan( 0 ).select( variance, - 1 );
 
@@ -492,10 +493,10 @@ class LightMapper {
 
 		const normal = flipNormal ? normalWorldGeometry.negate() : normalWorldGeometry;
 
-		// for the variance, the squared luminance of each sample accumulates in the second target
+		// for the variance, the luminance of each sample and its square accumulate in the second target
 
 		const accumulateMoments = this._accumulation.textures.length > 1;
-		const outputs = ( value ) => accumulateMoments ? mrt( { output: value, moment: luminance( value.rgb ).pow2() } ) : value;
+		const outputs = ( value ) => accumulateMoments ? mrt( { output: value, moment: vec2( luminance( value.rgb ), luminance( value.rgb ).pow2() ) } ) : value;
 
 		if ( directLights.length > 0 ) {
 

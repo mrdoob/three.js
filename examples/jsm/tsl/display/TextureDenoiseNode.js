@@ -170,14 +170,18 @@ class TextureDenoiseNode extends Node {
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
-		// the filter passes ping-pong between these, they store the color and the standard
-		// deviation of its noise in alpha, or -1 in alpha for texels without data
+		// the filter passes ping-pong between these, they store the color and the standard deviation of its
+		// noise in alpha, or -1 in alpha for texels without data. The denoised texture is written to the one
+		// that the last pass does not read
 
 		this._targets = [ 0, 1 ].map( () => new RenderTarget( 1, 1, { type: HalfFloatType, depthBuffer: false } ) );
 
-		this._renderTarget = new RenderTarget( 1, 1, { type: HalfFloatType, depthBuffer: false } );
-		this._renderTarget.texture.name = 'TextureDenoiseNode';
-		this._renderTarget.texture.channel = colorNode.value.channel;
+		for ( const target of this._targets ) {
+
+			target.texture.name = 'TextureDenoiseNode';
+			target.texture.channel = colorNode.value.channel;
+
+		}
 
 		this._size = uniform( new Vector2() );
 		this._step = uniform( 1, 'int' );
@@ -189,7 +193,7 @@ class TextureDenoiseNode extends Node {
 
 		// the denoised texture, sampled like the color
 
-		this._textureNode = passTexture( this, this._renderTarget.texture );
+		this._textureNode = passTexture( this, this._getOutput().texture );
 		this._textureNode.uvNode = colorNode.uvNode;
 
 	}
@@ -212,7 +216,7 @@ class TextureDenoiseNode extends Node {
 	 */
 	getTexture() {
 
-		return this._renderTarget.texture;
+		return this._getOutput().texture;
 
 	}
 
@@ -224,10 +228,9 @@ class TextureDenoiseNode extends Node {
 	 */
 	setSize( width, height ) {
 
-		if ( width === this._renderTarget.width && height === this._renderTarget.height ) return;
+		if ( width === this._targets[ 0 ].width && height === this._targets[ 0 ].height ) return;
 
 		for ( const target of this._targets ) target.setSize( width, height );
-		this._renderTarget.setSize( width, height );
 		this._size.value.set( width, height );
 
 	}
@@ -270,8 +273,10 @@ class TextureDenoiseNode extends Node {
 
 		_quadMesh.material = this._resolveMaterial;
 		_quadMesh.name = 'Texture Denoise [ Resolve ]';
-		renderer.setRenderTarget( this._renderTarget );
+		renderer.setRenderTarget( this._getOutput() );
 		_quadMesh.render( renderer );
+
+		this._textureNode.value = this._getOutput().texture;
 
 		RendererUtils.restoreRendererState( renderer, _rendererState );
 
@@ -303,7 +308,6 @@ class TextureDenoiseNode extends Node {
 	 */
 	dispose() {
 
-		this._renderTarget.dispose();
 		for ( const target of this._targets ) target.dispose();
 
 		if ( this._prepareMaterial !== null ) {
@@ -319,6 +323,18 @@ class TextureDenoiseNode extends Node {
 		}
 
 		super.dispose();
+
+	}
+
+	/**
+	 * Returns the render target of the denoised texture, the one that the last filter pass does not read.
+	 *
+	 * @private
+	 * @return {RenderTarget} The render target.
+	 */
+	_getOutput() {
+
+		return this._targets[ ( this.iterations + 1 ) % 2 ];
 
 	}
 

@@ -70,6 +70,10 @@
 			const scenes = { 'Cornell Box': createCornellBox, 'Courtyard': loadCourtyard };
 			const worlds = {};
 
+			// phones have less GPU memory, 4096² takes over 1 GB with the denoiser
+
+			const phone = window.matchMedia( '(pointer: coarse)' ).matches;
+
 			// every sample continues the ray sequences of the texels. The bake casts this many rays per texel, as
 			// many per frame as keep the frame rate of the display
 
@@ -107,7 +111,7 @@
 
 				const gui = renderer.inspector.createParameters( 'Light Baking' );
 				gui.add( params, 'scene', Object.keys( scenes ) ).name( 'Scene' ).onChange( setScene );
-				gui.add( params, 'resolution', [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( requestBake );
+				gui.add( params, 'resolution', phone ? [ 256, 1024, 2048 ] : [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( requestBake );
 				gui.add( params, 'denoise' ).name( 'Denoise' ).onChange( requestBake );
 				gui.add( { bake: requestBake }, 'bake' ).name( 'Re-Bake GI' );
 
