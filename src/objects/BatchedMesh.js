@@ -1477,9 +1477,9 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		super.copy( source );
+		super.copy( source, recursive );
 
 		this.geometry = source.geometry.clone();
 		this.perObjectFrustumCulled = source.perObjectFrustumCulled;
