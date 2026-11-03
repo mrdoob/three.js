@@ -5,12 +5,16 @@ Use Node 24 and install dependencies with `npm ci`. Tests import current source 
 | Command | Environment |
 | --- | --- |
 | `npm run test-unit` | CPU core and TSL code-generation tests in Node |
+| `npm run test-unit-headful` | CPU core tests plus browser tests in visible Chromium |
 | `npm run test-unit-addons` | CPU addon tests in Node |
+| `npm run test-unit-addons-headful` | CPU addon tests plus browser tests in visible Chromium |
 | `npm run test-unit-browser` | Image, loader and WebGL postprocessing tests in Chromium |
 | `npm run test-unit-gpu` | Native hardware WebGL and WebGPU tests using vitest-gpu |
 | `npm test` | Core lint and all unit projects, including native GPU |
 
 Install Chromium once with `npx playwright install chromium` for browser tests. Test commands run once by default and forward Vitest arguments after `--`: use `npm test -- --watch`, `npm run test-unit -- --watch test/unit/src/math/Vector3.tests.js`, or `npm run test-unit-browser -- --watch --browser.headless=false`. Use `npm test -- --project webgpu` to select one GPU backend. Vitest discovers `*.tests.js` automatically; GPU suites use a glob entry point rather than a manual import list.
+
+The restored headful entry points run their CPU project alongside the shared browser project with visible Chromium; native GPU tests remain available through `test-unit-gpu`.
 
 Tests use native Vitest `describe`, `test`, hooks and assertions. Existing numerical and geometry comparisons remain in `utils/test-utils.js`. An unfinished behavior can use `test.fails` when it should execute and report an unexpected pass; use `test.skip` for an explicitly unsupported case.
 

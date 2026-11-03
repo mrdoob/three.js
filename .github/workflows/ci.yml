@@ -65,7 +65,6 @@ jobs:
     timeout-minutes: 60
     env:
       VISIBLE: 1
-      THREE_SOFTWARE_GPU: 1
     strategy:
       fail-fast: false
       matrix:

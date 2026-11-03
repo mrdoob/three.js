@@ -8,7 +8,7 @@ npm run test-e2e -- webgl_geometry_cube
 
 # Check all examples, or only WebGPU examples.
 npm run test-e2e
-npm run test-e2e -- --webgpu
+npm run test-e2e-webgpu
 
 # Deliberately update thumbnails after reviewing a rendering change.
 npm run make-screenshot -- webgl_geometry_cube
@@ -23,7 +23,7 @@ node --test test/e2e/*.tests.js
 
 Run `npm run build` before example tests. Install the browser with `npx playwright install chromium`, or set `THREE_BROWSER_CHANNEL=chrome` to use an installed Google Chrome. `VISIBLE=1` opens a visible browser. Windows uses ANGLE's hardware D3D11 backend. Browser and driver differences can affect pixel comparisons; review mismatch artifacts before updating a thumbnail.
 
-A physical WebGL2 renderer is required. WebGPU examples additionally require a physical adapter and successful device creation. Software renderers fail the check unless `THREE_SOFTWARE_GPU=1` is set; GitHub Actions sets it because its Ubuntu runners render with Mesa lavapipe under xvfb, like the thumbnails. If the bundled Chromium cannot create a WebGPU device on Windows, try an installed Chrome channel.
+The runner records the WebGL renderer and, for WebGPU examples, adapter identity and successful device creation. GitHub Actions retains the legacy Ubuntu Mesa configuration under xvfb to match its screenshot baselines. Use a physical GPU when verifying rendering quality locally. If the bundled Chromium cannot create a WebGPU device on Windows, try an installed Chrome channel.
 
 One worker runs by default to avoid GPU contention. Playwright handles retries and replaces a failed worker's browser. Each example has its own context, console error checks and trace on failure. Increase workers explicitly when the hardware has enough capacity. CI uses Playwright's native sharding, independent of the `CI` environment variable.
 
