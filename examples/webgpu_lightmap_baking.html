@@ -340,13 +340,18 @@
 
 				// the light map accumulates one sample per frame in animate()
 
-				// the moments of the samples let the denoiser estimate the noise of each texel
+				// the light mapper also bakes the inputs of the denoiser: the variance of each texel and the
+				// surfaces of the texels as guides
 
-				lightMapper = new LightMapper( renderer, world.atlas.resolution, rayTracedRadiosityIrradiance( radiosity ), { moments: true } );
+				lightMapper = new LightMapper( renderer, world.atlas.resolution, rayTracedRadiosityIrradiance( radiosity ), { variance: true, guides: true } );
 				lightMapper.addObjects( meshes );
 
-				denoiser = new LightMapDenoiser( renderer, lightMapper );
-				denoiser.addObjects( meshes );
+				denoiser = new LightMapDenoiser( renderer, {
+					colorTexture: lightMapper.texture,
+					varianceTexture: lightMapper.varianceTexture,
+					positionTexture: lightMapper.positionTexture,
+					normalTexture: lightMapper.normalTexture
+				} );
 				denoised = false;
 
 				setLightMap();

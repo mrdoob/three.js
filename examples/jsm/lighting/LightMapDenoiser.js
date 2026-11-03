@@ -1,36 +1,43 @@
-import { BackSide, BufferAttribute, BufferGeometry, DoubleSide, FloatType, HalfFloatType, Mesh, NodeMaterial, NoBlending, OrthographicCamera, QuadMesh, RendererUtils, RenderTarget, Scene, Vector2 } from 'three/webgpu';
-import { Fn, If, Loop, abs, attribute, dot, exp, float, ivec2, length, luminance, max, mrt, normalWorldGeometry, positionWorld, pow, round, screenCoordinate, sqrt, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl';
-
-// the surface buffer is rasterized with these jitters, so that it covers the texels that
-// the first samples of the light mapper cover
-
-const SURFACE_JITTERS = 16;
+import { HalfFloatType, NodeMaterial, QuadMesh, RendererUtils, RenderTarget, Vector2 } from 'three/webgpu';
+import { Fn, If, Loop, abs, dot, exp, float, ivec2, length, luminance, max, pow, screenCoordinate, sqrt, texture, uniform, vec2, vec3, vec4 } from 'three/tsl';
 
 let _rendererState;
 
 /**
- * Denoises the light map of a {@link LightMapper} with an edge-aware à-trous wavelet filter in
- * light map space, like SVGF. Each texel is guided by the world-space position and normal of its
- * surface and the chart it belongs to, so the filter does not blur across geometric edges or
- * chart boundaries, and the luminance of the texels is compared to their noise, so the filter
- * keeps shadows and other details that rise above the noise. The noise of each texel is estimated
- * from the variance of its samples if the light mapper has the `moments` option, else from
- * {@link LightMapDenoiser#relativeNoise}. Each pass fits a plane to the weighted texels around a
- * texel instead of averaging them, so gradients stay unbiased where the neighborhood is one-sided,
- * e.g. at chart borders and in contact shadows.
+ * Denoises an image with an edge-aware à-trous wavelet filter, like SVGF, e.g. the light map of a
+ * {@link LightMapper} or a path traced frame. The filter is guided by the world-space position and normal
+ * of the surface of each texel and an id of the surface, e.g. the light map chart that it belongs to, so it
+ * does not blur across geometric edges or chart boundaries, and the luminance of the texels is compared to
+ * their noise, so it keeps shadows and other details that rise above the noise. The noise of each texel is
+ * estimated from its variance, else from {@link LightMapDenoiser#relativeNoise}. Each pass fits a plane to
+ * the weighted texels around a texel instead of averaging them, so gradients stay unbiased where the
+ * neighborhood is one-sided, e.g. at chart borders and in contact shadows.
  *
- * The filter removes the fine grain of independent noise, e.g. of the rays of each texel, so a
- * denoised light map needs fewer samples. Call `update()` once the samples have accumulated.
- * With moments, the noise estimate needs at least two samples.
+ * The inputs are textures of the same size:
+ *
+ * - `colorTexture`: the noisy color.
+ * - `positionTexture`: the world-space position of the surface of each texel, with the id of the surface
+ * in alpha, or 0 for texels without a surface, which are not filtered.
+ * - `normalTexture`: the world-space normal of the surface of each texel.
+ * - `varianceTexture`: optional, the variance of the luminance of each texel in red, e.g. the variance of
+ * the mean of its samples. Texels with a negative variance have no data, they are filled with the mean
+ * of the denoised texels around them, like the padding of a light map.
+ *
+ * The filter removes the fine grain of independent noise, e.g. of the rays of each texel, so a denoised
+ * image needs fewer samples. Call `update()` once the samples have accumulated. With variance, the noise
+ * estimate needs at least two samples.
  *
  * ```js
- * const lightMapper = new LightMapper( renderer, size, irradiance, { moments: true } );
+ * const lightMapper = new LightMapper( renderer, size, irradiance, { variance: true, guides: true } );
  * lightMapper.addObjects( meshes );
- *
- * const denoiser = new LightMapDenoiser( renderer, lightMapper );
- * denoiser.addObjects( meshes );
- *
  * lightMapper.update( samples );
+ *
+ * const denoiser = new LightMapDenoiser( renderer, {
+ * 	colorTexture: lightMapper.texture,
+ * 	varianceTexture: lightMapper.varianceTexture,
+ * 	positionTexture: lightMapper.positionTexture,
+ * 	normalTexture: lightMapper.normalTexture
+ * } );
  * denoiser.update();
  *
  * material.lightMap = denoiser.texture;
@@ -43,17 +50,20 @@ let _rendererState;
 class LightMapDenoiser {
 
 	/**
-	 * Constructs a new light map denoiser.
+	 * Constructs a new denoiser.
 	 *
 	 * @param {WebGPURenderer} renderer - The renderer.
-	 * @param {LightMapper} lightMapper - The light mapper to denoise.
-	 * @param {Object} [options] - The filter options.
-	 * @param {number} [options.iterations=4] - The number of à-trous passes, the filter spans `4 * 2^iterations - 3` texels.
-	 * @param {number} [options.luminancePhi=3] - How many standard deviations of the noise luminance differences may span before texels stop being averaged.
-	 * @param {number} [options.normalPhi=64] - The exponent of the normal similarity weight.
-	 * @param {number} [options.planePhi=0.2] - The sine of the angle to the tangent plane at which neighbors lose most of their weight.
+	 * @param {Object} parameters - The input textures and filter options.
+	 * @param {Texture} parameters.colorTexture - The noisy color.
+	 * @param {Texture} parameters.positionTexture - The world-space position of each texel, with the id of its surface in alpha, 0 without a surface.
+	 * @param {Texture} parameters.normalTexture - The world-space normal of each texel.
+	 * @param {?Texture} [parameters.varianceTexture=null] - The variance of the luminance of each texel in red, negative without data.
+	 * @param {number} [parameters.iterations=4] - The number of à-trous passes, the filter spans `4 * 2^iterations - 3` texels.
+	 * @param {number} [parameters.luminancePhi=3] - How many standard deviations of the noise luminance differences may span before texels stop being averaged.
+	 * @param {number} [parameters.normalPhi=64] - The exponent of the normal similarity weight.
+	 * @param {number} [parameters.planePhi=0.2] - The sine of the angle to the tangent plane at which neighbors lose most of their weight.
 	 */
-	constructor( renderer, lightMapper, { iterations = 4, luminancePhi = 3, normalPhi = 64, planePhi = 0.2 } = {} ) {
+	constructor( renderer, { colorTexture, positionTexture, normalTexture, varianceTexture = null, iterations = 4, luminancePhi = 3, normalPhi = 64, planePhi = 0.2 } ) {
 
 		/**
 		 * The renderer.
@@ -63,11 +73,36 @@ class LightMapDenoiser {
 		this.renderer = renderer;
 
 		/**
-		 * The light mapper to denoise.
+		 * The noisy color.
 		 *
-		 * @type {LightMapper}
+		 * @type {Texture}
+		 * @readonly
 		 */
-		this.lightMapper = lightMapper;
+		this.colorTexture = colorTexture;
+
+		/**
+		 * The world-space position of each texel, with the id of its surface in alpha.
+		 *
+		 * @type {Texture}
+		 * @readonly
+		 */
+		this.positionTexture = positionTexture;
+
+		/**
+		 * The world-space normal of each texel.
+		 *
+		 * @type {Texture}
+		 * @readonly
+		 */
+		this.normalTexture = normalTexture;
+
+		/**
+		 * The variance of the luminance of each texel, or `null`.
+		 *
+		 * @type {?Texture}
+		 * @readonly
+		 */
+		this.varianceTexture = varianceTexture;
 
 		/**
 		 * The number of à-trous passes.
@@ -100,47 +135,31 @@ class LightMapDenoiser {
 		this.planePhi = uniform( planePhi );
 
 		/**
-		 * The relative noise of the light map, the standard deviation of the texels over their luminance.
-		 * It is only used if the light mapper has no {@link LightMapper#momentTexture}.
+		 * The relative noise of the image, the standard deviation of the texels over their luminance.
+		 * It is only used without a variance texture.
 		 *
 		 * @type {UniformNode<float>}
 		 */
 		this.relativeNoise = uniform( 0.05 );
 
-		const size = lightMapper.size;
+		// the filter passes ping-pong between these, they store the color and the standard
+		// deviation of its noise in alpha, or -1 in alpha for texels without data
 
-		// world-space position with the chart index + 1 in alpha (0 without surface), and normal
+		this._targets = [ 0, 1 ].map( () => new RenderTarget( 1, 1, { type: HalfFloatType, depthBuffer: false } ) );
 
-		this._surface = new RenderTarget( size, size, { type: FloatType, depthBuffer: false, count: 2 } );
-		this._surface.textures[ 0 ].name = 'position';
-		this._surface.textures[ 1 ].name = 'normal';
-		this._surface.textures[ 1 ].type = HalfFloatType;
-		this._surfaceNeedsUpdate = false;
-		this._charts = 0;
-
-		// the filter passes ping-pong between these, they store the irradiance and the standard
-		// deviation of its noise in alpha, or -1 in alpha for texels without samples
-
-		this._targets = [ 0, 1 ].map( () => new RenderTarget( size, size, { type: HalfFloatType, depthBuffer: false } ) );
-
-		this._renderTarget = new RenderTarget( size, size, { type: HalfFloatType, depthBuffer: false } );
-		this._renderTarget.texture.channel = 1;
+		this._renderTarget = new RenderTarget( 1, 1, { type: HalfFloatType, depthBuffer: false } );
+		this._renderTarget.texture.channel = colorTexture.channel;
 
 		/**
-		 * The denoised light map, with the conventions of {@link LightMapper#texture}.
+		 * The denoised image, with the size and UV channel of the color texture.
 		 *
 		 * @type {Texture}
 		 */
 		this.texture = this._renderTarget.texture;
 
-		this._scene = new Scene();
-		this._camera = new OrthographicCamera();
-		this._jitter = uniform( new Vector2() );
+		this._size = uniform( new Vector2() );
 		this._step = uniform( 1, 'int' );
 		this._input = texture( this._targets[ 0 ].texture );
-
-		this._frontMaterial = this._createSurfaceMaterial( false );
-		this._backMaterial = this._createSurfaceMaterial( true );
 
 		this._prepareQuad = new QuadMesh( this._createPrepareMaterial() );
 		this._filterQuad = new QuadMesh( this._createFilterMaterial() );
@@ -149,15 +168,22 @@ class LightMapDenoiser {
 	}
 
 	/**
-	 * Denoises the samples that the light mapper has accumulated so far into {@link LightMapDenoiser#texture}.
+	 * Denoises the color texture into {@link LightMapDenoiser#texture}.
 	 */
 	update() {
 
 		const renderer = this.renderer;
+		const { width, height } = this.colorTexture.image;
+
+		if ( width !== this._renderTarget.width || height !== this._renderTarget.height ) {
+
+			for ( const target of this._targets ) target.setSize( width, height );
+			this._renderTarget.setSize( width, height );
+			this._size.value.set( width, height );
+
+		}
 
 		_rendererState = RendererUtils.resetRendererState( renderer, _rendererState );
-
-		if ( this._surfaceNeedsUpdate ) this._renderSurface();
 
 		renderer.setRenderTarget( this._targets[ 0 ] );
 		this._prepareQuad.render( renderer );
@@ -186,170 +212,38 @@ class LightMapDenoiser {
 	 */
 	dispose() {
 
-		this._surface.dispose();
 		this._renderTarget.dispose();
 		for ( const target of this._targets ) target.dispose();
 
-		this._frontMaterial.dispose();
-		this._backMaterial.dispose();
 		this._prepareQuad.material.dispose();
 		this._filterQuad.material.dispose();
 		this._resolveQuad.material.dispose();
 
-		// the proxies share the attributes of the meshes, only their chart attributes are freed. The
-		// materials go first, with them the render objects that would free all attributes they used
-
-		for ( const proxy of this._scene.children ) {
-
-			const geometry = proxy.geometry;
-
-			for ( const name of Object.keys( geometry.attributes ) ) {
-
-				if ( name !== 'lightMapChart' ) geometry.deleteAttribute( name );
-
-			}
-
-			geometry.setIndex( null );
-			geometry.dispose();
-
-		}
-
 	}
 
 	/**
-	 * Adds the meshes of the light mapper, with the same geometries and materials. The filter is
-	 * guided by their surfaces.
-	 *
-	 * @param {Array<Mesh>} objects - The meshes to add.
-	 */
-	addObjects( objects ) {
-
-		// a chart is a set of triangles that are connected in light map space
-
-		for ( const object of objects ) {
-
-			const source = object.geometry;
-			const geometry = new BufferGeometry();
-
-			for ( const name of [ 'position', 'normal', 'uv1' ] ) {
-
-				if ( source.attributes[ name ] !== undefined ) geometry.setAttribute( name, source.attributes[ name ] );
-
-			}
-
-			geometry.setIndex( source.index );
-			geometry.setDrawRange( source.drawRange.start, source.drawRange.count );
-			for ( const group of source.groups ) geometry.addGroup( group.start, group.count, group.materialIndex );
-
-			const chart = computeCharts( source );
-			for ( let i = 0; i < chart.array.length; i ++ ) chart.array[ i ] += this._charts;
-			this._charts += chart.count;
-			geometry.setAttribute( 'lightMapChart', new BufferAttribute( chart.array, 1 ) );
-
-			const surfaceMaterial = ( material ) => material.side === BackSide ? this._backMaterial : this._frontMaterial;
-			const material = Array.isArray( object.material ) ? object.material.map( surfaceMaterial ) : surfaceMaterial( object.material );
-
-			const proxy = new Mesh( geometry, material );
-			proxy.matrixAutoUpdate = false;
-			proxy.frustumCulled = false;
-			object.updateWorldMatrix( true, false );
-			proxy.matrix.copy( object.matrixWorld );
-
-			this._scene.add( proxy );
-
-		}
-
-		this._surfaceNeedsUpdate = true;
-
-	}
-
-	/**
-	 * Rasterizes the world-space positions, normals and chart indices of the meshes into the surface buffer.
-	 *
-	 * @private
-	 */
-	_renderSurface() {
-
-		const renderer = this.renderer;
-		const size = this.lightMapper.size;
-
-		renderer.autoClear = false;
-		renderer.setClearColor( 0x000000, 0 );
-		renderer.setRenderTarget( this._surface );
-		renderer.clear();
-
-		// the jittered rasterizations cover the texels of the chart borders, the last one writes the texel centers
-
-		for ( let i = SURFACE_JITTERS; i >= 0; i -- ) {
-
-			if ( i > 0 ) this._jitter.value.set( halton( i, 2 ) - 0.5, halton( i, 3 ) - 0.5 ).multiplyScalar( 2 / size );
-			else this._jitter.value.set( 0, 0 );
-
-			renderer.render( this._scene, this._camera );
-
-		}
-
-		this._surfaceNeedsUpdate = false;
-
-	}
-
-	/**
-	 * Creates the material that rasterizes the surface buffer in light map space.
-	 *
-	 * @private
-	 * @param {boolean} flipNormal - Whether to flip the normal, for back-sided meshes.
-	 * @return {NodeMaterial} The material.
-	 */
-	_createSurfaceMaterial( flipNormal ) {
-
-		const material = new NodeMaterial();
-		material.side = DoubleSide;
-		material.depthTest = false;
-		material.depthWrite = false;
-		material.blending = NoBlending;
-
-		material.vertexNode = vec4( uv( 1 ).flipY().mul( 2 ).sub( 1 ).add( this._jitter ), 0, 1 );
-
-		const normal = flipNormal ? normalWorldGeometry.negate() : normalWorldGeometry;
-		const chart = round( attribute( 'lightMapChart', 'float' ) ).add( 1 );
-
-		material.fragmentNode = mrt( { position: vec4( positionWorld, chart ), normal: vec4( normal.normalize(), 1 ) } );
-
-		return material;
-
-	}
-
-	/**
-	 * Creates the material that normalizes the samples and estimates the noise of each texel.
+	 * Creates the material that estimates the noise of each texel.
 	 *
 	 * @private
 	 * @return {NodeMaterial} The material.
 	 */
 	_createPrepareMaterial() {
 
-		const lightMapper = this.lightMapper;
-		const samples = texture( lightMapper.sampleTexture );
-		const moments = lightMapper.momentTexture !== null ? texture( lightMapper.momentTexture ) : null;
+		const color = texture( this.colorTexture );
+		const variance = this.varianceTexture !== null ? texture( this.varianceTexture ) : null;
 
 		const prepare = Fn( () => {
 
 			const coord = ivec2( screenCoordinate.xy );
-			const sum = samples.load( coord );
-			const count = sum.a;
-			const mean = sum.rgb.div( count.max( 1 ) );
+			const value = color.load( coord ).rgb;
 
-			// the standard deviation of the mean from the variance of the samples
+			if ( variance === null ) return vec4( value, luminance( value ).mul( this.relativeNoise ) );
 
-			let deviation = luminance( mean ).mul( this.relativeNoise );
+			// the standard deviation, -1 marks texels without data
 
-			if ( moments !== null ) {
+			const texelVariance = variance.load( coord ).r;
 
-				const variance = moments.load( coord ).r.div( count.max( 1 ) ).sub( luminance( mean ).pow2() ).max( 0 );
-				deviation = sqrt( variance.div( count.sub( 1 ).max( 1 ) ) );
-
-			}
-
-			return count.greaterThan( 0 ).select( vec4( mean, deviation ), vec4( 0, 0, 0, - 1 ) );
+			return vec4( value, texelVariance.lessThan( 0 ).select( - 1, sqrt( texelVariance.max( 0 ) ) ) );
 
 		} );
 
@@ -368,11 +262,11 @@ class LightMapDenoiser {
 	 */
 	_createFilterMaterial() {
 
-		const size = this.lightMapper.size;
+		const size = ivec2( this._size );
 		const input = this._input;
 		const step = this._step;
-		const positions = texture( this._surface.textures[ 0 ] );
-		const normals = texture( this._surface.textures[ 1 ] );
+		const positions = texture( this.positionTexture );
+		const normals = texture( this.normalTexture );
 		const luminancePhi = this.luminancePhi;
 		const normalPhi = this.normalPhi;
 		const planePhi = this.planePhi;
@@ -389,13 +283,13 @@ class LightMapDenoiser {
 				const normal = normals.load( coord ).xyz.toVar();
 				const centerLuminance = luminance( center.rgb ).toVar();
 
-				// a tap counts if it has samples and lies on the same chart
+				// a tap counts if it has data and lies on the same surface id, e.g. the same chart
 
 				const tap = ( offset, callback ) => {
 
 					const q = coord.add( offset );
 
-					If( q.x.greaterThanEqual( 0 ).and( q.y.greaterThanEqual( 0 ) ).and( q.x.lessThan( size ) ).and( q.y.lessThan( size ) ), () => {
+					If( q.x.greaterThanEqual( 0 ).and( q.y.greaterThanEqual( 0 ) ).and( q.x.lessThan( size.x ) ).and( q.y.lessThan( size.y ) ), () => {
 
 						const other = positions.load( q );
 						const value = input.load( q );
@@ -508,17 +402,17 @@ class LightMapDenoiser {
 	}
 
 	/**
-	 * Creates the material that writes the denoised light map and fills the chart padding like
-	 * {@link LightMapper} does.
+	 * Creates the material that writes the denoised image and fills the texels without data with
+	 * the mean of the denoised texels within two texels, like {@link LightMapper} fills the padding
+	 * of the charts.
 	 *
 	 * @private
 	 * @return {NodeMaterial} The material.
 	 */
 	_createResolveMaterial() {
 
-		const size = this.lightMapper.size;
 		const input = this._input;
-		const maxCoord = ivec2( size - 1 );
+		const size = ivec2( this._size );
 
 		const resolve = Fn( () => {
 
@@ -532,7 +426,7 @@ class LightMapDenoiser {
 
 				Loop( { start: - 2, end: 2, condition: '<=', name: 'y' }, { start: - 2, end: 2, condition: '<=', name: 'x' }, ( { x, y } ) => {
 
-					const value = input.load( coord.add( ivec2( x, y ) ).clamp( ivec2( 0 ), maxCoord ) ).toVar();
+					const value = input.load( coord.add( ivec2( x, y ) ).clamp( ivec2( 0 ), size.sub( 1 ) ) ).toVar();
 
 					If( value.a.greaterThanEqual( 0 ), () => {
 
@@ -542,7 +436,11 @@ class LightMapDenoiser {
 
 				} );
 
-				result.assign( vec4( sum.rgb.div( sum.a.max( 1e-4 ) ), 1 ) );
+				If( sum.a.greaterThan( 0 ), () => {
+
+					result.assign( vec4( sum.rgb.div( sum.a ), 1 ) );
+
+				} );
 
 			} );
 
@@ -556,92 +454,6 @@ class LightMapDenoiser {
 		return material;
 
 	}
-
-}
-
-/**
- * Finds the charts of a geometry: the sets of triangles that share light map vertices.
- *
- * @private
- * @param {BufferGeometry} geometry - A geometry with `uv1`.
- * @return {{array: Float32Array, count: number}} The chart index of each vertex and the number of charts.
- */
-function computeCharts( geometry ) {
-
-	const uv = geometry.getAttribute( 'uv1' );
-	const index = geometry.getIndex();
-	const parent = new Int32Array( uv.count );
-
-	for ( let i = 0; i < parent.length; i ++ ) parent[ i ] = i;
-
-	const find = ( i ) => {
-
-		while ( parent[ i ] !== i ) i = parent[ i ] = parent[ parent[ i ] ];
-		return i;
-
-	};
-
-	const union = ( a, b ) => {
-
-		a = find( a );
-		b = find( b );
-		if ( a !== b ) parent[ Math.max( a, b ) ] = Math.min( a, b );
-
-	};
-
-	// vertices at the same light map position, and the vertices of each triangle
-
-	const vertices = new Map();
-
-	for ( let i = 0; i < uv.count; i ++ ) {
-
-		const key = `${ uv.getX( i ) },${ uv.getY( i ) }`;
-		const other = vertices.get( key );
-
-		if ( other === undefined ) vertices.set( key, i );
-		else union( i, other );
-
-	}
-
-	const count = index !== null ? index.count : uv.count;
-	const vertex = ( i ) => index !== null ? index.getX( i ) : i;
-
-	for ( let i = 0; i + 2 < count; i += 3 ) {
-
-		union( vertex( i ), vertex( i + 1 ) );
-		union( vertex( i ), vertex( i + 2 ) );
-
-	}
-
-	const array = new Float32Array( uv.count );
-	const ids = new Map();
-
-	for ( let i = 0; i < array.length; i ++ ) {
-
-		const root = find( i );
-		if ( ids.has( root ) === false ) ids.set( root, ids.size );
-		array[ i ] = ids.get( root );
-
-	}
-
-	return { array, count: ids.size };
-
-}
-
-function halton( index, base ) {
-
-	let result = 0;
-	let f = 1;
-
-	while ( index > 0 ) {
-
-		f /= base;
-		result += f * ( index % base );
-		index = Math.floor( index / base );
-
-	}
-
-	return result;
 
 }
 
