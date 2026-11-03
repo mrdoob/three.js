@@ -131,18 +131,18 @@ class LightMapSeams {
 		const buffers = this._buffers;
 		const buffer = ( array, itemSize ) => buffers[ buffers.push( new StorageBufferAttribute( array, itemSize ) ) - 1 ];
 
-		const texels = storage( buffer( system.texels, 1 ), 'uint', unknownCount ).toReadOnly();
-		const ranges = storage( buffer( system.ranges, 2 ), 'uvec2', unknownCount ).toReadOnly();
-		const entries = storage( buffer( system.entries, 1 ), 'uint', system.entries.length ).toReadOnly();
-		const corners = storage( buffer( system.corners, 4 ), 'ivec4', sampleCount * 2 ).toReadOnly();
-		const fractions = storage( buffer( system.fractions, 4 ), 'vec4', sampleCount ).toReadOnly();
-		const weights = storage( buffer( system.weights, 1 ), 'float', sampleCount ).toReadOnly();
+		const texels = storage( buffer( system.texels, 1 ), 'uint' ).toReadOnly();
+		const ranges = storage( buffer( system.ranges, 2 ), 'uvec2' ).toReadOnly();
+		const entries = storage( buffer( system.entries, 1 ), 'uint' ).toReadOnly();
+		const corners = storage( buffer( system.corners, 4 ), 'ivec4' ).toReadOnly();
+		const fractions = storage( buffer( system.fractions, 4 ), 'vec4' ).toReadOnly();
+		const weights = storage( buffer( system.weights, 1 ), 'float' ).toReadOnly();
 
 		const valueBuffer = buffer( new Float32Array( unknownCount * 4 ), 4 );
-		const values = storage( valueBuffer, 'vec4', unknownCount );
-		const initial = storage( buffer( new Float32Array( unknownCount * 4 ), 4 ), 'vec4', unknownCount );
-		const residuals = storage( buffer( new Float32Array( sampleCount * 4 ), 4 ), 'vec4', sampleCount );
-		const bounds = storage( buffer( new Float32Array( unknownCount * 8 ), 4 ), 'vec4', unknownCount * 2 );
+		const values = storage( valueBuffer, 'vec4' );
+		const initial = storage( buffer( new Float32Array( unknownCount * 4 ), 4 ), 'vec4' );
+		const residuals = storage( buffer( new Float32Array( sampleCount * 4 ), 4 ), 'vec4' );
+		const bounds = storage( buffer( new Float32Array( unknownCount * 8 ), 4 ), 'vec4' );
 
 		const map = this._map;
 		const coverage = texture( lightMapper.pages[ page ].sampleTexture );
@@ -288,7 +288,7 @@ class LightMapSeams {
 		material.depthTest = false;
 		material.depthWrite = false;
 		material.vertexNode = vec4( positionGeometry.xy, 0, 1 );
-		material.fragmentNode = vec4( varying( storage( valueBuffer, 'vec4', unknownCount ).toReadOnly().element( vertexIndex ).rgb ), 1 );
+		material.fragmentNode = vec4( varying( storage( valueBuffer, 'vec4' ).toReadOnly().element( vertexIndex ).rgb ), 1 );
 
 		const points = new Points( geometry, material );
 		points.frustumCulled = false;

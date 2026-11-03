@@ -733,7 +733,9 @@ class RayTracedRadiosity {
 				const count = index !== null ? index.count : position.count;
 				const drawStart = Math.max( 0, geometry.drawRange.start );
 				const drawEnd = Math.min( count, geometry.drawRange.start + geometry.drawRange.count );
-				const groups = geometry.groups.length > 0 ? geometry.groups : [ { start: 0, count: Infinity, materialIndex: 0 } ];
+				// like the renderer, only use geometry groups for meshes with a material array
+
+				const groups = Array.isArray( object.material ) ? geometry.groups : [ { start: 0, count: Infinity, materialIndex: 0 } ];
 
 				for ( const group of groups ) {
 
@@ -859,7 +861,7 @@ class RayTracedRadiosity {
 		this._geometry = geometry;
 		this._bvh = bvh;
 		this._lightMapMeshes = lightMapMeshes;
-		this._triangles = storage( new StorageBufferAttribute( triangleData, 4 ), 'vec4', triangleData.length / 4 ).toReadOnly();
+		this._triangles = storage( new StorageBufferAttribute( triangleData, 4 ), 'vec4' ).toReadOnly();
 		this._textureList = Array.from( textures.keys() );
 
 		// the materials, emitters, light trees and lights share one storage buffer, the gathering shaders
@@ -958,7 +960,7 @@ class RayTracedRadiosity {
 		if ( environment === null ) return;
 
 		const attribute = new StorageBufferAttribute( new Float32Array( ( SKY_CELLS + SKY_ROWS ) * 4 ), 4 );
-		const table = storage( attribute, 'vec4', SKY_CELLS + SKY_ROWS );
+		const table = storage( attribute, 'vec4' );
 
 		// the power of a cell is its mean luminance times its solid angle, from a grid of directions that
 		// are distributed over the solid angle like the shadow rays, see _gather()
@@ -1051,7 +1053,7 @@ class RayTracedRadiosity {
 		material.dispose();
 		target.dispose();
 
-		this._sky = storage( attribute, 'vec4', SKY_CELLS + SKY_ROWS ).toReadOnly();
+		this._sky = storage( attribute, 'vec4' ).toReadOnly();
 
 	}
 
@@ -2202,11 +2204,11 @@ class RayTracedRadiosity {
 
 							If( cosReceiver.greaterThan( 0 ).and( cosLight.greaterThan( 0 ) ).and( dot( direction, faceNormal ).greaterThan( 0 ) ), () => {
 
-								// the unshadowed irradiance over the density of the candidate, with the projected solid
-								// angle clamped to the hemisphere next to an emitter. Its luminance is the resampling
-								// weight, and each candidate is kept with its share of the weight sum
+								// the unshadowed irradiance over the density of the candidate. Individual contributions may
+								// exceed pi near an emitter; clamping them would bias the integral. Its luminance is the
+								// resampling weight, and each candidate is kept with its share of the weight sum
 
-								const scale = cosReceiver.mul( cosLight ).mul( corner.w ).div( distanceSq ).min( Math.PI ).div( probability ).toVar();
+								const scale = cosReceiver.mul( cosLight ).mul( corner.w ).div( distanceSq ).div( probability ).toVar();
 								const contribution = emission.rgb.mul( scale ).toVar();
 								const target = dot( contribution, vec3( 0.2126, 0.7152, 0.0722 ) ).toVar();
 
@@ -2904,7 +2906,7 @@ function vec4Storage( data ) {
 	const array = new Float32Array( Math.max( data.length, 8 ) );
 	array.set( data );
 
-	return storage( new StorageBufferAttribute( array, 4 ), 'vec4', array.length / 4 ).toReadOnly();
+	return storage( new StorageBufferAttribute( array, 4 ), 'vec4' ).toReadOnly();
 
 }
 

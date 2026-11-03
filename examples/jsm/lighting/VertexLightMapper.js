@@ -298,7 +298,7 @@ class VertexLayout {
 
 			}
 
-			this._recordBuffer = storage( new StorageBufferAttribute( data, 4 ), 'vec4', data.length / 4 ).toReadOnly();
+			this._recordBuffer = storage( new StorageBufferAttribute( data, 4 ), 'vec4' ).toReadOnly();
 
 		}
 
@@ -320,7 +320,7 @@ class VertexLayout {
 			const data = new Uint32Array( Math.max( this.vertexRecords.length, 2 ) );
 			data.set( this.vertexRecords );
 
-			this._vertexMap = storage( new StorageBufferAttribute( data, 1 ), 'uint', data.length ).toReadOnly();
+			this._vertexMap = storage( new StorageBufferAttribute( data, 1 ), 'uint' ).toReadOnly();
 
 		}
 
@@ -1541,7 +1541,7 @@ class VertexLightMapper {
 		}
 
 		this.pointCount = pointCount;
-		this._indexBuffer = storage( new StorageBufferAttribute( data, 1 ), 'uint', data.length ).toReadOnly();
+		this._indexBuffer = storage( new StorageBufferAttribute( data, 1 ), 'uint' ).toReadOnly();
 
 		// a near square layout of the points in tiles, and a power of two width of the records
 
@@ -2005,7 +2005,7 @@ class VertexLightMapper {
 		let k = recordCount + 1;
 		for ( const neighbors of lists ) for ( const n of neighbors ) data[ k ++ ] = n;
 
-		const neighborBuffer = storage( new StorageBufferAttribute( data, 1 ), 'uint', data.length ).toReadOnly();
+		const neighborBuffer = storage( new StorageBufferAttribute( data, 1 ), 'uint' ).toReadOnly();
 		this._neighborSize = data.byteLength;
 
 		// the noise of each record relative to the noise of the bake: a record averages the points of its
@@ -2049,7 +2049,7 @@ class VertexLightMapper {
 
 		}
 
-		const noiseScaleBuffer = storage( new StorageBufferAttribute( noiseScale, 1 ), 'float', noiseScale.length ).toReadOnly();
+		const noiseScaleBuffer = storage( new StorageBufferAttribute( noiseScale, 1 ), 'float' ).toReadOnly();
 
 		// the passes ping-pong between these, they store the irradiance and the standard deviation of its
 		// noise in alpha, or -1 in alpha for records without samples, and the directions
