@@ -70,9 +70,13 @@
 			const scenes = { 'Cornell Box': createCornellBox, 'Courtyard': loadCourtyard };
 			const worlds = {};
 
-			// every sample continues the ray sequences of the texels
+			// every sample continues the ray sequences of the texels. The bake casts this many rays per texel, as
+			// many per frame as keep the frame rate of the display
 
-			const samples = 64;
+			const rays = 512;
+			const frameTimes = [];
+
+			let bakedRays = 0, raysPerFrame = 8, averageFrameTime = 0, lastFrame = 0;
 
 			init();
 
@@ -351,6 +355,8 @@
 				denoiseNode = params.denoise ? textureDenoise( lightMapper.getTextureNode( 'color' ), lightMapper.getTextureNode( 'position' ), lightMapper.getTextureNode( 'normal' ), lightMapper.getTextureNode( 'variance' ) ) : null;
 				if ( denoiseNode !== null ) denoiseNode.autoUpdate = false;
 				denoised = false;
+				bakedRays = 0;
+				raysPerFrame = 8;
 
 				setLightMap( lightMapper.getTextureNode() );
 
@@ -385,20 +391,52 @@
 
 				}
 
-				if ( lightMapper.samples < samples ) {
+				const now = performance.now();
 
-					lightMapper.update();
-					status.textContent = `Baking: ${ lightMapper.samples } / ${ samples } samples`;
+				if ( lastFrame > 0 ) {
+
+					const frameTime = now - lastFrame;
+
+					averageFrameTime += ( frameTime - averageFrameTime ) * 0.2;
+
+					frameTimes.push( frameTime );
+					if ( frameTimes.length > 60 ) frameTimes.shift();
+
+				}
+
+				lastFrame = now;
+
+				if ( bakedRays < rays ) {
+
+					// the frames take a multiple of the refresh interval of the display, about the shorter ones of
+					// the recent frames. Fewer rays per frame while the frames take longer, a quarter more otherwise
+
+					const sorted = [ ...frameTimes ].sort( ( a, b ) => a - b );
+					const refreshTime = Math.max( sorted[ Math.floor( sorted.length * 0.2 ) ] ?? 16, 4 );
+
+					if ( averageFrameTime > refreshTime * 1.25 ) raysPerFrame = Math.max( Math.floor( raysPerFrame * 0.75 ), 1 );
+					else raysPerFrame = Math.min( raysPerFrame + Math.ceil( raysPerFrame / 4 ), 64 );
+
+					// samples of up to 8 rays per texel
+
+					const budget = Math.min( raysPerFrame, rays - bakedRays );
+					const samples = Math.ceil( budget / 8 );
+
+					radiosity.rays = Math.ceil( budget / samples );
+					lightMapper.update( samples );
+					bakedRays += samples * radiosity.rays;
+
+					status.textContent = `Baking: ${ bakedRays } / ${ rays } rays per texel`;
 
 				} else {
 
-					status.textContent = `Baked: ${ samples } samples${ denoised ? ', denoised' : '' }`;
+					status.textContent = `Baked: ${ rays } rays per texel${ denoised ? ', denoised' : '' }`;
 
 				}
 
 				// denoise once the bake is done
 
-				if ( denoiseNode !== null && ! denoised && lightMapper.samples === samples ) {
+				if ( denoiseNode !== null && ! denoised && bakedRays >= rays ) {
 
 					denoiseNode.textureNeedsUpdate = true;
 					denoised = true;
