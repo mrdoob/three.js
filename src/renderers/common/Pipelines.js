@@ -74,6 +74,15 @@ class Pipelines extends DataMap {
 			compute: new Map()
 		};
 
+		/**
+		 * The compilation promises of the compute pipelines still compiling asynchronously, so a
+		 * later `Renderer.compileComputeAsync()` call waits on them instead of resolving early.
+		 *
+		 * @private
+		 * @type {WeakMap<ComputePipeline,Promise>}
+		 */
+		this._compilingPipelines = new WeakMap();
+
 	}
 
 	/**
@@ -149,6 +158,16 @@ class Pipelines extends DataMap {
 
 			data.version = computeNode.version;
 			data.pipeline = pipeline;
+
+		}
+
+		// wait on a compilation started by an earlier call that is still in flight
+
+		const compiling = this._compilingPipelines.get( data.pipeline );
+
+		if ( promises !== null && compiling !== undefined && promises.includes( compiling ) === false ) {
+
+			promises.push( compiling );
 
 		}
 
@@ -371,7 +390,19 @@ class Pipelines extends DataMap {
 
 			this.caches.set( cacheKey, pipeline );
 
+			const promiseCount = promises !== null ? promises.length : 0;
+
 			this.backend.createComputePipeline( pipeline, bindings, promises );
+
+			if ( promises !== null && promises.length > promiseCount ) {
+
+				const compiling = promises[ promises.length - 1 ];
+
+				this._compilingPipelines.set( pipeline, compiling );
+
+				compiling.then( () => this._compilingPipelines.delete( pipeline ) );
+
+			}
 
 		}
 

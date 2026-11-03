@@ -475,6 +475,14 @@ class NodeManager extends DataMap {
 
 		if ( nodeBuilderState === undefined || computeData.version !== computeNode.version ) {
 
+			// share an async build of the same version that is still in flight
+
+			if ( useAsync && computeData.buildPromise !== undefined && computeData.buildVersion === computeNode.version ) {
+
+				return computeData.buildPromise;
+
+			}
+
 			const nodeBuilder = this.backend.createNodeBuilder( null, this.renderer );
 			nodeBuilder.compute = computeNode;
 
@@ -484,7 +492,7 @@ class NodeManager extends DataMap {
 
 			if ( useAsync ) {
 
-				return nodeBuilder.buildAsync( yieldFn ).then( () => {
+				const buildPromise = nodeBuilder.buildAsync( yieldFn ).then( () => {
 
 					nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
 
@@ -493,7 +501,21 @@ class NodeManager extends DataMap {
 
 					return nodeBuilderState;
 
+				} ).finally( () => {
+
+					if ( computeData.buildPromise === buildPromise ) {
+
+						delete computeData.buildPromise;
+						delete computeData.buildVersion;
+
+					}
+
 				} );
+
+				computeData.buildPromise = buildPromise;
+				computeData.buildVersion = computeNode.version;
+
+				return buildPromise;
 
 			}
 
