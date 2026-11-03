@@ -9,6 +9,12 @@ const files = ( await fs.readdir( 'examples' ) )
 	.filter( file => file.endsWith( '.html' ) && file !== 'index.html' )
 	.map( file => file.slice( 0, - 5 ) );
 
+// Playwright shards are contiguous runs of tests. Declare them in bit-reversed alphabetical order
+// so each shard samples the whole list instead of, for example, only the slower webgpu_* examples.
+const bits = Math.ceil( Math.log2( files.length ) );
+const bitReverse = i => parseInt( i.toString( 2 ).padStart( bits, '0' ).split( '' ).reverse().join( '' ), 2 );
+const shardOrder = files.map( ( file, i ) => [ bitReverse( i ), file ] ).sort( ( a, b ) => a[ 0 ] - b[ 0 ] ).map( entry => entry[ 1 ] );
+
 const injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );
 const cleanPage = await fs.readFile( 'test/e2e/clean-page.js', 'utf8' );
 
@@ -29,7 +35,7 @@ test.beforeAll( async () => {
 
 } );
 
-for ( const file of files ) {
+for ( const file of shardOrder ) {
 
 	if ( exact.length ? ! exact.includes( file ) : exceptionList.includes( file ) ) continue;
 	if ( process.env.THREE_WEBGPU && ! file.startsWith( 'webgpu_' ) ) continue;
