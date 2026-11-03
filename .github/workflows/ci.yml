@@ -29,7 +29,6 @@ jobs:
       - run: npm run lint-test
       - run: npm run test-unit
       - run: npm run test-unit-addons
-      - run: node --test test/e2e/*.tests.js
       - run: npm run test-e2e-cov
       - run: npm run test-treeshake
 

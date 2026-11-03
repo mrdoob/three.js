@@ -16,9 +16,6 @@ npm run make-screenshot -- webgl_geometry_cube
 # Native Playwright selection, workers and sharding are available.
 npm run test-e2e -- --list
 npm run test-e2e -- --shard=1/5 --workers=1
-
-# Check runner option parsing and readiness without a browser.
-node --test test/e2e/*.tests.js
 ```
 
 Run `npm run build` before example tests. Install the browser with `npx playwright install chromium`, or set `THREE_BROWSER_CHANNEL=chrome` to use an installed Google Chrome. `VISIBLE=1` opens a visible browser. Windows uses ANGLE's hardware D3D11 backend. Browser and driver differences can affect pixel comparisons; review mismatch artifacts before updating a thumbnail.

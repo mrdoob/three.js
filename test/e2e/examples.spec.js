@@ -40,7 +40,7 @@ for ( const file of shardOrder ) {
 	if ( process.env.THREE_WEBGPU && ! file.startsWith( 'webgpu_' ) ) continue;
 
 	const slow = slowList.includes( file );
-	test( file, { annotation: { type: 'screenshot-readiness', description: process.env.THREE_SCREENSHOTS ? 'delayed' : slow ? 'delayed-polling' : 'polling' } }, async ( { page, context }, testInfo ) => {
+	test( file, async ( { page, context }, testInfo ) => {
 
 		let pageError;
 		const messages = [];
