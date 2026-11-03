@@ -138,10 +138,17 @@ class RayTracedRadiosity {
 		this._environmentInverseRotation = uniform( new Matrix4() );
 
 		// the sample sequences continue with every render call of the gathering materials, after the
-		// rays of the call before
+		// rays of the call before. They start after the rays of one sample, like they did with a constant
+		// number of rays
 
-		this._firstRay = 0;
-		this._firstRayNode = uniform( 0, 'uint' ).onRenderUpdate( () => this._firstRay += this.rays );
+		this._firstRay = rays;
+		this._firstRayNode = uniform( 0, 'uint' ).onRenderUpdate( () => {
+
+			const first = this._firstRay;
+			this._firstRay += this.rays;
+			return first;
+
+		} );
 		this._raysNode = uniform( rays, 'uint' ).onRenderUpdate( () => this.rays );
 		this._biasNode = uniform( this.bias ).onRenderUpdate( () => this.bias );
 
