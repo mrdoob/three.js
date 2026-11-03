@@ -1,5 +1,5 @@
 import { BackSide, BufferAttribute, BufferGeometry, CustomBlending, DoubleSide, FloatType, HalfFloatType, Mesh, MeshLambertNodeMaterial, NearestFilter, NoBlending, NodeMaterial, OneFactor, OrthographicCamera, QuadMesh, RedFormat, RendererUtils, RenderTarget, Scene, Vector2 } from 'three/webgpu';
-import { Fn, If, Loop, attribute, ivec2, lights, luminance, modelViewMatrix, mrt, normalViewGeometry, normalWorldGeometry, output, positionLocal, positionWorld, round, screenCoordinate, textureLoad, uniform, uv, vec4 } from 'three/tsl';
+import { Fn, If, Loop, attribute, ivec2, lights, luminance, modelViewMatrix, mrt, normalViewGeometry, normalWorldGeometry, output, positionLocal, positionWorld, round, screenCoordinate, texture, textureLoad, uniform, uv, vec4 } from 'three/tsl';
 
 let _rendererState;
 
@@ -23,7 +23,8 @@ let _rendererState;
  * irradiance. Material occlusion is applied once at runtime. Keep any contributions
  * included in the bake out of runtime diffuse lighting to avoid counting them twice.
  * The `variance` and `guides` options also bake the inputs of a denoiser like
- * {@link LightMapDenoiser}: the noise of each texel and the surface that it lies on.
+ * {@link TextureDenoiseNode}: the noise of each texel and the surface that it lies on,
+ * see {@link LightMapper#getTextureNode}.
  *
  * ```js
  * const radiosity = new RayTracedRadiosity();
@@ -157,6 +158,12 @@ class LightMapper {
 		 */
 		this.normalTexture = guides ? this._guides.textures[ 1 ] : null;
 
+		// all textures are in the space of the light map
+
+		for ( const map of [ this.varianceTexture, this.positionTexture, this.normalTexture ] ) if ( map !== null ) map.channel = 1;
+
+		this._textureNodes = {};
+
 		this._scene = new Scene();
 		this._guideScene = new Scene();
 		this._camera = new OrthographicCamera();
@@ -222,6 +229,47 @@ class LightMapper {
 		resolveMaterial.fragmentNode = moments !== null ? mrt( { output: resolve(), variance: estimateVariance() } ) : resolve();
 
 		this._quad = new QuadMesh( resolveMaterial );
+
+	}
+
+	/**
+	 * Returns a texture of the light mapper: `'color'`, the light map, or the inputs of a denoiser like
+	 * {@link TextureDenoiseNode}: `'variance'` with the `variance` option, `'position'` and `'normal'` with
+	 * the `guides` option.
+	 *
+	 * @param {('color'|'variance'|'position'|'normal')} [name='color'] - The name of the texture.
+	 * @return {Texture} The texture.
+	 */
+	getTexture( name = 'color' ) {
+
+		const map = { color: this.texture, variance: this.varianceTexture, position: this.positionTexture, normal: this.normalTexture }[ name ];
+
+		if ( map === undefined ) throw new Error( `THREE.LightMapper: Unknown texture "${ name }".` );
+		if ( map === null ) throw new Error( `THREE.LightMapper: The "${ name }" texture needs the ${ name === 'variance' ? 'variance' : 'guides' } option.` );
+
+		return map;
+
+	}
+
+	/**
+	 * Returns a texture of the light mapper as a texture node, see {@link LightMapper#getTexture}. The
+	 * nodes sample the light map UVs, e.g. `material.lightMapNode = lightMapper.getTextureNode()`.
+	 *
+	 * @param {('color'|'variance'|'position'|'normal')} [name='color'] - The name of the texture.
+	 * @return {TextureNode} The texture node.
+	 */
+	getTextureNode( name = 'color' ) {
+
+		let node = this._textureNodes[ name ];
+
+		if ( node === undefined ) {
+
+			node = texture( this.getTexture( name ) );
+			this._textureNodes[ name ] = node;
+
+		}
+
+		return node;
 
 	}
 

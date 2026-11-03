@@ -78,6 +78,31 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
+			QUnit.test( 'Returns its textures as texture nodes in the light map space', assert => {
+
+				const renderer = { hasFeature: name => name === 'float32-blendable' };
+				const mapper = new LightMapper( renderer, 32, () => vec3( 1 ), { variance: true, guides: true } );
+
+				for ( const name of [ 'color', 'variance', 'position', 'normal' ] ) {
+
+					const node = mapper.getTextureNode( name );
+					assert.strictEqual( node.value, mapper.getTexture( name ), `${ name } node` );
+					assert.strictEqual( mapper.getTextureNode( name ), node, `${ name } node is reused` );
+					assert.strictEqual( node.value.channel, 1, `${ name } channel` );
+
+				}
+
+				assert.strictEqual( mapper.getTexture(), mapper.texture, 'color by default' );
+				assert.throws( () => mapper.getTexture( 'depth' ), /Unknown texture/, 'unknown texture' );
+				mapper.dispose();
+
+				const plain = new LightMapper( {}, 32, () => vec3( 1 ) );
+				assert.throws( () => plain.getTextureNode( 'variance' ), /variance option/, 'variance needs the option' );
+				assert.throws( () => plain.getTextureNode( 'normal' ), /guides option/, 'guides need the option' );
+				plain.dispose();
+
+			} );
+
 			QUnit.test( 'Numbers the charts of the guides across meshes', assert => {
 
 				const geometries = [ new PlaneGeometry(), new PlaneGeometry( 1, 1, 2, 1 ) ];

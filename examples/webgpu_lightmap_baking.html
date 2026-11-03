@@ -42,7 +42,7 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 			import { LightMapper } from 'three/addons/lighting/LightMapper.js';
-			import { LightMapDenoiser } from 'three/addons/lighting/LightMapDenoiser.js';
+			import { textureDenoise } from 'three/addons/tsl/display/TextureDenoiseNode.js';
 			import { RayTracedRadiosity, rayTracedRadiosityIrradiance } from 'three/addons/lighting/RayTracedRadiosity.js';
 			import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
 
@@ -58,7 +58,7 @@
 
 			let camera, scene, renderer, controls, status;
 			let world, meshes, materials;
-			let radiosity, lightMapper, denoiser = null;
+			let radiosity, lightMapper, denoiseNode = null;
 			let needsBake = false, denoised = false;
 
 			const params = {
@@ -151,9 +151,9 @@
 				const room = new THREE.Group();
 				root.add( room );
 
-				const wallMaterial = new THREE.MeshStandardMaterial( { color: 0xcccccc } );
-				const redMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
-				const greenMaterial = new THREE.MeshStandardMaterial( { color: 0x00ff00 } );
+				const wallMaterial = new THREE.MeshStandardNodeMaterial( { color: 0xcccccc } );
+				const redMaterial = new THREE.MeshStandardNodeMaterial( { color: 0xff0000 } );
+				const greenMaterial = new THREE.MeshStandardNodeMaterial( { color: 0x00ff00 } );
 
 				// Floor
 				const floor = new THREE.Mesh( new THREE.PlaneGeometry( 6, 6 ), wallMaterial );
@@ -191,7 +191,7 @@
 
 				// Objects inside the box
 
-				const objectMaterial = new THREE.MeshStandardMaterial( { color: 0xeeeeee } );
+				const objectMaterial = new THREE.MeshStandardNodeMaterial( { color: 0xeeeeee } );
 
 				// Tall box
 				const tallBox = new THREE.Mesh( new THREE.BoxGeometry( 1.2, 2.5, 1.2 ), objectMaterial );
@@ -200,13 +200,13 @@
 				room.add( tallBox );
 
 				// Sphere
-				const sphereMaterial = new THREE.MeshStandardMaterial( { color: 0x0044ff, roughness: 0.15 } );
+				const sphereMaterial = new THREE.MeshStandardNodeMaterial( { color: 0x0044ff, roughness: 0.15 } );
 				const sphere = new THREE.Mesh( new THREE.SphereGeometry( 0.65, 32, 32 ), sphereMaterial );
 				sphere.position.set( 1, 0.65, 0.5 );
 				room.add( sphere );
 
 				// Emissive light panel, ray radiosity bakes its direct light with soft shadows
-				const lightPanel = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), new THREE.MeshStandardMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 20 } ) );
+				const lightPanel = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), new THREE.MeshStandardNodeMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 20 } ) );
 				lightPanel.rotation.x = Math.PI / 2;
 				lightPanel.position.y = 4.99;
 				root.add( lightPanel );
@@ -228,12 +228,12 @@
 
 				const root = new THREE.Group();
 
-				const stone = new THREE.MeshStandardMaterial( { color: 0xddd0b8 } );
-				const plaster = new THREE.MeshStandardMaterial( { color: 0xd9a066 } );
-				const tiles = new THREE.MeshStandardMaterial( { color: 0xb59a7e } );
-				const water = new THREE.MeshStandardMaterial( { color: 0x3c7a8a } );
-				const leaves = new THREE.MeshStandardMaterial( { color: 0x4a7a32 } );
-				const banners = [ 0xb02a20, 0x2a4ab0, 0xd8a020, 0x2a8a50 ].map( ( color ) => new THREE.MeshStandardMaterial( { color } ) );
+				const stone = new THREE.MeshStandardNodeMaterial( { color: 0xddd0b8 } );
+				const plaster = new THREE.MeshStandardNodeMaterial( { color: 0xd9a066 } );
+				const tiles = new THREE.MeshStandardNodeMaterial( { color: 0xb59a7e } );
+				const water = new THREE.MeshStandardNodeMaterial( { color: 0x3c7a8a } );
+				const leaves = new THREE.MeshStandardNodeMaterial( { color: 0x4a7a32 } );
+				const banners = [ 0xb02a20, 0x2a4ab0, 0xd8a020, 0x2a8a50 ].map( ( color ) => new THREE.MeshStandardNodeMaterial( { color } ) );
 
 				function add( parent, geometry, material, x, y, z ) {
 
@@ -316,10 +316,10 @@
 
 			function bake() {
 
-				for ( const material of materials ) material.lightMap = null;
+				setLightMap( null );
 
 				lightMapper?.dispose();
-				denoiser?.dispose();
+				denoiseNode?.dispose();
 				radiosity?.dispose();
 
 				// each mesh gets a new geometry with light map UVs, also for another resolution
@@ -346,23 +346,24 @@
 				lightMapper = new LightMapper( renderer, world.atlas.resolution, rayTracedRadiosityIrradiance( radiosity ), { variance: params.denoise, guides: params.denoise } );
 				lightMapper.addObjects( meshes );
 
-				denoiser = params.denoise ? new LightMapDenoiser( renderer, {
-					colorTexture: lightMapper.texture,
-					varianceTexture: lightMapper.varianceTexture,
-					positionTexture: lightMapper.positionTexture,
-					normalTexture: lightMapper.normalTexture
-				} ) : null;
+				// the denoiser filters once, when the bake is done
+
+				denoiseNode = params.denoise ? textureDenoise( lightMapper.getTextureNode( 'color' ), lightMapper.getTextureNode( 'position' ), lightMapper.getTextureNode( 'normal' ), lightMapper.getTextureNode( 'variance' ) ) : null;
+				if ( denoiseNode !== null ) denoiseNode.autoUpdate = false;
 				denoised = false;
 
-				setLightMap();
+				setLightMap( lightMapper.getTextureNode() );
 
 			}
 
-			function setLightMap() {
+			function setLightMap( lightMapNode ) {
 
-				const lightMap = denoised ? denoiser.texture : lightMapper.texture;
+				for ( const material of materials ) {
 
-				for ( const material of materials ) material.lightMap = lightMap;
+					material.lightMapNode = lightMapNode;
+					material.needsUpdate = true;
+
+				}
 
 			}
 
@@ -397,11 +398,11 @@
 
 				// denoise once the bake is done
 
-				if ( denoiser !== null && ! denoised && lightMapper.samples === samples ) {
+				if ( denoiseNode !== null && ! denoised && lightMapper.samples === samples ) {
 
-					denoiser.update();
+					denoiseNode.textureNeedsUpdate = true;
 					denoised = true;
-					setLightMap();
+					setLightMap( denoiseNode );
 
 				}
 
