@@ -3,6 +3,7 @@ import { execFile } from 'node:child_process';
 import { test } from 'node:test';
 import { promisify } from 'node:util';
 import { fileURLToPath } from 'node:url';
+import { slowList } from './exceptions.js';
 
 const execute = promisify( execFile );
 const cwd = fileURLToPath( new URL( '../../', import.meta.url ) );
@@ -65,5 +66,24 @@ test( 'native help and argument diagnostics remain available', async () => {
 		} );
 
 	}
+
+} );
+
+test( 'slow examples stay enabled and select legacy screenshot readiness', async () => {
+
+	const report = await list();
+	const specs = report.suites.flatMap( suite => suite.specs );
+	for ( const name of slowList ) {
+
+		const spec = specs.find( spec => spec.title === name );
+		assert.ok( spec, `${ name } must still run without an explicit selection` );
+		assert.ok( spec.tests[ 0 ].annotations.some( annotation => annotation.type === 'screenshot-readiness' && annotation.description === 'legacy' ) );
+
+	}
+
+	const fast = specs.find( spec => spec.title === 'webgl_geometry_cube' );
+	assert.ok( fast.tests[ 0 ].annotations.some( annotation => annotation.type === 'screenshot-readiness' && annotation.description === 'polling' ) );
+	const make = await list( 'webgl_geometry_cube', '--make' );
+	assert.ok( make.suites[ 0 ].specs[ 0 ].tests[ 0 ].annotations.some( annotation => annotation.type === 'screenshot-readiness' && annotation.description === 'legacy' ) );
 
 } );

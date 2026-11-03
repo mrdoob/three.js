@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import * as fs from 'node:fs/promises';
 import { Image } from './image.js';
-import { exceptionList } from './exceptions.js';
+import { exceptionList, slowList } from './exceptions.js';
 import { gotoWithLegacyNetworkIdle, waitForLegacyNetworkIdle, renderOnce } from './legacy-readiness.js';
 
 const exact = JSON.parse( process.env.THREE_EXAMPLES || '[]' );
@@ -34,7 +34,8 @@ for ( const file of files ) {
 	if ( exact.length ? ! exact.includes( file ) : exceptionList.includes( file ) ) continue;
 	if ( process.env.THREE_WEBGPU && ! file.startsWith( 'webgpu_' ) ) continue;
 
-	test( file, async ( { page, context }, testInfo ) => {
+	const slow = !! process.env.THREE_SCREENSHOTS || slowList.includes( file );
+	test( file, { annotation: { type: 'screenshot-readiness', description: slow ? 'legacy' : 'polling' } }, async ( { page, context }, testInfo ) => {
 
 		await page.goto( '/test/e2e/gpu-probe.html' );
 		const renderer = await page.evaluate( async ( webgpu ) => {
@@ -111,13 +112,23 @@ for ( const file of files ) {
 		}
 
 		await client.send( 'Input.setIgnoreInputEvents', { ignore: true } );
-		await gotoWithLegacyNetworkIdle( page, client, `/examples/${ file }.html` );
+		if ( slow ) {
+
+			// Some examples need the legacy scene state before releasing the one-shot render gate.
+			await gotoWithLegacyNetworkIdle( page, client, `/examples/${ file }.html` );
+
+		} else {
+
+			await page.goto( `/examples/${ file }.html`, { waitUntil: 'networkidle', timeout: 300000 } );
+
+		}
+
 		await page.evaluate( cleanPage );
-		await waitForLegacyNetworkIdle( page, pendingRequests );
+		if ( slow ) await waitForLegacyNetworkIdle( page, pendingRequests );
 		await page.waitForFunction( () => window._videosReady(), null, { polling: 100, timeout: 5000 } );
 		await renderOnce( page );
 
-		const screenshot = ( await Image.read( await page.screenshot() ) ).scale( 0.5 );
+		let screenshot = ( await Image.read( await page.screenshot() ) ).scale( 0.5 );
 		await testInfo.attach( 'browser-console', { body: messages.join( '\n' ), contentType: 'text/plain' } );
 		expect( pageError, 'Browser errors' ).toBeUndefined();
 		if ( process.env.THREE_SCREENSHOTS ) {
@@ -144,7 +155,22 @@ for ( const file of files ) {
 		let different = Infinity;
 		try {
 
-			different = expected.compare( screenshot, diff, 0.1 ) / ( screenshot.width * screenshot.height ) * 100;
+			if ( slow ) {
+
+				different = expected.compare( screenshot, diff, 0.1 ) / ( screenshot.width * screenshot.height ) * 100;
+				expect( different, 'Percentage of differing pixels' ).toBeLessThan( 0.1 );
+
+			} else {
+
+				await expect.poll( async () => {
+
+					screenshot = ( await Image.read( await page.screenshot() ) ).scale( 0.5 );
+					different = expected.compare( screenshot, diff, 0.1 ) / ( screenshot.width * screenshot.height ) * 100;
+					return different;
+
+				}, { message: 'Percentage of differing pixels', timeout: 5000, intervals: [ 100, 250, 500 ] } ).toBeLessThan( 0.1 );
+
+			}
 
 		} finally {
 
@@ -159,7 +185,7 @@ for ( const file of files ) {
 
 		}
 
-		expect( different, 'Percentage of differing pixels' ).toBeLessThan( 0.1 );
+		expect( pageError, 'Browser errors during screenshot polling' ).toBeUndefined();
 		// A successful retry must not leave failure images for the CI report.
 		await Promise.all( [ 'actual', 'expected', 'diff' ].map( kind => fs.rm( `${ prefix }-${ kind }.jpg`, { force: true } ) ) );
 
