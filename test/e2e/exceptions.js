@@ -84,6 +84,7 @@ export const exceptionList = [
 
 // Wait two extra seconds before rendering these examples; they are still tested.
 export const slowList = [
+	'misc_exporter_gltf', // KTX2 textures are transcoded in workers.
 	'misc_exporter_usdz', // Async model decoding.
 	'physics_rapier_basic', // Real-time physics and body creation.
 	'webgl_buffergeometry_glbufferattribute', // Swaps buffers every two seconds.
