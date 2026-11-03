@@ -59,7 +59,7 @@
 			let camera, scene, renderer, controls, status;
 			let world, meshes, materials;
 			let radiosity, lightMapper, denoiser;
-			let needsBake = false, denoisedSamples = 0;
+			let needsBake = false, denoised = false;
 
 			const params = {
 				scene: 'Cornell Box',
@@ -347,7 +347,7 @@
 
 				denoiser = new LightMapDenoiser( renderer, lightMapper );
 				denoiser.addObjects( meshes );
-				denoisedSamples = 0;
+				denoised = false;
 
 				setLightMap();
 
@@ -355,7 +355,7 @@
 
 			function setLightMap() {
 
-				const lightMap = params.denoise && denoisedSamples > 0 ? denoiser.texture : lightMapper.texture;
+				const lightMap = params.denoise && denoised ? denoiser.texture : lightMapper.texture;
 
 				for ( const material of materials ) material.lightMap = lightMap;
 
@@ -390,15 +390,12 @@
 
 				}
 
-				// denoise whenever the samples have doubled, which adds a few percent to the bake: half of the
-				// samples denoised are less noisy than all of them. The noise estimate needs two samples
+				// denoise once the bake is done
 
-				const count = lightMapper.samples;
-
-				if ( params.denoise && count > 1 && count !== denoisedSamples && ( count >= denoisedSamples * 2 || count === samples ) ) {
+				if ( params.denoise && ! denoised && lightMapper.samples === samples ) {
 
 					denoiser.update();
-					denoisedSamples = count;
+					denoised = true;
 					setLightMap();
 
 				}

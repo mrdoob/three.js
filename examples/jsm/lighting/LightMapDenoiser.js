@@ -20,9 +20,8 @@ let _rendererState;
  * e.g. at chart borders and in contact shadows.
  *
  * The filter removes the fine grain of independent noise, e.g. of the rays of each texel, so a
- * denoised light map needs fewer samples. To show a denoised light map while it bakes, call
- * `update()` whenever the samples have doubled, which costs a small fraction of the bake. With
- * moments, the noise estimate needs at least two samples.
+ * denoised light map needs fewer samples. Call `update()` once the samples have accumulated.
+ * With moments, the noise estimate needs at least two samples.
  *
  * ```js
  * const lightMapper = new LightMapper( renderer, size, irradiance, { moments: true } );
