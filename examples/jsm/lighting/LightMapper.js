@@ -13,8 +13,7 @@ let _rendererState;
  * the result. The function also receives the sample index, so stochastic sources can
  * vary their samples and converge as they accumulate. Call `update()` once per frame
  * to bake progressively, or pass a sample count to bake at once.
- * Bake at most 256 samples, since samples accumulate in half float precision, unless they
- * accumulate in float precision with the `variance` option.
+ * Bake at most 256 samples, since samples accumulate in half float precision.
  * Keep the source geometry and GI data static while accumulating. Call `reset()`
  * after changing transforms or lighting. Atlas charts need at least three texels
  * of padding; the resolve fills two texels around covered surfaces.

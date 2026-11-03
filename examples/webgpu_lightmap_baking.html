@@ -421,12 +421,12 @@
 					if ( averageFrameTime > refreshTime * 1.25 ) raysPerFrame = Math.max( Math.floor( raysPerFrame * 0.75 ), 1 );
 					else raysPerFrame = Math.min( raysPerFrame + Math.ceil( raysPerFrame / 4 ), 64 );
 
-					// samples of up to 8 rays per texel
+					// samples of 2 to 8 rays per texel: the light map accumulates at most 256 samples
 
 					const budget = Math.min( raysPerFrame, rays - bakedRays );
 					const samples = Math.ceil( budget / 8 );
 
-					radiosity.rays = Math.ceil( budget / samples );
+					radiosity.rays = Math.max( Math.ceil( budget / samples ), 2 );
 					lightMapper.update( samples );
 					bakedRays += samples * radiosity.rays;
 
