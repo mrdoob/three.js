@@ -6,7 +6,7 @@ import { normalLocal } from './Normal.js';
 import { positionLocal, positionPrevious } from './Position.js';
 import { tangentLocal } from './Tangent.js';
 import { reference, referenceBuffer } from './ReferenceNode.js';
-import { buffer } from './BufferNode.js';
+import { uniformTypedArray } from './BufferNode.js';
 import { storage } from './StorageBufferNode.js';
 import { texture } from './TextureNode.js';
 import { textureSize } from './TextureSizeNode.js';
@@ -312,7 +312,7 @@ export const computeSkinning = /*@__PURE__*/ Fn( ( [ skinnedMesh, toPosition = n
 	const skinWeightNode = storage( new InstancedBufferAttribute( skinnedMesh.geometry.getAttribute( 'skinWeight' ).array, 4 ), 'vec4' ).setPBO( true ).toReadOnly().element( instanceIndex ).toVar();
 	const bindMatrixNode = uniform( skinnedMesh.bindMatrix, 'mat4' );
 	const bindMatrixInverseNode = uniform( skinnedMesh.bindMatrixInverse, 'mat4' );
-	const boneMatricesNode = buffer( skinnedMesh.skeleton.boneMatrices, 'mat4', skinnedMesh.skeleton.bones.length );
+	const boneMatricesNode = uniformTypedArray( skinnedMesh.skeleton.boneMatrices, 'mat4', skinnedMesh.skeleton.bones.length );
 
 	const skeleton = skinnedMesh.skeleton;
 
@@ -344,7 +344,7 @@ export const computeSkinning = /*@__PURE__*/ Fn( ( [ skinnedMesh, toPosition = n
 
 		setupPreviousBoneData( skeleton );
 
-		const previousBoneMatricesNode = buffer( skeleton.previousBoneMatrices, 'mat4', skeleton.bones.length );
+		const previousBoneMatricesNode = uniformTypedArray( skeleton.previousBoneMatrices, 'mat4', skeleton.bones.length );
 		const previousSkinnedPosition = getSkinnedPosition( previousBoneMatricesNode, positionPrevious, bindMatrixNode, bindMatrixInverseNode, skinIndexNode, skinWeightNode );
 
 		positionPrevious.assign( previousSkinnedPosition );
