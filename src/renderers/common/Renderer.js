@@ -1367,6 +1367,10 @@ class Renderer {
 	 */
 	async compileComputeAsync( computeNodes, onProgress = null ) {
 
+		if ( this._isDeviceLost === true ) return;
+
+		if ( this._initialized === false ) await this.init();
+
 		const computeList = Array.isArray( computeNodes ) ? computeNodes : [ computeNodes ];
 
 		if ( computeList.length === 0 || computeList.some( ( computeNode ) => computeNode === undefined || computeNode === null || computeNode.isComputeNode !== true ) ) {
@@ -1406,10 +1410,6 @@ class Renderer {
 	 * @return {Promise} A Promise that resolves when the compile has been finished.
 	 */
 	async _compileComputeAsync( computeList, onProgress ) {
-
-		if ( this._isDeviceLost === true ) return;
-
-		if ( this._initialized === false ) await this.init();
 
 		const total = computeList.length;
 		let loaded = 0;
