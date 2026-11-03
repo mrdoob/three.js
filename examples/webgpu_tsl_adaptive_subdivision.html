@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - adaptive subdivision</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - adaptive subdivision">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_tsl_adaptive_subdivision.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_tsl_adaptive_subdivision.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Adaptive Subdivision</span>
+			</div>
+
+			<small>
+				Crack-free adaptive subdivision on the GPU with triplanar displacement maps, using<br/>
+				longest edge bisection on <a href="https://onrendering.com/data/papers/cbt/ConcurrentBinaryTrees.pdf" target="_blank" rel="noopener">Concurrent Binary Trees</a>.<br/>
+				Textures from <a href="https://polyhaven.com" target="_blank" rel="noopener">Poly Haven</a>.<br/>
+				<span id="stats"></span>
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { Fn, abs, color, dFdx, dFdy, float, fwidth, hue, ivec2, log2, luminance, max, min, mix, normalLocal, positionLocal, pow, screenCoordinate, select, smoothstep, texture, textureLoad, transformNormalToView, uniform, vec2, vec3, vec4 } from 'three/tsl';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { SimplexNoise } from 'three/addons/math/SimplexNoise.js';
+			import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+			import { AdaptiveSubdivisionMesh } from 'three/addons/objects/AdaptiveSubdivisionMesh.js';
+
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+
+			if ( WebGPU.isAvailable() === false ) {
+
+				document.body.appendChild( WebGPU.getErrorMessage() );
+
+				throw new Error( 'No WebGPU support' );
+
+			}
+
+			let camera, scene, renderer, controls;
+			let meshes, normalMappedMeshes, statsElement;
+
+			const params = {
+				adaptive: true,
+				displacement: 1.5,
+				targetEdgePixels: 8,
+				maxErrorPixels: 0.5,
+				shadowDetail: 0,
+				morphing: true,
+				morphTime: 0.05,
+				wireframe: false,
+				debugColors: 'none',
+				frustumCulling: true,
+				backfaceCulling: true,
+				freeze: false
+			};
+
+			const wireframe = uniform( 0 );
+			const debugColors = uniform( 0 ); // 0: none, 1: subdivision depth, 2: triangle size
+			const targetEdgePixels = uniform( params.targetEdgePixels );
+			const displacementScale = uniform( params.displacement );
+
+			init();
+
+			async function init() {
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.01, 100 );
+				camera.position.set( - 1.0, 1.0, 2.6 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x8fa7bd );
+				scene.fog = new THREE.Fog( 0x8fa7bd, 12, 30 );
+
+				// lights
+
+				scene.add( new THREE.HemisphereLight( 0xc6dcf2, 0x5c4a3a, 1.5 ) );
+
+				// a low sun from the side of the view, raking across the displaced relief
+
+				const light = new THREE.DirectionalLight( 0xfff0dd, 3 );
+				light.position.set( - 5, 3, 1.5 );
+				light.castShadow = true;
+				light.shadow.mapSize.set( 2048, 2048 );
+				light.shadow.camera.left = - 4;
+				light.shadow.camera.right = 4;
+				light.shadow.camera.top = 4;
+				light.shadow.camera.bottom = - 4;
+				light.shadow.camera.near = 1;
+				light.shadow.camera.far = 12;
+				scene.add( light );
+
+				// renderer, before the textures as their height maps are baked with it
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				// CC0 texture sets from Poly Haven. size: the physical size of a texture tile, depth: the range of the
+				// displacement, in meters, patch sizes: those of the meshes using the set, see bakeErrorPyramid().
+				// the rock scan is a reddish sandstone: its luminance is tinted with the mean color of the wall (in linear
+				// space, the wall's mean color divided by the rock's mean luminance), so the rocks match the grey stone
+
+				const [ cobblestone, stoneWall, rock ] = await Promise.all( [
+					loadTextureSet( 'cobblestone_floor_08', 2, 0.08, [ 8 ] ),
+					loadTextureSet( 'japanese_stone_wall', 1.9, 0.14, [ 4 ] ),
+					loadTextureSet( 'rock_face_03', 2, 0.21, [ 4 ], new THREE.Color( 1.32, 1.22, 1.05 ) )
+				] );
+
+				// the ground is projected from the top, the wall and the rocks with triplanar mapping. the ground is only a
+				// few triangles, so its leaves draw larger patches
+
+				const parts = [
+					[ createGroundGeometry(), createSurface( cobblestone, false, 8 ) ],
+					[ createWallGeometry(), createSurface( stoneWall, true, 4 ) ],
+					[ createRockGeometry(), createSurface( rock, true, 4 ) ]
+				];
+
+				// the subdivision meshes, and the same meshes normal mapped without subdivision to compare
+
+				meshes = parts.map( ( [ geometry, surface ] ) => createSubdivisionMesh( geometry, surface ) );
+				normalMappedMeshes = parts.map( ( [ geometry, surface ] ) => createNormalMappedMesh( geometry, surface ) );
+
+				scene.add( ...meshes, ...normalMappedMeshes );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0.15, 0.35, - 0.1 );
+				controls.minDistance = 0.1;
+				controls.maxDistance = 20;
+				controls.maxPolarAngle = Math.PI * 0.49;
+				controls.enableDamping = true;
+				controls.update();
+
+				// gui
+
+				const gui = renderer.inspector.createParameters( 'Adaptive Subdivision' );
+				gui.add( params, 'adaptive' ).name( 'Adaptive Displacement' ).onChange( v => {
+
+					for ( const mesh of meshes ) mesh.visible = v;
+					for ( const mesh of normalMappedMeshes ) mesh.visible = ! v;
+
+				} );
+				gui.add( params, 'displacement', 0, 3 ).name( 'Displacement' ).onChange( v => displacementScale.value = v );
+				gui.add( params, 'targetEdgePixels', 2, 32, 1 ).name( 'Target Edge (px)' ).onChange( v => targetEdgePixels.value = v );
+				gui.add( params, 'maxErrorPixels', 0, 4 ).name( 'Max Error (px)' );
+				gui.add( params, 'morphTime', 0, 0.5, 0.01 ).name( 'Transition Time (s)' );
+				gui.add( params, 'shadowDetail', 0, 1 ).name( 'Shadowmap Detail' );
+				gui.add( params, 'morphing' ).name( 'Smooth Transitions' );
+				gui.add( params, 'frustumCulling' ).name( 'Frustum Culling' );
+				gui.add( params, 'backfaceCulling' ).name( 'Backface Culling' );
+				gui.add( params, 'freeze' ).name( 'Freeze Subdivision' );
+				gui.add( params, 'wireframe' ).name( 'Wireframe' ).onChange( v => wireframe.value = v ? 1 : 0 );
+				gui.add( params, 'debugColors', { 'None': 'none', 'Subdivision Depth': 'depth', 'Triangle Size': 'size' } ).name( 'Debug Colors' ).onChange( v => debugColors.value = [ 'none', 'depth', 'size' ].indexOf( v ) );
+
+				statsElement = document.getElementById( 'stats' );
+
+				// the shaders are compiled in parallel before the first frame, instead of one after the other when first used.
+				// the rocks have the same shaders as the wall, so they compile after it and find them compiled
+
+				const [ ground, wall, rocks ] = meshes;
+
+				await Promise.all( [
+					renderer.compileAsync( scene, camera ),
+					ground.compileAsync( renderer ),
+					wall.compileAsync( renderer ).then( () => rocks.compileAsync( renderer ) )
+				] );
+
+				updateStats();
+
+				// the window may have been resized while loading
+
+				onWindowResize();
+
+				renderer.setAnimationLoop( animate );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			async function loadTextureSet( name, size, depth, patchSizes, tint = null ) {
+
+				const loader = new THREE.TextureLoader();
+
+				const load = async ( type, colorSpace ) => {
+
+					const map = await loader.loadAsync( `textures/polyhaven/${ name }_${ type }_1k.jpg` );
+					map.wrapS = map.wrapT = THREE.RepeatWrapping;
+					map.colorSpace = colorSpace;
+					map.anisotropy = 8;
+
+					return map;
+
+				};
+
+				const [ colorMap, heightMap ] = await Promise.all( [
+					load( 'diff', THREE.SRGBColorSpace ),
+					load( 'disp', THREE.NoColorSpace )
+				] );
+
+				const reliefMaps = {};
+
+				for ( const patchSize of patchSizes ) reliefMaps[ patchSize ] = bakeReliefMap( heightMap, patchSize );
+
+				const width = heightMap.image.width;
+
+				heightMap.dispose();
+
+				return { colorMap, reliefMaps, size: width, scale: 1 / size, depth, tint };
+
+			}
+
+			// a one time preprocess of a height map into a relief map: the height in r and its gradient in g and b, in height
+			// units per texture repeat. the gradient is smoothed over 3x3 texels (Sobel), so the 8-bit heights do not show up
+			// as noise, and its mipmaps are exact as the mean of gradients is the gradient of the mean height. a holds how
+			// far the triangles of a leaf deviate from the heights, see bakeErrorPyramid()
+
+			function bakeReliefMap( heightMap, patchSize ) {
+
+				const { width, height } = heightMap.image;
+
+				const renderTarget = new THREE.RenderTarget( width, height, {
+					type: THREE.HalfFloatType,
+					generateMipmaps: true,
+					minFilter: THREE.LinearMipmapLinearFilter,
+					wrapS: THREE.RepeatWrapping,
+					wrapT: THREE.RepeatWrapping,
+					depthBuffer: false
+				} );
+
+				const material = new THREE.NodeMaterial();
+
+				material.fragmentNode = Fn( () => {
+
+					const size = ivec2( width, height );
+					const texel = ivec2( screenCoordinate.xy );
+					const h = ( x, y ) => textureLoad( heightMap, texel.add( ivec2( x, y ) ).add( size ).mod( size ) ).x;
+
+					const gradientX = h( 1, - 1 ).add( h( 1, 0 ).mul( 2 ) ).add( h( 1, 1 ) ).sub( h( - 1, - 1 ) ).sub( h( - 1, 0 ).mul( 2 ) ).sub( h( - 1, 1 ) );
+					const gradientY = h( - 1, 1 ).add( h( 0, 1 ).mul( 2 ) ).add( h( 1, 1 ) ).sub( h( - 1, - 1 ) ).sub( h( 0, - 1 ).mul( 2 ) ).sub( h( 1, - 1 ) );
+
+					// the Sobel response to a slope of one per texel is eight
+
+					return vec4( h( 0, 0 ), gradientX.mul( width / 8 ), gradientY.mul( height / 8 ), 0 );
+
+				} )();
+
+				const quad = new THREE.QuadMesh( material );
+
+				renderer.setRenderTarget( renderTarget );
+				quad.render( renderer );
+				renderer.setRenderTarget( null );
+
+				material.dispose();
+
+				bakeErrorPyramid( renderTarget.texture, patchSize );
+
+				return renderTarget.texture;
+
+			}
+
+			// the error pyramid in a: mip level m holds the mean squared difference between the heights and their linear
+			// interpolation between texels 2^( m - k ) apart, over blocks of 2^m texels, which are the leaves of patches with
+			// 2^k segments per edge. so a single lookup tells how far the triangles of a leaf deviate from the heights. the
+			// interpolation is approximated by the bilinearly filtered mip level of the spacing
+
+			function bakeErrorPyramid( reliefMap, patchSize ) {
+
+				const { width, height } = reliefMap.image;
+				const levelCount = Math.log2( Math.max( width, height ) ) + 1;
+				const k = Math.log2( patchSize );
+
+				// the squared differences at full resolution, averaged by the mipmaps
+
+				const differenceTarget = new THREE.RenderTarget( width, height, {
+					type: THREE.HalfFloatType,
+					generateMipmaps: true,
+					minFilter: THREE.LinearMipmapLinearFilter,
+					depthBuffer: false
+				} );
+
+				const spacing = uniform( 0 );
+				const differenceMaterial = new THREE.NodeMaterial();
+
+				differenceMaterial.fragmentNode = Fn( () => {
+
+					const uv = screenCoordinate.xy.div( vec2( width, height ) );
+					const difference = textureLoad( reliefMap, ivec2( screenCoordinate.xy ) ).x.sub( texture( reliefMap, uv ).level( spacing ).x );
+
+					return vec4( difference.mul( difference ), 0, 0, 1 );
+
+				} )();
+
+				// a level of the relief map with the mean squared differences in a, copied into the relief map
+
+				const level = uniform( 0, 'int' );
+				const levelMaterial = new THREE.NodeMaterial();
+
+				levelMaterial.fragmentNode = Fn( () => {
+
+					const texel = ivec2( screenCoordinate.xy );
+
+					return vec4( textureLoad( reliefMap, texel, level ).xyz, textureLoad( differenceTarget.texture, texel, level ).x );
+
+				} )();
+
+				const differenceQuad = new THREE.QuadMesh( differenceMaterial );
+				const levelQuad = new THREE.QuadMesh( levelMaterial );
+
+				for ( let m = k; m < levelCount; m ++ ) {
+
+					spacing.value = m - k;
+
+					renderer.setRenderTarget( differenceTarget );
+					differenceQuad.render( renderer );
+
+					const levelTarget = new THREE.RenderTarget( Math.max( width >> m, 1 ), Math.max( height >> m, 1 ), { type: THREE.HalfFloatType, depthBuffer: false } );
+
+					level.value = m;
+
+					renderer.setRenderTarget( levelTarget );
+					levelQuad.render( renderer );
+
+					renderer.copyTextureToTexture( levelTarget.texture, reliefMap, null, null, 0, m );
+
+					levelTarget.dispose();
+
+				}
+
+				renderer.setRenderTarget( null );
+
+				differenceTarget.dispose();
+				differenceMaterial.dispose();
+				levelMaterial.dispose();
+
+			}
+
+			// the displacement of a texture set, its gradient and how far triangles deviate from it, and the shading. the
+			// scale, depth and tint are uniforms, so surfaces of the same kind have the same shaders, which compile once,
+			// see AdaptiveSubdivisionMesh.compileAsync(). untinted sets keep their saturation
+
+			function createSurface( set, triplanarMapping, patchSize ) {
+
+				const reliefMap = set.reliefMaps[ patchSize ];
+				const scale = uniform( set.scale );
+				const texelScale = uniform( set.scale * set.size ); // texels per meter
+				const depth = uniform( set.depth );
+				const saturation = uniform( set.tint === null ? 1 : 0 );
+				const tint = uniform( set.tint === null ? new THREE.Color( 1, 1, 1 ) : set.tint );
+
+				// samples with triplanar mapping or from the top
+
+				const project = ( sample, position, normal ) => {
+
+					const p = position.mul( scale );
+
+					return triplanarMapping ? triplanar( sample, p, normal ) : sample( p.xz );
+
+				};
+
+				// the relief: the height in [ 0, 1 ] and its gradient in local space, at the given mip level or with automatic
+				// mip levels in fragment shaders. the gradients of the projections are mapped back to the axes they project
+
+				const relief = ( position, normal, level = null ) => {
+
+					const sample = ( uv ) => level === null ? texture( reliefMap, uv ) : texture( reliefMap, uv ).level( level );
+					const p = position.mul( scale );
+
+					if ( triplanarMapping === false ) {
+
+						const y = sample( p.xz );
+
+						return { height: y.x, gradient: vec3( y.y, 0, y.z ).mul( scale ) };
+
+					}
+
+					const weights = triplanarWeights( normal );
+					const x = sample( p.zy ), y = sample( p.xz ), z = sample( p.xy );
+
+					return {
+						height: x.x.mul( weights.x ).add( y.x.mul( weights.y ) ).add( z.x.mul( weights.z ) ),
+						gradient: vec3( 0, x.z, x.y ).mul( weights.x ).add( vec3( y.y, 0, y.z ).mul( weights.y ) ).add( vec3( z.y, z.z, 0 ).mul( weights.z ) ).mul( scale )
+					};
+
+				};
+
+				// the mip level is picked from the footprint, the size of the rendered triangles or of the pixels for the normals
+
+				const mipLevel = ( footprint ) => max( log2( footprint.mul( texelScale ) ), 0 );
+
+				// the height around the mean, times the depth
+
+				const displacement = ( { position, normal, footprint } ) => relief( position, normal, mipLevel( footprint ) ).height.sub( 0.5 ).mul( depth ).mul( displacementScale );
+
+				// its gradient, much cheaper than finite differences
+
+				const displacementGradient = ( { position, normal, footprint } ) => relief( position, normal, mipLevel( footprint ) ).gradient.mul( depth ).mul( displacementScale );
+
+				// how far the triangles of a leaf deviate from the heights sampled with the footprint: the error at their size
+				// minus the error at the footprint, below which the triangles do not need to follow the heights
+
+				const displacementError = ( { position, normal, size, footprint } ) => {
+
+					const level = ( spacing ) => log2( spacing.mul( texelScale ) ).add( Math.log2( patchSize ) );
+					const variance = ( uv ) => texture( reliefMap, uv ).level( level( size ) ).w.sub( texture( reliefMap, uv ).level( level( footprint ) ).w );
+
+					return project( variance, position, normal ).max( 0 ).sqrt().mul( depth ).mul( displacementScale );
+
+				};
+
+				// the color and the gradient in fragment shaders, with automatic mip levels
+
+				const fragment = ( position, normal ) => {
+
+					const textureColor = project( ( uv ) => texture( set.colorMap, uv ), position, normal ).rgb;
+
+					return {
+						color: mix( vec3( luminance( textureColor ) ), textureColor, saturation ).mul( tint ),
+						gradient: relief( position, normal ).gradient.mul( depth ).mul( displacementScale )
+					};
+
+				};
+
+				const maxDisplacement = set.depth * 1.5; // half the depth at the largest displacement scale of 3
+
+				return { displacement, displacementGradient, displacementError, maxDisplacement, patchSize, fragment };
+
+			}
+
+			function createSubdivisionMesh( geometry, surface ) {
+
+				const material = new THREE.MeshStandardNodeMaterial( { roughness: 0.85 } );
+
+				const mesh = new AdaptiveSubdivisionMesh( geometry, material, {
+					displacement: surface.displacement,
+					displacementGradient: surface.displacementGradient,
+					displacementError: surface.displacementError,
+					maxDisplacement: surface.maxDisplacement,
+					patchSize: surface.patchSize,
+					maxLeafCount: 65536, // the leaf budget sizes the buffers, see the stats
+					targetEdgePixels: params.targetEdgePixels,
+					shadowDetail: params.shadowDetail
+				} );
+
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+
+				// color: optionally tinted by subdivision depth, with the wireframe on top
+
+				const surfaceColor = surface.fragment( mesh.basePositionNode, mesh.baseNormalNode.normalize() ).color;
+
+				// debug colors: the subdivision depth, relative to the source triangles so it differs between meshes, or the
+				// size of the rendered triangles on screen, from blue at a quarter of the target over green at the target
+				// to red at twice the target
+
+				const depthColor = hue( color( 0xff4040 ), mesh.depthNode.mul( 0.35 ) );
+				const sizeColor = triangleSizeColor( mesh.triangleBarycentricNode );
+				const debugColor = select( debugColors.equal( 1 ), depthColor, sizeColor );
+
+				const triangleEdges = edgeFactor( mesh.triangleBarycentricNode, 0 ).mul( lineDensityFade( mesh.triangleBarycentricNode ) );
+				const leafEdges = edgeFactor( mesh.leafBarycentricNode, 0.25 );
+
+				let finalColor = mix( surfaceColor, debugColor.mul( surfaceColor.dot( vec3( 0.3, 0.6, 0.1 ) ).mul( 1.5 ).add( 0.25 ) ), debugColors.greaterThan( 0 ) );
+				finalColor = mix( finalColor, color( 0x1a1a1a ), triangleEdges.mul( wireframe ).mul( 0.6 ) );
+				finalColor = mix( finalColor, color( 0xffd23f ), leafEdges.mul( wireframe ) );
+
+				material.colorNode = finalColor;
+
+				return mesh;
+
+			}
+
+			// the source mesh without subdivision, normal mapped with the gradient of the displacement instead, to compare
+
+			function createNormalMappedMesh( geometry, surface ) {
+
+				const material = new THREE.MeshStandardNodeMaterial( { roughness: 0.85 } );
+
+				const normal = normalLocal.normalize();
+				const { color, gradient } = surface.fragment( positionLocal, normal );
+
+				material.colorNode = color;
+				material.normalNode = transformNormalToView( normal.sub( gradient.sub( normal.mul( gradient.dot( normal ) ) ) ).normalize() );
+
+				const mesh = new THREE.Mesh( geometry, material );
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+				mesh.visible = false;
+
+				return mesh;
+
+			}
+
+			// blends three planar projections by the normal, so no UVs (and no UV seams) are needed.
+			// the side projections keep y as the vertical texture axis, so wall courses stay horizontal
+
+			function triplanar( sample, position, normal ) {
+
+				const weights = triplanarWeights( normal );
+
+				return sample( position.zy ).mul( weights.x ).add( sample( position.xz ).mul( weights.y ) ).add( sample( position.xy ).mul( weights.z ) );
+
+			}
+
+			function triplanarWeights( normal ) {
+
+				const power = pow( abs( normal ), vec3( 8 ) );
+
+				return power.div( power.x.add( power.y ).add( power.z ) );
+
+			}
+
+			// anti-aliased edge coverage from barycentric coordinates, the line is about 1 + width pixels wide
+
+			function edgeFactor( barycentric, width ) {
+
+				const d = fwidth( barycentric );
+				const a = smoothstep( d.mul( width ), d.mul( width + 1 ), barycentric );
+
+				return float( 1 ).sub( min( a.x, a.y, a.z ) );
+
+			}
+
+			// the size of the rendered triangle on screen as the edge of an equilateral triangle of the same area, like the
+			// target edge, from the screen space derivatives of the barycentric coordinates
+
+			function triangleSizeColor( barycentric ) {
+
+				const dx = dFdx( barycentric );
+				const dy = dFdy( barycentric );
+				const area = float( 0.5 ).div( max( abs( dx.x.mul( dy.y ).sub( dx.y.mul( dy.x ) ) ), 1e-9 ) );
+				const size = area.mul( 4 / Math.sqrt( 3 ) ).sqrt();
+				const t = log2( size.div( targetEdgePixels ) ).add( 2 ).div( 3 ).clamp();
+
+				return select( t.lessThan( 2 / 3 ), mix( color( 0x2050ff ), color( 0x30d040 ), t.mul( 1.5 ) ), mix( color( 0x30d040 ), color( 0xff3020 ), t.sub( 2 / 3 ).mul( 3 ) ) );
+
+			}
+
+			// fades out the lines of triangles that are only a few pixels large
+
+			function lineDensityFade( barycentric ) {
+
+				const d = fwidth( barycentric );
+				const pixels = float( 1 ).div( max( d.x, d.y, d.z ) );
+
+				return smoothstep( 4, 10, pixels );
+
+			}
+
+			// geometries: low poly, the detail comes from the displacement
+
+			function createGroundGeometry() {
+
+				const geometry = new THREE.PlaneGeometry( 12, 12, 2, 2 );
+				geometry.rotateX( - Math.PI / 2 );
+
+				return geometry;
+
+			}
+
+			function createWallGeometry() {
+
+				// a single box: the stones and the mortar joints come from the displacement. the faces are split into
+				// squares, as bisection keeps the shape of the source triangles and long slivers would refine far too much
+
+				const geometry = new THREE.BoxGeometry( 2.4, 1.1, 0.4, 12, 6, 2 );
+				geometry.deleteAttribute( 'uv' );
+				geometry.translate( 0, 0.55, - 0.6 );
+
+				return geometry;
+
+			}
+
+			function createRockGeometry() {
+
+				// boulders: an icosphere projected onto a convex polytope of random planes, with softened edges and a flat base
+
+				const random = mulberry32( 3 );
+				const noise = new SimplexNoise( { random } );
+				const rocks = [];
+
+				const placements = [
+					[ 0.9, 0.5, 0.5 ],
+					[ - 0.7, 0.7, 0.36 ],
+					[ 1.5, - 0.3, 0.3 ],
+					[ 0.15, 1.25, 0.2 ]
+				];
+
+				const softness = 0.02;
+				const direction = new THREE.Vector3();
+
+				for ( const [ x, z, radius ] of placements ) {
+
+					const planes = [ { normal: new THREE.Vector3( 0, - 1, 0 ), distance: 0.35 } ];
+
+					for ( let i = 0; i < 24; i ++ ) {
+
+						const normal = new THREE.Vector3( random() * 2 - 1, random() * 2 - 1, random() * 2 - 1 ).normalize();
+						planes.push( { normal, distance: 0.7 + random() * 0.25 } );
+
+					}
+
+					// fine enough that the vertex normals follow the shape: the triplanar weights and the displacement use them
+
+					const rock = new THREE.IcosahedronGeometry( 1, 5 );
+					rock.deleteAttribute( 'uv' );
+
+					const position = rock.attributes.position;
+
+					for ( let i = 0; i < position.count; i ++ ) {
+
+						direction.fromBufferAttribute( position, i ).normalize();
+
+						// distance to the polytope surface along the direction, a soft minimum over the planes rounds the edges
+
+						let sum = Math.exp( - 1.6 / softness );
+
+						for ( const { normal, distance } of planes ) {
+
+							const cosine = direction.dot( normal );
+							if ( cosine > 1e-4 ) sum += Math.exp( - distance / cosine / softness );
+
+						}
+
+						// broad lumps and sharp ridges break up the flat faces
+
+						const lumps = noise.noise3d( direction.x * 1.5 + x * 7, direction.y * 1.5, direction.z * 1.5 + z * 7 ) * 0.06;
+						const ridges = ( 0.5 - Math.abs( noise.noise3d( direction.x * 4 + x * 3, direction.y * 4, direction.z * 4 + z * 3 ) ) ) * 0.05;
+
+						const r = - softness * Math.log( sum ) * ( 1 + lumps + ridges );
+
+						position.setXYZ( i, x + direction.x * r * radius, ( direction.y * r + 0.35 ) * radius * 0.8, z + direction.z * r * radius );
+
+					}
+
+					rock.computeVertexNormals();
+
+					rocks.push( rock );
+
+				}
+
+				return mergeGeometries( rocks );
+
+			}
+
+			function mulberry32( seed ) {
+
+				return () => {
+
+					seed |= 0;
+					seed = seed + 0x6d2b79f5 | 0;
+					let t = Math.imul( seed ^ seed >>> 15, 1 | seed );
+					t = t + Math.imul( t ^ t >>> 7, 61 | t ) ^ t;
+					return ( ( t ^ t >>> 14 ) >>> 0 ) / 4294967296;
+
+				};
+
+			}
+
+			async function updateStats() {
+
+				if ( params.adaptive === false ) {
+
+					const triangles = normalMappedMeshes.reduce( ( count, { geometry } ) => count + ( geometry.index !== null ? geometry.index.count : geometry.attributes.position.count ) / 3, 0 );
+
+					statsElement.textContent = `${ triangles.toLocaleString() } source triangles, normal mapped`;
+
+					setTimeout( updateStats, 500 );
+
+					return;
+
+				}
+
+				let leaves = 0, triangles = 0, shadowTriangles = 0, memory = 0;
+
+				for ( const mesh of meshes ) {
+
+					const info = await mesh.getInfo( renderer );
+
+					leaves += info.leafCount;
+					triangles += info.triangleCount;
+					shadowTriangles += info.shadowTriangleCount;
+					memory += info.memory;
+
+				}
+
+				statsElement.textContent = `${ leaves.toLocaleString() } leaves, ${ triangles.toLocaleString() } rendered triangles, ${ shadowTriangles.toLocaleString() } in the shadow map, ${ Math.round( memory / 2 ** 20 ) } MB of buffers`;
+
+				setTimeout( updateStats, 500 );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				controls.update();
+
+				if ( params.adaptive && params.freeze === false ) {
+
+					for ( const mesh of meshes ) {
+
+						mesh.targetEdgePixels = params.targetEdgePixels;
+						mesh.maxErrorPixels = params.maxErrorPixels;
+						mesh.morphing = params.morphing;
+						mesh.morphTime = params.morphTime;
+						mesh.shadowDetail = params.shadowDetail;
+						mesh.frustumCulling = params.frustumCulling;
+						mesh.backfaceCulling = params.backfaceCulling;
+						mesh.update( renderer, camera );
+
+					}
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
