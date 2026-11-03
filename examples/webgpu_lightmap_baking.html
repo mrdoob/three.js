@@ -58,7 +58,7 @@
 
 			let camera, scene, renderer, controls, status;
 			let world, meshes, materials;
-			let radiosity, lightMapper, denoiser;
+			let radiosity, lightMapper, denoiser = null;
 			let needsBake = false, denoised = false;
 
 			const params = {
@@ -104,7 +104,7 @@
 				const gui = renderer.inspector.createParameters( 'Light Baking' );
 				gui.add( params, 'scene', Object.keys( scenes ) ).name( 'Scene' ).onChange( setScene );
 				gui.add( params, 'resolution', [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( requestBake );
-				gui.add( params, 'denoise' ).name( 'Denoise' ).onChange( setLightMap );
+				gui.add( params, 'denoise' ).name( 'Denoise' ).onChange( requestBake );
 				gui.add( { bake: requestBake }, 'bake' ).name( 'Re-Bake GI' );
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -340,18 +340,18 @@
 
 				// the light map accumulates one sample per frame in animate()
 
-				// the light mapper also bakes the inputs of the denoiser: the variance of each texel and the
-				// surfaces of the texels as guides
+				// to denoise, the light mapper also bakes the inputs of the denoiser: the variance of each texel
+				// and the surfaces of the texels as guides, which take more memory
 
-				lightMapper = new LightMapper( renderer, world.atlas.resolution, rayTracedRadiosityIrradiance( radiosity ), { variance: true, guides: true } );
+				lightMapper = new LightMapper( renderer, world.atlas.resolution, rayTracedRadiosityIrradiance( radiosity ), { variance: params.denoise, guides: params.denoise } );
 				lightMapper.addObjects( meshes );
 
-				denoiser = new LightMapDenoiser( renderer, {
+				denoiser = params.denoise ? new LightMapDenoiser( renderer, {
 					colorTexture: lightMapper.texture,
 					varianceTexture: lightMapper.varianceTexture,
 					positionTexture: lightMapper.positionTexture,
 					normalTexture: lightMapper.normalTexture
-				} );
+				} ) : null;
 				denoised = false;
 
 				setLightMap();
@@ -360,7 +360,7 @@
 
 			function setLightMap() {
 
-				const lightMap = params.denoise && denoised ? denoiser.texture : lightMapper.texture;
+				const lightMap = denoised ? denoiser.texture : lightMapper.texture;
 
 				for ( const material of materials ) material.lightMap = lightMap;
 
@@ -391,13 +391,13 @@
 
 				} else {
 
-					status.textContent = `Baked: ${ samples } samples${ params.denoise ? ', denoised' : '' }`;
+					status.textContent = `Baked: ${ samples } samples${ denoised ? ', denoised' : '' }`;
 
 				}
 
 				// denoise once the bake is done
 
-				if ( params.denoise && ! denoised && lightMapper.samples === samples ) {
+				if ( denoiser !== null && ! denoised && lightMapper.samples === samples ) {
 
 					denoiser.update();
 					denoised = true;
