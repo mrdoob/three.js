@@ -715,6 +715,13 @@ class RenderObject {
 		let firstVertex = drawRange.start * rangeFactor;
 		let lastVertex = ( drawRange.start + drawRange.count ) * rangeFactor;
 
+		if ( object.drawRange ) {
+
+			firstVertex = Math.max( firstVertex, object.drawRange.start * rangeFactor );
+			lastVertex = Math.min( lastVertex, ( object.drawRange.start + object.drawRange.count ) * rangeFactor );
+
+		}
+
 		if ( group !== null ) {
 
 			firstVertex = Math.max( firstVertex, group.start * rangeFactor );

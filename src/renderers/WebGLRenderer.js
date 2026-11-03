@@ -1230,6 +1230,13 @@ class WebGLRenderer {
 			let drawStart = drawRange.start * rangeFactor;
 			let drawEnd = ( drawRange.start + drawRange.count ) * rangeFactor;
 
+			if ( object.drawRange ) {
+
+				drawStart = Math.max( drawStart, object.drawRange.start * rangeFactor );
+				drawEnd = Math.min( drawEnd, ( object.drawRange.start + object.drawRange.count ) * rangeFactor );
+
+			}
+
 			if ( group !== null ) {
 
 				drawStart = Math.max( drawStart, group.start * rangeFactor );
