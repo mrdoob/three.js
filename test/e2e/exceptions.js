@@ -89,6 +89,7 @@ export const slowList = [
 	'webgl_buffergeometry_glbufferattribute', // Swaps buffers every two seconds.
 	'webgl_loader_gltf_progressive_lod', // Progressive loading.
 	'webgl_loader_imagebitmap', // Schedules loading up to 1.9 seconds after startup.
+	'webgl_performance', // Async shader compilation before the model is added.
 	'webgpu_meshlets_instanced', // Async preparation and shader compilation.
 	'webgpu_meshlets_meshes' // Async preparation and shader compilation.
 ];
