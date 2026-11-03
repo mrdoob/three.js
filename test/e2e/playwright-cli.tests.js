@@ -84,6 +84,6 @@ test( 'slow examples stay enabled and select delayed screenshot polling', async 
 	const fast = specs.find( spec => spec.title === 'webgl_geometry_cube' );
 	assert.ok( fast.tests[ 0 ].annotations.some( annotation => annotation.type === 'screenshot-readiness' && annotation.description === 'polling' ) );
 	const make = await list( 'webgl_geometry_cube', '--make' );
-	assert.ok( make.suites[ 0 ].specs[ 0 ].tests[ 0 ].annotations.some( annotation => annotation.type === 'screenshot-readiness' && annotation.description === 'legacy' ) );
+	assert.ok( make.suites[ 0 ].specs[ 0 ].tests[ 0 ].annotations.some( annotation => annotation.type === 'screenshot-readiness' && annotation.description === 'delayed' ) );
 
 } );

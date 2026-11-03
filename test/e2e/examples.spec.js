@@ -2,7 +2,6 @@ import { test, expect } from '@playwright/test';
 import * as fs from 'node:fs/promises';
 import { Image } from './image.js';
 import { exceptionList, slowList } from './exceptions.js';
-import { waitForLegacyNetworkIdle, renderOnce } from './legacy-readiness.js';
 
 const exact = JSON.parse( process.env.THREE_EXAMPLES || '[]' );
 const files = ( await fs.readdir( 'examples' ) )
@@ -41,24 +40,10 @@ for ( const file of shardOrder ) {
 	if ( process.env.THREE_WEBGPU && ! file.startsWith( 'webgpu_' ) ) continue;
 
 	const slow = slowList.includes( file );
-	test( file, { annotation: { type: 'screenshot-readiness', description: process.env.THREE_SCREENSHOTS ? 'legacy' : slow ? 'delayed-polling' : 'polling' } }, async ( { page, context }, testInfo ) => {
+	test( file, { annotation: { type: 'screenshot-readiness', description: process.env.THREE_SCREENSHOTS ? 'delayed' : slow ? 'delayed-polling' : 'polling' } }, async ( { page, context }, testInfo ) => {
 
 		let pageError;
 		const messages = [];
-		const pendingRequests = new Set();
-		page.on( 'request', request => {
-
-			pendingRequests.add( request );
-
-		} );
-		const finishRequest = request => {
-
-			pendingRequests.delete( request );
-
-		};
-
-		page.on( 'requestfinished', finishRequest );
-		page.on( 'requestfailed', finishRequest );
 		page.on( 'pageerror', error => pageError = error.message );
 		page.on( 'console', message => {
 
@@ -95,10 +80,18 @@ for ( const file of shardOrder ) {
 		await page.goto( `/examples/${ file }.html`, { waitUntil: 'networkidle', timeout: 300000 } );
 
 		await page.evaluate( cleanPage );
-		if ( process.env.THREE_SCREENSHOTS ) await waitForLegacyNetworkIdle( page, pendingRequests );
-		else if ( slow ) await page.waitForTimeout( 2000 );
+		// New thumbnails have no expected image to poll against, so they also get the extra wait.
+		if ( slow || process.env.THREE_SCREENSHOTS ) await page.waitForTimeout( 2000 );
 		await page.waitForFunction( () => window._videosReady(), null, { polling: 100, timeout: 5000 } );
-		await renderOnce( page );
+		await page.evaluate( async () => {
+
+			await new Promise( resolve => setTimeout( resolve, 0 ) );
+			window._renderStarted = true;
+			const start = performance._now();
+			// A timeout also supports examples that render without a rAF loop.
+			while ( ! window._renderFinished && performance._now() - start < 5000 ) await new Promise( resolve => setTimeout( resolve, 100 ) );
+
+		} );
 
 		let screenshot = ( await Image.read( await page.screenshot() ) ).scale( 0.5 );
 		await testInfo.attach( 'browser-console', { body: messages.join( '\n' ), contentType: 'text/plain' } );

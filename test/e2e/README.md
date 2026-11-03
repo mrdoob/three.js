@@ -31,7 +31,7 @@ Screenshot comparisons normally use Playwright's native `networkidle` navigation
 
 The `slowList` in `exceptions.js` adds a two-second wait before opening the render gate for examples with delayed loading, shader compilation or real-time timers. These examples are still tested and use the same navigation, video/render readiness, screenshot polling and comparison as other examples. Only the extra wait differs.
 
-`make-screenshot` keeps the original two-second network-quiet wait because a new thumbnail has no expected image against which to poll.
+`make-screenshot` also waits the extra two seconds because a new thumbnail has no expected image against which to poll.
 
 Playwright's DOM actionability checks do not establish GPU/asset readiness. Native network idle remains a heuristic, and screenshot polling cannot rerun an animation callback missed by the one-shot render gate. A scene captured before a timer or asynchronous setup finishes can remain wrong even while screenshots are retried; add such examples to `slowList` after comparing with the original method.
 
