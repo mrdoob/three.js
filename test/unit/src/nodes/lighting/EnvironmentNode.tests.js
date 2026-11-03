@@ -36,7 +36,7 @@ describe( 'Nodes', () => {
 
 		describe( 'EnvironmentNode', () => {
 
-			for ( const backend of [ process.env.THREE_GPU_BACKEND ] ) {
+			for ( const backend of [ import.meta.env.THREE_GPU_BACKEND ] ) {
 
 				for ( const Material of [ MeshStandardMaterial, MeshPhysicalMaterial ] ) {
 

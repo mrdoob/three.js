@@ -113,13 +113,9 @@
     "pngjs": "^7.0.0",
     "rollup": "^4.6.0",
     "turndown": "^7.2.2",
-    "vitest": "^5.0.5",
-    "vitest-environment-webgl-node": "^3.0.1",
-    "vitest-environment-webgpu-node": "^3.0.1"
+    "vitest": "^5.0.5"
   },
   "allowScripts": {
-    "fsevents": true,
-    "@onirenaud/node-webgl@0.2.0": true,
-    "webgpu@0.6.2": true
+    "fsevents": true
   }
 }

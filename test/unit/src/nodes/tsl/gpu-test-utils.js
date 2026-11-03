@@ -419,7 +419,7 @@ function buildAssertAPI( makeNode ) {
 // Register each case in the Vitest project for its selected native backend.
 function declareTest( name, backends, run ) {
 
-	const backend = process.env.THREE_GPU_BACKEND;
+	const backend = import.meta.env.THREE_GPU_BACKEND;
 	test.runIf( backends.includes( backend ) )( name, async () => {
 
 		await run( assert, await getSharedRenderer( backend ) );

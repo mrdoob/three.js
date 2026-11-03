@@ -20,15 +20,20 @@ const alias = {
 };
 const setupFiles = [ './test/unit/utils/console-wrapper.js' ];
 const maxWorkers = Math.max( 1, Math.floor( availableParallelism() * 0.75 ) );
+const browser = {
+	enabled: true,
+	headless: true,
+	provider: playwright( { launchOptions: { args: process.platform === 'win32' ? [ '--use-angle=d3d11' ] : process.platform === 'darwin' ? [ '--use-angle=metal' ] : [] } } )
+};
 const gpuProjects = [ 'webgl', 'webgpu' ].map( backend => ( {
 	extends: true,
 	test: {
 		name: backend,
 		include: [ 'test/gpu/suite.tests.js' ],
-		environment: `${ backend }-node`,
 		env: { THREE_GPU_BACKEND: backend },
 		testTimeout: 30000,
-		hookTimeout: 30000
+		hookTimeout: 30000,
+		browser: { ...browser, instances: [ { browser: 'chromium' } ] }
 	}
 } ) );
 
@@ -66,12 +71,7 @@ export default defineConfig( {
 					name: 'browser',
 					include: browserTests,
 					setupFiles,
-					browser: {
-						enabled: true,
-						headless: true,
-						provider: playwright( { launchOptions: { args: process.platform === 'win32' ? [ '--use-angle=d3d11' ] : process.platform === 'darwin' ? [ '--use-angle=metal' ] : [] } } ),
-						instances: [ { browser: 'chromium' } ]
-					}
+					browser: { ...browser, instances: [ { browser: 'chromium' } ] }
 				}
 			},
 			...gpuProjects

@@ -16,7 +16,7 @@ export function rawComputeTest( name, options, run ) {
 
 	const { backend = 'webgpu', requiredFeature } = options;
 
-	test.runIf( backend === process.env.THREE_GPU_BACKEND )( name, async ( context ) => {
+	test.runIf( backend === import.meta.env.THREE_GPU_BACKEND )( name, async ( context ) => {
 
 		const renderer = await getSharedRenderer( backend );
 

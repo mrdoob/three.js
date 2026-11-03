@@ -39,7 +39,7 @@ describe( 'Nodes', () => {
 
 		describe( 'workgroup arrays and atomics', () => {
 
-			test.runIf( process.env.THREE_GPU_BACKEND === 'webgpu' )( 'workgroupArray: plain (non-atomic) shared read/write survives a barrier', async () => {
+			test.runIf( import.meta.env.THREE_GPU_BACKEND === 'webgpu' )( 'workgroupArray: plain (non-atomic) shared read/write survives a barrier', async () => {
 
 				const renderer = await getSharedRenderer( 'webgpu' );
 
@@ -84,7 +84,7 @@ describe( 'Nodes', () => {
 
 			} );
 
-			test.runIf( process.env.THREE_GPU_BACKEND === 'webgpu' )( 'workgroupArray.toAtomic(): concurrent atomicAdd sums exactly once per invocation, per workgroup', async () => {
+			test.runIf( import.meta.env.THREE_GPU_BACKEND === 'webgpu' )( 'workgroupArray.toAtomic(): concurrent atomicAdd sums exactly once per invocation, per workgroup', async () => {
 
 				const renderer = await getSharedRenderer( 'webgpu' );
 

@@ -14,7 +14,7 @@ Unit tests use [Vitest](https://vitest.dev/) and import the source files directl
 | `npm run test-unit` | Core tests in Node |
 | `npm run test-unit-addons` | Addon tests in Node |
 | `npm run test-unit-browser` | Tests that need a browser, in Chromium |
-| `npm run test-unit-gpu` | WebGL and WebGPU tests on the GPU, using [vitest-gpu](https://github.com/bhouston/vitest-gpu) |
+| `npm run test-unit-gpu` | WebGL and WebGPU tests on the GPU, in Chromium |
 | `npm test` | Lint and all of the above |
 
 The `-headful` variants of `test-unit` and `test-unit-addons` also run the browser tests in a visible window.
