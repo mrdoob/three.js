@@ -34,8 +34,8 @@ for ( const file of files ) {
 	if ( exact.length ? ! exact.includes( file ) : exceptionList.includes( file ) ) continue;
 	if ( process.env.THREE_WEBGPU && ! file.startsWith( 'webgpu_' ) ) continue;
 
-	const slow = !! process.env.THREE_SCREENSHOTS || slowList.includes( file );
-	test( file, { annotation: { type: 'screenshot-readiness', description: slow ? 'legacy' : 'polling' } }, async ( { page, context }, testInfo ) => {
+	const slow = slowList.includes( file );
+	test( file, { annotation: { type: 'screenshot-readiness', description: process.env.THREE_SCREENSHOTS ? 'legacy' : slow ? 'delayed-polling' : 'polling' } }, async ( { page, context }, testInfo ) => {
 
 		await page.goto( '/test/e2e/gpu-probe.html' );
 		const renderer = await page.evaluate( async ( webgpu ) => {
@@ -112,9 +112,9 @@ for ( const file of files ) {
 		}
 
 		await client.send( 'Input.setIgnoreInputEvents', { ignore: true } );
-		if ( slow ) {
+		if ( process.env.THREE_SCREENSHOTS ) {
 
-			// Some examples need the legacy scene state before releasing the one-shot render gate.
+			// Thumbnail generation has no expected image to wait for.
 			await gotoWithLegacyNetworkIdle( page, client, `/examples/${ file }.html` );
 
 		} else {
@@ -124,7 +124,8 @@ for ( const file of files ) {
 		}
 
 		await page.evaluate( cleanPage );
-		if ( slow ) await waitForLegacyNetworkIdle( page, pendingRequests );
+		if ( process.env.THREE_SCREENSHOTS ) await waitForLegacyNetworkIdle( page, pendingRequests );
+		else if ( slow ) await page.waitForTimeout( 2000 );
 		await page.waitForFunction( () => window._videosReady(), null, { polling: 100, timeout: 5000 } );
 		await renderOnce( page );
 
@@ -155,22 +156,13 @@ for ( const file of files ) {
 		let different = Infinity;
 		try {
 
-			if ( slow ) {
+			await expect.poll( async () => {
 
+				screenshot = ( await Image.read( await page.screenshot() ) ).scale( 0.5 );
 				different = expected.compare( screenshot, diff, 0.1 ) / ( screenshot.width * screenshot.height ) * 100;
-				expect( different, 'Percentage of differing pixels' ).toBeLessThan( 0.1 );
+				return different;
 
-			} else {
-
-				await expect.poll( async () => {
-
-					screenshot = ( await Image.read( await page.screenshot() ) ).scale( 0.5 );
-					different = expected.compare( screenshot, diff, 0.1 ) / ( screenshot.width * screenshot.height ) * 100;
-					return different;
-
-				}, { message: 'Percentage of differing pixels', timeout: 5000, intervals: [ 100, 250, 500 ] } ).toBeLessThan( 0.1 );
-
-			}
+			}, { message: 'Percentage of differing pixels', timeout: 5000, intervals: [ 100, 250, 500 ] } ).toBeLessThan( 0.1 );
 
 		} finally {
 

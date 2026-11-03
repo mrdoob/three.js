@@ -82,7 +82,7 @@ export const exceptionList = [
 
 ];
 
-// Run these examples with legacy readiness waits; they are still tested.
+// Wait two extra seconds before rendering these examples; they are still tested.
 export const slowList = [
 	'misc_exporter_usdz', // Async model decoding.
 	'physics_rapier_basic', // Real-time physics and body creation.

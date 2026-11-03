@@ -69,7 +69,7 @@ test( 'native help and argument diagnostics remain available', async () => {
 
 } );
 
-test( 'slow examples stay enabled and select legacy screenshot readiness', async () => {
+test( 'slow examples stay enabled and select delayed screenshot polling', async () => {
 
 	const report = await list();
 	const specs = report.suites.flatMap( suite => suite.specs );
@@ -77,7 +77,7 @@ test( 'slow examples stay enabled and select legacy screenshot readiness', async
 
 		const spec = specs.find( spec => spec.title === name );
 		assert.ok( spec, `${ name } must still run without an explicit selection` );
-		assert.ok( spec.tests[ 0 ].annotations.some( annotation => annotation.type === 'screenshot-readiness' && annotation.description === 'legacy' ) );
+		assert.ok( spec.tests[ 0 ].annotations.some( annotation => annotation.type === 'screenshot-readiness' && annotation.description === 'delayed-polling' ) );
 
 	}
 
