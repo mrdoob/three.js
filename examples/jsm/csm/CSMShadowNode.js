@@ -174,6 +174,7 @@ class CSMShadowNode extends ShadowBaseNode {
 
 			const lShadow = light.shadow.clone();
 			lShadow.bias = lShadow.bias * ( i + 1 );
+			lShadow.filterNode = light.shadow.filterNode;
 
 			this.lights.push( lwLight );
 
