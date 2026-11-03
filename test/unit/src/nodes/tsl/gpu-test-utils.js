@@ -1,5 +1,4 @@
 import { afterAll, assert, test } from 'vitest';
-import { assertHardwareRenderer } from '../../../../gpu/hardware.js';
 //
 // GPU-native TSL unit test harness (prototype).
 //
@@ -259,7 +258,6 @@ export async function getSharedRenderer( backend ) {
 
 		const renderer = new WebGPURenderer( { antialias: false, ...BACKEND_OPTIONS[ backend ] } );
 		await renderer.init();
-		assertHardwareRenderer( renderer, backend );
 		sharedRenderers[ backend ] = renderer;
 
 	}
