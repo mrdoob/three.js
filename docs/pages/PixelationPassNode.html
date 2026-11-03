@@ -9,11 +9,14 @@
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
-		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="TempNode.html">TempNode</a> → <a href="PassNode.html">PassNode</a> → </p>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="PassNode.html">PassNode</a> → </p>
 	<h1 translate="no">PixelationPassNode</h1>
 		<section>
 			<header>
-				<div class="class-description"><p>A special render pass node that renders the scene with a pixelation effect.</p></div>
+				<div class="class-description"><p>A special render pass node that renders the scene with a pixelation effect,
+creating a visual presentation similar to that of a 2D pixel art game.</p>
+<p>The effect is achieved by rendering into a render target whose dimensions
+are scaled down by <a href="PixelationPassNode.html#pixelSize">PixelationPassNode#pixelSize</a>.</p></div>
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
@@ -21,7 +24,7 @@
 				<pre><code class="language-js">import { pixelationPass } from 'three/addons/tsl/display/PixelationPassNode.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="PixelationPassNode" translate="no">new <a href="#PixelationPassNode">PixelationPassNode</a><span class="signature">( scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, pixelSize : <span class="param-type"><a href="Node.html">Node</a>.&lt;float> | number</span>, normalEdgeStrength : <span class="param-type"><a href="Node.html">Node</a>.&lt;float> | number</span>, depthEdgeStrength : <span class="param-type"><a href="Node.html">Node</a>.&lt;float> | number</span> )</span> </h3>
+					<h3 class="name name-method" id="PixelationPassNode" translate="no">new <a href="#PixelationPassNode">PixelationPassNode</a><span class="signature">( scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span>, pixelSize : <span class="param-type">number</span>, normalEdgeStrength : <span class="param-type"><a href="Node.html">Node</a>.&lt;float> | number</span>, depthEdgeStrength : <span class="param-type"><a href="Node.html">Node</a>.&lt;float> | number</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new pixelation pass node.</p>
@@ -77,7 +80,7 @@
 				</div>
 				<h2 class="subsection-title">Properties</h2>
 				<div class="member">
-					<h3 class="name" id="depthEdgeStrength" translate="no">.<a href="#depthEdgeStrength">depthEdgeStrength</a><span class="type-signature"> : number</span> </h3>
+					<h3 class="name" id="depthEdgeStrength" translate="no">.<a href="#depthEdgeStrength">depthEdgeStrength</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
 					<div class="description">
 						<p>The depth edge strength.</p>
 						<p>Default is <code>0.4</code>.</p>
@@ -91,7 +94,7 @@
 					</div>
 				</div>
 				<div class="member">
-					<h3 class="name" id="normalEdgeStrength" translate="no">.<a href="#normalEdgeStrength">normalEdgeStrength</a><span class="type-signature"> : number</span> </h3>
+					<h3 class="name" id="normalEdgeStrength" translate="no">.<a href="#normalEdgeStrength">normalEdgeStrength</a><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
 					<div class="description">
 						<p>The normal edge strength.</p>
 						<p>Default is <code>0.3</code>.</p>
@@ -100,7 +103,7 @@
 				<div class="member">
 					<h3 class="name" id="pixelSize" translate="no">.<a href="#pixelSize">pixelSize</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
-						<p>The pixel size.</p>
+						<p>The pixel size. This value scales the pass's render target.</p>
 						<p>Default is <code>6</code>.</p>
 					</div>
 				</div>
@@ -109,6 +112,8 @@
 					<div class="method">
 						<div class="description">
 							<p>Sets the size of the pass.</p>
+<p><code>PassNode.updateBefore()</code> calls this method once per frame, so
+<a href="PixelationPassNode.html#pixelSize">PixelationPassNode#pixelSize</a> can be changed at any time.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -134,7 +139,7 @@
 							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="PassNode.html#setSize">PassNode#setSize</a></dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : <a href="PixelationNode.html">PixelationNode</a></span> </h3>
+					<h3 class="name name-method" id="setup" translate="no">.<a href="#setup">setup</a><span class="signature">( builder : <span class="param-type"><a href="NodeBuilder.html">NodeBuilder</a></span> )</span><span class="type-signature"> : ShaderCallNodeInternal</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>This method is used to setup the effect's TSL code.</p>

@@ -128,10 +128,6 @@ Reflection mapping for cube textures.
 
 Refraction mapping for cube textures.
 
-### .CubeUVReflectionMapping : number (constant)
-
-Reflection mapping for PMREM textures.
-
 ### .CullFaceBack : number (constant)
 
 Culls back faces.
@@ -1129,15 +1125,11 @@ TSL function that retrieves the indirect index for a given batch ID.
 
 ### .getMorph (constant)
 
-TSL function that retrieves and scales the morphed attribute (position or normal) texel value.
+TSL function that retrieves and scales the morphed attribute (position, normal or color) texel value.
 
 ### .getSpecularDominantFactor (constant)
 
 Specular dominant factor for parallax-corrected ray length. From REBLUR: A Hierarchical Recurrent Denoiser (NRD).
-
-### .ggxReflectionSample (constant)
-
-Importance-samples the GGX/VNDF specular lobe for one pixel and returns the reflected ray direction plus the Monte-Carlo weight to apply to the gathered radiance, along with the GGX terms the SSR env-miss MIS fallback needs.
 
 ### .ggxReflectionStruct (constant)
 
@@ -1150,6 +1142,14 @@ TSL object representing a varying property for the instanced color vector.
 ### .lineDistance : VaryingNode.<float> (constant)
 
 Varying node representing the accumulated distance along the line. Crucial for correctly computing dashed line intervals in fragment stage.
+
+### .morphBase : UniformNode.<float> (constant)
+
+The morph target base influence. It is `1` when `morphTargetsRelative` is `true`, otherwise `1 - sum( influences )`.
+
+### .morphColorSum : PropertyNode.<vec4> (constant)
+
+The sum of the weighted color morph targets.
 
 ### .outgoingLight : Node.<vec3> (constant)
 
@@ -1243,9 +1243,9 @@ A reference to the shadow cube map.
 
 The normalized direction from light to fragment.
 
-**dp**
+**distance**
 
-The depth value to compare against.
+The distance from the light to the fragment.
 
 **shadow**
 
@@ -1377,6 +1377,20 @@ Default is `0`.
 
 **Returns:** The tower colour.
 
+### .canReferenceInstanceData( object : InstancedMesh, builder : NodeBuilder ) : boolean
+
+Returns `true` if the build can bind the instance data of the rendered mesh, so it can be shared between instanced meshes.
+
+**object**
+
+The instanced mesh.
+
+**builder**
+
+The current node builder.
+
+**Returns:** Whether the build can bind the instance data of the rendered mesh.
+
 ### .ceilPowerOfTwo( value : number ) : number
 
 Returns the smallest power of two that is greater than or equal to the given number.
@@ -1465,6 +1479,42 @@ The target box.
 
 **Returns:** The bounding box.
 
+### .computeSolidVoxels( scene : Scene, options : Object, target : Uint8Array )
+
+Marks the sub-voxels inside closed meshes, so cones starting within an object are blocked. Only meshes with visible, opaque and single-sided materials whose geometry is closed and faces outwards are filled.
+
+**scene**
+
+The scene.
+
+**options**
+
+Options.
+
+**boundsMin**
+
+The minimum corner of the voxel grid.
+
+**voxelSize**
+
+The size of a voxel in world units.
+
+**gridSize**
+
+The number of voxels per axis.
+
+**layers**
+
+Objects must pass this layer test.
+
+**exclude**
+
+Objects to skip.
+
+**target**
+
+One byte per voxel that receives the 2x2x2 sub-voxel bits of the interiors.
+
 ### .contain( texture : Texture, aspect : number ) : Texture
 
 Scales the texture as large as possible within its surface without cropping or stretching the texture. The method preserves the original aspect ratio of the texture. Akin to CSS `object-fit: contain`
@@ -1521,7 +1571,7 @@ The indirect instance ID.
 
 **Returns:** The matrix node.
 
-### .createBuildingMaterial( layout : Object, seed : number | Node.<uint> ) : MeshStandardNodeMaterial
+### .createBuildingMaterial( layout : Object, seed : number | Node.<uint>, options : Object ) : MeshStandardNodeMaterial
 
 The shared material every tower in a [CityGenerator](CityGenerator.html) is dressed with: the per-lot [buildingColorNode](global.html#buildingColorNode) resolved once per vertex on a skyscraper material.
 
@@ -1534,6 +1584,10 @@ The city layout.
 A fixed seed, or [CityGenerator#seedNode](CityGenerator.html#seedNode) for a changing city.
 
 Default is `0`.
+
+**options**
+
+The features of the material, see [createSkyscraperMaterial](global.html#createSkyscraperMaterial).
 
 **Returns:** The building material.
 
@@ -1647,9 +1701,37 @@ The matrix buffer attribute.
 
 The road surface: wet asphalt with lane lines and crosswalks aligned to a [CityGenerator](CityGenerator.html) layout. Apply it to a ground plane sized to the city.
 
-### .createSkyscraperMaterial()
+### .createSkyscraperMaterial( buildingBase : Node.<vec3>, options : Object ) : MeshStandardNodeMaterial
 
 The facade material: a single MeshStandardNodeMaterial that reads the baked per-vertex `partId` and reproduces every zone — procedural terracotta brickwork on the walls and piers, smooth dressed stone on the window frames and ornament, dark glazing, and grey AC units — all dressed with world-space weathering. One material covers the whole building ( and a whole city ), which is what makes it compute-rasterizer friendly. `buildingBase` is the tower's flat masonry colour as a TSL node: pass a `uniform( Color )` for a single tower, or a per-fragment palette pick for a city, so the same material dresses both.
+
+**buildingBase**
+
+The flat masonry colour of the tower.
+
+**options**
+
+The features of the material, cheaper materials leave some out.
+
+**interiors**
+
+Whether the windows show raymarched rooms, `'average'` shows the average colour and the light of each room without the raymarch, for distant towers. `false` shows dark glass.
+
+Default is `true`.
+
+**weathering**
+
+Whether the surfaces are weathered by noise ( tone, soot, grime, dust ).
+
+Default is `true`.
+
+**relief**
+
+Whether the brickwork and the AC louvers have a bump relief.
+
+Default is `true`.
+
+**Returns:** The facade material.
 
 ### .createTreeMaterial( parameters : Object ) : MeshStandardNodeMaterial
 
@@ -1711,7 +1793,7 @@ The value to denormalize.
 
 The typed array that defines the data type of the value.
 
-**Returns:** The denormalize (float) value in the range `[0,1]`.
+**Returns:** The denormalized (float) value in the range `[0,1]` or `[-1,1]`
 
 ### .enhanceLogMessage( params : Array.<any> ) : Array.<any>
 
@@ -1796,6 +1878,50 @@ Returns a single precision floating point value (FP32) from the given half preci
 A half precision floating point value.
 
 **Returns:** The FP32 value.
+
+### .gather( trace : function, origin : Node.<vec3>, normal : Node.<vec3>, coneCount : Node.<uint> | number, tanHalfAngle : Node.<float>, maxDistance : Node.<float>, rotation : Node.<float> | number, elevation : Node.<float> | number, aoDistance : Node.<float> ) : Object
+
+Emits a diffuse gather: Traces stratified cosine-weighted cones around the normal and averages them.
+
+**trace**
+
+The cone tracing function, see [createConeTracer](global.html#createConeTracer).
+
+**origin**
+
+The origin of the cones.
+
+**normal**
+
+The normalized surface normal.
+
+**coneCount**
+
+The number of cones.
+
+**tanHalfAngle**
+
+The tangent of half the cone angle.
+
+**maxDistance**
+
+The maximum trace distance.
+
+**rotation**
+
+Rotation of the cones around the normal in `[0, 1)`.
+
+**elevation**
+
+Offset of the cones within their elevation strata in `[0, 1)`.
+
+**aoDistance**
+
+The AO falloff distance. AO is only computed if given.
+
+Default is `null`.
+
+**Returns:** The mean radiance and the mean AO of the cones.
 
 ### .generateMagicSquare( size : number ) : Array.<number>
 
@@ -1889,7 +2015,7 @@ Gets the currently set custom console function.
 
 ### .getDistanceAttenuation( inputs : Object ) : Node.<float>
 
-Represents a `discard` shader operation in TSL.
+Calculates, at a given distance from a light, the falloff of the light's brightness.
 
 **inputs**
 
@@ -1971,6 +2097,40 @@ An object where keys are member names and values are either types (as strings) o
 
 **Returns:** An array of member layouts.
 
+### .getNodeDefNames( category : string ) : Array.<string>
+
+Returns the names of the stdlib nodedefs that implement a node category.
+
+**category**
+
+The node category, e.g. `'multiply'`.
+
+**Returns:** The nodedef names, empty when the category is unknown.
+
+### .getNormalizationScale( array : TypedArray ) : number | undefined
+
+Returns the factor used by [normalize](TSL.html#normalize) and [denormalize](global.html#denormalize) for the given typed array, or `undefined` if the values are not scaled (float arrays) or the array type is not supported.
+
+**array**
+
+The typed array that defines the data type of the value.
+
+**Returns:** The normalization factor.
+
+### .getPreviousBoneMatricesNode( builder : NodeBuilder, skeleton : Skeleton ) : Object
+
+Creates the bone matrices node of the previous frame.
+
+**builder**
+
+The current node builder.
+
+**skeleton**
+
+The skeleton.
+
+**Returns:** The previous bone matrices node.
+
 ### .getPreviousInstance( instancedMesh : InstancedMesh, instanceMatrix : InstancedBufferAttribute | StorageInstancedBufferAttribute, builder : NodeBuilder ) : Node
 
 Retrieves or initializes the previous frame instance matrix node for motion vectors. Uses a WeakMap to cache previous frame instance matrices and their TSL nodes.
@@ -1989,49 +2149,25 @@ The current node builder.
 
 **Returns:** The previous frame instance matrix node.
 
-### .getPreviousNode( batchMesh : BatchedMesh, id : Node.<uint> ) : Node.<mat4>
+### .getPreviousMatricesTexture( batchMesh : BatchedMesh ) : DataTexture
 
-Retrieves or initializes the previous frame batching matrix node for motion vectors. Uses a WeakMap to cache previous frame matrices textures and their TSL nodes.
+Returns the batching matrices texture of the previous frame for motion vectors. It is created on first use and again after the batched mesh released it.
 
 **batchMesh**
 
 The batched mesh.
 
-**id**
+**Returns:** The previous frame matrices texture.
 
-The indirect instance ID.
+### .getPreviousMatrix( object : InstancedMesh ) : InstancedBufferAttribute
 
-**Returns:** The previous frame batching matrix node.
+Returns the instance matrices of the previous frame of the given mesh, for motion vectors.
 
-### .getPreviousSkinnedPosition( builder : NodeBuilder, skinnedMesh : SkinnedMesh, bindMatrixNode : Node.<mat4>, bindMatrixInverseNode : Node.<mat4>, skinIndexNode : Node.<uvec4>, skinWeightNode : Node.<vec4> ) : Node.<vec3>
+**object**
 
-Retrieves or initializes the previous frame skinned position node for motion vectors. Uses a WeakMap to cache previous frame bone matrix arrays and their TSL buffer nodes.
+The instanced mesh.
 
-**builder**
-
-The current node builder.
-
-**skinnedMesh**
-
-The skinned mesh.
-
-**bindMatrixNode**
-
-The bind matrix node.
-
-**bindMatrixInverseNode**
-
-The inverse bind matrix node.
-
-**skinIndexNode**
-
-The skin index attribute.
-
-**skinWeightNode**
-
-The skin weight attribute.
-
-**Returns:** The skinned position from the previous frame.
+**Returns:** The matrices of the previous frame.
 
 ### .getSkinnedNormalAndTangent( boneMatrices : Node, normal : Node.<vec3>, tangent : Node.<vec3>, bindMatrix : Node.<mat4>, bindMatrixInverse : Node.<mat4>, skinIndex : Node.<uvec4>, skinWeight : Node.<vec4> ) : Object
 
@@ -2253,6 +2389,24 @@ The interpolation factor in the closed interval `[0, 1]`.
 
 **Returns:** The interpolated value.
 
+### .lightProbeGridIrradiance( light : LightProbeGrid, position : Node.<vec3>, normal : Node.<vec3> ) : Node.<vec3>
+
+Returns the irradiance of a baked [LightProbeGrid](LightProbeGrid.html) at the given world-space position and normal. Use this to evaluate the grid outside of the lighting context, e.g. when baking light maps with [LightMapper](LightMapper.html).
+
+**light**
+
+The baked light probe grid.
+
+**position**
+
+The world-space position.
+
+**normal**
+
+The world-space normal.
+
+**Returns:** The irradiance.
+
 ### .log( …params : any )
 
 Logs an informational message with the 'THREE.' prefix.
@@ -2323,13 +2477,29 @@ Normalizes the given value according to the given typed array.
 
 **value**
 
-The float value in the range `[0,1]` to normalize.
+The float value in the range `[0,1]` or `[-1,1]` to normalize.
 
 **array**
 
 The typed array that defines the data type of the value.
 
-**Returns:** The normalize value.
+**Returns:** The normalized value.
+
+### .onPreviousInstanceDispose( event : Object )
+
+Frees the GPU buffer of the previous frame instance matrices when the mesh is disposed. The matrices are kept since the node refers to them, rendering the mesh again re-creates the buffer.
+
+**event**
+
+The dispose event.
+
+### .onPreviousMatrixDispose( event : Object )
+
+Disposes the instance matrices of the previous frame when the mesh is disposed.
+
+**event**
+
+The dispose event.
 
 ### .pickBuildingColor()
 
@@ -2409,6 +2579,16 @@ The scene to bake.
 
 **Returns:** The replacements to pass to [restoreSunLights](global.html#restoreSunLights), or `null` if the scene has no such lights.
 
+### .resolveNodeDef( nodeX : MaterialXNode ) : Object
+
+Resolves the nodedef of a node instance like `Node::getNodeDef()` in MaterialX.
+
+**nodeX**
+
+The node instance.
+
+**Returns:** The resolved nodedef or `null`.
+
 ### .restoreSunLights( scene : Scene, replacements : Array.<Object> )
 
 Restores the sun lights replaced by [replaceSunLights](global.html#replaceSunLights).
@@ -2487,22 +2667,6 @@ This allows external code to intercept and handle console.log, console.warn, and
 
 The function to handle console output. Should accept (type, message, ...params) where type is 'log', 'warn', or 'error'.
 
-### .setProjectionFromUnion( camera : ArrayCamera, cameraL : PerspectiveCamera, cameraR : PerspectiveCamera )
-
-Assumes 2 cameras that are parallel and share an X-axis, and that the cameras' projection and world matrices have already been set. And that near and far planes are identical for both cameras. Visualization of this technique: https://computergraphics.stackexchange.com/a/4765
-
-**camera**
-
-The camera to update.
-
-**cameraL**
-
-The left camera.
-
-**cameraR**
-
-The right camera.
-
 ### .setQuaternionFromProperEuler( q : Quaternion, a : number, b : number, c : number, order : 'XYX' | 'XZX' | 'YXY' | 'YZY' | 'ZXZ' | 'ZYZ' )
 
 Sets the given quaternion from the [Intrinsic Proper Euler Angles](https://en.wikipedia.org/wiki/Euler_angles) defined by the given angles and order.
@@ -2528,6 +2692,14 @@ The rotation applied to the third axis, in radians.
 **order**
 
 A string specifying the axes order.
+
+### .setupPreviousBoneData( skeleton : Skeleton )
+
+Creates the bone data of the previous frame if they do not exist yet.
+
+**skeleton**
+
+The skeleton.
 
 ### .setupWebGLXRFallback( renderer : WebGPURenderer, createFallbackRenderer : function, onFallback : function )
 
@@ -2643,6 +2815,76 @@ A single precision floating point value.
 
 **Returns:** The FP16 value.
 
+### .transformInstance( builder : NodeBuilder, instanceMatrixNode : Node.<mat4>, previousMatrixNode : Node.<mat4> )
+
+Transforms the position, the previous position and the normal with the given instance matrices.
+
+**builder**
+
+The current node builder.
+
+**instanceMatrixNode**
+
+The instance matrix.
+
+**previousMatrixNode**
+
+The instance matrix of the previous frame, if motion vectors are needed.
+
+### .unwrapUVs( root : Object3D, options : Object ) : Object
+
+Generates a unique UV atlas for the meshes in a hierarchy, measured in world space. Each mesh receives a new geometry. Skinned and morphed meshes are unwrapped in their current pose. InstancedMesh and BatchedMesh are skipped with a warning. Excluded faces collapse onto the UV of a neighboring chart vertex, or (0, 0) if isolated, and get a faceCharts entry of -1.
+
+**root**
+
+A mesh or hierarchy to unwrap.
+
+**options**
+
+Atlas and chart options.
+
+**attribute**
+
+Output attribute: uv, uv1, uv2, uv3.
+
+Default is `'uv1'`.
+
+**mode**
+
+'lightmap' or 'normal'. Normal tries LSCM.
+
+Default is `'lightmap'`.
+
+**resolution**
+
+Square atlas size in pixels, integer >= 4.
+
+Default is `1024`.
+
+**padding**
+
+Nonnegative gutter in pixels; 2 \* padding + 1 must be less than resolution.
+
+Default is `4`.
+
+**texelsPerUnit**
+
+Common world density; zero fits the atlas. Must be nonnegative.
+
+Default is `0`.
+
+**respectUVSeams**
+
+Cut discontinuities in existing uv (normal default).
+
+**useInputUVs**
+
+Preserve valid authored UV charts before trying LSCM.
+
+Default is `false`.
+
+**Returns:** Atlas size, density, chart bounds, mesh vertex/face mappings and warning counts (excluded faces, tiny faces under 0.01 atlas pixels squared and single-triangle charts, which signal fragmentation), or null if the charts do not fit. Meshes are left unchanged in that case. Charts that fail Float32 validation are split and repacked; single faces that still fail are excluded.
+
 ### .updateCamera( camera : Camera, parent : Object3D )
 
 Updates the world matrices for the given camera based on the parent 3D object.
@@ -2670,6 +2912,26 @@ The XR camera.
 **parent**
 
 The parent 3D object.
+
+### .vxgiIrradiance( volume : VXGIVolume, options : Object ) : function
+
+Creates a world-space diffuse irradiance sampler for a prepared [VXGIVolume](VXGIVolume.html). Call `volume.update( renderer, scene )` before baking. The sampler traces cosine-weighted cones through the volume's radiance, including cached bounces. It can be passed directly to [LightMapper](LightMapper.html), without a screen-space pass. The cones are rotated per pixel with interleaved gradient noise like `VXGINode`. When baking, the pixel is the light map texel. The optional sample index shifts the noise so that accumulated samples, or a temporal filter like TRAA, converge.
+
+**volume**
+
+The prepared voxel volume.
+
+**options**
+
+Options.
+
+**coneCount**
+
+The number of cones per sample. Fewer cones are faster but coarser.
+
+Default is `8`.
+
+**Returns:** The irradiance sampler.
 
 ### .warn( …params : any )
 
@@ -2944,6 +3206,20 @@ Default is `false`.
 [Node](Node.html).<float>
 
 Per-pixel metalness. Drives GGX reflection sampling and, with `reflectNonMetals=false`, the non-metal early-out.
+
+Default is `null`.
+
+**specularNode**  
+[Node](Node.html).<vec3>
+
+Stochastic mode only: material normal-incidence reflectance (F0), typically an MRT `specularColorBlended` attachment (it already includes IOR, specular intensity and metalness; raw `material.specularColor` reflects too brightly). Defaults to the metalness/base-color approximation.
+
+Default is `null`.
+
+**specularF90Node**  
+[Node](Node.html).<float>
+
+Stochastic mode only: material grazing reflectance, typically an MRT `specularF90` attachment. Defaults to one.
 
 Default is `null`.
 

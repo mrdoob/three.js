@@ -9,7 +9,7 @@
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
-		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="TempNode.html">TempNode</a> → </p>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → </p>
 	<h1 translate="no">VelocityNode</h1>
 		<section>
 			<header>
@@ -30,6 +30,12 @@ These offsets represent the final velocity.</p></div>
 					</div>
 				</div>
 				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="currentProjectionMatrix" translate="no">.<a href="#currentProjectionMatrix">currentProjectionMatrix</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;mat4></span> </h3>
+					<div class="description">
+						<p>The projection matrix of the current frame.</p>
+					</div>
+				</div>
 				<div class="member">
 					<h3 class="name" id="previousCameraViewMatrix" translate="no">.<a href="#previousCameraViewMatrix">previousCameraViewMatrix</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;mat4></span> </h3>
 					<div class="description">
@@ -54,7 +60,7 @@ These offsets represent the final velocity.</p></div>
 				<div class="member">
 					<h3 class="name" id="projectionMatrix" translate="no">.<a href="#projectionMatrix">projectionMatrix</a><span class="type-signature"> : <a href="Matrix4.html">Matrix4</a></span> </h3>
 					<div class="description">
-						<p>The current projection matrix.</p>
+						<p>An optional projection matrix that overrides the camera's projection matrix.</p>
 						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
@@ -65,7 +71,7 @@ These offsets represent the final velocity.</p></div>
 						<p>Default is <code>'object'</code>.</p>
 					</div>
 						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateAfterType">TempNode#updateAfterType</a></dt>
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#updateAfterType">Node#updateAfterType</a></dt>
 						</dl>
 				</div>
 				<div class="member">
@@ -75,7 +81,7 @@ These offsets represent the final velocity.</p></div>
 						<p>Default is <code>'object'</code>.</p>
 					</div>
 						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateType">TempNode#updateType</a></dt>
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#updateType">Node#updateType</a></dt>
 						</dl>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -115,7 +121,7 @@ These offsets represent the final velocity.</p></div>
 							</tbody>
 						</table>
 						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#setup">TempNode#setup</a></dt>
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#setup">Node#setup</a></dt>
 						</dl>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The motion vector.</dt>
@@ -139,7 +145,7 @@ These offsets represent the final velocity.</p></div>
 							</tbody>
 						</table>
 						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#update">TempNode#update</a></dt>
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#update">Node#update</a></dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="updateAfter" translate="no">.<a href="#updateAfter">updateAfter</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
@@ -160,7 +166,7 @@ These offsets represent the final velocity.</p></div>
 							</tbody>
 						</table>
 						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateAfter">TempNode#updateAfter</a></dt>
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#updateAfter">Node#updateAfter</a></dt>
 						</dl>
 					</div>
 				<h2 class="subsection-title">Source</h2>

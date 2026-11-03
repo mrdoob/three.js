@@ -93,6 +93,10 @@ Default is `true`.
 
 A reference to the canvas element the renderer is drawing to. This value of this property will automatically be created by the renderer.
 
+### .drawingPipeline : StandardDrawingPipeline
+
+Decides which objects of a scene are rendered and how they are submitted to the render list. Assigning a drawing pipeline binds it to this renderer. The default is a [StandardDrawingPipeline](StandardDrawingPipeline.html). This property is experimental.
+
 ### .highPrecision : boolean
 
 Enables or disables high precision for model-view and normal-view matrices. When enabled, will use CPU 64-bit precision for higher precision instead of GPU 32-bit for higher performance.
@@ -135,7 +139,7 @@ A map-like data structure for managing lights.
 
 ### .logarithmicDepthBuffer : boolean (readonly)
 
-Whether logarithmic depth buffer is enabled or not.
+Whether logarithmic depth buffer is enabled or not. It is disabled on initialization when a reversed depth buffer is in use.
 
 Default is `false`.
 
@@ -325,7 +329,7 @@ Executed while the compilation is in progress.
 
 ### .compileAsync( scene : Object3D, camera : Camera, targetScene : Scene, onProgress : onProgressCallback ) : Promise (async)
 
-Compiles all materials in the given scene. This can be useful to avoid a phenomenon which is called "shader compilation stutter", which occurs when rendering an object with a new shader for the first time.
+Compiles all materials in the given scene. This can be useful to avoid a phenomenon which is called "shader compilation stutter", which occurs when rendering an object with a new shader for the first time. The active drawing pipeline also prepares its geometry resources and compute pipelines.
 
 If you want to add a 3D object to an existing scene, use the third optional parameter for applying the target scene. Note that the (target) scene's lighting and environment must be configured before calling this method.
 
@@ -481,23 +485,25 @@ Can be used to transfer buffer data from a storage buffer attribute from the GPU
 
 **attribute**
 
-The storage buffer attribute to read frm.
+The storage buffer attribute to read from.
 
 **target**
 
-The storage buffer attribute.
+The readback buffer or array buffer that receives the data. If `null`, a new array buffer is returned.
 
 Default is `null`.
 
 **offset**
 
-The storage buffer attribute.
+The byte offset to start reading from. Must be a multiple of 4.
 
 Default is `0`.
 
 **count**
 
-The offset from which to start reading the
+The number of bytes to read. Must be a multiple of 4, or `-1` to read to the end of the buffer.
+
+Default is `-1`.
 
 **Returns:** A promise that resolves with the buffer data when the data are ready.
 
@@ -1085,7 +1091,7 @@ Renderer options.
 **logarithmicDepthBuffer**  
 boolean
 
-Whether logarithmic depth buffer is enabled or not.
+Whether logarithmic depth buffer is enabled or not. Ignored when a reversed depth buffer is in use.
 
 Default is `false`.
 

@@ -290,6 +290,9 @@ class BatchedMesh extends Mesh {
 		this._indirectTexture = null;
 		this._colorsTexture = null;
 
+		// previous frame matrices for motion vectors, created by the renderer
+		this._previousMatricesTexture = null;
+
 		this._initMatricesTexture();
 		this._initIndirectTexture();
 
@@ -1336,6 +1339,13 @@ class BatchedMesh extends Mesh {
 
 		}
 
+		if ( this._previousMatricesTexture !== null ) {
+
+			this._previousMatricesTexture.dispose();
+			this._previousMatricesTexture = null;
+
+		}
+
 	}
 
 	/**
@@ -1546,6 +1556,13 @@ class BatchedMesh extends Mesh {
 
 			this._colorsTexture.dispose();
 			this._colorsTexture = null;
+
+		}
+
+		if ( this._previousMatricesTexture !== null ) {
+
+			this._previousMatricesTexture.dispose();
+			this._previousMatricesTexture = null;
 
 		}
 

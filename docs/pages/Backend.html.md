@@ -244,6 +244,14 @@ Creates the GPU buffer of an indexed shader attribute.
 
 The indexed buffer attribute.
 
+### .createIndirectStorageAttribute( attribute : BufferAttribute ) (abstract)
+
+Creates the GPU buffer of an indirect storage attribute.
+
+**attribute**
+
+The buffer attribute.
+
 ### .createNodeBuilder( renderObject : RenderObject, renderer : Renderer ) : NodeBuilder (abstract)
 
 Returns a node builder for the given render object.
@@ -324,6 +332,14 @@ Delete GPU data associated with a bind group.
 
 The bind group.
 
+### .deleteVertexState( renderObject : RenderObject ) (abstract)
+
+Deletes the vertex state for the given render object.
+
+**renderObject**
+
+The render object.
+
 ### .destroyAttribute( attribute : BufferAttribute ) (abstract)
 
 Destroys the GPU buffer of a shader attribute.
@@ -331,6 +347,22 @@ Destroys the GPU buffer of a shader attribute.
 **attribute**
 
 The buffer attribute to destroy.
+
+### .destroyCanvasTarget( canvasTarget : CanvasTarget ) (abstract)
+
+Frees the GPU resources of the given canvas target.
+
+**canvasTarget**
+
+The canvas target.
+
+### .destroyPipeline( pipeline : Pipeline ) (abstract)
+
+Destroys the given pipeline.
+
+**pipeline**
+
+The pipeline.
 
 ### .destroyProgram( program : ProgrammableStage ) (abstract)
 
@@ -420,15 +452,41 @@ The object.
 
 **Returns:** The object's dictionary.
 
-### .getArrayBufferAsync( attribute : StorageBufferAttribute ) : Promise.<ArrayBuffer> (async)
+### .getArrayBufferAsync( attribute : BufferAttribute, target : ReadbackBuffer | ArrayBuffer, offset : number, count : number ) : Promise.<(ArrayBuffer|ReadbackBuffer)> (async)
 
 This method performs a readback operation by moving buffer data from a storage buffer attribute from the GPU to the CPU.
 
 **attribute**
 
-The storage buffer attribute.
+The storage buffer attribute to read from.
+
+**target**
+
+The readback buffer or array buffer that receives the data. If `null`, a new array buffer is returned.
+
+Default is `null`.
+
+**offset**
+
+The byte offset to start reading from. Must be a multiple of 4.
+
+Default is `0`.
+
+**count**
+
+The number of bytes to read. Must be a multiple of 4, or `-1` to read to the end of the buffer.
+
+Default is `-1`.
 
 **Returns:** A promise that resolves with the buffer data when the data are ready.
+
+### .getBufferAttribute( attribute : BufferAttribute | InterleavedBufferAttribute ) : BufferAttribute | InterleavedBuffer
+
+Utility method for handling interleaved buffer attributes correctly. To process them, their `InterleavedBuffer` is returned.
+
+**attribute**
+
+The attribute.
 
 ### .getClearColor() : Color4
 
@@ -453,6 +511,16 @@ Returns the DOM element. If no DOM element exists, the backend creates a new one
 Returns the drawing buffer size.
 
 **Returns:** The drawing buffer size.
+
+### .getOcclusionData( renderContext : RenderContext ) : Object
+
+Returns the occlusion query data of the given render context for its current camera.
+
+**renderContext**
+
+The render context.
+
+**Returns:** The occlusion query data.
 
 ### .getRenderCacheKey( renderObject : RenderObject ) : string (abstract)
 

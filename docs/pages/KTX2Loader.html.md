@@ -43,6 +43,14 @@ Constructs a new KTX2 loader.
 
 The loading manager.
 
+## Properties
+
+### .isKTX2Loader : boolean (readonly)
+
+This flag can be used for type testing.
+
+Default is `true`.
+
 ## Methods
 
 ### .detectSupport( renderer : WebGPURenderer | WebGLRenderer ) : KTX2Loader

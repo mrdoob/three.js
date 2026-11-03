@@ -44,6 +44,12 @@ GGX roughness (alpha).
 
 **f0**
 
+**f90**
+
+Grazing reflectance.
+
+Default is `1`.
+
 ### .sampleEnvironmentMIS( params : Object ) : Node.<vec3>
 
 Environment reflection for a screen-space miss, estimated with multiple importance sampling (MIS) between the BRDF / reflected-ray direction and the env-luminance CDF direction. Both techniques use consistent solid-angle PDFs (`D·G1(N·V)/(4·N·V)`), so the power heuristic is unbiased. Adapted from three-gpu-pathtracer.
@@ -69,6 +75,12 @@ View-space direction to camera.
 GGX roughness (alpha).
 
 **f0**
+
+**f90**
+
+Grazing reflectance.
+
+Default is `1`.
 
 **Xi2**
 

@@ -1,6 +1,6 @@
 import NodeMaterial from '../../../../src/materials/nodes/NodeMaterial.js';
 import { Material } from '../../../../src/materials/Material.js';
-import ProxyNodeMaterial from '../../../../src/materials/nodes/ProxyNodeMaterial.js';
+import NodeMaterialInstance from '../../../../src/materials/nodes/NodeMaterialInstance.js';
 import NodeLibrary from '../../../../src/renderers/common/nodes/NodeLibrary.js';
 import NodeMaterialObserver from '../../../../src/materials/nodes/manager/NodeMaterialObserver.js';
 import { materialReference } from '../../../../src/nodes/accessors/MaterialReferenceNode.js';
@@ -9,19 +9,19 @@ import { Texture } from '../../../../src/textures/Texture.js';
 
 export default QUnit.module( 'Materials', () => {
 
-	QUnit.module( 'ProxyNodeMaterial', () => {
+	QUnit.module( 'NodeMaterialInstance', () => {
 
 		QUnit.test( 'shared shader and independent instances', ( assert ) => {
 
 			const base = new NodeMaterial();
 			base.colorNode = materialReference( 'myColor', 'color' );
 			base.transparent = true;
-			const a = new ProxyNodeMaterial( base );
-			const b = new ProxyNodeMaterial( base );
+			const a = new NodeMaterialInstance( base );
+			const b = new NodeMaterialInstance( base );
 
 			assert.ok( a instanceof Material );
 			assert.notOk( a instanceof NodeMaterial );
-			assert.strictEqual( a.type, 'ProxyNodeMaterial' );
+			assert.strictEqual( a.type, 'NodeMaterialInstance' );
 			assert.strictEqual( new NodeLibrary().fromMaterial( a ), a, 'Renderer uses the delegated build directly' );
 			assert.strictEqual( a.nodeMaterial, base );
 			assert.strictEqual( a.colorNode, base.colorNode );
@@ -41,7 +41,7 @@ export default QUnit.module( 'Materials', () => {
 		QUnit.test( 'delegates shader setup with the instance material', ( assert ) => {
 
 			const base = new NodeMaterial();
-			const material = new ProxyNodeMaterial( base );
+			const material = new NodeMaterialInstance( base );
 			const builder = { material };
 			base.setup = function ( receivedBuilder ) {
 
@@ -59,7 +59,7 @@ export default QUnit.module( 'Materials', () => {
 
 			const base = new NodeMaterial();
 			base.colorNode = materialReference( 'myColor', 'color' );
-			const material = new ProxyNodeMaterial( base );
+			const material = new NodeMaterialInstance( base );
 
 			assert.strictEqual( material.colorNode, base.colorNode );
 			assert.strictEqual( material.positionNode, null );
@@ -80,8 +80,8 @@ export default QUnit.module( 'Materials', () => {
 		QUnit.test( 'node material updates', ( assert ) => {
 
 			const base = new NodeMaterial();
-			const a = new ProxyNodeMaterial( base );
-			const b = new ProxyNodeMaterial( base );
+			const a = new NodeMaterialInstance( base );
+			const b = new NodeMaterialInstance( base );
 			const key = a.customProgramCacheKey();
 
 			assert.strictEqual( a.version, 0 );
@@ -100,8 +100,8 @@ export default QUnit.module( 'Materials', () => {
 
 		QUnit.test( 'requires a node material', ( assert ) => {
 
-			assert.throws( () => new ProxyNodeMaterial(), /must be a NodeMaterial/ );
-			assert.throws( () => new ProxyNodeMaterial( new Material() ), /must be a NodeMaterial/ );
+			assert.throws( () => new NodeMaterialInstance(), /must be a NodeMaterial/ );
+			assert.throws( () => new NodeMaterialInstance( new Material() ), /must be a NodeMaterial/ );
 
 		} );
 
@@ -109,12 +109,12 @@ export default QUnit.module( 'Materials', () => {
 
 			const base = new NodeMaterial();
 			base.colorNode = materialReference( 'myColor', 'color' );
-			const material = new ProxyNodeMaterial( base );
+			const material = new NodeMaterialInstance( base );
 			material.opacity = 0.5;
 			material.myColor = new Color( 1, 0, 0 );
 			const clone = material.clone();
 
-			assert.ok( clone.isProxyNodeMaterial );
+			assert.ok( clone.isNodeMaterialInstance );
 			assert.strictEqual( clone.nodeMaterial, base );
 			assert.strictEqual( clone.colorNode, base.colorNode );
 			assert.strictEqual( clone.opacity, 0.5 );
@@ -130,8 +130,8 @@ export default QUnit.module( 'Materials', () => {
 			const base = new NodeMaterial();
 			const texture = new Texture();
 			base.userData = { phase: 1, tint: new Color( 1, 0, 0 ), map: texture };
-			const a = new ProxyNodeMaterial( base );
-			const b = new ProxyNodeMaterial( base );
+			const a = new NodeMaterialInstance( base );
+			const b = new NodeMaterialInstance( base );
 
 			assert.notStrictEqual( a.userData, base.userData );
 			assert.notStrictEqual( a.userData, b.userData );
@@ -161,7 +161,7 @@ export default QUnit.module( 'Materials', () => {
 
 			const base = new NodeMaterial();
 			base.addEventListener( 'dispose', () => assert.ok( false, 'Source must not be disposed' ) );
-			const material = new ProxyNodeMaterial( base );
+			const material = new NodeMaterialInstance( base );
 			let disposed = 0;
 			material.addEventListener( 'dispose', () => disposed ++ );
 			material.dispose();

@@ -16,18 +16,17 @@ let _rendererState;
 
 /**
  * Bakes indirect diffuse irradiance into a light map. The irradiance is defined by a
- * function that returns a TSL node for a world-space position and normal, so any
- * global illumination technique can be baked, e.g. a {@link LightProbeGrid} via
- * `lightProbeGridIrradiance()` or a prepared {@link VXGIVolume} via `vxgiIrradiance()`.
+ * function that returns a TSL node for a world-space position and normal, e.g. a prepared
+ * {@link RayTracedRadiosity} via `rayTracedRadiosityIrradiance()`.
  *
  * Meshes need light map UVs in the `uv1` attribute, e.g. generated with {@link unwrapUVs}.
  * Atlases of several pages bake into one light map per page, `mesh.userData.lightMapPage`
  * selects the page of a mesh. Instanced meshes bake each instance into its own atlas region,
  * see {@link lightMapUV}.
  * Each sample rasterizes the meshes in UV space with a sub-texel jitter and accumulates
- * the result. The function also receives the sample index, so stochastic sources like
- * `vxgiIrradiance()` can vary their samples and converge as they accumulate. Call
- * `update()` once per frame to bake progressively, or pass a sample count to bake at once.
+ * the result. The function also receives the sample index, so stochastic sources can
+ * vary their samples and converge as they accumulate. Call `update()` once per frame
+ * to bake progressively, or pass a sample count to bake at once.
  * Call `estimateNoise()` to stop once the light map has converged.
  * Keep the source geometry and GI data static while accumulating. Call `reset()`
  * after changing transforms or lighting. Atlas charts need at least three texels
@@ -41,9 +40,12 @@ let _rendererState;
  * included in the bake out of runtime diffuse lighting to avoid counting them twice.
  *
  * ```js
- * const lightMapper = new LightMapper( renderer, size, ( position, normal ) => lightProbeGridIrradiance( probes, position, normal ) );
+ * const radiosity = new RayTracedRadiosity();
+ * radiosity.update( renderer, scene );
+ *
+ * const lightMapper = new LightMapper( renderer, size, rayTracedRadiosityIrradiance( radiosity ) );
  * lightMapper.addObjects( meshes );
- * lightMapper.update( 16 );
+ * lightMapper.update( 64 );
  *
  * material.lightMap = lightMapper.texture;
  * ```

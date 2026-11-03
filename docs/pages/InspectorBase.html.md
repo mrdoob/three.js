@@ -2,7 +2,7 @@
 
 # InspectorBase
 
-InspectorBase is the base class for all inspectors.
+InspectorBase is the base class for all inspectors. Can only be used with [WebGPURenderer](WebGPURenderer.html).
 
 ## Constructor
 
@@ -50,7 +50,7 @@ A unique identifier for the render context.
 
 The compute node being executed.
 
-### .beginRender( uid : string, scene : Scene, camera : Camera, renderTarget : WebGLRenderTarget )
+### .beginRender( uid : string, scene : Scene, camera : Camera, renderTarget : RenderTarget )
 
 Called when a render operation begins.
 
@@ -130,7 +130,7 @@ Called when an animation loop ends.
 
 A unique identifier for the render context.
 
-### .getRenderer() : WebGLRenderer
+### .getRenderer() : Renderer
 
 Returns the renderer associated with this inspector.
 
@@ -144,7 +144,7 @@ Inspects a node.
 
 The node to inspect.
 
-### .setRenderer( renderer : WebGLRenderer ) : InspectorBase
+### .setRenderer( renderer : Renderer ) : InspectorBase
 
 Sets the renderer for this inspector.
 

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>LightMapper - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">LightMapper</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Bakes indirect diffuse irradiance into a light map. The irradiance is defined by a
+function that returns a TSL node for a world-space position and normal, so any
+global illumination technique can be baked, e.g. a <a href="LightProbeGrid.html">LightProbeGrid</a> via
+<code>lightProbeGridIrradiance()</code> or a prepared <a href="VXGIVolume.html">VXGIVolume</a> via <code>vxgiIrradiance()</code>.</p>
+<p>Meshes need light map UVs in the <code>uv1</code> attribute, e.g. generated with <a href="global.html#unwrapUVs">unwrapUVs</a>.
+Each sample rasterizes the meshes in UV space with a sub-texel jitter and accumulates
+the result. The function also receives the sample index, so stochastic sources like
+<code>vxgiIrradiance()</code> can vary their samples and converge as they accumulate. Call
+<code>update()</code> once per frame to bake progressively, or pass a sample count to bake at once.
+Bake at most 256 samples, since samples accumulate in half float precision.
+Keep the source geometry and GI data static while accumulating. Call <code>reset()</code>
+after changing transforms or lighting. Atlas charts need at least three texels
+of padding; the resolve fills two texels around covered surfaces.
+Irradiance uses linear BT.709/sRGB primaries in lux.
+Do not include material ambient occlusion, base color, or exposure in the source
+irradiance. Material occlusion is applied once at runtime. Keep any contributions
+included in the bake out of runtime diffuse lighting to avoid counting them twice.</p>
+<p>This class can only be used with <a href="WebGPURenderer.html">WebGPURenderer</a>.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const lightMapper = new LightMapper( renderer, size, ( position, normal ) => lightProbeGridIrradiance( probes, position, normal ) );
+lightMapper.addObjects( meshes );
+lightMapper.update( 16 );
+material.lightMap = lightMapper.texture;
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">LightMapper</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { LightMapper } from 'three/addons/lighting/LightMapper.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="LightMapper" translate="no">new <a href="#LightMapper">LightMapper</a><span class="signature">( renderer : <span class="param-type"><a href="WebGPURenderer.html">WebGPURenderer</a></span>, size : <span class="param-type">number</span>, irradianceNode : <span class="param-type">function</span>, options : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new light mapper.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">size</strong>
+									</td>
+									<td class="description last">
+										<p>The light map size in texels.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">irradianceNode</strong>
+									</td>
+									<td class="description last">
+										<p>Returns the irradiance for a world-space position, normal and sample index.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">options</strong>
+									</td>
+									<td class="description last">
+										<p>Bake options.</p>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">lights</strong>
+									</td>
+									<td class="description last">
+										<p>Direct lights to include in the diffuse bake. Render their shadows in the source scene first and disable shadow updates during the UV bake.</p>
+										<p>Default is <code>[]</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="irradianceNode" translate="no">.<a href="#irradianceNode">irradianceNode</a><span class="type-signature"> : function</span> </h3>
+					<div class="description">
+						<p>The source of indirect irradiance.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="renderer" translate="no">.<a href="#renderer">renderer</a><span class="type-signature"> : <a href="WebGPURenderer.html">WebGPURenderer</a></span> </h3>
+					<div class="description">
+						<p>The renderer.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="samples" translate="no">.<a href="#samples">samples</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The number of accumulated samples.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="size" translate="no">.<a href="#size">size</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The light map size in texels.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="texture" translate="no">.<a href="#texture">texture</a><span class="type-signature"> : <a href="Texture.html">Texture</a></span> </h3>
+					<div class="description">
+						<p>The baked light map. It stores linear diffuse irradiance in lux, without baked
+albedo, material ambient occlusion, or display exposure, and uses <code>uv1</code>.
+Values are not divided by pi, matching the runtime light map input.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="addObjects" translate="no">.<a href="#addObjects">addObjects</a><span class="signature">( objects : <span class="param-type">Array.&lt;<a href="Mesh.html">Mesh</a>></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Adds meshes to the light map. Their geometries must provide <code>uv1</code>.
+Skinned and instanced meshes are not supported.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">objects</strong>
+									</td>
+									<td class="description last">
+										<p>The meshes to add.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Frees all internal resources.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="reset" translate="no">.<a href="#reset">reset</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Discards the accumulated samples.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="update" translate="no">.<a href="#update">update</a><span class="signature">( samples : <span class="param-type">number</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Accumulates samples into the light map.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">samples</strong>
+									</td>
+									<td class="description last">
+										<p>The number of samples to add.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/lighting/LightMapper.js" translate="no" target="_blank" rel="noopener">examples/jsm/lighting/LightMapper.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

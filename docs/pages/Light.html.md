@@ -40,6 +40,16 @@ This flag can be used for type testing.
 
 Default is `true`.
 
+## Static Methods
+
+### .registerNode( lightNodeClass : AnalyticLightNode.constructor )
+
+Registers the node class that `WebGPURenderer` uses to shade lights of this type.
+
+**lightNodeClass**
+
+The light node class.
+
 ## Source
 
 [src/lights/Light.js](https://github.com/mrdoob/three.js/blob/master/src/lights/Light.js)

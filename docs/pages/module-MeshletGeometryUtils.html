@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>MeshletGeometryUtils - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">MeshletGeometryUtils</h1>
+		<section>
+			<header>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">MeshletGeometryUtils</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import * as MeshletGeometryUtils from 'three/addons/utils/MeshletGeometryUtils.js';</code></pre>
+				<div class="container-overview">
+					<div class="description"><p>Utilities to process geometries into clusters (meshlets) of 64 triangles with a chain of simplified
+levels of detail, used by the meshlet drawing pipelines.</p></div>
+				</div>
+				<h2 class="subsection-title">Static Properties</h2>
+				<div class="member">
+					<h3 class="name" id=".MAX_LODS" translate="no">.<a href="#.MAX_LODS">MAX_LODS</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>The maximum number of levels of detail of a geometry.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id=".MESHLET_SIZE" translate="no">.<a href="#.MESHLET_SIZE">MESHLET_SIZE</a><span class="type-signature"> : number</span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>The number of triangles of a meshlet. Meshlets are padded with degenerate triangles to this size.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id=".ready" translate="no">.<a href="#.ready">ready</a><span class="type-signature"> : Promise</span> <span class="type-signature">(constant) </span></h3>
+					<div class="description">
+						<p>Resolves when the meshoptimizer modules are ready to process geometries.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Static Methods</h2>
+					<h3 class="name name-method" id=".createMeshlets" translate="no">.<a href="#.createMeshlets">createMeshlets</a><span class="signature">( geometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, group : <span class="param-type">Object</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Builds meshlets of 64 triangles and a chain of simplified levels of detail for the given geometry.
+Identical vertices are welded first and all levels index the same vertices. The vertex data is
+interleaved into one storage buffer and accessed through the returned functions.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">geometry</strong>
+									</td>
+									<td class="description last">
+										<p>The geometry, with position and normal attributes.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">group</strong>
+									</td>
+									<td class="description last">
+										<p>An optional material group whose triangles are processed independently.</p>
+										<p>Default is <code>null</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The meshlet data.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/utils/MeshletGeometryUtils.js" translate="no" target="_blank" rel="noopener">examples/jsm/utils/MeshletGeometryUtils.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

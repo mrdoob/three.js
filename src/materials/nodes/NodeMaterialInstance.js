@@ -11,16 +11,16 @@ import { Material } from '../Material.js';
  * const nodeMaterial = new MeshBasicNodeMaterial();
  * nodeMaterial.colorNode = materialReference( 'myColor', 'color' );
  *
- * const material = new ProxyNodeMaterial( nodeMaterial );
+ * const material = new NodeMaterialInstance( nodeMaterial );
  * material.myColor = new Color( 1, 0, 0 );
  * ```
  *
  * @augments Material
  */
-class ProxyNodeMaterial extends Material {
+class NodeMaterialInstance extends Material {
 
 	/**
-	 * Constructs a new proxy node material.
+	 * Constructs a new node material instance.
 	 *
 	 * @param {NodeMaterial} nodeMaterial - The node material defining the shared shader.
 	 * @throws {TypeError} When the given material is not a node material.
@@ -31,7 +31,7 @@ class ProxyNodeMaterial extends Material {
 
 		if ( nodeMaterial?.isNodeMaterial !== true ) {
 
-			throw new TypeError( 'THREE.ProxyNodeMaterial: The parameter must be a NodeMaterial.' );
+			throw new TypeError( 'THREE.NodeMaterialInstance: The parameter must be a NodeMaterial.' );
 
 		}
 
@@ -41,7 +41,7 @@ class ProxyNodeMaterial extends Material {
 
 		this.userData = cloneUserData( nodeMaterial.userData );
 
-		this.type = 'ProxyNodeMaterial';
+		this.type = 'NodeMaterialInstance';
 
 		/**
 		 * This flag can be used for type testing.
@@ -50,7 +50,7 @@ class ProxyNodeMaterial extends Material {
 		 * @readonly
 		 * @default true
 		 */
-		this.isProxyNodeMaterial = true;
+		this.isNodeMaterialInstance = true;
 
 		/**
 		 * The node material defining the shared shader.
@@ -100,14 +100,14 @@ class ProxyNodeMaterial extends Material {
 	set version( value ) {}
 
 	/**
-	 * Copies the values of the given proxy node material to this instance.
+	 * Copies the values of the given node material instance to this instance.
 	 * Object values such as colors are shared with the source, except in `userData`.
 	 * Unlike {@link Material#copy}, `userData` is not copied via JSON: its first level
 	 * values are cloned when possible, so types such as colors are preserved. Textures
 	 * remain shared.
 	 *
-	 * @param {ProxyNodeMaterial} source - The material to copy.
-	 * @return {ProxyNodeMaterial} A reference to this instance.
+	 * @param {NodeMaterialInstance} source - The material to copy.
+	 * @return {NodeMaterialInstance} A reference to this instance.
 	 */
 	copy( source ) {
 
@@ -120,9 +120,9 @@ class ProxyNodeMaterial extends Material {
 	}
 
 	/**
-	 * Returns a new proxy node material that shares the same node material.
+	 * Returns a new node material instance that shares the same node material.
 	 *
-	 * @return {ProxyNodeMaterial} A clone of this instance.
+	 * @return {NodeMaterialInstance} A clone of this instance.
 	 */
 	clone() {
 
@@ -190,4 +190,4 @@ function copyProperties( target, source ) {
 
 }
 
-export default ProxyNodeMaterial;
+export default NodeMaterialInstance;

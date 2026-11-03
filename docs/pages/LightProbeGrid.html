@@ -34,7 +34,9 @@ happen on the GPU with zero CPU readback.</p></div>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new irradiance probe grid.</p>
-<p>The volume is centered at the object's position.</p>
+<p>The volume is centered at the object's position. It is split into one cell
+per probe, with each probe at the center of its cell, so the probes sit half
+a cell inside the volume.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -70,7 +72,7 @@ happen on the GPU with zero CPU readback.</p></div>
 										<strong translate="no">widthProbes</strong>
 									</td>
 									<td class="description last">
-										<p>Number of probes along X. Defaults to <code>Math.max( 2, Math.round( width ) + 1 )</code>.</p>
+										<p>Number of probes along X. Defaults to <code>Math.max( 1, Math.round( width ) )</code>.</p>
 									</td>
 								</tr>
 								<tr>
@@ -78,7 +80,7 @@ happen on the GPU with zero CPU readback.</p></div>
 										<strong translate="no">heightProbes</strong>
 									</td>
 									<td class="description last">
-										<p>Number of probes along Y. Defaults to <code>Math.max( 2, Math.round( height ) + 1 )</code>.</p>
+										<p>Number of probes along Y. Defaults to <code>Math.max( 1, Math.round( height ) )</code>.</p>
 									</td>
 								</tr>
 								<tr>
@@ -86,7 +88,7 @@ happen on the GPU with zero CPU readback.</p></div>
 										<strong translate="no">depthProbes</strong>
 									</td>
 									<td class="description last">
-										<p>Number of probes along Z. Defaults to <code>Math.max( 2, Math.round( depth ) + 1 )</code>.</p>
+										<p>Number of probes along Z. Defaults to <code>Math.max( 1, Math.round( depth ) )</code>.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -97,7 +99,8 @@ happen on the GPU with zero CPU readback.</p></div>
 				<div class="member">
 					<h3 class="name" id="boundingBox" translate="no">.<a href="#boundingBox">boundingBox</a><span class="type-signature"> : <a href="Box3.html">Box3</a></span> </h3>
 					<div class="description">
-						<p>The world-space bounding box for the grid. Updated automatically
+						<p>The world-space bounding box for the grid. This is the volume the grid
+lights, with the probes half a cell inside it. Updated automatically
 by <a href="LightProbeGrid.html#bake">LightProbeGrid#bake</a>.</p>
 					</div>
 				</div>
@@ -105,16 +108,6 @@ by <a href="LightProbeGrid.html#bake">LightProbeGrid#bake</a>.</p>
 					<h3 class="name" id="depth" translate="no">.<a href="#depth">depth</a><span class="type-signature"> : number</span> </h3>
 					<div class="description">
 						<p>The full depth of the volume along Z.</p>
-					</div>
-				</div>
-				<div class="member">
-					<h3 class="name" id="falloff" translate="no">.<a href="#falloff">falloff</a><span class="type-signature"> : number</span> </h3>
-					<div class="description">
-						<p>Distance in world units over which the grid contribution fades out
-past the volume boundary. <code>0</code> applies the contribution everywhere
-(clamped), which matches a single-volume setup. Use a small positive
-value to blend multiple overlapping grids.</p>
-						<p>Default is <code>0</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -131,6 +124,14 @@ value to blend multiple overlapping grids.</p>
 					</div>
 				</div>
 				<div class="member">
+					<h3 class="name" id="priority" translate="no">.<a href="#priority">priority</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>Where grids overlap, the grid with the highest priority lights the
+fragment. On ties, the most recently created grid wins.</p>
+						<p>Default is <code>0</code>.</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="resolution" translate="no">.<a href="#resolution">resolution</a><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
 					<div class="description">
 						<p>The number of probes along each axis.</p>
@@ -141,7 +142,6 @@ value to blend multiple overlapping grids.</p>
 					<div class="description">
 						<p>The single RGBA atlas 3D texture storing all seven packed SH
 sub-volumes stacked along Z.</p>
-						<p>Default is <code>null</code>.</p>
 					</div>
 				</div>
 				<div class="member">
@@ -198,7 +198,7 @@ cannot be frozen across probe renders.</p>
 										<strong translate="no">cubemapSize</strong>
 									</td>
 									<td class="description last">
-										<p>Resolution of each cubemap face.</p>
+										<p>Resolution of each cubemap face. Must be a multiple of 4.</p>
 										<p>Default is <code>8</code>.</p>
 									</td>
 								</tr>
@@ -227,15 +227,6 @@ cannot be frozen across probe renders.</p>
 									<td class="description last">
 										<p>Additional bounce passes. Only available when baking the whole grid.</p>
 										<p>Default is <code>0</code>.</p>
-									</td>
-								</tr>
-								<tr>
-									<td class="name">
-										<strong translate="no">sampleCount</strong>
-									</td>
-									<td class="description last">
-										<p>Directions integrated when projecting each cubemap to SH.</p>
-										<p>Default is <code>512</code>.</p>
 									</td>
 								</tr>
 								<tr>

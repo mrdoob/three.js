@@ -14,8 +14,12 @@
 		<section>
 			<header>
 				<div class="class-description"><p>A sun-like light that gets emitted in a specific direction, with rays that
-are all parallel, and casts cascaded shadow maps via <a href="SunLightShadow.html">SunLightShadow</a>,
+are all parallel, and casts Cascaded Shadow Maps (CSM) via <a href="SunLightShadow.html">SunLightShadow</a>,
 suited for lighting large scenes.</p>
+<p>Please be aware that <code>SunLight</code> is not a good fit for small, bounded scenes like
+dioramas, single rooms or model-viewers. Small scenes don't benefit from
+CSM because most content will be located in the last shadow cascade with the
+lowest shadow map resolution.</p>
 <p>Unlike <a href="DirectionalLight.html">DirectionalLight</a>, the light has no target: like
 <a href="HemisphereLight.html">HemisphereLight</a>, its direction is defined by its position. The
 light shines from its position towards the origin and points straight
@@ -25,9 +29,9 @@ sun.position.set( 1, 1, 1 );
 sun.castShadow = true;
 scene.add( sun );
 </code></pre>
-<p>When used with <code>WebGPURenderer</code>, the light must be registered with the
-renderer's node library first:</p>
-<pre><code class="language-js">renderer.library.addLight( SunLightNode, SunLight );
+<p>When used with <code>WebGPURenderer</code>, the light must be assigned its node
+implementation first:</p>
+<pre><code class="language-js">SunLight.registerNode( SunLightNode );
 </code></pre></div>
 			</header>
 			<article>

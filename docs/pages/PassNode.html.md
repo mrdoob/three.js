@@ -1,4 +1,4 @@
-*Inheritance: EventDispatcher → Node → TempNode →*
+*Inheritance: EventDispatcher → Node →*
 
 # PassNode
 
@@ -74,7 +74,7 @@ This flag is used for global cache.
 
 Default is `true`.
 
-**Overrides:** [TempNode#global](TempNode.html#global)
+**Overrides:** [Node#global](Node.html#global)
 
 ### .isPassNode : boolean (readonly)
 
@@ -112,7 +112,7 @@ The scope of the pass. The scope determines whether the node outputs color or de
 
 Whether the pass is transparent.
 
-Default is `false`.
+Default is `true`.
 
 ### .updateBeforeType : string
 
@@ -120,7 +120,9 @@ The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders t
 
 Default is `'frame'`.
 
-**Overrides:** [TempNode#updateBeforeType](TempNode.html#updateBeforeType)
+**Overrides:** [Node#updateBeforeType](Node.html#updateBeforeType)
+
+## Static Properties
 
 ### .COLOR : 'color'
 
@@ -148,7 +150,7 @@ See:
 
 Frees internal resources. Should be called when the node is no longer in use.
 
-**Overrides:** [TempNode#dispose](TempNode.html#dispose)
+**Overrides:** [Node#dispose](Node.html#dispose)
 
 ### .getLayers() : Layers
 

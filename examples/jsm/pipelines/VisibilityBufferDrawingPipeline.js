@@ -15,7 +15,7 @@ import {
 	normalLocal, normalViewGeometry, normalWorldGeometry, tangentViewFrame, bitangentViewFrame, modelWorldMatrix, modelViewMatrix, modelPosition, atomicMax, atomicAdd, atomicStore, atomicLoad
 } from 'three/tsl';
 
-import { MeshletDrawingPipeline, GPUDrivenBatch, cacheAttributes, createDebugMaterial, createDrawMaterial, createOcclusion } from './MeshletDrawingPipeline.js';
+import { MeshletDrawingPipeline, MeshletBatch, cacheAttributes, createDebugMaterial, createDrawMaterial, createOcclusion } from './MeshletDrawingPipeline.js';
 import { MESHLET_SIZE } from '../utils/MeshletGeometryUtils.js';
 
 // visibility buffer packing — the depth occupies the bits above each payload
@@ -182,8 +182,8 @@ function createView( width, height ) {
 	const screenTriAttribute = new StorageBufferAttribute( new Uint32Array( pixels ), 1 );
 	const screenInstAttribute = new StorageBufferAttribute( new Uint32Array( pixels ), 1 );
 
-	const screenTriAtomic = storage( screenTriAttribute, 'uint', pixels ).toAtomic();
-	const screenInstAtomic = storage( screenInstAttribute, 'uint', pixels ).toAtomic();
+	const screenTriAtomic = storage( screenTriAttribute, 'uint' ).toAtomic();
+	const screenInstAtomic = storage( screenInstAttribute, 'uint' ).toAtomic();
 
 	const computeClear = Fn( () => {
 
@@ -196,9 +196,9 @@ function createView( width, height ) {
 		width,
 		height,
 		screenTriAtomic,
-		screenTriRead: storage( screenTriAttribute, 'uint', pixels ).toReadOnly(),
+		screenTriRead: storage( screenTriAttribute, 'uint' ).toReadOnly(),
 		screenInstAtomic,
-		screenInstRead: storage( screenInstAttribute, 'uint', pixels ).toReadOnly(),
+		screenInstRead: storage( screenInstAttribute, 'uint' ).toReadOnly(),
 		computeClear,
 		dispose() {
 
@@ -218,9 +218,9 @@ function createView( width, height ) {
  * box of each object and shades the fragments whose visible triangle belongs to the object.
  *
  * @private
- * @augments GPUDrivenBatch
+ * @augments MeshletBatch
  */
-class VisibilityBufferBatch extends GPUDrivenBatch {
+class VisibilityBufferBatch extends MeshletBatch {
 
 	/**
 	 * Creates the software rasterizer, the hardware path of the large triangles and the resolve.
@@ -263,16 +263,16 @@ class VisibilityBufferBatch extends GPUDrivenBatch {
 		const { screenTriAtomic, screenTriRead, screenInstAtomic, screenInstRead } = this.view;
 
 		const dispatchAttribute = createAttribute( new Uint32Array( 3 ), 3, IndirectStorageBufferAttribute );
-		const dispatchBuffer = storage( dispatchAttribute, 'uint', 3 );
+		const dispatchBuffer = storage( dispatchAttribute, 'uint' );
 
 		// the software rasterizer sends large triangles to the hardware queue, the counter followed by [ instance, triangle ] pairs
 
 		const hwQueueAttribute = createAttribute( new Uint32Array( 1 + MAX_HW_TRIANGLES * 2 ), 1 );
-		const hwQueueAtomic = storage( hwQueueAttribute, 'uint', 1 + MAX_HW_TRIANGLES * 2 ).toAtomic();
-		const hwQueueRead = storage( hwQueueAttribute, 'uint', 1 + MAX_HW_TRIANGLES * 2 ).toReadOnly();
+		const hwQueueAtomic = storage( hwQueueAttribute, 'uint' ).toAtomic();
+		const hwQueueRead = storage( hwQueueAttribute, 'uint' ).toReadOnly();
 
 		const hwDrawAttribute = createAttribute( new Uint32Array( 4 ), 4, IndirectStorageBufferAttribute );
-		const hwDrawBuffer = storage( hwDrawAttribute, 'uint', 4 );
+		const hwDrawBuffer = storage( hwDrawAttribute, 'uint' );
 
 		const computeHWReset = Fn( () => {
 

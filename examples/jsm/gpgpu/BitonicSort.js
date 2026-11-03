@@ -612,10 +612,24 @@ export class BitonicSort {
 	 */
 	computeStep( renderer ) {
 
+		renderer.compute( this._getStepNodes() );
+
+	}
+
+	/**
+	 * Get the compute shaders that execute the next step of the bitonic sort, and advance the sort past that step.
+	 *
+	 * @private
+	 * @returns {Array<ComputeNode>} The compute shaders of the step, in dispatch order.
+	 */
+	_getStepNodes() {
+
+		const computeNodes = [];
+
 		// Swap local only runs once
 		if ( this.currentDispatch === 0 ) {
 
-			renderer.compute( this.swapLocalFn );
+			computeNodes.push( this.swapLocalFn );
 
 			this.globalOpsRemaining = 1;
 			this.globalOpsInSpan = 1;
@@ -624,7 +638,7 @@ export class BitonicSort {
 
 			const swapType = this.globalOpsRemaining === this.globalOpsInSpan ? 'Flip' : 'Disperse';
 
-			renderer.compute( swapType === 'Flip' ? this.flipGlobalNodes[ this.readBufferName ] : this.disperseGlobalNodes[ this.readBufferName ] );
+			computeNodes.push( swapType === 'Flip' ? this.flipGlobalNodes[ this.readBufferName ] : this.disperseGlobalNodes[ this.readBufferName ] );
 
 			if ( this.readBufferName === 'Data' ) {
 
@@ -641,7 +655,7 @@ export class BitonicSort {
 		} else {
 
 			// Then run local disperses when we've finished all global swaps
-			renderer.compute( this.disperseLocalNodes[ this.readBufferName ] );
+			computeNodes.push( this.disperseLocalNodes[ this.readBufferName ] );
 
 			const nextSpanGlobalOps = this.globalOpsInSpan + 1;
 			this.globalOpsInSpan = nextSpanGlobalOps;
@@ -658,13 +672,13 @@ export class BitonicSort {
 			// to fulfill the requirement of an in-place sort.
 			if ( this.readBufferName === 'Temp' ) {
 
-				renderer.compute( this.alignFn );
+				computeNodes.push( this.alignFn );
 				this.readBufferName = 'Data';
 
 			}
 
 			// Just reset the algorithm information
-			renderer.compute( this.resetFn );
+			computeNodes.push( this.resetFn );
 
 			this.currentDispatch = 0;
 			this.globalOpsRemaining = 0;
@@ -673,9 +687,11 @@ export class BitonicSort {
 		} else {
 
 			// Otherwise, determine what next swap span is
-			renderer.compute( this.setAlgoFn );
+			computeNodes.push( this.setAlgoFn );
 
 		}
+
+		return computeNodes;
 
 	}
 
@@ -690,11 +706,16 @@ export class BitonicSort {
 		this.globalOpsInSpan = 0;
 		this.currentDispatch = 0;
 
+		const computeNodes = [];
+
 		for ( let i = 0; i < this.stepCount; i ++ ) {
 
-			this.computeStep( renderer );
+			computeNodes.push( ...this._getStepNodes() );
 
 		}
+
+		// Dispatch the whole sort at once, so it runs in one compute pass instead of one pass per shader
+		renderer.compute( computeNodes );
 
 	}
 

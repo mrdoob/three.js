@@ -1,4 +1,4 @@
-*Inheritance: EventDispatcher → Node → TempNode →*
+*Inheritance: EventDispatcher → Node →*
 
 # OperatorNode
 
@@ -62,7 +62,7 @@ The output type.
 
 Default is `null`.
 
-**Overrides:** [TempNode#generateNodeType](TempNode.html#generateNodeType)
+**Overrides:** [Node#generateNodeType](Node.html#generateNodeType)
 
 **Returns:** The node type.
 

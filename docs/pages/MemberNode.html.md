@@ -34,6 +34,16 @@ The property name.
 
 The struct node.
 
+## Methods
+
+### .getScope() : Node
+
+Returns the scope of the struct so assignments to members mark the underlying value as mutable.
+
+**Overrides:** [Node#getScope](Node.html#getScope)
+
+**Returns:** The scope of the node.
+
 ## Source
 
 [src/nodes/utils/MemberNode.js](https://github.com/mrdoob/three.js/blob/master/src/nodes/utils/MemberNode.js)

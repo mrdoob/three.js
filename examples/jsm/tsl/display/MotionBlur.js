@@ -1,4 +1,4 @@
-import { Fn, float, uv, Loop, int } from 'three/tsl';
+import { Fn, float, uv, Loop, int, vec4 } from 'three/tsl';
 
 /**
  * Applies a motion blur effect to the given input node.
@@ -16,12 +16,16 @@ export const motionBlur = /*@__PURE__*/ Fn( ( [ inputNode, velocity, numSamples 
 
 	const uvs = uv();
 
-	const colorResult = sampleColor( uvs ).toVar();
+	const colorResult = vec4( 0 ).toVar();
 	const fSamples = float( numSamples );
 
-	Loop( { start: int( 1 ), end: numSamples, type: 'int', condition: '<=' }, ( { i } ) => {
+	// taps span [ -0.5, 0.5 ] * velocity, a single tap sits at the center
+	const center = fSamples.sub( 1 ).mul( 0.5 );
+	const spacing = fSamples.sub( 1 ).max( 1 );
 
-		const offset = velocity.mul( float( i ).div( fSamples.sub( 1 ) ).sub( 0.5 ) );
+	Loop( { start: int( 0 ), end: numSamples, type: 'int', condition: '<' }, ( { i } ) => {
+
+		const offset = velocity.mul( float( i ).sub( center ).div( spacing ) );
 		colorResult.addAssign( sampleColor( uvs.add( offset ) ) );
 
 	} );

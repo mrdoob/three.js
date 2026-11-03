@@ -16,6 +16,14 @@ The configuration parameter.
 
 ## Properties
 
+### .emissiveNode : Node.<vec3>
+
+The emissive color of phong materials is by default inferred from the `emissive`, `emissiveIntensity` and `emissiveMap` properties. This node property allows to overwrite the default and define the emissive color with a node instead.
+
+If you don't want to overwrite the emissive color but modify the existing value instead, use [materialEmissive](TSL.html#materialEmissive).
+
+Default is `null`.
+
 ### .isMeshPhongNodeMaterial : boolean (readonly)
 
 This flag can be used for type testing.

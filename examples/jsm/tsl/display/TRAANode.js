@@ -4,6 +4,7 @@ import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth, s
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
+const _jitterMatrix = /*@__PURE__*/ new Matrix4();
 
 let _rendererState;
 
@@ -143,7 +144,7 @@ class TRAANode extends Node {
 		 * @private
 		 * @type {?RenderTarget}
 		 */
-		this._historyRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType, depthTexture: new DepthTexture() } );
+		this._historyRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 		this._historyRenderTarget.texture.name = 'TRAANode.history';
 
 		/**
@@ -154,6 +155,15 @@ class TRAANode extends Node {
 		 */
 		this._resolveRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 		this._resolveRenderTarget.texture.name = 'TRAANode.resolve';
+
+		/**
+		 * The render target that holds the depth of the previous frame.
+		 *
+		 * @private
+		 * @type {RenderTarget}
+		 */
+		this._previousDepthRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, depthTexture: new DepthTexture(), count: 0 } );
+		this._previousDepthRenderTarget.depthTexture.name = 'TRAANode.previousDepth';
 
 		/**
 		 * Material used for the resolve step.
@@ -179,6 +189,15 @@ class TRAANode extends Node {
 		 * @type {Matrix4}
 		 */
 		this._originalProjectionMatrix = new Matrix4();
+
+		/**
+		 * Whether the jitter is currently applied to the camera.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._viewOffsetEnabled = false;
 
 		/**
 		 * A uniform node holding the camera's near and far.
@@ -229,12 +248,20 @@ class TRAANode extends Node {
 		this._previousCameraProjectionMatrixInverse = uniform( new Matrix4() );
 
 		/**
+		 * A texture node for the history.
+		 *
+		 * @private
+		 * @type {TextureNode}
+		 */
+		this._historyTextureNode = texture( this._historyRenderTarget.texture );
+
+		/**
 		 * A texture node for the previous depth buffer.
 		 *
 		 * @private
 		 * @type {TextureNode}
 		 */
-		this._previousDepthNode = texture( this._historyRenderTarget.depthTexture );
+		this._previousDepthNode = texture( this._previousDepthRenderTarget.depthTexture );
 
 		/**
 		 * The node used to render the scene's velocity.
@@ -268,13 +295,23 @@ class TRAANode extends Node {
 		this._historyRenderTarget.setSize( width, height );
 		this._resolveRenderTarget.setSize( width, height );
 
+		const previousDepthTexture = this._previousDepthRenderTarget.depthTexture;
+
+		if ( previousDepthTexture.image.width !== width || previousDepthTexture.image.height !== height ) {
+
+			previousDepthTexture.image.width = width;
+			previousDepthTexture.image.height = height;
+			previousDepthTexture.needsUpdate = true;
+
+		}
+
 		this._invSize.value.set( 1 / width, 1 / height );
 
 	}
 
 	/**
-	 * Defines the TRAA's current jitter as a view offset
-	 * to the scene's camera.
+	 * Applies the TRAA's current jitter to the projection
+	 * matrix of the scene's camera.
 	 *
 	 * @param {number} width - The width of the effect.
 	 * @param {number} height - The height of the effect.
@@ -283,44 +320,38 @@ class TRAANode extends Node {
 
 		// save original/unjittered projection matrix for velocity pass
 
-		this.camera.updateProjectionMatrix();
 		this._originalProjectionMatrix.copy( this.camera.projectionMatrix );
+		this._viewOffsetEnabled = true;
 
 		this._velocityNode.setProjectionMatrix( this._originalProjectionMatrix );
 
 		//
 
-		const viewOffset = {
-
-			fullWidth: width,
-			fullHeight: height,
-			offsetX: 0,
-			offsetY: 0,
-			width: width,
-			height: height
-
-		};
-
 		const jitterOffset = _haltonOffsets[ this._jitterIndex ];
 
-		this.camera.setViewOffset(
+		this.camera.projectionMatrix.premultiply( _jitterMatrix.makeTranslation(
 
-			viewOffset.fullWidth, viewOffset.fullHeight,
+			- 2 * ( jitterOffset[ 0 ] - 0.5 ) / width,
+			2 * ( jitterOffset[ 1 ] - 0.5 ) / height,
+			0
 
-			viewOffset.offsetX + jitterOffset[ 0 ] - 0.5, viewOffset.offsetY + jitterOffset[ 1 ] - 0.5,
+		) );
 
-			viewOffset.width, viewOffset.height
-
-		);
+		this.camera.projectionMatrixInverse.copy( this.camera.projectionMatrix ).invert();
 
 	}
 
 	/**
-	 * Clears the view offset from the scene's camera.
+	 * Restores the original projection matrix of the scene's camera.
 	 */
 	clearViewOffset() {
 
-		this.camera.clearViewOffset();
+		if ( this._viewOffsetEnabled === false ) return;
+
+		this._viewOffsetEnabled = false;
+
+		this.camera.projectionMatrix.copy( this._originalProjectionMatrix );
+		this.camera.projectionMatrixInverse.copy( this._originalProjectionMatrix ).invert();
 
 		this._velocityNode.setProjectionMatrix( null );
 
@@ -366,6 +397,15 @@ class TRAANode extends Node {
 		const needsRestart = this._historyRenderTarget.width !== width || this._historyRenderTarget.height !== height;
 		this.setSize( width, height );
 
+		// swap history and resolve
+
+		const historyRenderTarget = this._historyRenderTarget;
+		this._historyRenderTarget = this._resolveRenderTarget;
+		this._resolveRenderTarget = historyRenderTarget;
+
+		this._historyTextureNode.value = this._historyRenderTarget.texture;
+		this._textureNode.value = this._resolveRenderTarget.texture;
+
 		// every time when the dimensions change we need fresh history data
 
 		if ( needsRestart === true ) {
@@ -385,10 +425,6 @@ class TRAANode extends Node {
 		_quadMesh.render( renderer );
 		renderer.setRenderTarget( null );
 
-		// update history
-
-		renderer.copyTextureToTexture( this._resolveRenderTarget.texture, this._historyRenderTarget.texture );
-
 		// Copy current depth to previous depth buffer
 
 		const size = renderer.getDrawingBufferSize( _size );
@@ -401,7 +437,7 @@ class TRAANode extends Node {
 		if ( this._historyRenderTarget.height === size.height && this._historyRenderTarget.width === size.width ) {
 
 			const currentDepth = this.depthNode.value;
-			renderer.copyTextureToTexture( currentDepth, this._historyRenderTarget.depthTexture );
+			renderer.copyTextureToTexture( currentDepth, this._previousDepthRenderTarget.depthTexture );
 
 		}
 
@@ -442,8 +478,8 @@ class TRAANode extends Node {
 
 		}
 
-		this._historyRenderTarget.depthTexture.format = this.depthNode.value.format;
-		this._historyRenderTarget.depthTexture.type = this.depthNode.value.type;
+		this._previousDepthRenderTarget.depthTexture.format = this.depthNode.value.format;
+		this._previousDepthRenderTarget.depthTexture.type = this.depthNode.value.type;
 
 		if ( builder.context.velocity !== undefined ) {
 
@@ -502,7 +538,7 @@ class TRAANode extends Node {
 
 		}, { velocityUV: 'vec2', textureSize: 'ivec2', return: 'float' } );
 
-		const historyNode = texture( this._historyRenderTarget.texture );
+		const historyNode = this._historyTextureNode;
 
 		const resolve = Fn( () => {
 
@@ -584,6 +620,7 @@ class TRAANode extends Node {
 
 		this._historyRenderTarget.dispose();
 		this._resolveRenderTarget.dispose();
+		this._previousDepthRenderTarget.dispose();
 
 		this._resolveMaterial.dispose();
 

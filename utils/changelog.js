@@ -14,10 +14,12 @@ const categoryPaths = [
 	// Main sections
 	[ 'utils/docs', 'Docs' ],
 	[ 'docs', 'Docs' ],
+	[ 'tsl', 'Docs' ],
 	[ 'manual', 'Manual' ],
 	[ 'devtools', 'Devtools' ],
 	[ 'editor', 'Editor' ],
 	[ 'test', 'Tests' ],
+	[ 'eslint.config.js', 'Tests' ],
 	[ 'playground', 'Playground' ],
 	[ 'utils', 'Utils' ],
 	[ 'build', 'Build' ],
@@ -37,7 +39,7 @@ const skipPatterns = [
 	/^(\w+:\s*)?Updated? package(-lock)?\.json/i,
 	/npm audit/i,
 	/^Update copyright year/i,
-	/^Update \w+\.js\.?$/i, // Generic "Update File.js" commits
+	/^Update [\w.]+\.\w+\.?$/i, // Generic "Update File.js" commits
 	/^Updated? docs\.?$/i,
 	/^Update REVISION/i,
 	/^r\d+(\s*\(bis\))*$/i
@@ -46,6 +48,9 @@ const skipPatterns = [
 // Authors to skip (bots)
 const skipAuthors = new Set( [ 'dependabot', 'app/renovate', 'renovate[bot]', 'github-advanced-security[bot]' ] );
 
+// Category for generic changes in each group, listed first
+const genericCategories = { core: 'Global', nodes: 'Nodes', addons: 'Addons', addonNodes: 'TSL' };
+
 // Categories that map to sections
 const sectionCategories = [ 'Docs', 'Manual', 'Examples', 'Devtools', 'Editor', 'Tests', 'Utils', 'Build', 'CI' ];
 
@@ -53,7 +58,7 @@ const sectionCategories = [ 'Docs', 'Manual', 'Examples', 'Devtools', 'Editor', 
 const sectionPrefixes = [
 	[ /^doc/i, 'Docs' ],
 	[ /^manual/i, 'Manual' ],
-	[ /^exampl/i, 'Examples' ],
+	[ /^exam/i, 'Examples' ],
 	[ /^devtools/i, 'Devtools' ],
 	[ /^editor/i, 'Editor' ],
 	[ /^(test|e2e|puppeteer)/i, 'Tests' ],
@@ -100,10 +105,36 @@ function getChangedFiles( hash ) {
 
 }
 
-function getCoAuthorsFromPR( prNumber ) {
+function getLandedPRs( ref ) {
 
-	const result = exec( 'gh', [ 'pr', 'view', prNumber, '--json', 'commits', '--jq', '[.commits[].authors[].login] | unique | .[]' ] );
-	return result ? result.split( '\n' ).filter( Boolean ) : [];
+	// PR numbers squash-merged into the history, e.g. "Fix ssl error (#27163)"
+	const subjects = exec( 'git', [ 'log', '--format=%s', ref ] );
+	return new Set( [ ...subjects.matchAll( /\(#(\d+)\)$/gm ) ].map( match => match[ 1 ] ) );
+
+}
+
+function isUpstreamCommit( headline, prNumber, landedPRs ) {
+
+	// Dev merged into the PR branch, or another PR that already landed on dev
+	if ( /^Merge /.test( headline ) ) return true;
+
+	const match = headline.match( /\(#(\d+)\)$/ );
+	return match !== null && match[ 1 ] !== prNumber && landedPRs.has( match[ 1 ] );
+
+}
+
+function getCommitAuthor( hash ) {
+
+	// GitHub login of the commit author, also works when the PR was deleted
+	return exec( 'gh', [ 'api', `repos/{owner}/{repo}/commits/${hash}`, '--jq', '.author.login // empty' ] );
+
+}
+
+function isCommentOnly( hash ) {
+
+	// Every changed line is a comment or blank, e.g. JSDoc-only changes
+	const lines = exec( 'git', [ 'show', '-U0', '--format=', hash ] ).split( '\n' ).filter( line => /^[+-]/.test( line ) && ! /^(\+\+\+|---) /.test( line ) );
+	return lines.length > 0 && lines.every( line => /^[+-]\s*(\*|\/\*|\/\/|$)/.test( line ) );
 
 }
 
@@ -125,7 +156,7 @@ function extractPRNumber( subject ) {
 
 function getPRInfo( prNumber ) {
 
-	const result = exec( 'gh', [ 'pr', 'view', prNumber, '--json', 'author,title,files', '--jq', '{author: .author.login, title: .title, files: [.files[].path]}' ] );
+	const result = exec( 'gh', [ 'pr', 'view', prNumber, '--json', 'author,title,files,commits', '--jq', '{author: .author.login, title: .title, files: [.files[].path], commits: [.commits[] | {headline: .messageHeadline, logins: [.authors[].login]}]}' ] );
 
 	try {
 
@@ -147,7 +178,11 @@ function categorizeFile( file ) {
 		// Skip barrel/index files
 		if ( /\/Three(\.\w+)?\.js$/.test( file ) ) return { category: 'Global' };
 
-		const match = file.match( /\/([^/]+)\.js$/ );
+		// Third-party libraries and shader chunks are grouped by folder
+		if ( file.startsWith( 'examples/jsm/libs/' ) ) return { category: 'Libs' };
+		if ( file.endsWith( '.glsl.js' ) ) return { category: file.split( '/' ).at( - 2 ) };
+
+		const match = file.match( /\/([^/.]+)[^/]*\.js$/ );
 		if ( match ) return { category: match[ 1 ] };
 
 	}
@@ -245,7 +280,18 @@ function extractCategoryFromTitle( title ) {
 
 	// Extract category from title prefix like "Object3D: Added pivot"
 	const match = title.match( /^([A-Za-z0-9_/]+):\s/ );
-	return match ? match[ 1 ] : null;
+
+	// Conventional commit types like "chore:" aren't categories
+	if ( ! match || /^(chore|feat|fix|refactor)$/i.test( match[ 1 ] ) ) return null;
+
+	return match[ 1 ];
+
+}
+
+function normalizeTitle( title ) {
+
+	// "Examples - Clean up" and "Utils : Clean up" become "Examples: Clean up", double spaces collapse
+	return title.replace( /\s+/g, ' ' ).replace( /^([A-Za-z0-9_/]+) [-:] /, '$1: ' );
 
 }
 
@@ -271,10 +317,13 @@ function cleanSubject( subject, category ) {
 	}
 
 	// Also remove common prefixes
-	cleaned = cleaned.replace( /^(Examples|Docs|Manual|Editor|Tests|Build|CI|Global|TSL|WebGLRenderer|WebGPURenderer|Renderer|Scripts|Utils):\s*/i, '' );
+	cleaned = normalizeTitle( cleaned.replace( /^(Examples|Docs|Manual|Editor|Tests|Build|CI|Global|Src|Addons|Nodes|TSL|WebGLRenderer|WebGPURenderer|Renderer|Scripts|Utils|Chore|Feat|Fix|Refactor):\s*/i, '' ) );
 
 	// Remove trailing period if present, we'll add it back
 	cleaned = cleaned.replace( /\.\s*$/, '' );
+
+	// Capitalize a lowercase first word like "add", but not identifiers like "mergeVertices()"
+	cleaned = cleaned.replace( /^[a-z]+(?=[\s,])/, word => word[ 0 ].toUpperCase() + word.slice( 1 ) );
 
 	return cleaned;
 
@@ -294,9 +343,9 @@ function normalizeAuthor( author ) {
 
 }
 
-function formatEntry( subject, prNumber, hash, author, coAuthors, category ) {
+function formatEntry( title, prNumber, hash, author, coAuthors ) {
 
-	let entry = `${cleanSubject( subject, category )}.`;
+	let entry = `${title}.`;
 
 	if ( prNumber ) {
 
@@ -399,7 +448,7 @@ function collectRevertedTitles( commits ) {
 
 }
 
-function processCommit( commit, revertedTitles ) {
+function processCommit( commit, revertedTitles, landedPRs ) {
 
 	// Skip reverts
 	if ( /^Revert "/.test( commit.subject ) ) return null;
@@ -417,6 +466,7 @@ function processCommit( commit, revertedTitles ) {
 	let author = null;
 	let subject = commit.subject;
 	let files = null;
+	let coAuthors = null;
 
 	if ( prNumber ) {
 
@@ -430,14 +480,22 @@ function processCommit( commit, revertedTitles ) {
 			author = prInfo.author;
 			if ( prInfo.title ) subject = prInfo.title;
 			if ( prInfo.files && prInfo.files.length > 0 ) files = prInfo.files;
+			// Co-authors only from the PR's own commits
+			const logins = prInfo.commits.filter( ( { headline } ) => ! isUpstreamCommit( headline, prNumber, landedPRs ) ).flatMap( ( { logins } ) => logins );
+			coAuthors = [ ...new Set( logins ) ].sort();
 
 		}
 
 	}
 
+	subject = normalizeTitle( subject );
+
 	// Fall back to git data
 	if ( ! files ) files = getChangedFiles( commit.hash );
-	if ( ! author ) author = commit.author;
+	if ( ! author ) author = getCommitAuthor( commit.hash ) || commit.author;
+
+	// package.json-only commits are dependency and npm maintenance
+	if ( files.length > 0 && files.every( file => /^package(-lock)?\.json$/.test( file ) ) ) return null;
 
 	// Skip commits from bots (check normalized name for git author fallback)
 	if ( skipAuthors.has( normalizeAuthor( author ) ) ) return null;
@@ -468,12 +526,15 @@ function processCommit( commit, revertedTitles ) {
 
 			}
 
+			// Generic prefixes like "Src:" or "Addons:" use the group's generic category
+			if ( group && /^(global|src|addons|nodes)$/i.test( category ) ) category = genericCategories[ group ];
+
 		}
 
 	}
 
-	// Route jsdoc/typo/docs-related commits to Docs section
-	if ( /\b(jsdoc|typo|spelling|documentation)\b/i.test( subject ) ) {
+	// Route jsdoc/typo/docs-related commits, and library commits that only change comments, to Docs section
+	if ( /\b(jsdoc|typo|spelling|documentation)\b/i.test( subject ) || ( ! section && isCommentOnly( commit.hash ) ) ) {
 
 		section = 'Docs';
 
@@ -482,15 +543,19 @@ function processCommit( commit, revertedTitles ) {
 	// Section entries are flat, so the section is what a title prefix is matched against
 	if ( section ) category = section;
 
-	const coAuthors = ( prNumber ? getCoAuthorsFromPR( prNumber ) : getCoAuthorsFromCommit( commit.hash ) ).filter( login => login !== author && ! skipAuthors.has( login ) );
+	if ( ! coAuthors ) coAuthors = getCoAuthorsFromCommit( commit.hash );
+	coAuthors = coAuthors.filter( login => login && login !== author && ! skipAuthors.has( login ) );
+	const title = cleanSubject( subject, category );
 
 	return {
 		entry: {
+			hash: commit.hash,
 			subject,
+			title,
 			prNumber,
 			author,
 			category,
-			formatted: formatEntry( subject, prNumber, commit.hash, author, coAuthors, category )
+			formatted: formatEntry( title, prNumber, commit.hash, author, coAuthors )
 		},
 		category,
 		group,
@@ -537,13 +602,13 @@ function formatOutput( version, groups, sections ) {
 	output += `https://github.com/mrdoob/three.js/milestone/${version - 87}?closed=1\n\n`;
 
 	// Core changes
-	output += formatGroups( groups.core, 'Global' );
+	output += formatGroups( groups.core, genericCategories.core );
 
 	// Node system changes in src/
 	if ( Object.keys( groups.nodes ).length > 0 ) {
 
 		output += '\n**Nodes**\n\n';
-		output += formatGroups( groups.nodes, 'Nodes' );
+		output += formatGroups( groups.nodes, genericCategories.nodes );
 
 	}
 
@@ -551,7 +616,7 @@ function formatOutput( version, groups, sections ) {
 	if ( Object.keys( groups.addons ).length > 0 ) {
 
 		output += '\n**Addons**\n\n';
-		output += formatGroups( groups.addons, 'Addons' );
+		output += formatGroups( groups.addons, genericCategories.addons );
 
 	}
 
@@ -559,7 +624,7 @@ function formatOutput( version, groups, sections ) {
 	if ( Object.keys( groups.addonNodes ).length > 0 ) {
 
 		output += '\n**Addons / Nodes**\n\n';
-		output += formatGroups( groups.addonNodes, 'TSL' );
+		output += formatGroups( groups.addonNodes, genericCategories.addonNodes );
 
 	}
 
@@ -604,6 +669,7 @@ function generateChangelog() {
 	console.error( `Found ${commits.length} commits\n` );
 
 	const revertedTitles = collectRevertedTitles( commits );
+	const landedPRs = getLandedPRs( tag );
 
 	// Group commits by category
 	const groups = { core: {}, nodes: {}, addons: {}, addonNodes: {} };
@@ -619,6 +685,7 @@ function generateChangelog() {
 		CI: []
 	};
 
+	const results = [];
 	let skipped = 0;
 	const total = commits.length;
 	const barWidth = 40;
@@ -632,9 +699,29 @@ function generateChangelog() {
 		const pct = Math.round( 100 * done / total );
 		process.stderr.write( `\r  ${bar} ${pct}% (${done}/${total})` );
 
-		const result = processCommit( commit, revertedTitles );
+		const result = processCommit( commit, revertedTitles, landedPRs );
 
-		if ( ! result ) {
+		if ( result ) {
+
+			results.push( result );
+
+		} else {
+
+			skipped ++;
+
+		}
+
+	}
+
+	process.stderr.write( '\n\n' );
+
+	// Direct commits whose PR was merged afterwards as an empty commit with the same title
+	const getKey = ( { entry, group, section } ) => `${section || group}/${entry.category}/${entry.title}`;
+	const prKeys = new Set( results.filter( result => result.entry.prNumber && getChangedFiles( result.entry.hash ).length === 0 ).map( getKey ) );
+
+	for ( const result of results ) {
+
+		if ( ! result.entry.prNumber && prKeys.has( getKey( result ) ) ) {
 
 			skipped ++;
 			continue;
@@ -654,8 +741,6 @@ function generateChangelog() {
 		}
 
 	}
-
-	process.stderr.write( '\n\n' );
 
 	if ( skipped > 0 ) {
 

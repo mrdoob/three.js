@@ -176,12 +176,19 @@ class Textures extends DataMap {
 
 			textureNeedsUpdate = true;
 
-			if ( depthTexture && depthTexture.renderTarget === renderTarget ) {
+		}
+
+		if ( depthTexture && depthTexture.renderTarget === renderTarget ) {
+
+			const image = depthTexture.image;
+
+			if ( textureNeedsUpdate === true || image.width !== mipWidth || image.height !== mipHeight ) {
+
+				image.width = mipWidth;
+				image.height = mipHeight;
+				image.depth = useArrayDepth ? size.depth : 1;
 
 				depthTexture.needsUpdate = true;
-				depthTexture.image.width = mipWidth;
-				depthTexture.image.height = mipHeight;
-				depthTexture.image.depth = useArrayDepth ? size.depth : 1;
 
 			}
 
@@ -428,6 +435,8 @@ class Textures extends DataMap {
 
 						backend.createTexture( texture, options );
 
+						if ( textureData.isDefaultTexture === true ) this.info.updateTexture( texture, options );
+
 						textureData.isDefaultTexture = false;
 						textureData.generation = texture.version;
 
@@ -474,7 +483,7 @@ class Textures extends DataMap {
 
 			//
 
-			this.info.createTexture( texture );
+			this.info.createTexture( texture, options );
 
 			//
 

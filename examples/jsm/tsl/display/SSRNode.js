@@ -16,6 +16,8 @@ const MAX_STEPS = 64;
  * @typedef {Object} SSRNodeOptions
  * @property {boolean} [stochastic=false] - When `false`, traces a single mirror reflection and softens roughness with a blur pass (first-generation SSR). When `true`, varies the reflection direction per pixel with stochastic GGX rays (second-generation SSR); higher quality on rough/glossy surfaces but noisier, so it expects a temporal/spatial denoiser downstream.
  * @property {Node<float>} [metalnessNode=null] - Per-pixel metalness. Drives GGX reflection sampling and, with `reflectNonMetals=false`, the non-metal early-out.
+ * @property {Node<vec3>} [specularNode=null] - Stochastic mode only: material normal-incidence reflectance (F0), typically an MRT `specularColorBlended` attachment (it already includes IOR, specular intensity and metalness; raw `material.specularColor` reflects too brightly). Defaults to the metalness/base-color approximation.
+ * @property {Node<float>} [specularF90Node=null] - Stochastic mode only: material grazing reflectance, typically an MRT `specularF90` attachment. Defaults to one.
  * @property {Node<float>} [roughnessNode=null] - Per-pixel roughness. Drives GGX sampling and the blur mip selection.
  * @property {boolean} [reflectNonMetals=false] - Only used when `stochastic=false`. When `false`, non-metallic surfaces are discarded for a noticeable performance gain; set `true` to also reflect dielectrics (e.g. marble, polished wood, plastic).
  * @property {Texture} [environmentNode=null] - Equirectangular HDR environment map with CPU-side `image.data` (e.g. from RGBELoader). Not compatible with PMREM / `scene.environment` cubemaps.
@@ -56,6 +58,8 @@ class SSRNode extends Node {
 		const {
 			stochastic = false,
 			metalnessNode = null,
+			specularNode = null,
+			specularF90Node = null,
 			roughnessNode = null,
 			reflectNonMetals = false,
 			environmentNode = null,
@@ -119,6 +123,26 @@ class SSRNode extends Node {
 		 * @type {?Node<float>}
 		 */
 		this.metalnessNode = metalnessNode;
+
+		/**
+		 * Stochastic mode only: per-pixel normal-incidence reflectance (F0), typically an MRT
+		 * `specularColorBlended` attachment, which already includes IOR, specular intensity and
+		 * metalness (raw `material.specularColor` reflects too brightly). When `null`, F0 is
+		 * derived from metalness and the diffuse color.
+		 *
+		 * @type {?Node<vec3>}
+		 * @default null
+		 */
+		this.specularNode = specularNode;
+
+		/**
+		 * Stochastic mode only: per-pixel grazing reflectance (F90), typically an MRT
+		 * `specularF90` attachment. When `null`, the shader uses `1`.
+		 *
+		 * @type {?Node<float>}
+		 * @default null
+		 */
+		this.specularF90Node = specularF90Node;
 
 		/**
 		 * Per-pixel roughness, used to drive the GGX reflection sampling and the blur mip
@@ -904,7 +928,6 @@ class SSRNode extends Node {
 			const V = viewIncidentDir.negate().normalize().toVar();
 
 			let viewReflectDir, finalSampleWeight, specDominantFactor;
-			const albedo = vec3( 1 ).toVar();
 			let sampleEnvReflection = null;
 
 			if ( this.stochastic === false ) {
@@ -919,13 +942,14 @@ class SSRNode extends Node {
 				// mirror bias trades the unbiased GGX lobe for lower variance
 				Xi.y.assign( mix( Xi.y, 0.0, this.mirrorBias.mul( Xi.w.sqrt() ) ) );
 
-				albedo.assign( ( this.diffuseNode !== null ? this.diffuseNode.sample( uvPos ).rgb : vec3( 1 ) ) );
-				const ggxSample = ggxReflectionSample( viewNormal, V, roughness, metalness, albedo, Xi ).toVar();
+				// The base color only feeds the metalness F0 fallback.
+				const albedo = ( this.specularNode === null && this.diffuseNode !== null ? this.diffuseNode.sample( uvPos ).rgb : vec3( 1 ) ).toVar();
+				const ggxSample = ggxReflectionSample( viewNormal, V, roughness, metalness, albedo, Xi, this.specularNode, this.specularF90Node ?? 1 ).toVar();
 
 				// Sometimes the GGX sample is facing away from the surface, so we need to re-sample.
 				If( ggxSample.get( 'reflectDir' ).dot( viewNormal ).lessThan( 0 ), () => {
 
-					ggxSample.assign( ggxReflectionSample( viewNormal, V, roughness, metalness, albedo, Xi.add( Xi.mul( 7 ) ).fract() ) );
+					ggxSample.assign( ggxReflectionSample( viewNormal, V, roughness, metalness, albedo, Xi.add( Xi.mul( 7 ) ).fract(), this.specularNode, this.specularF90Node ?? 1 ) );
 
 				} );
 
@@ -950,6 +974,7 @@ class SSRNode extends Node {
 							V,
 							alpha: ggxSample.get( 'alpha' ),
 							f0: ggxSample.get( 'f0' ),
+							f90: ggxSample.get( 'f90' ),
 							Xi2
 						} ) );
 
@@ -961,7 +986,8 @@ class SSRNode extends Node {
 							N: viewNormal,
 							V,
 							alpha: ggxSample.get( 'alpha' ),
-							f0: ggxSample.get( 'f0' )
+							f0: ggxSample.get( 'f0' ),
+							f90: ggxSample.get( 'f90' )
 						} ) );
 
 					}
@@ -1031,6 +1057,24 @@ class SSRNode extends Node {
 			const d0 = uvPos.mul( this._resolution ).xy.toVar();
 			const d1 = getScreenPosition( d1viewPosition, this._cameraProjectionMatrix ).mul( this._resolution ).toVar();
 
+			// clip the ray to the screen so all steps land on visible texels
+
+			const extent = d1.sub( d0 ).toVar();
+			const exitT = vec2(
+				extent.x.greaterThanEqual( 0 ).select( this._resolution.x.sub( d0.x ), d0.x ),
+				extent.y.greaterThanEqual( 0 ).select( this._resolution.y.sub( d0.y ), d0.y )
+			).div( extent.abs().max( 1e-6 ) );
+			const clipT = min( exitT.x, exitT.y ).min( 1 ).toConst();
+
+			If( clipT.lessThan( 1 ), () => {
+
+				d1.assign( d0.add( extent.mul( clipT ) ) );
+				d1viewPosition.assign( this.camera.isPerspectiveCamera
+					? mix( viewPosition.div( viewPosition.z ), d1viewPosition.div( d1viewPosition.z ), clipT ).div( mix( viewPosition.z.reciprocal(), d1viewPosition.z.reciprocal(), clipT ) )
+					: mix( viewPosition, d1viewPosition, clipT ) );
+
+			} );
+
 			const xLen = d1.x.sub( d0.x ).toVar();
 			const yLen = d1.y.sub( d0.y ).toVar();
 
@@ -1063,6 +1107,12 @@ class SSRNode extends Node {
 			const reflectRayZAt = this.camera.isPerspectiveCamera
 				? ( sVal ) => float( 1 ).div( recipVPZ.add( sVal.mul( recipD1VPZ.sub( recipVPZ ) ) ) )
 				: ( sVal ) => viewPosition.z.add( sVal.mul( d1viewPosition.z.sub( viewPosition.z ) ) );
+
+			// view-space point on the reflected ray at s
+
+			const rayPointAt = this.camera.isPerspectiveCamera
+				? ( sVal ) => mix( viewPosition.div( viewPosition.z ), d1viewPosition.div( d1viewPosition.z ), sVal ).mul( reflectRayZAt( sVal ) )
+				: ( sVal ) => mix( viewPosition, d1viewPosition, sVal );
 
 			// Screen-space position along the ray for a given s ∈ [0,1].
 			const screenPosAt = ( sVal ) => d0.add( stepVec.mul( sVal.mul( totalStep ) ) );
@@ -1131,7 +1181,10 @@ class SSRNode extends Node {
 					const uvNeighbor = uvS.add( uvPixelStepX ).toVar();
 					const vPNeighbor = getViewPosition( uvNeighbor, d, this._cameraProjectionMatrixInverse ).toVar();
 					const minThickness = vPNeighbor.x.sub( vP.x ).mul( 3 ).toVar();
-					const tk = max( minThickness, this.thickness ).toVar();
+					// Only refinement may use a wider coarse tolerance.
+
+					const stepLength = distance( rayPointAt( lastS ), rayPointAt( s ) );
+					const tk = ( this.binaryRefine ? max( max( minThickness, this.thickness ), stepLength ) : max( minThickness, this.thickness ) ).toVar();
 
 					If( away.lessThanEqual( tk ), () => {
 
@@ -1194,9 +1247,11 @@ class SSRNode extends Node {
 						Loop( { start: int( 0 ), end: int( 8 ), type: 'int', condition: '<' }, () => {
 
 							const sMid = hitSLo.add( hitSHi ).mul( 0.5 ).toVar();
-							const sceneZMid = getViewZ( sampleDepth( screenPosAt( sMid ).mul( invResolution ) ) );
+							const uvMid = screenPosAt( sMid ).mul( invResolution ).toConst();
+							const sceneZMid = getViewZ( sampleDepth( uvMid ) );
+							const frontFacing = dot( viewReflectDir, this.normalNode.sample( uvMid ).rgb.normalize() ).lessThan( 0 );
 
-							If( reflectRayZAt( sMid ).lessThanEqual( sceneZMid ), () => {
+							If( reflectRayZAt( sMid ).lessThanEqual( sceneZMid ).and( frontFacing ), () => {
 
 								hitSHi.assign( sMid );
 

@@ -152,7 +152,7 @@ Default is `(1,1,1)`.
 
 ### .static : boolean
 
-Whether the 3D object is supposed to be static or not. If set to `true`, it means the 3D object is not going to be changed after the initial renderer. This includes geometry and material settings. A static 3D object can be processed by the renderer slightly faster since certain state checks can be bypassed.
+Whether the 3D object is supposed to be static or not. If set to `true`, it means the 3D object is not going to be changed after the first render. This includes geometry and material settings. A static 3D object can be processed by the renderer slightly faster since certain state checks can be bypassed.
 
 Only relevant in context of [WebGPURenderer](WebGPURenderer.html).
 
@@ -181,6 +181,8 @@ The UUID of the 3D object.
 When set to `true`, the 3D object gets rendered.
 
 Default is `true`.
+
+## Static Properties
 
 ### .DEFAULT_MATRIX_AUTO_UPDATE : boolean
 
@@ -391,9 +393,9 @@ The target vector the result is stored to.
 
 **Returns:** The 3D object's scale in world space.
 
-### .intersectsFrustum( frustum : Frustum | FrustumArray ) : boolean | undefined (abstract)
+### .intersectsFrustum( frustum : Frustum | FrustumArray ) : boolean
 
-Abstract method to test whether this 3D object intersects the given frustum. Renderable 3D objects such as [Mesh](Mesh.html), [Line](Line.html) or [Points](Points.html) implement this method in order to use frustum culling.
+Returns `true` if this 3D object intersects the given frustum. Renderable 3D objects such as [Mesh](Mesh.html), [Line](Line.html) or [Points](Points.html) override this method in order to use frustum culling. The default implementation always returns `true`.
 
 **frustum**
 
@@ -429,7 +431,7 @@ The y coordinate in world space.
 
 The z coordinate in world space.
 
-### .onAfterRender( renderer : Renderer | WebGLRenderer, object : Object3D, camera : Camera, geometry : BufferGeometry, material : Material, group : Object )
+### .onAfterRender( renderer : Renderer | WebGLRenderer, scene : Object3D, camera : Camera, geometry : BufferGeometry, material : Material, group : Object )
 
 A callback that is executed immediately after a 3D object is rendered.
 
@@ -437,9 +439,9 @@ A callback that is executed immediately after a 3D object is rendered.
 
 The renderer.
 
-**object**
+**scene**
 
-The 3D object.
+The scene.
 
 **camera**
 
@@ -489,7 +491,7 @@ The depth material.
 
 The geometry group data.
 
-### .onBeforeRender( renderer : Renderer | WebGLRenderer, object : Object3D, camera : Camera, geometry : BufferGeometry, material : Material, group : Object )
+### .onBeforeRender( renderer : Renderer | WebGLRenderer, scene : Object3D, camera : Camera, geometry : BufferGeometry, material : Material, group : Object )
 
 A callback that is executed immediately before a 3D object is rendered.
 
@@ -497,9 +499,9 @@ A callback that is executed immediately before a 3D object is rendered.
 
 The renderer.
 
-**object**
+**scene**
 
-The 3D object.
+The scene.
 
 **camera**
 

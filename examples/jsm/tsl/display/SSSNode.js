@@ -37,7 +37,7 @@ let _rendererState;
  * are currently visible within the camera's view.
  *
  * References:
- * - {@link https://panoskarabelas.com/posts/screen_space_shadows/}.
+ * - {@link https://panoskarabelas.com/blog/posts/screen_space_shadows/}.
  * - {@link https://www.bendstudio.com/blog/inside-bend-screen-space-shadows/}.
  *
  * @augments Node

@@ -728,7 +728,7 @@ Returns the maximum available precision for vertex and fragment shaders.
 **logarithmicDepthBuffer**  
 boolean
 
-`true` if `logarithmicDepthBuffer` was set to `true` in the constructor.
+`true` if `logarithmicDepthBuffer` was set to `true` in the constructor and no reversed depth buffer is in use.
 
 **maxAttributes**  
 number
@@ -943,7 +943,7 @@ Default is `true`.
 **logarithmicDepthBuffer**  
 boolean
 
-Whether to use a logarithmic depth buffer. It may be necessary to use this if dealing with huge differences in scale in a single scene. Note that this setting uses `gl_FragDepth` if available which disables the Early Fragment Test optimization and can cause a decrease in performance.
+Whether to use a logarithmic depth buffer. It may be necessary to use this if dealing with huge differences in scale in a single scene. Note that this setting uses `gl_FragDepth` if available which disables the Early Fragment Test optimization and can cause a decrease in performance. It is ignored when a reversed depth buffer is in use.
 
 Default is `false`.
 

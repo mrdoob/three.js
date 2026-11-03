@@ -1,4 +1,4 @@
-*Inheritance: EventDispatcher → Node → TempNode →*
+*Inheritance: EventDispatcher → Node →*
 
 # MathNode
 
@@ -72,7 +72,7 @@ The selected method as well as the input type determine the node type of this no
 
 The current node builder.
 
-**Overrides:** [TempNode#generateNodeType](TempNode.html#generateNodeType)
+**Overrides:** [Node#generateNodeType](Node.html#generateNodeType)
 
 **Returns:** The node type.
 

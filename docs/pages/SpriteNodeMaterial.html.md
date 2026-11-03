@@ -22,7 +22,7 @@ This flag can be used for type testing.
 
 Default is `true`.
 
-### .positionNode : Node.<vec2>
+### .positionNode : Node.<vec3>
 
 This property makes it possible to define the position of the sprite with a node. That can be useful when the material is used with instanced rendering and node data are defined with an instanced attribute node:
 

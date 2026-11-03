@@ -88,6 +88,7 @@ export * from './accessors/ReflectVector.js';
 export * from './accessors/Skinning.js';
 export * from './accessors/SceneProperties.js';
 export * from './accessors/StorageBufferNode.js';
+export * from './accessors/StorageStructNode.js';
 export * from './accessors/StorageTexture3DNode.js';
 export * from './accessors/StorageTextureNode.js';
 export * from './accessors/Tangent.js';

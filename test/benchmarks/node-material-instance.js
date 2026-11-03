@@ -2,12 +2,12 @@ import assert from 'node:assert/strict';
 import puppeteer from 'puppeteer';
 import { createServer } from '../../utils/server.js';
 
-// Run from the repository root with: npm run benchmark-proxy-node-material
+// Run from the repository root with: npm run benchmark-node-material-instance
 // Rotate ordering to reduce the effect of browser and driver warm-up.
 const runs = 3;
 const modes = [
 	{ name: 'node material', page: 'node-material', builds: 10000 },
-	{ name: 'proxy material', page: 'proxy-material', builds: 1 },
+	{ name: 'material instance', page: 'material-instance', builds: 1 },
 	{ name: 'shader material', page: 'shader-material', webgl: true }
 ];
 const metrics = {
@@ -33,7 +33,7 @@ try {
 			const page = await browser.newPage();
 			const errors = [];
 			page.on( 'pageerror', error => errors.push( error.message ) );
-			await page.goto( `http://localhost:${ server.address().port }/test/benchmarks/proxy-node-material/${ mode.page }.html` );
+			await page.goto( `http://localhost:${ server.address().port }/test/benchmarks/node-material-instance/${ mode.page }.html` );
 			await page.waitForFunction( () => window.benchmarkResults !== undefined, { timeout: 120000 } );
 			await page.click( '#update' );
 			await page.waitForFunction( () => window.benchmarkResults.uniformRender !== undefined );

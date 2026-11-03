@@ -1,4 +1,4 @@
-*Inheritance: EventDispatcher → Node → TempNode → PassNode →*
+*Inheritance: EventDispatcher → Node → PassNode →*
 
 # StereoCompositePassNode
 

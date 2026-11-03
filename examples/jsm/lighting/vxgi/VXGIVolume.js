@@ -495,7 +495,7 @@ class VXGIVolume {
 		if ( this._triangleAttribute !== null ) this._triangleAttribute.dispose();
 
 		this._triangleAttribute = new StorageBufferAttribute( count > 0 ? data : new Float32Array( TRIANGLE_STRIDE ), 4 );
-		this._trianglesNode = storage( this._triangleAttribute, 'vec4', this._triangleAttribute.count ).toReadOnly();
+		this._trianglesNode = storage( this._triangleAttribute, 'vec4' ).toReadOnly();
 
 		const solid = this._solidAttribute.array;
 
@@ -927,8 +927,8 @@ class VXGIVolume {
 
 	_createClearKernel() {
 
-		const occupancy = storage( this._occupancyAttribute, 'uint', this._voxelCount );
-		const triangleIds = storage( this._triangleIdAttribute, 'uint', this._voxelCount );
+		const occupancy = storage( this._occupancyAttribute, 'uint' );
+		const triangleIds = storage( this._triangleIdAttribute, 'uint' );
 		const voxelCount = this._voxelCountNode;
 
 		return Fn( () => {
@@ -946,8 +946,8 @@ class VXGIVolume {
 
 	_createVoxelizeKernel() {
 
-		const occupancy = storage( this._occupancyAttribute, 'uint', this._voxelCount ).toAtomic();
-		const triangleIds = storage( this._triangleIdAttribute, 'uint', this._voxelCount );
+		const occupancy = storage( this._occupancyAttribute, 'uint' ).toAtomic();
+		const triangleIds = storage( this._triangleIdAttribute, 'uint' );
 		const triangles = this._trianglesNode;
 		const triangleCount = this._triangleCountNode;
 		const boundsMin = this.boundsMinNode;
@@ -1054,8 +1054,8 @@ class VXGIVolume {
 
 	_createResolveKernel() {
 
-		const occupancy = storage( this._occupancyAttribute, 'uint', this._voxelCount ).toReadOnly();
-		const solid = storage( this._solidAttribute, 'uint', this._solidAttribute.count ).toReadOnly();
+		const occupancy = storage( this._occupancyAttribute, 'uint' ).toReadOnly();
+		const solid = storage( this._solidAttribute, 'uint' ).toReadOnly();
 		const opacityTexture = this.opacityTexture;
 		const voxelCount = this._voxelCountNode;
 		const size = this._getLevelSize( 0 );
@@ -1309,8 +1309,8 @@ class VXGIVolume {
 
 	_createInjectKernel( renderer, index ) {
 
-		const occupancy = storage( this._occupancyAttribute, 'uint', this._voxelCount ).toReadOnly();
-		const triangleIds = storage( this._triangleIdAttribute, 'uint', this._voxelCount ).toReadOnly();
+		const occupancy = storage( this._occupancyAttribute, 'uint' ).toReadOnly();
+		const triangleIds = storage( this._triangleIdAttribute, 'uint' ).toReadOnly();
 		const voxelCount = this._voxelCountNode;
 		const size = this._getLevelSize( 0 );
 		const voxelSize = this.voxelSizeNode;
@@ -1483,8 +1483,8 @@ class VXGIVolume {
 
 	_createBounceKernel( index ) {
 
-		const occupancy = storage( this._occupancyAttribute, 'uint', this._voxelCount ).toReadOnly();
-		const triangleIds = storage( this._triangleIdAttribute, 'uint', this._voxelCount ).toReadOnly();
+		const occupancy = storage( this._occupancyAttribute, 'uint' ).toReadOnly();
+		const triangleIds = storage( this._triangleIdAttribute, 'uint' ).toReadOnly();
 		const voxelCount = this._voxelCountNode;
 		const size = this._getLevelSize( 0 );
 		const voxelSize = this.voxelSizeNode;

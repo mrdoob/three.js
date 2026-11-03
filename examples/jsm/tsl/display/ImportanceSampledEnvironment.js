@@ -415,6 +415,7 @@ class ImportanceSampledEnvironment {
 	 * @param {Node<vec3>} params.V - View-space direction to camera.
 	 * @param {Node<float>} params.alpha - GGX roughness (alpha).
 	 * @param {Node<vec3>} params.f0
+	 * @param {Node<float>} [params.f90=1] - Grazing reflectance.
 	 * @return {Node<vec3>}
 	 */
 	sampleEnvironmentBRDF( {
@@ -423,7 +424,8 @@ class ImportanceSampledEnvironment {
 		N,
 		V,
 		alpha,
-		f0
+		f0,
+		f90 = float( 1 )
 	} ) {
 
 		const worldNormal = cameraWorldMatrix.mul( vec4( N, 0 ) ).xyz.normalize().toVar();
@@ -440,7 +442,7 @@ class ImportanceSampledEnvironment {
 		const NdotL1 = max( float( 0 ), dot( worldNormal, L1 ) ).toVar();
 		const VdotH1 = max( float( 0 ), dot( worldV, H1 ) ).toVar();
 
-		const W1 = F_Schlick( f0, VdotH1 ).mul( GeometryTerm( NdotL1, NdotV, alpha ) ).div( SmithG( NdotV, alpha ).max( float( 1e-4 ) ) );
+		const W1 = F_Schlick( f0, VdotH1, f90 ).mul( GeometryTerm( NdotL1, NdotV, alpha ) ).div( SmithG( NdotV, alpha ).max( float( 1e-4 ) ) );
 
 		return brdfEnvColor.mul( W1 ).mul( this.intensity );
 
@@ -461,6 +463,7 @@ class ImportanceSampledEnvironment {
 	 * @param {Node<vec3>} params.V - View-space direction to camera.
 	 * @param {Node<float>} params.alpha - GGX roughness (alpha).
 	 * @param {Node<vec3>} params.f0
+	 * @param {Node<float>} [params.f90=1] - Grazing reflectance.
 	 * @param {Node<vec4>} params.Xi2 - Second blue-noise sample (zw used for the CDF).
 	 * @return {Node<vec3>}
 	 */
@@ -471,6 +474,7 @@ class ImportanceSampledEnvironment {
 		V,
 		alpha,
 		f0,
+		f90 = float( 1 ),
 		Xi2
 	} ) {
 
@@ -503,7 +507,7 @@ class ImportanceSampledEnvironment {
 
 		// Monte-Carlo weight f·cosθ/pdfBrdf1 = F·G1(N·L) (GGX D cancels analytically — stable at low
 		// roughness). G2 and the pdf's G1 must use the same alpha for the cancellation to hold.
-		const W1 = F_Schlick( f0, VdotH1 ).mul( GeometryTerm( NdotL1, NdotV, alpha ) ).div( SmithG( NdotV, alpha ).max( float( 1e-4 ) ) );
+		const W1 = F_Schlick( f0, VdotH1, f90 ).mul( GeometryTerm( NdotL1, NdotV, alpha ) ).div( SmithG( NdotV, alpha ).max( float( 1e-4 ) ) );
 		const result = brdfEnvColor.mul( W1 ).mul( w1 ).toVar();
 
 		// MIS sample 2: the env-luminance CDF direction
@@ -537,7 +541,7 @@ class ImportanceSampledEnvironment {
 
 				// Specular BRDF (without Fresnel): D·G2 / (4·N·L·N·V), reusing D. Same GGX alpha as the pdf.
 				const envBrdfSpec = D.mul( GeometryTerm( envNdotL, NdotV, alpha ) ).div( max( float( 1e-6 ), float( 4 ).mul( envNdotL ).mul( NdotV ) ) );
-				const envFresnelWeight = F_Schlick( f0, envVdotH ); // vec3 — chromatic metal tint
+				const envFresnelWeight = F_Schlick( f0, envVdotH, f90 ); // vec3 — chromatic metal tint
 
 				result.addAssign( sampledColor.mul( envBrdfSpec ).mul( envFresnelWeight ).mul( envNdotL ).div( pdfEnv2 ).mul( w2 ) );
 

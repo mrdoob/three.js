@@ -1,8 +1,10 @@
-*Inheritance: EventDispatcher → Node → TempNode → PassNode →*
+*Inheritance: EventDispatcher → Node → PassNode →*
 
 # PixelationPassNode
 
-A special render pass node that renders the scene with a pixelation effect.
+A special render pass node that renders the scene with a pixelation effect, creating a visual presentation similar to that of a 2D pixel art game.
+
+The effect is achieved by rendering into a render target whose dimensions are scaled down by [PixelationPassNode#pixelSize](PixelationPassNode.html#pixelSize).
 
 ## Import
 
@@ -14,7 +16,7 @@ import { pixelationPass } from 'three/addons/tsl/display/PixelationPassNode.js';
 
 ## Constructor
 
-### new PixelationPassNode( scene : Scene, camera : Camera, pixelSize : Node.<float> | number, normalEdgeStrength : Node.<float> | number, depthEdgeStrength : Node.<float> | number )
+### new PixelationPassNode( scene : Scene, camera : Camera, pixelSize : number, normalEdgeStrength : Node.<float> | number, depthEdgeStrength : Node.<float> | number )
 
 Constructs a new pixelation pass node.
 
@@ -46,7 +48,7 @@ Default is `0.4`.
 
 ## Properties
 
-### .depthEdgeStrength : number
+### .depthEdgeStrength : Node.<float>
 
 The depth edge strength.
 
@@ -58,7 +60,7 @@ This flag can be used for type testing.
 
 Default is `true`.
 
-### .normalEdgeStrength : number
+### .normalEdgeStrength : Node.<float>
 
 The normal edge strength.
 
@@ -66,7 +68,7 @@ Default is `0.3`.
 
 ### .pixelSize : number
 
-The pixel size.
+The pixel size. This value scales the pass's render target.
 
 Default is `6`.
 
@@ -75,6 +77,8 @@ Default is `6`.
 ### .setSize( width : number, height : number )
 
 Sets the size of the pass.
+
+`PassNode.updateBefore()` calls this method once per frame, so [PixelationPassNode#pixelSize](PixelationPassNode.html#pixelSize) can be changed at any time.
 
 **width**
 
@@ -86,7 +90,7 @@ The height of the pass.
 
 **Overrides:** [PassNode#setSize](PassNode.html#setSize)
 
-### .setup( builder : NodeBuilder ) : PixelationNode
+### .setup( builder : NodeBuilder ) : ShaderCallNodeInternal
 
 This method is used to setup the effect's TSL code.
 
