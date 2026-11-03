@@ -1,7 +1,8 @@
 import { attribute } from '../core/AttributeNode.js';
 import { cameraWorldMatrix } from './Camera.js';
 import { modelViewMatrix } from './ModelNode.js';
-import { Fn, vec4 } from '../tsl/TSLBase.js';
+import { Fn, vec3, vec4, select, abs, lengthSq } from '../tsl/TSLBase.js';
+import { normalGeometry } from './Normal.js';
 import { tangentViewFrame } from './TangentUtils.js';
 import { negateOnBackSide } from '../display/FrontFacingNode.js';
 
@@ -19,7 +20,13 @@ export const tangentGeometry = /*@__PURE__*/ attribute( 'tangent', 'vec4' );
  * @tsl
  * @type {Node<vec3>}
  */
-export const tangentLocal = /*@__PURE__*/ tangentGeometry.xyz.toVar( 'tangentLocal' );
+export const tangentLocal = /*@__PURE__*/ select(
+	lengthSq( tangentGeometry.xyz ).greaterThan( 0 ),
+	tangentGeometry.xyz,
+	// a zero-length tangent, as left where a vertex's uvs are degenerate, would normalize to NaN, so
+	// any direction perpendicular to the normal is used instead
+	normalGeometry.cross( select( abs( normalGeometry.x ).lessThan( 0.9 ), vec3( 1, 0, 0 ), vec3( 0, 1, 0 ) ) )
+).toVar( 'tangentLocal' );
 
 /**
  * TSL object that represents the vertex tangent in view space of the current rendered object.
