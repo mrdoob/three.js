@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   test:
-    name: Lint, Unit, Unit addons, Circular dependencies & Examples testing
+    name: Lint, Circular dependencies & Examples testing
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -30,17 +30,11 @@ jobs:
       - name: === Lint testing ===
         run: npm run lint
 
-      - name: === Unit testing ===
-        run: npm run test-unit
-
-      - name: === Unit addons testing ===
-        run: npm run test-unit-addons
-
       - name: === Examples ready for release ===
         run: npm run test-e2e-cov
 
-  unit-gpu:
-    name: Unit browser & GPU testing
+  unit:
+    name: Unit & Unit addons testing
     runs-on: macos-latest
     permissions:
       contents: read
@@ -57,11 +51,11 @@ jobs:
       - name: Install Chromium
         run: npx playwright install chromium
 
-      - name: === Unit browser testing ===
-        run: npm run test-unit-browser
+      - name: === Unit testing ===
+        run: npm run test-unit
 
-      - name: === Unit GPU testing ===
-        run: npm run test-unit-gpu
+      - name: === Unit addons testing ===
+        run: npm run test-unit-addons
 
   e2e:
     name: E2E testing

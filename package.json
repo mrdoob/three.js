@@ -43,7 +43,7 @@
   ],
   "scripts": {
     "start": "npm run dev",
-    "test": "npm run lint && vitest",
+    "test": "npm run lint && npm run test-unit && npm run test-unit-addons",
     "build": "rollup -c utils/build/rollup.config.js",
     "build-docs": "jsdoc -c utils/docs/jsdoc.config.json && npm run build-llms",
     "build-llms": "node utils/llms/build.js",
@@ -59,19 +59,17 @@
     "lint-tsl": "eslint tsl",
     "lint": "npm run lint-core",
     "lint-fix": "npm run lint-core -- --fix && npm run lint-addons -- --fix && npm run lint-examples -- --fix && npm run lint-editor -- --fix && npm run lint-manual -- --fix && npm run lint-test -- --fix && npm run lint-utils -- --fix && npm run lint-tsl -- --fix",
-    "test-unit": "vitest --project unit",
+    "test-unit": "vitest --project unit --project unit-browser --project webgl --project webgpu",
     "benchmark-node-material-instance": "node test/benchmarks/node-material-instance.js",
-    "test-unit-headful": "vitest --project unit --project browser --browser.headless=false",
-    "test-unit-addons": "vitest --project addons",
-    "test-unit-addons-headful": "vitest --project addons --project browser --browser.headless=false",
+    "test-unit-headful": "vitest --project unit --project unit-browser --project webgl --project webgpu --browser.headless=false",
+    "test-unit-addons": "vitest --project addons --project addons-browser",
+    "test-unit-addons-headful": "vitest --project addons --project addons-browser --browser.headless=false",
     "test-e2e": "node test/e2e/playwright.js",
     "test-e2e-cov": "node test/e2e/check-coverage.js",
     "test-e2e-webgpu": "node test/e2e/playwright.js --webgpu",
     "test-treeshake": "rollup -c test/rollup.treeshake.config.js",
     "make-screenshot": "node test/e2e/playwright.js --make",
-    "make-tsl-reference": "node test/unit/tsl/make.js",
-    "test-unit-browser": "vitest --project browser",
-    "test-unit-gpu": "vitest --project webgl --project webgpu"
+    "make-tsl-reference": "node test/unit/tsl/make.js"
   },
   "keywords": [
     "three",

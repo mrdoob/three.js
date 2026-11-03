@@ -11,13 +11,11 @@ Unit tests use [Vitest](https://vitest.dev/) and import the source files directl
 
 | Command | Runs |
 | --- | --- |
-| `npm run test-unit` | Core tests in Node |
-| `npm run test-unit-addons` | Addon tests in Node |
-| `npm run test-unit-browser` | Tests that need a browser, in Chromium |
-| `npm run test-unit-gpu` | WebGL and WebGPU tests on the GPU, in Chromium |
+| `npm run test-unit` | Core tests: Node, plus Chromium for browser and WebGL/WebGPU tests |
+| `npm run test-unit-addons` | Addon tests: Node, plus Chromium for browser tests |
 | `npm test` | Lint and all of the above |
 
-The `-headful` variants of `test-unit` and `test-unit-addons` also run the browser tests in a visible window.
+The `-headful` variants run the browser tests in a visible window. A single Vitest project can be run with `npx vitest --project <name>` (see `vitest.config.js`).
 
 Vitest options can be passed after `--`, for example `npm run test-unit -- --watch test/unit/src/math/Vector3.tests.js`.
 
@@ -25,7 +23,7 @@ Vitest options can be passed after `--`, for example `npm run test-unit -- --wat
 
 Test files are discovered automatically: any `*.tests.js` file is picked up, so there is no import list to maintain.
 
-Tests that need browser APIs (such as `DOMParser` or image decoding) are listed in `browserTests` in `vitest.config.js`.
+Tests that need browser APIs (such as `DOMParser` or image decoding) are listed in `browserTests` and `addonsBrowserTests` in `vitest.config.js`.
 
 GPU tests need a real GPU. WebGL skips tests that need WebGPU-only features.
 
