@@ -608,7 +608,6 @@ class TemporalReprojectNode extends Node {
 
 	setViewOffset() {
 
-		this.camera.updateProjectionMatrix();
 		this._originalProjectionMatrix.copy( this.camera.projectionMatrix );
 		velocity.setProjectionMatrix( this._originalProjectionMatrix );
 

@@ -7,6 +7,7 @@ export const exceptionList = [
 	'webgl_materials_cubemap_dynamic', 	// 1 min
 	'webgl_materials_displacementmap', 	// 1 min
 	'webgl_materials_envmaps_hdr', 		// 1 min
+	'webgpu_loader_vdb',				// streams 31 MB of frames
 	'webgpu_water', 					// 1 min
 
 	// Requires HTML-in-Canvas API

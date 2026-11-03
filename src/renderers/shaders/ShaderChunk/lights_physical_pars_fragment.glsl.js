@@ -388,7 +388,7 @@ vec3 LTC_Evaluate( const in vec3 N, const in vec3 V, const in vec3 P, const in m
 
 #if defined( USE_SHEEN )
 
-// https://github.com/google/filament/blob/master/shaders/src/brdf.fs
+// https://github.com/google/filament/blob/main/shaders/src/surface_brdf.fs
 float D_Charlie( float roughness, float dotNH ) {
 
 	float alpha = pow2( roughness );
@@ -402,7 +402,7 @@ float D_Charlie( float roughness, float dotNH ) {
 
 }
 
-// https://github.com/google/filament/blob/master/shaders/src/brdf.fs
+// https://github.com/google/filament/blob/main/shaders/src/surface_brdf.fs
 float V_Neubelt( float dotNV, float dotNL ) {
 
 	// Neubelt and Pettineo 2013, "Crafting a Next-gen Material Pipeline for The Order: 1886"

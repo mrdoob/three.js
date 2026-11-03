@@ -347,7 +347,6 @@
 
 			// Total number of elements and the dimensions of the display grid.
 			const size = 262144;
-			const vecSize = divRoundUp( size, 4 );
 			// Grid display is gridDim x gridDim
 			const gridDim = Math.sqrt( size );
 			let maxWorkgroupSize = 64;
@@ -675,7 +674,8 @@
 
 				const fnDef = Fn( () => {
 
-					const inputSize = uint( inputBuffer.bufferCount );
+					// TODO: read the length in the shader once TSL supports WGSL's "arrayLength"
+					const inputSize = uint( inputBuffer.value.count );
 					const rowOffset = workgroupId.x.mul( rowSize );
 
 					// If the current rows elements exceed the bounds of the input
@@ -937,7 +937,7 @@
 				const inputStorage = instancedArray( array, 'uint' ).setPBO( true ).setName( `Current_${leftSideDisplay ? 'Left' : 'Right'}` );
 				// Represents array of data as vec4s in compute shader;
 				const inputVec4BufferAttribute = new THREE.StorageInstancedBufferAttribute( array, 4 );
-				const inputVectorizedStorage = storage( inputVec4BufferAttribute, 'uvec4', vecSize ).setPBO( true ).setName( `CurrentVectorized_${leftSideDisplay ? 'Left' : 'Right'}` );
+				const inputVectorizedStorage = storage( inputVec4BufferAttribute, 'uvec4' ).setPBO( true ).setName( `CurrentVectorized_${leftSideDisplay ? 'Left' : 'Right'}` );
 
 				// Reduce 3 Calculations
 				const workPerThread = 4;

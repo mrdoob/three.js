@@ -1,6 +1,6 @@
 # Unit tests
 
-Use Node 24 and install dependencies with `npm ci`. Tests import current source files. No build or manually started server is required.
+Use Node 26 and install dependencies with `npm ci`. Tests import current source files. No build or manually started server is required.
 
 | Command | Environment |
 | --- | --- |
@@ -18,7 +18,7 @@ The restored headful entry points run their CPU project alongside the shared bro
 
 Tests use native Vitest `describe`, `test`, hooks and assertions. Existing numerical and geometry comparisons remain in `utils/test-utils.js`. An unfinished behavior can use `test.fails` when it should execute and report an unexpected pass; use `test.skip` for an explicitly unsupported case.
 
-GPU tests use the WebGL and WebGPU Node environments from [vitest-gpu](https://github.com/bhouston/vitest-gpu). They test real shader results and renderer pixels through completed GPU readbacks. Missing contexts or software adapters fail hardware verification. WebGL skips tests requiring WebGPU-only workgroups, barriers or atomics; unsupported optional adapter features are reported as skips. CPU-only commands work without a GPU; the full `npm test` requires hardware and Chromium. CI runs both native backends on macOS using Metal and checks the actual adapter identity. Node 24 satisfies Vitest and the native environments.
+GPU tests use the WebGL and WebGPU Node environments from [vitest-gpu](https://github.com/bhouston/vitest-gpu). They test real shader results and renderer pixels through completed GPU readbacks. Missing contexts or software adapters fail hardware verification. WebGL skips tests requiring WebGPU-only workgroups, barriers or atomics; unsupported optional adapter features are reported as skips. CPU-only commands work without a GPU; the full `npm test` requires hardware and Chromium. CI runs both native backends on macOS using Metal and checks the actual adapter identity. Node 26 satisfies Vitest and the native environments.
 
 Browser tests cover APIs such as DOMParser, image decoding, HTTP loader integration and WebGL postprocessing. Browser examples and screenshot maintenance are documented in [../e2e/README.md](../e2e/README.md). Use `debugger` with Vitest's browser UI or Playwright traces to inspect a failure.
 
