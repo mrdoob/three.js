@@ -390,13 +390,9 @@ class Pipelines extends DataMap {
 
 			this.caches.set( cacheKey, pipeline );
 
-			const promiseCount = promises !== null ? promises.length : 0;
+			const compiling = this.backend.createComputePipeline( pipeline, bindings, promises );
 
-			this.backend.createComputePipeline( pipeline, bindings, promises );
-
-			if ( promises !== null && promises.length > promiseCount ) {
-
-				const compiling = promises[ promises.length - 1 ];
+			if ( compiling ) {
 
 				this._compilingPipelines.set( pipeline, compiling );
 
