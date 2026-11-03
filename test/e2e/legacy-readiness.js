@@ -1,37 +1,5 @@
-// Preserve Puppeteer's readiness boundaries: Chromium's networkIdle lifecycle,
-// two seconds of request quiescence, then one browser task before releasing rAF.
-export async function gotoWithLegacyNetworkIdle( page, client, url ) {
-
-	await client.send( 'Page.enable' );
-	await client.send( 'Page.setLifecycleEventsEnabled', { enabled: true } );
-	const { frameTree } = await client.send( 'Page.getFrameTree' );
-	let onLifecycle;
-	let timeout;
-	const idle = new Promise( ( resolve, reject ) => {
-
-		onLifecycle = event => {
-
-			if ( event.name === 'networkIdle' && event.frameId === frameTree.frame.id && event.loaderId !== frameTree.frame.loaderId ) resolve();
-
-		};
-
-		client.on( 'Page.lifecycleEvent', onLifecycle );
-		timeout = setTimeout( () => reject( new Error( 'Navigation network idle timeout' ) ), 300000 );
-
-	} );
-	try {
-
-		await Promise.all( [ page.goto( url, { waitUntil: 'load', timeout: 300000 } ), idle ] );
-
-	} finally {
-
-		clearTimeout( timeout );
-		client.off( 'Page.lifecycleEvent', onLifecycle );
-
-	}
-
-}
-
+// Preserve Puppeteer's readiness boundaries: two seconds of request quiescence,
+// then one browser task before releasing rAF.
 export async function waitForLegacyNetworkIdle( page, pendingRequests ) {
 
 	await new Promise( ( resolve, reject ) => {

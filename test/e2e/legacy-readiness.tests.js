@@ -1,60 +1,13 @@
 import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
 import { test } from 'node:test';
-import { gotoWithLegacyNetworkIdle, waitForLegacyNetworkIdle } from './legacy-readiness.js';
+import { waitForLegacyNetworkIdle } from './legacy-readiness.js';
 
 function page() {
 
 	return Object.assign( new EventEmitter(), { isClosed: () => false } );
 
 }
-
-function navigation() {
-
-	const client = new EventEmitter();
-	client.send = async method => method === 'Page.getFrameTree' ? { frameTree: { frame: { id: 'main', loaderId: 'previous' } } } : {};
-	const target = page();
-	let started;
-	const ready = new Promise( resolve => started = resolve );
-	target.goto = async () => started();
-	return { client, target, ready };
-
-}
-
-test( 'navigation waits for networkIdle from the new main-frame loader', async context => {
-
-	context.mock.timers.enable( { apis: [ 'setTimeout' ] } );
-	const { client, target, ready } = navigation();
-	let complete = false;
-	const waiting = gotoWithLegacyNetworkIdle( target, client, '/example' ).then( () => complete = true );
-	await ready;
-	for ( const event of [
-		{ name: 'networkIdle', frameId: 'main', loaderId: 'previous' },
-		{ name: 'networkIdle', frameId: 'child', loaderId: 'next' },
-		{ name: 'networkAlmostIdle', frameId: 'main', loaderId: 'next' }
-	] ) client.emit( 'Page.lifecycleEvent', event );
-	await Promise.resolve();
-	assert.equal( complete, false );
-	assert.equal( client.listenerCount( 'Page.lifecycleEvent' ), 1 );
-	client.emit( 'Page.lifecycleEvent', { name: 'networkIdle', frameId: 'main', loaderId: 'next' } );
-	await waiting;
-	assert.equal( complete, true );
-	assert.equal( client.listenerCount( 'Page.lifecycleEvent' ), 0 );
-
-} );
-
-test( 'navigation timeout removes its lifecycle listener', async context => {
-
-	context.mock.timers.enable( { apis: [ 'setTimeout' ] } );
-	const { client, target, ready } = navigation();
-	const waiting = gotoWithLegacyNetworkIdle( target, client, '/example' );
-	const rejected = assert.rejects( waiting, /Navigation network idle timeout/ );
-	await ready;
-	context.mock.timers.tick( 300000 );
-	await rejected;
-	assert.equal( client.listenerCount( 'Page.lifecycleEvent' ), 0 );
-
-} );
 
 test( 'request activity restarts the full two-second idle window', async context => {
 

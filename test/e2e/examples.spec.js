@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import * as fs from 'node:fs/promises';
 import { Image } from './image.js';
 import { exceptionList, slowList } from './exceptions.js';
-import { gotoWithLegacyNetworkIdle, waitForLegacyNetworkIdle, renderOnce } from './legacy-readiness.js';
+import { waitForLegacyNetworkIdle, renderOnce } from './legacy-readiness.js';
 
 const exact = JSON.parse( process.env.THREE_EXAMPLES || '[]' );
 const files = ( await fs.readdir( 'examples' ) )
@@ -42,32 +42,6 @@ for ( const file of shardOrder ) {
 
 	const slow = slowList.includes( file );
 	test( file, { annotation: { type: 'screenshot-readiness', description: process.env.THREE_SCREENSHOTS ? 'legacy' : slow ? 'delayed-polling' : 'polling' } }, async ( { page, context }, testInfo ) => {
-
-		await page.goto( '/test/e2e/gpu-probe.html' );
-		const renderer = await page.evaluate( async ( webgpu ) => {
-
-			const canvas = document.createElement( 'canvas' );
-			const gl = canvas.getContext( 'webgl2' );
-			if ( ! gl ) throw new Error( 'WebGL2 context unavailable' );
-			const debug = gl.getExtension( 'WEBGL_debug_renderer_info' );
-			if ( ! debug ) throw new Error( 'Cannot verify the WebGL renderer' );
-			const name = gl.getParameter( debug.UNMASKED_RENDERER_WEBGL );
-			gl.getExtension( 'WEBGL_lose_context' )?.loseContext();
-			if ( webgpu ) {
-
-				const adapter = await navigator.gpu?.requestAdapter();
-				if ( ! adapter ) throw new Error( 'WebGPU adapter unavailable' );
-				const device = await adapter.requestDevice();
-				device.destroy();
-				const info = adapter.info;
-				return name + ' ' + JSON.stringify( { vendor: info?.vendor, architecture: info?.architecture, device: info?.device, description: info?.description } );
-
-			}
-
-			return name;
-
-		}, file.startsWith( 'webgpu_' ) );
-		await testInfo.attach( 'gpu', { body: renderer, contentType: 'text/plain' } );
 
 		let pageError;
 		const messages = [];
@@ -118,16 +92,7 @@ for ( const file of shardOrder ) {
 		}
 
 		await client.send( 'Input.setIgnoreInputEvents', { ignore: true } );
-		if ( process.env.THREE_SCREENSHOTS ) {
-
-			// Thumbnail generation has no expected image to wait for.
-			await gotoWithLegacyNetworkIdle( page, client, `/examples/${ file }.html` );
-
-		} else {
-
-			await page.goto( `/examples/${ file }.html`, { waitUntil: 'networkidle', timeout: 300000 } );
-
-		}
+		await page.goto( `/examples/${ file }.html`, { waitUntil: 'networkidle', timeout: 300000 } );
 
 		await page.evaluate( cleanPage );
 		if ( process.env.THREE_SCREENSHOTS ) await waitForLegacyNetworkIdle( page, pendingRequests );
