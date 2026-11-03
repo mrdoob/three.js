@@ -1,10 +1,6 @@
 import { BackSide, BufferAttribute, BufferGeometry, CustomBlending, DoubleSide, FloatType, HalfFloatType, Mesh, MeshLambertNodeMaterial, NearestFilter, NoBlending, NodeMaterial, OneFactor, OrthographicCamera, QuadMesh, RedFormat, RendererUtils, RenderTarget, Scene, Vector2 } from 'three/webgpu';
 import { Fn, If, Loop, attribute, ivec2, lights, luminance, modelViewMatrix, mrt, normalViewGeometry, normalWorldGeometry, output, positionLocal, positionWorld, round, screenCoordinate, textureLoad, uniform, uv, vec4 } from 'three/tsl';
 
-// the guides are rasterized with these jitters, so that they cover the texels that the first samples cover
-
-const GUIDE_JITTERS = 16;
-
 let _rendererState;
 
 /**
@@ -278,7 +274,9 @@ class LightMapper {
 
 		}
 
-		if ( this._guidesNeedUpdate ) this._renderGuides();
+		// the guides follow the jitters of the samples, all of them after a reset or new objects
+
+		const firstGuide = this._guidesNeedUpdate ? 0 : this.samples;
 
 		renderer.setRenderTarget( this._accumulation );
 
@@ -293,6 +291,8 @@ class LightMapper {
 			this.samples ++;
 
 		}
+
+		if ( this._guides !== null ) this._renderGuides( firstGuide, this.samples );
 
 		renderer.setRenderTarget( this._renderTarget );
 		this._quad.render( renderer );
@@ -389,22 +389,25 @@ class LightMapper {
 	}
 
 	/**
-	 * Rasterizes the world-space positions, normals and chart indices of the meshes into the guides.
+	 * Rasterizes the world-space positions, normals and chart indices of the meshes into the guides, with the
+	 * jitters of a range of samples, so that the guides cover the texels that the samples cover, also at the
+	 * borders of the charts. The texel centers come last, the interior texels keep them.
 	 *
 	 * @private
+	 * @param {number} start - The first sample, 0 clears the guides.
+	 * @param {number} end - The sample after the last one.
 	 */
-	_renderGuides() {
+	_renderGuides( start, end ) {
 
 		const renderer = this.renderer;
 
 		renderer.setRenderTarget( this._guides );
-		renderer.clear();
 
-		// the jittered rasterizations cover the texels of the chart borders, the last one writes the texel centers
+		if ( start === 0 ) renderer.clear();
 
-		for ( let i = GUIDE_JITTERS; i >= 0; i -- ) {
+		for ( let i = start; i <= end; i ++ ) {
 
-			if ( i > 0 ) this._jitter.value.set( halton( i, 2 ) - 0.5, halton( i, 3 ) - 0.5 ).multiplyScalar( 2 / this.size );
+			if ( i < end ) this._jitter.value.set( halton( i + 1, 2 ) - 0.5, halton( i + 1, 3 ) - 0.5 ).multiplyScalar( 2 / this.size );
 			else this._jitter.value.set( 0, 0 );
 
 			renderer.render( this._guideScene, this._camera );
