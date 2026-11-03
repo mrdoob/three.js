@@ -41,6 +41,7 @@ let _rendererState;
  * 	lightMapper.getTextureNode( 'normal' ),
  * 	lightMapper.getTextureNode( 'variance' )
  * );
+ * denoiseNode.autoUpdate = false;
  *
  * material.lightMapNode = denoiseNode;
  * ```
