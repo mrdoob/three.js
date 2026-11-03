@@ -380,7 +380,6 @@ class WebGPUPipelineUtils {
 	 * @param {ComputePipeline} pipeline - The compute pipeline.
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 * @param {?Array<Promise>} [promises=null] - Optional compilation promises.
-	 * @return {?Promise} The compilation promise, if the pipeline compiles asynchronously.
 	 */
 	createComputePipeline( pipeline, bindings, promises = null ) {
 
@@ -503,11 +502,7 @@ class WebGPUPipelineUtils {
 
 			promises.push( promise );
 
-			return promise;
-
 		}
-
-		return null;
 
 	}
 

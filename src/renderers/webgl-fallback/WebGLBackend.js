@@ -1794,7 +1794,6 @@ class WebGLBackend extends Backend {
 	 * @param {ComputePipeline} computePipeline - The compute pipeline.
 	 * @param {Array<BindGroup>} bindings - The bindings.
 	 * @param {?Array<Promise>} [promises=null] - Optional compilation promises.
-	 * @return {?Promise} The compilation promise, if the pipeline compiles asynchronously.
 	 */
 	createComputePipeline( computePipeline, bindings, promises = null ) {
 
@@ -1895,14 +1894,12 @@ class WebGLBackend extends Backend {
 			} );
 
 			promises.push( p );
-			return p;
+			return;
 
 		}
 
 		// Sync fallback
 		this._completeComputeCompile( computePipeline, bindings );
-
-		return null;
 
 	}
 
