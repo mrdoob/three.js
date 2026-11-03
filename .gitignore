@@ -25,7 +25,4 @@ test/unit/build
 
 **/node_modules
 
-/test-results/
-/playwright-report/
 /test/e2e/results/
-/.vitest/
