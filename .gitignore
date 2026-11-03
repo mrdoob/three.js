@@ -2,7 +2,6 @@
 .DS_Store
 .idea/
 .project
-.puppeteer_profile/
 .vs/
 .vscode/
 

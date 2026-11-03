@@ -111,7 +111,6 @@
     "jsdoc": "^4.0.5",
     "magic-string": "^1.0.0",
     "pngjs": "^7.0.0",
-    "puppeteer": "^25.0.0",
     "rollup": "^4.6.0",
     "turndown": "^7.2.2",
     "vitest": "^5.0.5",
@@ -119,7 +118,6 @@
     "vitest-environment-webgpu-node": "^3.0.1"
   },
   "allowScripts": {
-    "puppeteer": true,
     "fsevents": true,
     "@onirenaud/node-webgl@0.2.0": true,
     "webgpu@0.6.2": true
