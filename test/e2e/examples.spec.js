@@ -111,23 +111,13 @@ for ( const file of files ) {
 		}
 
 		await client.send( 'Input.setIgnoreInputEvents', { ignore: true } );
-		if ( process.env.THREE_SCREENSHOTS ) {
-
-			// Thumbnail generation has no expected image to wait for.
-			await gotoWithLegacyNetworkIdle( page, client, `/examples/${ file }.html` );
-
-		} else {
-
-			await page.goto( `/examples/${ file }.html`, { waitUntil: 'networkidle', timeout: 300000 } );
-
-		}
-
+		await gotoWithLegacyNetworkIdle( page, client, `/examples/${ file }.html` );
 		await page.evaluate( cleanPage );
-		if ( process.env.THREE_SCREENSHOTS ) await waitForLegacyNetworkIdle( page, pendingRequests );
+		await waitForLegacyNetworkIdle( page, pendingRequests );
 		await page.waitForFunction( () => window._videosReady(), null, { polling: 100, timeout: 5000 } );
 		await renderOnce( page );
 
-		let screenshot = ( await Image.read( await page.screenshot() ) ).scale( 0.5 );
+		const screenshot = ( await Image.read( await page.screenshot() ) ).scale( 0.5 );
 		await testInfo.attach( 'browser-console', { body: messages.join( '\n' ), contentType: 'text/plain' } );
 		expect( pageError, 'Browser errors' ).toBeUndefined();
 		if ( process.env.THREE_SCREENSHOTS ) {
@@ -154,13 +144,7 @@ for ( const file of files ) {
 		let different = Infinity;
 		try {
 
-			await expect.poll( async () => {
-
-				screenshot = ( await Image.read( await page.screenshot() ) ).scale( 0.5 );
-				different = expected.compare( screenshot, diff, 0.1 ) / ( screenshot.width * screenshot.height ) * 100;
-				return different;
-
-			}, { message: 'Percentage of differing pixels', timeout: 5000, intervals: [ 100, 250, 500 ] } ).toBeLessThan( 0.1 );
+			different = expected.compare( screenshot, diff, 0.1 ) / ( screenshot.width * screenshot.height ) * 100;
 
 		} finally {
 
@@ -175,7 +159,7 @@ for ( const file of files ) {
 
 		}
 
-		expect( pageError, 'Browser errors during screenshot polling' ).toBeUndefined();
+		expect( different, 'Percentage of differing pixels' ).toBeLessThan( 0.1 );
 		// A successful retry must not leave failure images for the CI report.
 		await Promise.all( [ 'actual', 'expected', 'diff' ].map( kind => fs.rm( `${ prefix }-${ kind }.jpg`, { force: true } ) ) );
 
