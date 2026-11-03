@@ -1382,7 +1382,7 @@ class Renderer {
 		// nodes already compiling in another call are waited on rather than compiled again
 
 		const compiling = this._compilingComputeNodes;
-		const pending = computeList.filter( ( computeNode ) => compiling.has( computeNode ) ).map( ( computeNode ) => compiling.get( computeNode ) );
+		const pending = computeList.map( ( computeNode ) => compiling.get( computeNode ) ).filter( ( promise ) => promise );
 		const newNodes = computeList.filter( ( computeNode ) => compiling.has( computeNode ) === false );
 
 		const promise = newNodes.length > 0 ? this._compileComputeAsync( newNodes, onProgress ) : Promise.resolve();
