@@ -1,5 +1,5 @@
 import { Box3, Vector3, Vector4, Matrix4, Layers, Storage3DTexture, StorageBufferAttribute, StorageTexture3DNode, RendererUtils, HalfFloatType, UnsignedByteType, RGBAFormat, LinearFilter, LinearMipmapLinearFilter, ClampToEdgeWrapping, RepeatWrapping, MathUtils, EquirectangularReflectionMapping, EquirectangularRefractionMapping, NodeMaterial, QuadMesh, RenderTarget } from 'three/webgpu';
-import { Fn, If, Loop, uniform, uniformArray, storage, instanceIndex, textureStore, texture3D, texture, cubeTexture, pmremTexture, equirectUV, uv, float, int, uint, vec2, vec3, vec4, ivec3, uvec3, max, min, abs, dot, cross, normalize, floor, sign, select, countOneBits, atomicOr, smoothstep, hash, cos, sin, length, PI, getDistanceAttenuation, viewZToPerspectiveDepth, viewZToReversedPerspectiveDepth } from 'three/tsl';
+import { Fn, If, Loop, uniform, uniformArray, storage, instanceIndex, textureStore, texture3D, texture, cubeTexture, pmremTexture, equirectUV, uv, float, int, uint, vec2, vec3, vec4, ivec3, uvec3, max, min, abs, dot, cross, normalize, floor, sign, select, countOneBits, atomicOr, atomicMax, smoothstep, hash, cos, sin, length, PI, getDistanceAttenuation, viewZToPerspectiveDepth, viewZToReversedPerspectiveDepth } from 'three/tsl';
 
 import { collectSceneTriangles, computeSceneBounds, computeSolidVoxels, TRIANGLE_STRIDE } from './VXGISceneCollector.js';
 import { createConeTracer, gather } from './VXGIConeTracer.js';
@@ -10,6 +10,9 @@ const _position = /*@__PURE__*/ new Vector3();
 const _target = /*@__PURE__*/ new Vector3();
 
 const MAX_EDGE_SUBVOXELS = 16;
+const TRIANGLE_INDEX_BITS = 26;
+const TRIANGLE_INDEX_MASK = 2 ** TRIANGLE_INDEX_BITS - 1;
+const CLOSENESS_LEVELS = 63;
 const BOUNCE_CONE_COUNT = 8;
 
 // the six directions a ray can travel, as (axis, sign) pairs
@@ -947,7 +950,7 @@ class VXGIVolume {
 	_createVoxelizeKernel() {
 
 		const occupancy = storage( this._occupancyAttribute, 'uint' ).toAtomic();
-		const triangleIds = storage( this._triangleIdAttribute, 'uint' );
+		const triangleIds = storage( this._triangleIdAttribute, 'uint' ).toAtomic();
 		const triangles = this._trianglesNode;
 		const triangleCount = this._triangleCountNode;
 		const boundsMin = this.boundsMinNode;
@@ -971,6 +974,7 @@ class VXGIVolume {
 
 				const n = cross( p1.sub( p0 ), p2.sub( p0 ) ).toConst();
 				const an = abs( n ).toConst();
+				const planeNormal = normalize( n ).toConst();
 
 				// project along the dominant axis: swizzle so the dominant axis becomes z
 
@@ -1037,8 +1041,14 @@ class VXGIVolume {
 							const bit = uint( s.x.bitAnd( 1 ) ).bitOr( uint( s.y.bitAnd( 1 ) ).shiftLeft( uint( 1 ) ) ).bitOr( uint( s.z.bitAnd( 1 ) ).shiftLeft( uint( 2 ) ) ).toConst();
 							const voxelIndex = voxel.x.add( gx.mul( voxel.y.add( gy.mul( voxel.z ) ) ) ).toConst();
 
+							const distance = abs( dot( planeNormal, vec3( voxel ).mul( 2 ).add( 1 ).sub( p0 ) ) ).toConst();
+							const closeness = uint( distance.div( Math.sqrt( 3 ) ).oneMinus().saturate().mul( CLOSENESS_LEVELS ) ).toConst();
+
 							atomicOr( occupancy.element( voxelIndex ), uint( 1 ).shiftLeft( bit ) );
-							triangleIds.element( voxelIndex ).assign( triangleIndex.add( 1 ) );
+
+							// the triangle closest to the voxel center wins, regardless of the processing order
+
+							atomicMax( triangleIds.element( voxelIndex ), closeness.shiftLeft( uint( TRIANGLE_INDEX_BITS ) ).bitOr( triangleIndex.add( 1 ) ) );
 
 						} );
 
@@ -1291,7 +1301,7 @@ class VXGIVolume {
 
 		const triangles = this._trianglesNode;
 
-		const base = triangleId.sub( 1 ).mul( 5 ).toConst();
+		const base = triangleId.bitAnd( uint( TRIANGLE_INDEX_MASK ) ).sub( 1 ).mul( 5 ).toConst();
 		const a = triangles.element( base ).xyz.toConst();
 		const b = triangles.element( base.add( 1 ) ).xyz.toConst();
 		const c = triangles.element( base.add( 2 ) ).xyz.toConst();

@@ -273,10 +273,12 @@ class GTAOPass extends Pass {
 		if ( this.normalRenderTarget ) this.normalRenderTarget.dispose();
 		this.gtaoRenderTarget.dispose();
 		this.pdRenderTarget.dispose();
+		this.gtaoMaterial.dispose();
 		this.normalMaterial.dispose();
 		this.pdMaterial.dispose();
 		this.copyMaterial.dispose();
 		this.depthRenderMaterial.dispose();
+		this.blendMaterial.dispose();
 		this._fsQuad.dispose();
 
 	}
