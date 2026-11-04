@@ -8,8 +8,8 @@ import { assert, test } from 'vitest';
 // workgroup cooperate through shared/atomic memory or inspect built-in
 // workgroup/subgroup identity values.
 //
-// Register raw compute tests for this native backend. Optional GPU features
-// use real Vitest skips; a missing hardware context fails the test.
+// Register raw compute tests for this backend. Unavailable backends and
+// optional GPU features use explicit Vitest skips.
 import { getSharedRenderer } from './gpu-test-utils.js';
 
 export function rawComputeTest( name, options, run ) {
@@ -18,7 +18,7 @@ export function rawComputeTest( name, options, run ) {
 
 	test.runIf( backend === import.meta.env.THREE_GPU_BACKEND )( name, async ( context ) => {
 
-		const renderer = await getSharedRenderer( backend );
+		const renderer = await getSharedRenderer( backend, context );
 
 		if ( requiredFeature !== undefined && renderer.hasFeature( requiredFeature ) !== true ) {
 

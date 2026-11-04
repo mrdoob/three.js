@@ -26,7 +26,13 @@ const gpuTests = [
 	'test/unit/src/nodes/lighting/EnvironmentNode.tests.js'
 ];
 const maxWorkers = Math.max( 1, Math.floor( availableParallelism() * 0.75 ) );
-const provider = playwright( { launchOptions: { args: process.platform === 'win32' ? [ '--use-angle=d3d11' ] : process.platform === 'darwin' ? [ '--use-angle=metal' ] : [] } } );
+// Preserve the former unit runner's Vulkan/lavapipe setup on Ubuntu.
+const linux = process.platform === 'linux';
+const linuxArgs = [ '--hide-scrollbars', '--enable-unsafe-webgpu', '--enable-features=Vulkan', '--disable-vulkan-surface', '--ignore-gpu-blocklist', '--disable-gpu-driver-bug-workarounds', '--no-sandbox' ];
+const provider = playwright( { launchOptions: {
+	args: linux ? linuxArgs : process.platform === 'win32' ? [ '--use-angle=d3d11' ] : [ '--use-angle=metal' ],
+	env: linux ? { ...process.env, VK_DRIVER_FILES: '/usr/share/vulkan/icd.d/lvp_icd.x86_64.json' } : undefined
+} } );
 const browser = () => ( { enabled: true, headless: true, provider, instances: [ { browser: 'chromium' } ] } );
 const gpuProjects = [ 'webgl', 'webgpu' ].map( backend => ( {
 	extends: true,

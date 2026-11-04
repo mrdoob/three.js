@@ -39,9 +39,9 @@ describe( 'Nodes', () => {
 
 		describe( 'workgroup arrays and atomics', () => {
 
-			test.runIf( import.meta.env.THREE_GPU_BACKEND === 'webgpu' )( 'workgroupArray: plain (non-atomic) shared read/write survives a barrier', async () => {
+			test.runIf( import.meta.env.THREE_GPU_BACKEND === 'webgpu' )( 'workgroupArray: plain (non-atomic) shared read/write survives a barrier', async ( context ) => {
 
-				const renderer = await getSharedRenderer( 'webgpu' );
+				const renderer = await getSharedRenderer( 'webgpu', context );
 
 				// Regression guard: PR #34428 threads an `isAtomic` flag through
 				// `WorkgroupInfoNode`/`WGSLNodeBuilder.getScopedArray()` -- this
@@ -84,9 +84,9 @@ describe( 'Nodes', () => {
 
 			} );
 
-			test.runIf( import.meta.env.THREE_GPU_BACKEND === 'webgpu' )( 'workgroupArray.toAtomic(): concurrent atomicAdd sums exactly once per invocation, per workgroup', async () => {
+			test.runIf( import.meta.env.THREE_GPU_BACKEND === 'webgpu' )( 'workgroupArray.toAtomic(): concurrent atomicAdd sums exactly once per invocation, per workgroup', async ( context ) => {
 
-				const renderer = await getSharedRenderer( 'webgpu' );
+				const renderer = await getSharedRenderer( 'webgpu', context );
 
 				const workgroupSize = 8;
 				const workgroupCount = 4;

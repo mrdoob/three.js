@@ -244,14 +244,14 @@ export async function disposeSharedRenderers() {
 
 	for ( const backend of Object.keys( sharedRenderers ) ) {
 
-		await sharedRenderers[ backend ].dispose();
+		await sharedRenderers[ backend ]?.dispose();
 		delete sharedRenderers[ backend ];
 
 	}
 
 }
 
-export async function getSharedRenderer( backend ) {
+export async function getSharedRenderer( backend, context ) {
 
 	if ( BACKEND_OPTIONS[ backend ] === undefined ) {
 
@@ -262,11 +262,21 @@ export async function getSharedRenderer( backend ) {
 	if ( sharedRenderers[ backend ] === undefined ) {
 
 		const renderer = new WebGPURenderer( { antialias: false, ...BACKEND_OPTIONS[ backend ] } );
-		await renderer.init();
-		sharedRenderers[ backend ] = renderer;
+		try {
+
+			await renderer.init();
+			sharedRenderers[ backend ] = renderer;
+
+		} catch ( error ) {
+
+			console.warn( `GPU backend "${ backend }" is unavailable: ${ error.message }` );
+			sharedRenderers[ backend ] = null;
+
+		}
 
 	}
 
+	if ( sharedRenderers[ backend ] === null ) context.skip( `GPU backend "${ backend }" is unavailable.` );
 	return sharedRenderers[ backend ];
 
 }
@@ -425,9 +435,9 @@ function buildAssertAPI( makeNode ) {
 function declareTest( name, backends, run ) {
 
 	const backend = import.meta.env.THREE_GPU_BACKEND;
-	test.runIf( backends.includes( backend ) )( name, async () => {
+	test.runIf( backends.includes( backend ) )( name, async ( context ) => {
 
-		await run( assert, await getSharedRenderer( backend ) );
+		await run( assert, await getSharedRenderer( backend, context ) );
 
 	} );
 

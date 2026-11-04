@@ -25,7 +25,7 @@ Test files are discovered automatically: any `*.tests.js` file is picked up, so 
 
 Tests that need browser APIs (such as `DOMParser` or image decoding) are listed in `browserTests` and `addonsBrowserTests` in `vitest.config.js`.
 
-GPU tests need a real GPU. WebGL skips tests that need WebGPU-only features.
+Ubuntu CI uses Vulkan/lavapipe, as the previous runner did. Unavailable GPU backends and unsupported features are skipped.
 
 To run a GPU file or filter by test name:
 

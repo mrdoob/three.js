@@ -40,9 +40,9 @@ describe( 'Nodes', () => {
 
 				for ( const Material of [ MeshStandardMaterial, MeshPhysicalMaterial ] ) {
 
-					test( `${ Material.name } follows each material's envMap (${ backend })`, async () => {
+					test( `${ Material.name } follows each material's envMap (${ backend })`, async ( context ) => {
 
-						const renderer = await getSharedRenderer( backend );
+						const renderer = await getSharedRenderer( backend, context );
 
 						const red = createEnvironment( 255, 0, 32 );
 						const blue = createEnvironment( 0, 255, 64 );
@@ -113,9 +113,9 @@ describe( 'Nodes', () => {
 
 				}
 
-				test( `Follows changes of an environment texture node (${ backend })`, async () => {
+				test( `Follows changes of an environment texture node (${ backend })`, async ( context ) => {
 
-					const renderer = await getSharedRenderer( backend );
+					const renderer = await getSharedRenderer( backend, context );
 
 					const red = createEnvironment( 255, 0, 32 );
 					const blue = createEnvironment( 0, 255, 64 );
