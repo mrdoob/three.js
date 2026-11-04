@@ -27,6 +27,13 @@ Tests that need browser APIs (such as `DOMParser` or image decoding) are listed 
 
 GPU tests need a real GPU. WebGL skips tests that need WebGPU-only features.
 
+GPU files are discovered directly. Each GPU project runs one file at a time and reuses module imports, as the former combined suite did. The renderer is shared within a file and disposed after that file. To run one file or test:
+
+```sh
+npx vitest run --project webgpu test/unit/src/nodes/tsl/GPUComputeBuiltins.tests.js
+npx vitest run --project webgl test/unit/src/nodes/tsl/TSLMath.tests.js -t abs
+```
+
 ## Debugging
 
 The [Vitest VS Code extension](https://github.com/vitest-dev/vscode) can run and debug individual tests from the editor. For browser tests, add `debugger;` and run with `--browser.headless=false`.

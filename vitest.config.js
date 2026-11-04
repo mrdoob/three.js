@@ -21,6 +21,10 @@ const alias = {
 	three: source( 'Three.js' )
 };
 const setupFiles = [ './test/unit/utils/console-wrapper.js' ];
+const gpuTests = [
+	'test/unit/src/nodes/tsl/!(TSLCore).tests.js',
+	'test/unit/src/nodes/lighting/EnvironmentNode.tests.js'
+];
 const maxWorkers = Math.max( 1, Math.floor( availableParallelism() * 0.75 ) );
 const provider = playwright( { launchOptions: { args: process.platform === 'win32' ? [ '--use-angle=d3d11' ] : process.platform === 'darwin' ? [ '--use-angle=metal' ] : [] } } );
 const browser = () => ( { enabled: true, headless: true, provider, instances: [ { browser: 'chromium' } ] } );
@@ -28,7 +32,12 @@ const gpuProjects = [ 'webgl', 'webgpu' ].map( backend => ( {
 	extends: true,
 	test: {
 		name: backend,
-		include: [ 'test/gpu/suite.tests.js' ],
+		include: gpuTests,
+		// Reuse imports as the former aggregate suite did, with one GPU file at a time.
+		isolate: false,
+		maxWorkers: 1,
+		sequence: { groupOrder: 1 },
+		setupFiles: [ './test/gpu/setup.js' ],
 		env: { THREE_GPU_BACKEND: backend },
 		testTimeout: 30000,
 		hookTimeout: 30000,
@@ -49,7 +58,7 @@ export default defineConfig( {
 					environment: 'node',
 					isolate: false,
 					include: [ 'test/unit/src/**/*.tests.js', 'test/unit/tsl/*.tests.js' ],
-					exclude: [ ...browserTests, 'test/unit/src/nodes/tsl/!(TSLCore).tests.js', 'test/unit/src/nodes/lighting/EnvironmentNode.tests.js' ],
+					exclude: [ ...browserTests, ...gpuTests ],
 					setupFiles
 				}
 			},

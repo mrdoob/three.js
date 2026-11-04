@@ -1,4 +1,4 @@
-import { afterAll, assert, test } from 'vitest';
+import { assert, test } from 'vitest';
 //
 // GPU-native TSL unit test harness (prototype).
 //
@@ -240,11 +240,16 @@ const BACKEND_OPTIONS = {
 // Each native Vitest project owns one backend and one renderer per suite.
 const sharedRenderers = {};
 
-afterAll( async () => {
+export async function disposeSharedRenderers() {
 
-	for ( const renderer of Object.values( sharedRenderers ) ) await renderer.dispose();
+	for ( const backend of Object.keys( sharedRenderers ) ) {
 
-} );
+		await sharedRenderers[ backend ].dispose();
+		delete sharedRenderers[ backend ];
+
+	}
+
+}
 
 export async function getSharedRenderer( backend ) {
 
