@@ -16,7 +16,7 @@ const dHdxy_fwd = /*@__PURE__*/ Fn( ( { textureNode, bumpScale } ) => {
 
 	// For a texture, the gradient is taken with central differences one texel apart so it interpolates
 	// smoothly across texels, then mapped to screen-space
-	if ( textureNode.isTextureNode === true || ( textureNode.isMaterialReferenceNode === true && textureNode.uniformType === 'texture' ) ) {
+	if ( textureNode.isTextureNode === true || textureNode.uniformType === 'texture' ) {
 
 		const bumpUV = textureNode.uvNode || uv();
 		const texelSize = vec2( 1 ).div( vec2( textureSize( textureNode, 0 ) ) );
