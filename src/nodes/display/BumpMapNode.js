@@ -9,35 +9,17 @@ import { Fn, nodeProxy, float, vec2 } from '../tsl/TSLBase.js';
 // Bump Mapping Unparametrized Surfaces on the GPU by Morten S. Mikkelsen
 // https://mmikk.github.io/papers3d/mm_sfgrad_bump.pdf
 
-// Returns the texture node behind a bump map node, such as a swizzled texture or material map
-const getTextureNode = ( node, builder ) => {
-
-	if ( node.isSplitNode === true ) node = node.node;
-
-	if ( node.isMaterialReferenceNode === true && node.uniformType === 'texture' ) {
-
-		node.updateReference( builder );
-		node.updateValue();
-		node = node.node;
-
-	}
-
-	return node.isTextureNode === true ? node : null;
-
-};
-
-const dHdxy_fwd = /*@__PURE__*/ Fn( ( { textureNode, bumpScale }, builder ) => {
+const dHdxy_fwd = /*@__PURE__*/ Fn( ( { textureNode, bumpScale } ) => {
 
 	// It's used to preserve the same TextureNode instance
 	const sampleTexture = ( callback ) => textureNode.isolate().context( { getUV: ( texNode ) => callback( texNode.uvNode || uv() ), forceUVContext: true } );
 
 	// For a texture, the gradient is taken with central differences one texel apart so it interpolates
 	// smoothly across texels, then mapped to screen-space
-	const texture = getTextureNode( textureNode, builder );
-	if ( texture !== null ) {
+	if ( textureNode.isTextureNode === true || ( textureNode.isMaterialReferenceNode === true && textureNode.uniformType === 'texture' ) ) {
 
-		const bumpUV = texture.uvNode || uv();
-		const texelSize = vec2( 1 ).div( vec2( textureSize( texture, 0 ) ) );
+		const bumpUV = textureNode.uvNode || uv();
+		const texelSize = vec2( 1 ).div( vec2( textureSize( textureNode, 0 ) ) );
 		const dx = vec2( texelSize.x, 0 );
 		const dy = vec2( 0, texelSize.y );
 

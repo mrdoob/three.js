@@ -63,7 +63,10 @@ class TextureSizeNode extends Node {
 		const textureProperty = this.textureNode.build( builder, 'property' );
 		const level = this.levelNode === null ? '0' : this.levelNode.build( builder, 'int' );
 
-		const snippet = builder.generateTextureSize( this.textureNode.value, textureProperty, level );
+		// nodes that resolve to a texture node, such as material references, output it from setup
+		const textureNode = builder.getNodeProperties( this.textureNode ).outputNode || this.textureNode;
+
+		const snippet = builder.generateTextureSize( textureNode.value, textureProperty, level );
 
 		return builder.format( snippet, this.getNodeType( builder ) );
 
