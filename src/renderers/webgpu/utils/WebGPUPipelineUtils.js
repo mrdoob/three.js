@@ -671,7 +671,7 @@ class WebGPUPipelineUtils {
 	_getBlendComponent( blendSrc, blendDst, blendEquation ) {
 
 		const operation = this._getBlendOperation( blendEquation );
-		const ignoreFactors = operation === GPUBlendOperation.Min || operation === GPUBlendOperation.Max;
+		const ignoreFactors = ( operation === GPUBlendOperation.Min || operation === GPUBlendOperation.Max );
 
 		return {
 			srcFactor: ignoreFactors ? GPUBlendFactor.One : this._getBlendFactor( blendSrc ),
