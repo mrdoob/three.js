@@ -69,7 +69,7 @@
 				maxErrorPixels: 0.5,
 				shadowDetail: 0,
 				morphing: true,
-				morphTime: 0.05,
+				morphTime: 0,
 				wireframe: false,
 				debugColors: 'none',
 				frustumCulling: true,
@@ -111,35 +111,36 @@
 				light.shadow.camera.far = 12;
 				scene.add( light );
 
-				// renderer, before the textures as their height maps are baked with it
+				// renderer
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
-				renderer.inspector = new Inspector();
 				document.body.appendChild( renderer.domElement );
 
 				await renderer.init();
 
 				// CC0 texture sets from Poly Haven. size: the physical size of a texture tile, depth: the range of the
-				// displacement, in meters, patch sizes: those of the meshes using the set, see bakeErrorPyramid().
-				// the rock scan is a reddish sandstone: its luminance is tinted with the mean color of the wall (in linear
-				// space, the wall's mean color divided by the rock's mean luminance), so the rocks match the grey stone
+				// displacement, in meters, patch size: that of the mesh using the set, see bakeErrorPyramid(). the ground is
+				// only a few triangles, so its leaves draw larger patches. the rock scan is a reddish sandstone: its luminance
+				// is tinted with the mean color of the wall (in linear space, the wall's mean color divided by the rock's mean
+				// luminance), so the rocks match the grey stone
 
-				const [ cobblestone, stoneWall, rock ] = await Promise.all( [
-					loadTextureSet( 'cobblestone_floor_08', 2, 0.08, [ 8 ] ),
-					loadTextureSet( 'japanese_stone_wall', 1.9, 0.14, [ 4 ] ),
-					loadTextureSet( 'rock_face_03', 2, 0.21, [ 4 ], new THREE.Color( 1.32, 1.22, 1.05 ) )
+				const textureSets = await Promise.all( [
+					loadTextureSet( 'cobblestone_floor_08', 2, 0.08, 8 ),
+					loadTextureSet( 'japanese_stone_wall', 1.9, 0.14, 4 ),
+					loadTextureSet( 'rock_face_03', 2, 0.21, 4, new THREE.Color( 1.32, 1.22, 1.05 ) )
 				] );
 
-				// the ground is projected from the top, the wall and the rocks with triplanar mapping. the ground is only a
-				// few triangles, so its leaves draw larger patches
+				const [ cobblestone, stoneWall, rock ] = textureSets;
+
+				// the ground is projected from the top, the wall and the rocks with triplanar mapping
 
 				const parts = [
-					[ createGroundGeometry(), createSurface( cobblestone, false, 8 ) ],
-					[ createWallGeometry(), createSurface( stoneWall, true, 4 ) ],
-					[ createRockGeometry(), createSurface( rock, true, 4 ) ]
+					[ createGroundGeometry(), createSurface( cobblestone, false ) ],
+					[ createWallGeometry(), createSurface( stoneWall, true ) ],
+					[ createRockGeometry(), createSurface( rock, true ) ]
 				];
 
 				// the subdivision meshes, and the same meshes normal mapped without subdivision to compare
@@ -156,6 +157,23 @@
 				controls.maxPolarAngle = Math.PI * 0.49;
 				controls.enableDamping = true;
 				controls.update();
+
+				statsElement = document.getElementById( 'stats' );
+
+				// the shaders are compiled in parallel before the first frame, instead of one after the other when first used.
+				// the rocks have the same shaders as the wall, so they compile after it and find them compiled
+
+				const [ ground, wall, rocks ] = meshes;
+
+				await Promise.all( [
+					renderer.compileAsync( scene, camera ),
+					ground.compileAsync( renderer ),
+					wall.compileAsync( renderer ).then( () => rocks.compileAsync( renderer ) )
+				] );
+
+				// the inspector is attached after compiling, which would report the shadow nodes to it outside of a frame
+
+				renderer.inspector = new Inspector();
 
 				// gui
 
@@ -178,32 +196,29 @@
 				gui.add( params, 'wireframe' ).name( 'Wireframe' ).onChange( v => wireframe.value = v ? 1 : 0 );
 				gui.add( params, 'debugColors', { 'None': 'none', 'Subdivision Depth': 'depth', 'Triangle Size': 'size' } ).name( 'Debug Colors' ).onChange( v => debugColors.value = [ 'none', 'depth', 'size' ].indexOf( v ) );
 
-				statsElement = document.getElementById( 'stats' );
-
-				// the shaders are compiled in parallel before the first frame, instead of one after the other when first used.
-				// the rocks have the same shaders as the wall, so they compile after it and find them compiled
-
-				const [ ground, wall, rocks ] = meshes;
-
-				await Promise.all( [
-					renderer.compileAsync( scene, camera ),
-					ground.compileAsync( renderer ),
-					wall.compileAsync( renderer ).then( () => rocks.compileAsync( renderer ) )
-				] );
-
 				updateStats();
 
 				// the window may have been resized while loading
 
 				onWindowResize();
 
-				renderer.setAnimationLoop( animate );
+				// the relief maps are baked by the first frame, as rendering starts the animation loop of the renderer
+
+				renderer.setAnimationLoop( () => {
+
+					for ( const set of textureSets ) set.bake();
+
+					renderer.setAnimationLoop( animate );
+
+					animate();
+
+				} );
 
 				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
-			async function loadTextureSet( name, size, depth, patchSizes, tint = null ) {
+			async function loadTextureSet( name, size, depth, patchSize, tint = null ) {
 
 				const loader = new THREE.TextureLoader();
 
@@ -223,24 +238,19 @@
 					load( 'disp', THREE.NoColorSpace )
 				] );
 
-				const reliefMaps = {};
+				const { reliefMap, bake } = createReliefMap( heightMap, patchSize );
 
-				for ( const patchSize of patchSizes ) reliefMaps[ patchSize ] = bakeReliefMap( heightMap, patchSize );
-
-				const width = heightMap.image.width;
-
-				heightMap.dispose();
-
-				return { colorMap, reliefMaps, size: width, scale: 1 / size, depth, tint };
+				return { colorMap, reliefMap, bake, patchSize, size: heightMap.image.width, scale: 1 / size, depth, tint };
 
 			}
 
 			// a one time preprocess of a height map into a relief map: the height in r and its gradient in g and b, in height
 			// units per texture repeat. the gradient is smoothed over 3x3 texels (Sobel), so the 8-bit heights do not show up
 			// as noise, and its mipmaps are exact as the mean of gradients is the gradient of the mean height. a holds how
-			// far the triangles of a leaf deviate from the heights, see bakeErrorPyramid()
+			// far the triangles of a leaf deviate from the heights, see bakeErrorPyramid(). the relief map can be used right
+			// away, and is baked later
 
-			function bakeReliefMap( heightMap, patchSize ) {
+			function createReliefMap( heightMap, patchSize ) {
 
 				const { width, height } = heightMap.image;
 
@@ -270,17 +280,20 @@
 
 				} )();
 
-				const quad = new THREE.QuadMesh( material );
+				const bake = () => {
 
-				renderer.setRenderTarget( renderTarget );
-				quad.render( renderer );
-				renderer.setRenderTarget( null );
+					renderer.setRenderTarget( renderTarget );
+					new THREE.QuadMesh( material ).render( renderer );
+					renderer.setRenderTarget( null );
 
-				material.dispose();
+					material.dispose();
+					heightMap.dispose();
 
-				bakeErrorPyramid( renderTarget.texture, patchSize );
+					bakeErrorPyramid( renderTarget.texture, patchSize );
 
-				return renderTarget.texture;
+				};
+
+				return { reliefMap: renderTarget.texture, bake };
 
 			}
 
@@ -364,9 +377,9 @@
 			// scale, depth and tint are uniforms, so surfaces of the same kind have the same shaders, which compile once,
 			// see AdaptiveSubdivisionMesh.compileAsync(). untinted sets keep their saturation
 
-			function createSurface( set, triplanarMapping, patchSize ) {
+			function createSurface( set, triplanarMapping ) {
 
-				const reliefMap = set.reliefMaps[ patchSize ];
+				const { reliefMap, patchSize } = set;
 				const scale = uniform( set.scale );
 				const texelScale = uniform( set.scale * set.size ); // texels per meter
 				const depth = uniform( set.depth );

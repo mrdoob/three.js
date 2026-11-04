@@ -280,9 +280,9 @@ class AdaptiveSubdivisionMesh extends Mesh {
 		 * which pops when it moves fast.
 		 *
 		 * @type {number}
-		 * @default 0.05
+		 * @default 0
 		 */
-		this.morphTime = 0.05;
+		this.morphTime = 0;
 
 		/**
 		 * Whether leaves outside of the view frustum of the camera are culled and coarsened.
@@ -597,8 +597,6 @@ class AdaptiveSubdivisionMesh extends Mesh {
 
 		this._camera = null;
 		this._indirectOffsets = [];
-		this._frame = 0;
-		this._time = null;
 
 	}
 
@@ -713,12 +711,7 @@ class AdaptiveSubdivisionMesh extends Mesh {
 		this._edgePixels.value = this.targetEdgePixels;
 		this._morphing.value = this.morphing ? 1 : 0;
 
-		// morphs advance by the time since the last update, limited so a stall does not skip them
-
 		const time = performance.now() / 1000;
-		const delta = this._time !== null ? Math.min( time - this._time, 0.1 ) : 0;
-
-		this._time = time;
 
 		// the sub-cameras of array cameras can look in different directions, so there is no culling
 
@@ -746,7 +739,7 @@ class AdaptiveSubdivisionMesh extends Mesh {
 
 		if ( this._shadowRequested === true ) this._prepareShadowSubdivision();
 
-		if ( subdivision.compiling === null ) this._updateSubdivision( renderer, subdivision, delta );
+		if ( subdivision.compiling === null ) this._updateSubdivision( renderer, subdivision, time );
 
 		if ( this._shadowRequested === true && this._shadowSubdivision.compiling === null ) {
 
@@ -768,13 +761,11 @@ class AdaptiveSubdivisionMesh extends Mesh {
 
 			this._shadowFootprintScale.value = scale;
 
-			this._updateSubdivision( renderer, shadowSubdivision, delta );
+			this._updateSubdivision( renderer, shadowSubdivision, time );
 
 			this._shadowRequested = false;
 
 		}
-
-		this._frame ++;
 
 	}
 
@@ -1094,11 +1085,18 @@ class AdaptiveSubdivisionMesh extends Mesh {
 	 * @private
 	 * @param {Renderer} renderer - The renderer.
 	 * @param {Subdivision} subdivision - The subdivision.
-	 * @param {number} delta - The time since the last update in seconds.
+	 * @param {number} time - The current time in seconds.
 	 */
-	_updateSubdivision( renderer, subdivision, delta ) {
+	_updateSubdivision( renderer, subdivision, time ) {
 
 		const { splitNodes, mergeNodes, rebuildNodes } = subdivision;
+
+		// morphs advance by the time since the last update of the subdivision, as the shadow subdivision is not updated
+		// every frame, limited so a stall does not skip them
+
+		const delta = subdivision.time !== null ? Math.min( time - subdivision.time, 0.1 ) : 0;
+
+		subdivision.time = time;
 
 		// the passes of an update in one list, named after the mesh so the inspector tells the updates apart
 
@@ -1139,8 +1137,11 @@ class AdaptiveSubdivisionMesh extends Mesh {
 
 		} else {
 
-			const split = this._frame % 2 === 0;
+			// counted per subdivision, so one that is only updated every other frame still splits and merges
 
+			const split = subdivision.updateCount % 2 === 0;
+
+			subdivision.updateCount ++;
 			subdivision.splitFrame.value = split ? 1 : 0;
 
 			nodes.push( ...( split ? splitNodes : mergeNodes ), ...rebuildNodes );
@@ -3014,6 +3015,8 @@ class Subdivision {
 		this.minimal = false;
 		this.shadow = false;
 		this.compiling = null; // the promise of the pipelines being compiled, see AdaptiveSubdivisionMesh.compileAsync()
+		this.updateCount = 0; // the updates since the first, which alternate between splits and merges
+		this.time = null; // the time of the last update in seconds
 
 	}
 
