@@ -17,10 +17,7 @@ export default defineConfig( {
 	retries: 2,
 	timeout: 360000,
 	outputDir: 'results',
-	reporter: process.env.CI ? [
-		[ 'list' ],
-		[ 'html', { outputFolder: fileURLToPath( new URL( './report', import.meta.url ) ), open: 'never' } ]
-	] : 'list',
+	reporter: 'list',
 	use: {
 		browserName: 'chromium',
 		channel: process.env.THREE_BROWSER_CHANNEL,
@@ -31,7 +28,7 @@ export default defineConfig( {
 			args: [ '--hide-scrollbars', '--enable-unsafe-webgpu', ...( angleBackend ? [ `--use-angle=${ angleBackend }` ] : [] ), ...( linux ? linuxArgs : [] ) ],
 			env: linux ? { ...process.env, VK_DRIVER_FILES: '/usr/share/vulkan/icd.d/lvp_icd.x86_64.json' } : undefined
 		},
-		trace: 'retain-on-failure'
+		trace: 'off'
 	},
 	webServer: {
 		command: 'node utils/server.js -p 1234',

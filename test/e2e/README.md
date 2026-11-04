@@ -45,8 +45,13 @@ If none matches, Playwright retries the whole test with a fresh page, up to twic
 
 Use `slowList` for examples that consistently need more preparation time, and `exceptionList` as a last resort. Thumbnail generation also waits two extra seconds because there is no expected image to match.
 
-When a comparison fails, the actual, expected and diff images are saved in `test/e2e/output-screenshots`. Traces are saved in `test/e2e/results` and can be opened with `npx playwright show-trace <trace.zip>`.
+When a comparison fails, the actual, expected and diff images are saved in `test/e2e/output-screenshots` and uploaded by CI.
 
-CI keeps each shard's report and traces for seven days, including attempts that pass on retry. Download `E2E report-<os>-<shard>` and open it with `npx playwright show-report <extracted-path>/report`.
+For local traces and an HTML report, run:
 
-For a local HTML report, pass `--reporter=list,html`; output goes to `playwright-report`.
+```sh
+npm run test-e2e -- webgl_geometry_cube --trace retain-on-failure --reporter=list,html
+npx playwright show-report playwright-report
+```
+
+Traces are saved in `test/e2e/results` and can also be opened with `npx playwright show-trace <trace.zip>`. HTML reports and traces are disabled by default.
