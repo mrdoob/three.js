@@ -28,9 +28,10 @@ const perturbNormalArb = /*@__PURE__*/ Fn( ( inputs ) => {
 
 	const { surf_pos, surf_norm, dHdxy } = inputs;
 
-	// normalize is done to ensure that the bump map looks the same regardless of the texture's scale
-	const vSigmaX = surf_pos.dFdx().normalize();
-	const vSigmaY = surf_pos.dFdy().normalize();
+	// the surface derivatives are not normalized so bumpScale is a height in world units and the
+	// slope stays the same at any view distance
+	const vSigmaX = surf_pos.dFdx();
+	const vSigmaY = surf_pos.dFdy();
 	const vN = surf_norm; // normalized
 
 	const R1 = vSigmaY.cross( vN );
