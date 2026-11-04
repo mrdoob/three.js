@@ -26,3 +26,4 @@ test/unit/build
 **/node_modules
 
 /test/e2e/results/
+/test/e2e/report/

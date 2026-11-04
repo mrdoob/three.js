@@ -35,3 +35,7 @@ CI renders on Ubuntu with Mesa's software Vulkan driver (lavapipe), which the th
 If an example fails because a screenshot was captured too early, add it to `slowList`. Only add it to `exceptionList` as a last resort.
 
 When a comparison fails, the actual, expected and diff images are saved in `test/e2e/output-screenshots`. Traces are saved in `test/e2e/results` and can be opened with `npx playwright show-trace <trace.zip>`.
+
+CI also uploads an HTML report and the test results for each shard, including failures that pass on retry. Download the `E2E report-<os>-<shard>` artifact and run `npx playwright show-report <extracted-path>/report` to inspect tests, image attachments and traces. These artifacts are retained for seven days. The separate output-screenshots artifact is preserved for the screenshot comparison bot.
+
+To generate an HTML report locally, pass `--reporter=list,html` (Playwright writes this report to `playwright-report` by default).

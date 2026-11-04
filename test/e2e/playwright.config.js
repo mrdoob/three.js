@@ -17,7 +17,10 @@ export default defineConfig( {
 	retries: 2,
 	timeout: 360000,
 	outputDir: 'results',
-	reporter: 'list',
+	reporter: process.env.CI ? [
+		[ 'list' ],
+		[ 'html', { outputFolder: fileURLToPath( new URL( './report', import.meta.url ) ), open: 'never' } ]
+	] : 'list',
 	use: {
 		browserName: 'chromium',
 		channel: process.env.THREE_BROWSER_CHANNEL,

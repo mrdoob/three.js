@@ -98,3 +98,13 @@ jobs:
           name: Output screenshots-${{ matrix.os }}-${{ matrix.shard }}
           path: test/e2e/output-screenshots
           if-no-files-found: ignore
+      - name: Upload E2E report and traces
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        if: always()
+        with:
+          name: E2E report-${{ matrix.os }}-${{ matrix.shard }}
+          path: |
+            test/e2e/report
+            test/e2e/results
+          if-no-files-found: ignore
+          retention-days: 7
