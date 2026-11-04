@@ -53,7 +53,7 @@ class CompressedTextureLoader extends Loader {
 
 			if ( faces !== null ) {
 
-				warnOnce( 'CompressedTextureLoader: Loading cube maps with load() has been deprecated. Use loadAsync() instead.' ); // @deprecated r187
+				warnOnce( 'CompressedTextureLoader: Loading cube maps with load() has been deprecated. Use loadAsync() instead.' ); // @deprecated r188
 
 				texture.image = faces;
 
