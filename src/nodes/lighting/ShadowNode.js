@@ -217,6 +217,16 @@ class ShadowNode extends ShadowBaseNode {
 		this._currentShadowType = null;
 
 		/**
+		 * Whether the output node of this shadow node was set up
+		 * with transmitted shadows or not.
+		 *
+		 * @type {?boolean}
+		 * @private
+		 * @default null
+		 */
+		this._currentTransmitted = null;
+
+		/**
 		 * A Weak Map holding the current frame ID per camera. Used
 		 * to control the update of shadow maps.
 		 *
@@ -601,10 +611,15 @@ class ShadowNode extends ShadowBaseNode {
 		return Fn( () => {
 
 			const currentShadowType = builder.renderer.shadowMap.type;
+			const currentTransmitted = builder.renderer.shadowMap.transmitted;
 
 			if ( this._currentShadowType !== currentShadowType ) {
 
 				this._reset();
+				this._node = null;
+
+			} else if ( this._currentTransmitted !== currentTransmitted ) {
+
 				this._node = null;
 
 			}
@@ -617,6 +632,7 @@ class ShadowNode extends ShadowBaseNode {
 
 				this._node = node = this.setupShadow( builder );
 				this._currentShadowType = currentShadowType;
+				this._currentTransmitted = currentTransmitted;
 
 			}
 
