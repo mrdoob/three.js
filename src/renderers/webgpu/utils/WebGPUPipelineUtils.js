@@ -573,17 +573,8 @@ class WebGPUPipelineUtils {
 			const blendDstAlpha = object.blendDstAlpha !== null ? object.blendDstAlpha : blendDst;
 			const blendEquationAlpha = object.blendEquationAlpha !== null ? object.blendEquationAlpha : blendEquation;
 
-			color = {
-				srcFactor: this._getBlendFactor( blendSrc ),
-				dstFactor: this._getBlendFactor( blendDst ),
-				operation: this._getBlendOperation( blendEquation )
-			};
-
-			alpha = {
-				srcFactor: this._getBlendFactor( blendSrcAlpha ),
-				dstFactor: this._getBlendFactor( blendDstAlpha ),
-				operation: this._getBlendOperation( blendEquationAlpha )
-			};
+			color = this._getBlendComponent( blendSrc, blendDst, blendEquation );
+			alpha = this._getBlendComponent( blendSrcAlpha, blendDstAlpha, blendEquationAlpha );
 
 		} else {
 
@@ -664,6 +655,41 @@ class WebGPUPipelineUtils {
 		}
 
 	}
+	/**
+	 * Returns a blend component (color or alpha) as a descriptor object required
+	 * for the pipeline creation.
+	 *
+	 * WebGPU requires both factors to be `one` for the `min` and `max` operations.
+	 * WebGL ignores the factors for these operations, so they are set to `one`.
+	 *
+	 * @private
+	 * @param {number} blendSrc - source blend factor.
+	 * @param {number} blendDst - destination blend factor.
+	 * @param {number} blendEquation - blend equation.
+	 * @return {Object} The blend component.
+	 */
+	_getBlendComponent( blendSrc, blendDst, blendEquation ) {
+
+		const operation = this._getBlendOperation( blendEquation );
+
+		if ( operation === GPUBlendOperation.Min || operation === GPUBlendOperation.Max ) {
+
+			return {
+				srcFactor: GPUBlendFactor.One,
+				dstFactor: GPUBlendFactor.One,
+				operation
+			};
+
+		}
+
+		return {
+			srcFactor: this._getBlendFactor( blendSrc ),
+			dstFactor: this._getBlendFactor( blendDst ),
+			operation
+		};
+
+	}
+
 	/**
 	 * Returns the GPU blend factor which is required for the pipeline creation.
 	 *
