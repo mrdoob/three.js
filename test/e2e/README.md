@@ -21,7 +21,14 @@ npm run test-e2e -- webgl_geometry_cube webgl_loader_gltf
 npm run make-screenshot -- webgl_geometry_cube
 ```
 
-Playwright options can be passed after `--`, for example `--shard=1/5`. Set `VISIBLE=1` to watch the browser.
+Place example names before Playwright options after npm's `--` separator:
+
+```sh
+npm run test-e2e -- webgl_geometry_cube --workers 2 --retries 0
+npm run test-e2e -- --shard=1/5
+```
+
+The wrapper recognizes example names and its `--make` / `--webgpu` flags until the first Playwright option. Everything from that option onward is passed unchanged to Playwright's public CLI, including option values. Put wrapper flags before Playwright options as well. This avoids maintaining a second parser or depending on Playwright internals. Set `VISIBLE=1` to watch the browser.
 
 ## Notes
 
