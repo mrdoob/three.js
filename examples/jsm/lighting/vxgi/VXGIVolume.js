@@ -1,5 +1,5 @@
 import { Box3, Vector3, Vector4, Matrix4, Layers, Storage3DTexture, StorageBufferAttribute, StorageTexture3DNode, RendererUtils, HalfFloatType, UnsignedByteType, RGBAFormat, LinearFilter, LinearMipmapLinearFilter, ClampToEdgeWrapping, MathUtils } from 'three/webgpu';
-import { Fn, If, Loop, uniform, uniformArray, storage, instanceIndex, textureStore, texture3D, texture, cubeTexture, float, int, uint, vec2, vec3, vec4, ivec3, uvec3, max, min, abs, dot, cross, normalize, floor, sign, select, countOneBits, atomicOr, smoothstep, hash, length, PI, getDistanceAttenuation, viewZToPerspectiveDepth, viewZToReversedPerspectiveDepth } from 'three/tsl';
+import { Fn, If, Loop, uniform, uniformArray, storage, instanceIndex, textureStore, texture3D, texture, cubeTexture, float, int, uint, vec2, vec3, vec4, ivec3, uvec3, max, min, abs, dot, cross, normalize, floor, sign, select, countOneBits, atomicOr, atomicMax, smoothstep, hash, length, PI, getDistanceAttenuation, viewZToPerspectiveDepth, viewZToReversedPerspectiveDepth } from 'three/tsl';
 
 import { collectSceneTriangles, computeSceneBounds, computeSolidVoxels, TRIANGLE_STRIDE } from './VXGISceneCollector.js';
 import { createConeTracer, gather } from './VXGIConeTracer.js';
@@ -11,6 +11,18 @@ const _target = /*@__PURE__*/ new Vector3();
 
 const MAX_EDGE_SUBVOXELS = 16;
 const BOUNCE_CONE_COUNT = 8;
+
+// Every triangle that touches a voxel offers a winner key and the largest key wins (atomicMax), so the surface a
+// voxel takes its albedo, emission and normal from does not depend on the order in which the GPU runs the
+// triangles. From the most significant bit down: emitters outrank other surfaces, then the triangle whose plane
+// passes closest to the voxel centre (CLOSENESS_LEVELS steps over half the voxel diagonal), then the higher index
+// (plus one, so zero stays empty). A triangle record takes 80 bytes, so no storage buffer binding holds more
+// triangles than the index bits can address.
+
+const TRIANGLE_INDEX_BITS = 26;
+const TRIANGLE_INDEX_MASK = 2 ** TRIANGLE_INDEX_BITS - 1;
+const EMITTER_KEY = 2 ** 31;
+const CLOSENESS_LEVELS = 31;
 
 // the six directions a ray can travel, as (axis, sign) pairs
 
@@ -456,6 +468,8 @@ class VXGIVolume {
 			minOpacity: this.minOpacity
 		} );
 
+		if ( count > TRIANGLE_INDEX_MASK ) throw new Error( 'THREE.VXGIVolume: The scene has too many triangles to voxelize.' );
+
 		this._triangleCount = count;
 		this._triangleCountNode.value = count;
 
@@ -849,7 +863,7 @@ class VXGIVolume {
 	_createVoxelizeKernel() {
 
 		const occupancy = storage( this._occupancyAttribute, 'uint' ).toAtomic();
-		const triangleIds = storage( this._triangleIdAttribute, 'uint' );
+		const triangleIds = storage( this._triangleIdAttribute, 'uint' ).toAtomic();
 		const triangles = this._trianglesNode;
 		const triangleCount = this._triangleCountNode;
 		const boundsMin = this.boundsMinNode;
@@ -873,6 +887,13 @@ class VXGIVolume {
 
 				const n = cross( p1.sub( p0 ), p2.sub( p0 ) ).toConst();
 				const an = abs( n ).toConst();
+
+				// the parts of the winner key that do not depend on the voxel
+
+				const emissive = triangles.element( base.add( 4 ) ).xyz.toConst();
+				const emitterKey = select( max( emissive.x, max( emissive.y, emissive.z ) ).greaterThan( 0 ), uint( EMITTER_KEY ), uint( 0 ) );
+				const triangleKey = emitterKey.bitOr( triangleIndex.add( 1 ) ).toConst();
+				const normalLength = length( n ).toConst();
 
 				// project along the dominant axis: swizzle so the dominant axis becomes z
 
@@ -940,7 +961,15 @@ class VXGIVolume {
 							const voxelIndex = voxel.x.add( gx.mul( voxel.y.add( gy.mul( voxel.z ) ) ) ).toConst();
 
 							atomicOr( occupancy.element( voxelIndex ), uint( 1 ).shiftLeft( bit ) );
-							triangleIds.element( voxelIndex ).assign( triangleIndex.add( 1 ) );
+
+							// distance of the triangle plane to the voxel centre in sub-voxels, at most half the voxel
+							// diagonal; a degenerate triangle ranks farthest
+
+							const centre = vec3( voxel ).mul( 2 ).add( 1 );
+							const distance = select( normalLength.greaterThan( 0 ), abs( dot( n, centre.sub( p0 ) ) ).div( normalLength ), float( 2 ) );
+							const closeness = uint( float( CLOSENESS_LEVELS ).sub( min( distance.mul( CLOSENESS_LEVELS / Math.sqrt( 3 ) ), CLOSENESS_LEVELS ) ) );
+
+							atomicMax( triangleIds.element( voxelIndex ), triangleKey.bitOr( closeness.shiftLeft( uint( TRIANGLE_INDEX_BITS ) ) ) );
 
 						} );
 
@@ -1193,7 +1222,7 @@ class VXGIVolume {
 
 		const triangles = this._trianglesNode;
 
-		const base = triangleId.sub( 1 ).mul( 5 ).toConst();
+		const base = triangleId.bitAnd( uint( TRIANGLE_INDEX_MASK ) ).sub( 1 ).mul( 5 ).toConst();
 		const a = triangles.element( base ).xyz.toConst();
 		const b = triangles.element( base.add( 1 ) ).xyz.toConst();
 		const c = triangles.element( base.add( 2 ) ).xyz.toConst();
