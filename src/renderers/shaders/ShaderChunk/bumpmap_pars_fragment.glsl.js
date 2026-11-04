@@ -4,6 +4,9 @@ export default /* glsl */`
 	uniform sampler2D bumpMap;
 	uniform float bumpScale;
 
+	// determinant below which the bump fades out, as the normal nears the surface plane
+	const float BUMP_DEGENERATE_EPSILON = 1e-3;
+
 	// Bump Mapping Unparametrized Surfaces on the GPU by Morten S. Mikkelsen
 	// https://mmikk.github.io/papers3d/mm_sfgrad_bump.pdf
 
@@ -35,7 +38,10 @@ export default /* glsl */`
 		float fDet = dot( vSigmaX, R1 ) * faceDirection;
 
 		vec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );
-		return normalize( abs( fDet ) * surf_norm - vGrad );
+
+		// a normal lying in the surface plane, such as on terrain skirts, has no valid perturbation
+		float fade = smoothstep( 0.0, BUMP_DEGENERATE_EPSILON, abs( fDet ) );
+		return normalize( mix( surf_norm, abs( fDet ) * surf_norm - vGrad, fade ) );
 
 	}
 
