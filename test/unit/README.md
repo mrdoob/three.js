@@ -27,7 +27,7 @@ Tests that need browser APIs (such as `DOMParser` or image decoding) are listed 
 
 GPU tests need a real GPU. WebGL skips tests that need WebGPU-only features.
 
-GPU files are discovered directly. Each GPU project runs one file at a time and reuses module imports, as the former combined suite did. The renderer is shared within a file and disposed after that file. To run one file or test:
+To run a GPU file or filter by test name:
 
 ```sh
 npx vitest run --project webgpu test/unit/src/nodes/tsl/GPUComputeBuiltins.tests.js
