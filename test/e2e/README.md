@@ -34,12 +34,16 @@ The wrapper recognizes example names and its `--make` / `--webgpu` flags until t
 
 CI renders on Ubuntu with Mesa's software Vulkan driver (lavapipe), which the thumbnails were made with. Other GPUs can differ slightly, so review the failure images before updating a thumbnail.
 
+Screenshot comparison uses a greedy strategy: after the initial readiness checks, capture immediately rather than imposing a fixed delay on every example. If the image does not match yet, capture again at increasing intervals (100, 250, then 500 ms) for up to five seconds. The test passes as soon as a capture matches. Earlier mismatches within this polling window are expected readiness attempts, not failed or flaky tests, and do not produce failure reports.
+
+If no capture matches before the polling timeout, that test attempt fails and saves its comparison images. Separately, Playwright can retry the entire test with a fresh page, up to twice by default. A test that passes only on one of these full-test retries is labeled "flaky" by Playwright; that label does not refer to the greedy screenshot attempts within a successful test.
+
 `exceptions.js` has two lists:
 
 - `exceptionList`: examples that are not tested. Naming an example explicitly still runs it.
 - `slowList`: examples that need an extra two seconds before the screenshot, for example because of async loading or shader compilation.
 
-If an example fails because a screenshot was captured too early, add it to `slowList`. Only add it to `exceptionList` as a last resort.
+If an example consistently exhausts the polling window because it needs more preparation time, consider adding it to `slowList`. Thumbnail generation also waits an extra two seconds because it has no expected image to poll against. Only add an example to `exceptionList` as a last resort.
 
 When a comparison fails, the actual, expected and diff images are saved in `test/e2e/output-screenshots`. Traces are saved in `test/e2e/results` and can be opened with `npx playwright show-trace <trace.zip>`.
 
