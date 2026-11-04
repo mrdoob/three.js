@@ -1329,7 +1329,7 @@ class EXRLoader extends DataTextureLoader {
 		const _u32 = new Uint32Array( _f32.buffer );
 
 		// float -> half bits with round-to-nearest-even, like Imath's float_to_half
-		// (DataUtils.toHalfFloat truncates, which is what put DWA output 1-5 ulp off OpenEXR).
+		// (DataUtils.toHalfFloat clamps instead of overflowing to Infinity).
 		function floatToHalfBits( f ) {
 
 			_f32[ 0 ] = f;

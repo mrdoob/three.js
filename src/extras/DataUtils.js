@@ -26,8 +26,8 @@ function _generateTables() {
 
 			baseTable[ i ] = 0x0000;
 			baseTable[ i | 0x100 ] = 0x8000;
-			shiftTable[ i ] = 24;
-			shiftTable[ i | 0x100 ] = 24;
+			shiftTable[ i ] = 25;
+			shiftTable[ i | 0x100 ] = 25;
 
 			// small number (denorm)
 
@@ -53,8 +53,8 @@ function _generateTables() {
 
 			baseTable[ i ] = 0x7c00;
 			baseTable[ i | 0x100 ] = 0xfc00;
-			shiftTable[ i ] = 24;
-			shiftTable[ i | 0x100 ] = 24;
+			shiftTable[ i ] = 25;
+			shiftTable[ i | 0x100 ] = 25;
 
 			// stay (NaN, Infinity, -Infinity)
 
@@ -156,7 +156,17 @@ function toHalfFloat( val ) {
 	_tables.floatView[ 0 ] = val;
 	const f = _tables.uint32View[ 0 ];
 	const e = ( f >> 23 ) & 0x1ff;
-	return _tables.baseTable[ e ] + ( ( f & 0x007fffff ) >> _tables.shiftTable[ e ] );
+	const m = f & 0x007fffff;
+	const shift = _tables.shiftTable[ e ];
+	const result = _tables.baseTable[ e ] + ( m >> shift );
+
+	// round to nearest, ties to even (the implicit leading bit is only part of
+	// the remainder for values between 2^-25 and 2^-24, which round to 0 or 1)
+
+	const remainder = ( m | 0x00800000 ) & ( ( 1 << shift ) - 1 );
+	const halfway = 1 << ( shift - 1 );
+
+	return ( remainder > halfway || ( remainder === halfway && ( result & 1 ) === 1 ) ) ? result + 1 : result;
 
 }
 
