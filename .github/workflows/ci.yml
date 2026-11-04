@@ -14,8 +14,6 @@ jobs:
   test:
     name: Lint, Unit, Unit addons, Circular dependencies & Examples testing
     runs-on: ubuntu-latest
-    env:
-      VISIBLE: 1
     permissions:
       contents: read
     steps:
@@ -28,10 +26,10 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm ci
-      - name: Install Vulkan drivers and xvfb
+      - name: Install Vulkan drivers
         run: |
           sudo apt-get update
-          sudo apt-get install -y mesa-vulkan-drivers xvfb
+          sudo apt-get install -y mesa-vulkan-drivers
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 
@@ -39,10 +37,10 @@ jobs:
         run: npm run lint
 
       - name: === Unit testing ===
-        run: xvfb-run -a npm run test-unit
+        run: npm run test-unit
 
       - name: === Unit addons testing ===
-        run: xvfb-run -a npm run test-unit-addons
+        run: npm run test-unit-addons
 
       - name: === Examples ready for release ===
         run: npm run test-e2e-cov

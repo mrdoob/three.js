@@ -35,7 +35,7 @@ const provider = playwright( { launchOptions: {
 	args: linux ? linuxArgs : process.platform === 'win32' ? [ '--use-angle=d3d11' ] : [ '--use-angle=metal' ],
 	env: linux ? { ...process.env, VK_DRIVER_FILES: '/usr/share/vulkan/icd.d/lvp_icd.x86_64.json' } : undefined
 } } );
-const browser = () => ( { enabled: true, headless: ! process.env.VISIBLE, provider, instances: [ { browser: 'chromium' } ] } );
+const browser = () => ( { enabled: true, headless: true, provider, instances: [ { browser: 'chromium' } ] } );
 const gpuProjects = [ 'webgl', 'webgpu' ].map( backend => ( {
 	extends: true,
 	test: {
