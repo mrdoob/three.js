@@ -185,7 +185,6 @@ class TileShadowNode extends ShadowBaseNode {
 			const lwLight = new LwLight();
 			lwLight.castShadow = true;
 			const lShadow = light.shadow.clone();
-			lShadow.filterNode = light.shadow.filterNode;
 			const tile = this.tiles[ i ];
 			lShadow.camera.left = this.shadowSize.left + width * tile.x[ 0 ];
 			lShadow.camera.right = this.shadowSize.left + width * tile.x[ 1 ];
