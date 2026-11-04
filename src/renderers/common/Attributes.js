@@ -135,6 +135,7 @@ class Attributes extends DataMap {
 			}
 
 			data.version = attribute.version;
+			data.frame = this.info.frame;
 			data.generation = _generation ++;
 
 			// interleaved buffer attributes are not event dispatchers
@@ -159,11 +160,16 @@ class Attributes extends DataMap {
 
 		} else {
 
-			if ( data.version < attribute.version || attribute.usage === DynamicDrawUsage ) {
+			// dynamic attributes might change without a version update, so they are uploaded once per frame
+
+			const frame = this.info.frame;
+
+			if ( data.version < attribute.version || ( attribute.usage === DynamicDrawUsage && data.frame !== frame ) ) {
 
 				this.backend.updateAttribute( attribute );
 
 				data.version = attribute.version;
+				data.frame = frame;
 
 			}
 
