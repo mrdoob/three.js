@@ -30,6 +30,8 @@ const maxWorkers = Math.max( 1, Math.floor( availableParallelism() * 0.75 ) );
 const linux = process.platform === 'linux';
 const linuxArgs = [ '--hide-scrollbars', '--enable-unsafe-webgpu', '--enable-features=Vulkan', '--disable-vulkan-surface', '--ignore-gpu-blocklist', '--disable-gpu-driver-bug-workarounds', '--no-sandbox' ];
 const provider = playwright( { launchOptions: {
+	// Use full Chromium, as Puppeteer did, rather than Playwright's headless shell.
+	channel: linux ? 'chromium' : undefined,
 	args: linux ? linuxArgs : process.platform === 'win32' ? [ '--use-angle=d3d11' ] : [ '--use-angle=metal' ],
 	env: linux ? { ...process.env, VK_DRIVER_FILES: '/usr/share/vulkan/icd.d/lvp_icd.x86_64.json' } : undefined
 } } );
