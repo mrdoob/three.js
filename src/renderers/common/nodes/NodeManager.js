@@ -688,11 +688,11 @@ class NodeManager extends DataMap {
 		_chainKeys[ 0 ] = scene;
 		_chainKeys[ 1 ] = lightsNode;
 
-		const callId = this.renderer.info.calls;
+		const renderId = this.nodeFrame.renderId;
 
 		const cacheKeyData = this.callHashCache.get( _chainKeys ) || {};
 
-		if ( cacheKeyData.callId !== callId ) {
+		if ( cacheKeyData.renderId !== renderId ) {
 
 			_cacheKeyValues.push( this.renderer.getOutputRenderTarget() && this.renderer.getOutputRenderTarget().multiview ? 1 : 0 );
 			_cacheKeyValues.push( this.renderer.lighting.enabled ? 1 : 0 );
@@ -712,7 +712,7 @@ class NodeManager extends DataMap {
 			const fogNode = this.getFogNode( scene );
 			if ( fogNode ) _cacheKeyValues.push( fogNode.getCacheKey() );
 
-			cacheKeyData.callId = callId;
+			cacheKeyData.renderId = renderId;
 			cacheKeyData.cacheKey = hashArray( _cacheKeyValues );
 
 			this.callHashCache.set( _chainKeys, cacheKeyData );
