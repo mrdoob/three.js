@@ -228,10 +228,11 @@ class AdaptiveSubdivisionMesh extends Mesh {
 		this.type = 'AdaptiveSubdivisionMesh';
 
 		/**
-		 * The target size of rendered triangles in pixels: the edge length of an equilateral triangle
-		 * of the same area, so the triangle density does not depend on the shape of the source
-		 * triangles. Leaves are split until their triangles are at most this large, and meshes whose
-		 * leaves all are smaller draw coarser patches.
+		 * The target size of rendered triangles in pixels of the drawing buffer, which include the
+		 * pixel ratio of the renderer: the edge length of an equilateral triangle of the same area, so
+		 * the triangle density does not depend on the shape of the source triangles. Leaves are split
+		 * until their triangles are at most this large, and meshes whose leaves all are smaller draw
+		 * coarser patches.
 		 *
 		 * @type {number}
 		 * @default 8
@@ -704,7 +705,9 @@ class AdaptiveSubdivisionMesh extends Mesh {
 		this._cameraPosition.value.copy( _cameraPosition );
 		this._cameraDirection.value.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld ).transformDirection( _inverse );
 
-		renderer.getSize( _size );
+		// pixels of the drawing buffer, so the level of detail follows the pixel ratio
+
+		renderer.getDrawingBufferSize( _size );
 
 		this._projectionScale.value = 0.5 * _size.y * camera.projectionMatrix.elements[ 5 ];
 		this._orthographic.value = camera.isOrthographicCamera ? 1 : 0;
