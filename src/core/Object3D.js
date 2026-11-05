@@ -26,6 +26,8 @@ const _zAxis = /*@__PURE__*/ new Vector3( 0, 0, 1 );
 /**
  * Fires when the object has been added to its parent object.
  *
+ * Adding 3D objects inside a listener of this event is not supported.
+ *
  * @event Object3D#added
  * @type {Object}
  */
@@ -33,6 +35,8 @@ const _addedEvent = { type: 'added' };
 
 /**
  * Fires when the object has been removed from its parent object.
+ *
+ * Removing 3D objects inside a listener of this event is not supported.
  *
  * @event Object3D#removed
  * @type {Object}
@@ -42,6 +46,8 @@ const _removedEvent = { type: 'removed' };
 /**
  * Fires when a new child object has been added.
  *
+ * Adding 3D objects inside a listener of this event is not supported.
+ *
  * @event Object3D#childadded
  * @type {Object}
  */
@@ -49,6 +55,8 @@ const _childaddedEvent = { type: 'childadded', child: null };
 
 /**
  * Fires when a child object has been removed.
+ *
+ * Removing 3D objects inside a listener of this event is not supported.
  *
  * @event Object3D#childremoved
  * @type {Object}
