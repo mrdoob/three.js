@@ -206,10 +206,11 @@ class RealtimeRadianceCascades {
 		/**
 		 * Whether `quality` adapts to the frame time, see `targetFrameTime`. It measures the frames of `update()` over a
 		 * quarter of a second, by the timestamps of the animation frames and by when the GPU finishes them, since a
-		 * browser may run the animation loop faster than the GPU, showing only some of its frames: the quality falls while the frames take longer than the target, by
-		 * more the longer they take, and rises while they do not, slowly back to the quality at which they last took
-		 * longer. If lowering it by 0.2 did not shorten them, it compares them back at the quality above: if they are
-		 * not longer there, something else limits them, e.g. the display or the CPU, and it stays there for a while.
+		 * browser may run the animation loop faster than the GPU, showing only some of its frames. The quality starts
+		 * at 0 and rises while the frames keep up with the target, in steps that double, but only slowly back to the
+		 * quality at which they last took longer, and falls while they take longer, by more the longer they take. If
+		 * lowering it by 0.2 did not shorten them, it compares them back at the quality above: if they are not longer
+		 * there, something else limits them, e.g. the display or the CPU, and it stays there for a while.
 		 *
 		 * @type {boolean}
 		 * @default false
@@ -217,10 +218,10 @@ class RealtimeRadianceCascades {
 		this.adaptiveQuality = adaptiveQuality;
 
 		/**
-		 * The frame time in milliseconds that `quality` adapts to, e.g. `1000 / 60`, or 0 for the display's: the
-		 * timestamps of the animation frames step by whole frame times of the display, at first taken as 60 Hz, and
-		 * the shortest one that the steps show is the target. While even quality 0 takes longer, the target is a
-		 * multiple of it, up to the time of 30 Hz. While the frames take longer however low the quality, e.g. because
+		 * The frame time in milliseconds that `quality` adapts to, e.g. `1000 / 60`, or 0 for the display's: taken as
+		 * 60 Hz at first, and faster if a quarter of the frames come at a faster common refresh rate, in two
+		 * measurements in a row. While even quality 0 takes longer, the target is a multiple of it, up to the time of
+		 * 30 Hz. While the frames take longer however low the quality, at a steady common refresh rate, e.g. because
 		 * the browser runs the animation loop at 30 Hz in a low power mode, the target is their time, for a while. See
 		 * `activeTargetFrameTime`.
 		 *
@@ -392,6 +393,10 @@ class RealtimeRadianceCascades {
 		this._fences = [];
 		this._fencePending = false;
 		this._gpuFrameTime = 0;
+		this._started = false;
+		this._rise = 0.02;
+		this._floorOvers = 0;
+		this._fasterDisplay = null;
 		this._displayTime = 1000 / 60;
 		this._divisor = 1;
 		this._capTime = 0;
@@ -877,25 +882,51 @@ class RealtimeRadianceCascades {
 		if ( this.adaptiveQuality !== true ) {
 
 			this._lastUpdate = this._lastStamp = null;
+			this._started = false;
 			return;
 
 		}
 
+		// from quality 0 up, so that slow devices do not start with slow frames
+
+		if ( this._started === false ) {
+
+			this._started = true;
+			this.quality = 0;
+			this._qualityLimit = 1;
+			this._rise = 0.02;
+
+		}
+
 		// the frame times from the timestamps of the animation frames, which step by whole frame times of the display,
-		// from a callback in the next frame. Without them, e.g. in XR, from the time between the calls of update()
+		// from a callback every frame while update() is called. Without them, e.g. in XR, from the time between the
+		// calls of update()
 
 		if ( typeof requestAnimationFrame === 'function' && this._stampPending === false ) {
 
 			this._stampPending = true;
 
-			requestAnimationFrame( ( stamp ) => {
+			const onFrame = ( stamp ) => {
 
-				this._stampPending = false;
 				if ( this._lastStamp !== null ) this._addFrameTime( stamp - this._lastStamp );
+
 				this._lastStamp = stamp;
 				this._stampedAt = performance.now();
 
-			} );
+				if ( this.adaptiveQuality === true && this._stampedAt - this._lastUpdate < 250 ) {
+
+					requestAnimationFrame( onFrame );
+
+				} else {
+
+					this._stampPending = false;
+					this._lastStamp = null;
+
+				}
+
+			};
+
+			requestAnimationFrame( onFrame );
 
 		}
 
@@ -933,17 +964,28 @@ class RealtimeRadianceCascades {
 
 		this._frameTimes.length = 0;
 
-		// the frame time of the display: the steps of the timestamps show it if shorter, or else a quarter of the
-		// frames that come faster than it
+		// the frame time of the display: a quarter of the frames come at a faster common refresh rate, in two windows in
+		// a row, as the timestamps are coarse and jitter in some browsers
 
 		if ( auto ) {
 
-			const display = displayFrameTime( times ) ?? refreshTime( times.sort( ( a, b ) => a - b )[ times.length >> 2 ] );
+			const fast = times.slice().sort( ( a, b ) => a - b )[ times.length >> 2 ];
+			const display = refreshTime( fast );
 
-			if ( display < this._displayTime * 0.95 ) {
+			if ( display !== fast && display < this._displayTime * 0.95 ) {
 
-				this._displayTime = Math.max( display, 1000 / 240 );
-				this._divisor = 1;
+				if ( this._fasterDisplay === display ) {
+
+					this._displayTime = display;
+					this._divisor = 1;
+
+				}
+
+				this._fasterDisplay = display;
+
+			} else {
+
+				this._fasterDisplay = null;
 
 			}
 
@@ -960,6 +1002,7 @@ class RealtimeRadianceCascades {
 			const probe = this._probe;
 
 			this._probe = null;
+			this._rise = 0.02;
 
 			if ( frameTime < probe.time * 1.15 ) {
 
@@ -1010,11 +1053,16 @@ class RealtimeRadianceCascades {
 
 			}
 
-			// even quality 0 is too slow for the display's frame time: half the frame rate, down to 30 Hz
+			// even quality 0 is too slow for the display's frame time, twice: half the frame rate, down to 30 Hz
 
 			if ( quality === 0 ) {
 
-				if ( auto && this._displayTime * this._divisor * 2 <= 1000 / 30 * 1.01 ) this._divisor *= 2;
+				if ( ++ this._floorOvers >= 2 && auto && this._displayTime * this._divisor * 2 <= 1000 / 30 * 1.01 ) {
+
+					this._divisor *= 2;
+					this._floorOvers = 0;
+
+				}
 
 				return;
 
@@ -1025,6 +1073,7 @@ class RealtimeRadianceCascades {
 
 			const step = Math.min( Math.max( Math.log2( frameTime / target ) / 1.5, 0.03 ), 0.5 );
 
+			this._rise = 0.02;
 			this._descent ??= { quality, time: frameTime };
 			this._qualityLimit = Math.min( this._qualityLimit, quality - 0.02 );
 			this.quality = Math.max( quality - step, 0 );
@@ -1036,11 +1085,13 @@ class RealtimeRadianceCascades {
 
 			if ( this._divisor > 1 && quality === 1 && frameTime <= target * 0.55 ) this._divisor /= 2;
 
-			// up while the frames are fast enough, within the jitter of the display, faster with room to spare, and
-			// only slowly back to where they last were not
+			// up while the frames are fast enough, within the jitter of the display, in steps that double, and only
+			// slowly back to where they last were not
 
-			const step = Math.min( Math.max( Math.log2( target / frameTime ) / 3, 0.02 ), 0.1 );
+			const step = Math.min( Math.max( Math.log2( target / frameTime ) / 3, this._rise ), 0.25 );
 
+			this._rise = Math.min( this._rise * 2, 0.25 );
+			this._floorOvers = 0;
 			this._descent = null;
 			this._holdTime = 0;
 			this._qualityLimit = Math.min( this._qualityLimit + 0.002, 1 );
@@ -3713,30 +3764,6 @@ function octahedralTexel( texel ) {
 	} );
 
 	return uint( y.mul( IRRADIANCE_SIZE ).add( x ) );
-
-}
-
-/**
- * Returns the longest frame time of a common refresh rate that 85% of some frame times are whole multiples of, give
- * or take a millisecond or 5%, as the timestamps of animation frames are, or null.
- *
- * @private
- * @param {Array<number>} times - The frame times in milliseconds.
- * @return {?number} The frame time of the display.
- */
-function displayFrameTime( times ) {
-
-	for ( const rate of REFRESH_RATES ) {
-
-		const period = 1000 / rate;
-		const tolerance = Math.max( 1, period * 0.05 );
-		const fits = times.filter( ( time ) => time > period - tolerance && Math.abs( time - Math.round( time / period ) * period ) < tolerance ).length;
-
-		if ( fits >= times.length * 0.85 ) return period;
-
-	}
-
-	return null;
 
 }
 

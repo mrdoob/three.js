@@ -62,7 +62,7 @@
 				view: 'Lit',
 				rays: '1 per 4 pixels',
 				traa: false,
-				adaptiveQuality: 'Auto',
+				adaptiveQuality: true,
 				quality: 1,
 				secondary: true,
 				smoothing: 0.97,
@@ -74,7 +74,6 @@
 			};
 
 			const rayStrides = { '1 per 4 pixels': 2, '1 per pixel': 1 };
-			const frameRates = { 'Auto': 0, '30 FPS': 30, '60 FPS': 60, '120 FPS': 120, 'Off': null };
 			const views = { 'Lit': 0, 'Indirect': 1, 'Irradiance': 2, 'Probes': 3, 'Levels': 4 };
 			const scenes = { 'Sponza': createSponza, 'Courtyard': createCourtyard, 'Cornell Box': () => createCornellBox( 'panel' ), 'Cornell Box (Rect Area Light)': () => createCornellBox( 'rect' ), 'Cornell Box (Spot Light)': () => createCornellBox( 'spot' ) };
 
@@ -115,14 +114,14 @@
 				gui.add( params, 'rays', Object.keys( rayStrides ) ).name( 'Rays' ).onChange( updateCascades );
 				gui.add( params, 'secondary' ).name( 'Secondary Bounces' ).onChange( updateCascades );
 				gui.add( params, 'smoothing', 0, 1, 0.01 ).name( 'Temporal Smoothing' ).onChange( updateCascades );
-				gui.add( params, 'adaptiveQuality', Object.keys( frameRates ) ).name( 'Adaptive Quality' ).onChange( updateQuality ).listen();
+				gui.add( params, 'adaptiveQuality' ).name( 'Adaptive Quality' ).onChange( updateQuality ).listen();
 				gui.add( params, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( () => {
 
 					// the slider shows the adaptive quality, moving it fixes the quality
 
 					if ( params.quality === shownQuality ) return;
 
-					params.adaptiveQuality = 'Off';
+					params.adaptiveQuality = false;
 					updateQuality();
 
 				} ).listen();
@@ -259,12 +258,9 @@
 
 			function updateQuality() {
 
-				// the quality adapts to the frame rate of the display, or to a given one, or is fixed
+				// the quality adapts to the frame rate of the display, or is fixed
 
-				const frameRate = frameRates[ params.adaptiveQuality ];
-
-				cascades.adaptiveQuality = frameRate !== null;
-				cascades.targetFrameTime = frameRate > 0 ? 1000 / frameRate : 0;
+				cascades.adaptiveQuality = params.adaptiveQuality;
 				cascades.quality = params.quality;
 
 			}
