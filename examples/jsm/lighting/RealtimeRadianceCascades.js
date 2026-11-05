@@ -48,6 +48,10 @@ const ALLOCATED = 0, FREED = 1, PROBES = 2;
 
 const MAX_LIGHTS = 256;
 
+// the share of the light of a hit below which the lights trace their shadow ray only sometimes, see _lightRadiance()
+
+const LIGHT_SHARE = 0.1;
+
 const _position = /*@__PURE__*/ new Vector3();
 const _direction = /*@__PURE__*/ new Vector3();
 const _rotation = /*@__PURE__*/ new Matrix4();
@@ -100,6 +104,11 @@ const _size = /*@__PURE__*/ new Vector2();
  * `scene.background`, light the scene only through the cascades. The rays see the colors and the emissive colors of
  * the materials, not their texture maps. Meshes parented to a light, e.g. its helper or bulb, are left out, and the
  * shadow rays see every other mesh, so a light inside a closed mesh does not bounce.
+ *
+ * A hit that the lights reach traces a shadow ray to one of them, and every hit weighs all of them. Point and spot
+ * lights reach everything by default: give local ones a `distance`, beyond which they reach nothing, so that the hits
+ * beyond it trace no shadow ray for them. Lights that add less than a tenth of the light of a hit trace it only
+ * sometimes.
  *
  * This class can only be used with {@link WebGPURenderer} and a WebGPU backend.
  *
@@ -2915,8 +2924,8 @@ class RealtimeRadianceCascades {
 
 		} );
 
-		if ( this._lights !== null || this._rectLights !== null ) radiance.addAssign( this._lightRadiance( point, normal, distance ) );
 		if ( this.secondary ) radiance.addAssign( this._sampleSecondary( point, normal ) );
+		if ( this._lights !== null || this._rectLights !== null ) radiance.addAssign( this._lightRadiance( point, normal, distance, radiance ) );
 
 		return emission.add( albedo.mul( radiance ) ).mul( facing );
 
@@ -2929,8 +2938,13 @@ class RealtimeRadianceCascades {
 	 * probability of the pick.
 	 *
 	 * @private
+	 * @param {Node<vec3>} point - The hit.
+	 * @param {Node<vec3>} normal - The normal of the hit.
+	 * @param {Node<float>} distance - The distance of the hit from the origin of its ray.
+	 * @param {Node<vec3>} other - The rest of the light of the hit, see `LIGHT_SHARE`.
+	 * @return {Node<vec3>} The light.
 	 */
-	_lightRadiance( point, normal, distance ) {
+	_lightRadiance( point, normal, distance, other ) {
 
 		const total = float( 0 ).toVar();
 		const picked = vec4( 0 ).toVar();
@@ -3009,14 +3023,18 @@ class RealtimeRadianceCascades {
 
 		}
 
-		const radiance = vec3( 0 ).toVar();
+		// Russian roulette: lights that add less than LIGHT_SHARE of the light of the hit trace their shadow ray with
+		// the probability of their share over it, and their light is divided by it, which keeps its mean
 
-		If( total.greaterThan( 0 ), () => {
+		const radiance = vec3( 0 ).toVar();
+		const probability = total.div( total.add( other.dot( vec3( 1 ) ) ).mul( LIGHT_SHARE ) ).min( 1 ).toVar();
+
+		If( total.greaterThan( 0 ).and( hash( seed.add( 2 * MAX_LIGHTS ) ).lessThan( probability ) ), () => {
 
 			const origin = point.add( normal.mul( distance.mul( 1e-3 ).add( 1e-3 ) ) );
 			const visibility = this._visibility( origin, toLight.xyz, toLight.w.mul( 0.99 ) );
 
-			radiance.assign( picked.rgb.mul( total.div( picked.w ).mul( visibility ) ) );
+			radiance.assign( picked.rgb.mul( total.div( picked.w.mul( probability ) ).mul( visibility ) ) );
 
 		} );
 
