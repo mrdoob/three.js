@@ -1,5 +1,5 @@
 import { BackSide, BufferAttribute, BufferGeometry, Color, DepthTexture, EquirectangularReflectionMapping, EquirectangularRefractionMapping, FloatType, FrontSide, HalfFloatType, Matrix4, NodeMaterial, QuadMesh, RenderTarget, StorageBufferAttribute, Vector2, Vector3 } from 'three/webgpu';
-import { Break, Fn, If, Loop, abs, atan, atomicAdd, atomicLoad, atomicMax, atomicMin, atomicStore, cameraPosition, ceil, clamp, cos, cross, diffuseColor, dot, equirectUV, exp2, float, floatBitsToUint, floor, fract, getViewPosition, hash, instanceIndex, int, ivec2, ivec3, ivec4, log2, max, min, mix, mrt, normalWorldGeometry, normalize, output, pmremTexture, positionWorld, screenUV, select, sin, sqrt, storage, texture, uint, uintBitsToFloat, uniform, uv, uvec3, vec2, vec3, vec4, velocity } from 'three/tsl';
+import { Break, Fn, If, Loop, abs, atan, atomicAdd, atomicLoad, atomicMax, atomicMin, atomicStore, cameraPosition, ceil, clamp, cos, cross, diffuseColor, dot, equirectUV, exp2, float, floatBitsToUint, floor, fract, getViewPosition, hash, instanceIndex, int, ivec2, ivec3, ivec4, log2, max, min, mix, mrt, normalWorldGeometry, normalize, output, pmremTexture, positionWorld, screenUV, select, sin, sqrt, step, storage, texture, uint, uintBitsToFloat, uniform, uv, uvec3, vec2, vec3, vec4, velocity } from 'three/tsl';
 
 import { MeshBVH, SAH } from 'three-mesh-bvh';
 import { BVHComputeData, rayIntersectionResultStruct, rayStruct, wgslTagFn } from 'three-mesh-bvh/webgpu';
@@ -1210,6 +1210,17 @@ class RealtimeRadianceCascades {
 			// fn
 			fn realtimeRadianceCascadesTrace( origin: vec3f, direction: vec3f ) -> vec4f {
 
+				// a ray that is not finite passes every bounds test and walks the whole BVH, which can hang the GPU, so it
+				// misses. The exponent bits are tested since WGSL may assume that there are no NaNs.
+
+				let infinite = vec3u( 0x7f800000u );
+
+				if ( any( ( bitcast<vec3u>( origin ) & infinite ) == infinite ) || any( ( bitcast<vec3u>( direction ) & infinite ) == infinite ) ) {
+
+					return vec4f( 0.0 );
+
+				}
+
 				var ray: ${ rayStruct };
 				ray.origin = origin;
 				ray.direction = direction;
@@ -1251,6 +1262,16 @@ class RealtimeRadianceCascades {
 		this._visibility = wgslTagFn/* wgsl */`
 			// fn
 			fn realtimeRadianceCascadesVisibility( origin: vec3f, direction: vec3f, maxDist: f32 ) -> f32 {
+
+				// as in the trace, a ray that is not finite is not traced
+
+				let infinite = vec3u( 0x7f800000u );
+
+				if ( any( ( bitcast<vec3u>( origin ) & infinite ) == infinite ) || any( ( bitcast<vec3u>( direction ) & infinite ) == infinite ) ) {
+
+					return 0.0;
+
+				}
 
 				var ray: ${ rayStruct };
 				ray.origin = origin;
@@ -1574,9 +1595,9 @@ class RealtimeRadianceCascades {
 		const level = int( key.shiftRight( 27 ) ).toVar();
 		const wrapped = ivec3( int( key.bitAnd( 511 ) ), int( key.shiftRight( 9 ).bitAnd( 511 ) ), int( key.shiftRight( 18 ).bitAnd( 511 ) ) );
 		const camera = this._cellOf( this._cameraPosition, level, n ).toVar();
-		const delta = wrapped.sub( camera ).bitAnd( ivec3( 511 ) ).toVar();
+		const delta = wrapped.sub( camera ).add( 256 ).bitAnd( ivec3( 511 ) ).sub( 256 );
 
-		return { cell: camera.add( select( delta.greaterThanEqual( ivec3( 256 ) ), delta.sub( 512 ), delta ) ), level };
+		return { cell: camera.add( delta ), level };
 
 	}
 
@@ -1760,7 +1781,7 @@ class RealtimeRadianceCascades {
 
 					If( slot.notEqual( NONE ), () => {
 
-						const w = select( offset.equal( ivec3( 1 ) ), f, f.oneMinus() );
+						const w = mix( f.oneMinus(), f, vec3( offset ) );
 						const quality = this.useQualityWeight ? this._float( 'quality', slot ) : float( 1 );
 						const weight = w.x.mul( w.y ).mul( w.z ).mul( quality ).toVar();
 						const base = slot.mul( IRRADIANCE_TEXELS ).toVar();
@@ -2263,7 +2284,7 @@ class RealtimeRadianceCascades {
 
 					const cell = key.xyz.toVar();
 					const lower = ivec3( floor( vec3( cell.sub( 1 ) ).mul( 0.5 ) ) ).toVar();
-					const lowerWeight = select( cell.bitAnd( ivec3( 1 ) ).equal( ivec3( 0 ) ), vec3( 0.25 ), vec3( 0.75 ) ).toVar();
+					const lowerWeight = vec3( cell.bitAnd( ivec3( 1 ) ) ).mul( 0.5 ).add( 0.25 ).toVar();
 
 					for ( let corner = 0; corner < 8; corner ++ ) {
 
@@ -2919,7 +2940,7 @@ function binDirection( bin, theta ) {
 function octahedralEncode( direction ) {
 
 	const n = direction.div( abs( direction.x ).add( abs( direction.y ) ).add( abs( direction.z ) ) ).toVar();
-	const signs = select( n.xy.greaterThanEqual( vec2( 0 ) ), vec2( 1 ), vec2( - 1 ) );
+	const signs = step( vec2( 0 ), n.xy ).mul( 2 ).sub( 1 );
 	const folded = select( n.z.greaterThanEqual( 0 ), n.xy, abs( n.yx ).oneMinus().mul( signs ) );
 
 	return folded.mul( 0.5 ).add( 0.5 );
@@ -2935,7 +2956,7 @@ function octahedralDecode( coordinates ) {
 
 	const v = coordinates.mul( 2 ).sub( 1 ).toVar();
 	const f = abs( v.x ).add( abs( v.y ) ).oneMinus().toVar();
-	const signs = select( v.greaterThanEqual( vec2( 0 ) ), vec2( 1 ), vec2( - 1 ) );
+	const signs = step( vec2( 0 ), v ).mul( 2 ).sub( 1 );
 	const n = select( f.greaterThanEqual( 0 ), v, abs( v.yx ).oneMinus().mul( signs ) );
 
 	return normalize( vec3( n, f ) );
