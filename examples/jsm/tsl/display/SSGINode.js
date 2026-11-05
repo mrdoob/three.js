@@ -533,7 +533,7 @@ class SSGINode extends Node {
 
 					const lightColor = sampleBeauty( sampleUV );
 
-					If( luminance( lightColor ).greaterThan( 0.001 ), () => { // Continue if there is light at that location (intensity > 0)
+					If( luminance( lightColor.rgb ).greaterThan( 0.001 ), () => { // Continue if there is light at that location (intensity > 0)
 
 						const lightDirectionVS = normalize( pixelToSample );
 						const normalDotLightDirection = clamp( dot( viewNormal, lightDirectionVS ) );
