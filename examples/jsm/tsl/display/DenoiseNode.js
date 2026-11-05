@@ -642,10 +642,21 @@ class DenoiseNode extends Node {
 		this._viewHeight.value = 2 / e[ 5 ];
 		this._footprintScale.value = camera.isOrthographicCamera ? this._size.value.y : e[ 5 ] * this._size.value.y / 2;
 
-		// the jitter of the projection, e.g. of TRAA, in uv: the history moves with its change
+		// the jitter of the projection, e.g. of TRAA, in uv: the history moves with its change. It lands in the depth
+		// column of perspective projections and in the translation of orthographic projections
 
 		this._jitterDelta.value.copy( this._jitter );
-		this._jitter.set( - e[ 8 ] * 0.5, e[ 9 ] * 0.5 );
+
+		if ( camera.isOrthographicCamera ) {
+
+			this._jitter.set( e[ 12 ] * 0.5, - e[ 13 ] * 0.5 );
+
+		} else {
+
+			this._jitter.set( - e[ 8 ] * 0.5, e[ 9 ] * 0.5 );
+
+		}
+
 		this._jitterDelta.value.sub( this._jitter );
 
 		this._cameraWorldMatrix.value.copy( camera.matrixWorld );
