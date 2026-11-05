@@ -1,5 +1,5 @@
-import { BackSide, BufferAttribute, BufferGeometry, Color, DepthTexture, EquirectangularReflectionMapping, EquirectangularRefractionMapping, FloatType, FrontSide, HalfFloatType, Matrix4, NodeMaterial, QuadMesh, RenderTarget, StorageBufferAttribute, Vector2, Vector3 } from 'three/webgpu';
-import { Break, Fn, If, Loop, abs, atan, atomicAdd, atomicLoad, atomicMax, atomicMin, atomicStore, cameraPosition, ceil, clamp, cos, cross, diffuseColor, dot, equirectUV, exp2, float, floatBitsToUint, floor, fract, getViewPosition, hash, instanceIndex, int, ivec2, ivec3, ivec4, log2, max, min, mix, mrt, normalWorldGeometry, normalize, output, pmremTexture, positionWorld, screenUV, select, sin, sqrt, step, storage, texture, uint, uintBitsToFloat, uniform, uv, uvec3, vec2, vec3, vec4, velocity } from 'three/tsl';
+import { BackSide, BufferAttribute, BufferGeometry, DepthTexture, EquirectangularReflectionMapping, EquirectangularRefractionMapping, FloatType, FrontSide, HalfFloatType, Matrix4, NodeMaterial, QuadMesh, RenderTarget, StorageBufferAttribute, Vector2, Vector3, Vector4 } from 'three/webgpu';
+import { Break, Fn, If, Loop, abs, atan, atomicAdd, atomicLoad, atomicMax, atomicMin, atomicStore, cameraPosition, ceil, clamp, cos, cross, diffuseColor, dot, equirectUV, exp2, float, floatBitsToUint, floor, fract, getDistanceAttenuation, getViewPosition, hash, instanceIndex, int, isBackgroundDepth, ivec2, ivec3, ivec4, log2, max, min, mix, mrt, normalWorldGeometry, normalize, output, pmremTexture, positionWorld, screenUV, select, sin, smoothstep, sqrt, step, storage, texture, uint, uintBitsToFloat, uniform, uniformArray, uv, uvec3, vec2, vec3, vec4, velocity } from 'three/tsl';
 
 import { MeshBVH, SAH } from 'three-mesh-bvh';
 import { BVHComputeData, rayIntersectionResultStruct, rayStruct, wgslTagFn } from 'three-mesh-bvh/webgpu';
@@ -44,7 +44,13 @@ const IRRADIANCE_TEXELS = IRRADIANCE_SIZE * IRRADIANCE_SIZE;
 
 const ALLOCATED = 0, FREED = 1, PROBES = 2;
 
+// the most point and spot lights that light the hits, every hit weighs all of them
+
+const MAX_LIGHTS = 256;
+
 const _position = /*@__PURE__*/ new Vector3();
+const _direction = /*@__PURE__*/ new Vector3();
+const _entry = /*@__PURE__*/ new Float32Array( 8 );
 const _size = /*@__PURE__*/ new Vector2();
 
 /**
@@ -66,7 +72,8 @@ const _size = /*@__PURE__*/ new Vector2();
  * - Every pixel traces a ray through a {@link https://github.com/gkjohnson/three-mesh-bvh three-mesh-bvh} BVH of the scene, in a direction of an
  * R2 sequence over the rays of its probes, and every hit of the last frame traces a secondary ray. A hit adds
  * its emission, the light of the sun, which a shadow ray or the shadow map of the sun (`useShadowMap`) occludes,
- * and the irradiance of its secondary probe ("infinite bounces"). A ray adds its radiance to the cascade whose interval holds its hit distance, and its
+ * the light of one of the point and spot lights, picked in proportion to its light at the hit, which a shadow ray
+ * occludes, and the irradiance of its secondary probe ("infinite bounces"). A ray adds its radiance to the cascade whose interval holds its hit distance, and its
  * transmittance to the cascades below ("ray splitting").
  * - The bins sum their rays, and decay their sums by `qualityDecay` every frame. The probes count their rays
  * likewise ("quality"), which weighs them in the merge and the final gather.
@@ -83,12 +90,14 @@ const _size = /*@__PURE__*/ new Vector2();
  * probe layout and of the levels of detail (`spacing`, `levelDistance`, `levels`, `cascades`, `directions`,
  * `maxProbes`, `orientations`) clear the probes and rebuild the passes, `rayStride`,
  * `secondary`, `useQualityWeight`, `velocity` and `useShadowMap` rebuild the passes, the others are uniforms. Fetch `getCompositeNode()`
- * again after the passes were rebuilt.
+ * and `getIrradianceNode()` again after the passes were rebuilt.
  *
- * The geometry of the scene is static, see `setScene()`. The sun, the first visible directional light, and the
- * camera can change every frame. The direct light of the analytic lights is left to the materials of the G-buffer;
- * emissive surfaces and the sky, an equirectangular or cube texture in `scene.background`, light the scene only
- * through the cascades. The rays see the colors and the emissive colors of the materials, not their texture maps.
+ * The geometry of the scene is static, see `setScene()` and `setSceneData()`. The camera, the lights and the colors
+ * of the materials can change every frame: the sun, see `sun`, and the visible point and spot lights of the scene
+ * of `update()`, at most 256. The direct light of the analytic lights is left to the materials of the G-buffer, the
+ * cascades add its bounces; emissive surfaces and the sky, an equirectangular or cube texture in `scene.background`,
+ * light the scene only through the cascades. The rays see the colors and the emissive colors of the materials, not
+ * their texture maps, and the shadow rays see every mesh, so a light inside a closed mesh does not bounce.
  *
  * This class can only be used with {@link WebGPURenderer} and a WebGPU backend.
  *
@@ -229,11 +238,21 @@ class RealtimeRadianceCascades {
 		 */
 		this.intensity = uniform( 1 );
 
+		/**
+		 * The directional light that lights the hits, see `useShadowMap`: `undefined` takes the first visible
+		 * directional light of the scene, `null` none.
+		 *
+		 * @type {DirectionalLight|null|undefined}
+		 * @default undefined
+		 */
+		this.sun = undefined;
+
 		// the scene that the rays trace: its BVH, the material of each triangle, the materials and the sky
 
 		this._bvh = null;
-		this._geometry = null;
 		this._sceneData = null;
+		this._materials = [];
+		this._materialData = null;
 		this._triangleOffset = 0;
 		this._trace = null;
 		this._faceNormal = null;
@@ -247,6 +266,7 @@ class RealtimeRadianceCascades {
 		this._kernels = null;
 		this._frameKernels = null;
 		this._compositeNode = null;
+		this._irradianceNode = null;
 		this._frame = 0;
 		this._layout = null;
 		this._buffers = [];
@@ -271,6 +291,9 @@ class RealtimeRadianceCascades {
 		this._shadowSize = uniform( new Vector2() );
 		this._shadowOffset = uniform( 0 );
 		this._shadowSign = uniform( 1 );
+		this._lights = null;
+		this._lightCount = uniform( 0, 'uint' );
+		this._sceneLights = [];
 		this._lodBias = uniform( 0 );
 		this._readingCounts = false;
 		this._screenWidth = uniform( 1, 'uint' );
@@ -372,16 +395,63 @@ class RealtimeRadianceCascades {
 	}
 
 	/**
-	 * Builds the BVH of the scene that the rays trace. Call it again after changing the geometry or the
-	 * materials.
+	 * Builds the BVH of the visible meshes of a scene, which the rays trace, and takes the sky from its background.
+	 * Call it again after changing the geometry or assigning other materials, their colors are read every frame.
 	 *
 	 * @param {WebGPURenderer} renderer - The renderer.
 	 * @param {Scene} scene - The scene.
 	 */
 	setScene( renderer, scene ) {
 
+		this.setSceneData( renderer, this._collect( scene ), scene );
+
+	}
+
+	/**
+	 * Sets the triangles that the rays trace from data instead of the meshes of a scene, e.g. with a BVH that was
+	 * built in a worker or loaded. Call it again after changing the geometry.
+	 *
+	 * @param {WebGPURenderer} renderer - The renderer.
+	 * @param {Object} data - The triangles.
+	 * @param {BufferGeometry} data.geometry - The triangles in world space, one per three vertices: a non-indexed
+	 * geometry, or one whose index was the identity before its BVH sorted it. Its `boundsTree`, a `MeshBVH`, is built
+	 * if it has none.
+	 * @param {Array<Material>} data.materials - The materials, which the rays see as in `setScene()`. Objects with the
+	 * `color`, `emissive`, `emissiveIntensity`, `metalness` and `side` of a material will do.
+	 * @param {?(Array<number>|Uint8Array|Uint16Array|Uint32Array)} [data.materialIndices=null] - The index of the
+	 * material of each triangle, or null for the first material.
+	 * @param {?Scene} [scene=null] - The scene whose background is the sky.
+	 */
+	setSceneData( renderer, { geometry, materials, materialIndices = null }, scene = null ) {
+
 		this._clearScene();
-		this._collect( scene );
+		this._setEnvironment( scene );
+
+		// the BVH sorts the triangles of its index but the vertices keep their order, so the first vertex of a hit
+		// gives its triangle. A SAH tree with small leaves traces the rays faster than the default one
+
+		geometry.boundsTree ??= new MeshBVH( geometry, { strategy: SAH, targetLeafSize: 4 } );
+
+		const bvh = new BVHComputeData( geometry, { attributes: { position: 'vec4f' } } );
+		bvh.update();
+
+		// one buffer, which saves a binding: the materials as the bits of floats, see materialEntry(), then the
+		// material of each triangle
+
+		const offset = materials.length * 8;
+		const sceneArray = new Uint32Array( offset + Math.max( geometry.getAttribute( 'position' ).count / 3, 1 ) );
+		const materialData = new Float32Array( sceneArray.buffer, 0, offset );
+
+		materials.forEach( ( material, i ) => materialEntry( material, materialData.subarray( i * 8, i * 8 + 8 ) ) );
+
+		if ( materialIndices !== null ) sceneArray.set( materialIndices, offset );
+
+		this._bvh = bvh;
+		this._sceneData = storage( new StorageBufferAttribute( sceneArray, 1 ), 'uint' ).toReadOnly();
+		this._materials = materials.slice();
+		this._materialData = materialData;
+		this._triangleOffset = offset;
+
 		this._createTrace();
 		this._createSky( renderer );
 
@@ -412,6 +482,45 @@ class RealtimeRadianceCascades {
 	}
 
 	/**
+	 * Returns the node of the indirect light at the pixels of the G-buffer, at their screen position: the radiance
+	 * that a white diffuse surface reflects, times `intensity`. Times the diffuse color, it is the light that the
+	 * composite adds, so materials can light themselves with it in a pass of their own.
+	 *
+	 * @return {Node<vec3>} The indirect light.
+	 */
+	getIrradianceNode() {
+
+		this._applyChanges();
+
+		if ( this._irradianceNode ) return this._irradianceNode;
+
+		const gbuffer = this._getGBuffer( 1, 1 );
+		const normalMap = texture( gbuffer.textures[ 2 ] );
+		const depthMap = texture( gbuffer.depthTexture );
+
+		this._irradianceNode = Fn( () => {
+
+			const result = vec3( 0 ).toVar();
+			const depth = depthMap.sample( screenUV ).x.toVar();
+
+			If( isBackgroundDepth( depth ).not(), () => {
+
+				const position = this._worldPosition( screenUV, depth ).toVar();
+				const normal = this._facingNormal( normalMap.sample( screenUV ).xyz ).toVar();
+
+				result.assign( this._gather( position, normal ).mul( this.intensity ) );
+
+			} );
+
+			return result;
+
+		} )();
+
+		return this._irradianceNode;
+
+	}
+
+	/**
 	 * Returns the node that composites the lit scene and the indirect light, e.g. for the `outputNode` of a
 	 * {@link RenderPipeline}.
 	 *
@@ -428,6 +537,7 @@ class RealtimeRadianceCascades {
 		const albedo = texture( gbuffer.textures[ 1 ] );
 		const normalMap = texture( gbuffer.textures[ 2 ] );
 		const depthMap = texture( gbuffer.depthTexture );
+		const irradiance = this.getIrradianceNode();
 
 		this._compositeNode = Fn( () => {
 
@@ -435,12 +545,12 @@ class RealtimeRadianceCascades {
 			const result = lit.toVar();
 			const depth = depthMap.sample( screenUV ).x.toVar();
 
-			If( depth.lessThan( 1 ), () => {
+			If( isBackgroundDepth( depth ).not(), () => {
 
 				const position = this._worldPosition( screenUV, depth ).toVar();
 				const normal = this._facingNormal( normalMap.sample( screenUV ).xyz ).toVar();
 				const diffuse = albedo.sample( screenUV ).rgb.toVar();
-				const radiance = this._gather( position, normal ).mul( this.intensity ).toVar();
+				const radiance = irradiance.toVar();
 
 				If( this.mode.equal( 0 ), () => {
 
@@ -561,7 +671,9 @@ class RealtimeRadianceCascades {
 
 		// the passes are built after the G-buffer, whose render creates the shadow map of the sun
 
-		const shadowTexture = this._updateSun( renderer, scene );
+		this._updateMaterials();
+
+		const shadowTexture = this._updateLights( renderer, scene );
 
 		if ( shadowTexture !== this._shadowTexture ) {
 
@@ -785,7 +897,7 @@ class RealtimeRadianceCascades {
 		}
 
 		this._disposeKernels();
-		this._compositeNode = null;
+		this._compositeNode = this._irradianceNode = null;
 		this._kernelKey = kernelKey;
 
 	}
@@ -1026,11 +1138,12 @@ class RealtimeRadianceCascades {
 
 		// the vertex normal on the side of the visible face, the flat normal of the triangle towards the camera: the back
 		// faces of double sided materials and normals against the winding are flipped, but not smooth normals that point
-		// a little away from the camera at grazing angles
+		// a little away from the camera at grazing angles. Zero normals, which normalize to NaN, take the flat normal
 
 		const flat = cross( positionWorld.dFdx(), positionWorld.dFdy() );
 		const facing = select( dot( flat, cameraPosition.sub( positionWorld ) ).lessThan( 0 ), flat.negate(), flat );
-		const normal = select( dot( normalWorldGeometry, facing ).lessThan( 0 ), normalWorldGeometry.negate(), normalWorldGeometry );
+		const oriented = select( dot( normalWorldGeometry, facing ).lessThan( 0 ), normalWorldGeometry.negate(), normalWorldGeometry );
+		const normal = select( dot( normalWorldGeometry, normalWorldGeometry ).greaterThan( 0.25 ), oriented, normalize( facing ) );
 
 		this._gbuffer = gbuffer;
 		// the velocity needs the transforms of the last frame of every object, so it is only there on request
@@ -1052,27 +1165,23 @@ class RealtimeRadianceCascades {
 	_clearScene() {
 
 		this._bvh?.dispose();
-		this._geometry?.dispose();
 		this._sceneData?.value.dispose();
 
-		this._bvh = this._geometry = this._sceneData = null;
+		this._bvh = this._sceneData = this._materialData = null;
+		this._materials = [];
 
 	}
 
 	/**
-	 * Merges the visible meshes into one world space geometry, builds its BVH and stores the material of each
-	 * triangle, and the sky of the scene background.
+	 * Takes the sky from the background of a scene: an equirectangular or cube texture, oriented like the rendered
+	 * background.
 	 *
 	 * @private
-	 * @param {Scene} scene - The scene.
+	 * @param {?Scene} scene - The scene.
 	 */
-	_collect( scene ) {
+	_setEnvironment( scene ) {
 
-		scene.updateMatrixWorld();
-
-		// a background texture is the sky, oriented like the rendered background
-
-		const background = scene.background;
+		const background = scene !== null ? scene.background : null;
 
 		if ( background !== null && ( background.isCubeTexture === true || background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping ) ) {
 
@@ -1086,40 +1195,24 @@ class RealtimeRadianceCascades {
 
 		}
 
+	}
+
+	/**
+	 * Merges the visible meshes of a scene into one world space geometry, with the material of each triangle, see
+	 * `setSceneData()`.
+	 *
+	 * @private
+	 * @param {Scene} scene - The scene.
+	 * @return {{geometry: BufferGeometry, materials: Array<Material>, materialIndices: Uint32Array}} The triangles.
+	 */
+	_collect( scene ) {
+
+		scene.updateMatrixWorld();
+
 		const positions = [];
-		const triangles = [];
+		const materialIndices = [];
 		const materials = [];
-		const entries = new Map();
-
-		// one entry per material: the diffuse color and front side visibility, then the emitted radiance and back
-		// side visibility. Unlit surfaces emit their color, metals have no diffuse color
-
-		const getEntry = ( material ) => {
-
-			if ( entries.has( material ) === false ) {
-
-				const color = new Color( 0, 0, 0 );
-				const emission = new Color( 0, 0, 0 );
-
-				if ( material.isMeshBasicMaterial === true ) {
-
-					if ( material.color !== undefined ) emission.copy( material.color );
-
-				} else {
-
-					if ( material.color !== undefined ) color.copy( material.color ).multiplyScalar( 1 - ( material.metalness ?? 0 ) );
-					if ( material.emissive !== undefined ) emission.copy( material.emissive ).multiplyScalar( material.emissiveIntensity ?? 1 );
-
-				}
-
-				entries.set( material, entries.size );
-				materials.push( color.r, color.g, color.b, material.side !== BackSide ? 1 : 0, emission.r, emission.g, emission.b, material.side !== FrontSide ? 1 : 0 );
-
-			}
-
-			return entries.get( material );
-
-		};
+		const indices = new Map();
 
 		scene.traverseVisible( ( object ) => {
 
@@ -1147,7 +1240,14 @@ class RealtimeRadianceCascades {
 
 				if ( material === undefined || material.visible === false ) continue;
 
-				const entry = getEntry( material );
+				if ( indices.has( material ) === false ) {
+
+					indices.set( material, materials.length );
+					materials.push( material );
+
+				}
+
+				const materialIndex = indices.get( material );
 				const start = Math.max( drawStart, group.start );
 				const end = Math.min( drawEnd, group.start + group.count );
 
@@ -1160,7 +1260,7 @@ class RealtimeRadianceCascades {
 
 					}
 
-					triangles.push( entry );
+					materialIndices.push( materialIndex );
 
 				}
 
@@ -1168,28 +1268,11 @@ class RealtimeRadianceCascades {
 
 		} );
 
-		// the BVH sorts the triangles of its index but the vertices keep their order, so the first vertex of a hit
-		// gives its triangle. A SAH tree with small leaves traces the rays faster than the default one
-
 		const geometry = new BufferGeometry();
 		geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( positions ), 3 ) );
 		geometry.setIndex( new BufferAttribute( new Uint32Array( positions.length / 3 ).map( ( value, i ) => i ), 1 ) );
-		geometry.boundsTree = new MeshBVH( geometry, { strategy: SAH, targetLeafSize: 4 } );
 
-		const bvh = new BVHComputeData( geometry, { attributes: { position: 'vec4f' } } );
-		bvh.update();
-
-		// one buffer, which saves a binding: the materials as the bits of floats, then the material of each triangle
-
-		const sceneArray = new Uint32Array( materials.length + Math.max( triangles.length, 1 ) );
-
-		sceneArray.set( new Uint32Array( new Float32Array( materials ).buffer ) );
-		sceneArray.set( triangles, materials.length );
-
-		this._geometry = geometry;
-		this._bvh = bvh;
-		this._sceneData = storage( new StorageBufferAttribute( sceneArray, 1 ), 'uint' ).toReadOnly();
-		this._triangleOffset = materials.length;
+		return { geometry, materials, materialIndices: new Uint32Array( materialIndices ) };
 
 	}
 
@@ -1361,22 +1444,114 @@ class RealtimeRadianceCascades {
 	}
 
 	/**
-	 * Copies the first visible directional light into the sun uniforms, and its shadow map for `useShadowMap`.
+	 * Copies the colors of the materials that changed into the scene buffer.
+	 *
+	 * @private
+	 */
+	_updateMaterials() {
+
+		const data = this._materialData;
+
+		if ( data === null ) return;
+
+		let changed = false;
+
+		for ( let i = 0; i < this._materials.length; i ++ ) {
+
+			materialEntry( this._materials[ i ], _entry );
+
+			for ( let k = 0; k < 8; k ++ ) {
+
+				if ( data[ i * 8 + k ] !== _entry[ k ] ) {
+
+					data[ i * 8 + k ] = _entry[ k ];
+					changed = true;
+
+				}
+
+			}
+
+		}
+
+		if ( changed ) {
+
+			const attribute = this._sceneData.value;
+
+			attribute.clearUpdateRanges();
+			attribute.addUpdateRange( 0, data.length );
+			attribute.needsUpdate = true;
+
+		}
+
+	}
+
+	/**
+	 * Copies the visible point and spot lights into the light uniforms, and the sun, see `sun`, into the sun
+	 * uniforms, with its shadow map for `useShadowMap`.
 	 *
 	 * @private
 	 * @param {WebGPURenderer} renderer - The renderer.
 	 * @param {Scene} scene - The scene.
 	 * @return {?DepthTexture} The shadow map of the sun that the passes read, or null.
 	 */
-	_updateSun( renderer, scene ) {
+	_updateLights( renderer, scene ) {
 
-		let sun = null;
+		const lights = this._sceneLights;
+		let sun = this.sun ?? null;
+
+		lights.length = 0;
 
 		scene.traverseVisible( ( object ) => {
 
-			if ( sun === null && object.isDirectionalLight === true ) sun = object;
+			if ( sun === null && this.sun === undefined && object.isDirectionalLight === true ) sun = object;
+			if ( ( object.isPointLight === true || object.isSpotLight === true ) && lights.length < MAX_LIGHTS ) lights.push( object );
 
 		} );
+
+		// the room for the lights only grows, so that lights that come and go do not rebuild the passes
+
+		if ( lights.length > ( this._lights !== null ? this._lights.array.length / 3 : 0 ) ) {
+
+			const capacity = Math.min( 2 ** Math.ceil( Math.log2( lights.length ) ), MAX_LIGHTS );
+
+			this._lights = uniformArray( Array.from( { length: capacity * 3 }, () => new Vector4() ), 'vec4' );
+			this._disposeKernels( false );
+
+		}
+
+		// three vectors per light: its position and cut-off distance, its color times its intensity and its decay, and
+		// the axis of a spot light and the cosine of its cone, scaled so that the dot product of the axis and the
+		// direction from the light, minus the cosine, goes from 0 at the edge of the cone to 1 inside its penumbra
+
+		for ( let i = 0; i < lights.length; i ++ ) {
+
+			const light = lights[ i ];
+			const array = this._lights.array;
+
+			_position.setFromMatrixPosition( light.matrixWorld );
+
+			array[ i * 3 ].set( _position.x, _position.y, _position.z, light.distance );
+			array[ i * 3 + 1 ].set( light.color.r * light.intensity, light.color.g * light.intensity, light.color.b * light.intensity, light.decay );
+
+			if ( light.isSpotLight === true ) {
+
+				light.target.updateMatrixWorld();
+
+				const coneCos = Math.cos( light.angle );
+				const scale = 1 / Math.max( Math.cos( light.angle * ( 1 - light.penumbra ) ) - coneCos, 1e-4 );
+
+				_direction.setFromMatrixPosition( light.target.matrixWorld ).sub( _position ).normalize().multiplyScalar( scale );
+				array[ i * 3 + 2 ].set( _direction.x, _direction.y, _direction.z, coneCos * scale );
+
+			} else {
+
+				array[ i * 3 + 2 ].set( 0, 0, 0, - 1 );
+
+			}
+
+		}
+
+		this._lightCount.value = lights.length;
 
 		if ( sun === null ) {
 
@@ -1448,7 +1623,7 @@ class RealtimeRadianceCascades {
 		const position = this._worldPosition( uv, depth ).toVar();
 		const normal = this._facingNormal( texture( this._gbuffer.textures[ 2 ] ).load( pixel ).xyz ).toVar();
 
-		return { valid: depth.lessThan( 1 ), position, normal };
+		return { valid: isBackgroundDepth( depth ).not(), position, normal };
 
 	}
 
@@ -2676,7 +2851,7 @@ class RealtimeRadianceCascades {
 
 	/**
 	 * The radiance that leaves a hit towards the ray: its emission, and its albedo times the light of the
-	 * sun and of its secondary probe (`get_emission()` in chandra).
+	 * sun, of the point and spot lights and of its secondary probe (`get_emission()` in chandra).
 	 *
 	 * @private
 	 */
@@ -2693,9 +2868,71 @@ class RealtimeRadianceCascades {
 
 		} );
 
+		if ( this._lights !== null ) radiance.addAssign( this._lightRadiance( point, normal, distance ) );
 		if ( this.secondary ) radiance.addAssign( this._sampleSecondary( point, normal ) );
 
 		return emission.add( albedo.mul( radiance ) ).mul( facing );
+
+	}
+
+	/**
+	 * The light of the point and spot lights at a hit, as the radiance that a white diffuse surface reflects, with
+	 * the falloff of three.js: one light picked in proportion to its light there by weighted reservoir sampling,
+	 * whose shadow ray occludes it, over the probability of the pick.
+	 *
+	 * @private
+	 */
+	_lightRadiance( point, normal, distance ) {
+
+		const lights = this._lights;
+		const total = float( 0 ).toVar();
+		const picked = vec4( 0 ).toVar();
+		const toLight = vec4( 0 ).toVar();
+		const seed = floatBitsToUint( point.x ).add( floatBitsToUint( point.y ).mul( 7919 ) ).add( floatBitsToUint( point.z ).mul( 104729 ) ).add( this._frameNode.mul( 31337 ) ).toVar();
+
+		Loop( { start: uint( 0 ), end: this._lightCount, type: 'uint', condition: '<' }, ( { i } ) => {
+
+			const position = lights.element( i.mul( 3 ) );
+			const color = lights.element( i.mul( 3 ).add( 1 ) );
+			const cone = lights.element( i.mul( 3 ).add( 2 ) );
+
+			const vector = position.xyz.sub( point ).toVar();
+			const lightDistance = vector.length().toVar();
+			const direction = vector.div( lightDistance.max( 1e-6 ) ).toVar();
+			const attenuation = getDistanceAttenuation( { lightDistance, cutoffDistance: position.w, decayExponent: color.w } );
+			const spot = smoothstep( 0, 1, dot( direction.negate(), cone.xyz ).sub( cone.w ) );
+			const light = color.rgb.mul( attenuation.mul( spot ).mul( dot( normal, direction ).max( 0 ) ) ).toVar();
+			const weight = light.dot( vec3( 1 ) ).toVar();
+
+			// every light with a weight replaces the pick so far with the probability of its share of the weights
+
+			If( weight.greaterThan( 0 ), () => {
+
+				total.addAssign( weight );
+
+				If( hash( seed.add( i ) ).mul( total ).lessThan( weight ), () => {
+
+					picked.assign( vec4( light, weight ) );
+					toLight.assign( vec4( direction, lightDistance ) );
+
+				} );
+
+			} );
+
+		} );
+
+		const radiance = vec3( 0 ).toVar();
+
+		If( total.greaterThan( 0 ), () => {
+
+			const origin = point.add( normal.mul( distance.mul( 1e-3 ).add( 1e-3 ) ) );
+			const visibility = this._visibility( origin, toLight.xyz, toLight.w.mul( 0.99 ) );
+
+			radiance.assign( picked.rgb.mul( total.div( picked.w ).mul( visibility ) ).div( Math.PI ) );
+
+		} );
+
+		return radiance;
 
 	}
 
@@ -2832,6 +3069,37 @@ class RealtimeRadianceCascades {
 		} );
 
 	}
+
+}
+
+/**
+ * Writes the entry of a material in the scene buffer: its diffuse color and whether its front side is visible,
+ * then its emitted radiance and whether its back side is visible. Unlit surfaces emit their color, metals have no
+ * diffuse color.
+ *
+ * @private
+ * @param {Material} material - The material.
+ * @param {Float32Array} target - The 8 floats of the entry.
+ * @return {Float32Array} The entry.
+ */
+function materialEntry( material, target ) {
+
+	const unlit = material.isMeshBasicMaterial === true;
+	const color = unlit ? undefined : material.color;
+	const emissive = unlit ? material.color : material.emissive;
+	const diffuse = 1 - ( material.metalness ?? 0 );
+	const emission = unlit ? 1 : material.emissiveIntensity ?? 1;
+
+	target[ 0 ] = color !== undefined ? color.r * diffuse : 0;
+	target[ 1 ] = color !== undefined ? color.g * diffuse : 0;
+	target[ 2 ] = color !== undefined ? color.b * diffuse : 0;
+	target[ 3 ] = material.side !== BackSide ? 1 : 0;
+	target[ 4 ] = emissive !== undefined ? emissive.r * emission : 0;
+	target[ 5 ] = emissive !== undefined ? emissive.g * emission : 0;
+	target[ 6 ] = emissive !== undefined ? emissive.b * emission : 0;
+	target[ 7 ] = material.side !== FrontSide ? 1 : 0;
+
+	return target;
 
 }
 

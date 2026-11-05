@@ -73,7 +73,7 @@
 
 			const rayStrides = { '1 per 4 pixels': 2, '1 per pixel': 1 };
 			const views = { 'Lit': 0, 'Indirect': 1, 'Irradiance': 2, 'Probes': 3, 'Levels': 4 };
-			const scenes = { 'Sponza': createSponza, 'Courtyard': createCourtyard, 'Cornell Box': createCornellBox };
+			const scenes = { 'Sponza': createSponza, 'Courtyard': createCourtyard, 'Cornell Box': () => createCornellBox( false ), 'Cornell Box (Spot Light)': () => createCornellBox( true ) };
 
 			let sponza = null, sky = null;
 
@@ -131,12 +131,11 @@
 
 				status.textContent = `Loading ${ params.scene }…`;
 
-				// the meshes and the sun of the last scene, whose geometries and shadow map are disposed after the switch
-				// unless the new scene uses them
+				// the meshes and the lights of the last scene, whose geometries and shadow maps are disposed after the
+				// switch unless the new scene uses them
 
 				const previous = [];
-				const previousSun = world?.sun;
-				world?.root.traverse( ( object ) => object.isMesh && previous.push( object ) );
+				world?.root.traverse( ( object ) => ( object.isMesh || object.isLight ) && previous.push( object ) );
 
 				let next;
 
@@ -162,11 +161,15 @@
 				scene.background = world.background ?? new THREE.Color( 0 );
 				scene.add( world.root );
 
-				const geometries = new Set();
-				world.root.traverse( ( object ) => object.isMesh && geometries.add( object.geometry ) );
+				const used = new Set();
+				world.root.traverse( ( object ) => used.add( object.isMesh ? object.geometry : object ) );
 
-				for ( const mesh of previous ) if ( geometries.has( mesh.geometry ) === false ) mesh.geometry.dispose();
-				if ( previousSun !== world.sun ) previousSun?.dispose();
+				for ( const object of previous ) {
+
+					if ( object.isMesh && used.has( object.geometry ) === false ) object.geometry.dispose();
+					if ( object.isLight && used.has( object ) === false ) object.dispose();
+
+				}
 
 				camera.position.copy( world.camera );
 				camera.fov = world.fov ?? 50;
@@ -280,10 +283,11 @@
 
 			}
 
-			function createCornellBox() {
+			function createCornellBox( spotLight ) {
 
 				// the Cornell Box of webgpu_lightmap_baking, lit only by the emissive panel, whose light reaches the
-				// surfaces through the cascades. The front wall faces inwards, the camera sees through its back
+				// surfaces through the cascades, or by a spot light, which lights them directly and bounces through the
+				// cascades. The front wall faces inwards, the camera sees through its back
 
 				const root = new THREE.Group();
 
@@ -316,10 +320,23 @@
 				sphere.position.set( 1, 0.65, 0.5 );
 				root.add( sphere );
 
-				const panel = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), new THREE.MeshStandardMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 20 } ) );
-				panel.rotation.x = Math.PI / 2;
-				panel.position.y = 4.99;
-				root.add( panel );
+				if ( spotLight ) {
+
+					const spot = new THREE.SpotLight( 0xffffff, 80, 0, Math.PI / 6, 0.5 );
+					spot.position.set( 0, 4.9, 0 );
+					spot.castShadow = true;
+					spot.shadow.mapSize.setScalar( 1024 );
+					spot.shadow.bias = - 0.0005;
+					root.add( spot, spot.target );
+
+				} else {
+
+					const panel = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), new THREE.MeshStandardMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 20 } ) );
+					panel.rotation.x = Math.PI / 2;
+					panel.position.y = 4.99;
+					root.add( panel );
+
+				}
 
 				return {
 					root, background: new THREE.Color( 0x111111 ),
