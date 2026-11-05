@@ -427,15 +427,24 @@ class GTAONode extends Node {
 
 			If( this._resolutionScale.lessThan( 1 ), () => {
 
-				// Use the nearest of the four depth texels around the center to avoid banding and take the normal from the same texel to avoid dark silhouettes
+				// Use the nearest of the four depth texels around the center to avoid banding. At silhouettes, the four texels
+				// belong to different surfaces, so the normal comes from the nearest one to avoid a dark rim. At creases, the
+				// depths are nearly equal and the nearest texel changes with camera jitter, so the blended normal is kept to
+				// avoid jumpy noise. A view-space depth difference above 1% counts as a silhouette.
 
 				const g = this.depthNode.gather().sample( uvNode ).toConst();
 				const d = ( builder.renderer.reversedDepthBuffer === true ? max( max( g.x, g.y ), max( g.z, g.w ) ) : min( min( g.x, g.y ), min( g.z, g.w ) ) ).toConst();
 				const size = vec2( textureSize( this.depthNode, 0 ) ).toConst();
+				const base = uvNode.mul( size ).sub( 0.5 ).floor().toConst();
 				const offset = g.w.equal( d ).select( vec2( 0.5, 0.5 ), g.z.equal( d ).select( vec2( 1.5, 0.5 ), g.y.equal( d ).select( vec2( 1.5, 1.5 ), vec2( 0.5, 1.5 ) ) ) ).toConst();
 
+				const viewZ = ( texelDepth, x, y ) => abs( getViewPosition( base.add( vec2( x, y ) ).div( size ), projectionDepth( texelDepth, this._cameraNear, this._cameraFar ), this._cameraProjectionMatrixInverse ).z );
+				const zx = viewZ( g.x, 0.5, 1.5 ), zy = viewZ( g.y, 1.5, 1.5 ), zz = viewZ( g.z, 1.5, 0.5 ), zw = viewZ( g.w, 0.5, 0.5 );
+				const zMin = min( min( zx, zy ), min( zz, zw ) ).toConst();
+				const zMax = max( max( zx, zy ), max( zz, zw ) ).toConst();
+
 				depth.assign( projectionDepth( d, this._cameraNear, this._cameraFar ) );
-				normalUV.assign( uvNode.mul( size ).sub( 0.5 ).floor().add( offset ).div( size ) );
+				normalUV.assign( zMax.sub( zMin ).greaterThan( zMin.mul( 0.01 ) ).select( base.add( offset ).div( size ), uvNode ) );
 
 			} ).Else( () => {
 
