@@ -1,5 +1,5 @@
-import { BackSide, BufferAttribute, BufferGeometry, DepthTexture, EquirectangularReflectionMapping, EquirectangularRefractionMapping, FloatType, FrontSide, HalfFloatType, Matrix4, NodeMaterial, QuadMesh, RenderTarget, StorageBufferAttribute, Vector2, Vector3, Vector4 } from 'three/webgpu';
-import { Break, Fn, If, LTC_Evaluate, Loop, abs, atan, atomicAdd, atomicLoad, atomicMax, atomicMin, atomicStore, cameraPosition, ceil, clamp, cos, cross, diffuseColor, dot, equirectUV, exp2, float, floatBitsToUint, floor, fract, getDistanceAttenuation, getViewPosition, hash, instanceIndex, int, isBackgroundDepth, ivec2, ivec3, ivec4, log2, mat3, max, min, mix, mrt, normalWorldGeometry, normalize, output, pmremTexture, positionWorld, screenUV, select, sin, smoothstep, sqrt, step, storage, texture, uint, uintBitsToFloat, uniform, uniformArray, uv, uvec3, vec2, vec3, vec4, velocity } from 'three/tsl';
+import { BackSide, BufferAttribute, BufferGeometry, DepthTexture, EquirectangularReflectionMapping, EquirectangularRefractionMapping, FloatType, FrontSide, HalfFloatType, Matrix4, NodeMaterial, QuadMesh, RenderTarget, StorageBufferAttribute, StorageTexture, Vector2, Vector3, Vector4 } from 'three/webgpu';
+import { Break, Fn, If, LTC_Evaluate, Loop, abs, atan, atomicAdd, atomicLoad, atomicMax, atomicMin, atomicStore, cameraPosition, ceil, clamp, cos, cross, diffuseColor, dot, equirectUV, exp, exp2, float, floatBitsToUint, floor, fract, getDistanceAttenuation, getViewPosition, hash, instanceIndex, int, isBackgroundDepth, ivec2, ivec3, ivec4, log2, mat3, max, min, mix, mrt, normalWorldGeometry, normalize, output, pmremTexture, positionWorld, screenUV, select, sin, smoothstep, sqrt, step, storage, texture, textureStore, uint, uintBitsToFloat, uniform, uniformArray, uv, uvec2, uvec3, vec2, vec3, vec4, velocity } from 'three/tsl';
 
 import { MeshBVH, SAH } from 'three-mesh-bvh';
 import { BVHComputeData, rayIntersectionResultStruct, rayStruct, wgslTagFn } from 'three-mesh-bvh/webgpu';
@@ -195,8 +195,10 @@ class RealtimeRadianceCascades {
 		 * The quality of the light for its cost, from 0 to 1. Every frame, a pixel of each cell of
 		 * `rayStride * 2 ** ( 2 * ( 1 - quality ) )` pixels traces a ray, so a sixteenth as many rays at 0, and the
 		 * levels of detail are `1 - quality` octaves coarser, as with `lodBias`, so a quarter as many probes. The
-		 * tracing costs in proportion to the rays and most other passes to the probes. Lower qualities are noisier
-		 * and blurrier, and the light takes longer to settle. With `adaptiveQuality`, it adapts.
+		 * probes are inserted from a grid of cells of 1 pixel, 2 below quality 0.75 and 4 below 0.25, and from 2 on,
+		 * the pixels interpolate the light of its points instead of gathering their own. The tracing costs in
+		 * proportion to the rays and most other passes to the probes. Lower qualities are noisier and blurrier, and
+		 * the light takes longer to settle. With `adaptiveQuality`, it adapts.
 		 *
 		 * @type {number}
 		 * @default 1
@@ -374,6 +376,14 @@ class RealtimeRadianceCascades {
 
 		this._rays = uniform( new Vector3( 0, 1, 0 ) );
 		this._previousRays = uniform( new Vector3( 0, 1, 0 ) );
+
+		// the grid on which the pixels gather the light: the size of its cells, the cells per row and the cells, and the
+		// light of its points, see _createFrameKernels() and getIrradianceNode()
+
+		this._shading = uniform( new Vector3( 1, 1, 0 ) );
+		this._shadeTexture = new StorageTexture( 1, 1 );
+		this._shadeTexture.type = HalfFloatType;
+		this._shadeTexture.name = 'RealtimeRadianceCascades.irradiance';
 		this._stages = null;
 
 		// the state of the adaptive quality, see _adaptQuality()
@@ -599,6 +609,8 @@ class RealtimeRadianceCascades {
 		const normalMap = texture( gbuffer.textures[ 2 ] );
 		const depthMap = texture( gbuffer.depthTexture );
 
+		const shadeMap = texture( this._shadeTexture );
+
 		this._irradianceNode = Fn( () => {
 
 			const result = vec3( 0 ).toVar();
@@ -608,8 +620,54 @@ class RealtimeRadianceCascades {
 
 				const position = this._worldPosition( screenUV, depth ).toVar();
 				const normal = this._facingNormal( normalMap.sample( screenUV ).xyz ).toVar();
+				const shading = this._shading;
+				const grid = screenUV.mul( this._resolution ).div( shading.x ).sub( 0.5 ).toVar();
+				const sum = vec4( 0 ).toVar();
+				const plain = vec4( 0 ).toVar();
 
-				result.assign( this._gather( position, normal ).mul( this.intensity ) );
+				If( shading.x.greaterThanEqual( 1.5 ), () => {
+
+					// the 4 points of the grid around the pixel, weighted by their distance on the screen and by how close
+					// they lie to the plane and the normal of the pixel, within 2% of its distance to the camera
+
+					const lower = ivec2( floor( grid ) ).toVar();
+					const f = fract( grid ).toVar();
+					const last = ivec2( int( shading.y ).sub( 1 ), int( ceil( this._resolution.y.div( shading.x ) ) ).sub( 1 ) ).toVar();
+					const tolerance = position.sub( this._cameraPosition ).length().mul( 0.02 ).max( 1e-4 ).toVar();
+
+					for ( let corner = 0; corner < 4; corner ++ ) {
+
+						const cell = lower.add( ivec2( corner & 1, corner >> 1 ) ).clamp( ivec2( 0 ), last ).toVar();
+						const light = shadeMap.load( cell ).toVar();
+						const pixel = ivec2( vec2( cell ).add( 0.5 ).mul( shading.x ) ).min( ivec2( this._resolution ).sub( 1 ) ).toVar();
+						const point = this._worldPosition( vec2( pixel ).add( 0.5 ).div( this._resolution ), depthMap.load( pixel ).x );
+						const pointNormal = this._facingNormal( normalMap.load( pixel ).xyz );
+						const bilinear = ( corner & 1 ? f.x : f.x.oneMinus() ).mul( corner & 2 ? f.y : f.y.oneMinus() ).mul( light.w.greaterThan( 0 ) ).toVar();
+						const geometry = exp( abs( dot( normal, point.sub( position ) ) ).div( tolerance ).negate() ).mul( dot( normal, pointNormal ).max( 0 ).pow( 4 ) );
+
+						sum.addAssign( vec4( light.rgb, 1 ).mul( bilinear.mul( geometry ) ) );
+						plain.addAssign( vec4( light.rgb, 1 ).mul( bilinear ) );
+
+					}
+
+				} );
+
+				// a pixel of fine cells, or unlike the points around it, e.g. of a thin object, gathers its own light, or else
+				// takes theirs
+
+				If( sum.w.greaterThan( 1e-3 ), () => {
+
+					result.assign( sum.rgb.div( sum.w ) );
+
+				} ).Else( () => {
+
+					const light = this._gather( position, normal ).toVar();
+
+					result.assign( select( light.w.greaterThan( 0 ), light.rgb, plain.rgb.div( plain.w.max( 1e-5 ) ) ) );
+
+				} );
+
+				result.mulAssign( this.intensity );
 
 			} );
 
@@ -745,6 +803,17 @@ class RealtimeRadianceCascades {
 		const rays = columns * Math.ceil( height / cell );
 		const previousRays = this._rays.value.z;
 
+		// the pixels gather the light on a grid of cells of 1, 2 or 4 pixels at lower qualities and interpolate it, and
+		// the probes are inserted from its points. With cells of 1 pixel, the pixels gather their own light, which
+		// costs less than the grid. Its texture holds the grid of cells of one pixel
+
+		const shadingCell = 2 ** Math.round( 2 * ( 1 - quality ) );
+		const shadingColumns = Math.ceil( width / shadingCell );
+		const shadingPoints = shadingColumns * Math.ceil( height / shadingCell );
+
+		this._shading.value.set( shadingCell, shadingColumns, shadingPoints );
+		this._shadeTexture.setSize( width, height );
+
 		// the G-buffer
 
 		const previousTarget = renderer.getRenderTarget();
@@ -811,7 +880,8 @@ class RealtimeRadianceCascades {
 
 		const frameKernels = this._frameKernels;
 
-		frameKernels.gather.dispatchSize = pixels;
+		frameKernels.gather.dispatchSize = shadingPoints;
+		frameKernels.shade.dispatchSize = shadingCell === 1 ? 1 : shadingPoints;
 		frameKernels.count.dispatchSize = rays;
 		frameKernels.trace.dispatchSize = rays;
 
@@ -855,7 +925,7 @@ class RealtimeRadianceCascades {
 			trace: [ frameKernels.traceSecondary, frameKernels.trace ],
 			accumulate: kernels.accumulate.slice(),
 			merge: kernels.merge.slice().reverse(),
-			resolve: [ kernels.irradiance ]
+			resolve: [ kernels.irradiance, frameKernels.shade ]
 		};
 
 		for ( const stage in stages ) {
@@ -1256,6 +1326,7 @@ class RealtimeRadianceCascades {
 		this._clearScene();
 		this._skyTarget?.dispose();
 		this._gbuffer?.dispose();
+		this._shadeTexture.dispose();
 
 		this._disposeKernels();
 		this._disposeBuffers();
@@ -2364,7 +2435,7 @@ class RealtimeRadianceCascades {
 	 * The average radiance over the cosine lobe of a normal at a position: the octahedral irradiance maps of the
 	 * probes of the finest cascade around it, weighted by their trilinear weights and their ray counts, within each
 	 * level of detail, then blended by the weights of the levels (`shade_optimized_32()` in chandra, which weights the
-	 * levels by their ray counts too).
+	 * levels by their ray counts too), and the weight of the levels with probes, 0 without any.
 	 *
 	 * @private
 	 */
@@ -2440,7 +2511,7 @@ class RealtimeRadianceCascades {
 
 		} );
 
-		return sum.rgb.div( sum.w.max( 1e-5 ) );
+		return vec4( sum.rgb.div( sum.w.max( 1e-5 ) ), sum.w );
 
 	}
 
@@ -2815,65 +2886,75 @@ class RealtimeRadianceCascades {
 
 		const cascade = this._layout.cascades[ n ];
 
+		// a group of up to 64 threads per slot, each with some of its bins, so that the threads of a slot without a
+		// probe stop at once
+
+		const lanes = Math.min( cascade.bins, 64 );
+
 		return Fn( () => {
 
-			const item = instanceIndex;
-			const slot = item.div( cascade.bins ).toVar();
-			const bin = item.mod( cascade.bins ).toVar();
+			const slot = instanceIndex.div( lanes ).toVar();
+			const lane = instanceIndex.mod( lanes ).toVar();
 
 			If( this._isAlive( n, slot ), () => {
 
 				const global = slot.add( cascade.slotOffset ).toVar();
-				const index = item.add( cascade.binOffset ).toVar();
-				const base = index.mul( WORDS ).toVar();
 				const born = this._born.element( global ).equal( this._frameNode ).toVar();
-				const fluence = vec4( 0 ).toVar();
-				const weight = float( 0 ).toVar();
 
-				// the decay of the last frame's sums, which chandra applies after the merge
+				Loop( { start: uint( 0 ), end: uint( cascade.bins / lanes ), type: 'uint', condition: '<', name: 'j' }, ( { j } ) => {
 
-				If( born.not(), () => {
+					const bin = lane.add( j.mul( lanes ) ).toVar();
+					const index = slot.mul( cascade.bins ).add( bin ).add( cascade.binOffset ).toVar();
+					const base = index.mul( WORDS ).toVar();
+					const fluence = vec4( 0 ).toVar();
+					const weight = float( 0 ).toVar();
 
-					fluence.assign( this._fluence.element( index ) );
-					weight.assign( this._float( 'weights', index ) );
+					// the decay of the last frame's sums, which chandra applies after the merge
 
-					If( weight.greaterThan( this._minDirectionWeight ), () => {
+					If( born.not(), () => {
 
-						fluence.mulAssign( this._qualityDecay );
-						weight.mulAssign( this._qualityDecay );
+						fluence.assign( this._fluence.element( index ) );
+						weight.assign( this._float( 'weights', index ) );
+
+						If( weight.greaterThan( this._minDirectionWeight ), () => {
+
+							fluence.mulAssign( this._qualityDecay );
+							weight.mulAssign( this._qualityDecay );
+
+						} );
+
+					} );
+
+					const rays = atomicLoad( this._deposits.element( base.add( 4 ) ) ).min( MAX_RAYS ).toVar();
+
+					If( rays.greaterThan( 0 ), () => {
+
+						const word = ( k ) => float( atomicLoad( this._deposits.element( base.add( k ) ) ) );
+
+						fluence.addAssign( vec4( vec3( word( 0 ), word( 1 ), word( 2 ) ).div( SCALE ), word( 3 ) ) );
+						weight.addAssign( float( rays ) );
+
+						for ( let k = 0; k < WORDS; k ++ ) atomicStore( this._deposits.element( base.add( k ) ), uint( 0 ) );
+
+					} );
+
+					this._fluence.element( index ).assign( fluence );
+					this._setFloat( 'weights', index, weight );
+
+					If( bin.equal( 0 ), () => {
+
+						const quality = select( born, float( 0 ), this._float( 'quality', global ).mul( this._qualityDecay ) );
+
+						this._setFloat( 'quality', global, quality.add( float( atomicLoad( this._deposited.element( global ) ) ) ) );
+						atomicStore( this._deposited.element( global ), uint( 0 ) );
 
 					} );
 
 				} );
 
-				const rays = atomicLoad( this._deposits.element( base.add( 4 ) ) ).min( MAX_RAYS ).toVar();
-
-				If( rays.greaterThan( 0 ), () => {
-
-					const word = ( k ) => float( atomicLoad( this._deposits.element( base.add( k ) ) ) );
-
-					fluence.addAssign( vec4( vec3( word( 0 ), word( 1 ), word( 2 ) ).div( SCALE ), word( 3 ) ) );
-					weight.addAssign( float( rays ) );
-
-					for ( let k = 0; k < WORDS; k ++ ) atomicStore( this._deposits.element( base.add( k ) ), uint( 0 ) );
-
-				} );
-
-				this._fluence.element( index ).assign( fluence );
-				this._setFloat( 'weights', index, weight );
-
-				If( bin.equal( 0 ), () => {
-
-					const quality = select( born, float( 0 ), this._float( 'quality', global ).mul( this._qualityDecay ) );
-
-					this._setFloat( 'quality', global, quality.add( float( atomicLoad( this._deposited.element( global ) ) ) ) );
-					atomicStore( this._deposited.element( global ), uint( 0 ) );
-
-				} );
-
 			} );
 
-		} )().compute( cascade.capacity * cascade.bins ).setName( 'RC.Accumulate' + n );
+		} )().compute( cascade.capacity * lanes ).setName( 'RC.Accumulate' + n );
 
 	}
 
@@ -2892,11 +2973,14 @@ class RealtimeRadianceCascades {
 		const coarser = layout.cascades[ n + 1 ] ?? null;
 		const theta = cascade.theta;
 
+		// a group of up to 64 threads per slot, each with some of its outputs, see _createAccumulate()
+
+		const lanes = Math.min( cascade.outputs, 64 );
+
 		return Fn( () => {
 
-			const item = instanceIndex;
-			const slot = item.div( cascade.outputs ).toVar();
-			const output = item.mod( cascade.outputs ).toVar();
+			const slot = instanceIndex.div( lanes ).toVar();
+			const lane = instanceIndex.mod( lanes ).toVar();
 
 			If( this._isAlive( n, slot ), () => {
 
@@ -2971,40 +3055,45 @@ class RealtimeRadianceCascades {
 
 				};
 
-				const target = this._merged.element( item.add( cascade.mergedOffset ) );
+				Loop( { start: uint( 0 ), end: uint( cascade.outputs / lanes ), type: 'uint', condition: '<', name: 'j' }, ( { j } ) => {
 
-				if ( n === 0 ) {
+					const output = lane.add( j.mul( lanes ) ).toVar();
+					const target = this._merged.element( slot.mul( cascade.outputs ).add( output ).add( cascade.mergedOffset ) );
 
-					const { radiance, valid } = lightOf( output );
+					if ( n === 0 ) {
 
-					target.assign( select( valid, vec4( radiance, 1 ), vec4( 0 ) ) );
+						const { radiance, valid } = lightOf( output );
 
-				} else {
+						target.assign( select( valid, vec4( radiance, 1 ), vec4( 0 ) ) );
 
-					const column = output.mod( theta ).mul( 2 ).toVar();
-					const row = output.div( theta ).mul( 2 ).toVar();
-					const sum = vec4( 0 ).toVar();
+					} else {
 
-					for ( let child = 0; child < 4; child ++ ) {
+						const column = output.mod( theta ).mul( 2 ).toVar();
+						const row = output.div( theta ).mul( 2 ).toVar();
+						const sum = vec4( 0 ).toVar();
 
-						const bin = row.add( child >> 1 ).mul( 2 * theta ).add( column.add( child & 1 ) );
-						const { radiance, valid } = lightOf( bin );
+						for ( let child = 0; child < 4; child ++ ) {
 
-						If( valid, () => {
+							const bin = row.add( child >> 1 ).mul( 2 * theta ).add( column.add( child & 1 ) );
+							const { radiance, valid } = lightOf( bin );
 
-							sum.addAssign( vec4( radiance, 1 ) );
+							If( valid, () => {
 
-						} );
+								sum.addAssign( vec4( radiance, 1 ) );
+
+							} );
+
+						}
+
+						target.assign( select( sum.w.greaterThan( 0 ), vec4( sum.rgb.div( sum.w ), 1 ), vec4( 0 ) ) );
 
 					}
 
-					target.assign( select( sum.w.greaterThan( 0 ), vec4( sum.rgb.div( sum.w ), 1 ), vec4( 0 ) ) );
-
-				}
+				} );
 
 			} );
 
-		} )().compute( cascade.capacity * cascade.outputs ).setName( 'RC.Merge' + n );
+		} )().compute( cascade.capacity * lanes ).setName( 'RC.Merge' + n );
 
 	}
 
@@ -3018,34 +3107,47 @@ class RealtimeRadianceCascades {
 
 		const capacity = this._hitCapacity;
 		const width = this._screenWidth, height = this._screenHeight;
-		const pixels = width.mul( height );
 
 		// per pixel, the hit of its ray: the position and the frame, and the normal
 
 		this._hits = storage( new StorageBufferAttribute( new Float32Array( capacity * 8 ), 4 ), 'vec4', capacity * 2 );
 
-		const pixelOf = ( index ) => ivec2( int( index.mod( width ) ), int( index.div( width ) ) );
+		// the points of the grid on which the pixels gather the light, see update(): the cells, and the pixels at their
+		// centers
 
-		// every pixel inserts the probes of its levels of detail, except those of the pixel to its left: a probe covers
-		// many pixels, and only the first pixel of each run along a row inserting it halves the time of the pass
+		const shading = this._shading;
+
+		const shadingPoint = ( index ) => {
+
+			const columns = uint( shading.y );
+			const cell = ivec2( int( index.mod( columns ) ), int( index.div( columns ) ) ).toVar();
+			const pixel = ivec2( vec2( cell ).add( 0.5 ).mul( shading.x ) ).min( ivec2( int( width ).sub( 1 ), int( height ).sub( 1 ) ) ).toVar();
+
+			return { cell, pixel };
+
+		};
+
+		// every point of the grid inserts the probes of its levels of detail, except those of the point to its left: a
+		// probe covers many points, and only the first point of each run along a row inserting it halves the time of
+		// the pass
 
 		const gather = Fn( () => {
 
-			If( instanceIndex.lessThan( pixels ), () => {
+			If( float( instanceIndex ).lessThan( shading.z ), () => {
 
-				const pixel = pixelOf( instanceIndex ).toVar();
+				const { cell, pixel } = shadingPoint( instanceIndex );
 				const surface = this._pixelSurface( pixel );
 
 				If( surface.valid, () => {
 
 					const group = this._groupOf( surface.normal ).toVar();
 
-					// the keys of the pixel to the left, NONE where it inserts none
+					// the keys of the point to the left, NONE where it inserts none
 
-					const left = this._pixelSurface( pixel.sub( ivec2( 1, 0 ) ).max( ivec2( 0 ) ) );
+					const left = this._pixelSurface( shadingPoint( instanceIndex.max( 1 ).sub( 1 ) ).pixel );
 					const leftKeys = [ uint( NONE ).toVar(), uint( NONE ).toVar() ];
 
-					If( left.valid.and( pixel.x.greaterThan( 0 ) ).and( this._groupOf( left.normal ).equal( group ) ), () => {
+					If( left.valid.and( cell.x.greaterThan( 0 ) ).and( this._groupOf( left.normal ).equal( group ) ), () => {
 
 						this._levelsOf( left.position ).forEach( ( { level, weight }, i ) => {
 
@@ -3076,6 +3178,29 @@ class RealtimeRadianceCascades {
 			} );
 
 		} )().computeKernel().setName( 'RC.Gather' );
+
+		// the light of the points of the grid, which the pixels interpolate, see getIrradianceNode(): w is the weight of
+		// the levels of detail with probes, 0 without any or on the background
+
+		const shade = Fn( () => {
+
+			If( float( instanceIndex ).lessThan( shading.z ).and( shading.x.greaterThanEqual( 1.5 ) ), () => {
+
+				const { cell, pixel } = shadingPoint( instanceIndex );
+				const surface = this._pixelSurface( pixel );
+				const light = vec4( 0 ).toVar();
+
+				If( surface.valid, () => {
+
+					light.assign( this._gather( surface.position, surface.normal ) );
+
+				} );
+
+				textureStore( this._shadeTexture, uvec2( cell ), light ).toWriteOnly();
+
+			} );
+
+		} )().computeKernel().setName( 'RC.Shade' );
 
 		// a pixel of each cell of a grid traces a ray, see update(): a random one, shifted along the R2 sequence every
 		// frame. Neighbouring threads trace from neighbouring cells, so that their rays start close together
@@ -3182,7 +3307,7 @@ class RealtimeRadianceCascades {
 
 		} )().computeKernel().setName( 'RC.TraceSecondary' ) : null;
 
-		return { gather, gatherSecondary, count, trace, traceSecondary };
+		return { gather, shade, gatherSecondary, count, trace, traceSecondary };
 
 	}
 
