@@ -548,8 +548,11 @@
 
 				}
 
-				cascades.update( renderer, scene, camera );
+				// the options apply before the cascades render the G-buffer, whose depth TRAA reads: the inspector sets params
+				// at once but calls onChange a moment later, so a frame can see a change before its handler
+
 				updateOutput();
+				cascades.update( renderer, scene, camera );
 				renderPipeline.render();
 
 				if ( ++ frames % 30 === 0 ) {

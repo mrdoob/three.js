@@ -91,11 +91,12 @@ const _size = /*@__PURE__*/ new Vector2();
  * point, since WGSL has no float atomics, and the radiance of a ray is clamped to `maxRadiance`. Rays start
  * a share of the probe spacing off the surface, since the G-buffer positions come from a depth buffer.
  *
- * The options are properties that can change at any time, they apply in the next `update()`: the ones of the
- * probe layout and of the levels of detail (`spacing`, `levelDistance`, `levels`, `cascades`, `directions`,
- * `maxProbes`, `orientations`) clear the probes and rebuild the passes, `rayStride`,
- * `secondary`, `useQualityWeight`, `velocity` and `useShadowMap` rebuild the passes, the others are uniforms. Fetch `getCompositeNode()`
- * and `getIrradianceNode()` again after the passes were rebuilt.
+ * The options are properties that can change at any time, they apply in the next `update()`, or before it in
+ * `getCompositeNode()`, `getIrradianceNode()` and `getTextureNode()`: the ones of the probe layout and of the
+ * levels of detail (`spacing`, `levelDistance`, `levels`, `cascades`, `directions`, `maxProbes`,
+ * `orientations`) clear the probes and rebuild the passes, `rayStride`, `secondary`, `useQualityWeight`,
+ * `velocity` and `useShadowMap` rebuild the passes, the others are uniforms. `velocity` also replaces the G-buffer.
+ * Fetch the nodes again after the passes were rebuilt, before `update()`, which renders the G-buffer they read.
  *
  * The geometry of the scene is static, see `setScene()` and `setSceneData()`. The camera, the lights and the colors
  * of the materials can change every frame: the sun, see `sun`, and the visible point, spot and rect area lights of
