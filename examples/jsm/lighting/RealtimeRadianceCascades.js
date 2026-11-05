@@ -200,10 +200,11 @@ class RealtimeRadianceCascades {
 
 		/**
 		 * The frame time in milliseconds that `quality` adapts to, e.g. `1000 / 60`, or 0 for a fixed `quality`. It
-		 * measures the time between the calls of `update()`: the quality falls while the frames take longer, faster
-		 * the longer they take, and rises slowly while they do not, staying below the quality at which they last took
-		 * longer. Every quarter it falls, it compares the frames back at the quality above: if lowering it did not
-		 * shorten them, because something else limits them, e.g. the display or the CPU, it stays there for a while.
+		 * measures the time between the calls of `update()` over a quarter of a second: the quality falls while the
+		 * frames take longer, by more the longer they take, and rises while they do not, slowly back to the quality at
+		 * which they last took longer. If lowering it by 0.2 did not shorten them, it compares them back at the
+		 * quality above: if lowering it does not shorten them, because something else limits them, e.g. the display
+		 * or the CPU, it stays there for a while.
 		 *
 		 * @type {number}
 		 * @default 0
@@ -357,7 +358,7 @@ class RealtimeRadianceCascades {
 		this._holdUntil = 0;
 		this._holdTime = 0;
 		this._adaptAfter = 0;
-		this._overs = 0;
+		this._skipFrames = 5;
 
 		this._applyChanges();
 
@@ -844,35 +845,34 @@ class RealtimeRadianceCascades {
 		if ( time > 250 ) this._frameTimes.length = 0;
 		else if ( time > 0 ) this._frameTimes.push( time );
 
-		// the frames of half a second, a second for a window back up, at least 12, without the first 6 after a change,
-		// which are still in flight or move the probes to their new levels of detail
+		// the frames of a quarter of a second, half a second for a window back up, at least 8, without the first ones
+		// after a change: 5 after a step down, which are still in flight, and 12 after a step up, whose new finer probes
+		// cost more at first
 
-		const span = this._probe !== null ? 1000 : 500;
+		const times = this._frameTimes.slice( this._skipFrames );
+		const span = times.reduce( ( sum, t ) => sum + t, 0 );
 
-		if ( this._frameTimes.length < 18 || this._frameTimes.slice( 6 ).reduce( ( sum, t ) => sum + t, 0 ) < span ) return;
+		if ( times.length < 8 || span < ( this._probe !== null ? 500 : 250 ) ) return;
 
 		// the mean, since without vsync the frames can alternate between fast ones and ones that wait for the GPU
 
-		const times = this._frameTimes.slice( 6 );
-		const frameTime = times.reduce( ( sum, t ) => sum + t, 0 ) / times.length;
+		const frameTime = span / times.length;
 		const target = this.targetFrameTime;
 		const quality = this.quality;
 
 		this._frameTimes.length = 0;
 
-		// a window back at the quality where the descent started, or last paid off, every quarter below it and at 0:
-		// unless its frames take 15% longer than the ones below, lowering the quality does not shorten them,
-		// something else limits them, e.g. the display or the CPU. The quality stays there for 10 seconds, twice as
-		// long each time
+		// a window back up after steps down lowered the quality by 0.2 but did not shorten the frames by 15%: unless
+		// they take 15% longer there, the quality does not limit them, something else does, e.g. the display or the
+		// CPU. It stays up for 10 seconds, twice as long each time
 
 		if ( this._probe !== null ) {
 
-			const { quality: lower, time: lowerTime } = this._probe;
+			const probe = this._probe;
 
 			this._probe = null;
-			this._overs = 0;
 
-			if ( frameTime < lowerTime * 1.15 ) {
+			if ( frameTime < probe.time * 1.15 ) {
 
 				this._descent = null;
 				this._qualityLimit = quality;
@@ -881,7 +881,9 @@ class RealtimeRadianceCascades {
 
 			} else {
 
-				this.quality = this._descent.quality = lower;
+				this._descent = probe;
+				this.quality = probe.quality;
+				this._skipFrames = 5;
 
 			}
 
@@ -893,33 +895,42 @@ class RealtimeRadianceCascades {
 
 			if ( now < this._holdUntil ) return;
 
-			this._descent ??= { quality };
+			// the steps so far paid off, the next ones are compared with here
 
-			if ( this._descent.quality - quality >= 0.25 || ( quality === 0 && this._descent.quality > 0 ) ) {
+			if ( this._descent !== null && frameTime <= this._descent.time * 0.85 ) this._descent = { quality, time: frameTime };
+
+			if ( this._descent !== null && this._descent.quality - quality >= 0.2 && frameTime > this._descent.time * 0.85 ) {
 
 				this._probe = { quality, time: frameTime };
 				this.quality = this._descent.quality;
+				this._skipFrames = 12;
 
 				return;
 
 			}
 
-			// lower, the more the frames take longer and the longer they did
+			// down by the octaves that the frames take longer than the target, about 1.5 per quality between 1 and 0,
+			// at most by half
 
-			this._overs ++;
+			const step = Math.min( Math.max( Math.log2( frameTime / target ) / 1.5, 0.03 ), 0.5 );
+
+			this._descent ??= { quality, time: frameTime };
 			this._qualityLimit = Math.min( this._qualityLimit, quality - 0.02 );
-			this.quality = Math.max( quality - Math.min( 0.05 * this._overs * Math.max( Math.log2( frameTime / target ), 0.5 ), 0.25 ), 0 );
+			this.quality = Math.max( quality - step, 0 );
+			this._skipFrames = 5;
 
 		} else if ( frameTime <= target * 1.05 ) {
 
-			// up slowly while the frames are fast enough, within the jitter of the display, and only slowly back to
-			// where they last were not
+			// up while the frames are fast enough, within the jitter of the display, faster with room to spare, and
+			// only slowly back to where they last were not
+
+			const step = Math.min( Math.max( Math.log2( target / frameTime ) / 3, 0.02 ), 0.1 );
 
 			this._descent = null;
-			this._overs = 0;
 			this._holdTime = 0;
 			this._qualityLimit = Math.min( this._qualityLimit + 0.002, 1 );
-			this.quality = Math.min( quality + 0.02, Math.max( this._qualityLimit, quality ) );
+			this.quality = Math.min( quality + step, Math.max( this._qualityLimit, quality ) );
+			this._skipFrames = this.quality > quality ? 12 : 5;
 
 		}
 
