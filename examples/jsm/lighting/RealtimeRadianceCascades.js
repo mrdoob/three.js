@@ -149,7 +149,9 @@ class RealtimeRadianceCascades {
 	 * @param {number} [options.maxRadiance=500] - The radiance of a ray is clamped to this, for the fixed point sums.
 	 * @param {boolean} [options.adaptiveLOD=true] - Whether the levels of detail coarsen while the cascades are nearly full, so that
 	 * views that need more probes than `maxProbes` get coarser probes instead of none, see `lodBias`.
-	 * @param {boolean} [options.velocity=false] - Whether the G-buffer has a velocity texture, e.g. for {@link TRAANode}.
+	 * @param {boolean} [options.velocity=false] - Whether the G-buffer has a velocity texture, e.g. for {@link TRAANode}. TRAA jitters
+	 * the camera in the render pipeline, so call `update()` there too, e.g. from `OnBeforeFrameUpdate()` in a `Fn()` that
+	 * returns the composite.
 	 * @param {boolean} [options.useShadowMap=true] - Whether the hits read the light of the sun from its shadow map, where the map
 	 * covers them, instead of tracing a shadow ray. The sun must cast shadows.
 	 * @param {number} [options.quality=1] - The share of the rays and the fineness of the probes, from 0 to 1, see `quality`.

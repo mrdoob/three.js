@@ -34,6 +34,7 @@
 		<script type="module">
 
 			import * as THREE from 'three/webgpu';
+			import { Fn, OnBeforeFrameUpdate } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
@@ -53,7 +54,7 @@
 
 			}
 
-			let renderer, renderPipeline, camera, controls, scene, cascades, world, compositeNode, traaPass;
+			let renderer, renderPipeline, camera, controls, scene, cascades, world, compositeNode, outputNode, traaPass;
 
 			const status = document.getElementById( 'status' );
 
@@ -301,15 +302,26 @@
 
 					compositeNode = composite;
 
+					// the cascades render the G-buffer and run their passes in the render pipeline, before the composite, so
+					// that the jitter of the camera that TRAA applies for the pipeline applies to the G-buffer
+
+					outputNode = Fn( () => {
+
+						OnBeforeFrameUpdate( () => cascades.update( renderer, scene, camera ) );
+
+						return composite;
+
+					} )();
+
 					// the texture of the composite that traa() renders is disposed too
 
 					traaPass?.beautyNode.dispose();
 					traaPass?.dispose();
-					traaPass = params.traa ? traa( composite, cascades.getTextureNode( 'depth' ), cascades.getTextureNode( 'velocity' ), camera ) : null;
+					traaPass = params.traa ? traa( outputNode, cascades.getTextureNode( 'depth' ), cascades.getTextureNode( 'velocity' ), camera ) : null;
 
 				}
 
-				const output = params.traa ? traaPass : composite;
+				const output = params.traa ? traaPass : outputNode;
 
 				if ( renderPipeline.outputNode !== output ) {
 
@@ -597,11 +609,11 @@
 
 				}
 
-				// the options apply before the cascades render the G-buffer, whose depth TRAA reads: the inspector sets params
-				// at once but calls onChange a moment later, so a frame can see a change before its handler
+				// the options apply before the render pipeline, in which the cascades render the G-buffer, whose depth TRAA
+				// reads: the inspector sets params at once but calls onChange a moment later, so a frame can see a change
+				// before its handler
 
 				updateOutput();
-				cascades.update( renderer, scene, camera );
 				renderPipeline.render();
 
 				if ( cascades.adaptiveQuality ) {
