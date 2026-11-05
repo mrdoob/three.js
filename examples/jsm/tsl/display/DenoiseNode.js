@@ -8,7 +8,7 @@ let _rendererState;
 // the frames after which the temporal variance of a pixel is trusted over its spatial estimate ( SVGF )
 const HISTORY_FIX = 4;
 
-// the length of the fast history of the color anti-lag ( #35228 )
+// the length of the fast history of the color anti-lag ( ReLAX )
 const FAST_FRAMES = 4;
 
 // the distance to the tangent plane, relative to the view depth, beyond which a history texel is another surface
@@ -28,10 +28,10 @@ const HIT_DISTANCE_PHI = 8;
  * resolution of the input. With `temporalDenoise()`, the input is first accumulated in time: the history is reprojected
  * with the velocity buffer, without the texels of other surfaces, and blended with a weight of `1 / history length` up
  * to {@link DenoiseNode#maxFrames} (SVGF, ReLAX). A short fast history bounds the long one and drops it where they
- * diverge (the color anti-lag of `CoverageDenoiseNode`, #35228, by Ben Houston). The noise of each pixel is the
- * temporal variance of its luminance, or a spatial estimate while its history is short. Reflections with a roughness
- * and a hit distance are reprojected with the motion of the reflected point (virtual motion), and filtered within the
- * footprint of their reflection lobe on screen (ReBLUR, ReLAX).
+ * diverge (the color anti-lag of ReLAX). The noise of each pixel is the temporal variance of its luminance, or a
+ * spatial estimate while its history is short. Reflections with a roughness and a hit distance are reprojected with
+ * the motion of the reflected point (virtual motion), and filtered within the footprint of their reflection lobe on
+ * screen (ReBLUR, ReLAX).
  * - In texture space, the guides are textures of the world-space position, with the id of the surface (e.g. the chart
  * of a light map) in alpha, and of the world-space normal, e.g. those that `LightMapper` bakes. The noise comes from a
  * variance texture, else from {@link DenoiseNode#relativeNoise}. Texels without data are filled from their neighbors.
@@ -193,7 +193,7 @@ class DenoiseNode extends Node {
 		/**
 		 * Whether the input is radiance with its coverage in alpha: the node filters the radiance weighted by
 		 * coverage, so that texels without coverage do not darken it, and returns the radiance with the filtered
-		 * coverage in alpha (the convention of `CoverageDenoiseNode`, #35228).
+		 * coverage in alpha.
 		 *
 		 * @type {boolean}
 		 * @readonly
@@ -954,7 +954,7 @@ class DenoiseNode extends Node {
 					const previousFast = sumFast.div( sumWeight ).toVar();
 					const age = min( sumLength.div( sumWeight ).add( 1 ), this.maxFrames ).toVar();
 
-					// color anti-lag ( #35228 ): a short fast history, loosely bounded by the range of the current
+					// color anti-lag ( ReLAX ): a short fast history, loosely bounded by the range of the current
 					// neighborhood, bounds the long history; where they diverge beyond the spread of the fast history,
 					// the long history is dropped
 
