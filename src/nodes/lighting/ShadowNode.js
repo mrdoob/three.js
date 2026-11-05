@@ -613,13 +613,9 @@ class ShadowNode extends ShadowBaseNode {
 			const currentShadowType = builder.renderer.shadowMap.type;
 			const currentTransmitted = builder.renderer.shadowMap.transmitted;
 
-			if ( this._currentShadowType !== currentShadowType ) {
+			if ( this._currentShadowType !== currentShadowType || this._currentTransmitted !== currentTransmitted ) {
 
 				this._reset();
-				this._node = null;
-
-			} else if ( this._currentTransmitted !== currentTransmitted ) {
-
 				this._node = null;
 
 			}
@@ -774,6 +770,7 @@ class ShadowNode extends ShadowBaseNode {
 	_reset() {
 
 		this._currentShadowType = null;
+		this._currentTransmitted = null;
 
 		this.disposeShadowMaterial();
 

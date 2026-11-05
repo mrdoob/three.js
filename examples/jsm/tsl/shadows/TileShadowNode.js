@@ -414,7 +414,9 @@ class TileShadowNode extends ShadowBaseNode {
 	 */
 	setup( builder ) {
 
-		if ( this.lights.length === 0 ) {
+		// The shadow map has a color attachment only for transmitted shadows (see init()).
+
+		if ( this.lights.length === 0 || ( this.shadowMap.textures.length > 0 ) !== ( builder.renderer.shadowMap.transmitted === true ) ) {
 
 			this.init( builder );
 
