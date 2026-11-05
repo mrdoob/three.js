@@ -462,10 +462,9 @@ class SSGINode extends Node {
 			const depth = builder.renderer.reversedDepthBuffer === true ? max( max( g.x, g.y ), max( g.z, g.w ) ) : min( min( g.x, g.y ), min( g.z, g.w ) );
 
 			const size = vec2( textureSize( this.depthNode, 0 ) );
-			const offset = vec2(
-				g.y.equal( depth ).or( g.z.equal( depth ) ).select( 1.5, 0.5 ),
-				g.x.equal( depth ).or( g.y.equal( depth ) ).select( 1.5, 0.5 )
-			);
+			// one texel with the nearest depth decides both offsets, also when depths tie ( e.g. on planes facing the camera )
+
+			const offset = g.w.equal( depth ).select( vec2( 0.5, 0.5 ), g.z.equal( depth ).select( vec2( 1.5, 0.5 ), g.y.equal( depth ).select( vec2( 1.5, 1.5 ), vec2( 0.5, 1.5 ) ) ) );
 
 			return uv.mul( size ).sub( 0.5 ).floor().add( offset ).div( size );
 
