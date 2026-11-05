@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - virtual shadow maps</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - virtual shadow maps">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_shadowmap_virtual.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_shadowmap_virtual.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info" class="invert">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Virtual Shadow Maps</span>
+			</div>
+
+			<small>
+				Sparse, cached shadow pages for directional, spot, point, IES and projector lights.
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { IESLoader } from 'three/addons/loaders/IESLoader.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+
+			import { VirtualShadowNode } from 'three/addons/tsl/shadows/VirtualShadowNode.js';
+			import { VirtualShadowNodeHelper } from 'three/addons/tsl/shadows/VirtualShadowNodeHelper.js';
+
+			let camera, scene, renderer, controls, timer;
+			let knot, helper;
+
+			const lights = {};
+			const virtualShadowNodes = {};
+
+			const params = {
+				light: 'directional',
+				virtual: true,
+				lodBias: 0,
+				showLevels: true,
+				showAtlas: true,
+				animate: true
+			};
+
+			const stats = {
+				resident: 0,
+				rendered: 0
+			};
+
+			init();
+
+			async function init() {
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 4000 );
+				camera.position.set( 12, 8, 18 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xb9d3e8 );
+				scene.fog = new THREE.Fog( 0xb9d3e8, 300, 1500 );
+
+				scene.add( new THREE.HemisphereLight( 0xdfefff, 0x6b5a45, 1.5 ) );
+
+				timer = new THREE.Timer();
+				timer.connect( document );
+
+				// Lights, one visible at a time
+
+				const directional = new THREE.DirectionalLight( 0xfff2dd, 3 );
+				directional.position.set( - 1, 1.3, - 0.5 ).normalize().multiplyScalar( 1000 );
+				directional.shadow.camera.left = - 16;
+				directional.shadow.camera.right = 16;
+				directional.shadow.camera.top = 16;
+				directional.shadow.camera.bottom = - 16;
+				directional.shadow.camera.near = 1;
+				directional.shadow.camera.far = 2000;
+				directional.shadow.bias = - 0.0001;
+				lights.directional = directional;
+
+				const spot = new THREE.SpotLight( 0xfff2dd, 3000, 0, Math.PI / 4, 0.3, 2 );
+				spot.position.set( - 20, 30, - 10 );
+				spot.shadow.camera.near = 1;
+				spot.shadow.camera.far = 200;
+				spot.shadow.bias = - 0.00002;
+				lights.spot = spot;
+
+				const point = new THREE.PointLight( 0xfff2dd, 300, 0, 2 );
+				point.position.set( - 6, 7, - 3 );
+				point.shadow.camera.near = 0.5;
+				point.shadow.camera.far = 300;
+				point.shadow.bias = - 0.00002;
+				lights.point = point;
+
+				// IES and projector lights are spot lights, so they use the same virtual shadow map type.
+
+				const ies = new THREE.IESSpotLight( 0xfff2dd, 3000, 0, Math.PI / 4, 0.3, 2 );
+				ies.position.copy( spot.position );
+				ies.iesMap = await new IESLoader().setPath( './ies/' ).loadAsync( '06b4cfdc8805709e767b5e2e904be8ad.ies' );
+				ies.shadow.camera.near = 1;
+				ies.shadow.camera.far = 200;
+				ies.shadow.bias = - 0.00002;
+				lights.ies = ies;
+
+				const projector = new THREE.ProjectorLight( 0xffffff, 3000, 0, Math.PI / 6, 0.3, 2 );
+				projector.position.copy( spot.position );
+				projector.map = new THREE.TextureLoader().load( 'textures/colors.png' );
+				projector.map.colorSpace = THREE.SRGBColorSpace;
+				projector.shadow.camera.near = 1;
+				projector.shadow.camera.far = 200;
+				projector.shadow.bias = - 0.00002;
+				lights.projector = projector;
+
+				for ( const name in lights ) {
+
+					const light = lights[ name ];
+					light.castShadow = true;
+					light.shadow.mapSize.set( 2048, 2048 );
+					light.shadow.normalBias = 0.01;
+					light.visible = name === params.light;
+					scene.add( light );
+
+					// Without a shadow node, the light uses its default shadow map.
+
+					virtualShadowNodes[ name ] = new VirtualShadowNode( light );
+					virtualShadowNodes[ name ].showLevels = params.showLevels;
+					light.shadow.shadowNode = virtualShadowNodes[ name ];
+
+				}
+
+				// Ground
+
+				const ground = new THREE.Mesh( new THREE.PlaneGeometry( 4000, 4000 ), new THREE.MeshStandardMaterial( { color: 0x8a9a6b, roughness: 1 } ) );
+				ground.rotation.x = - Math.PI / 2;
+				ground.receiveShadow = true;
+				scene.add( ground );
+
+				// A moving object. Its pages render again when it moves.
+
+				knot = new THREE.Mesh( new THREE.TorusKnotGeometry( 1.5, 0.4, 200, 32 ), new THREE.MeshStandardMaterial( { color: 0xff6347, roughness: 0.4 } ) );
+				knot.position.set( 0, 3, 0 );
+				knot.castShadow = true;
+				knot.receiveShadow = true;
+				scene.add( knot );
+
+				// Many objects over a large area
+
+				const random = mulberry32( 7 );
+				const dummy = new THREE.Object3D();
+
+				const pillars = new THREE.InstancedMesh( new THREE.CylinderGeometry( 0.4, 0.5, 1, 12 ), new THREE.MeshStandardMaterial( { color: 0xeeeeee } ), 2000 );
+				const boxes = new THREE.InstancedMesh( new THREE.BoxGeometry( 1, 1, 1 ), new THREE.MeshStandardMaterial( { color: 0x6c8ebf } ), 2000 );
+
+				for ( const mesh of [ pillars, boxes ] ) {
+
+					for ( let i = 0; i < mesh.count; i ++ ) {
+
+						const radius = 15 + random() * 900;
+						const angle = random() * Math.PI * 2;
+						const height = 1 + random() * 6;
+
+						dummy.position.set( Math.cos( angle ) * radius, height / 2, Math.sin( angle ) * radius );
+						dummy.rotation.set( 0, random() * Math.PI, 0 );
+						dummy.scale.set( 1 + random() * 2, height, 1 + random() * 2 );
+						dummy.updateMatrix();
+
+						mesh.setMatrixAt( i, dummy.matrix );
+
+					}
+
+					mesh.castShadow = true;
+					mesh.receiveShadow = true;
+					scene.add( mesh );
+
+				}
+
+				// Renderer
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.shadowMap.enabled = true;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 2, 0 );
+				controls.maxPolarAngle = Math.PI / 2 - 0.05;
+				controls.update();
+
+				helper = new VirtualShadowNodeHelper( virtualShadowNodes[ params.light ] );
+				helper.visible = params.showAtlas;
+				scene.add( helper );
+
+				// GUI
+
+				const gui = renderer.inspector.createParameters( 'Settings' );
+
+				gui.add( params, 'light', Object.keys( lights ) ).onChange( ( value ) => {
+
+					for ( const name in lights ) lights[ name ].visible = name === value;
+
+					helper.virtualShadowNode = virtualShadowNodes[ value ];
+
+				} );
+
+				gui.add( params, 'virtual' ).name( 'virtual shadow map' ).onChange( ( value ) => {
+
+					for ( const name in lights ) lights[ name ].shadow.shadowNode = value ? virtualShadowNodes[ name ] : null;
+
+					// The lights set up their shadow again when the materials rebuild.
+
+					scene.traverse( ( object ) => {
+
+						if ( object.material ) object.material.needsUpdate = true;
+
+					} );
+
+					helper.visible = params.showAtlas && value;
+
+				} );
+
+				gui.add( params, 'lodBias', - 2, 4, 0.5 ).name( 'lod bias' ).onChange( ( value ) => {
+
+					for ( const name in virtualShadowNodes ) virtualShadowNodes[ name ].lodBias.value = value;
+
+				} );
+
+				gui.add( params, 'showLevels' ).name( 'show levels' ).onChange( ( value ) => {
+
+					for ( const name in virtualShadowNodes ) virtualShadowNodes[ name ].showLevels = value;
+
+				} );
+
+				gui.add( params, 'showAtlas' ).name( 'show atlas' ).onChange( ( value ) => {
+
+					helper.visible = value && params.virtual;
+
+				} );
+
+				gui.add( params, 'animate' );
+
+				gui.add( stats, 'resident' ).name( 'resident pages' ).listen();
+				gui.add( stats, 'rendered' ).name( 'rendered pages' ).listen();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function mulberry32( seed ) {
+
+				return function () {
+
+					seed |= 0;
+					seed = seed + 0x6D2B79F5 | 0;
+					let t = Math.imul( seed ^ seed >>> 15, 1 | seed );
+					t = t + Math.imul( t ^ t >>> 7, 61 | t ) ^ t;
+					return ( ( t ^ t >>> 14 ) >>> 0 ) / 4294967296;
+
+				};
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				timer.update();
+
+				if ( params.animate ) knot.rotation.y += timer.getDelta() * 0.5;
+
+				controls.update();
+				helper.update();
+
+				renderer.render( scene, camera );
+
+				const nodeStats = virtualShadowNodes[ params.light ].stats;
+
+				stats.resident = nodeStats.residentPages;
+				stats.rendered = nodeStats.renderedPages;
+
+			}
+
+		</script>
+	</body>
+</html>

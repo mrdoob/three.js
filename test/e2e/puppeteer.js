@@ -62,6 +62,7 @@ const exceptionList = [
 	'webgpu_meshlets_materials',
 	'webgpu_morphtargets_face',
 	'webgpu_shadowmap_progressive',
+	'webgpu_shadowmap_virtual', // Pages render one to three frames after the first request
 	'webgpu_lightmap_baking',
 	'webgpu_postprocessing_ssr_denoise',
 	'webgpu_renderer_pathtracer',

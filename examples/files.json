@@ -498,6 +498,7 @@
 		"webgpu_shadowmap_opacity",
 		"webgpu_shadowmap_pointlight",
 		"webgpu_shadowmap_progressive",
+		"webgpu_shadowmap_virtual",
 		"webgpu_shadowmap_vsm",
 		"webgpu_skinning",
 		"webgpu_skinning_instancing",

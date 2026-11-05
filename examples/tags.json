@@ -168,6 +168,7 @@
 	"webgpu_rtt": [ "renderTarget" ],
 	"webgpu_shadow_contact": [ "soft" ],
 	"webgpu_shadowmap_array": [ "tile" ],
+	"webgpu_shadowmap_virtual": [ "virtual", "sparse", "clipmap", "directional", "spot", "point" ],
 	"webgpu_sky": [ "sun" ],
 	"webgpu_tonemapping": [ "gltf" ],
 	"webgpu_tsl_compute_attractors_particles": [ "gpgpu" ],
