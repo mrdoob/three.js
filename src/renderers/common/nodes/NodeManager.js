@@ -703,6 +703,7 @@ class NodeManager extends DataMap {
 
 				_cacheKeyValues.push( this.renderer.shadowMap.enabled ? 1 : 0 );
 				_cacheKeyValues.push( this.renderer.shadowMap.type );
+				_cacheKeyValues.push( this.renderer.shadowMap.transmitted ? 1 : 0 );
 
 				const environmentNode = this.getEnvironmentNode( scene );
 				if ( environmentNode ) _cacheKeyValues.push( environmentNode.getCacheKey() );
