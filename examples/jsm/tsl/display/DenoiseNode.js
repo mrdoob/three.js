@@ -335,7 +335,8 @@ class DenoiseNode extends Node {
 		this._size = uniform( new Vector2() );
 		this._step = uniform( 1, 'int' );
 		this._blurDeviation = uniform( false, 'bool' );
-		this._pixelsPerRadian = uniform( 1 );
+		this._footprintScale = uniform( 1 );
+		this._viewHeight = uniform( 1 );
 
 		this._input = texture( this._targets[ 0 ].textures[ 0 ] );
 		this._inputAlpha = this.alpha ? texture( this._targets[ 0 ].textures[ 1 ] ) : null;
@@ -635,7 +636,11 @@ class DenoiseNode extends Node {
 		const camera = this.camera;
 		const e = camera.projectionMatrix.elements;
 
-		this._pixelsPerRadian.value = e[ 5 ] * this._size.value.y / 2;
+		// reflections: the texels per unit of the hit distance factor, per radian for perspective cameras, and across the
+		// height of the view for orthographic cameras, whose factor is relative to that height
+
+		this._viewHeight.value = 2 / e[ 5 ];
+		this._footprintScale.value = camera.isOrthographicCamera ? this._size.value.y : e[ 5 ] * this._size.value.y / 2;
 
 		// the jitter of the projection, e.g. of TRAA, in uv: the history moves with its change
 
@@ -684,12 +689,13 @@ class DenoiseNode extends Node {
 	 */
 	_viewPosition( coord, z, projectionMatrixInverse = this._cameraProjectionMatrixInverse ) {
 
-		// a point on the ray through the texel, scaled to the depth
+		// a point on the ray through the texel, scaled to the depth for perspective cameras and moved along the view axis
+		// for orthographic cameras
 
 		const { guideUV } = this._guideUV( coord );
 		const ray = getViewPosition( guideUV, float( 0.5 ), projectionMatrixInverse );
 
-		return ray.mul( z.div( ray.z ) );
+		return this.camera.isOrthographicCamera ? vec3( ray.xy, z ) : ray.mul( z.div( ray.z ) );
 
 	}
 
@@ -747,8 +753,9 @@ class DenoiseNode extends Node {
 
 	/**
 	 * Screen space: a function for the view positions of the texels around a texel from their view depth. The rays
-	 * through the texels, scaled to a view depth of 1, are affine in the texel for perspective cameras, so they are
-	 * interpolated from those of the texel and its neighbors instead of unprojecting each.
+	 * through the texels, scaled to a view depth of 1 for perspective cameras or at a view depth of 0 for orthographic
+	 * cameras, are affine in the texel, so they are interpolated from those of the texel and its neighbors instead of
+	 * unprojecting each.
 	 *
 	 * @private
 	 * @param {Node<ivec2>} coord - The texel.
@@ -756,10 +763,12 @@ class DenoiseNode extends Node {
 	 */
 	_rays( coord ) {
 
+		const orthographic = this.camera.isOrthographicCamera === true;
+
 		const ray = ( x, y ) => {
 
 			const r = getViewPosition( vec2( coord ).add( vec2( x, y ) ).div( this._size ), float( 0.5 ), this._cameraProjectionMatrixInverse );
-			return r.div( r.z );
+			return orthographic ? vec3( r.xy, 0 ) : r.div( r.z );
 
 		};
 
@@ -767,7 +776,12 @@ class DenoiseNode extends Node {
 		const dx = ray( 1.5, 0.5 ).sub( origin ).toVar();
 		const dy = ray( 0.5, 1.5 ).sub( origin ).toVar();
 
-		return ( q, z ) => origin.add( dx.mul( float( q.x.sub( coord.x ) ) ) ).add( dy.mul( float( q.y.sub( coord.y ) ) ) ).mul( z );
+		return ( q, z ) => {
+
+			const p = origin.add( dx.mul( float( q.x.sub( coord.x ) ) ) ).add( dy.mul( float( q.y.sub( coord.y ) ) ) );
+			return orthographic ? vec3( p.xy, z ) : p.mul( z );
+
+		};
 
 	}
 
@@ -834,14 +848,15 @@ class DenoiseNode extends Node {
 			const variance = float( 0 ).toVar();
 			const historyLength = float( 1 ).toVar();
 
-			// reflections: the hit distance factor h / ( h + d ), 1 for misses, accumulated like the color
+			// reflections: the hit distance factor h / ( h + d ) with the distance d of the surface ( the height of the view
+			// for orthographic cameras ), 1 for misses, accumulated like the color
 
 			const hitFactor = float( 1 ).toVar();
 
 			if ( this._specular ) {
 
 				const h = float( this.hitDistanceNode.sample( uv ) );
-				hitFactor.assign( h.lessThan( 1e3 ).and( h.greaterThan( 0 ) ).select( h.div( h.add( length( surface.xyz ) ) ), 1 ) );
+				hitFactor.assign( h.lessThan( 1e3 ).and( h.greaterThan( 0 ) ).select( h.div( h.add( this.camera.isOrthographicCamera ? this._viewHeight : length( surface.xyz ) ) ), 1 ) );
 
 			}
 
@@ -885,7 +900,9 @@ class DenoiseNode extends Node {
 				if ( this._specular ) {
 
 					const hitDistance = float( this.hitDistanceNode.sample( uv ) ).toVar();
-					const virtualPosition = surface.xyz.add( surface.xyz.normalize().mul( hitDistance ) );
+					const viewDirection = this.camera.isOrthographicCamera ? vec3( 0, 0, - 1 ) : surface.xyz.normalize();
+					const virtualPosition = surface.xyz.add( viewDirection.mul( hitDistance ) );
+
 					// the previous projection includes the previous jitter, so the history uv needs no jitter delta
 
 					const clip = this._previousProjectionMatrix.mul( this._previousViewMatrix.mul( this._cameraWorldMatrix.mul( vec4( virtualPosition, 1 ) ) ) ).toVar();
@@ -1295,10 +1312,10 @@ class DenoiseNode extends Node {
 					if ( this._specular && this.temporal ) {
 
 						// the footprint of the reflection lobe on screen in texels ( ReBLUR, ReLAX ): the tangent of the
-						// lobe angle times the hit distance factor h / ( h + d ), times the texels per radian
+						// lobe angle times the hit distance factor, times the texels per unit of the factor
 
 						centerHit = this._guideNormal.load( coord ).w.toVar();
-						footprint = a.mul( 1.7 ).mul( centerHit ).mul( this._pixelsPerRadian ).max( 0.5 ).toVar();
+						footprint = a.mul( 1.7 ).mul( centerHit ).mul( this._footprintScale ).max( 0.5 ).toVar();
 
 					}
 
