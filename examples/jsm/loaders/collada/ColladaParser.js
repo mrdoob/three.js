@@ -1321,6 +1321,8 @@ class ColladaParser {
 			hasUV: false
 		};
 
+		const polygons = [];
+
 		for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 			const child = xml.childNodes[ i ];
@@ -1346,6 +1348,7 @@ class ColladaParser {
 
 				case 'p':
 					primitive.p = parseInts( child.textContent );
+					polygons.push( primitive.p );
 					break;
 
 			}
@@ -1354,7 +1357,10 @@ class ColladaParser {
 
 		if ( primitive.type === 'polygons' ) {
 
-			primitive.vcount = [ primitive.p.length / primitive.stride ];
+			// each <p> element of <polygons> holds a single polygon
+
+			primitive.p = polygons.flat();
+			primitive.vcount = polygons.map( p => p.length / primitive.stride );
 
 		}
 
