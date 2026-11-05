@@ -836,11 +836,13 @@ class PassNode extends Node {
 
 		if ( this.contextNode !== null ) renderer.contextNode = this._getContextNode( renderer );
 
-		await renderer.compileAsync( this.scene, this.camera );
+		const promise = renderer.compileAsync( this.scene, this.camera );
 
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setMRT( currentMRT );
 		renderer.contextNode = currentContextNode;
+
+		await promise;
 
 	}
 

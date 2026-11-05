@@ -30,7 +30,7 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { Float16BufferAttribute } from '../../core/BufferAttribute.js';
-import { warn, error, yieldToMain } from '../../utils.js';
+import { warn, error } from '../../utils.js';
 
 let _id = 0;
 
@@ -3687,70 +3687,6 @@ class NodeBuilder {
 					}
 
 				}
-
-			}
-
-		}
-
-		this.setBuildStage( null );
-		this.setShaderStage( null );
-
-		// stage 4: build code for a specific output
-
-		this.buildCode();
-		this.buildUpdateNodes();
-
-		return this;
-
-	}
-
-	/**
-	 * Async version of build() that yields to main thread between shader stages.
-	 * Use this in compileAsync() to prevent blocking the main thread.
-	 *
-	 * @param {Function} [yieldFn=yieldToMain] - The function used to yield to the main thread.
-	 * @return {Promise<NodeBuilder>} A promise that resolves to this node builder.
-	 */
-	async buildAsync( yieldFn = yieldToMain ) {
-
-		this.prebuild();
-
-		// setup() -> stage 1: create possible new nodes and/or return an output reference node
-		// analyze()   -> stage 2: analyze nodes to possible optimization and validation
-		// generate()  -> stage 3: generate shader
-
-		for ( const buildStage of defaultBuildStages ) {
-
-			this.setBuildStage( buildStage );
-
-			if ( this.context.position && this.context.position.isNode ) {
-
-				this.flowNodeFromShaderStage( 'vertex', this.context.position );
-
-			}
-
-			for ( const shaderStage of shaderStages ) {
-
-				this.setShaderStage( shaderStage );
-
-				const flowNodes = this.flowNodes[ shaderStage ];
-
-				for ( const node of flowNodes ) {
-
-					if ( buildStage === 'generate' ) {
-
-						this.flowNode( node );
-
-					} else {
-
-						node.build( this );
-
-					}
-
-				}
-
-				// Yield to main thread after each shader stage to prevent blocking
-				await yieldFn();
 
 			}
 
