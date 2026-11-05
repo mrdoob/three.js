@@ -886,8 +886,10 @@ class DenoiseNode extends Node {
 
 					const hitDistance = float( this.hitDistanceNode.sample( uv ) ).toVar();
 					const virtualPosition = surface.xyz.add( surface.xyz.normalize().mul( hitDistance ) );
+					// the previous projection includes the previous jitter, so the history uv needs no jitter delta
+
 					const clip = this._previousProjectionMatrix.mul( this._previousViewMatrix.mul( this._cameraWorldMatrix.mul( vec4( virtualPosition, 1 ) ) ) ).toVar();
-					const virtualUV = clip.xy.div( clip.w ).mul( vec2( 0.5, - 0.5 ) ).add( 0.5 ).add( this._jitterDelta );
+					const virtualUV = clip.xy.div( clip.w ).mul( vec2( 0.5, - 0.5 ) ).add( 0.5 );
 					const smooth = float( 1 ).sub( normal.w.mul( 2 ) ).clamp().mul( hitDistance.greaterThan( 0 ).and( hitDistance.lessThan( 1e3 ) ).and( clip.w.greaterThan( 0 ) ).select( 1, 0 ) );
 					historyUV.assign( mix( historyUV, virtualUV, smooth ) );
 
