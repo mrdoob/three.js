@@ -62,6 +62,8 @@
 				view: 'Lit',
 				rays: '1 per 4 pixels',
 				traa: false,
+				adaptiveQuality: '60 FPS',
+				quality: 1,
 				secondary: true,
 				smoothing: 0.97,
 				probeSize: 12,
@@ -72,6 +74,7 @@
 			};
 
 			const rayStrides = { '1 per 4 pixels': 2, '1 per pixel': 1 };
+			const frameRates = { 'Off': 0, '30 FPS': 30, '60 FPS': 60, '120 FPS': 120 };
 			const views = { 'Lit': 0, 'Indirect': 1, 'Irradiance': 2, 'Probes': 3, 'Levels': 4 };
 			const scenes = { 'Sponza': createSponza, 'Courtyard': createCourtyard, 'Cornell Box': () => createCornellBox( 'panel' ), 'Cornell Box (Rect Area Light)': () => createCornellBox( 'rect' ), 'Cornell Box (Spot Light)': () => createCornellBox( 'spot' ) };
 
@@ -112,6 +115,17 @@
 				gui.add( params, 'rays', Object.keys( rayStrides ) ).name( 'Rays' ).onChange( updateCascades );
 				gui.add( params, 'secondary' ).name( 'Secondary Bounces' ).onChange( updateCascades );
 				gui.add( params, 'smoothing', 0, 1, 0.01 ).name( 'Temporal Smoothing' ).onChange( updateCascades );
+				gui.add( params, 'adaptiveQuality', Object.keys( frameRates ) ).name( 'Adaptive Quality' ).onChange( updateQuality ).listen();
+				gui.add( params, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( () => {
+
+					// the slider shows the adaptive quality, moving it fixes the quality
+
+					if ( params.quality === shownQuality ) return;
+
+					params.adaptiveQuality = 'Off';
+					updateQuality();
+
+				} ).listen();
 				gui.add( params, 'traa' ).name( 'TRAA' ).onChange( updateOutput );
 				gui.add( params, 'view', Object.keys( views ) ).name( 'View' ).onChange( () => cascades.mode.value = views[ params.view ] );
 				gui.add( params, 'intensity', 0, 4 ).name( 'Indirect' ).onChange( () => cascades.intensity.value = params.intensity );
@@ -185,6 +199,7 @@
 					cascades = new RealtimeRadianceCascades( { ...probeLayout(), ...cascadeOptions() } );
 					cascades.mode.value = views[ params.view ];
 					cascades.intensity.value = params.intensity;
+					updateQuality();
 
 				} else {
 
@@ -239,6 +254,17 @@
 			function updateCascades() {
 
 				Object.assign( cascades, cascadeOptions() );
+
+			}
+
+			function updateQuality() {
+
+				// the quality adapts to the frame rate, or is fixed
+
+				const frameRate = frameRates[ params.adaptiveQuality ];
+
+				cascades.targetFrameTime = frameRate > 0 ? 1000 / frameRate : 0;
+				cascades.quality = params.quality;
 
 			}
 
@@ -535,7 +561,7 @@
 
 			}
 
-			let frames = 0, lastTimings = {};
+			let frames = 0, lastTimings = {}, shownQuality = null;
 
 			async function animate() {
 
@@ -555,6 +581,8 @@
 				cascades.update( renderer, scene, camera );
 				renderPipeline.render();
 
+				if ( cascades.targetFrameTime > 0 ) params.quality = shownQuality = Math.round( cascades.quality * 100 ) / 100;
+
 				if ( ++ frames % 30 === 0 ) {
 
 					const timings = await cascades.readTimings( renderer ) ?? lastTimings;
@@ -565,7 +593,7 @@
 					lastTimings = timings;
 					const full = probes.some( ( count, n ) => count >= cascades.capacities[ n ] ) ? ' (full: probes are dropped)' : '';
 					const bias = cascades.lodBias > 0 ? `, levels of detail ${ cascades.lodBias.toFixed( 2 ) } octaves coarser to fit` : '';
-					status.textContent = `probes per cascade: ${ probes.join( ', ' ) }${ full }${ bias }, ${ cascades.newProbes } new, ${ ( cascades.memory / 2 ** 20 ).toFixed( 0 ) } MB. GPU ms: ${ stages }, total ${ total.toFixed( 2 ) }`;
+					status.textContent = `quality ${ cascades.quality.toFixed( 2 ) }, probes per cascade: ${ probes.join( ', ' ) }${ full }${ bias }, ${ cascades.newProbes } new, ${ ( cascades.memory / 2 ** 20 ).toFixed( 0 ) } MB. GPU ms: ${ stages }, total ${ total.toFixed( 2 ) }`;
 
 				}
 

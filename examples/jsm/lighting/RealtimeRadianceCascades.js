@@ -94,7 +94,7 @@ const _size = /*@__PURE__*/ new Vector2();
  * The options are properties that can change at any time, they apply in the next `update()`, or before it in
  * `getCompositeNode()`, `getIrradianceNode()` and `getTextureNode()`: the ones of the probe layout and of the
  * levels of detail (`spacing`, `levelDistance`, `levels`, `cascades`, `directions`, `maxProbes`,
- * `orientations`) clear the probes and rebuild the passes, `rayStride`, `secondary`, `useQualityWeight`,
+ * `orientations`) clear the probes and rebuild the passes, `secondary`, `useQualityWeight`,
  * `velocity` and `useShadowMap` rebuild the passes, the others are uniforms. `velocity` also replaces the G-buffer.
  * Fetch the nodes again after the passes were rebuilt, before `update()`, which renders the G-buffer they read.
  *
@@ -131,8 +131,8 @@ class RealtimeRadianceCascades {
 	 * @param {number} [options.directions=4] - The directions of the finest cascade along the polar axis, there are twice as many
 	 * around it, so 4 gives 32 directions. Every cascade doubles them along both axes.
 	 * @param {number} [options.maxProbes=32768] - The most probes of the finest cascade, every coarser one has 1.25 / 3^n as many.
-	 * @param {number} [options.rayStride=1] - The pixels of a block of this size take turns at tracing a ray, `1` traces a ray from
-	 * every pixel, as in chandra.
+	 * @param {number} [options.rayStride=1] - The size of the cells of pixels of which a random pixel traces a ray every frame, `1`
+	 * traces a ray from every pixel, as in chandra. Lower qualities widen the cells, see `quality`.
 	 * @param {boolean} [options.secondary=true] - Whether the hits of the rays get the light of secondary probes.
 	 * @param {number} [options.qualityDecay=0.97] - The factor of the sums of the bins and of the ray counts of the probes per frame.
 	 * @param {number} [options.minDirectionWeight=2] - The sums of a bin with at most this many rays do not decay.
@@ -148,8 +148,10 @@ class RealtimeRadianceCascades {
 	 * @param {boolean} [options.velocity=false] - Whether the G-buffer has a velocity texture, e.g. for {@link TRAANode}.
 	 * @param {boolean} [options.useShadowMap=true] - Whether the hits read the light of the sun from its shadow map, where the map
 	 * covers them, instead of tracing a shadow ray. The sun must cast shadows.
+	 * @param {number} [options.quality=1] - The share of the rays and the fineness of the probes, from 0 to 1, see `quality`.
+	 * @param {number} [options.targetFrameTime=0] - The frame time in milliseconds that `quality` adapts to, or 0 for a fixed quality.
 	 */
-	constructor( { spacing = 0.0625, levelDistance = 4, levels = 16, blendingRadius = 1.1, cascades = 4, directions = 4, maxProbes = 32768, rayStride = 1, secondary = true, qualityDecay = 0.97, minDirectionWeight = 2, useQualityWeight = true, maxLifetime = 1, secondaryLifetime = 10, orientations = false, maxRadiance = 500, adaptiveLOD = true, velocity = false, useShadowMap = true } = {} ) {
+	constructor( { spacing = 0.0625, levelDistance = 4, levels = 16, blendingRadius = 1.1, cascades = 4, directions = 4, maxProbes = 32768, rayStride = 1, secondary = true, qualityDecay = 0.97, minDirectionWeight = 2, useQualityWeight = true, maxLifetime = 1, secondaryLifetime = 10, orientations = false, maxRadiance = 500, adaptiveLOD = true, velocity = false, useShadowMap = true, quality = 1, targetFrameTime = 0 } = {} ) {
 
 		this._blendingOctaves = uniform( 0 );
 		this._maxLifetime = uniform( 1, 'uint' );
@@ -183,6 +185,30 @@ class RealtimeRadianceCascades {
 		 * @default 0
 		 */
 		this.lodBias = 0;
+
+		/**
+		 * The quality of the light for its cost, from 0 to 1. Every frame, a pixel of each cell of
+		 * `rayStride * 2 ** ( 2 * ( 1 - quality ) )` pixels traces a ray, so a sixteenth as many rays at 0, and the
+		 * levels of detail are `1 - quality` octaves coarser, as with `lodBias`, so a quarter as many probes. The
+		 * tracing costs in proportion to the rays and most other passes to the probes. Lower qualities are noisier
+		 * and blurrier, and the light takes longer to settle. With `targetFrameTime`, it adapts.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.quality = quality;
+
+		/**
+		 * The frame time in milliseconds that `quality` adapts to, e.g. `1000 / 60`, or 0 for a fixed `quality`. It
+		 * measures the time between the calls of `update()`: the quality falls while the frames take longer, faster
+		 * the longer they take, and rises slowly while they do not, staying below the quality at which they last took
+		 * longer. Every quarter it falls, it compares the frames back at the quality above: if lowering it did not
+		 * shorten them, because something else limits them, e.g. the display or the CPU, it stays there for a while.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.targetFrameTime = targetFrameTime;
 
 		/**
 		 * The factor of the interval lengths between cascades.
@@ -313,8 +339,25 @@ class RealtimeRadianceCascades {
 		this._readingCounts = false;
 		this._screenWidth = uniform( 1, 'uint' );
 		this._screenHeight = uniform( 1, 'uint' );
-		this._blocksX = uniform( 1, 'uint' );
-		this._blocks = uniform( 1, 'uint' );
+
+		// the rays of this frame and of the last one: the size of the cells of pixels that trace one, the cells per
+		// row and the rays, see _createFrameKernels()
+
+		this._rays = uniform( new Vector3( 0, 1, 0 ) );
+		this._previousRays = uniform( new Vector3( 0, 1, 0 ) );
+		this._stages = null;
+
+		// the state of the adaptive quality, see _adaptQuality()
+
+		this._lastUpdate = null;
+		this._frameTimes = [];
+		this._qualityLimit = 1;
+		this._descent = null;
+		this._probe = null;
+		this._holdUntil = 0;
+		this._holdTime = 0;
+		this._adaptAfter = 0;
+		this._overs = 0;
 
 		this._applyChanges();
 
@@ -630,6 +673,7 @@ class RealtimeRadianceCascades {
 	update( renderer, scene, camera ) {
 
 		this._applyChanges();
+		this._adaptQuality();
 
 		const size = renderer.getDrawingBufferSize( _size );
 		const width = Math.max( Math.floor( size.x ), 1 ), height = Math.max( Math.floor( size.y ), 1 );
@@ -647,13 +691,16 @@ class RealtimeRadianceCascades {
 
 		}
 
-		const stride = this.rayStride;
-		const blocks = Math.ceil( width / stride ) * Math.ceil( height / stride );
-
 		this._screenWidth.value = width;
 		this._screenHeight.value = height;
-		this._blocksX.value = Math.ceil( width / stride );
-		this._blocks.value = blocks;
+
+		// a pixel of each cell of rayStride x rayStride pixels traces a ray, up to 4 times as wide at lower qualities
+
+		const quality = Math.min( Math.max( this.quality, 0 ), 1 );
+		const cell = this.rayStride * 2 ** ( 2 * ( 1 - quality ) );
+		const columns = Math.ceil( width / cell );
+		const rays = columns * Math.ceil( height / cell );
+		const previousRays = this._rays.value.z;
 
 		// the G-buffer
 
@@ -684,6 +731,9 @@ class RealtimeRadianceCascades {
 		const random = pcg3d( this._frame, 29, 968 );
 		this._jitter.value.set( random[ 0 ] / 0xffffffff, random[ 1 ] / 0xffffffff );
 
+		this._previousRays.value.copy( this._rays.value );
+		this._rays.value.set( cell, columns, rays );
+
 		// the passes are built after the G-buffer, whose render creates the shadow map of the sun
 
 		this._updateMaterials();
@@ -700,57 +750,178 @@ class RealtimeRadianceCascades {
 		if ( this._kernels === null ) this._kernels = this._createKernels();
 		if ( this._frameKernels === null ) this._frameKernels = this._createFrameKernels();
 
-		this._lodBias.value = this.lodBias;
+		this._lodBias.value = this.lodBias + 1 - quality;
 
-		// the passes
+		// the passes, in one submission per stage, which also groups them for timestamp queries, see readTimings().
+		// The passes of the pixels and of the rays run over as many threads as they have
 
-		const kernels = this._kernels;
-		const frameKernels = this._frameKernels;
-		const uids = this._uids = {};
+		if ( this._stages === null ) {
 
-		// the passes are grouped by stage for timestamp queries, see readTimings()
+			this._stages = this._createStages();
 
-		const run = ( stage, kernel, count = null ) => {
+			// the adaptive quality waits for a second for the new passes to compile and the probes to fill
 
-			if ( kernel === null ) return;
-
-			renderer.compute( kernel, count );
-
-			if ( renderer.backend.trackTimestamp === true ) ( uids[ stage ] ??= [] ).push( renderer.backend.getTimestampUID( kernel ) );
-
-		};
-
-		run( 'allocate', kernels.clear );
-		run( 'allocate', frameKernels.gather, pixels );
-		run( 'allocate', frameKernels.gatherSecondary, blocks );
-		run( 'allocate', kernels.keep );
-		run( 'allocate', kernels.assign[ 0 ] );
-
-		for ( let n = 1; n < this.cascades; n ++ ) {
-
-			run( 'allocate', kernels.fill[ n ] );
-			run( 'allocate', kernels.assign[ n ] );
+			this._frameTimes.length = 0;
+			this._adaptAfter = performance.now() + 1000;
 
 		}
 
-		for ( let n = 0; n < this.cascades; n ++ ) run( 'allocate', kernels.free[ n ] );
+		const frameKernels = this._frameKernels;
 
-		// the offsets of the rays of the probes in the R2 sequence
+		frameKernels.gather.dispatchSize = pixels;
+		frameKernels.count.dispatchSize = rays;
+		frameKernels.trace.dispatchSize = rays;
 
-		run( 'allocate', frameKernels.count, blocks );
+		if ( this.secondary ) frameKernels.gatherSecondary.dispatchSize = frameKernels.traceSecondary.dispatchSize = Math.max( previousRays, 1 );
 
-		for ( let n = 1; n < this.cascades; n ++ ) run( 'allocate', kernels.countUp[ n ] );
-		for ( let n = this.cascades - 1; n >= 0; n -- ) run( 'allocate', kernels.offsets[ n ] );
+		const uids = this._uids = {};
 
-		run( 'trace', frameKernels.traceSecondary, blocks );
-		run( 'trace', frameKernels.trace, blocks );
+		for ( const stage in this._stages ) {
 
-		for ( let n = 0; n < this.cascades; n ++ ) run( 'accumulate', kernels.accumulate[ n ] );
-		for ( let n = this.cascades - 1; n >= 0; n -- ) run( 'merge', kernels.merge[ n ] );
+			renderer.compute( this._stages[ stage ] );
 
-		run( 'resolve', kernels.irradiance );
+			if ( renderer.backend.trackTimestamp === true ) uids[ stage ] = [ renderer.backend.getTimestampUID( this._stages[ stage ] ) ];
+
+		}
 
 		if ( this.adaptiveLOD ) this._adaptLOD( renderer );
+
+	}
+
+	/**
+	 * Returns the passes of a frame in order, grouped by stage.
+	 *
+	 * @private
+	 * @return {Object<string, Array<ComputeNode>>} The passes of the stages.
+	 */
+	_createStages() {
+
+		const kernels = this._kernels;
+		const frameKernels = this._frameKernels;
+		const allocate = [ kernels.clear, frameKernels.gather, frameKernels.gatherSecondary, kernels.keep, kernels.assign[ 0 ] ];
+
+		for ( let n = 1; n < this.cascades; n ++ ) allocate.push( kernels.fill[ n ], kernels.assign[ n ] );
+
+		// the probes, then the offsets of their rays in the R2 sequence
+
+		allocate.push( ...kernels.free, frameKernels.count, ...kernels.countUp.slice( 1 ), ...kernels.offsets.slice().reverse() );
+
+		const stages = {
+			allocate,
+			trace: [ frameKernels.traceSecondary, frameKernels.trace ],
+			accumulate: kernels.accumulate.slice(),
+			merge: kernels.merge.slice().reverse(),
+			resolve: [ kernels.irradiance ]
+		};
+
+		for ( const stage in stages ) {
+
+			stages[ stage ] = stages[ stage ].filter( ( kernel ) => kernel );
+			stages[ stage ].name = 'RC.' + stage[ 0 ].toUpperCase() + stage.slice( 1 );
+
+		}
+
+		return stages;
+
+	}
+
+	/**
+	 * Adapts `quality` to `targetFrameTime` by the mean time between the last calls of `update()`.
+	 *
+	 * @private
+	 */
+	_adaptQuality() {
+
+		const now = performance.now();
+		const time = now - ( this._lastUpdate ?? now );
+
+		this._lastUpdate = now;
+
+		if ( ! ( this.targetFrameTime > 0 ) || now < this._adaptAfter ) return;
+
+		// a pause, e.g. a hidden page or a new scene, starts the measurement again
+
+		if ( time > 250 ) this._frameTimes.length = 0;
+		else if ( time > 0 ) this._frameTimes.push( time );
+
+		// the frames of half a second, a second for a window back up, at least 12, without the first 6 after a change,
+		// which are still in flight or move the probes to their new levels of detail
+
+		const span = this._probe !== null ? 1000 : 500;
+
+		if ( this._frameTimes.length < 18 || this._frameTimes.slice( 6 ).reduce( ( sum, t ) => sum + t, 0 ) < span ) return;
+
+		// the mean, since without vsync the frames can alternate between fast ones and ones that wait for the GPU
+
+		const times = this._frameTimes.slice( 6 );
+		const frameTime = times.reduce( ( sum, t ) => sum + t, 0 ) / times.length;
+		const target = this.targetFrameTime;
+		const quality = this.quality;
+
+		this._frameTimes.length = 0;
+
+		// a window back at the quality where the descent started, or last paid off, every quarter below it and at 0:
+		// unless its frames take 15% longer than the ones below, lowering the quality does not shorten them,
+		// something else limits them, e.g. the display or the CPU. The quality stays there for 10 seconds, twice as
+		// long each time
+
+		if ( this._probe !== null ) {
+
+			const { quality: lower, time: lowerTime } = this._probe;
+
+			this._probe = null;
+			this._overs = 0;
+
+			if ( frameTime < lowerTime * 1.15 ) {
+
+				this._descent = null;
+				this._qualityLimit = quality;
+				this._holdTime = Math.min( this._holdTime * 2 || 10000, 160000 );
+				this._holdUntil = now + this._holdTime;
+
+			} else {
+
+				this.quality = this._descent.quality = lower;
+
+			}
+
+			return;
+
+		}
+
+		if ( frameTime > target * 1.1 ) {
+
+			if ( now < this._holdUntil ) return;
+
+			this._descent ??= { quality };
+
+			if ( this._descent.quality - quality >= 0.25 || ( quality === 0 && this._descent.quality > 0 ) ) {
+
+				this._probe = { quality, time: frameTime };
+				this.quality = this._descent.quality;
+
+				return;
+
+			}
+
+			// lower, the more the frames take longer and the longer they did
+
+			this._overs ++;
+			this._qualityLimit = Math.min( this._qualityLimit, quality - 0.02 );
+			this.quality = Math.max( quality - Math.min( 0.05 * this._overs * Math.max( Math.log2( frameTime / target ), 0.5 ), 0.25 ), 0 );
+
+		} else if ( frameTime <= target * 1.05 ) {
+
+			// up slowly while the frames are fast enough, within the jitter of the display, and only slowly back to
+			// where they last were not
+
+			this._descent = null;
+			this._overs = 0;
+			this._holdTime = 0;
+			this._qualityLimit = Math.min( this._qualityLimit + 0.002, 1 );
+			this.quality = Math.min( quality + 0.02, Math.max( this._qualityLimit, quality ) );
+
+		}
 
 	}
 
@@ -879,7 +1050,7 @@ class RealtimeRadianceCascades {
 	_applyChanges() {
 
 		const bufferKey = [ this.spacing, this.levelDistance, this.levels, this.cascades, this.directions, this.maxProbes, this.orientations ].join();
-		const kernelKey = [ bufferKey, this.rayStride, this.secondary, this.useQualityWeight, this.velocity ].join();
+		const kernelKey = [ bufferKey, this.secondary, this.useQualityWeight, this.velocity ].join();
 
 		if ( kernelKey === this._kernelKey ) return;
 
@@ -949,6 +1120,7 @@ class RealtimeRadianceCascades {
 		if ( all ) this._kernels = null;
 
 		this._frameKernels = null;
+		this._stages = null;
 		this._hits?.value.dispose();
 		this._hits = null;
 
@@ -2684,28 +2856,28 @@ class RealtimeRadianceCascades {
 
 		} )().computeKernel().setName( 'RC.Gather' );
 
-		// a pixel of each block of rayStride x rayStride pixels traces a ray, in turns
+		// a pixel of each cell of a grid traces a ray, see update(): a random one, shifted along the R2 sequence every
+		// frame. Neighbouring threads trace from neighbouring cells, so that their rays start close together
 
-		const stride = this.rayStride;
-		const blocksX = this._blocksX, blocks = this._blocks;
+		const tracedPixel = ( index, rays = this._rays, frame = this._frameNode ) => {
 
-		const tracedPixel = ( index, frame = this._frameNode ) => {
+			const columns = uint( rays.y );
+			const cell = vec2( float( index.mod( columns ) ), float( index.div( columns ) ) );
+			const shift = vec2( float( frame.mul( R2[ 0 ] ) ), float( frame.mul( R2[ 1 ] ) ) ).mul( 2 ** - 32 );
+			const offset = fract( vec2( hash( index ), hash( index.add( 0x5bd1e995 ) ) ).add( shift ) );
+			const pixel = ivec2( cell.add( offset ).mul( rays.x ) ).toVar();
 
-			const block = ivec2( int( index.mod( blocksX ) ), int( index.div( blocksX ) ) );
-			const turn = frame.add( uint( hash( index ).mul( stride * stride ) ) ).mod( stride * stride );
-			const pixel = block.mul( stride ).add( ivec2( int( turn.mod( stride ) ), int( turn.div( stride ) ) ) ).toVar();
-
-			return { pixel, valid: index.lessThan( blocks ).and( pixel.x.lessThan( int( width ) ) ).and( pixel.y.lessThan( int( height ) ) ) };
+			return { pixel, valid: float( index ).lessThan( rays.z ).and( pixel.x.lessThan( int( width ) ) ).and( pixel.y.lessThan( int( height ) ) ) };
 
 		};
 
-		// the hits of the rays of the last frame, at the pixels that the blocks traced: they insert their secondary
-		// probes, two levels coarser, and trace their rays. The passes run over the blocks rather than the pixels, of
-		// which only one per block has a hit, so that the threads of a SIMD group all trace
+		// the hits of the rays of the last frame, at the pixels that traced them: they insert their secondary probes,
+		// two levels coarser, and trace their rays. The passes run over the rays rather than the pixels, of which only
+		// some have a hit, so that the threads of a SIMD group all trace
 
-		const secondaryHit = ( block ) => {
+		const secondaryHit = ( ray ) => {
 
-			const traced = tracedPixel( block, this._frameNode.sub( 1 ) );
+			const traced = tracedPixel( ray, this._previousRays, this._frameNode.sub( 1 ) );
 			const index = uint( traced.pixel.y ).mul( width ).add( uint( traced.pixel.x ) ).toVar();
 			const position = this._hits.element( index.mul( 2 ) ).toVar();
 			const valid = traced.valid.and( position.w.equal( float( this._frameNode.sub( 1 ) ) ) ).and( this._frameNode.greaterThan( 1 ) );
