@@ -3396,7 +3396,7 @@ class GLTFMaterialsSheenExtension {
 		}
 
 		extensionDef.sheenRoughnessFactor = material.sheenRoughness;
-		extensionDef.sheenColorFactor = material.sheenColor.toArray();
+		extensionDef.sheenColorFactor = material.sheenColor.clone().multiplyScalar( material.sheen ).toArray();
 
 		materialDef.extensions = materialDef.extensions || {};
 		materialDef.extensions[ this.name ] = extensionDef;
