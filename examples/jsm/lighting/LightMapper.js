@@ -22,7 +22,7 @@ let _rendererState;
  * irradiance. Material occlusion is applied once at runtime. Keep any contributions
  * included in the bake out of runtime diffuse lighting to avoid counting them twice.
  * The `variance` and `guides` options also bake the inputs of a denoiser like
- * {@link TextureDenoiseNode}: the noise of each texel and the surface that it lies on,
+ * {@link DenoiseNode}: the noise of each texel and the surface that it lies on,
  * see {@link LightMapper#getTextureNode}.
  *
  * ```js
@@ -234,7 +234,7 @@ class LightMapper {
 
 	/**
 	 * Returns a texture of the light mapper: `'color'`, the light map, or the inputs of a denoiser like
-	 * {@link TextureDenoiseNode}: `'variance'` with the `variance` option, `'position'` and `'normal'` with
+	 * {@link DenoiseNode}: `'variance'` with the `variance` option, `'position'` and `'normal'` with
 	 * the `guides` option.
 	 *
 	 * @param {('color'|'variance'|'position'|'normal')} [name='color'] - The name of the texture.

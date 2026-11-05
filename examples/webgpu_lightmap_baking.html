@@ -42,7 +42,7 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 			import { LightMapper } from 'three/addons/lighting/LightMapper.js';
-			import { textureDenoise } from 'three/addons/tsl/display/TextureDenoiseNode.js';
+			import { denoise } from 'three/addons/tsl/display/DenoiseNode.js';
 			import { RayTracedRadiosity, rayTracedRadiosityIrradiance } from 'three/addons/lighting/RayTracedRadiosity.js';
 			import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
 
@@ -356,7 +356,12 @@
 
 				// the denoiser filters once, when the bake is done
 
-				denoiseNode = params.denoise ? textureDenoise( lightMapper.getTextureNode( 'color' ), lightMapper.getTextureNode( 'position' ), lightMapper.getTextureNode( 'normal' ), lightMapper.getTextureNode( 'variance' ) ) : null;
+				denoiseNode = params.denoise ? denoise( lightMapper.getTextureNode( 'color' ), {
+					position: lightMapper.getTextureNode( 'position' ),
+					normal: lightMapper.getTextureNode( 'normal' ),
+					variance: lightMapper.getTextureNode( 'variance' ),
+					quality: 'quality'
+				} ) : null;
 				if ( denoiseNode !== null ) denoiseNode.autoUpdate = false;
 				denoised = false;
 				bakedRays = 0;
