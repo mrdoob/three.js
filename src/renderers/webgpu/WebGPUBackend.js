@@ -32,6 +32,13 @@ import GPUTextureDescriptor from './descriptors/GPUTextureDescriptor.js';
 import GPUTextureViewDescriptor from './descriptors/GPUTextureViewDescriptor.js';
 import GPUExtent3D from './descriptors/GPUExtent3D.js';
 
+// the query slots shared by the GPU timers' start and end timestamps
+const TIMER_SLOT_COUNT = 64;
+
+// the end slot every pass overwrites. Each result is resolved when it's requested, so the later passes
+// of other timers don't affect it
+const TIMER_END_SLOT = 0;
+
 const _clearValue = { r: 0, g: 0, b: 0, a: 1 };
 const _blendConstant = { r: 0, g: 0, b: 0, a: 0 };
 const _bufferDescriptor = new GPUBufferDescriptor();
@@ -175,6 +182,14 @@ class WebGPUBackend extends Backend {
 		 * @type {Map<number,GPUBuffer>}
 		 */
 		this.occludedResolveCache = new Map();
+
+		/**
+		 * The GPU timers' shared query set, buffers and query slots, created on first use.
+		 *
+		 * @private
+		 * @type {?Object}
+		 */
+		this._timers = null;
 
 		// compatibility checks
 
@@ -2621,6 +2636,21 @@ class WebGPUBackend extends Backend {
 	 */
 	initTimestampQuery( type, uid, descriptor ) {
 
+		// inside GPU timers, the first pass after a timer begins writes its start slot, and every pass
+		// overwrites the end slot all the timers share
+		const timers = this._timers;
+		if ( timers !== null && timers.freeSlots.length < TIMER_SLOT_COUNT - 1 ) {
+
+			_renderPassTimestampWrites.querySet = timers.querySet;
+			_renderPassTimestampWrites.beginningOfPassWriteIndex = timers.pendingSlot === - 1 ? undefined : timers.pendingSlot;
+			_renderPassTimestampWrites.endOfPassWriteIndex = TIMER_END_SLOT;
+
+			descriptor.timestampWrites = _renderPassTimestampWrites;
+			timers.pendingSlot = - 1;
+			return;
+
+		}
+
 		if ( ! this.trackTimestamp ) {
 
 			descriptor.timestampWrites = undefined;
@@ -2644,6 +2674,160 @@ class WebGPUBackend extends Backend {
 		_renderPassTimestampWrites.endOfPassWriteIndex = baseOffset + 1;
 
 		descriptor.timestampWrites = _renderPassTimestampWrites;
+
+	}
+
+	/**
+	 * Starts a GPU timer measurement. The timers share one query set, created on first use.
+	 *
+	 * @return {?number} The measurement's start slot, or `null` without the `timestamp-query` feature.
+	 */
+	beginTimer() {
+
+		if ( ! this.device || ! this.hasFeature( GPUFeatureName.TimestampQuery ) ) {
+
+			return null;
+
+		}
+
+		if ( this._timers === null ) {
+
+			_querySetDescriptor.label = 'queryset_timer';
+			_querySetDescriptor.type = 'timestamp';
+			_querySetDescriptor.count = TIMER_SLOT_COUNT;
+
+			const querySet = this.device.createQuerySet( _querySetDescriptor );
+
+			_querySetDescriptor.reset();
+
+			// the start and end timestamps are resolved separately, and resolve offsets must be multiples of 256
+			_bufferDescriptor.label = 'buffer_timer_resolve';
+			_bufferDescriptor.size = 256 + 8;
+			_bufferDescriptor.usage = GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC;
+
+			const resolveBuffer = this.device.createBuffer( _bufferDescriptor );
+
+			_bufferDescriptor.reset();
+
+			this._timers = {
+				querySet,
+				resolveBuffer,
+
+				// the start slots and how many measurements use each, freed once none do
+				freeSlots: Array.from( { length: TIMER_SLOT_COUNT - 1 }, ( v, i ) => i + 1 ),
+				slotReferenceCounts: new Array( TIMER_SLOT_COUNT ).fill( 0 ),
+
+				// the start slot the next pass writes, shared by the measurements that begin before it
+				pendingSlot: - 1,
+			};
+
+		}
+
+		const timers = this._timers;
+		if ( timers.pendingSlot === - 1 ) {
+
+			if ( timers.freeSlots.length === 0 ) {
+
+				throw new Error( `WebGPUBackend: GPUTimer can't time more than ${ TIMER_SLOT_COUNT - 1 } overlapping measurements.` );
+
+			}
+
+			timers.pendingSlot = timers.freeSlots.pop();
+
+		}
+
+		timers.slotReferenceCounts[ timers.pendingSlot ] ++;
+
+		return timers.pendingSlot;
+
+	}
+
+	/**
+	 * Ends the given measurement and returns its GPU time in milliseconds.
+	 *
+	 * @param {?number} startSlot - The measurement's start slot returned by {@link WebGPUBackend#beginTimer}.
+	 * @return {Promise<?number>} The GPU time in milliseconds.
+	 */
+	endTimer( startSlot ) {
+
+		// resolved right away, before the start slot can be reused
+		const result = this.getTimerElapsed( startSlot );
+
+		if ( startSlot !== null ) {
+
+			const timers = this._timers;
+			timers.slotReferenceCounts[ startSlot ] --;
+			if ( timers.slotReferenceCounts[ startSlot ] === 0 ) {
+
+				timers.freeSlots.push( startSlot );
+
+				if ( timers.pendingSlot === startSlot ) {
+
+					timers.pendingSlot = - 1;
+
+				}
+
+			}
+
+		}
+
+		return result;
+
+	}
+
+	/**
+	 * Returns the GPU time of the given measurement so far, from the start of its first pass to the end
+	 * of the latest one, in milliseconds. The timestamps are resolved before this returns, so later
+	 * passes don't affect the result.
+	 *
+	 * @async
+	 * @param {?number} startSlot - The measurement's start slot returned by {@link WebGPUBackend#beginTimer}.
+	 * @return {Promise<?number>} The GPU time in milliseconds.
+	 */
+	async getTimerElapsed( startSlot ) {
+
+		if ( startSlot === null ) {
+
+			return null;
+
+		}
+
+		const timers = this._timers;
+		const device = this.device;
+
+		// no pass has written the start slot yet
+		if ( startSlot === timers.pendingSlot ) {
+
+			return 0;
+
+		}
+
+		_bufferDescriptor.label = 'buffer_timer_read';
+		_bufferDescriptor.size = 16;
+		_bufferDescriptor.usage = GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ;
+
+		const readBuffer = device.createBuffer( _bufferDescriptor );
+
+		_bufferDescriptor.reset();
+
+		// resolved before any await. Two buffers are required here - WebGPU doesn't allow usage of
+		// QUERY_RESOLVE & MAP_READ to be combined
+		const encoder = device.createCommandEncoder( _commandEncoderDescriptor );
+		encoder.resolveQuerySet( timers.querySet, startSlot, 1, timers.resolveBuffer, 0 );
+		encoder.resolveQuerySet( timers.querySet, TIMER_END_SLOT, 1, timers.resolveBuffer, 256 );
+		encoder.copyBufferToBuffer( timers.resolveBuffer, 0, readBuffer, 0, 8 );
+		encoder.copyBufferToBuffer( timers.resolveBuffer, 256, readBuffer, 8, 8 );
+		submit( device, encoder.finish() );
+
+		await readBuffer.mapAsync( GPUMapMode.READ );
+
+		// quantized timestamps of a short measurement can end before they begin
+		const times = new BigUint64Array( readBuffer.getMappedRange() );
+		const duration = Math.max( Number( times[ 1 ] - times[ 0 ] ) / 1e6, 0 );
+
+		readBuffer.destroy();
+
+		return duration;
 
 	}
 
@@ -3325,6 +3509,14 @@ class WebGPUBackend extends Backend {
 			}
 
 			this.occludedResolveCache.clear();
+
+		}
+
+		if ( this._timers !== null ) {
+
+			this._timers.querySet.destroy();
+			this._timers.resolveBuffer.destroy();
+			this._timers = null;
 
 		}
 

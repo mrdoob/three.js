@@ -631,6 +631,46 @@ class Backend {
 	}
 
 	/**
+	 * Starts a GPU timer measurement. Backends that support timing return an id for the measurement,
+	 * others return `null`.
+	 *
+	 * @return {?number} The measurement.
+	 */
+	beginTimer() {
+
+		return null;
+
+	}
+
+	/**
+	 * Ends the given measurement and returns its GPU time in milliseconds, or `null` when the
+	 * backend doesn't support timing.
+	 *
+	 * @async
+	 * @param {?number} measurement - The measurement returned by {@link Backend#beginTimer}.
+	 * @return {Promise<?number>} The GPU time in milliseconds.
+	 */
+	async endTimer( /* measurement */ ) {
+
+		return null;
+
+	}
+
+	/**
+	 * Returns the GPU time of the given measurement so far in milliseconds, or `null` when the backend
+	 * doesn't support timing.
+	 *
+	 * @async
+	 * @param {?number} measurement - The measurement returned by {@link Backend#beginTimer}.
+	 * @return {Promise<?number>} The GPU time in milliseconds.
+	 */
+	async getTimerElapsed( /* measurement */ ) {
+
+		return null;
+
+	}
+
+	/**
 	 * Returns `true` if the given 3D object is fully occluded by other
 	 * 3D objects in the scene. Backends must implement this method by using
 	 * a Occlusion Query API.
