@@ -779,9 +779,10 @@ class Object3D extends EventDispatcher {
 
 			object.dispatchEvent( _addedEvent );
 
+			const previousChild = _childaddedEvent.child;
 			_childaddedEvent.child = object;
 			this.dispatchEvent( _childaddedEvent );
-			_childaddedEvent.child = null;
+			_childaddedEvent.child = previousChild;
 
 		} else {
 
@@ -825,9 +826,10 @@ class Object3D extends EventDispatcher {
 
 			object.dispatchEvent( _removedEvent );
 
+			const previousChild = _childremovedEvent.child;
 			_childremovedEvent.child = object;
 			this.dispatchEvent( _childremovedEvent );
-			_childremovedEvent.child = null;
+			_childremovedEvent.child = previousChild;
 
 		}
 
@@ -906,9 +908,10 @@ class Object3D extends EventDispatcher {
 
 		object.dispatchEvent( _addedEvent );
 
+		const previousChild = _childaddedEvent.child;
 		_childaddedEvent.child = object;
 		this.dispatchEvent( _childaddedEvent );
-		_childaddedEvent.child = null;
+		_childaddedEvent.child = previousChild;
 
 		return this;
 

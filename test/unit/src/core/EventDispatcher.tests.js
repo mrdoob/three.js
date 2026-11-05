@@ -87,6 +87,34 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.test( 'dispatchEvent - nested dispatch keeps target for remaining listeners', ( assert ) => {
+
+			const eventDispatcher = new EventDispatcher();
+			const event = { type: 'example' };
+			const targets = [];
+
+			let nested = false;
+			eventDispatcher.addEventListener( 'example', () => {
+
+				// Re-dispatch the same (shared) event object from within a listener.
+				if ( ! nested ) {
+
+					nested = true;
+					eventDispatcher.dispatchEvent( event );
+
+				}
+
+			} );
+			eventDispatcher.addEventListener( 'example', ( e ) => targets.push( e.target ) );
+
+			eventDispatcher.dispatchEvent( event );
+
+			// The nested dispatch must not leave target null for the outer
+			// dispatch's remaining listeners.
+			assert.deepEqual( targets, [ eventDispatcher, eventDispatcher ], 'target is intact for every listener' );
+
+		} );
+
 	} );
 
 } );

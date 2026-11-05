@@ -472,6 +472,41 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.test( 'childadded/childremoved - a nested dispatch keeps event.child for remaining listeners', ( assert ) => {
+
+			// A nested add() inside a childadded listener re-dispatches the shared
+			// event object; the outer dispatch's remaining listeners must still see
+			// their own child rather than null (#35353).
+			const parentAdd = new Object3D();
+			const added = [];
+			parentAdd.addEventListener( 'childadded', ( event ) => {
+
+				if ( event.child.name === 'a' ) parentAdd.add( Object.assign( new Object3D(), { name: 'b' } ) );
+
+			} );
+			parentAdd.addEventListener( 'childadded', ( event ) => added.push( event.child && event.child.name ) );
+
+			parentAdd.add( Object.assign( new Object3D(), { name: 'a' } ) );
+			assert.deepEqual( added, [ 'b', 'a' ], 'every childadded listener sees its own child' );
+
+			const parentRemove = new Object3D();
+			const childA = Object.assign( new Object3D(), { name: 'a' } );
+			const childB = Object.assign( new Object3D(), { name: 'b' } );
+			parentRemove.add( childA, childB );
+
+			const removed = [];
+			parentRemove.addEventListener( 'childremoved', ( event ) => {
+
+				if ( event.child.name === 'a' ) parentRemove.remove( childB );
+
+			} );
+			parentRemove.addEventListener( 'childremoved', ( event ) => removed.push( event.child && event.child.name ) );
+
+			parentRemove.remove( childA );
+			assert.deepEqual( removed, [ 'b', 'a' ], 'every childremoved listener sees its own child' );
+
+		} );
+
 		QUnit.test( 'attach', ( assert ) => {
 
 			const object = new Object3D();

@@ -108,6 +108,12 @@ class EventDispatcher {
 
 		if ( listenerArray !== undefined ) {
 
+			// Restore the previous target afterwards rather than clearing it, so a
+			// nested dispatch of the same (shared) event object from within a
+			// listener does not leave `target` null for the remaining listeners of
+			// the outer dispatch.
+			const previousTarget = event.target;
+
 			event.target = this;
 
 			// Make a copy, in case listeners are removed while iterating.
@@ -119,7 +125,7 @@ class EventDispatcher {
 
 			}
 
-			event.target = null;
+			event.target = previousTarget;
 
 		}
 
