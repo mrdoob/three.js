@@ -159,7 +159,13 @@ class Attributes extends DataMap {
 
 		} else {
 
-			if ( data.version < attribute.version || attribute.usage === DynamicDrawUsage ) {
+			// Dynamic vertex buffers (e.g. dynamic instance matrices or buffers created by
+			// `dynamicBufferAttribute()`) are uploaded with every geometry update. Index
+			// buffers are never created that way, so they follow `version` like in WebGLRenderer.
+
+			const forceUpdate = attribute.usage === DynamicDrawUsage && type !== AttributeType.INDEX;
+
+			if ( data.version < attribute.version || forceUpdate === true ) {
 
 				this.backend.updateAttribute( attribute );
 
