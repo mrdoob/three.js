@@ -1594,8 +1594,6 @@ function createMaterial( name, count, body ) {
 
 }
 
-const toTexture = ( node ) => node.isTextureNode === true ? node : convertToTexture( node );
-
 /**
  * TSL function for creating a denoise node that filters a single noisy frame or texture, see {@link DenoiseNode}.
  *
@@ -1605,7 +1603,7 @@ const toTexture = ( node ) => node.isTextureNode === true ? node : convertToText
  * @param {Object} [options={}] - The guides and options, see {@link DenoiseNode}.
  * @returns {DenoiseNode}
  */
-export const denoise = ( node, options = {} ) => new DenoiseNode( toTexture( nodeObject( node ) ), { ...options, temporal: false } );
+export const denoise = ( node, options = {} ) => new DenoiseNode( convertToTexture( nodeObject( node ) ), { ...options, temporal: false } );
 
 /**
  * TSL function for creating a denoise node that accumulates a noisy screen-space effect in time before filtering it,
@@ -1617,4 +1615,4 @@ export const denoise = ( node, options = {} ) => new DenoiseNode( toTexture( nod
  * @param {Object} [options={}] - The guides and options, see {@link DenoiseNode}.
  * @returns {DenoiseNode}
  */
-export const temporalDenoise = ( node, options = {} ) => new DenoiseNode( toTexture( nodeObject( node ) ), { ...options, temporal: true } );
+export const temporalDenoise = ( node, options = {} ) => new DenoiseNode( convertToTexture( nodeObject( node ) ), { ...options, temporal: true } );
