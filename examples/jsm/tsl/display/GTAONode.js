@@ -1,5 +1,5 @@
 import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, Node, QuadMesh, NodeMaterial, RendererUtils, RedFormat } from 'three/webgpu';
-import { reference, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand, context, isBackgroundDepth, projectionDepth, ivec2 } from 'three/tsl';
+import { reference, getNormalFromDepth, getViewPosition, getScreenPositionFromClip, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, min, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, normalize, cross, mix, acos, clamp, interleavedGradientNoise, screenCoordinate, rand, context, isBackgroundDepth, projectionDepth } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -418,33 +418,18 @@ class GTAONode extends Node {
 
 		};
 
-		// the uv of the depth texel that the center depth comes from at a reduced resolution ( the nearest of the 2x2
-		// texels around the center ): the center normal must come from it too, since a normal sampled between the texels
-		// blends both sides of a silhouette and darkens its rim
-
 		const sampleCenterUV = ( uv ) => {
 
-			const size = vec2( textureSize( this.depthNode, 0 ) ).toConst();
-			const base = uv.mul( size ).sub( 0.5 ).floor().toConst();
-			const first = base.clamp( vec2( 0 ), size.sub( 1 ) ).toConst();
-			const texel = first.toVar();
-			const nearest = this.depthNode.load( ivec2( first ) ).r.toVar();
+			const g = this.depthNode.gather().sample( uv );
+			const depth = builder.renderer.reversedDepthBuffer === true ? max( max( g.x, g.y ), max( g.z, g.w ) ) : min( min( g.x, g.y ), min( g.z, g.w ) );
 
-			for ( const [ x, y ] of [[ 1, 0 ], [ 0, 1 ], [ 1, 1 ]] ) {
+			const size = vec2( textureSize( this.depthNode, 0 ) );
+			const offset = vec2(
+				g.y.equal( depth ).or( g.z.equal( depth ) ).select( 1.5, 0.5 ),
+				g.x.equal( depth ).or( g.y.equal( depth ) ).select( 1.5, 0.5 )
+			);
 
-				const candidate = base.add( vec2( x, y ) ).clamp( vec2( 0 ), size.sub( 1 ) ).toConst();
-				const depth = this.depthNode.load( ivec2( candidate ) ).r;
-
-				If( builder.renderer.reversedDepthBuffer === true ? depth.greaterThan( nearest ) : depth.lessThan( nearest ), () => {
-
-					nearest.assign( depth );
-					texel.assign( candidate );
-
-				} );
-
-			}
-
-			return texel.add( 0.5 ).div( size );
+			return uv.mul( size ).sub( 0.5 ).floor().add( offset ).div( size );
 
 		};
 
@@ -472,14 +457,7 @@ class GTAONode extends Node {
 			const centerTexel = uvNode.mul( depthSize ).floor().toConst();
 
 			const viewPosition = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).toConst();
-			const normalUV = uvNode.toVar();
-			If( this._resolutionScale.lessThan( 1 ), () => {
-
-				normalUV.assign( sampleCenterUV( uvNode ) );
-
-			} );
-
-			const viewNormal = sampleNormal( normalUV ).toConst();
+			const viewNormal = sampleNormal( this._resolutionScale.lessThan( 1 ).select( sampleCenterUV( uvNode ), uvNode ).toConst() ).toConst();
 
 			const radius = this.radius;
 			const invRadius = radius.reciprocal().toConst();
