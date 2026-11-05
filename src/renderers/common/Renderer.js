@@ -1020,9 +1020,11 @@ class Renderer {
 
 		if ( this._isDeviceLost === true ) return;
 
+		const precompilationState = this._getPrecompilationState();
+
 		if ( this._initialized === false ) await this.init();
 
-		// only awaited when the drawing pipeline prepares something, so the state below is still taken synchronously
+		// only awaited when the drawing pipeline prepares something
 
 		const prepare = this.drawingPipeline.prepareAsync( scene, camera );
 
@@ -1036,16 +1038,6 @@ class Renderer {
 
 		}
 
-		// preserve render tree
-
-		const nodeFrame = this._nodes.nodeFrame;
-
-		const previousRenderId = nodeFrame.renderId;
-		const previousRenderContext = this._currentRenderContext;
-		const previousRenderObjectFunction = this._currentRenderObjectFunction;
-		const previousHandleObjectFunction = this._handleObjectFunction;
-		const previousCompilationPromises = this._compilationPromises;
-
 		//
 
 		if ( targetScene === null ) targetScene = scene;
@@ -1054,138 +1046,129 @@ class Renderer {
 		// This ensures cache keys match between compileAsync and render
 		const sceneRef = ( scene.isScene === true ) ? scene : ( targetScene.isScene === true ) ? targetScene : _scene;
 
-		// Match render()'s logic: use frameBufferTarget when needsFrameBufferTarget is true
-		const useFrameBufferTarget = this.needsFrameBufferTarget && this._renderTarget === null;
-		const outputRenderTarget = this._renderTarget || this._outputRenderTarget;
-		const useXRCamera = this.xr.isPresenting === true && this.isOutputTarget;
-		const renderTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : outputRenderTarget;
-
-		const activeCubeFace = this._activeCubeFace;
-		const activeMipmapLevel = this._activeMipmapLevel;
-
-		// a state snapshot is taken once at the beginning and reapplied every time precompilation continues.
-		// `item` is the work item that is currently processed, see `_beginPreCompile()`
-
-		// the work items always set their render target, without the frame buffer target the current one is restored
-
-		const precompilationState = { useFrameBufferTarget, renderTarget, outputRenderTarget: useFrameBufferTarget ? outputRenderTarget : this._renderTarget, activeCubeFace, activeMipmapLevel, item: null, materialSide: null, mrt: this._mrt, outputMRT: this._mrt };
+		const compilationPromises = [];
 
 		this._beginPreCompile( precompilationState );
 
-		const renderContext = this._renderContexts.get( renderTarget, this._mrt, this._callDepth, camera );
+		try {
 
-		precompilationState.renderContext = renderContext;
+			// Match render()'s logic: use frameBufferTarget when needsFrameBufferTarget is true
+			const useFrameBufferTarget = this.needsFrameBufferTarget && this._renderTarget === null;
+			const outputRenderTarget = this._renderTarget || this._outputRenderTarget;
+			const useXRCamera = this.xr.isPresenting === true && this.isOutputTarget;
+			const renderTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : outputRenderTarget;
 
-		const compilationPromises = [];
+			const { activeMipmapLevel } = precompilationState;
 
-		this._currentRenderContext = renderContext;
-		this._currentRenderObjectFunction = this.renderObject;
+			if ( useFrameBufferTarget === true ) this.setRenderTarget( renderTarget );
 
-		this._handleObjectFunction = this._createObjectPipeline;
+			const renderContext = this._renderContexts.get( renderTarget, this._mrt, this._callDepth, camera );
 
-		this._compilationPromises = compilationPromises;
+			const nodeFrame = this._nodes.nodeFrame;
 
-		nodeFrame.renderId ++;
+			this._currentRenderContext = renderContext;
+			this._currentRenderObjectFunction = this.renderObject;
 
-		//
+			this._handleObjectFunction = this._createObjectPipeline;
 
-		nodeFrame.update();
+			this._compilationPromises = compilationPromises;
 
-		//
+			nodeFrame.renderId ++;
 
-		renderContext.depth = this.depth;
-		renderContext.stencil = this.stencil;
+			//
 
-		if ( ! renderContext.clippingContext ) renderContext.clippingContext = new ClippingContext();
-		renderContext.clippingContext.updateGlobal( sceneRef, camera );
+			nodeFrame.update();
 
-		//
+			//
 
-		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
+			renderContext.depth = this.depth;
+			renderContext.stencil = this.stencil;
 
-		camera = this._updateCamera( camera, useXRCamera );
+			if ( ! renderContext.clippingContext ) renderContext.clippingContext = new ClippingContext();
+			renderContext.clippingContext.updateGlobal( sceneRef, camera );
 
-		//
+			//
 
-		sceneRef.onBeforeRender( this, scene, camera, renderTarget );
+			if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
-		//
+			camera = this._updateCamera( camera, useXRCamera );
 
-		this.drawingPipeline.begin( camera, renderContext );
+			//
 
-		// Use sceneRef for render list to ensure lightsNode matches between compileAsync and render
-		const renderList = this._renderLists.get( sceneRef, camera, this.lighting );
-		this.drawingPipeline.beginRenderList( renderList );
+			sceneRef.onBeforeRender( this, scene, camera, renderTarget );
 
-		this.drawingPipeline.project( scene, camera, 0, renderList, renderContext.clippingContext );
+			//
 
-		// include lights from target scene
-		if ( targetScene !== scene ) {
+			this.drawingPipeline.begin( camera, renderContext );
 
-			targetScene.traverseVisible( function ( object ) {
+			// Use sceneRef for render list to ensure lightsNode matches between compileAsync and render
+			const renderList = this._renderLists.get( sceneRef, camera, this.lighting );
+			this.drawingPipeline.beginRenderList( renderList );
 
-				if ( object.isLight && object.layers.test( camera.layers ) ) {
+			this.drawingPipeline.project( scene, camera, 0, renderList, renderContext.clippingContext );
 
-					renderList.pushLight( object );
+			// include lights from target scene
+			if ( targetScene !== scene ) {
 
-				}
+				targetScene.traverseVisible( function ( object ) {
 
-			} );
+					if ( object.isLight && object.layers.test( camera.layers ) ) {
+
+						renderList.pushLight( object );
+
+					}
+
+				} );
+
+			}
+
+			this.drawingPipeline.finishRenderList( renderList );
+
+			//
+
+			if ( renderTarget !== null ) {
+
+				this._textures.updateRenderTarget( renderTarget, activeMipmapLevel );
+
+				const renderTargetData = this._textures.get( renderTarget );
+
+				renderContext.textures = renderTargetData.textures;
+				renderContext.depthTexture = renderTargetData.depthTexture;
+
+			} else {
+
+				renderContext.textures = null;
+				renderContext.depthTexture = null;
+
+			}
+
+			//
+
+			if ( targetScene !== scene ) {
+
+				this._background.update( targetScene, renderList, renderContext );
+
+			} else {
+
+				this._background.update( sceneRef, renderList, renderContext );
+
+			}
+
+			// process render lists - _createObjectPipeline queues work in _compilationPromises
+
+			const opaqueObjects = renderList.opaque;
+			const transparentObjects = renderList.transparent;
+			const transparentDoublePassObjects = renderList.transparentDoublePass;
+			const lightsNode = renderList.lightsNode;
+
+			if ( this.opaque === true && opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
+			if ( this.transparent === true && transparentObjects.length > 0 ) this._renderTransparents( transparentObjects, transparentDoublePassObjects, camera, sceneRef, lightsNode );
+
+		} finally {
+
+			this._finishPreCompile();
 
 		}
-
-		this.drawingPipeline.finishRenderList( renderList );
-
-		//
-
-		if ( renderTarget !== null ) {
-
-			this._textures.updateRenderTarget( renderTarget, activeMipmapLevel );
-
-			const renderTargetData = this._textures.get( renderTarget );
-
-			renderContext.textures = renderTargetData.textures;
-			renderContext.depthTexture = renderTargetData.depthTexture;
-
-		} else {
-
-			renderContext.textures = null;
-			renderContext.depthTexture = null;
-
-		}
-
-		//
-
-		if ( targetScene !== scene ) {
-
-			this._background.update( targetScene, renderList, renderContext );
-
-		} else {
-
-			this._background.update( sceneRef, renderList, renderContext );
-
-		}
-
-		// process render lists - _createObjectPipeline queues work in _compilationPromises
-
-		const opaqueObjects = renderList.opaque;
-		const transparentObjects = renderList.transparent;
-		const transparentDoublePassObjects = renderList.transparentDoublePass;
-		const lightsNode = renderList.lightsNode;
-
-		if ( this.opaque === true && opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
-		if ( this.transparent === true && transparentObjects.length > 0 ) this._renderTransparents( transparentObjects, transparentDoublePassObjects, camera, sceneRef, lightsNode );
-
-		// restore render tree
-
-		nodeFrame.renderId = previousRenderId;
-
-		this._currentRenderContext = previousRenderContext;
-		this._currentRenderObjectFunction = previousRenderObjectFunction;
-		this._handleObjectFunction = previousHandleObjectFunction;
-		this._compilationPromises = previousCompilationPromises;
-
-		this._finishPreCompile();
 
 		// Process compilation work items sequentially and yield to the main thread after a
 		// time budget to keep animation smooth. Pipelines are compiled in parallel while
@@ -1206,20 +1189,6 @@ class Renderer {
 				onProgress( new ProgressEvent( 'progress', { lengthComputable: true, loaded, total } ) );
 
 			}
-
-		};
-
-		const yieldPreCompile = async () => {
-
-			if ( scheduler.needsYield() === false ) return;
-
-			const activePrecompilationState = this._precompilationState;
-
-			this._finishPreCompile();
-
-			await scheduler.yield();
-
-			this._beginPreCompile( activePrecompilationState );
 
 		};
 
@@ -1246,19 +1215,24 @@ class Renderer {
 
 			this._beginPreCompile( itemPrecompilationState );
 
-			const renderObject = this._objects.get( item.object, item.material, item.scene, item.camera, item.lightsNode, item.renderContext, item.clippingContext, item.passId );
-			renderObject.drawRange = item.object.geometry.drawRange;
-			renderObject.group = item.group;
+			try {
 
-			await this._nodes.getForRenderAsync( renderObject, yieldPreCompile );
-			this._nodes.updateBefore( renderObject );
-			this._geometries.updateForRender( renderObject );
-			this._nodes.updateForRender( renderObject );
-			this._bindings.updateForRender( renderObject );
-			this._pipelines.getForRender( renderObject, pipelinePromises );
-			this._nodes.updateAfter( renderObject );
+				const renderObject = this._objects.get( item.object, item.material, item.scene, item.camera, item.lightsNode, item.renderContext, item.clippingContext, item.passId );
+				renderObject.drawRange = item.object.geometry.drawRange;
+				renderObject.group = item.group;
 
-			this._finishPreCompile();
+				this._nodes.updateBefore( renderObject );
+				this._geometries.updateForRender( renderObject );
+				this._nodes.updateForRender( renderObject );
+				this._bindings.updateForRender( renderObject );
+				this._pipelines.getForRender( renderObject, pipelinePromises );
+				this._nodes.updateAfter( renderObject );
+
+			} finally {
+
+				this._finishPreCompile();
+
+			}
 
 			if ( pipelinePromises.length > 0 ) {
 
@@ -1288,6 +1262,26 @@ class Renderer {
 	}
 
 	/**
+	 * Returns the renderer state a precompilation depends on.
+	 *
+	 * @private
+	 * @return {Object} The precompilation state.
+	 */
+	_getPrecompilationState() {
+
+		return {
+			renderTarget: this._renderTarget,
+			activeCubeFace: this._activeCubeFace,
+			activeMipmapLevel: this._activeMipmapLevel,
+			mrt: this._mrt,
+			contextNode: this.contextNode,
+			renderContext: this._currentRenderContext,
+			item: null
+		};
+
+	}
+
+	/**
 	 * Sets up the renderer state for precompiling in `compileAsync()`.
 	 * The state must be restored with `_finishPreCompile()` before yielding to the main thread,
 	 * otherwise it leaks into renders executed in the meantime.
@@ -1297,10 +1291,23 @@ class Renderer {
 	 */
 	_beginPreCompile( precompilationState ) {
 
-		const { useFrameBufferTarget, renderTarget, mrt, renderContext, item } = precompilationState;
+		const { renderTarget, activeCubeFace, activeMipmapLevel, mrt, contextNode, renderContext, item } = precompilationState;
 
-		if ( useFrameBufferTarget === true ) this.setRenderTarget( renderTarget );
+		precompilationState.previousRenderTarget = this._renderTarget;
+		precompilationState.previousActiveCubeFace = this._activeCubeFace;
+		precompilationState.previousActiveMipmapLevel = this._activeMipmapLevel;
+		precompilationState.previousMRT = this._mrt;
+		precompilationState.previousContextNode = this.contextNode;
+		precompilationState.previousRenderContext = this._currentRenderContext;
+		precompilationState.previousRenderObjectFunction = this._currentRenderObjectFunction;
+		precompilationState.previousHandleObjectFunction = this._handleObjectFunction;
+		precompilationState.previousCompilationPromises = this._compilationPromises;
+		precompilationState.previousRenderId = this._nodes.nodeFrame.renderId;
+		precompilationState.previousPrecompilationState = this._precompilationState;
+
+		this.setRenderTarget( renderTarget, activeCubeFace, activeMipmapLevel );
 		this.setMRT( mrt );
+		this.contextNode = contextNode;
 
 		if ( item !== null ) {
 
@@ -1316,9 +1323,7 @@ class Renderer {
 
 		// node builds take their shared bind groups from the current render context
 
-		precompilationState.previousRenderContext = this._currentRenderContext;
-
-		if ( renderContext !== undefined ) this._currentRenderContext = renderContext;
+		this._currentRenderContext = renderContext;
 
 		this._precompilationState = precompilationState;
 
@@ -1331,18 +1336,23 @@ class Renderer {
 	 */
 	_finishPreCompile() {
 
-		const { useFrameBufferTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel, outputMRT, previousRenderContext, item, materialSide } = this._precompilationState;
+		const precompilationState = this._precompilationState;
 
-		if ( useFrameBufferTarget === true ) this.setRenderTarget( outputRenderTarget, activeCubeFace, activeMipmapLevel );
-		this.setMRT( outputMRT );
+		this.setRenderTarget( precompilationState.previousRenderTarget, precompilationState.previousActiveCubeFace, precompilationState.previousActiveMipmapLevel );
+		this.setMRT( precompilationState.previousMRT );
+		this.contextNode = precompilationState.previousContextNode;
 
-		if ( item !== null ) item.material.side = materialSide;
+		if ( precompilationState.item !== null ) precompilationState.item.material.side = precompilationState.materialSide;
 
-		this._currentRenderContext = previousRenderContext;
+		this._currentRenderContext = precompilationState.previousRenderContext;
+		this._currentRenderObjectFunction = precompilationState.previousRenderObjectFunction;
+		this._handleObjectFunction = precompilationState.previousHandleObjectFunction;
+		this._compilationPromises = precompilationState.previousCompilationPromises;
+		this._nodes.nodeFrame.renderId = precompilationState.previousRenderId;
 
 		this._callDepth --;
 
-		this._precompilationState = null;
+		this._precompilationState = precompilationState.previousPrecompilationState;
 
 	}
 
@@ -1388,14 +1398,6 @@ class Renderer {
 
 		};
 
-		const yieldCompile = async () => {
-
-			if ( scheduler.needsYield() ) await scheduler.yield();
-
-		};
-
-		//
-
 		const pipelines = this._pipelines;
 		const bindings = this._bindings;
 		const nodes = this._nodes;
@@ -1425,8 +1427,6 @@ class Renderer {
 				}
 
 			}
-
-			await nodes.getForComputeAsync( computeNode, yieldCompile );
 
 			nodes.updateBeforeForCompute( computeNode );
 			nodes.updateForCompute( computeNode );
@@ -1460,7 +1460,7 @@ class Renderer {
 
 			}
 
-			await yieldCompile();
+			if ( scheduler.needsYield() ) await scheduler.yield();
 
 		}
 
@@ -4110,8 +4110,7 @@ class Renderer {
 	}
 
 	/**
-	 * A different implementation for `_handleObjectFunction` which only makes sure the object is ready for rendering.
-	 * Used in `compileAsync()`.
+	 * A different implementation for `_handleObjectFunction` which queues the object for `compileAsync()`.
 	 *
 	 * @private
 	 * @param {Object3D} object - The 3D object.
@@ -4125,52 +4124,21 @@ class Renderer {
 	 */
 	_createObjectPipeline( object, material, scene, camera, lightsNode, group, clippingContext, passId ) {
 
-		// If in async compilation mode, queue the work for sequential execution
-		if ( this._compilationPromises !== null ) {
-
-			// Store work items instead of promises - will be processed sequentially.
-			// The side is stored since the renderer might have changed it temporarily.
-			this._compilationPromises.push( {
-				object,
-				material,
-				side: material.side,
-				scene,
-				camera,
-				lightsNode,
-				group,
-				clippingContext,
-				passId,
-				renderContext: this._currentRenderContext,
-				precompilationState: {
-					...this._precompilationState,
-					useFrameBufferTarget: true,
-					renderTarget: this.getRenderTarget(),
-					mrt: this.getMRT(),
-					renderContext: this._currentRenderContext
-				}
-			} );
-
-			return;
-
-		}
-
-		// Sync path
-		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, clippingContext, passId );
-		renderObject.drawRange = object.geometry.drawRange;
-		renderObject.group = group;
-
-		//
-
-		this._nodes.updateBefore( renderObject );
-
-		this._geometries.updateForRender( renderObject );
-
-		this._nodes.updateForRender( renderObject );
-		this._bindings.updateForRender( renderObject );
-
-		this._pipelines.getForRender( renderObject, this._compilationPromises );
-
-		this._nodes.updateAfter( renderObject );
+		// Store work items instead of promises - will be processed sequentially.
+		// The side is stored since the renderer might have changed it temporarily.
+		this._compilationPromises.push( {
+			object,
+			material,
+			side: material.side,
+			scene,
+			camera,
+			lightsNode,
+			group,
+			clippingContext,
+			passId,
+			renderContext: this._currentRenderContext,
+			precompilationState: this._getPrecompilationState()
+		} );
 
 	}
 
