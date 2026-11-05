@@ -11,10 +11,4 @@ export const mx_srgb_texture_to_lin_rec709 = /*@__PURE__*/ Fn( ( [ color_immutab
 
 	return mix( linSeg, powSeg, isAbove );
 
-} ).setLayout( {
-	name: 'mx_srgb_texture_to_lin_rec709',
-	type: 'vec3',
-	inputs: [
-		{ name: 'color', type: 'vec3' }
-	]
-} );
+}, { color: 'vec3', return: 'vec3' } );

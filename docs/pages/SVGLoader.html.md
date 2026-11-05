@@ -33,7 +33,7 @@ scene.add( group );
 
 ## Import
 
-SVGLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+SVGLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';

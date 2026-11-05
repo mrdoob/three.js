@@ -100,17 +100,13 @@ TSL code which is executed if the condition evaluates to `true`.
 
 **Returns:** A reference to this stack node.
 
-### .Switch( expression : any, method : function ) : StackNode
+### .Switch( expression : any ) : StackNode
 
 Represents a `switch` statement in TSL.
 
 **expression**
 
 Represents the expression.
-
-**method**
-
-TSL code which is executed if the condition evaluates to `true`.
 
 **Returns:** A reference to this stack node.
 
@@ -130,13 +126,19 @@ Default is `-1`.
 
 **Returns:** A reference to this stack node.
 
-### .addToStackBefore( node : Node ) : StackNode
+### .addToStackBefore( node : Node, beforeNode : Node ) : StackNode
 
-Adds a node to the stack before the current node.
+Adds a node to the stack before the given node, by default the current node.
 
 **node**
 
 The node to add.
+
+**beforeNode**
+
+The node of the stack that the node is added before.
+
+Default is `this._currentNode`.
 
 **Returns:** A reference to this stack node.
 

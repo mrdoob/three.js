@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - meshlets meshes</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - meshlets meshes">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_meshlets_meshes.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_meshlets_meshes.jpg">
+		<link rel="icon" href="data:,">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Meshlets Meshes</span>
+			</div>
+			<small>
+				Individual meshes of Lucy statues of 100k triangles each, culled and simplified per cluster on the GPU.<br />
+				<span id="status" role="status">Loading...</span><br />
+				<span id="stats"></span>
+			</small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { MeshletDrawingPipeline } from 'three/addons/pipelines/MeshletDrawingPipeline.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+
+			if ( WebGPU.isAvailable() === false ) {
+
+				document.body.appendChild( WebGPU.getErrorMessage() );
+				throw new Error( 'No WebGPU support' );
+
+			}
+
+			const SPACING = 3;
+
+			const parameters = {
+				pipeline: 'Meshlet',
+				statues: 10000,
+				occlusion: true,
+				meshlets: false,
+				lod: 3,
+				rotate: true,
+				mode: 'Static'
+			};
+
+			const status = document.getElementById( 'status' );
+			const stats = document.getElementById( 'stats' );
+			const timer = new THREE.Timer();
+
+			let renderer, scene, camera, controls, pipelines, sunLight;
+			let geometry, materials, statues = null;
+
+			init().catch( error => {
+
+				status.textContent = error.message;
+				console.error( error );
+
+			} );
+
+			async function init() {
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.shadowMap.enabled = true;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+				await renderer.init();
+
+				pipelines = {
+					'Meshlet': new MeshletDrawingPipeline( { occlusionCulling: parameters.occlusion, lodThreshold: parameters.lod, shadowLodThreshold: parameters.lod } ),
+					'Default (slow)': renderer.drawingPipeline
+				};
+				renderer.drawingPipeline = pipelines[ parameters.pipeline ];
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x2e2a33 );
+				scene.fog = new THREE.FogExp2( 0x2e2a33, 0.009 );
+				scene.environment = new THREE.PMREMGenerator( renderer ).fromScene( new RoomEnvironment(), 0.04 ).texture;
+				scene.environmentIntensity = 0.4;
+
+				scene.add( new THREE.HemisphereLight( 0x9fb4d9, 0x4a3b30, 0.8 ) );
+
+				// the statues are static, the shadow map is rendered once for each layout
+
+				sunLight = new THREE.DirectionalLight( 0xffc58f, 3 );
+				sunLight.position.set( - 80, 50, 30 );
+				sunLight.castShadow = true;
+				sunLight.shadow.mapSize.setScalar( 4096 );
+				sunLight.shadow.normalBias = 0.05;
+				sunLight.shadow.autoUpdate = false;
+				scene.add( sunLight );
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 400 );
+				camera.position.set( 14, 6.5, 20 );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 2.5, 0 );
+				controls.enableDamping = true;
+				controls.autoRotate = parameters.rotate;
+				controls.autoRotateSpeed = 0.4;
+				controls.minDistance = 2;
+				controls.maxDistance = 150;
+				controls.maxPolarAngle = Math.PI * 0.49;
+				controls.update();
+
+				const ground = new THREE.Mesh( new THREE.CircleGeometry( 400, 64 ), new THREE.MeshStandardNodeMaterial( { color: 0x6b5d50, roughness: 0.9 } ) );
+				ground.rotation.x = - Math.PI / 2;
+				ground.receiveShadow = true;
+				scene.add( ground );
+
+				geometry = await new PLYLoader().loadAsync( 'models/ply/binary/Lucy100k.ply' );
+				geometry.computeVertexNormals();
+
+				// stand the statue on the ground with a height of 4 units
+
+				geometry.computeBoundingBox();
+				const box = geometry.boundingBox;
+				const size = box.getSize( new THREE.Vector3() );
+				geometry.translate( - ( box.min.x + box.max.x ) / 2, - box.min.y, - ( box.min.z + box.max.z ) / 2 );
+				geometry.scale( 4 / size.y, 4 / size.y, 4 / size.y );
+
+				// marble, sandstone and bronze. the meshes of each material are drawn together
+
+				materials = [ 0xc2b9ad, 0xb0a597, 0xd3cbc0, 0xb59a74, 0xa6855c, 0x7a4f24 ].map( color => new THREE.MeshStandardNodeMaterial( { color, roughness: 0.45, metalness: 0.1 } ) );
+
+				createStatues();
+				createGUI();
+				window.addEventListener( 'resize', onWindowResize );
+				await prepare();
+
+			}
+
+			function createStatues() {
+
+				// the meshes share the geometry and the materials, the previous statues are just removed
+
+				if ( statues !== null ) {
+
+					scene.remove( statues );
+					statues = null;
+
+				}
+
+				const group = createGroup();
+
+				// a square grid around the center, each statue with its own rotation, scale and material
+
+				const count = parameters.statues;
+				const side = Math.ceil( Math.sqrt( count ) );
+
+				for ( let i = 0; i < count; i ++ ) {
+
+					const x = ( i % side - ( side - 1 ) / 2 ) * SPACING;
+					const z = ( Math.floor( i / side ) - ( side - 1 ) / 2 ) * SPACING;
+
+					const tone = Math.random();
+					const material = tone < 0.6 ? materials[ Math.floor( Math.random() * 3 ) ] : tone < 0.9 ? materials[ 3 + Math.floor( Math.random() * 2 ) ] : materials[ 5 ];
+
+					const statue = new THREE.Mesh( geometry, material );
+					statue.position.set( x + ( Math.random() - 0.5 ) * SPACING * 0.4, 0, z + ( Math.random() - 0.5 ) * SPACING * 0.4 );
+					statue.rotation.y = Math.random() * Math.PI * 2;
+					statue.scale.setScalar( 0.8 + Math.random() * 0.4 );
+					statue.userData.distance = Math.hypot( x, z );
+					statue.userData.spin = ( Math.random() - 0.5 ) * 2;
+					statue.castShadow = true;
+					statue.receiveShadow = true;
+					group.add( statue );
+
+				}
+
+				setGroup( group );
+
+				// fit the shadow camera to the grid
+
+				const extent = side * SPACING / 2 + SPACING;
+				const shadowCamera = sunLight.shadow.camera;
+				shadowCamera.left = shadowCamera.bottom = - extent;
+				shadowCamera.right = shadowCamera.top = extent;
+				shadowCamera.near = 1;
+				shadowCamera.far = sunLight.position.length() + extent * 1.5;
+				shadowCamera.updateProjectionMatrix();
+				sunLight.shadow.needsUpdate = true;
+
+			}
+
+			function createGroup() {
+
+				// a regular group is traversed every frame. a static bundle group is captured once: the pipeline uploads
+				// the transforms of its meshes once and doesn't traverse it again until needsUpdate is set. a bundle
+				// group which isn't static is drawn like a regular group
+
+				if ( parameters.mode === 'Default' || parameters.mode === 'Animate' ) return new THREE.Group();
+
+				const group = new THREE.BundleGroup();
+				group.static = parameters.mode === 'Static';
+
+				return group;
+
+			}
+
+			function setGroup( group ) {
+
+				if ( statues !== null ) {
+
+					scene.remove( statues );
+					group.add( ...statues.children );
+
+				}
+
+				statues = group;
+				scene.add( statues );
+
+			}
+
+			async function prepare() {
+
+				renderer.setAnimationLoop( null );
+				status.textContent = 'Preparing statues...';
+
+				try {
+
+					renderer.drawingPipeline = pipelines[ parameters.pipeline ];
+					sunLight.shadow.needsUpdate = true;
+					await renderer.compileAsync( scene, camera );
+					status.textContent = '';
+
+				} catch ( error ) {
+
+					status.textContent = error.message;
+					console.error( error );
+
+				} finally {
+
+					renderer.setAnimationLoop( animate );
+
+				}
+
+			}
+
+			function createGUI() {
+
+				const pipeline = pipelines[ 'Meshlet' ];
+
+				const gui = renderer.inspector.createParameters( 'Settings' );
+				gui.add( parameters, 'pipeline', Object.keys( pipelines ) ).name( 'Pipeline' ).onChange( prepare );
+				gui.add( parameters, 'statues', { '1,000': 1000, '4,000': 4000, '10,000': 10000 } ).name( 'Statues' ).onChange( () => {
+
+					createStatues();
+					prepare();
+
+				} );
+				gui.add( parameters, 'lod', 1, 8, 0.5 ).name( 'LOD error (px)' ).onChange( value => {
+
+					pipeline.lodThreshold = value;
+					pipeline.shadowLodThreshold = value;
+					sunLight.shadow.needsUpdate = true;
+
+				} );
+				gui.add( parameters, 'occlusion' ).name( 'Occlusion culling' ).onChange( value => {
+
+					pipeline.occlusionCulling = value;
+					prepare();
+
+				} );
+				gui.add( parameters, 'meshlets' ).name( 'Show meshlets' ).onChange( value => {
+
+					pipeline.debug = value;
+					renderer.toneMapping = value ? THREE.NoToneMapping : THREE.ACESFilmicToneMapping;
+					prepare();
+
+				} );
+				gui.add( parameters, 'rotate' ).name( 'Auto rotate' ).onChange( value => controls.autoRotate = value );
+				gui.add( parameters, 'mode', [ 'Default', 'Animate', 'Static', 'Bundle Group' ] ).name( 'Mode' ).onChange( value => {
+
+					// the shadow map follows the animated statues, the others stand on the ground again
+
+					sunLight.shadow.autoUpdate = value === 'Animate';
+
+					if ( value !== 'Animate' ) for ( const statue of statues.children ) statue.position.y = 0;
+
+					setGroup( createGroup() );
+					prepare();
+
+				} );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function formatCount( value ) {
+
+				if ( value >= 1e9 ) return ( value / 1e9 ).toFixed( 1 ) + 'B';
+				if ( value >= 1e6 ) return ( value / 1e6 ).toFixed( 1 ) + 'M';
+				if ( value >= 1e3 ) return ( value / 1e3 ).toFixed( 0 ) + 'k';
+				return value.toString();
+
+			}
+
+			function animate( time ) {
+
+				timer.update( time );
+				const delta = timer.getDelta();
+
+				controls.update( delta );
+
+				if ( parameters.mode === 'Animate' ) {
+
+					// the statues spin and hop in a wave from the center, the transforms of all meshes are uploaded every frame
+
+					const elapsed = timer.getElapsed();
+
+					for ( const statue of statues.children ) {
+
+						statue.rotation.y += statue.userData.spin * delta;
+						statue.position.y = Math.max( 0, Math.sin( elapsed * 3 - statue.userData.distance * 0.15 ) ) * 1.5;
+
+					}
+
+				}
+
+				renderer.render( scene, camera );
+
+				let text = `${ formatCount( parameters.statues * geometry.index.count / 3 ) } triangles in the scene`;
+
+				if ( renderer.drawingPipeline === pipelines[ 'Meshlet' ] ) {
+
+					const info = pipelines[ 'Meshlet' ].info;
+					text += ` | ${ formatCount( info.triangles ) } drawn in ${ formatCount( info.clusters ) } clusters`;
+
+				}
+
+				stats.textContent = text;
+
+			}
+
+		</script>
+	</body>
+</html>

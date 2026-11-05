@@ -1,4 +1,4 @@
-*Inheritance: EventDispatcher → Node → TempNode →*
+*Inheritance: EventDispatcher → Node →*
 
 # DenoiseNode
 
@@ -8,7 +8,7 @@ Reference: [https://openaccess.thecvf.com/content/WACV2021/papers/Khademi\_Self-
 
 ## Import
 
-DenoiseNode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+DenoiseNode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { denoise } from 'three/addons/tsl/display/DenoiseNode.js';
@@ -80,9 +80,15 @@ The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node updates i
 
 Default is `'frame'`.
 
-**Overrides:** [TempNode#updateBeforeType](TempNode.html#updateBeforeType)
+**Overrides:** [Node#updateBeforeType](Node.html#updateBeforeType)
 
 ## Methods
+
+### .dispose()
+
+Frees internal resources. This method should be called when the effect is no longer required.
+
+**Overrides:** [Node#dispose](Node.html#dispose)
 
 ### .setup( builder : NodeBuilder ) : ShaderCallNodeInternal
 
@@ -92,7 +98,7 @@ This method is used to setup the effect's TSL code.
 
 The current node builder.
 
-**Overrides:** [TempNode#setup](TempNode.html#setup)
+**Overrides:** [Node#setup](Node.html#setup)
 
 ### .updateBefore( frame : NodeFrame )
 
@@ -102,7 +108,7 @@ This method is used to update internal uniforms once per frame.
 
 The current node frame.
 
-**Overrides:** [TempNode#updateBefore](TempNode.html#updateBefore)
+**Overrides:** [Node#updateBefore](Node.html#updateBefore)
 
 ## Source
 

@@ -94,7 +94,9 @@ Default is `this.shaderStage`.
 
 ### .enableDualSourceBlending()
 
-Enables the 'dual\_source\_blending' directive.
+Enables dual source blending.
+
+**Overrides:** [NodeBuilder#enableDualSourceBlending](NodeBuilder.html#enableDualSourceBlending)
 
 ### .enableHardwareClipping( planeCount : string )
 
@@ -106,15 +108,15 @@ The clipping plane count.
 
 ### .enableShaderF16()
 
-Enables the 'f16' directive.
+Enables 16 bit floats.
+
+**Overrides:** [NodeBuilder#enableShaderF16](NodeBuilder.html#enableShaderF16)
 
 ### .enableSubGroups()
 
-Enables the 'subgroups' directive.
+Enables subgroups.
 
-### .enableSubgroupsF16()
-
-Enables the 'subgroups-f16' directive.
+**Overrides:** [NodeBuilder#enableSubGroups](NodeBuilder.html#enableSubGroups)
 
 ### .generateArrayDeclaration( type : string, count : number ) : string
 
@@ -131,6 +133,28 @@ The count.
 **Overrides:** [NodeBuilder#generateArrayDeclaration](NodeBuilder.html#generateArrayDeclaration)
 
 **Returns:** The generated value as a shader string.
+
+### .generateConstStatement( type : string, name : string, count : number ) : string
+
+Returns a single const variable statement as a WGSL string for the given variable type and name.
+
+**type**
+
+The variable's type.
+
+**name**
+
+The variable's name.
+
+**count**
+
+The array length.
+
+Default is `null`.
+
+**Overrides:** [NodeBuilder#generateConstStatement](NodeBuilder.html#generateConstStatement)
+
+**Returns:** The WGSL snippet that defines a const variable.
 
 ### .generateFilteredTexture( texture : Texture, textureProperty : string, uvSnippet : string, offsetSnippet : string, levelSnippet : string, depthSnippet : string ) : string
 
@@ -163,6 +187,28 @@ Default is `'0u'`.
 A WGSL snippet that represents 0-based texture array index to sample.
 
 **Returns:** The WGSL snippet.
+
+### .generateLetStatement( type : string, name : string, count : number ) : string
+
+Returns a runtime read-only variable statement as a WGSL string.
+
+**type**
+
+The variable's type.
+
+**name**
+
+The variable's name.
+
+**count**
+
+The array length.
+
+Default is `null`.
+
+**Overrides:** [NodeBuilder#generateLetStatement](NodeBuilder.html#generateLetStatement)
+
+**Returns:** The WGSL snippet that defines a let variable.
 
 ### .generateStorageTextureLoad( texture : Texture, textureProperty : string, uvIndexSnippet : string, levelSnippet : string, depthSnippet : string, offsetSnippet : string ) : string
 
@@ -318,7 +364,7 @@ A WGSL snippet that represents the mip level, with level 0 containing a full siz
 
 **Returns:** The name of the dimension variable.
 
-### .generateTextureGather( texture : Texture, textureProperty : string, uvSnippet : string, gatherSnippet : string, depthSnippet : string, offsetSnippet : string, flipYSnippet : string ) : string
+### .generateTextureGather( texture : Texture, textureProperty : string, uvSnippet : string, gatherSnippet : string, depthSnippet : string, offsetSnippet : string ) : string
 
 Generates the WGSL snippet for gathering four texels from the given texture.
 
@@ -346,13 +392,9 @@ A WGSL snippet that represents 0-based texture array index to sample.
 
 A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
 
-**flipYSnippet**
-
-A WGSL snippet that represents the y-flip. Only used for WebGL.
-
 **Returns:** The WGSL snippet.
 
-### .generateTextureGatherCompare( texture : Texture, textureProperty : string, uvSnippet : string, compareSnippet : string, depthSnippet : string, offsetSnippet : string, flipYSnippet : string ) : string
+### .generateTextureGatherCompare( texture : Texture, textureProperty : string, uvSnippet : string, compareSnippet : string, depthSnippet : string, offsetSnippet : string ) : string
 
 Generates the WGSL snippet for performing a depth comparison on four texels in the given depth texture.
 
@@ -379,10 +421,6 @@ A WGSL snippet that represents 0-based texture array index to sample.
 **offsetSnippet**
 
 A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
-
-**flipYSnippet**
-
-A WGSL snippet that represents the y-flip. Only used for WebGL.
 
 **Returns:** The WGSL snippet.
 
@@ -422,7 +460,7 @@ Default is `this.shaderStage`.
 
 **Returns:** The WGSL snippet.
 
-### .generateTextureLevel( texture : Texture, textureProperty : string, uvSnippet : string, levelSnippet : string, depthSnippet : string, offsetSnippet : string, shaderStage : string ) : string
+### .generateTextureLevel( texture : Texture, textureProperty : string, uvSnippet : string, levelSnippet : string, depthSnippet : string, offsetSnippet : string ) : string
 
 Generates the WGSL snippet when sampling textures with explicit mip level.
 
@@ -449,12 +487,6 @@ A WGSL snippet that represents 0-based texture array index to sample.
 **offsetSnippet**
 
 A WGSL snippet that represents the offset that will be applied to the unnormalized texture coordinate before sampling the texture.
-
-**shaderStage**
-
-The shader stage this code snippet is generated for.
-
-Default is `this.shaderStage`.
 
 **Returns:** The WGSL snippet.
 
@@ -522,6 +554,26 @@ Default is `'0u'`.
 
 **Returns:** The WGSL snippet.
 
+### .generateTextureSize( texture : Texture, textureProperty : string, levelSnippet : string ) : string
+
+Generates the WGSL snippet that resolves the dimensions of the given texture.
+
+**texture**
+
+The texture.
+
+**textureProperty**
+
+The name of the texture uniform in the shader.
+
+**levelSnippet**
+
+A WGSL snippet that represents the mip level.
+
+**Overrides:** [NodeBuilder#generateTextureSize](NodeBuilder.html#generateTextureSize)
+
+**Returns:** The WGSL snippet.
+
 ### .generateTextureStore( texture : Texture, textureProperty : string, uvIndexSnippet : string, depthSnippet : string, valueSnippet : string ) : string
 
 Generates the WGSL snippet that writes a single texel to a texture.
@@ -547,6 +599,28 @@ A WGSL snippet that represents 0-based texture array index to sample.
 A WGSL snippet that represent the new texel value.
 
 **Returns:** The WGSL snippet.
+
+### .generateVarStatement( type : string, name : string, count : number ) : string
+
+Returns a single variable statement as a WGSL string for the given variable type and name.
+
+**type**
+
+The variable's type.
+
+**name**
+
+The variable's name.
+
+**count**
+
+The array length.
+
+Default is `null`.
+
+**Overrides:** [NodeBuilder#generateVarStatement](NodeBuilder.html#generateVarStatement)
+
+**Returns:** The WGSL snippet that defines a variable.
 
 ### .generateWrapFunction( texture : Texture ) : string
 
@@ -620,6 +694,18 @@ Returns the clip distances builtin.
 
 **Returns:** The clip distances builtin.
 
+### .getDeclarationName( node : Object ) : string
+
+Returns the identifier the given node declares in the shader. Buffers are accessed via `name.value` but declare `name` in the module scope.
+
+**node**
+
+The node.
+
+**Overrides:** [NodeBuilder#getDeclarationName](NodeBuilder.html#getDeclarationName)
+
+**Returns:** The declaration name.
+
 ### .getDirectives( shaderStage : string ) : string
 
 Returns the directives of the given shader stage as a WGSL string.
@@ -638,7 +724,7 @@ Overwritten as a NOP since this method is intended for the WebGL 2 backend.
 
 **Returns:** Null.
 
-### .getFloatPackingMethod( encoding : string ) : string
+### .getFloatPackingMethod( encoding : string, layout : string ) : string
 
 Returns the float packing method name for a given numeric encoding.
 
@@ -646,15 +732,27 @@ Returns the float packing method name for a given numeric encoding.
 
 The numeric encoding that describes how the float values are mapped to the integer range.
 
+**layout**
+
+The component layout of the packed integer.
+
+Default is `'2x16'`.
+
 **Returns:** The resolve WGSL float packing method name.
 
-### .getFloatUnpackingMethod( encoding : string ) : string
+### .getFloatUnpackingMethod( encoding : string, layout : string ) : string
 
 Returns the float unpacking method name for a given numeric encoding.
 
 **encoding**
 
 The numeric encoding that describes how the integer values are mapped to the float range.
+
+**layout**
+
+The component layout of the packed integer.
+
+Default is `'2x16'`.
 
 **Returns:** The resolve WGSL float unpacking method name.
 
@@ -709,6 +807,8 @@ Returns a builtin representing the index of a compute invocation within the scop
 ### .getInvocationSubgroupIndex() : string
 
 Returns a builtin representing the index of a compute invocation within the scope of a subgroup.
+
+**Overrides:** [NodeBuilder#getInvocationSubgroupIndex](NodeBuilder.html#getInvocationSubgroupIndex)
 
 **Returns:** The invocation subgroup index.
 
@@ -770,7 +870,7 @@ Default is `this.shaderStage`.
 
 **Returns:** The property name.
 
-### .getScopedArray( name : string, scope : string, bufferType : string, bufferCount : string ) : string
+### .getScopedArray( name : string, scope : string, bufferType : string, bufferCount : string, isAtomic : boolean ) : string
 
 This method should be used when a new scoped buffer is used in context of compute shaders. It adds the array to the internal data structure which is later used to generate the respective WGSL.
 
@@ -789,6 +889,10 @@ The buffer type.
 **bufferCount**
 
 The buffer count.
+
+**isAtomic**
+
+Whether the array elements are atomic or not.
 
 **Returns:** The array name.
 
@@ -840,11 +944,15 @@ The shader stage.
 
 Returns a builtin representing the index of a compute invocation's subgroup within its workgroup.
 
+**Overrides:** [NodeBuilder#getSubgroupIndex](NodeBuilder.html#getSubgroupIndex)
+
 **Returns:** The subgroup index.
 
 ### .getSubgroupSize() : string
 
 Returns a builtin representing the size of a subgroup within the current shader.
+
+**Overrides:** [NodeBuilder#getSubgroupSize](NodeBuilder.html#getSubgroupSize)
 
 **Returns:** The subgroup size.
 
@@ -1015,6 +1123,18 @@ Whether to flip texture data along its vertical axis or not.
 **Overrides:** [NodeBuilder#isFlipY](NodeBuilder.html#isFlipY)
 
 **Returns:** Returns always `false` in context of WGSL.
+
+### .isReservedKeyword( name : string ) : boolean
+
+Returns whether the given name is a reserved keyword of WGSL.
+
+**name**
+
+The name to test.
+
+**Overrides:** [NodeBuilder#isReservedKeyword](NodeBuilder.html#isReservedKeyword)
+
+**Returns:** Whether the name is a reserved keyword or not.
 
 ### .isSampleCompare( texture : Texture ) : boolean
 

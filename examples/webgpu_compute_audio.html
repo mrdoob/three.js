@@ -46,7 +46,7 @@
 			let camera, scene, renderer;
 			let computeNode;
 			let waveBuffer, sampleRate;
-			let waveArray;
+			let waveArray, readbackBuffer;
 			let currentAudio, currentAnalyser;
 			const analyserBuffer = new Uint8Array( 1024 );
 			let analyserTexture;
@@ -62,7 +62,9 @@
 
 				renderer.compute( computeNode );
 
-				const wave = new Float32Array( await renderer.getArrayBufferAsync( waveArray.value ) );
+				await renderer.getArrayBufferAsync( waveArray.value, readbackBuffer );
+
+				const wave = new Float32Array( readbackBuffer.buffer );
 
 				// play result
 
@@ -70,6 +72,10 @@
 				const audioOutputBuffer = audioOutputContext.createBuffer( 1, wave.length, sampleRate );
 
 				audioOutputBuffer.copyToChannel( wave, 0 );
+
+				// Only release readback after the buffer output has been read
+
+				readbackBuffer.release();
 
 				const source = audioOutputContext.createBufferSource();
 				source.connect( audioOutputContext.destination );
@@ -109,13 +115,13 @@
 				// create webgpu buffers
 
 				waveArray = instancedArray( waveBuffer );
+				readbackBuffer = new THREE.ReadbackBuffer( waveArray.value.array.byteLength );
 
 				// read-only buffer
 
 				const originalWave = instancedArray( waveBuffer ).toReadOnly();
 
 				// The Pixel Buffer Object (PBO) is required to get the GPU computed data to the CPU in the WebGL2 fallback.
-				// As used in `renderer.getArrayBufferAsync( waveArray.value )`.
 
 				originalWave.setPBO( true );
 				waveArray.setPBO( true );

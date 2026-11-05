@@ -115,20 +115,24 @@ class FunctionNode extends CodeNode {
 
 	generate( builder, output ) {
 
-		super.generate( builder );
-
 		const nodeFunction = this.getNodeFunction( builder );
+		const nodeData = builder.getDataFromNode( this );
 
-		const name = nodeFunction.name;
 		const type = nodeFunction.type;
 
-		const nodeCode = builder.getCodeFromNode( this, type );
+		let propertyName = nodeData.functionPropertyName;
 
-		if ( name !== '' ) {
+		if ( propertyName === undefined ) {
 
-			const nodeData = builder.getDataFromNode( this );
+			// The includes and the function code are generated once per builder and shader stage,
+			// further calls only need the function name.
 
-			if ( nodeData.declarationRegistered !== true ) {
+			super.generate( builder );
+
+			const name = nodeFunction.name;
+			const nodeCode = builder.getCodeFromNode( this, type );
+
+			if ( name !== '' ) {
 
 				// use a custom property name
 
@@ -136,17 +140,15 @@ class FunctionNode extends CodeNode {
 
 				builder.registerDeclaration( nodeCode );
 
-				nodeData.declarationRegistered = true;
-
 			}
 
+			propertyName = builder.getPropertyName( nodeCode );
+
+			nodeCode.code = nodeFunction.getCode( propertyName ) + '\n';
+
+			nodeData.functionPropertyName = propertyName;
+
 		}
-
-		const propertyName = builder.getPropertyName( nodeCode );
-
-		const code = this.getNodeFunction( builder ).getCode( propertyName );
-
-		nodeCode.code = code + '\n';
 
 		if ( output === 'property' ) {
 

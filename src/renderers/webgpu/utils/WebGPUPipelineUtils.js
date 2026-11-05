@@ -1,5 +1,5 @@
 import {
-	GPUFrontFace, GPUCullMode, GPUColorWriteFlags, GPUCompareFunction, GPUBlendFactor, GPUBlendOperation, GPUIndexFormat, GPUStencilOperation, GPUPrimitiveTopology
+	GPUFrontFace, GPUCullMode, GPUColorWriteFlags, GPUCompareFunction, GPUBlendFactor, GPUBlendOperation, GPUStencilOperation, GPUPrimitiveTopology
 } from './WebGPUConstants.js';
 
 import {
@@ -94,7 +94,7 @@ class WebGPUPipelineUtils {
 
 		// vertex buffers
 
-		const vertexBuffers = backend.attributeUtils.createShaderVertexBuffers( renderObject );
+		const vertexBuffers = backend.attributeUtils.getVertexBufferLayout( renderObject );
 
 		// material blending
 
@@ -237,8 +237,8 @@ class WebGPUPipelineUtils {
 
 			if ( material.polygonOffset === true && ( primitiveState.topology === GPUPrimitiveTopology.TriangleList ) ) {
 
-				depthStencil.depthBias = material.polygonOffsetUnits;
-				depthStencil.depthBiasSlopeScale = material.polygonOffsetFactor;
+				depthStencil.depthBias = ( this.backend.parameters.reversedDepthBuffer ) ? - material.polygonOffsetUnits : material.polygonOffsetUnits;
+				depthStencil.depthBiasSlopeScale = ( this.backend.parameters.reversedDepthBuffer ) ? - material.polygonOffsetFactor : material.polygonOffsetFactor;
 				depthStencil.depthBiasClamp = 0; // three.js does not provide an API to configure this value
 
 			}
@@ -298,6 +298,10 @@ class WebGPUPipelineUtils {
 
 					_renderPipelineDescriptor.reset();
 
+					// Pop the error scope before awaiting the pipeline, so several pipelines
+					// can be created at the same time without mixing their error scopes.
+					const errorScopePromise = device.popErrorScope();
+
 					if ( pipelinePromise !== null ) {
 
 						try {
@@ -312,7 +316,7 @@ class WebGPUPipelineUtils {
 
 					}
 
-					const errorScope = await device.popErrorScope();
+					const errorScope = await errorScopePromise;
 
 					if ( errorScope !== null || asyncError !== null ) {
 
@@ -455,6 +459,10 @@ class WebGPUPipelineUtils {
 
 					_computePipelineDescriptor.reset();
 
+					// Pop the error scope before awaiting the pipeline, so several pipelines
+					// can be created at the same time without mixing their error scopes.
+					const errorScopePromise = device.popErrorScope();
+
 					if ( pipelinePromise !== null ) {
 
 						try {
@@ -469,7 +477,7 @@ class WebGPUPipelineUtils {
 
 					}
 
-					const errorScope = await device.popErrorScope();
+					const errorScope = await errorScopePromise;
 
 					if ( errorScope !== null || asyncError !== null ) {
 
@@ -565,17 +573,8 @@ class WebGPUPipelineUtils {
 			const blendDstAlpha = object.blendDstAlpha !== null ? object.blendDstAlpha : blendDst;
 			const blendEquationAlpha = object.blendEquationAlpha !== null ? object.blendEquationAlpha : blendEquation;
 
-			color = {
-				srcFactor: this._getBlendFactor( blendSrc ),
-				dstFactor: this._getBlendFactor( blendDst ),
-				operation: this._getBlendOperation( blendEquation )
-			};
-
-			alpha = {
-				srcFactor: this._getBlendFactor( blendSrcAlpha ),
-				dstFactor: this._getBlendFactor( blendDstAlpha ),
-				operation: this._getBlendOperation( blendEquationAlpha )
-			};
+			color = this._getBlendComponent( blendSrc, blendDst, blendEquation );
+			alpha = this._getBlendComponent( blendSrcAlpha, blendDstAlpha, blendEquationAlpha );
 
 		} else {
 
@@ -656,6 +655,32 @@ class WebGPUPipelineUtils {
 		}
 
 	}
+	/**
+	 * Returns a blend component (color or alpha) as a descriptor object required
+	 * for the pipeline creation.
+	 *
+	 * WebGPU requires both factors to be `one` for the `min` and `max` operations.
+	 * WebGL ignores the factors for these operations, so they are set to `one`.
+	 *
+	 * @private
+	 * @param {number} blendSrc - source blend factor.
+	 * @param {number} blendDst - destination blend factor.
+	 * @param {number} blendEquation - blend equation.
+	 * @return {Object} The blend component.
+	 */
+	_getBlendComponent( blendSrc, blendDst, blendEquation ) {
+
+		const operation = this._getBlendOperation( blendEquation );
+		const ignoreFactors = ( operation === GPUBlendOperation.Min || operation === GPUBlendOperation.Max );
+
+		return {
+			srcFactor: ignoreFactors ? GPUBlendFactor.One : this._getBlendFactor( blendSrc ),
+			dstFactor: ignoreFactors ? GPUBlendFactor.One : this._getBlendFactor( blendDst ),
+			operation
+		};
+
+	}
+
 	/**
 	 * Returns the GPU blend factor which is required for the pipeline creation.
 	 *
@@ -902,12 +927,7 @@ class WebGPUPipelineUtils {
 		//
 
 		descriptor.topology = utils.getPrimitiveTopology( object, material );
-
-		if ( geometry.index !== null && object.isLine === true && object.isLineSegments !== true ) {
-
-			descriptor.stripIndexFormat = ( geometry.index.array instanceof Uint16Array ) ? GPUIndexFormat.Uint16 : GPUIndexFormat.Uint32;
-
-		}
+		descriptor.stripIndexFormat = utils.getStripIndexFormat( object, geometry );
 
 		//
 

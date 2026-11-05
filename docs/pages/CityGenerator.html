@@ -31,6 +31,28 @@ scene.add( city.build( materials ) );
 					<div class="method">
 					</div>
 				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="seedNode" translate="no">.<a href="#seedNode">seedNode</a><span class="type-signature"> : <a href="UniformNode.html">UniformNode</a>.&lt;uint></span> </h3>
+					<div class="description">
+						<p>The city seed shared by building and proxy materials. Pass this to
+<a href="global.html#createBuildingMaterial">createBuildingMaterial</a> to update the palette when rebuilding.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="buildProxy" translate="no">.<a href="#buildProxy">buildProxy</a><span class="signature">()</span><span class="type-signature"> : <a href="InstancedMesh.html">InstancedMesh</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Builds a lightweight stand-in for the city: one instanced box per tower,
+sized to match, in a single draw call. Intended for cheap global-illumination
+bakes, where the detailed facades and street furniture are unnecessary and the
+boxes still cast the same street shadows and bounce the same warm fill.</p>
+<p>Call after CityGenerator#build, which records the tower boxes.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The proxy mesh.</dt>
+						</dl>
+					</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
 					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/generators/CityGenerator.js" translate="no" target="_blank" rel="noopener">examples/jsm/generators/CityGenerator.js</a>

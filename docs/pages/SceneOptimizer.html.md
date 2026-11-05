@@ -4,7 +4,7 @@ This class can be used to optimized scenes by converting individual meshes into 
 
 ## Import
 
-SceneOptimizer is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+SceneOptimizer is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { SceneOptimizer } from 'three/addons/utils/SceneOptimizer.js';

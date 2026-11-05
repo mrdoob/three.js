@@ -81,6 +81,8 @@ The red component.
 
 Default is `1`.
 
+## Static Properties
+
 ### .NAMES : Object
 
 A dictionary with X11 color names.

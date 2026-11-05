@@ -15,7 +15,7 @@ scene.add( mesh );
 
 ## Import
 
-ConvexGeometry is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+ConvexGeometry is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { ConvexGeometry } from 'three/addons/geometries/ConvexGeometry.js';

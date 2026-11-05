@@ -54,7 +54,7 @@ class Clock {
 		 * Whether the clock is running or not.
 		 *
 		 * @type {boolean}
-		 * @default true
+		 * @default false
 		 */
 		this.running = false;
 

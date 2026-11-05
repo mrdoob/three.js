@@ -60,11 +60,33 @@ The default `minFilter` for storage textures is `THREE.LinearFilter`.
 
 **Overrides:** [Texture#minFilter](Texture.html#minFilter)
 
+### .mipmapsAutoUpdate : boolean
+
+Whether the renderer regenerates the mipmaps automatically.
+
+Overwritten and set to `false` by default since the WebGPU backend does not support mipmap generation for 3D textures.
+
+Default is `false`.
+
+**Overrides:** [Texture#mipmapsAutoUpdate](Texture.html#mipmapsAutoUpdate)
+
 ### .wrapR : number
 
 This defines how the texture is wrapped in the depth direction and corresponds to _W_ in UVW mapping.
 
 ## Methods
+
+### .copy( source : Storage3DTexture ) : Storage3DTexture
+
+Copies the values of the given texture to this instance.
+
+**source**
+
+The texture to copy.
+
+**Overrides:** [Texture#copy](Texture.html#copy)
+
+**Returns:** A reference to this instance.
 
 ### .setSize( width : number, height : number, depth : number )
 

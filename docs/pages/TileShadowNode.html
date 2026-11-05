@@ -20,7 +20,7 @@ to improve shadow quality and performance for large scenes.</p>
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">TileShadowNode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<p><span translate="no">TileShadowNode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { TileShadowNode } from 'three/addons/tsl/shadows/TileShadowNode.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -72,6 +72,15 @@ to improve shadow quality and performance for large scenes.</p>
 									</td>
 									<td class="description last">
 										<p>The resolution of the shadow map.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">depthType</strong>
+									</td>
+									<td class="description last">
+										<p>The type of the tile depth texture. <code>UnsignedShortType</code> halves the memory when the depth range allows it.</p>
+										<p>Default is <code>UnsignedIntType</code>.</p>
 									</td>
 								</tr>
 								<tr>

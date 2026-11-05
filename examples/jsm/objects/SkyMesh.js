@@ -51,28 +51,35 @@ class SkyMesh extends Mesh {
 		super( new BoxGeometry( 1, 1, 1 ), material );
 
 		/**
-		 * The turbidity uniform.
+		 * The atmospheric turbidity which controls the amount of haze.
+		 * Higher values produce a hazier sky.
 		 *
 		 * @type {UniformNode<float>}
 		 */
 		this.turbidity = uniform( 2 );
 
 		/**
-		 * The rayleigh uniform.
+		 * The strength of Rayleigh scattering by air molecules
+		 * which is responsible for the blue color of the sky.
+		 * Higher values produce a brighter sky.
 		 *
 		 * @type {UniformNode<float>}
 		 */
 		this.rayleigh = uniform( 1 );
 
 		/**
-		 * The mieCoefficient uniform.
+		 * The strength of Mie scattering by aerosol particles
+		 * which controls the intensity of the glow around the sun.
+		 * Higher values produce a brighter glow.
 		 *
 		 * @type {UniformNode<float>}
 		 */
 		this.mieCoefficient = uniform( 0.005 );
 
 		/**
-		 * The mieDirectionalG uniform.
+		 * The directionality of Mie scattering which controls
+		 * the size of the glow around the sun. Values closer to `1`
+		 * produce a smaller and more concentrated halo.
 		 *
 		 * @type {UniformNode<float>}
 		 */
@@ -86,13 +93,6 @@ class SkyMesh extends Mesh {
 		this.sunPosition = uniform( new Vector3() );
 
 		/**
-		 * The up position.
-		 *
-		 * @type {UniformNode<vec3>}
-		 */
-		this.upUniform = uniform( new Vector3( 0, 1, 0 ) );
-
-		/**
 		 * The cloud scale uniform.
 		 *
 		 * @type {UniformNode<float>}
@@ -104,7 +104,7 @@ class SkyMesh extends Mesh {
 		 *
 		 * @type {UniformNode<float>}
 		 */
-		this.cloudSpeed = uniform( 0.0001 );
+		this.cloudSpeed = uniform( 0.00002 );
 
 		/**
 		 * The cloud coverage uniform.
@@ -160,7 +160,7 @@ class SkyMesh extends Mesh {
 		const vBetaR = varyingProperty( 'vec3' );
 		const vBetaM = varyingProperty( 'vec3' );
 
-		const vertexNode = /*@__PURE__*/ Fn( () => {
+		const vertexNode = /*@__PURE__*/ Fn( ( builder ) => {
 
 			// constants for atmospheric scattering
 			const e = float( 2.718281828459045 );
@@ -192,7 +192,7 @@ class SkyMesh extends Mesh {
 
 			// varying sun intensity
 
-			const angle = dot( sunDirection, this.upUniform );
+			const angle = sunDirection.y;
 			const zenithAngleCos = clamp( angle, - 1, 1 );
 			const sunIntensity = EE.mul( max( 0.0, float( 1.0 ).sub( pow( e, cutoffAngle.sub( acos( zenithAngleCos ) ).div( steepness ).negate() ) ) ) );
 			vSunE.assign( sunIntensity );
@@ -219,7 +219,7 @@ class SkyMesh extends Mesh {
 			// position
 
 			const position = modelViewProjection;
-			position.z.assign( position.w ); // set z to camera.far
+			position.z.assign( builder.renderer.reversedDepthBuffer === true ? 0 : position.w ); // set z to camera.far
 
 			return position;
 
@@ -247,7 +247,7 @@ class SkyMesh extends Mesh {
 
 			// optical length
 			// cutoff angle at 90 to avoid singularity in next formula.
-			const zenithAngle = acos( max( 0.0, dot( this.upUniform, direction ) ) );
+			const zenithAngle = acos( max( 0.0, direction.y ) );
 			const inverse = float( 1.0 ).div( cos( zenithAngle ).add( float( 0.15 ).mul( pow( float( 93.885 ).sub( zenithAngle.mul( 180.0 ).div( pi ) ), - 1.253 ) ) ) );
 			const sR = rayleighZenithLength.mul( inverse );
 			const sM = mieZenithLength.mul( inverse );
@@ -272,7 +272,7 @@ class SkyMesh extends Mesh {
 			const betaMTheta = vBetaM.mul( mPhase );
 
 			const Lin = pow( vSunE.mul( add( betaRTheta, betaMTheta ).div( add( vBetaR, vBetaM ) ) ).mul( sub( 1.0, Fex ) ), vec3( 1.5 ) );
-			Lin.mulAssign( mix( vec3( 1.0 ), pow( vSunE.mul( add( betaRTheta, betaMTheta ).div( add( vBetaR, vBetaM ) ) ).mul( Fex ), vec3( 1.0 / 2.0 ) ), clamp( pow( sub( 1.0, dot( this.upUniform, vSunDirection ) ), 5.0 ), 0.0, 1.0 ) ) );
+			Lin.mulAssign( mix( vec3( 1.0 ), pow( vSunE.mul( add( betaRTheta, betaMTheta ).div( add( vBetaR, vBetaM ) ) ).mul( Fex ), vec3( 1.0 / 2.0 ) ), clamp( pow( sub( 1.0, vSunDirection.y ), 5.0 ), 0.0, 1.0 ) ) );
 
 			// nightsky
 
@@ -292,7 +292,7 @@ class SkyMesh extends Mesh {
 
 				return fract( p.xx.add( p.yz ).mul( p.zy ) ).mul( 2.0 ).sub( 1.0 );
 
-			} );
+			}, { i: 'vec2', return: 'vec2' } );
 
 			// 2D gradient noise: isotropic lobes like Perlin at value-noise cost
 			const noise = Fn( ( [ p ] ) => {
@@ -308,7 +308,7 @@ class SkyMesh extends Mesh {
 
 				return mix( mix( a, b, u.x ), mix( c, d, u.x ), u.y ).mul( 1.6 ); // ~[-1,1]
 
-			} );
+			}, { p: 'vec2', return: 'float' } );
 
 			// fbm; per-octave drift makes clouds billow instead of scrolling as a rigid stamp
 			const fbm = Fn( ( [ position, drift ] ) => {
@@ -327,7 +327,7 @@ class SkyMesh extends Mesh {
 
 				return result;
 
-			} );
+			}, { position: 'vec2', drift: 'vec2', return: 'float' } );
 
 			// Clouds
 			If( direction.y.greaterThan( 0.0 ).and( this.cloudCoverage.greaterThan( 0.0 ) ), () => {
@@ -391,6 +391,7 @@ class SkyMesh extends Mesh {
 
 		material.side = BackSide;
 		material.depthWrite = false;
+		material.fog = false;
 
 		material.vertexNode = vertexNode;
 		material.colorNode = colorNode;

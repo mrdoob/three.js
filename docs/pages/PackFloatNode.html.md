@@ -1,4 +1,4 @@
-*Inheritance: EventDispatcher → Node → TempNode →*
+*Inheritance: EventDispatcher → Node →*
 
 # PackFloatNode
 
@@ -27,6 +27,12 @@ The numeric encoding.
 This flag can be used for type testing.
 
 Default is `true`.
+
+### .layout : '2x16' | '4x8'
+
+The component layout of the packed integer.
+
+Default is `'2x16'`.
 
 ### .vectorNode : Node
 

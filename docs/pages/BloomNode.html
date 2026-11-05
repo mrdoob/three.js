@@ -9,7 +9,7 @@
 	<link type="text/css" rel="stylesheet" href="../styles/page.css">
 </head>
 <body>
-		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → <a href="TempNode.html">TempNode</a> → </p>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Node.html">Node</a> → </p>
 	<h1 translate="no">BloomNode</h1>
 		<section>
 			<header>
@@ -37,7 +37,7 @@ renderPipeline.outputNode = scenePassColor.add( bloomPass );
 			</header>
 			<article>
 				<h2 class="subsection-title">Import</h2>
-				<p><span translate="no">BloomNode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#en/installation" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<p><span translate="no">BloomNode</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
 				<pre><code class="language-js">import { bloom } from 'three/addons/tsl/display/BloomNode.js';</code></pre>
 				<div class="container-overview">
 					<h2>Constructor</h2>
@@ -89,6 +89,14 @@ renderPipeline.outputNode = scenePassColor.add( bloomPass );
 				</div>
 				<h2 class="subsection-title">Properties</h2>
 				<div class="member">
+					<h3 class="name" id="bloomTintColors" translate="no">.<a href="#bloomTintColors">bloomTintColors</a><span class="type-signature"> : Array.&lt;<a href="Vector3.html">Vector3</a>></span> </h3>
+					<div class="description">
+						<p>A per-mip tint color for the bloom, applied during the composite pass.
+Defaults to white (no tint) for each of the mips. Mutate the vectors to
+colorize the bloom (e.g. for a warm or anamorphic look).</p>
+					</div>
+				</div>
+				<div class="member">
 					<h3 class="name" id="highPassFn" translate="no">.<a href="#highPassFn">highPassFn</a><span class="type-signature"> : function</span> </h3>
 					<div class="description">
 						<p>Can be used to inject a custom high pass filter (e.g., for anamorphic effects).</p>
@@ -132,7 +140,7 @@ its effect once per frame in <code>updateBefore()</code>.</p>
 						<p>Default is <code>'frame'</code>.</p>
 					</div>
 						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateBeforeType">TempNode#updateBeforeType</a></dt>
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#updateBeforeType">Node#updateBeforeType</a></dt>
 						</dl>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -143,7 +151,7 @@ its effect once per frame in <code>updateBefore()</code>.</p>
 when the effect is no longer required.</p>
 						</div>
 						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#dispose">TempNode#dispose</a></dt>
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#dispose">Node#dispose</a></dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="getResolutionScale" translate="no">.<a href="#getResolutionScale">getResolutionScale</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
@@ -230,7 +238,7 @@ The resolution scale is a factor that is multiplied with the renderer's width an
 							</tbody>
 						</table>
 						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#setup">TempNode#setup</a></dt>
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#setup">Node#setup</a></dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="updateBefore" translate="no">.<a href="#updateBefore">updateBefore</a><span class="signature">( frame : <span class="param-type"><a href="NodeFrame.html">NodeFrame</a></span> )</span> </h3>
@@ -251,7 +259,7 @@ The resolution scale is a factor that is multiplied with the renderer's width an
 							</tbody>
 						</table>
 						<dl class="details">
-							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="TempNode.html#updateBefore">TempNode#updateBefore</a></dt>
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Node.html#updateBefore">Node#updateBefore</a></dt>
 						</dl>
 					</div>
 				<h2 class="subsection-title">Source</h2>

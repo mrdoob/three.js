@@ -5,6 +5,25 @@ import { ShaderNode, nodeProxy, getCurrentStack, setCurrentStack, nodeObject } f
 import { error } from '../../utils.js';
 
 /**
+ * Whether the given node is assignable but has not been assigned. It is just
+ * an expression, which is generated where it is used instead of in the stack.
+ *
+ * @private
+ * @param {NodeBuilder} builder - The current node builder.
+ * @param {Node} node - The node to check.
+ * @return {boolean} Whether the assignable node can be generated as an expression.
+ */
+const isAssignableExpression = ( builder, node ) => {
+
+	if ( node.assignable !== true ) return false;
+
+	const data = builder.getDataFromNode( node );
+
+	return data.forceDeclaration !== true && data.assign !== true;
+
+};
+
+/**
  * Stack is a helper for Nodes that need to produce stack-based code instead of continuous flow.
  * They are usually needed in cases like `If`, `Else`.
  *
@@ -97,6 +116,12 @@ class StackNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	getElementType( builder ) {
 
 		return this.outputNode ? this.outputNode.getElementType( builder ) : 'void';
@@ -167,14 +192,15 @@ class StackNode extends Node {
 	}
 
 	/**
-	 * Adds a node to the stack before the current node.
+	 * Adds a node to the stack before the given node, by default the current node.
 	 *
 	 * @param {Node} node - The node to add.
+	 * @param {?Node} [beforeNode=this._currentNode] - The node of the stack that the node is added before.
 	 * @return {StackNode} A reference to this stack node.
 	 */
-	addToStackBefore( node ) {
+	addToStackBefore( node, beforeNode = this._currentNode ) {
 
-		const index = this._currentNode ? this.nodes.indexOf( this._currentNode ) : 0;
+		const index = beforeNode ? this.nodes.indexOf( beforeNode ) : 0;
 
 		return this.addToStack( node, index );
 
@@ -328,15 +354,7 @@ class StackNode extends Node {
 
 		for ( const childNode of this.getChildren() ) {
 
-			if ( childNode.isVarNode && childNode.isIntent( builder ) ) {
-
-				if ( childNode.isAssign( builder ) !== true ) {
-
-					continue;
-
-				}
-
-			}
+			if ( isAssignableExpression( builder, childNode ) ) continue;
 
 			nodeProperties[ 'node' + index ++ ] = childNode;
 
@@ -349,6 +367,8 @@ class StackNode extends Node {
 	}
 
 	build( builder, ...params ) {
+
+		this._setupInspector( builder );
 
 		const previousStack = getCurrentStack();
 
@@ -367,15 +387,7 @@ class StackNode extends Node {
 
 			this._currentNode = node;
 
-			if ( node.isVarNode && node.isIntent( builder ) ) {
-
-				if ( node.isAssign( builder ) !== true ) {
-
-					continue;
-
-				}
-
-			}
+			if ( isAssignableExpression( builder, node ) ) continue;
 
 			if ( buildStage === 'setup' ) {
 

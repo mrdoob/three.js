@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>SunLightShadow - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="LightShadow.html">LightShadow</a> → </p>
+	<h1 translate="no">SunLightShadow</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Represents the shadow configuration of <a href="SunLight.html">SunLight</a>, using two
+cascaded shadow maps (CSM).</p>
+<p>The shadow camera projection is fitted automatically to slices of the view
+frustum, up to a distance of <code>camera.far</code> (or the view camera's far plane,
+whichever is smaller), and adjacent cascades blend into each other over a
+small depth range. <code>camera.left/right/top/bottom</code> are ignored.</p>
+<p>The default <code>mapSize</code> is <code>1024x1024</code> per cascade.</p></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">SunLightShadow</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { SunLightShadow } from 'three/addons/lights/SunLightShadow.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="SunLightShadow" translate="no">new <a href="#SunLightShadow">SunLightShadow</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new sun light shadow.</p>
+						</div>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="isSunLightShadow" translate="no">.<a href="#isSunLightShadow">isSunLightShadow</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="getCamera" translate="no">.<a href="#getCamera">getCamera</a><span class="signature">( cascadeIndex : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="OrthographicCamera.html">OrthographicCamera</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the shadow camera of the given cascade.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">cascadeIndex</strong>
+									</td>
+									<td class="description last">
+										<p>The cascade index.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="LightShadow.html#getCamera">LightShadow#getCamera</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The shadow camera.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getFrustum" translate="no">.<a href="#getFrustum">getFrustum</a><span class="signature">( cascadeIndex : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Frustum.html">Frustum</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the shadow camera frustum of the given cascade. Used internally by
+the renderer to cull objects.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">cascadeIndex</strong>
+									</td>
+									<td class="description last">
+										<p>The cascade index.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="LightShadow.html#getFrustum">LightShadow#getFrustum</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The shadow camera frustum.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getMatrix" translate="no">.<a href="#getMatrix">getMatrix</a><span class="signature">( cascadeIndex : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Matrix4.html">Matrix4</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the shadow matrix of the given cascade.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">cascadeIndex</strong>
+									</td>
+									<td class="description last">
+										<p>The cascade index.</p>
+										<p>Default is <code>0</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The shadow matrix.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="updateMatrices" translate="no">.<a href="#updateMatrices">updateMatrices</a><span class="signature">( light : <span class="param-type"><a href="Light.html">Light</a></span>, viewCamera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Update the matrices for the cascade cameras and shadows, used internally
+by the renderer.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">light</strong>
+									</td>
+									<td class="description last">
+										<p>The light for which the shadow is being rendered.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">viewCamera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera the scene is rendered with.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="LightShadow.html#updateMatrices">LightShadow#updateMatrices</a></dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/lights/SunLightShadow.js" translate="no" target="_blank" rel="noopener">examples/jsm/lights/SunLightShadow.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

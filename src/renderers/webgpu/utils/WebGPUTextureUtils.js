@@ -57,13 +57,13 @@ const _compareToWebGPU = {
 
 const _flipMap = [ 0, 1, 3, 2, 4, 5 ];
 
-function writeTextureLayer( device, textureGPU, mipLevel, layerIndex, mipmap, bytesPerImage, bytesPerRow, rowsPerImage, textureWidth, textureHeight ) {
+function writeTextureLayer( device, textureGPU, mipLevel, layerIndex, mipmap, dataOffset, bytesPerRow, rowsPerImage, textureWidth, textureHeight ) {
 
 	_texelCopyTextureInfo.texture = textureGPU;
 	_texelCopyTextureInfo.mipLevel = mipLevel;
 	_texelCopyTextureInfo.origin.z = layerIndex;
 
-	_texelCopyBufferLayout.offset = layerIndex * bytesPerImage;
+	_texelCopyBufferLayout.offset = dataOffset;
 	_texelCopyBufferLayout.bytesPerRow = bytesPerRow;
 	_texelCopyBufferLayout.rowsPerImage = rowsPerImage;
 
@@ -527,7 +527,7 @@ class WebGPUTextureUtils {
 		const colorTexture = canvasTarget.colorTexture;
 		const colorTextureData = backend.get( colorTexture );
 
-		if ( colorTexture.width === width && colorTexture.height === height && colorTexture.samples === samples ) {
+		if ( colorTextureData.texture !== undefined && colorTexture.width === width && colorTexture.height === height && colorTexture.samples === samples ) {
 
 			return colorTextureData.texture;
 
@@ -552,8 +552,8 @@ class WebGPUTextureUtils {
 
 		//
 
-		colorTexture.source.width = width;
-		colorTexture.source.height = height;
+		colorTexture.image.width = width;
+		colorTexture.image.height = height;
 		colorTexture.samples = samples;
 
 		colorTextureData.texture = colorBuffer;
@@ -695,7 +695,15 @@ class WebGPUTextureUtils {
 
 		} else if ( texture.isCompressedTexture || texture.isCompressedArrayTexture ) {
 
-			if ( texture.isCompressedArrayTexture && texture.layerUpdates.size > 0 ) {
+			if ( texture.isCompressedCubeTexture ) {
+
+				for ( let i = 0; i < 6; i ++ ) {
+
+					this._copyCompressedBufferToTexture( texture.image[ i ].mipmaps, textureData.texture, textureDescriptorGPU, null, i );
+
+				}
+
+			} else if ( texture.isCompressedArrayTexture && texture.layerUpdates.size > 0 ) {
 
 				this._copyCompressedBufferToTexture( texture.mipmaps, textureData.texture, textureDescriptorGPU, texture.layerUpdates );
 
@@ -809,10 +817,10 @@ class WebGPUTextureUtils {
 		const format = textureData.textureDescriptorGPU.format;
 		const bytesPerTexel = this._getBytesPerTexel( format );
 
-		let bytesPerRow = width * bytesPerTexel;
-		bytesPerRow = Math.ceil( bytesPerRow / 256 ) * 256; // Align to 256 bytes
+		const unpaddedBytesPerRow = width * bytesPerTexel;
+		const bytesPerRow = Math.ceil( unpaddedBytesPerRow / 256 ) * 256; // copyTextureToBuffer() requires a multiple of 256
 
-		_bufferDescriptor.size = ( ( height - 1 ) * bytesPerRow ) + ( width * bytesPerTexel ); // see https://github.com/mrdoob/three.js/issues/31658#issuecomment-3229442010
+		_bufferDescriptor.size = height * bytesPerRow; // multiple of 256, so it also meets the 4-byte size alignment required by mapAsync()
 		_bufferDescriptor.usage = GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ;
 
 		const readBuffer = device.createBuffer( _bufferDescriptor );
@@ -848,11 +856,22 @@ class WebGPUTextureUtils {
 
 		await readBuffer.mapAsync( GPUMapMode.READ );
 
-		const buffer = readBuffer.getMappedRange().slice();
+		// remove the row padding so the result is tightly packed
+
+		const paddedData = new Uint8Array( readBuffer.getMappedRange() );
+		const data = new Uint8Array( unpaddedBytesPerRow * height );
+
+		for ( let row = 0; row < height; row ++ ) {
+
+			const offset = row * bytesPerRow;
+
+			data.set( paddedData.subarray( offset, offset + unpaddedBytesPerRow ), row * unpaddedBytesPerRow );
+
+		}
 
 		readBuffer.destroy();
 
-		return new typedArrayType( buffer );
+		return new typedArrayType( data.buffer );
 
 	}
 
@@ -1130,8 +1149,9 @@ class WebGPUTextureUtils {
 	 * @param {GPUTexture} textureGPU - The GPU texture.
 	 * @param {Object} textureDescriptorGPU - The GPU texture descriptor.
 	 * @param {?Set<number>} [layerUpdates=null] - The layer indices to update.
+	 * @param {number} [faceIndex=-1] - The cube face the mipmaps belong to. Only relevant for compressed cube maps.
 	 */
-	_copyCompressedBufferToTexture( mipmaps, textureGPU, textureDescriptorGPU, layerUpdates = null ) {
+	_copyCompressedBufferToTexture( mipmaps, textureGPU, textureDescriptorGPU, layerUpdates = null, faceIndex = - 1 ) {
 
 		// @TODO: Consider to use GPUCommandEncoder.copyBufferToTexture()
 
@@ -1155,11 +1175,15 @@ class WebGPUTextureUtils {
 			const textureWidth = Math.ceil( width / blockData.width ) * blockData.width;
 			const textureHeight = rowsPerImage * blockData.height;
 
-			if ( activeLayerUpdates !== null ) {
+			if ( faceIndex !== - 1 ) {
+
+				writeTextureLayer( device, textureGPU, i, faceIndex, mipmap, 0, bytesPerRow, rowsPerImage, textureWidth, textureHeight );
+
+			} else if ( activeLayerUpdates !== null ) {
 
 				for ( const layerIndex of activeLayerUpdates ) {
 
-					writeTextureLayer( device, textureGPU, i, layerIndex, mipmap, bytesPerImage, bytesPerRow, rowsPerImage, textureWidth, textureHeight );
+					writeTextureLayer( device, textureGPU, i, layerIndex, mipmap, layerIndex * bytesPerImage, bytesPerRow, rowsPerImage, textureWidth, textureHeight );
 
 				}
 
@@ -1167,7 +1191,7 @@ class WebGPUTextureUtils {
 
 				for ( let layerIndex = 0; layerIndex < depth; layerIndex ++ ) {
 
-					writeTextureLayer( device, textureGPU, i, layerIndex, mipmap, bytesPerImage, bytesPerRow, rowsPerImage, textureWidth, textureHeight );
+					writeTextureLayer( device, textureGPU, i, layerIndex, mipmap, layerIndex * bytesPerImage, bytesPerRow, rowsPerImage, textureWidth, textureHeight );
 
 				}
 
@@ -1178,11 +1202,11 @@ class WebGPUTextureUtils {
 	}
 
 	/**
-	 * This method is only relevant for compressed texture formats. It returns a block
-	 * data descriptor for the given GPU compressed texture format.
+	 * This method is only relevant for compressed textures. It returns a block
+	 * data descriptor for the given GPU texture format.
 	 *
 	 * @private
-	 * @param {string} format - The GPU compressed texture format.
+	 * @param {string} format - The GPU texture format.
 	 * @return {Object} The block data descriptor.
 	 */
 	_getBlockData( format ) {
@@ -1217,6 +1241,8 @@ class WebGPUTextureUtils {
 		if ( format === GPUTextureFormat.ASTC10x10Unorm || format === GPUTextureFormat.ASTC10x10UnormSRGB ) return { byteLength: 16, width: 10, height: 10 };
 		if ( format === GPUTextureFormat.ASTC12x10Unorm || format === GPUTextureFormat.ASTC12x10UnormSRGB ) return { byteLength: 16, width: 12, height: 10 };
 		if ( format === GPUTextureFormat.ASTC12x12Unorm || format === GPUTextureFormat.ASTC12x12UnormSRGB ) return { byteLength: 16, width: 12, height: 12 };
+
+		return { byteLength: this._getBytesPerTexel( format ), width: 1, height: 1 }; // uncompressed data
 
 	}
 
@@ -1603,7 +1629,17 @@ export function getFormat( texture, device ) {
 				break;
 
 			case RGBAFormat:
-				formatGPU = ( transfer === SRGBTransfer ) ? GPUTextureFormat.RGBA8UnormSRGB : GPUTextureFormat.RGBA8Unorm;
+
+				if ( type === HalfFloatType ) {
+
+					formatGPU = GPUTextureFormat.RGBA16Float;
+
+				} else {
+
+					formatGPU = ( transfer === SRGBTransfer ) ? GPUTextureFormat.RGBA8UnormSRGB : GPUTextureFormat.RGBA8Unorm;
+
+				}
+
 				break;
 
 			default:

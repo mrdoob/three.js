@@ -30,7 +30,7 @@ class ShapePath {
 		 * The paths that have been generated for this shape.
 		 *
 		 * @type {Array<Path>}
-		 * @default null
+		 * @default []
 		 */
 		this.subPaths = [];
 

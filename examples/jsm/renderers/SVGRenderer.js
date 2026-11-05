@@ -108,6 +108,7 @@ class SVGRenderer {
 			_clearColor = new Color(),
 
 			_vector3 = new Vector3(), // Needed for PointLight
+			_vector3b = new Vector3(), // Needed for DirectionalLight
 			_centroid = new Vector3(),
 			_normal = new Vector3(),
 			_normalViewMatrix = new Matrix3(),
@@ -532,9 +533,9 @@ class SVGRenderer {
 
 				if ( light.isDirectionalLight ) {
 
-					const lightPosition = _vector3.setFromMatrixPosition( light.matrixWorld ).normalize();
+					const lightDirection = _vector3.setFromMatrixPosition( light.matrixWorld ).sub( _vector3b.setFromMatrixPosition( light.target.matrixWorld ) ).normalize();
 
-					let amount = normal.dot( lightPosition );
+					let amount = normal.dot( lightDirection );
 
 					if ( amount <= 0 ) continue;
 

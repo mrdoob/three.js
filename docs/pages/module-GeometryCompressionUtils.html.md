@@ -2,7 +2,7 @@
 
 ## Import
 
-GeometryCompressionUtils is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+GeometryCompressionUtils is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import * as GeometryCompressionUtils from 'three/addons/utils/GeometryCompressionUtils.js';

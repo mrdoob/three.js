@@ -67,6 +67,8 @@ class PCDLoader extends Loader {
 		const scope = this;
 
 		const loader = new FileLoader( scope.manager );
+		loader.setPriority( scope.priority );
+		loader.setCache( scope.cache );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
@@ -341,12 +343,14 @@ class PCDLoader extends Loader {
 			PCDheader.offset = {};
 
 			let sizeSum = 0;
+			let countSum = 0;
 
 			for ( let i = 0, l = PCDheader.fields.length; i < l; i ++ ) {
 
 				if ( PCDheader.data === 'ascii' ) {
 
-					PCDheader.offset[ PCDheader.fields[ i ] ] = i;
+					PCDheader.offset[ PCDheader.fields[ i ] ] = countSum;
+					countSum += PCDheader.count[ i ];
 
 				} else {
 
@@ -392,7 +396,7 @@ class PCDLoader extends Loader {
 
 				if ( lines[ i ] === '' ) continue;
 
-				const line = lines[ i ].split( ' ' );
+				const line = lines[ i ].trim().split( /\s+/ );
 
 				if ( offset.x !== undefined ) {
 

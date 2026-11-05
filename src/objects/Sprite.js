@@ -221,7 +221,19 @@ class Sprite extends Object3D {
 
 		this.material = source.material;
 
+		this.count = source.count;
+
 		return this;
+
+	}
+
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		data.object.center = this.center.toArray();
+
+		return data;
 
 	}
 

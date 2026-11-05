@@ -191,15 +191,15 @@ Default is `null`.
 
 ### .outputNode : Node.<vec4>
 
-This node can be used to define the final output of the material.
+This node can be used to overwrite the final output of the material.
 
-TODO: Explain the differences to `fragmentNode`.
+Unlike [NodeMaterial#fragmentNode](NodeMaterial.html#fragmentNode), the built-in material logic (diffuse color, lighting, etc.) is still evaluated; assigning a node only replaces the resulting output color.
 
 Default is `null`.
 
 ### .positionNode : Node.<vec3>
 
-The local vertex positions are computed based on multiple factors like the attribute data, morphing or skinning. This node property allows to overwrite the default and define local vertex positions with nodes instead.
+The local vertex positions are computed based on multiple factors like the attribute data, morphing, skinning, instancing or batching. This node property allows to overwrite the default and define local vertex positions with nodes instead.
 
 If you don't want to overwrite the vertex positions but modify the existing values instead, use [positionLocal](TSL.html#positionLocal).
 
@@ -316,17 +316,13 @@ Setups the depth of this material.
 
 The current node builder.
 
-### .setupDiffuseColor( builder : NodeBuilder, geometry : BufferGeometry )
+### .setupDiffuseColor( builder : NodeBuilder )
 
 Setups the computation of the material's diffuse color.
 
 **builder**
 
 The current node builder.
-
-**geometry**
-
-The geometry.
 
 ### .setupEnvironment( builder : NodeBuilder ) : Node.<vec4>
 

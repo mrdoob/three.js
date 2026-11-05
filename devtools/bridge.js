@@ -1,671 +1,486 @@
-/* global MESSAGE_ID, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, EVENT_REGISTER, EVENT_OBSERVE, EVENT_RENDERER, EVENT_SCENE, EVENT_SCENE_REMOVED, EVENT_OBJECT_DETAILS, EVENT_DEVTOOLS_READY */
+/* global MESSAGE_ID, MESSAGE_REQUEST_STATE, MESSAGE_REQUEST_OBJECT_DETAILS, MESSAGE_SCROLL_TO_CANVAS, MESSAGE_HIGHLIGHT_OBJECT, MESSAGE_UNHIGHLIGHT_OBJECT, MESSAGE_SELECT_OBJECTS, EVENT_REGISTER, EVENT_OBSERVE, EVENT_RENDERER, EVENT_SCENE, EVENT_SCENE_REMOVED, EVENT_OBJECT_DETAILS */
 
 /**
- * This script injected by the installed three.js developer
- * tools extension.
+ * Injected into the page by the three.js DevTools extension. Exposes
+ * window.__THREE_DEVTOOLS__ for three.js to report renderers and scenes,
+ * and answers the panel's requests.
  */
 
 ( function () {
 
-	const HIGHLIGHT_OVERLAY_DURATION = 1000;
+	if ( window.__THREE_DEVTOOLS__ ) return;
 
-	// Only initialize if not already initialized
-	if ( ! window.__THREE_DEVTOOLS__ ) {
+	const CANVAS_FLASH_DURATION = 1000;
+	const SCENE_EMPTY_TICKS_THRESHOLD = 5; // Polls before an empty scene is hidden from the panel, ~5s
 
-		// Create our custom EventTarget with logging
-		class DevToolsEventTarget extends EventTarget {
+	const observedScenes = [];
+	const observedRenderers = [];
+	const sceneObjectCountCache = new Map(); // Object count per scene at the last batch sent, absent while hidden from the panel
+	const sceneEmptyTicks = new Map(); // Consecutive sendState ticks each scene has been empty
+	const sceneViews = new Map(); // Where each scene is shown: the renderer, camera and viewport of the pass that put it on screen
 
-			constructor() {
+	// three.js reports its renderers and scenes by dispatching events on this
+	const devTools = new EventTarget();
+	Object.defineProperty( window, '__THREE_DEVTOOLS__', { value: devTools, enumerable: true } );
 
-				super();
-				this._ready = false;
-				this._backlog = [];
-				this.objects = new Map();
+	// Shared with highlight.js and preview.js, which add their own functions here
+	devTools.utils = { findObjectInScenes, getSceneView };
 
-			}
+	// Send a message to the panel (relayed by the content script)
+	function postToPanel( name, detail ) {
 
-			addEventListener( type, listener, options ) {
+		window.postMessage( { id: MESSAGE_ID, name: name, detail: detail }, '/' );
 
-				super.addEventListener( type, listener, options );
+	}
 
-				// If this is the first listener for a type, and we have backlogged events,
-				// check if we should process them
-				if ( type !== EVENT_DEVTOOLS_READY && this._backlog.length > 0 ) {
+	// --- Scene views ---
 
-					this.dispatchEvent( new CustomEvent( EVENT_DEVTOOLS_READY ) );
+	// The renderer copies its viewport into a Vector4 and returns that, so a stand-in returning the numbers will do
+	const readViewport = { copy: ( v ) => [ v.x, v.y, v.z, v.w ] };
 
-				}
+	// A scene is drawn many times a frame: shadow maps, reflections, post processing. Passes are seen
+	// as they finish, so one rendered from inside another is followed by the pass it served, and only
+	// a pass to the canvas, or to a texture shaped like it, can be what the page shows.
+	function watchScene( scene ) {
 
-			}
+		const pageHook = scene.onAfterRender;
 
-			dispatchEvent( event ) {
+		function hook( renderer, scene, camera ) {
 
-				if ( this._ready || event.type === EVENT_DEVTOOLS_READY ) {
+			const target = renderer.getRenderTarget();
+			const canvas = renderer.domElement;
+			const onCanvas = target === null;
 
-					if ( event.type === EVENT_DEVTOOLS_READY ) {
+			if ( onCanvas || Math.abs( target.width / target.height - canvas.width / canvas.height ) < 0.01 ) {
 
-						this._ready = true;
-						const backlog = this._backlog;
-						this._backlog = [];
-						backlog.forEach( e => super.dispatchEvent( e ) );
-
-					}
-
-					return super.dispatchEvent( event );
-
-				} else {
-
-					this._backlog.push( event );
-					return false; // Return false to indicate synchronous handling
-
-				}
+				sceneViews.set( scene, { scene: scene, renderer: renderer, camera: camera, viewport: onCanvas ? renderer.getViewport( readViewport ) : null } );
 
 			}
 
-			reset() {
-
-
-				// Clear objects map
-				this.objects.clear();
-
-				// Clear backlog
-				this._backlog = [];
-
-				// Reset ready state
-				this._ready = false;
-
-				// Clear observed arrays
-				observedScenes.length = 0;
-				observedRenderers.length = 0;
-				sceneObjectCountCache.clear();
-				sceneEmptyTicks.clear();
-				removedScenes.clear();
-
-			}
+			pageHook.apply( this, arguments );
 
 		}
 
-		// Create and expose the __THREE_DEVTOOLS__ object
-		const devTools = new DevToolsEventTarget();
-		Object.defineProperty( window, '__THREE_DEVTOOLS__', {
-			value: devTools,
-			configurable: false,
-			enumerable: true,
-			writable: false
-		} );
+		hook.isDevToolsHook = true;
+		scene.onAfterRender = hook;
 
-		// Declare arrays for tracking observed objects
-		const observedScenes = [];
-		const observedRenderers = [];
-		const sceneObjectCountCache = new Map(); // Cache for object counts per scene
-		const sceneEmptyTicks = new Map(); // Consecutive sendState ticks each scene has been empty
-		const removedScenes = new Set(); // Scenes hidden from the panel; tracked so we can resurrect them
-		const SCENE_EMPTY_TICKS_THRESHOLD = 5; // ~5s at 1s polling — hide empty scene from the panel
+	}
 
-		// Shared tree traversal function
-		function traverseObjectTree( rootObject, callback, skipDuplicates = false ) {
+	function getSceneView( object ) {
 
-			const processedUUIDs = skipDuplicates ? new Set() : null;
+		while ( object.parent !== null ) object = object.parent;
 
-			function traverse( object ) {
+		return sceneViews.get( object ) || null;
 
-				if ( ! object || ! object.uuid ) return;
+	}
 
-				// Skip DevTools highlight objects
-				if ( object.name === '__THREE_DEVTOOLS_HIGHLIGHT__' ) return;
+	// --- Data extraction ---
 
-				// Skip if already processed (when duplicate prevention is enabled)
-				if ( processedUUIDs && processedUUIDs.has( object.uuid ) ) return;
-				if ( processedUUIDs ) processedUUIDs.add( object.uuid );
+	function getRendererProperties( renderer ) {
 
-				// Execute callback for this object
-				callback( object );
+		// WebGL reports its context attributes, WebGPU exposes them directly
+		const parameters = renderer.getContextAttributes?.() || { alpha: renderer.alpha, antialias: renderer.samples > 0 };
 
-				// Process children recursively
-				if ( object.children && Array.isArray( object.children ) ) {
-
-					object.children.forEach( child => traverse( child ) );
-
+		return {
+			width: renderer.domElement.clientWidth,
+			height: renderer.domElement.clientHeight,
+			alpha: parameters.alpha || false,
+			antialias: parameters.antialias || false,
+			outputColorSpace: renderer.outputColorSpace,
+			toneMapping: renderer.toneMapping,
+			toneMappingExposure: renderer.toneMappingExposure,
+			shadows: renderer.shadowMap.enabled,
+			autoClear: renderer.autoClear,
+			autoClearColor: renderer.autoClearColor,
+			autoClearDepth: renderer.autoClearDepth,
+			autoClearStencil: renderer.autoClearStencil,
+			localClipping: renderer.localClippingEnabled,
+			info: {
+				render: {
+					frame: renderer.isWebGPURenderer ? renderer.info.frame : renderer.info.render.frame,
+					calls: renderer.isWebGPURenderer ? renderer.info.render.drawCalls : renderer.info.render.calls,
+					triangles: renderer.info.render.triangles,
+					points: renderer.info.render.points,
+					lines: renderer.info.render.lines
+				},
+				memory: {
+					geometries: renderer.info.memory.geometries,
+					textures: renderer.info.memory.textures,
+					// WebGPU counts its programs instead of listing them
+					programs: renderer.info.programs ? renderer.info.programs.length : renderer.info.memory.programs
 				}
-
 			}
+		};
 
-			traverse( rootObject );
+	}
+
+	function getObjectData( object ) {
+
+		const data = {
+			uuid: object.uuid,
+			name: object.name,
+			type: object.isInstancedMesh ? 'InstancedMesh' : object.type, // InstancedMesh doesn't set its own type
+			visible: object.visible,
+			isScene: object.isScene === true,
+			isCamera: object.isCamera === true,
+			isLight: object.isLight === true,
+			isGroup: object.isGroup === true,
+			isMesh: object.isMesh === true,
+			isInstancedMesh: object.isInstancedMesh === true,
+			children: object.children.map( child => child.uuid )
+		};
+
+		if ( object.isMesh ) {
+
+			data.geometryType = object.geometry.type;
+			data.materialType = [].concat( object.material ).map( material => material.type ).join( ', ' );
 
 		}
 
-		// Function to get renderer data
-		function getRendererData( renderer ) {
+		if ( object.isInstancedMesh ) {
 
-			try {
-
-				const data = {
-					uuid: renderer.uuid || generateUUID(),
-					type: renderer.isWebGLRenderer ? 'WebGLRenderer' : 'WebGPURenderer',
-					name: '',
-					properties: getRendererProperties( renderer ),
-					canvasInDOM: renderer.domElement && document.contains( renderer.domElement )
-				};
-				return data;
-
-			} catch ( error ) {
-
-				console.warn( 'DevTools: Error getting renderer data:', error );
-				return null;
-
-			}
+			data.count = object.count;
 
 		}
 
-		// Function to get object hierarchy
-		function getObjectData( obj ) {
+		return data;
 
-			try {
+	}
 
-				// Special case for WebGLRenderer
-				if ( obj.isWebGLRenderer === true || obj.isWebGPURenderer === true ) {
+	function getGeometryData( geometry ) {
 
-					return getRendererData( obj );
+		const properties = {};
 
-				}
+		for ( const [ name, attribute ] of Object.entries( geometry.attributes ) ) {
 
-				// Special case for InstancedMesh
-				const type = obj.isInstancedMesh ? 'InstancedMesh' : obj.type || obj.constructor.name;
-
-				// Get descriptive name for the object
-				let name = obj.name || type || obj.constructor.name;
-				if ( obj.isMesh ) {
-
-					const geoType = obj.geometry ? obj.geometry.type : 'Unknown';
-					const matType = obj.material ?
-						( Array.isArray( obj.material ) ?
-							obj.material.map( m => m.type ).join( ', ' ) :
-							obj.material.type ) :
-						'Unknown';
-					if ( obj.isInstancedMesh ) {
-
-						name = `${name} [${obj.count}]`;
-
-					}
-
-					name = `${name} <span class="object-details">${geoType} ${matType}</span>`;
-
-				}
-
-				const data = {
-					uuid: obj.uuid,
-					name: name,
-					type: type,
-					visible: obj.visible !== undefined ? obj.visible : true,
-					isScene: obj.isScene === true,
-					isObject3D: obj.isObject3D === true,
-					isCamera: obj.isCamera === true,
-					isLight: obj.isLight === true,
-					isMesh: obj.isMesh === true,
-					isInstancedMesh: obj.isInstancedMesh === true,
-					parent: obj.parent ? obj.parent.uuid : null,
-					children: obj.children ? obj.children.map( child => child.uuid ) : []
-				};
-
-				return data;
-
-			} catch ( error ) {
-
-				console.warn( 'DevTools: Error getting object data:', error );
-				return null;
-
-			}
+			properties[ name ] = `${attribute.count} × ${attribute.itemSize}`;
 
 		}
 
-		// Generate a UUID for objects that don't have one
-		function generateUUID() {
+		if ( geometry.index !== null ) properties.index = geometry.index.count;
+		if ( geometry.groups.length > 0 ) properties.groups = geometry.groups.length;
 
-			const array = new Uint8Array( 16 );
-			crypto.getRandomValues( array );
-			array[ 6 ] = ( array[ 6 ] & 0x0f ) | 0x40; // Set version to 4
-			array[ 8 ] = ( array[ 8 ] & 0x3f ) | 0x80; // Set variant to 10
-			return [ ...array ].map( ( b, i ) => ( i === 4 || i === 6 || i === 8 || i === 10 ? '-' : '' ) + b.toString( 16 ).padStart( 2, '0' ) ).join( '' );
+		return { type: geometry.type, name: geometry.name, properties: properties };
+
+	}
+
+	// Identity, shader sources and the blend/stencil/clip/polygon offset plumbing would drown the interesting properties
+	const HIDDEN_MATERIAL_PROPERTIES = /^(is|blend[A-Z]|stencil|clip|polygonOffset)|^(uuid|name|type|version|userData|defines|vertexShader|fragmentShader|depthFunc|shadowSide|colorWrite|precision|dithering|premultipliedAlpha|forceSinglePass|allowOverride)$/;
+
+	function getMaterialData( material ) {
+
+		const properties = {};
+
+		for ( const [ key, value ] of Object.entries( material ) ) {
+
+			// alphaTest, clearcoat, transmission and friends are stored in an underscored field behind a getter
+			const name = key.startsWith( '_' ) && key.slice( 1 ) in material ? key.slice( 1 ) : key;
+
+			if ( HIDDEN_MATERIAL_PROPERTIES.test( name ) ) continue;
+
+			const formatted = formatPropertyValue( value );
+			if ( formatted !== undefined ) properties[ name ] = formatted;
 
 		}
 
-		// Listen for Three.js registration
-		devTools.addEventListener( EVENT_REGISTER, ( event ) => {
+		return { type: material.type, name: material.name, properties: properties };
 
-			dispatchEvent( EVENT_REGISTER, event.detail );
+	}
 
-		} );
+	// What the light classes add to Object3D, listed for the lights that have them
+	const LIGHT_PROPERTIES = [ 'color', 'groundColor', 'intensity', 'distance', 'decay', 'angle', 'penumbra', 'width', 'height', 'depth', 'resolution', 'falloff', 'map', 'iesMap' ];
 
-		// Listen for object observations
-		devTools.addEventListener( EVENT_OBSERVE, ( event ) => {
+	// The shadow settings, and the bounds of the camera the shadow map is rendered from. A spot or point
+	// light sets the field of view itself, so it is left out.
+	const SHADOW_PROPERTIES = [ 'bias', 'normalBias', 'radius', 'blurSamples', 'intensity', 'focus', 'autoUpdate' ];
+	const SHADOW_CAMERA_PROPERTIES = [ 'left', 'right', 'top', 'bottom', 'near', 'far' ];
 
-			const obj = event.detail;
-			if ( ! obj ) {
+	function pickProperties( item, names, prefix = '' ) {
 
-				console.warn( 'DevTools: Received observe event with null/undefined detail' );
-				return;
+		const properties = {};
 
-			}
+		for ( const name of names ) {
 
-			// Generate UUID if needed
-			if ( ! obj.uuid ) {
+			const formatted = name in item ? formatPropertyValue( item[ name ] ) : undefined;
+			if ( formatted !== undefined ) properties[ prefix + name ] = formatted;
 
-				obj.uuid = generateUUID();
+		}
 
-			}
+		return properties;
 
-			// Skip if already registered (essential to prevent loops with batching)
-			if ( devTools.objects.has( obj.uuid ) ) {
+	}
 
-				return;
+	function getLightData( light ) {
 
-			}
+		const properties = pickProperties( light, LIGHT_PROPERTIES );
 
-			if ( obj.isWebGLRenderer || obj.isWebGPURenderer ) {
+		// Where the renderer aims the light, which is the target's position only once its world matrix is updated
+		if ( light.target ) properties.target = light.target.matrixWorld.elements.slice( 12, 15 );
+		if ( light.shadow ) properties.castShadow = light.castShadow;
 
-				const data = getObjectData( obj );
+		const data = { type: light.type, properties: properties };
 
-				if ( data ) {
+		if ( light.castShadow && light.shadow ) {
 
-					data.properties = getRendererProperties( obj );
-					observedRenderers.push( obj );
-					devTools.objects.set( obj.uuid, data );
+			const shadow = light.shadow;
 
-					dispatchEvent( EVENT_RENDERER, data );
+			// A sun fits its cascades to the view, only the depth range is its own
+			const cameraProperties = light.isSunLight ? [ 'near', 'far' ] : SHADOW_CAMERA_PROPERTIES;
 
-				}
-
-			} else if ( obj.isScene ) {
-
-				observedScenes.push( obj );
-
-				const batchObjects = [];
-
-				traverseObjectTree( obj, ( currentObj ) => {
-
-					const objectData = getObjectData( currentObj );
-					if ( objectData ) {
-
-						batchObjects.push( objectData );
-						devTools.objects.set( currentObj.uuid, objectData ); // Update local cache during batch creation
-
-					}
-
-				}, true );
-
-				dispatchEvent( EVENT_SCENE, { sceneUuid: obj.uuid, objects: batchObjects } );
-
-			}
-
-		} );
-
-		// Function to get renderer properties
-		function getRendererProperties( renderer ) {
-
-			const parameters = renderer.getContextAttributes ? renderer.getContextAttributes() : {};
-
-			return {
-				width: renderer.domElement ? renderer.domElement.clientWidth : 0,
-				height: renderer.domElement ? renderer.domElement.clientHeight : 0,
-				alpha: parameters.alpha || false,
-				antialias: parameters.antialias || false,
-				outputColorSpace: renderer.outputColorSpace,
-				toneMapping: renderer.toneMapping,
-				toneMappingExposure: renderer.toneMappingExposure !== undefined ? renderer.toneMappingExposure : 1,
-				shadows: renderer.shadowMap ? renderer.shadowMap.enabled : false,
-				autoClear: renderer.autoClear,
-				autoClearColor: renderer.autoClearColor,
-				autoClearDepth: renderer.autoClearDepth,
-				autoClearStencil: renderer.autoClearStencil,
-				localClipping: renderer.localClippingEnabled,
-				physicallyCorrectLights: renderer.physicallyCorrectLights || false, // Assuming false is default if undefined
-				info: {
-					render: {
-						frame: renderer.info.render.frame,
-						calls: renderer.isWebGPURenderer ? renderer.info.render.drawCalls : renderer.info.render.calls,
-						triangles: renderer.info.render.triangles,
-						points: renderer.info.render.points,
-						lines: renderer.info.render.lines,
-						geometries: renderer.info.render.geometries,
-						sprites: renderer.info.render.sprites
-					},
-					memory: {
-						geometries: renderer.info.memory.geometries,
-						textures: renderer.info.memory.textures,
-						programs: renderer.info.programs ? renderer.info.programs.length : 0,
-						renderLists: renderer.info.memory.renderLists,
-						renderTargets: renderer.info.memory.renderTargets
-					}
-				}
+			data.shadow = {
+				mapSize: `${shadow.mapSize.x} × ${shadow.mapSize.y}`,
+				...pickProperties( shadow, SHADOW_PROPERTIES ),
+				...pickProperties( shadow.camera, cameraProperties, 'camera.' )
 			};
 
 		}
 
+		return data;
 
-		// Function to check if bridge is available
-		function checkBridgeAvailability() {
+	}
 
-			const devToolsValue = window.__THREE_DEVTOOLS__;
+	// Plain values pass through, colors, textures, nodes and math objects are summarized, everything else is skipped
+	function formatPropertyValue( value ) {
 
-			// If we have devtools and we're interactive or complete, trigger ready
-			if ( devToolsValue && ( document.readyState === 'interactive' || document.readyState === 'complete' ) ) {
+		if ( value === null || typeof value === 'function' ) return undefined;
+		if ( typeof value !== 'object' ) return value;
+		if ( value.isColor ) return '#' + value.getHexString();
+		if ( value.isTexture ) return value.name || ( value.image && value.image.width ? `${value.image.width} × ${value.image.height}` : 'Texture' );
+		if ( value.isNode ) return value.type;
 
-				devTools.dispatchEvent( new CustomEvent( EVENT_DEVTOOLS_READY ) );
+		// Vectors, Eulers and matrices. A TSL node answers to any property, so the result has to be checked
+		if ( typeof value.toArray === 'function' ) {
 
-			}
+			const array = value.toArray();
+			if ( Array.isArray( array ) ) return array;
 
 		}
 
-		// Watch for readyState changes
-		document.addEventListener( 'readystatechange', () => {
+	}
 
-			if ( document.readyState === 'loading' ) {
+	// Collect data for an object and all of its descendants
+	function collectSceneObjects( object, objects = [] ) {
 
-				devTools.reset();
+		objects.push( getObjectData( object ) );
 
-			}
+		for ( const child of object.children ) collectSceneObjects( child, objects );
 
-			checkBridgeAvailability();
+		return objects;
 
-		} );
+	}
 
-		// Check if THREE is in the global scope (Old versions)
-		window.addEventListener( 'load', () => {
+	function findObjectInScenes( uuid ) {
 
-			if ( window.THREE && window.THREE.REVISION ) {
+		for ( const scene of observedScenes ) {
 
-				dispatchEvent( EVENT_REGISTER, { revision: window.THREE.REVISION } );
+			const object = scene.getObjectByProperty( 'uuid', uuid );
+			if ( object !== undefined ) return object;
 
-			}
+		}
 
-		} );
+		return null;
 
-		// Watch for page unload to reset state
-		window.addEventListener( 'beforeunload', () => {
+	}
 
-			devTools.reset();
+	// --- Three.js events ---
 
-		} );
+	// Kept, since the panel may open after three.js registered and asks for the state then
+	let revision = null;
 
-		// Listen for messages from the content script
-		window.addEventListener( 'message', function ( event ) {
+	function register( value ) {
 
-			// Only accept messages from the same frame
-			if ( event.source !== window ) return;
+		revision = value;
+		postToPanel( EVENT_REGISTER, { revision: revision } );
 
-			const message = event.data;
-			if ( ! message || message.id !== MESSAGE_ID ) return;
+	}
 
-			// Handle request for initial state from panel
-			if ( message.name === MESSAGE_REQUEST_STATE ) {
+	devTools.addEventListener( EVENT_REGISTER, ( event ) => register( event.detail.revision ) );
 
+	devTools.addEventListener( EVENT_OBSERVE, ( event ) => {
+
+		const object = event.detail;
+
+		if ( object.isWebGLRenderer || object.isWebGPURenderer ) {
+
+			// Renderers have no uuid of their own
+			object.uuid = [ ...crypto.getRandomValues( new Uint8Array( 16 ) ) ].map( b => b.toString( 16 ).padStart( 2, '0' ) ).join( '' );
+
+			observedRenderers.push( object );
+			sendRenderer( object );
+
+		} else if ( object.isScene ) {
+
+			observedScenes.push( object );
+			watchScene( object );
+			sendSceneObjects( object );
+
+		}
+
+	} );
+
+	// Old three.js versions don't register themselves, detect the global instead
+	window.addEventListener( 'load', () => {
+
+		if ( window.THREE && window.THREE.REVISION ) register( window.THREE.REVISION );
+
+	} );
+
+	// --- Panel requests ---
+
+	window.addEventListener( 'message', ( event ) => {
+
+		// Only accept messages from the same frame
+		if ( event.source !== window ) return;
+
+		const message = event.data;
+		if ( ! message || message.id !== MESSAGE_ID ) return;
+
+		switch ( message.name ) {
+
+			case MESSAGE_REQUEST_STATE:
 				sendState();
+				break;
 
-			} else if ( message.name === MESSAGE_REQUEST_OBJECT_DETAILS ) {
+			case MESSAGE_REQUEST_OBJECT_DETAILS:
+				sendObjectDetails( message.uuid, message.preview );
+				break;
 
-				sendObjectDetails( message.uuid );
-
-			} else if ( message.name === MESSAGE_SCROLL_TO_CANVAS ) {
-
+			case MESSAGE_SCROLL_TO_CANVAS:
 				scrollToCanvas( message.uuid );
+				break;
 
-			} else if ( message.name === MESSAGE_HIGHLIGHT_OBJECT ) {
+			case MESSAGE_HIGHLIGHT_OBJECT:
+				devTools.utils.highlight( message.uuid );
+				break;
 
-				devTools.dispatchEvent( new CustomEvent( 'highlight-object', { detail: { uuid: message.uuid } } ) );
+			case MESSAGE_UNHIGHLIGHT_OBJECT:
+				devTools.utils.unhighlight();
+				break;
 
-			} else if ( message.name === MESSAGE_UNHIGHLIGHT_OBJECT ) {
+			case MESSAGE_SELECT_OBJECTS:
+				devTools.utils.select( message.uuids );
+				break;
 
-				devTools.dispatchEvent( new CustomEvent( 'unhighlight-object' ) );
+		}
 
-			}
+	} );
 
-		} );
+	function sendState() {
 
-		function sendState() {
+		if ( revision !== null ) postToPanel( EVENT_REGISTER, { revision: revision } );
 
-			// Send current renderers
-			for ( const observedRenderer of observedRenderers ) {
+		for ( const renderer of observedRenderers ) sendRenderer( renderer );
 
-				const data = getObjectData( observedRenderer );
-				if ( data ) {
+		// Scenes have no dispose(), so one that stays empty for several polls is
+		// hidden from the panel, and brought back if it gains children again
+		for ( const scene of observedScenes ) {
 
-					data.properties = getRendererProperties( observedRenderer );
-					dispatchEvent( EVENT_RENDERER, data );
+			// The page may have replaced the hook since the scene was observed
+			if ( scene.onAfterRender.isDevToolsHook !== true ) watchScene( scene );
 
-				}
+			const ticks = scene.children.length === 0 ? ( sceneEmptyTicks.get( scene.uuid ) || 0 ) + 1 : 0;
 
-			}
+			sceneEmptyTicks.set( scene.uuid, ticks );
 
-			// Send current scenes. Three.js scenes have no dispose() method, so we
-			// approximate disposal: a scene that has stayed empty for several poll
-			// cycles is hidden from the panel; if it gains children again, we
-			// resurrect it (reloadSceneObjects re-dispatches the batch).
-			for ( const scene of observedScenes ) {
+			if ( ticks < SCENE_EMPTY_TICKS_THRESHOLD ) {
 
-				const isEmpty = scene.children.length === 0;
-				const wasRemoved = removedScenes.has( scene.uuid );
+				sendSceneObjects( scene );
 
-				if ( isEmpty ) {
+			} else if ( ticks === SCENE_EMPTY_TICKS_THRESHOLD ) {
 
-					// Already hidden — nothing to send until children come back
-					if ( wasRemoved ) continue;
-
-					const ticks = ( sceneEmptyTicks.get( scene.uuid ) || 0 ) + 1;
-
-					if ( ticks >= SCENE_EMPTY_TICKS_THRESHOLD ) {
-
-						removedScenes.add( scene.uuid );
-						sceneEmptyTicks.delete( scene.uuid );
-						sceneObjectCountCache.delete( scene.uuid );
-						dispatchEvent( EVENT_SCENE_REMOVED, { uuid: scene.uuid } );
-						continue;
-
-					}
-
-					sceneEmptyTicks.set( scene.uuid, ticks );
-
-				} else {
-
-					sceneEmptyTicks.delete( scene.uuid );
-
-					// Repopulated after removal — bring it back into the panel
-					if ( wasRemoved ) removedScenes.delete( scene.uuid );
-
-				}
-
-				reloadSceneObjects( scene );
+				// Dropping the count as well brings the scene back with a full batch
+				sceneObjectCountCache.delete( scene.uuid );
+				postToPanel( EVENT_SCENE_REMOVED, { uuid: scene.uuid } );
 
 			}
 
 		}
 
-		function findObjectInScenes( uuid ) {
+	}
 
-			for ( const scene of observedScenes ) {
+	function sendRenderer( renderer ) {
 
-				// Check if we're looking for the scene itself
-				if ( scene.uuid === uuid ) return scene;
+		try {
 
-				const found = scene.getObjectByProperty( 'uuid', uuid );
-				if ( found ) return found;
-
-			}
-
-			return null;
-
-		}
-
-		// Expose utilities for highlight.js in a clean namespace
-		devTools.utils = {
-			findObjectInScenes,
-			generateUUID
-		};
-
-		// Expose renderers array for highlight.js
-		devTools.renderers = observedRenderers;
-
-		function createHighlightOverlay( targetElement ) {
-
-			const overlay = document.createElement( 'div' );
-			overlay.style.cssText = `
-				position: absolute;
-				top: 0;
-				left: 0;
-				width: 100%;
-				height: 100%;
-				background-color: rgba(0, 122, 204, 0.3);
-				pointer-events: none;
-				z-index: 999999;
-			`;
-
-			// Position the overlay relative to the target
-			const parent = targetElement.parentElement || document.body;
-
-			if ( getComputedStyle( parent ).position === 'static' ) {
-
-				parent.style.position = 'relative';
-
-			}
-
-			parent.appendChild( overlay );
-
-			// Auto-remove after duration
-			setTimeout( () => {
-
-				if ( overlay.parentElement ) {
-
-					overlay.parentElement.removeChild( overlay );
-
-				}
-
-			}, HIGHLIGHT_OVERLAY_DURATION );
-
-		}
-
-		function sendObjectDetails( uuid ) {
-
-			const object = findObjectInScenes( uuid );
-
-			if ( object ) {
-
-				const details = {
-					uuid: object.uuid,
-					type: object.type,
-					name: object.name,
-					position: {
-						x: object.position.x,
-						y: object.position.y,
-						z: object.position.z
-					},
-					rotation: {
-						x: object.rotation.x,
-						y: object.rotation.y,
-						z: object.rotation.z
-					},
-					scale: {
-						x: object.scale.x,
-						y: object.scale.y,
-						z: object.scale.z
-					}
-				};
-
-				dispatchEvent( EVENT_OBJECT_DETAILS, details );
-
-			}
-
-		}
-
-		function scrollToCanvas( uuid ) {
-
-			let renderer = null;
-
-			if ( uuid ) {
-
-				// Find the renderer with the given UUID
-				renderer = observedRenderers.find( r => r.uuid === uuid );
-
-			} else {
-
-				// If no UUID provided, find the first available renderer whose canvas is in the DOM
-				renderer = observedRenderers.find( r => r.domElement && document.body.contains( r.domElement ) );
-
-			}
-
-			if ( renderer ) {
-
-				// Scroll the canvas element into view
-				renderer.domElement.scrollIntoView( {
-					behavior: 'smooth',
-					block: 'center',
-					inline: 'center'
-				} );
-
-				// Add a brief blue overlay flash effect
-				createHighlightOverlay( renderer.domElement );
-
-			}
-
-		}
-
-		function dispatchEvent( name, detail ) {
-
-			try {
-
-				window.postMessage( {
-					id: MESSAGE_ID,
-					name: name,
-					detail: detail
-				}, '*' );
-
-			} catch ( error ) {
-
-				// If we get an "Extension context invalidated" error, stop all monitoring
-				if ( error.message.includes( 'Extension context invalidated' ) ) {
-
-					console.log( 'DevTools: Extension context invalidated, stopping monitoring' );
-					devTools.reset();
-					return;
-
-				}
-
-				console.warn( 'DevTools: Error dispatching event:', error );
-
-			}
-
-		}
-
-		// Function to manually reload scene objects
-		function reloadSceneObjects( scene ) {
-
-			const batchObjects = [];
-
-			traverseObjectTree( scene, ( object ) => {
-
-				const objectData = getObjectData( object );
-				if ( objectData ) {
-
-					batchObjects.push( objectData ); // Add to batch
-					// Update or add to local cache immediately
-					devTools.objects.set( object.uuid, objectData );
-
-				}
-
+			postToPanel( EVENT_RENDERER, {
+				uuid: renderer.uuid,
+				type: renderer.isWebGLRenderer ? 'WebGLRenderer' : 'WebGPURenderer',
+				properties: getRendererProperties( renderer ),
+				canvasInDOM: document.contains( renderer.domElement )
 			} );
 
-			// --- Caching Logic ---
-			const currentObjectCount = batchObjects.length;
-			const previousObjectCount = sceneObjectCountCache.get( scene.uuid );
+		} catch ( error ) {
 
-			if ( currentObjectCount !== previousObjectCount ) {
-
-				// Dispatch the batch update for the panel
-				dispatchEvent( EVENT_SCENE, { sceneUuid: scene.uuid, objects: batchObjects } );
-				// Update the cache
-				sceneObjectCountCache.set( scene.uuid, currentObjectCount );
-
-			}
+			console.warn( 'DevTools: Error getting renderer data:', error );
 
 		}
+
+	}
+
+	// Send a scene batch when its object count changed (a hidden scene has no count, so it comes back).
+	// Counting is cheap, so the data of every object is only collected for a batch.
+	function sendSceneObjects( scene ) {
+
+		let count = 0;
+		scene.traverse( () => count ++ );
+
+		if ( count !== sceneObjectCountCache.get( scene.uuid ) ) {
+
+			sceneObjectCountCache.set( scene.uuid, count );
+			postToPanel( EVENT_SCENE, { sceneUuid: scene.uuid, objects: collectSceneObjects( scene ) } );
+
+		}
+
+	}
+
+	function sendObjectDetails( uuid, preview ) {
+
+		const object = findObjectInScenes( uuid );
+		if ( object === null ) return;
+
+		const details = {
+			uuid: uuid,
+			position: object.position.toArray(),
+			rotation: object.rotation.toArray(),
+			scale: object.scale.toArray(),
+			geometry: object.geometry ? getGeometryData( object.geometry ) : null,
+			materials: object.material ? [].concat( object.material ).map( getMaterialData ) : [],
+			light: object.isLight ? getLightData( object ) : null
+		};
+
+		// Drawing a preview takes the page time for large geometries, so it comes along only when asked for
+		if ( preview ) details.preview = devTools.utils.renderPreview( object );
+
+		postToPanel( EVENT_OBJECT_DETAILS, details );
+
+	}
+
+	function scrollToCanvas( uuid ) {
+
+		// Without a uuid, pick the first renderer whose canvas is in the DOM
+		const renderer = uuid ?
+			observedRenderers.find( candidate => candidate.uuid === uuid ) :
+			observedRenderers.find( candidate => document.contains( candidate.domElement ) );
+
+		if ( renderer === undefined ) return;
+
+		renderer.domElement.scrollIntoView( { behavior: 'smooth', block: 'center', inline: 'center' } );
+		flashCanvas( renderer.domElement );
+
+	}
+
+	// Brief blue overlay on top of the canvas
+	function flashCanvas( canvas ) {
+
+		const bounds = canvas.getBoundingClientRect();
+
+		const overlay = document.createElement( 'div' );
+		overlay.style.cssText = `position: absolute; top: ${bounds.top + window.scrollY}px; left: ${bounds.left + window.scrollX}px; width: ${bounds.width}px; height: ${bounds.height}px; background: rgba(0, 122, 204, 0.3); pointer-events: none; z-index: 999999;`;
+
+		// On <html>, so a positioned <body> cannot offset the document coordinates above
+		document.documentElement.appendChild( overlay );
+
+		setTimeout( () => overlay.remove(), CANVAS_FLASH_DURATION );
 
 	}
 

@@ -17,12 +17,9 @@ const TAU = Math.PI * 2;
 const UP = /*@__PURE__*/ new Vector3( 0, 1, 0 );
 const _axis = /*@__PURE__*/ new Vector3();
 
-// reusable scratch for one tube's ring vertices ( grows to the largest tube seen )
-let _ring = new Float32Array( 0 );
-
 /**
  * Grows a procedural tree skeleton — trunk, branches and twigs, each swept as a tapered
- * tube — and bakes it into one non-indexed {@link BufferGeometry} (position and normal
+ * tube — and bakes it into one indexed {@link BufferGeometry} (position and normal
  * only), ready to instance into a forest. It produces *branches only*; add foliage as a
  * separate layer.
  *
@@ -58,26 +55,10 @@ class TreeGenerator {
 		const p = Object.assign( {}, TreeGenerator.defaults, this.parameters );
 		const random = createRandom( p.seed );
 
-		// grow the skeleton into a flat list of tubes, then size and fill the geometry in
-		// one pass — no per-vertex objects, no array growth
-
 		const tubes = [];
 		growBranch( tubes, new Vector3(), UP, p.trunkLength, p.trunkRadius, 0, p, random );
 
-		let vertexCount = 0;
-		for ( const tube of tubes ) vertexCount += ( tube.rings.length - 1 ) * tube.radial * 6;
-
-		const positions = new Float32Array( vertexCount * 3 );
-		const normals = new Float32Array( vertexCount * 3 );
-
-		let offset = 0;
-		for ( const tube of tubes ) offset = emitTube( positions, normals, offset, tube.rings, tube.radial );
-
-		const geometry = new BufferGeometry();
-		geometry.setAttribute( 'position', new BufferAttribute( positions, 3 ) );
-		geometry.setAttribute( 'normal', new BufferAttribute( normals, 3 ) );
-		geometry.computeBoundingSphere();
-
+		const geometry = createGeometry( tubes );
 		const mesh = new Mesh( geometry, this.material || createTreeMaterial() );
 		mesh.name = 'Tree';
 
@@ -94,6 +75,8 @@ TreeGenerator.defaults = {
 	branchAngle: [ 38, 50, 58 ], // degrees a child tilts off its parent axis, per level
 	angleVariance: 14, // degrees of random jitter on the branch angle, breaks fractal regularity
 	lengthRatio: 0.62, // child length / parent length
+	lengthVariance: 0, // fractional variation in child length
+	branchLengthFalloff: 0, // shorten children toward the tip of their parent
 	trunkLength: 9, // trunk length in world units; sets the tree's height
 	trunkRadius: 0.42, // base radius of the trunk
 	taper: 0.55, // a branch thins to ( 1 - taper ) of its base radius along its own length
@@ -162,7 +145,6 @@ function growBranch( tubes, base, dir, length, baseRadius, level, p, random ) {
 			pos: pos.clone(),
 			tangent: tangent.clone(),
 			normal: normal.clone(),
-			binormal: new Vector3().crossVectors( tangent, normal ),
 			radius
 		} );
 
@@ -212,7 +194,10 @@ function growBranch( tubes, base, dir, length, baseRadius, level, p, random ) {
 		// the pipe-model drop, but never fatter than the wood it leaves nor below the floor
 		const childBase = Math.max( p.minRadius, Math.min( baseRadius * pipeDrop, ring.radius ) );
 
-		growBranch( tubes, ring.pos, childDir, length * p.lengthRatio, childBase, level + 1, p, random );
+		let childLength = length * p.lengthRatio * ( 1 - p.branchLengthFalloff * t );
+		if ( p.lengthVariance > 0 ) childLength *= 1 + ( random() * 2 - 1 ) * p.lengthVariance;
+
+		growBranch( tubes, ring.pos, childDir, childLength, childBase, level + 1, p, random );
 
 	}
 
@@ -244,7 +229,7 @@ function ringAt( rings, t ) {
 	const i = Math.floor( f );
 	const frac = f - i;
 	const a = rings[ i ];
-	const b = rings[ Math.min( i + 1, rings.length - 1 ) ];
+	const b = rings[ i + 1 ];
 
 	return {
 		pos: a.pos.clone().lerp( b.pos, frac ),
@@ -257,79 +242,87 @@ function ringAt( rings, t ) {
 
 // --- geometry ------------------------------------------------------------
 
-// Sweeps a tube through the rings: each ring is a loop of `radial` vertices in its
-// ( normal, binormal ) plane, the outward radial direction being the vertex normal.
-// Ring vertices are computed once into a reused scratch, then stitched straight into the
-// preallocated geometry arrays — no per-vertex objects.
-function emitTube( positions, normals, offset, rings, radial ) {
+// Write each ring vertex once, then join adjacent rings with indexed triangles.
+function createGeometry( tubes ) {
 
-	const stride = ( radial + 1 ) * 6; // one ring loop: ( position, normal ) per vertex
-	const needed = rings.length * stride;
-	if ( _ring.length < needed ) _ring = new Float32Array( needed );
+	let vertexCount = 0;
+	let indexCount = 0;
 
-	const ring = _ring;
+	for ( const { rings, radial } of tubes ) {
 
-	for ( let r = 0; r < rings.length; r ++ ) {
-
-		const { pos, normal, binormal, radius } = rings[ r ];
-		let o = r * stride;
-
-		for ( let j = 0; j <= radial; j ++ ) {
-
-			const a = j / radial * TAU;
-			const c = Math.cos( a );
-			const s = Math.sin( a );
-			const nx = c * normal.x + s * binormal.x;
-			const ny = c * normal.y + s * binormal.y;
-			const nz = c * normal.z + s * binormal.z;
-
-			ring[ o ++ ] = pos.x + nx * radius;
-			ring[ o ++ ] = pos.y + ny * radius;
-			ring[ o ++ ] = pos.z + nz * radius;
-			ring[ o ++ ] = nx;
-			ring[ o ++ ] = ny;
-			ring[ o ++ ] = nz;
-
-		}
+		vertexCount += rings.length * radial;
+		indexCount += ( rings.length - 1 ) * radial * 6;
 
 	}
 
-	// stitch consecutive rings into quads ( two triangles ), wound so normals face out
+	const positions = new Float32Array( vertexCount * 3 );
+	const normals = new Float32Array( vertexCount * 3 );
+	const indices = new ( vertexCount > 65535 ? Uint32Array : Uint16Array )( indexCount );
+	const binormal = new Vector3();
 
-	for ( let r = 0; r < rings.length - 1; r ++ ) {
+	let vertexOffset = 0;
+	let indexOffset = 0;
 
-		const a = r * stride;
-		const b = ( r + 1 ) * stride;
+	for ( const { rings, radial } of tubes ) {
 
-		for ( let j = 0; j < radial; j ++ ) {
+		let offset = vertexOffset * 3;
 
-			const aL = a + j * 6, aR = a + ( j + 1 ) * 6;
-			const bL = b + j * 6, bR = b + ( j + 1 ) * 6;
+		for ( const { pos, tangent, normal, radius } of rings ) {
 
-			offset = copyVertex( positions, normals, offset, ring, aL );
-			offset = copyVertex( positions, normals, offset, ring, bR );
-			offset = copyVertex( positions, normals, offset, ring, bL );
+			binormal.crossVectors( tangent, normal );
 
-			offset = copyVertex( positions, normals, offset, ring, aL );
-			offset = copyVertex( positions, normals, offset, ring, aR );
-			offset = copyVertex( positions, normals, offset, ring, bR );
+			for ( let j = 0; j < radial; j ++ ) {
+
+				const angle = j / radial * TAU;
+				const c = Math.cos( angle );
+				const s = Math.sin( angle );
+				const nx = c * normal.x + s * binormal.x;
+				const ny = c * normal.y + s * binormal.y;
+				const nz = c * normal.z + s * binormal.z;
+
+				positions[ offset ] = pos.x + nx * radius;
+				positions[ offset + 1 ] = pos.y + ny * radius;
+				positions[ offset + 2 ] = pos.z + nz * radius;
+				normals[ offset ] = nx;
+				normals[ offset + 1 ] = ny;
+				normals[ offset + 2 ] = nz;
+				offset += 3;
+
+			}
 
 		}
 
+		for ( let r = 0; r < rings.length - 1; r ++ ) {
+
+			const a = vertexOffset + r * radial;
+			const b = a + radial;
+
+			for ( let j = 0; j < radial; j ++ ) {
+
+				const next = ( j + 1 ) % radial; // wrap the seam back to the first vertex
+
+				indices[ indexOffset ++ ] = a + j;
+				indices[ indexOffset ++ ] = b + next;
+				indices[ indexOffset ++ ] = b + j;
+				indices[ indexOffset ++ ] = a + j;
+				indices[ indexOffset ++ ] = a + next;
+				indices[ indexOffset ++ ] = b + next;
+
+			}
+
+		}
+
+		vertexOffset += rings.length * radial;
+
 	}
 
-	return offset;
+	const geometry = new BufferGeometry();
+	geometry.setAttribute( 'position', new BufferAttribute( positions, 3 ) );
+	geometry.setAttribute( 'normal', new BufferAttribute( normals, 3 ) );
+	geometry.setIndex( new BufferAttribute( indices, 1 ) );
+	geometry.computeBoundingSphere();
 
-}
-
-// copies one ( position, normal ) vertex from the ring scratch into the geometry arrays
-function copyVertex( positions, normals, offset, ring, i ) {
-
-	const o = offset * 3;
-	positions[ o ] = ring[ i ]; positions[ o + 1 ] = ring[ i + 1 ]; positions[ o + 2 ] = ring[ i + 2 ];
-	normals[ o ] = ring[ i + 3 ]; normals[ o + 1 ] = ring[ i + 4 ]; normals[ o + 2 ] = ring[ i + 5 ];
-
-	return offset + 1;
+	return geometry;
 
 }
 
@@ -356,7 +349,7 @@ function createRandom( seed ) {
  * A simple bark material for a {@link TreeGenerator} mesh: a low-saturation brown with a
  * faint, vertically-stretched grain, so trunks read near-black against bright fog.
  *
- * @param {Object} [parameters] - `barkColor` ( a hex, THREE.Color or TSL node ).
+ * @param {Object} [parameters] - `barkColor` ( a hex, THREE.Color or TSL node ) and `barkScale` ( a THREE.Vector3 ).
  * @return {MeshStandardNodeMaterial}
  */
 function createTreeMaterial( parameters = {} ) {
@@ -365,7 +358,8 @@ function createTreeMaterial( parameters = {} ) {
 	const barkColor = c === undefined ? color( 0x4b3a2b ) : ( c.isColor || typeof c === 'number' ? color( c ) : c );
 
 	const material = new MeshStandardNodeMaterial();
-	const grain = mx_fractal_noise_float( positionLocal.mul( vec3( 2.5, 0.4, 2.5 ) ), 3 ).mul( 0.18 );
+	const barkScale = parameters.barkScale ? vec3( parameters.barkScale ) : vec3( 2.5, 0.4, 2.5 );
+	const grain = mx_fractal_noise_float( positionLocal.mul( barkScale ), 3 ).mul( 0.18 );
 	material.colorNode = barkColor.mul( grain.add( 0.9 ) );
 	material.roughnessNode = float( 0.95 );
 	material.metalnessNode = float( 0 );

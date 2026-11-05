@@ -1,20 +1,23 @@
 import { spawn } from 'child_process';
+import { createRequire } from 'module';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const rootDir = path.resolve( __dirname, '../..' );
 
+const rollupBin = createRequire( import.meta.url ).resolve( 'rollup/dist/bin/rollup' );
+
 // Start rollup in watch mode
-const rollup = spawn( 'npx', [
-	'rollup',
+const rollup = spawn( process.execPath, [
+	rollupBin,
 	'-c', 'utils/build/rollup.config.js',
 	'-w',
 	'-m', 'inline'
 ], {
 	cwd: rootDir,
 	stdio: [ 'ignore', 'pipe', 'pipe' ],
-	shell: true
+	shell: false
 } );
 
 // Start server

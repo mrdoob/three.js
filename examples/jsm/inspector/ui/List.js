@@ -11,9 +11,6 @@ export class List {
 		this.id = `list-${Math.random().toString( 36 ).slice( 2, 11 )}`;
 		this.domElement.dataset.listId = this.id;
 
-		this.gridStyleElement = document.createElement( 'style' );
-		this.domElement.appendChild( this.gridStyleElement );
-
 		const headerRow = document.createElement( 'div' );
 		headerRow.className = 'list-header';
 		this.headers.forEach( headerText => {
@@ -30,12 +27,7 @@ export class List {
 
 	setGridStyle( gridTemplate ) {
 
-		this.gridStyleElement.textContent = `
-[data-list-id="${this.id}"] > .list-header,
-[data-list-id="${this.id}"] .list-item-row {
-	grid-template-columns: ${gridTemplate};
-}
-`;
+		this.domElement.style.setProperty( '--list-grid-template', gridTemplate );
 
 	}
 

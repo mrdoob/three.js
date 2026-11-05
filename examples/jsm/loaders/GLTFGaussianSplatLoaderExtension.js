@@ -2,7 +2,7 @@ import {
 	Group
 } from 'three';
 
-import { GaussianSplatMesh } from '../objects/GaussianSplatMesh.js';
+import { GaussianSplat } from '../objects/GaussianSplat.js';
 import { SH_BAND_WORDS, createGaussianSplatGeometry, createPackedSphericalHarmonicsBand, writeColorBytesFromSH0, writeCovariance } from '../utils/GaussianSplatUtils.js';
 
 const EXTENSION_NAME = 'KHR_gaussian_splatting';
@@ -14,7 +14,7 @@ const ATTRIBUTES = {
 /**
  * A glTF loader plugin for `KHR_gaussian_splatting`.
  *
- * This plugin must be registered explicitly because {@link GaussianSplatMesh}
+ * This plugin must be registered explicitly because {@link GaussianSplat}
  * requires {@link WebGPURenderer}.
  *
  * ```js
@@ -46,7 +46,7 @@ class GLTFGaussianSplatLoaderExtension {
 	 * Loads a glTF mesh containing gaussian splat primitives.
 	 *
 	 * @param {number} meshIndex - The mesh index.
-	 * @return {?Promise<Group|GaussianSplatMesh>} The loaded mesh or `null` when the mesh does not use this extension.
+	 * @return {?Promise<Group|GaussianSplat>} The loaded mesh or `null` when the mesh does not use this extension.
 	 */
 	loadMesh( meshIndex ) {
 
@@ -77,7 +77,7 @@ class GLTFGaussianSplatLoaderExtension {
 
 				}
 
-				const mesh = createGaussianSplatMesh( geometry, primitive );
+				const mesh = createGaussianSplat( geometry, primitive );
 				mesh.name = parser.createUniqueName( meshDef.name || ( 'mesh_' + meshIndex ) );
 
 				assignExtrasToUserData( mesh, meshDef );
@@ -117,7 +117,7 @@ function isGaussianSplatPrimitive( primitiveDef ) {
 
 }
 
-function createGaussianSplatMesh( geometry, primitiveDef ) {
+function createGaussianSplat( geometry, primitiveDef ) {
 
 	const extensionDef = primitiveDef.extensions[ EXTENSION_NAME ];
 
@@ -194,7 +194,7 @@ function createGaussianSplatMesh( geometry, primitiveDef ) {
 
 	}
 
-	const mesh = new GaussianSplatMesh( createGaussianSplatGeometry( centers, covariances, colors, sphericalHarmonics ) );
+	const mesh = new GaussianSplat( createGaussianSplatGeometry( centers, covariances, colors, sphericalHarmonics ) );
 
 	mesh.userData.gltfExtensions = mesh.userData.gltfExtensions || {};
 	mesh.userData.gltfExtensions[ EXTENSION_NAME ] = Object.assign( {}, extensionDef );

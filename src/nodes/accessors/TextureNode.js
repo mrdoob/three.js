@@ -6,8 +6,7 @@ import { expression } from '../code/ExpressionNode.js';
 import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
 import { nodeProxy, vec3, nodeObject, int, Fn } from '../tsl/TSLBase.js';
 import { step } from '../math/MathNode.js';
-import { NodeUpdateType } from '../core/constants.js';
-import { getTextureType } from '../core/NodeUtils.js';
+import { getTextureType, hash } from '../core/NodeUtils.js';
 
 import { Compatibility, GreaterCompare, GreaterEqualCompare, IntType, LessCompare, LessEqualCompare, NearestFilter, UnsignedIntType } from '../../constants.js';
 
@@ -137,22 +136,21 @@ class TextureNode extends UniformNode {
 		this.updateMatrix = false;
 
 		/**
-		 * By default the `update()` method is not executed. Depending on
-		 * whether a uv transformation matrix and/or flipY is applied, `update()`
-		 * is executed per object.
-		 *
-		 * @type {string}
-		 * @default 'none'
-		 */
-		this.updateType = NodeUpdateType.NONE;
-
-		/**
 		 * The reference node.
 		 *
 		 * @type {?Node}
 		 * @default null
 		 */
 		this.referenceNode = null;
+
+		/**
+		 * The mergeable value is stored in a private property.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default true
+		 */
+		this._mergeable = true;
 
 		/**
 		 * The texture value is stored in a private property.
@@ -193,6 +191,32 @@ class TextureNode extends UniformNode {
 
 	}
 
+	set mergeable( value ) {
+
+		if ( this.referenceNode ) {
+
+			this.referenceNode.mergeable = value;
+
+		} else {
+
+			this._mergeable = value;
+
+		}
+
+	}
+
+	/**
+	 * Whether the uniform may be merged with other uniforms at compile-time.
+	 *
+	 * @type {boolean}
+	 * @default true
+	 */
+	get mergeable() {
+
+		return this.referenceNode ? this.referenceNode.mergeable : this._mergeable;
+
+	}
+
 	set value( value ) {
 
 		if ( this.referenceNode ) {
@@ -219,14 +243,39 @@ class TextureNode extends UniformNode {
 	}
 
 	/**
-	 * Overwritten since the uniform hash is defined by the texture's UUID.
+	 * Overwritten since the uniform hash is defined by the texture's UUID - if mergeable - and the hash of its reference node otherwise.
 	 *
 	 * @param {NodeBuilder} builder - The current node builder.
 	 * @return {string} The uniform hash.
 	 */
-	getUniformHash( /*builder*/ ) {
+	getUniformHash( builder ) {
+
+		if ( this.referenceNode && ! this.referenceNode.mergeable ) {
+
+			return this.referenceNode.getHash( builder );
+
+		}
+
+		if ( ! this._mergeable ) {
+
+			return this.getHash( builder );
+
+		}
 
 		return this.value.uuid;
+
+	}
+
+	/**
+	 * Overwritten since the texture's type and filters influence the generated shader code.
+	 *
+	 * @return {number} The custom cache key.
+	 */
+	customCacheKey() {
+
+		const { type, minFilter, magFilter } = this.value;
+
+		return hash( this.id, type, minFilter, magFilter );
 
 	}
 
@@ -291,9 +340,48 @@ class TextureNode extends UniformNode {
 	 */
 	getTransformedUV( uvNode ) {
 
-		if ( this._matrixUniform === null ) this._matrixUniform = uniform( this.value.matrix );
+		return this._getMatrixUniform().mul( vec3( uvNode, 1 ) ).xy;
 
-		return this._matrixUniform.mul( vec3( uvNode, 1 ) ).xy;
+	}
+
+	/**
+	 * Transforms the given uv gradient with the linear part of the texture matrix.
+	 *
+	 * @private
+	 * @param {Node<vec2>} gradientNode - The uv gradient.
+	 * @return {Node<vec2>} The transformed gradient.
+	 */
+	_getTransformedGradient( gradientNode ) {
+
+		return this._getMatrixUniform().mul( vec3( gradientNode, 0 ) ).xy;
+
+	}
+
+	/**
+	 * Returns the uniform of the texture matrix shared by all nodes of the same base texture node.
+	 *
+	 * @private
+	 * @return {UniformNode<mat3>} The texture matrix uniform.
+	 */
+	_getMatrixUniform() {
+
+		const baseNode = this.getBase();
+
+		if ( baseNode._matrixUniform === null ) {
+
+			baseNode._matrixUniform = uniform( baseNode.value.matrix ).onObjectUpdate( () => {
+
+				const texture = baseNode.value;
+
+				if ( texture.matrixAutoUpdate === true ) texture.updateMatrix();
+
+				return texture.matrix;
+
+			} );
+
+		}
+
+		return baseNode._matrixUniform;
 
 	}
 
@@ -323,17 +411,29 @@ class TextureNode extends UniformNode {
 
 		if ( builder.isFlipY() ) {
 
-			if ( this._flipYUniform === null ) this._flipYUniform = uniform( false );
+			const baseNode = this.getBase();
+
+			if ( baseNode._flipYUniform === null ) {
+
+				baseNode._flipYUniform = uniform( false ).onObjectUpdate( () => {
+
+					const texture = baseNode.value;
+
+					return ( texture.image instanceof ImageBitmap && texture.flipY === true ) || texture.isRenderTargetTexture === true || texture.isFramebufferTexture === true || texture.isDepthTexture === true;
+
+				} );
+
+			}
 
 			uvNode = uvNode.toVar();
 
 			if ( this.sampler ) {
 
-				uvNode = this._flipYUniform.select( uvNode.flipY(), uvNode );
+				uvNode = baseNode._flipYUniform.select( uvNode.flipY(), uvNode );
 
 			} else {
 
-				uvNode = this._flipYUniform.select( uvNode.setY( int( textureSize( this, this.levelNode ).y ).sub( uvNode.y ).sub( 1 ) ), uvNode );
+				uvNode = baseNode._flipYUniform.select( uvNode.setY( int( textureSize( this, this.levelNode ).y ).sub( int( uvNode.y ) ).sub( 1 ) ), uvNode );
 
 			}
 
@@ -385,12 +485,6 @@ class TextureNode extends UniformNode {
 
 			uvNode = this.setupUV( builder, uvNode );
 
-			//
-
-			this.updateType = ( this._matrixUniform !== null || this._flipYUniform !== null ) ? NodeUpdateType.OBJECT : NodeUpdateType.NONE;
-
-			//
-
 			return uvNode;
 
 		} )();
@@ -436,12 +530,28 @@ class TextureNode extends UniformNode {
 
 		}
 
+		// the context can provide analytic gradients of the default uv, e.g. if the uv is reconstructed per fragment
+
+		let gradNode = this.gradNode;
+
+		if ( gradNode === null && this.uvNode === null && levelNode === null && this.biasNode === null && this.sampler === true && builder.context.getTextureGradient ) {
+
+			const gradient = builder.context.getTextureGradient( this, builder );
+
+			if ( gradient ) {
+
+				gradNode = this.updateMatrix === true ? gradient.map( ( node ) => this._getTransformedGradient( node ) ) : gradient;
+
+			}
+
+		}
+
 		properties.uvNode = uvNode;
 		properties.levelNode = levelNode;
 		properties.biasNode = this.biasNode;
 		properties.compareNode = compareNode;
 		properties.compareStepNode = compareStepNode;
-		properties.gradNode = this.gradNode;
+		properties.gradNode = gradNode;
 		properties.gatherNode = this.gatherNode;
 		properties.depthNode = this.depthNode;
 		properties.offsetNode = this.offsetNode;
@@ -552,19 +662,15 @@ class TextureNode extends UniformNode {
 		const properties = builder.getNodeProperties( this );
 		const textureProperty = super.generate( builder, 'property' );
 
+		if ( output === 'samplerComparison' || properties.compareNode !== null ) {
+
+			// make sure the texture node creates a binding with a comparison sampler if necessary
+
+			this.getSharedNode( builder )._samplerComparison = true;
+
+		}
+
 		if ( /^sampler/.test( output ) ) {
-
-			if ( output === 'samplerComparison' ) {
-
-				this._samplerComparison = true;
-
-				// texture nodes with the same texture share a single uniform so it's
-				// important to set the flag on the node the binding refers to as well
-
-				const sharedNode = this.getSharedNode( builder );
-				sharedNode._samplerComparison = true;
-
-			}
 
 			return textureProperty + '_sampler';
 
@@ -593,7 +699,9 @@ class TextureNode extends UniformNode {
 				const gradSnippet = gradNode ? [ gradNode[ 0 ].build( builder, 'vec2' ), gradNode[ 1 ].build( builder, 'vec2' ) ] : null;
 				const gatherSnippet = gatherNode ? gatherNode.build( builder, 'int' ) : null;
 				const offsetSnippet = offsetNode ? this.generateOffset( builder, offsetNode ) : null;
-				const flipYSnippet = this._flipYUniform ? this._flipYUniform.build( builder, 'bool' ) : null;
+
+				const flipYUniform = this.getBase()._flipYUniform;
+				const flipYSnippet = flipYUniform ? flipYUniform.build( builder, 'bool' ) : null;
 
 				let finalDepthSnippet = depthSnippet;
 
@@ -699,7 +807,7 @@ class TextureNode extends UniformNode {
 		textureNode.uvNode = nodeObject( uvNode );
 		textureNode.referenceNode = this.getBase();
 
-		return nodeObject( textureNode );
+		return textureNode;
 
 	}
 
@@ -737,7 +845,7 @@ class TextureNode extends UniformNode {
 
 		}
 
-		return nodeObject( textureNode );
+		return textureNode;
 
 	}
 
@@ -753,7 +861,7 @@ class TextureNode extends UniformNode {
 		textureNode.levelNode = nodeObject( levelNode );
 		textureNode.referenceNode = this.getBase();
 
-		return nodeObject( textureNode );
+		return textureNode;
 
 	}
 
@@ -781,7 +889,7 @@ class TextureNode extends UniformNode {
 		textureNode.biasNode = nodeObject( biasNode );
 		textureNode.referenceNode = this.getBase();
 
-		return nodeObject( textureNode );
+		return textureNode;
 
 	}
 
@@ -807,7 +915,7 @@ class TextureNode extends UniformNode {
 		textureNode.compareNode = nodeObject( compareNode );
 		textureNode.referenceNode = this.getBase();
 
-		return nodeObject( textureNode );
+		return textureNode;
 
 	}
 
@@ -824,7 +932,7 @@ class TextureNode extends UniformNode {
 		textureNode.gradNode = [ nodeObject( gradNodeX ), nodeObject( gradNodeY ) ];
 		textureNode.referenceNode = this.getBase();
 
-		return nodeObject( textureNode );
+		return textureNode;
 
 	}
 
@@ -840,7 +948,7 @@ class TextureNode extends UniformNode {
 		textureNode.gatherNode = nodeObject( gatherNode );
 		textureNode.referenceNode = this.getBase();
 
-		return nodeObject( textureNode );
+		return textureNode;
 
 	}
 
@@ -868,7 +976,7 @@ class TextureNode extends UniformNode {
 		textureNode.depthNode = nodeObject( depthNode );
 		textureNode.referenceNode = this.getBase();
 
-		return nodeObject( textureNode );
+		return textureNode;
 
 	}
 
@@ -884,7 +992,7 @@ class TextureNode extends UniformNode {
 		textureNode.offsetNode = nodeObject( offsetNode );
 		textureNode.referenceNode = this.getBase();
 
-		return nodeObject( textureNode );
+		return textureNode;
 
 	}
 
@@ -897,7 +1005,6 @@ class TextureNode extends UniformNode {
 		data.value = this.value.toJSON( data.meta ).uuid;
 		data.sampler = this.sampler;
 		data.updateMatrix = this.updateMatrix;
-		data.updateType = this.updateType;
 
 	}
 
@@ -908,35 +1015,6 @@ class TextureNode extends UniformNode {
 		this.value = data.meta.textures[ data.value ];
 		this.sampler = data.sampler;
 		this.updateMatrix = data.updateMatrix;
-		this.updateType = data.updateType;
-
-	}
-
-	/**
-	 * The update is used to implement the update of the uv transformation matrix.
-	 */
-	update() {
-
-		const texture = this.value;
-		const matrixUniform = this._matrixUniform;
-
-		if ( matrixUniform !== null ) matrixUniform.value = texture.matrix;
-
-		if ( texture.matrixAutoUpdate === true ) {
-
-			texture.updateMatrix();
-
-		}
-
-		//
-
-		const flipYUniform = this._flipYUniform;
-
-		if ( flipYUniform !== null ) {
-
-			flipYUniform.value = ( ( texture.image instanceof ImageBitmap && texture.flipY === true ) || texture.isRenderTargetTexture === true || texture.isFramebufferTexture === true || texture.isDepthTexture === true );
-
-		}
 
 	}
 
@@ -993,7 +1071,7 @@ export const texture = ( value = EmptyTexture, uvNode = null, levelNode = null, 
 
 	if ( value && value.isTextureNode === true ) {
 
-		textureNode = nodeObject( value.clone() );
+		textureNode = value.clone();
 		textureNode.referenceNode = value.getBase(); // Ensure the reference is set to the original node
 
 		if ( uvNode !== null ) textureNode.uvNode = nodeObject( uvNode );
@@ -1011,14 +1089,22 @@ export const texture = ( value = EmptyTexture, uvNode = null, levelNode = null, 
 };
 
 /**
- * TSL function for creating a uniform texture node.
+ * TSL function for creating a non-mergeable uniform texture node.
  *
  * @tsl
  * @function
  * @param {?Texture} value - The texture.
  * @returns {TextureNode}
  */
-export const uniformTexture = ( value = EmptyTexture ) => texture( value );
+export const uniformTexture = ( value = EmptyTexture ) => {
+
+	const textureNode = texture( value );
+
+	textureNode.mergeable = false;
+
+	return textureNode;
+
+};
 
 /**
  * TSL function for creating a texture node that fetches/loads texels without interpolation.

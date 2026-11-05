@@ -13,7 +13,7 @@
 		<section>
 			<header>
 				<div class="class-description"><p>A two dimensional surface that extends infinitely in 3D space, represented
-in <a href="http://mathworld.wolfram.com/HessianNormalForm.html" target="_blank" rel="noopener">Hessian normal form</a>
+in <a href="https://mathworld.wolfram.com/HessianNormalForm.html" target="_blank" rel="noopener">Hessian normal form</a>
 by a unit length normal vector and a constant.</p></div>
 			</header>
 			<article>
@@ -215,6 +215,27 @@ projection of the normal at the origin onto the plane.</p>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> Whether this plane is equal with the given one.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="fromJSON" translate="no">.<a href="#fromJSON">fromJSON</a><span class="signature">( json : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="Plane.html">Plane</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the plane properties from the given JSON.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">json</strong>
+									</td>
+									<td class="description last">
+										<p>The serialized json to set the plane from.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this plane.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="intersectLine" translate="no">.<a href="#intersectLine">intersectLine</a><span class="signature">( line : <span class="param-type"><a href="Line3.html">Line3</a></span>, target : <span class="param-type"><a href="Vector3.html">Vector3</a></span>, clampToLine : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
@@ -509,6 +530,15 @@ that lies onto the plane).</p>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> A reference to this plane.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="toJSON" translate="no">.<a href="#toJSON">toJSON</a><span class="signature">()</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns a serialized structure of the plane.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Serialized structure with fields representing the object state.</dt>
 						</dl>
 					</div>
 					<h3 class="name name-method" id="translate" translate="no">.<a href="#translate">translate</a><span class="signature">( offset : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Plane.html">Plane</a></span> </h3>

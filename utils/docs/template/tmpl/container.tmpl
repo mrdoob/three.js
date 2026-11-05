@@ -93,11 +93,22 @@
 						});
 					}
 					if (members && members.length && members.forEach) {
+						var staticMembers = members.filter(function(m) { return m.scope === 'static'; });
+						var instanceMembers = members.filter(function(m) { return m.scope !== 'static'; });
+
+						if (instanceMembers.length) {
 				?>
 				<h2 class="subsection-title">Properties</h2>
-				<?js members.forEach(function(p) { ?>
+				<?js instanceMembers.forEach(function(p) { ?>
 					<?js= self.partial('members.tmpl', p) ?>
 				<?js }); ?>
+				<?js } ?>
+				<?js if (staticMembers.length) { ?>
+				<h2 class="subsection-title">Static Properties</h2>
+				<?js staticMembers.forEach(function(p) { ?>
+					<?js= self.partial('members.tmpl', p) ?>
+				<?js }); ?>
+				<?js } ?>
 				<?js } ?>
 				<?js
 					var methods = self.find({kind: 'function', memberof: isGlobalPage ? {isUndefined: true} : doc.longname, ...ignoreInheritedSymbols});

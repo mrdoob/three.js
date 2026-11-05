@@ -1,4 +1,4 @@
-*Inheritance: EventDispatcher → Node → TempNode →*
+*Inheritance: EventDispatcher → Node →*
 
 # Lut3DNode
 
@@ -6,7 +6,7 @@ A post processing node for color grading via lookup tables.
 
 ## Import
 
-Lut3DNode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+Lut3DNode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { lut3D } from 'three/addons/tsl/display/Lut3DNode.js';
@@ -62,7 +62,7 @@ This method is used to setup the effect's TSL code.
 
 The current node builder.
 
-**Overrides:** [TempNode#setup](TempNode.html#setup)
+**Overrides:** [Node#setup](Node.html#setup)
 
 ## Source
 

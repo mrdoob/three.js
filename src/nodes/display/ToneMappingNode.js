@@ -1,4 +1,4 @@
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
 import { addMethodChaining, nodeObject, vec4 } from '../tsl/TSLCore.js';
 import { rendererReference } from '../accessors/RendererReferenceNode.js';
 
@@ -9,9 +9,9 @@ import { error } from '../../utils.js';
 /**
  * This node represents a tone mapping operation.
  *
- * @augments TempNode
+ * @augments Node
  */
-class ToneMappingNode extends TempNode {
+class ToneMappingNode extends Node {
 
 	static get type() {
 

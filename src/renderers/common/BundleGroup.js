@@ -6,6 +6,10 @@ import { Group } from '../../objects/Group.js';
  * are considered as one render bundle and processed as such by
  * the renderer.
  *
+ * Only renderable 3D objects are allowed in a bundle group. Other
+ * types like lights are not supported and must be added to the scene
+ * outside of the group.
+ *
  * This module is only fully supported by `WebGPURenderer` with a WebGPU backend.
  * With a WebGL backend, the group can technically be rendered but without
  * any performance improvements.

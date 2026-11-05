@@ -6,7 +6,7 @@ This class is similar to [OrbitControls](OrbitControls.html). However, it does n
 
 ## Import
 
-TrackballControls is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+TrackballControls is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
@@ -86,6 +86,12 @@ controls.mouseButtons = {
 
 **Overrides:** [Controls#mouseButtons](Controls.html#mouseButtons)
 
+### .multiTouchRoll : boolean
+
+Whether two finger twist gesture rolls the camera around its view axis or not.
+
+Default is `false`.
+
 ### .noPan : boolean
 
 Whether panning is disabled or not.
@@ -109,6 +115,12 @@ Default is `false`.
 The pan speed.
 
 Default is `0.3`.
+
+### .rollSpeed : number
+
+The roll speed used for multi-touch roll.
+
+Default is `1`.
 
 ### .rotateSpeed : number
 

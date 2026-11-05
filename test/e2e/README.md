@@ -22,9 +22,12 @@ Merge only those commits that pass the tests, otherwise all next commits will al
 
 ### How it works
 - ci configs with parallelism
-- deterministic random/timer/rAF/video for screenshots
+- deterministic random and clocks in pages and workers
+- deterministic page rAF and video for screenshots
+- ignores browser input while preserving scripted DOM clicks
+- freezes video playback, preserves explicit seeks, and waits for decoded frames
 - increased robustness with hided text, datgui, different flags and timeouts.
-- pipeline: turn off rAF -> 'networkidle0' -> networkTax -> turn on rAF -> render promise
+- pipeline: turn off rAF -> 'networkidle0' -> video readiness -> networkTax -> turn on rAF -> render promise
 - added 3 progressive attempts for robustness
 
 ### Development progress

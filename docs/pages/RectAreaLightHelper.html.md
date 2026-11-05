@@ -16,7 +16,7 @@ light.add( helper );
 
 ## Import
 
-RectAreaLightHelper is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+RectAreaLightHelper is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { RectAreaLightHelper } from 'three/addons/helpers/RectAreaLightHelper.js';
@@ -51,6 +51,8 @@ The light to visualize.
 ### .dispose()
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+
+**Overrides:** [Line#dispose](Line.html#dispose)
 
 ## Source
 

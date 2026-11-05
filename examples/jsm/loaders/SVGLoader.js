@@ -106,6 +106,8 @@ class SVGLoader extends Loader {
 		const scope = this;
 
 		const loader = new FileLoader( scope.manager );
+		loader.setPriority( scope.priority );
+		loader.setCache( scope.cache );
 		loader.setPath( scope.path );
 		loader.setRequestHeader( scope.requestHeader );
 		loader.setWithCredentials( scope.withCredentials );
@@ -218,7 +220,7 @@ class SVGLoader extends Loader {
 				case 'use':
 					style = parseStyle( node, style );
 
-					const href = node.getAttributeNS( 'http://www.w3.org/1999/xlink', 'href' ) || '';
+					const href = node.getAttributeNS( 'http://www.w3.org/1999/xlink', 'href' ) || node.getAttribute( 'href' ) || '';
 					const usedNodeId = href.substring( 1 );
 					const usedNode = node.viewportElement.getElementById( usedNodeId );
 					if ( usedNode ) {
@@ -303,8 +305,7 @@ class SVGLoader extends Loader {
 			const control = new Vector2();
 
 			const firstPoint = new Vector2();
-			let isFirstPoint = true;
-			let doSetFirstPoint = false;
+			let isPathClosed = false;
 
 			const d = node.getAttribute( 'd' );
 
@@ -321,10 +322,17 @@ class SVGLoader extends Loader {
 				const type = command.charAt( 0 );
 				const data = command.slice( 1 ).trim();
 
-				if ( isFirstPoint === true ) {
+				if ( isPathClosed === true ) {
 
-					doSetFirstPoint = true;
-					isFirstPoint = false;
+					// commands after Z without M start a new subpath at the initial point
+
+					if ( type !== 'M' && type !== 'm' && type !== 'Z' && type !== 'z' ) {
+
+						path.moveTo( firstPoint.x, firstPoint.y );
+
+					}
+
+					isPathClosed = false;
 
 				}
 
@@ -367,8 +375,6 @@ class SVGLoader extends Loader {
 							control.y = point.y;
 							path.lineTo( point.x, point.y );
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
-
 						}
 
 						break;
@@ -382,8 +388,6 @@ class SVGLoader extends Loader {
 							control.x = point.x;
 							control.y = point.y;
 							path.lineTo( point.x, point.y );
-
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
 
@@ -399,8 +403,6 @@ class SVGLoader extends Loader {
 							control.x = point.x;
 							control.y = point.y;
 							path.lineTo( point.x, point.y );
-
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
 
@@ -424,8 +426,6 @@ class SVGLoader extends Loader {
 							point.x = numbers[ j + 4 ];
 							point.y = numbers[ j + 5 ];
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
-
 						}
 
 						break;
@@ -448,8 +448,6 @@ class SVGLoader extends Loader {
 							point.x = numbers[ j + 2 ];
 							point.y = numbers[ j + 3 ];
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
-
 						}
 
 						break;
@@ -469,8 +467,6 @@ class SVGLoader extends Loader {
 							control.y = numbers[ j + 1 ];
 							point.x = numbers[ j + 2 ];
 							point.y = numbers[ j + 3 ];
-
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
 
@@ -494,8 +490,6 @@ class SVGLoader extends Loader {
 							point.x = numbers[ j + 0 ];
 							point.y = numbers[ j + 1 ];
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
-
 						}
 
 						break;
@@ -516,8 +510,6 @@ class SVGLoader extends Loader {
 							parseArcCommand(
 								path, numbers[ j ], numbers[ j + 1 ], numbers[ j + 2 ], numbers[ j + 3 ], numbers[ j + 4 ], start, point
 							);
-
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
 
@@ -559,8 +551,6 @@ class SVGLoader extends Loader {
 							control.y = point.y;
 							path.lineTo( point.x, point.y );
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
-
 						}
 
 						break;
@@ -574,8 +564,6 @@ class SVGLoader extends Loader {
 							control.x = point.x;
 							control.y = point.y;
 							path.lineTo( point.x, point.y );
-
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
 
@@ -591,8 +579,6 @@ class SVGLoader extends Loader {
 							control.x = point.x;
 							control.y = point.y;
 							path.lineTo( point.x, point.y );
-
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
 
@@ -616,8 +602,6 @@ class SVGLoader extends Loader {
 							point.x += numbers[ j + 4 ];
 							point.y += numbers[ j + 5 ];
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
-
 						}
 
 						break;
@@ -640,8 +624,6 @@ class SVGLoader extends Loader {
 							point.x += numbers[ j + 2 ];
 							point.y += numbers[ j + 3 ];
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
-
 						}
 
 						break;
@@ -661,8 +643,6 @@ class SVGLoader extends Loader {
 							control.y = point.y + numbers[ j + 1 ];
 							point.x += numbers[ j + 2 ];
 							point.y += numbers[ j + 3 ];
-
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
 
@@ -686,8 +666,6 @@ class SVGLoader extends Loader {
 							point.x = point.x + numbers[ j + 0 ];
 							point.y = point.y + numbers[ j + 1 ];
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
-
 						}
 
 						break;
@@ -709,8 +687,6 @@ class SVGLoader extends Loader {
 								path, numbers[ j ], numbers[ j + 1 ], numbers[ j + 2 ], numbers[ j + 3 ], numbers[ j + 4 ], start, point
 							);
 
-							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
-
 						}
 
 						break;
@@ -724,7 +700,7 @@ class SVGLoader extends Loader {
 							// Reset point to beginning of Path
 							point.copy( firstPoint );
 							path.currentPath.currentPoint.copy( point );
-							isFirstPoint = true;
+							isPathClosed = true;
 
 						}
 
@@ -736,8 +712,6 @@ class SVGLoader extends Loader {
 				}
 
 				// console.log( type, parseFloats( data ), parseFloats( data ).length  )
-
-				doSetFirstPoint = false;
 
 			}
 
@@ -760,12 +734,16 @@ class SVGLoader extends Loader {
 					.filter( Boolean )
 					.map( i => i.trim() );
 
-				for ( let j = 0; j < selectorList.length; j ++ ) {
+				const definitions = {};
 
-					// Remove empty rules
-					const definitions = Object.fromEntries(
-						Object.entries( stylesheet.style ).filter( ( [ , v ] ) => v !== '' )
-					);
+				for ( let j = 0; j < stylesheet.style.length; j ++ ) {
+
+					const property = stylesheet.style[ j ];
+					definitions[ property ] = stylesheet.style.getPropertyValue( property );
+
+				}
+
+				for ( let j = 0; j < selectorList.length; j ++ ) {
 
 					stylesheets[ selectorList[ j ] ] = Object.assign(
 						stylesheets[ selectorList[ j ] ] || {},
@@ -959,7 +937,7 @@ class SVGLoader extends Loader {
 
 			}
 
-			const regex = /([+-]?\d*\.?\d+(?:e[+-]?\d+)?)(?:,|\s)([+-]?\d*\.?\d+(?:e[+-]?\d+)?)/g;
+			const regex = /([+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:e[+-]?\d+)?)(?:,|\s)([+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:e[+-]?\d+)?)/g;
 
 			const path = new ShapePath();
 
@@ -994,7 +972,7 @@ class SVGLoader extends Loader {
 
 			}
 
-			const regex = /([+-]?\d*\.?\d+(?:e[+-]?\d+)?)(?:,|\s)([+-]?\d*\.?\d+(?:e[+-]?\d+)?)/g;
+			const regex = /([+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:e[+-]?\d+)?)(?:,|\s)([+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:e[+-]?\d+)?)/g;
 
 			const path = new ShapePath();
 
@@ -1235,7 +1213,7 @@ class SVGLoader extends Loader {
 				};
 
 				if ( node.hasAttribute( svgName ) ) style[ jsName ] = adjustFunction( node.getAttribute( svgName ) );
-				if ( stylesheetStyles[ jsName ] ) style[ jsName ] = adjustFunction( stylesheetStyles[ jsName ] );
+				if ( stylesheetStyles[ svgName ] ) style[ jsName ] = adjustFunction( stylesheetStyles[ svgName ] );
 				if ( node.style && node.style[ svgName ] !== '' ) style[ jsName ] = adjustFunction( node.style[ svgName ] );
 
 			}

@@ -27,7 +27,6 @@ const PoissonDenoiseShader = {
 		'SAMPLES': 16,
 		'SAMPLE_VECTORS': generatePdSamplePointInitializer( 16, 2, 1 ),
 		'NORMAL_VECTOR_TYPE': 1,
-		'DEPTH_VALUE_SOURCE': 0,
 	},
 
 	uniforms: {
@@ -97,19 +96,11 @@ const PoissonDenoiseShader = {
 		}
 
 		float getDepth(const vec2 uv) {
-		#if DEPTH_VALUE_SOURCE == 1
-			return textureLod(tDepth, uv.xy, 0.0).a;
-		#else
 			return textureLod(tDepth, uv.xy, 0.0).r;
-		#endif
 		}
 
 		float fetchDepth(const ivec2 uv) {
-			#if DEPTH_VALUE_SOURCE == 1
-				return texelFetch(tDepth, uv.xy, 0).a;
-			#else
-				return texelFetch(tDepth, uv.xy, 0).r;
-			#endif
+			return texelFetch(tDepth, uv.xy, 0).r;
 		}
 
 		vec3 computeNormalFromDepth(const vec2 uv) {

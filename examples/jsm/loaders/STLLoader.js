@@ -78,6 +78,8 @@ class STLLoader extends Loader {
 		const scope = this;
 
 		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
@@ -181,7 +183,7 @@ class STLLoader extends Loader {
 			// process STL header
 			// check for default color in header ("COLOR=rgba" sequence).
 
-			for ( let index = 0; index < 80 - 10; index ++ ) {
+			for ( let index = 0; index <= 80 - 10; index ++ ) {
 
 				if ( ( reader.getUint32( index, false ) == 0x434F4C4F /*COLO*/ ) &&
 					( reader.getUint8( index + 4 ) == 0x52 /*'R'*/ ) &&

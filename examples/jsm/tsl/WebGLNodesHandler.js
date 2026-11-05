@@ -5,6 +5,7 @@ import {
 	Color,
 	UniformsLib,
 	UniformsUtils,
+	PMREMGenerator,
 } from 'three';
 import {
 	context,
@@ -24,6 +25,7 @@ import {
 	GLSLNodeBuilder,
 	BasicNodeLibrary,
 	WebGLCapabilities,
+	PMREMNode,
 } from 'three/webgpu';
 
 // Limitations
@@ -60,7 +62,7 @@ function generateUniformsList( program, uniforms ) {
 
 }
 
-// overrides shadow nodes to use the built in shadow textures
+// Adapts nodes to use WebGLRenderer resources.
 class WebGLNodeBuilder extends GLSLNodeBuilder {
 
 	addNode( node ) {
@@ -78,6 +80,10 @@ class WebGLNodeBuilder extends GLSLNodeBuilder {
 				// no need to rerender shadows since WebGLRenderer is handling it
 
 			};
+
+		} else if ( node instanceof PMREMNode && node._generator === null ) {
+
+			node._generator = new PMREMGenerator( this.renderer._renderer );
 
 		}
 
@@ -184,6 +190,8 @@ class RendererProxy {
 
 	constructor( renderer ) {
 
+		this._renderer = renderer;
+
 		const backend = {
 			isWebGPUBackend: false,
 			extensions: renderer.extensions,
@@ -225,6 +233,12 @@ class RendererProxy {
 	}
 
 	getMRT() {
+
+		return null;
+
+	}
+
+	getCanvasTarget() {
 
 		return null;
 
@@ -525,6 +539,7 @@ export class WebGLNodesHandler {
 			fogColor: { value: new Color() },
 			fogNear: { value: 0 },
 			fogFar: { value: 0 },
+			fogDensity: { value: 0 },
 			envMapIntensity: { value: 0 },
 			...UniformsUtils.clone( UniformsLib.lights )
 		};
@@ -554,16 +569,19 @@ export class WebGLNodesHandler {
 		}
 
 		// init uniforms
-		const builderUniforms = [ ...builder.uniforms.vertex, ...builder.uniforms.fragment ];
-		for ( const uniform of builderUniforms ) {
+		for ( const shaderStage of [ 'vertex', 'fragment' ] ) {
 
-			if ( uniform.type === 'buffer' ) {
+			for ( const uniform of builder.uniforms[ shaderStage ] ) {
 
-				// buffer uniforms are all nested in groups
-				const group = new UniformsGroup();
-				group.name = uniform.node.name;
-				group.uniforms = [ uniform ];
-				uniformsGroups.push( group );
+				if ( uniform.type === 'buffer' ) {
+
+					// buffer uniforms are all nested in groups
+					const group = new UniformsGroup();
+					group.name = builder.getUniformBufferName( uniform, shaderStage );
+					group.uniforms = [ uniform ];
+					uniformsGroups.push( group );
+
+				}
 
 			}
 

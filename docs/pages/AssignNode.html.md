@@ -1,4 +1,4 @@
-*Inheritance: EventDispatcher → Node → TempNode →*
+*Inheritance: EventDispatcher → Node →*
 
 # AssignNode
 
@@ -36,13 +36,17 @@ The target node.
 
 ## Methods
 
-### .hasDependencies() : boolean
+### .isCacheable( builder : NodeBuilder ) : boolean
 
-Whether this node is used more than once in context of other nodes. This method is overwritten since it always returns `false` (assigns are unique).
+Assignments must not be cached in temporary variables.
 
-**Overrides:** [TempNode#hasDependencies](TempNode.html#hasDependencies)
+**builder**
 
-**Returns:** A flag that indicates if there is more than one dependency to other nodes. Always `false`.
+The current node builder.
+
+**Overrides:** [Node#isCacheable](Node.html#isCacheable)
+
+**Returns:** Always `false`.
 
 ### .needsSplitAssign( builder : NodeBuilder ) : boolean
 

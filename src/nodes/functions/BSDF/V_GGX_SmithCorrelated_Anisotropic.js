@@ -11,19 +11,16 @@ const V_GGX_SmithCorrelated_Anisotropic = /*@__PURE__*/ Fn( ( { alphaT, alphaB, 
 
 	return div( 0.5, gv.add( gl ).max( EPSILON ) );
 
-} ).setLayout( {
-	name: 'V_GGX_SmithCorrelated_Anisotropic',
-	type: 'float',
-	inputs: [
-		{ name: 'alphaT', type: 'float', qualifier: 'in' },
-		{ name: 'alphaB', type: 'float', qualifier: 'in' },
-		{ name: 'dotTV', type: 'float', qualifier: 'in' },
-		{ name: 'dotBV', type: 'float', qualifier: 'in' },
-		{ name: 'dotTL', type: 'float', qualifier: 'in' },
-		{ name: 'dotBL', type: 'float', qualifier: 'in' },
-		{ name: 'dotNV', type: 'float', qualifier: 'in' },
-		{ name: 'dotNL', type: 'float', qualifier: 'in' }
-	]
+}, {
+	alphaT: 'float',
+	alphaB: 'float',
+	dotTV: 'float',
+	dotBV: 'float',
+	dotTL: 'float',
+	dotBL: 'float',
+	dotNV: 'float',
+	dotNL: 'float',
+	return: 'float'
 } );
 
 export default V_GGX_SmithCorrelated_Anisotropic;

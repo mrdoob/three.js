@@ -6,7 +6,7 @@ This class is only relevant if the referenced property is array-like. In this ca
 
 ## Constructor
 
-### new ReferenceElementNode( referenceNode : ReferenceBaseNode, indexNode : Node )
+### new ReferenceElementNode( referenceNode : ReferenceBaseNode | ReferenceNode, indexNode : Node )
 
 Constructs a new reference element node.
 
@@ -26,19 +26,7 @@ This flag can be used for type testing.
 
 Default is `true`.
 
-### .isReferenceElementNode : boolean (readonly)
-
-This flag can be used for type testing.
-
-Default is `true`.
-
-### .referenceNode : ReferenceBaseNode
-
-Similar to [ReferenceBaseNode#reference](ReferenceBaseNode.html#reference), an additional property references to the current node.
-
-Default is `null`.
-
-### .referenceNode : ReferenceNode
+### .referenceNode : ReferenceBaseNode | ReferenceNode
 
 Similar to [ReferenceNode#reference](ReferenceNode.html#reference), an additional property references to the current node.
 
@@ -54,78 +42,6 @@ This method is overwritten since the node type is inferred from the uniform type
 
 **Returns:** The node type.
 
-### .generateNodeType() : string
-
-This method is overwritten since the node type is inferred from the uniform type of the reference node.
-
-**Overrides:** [ArrayElementNode#generateNodeType](ArrayElementNode.html#generateNodeType)
-
-**Returns:** The node type.
-
 ## Source
 
-[src/nodes/accessors/ReferenceBaseNode.js](https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/ReferenceBaseNode.js)
-
-This class is only relevant if the referenced property is array-like. In this case, `ReferenceElementNode` allows to refer to a specific element inside the data structure via an index.
-
-## Constructor
-
-### new ReferenceElementNode( referenceNode : ReferenceNode, indexNode : Node )
-
-Constructs a new reference element node.
-
-**referenceNode**
-
-The reference node.
-
-**indexNode**
-
-The index node that defines the element access.
-
-## Properties
-
-### .isReferenceElementNode : boolean (readonly)
-
-This flag can be used for type testing.
-
-Default is `true`.
-
-### .isReferenceElementNode : boolean (readonly)
-
-This flag can be used for type testing.
-
-Default is `true`.
-
-### .referenceNode : ReferenceBaseNode
-
-Similar to [ReferenceBaseNode#reference](ReferenceBaseNode.html#reference), an additional property references to the current node.
-
-Default is `null`.
-
-### .referenceNode : ReferenceNode
-
-Similar to [ReferenceNode#reference](ReferenceNode.html#reference), an additional property references to the current node.
-
-Default is `null`.
-
-## Methods
-
-### .generateNodeType() : string
-
-This method is overwritten since the node type is inferred from the uniform type of the reference node.
-
-**Overrides:** [ArrayElementNode#generateNodeType](ArrayElementNode.html#generateNodeType)
-
-**Returns:** The node type.
-
-### .generateNodeType() : string
-
-This method is overwritten since the node type is inferred from the uniform type of the reference node.
-
-**Overrides:** [ArrayElementNode#generateNodeType](ArrayElementNode.html#generateNodeType)
-
-**Returns:** The node type.
-
-## Source
-
-[src/nodes/accessors/ReferenceNode.js](https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/ReferenceNode.js)
+[src/nodes/accessors/ReferenceElementNode.js](https://github.com/mrdoob/three.js/blob/master/src/nodes/accessors/ReferenceElementNode.js)

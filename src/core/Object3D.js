@@ -358,7 +358,7 @@ class Object3D extends EventDispatcher {
 
 		/**
 		 * Whether the 3D object is supposed to be static or not. If set to `true`, it means
-		 * the 3D object is not going to be changed after the initial renderer. This includes
+		 * the 3D object is not going to be changed after the first render. This includes
 		 * geometry and material settings. A static 3D object can be processed by the renderer
 		 * slightly faster since certain state checks can be bypassed.
 		 *
@@ -419,7 +419,7 @@ class Object3D extends EventDispatcher {
 	 * A callback that is executed immediately before a 3D object is rendered.
 	 *
 	 * @param {Renderer|WebGLRenderer} renderer - The renderer.
-	 * @param {Object3D} object - The 3D object.
+	 * @param {Object3D} scene - The scene.
 	 * @param {Camera} camera - The camera that is used to render the scene.
 	 * @param {BufferGeometry} geometry - The 3D object's geometry.
 	 * @param {Material} material - The 3D object's material.
@@ -431,7 +431,7 @@ class Object3D extends EventDispatcher {
 	 * A callback that is executed immediately after a 3D object is rendered.
 	 *
 	 * @param {Renderer|WebGLRenderer} renderer - The renderer.
-	 * @param {Object3D} object - The 3D object.
+	 * @param {Object3D} scene - The scene.
 	 * @param {Camera} camera - The camera that is used to render the scene.
 	 * @param {BufferGeometry} geometry - The 3D object's geometry.
 	 * @param {Material} material - The 3D object's material.
@@ -452,6 +452,13 @@ class Object3D extends EventDispatcher {
 		this.matrix.premultiply( matrix );
 
 		this.matrix.decompose( this.position, this.quaternion, this.scale );
+
+		if ( this.pivot !== null ) {
+
+			// the matrix maps the pivot to position + pivot, see updateMatrix()
+			this.position.copy( this.pivot ).applyMatrix4( this.matrix ).sub( this.pivot );
+
+		}
 
 	}
 
@@ -1061,15 +1068,18 @@ class Object3D extends EventDispatcher {
 	raycast( /* raycaster, intersects */ ) {}
 
 	/**
-	 * Abstract method to test whether this 3D object intersects the given frustum.
-	 * Renderable 3D objects such as {@link Mesh}, {@link Line} or {@link Points}
-	 * implement this method in order to use frustum culling.
+	 * Returns `true` if this 3D object intersects the given frustum. Renderable 3D objects
+	 * such as {@link Mesh}, {@link Line} or {@link Points} override this method in order
+	 * to use frustum culling. The default implementation always returns `true`.
 	 *
-	 * @abstract
 	 * @param {Frustum|FrustumArray} frustum - The frustum to test.
-	 * @return {boolean|undefined} Whether this 3D object intersects the given frustum or not.
+	 * @return {boolean} Whether this 3D object intersects the given frustum or not.
 	 */
-	intersectsFrustum( /* frustum */ ) {}
+	intersectsFrustum( /* frustum */ ) {
+
+		return true;
+
+	}
 
 	/**
 	 * Executes the callback on this 3D object and all descendants.

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>GaussianSplat - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="EventDispatcher.html">EventDispatcher</a> → <a href="Object3D.html">Object3D</a> → <a href="Mesh.html">Mesh</a> → </p>
+	<h1 translate="no">GaussianSplat</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A minimal renderer for 3D Gaussian splat geometry.</p>
+<p>Note that this class can only be used with <a href="WebGPURenderer.html">WebGPURenderer</a>. The
+<code>forceWebGL</code> fallback of <a href="WebGPURenderer.html">WebGPURenderer</a> is supported, but
+<a href="WebGLRenderer.html">WebGLRenderer</a> is not. Import maps or package exports must resolve
+both <code>three/webgpu</code> and <code>three/tsl</code>.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const splats = new GaussianSplat( geometry );
+scene.add( splats );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">GaussianSplat</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { GaussianSplat } from 'three/addons/objects/GaussianSplat.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="GaussianSplat" translate="no">new <a href="#GaussianSplat">GaussianSplat</a><span class="signature">( splatGeometry : <span class="param-type"><a href="BufferGeometry.html">BufferGeometry</a></span>, options : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new Gaussian splat mesh.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">splatGeometry</strong>
+									</td>
+									<td class="description last">
+										<p>The splat geometry to render. Higher-order spherical harmonics attributes must use packed <code>Uint32Array</code> words from <a href="global.html#createGaussianSplatGeometry">createGaussianSplatGeometry</a> (<code>SH_BAND_WORDS[ degree ]</code> words per splat, four clamped-byte coefficients per word).</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">options</strong>
+									</td>
+									<td class="description last">
+										<p>Options.</p>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">autoSort</strong>
+									</td>
+									<td class="description last">
+										<p>Whether to sort automatically in <code>onBeforeRender</code>.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="autoSort" translate="no">.<a href="#autoSort">autoSort</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether to sort automatically in <code>onBeforeRender</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="boundingBox" translate="no">.<a href="#boundingBox">boundingBox</a><span class="type-signature"> : <a href="Box3.html">Box3</a></span> </h3>
+					<div class="description">
+						<p>The bounding box of the splats. Can be computed via <a href="GaussianSplat.html#computeBoundingBox">GaussianSplat#computeBoundingBox</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="boundingSphere" translate="no">.<a href="#boundingSphere">boundingSphere</a><span class="type-signature"> : <a href="Sphere.html">Sphere</a></span> </h3>
+					<div class="description">
+						<p>The bounding sphere of the splats. Can be computed via <a href="GaussianSplat.html#computeBoundingSphere">GaussianSplat#computeBoundingSphere</a>.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="isGaussianSplat" translate="no">.<a href="#isGaussianSplat">isGaussianSplat</a><span class="type-signature"> : boolean</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>This flag can be used for type testing.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="splatGeometry" translate="no">.<a href="#splatGeometry">splatGeometry</a><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<div class="description">
+						<p>The source splat geometry.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="computeBoundingBox" translate="no">.<a href="#computeBoundingBox">computeBoundingBox</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the bounding box of the splats, updating <a href="GaussianSplat.html#boundingBox">GaussianSplat#boundingBox</a>.</p>
+<p>Each splat is expanded by its own extent rather than treated as a point, so the bounds cover
+what is drawn.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="computeBoundingSphere" translate="no">.<a href="#computeBoundingSphere">computeBoundingSphere</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes the bounding sphere of the splats, updating <a href="GaussianSplat.html#boundingSphere">GaussianSplat#boundingSphere</a>.</p>
+<p>Each splat is expanded by its own extent rather than treated as a point, so the bounds cover
+what is drawn.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="raycast" translate="no">.<a href="#raycast">raycast</a><span class="signature">( raycaster : <span class="param-type"><a href="Raycaster.html">Raycaster</a></span>, intersects : <span class="param-type">Array.&lt;Object></span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Computes intersection points between a casted ray and the splats.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">raycaster</strong>
+									</td>
+									<td class="description last">
+										<p>The raycaster.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">intersects</strong>
+									</td>
+									<td class="description last">
+										<p>The target array that holds the intersection points.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="Mesh.html#raycast">Mesh#raycast</a></dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="updateSort" translate="no">.<a href="#updateSort">updateSort</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the draw order if the camera or mesh orientation has changed enough
+to need a new sort.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera used for rendering.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether a sort was dispatched this call.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="updateSphericalHarmonics" translate="no">.<a href="#updateSphericalHarmonics">updateSphericalHarmonics</a><span class="signature">( renderer : <span class="param-type"><a href="Renderer.html">Renderer</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the view-dependent spherical harmonics colors if the camera or
+mesh transform has changed.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">renderer</strong>
+									</td>
+									<td class="description last">
+										<p>The renderer.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera used for rendering.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether a compute pass was dispatched this call.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/objects/GaussianSplat.js" translate="no" target="_blank" rel="noopener">examples/jsm/objects/GaussianSplat.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

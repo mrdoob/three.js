@@ -1,8 +1,10 @@
-import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, TempNode, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
-import { add, exp, float, If, Fn, max, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, getViewPosition, viewZToPerspectiveDepth, struct, ivec2, mix, property, outputStruct, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
+import { HalfFloatType, Vector2, RenderTarget, RendererUtils, QuadMesh, NodeMaterial, Node, NodeUpdateType, Matrix4, DepthTexture } from 'three/webgpu';
+import { exp, float, Fn, max, texture, uniform, uv, vec2, vec4, luminance, convertToTexture, passTexture, velocity, ivec2, mix, property, outputStruct, context, OnBeforeRenderPipeline, OnAfterRenderPipeline } from 'three/tsl';
+import { clipAABB, computeHaltonOffsets, flickerReduction, sampleCurrentDepth, samplePreviousDepth } from '../utils/TAAUtils.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
+const _jitterMatrix = /*@__PURE__*/ new Matrix4();
 
 let _rendererState;
 
@@ -26,10 +28,10 @@ let _rendererState;
  *
  * Note: MSAA must be disabled when TAAU is in use.
  *
- * @augments TempNode
+ * @augments Node
  * @three_import import { taau } from 'three/addons/tsl/display/TAAUNode.js';
  */
-class TAAUNode extends TempNode {
+class TAAUNode extends Node {
 
 	static get type() {
 
@@ -173,17 +175,14 @@ class TAAUNode extends TempNode {
 
 		/**
 		 * Render target whose depth attachment holds the previous frame's
-		 * depth buffer. The depth texture must be owned by a render target
-		 * so that `copyTextureToTexture` can copy into it on the WebGL
-		 * backend, which uses a framebuffer blit and therefore needs the
-		 * destination depth texture to be attached to a framebuffer. This
-		 * render target is sized independently of the history target so it
-		 * can match the (lower-resolution) input depth texture.
+		 * depth buffer. This render target is sized independently of the
+		 * history target so it can match the (lower-resolution) input depth
+		 * texture.
 		 *
 		 * @private
 		 * @type {RenderTarget}
 		 */
-		this._previousDepthRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, depthTexture: new DepthTexture() } );
+		this._previousDepthRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false, depthTexture: new DepthTexture(), count: 0 } );
 		this._previousDepthRenderTarget.depthTexture.name = 'TAAUNode.previousDepth';
 
 		/**
@@ -222,6 +221,15 @@ class TAAUNode extends TempNode {
 		 * @type {Matrix4}
 		 */
 		this._originalProjectionMatrix = new Matrix4();
+
+		/**
+		 * Whether the jitter is currently applied to the camera.
+		 *
+		 * @private
+		 * @type {boolean}
+		 * @default false
+		 */
+		this._viewOffsetEnabled = false;
 
 		/**
 		 * A uniform node holding the camera's near and far.
@@ -279,14 +287,6 @@ class TAAUNode extends TempNode {
 		 */
 		this._previousDepthNode = texture( this._previousDepthRenderTarget.depthTexture );
 
-		/**
-		 * Sync the post processing stack with the TAAU node.
-		 *
-		 * @private
-		 * @type {boolean}
-		 */
-		this._needsPostProcessingSync = false;
-
 	}
 
 	/**
@@ -316,8 +316,8 @@ class TAAUNode extends TempNode {
 	}
 
 	/**
-	 * Defines the TAAU's current jitter as a view offset to the scene's
-	 * camera. The jitter is shrunk to one *output* pixel (rather than one
+	 * Applies the TAAU's current jitter to the projection matrix of the
+	 * scene's camera. The jitter is shrunk to one *output* pixel (rather than one
 	 * input pixel) so that the halton sequence gradually fills the output
 	 * sub-pixel grid over multiple frames.
 	 *
@@ -328,8 +328,8 @@ class TAAUNode extends TempNode {
 
 		// save original/unjittered projection matrix for velocity pass
 
-		this.camera.updateProjectionMatrix();
 		this._originalProjectionMatrix.copy( this.camera.projectionMatrix );
+		this._viewOffsetEnabled = true;
 
 		velocity.setProjectionMatrix( this._originalProjectionMatrix );
 
@@ -343,31 +343,36 @@ class TAAUNode extends TempNode {
 
 		this._jitterOffset.value.set( jitterX, jitterY );
 
-		this.camera.setViewOffset(
+		this.camera.projectionMatrix.premultiply( _jitterMatrix.makeTranslation(
 
-			inputWidth, inputHeight,
+			- 2 * jitterX / inputWidth,
+			2 * jitterY / inputHeight,
+			0
 
-			jitterX, jitterY,
+		) );
 
-			inputWidth, inputHeight
-
-		);
+		this.camera.projectionMatrixInverse.copy( this.camera.projectionMatrix ).invert();
 
 	}
 
 	/**
-	 * Clears the view offset from the scene's camera.
+	 * Restores the original projection matrix of the scene's camera.
 	 */
 	clearViewOffset() {
 
-		this.camera.clearViewOffset();
+		if ( this._viewOffsetEnabled === false ) return;
+
+		this._viewOffsetEnabled = false;
+
+		this.camera.projectionMatrix.copy( this._originalProjectionMatrix );
+		this.camera.projectionMatrixInverse.copy( this._originalProjectionMatrix ).invert();
 
 		velocity.setProjectionMatrix( null );
 
 		// update jitter index
 
 		this._jitterIndex ++;
-		this._jitterIndex = this._jitterIndex % ( _haltonOffsets.length - 1 );
+		this._jitterIndex = this._jitterIndex % _haltonOffsets.length;
 
 	}
 
@@ -392,13 +397,7 @@ class TAAUNode extends TempNode {
 		this._cameraWorldMatrixInverse.value.copy( this.camera.matrixWorldInverse );
 		this._cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
 
-		// extract input dimensions from the beauty buffer and output
-		// dimensions from the renderer's drawing buffer
-
-		const beautyRenderTarget = ( this.beautyNode.isRTTNode ) ? this.beautyNode.renderTarget : this.beautyNode.passNode.renderTarget;
-
-		const inputWidth = beautyRenderTarget.texture.width;
-		const inputHeight = beautyRenderTarget.texture.height;
+		// the output dimensions are derived from the renderer's drawing buffer
 
 		const drawingBufferSize = renderer.getDrawingBufferSize( _size );
 		const outputWidth = drawingBufferSize.width;
@@ -420,11 +419,6 @@ class TAAUNode extends TempNode {
 
 		if ( needsRestart === true ) {
 
-			// make sure render targets are initialized after the resize which triggers a dispose()
-
-			renderer.initRenderTarget( this._historyRenderTarget );
-			renderer.initRenderTarget( this._resolveRenderTarget );
-
 			// Seed the history with a bilinear upscale of the current beauty
 			// buffer. Without this the first frames after a resize fade in
 			// from black because the history target was cleared. The seed
@@ -436,16 +430,6 @@ class TAAUNode extends TempNode {
 			_quadMesh.name = 'TAAU.seed';
 			_quadMesh.render( renderer );
 			renderer.setRenderTarget( null );
-
-		}
-
-		// must run after needsRestart so it does not affect the seed reset
-
-		if ( this._needsPostProcessingSync === true ) {
-
-			this.setViewOffset( inputWidth, inputHeight );
-
-			this._needsPostProcessingSync = false;
 
 		}
 
@@ -474,16 +458,17 @@ class TAAUNode extends TempNode {
 
 		if ( srcW > 0 && srcH > 0 ) {
 
-			if ( this._previousDepthRenderTarget.width !== srcW || this._previousDepthRenderTarget.height !== srcH ) {
+			const dstDepth = this._previousDepthRenderTarget.depthTexture;
 
-				this._previousDepthRenderTarget.setSize( srcW, srcH );
-				renderer.initRenderTarget( this._previousDepthRenderTarget );
+			if ( dstDepth.image.width !== srcW || dstDepth.image.height !== srcH ) {
+
+				dstDepth.image.width = srcW;
+				dstDepth.image.height = srcH;
+				dstDepth.needsUpdate = true;
 
 			}
 
-			const dstDepth = this._previousDepthRenderTarget.depthTexture;
 			renderer.copyTextureToTexture( currentDepth, dstDepth );
-			this._previousDepthNode.value = dstDepth;
 
 		}
 
@@ -501,11 +486,13 @@ class TAAUNode extends TempNode {
 	 */
 	setup( builder ) {
 
+		this.depthNode.build( builder );
+		this.velocityNode.build( builder );
+		this.beautyNode.build( builder );
+
 		if ( builder.renderPipeline && ! builder.context.renderPipelineState.viewOffsetOwner ) {
 
 			builder.context.renderPipelineState.viewOffsetOwner = this;
-
-			this._needsPostProcessingSync = true;
 
 			OnBeforeRenderPipeline( () => {
 
@@ -526,102 +513,8 @@ class TAAUNode extends TempNode {
 
 		}
 
-		const currentDepthStruct = struct( {
-
-			closestDepth: 'float',
-			closestPositionTexel: 'vec2',
-			farthestDepth: 'float',
-
-		} );
-
-		// Samples 3×3 neighborhood pixels and returns the closest and farthest depths.
-		const sampleCurrentDepth = Fn( ( [ positionTexel ] ) => {
-
-			const closestDepth = float( 2 ).toVar();
-			const closestPositionTexel = vec2( 0 ).toVar();
-			const farthestDepth = float( - 1 ).toVar();
-
-			for ( let x = - 1; x <= 1; ++ x ) {
-
-				for ( let y = - 1; y <= 1; ++ y ) {
-
-					const neighbor = positionTexel.add( vec2( x, y ) ).toVar();
-					const depth = this.depthNode.load( neighbor ).r.toVar();
-
-					If( depth.lessThan( closestDepth ), () => {
-
-						closestDepth.assign( depth );
-						closestPositionTexel.assign( neighbor );
-
-					} );
-
-					If( depth.greaterThan( farthestDepth ), () => {
-
-						farthestDepth.assign( depth );
-
-					} );
-
-				}
-
-			}
-
-			return currentDepthStruct( closestDepth, closestPositionTexel, farthestDepth );
-
-		} );
-
-		// Samples a previous depth and reproject it using the current camera matrices.
-		const samplePreviousDepth = ( uv ) => {
-
-			const depth = this._previousDepthNode.sample( uv ).r;
-			const positionView = getViewPosition( uv, depth, this._previousCameraProjectionMatrixInverse );
-			const positionWorld = this._previousCameraWorldMatrix.mul( vec4( positionView, 1 ) ).xyz;
-			const viewZ = this._cameraWorldMatrixInverse.mul( vec4( positionWorld, 1 ) ).z;
-			return viewZToPerspectiveDepth( viewZ, this._cameraNearFar.x, this._cameraNearFar.y );
-
-		};
-
-		// Optimized version of AABB clipping.
-		// Reference: https://github.com/playdeadgames/temporal
-		const clipAABB = Fn( ( [ currentColor, historyColor, minColor, maxColor ] ) => {
-
-			const pClip = maxColor.rgb.add( minColor.rgb ).mul( 0.5 );
-			const eClip = maxColor.rgb.sub( minColor.rgb ).mul( 0.5 ).add( 1e-7 );
-			const vClip = historyColor.sub( vec4( pClip, currentColor.a ) );
-			const vUnit = vClip.xyz.div( eClip );
-			const absUnit = vUnit.abs();
-			const maxUnit = max( absUnit.x, absUnit.y, absUnit.z );
-			return maxUnit.greaterThan( 1 ).select(
-				vec4( pClip, currentColor.a ).add( vClip.div( maxUnit ) ),
-				historyColor
-			);
-
-		} ).setLayout( {
-			name: 'clipAABB',
-			type: 'vec4',
-			inputs: [
-				{ name: 'currentColor', type: 'vec4' },
-				{ name: 'historyColor', type: 'vec4' },
-				{ name: 'minColor', type: 'vec4' },
-				{ name: 'maxColor', type: 'vec4' }
-			]
-		} );
-
-		// Flicker reduction based on luminance weighing.
-		const flickerReduction = Fn( ( [ currentColor, historyColor, currentWeight ] ) => {
-
-			const historyWeight = currentWeight.oneMinus();
-			const compressedCurrent = currentColor.mul( float( 1 ).div( ( max( currentColor.r, currentColor.g, currentColor.b ).add( 1 ) ) ) );
-			const compressedHistory = historyColor.mul( float( 1 ).div( ( max( historyColor.r, historyColor.g, historyColor.b ).add( 1 ) ) ) );
-
-			const luminanceCurrent = luminance( compressedCurrent.rgb );
-			const luminanceHistory = luminance( compressedHistory.rgb );
-
-			currentWeight.mulAssign( float( 1 ).div( luminanceCurrent.add( 1 ) ) );
-			historyWeight.mulAssign( float( 1 ).div( luminanceHistory.add( 1 ) ) );
-
-			return add( currentColor.mul( currentWeight ), historyColor.mul( historyWeight ) ).div( max( currentWeight.add( historyWeight ), 0.00001 ) ).toVar();
-
-		} );
+		this._previousDepthRenderTarget.depthTexture.format = this.depthNode.value.format;
+		this._previousDepthRenderTarget.depthTexture.type = this.depthNode.value.type;
 
 		const historyNode = texture( this._historyRenderTarget.textures[ 0 ] );
 		const lockNode = texture( this._historyRenderTarget.textures[ 1 ] );
@@ -660,7 +553,7 @@ class TAAUNode extends TempNode {
 
 			// depth dilation around the closest input tap
 
-			const currentDepth = sampleCurrentDepth( closestTapF );
+			const currentDepth = sampleCurrentDepth( this.depthNode, closestTapF, this._cameraNearFar );
 			const closestDepth = currentDepth.get( 'closestDepth' );
 			const closestPositionTexel = currentDepth.get( 'closestPositionTexel' );
 			const farthestDepth = currentDepth.get( 'farthestDepth' );
@@ -669,7 +562,7 @@ class TAAUNode extends TempNode {
 
 			const offsetUV = this.velocityNode.load( closestPositionTexel ).xy.mul( vec2( 0.5, - 0.5 ) );
 			const historyUV = uvNode.sub( offsetUV );
-			const previousDepth = samplePreviousDepth( historyUV );
+			const previousDepth = samplePreviousDepth( this._previousDepthNode, historyUV, this._previousCameraProjectionMatrixInverse, this._previousCameraWorldMatrix, this._cameraWorldMatrixInverse, this._cameraNearFar, this.camera );
 
 			// history validity
 
@@ -791,6 +684,8 @@ class TAAUNode extends TempNode {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this._historyRenderTarget.dispose();
 		this._resolveRenderTarget.dispose();
 		this._previousDepthRenderTarget.dispose();
@@ -804,26 +699,7 @@ class TAAUNode extends TempNode {
 
 export default TAAUNode;
 
-function _halton( index, base ) {
-
-	let fraction = 1;
-	let result = 0;
-	while ( index > 0 ) {
-
-		fraction /= base;
-		result += fraction * ( index % base );
-		index = Math.floor( index / base );
-
-	}
-
-	return result;
-
-}
-
-const _haltonOffsets = /*@__PURE__*/ Array.from(
-	{ length: 32 },
-	( _, index ) => [ _halton( index + 1, 2 ), _halton( index + 1, 3 ) ]
-);
+const _haltonOffsets = /*@__PURE__*/ computeHaltonOffsets( 32 );
 
 /**
  * TSL function for creating a TAAU node for Temporal Anti-Aliasing Upscaling.

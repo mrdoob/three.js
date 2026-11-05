@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>VisibilityBufferDrawingPipeline - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+		<p class="inheritance" translate="no"><a href="StandardDrawingPipeline.html">StandardDrawingPipeline</a> → <a href="MeshletDrawingPipeline.html">MeshletDrawingPipeline</a> → </p>
+	<h1 translate="no">VisibilityBufferDrawingPipeline</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A meshlet drawing pipeline with a hybrid rasterizer. Like <a href="MeshletDrawingPipeline.html">MeshletDrawingPipeline</a>, compute shaders select the
+level of detail and cull objects and clusters, but the visible clusters are rasterized into a visibility
+buffer: small triangles in software by a compute shader, large triangles by the hardware rasterizer. A
+resolve pass shades the visibility buffer with the material of the meshes: its node graph is evaluated on
+the reconstructed surface (position, normal, model matrices and the attributes of the geometry) with
+analytic derivatives, so custom nodes, lights, shadows and the environment work as usual and the meshes
+depth test against other objects.</p>
+<p>The visibility buffer stores the triangle in 16 bits, so only the levels of detail whose triangles fit
+into this range are used. Geometries whose most detailed level doesn't fit are drawn by the hardware
+pipeline of <a href="MeshletDrawingPipeline.html">MeshletDrawingPipeline</a>. The resolve only writes the color, so render calls with MRT, like the
+velocity of TRAA, draw all clusters with the hardware pipeline. The position node of the material is evaluated
+per corner of the triangles by the software rasterizer and by the resolve.</p>
+<p>This class is experimental and its interface might change.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">renderer.drawingPipeline = new VisibilityBufferDrawingPipeline();
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="VisibilityBufferDrawingPipeline" translate="no">new <a href="#VisibilityBufferDrawingPipeline">VisibilityBufferDrawingPipeline</a><span class="signature">( parameters : <span class="param-type">Object</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Constructs a new visibility buffer drawing pipeline.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">parameters</strong>
+									</td>
+									<td class="description last">
+										<p>The configuration parameter.</p>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">lodThreshold</strong>
+									</td>
+									<td class="description last">
+										<p>The projected error in pixels below which a simpler level of detail is selected.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">shadowLodThreshold</strong>
+									</td>
+									<td class="description last">
+										<p>The projected error in shadow map texels below which a simpler level of detail is selected for shadow casters.</p>
+										<p>Default is <code>1</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">maxRasterSize</strong>
+									</td>
+									<td class="description last">
+										<p>The maximum screen-space size in pixels of triangles rasterized in software.</p>
+										<p>Default is <code>8</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">debug</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the clusters should be shown with a flat color each instead of the material.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">occlusionCulling</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the clusters hidden by other clusters should be culled.</p>
+										<p>Default is <code>true</code>.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="maxInstances" translate="no">.<a href="#maxInstances">maxInstances</a><span class="type-signature"> : number</span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The maximum number of objects per render list, limited by the instance index of the visibility buffer.</p>
+					</div>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="MeshletDrawingPipeline.html#maxInstances">MeshletDrawingPipeline#maxInstances</a></dt>
+						</dl>
+				</div>
+				<div class="member">
+					<h3 class="name" id="maxRasterSize" translate="no">.<a href="#maxRasterSize">maxRasterSize</a><span class="type-signature"> : number</span> </h3>
+					<div class="description">
+						<p>The maximum screen-space size in pixels of triangles rasterized in software.
+Larger triangles are drawn by the hardware rasterizer. The software rasterizer
+loops over the pixels of a triangle in one thread, so it only pays off for small
+triangles.</p>
+						<p>Default is <code>8</code>.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="_getBatchKey" translate="no">.<a href="#_getBatchKey">_getBatchKey</a><span class="signature">( clusters : <span class="param-type">Object</span> )</span><span class="type-signature"> : Object</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>The batches of the software rasterizer index the triangles of one geometry, each geometry has its own batches.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">clusters</strong>
+									</td>
+									<td class="description last">
+										<p>The cluster data of the geometry.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-overrides"><strong>Overrides:</strong> <a href="MeshletDrawingPipeline.html#_getBatchKey">MeshletDrawingPipeline#_getBatchKey</a></dt>
+						</dl>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The key.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/pipelines/VisibilityBufferDrawingPipeline.js" translate="no" target="_blank" rel="noopener">examples/jsm/pipelines/VisibilityBufferDrawingPipeline.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

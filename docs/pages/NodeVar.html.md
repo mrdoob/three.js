@@ -4,7 +4,7 @@
 
 ## Constructor
 
-### new NodeVar( name : string, type : string, readOnly : boolean, count : number )
+### new NodeVar( name : string, type : string, readOnly : boolean, count : number, local : boolean )
 
 Constructs a new node variable.
 
@@ -28,6 +28,12 @@ The size.
 
 Default is `null`.
 
+**local**
+
+Whether the variable is declared locally in the flow.
+
+Default is `false`.
+
 ## Properties
 
 ### .count : number
@@ -39,6 +45,12 @@ The size.
 This flag can be used for type testing.
 
 Default is `true`.
+
+### .local : boolean
+
+Whether the variable is declared locally in the flow.
+
+Default is `false`.
 
 ### .name : string
 

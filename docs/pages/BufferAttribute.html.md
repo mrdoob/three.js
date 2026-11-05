@@ -180,7 +180,7 @@ The source index into the given buffer attribute.
 
 ### .dispose()
 
-Disposes of the buffer attribute. Available only in [WebGPURenderer](WebGPURenderer.html).
+Frees the GPU-related resources allocated by this instance. Available only in [WebGPURenderer](WebGPURenderer.html).
 
 ### .getComponent( index : number, component : number ) : number
 

@@ -16,7 +16,7 @@ scene.add( cubeShadow );
 
 ## Import
 
-ShadowMesh is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+ShadowMesh is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { ShadowMesh } from 'three/addons/objects/ShadowMesh.js';

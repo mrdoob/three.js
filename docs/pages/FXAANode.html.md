@@ -1,4 +1,4 @@
-*Inheritance: EventDispatcher → Node → TempNode →*
+*Inheritance: EventDispatcher → Node →*
 
 # FXAANode
 
@@ -6,7 +6,7 @@ Post processing node for applying FXAA. This node requires sRGB input so tone ma
 
 ## Import
 
-FXAANode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+FXAANode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { fxaa } from 'three/addons/tsl/display/FXAANode.js';
@@ -34,7 +34,7 @@ The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node updates i
 
 Default is `'frame'`.
 
-**Overrides:** [TempNode#updateBeforeType](TempNode.html#updateBeforeType)
+**Overrides:** [Node#updateBeforeType](Node.html#updateBeforeType)
 
 ## Methods
 
@@ -46,7 +46,7 @@ This method is used to setup the effect's TSL code.
 
 The current node builder.
 
-**Overrides:** [TempNode#setup](TempNode.html#setup)
+**Overrides:** [Node#setup](Node.html#setup)
 
 ### .updateBefore( frame : NodeFrame )
 
@@ -56,7 +56,7 @@ This method is used to update the effect's uniforms once per frame.
 
 The current node frame.
 
-**Overrides:** [TempNode#updateBefore](TempNode.html#updateBefore)
+**Overrides:** [Node#updateBefore](Node.html#updateBefore)
 
 ## Source
 

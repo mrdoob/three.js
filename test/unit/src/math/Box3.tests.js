@@ -5,6 +5,7 @@ import { Plane } from '../../../../src/math/Plane.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
 import { Matrix4 } from '../../../../src/math/Matrix4.js';
 import { Mesh } from '../../../../src/objects/Mesh.js';
+import { BatchedMesh } from '../../../../src/objects/BatchedMesh.js';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
 import { BoxGeometry } from '../../../../src/geometries/BoxGeometry.js';
 import {
@@ -188,6 +189,22 @@ export default QUnit.module( 'Maths', () => {
 				new Vector3( 2, 2, 2 )
 			);
 			assert.ok( compareBox( a, rotatedMinBox ), 'Passed!' );
+
+		} );
+
+		QUnit.test( 'setFromObject/Precise/BatchedMesh', ( assert ) => {
+
+			const geometry = new BoxGeometry( 2, 2, 2 );
+			const object = new BatchedMesh( 2, 100, 100 );
+			const geometryId = object.addGeometry( geometry );
+			object.setMatrixAt( object.addInstance( geometryId ), new Matrix4().makeTranslation( 10, 0, 0 ) );
+			object.setMatrixAt( object.addInstance( geometryId ), new Matrix4().makeTranslation( 20, 0, 0 ) );
+			object.position.set( 0, 5, 0 );
+
+			const box = new Box3().setFromObject( object, true );
+
+			assert.ok( box.min.equals( new Vector3( 9, 4, - 1 ) ), 'Minimum includes instance and world transforms' );
+			assert.ok( box.max.equals( new Vector3( 21, 6, 1 ) ), 'Maximum includes instance and world transforms' );
 
 		} );
 

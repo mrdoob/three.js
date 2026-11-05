@@ -19,4 +19,4 @@ export const checker = /*@__PURE__*/ Fn( ( [ coord = uv() ] ) => {
 
 	return result.sign();
 
-} );
+}, { coord: 'vec2', return: 'float' } );

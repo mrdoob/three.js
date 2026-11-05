@@ -1,4 +1,5 @@
 import { Texture } from './Texture.js';
+import { TextureSource } from './TextureSource.js';
 import { NearestFilter } from '../constants.js';
 
 /**
@@ -77,6 +78,16 @@ class FramebufferTexture extends Texture {
 		this.generateMipmaps = false;
 
 		this.needsUpdate = true;
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.source = new TextureSource( Object.assign( {}, source.image ) );
+
+		return this;
 
 	}
 

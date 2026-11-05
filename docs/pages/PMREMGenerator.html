@@ -12,19 +12,13 @@
 	<h1 translate="no">PMREMGenerator</h1>
 		<section>
 			<header>
-				<div class="class-description"><p>This class generates a Prefiltered, Mipmapped Radiance Environment Map
-(PMREM) from a cubeMap environment texture. This allows different levels of
-blur to be quickly accessed based on material roughness. It is packed into a
-special CubeUV format that allows us to perform custom interpolation so that
-we can support nonlinear formats such as RGBE. Unlike a traditional mipmap
-chain, it only goes down to the LOD_MIN level (above), and then creates extra
-even more filtered 'mips' at the same LOD_MIN resolution, associated with
-higher roughness levels. In this way we maintain resolution to smoothly
-interpolate diffuse lighting while limiting sampling computation.</p>
-<p>The prefiltering uses GGX VNDF (Visible Normal Distribution Function)
-importance sampling based on &quot;Sampling the GGX Distribution of Visible Normals&quot;
-(Heitz, 2018) to generate environment maps that accurately match the GGX BRDF
-used in material rendering for physically-based image-based lighting.</p></div>
+				<div class="class-description"><p>Generates a Prefiltered, Mipmapped Radiance Environment Map (PMREM) for
+image-based lighting. The result is a cube render target whose mip levels
+store GGX-filtered radiance at increasing roughness, from a mirror at level 0
+to roughness 1. See <a href="PMREMGenerator.html#.lodToRoughness">PMREMGenerator.lodToRoughness</a> for the mapping.</p>
+<p>Filtering assumes the view direction equals the surface normal. Sharp levels
+use GGX visible normal sampling (Heitz, 2018), while rough levels integrate a
+lower-resolution source cubemap.</p></div>
 			</header>
 			<article>
 				<div class="container-overview">
@@ -46,6 +40,14 @@ used in material rendering for physically-based image-based lighting.</p></div>
 								</tr>
 							</tbody>
 						</table>
+						<dl class="details">
+							<dt class="tag-see">See:</dt>
+							<dd class="tag-see">
+								<ul>
+									<li><a href="https://jcgt.org/published/0007/04/01/" target="_blank" rel="noopener">Sampling the GGX Distribution of Visible Normals</a></li>
+								</ul>
+							</dd>
+						</dl>
 					</div>
 				</div>
 				<h2 class="subsection-title">Methods</h2>
@@ -66,18 +68,15 @@ your texture's network fetch for increased concurrency.</p>
 					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Disposes of the PMREMGenerator's internal memory. Note that PMREMGenerator is a static class,
-so you should not need more than one PMREMGenerator object. If you do, calling dispose() on
-one of them will cause any others to also become unusable.</p>
+							<p>Disposes of the PMREMGenerator's internal memory. The PMREMs it returned
+belong to the caller and are not disposed.</p>
 						</div>
 					</div>
-					<h3 class="name name-method" id="fromCubemap" translate="no">.<a href="#fromCubemap">fromCubemap</a><span class="signature">( cubemap : <span class="param-type"><a href="Texture.html">Texture</a></span>, renderTarget : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> )</span><span class="type-signature"> : <a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> </h3>
+					<h3 class="name name-method" id="fromCubemap" translate="no">.<a href="#fromCubemap">fromCubemap</a><span class="signature">( cubemap : <span class="param-type"><a href="Texture.html">Texture</a></span>, renderTarget : <span class="param-type"><a href="WebGLCubeRenderTarget.html">WebGLCubeRenderTarget</a></span> )</span><span class="type-signature"> : <a href="WebGLCubeRenderTarget.html">WebGLCubeRenderTarget</a></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Generates a PMREM from an cubemap texture, which can be either LDR
-or HDR. The ideal input cube size is 256 x 256, as this matches best
-with the 256 x 256 cubemap output. The minimum supported input cube
-size is 16 x 16 per face.</p>
+							<p>Generates a PMREM from an LDR or HDR cubemap. The cube face size matches
+the input, rounded down to a power of two and at least 256.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -104,13 +103,12 @@ size is 16 x 16 per face.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The resulting PMREM.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="fromEquirectangular" translate="no">.<a href="#fromEquirectangular">fromEquirectangular</a><span class="signature">( equirectangular : <span class="param-type"><a href="Texture.html">Texture</a></span>, renderTarget : <span class="param-type"><a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> )</span><span class="type-signature"> : <a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> </h3>
+					<h3 class="name name-method" id="fromEquirectangular" translate="no">.<a href="#fromEquirectangular">fromEquirectangular</a><span class="signature">( equirectangular : <span class="param-type"><a href="Texture.html">Texture</a></span>, renderTarget : <span class="param-type"><a href="WebGLCubeRenderTarget.html">WebGLCubeRenderTarget</a></span> )</span><span class="type-signature"> : <a href="WebGLCubeRenderTarget.html">WebGLCubeRenderTarget</a></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Generates a PMREM from an equirectangular texture, which can be either LDR
-or HDR. The ideal input image size is 1k (1024 x 512), as this matches best
-with the 256 x 256 cubemap output. The minimum supported input image size
-is 64 x 32.</p>
+							<p>Generates a PMREM from an LDR or HDR equirectangular texture. The cube face
+size is one quarter of the image width, rounded down to a power of two and
+at least 256.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -137,13 +135,11 @@ is 64 x 32.</p>
 							<dt class="tag-returns"><strong>Returns:</strong> The resulting PMREM.</dt>
 						</dl>
 					</div>
-					<h3 class="name name-method" id="fromScene" translate="no">.<a href="#fromScene">fromScene</a><span class="signature">( scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, sigma : <span class="param-type">number</span>, near : <span class="param-type">number</span>, far : <span class="param-type">number</span>, options : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="WebGLRenderTarget.html">WebGLRenderTarget</a></span> </h3>
+					<h3 class="name name-method" id="fromScene" translate="no">.<a href="#fromScene">fromScene</a><span class="signature">( scene : <span class="param-type"><a href="Scene.html">Scene</a></span>, sigma : <span class="param-type">number</span>, near : <span class="param-type">number</span>, far : <span class="param-type">number</span>, options : <span class="param-type">Object</span> )</span><span class="type-signature"> : <a href="WebGLCubeRenderTarget.html">WebGLCubeRenderTarget</a></span> </h3>
 					<div class="method">
 						<div class="description">
-							<p>Generates a PMREM from a supplied Scene, which can be faster than using an
-image if networking bandwidth is low. Optional sigma specifies a blur radius
-in radians to be applied to the scene before PMREM generation. Optional near
-and far planes ensure the scene is rendered in its entirety.</p>
+							<p>Generates a PMREM from a scene, optionally applying a Gaussian blur before
+GGX filtering.</p>
 						</div>
 						<table class="params">
 							<tbody>
@@ -196,7 +192,7 @@ and far planes ensure the scene is rendered in its entirety.</p>
 										<strong translate="no">size</strong>
 									</td>
 									<td class="description last">
-										<p>The texture size of the PMREM.</p>
+										<p>The texture size of the PMREM, rounded down to a power of two and at least 256.</p>
 										<p>Default is <code>256</code>.</p>
 									</td>
 								</tr>
@@ -217,6 +213,37 @@ and far planes ensure the scene is rendered in its entirety.</p>
 						</table>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The resulting PMREM.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Static Methods</h2>
+					<h3 class="name name-method" id=".lodToRoughness" translate="no">.<a href="#.lodToRoughness">lodToRoughness</a><span class="signature">( lod : <span class="param-type">number</span>, maxLod : <span class="param-type">number</span> )</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the roughness a mip level of a PMREM has been prefiltered for.
+The inverse mapping is used by the renderers when sampling a PMREM.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">lod</strong>
+									</td>
+									<td class="description last">
+										<p>The mip level.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">maxLod</strong>
+									</td>
+									<td class="description last">
+										<p>The last mip level of the PMREM.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The roughness.</dt>
 						</dl>
 					</div>
 				<h2 class="subsection-title">Source</h2>

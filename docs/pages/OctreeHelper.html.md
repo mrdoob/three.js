@@ -13,7 +13,7 @@ scene.add( helper );
 
 ## Import
 
-OctreeHelper is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+OctreeHelper is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { OctreeHelper } from 'three/addons/helpers/OctreeHelper.js';
@@ -50,6 +50,8 @@ The octree to visualize.
 ### .dispose()
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+
+**Overrides:** [LineSegments#dispose](LineSegments.html#dispose)
 
 ### .update()
 

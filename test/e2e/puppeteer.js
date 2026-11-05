@@ -15,10 +15,14 @@ const exceptionList = [
 	'webgl_materials_displacementmap', 	// 1 min
 	'webgl_materials_envmaps_hdr', 		// 1 min
 	'webgpu_water', 					// 1 min
+	'webgpu_loader_vdb',				// streams 31 MB of frames
 
 	// Requires HTML-in-Canvas API
 	'webgl_materials_texture_html',
 	'webgpu_materials_texture_html',
+
+	// Requires srgb-linear and float16 canvas
+	'webgpu_loader_jpegxl',
 
 	// Black screen
 	'webgpu_postprocessing_ao',
@@ -37,8 +41,8 @@ const exceptionList = [
 	'webgpu_compute_audio',
 	'webgpu_compute_cloth',
 	'webgpu_compute_particles_fluid',
-	'webgpu_compute_rasterizer_ibl', // Rasterizer discrepancies
 	'webgpu_compute_sort_bitonic',
+	'webgpu_meshlets_ibl', // Rasterizer discrepancies
 	'webgpu_storage_buffer',
 	'webgpu_tsl_editor',
 	'webgpu_tsl_graph',
@@ -52,12 +56,22 @@ const exceptionList = [
 	'webgl_loader_3dtiles',
 	'webgl_loader_texture_lottie',
 	'webgl_morphtargets_face',
-	'webgl_renderer_pathtracer',
 	'webgl_shadowmap_progressive',
 	'webgpu_materials_matcap',
+	'webgpu_meshlets_city',
+	'webgpu_meshlets_materials',
 	'webgpu_morphtargets_face',
 	'webgpu_shadowmap_progressive',
+	'webgpu_lightmap_baking',
 	'webgpu_postprocessing_ssr_denoise',
+	'webgpu_renderer_pathtracer',
+	'webgpu_vxgi',
+	'webgpu_vxgi_sponza',
+
+	// Incremental light probe baking
+	'webgl_lightprobes_sponza',
+	'webgpu_generator_city', // Sub-pixel coverage of thin high-contrast geometry edges differs across rasterizers #33817
+	'webgpu_lightprobes_sponza',
 
 	// Video hangs the CI?
 	'css3d_youtube',
@@ -70,10 +84,7 @@ const exceptionList = [
 
 	// Webcam
 	'webgl_materials_video_webcam',
-	'webgl_morphtargets_webcam',
-
-	// Sub-pixel coverage of thin high-contrast geometry edges differs across rasterizers #33817
-	'webgpu_generator_city'
+	'webgl_morphtargets_webcam'
 
 ];
 
@@ -88,6 +99,7 @@ const parseTime = 1; // 1 second per megabyte
 
 const networkTimeout = 5; // 5 minutes, set to 0 to disable
 const renderTimeout = 5; // 5 seconds, set to 0 to disable
+const maxRetries = 2; // Retry timed-out or completely black examples in a fresh browser
 const numCIJobs = 5; // GitHub Actions run the script in 5 threads
 
 const width = 400;
@@ -227,13 +239,14 @@ async function main() {
 
 	/* Prepare injections */
 
-	const buildInjection = ( code ) => code
+	const cleanPage = await fs.readFile( 'test/e2e/clean-page.js', 'utf8' );
+	const injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );
+
+	// Workers do not receive evaluateOnNewDocument scripts.
+	const buildInjection = ( code ) => injection + '\n' + code
 		.replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' )
 		// Disables WebGPU timestamp queries to prevent Inspector/Profiler from crashing in E2E software mode
 		.replace( /this\.trackTimestamp\s*=\s*\(\s*parameters\.trackTimestamp\s*===\s*true\s*\);/g, 'Object.defineProperty(this, \'trackTimestamp\', { get: () => false, set: () => {} });' );
-
-	const cleanPage = await fs.readFile( 'test/e2e/clean-page.js', 'utf8' );
-	const injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );
 
 	const builds = {
 		'three.core.js': buildInjection( await fs.readFile( 'build/three.core.js', 'utf8' ) ),
@@ -316,8 +329,18 @@ async function main() {
 
 async function preparePage( page, injection, builds, errorMessages ) {
 
+	// Ignore ambient input from the browser window; scripted DOM clicks still work.
+	const client = await page.createCDPSession();
+	await client.send( 'Input.setIgnoreInputEvents', { ignore: true } );
+
 	await page.evaluateOnNewDocument( injection );
 	await page.setRequestInterception( true );
+
+	page.on( 'pageerror', error => {
+
+		if ( page.file !== undefined ) page.error = `${ page.file }: ${ error.message }`;
+
+	} );
 
 	page.on( 'console', async msg => {
 
@@ -425,7 +448,7 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 }
 
-async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file ) {
+async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file, retries = 0 ) {
 
 	const page = ctx.page;
 	const pageStart = performance.now();
@@ -460,6 +483,11 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 			await page.waitForNetworkIdle( {
 				timeout: networkTimeout * 60000,
 				idleTime: idleTime * 1000
+			} );
+
+			await page.waitForFunction( () => window._videosReady(), {
+				polling: 100,
+				timeout: renderTimeout * 1000
 			} );
 
 			await page.evaluate( async ( renderTimeout, parseTime ) => {
@@ -498,7 +526,7 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 
 		} catch ( e ) {
 
-			if ( e.includes && e.includes( 'Render timeout exceeded' ) === false ) {
+			if ( e !== 'Render timeout exceeded' ) {
 
 				throw new Error( `Error happened while rendering file ${ file }: ${ e }` );
 
@@ -568,6 +596,18 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 
 			} else {
 
+				const isBlack = actual.data.every( ( value, index ) => index % 4 === 3 || value === 0 );
+
+				if ( isBlack && retries < maxRetries ) {
+
+					console.yellow( 'Restarting browser...' );
+					await ctx.restart();
+
+					console.yellow( `Retrying ${ file } after black screenshot (${ retries + 1 }/${ maxRetries })...` );
+					return await checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file, retries + 1 );
+
+				}
+
 				await screenshot.write( `test/e2e/output-screenshots/${ file }-actual.jpg`, jpgQuality );
 				await expected.write( `test/e2e/output-screenshots/${ file }-expected.jpg`, jpgQuality );
 				await diff.write( `test/e2e/output-screenshots/${ file }-diff.jpg`, jpgQuality );
@@ -586,6 +626,23 @@ async function checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, f
 			await ctx.restart();
 
 		} else {
+
+			// A timed-out page can stay wedged and time out every following file
+
+			if ( String( e ).includes( 'TimeoutError' ) ) {
+
+				console.yellow( 'Restarting browser...' );
+				await ctx.restart();
+
+				if ( retries < maxRetries ) {
+
+					console.yellow( `${ e }` );
+					console.yellow( `Retrying ${ file } after timeout (${ retries + 1 }/${ maxRetries })...` );
+					return await checkFile( ctx, failedScreenshots, cleanPage, isMakeScreenshot, file, retries + 1 );
+
+				}
+
+			}
 
 			console.red( e );
 			failedScreenshots.push( file );

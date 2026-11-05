@@ -2,7 +2,7 @@
 
 An exporter for PLY.
 
-PLY (Polygon or Stanford Triangle Format) is a file format for efficient delivery and loading of simple, static 3D content in a dense format. Both binary and ascii formats are supported. PLY can store vertex positions, colors, normals and uv coordinates. No textures or texture references are saved.
+PLY (Polygon or Stanford Triangle Format) is a file format for efficient delivery and loading of simple, static 3D content in a dense format. Both binary and ascii formats are supported. PLY can store vertex positions, colors, normals and uv coordinates. No textures or texture references are saved. Quantized attributes must be normalized.
 
 ## Code Example
 
@@ -13,7 +13,7 @@ const data = exporter.parse( scene, options );
 
 ## Import
 
-PLYExporter is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+PLYExporter is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { PLYExporter } from 'three/addons/exporters/PLYExporter.js';

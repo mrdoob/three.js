@@ -13,6 +13,8 @@ import { warn, error } from '../../utils.js';
 
 let currentStack = null;
 
+const _secureNodeBuilders = new WeakMap();
+
 const NodeElements = new Map();
 
 // Extend Node Class for TSL using prototype
@@ -37,8 +39,6 @@ export function addMethodChaining( name, nodeElement ) {
 		// Changing Node prototype to add method chaining
 
 		Node.prototype[ name ] = function ( ...params ) {
-
-			//if ( name === 'toVarIntent' ) return this;
 
 			return this.isStackNode ? this.addToStack( nodeElement( ...params ) ) : nodeElement( this, ...params );
 
@@ -85,12 +85,6 @@ Node.prototype.assign = function ( ...params ) {
 
 };
 
-Node.prototype.toVarIntent = function () {
-
-	return this;
-
-};
-
 Node.prototype.get = function ( value ) {
 
 	return new MemberNode( this, value );
@@ -100,6 +94,26 @@ Node.prototype.get = function ( value ) {
 // Cache prototype for TSL
 
 const proto = {};
+
+// Cache of the swizzle and element nodes, a proxy of a node has its own cache
+
+const _swizzleCache = new WeakMap();
+
+function getSwizzleCache( node ) {
+
+	let cache = _swizzleCache.get( node );
+
+	if ( cache === undefined ) {
+
+		cache = {};
+
+		_swizzleCache.set( node, cache );
+
+	}
+
+	return cache;
+
+}
 
 // Set swizzle properties for xyzw, rgba, and stpq.
 
@@ -111,17 +125,17 @@ function setProtoSwizzle( property, altA, altB ) {
 
 		get() {
 
-			this._cache = this._cache || {};
+			const cache = getSwizzleCache( this );
 
 			//
 
-			let split = this._cache[ property ];
+			let split = cache[ property ];
 
 			if ( split === undefined ) {
 
 				split = new SplitNode( this, property );
 
-				this._cache[ property ] = split;
+				cache[ property ] = split;
 
 			}
 
@@ -217,17 +231,17 @@ for ( let i = 0; i < 32; i ++ ) {
 
 		get() {
 
-			this._cache = this._cache || {};
+			const cache = getSwizzleCache( this );
 
 			//
 
-			let element = this._cache[ i ];
+			let element = cache[ i ];
 
 			if ( element === undefined ) {
 
 				element = new ArrayElementNode( this, new ConstNode( i, 'uint' ) );
 
-				this._cache[ i ] = element;
+				cache[ i ] = element;
 
 			}
 
@@ -254,17 +268,17 @@ function setProtoProperty( property, target ) {
 
 		get() {
 
-			this._cache = this._cache || {};
+			const cache = getSwizzleCache( this );
 
 			//
 
-			let split = this._cache[ target ];
+			let split = cache[ target ];
 
 			if ( split === undefined ) {
 
 				split = new SplitNode( this, target );
 
-				this._cache[ target ] = split;
+				cache[ target ] = split;
 
 			}
 
@@ -301,7 +315,7 @@ const ShaderNodeObject = function ( obj, altType = null ) {
 
 	} else if ( ( altType === null && ( type === 'float' || type === 'boolean' ) ) || ( type && type !== 'shader' && type !== 'string' ) ) {
 
-		return nodeObject( getConstNode( obj, altType ) );
+		return getConstNode( obj, altType );
 
 	} else if ( type === 'shader' ) {
 
@@ -345,17 +359,13 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, setti
 
 		if ( settings !== null ) {
 
-			node = nodeObject( Object.assign( node, settings ) );
+			Object.assign( node, settings );
 
-			if ( settings.intent === true ) {
+			if ( settings.assignable === true ) {
 
-				node = node.toVarIntent();
+				node = node.toAssignable();
 
 			}
-
-		} else {
-
-			node = nodeObject( node );
 
 		}
 
@@ -459,6 +469,13 @@ class ShaderCallNodeInternal extends Node {
 
 	}
 
+	isCacheable( builder ) {
+
+		// A call is an expression unless its body has statements.
+		return this.getOutputNode( builder ).nodes.length === 0;
+
+	}
+
 	generateNodeType( builder ) {
 
 		return this.shaderNode.nodeType || this.getOutputNode( builder ).getNodeType( builder );
@@ -502,45 +519,44 @@ class ShaderCallNodeInternal extends Node {
 
 		let result = null;
 
-		if ( shaderNode.layout ) {
+		// A layout call needs every input. Missing inputs are completed with the default values
+		// of the function parameters; if they can't be resolved, the function is expanded inline.
 
-			// build inputs first
+		const layoutInputs = shaderNode.layout ? builder._getLayoutInputs( shaderNode, rawInputs ) : null;
 
-			if ( rawInputs ) {
+		if ( layoutInputs !== null ) {
 
-				// use layout inputs to ensure that no extra parameters are built
+			// build inputs first, use layout inputs to ensure that no extra parameters are built
 
-				const inputs = shaderNode.layout.inputs;
+			const layoutParameters = shaderNode.layout.inputs;
 
-				if ( isArrayAsParameter( rawInputs ) ) {
+			if ( isArrayAsParameter( layoutInputs ) ) {
 
-					const rawArrayParameters = rawInputs;
+				const rawArrayParameters = layoutInputs;
 
-					for ( let i = 0; i < inputs.length; i ++ ) {
+				for ( let i = 0; i < layoutParameters.length; i ++ ) {
 
-						const rawParameter = rawArrayParameters[ i ];
+					const rawParameter = rawArrayParameters[ i ];
 
-						if ( rawParameter && rawParameter.isNode ) {
+					if ( rawParameter && rawParameter.isNode ) {
 
-							rawParameter.build( builder );
-
-						}
+						rawParameter.build( builder );
 
 					}
 
-				} else {
+				}
 
-					const rawObjectParameters = rawInputs[ 0 ];
+			} else {
 
-					for ( const param of inputs ) {
+				const rawObjectParameters = layoutInputs[ 0 ];
 
-						const rawParameter = rawObjectParameters[ param.name ];
+				for ( const param of layoutParameters ) {
 
-						if ( rawParameter && rawParameter.isNode ) {
+					const rawParameter = rawObjectParameters[ param.name ];
 
-							rawParameter.build( builder );
+					if ( rawParameter && rawParameter.isNode ) {
 
-						}
+						rawParameter.build( builder );
 
 					}
 
@@ -554,37 +570,45 @@ class ShaderCallNodeInternal extends Node {
 
 			//
 
-			const inputs = rawInputs ? getLayoutParameters( rawInputs ) : null;
+			const inputs = getLayoutParameters( layoutInputs );
 
 			result = functionNode.call( inputs );
 
 		} else {
 
-			const secureNodeBuilder = new Proxy( builder, {
+			let secureNodeBuilder = _secureNodeBuilders.get( builder );
 
-				get: ( target, property, receiver ) => {
+			if ( secureNodeBuilder === undefined ) {
 
-					let value;
+				secureNodeBuilder = new Proxy( builder, {
 
-					if ( Symbol.iterator === property ) {
+					get: ( target, property, receiver ) => {
 
-						value = function* () {
+						let value;
 
-							yield undefined;
+						if ( Symbol.iterator === property ) {
 
-						};
+							value = function* () {
 
-					} else {
+								yield undefined;
 
-						value = Reflect.get( target, property, receiver );
+							};
+
+						} else {
+
+							value = Reflect.get( target, property, receiver );
+
+						}
+
+						return value;
 
 					}
 
-					return value;
+				} );
 
-				}
+				_secureNodeBuilders.set( builder, secureNodeBuilder );
 
-			} );
+			}
 
 			//
 
@@ -634,12 +658,33 @@ class ShaderCallNodeInternal extends Node {
 
 	}
 
+	generate( builder, output ) {
+
+		return this.getOutputNode( builder ).build( builder, output ) || '';
+
+	}
+
 	build( builder, output = null ) {
+
+		// The call does not use Node.build(), so it handles the inspector node, shared and overridden nodes and assignable state here.
+		this._setupInspector( builder );
+
+		const refNode = this.getShared( builder );
+
+		if ( this !== refNode ) {
+
+			return refNode.build( builder, output );
+
+		}
 
 		let result = null;
 
 		const buildStage = builder.getBuildStage();
 		const properties = builder.getNodeProperties( this );
+
+		const nodeData = this.assignable === true ? builder.getDataFromNode( this ) : null;
+
+		if ( nodeData !== null ) this._updateAssignable( builder, nodeData );
 
 		const subBuildOutput = builder.getSubBuildOutput( this );
 		const outputNode = this.getOutputNode( builder );
@@ -687,11 +732,31 @@ class ShaderCallNodeInternal extends Node {
 
 		} else if ( buildStage === 'analyze' ) {
 
-			outputNode.build( builder, output );
+			// A variable is evaluated once, so its value is analyzed only once.
+			if ( nodeData === null || this._isVariable( builder, nodeData ) === false || builder.increaseUsage( this ) === 1 ) {
+
+				outputNode.build( builder, output );
+
+			}
 
 		} else if ( buildStage === 'generate' ) {
 
-			result = outputNode.build( builder, output ) || '';
+			if ( nodeData !== null && this._isVariable( builder, nodeData ) ) {
+
+				this._checkFlowBlock( builder, nodeData );
+
+				const isCached = nodeData.propertyName !== undefined;
+				const flowCodeLength = builder.flow.code.length;
+
+				result = this._buildVariable( builder, nodeData, output );
+
+				this._setFlowBlock( builder, nodeData, isCached, flowCodeLength );
+
+			} else {
+
+				result = outputNode.build( builder, output ) || '';
+
+			}
 
 		}
 
@@ -749,7 +814,7 @@ function getProxyParameters( params ) {
 
 					for ( const inputNode of params ) {
 
-						yield nodeObject( inputNode );
+						yield inputNode;
 
 					}
 
@@ -820,6 +885,12 @@ class ShaderNodeInternal extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	setLayout( layout ) {
 
 		this.layout = layout;
@@ -859,16 +930,18 @@ for ( const bool of bools ) boolsCacheMap.set( bool, new ConstNode( bool ) );
 const uintsCacheMap = new Map();
 for ( const uint of uints ) uintsCacheMap.set( uint, new ConstNode( uint, 'uint' ) );
 
-const intsCacheMap = new Map( [ ...uintsCacheMap ].map( el => new ConstNode( el.value, 'int' ) ) );
+const intsCacheMap = new Map();
+for ( const value of uintsCacheMap.keys() ) intsCacheMap.set( value, new ConstNode( value, 'int' ) );
 for ( const int of ints ) intsCacheMap.set( int, new ConstNode( int, 'int' ) );
 
-const floatsCacheMap = new Map( [ ...intsCacheMap ].map( el => new ConstNode( el.value ) ) );
+const floatsCacheMap = new Map();
+for ( const value of intsCacheMap.keys() ) floatsCacheMap.set( value, new ConstNode( value ) );
 for ( const float of floats ) floatsCacheMap.set( float, new ConstNode( float ) );
 for ( const float of floats ) floatsCacheMap.set( - float, new ConstNode( - float ) );
 
 const cacheMaps = { bool: boolsCacheMap, uint: uintsCacheMap, ints: intsCacheMap, float: floatsCacheMap };
 
-const constNodesCacheMap = new Map( [ ...boolsCacheMap, ...floatsCacheMap ] );
+const constNodesCacheMap = new Map( boolsCacheMap );
 
 const getConstNode = ( value, type ) => {
 
@@ -882,11 +955,18 @@ const getConstNode = ( value, type ) => {
 
 	} else {
 
-		return new ConstNode( value, type );
+		const node = new ConstNode( value, type );
+
+		// Implicit numbers are weak and can adapt to the type of other operands.
+		node.isWeak = ! type && typeof value === 'number';
+
+		return node;
 
 	}
 
 };
+
+for ( const value of floatsCacheMap.keys() ) constNodesCacheMap.set( value, getConstNode( value ) );
 
 const ConvertType = function ( type, cacheMap = null ) {
 
@@ -918,20 +998,33 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 		if ( params.length === 1 && cacheMap !== null && cacheMap.has( params[ 0 ] ) ) {
 
-			return nodeObjectIntent( cacheMap.get( params[ 0 ] ) );
+			const cached = cacheMap.get( params[ 0 ] );
+
+			return new ConstNode( cached.value, cached.nodeType ).toAssignable();
 
 		}
 
 		if ( params.length === 1 ) {
 
-			const node = getConstNode( params[ 0 ], type );
-			if ( node.nodeType === type ) return nodeObjectIntent( node );
-			return nodeObjectIntent( new ConvertNode( node, type ) );
+			const param = params[ 0 ];
+			const node = getConstNode( param, type );
+
+			if ( node.nodeType === type ) {
+
+				// A node given by the user or a shared constant must not become the variable itself.
+				if ( node === param ) return new ConvertNode( node, type ).toAssignable();
+				if ( constNodesCacheMap.get( param ) === node ) return new ConstNode( node.value, node.nodeType ).toAssignable();
+
+				return node.toAssignable();
+
+			}
+
+			return new ConvertNode( node, type ).toAssignable();
 
 		}
 
 		const nodes = params.map( param => getConstNode( param ) );
-		return nodeObjectIntent( new JoinNode( nodes, type ) );
+		return new JoinNode( nodes, type ).toAssignable();
 
 	};
 
@@ -972,12 +1065,28 @@ export function ShaderNode( jsFunc, nodeType ) {
 }
 
 export const nodeObject = ( val, altType = null ) => /* new */ ShaderNodeObject( val, altType );
-export const nodeObjectIntent = ( val, altType = null ) => /* new */ nodeObject( val, altType ).toVarIntent();
+export const nodeObjectAssignable = ( val, altType = null ) => {
+
+	let node = nodeObject( val, altType );
+
+	// Shared constants need their own assignable node.
+	if ( node.isConstNode === true && constNodesCacheMap.get( node.value ) === node ) {
+
+		const copy = new ConstNode( node.value, node.nodeType );
+		copy.isWeak = node.isWeak;
+		node = copy;
+
+	}
+
+	return node.toAssignable();
+
+};
+
 export const nodeObjects = ( val, altType = null ) => new ShaderNodeObjects( val, altType );
 export const nodeArray = ( val, altType = null ) => new ShaderNodeArray( val, altType );
 export const nodeProxy = ( NodeClass, scope = null, factor = null, settings = null ) => new ShaderNodeProxy( NodeClass, scope, factor, settings );
 export const nodeImmutable = ( NodeClass, ...params ) => new ShaderNodeImmutable( NodeClass, ...params );
-export const nodeProxyIntent = ( NodeClass, scope = null, factor = null, settings = {} ) => new ShaderNodeProxy( NodeClass, scope, factor, { ...settings, intent: true } );
+export const nodeProxyAssignable = ( NodeClass, scope = null, factor = null, settings = {} ) => new ShaderNodeProxy( NodeClass, scope, factor, { ...settings, assignable: true } );
 
 export const nodeProxyConstructor = ( constructorFunction, nodeInstance ) => {
 
@@ -1045,6 +1154,12 @@ class FnNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	setLayout( layout ) {
 
 		const nodeType = this.shaderNode.nodeType;
@@ -1088,9 +1203,10 @@ class FnNode extends Node {
 
 		const fnCall = this.shaderNode.call( params );
 
-		if ( this.shaderNode.nodeType === 'void' ) fnCall.toStack();
+		// A call without a return value is a statement.
+		if ( this.shaderNode.nodeType === 'void' ) return fnCall.toStack();
 
-		return fnCall.toVarIntent();
+		return fnCall.toAssignable();
 
 	}
 
@@ -1116,6 +1232,15 @@ class FnNode extends Node {
 }
 
 export function Fn( jsFunc, layout = null ) {
+
+	// Layout functions are cached across shaders of the same backend. Their bodies
+	// must depend only on explicit inputs and constants, not uniforms or material context.
+	//
+	// Parameters can have default values. A call without some inputs passes the defaults as
+	// arguments, so values like `uv()` are evaluated at the call site. The defaults are resolved
+	// once per function and shared by all calls: a value that must be evaluated per build should
+	// be a node like `Fn( ... ).once()().toVar( name )`. If a default depends on another
+	// parameter, that call is expanded inline.
 
 	const instance = new FnNode( jsFunc, layout );
 

@@ -20,7 +20,15 @@ function WebGLRenderState( extensions ) {
 
 	function pushLight( light ) {
 
-		lightsArray.push( light );
+		if ( light.isLightProbeGrid ) {
+
+			lightProbeGridArray.push( light );
+
+		} else {
+
+			lightsArray.push( light );
+
+		}
 
 	}
 
@@ -30,15 +38,11 @@ function WebGLRenderState( extensions ) {
 
 	}
 
-	function pushLightProbeGrid( volume ) {
-
-		lightProbeGridArray.push( volume );
-
-	}
-
 	function setupLights() {
 
 		lights.setup( lightsArray );
+
+		lightProbeGridArray.sort( ( a, b ) => a.priority - b.priority || a.id - b.id );
 
 	}
 
@@ -68,8 +72,7 @@ function WebGLRenderState( extensions ) {
 		setupLightsView: setupLightsView,
 
 		pushLight: pushLight,
-		pushShadow: pushShadow,
-		pushLightProbeGrid: pushLightProbeGrid
+		pushShadow: pushShadow
 	};
 
 }

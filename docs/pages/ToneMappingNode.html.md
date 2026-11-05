@@ -1,4 +1,4 @@
-*Inheritance: EventDispatcher → Node → TempNode →*
+*Inheritance: EventDispatcher → Node →*
 
 # ToneMappingNode
 
@@ -44,7 +44,7 @@ Default is `null`.
 
 Overwrites the default `customCacheKey()` implementation by including the tone mapping type into the cache key.
 
-**Overrides:** [TempNode#customCacheKey](TempNode.html#customCacheKey)
+**Overrides:** [Node#customCacheKey](Node.html#customCacheKey)
 
 **Returns:** The hash.
 

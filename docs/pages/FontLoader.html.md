@@ -15,7 +15,7 @@ const font = await loader.loadAsync( 'fonts/helvetiker_regular.typeface.json' );
 
 ## Import
 
-FontLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+FontLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';

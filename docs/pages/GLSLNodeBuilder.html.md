@@ -58,6 +58,14 @@ The shader node.
 
 **Returns:** The GLSL function code.
 
+### .enableDualSourceBlending()
+
+Enables dual source blending.
+
+WebGL 2 can express this through the `WEBGL_blend_func_extended` extension, but WebGLBackend does not implement it.
+
+**Overrides:** [NodeBuilder#enableDualSourceBlending](NodeBuilder.html#enableDualSourceBlending)
+
 ### .enableExtension( name : string, behavior : string, shaderStage : string )
 
 Enables the given extension.
@@ -87,6 +95,40 @@ The clipping plane count.
 ### .enableMultiview()
 
 Enables multiview.
+
+### .enableShaderF16()
+
+Enables 16 bit floats.
+
+**Overrides:** [NodeBuilder#enableShaderF16](NodeBuilder.html#enableShaderF16)
+
+### .enableSubGroups()
+
+Enables subgroups.
+
+**Overrides:** [NodeBuilder#enableSubGroups](NodeBuilder.html#enableSubGroups)
+
+### .generateConstStatement( type : string, name : string, count : number ) : string
+
+Returns a single const variable statement as a GLSL string for the given variable type and name.
+
+**type**
+
+The variable's type.
+
+**name**
+
+The variable's name.
+
+**count**
+
+The array length.
+
+Default is `null`.
+
+**Overrides:** [NodeBuilder#generateConstStatement](NodeBuilder.html#generateConstStatement)
+
+**Returns:** The GLSL snippet that defines a const variable.
 
 ### .generatePBO( storageArrayElementNode : StorageArrayElementNode ) : string
 
@@ -350,6 +392,48 @@ A GLSL snippet that represents the offset that will be applied to the unnormaliz
 
 **Returns:** The GLSL snippet.
 
+### .generateTextureSize( texture : Texture, textureProperty : string, levelSnippet : string ) : string
+
+Generates the GLSL snippet that resolves the dimensions of the given texture.
+
+**texture**
+
+The texture.
+
+**textureProperty**
+
+The name of the texture uniform in the shader.
+
+**levelSnippet**
+
+A GLSL snippet that represents the mip level.
+
+**Overrides:** [NodeBuilder#generateTextureSize](NodeBuilder.html#generateTextureSize)
+
+**Returns:** The GLSL snippet.
+
+### .generateVarStatement( type : string, name : string, count : number ) : string
+
+Returns a single variable statement as a GLSL string for the given variable type and name.
+
+**type**
+
+The variable's type.
+
+**name**
+
+The variable's name.
+
+**count**
+
+The array length.
+
+Default is `null`.
+
+**Overrides:** [NodeBuilder#generateVarStatement](NodeBuilder.html#generateVarStatement)
+
+**Returns:** The GLSL snippet that defines a variable.
+
 ### .getAttributes( shaderStage : string ) : string
 
 Returns the shader attributes of the given shader stage as a GLSL string.
@@ -400,7 +484,7 @@ The shader stage.
 
 **Returns:** The GLSL snippet that defines the enabled extensions.
 
-### .getFloatPackingMethod( encoding : string ) : string
+### .getFloatPackingMethod( encoding : string, layout : string ) : string
 
 Returns the float packing method name for a given numeric encoding.
 
@@ -408,15 +492,27 @@ Returns the float packing method name for a given numeric encoding.
 
 The numeric encoding that describes how the float values are mapped to the integer range.
 
+**layout**
+
+The component layout of the packed integer.
+
+Default is `'2x16'`.
+
 **Returns:** The resolved GLSL float packing method name.
 
-### .getFloatUnpackingMethod( encoding : string ) : string
+### .getFloatUnpackingMethod( encoding : string, layout : string ) : string
 
 Returns the float unpacking method name for a given numeric encoding.
 
 **encoding**
 
 The numeric encoding that describes how the integer values are mapped to the float range.
+
+**layout**
+
+The component layout of the packed integer.
+
+Default is `'2x16'`.
 
 **Returns:** The resolved GLSL float unpacking method name.
 
@@ -459,6 +555,8 @@ Returns a builtin representing the index of an invocation within its workgroup.
 ### .getInvocationSubgroupIndex()
 
 Returns a builtin representing the index of an invocation within its subgroup.
+
+**Overrides:** [NodeBuilder#getInvocationSubgroupIndex](NodeBuilder.html#getInvocationSubgroupIndex)
 
 ### .getMethod( method : string ) : string
 
@@ -520,9 +618,13 @@ The shader stage.
 
 Returns a builtin representing the index of the current invocation's subgroup within its workgroup.
 
+**Overrides:** [NodeBuilder#getSubgroupIndex](NodeBuilder.html#getSubgroupIndex)
+
 ### .getSubgroupSize()
 
 Returns a builtin representing the size of a subgroup within the current shader.
+
+**Overrides:** [NodeBuilder#getSubgroupSize](NodeBuilder.html#getSubgroupSize)
 
 ### .getTernary( condSnippet : string, ifSnippet : string, elseSnippet : string ) : string
 
@@ -565,6 +667,20 @@ The buffer attribute.
 **Overrides:** [NodeBuilder#getTypeFromAttribute](NodeBuilder.html#getTypeFromAttribute)
 
 **Returns:** The type.
+
+### .getUniformBufferName( uniform : NodeUniform, shaderStage : string ) : string
+
+Returns the uniform block name of the given buffer uniform.
+
+**uniform**
+
+The buffer uniform.
+
+**shaderStage**
+
+The shader stage.
+
+**Returns:** The uniform block name.
 
 ### .getUniformFromNode( node : UniformNode, type : string, shaderStage : string, name : string ) : NodeUniform
 
@@ -618,6 +734,30 @@ The shader stage.
 
 **Returns:** The GLSL snippet that defines the varyings.
 
+### .getVectorSelect( condSnippet : string, ifSnippet : string, elseSnippet : string, type : string ) : string
+
+Returns the native snippet for a genuinely per-component vector select. GLSL has no vector ternary, so `float` types use `mix()`'s `bvecN`\-selector overload; `int`/`uint`/`bool` types use an arithmetic select instead, since that overload doesn't exist for them.
+
+**condSnippet**
+
+The per-component boolean (`bvecN`) condition.
+
+**ifSnippet**
+
+The vector expression selected where `condSnippet` is `true`.
+
+**elseSnippet**
+
+The vector expression selected where `condSnippet` is `false`.
+
+**type**
+
+The (vector) type of `ifSnippet`/`elseSnippet`.
+
+**Overrides:** [NodeBuilder#getVectorSelect](NodeBuilder.html#getVectorSelect)
+
+**Returns:** The resolved method name.
+
 ### .getVertexIndex() : string
 
 Returns the vertex index builtin.
@@ -645,6 +785,18 @@ Whether to flip texture data along its vertical axis or not.
 **Overrides:** [NodeBuilder#isFlipY](NodeBuilder.html#isFlipY)
 
 **Returns:** Returns always `true` in context of GLSL.
+
+### .isReservedKeyword( name : string ) : boolean
+
+Returns whether the given name is a reserved keyword of GLSL.
+
+**name**
+
+The name to test.
+
+**Overrides:** [NodeBuilder#isReservedKeyword](NodeBuilder.html#isReservedKeyword)
+
+**Returns:** Whether the name is a reserved keyword or not.
 
 ### .needsToWorkingColorSpace( texture : Texture ) : boolean
 

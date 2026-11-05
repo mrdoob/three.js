@@ -84,6 +84,7 @@ const _frustumArray = /*@__PURE__*/ new FrustumArray();
 const _box = /*@__PURE__*/ new Box3();
 const _sphere = /*@__PURE__*/ new Sphere();
 const _vector = /*@__PURE__*/ new Vector3();
+const _cameraPosition = /*@__PURE__*/ new Vector3();
 const _forward = /*@__PURE__*/ new Vector3();
 const _temp = /*@__PURE__*/ new Vector3();
 const _renderList = /*@__PURE__*/ new MultiDrawRenderList();
@@ -176,6 +177,10 @@ function copyArrayContents( src, target ) {
  *
  * scene.add( batchedMesh );
  * ```
+ *
+ * The first geometry added defines the layout of the batch. All subsequent geometries must
+ * match its index usage and provide its attributes with the same itemSize and normalized
+ * values. Additional attributes are ignored.
  *
  * @augments Mesh
  */
@@ -274,10 +279,19 @@ class BatchedMesh extends Mesh {
 		this._multiDrawCount = 0;
 		this._multiDrawBytesPerElement = 1;
 
+		// buffers for instanced draws, consecutive draws with the same range are merged
+		this._mergedDrawCounts = new Int32Array( maxInstanceCount );
+		this._mergedDrawStarts = new Int32Array( maxInstanceCount );
+		this._mergedDrawInstanceCounts = new Int32Array( maxInstanceCount );
+		this._mergedDrawCount = 0;
+
 		// Local matrix per geometry by using data texture
 		this._matricesTexture = null;
 		this._indirectTexture = null;
 		this._colorsTexture = null;
+
+		// previous frame matrices for motion vectors, created by the renderer
+		this._previousMatricesTexture = null;
 
 		this._initMatricesTexture();
 		this._initIndirectTexture();
@@ -437,7 +451,7 @@ class BatchedMesh extends Mesh {
 			const dstAttribute = batchGeometry.getAttribute( attributeName );
 			if ( srcAttribute.itemSize !== dstAttribute.itemSize || srcAttribute.normalized !== dstAttribute.normalized ) {
 
-				throw new Error( 'THREE.BatchedMesh: All attributes must have a consistent itemSize and normalized value.' );
+				throw new Error( `THREE.BatchedMesh: Added geometry attribute "${ attributeName }" has an inconsistent itemSize or normalized value.` );
 
 			}
 
@@ -494,7 +508,7 @@ class BatchedMesh extends Mesh {
 	/**
 	 * Computes the bounding box, updating {@link BatchedMesh#boundingBox}.
 	 * Bounding boxes aren't computed by default. They need to be explicitly computed,
-	 * otherwise they are `null`.
+	 * otherwise they are `null`. Must be recomputed when instances change.
 	 */
 	computeBoundingBox() {
 
@@ -523,8 +537,8 @@ class BatchedMesh extends Mesh {
 
 	/**
 	 * Computes the bounding sphere, updating {@link BatchedMesh#boundingSphere}.
-	 * Bounding spheres aren't computed by default. They need to be explicitly computed,
-	 * otherwise they are `null`.
+	 * The engine computes the bounding sphere once when it is needed. Must be
+	 * recomputed when instances change.
 	 */
 	computeBoundingSphere() {
 
@@ -1226,7 +1240,7 @@ class BatchedMesh extends Mesh {
 
 	/**
 	 * Get the range representing the subset of triangles related to the attached geometry,
-	 * indicating the starting offset and count, or `null` if invalid.
+	 * indicating the starting offset and count, or throws an error if invalid.
 	 *
 	 * @param {number} geometryId - The id of the geometry to get the range of.
 	 * @param {Object} [target] - The target object that is used to store the method's result.
@@ -1291,6 +1305,17 @@ class BatchedMesh extends Mesh {
 
 		this._multiDrawCounts = multiDrawCounts;
 		this._multiDrawStarts = multiDrawStarts;
+
+		const mergedDrawCounts = new Int32Array( maxInstanceCount );
+		const mergedDrawStarts = new Int32Array( maxInstanceCount );
+		const mergedDrawInstanceCounts = new Int32Array( maxInstanceCount );
+		copyArrayContents( this._mergedDrawCounts, mergedDrawCounts );
+		copyArrayContents( this._mergedDrawStarts, mergedDrawStarts );
+		copyArrayContents( this._mergedDrawInstanceCounts, mergedDrawInstanceCounts );
+
+		this._mergedDrawCounts = mergedDrawCounts;
+		this._mergedDrawStarts = mergedDrawStarts;
+		this._mergedDrawInstanceCounts = mergedDrawInstanceCounts;
 		this._maxInstanceCount = maxInstanceCount;
 
 		// update texture data for instance sampling
@@ -1314,6 +1339,13 @@ class BatchedMesh extends Mesh {
 
 		}
 
+		if ( this._previousMatricesTexture !== null ) {
+
+			this._previousMatricesTexture.dispose();
+			this._previousMatricesTexture = null;
+
+		}
+
 	}
 
 	/**
@@ -1331,7 +1363,7 @@ class BatchedMesh extends Mesh {
 		const requiredVertexLength = Math.max( ...validRanges.map( range => range.vertexStart + range.reservedVertexCount ) );
 		if ( requiredVertexLength > maxVertexCount ) {
 
-			throw new Error( `THREE.BatchedMesh: Geometry vertex values are being used outside the range ${ maxIndexCount }. Cannot shrink further.` );
+			throw new Error( `THREE.BatchedMesh: Geometry vertex values are being used outside the range ${ maxVertexCount }. Cannot shrink further.` );
 
 		}
 
@@ -1378,6 +1410,8 @@ class BatchedMesh extends Mesh {
 			copyArrayContents( oldGeometry.attributes[ key ].array, geometry.attributes[ key ].array );
 
 		}
+
+		this._visibilityChanged = true;
 
 	}
 
@@ -1443,9 +1477,9 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		super.copy( source );
+		super.copy( source, recursive );
 
 		this.geometry = source.geometry.clone();
 		this.perObjectFrustumCulled = source.perObjectFrustumCulled;
@@ -1476,6 +1510,9 @@ class BatchedMesh extends Mesh {
 		this._multiDrawCounts = source._multiDrawCounts.slice();
 		this._multiDrawStarts = source._multiDrawStarts.slice();
 		this._multiDrawBytesPerElement = source._multiDrawBytesPerElement;
+		this._mergedDrawCounts = source._mergedDrawCounts.slice();
+		this._mergedDrawStarts = source._mergedDrawStarts.slice();
+		this._mergedDrawInstanceCounts = source._mergedDrawInstanceCounts.slice();
 
 		this._indirectTexture = source._indirectTexture.clone();
 		this._indirectTexture.image.data = this._indirectTexture.image.data.slice();
@@ -1483,10 +1520,14 @@ class BatchedMesh extends Mesh {
 		this._matricesTexture = source._matricesTexture.clone();
 		this._matricesTexture.image.data = this._matricesTexture.image.data.slice();
 
-		if ( this._colorsTexture !== null ) {
+		if ( source._colorsTexture !== null ) {
 
 			this._colorsTexture = source._colorsTexture.clone();
 			this._colorsTexture.image.data = this._colorsTexture.image.data.slice();
+
+		} else {
+
+			this._colorsTexture = null;
 
 		}
 
@@ -1518,9 +1559,26 @@ class BatchedMesh extends Mesh {
 
 		}
 
+		if ( this._previousMatricesTexture !== null ) {
+
+			this._previousMatricesTexture.dispose();
+			this._previousMatricesTexture = null;
+
+		}
+
 	}
 
-	onBeforeRender( renderer, scene, camera, geometry, material/*, _group*/ ) {
+	/**
+	 * Updates the draw parameters for the next draw. Depending on {@link BatchedMesh#perObjectFrustumCulled}
+	 * and {@link BatchedMesh#sortObjects}, this includes per-object frustum culling and sorting.
+	 *
+	 * @private
+	 * @param {Camera} camera - The camera of the next draw.
+	 * @param {BufferGeometry} geometry - The batch's geometry.
+	 * @param {Material} material - The material of the next draw.
+	 * @param {('multiDraw'|'merged')} [drawFormat='multiDraw'] - The format of the draw parameters.
+	 */
+	_updateDrawParameters( camera, geometry, material, drawFormat = 'multiDraw' ) {
 
 		// if visibility has not changed and frustum culling and object sorting is not required
 		// then skip iterating over all items
@@ -1550,6 +1608,9 @@ class BatchedMesh extends Mesh {
 		const instanceInfo = this._instanceInfo;
 		const multiDrawStarts = this._multiDrawStarts;
 		const multiDrawCounts = this._multiDrawCounts;
+		const mergedDrawStarts = this._mergedDrawStarts;
+		const mergedDrawCounts = this._mergedDrawCounts;
+		const mergedDrawInstanceCounts = this._mergedDrawInstanceCounts;
 		const geometryInfoList = this._geometryInfo;
 		const perObjectFrustumCulled = this.perObjectFrustumCulled;
 		const indirectTexture = this._indirectTexture;
@@ -1580,11 +1641,12 @@ class BatchedMesh extends Mesh {
 		}
 
 		let multiDrawCount = 0;
+		let mergedDrawCount = 0;
 		if ( this.sortObjects ) {
 
 			// get the camera position in the local frame
 			_matrix.copy( this.matrixWorld ).invert();
-			_vector.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _matrix );
+			_cameraPosition.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _matrix );
 			_forward.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld ).transformDirection( _matrix );
 
 			for ( let i = 0, l = instanceInfo.length; i < l; i ++ ) {
@@ -1609,7 +1671,7 @@ class BatchedMesh extends Mesh {
 
 						// get the distance from camera used for sorting
 						const geometryInfo = geometryInfoList[ geometryId ];
-						const z = _temp.subVectors( _sphere.center, _vector ).dot( _forward );
+						const z = _temp.subVectors( _sphere.center, _cameraPosition ).dot( _forward );
 						_renderList.push( geometryInfo.start, geometryInfo.count, z, i );
 
 					}
@@ -1634,8 +1696,31 @@ class BatchedMesh extends Mesh {
 			for ( let i = 0, l = list.length; i < l; i ++ ) {
 
 				const item = list[ i ];
-				multiDrawStarts[ multiDrawCount ] = item.start * bytesPerElement * multiDrawMultiplier;
-				multiDrawCounts[ multiDrawCount ] = item.count * multiDrawMultiplier;
+				const start = item.start * bytesPerElement * multiDrawMultiplier;
+				const count = item.count * multiDrawMultiplier;
+
+				if ( drawFormat === 'merged' ) {
+
+					if ( mergedDrawCount > 0 && mergedDrawStarts[ mergedDrawCount - 1 ] === start && mergedDrawCounts[ mergedDrawCount - 1 ] === count ) {
+
+						mergedDrawInstanceCounts[ mergedDrawCount - 1 ] ++;
+
+					} else {
+
+						mergedDrawStarts[ mergedDrawCount ] = start;
+						mergedDrawCounts[ mergedDrawCount ] = count;
+						mergedDrawInstanceCounts[ mergedDrawCount ] = 1;
+						mergedDrawCount ++;
+
+					}
+
+				} else {
+
+					multiDrawStarts[ multiDrawCount ] = start;
+					multiDrawCounts[ multiDrawCount ] = count;
+
+				}
+
 				indirectArray[ multiDrawCount ] = item.index;
 				multiDrawCount ++;
 
@@ -1665,8 +1750,31 @@ class BatchedMesh extends Mesh {
 					if ( ! culled ) {
 
 						const geometryInfo = geometryInfoList[ geometryId ];
-						multiDrawStarts[ multiDrawCount ] = geometryInfo.start * bytesPerElement * multiDrawMultiplier;
-						multiDrawCounts[ multiDrawCount ] = geometryInfo.count * multiDrawMultiplier;
+						const start = geometryInfo.start * bytesPerElement * multiDrawMultiplier;
+						const count = geometryInfo.count * multiDrawMultiplier;
+
+						if ( drawFormat === 'merged' ) {
+
+							if ( mergedDrawCount > 0 && mergedDrawStarts[ mergedDrawCount - 1 ] === start && mergedDrawCounts[ mergedDrawCount - 1 ] === count ) {
+
+								mergedDrawInstanceCounts[ mergedDrawCount - 1 ] ++;
+
+							} else {
+
+								mergedDrawStarts[ mergedDrawCount ] = start;
+								mergedDrawCounts[ mergedDrawCount ] = count;
+								mergedDrawInstanceCounts[ mergedDrawCount ] = 1;
+								mergedDrawCount ++;
+
+							}
+
+						} else {
+
+							multiDrawStarts[ multiDrawCount ] = start;
+							multiDrawCounts[ multiDrawCount ] = count;
+
+						}
+
 						indirectArray[ multiDrawCount ] = i;
 						multiDrawCount ++;
 
@@ -1680,14 +1788,37 @@ class BatchedMesh extends Mesh {
 
 		indirectTexture.needsUpdate = true;
 		this._multiDrawCount = multiDrawCount;
+		this._mergedDrawCount = mergedDrawCount;
 		this._multiDrawBytesPerElement = bytesPerElement;
 		this._visibilityChanged = false;
 
 	}
 
+	onBeforeRender( renderer, scene, camera, geometry, material/*, _group*/ ) {
+
+		if ( renderer.isWebGPURenderer === true ) {
+
+			if ( this._visibilityChanged || this.perObjectFrustumCulled || this.sortObjects ) {
+
+				this._indirectTexture.needsUpdate = true;
+
+			}
+
+		} else {
+
+			this._updateDrawParameters( camera, geometry, material );
+
+		}
+
+	}
+
 	onBeforeShadow( renderer, object, camera, shadowCamera, geometry, depthMaterial/* , group */ ) {
 
-		this.onBeforeRender( renderer, null, shadowCamera, geometry, depthMaterial );
+		if ( renderer.isWebGPURenderer !== true ) {
+
+			this._updateDrawParameters( shadowCamera, geometry, depthMaterial );
+
+		}
 
 	}
 

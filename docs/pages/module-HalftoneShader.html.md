@@ -2,7 +2,7 @@
 
 ## Import
 
-HalftoneShader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+HalftoneShader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { HalftoneShader } from 'three/addons/shaders/HalftoneShader.js';

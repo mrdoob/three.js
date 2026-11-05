@@ -8,7 +8,7 @@ A class that extends `ShadowBaseNode` to implement tiled shadow mapping. This al
 
 ## Import
 
-TileShadowNode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+TileShadowNode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { TileShadowNode } from 'three/addons/tsl/shadows/TileShadowNode.js';
@@ -45,6 +45,12 @@ Default is `2`.
 **resolution**
 
 The resolution of the shadow map.
+
+**depthType**
+
+The type of the tile depth texture. `UnsignedShortType` halves the memory when the depth range allows it.
+
+Default is `UnsignedIntType`.
 
 **debug**
 

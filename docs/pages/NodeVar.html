@@ -20,7 +20,7 @@ this purpose.</p></div>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="NodeVar" translate="no">new <a href="#NodeVar">NodeVar</a><span class="signature">( name : <span class="param-type">string</span>, type : <span class="param-type">string</span>, readOnly : <span class="param-type">boolean</span>, count : <span class="param-type">number</span> )</span> </h3>
+					<h3 class="name name-method" id="NodeVar" translate="no">new <a href="#NodeVar">NodeVar</a><span class="signature">( name : <span class="param-type">string</span>, type : <span class="param-type">string</span>, readOnly : <span class="param-type">boolean</span>, count : <span class="param-type">number</span>, local : <span class="param-type">boolean</span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new node variable.</p>
@@ -61,6 +61,15 @@ this purpose.</p></div>
 										<p>Default is <code>null</code>.</p>
 									</td>
 								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">local</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the variable is declared locally in the flow.</p>
+										<p>Default is <code>false</code>.</p>
+									</td>
+								</tr>
 							</tbody>
 						</table>
 					</div>
@@ -77,6 +86,13 @@ this purpose.</p></div>
 					<div class="description">
 						<p>This flag can be used for type testing.</p>
 						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="local" translate="no">.<a href="#local">local</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether the variable is declared locally in the flow.</p>
+						<p>Default is <code>false</code>.</p>
 					</div>
 				</div>
 				<div class="member">

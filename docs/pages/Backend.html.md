@@ -142,7 +142,7 @@ The height of the copy.
 
 **faceIndex**
 
-The face index.
+The cube face, depth slice or array layer index.
 
 **Returns:** A Promise that resolves with a typed array when the copy operation has finished.
 
@@ -190,7 +190,7 @@ Creates the GPU buffer of a shader attribute.
 
 The buffer attribute.
 
-### .createBindings( bindGroup : BindGroup, bindings : Array.<BindGroup>, cacheIndex : number, version : number ) (abstract)
+### .createBindings( bindGroup : BindGroup, bindings : Array.<BindGroup>, cacheKey : string, version : number ) (abstract)
 
 Creates bindings from the given bind group definition.
 
@@ -202,15 +202,15 @@ The bind group.
 
 Array of bind groups.
 
-**cacheIndex**
+**cacheKey**
 
-The cache index.
+The cache key.
 
 **version**
 
 The version.
 
-### .createComputePipeline( computePipeline : ComputePipeline, bindings : Array.<BindGroup> ) (abstract)
+### .createComputePipeline( computePipeline : ComputePipeline, bindings : Array.<BindGroup>, promises : Array.<Promise> ) (abstract)
 
 Creates a compute pipeline for the given compute node.
 
@@ -221,6 +221,12 @@ The compute pipeline.
 **bindings**
 
 The bindings.
+
+**promises**
+
+Optional compilation promises.
+
+Default is `null`.
 
 ### .createDefaultTexture( texture : Texture ) (abstract)
 
@@ -237,6 +243,14 @@ Creates the GPU buffer of an indexed shader attribute.
 **attribute**
 
 The indexed buffer attribute.
+
+### .createIndirectStorageAttribute( attribute : BufferAttribute ) (abstract)
+
+Creates the GPU buffer of an indirect storage attribute.
+
+**attribute**
+
+The buffer attribute.
 
 ### .createNodeBuilder( renderObject : RenderObject, renderer : Renderer ) : NodeBuilder (abstract)
 
@@ -318,6 +332,14 @@ Delete GPU data associated with a bind group.
 
 The bind group.
 
+### .deleteVertexState( renderObject : RenderObject ) (abstract)
+
+Deletes the vertex state for the given render object.
+
+**renderObject**
+
+The render object.
+
 ### .destroyAttribute( attribute : BufferAttribute ) (abstract)
 
 Destroys the GPU buffer of a shader attribute.
@@ -325,6 +347,22 @@ Destroys the GPU buffer of a shader attribute.
 **attribute**
 
 The buffer attribute to destroy.
+
+### .destroyCanvasTarget( canvasTarget : CanvasTarget ) (abstract)
+
+Frees the GPU resources of the given canvas target.
+
+**canvasTarget**
+
+The canvas target.
+
+### .destroyPipeline( pipeline : Pipeline ) (abstract)
+
+Destroys the given pipeline.
+
+**pipeline**
+
+The pipeline.
 
 ### .destroyProgram( program : ProgrammableStage ) (abstract)
 
@@ -364,7 +402,7 @@ Destroys a uniform buffer.
 
 The uniform buffer.
 
-### .dispose() (abstract)
+### .dispose() (async, abstract)
 
 Frees internal resources.
 
@@ -414,15 +452,41 @@ The object.
 
 **Returns:** The object's dictionary.
 
-### .getArrayBufferAsync( attribute : StorageBufferAttribute ) : Promise.<ArrayBuffer> (async)
+### .getArrayBufferAsync( attribute : BufferAttribute, target : ReadbackBuffer | ArrayBuffer, offset : number, count : number ) : Promise.<(ArrayBuffer|ReadbackBuffer)> (async)
 
 This method performs a readback operation by moving buffer data from a storage buffer attribute from the GPU to the CPU.
 
 **attribute**
 
-The storage buffer attribute.
+The storage buffer attribute to read from.
+
+**target**
+
+The readback buffer or array buffer that receives the data. If `null`, a new array buffer is returned.
+
+Default is `null`.
+
+**offset**
+
+The byte offset to start reading from. Must be a multiple of 4.
+
+Default is `0`.
+
+**count**
+
+The number of bytes to read. Must be a multiple of 4, or `-1` to read to the end of the buffer.
+
+Default is `-1`.
 
 **Returns:** A promise that resolves with the buffer data when the data are ready.
+
+### .getBufferAttribute( attribute : BufferAttribute | InterleavedBufferAttribute ) : BufferAttribute | InterleavedBuffer
+
+Utility method for handling interleaved buffer attributes correctly. To process them, their `InterleavedBuffer` is returned.
+
+**attribute**
+
+The attribute.
 
 ### .getClearColor() : Color4
 
@@ -447,6 +511,16 @@ Returns the DOM element. If no DOM element exists, the backend creates a new one
 Returns the drawing buffer size.
 
 **Returns:** The drawing buffer size.
+
+### .getOcclusionData( renderContext : RenderContext ) : Object
+
+Returns the occlusion query data of the given render context for its current camera.
+
+**renderContext**
+
+The render context.
+
+**Returns:** The occlusion query data.
 
 ### .getRenderCacheKey( renderObject : RenderObject ) : string (abstract)
 
@@ -580,6 +654,10 @@ The render object.
 
 **Returns:** Whether the render pipeline requires an update or not.
 
+### .resetState() (abstract)
+
+Resets the backend's internal state. A no-op for backends without a state cache (e.g. WebGPU).
+
 ### .resolveTimestampsAsync( type : string ) : Promise.<number> (async, abstract)
 
 Resolves the time stamp for the given render context and type.
@@ -638,7 +716,7 @@ Updates a buffer binding.
 
 The buffer binding to update.
 
-### .updateBindings( bindGroup : BindGroup, bindings : Array.<BindGroup>, cacheIndex : number, version : number ) (abstract)
+### .updateBindings( bindGroup : BindGroup, bindings : Array.<BindGroup>, cacheKey : string, version : number ) (abstract)
 
 Updates the given bind group definition.
 
@@ -650,9 +728,9 @@ The bind group.
 
 Array of bind groups.
 
-**cacheIndex**
+**cacheKey**
 
-The cache index.
+The cache key.
 
 **version**
 
@@ -686,7 +764,7 @@ Optional configuration parameter.
 
 Default is `{}`.
 
-### .updateTimeStampUID( abstractRenderContext : RenderContext | ComputeNode )
+### .updateTimeStampUID( abstractRenderContext : RenderContext | ComputeNode | Array.<ComputeNode> )
 
 Updates a unique identifier for the given render context that can be used to allocate resources like occlusion queries or timestamp queries.
 

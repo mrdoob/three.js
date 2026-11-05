@@ -2,11 +2,25 @@ import DataMap from './DataMap.js';
 
 import { Vector3 } from '../../math/Vector3.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
-import { DepthStencilFormat, DepthFormat, UnsignedIntType, UnsignedInt248Type, UnsignedByteType, SRGBTransfer } from '../../constants.js';
+import { DepthStencilFormat, DepthFormat, UnsignedIntType, UnsignedInt248Type, UnsignedByteType, FloatType, SRGBTransfer } from '../../constants.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 import { warn } from '../../utils.js';
 
 const _size = /*@__PURE__*/ new Vector3();
+
+/**
+ * Returns the mipmaps of the given texture. Compressed cube textures
+ * define them per face.
+ *
+ * @private
+ * @param {Texture} texture - The texture.
+ * @return {Array<Object>} The mipmaps.
+ */
+function getMipmaps( texture ) {
+
+	return texture.isCompressedCubeTexture === true ? texture.image[ 0 ].mipmaps : texture.mipmaps;
+
+}
 
 /**
  * This module manages the textures of the renderer.
@@ -55,6 +69,56 @@ class Textures extends DataMap {
 		 */
 		this._htmlTextures = new Set();
 
+		/**
+		 * Stores weak references to the textures and render targets
+		 * with attached `dispose` event listeners.
+		 *
+		 * @private
+		 * @type {Set<WeakRef<(Texture|RenderTarget)>>}
+		 */
+		this._tracked = new Set();
+
+		/**
+		 * Removes weak references from `_tracked` when their texture or
+		 * render target has been garbage collected without an explicit
+		 * `dispose()`.
+		 *
+		 * @private
+		 * @type {FinalizationRegistry}
+		 */
+		this._registry = new FinalizationRegistry( ( ref ) => this._tracked.delete( ref ) );
+
+	}
+
+	/**
+	 * Frees internal resources.
+	 */
+	dispose() {
+
+		for ( const ref of this._tracked ) {
+
+			const object = ref.deref();
+
+			if ( object === undefined || this.has( object ) === false ) continue;
+
+			if ( object.isRenderTarget === true ) {
+
+				this._destroyRenderTarget( object );
+
+			} else {
+
+				this._destroyTexture( object );
+
+			}
+
+		}
+
+		this._tracked.clear();
+
+		this._htmlTextures.clear();
+
+		super.dispose();
+
 	}
 
 	/**
@@ -73,7 +137,8 @@ class Textures extends DataMap {
 
 		const textures = renderTarget.textures;
 
-		const size = this.getSize( textures[ 0 ] );
+		// Depth-only render targets take their size from the depth texture.
+		const size = this.getSize( textures.length > 0 ? textures[ 0 ] : renderTarget.depthTexture );
 
 		const mipWidth = size.width >> activeMipmapLevel;
 		const mipHeight = size.height >> activeMipmapLevel;
@@ -91,7 +156,7 @@ class Textures extends DataMap {
 			depthTexture = new DepthTexture();
 
 			depthTexture.format = renderTarget.stencilBuffer ? DepthStencilFormat : DepthFormat;
-			depthTexture.type = renderTarget.stencilBuffer ? UnsignedInt248Type : UnsignedIntType; // FloatType
+			depthTexture.type = this.renderer.reversedDepthBuffer === true ? FloatType : ( renderTarget.stencilBuffer ? UnsignedInt248Type : UnsignedIntType );
 			depthTexture.image.width = mipWidth;
 			depthTexture.image.height = mipHeight;
 			depthTexture.image.depth = size.depth;
@@ -111,12 +176,19 @@ class Textures extends DataMap {
 
 			textureNeedsUpdate = true;
 
-			if ( depthTexture && depthTexture.renderTarget === renderTarget ) {
+		}
+
+		if ( depthTexture && depthTexture.renderTarget === renderTarget ) {
+
+			const image = depthTexture.image;
+
+			if ( textureNeedsUpdate === true || image.width !== mipWidth || image.height !== mipHeight ) {
+
+				image.width = mipWidth;
+				image.height = mipHeight;
+				image.depth = useArrayDepth ? size.depth : 1;
 
 				depthTexture.needsUpdate = true;
-				depthTexture.image.width = mipWidth;
-				depthTexture.image.height = mipHeight;
-				depthTexture.image.depth = useArrayDepth ? size.depth : 1;
 
 			}
 
@@ -144,8 +216,31 @@ class Textures extends DataMap {
 
 		}
 
-		//
+		// dispose handler
 
+		if ( renderTargetData.initialized !== true ) {
+
+			renderTargetData.initialized = true;
+
+			this.info.memory.renderTargets ++;
+
+			// dispose
+
+			renderTargetData.onDispose = () => {
+
+				this._destroyRenderTarget( renderTarget );
+
+			};
+
+			renderTarget.addEventListener( 'dispose', renderTargetData.onDispose );
+
+			// see #34368 why tracking separate remove listeners is required right now
+			renderTargetData.ref = new WeakRef( renderTarget );
+
+			this._tracked.add( renderTargetData.ref );
+			this._registry.register( renderTarget, renderTargetData.ref, renderTargetData.ref );
+
+		}
 
 		const options = { sampleCount };
 
@@ -171,26 +266,6 @@ class Textures extends DataMap {
 
 		}
 
-		// dispose handler
-
-		if ( renderTargetData.initialized !== true ) {
-
-			renderTargetData.initialized = true;
-
-			this.info.memory.renderTargets ++;
-
-			// dispose
-
-			renderTargetData.onDispose = () => {
-
-				this._destroyRenderTarget( renderTarget );
-
-			};
-
-			renderTarget.addEventListener( 'dispose', renderTargetData.onDispose );
-
-		}
-
 	}
 
 	/**
@@ -200,11 +275,24 @@ class Textures extends DataMap {
 	 *
 	 * @param {Texture} texture - The texture to update.
 	 * @param {Object} [options={}] - The options.
+	 * @return {number} The current texture generation.
 	 */
 	updateTexture( texture, options = {} ) {
 
 		const textureData = this.get( texture );
-		if ( textureData.initialized === true && textureData.version === texture.version ) return;
+		if ( textureData.initialized === true && textureData.version === texture.version ) return textureData.generation;
+
+		// render target textures are created with their render target
+
+		const renderTarget = ( texture.isRenderTargetTexture || texture.isDepthTexture ) ? texture.renderTarget : null;
+
+		if ( renderTarget !== null && this.get( renderTarget ).initialized !== true ) {
+
+			this.updateRenderTarget( renderTarget );
+
+			return textureData.generation;
+
+		}
 
 		const isRenderTarget = texture.isRenderTargetTexture || texture.isDepthTexture || texture.isFramebufferTexture;
 		const backend = this.backend;
@@ -296,10 +384,10 @@ class Textures extends DataMap {
 		options.levels = options.needsMipmaps ? this.getMipLevels( texture, width, height ) : 1;
 
 		// TODO: Uniformly handle mipmap definitions
-		// Normal textures and compressed cube textures define base level + mips with their mipmap array
+		// Normal textures, compressed cube textures and render targets define base level + mips with their mipmap array
 		// Uncompressed cube textures use their mipmap array only for mips (no base level)
 
-		if ( texture.isCubeTexture && texture.mipmaps.length > 0 ) options.levels ++;
+		if ( texture.isCubeTexture && texture.mipmaps.length > 0 && ! isRenderTarget ) options.levels ++;
 
 		//
 
@@ -347,16 +435,22 @@ class Textures extends DataMap {
 
 						backend.createTexture( texture, options );
 
+						if ( textureData.isDefaultTexture === true ) this.info.updateTexture( texture, options );
+
 						textureData.isDefaultTexture = false;
 						textureData.generation = texture.version;
 
 					}
 
-					if ( texture.source.dataReady === true ) backend.updateTexture( texture, options );
+					if ( texture.source.dataReady === true ) {
 
-					const skipAutoGeneration = texture.isStorageTexture === true && texture.mipmapsAutoUpdate === false;
+						backend.updateTexture( texture, options );
 
-					if ( options.needsMipmaps && texture.mipmaps.length === 0 && ! skipAutoGeneration ) {
+						texture.clearUpdateRanges();
+
+					}
+
+					if ( options.needsMipmaps && getMipmaps( texture ).length === 0 && texture.mipmapsAutoUpdate === true ) {
 
 						backend.generateMipmaps( texture );
 
@@ -389,7 +483,7 @@ class Textures extends DataMap {
 
 			//
 
-			this.info.createTexture( texture );
+			this.info.createTexture( texture, options );
 
 			//
 
@@ -401,19 +495,31 @@ class Textures extends DataMap {
 
 			// dispose
 
-			textureData.onDispose = () => {
+			if ( texture.isRenderTargetTexture !== true ) {
 
-				this._destroyTexture( texture );
+				textureData.onDispose = () => {
 
-			};
+					this._destroyTexture( texture );
 
-			texture.addEventListener( 'dispose', textureData.onDispose );
+				};
+
+				texture.addEventListener( 'dispose', textureData.onDispose );
+
+			}
+
+			// see #34368 why tracking separate remove listeners is required right now
+			textureData.ref = new WeakRef( texture );
+
+			this._tracked.add( textureData.ref );
+			this._registry.register( texture, textureData.ref, textureData.ref );
 
 		}
 
 		//
 
 		textureData.version = texture.version;
+
+		return textureData.generation;
 
 	}
 
@@ -450,6 +556,8 @@ class Textures extends DataMap {
 	getSize( texture, target = _size ) {
 
 		let image = texture.images ? texture.images[ 0 ] : texture.image;
+
+		if ( texture.isCompressedCubeTexture === true ) image = image[ 0 ];
 
 		if ( image ) {
 
@@ -503,9 +611,11 @@ class Textures extends DataMap {
 
 		let mipLevelCount;
 
-		if ( texture.mipmaps.length > 0 ) {
+		const mipmaps = getMipmaps( texture );
 
-			mipLevelCount = texture.mipmaps.length;
+		if ( mipmaps.length > 0 ) {
+
+			mipLevelCount = mipmaps.length;
 
 		} else {
 
@@ -537,7 +647,7 @@ class Textures extends DataMap {
 	 */
 	needsMipmaps( texture ) {
 
-		return texture.generateMipmaps === true || texture.mipmaps.length > 0;
+		return texture.generateMipmaps === true || getMipmaps( texture ).length > 0;
 
 	}
 
@@ -559,6 +669,9 @@ class Textures extends DataMap {
 			//
 
 			renderTarget.removeEventListener( 'dispose', renderTargetData.onDispose );
+
+			this._tracked.delete( renderTargetData.ref );
+			this._registry.unregister( renderTargetData.ref );
 
 			//
 
@@ -598,6 +711,9 @@ class Textures extends DataMap {
 			//
 
 			texture.removeEventListener( 'dispose', textureData.onDispose );
+
+			this._tracked.delete( textureData.ref );
+			this._registry.unregister( textureData.ref );
 
 			// if a texture is not ready for use, it falls back to a default texture so it's possible
 			// to use it for rendering. If a texture in this state is disposed, it's important to

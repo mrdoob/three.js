@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>CarGenerator - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">CarGenerator</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A low-poly car fleet with lofted bodies, circular wheel arches, curved
+windscreens and recessed alloy wheels. Separate cabin panels define the
+windows and their frames. Two body types ( sedan and SUV ) are mixed
+deterministically across the fleet, and the taxi colour gets its own sedan with
+a roof sign, so a parked row reads as different vehicles rather than one mould.</p>
+<p>Each geometry is built once per type and shared; cars are grouped by body
+type with per-instance paint, so each group is a single instanced draw that
+assigns paint, glass, tyres and lamps using a baked <code>partId</code>, panel UVs and
+canonical-space masks.</p>
+<p>The canonical model stands with its wheels on <code>y = 0</code>, centred in X / Z, facing
+<code>+Z</code>, so a placement whose local <code>+Z</code> faces the road parks it nose-out.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const cars = new CarGenerator();
+scene.add( cars.build( placements ) ); // placements: { matrix: Matrix4, color }[]
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="CarGenerator" translate="no">new <a href="#CarGenerator">CarGenerator</a><span class="signature">()</span> </h3>
+					<div class="method">
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/generators/city/CarGenerator.js" translate="no" target="_blank" rel="noopener">examples/jsm/generators/city/CarGenerator.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

@@ -40,9 +40,9 @@ const captureConsole = ( page ) => {
 	page.on( 'console', async ( message ) => {
 
 		const type = message.type().toUpperCase();
-		const color = colors[ type ] || blue;
+		const printer = colors[ type ] || blue;
 
-		color( `${type}: ${message.text()} ` );
+		printer( `${type}: ${message.text()} ` );
 
 	} );
 
@@ -107,6 +107,53 @@ function main() {
 
 		captureConsole( page );
 
+		// Collect per-test failure details (name + assertion messages) so
+		// they can be printed below -- QUnit doesn't log these to the console
+		// itself, and `window._QUnitStats` (used below) only holds aggregate
+		// counts. Installed before navigation since QUnit starts running as
+		// soon as the test page's scripts load.
+		await page.evaluateOnNewDocument( () => {
+
+			window._QUnitFailures = [];
+
+			const install = () => {
+
+				window.QUnit.on( 'testEnd', ( test ) => {
+
+					if ( test.status === 'failed' ) {
+
+						window._QUnitFailures.push( {
+							name: test.fullName.join( ' > ' ),
+							messages: test.errors.map( ( e ) => e.message )
+						} );
+
+					}
+
+				} );
+
+			};
+
+			if ( window.QUnit ) {
+
+				install();
+
+			} else {
+
+				const interval = setInterval( () => {
+
+					if ( window.QUnit ) {
+
+						clearInterval( interval );
+						install();
+
+					}
+
+				}, 1 );
+
+			}
+
+		} );
+
 		const testUrl = `http://localhost:${port}/test/unit/${testPage}`;
 
 		// Load the test page
@@ -118,7 +165,7 @@ function main() {
 		// Wait for the QUnit test results
 		await page.waitForFunction( () => {
 
-			return window.QUnit && window.QUnit.done;
+			return window._QUnitStats !== undefined;
 
 		} );
 
@@ -130,11 +177,20 @@ function main() {
 
 		} );
 
+		const failures = await page.evaluate( () => window._QUnitFailures );
+
 		white( `1..${stats.total}` );
 		green( `# pass ${stats.passed}` );
 		yellow( `# skip ${stats.skipped}` );
 		cyan( `# todo ${stats.todo}` );
 		red( `# fail ${stats.failed}` );
+
+		for ( const failure of failures ) {
+
+			red( `not ok - ${failure.name}` );
+			for ( const message of failure.messages ) red( `    ${message.replace( /\n/g, '\n    ' )}` );
+
+		}
 
 		// Keep the process running if testing in headful mode, otherwise close it.
 		testMode === 'headless' && close( stats.failed > 0 ? 1 : 0 );

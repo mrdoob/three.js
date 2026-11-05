@@ -307,7 +307,7 @@ class Interpolant {
 	 *
 	 * @param {number} i1 - An index into the sample value buffer.
 	 * @param {number} t0 - The previous interpolation factor.
-	 * @param {number} t - The current interpolation factor.
+	 * @param {number} t1 - The next interpolation factor.
 	 */
 	intervalChanged_( /* i1, t0, t1 */ ) {
 

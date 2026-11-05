@@ -1,12 +1,12 @@
-import TempNode from '../core/TempNode.js';
-import { nodeProxyIntent } from '../tsl/TSLCore.js';
+import Node from '../core/Node.js';
+import { nodeProxyAssignable } from '../tsl/TSLCore.js';
 /**
  * This node represents an operation that reinterprets the bit representation of a value
  * in one type as a value in another type.
  *
- * @augments TempNode
+ * @augments Node
  */
-class BitcastNode extends TempNode {
+class BitcastNode extends Node {
 
 	static get type() {
 
@@ -113,7 +113,7 @@ export default BitcastNode;
  * @param {string} y - The new type.
  * @returns {Node}
  */
-export const bitcast = /*@__PURE__*/ nodeProxyIntent( BitcastNode ).setParameterLength( 2 );
+export const bitcast = /*@__PURE__*/ nodeProxyAssignable( BitcastNode ).setParameterLength( 2 );
 
 /**
  * Bitcasts a float or a vector of floats to a corresponding integer type with the same element size.

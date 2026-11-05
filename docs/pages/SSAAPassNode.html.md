@@ -1,4 +1,4 @@
-*Inheritance: EventDispatcher → Node → TempNode → PassNode →*
+*Inheritance: EventDispatcher → Node → PassNode →*
 
 # SSAAPassNode
 
@@ -10,7 +10,7 @@ Reference: [https://en.wikipedia.org/wiki/Supersampling](https://en.wikipedia.or
 
 ## Import
 
-SSAAPassNode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+SSAAPassNode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { ssaaPass } from 'three/addons/tsl/display/SSAAPassNode.js';

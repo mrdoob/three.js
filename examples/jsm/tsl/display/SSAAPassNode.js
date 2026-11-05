@@ -32,7 +32,7 @@ class SSAAPassNode extends PassNode {
 	 */
 	constructor( scene, camera ) {
 
-		super( PassNode.COLOR, scene, camera );
+		super( PassNode.COLOR, scene, camera, { samples: 0 } );
 
 		/**
 		 * This flag can be used for type testing.
@@ -99,9 +99,7 @@ class SSAAPassNode extends PassNode {
 
 		//
 
-		this._pixelRatio = renderer.getPixelRatio();
-
-		const size = renderer.getSize( _size );
+		const size = renderer.getDrawingBufferSize( _size );
 
 		this.setSize( size.width, size.height );
 		this._sampleRenderTarget.setSize( this.renderTarget.width, this.renderTarget.height );

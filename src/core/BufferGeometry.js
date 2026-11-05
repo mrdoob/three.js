@@ -866,6 +866,7 @@ class BufferGeometry extends EventDispatcher {
 		}
 
 		const tan1 = [], tan2 = [];
+		const used = new Uint8Array( positionAttribute.count );
 
 		for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
@@ -886,6 +887,8 @@ class BufferGeometry extends EventDispatcher {
 			tdir = new Vector3();
 
 		function handleTriangle( a, b, c ) {
+
+			used[ a ] = used[ b ] = used[ c ] = 1;
 
 			vA.fromBufferAttribute( positionAttribute, a );
 			vB.fromBufferAttribute( positionAttribute, b );
@@ -965,6 +968,24 @@ class BufferGeometry extends EventDispatcher {
 			tmp.copy( t );
 			tmp.sub( n.multiplyScalar( n.dot( t ) ) ).normalize();
 
+			// Degenerate uvs give no tangent direction, so use any direction perpendicular to the normal
+
+			if ( tmp.lengthSq() === 0 ) {
+
+				if ( Math.abs( n2.x ) < 0.9 ) {
+
+					tmp.set( 1, 0, 0 );
+
+				} else {
+
+					tmp.set( 0, 1, 0 );
+
+				}
+
+				tmp.crossVectors( n2, tmp ).normalize();
+
+			}
+
 			// Calculate handedness
 
 			tmp2.crossVectors( n2, t );
@@ -975,20 +996,9 @@ class BufferGeometry extends EventDispatcher {
 
 		}
 
-		for ( let i = 0, il = groups.length; i < il; ++ i ) {
+		for ( let i = 0, il = positionAttribute.count; i < il; ++ i ) {
 
-			const group = groups[ i ];
-
-			const start = group.start;
-			const count = group.count;
-
-			for ( let j = start, jl = start + count; j < jl; j += 3 ) {
-
-				handleVertex( index.getX( j + 0 ) );
-				handleVertex( index.getX( j + 1 ) );
-				handleVertex( index.getX( j + 2 ) );
-
-			}
+			if ( used[ i ] ) handleVertex( i );
 
 		}
 

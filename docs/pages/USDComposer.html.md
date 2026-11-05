@@ -66,9 +66,13 @@ Get the base path (directory) from a file path.
 
 Extract variant selections from a spec's fields.
 
+### ._getMaterialBindingSpec()
+
+Get the material binding relationship for a prim, including overrides from active variants.
+
 ### ._getMaterialBindingTarget()
 
-Get material binding target path, checking variant paths if needed.
+Get the resolved material binding target for a prim. Material bindings are inherited, and an ancestor marked strongerThanDescendants takes precedence over bindings authored on its descendants.
 
 ### ._getMaterialPath()
 
@@ -91,6 +95,10 @@ Check if an object has a non-identity local transform.
 ### ._isDirectChild()
 
 Check if a path is a direct child of parentPath.
+
+### ._resolveAttributeValue()
+
+Resolve an attribute's authored value, following connections before using local fallback values.
 
 ### ._resolveFilePath()
 

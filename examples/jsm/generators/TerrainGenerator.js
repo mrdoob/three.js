@@ -1,6 +1,6 @@
 import {
+	BufferAttribute,
 	BufferGeometry,
-	Float32BufferAttribute,
 	Group,
 	Mesh
 } from 'three';
@@ -11,22 +11,12 @@ import { cameraPosition, color, float, Fn, If, mix, mx_noise_float, normalView, 
 import { ImprovedNoise } from '../math/ImprovedNoise.js';
 
 /**
- * Bakes a procedural mountain range into a single {@link THREE.BufferGeometry} and
- * returns a `THREE.Group` ready to add to a scene.
+ * Bakes a procedural mountain range into a single mesh, returned in a `THREE.Group`.
+ * Domain-warped, derivative-damped noise shapes the ridges; thermal erosion relaxes
+ * steep slopes. A TSL material shades grass, rock and snow from altitude and slope.
  *
- * The heightfield is a derivative-damped fractal sum ( Quilez's fake erosion ): each
- * octave is suppressed where the running slope is already steep, concentrating detail
- * into weathered ridgelines, and a low-frequency domain warp makes those ridges
- * meander. A few passes of thermal ( talus ) erosion then relax any slope past the
- * angle of repose, settling the fractal's needle-spikes into real crests.
- *
- * The grid is triangulated with alternating quad diagonals ( a diamond pattern ), so a
- * coarse mesh holds its silhouette without a one-way grain. The surface shades itself
- * from altitude and slope in TSL — grass, forest, rock, scree and snow, with detail
- * normals and aerial perspective — so no material or textures are needed.
- *
- * The baked height grid is exposed through {@link TerrainGenerator#sampleHeight} so a
- * scattered forest ( or anything else ) can sit exactly on the surface.
+ * The baked grid is available through {@link TerrainGenerator#sampleHeight} for
+ * placing a forest or other objects on the terrain.
  *
  * ```js
  * const terrain = new TerrainGenerator( { seed: 1 } );
@@ -82,6 +72,8 @@ class TerrainGenerator {
 
 		// lay the grid out flat in the XZ plane ( Y-up ) and find the height range
 		const positions = new Float32Array( N * N * 3 );
+		const normals = new Float32Array( N * N * 3 );
+		const cellSize = p.size / p.segments;
 		let min = Infinity, max = - Infinity;
 
 		for ( let iz = 0; iz < N; iz ++ ) {
@@ -95,6 +87,16 @@ class TerrainGenerator {
 				positions[ o * 3 + 1 ] = y;
 				positions[ o * 3 + 2 ] = coord[ iz ];
 
+				// Sample the grid's gradient so alternating triangle fans have equal weight.
+				const left = Math.max( 0, ix - 1 ), right = Math.min( N - 1, ix + 1 );
+				const back = Math.max( 0, iz - 1 ), front = Math.min( N - 1, iz + 1 );
+				const nx = ( heights[ iz * N + left ] - heights[ iz * N + right ] ) / ( ( right - left ) * cellSize );
+				const nz = ( heights[ back * N + ix ] - heights[ front * N + ix ] ) / ( ( front - back ) * cellSize );
+				const length = Math.hypot( nx, 1, nz );
+				normals[ o * 3 ] = nx / length;
+				normals[ o * 3 + 1 ] = 1 / length;
+				normals[ o * 3 + 2 ] = nz / length;
+
 				if ( y < min ) min = y;
 				if ( y > max ) max = y;
 
@@ -104,25 +106,32 @@ class TerrainGenerator {
 
 		// flip the quad diagonal on every other quad, so the mesh reads as diamonds
 		// rather than a one-way grain
-		const indices = [];
+		const IndexArray = N * N > 65535 ? Uint32Array : Uint16Array;
+		const indices = new IndexArray( p.segments * p.segments * 6 );
+		let index = 0;
 
 		for ( let iz = 0; iz < p.segments; iz ++ ) {
 
 			for ( let ix = 0; ix < p.segments; ix ++ ) {
 
 				const a = iz * N + ix, b = a + 1, c = a + N, d = c + 1;
+				const even = ( ix + iz ) % 2 === 0;
 
-				if ( ( ix + iz ) % 2 === 0 ) indices.push( a, c, b, b, c, d );
-				else indices.push( a, c, d, a, d, b );
+				indices[ index ++ ] = a;
+				indices[ index ++ ] = c;
+				indices[ index ++ ] = even ? b : d;
+				indices[ index ++ ] = even ? b : a;
+				indices[ index ++ ] = even ? c : d;
+				indices[ index ++ ] = even ? d : b;
 
 			}
 
 		}
 
 		const geometry = new BufferGeometry();
-		geometry.setAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
-		geometry.setIndex( indices );
-		geometry.computeVertexNormals();
+		geometry.setAttribute( 'position', new BufferAttribute( positions, 3 ) );
+		geometry.setAttribute( 'normal', new BufferAttribute( normals, 3 ) );
+		geometry.setIndex( new BufferAttribute( indices, 1 ) );
 
 		this.heights = heights;
 		this.gridSize = N;
@@ -384,7 +393,7 @@ function thermalErode( h, N, cellSize, talus, passes ) {
 // method. the built-in bumpMap reads height by offsetting the UV — a no-op for a
 // world-keyed height — so the height's screen-space derivatives are fed in directly.
 // returns a view-space normal.
-function bumpNormal( height ) {
+function bumpNormal( height, strength ) {
 
 	const dpdx = positionView.dFdx();
 	const dpdy = positionView.dFdy();
@@ -393,7 +402,7 @@ function bumpNormal( height ) {
 	const det = dpdx.dot( r1 );
 	const grad = det.sign().mul( height.dFdx().mul( r1 ).add( height.dFdy().mul( r2 ) ) );
 
-	return det.abs().mul( normalView ).sub( grad ).normalize();
+	return det.abs().mul( normalView ).sub( grad.mul( strength ) ).normalize();
 
 }
 
@@ -420,7 +429,7 @@ function terrainMaterial( minHeight, maxHeight ) {
 	const grass = color( 0x6e7253 ); // dry sage-olive meadow ( not video-game green )
 	const dryGrass = color( 0x8a8550 );
 	const forest = color( 0x39402f ); // dark forested mid-slope band, under the trees
-	const rock = color( 0x736a5f ); // warm grey-brown rock
+	const rock = color( 0x716e68 ); // weathered grey-brown rock
 	const scree = color( 0x837a6f ); // brighter broken rock below the cliffs
 	const lichen = color( 0x6c7355 ); // muted green-grey, patched onto lower rock
 	const snow = color( 0xe9ecf0 ); // fresh snow; warm-sun / cool-sky cast is from the lighting
@@ -428,13 +437,13 @@ function terrainMaterial( minHeight, maxHeight ) {
 
 	// two band frequencies of lighter / darker stone, wobbled by noise, so cliff faces
 	// read as layered bedding instead of flat grey
-	const bandA = positionWorld.y.mul( 0.5 ).add( detail.mul( 3 ) ).add( macro.mul( 4 ) ).sin();
+	const bandA = positionWorld.y.mul( 0.5 ).add( positionWorld.x.mul( 0.08 ) ).add( positionWorld.z.mul( 0.05 ) ).add( detail.mul( 3 ) ).add( macro.mul( 4 ) ).sin();
 	const bandB = positionWorld.y.mul( 1.4 ).add( grain.mul( 2 ) ).sin();
 	const strata = bandA.mul( 0.6 ).add( bandB.mul( 0.4 ) ).mul( 0.5 ).add( 0.5 );
 
 	// lichen creeps onto the lower, gentler rock; cliffs and high ground stay bare grey
 	const lichenMask = smoothstep( 0.45, 0.72, grain ).mul( smoothstep( 0.62, 0.32, steep ) ).mul( smoothstep( 0.66, 0.34, altitude ) );
-	const rockShade = mix( rock, lichen, lichenMask.mul( 0.45 ) ).mul( strata.mul( 0.36 ).add( 0.8 ) );
+	const rockShade = mix( rock, lichen, lichenMask.mul( 0.45 ) ).mul( strata.mul( 0.36 ).add( 0.8 ) ).mul( grain.mul( 0.18 ).add( 1 ) );
 
 	// meadow, drifting to dry grass in macro-noise patches over a mid band
 	let surface = mix( grass, dryGrass, smoothstep( 0.15, 0.75, macro ).mul( smoothstep( 0.22, 0.5, altitude ) ) );
@@ -452,7 +461,7 @@ function terrainMaterial( minHeight, maxHeight ) {
 
 	// snow on high, flat ground; the grain noise breaks the line so rock pokes through
 	// near the snowline instead of stopping on a clean contour
-	const snowMask = smoothstep( 0.56, 0.78, altitude.add( detail.mul( 0.08 ) ).add( grain.mul( 0.05 ) ) ).mul( smoothstep( 0.3, 0.6, flatness ) );
+	const snowMask = smoothstep( 0.56, 0.78, altitude.add( detail.mul( 0.08 ) ).add( grain.mul( 0.05 ) ) ).mul( smoothstep( 0.45, 0.75, flatness ) );
 	const snowColor = mix( snow, snowDeep, smoothstep( 0.2, 0.7, grain ).mul( 0.6 ) ); // patchy, not a flat sheet
 	surface = mix( surface, snowColor, snowMask );
 
@@ -473,21 +482,23 @@ function terrainMaterial( minHeight, maxHeight ) {
 	material.colorNode = surface;
 	material.roughnessNode = mix( float( 0.95 ), float( 0.72 ), snowMask );
 
-	// detail normals: three octaves of world-space relief, faded out with distance so
-	// they can't alias into fireflies in the haze. gating the noise behind the fade ( a
-	// real branch ) lets the far majority of this fragment-bound terrain skip the taps.
+	// Volumetric noise keeps relief consistent on cliffs. Skip fine grain in the distance.
 	const detailFade = smoothstep( 420, 60, distance );
-	const reliefStrength = mix( float( 0.25 ), float( 0.55 ), steep ); // more on rock, less on grass
+	const grainFade = smoothstep( 180, 40, distance );
+	const reliefStrength = mix( mix( float( 0.25 ), float( 0.55 ), steep ), float( 0.04 ), snowMask );
 	const relief = Fn( () => {
 
 		const r = float( 0 ).toVar();
 
 		If( detailFade.greaterThan( 0.01 ), () => {
 
-			r.assign( mx_noise_float( positionWorld.xz.mul( 0.6 ) )
-				.add( mx_noise_float( positionWorld.xz.mul( 1.7 ) ).mul( 0.5 ) )
-				.add( mx_noise_float( positionWorld.xz.mul( 4.0 ) ).mul( 0.25 ) )
-				.mul( reliefStrength ).mul( detailFade ).mul( 0.25 ) );
+			r.assign( mx_noise_float( positionWorld.mul( 0.6 ) ) );
+
+			If( grainFade.greaterThan( 0.01 ), () => {
+
+				r.addAssign( mx_noise_float( positionWorld.mul( 1.7 ) ).mul( 0.5 ).mul( grainFade ) );
+
+			} );
 
 		} );
 
@@ -495,7 +506,8 @@ function terrainMaterial( minHeight, maxHeight ) {
 
 	} )();
 
-	material.normalNode = bumpNormal( relief );
+	// Apply strength after differentiating the noise; slope derivatives reveal triangles.
+	material.normalNode = bumpNormal( relief, reliefStrength.mul( detailFade ).mul( 0.25 ) );
 
 	return material;
 

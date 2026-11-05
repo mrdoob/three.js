@@ -33,9 +33,7 @@
 					"three": "../build/three.webgpu.js",
 					"three/webgpu": "../build/three.webgpu.js",
 					"three/tsl": "../build/three.tsl.js",
-					"three/addons/": "./jsm/",
-					"monomorph": "https://cdn.jsdelivr.net/npm/monomorph@2.3.1/build/monomorph.js",
-					"@perplexdotgg/bounce": "https://cdn.jsdelivr.net/npm/@perplexdotgg/bounce@1.8.1/build/bounce.js"
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -46,7 +44,7 @@
 			import { pass, mrt, output, normalView, diffuseColor, velocity, add, vec4, packNormalToRGB, unpackRGBToNormal, sample } from 'three/tsl';
 			import { ssgi } from 'three/addons/tsl/display/SSGINode.js';
 			import { traa } from 'three/addons/tsl/display/TRAANode.js';
-			import { World } from '@perplexdotgg/bounce';
+			import { RapierPhysics } from 'three/addons/physics/RapierPhysics.js';
 
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
@@ -63,12 +61,36 @@
 			let raycaster, pointer;
 			let mouseLight;
 
-			let world;
+			let physics;
 			let ballCount = 0;
-			let bodies = [];
 			let ballsMesh = null;
 			let wallMeshes = [];
 			const boxSize = { w: 8, h: BOX_HEIGHT, d: BOX_DEPTH };
+
+			const whiteMaterial = new THREE.MeshPhysicalMaterial( {
+				color: 0xeeeeee,
+				roughness: 0.7,
+				metalness: 0.0
+			} );
+
+			const redMaterial = new THREE.MeshPhysicalMaterial( {
+				color: 0xff2222,
+				roughness: 0.7,
+				metalness: 0.0
+			} );
+
+			const greenMaterial = new THREE.MeshPhysicalMaterial( {
+				color: 0x22ff22,
+				roughness: 0.7,
+				metalness: 0.0
+			} );
+
+			const ballGeometry = new THREE.SphereGeometry( BALL_RADIUS, 32, 16 );
+
+			const ballMaterial = new THREE.MeshPhysicalMaterial( {
+				roughness: 0.3,
+				metalness: 0.1
+			} );
 
 			const mouseRayOrigin = new THREE.Vector3();
 			const mouseRayDir = new THREE.Vector3();
@@ -83,6 +105,8 @@
 			init();
 
 			async function init() {
+
+				physics = await RapierPhysics();
 
 				camera = new THREE.PerspectiveCamera( CAM_FOV, window.innerWidth / window.innerHeight, 0.1, 100 );
 
@@ -197,6 +221,7 @@
 
 				for ( const mesh of wallMeshes ) {
 
+					physics.world.removeRigidBody( mesh.userData.physics.body );
 					scene.remove( mesh );
 					mesh.geometry.dispose();
 
@@ -206,26 +231,15 @@
 
 				if ( ballsMesh ) {
 
+					physics.removeMesh( ballsMesh );
 					scene.remove( ballsMesh );
 					ballsMesh.dispose();
 					ballsMesh = null;
 
 				}
 
-				bodies = [];
-
 				boxSize.w = getBoxWidth();
 				ballCount = getBallCount();
-
-				world = new World( {
-					gravity: [ 0, - 9.81, 0 ],
-					solveVelocityIterations: 6,
-					solvePositionIterations: 2,
-					linearDamping: 0.1,
-					angularDamping: 0.1,
-					restitution: 0.4,
-					friction: 0.5
-				} );
 
 				fitCameraToBox();
 				createBox();
@@ -240,48 +254,26 @@
 				const hd = boxSize.d / 2;
 				const t = WALL_THICKNESS;
 
-				const whiteMaterial = new THREE.MeshPhysicalMaterial( {
-					color: 0xeeeeee,
-					roughness: 0.7,
-					metalness: 0.0
-				} );
-
-				const redMaterial = new THREE.MeshPhysicalMaterial( {
-					color: 0xff2222,
-					roughness: 0.7,
-					metalness: 0.0
-				} );
-
-				const greenMaterial = new THREE.MeshPhysicalMaterial( {
-					color: 0x22ff22,
-					roughness: 0.7,
-					metalness: 0.0
-				} );
-
 				const walls = [
 					{ size: [ boxSize.w, t, boxSize.d ], pos: [ 0, - t / 2, 0 ], mat: whiteMaterial },
 					{ size: [ boxSize.w, t, boxSize.d ], pos: [ 0, boxSize.h + t / 2, 0 ], mat: whiteMaterial },
 					{ size: [ boxSize.w, boxSize.h, t ], pos: [ 0, hh, - hd - t / 2 ], mat: whiteMaterial },
-					{ size: [ boxSize.w, boxSize.h, t ], pos: [ 0, hh, hd + t / 2 ], noMesh: true },
+					{ size: [ boxSize.w, boxSize.h, t ], pos: [ 0, hh, hd + t / 2 ], mat: whiteMaterial, noMesh: true },
 					{ size: [ t, boxSize.h, boxSize.d ], pos: [ - hw - t / 2, hh, 0 ], mat: redMaterial },
 					{ size: [ t, boxSize.h, boxSize.d ], pos: [ hw + t / 2, hh, 0 ], mat: greenMaterial }
 				];
 
 				for ( const w of walls ) {
 
-					const shape = world.createBox( { width: w.size[ 0 ], height: w.size[ 1 ], depth: w.size[ 2 ] } );
-					world.createStaticBody( { shape, position: w.pos } );
+					const geo = new THREE.BoxGeometry( w.size[ 0 ], w.size[ 1 ], w.size[ 2 ] );
+					const mesh = new THREE.Mesh( geo, w.mat );
+					mesh.position.set( ...w.pos );
+					mesh.receiveShadow = true;
+					wallMeshes.push( mesh );
 
-					if ( ! w.noMesh ) {
+					physics.addMesh( mesh, 0, 0.4 );
 
-						const geo = new THREE.BoxGeometry( w.size[ 0 ], w.size[ 1 ], w.size[ 2 ] );
-						const mesh = new THREE.Mesh( geo, w.mat );
-						mesh.position.set( ...w.pos );
-						mesh.receiveShadow = true;
-						scene.add( mesh );
-						wallMeshes.push( mesh );
-
-					}
+					if ( ! w.noMesh ) scene.add( mesh );
 
 				}
 
@@ -289,15 +281,7 @@
 
 			function createBalls() {
 
-				const sphereGeo = new THREE.SphereGeometry( BALL_RADIUS, 32, 16 );
-				const sphereShape = world.createSphere( { radius: BALL_RADIUS } );
-
-				const material = new THREE.MeshPhysicalMaterial( {
-					roughness: 0.3,
-					metalness: 0.1
-				} );
-
-				ballsMesh = new THREE.InstancedMesh( sphereGeo, material, ballCount );
+				ballsMesh = new THREE.InstancedMesh( ballGeometry, ballMaterial, ballCount );
 				ballsMesh.castShadow = true;
 				ballsMesh.receiveShadow = true;
 				scene.add( ballsMesh );
@@ -308,6 +292,7 @@
 				];
 
 				const color = new THREE.Color();
+				const matrix = new THREE.Matrix4();
 				const hw = boxSize.w / 2 - BALL_RADIUS - 0.1;
 				const hd = boxSize.d / 2 - BALL_RADIUS - 0.1;
 
@@ -320,17 +305,11 @@
 					const y = BALL_RADIUS + Math.random() * ( boxSize.h - BALL_RADIUS * 2 );
 					const z = ( Math.random() - 0.5 ) * 2 * hd;
 
-					const body = world.createDynamicBody( {
-						shape: sphereShape,
-						position: [ x, y, z ],
-						mass: 1,
-						restitution: 0.5,
-						friction: 0.4
-					} );
-
-					bodies.push( body );
+					ballsMesh.setMatrixAt( i, matrix.makeTranslation( x, y, z ) );
 
 				}
+
+				physics.addMesh( ballsMesh, 1, 0.5 );
 
 			}
 
@@ -394,19 +373,20 @@
 				const hw = boxSize.w / 2 - BALL_RADIUS - 0.1;
 				const hd = boxSize.d / 2 - BALL_RADIUS - 0.1;
 				const count = 5;
+				const position = new THREE.Vector3();
 
 				for ( let i = 0; i < count; i ++ ) {
 
-					const body = bodies[ Math.floor( Math.random() * bodies.length ) ];
-
-					body.position.set( [
+					position.set(
 						( Math.random() - 0.5 ) * 2 * hw,
 						boxSize.h - BALL_RADIUS - Math.random() * 1,
 						( Math.random() - 0.5 ) * 2 * hd
-					] );
-					body.linearVelocity.set( [ 0, 0, 0 ] );
-					body.angularVelocity.set( [ 0, 0, 0 ] );
-					body.commitChanges();
+					);
+
+					const index = Math.floor( Math.random() * ballCount );
+
+					physics.setMeshPosition( ballsMesh, position, index );
+					ballsMesh.userData.physics.body[ index ].wakeUp();
 
 				}
 
@@ -432,7 +412,7 @@
 			}
 
 			const timer = new THREE.Timer();
-			const _dummy = new THREE.Object3D();
+			const _matrix = new THREE.Matrix4();
 
 			function animate() {
 
@@ -458,10 +438,10 @@
 					const _ballPos = new THREE.Vector3();
 					const _pushDir = new THREE.Vector3();
 
-					for ( const body of bodies ) {
+					for ( let i = 0; i < ballCount; i ++ ) {
 
-						const bp = body.position;
-						_ballPos.set( bp.x, bp.y, bp.z );
+						ballsMesh.getMatrixAt( i, _matrix );
+						_ballPos.setFromMatrixPosition( _matrix );
 
 						const ray = new THREE.Ray( mouseRayOrigin, mouseRayDir );
 						ray.closestPointToPoint( _ballPos, _closest );
@@ -475,39 +455,13 @@
 							_pushDir.normalize();
 
 							const strength = pushStrength * ( 1 - dist / pushRadius );
-							body.applyLinearImpulse( {
-								x: _pushDir.x * strength,
-								y: _pushDir.y * strength,
-								z: _pushDir.z * strength
-							} );
+							physics.applyImpulse( ballsMesh, _pushDir.multiplyScalar( strength ), i );
 
 						}
 
 					}
 
 				}
-
-				if ( world ) {
-
-					world.advanceTime( 1 / 60, dt );
-
-				}
-
-				for ( let i = 0; i < bodies.length; i ++ ) {
-
-					const body = bodies[ i ];
-					const p = body.position;
-					const q = body.orientation;
-
-					_dummy.position.set( p.x, p.y, p.z );
-					_dummy.quaternion.set( q.x, q.y, q.z, q.w );
-					_dummy.updateMatrix();
-
-					ballsMesh.setMatrixAt( i, _dummy.matrix );
-
-				}
-
-				ballsMesh.instanceMatrix.needsUpdate = true;
 
 				renderPipeline.render();
 

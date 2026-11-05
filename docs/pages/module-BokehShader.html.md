@@ -2,7 +2,7 @@
 
 ## Import
 
-BokehShader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+BokehShader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { BokehShader } from 'three/addons/shaders/BokehShader.js';

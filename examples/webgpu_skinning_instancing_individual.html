@@ -109,7 +109,7 @@
 						skeleton,
 						boneCount,
 						boneMatrices,
-						boneMatricesNode: storage( boneMatrices, 'mat4', boneMatrices.count ).toReadOnly()
+						boneMatricesNode: storage( boneMatrices, 'mat4' ).toReadOnly()
 					};
 
 					skeletonStates.set( skeleton, state );
@@ -127,9 +127,9 @@
 				const vertexCount = geometry.getAttribute( 'position' ).count;
 				const skeletonState = getSkeletonState( source.skeleton, instanceCount );
 
-				const sourceVertices = storage( createSourceVertexAttribute( geometry ), 'vec4', vertexCount * 3 ).toReadOnly();
-				const skinIndices = storage( new THREE.StorageBufferAttribute( new Uint32Array( geometry.getAttribute( 'skinIndex' ).array ), 4 ), 'uvec4', vertexCount ).toReadOnly();
-				const skinWeights = storage( new THREE.StorageBufferAttribute( geometry.getAttribute( 'skinWeight' ).array, 4 ), 'vec4', vertexCount ).toReadOnly();
+				const sourceVertices = storage( createSourceVertexAttribute( geometry ), 'vec4' ).toReadOnly();
+				const skinIndices = storage( new THREE.StorageBufferAttribute( new Uint32Array( geometry.getAttribute( 'skinIndex' ).array ), 4 ), 'uvec4' ).toReadOnly();
+				const skinWeights = storage( new THREE.StorageBufferAttribute( geometry.getAttribute( 'skinWeight' ).array, 4 ), 'vec4' ).toReadOnly();
 				const bindMatrix = uniform( source.bindMatrix, 'mat4' );
 				const bindMatrixInverse = uniform( source.bindMatrixInverse, 'mat4' );
 				const vertices = attributeArray( instanceCount * vertexCount * 2, 'vec4' );
@@ -282,8 +282,8 @@
 
 					const bellyWeights = new THREE.StorageBufferAttribute( instanceCount, 1 );
 					instanceMatrices = new THREE.StorageBufferAttribute( instanceCount, 16 );
-					bellyWeightsNode = storage( bellyWeights, 'float', instanceCount ).toReadOnly();
-					instanceMatricesNode = storage( instanceMatrices, 'mat4', instanceCount ).toReadOnly();
+					bellyWeightsNode = storage( bellyWeights, 'float' ).toReadOnly();
+					instanceMatricesNode = storage( instanceMatrices, 'mat4' ).toReadOnly();
 
 					for ( let i = 0; i < instanceCount; i ++ ) {
 

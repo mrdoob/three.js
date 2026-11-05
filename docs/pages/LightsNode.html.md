@@ -38,16 +38,6 @@ A node representing the total specular light.
 
 ## Methods
 
-### .analyze( builder : NodeBuilder )
-
-Analyzes the node's dependencies by building all nested light nodes and the output node.
-
-**builder**
-
-A reference to the current node builder.
-
-**Overrides:** [Node#analyze](Node.html#analyze)
-
 ### .customCacheKey() : number
 
 Overwrites the default [Node#customCacheKey](Node.html#customCacheKey) implementation by including light data into the cache key.
@@ -55,6 +45,14 @@ Overwrites the default [Node#customCacheKey](Node.html#customCacheKey) implement
 **Overrides:** [Node#customCacheKey](Node.html#customCacheKey)
 
 **Returns:** The custom cache key.
+
+### .getBuiltinLights() : Array.<Light>
+
+Returns an array of the scene's lights.
+
+The light variations are shader-dependent; if this array changes, the shader needs to be recreated.
+
+**Returns:** The scene's lights.
 
 ### .getHash( builder : NodeBuilder ) : string
 

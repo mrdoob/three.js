@@ -47,10 +47,6 @@ This flag can be used for type testing.
 
 Default is `true`.
 
-### .paddedType : string
-
-The padded type. Uniform buffers must conform to a certain buffer layout so a separate type is computed to ensure correct buffer size.
-
 ### .updateType : string
 
 Overwritten since uniform array nodes are updated per render.
@@ -71,7 +67,7 @@ The index node.
 
 ### .generateNodeType( builder : NodeBuilder ) : string
 
-This method is overwritten since the node type is inferred from the [UniformArrayNode#paddedType](UniformArrayNode.html#paddedType).
+This method is overwritten since the node type is inferred from the padded type.
 
 **builder**
 
@@ -93,11 +89,31 @@ The current node builder.
 
 **Returns:** The element type.
 
-### .getPaddedType() : string
+### .getPaddedType( builder : NodeBuilder ) : string
 
 Returns the padded type based on the element type.
 
+**builder**
+
+The current node builder.
+
 **Returns:** The padded type.
+
+### .onUpdate( callback : function, updateType : string ) : UniformArrayNode
+
+Composes a user-defined update with the buffer transfer.
+
+**callback**
+
+The update function.
+
+**updateType**
+
+The update type.
+
+**Overrides:** [BufferNode#onUpdate](BufferNode.html#onUpdate)
+
+**Returns:** A reference to this node.
 
 ### .setup( builder : NodeBuilder ) : null
 
@@ -109,15 +125,9 @@ A reference to the current node builder.
 
 **Overrides:** [BufferNode#setup](BufferNode.html#setup)
 
-### .update( frame : NodeFrame )
+### .updateBuffer()
 
-The update makes sure to correctly transfer the data from the (complex) objects in the array to the internal, correctly padded value buffer.
-
-**frame**
-
-A reference to the current node frame.
-
-**Overrides:** [BufferNode#update](BufferNode.html#update)
+The method makes sure to correctly transfer the data from the (complex) objects in the array to the internal, correctly padded value buffer.
 
 ## Source
 

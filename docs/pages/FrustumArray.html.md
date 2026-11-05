@@ -36,15 +36,25 @@ The point to test.
 
 **Returns:** Whether the point is visible in any camera.
 
-### .copy( frustumArray : FrustumArray ) : FrustumArray
+### .copy( source : FrustumArray ) : FrustumArray
 
 Copies the values of the given frustum array to this instance.
 
-**frustumArray**
+**source**
 
 The frustum array to copy.
 
 **Returns:** A reference to this frustum array.
+
+### .getFrustum( index : number ) : Frustum | undefined
+
+Returns the cached frustum for the sub-camera at the given index.
+
+**index**
+
+The sub-camera index.
+
+**Returns:** The cached frustum.
 
 ### .intersectsBox( box : Box3 ) : boolean
 

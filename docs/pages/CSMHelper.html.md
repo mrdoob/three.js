@@ -6,7 +6,7 @@ A helper for visualizing the cascades of a CSM instance.
 
 ## Import
 
-CSMHelper is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+CSMHelper is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { CSMHelper } from 'three/addons/csm/CSMHelper.js';
@@ -51,6 +51,8 @@ Default is `true`.
 ### .dispose()
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+
+**Overrides:** [Group#dispose](Group.html#dispose)
 
 ### .update()
 

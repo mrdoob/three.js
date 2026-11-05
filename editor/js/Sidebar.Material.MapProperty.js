@@ -4,7 +4,6 @@ import { UIButton, UICheckbox, UIDiv, UINumber, UIRow, UIText } from './libs/ui.
 import { UITexture } from './libs/ui.three.js';
 import { SetMaterialMapCommand } from './commands/SetMaterialMapCommand.js';
 import { SetMaterialValueCommand } from './commands/SetMaterialValueCommand.js';
-import { SetMaterialRangeCommand } from './commands/SetMaterialRangeCommand.js';
 import { SetMaterialVectorCommand } from './commands/SetMaterialVectorCommand.js';
 import { SetTextureParametersCommand } from './commands/SetTextureParametersCommand.js';
 import { TextureParametersDialog } from './TextureParametersDialog.js';
@@ -72,7 +71,7 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 		rangeMinRow.add( new UIText( 'min:' ).setWidth( '35px' ) );
 
-		rangeMin = new UINumber().setWidth( '40px' ).onChange( onRangeChange );
+		rangeMin = new UINumber().setWidth( '40px' ).onChange( onRangeMinChange );
 		rangeMinRow.add( rangeMin );
 
 		const rangeMaxRow = new UIRow().setMarginBottom( '6px' ).setStyle( 'min-height', '0px' );
@@ -80,7 +79,7 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 		rangeMaxRow.add( new UIText( 'max:' ).setWidth( '35px' ) );
 
-		rangeMax = new UINumber().setWidth( '40px' ).onChange( onRangeChange );
+		rangeMax = new UINumber().setWidth( '40px' ).onChange( onRangeMaxChange );
 		rangeMaxRow.add( rangeMax );
 
 		// Additional settings for iridescenceThicknessMap
@@ -188,13 +187,21 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 	}
 
-	function onRangeChange() {
+	function onRangeMinChange() {
 
-		const value = [ rangeMin.getValue(), rangeMax.getValue() ];
+		if ( material[ `${ mapType }Minimum` ] !== rangeMin.getValue() ) {
 
-		if ( material[ `${ mapType }Range` ][ 0 ] !== value[ 0 ] || material[ `${ mapType }Range` ][ 1 ] !== value[ 1 ] ) {
+			editor.execute( new SetMaterialValueCommand( editor, object, `${ mapType }Minimum`, rangeMin.getValue(), materialSlot ) );
 
-			editor.execute( new SetMaterialRangeCommand( editor, object, `${ mapType }Range`, value[ 0 ], value[ 1 ], materialSlot ) );
+		}
+
+	}
+
+	function onRangeMaxChange() {
+
+		if ( material[ `${ mapType }Maximum` ] !== rangeMax.getValue() ) {
+
+			editor.execute( new SetMaterialValueCommand( editor, object, `${ mapType }Maximum`, rangeMax.getValue(), materialSlot ) );
 
 		}
 
@@ -243,8 +250,8 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 			if ( rangeMin !== undefined ) {
 
-				rangeMin.setValue( material[ `${ mapType }Range` ][ 0 ] );
-				rangeMax.setValue( material[ `${ mapType }Range` ][ 1 ] );
+				rangeMin.setValue( material[ `${ mapType }Minimum` ] );
+				rangeMax.setValue( material[ `${ mapType }Maximum` ] );
 
 			}
 

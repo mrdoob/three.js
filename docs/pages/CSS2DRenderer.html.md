@@ -1,6 +1,6 @@
 # CSS2DRenderer
 
-This renderer is a simplified version of [CSS3DRenderer](CSS3DRenderer.html). The only transformation that is supported is translation.
+This renderer is a simplified version of [CSS3DRenderer](CSS3DRenderer.html). The only transformations that are supported are translation and 2D rotation.
 
 The renderer is very useful if you want to combine HTML based labels with 3D objects. Here too, the respective DOM elements are wrapped into an instance of [CSS2DObject](CSS2DObject.html) and added to the scene graph. All other types of renderable 3D objects (like meshes or point clouds) are ignored.
 
@@ -8,7 +8,7 @@ The renderer is very useful if you want to combine HTML based labels with 3D obj
 
 ## Import
 
-CSS2DRenderer is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+CSS2DRenderer is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';

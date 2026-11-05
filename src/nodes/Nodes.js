@@ -54,11 +54,13 @@ export { default as MaterialReferenceNode } from './accessors/MaterialReferenceN
 export { default as ModelNode } from './accessors/ModelNode.js';
 export { default as Object3DNode } from './accessors/Object3DNode.js';
 export { default as PointUVNode } from './accessors/PointUVNode.js';
+export { default as ReferenceAttributeNode } from './accessors/ReferenceAttributeNode.js';
 export { default as ReferenceBaseNode } from './accessors/ReferenceBaseNode.js';
 export { default as ReferenceElementNode } from './accessors/ReferenceElementNode.js';
 export { default as ReferenceNode } from './accessors/ReferenceNode.js';
 export { default as RendererReferenceNode } from './accessors/RendererReferenceNode.js';
 export { default as StorageBufferNode } from './accessors/StorageBufferNode.js';
+export { default as StorageStructNode } from './accessors/StorageStructNode.js';
 export { default as StorageTexture3DNode } from './accessors/StorageTexture3DNode.js';
 export { default as StorageTextureNode } from './accessors/StorageTextureNode.js';
 export { default as Texture3DNode } from './accessors/Texture3DNode.js';
@@ -131,6 +133,7 @@ export { default as ConditionalNode } from './math/ConditionalNode.js';
 export { default as MathNode } from './math/MathNode.js';
 export { default as OperatorNode } from './math/OperatorNode.js';
 export { default as PackFloatNode } from './math/PackFloatNode.js';
+export { default as Packed4x8IntegerNode } from './math/Packed4x8IntegerNode.js';
 export { default as UnpackFloatNode } from './math/UnpackFloatNode.js';
 
 // parsers

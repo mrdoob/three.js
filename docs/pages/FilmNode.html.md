@@ -1,4 +1,4 @@
-*Inheritance: EventDispatcher → Node → TempNode →*
+*Inheritance: EventDispatcher → Node →*
 
 # FilmNode
 
@@ -6,7 +6,7 @@ Post processing node for creating a film grain effect.
 
 ## Import
 
-FilmNode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+FilmNode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { film } from 'three/addons/tsl/display/FilmNode.js';
@@ -62,7 +62,7 @@ This method is used to setup the effect's TSL code.
 
 The current node builder.
 
-**Overrides:** [TempNode#setup](TempNode.html#setup)
+**Overrides:** [Node#setup](Node.html#setup)
 
 ## Source
 

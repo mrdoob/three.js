@@ -103,7 +103,7 @@ function createMeshesFromMultiMaterialMesh( mesh ) {
 			const type = attribute.array.constructor;
 
 			const newArray = new type( newLength );
-			const newAttribute = new BufferAttribute( newArray, itemSize );
+			const newAttribute = new BufferAttribute( newArray, itemSize, attribute.normalized );
 
 			for ( let k = start, n = 0; k < end; k ++, n ++ ) {
 

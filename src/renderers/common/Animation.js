@@ -64,9 +64,11 @@ class Animation {
 	}
 
 	/**
-	 * Starts the internal animation loop.
+	 * Starts the internal animation loop, if it is not running yet.
 	 */
 	start() {
+
+		if ( this._requestId !== null ) return;
 
 		const update = ( time, xrFrame ) => {
 
@@ -161,6 +163,8 @@ class Animation {
 	dispose() {
 
 		this.stop();
+
+		this._animationLoop = null;
 
 	}
 

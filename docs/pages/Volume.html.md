@@ -4,7 +4,7 @@ This class had been written to handle the output of the [NRRDLoader](NRRDLoader.
 
 ## Import
 
-Volume is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+Volume is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { Volume } from 'three/addons/misc/Volume.js';

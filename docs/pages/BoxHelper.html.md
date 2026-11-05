@@ -41,6 +41,8 @@ The 3D object being visualized.
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
 
+**Overrides:** [LineSegments#dispose](LineSegments.html#dispose)
+
 ### .setFromObject( object : Object3D ) : BoxHelper
 
 Updates the wireframe box for the passed object.

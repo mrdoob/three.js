@@ -2,7 +2,7 @@
 
 ## Import
 
-GroundedSkybox is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+GroundedSkybox is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { getGroundProjectedNormal } from 'three/addons/tsl/utils/GroundedSkybox.js';

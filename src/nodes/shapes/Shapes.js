@@ -10,7 +10,7 @@ import { uv } from '../accessors/UV.js';
  * @param {Node<vec2>} coord - The uv to generate the circle.
  * @return {Node<float>} The circle shape.
  */
-export const shapeCircle = Fn( ( [ coord = uv() ], { renderer, material } ) => {
+export const shapeCircle = /*@__PURE__*/ Fn( ( [ coord = uv() ], { renderer, material } ) => {
 
 	const len2 = lengthSq( coord.mul( 2 ).sub( 1 ) );
 

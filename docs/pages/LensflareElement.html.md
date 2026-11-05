@@ -4,7 +4,7 @@ Represents a single flare that can be added to a [Lensflare](Lensflare.html) con
 
 ## Import
 
-LensflareElement is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+LensflareElement is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { LensflareElement } from 'three/addons/objects/Lensflare.js';

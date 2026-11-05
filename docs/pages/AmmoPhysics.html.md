@@ -12,7 +12,7 @@ const physics = await AmmoPhysics();
 
 ## Import
 
-AmmoPhysics is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+AmmoPhysics is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { AmmoPhysics } from 'three/addons/physics/AmmoPhysics.js';

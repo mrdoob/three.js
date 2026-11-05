@@ -8,13 +8,13 @@ const hash2D = /*@__PURE__*/ Fn( ( [ value ] ) => {
 
 	return fract( mul( 1.0e4, sin( mul( 17.0, value.x ).add( mul( 0.1, value.y ) ) ) ).mul( add( 0.1, abs( sin( mul( 13.0, value.y ).add( value.x ) ) ) ) ) );
 
-} );
+}, { value: 'vec2', return: 'float' } );
 
 const hash3D = /*@__PURE__*/ Fn( ( [ value ] ) => {
 
 	return hash2D( vec2( hash2D( value.xy ), value.z ) );
 
-} );
+}, { value: 'vec3', return: 'float' } );
 
 const getAlphaHashThreshold = /*@__PURE__*/ Fn( ( [ position ] ) => {
 
@@ -57,12 +57,6 @@ const getAlphaHashThreshold = /*@__PURE__*/ Fn( ( [ position ] ) => {
 	// Avoids ατ == 0. Could also do ατ =1-ατ
 	return clamp( threshold, 1.0e-6, 1.0 );
 
-} ).setLayout( {
-	name: 'getAlphaHashThreshold',
-	type: 'float',
-	inputs: [
-		{ name: 'position', type: 'vec3' }
-	]
-} );
+}, { position: 'vec3', return: 'float' } );
 
 export default getAlphaHashThreshold;

@@ -26,6 +26,27 @@ class RenderContext {
 		this.id = _id ++;
 
 		/**
+		 * Identifies the attachment and MRT configuration of the context.
+		 * Unlike the ID, it is the same for the contexts of all renderer
+		 * call depths, so render objects use it in their cache key. That way,
+		 * the shaders built by `compileAsync()` are also used by nested render
+		 * calls like the scene pass of a render pipeline.
+		 *
+		 * @type {string}
+		 * @default ''
+		 */
+		this.stateKey = '';
+
+		/**
+		 * Cached sub-camera frustums shared by render-list and backend culling.
+		 * Kept per context so nested renders do not overwrite the active frustums.
+		 *
+		 * @type {?FrustumArray}
+		 * @default null
+		 */
+		this.frustumArray = null;
+
+		/**
 		 * The MRT configuration.
 		 *
 		 * @type {?MRTNode}
@@ -272,7 +293,7 @@ class RenderContext {
  */
 export function getCacheKey( renderContext ) {
 
-	const { textures, activeCubeFace, activeMipmapLevel } = renderContext;
+	const { textures, depthTexture, activeCubeFace, activeMipmapLevel } = renderContext;
 
 	const values = [ activeCubeFace, activeMipmapLevel ];
 
@@ -281,6 +302,8 @@ export function getCacheKey( renderContext ) {
 		values.push( texture.id );
 
 	}
+
+	if ( depthTexture !== null ) values.push( depthTexture.id );
 
 	return hashArray( values );
 

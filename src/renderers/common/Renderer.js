@@ -19,14 +19,13 @@ import Lighting from './Lighting.js';
 import XRManager from './XRManager.js';
 import InspectorBase from './InspectorBase.js';
 import CanvasTarget from './CanvasTarget.js';
+import { AttributeType } from './Constants.js';
+import StandardDrawingPipeline from './StandardDrawingPipeline.js';
 
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 import { Scene } from '../../scenes/Scene.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
-import { Frustum } from '../../math/Frustum.js';
-import { FrustumArray } from '../../math/FrustumArray.js';
-import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
@@ -41,13 +40,88 @@ import { error, warn, warnOnce, yieldToMain } from '../../utils.js';
 const _scene = /*@__PURE__*/ new Scene();
 const _drawingBufferSize = /*@__PURE__*/ new Vector2();
 const _screen = /*@__PURE__*/ new Vector4();
-const _frustum = /*@__PURE__*/ new Frustum();
-const _frustumArray = /*@__PURE__*/ new FrustumArray();
-
-const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _vector4 = /*@__PURE__*/ new Vector4();
 
 const _shadowSide = { [ FrontSide ]: BackSide, [ BackSide ]: FrontSide, [ DoubleSide ]: DoubleSide };
+
+// The time in milliseconds an async compilation works before it yields to the main thread.
+const _compileYieldInterval = 8;
+
+// The maximum number of pipelines an async compilation creates at the same time.
+// Too many pipelines in flight stall the rendering of new frames.
+const _maxCompilingPipelines = 16;
+
+/**
+ * Yields to the main thread during an async compilation, but only after a time
+ * budget, so the compilation does not wait for a new task or frame after every
+ * small piece of work.
+ *
+ * @private
+ */
+class CompileScheduler {
+
+	constructor() {
+
+		this.lastYieldTime = performance.now();
+
+	}
+
+	/**
+	 * Whether the compilation worked longer than the time budget since the last yield.
+	 *
+	 * @return {boolean} Whether the compilation should yield to the main thread.
+	 */
+	needsYield() {
+
+		return performance.now() - this.lastYieldTime >= _compileYieldInterval;
+
+	}
+
+	/**
+	 * Yields to the main thread until the next frame was rendered. `scheduler.yield()`
+	 * alone is not enough, since its continuations run before the browser renders.
+	 *
+	 * @return {Promise} A promise that resolves when the compilation can continue.
+	 */
+	async yield() {
+
+		if ( typeof requestAnimationFrame === 'undefined' || ( typeof document !== 'undefined' && document.hidden === true ) ) {
+
+			// no frames are rendered
+			await yieldToMain();
+
+		} else {
+
+			await new Promise( ( resolve ) => {
+
+				let resolved = false;
+
+				const done = () => {
+
+					if ( resolved === false ) {
+
+						resolved = true;
+						resolve();
+
+					}
+
+				};
+
+				// continue in a new task after the next frame was rendered
+				requestAnimationFrame( () => setTimeout( done, 0 ) );
+
+				// requestAnimationFrame() stops if the page is hidden in the meantime
+				setTimeout( done, 100 );
+
+			} );
+
+		}
+
+		this.lastYieldTime = performance.now();
+
+	}
+
+}
 
 /**
  * Base class for renderers.
@@ -58,7 +132,7 @@ class Renderer {
 	 * Renderer options.
 	 *
 	 * @typedef {Object} Renderer~Options
-	 * @property {boolean} [logarithmicDepthBuffer=false] - Whether logarithmic depth buffer is enabled or not.
+	 * @property {boolean} [logarithmicDepthBuffer=false] - Whether logarithmic depth buffer is enabled or not. Ignored when a reversed depth buffer is in use.
 	 * @property {boolean} [reversedDepthBuffer=false] - Whether reversed depth buffer is enabled or not.
 	 * @property {boolean} [alpha=true] - Whether the default framebuffer (which represents the final contents of the canvas) should be transparent or opaque.
 	 * @property {boolean} [depth=true] - Whether the default framebuffer should have a depth buffer or not.
@@ -158,7 +232,8 @@ class Renderer {
 		this.alpha = alpha;
 
 		/**
-		 * Whether logarithmic depth buffer is enabled or not.
+		 * Whether logarithmic depth buffer is enabled or not. It is disabled
+		 * on initialization when a reversed depth buffer is in use.
 		 *
 		 * @type {boolean}
 		 * @default false
@@ -263,6 +338,16 @@ class Renderer {
 		 */
 		this.lighting = new Lighting();
 
+		/**
+		 * The current drawing pipeline. See {@link Renderer#drawingPipeline}.
+		 *
+		 * @private
+		 * @type {StandardDrawingPipeline}
+		 */
+		this._drawingPipeline = null;
+
+		this.drawingPipeline = new StandardDrawingPipeline();
+
 		// internals
 
 		/**
@@ -283,6 +368,14 @@ class Renderer {
 		this._onCanvasTargetResize = this._onCanvasTargetResize.bind( this );
 
 		/**
+		 * OnCanvasTargetDispose callback function.
+		 *
+		 * @private
+		 * @type {Function}
+		 */
+		this._onCanvasTargetDispose = this._onCanvasTargetDispose.bind( this );
+
+		/**
 		 * The canvas target for rendering.
 		 *
 		 * @private
@@ -290,6 +383,7 @@ class Renderer {
 		 */
 		this._canvasTarget = new CanvasTarget( backend.getDomElement() );
 		this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
+		this._canvasTarget.addEventListener( 'dispose', this._onCanvasTargetDispose );
 		this._canvasTarget.isDefaultCanvasTarget = true;
 
 		/**
@@ -653,23 +747,23 @@ class Renderer {
 		this._initPromise = null;
 
 		/**
-		 * An array of compilation promises which are used in `compileAsync()`.
+		 * Render and compute work items processed sequentially by `compileAsync()`.
 		 *
 		 * @private
-		 * @type {?Array<Promise>}
+		 * @type {?Array<Object>}
 		 * @default null
 		 */
 		this._compilationPromises = null;
 
 		/**
-		 * Whether the renderer is currently precompiling a render object in
-		 * `compileAsync()`.
+		 * The state of the current precompilation in `compileAsync()`.
+		 * `null` when the renderer is not precompiling.
 		 *
 		 * @private
-		 * @type {boolean}
-		 * @default false
+		 * @type {?Object}
+		 * @default null
 		 */
-		this._isPreCompiling = false;
+		this._precompilationState = null;
 
 		/**
 		 * When an override material is in use, this property points to the current
@@ -760,7 +854,7 @@ class Renderer {
 				const renderTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : ( this._renderTarget || this._outputRenderTarget );
 
 				const renderList = this._renderLists.get( scene, camera, this.lighting );
-				const renderContext = this._renderContexts.get( renderTarget, this._mrt );
+				const renderContext = this._renderContexts.get( renderTarget, this._mrt, 0, camera );
 
 				const material = scene.overrideMaterial || object.material;
 
@@ -772,6 +866,27 @@ class Renderer {
 
 			}
 		};
+
+	}
+
+	/**
+	 * Decides which objects of a scene are rendered and how they are submitted
+	 * to the render list. Assigning a drawing pipeline binds it to this renderer.
+	 * The default is a {@link StandardDrawingPipeline}. This property is experimental.
+	 *
+	 * @type {StandardDrawingPipeline}
+	 */
+	set drawingPipeline( pipeline ) {
+
+		pipeline.renderer = this;
+
+		this._drawingPipeline = pipeline;
+
+	}
+
+	get drawingPipeline() {
+
+		return this._drawingPipeline;
 
 	}
 
@@ -824,11 +939,19 @@ class Renderer {
 
 			}
 
+			if ( this.logarithmicDepthBuffer === true && this.reversedDepthBuffer === true ) {
+
+				warn( 'WebGPURenderer: Logarithmic depth buffer is ignored when reversed depth buffer is enabled.' );
+
+				this.logarithmicDepthBuffer = false;
+
+			}
+
 			this._nodes = new NodeManager( this, backend );
 			this._animation = new Animation( this, this._nodes, this.info );
 			this._attributes = new Attributes( backend, this.info );
 			this._background = new Background( this, this._nodes );
-			this._geometries = new Geometries( this._attributes, this.info );
+			this._geometries = new Geometries( backend, this._attributes, this.info );
 			this._textures = new Textures( this, backend, this.info );
 			this._pipelines = new Pipelines( backend, this._nodes, this.info );
 			this._bindings = new Bindings( backend, this._nodes, this._textures, this._attributes, this._pipelines, this.info );
@@ -839,14 +962,7 @@ class Renderer {
 
 			//
 
-			this._animation.start();
 			this._initialized = true;
-
-			//
-
-			this._inspector.init();
-
-			//
 
 			resolve( this );
 
@@ -887,6 +1003,7 @@ class Renderer {
 	 * Compiles all materials in the given scene. This can be useful to avoid a
 	 * phenomenon which is called "shader compilation stutter", which occurs when
 	 * rendering an object with a new shader for the first time.
+	 * The active drawing pipeline also prepares its geometry resources and compute pipelines.
 	 *
 	 * If you want to add a 3D object to an existing scene, use the third optional
 	 * parameter for applying the target scene. Note that the (target) scene's lighting
@@ -904,6 +1021,12 @@ class Renderer {
 		if ( this._isDeviceLost === true ) return;
 
 		if ( this._initialized === false ) await this.init();
+
+		// only awaited when the drawing pipeline prepares something, so the state below is still taken synchronously
+
+		const prepare = this.drawingPipeline.prepareAsync( scene, camera );
+
+		if ( prepare !== undefined ) await prepare;
 
 		if ( this.shadowMap.type === PCFSoftShadowMap ) {
 
@@ -936,8 +1059,22 @@ class Renderer {
 		const outputRenderTarget = this._renderTarget || this._outputRenderTarget;
 		const useXRCamera = this.xr.isPresenting === true && this.isOutputTarget;
 		const renderTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : outputRenderTarget;
-		const renderContext = this._renderContexts.get( renderTarget, this._mrt );
+
+		const activeCubeFace = this._activeCubeFace;
 		const activeMipmapLevel = this._activeMipmapLevel;
+
+		// a state snapshot is taken once at the beginning and reapplied every time precompilation continues.
+		// `item` is the work item that is currently processed, see `_beginPreCompile()`
+
+		// the work items always set their render target, without the frame buffer target the current one is restored
+
+		const precompilationState = { useFrameBufferTarget, renderTarget, outputRenderTarget: useFrameBufferTarget ? outputRenderTarget : this._renderTarget, activeCubeFace, activeMipmapLevel, item: null, materialSide: null, mrt: this._mrt, outputMRT: this._mrt };
+
+		this._beginPreCompile( precompilationState );
+
+		const renderContext = this._renderContexts.get( renderTarget, this._mrt, this._callDepth, camera );
+
+		precompilationState.renderContext = renderContext;
 
 		const compilationPromises = [];
 
@@ -974,23 +1111,13 @@ class Renderer {
 
 		//
 
-		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-
-		if ( camera.isArrayCamera ) {
-
-			_frustumArray.setFromArrayCamera( camera );
-
-		} else {
-
-			_frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
-
-		}
+		this.drawingPipeline.begin( camera, renderContext );
 
 		// Use sceneRef for render list to ensure lightsNode matches between compileAsync and render
 		const renderList = this._renderLists.get( sceneRef, camera, this.lighting );
-		renderList.begin();
+		this.drawingPipeline.beginRenderList( renderList );
 
-		this._projectObject( scene, camera, 0, renderList, renderContext.clippingContext );
+		this.drawingPipeline.project( scene, camera, 0, renderList, renderContext.clippingContext );
 
 		// include lights from target scene
 		if ( targetScene !== scene ) {
@@ -1007,7 +1134,7 @@ class Renderer {
 
 		}
 
-		renderList.finish();
+		this.drawingPipeline.finishRenderList( renderList );
 
 		//
 
@@ -1039,7 +1166,7 @@ class Renderer {
 
 		}
 
-		// process render lists - _createObjectPipeline will push async promises to _compilationPromises
+		// process render lists - _createObjectPipeline queues work in _compilationPromises
 
 		const opaqueObjects = renderList.opaque;
 		const transparentObjects = renderList.transparent;
@@ -1058,40 +1185,19 @@ class Renderer {
 		this._handleObjectFunction = previousHandleObjectFunction;
 		this._compilationPromises = previousCompilationPromises;
 
-		// Process compilation work items sequentially to avoid freezing
-		// Yields between objects to keep animation smooth
+		this._finishPreCompile();
+
+		// Process compilation work items sequentially and yield to the main thread after a
+		// time budget to keep animation smooth. Pipelines are compiled in parallel while
+		// the next items are processed.
 
 		const total = compilationPromises.length;
 		let loaded = 0;
 
-		for ( const item of compilationPromises ) {
+		const scheduler = new CompileScheduler();
+		const compilingPipelines = new Set();
 
-			const renderObject = this._objects.get( item.object, item.material, item.scene, item.camera, item.lightsNode, item.renderContext, item.clippingContext, item.passId );
-			renderObject.drawRange = item.object.geometry.drawRange;
-			renderObject.group = item.group;
-
-			// Use async node building to yield to main thread
-			await this._nodes.getForRenderAsync( renderObject );
-
-			this._isPreCompiling = true; // note: no awaits are allowed when this flag is true otherwise the state leaks outside of this method
-			this._nodes.updateBefore( renderObject );
-			this._geometries.updateForRender( renderObject );
-			this._nodes.updateForRender( renderObject );
-			this._bindings.updateForRender( renderObject );
-			this._isPreCompiling = false;
-
-			// Wait for pipeline creation
-			const pipelinePromises = [];
-			this._pipelines.getForRender( renderObject, pipelinePromises );
-			if ( pipelinePromises.length > 0 ) {
-
-				await Promise.all( pipelinePromises );
-
-			}
-
-			this._isPreCompiling = true;
-			this._nodes.updateAfter( renderObject );
-			this._isPreCompiling = false;
+		const onLoaded = () => {
 
 			loaded ++;
 
@@ -1101,10 +1207,142 @@ class Renderer {
 
 			}
 
-			// Yield between objects to allow animation frames
-			await yieldToMain();
+		};
+
+		const yieldPreCompile = async () => {
+
+			if ( scheduler.needsYield() === false ) return;
+
+			const activePrecompilationState = this._precompilationState;
+
+			this._finishPreCompile();
+
+			await scheduler.yield();
+
+			this._beginPreCompile( activePrecompilationState );
+
+		};
+
+		for ( const item of compilationPromises ) {
+
+			if ( item.computeNodes !== undefined ) {
+
+				// compute work queued by the drawing pipeline, e.g. its culling
+
+				await this.compileComputeAsync( item.computeNodes );
+
+				onLoaded();
+
+				continue;
+
+			}
+
+			const pipelinePromises = [];
+
+			// each item is compiled with the state of the render call that queued it, e.g. a nested render into another target
+
+			const itemPrecompilationState = item.precompilationState;
+			itemPrecompilationState.item = item;
+
+			this._beginPreCompile( itemPrecompilationState );
+
+			const renderObject = this._objects.get( item.object, item.material, item.scene, item.camera, item.lightsNode, item.renderContext, item.clippingContext, item.passId );
+			renderObject.drawRange = item.object.geometry.drawRange;
+			renderObject.group = item.group;
+
+			await this._nodes.getForRenderAsync( renderObject, yieldPreCompile );
+			this._nodes.updateBefore( renderObject );
+			this._geometries.updateForRender( renderObject );
+			this._nodes.updateForRender( renderObject );
+			this._bindings.updateForRender( renderObject );
+			this._pipelines.getForRender( renderObject, pipelinePromises );
+			this._nodes.updateAfter( renderObject );
+
+			this._finishPreCompile();
+
+			if ( pipelinePromises.length > 0 ) {
+
+				const promise = Promise.all( pipelinePromises ).then( () => {
+
+					compilingPipelines.delete( promise );
+					onLoaded();
+
+				} );
+
+				compilingPipelines.add( promise );
+
+				while ( compilingPipelines.size >= _maxCompilingPipelines ) await Promise.race( compilingPipelines );
+
+			} else {
+
+				onLoaded();
+
+			}
+
+			if ( scheduler.needsYield() ) await scheduler.yield();
 
 		}
+
+		await Promise.all( compilingPipelines );
+
+	}
+
+	/**
+	 * Sets up the renderer state for precompiling in `compileAsync()`.
+	 * The state must be restored with `_finishPreCompile()` before yielding to the main thread,
+	 * otherwise it leaks into renders executed in the meantime.
+	 *
+	 * @private
+	 * @param {Object} precompilationState - The precompilation state.
+	 */
+	_beginPreCompile( precompilationState ) {
+
+		const { useFrameBufferTarget, renderTarget, mrt, renderContext, item } = precompilationState;
+
+		if ( useFrameBufferTarget === true ) this.setRenderTarget( renderTarget );
+		this.setMRT( mrt );
+
+		if ( item !== null ) {
+
+			// apply the material side the work item was queued with since the renderer changes the side
+			// temporarily, e.g. for the back and front pass of double-sided transparent materials
+
+			precompilationState.materialSide = item.material.side;
+			item.material.side = item.side;
+
+		}
+
+		this._callDepth ++;
+
+		// node builds take their shared bind groups from the current render context
+
+		precompilationState.previousRenderContext = this._currentRenderContext;
+
+		if ( renderContext !== undefined ) this._currentRenderContext = renderContext;
+
+		this._precompilationState = precompilationState;
+
+	}
+
+	/**
+	 * Restores the renderer state after precompiling in `compileAsync()`.
+	 *
+	 * @private
+	 */
+	_finishPreCompile() {
+
+		const { useFrameBufferTarget, outputRenderTarget, activeCubeFace, activeMipmapLevel, outputMRT, previousRenderContext, item, materialSide } = this._precompilationState;
+
+		if ( useFrameBufferTarget === true ) this.setRenderTarget( outputRenderTarget, activeCubeFace, activeMipmapLevel );
+		this.setMRT( outputMRT );
+
+		if ( item !== null ) item.material.side = materialSide;
+
+		this._currentRenderContext = previousRenderContext;
+
+		this._callDepth --;
+
+		this._precompilationState = null;
 
 	}
 
@@ -1134,6 +1372,27 @@ class Renderer {
 
 		const total = computeList.length;
 		let loaded = 0;
+
+		const scheduler = new CompileScheduler();
+		const compilingPipelines = new Set();
+
+		const onLoaded = () => {
+
+			loaded ++;
+
+			if ( onProgress !== null ) {
+
+				onProgress( new ProgressEvent( 'progress', { lengthComputable: true, loaded, total } ) );
+
+			}
+
+		};
+
+		const yieldCompile = async () => {
+
+			if ( scheduler.needsYield() ) await scheduler.yield();
+
+		};
 
 		//
 
@@ -1167,8 +1426,9 @@ class Renderer {
 
 			}
 
-			await nodes.getForComputeAsync( computeNode );
+			await nodes.getForComputeAsync( computeNode, yieldCompile );
 
+			nodes.updateBeforeForCompute( computeNode );
 			nodes.updateForCompute( computeNode );
 			bindings.updateForCompute( computeNode );
 
@@ -1176,19 +1436,35 @@ class Renderer {
 			const compilationPromises = [];
 
 			pipelines.getForCompute( computeNode, computeBindings, compilationPromises );
-			await Promise.all( compilationPromises );
 
-			loaded ++;
+			nodes.updateAfterForCompute( computeNode );
 
-			if ( onProgress !== null ) {
+			// Pipelines are compiled in parallel while the next compute nodes are processed
 
-				onProgress( new ProgressEvent( 'progress', { lengthComputable: true, loaded, total } ) );
+			if ( compilationPromises.length > 0 ) {
+
+				const promise = Promise.all( compilationPromises ).then( () => {
+
+					compilingPipelines.delete( promise );
+					onLoaded();
+
+				} );
+
+				compilingPipelines.add( promise );
+
+				while ( compilingPipelines.size >= _maxCompilingPipelines ) await Promise.race( compilingPipelines );
+
+			} else {
+
+				onLoaded();
 
 			}
 
-			if ( loaded < total ) await yieldToMain();
+			await yieldCompile();
 
 		}
+
+		await Promise.all( compilingPipelines );
 
 	}
 
@@ -1386,7 +1662,8 @@ class Renderer {
 
 	/**
 	 * Returns `true` if the cached GPU render bundle for the given bundle group is
-	 * out-of-date and must be recorded again.
+	 * out-of-date and must be recorded again. The drawing pipeline decides which objects are
+	 * recorded, so bundles recorded by another drawing pipeline are recorded again.
 	 *
 	 * @private
 	 * @param {BundleGroup} bundleGroup - The bundle group.
@@ -1395,7 +1672,43 @@ class Renderer {
 	 */
 	_bundleNeedsUpdate( bundleGroup, renderBundleData ) {
 
-		return renderBundleData.bundleGPU === undefined || bundleGroup.version !== renderBundleData.version;
+		if ( renderBundleData.bundleGPU === undefined || bundleGroup.version !== renderBundleData.version || renderBundleData.drawingPipeline !== this.drawingPipeline ) return true;
+
+		// the recorded bundle references the buffers of its attributes. they are only verified after a disposal
+
+		const attributes = this._attributes;
+
+		if ( renderBundleData.attributesDisposeVersion !== attributes.disposeVersion ) {
+
+			renderBundleData.attributesDisposeVersion = attributes.disposeVersion;
+
+			for ( const renderObject of renderBundleData.renderObjects ) {
+
+				const index = renderObject.getIndex();
+
+				let disposed = index !== null && attributes.has( index ) === false;
+
+				for ( const vertexBuffer of renderObject.getVertexBuffers() ) {
+
+					if ( attributes.has( vertexBuffer ) === false ) disposed = true;
+
+				}
+
+				if ( disposed ) {
+
+					// invalidate the recorded version so the bundle is recorded again
+
+					renderBundleData.version = null;
+
+					return true;
+
+				}
+
+			}
+
+		}
+
+		return false;
 
 	}
 
@@ -1423,7 +1736,16 @@ class Renderer {
 
 			this.backend.beginBundle( renderContext );
 
+			// nested renders, like shadow maps updated by the objects of the bundle, record their own bundles
+
+			const previousRenderBundle = this._currentRenderBundle;
+
 			this._currentRenderBundle = renderBundle;
+
+			// objects whose pipelines are not ready yet reset the version, so the bundle is recorded again
+
+			renderBundleData.version = bundleGroup.version;
+			renderBundleData.drawingPipeline = this.drawingPipeline;
 
 			const {
 				transparentDoublePass: transparentDoublePassObjects,
@@ -1434,13 +1756,11 @@ class Renderer {
 			if ( this.opaque === true && opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
 			if ( this.transparent === true && transparentObjects.length > 0 ) this._renderTransparents( transparentObjects, transparentDoublePassObjects, camera, sceneRef, lightsNode );
 
-			this._currentRenderBundle = null;
+			this._currentRenderBundle = previousRenderBundle;
 
 			//
 
 			this.backend.finishBundle( renderContext, renderBundle );
-
-			renderBundleData.version = bundleGroup.version;
 
 		} else {
 
@@ -1503,6 +1823,8 @@ class Renderer {
 			throw new Error( 'THREE.Renderer: .render() called before the backend is initialized. Use "await renderer.init();" before rendering.' );
 
 		}
+
+		this._animation.start();
 
 		this._renderScene( scene, camera );
 
@@ -1597,6 +1919,16 @@ class Renderer {
 
 				this._frameBufferTargets.delete( target );
 
+				const quadData = this._quadCache.get( frameBufferTarget );
+
+				if ( quadData !== undefined ) {
+
+					quadData.quad.material.dispose();
+
+					this._quadCache.delete( frameBufferTarget );
+
+				}
+
 			};
 
 			target.addEventListener( 'dispose', dispose );
@@ -1678,6 +2010,11 @@ class Renderer {
 		const previousRenderContext = this._currentRenderContext;
 		const previousRenderObjectFunction = this._currentRenderObjectFunction;
 		const previousHandleObjectFunction = this._handleObjectFunction;
+		const previousRenderBundle = this._currentRenderBundle;
+
+		// a render nested in the recording of a render bundle draws its objects directly
+
+		this._currentRenderBundle = null;
 
 		this.lighting.beginRender( scene );
 
@@ -1733,7 +2070,7 @@ class Renderer {
 
 		//
 
-		const renderContext = this._renderContexts.get( renderTarget, this._mrt, this._callDepth );
+		const renderContext = this._renderContexts.get( renderTarget, this._mrt, this._callDepth, camera );
 
 		this._currentRenderContext = renderContext;
 		this._currentRenderObjectFunction = this._renderObjectFunction || this.renderObject;
@@ -1765,19 +2102,17 @@ class Renderer {
 
 		let viewport = canvasTarget._viewport;
 		let scissor = canvasTarget._scissor;
+		let scissorTest = canvasTarget._scissorTest;
 		let pixelRatio = canvasTarget._pixelRatio;
 
 		if ( renderTarget !== null ) {
 
 			viewport = renderTarget.viewport;
 			scissor = renderTarget.scissor;
+			scissorTest = renderTarget.scissorTest;
 			pixelRatio = 1;
 
 		}
-
-		this.getDrawingBufferSize( _drawingBufferSize );
-
-		_screen.set( 0, 0, _drawingBufferSize.width, _drawingBufferSize.height );
 
 		const minDepth = ( viewport.minDepth === undefined ) ? 0 : viewport.minDepth;
 		const maxDepth = ( viewport.maxDepth === undefined ) ? 1 : viewport.maxDepth;
@@ -1787,10 +2122,8 @@ class Renderer {
 		renderContext.viewportValue.height >>= activeMipmapLevel;
 		renderContext.viewportValue.minDepth = minDepth;
 		renderContext.viewportValue.maxDepth = maxDepth;
-		renderContext.viewport = renderContext.viewportValue.equals( _screen ) === false;
 
 		renderContext.scissorValue.copy( scissor ).multiplyScalar( pixelRatio ).floor();
-		renderContext.scissor = canvasTarget._scissorTest && renderContext.scissorValue.equals( _screen ) === false;
 		renderContext.scissorValue.width >>= activeMipmapLevel;
 		renderContext.scissorValue.height >>= activeMipmapLevel;
 
@@ -1803,26 +2136,16 @@ class Renderer {
 
 		//
 
-		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-
-		if ( camera.isArrayCamera ) {
-
-			_frustumArray.setFromArrayCamera( camera );
-
-		} else {
-
-			_frustum.setFromProjectionMatrix( _projScreenMatrix, camera.coordinateSystem, camera.reversedDepth );
-
-		}
+		this.drawingPipeline.begin( camera, renderContext );
 
 		this._renderLists.update( nodeFrame.frameId );
 
 		const renderList = this._renderLists.get( scene, camera, this.lighting );
-		renderList.begin();
+		this.drawingPipeline.beginRenderList( renderList );
 
-		this._projectObject( scene, camera, 0, renderList, renderContext.clippingContext );
+		this.drawingPipeline.project( scene, camera, 0, renderList, renderContext.clippingContext );
 
-		renderList.finish();
+		this.drawingPipeline.finishRenderList( renderList );
 
 		if ( this.sortObjects === true ) {
 
@@ -1847,6 +2170,8 @@ class Renderer {
 			renderContext.stencil = renderTarget.stencilBuffer;
 
 		} else {
+
+			this.getDrawingBufferSize( _drawingBufferSize );
 
 			renderContext.textures = null;
 			renderContext.depthTexture = null;
@@ -1879,6 +2204,11 @@ class Renderer {
 			renderContext.scissorValue.height = Math.max( renderContext.height - renderContext.scissorValue.y, 0 );
 
 		}
+
+		_screen.set( 0, 0, renderContext.width, renderContext.height );
+
+		renderContext.viewport = renderContext.viewportValue.equals( _screen ) === false;
+		renderContext.scissor = scissorTest && renderContext.scissorValue.equals( _screen ) === false;
 
 		//
 
@@ -1913,6 +2243,7 @@ class Renderer {
 		this._currentRenderContext = previousRenderContext;
 		this._currentRenderObjectFunction = previousRenderObjectFunction;
 		this._handleObjectFunction = previousHandleObjectFunction;
+		this._currentRenderBundle = previousRenderBundle;
 
 		this.lighting.finishRender( scene );
 
@@ -1963,7 +2294,7 @@ class Renderer {
 
 		const cacheKey = this._nodes.getOutputCacheKey();
 
-		let quadData = this._quadCache.get( renderTarget.texture );
+		let quadData = this._quadCache.get( renderTarget );
 		let quad;
 
 		if ( quadData === undefined ) {
@@ -1979,21 +2310,7 @@ class Renderer {
 				cacheKey
 			};
 
-			this._quadCache.set( renderTarget.texture, quadData );
-
-			// dispose logic
-
-			const dispose = () => {
-
-				quad.material.dispose();
-
-				this._quadCache.delete( renderTarget.texture );
-
-				renderTarget.texture.removeEventListener( 'dispose', dispose );
-
-			};
-
-			renderTarget.texture.addEventListener( 'dispose', dispose );
+			this._quadCache.set( renderTarget, quadData );
 
 		} else {
 
@@ -2071,6 +2388,9 @@ class Renderer {
 
 		if ( this._initialized === false ) await this.init();
 
+		// started before assigning the callback, so it first runs on the next frame
+
+		if ( callback !== null ) this._animation.start();
 		this._animation.setAnimationLoop( callback );
 
 	}
@@ -2091,10 +2411,10 @@ class Renderer {
 	 * from the GPU to the CPU in context of compute shaders.
 	 *
 	 * @async
-	 * @param {BufferAttribute} attribute - The storage buffer attribute to read frm.
-	 * @param {ReadbackBuffer|ArrayBuffer} target - The storage buffer attribute.
-	 * @param {number} offset - The storage buffer attribute.
-	 * @param {number} count - The offset from which to start reading the
+	 * @param {BufferAttribute} attribute - The storage buffer attribute to read from.
+	 * @param {?(ReadbackBuffer|ArrayBuffer)} [target=null] - The readback buffer or array buffer that receives the data. If `null`, a new array buffer is returned.
+	 * @param {number} [offset=0] - The byte offset to start reading from. Must be a multiple of 4.
+	 * @param {number} [count=-1] - The number of bytes to read. Must be a multiple of 4, or `-1` to read to the end of the buffer.
 	 * @return {Promise<ArrayBuffer|ReadbackBuffer>} A promise that resolves with the buffer data when the data are ready.
 	 */
 	async getArrayBufferAsync( attribute, target = null, offset = 0, count = - 1 ) {
@@ -2696,22 +3016,33 @@ class Renderer {
 	 * Frees all internal resources of the renderer. Call this method if the renderer
 	 * is no longer in use by your app.
 	 */
-	dispose() {
+	async dispose() {
+
+		// edge case: If dispose() is called during an init, wait for the finish
+
+		if ( this._initPromise !== null ) {
+
+			await this.init();
+
+		}
 
 		if ( this._initialized === true ) {
 
-			this.info.dispose();
-			this.backend.dispose();
+			// the drawing pipeline frees its resources while the managers of the renderer still track them
 
+			this.drawingPipeline.dispose();
+
+			this.lighting.dispose();
+			this._inspector.dispose();
 			this._animation.dispose();
 			this._objects.dispose();
 			this._geometries.dispose();
+			this._attributes.dispose();
 			this._pipelines.dispose();
 			this._nodes.dispose();
 			this._bindings.dispose();
 			this._renderLists.dispose();
 			this._renderContexts.dispose();
-			this._textures.dispose();
 
 			for ( const canvasTarget of this._frameBufferTargets.keys() ) {
 
@@ -2719,16 +3050,16 @@ class Renderer {
 
 			}
 
-			Object.values( this.backend.timestampQueryPool ).forEach( queryPool => {
+			this._destroyCanvasTarget( this._canvasTarget );
 
-				if ( queryPool !== null ) queryPool.dispose();
+			this._textures.dispose();
+			this.info.dispose();
 
-			} );
+			await this.backend.dispose();
 
 		}
 
 		this.setRenderTarget( null );
-		this.setAnimationLoop( null );
 
 	}
 
@@ -2791,9 +3122,12 @@ class Renderer {
 	setCanvasTarget( canvasTarget ) {
 
 		this._canvasTarget.removeEventListener( 'resize', this._onCanvasTargetResize );
+		// keep any dispose event listener attached for later use
 
 		this._canvasTarget = canvasTarget;
+
 		this._canvasTarget.addEventListener( 'resize', this._onCanvasTargetResize );
+		this._canvasTarget.addEventListener( 'dispose', this._onCanvasTargetDispose );
 
 	}
 
@@ -2887,13 +3221,29 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			warn( 'Renderer: .compute() called before the backend is initialized. Try using .computeAsync() instead.' );
+			warn( 'Renderer: ".compute()" called before the backend is initialized. Try using ".computeAsync()" instead.' );
 
 			return this.computeAsync( computeNodes, dispatchSize );
 
 		}
 
+		const computeList = Array.isArray( computeNodes ) ? computeNodes : [ computeNodes ];
+
+		if ( computeList.length === 0 || computeList.some( computeNode => computeNode?.isComputeNode !== true ) ) {
+
+			throw new Error( 'THREE.Renderer: ".compute()" expects a "ComputeNode".' );
+
+		}
+
+		if ( dispatchSize !== null && computeList.some( computeNode => computeNode.count !== null || computeNode.dispatchSize !== null ) ) {
+
+			throw new Error( 'THREE.Renderer: A dispatch size cannot be passed to "renderer.compute()" for nodes created with "compute( count )". Use "computeKernel()" instead.' );
+
+		}
+
 		//
+
+		this._animation.start();
 
 		const nodeFrame = this._nodes.nodeFrame;
 
@@ -2919,14 +3269,6 @@ class Renderer {
 		const pipelines = this._pipelines;
 		const bindings = this._bindings;
 		const nodes = this._nodes;
-
-		const computeList = Array.isArray( computeNodes ) ? computeNodes : [ computeNodes ];
-
-		if ( computeList[ 0 ] === undefined || computeList[ 0 ].isComputeNode !== true ) {
-
-			throw new Error( 'THREE.Renderer: .compute() expects a ComputeNode.' );
-
-		}
 
 		backend.beginCompute( computeNodes );
 
@@ -2960,13 +3302,18 @@ class Renderer {
 
 			}
 
+			nodes.updateBeforeForCompute( computeNode );
 			nodes.updateForCompute( computeNode );
 			bindings.updateForCompute( computeNode );
 
 			const computeBindings = bindings.getForCompute( computeNode );
 			const computePipeline = pipelines.getForCompute( computeNode, computeBindings );
 
+			this._updateDispatchSize( computeNode, dispatchSize );
+
 			backend.compute( computeNodes, computeNode, computeBindings, computePipeline, dispatchSize );
+
+			nodes.updateAfterForCompute( computeNode );
 
 		}
 
@@ -3233,175 +3580,6 @@ class Renderer {
 	}
 
 	/**
-	 * Analyzes the given 3D object's hierarchy and builds render lists from the
-	 * processed hierarchy.
-	 *
-	 * @private
-	 * @param {Object3D} object - The 3D object to process (usually a scene).
-	 * @param {Camera} camera - The camera the object is rendered with.
-	 * @param {number} groupOrder - The group order is derived from the `renderOrder` of groups and is used to group 3D objects within groups.
-	 * @param {RenderList} renderList - The current render list.
-	 * @param {ClippingContext} clippingContext - The current clipping context.
-	 */
-	_projectObject( object, camera, groupOrder, renderList, clippingContext ) {
-
-		if ( object.visible === false ) return;
-
-		const visible = object.layers.test( camera.layers );
-
-		if ( visible ) {
-
-			if ( object.isGroup ) {
-
-				groupOrder = object.renderOrder;
-
-				if ( object.isClippingGroup && object.enabled ) clippingContext = clippingContext.getGroupContext( object );
-
-			} else if ( object.isLOD ) {
-
-				if ( object.autoUpdate === true ) object.update( camera );
-
-			} else if ( object.isLight ) {
-
-				renderList.pushLight( object );
-
-			} else if ( object.isSprite ) {
-
-				const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
-
-				if ( ! object.frustumCulled || object.intersectsFrustum( frustum ) ) {
-
-					if ( this.sortObjects === true ) {
-
-						_vector4.setFromMatrixPosition( object.matrixWorld ).applyMatrix4( _projScreenMatrix );
-
-					}
-
-					const { geometry, material } = object;
-
-					if ( material.visible ) {
-
-						renderList.push( object, geometry, material, groupOrder, _vector4.z, null, clippingContext );
-
-					}
-
-				}
-
-			} else if ( object.isLineLoop ) {
-
-				error( 'Renderer: Objects of type THREE.LineLoop are not supported. Please use THREE.Line or THREE.LineSegments.' );
-
-			} else if ( object.isMesh || object.isLine || object.isPoints ) {
-
-				const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
-
-				if ( ! object.frustumCulled || object.intersectsFrustum( frustum ) ) {
-
-					const { geometry, material } = object;
-
-					if ( this.sortObjects === true ) {
-
-						if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
-
-						_vector4
-							.copy( geometry.boundingSphere.center )
-							.applyMatrix4( object.matrixWorld )
-							.applyMatrix4( _projScreenMatrix );
-
-					}
-
-					if ( Array.isArray( material ) ) {
-
-						const groups = geometry.groups;
-
-						for ( let i = 0, l = groups.length; i < l; i ++ ) {
-
-							const group = groups[ i ];
-							const groupMaterial = material[ group.materialIndex ];
-
-							if ( groupMaterial && groupMaterial.visible ) {
-
-								renderList.push( object, geometry, groupMaterial, groupOrder, _vector4.z, group, clippingContext );
-
-							}
-
-						}
-
-					} else if ( material.visible ) {
-
-						renderList.push( object, geometry, material, groupOrder, _vector4.z, null, clippingContext );
-
-					}
-
-				}
-
-			}
-
-		}
-
-		if ( object.isBundleGroup === true && this.backend.beginBundle !== undefined ) {
-
-			const baseRenderList = renderList;
-
-			// replace render list
-
-			renderList = this._renderLists.get( object, camera, this.lighting );
-
-			const renderBundle = this._bundles.get( object, camera, this._currentRenderContext );
-			const renderBundleData = this.backend.get( renderBundle );
-			const renderBundleNeedsUpdate = this._bundleNeedsUpdate( object, renderBundleData );
-
-			if ( renderBundleNeedsUpdate ) {
-
-				// update render list if necessary
-
-				renderList.begin();
-
-				if ( renderBundleData.renderObjects === undefined ) {
-
-					renderBundleData.renderObjects = [];
-
-				} else {
-
-					renderBundleData.renderObjects.length = 0;
-
-				}
-
-				const children = object.children;
-
-				for ( let i = 0, l = children.length; i < l; i ++ ) {
-
-					this._projectObject( children[ i ], camera, groupOrder, renderList, clippingContext );
-
-				}
-
-				renderList.finish();
-
-			}
-
-			baseRenderList.pushBundle( {
-				bundleGroup: object,
-				camera,
-				renderList,
-			} );
-
-			return;
-
-		}
-
-		//
-
-		const children = object.children;
-
-		for ( let i = 0, l = children.length; i < l; i ++ ) {
-
-			this._projectObject( children[ i ], camera, groupOrder, renderList, clippingContext );
-
-		}
-
-	}
-
-	/**
 	 * Renders the given render bundles.
 	 *
 	 * @private
@@ -3611,8 +3789,9 @@ class Renderer {
 	_updateCamera( camera, useXRCamera ) {
 
 		const xr = this.xr;
+		const useXR = xr.enabled === true && xr.isPresenting === true && useXRCamera === true;
 
-		if ( xr.isPresenting === false || useXRCamera === false ) {
+		if ( useXR === false ) {
 
 			let projectionMatrixNeedsUpdate = false;
 
@@ -3682,7 +3861,7 @@ class Renderer {
 
 		// handle XR
 
-		if ( useXRCamera === true && xr.enabled === true && xr.isPresenting === true ) {
+		if ( useXR === true ) {
 
 			if ( xr.cameraAutoUpdate === true ) xr.updateCamera( camera );
 			camera = xr.getCamera(); // use XR camera for rendering
@@ -3690,6 +3869,26 @@ class Renderer {
 		}
 
 		return camera;
+
+	}
+
+	/**
+	 * Updates the indirect storage attribute that defines the dispatch size
+	 * of the given compute node, if any.
+	 *
+	 * @private
+	 * @param {ComputeNode} computeNode - The compute node.
+	 * @param {?(number|Array<number>|IndirectStorageBufferAttribute)} dispatchSize - The dispatch size of the compute call.
+	 */
+	_updateDispatchSize( computeNode, dispatchSize ) {
+
+		const indirect = dispatchSize !== null ? dispatchSize : computeNode.dispatchSize;
+
+		if ( indirect && indirect.isIndirectStorageBufferAttribute === true ) {
+
+			this._attributes.update( indirect, AttributeType.INDIRECT );
+
+		}
 
 	}
 
@@ -3749,7 +3948,7 @@ class Renderer {
 
 			}
 
-			overrideMaterial.alphaTest = material.alphaTest;
+			overrideMaterial._alphaTest = material.alphaTest; // bypass the setter so the version doesn't change
 			overrideMaterial.alphaMap = material.alphaMap;
 			overrideMaterial.displacementMap = material.displacementMap;
 			overrideMaterial.displacementScale = material.displacementScale;
@@ -3902,6 +4101,10 @@ class Renderer {
 
 			if ( refreshType !== RenderObjectRefreshType.NONE ) this._nodes.updateAfter( renderObject );
 
+		} else if ( this._currentRenderBundle !== null ) {
+
+			this.backend.get( this._currentRenderBundle ).version = - 1;
+
 		}
 
 	}
@@ -3925,17 +4128,26 @@ class Renderer {
 		// If in async compilation mode, queue the work for sequential execution
 		if ( this._compilationPromises !== null ) {
 
-			// Store work items instead of promises - will be processed sequentially
+			// Store work items instead of promises - will be processed sequentially.
+			// The side is stored since the renderer might have changed it temporarily.
 			this._compilationPromises.push( {
 				object,
 				material,
+				side: material.side,
 				scene,
 				camera,
 				lightsNode,
 				group,
 				clippingContext,
 				passId,
-				renderContext: this._currentRenderContext
+				renderContext: this._currentRenderContext,
+				precompilationState: {
+					...this._precompilationState,
+					useFrameBufferTarget: true,
+					renderTarget: this.getRenderTarget(),
+					mrt: this.getMRT(),
+					renderContext: this._currentRenderContext
+				}
 			} );
 
 			return;
@@ -3970,6 +4182,32 @@ class Renderer {
 	_onCanvasTargetResize() {
 
 		if ( this._initialized ) this.backend.updateSize();
+
+	}
+
+	/**
+	 * Callback when a canvas target has been disposed.
+	 *
+	 * @private
+	 * @param {Object} event - The dispose event.
+	 */
+	_onCanvasTargetDispose( event ) {
+
+		this._destroyCanvasTarget( event.target );
+
+	}
+
+	/**
+	 * Frees the GPU resources of the given canvas target.
+	 *
+	 * @private
+	 * @param {CanvasTarget} canvasTarget - The canvas target.
+	 */
+	_destroyCanvasTarget( canvasTarget ) {
+
+		canvasTarget.removeEventListener( 'dispose', this._onCanvasTargetDispose );
+
+		if ( this._initialized ) this.backend.destroyCanvasTarget( canvasTarget );
 
 	}
 

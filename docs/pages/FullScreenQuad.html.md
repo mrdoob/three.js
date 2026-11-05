@@ -10,7 +10,7 @@ This module can only be used with [WebGLRenderer](WebGLRenderer.html).
 
 ## Import
 
-FullScreenQuad is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+FullScreenQuad is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
@@ -39,6 +39,8 @@ The quad's material.
 ### .dispose()
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever the instance is no longer used in your app.
+
+**Overrides:** [Mesh#dispose](Mesh.html#dispose)
 
 ### .render( renderer : WebGLRenderer )
 

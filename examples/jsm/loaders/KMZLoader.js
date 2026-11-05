@@ -47,6 +47,8 @@ class KMZLoader extends Loader {
 		const scope = this;
 
 		const loader = new FileLoader( scope.manager );
+		loader.setPriority( scope.priority );
+		loader.setCache( scope.cache );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
@@ -130,6 +132,8 @@ class KMZLoader extends Loader {
 			if ( model ) {
 
 				const loader = new ColladaLoader( manager );
+				loader.setPriority( this.priority );
+				loader.setCache( this.cache );
 				return loader.parse( new TextDecoder().decode( zip[ model.textContent ] ) );
 
 			}
@@ -145,6 +149,8 @@ class KMZLoader extends Loader {
 				if ( extension === 'dae' ) {
 
 					const loader = new ColladaLoader( manager );
+					loader.setPriority( this.priority );
+					loader.setCache( this.cache );
 					return loader.parse( new TextDecoder().decode( zip[ path ] ) );
 
 				}

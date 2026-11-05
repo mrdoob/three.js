@@ -29,7 +29,7 @@ sky.showSunDisc.value = true;
 
 ## Import
 
-SkyMesh is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+SkyMesh is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
@@ -79,15 +79,15 @@ Default is `true`.
 
 ### .mieCoefficient : UniformNode.<float>
 
-The mieCoefficient uniform.
+The strength of Mie scattering by aerosol particles which controls the intensity of the glow around the sun. Higher values produce a brighter glow.
 
 ### .mieDirectionalG : UniformNode.<float>
 
-The mieDirectionalG uniform.
+The directionality of Mie scattering which controls the size of the glow around the sun. Values closer to `1` produce a smaller and more concentrated halo.
 
 ### .rayleigh : UniformNode.<float>
 
-The rayleigh uniform.
+The strength of Rayleigh scattering by air molecules which is responsible for the blue color of the sky. Higher values produce a brighter sky.
 
 ### .showSunDisc : UniformNode.<float>
 
@@ -99,11 +99,7 @@ The sun position uniform.
 
 ### .turbidity : UniformNode.<float>
 
-The turbidity uniform.
-
-### .upUniform : UniformNode.<vec3>
-
-The up position.
+The atmospheric turbidity which controls the amount of haze. Higher values produce a hazier sky.
 
 ## Source
 

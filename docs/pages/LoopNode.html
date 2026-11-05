@@ -34,12 +34,12 @@ Loop( value.lessThan( 10 ), () => {
 	value.addAssign( 1 );
 } );
 </code></pre>
-<p>The module also provides <code>Break()</code> and <code>Continue()</code> TSL expression for loop control.</p></div>
+<p>The module also provides <code>Break()</code> and <code>Continue()</code> TSL expressions for loop control.</p></div>
 			</header>
 			<article>
 				<div class="container-overview">
 					<h2>Constructor</h2>
-					<h3 class="name name-method" id="LoopNode" translate="no">new <a href="#LoopNode">LoopNode</a><span class="signature">( params : <span class="param-type">Array.&lt;<a href="global.html#any">any</a>></span> )</span> </h3>
+					<h3 class="name name-method" id="LoopNode" translate="no">new <a href="#LoopNode">LoopNode</a><span class="signature">( params : <span class="param-type">Array.&lt;(<a href="LoopNode.html#~Params">LoopNode~Params</a>|<a href="global.html#loopBodyCallback">loopBodyCallback</a>)></span> )</span> </h3>
 					<div class="method">
 						<div class="description">
 							<p>Constructs a new loop node.</p>
@@ -51,7 +51,7 @@ Loop( value.lessThan( 10 ), () => {
 										<strong translate="no">params</strong>
 									</td>
 									<td class="description last">
-										<p>Depending on the loop type, array holds different parameterization values for the loop.</p>
+										<p>Any number of loop parameters followed by the loop body.</p>
 									</td>
 								</tr>
 							</tbody>
@@ -102,6 +102,106 @@ Loop( value.lessThan( 10 ), () => {
 							<dt class="tag-returns"><strong>Returns:</strong> The loop variable name.</dt>
 						</dl>
 					</div>
+				<h2 class="subsection-title">Type Definitions</h2>
+				<div class="member">
+					<h3 class="name" id="~ObjectParams" translate="no">.<a href="#~ObjectParams">ObjectParams</a> </h3>
+					<div class="description">
+						<p>A detailed loop configuration.</p>
+					</div>
+<table class="props">
+	<tbody>
+		<tr>
+				<td class="name">
+					<strong>start</strong>
+						<br>
+<span class="param-type">number</span>
+|
+<span class="param-type"><a href="Node.html">Node</a>.&lt;int></span>
+|
+<span class="param-type"><a href="Node.html">Node</a>.&lt;uint></span>
+				</td>
+			<td class="description last">
+				<p>The initial value of the loop variable.</p>
+						<p>Default is <code>0</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>end</strong>
+						<br>
+<span class="param-type">number</span>
+|
+<span class="param-type"><a href="Node.html">Node</a>.&lt;int></span>
+|
+<span class="param-type"><a href="Node.html">Node</a>.&lt;uint></span>
+				</td>
+			<td class="description last">
+				<p>The value the loop variable is compared against. If omitted, the loop counts down from <code>start - 1</code> to <code>0</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>name</strong>
+						<br>
+<span class="param-type">string</span>
+				</td>
+			<td class="description last">
+				<p>The name of the loop variable. Defaults to <code>i</code>, <code>j</code>, <code>k</code> and so on.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>type</strong>
+						<br>
+<span class="param-type">string</span>
+				</td>
+			<td class="description last">
+				<p>The data type of the loop variable.</p>
+						<p>Default is <code>'int'</code>.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>condition</strong>
+						<br>
+<span class="param-type">'&lt;'</span>
+|
+<span class="param-type">'&lt;='</span>
+|
+<span class="param-type">'>'</span>
+|
+<span class="param-type">'>='</span>
+				</td>
+			<td class="description last">
+				<p>The comparison operator. The loop runs as long as the comparison is true. Inferred from <code>start</code> and <code>end</code> if not set.</p>
+			</td>
+		</tr>
+		<tr>
+				<td class="name">
+					<strong>update</strong>
+						<br>
+<span class="param-type">string</span>
+|
+<span class="param-type">number</span>
+|
+<span class="param-type">function</span>
+|
+<span class="param-type"><a href="Node.html">Node</a></span>
+				</td>
+			<td class="description last">
+				<p>Defines how the loop variable is updated after each iteration. Inferred from <code>condition</code> and <code>type</code> if not set.</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+				</div>
+				<div class="member">
+					<h3 class="name" id="~Params" translate="no">.<a href="#~Params">Params</a> </h3>
+					<div class="description">
+						<p>The parameters of a loop. A number or int/uint node defines the loop's end value,
+a bool node defines a <code>while</code> loop and an object allows a more detailed configuration.</p>
+					</div>
+				</div>
 				<h2 class="subsection-title">Source</h2>
 				<p>
 					<a href="https://github.com/mrdoob/three.js/blob/master/src/nodes/utils/LoopNode.js" translate="no" target="_blank" rel="noopener">src/nodes/utils/LoopNode.js</a>

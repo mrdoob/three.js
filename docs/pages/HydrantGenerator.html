@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>HydrantGenerator - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">HydrantGenerator</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>A classic cast-iron fire hydrant: a stout barrel on a flared footing, capped by a
+domed bonnet and a hex operating nut, with two side outlet nozzles and a larger
+front pumper nozzle. Built once and instanced across a list of placements, dressed
+with one cheap material that branches on a baked <code>partId</code> ( weathered red iron,
+bare metal caps ).</p>
+<p>The canonical model stands on <code>y = 0</code>, centred in X / Z, with the pumper nozzle
+facing <code>+Z</code>, so a placement whose local <code>+Z</code> faces the road presents it to traffic.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const hydrants = new HydrantGenerator();
+scene.add( hydrants.build( placements ) ); // placements: Matrix4[]
+</code></pre></div>
+			</header>
+			<article>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="HydrantGenerator" translate="no">new <a href="#HydrantGenerator">HydrantGenerator</a><span class="signature">()</span> </h3>
+					<div class="method">
+					</div>
+				</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/generators/city/HydrantGenerator.js" translate="no" target="_blank" rel="noopener">examples/jsm/generators/city/HydrantGenerator.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

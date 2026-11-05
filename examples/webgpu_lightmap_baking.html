@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - light baking</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta property="og:title" content="three.js webgpu - light baking">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://threejs.org/examples/webgpu_lightmap_baking.html">
+		<meta property="og:image" content="https://threejs.org/examples/screenshots/webgpu_lightmap_baking.jpg">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+
+			<div class="title-wrapper">
+				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Light Baking</span>
+			</div>
+
+			<small>Progressively bake ray traced radiosity (<a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">three-mesh-bvh</a>) diffuse irradiance into a UV atlas by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br/><span id="status"></span></small>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/",
+					"three-mesh-bvh/webgpu": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.15/src/webgpu/index.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+			import { LightMapper } from 'three/addons/lighting/LightMapper.js';
+			import { RayTracedRadiosity, rayTracedRadiosityIrradiance } from 'three/addons/lighting/RayTracedRadiosity.js';
+			import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
+
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+
+			if ( WebGPU.isAvailable() === false ) {
+
+				document.body.appendChild( WebGPU.getErrorMessage() );
+
+				throw new Error( 'No WebGPU support' );
+
+			}
+
+			let camera, scene, renderer, controls, status;
+			let world, meshes, materials;
+			let radiosity, lightMapper;
+			let needsBake = false;
+
+			const params = {
+				scene: 'Cornell Box',
+				resolution: 1024
+			};
+
+			const scenes = { 'Cornell Box': createCornellBox, 'Courtyard': loadCourtyard };
+			const worlds = {};
+
+			// every sample continues the ray sequences of the texels
+
+			const samples = 64;
+
+			init();
+
+			async function init() {
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
+
+				scene = new THREE.Scene();
+
+				// Renderer
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.inspector = new Inspector();
+				document.body.appendChild( renderer.domElement );
+
+				await renderer.init();
+
+				// Controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+
+				status = document.getElementById( 'status' );
+
+				// GUI
+
+				const gui = renderer.inspector.createParameters( 'Light Baking' );
+				gui.add( params, 'scene', Object.keys( scenes ) ).name( 'Scene' ).onChange( setScene );
+				gui.add( params, 'resolution', [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( requestBake );
+				gui.add( { bake: requestBake }, 'bake' ).name( 'Re-Bake GI' );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				await setScene();
+
+				renderer.setAnimationLoop( animate );
+
+			}
+
+			async function setScene() {
+
+				const name = params.scene;
+
+				worlds[ name ] ??= await scenes[ name ]();
+
+				// another scene was picked while this one loaded
+
+				if ( name !== params.scene ) return;
+
+				if ( world !== undefined ) scene.remove( world.root );
+
+				world = worlds[ name ];
+				scene.add( world.root );
+				scene.background = world.background;
+
+				camera.position.copy( world.camera );
+				controls.target.copy( world.target );
+				controls.update();
+
+				meshes = [];
+				world.lightMapped.traverse( ( object ) => object.isMesh && meshes.push( object ) );
+				materials = new Set( meshes.map( ( mesh ) => mesh.material ) );
+
+				requestBake();
+
+			}
+
+			function createCornellBox() {
+
+				// keep the light source outside the light-mapped room
+
+				const root = new THREE.Group();
+				const room = new THREE.Group();
+				root.add( room );
+
+				const wallMaterial = new THREE.MeshStandardMaterial( { color: 0xcccccc } );
+				const redMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
+				const greenMaterial = new THREE.MeshStandardMaterial( { color: 0x00ff00 } );
+
+				// Floor
+				const floor = new THREE.Mesh( new THREE.PlaneGeometry( 6, 6 ), wallMaterial );
+				floor.rotation.x = - Math.PI / 2;
+				room.add( floor );
+
+				// Ceiling
+				const ceiling = new THREE.Mesh( new THREE.PlaneGeometry( 6, 6 ), wallMaterial );
+				ceiling.rotation.x = Math.PI / 2;
+				ceiling.position.y = 5;
+				room.add( ceiling );
+
+				// Back wall
+				const backWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), wallMaterial );
+				backWall.position.set( 0, 2.5, - 3 );
+				room.add( backWall );
+
+				// Front wall
+				const frontWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), wallMaterial );
+				frontWall.rotation.y = Math.PI;
+				frontWall.position.set( 0, 2.5, 3 );
+				room.add( frontWall );
+
+				// Left wall (red)
+				const leftWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), redMaterial );
+				leftWall.rotation.y = Math.PI / 2;
+				leftWall.position.set( - 3, 2.5, 0 );
+				room.add( leftWall );
+
+				// Right wall (green)
+				const rightWall = new THREE.Mesh( new THREE.PlaneGeometry( 6, 5 ), greenMaterial );
+				rightWall.rotation.y = - Math.PI / 2;
+				rightWall.position.set( 3, 2.5, 0 );
+				room.add( rightWall );
+
+				// Objects inside the box
+
+				const objectMaterial = new THREE.MeshStandardMaterial( { color: 0xeeeeee } );
+
+				// Tall box
+				const tallBox = new THREE.Mesh( new THREE.BoxGeometry( 1.2, 2.5, 1.2 ), objectMaterial );
+				tallBox.position.set( - 0.8, 1.25, - 0.8 );
+				tallBox.rotation.y = Math.PI / 8;
+				room.add( tallBox );
+
+				// Sphere
+				const sphereMaterial = new THREE.MeshStandardMaterial( { color: 0x0044ff, roughness: 0.15 } );
+				const sphere = new THREE.Mesh( new THREE.SphereGeometry( 0.65, 32, 32 ), sphereMaterial );
+				sphere.position.set( 1, 0.65, 0.5 );
+				room.add( sphere );
+
+				// Emissive light panel, ray radiosity bakes its direct light with soft shadows
+				const lightPanel = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), new THREE.MeshStandardMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 20 } ) );
+				lightPanel.rotation.x = Math.PI / 2;
+				lightPanel.position.y = 4.99;
+				root.add( lightPanel );
+
+				return {
+					root, lightMapped: room, background: new THREE.Color( 0x111111 ), cacheSize: 256,
+					camera: new THREE.Vector3( 0, 2.5, 8 ), target: new THREE.Vector3( 0, 2.5, 0 )
+				};
+
+			}
+
+			async function loadCourtyard() {
+
+				// a two storey cloister at sunrise, lit by the sky. It has no outer walls, their outside would only
+				// take light map space and bake time
+
+				const sky = await new HDRLoader().loadAsync( 'textures/equirectangular/blouberg_sunrise_2_1k.hdr' );
+				sky.mapping = THREE.EquirectangularReflectionMapping;
+
+				const root = new THREE.Group();
+
+				const stone = new THREE.MeshStandardMaterial( { color: 0xddd0b8 } );
+				const plaster = new THREE.MeshStandardMaterial( { color: 0xd9a066 } );
+				const tiles = new THREE.MeshStandardMaterial( { color: 0xb59a7e } );
+				const water = new THREE.MeshStandardMaterial( { color: 0x3c7a8a } );
+				const leaves = new THREE.MeshStandardMaterial( { color: 0x4a7a32 } );
+				const banners = [ 0xb02a20, 0x2a4ab0, 0xd8a020, 0x2a8a50 ].map( ( color ) => new THREE.MeshStandardMaterial( { color } ) );
+
+				function add( parent, geometry, material, x, y, z ) {
+
+					const mesh = new THREE.Mesh( geometry, material );
+					mesh.position.set( x, y, z );
+					parent.add( mesh );
+					return mesh;
+
+				}
+
+				// the courtyard facade of a wing in one piece, so that no seams show: arches down to the floor below,
+				// and above a parapet upstairs
+
+				const arches = [ - 4.5, - 1.5, 1.5, 4.5 ];
+				const facadeShape = new THREE.Shape().moveTo( - 6.5, 0 );
+
+				for ( const x of arches ) facadeShape.lineTo( x - 1, 0 ).lineTo( x - 1, 2.4 ).absarc( x, 2.4, 1, Math.PI, 0, true ).lineTo( x + 1, 0 );
+
+				facadeShape.lineTo( 6, 0 ).lineTo( 6, 7.5 ).lineTo( - 6.5, 7.5 ).closePath();
+
+				for ( const x of arches ) facadeShape.holes.push( new THREE.Path().moveTo( x + 0.9, 5.2 ).lineTo( x + 0.9, 5.8 ).absarc( x, 5.8, 0.9, 0, Math.PI ).lineTo( x - 0.9, 5.2 ).closePath() );
+
+				const facade = new THREE.ExtrudeGeometry( facadeShape, { depth: 0.5, bevelEnabled: false, curveSegments: 16 } );
+				const floorSlab = new THREE.BoxGeometry( 15.5, 0.3, 2.5 );
+				const roof = new THREE.BoxGeometry( 15.2, 0.3, 3.8 );
+				const banner = new THREE.PlaneGeometry( 0.7, 2.4 );
+
+				// four wings, each one covers the corner on its left so that the walls do not overlap
+
+				for ( let i = 0; i < 4; i ++ ) {
+
+					const wing = new THREE.Group();
+					wing.rotation.y = - i * Math.PI / 2;
+					root.add( wing );
+
+					add( wing, facade, stone, 0, 0, - 6.5 );
+					add( wing, floorSlab, stone, - 1.25, 4.15, - 7.75 );
+					add( wing, roof, stone, - 1.9, 7.65, - 7.6 );
+
+					for ( const x of [ - 3, 0, 3 ] ) add( wing, banner, banners[ i ], x, 6.25, - 5.95 );
+
+				}
+
+				add( root, new THREE.PlaneGeometry( 19, 19 ), tiles, 0, 0, 0 ).rotation.x = - Math.PI / 2;
+
+				// fountain
+
+				const octagon = ( radius ) => Array.from( { length: 8 }, ( v, i ) => new THREE.Vector2( radius, 0 ).rotateAround( new THREE.Vector2(), ( i + 0.5 ) * Math.PI / 4 ) );
+
+				const basin = new THREE.Shape( octagon( 1.9 ) );
+				basin.holes.push( new THREE.Path( octagon( 1.6 ) ) );
+
+				add( root, new THREE.ExtrudeGeometry( basin, { depth: 0.55, bevelEnabled: false } ), stone, 0, 0, 0 ).rotation.x = - Math.PI / 2;
+				add( root, new THREE.ShapeGeometry( new THREE.Shape( octagon( 1.6 ) ) ), water, 0, 0.4, 0 ).rotation.x = - Math.PI / 2;
+				add( root, new THREE.CylinderGeometry( 0.2, 0.3, 1.3, 16 ), stone, 0, 0.65, 0 );
+				add( root, new THREE.CylinderGeometry( 0.8, 0.3, 0.3, 16 ), stone, 0, 1.45, 0 );
+				add( root, new THREE.SphereGeometry( 0.25, 16, 12 ), stone, 0, 1.85, 0 );
+
+				// cypresses in planters
+
+				for ( const [ x, z ] of [[ - 4.6, - 4.6 ], [ 4.6, - 4.6 ], [ 4.6, 4.6 ], [ - 4.6, 4.6 ]] ) {
+
+					add( root, new THREE.BoxGeometry( 1.2, 0.6, 1.2 ), plaster, x, 0.3, z );
+					add( root, new THREE.ConeGeometry( 0.55, 3.2, 12 ), leaves, x, 2.2, z );
+
+				}
+
+				return {
+					root, lightMapped: root, background: sky, cacheSize: 512,
+					camera: new THREE.Vector3( - 5.6, 1.6, 1.5 ), target: new THREE.Vector3( 3, 3.4, - 2.5 )
+				};
+
+			}
+
+			function requestBake() {
+
+				needsBake = true;
+
+			}
+
+			function bake() {
+
+				for ( const material of materials ) material.lightMap = null;
+
+				lightMapper?.dispose();
+				radiosity?.dispose();
+
+				// each mesh gets a new geometry with light map UVs, also for another resolution
+
+				if ( world.atlas?.resolution !== params.resolution ) {
+
+					const geometries = new Set( meshes.map( ( mesh ) => mesh.geometry ) );
+					world.atlas = unwrapUVs( world.lightMapped, { resolution: params.resolution, padding: 3 } );
+
+					for ( const geometry of geometries ) geometry.dispose();
+
+				}
+
+				// rays through a BVH of the scene, with the bounces cached in a light map of their own
+
+				radiosity = new RayTracedRadiosity( { cacheSize: world.cacheSize } );
+				radiosity.update( renderer, scene );
+
+				// the light map accumulates one sample per frame in animate()
+
+				lightMapper = new LightMapper( renderer, world.atlas.resolution, rayTracedRadiosityIrradiance( radiosity ) );
+				lightMapper.addObjects( meshes );
+
+				for ( const material of materials ) material.lightMap = lightMapper.texture;
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				if ( needsBake ) {
+
+					bake();
+					needsBake = false;
+
+				}
+
+				if ( lightMapper.samples < samples ) {
+
+					lightMapper.update();
+					status.textContent = `Baking: ${ lightMapper.samples } / ${ samples } samples`;
+
+				} else {
+
+					status.textContent = `Baked: ${ samples } samples`;
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

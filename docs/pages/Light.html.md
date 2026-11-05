@@ -40,11 +40,15 @@ This flag can be used for type testing.
 
 Default is `true`.
 
-## Methods
+## Static Methods
 
-### .dispose()
+### .registerNode( lightNodeClass : AnalyticLightNode.constructor )
 
-Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+Registers the node class that `WebGPURenderer` uses to shade lights of this type.
+
+**lightNodeClass**
+
+The light node class.
 
 ## Source
 

@@ -28,9 +28,11 @@ An optional output node.
 
 ## Properties
 
-### .context : Object (readonly)
+### .isRenderPipeline : boolean (readonly)
 
-Returns the current context of the render pipeline stack.
+This flag can be used for type testing.
+
+Default is `true`.
 
 ### .needsUpdate : Node.<vec4>
 

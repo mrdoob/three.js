@@ -13,7 +13,7 @@ const volume = await loader.loadAsync( 'models/nrrd/I.nrrd' );
 
 ## Import
 
-NRRDLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+NRRDLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { NRRDLoader } from 'three/addons/loaders/NRRDLoader.js';

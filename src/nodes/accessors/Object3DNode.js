@@ -70,6 +70,12 @@ class Object3DNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	/**
 	 * Overwritten since the node type is inferred from the scope.
 	 *

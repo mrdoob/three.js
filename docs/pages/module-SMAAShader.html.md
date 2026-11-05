@@ -2,7 +2,7 @@
 
 ## Import
 
-SMAAShader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+SMAAShader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { SMAAShader } from 'three/addons/shaders/SMAAShader.js';

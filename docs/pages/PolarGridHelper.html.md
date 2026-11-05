@@ -37,7 +37,7 @@ Default is `16`.
 
 The number of rings. This can be any positive integer.
 
-Default is `16`.
+Default is `8`.
 
 **divisions**
 
@@ -62,6 +62,8 @@ Default is `0x888888`.
 ### .dispose()
 
 Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+
+**Overrides:** [LineSegments#dispose](LineSegments.html#dispose)
 
 ## Source
 

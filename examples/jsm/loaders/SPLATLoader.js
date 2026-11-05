@@ -11,13 +11,13 @@ const ROW_SIZE_BYTES = 32;
  * A loader for standard fixed-width Gaussian splat `.splat` files.
  *
  * This loader decodes the format into `BufferGeometry` for use with
- * `GaussianSplatMesh`. Each 32-byte row stores center, scale, color and
+ * `GaussianSplat`. Each 32-byte row stores center, scale, color and
  * rotation data for one splat.
  *
  * ```js
  * const loader = new SPLATLoader();
  * const data = await loader.loadAsync( './models/gsplat/example.splat' );
- * scene.add( new GaussianSplatMesh( data ) );
+ * scene.add( new GaussianSplat( data ) );
  * ```
  *
  * @augments Loader
@@ -50,6 +50,8 @@ class SPLATLoader extends Loader {
 		const scope = this;
 
 		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );

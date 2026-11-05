@@ -16,7 +16,9 @@ let _rendererState, _sceneState;
  * incorrectly resolved intersecting geometry are avoided.
  *
  * Only transparent materials using `NormalBlending` and no transmission qualify
- * for OIT. All other objects are rendered as usual. MSAA is not supported.
+ * for OIT. All other objects are rendered as usual.
+ *
+ * MSAA is only supported with the WebGPU backend.
  *
  * MRT configurations assigned via `setMRT()` apply to the default pass only.
  * OIT-qualified objects contribute to the color output but not to custom
@@ -51,7 +53,7 @@ class OITPassNode extends PassNode {
 	 */
 	constructor( scene, camera, options = {} ) {
 
-		super( PassNode.COLOR, scene, camera, { ...options, samples: 0 } );
+		super( PassNode.COLOR, scene, camera, options );
 
 		/**
 		 * This flag can be used for type testing.
@@ -210,6 +212,25 @@ class OITPassNode extends PassNode {
 
 		const beautyNode = super.setup( builder );
 
+		// MSAA
+
+		if ( builder.renderer.backend.isWebGPUBackend === true ) {
+
+			// sample counts must match since the depth buffer is shared
+
+			this._oitRenderTarget.samples = this.renderTarget.samples;
+
+		} else {
+
+			// The WebGL backend does not support depth texture sharing with MSAA unless
+			// WEBGL_multisampled_render_to_texture is supported (which isn't available on most devices)
+
+			this.renderTarget.samples = 0;
+
+		}
+
+		// TSL
+
 		const accumNode = texture( this._oitRenderTarget.textures[ 0 ] );
 		const revealageNode = texture( this._oitRenderTarget.textures[ 1 ] ).r;
 
@@ -231,11 +252,6 @@ class OITPassNode extends PassNode {
 
 		_rendererState = RendererUtils.saveRendererState( renderer, _rendererState );
 
-		const currentAutoClearColor = renderer.autoClearColor;
-		const currentAutoClearDepth = renderer.autoClearDepth;
-		const currentAutoClearStencil = renderer.autoClearStencil;
-		const currentTransparent = renderer.transparent;
-		const currentOpaque = renderer.opaque;
 		const currentMask = camera.layers.mask;
 
 		this._cameraNear.value = camera.near;
@@ -277,12 +293,6 @@ class OITPassNode extends PassNode {
 
 		RendererUtils.restoreSceneState( scene, _sceneState );
 		RendererUtils.restoreRendererState( renderer, _rendererState );
-
-		renderer.autoClearColor = currentAutoClearColor;
-		renderer.autoClearDepth = currentAutoClearDepth;
-		renderer.autoClearStencil = currentAutoClearStencil;
-		renderer.transparent = currentTransparent;
-		renderer.opaque = currentOpaque;
 
 		camera.layers.mask = currentMask;
 

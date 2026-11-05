@@ -12,6 +12,7 @@ A loader for the glTF 2.0 format.
 *   KHR\_lights\_punctual
 *   KHR\_materials\_anisotropy
 *   KHR\_materials\_clearcoat
+*   KHR\_materials\_diffuse\_roughness
 *   KHR\_materials\_dispersion
 *   KHR\_materials\_emissive\_strength
 *   KHR\_materials\_ior
@@ -30,8 +31,9 @@ A loader for the glTF 2.0 format.
 *   EXT\_texture\_avif
 *   EXT\_texture\_webp
 
-The following glTF 2.0 extension is supported by an external user plugin:
+The following glTF 2.0 extensions are supported by separately registered plugins:
 
+*   KHR\_gaussian\_splatting
 *   [KHR\_materials\_variants](https://github.com/takahirox/three-gltf-extensions)
 *   [MSFT\_texture\_dds](https://github.com/takahirox/three-gltf-extensions)
 *   [KHR\_animation\_pointer](https://github.com/needle-tools/three-animation-pointer)
@@ -51,7 +53,7 @@ scene.add( gltf.scene );
 
 ## Import
 
-GLTFLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+GLTFLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';

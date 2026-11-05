@@ -1,6 +1,6 @@
 export class Style {
 
-	static init( container ) {
+	static init( container, nonce = null ) {
 
 		const css = /* css */`
 @scope (.three-inspector) {
@@ -29,6 +29,7 @@ export class Style {
 		pointer-events: none;
 		z-index: 1000;
 		overflow: hidden;
+		color-scheme: dark;
 	}
 
 	:scope * {
@@ -354,11 +355,6 @@ export class Style {
 
 		.mini-panel-content .parameters {
 			min-width: 0 !important;
-		}
-
-		.mini-panel-content .list-container.parameters .list-item-row,
-		.mini-panel-content .list-container.parameters .list-header {
-			grid-template-columns: minmax(0, .5fr) minmax(0, 1fr) !important;
 		}
 
 	}
@@ -1080,6 +1076,7 @@ export class Style {
 
 	.list-item-row {
 		display: grid;
+		grid-template-columns: var(--list-grid-template, none);
 		align-items: center;
 		padding: 4px 8px;
 		border-radius: 3px;
@@ -1171,6 +1168,7 @@ export class Style {
 
 	.list-header {
 		display: grid;
+		grid-template-columns: var(--list-grid-template, none);
 		align-items: center;
 		padding: 4px 8px;
 		font-weight: 600;
@@ -1437,6 +1435,7 @@ export class Style {
 		font-family: var(--font-mono);
 		width: 100%;
 		box-sizing: border-box;
+		color-scheme: dark;
 	}
 
 	.param-control input:focus {
@@ -1610,39 +1609,36 @@ export class Style {
 		margin-left: 2px;
 	}
 
-	@media screen and (max-width: 340px) {
+	.list-container.parameters .list-item-cell:first-child .value {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
 
-		.mini-panel-content .list-item-cell:first-child {
-			display: flex;
-			align-items: center;
-			min-width: 0;
-			overflow: hidden;
-			width: 100%;
-		}
+	.list-container.parameters .list-item-cell:first-child .value:has(> .info-icon) {
+		position: relative;
+		padding-right: 20px;
+	}
 
-		.mini-panel-content .list-item-cell:first-child .value {
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-			flex: 1 1 0%;
-			min-width: 0;
-		}
-
-		.mini-panel-content .list-item-cell:first-child .info-icon {
-			flex-shrink: 0;
-		}
-
+	.list-container.parameters .list-item-cell:first-child .value > .info-icon {
+		position: absolute;
+		top: calc(50% - 8px);
+		right: 0;
 	}
 
 	.mini-panel-content .custom-checkbox .checkmark {
-		width: 12px;
-		height: 12px;
+		width: 11px;
+		height: 11px;
 		margin-bottom: 2px;
 		will-change: transform;
 	}
 
 	.mini-panel-content .list-container.parameters .list-item-row:not(.collapsible) {
 		margin-bottom: 2px;
+	}
+
+	.mini-panel-content .list-container.parameters .list-item-wrapper:has(> .list-children-container.closed) + .list-item-wrapper {
+		margin-top: 2px;
 	}
 
 	.mini-panel-content .list-container.parameters .list-children-container > .list-item-wrapper:first-child:has(> .list-item-row:not(.collapsible)) {
@@ -2019,6 +2015,16 @@ export class Style {
 		background-color: rgba(255, 255, 255, 0.05);
 	}
 
+	select {
+		color-scheme: dark;
+	}
+
+	select option,
+	option {
+		background-color: #1e1e24;
+		color: var(--text-primary);
+	}
+
 	.select {
 		background: var(--profiler-background);
 		border: 1px solid var(--profiler-border);
@@ -2029,6 +2035,7 @@ export class Style {
 		font-size: 12px;
 		outline: none;
 		cursor: pointer;
+		color-scheme: dark;
 		appearance: none;
 		-webkit-appearance: none;
 		-moz-appearance: none;
@@ -2099,14 +2106,22 @@ export class Style {
 		position: absolute;
 		top: 0;
 		bottom: 0;
-		width: 4px;
-		margin-left: -2px;
+		width: 1px;
 		left: 50%;
-		background: var(--profiler-border);
+		background-color: transparent;
+		/*background-color: rgba(255, 255, 255, 0.25);
+		box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);*/
 		cursor: ew-resize;
 		pointer-events: auto !important;
 		z-index: 10;
 		touch-action: none;
+		transition: background-color 0.15s ease-out;
+	}
+
+	.split-screen-line:hover,
+	.split-screen-line:active,
+	.split-screen-line.active {
+		background-color: var(--color-accent);
 	}
 
 	.split-screen-line::before {
@@ -2114,8 +2129,8 @@ export class Style {
 		position: absolute;
 		top: 0;
 		bottom: 0;
-		left: -10px;
-		width: 24px;
+		left: -12px;
+		width: 25px;
 		background: transparent;
 		cursor: ew-resize;
 	}
@@ -2187,10 +2202,63 @@ export class Style {
 		justify-content: center !important;
 	}
 
+	/* Timeline Info & Details */
+	.timeline-detail-block {
+		font-size: 11px;
+		margin-left: 8px;
+		color: var(--text-secondary);
+		opacity: 1;
+	}
+
+	.timeline-detail-key,
+	.timeline-detail-sep,
+	.timeline-call-count {
+		opacity: 0.5;
+	}
+
+	.timeline-detail-value {
+		color: var(--text-secondary);
+		opacity: 1;
+	}
+
+	.timeline-info-group {
+		display: inline-flex;
+		align-items: center;
+		margin-left: 12px;
+		flex-shrink: 0;
+	}
+
+	.timeline-info-dot {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		margin-right: 6px;
+		flex-shrink: 0;
+	}
+
+	.timeline-info-dot.fps {
+		background-color: var(--color-fps);
+	}
+
+	.timeline-info-dot.call {
+		background-color: var(--color-call);
+	}
+
+	.timeline-info-dot.red {
+		background-color: var(--color-red);
+	}
+
 }
 `;
 
 		const styleElement = document.createElement( 'style' );
+
+		if ( nonce ) {
+
+			styleElement.nonce = nonce;
+
+		}
+
 		styleElement.textContent = css;
 
 		container.appendChild( styleElement );

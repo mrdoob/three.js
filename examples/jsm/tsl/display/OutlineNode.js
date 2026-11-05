@@ -1,4 +1,4 @@
-import { DepthTexture, FloatType, RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, SpriteNodeMaterial, RendererUtils, NodeUpdateType } from 'three/webgpu';
+import { DepthTexture, FloatType, RenderTarget, Vector2, Node, QuadMesh, NodeMaterial, SpriteNodeMaterial, RendererUtils, NodeUpdateType } from 'three/webgpu';
 import { Loop, int, exp, min, float, mul, uv, vec2, vec3, Fn, textureSize, orthographicDepthToViewZ, screenUV, nodeObject, uniform, vec4, passTexture, texture, perspectiveDepthToViewZ, positionView, reference, color } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -39,10 +39,10 @@ let _rendererState;
  * renderPipeline.outputNode = outlineColor.add( scenePass );
  * ```
  *
- * @augments TempNode
+ * @augments Node
  * @three_import import { outline } from 'three/addons/tsl/display/OutlineNode.js';
  */
-class OutlineNode extends TempNode {
+class OutlineNode extends Node {
 
 	static get type() {
 
@@ -358,6 +358,49 @@ class OutlineNode extends TempNode {
 		this._compositeMaterial.name = 'OutlineNode.composite';
 
 		/**
+		 * An internal cache for depth materials.
+		 *
+		 * @private
+		 * @type {Map<Material, NodeMaterial>}
+		 */
+		this._depthMaterialCache = new Map();
+
+		/**
+		 * An internal cache for mask materials.
+		 *
+		 * @private
+		 * @type {Map<Material, NodeMaterial>}
+		 */
+		this._prepareMaskMaterialCache = new Map();
+
+		/**
+		 * Disposes the pass materials of a disposed material.
+		 *
+		 * @private
+		 * @type {Function}
+		 */
+		this._onMaterialDispose = ( event ) => {
+
+			const originalMaterial = event.target;
+
+			originalMaterial.removeEventListener( 'dispose', this._onMaterialDispose );
+
+			for ( const cache of [ this._depthMaterialCache, this._prepareMaskMaterialCache ] ) {
+
+				const passMaterial = cache.get( originalMaterial );
+
+				if ( passMaterial !== undefined ) {
+
+					passMaterial.dispose();
+					cache.delete( originalMaterial );
+
+				}
+
+			}
+
+		};
+
+		/**
 		 * A set to cache selected objects in the scene.
 		 *
 		 * @private
@@ -509,7 +552,8 @@ class OutlineNode extends TempNode {
 
 			if ( this._selectionCache.has( object ) === false ) {
 
-				const overrideMaterial = object.isSprite ? this._depthSpriteMaterial : this._depthMaterial;
+				const baseMaterial = object.isSprite ? this._depthSpriteMaterial : this._depthMaterial;
+				const overrideMaterial = this._getPassMaterial( this._depthMaterialCache, baseMaterial, material );
 
 				renderer.renderObject( object, scene, camera, geometry, overrideMaterial, group, lightsNode, clippingContext );
 
@@ -527,7 +571,8 @@ class OutlineNode extends TempNode {
 
 			if ( this._selectionCache.has( object ) === true ) {
 
-				const overrideMaterial = object.isSprite ? this._prepareMaskSpriteMaterial : this._prepareMaskMaterial;
+				const baseMaterial = object.isSprite ? this._prepareMaskSpriteMaterial : this._prepareMaskMaterial;
+				const overrideMaterial = this._getPassMaterial( this._prepareMaskMaterialCache, baseMaterial, material );
 
 				renderer.renderObject( object, scene, camera, geometry, overrideMaterial, group, lightsNode, clippingContext );
 
@@ -748,6 +793,8 @@ class OutlineNode extends TempNode {
 	 */
 	dispose() {
 
+		super.dispose();
+
 		this.selectedObjects.length = 0;
 
 		this._renderTargetDepthBuffer.dispose();
@@ -769,6 +816,20 @@ class OutlineNode extends TempNode {
 		this._separableBlurMaterial2.dispose();
 		this._compositeMaterial.dispose();
 
+		for ( const cache of [ this._depthMaterialCache, this._prepareMaskMaterialCache ] ) {
+
+			for ( const [ originalMaterial, passMaterial ] of cache ) {
+
+				originalMaterial.removeEventListener( 'dispose', this._onMaterialDispose );
+
+				passMaterial.dispose();
+
+			}
+
+			cache.clear();
+
+		}
+
 	}
 
 	/**
@@ -788,6 +849,49 @@ class OutlineNode extends TempNode {
 			} );
 
 		}
+
+	}
+
+	/**
+	 * For the given material, this method returns the corresponding pass material.
+	 *
+	 * @private
+	 * @param {Map<Material, NodeMaterial>} cache - The material cache of the pass.
+	 * @param {NodeMaterial} baseMaterial - The pass material to derive from.
+	 * @param {Material} originalMaterial - The object's material.
+	 * @return {NodeMaterial} The pass material.
+	 */
+	_getPassMaterial( cache, baseMaterial, originalMaterial ) {
+
+		if ( ! originalMaterial.positionNode ) return baseMaterial; // early out if there are no node modifications
+
+		let force = false;
+		let passMaterial = cache.get( originalMaterial );
+
+		// create
+
+		if ( passMaterial === undefined ) {
+
+			passMaterial = baseMaterial.clone();
+
+			cache.set( originalMaterial, passMaterial );
+
+			originalMaterial.addEventListener( 'dispose', this._onMaterialDispose );
+
+			force = true;
+
+		}
+
+		// update
+
+		if ( passMaterial.version !== originalMaterial.version || force === true ) {
+
+			passMaterial.positionNode = originalMaterial.positionNode || null;
+			passMaterial.version = originalMaterial.version;
+
+		}
+
+		return passMaterial;
 
 	}
 

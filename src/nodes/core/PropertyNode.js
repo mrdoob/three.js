@@ -78,6 +78,12 @@ class PropertyNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	getNodeType( builder ) {
 
 		const nodeType = super.getNodeType( builder );
@@ -178,6 +184,14 @@ export const diffuseColor = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec4', '
  * @type {PropertyNode<vec3>}
  */
 export const diffuseContribution = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'DiffuseContribution' );
+
+/**
+ * TSL object that represents the shader variable `DiffuseRoughness`.
+ *
+ * @tsl
+ * @type {PropertyNode<float>}
+ */
+export const diffuseRoughness = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'DiffuseRoughness' );
 
 /**
  * TSL object that represents the shader variable `EmissiveColor`.

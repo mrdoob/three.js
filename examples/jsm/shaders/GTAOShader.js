@@ -29,7 +29,6 @@ const GTAOShader = {
 		PERSPECTIVE_CAMERA: 1,
 		SAMPLES: 16,
 		NORMAL_VECTOR_TYPE: 1,
-		DEPTH_SWIZZLING: 'x',
 		SCREEN_SPACE_RADIUS: 0,
 		SCREEN_SPACE_RADIUS_SCALE: 100.0,
 		SCENE_CLIP_BOX: 0,
@@ -102,11 +101,11 @@ const GTAOShader = {
 		}
 
 		float getDepth(const vec2 uv) {
-			return textureLod(tDepth, uv.xy, 0.0).DEPTH_SWIZZLING;
+			return textureLod(tDepth, uv.xy, 0.0).r;
 		}
 
 		float fetchDepth(const ivec2 uv) {
-			return texelFetch(tDepth, uv.xy, 0).DEPTH_SWIZZLING;
+			return texelFetch(tDepth, uv.xy, 0).r;
 		}
 
 		float getViewZ(const in float depth) {
@@ -208,7 +207,11 @@ const GTAOShader = {
 				vec4 sampleDir = vec4(cos(angle), sin(angle), 0., 0.5 + 0.5 * noiseTexel.w);
 				sampleDir.xyz = normalize(kernelMatrix * sampleDir.xyz);
 
-				vec3 viewDir = normalize(-viewPos.xyz);
+				#if PERSPECTIVE_CAMERA == 1
+					vec3 viewDir = normalize(-viewPos.xyz);
+				#else
+					vec3 viewDir = vec3(0., 0., 1.);
+				#endif
 				vec3 sliceBitangent = normalize(cross(sampleDir.xyz, viewDir));
 				vec3 sliceTangent = cross(sliceBitangent, viewDir);
 				vec3 normalInSlice = normalize(viewNormal - sliceBitangent * dot(viewNormal, sliceBitangent));

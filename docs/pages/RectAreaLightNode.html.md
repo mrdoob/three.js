@@ -28,7 +28,7 @@ Uniform node representing the half width of the are light.
 
 ### .updateType : string
 
-The `updateType` is set to `NodeUpdateType.RENDER` since the light relies on `viewMatrix` which might vary per render call.
+The `updateType` is set to `NodeUpdateType.RENDER` since the light's world matrix might vary per render call.
 
 Default is `'render'`.
 

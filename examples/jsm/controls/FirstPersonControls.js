@@ -123,7 +123,7 @@ class FirstPersonControls extends Controls {
 		 * How far you can vertically look around, upper limit. Range is `0` to `Math.PI` in radians.
 		 *
 		 * @type {number}
-		 * @default 0
+		 * @default Math.PI
 		 */
 		this.verticalMax = Math.PI;
 
@@ -279,7 +279,7 @@ class FirstPersonControls extends Controls {
 		}
 
 		// target velocity in world space: keys are world axis aligned, moving in the
-		// XZ plane from the camera's yaw only (Q / E along world Y), while pointer
+		// XZ plane from the camera's yaw only (R / F along world Y), while pointer
 		// and touch input moves along the look direction
 
 		const yaw = MathUtils.degToRad( this._lon );
@@ -471,8 +471,8 @@ function onKeyDown( event ) {
 		case 'ArrowRight':
 		case 'KeyD': this._moveRight = true; break;
 
-		case 'KeyE': this._moveUp = true; break;
-		case 'KeyQ': this._moveDown = true; break;
+		case 'KeyR': this._moveUp = true; break;
+		case 'KeyF': this._moveDown = true; break;
 
 	}
 
@@ -494,8 +494,8 @@ function onKeyUp( event ) {
 		case 'ArrowRight':
 		case 'KeyD': this._moveRight = false; break;
 
-		case 'KeyE': this._moveUp = false; break;
-		case 'KeyQ': this._moveDown = false; break;
+		case 'KeyR': this._moveUp = false; break;
+		case 'KeyF': this._moveDown = false; break;
 
 	}
 

@@ -285,6 +285,13 @@ class WebGLState {
 
 	}
 
+	/**
+	 * Defines the blending for each draw buffer of a MRT-configured render target.
+	 *
+	 * @param {Array<Texture>} textures - The textures of the render target.
+	 * @param {?MRTNode} mrt - The MRT configuration.
+	 * @param {Material} material - The material whose blending is used for outputs with `MaterialBlending`.
+	 */
 	setMRTBlending( textures, mrt, material ) {
 
 		const gl = this.gl;
@@ -338,6 +345,17 @@ class WebGLState {
 			}
 
 		}
+
+		// invalidate cache
+
+		this.currentBlending = null;
+		this.currentBlendEquation = null;
+		this.currentBlendEquationAlpha = null;
+		this.currentBlendSrc = null;
+		this.currentBlendDst = null;
+		this.currentBlendSrcAlpha = null;
+		this.currentBlendDstAlpha = null;
+		this.currentPremultipledAlpha = null;
 
 	}
 
@@ -959,27 +977,26 @@ class WebGLState {
 			? this.enable( gl.SAMPLE_ALPHA_TO_COVERAGE )
 			: this.disable( gl.SAMPLE_ALPHA_TO_COVERAGE );
 
-		if ( hardwareClippingPlanes > 0 ) {
 
-			if ( this.currentClippingPlanes !== hardwareClippingPlanes ) {
+		if ( this.currentClippingPlanes !== hardwareClippingPlanes ) {
 
-				const CLIP_DISTANCE0_WEBGL = 0x3000;
+			const CLIP_DISTANCE0_WEBGL = 0x3000;
 
-				for ( let i = 0; i < 8; i ++ ) {
+			for ( let i = 0; i < 8; i ++ ) {
 
-					if ( i < hardwareClippingPlanes ) {
+				if ( i < hardwareClippingPlanes ) {
 
-						this.enable( CLIP_DISTANCE0_WEBGL + i );
+					this.enable( CLIP_DISTANCE0_WEBGL + i );
 
-					} else {
+				} else {
 
-						this.disable( CLIP_DISTANCE0_WEBGL + i );
-
-					}
+					this.disable( CLIP_DISTANCE0_WEBGL + i );
 
 				}
 
 			}
+
+			this.currentClippingPlanes = hardwareClippingPlanes;
 
 		}
 
@@ -1005,10 +1022,17 @@ class WebGLState {
 
 			if ( this.currentPolygonOffsetFactor !== factor || this.currentPolygonOffsetUnits !== units ) {
 
-				gl.polygonOffset( factor, units );
-
 				this.currentPolygonOffsetFactor = factor;
 				this.currentPolygonOffsetUnits = units;
+
+				if ( this.currentDepthReversed ) {
+
+					factor = - factor;
+					units = - units;
+
+				}
+
+				gl.polygonOffset( factor, units );
 
 			}
 
@@ -1161,7 +1185,7 @@ class WebGLState {
 
 			if ( drawBuffers === undefined ) {
 
-				drawBuffers = [];
+				drawBuffers = [ gl.COLOR_ATTACHMENT0 ];
 				this.currentDrawbuffers.set( framebuffer, drawBuffers );
 
 			}
@@ -1169,7 +1193,7 @@ class WebGLState {
 
 			const textures = renderContext.textures;
 
-			if ( drawBuffers.length !== textures.length || drawBuffers[ 0 ] !== gl.COLOR_ATTACHMENT0 ) {
+			if ( drawBuffers.length !== textures.length ) {
 
 				for ( let i = 0, il = textures.length; i < il; i ++ ) {
 

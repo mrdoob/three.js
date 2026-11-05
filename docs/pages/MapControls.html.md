@@ -10,7 +10,7 @@ This class is intended for transforming a camera over a map from bird's eye pers
 
 ## Import
 
-MapControls is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+MapControls is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { MapControls } from 'three/addons/controls/MapControls.js';

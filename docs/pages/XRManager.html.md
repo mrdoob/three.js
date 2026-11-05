@@ -84,6 +84,10 @@ Allows to configure the layer's render target.
 
 Default is `{}`.
 
+**samples**
+
+The scene MSAA sample count. Defaults to the renderer's sample count.
+
 **Returns:** A mesh representing the cylindrical XR layer. This mesh should be added to the XR scene.
 
 ### .createQuadLayer( width : number, height : number, translation : Vector3, quaternion : Quaternion, pixelwidth : number, pixelheight : number, rendercall : function, attributes : Object ) : Mesh
@@ -124,6 +128,10 @@ Allows to configure the layer's render target.
 
 Default is `{}`.
 
+**samples**
+
+The scene MSAA sample count. Defaults to the renderer's sample count.
+
 **Returns:** A mesh representing the quadratic XR layer. This mesh should be added to the XR scene.
 
 ### .foveateBoundTexture( renderTarget : RenderTarget )
@@ -155,6 +163,8 @@ Creates a new binding if needed and the browser is capable of doing so.
 ### .getCamera() : ArrayCamera
 
 Returns the XR camera.
+
+The camera's transformation and projection matrix are derived from the first sub camera (e.g. the left eye in a stereo setup).
 
 **Returns:** The XR camera.
 

@@ -18,7 +18,7 @@ const data = await exporter.parseAsync( mesh, options );
 
 ## Import
 
-DRACOExporter is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+DRACOExporter is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { DRACOExporter } from 'three/addons/exporters/DRACOExporter.js';
@@ -28,7 +28,7 @@ import { DRACOExporter } from 'three/addons/exporters/DRACOExporter.js';
 
 ### new DRACOExporter()
 
-## Properties
+## Static Properties
 
 ### .MESH_EDGEBREAKER_ENCODING : number (constant)
 

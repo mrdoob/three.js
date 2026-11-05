@@ -46,6 +46,12 @@ class SubBuildNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	generateNodeType( builder ) {
 
 		if ( this.nodeType !== null ) return this.nodeType;
@@ -61,6 +67,8 @@ class SubBuildNode extends Node {
 	}
 
 	build( builder, ...params ) {
+
+		this._setupInspector( builder );
 
 		builder.addSubBuild( this.name );
 

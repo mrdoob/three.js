@@ -15,6 +15,10 @@ export default /* glsl */`
 
 	#if NUM_SUN_LIGHT_SHADOWS > 0
 
+		// must match the cascade count in SunLightShadow
+
+		#define SUN_LIGHT_CASCADES 2
+
 		#if defined( SHADOWMAP_TYPE_PCF )
 
 			uniform sampler2DShadow sunShadowMap[ NUM_SUN_LIGHT_SHADOWS ];
@@ -25,8 +29,8 @@ export default /* glsl */`
 
 		#endif
 
-		uniform mat4 sunShadowMatrix[ NUM_SUN_LIGHT_SHADOWS * 4 ];
-		uniform vec4 sunShadowCascade[ NUM_SUN_LIGHT_SHADOWS * 4 ];
+		uniform mat4 sunShadowMatrix[ NUM_SUN_LIGHT_SHADOWS * SUN_LIGHT_CASCADES ];
+		uniform vec4 sunShadowCascade[ NUM_SUN_LIGHT_SHADOWS * SUN_LIGHT_CASCADES ];
 		varying vec4 vSunShadowWorldPosition;
 		varying vec3 vSunShadowWorldNormal;
 
@@ -148,7 +152,16 @@ export default /* glsl */`
 			float shadow = 1.0;
 
 			shadowCoord.xyz /= shadowCoord.w;
-			shadowCoord.z += shadowBias;
+
+			#ifdef USE_REVERSED_DEPTH_BUFFER
+
+				shadowCoord.z -= shadowBias;
+
+			#else
+
+				shadowCoord.z += shadowBias;
+
+			#endif
 
 			bool inFrustum = shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0;
 			bool frustumTest = inFrustum && shadowCoord.z <= 1.0;
@@ -158,7 +171,7 @@ export default /* glsl */`
 				// Hardware PCF with LinearFilter gives us 4-tap filtering per sample
 				// 5 samples using Vogel disk + IGN = effectively 20 filtered taps with better distribution
 				vec2 texelSize = vec2( 1.0 ) / shadowMapSize;
-				float radius = shadowRadius * texelSize.x;
+				vec2 radius = shadowRadius * texelSize;
 
 				// Use IGN to rotate sampling pattern per pixel
 				float phi = interleavedGradientNoise( gl_FragCoord.xy ) * PI2;
@@ -301,13 +314,13 @@ export default /* glsl */`
 
 			vec4 shadowWorldPosition = vec4( vSunShadowWorldPosition.xyz + vSunShadowWorldNormal * sunLightShadow.shadowNormalBias, 1.0 );
 			float viewDepth = vSunShadowWorldPosition.w;
-			int cascadeOffset = shadowIndex * 4;
+			int cascadeOffset = shadowIndex * SUN_LIGHT_CASCADES;
 
 			float shadow = 1.0;
 
 			// walk the cascades back to front so each fade band can blend with the shadow behind it
 
-			for ( int i = 3; i >= 0; i -- ) {
+			for ( int i = SUN_LIGHT_CASCADES - 1; i >= 0; i -- ) {
 
 				// ( begin, end, fade start ) view depths of the cascade
 
@@ -315,7 +328,14 @@ export default /* glsl */`
 
 				if ( viewDepth >= cascade.x && viewDepth < cascade.y ) {
 
-					float cascadeShadow = getShadow( shadowMap, sunLightShadow.shadowMapSize, sunLightShadow.shadowIntensity, sunLightShadow.shadowBias, sunLightShadow.shadowRadius, sunShadowMatrix[ cascadeOffset + i ] * shadowWorldPosition );
+					float cascadeShadow = getShadow(
+						shadowMap,
+						sunLightShadow.shadowMapSize,
+						sunLightShadow.shadowIntensity,
+						sunLightShadow.shadowBias,
+						sunLightShadow.shadowRadius,
+						sunShadowMatrix[ cascadeOffset + i ] * shadowWorldPosition
+					);
 
 					shadow = mix( cascadeShadow, shadow, smoothstep( cascade.z, cascade.y, viewDepth ) );
 
@@ -351,17 +371,22 @@ export default /* glsl */`
 
 		if ( viewSpaceZ - shadowCameraFar <= 0.0 && viewSpaceZ - shadowCameraNear >= 0.0 ) {
 
-			// viewZ to perspective depth
+			// Each sample is compared against the depth of the point next to the fragment in its direction,
+			// on whichever face of the cube it falls, so the comparison is the same on every face. A face
+			// stores the depth along its own axis, which for the point at direction * lightDistance is
+			// lightDistance * max( |x|, |y|, |z| ) of the direction, and perspective depth is a + b / z.
+			float lightDistance = length( lightToPosition );
+			float depthRange = shadowCameraFar - shadowCameraNear;
 
 			#ifdef USE_REVERSED_DEPTH_BUFFER
 
-				float dp = ( shadowCameraNear * ( shadowCameraFar - viewSpaceZ ) ) / ( viewSpaceZ * ( shadowCameraFar - shadowCameraNear ) );
-				dp -= shadowBias;
+				float depthA = - shadowCameraNear / depthRange - shadowBias;
+				float depthB = shadowCameraNear * shadowCameraFar / ( depthRange * lightDistance );
 
 			#else
 
-				float dp = ( shadowCameraFar * ( viewSpaceZ - shadowCameraNear ) ) / ( viewSpaceZ * ( shadowCameraFar - shadowCameraNear ) );
-				dp += shadowBias;
+				float depthA = shadowCameraFar / depthRange + shadowBias;
+				float depthB = - shadowCameraNear * shadowCameraFar / ( depthRange * lightDistance );
 
 			#endif
 
@@ -378,19 +403,21 @@ export default /* glsl */`
 			// Use IGN to rotate sampling pattern per pixel
 			float phi = interleavedGradientNoise( gl_FragCoord.xy ) * PI2;
 
-			vec2 sample0 = vogelDiskSample( 0, 5, phi );
-			vec2 sample1 = vogelDiskSample( 1, 5, phi );
-			vec2 sample2 = vogelDiskSample( 2, 5, phi );
-			vec2 sample3 = vogelDiskSample( 3, 5, phi );
-			vec2 sample4 = vogelDiskSample( 4, 5, phi );
+			shadow = 0.0;
 
-			shadow = (
-				texture( shadowMap, vec4( bd3D + ( tangent * sample0.x + bitangent * sample0.y ) * texelSize, dp ) ) +
-				texture( shadowMap, vec4( bd3D + ( tangent * sample1.x + bitangent * sample1.y ) * texelSize, dp ) ) +
-				texture( shadowMap, vec4( bd3D + ( tangent * sample2.x + bitangent * sample2.y ) * texelSize, dp ) ) +
-				texture( shadowMap, vec4( bd3D + ( tangent * sample3.x + bitangent * sample3.y ) * texelSize, dp ) ) +
-				texture( shadowMap, vec4( bd3D + ( tangent * sample4.x + bitangent * sample4.y ) * texelSize, dp ) )
-			) * 0.2;
+			for ( int i = 0; i < 5; i ++ ) {
+
+				vec2 offset = vogelDiskSample( i, 5, phi );
+				vec3 direction = bd3D + ( tangent * offset.x + bitangent * offset.y ) * texelSize;
+				vec3 absDirection = abs( direction );
+
+				float dp = depthA + depthB / max( max( absDirection.x, absDirection.y ), absDirection.z );
+
+				shadow += texture( shadowMap, vec4( direction, dp ) );
+
+			}
+
+			shadow *= 0.2;
 
 		}
 

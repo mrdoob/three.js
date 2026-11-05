@@ -15,7 +15,7 @@ function render() {
 
 ## Import
 
-OutlineEffect is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+OutlineEffect is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { OutlineEffect } from 'three/addons/effects/OutlineEffect.js';

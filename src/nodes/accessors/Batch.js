@@ -7,10 +7,8 @@ import { textureSize } from './TextureSizeNode.js';
 import { tangentLocal } from './Tangent.js';
 import { instanceIndex, drawIndex } from '../core/IndexNode.js';
 import { varyingProperty } from '../core/PropertyNode.js';
-import { OnAfterObjectUpdate } from '../utils/EventNode.js';
+import { OnObjectUpdate, OnAfterObjectUpdate } from '../utils/EventNode.js';
 import { DataTexture } from '../../textures/DataTexture.js';
-
-const _previousBatchingMatrices = /*@__PURE__*/ new WeakMap();
 
 /**
  * TSL function that retrieves the batching color for a given instance ID from a colors texture.
@@ -70,33 +68,28 @@ function createBatchingMatrixNode( matricesTexture, id ) {
 }
 
 /**
- * Retrieves or initializes the previous frame batching matrix node for motion vectors.
- * Uses a WeakMap to cache previous frame matrices textures and their TSL nodes.
+ * Returns the batching matrices texture of the previous frame for motion vectors.
+ * It is created on first use and again after the batched mesh released it.
  *
  * @param {BatchedMesh} batchMesh - The batched mesh.
- * @param {Node<uint>} id - The indirect instance ID.
- * @returns {Node<mat4>} The previous frame batching matrix node.
+ * @returns {DataTexture} The previous frame matrices texture.
  */
-function getPreviousNode( batchMesh, id ) {
+function getPreviousMatricesTexture( batchMesh ) {
 
-	let data = _previousBatchingMatrices.get( batchMesh );
+	let previousMatricesTexture = batchMesh._previousMatricesTexture;
 
-	if ( data === undefined ) {
+	if ( previousMatricesTexture === null ) {
 
-		const { image, format, type } = batchMesh._matricesTexture;
+		const { image, format, type, version } = batchMesh._matricesTexture;
 
-		const previousMatricesTexture = new DataTexture( image.data.slice(), image.width, image.height, format, type );
+		previousMatricesTexture = new DataTexture( image.data.slice(), image.width, image.height, format, type );
+		previousMatricesTexture.version = version;
 
-		data = {
-			previousMatricesTexture,
-			node: createBatchingMatrixNode( previousMatricesTexture, id )
-		};
-
-		_previousBatchingMatrices.set( batchMesh, data );
+		batchMesh._previousMatricesTexture = previousMatricesTexture;
 
 	}
 
-	return data.node;
+	return previousMatricesTexture;
 
 }
 
@@ -151,14 +144,19 @@ export const batch = /*@__PURE__*/ Fn( ( [ batchMesh ], builder ) => {
 
 		OnAfterObjectUpdate( ( { object } ) => {
 
-			const previousBatchData = _previousBatchingMatrices.get( object );
+			const previousMatricesTexture = getPreviousMatricesTexture( object );
+			const matricesTexture = object._matricesTexture;
 
-			previousBatchData.previousMatricesTexture.image.data.set( object._matricesTexture.image.data );
-			previousBatchData.previousMatricesTexture.needsUpdate = true;
+			if ( previousMatricesTexture.version !== matricesTexture.version ) {
+
+				previousMatricesTexture.image.data.set( matricesTexture.image.data );
+				previousMatricesTexture.version = matricesTexture.version;
+
+			}
 
 		} );
 
-		const previousBatchingMatrixNode = getPreviousNode( batchMesh, indirectId );
+		const previousBatchingMatrixNode = createBatchingMatrixNode( getPreviousMatricesTexture( batchMesh ), indirectId );
 		positionPrevious.assign( previousBatchingMatrixNode.mul( positionPrevious ).xyz );
 
 	}
@@ -174,6 +172,14 @@ export const batch = /*@__PURE__*/ Fn( ( [ batchMesh ], builder ) => {
 		tangentLocal.mulAssign( bm );
 
 	}
+
+	const drawFormat = builder.renderer.backend.isWebGPUBackend === true ? 'merged' : 'multiDraw';
+
+	OnObjectUpdate( ( { object, camera, material } ) => {
+
+		object._updateDrawParameters( camera, object.geometry, material, drawFormat );
+
+	} );
 
 }, 'void' );
 

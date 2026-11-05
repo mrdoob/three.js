@@ -1,6 +1,6 @@
 # TreeGenerator
 
-Grows a procedural tree skeleton — trunk, branches and twigs, each swept as a tapered tube — and bakes it into one non-indexed [BufferGeometry](BufferGeometry.html) (position and normal only), ready to instance into a forest. It produces _branches only_; add foliage as a separate layer.
+Grows a procedural tree skeleton — trunk, branches and twigs, each swept as a tapered tube — and bakes it into one indexed [BufferGeometry](BufferGeometry.html) (position and normal only), ready to instance into a forest. It produces _branches only_; add foliage as a separate layer.
 
 The branching is deterministic for a given `seed`: a recursive sweep lays down gently curved tubes with a parallel-transport frame (so they never twist), forking by the pipe model (each child much thinner than its parent), spreading children along the upper part of each branch with a golden-angle roll, and pulling them back up toward the light. A flared root, non-linear taper and gravity droop fill in the character.
 

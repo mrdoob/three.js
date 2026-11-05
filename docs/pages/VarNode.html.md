@@ -34,6 +34,14 @@ Default is `false`.
 
 ## Properties
 
+### .assignable : boolean
+
+Whether this node can be generated as an expression until it is assigned.
+
+Default is `false`.
+
+**Overrides:** [Node#assignable](Node.html#assignable)
+
 ### .global : boolean
 
 `VarNode` sets this property to `true` by default.
@@ -41,12 +49,6 @@ Default is `false`.
 Default is `true`.
 
 **Overrides:** [Node#global](Node.html#global)
-
-### .intent : boolean
-
-This flag is used to indicate that this node is used for intent.
-
-Default is `false`.
 
 ### .isVarNode : boolean (readonly)
 
@@ -82,33 +84,21 @@ Default is `false`.
 
 ## Methods
 
-### .getIntent() : boolean
+### .getAssignable() : boolean
 
-Returns the intent flag of this node.
+Returns the assignable flag of this node.
 
-**Returns:** The intent flag.
+**Returns:** The assignable flag.
 
-### .isIntent( builder : NodeBuilder ) : boolean
+### .setAssignable( value : boolean ) : VarNode
 
-Checks if this node is used for intent.
+Sets the assignable flag for this node.
 
-**builder**
-
-The node builder.
-
-**Returns:** Whether this node is used for intent.
-
-### .setIntent( value : boolean ) : VarNode
-
-Sets the intent flag for this node.
-
-This flag is used to indicate that this node is used for intent and should not be built directly. Instead, it is used to indicate that the node should be treated as a variable intent.
-
-It's useful for assigning variables without needing creating a new variable node.
+An assignable node is generated as an expression until it is assigned, at which point it is declared as a variable.
 
 **value**
 
-The value to set for the intent flag.
+The value to set for the assignable flag.
 
 **Returns:** This node.
 

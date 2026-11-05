@@ -24,6 +24,7 @@
 
 			import * as THREE from 'three';
 
+			import { SunLight } from 'three/addons/lights/SunLight.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			import Stats from 'three/addons/libs/stats.module.js';
@@ -55,7 +56,7 @@
 
 				scene.fog = new THREE.Fog( 0x99DDFF, 5000, 10000 );
 
-				const light = new THREE.SunLight( 0xffffff, 2 );
+				const light = new SunLight( 0xffffff, 2 );
 
 				light.position.set( 200, 1000, 50 );
 

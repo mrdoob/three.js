@@ -2,7 +2,7 @@ import { NodeUpdateType } from './constants.js';
 import { hash, hashArray, hashString } from './NodeUtils.js';
 
 import { EventDispatcher } from '../../core/EventDispatcher.js';
-import { MathUtils } from '../../math/MathUtils.js';
+import { generateUUID } from '../../math/MathUtils.js';
 import { warn, error } from '../../utils.js';
 
 import StackTrace from './StackTrace.js';
@@ -104,6 +104,15 @@ class Node extends EventDispatcher {
 		this.parents = false;
 
 		/**
+		 * Whether this node can be assigned. It is generated as an expression,
+		 * unless it is assigned, in which case it is declared as a variable where it was created.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.assignable = false;
+
+		/**
 		 * This flag can be used for type testing.
 		 *
 		 * @type {boolean}
@@ -114,7 +123,7 @@ class Node extends EventDispatcher {
 
 		// private
 
-		this._beforeNodes = null;
+		this._inspectorNode = null;
 
 		/**
 		 * The cache key of this node.
@@ -168,6 +177,257 @@ class Node extends EventDispatcher {
 	}
 
 	/**
+	 * Whether this node allows caching its result in a temporary variable.
+	 * Caching is enabled by default. Override this method to disable it.
+	 *
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @return {boolean} Whether temporary caching is allowed.
+	 */
+	isCacheable( /*builder*/ ) {
+
+		return true;
+
+	}
+
+	/**
+	 * Makes this node assignable and adds it to the current stack,
+	 * so it can be declared where it was created if it is assigned later.
+	 * Only use it with nodes that are not shared, see {@link Node#assignable}.
+	 *
+	 * @return {Node} A reference to this node.
+	 */
+	toAssignable() {
+
+		this.assignable = true;
+
+		return this.toStack();
+
+	}
+
+	/**
+	 * Checks if this node is assignable without a forced declaration.
+	 *
+	 * @param {NodeBuilder} builder - The node builder.
+	 * @returns {boolean} Whether this node is assignable without a forced declaration.
+	 */
+	isAssignable( builder ) {
+
+		const data = builder.getDataFromNode( this );
+
+		if ( data.forceDeclaration === true ) return false;
+
+		return this.assignable;
+
+	}
+
+	/**
+	 * Checks if this node is the target of an assignment.
+	 *
+	 * @param {NodeBuilder} builder - The node builder.
+	 * @returns {boolean} Whether this node is assigned.
+	 */
+	isAssign( builder ) {
+
+		const data = builder.getDataFromNode( this );
+
+		return data.assign;
+
+	}
+
+	/**
+	 * Declares the assignable node before the loops where it is used if it has no stack, and
+	 * decides if a value that cannot be cached must be evaluated once at its declaration.
+	 *
+	 * @private
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {Object} data - The node data.
+	 * @param {Node} [valueNode=this] - The node that defines the value of the assignable node.
+	 */
+	_updateAssignable( builder, data, valueNode = this ) {
+
+		const nodeLoop = builder.context.nodeLoop;
+
+		if ( data.stack === undefined && builder.buildStage === 'setup' ) {
+
+			// A node outside of the stacks of this build, e.g. created outside of a function, is declared
+			// before the outermost loop where its value does not change, otherwise every iteration would repeat it.
+			data.stack = builder.declareBeforeBlock( this );
+
+		} else if ( this.assignable === true && nodeLoop && builder.buildStage === 'analyze' ) {
+
+			if ( valueNode.isCacheable( builder ) === false && builder.isDeterministic( valueNode ) === false ) {
+
+				// A value that cannot be cached, e.g. a function call, is evaluated once at its declaration
+				// if it is used in a loop that runs after it, otherwise the loop would repeat it.
+				const declarationIndex = builder.activeStacks.indexOf( data.stack );
+				const loopIndex = builder.activeStacks.indexOf( builder.getDataFromNode( nodeLoop ).stack );
+
+				if ( declarationIndex !== - 1 && loopIndex >= declarationIndex ) data.forceDeclaration = true;
+
+			}
+
+		}
+
+	}
+
+	/**
+	 * Whether `build()` declares this assignable node as a variable when it is assigned.
+	 * Nodes that wrap an assignable value, like {@link VarNode}, declare it themselves.
+	 *
+	 * @private
+	 * @return {boolean} Whether `build()` declares the assignable node.
+	 */
+	_declaresAssignable() {
+
+		return true;
+
+	}
+
+	/**
+	 * Declares a variable for this node in the current flow, initialized with the given snippet.
+	 *
+	 * @private
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {string} snippet - The initial value.
+	 * @param {string} type - The variable type.
+	 * @param {boolean} readOnly - Whether the variable is read-only.
+	 * @param {string} property - The node data property that holds the variable.
+	 * @return {string} The property name of the variable.
+	 */
+	_declareVariable( builder, snippet, type, readOnly, property ) {
+
+		const nodeVar = builder.getVarFromNode( this, null, type, undefined, readOnly, true, property );
+		const propertyName = builder.getPropertyName( nodeVar );
+		const declarationPrefix = readOnly
+			? builder.generateLetStatement( nodeVar.type, propertyName, nodeVar.count )
+			: builder.generateVarStatement( nodeVar.type, propertyName, nodeVar.count );
+
+		builder.addLineFlowCode( `${ declarationPrefix } = ${ snippet }`, this );
+
+		return propertyName;
+
+	}
+
+	/**
+	 * Whether this assignable node must be declared as a variable, because it is assigned
+	 * or must be evaluated once at its declaration.
+	 *
+	 * @private
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {Object} nodeData - The node data.
+	 * @return {boolean} Whether the assignable node is a variable.
+	 */
+	_isVariable( builder, nodeData ) {
+
+		return ( nodeData.assign === true || nodeData.forceDeclaration === true ) && this.getNodeType( builder ) !== 'void';
+
+	}
+
+	/**
+	 * Generates an assignable node as a variable. The variable is declared the first
+	 * time it is generated, which is its stack position, and then referenced by name.
+	 *
+	 * @private
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {Object} nodeData - The node data.
+	 * @param {?string} output - The output type.
+	 * @return {string} The generated shader string.
+	 */
+	_buildVariable( builder, nodeData, output ) {
+
+		const nodeType = this.getNodeType( builder );
+		const type = builder.getVectorType( nodeType );
+
+		if ( nodeData.propertyName === undefined ) {
+
+			const snippet = this.generate.length < 2
+				? builder.format( this.generate( builder ) || '', nodeType, type )
+				: this.generate( builder, type ) || '';
+
+			nodeData.propertyName = this._declareVariable( builder, snippet, type, false, 'variable' );
+
+		}
+
+		return builder.format( nodeData.propertyName, type, output );
+
+	}
+
+	/**
+	 * Whether the generated value is a variable declared in the scope of the function,
+	 * so it keeps its value after the block where it was generated, e.g. a {@link VarNode}.
+	 *
+	 * @private
+	 * @return {boolean} Whether the generated value is a variable of the function scope.
+	 */
+	_isFunctionScope() {
+
+		return false;
+
+	}
+
+	/**
+	 * A generated value is only visible in the block where it was declared and in its inner blocks.
+	 * A variable of the function scope is also visible in a later block of the same parent and guard,
+	 * e.g. a second `if ( c )` of an immutable condition `c`, since that block only runs if its block ran.
+	 * This method discards the generated value if it is not visible in the current block.
+	 *
+	 * @private
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {Object} nodeData - The node data.
+	 */
+	_checkFlowBlock( builder, nodeData ) {
+
+		if ( nodeData.flowBlock !== undefined ) {
+
+			const { guard, parent } = nodeData.flowBlock;
+			const isFunctionScope = guard !== undefined && this._isFunctionScope();
+
+			let flowBlock = builder.flowBlock;
+
+			while ( flowBlock !== null && flowBlock !== nodeData.flowBlock ) {
+
+				if ( isFunctionScope && flowBlock.guard === guard && flowBlock.parent === parent ) break;
+
+				flowBlock = flowBlock.parent;
+
+			}
+
+			if ( flowBlock === null ) {
+
+				nodeData.flowBlock = undefined;
+				nodeData.propertyName = undefined;
+				nodeData.snippet = undefined;
+				nodeData.generated = undefined;
+
+			}
+
+		}
+
+	}
+
+	/**
+	 * Keeps the block where a value was generated, so it is only reused where it is visible.
+	 * A global node is a declaration visible in any block, unless it emitted code in this block.
+	 *
+	 * @private
+	 * @param {NodeBuilder} builder - The current node builder.
+	 * @param {Object} nodeData - The node data.
+	 * @param {boolean} isCached - Whether the value was generated before.
+	 * @param {number} flowCodeLength - The length of the flow code before the value was generated.
+	 */
+	_setFlowBlock( builder, nodeData, isCached, flowCodeLength ) {
+
+		const isLocal = this.isGlobal( builder ) === false || builder.flow.code.length !== flowCodeLength;
+
+		if ( isCached === false && ( nodeData.propertyName !== undefined || nodeData.snippet !== undefined ) && isLocal && builder.flowBlock !== null ) {
+
+			nodeData.flowBlock = builder.flowBlock;
+
+		}
+
+	}
+
+	/**
 	 * Set this property to `true` when the node should be regenerated.
 	 *
 	 * @type {boolean}
@@ -194,7 +454,7 @@ class Node extends EventDispatcher {
 
 		if ( this._uuid === null ) {
 
-			this._uuid = MathUtils.generateUUID();
+			this._uuid = generateUUID();
 
 		}
 
@@ -311,18 +571,22 @@ class Node extends EventDispatcher {
 	}
 
 	/**
-	 * Generator function that can be used to iterate over the child nodes.
+	 * Returns the child nodes of this node.
 	 *
-	 * @generator
-	 * @yields {Node} A child node.
+	 * @return {Array<Node>} The child nodes.
 	 */
-	* getChildren() {
+	getChildren() {
 
-		for ( const { childNode } of this._getChildren() ) {
+		const children = this._getChildren();
+		const nodes = [];
 
-			yield childNode;
+		for ( let i = 0; i < children.length; i ++ ) {
+
+			nodes.push( children[ i ].childNode );
 
 		}
+
+		return nodes;
 
 	}
 
@@ -374,12 +638,19 @@ class Node extends EventDispatcher {
 		// avoid circular references
 		ignores.add( this );
 
-		for ( const property of Object.getOwnPropertyNames( this ) ) {
+		const properties = Object.getOwnPropertyNames( this );
+
+		for ( let p = 0; p < properties.length; p ++ ) {
+
+			const property = properties[ p ];
+
+			// Ignore private properties.
+			if ( property.charCodeAt( 0 ) === 95 ) continue;
 
 			const object = this[ property ];
 
-			// Ignore private properties and ignored nodes.
-			if ( property.startsWith( '_' ) === true || ignores.has( object ) ) continue;
+			// Ignore primitives and ignored nodes.
+			if ( object === null || ( typeof object !== 'object' && typeof object !== 'function' ) || ignores.has( object ) ) continue;
 
 			if ( Array.isArray( object ) === true ) {
 
@@ -501,9 +772,10 @@ class Node extends EventDispatcher {
 	/**
 	 * Returns the update type of {@link Node#update}.
 	 *
+	 * @param {NodeFrame} [frame] - The current node frame.
 	 * @return {NodeUpdateType} The update type.
 	 */
-	getUpdateType() {
+	getUpdateType( /*frame*/ ) {
 
 		return this.updateType;
 
@@ -512,9 +784,10 @@ class Node extends EventDispatcher {
 	/**
 	 * Returns the update type of {@link Node#updateBefore}.
 	 *
+	 * @param {NodeFrame} [frame] - The current node frame.
 	 * @return {NodeUpdateType} The update type.
 	 */
-	getUpdateBeforeType() {
+	getUpdateBeforeType( /*frame*/ ) {
 
 		return this.updateBeforeType;
 
@@ -523,9 +796,10 @@ class Node extends EventDispatcher {
 	/**
 	 * Returns the update type of {@link Node#updateAfter}.
 	 *
+	 * @param {NodeFrame} [frame] - The current node frame.
 	 * @return {NodeUpdateType} The update type.
 	 */
-	getUpdateAfterType() {
+	getUpdateAfterType( /*frame*/ ) {
 
 		return this.updateAfterType;
 
@@ -654,23 +928,26 @@ class Node extends EventDispatcher {
 
 			if ( callback ) {
 
+				// the overrides are cached per callback, nested contexts can override the same node with different nodes
+
 				const nodeData = builder.getDataFromNode( this );
+				const overrides = nodeData.overrides || ( nodeData.overrides = new Map() );
 
-				if ( nodeData.isOverwritten !== true ) {
+				if ( overrides.has( callback ) === false ) {
 
-					nodeData.isOverwritten = true;
+					// avoid recursive override calls
+
+					overrides.set( callback, null );
 
 					// cancel the override for use the same node inside the callback
 
 					sharedNode = callback( builder ).overrideNode( this, null );
 
-					nodeData.sharedNode = sharedNode;
+					overrides.set( callback, sharedNode );
 
 				} else {
 
-					// avoid recursive override calls
-
-					sharedNode = nodeData.sharedNode;
+					sharedNode = overrides.get( callback );
 
 				}
 
@@ -822,13 +1099,20 @@ class Node extends EventDispatcher {
 
 	}
 
-	before( node ) {
+	/**
+	 * Registers the inspector node added with `toInspector()` in the builder, so it is updated every frame.
+	 * Nodes that override `build()` without always calling `super.build()` must call this method.
+	 *
+	 * @private
+	 * @param {NodeBuilder} builder - The current node builder.
+	 */
+	_setupInspector( builder ) {
 
-		if ( this._beforeNodes === null ) this._beforeNodes = [];
+		if ( this._inspectorNode !== null && builder.buildStage === 'setup' ) {
 
-		this._beforeNodes.push( node );
+			builder.addNode( this._inspectorNode );
 
-		return this;
+		}
 
 	}
 
@@ -844,6 +1128,8 @@ class Node extends EventDispatcher {
 	 */
 	build( builder, output = null ) {
 
+		this._setupInspector( builder );
+
 		const refNode = this.getShared( builder );
 
 		if ( this !== refNode ) {
@@ -854,26 +1140,11 @@ class Node extends EventDispatcher {
 
 		//
 
-		if ( this._beforeNodes !== null ) {
-
-			const currentBeforeNodes = this._beforeNodes;
-
-			this._beforeNodes = null;
-
-			for ( const beforeNode of currentBeforeNodes ) {
-
-				beforeNode.build( builder, output );
-
-			}
-
-			this._beforeNodes = currentBeforeNodes;
-
-		}
-
-		//
-
 		const nodeData = builder.getDataFromNode( this );
-		nodeData.buildStages = nodeData.buildStages || {};
+
+		if ( this.assignable === true && this._declaresAssignable() ) this._updateAssignable( builder, nodeData );
+
+		nodeData.buildStages = nodeData.buildStages || { setup: false, analyze: false, generate: false };
 		nodeData.buildStages[ builder.buildStage ] = true;
 
 		const parentBuildStage = _parentBuildStage[ builder.buildStage ];
@@ -957,61 +1228,93 @@ class Node extends EventDispatcher {
 
 		} else if ( buildStage === 'generate' ) {
 
-			// If generate has just one argument, it means the output type is not required.
-			// This means that the node does not handle output conversions internally,
-			// so the value is stored in a cache and the builder handles the conversion
-			// for all requested output types.
+			this._checkFlowBlock( builder, nodeData );
 
-			const isGenerateOnce = this.generate.length < 2;
+			const isCached = nodeData.propertyName !== undefined || nodeData.snippet !== undefined;
+			const flowCodeLength = builder.flow.code.length;
 
-			if ( isGenerateOnce ) {
+			// References must be generated directly, even if a cached value exists.
+			const allowedCache = this.isCacheable( builder ) && builder.isReference( output ) === false;
+			const type = allowedCache ? builder.getVectorType( this.getNodeType( builder, output ) ) : null;
+			const cacheResult = allowedCache && type !== 'void' && output !== 'void' && nodeData.usageCount > 1;
+			const generateOutput = cacheResult ? type : output;
 
-				const type = this.getNodeType( builder );
-				const nodeData = builder.getDataFromNode( this );
+			if ( this.assignable === true && this._declaresAssignable() && this._isVariable( builder, nodeData ) ) {
 
-				result = nodeData.snippet;
+				result = this._buildVariable( builder, nodeData, output );
 
-				if ( result === undefined ) {
+			} else if ( allowedCache && nodeData.propertyName !== undefined ) {
 
-					if ( nodeData.generated === undefined ) {
-
-						nodeData.generated = true;
-
-						result = this.generate( builder ) || '';
-
-						nodeData.snippet = result;
-
-					} else {
-
-						warn( 'Node: Recursion detected.', this );
-
-						result = '/* Recursion detected. */';
-
-					}
-
-				} else if ( nodeData.flowCodes !== undefined && builder.context.nodeBlock !== undefined ) {
-
-					builder.addFlowCodeHierarchy( this, builder.context.nodeBlock );
-
-				}
-
-				result = builder.format( result, type, output );
+				result = builder.format( nodeData.propertyName, type, output );
 
 			} else {
 
-				result = this.generate( builder, output ) || '';
+				// If generate has just one argument, it means the output type is not required.
+				// This means that the node does not handle output conversions internally,
+				// so the value is stored in a cache and the builder handles the conversion
+				// for all requested output types.
+
+				const isGenerateOnce = this.generate.length < 2;
+
+				if ( isGenerateOnce ) {
+
+					const type = this.getNodeType( builder );
+
+					result = nodeData.snippet;
+
+					if ( result === undefined ) {
+
+						if ( nodeData.generated === undefined ) {
+
+							nodeData.generated = true;
+
+							result = this.generate( builder ) || '';
+
+							nodeData.snippet = result;
+
+						} else {
+
+							warn( 'Node: Recursion detected.', this );
+
+							result = '/* Recursion detected. */';
+
+						}
+
+					}
+
+					result = builder.format( result, type, generateOutput );
+
+				} else {
+
+					result = this.generate( builder, generateOutput ) || '';
+
+				}
+
+				if ( result === '' && generateOutput !== null && generateOutput !== 'void' && generateOutput !== 'OutputType' ) {
+
+					// if no snippet is generated, return a default value
+
+					error( `TSL: Invalid generated code, expected a "${ generateOutput }".` );
+
+					result = builder.generateConst( generateOutput );
+
+				}
+
+				if ( cacheResult ) {
+
+					// Use a dedicated property, the node may already own a variable.
+					const propertyName = this._declareVariable( builder, result, type, nodeData.assign !== true, 'cacheVariable' );
+
+					nodeData.snippet = result;
+					nodeData.propertyName = propertyName;
+
+					result = builder.format( propertyName, type, output );
+
+				}
 
 			}
 
-			if ( result === '' && output !== null && output !== 'void' && output !== 'OutputType' ) {
-
-				// if no snippet is generated, return a default value
-
-				error( `TSL: Invalid generated code, expected a "${ output }".` );
-
-				result = builder.generateConst( output );
-
-			}
+			this._setFlowBlock( builder, nodeData, isCached, flowCodeLength );
 
 		}
 

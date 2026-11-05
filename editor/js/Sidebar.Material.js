@@ -10,7 +10,6 @@ import { SidebarMaterialColorProperty } from './Sidebar.Material.ColorProperty.j
 import { SidebarMaterialConstantProperty } from './Sidebar.Material.ConstantProperty.js';
 import { SidebarMaterialMapProperty } from './Sidebar.Material.MapProperty.js';
 import { SidebarMaterialNumberProperty } from './Sidebar.Material.NumberProperty.js';
-import { SidebarMaterialRangeValueProperty } from './Sidebar.Material.RangeValueProperty.js';
 import { SidebarMaterialProgram } from './Sidebar.Material.Program.js';
 
 function SidebarMaterial( editor ) {
@@ -153,7 +152,7 @@ function SidebarMaterial( editor ) {
 
 	// iridescenceThicknessMax
 
-	const materialIridescenceThicknessMax = new SidebarMaterialRangeValueProperty( editor, 'iridescenceThicknessRange', strings.getKey( 'sidebar/material/iridescenceThicknessMax' ), false, [ 0, Infinity ], 0, 10, 1, 'nm' );
+	const materialIridescenceThicknessMax = new SidebarMaterialNumberProperty( editor, 'iridescenceThicknessMaximum', strings.getKey( 'sidebar/material/iridescenceThicknessMax' ), [ 0, Infinity ], 0, 10, 1, 'nm' );
 	container.add( materialIridescenceThicknessMax );
 
 	// sheen

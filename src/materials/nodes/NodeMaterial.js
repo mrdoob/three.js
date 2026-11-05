@@ -10,7 +10,7 @@ import { batch, batchColor } from '../../nodes/accessors/Batch.js';
 import { materialReference } from '../../nodes/accessors/MaterialReferenceNode.js';
 import { positionLocal, positionView } from '../../nodes/accessors/Position.js';
 import { skinning } from '../../nodes/accessors/Skinning.js';
-import { morphReference } from '../../nodes/accessors/Morph.js';
+import { morphReference, morphColor } from '../../nodes/accessors/Morph.js';
 import { fwidth, mix, smoothstep } from '../../nodes/math/MathNode.js';
 import { float, vec3, vec4, bool } from '../../nodes/tsl/TSLBase.js';
 import AONode from '../../nodes/lighting/AONode.js';
@@ -239,8 +239,8 @@ class NodeMaterial extends Material {
 
 		/**
 		 * The local vertex positions are computed based on multiple factors like the
-		 * attribute data, morphing or skinning. This node property allows to overwrite
-		 * the default and define local vertex positions with nodes instead.
+		 * attribute data, morphing, skinning, instancing or batching. This node property
+		 * allows to overwrite the default and define local vertex positions with nodes instead.
 		 *
 		 * If you don't want to overwrite the vertex positions but modify the existing
 		 * values instead, use {@link positionLocal}.
@@ -431,7 +431,7 @@ class NodeMaterial extends Material {
 
 		for ( const { property, childNode } of this._getNodeChildren() ) {
 
-			values.push( hashString( property.slice( 0, - 4 ) ), childNode.getCacheKey() );
+			values.push( hashString( property.slice( 0, - 4 ) ), childNode.getCacheKey( true ) );
 
 		}
 
@@ -692,7 +692,7 @@ class NodeMaterial extends Material {
 
 			} else if ( renderer.logarithmicDepthBuffer === true ) {
 
-				if ( camera.isPerspectiveCamera ) {
+				if ( camera.isOrthographicCamera !== true ) {
 
 					depthNode = viewZToLogarithmicDepth( positionView.z, cameraNear, cameraFar );
 
@@ -836,9 +836,11 @@ class NodeMaterial extends Material {
 
 		// VERTEX COLORS
 
+		let vertexColorNode = null;
+
 		if ( this.vertexColors === true && geometry.hasAttribute( 'color' ) ) {
 
-			colorNode = colorNode.mul( vertexColor() );
+			vertexColorNode = vertexColor();
 
 		}
 
@@ -846,13 +848,27 @@ class NodeMaterial extends Material {
 
 		if ( object.instanceColor ) {
 
-			colorNode = instanceColor.mul( colorNode );
+			vertexColorNode = vertexColorNode !== null ? vertexColorNode.mul( instanceColor ) : instanceColor;
 
 		}
 
 		if ( object.isBatchedMesh && object._colorsTexture ) {
 
-			colorNode = batchColor.mul( colorNode );
+			vertexColorNode = vertexColorNode !== null ? vertexColorNode.mul( batchColor ) : batchColor;
+
+		}
+
+		// MORPHED COLORS
+
+		if ( this.vertexColors === true && geometry.morphAttributes.color !== undefined ) {
+
+			vertexColorNode = morphColor( vec4( vertexColorNode !== null ? vertexColorNode : 1 ) );
+
+		}
+
+		if ( vertexColorNode !== null ) {
+
+			colorNode = colorNode.mul( vertexColorNode );
 
 		}
 
@@ -1012,6 +1028,18 @@ class NodeMaterial extends Material {
 		if ( builder.context.ambientOcclusion ) {
 
 			materialLightsNode.push( new AONode( builder.context.ambientOcclusion ) );
+
+		}
+
+		if ( builder.context.getGI ) {
+
+			const giNode = builder.context.getGI( null, builder );
+
+			if ( giNode !== null ) {
+
+				materialLightsNode.push( new IrradianceNode( giNode ) );
+
+			}
 
 		}
 
@@ -1308,21 +1336,25 @@ class NodeMaterial extends Material {
 	 */
 	copy( source ) {
 
-		const descriptors = Object.getOwnPropertyDescriptors( this.constructor.prototype );
+		for ( let prototype = Object.getPrototypeOf( this ); prototype !== Object.prototype; prototype = Object.getPrototypeOf( prototype ) ) {
 
-		for ( const property in descriptors ) {
+			const descriptors = Object.getOwnPropertyDescriptors( prototype );
 
-			if ( descriptors[ property ].set !== undefined && source[ property ] !== undefined ) {
+			for ( const property in descriptors ) {
 
-				const value = source[ property ];
+				if ( descriptors[ property ].set !== undefined && source[ property ] !== undefined ) {
 
-				if ( this[ property ] && this[ property ].copy !== undefined ) {
+					const value = source[ property ];
 
-					this[ property ].copy( value );
+					if ( this[ property ] && this[ property ].copy !== undefined ) {
 
-				} else {
+						this[ property ].copy( value );
 
-					this[ property ] = value;
+					} else {
+
+						this[ property ] = value;
+
+					}
 
 				}
 

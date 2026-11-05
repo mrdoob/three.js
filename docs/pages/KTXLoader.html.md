@@ -19,7 +19,7 @@ map.colorSpace = THREE.SRGBColorSpace; // only for color textures
 
 ## Import
 
-KTXLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+KTXLoader is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { KTXLoader } from 'three/addons/loaders/KTXLoader.js';

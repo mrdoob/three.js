@@ -13,8 +13,10 @@ class ComputePipeline extends Pipeline {
 	 *
 	 * @param {string} cacheKey - The pipeline's cache key.
 	 * @param {ProgrammableStage} computeProgram - The pipeline's compute shader.
+	 * @param {?Array<Object>} [transforms=null] - The transforms (only relevant for WebGL 2 which uses Transform Feedback).
+	 * @param {?Array<Object>} [attributes=null] - The attributes (only relevant for WebGL 2 which uses Transform Feedback).
 	 */
-	constructor( cacheKey, computeProgram ) {
+	constructor( cacheKey, computeProgram, transforms = null, attributes = null ) {
 
 		super( cacheKey );
 
@@ -24,6 +26,20 @@ class ComputePipeline extends Pipeline {
 		 * @type {ProgrammableStage}
 		 */
 		this.computeProgram = computeProgram;
+
+		/**
+		 * The transforms (only relevant for WebGL 2 which uses Transform Feedback).
+		 *
+		 * @type {?Array<Object>}
+		 */
+		this.transforms = transforms;
+
+		/**
+		 * The attributes (only relevant for WebGL 2 which uses Transform Feedback).
+		 *
+		 * @type {?Array<Object>}
+		 */
+		this.attributes = attributes;
 
 		/**
 		 * This flag can be used for type testing.

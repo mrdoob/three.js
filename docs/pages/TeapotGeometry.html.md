@@ -21,7 +21,7 @@ scene.add( teapot );
 
 ## Import
 
-TeapotGeometry is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+TeapotGeometry is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';

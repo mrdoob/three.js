@@ -6,7 +6,7 @@ A special type of an animated mesh with a simple interface for animation playbac
 
 ## Import
 
-MorphAnimMesh is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+MorphAnimMesh is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { MorphAnimMesh } from 'three/addons/misc/MorphAnimMesh.js';

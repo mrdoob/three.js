@@ -1,4 +1,4 @@
-*Inheritance: EventDispatcher → Node → TempNode →*
+*Inheritance: EventDispatcher → Node →*
 
 # ChromaticAberrationNode
 
@@ -6,7 +6,7 @@ Post processing node for applying chromatic aberration effect. This effect simul
 
 ## Import
 
-ChromaticAberrationNode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+ChromaticAberrationNode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { chromaticAberration } from 'three/addons/tsl/display/ChromaticAberrationNode.js';
@@ -62,7 +62,7 @@ This method is used to setup the effect's TSL code.
 
 The current node builder.
 
-**Overrides:** [TempNode#setup](TempNode.html#setup)
+**Overrides:** [Node#setup](Node.html#setup)
 
 ## Source
 

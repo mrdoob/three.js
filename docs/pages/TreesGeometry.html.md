@@ -6,7 +6,7 @@ A procedural trees geometry.
 
 ## Import
 
-TreesGeometry is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+TreesGeometry is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { TreesGeometry } from 'three/addons/misc/RollerCoaster.js';

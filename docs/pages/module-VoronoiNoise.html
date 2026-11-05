@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>VoronoiNoise - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">VoronoiNoise</h1>
+		<section>
+			<header>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">VoronoiNoise</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { voronoi2d, voronoi3d } from 'three/addons/tsl/math/voronoiNoise.js';</code></pre>
+				<div class="container-overview">
+				</div>
+				<h2 class="subsection-title">Static Methods</h2>
+					<h3 class="name name-method" id=".hash2d" translate="no">.<a href="#.hash2d">hash2d</a><span class="signature">( p : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec2></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec2></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates a pseudo-random vec2 from the given coordinate.</p>
+<p>Reference: <a href="https://www.shadertoy.com/view/MslGD8" target="_blank" rel="noopener">https://www.shadertoy.com/view/MslGD8</a>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">p</strong>
+									</td>
+									<td class="description last">
+										<p>The input coordinate.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A pseudo-random value in the range <code>[0, 1]</code>.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".hash3d" translate="no">.<a href="#.hash3d">hash3d</a><span class="signature">( p : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;vec3></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Generates a pseudo-random vec3 from the given coordinate.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">p</strong>
+									</td>
+									<td class="description last">
+										<p>The input coordinate.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A pseudo-random value in the range <code>[0, 1]</code>.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".voronoi2d" translate="no">.<a href="#.voronoi2d">voronoi2d</a><span class="signature">( p : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec2></span>, time : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Animated 2D Voronoi noise. The feature points orbit inside their cells so the
+resulting pattern morphs over time.</p>
+<p>Reference: <a href="https://www.shadertoy.com/view/MslGD8" target="_blank" rel="noopener">https://www.shadertoy.com/view/MslGD8</a>.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">p</strong>
+									</td>
+									<td class="description last">
+										<p>The input coordinate.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">time</strong>
+									</td>
+									<td class="description last">
+										<p>The animation time.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The squared distance to the closest feature point, roughly in the range <code>[0, 1]</code>.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id=".voronoi3d" translate="no">.<a href="#.voronoi3d">voronoi3d</a><span class="signature">( p : <span class="param-type"><a href="Node.html">Node</a>.&lt;vec3></span>, time : <span class="param-type"><a href="Node.html">Node</a>.&lt;float></span> )</span><span class="type-signature"> : <a href="Node.html">Node</a>.&lt;float></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Animated 3D Voronoi noise. Like voronoi2d but with a volumetric input
+coordinate so the pattern can be applied to arbitrary surfaces without
+projection artifacts. Evaluates 27 cells instead of 9 and is therefore
+considerably more expensive than the 2D version.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">p</strong>
+									</td>
+									<td class="description last">
+										<p>The input coordinate.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">time</strong>
+									</td>
+									<td class="description last">
+										<p>The animation time.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The squared distance to the closest feature point, roughly in the range <code>[0, 1]</code>.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/tsl/math/voronoiNoise.js" translate="no" target="_blank" rel="noopener">examples/jsm/tsl/math/voronoiNoise.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

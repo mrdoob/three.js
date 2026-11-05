@@ -1,4 +1,4 @@
-*Inheritance: EventDispatcher → Node → TempNode →*
+*Inheritance: EventDispatcher → Node →*
 
 # RecurrentDenoiseNode
 
@@ -8,7 +8,7 @@ The denoising kernel is selected at construction time via `mode`: `'diffuse'` (S
 
 ## Import
 
-RecurrentDenoiseNode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+RecurrentDenoiseNode is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';

@@ -1,4 +1,4 @@
-import TempNode from '../core/TempNode.js';
+import Node from '../core/Node.js';
 import { addMethodChaining, nodeObject, vec4 } from '../tsl/TSLCore.js';
 import { premultiplyAlpha, unpremultiplyAlpha } from './PremultiplyAlphaFunctions.js';
 
@@ -26,9 +26,9 @@ import { ColorManagement } from '../../math/ColorManagement.js';
  * postProcessing.outputNode = outputPass;
  * ```
  *
- * @augments TempNode
+ * @augments Node
  */
-class RenderOutputNode extends TempNode {
+class RenderOutputNode extends Node {
 
 	static get type() {
 
@@ -68,6 +68,15 @@ class RenderOutputNode extends TempNode {
 		 * @type {?string}
 		 */
 		this.outputColorSpace = outputColorSpace;
+
+		/**
+		 * Whether the color node uses premultiplied alpha. The output
+		 * uses the same alpha mode.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.premultipliedAlpha = true;
 
 		/**
 		 * This flag can be used for type testing.
@@ -113,7 +122,11 @@ class RenderOutputNode extends TempNode {
 		outputNode = vec4( outputNode.rgb, outputNode.a.clamp( 0.0, 1.0 ) );
 
 		// unpremultiply
-		outputNode = unpremultiplyAlpha( outputNode );
+		if ( this.premultipliedAlpha === true ) {
+
+			outputNode = unpremultiplyAlpha( outputNode );
+
+		}
 
 		// tone mapping
 		const toneMapping = ( this._toneMapping !== null ? this._toneMapping : context.toneMapping ) || NoToneMapping;
@@ -134,7 +147,11 @@ class RenderOutputNode extends TempNode {
 		}
 
 		// premultiply in output color space
-		outputNode = premultiplyAlpha( outputNode );
+		if ( this.premultipliedAlpha === true ) {
+
+			outputNode = premultiplyAlpha( outputNode );
+
+		}
 
 		return outputNode;
 

@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Sculptor - Three.js Docs</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<script src="../scripts/highlight.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="../styles/highlight-three.css">
+	<link type="text/css" rel="stylesheet" href="../styles/page.css">
+</head>
+<body>
+	<h1 translate="no">Sculptor</h1>
+		<section>
+			<header>
+				<div class="class-description"><p>Sculpts triangle meshes with adaptive topology.</p>
+<p>Replaces <code>mesh.geometry</code> with a welded geometry containing positions, normals
+and indices. The source geometry is unchanged and is not disposed.</p>
+<p>The mesh must use one material and a non-zero uniform world scale without
+shear. Skinned, instanced and batched meshes are not supported.</p>
+<p>Sculptor manages bounds, draw range and spare buffer capacity. Geometry and
+attributes may be replaced as capacity changes; do not cache them. Use
+<a href="Sculptor.html#getGeometry">Sculptor#getGeometry</a> for a compact copy for export or geometry processing.</p></div>
+				<h2>Code Example</h2>
+				<div translate="no"><pre><code class="language-js">const sculptor = new Sculptor( mesh, camera )
+	.setTool( 'inflate' )
+	.setSize( 75 )
+	.setStrength( 0.3 );
+sculptor.connect( renderer.domElement );
+</code></pre></div>
+			</header>
+			<article>
+				<h2 class="subsection-title">Import</h2>
+				<p><span translate="no">Sculptor</span> is an addon, and must be imported explicitly, see <a href="https://threejs.org/manual/#installation#addons" target="_blank" rel="noopener">Installation#Addons</a>.</p>
+				<pre><code class="language-js">import { Sculptor } from 'three/addons/misc/Sculptor.js';</code></pre>
+				<div class="container-overview">
+					<h2>Constructor</h2>
+					<h3 class="name name-method" id="Sculptor" translate="no">new <a href="#Sculptor">Sculptor</a><span class="signature">( mesh : <span class="param-type"><a href="Mesh.html">Mesh</a></span>, camera : <span class="param-type"><a href="Camera.html">Camera</a></span> )</span> </h3>
+					<div class="method">
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">mesh</strong>
+									</td>
+									<td class="description last">
+										<p>The mesh to sculpt.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">camera</strong>
+									</td>
+									<td class="description last">
+										<p>The camera used for pointer picking.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<h2 class="subsection-title">Properties</h2>
+				<div class="member">
+					<h3 class="name" id="camera" translate="no">.<a href="#camera">camera</a><span class="type-signature"> : <a href="Camera.html">Camera</a></span> </h3>
+					<div class="description">
+						<p>The camera used for pointer picking.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="domElement" translate="no">.<a href="#domElement">domElement</a><span class="type-signature"> : HTMLElement</span> </h3>
+					<div class="description">
+						<p>The element receiving pointer events, or <code>null</code> while disconnected.</p>
+						<p>Default is <code>null</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="enabled" translate="no">.<a href="#enabled">enabled</a><span class="type-signature"> : boolean</span> </h3>
+					<div class="description">
+						<p>Whether pointer input is enabled. Does not affect programmatic strokes.</p>
+						<p>Default is <code>true</code>.</p>
+					</div>
+				</div>
+				<div class="member">
+					<h3 class="name" id="mesh" translate="no">.<a href="#mesh">mesh</a><span class="type-signature"> : <a href="Mesh.html">Mesh</a></span> <span class="type-signature">(readonly) </span></h3>
+					<div class="description">
+						<p>The mesh being sculpted.</p>
+					</div>
+				</div>
+				<h2 class="subsection-title">Methods</h2>
+					<h3 class="name name-method" id="beginStroke" translate="no">.<a href="#beginStroke">beginStroke</a><span class="signature">()</span><span class="type-signature"> : <a href="Sculptor.html">Sculptor</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Begins a stroke and fires <code>start</code>. Does nothing while a stroke is active.
+Called automatically by pointer input or the first successful ray stamp.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this sculptor.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="connect" translate="no">.<a href="#connect">connect</a><span class="signature">( element : <span class="param-type">HTMLElement</span> )</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Connects pointer input to a DOM element.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">element</strong>
+									</td>
+									<td class="description last">
+										<p>The element receiving pointer events.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h3 class="name name-method" id="disconnect" translate="no">.<a href="#disconnect">disconnect</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Disconnects pointer input and finishes the active stroke.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="dispose" translate="no">.<a href="#dispose">dispose</a><span class="signature">()</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Disconnects the sculptor. The mesh and its geometry are not disposed.</p>
+						</div>
+					</div>
+					<h3 class="name name-method" id="endStroke" translate="no">.<a href="#endStroke">endStroke</a><span class="signature">()</span><span class="type-signature"> : <a href="Sculptor.html">Sculptor</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Releases pointer capture, balances the octree and updates exact bounds,
+then fires <code>end</code>. Does nothing while idle. Called automatically when a
+pointer stroke ends or is cancelled.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this sculptor.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getDetail" translate="no">.<a href="#getDetail">getDetail</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the adaptive-topology detail. <code>0</code> freezes topology.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The detail level.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getGeometry" translate="no">.<a href="#getGeometry">getGeometry</a><span class="signature">()</span><span class="type-signature"> : <a href="BufferGeometry.html">BufferGeometry</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns an independent copy of the active vertices and triangles, without
+spare capacity. Suitable for export or geometry processing. The caller owns it.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A new geometry containing the active vertices and triangles.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getHitNormal" translate="no">.<a href="#getHitNormal">getHitNormal</a><span class="signature">( target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies the current local-space unit surface normal into the target vector.
+Returns a zero vector when there is no hit.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">target</strong>
+									</td>
+									<td class="description last">
+										<p>The vector to receive the surface normal.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The target vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getHitPoint" translate="no">.<a href="#getHitPoint">getHitPoint</a><span class="signature">( target : <span class="param-type"><a href="Vector3.html">Vector3</a></span> )</span><span class="type-signature"> : <a href="Vector3.html">Vector3</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Copies the current local-space hit position into the target vector.
+Returns a zero vector when there is no hit.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">target</strong>
+									</td>
+									<td class="description last">
+										<p>The vector to receive the hit position.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The target vector.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getNegative" translate="no">.<a href="#getNegative">getNegative</a><span class="signature">()</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns whether the active tool applies its inverse effect.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the tool direction is inverted.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getSize" translate="no">.<a href="#getSize">getSize</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the pointer brush radius in CSS pixels.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The brush radius.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getStrength" translate="no">.<a href="#getStrength">getStrength</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the strength of the active tool.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The tool strength.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getTool" translate="no">.<a href="#getTool">getTool</a><span class="signature">()</span><span class="type-signature"> : 'clay' | 'brush' | 'inflate' | 'smooth' | 'flatten' | 'pinch' | 'crease' | 'drag' | 'scale'</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the active sculpting tool.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The tool name.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="getWorldRadius" translate="no">.<a href="#getWorldRadius">getWorldRadius</a><span class="signature">()</span><span class="type-signature"> : number</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns the brush radius in world units, or <code>0</code> without a hit.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> The brush radius in world units.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="hasHit" translate="no">.<a href="#hasHit">hasHit</a><span class="signature">()</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns whether the latest pick or stroke ray hit the mesh.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the latest ray hit the mesh.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="isSculpting" translate="no">.<a href="#isSculpting">isSculpting</a><span class="signature">()</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Returns whether a pointer or programmatic stroke is active.</p>
+						</div>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether a stroke is active.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="pickFromPointer" translate="no">.<a href="#pickFromPointer">pickFromPointer</a><span class="signature">( clientX : <span class="param-type">number</span>, clientY : <span class="param-type">number</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the current hit from client coordinates without sculpting.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">clientX</strong>
+									</td>
+									<td class="description last">
+										<p>Horizontal client coordinate in CSS pixels.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">clientY</strong>
+									</td>
+									<td class="description last">
+										<p>Vertical client coordinate in CSS pixels.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the pointer ray hit the mesh.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="pickFromRay" translate="no">.<a href="#pickFromRay">pickFromRay</a><span class="signature">( ray : <span class="param-type"><a href="Ray.html">Ray</a></span>, worldRadius : <span class="param-type">number</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Updates the current hit from a world-space ray without sculpting.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">ray</strong>
+									</td>
+									<td class="description last">
+										<p>The world-space ray, with a non-zero direction.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">worldRadius</strong>
+									</td>
+									<td class="description last">
+										<p>The brush radius in world units.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the ray hit the mesh.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setDetail" translate="no">.<a href="#setDetail">setDetail</a><span class="signature">( value : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Sculptor.html">Sculptor</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the adaptive-topology detail. Higher values produce shorter edges
+relative to the brush radius; <code>0</code> freezes topology. Remeshing splits long
+edges and collapses short ones, and can alter the surface even at zero strength.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">value</strong>
+									</td>
+									<td class="description last">
+										<p>A value between 0 and 1.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this sculptor.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setNegative" translate="no">.<a href="#setNegative">setNegative</a><span class="signature">( value : <span class="param-type">boolean</span> )</span><span class="type-signature"> : <a href="Sculptor.html">Sculptor</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets whether the active tool applies its inverse effect.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">value</strong>
+									</td>
+									<td class="description last">
+										<p>Whether the tool direction is inverted.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this sculptor.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setSize" translate="no">.<a href="#setSize">setSize</a><span class="signature">( value : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Sculptor.html">Sculptor</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the pointer brush radius in CSS pixels.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">value</strong>
+									</td>
+									<td class="description last">
+										<p>A value between 5 and 500.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this sculptor.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setStrength" translate="no">.<a href="#setStrength">setStrength</a><span class="signature">( value : <span class="param-type">number</span> )</span><span class="type-signature"> : <a href="Sculptor.html">Sculptor</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Sets the strength of the active tool.
+A value of <code>0</code> disables deformation, but not adaptive remeshing.
+Drag and Scale use pointer movement instead of this setting.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">value</strong>
+									</td>
+									<td class="description last">
+										<p>A value between 0 and 1.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this sculptor.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="setTool" translate="no">.<a href="#setTool">setTool</a><span class="signature">( value : <span class="param-type">'clay' | 'brush' | 'inflate' | 'smooth' | 'flatten' | 'pinch' | 'crease' | 'drag' | 'scale'</span> )</span><span class="type-signature"> : <a href="Sculptor.html">Sculptor</a></span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Selects a tool and restores its size, strength and negative setting.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">value</strong>
+									</td>
+									<td class="description last">
+										<p>The tool name.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> A reference to this sculptor.</dt>
+						</dl>
+					</div>
+					<h3 class="name name-method" id="strokeFromRay" translate="no">.<a href="#strokeFromRay">strokeFromRay</a><span class="signature">( ray : <span class="param-type"><a href="Ray.html">Ray</a></span>, worldRadius : <span class="param-type">number</span> )</span><span class="type-signature"> : boolean</span> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Applies a ray stamp, starting a stroke on a hit. Call
+<a href="Sculptor.html#endStroke">Sculptor#endStroke</a> after the last stamp.</p>
+<p>Returns <code>false</code> without updating the hit during a pointer stroke.
+Drag and Scale require pointer input.</p>
+						</div>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">ray</strong>
+									</td>
+									<td class="description last">
+										<p>The world-space ray, with a non-zero direction.</p>
+									</td>
+								</tr>
+								<tr>
+									<td class="name">
+										<strong translate="no">worldRadius</strong>
+									</td>
+									<td class="description last">
+										<p>The brush radius in world units.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<dl class="details">
+							<dt class="tag-returns"><strong>Returns:</strong> Whether the ray hit the mesh.</dt>
+						</dl>
+					</div>
+				<h2 class="subsection-title">Events</h2>
+					<h3 class="name name-method" id="event:change" translate="no">.<a href="#event:change">change</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires after the sculpt geometry has been updated.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+					<h3 class="name name-method" id="event:end" translate="no">.<a href="#event:end">end</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires after the active stroke finishes and exact bounds are up to date.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+					<h3 class="name name-method" id="event:start" translate="no">.<a href="#event:start">start</a> </h3>
+					<div class="method">
+						<div class="description">
+							<p>Fires when a pointer or programmatic stroke begins.</p>
+						</div>
+						<h5>Type:</h5>
+						<ul>
+							<li>
+<span class="param-type">Object</span>
+							</li>
+						</ul>
+					</div>
+				<h2 class="subsection-title">Source</h2>
+				<p>
+					<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/misc/Sculptor.js" translate="no" target="_blank" rel="noopener">examples/jsm/misc/Sculptor.js</a>
+				</p>
+			</article>
+		</section>
+<script src="../scripts/linenumber.js"></script>
+<script src="../scripts/page.js"></script>
+</body>
+</html>

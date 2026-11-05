@@ -10,11 +10,11 @@ This node can only be used with a WebGPU backend.
 
 ### new WorkgroupInfoNode( scope : string, bufferType : string, bufferCount : number )
 
-Constructs a new buffer scoped to type scope.
+Constructs a new workgroup info node.
 
 **scope**
 
-TODO.
+The address space the buffer is scoped to. Currently only `'Workgroup'` is used.
 
 **bufferType**
 
@@ -42,6 +42,12 @@ The buffer type.
 
 The data type of the array buffer.
 
+### .isAtomic : boolean
+
+Whether the node is atomic or not.
+
+Default is `false`.
+
 ### .isWorkgroupInfoNode : boolean (readonly)
 
 This flag can be used for type testing.
@@ -58,7 +64,7 @@ Default is `''`.
 
 ### .scope : string
 
-TODO.
+The address space the buffer is scoped to. Currently only `'Workgroup'` is used.
 
 ## Methods
 
@@ -102,6 +108,16 @@ The name to set.
 
 **Returns:** A reference to this node.
 
+### .setAtomic( value : boolean ) : WorkgroupInfoNode
+
+Defines whether the node is atomic or not.
+
+**value**
+
+The atomic flag.
+
+**Returns:** A reference to this node.
+
 ### .setName( name : string ) : WorkgroupInfoNode
 
 Sets the name of this node.
@@ -119,6 +135,12 @@ Sets the scope of this node.
 **scope**
 
 The scope to set.
+
+**Returns:** A reference to this node.
+
+### .toAtomic() : WorkgroupInfoNode
+
+Convenience method for making this node atomic.
 
 **Returns:** A reference to this node.
 

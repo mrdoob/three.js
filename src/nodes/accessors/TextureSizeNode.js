@@ -52,6 +52,12 @@ class TextureSizeNode extends Node {
 
 	}
 
+	isCacheable( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	generate( builder ) {
 
 		const textureProperty = this.textureNode.build( builder, 'property' );

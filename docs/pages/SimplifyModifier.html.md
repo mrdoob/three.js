@@ -2,18 +2,18 @@
 
 This class can be used to modify a geometry by simplifying it. A typical use case for such a modifier is automatic LOD generation.
 
-The implementation is based on [Progressive Mesh type Polygon Reduction Algorithm](https://web.archive.org/web/20230610044040/http://www.melax.com/polychop/) by Stan Melax in 1998.
+The implementation is based on [meshoptimizer](https://github.com/zeux/meshoptimizer). If you only need a simplified index buffer, use MeshoptSimplifier directly.
 
 ## Code Example
 
 ```js
 const modifier = new SimplifyModifier();
-geometry = modifier.modify( geometry );
+geometry = await modifier.modify( geometry, count );
 ```
 
 ## Import
 
-SimplifyModifier is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+SimplifyModifier is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { SimplifyModifier } from 'three/addons/modifiers/SimplifyModifier.js';
@@ -25,9 +25,9 @@ import { SimplifyModifier } from 'three/addons/modifiers/SimplifyModifier.js';
 
 ## Methods
 
-### .modify( geometry : BufferGeometry, count : number ) : BufferGeometry
+### .modify( geometry : BufferGeometry, count : number ) : Promise.<BufferGeometry> (async)
 
-Returns a new, modified version of the given geometry by applying a simplification. Please note that the resulting geometry is always non-indexed.
+Returns a new, simplified version of the given geometry. The vertex buffers of the result only contain vertices referenced by the simplified index.
 
 **geometry**
 
@@ -35,9 +35,9 @@ The geometry to modify.
 
 **count**
 
-The number of vertices to remove.
+The approximate number of vertices to remove.
 
-**Returns:** A new, modified geometry.
+**Returns:** A promise that resolves with the new, modified geometry.
 
 ## Source
 

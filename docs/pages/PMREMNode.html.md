@@ -1,4 +1,4 @@
-*Inheritance: EventDispatcher → Node → TempNode →*
+*Inheritance: EventDispatcher → Node →*
 
 # PMREMNode
 
@@ -13,9 +13,9 @@ material.envNode = pmremTexture( envMap );
 
 ## Constructor
 
-### new PMREMNode( value : Texture, uvNode : Node.<vec2>, levelNode : Node.<float> )
+### new PMREMNode( value : Texture, uvNode : Node.<vec3>, levelNode : Node.<float> )
 
-Constructs a new function overloading node.
+Constructs a new PMREM node.
 
 **value**
 
@@ -45,9 +45,9 @@ The `updateBeforeType` is set to `NodeUpdateType.RENDER`.
 
 Default is `'render'`.
 
-**Overrides:** [TempNode#updateBeforeType](TempNode.html#updateBeforeType)
+**Overrides:** [Node#updateBeforeType](Node.html#updateBeforeType)
 
-### .uvNode : Node.<vec2>
+### .uvNode : Node.<vec3>
 
 The uv node.
 

@@ -12,7 +12,7 @@ const physics = await JoltPhysics();
 
 ## Import
 
-JoltPhysics is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#en/installation).
+JoltPhysics is an addon, and must be imported explicitly, see [Installation#Addons](https://threejs.org/manual/#installation#addons).
 
 ```js
 import { JoltPhysics } from 'three/addons/physics/JoltPhysics.js';

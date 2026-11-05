@@ -8,6 +8,8 @@ import { warnOnce } from '../../utils.js';
  * InspectorNode is a wrapper node that allows inspection of node values during rendering.
  * It can be used to debug or analyze node outputs in the rendering pipeline.
  *
+ * The inspector node is registered by the inspected node when it is built, see {@link Node#_setupInspector}.
+ *
  * @augments Node
  */
 class InspectorNode extends Node {
@@ -28,7 +30,7 @@ class InspectorNode extends Node {
 	 *
 	 * @param {Node} node - The node to inspect.
 	 * @param {string} [name=''] - Optional name for the inspector node.
-	 * @param {Function|null} [callback=null] - Optional callback to modify the node during setup.
+	 * @param {Function|null} [callback=null] - Optional callback to modify the node presented by the inspector.
 	 */
 	constructor( node, name = '', callback = null ) {
 
@@ -62,7 +64,15 @@ class InspectorNode extends Node {
 	 */
 	update( frame ) {
 
-		frame.renderer.inspector.inspect( this );
+		const { renderer } = frame;
+
+		if ( renderer.backend.isWebGPUBackend !== true && renderer.inspector.constructor !== InspectorBase ) {
+
+			warnOnce( 'TSL: ".toInspector()" is only available with WebGPU.' );
+
+		}
+
+		renderer.inspector.inspect( this );
 
 	}
 
@@ -78,32 +88,6 @@ class InspectorNode extends Node {
 
 	}
 
-	/**
-	 * Sets up the inspector node.
-	 *
-	 * @param {NodeBuilder} builder - The node builder.
-	 * @returns {Node} The setup node.
-	 */
-	setup( builder ) {
-
-		let node = this.node;
-
-		if ( builder.context.inspector === true && this.callback !== null ) {
-
-			node = this.callback( node );
-
-		}
-
-		if ( builder.renderer.backend.isWebGPUBackend !== true && builder.renderer.inspector.constructor !== InspectorBase ) {
-
-			warnOnce( 'TSL: ".toInspector()" is only available with WebGPU.' );
-
-		}
-
-		return node;
-
-	}
-
 }
 
 export default InspectorNode;
@@ -114,15 +98,17 @@ export default InspectorNode;
  * @tsl
  * @param {Node} node - The node to inspect.
  * @param {string} [name=''] - Optional name for the inspector node.
- * @param {Function|null} [callback=null] - Optional callback to modify the node during setup.
- * @returns {Node} The inspector node.
+ * @param {Function|null} [callback=null] - Optional callback to modify the node presented by the inspector.
+ * @returns {Node} The inspected node.
  */
-export function inspector( node, name = '', callback = null ) {
+export function inspect( node, name = '', callback = null ) {
 
 	node = nodeObject( node );
 
-	return node.before( new InspectorNode( node, name, callback ) );
+	node._inspectorNode = new InspectorNode( node, name, callback );
+
+	return node;
 
 }
 
-addMethodChaining( 'toInspector', inspector );
+addMethodChaining( 'toInspector', inspect );

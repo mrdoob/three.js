@@ -11,7 +11,9 @@ import {
 	DirectionalLight,
 	Euler,
 	Group,
+	ImageLoader,
 	LoaderUtils,
+	LinearSRGBColorSpace,
 	Matrix4,
 	Mesh,
 	MeshPhysicalMaterial,
@@ -79,11 +81,12 @@ const USD_CAMERA_DEFAULTS = {
  */
 class USDComposer {
 
-	constructor( manager = null ) {
+	constructor( manager ) {
 
 		this.textureCache = {};
 		this.skinnedMeshes = [];
 		this.manager = manager;
+		this.imageLoader = new ImageLoader( manager );
 		this.texturePromises = [];
 
 	}
@@ -894,6 +897,9 @@ class USDComposer {
 		if ( referencedData.specsByPath ) {
 
 			const composer = new USDComposer( this.manager );
+			composer.imageLoader.setCrossOrigin( this.imageLoader.crossOrigin );
+			composer.imageLoader.setPriority( this.imageLoader.priority );
+			composer.imageLoader.setCache( this.imageLoader.cache );
 			const newBasePath = this._getBasePath( resolvedPath );
 			const composedGroup = composer.compose( referencedData, this.assets, mergedVariants, newBasePath );
 
@@ -1082,6 +1088,47 @@ class USDComposer {
 	}
 
 	/**
+	 * Resolve an attribute's authored value, following connections before using
+	 * local fallback values.
+	 */
+	_resolveAttributeValue( path, visited = new Set() ) {
+
+		const cleanPath = String( path ).replace( /<|>/g, '' );
+		if ( visited.has( cleanPath ) ) return undefined;
+
+		const fields = this.specsByPath[ cleanPath ]?.fields;
+		if ( ! fields ) return undefined;
+
+		const nextVisited = new Set( visited );
+		nextVisited.add( cleanPath );
+
+		if ( fields.connectionPaths ) {
+
+			for ( const connectionPath of fields.connectionPaths ) {
+
+				const value = this._resolveAttributeValue( connectionPath, nextVisited );
+				if ( value !== undefined ) return value;
+
+			}
+
+		}
+
+		if ( fields.default !== undefined ) return fields.default;
+
+		const { times, values } = fields.timeSamples || {};
+		if ( times && values && times.length > 0 ) {
+
+			// Find time 0, or use the first available time (rest pose).
+			const index = times.indexOf( 0 );
+			return values[ index >= 0 ? index : 0 ];
+
+		}
+
+		return undefined;
+
+	}
+
+	/**
 	 * Get attributes for a path from attribute specs.
 	 */
 	_getAttributes( path ) {
@@ -1141,21 +1188,10 @@ class USDComposer {
 
 		for ( const [ attrName, attrSpec ] of attrMap ) {
 
-			if ( attrSpec.fields?.default !== undefined ) {
+			const value = this._resolveAttributeValue( path + '.' + attrName );
+			if ( value !== undefined ) {
 
-				attrs[ attrName ] = attrSpec.fields.default;
-
-			} else if ( attrSpec.fields?.timeSamples ) {
-
-				// For animated attributes without default, use the first time sample (rest pose)
-				const { times, values } = attrSpec.fields.timeSamples;
-				if ( times && values && times.length > 0 ) {
-
-					// Find time 0, or use the first available time
-					const idx = times.indexOf( 0 );
-					attrs[ attrName ] = idx >= 0 ? values[ idx ] : values[ 0 ];
-
-				}
+				attrs[ attrName ] = value;
 
 			}
 
@@ -1300,7 +1336,7 @@ class USDComposer {
 
 				if ( mat.color && mat.color.r === 1 && mat.color.g === 1 && mat.color.b === 1 && ! mat.map ) {
 
-					mat.color.setRGB( displayColor[ 0 ], displayColor[ 1 ], displayColor[ 2 ], SRGBColorSpace );
+					mat.color.setRGB( displayColor[ 0 ], displayColor[ 1 ], displayColor[ 2 ], LinearSRGBColorSpace );
 
 				}
 
@@ -1634,22 +1670,16 @@ class USDComposer {
 	}
 
 	/**
-	 * Get material binding target path, checking variant paths if needed.
+	 * Get the material binding relationship for a prim, including overrides from
+	 * active variants.
 	 */
-	_getMaterialBindingTarget( primPath ) {
+	_getMaterialBindingSpec( primPath ) {
 
 		const attrName = 'material:binding';
-
-		// First check direct path
 		const directPath = primPath + '.' + attrName;
-		const directSpec = this.specsByPath[ directPath ];
-		if ( directSpec?.fields?.targetPaths?.length > 0 ) {
+		let bindingSpec = this.specsByPath[ directPath ] || null;
 
-			return directSpec.fields.targetPaths[ 0 ];
-
-		}
-
-		// Check variant paths at ancestor levels
+		// A variant on any ancestor may override this prim's relationship.
 		const parts = primPath.split( '/' );
 		for ( let i = 1; i < parts.length; i ++ ) {
 
@@ -1664,7 +1694,7 @@ class USDComposer {
 
 				if ( overrideSpec?.fields?.targetPaths?.length > 0 ) {
 
-					return overrideSpec.fields.targetPaths[ 0 ];
+					bindingSpec = overrideSpec;
 
 				}
 
@@ -1672,7 +1702,35 @@ class USDComposer {
 
 		}
 
-		return null;
+		return bindingSpec;
+
+	}
+
+	/**
+	 * Get the resolved material binding target for a prim. Material bindings are
+	 * inherited, and an ancestor marked strongerThanDescendants takes precedence
+	 * over bindings authored on its descendants.
+	 */
+	_getMaterialBindingTarget( primPath ) {
+
+		const parts = primPath.split( '/' ).filter( Boolean );
+		let resolvedBinding = null;
+
+		for ( let i = 0; i < parts.length; i ++ ) {
+
+			const ancestorPath = '/' + parts.slice( 0, i + 1 ).join( '/' );
+			const bindingSpec = this._getMaterialBindingSpec( ancestorPath );
+			if ( ! bindingSpec?.fields?.targetPaths?.length ) continue;
+
+			if ( ! resolvedBinding || resolvedBinding.fields?.bindMaterialAs !== 'strongerThanDescendants' ) {
+
+				resolvedBinding = bindingSpec;
+
+			}
+
+		}
+
+		return resolvedBinding?.fields.targetPaths[ 0 ] || null;
 
 	}
 
@@ -2917,21 +2975,7 @@ class USDComposer {
 	 */
 	_applyMaterialBinding( mesh, primPath ) {
 
-		// Look for material:binding on this prim
-		const bindingPath = primPath + '.material:binding';
-		const bindingSpec = this.specsByPath[ bindingPath ];
-
-		if ( ! bindingSpec ) return;
-
-		let materialPath = null;
-		const targetPaths = bindingSpec.fields?.targetPaths || bindingSpec.fields?.default;
-
-		if ( targetPaths ) {
-
-			materialPath = Array.isArray( targetPaths ) ? targetPaths[ 0 ] : targetPaths;
-
-		}
-
+		let materialPath = this._getMaterialBindingTarget( primPath );
 		if ( ! materialPath ) return;
 
 		// Clean the material path
@@ -3069,7 +3113,7 @@ class USDComposer {
 
 				if ( Array.isArray( color ) && color.length >= 3 ) {
 
-					material.color.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
+					material.color.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], LinearSRGBColorSpace );
 
 				}
 
@@ -3082,7 +3126,7 @@ class USDComposer {
 			const scale = material.map.userData.scale;
 			if ( Array.isArray( scale ) && scale.length >= 3 ) {
 
-				material.color.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], SRGBColorSpace );
+				material.color.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], LinearSRGBColorSpace );
 
 			}
 
@@ -3097,7 +3141,7 @@ class USDComposer {
 
 				if ( Array.isArray( color ) && color.length >= 3 ) {
 
-					material.emissive.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
+					material.emissive.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], LinearSRGBColorSpace );
 
 				}
 
@@ -3111,7 +3155,7 @@ class USDComposer {
 				const scale = material.emissiveMap.userData.scale;
 				if ( Array.isArray( scale ) && scale.length >= 3 ) {
 
-					material.emissive.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], SRGBColorSpace );
+					material.emissive.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], LinearSRGBColorSpace );
 
 				}
 
@@ -3190,7 +3234,7 @@ class USDComposer {
 
 				if ( Array.isArray( color ) && color.length >= 3 ) {
 
-					material.specularColor.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
+					material.specularColor.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], LinearSRGBColorSpace );
 
 				}
 
@@ -3203,7 +3247,7 @@ class USDComposer {
 			const scale = material.specularColorMap.userData.scale;
 			if ( Array.isArray( scale ) && scale.length >= 3 ) {
 
-				material.specularColor.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], SRGBColorSpace );
+				material.specularColor.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], LinearSRGBColorSpace );
 
 			}
 
@@ -3284,7 +3328,7 @@ class USDComposer {
 
 				if ( Array.isArray( color ) && color.length >= 3 ) {
 
-					material.color.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
+					material.color.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], LinearSRGBColorSpace );
 
 				}
 
@@ -3297,7 +3341,7 @@ class USDComposer {
 			const scale = material.map.userData.scale;
 			if ( Array.isArray( scale ) && scale.length >= 3 ) {
 
-				material.color.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], SRGBColorSpace );
+				material.color.setRGB( scale[ 0 ], scale[ 1 ], scale[ 2 ], LinearSRGBColorSpace );
 
 			}
 
@@ -3344,7 +3388,7 @@ class USDComposer {
 
 				if ( Array.isArray( color ) && color.length >= 3 ) {
 
-					material.emissive.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], SRGBColorSpace );
+					material.emissive.setRGB( color[ 0 ], color[ 1 ], color[ 2 ], LinearSRGBColorSpace );
 
 				}
 
@@ -3388,7 +3432,7 @@ class USDComposer {
 
 			if ( transmissionColor !== undefined && Array.isArray( transmissionColor ) ) {
 
-				material.attenuationColor.setRGB( transmissionColor[ 0 ], transmissionColor[ 1 ], transmissionColor[ 2 ] );
+				material.attenuationColor.setRGB( transmissionColor[ 0 ], transmissionColor[ 1 ], transmissionColor[ 2 ], LinearSRGBColorSpace );
 				material.attenuationDistance = transmissionDepth || 1.0;
 
 			}
@@ -3452,7 +3496,8 @@ class USDComposer {
 
 				// OpenPBR uses micrometers, Three.js uses nanometers
 				const thicknessNm = thinFilmThickness * 1000;
-				material.iridescenceThicknessRange = [ thicknessNm, thicknessNm ];
+				material.iridescenceThicknessMinimum = thicknessNm;
+				material.iridescenceThicknessMaximum = thicknessNm;
 
 			}
 
@@ -3471,7 +3516,7 @@ class USDComposer {
 
 		if ( specularColor !== undefined && Array.isArray( specularColor ) ) {
 
-			material.specularColor.setRGB( specularColor[ 0 ], specularColor[ 1 ], specularColor[ 2 ] );
+			material.specularColor.setRGB( specularColor[ 0 ], specularColor[ 1 ], specularColor[ 2 ], LinearSRGBColorSpace );
 
 		}
 
@@ -3832,13 +3877,7 @@ class USDComposer {
 			// Try loading via LoadingManager if available
 			if ( this.manager ) {
 
-				const url = this.manager.resolveURL( baseName );
-				if ( url !== baseName ) {
-
-					// URL modifier found a match - load it
-					return this._createTextureFromData( url, textureAttrs, transformAttrs );
-
-				}
+				return this._createTextureFromData( baseName, textureAttrs, transformAttrs );
 
 			}
 
@@ -3875,11 +3914,9 @@ class USDComposer {
 
 		}
 
-		const image = new Image();
-
 		this.texturePromises.push( new Promise( ( resolve ) => {
 
-			image.onload = function () {
+			this.imageLoader.load( url, function ( image ) {
 
 				texture.image = image;
 
@@ -3901,9 +3938,7 @@ class USDComposer {
 
 				resolve();
 
-			};
-
-			image.onerror = function () {
+			}, undefined, function () {
 
 				console.warn( 'USDLoader: Failed to load texture:', url );
 
@@ -3915,11 +3950,9 @@ class USDComposer {
 
 				resolve();
 
-			};
+			} );
 
 		} ) );
-
-		image.src = url;
 
 		return texture;
 

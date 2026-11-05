@@ -114,6 +114,8 @@ class FBXLoader extends Loader {
 		const path = ( scope.path === '' ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
 
 		const loader = new FileLoader( this.manager );
+		loader.setPriority( this.priority );
+		loader.setCache( this.cache );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
@@ -181,6 +183,8 @@ class FBXLoader extends Loader {
 		// console.log( fbxTree );
 
 		const textureLoader = new TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
+		textureLoader.setPriority( this.priority );
+		textureLoader.setCache( this.cache );
 
 		return new FBXTreeParser( textureLoader, this.manager, this.trimAnimationClips ).parse( fbxTree );
 
@@ -378,7 +382,7 @@ class FBXTreeParser {
 		} else { // Binary Format
 
 			const array = new Uint8Array( content );
-			return window.URL.createObjectURL( new Blob( [ array ], { type: type } ) );
+			return URL.createObjectURL( new Blob( [ array ], { type: type } ) );
 
 		}
 
@@ -1017,6 +1021,7 @@ class FBXTreeParser {
 		if ( sceneGraph.children.length === 1 && sceneGraph.children[ 0 ].isGroup ) {
 
 			sceneGraph.children[ 0 ].animations = animations;
+			Object.assign( sceneGraph.children[ 0 ].userData, sceneGraph.userData );
 			sceneGraph = sceneGraph.children[ 0 ];
 
 		}

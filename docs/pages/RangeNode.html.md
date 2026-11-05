@@ -2,7 +2,7 @@
 
 # RangeNode
 
-`RangeNode` generates random instanced attribute data in a defined range. An exemplary use case for this utility node is to generate random per-instance colors:
+`RangeNode` generates random per-instance values in a defined range. An exemplary use case for this utility node is to generate random per-instance colors:
 
 ## Code Example
 

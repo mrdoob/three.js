@@ -57,13 +57,23 @@ class ComputeStats extends ObjectStats {
 
 	constructor( uid, computeNode ) {
 
-		super( uid, computeNode.name );
+		const name = computeNode.name || ( computeNode.isComputeNode ? 'Compute' : 'Compute Group' );
+
+		super( uid, name );
 
 		this.computeNode = computeNode;
 
 		this.isComputeStats = true;
 
 	}
+
+}
+
+// returns true if the frame of the animation loop rendered or computed
+
+function isRenderedFrame( frame ) {
+
+	return frame.renders.length > 0 || frame.computes.length > 0;
 
 }
 
@@ -74,7 +84,9 @@ export class RendererInspector extends InspectorBase {
 		super();
 
 		this.currentFrame = null;
+		this.currentContext = null;
 		this.currentRender = null;
+		this.currentCompute = null;
 		this.currentNodes = null;
 		this.lastFrame = null;
 
@@ -83,10 +95,13 @@ export class RendererInspector extends InspectorBase {
 		this.maxFrames = 512;
 
 		this._lastFinishTime = 0;
+		this._lastRenderedFinishTime = 0;
 		this._resolveTimestampPromise = null;
+		this._rAFId = null;
 
 		this.overdraw = false;
 		this._overdrawMaterial = null;
+		this._renderingOverdraw = false;
 
 		this.isRendererInspector = true;
 
@@ -94,7 +109,7 @@ export class RendererInspector extends InspectorBase {
 
 	getParent() {
 
-		return this.currentRender || this.getFrame();
+		return this.currentContext || this.getFrame();
 
 	}
 
@@ -103,7 +118,9 @@ export class RendererInspector extends InspectorBase {
 		super.begin();
 
 		this.currentFrame = this._createFrame();
-		this.currentRender = this.currentFrame;
+		this.currentContext = this.currentFrame;
+		this.currentRender = null;
+		this.currentCompute = null;
 		this.currentNodes = [];
 
 	}
@@ -116,7 +133,22 @@ export class RendererInspector extends InspectorBase {
 
 		const frame = this.currentFrame;
 		frame.finishTime = now;
-		frame.deltaTime = now - ( this._lastFinishTime > 0 ? this._lastFinishTime : now );
+
+		// frames of the animation loop which didn't render or compute, like frames skipped by the application
+		// while the GPU is busy, are not frames of the application: the time is measured since the last frame
+		// which rendered
+
+		if ( isRenderedFrame( frame ) ) {
+
+			frame.deltaTime = now - ( this._lastRenderedFinishTime > 0 ? this._lastRenderedFinishTime : now );
+
+			this._lastRenderedFinishTime = now;
+
+		} else {
+
+			frame.deltaTime = now - ( this._lastFinishTime > 0 ? this._lastFinishTime : now );
+
+		}
 
 		this.addFrame( frame );
 
@@ -125,16 +157,12 @@ export class RendererInspector extends InspectorBase {
 		this.lastFrame = frame;
 
 		this.currentFrame = null;
+		this.currentContext = null;
 		this.currentRender = null;
+		this.currentCompute = null;
 		this.currentNodes = null;
 
 		this._lastFinishTime = now;
-
-		if ( this.overdraw === true ) {
-
-			this._renderOverdraw();
-
-		}
 
 	}
 
@@ -170,13 +198,19 @@ export class RendererInspector extends InspectorBase {
 
 		scene.overrideMaterial = this._overdrawMaterial;
 
+		this._renderingOverdraw = true;
+
 		renderer.render( scene, camera );
+
+		this._renderingOverdraw = false;
 
 		RendererUtils.restoreRendererAndSceneState( renderer, scene, state );
 
 	}
 
 	_getFPS() {
+
+		// only the frames which rendered or computed are counted, within the last second
 
 		let frameSum = 0;
 		let timeSum = 0;
@@ -185,6 +219,8 @@ export class RendererInspector extends InspectorBase {
 
 			const frame = this.frames[ i ];
 
+			if ( isRenderedFrame( frame ) === false ) continue;
+
 			frameSum ++;
 			timeSum += frame.deltaTime;
 
@@ -192,7 +228,7 @@ export class RendererInspector extends InspectorBase {
 
 		}
 
-		return ( frameSum * 1000 ) / timeSum;
+		return timeSum > 0 ? ( frameSum * 1000 ) / timeSum : 0;
 
 	}
 
@@ -262,14 +298,32 @@ export class RendererInspector extends InspectorBase {
 
 		this._resolveTimestampPromise = new Promise( ( resolve ) => {
 
-			requestAnimationFrame( async () => {
+			this._rAFId = requestAnimationFrame( async () => {
+
+				this._rAFId = null;
 
 				const renderer = this.getRenderer();
+
+				if ( renderer === null ) {
+
+					this._resolveTimestampPromise = null;
+					resolve();
+					return;
+
+				}
 
 				if ( renderer.backend.hasTimestamp ) {
 
 					await renderer.resolveTimestampsAsync( TimestampQuery.COMPUTE );
 					await renderer.resolveTimestampsAsync( TimestampQuery.RENDER );
+
+					if ( renderer !== this.getRenderer() ) {
+
+						this._resolveTimestampPromise = null;
+						resolve();
+						return;
+
+					}
 
 					const computeFrames = renderer.backend.getTimestampFrames( TimestampQuery.COMPUTE );
 					const renderFrames = renderer.backend.getTimestampFrames( TimestampQuery.RENDER );
@@ -481,21 +535,13 @@ export class RendererInspector extends InspectorBase {
 
 		const currentCompute = new ComputeStats( uid, computeNode );
 		currentCompute.timestamp = performance.now();
-		currentCompute.parent = this.currentCompute || this.getParent();
+		currentCompute.parent = this.getParent();
 
 		frame.computes.push( currentCompute );
-
-		if ( this.currentRender !== null ) {
-
-			this.currentRender.children.push( currentCompute );
-
-		} else {
-
-			frame.children.push( currentCompute );
-
-		}
+		currentCompute.parent.children.push( currentCompute );
 
 		this.currentCompute = currentCompute;
+		this.currentContext = currentCompute;
 
 	}
 
@@ -508,7 +554,8 @@ export class RendererInspector extends InspectorBase {
 		const currentCompute = this.currentCompute;
 		currentCompute.cpu = performance.now() - currentCompute.timestamp;
 
-		this.currentCompute = currentCompute.parent.isComputeStats ? currentCompute.parent : null;
+		this.currentContext = currentCompute.parent;
+		this.currentCompute = currentCompute.parent && currentCompute.parent.isComputeStats ? currentCompute.parent : null;
 
 	}
 
@@ -523,18 +570,10 @@ export class RendererInspector extends InspectorBase {
 		currentRender.parent = this.getParent();
 
 		frame.renders.push( currentRender );
-
-		if ( this.currentRender !== null ) {
-
-			this.currentRender.children.push( currentRender );
-
-		} else {
-
-			frame.children.push( currentRender );
-
-		}
+		currentRender.parent.children.push( currentRender );
 
 		this.currentRender = currentRender;
+		this.currentContext = currentRender;
 
 	}
 
@@ -547,7 +586,38 @@ export class RendererInspector extends InspectorBase {
 		const currentRender = this.currentRender;
 		currentRender.cpu = performance.now() - currentRender.timestamp;
 
-		this.currentRender = currentRender.parent;
+		this.currentContext = currentRender.parent;
+		this.currentRender = currentRender.parent && currentRender.parent.isRenderStats ? currentRender.parent : null;
+
+		// draw over each top-level render to the canvas, the frame finishes only at the start of the next one
+
+		if ( this.overdraw === true && this._renderingOverdraw === false && currentRender.parent === frame && this.getRenderer().getRenderTarget() === null ) {
+
+			this._renderOverdraw();
+
+		}
+
+	}
+
+	dispose() {
+
+		if ( this._rAFId !== null ) {
+
+			cancelAnimationFrame( this._rAFId );
+			this._rAFId = null;
+
+		}
+
+		this._resolveTimestampPromise = null;
+
+		if ( this._overdrawMaterial !== null ) {
+
+			this._overdrawMaterial.dispose();
+			this._overdrawMaterial = null;
+
+		}
+
+		super.dispose();
 
 	}
 

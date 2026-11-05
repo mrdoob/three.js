@@ -150,6 +150,18 @@ the default animation loop, this method can be used to update/transform 3D objec
 									<td class="description last">
 										<p>Allows to configure the layer's render target.</p>
 										<p>Default is <code>{}</code>.</p>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">samples</strong>
+									</td>
+									<td class="description last">
+										<p>The scene MSAA sample count. Defaults to the renderer's sample count.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
 									</td>
 								</tr>
 							</tbody>
@@ -230,6 +242,18 @@ the default animation loop, this method can be used to update/transform 3D objec
 									<td class="description last">
 										<p>Allows to configure the layer's render target.</p>
 										<p>Default is <code>{}</code>.</p>
+						<table class="params">
+							<tbody>
+								<tr>
+									<td class="name">
+										<strong translate="no">samples</strong>
+									</td>
+									<td class="description last">
+										<p>The scene MSAA sample count. Defaults to the renderer's sample count.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
 									</td>
 								</tr>
 							</tbody>
@@ -285,6 +309,8 @@ capable of doing so.</p>
 					<div class="method">
 						<div class="description">
 							<p>Returns the XR camera.</p>
+<p>The camera's transformation and projection matrix are derived from the first
+sub camera (e.g. the left eye in a stereo setup).</p>
 						</div>
 						<dl class="details">
 							<dt class="tag-returns"><strong>Returns:</strong> The XR camera.</dt>

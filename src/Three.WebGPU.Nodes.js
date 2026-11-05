@@ -5,6 +5,7 @@ export { default as WebGPURenderer } from './renderers/webgpu/WebGPURenderer.Nod
 export { default as WebGPUBackend } from './renderers/webgpu/WebGPUBackend.js';
 export { default as WebGLBackend } from './renderers/webgl-fallback/WebGLBackend.js';
 export { default as Lighting } from './renderers/common/Lighting.js';
+export { default as StandardDrawingPipeline } from './renderers/common/StandardDrawingPipeline.js';
 export { default as BundleGroup } from './renderers/common/BundleGroup.js';
 export { default as QuadMesh } from './renderers/common/QuadMesh.js';
 export { default as PMREMGenerator } from './renderers/common/extras/PMREMGenerator.js';
@@ -28,5 +29,5 @@ export { default as CanvasTarget } from './renderers/common/CanvasTarget.js';
 export { default as BlendMode } from './renderers/common/BlendMode.js';
 export { ClippingGroup } from './objects/ClippingGroup.js';
 export * from './nodes/Nodes.js';
-import * as TSL from './nodes/TSL.js';
+import * as TSL from './Three.TSL.js';
 export { TSL };
