@@ -1,4 +1,4 @@
-import { BackSide, BufferAttribute, BufferGeometry, DepthTexture, EquirectangularReflectionMapping, EquirectangularRefractionMapping, FloatType, FrontSide, HalfFloatType, Matrix4, NodeMaterial, QuadMesh, RenderTarget, StorageBufferAttribute, StorageTexture, Vector2, Vector3, Vector4 } from 'three/webgpu';
+import { BackSide, BufferAttribute, BufferGeometry, DepthTexture, EquirectangularReflectionMapping, EquirectangularRefractionMapping, FloatType, FrontSide, HalfFloatType, Matrix4, NodeMaterial, QuadMesh, ReadbackBuffer, RenderTarget, StorageBufferAttribute, StorageTexture, Vector2, Vector3, Vector4 } from 'three/webgpu';
 import { Break, Fn, If, LTC_Evaluate, Loop, abs, atan, atomicAdd, atomicLoad, atomicMax, atomicMin, atomicStore, cameraPosition, ceil, clamp, cos, cross, diffuseColor, dot, equirectUV, exp, exp2, float, floatBitsToUint, floor, fract, getDistanceAttenuation, getViewPosition, hash, instanceIndex, int, isBackgroundDepth, ivec2, ivec3, ivec4, log2, mat3, max, min, mix, mrt, normalWorldGeometry, normalize, output, pmremTexture, positionWorld, screenUV, select, sin, smoothstep, sqrt, step, storage, texture, textureStore, uint, uintBitsToFloat, uniform, uniformArray, uv, uvec2, uvec3, vec2, vec3, vec4, velocity } from 'three/tsl';
 
 import { MeshBVH, SAH } from 'three-mesh-bvh';
@@ -153,10 +153,11 @@ class RealtimeRadianceCascades {
 	 * @param {boolean} [options.useShadowMap=true] - Whether the hits read the light of the sun from its shadow map, where the map
 	 * covers them, instead of tracing a shadow ray. The sun must cast shadows.
 	 * @param {number} [options.quality=1] - The share of the rays and the fineness of the probes, from 0 to 1, see `quality`.
+	 * @param {boolean} [options.halfResolution=false] - Whether the pixels interpolate the light of a grid of 2x2 pixels, see `halfResolution`.
 	 * @param {boolean} [options.adaptiveQuality=false] - Whether `quality` adapts to the frame time, see `adaptiveQuality`.
 	 * @param {number} [options.targetFrameTime=0] - The frame time in milliseconds that `quality` adapts to, or 0 for the display's.
 	 */
-	constructor( { spacing = 0.0625, levelDistance = 4, levels = 16, blendingRadius = 1.1, cascades = 4, directions = 4, maxProbes = 32768, rayStride = 1, secondary = true, qualityDecay = 0.97, minDirectionWeight = 2, useQualityWeight = true, maxLifetime = 1, secondaryLifetime = 10, orientations = false, maxRadiance = 500, adaptiveLOD = true, velocity = false, useShadowMap = true, quality = 1, adaptiveQuality = false, targetFrameTime = 0 } = {} ) {
+	constructor( { spacing = 0.0625, levelDistance = 4, levels = 16, blendingRadius = 1.1, cascades = 4, directions = 4, maxProbes = 32768, rayStride = 1, secondary = true, qualityDecay = 0.97, minDirectionWeight = 2, useQualityWeight = true, maxLifetime = 1, secondaryLifetime = 10, orientations = false, maxRadiance = 500, adaptiveLOD = true, velocity = false, useShadowMap = true, quality = 1, halfResolution = false, adaptiveQuality = false, targetFrameTime = 0 } = {} ) {
 
 		this._blendingOctaves = uniform( 0 );
 		this._maxLifetime = uniform( 1, 'uint' );
@@ -195,10 +196,8 @@ class RealtimeRadianceCascades {
 		 * The quality of the light for its cost, from 0 to 1. Every frame, a pixel of each cell of
 		 * `rayStride * 2 ** ( 2 * ( 1 - quality ) )` pixels traces a ray, so a sixteenth as many rays at 0, and the
 		 * levels of detail are `1 - quality` octaves coarser, as with `lodBias`, so a quarter as many probes. The
-		 * probes are inserted from a grid of cells of 1 pixel, 2 below quality 0.75 and 4 below 0.25, and from 2 on,
-		 * the pixels interpolate the light of its points instead of gathering their own. The tracing costs in
-		 * proportion to the rays and most other passes to the probes. Lower qualities are noisier and blurrier, and
-		 * the light takes longer to settle. With `adaptiveQuality`, it adapts.
+		 * tracing costs in proportion to the rays and most other passes to the probes. Lower qualities are noisier and
+		 * blurrier, and the light takes longer to settle. With `adaptiveQuality`, it adapts.
 		 *
 		 * @type {number}
 		 * @default 1
@@ -206,13 +205,26 @@ class RealtimeRadianceCascades {
 		this.quality = quality;
 
 		/**
+		 * Whether the pixels interpolate the light of a grid of cells of 2x2 pixels, by their planes and normals,
+		 * instead of gathering their own, and the probes are inserted from its points: a quarter of the cost of the
+		 * passes of the pixels, for little change to the smooth light. With `adaptiveQuality`, it is the first step
+		 * down and the last step up.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.halfResolution = halfResolution;
+
+		/**
 		 * Whether `quality` adapts to the frame time, see `targetFrameTime`. It measures the frames of `update()` over a
 		 * quarter of a second, by the timestamps of the animation frames and by when the GPU finishes them, since a
 		 * browser may run the animation loop faster than the GPU, showing only some of its frames. The quality starts
-		 * at 0 and rises while the frames keep up with the target, in steps that double, but only slowly back to the
-		 * quality at which they last took longer, and falls while they take longer, by more the longer they take. If
-		 * lowering it by 0.2 did not shorten them, it compares them back at the quality above: if they are not longer
-		 * there, something else limits them, e.g. the display or the CPU, and it stays there for a while.
+		 * at 0 at `halfResolution` and rises while the frames keep up with the target, in steps that double, but only
+		 * slowly back to the quality at which they last took longer, and falls while they take longer, by more the
+		 * longer they take. If lowering it by 0.2 did not shorten them, it compares them back at the quality above: if
+		 * they are not longer there, something else limits them, e.g. the display or the CPU, and it stays there for a
+		 * while. At quality 1, it tries the full resolution, and goes back to half if the frames do not keep up, for 10
+		 * seconds, twice as long each time; at the full resolution, half is the first step down.
 		 *
 		 * @type {boolean}
 		 * @default false
@@ -320,6 +332,7 @@ class RealtimeRadianceCascades {
 
 		this._bvh = null;
 		this._sceneData = null;
+		this._collectedGeometry = null;
 		this._materials = [];
 		this._materialData = null;
 		this._triangleOffset = 0;
@@ -331,6 +344,8 @@ class RealtimeRadianceCascades {
 		this._environmentRotation = uniform( new Matrix4() );
 		this._skyTarget = null;
 		this._gbuffer = null;
+		this._gbuffers = [ null, null ];
+		this._mrts = [ null, null ];
 		this._hits = null;
 		this._kernels = null;
 		this._frameKernels = null;
@@ -402,8 +417,14 @@ class RealtimeRadianceCascades {
 		this._stampPending = false;
 		this._fences = [];
 		this._fencePending = false;
+		this._fenceReadback = null;
+		this._countsReadback = null;
 		this._gpuFrameTime = 0;
 		this._started = false;
+		this._fullTrial = false;
+		this._fullHoldUntil = 0;
+		this._fullHoldTime = 0;
+		this._fullSince = 0;
 		this._rise = 0.02;
 		this._floorOvers = 0;
 		this._fasterDisplay = null;
@@ -514,7 +535,13 @@ class RealtimeRadianceCascades {
 	 */
 	setScene( renderer, scene ) {
 
-		this.setSceneData( renderer, this._collect( scene ), scene );
+		const data = this._collect( scene );
+
+		this.setSceneData( renderer, data, scene );
+
+		// the geometry is the cascades', disposed with the scene
+
+		this._collectedGeometry = data.geometry;
 
 	}
 
@@ -803,11 +830,11 @@ class RealtimeRadianceCascades {
 		const rays = columns * Math.ceil( height / cell );
 		const previousRays = this._rays.value.z;
 
-		// the pixels gather the light on a grid of cells of 1, 2 or 4 pixels at lower qualities and interpolate it, and
-		// the probes are inserted from its points. With cells of 1 pixel, the pixels gather their own light, which
-		// costs less than the grid. Its texture holds the grid of cells of one pixel
+		// at half resolution, the pixels interpolate the light of a grid of cells of 2 pixels, and the probes are inserted
+		// from its points. With cells of 1 pixel, the pixels gather their own light, which costs less than the grid. Its
+		// texture holds the grid of cells of one pixel
 
-		const shadingCell = 2 ** Math.round( 2 * ( 1 - quality ) );
+		const shadingCell = this.halfResolution ? 2 : 1;
 		const shadingColumns = Math.ceil( width / shadingCell );
 		const shadingPoints = shadingColumns * Math.ceil( height / shadingCell );
 
@@ -963,6 +990,7 @@ class RealtimeRadianceCascades {
 
 			this._started = true;
 			this.quality = 0;
+			this.halfResolution = true;
 			this._qualityLimit = 1;
 			this._rise = 0.02;
 
@@ -1107,6 +1135,22 @@ class RealtimeRadianceCascades {
 
 		if ( frameTime > target * 1.1 ) {
 
+			// at the full resolution, half is the first step down, and the next try of the full resolution waits for 10
+			// seconds, twice as long each time
+
+			if ( this.halfResolution === false && ( this._fullTrial || now >= this._holdUntil ) ) {
+
+				this._fullTrial = false;
+				this.halfResolution = true;
+				this._fullHoldTime = Math.min( this._fullHoldTime * 2 || 10000, 160000 );
+				this._fullHoldUntil = now + this._fullHoldTime;
+				this._rise = 0.02;
+				this._skipFrames = 5;
+
+				return;
+
+			}
+
 			if ( now < this._holdUntil ) return;
 
 			// the steps so far paid off, the next ones are compared with here
@@ -1168,6 +1212,22 @@ class RealtimeRadianceCascades {
 			this.quality = Math.min( quality + step, Math.max( this._qualityLimit, quality ) );
 			this._skipFrames = this.quality > quality ? 12 : 5;
 
+			// a try of the full resolution held, the wait for the next one is short again after 30 seconds of it, and at
+			// quality 1 the full resolution is the last step up
+
+			if ( this._fullTrial ) this._fullSince = now;
+			if ( this.halfResolution === false && now - this._fullSince > 30000 ) this._fullHoldTime = 0;
+
+			this._fullTrial = false;
+
+			if ( quality === 1 && this.halfResolution && now >= this._fullHoldUntil ) {
+
+				this.halfResolution = false;
+				this._fullTrial = true;
+				this._skipFrames = 12;
+
+			}
+
 		}
 
 	}
@@ -1202,8 +1262,11 @@ class RealtimeRadianceCascades {
 		const frame = this._frame;
 		const atomics = this._atomics;
 
-		renderer.getArrayBufferAsync( atomics.value, null, 0, 4 ).then( () => {
+		const readback = this._fenceReadback ??= new ReadbackBuffer( 4 );
 
+		renderer.getArrayBufferAsync( atomics.value, readback, 0, 4 ).then( () => {
+
+			readback.release();
 			this._fencePending = false;
 
 			if ( this._atomics === atomics && this._fences.length < 1000 ) this._fences.push( [ frame, performance.now() ] );
@@ -1235,15 +1298,20 @@ class RealtimeRadianceCascades {
 		const capacities = this.capacities;
 		const cascades = this.cascades;
 
-		renderer.getArrayBufferAsync( counters.value, null, 0, this._layout.counters * 8 ).then( ( buffer ) => {
+		const byteLength = this._layout.counters * 8;
+		const readback = this._countsReadback ??= new ReadbackBuffer( byteLength );
 
+		renderer.getArrayBufferAsync( counters.value, readback, 0, byteLength ).then( () => {
+
+			const counts = new Uint32Array( readback.buffer.slice( 0, byteLength ) );
+
+			readback.release();
 			this._readingCounts = false;
 
 			if ( this._atomics !== counters ) return;
 
 			// the probes a cascade wanted: the ones it has, and the new ones beyond the free slots of the last frame
 
-			const counts = new Uint32Array( buffer );
 			let fullness = 0;
 
 			for ( let n = 0; n < cascades; n ++ ) {
@@ -1264,6 +1332,8 @@ class RealtimeRadianceCascades {
 		} ).catch( () => {
 
 			// disposed
+
+			this._readingCounts = false;
 
 		} );
 
@@ -1325,8 +1395,10 @@ class RealtimeRadianceCascades {
 
 		this._clearScene();
 		this._skyTarget?.dispose();
-		this._gbuffer?.dispose();
+		for ( const gbuffer of this._gbuffers ) gbuffer?.dispose();
 		this._shadeTexture.dispose();
+		this._fenceReadback?.dispose();
+		this._fenceReadback = null;
 
 		this._disposeKernels();
 		this._disposeBuffers();
@@ -1367,6 +1439,9 @@ class RealtimeRadianceCascades {
 
 		// the passes and the composite read the textures of the G-buffer, which has a velocity texture or not
 
+		// the G-buffers with and without the velocity stay, so that the render objects of the scene for them do too,
+		// but the textures of the one that is not used are freed
+
 		if ( this._gbuffer !== null && this._gbuffer.textures.length !== ( this.velocity ? 4 : 3 ) ) {
 
 			this._gbuffer.dispose();
@@ -1388,6 +1463,11 @@ class RealtimeRadianceCascades {
 	_disposeBuffers() {
 
 		for ( const buffer of this._buffers ) buffer.value.dispose();
+
+		// the readback of the counters has their size, the reads in flight finish with an error
+
+		this._countsReadback?.dispose();
+		this._countsReadback = null;
 
 		this._buffers = [];
 		this.memory = 0;
@@ -1608,6 +1688,16 @@ class RealtimeRadianceCascades {
 
 		if ( this._gbuffer !== null ) return this._gbuffer;
 
+		const index = this.velocity ? 1 : 0;
+
+		if ( this._gbuffers[ index ] !== null ) {
+
+			this._mrt = this._mrts[ index ];
+
+			return this._gbuffer = this._gbuffers[ index ];
+
+		}
+
 		const gbuffer = new RenderTarget( width, height, { count: this.velocity ? 4 : 3, type: HalfFloatType } );
 		gbuffer.textures[ 0 ].name = 'output';
 		gbuffer.textures[ 1 ].name = 'albedo';
@@ -1630,7 +1720,8 @@ class RealtimeRadianceCascades {
 		const outputs = { output, albedo: vec4( diffuseColor.rgb, 1 ), normal: vec4( normal, 1 ) };
 		if ( this.velocity ) outputs.velocity = velocity;
 
-		this._mrt = mrt( outputs );
+		this._mrt = this._mrts[ index ] = mrt( outputs );
+		this._gbuffers[ index ] = gbuffer;
 
 		return gbuffer;
 
@@ -1645,8 +1736,9 @@ class RealtimeRadianceCascades {
 
 		this._bvh?.dispose();
 		this._sceneData?.value.dispose();
+		this._collectedGeometry?.dispose();
 
-		this._bvh = this._sceneData = this._materialData = null;
+		this._bvh = this._sceneData = this._materialData = this._collectedGeometry = null;
 		this._materials = [];
 
 	}

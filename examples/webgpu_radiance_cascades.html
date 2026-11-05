@@ -64,6 +64,7 @@
 				traa: false,
 				adaptiveQuality: true,
 				quality: 1,
+				halfResolution: false,
 				secondary: true,
 				smoothing: 0.97,
 				probeSize: 12,
@@ -121,6 +122,16 @@
 
 					if ( params.quality === shownQuality ) return;
 
+					shownQuality = shownHalf = null;
+					params.adaptiveQuality = false;
+					updateQuality();
+
+				} ).listen();
+				gui.add( params, 'halfResolution' ).name( 'Half Resolution' ).onChange( () => {
+
+					if ( params.halfResolution === shownHalf ) return;
+
+					shownQuality = shownHalf = null;
 					params.adaptiveQuality = false;
 					updateQuality();
 
@@ -144,11 +155,11 @@
 
 				status.textContent = `Loading ${ params.scene }…`;
 
-				// the meshes and the lights of the last scene, whose geometries and shadow maps are disposed after the
-				// switch unless the new scene uses them
+				// the meshes, lines and lights of the last scene, whose geometries, materials and shadow maps are disposed
+				// after the switch unless the new scene uses them
 
 				const previous = [];
-				world?.root.traverse( ( object ) => ( object.isMesh || object.isLight ) && previous.push( object ) );
+				world?.root.traverse( ( object ) => ( object.isMesh || object.isLine || object.isLight ) && previous.push( object ) );
 
 				let next;
 
@@ -170,17 +181,28 @@
 
 				world = next;
 
-				scene = new THREE.Scene();
+				// one scene for all, since a new one would leave the background mesh of the last one to the renderer
+
+				scene ??= new THREE.Scene();
+				scene.clear();
 				scene.background = world.background ?? new THREE.Color( 0 );
 				scene.add( world.root );
 
 				const used = new Set();
-				world.root.traverse( ( object ) => used.add( object.isMesh ? object.geometry : object ) );
+				world.root.traverse( ( object ) => object.isMesh || object.isLine ? used.add( object.geometry ).add( object.material ) : used.add( object ) );
 
 				for ( const object of previous ) {
 
-					if ( object.isMesh && used.has( object.geometry ) === false ) object.geometry.dispose();
-					if ( object.isLight && used.has( object ) === false ) object.dispose();
+					if ( object.isLight ) {
+
+						if ( used.has( object ) === false ) object.dispose();
+
+					} else {
+
+						if ( used.has( object.geometry ) === false ) object.geometry.dispose();
+						if ( used.has( object.material ) === false ) object.material.dispose();
+
+					}
 
 				}
 
@@ -262,6 +284,7 @@
 
 				cascades.adaptiveQuality = params.adaptiveQuality;
 				cascades.quality = params.quality;
+				cascades.halfResolution = params.halfResolution;
 
 			}
 
@@ -278,6 +301,9 @@
 
 					compositeNode = composite;
 
+					// the texture of the composite that traa() renders is disposed too
+
+					traaPass?.beautyNode.dispose();
 					traaPass?.dispose();
 					traaPass = params.traa ? traa( composite, cascades.getTextureNode( 'depth' ), cascades.getTextureNode( 'velocity' ), camera ) : null;
 
@@ -558,7 +584,7 @@
 
 			}
 
-			let frames = 0, lastTimings = {}, shownQuality = null;
+			let frames = 0, lastTimings = {}, shownQuality = null, shownHalf = null;
 
 			async function animate() {
 
@@ -578,7 +604,12 @@
 				cascades.update( renderer, scene, camera );
 				renderPipeline.render();
 
-				if ( cascades.adaptiveQuality ) params.quality = shownQuality = Math.round( cascades.quality * 100 ) / 100;
+				if ( cascades.adaptiveQuality ) {
+
+					params.quality = shownQuality = Math.round( cascades.quality * 100 ) / 100;
+					params.halfResolution = shownHalf = cascades.halfResolution;
+
+				}
 
 				if ( ++ frames % 30 === 0 ) {
 
@@ -591,7 +622,8 @@
 					const full = probes.some( ( count, n ) => count >= cascades.capacities[ n ] ) ? ' (full: probes are dropped)' : '';
 					const bias = cascades.lodBias > 0 ? `, levels of detail ${ cascades.lodBias.toFixed( 2 ) } octaves coarser to fit` : '';
 					const target = cascades.adaptiveQuality ? ` for ${ ( 1000 / cascades.activeTargetFrameTime ).toFixed( 0 ) } FPS` : '';
-					status.textContent = `quality ${ cascades.quality.toFixed( 2 ) }${ target }, probes per cascade: ${ probes.join( ', ' ) }${ full }${ bias }, ${ cascades.newProbes } new, ${ ( cascades.memory / 2 ** 20 ).toFixed( 0 ) } MB. GPU ms: ${ stages }, total ${ total.toFixed( 2 ) }`;
+					const half = cascades.halfResolution ? ' at half resolution' : '';
+					status.textContent = `quality ${ cascades.quality.toFixed( 2 ) }${ half }${ target }, probes per cascade: ${ probes.join( ', ' ) }${ full }${ bias }, ${ cascades.newProbes } new, ${ ( cascades.memory / 2 ** 20 ).toFixed( 0 ) } MB. GPU ms: ${ stages }, total ${ total.toFixed( 2 ) }`;
 
 				}
 
