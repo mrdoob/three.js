@@ -199,8 +199,8 @@ class LDrawUtils {
 
 		}
 
-		mergedObject.userData.constructionStep = 0;
-		mergedObject.userData.numConstructionSteps = 1;
+		mergedObject.userData.buildingStep = 0;
+		mergedObject.userData.numBuildingSteps = 1;
 
 		return mergedObject;
 
