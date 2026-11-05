@@ -62,7 +62,7 @@
 				view: 'Lit',
 				rays: '1 per 4 pixels',
 				traa: false,
-				adaptiveQuality: '60 FPS',
+				adaptiveQuality: 'Auto',
 				quality: 1,
 				secondary: true,
 				smoothing: 0.97,
@@ -74,7 +74,7 @@
 			};
 
 			const rayStrides = { '1 per 4 pixels': 2, '1 per pixel': 1 };
-			const frameRates = { 'Off': 0, '30 FPS': 30, '60 FPS': 60, '120 FPS': 120 };
+			const frameRates = { 'Auto': 0, '30 FPS': 30, '60 FPS': 60, '120 FPS': 120, 'Off': null };
 			const views = { 'Lit': 0, 'Indirect': 1, 'Irradiance': 2, 'Probes': 3, 'Levels': 4 };
 			const scenes = { 'Sponza': createSponza, 'Courtyard': createCourtyard, 'Cornell Box': () => createCornellBox( 'panel' ), 'Cornell Box (Rect Area Light)': () => createCornellBox( 'rect' ), 'Cornell Box (Spot Light)': () => createCornellBox( 'spot' ) };
 
@@ -259,10 +259,11 @@
 
 			function updateQuality() {
 
-				// the quality adapts to the frame rate, or is fixed
+				// the quality adapts to the frame rate of the display, or to a given one, or is fixed
 
 				const frameRate = frameRates[ params.adaptiveQuality ];
 
+				cascades.adaptiveQuality = frameRate !== null;
 				cascades.targetFrameTime = frameRate > 0 ? 1000 / frameRate : 0;
 				cascades.quality = params.quality;
 
@@ -581,7 +582,7 @@
 				cascades.update( renderer, scene, camera );
 				renderPipeline.render();
 
-				if ( cascades.targetFrameTime > 0 ) params.quality = shownQuality = Math.round( cascades.quality * 100 ) / 100;
+				if ( cascades.adaptiveQuality ) params.quality = shownQuality = Math.round( cascades.quality * 100 ) / 100;
 
 				if ( ++ frames % 30 === 0 ) {
 
@@ -593,7 +594,8 @@
 					lastTimings = timings;
 					const full = probes.some( ( count, n ) => count >= cascades.capacities[ n ] ) ? ' (full: probes are dropped)' : '';
 					const bias = cascades.lodBias > 0 ? `, levels of detail ${ cascades.lodBias.toFixed( 2 ) } octaves coarser to fit` : '';
-					status.textContent = `quality ${ cascades.quality.toFixed( 2 ) }, probes per cascade: ${ probes.join( ', ' ) }${ full }${ bias }, ${ cascades.newProbes } new, ${ ( cascades.memory / 2 ** 20 ).toFixed( 0 ) } MB. GPU ms: ${ stages }, total ${ total.toFixed( 2 ) }`;
+					const target = cascades.adaptiveQuality ? ` for ${ ( 1000 / cascades.activeTargetFrameTime ).toFixed( 0 ) } FPS` : '';
+					status.textContent = `quality ${ cascades.quality.toFixed( 2 ) }${ target }, probes per cascade: ${ probes.join( ', ' ) }${ full }${ bias }, ${ cascades.newProbes } new, ${ ( cascades.memory / 2 ** 20 ).toFixed( 0 ) } MB. GPU ms: ${ stages }, total ${ total.toFixed( 2 ) }`;
 
 				}
 

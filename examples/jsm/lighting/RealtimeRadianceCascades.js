@@ -52,6 +52,10 @@ const MAX_LIGHTS = 256;
 
 const LIGHT_SHARE = 0.1;
 
+// common refresh rates of displays, and of browsers that throttle the animation loop
+
+const REFRESH_RATES = [ 24, 30, 40, 48, 50, 60, 72, 75, 90, 100, 120, 144, 165, 180, 240 ];
+
 const _position = /*@__PURE__*/ new Vector3();
 const _direction = /*@__PURE__*/ new Vector3();
 const _rotation = /*@__PURE__*/ new Matrix4();
@@ -149,9 +153,10 @@ class RealtimeRadianceCascades {
 	 * @param {boolean} [options.useShadowMap=true] - Whether the hits read the light of the sun from its shadow map, where the map
 	 * covers them, instead of tracing a shadow ray. The sun must cast shadows.
 	 * @param {number} [options.quality=1] - The share of the rays and the fineness of the probes, from 0 to 1, see `quality`.
-	 * @param {number} [options.targetFrameTime=0] - The frame time in milliseconds that `quality` adapts to, or 0 for a fixed quality.
+	 * @param {boolean} [options.adaptiveQuality=false] - Whether `quality` adapts to the frame time, see `adaptiveQuality`.
+	 * @param {number} [options.targetFrameTime=0] - The frame time in milliseconds that `quality` adapts to, or 0 for the display's.
 	 */
-	constructor( { spacing = 0.0625, levelDistance = 4, levels = 16, blendingRadius = 1.1, cascades = 4, directions = 4, maxProbes = 32768, rayStride = 1, secondary = true, qualityDecay = 0.97, minDirectionWeight = 2, useQualityWeight = true, maxLifetime = 1, secondaryLifetime = 10, orientations = false, maxRadiance = 500, adaptiveLOD = true, velocity = false, useShadowMap = true, quality = 1, targetFrameTime = 0 } = {} ) {
+	constructor( { spacing = 0.0625, levelDistance = 4, levels = 16, blendingRadius = 1.1, cascades = 4, directions = 4, maxProbes = 32768, rayStride = 1, secondary = true, qualityDecay = 0.97, minDirectionWeight = 2, useQualityWeight = true, maxLifetime = 1, secondaryLifetime = 10, orientations = false, maxRadiance = 500, adaptiveLOD = true, velocity = false, useShadowMap = true, quality = 1, adaptiveQuality = false, targetFrameTime = 0 } = {} ) {
 
 		this._blendingOctaves = uniform( 0 );
 		this._maxLifetime = uniform( 1, 'uint' );
@@ -191,7 +196,7 @@ class RealtimeRadianceCascades {
 		 * `rayStride * 2 ** ( 2 * ( 1 - quality ) )` pixels traces a ray, so a sixteenth as many rays at 0, and the
 		 * levels of detail are `1 - quality` octaves coarser, as with `lodBias`, so a quarter as many probes. The
 		 * tracing costs in proportion to the rays and most other passes to the probes. Lower qualities are noisier
-		 * and blurrier, and the light takes longer to settle. With `targetFrameTime`, it adapts.
+		 * and blurrier, and the light takes longer to settle. With `adaptiveQuality`, it adapts.
 		 *
 		 * @type {number}
 		 * @default 1
@@ -199,17 +204,39 @@ class RealtimeRadianceCascades {
 		this.quality = quality;
 
 		/**
-		 * The frame time in milliseconds that `quality` adapts to, e.g. `1000 / 60`, or 0 for a fixed `quality`. It
-		 * measures the time between the calls of `update()` over a quarter of a second: the quality falls while the
-		 * frames take longer, by more the longer they take, and rises while they do not, slowly back to the quality at
-		 * which they last took longer. If lowering it by 0.2 did not shorten them, it compares them back at the
-		 * quality above: if lowering it does not shorten them, because something else limits them, e.g. the display
-		 * or the CPU, it stays there for a while.
+		 * Whether `quality` adapts to the frame time, see `targetFrameTime`. It measures the frames of `update()` over a
+		 * quarter of a second, by the timestamps of the animation frames and by when the GPU finishes them, since a
+		 * browser may run the animation loop faster than the GPU, showing only some of its frames: the quality falls while the frames take longer than the target, by
+		 * more the longer they take, and rises while they do not, slowly back to the quality at which they last took
+		 * longer. If lowering it by 0.2 did not shorten them, it compares them back at the quality above: if they are
+		 * not longer there, something else limits them, e.g. the display or the CPU, and it stays there for a while.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.adaptiveQuality = adaptiveQuality;
+
+		/**
+		 * The frame time in milliseconds that `quality` adapts to, e.g. `1000 / 60`, or 0 for the display's: the
+		 * timestamps of the animation frames step by whole frame times of the display, at first taken as 60 Hz, and
+		 * the shortest one that the steps show is the target. While even quality 0 takes longer, the target is a
+		 * multiple of it, up to the time of 30 Hz. While the frames take longer however low the quality, e.g. because
+		 * the browser runs the animation loop at 30 Hz in a low power mode, the target is their time, for a while. See
+		 * `activeTargetFrameTime`.
 		 *
 		 * @type {number}
 		 * @default 0
 		 */
 		this.targetFrameTime = targetFrameTime;
+
+		/**
+		 * The frame time in milliseconds that `quality` adapts to at the moment, see `targetFrameTime`.
+		 *
+		 * @type {number}
+		 * @readonly
+		 */
+		this.activeTargetFrameTime = targetFrameTime > 0 ? targetFrameTime : 1000 / 60;
+
 
 		/**
 		 * The factor of the interval lengths between cascades.
@@ -359,6 +386,16 @@ class RealtimeRadianceCascades {
 		this._holdTime = 0;
 		this._adaptAfter = 0;
 		this._skipFrames = 5;
+		this._lastStamp = null;
+		this._stampedAt = - Infinity;
+		this._stampPending = false;
+		this._fences = [];
+		this._fencePending = false;
+		this._gpuFrameTime = 0;
+		this._displayTime = 1000 / 60;
+		this._divisor = 1;
+		this._capTime = 0;
+		this._capUntil = 0;
 
 		this._applyChanges();
 
@@ -786,6 +823,7 @@ class RealtimeRadianceCascades {
 		}
 
 		if ( this.adaptiveLOD ) this._adaptLOD( renderer );
+		if ( this.adaptiveQuality ) this._readFence( renderer );
 
 	}
 
@@ -827,23 +865,50 @@ class RealtimeRadianceCascades {
 	}
 
 	/**
-	 * Adapts `quality` to `targetFrameTime` by the mean time between the last calls of `update()`.
+	 * Adapts `quality` to the target frame time by the mean time between the last calls of `update()`, see
+	 * `adaptiveQuality` and `targetFrameTime`.
 	 *
 	 * @private
 	 */
 	_adaptQuality() {
 
 		const now = performance.now();
-		const time = now - ( this._lastUpdate ?? now );
+
+		if ( this.adaptiveQuality !== true ) {
+
+			this._lastUpdate = this._lastStamp = null;
+			return;
+
+		}
+
+		// the frame times from the timestamps of the animation frames, which step by whole frame times of the display,
+		// from a callback in the next frame. Without them, e.g. in XR, from the time between the calls of update()
+
+		if ( typeof requestAnimationFrame === 'function' && this._stampPending === false ) {
+
+			this._stampPending = true;
+
+			requestAnimationFrame( ( stamp ) => {
+
+				this._stampPending = false;
+				if ( this._lastStamp !== null ) this._addFrameTime( stamp - this._lastStamp );
+				this._lastStamp = stamp;
+				this._stampedAt = performance.now();
+
+			} );
+
+		}
+
+		if ( now - this._stampedAt > 250 && this._lastUpdate !== null ) this._addFrameTime( now - this._lastUpdate );
 
 		this._lastUpdate = now;
 
-		if ( ! ( this.targetFrameTime > 0 ) || now < this._adaptAfter ) return;
+		if ( now < this._adaptAfter ) {
 
-		// a pause, e.g. a hidden page or a new scene, starts the measurement again
+			this._frameTimes.length = 0;
+			return;
 
-		if ( time > 250 ) this._frameTimes.length = 0;
-		else if ( time > 0 ) this._frameTimes.push( time );
+		}
 
 		// the frames of a quarter of a second, half a second for a window back up, at least 8, without the first ones
 		// after a change: 5 after a step down, which are still in flight, and 12 after a step up, whose new finer probes
@@ -854,17 +919,41 @@ class RealtimeRadianceCascades {
 
 		if ( times.length < 8 || span < ( this._probe !== null ? 500 : 250 ) ) return;
 
-		// the mean, since without vsync the frames can alternate between fast ones and ones that wait for the GPU
+		// the mean, since without vsync the frames can alternate between fast ones and ones that wait for the GPU, or
+		// the GPU's frame time if longer: the time between the reads that wait for it, over the frames between them
 
-		const frameTime = span / times.length;
-		const target = this.targetFrameTime;
+		const fences = this._fences.filter( ( [ frame ] ) => frame >= this._frame - times.length );
+
+		this._gpuFrameTime = fences.length > 1 ? ( fences[ fences.length - 1 ][ 1 ] - fences[ 0 ][ 1 ] ) / ( fences[ fences.length - 1 ][ 0 ] - fences[ 0 ][ 0 ] ) : 0;
+		this._fences = this._fences.slice( - 1 );
+
+		const frameTime = Math.max( span / times.length, this._gpuFrameTime );
 		const quality = this.quality;
+		const auto = ! ( this.targetFrameTime > 0 );
 
 		this._frameTimes.length = 0;
 
+		// the frame time of the display: the steps of the timestamps show it if shorter, or else a quarter of the
+		// frames that come faster than it
+
+		if ( auto ) {
+
+			const display = displayFrameTime( times ) ?? refreshTime( times.sort( ( a, b ) => a - b )[ times.length >> 2 ] );
+
+			if ( display < this._displayTime * 0.95 ) {
+
+				this._displayTime = Math.max( display, 1000 / 240 );
+				this._divisor = 1;
+
+			}
+
+		}
+
+		const target = this.activeTargetFrameTime = auto ? Math.max( this._displayTime * this._divisor, now < this._capUntil ? this._capTime : 0 ) : this.targetFrameTime;
+
 		// a window back up after steps down lowered the quality by 0.2 but did not shorten the frames by 15%: unless
 		// they take 15% longer there, the quality does not limit them, something else does, e.g. the display or the
-		// CPU. It stays up for 10 seconds, twice as long each time
+		// CPU. It stays up for 10 seconds, twice as long each time, and the display's target is their time meanwhile
 
 		if ( this._probe !== null ) {
 
@@ -878,6 +967,18 @@ class RealtimeRadianceCascades {
 				this._qualityLimit = quality;
 				this._holdTime = Math.min( this._holdTime * 2 || 10000, 160000 );
 				this._holdUntil = now + this._holdTime;
+
+				// a cap below the display's frame rate, e.g. a low power mode, if the timestamps step by it frame after frame,
+				// 24 Hz and up
+
+				const cap = steadyFrameTime( times );
+
+				if ( cap !== null && cap > this._displayTime * 1.05 && cap <= 1000 / 24 ) {
+
+					this._capTime = cap;
+					this._capUntil = this._holdUntil;
+
+				}
 
 			} else {
 
@@ -909,6 +1010,16 @@ class RealtimeRadianceCascades {
 
 			}
 
+			// even quality 0 is too slow for the display's frame time: half the frame rate, down to 30 Hz
+
+			if ( quality === 0 ) {
+
+				if ( auto && this._displayTime * this._divisor * 2 <= 1000 / 30 * 1.01 ) this._divisor *= 2;
+
+				return;
+
+			}
+
 			// down by the octaves that the frames take longer than the target, about 1.5 per quality between 1 and 0,
 			// at most by half
 
@@ -920,6 +1031,10 @@ class RealtimeRadianceCascades {
 			this._skipFrames = 5;
 
 		} else if ( frameTime <= target * 1.05 ) {
+
+			// at full quality with half the frame time, the display's full frame rate again
+
+			if ( this._divisor > 1 && quality === 1 && frameTime <= target * 0.55 ) this._divisor /= 2;
 
 			// up while the frames are fast enough, within the jitter of the display, faster with room to spare, and
 			// only slowly back to where they last were not
@@ -933,6 +1048,50 @@ class RealtimeRadianceCascades {
 			this._skipFrames = this.quality > quality ? 12 : 5;
 
 		}
+
+	}
+
+	/**
+	 * Adds the time of a frame to the measurement of the adaptive quality, or starts it again after a pause, e.g. a
+	 * hidden page or a new scene.
+	 *
+	 * @private
+	 * @param {number} time - The frame time in milliseconds.
+	 */
+	_addFrameTime( time ) {
+
+		if ( time > 250 ) this._frameTimes.length = 0;
+		else if ( time > 0 ) this._frameTimes.push( time );
+
+	}
+
+	/**
+	 * Reads a word after the passes of the frame, one read at a time, and records when the GPU finished them, for the
+	 * adaptive quality.
+	 *
+	 * @private
+	 * @param {WebGPURenderer} renderer - The renderer.
+	 */
+	_readFence( renderer ) {
+
+		if ( this._fencePending ) return;
+
+		this._fencePending = true;
+
+		const frame = this._frame;
+		const atomics = this._atomics;
+
+		renderer.getArrayBufferAsync( atomics.value, null, 0, 4 ).then( () => {
+
+			this._fencePending = false;
+
+			if ( this._atomics === atomics && this._fences.length < 1000 ) this._fences.push( [ frame, performance.now() ] );
+
+		} ).catch( () => {
+
+			this._fencePending = false;
+
+		} );
 
 	}
 
@@ -3554,6 +3713,68 @@ function octahedralTexel( texel ) {
 	} );
 
 	return uint( y.mul( IRRADIANCE_SIZE ).add( x ) );
+
+}
+
+/**
+ * Returns the longest frame time of a common refresh rate that 85% of some frame times are whole multiples of, give
+ * or take a millisecond or 5%, as the timestamps of animation frames are, or null.
+ *
+ * @private
+ * @param {Array<number>} times - The frame times in milliseconds.
+ * @return {?number} The frame time of the display.
+ */
+function displayFrameTime( times ) {
+
+	for ( const rate of REFRESH_RATES ) {
+
+		const period = 1000 / rate;
+		const tolerance = Math.max( 1, period * 0.05 );
+		const fits = times.filter( ( time ) => time > period - tolerance && Math.abs( time - Math.round( time / period ) * period ) < tolerance ).length;
+
+		if ( fits >= times.length * 0.85 ) return period;
+
+	}
+
+	return null;
+
+}
+
+/**
+ * Returns the frame time of a common refresh rate that 85% of some frame times equal, give or take a millisecond or
+ * 5%, or null.
+ *
+ * @private
+ * @param {Array<number>} times - The frame times in milliseconds.
+ * @return {?number} The frame time.
+ */
+function steadyFrameTime( times ) {
+
+	for ( const rate of REFRESH_RATES ) {
+
+		const period = 1000 / rate;
+		const tolerance = Math.max( 1, period * 0.05 );
+
+		if ( times.filter( ( time ) => Math.abs( time - period ) < tolerance ).length >= times.length * 0.85 ) return period;
+
+	}
+
+	return null;
+
+}
+
+/**
+ * Returns the frame time of the common refresh rate within 8% of a frame time, or the frame time.
+ *
+ * @private
+ * @param {number} time - The frame time in milliseconds.
+ * @return {number} The frame time.
+ */
+function refreshTime( time ) {
+
+	for ( const rate of REFRESH_RATES ) if ( Math.abs( 1000 / rate - time ) < time * 0.08 ) return 1000 / rate;
+
+	return time;
 
 }
 
