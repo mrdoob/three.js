@@ -73,9 +73,9 @@
 
 			const rayStrides = { '1 per 4 pixels': 2, '1 per pixel': 1 };
 			const views = { 'Lit': 0, 'Indirect': 1, 'Irradiance': 2, 'Probes': 3, 'Levels': 4 };
-			const scenes = { 'Sponza': createSponza, 'Courtyard': createCourtyard, 'Cornell Box': () => createCornellBox( false ), 'Cornell Box (Spot Light)': () => createCornellBox( true ) };
+			const scenes = { 'Sponza': createSponza, 'Courtyard': createCourtyard, 'Cornell Box': () => createCornellBox( 'panel' ), 'Cornell Box (Rect Area Light)': () => createCornellBox( 'rect' ), 'Cornell Box (Spot Light)': () => createCornellBox( 'spot' ) };
 
-			let sponza = null, sky = null;
+			let sponza = null, sky = null, rectAreaLights = null;
 
 			init();
 
@@ -283,11 +283,11 @@
 
 			}
 
-			function createCornellBox( spotLight ) {
+			async function createCornellBox( light ) {
 
 				// the Cornell Box of webgpu_lightmap_baking, lit only by the emissive panel, whose light reaches the
-				// surfaces through the cascades, or by a spot light, which lights them directly and bounces through the
-				// cascades. The front wall faces inwards, the camera sees through its back
+				// surfaces through the cascades, or by a rect area light of the same light or a spot light, which light
+				// them directly and bounce through the cascades. The front wall faces inwards, the camera sees through its back
 
 				const root = new THREE.Group();
 
@@ -320,7 +320,29 @@
 				sphere.position.set( 1, 0.65, 0.5 );
 				root.add( sphere );
 
-				if ( spotLight ) {
+				if ( light === 'rect' ) {
+
+					// the textures of the direct light of rect area lights, the rays do not need them
+
+					rectAreaLights ??= Promise.all( [ import( 'three/addons/lights/RectAreaLightTexturesLib.js' ), import( 'three/addons/helpers/RectAreaLightHelper.js' ) ] ).then( ( [ { RectAreaLightTexturesLib }, { RectAreaLightHelper } ] ) => {
+
+						THREE.RectAreaLightNode.setLTC( RectAreaLightTexturesLib.init() );
+
+						return RectAreaLightHelper;
+
+					} );
+
+					const RectAreaLightHelper = await rectAreaLights;
+
+					// it shines down, and the rays leave out its helper
+
+					const rect = new THREE.RectAreaLight( 0xffffff, 20, 2, 2 );
+					rect.rotation.x = - Math.PI / 2;
+					rect.position.y = 4.99;
+					rect.add( new RectAreaLightHelper( rect ) );
+					root.add( rect );
+
+				} else if ( light === 'spot' ) {
 
 					const spot = new THREE.SpotLight( 0xffffff, 80, 0, Math.PI / 6, 0.5 );
 					spot.position.set( 0, 4.9, 0 );

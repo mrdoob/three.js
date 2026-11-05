@@ -1,5 +1,5 @@
 import { BackSide, BufferAttribute, BufferGeometry, DepthTexture, EquirectangularReflectionMapping, EquirectangularRefractionMapping, FloatType, FrontSide, HalfFloatType, Matrix4, NodeMaterial, QuadMesh, RenderTarget, StorageBufferAttribute, Vector2, Vector3, Vector4 } from 'three/webgpu';
-import { Break, Fn, If, Loop, abs, atan, atomicAdd, atomicLoad, atomicMax, atomicMin, atomicStore, cameraPosition, ceil, clamp, cos, cross, diffuseColor, dot, equirectUV, exp2, float, floatBitsToUint, floor, fract, getDistanceAttenuation, getViewPosition, hash, instanceIndex, int, isBackgroundDepth, ivec2, ivec3, ivec4, log2, max, min, mix, mrt, normalWorldGeometry, normalize, output, pmremTexture, positionWorld, screenUV, select, sin, smoothstep, sqrt, step, storage, texture, uint, uintBitsToFloat, uniform, uniformArray, uv, uvec3, vec2, vec3, vec4, velocity } from 'three/tsl';
+import { Break, Fn, If, LTC_Evaluate, Loop, abs, atan, atomicAdd, atomicLoad, atomicMax, atomicMin, atomicStore, cameraPosition, ceil, clamp, cos, cross, diffuseColor, dot, equirectUV, exp2, float, floatBitsToUint, floor, fract, getDistanceAttenuation, getViewPosition, hash, instanceIndex, int, isBackgroundDepth, ivec2, ivec3, ivec4, log2, mat3, max, min, mix, mrt, normalWorldGeometry, normalize, output, pmremTexture, positionWorld, screenUV, select, sin, smoothstep, sqrt, step, storage, texture, uint, uintBitsToFloat, uniform, uniformArray, uv, uvec3, vec2, vec3, vec4, velocity } from 'three/tsl';
 
 import { MeshBVH, SAH } from 'three-mesh-bvh';
 import { BVHComputeData, rayIntersectionResultStruct, rayStruct, wgslTagFn } from 'three-mesh-bvh/webgpu';
@@ -44,12 +44,13 @@ const IRRADIANCE_TEXELS = IRRADIANCE_SIZE * IRRADIANCE_SIZE;
 
 const ALLOCATED = 0, FREED = 1, PROBES = 2;
 
-// the most point and spot lights that light the hits, every hit weighs all of them
+// the most point and spot lights, and the most rect area lights, that light the hits: every hit weighs all of them
 
 const MAX_LIGHTS = 256;
 
 const _position = /*@__PURE__*/ new Vector3();
 const _direction = /*@__PURE__*/ new Vector3();
+const _rotation = /*@__PURE__*/ new Matrix4();
 const _entry = /*@__PURE__*/ new Float32Array( 8 );
 const _size = /*@__PURE__*/ new Vector2();
 
@@ -72,8 +73,8 @@ const _size = /*@__PURE__*/ new Vector2();
  * - Every pixel traces a ray through a {@link https://github.com/gkjohnson/three-mesh-bvh three-mesh-bvh} BVH of the scene, in a direction of an
  * R2 sequence over the rays of its probes, and every hit of the last frame traces a secondary ray. A hit adds
  * its emission, the light of the sun, which a shadow ray or the shadow map of the sun (`useShadowMap`) occludes,
- * the light of one of the point and spot lights, picked in proportion to its light at the hit, which a shadow ray
- * occludes, and the irradiance of its secondary probe ("infinite bounces"). A ray adds its radiance to the cascade whose interval holds its hit distance, and its
+ * the light of one of the point, spot and rect area lights, picked in proportion to its light at the hit, which a
+ * shadow ray occludes, and the irradiance of its secondary probe ("infinite bounces"). A ray adds its radiance to the cascade whose interval holds its hit distance, and its
  * transmittance to the cascades below ("ray splitting").
  * - The bins sum their rays, and decay their sums by `qualityDecay` every frame. The probes count their rays
  * likewise ("quality"), which weighs them in the merge and the final gather.
@@ -93,11 +94,12 @@ const _size = /*@__PURE__*/ new Vector2();
  * and `getIrradianceNode()` again after the passes were rebuilt.
  *
  * The geometry of the scene is static, see `setScene()` and `setSceneData()`. The camera, the lights and the colors
- * of the materials can change every frame: the sun, see `sun`, and the visible point and spot lights of the scene
- * of `update()`, at most 256. The direct light of the analytic lights is left to the materials of the G-buffer, the
- * cascades add its bounces; emissive surfaces and the sky, an equirectangular or cube texture in `scene.background`,
- * light the scene only through the cascades. The rays see the colors and the emissive colors of the materials, not
- * their texture maps, and the shadow rays see every mesh, so a light inside a closed mesh does not bounce.
+ * of the materials can change every frame: the sun, see `sun`, and the visible point, spot and rect area lights of
+ * the scene of `update()`, at most 256 of each. The direct light of the analytic lights is left to the materials of
+ * the G-buffer, the cascades add its bounces; emissive surfaces and the sky, an equirectangular or cube texture in
+ * `scene.background`, light the scene only through the cascades. The rays see the colors and the emissive colors of
+ * the materials, not their texture maps. Meshes parented to a light, e.g. its helper or bulb, are left out, and the
+ * shadow rays see every other mesh, so a light inside a closed mesh does not bounce.
  *
  * This class can only be used with {@link WebGPURenderer} and a WebGPU backend.
  *
@@ -294,6 +296,9 @@ class RealtimeRadianceCascades {
 		this._lights = null;
 		this._lightCount = uniform( 0, 'uint' );
 		this._sceneLights = [];
+		this._rectLights = null;
+		this._rectLightCount = uniform( 0, 'uint' );
+		this._sceneRectLights = [];
 		this._lodBias = uniform( 0 );
 		this._readingCounts = false;
 		this._screenWidth = uniform( 1, 'uint' );
@@ -1218,6 +1223,10 @@ class RealtimeRadianceCascades {
 
 			if ( object.isMesh !== true || object.isSkinnedMesh === true || object.isInstancedMesh === true || object.isBatchedMesh === true ) return;
 
+			// the meshes of a light, e.g. its helper or bulb, would add its light again and occlude its shadow rays
+
+			for ( let parent = object.parent; parent !== null; parent = parent.parent ) if ( parent.isLight === true ) return;
+
 			const geometry = object.geometry;
 			const position = geometry.getAttribute( 'position' );
 			const index = geometry.getIndex();
@@ -1486,8 +1495,29 @@ class RealtimeRadianceCascades {
 	}
 
 	/**
-	 * Copies the visible point and spot lights into the light uniforms, and the sun, see `sun`, into the sun
-	 * uniforms, with its shadow map for `useShadowMap`.
+	 * Returns a uniform array with room for some lights, three vectors each: the given one if it has room, else a
+	 * larger one, which rebuilds the passes. The room only grows, so that lights that come and go do not rebuild them.
+	 *
+	 * @private
+	 * @param {?UniformArrayNode} lights - The uniform array of the lights, or null.
+	 * @param {number} count - The lights.
+	 * @return {?UniformArrayNode} The uniform array, or null without lights.
+	 */
+	_fitLights( lights, count ) {
+
+		if ( count <= ( lights !== null ? lights.array.length / 3 : 0 ) ) return lights;
+
+		this._disposeKernels( false );
+
+		const capacity = Math.min( 2 ** Math.ceil( Math.log2( count ) ), MAX_LIGHTS );
+
+		return uniformArray( Array.from( { length: capacity * 3 }, () => new Vector4() ), 'vec4' );
+
+	}
+
+	/**
+	 * Copies the visible point, spot and rect area lights into the light uniforms, and the sun, see `sun`, into the
+	 * sun uniforms, with its shadow map for `useShadowMap`.
 	 *
 	 * @private
 	 * @param {WebGPURenderer} renderer - The renderer.
@@ -1497,27 +1527,22 @@ class RealtimeRadianceCascades {
 	_updateLights( renderer, scene ) {
 
 		const lights = this._sceneLights;
+		const rectLights = this._sceneRectLights;
 		let sun = this.sun ?? null;
 
 		lights.length = 0;
+		rectLights.length = 0;
 
 		scene.traverseVisible( ( object ) => {
 
 			if ( sun === null && this.sun === undefined && object.isDirectionalLight === true ) sun = object;
 			if ( ( object.isPointLight === true || object.isSpotLight === true ) && lights.length < MAX_LIGHTS ) lights.push( object );
+			if ( object.isRectAreaLight === true && rectLights.length < MAX_LIGHTS ) rectLights.push( object );
 
 		} );
 
-		// the room for the lights only grows, so that lights that come and go do not rebuild the passes
-
-		if ( lights.length > ( this._lights !== null ? this._lights.array.length / 3 : 0 ) ) {
-
-			const capacity = Math.min( 2 ** Math.ceil( Math.log2( lights.length ) ), MAX_LIGHTS );
-
-			this._lights = uniformArray( Array.from( { length: capacity * 3 }, () => new Vector4() ), 'vec4' );
-			this._disposeKernels( false );
-
-		}
+		this._lights = this._fitLights( this._lights, lights.length );
+		this._rectLights = this._fitLights( this._rectLights, rectLights.length );
 
 		// three vectors per light: its position and cut-off distance, its color times its intensity and its decay, and
 		// the axis of a spot light and the cosine of its cone, scaled so that the dot product of the axis and the
@@ -1551,7 +1576,29 @@ class RealtimeRadianceCascades {
 
 		}
 
+		// three vectors per rect area light: its center, half width and half height, which it shines away from on the
+		// side of its local -z, with its color times its intensity in their fourth components
+
+		for ( let i = 0; i < rectLights.length; i ++ ) {
+
+			const light = rectLights[ i ];
+			const array = this._rectLights.array;
+			const { r, g, b } = light.color;
+
+			_rotation.extractRotation( light.matrixWorld );
+			_position.setFromMatrixPosition( light.matrixWorld );
+			array[ i * 3 ].set( _position.x, _position.y, _position.z, r * light.intensity );
+
+			_direction.set( light.width * 0.5, 0, 0 ).applyMatrix4( _rotation );
+			array[ i * 3 + 1 ].set( _direction.x, _direction.y, _direction.z, g * light.intensity );
+
+			_direction.set( 0, light.height * 0.5, 0 ).applyMatrix4( _rotation );
+			array[ i * 3 + 2 ].set( _direction.x, _direction.y, _direction.z, b * light.intensity );
+
+		}
+
 		this._lightCount.value = lights.length;
+		this._rectLightCount.value = rectLights.length;
 
 		if ( sun === null ) {
 
@@ -2851,7 +2898,7 @@ class RealtimeRadianceCascades {
 
 	/**
 	 * The radiance that leaves a hit towards the ray: its emission, and its albedo times the light of the
-	 * sun, of the point and spot lights and of its secondary probe (`get_emission()` in chandra).
+	 * sun, of the point, spot and rect area lights and of its secondary probe (`get_emission()` in chandra).
 	 *
 	 * @private
 	 */
@@ -2868,7 +2915,7 @@ class RealtimeRadianceCascades {
 
 		} );
 
-		if ( this._lights !== null ) radiance.addAssign( this._lightRadiance( point, normal, distance ) );
+		if ( this._lights !== null || this._rectLights !== null ) radiance.addAssign( this._lightRadiance( point, normal, distance ) );
 		if ( this.secondary ) radiance.addAssign( this._sampleSecondary( point, normal ) );
 
 		return emission.add( albedo.mul( radiance ) ).mul( facing );
@@ -2876,50 +2923,91 @@ class RealtimeRadianceCascades {
 	}
 
 	/**
-	 * The light of the point and spot lights at a hit, as the radiance that a white diffuse surface reflects, with
-	 * the falloff of three.js: one light picked in proportion to its light there by weighted reservoir sampling,
-	 * whose shadow ray occludes it, over the probability of the pick.
+	 * The light of the point, spot and rect area lights at a hit, as the radiance that a white diffuse surface
+	 * reflects, with the falloff and the form factors of three.js: one light picked in proportion to its light there
+	 * by weighted reservoir sampling, whose shadow ray, to a random point of a rect area light, occludes it, over the
+	 * probability of the pick.
 	 *
 	 * @private
 	 */
 	_lightRadiance( point, normal, distance ) {
 
-		const lights = this._lights;
 		const total = float( 0 ).toVar();
 		const picked = vec4( 0 ).toVar();
 		const toLight = vec4( 0 ).toVar();
 		const seed = floatBitsToUint( point.x ).add( floatBitsToUint( point.y ).mul( 7919 ) ).add( floatBitsToUint( point.z ).mul( 104729 ) ).add( this._frameNode.mul( 31337 ) ).toVar();
 
-		Loop( { start: uint( 0 ), end: this._lightCount, type: 'uint', condition: '<' }, ( { i } ) => {
+		// every light with a weight replaces the pick so far with the probability of its share of the weights
 
-			const position = lights.element( i.mul( 3 ) );
-			const color = lights.element( i.mul( 3 ).add( 1 ) );
-			const cone = lights.element( i.mul( 3 ).add( 2 ) );
+		const consider = ( index, light, target ) => {
 
-			const vector = position.xyz.sub( point ).toVar();
-			const lightDistance = vector.length().toVar();
-			const direction = vector.div( lightDistance.max( 1e-6 ) ).toVar();
-			const attenuation = getDistanceAttenuation( { lightDistance, cutoffDistance: position.w, decayExponent: color.w } );
-			const spot = smoothstep( 0, 1, dot( direction.negate(), cone.xyz ).sub( cone.w ) );
-			const light = color.rgb.mul( attenuation.mul( spot ).mul( dot( normal, direction ).max( 0 ) ) ).toVar();
 			const weight = light.dot( vec3( 1 ) ).toVar();
-
-			// every light with a weight replaces the pick so far with the probability of its share of the weights
 
 			If( weight.greaterThan( 0 ), () => {
 
 				total.addAssign( weight );
 
-				If( hash( seed.add( i ) ).mul( total ).lessThan( weight ), () => {
+				If( hash( seed.add( index ) ).mul( total ).lessThan( weight ), () => {
+
+					const vector = target().sub( point ).toVar();
 
 					picked.assign( vec4( light, weight ) );
-					toLight.assign( vec4( direction, lightDistance ) );
+					toLight.assign( vec4( vector.normalize(), vector.length() ) );
 
 				} );
 
 			} );
 
-		} );
+		};
+
+		if ( this._lights !== null ) {
+
+			const lights = this._lights;
+
+			Loop( { start: uint( 0 ), end: this._lightCount, type: 'uint', condition: '<' }, ( { i } ) => {
+
+				const position = lights.element( i.mul( 3 ) );
+				const color = lights.element( i.mul( 3 ).add( 1 ) );
+				const cone = lights.element( i.mul( 3 ).add( 2 ) );
+
+				const vector = position.xyz.sub( point ).toVar();
+				const lightDistance = vector.length().toVar();
+				const direction = vector.div( lightDistance.max( 1e-6 ) ).toVar();
+				const attenuation = getDistanceAttenuation( { lightDistance, cutoffDistance: position.w, decayExponent: color.w } );
+				const spot = smoothstep( 0, 1, dot( direction.negate(), cone.xyz ).sub( cone.w ) );
+
+				consider( i, color.rgb.mul( attenuation.mul( spot ).mul( dot( normal, direction ).max( 0 ) ).div( Math.PI ) ), () => position.xyz );
+
+			} );
+
+		}
+
+		if ( this._rectLights !== null ) {
+
+			const lights = this._rectLights;
+			const random = vec2( hash( seed.bitXor( uint( 0x5bd1e995 ) ) ), hash( seed.bitXor( uint( 0x1b873593 ) ) ) ).mul( 2 ).sub( 1 ).toVar();
+
+			// any direction but the normal sets up the frame of the form factor
+
+			const frame = select( abs( normal.y ).lessThan( 0.9 ), vec3( 0, 1, 0 ), vec3( 1, 0, 0 ) );
+
+			Loop( { start: uint( 0 ), end: this._rectLightCount, type: 'uint', condition: '<' }, ( { i } ) => {
+
+				const center = lights.element( i.mul( 3 ) );
+				const halfWidth = lights.element( i.mul( 3 ).add( 1 ) );
+				const halfHeight = lights.element( i.mul( 3 ).add( 2 ) );
+
+				const p0 = center.xyz.add( halfWidth.xyz ).sub( halfHeight.xyz );
+				const p1 = center.xyz.sub( halfWidth.xyz ).sub( halfHeight.xyz );
+				const p2 = center.xyz.sub( halfWidth.xyz ).add( halfHeight.xyz );
+				const p3 = center.xyz.add( halfWidth.xyz ).add( halfHeight.xyz );
+				const formFactor = LTC_Evaluate( { N: normal, V: frame, P: point, mInv: mat3( 1, 0, 0, 0, 1, 0, 0, 0, 1 ), p0, p1, p2, p3 } ).x;
+
+				consider( i.add( MAX_LIGHTS ), vec3( center.w, halfWidth.w, halfHeight.w ).mul( formFactor ), () => center.xyz.add( halfWidth.xyz.mul( random.x ) ).add( halfHeight.xyz.mul( random.y ) ) );
+
+			} );
+
+		}
 
 		const radiance = vec3( 0 ).toVar();
 
@@ -2928,7 +3016,7 @@ class RealtimeRadianceCascades {
 			const origin = point.add( normal.mul( distance.mul( 1e-3 ).add( 1e-3 ) ) );
 			const visibility = this._visibility( origin, toLight.xyz, toLight.w.mul( 0.99 ) );
 
-			radiance.assign( picked.rgb.mul( total.div( picked.w ).mul( visibility ) ).div( Math.PI ) );
+			radiance.assign( picked.rgb.mul( total.div( picked.w ).mul( visibility ) ) );
 
 		} );
 
