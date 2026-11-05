@@ -444,32 +444,6 @@ class SSGINode extends Node {
 		const globalOccludedBitfield = uint( 0 );
 
 		const sampleDepth = ( uv ) => projectionDepth( this.depthNode.sample( uv ).r, this._cameraNear, this._cameraFar );
-
-		const sampleCenterDepth = ( uv ) => {
-
-			// Sidestep the nearest-rounding during depth access for the unjittered center pixel to avoid banding
-
-			const g = this.depthNode.gather().sample( uv );
-			const depth = builder.renderer.reversedDepthBuffer === true ? max( max( g.x, g.y ), max( g.z, g.w ) ) : min( min( g.x, g.y ), min( g.z, g.w ) );
-
-			return projectionDepth( depth, this._cameraNear, this._cameraFar );
-
-		};
-
-		const sampleCenterUV = ( uv ) => {
-
-			const g = this.depthNode.gather().sample( uv );
-			const depth = builder.renderer.reversedDepthBuffer === true ? max( max( g.x, g.y ), max( g.z, g.w ) ) : min( min( g.x, g.y ), min( g.z, g.w ) );
-
-			const size = vec2( textureSize( this.depthNode, 0 ) );
-			// one texel with the nearest depth decides both offsets, also when depths tie ( e.g. on planes facing the camera )
-
-			const offset = g.w.equal( depth ).select( vec2( 0.5, 0.5 ), g.z.equal( depth ).select( vec2( 1.5, 0.5 ), g.y.equal( depth ).select( vec2( 1.5, 1.5 ), vec2( 0.5, 1.5 ) ) ) );
-
-			return uv.mul( size ).sub( 0.5 ).floor().add( offset ).div( size );
-
-		};
-
 		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.sample( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this._cameraProjectionMatrixInverse );
 		const sampleBeauty = ( uv ) => this.beautyNode.sample( uv );
 
@@ -584,12 +558,31 @@ class SSGINode extends Node {
 
 		const gi = Fn( () => {
 
-			const depth = this._resolutionScale.lessThan( 1 ).select( sampleCenterDepth( uvNode ), sampleDepth( uvNode ) ).toConst();
+			const depth = float( 0 ).toVar();
+			const normalUV = uvNode.toVar();
+
+			If( this._resolutionScale.lessThan( 1 ), () => {
+
+				// Use the nearest of the four depth texels around the center to avoid banding and take the normal from the same texel to avoid dark silhouettes
+
+				const g = this.depthNode.gather().sample( uvNode ).toConst();
+				const d = ( builder.renderer.reversedDepthBuffer === true ? max( max( g.x, g.y ), max( g.z, g.w ) ) : min( min( g.x, g.y ), min( g.z, g.w ) ) ).toConst();
+				const size = vec2( textureSize( this.depthNode, 0 ) ).toConst();
+				const offset = g.w.equal( d ).select( vec2( 0.5, 0.5 ), g.z.equal( d ).select( vec2( 1.5, 0.5 ), g.y.equal( d ).select( vec2( 1.5, 1.5 ), vec2( 0.5, 1.5 ) ) ) ).toConst();
+
+				depth.assign( projectionDepth( d, this._cameraNear, this._cameraFar ) );
+				normalUV.assign( uvNode.mul( size ).sub( 0.5 ).floor().add( offset ).div( size ) );
+
+			} ).Else( () => {
+
+				depth.assign( sampleDepth( uvNode ) );
+
+			} );
 
 			isBackgroundDepth( depth ).discard();
 
 			const viewPosition = getViewPosition( uvNode, depth, this._cameraProjectionMatrixInverse ).toVar();
-			const viewNormal = sampleNormal( this._resolutionScale.lessThan( 1 ).select( sampleCenterUV( uvNode ), uvNode ).toConst() ).toVar();
+			const viewNormal = sampleNormal( normalUV ).toVar();
 			const viewDir = normalize( viewPosition.xyz.negate() ).toVar();
 
 			//
