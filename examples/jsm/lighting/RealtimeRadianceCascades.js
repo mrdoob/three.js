@@ -384,7 +384,6 @@ class RealtimeRadianceCascades {
 		this._rectLightCount = uniform( 0, 'uint' );
 		this._sceneRectLights = [];
 		this._lodBias = uniform( 0 );
-		this._readingCounts = false;
 		this._screenWidth = uniform( 1, 'uint' );
 		this._screenHeight = uniform( 1, 'uint' );
 
@@ -401,7 +400,10 @@ class RealtimeRadianceCascades {
 		this._shadeTexture = new StorageTexture( 1, 1 );
 		this._shadeTexture.type = HalfFloatType;
 		this._shadeTexture.name = 'RealtimeRadianceCascades.irradiance';
-		this._stages = null;
+		this._shadeTexture.generateMipmaps = false;
+		this._passes = null;
+		this._timestampUID = null;
+
 
 		// the state of the adaptive quality, see _adaptQuality()
 
@@ -418,9 +420,8 @@ class RealtimeRadianceCascades {
 		this._stampedAt = - Infinity;
 		this._stampPending = false;
 		this._fences = [];
-		this._fencePending = false;
-		this._fenceReadback = null;
-		this._countsReadback = null;
+		this._reading = false;
+		this._readback = null;
 		this._gpuFrameTime = 0;
 		this._started = false;
 		this._fullTrial = false;
@@ -893,12 +894,12 @@ class RealtimeRadianceCascades {
 
 		this._lodBias.value = this.lodBias + 1 - quality;
 
-		// the passes, in one submission per stage, which also groups them for timestamp queries, see readTimings().
-		// The passes of the pixels and of the rays run over as many threads as they have
+		// the passes of the frame, in one submission. The passes of the pixels and of the rays run over as many threads
+		// as they have
 
-		if ( this._stages === null ) {
+		if ( this._passes === null ) {
 
-			this._stages = this._createStages();
+			this._passes = this._createPasses();
 
 			// the adaptive quality waits for a second for the new passes to compile and the probes to fill
 
@@ -916,55 +917,42 @@ class RealtimeRadianceCascades {
 
 		if ( this.secondary ) frameKernels.gatherSecondary.dispatchSize = frameKernels.traceSecondary.dispatchSize = Math.max( previousRays, 1 );
 
-		const uids = this._uids = {};
+		renderer.compute( this._passes );
 
-		for ( const stage in this._stages ) {
+		if ( renderer.backend.trackTimestamp === true ) this._timestampUID = renderer.backend.getTimestampUID( this._passes );
 
-			renderer.compute( this._stages[ stage ] );
-
-			if ( renderer.backend.trackTimestamp === true ) uids[ stage ] = [ renderer.backend.getTimestampUID( this._stages[ stage ] ) ];
-
-		}
-
-		if ( this.adaptiveLOD ) this._adaptLOD( renderer );
-		if ( this.adaptiveQuality ) this._readFence( renderer );
+		if ( this.adaptiveLOD || this.adaptiveQuality ) this._readCounters( renderer );
 
 	}
 
 	/**
-	 * Returns the passes of a frame in order, grouped by stage.
+	 * Returns the passes of a frame in order.
 	 *
 	 * @private
-	 * @return {Object<string, Array<ComputeNode>>} The passes of the stages.
+	 * @return {Array<ComputeNode>} The passes.
 	 */
-	_createStages() {
+	_createPasses() {
 
 		const kernels = this._kernels;
 		const frameKernels = this._frameKernels;
-		const allocate = [ kernels.clear, frameKernels.gather, frameKernels.gatherSecondary, kernels.keep, kernels.assign[ 0 ] ];
 
-		for ( let n = 1; n < this.cascades; n ++ ) allocate.push( kernels.fill[ n ], kernels.assign[ n ] );
+		// the probes of the pixels and of the hits of the last frame, then the offsets of their rays in the R2 sequence
 
-		// the probes, then the offsets of their rays in the R2 sequence
+		const passes = [ kernels.clear, frameKernels.gather, frameKernels.gatherSecondary, kernels.keep, kernels.assign[ 0 ] ];
 
-		allocate.push( ...kernels.free, frameKernels.count, ...kernels.countUp.slice( 1 ), ...kernels.offsets.slice().reverse() );
+		for ( let n = 1; n < this.cascades; n ++ ) passes.push( kernels.fill[ n ], kernels.assign[ n ] );
 
-		const stages = {
-			allocate,
-			trace: [ frameKernels.traceSecondary, frameKernels.trace ],
-			accumulate: kernels.accumulate.slice(),
-			merge: kernels.merge.slice().reverse(),
-			resolve: [ kernels.irradiance, frameKernels.shade ]
-		};
+		passes.push( ...kernels.free, frameKernels.count, ...kernels.countUp.slice( 1 ), ...kernels.offsets.slice().reverse() );
 
-		for ( const stage in stages ) {
+		// the rays, their light in the probes, the merge of the cascades from the coarsest, and the irradiance
 
-			stages[ stage ] = stages[ stage ].filter( ( kernel ) => kernel );
-			stages[ stage ].name = 'RC.' + stage[ 0 ].toUpperCase() + stage.slice( 1 );
+		passes.push( frameKernels.traceSecondary, frameKernels.trace, ...kernels.accumulate, ...kernels.merge.slice().reverse() );
+		passes.push( kernels.irradiance, frameKernels.shade );
 
-		}
+		const result = passes.filter( ( kernel ) => kernel );
+		result.name = 'RealtimeRadianceCascades';
 
-		return stages;
+		return result;
 
 	}
 
@@ -1249,95 +1237,77 @@ class RealtimeRadianceCascades {
 	}
 
 	/**
-	 * Reads a word after the passes of the frame, one read at a time, and records when the GPU finished them, for the
-	 * adaptive quality.
+	 * Reads back the counters after the passes of the frame, one read at a time. Their probe counts adapt `lodBias`,
+	 * and when the read finished tells when the GPU finished the frame, for the adaptive quality.
 	 *
 	 * @private
 	 * @param {WebGPURenderer} renderer - The renderer.
 	 */
-	_readFence( renderer ) {
+	_readCounters( renderer ) {
 
-		if ( this._fencePending ) return;
+		if ( this._reading ) return;
 
-		this._fencePending = true;
+		this._reading = true;
 
 		const frame = this._frame;
 		const atomics = this._atomics;
+		const byteLength = this._layout.counters * 8;
+		const readback = this._readback ??= new ReadbackBuffer( byteLength );
 
-		const readback = this._fenceReadback ??= new ReadbackBuffer( 4 );
+		renderer.getArrayBufferAsync( atomics.value, readback, 0, byteLength ).then( () => {
 
-		renderer.getArrayBufferAsync( atomics.value, readback, 0, 4 ).then( () => {
+			const counts = new Uint32Array( readback.buffer.slice( 0, byteLength ) );
 
 			readback.release();
-			this._fencePending = false;
+			this._reading = false;
 
-			if ( this._atomics === atomics && this._fences.length < 1000 ) this._fences.push( [ frame, performance.now() ] );
+			if ( this._atomics !== atomics ) return;
+
+			if ( this.adaptiveQuality && this._fences.length < 1000 ) this._fences.push( [ frame, performance.now() ] );
+			if ( this.adaptiveLOD ) this._adaptLOD( counts, frame );
 
 		} ).catch( () => {
 
-			this._fencePending = false;
+			// disposed
+
+			this._reading = false;
 
 		} );
 
 	}
 
 	/**
-	 * Reads back the probe counts of this frame, one read at a time, and adapts `lodBias` to how full the cascades
-	 * are (after zalo's adaptive LOD bias for chandra).
+	 * Adapts `lodBias` to how full the cascades were in a frame (after zalo's adaptive LOD bias for chandra).
 	 *
 	 * @private
-	 * @param {WebGPURenderer} renderer - The renderer.
+	 * @param {Uint32Array} counts - The counters read after the frame.
+	 * @param {number} frame - The frame.
 	 */
-	_adaptLOD( renderer ) {
+	_adaptLOD( counts, frame ) {
 
-		if ( this._readingCounts ) return;
-
-		this._readingCounts = true;
-
-		const base = ( this._frame & 1 ) * this._layout.counters;
-		const previous = ( ( this._frame + 1 ) & 1 ) * this._layout.counters;
-		const counters = this._atomics;
+		const base = ( frame & 1 ) * this._layout.counters;
+		const previous = ( ( frame + 1 ) & 1 ) * this._layout.counters;
 		const capacities = this.capacities;
 		const cascades = this.cascades;
 
-		const byteLength = this._layout.counters * 8;
-		const readback = this._countsReadback ??= new ReadbackBuffer( byteLength );
+		// the probes a cascade wanted: the ones it has, and the new ones beyond the free slots of the last frame
 
-		renderer.getArrayBufferAsync( counters.value, readback, 0, byteLength ).then( () => {
+		let fullness = 0;
 
-			const counts = new Uint32Array( readback.buffer.slice( 0, byteLength ) );
+		for ( let n = 0; n < cascades; n ++ ) {
 
-			readback.release();
-			this._readingCounts = false;
+			const failed = Math.max( counts[ base + ALLOCATED * cascades + n ] - counts[ previous + FREED * cascades + n ], 0 );
 
-			if ( this._atomics !== counters ) return;
+			fullness = Math.max( fullness, ( counts[ base + PROBES * cascades + n ] + failed ) / capacities[ n ] );
 
-			// the probes a cascade wanted: the ones it has, and the new ones beyond the free slots of the last frame
+		}
 
-			let fullness = 0;
+		// a level of detail has about a quarter of the probes of the one before: up by half of the octaves that
+		// would bring the cascades to 75%, at least 0.05, and down slowly until they are close to it, so that they
+		// do not stay coarse after a spike of probes
 
-			for ( let n = 0; n < cascades; n ++ ) {
-
-				const failed = Math.max( counts[ base + ALLOCATED * cascades + n ] - counts[ previous + FREED * cascades + n ], 0 );
-
-				fullness = Math.max( fullness, ( counts[ base + PROBES * cascades + n ] + failed ) / capacities[ n ] );
-
-			}
-
-			// a level of detail has about a quarter of the probes of the one before: up by half of the octaves that
-			// would bring the cascades to 75%, at least 0.05, and down slowly until they are close to it, so that they
-			// do not stay coarse after a spike of probes
-
-			if ( fullness > 0.85 ) this.lodBias += Math.max( Math.log2( fullness / 0.75 ) / 4, 0.05 );
-			else if ( fullness < 0.7 ) this.lodBias = Math.max( this.lodBias - 0.01, 0 );
-
-		} ).catch( () => {
-
-			// disposed
-
-			this._readingCounts = false;
-
-		} );
+		if ( fullness > 0.85 ) this.lodBias += Math.max( Math.log2( fullness / 0.75 ) / 4, 0.05 );
+		else if ( fullness < 0.7 ) this.lodBias = Math.max( this.lodBias - 0.01, 0 );
 
 	}
 
@@ -1361,32 +1331,24 @@ class RealtimeRadianceCascades {
 	}
 
 	/**
-	 * Returns the GPU time of the stages of the last frame in milliseconds: the allocation of the probes,
-	 * the rays, the accumulation, the merge and the irradiance maps. The renderer must track timestamps.
+	 * Returns the GPU time of the passes of the last frame in milliseconds. The renderer must track timestamps.
 	 *
 	 * @param {WebGPURenderer} renderer - The renderer.
-	 * @return {Promise<?Object<string, number>>} The times, or null if some are missing.
+	 * @return {Promise<?number>} The time, or null if it is missing.
 	 */
-	async readTimings( renderer ) {
+	async readGPUTime( renderer ) {
 
-		const uids = this._uids ?? {};
+		const uid = this._timestampUID;
 
 		await renderer.resolveTimestampsAsync( 'compute' );
 
-		// other readers of the timestamps, e.g. the inspector, may have taken some of them
+		// other readers of the timestamps, e.g. the inspector, may have taken it
 
 		const pool = renderer.backend.timestampQueryPool.compute;
-		const timings = {};
 
-		for ( const stage in uids ) {
+		if ( uid === null || pool?.hasTimestampQuery( uid ) !== true ) return null;
 
-			if ( uids[ stage ].some( ( uid ) => pool?.hasTimestampQuery( uid ) !== true ) ) return null;
-
-			timings[ stage ] = uids[ stage ].reduce( ( total, uid ) => total + pool.getTimestamp( uid ), 0 );
-
-		}
-
-		return timings;
+		return pool.getTimestamp( uid );
 
 	}
 
@@ -1399,8 +1361,6 @@ class RealtimeRadianceCascades {
 		this._skyTarget?.dispose();
 		for ( const gbuffer of this._gbuffers ) gbuffer?.dispose();
 		this._shadeTexture.dispose();
-		this._fenceReadback?.dispose();
-		this._fenceReadback = null;
 
 		this._disposeKernels();
 		this._disposeBuffers();
@@ -1468,8 +1428,8 @@ class RealtimeRadianceCascades {
 
 		// the readback of the counters has their size, the reads in flight finish with an error
 
-		this._countsReadback?.dispose();
-		this._countsReadback = null;
+		this._readback?.dispose();
+		this._readback = null;
 
 		this._buffers = [];
 		this.memory = 0;
@@ -1494,7 +1454,7 @@ class RealtimeRadianceCascades {
 		if ( all ) this._kernels = null;
 
 		this._frameKernels = null;
-		this._stages = null;
+		this._passes = null;
 		this._hits?.value.dispose();
 		this._hits = null;
 

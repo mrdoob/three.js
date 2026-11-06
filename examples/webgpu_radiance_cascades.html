@@ -600,7 +600,7 @@
 
 			}
 
-			let frames = 0, lastTimings = {}, shownQuality = null, shownHalf = null;
+			let frames = 0, lastGPUTime = null, shownQuality = null, shownHalf = null;
 
 			async function animate() {
 
@@ -633,17 +633,15 @@
 
 				if ( ++ frames % 30 === 0 ) {
 
-					const timings = await cascades.readTimings( renderer ) ?? lastTimings;
+					const gpuTime = await cascades.readGPUTime( renderer ) ?? lastGPUTime;
 					const probes = await cascades.readStats( renderer );
-					const total = Object.values( timings ).reduce( ( sum, time ) => sum + time, 0 );
-					const stages = Object.entries( timings ).map( ( [ stage, time ] ) => `${ stage } ${ time.toFixed( 2 ) }` ).join( ', ' );
 
-					lastTimings = timings;
+					lastGPUTime = gpuTime;
 					const full = probes.some( ( count, n ) => count >= cascades.capacities[ n ] ) ? ' (full: probes are dropped)' : '';
 					const bias = cascades.lodBias > 0 ? `, levels of detail ${ cascades.lodBias.toFixed( 2 ) } octaves coarser to fit` : '';
 					const target = cascades.adaptiveQuality ? ` for ${ ( 1000 / cascades.activeTargetFrameTime ).toFixed( 0 ) } FPS` : '';
 					const half = cascades.halfResolution ? ' at half resolution' : '';
-					status.textContent = `quality ${ cascades.quality.toFixed( 2 ) }${ half }${ target }, probes per cascade: ${ probes.join( ', ' ) }${ full }${ bias }, ${ cascades.newProbes } new, ${ ( cascades.memory / 2 ** 20 ).toFixed( 0 ) } MB. GPU ms: ${ stages }, total ${ total.toFixed( 2 ) }`;
+					status.textContent = `quality ${ cascades.quality.toFixed( 2 ) }${ half }${ target }, probes per cascade: ${ probes.join( ', ' ) }${ full }${ bias }, ${ cascades.newProbes } new, ${ ( cascades.memory / 2 ** 20 ).toFixed( 0 ) } MB${ gpuTime !== null ? `, ${ gpuTime.toFixed( 2 ) } ms on the GPU` : '' }.`;
 
 				}
 
