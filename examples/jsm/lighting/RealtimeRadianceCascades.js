@@ -1,4 +1,4 @@
-import { BackSide, BufferAttribute, BufferGeometry, DepthTexture, EquirectangularReflectionMapping, EquirectangularRefractionMapping, FloatType, FrontSide, HalfFloatType, Matrix4, NodeMaterial, QuadMesh, ReadbackBuffer, RenderTarget, StorageBufferAttribute, StorageTexture, Vector2, Vector3, Vector4 } from 'three/webgpu';
+import { BackSide, Box3, BufferAttribute, BufferGeometry, DepthTexture, EquirectangularReflectionMapping, EquirectangularRefractionMapping, FloatType, FrontSide, HalfFloatType, Matrix4, NodeMaterial, QuadMesh, ReadbackBuffer, RenderTarget, Sphere, StorageBufferAttribute, StorageTexture, Vector2, Vector3, Vector4 } from 'three/webgpu';
 import { Break, Fn, If, LTC_Evaluate, Loop, abs, atan, atomicAdd, atomicLoad, atomicMax, atomicMin, atomicStore, cameraPosition, ceil, clamp, cos, cross, diffuseColor, dot, equirectUV, exp, exp2, float, floatBitsToUint, floor, fract, getDistanceAttenuation, getViewPosition, hash, instanceIndex, int, isBackgroundDepth, ivec2, ivec3, ivec4, log2, mat3, max, min, mix, mrt, normalWorldGeometry, normalize, output, pmremTexture, positionWorld, screenUV, select, sharedUniformGroup, sin, smoothstep, sqrt, step, storage, texture, textureStore, uint, uintBitsToFloat, uniform, uniformArray, uv, uvec2, uvec3, vec2, vec3, vec4, velocity } from 'three/tsl';
 
 import { MeshBVH, SAH } from 'three-mesh-bvh';
@@ -603,7 +603,7 @@ class RealtimeRadianceCascades {
 		this._materialData = materialData;
 		this._triangleOffset = offset;
 
-		this._createTrace();
+		this._createTrace( geometry.boundsTree.getBoundingBox( new Box3() ).getBoundingSphere( new Sphere() ) );
 		this._createSky( renderer );
 
 		// the probes of the last scene are cleared, and the passes trace the new BVH
@@ -1831,11 +1831,35 @@ class RealtimeRadianceCascades {
 	 * Creates the functions that trace rays through the BVH.
 	 *
 	 * @private
+	 * @param {Sphere} sphere - The bounding sphere of the scene.
 	 */
-	_createTrace() {
+	_createTrace( sphere ) {
 
 		const { raycastFirstHit } = this._bvh.fns;
 		const { attributes } = this._bvh.storage;
+		const { center, radius } = sphere;
+
+		// whether a ray is traced: not if it isn't finite, as it passes every bounds test and walks the whole BVH,
+		// which can hang the GPU (the exponent bits are tested since WGSL may assume that there are no NaNs), nor if
+		// it starts far outside the scene, from where the boxes of the BVH collapse within the precision of a float
+		// and a ray toward the scene walks it all too, though the scene covers a negligible part of its sky
+
+		const traceable = wgslTagFn/* wgsl */`
+			// fn
+			fn realtimeRadianceCascadesTraceable( origin: vec3f, direction: vec3f ) -> bool {
+
+				let infinite = vec3u( 0x7f800000u );
+
+				if ( any( ( bitcast<vec3u>( origin ) & infinite ) == infinite ) || any( ( bitcast<vec3u>( direction ) & infinite ) == infinite ) ) {
+
+					return false;
+
+				}
+
+				return distance( origin, vec3f( ${ center.x }, ${ center.y }, ${ center.z } ) ) < ${ radius * 100 };
+
+			}
+		`;
 
 		// traces a ray and returns the barycentric coordinates of the closest hit, its triangle plus one, negated
 		// for back faces, and its distance, or zeros if nothing is hit
@@ -1844,12 +1868,7 @@ class RealtimeRadianceCascades {
 			// fn
 			fn realtimeRadianceCascadesTrace( origin: vec3f, direction: vec3f ) -> vec4f {
 
-				// a ray that is not finite passes every bounds test and walks the whole BVH, which can hang the GPU, so it
-				// misses. The exponent bits are tested since WGSL may assume that there are no NaNs.
-
-				let infinite = vec3u( 0x7f800000u );
-
-				if ( any( ( bitcast<vec3u>( origin ) & infinite ) == infinite ) || any( ( bitcast<vec3u>( direction ) & infinite ) == infinite ) ) {
+				if ( ! ${ traceable }( origin, direction ) ) {
 
 					return vec4f( 0.0 );
 
@@ -1897,11 +1916,7 @@ class RealtimeRadianceCascades {
 			// fn
 			fn realtimeRadianceCascadesVisibility( origin: vec3f, direction: vec3f, maxDist: f32 ) -> f32 {
 
-				// as in the trace, a ray that is not finite is not traced
-
-				let infinite = vec3u( 0x7f800000u );
-
-				if ( any( ( bitcast<vec3u>( origin ) & infinite ) == infinite ) || any( ( bitcast<vec3u>( direction ) & infinite ) == infinite ) ) {
+				if ( ! ${ traceable }( origin, direction ) ) {
 
 					return 0.0;
 
