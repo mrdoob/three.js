@@ -91,7 +91,7 @@ class Settings extends Parameters {
 
 	constructor() {
 
-		super( { name: 'Settings' } );
+		super( { name: 'Settings', filter: false } );
 
 		this.extensions = {};
 
