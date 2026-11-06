@@ -101,7 +101,7 @@ Sky.SkyShader = {
 		varying vec3 vSunDirection;
 		varying vec3 vBetaR;
 		varying vec3 vBetaM;
-		varying float vSunE;
+		varying vec3 vSunE;
 
 		// constants for atmospheric scattering
 		const float pi = 3.141592653589793238462643383279502884197169;
@@ -154,7 +154,10 @@ Sky.SkyShader = {
 
 			vSunDirection = normalize( sunPosition );
 
-			vSunE = sunIntensity( vSunDirection.y );
+			// stratospheric ozone (Chappuis band) absorption along incoming sun path
+			float sunCos = max( 0.0, vSunDirection.y );
+			float sunOzoneAirMass = 1.0 / sqrt( sunCos * sunCos + 0.004 );
+			vSunE = sunIntensity( vSunDirection.y ) * exp( -vec3( 0.005, 0.016, 0.0007 ) * sunOzoneAirMass );
 
 			float sunfade = 1.0 - clamp( 1.0 - exp( vSunDirection.y ), 0.0, 1.0 );
 
@@ -174,7 +177,7 @@ Sky.SkyShader = {
 		varying vec3 vSunDirection;
 		varying vec3 vBetaR;
 		varying vec3 vBetaM;
-		varying float vSunE;
+		varying vec3 vSunE;
 
 		uniform float mieDirectionalG;
 		uniform float cloudScale;
@@ -252,11 +255,12 @@ Sky.SkyShader = {
 
 			// in scattering
 			float cosTheta = dot( direction, vSunDirection );
+			float horizonMask = smoothstep( -0.15, 0.0, direction.y );
 
-			float rPhase = rayleighPhase( cosTheta * 0.5 + 0.5 );
+			float rPhase = rayleighPhase( ( cosTheta * horizonMask ) * 0.5 + 0.5 );
 			vec3 betaRTheta = vBetaR * rPhase;
 
-			float mPhase = hgPhase( cosTheta, mieDirectionalG );
+			float mPhase = hgPhase( cosTheta, mieDirectionalG ) * smoothstep( -0.06, 0.0, direction.y );
 			vec3 betaMTheta = vBetaM * mPhase;
 
 			vec3 betaScatOverExt = ( betaRTheta + betaMTheta ) / ( vBetaR + vBetaM );
@@ -269,8 +273,10 @@ Sky.SkyShader = {
 			// nightsky
 			vec3 L0 = vec3( 0.1 ) * Fex;
 
-			// composition + solar disc
-			float sundisc = clamp( ( cosTheta - sunAngularDiameterCos ) * 50000.0, 0.0, 1.0 ) * showSunDisc;
+			// composition + solar disc with photospheric limb darkening
+			float mu2 = clamp( ( cosTheta - sunAngularDiameterCos ) * 23082.0, 0.0, 1.0 );
+			float mu = sqrt( mu2 );
+			vec3 sundisc = smoothstep( 0.0, 0.1, mu2 ) * vec3( 1.0, mix( 0.72, 1.0, mu ), mu2 ) * showSunDisc * smoothstep( -0.002, 0.002, direction.y );
 			vec3 sundiscColor = ( 760.0 * sundisc ) * min( vSunE * Fex, 80.0 );
 
 			vec3 texColor = ( Lin + L0 ) * 0.04 + sundiscColor + vec3( 0.0, 0.0003, 0.00075 );

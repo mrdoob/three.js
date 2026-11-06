@@ -156,7 +156,7 @@ class SkyMesh extends Mesh {
 		// Varyings
 
 		const vSunDirection = varyingProperty( 'vec3' );
-		const vSunE = varyingProperty( 'float' );
+		const vSunE = varyingProperty( 'vec3' );
 		const vBetaR = varyingProperty( 'vec3' );
 		const vBetaM = varyingProperty( 'vec3' );
 
@@ -191,7 +191,11 @@ class SkyMesh extends Mesh {
 			const angle = sunDirection.y;
 			const zenithAngleCos = clamp( angle, - 1, 1 );
 			const sunIntensity = EE.mul( max( 0.0, float( 1.0 ).sub( exp( cutoffAngle.sub( acos( zenithAngleCos ) ).div( steepness ).negate() ) ) ) );
-			vSunE.assign( sunIntensity );
+
+			// stratospheric ozone (Chappuis band) absorption along incoming sun path
+			const sunCos = max( 0.0, angle );
+			const sunOzoneAirMass = float( 1.0 ).div( sqrt( sunCos.mul( sunCos ).add( 0.004 ) ) );
+			vSunE.assign( exp( vec3( 0.005, 0.016, 0.0007 ).mul( sunOzoneAirMass ).negate() ).mul( sunIntensity ) );
 
 			// sun fade
 
@@ -249,10 +253,11 @@ class SkyMesh extends Mesh {
 
 			// in scattering
 			const cosTheta = dot( direction, vSunDirection );
+			const horizonMask = smoothstep( - 0.15, 0.0, direction.y );
 
 			// betaRTheta
 
-			const c = cosTheta.mul( 0.5 ).add( 0.5 );
+			const c = cosTheta.mul( horizonMask ).mul( 0.5 ).add( 0.5 );
 			const rPhase = THREE_OVER_SIXTEENPI.mul( float( 1.0 ).add( c.mul( c ) ) );
 			const betaRTheta = vBetaR.mul( rPhase );
 
@@ -260,7 +265,7 @@ class SkyMesh extends Mesh {
 
 			const g2 = this.mieDirectionalG.mul( this.mieDirectionalG );
 			const invSqrt = inverseSqrt( max( 1e-4, float( 1.0 ).sub( float( 2.0 ).mul( this.mieDirectionalG ).mul( cosTheta ) ).add( g2 ) ) );
-			const mPhase = ONE_OVER_FOURPI.mul( float( 1.0 ).sub( g2 ) ).mul( invSqrt.mul( invSqrt ).mul( invSqrt ) );
+			const mPhase = ONE_OVER_FOURPI.mul( float( 1.0 ).sub( g2 ) ).mul( invSqrt.mul( invSqrt ).mul( invSqrt ) ).mul( smoothstep( - 0.06, 0.0, direction.y ) );
 			const betaMTheta = vBetaM.mul( mPhase );
 
 			const betaScatOverExt = add( betaRTheta, betaMTheta ).div( add( vBetaR, vBetaM ) );
@@ -274,8 +279,10 @@ class SkyMesh extends Mesh {
 
 			const L0 = vec3( 0.1 ).mul( Fex );
 
-			// composition + solar disc
-			const sundisc = clamp( cosTheta.sub( sunAngularDiameterCos ).mul( 50000.0 ), 0.0, 1.0 ).mul( this.showSunDisc );
+			// composition + solar disc with photospheric limb darkening
+			const mu2 = clamp( cosTheta.sub( sunAngularDiameterCos ).mul( 23082.0 ), 0.0, 1.0 );
+			const mu = sqrt( mu2 );
+			const sundisc = smoothstep( 0.0, 0.1, mu2 ).mul( vec3( 1.0, mix( 0.72, 1.0, mu ), mu2 ) ).mul( this.showSunDisc ).mul( smoothstep( - 0.002, 0.002, direction.y ) );
 			const sundiscColor = min( vSunE.mul( Fex ), 80.0 ).mul( 760.0 ).mul( sundisc );
 
 			const texColor = add( Lin, L0 ).mul( 0.04 ).add( sundiscColor ).add( vec3( 0.0, 0.0003, 0.00075 ) ).toVar();
