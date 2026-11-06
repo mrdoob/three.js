@@ -8,7 +8,7 @@ import {
 	Node
 } from 'three/webgpu';
 
-import { Fn, vec2, viewportSafeUV, viewportSharedTexture, reflector, float, abs, fract, inverseSqrt, mod, sub, texture, uniform, vec4, cameraPosition, cameraViewMatrix, positionWorld, uv, mix, vec3, normalize, max, dot, screenUV } from 'three/tsl';
+import { Fn, vec2, viewportSafeUV, viewportSharedTexture, reflector, float, abs, add, clamp, fract, inverseSqrt, mod, mul, sub, texture, uniform, vec4, cameraPosition, cameraViewMatrix, positionWorld, uv, mix, vec3, normalize, max, dot, screenUV } from 'three/tsl';
 
 /** @module Water2Mesh */
 
@@ -205,30 +205,44 @@ class WaterNode extends Node {
 
 			}
 
+			const NoV = dot( toEye, normal );
+			normal = normalize( normal.add( toEye.mul( max( 0.0, sub( 0.02, NoV ) ) ) ) );
+
 			// calculate the fresnel term to blend reflection and refraction maps
 			const theta = max( dot( toEye, normal ), 0 );
 			const oneMinusTheta = sub( 1.0, theta );
 			const oneMinusTheta2 = oneMinusTheta.mul( oneMinusTheta );
 			const reflectance = oneMinusTheta2.mul( oneMinusTheta2 ).mul( oneMinusTheta ).mul( sub( 1.0, this.reflectivity ) ).add( this.reflectivity );
 
-			// reflector, refractor
+			// reflector, refractor with decoupled reflection and Snell refraction distortion
 
 			const viewRight = vec2( cameraViewMatrix[ 0 ].x, cameraViewMatrix[ 2 ].x );
 			const normalTilt = vec2(
 				normal.x.mul( viewRight.x ).add( normal.z.mul( viewRight.y ) ),
 				normal.z.mul( viewRight.x ).sub( normal.x.mul( viewRight.y ) )
 			);
-			const offset = normalTilt.mul( float( 0.05 ).div( float( 1.0 ).add( distance.mul( 0.02 ) ) ) ).toVar();
+			const distFalloff = float( 1.0 ).div( float( 1.0 ).add( distance.mul( 0.02 ) ) );
+			const grazing = clamp( toEye.y.mul( 3.0 ), 0.0, 1.0 );
+			const reflOffset = vec2(
+				normalTilt.x.mul( max( toEye.y, 0.2 ) ),
+				mix( abs( normalTilt.y ), normalTilt.y, grazing )
+			).mul( mul( 0.055, distFalloff ) ).toVar();
+			const refrOffset = normalTilt.mul( mul( 0.022, distFalloff ) ).toVar();
 
 			const reflectionSampler = this._reflectionSampler;
-			reflectionSampler.uvNode = this._defaultReflectorUV.add( vec2( offset.x.negate(), offset.y ) );
+			reflectionSampler.uvNode = this._defaultReflectorUV.add( vec2( reflOffset.x.negate(), reflOffset.y ) );
 
-			const refractorUV = screenUV.sub( offset );
+			const refractorUV = screenUV.sub( refrOffset );
 			const refractionSampler = viewportSharedTexture( viewportSafeUV( refractorUV ) );
+
+			// angular Beer-Lambert absorption along Snell's refracted path (n = 1.333)
+
+			const invMuT = inverseSqrt( add( 0.4375, theta.mul( theta ).mul( 0.5625 ) ) );
+			const transmittance = mix( this.color, this.color.mul( this.color ), invMuT.sub( 1.0 ) );
 
 			// tint transmitted light only; dielectric surface reflections stay achromatic
 
-			return vec4( mix( refractionSampler.rgb.mul( this.color ), reflectionSampler.rgb, reflectance ), 1.0 );
+			return vec4( mix( refractionSampler.rgb.mul( transmittance ), reflectionSampler.rgb, reflectance ), 1.0 );
 
 		} )();
 

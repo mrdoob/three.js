@@ -383,27 +383,40 @@ Water.WaterShader = {
 				normal = normalize( vec3( blended.x * 1.55, blended.z, blended.y * 1.55 ) );
 			#endif
 
+			float NoV = dot( toEye, normal );
+			normal = normalize( normal + toEye * max( 0.0, - NoV + 0.02 ) );
+
 			// calculate the fresnel term to blend reflection and refraction maps
 			float theta = max( dot( toEye, normal ), 0.0 );
 			float oneMinusTheta = 1.0 - theta;
 			float oneMinusTheta2 = oneMinusTheta * oneMinusTheta;
 			float reflectance = reflectivity + ( 1.0 - reflectivity ) * ( oneMinusTheta2 * oneMinusTheta2 * oneMinusTheta );
 
-			// calculate final uv coords
+			// calculate final uv coords with decoupled reflection and Snell refraction distortion
 			vec2 viewRight = vec2( viewMatrix[ 0 ][ 0 ], viewMatrix[ 2 ][ 0 ] );
 			vec2 normalTilt = vec2(
 				normal.x * viewRight.x + normal.z * viewRight.y,
 				normal.z * viewRight.x - normal.x * viewRight.y
 			);
-			vec2 offset = normalTilt * ( 0.05 / ( 1.0 + 0.02 * distance ) );
+			float distFalloff = 1.0 / ( 1.0 + 0.02 * distance );
+			float grazing = clamp( toEye.y * 3.0, 0.0, 1.0 );
+			vec2 reflOffset = vec2(
+				normalTilt.x * max( toEye.y, 0.2 ),
+				mix( abs( normalTilt.y ), normalTilt.y, grazing )
+			) * ( 0.055 * distFalloff );
+			vec2 refrOffset = normalTilt * ( 0.022 * distFalloff );
 
 			vec2 coord = vCoord.xy / vCoord.w;
 
-			vec4 reflectColor = texture2D( tReflectionMap, vec2( 1.0 - coord.x - offset.x, coord.y - offset.y ) );
-			vec4 refractColor = texture2D( tRefractionMap, vec2( coord.x - offset.x, coord.y + offset.y ) );
+			vec4 reflectColor = texture2D( tReflectionMap, vec2( 1.0 - coord.x - reflOffset.x, coord.y - reflOffset.y ) );
+			vec4 refractColor = texture2D( tRefractionMap, vec2( coord.x - refrOffset.x, coord.y + refrOffset.y ) );
+
+			// angular Beer-Lambert absorption along Snell's refracted path (n = 1.333)
+			float invMuT = inversesqrt( 0.4375 + 0.5625 * theta * theta );
+			vec3 transmittance = mix( color, color * color, invMuT - 1.0 );
 
 			// tint transmitted light only; dielectric surface reflections stay achromatic
-			gl_FragColor = vec4( mix( refractColor.rgb * color, reflectColor.rgb, reflectance ), 1.0 );
+			gl_FragColor = vec4( mix( refractColor.rgb * transmittance, reflectColor.rgb, reflectance ), 1.0 );
 
 			#include <tonemapping_fragment>
 			#include <colorspace_fragment>
