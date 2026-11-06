@@ -7,16 +7,22 @@ export default /* glsl */`
 	// Bump Mapping Unparametrized Surfaces on the GPU by Morten S. Mikkelsen
 	// https://mmikk.github.io/papers3d/mm_sfgrad_bump.pdf
 
-	// Evaluate the derivative of the height w.r.t. screen-space using forward differencing (listing 2)
+	// Evaluate the derivative of the height w.r.t. screen-space. The texture gradient is taken with central
+	// differences one texel apart so it interpolates smoothly across texels, then mapped to screen-space
 
 	vec2 dHdxy_fwd() {
 
 		vec2 dSTdx = dFdx( vBumpMapUv );
 		vec2 dSTdy = dFdy( vBumpMapUv );
 
-		float Hll = bumpScale * texture2D( bumpMap, vBumpMapUv ).x;
-		float dBx = bumpScale * texture2D( bumpMap, vBumpMapUv + dSTdx ).x - Hll;
-		float dBy = bumpScale * texture2D( bumpMap, vBumpMapUv + dSTdy ).x - Hll;
+		vec2 texelSize = 1.0 / vec2( textureSize( bumpMap, 0 ) );
+		vec2 dx = vec2( texelSize.x, 0.0 );
+		vec2 dy = vec2( 0.0, texelSize.y );
+		float gradU = ( texture2D( bumpMap, vBumpMapUv + dx ).x - texture2D( bumpMap, vBumpMapUv - dx ).x ) / ( 2.0 * texelSize.x );
+		float gradV = ( texture2D( bumpMap, vBumpMapUv + dy ).x - texture2D( bumpMap, vBumpMapUv - dy ).x ) / ( 2.0 * texelSize.y );
+
+		float dBx = bumpScale * ( gradU * dSTdx.x + gradV * dSTdx.y );
+		float dBy = bumpScale * ( gradU * dSTdy.x + gradV * dSTdy.y );
 
 		return vec2( dBx, dBy );
 

@@ -2,6 +2,7 @@ import Node from '../core/Node.js';
 import { uv } from '../accessors/UV.js';
 import { normalView } from '../accessors/Normal.js';
 import { positionView } from '../accessors/Position.js';
+import { textureSize } from '../accessors/TextureSizeNode.js';
 import { faceDirection } from './FrontFacingNode.js';
 import { Fn, nodeProxy, float, vec2 } from '../tsl/TSLBase.js';
 
@@ -12,6 +13,28 @@ const dHdxy_fwd = /*@__PURE__*/ Fn( ( { textureNode, bumpScale } ) => {
 
 	// It's used to preserve the same TextureNode instance
 	const sampleTexture = ( callback ) => textureNode.isolate().context( { getUV: ( texNode ) => callback( texNode.uvNode || uv() ), forceUVContext: true } );
+
+	// For a texture, the gradient is taken with central differences one texel apart so it interpolates
+	// smoothly across texels, then mapped to screen-space
+	if ( textureNode.isTextureNode === true || textureNode.uniformType === 'texture' ) {
+
+		const bumpUV = textureNode.uvNode || uv();
+		const texelSize = vec2( 1 ).div( vec2( textureSize( textureNode, 0 ) ) );
+		const dx = vec2( texelSize.x, 0 );
+		const dy = vec2( 0, texelSize.y );
+
+		const gradU = float( sampleTexture( ( uvNode ) => uvNode.add( dx ) ) ).sub( float( sampleTexture( ( uvNode ) => uvNode.sub( dx ) ) ) ).div( texelSize.x.mul( 2 ) );
+		const gradV = float( sampleTexture( ( uvNode ) => uvNode.add( dy ) ) ).sub( float( sampleTexture( ( uvNode ) => uvNode.sub( dy ) ) ) ).div( texelSize.y.mul( 2 ) );
+
+		const dSTdx = bumpUV.dFdx();
+		const dSTdy = bumpUV.dFdy();
+
+		return vec2(
+			gradU.mul( dSTdx.x ).add( gradV.mul( dSTdx.y ) ),
+			gradU.mul( dSTdy.x ).add( gradV.mul( dSTdy.y ) )
+		).mul( bumpScale );
+
+	}
 
 	const Hll = float( sampleTexture( ( uvNode ) => uvNode ) );
 
