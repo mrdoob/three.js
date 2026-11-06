@@ -109,19 +109,21 @@ class WaterMesh extends Mesh {
 
 			const offset = time;
 
-			const uv0 = uv.mul( 1 / 103 ).add( offset.mul( vec2( 1 / 17, 1 / 29 ) ) ).toVar();
-			const uv1 = uv.mul( 1 / 107 ).sub( offset.mul( vec2( - 1 / 19, 1 / 31 ) ) ).toVar();
-			const uv2 = uv.mul( vec2( 1 / 8907.0, 1 / 9803.0 ) ).add( offset.mul( vec2( 1 / 101, 1 / 97 ) ) ).toVar();
-			const uv3 = uv.mul( vec2( 1 / 1091.0, 1 / 1027.0 ) ).sub( offset.mul( vec2( 1 / 109, - 1 / 113 ) ) ).toVar();
+			const r1 = vec2( uv.x.mul( 0.8 ).sub( uv.y.mul( 0.6 ) ), uv.x.mul( 0.6 ).add( uv.y.mul( 0.8 ) ) );
+			const r2 = vec2( uv.x.mul( 0.38461538 ).add( uv.y.mul( 0.92307692 ) ), uv.y.mul( 0.38461538 ).sub( uv.x.mul( 0.92307692 ) ) );
+			const r3 = vec2( uv.y.mul( 0.88235294 ).sub( uv.x.mul( 0.47058824 ) ), uv.y.mul( - 0.47058824 ).sub( uv.x.mul( 0.88235294 ) ) );
 
-			const sample0 = this.waterNormals.sample( uv0 );
-			const sample1 = this.waterNormals.sample( uv1 );
-			const sample2 = this.waterNormals.sample( uv2 );
-			const sample3 = this.waterNormals.sample( uv3 );
+			const uv0 = uv.mul( 1 / 960 ).add( offset.mul( vec2( 0.011, 0.010 ) ) ).add( vec2( 0.13, 0.37 ) ).toVar();
+			const uv1 = r1.mul( 1 / 290 ).add( offset.mul( vec2( 0.021, - 0.018 ) ) ).add( vec2( 0.41, 0.73 ) ).toVar();
+			const uv2 = r2.mul( 1 / 97 ).add( offset.mul( vec2( - 0.034, 0.036 ) ) ).add( vec2( 0.67, 0.19 ) ).toVar();
+			const uv3 = r3.mul( 1 / 31 ).add( offset.mul( vec2( 0.058, - 0.064 ) ) ).add( vec2( 0.83, 0.53 ) ).toVar();
 
-			const noise = sample0.add( sample1 ).add( sample2 ).add( sample3 );
+			const noise = this.waterNormals.sample( uv0 ).mul( 0.16 )
+				.add( this.waterNormals.sample( uv1 ).mul( 0.30 ) )
+				.add( this.waterNormals.sample( uv2 ).mul( 0.34 ) )
+				.add( this.waterNormals.sample( uv3 ).mul( 0.20 ) );
 
-			return noise.mul( 0.5 ).sub( 1 );
+			return noise.mul( 2.0 ).sub( 1.0 );
 
 		} );
 

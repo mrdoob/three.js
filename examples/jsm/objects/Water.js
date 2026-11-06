@@ -150,15 +150,20 @@ class Water extends Mesh {
 				varying vec4 worldPosition;
 
 				vec4 getNoise( vec2 uv ) {
-					vec2 uv0 = uv * ( 1.0 / 103.0 ) + time * vec2( 1.0 / 17.0, 1.0 / 29.0 );
-					vec2 uv1 = uv * ( 1.0 / 107.0 ) - time * vec2( - 1.0 / 19.0, 1.0 / 31.0 );
-					vec2 uv2 = uv * vec2( 1.0 / 8907.0, 1.0 / 9803.0 ) + time * vec2( 1.0 / 101.0, 1.0 / 97.0 );
-					vec2 uv3 = uv * vec2( 1.0 / 1091.0, 1.0 / 1027.0 ) - time * vec2( 1.0 / 109.0, - 1.0 / 113.0 );
-					vec4 noise = texture2D( normalSampler, uv0 ) +
-						texture2D( normalSampler, uv1 ) +
-						texture2D( normalSampler, uv2 ) +
-						texture2D( normalSampler, uv3 );
-					return noise * 0.5 - 1.0;
+					vec2 r1 = vec2( uv.x * 0.8 - uv.y * 0.6, uv.x * 0.6 + uv.y * 0.8 );
+					vec2 r2 = vec2( uv.x * 0.38461538 + uv.y * 0.92307692, uv.y * 0.38461538 - uv.x * 0.92307692 );
+					vec2 r3 = vec2( - uv.x * 0.47058824 + uv.y * 0.88235294, - uv.y * 0.47058824 - uv.x * 0.88235294 );
+
+					vec2 uv0 = uv * ( 1.0 / 960.0 ) + time * vec2( 0.011, 0.010 ) + vec2( 0.13, 0.37 );
+					vec2 uv1 = r1 * ( 1.0 / 290.0 ) + time * vec2( 0.021, - 0.018 ) + vec2( 0.41, 0.73 );
+					vec2 uv2 = r2 * ( 1.0 / 97.0 ) + time * vec2( - 0.034, 0.036 ) + vec2( 0.67, 0.19 );
+					vec2 uv3 = r3 * ( 1.0 / 31.0 ) + time * vec2( 0.058, - 0.064 ) + vec2( 0.83, 0.53 );
+
+					vec4 noise = texture2D( normalSampler, uv0 ) * 0.16 +
+						texture2D( normalSampler, uv1 ) * 0.30 +
+						texture2D( normalSampler, uv2 ) * 0.34 +
+						texture2D( normalSampler, uv3 ) * 0.20;
+					return noise * 2.0 - 1.0;
 				}
 
 				void sunLight( const vec3 surfaceNormal, const vec3 eyeDirection, float shiny, float spec, float diffuse, inout vec3 diffuseColor, inout vec3 specularColor ) {
