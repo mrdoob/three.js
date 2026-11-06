@@ -3592,7 +3592,7 @@ class GLTFMeshGpuInstancing {
 		};
 
 		if ( mesh.instanceColor )
-			attributes._COLOR_0 = writer.processAccessor( mesh.instanceColor );
+			attributes._COLOR_0 = writer.processAccessor( mesh.instanceColor, undefined, 0, mesh.count );
 
 		nodeDef.extensions = nodeDef.extensions || {};
 		nodeDef.extensions[ this.name ] = { attributes };
