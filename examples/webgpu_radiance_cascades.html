@@ -620,7 +620,11 @@
 				updateOutput();
 				renderPipeline.render();
 
-				if ( cascades.adaptiveQuality ) {
+				// the controls show the adaptive quality, unless they were just changed and their handler is still to come
+
+				const edited = shownQuality !== null && ( params.quality !== shownQuality || params.halfResolution !== shownHalf );
+
+				if ( cascades.adaptiveQuality && ! edited ) {
 
 					params.quality = shownQuality = Math.round( cascades.quality * 100 ) / 100;
 					params.halfResolution = shownHalf = cascades.halfResolution;
