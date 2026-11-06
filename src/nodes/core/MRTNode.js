@@ -181,6 +181,18 @@ class MRTNode extends OutputStructNode {
 	}
 
 	/**
+	 * Returns `true` if the given render target defines a target for each MRT output.
+	 *
+	 * @param {RenderTarget} renderTarget - The render target.
+	 * @return {boolean} Whether the MRT node is compatible with the render target or not.
+	 */
+	isCompatible( renderTarget ) {
+
+		return renderTarget.textures.every( ( texture ) => this.has( texture.name ) );
+
+	}
+
+	/**
 	 * Merges the outputs of the given MRT node with the outputs of this node.
 	 *
 	 * @param {MRTNode} mrtNode - The MRT to merge.

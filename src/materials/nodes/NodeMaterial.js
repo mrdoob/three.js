@@ -586,7 +586,7 @@ class NodeMaterial extends Material {
 
 					}
 
-				} else if ( materialMRT !== null ) {
+				} else if ( materialMRT !== null && materialMRT.isCompatible( renderTarget ) ) {
 
 					resultNode = materialMRT;
 
