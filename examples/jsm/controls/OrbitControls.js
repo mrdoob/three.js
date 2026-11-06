@@ -391,7 +391,7 @@ class OrbitControls extends Controls {
 		 */
 		this.zoom0 = this.object.zoom;
 
-		this._cursorStyle = 'auto';
+		this._cursorStyle = '';
 
 		// the target DOM element for key events
 		this._domElementKeyEvents = null;
@@ -467,8 +467,8 @@ class OrbitControls extends Controls {
 	/**
 	 * Defines the visual representation of the cursor.
 	 *
-	 * @type {('auto'|'grab')}
-	 * @default 'auto'
+	 * @type {(''|'grab')}
+	 * @default ''
 	 */
 	set cursorStyle( type ) {
 
@@ -480,7 +480,7 @@ class OrbitControls extends Controls {
 
 		} else {
 
-			this.domElement.style.cursor = 'auto';
+			this.domElement.style.cursor = '';
 
 		}
 
@@ -531,7 +531,8 @@ class OrbitControls extends Controls {
 		this._pointerPositions = {};
 
 		this.domElement.style.touchAction = ''; // Restore touch scroll
-		this.domElement.style.cursor = 'auto';
+
+		if ( this._cursorStyle === 'grab' ) this.domElement.style.cursor = '';
 
 	}
 

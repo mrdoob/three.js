@@ -1618,7 +1618,7 @@ class VRMLLoader extends Loader {
 				switch ( fieldName ) {
 
 					case 'position':
-						camera.position.set( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 0 ] );
+						camera.position.set( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ] );
 						break;
 
 					case 'orientation':

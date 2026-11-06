@@ -1,5 +1,5 @@
 import { BackSide, Box3, BufferAttribute, BufferGeometry, ClampToEdgeWrapping, Color, DoubleSide, EquirectangularReflectionMapping, EquirectangularRefractionMapping, FloatType, FrontSide, LinearMipmapLinearFilter, Matrix4, MirroredRepeatWrapping, Node, NodeMaterial, NodeUpdateType, QuadMesh, RendererUtils, RenderTarget, RepeatWrapping, SRGBColorSpace, StorageBufferAttribute, StructTypeNode, Vector3, Vector4 } from 'three/webgpu';
-import { Fn, If, Loop, abs, asin, atan, cos, cross, dFdx, dFdy, dot, exp2, float, fract, hash, instanceIndex, int, length, luminance, mix, nodeObject, normalize, pmremTexture, screenCoordinate, select, sin, smoothstep, sqrt, storage, texture, textureLoad, uint, uniform, uv, uvec2, vec2, vec3, vec4 } from 'three/tsl';
+import { Fn, If, Loop, abs, asin, atan, cos, cross, dFdx, dFdy, dot, exp2, float, fract, hash, instanceIndex, int, length, log2, luminance, mix, nodeObject, normalize, pmremTexture, screenCoordinate, select, sin, smoothstep, sqrt, storage, texture, textureLoad, uint, uniform, uv, uvec2, vec2, vec3, vec4 } from 'three/tsl';
 import { MeshBVH, SAH } from 'three-mesh-bvh';
 import { BVHComputeData, bvhNodeBoundsStruct, intersectRayTriangle, rayIntersectionResultStruct, rayStruct, wgslTagCode, wgslTagFn } from 'three-mesh-bvh/webgpu';
 
@@ -112,7 +112,8 @@ class RayTracedRadiosity {
 	constructor( { rays = 8, lightCandidates = 4, bounces = 16, cacheSamples = 32, cacheSize = 256, textureSize = 512, cache = 'lightMap', geometries = null } = {} ) {
 
 		/**
-		 * The number of rays cast per point and sample.
+		 * The number of rays cast per point and sample. It can change between samples, e.g. to keep the
+		 * frame rate of a progressive bake: the samples continue the same sequences of rays.
 		 *
 		 * @type {number}
 		 * @default 8
@@ -313,10 +314,24 @@ class RayTracedRadiosity {
 		this._environmentIntensity = uniform( 1 );
 		this._environmentRotation = uniform( new Matrix4() );
 		this._environmentInverseRotation = uniform( new Matrix4() );
-		this._biasNode = uniform( this.bias );
 		this._passNode = uniform( 0, 'uint' );
 		this._pass = 0;
 		this._renderId = - 1;
+
+		// the sample sequences continue with every render call of the gathering materials, after the
+		// rays of the call before. They start after the rays of one sample, like they did with a constant
+		// number of rays
+
+		this._firstRay = rays;
+		this._firstRayNode = uniform( 0, 'uint' ).onRenderUpdate( () => {
+
+			const first = this._firstRay;
+			this._firstRay += this.rays;
+			return first;
+
+		} );
+		this._raysNode = uniform( rays, 'uint' ).onRenderUpdate( () => this.rays );
+		this._biasNode = uniform( this.bias ).onRenderUpdate( () => this.bias );
 
 	}
 
@@ -1737,7 +1752,8 @@ class RayTracedRadiosity {
 	 */
 	_gather( positionNode, normalNode, analyticLights, directionNode = null, { faceNormal: faceNormalNode = null, seed: seedNode = null, inside: insideNode = null, smoothNormal: smoothNormalNode = null, bounces: forBounces = false } = {} ) {
 
-		const rays = this.rays;
+		const rays = this._raysNode;
+		const rayCount = float( rays );
 		const trace = this._trace;
 		const visibility = this._visibility;
 		const materials = this._materials;
@@ -1771,7 +1787,7 @@ class RayTracedRadiosity {
 
 		const textured = this._textures !== null;
 		const exactEmitters = textured || this._alpha;
-		const spread = Math.log2( Math.sqrt( Math.PI / ( 32 * rays ) ) );
+		const spread = log2( sqrt( float( Math.PI ).div( rayCount.mul( 32 ) ) ) );
 
 		const albedoAt = ( entry, coord, lod ) => textured ? this._albedo( uint( entry ), coord, lod ) : materials.element( entry.mul( MATERIAL_STRIDE ) ).rgb;
 
@@ -1996,11 +2012,11 @@ class RayTracedRadiosity {
 
 			// the direct light of the analytic lights is not a sum over the rays
 
-			const weighAnalytic = ( light, direction ) => weigh( light.mul( rays ), direction );
+			const weighAnalytic = ( light, direction ) => weigh( light.mul( rayCount ), direction );
 
-			Loop( rays, ( { i } ) => {
+			Loop( { start: uint( 0 ), end: rays, type: 'uint', condition: '<' }, ( { i } ) => {
 
-				const n = this._passNode.mul( rays ).add( uint( i ) ).toVar();
+				const n = this._firstRayNode.add( i ).toVar();
 
 				// a ray of the contact occlusion of its own, cosine-distributed, which may hit the face it starts from
 
@@ -2082,7 +2098,7 @@ class RayTracedRadiosity {
 
 							// rays that hit the invisible back of a face start inside a closed mesh
 
-							if ( insideNode !== null ) insideNode.addAssign( select( hit.z.lessThan( 0 ).and( facing.equal( 0 ) ), float( 1 / rays ), float( 0 ) ) );
+							if ( insideNode !== null ) insideNode.addAssign( select( hit.z.lessThan( 0 ).and( facing.equal( 0 ) ), float( 1 ).div( rayCount ), float( 0 ) ) );
 
 							radiance.mulAssign( facing );
 							gathered.addAssign( radiance );
@@ -2298,8 +2314,8 @@ class RayTracedRadiosity {
 
 			// the occlusion of the hemisphere lights and of the direct light
 
-			const ambientShare = ambientOcclusion !== null ? ambientHits.div( rays ).mul( ambientOcclusion.strength ).oneMinus().toVar() : float( 1 );
-			const contactShare = contactOcclusion !== null ? contactHits.div( rays ).oneMinus().toVar() : float( 1 );
+			const ambientShare = ambientOcclusion !== null ? ambientHits.div( rayCount ).mul( ambientOcclusion.strength ).oneMinus().toVar() : float( 1 );
+			const contactShare = contactOcclusion !== null ? contactHits.div( rayCount ).oneMinus().toVar() : float( 1 );
 			const directShare = contactOcclusion !== null ? mix( float( 1 ), contactShare, contactOcclusion.direct ).toVar() : float( 1 );
 
 			// the unshadowed light of a directional, point or spot light: the distance attenuation of point and spot
@@ -2514,9 +2530,9 @@ class RayTracedRadiosity {
 
 			}
 
-			if ( directionNode !== null ) directionNode.addAssign( rayDirection.div( rays ) );
+			if ( directionNode !== null ) directionNode.addAssign( rayDirection.div( rayCount ) );
 
-			return gathered.add( direct ).div( rays ).add( analytic );
+			return gathered.add( direct ).div( rayCount ).add( analytic );
 
 		} )();
 

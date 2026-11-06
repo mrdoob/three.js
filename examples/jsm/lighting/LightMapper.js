@@ -1,5 +1,5 @@
-import { BackSide, CustomBlending, DoubleSide, FloatType, HalfFloatType, InstancedMesh, Mesh, MeshLambertNodeMaterial, NodeMaterial, OneFactor, OrthographicCamera, PhongLightingModel, QuadMesh, RedFormat, RendererUtils, RenderTarget, Scene, Vector2, Vector4 } from 'three/webgpu';
-import { Fn, If, Loop, Stack, cameraWorldMatrix, ivec2, length, lights, luminance, modelViewMatrix, mrt, normalView, normalViewGeometry, normalWorldGeometry, output, positionLocal, positionWorld, screenCoordinate, textureLoad, uniform, vec3, vec4 } from 'three/tsl';
+import { BackSide, BufferAttribute, BufferGeometry, CustomBlending, DoubleSide, FloatType, HalfFloatType, InstancedMesh, Mesh, MeshLambertNodeMaterial, NearestFilter, NoBlending, NodeMaterial, OneFactor, OrthographicCamera, PhongLightingModel, QuadMesh, RedFormat, RendererUtils, RenderTarget, Scene, Vector2, Vector4 } from 'three/webgpu';
+import { Fn, If, Loop, Stack, attribute, cameraWorldMatrix, float, instanceIndex, ivec2, length, lights, luminance, modelViewMatrix, mrt, normalView, normalViewGeometry, normalWorldGeometry, output, positionLocal, positionWorld, round, screenCoordinate, texture, textureLoad, uniform, vec3, vec4 } from 'three/tsl';
 
 import { lightMapUV } from '../tsl/lighting/DirectionalLightMapNode.js';
 
@@ -11,6 +11,10 @@ const NOISE_BLOCK = 16;
 
 const _uvTransforms = /*@__PURE__*/ new WeakMap();
 const _identity = /*@__PURE__*/ new Vector4( 1, 1, 0, 0 );
+
+// the number of charts of one instance of the instanced guide proxies, see _addGuide()
+
+const _chartStrides = /*@__PURE__*/ new WeakMap();
 
 let _rendererState;
 
@@ -28,6 +32,9 @@ let _rendererState;
  * vary their samples and converge as they accumulate. Call `update()` once per frame
  * to bake progressively, or pass a sample count to bake at once.
  * Call `estimateNoise()` to stop once the light map has converged.
+ * The `variance` and `guides` options also bake the inputs of a denoiser like
+ * {@link DenoiseNode}: the noise of each texel and the surface that it lies on,
+ * see {@link LightMapper#getTextureNode}.
  * Keep the source geometry and GI data static while accumulating. Call `reset()`
  * after changing transforms or lighting. Atlas charts need at least three texels
  * of padding; the resolve fills two texels around covered surfaces.
@@ -68,8 +75,10 @@ class LightMapper {
 	 * @param {boolean} [options.moments=false] - Whether to also sum the squared sample luminances into {@link LightMapper#momentTexture}, e.g. for a {@link LightMapDenoiser}. Requires the 'float32-blendable' renderer feature.
 	 * @param {boolean} [options.directional=false] - Whether to also bake the dominant direction of the incident light into {@link LightMapper#directionTexture}.
 	 * @param {number} [options.pages=1] - The number of light map pages, each one of `size`, e.g. the `pages` of {@link unwrapUVs}.
+	 * @param {boolean} [options.variance=false] - Whether to also estimate the noise of each texel into {@link LightMapper#varianceTexture}. Requires the 'float32-blendable' renderer feature.
+	 * @param {boolean} [options.guides=false] - Whether to also rasterize the surface of each texel into {@link LightMapper#positionTexture} and {@link LightMapper#normalTexture}.
 	 */
-	constructor( renderer, size, irradianceNode, { lights = [], moments = false, directional = false, pages = 1 } = {} ) {
+	constructor( renderer, size, irradianceNode, { lights = [], moments = false, directional = false, pages = 1, variance = false, guides = false } = {} ) {
 
 		/**
 		 * The renderer.
@@ -112,12 +121,16 @@ class LightMapper {
 
 		const floatBlendable = renderer.hasFeature( 'float32-blendable' );
 
+		// the variance needs the moments too
+
+		const accumulateMoments = ( moments || variance ) && floatBlendable;
+
 		// WebGPU guarantees 32 bytes of color attachments per sample, so with directions the moments
 		// accumulate in the unused alpha channel of the direction sums
 
 		const outputs = [ 'output' ];
 
-		if ( moments && floatBlendable && directional === false ) outputs.push( 'moment' );
+		if ( accumulateMoments && directional === false ) outputs.push( 'moment' );
 		if ( directional ) outputs.push( 'direction' );
 
 		/**
@@ -135,25 +148,25 @@ class LightMapper {
 		 *
 		 * @type {string}
 		 */
-		this.momentChannel = moments && floatBlendable && directional ? 'a' : 'r';
+		this.momentChannel = accumulateMoments && directional ? 'a' : 'r';
 
 		/**
-		 * The pages of the light map, each one with its light map, directions and moments like the ones
+		 * The pages of the light map, each one with its light map, directions, moments, variance and guides like the ones
 		 * of the light mapper, which are the ones of the first page, the meshes baked into it, and its
 		 * `sampleTexture`: the sums of the samples with their count in alpha, before the normalization
 		 * and padding of the light map. Texels without samples are zero.
 		 *
-		 * @type {Array<{texture: Texture, directionTexture: ?Texture, sampleTexture: Texture, momentTexture: ?Texture, objects: Array<Mesh>}>}
+		 * @type {Array<{texture: Texture, directionTexture: ?Texture, sampleTexture: Texture, momentTexture: ?Texture, varianceTexture: ?Texture, positionTexture: ?Texture, normalTexture: ?Texture, objects: Array<Mesh>}>}
 		 * @readonly
 		 */
 		this.pages = [];
 
 		this._pages = [];
 
-		for ( let i = 0; i < pages; i ++ ) this._createPage( floatBlendable ? FloatType : HalfFloatType, outputs, moments && floatBlendable );
+		for ( let i = 0; i < pages; i ++ ) this._createPage( floatBlendable ? FloatType : HalfFloatType, outputs, accumulateMoments, variance && accumulateMoments, guides );
 
 		/**
-		 * The sums of the squared sample luminances, with the `moments` option and the 'float32-blendable'
+		 * The sums of the squared sample luminances, with the `moments` or `variance` option and the 'float32-blendable'
 		 * renderer feature, else `null`. Half floats would overflow.
 		 *
 		 * @type {?Texture}
@@ -180,6 +193,36 @@ class LightMapper {
 		 */
 		this.directionTexture = this.pages[ 0 ].directionTexture;
 
+		/**
+		 * The variance of the luminance of each texel of the light map, the variance of the mean of its
+		 * samples, in the red channel. Texels without samples are -1. Only with the `variance` option and
+		 * the 'float32-blendable' renderer feature, else `null`.
+		 *
+		 * @type {?Texture}
+		 * @readonly
+		 */
+		this.varianceTexture = this.pages[ 0 ].varianceTexture;
+
+		/**
+		 * The world-space position of the surface of each texel, with the index of its chart + 1 in alpha,
+		 * or 0 in alpha for texels without a surface. A chart is a set of triangles that are connected in
+		 * the light map. Only with the `guides` option, else `null`.
+		 *
+		 * @type {?Texture}
+		 * @readonly
+		 */
+		this.positionTexture = this.pages[ 0 ].positionTexture;
+
+		/**
+		 * The world-space normal of the surface of each texel. Only with the `guides` option, else `null`.
+		 *
+		 * @type {?Texture}
+		 * @readonly
+		 */
+		this.normalTexture = this.pages[ 0 ].normalTexture;
+
+		this._textureNodes = {};
+
 		this._camera = new OrthographicCamera();
 		this._objects = [];
 		this._proxies = [];
@@ -193,6 +236,14 @@ class LightMapper {
 		this._lights = lights;
 		this._frontMaterial = this._createBakeMaterial( irradianceNode, false, lights );
 		this._backMaterial = this._createBakeMaterial( irradianceNode, true, lights );
+
+		// the guides: proxies of the meshes that rasterize their surfaces and charts, one per mesh
+
+		this._chartStride = uniform( 0 ).onObjectUpdate( ( { object } ) => _chartStrides.get( object ) ?? 0 );
+		this._guideMaterials = guides ? [ this._createGuideMaterial( false ), this._createGuideMaterial( true ) ] : null;
+		this._guideProxies = [];
+		this._charts = 0;
+		this._guidesNeedUpdate = false;
 
 		// noise estimation, created on first use: a luminance snapshot and its change summed per block
 
@@ -212,14 +263,16 @@ class LightMapper {
 	 * @param {number} type - The type of the accumulation target.
 	 * @param {Array<string>} outputs - The outputs of the accumulation target.
 	 * @param {boolean} moments - Whether to accumulate the squared sample luminances.
+	 * @param {boolean} variance - Whether to estimate the variance of each texel, with the moments.
+	 * @param {boolean} guides - Whether to rasterize the guides.
 	 */
-	_createPage( type, outputs, moments ) {
+	_createPage( type, outputs, moments, variance, guides ) {
 
 		const size = this.size;
 		const directional = outputs.includes( 'direction' );
 
 		const accumulationTarget = new RenderTarget( size, size, { type, depthBuffer: false, count: outputs.length } );
-		const renderTarget = new RenderTarget( size, size, { type: HalfFloatType, depthBuffer: false, count: directional ? 2 : 1 } );
+		const renderTarget = new RenderTarget( size, size, { type: HalfFloatType, depthBuffer: false, count: ( directional ? 2 : 1 ) + ( variance ? 1 : 0 ) } );
 		renderTarget.texture.channel = 1;
 
 		let momentTexture = null, directionSums = null, directionTexture = null;
@@ -240,12 +293,38 @@ class LightMapper {
 
 		}
 
+		if ( renderTarget.textures.length > 1 ) renderTarget.texture.name = 'output';
+
 		if ( directional ) {
 
-			renderTarget.texture.name = 'output';
 			directionTexture = renderTarget.textures[ 1 ];
 			directionTexture.name = 'direction';
 			directionTexture.channel = 1;
+
+		}
+
+		let varianceTexture = null;
+
+		if ( variance ) {
+
+			varianceTexture = renderTarget.textures[ renderTarget.textures.length - 1 ];
+			varianceTexture.name = 'variance';
+			varianceTexture.channel = 1;
+
+		}
+
+		// the world-space position with the chart index + 1 in alpha ( 0 without surface ), and the normal
+
+		let guideTarget = null;
+
+		if ( guides ) {
+
+			guideTarget = new RenderTarget( size, size, { type: FloatType, minFilter: NearestFilter, magFilter: NearestFilter, depthBuffer: false, count: 2 } );
+			guideTarget.textures[ 0 ].name = 'position';
+			guideTarget.textures[ 1 ].name = 'normal';
+			guideTarget.textures[ 1 ].type = HalfFloatType;
+
+			for ( const map of guideTarget.textures ) map.channel = 1;
 
 		}
 
@@ -301,13 +380,87 @@ class LightMapper {
 
 		} );
 
+		// the variance of the samples over their count is the variance of their mean. The sum of the
+		// luminances is the luminance of the sum, the squared luminances are summed with the moments
+
+		const momentChannel = moments && directional ? 'a' : 'r';
+
+		const estimateVariance = Fn( () => {
+
+			const coord = ivec2( screenCoordinate.xy );
+			const sum = textureLoad( accumulation, coord ).toVar();
+			const count = sum.a;
+			const mean = luminance( sum.rgb ).div( count.max( 1 ) );
+			const meanSquare = textureLoad( momentTexture, coord )[ momentChannel ].div( count.max( 1 ) );
+			const variance = meanSquare.sub( mean.pow2() ).max( 0 ).div( count.sub( 1 ).max( 1 ) );
+
+			return count.greaterThan( 0 ).select( variance, - 1 );
+
+		} );
+
 		// the directions are encoded like a normal map
 
-		const resolveMaterial = new NodeMaterial();
-		resolveMaterial.fragmentNode = direction !== null ? mrt( { output: resolve(), direction: vec4( direction.mul( 0.5 ).add( 0.5 ), 1 ) } ) : resolve();
+		const members = { output: resolve() };
 
-		this.pages.push( { texture: renderTarget.texture, directionTexture, sampleTexture: accumulation, momentTexture, objects: [] } );
-		this._pages.push( { accumulation: accumulationTarget, renderTarget, directionSums, quad: new QuadMesh( resolveMaterial ), scene: new Scene(), snapshot: null, noiseTarget: null, noiseQuad: null, snapshotQuad: null } );
+		if ( direction !== null ) members.direction = vec4( direction.mul( 0.5 ).add( 0.5 ), 1 );
+		if ( varianceTexture !== null ) members.variance = estimateVariance();
+
+		const resolveMaterial = new NodeMaterial();
+		resolveMaterial.fragmentNode = Object.keys( members ).length > 1 ? mrt( members ) : members.output;
+
+		const positionTexture = guideTarget !== null ? guideTarget.textures[ 0 ] : null;
+		const normalTexture = guideTarget !== null ? guideTarget.textures[ 1 ] : null;
+
+		this.pages.push( { texture: renderTarget.texture, directionTexture, sampleTexture: accumulation, momentTexture, varianceTexture, positionTexture, normalTexture, objects: [] } );
+		this._pages.push( { accumulation: accumulationTarget, renderTarget, directionSums, quad: new QuadMesh( resolveMaterial ), scene: new Scene(), guides: guideTarget, guideScene: new Scene(), snapshot: null, noiseTarget: null, noiseQuad: null, snapshotQuad: null } );
+
+	}
+
+	/**
+	 * Returns a texture of the light mapper: `'color'`, the light map, or the inputs of a denoiser like
+	 * {@link DenoiseNode}: `'variance'` with the `variance` option, `'position'` and `'normal'` with
+	 * the `guides` option.
+	 *
+	 * @param {('color'|'variance'|'position'|'normal')} [name='color'] - The name of the texture.
+	 * @param {number} [page=0] - The page of the texture.
+	 * @return {Texture} The texture.
+	 */
+	getTexture( name = 'color', page = 0 ) {
+
+		const target = this.pages[ page ];
+
+		if ( target === undefined ) throw new Error( `THREE.LightMapper: Unknown page ${ page }.` );
+
+		const map = { color: target.texture, variance: target.varianceTexture, position: target.positionTexture, normal: target.normalTexture }[ name ];
+
+		if ( map === undefined ) throw new Error( `THREE.LightMapper: Unknown texture "${ name }".` );
+		if ( map === null ) throw new Error( `THREE.LightMapper: The "${ name }" texture needs the ${ name === 'variance' ? 'variance' : 'guides' } option.` );
+
+		return map;
+
+	}
+
+	/**
+	 * Returns a texture of the light mapper as a texture node, see {@link LightMapper#getTexture}. The
+	 * nodes sample the light map UVs, e.g. `material.lightMapNode = lightMapper.getTextureNode()`.
+	 *
+	 * @param {('color'|'variance'|'position'|'normal')} [name='color'] - The name of the texture.
+	 * @param {number} [page=0] - The page of the texture.
+	 * @return {TextureNode} The texture node.
+	 */
+	getTextureNode( name = 'color', page = 0 ) {
+
+		const key = `${ name }:${ page }`;
+		let node = this._textureNodes[ key ];
+
+		if ( node === undefined ) {
+
+			node = texture( this.getTexture( name, page ) );
+			this._textureNodes[ key ] = node;
+
+		}
+
+		return node;
 
 	}
 
@@ -346,6 +499,8 @@ class LightMapper {
 			this.pages[ index ].objects.push( object );
 			this._objects.push( object );
 			this._proxies.push( proxy );
+
+			if ( this._guideMaterials !== null ) this._addGuide( object, index, uvTransform );
 
 		}
 
@@ -387,6 +542,13 @@ class LightMapper {
 			this._proxies[ i ].matrix.copy( object.matrixWorld );
 			if ( object.isInstancedMesh ) this._proxies[ i ].count = object.count;
 
+			if ( this._guideMaterials !== null ) {
+
+				this._guideProxies[ i ].matrix.copy( object.matrixWorld );
+				if ( object.isInstancedMesh ) this._guideProxies[ i ].count = object.count;
+
+			}
+
 		}
 
 		// keep the shadow maps of the direct lights, rendering them from the UV bake would miss the casters
@@ -394,6 +556,10 @@ class LightMapper {
 		const shadows = this._lights.filter( ( light ) => light.shadow !== undefined ).map( ( { shadow } ) => [ shadow, shadow.autoUpdate, shadow.needsUpdate ] );
 
 		for ( const [ shadow ] of shadows ) shadow.autoUpdate = shadow.needsUpdate = false;
+
+		// the guides follow the jitters of the samples, all of them after a reset or new objects
+
+		const firstGuide = this._guidesNeedUpdate ? 0 : this.samples;
 
 		for ( let i = 0; i < samples; i ++ ) {
 
@@ -417,6 +583,8 @@ class LightMapper {
 			shadow.needsUpdate = needsUpdate;
 
 		}
+
+		if ( this._guideMaterials !== null ) this._renderGuides( firstGuide, this.samples );
 
 		for ( const page of this._pages ) {
 
@@ -520,6 +688,7 @@ class LightMapper {
 		this._resets ++;
 		this._variance = 0;
 		this._varianceSamples = 0;
+		this._guidesNeedUpdate = this._guideMaterials !== null;
 
 	}
 
@@ -531,11 +700,36 @@ class LightMapper {
 		this._frontMaterial.dispose();
 		this._backMaterial.dispose();
 
+		if ( this._guideMaterials !== null ) {
+
+			for ( const material of this._guideMaterials ) material.dispose();
+
+			// the guide proxies share the attributes of the meshes, only their chart attributes are freed.
+			// The materials go first, with them the render objects that would free all attributes they used
+
+			for ( const proxy of this._guideProxies ) {
+
+				const geometry = proxy.geometry;
+
+				for ( const name of Object.keys( geometry.attributes ) ) {
+
+					if ( name !== 'lightMapChart' ) geometry.deleteAttribute( name );
+
+				}
+
+				geometry.setIndex( null );
+				geometry.dispose();
+
+			}
+
+		}
+
 		for ( const page of this._pages ) {
 
 			page.accumulation.dispose();
 			page.renderTarget.dispose();
 			page.quad.material.dispose();
+			if ( page.guides !== null ) page.guides.dispose();
 
 			if ( page.snapshot !== null ) {
 
@@ -547,6 +741,114 @@ class LightMapper {
 			}
 
 		}
+
+	}
+
+	/**
+	 * Adds a proxy of a mesh that rasterizes its surface and charts into the guides of its page. The
+	 * instances of instanced meshes get charts of their own.
+	 *
+	 * @private
+	 * @param {Mesh} object - The mesh.
+	 * @param {number} page - The page of the mesh.
+	 * @param {?Vector4} uvTransform - The transform of its light map UVs, see {@link LightMapper#addObjects}.
+	 */
+	_addGuide( object, page, uvTransform ) {
+
+		const source = object.geometry;
+		const geometry = new BufferGeometry();
+
+		for ( const name of Object.keys( source.attributes ) ) geometry.setAttribute( name, source.attributes[ name ] );
+
+		geometry.setIndex( source.index );
+		geometry.setDrawRange( source.drawRange.start, source.drawRange.count );
+		for ( const group of source.groups ) geometry.addGroup( group.start, group.count, group.materialIndex );
+
+		const chart = computeCharts( source );
+		for ( let i = 0; i < chart.array.length; i ++ ) chart.array[ i ] += this._charts;
+		this._charts += chart.count * ( object.isInstancedMesh ? object.instanceMatrix.count : 1 );
+		geometry.setAttribute( 'lightMapChart', new BufferAttribute( chart.array, 1 ) );
+
+		const [ frontMaterial, backMaterial ] = this._guideMaterials;
+		const guideMaterial = material => material.side === BackSide ? backMaterial : frontMaterial;
+		const material = Array.isArray( object.material ) ? object.material.map( guideMaterial ) : guideMaterial( object.material );
+
+		const proxy = object.isInstancedMesh ? new InstancedMesh( geometry, material, object.count ) : new Mesh( geometry, material );
+
+		if ( object.isInstancedMesh ) {
+
+			proxy.instanceMatrix = object.instanceMatrix;
+			_chartStrides.set( proxy, chart.count );
+
+		}
+
+		proxy.matrixAutoUpdate = false;
+		proxy.frustumCulled = false;
+
+		if ( uvTransform !== null ) _uvTransforms.set( proxy, uvTransform.clone() );
+
+		this._pages[ page ].guideScene.add( proxy );
+		this._guideProxies.push( proxy );
+		this._guidesNeedUpdate = true;
+
+	}
+
+	/**
+	 * Rasterizes the world-space positions, normals and chart indices of the meshes into the guides, with the
+	 * jitters of a range of samples, so that the guides cover the texels that the samples cover, also at the
+	 * borders of the charts. The texel centers come last, the interior texels keep them.
+	 *
+	 * @private
+	 * @param {number} start - The first sample, 0 clears the guides.
+	 * @param {number} end - The sample after the last one.
+	 */
+	_renderGuides( start, end ) {
+
+		const renderer = this.renderer;
+
+		for ( let i = start; i <= end; i ++ ) {
+
+			if ( i < end ) this._jitter.value.set( halton( i + 1, 2 ) - 0.5, halton( i + 1, 3 ) - 0.5 ).multiplyScalar( 2 / this.size );
+			else this._jitter.value.set( 0, 0 );
+
+			for ( const page of this._pages ) {
+
+				renderer.setRenderTarget( page.guides );
+				if ( i === 0 ) renderer.clear();
+				renderer.render( page.guideScene, this._camera );
+
+			}
+
+		}
+
+		this._guidesNeedUpdate = false;
+
+	}
+
+	/**
+	 * Creates the material that rasterizes the guides in UV space, like the bake materials.
+	 *
+	 * @private
+	 * @param {boolean} flipNormal - Whether to flip the normal, for back-sided meshes.
+	 * @return {NodeMaterial} The material.
+	 */
+	_createGuideMaterial( flipNormal ) {
+
+		const material = new NodeMaterial();
+		material.side = DoubleSide;
+		material.depthTest = false;
+		material.depthWrite = false;
+		material.blending = NoBlending;
+
+		const clipPosition = vec4( lightMapUV().mul( this._uvTransform.xy ).add( this._uvTransform.zw ).flipY().mul( 2 ).sub( 1 ).add( this._jitter ), 0, 1 );
+		material.setupModelViewProjection = () => clipPosition;
+
+		const normal = flipNormal ? normalWorldGeometry.negate() : normalWorldGeometry;
+		const chart = round( attribute( 'lightMapChart', 'float' ).add( float( instanceIndex ).mul( this._chartStride ) ).toVarying() ).add( 1 );
+
+		material.fragmentNode = mrt( { position: vec4( positionWorld, chart ), normal: vec4( normal.normalize(), 1 ) } );
+
+		return material;
 
 	}
 
@@ -744,6 +1046,75 @@ class DirectionalLambertLightingModel extends PhongLightingModel {
 		this.direction.addAssign( cameraWorldMatrix.mul( vec4( lightDirection, 0 ) ).xyz.mul( luminance( irradiance ) ) );
 
 	}
+
+}
+
+/**
+ * Finds the charts of a geometry: the sets of triangles that share light map vertices.
+ *
+ * @private
+ * @param {BufferGeometry} geometry - A geometry with `uv1`.
+ * @return {{array: Float32Array, count: number}} The chart index of each vertex and the number of charts.
+ */
+function computeCharts( geometry ) {
+
+	const uv = geometry.getAttribute( 'uv1' );
+	const index = geometry.getIndex();
+	const parent = new Int32Array( uv.count );
+
+	for ( let i = 0; i < parent.length; i ++ ) parent[ i ] = i;
+
+	const find = ( i ) => {
+
+		while ( parent[ i ] !== i ) i = parent[ i ] = parent[ parent[ i ] ];
+		return i;
+
+	};
+
+	const union = ( a, b ) => {
+
+		a = find( a );
+		b = find( b );
+		if ( a !== b ) parent[ Math.max( a, b ) ] = Math.min( a, b );
+
+	};
+
+	// vertices at the same light map position, and the vertices of each triangle
+
+	const vertices = new Map();
+
+	for ( let i = 0; i < uv.count; i ++ ) {
+
+		const key = `${ uv.getX( i ) },${ uv.getY( i ) }`;
+		const other = vertices.get( key );
+
+		if ( other === undefined ) vertices.set( key, i );
+		else union( i, other );
+
+	}
+
+	const count = index !== null ? index.count : uv.count;
+	const vertex = ( i ) => index !== null ? index.getX( i ) : i;
+
+	for ( let i = 0; i + 2 < count; i += 3 ) {
+
+		union( vertex( i ), vertex( i + 1 ) );
+		union( vertex( i ), vertex( i + 2 ) );
+
+	}
+
+	const array = new Float32Array( uv.count );
+	const ids = new Map();
+
+	for ( let i = 0; i < array.length; i ++ ) {
+
+		const root = find( i );
+		if ( ids.has( root ) === false ) ids.set( root, ids.size );
+		array[ i ] = ids.get( root );
+
+	}
+
+	return { array, count: ids.size };
 
 }
 

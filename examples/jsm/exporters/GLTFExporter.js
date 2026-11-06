@@ -3396,7 +3396,7 @@ class GLTFMaterialsSheenExtension {
 		}
 
 		extensionDef.sheenRoughnessFactor = material.sheenRoughness;
-		extensionDef.sheenColorFactor = material.sheenColor.toArray();
+		extensionDef.sheenColorFactor = material.sheenColor.clone().multiplyScalar( material.sheen ).toArray();
 
 		materialDef.extensions = materialDef.extensions || {};
 		materialDef.extensions[ this.name ] = extensionDef;
@@ -3434,7 +3434,10 @@ class GLTFMaterialsAnisotropyExtension {
 
 		if ( material.anisotropyMap ) {
 
-			const anisotropyMapDef = { index: await writer.processTextureAsync( material.anisotropyMap ) };
+			const anisotropyMapDef = {
+				index: await writer.processTextureAsync( material.anisotropyMap ),
+				texCoord: material.anisotropyMap.channel
+			};
 			writer.applyTextureTransform( anisotropyMapDef, material.anisotropyMap );
 			extensionDef.anisotropyTexture = anisotropyMapDef;
 
