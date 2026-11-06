@@ -334,6 +334,37 @@ export const projectionDepth = /*@__PURE__*/ Fn( ( [ depth, near, far ], builder
 } );
 
 /**
+ * TSL function for converting a depth value to a viewZ value.
+ *
+ * It supports perspective and orthographic cameras and any depth buffer type.
+ *
+ * @tsl
+ * @function
+ * @param {Node<float>} depth - The depth value.
+ * @param {Node<float>} near - The camera's near value.
+ * @param {Node<float>} far - The camera's far value.
+ * @param {Camera} camera - The camera that produced the depth value.
+ * @returns {Node<float>}
+ */
+export const depthToViewZ = /*@__PURE__*/ Fn( ( [ depth, near, far, camera ], builder ) => {
+
+	if ( camera.isOrthographicCamera === true ) {
+
+		return orthographicDepthToViewZ( depth, near, far );
+
+	}
+
+	if ( builder.renderer.logarithmicDepthBuffer === true ) {
+
+		return logarithmicDepthToViewZ( depth, near, far );
+
+	}
+
+	return perspectiveDepthToViewZ( depth, near, far );
+
+} );
+
+/**
  * TSL function for defining a value for the current fragment's depth.
  *
  * @tsl

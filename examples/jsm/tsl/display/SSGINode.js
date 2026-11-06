@@ -1,5 +1,5 @@
 import { RenderTarget, Vector2, Node, QuadMesh, NodeMaterial, RendererUtils, MathUtils, RGBFormat, RedFormat, UnsignedInt101111Type, UnsignedByteType } from 'three/webgpu';
-import { clamp, normalize, reference, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, bool, getNormalFromDepth, countOneBits, interleavedGradientNoise, property, outputStruct, context, isBackgroundDepth, min, projectionDepth, textureSize } from 'three/tsl';
+import { clamp, normalize, reference, Fn, NodeUpdateType, uniform, vec4, passTexture, uv, getViewPosition, screenCoordinate, float, sub, fract, dot, vec2, rand, vec3, Loop, mul, PI, cos, sin, uint, cross, acos, sign, pow, luminance, If, max, abs, Break, sqrt, HALF_PI, div, ceil, shiftRight, convertToTexture, bool, getNormalFromDepth, countOneBits, interleavedGradientNoise, property, outputStruct, context, isBackgroundDepth, min, projectionDepth, textureSize, depthToViewZ } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -446,7 +446,6 @@ class SSGINode extends Node {
 		const sampleDepth = ( uv ) => projectionDepth( this.depthNode.sample( uv ).r, this._cameraNear, this._cameraFar );
 		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.sample( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this._cameraProjectionMatrixInverse );
 		const sampleBeauty = ( uv ) => this.beautyNode.sample( uv );
-		const viewZ = ( v ) => getViewPosition( uvNode, projectionDepth( v, this._cameraNear, this._cameraFar ), this._cameraProjectionMatrixInverse ).z;
 
 		// From Activision GTAO paper: https://www.activision.com/cdn/research/s2016_pbs_activision_occlusion.pptx
 
@@ -574,7 +573,10 @@ class SSGINode extends Node {
 
 				depth.assign( projectionDepth( d, this._cameraNear, this._cameraFar ) );
 
-				If( viewZ( minD ).div( viewZ( maxD ) ).sub( 1 ).abs().greaterThan( 0.01 ), () => {
+				const minViewZ = depthToViewZ( minD, this._cameraNear, this._cameraFar, this._camera ).toConst();
+				const maxViewZ = depthToViewZ( maxD, this._cameraNear, this._cameraFar, this._camera ).toConst();
+
+				If( minViewZ.div( maxViewZ ).sub( 1 ).abs().greaterThan( 0.01 ), () => {
 
 					const size = vec2( textureSize( this.depthNode, 0 ) ).toConst();
 					const offset = g.w.equal( d ).select( vec2( 0.5, 0.5 ), g.z.equal( d ).select( vec2( 1.5, 0.5 ), g.y.equal( d ).select( vec2( 1.5, 1.5 ), vec2( 0.5, 1.5 ) ) ) ).toConst();
