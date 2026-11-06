@@ -6,7 +6,7 @@ import {
 	NodeMaterial
 } from 'three/webgpu';
 
-import { Fn, add, cameraPosition, cameraViewMatrix, inverseSqrt, normalize, positionWorld, sub, time, texture, vec2, vec3, max, dot, reflect, pow, uniform, reflector, mul, mix } from 'three/tsl';
+import { Fn, abs, add, cameraPosition, cameraViewMatrix, clamp, inverseSqrt, normalize, positionWorld, sub, time, texture, vec2, vec3, max, dot, reflect, pow, uniform, reflector, mul, mix } from 'three/tsl';
 
 /**
  * A basic flat, reflective water effect.
@@ -128,11 +128,14 @@ class WaterMesh extends Mesh {
 		} );
 
 		const noise = getNoise( positionWorld.xz.mul( this.size ) );
-		const surfaceNormal = normalize( noise.xzy.mul( vec3( 1.5, 1.0, 1.5 ) ) );
+		const rawNormal = normalize( noise.xzy.mul( vec3( 1.5, 1.0, 1.5 ) ) );
 
 		const worldToEye = cameraPosition.sub( positionWorld );
 		const invDistance = inverseSqrt( dot( worldToEye, worldToEye ) );
 		const eyeDirection = worldToEye.mul( invDistance );
+
+		const NoV = dot( eyeDirection, rawNormal );
+		const surfaceNormal = normalize( rawNormal.add( eyeDirection.mul( max( 0.0, sub( 0.02, NoV ) ) ) ) );
 
 		const reflection = reflect( this.sunDirection.negate(), surfaceNormal );
 		const direction = max( 0.0, dot( eyeDirection, reflection ) );
@@ -144,7 +147,12 @@ class WaterMesh extends Mesh {
 			surfaceNormal.x.mul( viewRight.x ).add( surfaceNormal.z.mul( viewRight.y ) ),
 			surfaceNormal.z.mul( viewRight.x ).sub( surfaceNormal.x.mul( viewRight.y ) )
 		);
-		const distortion = vec2( normalTilt.x.negate(), normalTilt.y ).mul( add( 0.001, invDistance ) ).mul( this.distortionScale );
+		const grazing = clamp( eyeDirection.y.mul( 3.0 ), 0.0, 1.0 );
+		const reflTilt = vec2(
+			normalTilt.x.mul( max( eyeDirection.y, 0.15 ) ),
+			mix( abs( normalTilt.y ), normalTilt.y, grazing )
+		);
+		const distortion = vec2( reflTilt.x.negate(), reflTilt.y ).mul( add( 0.001, invDistance ) ).mul( this.distortionScale );
 
 		const mirrorSampler = reflector( {
 			resolutionScale: options.resolutionScale !== undefined ? options.resolutionScale : 0.5,

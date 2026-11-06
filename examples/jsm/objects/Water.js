@@ -194,6 +194,10 @@ class Water extends Mesh {
 					vec3 worldToEye = eye - worldPosition.xyz;
 					float invDistance = inversesqrt( dot( worldToEye, worldToEye ) );
 					vec3 eyeDirection = worldToEye * invDistance;
+
+					float NoV = dot( eyeDirection, surfaceNormal );
+					surfaceNormal = normalize( surfaceNormal + eyeDirection * max( 0.0, - NoV + 0.02 ) );
+
 					sunLight( surfaceNormal, eyeDirection, 100.0, 2.0, 0.5, diffuseLight, specularLight );
 
 					vec2 viewRight = vec2( viewMatrix[ 0 ][ 0 ], viewMatrix[ 2 ][ 0 ] );
@@ -201,7 +205,12 @@ class Water extends Mesh {
 						surfaceNormal.x * viewRight.x + surfaceNormal.z * viewRight.y,
 						surfaceNormal.z * viewRight.x - surfaceNormal.x * viewRight.y
 					);
-					vec2 distortion = - normalTilt * ( 0.001 + invDistance ) * distortionScale;
+					float grazing = clamp( eyeDirection.y * 3.0, 0.0, 1.0 );
+					vec2 reflTilt = vec2(
+						normalTilt.x * max( eyeDirection.y, 0.15 ),
+						mix( abs( normalTilt.y ), normalTilt.y, grazing )
+					);
+					vec2 distortion = - reflTilt * ( 0.001 + invDistance ) * distortionScale;
 					vec3 reflectionSample = vec3( texture2D( mirrorSampler, mirrorCoord.xy / mirrorCoord.w + distortion ) );
 
 					float theta = max( dot( eyeDirection, surfaceNormal ), 0.0 );
