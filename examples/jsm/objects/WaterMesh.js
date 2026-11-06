@@ -5,7 +5,7 @@ import {
 	NodeMaterial
 } from 'three/webgpu';
 
-import { Fn, add, cameraPosition, div, normalize, positionWorld, sub, time, texture, vec2, max, dot, reflect, pow, length, float, uniform, reflector, mul, mix } from 'three/tsl';
+import { Fn, add, cameraPosition, div, normalize, positionWorld, sub, time, texture, vec2, vec3, max, dot, reflect, pow, length, float, uniform, reflector, mul, mix } from 'three/tsl';
 
 /**
  * A basic flat, reflective water effect.
@@ -125,7 +125,7 @@ class WaterMesh extends Mesh {
 		} );
 
 		const noise = getNoise( positionWorld.xz.mul( this.size ) );
-		const surfaceNormal = normalize( noise.xzy.mul( 1.5, 1.0, 1.5 ) );
+		const surfaceNormal = normalize( noise.xzy.mul( vec3( 1.5, 1.0, 1.5 ) ) );
 
 		const worldToEye = cameraPosition.sub( positionWorld );
 		const eyeDirection = normalize( worldToEye );
