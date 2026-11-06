@@ -6,7 +6,7 @@ import {
 	NodeMaterial
 } from 'three/webgpu';
 
-import { Fn, add, cameraPosition, cameraViewMatrix, inverseSqrt, normalize, positionWorld, sub, time, texture, vec2, vec3, max, dot, reflect, pow, uniform, reflector, mul, mix } from 'three/tsl';
+import { Fn, abs, add, cameraPosition, cameraViewMatrix, clamp, div, inverseSqrt, normalize, positionWorld, smoothstep, sqrt, sub, time, texture, vec2, vec3, max, dot, uniform, reflector, mul, mix } from 'three/tsl';
 
 /**
  * A basic flat, reflective water effect.
@@ -109,40 +109,68 @@ class WaterMesh extends Mesh {
 
 			const offset = time;
 
-			const uv0 = uv.mul( 1 / 103 ).add( offset.mul( vec2( 1 / 17, 1 / 29 ) ) ).toVar();
-			const uv1 = uv.mul( 1 / 107 ).sub( offset.mul( vec2( - 1 / 19, 1 / 31 ) ) ).toVar();
-			const uv2 = uv.mul( vec2( 1 / 8907.0, 1 / 9803.0 ) ).add( offset.mul( vec2( 1 / 101, 1 / 97 ) ) ).toVar();
-			const uv3 = uv.mul( vec2( 1 / 1091.0, 1 / 1027.0 ) ).sub( offset.mul( vec2( 1 / 109, - 1 / 113 ) ) ).toVar();
+			const r1 = vec2( uv.x.mul( 0.8 ).sub( uv.y.mul( 0.6 ) ), uv.x.mul( 0.6 ).add( uv.y.mul( 0.8 ) ) );
+			const r2 = vec2( uv.x.mul( 0.38461538 ).add( uv.y.mul( 0.92307692 ) ), uv.y.mul( 0.38461538 ).sub( uv.x.mul( 0.92307692 ) ) );
+			const r3 = vec2( uv.y.mul( 0.88235294 ).sub( uv.x.mul( 0.47058824 ) ), uv.y.mul( - 0.47058824 ).sub( uv.x.mul( 0.88235294 ) ) );
 
-			const sample0 = this.waterNormals.sample( uv0 );
-			const sample1 = this.waterNormals.sample( uv1 );
-			const sample2 = this.waterNormals.sample( uv2 );
-			const sample3 = this.waterNormals.sample( uv3 );
+			const uv0 = uv.mul( 1 / 960 ).add( offset.mul( vec2( 0.011, 0.010 ) ) ).add( vec2( 0.13, 0.37 ) ).toVar();
+			const uv1 = r1.mul( 1 / 290 ).add( offset.mul( vec2( 0.021, - 0.018 ) ) ).add( vec2( 0.41, 0.73 ) ).toVar();
+			const uv2 = r2.mul( 1 / 97 ).add( offset.mul( vec2( - 0.034, 0.036 ) ) ).add( vec2( 0.67, 0.19 ) ).toVar();
+			const uv3 = r3.mul( 1 / 31 ).add( offset.mul( vec2( 0.058, - 0.064 ) ) ).add( vec2( 0.83, 0.53 ) ).toVar();
 
-			const noise = sample0.add( sample1 ).add( sample2 ).add( sample3 );
+			const noise = this.waterNormals.sample( uv0 ).mul( 0.16 )
+				.add( this.waterNormals.sample( uv1 ).mul( 0.30 ) )
+				.add( this.waterNormals.sample( uv2 ).mul( 0.34 ) )
+				.add( this.waterNormals.sample( uv3 ).mul( 0.20 ) );
 
-			return noise.mul( 0.5 ).sub( 1 );
+			return noise.mul( 2.0 ).sub( 1.0 );
 
 		} );
 
 		const noise = getNoise( positionWorld.xz.mul( this.size ) );
-		const surfaceNormal = normalize( noise.xzy.mul( vec3( 1.5, 1.0, 1.5 ) ) );
+		const rawNormal = normalize( noise.xzy.mul( vec3( 1.5, 1.0, 1.5 ) ) );
 
 		const worldToEye = cameraPosition.sub( positionWorld );
 		const invDistance = inverseSqrt( dot( worldToEye, worldToEye ) );
 		const eyeDirection = worldToEye.mul( invDistance );
 
-		const reflection = reflect( this.sunDirection.negate(), surfaceNormal );
-		const direction = max( 0.0, dot( eyeDirection, reflection ) );
-		const specularLight = pow( direction, 100 ).mul( this.sunColor ).mul( 2.0 );
-		const diffuseLight = max( dot( this.sunDirection, surfaceNormal ), 0.0 ).mul( this.sunColor ).mul( 0.5 );
+		const NoV = dot( eyeDirection, rawNormal );
+		const surfaceNormal = normalize( rawNormal.add( eyeDirection.mul( max( 0.0, sub( 0.02, NoV ) ) ) ) );
+
+		const NoL = max( dot( surfaceNormal, this.sunDirection ), 0.0 );
+
+		const halfVector = normalize( this.sunDirection.add( eyeDirection ) );
+		const NoH = max( dot( surfaceNormal, halfVector ), 0.0 );
+		const clampedNoV = max( dot( surfaceNormal, eyeDirection ), 0.001 );
+		const VoH = max( dot( eyeDirection, halfVector ), 0.0 );
+
+		const roughness = sub( 0.14, invDistance.mul( 0.095 ).div( invDistance.add( 0.004 ) ) );
+		const a = roughness.mul( roughness );
+		const a2 = a.mul( a );
+		const d = NoH.mul( a2 ).sub( NoH ).mul( NoH ).add( 1.0 );
+		const D = a2.div( d.mul( d ).mul( 3.14159265 ).add( 1e-7 ) );
+
+		const Vis = div( 0.5, mix( NoL.mul( clampedNoV ).mul( 2.0 ), NoL.add( clampedNoV ), a ) );
+
+		const oneMinusVoH = sub( 1.0, VoH );
+		const oneMinusVoH2 = oneMinusVoH.mul( oneMinusVoH );
+		const F = add( 0.02, mul( 0.98, oneMinusVoH2.mul( oneMinusVoH2 ).mul( oneMinusVoH ) ) );
+
+		const sunFade = smoothstep( - 0.02, 0.02, this.sunDirection.y );
+		const spec = D.mul( Vis ).mul( F ).mul( NoL ).mul( sunFade ).mul( 3.0 );
+		const specularLight = spec.div( spec.mul( 0.08 ).add( 1.0 ) ).mul( this.sunColor );
 
 		const viewRight = vec2( cameraViewMatrix[ 0 ].x, cameraViewMatrix[ 2 ].x );
 		const normalTilt = vec2(
 			surfaceNormal.x.mul( viewRight.x ).add( surfaceNormal.z.mul( viewRight.y ) ),
 			surfaceNormal.z.mul( viewRight.x ).sub( surfaceNormal.x.mul( viewRight.y ) )
 		);
-		const distortion = vec2( normalTilt.x.negate(), normalTilt.y ).mul( add( 0.001, invDistance ) ).mul( this.distortionScale );
+		const grazing = clamp( eyeDirection.y.mul( 3.0 ), 0.0, 1.0 );
+		const reflTilt = vec2(
+			normalTilt.x.mul( max( eyeDirection.y, 0.15 ) ),
+			mix( abs( normalTilt.y ), normalTilt.y, grazing )
+		);
+		const distortion = vec2( reflTilt.x.negate(), reflTilt.y ).mul( add( 0.001, invDistance ) ).mul( this.distortionScale );
 
 		const mirrorSampler = reflector( {
 			resolutionScale: options.resolutionScale !== undefined ? options.resolutionScale : 0.5,
@@ -167,8 +195,16 @@ class WaterMesh extends Mesh {
 			const oneMinusTheta = sub( 1.0, theta );
 			const oneMinusTheta2 = oneMinusTheta.mul( oneMinusTheta );
 			const reflectance = add( 0.02, mul( 0.98, oneMinusTheta2.mul( oneMinusTheta2 ).mul( oneMinusTheta ) ) );
-			const scatter = this.waterColor.mul( theta );
-			const albedo = mix( diffuseLight.mul( 0.3 ).add( scatter ), mirrorSampler.rgb.add( specularLight ), reflectance );
+
+			const twilight = smoothstep( - 0.1, 0.05, this.sunDirection.y );
+			const upwelling = this.waterColor.mul( this.sunColor ).mul( twilight.mul( add( 0.35, max( this.sunDirection.y, 0.0 ).mul( 0.65 ) ) ).mul( add( 0.35, theta.mul( 0.65 ) ) ) );
+			const crestSlope = max( 0.0, normalTilt.y );
+			const backSun = max( 0.0, dot( eyeDirection.negate(), normalize( this.sunDirection.add( vec3( surfaceNormal.x, 0.0, surfaceNormal.z ).mul( 0.6 ) ) ) ) );
+			const backSun2 = backSun.mul( backSun );
+			const sssFactor = crestSlope.mul( backSun2.mul( backSun2 ) ).mul( twilight );
+			const subsurface = upwelling.add( sqrt( max( this.waterColor, vec3( 0.0 ) ) ).mul( this.sunColor ).mul( sssFactor.mul( 0.35 ) ) );
+
+			const albedo = mix( subsurface, mirrorSampler.rgb, reflectance ).add( specularLight );
 
 			return albedo;
 

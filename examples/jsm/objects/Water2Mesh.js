@@ -8,7 +8,7 @@ import {
 	Node
 } from 'three/webgpu';
 
-import { Fn, vec2, viewportSafeUV, viewportSharedTexture, reflector, float, abs, inverseSqrt, sub, texture, uniform, vec4, cameraPosition, cameraViewMatrix, positionWorld, uv, mix, vec3, normalize, max, dot, screenUV } from 'three/tsl';
+import { Fn, vec2, viewportSafeUV, viewportSharedTexture, reflector, float, abs, add, clamp, fract, inverseSqrt, mod, mul, sub, texture, uniform, vec4, cameraPosition, cameraViewMatrix, positionWorld, uv, mix, vec3, normalize, max, dot, screenUV } from 'three/tsl';
 
 /** @module Water2Mesh */
 
@@ -116,18 +116,24 @@ class WaterNode extends Node {
 		this.flowConfig.value.x += this.flowSpeed.value * delta; // flowMapOffset0
 		this.flowConfig.value.y = this.flowConfig.value.x + this._halfCycle; // flowMapOffset1
 
-		// Important: The distance between offsets should be always the value of "halfCycle".
-		// Moreover, both offsets should be in the range of [ 0, cycle ].
-		// This approach ensures a smooth water flow and avoids "reset" effects.
+		if ( this._USE_FLOW === true ) {
 
-		if ( this.flowConfig.value.x >= this._cycle ) {
+			// Important: The distance between offsets should be always the value of "halfCycle".
+			// Moreover, both offsets should be in the range of [ 0, cycle ].
+			// This approach ensures a smooth water flow and avoids "reset" effects.
 
-			this.flowConfig.value.x = 0;
-			this.flowConfig.value.y = this._halfCycle;
+			if ( this.flowConfig.value.x >= this._cycle ) {
 
-		} else if ( this.flowConfig.value.y >= this._cycle ) {
+				this.flowConfig.value.x = this.flowConfig.value.x % this._cycle;
+				this.flowConfig.value.y = this.flowConfig.value.x + this._halfCycle;
 
-			this.flowConfig.value.y = this.flowConfig.value.y - this._cycle;
+			}
+
+			if ( this.flowConfig.value.y >= this._cycle ) {
+
+				this.flowConfig.value.y = this.flowConfig.value.y - this._cycle;
+
+			}
 
 		}
 
@@ -146,7 +152,6 @@ class WaterNode extends Node {
 		const outputNode = Fn( () => {
 
 			const flowMapOffset0 = this.flowConfig.x;
-			const flowMapOffset1 = this.flowConfig.y;
 			const halfCycle = this.flowConfig.z;
 
 			const worldToEye = cameraPosition.sub( positionWorld );
@@ -155,27 +160,53 @@ class WaterNode extends Node {
 			const toEye = worldToEye.mul( invDistance );
 			const distance = distSq.mul( invDistance );
 
-			const flow = ( this._USE_FLOW === true
-				? this.flowMap.rg.mul( 2 ).sub( 1 )
-				: vec2( this.flowDirection.x, this.flowDirection.y )
-			).mul( vec2( - 1, 1 ) );
-
-			// sample normal maps (distort uvs with flowdata)
+			// determine flow direction and sample normal maps
 
 			const uvs = uv();
+			const rotUv = vec2( uvs.x.mul( 0.8 ).sub( uvs.y.mul( 0.6 ) ), uvs.x.mul( 0.6 ).add( uvs.y.mul( 0.8 ) ) );
 
-			const normalUv0 = uvs.mul( this.scale ).add( flow.mul( flowMapOffset0 ) );
-			const normalUv1 = uvs.mul( this.scale ).add( flow.mul( flowMapOffset1 ) );
+			let normal;
 
-			const normalColor0 = this.normalMap0.sample( normalUv0 );
-			const normalColor1 = this.normalMap1.sample( normalUv1 );
+			if ( this._USE_FLOW === true ) {
 
-			// linear interpolate to get the final normal color
-			const flowLerp = abs( halfCycle.sub( flowMapOffset0 ) ).div( halfCycle );
-			const normalColor = mix( normalColor0, normalColor1, flowLerp );
+				const flow = this.flowMap.rg.mul( 2 ).sub( 1 ).mul( vec2( - 1, 1 ) );
 
-			// calculate normal vector
-			const normal = normalize( vec3( normalColor.r.mul( 2 ).sub( 1 ), normalColor.b, normalColor.g.mul( 2 ).sub( 1 ) ) );
+				const cycle = halfCycle.mul( 2.0 );
+				const phaseShift = fract( dot( uvs, vec2( 3.1, 4.7 ) ) ).mul( cycle );
+				const phase0 = mod( flowMapOffset0.add( phaseShift ), cycle );
+				const phase1 = mod( phase0.add( halfCycle ), cycle );
+
+				const normalUv0 = uvs.mul( this.scale ).add( flow.mul( phase0 ) );
+				const normalUv1 = rotUv.mul( this.scale.mul( 1.37 ) ).add( flow.mul( phase1 ) ).add( vec2( 0.37, 0.73 ) );
+
+				const n0 = this.normalMap0.sample( normalUv0 ).rgb.mul( 2.0 ).sub( 1.0 );
+				const n1 = this.normalMap1.sample( normalUv1 ).rgb.mul( 2.0 ).sub( 1.0 );
+
+				const flowLerp = abs( halfCycle.sub( phase0 ) ).div( halfCycle );
+				const blended = mix( n0, n1, flowLerp );
+				const varianceNorm = inverseSqrt( sub( 1.0, flowLerp.mul( sub( 1.0, flowLerp ) ).mul( 2.0 ) ) );
+
+				normal = normalize( vec3( blended.x.mul( varianceNorm ), blended.z, blended.y.mul( varianceNorm ) ) );
+
+			} else {
+
+				const flow = vec2( this.flowDirection.x.negate(), this.flowDirection.y );
+				const flow0 = vec2( flow.x.mul( 0.98480775 ).sub( flow.y.mul( 0.17364818 ) ), flow.x.mul( 0.17364818 ).add( flow.y.mul( 0.98480775 ) ) );
+				const flow1 = vec2( flow.x.mul( 0.98480775 ).add( flow.y.mul( 0.17364818 ) ), flow.y.mul( 0.98480775 ).sub( flow.x.mul( 0.17364818 ) ) );
+
+				const normalUv0 = uvs.mul( this.scale ).add( flow0.mul( flowMapOffset0 ) );
+				const normalUv1 = rotUv.mul( this.scale.mul( 2.15 ) ).add( flow1.mul( flowMapOffset0.mul( 1.45 ) ) ).add( vec2( 0.37, 0.73 ) );
+
+				const n0 = this.normalMap0.sample( normalUv0 ).rgb.mul( 2.0 ).sub( 1.0 );
+				const n1 = this.normalMap1.sample( normalUv1 ).rgb.mul( 2.0 ).sub( 1.0 );
+
+				const blended = n0.mul( 0.65 ).add( n1.mul( 0.35 ) );
+				normal = normalize( vec3( blended.x.mul( 1.55 ), blended.z, blended.y.mul( 1.55 ) ) );
+
+			}
+
+			const NoV = dot( toEye, normal );
+			normal = normalize( normal.add( toEye.mul( max( 0.0, sub( 0.02, NoV ) ) ) ) );
 
 			// calculate the fresnel term to blend reflection and refraction maps
 			const theta = max( dot( toEye, normal ), 0 );
@@ -183,24 +214,35 @@ class WaterNode extends Node {
 			const oneMinusTheta2 = oneMinusTheta.mul( oneMinusTheta );
 			const reflectance = oneMinusTheta2.mul( oneMinusTheta2 ).mul( oneMinusTheta ).mul( sub( 1.0, this.reflectivity ) ).add( this.reflectivity );
 
-			// reflector, refractor
+			// reflector, refractor with decoupled reflection and Snell refraction distortion
 
 			const viewRight = vec2( cameraViewMatrix[ 0 ].x, cameraViewMatrix[ 2 ].x );
 			const normalTilt = vec2(
 				normal.x.mul( viewRight.x ).add( normal.z.mul( viewRight.y ) ),
 				normal.z.mul( viewRight.x ).sub( normal.x.mul( viewRight.y ) )
 			);
-			const offset = normalTilt.mul( float( 0.05 ).div( float( 1.0 ).add( distance.mul( 0.02 ) ) ) ).toVar();
+			const distFalloff = float( 1.0 ).div( float( 1.0 ).add( distance.mul( 0.02 ) ) );
+			const grazing = clamp( toEye.y.mul( 3.0 ), 0.0, 1.0 );
+			const reflOffset = vec2(
+				normalTilt.x.mul( max( toEye.y, 0.2 ) ),
+				mix( abs( normalTilt.y ), normalTilt.y, grazing )
+			).mul( mul( 0.055, distFalloff ) ).toVar();
+			const refrOffset = normalTilt.mul( mul( 0.022, distFalloff ) ).toVar();
 
 			const reflectionSampler = this._reflectionSampler;
-			reflectionSampler.uvNode = this._defaultReflectorUV.add( vec2( offset.x.negate(), offset.y ) );
+			reflectionSampler.uvNode = this._defaultReflectorUV.add( vec2( reflOffset.x.negate(), reflOffset.y ) );
 
-			const refractorUV = screenUV.sub( offset );
+			const refractorUV = screenUV.sub( refrOffset );
 			const refractionSampler = viewportSharedTexture( viewportSafeUV( refractorUV ) );
+
+			// angular Beer-Lambert absorption along Snell's refracted path (n = 1.333)
+
+			const invMuT = inverseSqrt( add( 0.4375, theta.mul( theta ).mul( 0.5625 ) ) );
+			const transmittance = mix( this.color, this.color.mul( this.color ), invMuT.sub( 1.0 ) );
 
 			// tint transmitted light only; dielectric surface reflections stay achromatic
 
-			return vec4( mix( refractionSampler.rgb.mul( this.color ), reflectionSampler.rgb, reflectance ), 1.0 );
+			return vec4( mix( refractionSampler.rgb.mul( transmittance ), reflectionSampler.rgb, reflectance ), 1.0 );
 
 		} )();
 

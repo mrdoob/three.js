@@ -186,18 +186,24 @@ class Water extends Mesh {
 			config.value.x += flowSpeed * delta; // flowMapOffset0
 			config.value.y = config.value.x + halfCycle; // flowMapOffset1
 
-			// Important: The distance between offsets should be always the value of "halfCycle".
-			// Moreover, both offsets should be in the range of [ 0, cycle ].
-			// This approach ensures a smooth water flow and avoids "reset" effects.
+			if ( flowMap !== undefined ) {
 
-			if ( config.value.x >= cycle ) {
+				// Important: The distance between offsets should be always the value of "halfCycle".
+				// Moreover, both offsets should be in the range of [ 0, cycle ].
+				// This approach ensures a smooth water flow and avoids "reset" effects.
 
-				config.value.x = 0;
-				config.value.y = halfCycle;
+				if ( config.value.x >= cycle ) {
 
-			} else if ( config.value.y >= cycle ) {
+					config.value.x = config.value.x % cycle;
+					config.value.y = config.value.x + halfCycle;
 
-				config.value.y = config.value.y - cycle;
+				}
+
+				if ( config.value.y >= cycle ) {
+
+					config.value.y = config.value.y - cycle;
+
+				}
 
 			}
 
@@ -343,25 +349,42 @@ Water.WaterShader = {
 			vec3 toEye = vToEye * invDistance;
 			float distance = distSq * invDistance;
 
-			// determine flow direction
+			// determine flow direction and sample normal maps
 			vec2 flow;
+			vec3 normal;
 			#ifdef USE_FLOWMAP
 				flow = texture2D( tFlowMap, vUv ).rg * 2.0 - 1.0;
+				flow.x *= - 1.0;
+
+				float cycle = halfCycle * 2.0;
+				float phaseShift = fract( dot( vUv, vec2( 3.1, 4.7 ) ) ) * cycle;
+				float phase0 = mod( flowMapOffset0 + phaseShift, cycle );
+				float phase1 = mod( phase0 + halfCycle, cycle );
+
+				vec2 rotUv = vec2( vUv.x * 0.8 - vUv.y * 0.6, vUv.x * 0.6 + vUv.y * 0.8 );
+				vec3 n0 = texture2D( tNormalMap0, ( vUv * scale ) + flow * phase0 ).rgb * 2.0 - 1.0;
+				vec3 n1 = texture2D( tNormalMap1, ( rotUv * ( scale * 1.37 ) ) + flow * phase1 + vec2( 0.37, 0.73 ) ).rgb * 2.0 - 1.0;
+
+				float flowLerp = abs( halfCycle - phase0 ) / halfCycle;
+				vec3 blended = mix( n0, n1, flowLerp );
+				float varianceNorm = inversesqrt( 1.0 - 2.0 * flowLerp * ( 1.0 - flowLerp ) );
+				normal = normalize( vec3( blended.x * varianceNorm, blended.z, blended.y * varianceNorm ) );
 			#else
-				flow = flowDirection;
+				flow = vec2( - flowDirection.x, flowDirection.y );
+
+				vec2 flow0 = vec2( flow.x * 0.98480775 - flow.y * 0.17364818, flow.x * 0.17364818 + flow.y * 0.98480775 );
+				vec2 flow1 = vec2( flow.x * 0.98480775 + flow.y * 0.17364818, flow.y * 0.98480775 - flow.x * 0.17364818 );
+				vec2 rotUv = vec2( vUv.x * 0.8 - vUv.y * 0.6, vUv.x * 0.6 + vUv.y * 0.8 );
+
+				vec3 n0 = texture2D( tNormalMap0, ( vUv * scale ) + flow0 * flowMapOffset0 ).rgb * 2.0 - 1.0;
+				vec3 n1 = texture2D( tNormalMap1, ( rotUv * ( scale * 2.15 ) ) + flow1 * ( flowMapOffset0 * 1.45 ) + vec2( 0.37, 0.73 ) ).rgb * 2.0 - 1.0;
+
+				vec3 blended = n0 * 0.65 + n1 * 0.35;
+				normal = normalize( vec3( blended.x * 1.55, blended.z, blended.y * 1.55 ) );
 			#endif
-			flow.x *= - 1.0;
 
-			// sample normal maps (distort uvs with flowdata)
-			vec4 normalColor0 = texture2D( tNormalMap0, ( vUv * scale ) + flow * flowMapOffset0 );
-			vec4 normalColor1 = texture2D( tNormalMap1, ( vUv * scale ) + flow * flowMapOffset1 );
-
-			// linear interpolate to get the final normal color
-			float flowLerp = abs( halfCycle - flowMapOffset0 ) / halfCycle;
-			vec4 normalColor = mix( normalColor0, normalColor1, flowLerp );
-
-			// calculate normal vector
-			vec3 normal = normalize( vec3( normalColor.r * 2.0 - 1.0, normalColor.b,  normalColor.g * 2.0 - 1.0 ) );
+			float NoV = dot( toEye, normal );
+			normal = normalize( normal + toEye * max( 0.0, - NoV + 0.02 ) );
 
 			// calculate the fresnel term to blend reflection and refraction maps
 			float theta = max( dot( toEye, normal ), 0.0 );
@@ -369,21 +392,31 @@ Water.WaterShader = {
 			float oneMinusTheta2 = oneMinusTheta * oneMinusTheta;
 			float reflectance = reflectivity + ( 1.0 - reflectivity ) * ( oneMinusTheta2 * oneMinusTheta2 * oneMinusTheta );
 
-			// calculate final uv coords
+			// calculate final uv coords with decoupled reflection and Snell refraction distortion
 			vec2 viewRight = vec2( viewMatrix[ 0 ][ 0 ], viewMatrix[ 2 ][ 0 ] );
 			vec2 normalTilt = vec2(
 				normal.x * viewRight.x + normal.z * viewRight.y,
 				normal.z * viewRight.x - normal.x * viewRight.y
 			);
-			vec2 offset = normalTilt * ( 0.05 / ( 1.0 + 0.02 * distance ) );
+			float distFalloff = 1.0 / ( 1.0 + 0.02 * distance );
+			float grazing = clamp( toEye.y * 3.0, 0.0, 1.0 );
+			vec2 reflOffset = vec2(
+				normalTilt.x * max( toEye.y, 0.2 ),
+				mix( abs( normalTilt.y ), normalTilt.y, grazing )
+			) * ( 0.055 * distFalloff );
+			vec2 refrOffset = normalTilt * ( 0.022 * distFalloff );
 
 			vec2 coord = vCoord.xy / vCoord.w;
 
-			vec4 reflectColor = texture2D( tReflectionMap, vec2( 1.0 - coord.x - offset.x, coord.y - offset.y ) );
-			vec4 refractColor = texture2D( tRefractionMap, vec2( coord.x - offset.x, coord.y + offset.y ) );
+			vec4 reflectColor = texture2D( tReflectionMap, vec2( 1.0 - coord.x - reflOffset.x, coord.y - reflOffset.y ) );
+			vec4 refractColor = texture2D( tRefractionMap, vec2( coord.x - refrOffset.x, coord.y + refrOffset.y ) );
+
+			// angular Beer-Lambert absorption along Snell's refracted path (n = 1.333)
+			float invMuT = inversesqrt( 0.4375 + 0.5625 * theta * theta );
+			vec3 transmittance = mix( color, color * color, invMuT - 1.0 );
 
 			// tint transmitted light only; dielectric surface reflections stay achromatic
-			gl_FragColor = vec4( mix( refractColor.rgb * color, reflectColor.rgb, reflectance ), 1.0 );
+			gl_FragColor = vec4( mix( refractColor.rgb * transmittance, reflectColor.rgb, reflectance ), 1.0 );
 
 			#include <tonemapping_fragment>
 			#include <colorspace_fragment>
