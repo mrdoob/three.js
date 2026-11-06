@@ -23,7 +23,8 @@
 				Crack-free adaptive subdivision on the GPU with triplanar displacement maps, using<br/>
 				longest edge bisection on <a href="https://onrendering.com/data/papers/cbt/ConcurrentBinaryTrees.pdf" target="_blank" rel="noopener">Concurrent Binary Trees</a>.<br/>
 				Textures from <a href="https://polyhaven.com" target="_blank" rel="noopener">Poly Haven</a>.<br/>
-				<span id="stats"></span>
+				<span id="stats"></span><br/>
+				<span id="telemetry"></span>
 			</small>
 		</div>
 
@@ -45,8 +46,10 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { CSMShadowNode } from 'three/addons/csm/CSMShadowNode.js';
 			import { SimplexNoise } from 'three/addons/math/SimplexNoise.js';
-			import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+			import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
+			import { mergeGeometries, mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 			import { AdaptiveSubdivisionMesh } from 'three/addons/objects/AdaptiveSubdivisionMesh.js';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
@@ -60,7 +63,7 @@
 			}
 
 			let camera, scene, renderer, controls;
-			let meshes, normalMappedMeshes, statsElement;
+			let meshes, normalMappedMeshes, light, statsElement, telemetryElement;
 
 			const params = {
 				adaptive: true,
@@ -74,41 +77,130 @@
 				debugColors: 'none',
 				frustumCulling: true,
 				backfaceCulling: true,
-				freeze: false
+				freeze: false,
+				shadows: true,
+				pixelRatio: window.devicePixelRatio
 			};
+
+			// where the time of a frame goes: the CPU time of the updates and the render, averaged over frames, and the GPU
+			// time of the subdivision updates, the shadow maps and the scene from the inspector, where the browser supports
+			// GPU timestamps
+
+			const telemetry = { cpu: { total: 0, subdivision: 0, render: 0 }, gpu: null };
+
+			class TelemetryInspector extends Inspector {
+
+				resolveFrame( frame ) {
+
+					super.resolveFrame( frame );
+
+					const gpu = { subdivision: 0, shadows: 0, scene: 0 };
+
+					for ( const stats of frame.children ) {
+
+						const time = this.getStatsData( stats.cid ).gpu;
+
+						if ( stats.isComputeStats ) {
+
+							gpu.subdivision += time;
+
+						} else {
+
+							// the shadow maps are rendered within the scene
+
+							const shadowMaps = stats.children.filter( ( child ) => child.name.startsWith( 'Shadow Map' ) );
+							const shadows = shadowMaps.reduce( ( sum, child ) => sum + this.getStatsData( child.cid ).gpu, 0 );
+
+							gpu.shadows += shadows;
+							gpu.scene += time - shadows;
+
+						}
+
+					}
+
+					telemetry.gpu = gpu;
+
+				}
+
+			}
 
 			const wireframe = uniform( 0 );
 			const debugColors = uniform( 0 ); // 0: none, 1: subdivision depth, 2: triangle size
 			const targetEdgePixels = uniform( params.targetEdgePixels );
 			const displacementScale = uniform( params.displacement );
 
+			// the world: ruins on a plateau, a path winding up to them from a valley and a ridge with cliffs behind. the
+			// shapes are generated on the CPU from noise and kept coarse, the detail comes from the displacement maps
+
+			const random = mulberry32( 5 );
+			const noise = new SimplexNoise( { random } );
+
+			const PLATEAU_HEIGHT = 3;
+			const PATH_WIDTH = 2.2;
+			const TERRAIN_SIZE = 180;
+			const BLEND_SHARPNESS = 0.08; // the height range over which texture layers blend, see createSubdivisionMesh()
+			const WIREFRAME_COLOR = color( 0x40d0ff );
+			const WIREFRAME_OPACITY = 0.7; // the triangles are only a few pixels large, so opaque lines would hide the surface
+
+			// the path, with its height following the ground smoothly up to the plateau
+
+			const path = new THREE.CatmullRomCurve3( [
+				[ - 24, 40 ], [ - 18, 27 ], [ - 6, 19 ], [ 7, 15 ], [ 9, 9 ], [ 3, 6 ], [ 0, 3.5 ], [ 0, 1 ]
+			].map( ( [ x, z ] ) => new THREE.Vector3( x, 0, z ) ) ).getSpacedPoints( 100 );
+
+			const pathBounds = new THREE.Box3().setFromPoints( path ).expandByScalar( PATH_WIDTH * 2 );
+
+			for ( const point of path ) point.y = plateauHeight( point.x, point.z );
+
+			for ( let pass = 0; pass < 4; pass ++ ) {
+
+				const heights = path.map( ( point ) => point.y );
+
+				path.forEach( ( point, i ) => {
+
+					let sum = 0;
+
+					for ( let k = - 6; k <= 6; k ++ ) sum += heights[ THREE.MathUtils.clamp( i + k, 0, path.length - 1 ) ];
+
+					point.y = sum / 13;
+
+				} );
+
+			}
+
 			init();
 
 			async function init() {
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.01, 100 );
-				camera.position.set( - 1.0, 1.0, 2.6 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.05, 400 );
+				camera.position.set( - 7, 6.5, 20 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x8fa7bd );
-				scene.fog = new THREE.Fog( 0x8fa7bd, 12, 30 );
+				scene.fog = new THREE.FogExp2( 0xc4d2de, 0.006 );
 
-				// lights
+				// a low sun from the left of the view, raking across the displaced relief
 
-				scene.add( new THREE.HemisphereLight( 0xc6dcf2, 0x5c4a3a, 1.5 ) );
+				const sun = new THREE.Vector3().setFromSphericalCoords( 1, THREE.MathUtils.degToRad( 90 - 28 ), THREE.MathUtils.degToRad( - 70 ) );
 
-				// a low sun from the side of the view, raking across the displaced relief
+				const sky = new SkyMesh();
+				sky.scale.setScalar( 1000 );
+				sky.turbidity.value = 4;
+				sky.rayleigh.value = 1.5;
+				sky.mieDirectionalG.value = 0.85;
+				sky.sunPosition.value.copy( sun );
+				scene.add( sky );
 
-				const light = new THREE.DirectionalLight( 0xfff0dd, 3 );
-				light.position.set( - 5, 3, 1.5 );
+				scene.add( new THREE.HemisphereLight( 0xc6dcf2, 0x6b5a45, 1.5 ) );
+
+				// cascaded shadow maps cover the whole view
+
+				light = new THREE.DirectionalLight( 0xffe2c4, 3.5 );
+				light.position.copy( sun ).multiplyScalar( 100 );
 				light.castShadow = true;
 				light.shadow.mapSize.set( 2048, 2048 );
-				light.shadow.camera.left = - 4;
-				light.shadow.camera.right = 4;
-				light.shadow.camera.top = 4;
-				light.shadow.camera.bottom = - 4;
 				light.shadow.camera.near = 1;
-				light.shadow.camera.far = 12;
+				light.shadow.camera.far = 400;
+				light.shadow.shadowNode = new CSMShadowNode( light, { cascades: 3, maxFar: 120, lightMargin: 80 } );
 				scene.add( light );
 
 				// renderer
@@ -116,64 +208,97 @@
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 0.8;
 				renderer.shadowMap.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
 				await renderer.init();
 
 				// CC0 texture sets from Poly Haven. size: the physical size of a texture tile, depth: the range of the
-				// displacement, in meters, patch size: that of the mesh using the set, see bakeErrorPyramid(). the ground is
-				// only a few triangles, so its leaves draw larger patches. the rock scan is a reddish sandstone: its luminance
-				// is tinted with the mean color of the wall (in linear space, the wall's mean color divided by the rock's mean
-				// luminance), so the rocks match the grey stone
+				// displacement, in meters, patch size: that of the meshes using the set, see bakeErrorPyramid().
+				// the rock scan is a reddish sandstone: its luminance is tinted with the mean color of the wall (in linear
+				// space, the wall's mean color divided by the rock's mean luminance), so the rocks match the grey stone
 
 				const textureSets = await Promise.all( [
-					loadTextureSet( 'cobblestone_floor_08', 2, 0.08, 8 ),
+					loadTextureSet( 'coast_sand_rocks_02', 4, 0.08, 4 ),
+					loadTextureSet( 'cobblestone_floor_08', 2, 0.08, 4 ),
 					loadTextureSet( 'japanese_stone_wall', 1.9, 0.14, 4 ),
 					loadTextureSet( 'rock_face_03', 2, 0.21, 4, new THREE.Color( 1.32, 1.22, 1.05 ) )
 				] );
 
-				const [ cobblestone, stoneWall, rock ] = textureSets;
+				const [ grass, cobblestone, stoneWall, rock ] = textureSets;
 
-				// the ground is projected from the top, the wall and the rocks with triplanar mapping
+				// the terrain blends three layers: grass, rock on steep slopes and cobblestones along the path and in the
+				// ruins, painted into a mask texture. grass and cobblestones are projected from the top, rock with triplanar
+				// mapping
+
+				const terrainMaskTexture = createTerrainMask();
+
+				const terrainMask = ( position ) => {
+
+					const { x: cobble, y: rock } = texture( terrainMaskTexture, position.xz.div( TERRAIN_SIZE ).add( 0.5 ) ).level( 0 );
+
+					return vec3( float( 1 ).sub( cobble ).sub( rock ), rock, cobble );
+
+				};
+
+				const boulders = [
+					[ 6.5, 5, 0.6 ], [ - 7, 4.5, 0.9 ], [ - 9.5, - 3, 0.5 ], [ 12, 13, 1.1 ], [ - 2.5, 13, 0.7 ], [ - 12.5, 22, 1.2 ],
+					[ 3.5, 19.5, 0.5 ], [ - 19.5, 31, 0.9 ], [ 11, - 7, 0.8 ], [ - 6, - 9.5, 1 ], [ 2, - 8.5, 0.45 ], [ 15, 3, 0.7 ],
+					[ - 15, 9, 1.3 ], [ 9, 23, 0.9 ], [ - 26, 36, 1.4 ], [ 0.5, 27, 0.6 ]
+				];
+
+				const outcrops = [
+					[ - 12, - 18, 3.5 ], [ 4, - 21, 4 ], [ 17, - 15, 3 ], [ - 27, - 11, 4.5 ], [ 25, 9, 3 ], [ - 29, 17, 3.5 ]
+				];
+
+				// one mesh per material, as each leaf draws its own patch size, so near and far objects can share a mesh
+
+				const rockGeometry = mergeGeometries( [ createRockGeometry( boulders, 3 ), createRockGeometry( outcrops, 5 ) ] );
 
 				const parts = [
-					[ createGroundGeometry(), createSurface( cobblestone, false ) ],
-					[ createWallGeometry(), createSurface( stoneWall, true ) ],
-					[ createRockGeometry(), createSurface( rock, true ) ]
+					[ createTerrainGeometry(), createSurface( [ { set: grass }, { set: rock, triplanar: true, scale: 1 / 3, depth: 0.35 }, { set: cobblestone } ], terrainMask ) ],
+					[ createRuinsGeometry(), createSurface( [ { set: stoneWall, triplanar: true } ], null ) ],
+					[ rockGeometry, createSurface( [ { set: rock, triplanar: true } ], null ) ]
 				];
 
 				// the subdivision meshes, and the same meshes normal mapped without subdivision to compare
 
 				meshes = parts.map( ( [ geometry, surface ] ) => createSubdivisionMesh( geometry, surface ) );
+
+				[ 'Terrain', 'Ruins', 'Rocks' ].forEach( ( name, i ) => meshes[ i ].name = name );
+
 				normalMappedMeshes = parts.map( ( [ geometry, surface ] ) => createNormalMappedMesh( geometry, surface ) );
 
 				scene.add( ...meshes, ...normalMappedMeshes );
 
 				controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0.15, 0.35, - 0.1 );
-				controls.minDistance = 0.1;
-				controls.maxDistance = 20;
-				controls.maxPolarAngle = Math.PI * 0.49;
+				controls.target.set( 0.5, 3.4, 0 );
+				controls.minDistance = 0.3;
+				controls.maxDistance = 80;
+				controls.maxPolarAngle = Math.PI * 0.6;
+				controls.screenSpacePanning = false;
 				controls.enableDamping = true;
 				controls.update();
 
 				statsElement = document.getElementById( 'stats' );
+				telemetryElement = document.getElementById( 'telemetry' );
 
 				// the shaders are compiled in parallel before the first frame, instead of one after the other when first used.
-				// the rocks have the same shaders as the wall, so they compile after it and find them compiled
+				// the rocks have the same shaders as the ruins, so they compile after them and find them compiled
 
-				const [ ground, wall, rocks ] = meshes;
+				const [ terrain, ruins, rocks ] = meshes;
 
 				await Promise.all( [
 					renderer.compileAsync( scene, camera ),
-					ground.compileAsync( renderer ),
-					wall.compileAsync( renderer ).then( () => rocks.compileAsync( renderer ) )
+					terrain.compileAsync( renderer ),
+					ruins.compileAsync( renderer ).then( () => rocks.compileAsync( renderer ) )
 				] );
 
 				// the inspector is attached after compiling, which would report the shadow nodes to it outside of a frame
 
-				renderer.inspector = new Inspector();
+				renderer.inspector = new TelemetryInspector();
 
 				// gui
 
@@ -195,6 +320,14 @@
 				gui.add( params, 'freeze' ).name( 'Freeze Subdivision' );
 				gui.add( params, 'wireframe' ).name( 'Wireframe' ).onChange( v => wireframe.value = v ? 1 : 0 );
 				gui.add( params, 'debugColors', { 'None': 'none', 'Subdivision Depth': 'depth', 'Triangle Size': 'size' } ).name( 'Debug Colors' ).onChange( v => debugColors.value = [ 'none', 'depth', 'size' ].indexOf( v ) );
+
+				// switching off the shadows and lowering the resolution shows what they cost, also without GPU timestamps
+
+				const ratio = window.devicePixelRatio;
+
+				gui.add( params, 'shadows' ).name( 'Shadows' ).onChange( v => light.castShadow = v );
+				gui.add( params, 'pixelRatio', { [ `Device (${ ratio }x)` ]: ratio, 'Half': ratio / 2, 'Quarter': ratio / 4 } ).name( 'Resolution' ).onChange( v => renderer.setPixelRatio( v ) );
+
 
 				updateStats();
 
@@ -373,42 +506,60 @@
 
 			}
 
-			// the displacement of a texture set, its gradient and how far triangles deviate from it, and the shading. the
-			// scale, depth and tint are uniforms, so surfaces of the same kind have the same shaders, which compile once,
-			// see AdaptiveSubdivisionMesh.compileAsync(). untinted sets keep their saturation
+			// a surface displaced by one or more texture layers, which can override the scale and depth of their texture set.
+			// with several layers, mask( position ) returns their weights, which are sharpened by the heights so the stones of
+			// the higher layer poke through where they blend. all inputs of the displacement are the same for vertices shared
+			// by neighboring triangles, so the blended surface is crack-free too
 
-			function createSurface( set, triplanarMapping ) {
+			function createSurface( layerSets, mask ) {
 
-				const { reliefMap, patchSize } = set;
-				const scale = uniform( set.scale );
-				const texelScale = uniform( set.scale * set.size ); // texels per meter
-				const depth = uniform( set.depth );
-				const saturation = uniform( set.tint === null ? 1 : 0 );
-				const tint = uniform( set.tint === null ? new THREE.Color( 1, 1, 1 ) : set.tint );
+				// the relief maps of all layers are baked for the patch size of the meshes, see bakeErrorPyramid()
 
-				// samples with triplanar mapping or from the top
+				const patchSize = layerSets[ 0 ].set.patchSize;
 
-				const project = ( sample, position, normal ) => {
+				// the scale, depth and tint of a layer are uniforms, so surfaces with the same kinds of layers have the same
+				// shaders, which compile once, see AdaptiveSubdivisionMesh.compileAsync(). untinted layers keep their saturation
 
-					const p = position.mul( scale );
+				const layers = layerSets.map( ( { set, triplanar = false, ...overrides } ) => {
 
-					return triplanarMapping ? triplanar( sample, p, normal ) : sample( p.xz );
+					const layer = { ...set, ...overrides, triplanar };
+
+					layer.scaleNode = uniform( layer.scale );
+					layer.texelScaleNode = uniform( layer.scale * layer.size ); // texels per meter
+					layer.depthNode = uniform( layer.depth );
+					layer.saturationNode = uniform( layer.tint === null ? 1 : 0 );
+					layer.tintNode = uniform( layer.tint === null ? new THREE.Color( 1, 1, 1 ) : layer.tint );
+
+					return layer;
+
+				} );
+
+				const sum = ( values ) => values.reduce( ( a, b ) => a.add( b ) );
+
+				// samples a layer from the top or with triplanar mapping
+
+				const project = ( layer, sample, position, normal ) => {
+
+					const p = position.mul( layer.scaleNode );
+
+					return layer.triplanar ? triplanar( sample, p, normal ) : sample( p.xz );
 
 				};
 
-				// the relief: the height in [ 0, 1 ] and its gradient in local space, at the given mip level or with automatic
-				// mip levels in fragment shaders. the gradients of the projections are mapped back to the axes they project
+				// the relief of a layer: the height in [ 0, 1 ] and its gradient in local space, at the given mip level or
+				// with automatic mip levels in fragment shaders. the gradients of the projections are mapped back to the
+				// axes they project, the change of the blend weights along the surface is ignored
 
-				const relief = ( position, normal, level = null ) => {
+				const relief = ( layer, position, normal, level = null ) => {
 
-					const sample = ( uv ) => level === null ? texture( reliefMap, uv ) : texture( reliefMap, uv ).level( level );
-					const p = position.mul( scale );
+					const sample = ( uv ) => level === null ? texture( layer.reliefMap, uv ) : texture( layer.reliefMap, uv ).level( level );
+					const p = position.mul( layer.scaleNode );
 
-					if ( triplanarMapping === false ) {
+					if ( layer.triplanar === false ) {
 
 						const y = sample( p.xz );
 
-						return { height: y.x, gradient: vec3( y.y, 0, y.z ).mul( scale ) };
+						return { height: y.x, gradient: vec3( y.y, 0, y.z ).mul( layer.scaleNode ) };
 
 					}
 
@@ -417,32 +568,69 @@
 
 					return {
 						height: x.x.mul( weights.x ).add( y.x.mul( weights.y ) ).add( z.x.mul( weights.z ) ),
-						gradient: vec3( 0, x.z, x.y ).mul( weights.x ).add( vec3( y.y, 0, y.z ).mul( weights.y ) ).add( vec3( z.y, z.z, 0 ).mul( weights.z ) ).mul( scale )
+						gradient: vec3( 0, x.z, x.y ).mul( weights.x ).add( vec3( y.y, 0, y.z ).mul( weights.y ) ).add( vec3( z.y, z.z, 0 ).mul( weights.z ) ).mul( layer.scaleNode )
 					};
 
 				};
 
 				// the mip level is picked from the footprint, the size of the rendered triangles or of the pixels for the normals
 
-				const mipLevel = ( footprint ) => max( log2( footprint.mul( texelScale ) ), 0 );
+				const mipLevel = ( layer, footprint ) => max( log2( footprint.mul( layer.texelScaleNode ) ), 0 );
+
+				const reliefs = ( position, normal, footprint ) => layers.map( ( layer ) => relief( layer, position, normal, footprint !== null ? mipLevel( layer, footprint ) : null ) );
+
+				// the weights of the layers: a layer wins where its height plus its mask weight is the highest
+
+				const blend = ( position, normal, heights ) => {
+
+					if ( layers.length === 1 ) return [ float( 1 ) ];
+
+					const s = vec3( ...heights ).add( mask( position ).mul( 1 + BLEND_SHARPNESS ) );
+					const b = s.sub( max( s.x, s.y, s.z ).sub( BLEND_SHARPNESS ) ).max( 0 );
+					const weights = b.div( b.x.add( b.y ).add( b.z ) );
+
+					return [ weights.x, weights.y, weights.z ];
+
+				};
 
 				// the height around the mean, times the depth
 
-				const displacement = ( { position, normal, footprint } ) => relief( position, normal, mipLevel( footprint ) ).height.sub( 0.5 ).mul( depth ).mul( displacementScale );
+				const displacement = ( { position, normal, footprint } ) => {
+
+					const r = reliefs( position, normal, footprint );
+					const weights = blend( position, normal, r.map( ( { height } ) => height ) );
+
+					return sum( layers.map( ( layer, i ) => r[ i ].height.sub( 0.5 ).mul( weights[ i ] ).mul( layer.depthNode ) ) ).mul( displacementScale );
+
+				};
 
 				// its gradient, much cheaper than finite differences
 
-				const displacementGradient = ( { position, normal, footprint } ) => relief( position, normal, mipLevel( footprint ) ).gradient.mul( depth ).mul( displacementScale );
+				const displacementGradient = ( { position, normal, footprint } ) => {
+
+					const r = reliefs( position, normal, footprint );
+					const weights = blend( position, normal, r.map( ( { height } ) => height ) );
+
+					return sum( layers.map( ( layer, i ) => r[ i ].gradient.mul( weights[ i ] ).mul( layer.depthNode ) ) ).mul( displacementScale );
+
+				};
 
 				// how far the triangles of a leaf deviate from the heights sampled with the footprint: the error at their size
-				// minus the error at the footprint, below which the triangles do not need to follow the heights
+				// minus the error at the footprint, below which the triangles do not need to follow the heights. weighted by
+				// the mask alone, which is close enough
 
-				const displacementError = ( { position, normal, size, footprint } ) => {
+				const displacementError = ( { position, normal, size: triangleSize, footprint } ) => {
 
-					const level = ( spacing ) => log2( spacing.mul( texelScale ) ).add( Math.log2( patchSize ) );
-					const variance = ( uv ) => texture( reliefMap, uv ).level( level( size ) ).w.sub( texture( reliefMap, uv ).level( level( footprint ) ).w );
+					const weights = layers.length === 1 ? [ float( 1 ) ] : [ 'x', 'y', 'z' ].map( ( c ) => mask( position )[ c ] );
 
-					return project( variance, position, normal ).max( 0 ).sqrt().mul( depth ).mul( displacementScale );
+					return sum( layers.map( ( layer, i ) => {
+
+						const level = ( spacing ) => log2( spacing.mul( layer.texelScaleNode ) ).add( Math.log2( patchSize ) );
+						const variance = ( uv ) => texture( layer.reliefMap, uv ).level( level( triangleSize ) ).w.sub( texture( layer.reliefMap, uv ).level( level( footprint ) ).w );
+
+						return project( layer, variance, position, normal ).max( 0 ).sqrt().mul( weights[ i ] ).mul( layer.depthNode );
+
+					} ) ).mul( displacementScale );
 
 				};
 
@@ -450,16 +638,24 @@
 
 				const fragment = ( position, normal ) => {
 
-					const textureColor = project( ( uv ) => texture( set.colorMap, uv ), position, normal ).rgb;
+					const r = reliefs( position, normal, null );
+					const weights = blend( position, normal, r.map( ( { height } ) => height ) );
 
-					return {
-						color: mix( vec3( luminance( textureColor ) ), textureColor, saturation ).mul( tint ),
-						gradient: relief( position, normal ).gradient.mul( depth ).mul( displacementScale )
-					};
+					const surfaceColor = sum( layers.map( ( layer, i ) => {
+
+						const textureColor = project( layer, ( uv ) => texture( layer.colorMap, uv ), position, normal ).rgb;
+
+						return mix( vec3( luminance( textureColor ) ), textureColor, layer.saturationNode ).mul( layer.tintNode ).mul( weights[ i ] );
+
+					} ) );
+
+					const gradient = sum( layers.map( ( layer, i ) => r[ i ].gradient.mul( weights[ i ] ).mul( layer.depthNode ) ) ).mul( displacementScale );
+
+					return { color: surfaceColor, gradient };
 
 				};
 
-				const maxDisplacement = set.depth * 1.5; // half the depth at the largest displacement scale of 3
+				const maxDisplacement = Math.max( ...layers.map( ( layer ) => layer.depth ) ) * 1.5; // half the depth at the largest displacement scale of 3
 
 				return { displacement, displacementGradient, displacementError, maxDisplacement, patchSize, fragment };
 
@@ -495,12 +691,10 @@
 				const sizeColor = triangleSizeColor( mesh.triangleBarycentricNode );
 				const debugColor = select( debugColors.equal( 1 ), depthColor, sizeColor );
 
-				const triangleEdges = edgeFactor( mesh.triangleBarycentricNode, 0 ).mul( lineDensityFade( mesh.triangleBarycentricNode ) );
-				const leafEdges = edgeFactor( mesh.leafBarycentricNode, 0.25 );
+				const edges = edgeFactor( mesh.triangleBarycentricNode, 0 );
 
 				let finalColor = mix( surfaceColor, debugColor.mul( surfaceColor.dot( vec3( 0.3, 0.6, 0.1 ) ).mul( 1.5 ).add( 0.25 ) ), debugColors.greaterThan( 0 ) );
-				finalColor = mix( finalColor, color( 0x1a1a1a ), triangleEdges.mul( wireframe ).mul( 0.6 ) );
-				finalColor = mix( finalColor, color( 0xffd23f ), leafEdges.mul( wireframe ) );
+				finalColor = mix( finalColor, WIREFRAME_COLOR, edges.mul( wireframe ).mul( WIREFRAME_OPACITY ) );
 
 				material.colorNode = finalColor;
 
@@ -574,56 +768,345 @@
 
 			}
 
-			// fades out the lines of triangles that are only a few pixels large
+			// the terrain height: rolling hills with a valley in front of the ruins and a ridge behind them, flattened for the
+			// plateau of the ruins and the path
 
-			function lineDensityFade( barycentric ) {
+			function hills( x, z ) {
 
-				const d = fwidth( barycentric );
-				const pixels = float( 1 ).div( max( d.x, d.y, d.z ) );
+				// a ridge whose steepest part breaks into cliffs in places, and hills all around hiding the edge of the terrain
 
-				return smoothstep( 4, 10, pixels );
+				const cliffs = Math.max( noise.noise( x * 0.03, 11 ), 0 ) * 7;
+				const ridge = smoothstepCPU( - 8, - 50, z ) * 14 + smoothstepCPU( - 16, - 21, z + noise.noise( x * 0.06, 7 ) * 4 ) * cliffs;
+				const valley = smoothstepCPU( 6, 30, z ) * 3;
+				const rim = smoothstepCPU( 50, 90, Math.hypot( x, z ) ) * 14;
+
+				return fbm( x * 0.018 + 3, z * 0.018 ) * 4 - valley + ridge + rim;
 
 			}
 
-			// geometries: low poly, the detail comes from the displacement
+			function plateauHeight( x, z ) {
 
-			function createGroundGeometry() {
+				const plateau = smoothstepCPU( 13, 9, Math.hypot( x / 1.25, z + 1 ) );
 
-				const geometry = new THREE.PlaneGeometry( 12, 12, 2, 2 );
-				geometry.rotateX( - Math.PI / 2 );
+				return THREE.MathUtils.lerp( hills( x, z ), PLATEAU_HEIGHT + fbm( x * 0.2, z * 0.2 ) * 0.12, plateau );
+
+			}
+
+			function terrainHeight( x, z ) {
+
+				const height = plateauHeight( x, z );
+
+				// the path, cut into the slopes and banked up over hollows
+
+				const { distance, height: pathHeight } = pathDistance( x, z );
+
+				return THREE.MathUtils.lerp( height, pathHeight, smoothstepCPU( PATH_WIDTH * 2, PATH_WIDTH * 0.6, distance ) );
+
+			}
+
+			// the distance to the path and its height at the closest point
+
+			function pathDistance( x, z ) {
+
+				if ( x < pathBounds.min.x || x > pathBounds.max.x || z < pathBounds.min.z || z > pathBounds.max.z ) return { distance: Infinity, height: 0 };
+
+				let closest = Infinity, height = 0;
+
+				for ( let i = 0; i < path.length - 1; i ++ ) {
+
+					const a = path[ i ], b = path[ i + 1 ];
+					const abx = b.x - a.x, abz = b.z - a.z;
+					const t = THREE.MathUtils.clamp( ( ( x - a.x ) * abx + ( z - a.z ) * abz ) / ( abx * abx + abz * abz ), 0, 1 );
+					const dx = a.x + abx * t - x, dz = a.z + abz * t - z;
+					const distance = dx * dx + dz * dz;
+
+					if ( distance < closest ) {
+
+						closest = distance;
+						height = a.y + ( b.y - a.y ) * t;
+
+					}
+
+				}
+
+				return { distance: Math.sqrt( closest ), height };
+
+			}
+
+			// the layers of the terrain: cobblestones in r, on the path with ragged edges and on the floor of the ruins,
+			// overgrown along the walls, and rock in g, on steep slopes
+
+			function createTerrainMask() {
+
+				const size = 512;
+				const texel = TERRAIN_SIZE / size;
+				const coordinate = ( i ) => ( ( i + 0.5 ) / size - 0.5 ) * TERRAIN_SIZE;
+
+				const heights = new Float32Array( size * size );
+
+				for ( let j = 0; j < size; j ++ ) {
+
+					for ( let i = 0; i < size; i ++ ) heights[ j * size + i ] = terrainHeight( coordinate( i ), coordinate( j ) );
+
+				}
+
+				const data = new Uint8Array( size * size * 4 );
+
+				for ( let j = 0; j < size; j ++ ) {
+
+					for ( let i = 0; i < size; i ++ ) {
+
+						const x = coordinate( i ), z = coordinate( j );
+
+						const edge = PATH_WIDTH / 2 + noise.noise( x * 0.7, z * 0.7 ) * 0.25;
+						const inside = Math.min( 4.65 - Math.abs( x ), z + 4.65, 2.65 - z );
+
+						const path = smoothstepCPU( edge + 0.3, edge - 0.3, pathDistance( x, z ).distance );
+						const floor = smoothstepCPU( - 0.2, 1.2, inside + noise.noise( x * 0.5, z * 0.5 ) * 0.8 );
+						const cobble = Math.max( path, floor );
+
+						// the slope from the neighboring heights, with noise so the rock does not follow it too closely
+
+						const h = ( di, dj ) => heights[ THREE.MathUtils.clamp( j + dj, 0, size - 1 ) * size + THREE.MathUtils.clamp( i + di, 0, size - 1 ) ];
+						const slope = Math.hypot( h( 1, 0 ) - h( - 1, 0 ), h( 0, 1 ) - h( 0, - 1 ) ) / ( 2 * texel );
+						const rock = smoothstepCPU( 0.75, 0.9, slope * ( 1 + fbm( x * 0.35, z * 0.35 ) * 0.6 ) ) * ( 1 - cobble );
+
+						data[ 4 * ( j * size + i ) ] = cobble * 255;
+						data[ 4 * ( j * size + i ) + 1 ] = rock * 255;
+
+					}
+
+				}
+
+				const mask = new THREE.DataTexture( data, size, size );
+				mask.magFilter = mask.minFilter = THREE.LinearFilter;
+				mask.needsUpdate = true;
+
+				return mask;
+
+			}
+
+			// geometries: coarse, the detail comes from the displacement. bisection keeps the shape of the source triangles,
+			// so all faces are split into squares, long slivers would refine far too much
+
+			function createTerrainGeometry() {
+
+				// a grid, 2 m cells around the ruins growing to 8 m at the edges
+
+				const coordinates = [ 0 ];
+
+				for ( let cell = 2; coordinates[ coordinates.length - 1 ] < TERRAIN_SIZE / 2; ) {
+
+					const last = coordinates[ coordinates.length - 1 ];
+
+					coordinates.push( Math.min( last + cell, TERRAIN_SIZE / 2 ) );
+
+					if ( last >= 26 ) cell = Math.min( cell * 1.2, 8 );
+
+				}
+
+				const axis = [ ...coordinates.slice( 1 ).reverse().map( ( c ) => - c ), ...coordinates ];
+				const n = axis.length;
+
+				const positions = [];
+				const indices = [];
+
+				for ( let j = 0; j < n; j ++ ) {
+
+					for ( let i = 0; i < n; i ++ ) {
+
+						positions.push( axis[ i ], terrainHeight( axis[ i ], axis[ j ] ), axis[ j ] );
+
+					}
+
+				}
+
+				for ( let j = 0; j < n - 1; j ++ ) {
+
+					for ( let i = 0; i < n - 1; i ++ ) {
+
+						const a = j * n + i, b = a + 1, c = a + n, d = c + 1;
+
+						indices.push( a, c, b, b, c, d );
+
+					}
+
+				}
+
+				const geometry = new THREE.BufferGeometry();
+				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+				geometry.setIndex( indices );
+				geometry.computeVertexNormals();
 
 				return geometry;
 
 			}
 
-			function createWallGeometry() {
+			function createRuinsGeometry() {
 
-				// a single box: the stones and the mortar joints come from the displacement. the faces are split into
-				// squares, as bisection keeps the shape of the source triangles and long slivers would refine far too much
+				const parts = [];
 
-				const geometry = new THREE.BoxGeometry( 2.4, 1.1, 0.4, 12, 6, 2 );
-				geometry.deleteAttribute( 'uv' );
-				geometry.translate( 0, 0.55, - 0.6 );
+				// the walls of a building, from half a meter below the ground: start, end, the heights at both ends
 
-				return geometry;
-
-			}
-
-			function createRockGeometry() {
-
-				// boulders: an icosphere projected onto a convex polytope of random planes, with softened edges and a flat base
-
-				const random = mulberry32( 3 );
-				const noise = new SimplexNoise( { random } );
-				const rocks = [];
-
-				const placements = [
-					[ 0.9, 0.5, 0.5 ],
-					[ - 0.7, 0.7, 0.36 ],
-					[ 1.5, - 0.3, 0.3 ],
-					[ 0.15, 1.25, 0.2 ]
+				const walls = [
+					[ - 5.35, - 5, 5.35, - 5, 3.8, 2.6 ],
+					[ - 5, - 4.65, - 5, - 0.5, 3.6, 2.2 ],
+					[ - 5, - 0.5, - 5, 2.65, 2.2, 1.1 ],
+					[ 5, - 4.65, 5, - 1.2, 3, 2.2 ],
+					[ 5, 0.6, 5, 2.65, 1.6, 0.9 ],
+					[ - 5.35, 3, - 1.9, 3, 1.2, 0.7 ],
+					[ 1.9, 3, 5.35, 3, 0.8, 1.4 ]
 				];
 
+				walls.forEach( ( wall, i ) => parts.push( createWall( ...wall, i * 10 ) ) );
+
+				// an arched gate between the front walls
+
+				for ( const x of [ - 1.5, 1.5 ] ) parts.push( placed( segmentedBox( 0.8, 2.9, 0.9 ), x, 0.95, 3 ) );
+
+				parts.push( createArch( 0, 3, 1.1, 1.9, 0.9, 2.4 ) );
+
+				// a colonnade along the building, with a lintel on two of the columns and a fallen one
+
+				const columns = [
+					[ - 4, 3.4, 0, 0 ], [ - 1.8, 3.4, 0, 0 ], [ 0.4, 1.9, 0.5, - 0.3 ], [ 2.6, 0.9, - 0.4, 0.4 ]
+				];
+
+				for ( const [ z, height, tiltX, tiltZ ] of columns ) {
+
+					parts.push( createColumn( height, tiltX, tiltZ ).translate( 8, PLATEAU_HEIGHT + 0.3, z ) );
+					parts.push( placed( segmentedBox( 0.85, 0.7, 0.85, 0.3 ), 8, - 0.05, z ) );
+
+				}
+
+				parts.push( placed( segmentedBox( 0.75, 0.45, 3, 0.25 ), 8, 3.925, - 2.9 ) );
+
+				const fallen = createColumn( 2.6, 0.3, - 0.2 ).translate( 0, - 1.3, 0 ).rotateZ( Math.PI / 2 ).rotateY( 0.5 );
+				parts.push( fallen.translate( 10.5, terrainHeight( 10.5, 1 ) + 0.25, 1 ) );
+
+				// fallen blocks
+
+				const blocks = [
+					[ - 3, - 2, 0.8, 0.5, 0.6 ], [ 2.5, 1, 0.6, 0.45, 0.5 ], [ - 6.4, 1.5, 0.7, 0.5, 0.5 ],
+					[ 6.2, - 3, 0.9, 0.55, 0.6 ], [ 3, 4.8, 0.6, 0.4, 0.5 ], [ - 2, - 6.3, 0.7, 0.5, 0.6 ]
+				];
+
+				for ( const [ x, z, width, height, depth ] of blocks ) {
+
+					const block = segmentedBox( width, height, depth, 0.25 ).rotateX( ( random() - 0.5 ) * 0.4 ).rotateY( random() * Math.PI );
+
+					parts.push( block.translate( x, terrainHeight( x, z ) + height * 0.3, z ) );
+
+				}
+
+				return mergeGeometries( parts );
+
+			}
+
+			function segmentedBox( width, height, depth, cell = 0.35 ) {
+
+				const segments = ( length ) => Math.max( Math.round( length / cell ), 1 );
+
+				const geometry = new THREE.BoxGeometry( width, height, depth, segments( width ), segments( height ), segments( depth ) );
+				geometry.deleteAttribute( 'uv' );
+
+				return geometry;
+
+			}
+
+			// moves a geometry to the given position, with the height relative to the plateau
+
+			function placed( geometry, x, y, z ) {
+
+				return geometry.translate( x, PLATEAU_HEIGHT + y, z );
+
+			}
+
+			// a wall whose top is eroded by noise. the heights at the ends should not differ by more than twice, as the
+			// faces are stretched to the height
+
+			function createWall( x0, z0, x1, z1, height0, height1, seed ) {
+
+				const length = Math.hypot( x1 - x0, z1 - z0 );
+				const height = Math.max( height0, height1 ) + 0.5;
+
+				const geometry = segmentedBox( length, height, 0.7 );
+				const position = geometry.attributes.position;
+
+				for ( let i = 0; i < position.count; i ++ ) {
+
+					const t = position.getX( i ) / length + 0.5;
+					const top = THREE.MathUtils.lerp( height0, height1, t ) * ( 1 - Math.max( noise.noise( t * length * 0.6, seed ), 0 ) * 0.35 );
+
+					position.setY( i, ( position.getY( i ) / height + 0.5 ) * ( top + 0.5 ) - 0.5 );
+
+				}
+
+				geometry.computeVertexNormals();
+				geometry.rotateY( - Math.atan2( z1 - z0, x1 - x0 ) );
+
+				return placed( geometry, ( x0 + x1 ) / 2, 0, ( z0 + z1 ) / 2 );
+
+			}
+
+			// a semicircular arch: a box bent around its center
+
+			function createArch( x, z, innerRadius, outerRadius, depth, springing ) {
+
+				const cell = 0.3;
+				const segments = ( length ) => Math.max( Math.round( length / cell ), 1 );
+
+				const geometry = new THREE.BoxGeometry( 1, 1, depth, segments( Math.PI * ( innerRadius + outerRadius ) / 2 ), segments( outerRadius - innerRadius ), segments( depth ) );
+				geometry.deleteAttribute( 'uv' );
+
+				const position = geometry.attributes.position;
+
+				for ( let i = 0; i < position.count; i ++ ) {
+
+					const angle = Math.PI * ( 0.5 - position.getX( i ) );
+					const radius = THREE.MathUtils.lerp( innerRadius, outerRadius, position.getY( i ) + 0.5 );
+
+					position.setXY( i, Math.cos( angle ) * radius, Math.sin( angle ) * radius );
+
+				}
+
+				geometry.computeVertexNormals();
+
+				return placed( geometry, x, springing, z );
+
+			}
+
+			// a column standing on the origin, broken off at a slant
+
+			function createColumn( height, tiltX, tiltZ ) {
+
+				const radius = 0.32;
+				const segments = 12;
+				const rows = Math.max( Math.round( height / ( 2 * Math.PI * radius / segments ) ), 1 );
+
+				const geometry = new THREE.CylinderGeometry( radius, radius, height, segments, rows );
+				geometry.deleteAttribute( 'uv' );
+
+				const position = geometry.attributes.position;
+
+				for ( let i = 0; i < position.count; i ++ ) {
+
+					if ( position.getY( i ) > height / 2 - 1e-4 ) position.setY( i, height / 2 + position.getX( i ) * tiltX + position.getZ( i ) * tiltZ );
+
+				}
+
+				geometry.computeVertexNormals();
+
+				return geometry.translate( 0, height / 2, 0 );
+
+			}
+
+			// boulders: icospheres projected onto convex polytopes of random planes, with softened edges and a flat base,
+			// sunk into the ground
+
+			function createRockGeometry( placements, detail ) {
+
+				const rocks = [];
 				const softness = 0.02;
 				const direction = new THREE.Vector3();
 
@@ -638,10 +1121,20 @@
 
 					}
 
+					let ground = terrainHeight( x, z );
+
+					for ( let i = 0; i < 8; i ++ ) {
+
+						const angle = i * Math.PI / 4;
+						ground = Math.min( ground, terrainHeight( x + Math.cos( angle ) * radius * 0.8, z + Math.sin( angle ) * radius * 0.8 ) );
+
+					}
+
+					ground -= radius * 0.15;
+
 					// fine enough that the vertex normals follow the shape: the triplanar weights and the displacement use them
 
-					const rock = new THREE.IcosahedronGeometry( 1, 5 );
-					rock.deleteAttribute( 'uv' );
+					const rock = mergeVertices( new THREE.IcosahedronGeometry( 1, detail ).deleteAttribute( 'uv' ) );
 
 					const position = rock.attributes.position;
 
@@ -667,7 +1160,7 @@
 
 						const r = - softness * Math.log( sum ) * ( 1 + lumps + ridges );
 
-						position.setXYZ( i, x + direction.x * r * radius, ( direction.y * r + 0.35 ) * radius * 0.8, z + direction.z * r * radius );
+						position.setXYZ( i, x + direction.x * r * radius, ground + ( direction.y * r + 0.35 ) * radius * 0.8, z + direction.z * r * radius );
 
 					}
 
@@ -678,6 +1171,32 @@
 				}
 
 				return mergeGeometries( rocks );
+
+			}
+
+			function fbm( x, z ) {
+
+				let sum = 0, amplitude = 1;
+
+				for ( let i = 0; i < 4; i ++ ) {
+
+					sum += noise.noise( x, z ) * amplitude;
+
+					x *= 2;
+					z *= 2;
+					amplitude *= 0.5;
+
+				}
+
+				return sum / 1.875;
+
+			}
+
+			function smoothstepCPU( edge0, edge1, x ) {
+
+				const t = THREE.MathUtils.clamp( ( x - edge0 ) / ( edge1 - edge0 ), 0, 1 );
+
+				return t * t * ( 3 - 2 * t );
 
 			}
 
@@ -696,6 +1215,23 @@
 			}
 
 			async function updateStats() {
+
+				const ms = ( value ) => value.toFixed( 2 );
+				const { cpu, gpu } = telemetry;
+
+				let text = `${ Math.round( renderer.inspector.fps ) } fps, CPU ${ ms( cpu.total ) } ms (subdivision ${ ms( cpu.subdivision ) }, render ${ ms( cpu.render ) })`;
+
+				if ( renderer.backend.hasTimestamp !== true ) {
+
+					text += ', no GPU timestamps in this browser';
+
+				} else if ( gpu !== null ) {
+
+					text += `, GPU ${ ms( gpu.subdivision + gpu.shadows + gpu.scene ) } ms (subdivision ${ ms( gpu.subdivision ) }, shadows ${ ms( gpu.shadows ) }, scene ${ ms( gpu.scene ) })`;
+
+				}
+
+				telemetryElement.textContent = text;
 
 				if ( params.adaptive === false ) {
 
@@ -735,13 +1271,27 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
+				// the shadow cascades cover the view of the camera
+
+				light.shadow.shadowNode.updateFrustums();
+
 			}
 
 			function animate() {
 
+				const start = performance.now();
+				let subdivision = 0;
+
 				controls.update();
 
+				// the camera and its target stay above the ground
+
+				controls.target.y = Math.max( controls.target.y, terrainHeight( controls.target.x, controls.target.z ) + 0.5 );
+				camera.position.y = Math.max( camera.position.y, terrainHeight( camera.position.x, camera.position.z ) + 0.3 );
+
 				if ( params.adaptive && params.freeze === false ) {
+
+					const updateStart = performance.now();
 
 					for ( const mesh of meshes ) {
 
@@ -756,9 +1306,23 @@
 
 					}
 
+					subdivision = performance.now() - updateStart;
+
 				}
 
+				const renderStart = performance.now();
+
 				renderer.render( scene, camera );
+
+				const end = performance.now();
+
+				// averaged over about a second
+
+				const average = ( key, value ) => telemetry.cpu[ key ] += ( value - telemetry.cpu[ key ] ) * 0.02;
+
+				average( 'total', end - start );
+				average( 'subdivision', subdivision );
+				average( 'render', end - renderStart );
 
 			}
 
