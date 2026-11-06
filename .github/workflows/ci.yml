@@ -26,6 +26,12 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm ci
+      - name: Install Vulkan drivers
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mesa-vulkan-drivers
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
 
       - name: === Lint testing ===
         run: npm run lint
@@ -49,9 +55,9 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest ]
-        CI: [ 0, 1, 2, 3, 4 ]
+        shard: [ 1, 2, 3, 4, 5 ]
     env:
-      CI: ${{ matrix.CI }}
+      VISIBLE: 1
     steps:
       - name: Git checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -66,15 +72,17 @@ jobs:
           sudo apt-get install -y mesa-vulkan-drivers xvfb
       - name: Install dependencies
         run: npm ci
+      - name: Install Chromium
+        run: npx playwright install chromium
       - name: Build
         run: npm run build
 
       - name: === E2E testing ===
-        run: xvfb-run -a npm run test-e2e
+        run: xvfb-run -a npm run test-e2e -- --shard=${{ matrix.shard }}/5
       - name: Upload output screenshots
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: always()
         with:
-          name: Output screenshots-${{ matrix.os }}-${{ matrix.CI }}
+          name: Output screenshots-${{ matrix.os }}-${{ matrix.shard }}
           path: test/e2e/output-screenshots
           if-no-files-found: ignore

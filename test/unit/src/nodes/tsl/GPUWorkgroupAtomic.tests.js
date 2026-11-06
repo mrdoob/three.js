@@ -1,3 +1,4 @@
+import { describe, assert, test } from 'vitest';
 import {
 	Fn,
 	instanceIndex, invocationLocalIndex,
@@ -32,22 +33,15 @@ async function readUintBuffer( renderer, buffer ) {
 // fallback backend (no `getScopedArray()` there), so these only register
 // against the 'webgpu' backend.
 
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'workgroup arrays and atomics', () => {
+		describe( 'workgroup arrays and atomics', () => {
 
-			QUnit.test( 'workgroupArray: plain (non-atomic) shared read/write survives a barrier', async ( assert ) => {
+			test.runIf( import.meta.env.THREE_GPU_BACKEND === 'webgpu' )( 'workgroupArray: plain (non-atomic) shared read/write survives a barrier', async ( context ) => {
 
-				const renderer = await getSharedRenderer( 'webgpu' );
-
-				if ( renderer === null ) {
-
-					assert.ok( true, 'SKIPPED: "webgpu" backend is not available in this environment.' );
-					return;
-
-				}
+				const renderer = await getSharedRenderer( 'webgpu', context );
 
 				// Regression guard: PR #34428 threads an `isAtomic` flag through
 				// `WorkgroupInfoNode`/`WGSLNodeBuilder.getScopedArray()` -- this
@@ -90,16 +84,9 @@ export default QUnit.module( 'Nodes', () => {
 
 			} );
 
-			QUnit.test( 'workgroupArray.toAtomic(): concurrent atomicAdd sums exactly once per invocation, per workgroup', async ( assert ) => {
+			test.runIf( import.meta.env.THREE_GPU_BACKEND === 'webgpu' )( 'workgroupArray.toAtomic(): concurrent atomicAdd sums exactly once per invocation, per workgroup', async ( context ) => {
 
-				const renderer = await getSharedRenderer( 'webgpu' );
-
-				if ( renderer === null ) {
-
-					assert.ok( true, 'SKIPPED: "webgpu" backend is not available in this environment.' );
-					return;
-
-				}
+				const renderer = await getSharedRenderer( 'webgpu', context );
 
 				const workgroupSize = 8;
 				const workgroupCount = 4;

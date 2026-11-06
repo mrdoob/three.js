@@ -1,16 +1,18 @@
+import { assert, describe, test } from 'vitest';
+
 import { Cache, LoadingManager } from 'three';
 import { USDLoader } from '../../../../examples/jsm/loaders/USDLoader.js';
 import { USDComposer, SpecType } from '../../../../examples/jsm/loaders/usd/USDComposer.js';
 import { USDAParser } from '../../../../examples/jsm/loaders/usd/USDAParser.js';
 import { USDCParser } from '../../../../examples/jsm/loaders/usd/USDCParser.js';
 
-export default QUnit.module( 'Addons', () => {
+describe( 'Addons', () => {
 
-	QUnit.module( 'Loaders', () => {
+	describe( 'Loaders', () => {
 
-		QUnit.module( 'USDLoader', () => {
+		describe( 'USDLoader', () => {
 
-			QUnit.test( 'textures inherit CORS, resolve URLs once, and use the loading manager and image cache', async ( assert ) => {
+			test( 'textures inherit CORS, resolve URLs once, and use the loading manager and image cache', async () => {
 
 				const url = '/examples/textures/uv_grid_opengl.jpg?usd-loader-settings';
 				const manager = new LoadingManager();
@@ -53,7 +55,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'strips USDA block comments', ( assert ) => {
+			test( 'strips USDA block comments', () => {
 
 				const parser = new USDAParser();
 
@@ -64,7 +66,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'collapses USDA triple-quoted strings into single lines', ( assert ) => {
+			test( 'collapses USDA triple-quoted strings into single lines', () => {
 
 				const parser = new USDAParser();
 
@@ -74,7 +76,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'reads the USDC string table after its count prefix', ( assert ) => {
+			test( 'reads the USDC string table after its count prefix', () => {
 
 				const parser = new USDCParser();
 				const stringIndices = [ 4, 7, 9 ];
@@ -107,7 +109,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'resolves inherited material bindings by strength', ( assert ) => {
+			test( 'resolves inherited material bindings by strength', () => {
 
 				const composer = new USDComposer();
 				const parentBinding = {
@@ -153,7 +155,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'reads USDA material binding strength metadata', ( assert ) => {
+			test( 'reads USDA material binding strength metadata', () => {
 
 				const usda = `#usda 1.0
 
@@ -208,7 +210,7 @@ def Xform "Root"
 
 			} );
 
-			QUnit.test( 'resolves connected asset inputs before fallback values', ( assert ) => {
+			test( 'resolves connected asset inputs before fallback values', () => {
 
 				const usda = `#usda 1.0
 (
@@ -263,7 +265,7 @@ def Xform "Root"
 
 			} );
 
-			QUnit.test( 'interprets USD color3f material inputs as linear', ( assert ) => {
+			test( 'interprets USD color3f material inputs as linear', () => {
 
 				const usda = `#usda 1.0
 (
@@ -299,7 +301,7 @@ def Xform "Root"
 
 			} );
 
-			QUnit.test( 'uses timeCodesPerSecond for USDA animation timing', ( assert ) => {
+			test( 'uses timeCodesPerSecond for USDA animation timing', () => {
 
 				const usda = `#usda 1.0
 (
@@ -338,7 +340,7 @@ def Xform "Root"
 
 			} );
 
-			QUnit.test( 'keeps USDA time samples at negative time codes', ( assert ) => {
+			test( 'keeps USDA time samples at negative time codes', () => {
 
 				const usda = `#usda 1.0
 (

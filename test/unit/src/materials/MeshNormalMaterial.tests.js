@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { MeshNormalMaterial } from '../../../../src/materials/MeshNormalMaterial.js';
 
 import { Material } from '../../../../src/materials/Material.js';
 
-export default QUnit.module( 'Materials', () => {
+describe( 'Materials', () => {
 
-	QUnit.module( 'MeshNormalMaterial', () => {
+	describe( 'MeshNormalMaterial', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new MeshNormalMaterial();
 			assert.strictEqual(
@@ -18,7 +20,7 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new MeshNormalMaterial();
 			assert.ok( object, 'Can instantiate a MeshNormalMaterial.' );
@@ -26,7 +28,7 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new MeshNormalMaterial();
 			assert.ok(
@@ -37,7 +39,7 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isMeshNormalMaterial', ( assert ) => {
+		test( 'isMeshNormalMaterial', () => {
 
 			const object = new MeshNormalMaterial();
 			assert.ok(

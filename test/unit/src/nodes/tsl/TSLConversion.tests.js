@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import {
 	float, vec3,
 	grayscale, saturation, hue, luminance, posterize,
@@ -15,11 +16,11 @@ import { gpuTest } from './gpu-test-utils.js';
 // keeps these tests' expected values independently hand-computable.
 const REC709 = vec3( 0.2126, 0.7152, 0.0722 );
 
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'color conversion', () => {
+		describe( 'color conversion', () => {
 
 			gpuTest( 'luminance() matches hand-computed Rec.709 dot product', ( { assert } ) => {
 

@@ -1,17 +1,19 @@
+import { assert, beforeEach, describe, test } from 'vitest';
+
 import { TubeGeometry } from '../../../../src/geometries/TubeGeometry.js';
 
 import { LineCurve3 } from '../../../../src/extras/curves/LineCurve3.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
-// import { runStdGeometryTests } from '../../utils/qunit-utils.js';
+// import { runStdGeometryTests } from '../../utils/test-utils.js';
 
-export default QUnit.module( 'Geometries', () => {
+describe( 'Geometries', () => {
 
-	QUnit.module( 'TubeGeometry', ( hooks ) => {
+	describe( 'TubeGeometry', () => {
 
 		let geometries = undefined; // eslint-disable-line no-unused-vars
-		hooks.beforeEach( function () {
+		beforeEach( function () {
 
 			const path = new LineCurve3( new Vector3( 0, 0, 0 ), new Vector3( 0, 1, 0 ) );
 
@@ -22,7 +24,7 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new TubeGeometry();
 			assert.strictEqual(
@@ -33,7 +35,7 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new TubeGeometry();
 			assert.ok( object, 'Can instantiate a TubeGeometry.' );
@@ -41,7 +43,7 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new TubeGeometry();
 			assert.ok(

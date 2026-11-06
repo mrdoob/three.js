@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import {
 	float, uint, vec2, vec3, vec4, hash, abs,
 	packSnorm2x16, unpackSnorm2x16,
@@ -15,11 +16,11 @@ import { gpuTest, gpuFuzzTest } from './gpu-test-utils.js';
 // packed and then unpacked against the *original* input (an independent,
 // pre-existing value -- not something derived from the packed result), so a
 // broken pack() or unpack() that just agreed with itself can't slip through.
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'packing', () => {
+		describe( 'packing', () => {
 
 			gpuTest( 'packSnorm2x16 <-> unpackSnorm2x16 round trip', ( { assert } ) => {
 

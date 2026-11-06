@@ -1,14 +1,16 @@
+import { beforeEach, describe, test } from 'vitest';
+
 import { AmbientLight } from '../../../../src/lights/AmbientLight.js';
 
 import { Light } from '../../../../src/lights/Light.js';
-import { runStdLightTests } from '../../utils/qunit-utils.js';
+import { assert, runStdLightTests } from '../../utils/test-utils.js';
 
-export default QUnit.module( 'Lights', () => {
+describe( 'Lights', () => {
 
-	QUnit.module( 'AmbientLight', ( hooks ) => {
+	describe( 'AmbientLight', () => {
 
 		let lights = undefined;
-		hooks.beforeEach( function () {
+		beforeEach( function () {
 
 			const parameters = {
 				color: 0xaaaaaa,
@@ -24,7 +26,7 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new AmbientLight();
 			assert.strictEqual(
@@ -35,7 +37,7 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new AmbientLight();
 			assert.ok( object, 'Can instantiate an AmbientLight.' );
@@ -43,7 +45,7 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new AmbientLight();
 			assert.ok(
@@ -54,7 +56,7 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isAmbientLight', ( assert ) => {
+		test( 'isAmbientLight', () => {
 
 			const object = new AmbientLight();
 			assert.ok(
@@ -65,7 +67,7 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// OTHERS
-		QUnit.test( 'Standard light tests', ( assert ) => {
+		test( 'Standard light tests', () => {
 
 			runStdLightTests( assert, lights );
 

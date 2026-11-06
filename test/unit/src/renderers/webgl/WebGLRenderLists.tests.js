@@ -1,15 +1,18 @@
+import { describe, test } from 'vitest';
+import { assert } from '../../../utils/test-utils.js';
+
 import { WebGLRenderLists, WebGLRenderList } from '../../../../../src/renderers/webgl/WebGLRenderLists.js';
 import { Scene } from '../../../../../src/scenes/Scene.js';
 import { Camera } from '../../../../../src/cameras/Camera.js';
 
-export default QUnit.module( 'Renderers', () => {
+describe( 'Renderers', () => {
 
-	QUnit.module( 'WebGL', () => {
+	describe( 'WebGL', () => {
 
-		QUnit.module( 'WebGLRenderLists', () => {
+		describe( 'WebGLRenderLists', () => {
 
 			// PUBLIC
-			QUnit.test( 'get', ( assert ) => {
+			test( 'get', () => {
 
 				const renderLists = new WebGLRenderLists();
 				const sceneA = new Scene();
@@ -18,17 +21,17 @@ export default QUnit.module( 'Renderers', () => {
 				const listA = renderLists.get( sceneA );
 				const listB = renderLists.get( sceneB );
 
-				assert.propEqual( listA, new WebGLRenderList(), 'listA is type of WebGLRenderList.' );
-				assert.propEqual( listB, new WebGLRenderList(), 'listB is type of WebGLRenderList.' );
+				assert.equalProperties( listA, new WebGLRenderList(), 'listA is type of WebGLRenderList.' );
+				assert.equalProperties( listB, new WebGLRenderList(), 'listB is type of WebGLRenderList.' );
 				assert.ok( listA !== listB, 'Render lists are different.' );
 
 			} );
 
 		} );
 
-		QUnit.module( 'WebGLRenderList', () => {
+		describe( 'WebGLRenderList', () => {
 
-			QUnit.test( 'init', ( assert ) => {
+			test( 'init', () => {
 
 				const list = new WebGLRenderList();
 				const camera = new Camera();
@@ -49,7 +52,7 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
-			QUnit.test( 'push', ( assert ) => {
+			test( 'push', () => {
 
 				const list = new WebGLRenderList();
 				const camera = new Camera();
@@ -148,7 +151,7 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
-			QUnit.test( 'unshift', ( assert ) => {
+			test( 'unshift', () => {
 
 				const list = new WebGLRenderList();
 				const objA = { id: 'A', renderOrder: 0 };
@@ -246,7 +249,7 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
-			QUnit.test( 'sort', ( assert ) => {
+			test( 'sort', () => {
 
 				const list = new WebGLRenderList();
 				const camera = new Camera();

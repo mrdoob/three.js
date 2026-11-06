@@ -1,14 +1,16 @@
+import { beforeEach, describe, test } from 'vitest';
+
 import { OctahedronGeometry } from '../../../../src/geometries/OctahedronGeometry.js';
 
 import { PolyhedronGeometry } from '../../../../src/geometries/PolyhedronGeometry.js';
-import { runStdGeometryTests } from '../../utils/qunit-utils.js';
+import { assert, runStdGeometryTests } from '../../utils/test-utils.js';
 
-export default QUnit.module( 'Geometries', () => {
+describe( 'Geometries', () => {
 
-	QUnit.module( 'OctahedronGeometry', ( hooks ) => {
+	describe( 'OctahedronGeometry', () => {
 
 		let geometries = undefined;
-		hooks.beforeEach( function () {
+		beforeEach( function () {
 
 			const parameters = {
 				radius: 10,
@@ -24,7 +26,7 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new OctahedronGeometry();
 			assert.strictEqual(
@@ -35,7 +37,7 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new OctahedronGeometry();
 			assert.ok( object, 'Can instantiate an OctahedronGeometry.' );
@@ -43,7 +45,7 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new OctahedronGeometry();
 			assert.ok(
@@ -54,7 +56,7 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// OTHERS
-		QUnit.test( 'Standard geometry tests', ( assert ) => {
+		test( 'Standard geometry tests', () => {
 
 			runStdGeometryTests( assert, geometries );
 

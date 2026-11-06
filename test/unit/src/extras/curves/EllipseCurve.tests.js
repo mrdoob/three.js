@@ -1,16 +1,19 @@
+import { beforeAll, describe, test } from 'vitest';
+import { assert } from '../../../utils/test-utils.js';
+
 import { EllipseCurve } from '../../../../../src/extras/curves/EllipseCurve.js';
 
 import { Curve } from '../../../../../src/extras/core/Curve.js';
 import { Vector2 } from '../../../../../src/math/Vector2.js';
 
-export default QUnit.module( 'Extras', () => {
+describe( 'Extras', () => {
 
-	QUnit.module( 'Curves', () => {
+	describe( 'Curves', () => {
 
-		QUnit.module( 'EllipseCurve', ( hooks ) => {
+		describe( 'EllipseCurve', () => {
 
 			let curve = undefined;
-			hooks.before( function () {
+			beforeAll( function () {
 
 				curve = new EllipseCurve(
 					0, 0, // ax, aY
@@ -23,7 +26,7 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// INHERITANCE
-			QUnit.test( 'Extending', ( assert ) => {
+			test( 'Extending', () => {
 
 				const object = new EllipseCurve();
 				assert.strictEqual(
@@ -34,7 +37,7 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			test( 'Instancing', () => {
 
 				const object = new EllipseCurve();
 				assert.ok( object, 'Can instantiate an EllipseCurve.' );
@@ -42,7 +45,7 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// PROPERTIES
-			QUnit.test( 'type', ( assert ) => {
+			test( 'type', () => {
 
 				const object = new EllipseCurve();
 				assert.ok(
@@ -53,7 +56,7 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// PUBLIC
-			QUnit.test( 'isEllipseCurve', ( assert ) => {
+			test( 'isEllipseCurve', () => {
 
 				const object = new EllipseCurve();
 				assert.ok(
@@ -64,7 +67,7 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// OTHERS
-			QUnit.test( 'Simple curve', ( assert ) => {
+			test( 'Simple curve', () => {
 
 				const expectedPoints = [
 					new Vector2( 10, 0 ),
@@ -87,7 +90,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'getLength/getLengths', ( assert ) => {
+			test( 'getLength/getLengths', () => {
 
 				const length = curve.getLength();
 				const expectedLength = 62.829269247282795;
@@ -114,7 +117,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'getPoint/getPointAt', ( assert ) => {
+			test( 'getPoint/getPointAt', () => {
 
 				const testValues = [ 0, 0.3, 0.5, 0.7, 1 ];
 
@@ -139,7 +142,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'getTangent', ( assert ) => {
+			test( 'getTangent', () => {
 
 				const expectedTangents = [
 					new Vector2( - 0.000314159260186071, 0.9999999506519786 ),
@@ -168,7 +171,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'getUtoTmapping', ( assert ) => {
+			test( 'getUtoTmapping', () => {
 
 				const start = curve.getUtoTmapping( 0, 0 );
 				const end = curve.getUtoTmapping( 0, curve.getLength() );
@@ -182,7 +185,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'getSpacedPoints', ( assert ) => {
+			test( 'getSpacedPoints', () => {
 
 				const expectedPoints = [
 					new Vector2( 10, 0 ),

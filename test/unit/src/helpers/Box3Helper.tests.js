@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { Box3Helper } from '../../../../src/helpers/Box3Helper.js';
 
 import { LineSegments } from '../../../../src/objects/LineSegments.js';
 
-export default QUnit.module( 'Helpers', () => {
+describe( 'Helpers', () => {
 
-	QUnit.module( 'Box3Helper', () => {
+	describe( 'Box3Helper', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new Box3Helper();
 			assert.strictEqual(
@@ -18,7 +20,7 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new Box3Helper();
 			assert.ok( object, 'Can instantiate a Box3Helper.' );
@@ -26,7 +28,7 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new Box3Helper();
 			assert.ok(
@@ -38,9 +40,8 @@ export default QUnit.module( 'Helpers', () => {
 
 		// PUBLIC
 
-		QUnit.test( 'dispose', ( assert ) => {
+		test( 'dispose', () => {
 
-			assert.expect( 0 );
 
 			const object = new Box3Helper();
 			object.dispose();

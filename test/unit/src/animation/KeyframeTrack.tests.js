@@ -1,12 +1,15 @@
+import { describe, test } from 'vitest';
+import { assert } from '../../utils/test-utils.js';
+
 import { NumberKeyframeTrack } from '../../../../src/animation/tracks/NumberKeyframeTrack.js';
 
 import { KeyframeTrack } from '../../../../src/animation/KeyframeTrack.js';
 import { InterpolateBezier } from '../../../../src/constants.js';
 import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
 
-export default QUnit.module( 'Animation', () => {
+describe( 'Animation', () => {
 
-	QUnit.module( 'KeyframeTrack', () => {
+	describe( 'KeyframeTrack', () => {
 
 		const parameters = {
 			name: '.material.opacity',
@@ -16,7 +19,7 @@ export default QUnit.module( 'Animation', () => {
 		};
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new NumberKeyframeTrack( parameters.name, parameters.times, parameters.values );
 			assert.strictEqual(
@@ -27,7 +30,7 @@ export default QUnit.module( 'Animation', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			// name, times, values
 			const object = new NumberKeyframeTrack( parameters.name, parameters.times, parameters.values );
@@ -45,7 +48,7 @@ export default QUnit.module( 'Animation', () => {
 
 		// PUBLIC
 
-		QUnit.test( 'shift', ( assert ) => {
+		test( 'shift', () => {
 
 			const track = new NumberKeyframeTrack( '.material.opacity', [ 0, 1 ], [ 0, 1 ], InterpolateBezier );
 			track.settings = {
@@ -61,7 +64,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'validate', ( assert ) => {
+		test( 'validate', () => {
 
 			const validTrack = new NumberKeyframeTrack( '.material.opacity', [ 0, 1 ], [ 0, 0.5 ] );
 			const invalidTrack = new NumberKeyframeTrack( '.material.opacity', [ 0, 1 ], [ 0, NaN ] );
@@ -74,7 +77,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'optimize', ( assert ) => {
+		test( 'optimize', () => {
 
 			const track = new NumberKeyframeTrack( '.material.opacity', [ 0, 1, 2, 3, 4 ], [ 0, 0, 0, 0, 1 ] );
 

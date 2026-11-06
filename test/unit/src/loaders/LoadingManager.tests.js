@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { LoadingManager } from '../../../../src/loaders/LoadingManager.js';
 
 import { Loader } from '../../../../src/loaders/Loader.js';
 
-export default QUnit.module( 'Loaders', () => {
+describe( 'Loaders', () => {
 
-	QUnit.module( 'LoadingManager', () => {
+	describe( 'LoadingManager', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			// no params
 			const object = new LoadingManager();
@@ -18,7 +20,7 @@ export default QUnit.module( 'Loaders', () => {
 		} );
 
 		// OTHERS
-		QUnit.test( 'addHandler/getHandler/removeHandler', ( assert ) => {
+		test( 'addHandler/getHandler/removeHandler', () => {
 
 			const loadingManager = new LoadingManager();
 			const loader = new Loader();
@@ -40,7 +42,7 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		QUnit.test( 'abortController - lazy instantiation', ( assert ) => {
+		test( 'abortController - lazy instantiation', () => {
 
 			const loadingManager = new LoadingManager();
 
@@ -56,7 +58,7 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		QUnit.test( 'abort() - aborts controller and resets', ( assert ) => {
+		test( 'abort() - aborts controller and resets', () => {
 
 			const loadingManager = new LoadingManager();
 
@@ -71,7 +73,7 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		QUnit.test( 'abortController - recreation after abort', ( assert ) => {
+		test( 'abortController - recreation after abort', () => {
 
 			const loadingManager = new LoadingManager();
 

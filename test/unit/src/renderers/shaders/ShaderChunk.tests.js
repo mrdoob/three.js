@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { ShaderChunk } from '../../../../../src/renderers/shaders/ShaderChunk.js';
 
-export default QUnit.module( 'Renderers', () => {
+describe( 'Renderers', () => {
 
-	QUnit.module( 'Shaders', () => {
+	describe( 'Shaders', () => {
 
-		QUnit.module( 'ShaderChunk', () => {
+		describe( 'ShaderChunk', () => {
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			test( 'Instancing', () => {
 
 				assert.ok( ShaderChunk, 'ShaderChunk is defined.' );
 

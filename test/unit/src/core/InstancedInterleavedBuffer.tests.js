@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { InstancedInterleavedBuffer } from '../../../../src/core/InstancedInterleavedBuffer.js';
 
 import { InterleavedBuffer } from '../../../../src/core/InterleavedBuffer.js';
 
-export default QUnit.module( 'Core', () => {
+describe( 'Core', () => {
 
-	QUnit.module( 'InstancedInterleavedBuffer', () => {
+	describe( 'InstancedInterleavedBuffer', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new InstancedInterleavedBuffer();
 			assert.strictEqual(
@@ -18,7 +20,7 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const array = new Float32Array( [ 1, 2, 3, 7, 8, 9 ] );
 			const instance = new InstancedInterleavedBuffer( array, 3 );
@@ -28,7 +30,7 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isInstancedInterleavedBuffer', ( assert ) => {
+		test( 'isInstancedInterleavedBuffer', () => {
 
 			const object = new InstancedInterleavedBuffer();
 			assert.ok(
@@ -38,7 +40,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'copy', ( assert ) => {
+		test( 'copy', () => {
 
 			const array = new Float32Array( [ 1, 2, 3, 7, 8, 9 ] );
 			const instance = new InstancedInterleavedBuffer( array, 3 );

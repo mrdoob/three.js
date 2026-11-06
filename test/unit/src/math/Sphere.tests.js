@@ -1,3 +1,5 @@
+import { assert, describe, test } from 'vitest';
+
 import { Box3 } from '../../../../src/math/Box3.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
 import { Sphere } from '../../../../src/math/Sphere.js';
@@ -10,12 +12,12 @@ import {
 	eps
 } from '../../utils/math-constants.js';
 
-export default QUnit.module( 'Maths', () => {
+describe( 'Maths', () => {
 
-	QUnit.module( 'Sphere', () => {
+	describe( 'Sphere', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			let a = new Sphere();
 			assert.ok( a.center.equals( zero3 ), 'Passed!' );
@@ -28,7 +30,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isSphere', ( assert ) => {
+		test( 'isSphere', () => {
 
 			const a = new Sphere();
 			assert.ok( a.isSphere === true, 'Passed!' );
@@ -38,7 +40,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'set', ( assert ) => {
+		test( 'set', () => {
 
 			const a = new Sphere();
 			assert.ok( a.center.equals( zero3 ), 'Passed!' );
@@ -50,7 +52,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setFromPoints', ( assert ) => {
+		test( 'setFromPoints', () => {
 
 			const a = new Sphere();
 			const expectedCenter = new Vector3( 0.9330126941204071, 0, 0 );
@@ -84,7 +86,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'copy', ( assert ) => {
+		test( 'copy', () => {
 
 			const a = new Sphere( one3.clone(), 1 );
 			const b = new Sphere().copy( a );
@@ -100,7 +102,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'isEmpty', ( assert ) => {
+		test( 'isEmpty', () => {
 
 			const a = new Sphere();
 			assert.ok( a.isEmpty(), 'Passed!' );
@@ -118,7 +120,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'makeEmpty', ( assert ) => {
+		test( 'makeEmpty', () => {
 
 			const a = new Sphere( one3.clone(), 1 );
 
@@ -130,7 +132,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'containsPoint', ( assert ) => {
+		test( 'containsPoint', () => {
 
 			const a = new Sphere( one3.clone(), 1 );
 
@@ -142,7 +144,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'distanceToPoint', ( assert ) => {
+		test( 'distanceToPoint', () => {
 
 			const a = new Sphere( one3.clone(), 1 );
 
@@ -151,7 +153,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'intersectsSphere', ( assert ) => {
+		test( 'intersectsSphere', () => {
 
 			const a = new Sphere( one3.clone(), 1 );
 			const b = new Sphere( zero3.clone(), 1 );
@@ -162,7 +164,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'intersectsBox', ( assert ) => {
+		test( 'intersectsBox', () => {
 
 			const a = new Sphere( zero3, 1 );
 			const b = new Sphere( new Vector3( - 5, - 5, - 5 ), 1 );
@@ -173,7 +175,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'intersectsPlane', ( assert ) => {
+		test( 'intersectsPlane', () => {
 
 			const a = new Sphere( zero3.clone(), 1 );
 			const b = new Plane( new Vector3( 0, 1, 0 ), 1 );
@@ -186,7 +188,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'clampPoint', ( assert ) => {
+		test( 'clampPoint', () => {
 
 			const a = new Sphere( one3.clone(), 1 );
 			const point = new Vector3();
@@ -198,7 +200,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'getBoundingBox', ( assert ) => {
+		test( 'getBoundingBox', () => {
 
 			const a = new Sphere( one3.clone(), 1 );
 			const aabb = new Box3();
@@ -217,7 +219,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'applyMatrix4', ( assert ) => {
+		test( 'applyMatrix4', () => {
 
 			const a = new Sphere( one3.clone(), 1 );
 			const m = new Matrix4().makeTranslation( 1, - 2, 1 );
@@ -231,7 +233,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'translate', ( assert ) => {
+		test( 'translate', () => {
 
 			const a = new Sphere( one3.clone(), 1 );
 
@@ -240,7 +242,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'expandByPoint', ( assert ) => {
+		test( 'expandByPoint', () => {
 
 			const a = new Sphere( zero3.clone(), 1 );
 			const p = new Vector3( 2, 0, 0 );
@@ -255,7 +257,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'union', ( assert ) => {
+		test( 'union', () => {
 
 			const a = new Sphere( zero3.clone(), 1 );
 			const b = new Sphere( new Vector3( 2, 0, 0 ), 1 );
@@ -287,7 +289,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'equals', ( assert ) => {
+		test( 'equals', () => {
 
 			const a = new Sphere();
 			const b = new Sphere( new Vector3( 1, 0, 0 ) );

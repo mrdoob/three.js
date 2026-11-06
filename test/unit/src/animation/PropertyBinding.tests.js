@@ -1,15 +1,18 @@
+import { describe, test } from 'vitest';
+import { assert } from '../../utils/test-utils.js';
+
 import { PropertyBinding } from '../../../../src/animation/PropertyBinding.js';
 
 import { BoxGeometry } from '../../../../src/geometries/BoxGeometry.js';
 import { Mesh } from '../../../../src/objects/Mesh.js';
 import { MeshBasicMaterial } from '../../../../src/materials/MeshBasicMaterial.js';
 
-export default QUnit.module( 'Animation', () => {
+describe( 'Animation', () => {
 
-	QUnit.module( 'PropertyBinding', () => {
+	describe( 'PropertyBinding', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const geometry = new BoxGeometry();
 			const material = new MeshBasicMaterial();
@@ -35,7 +38,7 @@ export default QUnit.module( 'Animation', () => {
 
 		// STATIC
 
-		QUnit.test( 'sanitizeNodeName', ( assert ) => {
+		test( 'sanitizeNodeName', () => {
 
 			assert.equal(
 				PropertyBinding.sanitizeNodeName( 'valid-name-123_' ),
@@ -69,7 +72,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'parseTrackName', ( assert ) => {
+		test( 'parseTrackName', () => {
 
 			const paths = [
 
@@ -290,7 +293,7 @@ export default QUnit.module( 'Animation', () => {
 
 		// PUBLIC STUFF
 
-		QUnit.test( 'setValue', ( assert ) => {
+		test( 'setValue', () => {
 
 			const paths = [
 				'.material.opacity',

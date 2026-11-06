@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import { float, int, uint, ivec4, uvec4, bitcast, countLeadingZeros, countOneBits, countTrailingZeros, inversesqrt } from 'three/tsl';
 import { gpuTest } from './gpu-test-utils.js';
 
@@ -6,11 +7,11 @@ import { gpuTest } from './gpu-test-utils.js';
 // convenience wrappers in TSLCurveUtils.tests.js, which are themselves thin
 // calls to this same node) and the 32-bit population/leading/trailing-zero
 // count helpers (src/nodes/math/BitcountNode.js), plus inversesqrt().
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'bitcast()', () => {
+		describe( 'bitcast()', () => {
 
 			gpuTest( 'bitcast() reinterprets bits between int and float per known IEEE-754 patterns', ( { assert } ) => {
 
@@ -61,7 +62,7 @@ export default QUnit.module( 'Nodes', () => {
 
 		} );
 
-		QUnit.module( 'bit counting', () => {
+		describe( 'bit counting', () => {
 
 			gpuTest( 'countOneBits() matches a hand-computed popcount', ( { assert } ) => {
 
@@ -139,7 +140,7 @@ export default QUnit.module( 'Nodes', () => {
 
 		} );
 
-		QUnit.module( 'inversesqrt()', () => {
+		describe( 'inversesqrt()', () => {
 
 			gpuTest( 'inversesqrt() is 1/sqrt(x)', ( { assert } ) => {
 

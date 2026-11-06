@@ -1,12 +1,14 @@
+import { assert, describe, test } from 'vitest';
+
 import { BooleanKeyframeTrack } from '../../../../../src/animation/tracks/BooleanKeyframeTrack.js';
 
 import { KeyframeTrack } from '../../../../../src/animation/KeyframeTrack.js';
 
-export default QUnit.module( 'Animation', () => {
+describe( 'Animation', () => {
 
-	QUnit.module( 'Tracks', () => {
+	describe( 'Tracks', () => {
 
-		QUnit.module( 'BooleanKeyframeTrack', () => {
+		describe( 'BooleanKeyframeTrack', () => {
 
 			const parameters = {
 				name: '.visible',
@@ -15,7 +17,7 @@ export default QUnit.module( 'Animation', () => {
 			};
 
 			// INHERITANCE
-			QUnit.test( 'Extending', ( assert ) => {
+			test( 'Extending', () => {
 
 				const object = new BooleanKeyframeTrack( parameters.name, parameters.times, parameters.values );
 				assert.strictEqual(
@@ -26,7 +28,7 @@ export default QUnit.module( 'Animation', () => {
 			} );
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			test( 'Instancing', () => {
 
 				// name, times, values
 				const object = new BooleanKeyframeTrack( parameters.name, parameters.times, parameters.values );

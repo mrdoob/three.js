@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { InterleavedBufferAttribute } from '../../../../src/core/InterleavedBufferAttribute.js';
 
 import { InterleavedBuffer } from '../../../../src/core/InterleavedBuffer.js';
 
-export default QUnit.module( 'Core', () => {
+describe( 'Core', () => {
 
-	QUnit.module( 'InterleavedBufferAttribute', () => {
+	describe( 'InterleavedBufferAttribute', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new InterleavedBufferAttribute();
 			assert.ok( object, 'Can instantiate an InterleavedBufferAttribute.' );
@@ -16,7 +18,7 @@ export default QUnit.module( 'Core', () => {
 
 		// PROPERTIES
 
-		QUnit.test( 'count', ( assert ) => {
+		test( 'count', () => {
 
 			const buffer = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 7, 8, 9 ] ), 3 );
 			const instance = new InterleavedBufferAttribute( buffer, 2, 0 );
@@ -26,7 +28,7 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isInterleavedBufferAttribute', ( assert ) => {
+		test( 'isInterleavedBufferAttribute', () => {
 
 			const object = new InterleavedBufferAttribute();
 			assert.ok(
@@ -36,9 +38,9 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		// setY, setZ and setW are calculated in the same way so not QUnit.testing this
+		// setY, setZ and setW are calculated in the same way so not testing this
 		// TODO: ( you can't be sure that will be the case in future, or a mistake was introduce in one off them ! )
-		QUnit.test( 'setX', ( assert ) => {
+		test( 'setX', () => {
 
 			let buffer = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 7, 8, 9 ] ), 3 );
 			let instance = new InterleavedBufferAttribute( buffer, 2, 0 );

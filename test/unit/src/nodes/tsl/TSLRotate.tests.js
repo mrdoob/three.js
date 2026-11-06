@@ -1,13 +1,14 @@
+import { describe } from 'vitest';
 import {
 	float, vec2, vec3, rotate
 } from 'three/tsl';
 import { gpuTest } from './gpu-test-utils.js';
 
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'rotate()', () => {
+		describe( 'rotate()', () => {
 
 			gpuTest( 'rotate() on a 2D position by known angles', ( { assert } ) => {
 

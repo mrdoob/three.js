@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { PointLightShadow } from '../../../../src/lights/PointLightShadow.js';
 
 import { LightShadow } from '../../../../src/lights/LightShadow.js';
 
-export default QUnit.module( 'Lights', () => {
+describe( 'Lights', () => {
 
-	QUnit.module( 'PointLightShadow', () => {
+	describe( 'PointLightShadow', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new PointLightShadow();
 			assert.strictEqual(
@@ -18,7 +20,7 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new PointLightShadow();
 			assert.ok( object, 'Can instantiate a PointLightShadow.' );
@@ -26,7 +28,7 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isPointLightShadow', ( assert ) => {
+		test( 'isPointLightShadow', () => {
 
 			const object = new PointLightShadow();
 			assert.ok(

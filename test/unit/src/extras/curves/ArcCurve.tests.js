@@ -1,15 +1,17 @@
+import { assert, describe, test } from 'vitest';
+
 import { ArcCurve } from '../../../../../src/extras/curves/ArcCurve.js';
 
 import { EllipseCurve } from '../../../../../src/extras/curves/EllipseCurve.js';
 
-export default QUnit.module( 'Extras', () => {
+describe( 'Extras', () => {
 
-	QUnit.module( 'Curves', () => {
+	describe( 'Curves', () => {
 
-		QUnit.module( 'ArcCurve', () => {
+		describe( 'ArcCurve', () => {
 
 			// INHERITANCE
-			QUnit.test( 'Extending', ( assert ) => {
+			test( 'Extending', () => {
 
 				const object = new ArcCurve();
 				assert.strictEqual(
@@ -20,7 +22,7 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			test( 'Instancing', () => {
 
 				const object = new ArcCurve();
 				assert.ok( object, 'Can instantiate an ArcCurve.' );
@@ -28,7 +30,7 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// PROPERTIES
-			QUnit.test( 'type', ( assert ) => {
+			test( 'type', () => {
 
 				const object = new ArcCurve();
 				assert.ok(
@@ -39,7 +41,7 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// PUBLIC
-			QUnit.test( 'isArcCurve', ( assert ) => {
+			test( 'isArcCurve', () => {
 
 				const object = new ArcCurve();
 				assert.ok(

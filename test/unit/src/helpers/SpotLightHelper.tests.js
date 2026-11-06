@@ -1,11 +1,13 @@
+import { assert, describe, test } from 'vitest';
+
 import { SpotLightHelper } from '../../../../src/helpers/SpotLightHelper.js';
 
 import { Object3D } from '../../../../src/core/Object3D.js';
 import { SpotLight } from '../../../../src/lights/SpotLight.js';
 
-export default QUnit.module( 'Helpers', () => {
+describe( 'Helpers', () => {
 
-	QUnit.module( 'SpotLightHelper', () => {
+	describe( 'SpotLightHelper', () => {
 
 		const parameters = {
 			color: 0xaaaaaa,
@@ -17,7 +19,7 @@ export default QUnit.module( 'Helpers', () => {
 		};
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const light = new SpotLight( parameters.color );
 			const object = new SpotLightHelper( light, parameters.color );
@@ -29,7 +31,7 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const light = new SpotLight( parameters.color );
 			const object = new SpotLightHelper( light, parameters.color );
@@ -38,7 +40,7 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const light = new SpotLight( parameters.color );
 			const object = new SpotLightHelper( light, parameters.color );
@@ -50,9 +52,8 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'dispose', ( assert ) => {
+		test( 'dispose', () => {
 
-			assert.expect( 0 );
 
 			const light = new SpotLight( parameters.color );
 			const object = new SpotLightHelper( light, parameters.color );

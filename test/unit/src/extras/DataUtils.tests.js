@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import * as DataUtils from '../../../../src/extras/DataUtils.js';
 
 import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
 
-export default QUnit.module( 'Extras', () => {
+describe( 'Extras', () => {
 
-	QUnit.module( 'DataUtils', () => {
+	describe( 'DataUtils', () => {
 
 		// PUBLIC
-		QUnit.test( 'toHalfFloat', ( assert ) => {
+		test( 'toHalfFloat', () => {
 
 			assert.ok( DataUtils.toHalfFloat( 0 ) === 0, 'Passed!' );
 
@@ -26,7 +28,7 @@ export default QUnit.module( 'Extras', () => {
 
 		} );
 
-		QUnit.test( 'fromHalfFloat', ( assert ) => {
+		test( 'fromHalfFloat', () => {
 
 			assert.ok( DataUtils.fromHalfFloat( 0 ) === 0, 'Passed!' );
 			assert.ok( DataUtils.fromHalfFloat( 31744 ) === Infinity, 'Passed!' );

@@ -1,14 +1,16 @@
+import { assert, describe, test } from 'vitest';
+
 import { SkeletonHelper } from '../../../../src/helpers/SkeletonHelper.js';
 
 import { LineSegments } from '../../../../src/objects/LineSegments.js';
 import { Bone } from '../../../../src/objects/Bone.js';
 
-export default QUnit.module( 'Helpers', () => {
+describe( 'Helpers', () => {
 
-	QUnit.module( 'SkeletonHelper', () => {
+	describe( 'SkeletonHelper', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const bone = new Bone();
 			const object = new SkeletonHelper( bone );
@@ -20,7 +22,7 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const bone = new Bone();
 			const object = new SkeletonHelper( bone );
@@ -29,7 +31,7 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const bone = new Bone();
 			const object = new SkeletonHelper( bone );
@@ -41,7 +43,7 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isSkeletonHelper', ( assert ) => {
+		test( 'isSkeletonHelper', () => {
 
 			const bone = new Bone();
 			const object = new SkeletonHelper( bone );
@@ -52,9 +54,8 @@ export default QUnit.module( 'Helpers', () => {
 
 		} );
 
-		QUnit.test( 'dispose', ( assert ) => {
+		test( 'dispose', () => {
 
-			assert.expect( 0 );
 
 			const bone = new Bone();
 			const object = new SkeletonHelper( bone );

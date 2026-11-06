@@ -1,33 +1,41 @@
+# Unit tests
+
+Unit tests use [Vitest](https://vitest.dev/) and import the source files directly, so no build is needed.
+
 ## Setup
 
-- Execute `npm install` from the root folder
+- Execute `npm install` from the root folder.
+- For browser tests, install Chromium once with `npx playwright install chromium`.
 
 ## Run
 
-You can run the unit tests in two ways:
+| Command | Runs |
+| --- | --- |
+| `npm run test-unit` | Core tests: Node, plus Chromium for browser and WebGL/WebGPU tests |
+| `npm run test-unit-addons` | Addon tests: Node, plus Chromium for browser tests |
+| `npm test` | Lint and all of the above |
 
-- Headless: Execute `npm run test-unit`, `npm run test-unit-addons` from the root folder.  
-  In headless mode the tests will run in a headless browser.
-- Headful: Execute `npm run test-unit-headful`, `npm run test-unit-addons-headful` from the root folder.  
-  In headful mode, a browser window will open, and you can see the tests running.  
-  While the headful mode is running you can also use any browser to navigate to http://localhost:8080/test/unit/UnitTests.html or http://localhost:8080/test/unit/UnitTestsAddons.html to run the tests in that browser.  
-  Further changes to the library will not be reflected until the page is refreshed.
+The `-headful` variants run the browser tests in a visible window. A single Vitest project can be run with `npx vitest --project <name>` (see `vitest.config.js`).
 
-See [Installation](https://threejs.org/docs/#manual/introduction/Installation) for more information.
+Vitest options can be passed after `--`, for example `npm run test-unit -- --watch test/unit/src/math/Vector3.tests.js`.
 
 ## Notes
 
-A small number of tests can only be run in a browser environment.
+Test files are discovered automatically: any `*.tests.js` file is picked up, so there is no import list to maintain.
 
-For browser tests, further changes to the library will not be reflected until the page is refreshed.
+Tests that need browser APIs (such as `DOMParser` or image decoding) are listed in `browserTests` and `addonsBrowserTests` in `vitest.config.js`.
 
-## Troubleshooting
+Ubuntu CI uses Vulkan/lavapipe, as the previous runner did. Unavailable GPU backends and unsupported features are skipped.
 
-When adding or updating tests, the most common cause of test failure is forgetting to change `QUnit.todo` to `QUnit.test` when the test is ready.
+To run a GPU file or filter by test name:
 
-An error that indicates "no tests were found" means that an import statement could not be resolved. This is usually caused by a typo in the import path.
+```sh
+npx vitest run --project webgpu test/unit/src/nodes/tsl/GPUComputeBuiltins.tests.js
+npx vitest run --project webgl test/unit/src/nodes/tsl/TSLMath.tests.js -t abs
+```
 
 ## Debugging
 
-To debug a test, add `debugger;` to the test code. Then, run the test in a browser and open the developer tools. The test will stop at the `debugger` statement and you can inspect the code.
+The [Vitest VS Code extension](https://github.com/vitest-dev/vscode) can run and debug individual tests from the editor. For browser tests, add `debugger;` and run with `--browser.headless=false`.
 
+See [../e2e/README.md](../e2e/README.md) for the example screenshot tests.

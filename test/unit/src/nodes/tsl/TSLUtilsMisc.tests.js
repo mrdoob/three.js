@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import {
 	float, int, vec2, vec3, vec4, mat4, length,
 	equirectUV, equirectDirection,
@@ -15,11 +16,11 @@ import { gpuTest } from './gpu-test-utils.js';
 // exception: they layer the *actual* TSL functions on top of each other to
 // check the documented inverse-of-each-other property, which is itself the
 // thing under test, same pattern as TSLDepthConversion.tests.js's round trips).
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'equirectUV() / equirectDirection()', () => {
+		describe( 'equirectUV() / equirectDirection()', () => {
 
 			gpuTest( 'equirectUV() matches its own documented spherical-coordinate formula', ( { assert } ) => {
 
@@ -119,7 +120,7 @@ export default QUnit.module( 'Nodes', () => {
 
 		} );
 
-		QUnit.module( 'spritesheetUV()', () => {
+		describe( 'spritesheetUV()', () => {
 
 			gpuTest( 'spritesheetUV() maps a frame index to its sub-rectangle, with explicit inputs', ( { assert } ) => {
 
@@ -183,7 +184,7 @@ export default QUnit.module( 'Nodes', () => {
 
 		} );
 
-		QUnit.module( 'interleavedGradientNoise()', () => {
+		describe( 'interleavedGradientNoise()', () => {
 
 			gpuTest( 'interleavedGradientNoise() matches the Jimenez 2014 formula', ( { assert } ) => {
 
@@ -210,7 +211,7 @@ export default QUnit.module( 'Nodes', () => {
 
 		} );
 
-		QUnit.module( 'vogelDiskSample()', () => {
+		describe( 'vogelDiskSample()', () => {
 
 			gpuTest( 'vogelDiskSample() matches the golden-angle disk-sampling formula', ( { assert } ) => {
 
@@ -259,7 +260,7 @@ export default QUnit.module( 'Nodes', () => {
 
 		} );
 
-		QUnit.module( 'getScreenPosition() / getScreenPositionFromClip()', () => {
+		describe( 'getScreenPosition() / getScreenPositionFromClip()', () => {
 
 			gpuTest( 'getScreenPosition() matches the clip-space-projection formula, with an explicit identity projection matrix', ( { assert } ) => {
 

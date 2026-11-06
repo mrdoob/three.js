@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import {
 	vec3,
 	sRGBTransferEOTF, sRGBTransferOETF
@@ -12,11 +13,11 @@ import { gpuTest } from './gpu-test-utils.js';
 // implementation, not derived by re-running the TSL expressions under test
 // (see TSLMath.tests.js's file header for why that matters:
 // https://ben3d.ca/blog/the-rise-of-test-theater).
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'color space functions', () => {
+		describe( 'color space functions', () => {
 
 			gpuTest( 'sRGBTransferEOTF() decodes sRGB to linear', ( { assert } ) => {
 

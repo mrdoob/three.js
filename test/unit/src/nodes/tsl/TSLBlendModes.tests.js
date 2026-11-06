@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import {
 	vec3, vec4,
 	blendBurn, blendDodge, blendScreen, blendOverlay, blendColor
@@ -9,11 +10,11 @@ import { gpuTest } from './gpu-test-utils.js';
 // hand-evaluated in plain JS/comments -- not derived by re-running the TSL
 // expression under test -- see TSLMath.tests.js's file header for why that
 // matters (https://ben3d.ca/blog/the-rise-of-test-theater).
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'blend mode functions', () => {
+		describe( 'blend mode functions', () => {
 
 			gpuTest( 'blendBurn() darkens base using blend -- min(1, (1-base)/blend), inverted', ( { assert } ) => {
 

@@ -1,3 +1,5 @@
+import { assert, describe, test } from 'vitest';
+
 import { BufferGeometry } from 'three';
 import { KSPLATLoader } from '../../../../examples/jsm/loaders/KSPLATLoader.js';
 import { unpackSphericalHarmonicsBand } from '../utils/GaussianSplatTestUtils.js';
@@ -74,13 +76,13 @@ function createKSPLATBuffer( sphericalHarmonicsDegree = 0 ) {
 
 }
 
-export default QUnit.module( 'Addons', () => {
+describe( 'Addons', () => {
 
-	QUnit.module( 'Loaders', () => {
+	describe( 'Loaders', () => {
 
-		QUnit.module( 'KSPLATLoader', () => {
+		describe( 'KSPLATLoader', () => {
 
-			QUnit.test( 'parses uncompressed KSPLAT data', ( assert ) => {
+			test( 'parses uncompressed KSPLAT data', () => {
 
 				const loader = new KSPLATLoader();
 				const data = loader.parse( createKSPLATBuffer() );
@@ -100,7 +102,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'parses uncompressed KSPLAT spherical harmonics data', ( assert ) => {
+			test( 'parses uncompressed KSPLAT spherical harmonics data', () => {
 
 				const loader = new KSPLATLoader();
 				const data = loader.parse( createKSPLATBuffer( 1 ) );
@@ -109,7 +111,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'initializes missing KSPLAT spherical harmonics coefficients to zero', ( assert ) => {
+			test( 'initializes missing KSPLAT spherical harmonics coefficients to zero', () => {
 
 				const loader = new KSPLATLoader();
 				const data = loader.parse( createKSPLATBuffer( [ 0, 1 ] ) );

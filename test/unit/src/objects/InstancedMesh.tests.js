@@ -1,12 +1,14 @@
+import { assert, describe, test } from 'vitest';
+
 import { InstancedMesh } from '../../../../src/objects/InstancedMesh.js';
 import { Mesh } from '../../../../src/objects/Mesh.js';
 
-export default QUnit.module( 'Objects', () => {
+describe( 'Objects', () => {
 
-	QUnit.module( 'InstancedMesh', () => {
+	describe( 'InstancedMesh', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new InstancedMesh();
 			assert.strictEqual(
@@ -17,7 +19,7 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new InstancedMesh();
 			assert.ok( object, 'Can instantiate a InstancedMesh.' );
@@ -25,7 +27,7 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( 'isInstancedMesh', ( assert ) => {
+		test( 'isInstancedMesh', () => {
 
 			const object = new InstancedMesh();
 			assert.ok(
@@ -35,9 +37,8 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		QUnit.test( 'dispose', ( assert ) => {
+		test( 'dispose', () => {
 
-			assert.expect( 0 );
 
 			const object = new InstancedMesh();
 			object.dispose();

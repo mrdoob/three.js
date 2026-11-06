@@ -1,14 +1,16 @@
+import { beforeEach, describe, test } from 'vitest';
+
 import { BoxGeometry } from '../../../../src/geometries/BoxGeometry.js';
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
-import { runStdGeometryTests } from '../../utils/qunit-utils.js';
+import { assert, runStdGeometryTests } from '../../utils/test-utils.js';
 
-export default QUnit.module( 'Geometries', () => {
+describe( 'Geometries', () => {
 
-	QUnit.module( 'BoxGeometry', ( hooks ) => {
+	describe( 'BoxGeometry', () => {
 
 		let geometries = undefined;
-		hooks.beforeEach( function () {
+		beforeEach( function () {
 
 			const parameters = {
 				width: 10,
@@ -28,7 +30,7 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new BoxGeometry();
 			assert.strictEqual(
@@ -39,7 +41,7 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new BoxGeometry();
 			assert.ok( object, 'Can instantiate a BoxGeometry.' );
@@ -47,7 +49,7 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new BoxGeometry();
 			assert.ok(
@@ -58,13 +60,13 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// OTHERS
-		QUnit.test( 'Standard geometry tests', ( assert ) => {
+		test( 'Standard geometry tests', () => {
 
 			runStdGeometryTests( assert, geometries );
 
 		} );
 
-		QUnit.test( 'toJSON: parametric serialization for untransformed geometry', ( assert ) => {
+		test( 'toJSON: parametric serialization for untransformed geometry', () => {
 
 			const geometry = new BoxGeometry( 10, 20, 30 );
 			const json = geometry.toJSON();
@@ -78,7 +80,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		} );
 
-		QUnit.test( 'toJSON: attribute serialization after translate()', ( assert ) => {
+		test( 'toJSON: attribute serialization after translate()', () => {
 
 			const geometry = new BoxGeometry( 10, 20, 30 );
 			geometry.translate( 1, 2, 3 );
@@ -91,7 +93,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		} );
 
-		QUnit.test( 'toJSON: clone of a transformed geometry preserves _transformed', ( assert ) => {
+		test( 'toJSON: clone of a transformed geometry preserves _transformed', () => {
 
 			const source = new BoxGeometry( 10, 20, 30 );
 			source.translate( 1, 2, 3 );

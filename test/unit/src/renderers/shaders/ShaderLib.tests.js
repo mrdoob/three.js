@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { ShaderLib } from '../../../../../src/renderers/shaders/ShaderLib.js';
 
-export default QUnit.module( 'Renderers', () => {
+describe( 'Renderers', () => {
 
-	QUnit.module( 'Shaders', () => {
+	describe( 'Shaders', () => {
 
-		QUnit.module( 'ShaderLib', () => {
+		describe( 'ShaderLib', () => {
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			test( 'Instancing', () => {
 
 				assert.ok( ShaderLib, 'ShaderLib is defined.' );
 

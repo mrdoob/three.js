@@ -1,13 +1,14 @@
+import { describe } from 'vitest';
 import {
 	float, sinc
 } from 'three/tsl';
 import { gpuTest } from './gpu-test-utils.js';
 
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'sinc()', () => {
+		describe( 'sinc()', () => {
 
 			gpuTest( 'sinc() starts and ends at zero over one full bounce period', ( { assert } ) => {
 

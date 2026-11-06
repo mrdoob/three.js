@@ -1,3 +1,5 @@
+import { assert, describe, test } from 'vitest';
+
 import { ColorManagement } from '../../../../src/math/ColorManagement.js';
 import { Color } from '../../../../src/math/Color.js';
 import { Matrix3 } from '../../../../src/math/Matrix3.js';
@@ -5,12 +7,12 @@ import { Vector3 } from '../../../../src/math/Vector3.js';
 import { LinearSRGBColorSpace, LinearTransfer } from '../../../../src/constants.js';
 import { eps } from '../../utils/math-constants.js';
 
-export default QUnit.module( 'Maths', () => {
+describe( 'Maths', () => {
 
-	QUnit.module( 'ColorManagement', () => {
+	describe( 'ColorManagement', () => {
 
 		// PROPERTIES
-		QUnit.test( 'enabled', ( assert ) => {
+		test( 'enabled', () => {
 
 			assert.strictEqual(
 				ColorManagement.enabled, true,
@@ -20,7 +22,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// INTERNALS
-		QUnit.test( '_getMatrix', ( assert ) => {
+		test( '_getMatrix', () => {
 
 			const LinearDisplayP3ColorSpace = 'test-display-p3-linear';
 

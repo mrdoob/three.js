@@ -1,11 +1,13 @@
+import { assert, describe, test } from 'vitest';
+
 import { Fog } from '../../../../src/scenes/Fog.js';
 
-export default QUnit.module( 'Scenes', () => {
+describe( 'Scenes', () => {
 
-	QUnit.module( 'Fog', () => {
+	describe( 'Fog', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			// Fog( color, near = 1, far = 1000 )
 
@@ -24,7 +26,7 @@ export default QUnit.module( 'Scenes', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isFog', ( assert ) => {
+		test( 'isFog', () => {
 
 			const object = new Fog();
 			assert.ok(

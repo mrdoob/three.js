@@ -1,11 +1,13 @@
+import { assert, describe, test } from 'vitest';
+
 import { InstancedBufferGeometry } from '../../../../src/core/InstancedBufferGeometry.js';
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
 
-export default QUnit.module( 'Core', () => {
+describe( 'Core', () => {
 
-	QUnit.module( 'InstancedBufferGeometry', () => {
+	describe( 'InstancedBufferGeometry', () => {
 
 		function createClonableMock() {
 
@@ -22,7 +24,7 @@ export default QUnit.module( 'Core', () => {
 		}
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new InstancedBufferGeometry();
 			assert.strictEqual(
@@ -33,7 +35,7 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new InstancedBufferGeometry();
 			assert.ok( object, 'Can instantiate an InstancedBufferGeometry.' );
@@ -41,7 +43,7 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new InstancedBufferGeometry();
 			assert.ok(
@@ -52,7 +54,7 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isInstancedBufferGeometry', ( assert ) => {
+		test( 'isInstancedBufferGeometry', () => {
 
 			const object = new InstancedBufferGeometry();
 			assert.ok(
@@ -62,7 +64,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'copy', ( assert ) => {
+		test( 'copy', () => {
 
 			const instanceMock1 = {};
 			const instanceMock2 = {};

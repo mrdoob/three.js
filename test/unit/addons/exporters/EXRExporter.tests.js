@@ -1,3 +1,5 @@
+import { assert, describe, test } from 'vitest';
+
 import { DataTexture, FloatType, RGBAFormat } from 'three';
 import { EXRExporter, NO_COMPRESSION, RLE_COMPRESSION, ZIPS_COMPRESSION, ZIP_COMPRESSION, PIZ_COMPRESSION } from '../../../../examples/jsm/exporters/EXRExporter.js';
 import { EXRLoader } from '../../../../examples/jsm/loaders/EXRLoader.js';
@@ -24,17 +26,17 @@ async function roundTrip( texture, compression ) {
 
 }
 
-export default QUnit.module( 'Addons', () => {
+describe( 'Addons', () => {
 
-	QUnit.module( 'Exporters', () => {
+	describe( 'Exporters', () => {
 
-		QUnit.module( 'EXRExporter', () => {
+		describe( 'EXRExporter', () => {
 
 			const compressions = { NO_COMPRESSION, RLE_COMPRESSION, ZIPS_COMPRESSION, ZIP_COMPRESSION, PIZ_COMPRESSION };
 
 			for ( const name in compressions ) {
 
-				QUnit.test( `round trip (${ name })`, async ( assert ) => {
+				test( `round trip (${ name })`, async () => {
 
 					// 17 lines leaves a partial last block with ZIP_COMPRESSION (16 lines per block).
 					// Noisy data does not shrink when compressed and must be stored uncompressed.
@@ -60,7 +62,7 @@ export default QUnit.module( 'Addons', () => {
 
 			}
 
-			QUnit.test( 'round trip (PIZ_COMPRESSION, 16-bit wavelet)', async ( assert ) => {
+			test( 'round trip (PIZ_COMPRESSION, 16-bit wavelet)', async () => {
 
 				const width = 256, height = 32;
 				const data = new Float32Array( width * height * 4 );

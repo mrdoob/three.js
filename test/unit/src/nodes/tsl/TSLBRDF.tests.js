@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import {
 	float, vec3,
 	D_GGX, D_GGX_Anisotropic, F_Schlick, Schlick_to_F0,
@@ -13,11 +14,11 @@ import { gpuTest } from './gpu-test-utils.js';
 // reference papers directly -- Karis/Epic's GGX notes, Filament's BRDF
 // implementation, the Frostbite PBR course notes), never by re-running the
 // TSL expression under test.
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'BSDF building blocks', () => {
+		describe( 'BSDF building blocks', () => {
 
 			gpuTest( 'D_GGX() matches the normal distribution function formula', ( { assert } ) => {
 
@@ -260,7 +261,7 @@ export default QUnit.module( 'Nodes', () => {
 
 		} );
 
-		QUnit.module( 'BRDF_GGX()', () => {
+		describe( 'BRDF_GGX()', () => {
 
 			gpuTest( 'BRDF_GGX() (no iridescence/anisotropy) is F * V * D from its own standalone building blocks', ( { assert } ) => {
 
@@ -312,7 +313,7 @@ export default QUnit.module( 'Nodes', () => {
 
 		} );
 
-		QUnit.module( 'getDistanceAttenuation()', () => {
+		describe( 'getDistanceAttenuation()', () => {
 
 			gpuTest( 'getDistanceAttenuation() without a cutoff is the inverse-power falloff', ( { assert } ) => {
 

@@ -1,14 +1,16 @@
+import { beforeEach, describe, test } from 'vitest';
+
 import { HemisphereLight } from '../../../../src/lights/HemisphereLight.js';
 
 import { Light } from '../../../../src/lights/Light.js';
-import { runStdLightTests } from '../../utils/qunit-utils.js';
+import { assert, runStdLightTests } from '../../utils/test-utils.js';
 
-export default QUnit.module( 'Lights', () => {
+describe( 'Lights', () => {
 
-	QUnit.module( 'HemisphereLight', ( hooks ) => {
+	describe( 'HemisphereLight', () => {
 
 		let lights = undefined;
-		hooks.beforeEach( function () {
+		beforeEach( function () {
 
 			const parameters = {
 				skyColor: 0x123456,
@@ -26,7 +28,7 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new HemisphereLight();
 			assert.strictEqual(
@@ -37,7 +39,7 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new HemisphereLight();
 			assert.ok( object, 'Can instantiate a HemisphereLight.' );
@@ -45,7 +47,7 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new HemisphereLight();
 			assert.ok(
@@ -56,7 +58,7 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isHemisphereLight', ( assert ) => {
+		test( 'isHemisphereLight', () => {
 
 			const object = new HemisphereLight();
 			assert.ok(
@@ -67,7 +69,7 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// OTHERS
-		QUnit.test( 'Standard light tests', ( assert ) => {
+		test( 'Standard light tests', () => {
 
 			runStdLightTests( assert, lights );
 

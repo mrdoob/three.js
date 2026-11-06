@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import {
 	Fn, If,
 	instanceIndex, invocationLocalIndex,
@@ -15,11 +16,11 @@ import { rawComputeTest, readUintBuffer } from './gpu-raw-test-utils.js';
 // (src, examples, or tests) to model against -- see the second test's
 // comments for what had to be worked out from scratch.
 
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'barriers', () => {
+		describe( 'barriers', () => {
 
 			rawComputeTest( 'storageBarrier: a workgroup-mate\'s storage write is visible after the barrier', {}, async ( { assert, renderer } ) => {
 

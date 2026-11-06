@@ -1,14 +1,16 @@
+import { beforeEach, describe, test } from 'vitest';
+
 import { PlaneGeometry } from '../../../../src/geometries/PlaneGeometry.js';
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
-import { runStdGeometryTests } from '../../utils/qunit-utils.js';
+import { assert, runStdGeometryTests } from '../../utils/test-utils.js';
 
-export default QUnit.module( 'Geometries', () => {
+describe( 'Geometries', () => {
 
-	QUnit.module( 'PlaneGeometry', ( hooks ) => {
+	describe( 'PlaneGeometry', () => {
 
 		let geometries = undefined;
-		hooks.beforeEach( function () {
+		beforeEach( function () {
 
 			const parameters = {
 				width: 10,
@@ -28,7 +30,7 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new PlaneGeometry();
 			assert.strictEqual(
@@ -39,7 +41,7 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new PlaneGeometry();
 			assert.ok( object, 'Can instantiate a PlaneGeometry.' );
@@ -47,7 +49,7 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new PlaneGeometry();
 			assert.ok(
@@ -58,7 +60,7 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// OTHERS
-		QUnit.test( 'Standard geometry tests', ( assert ) => {
+		test( 'Standard geometry tests', () => {
 
 			runStdGeometryTests( assert, geometries );
 

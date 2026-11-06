@@ -1,14 +1,17 @@
+import { describe, test } from 'vitest';
+import { assert } from '../../utils/test-utils.js';
+
 import { Camera } from '../../../../src/cameras/Camera.js';
 
 import { Vector3 } from '../../../../src/math/Vector3.js';
 import { Object3D } from '../../../../src/core/Object3D.js';
 
-export default QUnit.module( 'Cameras', () => {
+describe( 'Cameras', () => {
 
-	QUnit.module( 'Camera', () => {
+	describe( 'Camera', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new Camera();
 			assert.strictEqual(
@@ -19,7 +22,7 @@ export default QUnit.module( 'Cameras', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new Camera();
 			assert.ok( object, 'Can instantiate a Camera.' );
@@ -27,7 +30,7 @@ export default QUnit.module( 'Cameras', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new Camera();
 			assert.ok(
@@ -38,7 +41,7 @@ export default QUnit.module( 'Cameras', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isCamera', ( assert ) => {
+		test( 'isCamera', () => {
 
 			const object = new Camera();
 			assert.ok(
@@ -48,7 +51,7 @@ export default QUnit.module( 'Cameras', () => {
 
 		} );
 
-		QUnit.test( 'clone', ( assert ) => {
+		test( 'clone', () => {
 
 			const cam = new Camera();
 
@@ -68,7 +71,7 @@ export default QUnit.module( 'Cameras', () => {
 
 		// OTHERS
 		// TODO: this should not be here, Object3D related
-		QUnit.test( 'lookAt', ( assert ) => {
+		test( 'lookAt', () => {
 
 			const cam = new Camera();
 			cam.lookAt( new Vector3( 0, 1, - 1 ) );

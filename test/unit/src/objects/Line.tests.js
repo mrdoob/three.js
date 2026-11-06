@@ -1,3 +1,5 @@
+import { assert, describe, test } from 'vitest';
+
 import { Line } from '../../../../src/objects/Line.js';
 
 import { Object3D } from '../../../../src/core/Object3D.js';
@@ -5,12 +7,12 @@ import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../../../../src/core/BufferAttribute.js';
 import { Material } from '../../../../src/materials/Material.js';
 
-export default QUnit.module( 'Objects', () => {
+describe( 'Objects', () => {
 
-	QUnit.module( 'Line', () => {
+	describe( 'Line', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const line = new Line();
 			assert.strictEqual(
@@ -21,7 +23,7 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new Line();
 			assert.ok( object, 'Can instantiate a Line.' );
@@ -29,7 +31,7 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new Line();
 			assert.ok(
@@ -40,7 +42,7 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isLine', ( assert ) => {
+		test( 'isLine', () => {
 
 			const object = new Line();
 			assert.ok(
@@ -50,7 +52,7 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		QUnit.test( 'copy/material', ( assert ) => {
+		test( 'copy/material', () => {
 
 			// Material arrays are cloned
 			const mesh1 = new Line();
@@ -67,7 +69,7 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		QUnit.test( 'copy/morphTargets', ( assert ) => {
+		test( 'copy/morphTargets', () => {
 
 			const geometry = new BufferGeometry();
 			geometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 1, 1, 1 ], 3 ) );

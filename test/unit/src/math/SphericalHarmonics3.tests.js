@@ -1,11 +1,13 @@
+import { assert, describe, test } from 'vitest';
+
 import { SphericalHarmonics3 } from '../../../../src/math/SphericalHarmonics3.js';
 
-export default QUnit.module( 'Maths', () => {
+describe( 'Maths', () => {
 
-	QUnit.module( 'SphericalHarmonics3', () => {
+	describe( 'SphericalHarmonics3', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new SphericalHarmonics3();
 			assert.ok( object, 'Can instantiate a SphericalHarmonics3.' );
@@ -13,7 +15,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isSphericalHarmonics3', ( assert ) => {
+		test( 'isSphericalHarmonics3', () => {
 
 			const object = new SphericalHarmonics3();
 			assert.ok(

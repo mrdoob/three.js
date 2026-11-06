@@ -1,16 +1,19 @@
+import { beforeAll, describe, test } from 'vitest';
+import { assert } from '../../../utils/test-utils.js';
+
 import { CubicBezierCurve3 } from '../../../../../src/extras/curves/CubicBezierCurve3.js';
 
 import { Curve } from '../../../../../src/extras/core/Curve.js';
 import { Vector3 } from '../../../../../src/math/Vector3.js';
 
-export default QUnit.module( 'Extras', () => {
+describe( 'Extras', () => {
 
-	QUnit.module( 'Curves', () => {
+	describe( 'Curves', () => {
 
-		QUnit.module( 'CubicBezierCurve3', ( hooks ) => {
+		describe( 'CubicBezierCurve3', () => {
 
 			let curve = undefined;
-			hooks.before( function () {
+			beforeAll( function () {
 
 				curve = new CubicBezierCurve3(
 					new Vector3( - 10, 0, 2 ),
@@ -22,7 +25,7 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// INHERITANCE
-			QUnit.test( 'Extending', ( assert ) => {
+			test( 'Extending', () => {
 
 				const object = new CubicBezierCurve3();
 				assert.strictEqual(
@@ -33,7 +36,7 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			test( 'Instancing', () => {
 
 				const object = new CubicBezierCurve3();
 				assert.ok( object, 'Can instantiate a CubicBezierCurve3.' );
@@ -41,7 +44,7 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// PROPERTIES
-			QUnit.test( 'type', ( assert ) => {
+			test( 'type', () => {
 
 				const object = new CubicBezierCurve3();
 				assert.ok(
@@ -52,7 +55,7 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// PUBLIC
-			QUnit.test( 'isCubicBezierCurve3', ( assert ) => {
+			test( 'isCubicBezierCurve3', () => {
 
 				const object = new CubicBezierCurve3();
 				assert.ok(
@@ -63,7 +66,7 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// OTHERS
-			QUnit.test( 'Simple curve', ( assert ) => {
+			test( 'Simple curve', () => {
 
 				const expectedPoints = [
 					new Vector3( - 10, 0, 2 ),
@@ -90,7 +93,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'getLength/getLengths', ( assert ) => {
+			test( 'getLength/getLengths', () => {
 
 				const length = curve.getLength();
 				const expectedLength = 39.58103024989427;
@@ -116,7 +119,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'getPointAt', ( assert ) => {
+			test( 'getPointAt', () => {
 
 				const expectedPoints = [
 					new Vector3( - 10, 0, 2 ),
@@ -136,7 +139,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'getTangent/getTangentAt', ( assert ) => {
+			test( 'getTangent/getTangentAt', () => {
 
 				let expectedTangents = [
 					new Vector3( 0.3138715439944244, 0.9411440474105875, 0.12542940601858074 ),
@@ -192,7 +195,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'getUtoTmapping', ( assert ) => {
+			test( 'getUtoTmapping', () => {
 
 				const start = curve.getUtoTmapping( 0, 0 );
 				const end = curve.getUtoTmapping( 0, curve.getLength() );
@@ -206,7 +209,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'getSpacedPoints', ( assert ) => {
+			test( 'getSpacedPoints', () => {
 
 				const expectedPoints = [
 					new Vector3( - 10, 0, 2 ),
@@ -224,7 +227,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'computeFrenetFrames', ( assert ) => {
+			test( 'computeFrenetFrames', () => {
 
 				const expected = {
 					binormals: [

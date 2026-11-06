@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { MeshPhysicalMaterial } from '../../../../src/materials/MeshPhysicalMaterial.js';
 
 import { Material } from '../../../../src/materials/Material.js';
 
-export default QUnit.module( 'Materials', () => {
+describe( 'Materials', () => {
 
-	QUnit.module( 'MeshPhysicalMaterial', () => {
+	describe( 'MeshPhysicalMaterial', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new MeshPhysicalMaterial();
 			assert.strictEqual(
@@ -18,7 +20,7 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new MeshPhysicalMaterial();
 			assert.ok( object, 'Can instantiate a MeshPhysicalMaterial.' );
@@ -27,7 +29,7 @@ export default QUnit.module( 'Materials', () => {
 
 		// PROPERTIES
 
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new MeshPhysicalMaterial();
 			assert.ok(
@@ -37,7 +39,7 @@ export default QUnit.module( 'Materials', () => {
 
 		} );
 
-		QUnit.test( 'retroreflectivity', ( assert ) => {
+		test( 'retroreflectivity', () => {
 
 			const object = new MeshPhysicalMaterial();
 			assert.strictEqual( object.retroreflectivity, 0, 'retroreflectivity defaults to 0.' );
@@ -47,7 +49,7 @@ export default QUnit.module( 'Materials', () => {
 
 		} );
 
-		QUnit.test( 'copy copies retroreflectivity', ( assert ) => {
+		test( 'copy copies retroreflectivity', () => {
 
 			const source = new MeshPhysicalMaterial( { retroreflectivity: 0.5 } );
 			const object = new MeshPhysicalMaterial();
@@ -58,7 +60,7 @@ export default QUnit.module( 'Materials', () => {
 
 		} );
 
-		QUnit.test( 'fromJSON restores retroreflectivity', ( assert ) => {
+		test( 'fromJSON restores retroreflectivity', () => {
 
 			const source = new MeshPhysicalMaterial( { retroreflectivity: 0.25 } );
 			const json = source.toJSON();
@@ -72,7 +74,7 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isMeshPhysicalMaterial', ( assert ) => {
+		test( 'isMeshPhysicalMaterial', () => {
 
 			const object = new MeshPhysicalMaterial();
 			assert.ok(

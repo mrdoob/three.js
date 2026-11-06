@@ -1,11 +1,13 @@
+import { assert, describe, test } from 'vitest';
+
 import { Interpolant } from '../../../../src/math/Interpolant.js';
 
-export default QUnit.module( 'Maths', () => {
+describe( 'Maths', () => {
 
-	QUnit.module( 'Interpolant', () => {
+	describe( 'Interpolant', () => {
 
 		// Since this is an abstract base class, we have to make it concrete in order
-		// to QUnit.test its functionality...
+		// to test its functionality...
 
 		class Mock extends Interpolant {
 
@@ -52,7 +54,7 @@ export default QUnit.module( 'Maths', () => {
 		// Tests
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const interpolant = new Mock( null, [ 1, 11, 2, 22, 3, 33 ], 2, [] );
 			assert.strictEqual(
@@ -63,7 +65,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PRIVATE
-		QUnit.test( 'copySampleValue_', ( assert ) => {
+		test( 'copySampleValue_', () => {
 
 			const interpolant = new Mock( null, [ 1, 11, 2, 22, 3, 33 ], 2, [] );
 
@@ -73,7 +75,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'evaluate -> intervalChanged_ / interpolate_', ( assert ) => {
+		test( 'evaluate -> intervalChanged_ / interpolate_', () => {
 
 			let actual, expect;
 

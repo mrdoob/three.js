@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { Object3D } from '../../../../src/core/Object3D.js';
 import { Line } from '../../../../src/objects/Line.js';
 import { LineSegments } from '../../../../src/objects/LineSegments.js';
 
-export default QUnit.module( 'Objects', () => {
+describe( 'Objects', () => {
 
-	QUnit.module( 'LineSegments', () => {
+	describe( 'LineSegments', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const lineSegments = new LineSegments();
 			assert.strictEqual( lineSegments instanceof Object3D, true, 'LineSegments extends from Object3D' );
@@ -16,7 +18,7 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new LineSegments();
 			assert.ok( object, 'Can instantiate a LineSegments.' );
@@ -24,7 +26,7 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new LineSegments();
 			assert.ok(
@@ -35,7 +37,7 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isLineSegments', ( assert ) => {
+		test( 'isLineSegments', () => {
 
 			const object = new LineSegments();
 			assert.ok(

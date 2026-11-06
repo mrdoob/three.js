@@ -1,3 +1,6 @@
+import { describe, test } from 'vitest';
+import { assert } from '../../utils/test-utils.js';
+
 import { Line3 } from '../../../../src/math/Line3.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
 import { Vector4 } from '../../../../src/math/Vector4.js';
@@ -11,12 +14,12 @@ import {
 	two3
 } from '../../utils/math-constants.js';
 
-export default QUnit.module( 'Maths', () => {
+describe( 'Maths', () => {
 
-	QUnit.module( 'Line3', () => {
+	describe( 'Line3', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			let a = new Line3();
 			assert.ok( a.start.equals( zero3 ), 'Passed!' );
@@ -29,7 +32,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( 'set', ( assert ) => {
+		test( 'set', () => {
 
 			const a = new Line3();
 
@@ -39,7 +42,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'copy/equals', ( assert ) => {
+		test( 'copy/equals', () => {
 
 			const a = new Line3( zero3.clone(), one3.clone() );
 			const b = new Line3().copy( a );
@@ -54,7 +57,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'clone/equal', ( assert ) => {
+		test( 'clone/equal', () => {
 
 			let a = new Line3();
 			const b = new Line3( zero3, new Vector3( 1, 1, 1 ) );
@@ -73,7 +76,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'getCenter', ( assert ) => {
+		test( 'getCenter', () => {
 
 			const center = new Vector3();
 
@@ -82,7 +85,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'delta', ( assert ) => {
+		test( 'delta', () => {
 
 			const delta = new Vector3();
 
@@ -91,7 +94,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'distanceSq', ( assert ) => {
+		test( 'distanceSq', () => {
 
 			const a = new Line3( zero3, zero3 );
 			const b = new Line3( zero3, one3 );
@@ -106,7 +109,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'distance', ( assert ) => {
+		test( 'distance', () => {
 
 			const a = new Line3( zero3, zero3 );
 			const b = new Line3( zero3, one3 );
@@ -120,7 +123,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'at', ( assert ) => {
+		test( 'at', () => {
 
 			const a = new Line3( one3.clone(), new Vector3( 1, 1, 2 ) );
 			const point = new Vector3();
@@ -136,7 +139,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'closestPointToPoint/closestPointToPointParameter', ( assert ) => {
+		test( 'closestPointToPoint/closestPointToPointParameter', () => {
 
 			const a = new Line3( one3.clone(), new Vector3( 1, 1, 2 ) );
 			const point = new Vector3();
@@ -169,7 +172,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'applyMatrix4', ( assert ) => {
+		test( 'applyMatrix4', () => {
 
 			const a = new Line3( zero3.clone(), two3.clone() );
 			const b = new Vector4( two3.x, two3.y, two3.z, 1 );
@@ -207,7 +210,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'equals', ( assert ) => {
+		test( 'equals', () => {
 
 			const a = new Line3( zero3.clone(), zero3.clone() );
 			const b = new Line3();
@@ -215,7 +218,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'distanceSqToLine3', ( assert ) => {
+		test( 'distanceSqToLine3', () => {
 
 			const line1 = new Line3();
 			line1.start.set( 0, 0, 0 );

@@ -1,10 +1,12 @@
+import { afterAll, assert, beforeAll, describe, test } from 'vitest';
+
 import { AudioListener } from '../../../../src/audio/AudioListener.js';
 
 import { Object3D } from '../../../../src/core/Object3D.js';
 
-export default QUnit.module( 'Audios', () => {
+describe( 'Audios', () => {
 
-	QUnit.module( 'AudioListener', ( hooks ) => {
+	describe( 'AudioListener', () => {
 
 		function mockWindowAudioContext() {
 
@@ -28,13 +30,13 @@ export default QUnit.module( 'Audios', () => {
 
 		if ( typeof window === 'undefined' ) {
 
-			hooks.before( function () {
+			beforeAll( function () {
 
 				mockWindowAudioContext();
 
 			} );
 
-			hooks.after( function () {
+			afterAll( function () {
 
 				global.window = undefined;
 
@@ -43,7 +45,7 @@ export default QUnit.module( 'Audios', () => {
 		}
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new AudioListener();
 			assert.strictEqual(
@@ -54,7 +56,7 @@ export default QUnit.module( 'Audios', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new AudioListener();
 			assert.ok( object, 'Can instantiate an AudioListener.' );
@@ -62,7 +64,7 @@ export default QUnit.module( 'Audios', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new AudioListener();
 			assert.ok(

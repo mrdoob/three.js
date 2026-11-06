@@ -1,13 +1,14 @@
+import { describe } from 'vitest';
 import {
 	vec3, faceForward
 } from 'three/tsl';
 import { gpuTest } from './gpu-test-utils.js';
 
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'faceForward()', () => {
+		describe( 'faceForward()', () => {
 
 			gpuTest( 'faceForward() picks the side facing the incident ray', ( { assert } ) => {
 

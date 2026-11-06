@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import {
 	float, int, uint, vec2, vec3,
 	bool, bvec2, bvec3, ivec2, ivec3, ivec4, uvec2, uvec3, uvec4, mat2, color,
@@ -9,11 +10,11 @@ import { gpuTest } from './gpu-test-utils.js';
 // TSLCore.js's `ConvertType` factory (the same machinery mat3()/mat4() go
 // through -- see TSLVectorMatrix.tests.js's dedicated row-major-convention
 // tests for that finding), and for `color()`.
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'type constructors', () => {
+		describe( 'type constructors', () => {
 
 			gpuTest( 'mat2(a,b,c,d) 4-scalar constructor is ROW-major, like mat3()/mat4() (see TSLVectorMatrix.tests.js)', ( { assert } ) => {
 

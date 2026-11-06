@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { CubeTextureLoader } from '../../../../src/loaders/CubeTextureLoader.js';
 
 import { Loader } from '../../../../src/loaders/Loader.js';
 
-export default QUnit.module( 'Loaders', () => {
+describe( 'Loaders', () => {
 
-	QUnit.module( 'CubeTextureLoader', () => {
+	describe( 'CubeTextureLoader', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new CubeTextureLoader();
 			assert.strictEqual(
@@ -18,7 +20,7 @@ export default QUnit.module( 'Loaders', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new CubeTextureLoader();
 			assert.ok( object, 'Can instantiate a CubeTextureLoader.' );

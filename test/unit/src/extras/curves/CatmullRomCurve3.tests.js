@@ -1,13 +1,16 @@
+import { describe, test } from 'vitest';
+import { assert } from '../../../utils/test-utils.js';
+
 import { CatmullRomCurve3 } from '../../../../../src/extras/curves/CatmullRomCurve3.js';
 
 import { Curve } from '../../../../../src/extras/core/Curve.js';
 import { Vector3 } from '../../../../../src/math/Vector3.js';
 
-export default QUnit.module( 'Extras', () => {
+describe( 'Extras', () => {
 
-	QUnit.module( 'Curves', () => {
+	describe( 'Curves', () => {
 
-		QUnit.module( 'CatmullRomCurve3', () => {
+		describe( 'CatmullRomCurve3', () => {
 
 			/* eslint-disable */
 			const positions = [
@@ -20,7 +23,7 @@ export default QUnit.module( 'Extras', () => {
 			/* eslint-enable */
 
 			// INHERITANCE
-			QUnit.test( 'Extending', ( assert ) => {
+			test( 'Extending', () => {
 
 				const object = new CatmullRomCurve3();
 				assert.strictEqual(
@@ -31,7 +34,7 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			test( 'Instancing', () => {
 
 				const object = new CatmullRomCurve3();
 				assert.ok( object, 'Can instantiate a CatmullRomCurve3.' );
@@ -39,7 +42,7 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// PROPERTIES
-			QUnit.test( 'type', ( assert ) => {
+			test( 'type', () => {
 
 				const object = new CatmullRomCurve3();
 				assert.ok(
@@ -50,7 +53,7 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// PUBLIC
-			QUnit.test( 'isCatmullRomCurve3', ( assert ) => {
+			test( 'isCatmullRomCurve3', () => {
 
 				const object = new CatmullRomCurve3();
 				assert.ok(
@@ -61,7 +64,7 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// OTHERS
-			QUnit.test( 'catmullrom check', ( assert ) => {
+			test( 'catmullrom check', () => {
 
 				const curve = new CatmullRomCurve3( positions );
 				curve.curveType = 'catmullrom';
@@ -96,7 +99,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'chordal basic check', ( assert ) => {
+			test( 'chordal basic check', () => {
 
 				const curve = new CatmullRomCurve3( positions );
 
@@ -130,7 +133,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'centripetal basic check', ( assert ) => {
+			test( 'centripetal basic check', () => {
 
 				const curve = new CatmullRomCurve3( positions );
 				curve.curveType = 'centripetal';
@@ -163,7 +166,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'closed catmullrom basic check', ( assert ) => {
+			test( 'closed catmullrom basic check', () => {
 
 				const curve = new CatmullRomCurve3( positions );
 				curve.curveType = 'catmullrom';
@@ -200,7 +203,7 @@ export default QUnit.module( 'Extras', () => {
 			//
 			// curve.type = 'catmullrom'; only from here on
 			//
-			QUnit.test( 'getLength/getLengths', ( assert ) => {
+			test( 'getLength/getLengths', () => {
 
 				const curve = new CatmullRomCurve3( positions );
 				curve.curveType = 'catmullrom';
@@ -229,7 +232,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'getPointAt', ( assert ) => {
+			test( 'getPointAt', () => {
 
 				const curve = new CatmullRomCurve3( positions );
 				curve.curveType = 'catmullrom';
@@ -252,7 +255,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'getTangent/getTangentAt', ( assert ) => {
+			test( 'getTangent/getTangentAt', () => {
 
 				const curve = new CatmullRomCurve3( positions );
 				curve.curveType = 'catmullrom';
@@ -311,7 +314,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'computeFrenetFrames', ( assert ) => {
+			test( 'computeFrenetFrames', () => {
 
 				const curve = new CatmullRomCurve3( positions );
 				curve.curveType = 'catmullrom';
@@ -350,7 +353,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'getUtoTmapping', ( assert ) => {
+			test( 'getUtoTmapping', () => {
 
 				const curve = new CatmullRomCurve3( positions );
 				curve.curveType = 'catmullrom';
@@ -367,7 +370,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'getSpacedPoints', ( assert ) => {
+			test( 'getSpacedPoints', () => {
 
 				const curve = new CatmullRomCurve3( positions );
 				curve.curveType = 'catmullrom';
@@ -388,7 +391,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'two points', ( assert ) => {
+			test( 'two points', () => {
 
 				const curve = new CatmullRomCurve3( [
 					new Vector3( 0, 0, 0 ),

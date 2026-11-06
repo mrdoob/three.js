@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { Scene } from '../../../../src/scenes/Scene.js';
 
 import { Object3D } from '../../../../src/core/Object3D.js';
 
-export default QUnit.module( 'Scenes', () => {
+describe( 'Scenes', () => {
 
-	QUnit.module( 'Scene', () => {
+	describe( 'Scene', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new Scene();
 			assert.strictEqual(
@@ -18,7 +20,7 @@ export default QUnit.module( 'Scenes', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new Scene();
 			assert.ok( object, 'Can instantiate a Scene.' );
@@ -26,7 +28,7 @@ export default QUnit.module( 'Scenes', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isScene', ( assert ) => {
+		test( 'isScene', () => {
 
 			const object = new Scene();
 			assert.ok(

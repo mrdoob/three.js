@@ -1,3 +1,5 @@
+import { assert, describe, test } from 'vitest';
+
 import { BufferAttribute, BufferGeometry, DynamicDrawUsage, Float16BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute } from 'three';
 import * as BufferGeometryUtils from '../../../../examples/jsm/utils/BufferGeometryUtils.js';
 import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
@@ -31,13 +33,13 @@ const getGeometry = () => {
 
 };
 
-export default QUnit.module( 'Addons', () => {
+describe( 'Addons', () => {
 
-	QUnit.module( 'Utils', () => {
+	describe( 'Utils', () => {
 
-		QUnit.module( 'BufferGeometryUtils', () => {
+		describe( 'BufferGeometryUtils', () => {
 
-			QUnit.test( 'remapAttribute preserves raw values and metadata', ( assert ) => {
+			test( 'remapAttribute preserves raw values and metadata', () => {
 
 				const attribute = new BufferAttribute( new Int16Array( [ - 32768, 32767, - 1, 1 ] ), 2, true );
 				attribute.name = 'weights';
@@ -51,13 +53,13 @@ export default QUnit.module( 'Addons', () => {
 				assert.strictEqual( result.gpuType, IntType );
 				const half = new Float16BufferAttribute( [ 0x8000, 0x3c00, 0x0001 ], 1 );
 				const remappedHalf = BufferGeometryUtils.remapAttribute( half, [ 2, 0, 1 ] );
-				assert.true( remappedHalf.isFloat16BufferAttribute );
+				assert.isTrue( remappedHalf.isFloat16BufferAttribute );
 				assert.deepEqual( Array.from( remappedHalf.array ), [ 0x0001, 0x8000, 0x3c00 ] );
 				assert.notStrictEqual( result.array, attribute.array );
 
 			} );
 
-			QUnit.test( 'remapAttribute preserves shared interleaved buffers', ( assert ) => {
+			test( 'remapAttribute preserves shared interleaved buffers', () => {
 
 				const data = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 ).setUsage( DynamicDrawUsage );
 				const position = new InterleavedBufferAttribute( data, 2, 0 );
@@ -70,12 +72,12 @@ export default QUnit.module( 'Addons', () => {
 				assert.strictEqual( p.data.usage, DynamicDrawUsage );
 				assert.deepEqual( Array.from( p.data.array ), [ 4, 5, 6, 1, 2, 3, 4, 5, 6 ] );
 				assert.strictEqual( w.getX( 2 ), 6 );
-				assert.false( 'gpuType' in p, 'interleaved attributes do not acquire gpuType' );
-				assert.false( 'gpuType' in w, 'shared interleaved attributes do not acquire gpuType' );
+				assert.isFalse( 'gpuType' in p, 'interleaved attributes do not acquire gpuType' );
+				assert.isFalse( 'gpuType' in w, 'shared interleaved attributes do not acquire gpuType' );
 
 			} );
 
-			QUnit.test( 'mergeVertices remaps half-float morphs without conversion', ( assert ) => {
+			test( 'mergeVertices remaps half-float morphs without conversion', () => {
 
 				const geometry = new BufferGeometry();
 				geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( [ 1, 0, 0, 2, 0, 0, 1, 0, 0 ] ), 3 ) );
@@ -87,7 +89,7 @@ export default QUnit.module( 'Addons', () => {
 				const result = BufferGeometryUtils.mergeVertices( geometry );
 				assert.deepEqual( Array.from( result.index.array ), [ 0, 1, 1 ] );
 				const output = result.morphAttributes.position[ 0 ];
-				assert.true( output.isFloat16BufferAttribute );
+				assert.isTrue( output.isFloat16BufferAttribute );
 				assert.deepEqual( Array.from( output.array ), [ 0x4000, 0x4200, 0x4400, 0x8000, 0x0001, 0x3c00 ] );
 				assert.strictEqual( output.name, 'pose' );
 				assert.strictEqual( output.usage, DynamicDrawUsage );
@@ -95,9 +97,9 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.module( 'mergeGeometries', () => {
+			describe( 'mergeGeometries', () => {
 
-				QUnit.test( 'rejects missing morph attributes', ( assert ) => {
+				test( 'rejects missing morph attributes', () => {
 
 					const geometry1 = getGeometry();
 					const geometry2 = getGeometry();
@@ -112,7 +114,7 @@ export default QUnit.module( 'Addons', () => {
 
 				for ( const [ count1, count2 ] of [[ 2, 1 ], [ 1, 2 ], [ 0, 1 ], [ 1, 0 ]] ) {
 
-					QUnit.test( `rejects inconsistent morph target counts (${count1}, ${count2})`, ( assert ) => {
+					test( `rejects inconsistent morph target counts (${count1}, ${count2})`, () => {
 
 						const geometry1 = getGeometry();
 						const geometry2 = getGeometry();
@@ -128,7 +130,7 @@ export default QUnit.module( 'Addons', () => {
 
 				}
 
-				QUnit.test( 'merges compatible morph targets', ( assert ) => {
+				test( 'merges compatible morph targets', () => {
 
 					const geometry1 = getGeometry();
 					const geometry2 = getGeometry();
@@ -174,7 +176,7 @@ export default QUnit.module( 'Addons', () => {
 
 				} );
 
-				QUnit.test( 'merges geometries without morph attributes', ( assert ) => {
+				test( 'merges geometries without morph attributes', () => {
 
 					const geometry = getGeometry();
 					delete geometry.morphAttributes.position;
@@ -186,7 +188,7 @@ export default QUnit.module( 'Addons', () => {
 
 				} );
 
-				QUnit.test( 'merges geometries with empty morph target arrays', ( assert ) => {
+				test( 'merges geometries with empty morph target arrays', () => {
 
 					const geometry = getGeometry();
 					geometry.morphAttributes.position = [];
@@ -200,9 +202,9 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.module( 'mergeVertices', () => {
+			describe( 'mergeVertices', () => {
 
-				QUnit.test( 'can handle morphAttributes without crashing', ( assert ) => {
+				test( 'can handle morphAttributes without crashing', () => {
 
 					const geometry = getGeometry();
 
@@ -213,7 +215,7 @@ export default QUnit.module( 'Addons', () => {
 
 				} );
 
-				QUnit.test( 'preserves distinct vertices with zero tolerance', ( assert ) => {
+				test( 'preserves distinct vertices with zero tolerance', () => {
 
 					const geometry = new BufferGeometry();
 					geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( [
@@ -229,7 +231,7 @@ export default QUnit.module( 'Addons', () => {
 
 				} );
 
-				QUnit.test( 'preserves interleaved attributes', ( assert ) => {
+				test( 'preserves interleaved attributes', () => {
 
 					const geometry = new BufferGeometry();
 
@@ -292,9 +294,9 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.module( 'deinterleaveGeometry', () => {
+			describe( 'deinterleaveGeometry', () => {
 
-				QUnit.test( 'deinterleaves attributes and morph attributes', ( assert ) => {
+				test( 'deinterleaves attributes and morph attributes', () => {
 
 					const geometry = new BufferGeometry();
 

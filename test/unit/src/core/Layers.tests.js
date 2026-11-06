@@ -1,11 +1,13 @@
+import { assert, describe, test } from 'vitest';
+
 import { Layers } from '../../../../src/core/Layers.js';
 
-export default QUnit.module( 'Core', () => {
+describe( 'Core', () => {
 
-	QUnit.module( 'Layers', () => {
+	describe( 'Layers', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new Layers();
 			assert.ok( object, 'Can instantiate a Layers.' );
@@ -13,7 +15,7 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'set', ( assert ) => {
+		test( 'set', () => {
 
 			const a = new Layers();
 
@@ -26,7 +28,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'enable', ( assert ) => {
+		test( 'enable', () => {
 
 			const a = new Layers();
 
@@ -48,7 +50,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'toggle', ( assert ) => {
+		test( 'toggle', () => {
 
 			const a = new Layers();
 
@@ -70,7 +72,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'disable', ( assert ) => {
+		test( 'disable', () => {
 
 			const a = new Layers();
 
@@ -92,7 +94,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'test', ( assert ) => {
+		test( 'test', () => {
 
 			const a = new Layers();
 			const b = new Layers();
@@ -100,26 +102,26 @@ export default QUnit.module( 'Core', () => {
 			assert.ok( a.test( b ), 'Start out true' );
 
 			a.set( 1 );
-			assert.notOk( a.test( b ), 'Set channel 1 in a and fail the QUnit.test' );
+			assert.notOk( a.test( b ), 'Set channel 1 in a and fail the test' );
 
 			b.toggle( 1 );
 			assert.ok( a.test( b ), 'Toggle channel 1 in b and pass again' );
 
 		} );
 
-		QUnit.test( 'isEnabled', ( assert ) => {
+		test( 'isEnabled', () => {
 
 			const a = new Layers();
 
 			a.enable( 1 );
-			assert.ok( a.isEnabled( 1 ), 'Enable channel 1 and pass the QUnit.test' );
+			assert.ok( a.isEnabled( 1 ), 'Enable channel 1 and pass the test' );
 
 			a.enable( 2 );
-			assert.ok( a.isEnabled( 2 ), 'Enable channel 2 and pass the QUnit.test' );
+			assert.ok( a.isEnabled( 2 ), 'Enable channel 2 and pass the test' );
 
 			a.toggle( 1 );
-			assert.notOk( a.isEnabled( 1 ), 'Toggle channel 1 and fail the QUnit.test' );
-			assert.ok( a.isEnabled( 2 ), 'Channel 2 still enabled and pass the QUnit.test' );
+			assert.notOk( a.isEnabled( 1 ), 'Toggle channel 1 and fail the test' );
+			assert.ok( a.isEnabled( 2 ), 'Channel 2 still enabled and pass the test' );
 
 		} );
 

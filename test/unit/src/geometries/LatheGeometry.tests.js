@@ -1,15 +1,17 @@
+import { beforeEach, describe, test } from 'vitest';
+
 import { LatheGeometry } from '../../../../src/geometries/LatheGeometry.js';
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
-import { runStdGeometryTests } from '../../utils/qunit-utils.js';
+import { assert, runStdGeometryTests } from '../../utils/test-utils.js';
 
-export default QUnit.module( 'Geometries', () => {
+describe( 'Geometries', () => {
 
-	QUnit.module( 'LatheGeometry', ( hooks ) => {
+	describe( 'LatheGeometry', () => {
 
 		let geometries = undefined;
-		hooks.beforeEach( function () {
+		beforeEach( function () {
 
 			const parameters = {
 				points: [],
@@ -25,7 +27,7 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new LatheGeometry();
 			assert.strictEqual(
@@ -36,7 +38,7 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new LatheGeometry();
 			assert.ok( object, 'Can instantiate a LatheGeometry.' );
@@ -44,7 +46,7 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new LatheGeometry();
 			assert.ok(
@@ -55,13 +57,13 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// OTHERS
-		QUnit.test( 'Standard geometry tests', ( assert ) => {
+		test( 'Standard geometry tests', () => {
 
 			runStdGeometryTests( assert, geometries );
 
 		} );
 
-		QUnit.test( 'normals', ( assert ) => {
+		test( 'normals', () => {
 
 			const normals = new LatheGeometry().getAttribute( 'normal' );
 			const normal = new Vector3();

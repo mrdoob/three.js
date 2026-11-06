@@ -1,17 +1,19 @@
+import { assert, describe, test } from 'vitest';
+
 import { viewportTexture } from '../../../../../src/nodes/display/ViewportTextureNode.js';
 import { FramebufferTexture } from '../../../../../src/textures/FramebufferTexture.js';
 import { RenderTarget } from '../../../../../src/core/RenderTarget.js';
 
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'Display', () => {
+	describe( 'Display', () => {
 
-		QUnit.module( 'ViewportTextureNode', () => {
+		describe( 'ViewportTextureNode', () => {
 
 			// CACHING BEHAVIOR
-			QUnit.module( 'Texture Caching', () => {
+			describe( 'Texture Caching', () => {
 
-				QUnit.test( 'getTextureForReference returns defaultFramebuffer for null reference', ( assert ) => {
+				test( 'getTextureForReference returns defaultFramebuffer for null reference', () => {
 
 					const node = viewportTexture();
 					const texture = node.getTextureForReference( null );
@@ -23,7 +25,7 @@ export default QUnit.module( 'Nodes', () => {
 
 				} );
 
-				QUnit.test( 'getTextureForReference caches textures per reference', ( assert ) => {
+				test( 'getTextureForReference caches textures per reference', () => {
 
 					const node = viewportTexture();
 
@@ -64,7 +66,7 @@ export default QUnit.module( 'Nodes', () => {
 
 				} );
 
-				QUnit.test( 'cached textures are independent from defaultFramebuffer', ( assert ) => {
+				test( 'cached textures are independent from defaultFramebuffer', () => {
 
 					const node = viewportTexture();
 
@@ -81,7 +83,7 @@ export default QUnit.module( 'Nodes', () => {
 
 				} );
 
-				QUnit.test( 'multiple render targets get independent caches', ( assert ) => {
+				test( 'multiple render targets get independent caches', () => {
 
 					const node = viewportTexture();
 
@@ -128,9 +130,9 @@ export default QUnit.module( 'Nodes', () => {
 			} );
 
 			// REFERENCE PRIORITY
-			QUnit.module( 'Reference Priority', () => {
+			describe( 'Reference Priority', () => {
 
-				QUnit.test( 'referenceNode delegation works correctly', ( assert ) => {
+				test( 'referenceNode delegation works correctly', () => {
 
 					// Create a parent node
 					const parentNode = viewportTexture();
@@ -156,7 +158,7 @@ export default QUnit.module( 'Nodes', () => {
 				} );
 
 				// When rendering to a RenderTarget, it should take priority over CanvasTarget
-				QUnit.test( 'updateReference prioritizes renderTarget over canvasTarget', ( assert ) => {
+				test( 'updateReference prioritizes renderTarget over canvasTarget', () => {
 
 					const node = viewportTexture();
 
@@ -198,7 +200,7 @@ export default QUnit.module( 'Nodes', () => {
 				} );
 
 				// Test the edge case: when only canvasTarget is available (renderTarget is null)
-				QUnit.test( 'updateReference uses canvasTarget when renderTarget is null', ( assert ) => {
+				test( 'updateReference uses canvasTarget when renderTarget is null', () => {
 
 					const node = viewportTexture();
 

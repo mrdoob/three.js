@@ -2,7 +2,6 @@
 .DS_Store
 .idea/
 .project
-.puppeteer_profile/
 .vs/
 .vscode/
 
@@ -25,3 +24,6 @@ test/treeshake/three.webgpu.nodes.bundle.min.js
 test/unit/build
 
 **/node_modules
+
+/test/e2e/results/
+/playwright-report/

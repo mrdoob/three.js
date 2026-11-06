@@ -1,3 +1,5 @@
+import { assert, describe, test } from 'vitest';
+
 import {
 	SH_BAND_COMPONENTS,
 	SH_BAND_WORDS,
@@ -21,13 +23,13 @@ function closeTo( assert, actual, expected, message ) {
 
 }
 
-export default QUnit.module( 'Addons', () => {
+describe( 'Addons', () => {
 
-	QUnit.module( 'Utils', () => {
+	describe( 'Utils', () => {
 
-		QUnit.module( 'GaussianSplatUtils', () => {
+		describe( 'GaussianSplatUtils', () => {
 
-			QUnit.test( 'maps spherical harmonics coefficients to packed uint words', ( assert ) => {
+			test( 'maps spherical harmonics coefficients to packed uint words', () => {
 
 				assert.deepEqual( SH_BAND_WORDS, [ 0, 3, 4, 6 ], 'words cover each band with four bytes per uint' );
 
@@ -48,7 +50,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'converts degree-0 spherical harmonics and linear color', ( assert ) => {
+			test( 'converts degree-0 spherical harmonics and linear color', () => {
 
 				closeTo( assert, sh0ToLinear( 0 ), 0.5, 'zero coefficient maps to biased half' );
 				closeTo( assert, linearToSH0( 0.5 ), 0, 'biased half maps to zero coefficient' );
@@ -56,14 +58,14 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'applies sigmoid activation', ( assert ) => {
+			test( 'applies sigmoid activation', () => {
 
 				closeTo( assert, sigmoid( 0 ), 0.5, 'zero maps to half' );
 				closeTo( assert, sigmoid( Math.log( 3 ) ), 0.75, 'logit maps to expected value' );
 
 			} );
 
-			QUnit.test( 'creates Gaussian splat geometry from packed arrays', ( assert ) => {
+			test( 'creates Gaussian splat geometry from packed arrays', () => {
 
 				const data = createGaussianSplatGeometry(
 					new Float32Array( [ 1, 2, 3 ] ),
@@ -79,7 +81,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'creates Gaussian splat geometry with spherical harmonics attributes', ( assert ) => {
+			test( 'creates Gaussian splat geometry with spherical harmonics attributes', () => {
 
 				const coefficients = new Uint8ClampedArray( [ 129, 130, 131, 132, 133, 134, 135, 136, 137 ] );
 				const packedWords = packSphericalHarmonicsBand( coefficients, 1, 1 );
@@ -105,7 +107,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'requires packed uint32 spherical harmonics on geometry', ( assert ) => {
+			test( 'requires packed uint32 spherical harmonics on geometry', () => {
 
 				assert.throws( () => {
 

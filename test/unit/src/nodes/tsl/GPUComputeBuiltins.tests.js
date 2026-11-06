@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import {
 	Fn, instanceIndex, instancedArray,
 	localId, workgroupId, globalId, numWorkgroups,
@@ -23,11 +24,11 @@ const WORKGROUP_SIZE = 8;
 const WORKGROUP_COUNT = 5;
 const DISPATCH_COUNT = WORKGROUP_SIZE * WORKGROUP_COUNT; // 40
 
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'compute builtins', () => {
+		describe( 'compute builtins', () => {
 
 			rawComputeTest( 'localId, workgroupId, globalId and numWorkgroups match their WGSL definitions', {}, async ( { assert, renderer } ) => {
 

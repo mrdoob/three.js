@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import {
 	float, vec3, mat3, mat4,
 	dot, cross, length, distance, normalize,
@@ -14,11 +15,11 @@ import { gpuTest } from './gpu-test-utils.js';
 //
 // mat3/mat4 assertions exercise gpu-test-utils.js's matrix support (see its
 // file header for how a mat3/mat4 value is threaded through the harness).
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'vector functions', () => {
+		describe( 'vector functions', () => {
 
 			gpuTest( 'dot/cross/length/distance with hand-computed values', ( { assert } ) => {
 
@@ -76,7 +77,7 @@ export default QUnit.module( 'Nodes', () => {
 
 		} );
 
-		QUnit.module( 'matrix functions (mat3/mat4)', () => {
+		describe( 'matrix functions (mat3/mat4)', () => {
 
 			gpuTest( 'mat3(a,b,c,...) 9-scalar constructor takes ROW-major arguments (like Matrix3.set(), NOT GLSL\'s own column-major literal convention)', ( { assert } ) => {
 

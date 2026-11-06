@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { PlaneHelper } from '../../../../src/helpers/PlaneHelper.js';
 
 import { Line } from '../../../../src/objects/Line.js';
 
-export default QUnit.module( 'Helpers', () => {
+describe( 'Helpers', () => {
 
-	QUnit.module( 'PlaneHelper', () => {
+	describe( 'PlaneHelper', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new PlaneHelper();
 			assert.strictEqual(
@@ -18,7 +20,7 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new PlaneHelper();
 			assert.ok( object, 'Can instantiate a PlaneHelper.' );
@@ -26,7 +28,7 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new PlaneHelper();
 			assert.ok(
@@ -38,9 +40,8 @@ export default QUnit.module( 'Helpers', () => {
 
 		// PUBLIC
 
-		QUnit.test( 'dispose', ( assert ) => {
+		test( 'dispose', () => {
 
-			assert.expect( 0 );
 
 			const object = new PlaneHelper();
 			object.dispose();

@@ -1,7 +1,7 @@
 // Usage: node utils/generatePMREM.js input.hdr output.ktx2 [basisu-path]
 // Requires Basis Universal 2.50 or later, with HDR compression support.
 
-import puppeteer from 'puppeteer';
+import { chromium } from '@playwright/test';
 import { execFile } from 'node:child_process';
 import { once } from 'node:events';
 import { mkdtemp, mkdir, readFile, writeFile, rm } from 'node:fs/promises';
@@ -33,7 +33,7 @@ try {
 	server.listen( 0, '127.0.0.1' );
 	await once( server, 'listening' );
 
-	browser = await puppeteer.launch( { headless: true, args: [ '--no-sandbox' ], protocolTimeout: 120000 } );
+	browser = await chromium.launch( { channel: 'chromium', headless: true, args: [ '--no-sandbox' ] } );
 	const page = await browser.newPage();
 	const errors = [];
 	page.on( 'pageerror', error => errors.push( error.message ) );
@@ -43,14 +43,13 @@ try {
 
 	} );
 
-	await page.setRequestInterception( true );
-	page.on( 'request', request => {
+	await page.route( '**/*', route => {
 
-		const pathname = new URL( request.url() ).pathname;
+		const pathname = new URL( route.request().url() ).pathname;
 
 		if ( pathname === '/generate-pmrem.html' ) {
 
-			return request.respond( {
+			return route.fulfill( {
 				status: 200,
 				contentType: 'text/html',
 				body: '<link rel="icon" href="data:,"><script type="importmap">{"imports":{"three":"/src/Three.js"}}</script>'
@@ -60,11 +59,11 @@ try {
 
 		if ( pathname === '/input.hdr' ) {
 
-			return request.respond( { status: 200, contentType: 'application/octet-stream', body: source } );
+			return route.fulfill( { status: 200, contentType: 'application/octet-stream', body: source } );
 
 		}
 
-		return request.continue();
+		return route.continue();
 
 	} );
 

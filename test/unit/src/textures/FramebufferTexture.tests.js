@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { FramebufferTexture } from '../../../../src/textures/FramebufferTexture.js';
 
 import { Texture } from '../../../../src/textures/Texture.js';
 
-export default QUnit.module( 'Textures', () => {
+describe( 'Textures', () => {
 
-	QUnit.module( 'FramebufferTexture', () => {
+	describe( 'FramebufferTexture', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new FramebufferTexture();
 			assert.strictEqual(
@@ -18,7 +20,7 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new FramebufferTexture();
 			assert.ok( object, 'Can instantiate a FramebufferTexture.' );
@@ -26,7 +28,7 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isFramebufferTexture', ( assert ) => {
+		test( 'isFramebufferTexture', () => {
 
 			const object = new FramebufferTexture();
 			assert.ok(

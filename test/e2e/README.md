@@ -1,44 +1,57 @@
 # Three.js end-to-end testing
 
-### Motivation
-Simplify code reviews with quick pixel testing inside CI. The same screenshots are used for thumbnails.
+Each example is loaded in Chromium with [Playwright](https://playwright.dev/) and its screenshot is compared with its thumbnail in `examples/screenshots`. The same screenshots are used as the example thumbnails.
 
-### Local usage
-If you get an error in e2e test after PR and you sure that all is correct,
-just make a new screenshot to example. As a last resort increase timeouts or add it to exception list.
+## Setup
 
-```shell
-# generate new screenshots for exact examples
-npm run make-screenshot <example1_name> ... <exampleN_name>
+- Execute `npm install` and `npm run build` from the root folder.
+- Install the browser once with `npx playwright install chromium`.
 
-# check exact examples
-npm run test-e2e <example1_name> ... <exampleN_name>
+## Run
 
-# check all examples
+```sh
+# Check all examples, or only WebGPU examples.
 npm run test-e2e
+npm run test-e2e-webgpu
+
+# Check specific examples.
+npm run test-e2e -- webgl_geometry_cube webgl_loader_gltf
+
+# Update thumbnails after reviewing a rendering change.
+npm run make-screenshot -- webgl_geometry_cube
 ```
 
-Merge only those commits that pass the tests, otherwise all next commits will also fail.
+Place example names before Playwright options after npm's `--` separator:
 
-### How it works
-- ci configs with parallelism
-- deterministic random and clocks in pages and workers
-- deterministic page rAF and video for screenshots
-- ignores browser input while preserving scripted DOM clicks
-- freezes video playback, preserves explicit seeks, and waits for decoded frames
-- increased robustness with hided text, datgui, different flags and timeouts.
-- pipeline: turn off rAF -> 'networkidle0' -> video readiness -> networkTax -> turn on rAF -> render promise
-- added 3 progressive attempts for robustness
+```sh
+npm run test-e2e -- webgl_geometry_cube --workers 2 --retries 0
+npm run test-e2e -- --shard=1/5
+```
 
-### Development progress
+Put `--make` and `--webgpu` before Playwright options too. Set `VISIBLE=1` to watch the browser.
 
-|           Travis                        |               Attempts               |
-|-----------------------------------------|--------------------------------------|
-| 61 from 362 failed, time=21:14          | networkidle0 timeout                 |
-| 26 from 362 failed, time=16:22          | with rAF hook                        |
-| 13=1+1+7+4 failed, time=4:26            | with render promise and parallelism  |
-| 4=0+0+2+2 failed, time=5:13             | with network tax and other settings  |
-| 4=0+0+2+2 failed, time=3:26             | with progressive attempts            |
+## Notes
 
-### Status
-97% examples are covered with tests. Check exception list for more information.
+CI renders on Ubuntu with Mesa's software Vulkan driver (lavapipe), which the thumbnails were made with. Other GPUs can differ slightly, so review the failure images before updating a thumbnail.
+
+Screenshots are captured as soon as possible and retried for up to five seconds until one matches. Early mismatches are expected and are not reported as failures.
+
+If none matches, Playwright retries the whole test with a fresh page, up to twice. Playwright labels tests that pass on a whole-test retry "flaky"; this does not refer to the screenshot polling above.
+
+`exceptions.js` has two lists:
+
+- `exceptionList`: examples that are not tested. Naming an example explicitly still runs it.
+- `slowList`: examples that need an extra two seconds before the screenshot, for example because of async loading or shader compilation.
+
+Use `slowList` for examples that consistently need more preparation time, and `exceptionList` as a last resort. Thumbnail generation also waits two extra seconds because there is no expected image to match.
+
+When a comparison fails, the actual, expected and diff images are saved in `test/e2e/output-screenshots` and uploaded by CI.
+
+For local traces and an HTML report, run:
+
+```sh
+npm run test-e2e -- webgl_geometry_cube --trace retain-on-failure --reporter=list,html
+npx playwright show-report playwright-report
+```
+
+Traces are saved in `test/e2e/results` and can also be opened with `npx playwright show-trace <trace.zip>`. HTML reports and traces are disabled by default.

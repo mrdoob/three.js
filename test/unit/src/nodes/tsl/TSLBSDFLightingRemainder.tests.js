@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import {
 	float, vec2, vec3, mat3,
 	directPointLight, getDistanceAttenuation,
@@ -12,11 +13,11 @@ import { gpuTest } from './gpu-test-utils.js';
 // TSL.Irradiance.tests.js.) Every expected value below is a plain-JS
 // transliteration of each function's own documented formula, computed
 // independently -- never by re-running the TSL expression under test.
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'directPointLight()', () => {
+		describe( 'directPointLight()', () => {
 
 			gpuTest( 'directPointLight() combines normalize(lightVector) with color * getDistanceAttenuation()', ( { assert } ) => {
 
@@ -133,7 +134,7 @@ export default QUnit.module( 'Nodes', () => {
 
 		} );
 
-		QUnit.module( 'LTC area-light math', () => {
+		describe( 'LTC area-light math', () => {
 
 			gpuTest( 'LTC_Uv() matches the roughness/dotNV texture parameterization formula', ( { assert } ) => {
 

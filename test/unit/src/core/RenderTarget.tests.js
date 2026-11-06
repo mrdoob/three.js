@@ -1,12 +1,14 @@
+import { assert, describe, test } from 'vitest';
+
 import { NearestFilter } from '../../../../src/constants.js';
 import { RenderTarget } from '../../../../src/core/RenderTarget.js';
 
-export default QUnit.module( 'Core', () => {
+describe( 'Core', () => {
 
-	QUnit.module( 'RenderTarget', () => {
+	describe( 'RenderTarget', () => {
 
 		// Constructor options
-		QUnit.test( 'Constructor', ( assert ) => {
+		test( 'Constructor', () => {
 
 			const empty = new RenderTarget();
 			assert.ok( empty.width != null && empty.height != null && empty.textures.length === 1, 'Can instantiate a RenderTarget with no arguments.' );
@@ -23,7 +25,7 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'setSize', ( assert ) => {
+		test( 'setSize', () => {
 
 			const renderTarget = new RenderTarget();
 			renderTarget.setSize( 128, 128 );

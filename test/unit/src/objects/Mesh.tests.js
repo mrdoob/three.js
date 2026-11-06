@@ -1,3 +1,5 @@
+import { assert, describe, test } from 'vitest';
+
 import { Object3D } from '../../../../src/core/Object3D.js';
 import { Mesh } from '../../../../src/objects/Mesh.js';
 import { Raycaster } from '../../../../src/core/Raycaster.js';
@@ -9,12 +11,12 @@ import { Vector3 } from '../../../../src/math/Vector3.js';
 import { DoubleSide } from '../../../../src/constants.js';
 import { Material } from '../../../../src/materials/Material.js';
 
-export default QUnit.module( 'Objects', () => {
+describe( 'Objects', () => {
 
-	QUnit.module( 'Mesh', () => {
+	describe( 'Mesh', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const mesh = new Mesh();
 			assert.strictEqual(
@@ -25,7 +27,7 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new Mesh();
 			assert.ok( object, 'Can instantiate a Mesh.' );
@@ -33,7 +35,7 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new Mesh();
 			assert.ok(
@@ -44,7 +46,7 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isMesh', ( assert ) => {
+		test( 'isMesh', () => {
 
 			const object = new Mesh();
 			assert.ok(
@@ -54,7 +56,7 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		QUnit.test( 'copy/material', ( assert ) => {
+		test( 'copy/material', () => {
 
 			// Material arrays are cloned
 			const mesh1 = new Mesh();
@@ -71,7 +73,7 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		QUnit.todo( 'raycast', ( assert ) => {
+		test.fails( 'raycast', () => {
 
 			const geometry = new PlaneGeometry();
 			const material = new MeshBasicMaterial();
@@ -97,7 +99,7 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		QUnit.test( 'raycast/range', ( assert ) => {
+		test( 'raycast/range', () => {
 
 			const geometry = new BoxGeometry( 1, 1, 1 );
 			const material = new MeshBasicMaterial( { side: DoubleSide } );

@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { MeshBasicMaterial } from '../../../../src/materials/MeshBasicMaterial.js';
 
 import { Material } from '../../../../src/materials/Material.js';
 
-export default QUnit.module( 'Materials', () => {
+describe( 'Materials', () => {
 
-	QUnit.module( 'MeshBasicMaterial', () => {
+	describe( 'MeshBasicMaterial', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new MeshBasicMaterial();
 			assert.strictEqual(
@@ -18,7 +20,7 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new MeshBasicMaterial();
 			assert.ok( object, 'Can instantiate a MeshBasicMaterial.' );
@@ -26,7 +28,7 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new MeshBasicMaterial();
 			assert.ok(
@@ -37,7 +39,7 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isMeshBasicMaterial', ( assert ) => {
+		test( 'isMeshBasicMaterial', () => {
 
 			const object = new MeshBasicMaterial();
 			assert.ok(

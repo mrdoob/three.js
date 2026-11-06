@@ -1,11 +1,13 @@
+import { assert, describe, test } from 'vitest';
+
 import { Color, SRGBColorSpace } from 'three';
 import { ColorConverter } from '../../../../examples/jsm/math/ColorConverter.js';
 
-export default QUnit.module( 'Maths', () => {
+describe( 'Maths', () => {
 
-	QUnit.module( 'ColorConverter', () => {
+	describe( 'ColorConverter', () => {
 
-		QUnit.test( 'setHSV achromatic colors', ( assert ) => {
+		test( 'setHSV achromatic colors', () => {
 
 			const color = new Color();
 
@@ -17,7 +19,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'getHSV achromatic colors', ( assert ) => {
+		test( 'getHSV achromatic colors', () => {
 
 			const target = {};
 
@@ -28,7 +30,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'primary colors', ( assert ) => {
+		test( 'primary colors', () => {
 
 			const colors = [ new Color( 1, 0, 0 ), new Color( 0, 1, 0 ), new Color( 0, 0, 1 ) ];
 
@@ -44,7 +46,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'clamping and hue wrapping', ( assert ) => {
+		test( 'clamping and hue wrapping', () => {
 
 			const color = new Color();
 
@@ -57,7 +59,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'round trip', ( assert ) => {
+		test( 'round trip', () => {
 
 			for ( const hsv of [ { h: 0.1, s: 0.5, v: 0.75 }, { h: 0.6, s: 0.8, v: 0.2 } ] ) {
 
@@ -71,7 +73,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'working color space', ( assert ) => {
+		test( 'working color space', () => {
 
 			const color = new Color().setRGB( 0.5, 0.5, 0.5, SRGBColorSpace );
 			const hsv = ColorConverter.getHSV( color, {} );

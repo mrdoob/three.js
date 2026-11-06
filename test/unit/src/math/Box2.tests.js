@@ -1,3 +1,5 @@
+import { assert, describe, test } from 'vitest';
+
 import { Box2 } from '../../../../src/math/Box2.js';
 import { Vector2 } from '../../../../src/math/Vector2.js';
 import {
@@ -9,12 +11,12 @@ import {
 	two2
 } from '../../utils/math-constants.js';
 
-export default QUnit.module( 'Maths', () => {
+describe( 'Maths', () => {
 
-	QUnit.module( 'Box2', () => {
+	describe( 'Box2', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			let a = new Box2();
 			assert.ok( a.min.equals( posInf2 ), 'Passed!' );
@@ -31,7 +33,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( 'isBox2', ( assert ) => {
+		test( 'isBox2', () => {
 
 			const a = new Box2();
 			assert.ok( a.isBox2 === true, 'Passed!' );
@@ -41,7 +43,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'set', ( assert ) => {
+		test( 'set', () => {
 
 			const a = new Box2();
 
@@ -51,7 +53,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setFromPoints', ( assert ) => {
+		test( 'setFromPoints', () => {
 
 			const a = new Box2();
 
@@ -68,7 +70,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setFromCenterAndSize', ( assert ) => {
+		test( 'setFromCenterAndSize', () => {
 
 			const a = new Box2();
 
@@ -86,7 +88,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'clone', ( assert ) => {
+		test( 'clone', () => {
 
 			let a = new Box2( zero2, zero2 );
 
@@ -101,7 +103,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'copy', ( assert ) => {
+		test( 'copy', () => {
 
 			const a = new Box2( zero2.clone(), one2.clone() );
 			const b = new Box2().copy( a );
@@ -116,7 +118,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'empty/makeEmpty', ( assert ) => {
+		test( 'empty/makeEmpty', () => {
 
 			let a = new Box2();
 
@@ -130,7 +132,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'isEmpty', ( assert ) => {
+		test( 'isEmpty', () => {
 
 			let a = new Box2( zero2.clone(), zero2.clone() );
 			assert.ok( ! a.isEmpty(), 'Passed!' );
@@ -146,7 +148,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'getCenter', ( assert ) => {
+		test( 'getCenter', () => {
 
 			let a = new Box2( zero2.clone(), zero2.clone() );
 			const center = new Vector2();
@@ -158,7 +160,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'getSize', ( assert ) => {
+		test( 'getSize', () => {
 
 			let a = new Box2( zero2.clone(), zero2.clone() );
 			const size = new Vector2();
@@ -170,7 +172,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'expandByPoint', ( assert ) => {
+		test( 'expandByPoint', () => {
 
 			const a = new Box2( zero2.clone(), zero2.clone() );
 			const size = new Vector2();
@@ -188,7 +190,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'expandByVector', ( assert ) => {
+		test( 'expandByVector', () => {
 
 			const a = new Box2( zero2.clone(), zero2.clone() );
 			const size = new Vector2();
@@ -203,7 +205,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'expandByScalar', ( assert ) => {
+		test( 'expandByScalar', () => {
 
 			const a = new Box2( zero2.clone(), zero2.clone() );
 			const size = new Vector2();
@@ -218,7 +220,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'containsPoint', ( assert ) => {
+		test( 'containsPoint', () => {
 
 			const a = new Box2( zero2.clone(), zero2.clone() );
 
@@ -232,7 +234,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'containsBox', ( assert ) => {
+		test( 'containsBox', () => {
 
 			const a = new Box2( zero2.clone(), zero2.clone() );
 			const b = new Box2( zero2.clone(), one2.clone() );
@@ -248,7 +250,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'getParameter', ( assert ) => {
+		test( 'getParameter', () => {
 
 			const a = new Box2( zero2.clone(), one2.clone() );
 			const b = new Box2( one2.clone().negate(), one2.clone() );
@@ -269,7 +271,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'intersectsBox', ( assert ) => {
+		test( 'intersectsBox', () => {
 
 			const a = new Box2( zero2.clone(), zero2.clone() );
 			const b = new Box2( zero2.clone(), one2.clone() );
@@ -290,7 +292,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'clampPoint', ( assert ) => {
+		test( 'clampPoint', () => {
 
 			const a = new Box2( zero2.clone(), zero2.clone() );
 			const b = new Box2( one2.clone().negate(), one2.clone() );
@@ -317,7 +319,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'distanceToPoint', ( assert ) => {
+		test( 'distanceToPoint', () => {
 
 			const a = new Box2( zero2.clone(), zero2.clone() );
 			const b = new Box2( one2.clone().negate(), one2.clone() );
@@ -334,7 +336,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'intersect', ( assert ) => {
+		test( 'intersect', () => {
 
 			const a = new Box2( zero2.clone(), zero2.clone() );
 			const b = new Box2( zero2.clone(), one2.clone() );
@@ -354,7 +356,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'union', ( assert ) => {
+		test( 'union', () => {
 
 			const a = new Box2( zero2.clone(), zero2.clone() );
 			const b = new Box2( zero2.clone(), one2.clone() );
@@ -367,7 +369,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'translate', ( assert ) => {
+		test( 'translate', () => {
 
 			const a = new Box2( zero2.clone(), zero2.clone() );
 			const b = new Box2( zero2.clone(), one2.clone() );
@@ -380,7 +382,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'equals', ( assert ) => {
+		test( 'equals', () => {
 
 
 			let a = new Box2();

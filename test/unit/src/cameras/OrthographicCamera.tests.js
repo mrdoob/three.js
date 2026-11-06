@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { OrthographicCamera } from '../../../../src/cameras/OrthographicCamera.js';
 
 import { Camera } from '../../../../src/cameras/Camera.js';
 
-export default QUnit.module( 'Cameras', () => {
+describe( 'Cameras', () => {
 
-	QUnit.module( 'OrthographicCamera', () => {
+	describe( 'OrthographicCamera', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new OrthographicCamera();
 			assert.strictEqual(
@@ -18,7 +20,7 @@ export default QUnit.module( 'Cameras', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new OrthographicCamera();
 			assert.ok( object, 'Can instantiate an OrthographicCamera.' );
@@ -26,7 +28,7 @@ export default QUnit.module( 'Cameras', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new OrthographicCamera();
 			assert.ok(
@@ -37,7 +39,7 @@ export default QUnit.module( 'Cameras', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isOrthographicCamera', ( assert ) => {
+		test( 'isOrthographicCamera', () => {
 
 			const object = new OrthographicCamera();
 			assert.ok(
@@ -47,7 +49,7 @@ export default QUnit.module( 'Cameras', () => {
 
 		} );
 
-		QUnit.test( 'updateProjectionMatrix', ( assert ) => {
+		test( 'updateProjectionMatrix', () => {
 
 			const left = - 1, right = 1, top = 1, bottom = - 1, near = 1, far = 3;
 			const cam = new OrthographicCamera( left, right, top, bottom, near, far );
@@ -72,7 +74,7 @@ export default QUnit.module( 'Cameras', () => {
 
 		// OTHERS
 		// TODO: clone is a camera methods that relied to copy method
-		QUnit.test( 'clone', ( assert ) => {
+		test( 'clone', () => {
 
 			const left = - 1.5, right = 1.5, top = 1, bottom = - 1, near = 0.1, far = 42;
 			const cam = new OrthographicCamera( left, right, top, bottom, near, far );

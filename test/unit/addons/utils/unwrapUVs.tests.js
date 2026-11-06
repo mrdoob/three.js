@@ -1,3 +1,5 @@
+import { assert, describe, test } from 'vitest';
+
 import {
 	BatchedMesh, BoxGeometry, BufferAttribute, BufferGeometry, CylinderGeometry, Float32BufferAttribute,
 	Group, InstancedMesh, ObjectLoader, Mesh, PlaneGeometry, SphereGeometry,
@@ -157,13 +159,13 @@ function verify( assert, result, limit = 1.5 ) {
 
 }
 
-export default QUnit.module( 'Addons', () => {
+describe( 'Addons', () => {
 
-	QUnit.module( 'Utils', () => {
+	describe( 'Utils', () => {
 
-		QUnit.module( 'unwrapUVs', () => {
+		describe( 'unwrapUVs', () => {
 
-			QUnit.test( 'unique atlas for shared geometry under nested, mirrored, nonuniform transforms', assert => {
+			test( 'unique atlas for shared geometry under nested, mirrored, nonuniform transforms', () => {
 
 				const root = new Group(), nested = new Group(), geometry = new BoxGeometry();
 				nested.rotation.set( 0.5, 0.3, 0.2 );
@@ -193,7 +195,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'chart area normalization preserves common density on differently scaled planes', assert => {
+			test( 'chart area normalization preserves common density on differently scaled planes', () => {
 
 				const root = new Group();
 				for ( const scale of [ 0.5, 1, 4 ] ) {
@@ -210,7 +212,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'conformal solve improves curved charts; sphere and torus remain valid', assert => {
+			test( 'conformal solve improves curved charts; sphere and torus remain valid', () => {
 
 				let lightmap;
 				for ( const mode of [ 'lightmap', 'normal' ] ) {
@@ -231,7 +233,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'seam splitting copies every attribute', assert => {
+			test( 'seam splitting copies every attribute', () => {
 
 				const geometry = new BoxGeometry();
 				const count = geometry.attributes.position.count;
@@ -257,7 +259,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'preserves original triangle order, removes no faces, and handles nonindexed geometry', assert => {
+			test( 'preserves original triangle order, removes no faces, and handles nonindexed geometry', () => {
 
 				const mesh = new Mesh( new BoxGeometry().toNonIndexed() );
 				const original = mesh.geometry;
@@ -275,7 +277,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'atlas overflow returns null without modifying any mesh', assert => {
+			test( 'atlas overflow returns null without modifying any mesh', () => {
 
 				const root = new Group(), good = new Mesh( new BoxGeometry() ), other = new Mesh( new BoxGeometry() );
 				const original = good.geometry;
@@ -290,7 +292,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'degenerate and nonmanifold triangles terminate, retain topology and report degeneracy', assert => {
+			test( 'degenerate and nonmanifold triangles terminate, retain topology and report degeneracy', () => {
 
 				const geometry = new BufferGeometry();
 				geometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, - 1, 0, 0, 0, 1 ], 3 ) );
@@ -305,7 +307,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'deterministic output and bounded chart work', assert => {
+			test( 'deterministic output and bounded chart work', () => {
 
 				const results = [ 0, 1 ].map( () => unwrap( new Mesh( new PlaneGeometry( 1, 1, 40, 40 ) ), { mode: 'normal' } ) );
 				verify( assert, results[ 0 ], 2 );
@@ -316,7 +318,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'dense lightmap planes retain packing efficiency with bounded chart work', assert => {
+			test( 'dense lightmap planes retain packing efficiency with bounded chart work', () => {
 
 				const result = unwrap( new Mesh( new PlaneGeometry( 1, 1, 64, 64 ) ), { mode: 'lightmap' } );
 				assert.strictEqual( result.charts.length, 1, 'An 8192-face plane stays in one chart' );
@@ -324,12 +326,12 @@ export default QUnit.module( 'Addons', () => {
 				const larger = unwrap( new Mesh( new PlaneGeometry( 1, 1, 66, 66 ) ), { mode: 'lightmap' } );
 				const sizes = new Map();
 				for ( const chart of larger.meshes[ 0 ].faceCharts ) sizes.set( chart, ( sizes.get( chart ) || 0 ) + 1 );
-				assert.false( sizes.has( - 1 ), 'All plane faces receive UVs' );
+				assert.isFalse( sizes.has( - 1 ), 'All plane faces receive UVs' );
 				assert.ok( Array.from( sizes.values() ).every( count => count <= 8192 ), 'Lightmap chart work remains bounded' );
 
 			} );
 
-			QUnit.test( 'authored cylinder seams remain distinct and valid islands retain their shape', assert => {
+			test( 'authored cylinder seams remain distinct and valid islands retain their shape', () => {
 
 				const mesh = new Mesh( new CylinderGeometry( 1, 1, 6.4, 32, 1, true ) );
 				const original = mesh.geometry.attributes.uv;
@@ -350,28 +352,28 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'reprojects rejected authored islands before splitting lightmap charts', assert => {
+			test( 'reprojects rejected authored islands before splitting lightmap charts', () => {
 
 				const geometry = new PlaneGeometry( 1, 1, 8, 8 );
 				for ( let i = 0; i < geometry.attributes.uv.count; i ++ ) geometry.attributes.uv.setX( i, geometry.attributes.uv.getX( i ) * 10 );
 				const result = unwrap( new Mesh( geometry ), { mode: 'lightmap', useInputUVs: true } );
 				verify( assert, result );
 				assert.strictEqual( result.charts.length, 1, 'A distorted authored island is reprojected as one planar chart' );
-				assert.false( result.meshes[ 0 ].faceCharts.includes( - 1 ), 'All faces receive valid UVs' );
+				assert.isFalse( result.meshes[ 0 ].faceCharts.includes( - 1 ), 'All faces receive valid UVs' );
 
 			} );
 
-			QUnit.test( 'rejected curved authored islands retain valid conformal subset fallbacks', assert => {
+			test( 'rejected curved authored islands retain valid conformal subset fallbacks', () => {
 
 				const mesh = new Mesh( new TorusGeometry( 1, 0.4, 12, 36 ) );
 				const result = unwrap( mesh, { mode: 'normal', useInputUVs: true } );
 				verify( assert, result, 2 );
-				assert.false( result.meshes[ 0 ].faceCharts.includes( - 1 ), 'All curved faces receive valid UVs' );
+				assert.isFalse( result.meshes[ 0 ].faceCharts.includes( - 1 ), 'All curved faces receive valid UVs' );
 				assert.ok( result.charts.length < result.meshes[ 0 ].faceCharts.length / 4, 'Subset fallback avoids per-triangle fragmentation' );
 
 			} );
 
-			QUnit.test( 'unsupported mesh types are skipped without modifying their geometry', assert => {
+			test( 'unsupported mesh types are skipped without modifying their geometry', () => {
 
 				const root = new Group(), regular = new Mesh( new BoxGeometry() );
 				const instanced = new InstancedMesh( new BoxGeometry(), undefined, 2 );
@@ -389,7 +391,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'near-zero area slivers are retained but excluded from the atlas', assert => {
+			test( 'near-zero area slivers are retained but excluded from the atlas', () => {
 
 				for ( const mode of [ 'lightmap', 'normal' ] ) {
 
@@ -412,7 +414,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'ignored shared vertices are split and fully degenerate meshes retain topology', assert => {
+			test( 'ignored shared vertices are split and fully degenerate meshes retain topology', () => {
 
 				const geometry = new BufferGeometry();
 				geometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 1e-8, 0 ], 3 ) );
@@ -440,7 +442,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'near-degenerate slivers from large coordinates are excluded', assert => {
+			test( 'near-degenerate slivers from large coordinates are excluded', () => {
 
 				const geometry = new BufferGeometry();
 				geometry.setAttribute( 'position', new BufferAttribute( new Float64Array( [ 0, 0, 0, 10000, 10000, 0, 10000, 10000.0001, 0 ] ), 3 ) );
@@ -451,7 +453,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'subtexel Float32 failures are excluded without weakening retained chart validation', assert => {
+			test( 'subtexel Float32 failures are excluded without weakening retained chart validation', () => {
 
 				const geometry = new BufferGeometry();
 				geometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 1, 0, 0, 0.5, 2e-5, 0 ], 3 ) );
@@ -471,7 +473,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'Float32 chart failures are split and repacked, keeping the faces that validate', assert => {
+			test( 'Float32 chart failures are split and repacked, keeping the faces that validate', () => {
 
 				const mesh = new Mesh( new PlaneGeometry( 1, 1, 2, 2 ) );
 				const result = unwrap( mesh, { texelsPerUnit: 0.0000013182567385564074 } );
@@ -482,7 +484,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'parameterized geometries serialize the actual unwrapped buffers', assert => {
+			test( 'parameterized geometries serialize the actual unwrapped buffers', () => {
 
 				for ( const geometry of [ new BoxGeometry(), new SphereGeometry( 1, 12, 6 ) ] ) {
 
@@ -503,7 +505,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'three square charts use the full atlas width at fixed and fitted density', assert => {
+			test( 'three square charts use the full atlas width at fixed and fitted density', () => {
 
 				for ( const texelsPerUnit of [ 500, 0 ] ) {
 
@@ -519,7 +521,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'result retains atlas metadata and vertex and face mappings', assert => {
+			test( 'result retains atlas metadata and vertex and face mappings', () => {
 
 				const result = unwrap( new Mesh( new BoxGeometry() ) );
 				assert.deepEqual( Object.keys( result ), [ 'attribute', 'resolution', 'padding', 'texelsPerUnit', 'charts', 'meshes', 'warnings' ] );

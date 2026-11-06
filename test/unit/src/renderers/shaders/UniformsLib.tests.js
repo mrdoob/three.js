@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { UniformsLib } from '../../../../../src/renderers/shaders/UniformsLib.js';
 
-export default QUnit.module( 'Renderers', () => {
+describe( 'Renderers', () => {
 
-	QUnit.module( 'Shaders', () => {
+	describe( 'Shaders', () => {
 
-		QUnit.module( 'UniformsLib', () => {
+		describe( 'UniformsLib', () => {
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			test( 'Instancing', () => {
 
 				assert.ok( UniformsLib, 'UniformsLib is defined.' );
 

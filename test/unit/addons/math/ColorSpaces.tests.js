@@ -1,3 +1,5 @@
+import { assert, describe, test } from 'vitest';
+
 import { Color, ColorManagement, LinearSRGBColorSpace } from 'three';
 import {
 	DisplayP3ColorSpace,
@@ -10,9 +12,9 @@ import {
 
 // Reference: https://apps.colorjs.io/convert/
 
-export default QUnit.module( 'Maths', () => {
+describe( 'Maths', () => {
 
-	QUnit.module( 'ColorSpaces', () => {
+	describe( 'ColorSpaces', () => {
 
 		ColorManagement.define( {
 
@@ -22,7 +24,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'DisplayP3ColorSpace', ( assert ) => {
+		test( 'DisplayP3ColorSpace', () => {
 
 			const c = new Color().setRGB( 0.3, 0.5, 0.7 );
 
@@ -42,7 +44,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'LinearDisplayP3ColorSpace', ( assert ) => {
+		test( 'LinearDisplayP3ColorSpace', () => {
 
 			const c = new Color().setRGB( 0.3, 0.5, 0.7 );
 
@@ -62,7 +64,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'LinearRec2020ColorSpace', ( assert ) => {
+		test( 'LinearRec2020ColorSpace', () => {
 
 			const c = new Color().setRGB( 0.3, 0.5, 0.7 );
 

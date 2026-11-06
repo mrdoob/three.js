@@ -1,11 +1,13 @@
+import { assert, describe, test } from 'vitest';
+
 import * as MathUtils from '../../../../src/math/MathUtils.js';
 
-export default QUnit.module( 'Maths', () => {
+describe( 'Maths', () => {
 
-	QUnit.module( 'Math', () => {
+	describe( 'Math', () => {
 
 		// PUBLIC STUFF
-		QUnit.test( 'generateUUID', ( assert ) => {
+		test( 'generateUUID', () => {
 
 			const a = MathUtils.generateUUID();
 			const regex = /[A-Z0-9]{8}-[A-Z0-9]{4}-4[A-Z0-9]{3}-[A-Z0-9]{4}-[A-Z0-9]{12}/i;
@@ -15,7 +17,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'clamp', ( assert ) => {
+		test( 'clamp', () => {
 
 			assert.strictEqual( MathUtils.clamp( 0.5, 0, 1 ), 0.5, 'Value already within limits' );
 			assert.strictEqual( MathUtils.clamp( 0, 0, 1 ), 0, 'Value equal to one limit' );
@@ -24,7 +26,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'euclideanModulo', ( assert ) => {
+		test( 'euclideanModulo', () => {
 
 			assert.ok( isNaN( MathUtils.euclideanModulo( 6, 0 ) ), 'Division by zero returns NaN' );
 			assert.strictEqual( MathUtils.euclideanModulo( 6, 1 ), 0, 'Division by trivial divisor' );
@@ -35,7 +37,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'mapLinear', ( assert ) => {
+		test( 'mapLinear', () => {
 
 			assert.strictEqual( MathUtils.mapLinear( 0.5, 0, 1, 0, 10 ), 5, 'Value within range' );
 			assert.strictEqual( MathUtils.mapLinear( 0.0, 0, 1, 0, 10 ), 0, 'Value equal to lower boundary' );
@@ -43,7 +45,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'inverseLerp', ( assert ) => {
+		test( 'inverseLerp', () => {
 
 			assert.strictEqual( MathUtils.inverseLerp( 1, 2, 1.5 ), 0.5, '50% Percentage' );
 			assert.strictEqual( MathUtils.inverseLerp( 1, 2, 2 ), 1, '100% Percentage' );
@@ -52,7 +54,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'lerp', ( assert ) => {
+		test( 'lerp', () => {
 
 			assert.strictEqual( MathUtils.lerp( 1, 2, 0 ), 1, 'Value equal to lower boundary' );
 			assert.strictEqual( MathUtils.lerp( 1, 2, 1 ), 2, 'Value equal to upper boundary' );
@@ -60,14 +62,14 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'damp', ( assert ) => {
+		test( 'damp', () => {
 
 			assert.strictEqual( MathUtils.damp( 1, 2, 0, 0.016 ), 1, 'Value equal to lower boundary' );
 			assert.strictEqual( MathUtils.damp( 1, 2, 10, 0.016 ), 1.1478562110337887, 'Value within range' );
 
 		} );
 
-		QUnit.test( 'pingpong', ( assert ) => {
+		test( 'pingpong', () => {
 
 			assert.strictEqual( MathUtils.pingpong( 2.5 ), 0.5, 'Value at 2.5 is 0.5' );
 			assert.strictEqual( MathUtils.pingpong( 2.5, 2 ), 1.5, 'Value at 2.5 with length of 2 is 1.5' );
@@ -75,7 +77,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'smoothstep', ( assert ) => {
+		test( 'smoothstep', () => {
 
 			assert.strictEqual( MathUtils.smoothstep( - 1, 0, 2 ), 0, 'Value lower than minimum' );
 			assert.strictEqual( MathUtils.smoothstep( 0, 0, 2 ), 0, 'Value equal to minimum' );
@@ -87,7 +89,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'smootherstep', ( assert ) => {
+		test( 'smootherstep', () => {
 
 			assert.strictEqual( MathUtils.smootherstep( - 1, 0, 2 ), 0, 'Value lower than minimum' );
 			assert.strictEqual( MathUtils.smootherstep( 0, 0, 2 ), 0, 'Value equal to minimum' );
@@ -99,7 +101,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'randInt', ( assert ) => {
+		test( 'randInt', () => {
 
 			const low = 1, high = 3;
 			const a = MathUtils.randInt( low, high );
@@ -109,7 +111,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'randFloat', ( assert ) => {
+		test( 'randFloat', () => {
 
 			const low = 1, high = 3;
 			const a = MathUtils.randFloat( low, high );
@@ -119,7 +121,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'randFloatSpread', ( assert ) => {
+		test( 'randFloatSpread', () => {
 
 			const a = MathUtils.randFloatSpread( 3 );
 
@@ -128,7 +130,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'degToRad', ( assert ) => {
+		test( 'degToRad', () => {
 
 			assert.strictEqual( MathUtils.degToRad( 0 ), 0, '0 degrees' );
 			assert.strictEqual( MathUtils.degToRad( 90 ), Math.PI / 2, '90 degrees' );
@@ -137,7 +139,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'radToDeg', ( assert ) => {
+		test( 'radToDeg', () => {
 
 			assert.strictEqual( MathUtils.radToDeg( 0 ), 0, '0 radians' );
 			assert.strictEqual( MathUtils.radToDeg( Math.PI / 2 ), 90, 'Math.PI / 2 radians' );
@@ -146,7 +148,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'isPowerOfTwo', ( assert ) => {
+		test( 'isPowerOfTwo', () => {
 
 			assert.strictEqual( MathUtils.isPowerOfTwo( 0 ), false, '0 is not a PoT' );
 			assert.strictEqual( MathUtils.isPowerOfTwo( 1 ), true, '1 is a PoT' );
@@ -158,7 +160,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'ceilPowerOfTwo', ( assert ) => {
+		test( 'ceilPowerOfTwo', () => {
 
 			assert.strictEqual( MathUtils.ceilPowerOfTwo( 1 ), 1, 'Closest higher PoT to 1 is 1' );
 			assert.strictEqual( MathUtils.ceilPowerOfTwo( 3 ), 4, 'Closest higher PoT to 3 is 4' );
@@ -166,7 +168,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'floorPowerOfTwo', ( assert ) => {
+		test( 'floorPowerOfTwo', () => {
 
 			assert.strictEqual( MathUtils.floorPowerOfTwo( 1 ), 1, 'Closest lower PoT to 1 is 1' );
 			assert.strictEqual( MathUtils.floorPowerOfTwo( 3 ), 2, 'Closest lower PoT to 3 is 2' );

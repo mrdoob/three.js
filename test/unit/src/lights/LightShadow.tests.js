@@ -1,13 +1,16 @@
+import { describe, test } from 'vitest';
+import { assert } from '../../utils/test-utils.js';
+
 import { LightShadow } from '../../../../src/lights/LightShadow.js';
 
 import { OrthographicCamera } from '../../../../src/cameras/OrthographicCamera.js';
 
-export default QUnit.module( 'Lights', () => {
+describe( 'Lights', () => {
 
-	QUnit.module( 'LightShadow', () => {
+	describe( 'LightShadow', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const camera = new OrthographicCamera( - 5, 5, 5, - 5, 0.5, 500 );
 			const object = new LightShadow( camera );
@@ -17,9 +20,8 @@ export default QUnit.module( 'Lights', () => {
 
 		// PUBLIC
 
-		QUnit.test( 'dispose', ( assert ) => {
+		test( 'dispose', () => {
 
-			assert.expect( 0 );
 
 			const object = new LightShadow();
 			object.dispose();
@@ -27,7 +29,7 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// OTHERS
-		QUnit.test( 'clone/copy', ( assert ) => {
+		test( 'clone/copy', () => {
 
 			const a = new LightShadow( new OrthographicCamera( - 5, 5, 5, - 5, 0.5, 500 ) );
 			const b = new LightShadow( new OrthographicCamera( - 3, 3, 3, - 3, 0.3, 300 ) );

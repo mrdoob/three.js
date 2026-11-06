@@ -1,18 +1,20 @@
+import { beforeEach, describe, test } from 'vitest';
+
 import { BoxHelper } from '../../../../src/helpers/BoxHelper.js';
 
 import { LineSegments } from '../../../../src/objects/LineSegments.js';
-import { runStdGeometryTests } from '../../utils/qunit-utils.js';
+import { assert, runStdGeometryTests } from '../../utils/test-utils.js';
 import { BoxGeometry } from '../../../../src/geometries/BoxGeometry.js';
 import { SphereGeometry } from '../../../../src/geometries/SphereGeometry.js';
 import { Mesh } from '../../../../src/objects/Mesh.js';
 
-export default QUnit.module( 'Helpers', () => {
+describe( 'Helpers', () => {
 
-	QUnit.module( 'BoxHelper', ( hooks ) => {
+	describe( 'BoxHelper', () => {
 
 		let geometries = undefined;
 
-		hooks.beforeEach( function () {
+		beforeEach( function () {
 
 			// Test with a normal cube and a box helper
 			const boxGeometry = new BoxGeometry();
@@ -31,7 +33,7 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new BoxHelper();
 			assert.strictEqual(
@@ -42,7 +44,7 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new BoxHelper();
 			assert.ok( object, 'Can instantiate a BoxHelper.' );
@@ -50,7 +52,7 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new BoxHelper();
 			assert.ok(
@@ -62,9 +64,8 @@ export default QUnit.module( 'Helpers', () => {
 
 		// PUBLIC
 
-		QUnit.test( 'dispose', ( assert ) => {
+		test( 'dispose', () => {
 
-			assert.expect( 0 );
 
 			const object = new BoxHelper();
 			object.dispose();
@@ -72,7 +73,7 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// OTHERS
-		QUnit.test( 'Standard geometry tests', ( assert ) => {
+		test( 'Standard geometry tests', () => {
 
 			runStdGeometryTests( assert, geometries );
 

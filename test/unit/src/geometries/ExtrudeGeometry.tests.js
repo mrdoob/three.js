@@ -1,14 +1,16 @@
+import { assert, describe, test } from 'vitest';
+
 import { ExtrudeGeometry } from '../../../../src/geometries/ExtrudeGeometry.js';
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
-// import { runStdGeometryTests } from '../../utils/qunit-utils.js';
+// import { runStdGeometryTests } from '../../utils/test-utils.js';
 
-export default QUnit.module( 'Geometries', () => {
+describe( 'Geometries', () => {
 
-	QUnit.module( 'ExtrudeGeometry', () => {
+	describe( 'ExtrudeGeometry', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new ExtrudeGeometry();
 			assert.strictEqual(
@@ -19,7 +21,7 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new ExtrudeGeometry();
 			assert.ok( object, 'Can instantiate an ExtrudeGeometry.' );
@@ -27,7 +29,7 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new ExtrudeGeometry();
 			assert.ok(

@@ -1,21 +1,23 @@
+import { afterEach, assert, describe, test } from 'vitest';
+
 import { Color, ColorManagement } from 'three';
 import * as ColorUtils from '../../../../examples/jsm/utils/ColorUtils.js';
 
-export default QUnit.module( 'Addons', () => {
+describe( 'Addons', () => {
 
-	QUnit.module( 'Utils', () => {
+	describe( 'Utils', () => {
 
-		QUnit.module( 'ColorUtils', () => {
+		describe( 'ColorUtils', () => {
 
 			const colorManagementEnabled = ColorManagement.enabled;
 
-			QUnit.testDone( () => {
+			afterEach( () => {
 
 				ColorManagement.enabled = colorManagementEnabled;
 
 			} );
 
-			QUnit.test( 'setKelvin', ( assert ) => {
+			test( 'setKelvin', () => {
 
 				ColorManagement.enabled = false; // TODO: Update and enable.
 

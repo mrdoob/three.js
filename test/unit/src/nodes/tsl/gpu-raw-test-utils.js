@@ -1,3 +1,4 @@
+import { assert, test } from 'vitest';
 //
 // Shared boilerplate for GPU-native compute tests that need full control over
 // dispatch shape (workgroupSize, multiple workgroups, raw typed-array
@@ -7,36 +8,21 @@
 // workgroup cooperate through shared/atomic memory or inspect built-in
 // workgroup/subgroup identity values.
 //
-// `rawComputeTest(name, options, run)` registers one QUnit.test that:
-//  - resolves the shared renderer for `options.backend` (default 'webgpu'),
-//    soft-skipping (not failing) if that backend isn't available here --
-//    same policy as gpu-test-utils.js's `declareTest`.
-//  - soft-skips if `options.requiredFeature` is set and the renderer doesn't
-//    report it (`renderer.hasFeature(...)`) -- used for subgroup tests, which
-//    many GPUs/software backends don't implement.
-//  - calls `run({ assert, renderer })`; the test body builds and dispatches
-//    its own TSL compute kernel and reads results back itself.
-//
+// Register raw compute tests for this backend. Unavailable backends and
+// optional GPU features use explicit Vitest skips.
 import { getSharedRenderer } from './gpu-test-utils.js';
 
 export function rawComputeTest( name, options, run ) {
 
 	const { backend = 'webgpu', requiredFeature } = options;
 
-	QUnit.test( name, async ( assert ) => {
+	test.runIf( backend === import.meta.env.THREE_GPU_BACKEND )( name, async ( context ) => {
 
-		const renderer = await getSharedRenderer( backend );
-
-		if ( renderer === null ) {
-
-			assert.ok( true, `SKIPPED: "${ backend }" backend is not available in this environment.` );
-			return;
-
-		}
+		const renderer = await getSharedRenderer( backend, context );
 
 		if ( requiredFeature !== undefined && renderer.hasFeature( requiredFeature ) !== true ) {
 
-			assert.ok( true, `SKIPPED: "${ backend }" backend does not support required feature "${ requiredFeature }" in this environment.` );
+			context.skip( `GPU does not support feature "${ requiredFeature }".` );
 			return;
 
 		}

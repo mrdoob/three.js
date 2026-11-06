@@ -1,13 +1,14 @@
+import { describe } from 'vitest';
 import {
 	float, mat3, mat4, determinant
 } from 'three/tsl';
 import { gpuTest } from './gpu-test-utils.js';
 
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'determinant()', () => {
+		describe( 'determinant()', () => {
 
 			gpuTest( 'determinant() of identity matrices is 1', ( { assert } ) => {
 

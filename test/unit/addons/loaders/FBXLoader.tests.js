@@ -1,25 +1,18 @@
+import { assert, describe, test } from 'vitest';
+
 import { FBXLoader } from '../../../../examples/jsm/loaders/FBXLoader.js';
 
-export default QUnit.module( 'Addons', () => {
+describe( 'Addons', () => {
 
-	QUnit.module( 'Loaders', () => {
+	describe( 'Loaders', () => {
 
-		QUnit.module( 'FBXLoader', () => {
+		describe( 'FBXLoader', () => {
 
-			QUnit.test( 'morphAttributes length match geometry position length', ( assert ) => {
+			test( 'morphAttributes length match geometry position length', async () => {
 
-				const fbxLoader = new FBXLoader();
-				const done = assert.async();
-				fbxLoader.load( '/examples/models/fbx/morph_test.fbx', ( fbx ) => {
-
-					const mesh = fbx.children[ 0 ];
-					const baseGeometryLength = mesh.geometry.attributes.position.count;
-					const morphAttributesLength = mesh.geometry.morphAttributes.position[ 0 ].count;
-
-					assert.ok( baseGeometryLength === morphAttributesLength, 'length is the same' );
-					done();
-
-				} );
+				const fbx = await new FBXLoader().loadAsync( '/examples/models/fbx/morph_test.fbx' );
+				const mesh = fbx.children[ 0 ];
+				assert.strictEqual( mesh.geometry.morphAttributes.position[ 0 ].count, mesh.geometry.attributes.position.count );
 
 			} );
 

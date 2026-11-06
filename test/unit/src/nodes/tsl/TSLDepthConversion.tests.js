@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import {
 	float,
 	viewZToOrthographicDepth, orthographicDepthToViewZ,
@@ -20,11 +21,11 @@ import { gpuTest } from './gpu-test-utils.js';
 // viewZ is negative for points in front of the camera (see this module's
 // own "NOTE" comment) -- every viewZ value below is chosen negative to
 // match that convention.
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'depth conversions', () => {
+		describe( 'depth conversions', () => {
 
 			gpuTest( 'orthographic viewZ<->depth conversion matches its documented formula and round-trips', ( { assert } ) => {
 

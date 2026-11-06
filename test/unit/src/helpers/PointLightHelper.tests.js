@@ -1,11 +1,13 @@
+import { assert, describe, test } from 'vitest';
+
 import { PointLightHelper } from '../../../../src/helpers/PointLightHelper.js';
 
 import { Mesh } from '../../../../src/objects/Mesh.js';
 import { PointLight } from '../../../../src/lights/PointLight.js';
 
-export default QUnit.module( 'Helpers', () => {
+describe( 'Helpers', () => {
 
-	QUnit.module( 'PointLightHelper', () => {
+	describe( 'PointLightHelper', () => {
 
 		const parameters = {
 			sphereSize: 1,
@@ -16,7 +18,7 @@ export default QUnit.module( 'Helpers', () => {
 		};
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const light = new PointLight( parameters.color );
 			const object = new PointLightHelper( light, parameters.sphereSize, parameters.color );
@@ -28,7 +30,7 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const light = new PointLight( parameters.color );
 			const object = new PointLightHelper( light, parameters.sphereSize, parameters.color );
@@ -37,7 +39,7 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const light = new PointLight( parameters.color );
 			const object = new PointLightHelper( light, parameters.sphereSize, parameters.color );
@@ -49,9 +51,8 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'dispose', ( assert ) => {
+		test( 'dispose', () => {
 
-			assert.expect( 0 );
 
 			const light = new PointLight( parameters.color );
 			const object = new PointLightHelper( light, parameters.sphereSize, parameters.color );

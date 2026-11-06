@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { VideoTexture } from '../../../../src/textures/VideoTexture.js';
 
 import { Texture } from '../../../../src/textures/Texture.js';
 
-export default QUnit.module( 'Textures', () => {
+describe( 'Textures', () => {
 
-	QUnit.module( 'VideoTexture', () => {
+	describe( 'VideoTexture', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const videoDocumentElement = {};
 			const object = new VideoTexture( videoDocumentElement );
@@ -19,7 +21,7 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const videoDocumentElement = {};
 			const object = new VideoTexture( videoDocumentElement );
@@ -28,7 +30,7 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( 'isVideoTexture', ( assert ) => {
+		test( 'isVideoTexture', () => {
 
 			const videoDocumentElement = {};
 			const object = new VideoTexture( videoDocumentElement );

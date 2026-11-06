@@ -1,11 +1,13 @@
+import { assert, describe, test } from 'vitest';
+
 import { HemisphereLightHelper } from '../../../../src/helpers/HemisphereLightHelper.js';
 
 import { Object3D } from '../../../../src/core/Object3D.js';
 import { HemisphereLight } from '../../../../src/lights/HemisphereLight.js';
 
-export default QUnit.module( 'Helpers', () => {
+describe( 'Helpers', () => {
 
-	QUnit.module( 'HemisphereLightHelper', () => {
+	describe( 'HemisphereLightHelper', () => {
 
 		const parameters = {
 			size: 1,
@@ -16,7 +18,7 @@ export default QUnit.module( 'Helpers', () => {
 		};
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const light = new HemisphereLight( parameters.skyColor );
 			const object = new HemisphereLightHelper( light, parameters.size, parameters.color );
@@ -28,7 +30,7 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const light = new HemisphereLight( parameters.skyColor );
 			const object = new HemisphereLightHelper( light, parameters.size, parameters.color );
@@ -37,7 +39,7 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const light = new HemisphereLight( parameters.skyColor );
 			const object = new HemisphereLightHelper( light, parameters.size, parameters.color );
@@ -49,9 +51,8 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'dispose', ( assert ) => {
+		test( 'dispose', () => {
 
-			assert.expect( 0 );
 
 			const light = new HemisphereLight( parameters.skyColor );
 			const object = new HemisphereLightHelper( light, parameters.size, parameters.color );

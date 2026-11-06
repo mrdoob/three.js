@@ -1,15 +1,18 @@
+import { describe, test } from 'vitest';
+import { assert } from '../../utils/test-utils.js';
+
 import { DirectionalLightShadow } from '../../../../src/lights/DirectionalLightShadow.js';
 
 import { LightShadow } from '../../../../src/lights/LightShadow.js';
 import { ObjectLoader } from '../../../../src/loaders/ObjectLoader.js';
 import { DirectionalLight } from '../../../../src/lights/DirectionalLight.js';
 
-export default QUnit.module( 'Lights', () => {
+describe( 'Lights', () => {
 
-	QUnit.module( 'DirectionalLightShadow', () => {
+	describe( 'DirectionalLightShadow', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new DirectionalLightShadow();
 			assert.strictEqual(
@@ -20,7 +23,7 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new DirectionalLightShadow();
 			assert.ok( object, 'Can instantiate a DirectionalLightShadow.' );
@@ -28,7 +31,7 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isDirectionalLightShadow', ( assert ) => {
+		test( 'isDirectionalLightShadow', () => {
 
 			const object = new DirectionalLightShadow();
 			assert.ok(
@@ -39,7 +42,7 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// OTHERS
-		QUnit.test( 'clone/copy', ( assert ) => {
+		test( 'clone/copy', () => {
 
 			const a = new DirectionalLightShadow();
 			const b = new DirectionalLightShadow();
@@ -60,7 +63,7 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		QUnit.test( 'toJSON', ( assert ) => {
+		test( 'toJSON', () => {
 
 			const light = new DirectionalLight();
 			const shadow = new DirectionalLightShadow();

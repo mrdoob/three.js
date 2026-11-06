@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { ShadowMaterial } from '../../../../src/materials/ShadowMaterial.js';
 
 import { Material } from '../../../../src/materials/Material.js';
 
-export default QUnit.module( 'Materials', () => {
+describe( 'Materials', () => {
 
-	QUnit.module( 'ShadowMaterial', () => {
+	describe( 'ShadowMaterial', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new ShadowMaterial();
 			assert.strictEqual(
@@ -18,7 +20,7 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new ShadowMaterial();
 			assert.ok( object, 'Can instantiate a ShadowMaterial.' );
@@ -26,7 +28,7 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new ShadowMaterial();
 			assert.ok(
@@ -37,7 +39,7 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isShadowMaterial', ( assert ) => {
+		test( 'isShadowMaterial', () => {
 
 			const object = new ShadowMaterial();
 			assert.ok(

@@ -1,12 +1,14 @@
+import { assert, describe, test } from 'vitest';
+
 import { Loader } from '../../../../src/loaders/Loader.js';
 
 import { LoadingManager } from '../../../../src/loaders/LoadingManager.js';
 
-export default QUnit.module( 'Loaders', () => {
+describe( 'Loaders', () => {
 
-	QUnit.module( 'Loader', () => {
+	describe( 'Loader', () => {
 
-		QUnit.test( 'request settings', ( assert ) => {
+		test( 'request settings', () => {
 
 			const loader = new Loader();
 			assert.strictEqual( loader.priority, 'auto' );
@@ -19,7 +21,7 @@ export default QUnit.module( 'Loaders', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new Loader();
 			assert.ok( object, 'Can instantiate a Loader.' );
@@ -27,7 +29,7 @@ export default QUnit.module( 'Loaders', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'manager', ( assert ) => {
+		test( 'manager', () => {
 
 			// uses default LoadingManager if not supplied in constructor
 			const object = new Loader().manager;
@@ -38,7 +40,7 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		QUnit.test( 'crossOrigin', ( assert ) => {
+		test( 'crossOrigin', () => {
 
 			const actual = new Loader().crossOrigin;
 			const expected = 'anonymous';
@@ -46,7 +48,7 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		QUnit.test( 'withCredentials', ( assert ) => {
+		test( 'withCredentials', () => {
 
 			const actual = new Loader().withCredentials;
 			const expected = false;
@@ -54,7 +56,7 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		QUnit.test( 'path', ( assert ) => {
+		test( 'path', () => {
 
 			const actual = new Loader().path;
 			const expected = '';
@@ -62,7 +64,7 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		QUnit.test( 'resourcePath', ( assert ) => {
+		test( 'resourcePath', () => {
 
 			const actual = new Loader().resourcePath;
 			const expected = '';
@@ -70,7 +72,7 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		QUnit.test( 'requestHeader', ( assert ) => {
+		test( 'requestHeader', () => {
 
 			const actual = new Loader().requestHeader;
 			const expected = {};

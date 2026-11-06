@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import {
 	float, int, uint,
 	abs, sign, floor, ceil, round, trunc, fract,
@@ -15,11 +16,11 @@ import { gpuTest } from './gpu-test-utils.js';
 // the same TSL expression under test -- so these can't degrade into "test
 // theater" (https://ben3d.ca/blog/the-rise-of-test-theater), assertions that
 // always pass because they only check a function agrees with itself.
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'math library', () => {
+		describe( 'math library', () => {
 
 			gpuTest( 'trigonometric functions at known angles', ( { assert } ) => {
 

@@ -1,14 +1,16 @@
+import { assert, describe, test } from 'vitest';
+
 import { Group, Mesh, MeshBasicMaterial, PlaneGeometry } from 'three/webgpu';
 import { vec3 } from 'three/tsl';
 import { LightMapper } from '../../../../examples/jsm/lighting/LightMapper.js';
 
-export default QUnit.module( 'Addons', () => {
+describe( 'Addons', () => {
 
-	QUnit.module( 'Lighting', () => {
+	describe( 'Lighting', () => {
 
-		QUnit.module( 'LightMapper', () => {
+		describe( 'LightMapper', () => {
 
-			QUnit.test( 'Uses current world transforms without rendering the source scene first', assert => {
+			test( 'Uses current world transforms without rendering the source scene first', () => {
 
 				const parent = new Group();
 				parent.position.set( 2, 3, 4 );

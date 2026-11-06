@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { Material } from '../../../../src/materials/Material.js';
 
 import { EventDispatcher } from '../../../../src/core/EventDispatcher.js';
 
-export default QUnit.module( 'Materials', () => {
+describe( 'Materials', () => {
 
-	QUnit.module( 'Material', () => {
+	describe( 'Material', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new Material();
 			assert.strictEqual(
@@ -18,7 +20,7 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new Material();
 			assert.ok( object, 'Can instantiate a Material.' );
@@ -27,7 +29,7 @@ export default QUnit.module( 'Materials', () => {
 
 		// PROPERTIES
 
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new Material();
 			assert.ok(
@@ -38,7 +40,7 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isMaterial', ( assert ) => {
+		test( 'isMaterial', () => {
 
 			const object = new Material();
 			assert.ok(
@@ -48,9 +50,8 @@ export default QUnit.module( 'Materials', () => {
 
 		} );
 
-		QUnit.test( 'dispose', ( assert ) => {
+		test( 'dispose', () => {
 
-			assert.expect( 0 );
 
 			const object = new Material();
 			object.dispose();

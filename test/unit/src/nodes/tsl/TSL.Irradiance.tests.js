@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import { SphericalHarmonics3, Vector3 } from 'three';
 import { vec3, array, getShIrradianceAt } from 'three/tsl';
 import { gpuTest } from './gpu-test-utils.js';
@@ -9,11 +10,11 @@ import { gpuTest } from './gpu-test-utils.js';
 // etc.) -- so the math-library method itself is used as the independent
 // reference here, rather than a hand-rolled JS transliteration of the node's
 // own formula.
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'getShIrradianceAt()', () => {
+		describe( 'getShIrradianceAt()', () => {
 
 			// A fixed, arbitrary-but-deterministic set of 9 SH coefficient triples
 			// (one per color channel) shared by every case below.

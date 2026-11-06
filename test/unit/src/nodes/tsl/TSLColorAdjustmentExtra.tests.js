@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import {
 	float, vec3, vec4,
 	vibrance, cdl
@@ -14,11 +15,11 @@ import { gpuTest } from './gpu-test-utils.js';
 // the documented formula), never by re-running the same TSL expression
 // under test -- see TSLMath.tests.js's file header for why that matters
 // (https://ben3d.ca/blog/the-rise-of-test-theater).
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'color adjustment (extra)', () => {
+		describe( 'color adjustment (extra)', () => {
 
 			gpuTest( 'vibrance() pushes less-saturated channels toward the max channel', ( { assert } ) => {
 

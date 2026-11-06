@@ -1,14 +1,16 @@
+import { beforeEach, describe, test } from 'vitest';
+import { assert, runStdLightTests } from '../../utils/test-utils.js';
+
 import { PointLight } from '../../../../src/lights/PointLight.js';
 
 import { Light } from '../../../../src/lights/Light.js';
-import { runStdLightTests } from '../../utils/qunit-utils.js';
 
-export default QUnit.module( 'Lights', () => {
+describe( 'Lights', () => {
 
-	QUnit.module( 'PointLight', ( hooks ) => {
+	describe( 'PointLight', () => {
 
 		let lights = undefined;
-		hooks.beforeEach( function () {
+		beforeEach( function () {
 
 			const parameters = {
 				color: 0xaaaaaa,
@@ -28,7 +30,7 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new PointLight();
 			assert.strictEqual(
@@ -39,7 +41,7 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new PointLight();
 			assert.ok( object, 'Can instantiate a PointLight.' );
@@ -47,7 +49,7 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new PointLight();
 			assert.ok(
@@ -57,7 +59,7 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		QUnit.test( 'power', ( assert ) => {
+		test( 'power', () => {
 
 			const a = new PointLight( 0xaaaaaa );
 
@@ -73,7 +75,7 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isPointLight', ( assert ) => {
+		test( 'isPointLight', () => {
 
 			const object = new PointLight();
 			assert.ok(
@@ -83,9 +85,8 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		QUnit.test( 'dispose', ( assert ) => {
+		test( 'dispose', () => {
 
-			assert.expect( 0 );
 
 			const object = new PointLight();
 			object.dispose();
@@ -95,7 +96,7 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// OTHERS
-		QUnit.test( 'Standard light tests', ( assert ) => {
+		test( 'Standard light tests', () => {
 
 			runStdLightTests( assert, lights );
 

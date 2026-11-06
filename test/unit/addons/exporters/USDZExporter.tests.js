@@ -1,3 +1,5 @@
+import { assert, describe, test } from 'vitest';
+
 import { BoxGeometry, Mesh, MeshStandardMaterial, Scene, SphereGeometry } from 'three';
 import { USDZExporter } from '../../../../examples/jsm/exporters/USDZExporter.js';
 import { USDLoader } from '../../../../examples/jsm/loaders/USDLoader.js';
@@ -12,13 +14,13 @@ function isValidUSDA( usda ) {
 
 }
 
-export default QUnit.module( 'Addons', () => {
+describe( 'Addons', () => {
 
-	QUnit.module( 'Exporters', () => {
+	describe( 'Exporters', () => {
 
-		QUnit.module( 'USDZExporter', () => {
+		describe( 'USDZExporter', () => {
 
-			QUnit.test( 'methods', ( assert ) => {
+			test( 'methods', () => {
 
 				const exporter = new USDZExporter();
 				assert.ok(
@@ -37,7 +39,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'export basic scene', async ( assert ) => {
+			test( 'export basic scene', async () => {
 
 				const exporter = new USDZExporter();
 
@@ -81,7 +83,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'export scene with onlyVisible option', async ( assert ) => {
+			test( 'export scene with onlyVisible option', async () => {
 
 				const exporter = new USDZExporter( );
 
@@ -158,7 +160,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'export and import', async ( assert ) => {
+			test( 'export and import', async () => {
 
 				const exporter = new USDZExporter();
 

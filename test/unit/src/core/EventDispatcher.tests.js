@@ -1,11 +1,13 @@
+import { assert, describe, test } from 'vitest';
+
 import { EventDispatcher } from '../../../../src/core/EventDispatcher.js';
 
-export default QUnit.module( 'Core', () => {
+describe( 'Core', () => {
 
-	QUnit.module( 'EventDispatcher', () => {
+	describe( 'EventDispatcher', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new EventDispatcher();
 			assert.ok( object, 'Can instantiate an EventDispatcher.' );
@@ -13,7 +15,7 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'addEventListener', ( assert ) => {
+		test( 'addEventListener', () => {
 
 			const eventDispatcher = new EventDispatcher();
 
@@ -30,7 +32,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'hasEventListener', ( assert ) => {
+		test( 'hasEventListener', () => {
 
 			const eventDispatcher = new EventDispatcher();
 
@@ -42,7 +44,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'removeEventListener', ( assert ) => {
+		test( 'removeEventListener', () => {
 
 			const eventDispatcher = new EventDispatcher();
 
@@ -65,7 +67,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'dispatchEvent', ( assert ) => {
+		test( 'dispatchEvent', () => {
 
 			const eventDispatcher = new EventDispatcher();
 

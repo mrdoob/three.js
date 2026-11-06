@@ -1,91 +1,70 @@
-//
-// Custom QUnit assertions.
+import { assert as vitestAssert, expect } from 'vitest';
 import { SmartComparer } from './SmartComparer.js';
 import { ObjectLoader } from '../../../src/loaders/ObjectLoader.js';
 
-QUnit.assert.success = function ( message ) {
+// Compare copy data without distinguishing signed zero or identical instance methods.
+expect.extend( {
 
-	// Equivalent to assert( true, message );
-	this.pushResult( {
-		result: true,
-		actual: undefined,
-		expected: undefined,
-		message: message
-	} );
+	toEqualProperties( actual, expected ) {
 
-};
+		const pass = this.equals( actual, expected, [ ( a, b ) => {
 
-QUnit.assert.fail = function ( message ) {
+			if ( a === 0 && b === 0 ) return true;
+			if ( typeof a === 'function' && typeof b === 'function' ) return a.toString() === b.toString();
+			if ( a !== null && b !== null && typeof a === 'object' && typeof b === 'object' && a.constructor !== b.constructor ) return false;
 
-	// Equivalent to assert( false, message );
-	this.pushResult( {
-		result: false,
-		actual: undefined,
-		expected: undefined,
-		message: message
-	} );
+		} ], true );
 
-};
+		return { pass, actual, expected, message: () => 'Expected objects to have equal enumerable properties' };
 
-QUnit.assert.numEqual = function ( actual, expected, message ) {
+	}
 
-	const diff = Math.abs( actual - expected );
-	message = message || ( actual + ' should be equal to ' + expected );
-	this.pushResult( {
-		result: diff < 0.1,
-		actual: actual,
-		expected: expected,
-		message: message
-	} );
+} );
 
-};
+const assert = {
 
-QUnit.assert.equalKey = function ( obj, ref, key ) {
+	...vitestAssert,
 
-	const actual = obj[ key ];
-	const expected = ref[ key ];
-	const message = actual + ' should be equal to ' + expected + ' for key "' + key + '"';
-	this.pushResult( {
-		result: actual == expected,
-		actual: actual,
-		expected: expected,
-		message: message
-	} );
+	equalProperties( actual, expected, message ) {
 
-};
+		expect( actual, message ).toEqualProperties( expected );
 
-QUnit.assert.smartEqual = function ( actual, expected, message ) {
+	},
 
-	const cmp = new SmartComparer();
+	numEqual( actual, expected, message ) {
 
-	const same = cmp.areEqual( actual, expected );
-	const msg = cmp.getDiagnostic() || message;
+		vitestAssert.isBelow( Math.abs( actual - expected ), 0.1, message );
 
-	this.pushResult( {
-		result: same,
-		actual: actual,
-		expected: expected,
-		message: msg
-	} );
+	},
+
+	equalKey( actual, expected, key ) {
+
+		vitestAssert.equal( actual[ key ], expected[ key ], `Property "${ key }"` );
+
+	},
+
+	smartEqual( actual, expected, message ) {
+
+		const comparer = new SmartComparer();
+		const equal = comparer.areEqual( actual, expected );
+		vitestAssert.isTrue( equal, comparer.getDiagnostic() || message );
+
+	}
 
 };
-
-//
-//	GEOMETRY TEST HELPERS
-//
 
 function checkGeometryClone( geom ) {
 
 	// Clone
 	const copy = geom.clone();
-	QUnit.assert.notEqual( copy.uuid, geom.uuid, 'clone uuid should differ from original' );
-	QUnit.assert.notEqual( copy.id, geom.id, 'clone id should differ from original' );
+	assert.notEqual( copy.uuid, geom.uuid, 'clone uuid should differ from original' );
+	assert.notEqual( copy.id, geom.id, 'clone id should differ from original' );
 
 	let differingProp = getDifferingProp( geom, copy );
-	QUnit.assert.ok( differingProp === undefined, 'properties are equal' );
+	assert.ok( differingProp === undefined, 'properties are equal' );
 
 	differingProp = getDifferingProp( copy, geom );
-	QUnit.assert.ok( differingProp === undefined, 'properties are equal' );
+	assert.ok( differingProp === undefined, 'properties are equal' );
 
 	// json round trip with clone
 	checkGeometryJsonRoundtrip( copy );
@@ -119,10 +98,10 @@ function getDifferingProp( geometryA, geometryB ) {
 // Compare json file with its source geometry.
 function checkGeometryJsonWriting( geom, json ) {
 
-	QUnit.assert.equal( json.metadata.version, '4.7', 'check metadata version' );
-	QUnit.assert.equalKey( geom, json, 'type' );
-	QUnit.assert.equalKey( geom, json, 'uuid' );
-	QUnit.assert.equal( json.id, undefined, 'should not persist id' );
+	assert.equal( json.metadata.version, '4.7', 'check metadata version' );
+	assert.equalKey( geom, json, 'type' );
+	assert.equalKey( geom, json, 'uuid' );
+	assert.equal( json.id, undefined, 'should not persist id' );
 
 	const params = geom.parameters;
 	if ( ! params ) {
@@ -135,7 +114,7 @@ function checkGeometryJsonWriting( geom, json ) {
 	let keys = Object.keys( params );
 	for ( let i = 0, l = keys.length; i < l; i ++ ) {
 
-		QUnit.assert.equalKey( params, json, keys[ i ] );
+		assert.equalKey( params, json, keys[ i ] );
 
 	}
 
@@ -146,7 +125,7 @@ function checkGeometryJsonWriting( geom, json ) {
 	for ( let i = 0, l = keys.length; i < l; i ++ ) {
 
 		const key = keys[ i ];
-		if ( notParameters.indexOf( key ) === - 1 ) QUnit.assert.equalKey( params, json, key );
+		if ( notParameters.indexOf( key ) === - 1 ) assert.equalKey( params, json, key );
 
 	}
 
@@ -160,17 +139,17 @@ function checkGeometryJsonReading( json, geom ) {
 	const loader = new ObjectLoader();
 	const output = loader.parseGeometries( wrap );
 
-	QUnit.assert.ok( output[ geom.uuid ], 'geometry matching source uuid not in output' );
-	// QUnit.assert.smartEqual( output[ geom.uuid ], geom, 'Reconstruct geometry from ObjectLoader' );
+	assert.ok( output[ geom.uuid ], 'geometry matching source uuid not in output' );
+	// assert.smartEqual( output[ geom.uuid ], geom, 'Reconstruct geometry from ObjectLoader' );
 
 	const differing = getDifferingProp( output[ geom.uuid ], geom );
 	if ( differing ) console.log( differing );
 
 	let differingProp = getDifferingProp( output[ geom.uuid ], geom );
-	QUnit.assert.ok( differingProp === undefined, 'properties are equal' );
+	assert.ok( differingProp === undefined, 'properties are equal' );
 
 	differingProp = getDifferingProp( geom, output[ geom.uuid ] );
-	QUnit.assert.ok( differingProp === undefined, 'properties are equal' );
+	assert.ok( differingProp === undefined, 'properties are equal' );
 
 }
 
@@ -213,14 +192,14 @@ function runStdLightTests( assert, lights ) {
 		const light = lights[ i ];
 
 		// copy and clone
-		checkLightCopyClone( assert, light );
+		checkLightCopyClone( light );
 
 		// THREE.Light doesn't get parsed by ObjectLoader as it's only
 		// used as an abstract base class - so we skip the JSON tests
 		if ( light.type !== 'Light' ) {
 
 			// json round trip
-			checkLightJsonRoundtrip( assert, light );
+			checkLightJsonRoundtrip( light );
 
 		}
 
@@ -228,45 +207,45 @@ function runStdLightTests( assert, lights ) {
 
 }
 
-function checkLightCopyClone( assert, light ) {
+function checkLightCopyClone( light ) {
 
 	// copy
 	const newLight = new light.constructor( 0xc0ffee );
 	newLight.copy( light );
 
-	QUnit.assert.notEqual( newLight.uuid, light.uuid, 'Copied light\'s UUID differs from original' );
-	QUnit.assert.notEqual( newLight.id, light.id, 'Copied light\'s id differs from original' );
-	QUnit.assert.smartEqual( newLight, light, 'Copied light is equal to original' );
+	assert.notEqual( newLight.uuid, light.uuid, 'Copied light\'s UUID differs from original' );
+	assert.notEqual( newLight.id, light.id, 'Copied light\'s id differs from original' );
+	assert.smartEqual( newLight, light, 'Copied light is equal to original' );
 
 	// real copy?
 	newLight.color.setHex( 0xc0ffee );
-	QUnit.assert.notStrictEqual(
+	assert.notStrictEqual(
 		newLight.color.getHex(), light.color.getHex(), 'Copied light is independent from original'
 	);
 
 	// Clone
 	const clone = light.clone(); // better get a new clone
-	QUnit.assert.notEqual( clone.uuid, light.uuid, 'Cloned light\'s UUID differs from original' );
-	QUnit.assert.notEqual( clone.id, light.id, 'Clone light\'s id differs from original' );
-	QUnit.assert.smartEqual( clone, light, 'Clone light is equal to original' );
+	assert.notEqual( clone.uuid, light.uuid, 'Cloned light\'s UUID differs from original' );
+	assert.notEqual( clone.id, light.id, 'Clone light\'s id differs from original' );
+	assert.smartEqual( clone, light, 'Clone light is equal to original' );
 
 	// real clone?
 	clone.color.setHex( 0xc0ffee );
-	QUnit.assert.notStrictEqual(
+	assert.notStrictEqual(
 		clone.color.getHex(), light.color.getHex(), 'Clone light is independent from original'
 	);
 
 	if ( light.type !== 'Light' ) {
 
 		// json round trip with clone
-		checkLightJsonRoundtrip( assert, clone );
+		checkLightJsonRoundtrip( clone );
 
 	}
 
 }
 
 // Compare json file with its source Light.
-function checkLightJsonWriting( assert, light, json ) {
+function checkLightJsonWriting( light, json ) {
 
 	assert.equal( json.metadata.version, '4.7', 'check metadata version' );
 
@@ -278,7 +257,7 @@ function checkLightJsonWriting( assert, light, json ) {
 }
 
 // Check parsing and reconstruction of json Light
-function checkLightJsonReading( assert, json, light ) {
+function checkLightJsonReading( json, light ) {
 
 	const loader = new ObjectLoader();
 	const outputLight = loader.parse( json );
@@ -288,12 +267,12 @@ function checkLightJsonReading( assert, json, light ) {
 }
 
 // Verify light -> json -> light
-function checkLightJsonRoundtrip( assert, light ) {
+function checkLightJsonRoundtrip( light ) {
 
 	const json = light.toJSON();
-	checkLightJsonWriting( assert, light, json );
-	checkLightJsonReading( assert, json, light );
+	checkLightJsonWriting( light, json );
+	checkLightJsonReading( json, light );
 
 }
 
-export { runStdLightTests, runStdGeometryTests };
+export { assert, runStdLightTests, runStdGeometryTests };

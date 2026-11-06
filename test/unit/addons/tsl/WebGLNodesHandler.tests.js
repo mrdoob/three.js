@@ -1,3 +1,5 @@
+import { assert, describe, test } from 'vitest';
+
 import {
 	AmbientLight,
 	PerspectiveCamera,
@@ -6,13 +8,13 @@ import {
 } from 'three';
 import { WebGLNodesHandler } from '../../../../examples/jsm/tsl/WebGLNodesHandler.js';
 
-export default QUnit.module( 'Addons', () => {
+describe( 'Addons', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'WebGLNodesHandler', () => {
+		describe( 'WebGLNodesHandler', () => {
 
-			QUnit.test( 'nested render lifecycle', ( assert ) => {
+			test( 'nested render lifecycle', () => {
 
 				const handler = new WebGLNodesHandler();
 				handler.setRenderer( {

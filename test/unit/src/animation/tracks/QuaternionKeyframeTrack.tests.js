@@ -1,12 +1,14 @@
+import { assert, describe, test } from 'vitest';
+
 import { QuaternionKeyframeTrack } from '../../../../../src/animation/tracks/QuaternionKeyframeTrack.js';
 
 import { KeyframeTrack } from '../../../../../src/animation/KeyframeTrack.js';
 
-export default QUnit.module( 'Animation', () => {
+describe( 'Animation', () => {
 
-	QUnit.module( 'Tracks', () => {
+	describe( 'Tracks', () => {
 
-		QUnit.module( 'QuaternionKeyframeTrack', () => {
+		describe( 'QuaternionKeyframeTrack', () => {
 
 			const parameters = {
 				name: '.rotation',
@@ -16,7 +18,7 @@ export default QUnit.module( 'Animation', () => {
 			};
 
 			// INHERITANCE
-			QUnit.test( 'Extending', ( assert ) => {
+			test( 'Extending', () => {
 
 				const object = new QuaternionKeyframeTrack( parameters.name, parameters.times, parameters.values );
 				assert.strictEqual(
@@ -27,7 +29,7 @@ export default QUnit.module( 'Animation', () => {
 			} );
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			test( 'Instancing', () => {
 
 				// name, times, values
 				const object = new QuaternionKeyframeTrack( parameters.name, parameters.times, parameters.values );

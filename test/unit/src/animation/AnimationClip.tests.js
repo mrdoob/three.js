@@ -1,11 +1,13 @@
+import { assert, describe, test } from 'vitest';
+
 import { AnimationClip } from '../../../../src/animation/AnimationClip.js';
 
-export default QUnit.module( 'Animation', () => {
+describe( 'Animation', () => {
 
-	QUnit.module( 'AnimationClip', () => {
+	describe( 'AnimationClip', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const clip = new AnimationClip( 'clip1', 1000, [ {} ] );
 			assert.ok( clip, 'AnimationClip can be instantiated' );
@@ -13,7 +15,7 @@ export default QUnit.module( 'Animation', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'name', ( assert ) => {
+		test( 'name', () => {
 
 			const clip = new AnimationClip( 'clip1', 1000, [ {} ] );
 			assert.strictEqual(

@@ -1,14 +1,16 @@
+import { assert, describe, test } from 'vitest';
+
 import { NearestFilter } from '../../../../src/constants.js';
 import { WebGLArrayRenderTarget } from '../../../../src/renderers/WebGLArrayRenderTarget.js';
 
 import { WebGLRenderTarget } from '../../../../src/renderers/WebGLRenderTarget.js';
 
-export default QUnit.module( 'Renderers', () => {
+describe( 'Renderers', () => {
 
-	QUnit.module( 'WebGLArrayRenderTarget', () => {
+	describe( 'WebGLArrayRenderTarget', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new WebGLArrayRenderTarget();
 			assert.strictEqual(
@@ -22,7 +24,7 @@ export default QUnit.module( 'Renderers', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new WebGLArrayRenderTarget();
 			assert.ok( object, 'Can instantiate a WebGLArrayRenderTarget.' );

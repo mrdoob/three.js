@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { CompressedTexture } from '../../../../src/textures/CompressedTexture.js';
 
 import { Texture } from '../../../../src/textures/Texture.js';
 
-export default QUnit.module( 'Textures', () => {
+describe( 'Textures', () => {
 
-	QUnit.module( 'CompressedTexture', () => {
+	describe( 'CompressedTexture', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new CompressedTexture();
 			assert.strictEqual(
@@ -18,7 +20,7 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new CompressedTexture();
 			assert.ok( object, 'Can instantiate a CompressedTexture.' );
@@ -26,7 +28,7 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isCompressedTexture', ( assert ) => {
+		test( 'isCompressedTexture', () => {
 
 			const object = new CompressedTexture();
 			assert.ok(

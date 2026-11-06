@@ -1,11 +1,13 @@
+import { assert, describe, test } from 'vitest';
+
 import { AnimationObjectGroup } from '../../../../src/animation/AnimationObjectGroup.js';
 
 import { Object3D } from '../../../../src/core/Object3D.js';
 import { PropertyBinding } from '../../../../src/animation/PropertyBinding.js';
 
-export default QUnit.module( 'Animation', () => {
+describe( 'Animation', () => {
 
-	QUnit.module( 'AnimationObjectGroup', () => {
+	describe( 'AnimationObjectGroup', () => {
 
 		const ObjectA = new Object3D(),
 			ObjectB = new Object3D(),
@@ -20,7 +22,7 @@ export default QUnit.module( 'Animation', () => {
 			ParsedPathC = PropertyBinding.parseTrackName( PathC );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const groupA = new AnimationObjectGroup();
 			assert.ok(
@@ -31,7 +33,7 @@ export default QUnit.module( 'Animation', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isAnimationObjectGroup', ( assert ) => {
+		test( 'isAnimationObjectGroup', () => {
 
 			const object = new AnimationObjectGroup();
 			assert.ok(
@@ -42,7 +44,7 @@ export default QUnit.module( 'Animation', () => {
 		} );
 
 		// OTHERS
-		QUnit.test( 'smoke test', ( assert ) => {
+		test( 'smoke test', () => {
 
 			var expect = function expect( testIndex, group, bindings, path, cached, roots ) {
 
@@ -61,10 +63,10 @@ export default QUnit.module( 'Animation', () => {
 
 				}
 
-				assert.ok( pathsOk, QUnit.testIndex + ' paths' );
-				assert.ok( nodesOk, QUnit.testIndex + ' nodes' );
-				assert.ok( group.nCachedObjects_ === cached, QUnit.testIndex + ' cache size' );
-				assert.ok( bindings.length - group.nCachedObjects_ === roots.length, QUnit.testIndex + ' object count' );
+				assert.ok( pathsOk, ' paths' );
+				assert.ok( nodesOk, ' nodes' );
+				assert.ok( group.nCachedObjects_ === cached, ' cache size' );
+				assert.ok( bindings.length - group.nCachedObjects_ === roots.length, ' object count' );
 
 			};
 

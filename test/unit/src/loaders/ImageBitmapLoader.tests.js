@@ -1,15 +1,17 @@
+import { assert, describe, test } from 'vitest';
+
 import { ImageBitmapLoader } from '../../../../src/loaders/ImageBitmapLoader.js';
 
 import { Cache } from '../../../../src/loaders/Cache.js';
 import { Loader } from '../../../../src/loaders/Loader.js';
 import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
 
-export default QUnit.module( 'Loaders', () => {
+describe( 'Loaders', () => {
 
-	QUnit.module( 'ImageBitmapLoader', () => {
+	describe( 'ImageBitmapLoader', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			// suppress the following console message when testing
 			// THREE.ImageBitmapLoader: createImageBitmap() not supported.
@@ -26,7 +28,7 @@ export default QUnit.module( 'Loaders', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			// suppress the following console message when testing
 			// THREE.ImageBitmapLoader: createImageBitmap() not supported.
@@ -40,7 +42,7 @@ export default QUnit.module( 'Loaders', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'options', ( assert ) => {
+		test( 'options', () => {
 
 			// suppress the following console message when testing in node
 			// THREE.ImageBitmapLoader: createImageBitmap() not supported.
@@ -55,7 +57,7 @@ export default QUnit.module( 'Loaders', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isImageBitmapLoader', ( assert ) => {
+		test( 'isImageBitmapLoader', () => {
 
 			// suppress the following console message when testing in node
 			// THREE.ImageBitmapLoader: createImageBitmap() not supported.
@@ -71,7 +73,7 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		QUnit.test( 'load', async ( assert ) => {
+		test( 'load', async () => {
 
 			const canvas = document.createElement( 'canvas' );
 			canvas.width = 8;

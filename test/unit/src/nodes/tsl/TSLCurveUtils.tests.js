@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import {
 	float,
 	parabola,
@@ -16,11 +17,11 @@ import { gpuTest } from './gpu-test-utils.js';
 // formula, or from plain JS Math), never by re-running the same TSL
 // expression under test -- see TSLMath.tests.js's file header for why that
 // matters (https://ben3d.ca/blog/the-rise-of-test-theater).
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'curve/remap-shape helpers', () => {
+		describe( 'curve/remap-shape helpers', () => {
 
 			gpuTest( 'parabola() maps [0,1] corners to 0 and the center to 1', ( { assert } ) => {
 
@@ -41,7 +42,7 @@ export default QUnit.module( 'Nodes', () => {
 
 		} );
 
-		QUnit.module( 'timer-driven oscillators', () => {
+		describe( 'timer-driven oscillators', () => {
 
 			gpuTest( 'oscSine/oscSquare/oscTriangle/oscSawtooth at known phases', ( { assert } ) => {
 
@@ -76,7 +77,7 @@ export default QUnit.module( 'Nodes', () => {
 
 		} );
 
-		QUnit.module( 'bit-reinterpretation casts', () => {
+		describe( 'bit-reinterpretation casts', () => {
 
 			gpuTest( 'floatBitsToInt/floatBitsToUint/intBitsToFloat/uintBitsToFloat round trip and match IEEE-754 bit patterns', ( { assert } ) => {
 

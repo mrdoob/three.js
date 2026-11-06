@@ -1,3 +1,5 @@
+import { assert, describe, test } from 'vitest';
+
 import { BufferGeometry } from 'three';
 
 import { GaussianSplatPLYLoader } from '../../../../examples/jsm/loaders/GaussianSplatPLYLoader.js';
@@ -61,13 +63,13 @@ function createGaussianSplatPLY( shRestCoefficientCount = 0 ) {
 
 }
 
-export default QUnit.module( 'Addons', () => {
+describe( 'Addons', () => {
 
-	QUnit.module( 'Loaders', () => {
+	describe( 'Loaders', () => {
 
-		QUnit.module( 'GaussianSplatPLYLoader', () => {
+		describe( 'GaussianSplatPLYLoader', () => {
 
-			QUnit.test( 'parses a Gaussian splat PLY with no spherical harmonics', ( assert ) => {
+			test( 'parses a Gaussian splat PLY with no spherical harmonics', () => {
 
 				const loader = new GaussianSplatPLYLoader();
 				const data = loader.parse( createGaussianSplatPLY() );
@@ -82,7 +84,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'detects spherical harmonics degree from the header and converts f_rest', ( assert ) => {
+			test( 'detects spherical harmonics degree from the header and converts f_rest', () => {
 
 				const loader = new GaussianSplatPLYLoader();
 				const data = loader.parse( createGaussianSplatPLY( 9 ) );
@@ -95,7 +97,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'requires no pre-setup for each supported spherical harmonics degree', ( assert ) => {
+			test( 'requires no pre-setup for each supported spherical harmonics degree', () => {
 
 				const loader = new GaussianSplatPLYLoader();
 
@@ -108,7 +110,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'rejects an unsupported number of f_rest coefficients', ( assert ) => {
+			test( 'rejects an unsupported number of f_rest coefficients', () => {
 
 				const loader = new GaussianSplatPLYLoader();
 
@@ -120,7 +122,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'rejects PLY data missing required Gaussian splat properties', ( assert ) => {
+			test( 'rejects PLY data missing required Gaussian splat properties', () => {
 
 				const ply = [
 					'ply',

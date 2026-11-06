@@ -1,15 +1,17 @@
+import { assert, beforeEach, describe, test } from 'vitest';
+
 import { ShapeGeometry } from '../../../../src/geometries/ShapeGeometry.js';
 
 import { Shape } from '../../../../src/extras/core/Shape.js';
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
-// import { runStdGeometryTests } from '../../utils/qunit-utils.js';
+// import { runStdGeometryTests } from '../../utils/test-utils.js';
 
-export default QUnit.module( 'Geometries', () => {
+describe( 'Geometries', () => {
 
-	QUnit.module( 'ShapeGeometry', ( hooks ) => {
+	describe( 'ShapeGeometry', () => {
 
 		let geometries = undefined; // eslint-disable-line no-unused-vars
-		hooks.beforeEach( function () {
+		beforeEach( function () {
 
 			const triangleShape = new Shape();
 			triangleShape.moveTo( 0, - 1 );
@@ -23,7 +25,7 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new ShapeGeometry();
 			assert.strictEqual(
@@ -34,7 +36,7 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new ShapeGeometry();
 			assert.ok( object, 'Can instantiate a ShapeGeometry.' );
@@ -42,7 +44,7 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new ShapeGeometry();
 			assert.ok(

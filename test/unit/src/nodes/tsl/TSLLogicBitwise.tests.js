@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import {
 	bool, float, int, uint, ivec3, vec3,
 	equal, notEqual, lessThan, greaterThan, lessThanEqual, greaterThanEqual,
@@ -18,11 +19,11 @@ import { gpuTest } from './gpu-test-utils.js';
 // -> 0.0, true -> 1.0) is the natural, spec-defined way to make a bool value
 // comparable there, rather than adding first-class bool support to the
 // harness for this one case.
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'logic and comparison operators', () => {
+		describe( 'logic and comparison operators', () => {
 
 			gpuTest( 'mixed-type equality is independent of operand order', ( { assert } ) => {
 
@@ -96,7 +97,7 @@ export default QUnit.module( 'Nodes', () => {
 
 		} );
 
-		QUnit.module( 'bitwise operators', () => {
+		describe( 'bitwise operators', () => {
 
 			gpuTest( 'bitAnd/bitOr/bitXor/bitNot on known bit patterns', ( { assert } ) => {
 

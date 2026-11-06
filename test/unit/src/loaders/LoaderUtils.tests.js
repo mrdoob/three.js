@@ -1,12 +1,14 @@
+import { assert, describe, test } from 'vitest';
+
 import { LoaderUtils } from '../../../../src/loaders/LoaderUtils.js';
 
-export default QUnit.module( 'Loaders', () => {
+describe( 'Loaders', () => {
 
-	QUnit.module( 'LoaderUtils', () => {
+	describe( 'LoaderUtils', () => {
 
 		// STATIC
 
-		QUnit.test( 'extractUrlBase', ( assert ) => {
+		test( 'extractUrlBase', () => {
 
 			assert.equal( '/path/to/', LoaderUtils.extractUrlBase( '/path/to/model.glb' ) );
 			assert.equal( './', LoaderUtils.extractUrlBase( 'model.glb' ) );

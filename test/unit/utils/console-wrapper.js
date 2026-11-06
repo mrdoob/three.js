@@ -24,11 +24,11 @@ export const CONSOLE_LEVEL = {
 console.level = CONSOLE_LEVEL.DEFAULT;
 
 // Save the original methods
-console._error = console.error;
-console._warn = console.warn;
-console._log = console.log;
-console._info = console.info;
-console._debug = console.debug;
+console._error ??= console.error;
+console._warn ??= console.warn;
+console._log ??= console.log;
+console._info ??= console.info;
+console._debug ??= console.debug;
 
 // Wrap console methods
 console.error = function () {

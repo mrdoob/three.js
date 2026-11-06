@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import {
 	int, uint, ivec4, uvec4,
 	bitAnd, shiftRight,
@@ -13,11 +14,11 @@ function byte( value, offset ) {
 
 }
 
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'packed 4x8 integer operations', () => {
+		describe( 'packed 4x8 integer operations', () => {
 
 			gpuTest( 'packed integer dot products', ( { assert } ) => {
 

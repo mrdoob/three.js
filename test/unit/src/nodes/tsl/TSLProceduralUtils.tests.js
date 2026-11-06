@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import {
 	float, vec2, vec4,
 	premultiplyAlpha, unpremultiplyAlpha,
@@ -13,11 +14,11 @@ import { gpuTest } from './gpu-test-utils.js';
 // re-running the same TSL expression under test -- see TSLMath.tests.js's
 // file header for why that matters
 // (https://ben3d.ca/blog/the-rise-of-test-theater).
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'alpha premultiplication', () => {
+		describe( 'alpha premultiplication', () => {
 
 			gpuTest( 'premultiplyAlpha() scales RGB by alpha, leaves alpha unchanged', ( { assert } ) => {
 
@@ -49,7 +50,7 @@ export default QUnit.module( 'Nodes', () => {
 
 		} );
 
-		QUnit.module( 'UV transforms', () => {
+		describe( 'UV transforms', () => {
 
 			gpuTest( 'rotateUV() rotates counter-clockwise about a center point, matching rotate()\'s own documented convention', ( { assert } ) => {
 
@@ -90,7 +91,7 @@ export default QUnit.module( 'Nodes', () => {
 
 		} );
 
-		QUnit.module( 'procedural functions', () => {
+		describe( 'procedural functions', () => {
 
 			gpuTest( 'checker() produces a 2x2-per-unit checkerboard, GLSL-style mod() for negative coordinates included', ( { assert } ) => {
 

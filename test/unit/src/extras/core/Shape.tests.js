@@ -1,15 +1,17 @@
+import { assert, describe, test } from 'vitest';
+
 import { Shape } from '../../../../../src/extras/core/Shape.js';
 
 import { Path } from '../../../../../src/extras/core/Path.js';
 
-export default QUnit.module( 'Extras', () => {
+describe( 'Extras', () => {
 
-	QUnit.module( 'Core', () => {
+	describe( 'Core', () => {
 
-		QUnit.module( 'Shape', () => {
+		describe( 'Shape', () => {
 
 			// INHERITANCE
-			QUnit.test( 'Extending', ( assert ) => {
+			test( 'Extending', () => {
 
 				const object = new Shape();
 				assert.strictEqual(
@@ -20,7 +22,7 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			test( 'Instancing', () => {
 
 				const object = new Shape();
 				assert.ok( object, 'Can instantiate a Shape.' );
@@ -28,7 +30,7 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// PROPERTIES
-			QUnit.test( 'type', ( assert ) => {
+			test( 'type', () => {
 
 				const object = new Shape();
 				assert.ok(

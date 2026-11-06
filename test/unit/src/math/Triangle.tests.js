@@ -1,3 +1,5 @@
+import { assert, describe, test } from 'vitest';
+
 import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
 import { Triangle } from '../../../../src/math/Triangle.js';
 import { Box3 } from '../../../../src/math/Box3.js';
@@ -9,12 +11,12 @@ import {
 	two3
 } from '../../utils/math-constants.js';
 
-export default QUnit.module( 'Maths', () => {
+describe( 'Maths', () => {
 
-	QUnit.module( 'Triangle', () => {
+	describe( 'Triangle', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			let a = new Triangle();
 			assert.ok( a.a.equals( zero3 ), 'Passed!' );
@@ -29,7 +31,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'set', ( assert ) => {
+		test( 'set', () => {
 
 			const a = new Triangle();
 
@@ -40,7 +42,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setFromPointsAndIndices', ( assert ) => {
+		test( 'setFromPointsAndIndices', () => {
 
 			const a = new Triangle();
 
@@ -52,7 +54,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setFromAttributeAndIndices', ( assert ) => {
+		test( 'setFromAttributeAndIndices', () => {
 
 			const a = new Triangle();
 			const attribute = new BufferAttribute( new Float32Array( [ 1, 1, 1, - 1, - 1, - 1, 2, 2, 2 ] ), 3 );
@@ -64,7 +66,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'copy', ( assert ) => {
+		test( 'copy', () => {
 
 			const a = new Triangle( one3.clone().negate(), one3.clone(), two3.clone() );
 			const b = new Triangle().copy( a );
@@ -82,7 +84,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'getArea', ( assert ) => {
+		test( 'getArea', () => {
 
 			let a = new Triangle();
 
@@ -100,7 +102,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'getMidpoint', ( assert ) => {
+		test( 'getMidpoint', () => {
 
 			let a = new Triangle();
 			const midpoint = new Vector3();
@@ -115,7 +117,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'getNormal', ( assert ) => {
+		test( 'getNormal', () => {
 
 			let a = new Triangle();
 			const normal = new Vector3();
@@ -130,7 +132,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'getPlane', ( assert ) => {
+		test( 'getPlane', () => {
 
 			let a = new Triangle();
 			const plane = new Plane();
@@ -140,7 +142,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.notOk( isNaN( plane.distanceToPoint( a.a ) ), 'Passed!' );
 			assert.notOk( isNaN( plane.distanceToPoint( a.b ) ), 'Passed!' );
 			assert.notOk( isNaN( plane.distanceToPoint( a.c ) ), 'Passed!' );
-			assert.notPropEqual( plane.normal, {
+			assert.notDeepEqual( { ...plane.normal }, {
 				x: NaN,
 				y: NaN,
 				z: NaN
@@ -164,7 +166,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'getBarycoord', ( assert ) => {
+		test( 'getBarycoord', () => {
 
 			let a = new Triangle();
 
@@ -201,7 +203,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'containsPoint', ( assert ) => {
+		test( 'containsPoint', () => {
 
 			let a = new Triangle();
 			const midpoint = new Vector3();
@@ -228,7 +230,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'intersectsBox', ( assert ) => {
+		test( 'intersectsBox', () => {
 
 			const a = new Box3( one3.clone(), two3.clone() );
 			const b = new Triangle( new Vector3( 1.5, 1.5, 2.5 ), new Vector3( 2.5, 1.5, 1.5 ), new Vector3( 1.5, 2.5, 1.5 ) );
@@ -245,7 +247,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'closestPointToPoint', ( assert ) => {
+		test( 'closestPointToPoint', () => {
 
 			const a = new Triangle( new Vector3( - 1, 0, 0 ), new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ) );
 			const point = new Vector3();
@@ -288,7 +290,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'isFrontFacing', ( assert ) => {
+		test( 'isFrontFacing', () => {
 
 			let a = new Triangle();
 			let dir = new Vector3();
@@ -303,7 +305,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'equals', ( assert ) => {
+		test( 'equals', () => {
 
 			const a = new Triangle(
 				new Vector3( 1, 0, 0 ),

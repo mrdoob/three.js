@@ -1,8 +1,10 @@
+import { afterAll, assert, beforeAll, describe, test } from 'vitest';
+
 import { AudioContext } from '../../../../src/audio/AudioContext.js';
 
-export default QUnit.module( 'Audios', () => {
+describe( 'Audios', () => {
 
-	QUnit.module( 'AudioContext', ( hooks ) => {
+	describe( 'AudioContext', () => {
 
 		function mockWindowAudioContext() {
 
@@ -26,13 +28,13 @@ export default QUnit.module( 'Audios', () => {
 
 		if ( typeof window === 'undefined' ) {
 
-			hooks.before( function () {
+			beforeAll( function () {
 
 				mockWindowAudioContext();
 
 			} );
 
-			hooks.after( function () {
+			afterAll( function () {
 
 				global.window = undefined;
 
@@ -41,7 +43,7 @@ export default QUnit.module( 'Audios', () => {
 		}
 
 		// STATIC
-		QUnit.test( 'getContext', ( assert ) => {
+		test( 'getContext', () => {
 
 			const context = AudioContext.getContext();
 			assert.strictEqual(
@@ -51,7 +53,7 @@ export default QUnit.module( 'Audios', () => {
 
 		} );
 
-		QUnit.test( 'setContext', ( assert ) => {
+		test( 'setContext', () => {
 
 			AudioContext.setContext( new window.AudioContext() );
 			const context = AudioContext.getContext();

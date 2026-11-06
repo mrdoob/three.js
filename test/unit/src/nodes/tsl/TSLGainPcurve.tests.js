@@ -1,11 +1,12 @@
+import { describe } from 'vitest';
 import { float, gain, pcurve } from 'three/tsl';
 import { gpuTest } from './gpu-test-utils.js';
 
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'gain() and pcurve()', () => {
+		describe( 'gain() and pcurve()', () => {
 
 			gpuTest( 'gain() keeps the endpoints and midpoint fixed, k=1 is the identity', ( { assert } ) => {
 

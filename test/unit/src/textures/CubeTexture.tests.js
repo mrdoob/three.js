@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { CubeTexture } from '../../../../src/textures/CubeTexture.js';
 
 import { Texture } from '../../../../src/textures/Texture.js';
 
-export default QUnit.module( 'Textures', () => {
+describe( 'Textures', () => {
 
-	QUnit.module( 'CubeTexture', () => {
+	describe( 'CubeTexture', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new CubeTexture();
 			assert.strictEqual(
@@ -18,7 +20,7 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new CubeTexture();
 			assert.ok( object, 'Can instantiate a CubeTexture.' );
@@ -26,7 +28,7 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isCubeTexture', ( assert ) => {
+		test( 'isCubeTexture', () => {
 
 			const object = new CubeTexture();
 			assert.ok(

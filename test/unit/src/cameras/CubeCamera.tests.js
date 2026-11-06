@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { CubeCamera } from '../../../../src/cameras/CubeCamera.js';
 
 import { Object3D } from '../../../../src/core/Object3D.js';
 
-export default QUnit.module( 'Cameras', () => {
+describe( 'Cameras', () => {
 
-	QUnit.module( 'CubeCamera', () => {
+	describe( 'CubeCamera', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new CubeCamera();
 			assert.strictEqual(
@@ -18,7 +20,7 @@ export default QUnit.module( 'Cameras', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new CubeCamera();
 			assert.ok( object, 'Can instantiate a CubeCamera.' );
@@ -26,7 +28,7 @@ export default QUnit.module( 'Cameras', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new CubeCamera();
 			assert.ok(

@@ -1,3 +1,5 @@
+import { assert, describe, test } from 'vitest';
+
 import { ObjectLoader } from '../../../../src/loaders/ObjectLoader.js';
 
 import { Loader } from '../../../../src/loaders/Loader.js';
@@ -6,12 +8,12 @@ import { Sprite } from '../../../../src/objects/Sprite.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
 import { eps } from '../../utils/math-constants.js';
 
-export default QUnit.module( 'Loaders', () => {
+describe( 'Loaders', () => {
 
-	QUnit.module( 'ObjectLoader', () => {
+	describe( 'ObjectLoader', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new ObjectLoader();
 			assert.strictEqual(
@@ -22,7 +24,7 @@ export default QUnit.module( 'Loaders', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new ObjectLoader();
 			assert.ok( object, 'Can instantiate an ObjectLoader.' );
@@ -30,7 +32,7 @@ export default QUnit.module( 'Loaders', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'parse (pivot)', ( assert ) => {
+		test( 'parse (pivot)', () => {
 
 			const object = new Object3D();
 			object.position.set( 1, 2, 3 );
@@ -46,7 +48,7 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		QUnit.test( 'parse (Sprite center)', ( assert ) => {
+		test( 'parse (Sprite center)', () => {
 
 			const sprite = new Sprite();
 			sprite.center.set( 0.5, 0 );

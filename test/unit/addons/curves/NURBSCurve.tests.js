@@ -1,15 +1,17 @@
+import { assert, beforeAll, describe, test } from 'vitest';
+
 import { NURBSCurve } from '../../../../examples/jsm/curves/NURBSCurve.js';
 import { MathUtils, Vector4 } from 'three';
 
-export default QUnit.module( 'Extras', () => {
+describe( 'Extras', () => {
 
-	QUnit.module( 'Curves', () => {
+	describe( 'Curves', () => {
 
-		QUnit.module( 'NURBSCurve', ( hooks ) => {
+		describe( 'NURBSCurve', () => {
 
 			let _nurbsCurve = undefined;
 
-			hooks.before( function () {
+			beforeAll( function () {
 
 				const nurbsControlPoints = [];
 				const nurbsKnots = [];
@@ -35,7 +37,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'clone', ( assert ) => {
+			test( 'clone', () => {
 
 				const clone = _nurbsCurve.clone();
 
@@ -52,7 +54,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'toJSON', ( assert ) => {
+			test( 'toJSON', () => {
 
 				const json = _nurbsCurve.toJSON();
 
@@ -64,7 +66,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'fromJSON', ( assert ) => {
+			test( 'fromJSON', () => {
 
 				const json = _nurbsCurve.toJSON();
 				const fromJson = new NURBSCurve().fromJSON( json );

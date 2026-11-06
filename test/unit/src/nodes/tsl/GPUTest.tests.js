@@ -1,11 +1,12 @@
+import { describe } from 'vitest';
 import { hash, vec3, float, sRGBTransferEOTF, sRGBTransferOETF } from 'three/tsl';
 import { gpuTest, gpuFuzzTest } from './gpu-test-utils.js';
 
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'GPU-native unit tests (prototype)', () => {
+		describe( 'GPU-native unit tests (prototype)', () => {
 
 			gpuTest( 'sRGB <-> linear round trip', ( { assert } ) => {
 

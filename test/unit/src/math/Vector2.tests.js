@@ -1,3 +1,6 @@
+import { describe, test } from 'vitest';
+import { assert } from '../../utils/test-utils.js';
+
 import { Vector2 } from '../../../../src/math/Vector2.js';
 import { Matrix3 } from '../../../../src/math/Matrix3.js';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
@@ -7,12 +10,12 @@ import {
 	eps
 } from '../../utils/math-constants.js';
 
-export default QUnit.module( 'Maths', () => {
+describe( 'Maths', () => {
 
-	QUnit.module( 'Vector2', () => {
+	describe( 'Vector2', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			let a = new Vector2();
 			assert.ok( a.x == 0, 'Passed!' );
@@ -25,7 +28,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PROPERTIES // ( [Itee] WHAT ??? o_O )
-		QUnit.test( 'properties', ( assert ) => {
+		test( 'properties', () => {
 
 			const a = new Vector2( 0, 0 );
 			const width = 100;
@@ -41,14 +44,14 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( 'isVector2', ( assert ) => {
+		test( 'isVector2', () => {
 
 			const object = new Vector2();
 			assert.ok( object.isVector2, 'Vector2.isVector2 should be true' );
 
 		} );
 
-		QUnit.test( 'set', ( assert ) => {
+		test( 'set', () => {
 
 			const a = new Vector2();
 			assert.ok( a.x == 0, 'Passed!' );
@@ -60,7 +63,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'copy', ( assert ) => {
+		test( 'copy', () => {
 
 			const a = new Vector2( x, y );
 			const b = new Vector2().copy( a );
@@ -75,7 +78,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'add', ( assert ) => {
+		test( 'add', () => {
 
 			const a = new Vector2( x, y );
 			const b = new Vector2( - x, - y );
@@ -90,7 +93,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'addScaledVector', ( assert ) => {
+		test( 'addScaledVector', () => {
 
 			const a = new Vector2( x, y );
 			const b = new Vector2( 2, 3 );
@@ -102,7 +105,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'sub', ( assert ) => {
+		test( 'sub', () => {
 
 			const a = new Vector2( x, y );
 			const b = new Vector2( - x, - y );
@@ -117,7 +120,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'applyMatrix3', ( assert ) => {
+		test( 'applyMatrix3', () => {
 
 			const a = new Vector2( x, y );
 			const m = new Matrix3().set( 2, 3, 5, 7, 11, 13, 17, 19, 23 );
@@ -128,7 +131,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'negate', ( assert ) => {
+		test( 'negate', () => {
 
 			const a = new Vector2( x, y );
 
@@ -138,7 +141,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'dot', ( assert ) => {
+		test( 'dot', () => {
 
 			const a = new Vector2( x, y );
 			const b = new Vector2( - x, - y );
@@ -152,7 +155,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'cross', ( assert ) => {
+		test( 'cross', () => {
 
 			const a = new Vector2( x, y );
 			const b = new Vector2( 2 * x, - y );
@@ -163,7 +166,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'manhattanLength', ( assert ) => {
+		test( 'manhattanLength', () => {
 
 			const a = new Vector2( x, 0 );
 			const b = new Vector2( 0, - y );
@@ -178,7 +181,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'normalize', ( assert ) => {
+		test( 'normalize', () => {
 
 			const a = new Vector2( x, 0 );
 			const b = new Vector2( 0, - y );
@@ -193,7 +196,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'angleTo', ( assert ) => {
+		test( 'angleTo', () => {
 
 			const a = new Vector2( - 0.18851655680720186, 0.9820700116639124 );
 			const b = new Vector2( 0.18851655680720186, - 0.9820700116639124 );
@@ -211,7 +214,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setLength', ( assert ) => {
+		test( 'setLength', () => {
 
 			let a = new Vector2( x, 0 );
 
@@ -228,7 +231,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'equals', ( assert ) => {
+		test( 'equals', () => {
 
 			const a = new Vector2( x, 0 );
 			const b = new Vector2( 0, - y );
@@ -248,7 +251,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'fromArray', ( assert ) => {
+		test( 'fromArray', () => {
 
 			const a = new Vector2();
 			const array = [ 1, 2, 3, 4 ];
@@ -263,7 +266,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'toArray', ( assert ) => {
+		test( 'toArray', () => {
 
 			const a = new Vector2( x, y );
 
@@ -284,7 +287,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'fromBufferAttribute', ( assert ) => {
+		test( 'fromBufferAttribute', () => {
 
 			const a = new Vector2();
 			const attr = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4 ] ), 2 );
@@ -300,7 +303,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// TODO (Itee) refactor/split
-		QUnit.test( 'setX,setY', ( assert ) => {
+		test( 'setX,setY', () => {
 
 			const a = new Vector2();
 			assert.ok( a.x == 0, 'Passed!' );
@@ -313,7 +316,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setComponent,getComponent', ( assert ) => {
+		test( 'setComponent,getComponent', () => {
 
 			const a = new Vector2();
 			assert.ok( a.x == 0, 'Passed!' );
@@ -326,7 +329,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'multiply/divide', ( assert ) => {
+		test( 'multiply/divide', () => {
 
 			const a = new Vector2( x, y );
 			const b = new Vector2( - x, - y );
@@ -349,7 +352,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'min/max/clamp', ( assert ) => {
+		test( 'min/max/clamp', () => {
 
 			const a = new Vector2( x, y );
 			const b = new Vector2( - x, - y );
@@ -375,30 +378,30 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'rounding', ( assert ) => {
+		test( 'rounding', () => {
 
 			assert.deepEqual( new Vector2( - 0.1, 0.1 ).floor(), new Vector2( - 1, 0 ), 'floor .1' );
 			assert.deepEqual( new Vector2( - 0.5, 0.5 ).floor(), new Vector2( - 1, 0 ), 'floor .5' );
 			assert.deepEqual( new Vector2( - 0.9, 0.9 ).floor(), new Vector2( - 1, 0 ), 'floor .9' );
 
-			assert.deepEqual( new Vector2( - 0.1, 0.1 ).ceil(), new Vector2( 0, 1 ), 'ceil .1' );
-			assert.deepEqual( new Vector2( - 0.5, 0.5 ).ceil(), new Vector2( 0, 1 ), 'ceil .5' );
-			assert.deepEqual( new Vector2( - 0.9, 0.9 ).ceil(), new Vector2( 0, 1 ), 'ceil .9' );
+			assert.equalProperties( new Vector2( - 0.1, 0.1 ).ceil(), new Vector2( 0, 1 ), 'ceil .1' );
+			assert.equalProperties( new Vector2( - 0.5, 0.5 ).ceil(), new Vector2( 0, 1 ), 'ceil .5' );
+			assert.equalProperties( new Vector2( - 0.9, 0.9 ).ceil(), new Vector2( 0, 1 ), 'ceil .9' );
 
-			assert.deepEqual( new Vector2( - 0.1, 0.1 ).round(), new Vector2( 0, 0 ), 'round .1' );
-			assert.deepEqual( new Vector2( - 0.5, 0.5 ).round(), new Vector2( 0, 1 ), 'round .5' );
-			assert.deepEqual( new Vector2( - 0.9, 0.9 ).round(), new Vector2( - 1, 1 ), 'round .9' );
+			assert.equalProperties( new Vector2( - 0.1, 0.1 ).round(), new Vector2( 0, 0 ), 'round .1' );
+			assert.equalProperties( new Vector2( - 0.5, 0.5 ).round(), new Vector2( 0, 1 ), 'round .5' );
+			assert.equalProperties( new Vector2( - 0.9, 0.9 ).round(), new Vector2( - 1, 1 ), 'round .9' );
 
-			assert.deepEqual( new Vector2( - 0.1, 0.1 ).roundToZero(), new Vector2( 0, 0 ), 'roundToZero .1' );
-			assert.deepEqual( new Vector2( - 0.5, 0.5 ).roundToZero(), new Vector2( 0, 0 ), 'roundToZero .5' );
-			assert.deepEqual( new Vector2( - 0.9, 0.9 ).roundToZero(), new Vector2( 0, 0 ), 'roundToZero .9' );
-			assert.deepEqual( new Vector2( - 1.1, 1.1 ).roundToZero(), new Vector2( - 1, 1 ), 'roundToZero 1.1' );
-			assert.deepEqual( new Vector2( - 1.5, 1.5 ).roundToZero(), new Vector2( - 1, 1 ), 'roundToZero 1.5' );
-			assert.deepEqual( new Vector2( - 1.9, 1.9 ).roundToZero(), new Vector2( - 1, 1 ), 'roundToZero 1.9' );
+			assert.equalProperties( new Vector2( - 0.1, 0.1 ).roundToZero(), new Vector2( 0, 0 ), 'roundToZero .1' );
+			assert.equalProperties( new Vector2( - 0.5, 0.5 ).roundToZero(), new Vector2( 0, 0 ), 'roundToZero .5' );
+			assert.equalProperties( new Vector2( - 0.9, 0.9 ).roundToZero(), new Vector2( 0, 0 ), 'roundToZero .9' );
+			assert.equalProperties( new Vector2( - 1.1, 1.1 ).roundToZero(), new Vector2( - 1, 1 ), 'roundToZero 1.1' );
+			assert.equalProperties( new Vector2( - 1.5, 1.5 ).roundToZero(), new Vector2( - 1, 1 ), 'roundToZero 1.5' );
+			assert.equalProperties( new Vector2( - 1.9, 1.9 ).roundToZero(), new Vector2( - 1, 1 ), 'roundToZero 1.9' );
 
 		} );
 
-		QUnit.test( 'length/lengthSq', ( assert ) => {
+		test( 'length/lengthSq', () => {
 
 			const a = new Vector2( x, 0 );
 			const b = new Vector2( 0, - y );
@@ -417,7 +420,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'distanceTo/distanceToSquared', ( assert ) => {
+		test( 'distanceTo/distanceToSquared', () => {
 
 			const a = new Vector2( x, 0 );
 			const b = new Vector2( 0, - y );
@@ -431,7 +434,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'lerp/clone', ( assert ) => {
+		test( 'lerp/clone', () => {
 
 			const a = new Vector2( x, 0 );
 			const b = new Vector2( 0, - y );
@@ -448,7 +451,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setComponent/getComponent exceptions', ( assert ) => {
+		test( 'setComponent/getComponent exceptions', () => {
 
 			const a = new Vector2( 0, 0 );
 
@@ -473,7 +476,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setScalar/addScalar/subScalar', ( assert ) => {
+		test( 'setScalar/addScalar/subScalar', () => {
 
 			const a = new Vector2( 1, 1 );
 			const s = 3;
@@ -492,7 +495,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'multiply/divide', ( assert ) => {
+		test( 'multiply/divide', () => {
 
 			const a = new Vector2( x, y );
 			const b = new Vector2( 2 * x, 2 * y );
@@ -509,7 +512,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// OTHERS
-		QUnit.test( 'iterable', ( assert ) => {
+		test( 'iterable', () => {
 
 			const v = new Vector2( 0, 1 );
 			const array = [ ...v ];

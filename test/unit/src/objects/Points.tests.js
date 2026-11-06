@@ -1,15 +1,17 @@
+import { assert, describe, test } from 'vitest';
+
 import { Object3D } from '../../../../src/core/Object3D.js';
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../../../../src/core/BufferAttribute.js';
 import { Material } from '../../../../src/materials/Material.js';
 import { Points } from '../../../../src/objects/Points.js';
 
-export default QUnit.module( 'Objects', () => {
+describe( 'Objects', () => {
 
-	QUnit.module( 'Points', () => {
+	describe( 'Points', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const points = new Points();
 			assert.strictEqual(
@@ -20,7 +22,7 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new Points();
 			assert.ok( object, 'Can instantiate a Points.' );
@@ -28,7 +30,7 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new Points();
 			assert.ok(
@@ -39,7 +41,7 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isPoints', ( assert ) => {
+		test( 'isPoints', () => {
 
 			const object = new Points();
 			assert.ok(
@@ -49,7 +51,7 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		QUnit.test( 'copy/material', ( assert ) => {
+		test( 'copy/material', () => {
 
 			// Material arrays are cloned
 			const mesh1 = new Points();
@@ -66,7 +68,7 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		QUnit.test( 'copy/morphTargets', ( assert ) => {
+		test( 'copy/morphTargets', () => {
 
 			const geometry = new BufferGeometry();
 			geometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 1, 1, 1 ], 3 ) );

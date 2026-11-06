@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { Bone } from '../../../../src/objects/Bone.js';
 
 import { Object3D } from '../../../../src/core/Object3D.js';
 
-export default QUnit.module( 'Objects', () => {
+describe( 'Objects', () => {
 
-	QUnit.module( 'Bone', () => {
+	describe( 'Bone', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const bone = new Bone();
 			assert.strictEqual(
@@ -18,7 +20,7 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new Bone();
 			assert.ok( object, 'Can instantiate a Bone.' );
@@ -26,7 +28,7 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new Bone();
 			assert.ok(
@@ -37,7 +39,7 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isBone', ( assert ) => {
+		test( 'isBone', () => {
 
 			const object = new Bone();
 			assert.ok(

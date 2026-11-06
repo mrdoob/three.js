@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import puppeteer from 'puppeteer';
+import { chromium } from '@playwright/test';
 import { createServer } from '../../utils/server.js';
 
 // Run from the repository root with: npm run benchmark-node-material-instance
@@ -22,7 +22,7 @@ let browser;
 try {
 
 	await new Promise( resolve => server.listen( 0, resolve ) );
-	browser = await puppeteer.launch( { headless: true, args: [ '--enable-unsafe-webgpu' ] } );
+	browser = await chromium.launch( { channel: 'chromium', headless: true, args: [ '--enable-unsafe-webgpu' ] } );
 
 	for ( let run = 0; run < runs; run ++ ) {
 
@@ -34,7 +34,7 @@ try {
 			const errors = [];
 			page.on( 'pageerror', error => errors.push( error.message ) );
 			await page.goto( `http://localhost:${ server.address().port }/test/benchmarks/node-material-instance/${ mode.page }.html` );
-			await page.waitForFunction( () => window.benchmarkResults !== undefined, { timeout: 120000 } );
+			await page.waitForFunction( () => window.benchmarkResults !== undefined, null, { timeout: 120000 } );
 			await page.click( '#update' );
 			await page.waitForFunction( () => window.benchmarkResults.uniformRender !== undefined );
 			const result = await page.evaluate( () => window.benchmarkResults );

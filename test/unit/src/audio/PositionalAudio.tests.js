@@ -1,10 +1,12 @@
+import { assert, describe, test } from 'vitest';
+
 import { PositionalAudio } from '../../../../src/audio/PositionalAudio.js';
 
 import { Audio } from '../../../../src/audio/Audio.js';
 
-export default QUnit.module( 'Audios', () => {
+describe( 'Audios', () => {
 
-	QUnit.module( 'PositionalAudio', () => {
+	describe( 'PositionalAudio', () => {
 
 		function mock3DListener() {
 
@@ -32,7 +34,7 @@ export default QUnit.module( 'Audios', () => {
 		}
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const listener = mock3DListener();
 			const object = new PositionalAudio( listener );
@@ -44,7 +46,7 @@ export default QUnit.module( 'Audios', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const listener = mock3DListener();
 			const object = new PositionalAudio( listener );

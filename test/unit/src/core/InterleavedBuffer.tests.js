@@ -1,10 +1,12 @@
+import { assert, describe, test } from 'vitest';
+
 import { InterleavedBuffer } from '../../../../src/core/InterleavedBuffer.js';
 
 import { DynamicDrawUsage } from '../../../../src/constants.js';
 
-export default QUnit.module( 'Core', () => {
+describe( 'Core', () => {
 
-	QUnit.module( 'InterleavedBuffer', () => {
+	describe( 'InterleavedBuffer', () => {
 
 		function checkInstanceAgainstCopy( instance, copiedInstance, assert ) {
 
@@ -22,7 +24,7 @@ export default QUnit.module( 'Core', () => {
 		}
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new InterleavedBuffer();
 			assert.ok( object, 'Can instantiate an InterleavedBuffer.' );
@@ -31,7 +33,7 @@ export default QUnit.module( 'Core', () => {
 
 		// PROPERTIES
 
-		QUnit.test( 'needsUpdate', ( assert ) => {
+		test( 'needsUpdate', () => {
 
 			const a = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 4 ] ), 2 );
 			a.needsUpdate = true;
@@ -41,7 +43,7 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isInterleavedBuffer', ( assert ) => {
+		test( 'isInterleavedBuffer', () => {
 
 			const object = new InterleavedBuffer();
 			assert.ok(
@@ -51,7 +53,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'setUsage', ( assert ) => {
+		test( 'setUsage', () => {
 
 			const instance = new InterleavedBuffer();
 			instance.setUsage( DynamicDrawUsage );
@@ -60,7 +62,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'copy', ( assert ) => {
+		test( 'copy', () => {
 
 			const array = new Float32Array( [ 1, 2, 3, 7, 8, 9 ] );
 			const instance = new InterleavedBuffer( array, 3 );
@@ -70,7 +72,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'copyAt', ( assert ) => {
+		test( 'copyAt', () => {
 
 			const a = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ] ), 3 );
 			const b = new InterleavedBuffer( new Float32Array( 9 ), 3 );
@@ -84,7 +86,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'set', ( assert ) => {
+		test( 'set', () => {
 
 			const instance = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 7, 8, 9 ] ), 3 );
 
@@ -93,7 +95,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'clone', ( assert ) => {
+		test( 'clone', () => {
 
 			const instance = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 7, 8, 9 ] ), 3 );
 			instance.setUsage( DynamicDrawUsage );
@@ -102,7 +104,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'clone (views into a shared array buffer)', ( assert ) => {
+		test( 'clone (views into a shared array buffer)', () => {
 
 			// e.g. GLTFLoader creates interleaved buffers as views at different offsets into one array buffer
 
@@ -124,7 +126,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'onUpload', ( assert ) => {
+		test( 'onUpload', () => {
 
 			const a = new InterleavedBuffer();
 			const func = function () { };
@@ -136,7 +138,7 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// OTHERS
-		QUnit.test( 'count', ( assert ) => {
+		test( 'count', () => {
 
 			const instance = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 7, 8, 9 ] ), 3 );
 

@@ -1,15 +1,18 @@
+import { describe, test } from 'vitest';
+import { assert } from '../../utils/test-utils.js';
+
 import { SpotLightShadow } from '../../../../src/lights/SpotLightShadow.js';
 
 import { LightShadow } from '../../../../src/lights/LightShadow.js';
 import { SpotLight } from '../../../../src/lights/SpotLight.js';
 import { ObjectLoader } from '../../../../src/loaders/ObjectLoader.js';
 
-export default QUnit.module( 'Lights', () => {
+describe( 'Lights', () => {
 
-	QUnit.module( 'SpotLightShadow', () => {
+	describe( 'SpotLightShadow', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new SpotLightShadow();
 			assert.strictEqual(
@@ -20,7 +23,7 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new SpotLightShadow();
 			assert.ok( object, 'Can instantiate a SpotLightShadow.' );
@@ -28,7 +31,7 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isSpotLightShadow', ( assert ) => {
+		test( 'isSpotLightShadow', () => {
 
 			const object = new SpotLightShadow();
 			assert.ok(
@@ -39,7 +42,7 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// OTHERS
-		QUnit.test( 'clone/copy', ( assert ) => {
+		test( 'clone/copy', () => {
 
 			const a = new SpotLightShadow();
 			const b = new SpotLightShadow();
@@ -60,7 +63,7 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		QUnit.test( 'toJSON', ( assert ) => {
+		test( 'toJSON', () => {
 
 			const light = new SpotLight();
 			const shadow = new SpotLightShadow();

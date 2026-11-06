@@ -1,14 +1,16 @@
+import { assert, describe, test } from 'vitest';
+
 import { WebGLRenderTarget } from '../../../../src/renderers/WebGLRenderTarget.js';
 
 import { EventDispatcher } from '../../../../src/core/EventDispatcher.js';
 import { NearestFilter } from '../../../../src/constants.js';
 
-export default QUnit.module( 'Renderers', () => {
+describe( 'Renderers', () => {
 
-	QUnit.module( 'WebGLRenderTarget', () => {
+	describe( 'WebGLRenderTarget', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new WebGLRenderTarget();
 			assert.strictEqual(
@@ -22,7 +24,7 @@ export default QUnit.module( 'Renderers', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new WebGLRenderTarget();
 			assert.ok( object, 'Can instantiate a WebGLRenderTarget.' );
@@ -31,9 +33,8 @@ export default QUnit.module( 'Renderers', () => {
 
 		// PUBLIC
 
-		QUnit.test( 'dispose', ( assert ) => {
+		test( 'dispose', () => {
 
-			assert.expect( 0 );
 
 			const object = new WebGLRenderTarget();
 			object.dispose();

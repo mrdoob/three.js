@@ -1,3 +1,5 @@
+import { assert, describe, test } from 'vitest';
+
 import { DataTexture, DepthTexture, PerspectiveCamera, Scene, Texture, WebGLRenderer, WebGLRenderTarget } from 'three';
 import { GTAOPass } from '../../../../examples/jsm/postprocessing/GTAOPass.js';
 
@@ -11,11 +13,11 @@ function assertGBuffer( assert, pass, depth, normal ) {
 
 }
 
-export default QUnit.module( 'Postprocessing', () => {
+describe( 'Postprocessing', () => {
 
-	QUnit.module( 'GTAOPass', () => {
+	describe( 'GTAOPass', () => {
 
-		QUnit.test( 'external construction, resize and disposal preserve caller ownership', ( assert ) => {
+		test( 'external construction, resize and disposal preserve caller ownership', () => {
 
 			const depth = new DepthTexture( 32, 32 );
 			const normal = new Texture();
@@ -25,7 +27,7 @@ export default QUnit.module( 'Postprocessing', () => {
 			const pass = new GTAOPass( new Scene(), new PerspectiveCamera(), 32, 32, { depthTexture: depth, normalTexture: normal } );
 
 			assertGBuffer( assert, pass, depth, normal );
-			assert.notOk( pass._renderGBuffer, 'External inputs skip the internal prepass' );
+			assert.isNotOk( pass._renderGBuffer, 'External inputs skip the internal prepass' );
 			assert.strictEqual( pass.normalRenderTarget, undefined, 'No internal target is allocated' );
 			pass.setSize( 64, 48 );
 			assert.deepEqual( [ depth.image.width, depth.image.height ], [ 32, 32 ], 'External depth is not resized' );
@@ -38,7 +40,7 @@ export default QUnit.module( 'Postprocessing', () => {
 
 		} );
 
-		QUnit.test( 'internal → external → internal restores inputs and reuses the owned target', ( assert ) => {
+		test( 'internal → external → internal restores inputs and reuses the owned target', () => {
 
 			const pass = new GTAOPass( new Scene(), new PerspectiveCamera(), 32, 32 );
 			const target = pass.normalRenderTarget;
@@ -82,7 +84,7 @@ export default QUnit.module( 'Postprocessing', () => {
 
 		} );
 
-		QUnit.test( 'depth-only input and lazy internal allocation after resize', ( assert ) => {
+		test( 'depth-only input and lazy internal allocation after resize', () => {
 
 			const depth = new DepthTexture( 32, 32 );
 			const pass = new GTAOPass( new Scene(), new PerspectiveCamera(), 32, 32, { depthTexture: depth } );
@@ -99,17 +101,12 @@ export default QUnit.module( 'Postprocessing', () => {
 
 		} );
 
-		QUnit.test( 'browser previews follow external, depth-only and internal inputs', ( assert ) => {
+		test( 'browser previews follow external, depth-only and internal inputs', ( testContext ) => {
 
 			const canvas = document.createElement( 'canvas' );
 			const context = canvas.getContext( 'webgl2' );
 
-			if ( context === null ) {
-
-				assert.ok( true, 'SKIPPED: WebGL2 is not available in this environment.' );
-				return;
-
-			}
+			if ( context === null ) testContext.skip( 'WebGL2 is not available in this environment.' );
 
 			const renderer = new WebGLRenderer( { canvas, context } );
 			renderer.setSize( 4, 4 );

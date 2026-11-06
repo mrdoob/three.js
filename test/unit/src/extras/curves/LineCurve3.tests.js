@@ -1,17 +1,20 @@
+import { beforeAll, describe, test } from 'vitest';
+import { assert } from '../../../utils/test-utils.js';
+
 import { LineCurve3 } from '../../../../../src/extras/curves/LineCurve3.js';
 
 import { Curve } from '../../../../../src/extras/core/Curve.js';
 import { Vector3 } from '../../../../../src/math/Vector3.js';
 
-export default QUnit.module( 'Extras', () => {
+describe( 'Extras', () => {
 
-	QUnit.module( 'Curves', () => {
+	describe( 'Curves', () => {
 
-		QUnit.module( 'LineCurve3', ( hooks ) => {
+		describe( 'LineCurve3', () => {
 
 			let _points = undefined;
 			let _curve = undefined;
-			hooks.before( function () {
+			beforeAll( function () {
 
 				_points = [
 					new Vector3( 0, 0, 0 ),
@@ -25,7 +28,7 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// INHERITANCE
-			QUnit.test( 'Extending', ( assert ) => {
+			test( 'Extending', () => {
 
 				const object = new LineCurve3();
 				assert.strictEqual(
@@ -36,7 +39,7 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			test( 'Instancing', () => {
 
 				const object = new LineCurve3();
 				assert.ok( object, 'Can instantiate a LineCurve3.' );
@@ -44,7 +47,7 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// PROPERTIES
-			QUnit.test( 'type', ( assert ) => {
+			test( 'type', () => {
 
 				const object = new LineCurve3();
 				assert.ok(
@@ -55,7 +58,7 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// PUBLIC
-			QUnit.test( 'isLineCurve3', ( assert ) => {
+			test( 'isLineCurve3', () => {
 
 				const object = new LineCurve3();
 				assert.ok(
@@ -65,7 +68,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'getPointAt', ( assert ) => {
+			test( 'getPointAt', () => {
 
 				const curve = new LineCurve3( _points[ 0 ], _points[ 3 ] );
 
@@ -88,7 +91,7 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// OTHERS
-			QUnit.test( 'Simple curve', ( assert ) => {
+			test( 'Simple curve', () => {
 
 				let curve = _curve;
 
@@ -124,7 +127,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'getLength/getLengths', ( assert ) => {
+			test( 'getLength/getLengths', () => {
 
 				const curve = _curve;
 
@@ -153,7 +156,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'getTangent/getTangentAt', ( assert ) => {
+			test( 'getTangent/getTangentAt', () => {
 
 				const curve = _curve;
 				let tangent = new Vector3();
@@ -173,7 +176,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'computeFrenetFrames', ( assert ) => {
+			test( 'computeFrenetFrames', () => {
 
 				const curve = _curve;
 
@@ -195,7 +198,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'getUtoTmapping', ( assert ) => {
+			test( 'getUtoTmapping', () => {
 
 				const curve = _curve;
 
@@ -209,7 +212,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'getSpacedPoints', ( assert ) => {
+			test( 'getSpacedPoints', () => {
 
 				const curve = _curve;
 

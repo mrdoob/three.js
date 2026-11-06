@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { Curve } from '../../../../../src/extras/core/Curve.js';
 
-export default QUnit.module( 'Extras', () => {
+describe( 'Extras', () => {
 
-	QUnit.module( 'Core', () => {
+	describe( 'Core', () => {
 
-		QUnit.module( 'Curve', () => {
+		describe( 'Curve', () => {
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			test( 'Instancing', () => {
 
 				const object = new Curve();
 				assert.ok( object, 'Can instantiate a Curve.' );
@@ -15,7 +17,7 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// PROPERTIES
-			QUnit.test( 'type', ( assert ) => {
+			test( 'type', () => {
 
 				const object = new Curve();
 				assert.ok(

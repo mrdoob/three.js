@@ -1,8 +1,10 @@
+import { assert, describe, test } from 'vitest';
+
 import { arrayMin, arrayMax, getTypedArray } from '../../../src/utils.js';
 
-QUnit.module( 'utils', () => {
+describe( 'utils', () => {
 
-	QUnit.test( 'arrayMin', ( assert ) => {
+	test( 'arrayMin', () => {
 
 		assert.equal( arrayMin( [] ), Infinity, 'Empty array return positive infinity' );
 		assert.equal( arrayMin( [ 5 ] ), 5, 'Single valued array should return the unique value as minimum' );
@@ -14,7 +16,7 @@ QUnit.module( 'utils', () => {
 
 	} );
 
-	QUnit.test( 'arrayMax', ( assert ) => {
+	test( 'arrayMax', () => {
 
 		assert.equal( arrayMax( [] ), - Infinity, 'Empty array return negative infinity' );
 		assert.equal( arrayMax( [ 5 ] ), 5, 'Single valued array should return the unique value as maximum' );
@@ -27,7 +29,7 @@ QUnit.module( 'utils', () => {
 	} );
 
 
-	QUnit.test( 'getTypedArray', ( assert ) => {
+	test( 'getTypedArray', () => {
 
 		assert.ok( getTypedArray( 'Int8Array', new ArrayBuffer() ) instanceof Int8Array, 'Int8Array' );
 		assert.ok( getTypedArray( 'Uint8Array', new ArrayBuffer() ) instanceof Uint8Array, 'Uint8Array' );

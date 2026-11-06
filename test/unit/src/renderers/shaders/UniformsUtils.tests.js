@@ -1,3 +1,5 @@
+import { assert, describe, test } from 'vitest';
+
 import { UniformsUtils } from '../../../../../src/renderers/shaders/UniformsUtils.js';
 import { Color } from '../../../../../src/math/Color.js';
 import { Vector2 } from '../../../../../src/math/Vector2.js';
@@ -10,21 +12,21 @@ import { Texture } from '../../../../../src/textures/Texture.js';
 import { CubeReflectionMapping, UVMapping } from '../../../../../src/constants.js';
 import { CONSOLE_LEVEL } from '../../../utils/console-wrapper.js';
 
-export default QUnit.module( 'Renderers', () => {
+describe( 'Renderers', () => {
 
-	QUnit.module( 'Shaders', () => {
+	describe( 'Shaders', () => {
 
-		QUnit.module( 'UniformsUtils', () => {
+		describe( 'UniformsUtils', () => {
 
 			// INSTANCING - LEGACY
-			QUnit.test( 'Instancing', ( assert ) => {
+			test( 'Instancing', () => {
 
 				assert.ok( UniformsUtils, 'UniformsUtils is defined.' );
 
 			} );
 
 			// PUBLIC
-			QUnit.test( 'cloneUniforms copies values', ( assert ) => {
+			test( 'cloneUniforms copies values', () => {
 
 				const uniforms = {
 					floatValue: { value: 1.23 },
@@ -63,7 +65,7 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
-			QUnit.test( 'cloneUniforms clones properties', ( assert ) => {
+			test( 'cloneUniforms clones properties', () => {
 
 				const uniforms = {
 					floatValue: { value: 1.23 },
@@ -114,7 +116,7 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
-			QUnit.test( 'cloneUniforms clones arrays of objects', ( assert ) => {
+			test( 'cloneUniforms clones arrays of objects', () => {
 
 				const uniforms = {
 					vector3Array: { value: [ new Vector3( 1, 2, 3 ), new Vector3( 4, 5, 6 ) ] },
@@ -137,7 +139,7 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
-			QUnit.test( 'cloneUniforms skips render target textures', ( assert ) => {
+			test( 'cloneUniforms skips render target textures', () => {
 
 				const uniforms = {
 					textureValue: { value: new Texture( null, CubeReflectionMapping ) },

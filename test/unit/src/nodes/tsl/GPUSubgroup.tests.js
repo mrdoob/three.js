@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import {
 	Fn,
 	instanceIndex, invocationSubgroupIndex,
@@ -59,11 +60,11 @@ const DISPATCH_COUNT = WORKGROUP_SIZE * WORKGROUP_COUNT; // 256
 // `[workgroupCount, 1, 1]` array form instead skips that guard entirely.
 const DISPATCH_SIZE = [ WORKGROUP_COUNT, 1, 1 ];
 
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'subgroup functions', () => {
+		describe( 'subgroup functions', () => {
 
 			rawComputeTest( 'subgroupSize is a plausible, non-skipped value', { requiredFeature: 'subgroups' }, async ( { assert, renderer } ) => {
 

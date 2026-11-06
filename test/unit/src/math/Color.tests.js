@@ -1,23 +1,26 @@
+import { afterEach, describe, test } from 'vitest';
+import { assert } from '../../utils/test-utils.js';
+
 import { Color } from '../../../../src/math/Color.js';
 import { ColorManagement } from '../../../../src/math/ColorManagement.js';
 import { eps } from '../../utils/math-constants.js';
 import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
 import { SRGBColorSpace } from '../../../../src/constants.js';
 
-export default QUnit.module( 'Maths', () => {
+describe( 'Maths', () => {
 
-	QUnit.module( 'Color', () => {
+	describe( 'Color', () => {
 
 		const colorManagementEnabled = ColorManagement.enabled;
 
-		QUnit.testDone( () => {
+		afterEach( () => {
 
 			ColorManagement.enabled = colorManagementEnabled;
 
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -36,7 +39,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// EXPOSED CONSTANTS
-		QUnit.test( 'Color.NAMES', ( assert ) => {
+		test( 'Color.NAMES', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -45,7 +48,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( 'isColor', ( assert ) => {
+		test( 'isColor', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -57,7 +60,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'set', ( assert ) => {
+		test( 'set', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -81,7 +84,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setScalar', ( assert ) => {
+		test( 'setScalar', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -93,7 +96,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setHex', ( assert ) => {
+		test( 'setHex', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -106,7 +109,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setRGB', ( assert ) => {
+		test( 'setRGB', () => {
 
 			ColorManagement.enabled = true;
 
@@ -126,7 +129,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setHSL', ( assert ) => {
+		test( 'setHSL', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -141,7 +144,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setStyle', ( assert ) => {
+		test( 'setStyle', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -186,7 +189,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setColorName', ( assert ) => {
+		test( 'setColorName', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -198,7 +201,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'clone', ( assert ) => {
+		test( 'clone', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 			const c = new Color( 'teal' );
@@ -207,7 +210,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'copy', ( assert ) => {
+		test( 'copy', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -220,7 +223,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'copySRGBToLinear', ( assert ) => {
+		test( 'copySRGBToLinear', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -234,7 +237,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'copyLinearToSRGB', ( assert ) => {
+		test( 'copyLinearToSRGB', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -248,7 +251,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'convertSRGBToLinear', ( assert ) => {
+		test( 'convertSRGBToLinear', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -261,7 +264,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'convertLinearToSRGB', ( assert ) => {
+		test( 'convertLinearToSRGB', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -274,7 +277,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'getHex', ( assert ) => {
+		test( 'getHex', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -284,7 +287,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'getHexString', ( assert ) => {
+		test( 'getHexString', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -294,7 +297,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'getHSL', ( assert ) => {
+		test( 'getHSL', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -308,7 +311,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'getRGB', ( assert ) => {
+		test( 'getRGB', () => {
 
 			ColorManagement.enabled = true;
 
@@ -329,7 +332,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'getStyle', ( assert ) => {
+		test( 'getStyle', () => {
 
 			ColorManagement.enabled = true;
 
@@ -339,7 +342,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'offsetHSL', ( assert ) => {
+		test( 'offsetHSL', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -354,7 +357,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'add', ( assert ) => {
+		test( 'add', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -368,7 +371,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'addColors', ( assert ) => {
+		test( 'addColors', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -383,7 +386,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'addScalar', ( assert ) => {
+		test( 'addScalar', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -396,7 +399,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'sub', ( assert ) => {
+		test( 'sub', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -412,7 +415,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'multiply', ( assert ) => {
+		test( 'multiply', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -425,7 +428,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'multiplyScalar', ( assert ) => {
+		test( 'multiplyScalar', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -437,7 +440,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'lerp', ( assert ) => {
+		test( 'lerp', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -451,7 +454,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'equals', ( assert ) => {
+		test( 'equals', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -475,7 +478,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'fromArray', ( assert ) => {
+		test( 'fromArray', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -494,7 +497,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'toArray', ( assert ) => {
+		test( 'toArray', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -521,7 +524,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'toJSON', ( assert ) => {
+		test( 'toJSON', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -538,7 +541,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// OTHERS - FUNCTIONAL
-		QUnit.test( 'copyHex', ( assert ) => {
+		test( 'copyHex', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -549,7 +552,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'copyColorString', ( assert ) => {
+		test( 'copyColorString', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -560,7 +563,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setWithNum', ( assert ) => {
+		test( 'setWithNum', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -572,7 +575,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setWithString', ( assert ) => {
+		test( 'setWithString', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -582,7 +585,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setStyleRGBRed', ( assert ) => {
+		test( 'setStyleRGBRed', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -594,7 +597,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setStyleRGBARed', ( assert ) => {
+		test( 'setStyleRGBARed', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -610,7 +613,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setStyleRGBRedWithSpaces', ( assert ) => {
+		test( 'setStyleRGBRedWithSpaces', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -622,7 +625,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setStyleRGBARedWithSpaces', ( assert ) => {
+		test( 'setStyleRGBARedWithSpaces', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -634,7 +637,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setStyleRGBPercent', ( assert ) => {
+		test( 'setStyleRGBPercent', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -646,7 +649,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setStyleRGBAPercent', ( assert ) => {
+		test( 'setStyleRGBAPercent', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -662,7 +665,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setStyleRGBPercentWithSpaces', ( assert ) => {
+		test( 'setStyleRGBPercentWithSpaces', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -674,7 +677,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setStyleRGBAPercentWithSpaces', ( assert ) => {
+		test( 'setStyleRGBAPercentWithSpaces', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -690,7 +693,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setStyleRGBPercentWithDecimals', ( assert ) => {
+		test( 'setStyleRGBPercentWithDecimals', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -702,7 +705,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setStyleHSLRed', ( assert ) => {
+		test( 'setStyleHSLRed', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -714,7 +717,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setStyleHSLARed', ( assert ) => {
+		test( 'setStyleHSLARed', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -730,7 +733,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setStyleHSLRedWithSpaces', ( assert ) => {
+		test( 'setStyleHSLRedWithSpaces', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -742,7 +745,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setStyleHSLNegativeHue', ( assert ) => {
+		test( 'setStyleHSLNegativeHue', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -754,7 +757,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setStyleHSLARedWithSpaces', ( assert ) => {
+		test( 'setStyleHSLARedWithSpaces', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -770,7 +773,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setStyleHSLRedWithDecimals', ( assert ) => {
+		test( 'setStyleHSLRedWithDecimals', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -782,7 +785,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setStyleHSLARedWithDecimals', ( assert ) => {
+		test( 'setStyleHSLARedWithDecimals', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -798,7 +801,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setStyleHexSkyBlue', ( assert ) => {
+		test( 'setStyleHexSkyBlue', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -808,7 +811,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setStyleHexSkyBlueMixed', ( assert ) => {
+		test( 'setStyleHexSkyBlueMixed', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -818,7 +821,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setStyleHex2Olive', ( assert ) => {
+		test( 'setStyleHex2Olive', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -828,7 +831,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setStyleHex2OliveMixed', ( assert ) => {
+		test( 'setStyleHex2OliveMixed', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -838,7 +841,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setStyleColorName', ( assert ) => {
+		test( 'setStyleColorName', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 
@@ -848,7 +851,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'iterable', ( assert ) => {
+		test( 'iterable', () => {
 
 			ColorManagement.enabled = false; // TODO: Update and enable.
 

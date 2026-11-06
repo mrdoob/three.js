@@ -1,3 +1,5 @@
+import { assert, describe, test } from 'vitest';
+
 import { WebGLExtensions } from '../../../../../src/renderers/webgl/WebGLExtensions.js';
 
 import { CONSOLE_LEVEL } from '../../../utils/console-wrapper.js';
@@ -21,14 +23,14 @@ const WebglContextMock = function ( supportedExtensions ) {
 
 };
 
-export default QUnit.module( 'Renderers', () => {
+describe( 'Renderers', () => {
 
-	QUnit.module( 'WebGL', () => {
+	describe( 'WebGL', () => {
 
-		QUnit.module( 'WebGLExtensions', () => {
+		describe( 'WebGLExtensions', () => {
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			test( 'Instancing', () => {
 
 				const gl = new WebglContextMock();
 				const extensions = new WebGLExtensions( gl );
@@ -36,7 +38,7 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
-			QUnit.test( 'has', ( assert ) => {
+			test( 'has', () => {
 
 				const gl = new WebglContextMock( [ 'Extension1', 'Extension2' ] );
 				const extensions = new WebGLExtensions( gl );
@@ -47,7 +49,7 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
-			QUnit.test( 'get', ( assert ) => {
+			test( 'get', () => {
 
 				const gl = new WebglContextMock( [ 'Extension1', 'Extension2' ] );
 				const extensions = new WebGLExtensions( gl );

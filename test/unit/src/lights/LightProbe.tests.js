@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { LightProbe } from '../../../../src/lights/LightProbe.js';
 
 import { Light } from '../../../../src/lights/Light.js';
 
-export default QUnit.module( 'Lights', () => {
+describe( 'Lights', () => {
 
-	QUnit.module( 'LightProbe', () => {
+	describe( 'LightProbe', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new LightProbe();
 			assert.strictEqual(
@@ -18,7 +20,7 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isLightProbe', ( assert ) => {
+		test( 'isLightProbe', () => {
 
 			const object = new LightProbe();
 			assert.ok(

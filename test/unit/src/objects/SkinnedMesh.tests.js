@@ -1,14 +1,16 @@
+import { assert, describe, test } from 'vitest';
+
 import { Object3D } from '../../../../src/core/Object3D.js';
 import { Mesh } from '../../../../src/objects/Mesh.js';
 import { SkinnedMesh } from '../../../../src/objects/SkinnedMesh.js';
 import { AttachedBindMode } from '../../../../src/constants.js';
 
-export default QUnit.module( 'Objects', () => {
+describe( 'Objects', () => {
 
-	QUnit.module( 'SkinnedMesh', () => {
+	describe( 'SkinnedMesh', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const skinnedMesh = new SkinnedMesh();
 
@@ -18,7 +20,7 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new SkinnedMesh();
 			assert.ok( object, 'Can instantiate a SkinnedMesh.' );
@@ -26,7 +28,7 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new SkinnedMesh();
 			assert.ok(
@@ -36,7 +38,7 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		QUnit.test( 'bindMode', ( assert ) => {
+		test( 'bindMode', () => {
 
 			const object = new SkinnedMesh();
 			assert.ok(
@@ -47,7 +49,7 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isSkinnedMesh', ( assert ) => {
+		test( 'isSkinnedMesh', () => {
 
 			const object = new SkinnedMesh();
 			assert.ok(

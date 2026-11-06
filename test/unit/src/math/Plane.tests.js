@@ -1,3 +1,5 @@
+import { assert, describe, test } from 'vitest';
+
 import { Plane } from '../../../../src/math/Plane.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
 import { Line3 } from '../../../../src/math/Line3.js';
@@ -21,12 +23,12 @@ function comparePlane( a, b, threshold ) {
 
 }
 
-export default QUnit.module( 'Maths', () => {
+describe( 'Maths', () => {
 
-	QUnit.module( 'Plane', () => {
+	describe( 'Plane', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			let a = new Plane();
 			assert.ok( a.normal.x == 1, 'Passed!' );
@@ -49,7 +51,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( 'isPlane', ( assert ) => {
+		test( 'isPlane', () => {
 
 			const a = new Plane();
 			assert.ok( a.isPlane === true, 'Passed!' );
@@ -59,7 +61,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'set', ( assert ) => {
+		test( 'set', () => {
 
 			const a = new Plane();
 			assert.ok( a.normal.x == 1, 'Passed!' );
@@ -75,7 +77,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setComponents', ( assert ) => {
+		test( 'setComponents', () => {
 
 			const a = new Plane();
 			assert.ok( a.normal.x == 1, 'Passed!' );
@@ -91,7 +93,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setFromNormalAndCoplanarPoint', ( assert ) => {
+		test( 'setFromNormalAndCoplanarPoint', () => {
 
 			const normal = one3.clone().normalize();
 			const a = new Plane().setFromNormalAndCoplanarPoint( normal, zero3 );
@@ -101,7 +103,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setFromCoplanarPoints', ( assert ) => {
+		test( 'setFromCoplanarPoints', () => {
 
 			const a = new Plane();
 			const v1 = new Vector3( 2.0, 0.5, 0.25 );
@@ -117,7 +119,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'clone', ( assert ) => {
+		test( 'clone', () => {
 
 			const a = new Plane( new Vector3( 2.0, 0.5, 0.25 ) );
 			const b = a.clone();
@@ -126,7 +128,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'copy', ( assert ) => {
+		test( 'copy', () => {
 
 			const a = new Plane( new Vector3( x, y, z ), w );
 			const b = new Plane().copy( a );
@@ -147,7 +149,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'normalize', ( assert ) => {
+		test( 'normalize', () => {
 
 			const a = new Plane( new Vector3( 2, 0, 0 ), 2 );
 
@@ -158,7 +160,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'negate/distanceToPoint', ( assert ) => {
+		test( 'negate/distanceToPoint', () => {
 
 			const a = new Plane( new Vector3( 2, 0, 0 ), - 2 );
 
@@ -172,7 +174,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'distanceToPoint', ( assert ) => {
+		test( 'distanceToPoint', () => {
 
 			const a = new Plane( new Vector3( 2, 0, 0 ), - 2 );
 			const point = new Vector3();
@@ -183,7 +185,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'distanceToSphere', ( assert ) => {
+		test( 'distanceToSphere', () => {
 
 			const a = new Plane( new Vector3( 1, 0, 0 ), 0 );
 
@@ -198,7 +200,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'projectPoint', ( assert ) => {
+		test( 'projectPoint', () => {
 
 			let a = new Plane( new Vector3( 1, 0, 0 ), 0 );
 			const point = new Vector3();
@@ -216,7 +218,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'intersectLine', ( assert ) => {
+		test( 'intersectLine', () => {
 
 			let a = new Plane( new Vector3( 1, 0, 0 ), 0 );
 			const point = new Vector3();
@@ -242,7 +244,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'intersectsBox', ( assert ) => {
+		test( 'intersectsBox', () => {
 
 			const a = new Box3( zero3.clone(), one3.clone() );
 			const b = new Plane( new Vector3( 0, 1, 0 ), 1 );
@@ -267,7 +269,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'intersectsSphere', ( assert ) => {
+		test( 'intersectsSphere', () => {
 
 			const a = new Sphere( zero3.clone(), 1 );
 			const b = new Plane( new Vector3( 0, 1, 0 ), 1 );
@@ -280,7 +282,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'coplanarPoint', ( assert ) => {
+		test( 'coplanarPoint', () => {
 
 			const point = new Vector3();
 
@@ -294,7 +296,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'applyMatrix4/translate', ( assert ) => {
+		test( 'applyMatrix4/translate', () => {
 
 			let a = new Plane( new Vector3( 1, 0, 0 ), 0 );
 
@@ -311,7 +313,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'equals', ( assert ) => {
+		test( 'equals', () => {
 
 			const a = new Plane( new Vector3( 1, 0, 0 ), 0 );
 			const b = new Plane( new Vector3( 1, 0, 0 ), 1 );
@@ -337,4 +339,4 @@ export default QUnit.module( 'Maths', () => {
 
 } );
 
-QUnit.module( 'Plane' );
+describe( 'Plane' );

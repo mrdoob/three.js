@@ -1,11 +1,13 @@
+import { assert, describe, test } from 'vitest';
+
 import { StereoCamera } from '../../../../src/cameras/StereoCamera.js';
 
-export default QUnit.module( 'Cameras', () => {
+describe( 'Cameras', () => {
 
-	QUnit.module( 'StereoCamera', () => {
+	describe( 'StereoCamera', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new StereoCamera();
 			assert.ok( object, 'Can instantiate a StereoCamera.' );
@@ -13,7 +15,7 @@ export default QUnit.module( 'Cameras', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new StereoCamera();
 			assert.ok(

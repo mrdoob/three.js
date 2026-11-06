@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import {
 	float, vec3,
 	linearToneMapping, reinhardToneMapping, cineonToneMapping,
@@ -15,11 +16,11 @@ import { gpuTest } from './gpu-test-utils.js';
 // (https://ben3d.ca/blog/the-rise-of-test-theater). Numeric expectations for
 // the three multi-stage operators were produced once via an independent JS
 // port kept out of this file (not shipped, not imported) and hardcoded here.
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'tone mapping functions', () => {
+		describe( 'tone mapping functions', () => {
 
 			gpuTest( 'linearToneMapping() -- color * exposure, clamped to [0,1]', ( { assert } ) => {
 

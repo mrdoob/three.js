@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import { vec4, convertColorSpace, workingToColorSpace, colorSpaceToWorking, sRGBTransferEOTF, sRGBTransferOETF } from 'three/tsl';
 import { SRGBColorSpace, LinearSRGBColorSpace } from 'three';
 import { gpuTest } from './gpu-test-utils.js';
@@ -17,11 +18,11 @@ import { gpuTest } from './gpu-test-utils.js';
 //
 // The default working color space is LinearSRGBColorSpace (see
 // ColorManagement.js), which this suite never overrides.
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'color space conversion', () => {
+		describe( 'color space conversion', () => {
 
 			gpuTest( 'colorSpaceToWorking(sRGB) applies the sRGB EOTF (sRGB -> linear-sRGB working space)', ( { assert } ) => {
 

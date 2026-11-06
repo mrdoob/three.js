@@ -1,3 +1,6 @@
+import { describe, test } from 'vitest';
+import { assert } from '../../utils/test-utils.js';
+
 import { Matrix3 } from '../../../../src/math/Matrix3.js';
 import { Matrix4 } from '../../../../src/math/Matrix4.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
@@ -39,12 +42,12 @@ function eulerEquals( a, b, tolerance ) {
 
 }
 
-export default QUnit.module( 'Maths', () => {
+describe( 'Maths', () => {
 
-	QUnit.module( 'Matrix4', () => {
+	describe( 'Matrix4', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const a = new Matrix4();
 			assert.ok( a.determinant() == 1, 'Passed!' );
@@ -92,7 +95,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( 'isMatrix4', ( assert ) => {
+		test( 'isMatrix4', () => {
 
 			const a = new Matrix4();
 			assert.ok( a.isMatrix4 === true, 'Passed!' );
@@ -102,7 +105,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'set', ( assert ) => {
+		test( 'set', () => {
 
 			const b = new Matrix4();
 			assert.ok( b.determinant() == 1, 'Passed!' );
@@ -127,7 +130,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'identity', ( assert ) => {
+		test( 'identity', () => {
 
 			const b = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 			assert.ok( b.elements[ 0 ] == 0 );
@@ -155,7 +158,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'clone', ( assert ) => {
+		test( 'clone', () => {
 
 			const a = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 			const b = a.clone();
@@ -168,7 +171,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'copy', ( assert ) => {
+		test( 'copy', () => {
 
 			const a = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 			const b = new Matrix4().copy( a );
@@ -181,7 +184,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setFromMatrix3', ( assert ) => {
+		test( 'setFromMatrix3', () => {
 
 			const a = new Matrix3().set(
 				0, 1, 2,
@@ -200,7 +203,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'copyPosition', ( assert ) => {
+		test( 'copyPosition', () => {
 
 			const a = new Matrix4().set( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
 			const b = new Matrix4().set( 1, 2, 3, 0, 5, 6, 7, 0, 9, 10, 11, 0, 13, 14, 15, 16 );
@@ -212,7 +215,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'makeBasis/extractBasis', ( assert ) => {
+		test( 'makeBasis/extractBasis', () => {
 
 			const identityBasis = [ new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ), new Vector3( 0, 0, 1 ) ];
 			const a = new Matrix4().makeBasis( identityBasis[ 0 ], identityBasis[ 1 ], identityBasis[ 2 ] );
@@ -252,7 +255,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'makeRotationFromEuler/extractRotation', ( assert ) => {
+		test( 'makeRotationFromEuler/extractRotation', () => {
 
 			const testValues = [
 				new Euler( 0, 0, 0, 'XYZ' ),
@@ -284,7 +287,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'lookAt', ( assert ) => {
+		test( 'lookAt', () => {
 
 			const a = new Matrix4();
 			const expected = new Matrix4().identity();
@@ -315,7 +318,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'multiply', ( assert ) => {
+		test( 'multiply', () => {
 
 			const lhs = new Matrix4().set( 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53 );
 			const rhs = new Matrix4().set( 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131 );
@@ -341,7 +344,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'premultiply', ( assert ) => {
+		test( 'premultiply', () => {
 
 			const lhs = new Matrix4().set( 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53 );
 			const rhs = new Matrix4().set( 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131 );
@@ -367,7 +370,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'multiplyMatrices', ( assert ) => {
+		test( 'multiplyMatrices', () => {
 
 			// Reference:
 			//
@@ -410,7 +413,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'multiplyScalar', ( assert ) => {
+		test( 'multiplyScalar', () => {
 
 			const b = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 			assert.ok( b.elements[ 0 ] == 0 );
@@ -450,7 +453,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'determinant', ( assert ) => {
+		test( 'determinant', () => {
 
 			const a = new Matrix4();
 			assert.ok( a.determinant() == 1, 'Passed!' );
@@ -467,7 +470,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'determinantAffine', ( assert ) => {
+		test( 'determinantAffine', () => {
 
 			// for affine matrices (the typical object world matrix), the 3x3 result
 			// equals the full 4x4 determinant since the bottom row is [ 0, 0, 0, 1 ]
@@ -494,7 +497,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'determinantAffine (projective matrix)', ( assert ) => {
+		test( 'determinantAffine (projective matrix)', () => {
 
 			// for non-affine (projective) matrices, the bottom row is not [ 0, 0, 0, 1 ]
 			// and so the 3x3 result generally differs from the full 4x4 determinant
@@ -504,7 +507,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'transpose', ( assert ) => {
+		test( 'transpose', () => {
 
 			const a = new Matrix4();
 			let b = a.clone().transpose();
@@ -518,7 +521,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setPosition', ( assert ) => {
+		test( 'setPosition', () => {
 
 			const a = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 			const b = new Vector3( - 1, - 2, - 3 );
@@ -535,7 +538,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'invert', ( assert ) => {
+		test( 'invert', () => {
 
 			const zero = new Matrix4().set( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 			const identity = new Matrix4();
@@ -584,7 +587,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'scale', ( assert ) => {
+		test( 'scale', () => {
 
 			const a = new Matrix4().set( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
 			const b = new Vector3( 2, 3, 4 );
@@ -595,7 +598,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'getMaxScaleOnAxis', ( assert ) => {
+		test( 'getMaxScaleOnAxis', () => {
 
 			const a = new Matrix4().set( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
 			const expected = Math.sqrt( 3 * 3 + 7 * 7 + 11 * 11 );
@@ -604,7 +607,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'makeTranslation', ( assert ) => {
+		test( 'makeTranslation', () => {
 
 			const a = new Matrix4();
 			const b = new Vector3( 2, 3, 4 );
@@ -618,7 +621,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'makeRotationX', ( assert ) => {
+		test( 'makeRotationX', () => {
 
 			const a = new Matrix4();
 			const b = Math.sqrt( 3 ) / 2;
@@ -629,7 +632,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'makeRotationY', ( assert ) => {
+		test( 'makeRotationY', () => {
 
 			const a = new Matrix4();
 			const b = Math.sqrt( 3 ) / 2;
@@ -640,7 +643,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'makeRotationZ', ( assert ) => {
+		test( 'makeRotationZ', () => {
 
 			const a = new Matrix4();
 			const b = Math.sqrt( 3 ) / 2;
@@ -651,7 +654,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'makeRotationAxis', ( assert ) => {
+		test( 'makeRotationAxis', () => {
 
 			const axis = new Vector3( 1.5, 0.0, 1.0 ).normalize();
 			const radians = MathUtils.degToRad( 45 );
@@ -668,7 +671,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'makeScale', ( assert ) => {
+		test( 'makeScale', () => {
 
 			const a = new Matrix4();
 			const c = new Matrix4().set( 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 4, 0, 0, 0, 0, 1 );
@@ -678,7 +681,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'makeShear', ( assert ) => {
+		test( 'makeShear', () => {
 
 			const a = new Matrix4();
 			const c = new Matrix4().set( 1, 3, 5, 0, 1, 1, 6, 0, 2, 4, 1, 0, 0, 0, 0, 1 );
@@ -688,7 +691,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'compose/decompose', ( assert ) => {
+		test( 'compose/decompose', () => {
 
 			const tValues = [
 				new Vector3(),
@@ -762,7 +765,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'makePerspective', ( assert ) => {
+		test( 'makePerspective', () => {
 
 			const a = new Matrix4().makePerspective( - 1, 1, - 1, 1, 1, 100 );
 			const expected = new Matrix4().set(
@@ -775,7 +778,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'makeOrthographic', ( assert ) => {
+		test( 'makeOrthographic', () => {
 
 			const a = new Matrix4().makeOrthographic( - 1, 1, - 1, 1, 1, 100 );
 			const expected = new Matrix4().set(
@@ -789,7 +792,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'equals', ( assert ) => {
+		test( 'equals', () => {
 
 			const a = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
 			const b = new Matrix4().set( 0, - 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
@@ -803,7 +806,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'fromArray', ( assert ) => {
+		test( 'fromArray', () => {
 
 			const a = new Matrix4();
 			const b = new Matrix4().set( 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15, 4, 8, 12, 16 );
@@ -813,7 +816,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'toArray', ( assert ) => {
+		test( 'toArray', () => {
 
 			const a = new Matrix4().set( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
 			const noOffset = [ 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15, 4, 8, 12, 16 ];

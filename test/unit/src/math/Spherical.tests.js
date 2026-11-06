@@ -1,15 +1,17 @@
+import { assert, describe, test } from 'vitest';
+
 import { Spherical } from '../../../../src/math/Spherical.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
 import {
 	eps
 } from '../../utils/math-constants.js';
 
-export default QUnit.module( 'Maths', () => {
+describe( 'Maths', () => {
 
-	QUnit.module( 'Spherical', () => {
+	describe( 'Spherical', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			let a = new Spherical();
 			const radius = 10.0;
@@ -28,7 +30,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( 'set', ( assert ) => {
+		test( 'set', () => {
 
 			const a = new Spherical();
 			const radius = 10.0;
@@ -42,7 +44,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'clone', ( assert ) => {
+		test( 'clone', () => {
 
 			const radius = 10.0;
 			const phi = Math.acos( - 0.5 );
@@ -50,14 +52,14 @@ export default QUnit.module( 'Maths', () => {
 			const a = new Spherical( radius, phi, theta );
 			const b = a.clone();
 
-			assert.propEqual( a, b, 'Check a and b are equal after clone()' );
+			assert.deepEqual( a, b, 'Check a and b are equal after clone()' );
 
 			a.radius = 2.0;
-			assert.notPropEqual( a, b, 'Check a and b are not equal after modification' );
+			assert.notDeepEqual( a, b, 'Check a and b are not equal after modification' );
 
 		} );
 
-		QUnit.test( 'copy', ( assert ) => {
+		test( 'copy', () => {
 
 			const radius = 10.0;
 			const phi = Math.acos( - 0.5 );
@@ -65,14 +67,14 @@ export default QUnit.module( 'Maths', () => {
 			const a = new Spherical( radius, phi, theta );
 			const b = new Spherical().copy( a );
 
-			assert.propEqual( a, b, 'Check a and b are equal after copy()' );
+			assert.deepEqual( a, b, 'Check a and b are equal after copy()' );
 
 			a.radius = 2.0;
-			assert.notPropEqual( a, b, 'Check a and b are not equal after modification' );
+			assert.notDeepEqual( a, b, 'Check a and b are not equal after modification' );
 
 		} );
 
-		QUnit.test( 'makeSafe', ( assert ) => {
+		test( 'makeSafe', () => {
 
 			const EPS = 0.000001; // from source
 			const tooLow = 0.0;
@@ -93,7 +95,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setFromVector3', ( assert ) => {
+		test( 'setFromVector3', () => {
 
 			const a = new Spherical( 1, 1, 1 );
 			const b = new Vector3( 0, 0, 0 );
@@ -112,7 +114,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setFromCartesianCoords', ( assert ) => {
+		test( 'setFromCartesianCoords', () => {
 
 			const a = new Spherical( 1, 1, 1 );
 			const expected = new Spherical( 4.554032147688322, 1.3494066171539107, 2.356194490192345 );

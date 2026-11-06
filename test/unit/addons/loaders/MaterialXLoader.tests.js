@@ -1,3 +1,5 @@
+import { assert, describe, test } from 'vitest';
+
 import { CustomBlending, OneFactor, OneMinusSrcAlphaFactor, ClampToEdgeWrapping, CompressedTexture, DataTexture, HalfFloatType, LinearFilter, LinearSRGBColorSpace, LoadingManager, NearestFilter, RedFormat, RepeatWrapping, RGB_S3TC_DXT1_Format, SRGBColorSpace } from 'three';
 import { mul, vec3 } from 'three/tsl';
 import { MaterialXLoader } from '../../../../examples/jsm/loaders/MaterialXLoader.js';
@@ -159,13 +161,13 @@ function parseNodeGraph( body, type ) {
 
 }
 
-export default QUnit.module( 'Addons', () => {
+describe( 'Addons', () => {
 
-	QUnit.module( 'Loaders', () => {
+	describe( 'Loaders', () => {
 
-		QUnit.module( 'MaterialXLoader', () => {
+		describe( 'MaterialXLoader', () => {
 
-			QUnit.test( 'texture settings', ( assert ) => {
+			test( 'texture settings', () => {
 
 				const loader = new MaterialXLoader().setCrossOrigin( 'use-credentials' ).setWithCredentials( true ).setRequestHeader( { Accept: 'image/*' } );
 				const { document } = loader._parse( '<materialx version="1.39"/>', { path: 'textures/' } );
@@ -177,7 +179,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'builds nodes of a host node library through the node resolver', ( assert ) => {
+			test( 'builds nodes of a host node library through the node resolver', () => {
 
 				const text = `<?xml version="1.0"?>
 <materialx version="1.39">
@@ -210,8 +212,8 @@ export default QUnit.module( 'Addons', () => {
 				const values = collectConstValues( result.materials.test_graph.colorNode );
 
 				assert.strictEqual( result.errors.length, 0, 'The custom node is not unsupported.' );
-				assert.true( resolved.includes( 'add' ), 'The resolver is asked about every node.' );
-				assert.true( values.includes( 2 ) && values.includes( 0.5 ), 'The resolved node and the loader-built node are both part of the graph.' );
+				assert.isTrue( resolved.includes( 'add' ), 'The resolver is asked about every node.' );
+				assert.isTrue( values.includes( 2 ) && values.includes( 0.5 ), 'The resolved node and the loader-built node are both part of the graph.' );
 
 				// A channel output takes the channel of the resolved node, as for the loader's own nodes.
 				const channelText = text.replace( '<input name="in1" type="float" nodename="doubled" />', '<input name="in1" type="float" nodename="doubled" output="outy" />' ).replace( 'name="doubled" type="float"', 'name="doubled" type="vector3"' );
@@ -225,13 +227,13 @@ export default QUnit.module( 'Addons', () => {
 
 				} } );
 				assert.deepEqual( outputs, [ 'outy' ], 'The resolver receives the channel output.' );
-				assert.true( hasNode( channelResult.materials.test_graph.colorNode, ( node ) => node.isArrayElementNode === true && node.indexNode.value === 1 ), 'The loader takes the y channel of the resolved node.' );
+				assert.isTrue( hasNode( channelResult.materials.test_graph.colorNode, ( node ) => node.isArrayElementNode === true && node.indexNode.value === 1 ), 'The loader takes the y channel of the resolved node.' );
 
-				assert.true( loader.parse( text, { throwOnErrors: false } ).errors.length > 0, 'Without the resolver the custom node is unsupported.' );
+				assert.isTrue( loader.parse( text, { throwOnErrors: false } ).errors.length > 0, 'Without the resolver the custom node is unsupported.' );
 
 			} );
 
-			QUnit.test( 'reads the first output of a separate node connected without an output', ( assert ) => {
+			test( 'reads the first output of a separate node connected without an output', () => {
 
 				const text = `<?xml version="1.0"?>
 <materialx version="1.39">
@@ -266,7 +268,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'gives vector and color noise one noise per channel', ( assert ) => {
+			test( 'gives vector and color noise one noise per channel', () => {
 
 				// Function layouts are matched by return type; the TSL noise functions have generated names.
 				const usesFunction = ( category, type, returnType ) => {
@@ -278,34 +280,34 @@ export default QUnit.module( 'Addons', () => {
 
 				// MaterialX builds these variants from vec3 noise (plus an offset scalar for a fourth channel);
 				// they used to repeat the scalar noise in every channel.
-				assert.true( usesFunction( 'noise2d', 'vector2', 'vec3' ), 'noise2d vector2 samples vec3 noise.' );
-				assert.true( usesFunction( 'noise2d', 'vector4', 'vec4' ), 'noise2d vector4 samples vec4 noise.' );
-				assert.true( usesFunction( 'noise2d', 'color4', 'vec4' ), 'noise2d color4 samples vec4 noise.' );
-				assert.true( usesFunction( 'noise3d', 'vector4', 'vec4' ), 'noise3d vector4 samples vec4 noise.' );
-				assert.true( usesFunction( 'fractal3d', 'vector2', 'vec2' ), 'fractal3d vector2 uses vec2 fractal noise.' );
-				assert.true( usesFunction( 'fractal3d', 'vector4', 'vec4' ), 'fractal3d vector4 uses vec4 fractal noise.' );
-				assert.false( usesFunction( 'noise2d', 'float', 'vec3' ), 'Scalar noise stays scalar.' );
+				assert.isTrue( usesFunction( 'noise2d', 'vector2', 'vec3' ), 'noise2d vector2 samples vec3 noise.' );
+				assert.isTrue( usesFunction( 'noise2d', 'vector4', 'vec4' ), 'noise2d vector4 samples vec4 noise.' );
+				assert.isTrue( usesFunction( 'noise2d', 'color4', 'vec4' ), 'noise2d color4 samples vec4 noise.' );
+				assert.isTrue( usesFunction( 'noise3d', 'vector4', 'vec4' ), 'noise3d vector4 samples vec4 noise.' );
+				assert.isTrue( usesFunction( 'fractal3d', 'vector2', 'vec2' ), 'fractal3d vector2 uses vec2 fractal noise.' );
+				assert.isTrue( usesFunction( 'fractal3d', 'vector4', 'vec4' ), 'fractal3d vector4 uses vec4 fractal noise.' );
+				assert.isFalse( usesFunction( 'noise2d', 'float', 'vec3' ), 'Scalar noise stays scalar.' );
 
 			} );
 
-			QUnit.test( 'randomfloat and randomcolor', ( assert ) => {
+			test( 'randomfloat and randomcolor', () => {
 
 				const floatResult = parseNodeGraph( '<randomfloat name="test_node" type="float"><input name="in" type="float" value="0.5" /><input name="seed" type="integer" value="3" /></randomfloat>', 'float' );
 				assert.strictEqual( floatResult.errors.length, 0, 'randomfloat float: no errors.' );
-				assert.true( collectConstValues( floatResult.materials.test_graph.colorNode ).includes( 4096 ), 'randomfloat float: input scaled by 4096.' );
+				assert.isTrue( collectConstValues( floatResult.materials.test_graph.colorNode ).includes( 4096 ), 'randomfloat float: input scaled by 4096.' );
 
 				const integerResult = parseNodeGraph( '<randomfloat name="test_node" type="float"><input name="in" type="integer" value="3" /></randomfloat>', 'float' );
 				assert.strictEqual( integerResult.errors.length, 0, 'randomfloat integer: no errors.' );
 				const integerValues = collectConstValues( integerResult.materials.test_graph.colorNode );
-				assert.true( integerValues.includes( 3 ), 'randomfloat integer: input found.' );
-				assert.false( integerValues.includes( 4096 ), 'randomfloat integer: input not scaled.' );
+				assert.isTrue( integerValues.includes( 3 ), 'randomfloat integer: input found.' );
+				assert.isFalse( integerValues.includes( 4096 ), 'randomfloat integer: input not scaled.' );
 
 				const colorResult = parseNodeGraph( '<randomcolor name="test_node" type="color3"><input name="in" type="float" value="0.5" /></randomcolor>', 'color3' );
 				assert.strictEqual( colorResult.errors.length, 0, 'randomcolor: no errors.' );
 
 			} );
 
-			QUnit.test( 'renders <surface_unlit> without lighting', ( assert ) => {
+			test( 'renders <surface_unlit> without lighting', () => {
 
 				const text = ( inputs ) => `<?xml version="1.0"?>
 <materialx version="1.39">
@@ -319,22 +321,22 @@ export default QUnit.module( 'Addons', () => {
 				const material = opaque.materials.test_material;
 
 				assert.strictEqual( opaque.errors.length, 0, 'surface_unlit is supported.' );
-				assert.true( material.isMeshBasicNodeMaterial, 'An unlit surface makes an unlit material.' );
+				assert.isTrue( material.isMeshBasicNodeMaterial, 'An unlit surface makes an unlit material.' );
 				assert.ok( material.colorNode, 'The emission is the color.' );
-				assert.false( material.transparent, 'An opaque unlit surface stays opaque.' );
+				assert.isFalse( material.transparent, 'An opaque unlit surface stays opaque.' );
 
 				const translucent = new MaterialXLoader().parse( text( '<input name="opacity" type="float" value="0.5" />' ) ).materials.test_material;
-				assert.true( translucent.transparent, 'Opacity makes the material transparent.' );
+				assert.isTrue( translucent.transparent, 'Opacity makes the material transparent.' );
 				// MaterialX adds transparency * background to a color that already carries the opacity.
 				assert.strictEqual( translucent.blending, CustomBlending, 'The material blends its own way.' );
 				assert.strictEqual( translucent.blendSrc, OneFactor, 'The color is added as it is.' );
 				assert.strictEqual( translucent.blendDst, OneMinusSrcAlphaFactor, 'The background is weighted by the transparency.' );
-				assert.false( translucent.premultipliedAlpha, 'The color is not multiplied by alpha a second time.' );
+				assert.isFalse( translucent.premultipliedAlpha, 'The color is not multiplied by alpha a second time.' );
 				assert.ok( translucent.opacityNode, 'The opacity becomes the alpha.' );
 
 			} );
 
-			QUnit.test( 'resolves unlit surface shaders through nodegraph outputs', ( assert ) => {
+			test( 'resolves unlit surface shaders through nodegraph outputs', () => {
 
 				for ( const connection of [ 'nodegraph="NG" output="surface"', 'nodegraph="NG"' ] ) {
 
@@ -359,15 +361,15 @@ export default QUnit.module( 'Addons', () => {
 					const result = new MaterialXLoader().parse( text );
 					const material = result.materials.test_material;
 					assert.strictEqual( result.errors.length, 0, `${ connection }: shader connections resolve.` );
-					assert.true( material.isMeshBasicNodeMaterial, 'The resolved front surface selects the material class.' );
+					assert.isTrue( material.isMeshBasicNodeMaterial, 'The resolved front surface selects the material class.' );
 					assert.ok( material.positionNode, 'Displacement is retained on the unlit material.' );
-					assert.true( collectConstValues( material.colorNode ).some( ( value ) => value.isColor && value.r === 0.2 ), 'The selected output reaches the surface mapper.' );
+					assert.isTrue( collectConstValues( material.colorNode ).some( ( value ) => value.isColor && value.r === 0.2 ), 'The selected output reaches the surface mapper.' );
 
 				}
 
 			} );
 
-			QUnit.test( 'a back surface does not replace the front surface or its material class', ( assert ) => {
+			test( 'a back surface does not replace the front surface or its material class', () => {
 
 				for ( const [ front, back ] of [[ 'standard_surface', 'surface_unlit' ], [ 'surface_unlit', 'standard_surface' ]] ) {
 
@@ -386,15 +388,15 @@ export default QUnit.module( 'Addons', () => {
 					assert.strictEqual( result.errors.length, 0, 'The front shader translates.' );
 					assert.strictEqual( material.isMeshBasicNodeMaterial === true, front === 'surface_unlit', 'Only the front surface determines whether the material is unlit.' );
 					const values = collectConstValues( material.colorNode );
-					assert.true( values.some( ( value ) => value.isColor && value.r === 0.2 ), 'The front surface color is retained.' );
-					assert.false( values.some( ( value ) => value.isColor && value.r === 0.9 ), 'The back surface does not overwrite the front color.' );
-					assert.true( result.warnings.some( ( warning ) => warning.code === 'ignored-surface-input' && warning.message.includes( 'backsurfaceshader' ) ), 'Unsupported back-surface shading is reported.' );
+					assert.isTrue( values.some( ( value ) => value.isColor && value.r === 0.2 ), 'The front surface color is retained.' );
+					assert.isFalse( values.some( ( value ) => value.isColor && value.r === 0.9 ), 'The back surface does not overwrite the front color.' );
+					assert.isTrue( result.warnings.some( ( warning ) => warning.code === 'ignored-surface-input' && warning.message.includes( 'backsurfaceshader' ) ), 'Unsupported back-surface shading is reported.' );
 
 				}
 
 			} );
 
-			QUnit.test( 'builds nodes implemented by a nodegraph of the document', ( assert ) => {
+			test( 'builds nodes implemented by a nodegraph of the document', () => {
 
 				const text = `<?xml version="1.0"?>
 <materialx version="1.39">
@@ -450,20 +452,20 @@ export default QUnit.module( 'Addons', () => {
 
 				// The outer input should reach the surface shader through both custom nodes.
 				const material = result.materials.test_material;
-				assert.true( material.isMeshPhysicalNodeMaterial, 'A custom node can produce the surface shader.' );
+				assert.isTrue( material.isMeshPhysicalNodeMaterial, 'A custom node can produce the surface shader.' );
 				const surfaceValues = collectConstValues( material.colorNode );
-				assert.true( surfaceValues.includes( 0.25 ), 'The nested node uses the value of its own input.' );
-				assert.true( surfaceValues.some( ( value ) => value.isColor && value.r === 0.8 ), 'The instance input reaches the nested node through the graph interfaces.' );
+				assert.isTrue( surfaceValues.includes( 0.25 ), 'The nested node uses the value of its own input.' );
+				assert.isTrue( surfaceValues.some( ( value ) => value.isColor && value.r === 0.8 ), 'The instance input reaches the nested node through the graph interfaces.' );
 
-				assert.false( 'NG_tint' in result.materials, 'An implementation nodegraph is not a material.' );
+				assert.isFalse( 'NG_tint' in result.materials, 'An implementation nodegraph is not a material.' );
 
 				const graph = new MaterialXLoader().parse( text.replace( /<surfacematerial[\s\S]*?<\/surfacematerial>/, '' ) ).materials.test_graph;
 				const graphValues = collectConstValues( graph.colorNode );
-				assert.true( graphValues.includes( 0.5 ) && graphValues.includes( 2 ), 'Each instance binds its own inputs, or the nodedef defaults.' );
+				assert.isTrue( graphValues.includes( 0.5 ) && graphValues.includes( 2 ), 'Each instance binds its own inputs, or the nodedef defaults.' );
 
 			} );
 
-			QUnit.test( 'binds outputs, geometric defaults and textures of implementation graphs', ( assert ) => {
+			test( 'binds outputs, geometric defaults and textures of implementation graphs', () => {
 
 				const text = `<?xml version="1.0"?>
 <materialx version="1.39">
@@ -513,7 +515,7 @@ export default QUnit.module( 'Addons', () => {
 
 				const result = new MaterialXLoader( manager ).parse( text );
 				assert.strictEqual( result.errors.length, 0, 'The document translates without errors.' );
-				assert.true( requested.some( ( url ) => url.endsWith( 'photo.test' ) ), 'A file input bound through the interface loads the instance\'s file.' );
+				assert.isTrue( requested.some( ( url ) => url.endsWith( 'photo.test' ) ), 'A file input bound through the interface loads the instance\'s file.' );
 
 				// separate2 already extracts the channels; graph outputs should not extract them again.
 				let elementNodes = 0;
@@ -527,7 +529,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'keeps named and default implementation outputs separate', ( assert ) => {
+			test( 'keeps named and default implementation outputs separate', () => {
 
 				const text = `<materialx version="1.39">
   <nodedef name="ND_pair" node="pair">
@@ -553,12 +555,12 @@ export default QUnit.module( 'Addons', () => {
 
 				const result = new MaterialXLoader().parse( text );
 				const values = collectConstValues( result.materials.G.colorNode );
-				assert.true( values.includes( 0.8 ), 'The named output uses its own value.' );
-				assert.true( values.includes( 0.2 ), 'Reading the named output does not replace the default output.' );
+				assert.isTrue( values.includes( 0.8 ), 'The named output uses its own value.' );
+				assert.isTrue( values.includes( 0.2 ), 'Reading the named output does not replace the default output.' );
 
 			} );
 
-			QUnit.test( 'uses nodedef output order for an omitted implementation selector', ( assert ) => {
+			test( 'uses nodedef output order for an omitted implementation selector', () => {
 
 				const text = `<materialx version="1.39">
   <nodedef name="ND_pair" node="pair">
@@ -579,12 +581,12 @@ export default QUnit.module( 'Addons', () => {
 
 				const result = new MaterialXLoader().parse( text );
 				const values = collectConstValues( result.materials.G.colorNode );
-				assert.true( values.includes( 0.8 ), 'The first nodedef output is the default.' );
-				assert.false( values.includes( 0.2 ), 'An output named out does not take priority over the nodedef order.' );
+				assert.isTrue( values.includes( 0.8 ), 'The first nodedef output is the default.' );
+				assert.isFalse( values.includes( 0.2 ), 'An output named out does not take priority over the nodedef order.' );
 
 			} );
 
-			QUnit.test( 'supports channel selectors on custom color nodes', ( assert ) => {
+			test( 'supports channel selectors on custom color nodes', () => {
 
 				const text = `<materialx version="1.39">
   <nodedef name="ND_color" node="custom_color"><output name="out" type="color3"/></nodedef>
@@ -599,11 +601,11 @@ export default QUnit.module( 'Addons', () => {
 </materialx>`;
 
 				const result = new MaterialXLoader().parse( text );
-				assert.true( hasNode( result.materials.G.colorNode, ( node ) => node.isArrayElementNode && node.indexNode.value === 1 ), 'outg reads the green channel of the default output.' );
+				assert.isTrue( hasNode( result.materials.G.colorNode, ( node ) => node.isArrayElementNode && node.indexNode.value === 1 ), 'outg reads the green channel of the default output.' );
 
 			} );
 
-			QUnit.test( 'selects versioned implementation graphs and their nodedef defaults', ( assert ) => {
+			test( 'selects versioned implementation graphs and their nodedef defaults', () => {
 
 				const text = ( selector ) => `<materialx version="1.39">
 	<nodedef name="ND_version1" node="versioned" version="1.0">
@@ -636,13 +638,13 @@ export default QUnit.module( 'Addons', () => {
 					assert.strictEqual( result.errors.length, 0, `${ selector }: the selected implementation binds its interface.` );
 					assert.deepEqual( Object.keys( result.materials ), [ 'test_graph' ], 'Neither implementation graph is exposed as a material.' );
 					const values = collectConstValues( result.materials.test_graph.colorNode );
-					assert.true( values.includes( amount ) && values.includes( multiplier ), `${ selector }: defaults and implementation use the same nodedef.` );
+					assert.isTrue( values.includes( amount ) && values.includes( multiplier ), `${ selector }: defaults and implementation use the same nodedef.` );
 
 				}
 
 			} );
 
-			QUnit.test( 'uses the image default for an empty filename interface', ( assert ) => {
+			test( 'uses the image default for an empty filename interface', () => {
 
 				const text = `<materialx version="1.39">
 	<nodedef name="ND_picture" node="picture">
@@ -665,11 +667,11 @@ export default QUnit.module( 'Addons', () => {
 				const result = new MaterialXLoader().parse( text );
 				const material = Object.values( result.materials )[ 0 ];
 				assert.strictEqual( result.errors.length, 0, 'The graph translates without errors.' );
-				assert.true( collectConstValues( material.colorNode ).some( ( value ) => value.isColor && value.r === 0.2 ), 'The image default reaches the graph output.' );
+				assert.isTrue( collectConstValues( material.colorNode ).some( ( value ) => value.isColor && value.r === 0.2 ), 'The image default reaches the graph output.' );
 
 			} );
 
-			QUnit.test( 'selects the first implementation when no target is specified', ( assert ) => {
+			test( 'selects the first implementation when no target is specified', () => {
 
 				const text = `<materialx version="1.39">
 	<nodedef name="ND_n" node="custom">
@@ -696,12 +698,12 @@ export default QUnit.module( 'Addons', () => {
 				const result = new MaterialXLoader().parse( text );
 				const material = Object.values( result.materials )[ 0 ];
 				assert.strictEqual( result.errors.length, 0, 'The graph translates without errors.' );
-				assert.true( collectConstValues( material.colorNode ).includes( 0.2 ), 'The first implementation is used.' );
-				assert.false( collectConstValues( material.colorNode ).includes( 0.8 ), 'The last implementation does not replace the first.' );
+				assert.isTrue( collectConstValues( material.colorNode ).includes( 0.2 ), 'The first implementation is used.' );
+				assert.isFalse( collectConstValues( material.colorNode ).includes( 0.8 ), 'The last implementation does not replace the first.' );
 
 			} );
 
-			QUnit.test( 'resolves custom surface shaders through nodegraph outputs', ( assert ) => {
+			test( 'resolves custom surface shaders through nodegraph outputs', () => {
 
 				for ( const [ shader, input ] of [[ 'standard_surface', 'base_color' ], [ 'surface_unlit', 'emission_color' ]] ) {
 
@@ -729,13 +731,13 @@ export default QUnit.module( 'Addons', () => {
 					const material = Object.values( result.materials )[ 0 ];
 					assert.strictEqual( result.errors.length, 0, 'The graph translates without errors.' );
 					assert.strictEqual( material.isMeshBasicNodeMaterial === true, shader === 'surface_unlit', 'The implemented shader selects its material class.' );
-					assert.true( collectConstValues( material.colorNode ).some( ( value ) => value.isColor && value.r === 0.2 ), 'The implementation binds its default tint.' );
+					assert.isTrue( collectConstValues( material.colorNode ).some( ( value ) => value.isColor && value.r === 0.2 ), 'The implementation binds its default tint.' );
 
 				}
 
 			} );
 
-			QUnit.test( 'supports hsvadjust, facingratio and triplanarprojection', ( assert ) => {
+			test( 'supports hsvadjust, facingratio and triplanarprojection', () => {
 
 				const nodes = [
 					'<hsvadjust name="test_node" type="color3"><input name="amount" type="vector3" value="0.5, 1, 1" /></hsvadjust>',
@@ -761,7 +763,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'maps <displacement> onto vertex displacement instead of failing', ( assert ) => {
+			test( 'maps <displacement> onto vertex displacement instead of failing', () => {
 
 				const result = new MaterialXLoader().parse( MATERIAL_X_DISPLACEMENT );
 				const material = result.materials.test_material;
@@ -775,7 +777,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'waits for dependent textures before resolving', async ( assert ) => {
+			test( 'waits for dependent textures before resolving', async () => {
 
 				const progressURLs = [];
 				const manager = new LoadingManager( undefined, ( url ) => progressURLs.push( url ) );
@@ -793,7 +795,7 @@ export default QUnit.module( 'Addons', () => {
 
 				await textureLoader.started;
 				await Promise.resolve();
-				assert.false( resolved, 'The MaterialX load remains pending while its texture is pending.' );
+				assert.isFalse( resolved, 'The MaterialX load remains pending while its texture is pending.' );
 
 				const expectedURL = documentURL.slice( 0, documentURL.lastIndexOf( '/' ) + 1 ) + 'texture.test';
 				assert.strictEqual( textureLoader.pending[ 0 ].url, expectedURL, 'Handler URLs are resolved against the document path.' );
@@ -810,7 +812,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'reports failed dependent textures as warnings, matching GLTFLoader', async ( assert ) => {
+			test( 'reports failed dependent textures as warnings, matching GLTFLoader', async () => {
 
 				const manager = new LoadingManager();
 				const textureLoader = new ControlledTextureLoader( manager );
@@ -830,7 +832,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'keeps LoadingManager active through the loader callback', async ( assert ) => {
+			test( 'keeps LoadingManager active through the loader callback', async () => {
 
 				let managerComplete = false;
 				const manager = new LoadingManager( () => {
@@ -846,7 +848,7 @@ export default QUnit.module( 'Addons', () => {
 
 					new MaterialXLoader( manager ).load( documentURL, ( result ) => {
 
-						assert.false( managerComplete, 'LoadingManager remains active while the loader callback runs.' );
+						assert.isFalse( managerComplete, 'LoadingManager remains active while the loader callback runs.' );
 						resolve( result );
 
 					}, undefined, reject );
@@ -858,11 +860,11 @@ export default QUnit.module( 'Addons', () => {
 				await loadPromise;
 				URL.revokeObjectURL( documentURL );
 
-				assert.true( managerComplete, 'LoadingManager completes after the loader callback.' );
+				assert.isTrue( managerComplete, 'LoadingManager completes after the loader callback.' );
 
 			} );
 
-			QUnit.test( 'applies nodedef defaults to inputs the document omits', ( assert ) => {
+			test( 'applies nodedef defaults to inputs the document omits', () => {
 
 				const document = `<?xml version="1.0"?>
 <materialx version="1.39">
@@ -885,7 +887,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'has a nodedef default for every input of every supported node', ( assert ) => {
+			test( 'has a nodedef default for every input of every supported node', () => {
 
 				const supported = new Set( [ ...Object.keys( MtlXLibrary ), ...createMaterialXCompileRegistry().keys(), 'ifgreater', 'ifgreatereq', 'ifequal' ] );
 				const convertible = new Set( [ 'float', 'integer', 'boolean', 'vector2', 'vector3', 'vector4', 'color3', 'color4' ] );
@@ -928,7 +930,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'surface shaders use nodedef defaults for omitted inputs', ( assert ) => {
+			test( 'surface shaders use nodedef defaults for omitted inputs', () => {
 
 				const translate = ( shader ) => new MaterialXLoader().parse( `<?xml version="1.0"?>
 <materialx version="1.39">
@@ -959,18 +961,18 @@ export default QUnit.module( 'Addons', () => {
 		<input name="alpha" type="float" value="0.5" />
 	</gltf_pbr>` );
 
-				assert.false( gltfOpaque.transparent, 'gltf_pbr: alpha without alpha_mode (default OPAQUE) is not transparent.' );
+				assert.isFalse( gltfOpaque.transparent, 'gltf_pbr: alpha without alpha_mode (default OPAQUE) is not transparent.' );
 
 				const gltfBlend = translate( `<gltf_pbr name="test_surface" type="surfaceshader">
 		<input name="alpha" type="float" value="0.5" />
 		<input name="alpha_mode" type="integer" value="2" />
 	</gltf_pbr>` );
 
-				assert.true( gltfBlend.transparent, 'gltf_pbr: alpha with alpha_mode BLEND is transparent.' );
+				assert.isTrue( gltfBlend.transparent, 'gltf_pbr: alpha with alpha_mode BLEND is transparent.' );
 
 			} );
 
-			QUnit.test( 'resolves nodedef overloads without a nodedef attribute', ( assert ) => {
+			test( 'resolves nodedef overloads without a nodedef attribute', () => {
 
 				const document = `<?xml version="1.0"?>
 <materialx version="1.39">
@@ -1009,7 +1011,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'resolves default nodedef versions and document nodedefs like MaterialX', ( assert ) => {
+			test( 'resolves default nodedef versions and document nodedefs like MaterialX', () => {
 
 				// Maps node names to the names of their resolved nodedefs.
 				const resolveNodeDefs = ( body ) => {
@@ -1053,11 +1055,11 @@ export default QUnit.module( 'Addons', () => {
 	</convert>
 </materialx>`, { throwOnErrors: false, interfaceValidator: createStrictInterfaceValidator() } );
 
-				assert.true( result.errors.some( ( entry ) => /rgba/.test( entry.message ) ), 'The rgba output of UsdUVTexture 2.2 is not an output of the default 2.3.' );
+				assert.isTrue( result.errors.some( ( entry ) => /rgba/.test( entry.message ) ), 'The rgba output of UsdUVTexture 2.2 is not an output of the default 2.3.' );
 
 			} );
 
-			QUnit.test( 'hextilednormalmap translates with only a file input', ( assert ) => {
+			test( 'hextilednormalmap translates with only a file input', () => {
 
 				const manager = new LoadingManager();
 				manager.addHandler( /\.test$/i, new ControlledTextureLoader( manager ) );
@@ -1082,7 +1084,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'node library parameter names are declared by the nodedef registry', ( assert ) => {
+			test( 'node library parameter names are declared by the nodedef registry', () => {
 
 				const problems = [];
 
@@ -1109,7 +1111,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'propagates DataTexture-style results from handlers like EXRLoader', async ( assert ) => {
+			test( 'propagates DataTexture-style results from handlers like EXRLoader', async () => {
 
 				const manager = new LoadingManager();
 				const textureLoader = new ControlledTextureLoader( manager );
@@ -1133,25 +1135,25 @@ export default QUnit.module( 'Addons', () => {
 				const textureNode = findTexture( material, dataTexture.image );
 
 				assert.ok( textureNode, 'The texture node receives the DataTexture image data.' );
-				assert.true( textureNode.isDataTexture, 'isDataTexture is propagated so the renderer uploads raw pixel data.' );
+				assert.isTrue( textureNode.isDataTexture, 'isDataTexture is propagated so the renderer uploads raw pixel data.' );
 				assert.strictEqual( textureNode.type, HalfFloatType, 'The half-float texture type is propagated.' );
 				assert.strictEqual( textureNode.format, RedFormat, 'The texture format is propagated.' );
 				assert.strictEqual( textureNode.minFilter, LinearFilter, 'The min filter is propagated.' );
-				assert.false( textureNode.generateMipmaps, 'generateMipmaps is propagated so loaders can opt out of mipmaps.' );
+				assert.isFalse( textureNode.generateMipmaps, 'generateMipmaps is propagated so loaders can opt out of mipmaps.' );
 				assert.strictEqual( textureNode.magFilter, NearestFilter, 'The mag filter is propagated.' );
 				assert.strictEqual( textureNode.colorSpace, LinearSRGBColorSpace, 'The color space is propagated.' );
-				assert.true( textureNode.flipY, 'Bottom-first data textures are flipped to match the top-first MaterialX orientation.' );
+				assert.isTrue( textureNode.flipY, 'Bottom-first data textures are flipped to match the top-first MaterialX orientation.' );
 				assert.strictEqual( textureNode.unpackAlignment, 1, 'Odd-width half-float rows retain their packed alignment.' );
 				assert.ok( textureNode instanceof DataTexture, 'The loaded texture retains its subtype.' );
 
 				const clone = textureNode.clone();
-				assert.true( clone.isDataTexture, 'Cloning preserves raw pixel upload behavior.' );
+				assert.isTrue( clone.isDataTexture, 'Cloning preserves raw pixel upload behavior.' );
 				assert.strictEqual( clone.image, dataTexture.image, 'Cloning preserves the pixel data.' );
 				assert.strictEqual( clone.unpackAlignment, 1, 'Cloning preserves row alignment.' );
 
 			} );
 
-			QUnit.test( 'shares loaded textures by URI and address modes without modifying handler results', async ( assert ) => {
+			test( 'shares loaded textures by URI and address modes without modifying handler results', async () => {
 
 				const manager = new LoadingManager();
 				const textureLoader = new ControlledTextureLoader( manager );
@@ -1193,13 +1195,13 @@ export default QUnit.module( 'Addons', () => {
 				assert.strictEqual( first.wrapS, RepeatWrapping, 'Periodic addressing is applied.' );
 				assert.strictEqual( clamped.wrapS, ClampToEdgeWrapping, 'Clamp addressing is applied.' );
 				assert.strictEqual( clamped.wrapT, RepeatWrapping, 'The other axis keeps periodic addressing.' );
-				assert.false( first.flipY, 'Top-first handler textures are not flipped again.' );
+				assert.isFalse( first.flipY, 'Top-first handler textures are not flipped again.' );
 				assert.strictEqual( source.wrapS, ClampToEdgeWrapping, 'The handler texture wrapping is unchanged.' );
-				assert.true( source.flipY, 'The handler texture orientation is unchanged.' );
+				assert.isTrue( source.flipY, 'The handler texture orientation is unchanged.' );
 
 			} );
 
-			QUnit.test( 'preserves compressed textures and their mipmaps', async ( assert ) => {
+			test( 'preserves compressed textures and their mipmaps', async () => {
 
 				const manager = new LoadingManager();
 				const textureLoader = new ControlledTextureLoader( manager );
@@ -1223,9 +1225,9 @@ export default QUnit.module( 'Addons', () => {
 				assert.deepEqual( loaded.mipmaps, mipmaps, 'Every mip level retains its dimensions and compressed data.' );
 				assert.strictEqual( loaded.minFilter, source.minFilter, 'The mipmap filter is preserved.' );
 				assert.strictEqual( loaded.colorSpace, SRGBColorSpace, 'The color space is preserved.' );
-				assert.false( loaded.generateMipmaps, 'Compressed mipmaps are not regenerated.' );
-				assert.false( loaded.flipY, 'Compressed textures are not flipped.' );
-				assert.true( loaded.clone().isCompressedTexture, 'Cloning preserves compressed upload behavior.' );
+				assert.isFalse( loaded.generateMipmaps, 'Compressed mipmaps are not regenerated.' );
+				assert.isFalse( loaded.flipY, 'Compressed textures are not flipped.' );
+				assert.isTrue( loaded.clone().isCompressedTexture, 'Cloning preserves compressed upload behavior.' );
 
 			} );
 

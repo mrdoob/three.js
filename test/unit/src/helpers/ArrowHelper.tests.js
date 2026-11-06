@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { ArrowHelper } from '../../../../src/helpers/ArrowHelper.js';
 
 import { Object3D } from '../../../../src/core/Object3D.js';
 
-export default QUnit.module( 'Helpers', () => {
+describe( 'Helpers', () => {
 
-	QUnit.module( 'ArrowHelper', () => {
+	describe( 'ArrowHelper', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new ArrowHelper();
 			assert.strictEqual(
@@ -18,7 +20,7 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new ArrowHelper();
 			assert.ok( object, 'Can instantiate an ArrowHelper.' );
@@ -26,7 +28,7 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new ArrowHelper();
 			assert.ok(
@@ -38,9 +40,8 @@ export default QUnit.module( 'Helpers', () => {
 
 		// PUBLIC
 
-		QUnit.test( 'dispose', ( assert ) => {
+		test( 'dispose', () => {
 
-			assert.expect( 0 );
 
 			const object = new ArrowHelper();
 			object.dispose();

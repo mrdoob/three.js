@@ -1,3 +1,6 @@
+import { describe, test } from 'vitest';
+import { assert } from '../../utils/test-utils.js';
+
 import { Object3D } from '../../../../src/core/Object3D.js';
 
 import { Vector3 } from '../../../../src/math/Vector3.js';
@@ -29,9 +32,9 @@ const matrixEquals4 = ( a, b ) => {
 
 };
 
-export default QUnit.module( 'Core', () => {
+describe( 'Core', () => {
 
-	QUnit.module( 'Object3D', () => {
+	describe( 'Object3D', () => {
 
 		const RadToDeg = 180 / Math.PI;
 
@@ -54,7 +57,7 @@ export default QUnit.module( 'Core', () => {
 		};
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new Object3D();
 			assert.strictEqual(
@@ -65,7 +68,7 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new Object3D();
 			assert.ok( object, 'Can instantiate an Object3D.' );
@@ -74,7 +77,7 @@ export default QUnit.module( 'Core', () => {
 
 		// PROPERTIES
 
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new Object3D();
 			assert.ok(
@@ -85,7 +88,7 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// STATIC
-		QUnit.test( 'DEFAULT_UP', ( assert ) => {
+		test( 'DEFAULT_UP', () => {
 
 			const currentDefaultUp = new Vector3().copy( Object3D.DEFAULT_UP );
 			const v = new Vector3();
@@ -112,7 +115,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'DEFAULT_MATRIX_AUTO_UPDATE', ( assert ) => {
+		test( 'DEFAULT_MATRIX_AUTO_UPDATE', () => {
 
 			const currentDefaultMatrixAutoUpdate = Object3D.DEFAULT_MATRIX_AUTO_UPDATE;
 
@@ -145,7 +148,7 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isObject3D', ( assert ) => {
+		test( 'isObject3D', () => {
 
 			const object = new Object3D();
 			assert.ok(
@@ -161,7 +164,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'applyMatrix4', ( assert ) => {
+		test( 'applyMatrix4', () => {
 
 			const a = new Object3D();
 			const m = new Matrix4();
@@ -183,7 +186,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'applyMatrix4 (pivot)', ( assert ) => {
+		test( 'applyMatrix4 (pivot)', () => {
 
 			const object = new Object3D();
 			object.position.set( 1, 2, 3 );
@@ -202,7 +205,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'applyQuaternion', ( assert ) => {
+		test( 'applyQuaternion', () => {
 
 			const a = new Object3D();
 			const sqrt = 0.5 * Math.sqrt( 2 );
@@ -221,7 +224,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'setRotationFromAxisAngle', ( assert ) => {
+		test( 'setRotationFromAxisAngle', () => {
 
 			const a = new Object3D();
 			const axis = new Vector3( 0, 1, 0 );
@@ -243,7 +246,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'setRotationFromEuler', ( assert ) => {
+		test( 'setRotationFromEuler', () => {
 
 			const a = new Object3D();
 			const rotation = new Euler( ( 45 / RadToDeg ), 0, Math.PI );
@@ -256,7 +259,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'setRotationFromMatrix', ( assert ) => {
+		test( 'setRotationFromMatrix', () => {
 
 			const a = new Object3D();
 			const m = new Matrix4();
@@ -272,7 +275,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'setRotationFromQuaternion', ( assert ) => {
+		test( 'setRotationFromQuaternion', () => {
 
 			const a = new Object3D();
 			const rotation = new Quaternion().setFromEuler( new Euler( Math.PI, 0, - Math.PI ) );
@@ -284,7 +287,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'rotateX', ( assert ) => {
+		test( 'rotateX', () => {
 
 			const obj = new Object3D();
 			const angleInRad = 1.562;
@@ -294,7 +297,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'rotateY', ( assert ) => {
+		test( 'rotateY', () => {
 
 			const obj = new Object3D();
 			const angleInRad = - 0.346;
@@ -304,7 +307,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'rotateZ', ( assert ) => {
+		test( 'rotateZ', () => {
 
 			const obj = new Object3D();
 			const angleInRad = 1;
@@ -314,14 +317,14 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'translateOnAxis', ( assert ) => {
+		test( 'translateOnAxis', () => {
 
 			const obj = new Object3D();
 			obj.translateOnAxis( new Vector3( 1, 0, 0 ), 1 );
 			obj.translateOnAxis( new Vector3( 0, 1, 0 ), 1.23 );
 			obj.translateOnAxis( new Vector3( 0, 0, 1 ), - 4.56 );
 
-			assert.propEqual( obj.position, {
+			assert.deepEqual( { ...obj.position }, {
 				x: 1,
 				y: 1.23,
 				z: - 4.56,
@@ -329,7 +332,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'translateX', ( assert ) => {
+		test( 'translateX', () => {
 
 			const obj = new Object3D();
 			obj.translateX( 1.234 );
@@ -338,7 +341,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'translateY', ( assert ) => {
+		test( 'translateY', () => {
 
 			const obj = new Object3D();
 			obj.translateY( 1.234 );
@@ -347,7 +350,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'translateZ', ( assert ) => {
+		test( 'translateZ', () => {
 
 			const obj = new Object3D();
 			obj.translateZ( 1.234 );
@@ -356,7 +359,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'localToWorld', ( assert ) => {
+		test( 'localToWorld', () => {
 
 			const v = new Vector3();
 			const expectedPosition = new Vector3( 5, - 1, - 4 );
@@ -386,7 +389,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'worldToLocal', ( assert ) => {
+		test( 'worldToLocal', () => {
 
 			const v = new Vector3();
 			const expectedPosition = new Vector3( - 1, 0.5, - 1 );
@@ -416,7 +419,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'lookAt', ( assert ) => {
+		test( 'lookAt', () => {
 
 			const obj = new Object3D();
 			obj.lookAt( new Vector3( 0, - 1, 1 ) );
@@ -425,7 +428,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'add/remove/removeFromParent/clear', ( assert ) => {
+		test( 'add/remove/removeFromParent/clear', () => {
 
 			const a = new Object3D();
 			const child1 = new Object3D();
@@ -472,7 +475,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'attach', ( assert ) => {
+		test( 'attach', () => {
 
 			const object = new Object3D();
 			const oldParent = new Object3D();
@@ -529,7 +532,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'attach (pivot)', ( assert ) => {
+		test( 'attach (pivot)', () => {
 
 			const object = new Object3D();
 			object.position.set( 1, 2, 3 );
@@ -549,7 +552,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'getObjectById/getObjectByName/getObjectByProperty', ( assert ) => {
+		test( 'getObjectById/getObjectByName/getObjectByProperty', () => {
 
 			const parent = new Object3D();
 			const childName = new Object3D();
@@ -570,7 +573,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'getObjectsByProperty', ( assert ) => {
+		test( 'getObjectsByProperty', () => {
 
 			const parent = new Object3D();
 			const childName = new Object3D();
@@ -591,7 +594,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'getWorldPosition', ( assert ) => {
+		test( 'getWorldPosition', () => {
 
 			const a = new Object3D();
 			const b = new Object3D();
@@ -616,7 +619,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'getWorldScale', ( assert ) => {
+		test( 'getWorldScale', () => {
 
 			const a = new Object3D();
 			const m = new Matrix4().makeScale( x, y, z );
@@ -628,7 +631,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'getWorldDirection', ( assert ) => {
+		test( 'getWorldDirection', () => {
 
 			const a = new Object3D();
 			const expected = new Vector3( 0, - 0.5 * Math.sqrt( 2 ), 0.5 * Math.sqrt( 2 ) );
@@ -646,7 +649,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'localTransformVariableInstantiation', ( assert ) => {
+		test( 'localTransformVariableInstantiation', () => {
 
 			const a = new Object3D();
 			const b = new Object3D();
@@ -675,7 +678,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'traverse/traverseVisible/traverseAncestors', ( assert ) => {
+		test( 'traverse/traverseVisible/traverseAncestors', () => {
 
 			const a = new Object3D();
 			const b = new Object3D();
@@ -721,7 +724,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'updateMatrix', ( assert ) => {
+		test( 'updateMatrix', () => {
 
 			const a = new Object3D();
 			a.position.set( 2, 3, 4 );
@@ -748,7 +751,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'updateMatrixWorld', ( assert ) => {
+		test( 'updateMatrixWorld', () => {
 
 			const parent = new Object3D();
 			const child = new Object3D();
@@ -925,7 +928,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'updateWorldMatrix', ( assert ) => {
+		test( 'updateWorldMatrix', () => {
 
 			const object = new Object3D();
 			const parent = new Object3D();
@@ -1103,7 +1106,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'toJSON', ( assert ) => {
+		test( 'toJSON', () => {
 
 			const a = new Object3D();
 			const child = new Object3D();
@@ -1188,11 +1191,12 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'clone', ( assert ) => {
+		test( 'clone', () => {
 
 			/* eslint-disable prefer-const*/
 			let a;
 			const b = new Object3D();
+
 
 			assert.strictEqual( a, undefined, 'Undefined pre-clone()' );
 
@@ -1200,11 +1204,11 @@ export default QUnit.module( 'Core', () => {
 			assert.notStrictEqual( a, b, 'Defined but separate instances post-clone()' );
 
 			a.uuid = b.uuid;
-			assert.deepEqual( a, b, 'But identical properties' );
+			assert.equalProperties( a, b, 'But identical properties' );
 
 		} );
 
-		QUnit.test( 'copy', ( assert ) => {
+		test( 'copy', () => {
 
 			const a = new Object3D();
 			const b = new Object3D();
@@ -1218,7 +1222,7 @@ export default QUnit.module( 'Core', () => {
 			b.quaternion.set( x, y, z, w );
 			b.scale.set( 2, 3, 4 );
 
-			// bogus QUnit.test values
+			// bogus test values
 			b.matrix.set( 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 );
 			b.matrixWorld.set( 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 );
 
@@ -1255,7 +1259,7 @@ export default QUnit.module( 'Core', () => {
 			a.children[ 0 ].uuid = b.children[ 0 ].uuid;
 			a.children[ 0 ].children[ 0 ].uuid = b.children[ 0 ].children[ 0 ].uuid;
 
-			assert.deepEqual( a, b, 'Objects are equal post-copy()' );
+			assert.equalProperties( a, b, 'Objects are equal post-copy()' );
 
 		} );
 

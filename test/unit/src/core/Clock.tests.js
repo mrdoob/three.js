@@ -1,14 +1,17 @@
+import { afterEach, describe, test, vi } from 'vitest';
+import { assert } from '../../utils/test-utils.js';
+
 import { Clock } from '../../../../src/core/Clock.js';
 
-export default QUnit.module( 'Core', () => {
+describe( 'Core', () => {
 
-	QUnit.module( 'Clock', () => {
+	describe( 'Clock', () => {
+
+		afterEach( () => vi.unstubAllGlobals() );
 
 		function mockPerformance() {
 
-			const reference = ( typeof global !== 'undefined' ) ? global : self;
-
-			reference.performance = {
+			vi.stubGlobal( 'performance', {
 				deltaTime: 0,
 
 				next: function ( delta ) {
@@ -23,12 +26,12 @@ export default QUnit.module( 'Core', () => {
 
 				}
 
-			};
+			} );
 
 		}
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			// no params
 			const object = new Clock();
@@ -41,11 +44,10 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// OTHERS
-		QUnit.test( 'clock with performance', ( assert ) => {
+		test( 'clock with performance', () => {
 
 			if ( typeof performance === 'undefined' ) {
 
-				assert.expect( 0 );
 				return;
 
 			}

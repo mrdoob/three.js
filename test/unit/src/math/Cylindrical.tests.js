@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { Cylindrical } from '../../../../src/math/Cylindrical.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
 import { eps } from '../../utils/math-constants.js';
 
-export default QUnit.module( 'Maths', () => {
+describe( 'Maths', () => {
 
-	QUnit.module( 'Cylindrical', () => {
+	describe( 'Cylindrical', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			let a = new Cylindrical();
 			const radius = 10.0;
@@ -26,7 +28,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'set', ( assert ) => {
+		test( 'set', () => {
 
 			const a = new Cylindrical();
 			const radius = 10.0;
@@ -40,7 +42,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'clone', ( assert ) => {
+		test( 'clone', () => {
 
 			const radius = 10.0;
 			const theta = Math.PI;
@@ -48,14 +50,14 @@ export default QUnit.module( 'Maths', () => {
 			const a = new Cylindrical( radius, theta, y );
 			const b = a.clone();
 
-			assert.propEqual( a, b, 'Check a and b are equal after clone()' );
+			assert.deepEqual( a, b, 'Check a and b are equal after clone()' );
 
 			a.radius = 1;
-			assert.notPropEqual( a, b, 'Check a and b are not equal after modification' );
+			assert.notDeepEqual( a, b, 'Check a and b are not equal after modification' );
 
 		} );
 
-		QUnit.test( 'copy', ( assert ) => {
+		test( 'copy', () => {
 
 			const radius = 10.0;
 			const theta = Math.PI;
@@ -63,14 +65,14 @@ export default QUnit.module( 'Maths', () => {
 			const a = new Cylindrical( radius, theta, y );
 			const b = new Cylindrical().copy( a );
 
-			assert.propEqual( a, b, 'Check a and b are equal after copy()' );
+			assert.deepEqual( a, b, 'Check a and b are equal after copy()' );
 
 			a.radius = 1;
-			assert.notPropEqual( a, b, 'Check a and b are not equal after modification' );
+			assert.notDeepEqual( a, b, 'Check a and b are not equal after modification' );
 
 		} );
 
-		QUnit.test( 'setFromVector3', ( assert ) => {
+		test( 'setFromVector3', () => {
 
 			const a = new Cylindrical( 1, 1, 1 );
 			const b = new Vector3( 0, 0, 0 );

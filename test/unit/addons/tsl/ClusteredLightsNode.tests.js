@@ -1,3 +1,5 @@
+import { assert, describe, test } from 'vitest';
+
 import { DirectionalLight, PointLight } from 'three/webgpu';
 import ClusteredLightsNode from '../../../../examples/jsm/tsl/lighting/ClusteredLightsNode.js';
 
@@ -8,13 +10,13 @@ function createRenderer( width = 128, height = 128 ) {
 
 }
 
-export default QUnit.module( 'Addons', () => {
+describe( 'Addons', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'ClusteredLightsNode', () => {
+		describe( 'ClusteredLightsNode', () => {
 
-			QUnit.test( 'first grid allocation preserves the precompilation cache key', assert => {
+			test( 'first grid allocation preserves the precompilation cache key', () => {
 
 				const node = new ClusteredLightsNode( 8, 32, 4, 8 );
 				const key = node.getCacheKey( true );
@@ -26,7 +28,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'distinct lights nodes never share storage bindings', assert => {
+			test( 'distinct lights nodes never share storage bindings', () => {
 
 				const first = new ClusteredLightsNode( 8, 32, 4, 8 );
 				const second = new ClusteredLightsNode( 8, 32, 4, 8 );
@@ -39,7 +41,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'only storage replacement invalidates materials on resize', assert => {
+			test( 'only storage replacement invalidates materials on resize', () => {
 
 				const node = new ClusteredLightsNode( 8, 32, 4, 8 );
 				const renderer = createRenderer();
@@ -63,7 +65,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'analytical light changes still invalidate materials', assert => {
+			test( 'analytical light changes still invalidate materials', () => {
 
 				const node = new ClusteredLightsNode( 8, 32, 4, 8 );
 				const key = node.getCacheKey( true );

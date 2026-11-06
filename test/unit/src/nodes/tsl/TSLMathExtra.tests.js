@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import {
 	float, vec3,
 	sinh, cosh, tanh, asinh, acosh, atanh,
@@ -16,11 +17,11 @@ import { gpuTest } from './gpu-test-utils.js';
 // from plain JS Math), never by re-running the same TSL expression under
 // test -- see TSLMath.tests.js's file header for why that matters
 // (https://ben3d.ca/blog/the-rise-of-test-theater).
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'math library (extra)', () => {
+		describe( 'math library (extra)', () => {
 
 			gpuTest( 'hyperbolic and inverse hyperbolic functions', ( { assert } ) => {
 

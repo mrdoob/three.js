@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import {
 	Fn, instanceIndex, instancedArray,
 	atomicAdd, atomicSub, atomicMax, atomicMin, atomicAnd, atomicOr, atomicXor,
@@ -49,11 +50,11 @@ async function seed( renderer, counter, value ) {
 
 }
 
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'storage buffer atomics', () => {
+		describe( 'storage buffer atomics', () => {
 
 			rawComputeTest( 'atomicAdd: concurrent adds across multiple workgroups sum exactly once each', {}, async ( { assert, renderer } ) => {
 

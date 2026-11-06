@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { DepthTexture } from '../../../../src/textures/DepthTexture.js';
 
 import { Texture } from '../../../../src/textures/Texture.js';
 
-export default QUnit.module( 'Textures', () => {
+describe( 'Textures', () => {
 
-	QUnit.module( 'DepthTexture', () => {
+	describe( 'DepthTexture', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new DepthTexture();
 			assert.strictEqual(
@@ -18,7 +20,7 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new DepthTexture();
 			assert.ok( object, 'Can instantiate a DepthTexture.' );
@@ -26,7 +28,7 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isDepthTexture', ( assert ) => {
+		test( 'isDepthTexture', () => {
 
 			const object = new DepthTexture();
 			assert.ok(

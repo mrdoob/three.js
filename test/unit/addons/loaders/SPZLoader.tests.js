@@ -1,3 +1,5 @@
+import { assert, describe, expect, test } from 'vitest';
+
 import { BufferGeometry } from 'three';
 import { gzipSync } from '../../../../examples/jsm/libs/fflate.module.js';
 import { SPZLoader } from '../../../../examples/jsm/loaders/SPZLoader.js';
@@ -120,13 +122,13 @@ function createSPZV4Buffer( { version = 4, shDegree = 1, flags = 0, extensionByt
 
 }
 
-export default QUnit.module( 'Addons', () => {
+describe( 'Addons', () => {
 
-	QUnit.module( 'Loaders', () => {
+	describe( 'Loaders', () => {
 
-		QUnit.module( 'SPZLoader', () => {
+		describe( 'SPZLoader', () => {
 
-			QUnit.test( 'parses SPZ v2 fixed-point data', async ( assert ) => {
+			test( 'parses SPZ v2 fixed-point data', async () => {
 
 				const data = await parseSPZ( createSPZBuffer() );
 
@@ -142,7 +144,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'parses SPZ v4 ZSTD stream data', async ( assert ) => {
+			test( 'parses SPZ v4 ZSTD stream data', async () => {
 
 				const data = await parseSPZ( createSPZV4Buffer() );
 				const covariances = data.getAttribute( 'covariance' ).array;
@@ -162,7 +164,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'warns when skipping SPZ v4 vendor extensions', async ( assert ) => {
+			test( 'warns when skipping SPZ v4 vendor extensions', async () => {
 
 				const warn = console.warn;
 				const warnings = [];
@@ -191,7 +193,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'parses SPZ v4 spherical harmonics degree 4 as degree 3 data', async ( assert ) => {
+			test( 'parses SPZ v4 spherical harmonics degree 4 as degree 3 data', async () => {
 
 				const data = await parseSPZ( createSPZV4Buffer( { shDegree: 4 } ) );
 
@@ -208,13 +210,13 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'rejects unsupported SPZ versions', async ( assert ) => {
+			test( 'rejects unsupported SPZ versions', async () => {
 
-				await assert.rejects( parseSPZ( createSPZV4Buffer( { version: 5 } ) ), /SPZ version 5 is not supported/, 'SPZ v5' );
+				await expect( parseSPZ( createSPZV4Buffer( { version: 5 } ) ), 'SPZ v5' ).rejects.toThrow( /SPZ version 5 is not supported/ );
 
 			} );
 
-			QUnit.test( 'parses SPZ spherical harmonics degree 1 data', async ( assert ) => {
+			test( 'parses SPZ spherical harmonics degree 1 data', async () => {
 
 				const data = await parseSPZ( createSPZBuffer( 1 ) );
 
@@ -226,7 +228,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'parses SPZ spherical harmonics degree 2 data', async ( assert ) => {
+			test( 'parses SPZ spherical harmonics degree 2 data', async () => {
 
 				const data = await parseSPZ( createSPZBuffer( 2 ) );
 
@@ -240,7 +242,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'parses SPZ spherical harmonics degree 3 data', async ( assert ) => {
+			test( 'parses SPZ spherical harmonics degree 3 data', async () => {
 
 				const data = await parseSPZ( createSPZBuffer( 3 ) );
 

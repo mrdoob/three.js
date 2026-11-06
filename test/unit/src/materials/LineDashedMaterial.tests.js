@@ -1,13 +1,15 @@
+import { assert, describe, test } from 'vitest';
+
 import { LineDashedMaterial } from '../../../../src/materials/LineDashedMaterial.js';
 
 import { Material } from '../../../../src/materials/Material.js';
 
-export default QUnit.module( 'Materials', () => {
+describe( 'Materials', () => {
 
-	QUnit.module( 'LineDashedMaterial', () => {
+	describe( 'LineDashedMaterial', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new LineDashedMaterial();
 			assert.strictEqual(
@@ -18,7 +20,7 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new LineDashedMaterial();
 			assert.ok( object, 'Can instantiate a LineDashedMaterial.' );
@@ -26,7 +28,7 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new LineDashedMaterial();
 			assert.ok(
@@ -37,7 +39,7 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isLineDashedMaterial', ( assert ) => {
+		test( 'isLineDashedMaterial', () => {
 
 			const object = new LineDashedMaterial();
 			assert.ok(

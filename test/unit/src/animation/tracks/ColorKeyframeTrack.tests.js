@@ -1,12 +1,14 @@
+import { assert, describe, test } from 'vitest';
+
 import { ColorKeyframeTrack } from '../../../../../src/animation/tracks/ColorKeyframeTrack.js';
 
 import { KeyframeTrack } from '../../../../../src/animation/KeyframeTrack.js';
 
-export default QUnit.module( 'Animation', () => {
+describe( 'Animation', () => {
 
-	QUnit.module( 'Tracks', () => {
+	describe( 'Tracks', () => {
 
-		QUnit.module( 'ColorKeyframeTrack', () => {
+		describe( 'ColorKeyframeTrack', () => {
 
 			const parameters = {
 				name: '.material.diffuse',
@@ -16,7 +18,7 @@ export default QUnit.module( 'Animation', () => {
 			};
 
 			// INHERITANCE
-			QUnit.test( 'Extending', ( assert ) => {
+			test( 'Extending', () => {
 
 				const object = new ColorKeyframeTrack( parameters.name, parameters.times, parameters.values );
 				assert.strictEqual(
@@ -27,7 +29,7 @@ export default QUnit.module( 'Animation', () => {
 			} );
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			test( 'Instancing', () => {
 
 				// name, times, values
 				const object = new ColorKeyframeTrack( parameters.name, parameters.times, parameters.values );

@@ -1,14 +1,16 @@
+import { assert, describe, test } from 'vitest';
+
 import { NearestFilter } from '../../../../src/constants.js';
 import { WebGLCubeRenderTarget } from '../../../../src/renderers/WebGLCubeRenderTarget.js';
 
 import { WebGLRenderTarget } from '../../../../src/renderers/WebGLRenderTarget.js';
 
-export default QUnit.module( 'Renderers', () => {
+describe( 'Renderers', () => {
 
-	QUnit.module( 'WebGLCubeRenderTarget', () => {
+	describe( 'WebGLCubeRenderTarget', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new WebGLCubeRenderTarget();
 			assert.strictEqual(
@@ -22,7 +24,7 @@ export default QUnit.module( 'Renderers', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new WebGLCubeRenderTarget();
 			assert.ok( object, 'Can instantiate a WebGLCubeRenderTarget.' );

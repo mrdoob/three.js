@@ -1,3 +1,5 @@
+import { assert, describe, test } from 'vitest';
+
 import { Euler } from '../../../../src/math/Euler.js';
 import { Matrix4 } from '../../../../src/math/Matrix4.js';
 import { Quaternion } from '../../../../src/math/Quaternion.js';
@@ -41,12 +43,12 @@ function quatEquals( a, b, tolerance ) {
 
 }
 
-export default QUnit.module( 'Maths', () => {
+describe( 'Maths', () => {
 
-	QUnit.module( 'Euler', () => {
+	describe( 'Euler', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const a = new Euler();
 			assert.ok( a.equals( eulerZero ), 'Passed!' );
@@ -57,14 +59,14 @@ export default QUnit.module( 'Maths', () => {
 
 		// STATIC STUFF
 
-		QUnit.test( 'DEFAULT_ORDER', ( assert ) => {
+		test( 'DEFAULT_ORDER', () => {
 
 			assert.equal( Euler.DEFAULT_ORDER, 'XYZ', 'Passed!' );
 
 		} );
 
 		// PROPERTIES STUFF
-		QUnit.test( 'x', ( assert ) => {
+		test( 'x', () => {
 
 			let a = new Euler();
 			assert.ok( a.x === 0, 'Passed!' );
@@ -92,7 +94,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'y', ( assert ) => {
+		test( 'y', () => {
 
 			let a = new Euler();
 			assert.ok( a.y === 0, 'Passed!' );
@@ -120,7 +122,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'z', ( assert ) => {
+		test( 'z', () => {
 
 			let a = new Euler();
 			assert.ok( a.z === 0, 'Passed!' );
@@ -148,7 +150,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'order', ( assert ) => {
+		test( 'order', () => {
 
 			let a = new Euler();
 			assert.ok( a.order === Euler.DEFAULT_ORDER, 'Passed!' );
@@ -177,7 +179,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( 'isEuler', ( assert ) => {
+		test( 'isEuler', () => {
 
 			const a = new Euler();
 			assert.ok( a.isEuler, 'Passed!' );
@@ -186,7 +188,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'clone/copy/equals', ( assert ) => {
+		test( 'clone/copy/equals', () => {
 
 			const a = eulerAxyz.clone();
 			assert.ok( a.equals( eulerAxyz ), 'Passed!' );
@@ -200,7 +202,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'Quaternion.setFromEuler/Euler.setFromQuaternion', ( assert ) => {
+		test( 'Quaternion.setFromEuler/Euler.setFromQuaternion', () => {
 
 			const testValues = [ eulerZero, eulerAxyz, eulerAzyx ];
 			for ( let i = 0; i < testValues.length; i ++ ) {
@@ -216,7 +218,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'Matrix4.makeRotationFromEuler/Euler.setFromRotationMatrix', ( assert ) => {
+		test( 'Matrix4.makeRotationFromEuler/Euler.setFromRotationMatrix', () => {
 
 			const testValues = [ eulerZero, eulerAxyz, eulerAzyx ];
 			for ( let i = 0; i < testValues.length; i ++ ) {
@@ -232,7 +234,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'reorder', ( assert ) => {
+		test( 'reorder', () => {
 
 			const testValues = [ eulerZero, eulerAxyz, eulerAzyx ];
 			for ( let i = 0; i < testValues.length; i ++ ) {
@@ -252,12 +254,14 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'set/get properties, check callbacks', ( assert ) => {
+		test( 'set/get properties, check callbacks', () => {
+
+			const steps = [];
 
 			const a = new Euler();
 			a._onChange( function () {
 
-				assert.step( 'set: onChange called' );
+				steps.push( 'set: onChange called' );
 
 			} );
 
@@ -271,18 +275,20 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( a.z, 3, 'get: check z' );
 			assert.strictEqual( a.order, 'ZYX', 'get: check order' );
 
-			assert.verifySteps( Array( 4 ).fill( 'set: onChange called' ) );
+			assert.deepEqual( steps, Array( 4 ).fill( 'set: onChange called' ) );
 
 		} );
 
-		QUnit.test( 'clone/copy, check callbacks', ( assert ) => {
+		test( 'clone/copy, check callbacks', () => {
+
+			const steps = [];
 
 			let a = new Euler( 1, 2, 3, 'ZXY' );
 			const b = new Euler( 4, 5, 6, 'XZY' );
 			const cbSucceed = function () {
 
 				assert.ok( true );
-				assert.step( 'onChange called' );
+				steps.push( 'onChange called' );
 
 			};
 
@@ -304,11 +310,11 @@ export default QUnit.module( 'Maths', () => {
 			a._onChange( cbSucceed );
 			a.copy( b );
 			assert.ok( a.equals( b ), 'copy: check if a equals b' );
-			assert.verifySteps( [ 'onChange called' ] );
+			assert.deepEqual( steps, [ 'onChange called' ] );
 
 		} );
 
-		QUnit.test( 'toArray', ( assert ) => {
+		test( 'toArray', () => {
 
 			const order = 'YXZ';
 			const a = new Euler( x, y, z, order );
@@ -336,13 +342,15 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'fromArray', ( assert ) => {
+		test( 'fromArray', () => {
+
+			const steps = [];
 
 			let a = new Euler();
 			let array = [ x, y, z ];
 			const cb = function () {
 
-				assert.step( 'onChange called' );
+				steps.push( 'onChange called' );
 
 			};
 
@@ -363,11 +371,11 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( a.z, z, 'With order: check z' );
 			assert.strictEqual( a.order, 'ZXY', 'With order: check order' );
 
-			assert.verifySteps( Array( 2 ).fill( 'onChange called' ) );
+			assert.deepEqual( steps, Array( 2 ).fill( 'onChange called' ) );
 
 		} );
 
-		QUnit.test( '_onChange', ( assert ) => {
+		test( '_onChange', () => {
 
 			const f = function () {
 
@@ -379,7 +387,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( '_onChangeCallback', ( assert ) => {
+		test( '_onChangeCallback', () => {
 
 			let b = false;
 			const a = new Euler( 11, 12, 13, 'XYZ' );
@@ -398,7 +406,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'iterable', ( assert ) => {
+		test( 'iterable', () => {
 
 			const e = new Euler( 0.5, 0.75, 1, 'YZX' );
 			const array = [ ...e ];

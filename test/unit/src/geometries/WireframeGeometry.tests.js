@@ -1,14 +1,16 @@
+import { assert, beforeEach, describe, test } from 'vitest';
+
 import { WireframeGeometry } from '../../../../src/geometries/WireframeGeometry.js';
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
-// import { runStdGeometryTests } from '../../utils/qunit-utils.js';
+// import { runStdGeometryTests } from '../../utils/test-utils.js';
 
-export default QUnit.module( 'Geometries', () => {
+describe( 'Geometries', () => {
 
-	QUnit.module( 'WireframeGeometry', ( hooks ) => {
+	describe( 'WireframeGeometry', () => {
 
 		let geometries = undefined; // eslint-disable-line no-unused-vars
-		hooks.beforeEach( function () {
+		beforeEach( function () {
 
 			geometries = [
 				new WireframeGeometry()
@@ -17,7 +19,7 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const object = new WireframeGeometry();
 			assert.strictEqual(
@@ -28,7 +30,7 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const object = new WireframeGeometry();
 			assert.ok( object, 'Can instantiate a WireframeGeometry.' );
@@ -36,7 +38,7 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const object = new WireframeGeometry();
 			assert.ok(

@@ -1,3 +1,5 @@
+import { assert, describe, test } from 'vitest';
+
 import { Vector3 } from '../../../../src/math/Vector3.js';
 import { Vector4 } from '../../../../src/math/Vector4.js';
 import { Matrix3 } from '../../../../src/math/Matrix3.js';
@@ -15,12 +17,12 @@ import {
 	eps
 } from '../../utils/math-constants.js';
 
-export default QUnit.module( 'Maths', () => {
+describe( 'Maths', () => {
 
-	QUnit.module( 'Vector3', () => {
+	describe( 'Vector3', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			let a = new Vector3();
 			assert.ok( a.x == 0, 'Passed!' );
@@ -35,14 +37,14 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( 'isVector3', ( assert ) => {
+		test( 'isVector3', () => {
 
 			const object = new Vector3();
 			assert.ok( object.isVector3, 'Vector3.isVector3 should be true' );
 
 		} );
 
-		QUnit.test( 'set', ( assert ) => {
+		test( 'set', () => {
 
 			const a = new Vector3();
 			assert.ok( a.x == 0, 'Passed!' );
@@ -56,7 +58,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'copy', ( assert ) => {
+		test( 'copy', () => {
 
 			const a = new Vector3( x, y, z );
 			const b = new Vector3().copy( a );
@@ -74,7 +76,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'add', ( assert ) => {
+		test( 'add', () => {
 
 			const a = new Vector3( x, y, z );
 			const b = new Vector3( - x, - y, - z );
@@ -91,7 +93,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'addScaledVector', ( assert ) => {
+		test( 'addScaledVector', () => {
 
 			const a = new Vector3( x, y, z );
 			const b = new Vector3( 2, 3, 4 );
@@ -104,7 +106,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'sub', ( assert ) => {
+		test( 'sub', () => {
 
 			const a = new Vector3( x, y, z );
 			const b = new Vector3( - x, - y, - z );
@@ -121,7 +123,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'multiplyVectors', ( assert ) => {
+		test( 'multiplyVectors', () => {
 
 			const a = new Vector3( x, y, z );
 			const b = new Vector3( 2, 3, - 5 );
@@ -133,7 +135,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'applyEuler', ( assert ) => {
+		test( 'applyEuler', () => {
 
 			const a = new Vector3( x, y, z );
 			const euler = new Euler( 90, - 45, 0 );
@@ -146,7 +148,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'applyAxisAngle', ( assert ) => {
+		test( 'applyAxisAngle', () => {
 
 			const a = new Vector3( x, y, z );
 			const axis = new Vector3( 0, 1, 0 );
@@ -160,7 +162,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'applyMatrix3', ( assert ) => {
+		test( 'applyMatrix3', () => {
 
 			const a = new Vector3( x, y, z );
 			const m = new Matrix3().set( 2, 3, 5, 7, 11, 13, 17, 19, 23 );
@@ -172,7 +174,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'applyMatrix4', ( assert ) => {
+		test( 'applyMatrix4', () => {
 
 			const a = new Vector3( x, y, z );
 			const b = new Vector4( x, y, z, 1 );
@@ -205,7 +207,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'applyQuaternion', ( assert ) => {
+		test( 'applyQuaternion', () => {
 
 			const a = new Vector3( x, y, z );
 
@@ -216,7 +218,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'transformDirection', ( assert ) => {
+		test( 'transformDirection', () => {
 
 			const a = new Vector3( x, y, z );
 			const m = new Matrix4();
@@ -229,7 +231,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'clampScalar', ( assert ) => {
+		test( 'clampScalar', () => {
 
 			const a = new Vector3( - 0.01, 0.5, 1.5 );
 			const clamped = new Vector3( 0.1, 0.5, 1.0 );
@@ -241,7 +243,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'negate', ( assert ) => {
+		test( 'negate', () => {
 
 			const a = new Vector3( x, y, z );
 
@@ -252,7 +254,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'dot', ( assert ) => {
+		test( 'dot', () => {
 
 			const a = new Vector3( x, y, z );
 			const b = new Vector3( - x, - y, - z );
@@ -266,7 +268,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'manhattanLength', ( assert ) => {
+		test( 'manhattanLength', () => {
 
 			const a = new Vector3( x, 0, 0 );
 			const b = new Vector3( 0, - y, 0 );
@@ -283,7 +285,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'normalize', ( assert ) => {
+		test( 'normalize', () => {
 
 			const a = new Vector3( x, 0, 0 );
 			const b = new Vector3( 0, - y, 0 );
@@ -303,7 +305,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setLength', ( assert ) => {
+		test( 'setLength', () => {
 
 			let a = new Vector3( x, 0, 0 );
 
@@ -320,7 +322,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'cross', ( assert ) => {
+		test( 'cross', () => {
 
 			const a = new Vector3( x, y, z );
 			const b = new Vector3( 2 * x, - y, 0.5 * z );
@@ -333,7 +335,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'crossVectors', ( assert ) => {
+		test( 'crossVectors', () => {
 
 			const a = new Vector3( x, y, z );
 			const b = new Vector3( x, - y, z );
@@ -347,7 +349,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'projectOnVector', ( assert ) => {
+		test( 'projectOnVector', () => {
 
 			const a = new Vector3( 1, 0, 0 );
 			const b = new Vector3();
@@ -366,7 +368,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'projectOnPlane', ( assert ) => {
+		test( 'projectOnPlane', () => {
 
 			const a = new Vector3( 1, 0, 0 );
 			const b = new Vector3();
@@ -385,7 +387,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'reflect', ( assert ) => {
+		test( 'reflect', () => {
 
 			const a = new Vector3();
 			const normal = new Vector3( 0, 1, 0 );
@@ -403,7 +405,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'angleTo', ( assert ) => {
+		test( 'angleTo', () => {
 
 			const a = new Vector3( 0, - 0.18851655680720186, 0.9820700116639124 );
 			const b = new Vector3( 0, 0.18851655680720186, - 0.9820700116639124 );
@@ -423,7 +425,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setFromSpherical', ( assert ) => {
+		test( 'setFromSpherical', () => {
 
 			const a = new Vector3();
 			const phi = Math.acos( - 0.5 );
@@ -438,7 +440,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setFromCylindrical', ( assert ) => {
+		test( 'setFromCylindrical', () => {
 
 			const a = new Vector3();
 			const cyl = new Cylindrical( 10, Math.PI * 0.125, 20 );
@@ -451,7 +453,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setFromMatrixPosition', ( assert ) => {
+		test( 'setFromMatrixPosition', () => {
 
 			const a = new Vector3();
 			const m = new Matrix4().set( 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53 );
@@ -463,7 +465,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setFromMatrixScale', ( assert ) => {
+		test( 'setFromMatrixScale', () => {
 
 			const a = new Vector3();
 			const m = new Matrix4().set( 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53 );
@@ -476,7 +478,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setFromMatrixColumn', ( assert ) => {
+		test( 'setFromMatrixColumn', () => {
 
 			const a = new Vector3();
 			const m = new Matrix4().set( 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53 );
@@ -493,7 +495,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'equals', ( assert ) => {
+		test( 'equals', () => {
 
 			const a = new Vector3( x, 0, z );
 			const b = new Vector3( 0, - y, 0 );
@@ -515,7 +517,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'fromArray', ( assert ) => {
+		test( 'fromArray', () => {
 
 			const a = new Vector3();
 			const array = [ 1, 2, 3, 4, 5, 6 ];
@@ -532,7 +534,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'toArray', ( assert ) => {
+		test( 'toArray', () => {
 
 			const a = new Vector3( x, y, z );
 
@@ -556,7 +558,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'fromBufferAttribute', ( assert ) => {
+		test( 'fromBufferAttribute', () => {
 
 			const a = new Vector3();
 			const attr = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 );
@@ -573,7 +575,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'randomDirection', ( assert ) => {
+		test( 'randomDirection', () => {
 
 			const vec = new Vector3();
 
@@ -591,7 +593,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// TODO (Itee) refactor/split
-		QUnit.test( 'setX,setY,setZ', ( assert ) => {
+		test( 'setX,setY,setZ', () => {
 
 			const a = new Vector3();
 			assert.ok( a.x == 0, 'Passed!' );
@@ -608,7 +610,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setComponent,getComponent', ( assert ) => {
+		test( 'setComponent,getComponent', () => {
 
 			const a = new Vector3();
 			assert.ok( a.x == 0, 'Passed!' );
@@ -624,7 +626,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setComponent/getComponent exceptions', ( assert ) => {
+		test( 'setComponent/getComponent exceptions', () => {
 
 			const a = new Vector3();
 
@@ -649,7 +651,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'min/max/clamp', ( assert ) => {
+		test( 'min/max/clamp', () => {
 
 			const a = new Vector3( x, y, z );
 			const b = new Vector3( - x, - y, - z );
@@ -673,7 +675,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'distanceTo/distanceToSquared', ( assert ) => {
+		test( 'distanceTo/distanceToSquared', () => {
 
 			const a = new Vector3( x, 0, 0 );
 			const b = new Vector3( 0, - y, 0 );
@@ -691,7 +693,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setScalar/addScalar/subScalar', ( assert ) => {
+		test( 'setScalar/addScalar/subScalar', () => {
 
 			const a = new Vector3();
 			const s = 3;
@@ -713,7 +715,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'multiply/divide', ( assert ) => {
+		test( 'multiply/divide', () => {
 
 			const a = new Vector3( x, y, z );
 			const b = new Vector3( 2 * x, 2 * y, 2 * z );
@@ -731,7 +733,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'multiply/divide', ( assert ) => {
+		test( 'multiply/divide', () => {
 
 			const a = new Vector3( x, y, z );
 			const b = new Vector3( - x, - y, - z );
@@ -758,7 +760,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'project/unproject', ( assert ) => {
+		test( 'project/unproject', () => {
 
 			const a = new Vector3( x, y, z );
 			const camera = new PerspectiveCamera( 75, 16 / 9, 0.1, 300.0 );
@@ -776,7 +778,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'length/lengthSq', ( assert ) => {
+		test( 'length/lengthSq', () => {
 
 			const a = new Vector3( x, 0, 0 );
 			const b = new Vector3( 0, - y, 0 );
@@ -798,7 +800,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'lerp/clone', ( assert ) => {
+		test( 'lerp/clone', () => {
 
 			const a = new Vector3( x, 0, z );
 			const b = new Vector3( 0, - y, 0 );
@@ -817,7 +819,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// OTHERS
-		QUnit.test( 'iterable', ( assert ) => {
+		test( 'iterable', () => {
 
 			const v = new Vector3( 0, 0.5, 1 );
 			const array = [ ...v ];

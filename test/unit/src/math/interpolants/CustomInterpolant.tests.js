@@ -1,10 +1,12 @@
+import { assert, describe, test } from 'vitest';
+
 import { Interpolant } from '../../../../../src/math/Interpolant.js';
 
-export default QUnit.module( 'Maths', () => {
+describe( 'Maths', () => {
 
-	QUnit.module( 'Interpolants', () => {
+	describe( 'Interpolants', () => {
 
-		QUnit.module( 'CustomInterpolant', () => {
+		describe( 'CustomInterpolant', () => {
 
 			// A custom cubic spline interpolant mimicking `GLTFCubicSplineInterpolant`
 			// from `GLTFLoader`. The keyframe layout for CUBICSPLINE animations is:
@@ -76,7 +78,7 @@ export default QUnit.module( 'Maths', () => {
 			}
 
 			// INHERITANCE
-			QUnit.test( 'Extending', ( assert ) => {
+			test( 'Extending', () => {
 
 				// parameterPositions, sampleValues, sampleSize, resultBuffer
 				const object = new CubicSplineInterpolant( [ 0, 1 ], [ 0, 0, 0, 0, 0, 0 ], 1, [] );
@@ -88,7 +90,7 @@ export default QUnit.module( 'Maths', () => {
 			} );
 
 			// PUBLIC
-			QUnit.test( 'evaluate', ( assert ) => {
+			test( 'evaluate', () => {
 
 				// Two keyframes at t = 0 and t = 1, valueSize = 1.
 				// Layout: [ in_0, v_0, out_0, in_1, v_1, out_1 ]

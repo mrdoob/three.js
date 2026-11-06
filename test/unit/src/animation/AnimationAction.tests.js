@@ -1,3 +1,5 @@
+import { assert, describe, test } from 'vitest';
+
 import { AnimationAction } from '../../../../src/animation/AnimationAction.js';
 
 import { AnimationMixer } from '../../../../src/animation/AnimationMixer.js';
@@ -49,12 +51,12 @@ function createTwoAnimations() {
 
 }
 
-export default QUnit.module( 'Animation', () => {
+describe( 'Animation', () => {
 
-	QUnit.module( 'AnimationAction', () => {
+	describe( 'AnimationAction', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const mixer = new AnimationMixer();
 			const clip = new AnimationClip( 'nonname', - 1, [] );
@@ -65,7 +67,7 @@ export default QUnit.module( 'Animation', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( 'play', ( assert ) => {
+		test( 'play', () => {
 
 			const { mixer, animationAction } = createAnimation();
 			const animationAction2 = animationAction.play();
@@ -91,11 +93,11 @@ export default QUnit.module( 'Animation', () => {
 
 				animationAction.play();
 
-			}, new UserException() );
+			}, UserException );
 
 		} );
 
-		QUnit.test( 'stop', ( assert ) => {
+		test( 'stop', () => {
 
 			const { mixer, animationAction } = createAnimation();
 			const animationAction2 = animationAction.stop();
@@ -121,11 +123,11 @@ export default QUnit.module( 'Animation', () => {
 
 				animationAction.stop();
 
-			}, new UserException() );
+			}, UserException );
 
 		} );
 
-		QUnit.test( 'reset', ( assert ) => {
+		test( 'reset', () => {
 
 			const { animationAction } = createAnimation();
 			const animationAction2 = animationAction.stop();
@@ -138,7 +140,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'isRunning', ( assert ) => {
+		test( 'isRunning', () => {
 
 			const { animationAction } = createAnimation();
 			assert.notOk( animationAction.isRunning(), 'When an animation is just made, it is not running.' );
@@ -157,7 +159,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'isScheduled', ( assert ) => {
+		test( 'isScheduled', () => {
 
 			const { mixer, animationAction } = createAnimation();
 			assert.notOk( animationAction.isScheduled(), 'When an animation is just made, it is not scheduled.' );
@@ -170,7 +172,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'startAt', ( assert ) => {
+		test( 'startAt', () => {
 
 			const { mixer, animationAction } = createAnimation();
 			animationAction.startAt( 2 );
@@ -189,7 +191,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'setLoop LoopOnce', ( assert ) => {
+		test( 'setLoop LoopOnce', () => {
 
 			const { mixer, animationAction } = createAnimation();
 			animationAction.setLoop( LoopOnce );
@@ -204,7 +206,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'setLoop LoopRepeat', ( assert ) => {
+		test( 'setLoop LoopRepeat', () => {
 
 			const { root, mixer, animationAction } = createAnimation();
 			animationAction.setLoop( LoopRepeat, 3 );
@@ -225,7 +227,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'setLoop LoopPingPong', ( assert ) => {
+		test( 'setLoop LoopPingPong', () => {
 
 			const { root, mixer, animationAction } = createAnimation();
 			animationAction.setLoop( LoopPingPong, 3 );
@@ -246,7 +248,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'setEffectiveWeight', ( assert ) => {
+		test( 'setEffectiveWeight', () => {
 
 			const { animationAction } = createAnimation();
 			assert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation is created, EffectiveWeight is 1.' );
@@ -255,7 +257,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'setEffectiveWeight - disabled', ( assert ) => {
+		test( 'setEffectiveWeight - disabled', () => {
 
 			const { animationAction } = createAnimation();
 			assert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation is created, EffectiveWeight is 1.' );
@@ -265,7 +267,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'setEffectiveWeight - over duration', ( assert ) => {
+		test( 'setEffectiveWeight - over duration', () => {
 
 			const { root, mixer, animationAction } = createAnimation();
 			animationAction.setEffectiveWeight( 0.5 );
@@ -277,7 +279,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'getEffectiveWeight', ( assert ) => {
+		test( 'getEffectiveWeight', () => {
 
 			let { animationAction } = createAnimation();
 			assert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation is created, EffectiveWeight is 1.' );
@@ -292,7 +294,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'fadeIn', ( assert ) => {
+		test( 'fadeIn', () => {
 
 			const { mixer, animationAction } = createAnimation();
 			animationAction.fadeIn( 1000 );
@@ -309,7 +311,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'fadeOut', ( assert ) => {
+		test( 'fadeOut', () => {
 
 			const { mixer, animationAction } = createAnimation();
 			animationAction.fadeOut( 1000 );
@@ -326,7 +328,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'crossFadeFrom', ( assert ) => {
+		test( 'crossFadeFrom', () => {
 
 			const { mixer, animationAction, animationAction2 } = createTwoAnimations();
 			animationAction.crossFadeFrom( animationAction2, 1000, false );
@@ -349,7 +351,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'crossFadeTo', ( assert ) => {
+		test( 'crossFadeTo', () => {
 
 			const { mixer, animationAction, animationAction2 } = createTwoAnimations();
 			animationAction2.crossFadeTo( animationAction, 1000, false );
@@ -372,7 +374,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'getMixer', ( assert ) => {
+		test( 'getMixer', () => {
 
 			const { mixer, animationAction } = createAnimation();
 			const mixer2 = animationAction.getMixer();
@@ -380,7 +382,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'getClip', ( assert ) => {
+		test( 'getClip', () => {
 
 			const { clip, animationAction } = createAnimation();
 			const clip2 = animationAction.getClip();
@@ -388,7 +390,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'getRoot', ( assert ) => {
+		test( 'getRoot', () => {
 
 			const { root, animationAction } = createAnimation();
 			const root2 = animationAction.getRoot();
@@ -397,7 +399,7 @@ export default QUnit.module( 'Animation', () => {
 		} );
 
 		// OTHERS
-		QUnit.test( 'StartAt when already executed once', ( assert ) => {
+		test( 'StartAt when already executed once', () => {
 
 			const root = new Object3D();
 			const mixer = new AnimationMixer( root );
@@ -446,7 +448,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'LoopRepeat with timeScale reversal during first loop', ( assert ) => {
+		test( 'LoopRepeat with timeScale reversal during first loop', () => {
 
 			// Regression test for #19151
 			const root = new Object3D();
@@ -474,7 +476,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'LoopPingPong with timeScale reversal during first loop', ( assert ) => {
+		test( 'LoopPingPong with timeScale reversal during first loop', () => {
 
 			// Regression test for #19151
 			const root = new Object3D();

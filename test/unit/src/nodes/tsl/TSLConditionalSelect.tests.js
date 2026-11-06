@@ -1,11 +1,12 @@
+import { describe } from 'vitest';
 import { bvec2, bvec3, bvec4, float, int, ivec2, ivec3, ivec4, select, uvec2, uvec3, uvec4, vec2, vec3, vec4 } from 'three/tsl';
 import { gpuTest } from './gpu-test-utils.js';
 
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'Conditional (select)', () => {
+		describe( 'Conditional (select)', () => {
 
 			gpuTest( 'select() with a vector condition selects per-component, matching WGSL select()/GLSL mix() semantics', ( { assert } ) => {
 

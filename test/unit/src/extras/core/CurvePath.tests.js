@@ -1,15 +1,17 @@
+import { assert, describe, test } from 'vitest';
+
 import { CurvePath } from '../../../../../src/extras/core/CurvePath.js';
 
 import { Curve } from '../../../../../src/extras/core/Curve.js';
 
-export default QUnit.module( 'Extras', () => {
+describe( 'Extras', () => {
 
-	QUnit.module( 'Core', () => {
+	describe( 'Core', () => {
 
-		QUnit.module( 'CurvePath', () => {
+		describe( 'CurvePath', () => {
 
 			// INHERITANCE
-			QUnit.test( 'Extending', ( assert ) => {
+			test( 'Extending', () => {
 
 				const object = new CurvePath();
 				assert.strictEqual(
@@ -20,7 +22,7 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			test( 'Instancing', () => {
 
 				const object = new CurvePath();
 				assert.ok( object, 'Can instantiate a CurvePath.' );
@@ -28,7 +30,7 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// PROPERTIES
-			QUnit.test( 'type', ( assert ) => {
+			test( 'type', () => {
 
 				const object = new Curve();
 				assert.ok(

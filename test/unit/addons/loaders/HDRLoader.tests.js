@@ -1,12 +1,14 @@
+import { assert, describe, test } from 'vitest';
+
 import { HDRLoader } from '../../../../examples/jsm/loaders/HDRLoader.js';
 
-export default QUnit.module( 'Addons', () => {
+describe( 'Addons', () => {
 
-	QUnit.module( 'Loaders', () => {
+	describe( 'Loaders', () => {
 
-		QUnit.module( 'HDRLoader', () => {
+		describe( 'HDRLoader', () => {
 
-			QUnit.test( 'Instancing', ( assert ) => {
+			test( 'Instancing', () => {
 
 				const loader = new HDRLoader();
 
@@ -14,7 +16,7 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'parses valid HDR with large header (> chunk size)', ( assert ) => {
+			test( 'parses valid HDR with large header (> chunk size)', () => {
 
 				// Regression: fgets uses chunkSize=128. When a line (e.g. pcomb) exceeds
 				// 128 bytes, chunking can skip the FORMAT line, causing "missing format

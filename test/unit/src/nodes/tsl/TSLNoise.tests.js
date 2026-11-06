@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import { float, vec3, triNoise3D } from 'three/tsl';
 import { gpuTest } from './gpu-test-utils.js';
 
@@ -8,11 +9,11 @@ import { gpuTest } from './gpu-test-utils.js';
 // is more machinery than it's worth here -- so this only checks properties
 // derivable without a full port: determinism, and the value staying inside
 // the range the accumulation can mathematically produce.
-export default QUnit.module( 'Nodes', () => {
+describe( 'Nodes', () => {
 
-	QUnit.module( 'TSL', () => {
+	describe( 'TSL', () => {
 
-		QUnit.module( 'triNoise3D()', () => {
+		describe( 'triNoise3D()', () => {
 
 			gpuTest( 'triNoise3D() is deterministic -- the same inputs always produce the same output', ( { assert } ) => {
 

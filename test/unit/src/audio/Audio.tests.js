@@ -1,10 +1,12 @@
+import { assert, describe, test } from 'vitest';
+
 import { Audio } from '../../../../src/audio/Audio.js';
 
 import { Object3D } from '../../../../src/core/Object3D.js';
 
-export default QUnit.module( 'Audios', () => {
+describe( 'Audios', () => {
 
-	QUnit.module( 'Audio', () => {
+	describe( 'Audio', () => {
 
 		function mockListener() {
 
@@ -24,7 +26,7 @@ export default QUnit.module( 'Audios', () => {
 		}
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		test( 'Extending', () => {
 
 			const listener = mockListener();
 			const object = new Audio( listener );
@@ -36,7 +38,7 @@ export default QUnit.module( 'Audios', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			const listener = mockListener();
 			const object = new Audio( listener );
@@ -45,7 +47,7 @@ export default QUnit.module( 'Audios', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		test( 'type', () => {
 
 			const listener = mockListener();
 			const object = new Audio( listener );

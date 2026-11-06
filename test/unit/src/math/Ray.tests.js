@@ -1,3 +1,5 @@
+import { assert, describe, test } from 'vitest';
+
 import { Ray } from '../../../../src/math/Ray.js';
 import { Box3 } from '../../../../src/math/Box3.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
@@ -12,12 +14,12 @@ import {
 	posInf3
 } from '../../utils/math-constants.js';
 
-export default QUnit.module( 'Maths', () => {
+describe( 'Maths', () => {
 
-	QUnit.module( 'Ray', () => {
+	describe( 'Ray', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		test( 'Instancing', () => {
 
 			let a = new Ray();
 			assert.ok( a.origin.equals( zero3 ), 'Passed!' );
@@ -30,7 +32,7 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'set', ( assert ) => {
+		test( 'set', () => {
 
 			const a = new Ray();
 
@@ -40,7 +42,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'recast/clone', ( assert ) => {
+		test( 'recast/clone', () => {
 
 			const a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 
@@ -60,7 +62,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'copy/equals', ( assert ) => {
+		test( 'copy/equals', () => {
 
 			const a = new Ray( zero3.clone(), one3.clone() );
 			const b = new Ray().copy( a );
@@ -75,7 +77,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'at', ( assert ) => {
+		test( 'at', () => {
 
 			const a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 			const point = new Vector3();
@@ -89,7 +91,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'lookAt', ( assert ) => {
+		test( 'lookAt', () => {
 
 			const a = new Ray( two3.clone(), one3.clone() );
 			const target = one3.clone();
@@ -100,7 +102,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'closestPointToPoint', ( assert ) => {
+		test( 'closestPointToPoint', () => {
 
 			const a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 			const point = new Vector3();
@@ -119,7 +121,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'distanceToPoint', ( assert ) => {
+		test( 'distanceToPoint', () => {
 
 			const a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 
@@ -137,7 +139,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'distanceSqToPoint', ( assert ) => {
+		test( 'distanceSqToPoint', () => {
 
 			const a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 
@@ -155,7 +157,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'distanceSqToSegment', ( assert ) => {
+		test( 'distanceSqToSegment', () => {
 
 			const a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 			const ptOnLine = new Vector3();
@@ -192,7 +194,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'intersectSphere', ( assert ) => {
+		test( 'intersectSphere', () => {
 
 			const TOL = 0.0001;
 			const point = new Vector3();
@@ -237,7 +239,7 @@ export default QUnit.module( 'Maths', () => {
 			a0.intersectSphere( b, point.copy( posInf3 ) );
 			assert.ok( point.equals( posInf3 ), 'Passed!' );
 
-			// following QUnit.tests are for situations where the ray origin is inside the sphere
+			// following tests are for situations where the ray origin is inside the sphere
 
 			// sphere (radius of 1) center located at ray a0 origin / sphere surrounds the ray origin, so the first intersect point 0, 0, 1,
 			// is behind ray a0.  Therefore, second exit point on back of sphere will be returned: 0, 0, -1
@@ -269,7 +271,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'intersectsSphere', ( assert ) => {
+		test( 'intersectsSphere', () => {
 
 			const a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 			const b = new Sphere( zero3, 0.5 );
@@ -286,7 +288,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'intersectPlane', ( assert ) => {
+		test( 'intersectPlane', () => {
 
 			const a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 			const point = new Vector3();
@@ -318,7 +320,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'intersectsPlane', ( assert ) => {
+		test( 'intersectsPlane', () => {
 
 			const a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 
@@ -344,7 +346,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'intersectBox', ( assert ) => {
+		test( 'intersectBox', () => {
 
 			const TOL = 0.0001;
 
@@ -389,7 +391,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'intersectTriangle', ( assert ) => {
+		test( 'intersectTriangle', () => {
 
 			const ray = new Ray();
 			const a = new Vector3( 1, 1, 0 );
@@ -438,7 +440,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'intersectTriangle (watertight at shared edges)', ( assert ) => {
+		test( 'intersectTriangle (watertight at shared edges)', () => {
 
 			// Two triangles forming a quad and sharing the diagonal edge from
 			// ( -2, -2, -2 ) to ( 2, -2, 2 ). A ray aimed exactly at the midpoint of
@@ -470,7 +472,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'applyMatrix4', ( assert ) => {
+		test( 'applyMatrix4', () => {
 
 			let a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 			const m = new Matrix4();
