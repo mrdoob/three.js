@@ -34,6 +34,9 @@ import {
 	pow,
 	sqrt,
 	sign,
+	attribute,
+	bool,
+	Fn,
 } from 'three/tsl';
 import {
 	getComponentCountForType,
@@ -322,6 +325,43 @@ const compileTexcoordNode = ( nodeX, compileContext ) => {
 	const indexNode = nodeX.getChildByName( 'index' );
 	const index = indexNode ? parseInt( indexNode.value, 10 ) : 0;
 	return compileContext.getTexcoordNode( index );
+
+};
+
+const GEOMPROP_ATTRIBUTE_TYPES = {
+	float: 'float',
+	integer: 'float',
+	boolean: 'float',
+	vector2: 'vec2',
+	vector3: 'vec3',
+	vector4: 'vec4',
+	color3: 'vec3',
+	color4: 'vec4',
+};
+
+// Built-in names resolve like defaultgeomprop; other names read the geometry attribute of that name.
+const compileGeomPropValueNode = ( nodeX, compileContext ) => {
+
+	const nameNode = nodeX.getChildByName( 'geomprop' );
+	const name = nameNode ? String( nameNode.value || '' ) : '';
+	const fallback = nodeX.getNodeByName( 'default' );
+	if ( name === '' ) return fallback;
+
+	const builtIn = compileContext.getGeomPropNode( name );
+	if ( builtIn ) return builtIn;
+
+	const attributeType = GEOMPROP_ATTRIBUTE_TYPES[ nodeX.type ];
+	if ( ! attributeType ) return fallback;
+
+	return Fn( ( builder ) => {
+
+		if ( builder.hasGeometryAttribute( name ) !== true ) return fallback;
+		const value = attribute( name, attributeType );
+		if ( nodeX.type === 'integer' ) return int( value );
+		if ( nodeX.type === 'boolean' ) return bool( value );
+		return value;
+
+	} )();
 
 };
 
@@ -935,6 +975,7 @@ function createMaterialXCompileRegistry() {
 	register( registry, [ 'bitangent' ], ( nodeX ) => compileNormalizedSpaceInputNode( nodeX, bitangentLocal, bitangentWorld ) );
 	register( registry, [ 'texcoord' ], ( nodeX, out, compileContext ) => compileTexcoordNode( nodeX, compileContext ) );
 	register( registry, [ 'geomcolor' ], ( nodeX ) => compileGeomColorNode( nodeX ) );
+	register( registry, [ 'geompropvalue' ], ( nodeX, out, compileContext ) => compileGeomPropValueNode( nodeX, compileContext ) );
 	register( registry, [ 'tiledimage' ], ( nodeX, out, compileContext ) => compileTiledImageNode( nodeX, compileContext ) );
 	register( registry, [ 'image' ], ( nodeX, out, compileContext ) => compileImageLikeNode( nodeX, compileContext ) );
 	register( registry, [ 'triplanarprojection' ], ( nodeX, out, compileContext ) => compileTriplanarProjectionNode( nodeX, compileContext ) );
