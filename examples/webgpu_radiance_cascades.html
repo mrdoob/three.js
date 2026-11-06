@@ -112,12 +112,12 @@
 				// the options of the cascades change at run time, only the scene loads and builds its BVH again
 
 				gui.add( params, 'scene', Object.keys( scenes ) ).name( 'Scene' ).onChange( setScene );
-				gui.add( params, 'probeSize', [ 6, 8, 12, 16 ] ).name( 'Probe Size (px)' ).onChange( () => Object.assign( cascades, probeLayout() ) );
-				gui.add( params, 'rays', Object.keys( rayStrides ) ).name( 'Rays' ).onChange( updateCascades );
-				gui.add( params, 'secondary' ).name( 'Secondary Bounces' ).onChange( updateCascades );
-				gui.add( params, 'smoothing', 0, 1, 0.01 ).name( 'Temporal Smoothing' ).onChange( updateCascades );
-				gui.add( params, 'adaptiveQuality' ).name( 'Adaptive Quality' ).onChange( updateQuality ).listen();
-				gui.add( params, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( () => {
+
+				const qualityFolder = gui.addFolder( 'Quality' );
+				qualityFolder.add( params, 'probeSize', [ 6, 8, 12, 16 ] ).name( 'Probe Size (px)' ).onChange( () => Object.assign( cascades, probeLayout() ) );
+				qualityFolder.add( params, 'rays', Object.keys( rayStrides ) ).name( 'Rays' ).onChange( updateCascades );
+				qualityFolder.add( params, 'smoothing', 0, 1, 0.01 ).name( 'Temporal Smoothing' ).onChange( updateCascades );
+				qualityFolder.add( params, 'quality', 0, 1, 0.01 ).name( 'Quality' ).onChange( () => {
 
 					// the slider shows the adaptive quality, moving it fixes the quality
 
@@ -128,7 +128,8 @@
 					updateQuality();
 
 				} ).listen();
-				gui.add( params, 'halfResolution' ).name( 'Half Resolution' ).onChange( () => {
+				qualityFolder.add( params, 'adaptiveQuality' ).name( 'Adaptive Quality' ).onChange( updateQuality ).listen();
+				qualityFolder.add( params, 'halfResolution' ).name( 'Half Resolution' ).onChange( () => {
 
 					if ( params.halfResolution === shownHalf ) return;
 
@@ -137,12 +138,15 @@
 					updateQuality();
 
 				} ).listen();
-				gui.add( params, 'traa' ).name( 'TRAA' ).onChange( updateOutput );
-				gui.add( params, 'view', Object.keys( views ) ).name( 'View' ).onChange( () => cascades.mode.value = views[ params.view ] );
-				gui.add( params, 'intensity', 0, 4 ).name( 'Indirect' ).onChange( () => cascades.intensity.value = params.intensity );
-				gui.add( params, 'sunAngle', 5, 175 ).name( 'Sun Angle' ).onChange( updateSun ).listen();
-				gui.add( params, 'animateSun' ).name( 'Animate Sun' );
-				gui.add( params, 'autoRotate' ).name( 'Auto Rotate' ).onChange( () => controls.autoRotate = params.autoRotate );
+				qualityFolder.add( params, 'secondary' ).name( 'Secondary Bounces' ).onChange( updateCascades );
+				qualityFolder.add( params, 'traa' ).name( 'TRAA' ).onChange( updateOutput );
+
+				const visualizationFolder = gui.addFolder( 'Visualization' );
+				visualizationFolder.add( params, 'view', Object.keys( views ) ).name( 'View' ).onChange( () => cascades.mode.value = views[ params.view ] );
+				visualizationFolder.add( params, 'intensity', 0, 4 ).name( 'Indirect' ).onChange( () => cascades.intensity.value = params.intensity );
+				visualizationFolder.add( params, 'sunAngle', 5, 175 ).name( 'Sun Angle' ).onChange( updateSun ).listen();
+				visualizationFolder.add( params, 'animateSun' ).name( 'Animate Sun' );
+				visualizationFolder.add( params, 'autoRotate' ).name( 'Auto Rotate' ).onChange( () => controls.autoRotate = params.autoRotate );
 
 				await setScene();
 
