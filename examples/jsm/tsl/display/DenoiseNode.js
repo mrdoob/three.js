@@ -20,26 +20,13 @@ const HIT_DISTANCE_PHI = 8;
 
 /**
  * Denoises the noisy output of a screen-space effect, e.g. AO, GI or reflections, or a texture, e.g. a light map,
- * with the edge-aware à-trous wavelet filter of SVGF. The filter is guided by the surface (position and id) and the
- * normal of each texel, so it does not blur across geometric edges, and it compares the luminance of the texels to
- * their noise, so it keeps the details that rise above the noise.
+ * with the edge-aware à-trous wavelet filter of SVGF. In screen space, `temporalDenoise()` also accumulates the input
+ * in time. In texture space, the filter is guided by textures of the world-space position and normal.
  *
- * - In screen space, the guides are the depth and the view-space normals of the scene, resolved once per frame at the
- * resolution of the input. With `temporalDenoise()`, the input is first accumulated in time: the history is reprojected
- * with the velocity buffer, without the texels of other surfaces, and blended with a weight of `1 / history length` up
- * to {@link DenoiseNode#maxFrames} (SVGF, ReLAX). A short fast history bounds the long one and drops it where they
- * diverge (the color anti-lag of ReLAX). The noise of each pixel is the temporal variance of its luminance, or a
- * spatial estimate while its history is short. Reflections with a roughness and a hit distance are reprojected with
- * the motion of the reflected point (virtual motion), and filtered within the footprint of their reflection lobe on
- * screen (ReBLUR, ReLAX).
- * - In texture space, the guides are textures of the world-space position, with the id of the surface (e.g. the chart
- * of a light map) in alpha, and of the world-space normal, e.g. those that `LightMapper` bakes. The noise comes from a
- * variance texture, else from {@link DenoiseNode#relativeNoise}. Texels without data are filled from their neighbors.
- *
- * With `quality: 'fast'` (default), the filter is two passes of a flat 3x3 kernel, 3 texels apart in the second, one
- * 9x9 box of 18 taps. With `quality: 'quality'`, it is three passes (four in texture space) of a 3x3 kernel with growing
- * strides, each fitting a plane to the weighted texels instead of averaging them, so gradients stay unbiased where a
- * neighborhood is one-sided, e.g. at chart borders and in contact shadows.
+ * SVGF delivers high quality but is designed for desktop-class hardware and its cost can be very noticeable on mobile
+ * devices. Performance-restricted use cases should avoid per-frame denoising with this node and rely on the basic
+ * denoising of TAA instead, see {@link TRAANode}. {@link BilateralBlurNode} is a performant alternative as well. Both
+ * come at the cost of lower denoise quality.
  *
  * ```js
  * // SSGI, accumulated in time before TRAA: GI in rgb and AO in alpha
