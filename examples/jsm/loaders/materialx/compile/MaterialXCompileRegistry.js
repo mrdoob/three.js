@@ -116,7 +116,7 @@ const sampleTexture = ( textureFile, uvNode, compileContext, fallback, addressMo
 
 	if ( ! textureFile ) return fallback;
 
-	const textureUvNode = compileContext.mxFromBottomLeftUvSpace( uvNode );
+	const textureUvNode = compileContext.mxToImageUv( uvNode );
 	const sampled = texture( textureFile, textureUvNode );
 	return addressModes ? applyTextureAddressModeDefault( sampled, textureUvNode, addressModes, defaultNode ) : sampled;
 
@@ -508,7 +508,7 @@ const compileHexTiledTextureNode = ( nodeX, compileContext, category ) => {
 	const offsetRange = nodeX.getNodeByName( 'offsetrange' );
 	const falloff = nodeX.getNodeByName( 'falloff' );
 
-	const transformedUv = compileContext.mxFromBottomLeftUvSpace( mul( uvNode, tiling ) );
+	const transformedUv = compileContext.mxToImageUv( mul( uvNode, tiling ) );
 	const tileData = compileContext.mxHextileCoord( transformedUv, rotation, rotationRange, scale, scaleRange, offset, offsetRange );
 
 	let sample0 = texture( textureFile, tileData.coords[ 0 ] ).grad(

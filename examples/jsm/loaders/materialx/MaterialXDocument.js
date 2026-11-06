@@ -171,7 +171,6 @@ function getBottomLeftUvSpaceHelpers( uvSpace ) {
 	const helper = uvSpace === 'top-left' ? mxFlipUvY : mxIdentityUv;
 	return {
 		mxToBottomLeftUvSpace: helper,
-		mxFromBottomLeftUvSpace: helper,
 	};
 
 }
@@ -1018,6 +1017,8 @@ class MaterialXDocument {
 			compileRegistry: COMPILE_REGISTRY,
 			nodeLibrary: MtlXLibrary,
 			...bottomLeftUvSpaceHelpers,
+			// Graph coordinates start at the bottom-left; images are stored top-first.
+			mxToImageUv: ( uvNode ) => uvNode.flipY(),
 			getTexcoordNode: ( index = 0 ) => bottomLeftUvSpaceHelpers.mxToBottomLeftUvSpace( uv( index ) ),
 			getGeomPropNode: ( name ) => {
 
