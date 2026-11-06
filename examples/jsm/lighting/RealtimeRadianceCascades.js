@@ -1,5 +1,5 @@
 import { BackSide, BufferAttribute, BufferGeometry, DepthTexture, EquirectangularReflectionMapping, EquirectangularRefractionMapping, FloatType, FrontSide, HalfFloatType, Matrix4, NodeMaterial, QuadMesh, ReadbackBuffer, RenderTarget, StorageBufferAttribute, StorageTexture, Vector2, Vector3, Vector4 } from 'three/webgpu';
-import { Break, Fn, If, LTC_Evaluate, Loop, abs, atan, atomicAdd, atomicLoad, atomicMax, atomicMin, atomicStore, cameraPosition, ceil, clamp, cos, cross, diffuseColor, dot, equirectUV, exp, exp2, float, floatBitsToUint, floor, fract, getDistanceAttenuation, getViewPosition, hash, instanceIndex, int, isBackgroundDepth, ivec2, ivec3, ivec4, log2, mat3, max, min, mix, mrt, normalWorldGeometry, normalize, output, pmremTexture, positionWorld, screenUV, select, sin, smoothstep, sqrt, step, storage, texture, textureStore, uint, uintBitsToFloat, uniform, uniformArray, uv, uvec2, uvec3, vec2, vec3, vec4, velocity } from 'three/tsl';
+import { Break, Fn, If, LTC_Evaluate, Loop, abs, atan, atomicAdd, atomicLoad, atomicMax, atomicMin, atomicStore, cameraPosition, ceil, clamp, cos, cross, diffuseColor, dot, equirectUV, exp, exp2, float, floatBitsToUint, floor, fract, getDistanceAttenuation, getViewPosition, hash, instanceIndex, int, isBackgroundDepth, ivec2, ivec3, ivec4, log2, mat3, max, min, mix, mrt, normalWorldGeometry, normalize, output, pmremTexture, positionWorld, screenUV, select, sharedUniformGroup, sin, smoothstep, sqrt, step, storage, texture, textureStore, uint, uintBitsToFloat, uniform, uniformArray, uv, uvec2, uvec3, vec2, vec3, vec4, velocity } from 'three/tsl';
 
 import { MeshBVH, SAH } from 'three-mesh-bvh';
 import { BVHComputeData, rayIntersectionResultStruct, rayStruct, wgslTagFn } from 'three-mesh-bvh/webgpu';
@@ -404,6 +404,16 @@ class RealtimeRadianceCascades {
 		this._passes = null;
 		this._timestampUID = null;
 
+		// the uniforms that change from frame to frame are written once per frame, see update(), into a buffer for each
+		// set of them that a shader reads, instead of into a buffer of every pass
+
+		this._frameUniforms = sharedUniformGroup( 'radianceCascades' );
+
+		for ( const node of [ this._parity, this._frameNode, this._jitter, this._cameraPosition, this._projectionInverse, this._cameraWorld, this._resolution, this._rays, this._previousRays, this._shading, this._lodBias, this._screenWidth, this._screenHeight, this._sunDirection, this._sunColor, this._shadowMatrix, this._shadowSize, this._shadowOffset, this._shadowSign, this._lightCount, this._rectLightCount ] ) {
+
+			node.setGroup( this._frameUniforms );
+
+		}
 
 		// the state of the adaptive quality, see _adaptQuality()
 
@@ -916,6 +926,10 @@ class RealtimeRadianceCascades {
 		frameKernels.trace.dispatchSize = rays;
 
 		if ( this.secondary ) frameKernels.gatherSecondary.dispatchSize = frameKernels.traceSecondary.dispatchSize = Math.max( previousRays, 1 );
+
+		// the uniforms of the frame are set: their buffers are written when the passes and the irradiance bind them next
+
+		this._frameUniforms.needsUpdate = true;
 
 		renderer.compute( this._passes );
 
@@ -2039,7 +2053,7 @@ class RealtimeRadianceCascades {
 
 		const capacity = Math.min( 2 ** Math.ceil( Math.log2( count ) ), MAX_LIGHTS );
 
-		return uniformArray( Array.from( { length: capacity * 3 }, () => new Vector4() ), 'vec4' );
+		return uniformArray( Array.from( { length: capacity * 3 }, () => new Vector4() ), 'vec4' ).setGroup( this._frameUniforms );
 
 	}
 
