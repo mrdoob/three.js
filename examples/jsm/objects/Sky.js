@@ -99,13 +99,11 @@ Sky.SkyShader = {
 
 		varying vec3 vWorldPosition;
 		varying vec3 vSunDirection;
-		varying float vSunfade;
 		varying vec3 vBetaR;
 		varying vec3 vBetaM;
 		varying float vSunE;
 
 		// constants for atmospheric scattering
-		const float e = 2.71828182845904523536028747135266249775724709369995957;
 		const float pi = 3.141592653589793238462643383279502884197169;
 
 		// wavelength of used primaries, according to preetham
@@ -129,7 +127,7 @@ Sky.SkyShader = {
 
 		float sunIntensity( float zenithAngleCos ) {
 			zenithAngleCos = clamp( zenithAngleCos, -1.0, 1.0 );
-			return EE * max( 0.0, 1.0 - pow( e, -( ( cutoffAngle - acos( zenithAngleCos ) ) / steepness ) ) );
+			return EE * max( 0.0, 1.0 - exp( -( ( cutoffAngle - acos( zenithAngleCos ) ) / steepness ) ) );
 		}
 
 		vec3 totalMie( float T ) {
@@ -158,9 +156,9 @@ Sky.SkyShader = {
 
 			vSunE = sunIntensity( vSunDirection.y );
 
-			vSunfade = 1.0 - clamp( 1.0 - exp( ( sunPosition.y / 450000.0 ) ), 0.0, 1.0 );
+			float sunfade = 1.0 - clamp( 1.0 - exp( vSunDirection.y ), 0.0, 1.0 );
 
-			float rayleighCoefficient = rayleigh - ( 1.0 * ( 1.0 - vSunfade ) );
+			float rayleighCoefficient = max( 0.0, rayleigh - ( 1.0 - sunfade ) );
 
 			// extinction (absorption + out scattering)
 			// rayleigh coefficients
@@ -221,9 +219,6 @@ Sky.SkyShader = {
 		// constants for atmospheric scattering
 		const float pi = 3.141592653589793238462643383279502884197169;
 
-		const float n = 1.0003; // refractive index of air
-		const float N = 2.545E25; // number of molecules per unit volume for air at 288.15K and 1013mb (sea level -45 celsius)
-
 		// optical length at zenith for molecules
 		const float rayleighZenithLength = 8.4E3;
 		const float mieZenithLength = 1.25E3;
@@ -272,9 +267,6 @@ Sky.SkyShader = {
 			Lin *= mix( vec3( 1.0 ), pow( vSunE * ( ( betaRTheta + betaMTheta ) / ( vBetaR + vBetaM ) ) * Fex, vec3( 1.0 / 2.0 ) ), clamp( pow( 1.0 - vSunDirection.y, 5.0 ), 0.0, 1.0 ) );
 
 			// nightsky
-			float theta = acos( direction.y ); // elevation --> y-axis, [-pi/2, pi/2]
-			float phi = atan( direction.z, direction.x ); // azimuth --> x-axis [-pi/2, pi/2]
-			vec2 uv = vec2( phi, theta ) / vec2( 2.0 * pi, pi ) + vec2( 0.5, 0.0 );
 			vec3 L0 = vec3( 0.1 ) * Fex;
 
 			// composition + solar disc
@@ -331,7 +323,7 @@ Sky.SkyShader = {
 				float alpha = ( 1.0 - exp( depth * cloudDensity * -12.0 ) ) * horizonFade;
 
 				// Occlude the sun disc/glow behind opaque cloud
-				texColor -= L0 * 0.04 * alpha;
+				texColor -= ( L0 * 0.04 + sundiscColor ) * alpha;
 
 				// Composite through the atmosphere so distant clouds dissolve into haze
 				vec3 cloudAerial = mix( texColor, cloudColor, Fex );

@@ -162,10 +162,6 @@ class SkyMesh extends Mesh {
 
 		const vertexNode = /*@__PURE__*/ Fn( ( builder ) => {
 
-			// constants for atmospheric scattering
-			const e = float( 2.718281828459045 );
-			// const pi = float( 3.141592653589793 );
-
 			// wavelength of used primaries, according to preetham
 			// const lambda = vec3( 680E-9, 550E-9, 450E-9 );
 			// this pre-calculation replaces older TotalRayleigh(vec3 lambda) function:
@@ -194,16 +190,16 @@ class SkyMesh extends Mesh {
 
 			const angle = sunDirection.y;
 			const zenithAngleCos = clamp( angle, - 1, 1 );
-			const sunIntensity = EE.mul( max( 0.0, float( 1.0 ).sub( pow( e, cutoffAngle.sub( acos( zenithAngleCos ) ).div( steepness ).negate() ) ) ) );
+			const sunIntensity = EE.mul( max( 0.0, float( 1.0 ).sub( exp( cutoffAngle.sub( acos( zenithAngleCos ) ).div( steepness ).negate() ) ) ) );
 			vSunE.assign( sunIntensity );
 
 			// sun fade
 
-			const sunfade = float( 1.0 ).sub( clamp( float( 1.0 ).sub( exp( this.sunPosition.y.div( 450000.0 ) ) ), 0, 1 ) );
+			const sunfade = float( 1.0 ).sub( clamp( float( 1.0 ).sub( exp( sunDirection.y ) ), 0, 1 ) );
 
 			// varying vBetaR
 
-			const rayleighCoefficient = this.rayleigh.sub( float( 1.0 ).mul( float( 1.0 ).sub( sunfade ) ) );
+			const rayleighCoefficient = max( 0.0, this.rayleigh.sub( float( 1.0 ).sub( sunfade ) ) );
 
 			// extinction (absorption + out scattering)
 			// rayleigh coefficients
