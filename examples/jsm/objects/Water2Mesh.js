@@ -8,7 +8,7 @@ import {
 	Node
 } from 'three/webgpu';
 
-import { Fn, vec2, viewportSafeUV, viewportSharedTexture, reflector, pow, float, abs, texture, uniform, vec4, cameraPosition, positionWorld, uv, mix, vec3, normalize, max, dot, screenUV } from 'three/tsl';
+import { Fn, vec2, viewportSafeUV, viewportSharedTexture, reflector, pow, float, abs, length, texture, uniform, vec4, cameraPosition, cameraViewMatrix, positionWorld, uv, mix, vec3, normalize, max, dot, screenUV } from 'three/tsl';
 
 /** @module Water2Mesh */
 
@@ -52,6 +52,26 @@ class WaterMesh extends Mesh {
 
 		material.colorNode = new WaterNode( options, this );
 
+		this._reflector = material.colorNode._reflectionSampler.reflector;
+
+	}
+
+	/**
+	 * The effect's resolution scale.
+	 *
+	 * @type {number}
+	 * @default 1
+	 */
+	get resolutionScale() {
+
+		return this._reflector.resolutionScale;
+
+	}
+
+	set resolutionScale( value ) {
+
+		this._reflector.resolutionScale = value;
+
 	}
 
 }
@@ -82,7 +102,10 @@ class WaterNode extends Node {
 
 		this._USE_FLOW = options.flowMap !== undefined;
 
-		this._reflectionSampler = reflector();
+		this._reflectionSampler = reflector( {
+			resolutionScale: options.resolutionScale !== undefined ? options.resolutionScale : 1,
+			bounces: false
+		} );
 		this._defaultReflectorUV = this._reflectionSampler.uvNode;
 		waterBody.add( this._reflectionSampler.target );
 
@@ -126,21 +149,14 @@ class WaterNode extends Node {
 			const flowMapOffset1 = this.flowConfig.y;
 			const halfCycle = this.flowConfig.z;
 
-			const toEye = normalize( cameraPosition.sub( positionWorld ) );
+			const worldToEye = cameraPosition.sub( positionWorld );
+			const distance = length( worldToEye );
+			const toEye = worldToEye.div( distance );
 
-			let flow;
-
-			if ( this._USE_FLOW === true ) {
-
-				flow = this.flowMap.rg.mul( 2 ).sub( 1 );
-
-			} else {
-
-				flow = vec2( this.flowDirection.x, this.flowDirection.y );
-
-			}
-
-			flow.x.mulAssign( - 1 );
+			const flow = ( this._USE_FLOW === true
+				? this.flowMap.rg.mul( 2 ).sub( 1 )
+				: vec2( this.flowDirection.x, this.flowDirection.y )
+			).mul( vec2( - 1, 1 ) );
 
 			// sample normal maps (distort uvs with flowdata)
 
@@ -165,17 +181,22 @@ class WaterNode extends Node {
 
 			// reflector, refractor
 
-			const offset = normal.xz.mul( 0.05 ).toVar();
+			const viewRight = vec2( cameraViewMatrix[ 0 ].x, cameraViewMatrix[ 2 ].x );
+			const normalTilt = vec2(
+				normal.x.mul( viewRight.x ).add( normal.z.mul( viewRight.y ) ),
+				normal.z.mul( viewRight.x ).sub( normal.x.mul( viewRight.y ) )
+			);
+			const offset = normalTilt.mul( float( 0.05 ).div( float( 1.0 ).add( distance.mul( 0.02 ) ) ) ).toVar();
 
 			const reflectionSampler = this._reflectionSampler;
-			reflectionSampler.uvNode = this._defaultReflectorUV.add( offset );
+			reflectionSampler.uvNode = this._defaultReflectorUV.add( vec2( offset.x.negate(), offset.y ) );
 
-			const refractorUV = screenUV.add( offset );
+			const refractorUV = screenUV.sub( offset );
 			const refractionSampler = viewportSharedTexture( viewportSafeUV( refractorUV ) );
 
-			// calculate final uv coords
+			// tint transmitted light only; dielectric surface reflections stay achromatic
 
-			return vec4( this.color, 1.0 ).mul( mix( refractionSampler, reflectionSampler, reflectance ) );
+			return vec4( mix( refractionSampler.rgb.mul( this.color ), reflectionSampler.rgb, reflectance ), 1.0 );
 
 		} )();
 
@@ -190,6 +211,7 @@ class WaterNode extends Node {
  *
  * @typedef {Object} module:Water2Mesh~Options
  * @property {number|Color|string} [color=0xFFFFFF] - The water color.
+ * @property {number} [resolutionScale=1] - The resolution scale.
  * @property {Vector2} [flowDirection=(1,0)] - The water's flow direction.
  * @property {number} [flowSpeed=0.03] - The water's flow speed.
  * @property {number} [reflectivity=0.02] - The water's reflectivity.
