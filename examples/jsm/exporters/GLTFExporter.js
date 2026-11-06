@@ -3434,7 +3434,10 @@ class GLTFMaterialsAnisotropyExtension {
 
 		if ( material.anisotropyMap ) {
 
-			const anisotropyMapDef = { index: await writer.processTextureAsync( material.anisotropyMap ) };
+			const anisotropyMapDef = {
+				index: await writer.processTextureAsync( material.anisotropyMap ),
+				texCoord: material.anisotropyMap.channel
+			};
 			writer.applyTextureTransform( anisotropyMapDef, material.anisotropyMap );
 			extensionDef.anisotropyTexture = anisotropyMapDef;
 
