@@ -45,14 +45,6 @@ class WaterMesh extends Mesh {
 		 */
 		this.isWaterMesh = true;
 
-		/**
-		 * The effect's resolution scale.
-		 *
-		 * @type {number}
-		 * @default 0.5
-		 */
-		this.resolutionScale = options.resolutionScale !== undefined ? options.resolutionScale : 0.5;
-
 		// Uniforms
 
 		/**
@@ -147,6 +139,12 @@ class WaterMesh extends Mesh {
 
 		const distortion = surfaceNormal.xz.mul( float( 0.001 ).add( float( 1.0 ).div( distance ) ) ).mul( this.distortionScale );
 
+		const mirrorSampler = reflector( { resolutionScale: options.resolutionScale !== undefined ? options.resolutionScale : 0.5 } );
+		mirrorSampler.uvNode = mirrorSampler.uvNode.add( distortion );
+		this.add( mirrorSampler.target );
+
+		this._reflector = mirrorSampler.reflector;
+
 		// Material
 
 		material.transparent = true;
@@ -157,12 +155,6 @@ class WaterMesh extends Mesh {
 
 		material.colorNode = Fn( () => {
 
-			const mirrorSampler = reflector();
-			mirrorSampler.uvNode = mirrorSampler.uvNode.add( distortion );
-			mirrorSampler.reflector.resolutionScale = this.resolutionScale;
-
-			this.add( mirrorSampler.target );
-
 			const theta = max( dot( eyeDirection, surfaceNormal ), 0.0 );
 			const rf0 = float( 0.02 );
 			const reflectance = mul( pow( float( 1.0 ).sub( theta ), 5.0 ), float( 1.0 ).sub( rf0 ) ).add( rf0 );
@@ -172,6 +164,24 @@ class WaterMesh extends Mesh {
 			return albedo;
 
 		} )();
+
+	}
+
+	/**
+	 * The effect's resolution scale.
+	 *
+	 * @type {number}
+	 * @default 0.5
+	 */
+	get resolutionScale() {
+
+		return this._reflector.resolutionScale;
+
+	}
+
+	set resolutionScale( value ) {
+
+		this._reflector.resolutionScale = value;
 
 	}
 

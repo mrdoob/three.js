@@ -82,6 +82,10 @@ class WaterNode extends Node {
 
 		this._USE_FLOW = options.flowMap !== undefined;
 
+		this._reflectionSampler = reflector();
+		this._defaultReflectorUV = this._reflectionSampler.uvNode;
+		waterBody.add( this._reflectionSampler.target );
+
 	}
 
 	updateFlow( delta ) {
@@ -163,9 +167,8 @@ class WaterNode extends Node {
 
 			const offset = normal.xz.mul( 0.05 ).toVar();
 
-			const reflectionSampler = reflector();
-			this.waterBody.add( reflectionSampler.target );
-			reflectionSampler.uvNode = reflectionSampler.uvNode.add( offset );
+			const reflectionSampler = this._reflectionSampler;
+			reflectionSampler.uvNode = this._defaultReflectorUV.add( offset );
 
 			const refractorUV = screenUV.add( offset );
 			const refractionSampler = viewportSharedTexture( viewportSafeUV( refractorUV ) );
