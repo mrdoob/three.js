@@ -8,7 +8,7 @@ import {
 	Node
 } from 'three/webgpu';
 
-import { Fn, vec2, viewportSafeUV, viewportSharedTexture, reflector, pow, float, abs, length, texture, uniform, vec4, cameraPosition, cameraViewMatrix, positionWorld, uv, mix, vec3, normalize, max, dot, screenUV } from 'three/tsl';
+import { Fn, vec2, viewportSafeUV, viewportSharedTexture, reflector, float, abs, inverseSqrt, sub, texture, uniform, vec4, cameraPosition, cameraViewMatrix, positionWorld, uv, mix, vec3, normalize, max, dot, screenUV } from 'three/tsl';
 
 /** @module Water2Mesh */
 
@@ -150,8 +150,10 @@ class WaterNode extends Node {
 			const halfCycle = this.flowConfig.z;
 
 			const worldToEye = cameraPosition.sub( positionWorld );
-			const distance = length( worldToEye );
-			const toEye = worldToEye.div( distance );
+			const distSq = dot( worldToEye, worldToEye );
+			const invDistance = inverseSqrt( distSq );
+			const toEye = worldToEye.mul( invDistance );
+			const distance = distSq.mul( invDistance );
 
 			const flow = ( this._USE_FLOW === true
 				? this.flowMap.rg.mul( 2 ).sub( 1 )
@@ -177,7 +179,9 @@ class WaterNode extends Node {
 
 			// calculate the fresnel term to blend reflection and refraction maps
 			const theta = max( dot( toEye, normal ), 0 );
-			const reflectance = pow( float( 1.0 ).sub( theta ), 5.0 ).mul( float( 1.0 ).sub( this.reflectivity ) ).add( this.reflectivity );
+			const oneMinusTheta = sub( 1.0, theta );
+			const oneMinusTheta2 = oneMinusTheta.mul( oneMinusTheta );
+			const reflectance = oneMinusTheta2.mul( oneMinusTheta2 ).mul( oneMinusTheta ).mul( sub( 1.0, this.reflectivity ) ).add( this.reflectivity );
 
 			// reflector, refractor
 

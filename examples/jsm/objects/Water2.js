@@ -338,8 +338,10 @@ Water.WaterShader = {
 			float halfCycle = config.z;
 			float scale = config.w;
 
-			float distance = length( vToEye );
-			vec3 toEye = vToEye / distance;
+			float distSq = dot( vToEye, vToEye );
+			float invDistance = inversesqrt( distSq );
+			vec3 toEye = vToEye * invDistance;
+			float distance = distSq * invDistance;
 
 			// determine flow direction
 			vec2 flow;
@@ -363,7 +365,9 @@ Water.WaterShader = {
 
 			// calculate the fresnel term to blend reflection and refraction maps
 			float theta = max( dot( toEye, normal ), 0.0 );
-			float reflectance = reflectivity + ( 1.0 - reflectivity ) * pow( ( 1.0 - theta ), 5.0 );
+			float oneMinusTheta = 1.0 - theta;
+			float oneMinusTheta2 = oneMinusTheta * oneMinusTheta;
+			float reflectance = reflectivity + ( 1.0 - reflectivity ) * ( oneMinusTheta2 * oneMinusTheta2 * oneMinusTheta );
 
 			// calculate final uv coords
 			vec2 viewRight = vec2( viewMatrix[ 0 ][ 0 ], viewMatrix[ 2 ][ 0 ] );
