@@ -39,7 +39,7 @@ const _commandEncoderDescriptor = new GPUCommandEncoderDescriptor();
 const _computePassDescriptor = new GPUComputePassDescriptor();
 const _querySetDescriptor = new GPUQuerySetDescriptor();
 const _shaderModuleDescriptor = new GPUShaderModuleDescriptor();
-const _renderPassTimestampWrites = new GPURenderPassTimestampWrites();
+const _computePassTimestampWrites = new GPURenderPassTimestampWrites();
 const _texelCopyTextureInfoSrc = new GPUTexelCopyTextureInfo();
 const _texelCopyTextureInfoDst = new GPUTexelCopyTextureInfo();
 const _textureDescriptor = new GPUTextureDescriptor();
@@ -941,7 +941,10 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		this.initTimestampQuery( TimestampQuery.RENDER, this.getTimestampUID( renderContext ), descriptor );
+		// Per render context, so a render nested between this pass and its resume can't change its query indices.
+		if ( this.trackTimestamp === true && renderContextData.timestampWrites === undefined ) renderContextData.timestampWrites = new GPURenderPassTimestampWrites();
+
+		this.initTimestampQuery( TimestampQuery.RENDER, this.getTimestampUID( renderContext ), descriptor, renderContextData.timestampWrites );
 
 		descriptor.occlusionQuerySet = occlusionQuerySet;
 
@@ -1441,10 +1444,14 @@ class WebGPUBackend extends Backend {
 			const renderStages = renderContextData.arrayCameraRenderStages;
 			renderStages.push( { bundles } );
 
+			// All layer passes after the first one only write the end timestamp so the query spans the entire render context.
+			const resumedTimestampWrites = this._getResumedTimestampWrites( renderContextData );
+
 			// A viewport texture is 2D, so each layer must be captured immediately before that layer samples it.
 			for ( let i = 0; i < renderContextData.layerDescriptors.length; i ++ ) {
 
 				const layerDescriptor = renderContextData.layerDescriptors[ i ];
+				const timestampWrites = layerDescriptor.timestampWrites;
 				const colorLoadOps = layerDescriptor.colorAttachments.map( attachment => attachment.loadOp );
 				const colorStoreOps = layerDescriptor.colorAttachments.map( attachment => attachment.storeOp );
 				const depthLoadOp = layerDescriptor.depthStencilAttachment?.depthLoadOp;
@@ -1480,6 +1487,8 @@ class WebGPUBackend extends Backend {
 
 					}
 
+					layerDescriptor.timestampWrites = ( i === 0 && stageIndex === 0 ) ? timestampWrites : resumedTimestampWrites;
+
 					const renderPass = encoder.beginRenderPass( layerDescriptor );
 
 					if ( renderContext.viewport ) {
@@ -1509,6 +1518,8 @@ class WebGPUBackend extends Backend {
 					}
 
 				}
+
+				layerDescriptor.timestampWrites = timestampWrites;
 
 				for ( let j = 0; j < layerDescriptor.colorAttachments.length; j ++ ) {
 
@@ -2618,8 +2629,10 @@ class WebGPUBackend extends Backend {
 	 * @param {string} type - The type of the timestamp query (e.g. 'render', 'compute').
 	 * @param {number} uid - Unique id for the context (e.g. render context id).
 	 * @param {Object} descriptor - The query descriptor.
+	 * @param {GPURenderPassTimestampWrites} [timestampWrites] - The timestamp writes object that is assigned to the descriptor.
+	 * Render contexts pass their own object since their descriptor can be used again when a pass is resumed.
 	 */
-	initTimestampQuery( type, uid, descriptor ) {
+	initTimestampQuery( type, uid, descriptor, timestampWrites = _computePassTimestampWrites ) {
 
 		if ( ! this.trackTimestamp ) {
 
@@ -2639,11 +2652,42 @@ class WebGPUBackend extends Backend {
 
 		const baseOffset = timestampQueryPool.allocateQueriesForContext( uid );
 
-		_renderPassTimestampWrites.querySet = timestampQueryPool.querySet;
-		_renderPassTimestampWrites.beginningOfPassWriteIndex = baseOffset;
-		_renderPassTimestampWrites.endOfPassWriteIndex = baseOffset + 1;
+		timestampWrites.querySet = timestampQueryPool.querySet;
+		timestampWrites.beginningOfPassWriteIndex = baseOffset;
+		timestampWrites.endOfPassWriteIndex = baseOffset + 1;
 
-		descriptor.timestampWrites = _renderPassTimestampWrites;
+		descriptor.timestampWrites = timestampWrites;
+
+	}
+
+	/**
+	 * Returns the timestamp writes for a pass that resumes a render context, e.g. after a framebuffer
+	 * copy or for the next layer of a layered render target. Only the end timestamp is written so the
+	 * query spans all passes of the render context.
+	 *
+	 * @private
+	 * @param {Object} renderContextData - The backend data of the render context.
+	 * @return {GPURenderPassTimestampWrites|undefined} The timestamp writes or `undefined` if timestamps are not tracked.
+	 */
+	_getResumedTimestampWrites( renderContextData ) {
+
+		const timestampWrites = renderContextData.timestampWrites;
+
+		if ( this.trackTimestamp === false || timestampWrites === undefined ) return undefined;
+
+		let resumedTimestampWrites = renderContextData.resumedTimestampWrites;
+
+		if ( resumedTimestampWrites === undefined ) {
+
+			resumedTimestampWrites = new GPURenderPassTimestampWrites();
+			renderContextData.resumedTimestampWrites = resumedTimestampWrites;
+
+		}
+
+		resumedTimestampWrites.querySet = timestampWrites.querySet;
+		resumedTimestampWrites.endOfPassWriteIndex = timestampWrites.endOfPassWriteIndex;
+
+		return resumedTimestampWrites;
 
 	}
 
@@ -3224,6 +3268,9 @@ class WebGPUBackend extends Backend {
 
 			if ( renderContext.depth ) descriptor.depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
 			if ( renderContext.stencil ) descriptor.depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
+
+			// The resumed pass must not write the beginning timestamp again, otherwise the time of the previous segment is lost.
+			descriptor.timestampWrites = this._getResumedTimestampWrites( renderContextData );
 
 			renderContextData.currentPass = encoder.beginRenderPass( descriptor );
 
