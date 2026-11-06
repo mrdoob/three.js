@@ -52,9 +52,10 @@ const MAX_LIGHTS = 256;
 
 const LIGHT_SHARE = 0.1;
 
-// common refresh rates of displays, and of browsers that throttle the animation loop
+// the refresh rates that the adaptive quality targets: the common ones of displays, and 30 Hz of browsers that throttle
+// the animation loop. Rarer ones are left out, as the jitter of the frames at one rate can match another, e.g. 72 Hz at 60
 
-const REFRESH_RATES = [ 24, 30, 40, 48, 50, 60, 72, 75, 90, 100, 120, 144, 165, 180, 240 ];
+const REFRESH_RATES = [ 30, 60, 120, 144, 240 ];
 
 const _position = /*@__PURE__*/ new Vector3();
 const _direction = /*@__PURE__*/ new Vector3();
@@ -236,10 +237,10 @@ class RealtimeRadianceCascades {
 
 		/**
 		 * The frame time in milliseconds that `quality` adapts to, e.g. `1000 / 60`, or 0 for the display's: taken as
-		 * 60 Hz at first, and faster if a quarter of the frames come at a faster common refresh rate, in two
-		 * measurements in a row. While even quality 0 takes longer, the target is a multiple of it, up to the time of
-		 * 30 Hz. While the frames take longer however low the quality, at a steady common refresh rate, e.g. because
-		 * the browser runs the animation loop at 30 Hz in a low power mode, the target is their time, for a while. See
+		 * 60 Hz at first, and as 120, 144 or 240 Hz if a quarter of the frames come at that rate, in two measurements in a
+		 * row. While even quality 0 takes longer, the target is a multiple of it, up to the time of 30 Hz. While the
+		 * frames take longer however low the quality, at a steady 30, 60, 120 or 144 Hz, e.g. because the browser runs
+		 * the animation loop at 30 Hz in a low power mode, the target is their time, for a while. See
 		 * `activeTargetFrameTime`.
 		 *
 		 * @type {number}
@@ -1114,12 +1115,11 @@ class RealtimeRadianceCascades {
 				this._holdTime = Math.min( this._holdTime * 2 || 10000, 160000 );
 				this._holdUntil = now + this._holdTime;
 
-				// a cap below the display's frame rate, e.g. a low power mode, if the timestamps step by it frame after frame,
-				// 24 Hz and up
+				// a cap below the display's frame rate, e.g. a low power mode, if the timestamps step by it frame after frame
 
 				const cap = steadyFrameTime( times );
 
-				if ( cap !== null && cap > this._displayTime * 1.05 && cap <= 1000 / 24 ) {
+				if ( cap !== null && cap > this._displayTime * 1.05 ) {
 
 					this._capTime = cap;
 					this._capUntil = this._holdUntil;
