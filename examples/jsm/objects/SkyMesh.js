@@ -6,7 +6,7 @@ import {
 	NodeMaterial
 } from 'three/webgpu';
 
-import { Fn, float, floor, fract, vec2, vec3, acos, add, mul, clamp, dot, exp, inverseSqrt, max, min, mix, modelViewProjection, normalize, positionWorld, pow, smoothstep, sqrt, sub, varyingProperty, vec4, uniform, cameraPosition, time, If, Loop } from 'three/tsl';
+import { Fn, float, floor, fract, vec2, vec3, abs, acos, add, mul, clamp, dot, exp, inverseSqrt, max, min, mix, modelViewProjection, normalize, positionWorld, smoothstep, sqrt, sub, varyingProperty, vec4, uniform, cameraPosition, time, If, Loop } from 'three/tsl';
 
 /**
  * Represents a skydome for scene backgrounds. Based on [A Practical Analytic Model for Daylight](https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight)
@@ -157,6 +157,7 @@ class SkyMesh extends Mesh {
 
 		const vSunDirection = varyingProperty( 'vec3' );
 		const vSunE = varyingProperty( 'vec3' );
+		const vSunFex = varyingProperty( 'vec3' );
 		const vBetaR = varyingProperty( 'vec3' );
 		const vBetaM = varyingProperty( 'vec3' );
 
@@ -204,17 +205,25 @@ class SkyMesh extends Mesh {
 			// varying vBetaR
 
 			const rayleighCoefficient = max( 0.0, this.rayleigh.sub( float( 1.0 ).sub( sunfade ) ) );
+			const betaR = totalRayleigh.mul( rayleighCoefficient );
 
 			// extinction (absorption + out scattering)
 			// rayleigh coefficients
-			vBetaR.assign( totalRayleigh.mul( rayleighCoefficient ) );
+			vBetaR.assign( betaR );
 
 			// varying vBetaM
 
 			const c = float( 0.2 ).mul( this.turbidity ).mul( 10E-18 );
 			const totalMie = float( 0.434 ).mul( c ).mul( MieConst );
+			const betaM = totalMie.mul( this.mieCoefficient );
 
-			vBetaM.assign( totalMie.mul( this.mieCoefficient ) );
+			vBetaM.assign( betaM );
+
+			// sun-path transmittance through lower troposphere to cloud altitude (~2km)
+
+			const sunCloudCos = max( 0.0, angle.add( 0.03 ) );
+			const sunCloudAirMass = float( 2.0 ).div( sunCloudCos.add( sqrt( sunCloudCos.mul( sunCloudCos ).add( 0.012 ) ) ) );
+			vSunFex.assign( exp( betaR.mul( 4600.0 ).add( betaM.mul( 190.0 ) ).mul( sunCloudAirMass ).negate() ) );
 
 			// position
 
@@ -285,7 +294,8 @@ class SkyMesh extends Mesh {
 			const sundisc = smoothstep( 0.0, 0.1, mu2 ).mul( vec3( 1.0, mix( 0.72, 1.0, mu ), mu2 ) ).mul( this.showSunDisc ).mul( smoothstep( - 0.002, 0.002, direction.y ) );
 			const sundiscColor = min( vSunE.mul( Fex ), 80.0 ).mul( 760.0 ).mul( sundisc );
 
-			const texColor = add( Lin, L0 ).mul( 0.04 ).add( sundiscColor ).add( vec3( 0.0, 0.0003, 0.00075 ) ).toVar();
+			const skyInscatter = Lin.mul( 0.04 ).add( vec3( 0.0, 0.0003, 0.00075 ) ).toVar();
+			const texColor = skyInscatter.add( L0.mul( 0.04 ) ).add( sundiscColor ).toVar();
 
 			// gradient at a lattice corner; sinless hash so every GPU produces the same clouds
 			const gradient = Fn( ( [ i ] ) => {
@@ -313,78 +323,225 @@ class SkyMesh extends Mesh {
 
 			}, { p: 'vec2', return: 'float' } );
 
-			// fbm; per-octave drift makes clouds billow instead of scrolling as a rigid stamp
-			const fbm = Fn( ( [ position, drift ] ) => {
+			// Fast scalar value noise for low-frequency macro weather modulation
+			const hash = Fn( ( [ i ] ) => {
 
-				const p = vec2( position ).toVar();
-				const result = float( 0.0 ).toVar();
-				const amplitude = float( 1.0 ).toVar();
+				const p = fract( vec3( i.xyx ).mul( 0.1031 ) ).toVar();
+				p.addAssign( dot( p, p.yzx.add( 33.33 ) ) );
 
-				Loop( 4, () => {
+				return fract( p.x.add( p.y ).mul( p.z ) );
 
-					result.addAssign( amplitude.mul( noise( p ) ) );
-					amplitude.mulAssign( 0.5 );
-					p.mulAssign( 2.0 ).addAssign( drift );
+			}, { i: 'vec2', return: 'float' } );
 
-				} );
+			const vnoise = Fn( ( [ p ] ) => {
 
-				return result;
+				const i = floor( p );
+				const f = fract( p );
+				const u = f.mul( f ).mul( sub( 3.0, f.mul( 2.0 ) ) );
 
-			}, { position: 'vec2', drift: 'vec2', return: 'float' } );
+				const a = hash( i );
+				const b = hash( i.add( vec2( 1.0, 0.0 ) ) );
+				const c = hash( i.add( vec2( 0.0, 1.0 ) ) );
+				const d = hash( i.add( vec2( 1.0, 1.0 ) ) );
 
-			// Clouds
+				return mix( mix( a, b, u.x ), mix( c, d, u.x ), u.y ).mul( 2.0 ).sub( 1.0 );
+
+			}, { p: 'vec2', return: 'float' } );
+
+			// Advance one rotated FBM octave (3-4-5 Pythagorean rotation avoids grid alignment)
+			const nextOctave = ( p, drift ) => vec2( p.x.mul( 0.8 ).add( p.y.mul( 0.6 ) ), p.y.mul( 0.8 ).sub( p.x.mul( 0.6 ) ) ).mul( 2.08 ).add( drift );
+
+			// 2-octave turret field for directional sun self-shadowing
+			const cloudShadow = Fn( ( [ uv, drift ] ) => {
+
+				const p = uv.mul( 600.0 ).toVar();
+				const base = noise( p ).mul( 0.58 ).toVar();
+				p.assign( nextOctave( p, drift ) );
+				base.addAssign( noise( p ).mul( 0.32 ) );
+
+				return base.mul( 0.72 ).add( 0.5 );
+
+			}, { uv: 'vec2', drift: 'float', return: 'float' } );
+
+			// Volumetric Cloud Slab
 			If( direction.y.greaterThan( 0.0 ).and( this.cloudCoverage.greaterThan( 0.0 ) ), () => {
 
-				// Project to cloud plane (higher elevation = clouds appear lower/closer)
+				// Intersect view ray with base and top of a curved planetary cloud slab
 				const elevation = mix( 1.0, 0.1, this.cloudElevation );
-				const cloudUV = direction.xz.div( direction.y.mul( elevation ) ).toVar();
-				cloudUV.mulAssign( this.cloudScale );
-				cloudUV.addAssign( time.mul( this.cloudSpeed ) );
+				const slabThickness = mix( 0.45, 1.0, smoothstep( 0.02, 0.20, direction.y ) ).mul( 0.26 );
+				const shellBase = float( 2.0 ).div( sqrt( direction.y.mul( direction.y ).add( 0.015 ) ).add( direction.y ) );
+				const topScale = add( 1.0, slabThickness );
+				const shellTop = topScale.mul( 2.0 ).div( sqrt( direction.y.mul( direction.y ).add( mul( 0.015, topScale ) ) ).add( direction.y ) );
 
-				// Cloud density field
-				const evolve = time.mul( this.cloudSpeed ).mul( 300.0 );
-				const cloudNoise = fbm( cloudUV.mul( 1000.0 ), evolve ).mul( 0.7 ).add( 0.5 ).clamp( 0.0, 1.0 ).toVar();
+				const driftUV = vec2( time.mul( this.cloudSpeed ) );
+				const uvBase = direction.xz.mul( shellBase.div( elevation ) ).mul( this.cloudScale ).add( driftUV );
+				const uvTop = direction.xz.mul( shellTop.div( elevation ) ).mul( this.cloudScale ).add( driftUV ).add( vec2( 0.75, 0.3 ).mul( this.cloudScale ) );
 
-				// Large-scale coverage variation: clear gaps next to dense banks
-				const region = noise( cloudUV.mul( 300.0 ) ).mul( 0.37 ).add( 0.5 );
-				const cov = clamp( this.cloudCoverage.add( region.sub( 0.5 ).mul( 0.6 ) ), 0.0, 1.0 );
+				const evolve = time.mul( this.cloudSpeed ).mul( 200.0 );
+				const covEnv = this.cloudCoverage.mul( sub( 1.0, this.cloudCoverage ) );
+				const minThreshold = sub( 1.0, min( 1.0, this.cloudCoverage.add( covEnv.mul( 0.75 ) ) ) );
 
-				// Carve clouds where noise rises above the coverage level
-				const threshold = sub( 1.0, cov ).toVar();
-				const cloudMask = smoothstep( threshold, threshold.add( 0.3 ), cloudNoise ).toVar();
+				// Evaluate 2-octave macro field at slab base first to reject clear sky in 2 noise calls
+				const pBase = uvBase.mul( 600.0 ).toVar();
+				const macroBase = noise( pBase ).mul( 0.55 ).toVar();
+				pBase.assign( nextOctave( pBase, evolve ) );
+				macroBase.assign( macroBase.add( noise( pBase ).mul( 0.275 ) ).mul( 0.72 ).add( 0.5 ) );
 
-				// Fade clouds near horizon (adjusted by elevation)
-				const horizonFade = smoothstep( 0.0, add( 0.03, mul( 0.06, this.cloudElevation ) ), direction.y );
-				cloudMask.mulAssign( horizonFade );
+				If( macroBase.add( 0.34 ).greaterThan( minThreshold ), () => {
 
-				// Cloud lighting from the sky's own radiance
-				const dayFactor = smoothstep( - 0.08, 0.3, vSunDirection.y );
-				const sunColor = vSunE.mul( Fex ).mul( 0.22 ).mul( 0.04 ).toVar(); // 0.22 ~ albedo/pi, 0.04 = exposure; the aerial composite adds the eye-leg extinction
-				const skyAmbient = Lin.mul( 0.04 ).add( vec3( 0.0, 0.0003, 0.00075 ) );
+					// Subtle large-scale weather modulation for natural cloud banks and storm breaks
+					const localCov = float( this.cloudCoverage ).toVar();
+					If( covEnv.greaterThan( 0.005 ), () => {
 
-				// Beer-powder self-shadow from the sampled density
-				const depth = max( 0.0, cloudNoise.sub( threshold ) ).toVar();
-				const beer = exp( depth.mul( - 4.0 ) ).toVar();
-				const powder = sub( 1.0, beer.mul( beer ) ); // beer*beer == exp(-8*depth)
-				const shade = mix( 0.45, 1.0, beer.mul( powder ).mul( 2.6 ).clamp( 0.0, 1.0 ) ); // 2.6 = 1/0.385, normalizes beer*powder peak to 1
+						const weather = vnoise( add( uvBase, uvTop ).mul( 75.0 ).add( vec2( 2.1, 1.3 ) ) );
+						localCov.assign( clamp( this.cloudCoverage.add( weather.mul( covEnv ).mul( 0.65 ) ), 0.0, 1.0 ) );
 
-				// Henyey-Greenstein forward lobe ( g = 0.7 ): silver lining on rims toward the sun
-				const silver = float( 0.51 ).div( pow( sub( 1.49, cosTheta.mul( 1.4 ) ), 1.5 ) ).clamp( 0.0, 3.0 ); // 0.51=1-g^2, 1.49=1+g^2, 1.4=2g
-				const edge = cloudMask.mul( sub( 1.0, cloudMask ) ).mul( 4.0 );
+					} );
+					const threshold = sub( 1.0, localCov );
 
-				const cloudColor = skyAmbient.add( sunColor.mul( shade ) ).toVar();
-				cloudColor.addAssign( sunColor.mul( silver ).mul( edge ).mul( 0.6 ) );
-				cloudColor.mulAssign( dayFactor.max( 0.03 ) );
+					If( localCov.greaterThan( 0.005 ).and( macroBase.add( 0.34 ).greaterThan( threshold ) ), () => {
 
-				// Cloud opacity via Beer's law: density sets how solid the clouds get
-				const alpha = sub( 1.0, exp( depth.mul( this.cloudDensity ).mul( - 12.0 ) ) ).mul( horizonFade ).toVar();
+						const pTop = uvTop.mul( 600.0 ).toVar();
+						const macroTop = noise( pTop ).mul( 0.55 ).toVar();
+						pTop.assign( nextOctave( pTop, evolve ) );
+						macroTop.assign( macroTop.add( noise( pTop ).mul( 0.275 ) ).mul( 0.72 ).add( 0.5 ) );
 
-				// Occlude the sun disc/glow behind opaque cloud
-				texColor.subAssign( L0.mul( 0.04 ).add( sundiscColor ).mul( alpha ) );
+						If( max( macroBase, macroTop ).add( 0.24 ).greaterThan( threshold ), () => {
 
-				// Composite through the atmosphere so distant clouds dissolve into haze
-				const cloudAerial = mix( texColor, cloudColor, Fex );
-				texColor.assign( mix( texColor, cloudAerial, alpha ) );
+							// Estimate smooth front-surface hit height to sample turret & billow detail once in 3D
+							const baseHit = smoothstep( threshold.sub( 0.12 ), threshold.add( 0.18 ), macroBase );
+							const slopeDiff = macroTop.sub( macroBase );
+							const hPeak = clamp( add( 0.5, slopeDiff.mul( 0.45 ).div( abs( slopeDiff ).add( 0.12 ) ) ), 0.15, 0.82 );
+							const hProbe = mix( hPeak, 0.18, baseHit.mul( 0.80 ) );
+
+							const pHit = nextOctave( mix( pBase, pTop, hProbe ), evolve ).toVar();
+							const n3 = noise( pHit ).toVar();
+							pHit.assign( nextOctave( pHit, evolve ) );
+							const n4 = noise( pHit ).toVar();
+
+							// Feathery fractal wisps at fringes, transitioning to cauliflower billows on cumulus bodies
+							const detailFade = smoothstep( 0.025, 0.24, direction.y ).toVar();
+							const micro = float( 0.0 ).toVar();
+							const midMax = max( macroBase, macroTop ).add( n3.mul( 0.12 ) ).add( n4.mul( 0.06 ).mul( detailFade ) ).toVar();
+
+							If( detailFade.greaterThan( 0.01 ).and( midMax.add( 0.10 ).greaterThan( threshold ) ), () => {
+
+								pHit.assign( nextOctave( pHit, evolve ) );
+								const n5 = noise( pHit ).toVar();
+								const ep = vec2( pHit.x.mul( 0.8 ).add( pHit.y.mul( 0.6 ) ), pHit.y.mul( 0.8 ).sub( pHit.x.mul( 0.6 ) ) ).mul( 2.15 ).sub( evolve.mul( 0.7 ) );
+								const n6 = noise( ep ).toVar();
+
+								const wispy = n5.mul( 0.65 ).add( n6.mul( 0.35 ) );
+								const billow = abs( n5 ).mul( 0.66 ).add( abs( n6 ).mul( 0.34 ) ).sub( 0.46 ).mul( 1.45 );
+								const bodyMask = smoothstep( threshold.sub( 0.01 ), threshold.add( 0.15 ), midMax );
+								micro.assign( mix( wispy.mul( 0.09 ), billow.mul( 0.16 ), bodyMask ) );
+
+							} );
+
+							const sculpt = n3.mul( 0.12 ).add( n4.mul( 0.06 ).add( micro ).mul( detailFade ) ).toVar();
+							const fieldBase = clamp( macroBase.add( sculpt.mul( mix( 0.90, 0.60, clamp( macroBase, 0.0, 1.0 ) ) ) ), 0.0, 1.0 ).toVar();
+							const fieldTop = clamp( macroTop.add( sculpt.mul( mix( 1.20, 0.80, clamp( macroTop, 0.0, 1.0 ) ) ) ), 0.0, 1.0 ).toVar();
+
+							If( max( fieldBase, fieldTop ).greaterThan( threshold ), () => {
+
+								const depthNorm = max( 0.18, sub( 0.88, threshold.mul( 0.88 ) ) );
+								const pathStretch = float( 1.0 ).div( max( direction.y, 0.28 ) );
+								const stepSigma = this.cloudDensity.mul( 22.0 / 4.0 ).mul( mix( 1.0, pathStretch, 0.55 ) );
+
+								const vis = float( 1.0 ).toVar();
+								const densitySum = float( 0.0 ).toVar();
+								const accumH = float( 0.0 ).toVar();
+								const accumTower = float( 0.0 ).toVar();
+								const accumField = float( 0.0 ).toVar();
+
+								// Branchless 4-step slab integration (zero noise, sqrt, or exp inside loop)
+								Loop( 4, ( { i } ) => {
+
+									const h = float( i ).add( 0.5 ).mul( 0.25 ).toVar();
+									const colNoise = mix( fieldBase, fieldTop, h ).toVar();
+									const colClamped = clamp( colNoise.sub( threshold ).div( depthNorm ), 0.0, 1.0 ).toVar();
+									const towerHeight = colClamped.mul( 2.25 ).div( add( 1.0, colClamped.mul( 1.25 ) ) ).toVar();
+
+									const baseShape = smoothstep( 0.0, 0.13, h );
+									const crownCap = smoothstep( 0.0, 0.32, towerHeight.sub( h ).add( 0.07 ) );
+									const localDensity = colClamped.mul( add( 0.45, baseShape.mul( 0.75 ) ) ).mul( crownCap ).toVar();
+
+									const x = localDensity.mul( stepSigma ).toVar();
+									const stepTrans = float( 1.0 ).div( add( 1.0, x.add( x.mul( x ).mul( 0.5 ) ) ) ).toVar();
+									const w = vis.mul( sub( 1.0, stepTrans ) ).toVar();
+									accumH.addAssign( w.mul( h ) );
+									accumTower.addAssign( w.mul( towerHeight ) );
+									accumField.addAssign( w.mul( colNoise ) );
+									vis.mulAssign( stepTrans );
+									densitySum.addAssign( localDensity );
+
+								} );
+
+								const horizonFade = smoothstep( 0.0, add( 0.015, mul( 0.03, this.cloudElevation ) ), direction.y );
+								const alpha = sub( 1.0, exp( densitySum.mul( stepSigma ).negate() ) ).mul( horizonFade );
+
+								If( alpha.greaterThan( 0.001 ), () => {
+
+									const invW = float( 1.0 ).div( max( sub( 1.0, vis ), 1e-4 ) );
+									const hEff = accumH.mul( invW );
+									const towerEff = accumTower.mul( invW );
+									const fieldEff = accumField.mul( invW );
+
+									// Project from 3D scattering point toward the sun for turret & belly self-shadowing
+									const uvHit = mix( uvBase, uvTop, hEff );
+									const sunDist = mix( 0.95, 0.50, max( 0.0, vSunDirection.y ) ).mul( sub( 1.15, hEff.mul( 0.50 ) ) );
+									const sunStep = vSunDirection.xz.mul( sunDist.div( elevation ).mul( this.cloudScale ) );
+									const sunRaw = cloudShadow( uvHit.add( sunStep ), evolve ).toVar();
+									const sunColDepth = clamp( sunRaw.sub( threshold ).div( depthNorm ), 0.0, 1.0 ).toVar();
+									const sunTower = sunColDepth.mul( 2.25 ).div( add( 1.0, sunColDepth.mul( 1.25 ) ) );
+
+									const sunRise = max( 0.0, vSunDirection.y ).mul( 0.26 );
+									const shadow3D = max( 0.0, sunTower.sub( hEff.add( sunRise ) ) );
+									const slopeShadow = max( 0.0, sunRaw.sub( fieldEff ) );
+									const overheadDepth = max( 0.0, towerEff.sub( hEff ) );
+									const densityExt = this.cloudDensity.mul( add( 0.70, this.cloudDensity.mul( 1.30 ) ) );
+									const tau = densityExt.mul( shadow3D.mul( 3.8 ).add( slopeShadow.mul( 6.0 ) ).add( overheadDepth.mul( mix( 0.8, 3.0, max( 0.0, vSunDirection.y ) ) ) ).add( sunColDepth.mul( 0.8 ) ) );
+
+									// Dual-lobe Henyey-Greenstein phase + Beer-powder multiple scattering
+									const fwdInv = inverseSqrt( sub( 1.5184, cosTheta.mul( 1.44 ) ) );
+									const hgFwd = min( fwdInv.mul( fwdInv ).mul( fwdInv ).mul( 0.4816 ), 4.5 );
+									const backInv = inverseSqrt( add( 1.0625, cosTheta.mul( 0.5 ) ) );
+									const hgBack = backInv.mul( backInv ).mul( backInv ).mul( 0.9375 );
+									const phase = mix( hgBack, hgFwd, 0.6 );
+
+									const optDepth = densitySum.mul( stepSigma );
+									const powder = mix( sub( 1.0, exp( optDepth.mul( - 1.3 ) ).mul( 0.36 ) ), 1.0, max( 0.0, cosTheta ) );
+									const scatter = exp( tau.negate() ).mul( phase ).mul( powder )
+										.add( float( 0.48 ).mul( exp( tau.mul( - 0.32 ) ) ).mul( mix( 1.0, min( phase, 1.3 ), 0.28 ) ) );
+
+									// Attenuate overhead sky ambient through column above hEff to shade flat cloud bases
+									const dayFactor = max( smoothstep( - 0.1, 0.02, vSunDirection.y ), 0.03 );
+									const sunColor = vSunE.mul( vSunFex ).mul( mix( 0.011, 0.028, smoothstep( 0.0, 0.5, vSunDirection.y ) ) );
+									const ambientScat = vBetaR.mul( THREE_OVER_SIXTEENPI.mul( 1.5 ) ).add( vBetaM.mul( ONE_OVER_FOURPI ) ).div( add( vBetaR, vBetaM ) );
+									const ambientBase = max( vec3( 0.0 ), vSunE.mul( ambientScat ).mul( sub( 1.0, Fex ) ) );
+									const skyAmbientTop = ambientBase.mul( sqrt( ambientBase ) ).mul( 0.04 ).add( vec3( 0.0, 0.0003, 0.00075 ) );
+
+									const baseAlbedo = mix( 0.42, 0.20, this.cloudDensity );
+									const skyAccess = exp( overheadDepth.mul( add( 0.65, this.cloudDensity.mul( 1.65 ) ) ).negate() );
+									const heightBounce = add( baseAlbedo, sub( 1.08, baseAlbedo ).mul( skyAccess ).mul( mix( 0.72, 1.0, hEff ) ) );
+									const cloudColor = skyAmbientTop.mul( heightBounce ).add( sunColor.mul( scatter ) ).mul( dayFactor );
+
+									// Composite through sub-cloud airlight while occluding solar disc and nightsky behind clouds
+									const airFraction = mix( 0.35, 0.08, this.cloudElevation );
+									const cloudOpticalDepth = dot( mul( vBetaR, sR ).mul( airFraction ).add( mul( vBetaM, sM ).mul( min( 1.0, airFraction.mul( 2.5 ) ) ) ), vec3( 0.2126, 0.7152, 0.0722 ) );
+									const cloudTransmittance = exp( cloudOpticalDepth.negate() );
+									const aerialCloud = mix( skyInscatter, cloudColor, cloudTransmittance );
+									texColor.assign( mix( texColor, aerialCloud, alpha ) );
+
+								} );
+
+							} );
+
+						} );
+
+					} );
+
+				} );
 
 			} );
 

@@ -102,6 +102,7 @@ Sky.SkyShader = {
 		varying vec3 vBetaR;
 		varying vec3 vBetaM;
 		varying vec3 vSunE;
+		varying vec3 vSunFex;
 
 		// constants for atmospheric scattering
 		const float pi = 3.141592653589793238462643383279502884197169;
@@ -170,6 +171,11 @@ Sky.SkyShader = {
 			// mie coefficients
 			vBetaM = totalMie( turbidity ) * mieCoefficient;
 
+			// sun-path transmittance through lower troposphere to cloud altitude (~2km)
+			float sunCloudCos = max( 0.0, vSunDirection.y + 0.03 );
+			float sunCloudAirMass = 2.0 / ( sunCloudCos + sqrt( sunCloudCos * sunCloudCos + 0.012 ) );
+			vSunFex = exp( -( ( vBetaR * 4600.0 + vBetaM * 190.0 ) * sunCloudAirMass ) );
+
 		}`,
 
 	fragmentShader: /* glsl */`
@@ -178,6 +184,7 @@ Sky.SkyShader = {
 		varying vec3 vBetaR;
 		varying vec3 vBetaM;
 		varying vec3 vSunE;
+		varying vec3 vSunFex;
 
 		uniform float mieDirectionalG;
 		uniform float cloudScale;
@@ -207,16 +214,36 @@ Sky.SkyShader = {
 			return mix( mix( a, b, u.x ), mix( c, d, u.x ), u.y ) * 1.6; // ~[-1,1]
 		}
 
-		// fbm; per-octave drift makes clouds billow instead of scrolling as a rigid stamp
-		float fbm( vec2 p, float drift ) {
-			float result = 0.0;
-			float amplitude = 1.0;
-			for ( int i = 0; i < 4; i ++ ) {
-				result += amplitude * noise( p );
-				amplitude *= 0.5;
-				p = p * 2.0 + drift;
-			}
-			return result;
+		// Fast scalar value noise for low-frequency macro weather modulation
+		float hash( vec2 i ) {
+			vec3 p = fract( vec3( i.xyx ) * 0.1031 );
+			p += dot( p, p.yzx + 33.33 );
+			return fract( ( p.x + p.y ) * p.z );
+		}
+
+		float vnoise( vec2 p ) {
+			vec2 i = floor( p );
+			vec2 f = fract( p );
+			vec2 u = f * f * ( 3.0 - 2.0 * f );
+			return mix(
+				mix( hash( i ), hash( i + vec2( 1.0, 0.0 ) ), u.x ),
+				mix( hash( i + vec2( 0.0, 1.0 ) ), hash( i + vec2( 1.0, 1.0 ) ), u.x ),
+				u.y
+			) * 2.0 - 1.0;
+		}
+
+		// Advance one rotated FBM octave (3-4-5 Pythagorean rotation avoids grid alignment)
+		vec2 nextOctave( vec2 p, float drift ) {
+			return vec2( p.x * 0.8 + p.y * 0.6, p.y * 0.8 - p.x * 0.6 ) * 2.08 + drift;
+		}
+
+		// 2-octave turret field for directional sun self-shadowing
+		float cloudShadow( vec2 uv, float drift ) {
+			vec2 p = uv * 600.0;
+			float base = 0.58 * noise( p );
+			p = nextOctave( p, drift );
+			base += 0.32 * noise( p );
+			return base * 0.72 + 0.5;
 		}
 
 		// optical length at zenith for molecules
@@ -279,61 +306,182 @@ Sky.SkyShader = {
 			vec3 sundisc = smoothstep( 0.0, 0.1, mu2 ) * vec3( 1.0, mix( 0.72, 1.0, mu ), mu2 ) * showSunDisc * smoothstep( -0.002, 0.002, direction.y );
 			vec3 sundiscColor = ( 760.0 * sundisc ) * min( vSunE * Fex, 80.0 );
 
-			vec3 texColor = ( Lin + L0 ) * 0.04 + sundiscColor + vec3( 0.0, 0.0003, 0.00075 );
+			vec3 skyInscatter = Lin * 0.04 + vec3( 0.0, 0.0003, 0.00075 );
+			vec3 texColor = skyInscatter + L0 * 0.04 + sundiscColor;
 
-			// Clouds
+			// Volumetric Cloud Slab
 			if ( direction.y > 0.0 && cloudCoverage > 0.0 ) {
 
-				// Project to cloud plane (higher elevation = clouds appear lower/closer)
+				// Intersect view ray with base and top of a curved planetary cloud slab
 				float elevation = mix( 1.0, 0.1, cloudElevation );
-				vec2 cloudUV = direction.xz / ( direction.y * elevation );
-				cloudUV *= cloudScale;
-				cloudUV += time * cloudSpeed;
+				float slabThickness = 0.26 * mix( 0.45, 1.0, smoothstep( 0.02, 0.20, direction.y ) );
+				float shellBase = 2.0 / ( sqrt( direction.y * direction.y + 0.015 ) + direction.y );
+				float shellTop = 2.0 * ( 1.0 + slabThickness ) / ( sqrt( direction.y * direction.y + 0.015 * ( 1.0 + slabThickness ) ) + direction.y );
 
-				// Cloud density field
-				float evolve = time * cloudSpeed * 300.0;
-				float cloudNoise = clamp( fbm( cloudUV * 1000.0, evolve ) * 0.7 + 0.5, 0.0, 1.0 );
+				vec2 driftUV = vec2( time * cloudSpeed );
+				vec2 uvBase = direction.xz * ( shellBase / elevation ) * cloudScale + driftUV;
+				vec2 uvTop = direction.xz * ( shellTop / elevation ) * cloudScale + driftUV + vec2( 0.75, 0.3 ) * cloudScale;
 
-				// Large-scale coverage variation: clear gaps next to dense banks
-				float region = noise( cloudUV * 300.0 ) * 0.37 + 0.5;
-				float cov = clamp( cloudCoverage + ( region - 0.5 ) * 0.6, 0.0, 1.0 );
+				float evolve = time * cloudSpeed * 200.0;
+				float covEnv = cloudCoverage * ( 1.0 - cloudCoverage );
+				float minThreshold = 1.0 - min( 1.0, cloudCoverage + covEnv * 0.75 );
 
-				// Carve clouds where noise rises above the coverage level
-				float threshold = 1.0 - cov;
-				float cloudMask = smoothstep( threshold, threshold + 0.3, cloudNoise );
+				// Evaluate 2-octave macro field at slab base first to reject clear sky in 2 noise calls
+				vec2 pBase = uvBase * 600.0;
+				float macroBase = 0.55 * noise( pBase );
+				pBase = nextOctave( pBase, evolve );
+				macroBase = ( macroBase + 0.275 * noise( pBase ) ) * 0.72 + 0.5;
 
-				// Fade clouds near horizon (adjusted by elevation)
-				float horizonFade = smoothstep( 0.0, 0.03 + 0.06 * cloudElevation, direction.y );
-				cloudMask *= horizonFade;
+				if ( macroBase + 0.34 > minThreshold ) {
 
-				// Cloud lighting from the sky's own radiance
-				float dayFactor = smoothstep( -0.08, 0.3, vSunDirection.y );
-				vec3 sunColor = vSunE * Fex * 0.22 * 0.04; // 0.22 ~ albedo/pi, 0.04 = exposure; the aerial composite adds the eye-leg extinction
-				vec3 skyAmbient = Lin * 0.04 + vec3( 0.0, 0.0003, 0.00075 );
+					// Subtle large-scale weather modulation for natural cloud banks and storm breaks
+					float weather = covEnv > 0.005 ? vnoise( ( uvBase + uvTop ) * 75.0 + vec2( 2.1, 1.3 ) ) : 0.0;
+					float localCov = clamp( cloudCoverage + weather * covEnv * 0.65, 0.0, 1.0 );
+					float threshold = 1.0 - localCov;
 
-				// Beer-powder self-shadow from the sampled density
-				float depth = max( 0.0, cloudNoise - threshold );
-				float beer = exp( depth * -4.0 );
-				float powder = 1.0 - beer * beer; // beer*beer == exp(-8*depth)
-				float shade = mix( 0.45, 1.0, clamp( beer * powder * 2.6, 0.0, 1.0 ) ); // 2.6 = 1/0.385, normalizes beer*powder peak to 1
+					if ( localCov > 0.005 && macroBase + 0.34 > threshold ) {
 
-				// Henyey-Greenstein forward lobe ( g = 0.7 ): silver lining on rims toward the sun
-				float silver = clamp( 0.51 / pow( 1.49 - cosTheta * 1.4, 1.5 ), 0.0, 3.0 ); // 0.51=1-g^2, 1.49=1+g^2, 1.4=2g
-				float edge = cloudMask * ( 1.0 - cloudMask ) * 4.0;
+						vec2 pTop = uvTop * 600.0;
+						float macroTop = 0.55 * noise( pTop );
+						pTop = nextOctave( pTop, evolve );
+						macroTop = ( macroTop + 0.275 * noise( pTop ) ) * 0.72 + 0.5;
 
-				vec3 cloudColor = skyAmbient + sunColor * shade;
-				cloudColor += sunColor * silver * edge * 0.6;
-				cloudColor *= max( dayFactor, 0.03 );
+						if ( max( macroBase, macroTop ) + 0.24 > threshold ) {
 
-				// Cloud opacity via Beer's law: density sets how solid the clouds get
-				float alpha = ( 1.0 - exp( depth * cloudDensity * -12.0 ) ) * horizonFade;
+							// Estimate smooth front-surface hit height to sample turret & billow detail once in 3D
+							float baseHit = smoothstep( threshold - 0.12, threshold + 0.18, macroBase );
+							float slopeDiff = macroTop - macroBase;
+							float hPeak = clamp( 0.5 + 0.45 * slopeDiff / ( abs( slopeDiff ) + 0.12 ), 0.15, 0.82 );
+							float hProbe = mix( hPeak, 0.18, baseHit * 0.80 );
 
-				// Occlude the sun disc/glow behind opaque cloud
-				texColor -= ( L0 * 0.04 + sundiscColor ) * alpha;
+							vec2 pHit = nextOctave( mix( pBase, pTop, hProbe ), evolve );
+							float n3 = noise( pHit );
+							pHit = nextOctave( pHit, evolve );
+							float n4 = noise( pHit );
 
-				// Composite through the atmosphere so distant clouds dissolve into haze
-				vec3 cloudAerial = mix( texColor, cloudColor, Fex );
-				texColor = mix( texColor, cloudAerial, alpha );
+							// Feathery fractal wisps at fringes, transitioning to cauliflower billows on cumulus bodies
+							float detailFade = smoothstep( 0.025, 0.24, direction.y );
+							float micro = 0.0;
+							float midMax = max( macroBase, macroTop ) + 0.12 * n3 + 0.06 * n4 * detailFade;
+
+							if ( detailFade > 0.01 && midMax + 0.10 > threshold ) {
+
+								pHit = nextOctave( pHit, evolve );
+								float n5 = noise( pHit );
+								vec2 ep = vec2( pHit.x * 0.8 + pHit.y * 0.6, pHit.y * 0.8 - pHit.x * 0.6 ) * 2.15 - evolve * 0.7;
+								float n6 = noise( ep );
+
+								float wispy = 0.65 * n5 + 0.35 * n6;
+								float billow = ( 0.66 * abs( n5 ) + 0.34 * abs( n6 ) - 0.46 ) * 1.45;
+								float bodyMask = smoothstep( threshold - 0.01, threshold + 0.15, midMax );
+								micro = mix( wispy * 0.09, billow * 0.16, bodyMask );
+
+							}
+
+							float sculpt = 0.12 * n3 + ( 0.06 * n4 + micro ) * detailFade;
+							float fieldBase = clamp( macroBase + sculpt * mix( 0.90, 0.60, clamp( macroBase, 0.0, 1.0 ) ), 0.0, 1.0 );
+							float fieldTop = clamp( macroTop + sculpt * mix( 1.20, 0.80, clamp( macroTop, 0.0, 1.0 ) ), 0.0, 1.0 );
+
+							if ( max( fieldBase, fieldTop ) > threshold ) {
+
+								float depthNorm = max( 0.18, 0.88 - threshold * 0.88 );
+								float pathStretch = 1.0 / max( direction.y, 0.28 );
+								float stepSigma = cloudDensity * ( 22.0 / 4.0 ) * mix( 1.0, pathStretch, 0.55 );
+
+								float vis = 1.0;
+								float densitySum = 0.0;
+								float accumH = 0.0;
+								float accumTower = 0.0;
+								float accumField = 0.0;
+
+								// Branchless 4-step slab integration (zero noise, sqrt, or exp inside loop)
+								for ( int i = 0; i < 4; i ++ ) {
+
+									float h = ( float( i ) + 0.5 ) * 0.25;
+									float colNoise = mix( fieldBase, fieldTop, h );
+									float colClamped = clamp( ( colNoise - threshold ) / depthNorm, 0.0, 1.0 );
+									float towerHeight = ( 2.25 * colClamped ) / ( 1.0 + 1.25 * colClamped );
+
+									float baseShape = smoothstep( 0.0, 0.13, h );
+									float crownCap = smoothstep( 0.0, 0.32, towerHeight - h + 0.07 );
+									float localDensity = colClamped * ( 0.45 + 0.75 * baseShape ) * crownCap;
+
+									float x = localDensity * stepSigma;
+									float stepTrans = 1.0 / ( 1.0 + x + 0.5 * x * x );
+									float w = vis * ( 1.0 - stepTrans );
+									accumH += w * h;
+									accumTower += w * towerHeight;
+									accumField += w * colNoise;
+									vis *= stepTrans;
+									densitySum += localDensity;
+
+								}
+
+								float horizonFade = smoothstep( 0.0, 0.015 + 0.03 * cloudElevation, direction.y );
+								float alpha = ( 1.0 - exp( -densitySum * stepSigma ) ) * horizonFade;
+
+								if ( alpha > 0.001 ) {
+
+									float invW = 1.0 / max( 1.0 - vis, 1e-4 );
+									float hEff = accumH * invW;
+									float towerEff = accumTower * invW;
+									float fieldEff = accumField * invW;
+
+									// Project from 3D scattering point toward the sun for turret & belly self-shadowing
+									vec2 uvHit = mix( uvBase, uvTop, hEff );
+									float sunDist = mix( 0.95, 0.50, max( 0.0, vSunDirection.y ) ) * ( 1.15 - 0.50 * hEff );
+									vec2 sunStep = vSunDirection.xz * ( ( sunDist / elevation ) * cloudScale );
+									float sunRaw = cloudShadow( uvHit + sunStep, evolve );
+									float sunColDepth = clamp( ( sunRaw - threshold ) / depthNorm, 0.0, 1.0 );
+									float sunTower = ( 2.25 * sunColDepth ) / ( 1.0 + 1.25 * sunColDepth );
+
+									float sunRise = max( 0.0, vSunDirection.y ) * 0.26;
+									float shadow3D = max( 0.0, sunTower - ( hEff + sunRise ) );
+									float slopeShadow = max( 0.0, sunRaw - fieldEff );
+									float overheadDepth = max( 0.0, towerEff - hEff );
+									float densityExt = cloudDensity * ( 0.70 + 1.30 * cloudDensity );
+									float tau = densityExt * ( shadow3D * 3.8 + slopeShadow * 6.0 + overheadDepth * mix( 0.8, 3.0, max( 0.0, vSunDirection.y ) ) + sunColDepth * 0.8 );
+
+									// Dual-lobe Henyey-Greenstein phase + Beer-powder multiple scattering
+									float fwdInv = inversesqrt( 1.5184 - 1.44 * cosTheta );
+									float hgFwd = min( 0.4816 * fwdInv * fwdInv * fwdInv, 4.5 );
+									float backInv = inversesqrt( 1.0625 + 0.5 * cosTheta );
+									float hgBack = 0.9375 * backInv * backInv * backInv;
+									float phase = mix( hgBack, hgFwd, 0.6 );
+
+									float optDepth = densitySum * stepSigma;
+									float powder = mix( 1.0 - 0.36 * exp( -optDepth * 1.3 ), 1.0, max( 0.0, cosTheta ) );
+									float scatter = exp( -tau ) * phase * powder
+										+ 0.48 * exp( -tau * 0.32 ) * mix( 1.0, min( phase, 1.3 ), 0.28 );
+
+									// Attenuate overhead sky ambient through column above hEff to shade flat cloud bases
+									float dayFactor = max( smoothstep( -0.1, 0.02, vSunDirection.y ), 0.03 );
+									vec3 sunColor = vSunE * vSunFex * mix( 0.011, 0.028, smoothstep( 0.0, 0.5, vSunDirection.y ) );
+									vec3 ambientScat = ( vBetaR * ( THREE_OVER_SIXTEENPI * 1.5 ) + vBetaM * ONE_OVER_FOURPI ) / ( vBetaR + vBetaM );
+									vec3 ambientBase = max( vec3( 0.0 ), vSunE * ambientScat * ( 1.0 - Fex ) );
+									vec3 skyAmbientTop = ambientBase * sqrt( ambientBase ) * 0.04 + vec3( 0.0, 0.0003, 0.00075 );
+
+									float baseAlbedo = mix( 0.42, 0.20, cloudDensity );
+									float skyAccess = exp( -overheadDepth * ( 0.65 + 1.65 * cloudDensity ) );
+									float heightBounce = baseAlbedo + ( 1.08 - baseAlbedo ) * skyAccess * mix( 0.72, 1.0, hEff );
+									vec3 cloudColor = ( skyAmbientTop * heightBounce + sunColor * scatter ) * dayFactor;
+
+									// Composite through sub-cloud airlight while occluding solar disc and nightsky behind clouds
+									float airFraction = mix( 0.35, 0.08, cloudElevation );
+									float cloudOpticalDepth = dot( vBetaR * sR * airFraction + vBetaM * sM * min( 1.0, airFraction * 2.5 ), vec3( 0.2126, 0.7152, 0.0722 ) );
+									float cloudTransmittance = exp( -cloudOpticalDepth );
+									vec3 aerialCloud = mix( skyInscatter, cloudColor, cloudTransmittance );
+									texColor = mix( texColor, aerialCloud, alpha );
+
+								}
+
+							}
+
+						}
+
+					}
+
+				}
 
 			}
 
