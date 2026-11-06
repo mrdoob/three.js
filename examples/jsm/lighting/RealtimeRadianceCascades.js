@@ -187,7 +187,8 @@ class RealtimeRadianceCascades {
 		 * wants more than 85% of its probes, by half of the octaves that would bring it to 75%, and falls by 0.01 while
 		 * all have less than 70%, so that it returns after a spike of probes, after the probe counts of a frame are read
 		 * back. A level of detail has about a quarter of the probes of the one before, and the blending of the levels
-		 * hides the fractional steps.
+		 * hides the fractional steps. Below `quality` 1, it falls only while the cascades would have less than 70% at
+		 * quality 1 too, so that it does not undo the coarser levels of the quality.
 		 *
 		 * @type {number}
 		 * @default 0
@@ -1264,6 +1265,7 @@ class RealtimeRadianceCascades {
 		this._reading = true;
 
 		const frame = this._frame;
+		const quality = Math.min( Math.max( this.quality, 0 ), 1 );
 		const atomics = this._atomics;
 		const byteLength = this._layout.counters * 8;
 		const readback = this._readback ??= new ReadbackBuffer( byteLength );
@@ -1278,7 +1280,7 @@ class RealtimeRadianceCascades {
 			if ( this._atomics !== atomics ) return;
 
 			if ( this.adaptiveQuality && this._fences.length < 1000 ) this._fences.push( [ frame, performance.now() ] );
-			if ( this.adaptiveLOD ) this._adaptLOD( counts, frame );
+			if ( this.adaptiveLOD ) this._adaptLOD( counts, frame, quality );
 
 		} ).catch( () => {
 
@@ -1296,23 +1298,30 @@ class RealtimeRadianceCascades {
 	 * @private
 	 * @param {Uint32Array} counts - The counters read after the frame.
 	 * @param {number} frame - The frame.
+	 * @param {number} quality - The quality of the frame.
 	 */
-	_adaptLOD( counts, frame ) {
+	_adaptLOD( counts, frame, quality ) {
 
 		const base = ( frame & 1 ) * this._layout.counters;
 		const previous = ( ( frame + 1 ) & 1 ) * this._layout.counters;
 		const capacities = this.capacities;
 		const cascades = this.cascades;
 
-		// the probes a cascade wanted: the ones it has, and the new ones beyond the free slots of the last frame
+		// the probes a cascade wanted: the ones it has, and the new ones beyond the free slots of the last frame. Below
+		// quality 1, the levels of detail are 1 - quality octaves coarser, for up to a quarter of the probes per octave:
+		// the bias falls only if the cascades would have room at quality 1 too, or it would undo the quality
 
-		let fullness = 0;
+		const share = 4 ** ( quality - 1 );
+
+		let fullness = 0, fullnessAtFullQuality = 0;
 
 		for ( let n = 0; n < cascades; n ++ ) {
 
 			const failed = Math.max( counts[ base + ALLOCATED * cascades + n ] - counts[ previous + FREED * cascades + n ], 0 );
+			const wanted = counts[ base + PROBES * cascades + n ] + failed;
 
-			fullness = Math.max( fullness, ( counts[ base + PROBES * cascades + n ] + failed ) / capacities[ n ] );
+			fullness = Math.max( fullness, wanted / capacities[ n ] );
+			fullnessAtFullQuality = Math.max( fullnessAtFullQuality, wanted / ( capacities[ n ] * share ) );
 
 		}
 
@@ -1321,7 +1330,7 @@ class RealtimeRadianceCascades {
 		// do not stay coarse after a spike of probes
 
 		if ( fullness > 0.85 ) this.lodBias += Math.max( Math.log2( fullness / 0.75 ) / 4, 0.05 );
-		else if ( fullness < 0.7 ) this.lodBias = Math.max( this.lodBias - 0.01, 0 );
+		else if ( fullnessAtFullQuality < 0.7 ) this.lodBias = Math.max( this.lodBias - 0.01, 0 );
 
 	}
 
