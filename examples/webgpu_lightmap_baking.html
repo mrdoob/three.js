@@ -19,7 +19,7 @@
 				<a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Light Baking</span>
 			</div>
 
-			<small>Progressively bake ray traced radiosity (<a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">three-mesh-bvh</a>) diffuse irradiance into a UV atlas by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br/><span id="status"></span></small>
+			<small>Progressively bake and denoise ray traced radiosity (<a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">three-mesh-bvh</a>) diffuse irradiance into a UV atlas by <a href="https://ben3d.ca" target="_blank" rel="noopener">Ben Houston</a>.<br/><span id="status"></span></small>
 		</div>
 
 		<script type="importmap">
@@ -42,6 +42,7 @@
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 			import { LightMapper } from 'three/addons/lighting/LightMapper.js';
+			import { denoise } from 'three/addons/tsl/display/DenoiseNode.js';
 			import { RayTracedRadiosity, rayTracedRadiosityIrradiance } from 'three/addons/lighting/RayTracedRadiosity.js';
 			import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
 
@@ -57,20 +58,29 @@
 
 			let camera, scene, renderer, controls, status;
 			let world, meshes, materials;
-			let radiosity, lightMapper;
-			let needsBake = false;
+			let radiosity, lightMapper, denoiseNode = null;
+			let needsBake = false, denoised = false;
 
 			const params = {
 				scene: 'Cornell Box',
-				resolution: 1024
+				resolution: 1024,
+				denoise: false
 			};
 
 			const scenes = { 'Cornell Box': createCornellBox, 'Courtyard': loadCourtyard };
 			const worlds = {};
 
-			// every sample continues the ray sequences of the texels
+			// phones have less GPU memory, 4096² takes over 1 GB with the denoiser
 
-			const samples = 64;
+			const phone = window.matchMedia( '(pointer: coarse)' ).matches;
+
+			// every sample continues the ray sequences of the texels. The bake casts this many rays per texel, as
+			// many per frame as keep the frame rate of the display
+
+			const rays = 512;
+			const frameTimes = [];
+
+			let bakedRays = 0, raysPerFrame = 8, averageFrameTime = 0, lastFrame = 0;
 
 			init();
 
@@ -101,7 +111,8 @@
 
 				const gui = renderer.inspector.createParameters( 'Light Baking' );
 				gui.add( params, 'scene', Object.keys( scenes ) ).name( 'Scene' ).onChange( setScene );
-				gui.add( params, 'resolution', [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( requestBake );
+				gui.add( params, 'resolution', phone ? [ 256, 1024, 2048 ] : [ 256, 1024, 2048, 4096 ] ).name( 'Light Map Resolution' ).onChange( requestBake );
+				gui.add( params, 'denoise' ).name( 'Denoise' ).onChange( requestBake );
 				gui.add( { bake: requestBake }, 'bake' ).name( 'Re-Bake GI' );
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -148,9 +159,9 @@
 				const room = new THREE.Group();
 				root.add( room );
 
-				const wallMaterial = new THREE.MeshStandardMaterial( { color: 0xcccccc } );
-				const redMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
-				const greenMaterial = new THREE.MeshStandardMaterial( { color: 0x00ff00 } );
+				const wallMaterial = new THREE.MeshStandardNodeMaterial( { color: 0xcccccc } );
+				const redMaterial = new THREE.MeshStandardNodeMaterial( { color: 0xff0000 } );
+				const greenMaterial = new THREE.MeshStandardNodeMaterial( { color: 0x00ff00 } );
 
 				// Floor
 				const floor = new THREE.Mesh( new THREE.PlaneGeometry( 6, 6 ), wallMaterial );
@@ -188,7 +199,7 @@
 
 				// Objects inside the box
 
-				const objectMaterial = new THREE.MeshStandardMaterial( { color: 0xeeeeee } );
+				const objectMaterial = new THREE.MeshStandardNodeMaterial( { color: 0xeeeeee } );
 
 				// Tall box
 				const tallBox = new THREE.Mesh( new THREE.BoxGeometry( 1.2, 2.5, 1.2 ), objectMaterial );
@@ -197,13 +208,13 @@
 				room.add( tallBox );
 
 				// Sphere
-				const sphereMaterial = new THREE.MeshStandardMaterial( { color: 0x0044ff, roughness: 0.15 } );
+				const sphereMaterial = new THREE.MeshStandardNodeMaterial( { color: 0x0044ff, roughness: 0.15 } );
 				const sphere = new THREE.Mesh( new THREE.SphereGeometry( 0.65, 32, 32 ), sphereMaterial );
 				sphere.position.set( 1, 0.65, 0.5 );
 				room.add( sphere );
 
 				// Emissive light panel, ray radiosity bakes its direct light with soft shadows
-				const lightPanel = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), new THREE.MeshStandardMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 20 } ) );
+				const lightPanel = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), new THREE.MeshStandardNodeMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 20 } ) );
 				lightPanel.rotation.x = Math.PI / 2;
 				lightPanel.position.y = 4.99;
 				root.add( lightPanel );
@@ -225,12 +236,12 @@
 
 				const root = new THREE.Group();
 
-				const stone = new THREE.MeshStandardMaterial( { color: 0xddd0b8 } );
-				const plaster = new THREE.MeshStandardMaterial( { color: 0xd9a066 } );
-				const tiles = new THREE.MeshStandardMaterial( { color: 0xb59a7e } );
-				const water = new THREE.MeshStandardMaterial( { color: 0x3c7a8a } );
-				const leaves = new THREE.MeshStandardMaterial( { color: 0x4a7a32 } );
-				const banners = [ 0xb02a20, 0x2a4ab0, 0xd8a020, 0x2a8a50 ].map( ( color ) => new THREE.MeshStandardMaterial( { color } ) );
+				const stone = new THREE.MeshStandardNodeMaterial( { color: 0xddd0b8 } );
+				const plaster = new THREE.MeshStandardNodeMaterial( { color: 0xd9a066 } );
+				const tiles = new THREE.MeshStandardNodeMaterial( { color: 0xb59a7e } );
+				const water = new THREE.MeshStandardNodeMaterial( { color: 0x3c7a8a } );
+				const leaves = new THREE.MeshStandardNodeMaterial( { color: 0x4a7a32 } );
+				const banners = [ 0xb02a20, 0x2a4ab0, 0xd8a020, 0x2a8a50 ].map( ( color ) => new THREE.MeshStandardNodeMaterial( { color } ) );
 
 				function add( parent, geometry, material, x, y, z ) {
 
@@ -313,9 +324,10 @@
 
 			function bake() {
 
-				for ( const material of materials ) material.lightMap = null;
+				setLightMap( null );
 
 				lightMapper?.dispose();
+				denoiseNode?.dispose();
 				radiosity?.dispose();
 
 				// each mesh gets a new geometry with light map UVs, also for another resolution
@@ -336,10 +348,37 @@
 
 				// the light map accumulates one sample per frame in animate()
 
-				lightMapper = new LightMapper( renderer, world.atlas.resolution, rayTracedRadiosityIrradiance( radiosity ) );
+				// to denoise, the light mapper also bakes the inputs of the denoiser: the variance of each texel
+				// and the surfaces of the texels as guides, which take more memory
+
+				lightMapper = new LightMapper( renderer, world.atlas.resolution, rayTracedRadiosityIrradiance( radiosity ), { variance: params.denoise, guides: params.denoise } );
 				lightMapper.addObjects( meshes );
 
-				for ( const material of materials ) material.lightMap = lightMapper.texture;
+				// the denoiser filters once, when the bake is done
+
+				denoiseNode = params.denoise ? denoise( lightMapper.getTextureNode( 'color' ), {
+					position: lightMapper.getTextureNode( 'position' ),
+					normal: lightMapper.getTextureNode( 'normal' ),
+					variance: lightMapper.getTextureNode( 'variance' ),
+					quality: 'quality'
+				} ) : null;
+				if ( denoiseNode !== null ) denoiseNode.autoUpdate = false;
+				denoised = false;
+				bakedRays = 0;
+				raysPerFrame = 8;
+
+				setLightMap( lightMapper.getTextureNode() );
+
+			}
+
+			function setLightMap( lightMapNode ) {
+
+				for ( const material of materials ) {
+
+					material.lightMapNode = lightMapNode;
+					material.needsUpdate = true;
+
+				}
 
 			}
 
@@ -361,14 +400,56 @@
 
 				}
 
-				if ( lightMapper.samples < samples ) {
+				const now = performance.now();
 
-					lightMapper.update();
-					status.textContent = `Baking: ${ lightMapper.samples } / ${ samples } samples`;
+				if ( lastFrame > 0 ) {
+
+					const frameTime = now - lastFrame;
+
+					averageFrameTime += ( frameTime - averageFrameTime ) * 0.2;
+
+					frameTimes.push( frameTime );
+					if ( frameTimes.length > 60 ) frameTimes.shift();
+
+				}
+
+				lastFrame = now;
+
+				if ( bakedRays < rays ) {
+
+					// the frames take a multiple of the refresh interval of the display, about the shorter ones of
+					// the recent frames. Fewer rays per frame while the frames take longer, a quarter more otherwise
+
+					const sorted = [ ...frameTimes ].sort( ( a, b ) => a - b );
+					const refreshTime = Math.max( sorted[ Math.floor( sorted.length * 0.2 ) ] ?? 16, 4 );
+
+					if ( averageFrameTime > refreshTime * 1.25 ) raysPerFrame = Math.max( Math.floor( raysPerFrame * 0.75 ), 1 );
+					else raysPerFrame = Math.min( raysPerFrame + Math.ceil( raysPerFrame / 4 ), 64 );
+
+					// samples of 2 to 8 rays per texel: the light map accumulates at most 256 samples
+
+					const budget = Math.min( raysPerFrame, rays - bakedRays );
+					const samples = Math.ceil( budget / 8 );
+
+					radiosity.rays = Math.max( Math.ceil( budget / samples ), 2 );
+					lightMapper.update( samples );
+					bakedRays += samples * radiosity.rays;
+
+					status.textContent = `Baking: ${ bakedRays } / ${ rays } rays per texel`;
 
 				} else {
 
-					status.textContent = `Baked: ${ samples } samples`;
+					status.textContent = `Baked: ${ rays } rays per texel${ denoised ? ', denoised' : '' }`;
+
+				}
+
+				// denoise once the bake is done
+
+				if ( denoiseNode !== null && ! denoised && bakedRays >= rays ) {
+
+					denoiseNode.textureNeedsUpdate = true;
+					denoised = true;
+					setLightMap( denoiseNode );
 
 				}
 
