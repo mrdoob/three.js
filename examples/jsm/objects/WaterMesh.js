@@ -6,7 +6,7 @@ import {
 	NodeMaterial
 } from 'three/webgpu';
 
-import { Fn, abs, add, cameraPosition, cameraViewMatrix, clamp, inverseSqrt, normalize, positionWorld, sub, time, texture, vec2, vec3, max, dot, reflect, pow, uniform, reflector, mul, mix } from 'three/tsl';
+import { Fn, abs, add, cameraPosition, cameraViewMatrix, clamp, div, inverseSqrt, normalize, positionWorld, smoothstep, sub, time, texture, vec2, vec3, max, dot, uniform, reflector, mul, mix } from 'three/tsl';
 
 /**
  * A basic flat, reflective water effect.
@@ -137,10 +137,29 @@ class WaterMesh extends Mesh {
 		const NoV = dot( eyeDirection, rawNormal );
 		const surfaceNormal = normalize( rawNormal.add( eyeDirection.mul( max( 0.0, sub( 0.02, NoV ) ) ) ) );
 
-		const reflection = reflect( this.sunDirection.negate(), surfaceNormal );
-		const direction = max( 0.0, dot( eyeDirection, reflection ) );
-		const specularLight = pow( direction, 100 ).mul( this.sunColor ).mul( 2.0 );
-		const diffuseLight = max( dot( this.sunDirection, surfaceNormal ), 0.0 ).mul( this.sunColor ).mul( 0.5 );
+		const NoL = max( dot( surfaceNormal, this.sunDirection ), 0.0 );
+		const diffuseLight = NoL.mul( this.sunColor ).mul( 0.5 );
+
+		const halfVector = normalize( this.sunDirection.add( eyeDirection ) );
+		const NoH = max( dot( surfaceNormal, halfVector ), 0.0 );
+		const clampedNoV = max( dot( surfaceNormal, eyeDirection ), 0.001 );
+		const VoH = max( dot( eyeDirection, halfVector ), 0.0 );
+
+		const roughness = sub( 0.14, invDistance.mul( 0.095 ).div( invDistance.add( 0.004 ) ) );
+		const a = roughness.mul( roughness );
+		const a2 = a.mul( a );
+		const d = NoH.mul( a2 ).sub( NoH ).mul( NoH ).add( 1.0 );
+		const D = a2.div( d.mul( d ).mul( 3.14159265 ).add( 1e-7 ) );
+
+		const Vis = div( 0.5, mix( NoL.mul( clampedNoV ).mul( 2.0 ), NoL.add( clampedNoV ), a ) );
+
+		const oneMinusVoH = sub( 1.0, VoH );
+		const oneMinusVoH2 = oneMinusVoH.mul( oneMinusVoH );
+		const F = add( 0.02, mul( 0.98, oneMinusVoH2.mul( oneMinusVoH2 ).mul( oneMinusVoH ) ) );
+
+		const sunFade = smoothstep( - 0.02, 0.02, this.sunDirection.y );
+		const spec = D.mul( Vis ).mul( F ).mul( NoL ).mul( sunFade ).mul( 3.0 );
+		const specularLight = spec.div( spec.mul( 0.08 ).add( 1.0 ) ).mul( this.sunColor );
 
 		const viewRight = vec2( cameraViewMatrix[ 0 ].x, cameraViewMatrix[ 2 ].x );
 		const normalTilt = vec2(
@@ -178,7 +197,7 @@ class WaterMesh extends Mesh {
 			const oneMinusTheta2 = oneMinusTheta.mul( oneMinusTheta );
 			const reflectance = add( 0.02, mul( 0.98, oneMinusTheta2.mul( oneMinusTheta2 ).mul( oneMinusTheta ) ) );
 			const scatter = this.waterColor.mul( theta );
-			const albedo = mix( diffuseLight.mul( 0.3 ).add( scatter ), mirrorSampler.rgb.add( specularLight ), reflectance );
+			const albedo = mix( diffuseLight.mul( 0.3 ).add( scatter ), mirrorSampler.rgb, reflectance ).add( specularLight );
 
 			return albedo;
 

@@ -166,11 +166,29 @@ class Water extends Mesh {
 					return noise * 2.0 - 1.0;
 				}
 
-				void sunLight( const vec3 surfaceNormal, const vec3 eyeDirection, float shiny, float spec, float diffuse, inout vec3 diffuseColor, inout vec3 specularColor ) {
-					vec3 reflection = reflect( - sunDirection, surfaceNormal );
-					float direction = max( 0.0, dot( eyeDirection, reflection ) );
-					specularColor += pow( direction, shiny ) * sunColor * spec;
-					diffuseColor += max( dot( sunDirection, surfaceNormal ), 0.0 ) * sunColor * diffuse;
+				void sunLight( const vec3 surfaceNormal, const vec3 eyeDirection, float roughness, inout vec3 diffuseColor, inout vec3 specularColor ) {
+					float NoL = max( dot( surfaceNormal, sunDirection ), 0.0 );
+					diffuseColor += NoL * sunColor * 0.5;
+
+					vec3 halfVector = normalize( sunDirection + eyeDirection );
+					float NoH = max( dot( surfaceNormal, halfVector ), 0.0 );
+					float NoV = max( dot( surfaceNormal, eyeDirection ), 0.001 );
+					float VoH = max( dot( eyeDirection, halfVector ), 0.0 );
+
+					float a = roughness * roughness;
+					float a2 = a * a;
+					float d = ( NoH * a2 - NoH ) * NoH + 1.0;
+					float D = a2 / ( 3.14159265 * d * d + 1e-7 );
+
+					float Vis = 0.5 / mix( 2.0 * NoL * NoV, NoL + NoV, a );
+
+					float oneMinusVoH = 1.0 - VoH;
+					float oneMinusVoH2 = oneMinusVoH * oneMinusVoH;
+					float F = 0.02 + 0.98 * ( oneMinusVoH2 * oneMinusVoH2 * oneMinusVoH );
+
+					float sunFade = smoothstep( - 0.02, 0.02, sunDirection.y );
+					float spec = D * Vis * F * NoL * sunFade * 3.0;
+					specularColor += ( spec / ( 1.0 + spec * 0.08 ) ) * sunColor;
 				}
 
 				#include <common>
@@ -198,7 +216,8 @@ class Water extends Mesh {
 					float NoV = dot( eyeDirection, surfaceNormal );
 					surfaceNormal = normalize( surfaceNormal + eyeDirection * max( 0.0, - NoV + 0.02 ) );
 
-					sunLight( surfaceNormal, eyeDirection, 100.0, 2.0, 0.5, diffuseLight, specularLight );
+					float roughness = 0.14 - ( 0.095 * invDistance ) / ( invDistance + 0.004 );
+					sunLight( surfaceNormal, eyeDirection, roughness, diffuseLight, specularLight );
 
 					vec2 viewRight = vec2( viewMatrix[ 0 ][ 0 ], viewMatrix[ 2 ][ 0 ] );
 					vec2 normalTilt = vec2(
@@ -219,7 +238,7 @@ class Water extends Mesh {
 					float reflectance = 0.02 + 0.98 * ( oneMinusTheta2 * oneMinusTheta2 * oneMinusTheta );
 					vec3 scatter = theta * waterColor;
 					float shadowMask = getShadowMask();
-					vec3 albedo = mix( ( diffuseLight * 0.3 + scatter ) * shadowMask, reflectionSample + specularLight * shadowMask, reflectance );
+					vec3 albedo = mix( ( diffuseLight * 0.3 + scatter ) * shadowMask, reflectionSample, reflectance ) + specularLight * shadowMask;
 					vec3 outgoingLight = albedo;
 					gl_FragColor = vec4( outgoingLight, alpha );
 
