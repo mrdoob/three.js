@@ -484,6 +484,10 @@ class TransformControls extends Controls {
 
 			if ( pointer !== null ) _raycaster.setFromCamera( pointer, this.camera );
 
+			// the axis might have changed since the last render (e.g. on touch devices) so update the plane's orientation
+
+			this._plane.updateMatrixWorld();
+
 			const planeIntersect = intersectObjectWithRay( this._plane, _raycaster, true );
 
 			if ( planeIntersect ) {
