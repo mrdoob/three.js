@@ -4,7 +4,7 @@ import { NodeUpdateType } from '../core/constants.js';
 import { context } from '../tsl/TSLBase.js';
 import { mergeContext } from '../core/NodeUtils.js';
 import { uniform } from '../core/UniformNode.js';
-import { viewZToOrthographicDepth, perspectiveDepthToViewZ } from './ViewportDepthNode.js';
+import { viewZToOrthographicDepth, viewZ } from './ViewportDepthNode.js';
 
 import { HalfFloatType, FloatType, DepthStencilFormat, UnsignedInt248Type } from '../../constants.js';
 import { Vector2 } from '../../math/Vector2.js';
@@ -772,7 +772,7 @@ class PassNode extends Node {
 			const cameraNear = this._cameraNear;
 			const cameraFar = this._cameraFar;
 
-			this._viewZNodes[ name ] = viewZNode = perspectiveDepthToViewZ( this.getTextureNode( name ), cameraNear, cameraFar );
+			this._viewZNodes[ name ] = viewZNode = viewZ( this.getTextureNode( name ), cameraNear, cameraFar, this.camera );
 
 		}
 

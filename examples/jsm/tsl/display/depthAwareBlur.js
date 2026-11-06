@@ -1,4 +1,4 @@
-import { abs, exp, float, Fn, int, logarithmicDepthToViewZ, Loop, max, perspectiveDepthToViewZ, reference, uv } from 'three/tsl';
+import { abs, exp, float, Fn, int, Loop, max, reference, uv, viewZ } from 'three/tsl';
 
 /**
  * Applies one pass of a separable, depth-aware (bilateral) blur to a screen-space signal.
@@ -19,27 +19,15 @@ import { abs, exp, float, Fn, int, logarithmicDepthToViewZ, Loop, max, perspecti
  * @param {Node<float> | number} [radius=1] - The world-space scale the depth rejection is relative to.
  * @returns {Node<float>} The blurred value.
  */
-export const depthAwareBlur = /*#__PURE__*/ Fn( ( [ inputNode, depthNode, directionNode, camera, sharpness = 2, radius = 1 ], builder ) => {
+export const depthAwareBlur = /*#__PURE__*/ Fn( ( [ inputNode, depthNode, directionNode, camera, sharpness = 2, radius = 1 ] ) => {
 
 	const cameraNear = reference( 'near', 'float', camera );
 	const cameraFar = reference( 'far', 'float', camera );
 
-	const viewZ = ( uvNode ) => {
-
-		const depth = depthNode.sample( uvNode ).r;
-
-		if ( builder.renderer.logarithmicDepthBuffer === true ) {
-
-			return logarithmicDepthToViewZ( depth, cameraNear, cameraFar );
-
-		}
-
-		return perspectiveDepthToViewZ( depth, cameraNear, cameraFar );
-
-	};
+	const sampleViewZ = ( uvNode ) => viewZ( depthNode.sample( uvNode ).r, cameraNear, cameraFar, camera );
 
 	const uvNode = uv();
-	const centerViewZ = viewZ( uvNode ).toVar();
+	const centerViewZ = sampleViewZ( uvNode ).toVar();
 
 	const sum = float( 0 ).toVar();
 	const weightSum = float( 0 ).toVar();
@@ -50,7 +38,7 @@ export const depthAwareBlur = /*#__PURE__*/ Fn( ( [ inputNode, depthNode, direct
 		const sampleUv = uvNode.add( directionNode.mul( fi ) );
 
 		const spatialWeight = exp( fi.mul( fi ).mul( - 0.5 ) );
-		const depthWeight = exp( abs( viewZ( sampleUv ).sub( centerViewZ ) ).div( radius ).mul( sharpness ).negate() );
+		const depthWeight = exp( abs( sampleViewZ( sampleUv ).sub( centerViewZ ) ).div( radius ).mul( sharpness ).negate() );
 		const weight = spatialWeight.mul( depthWeight );
 
 		sum.addAssign( inputNode.sample( sampleUv ).r.mul( weight ) );
