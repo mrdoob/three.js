@@ -1359,6 +1359,20 @@ class WebGLRenderer {
 
 		// Compile
 
+		// Collect the exact programs selected during a synchronous compile.
+		// A shared material's currentProgram may be replaced by another compile
+		// or render before the first program has finished linking.
+
+		let compilePrograms = null;
+
+		function trackCompiledProgram( program ) {
+
+			if ( compilePrograms !== null ) compilePrograms.add( program );
+
+			return program;
+
+		}
+
 		function prepareMaterial( material, scene, camera, object ) {
 
 			if ( _nodesHandler !== null && material.isNodeMaterial ) _nodesHandler.setObject( object, material );
@@ -1369,17 +1383,17 @@ class WebGLRenderer {
 
 				material.side = BackSide;
 				material.needsUpdate = true;
-				getProgram( material, scene, object );
+				trackCompiledProgram( getProgram( material, scene, object ) );
 
 				material.side = FrontSide;
 				material.needsUpdate = true;
-				getProgram( material, scene, object );
+				trackCompiledProgram( getProgram( material, scene, object ) );
 
 				material.side = DoubleSide;
 
 			} else {
 
-				getProgram( material, scene, object );
+				trackCompiledProgram( getProgram( material, scene, object ) );
 
 			}
 
@@ -1518,7 +1532,19 @@ class WebGLRenderer {
 		 */
 		this.compileAsync = function ( scene, camera, targetScene = null ) {
 
-			const materials = this.compile( scene, camera, targetScene );
+			const programs = new Set();
+			const previousPrograms = compilePrograms;
+			compilePrograms = programs;
+
+			try {
+
+				this.compile( scene, camera, targetScene );
+
+			} finally {
+
+				compilePrograms = previousPrograms;
+
+			}
 
 			// Wait for all the materials in the new object to indicate that they're
 			// ready to be used before resolving the promise.
@@ -1527,15 +1553,12 @@ class WebGLRenderer {
 
 				function checkMaterialsReady() {
 
-					materials.forEach( function ( material ) {
+					programs.forEach( function ( program ) {
 
-						const materialProperties = properties.get( material );
-						const program = materialProperties.currentProgram;
+						if ( program.isReady() ) {
 
-						if ( program === undefined || program.isReady() ) {
-
-							// stop waiting for materials that are ready to use or have been disposed
-							materials.delete( material );
+							// stop waiting for programs that are ready to use
+							programs.delete( program );
 
 						}
 
@@ -1543,7 +1566,7 @@ class WebGLRenderer {
 
 					// once the list of compiling materials is empty, call the callback
 
-					if ( materials.size === 0 ) {
+					if ( programs.size === 0 ) {
 
 						resolve( scene );
 						return;
