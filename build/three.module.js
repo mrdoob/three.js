@@ -19206,8 +19206,8 @@ class WebGLRenderer {
 			} else {
 
 				const levelScale = Math.pow( 2, - srcLevel );
-				width = Math.floor( image.width * levelScale );
-				height = Math.floor( image.height * levelScale );
+				width = Math.floor( srcTexture.width * levelScale );
+				height = Math.floor( srcTexture.height * levelScale );
 				if ( srcTexture.isDataArrayTexture ) {
 
 					depth = image.depth;
@@ -19377,7 +19377,7 @@ class WebGLRenderer {
 
 					} else if ( dstTexture.isCompressedArrayTexture ) {
 
-						_gl.compressedTexSubImage3D( glTarget, dstLevel, dstX, dstY, dstZ, width, height, depth, glFormat, image.data );
+						_gl.compressedTexSubImage3D( glTarget, dstLevel, dstX, dstY, dstZ, image.width, image.height, depth, glFormat, image.data );
 
 					} else {
 
