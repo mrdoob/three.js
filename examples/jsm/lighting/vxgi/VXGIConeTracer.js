@@ -79,14 +79,15 @@ export function sampleDirectional( volume, directionalNode, uvw, level, directio
  * composited front-to-back with the emission-absorption model, the opacity of a sample is
  * corrected for the step size and the anisotropic opacity (and, if given, the directional
  * radiance) is interpolated from the three directional values closest to the cone direction.
- * Cones leaving the volume gather nothing.
+ * Cones leaving the volume gather nothing, their transmittance is returned as the visibility of
+ * the sky.
  *
  * @param {VXGIVolume} volume - The volume to trace.
  * @param {Object} [options={}] - Options.
  * @param {?TextureNode} [options.radianceNode=null] - The radiance texture node to gather from. If `null`, only occlusion is computed.
  * @param {?Texture3DNode} [options.directionalNode=null] - The directional radiance texture node of the coarser levels, see {@link VXGIVolume#directionalRadiance}. If `null`, the coarser levels are gathered from the radiance node's mips.
  * @param {number} [options.maxSteps=128] - Upper bound of steps per cone.
- * @return {Function} A function `( origin, direction, tanHalfAngle, maxDistance, aoDistance = null ) => { color, alpha, ao }`. AO is only computed if `aoDistance` is given.
+ * @return {Function} A function `( origin, direction, tanHalfAngle, maxDistance, aoDistance = null ) => { color, alpha, ao, visibility }`. AO is only computed if `aoDistance` is given. The visibility is the transmittance of a cone that left the volume, zero if it ended inside.
  */
 export function createConeTracer( volume, options = {} ) {
 
@@ -187,7 +188,11 @@ export function createConeTracer( volume, options = {} ) {
 
 		} );
 
-		return { color, alpha, ao };
+		// cones that end at the maximum distance or in an opaque surface see no sky
+
+		const visibility = select( tExit.greaterThan( maxDistance ).or( alpha.greaterThanEqual( 0.98 ) ), float( 0 ), alpha.oneMinus() );
+
+		return { color, alpha, ao, visibility };
 
 	};
 
@@ -205,9 +210,10 @@ export function createConeTracer( volume, options = {} ) {
  * @param {Node<float>|number} rotation - Rotation of the cones around the normal in `[0, 1)`.
  * @param {Node<float>|number} elevation - Offset of the cones within their elevation strata in `[0, 1)`.
  * @param {?Node<float>} [aoDistance=null] - The AO falloff distance. AO is only computed if given.
+ * @param {?Function} [radiance=null] - A function `( direction, cone ) => Node<vec3>` that returns the radiance of a cone from its direction and trace result, e.g. to add the sky. If `null`, the cone color.
  * @return {{color: Node<vec3>, ao: Node<float>}} The mean radiance and the mean AO of the cones.
  */
-export function gather( trace, origin, normal, coneCount, tanHalfAngle, maxDistance, rotation, elevation, aoDistance = null ) {
+export function gather( trace, origin, normal, coneCount, tanHalfAngle, maxDistance, rotation, elevation, aoDistance = null, radiance = null ) {
 
 	// tangent frame
 
@@ -232,7 +238,7 @@ export function gather( trace, origin, normal, coneCount, tanHalfAngle, maxDista
 
 		const cone = trace( origin, direction, tanHalfAngle, maxDistance, aoDistance );
 
-		color.addAssign( cone.color );
+		color.addAssign( radiance !== null ? radiance( direction, cone ) : cone.color );
 
 		if ( aoDistance !== null ) ao.addAssign( cone.ao );
 
