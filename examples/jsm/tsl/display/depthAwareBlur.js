@@ -1,4 +1,4 @@
-import { abs, exp, float, Fn, int, Loop, max, reference, uv, viewZ } from 'three/tsl';
+import { abs, exp, float, Fn, int, Loop, max, reference, uv, depthToViewZ } from 'three/tsl';
 
 /**
  * Applies one pass of a separable, depth-aware (bilateral) blur to a screen-space signal.
@@ -24,7 +24,7 @@ export const depthAwareBlur = /*#__PURE__*/ Fn( ( [ inputNode, depthNode, direct
 	const cameraNear = reference( 'near', 'float', camera );
 	const cameraFar = reference( 'far', 'float', camera );
 
-	const sampleViewZ = ( uvNode ) => viewZ( depthNode.sample( uvNode ).r, cameraNear, cameraFar, camera );
+	const sampleViewZ = ( uvNode ) => depthToViewZ( depthNode.sample( uvNode ).r, cameraNear, cameraFar, camera );
 
 	const uvNode = uv();
 	const centerViewZ = sampleViewZ( uvNode ).toVar();

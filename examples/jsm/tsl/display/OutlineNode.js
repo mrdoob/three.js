@@ -1,5 +1,5 @@
 import { DepthTexture, FloatType, RenderTarget, Vector2, Node, QuadMesh, NodeMaterial, SpriteNodeMaterial, RendererUtils, NodeUpdateType } from 'three/webgpu';
-import { Loop, int, exp, min, float, mul, uv, vec2, vec3, Fn, textureSize, screenUV, nodeObject, uniform, vec4, passTexture, texture, viewZ, positionView, reference, color } from 'three/tsl';
+import { Loop, int, exp, min, float, mul, uv, vec2, vec3, Fn, textureSize, screenUV, nodeObject, uniform, vec4, passTexture, texture, depthToViewZ, positionView, reference, color } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -664,7 +664,7 @@ class OutlineNode extends Node {
 
 			const depth = this._depthTextureUniform.sample( screenUV );
 
-			const viewZNode = viewZ( depth, this._cameraNear, this._cameraFar, this.camera );
+			const viewZNode = depthToViewZ( depth, this._cameraNear, this._cameraFar, this.camera );
 
 			const depthTest = positionView.z.lessThanEqual( viewZNode ).select( 1, 0 );
 			return vec3( 0.0, depthTest, 1.0 );

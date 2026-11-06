@@ -334,7 +334,9 @@ export const projectionDepth = /*@__PURE__*/ Fn( ( [ depth, near, far ], builder
 } );
 
 /**
- * TSL function for retrieving the viewZ value of a depth value.
+ * TSL function for converting a depth value to a viewZ value.
+ *
+ * It supports perspective and orthographic cameras and any depth buffer type.
  *
  * @tsl
  * @function
@@ -344,7 +346,7 @@ export const projectionDepth = /*@__PURE__*/ Fn( ( [ depth, near, far ], builder
  * @param {Camera} camera - The camera that produced the depth value.
  * @returns {Node<float>}
  */
-export const viewZ = /*@__PURE__*/ Fn( ( [ depth, near, far, camera ], builder ) => {
+export const depthToViewZ = /*@__PURE__*/ Fn( ( [ depth, near, far, camera ], builder ) => {
 
 	if ( camera.isOrthographicCamera === true ) {
 

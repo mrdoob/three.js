@@ -1,4 +1,4 @@
-import { abs, color, float, Fn, Loop, mix, nodeObject, reference, textureSize, uv, vec2, vec4, viewZ, viewZToOrthographicDepth, int, If, array, ivec2 } from 'three/tsl';
+import { abs, color, float, Fn, Loop, mix, nodeObject, reference, textureSize, uv, vec2, vec4, depthToViewZ, viewZToOrthographicDepth, int, If, array, ivec2 } from 'three/tsl';
 
 /**
  * Performs a depth-aware blend between a base scene and a secondary effect (like godrays).
@@ -27,7 +27,7 @@ export const depthAwareBlend = /*#__PURE__*/ Fn( ( [ baseNode, blendNode, depthN
 	const edgeRadius = nodeObject( options.edgeRadius ) || int( 2 );
 	const edgeStrength = nodeObject( options.edgeStrength ) || float( 2 );
 
-	const centerViewZ = viewZ( depthNode, cameraNear, cameraFar, camera );
+	const centerViewZ = depthToViewZ( depthNode, cameraNear, cameraFar, camera );
 	const correctDepth = viewZToOrthographicDepth( centerViewZ, cameraNear, cameraFar );
 
 	const pushDir = vec2( 0.0 ).toVar();
@@ -54,7 +54,7 @@ export const depthAwareBlend = /*#__PURE__*/ Fn( ( [ baseNode, blendNode, depthN
 		const sampleUv = uvNode.add( offset.mul( pixelStep ) );
 		const sampleDepth = depthNode.sample( sampleUv );
 
-		const sampleViewZ = viewZ( sampleDepth, cameraNear, cameraFar, camera );
+		const sampleViewZ = depthToViewZ( sampleDepth, cameraNear, cameraFar, camera );
 		const sampleLinearDepth = viewZToOrthographicDepth( sampleViewZ, cameraNear, cameraFar );
 
 		If( abs( sampleLinearDepth.sub( correctDepth ) ).lessThan( float( 0.05 ).mul( correctDepth ) ), () => {

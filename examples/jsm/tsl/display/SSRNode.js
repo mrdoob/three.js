@@ -1,4 +1,4 @@
-import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, passTexture, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth, projectionDepth, viewZ } from 'three/tsl';
+import { Break, Continue, Fn, If, Loop, abs, bool, cross, distance, div, dot, float, getScreenPosition, getViewPosition, int, luminance, max, min, mix, mul, nodeObject, normalize, passTexture, reference, reflect, sub, texture, textureSize, trunc, uniform, uv, vec2, vec3, vec4, context, isBackgroundDepth, projectionDepth, depthToViewZ } from 'three/tsl';
 import { HalfFloatType, LinearFilter, LinearMipmapLinearFilter, Matrix4, NodeMaterial, NodeUpdateType, QuadMesh, RenderTarget, RendererUtils, Node, Vector2, Vector3 } from 'three/webgpu';
 import { bindAnalyticNoise } from '../utils/RNoise.js';
 import { ENV_RAY_LENGTH, getSpecularDominantFactor, ggxReflectionSample } from '../utils/SpecularHelpers.js';
@@ -1144,7 +1144,7 @@ class SSRNode extends Node {
 				const uvS = xy.mul( invResolution ).toVar();
 				const rawDepth = this.depthNode.sample( uvS ).r;
 				const d = projectionDepth( rawDepth, this._cameraNear, this._cameraFar ).toVar();
-				const vZ = viewZ( rawDepth, this._cameraNear, this._cameraFar, this.camera ).toVar();
+				const vZ = depthToViewZ( rawDepth, this._cameraNear, this._cameraFar, this.camera ).toVar();
 
 				const viewReflectRayZ = reflectRayZAt( s ).toVar();
 
@@ -1231,7 +1231,7 @@ class SSRNode extends Node {
 
 							const sMid = hitSLo.add( hitSHi ).mul( 0.5 ).toVar();
 							const uvMid = screenPosAt( sMid ).mul( invResolution ).toConst();
-							const sceneZMid = viewZ( this.depthNode.sample( uvMid ).r, this._cameraNear, this._cameraFar, this.camera );
+							const sceneZMid = depthToViewZ( this.depthNode.sample( uvMid ).r, this._cameraNear, this._cameraFar, this.camera );
 							const frontFacing = dot( viewReflectDir, this.normalNode.sample( uvMid ).rgb.normalize() ).lessThan( 0 );
 
 							If( reflectRayZAt( sMid ).lessThanEqual( sceneZMid ).and( frontFacing ), () => {
