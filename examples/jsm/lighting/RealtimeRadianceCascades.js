@@ -3553,7 +3553,9 @@ class RealtimeRadianceCascades {
 		const toLight = vec4( 0 ).toVar();
 		const seed = floatBitsToUint( point.x ).add( floatBitsToUint( point.y ).mul( 7919 ) ).add( floatBitsToUint( point.z ).mul( 104729 ) ).add( this._frameNode.mul( 31337 ) ).toVar();
 
-		// every light with a weight replaces the pick so far with the probability of its share of the weights
+		// every light with a weight replaces the pick so far with the probability of its share of the weights. The
+		// test includes equality as hash() can round up to 1, which would leave the first light unpicked: a shadow
+		// ray without a direction and a light of NaN
 
 		const consider = ( index, light, target ) => {
 
@@ -3563,7 +3565,7 @@ class RealtimeRadianceCascades {
 
 				total.addAssign( weight );
 
-				If( hash( seed.add( index ) ).mul( total ).lessThan( weight ), () => {
+				If( hash( seed.add( index ) ).mul( total ).lessThanEqual( weight ), () => {
 
 					const vector = target().sub( point ).toVar();
 
