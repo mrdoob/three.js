@@ -1,11 +1,12 @@
 import {
 	Color,
+	FrontSide,
 	Mesh,
 	Vector3,
 	NodeMaterial
 } from 'three/webgpu';
 
-import { Fn, add, cameraPosition, div, normalize, positionWorld, sub, time, texture, vec2, vec3, max, dot, reflect, pow, length, float, uniform, reflector, mul, mix } from 'three/tsl';
+import { Fn, add, cameraPosition, cameraViewMatrix, div, normalize, positionWorld, sub, time, texture, vec2, vec3, max, dot, reflect, pow, length, float, uniform, reflector, mul, mix } from 'three/tsl';
 
 /**
  * A basic flat, reflective water effect.
@@ -30,7 +31,7 @@ class WaterMesh extends Mesh {
 	 * @param {BufferGeometry} geometry - The water mesh's geometry.
 	 * @param {WaterMesh~Options} [options] - The configuration options.
 	 */
-	constructor( geometry, options ) {
+	constructor( geometry, options = {} ) {
 
 		const material = new NodeMaterial();
 
@@ -137,9 +138,17 @@ class WaterMesh extends Mesh {
 
 		const distance = length( worldToEye );
 
-		const distortion = surfaceNormal.xz.mul( float( 0.001 ).add( float( 1.0 ).div( distance ) ) ).mul( this.distortionScale );
+		const viewRight = vec2( cameraViewMatrix[ 0 ].x, cameraViewMatrix[ 2 ].x );
+		const normalTilt = vec2(
+			surfaceNormal.x.mul( viewRight.x ).add( surfaceNormal.z.mul( viewRight.y ) ),
+			surfaceNormal.z.mul( viewRight.x ).sub( surfaceNormal.x.mul( viewRight.y ) )
+		);
+		const distortion = vec2( normalTilt.x.negate(), normalTilt.y ).mul( float( 0.001 ).add( float( 1.0 ).div( distance ) ) ).mul( this.distortionScale );
 
-		const mirrorSampler = reflector( { resolutionScale: options.resolutionScale !== undefined ? options.resolutionScale : 0.5 } );
+		const mirrorSampler = reflector( {
+			resolutionScale: options.resolutionScale !== undefined ? options.resolutionScale : 0.5,
+			bounces: false
+		} );
 		mirrorSampler.uvNode = mirrorSampler.uvNode.add( distortion );
 		this.add( mirrorSampler.target );
 
@@ -147,11 +156,11 @@ class WaterMesh extends Mesh {
 
 		// Material
 
-		material.transparent = true;
+		material.side = options.side !== undefined ? options.side : FrontSide;
+		material.fog = options.fog === true;
+		material.transparent = options.alpha !== undefined && options.alpha < 1.0;
 
 		material.opacityNode = this.alpha;
-
-		material.receivedShadowPositionNode = positionWorld.add( distortion );
 
 		material.colorNode = Fn( () => {
 
@@ -159,7 +168,7 @@ class WaterMesh extends Mesh {
 			const rf0 = float( 0.02 );
 			const reflectance = mul( pow( float( 1.0 ).sub( theta ), 5.0 ), float( 1.0 ).sub( rf0 ) ).add( rf0 );
 			const scatter = max( 0.0, dot( surfaceNormal, eyeDirection ) ).mul( this.waterColor );
-			const albedo = mix( this.sunColor.mul( diffuseLight ).mul( 0.3 ).add( scatter ), mirrorSampler.rgb.add( specularLight ), reflectance );
+			const albedo = mix( diffuseLight.mul( 0.3 ).add( scatter ), mirrorSampler.rgb.add( specularLight ), reflectance );
 
 			return albedo;
 
@@ -199,6 +208,8 @@ class WaterMesh extends Mesh {
  * @property {Vector3} [sunDirection=(0.70707,0.70707,0.0)] - The sun direction.
  * @property {number|Color|string} [waterColor=0x7F7F7F] - The water color.
  * @property {number} [distortionScale=20] - The distortion scale.
+ * @property {(FrontSide|BackSide|DoubleSide)} [side=FrontSide] - The water material's `side` property.
+ * @property {boolean} [fog=false] - Whether the water should be affected by fog or not.
  **/
 
 export { WaterMesh };
