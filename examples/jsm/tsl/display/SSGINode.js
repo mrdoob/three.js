@@ -520,7 +520,7 @@ class SSGINode extends Node {
 
 				If( numOccludedZones.greaterThan( 0 ), () => { // If a ray hit the sample, that sample is visible from shading point
 
-					const lightColor = sampleBeauty( sampleUV );
+					const lightColor = sampleBeauty( sampleUV ).rgb;
 
 					If( luminance( lightColor ).greaterThan( 0.001 ), () => { // Continue if there is light at that location (intensity > 0)
 
