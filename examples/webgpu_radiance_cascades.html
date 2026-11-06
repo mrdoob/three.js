@@ -345,6 +345,7 @@
 				const angle = THREE.MathUtils.degToRad( params.sunAngle );
 				const [ x, z ] = world.sunAzimuth ?? [ 0.5, 0.6 ];
 				world.sun.position.set( Math.cos( angle ) * x, Math.sin( angle ), Math.cos( angle ) * z ).normalize().multiplyScalar( world.sunDistance ?? 30 ).add( world.sun.target.position );
+				world.sun.shadow.needsUpdate = true;
 
 			}
 
@@ -414,6 +415,7 @@
 					spot.castShadow = true;
 					spot.shadow.mapSize.setScalar( 1024 );
 					spot.shadow.bias = - 0.0005;
+					spot.shadow.autoUpdate = false;
 					root.add( spot, spot.target );
 
 				} else {
@@ -564,6 +566,11 @@
 				sun.shadow.normalBias = 0.02;
 				sun.target.position.copy( sphere.center );
 				root.add( sun, sun.target );
+
+				// the scene does not move, so the shadow map renders again only when the sun does, see updateSun(). That
+				// spares drawing the scene twice in every frame
+
+				sun.shadow.autoUpdate = false;
 
 				const toSun = new THREE.Vector3( 0.5, 1, 0.1 ).normalize();
 				const azimuth = new THREE.Vector2( toSun.x, toSun.z ).normalize();
