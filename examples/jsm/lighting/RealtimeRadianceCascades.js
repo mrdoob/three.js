@@ -187,8 +187,8 @@ class RealtimeRadianceCascades {
 		 * wants more than 85% of its probes, by half of the octaves that would bring it to 75%, and falls by 0.01 while
 		 * all have less than 70%, so that it returns after a spike of probes, after the probe counts of a frame are read
 		 * back. A level of detail has about a quarter of the probes of the one before, and the blending of the levels
-		 * hides the fractional steps. Below `quality` 1, it falls only while the cascades would have less than 70% at
-		 * quality 1 too, so that it does not undo the coarser levels of the quality.
+		 * hides the fractional steps. Below `quality` 1, the finest cascade counts against its share of the probes at that
+		 * quality, a quarter per octave, so that the bias does not undo the coarser levels of the quality.
 		 *
 		 * @type {number}
 		 * @default 0
@@ -1308,20 +1308,19 @@ class RealtimeRadianceCascades {
 		const cascades = this.cascades;
 
 		// the probes a cascade wanted: the ones it has, and the new ones beyond the free slots of the last frame. Below
-		// quality 1, the levels of detail are 1 - quality octaves coarser, for up to a quarter of the probes per octave:
-		// the bias falls only if the cascades would have room at quality 1 too, or it would undo the quality
+		// quality 1, the levels of detail are 1 - quality octaves coarser, a quarter of the probes per octave, which
+		// would let the bias fall by as much and undo them: the finest cascade counts against that share of its
+		// capacity. The coarser ones cover the view with few probes, which hardly shrink with the levels
 
 		const share = 4 ** ( quality - 1 );
 
-		let fullness = 0, fullnessAtFullQuality = 0;
+		let fullness = 0;
 
 		for ( let n = 0; n < cascades; n ++ ) {
 
 			const failed = Math.max( counts[ base + ALLOCATED * cascades + n ] - counts[ previous + FREED * cascades + n ], 0 );
-			const wanted = counts[ base + PROBES * cascades + n ] + failed;
 
-			fullness = Math.max( fullness, wanted / capacities[ n ] );
-			fullnessAtFullQuality = Math.max( fullnessAtFullQuality, wanted / ( capacities[ n ] * share ) );
+			fullness = Math.max( fullness, ( counts[ base + PROBES * cascades + n ] + failed ) / ( capacities[ n ] * ( n === 0 ? share : 1 ) ) );
 
 		}
 
@@ -1330,7 +1329,7 @@ class RealtimeRadianceCascades {
 		// do not stay coarse after a spike of probes
 
 		if ( fullness > 0.85 ) this.lodBias += Math.max( Math.log2( fullness / 0.75 ) / 4, 0.05 );
-		else if ( fullnessAtFullQuality < 0.7 ) this.lodBias = Math.max( this.lodBias - 0.01, 0 );
+		else if ( fullness < 0.7 ) this.lodBias = Math.max( this.lodBias - 0.01, 0 );
 
 	}
 
