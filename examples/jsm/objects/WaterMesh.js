@@ -6,7 +6,7 @@ import {
 	NodeMaterial
 } from 'three/webgpu';
 
-import { Fn, add, cameraPosition, cameraViewMatrix, div, normalize, positionWorld, sub, time, texture, vec2, vec3, max, dot, reflect, pow, length, float, uniform, reflector, mul, mix } from 'three/tsl';
+import { Fn, add, cameraPosition, cameraViewMatrix, inverseSqrt, normalize, positionWorld, sub, time, texture, vec2, vec3, max, dot, reflect, pow, uniform, reflector, mul, mix } from 'three/tsl';
 
 /**
  * A basic flat, reflective water effect.
@@ -112,10 +112,10 @@ class WaterMesh extends Mesh {
 
 			const offset = time;
 
-			const uv0 = add( div( uv, 103 ), vec2( div( offset, 17 ), div( offset, 29 ) ) ).toVar();
-			const uv1 = div( uv, 107 ).sub( vec2( div( offset, - 19 ), div( offset, 31 ) ) ).toVar();
-			const uv2 = add( div( uv, vec2( 8907.0, 9803.0 ) ), vec2( div( offset, 101 ), div( offset, 97 ) ) ).toVar();
-			const uv3 = sub( div( uv, vec2( 1091.0, 1027.0 ) ), vec2( div( offset, 109 ), div( offset, - 113 ) ) ).toVar();
+			const uv0 = uv.mul( 1 / 103 ).add( offset.mul( vec2( 1 / 17, 1 / 29 ) ) ).toVar();
+			const uv1 = uv.mul( 1 / 107 ).sub( offset.mul( vec2( - 1 / 19, 1 / 31 ) ) ).toVar();
+			const uv2 = uv.mul( vec2( 1 / 8907.0, 1 / 9803.0 ) ).add( offset.mul( vec2( 1 / 101, 1 / 97 ) ) ).toVar();
+			const uv3 = uv.mul( vec2( 1 / 1091.0, 1 / 1027.0 ) ).sub( offset.mul( vec2( 1 / 109, - 1 / 113 ) ) ).toVar();
 
 			const sample0 = this.waterNormals.sample( uv0 );
 			const sample1 = this.waterNormals.sample( uv1 );
@@ -132,21 +132,20 @@ class WaterMesh extends Mesh {
 		const surfaceNormal = normalize( noise.xzy.mul( vec3( 1.5, 1.0, 1.5 ) ) );
 
 		const worldToEye = cameraPosition.sub( positionWorld );
-		const eyeDirection = normalize( worldToEye );
+		const invDistance = inverseSqrt( dot( worldToEye, worldToEye ) );
+		const eyeDirection = worldToEye.mul( invDistance );
 
-		const reflection = normalize( reflect( this.sunDirection.negate(), surfaceNormal ) );
+		const reflection = reflect( this.sunDirection.negate(), surfaceNormal );
 		const direction = max( 0.0, dot( eyeDirection, reflection ) );
 		const specularLight = pow( direction, 100 ).mul( this.sunColor ).mul( 2.0 );
 		const diffuseLight = max( dot( this.sunDirection, surfaceNormal ), 0.0 ).mul( this.sunColor ).mul( 0.5 );
-
-		const distance = length( worldToEye );
 
 		const viewRight = vec2( cameraViewMatrix[ 0 ].x, cameraViewMatrix[ 2 ].x );
 		const normalTilt = vec2(
 			surfaceNormal.x.mul( viewRight.x ).add( surfaceNormal.z.mul( viewRight.y ) ),
 			surfaceNormal.z.mul( viewRight.x ).sub( surfaceNormal.x.mul( viewRight.y ) )
 		);
-		const distortion = vec2( normalTilt.x.negate(), normalTilt.y ).mul( float( 0.001 ).add( float( 1.0 ).div( distance ) ) ).mul( this.distortionScale );
+		const distortion = vec2( normalTilt.x.negate(), normalTilt.y ).mul( add( 0.001, invDistance ) ).mul( this.distortionScale );
 
 		const mirrorSampler = reflector( {
 			resolutionScale: options.resolutionScale !== undefined ? options.resolutionScale : 0.5,
@@ -168,9 +167,10 @@ class WaterMesh extends Mesh {
 		material.colorNode = Fn( () => {
 
 			const theta = max( dot( eyeDirection, surfaceNormal ), 0.0 );
-			const rf0 = float( 0.02 );
-			const reflectance = mul( pow( float( 1.0 ).sub( theta ), 5.0 ), float( 1.0 ).sub( rf0 ) ).add( rf0 );
-			const scatter = max( 0.0, dot( surfaceNormal, eyeDirection ) ).mul( this.waterColor );
+			const oneMinusTheta = sub( 1.0, theta );
+			const oneMinusTheta2 = oneMinusTheta.mul( oneMinusTheta );
+			const reflectance = add( 0.02, mul( 0.98, oneMinusTheta2.mul( oneMinusTheta2 ).mul( oneMinusTheta ) ) );
+			const scatter = this.waterColor.mul( theta );
 			const albedo = mix( diffuseLight.mul( 0.3 ).add( scatter ), mirrorSampler.rgb.add( specularLight ), reflectance );
 
 			return albedo;
