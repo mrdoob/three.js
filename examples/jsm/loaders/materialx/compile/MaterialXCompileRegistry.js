@@ -352,9 +352,12 @@ const compileTiledImageNode = ( nodeX, compileContext ) => {
 
 	}
 
+	// ( texcoord * uvtiling - uvoffset ) / realworldimagesize * realworldtilesize, as in NG_tiledimage.
 	const uvTiling = nodeX.getNodeByName( 'uvtiling' );
 	const uvOffset = nodeX.getNodeByName( 'uvoffset' );
-	const transformedUv = compileContext.mxTransformUv( uvTiling, uvOffset, uvNode );
+	const realWorldImageSize = nodeX.getNodeByName( 'realworldimagesize' );
+	const realWorldTileSize = nodeX.getNodeByName( 'realworldtilesize' );
+	const transformedUv = mul( div( sub( mul( uvNode, uvTiling ), uvOffset ), realWorldImageSize ), realWorldTileSize );
 	const node = sampleTexture( textureFile, transformedUv, compileContext, textureDefault, addressModes, textureDefault );
 	return applyTextureColorSpace( node, file );
 
