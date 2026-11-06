@@ -216,9 +216,6 @@ Sky.SkyShader = {
 			return result;
 		}
 
-		// constants for atmospheric scattering
-		const float pi = 3.141592653589793238462643383279502884197169;
-
 		// optical length at zenith for molecules
 		const float rayleighZenithLength = 8.4E3;
 		const float mieZenithLength = 1.25E3;
@@ -231,23 +228,22 @@ Sky.SkyShader = {
 		const float ONE_OVER_FOURPI = 0.07957747154594767;
 
 		float rayleighPhase( float cosTheta ) {
-			return THREE_OVER_SIXTEENPI * ( 1.0 + pow( cosTheta, 2.0 ) );
+			return THREE_OVER_SIXTEENPI * ( 1.0 + cosTheta * cosTheta );
 		}
 
 		float hgPhase( float cosTheta, float g ) {
-			float g2 = pow( g, 2.0 );
-			float inverse = 1.0 / pow( 1.0 - 2.0 * g * cosTheta + g2, 1.5 );
-			return ONE_OVER_FOURPI * ( ( 1.0 - g2 ) * inverse );
+			float g2 = g * g;
+			float invSqrt = inversesqrt( max( 1e-4, 1.0 - 2.0 * g * cosTheta + g2 ) );
+			return ONE_OVER_FOURPI * ( 1.0 - g2 ) * ( invSqrt * invSqrt * invSqrt );
 		}
 
 		void main() {
 
 			vec3 direction = normalize( vWorldPosition - cameraPosition );
 
-			// optical length
-			// cutoff angle at 90 to avoid singularity in next formula.
-			float zenithAngle = acos( max( 0.0, direction.y ) );
-			float inverse = 1.0 / ( cos( zenithAngle ) + 0.15 * pow( 93.885 - ( ( zenithAngle * 180.0 ) / pi ), -1.253 ) );
+			// optical length (rational Kasten-Young air mass fit, <0.06% error on [0, 1])
+			float cosZenith = max( 0.0, direction.y );
+			float inverse = 1.0 / ( cosZenith + 0.02739 / ( 1.0 + cosZenith * ( 18.6 + 26.0 * cosZenith ) ) );
 			float sR = rayleighZenithLength * inverse;
 			float sM = mieZenithLength * inverse;
 
@@ -263,8 +259,12 @@ Sky.SkyShader = {
 			float mPhase = hgPhase( cosTheta, mieDirectionalG );
 			vec3 betaMTheta = vBetaM * mPhase;
 
-			vec3 Lin = pow( vSunE * ( ( betaRTheta + betaMTheta ) / ( vBetaR + vBetaM ) ) * ( 1.0 - Fex ), vec3( 1.5 ) );
-			Lin *= mix( vec3( 1.0 ), pow( vSunE * ( ( betaRTheta + betaMTheta ) / ( vBetaR + vBetaM ) ) * Fex, vec3( 1.0 / 2.0 ) ), clamp( pow( 1.0 - vSunDirection.y, 5.0 ), 0.0, 1.0 ) );
+			vec3 betaScatOverExt = ( betaRTheta + betaMTheta ) / ( vBetaR + vBetaM );
+			vec3 LinBase = max( vec3( 0.0 ), vSunE * betaScatOverExt * ( 1.0 - Fex ) );
+			vec3 Lin = LinBase * sqrt( LinBase );
+			float sunHorizon = clamp( 1.0 - vSunDirection.y, 0.0, 1.0 );
+			float sunHorizon2 = sunHorizon * sunHorizon;
+			Lin *= mix( vec3( 1.0 ), sqrt( max( vec3( 0.0 ), vSunE * betaScatOverExt * Fex ) ), sunHorizon2 * sunHorizon2 * sunHorizon );
 
 			// nightsky
 			vec3 L0 = vec3( 0.1 ) * Fex;

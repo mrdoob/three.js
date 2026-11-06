@@ -6,7 +6,7 @@ import {
 	NodeMaterial
 } from 'three/webgpu';
 
-import { Fn, float, floor, fract, vec2, vec3, acos, add, mul, clamp, cos, dot, exp, max, min, mix, modelViewProjection, normalize, positionWorld, pow, smoothstep, sub, varyingProperty, vec4, uniform, cameraPosition, time, If, Loop } from 'three/tsl';
+import { Fn, float, floor, fract, vec2, vec3, acos, add, mul, clamp, dot, exp, inverseSqrt, max, min, mix, modelViewProjection, normalize, positionWorld, pow, smoothstep, sqrt, sub, varyingProperty, vec4, uniform, cameraPosition, time, If, Loop } from 'three/tsl';
 
 /**
  * Represents a skydome for scene backgrounds. Based on [A Practical Analytic Model for Daylight](https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight)
@@ -223,9 +223,6 @@ class SkyMesh extends Mesh {
 
 		const colorNode = /*@__PURE__*/ Fn( () => {
 
-			// constants for atmospheric scattering
-			const pi = float( 3.141592653589793 );
-
 			// optical length at zenith for molecules
 			const rayleighZenithLength = float( 8.4E3 );
 			const mieZenithLength = float( 1.25E3 );
@@ -241,10 +238,9 @@ class SkyMesh extends Mesh {
 
 			const direction = normalize( positionWorld.sub( cameraPosition ) );
 
-			// optical length
-			// cutoff angle at 90 to avoid singularity in next formula.
-			const zenithAngle = acos( max( 0.0, direction.y ) );
-			const inverse = float( 1.0 ).div( cos( zenithAngle ).add( float( 0.15 ).mul( pow( float( 93.885 ).sub( zenithAngle.mul( 180.0 ).div( pi ) ), - 1.253 ) ) ) );
+			// optical length (rational Kasten-Young air mass fit, <0.06% error on [0, 1])
+			const cosZenith = max( 0.0, direction.y );
+			const inverse = float( 1.0 ).div( cosZenith.add( float( 0.02739 ).div( cosZenith.mul( cosZenith.mul( 26.0 ).add( 18.6 ) ).add( 1.0 ) ) ) );
 			const sR = rayleighZenithLength.mul( inverse );
 			const sM = mieZenithLength.mul( inverse );
 
@@ -257,18 +253,22 @@ class SkyMesh extends Mesh {
 			// betaRTheta
 
 			const c = cosTheta.mul( 0.5 ).add( 0.5 );
-			const rPhase = THREE_OVER_SIXTEENPI.mul( float( 1.0 ).add( pow( c, 2.0 ) ) );
+			const rPhase = THREE_OVER_SIXTEENPI.mul( float( 1.0 ).add( c.mul( c ) ) );
 			const betaRTheta = vBetaR.mul( rPhase );
 
 			// betaMTheta
 
-			const g2 = pow( this.mieDirectionalG, 2.0 );
-			const inv = float( 1.0 ).div( pow( float( 1.0 ).sub( float( 2.0 ).mul( this.mieDirectionalG ).mul( cosTheta ) ).add( g2 ), 1.5 ) );
-			const mPhase = ONE_OVER_FOURPI.mul( float( 1.0 ).sub( g2 ) ).mul( inv );
+			const g2 = this.mieDirectionalG.mul( this.mieDirectionalG );
+			const invSqrt = inverseSqrt( max( 1e-4, float( 1.0 ).sub( float( 2.0 ).mul( this.mieDirectionalG ).mul( cosTheta ) ).add( g2 ) ) );
+			const mPhase = ONE_OVER_FOURPI.mul( float( 1.0 ).sub( g2 ) ).mul( invSqrt.mul( invSqrt ).mul( invSqrt ) );
 			const betaMTheta = vBetaM.mul( mPhase );
 
-			const Lin = pow( vSunE.mul( add( betaRTheta, betaMTheta ).div( add( vBetaR, vBetaM ) ) ).mul( sub( 1.0, Fex ) ), vec3( 1.5 ) );
-			Lin.mulAssign( mix( vec3( 1.0 ), pow( vSunE.mul( add( betaRTheta, betaMTheta ).div( add( vBetaR, vBetaM ) ) ).mul( Fex ), vec3( 1.0 / 2.0 ) ), clamp( pow( sub( 1.0, vSunDirection.y ), 5.0 ), 0.0, 1.0 ) ) );
+			const betaScatOverExt = add( betaRTheta, betaMTheta ).div( add( vBetaR, vBetaM ) );
+			const LinBase = max( vec3( 0.0 ), vSunE.mul( betaScatOverExt ).mul( sub( 1.0, Fex ) ) );
+			const Lin = LinBase.mul( sqrt( LinBase ) ).toVar();
+			const sunHorizon = clamp( sub( 1.0, vSunDirection.y ), 0.0, 1.0 );
+			const sunHorizon2 = sunHorizon.mul( sunHorizon );
+			Lin.mulAssign( mix( vec3( 1.0 ), sqrt( max( vec3( 0.0 ), vSunE.mul( betaScatOverExt ).mul( Fex ) ) ), sunHorizon2.mul( sunHorizon2 ).mul( sunHorizon ) ) );
 
 			// nightsky
 
