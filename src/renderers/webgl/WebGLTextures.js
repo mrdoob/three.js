@@ -1318,14 +1318,28 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			} else if ( texture.isHTMLTexture ) {
 
-				if ( 'texElementImage2D' in _gl ) {
+				// Chrome 157.0.8096.0+ removed texElementImage2D() in favor of texElementSubImage2D().
+				if ( 'texElementImage2D' in _gl || 'texElementSubImage2D' in _gl ) {
 
 					const canvas = _gl.canvas;
 
 					// Ensure the canvas supports HTML-in-Canvas and the element is a child.
-					if ( ! canvas.hasAttribute( 'layoutsubtree' ) ) {
+					if ( 'content' in canvas ) {
 
+						// Chrome 156+: layoutsubtree was renamed to content="drawable"
+						if ( canvas.content !== 'drawable' ) canvas.setAttribute( 'content', 'drawable' );
+
+					} else if ( ! canvas.hasAttribute( 'layoutsubtree' ) ) {
+
+						// Chrome 138 - 155
 						canvas.setAttribute( 'layoutsubtree', 'true' );
+
+					}
+
+					// Chrome 157+ requires the drawable attribute on drawn canvas children.
+					if ( ! image.hasAttribute( 'drawable' ) ) {
+
+						image.setAttribute( 'drawable', '' );
 
 					}
 
@@ -1357,7 +1371,48 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					}
 
-					if ( _gl.texElementImage2D.length === 3 ) {
+					if ( typeof _gl.texElementSubImage2D === 'function' ) {
+
+						// Chrome 154+: copy into a texture allocated with the size of the element snapshot.
+
+						let elementImage;
+
+						try {
+
+							elementImage = canvas.captureElementImage( image );
+
+						} catch ( e ) {
+
+							// No paint record for the element yet. Returning early keeps the
+							// texture marked for upload, so the copy is retried on the next frame.
+							canvas.requestPaint();
+							return;
+
+						}
+
+						// TODO: Remove the ElementImage fallback once Chrome 157.0.8094.0+ is the baseline.
+						// Chrome 157.0.8094.0+ moved the default size from ElementImage to the canvas.
+						const size = typeof canvas.getElementImageDefaultSize === 'function' ? canvas.getElementImageDefaultSize( elementImage ) : elementImage;
+
+						// Default sizes are fractional, whereas the copy is rounded up.
+						const width = Math.ceil( size.width );
+						const height = Math.ceil( size.height );
+
+						// Re-allocate only when the size changes since it resets the contents.
+						if ( textureProperties.__width !== width || textureProperties.__height !== height ) {
+
+							state.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA8, width, height, 0, _gl.RGBA, _gl.UNSIGNED_BYTE, null );
+							textureProperties.__width = width;
+							textureProperties.__height = height;
+
+						}
+
+						// Pass the destination size. It forces the copy to exactly fill the
+						// allocated texture, independently of how the canvas is sized.
+						_gl.texElementSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, elementImage, { width, height } );
+						elementImage.close();
+
+					} else if ( _gl.texElementImage2D.length === 3 ) {
 
 						// Chrome 150+
 
