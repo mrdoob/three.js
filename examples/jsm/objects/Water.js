@@ -166,10 +166,8 @@ class Water extends Mesh {
 					return noise * 2.0 - 1.0;
 				}
 
-				void sunLight( const vec3 surfaceNormal, const vec3 eyeDirection, float roughness, inout vec3 diffuseColor, inout vec3 specularColor ) {
+				vec3 sunGlitter( const vec3 surfaceNormal, const vec3 eyeDirection, float roughness ) {
 					float NoL = max( dot( surfaceNormal, sunDirection ), 0.0 );
-					diffuseColor += NoL * sunColor * 0.5;
-
 					vec3 halfVector = normalize( sunDirection + eyeDirection );
 					float NoH = max( dot( surfaceNormal, halfVector ), 0.0 );
 					float NoV = max( dot( surfaceNormal, eyeDirection ), 0.001 );
@@ -188,7 +186,7 @@ class Water extends Mesh {
 
 					float sunFade = smoothstep( - 0.02, 0.02, sunDirection.y );
 					float spec = D * Vis * F * NoL * sunFade * 3.0;
-					specularColor += ( spec / ( 1.0 + spec * 0.08 ) ) * sunColor;
+					return ( spec / ( 1.0 + spec * 0.08 ) ) * sunColor;
 				}
 
 				#include <common>
@@ -206,9 +204,6 @@ class Water extends Mesh {
 					vec4 noise = getNoise( worldPosition.xz * size );
 					vec3 surfaceNormal = normalize( noise.xzy * vec3( 1.5, 1.0, 1.5 ) );
 
-					vec3 diffuseLight = vec3(0.0);
-					vec3 specularLight = vec3(0.0);
-
 					vec3 worldToEye = eye - worldPosition.xyz;
 					float invDistance = inversesqrt( dot( worldToEye, worldToEye ) );
 					vec3 eyeDirection = worldToEye * invDistance;
@@ -217,7 +212,7 @@ class Water extends Mesh {
 					surfaceNormal = normalize( surfaceNormal + eyeDirection * max( 0.0, - NoV + 0.02 ) );
 
 					float roughness = 0.14 - ( 0.095 * invDistance ) / ( invDistance + 0.004 );
-					sunLight( surfaceNormal, eyeDirection, roughness, diffuseLight, specularLight );
+					vec3 specularLight = sunGlitter( surfaceNormal, eyeDirection, roughness );
 
 					vec2 viewRight = vec2( viewMatrix[ 0 ][ 0 ], viewMatrix[ 2 ][ 0 ] );
 					vec2 normalTilt = vec2(
@@ -236,9 +231,16 @@ class Water extends Mesh {
 					float oneMinusTheta = 1.0 - theta;
 					float oneMinusTheta2 = oneMinusTheta * oneMinusTheta;
 					float reflectance = 0.02 + 0.98 * ( oneMinusTheta2 * oneMinusTheta2 * oneMinusTheta );
-					vec3 scatter = theta * waterColor;
+
+					float twilight = smoothstep( - 0.1, 0.05, sunDirection.y );
+					vec3 upwelling = waterColor * sunColor * ( twilight * ( 0.35 + 0.65 * max( sunDirection.y, 0.0 ) ) * ( 0.35 + 0.65 * theta ) );
+					float crestSlope = max( 0.0, normalTilt.y );
+					float backSun = max( 0.0, dot( - eyeDirection, normalize( sunDirection + vec3( surfaceNormal.x, 0.0, surfaceNormal.z ) * 0.6 ) ) );
+					float sssFactor = crestSlope * ( backSun * backSun * backSun * backSun ) * twilight;
+					vec3 subsurface = upwelling + sqrt( max( waterColor, vec3( 0.0 ) ) ) * sunColor * ( sssFactor * 0.35 );
+
 					float shadowMask = getShadowMask();
-					vec3 albedo = mix( ( diffuseLight * 0.3 + scatter ) * shadowMask, reflectionSample, reflectance ) + specularLight * shadowMask;
+					vec3 albedo = mix( subsurface * shadowMask, reflectionSample, reflectance ) + specularLight * shadowMask;
 					vec3 outgoingLight = albedo;
 					gl_FragColor = vec4( outgoingLight, alpha );
 

@@ -6,7 +6,7 @@ import {
 	NodeMaterial
 } from 'three/webgpu';
 
-import { Fn, abs, add, cameraPosition, cameraViewMatrix, clamp, div, inverseSqrt, normalize, positionWorld, smoothstep, sub, time, texture, vec2, vec3, max, dot, uniform, reflector, mul, mix } from 'three/tsl';
+import { Fn, abs, add, cameraPosition, cameraViewMatrix, clamp, div, inverseSqrt, normalize, positionWorld, smoothstep, sqrt, sub, time, texture, vec2, vec3, max, dot, uniform, reflector, mul, mix } from 'three/tsl';
 
 /**
  * A basic flat, reflective water effect.
@@ -138,7 +138,6 @@ class WaterMesh extends Mesh {
 		const surfaceNormal = normalize( rawNormal.add( eyeDirection.mul( max( 0.0, sub( 0.02, NoV ) ) ) ) );
 
 		const NoL = max( dot( surfaceNormal, this.sunDirection ), 0.0 );
-		const diffuseLight = NoL.mul( this.sunColor ).mul( 0.5 );
 
 		const halfVector = normalize( this.sunDirection.add( eyeDirection ) );
 		const NoH = max( dot( surfaceNormal, halfVector ), 0.0 );
@@ -196,8 +195,16 @@ class WaterMesh extends Mesh {
 			const oneMinusTheta = sub( 1.0, theta );
 			const oneMinusTheta2 = oneMinusTheta.mul( oneMinusTheta );
 			const reflectance = add( 0.02, mul( 0.98, oneMinusTheta2.mul( oneMinusTheta2 ).mul( oneMinusTheta ) ) );
-			const scatter = this.waterColor.mul( theta );
-			const albedo = mix( diffuseLight.mul( 0.3 ).add( scatter ), mirrorSampler.rgb, reflectance ).add( specularLight );
+
+			const twilight = smoothstep( - 0.1, 0.05, this.sunDirection.y );
+			const upwelling = this.waterColor.mul( this.sunColor ).mul( twilight.mul( add( 0.35, max( this.sunDirection.y, 0.0 ).mul( 0.65 ) ) ).mul( add( 0.35, theta.mul( 0.65 ) ) ) );
+			const crestSlope = max( 0.0, normalTilt.y );
+			const backSun = max( 0.0, dot( eyeDirection.negate(), normalize( this.sunDirection.add( vec3( surfaceNormal.x, 0.0, surfaceNormal.z ).mul( 0.6 ) ) ) ) );
+			const backSun2 = backSun.mul( backSun );
+			const sssFactor = crestSlope.mul( backSun2.mul( backSun2 ) ).mul( twilight );
+			const subsurface = upwelling.add( sqrt( max( this.waterColor, vec3( 0.0 ) ) ).mul( this.sunColor ).mul( sssFactor.mul( 0.35 ) ) );
+
+			const albedo = mix( subsurface, mirrorSampler.rgb, reflectance ).add( specularLight );
 
 			return albedo;
 
