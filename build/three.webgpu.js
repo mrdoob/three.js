@@ -1630,7 +1630,11 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 
 		let node = null;
 
-		if ( builder.material.lightMap ) {
+		if ( this.lightMapNode !== null ) {
+
+			node = new BasicLightMapNode( vec3( this.lightMapNode ) );
+
+		} else if ( builder.material.lightMap ) {
 
 			node = new BasicLightMapNode( materialLightMap );
 
@@ -10661,7 +10665,8 @@ class Textures extends DataMap {
 
 		} else {
 
-			target.width = target.height = target.depth = 1;
+			target.width = target.height = 1;
+			target.depth = texture.isCubeTexture ? 6 : 1;
 
 		}
 
@@ -34519,7 +34524,9 @@ const GLFeatureName = {
 	'WEBGL_compressed_texture_s3tc': 'texture-compression-s3tc',
 	'EXT_texture_compression_bptc': 'texture-compression-bc',
 	'EXT_disjoint_timer_query_webgl2': 'timestamp-query',
-	'OVR_multiview2': 'OVR_multiview2'
+	'OVR_multiview2': 'OVR_multiview2',
+	'OES_texture_float_linear': 'float32-filterable',
+	'WEBGL_clip_cull_distance': 'clip-distances'
 
 };
 

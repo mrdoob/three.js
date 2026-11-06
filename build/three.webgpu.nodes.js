@@ -22400,6 +22400,37 @@ const projectionDepth = /*@__PURE__*/ Fn( ( [ depth, near, far ], builder ) => {
 } );
 
 /**
+ * TSL function for converting a depth value to a viewZ value.
+ *
+ * It supports perspective and orthographic cameras and any depth buffer type.
+ *
+ * @tsl
+ * @function
+ * @param {Node<float>} depth - The depth value.
+ * @param {Node<float>} near - The camera's near value.
+ * @param {Node<float>} far - The camera's far value.
+ * @param {Camera} camera - The camera that produced the depth value.
+ * @returns {Node<float>}
+ */
+const depthToViewZ = /*@__PURE__*/ Fn( ( [ depth, near, far, camera ], builder ) => {
+
+	if ( camera.isOrthographicCamera === true ) {
+
+		return orthographicDepthToViewZ( depth, near, far );
+
+	}
+
+	if ( builder.renderer.logarithmicDepthBuffer === true ) {
+
+		return logarithmicDepthToViewZ( depth, near, far );
+
+	}
+
+	return perspectiveDepthToViewZ( depth, near, far );
+
+} );
+
+/**
  * TSL function for defining a value for the current fragment's depth.
  *
  * @tsl
@@ -22958,6 +22989,17 @@ class NodeMaterial extends Material {
 		 * @default null
 		 */
 		this.aoNode = null;
+
+		/**
+		 * The lighting of node materials might be influenced by a light map. The default
+		 * light map is inferred from a light map assigned to `lightMap` and the respective
+		 * `lightMapIntensity`. This node property allows to overwrite the default and define
+		 * the light map with a custom node instead, e.g. the output of a denoiser.
+		 *
+		 * @type {?Node<vec3>}
+		 * @default null
+		 */
+		this.lightMapNode = null;
 
 		/**
 		 * The diffuse color of node materials is by default inferred from the
@@ -23817,7 +23859,11 @@ class NodeMaterial extends Material {
 
 		let node = null;
 
-		if ( builder.material.lightMap ) {
+		if ( this.lightMapNode !== null ) {
+
+			node = new IrradianceNode( vec3( this.lightMapNode ) );
+
+		} else if ( builder.material.lightMap ) {
 
 			node = new IrradianceNode( materialLightMap );
 
@@ -26029,7 +26075,11 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 
 		let node = null;
 
-		if ( builder.material.lightMap ) {
+		if ( this.lightMapNode !== null ) {
+
+			node = new BasicLightMapNode( vec3( this.lightMapNode ) );
+
+		} else if ( builder.material.lightMap ) {
 
 			node = new BasicLightMapNode( materialLightMap );
 
@@ -37150,7 +37200,8 @@ class Textures extends DataMap {
 
 		} else {
 
-			target.width = target.height = target.depth = 1;
+			target.width = target.height = 1;
+			target.depth = texture.isCubeTexture ? 6 : 1;
 
 		}
 
@@ -44599,7 +44650,7 @@ class PassNode extends Node {
 			const cameraNear = this._cameraNear;
 			const cameraFar = this._cameraFar;
 
-			this._viewZNodes[ name ] = viewZNode = perspectiveDepthToViewZ( this.getTextureNode( name ), cameraNear, cameraFar );
+			this._viewZNodes[ name ] = viewZNode = depthToViewZ( this.getTextureNode( name ), cameraNear, cameraFar, this.camera );
 
 		}
 
@@ -75750,7 +75801,9 @@ const GLFeatureName = {
 	'WEBGL_compressed_texture_s3tc': 'texture-compression-s3tc',
 	'EXT_texture_compression_bptc': 'texture-compression-bc',
 	'EXT_disjoint_timer_query_webgl2': 'timestamp-query',
-	'OVR_multiview2': 'OVR_multiview2'
+	'OVR_multiview2': 'OVR_multiview2',
+	'OES_texture_float_linear': 'float32-filterable',
+	'WEBGL_clip_cull_distance': 'clip-distances'
 
 };
 
@@ -94542,6 +94595,7 @@ var Three_TSL = /*#__PURE__*/Object.freeze({
 	densityFogFactor: densityFogFactor,
 	depth: depth,
 	depthPass: depthPass,
+	depthToViewZ: depthToViewZ,
 	determinant: determinant,
 	difference: difference,
 	diffuseColor: diffuseColor,
