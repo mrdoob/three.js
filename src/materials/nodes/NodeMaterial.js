@@ -779,6 +779,13 @@ class NodeMaterial extends Material {
 
 		}
 
+		// morphs and skinning change the normal's length, which the bump map scale expects to be one
+		if ( ( geometry.morphAttributes.normal || object.isSkinnedMesh === true ) && geometry.hasAttribute( 'normal' ) ) {
+
+			normalLocal.assign( normalLocal.normalize() );
+
+		}
+
 		if ( this.displacementMap ) {
 
 			const displacementMap = materialReference( 'displacementMap', 'texture' );
