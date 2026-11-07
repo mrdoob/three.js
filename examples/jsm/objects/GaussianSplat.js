@@ -31,6 +31,7 @@ import {
 	min,
 	normalize,
 	positionGeometry,
+	select,
 	sin,
 	sqrt,
 	storage,
@@ -118,10 +119,14 @@ class GaussianSplat extends Mesh {
 			sh2: sphericalHarmonicsDegree >= 2 ? splatGeometry.getAttribute( 'sphericalHarmonics2' ).array : undefined,
 			sh3: sphericalHarmonicsDegree >= 3 ? splatGeometry.getAttribute( 'sphericalHarmonics3' ).array : undefined
 		} );
-		const localCameraPosition = uniform( new Vector3() );
-		const sphericalHarmonicsComputeNode = createSphericalHarmonicsComputeNode( buffers, localCameraPosition );
+		const localCamera = {
+			position: uniform( new Vector3() ),
+			direction: uniform( new Vector3( 0, 0, - 1 ) ),
+			orthographic: uniform( false )
+		};
+		const sphericalHarmonicsComputeNode = createSphericalHarmonicsComputeNode( buffers, localCamera );
 		const sort = new CountingSort( count, { binCount: BIN_COUNT, workgroupSize: WORKGROUP_SIZE } );
-		const materialNodes = createMaterialNodes( buffers, sort, localCameraPosition );
+		const materialNodes = createMaterialNodes( buffers, sort, localCamera );
 		const material = createMaterial( materialNodes.vertexNode, materialNodes.fragmentNode );
 
 		super( geometry, material );
@@ -173,7 +178,7 @@ class GaussianSplat extends Mesh {
 		this._sortDepthRange = uniform( new Vector2( 0, 1 ) );
 		this._sortInitialized = false;
 		this._lastSortDirection = new Vector3();
-		this._localCameraPosition = localCameraPosition;
+		this._localCamera = localCamera;
 		this._sphericalHarmonicsComputeNode = sphericalHarmonicsComputeNode;
 		this._sphericalHarmonicsInitialized = false;
 		this._lastSphericalHarmonicsCameraMatrix = new Matrix4();
@@ -241,6 +246,7 @@ class GaussianSplat extends Mesh {
 		if ( this._sphericalHarmonicsInitialized === true &&
 			camera.matrixWorld.equals( this._lastSphericalHarmonicsCameraMatrix ) &&
 			this.matrixWorld.equals( this._lastSphericalHarmonicsWorldMatrix ) &&
+			this._localCamera.orthographic.value === ( camera.isOrthographicCamera === true ) &&
 			( isWebGLBackend === true || this._buffers.sphericalHarmonicsContributionRead !== undefined ) ) {
 
 			return false;
@@ -254,7 +260,9 @@ class GaussianSplat extends Mesh {
 		}
 
 		_worldMatrixInverse.copy( this.matrixWorld ).invert();
-		this._localCameraPosition.value.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _worldMatrixInverse );
+		this._localCamera.position.value.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _worldMatrixInverse );
+		camera.getWorldDirection( this._localCamera.direction.value ).transformDirection( _worldMatrixInverse );
+		this._localCamera.orthographic.value = camera.isOrthographicCamera === true;
 
 		this._lastSphericalHarmonicsCameraMatrix.copy( camera.matrixWorld );
 		this._lastSphericalHarmonicsWorldMatrix.copy( this.matrixWorld );
@@ -812,9 +820,13 @@ function applySphericalHarmonicsBand( buffer, splatIndex, packed, componentCount
 
 }
 
-function applySphericalHarmonics( rgb, center, localCameraPosition, splatIndex, buffers ) {
+function applySphericalHarmonics( rgb, center, localCamera, splatIndex, buffers ) {
 
-	const viewDirection = normalize( center.sub( localCameraPosition ) ).toVar( 'sphericalHarmonicsViewDirection' );
+	const viewDirection = select(
+		localCamera.orthographic,
+		localCamera.direction,
+		normalize( center.sub( localCamera.position ) )
+	).toVar( 'sphericalHarmonicsViewDirection' );
 	const x = viewDirection.x;
 	const y = viewDirection.y;
 	const z = viewDirection.z;
@@ -880,7 +892,7 @@ function applySphericalHarmonics( rgb, center, localCameraPosition, splatIndex, 
 
 }
 
-function createSphericalHarmonicsComputeNode( buffers, localCameraPosition ) {
+function createSphericalHarmonicsComputeNode( buffers, localCamera ) {
 
 	if ( buffers.sphericalHarmonicsDegree === 0 ) return null;
 
@@ -890,14 +902,14 @@ function createSphericalHarmonicsComputeNode( buffers, localCameraPosition ) {
 		const center = buffers.centerRead.element( splatIndex ).xyz.toVar( 'center' );
 		const rgb = vec3( 0 ).toVar( 'sphericalHarmonicsContribution' );
 
-		applySphericalHarmonics( rgb, center, localCameraPosition, splatIndex, buffers );
+		applySphericalHarmonics( rgb, center, localCamera, splatIndex, buffers );
 		buffers.sphericalHarmonicsContributionWrite.element( splatIndex ).assign( vec4( rgb, 0 ) );
 
 	} )().compute( buffers.count, [ WORKGROUP_SIZE ] ).setName( 'GaussianSplatSphericalHarmonics' );
 
 }
 
-function createMaterialNodes( buffers, sort, localCameraPosition ) {
+function createMaterialNodes( buffers, sort, localCamera ) {
 
 	const splatUv = varyingProperty( 'vec2', 'vSplatUv' );
 	const splatColor = varyingProperty( 'vec4', 'vSplatColor' );
@@ -920,7 +932,7 @@ function createMaterialNodes( buffers, sort, localCameraPosition ) {
 
 			} else {
 
-				applySphericalHarmonics( rgb, center, localCameraPosition, splatIndex, buffers );
+				applySphericalHarmonics( rgb, center, localCamera, splatIndex, buffers );
 
 			}
 
@@ -957,10 +969,11 @@ function createMaterialNodes( buffers, sort, localCameraPosition ) {
 		const invZ2 = invZ.mul( invZ ).toVar( 'invZ2' );
 		const focal = cameraViewport.zw.mul( 0.5 ).mul( vec2( cameraProjectionMatrix[ 0 ].x, cameraProjectionMatrix[ 1 ].y ) ).toVar( 'focal' );
 
-		const j00 = focal.x.negate().mul( invZ ).toVar( 'j00' );
-		const j11 = focal.y.negate().mul( invZ ).toVar( 'j11' );
-		const j02 = focal.x.mul( viewCenter.x ).mul( invZ2 ).toVar( 'j02' );
-		const j12 = focal.y.mul( viewCenter.y ).mul( invZ2 ).toVar( 'j12' );
+		const orthographic = cameraProjectionMatrix[ 2 ].w.equal( 0 ).toVar( 'orthographic' );
+		const j00 = select( orthographic, focal.x, focal.x.negate().mul( invZ ) ).toVar( 'j00' );
+		const j11 = select( orthographic, focal.y, focal.y.negate().mul( invZ ) ).toVar( 'j11' );
+		const j02 = select( orthographic, float( 0 ), focal.x.mul( viewCenter.x ).mul( invZ2 ) ).toVar( 'j02' );
+		const j12 = select( orthographic, float( 0 ), focal.y.mul( viewCenter.y ).mul( invZ2 ) ).toVar( 'j12' );
 
 		const aBase = j00.mul( j00 ).mul( c00 )
 			.add( j00.mul( j02 ).mul( c02 ).mul( 2 ) )
@@ -984,7 +997,7 @@ function createMaterialNodes( buffers, sort, localCameraPosition ) {
 		splatColor.assign( vec4( rgb.max( 0 ), color.a.mul( alphaScale ) ) );
 
 		const halfTrace = a.add( c ).mul( 0.5 ).toVar( 'halfTrace' );
-		const radius = sqrt( max( a.sub( c ).mul( 0.5 ).pow2().add( b.mul( b ) ), EPSILON ) ).toVar( 'radius' );
+		const radius = sqrt( max( a.sub( c ).mul( 0.5 ).pow2().add( b.mul( b ) ), 0 ) ).toVar( 'radius' );
 		const lambda1 = max( halfTrace.add( radius ), EPSILON ).toVar( 'lambda1' );
 		const lambda2 = max( halfTrace.sub( radius ), EPSILON ).toVar( 'lambda2' );
 		const axis1 = vec2( 1, 0 ).toVar( 'axis1' );
