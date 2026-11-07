@@ -88,32 +88,10 @@ class LDrawConditionalLineMaterial extends NodeMaterial {
 		this.colorNode = colorNode;
 
 		this._diffuseUniform = uniform( new Color() );
-		this._opacityUniform = uniform( 1 );
 
 		//
 
 		Object.defineProperties( this, {
-
-			/**
-			 * The material's opacity.
-			 *
-			 * @name LDrawConditionalLineMaterial#opacity
-			 * @type {number}
-			 * @default 1
-			 */
-			opacity: {
-				get: function () {
-
-					return this._opacityUniform.value;
-
-				},
-
-				set: function ( value ) {
-
-					this._opacityUniform.value = value;
-
-				}
-			},
 
 			/**
 			 * The material's color.
