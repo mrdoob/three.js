@@ -912,6 +912,8 @@ class ObjectLoader extends Loader {
 				if ( data.filmOffset !== undefined ) object.filmOffset = data.filmOffset;
 				if ( data.view !== undefined ) object.view = Object.assign( {}, data.view );
 
+				object.updateProjectionMatrix();
+
 				break;
 
 			case 'OrthographicCamera':
@@ -920,6 +922,8 @@ class ObjectLoader extends Loader {
 
 				if ( data.zoom !== undefined ) object.zoom = data.zoom;
 				if ( data.view !== undefined ) object.view = Object.assign( {}, data.view );
+
+				object.updateProjectionMatrix();
 
 				break;
 
