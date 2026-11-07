@@ -480,6 +480,7 @@
 		"webgpu_postprocessing",
 		"webgpu_postprocessing_direct",
 		"webgpu_procedural_texture",
+		"webgpu_radiance_cascades",
 		"webgpu_reflection",
 		"webgpu_reflection_blurred",
 		"webgpu_reflection_roughness",
