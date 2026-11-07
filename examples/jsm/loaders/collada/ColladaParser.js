@@ -1322,6 +1322,7 @@ class ColladaParser {
 		};
 
 		const polygons = [];
+		let texcoordCount = 0;
 
 		for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
@@ -1336,10 +1337,22 @@ class ColladaParser {
 					const semantic = child.getAttribute( 'semantic' );
 					const offset = parseInt( child.getAttribute( 'offset' ) );
 					const set = parseInt( child.getAttribute( 'set' ) );
-					const inputname = ( set > 0 ? semantic + set : semantic );
+					let inputname = ( set > 0 ? semantic + set : semantic );
+
+					if ( semantic === 'TEXCOORD' ) {
+
+						// texture coordinate sets do not have to start at 0 (3ds Max starts at 1),
+						// so name them in order of appearance: the first set becomes "uv", the second "uv1"
+
+						inputname = ( texcoordCount > 0 ? semantic + texcoordCount : semantic );
+						texcoordCount ++;
+
+						primitive.hasUV = true;
+
+					}
+
 					primitive.inputs[ inputname ] = { id: id, offset: offset };
 					primitive.stride = Math.max( primitive.stride, offset + 1 );
-					if ( semantic === 'TEXCOORD' ) primitive.hasUV = true;
 					break;
 
 				case 'vcount':
