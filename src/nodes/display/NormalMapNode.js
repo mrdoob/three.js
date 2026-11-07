@@ -105,7 +105,7 @@ class NormalMapNode extends Node {
 
 			let scale = scaleNode;
 
-			if ( builder.isFlatShading() === true ) {
+			if ( normalMapType === TangentSpaceNormalMap && builder.isFlatShading() === true ) {
 
 				scale = negateOnBackSide( scale );
 
@@ -119,7 +119,7 @@ class NormalMapNode extends Node {
 
 		if ( normalMapType === ObjectSpaceNormalMap ) {
 
-			output = transformNormalToView( normalMap );
+			output = transformNormalToView( negateOnBackSide( normalMap ) );
 
 		} else if ( normalMapType === TangentSpaceNormalMap ) {
 
