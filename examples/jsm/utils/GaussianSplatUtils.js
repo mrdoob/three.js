@@ -94,23 +94,32 @@ function createPackedSphericalHarmonicsBand( count, degree ) {
 
 }
 
+function getSphericalHarmonicsItemSize( values, degree ) {
+
+	if ( values instanceof Uint32Array ) return SH_BAND_WORDS[ degree ];
+	if ( values instanceof Float32Array ) return SH_BAND_COMPONENTS[ degree ];
+
+	return 0;
+
+}
+
 function createSphericalHarmonicsAttribute( values, count, degree ) {
 
-	const words = SH_BAND_WORDS[ degree ];
+	const itemSize = getSphericalHarmonicsItemSize( values, degree );
 
-	if ( values instanceof Uint32Array === false ) {
+	if ( itemSize === 0 ) {
 
-		throw new Error( `THREE.createGaussianSplatGeometry: sphericalHarmonics${ degree } must use packed uint32 words.` );
-
-	}
-
-	if ( values.length !== count * words ) {
-
-		throw new Error( `THREE.createGaussianSplatGeometry: Invalid sphericalHarmonics${ degree } packed length.` );
+		throw new Error( `THREE.createGaussianSplatGeometry: sphericalHarmonics${ degree } must use packed uint32 words or float32 coefficients.` );
 
 	}
 
-	return new BufferAttribute( values, words );
+	if ( values.length !== count * itemSize ) {
+
+		throw new Error( `THREE.createGaussianSplatGeometry: Invalid sphericalHarmonics${ degree } length.` );
+
+	}
+
+	return new BufferAttribute( values, itemSize );
 
 }
 
@@ -126,15 +135,17 @@ function getSphericalHarmonicsDegree( geometry ) {
 
 		if ( attribute === undefined ) break;
 
-		if ( attribute.itemSize !== SH_BAND_WORDS[ i ] ) {
+		const itemSize = getSphericalHarmonicsItemSize( attribute.array, i );
 
-			throw new Error( `THREE.getSphericalHarmonicsDegree: Invalid sphericalHarmonics${ i } itemSize.` );
+		if ( itemSize === 0 ) {
+
+			throw new Error( `THREE.getSphericalHarmonicsDegree: sphericalHarmonics${ i } must use packed uint32 words or float32 coefficients.` );
 
 		}
 
-		if ( attribute.array instanceof Uint32Array === false ) {
+		if ( attribute.itemSize !== itemSize ) {
 
-			throw new Error( `THREE.getSphericalHarmonicsDegree: sphericalHarmonics${ i } must use packed uint32 words.` );
+			throw new Error( `THREE.getSphericalHarmonicsDegree: Invalid sphericalHarmonics${ i } itemSize.` );
 
 		}
 
@@ -173,15 +184,16 @@ function getSphericalHarmonicsDegree( geometry ) {
 }
 
 /**
- * Creates Gaussian splat geometry from packed attribute arrays. Higher-order
- * spherical harmonics must be supplied as packed `Uint32Array` words
+ * Creates Gaussian splat geometry from attribute arrays. Each higher-order
+ * spherical harmonics band is either packed `Uint32Array` words
  * (`SH_BAND_WORDS[ degree ]` words per splat, four clamped-byte coefficients
- * per word using `( value - 128 ) / 128`).
+ * per word using `( value - 128 ) / 128`) or a full-precision `Float32Array`
+ * (`SH_BAND_COMPONENTS[ degree ]` coefficients per splat).
  *
  * @param {Float32Array} centers - Splat centers.
  * @param {Float32Array} covariances - Splat covariance matrices.
- * @param {Uint8Array|Uint8ClampedArray} colors - RGBA colors.
- * @param {Object} [sphericalHarmonics={}] - Optional packed SH band arrays.
+ * @param {Uint8Array|Uint8ClampedArray|Float32Array} colors - RGBA colors.
+ * @param {Object} [sphericalHarmonics={}] - Optional SH band arrays.
  * @return {BufferGeometry} The Gaussian splat geometry.
  */
 function createGaussianSplatGeometry( centers, covariances, colors, sphericalHarmonics = {} ) {
@@ -189,7 +201,7 @@ function createGaussianSplatGeometry( centers, covariances, colors, sphericalHar
 	const geometry = new BufferGeometry();
 	geometry.setAttribute( 'position', new BufferAttribute( centers, 3 ) );
 	geometry.setAttribute( 'covariance', new BufferAttribute( covariances, 6 ) );
-	geometry.setAttribute( 'color', new BufferAttribute( colors, 4, true ) );
+	geometry.setAttribute( 'color', new BufferAttribute( colors, 4, colors instanceof Float32Array === false ) );
 
 	const count = centers.length / 3;
 

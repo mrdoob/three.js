@@ -79,6 +79,21 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
+			QUnit.test( 'creates Gaussian splat geometry with high dynamic range colors', ( assert ) => {
+
+				const data = createGaussianSplatGeometry(
+					new Float32Array( [ 1, 2, 3 ] ),
+					new Float32Array( [ 4, 0, 0, 9, 0, 16 ] ),
+					new Float32Array( [ 4, 0.5, 0, 0.75 ] )
+				);
+				const color = data.getAttribute( 'color' );
+
+				assert.strictEqual( color.normalized, false, 'float colors are not normalized' );
+				assert.strictEqual( color.getX( 0 ), 4, 'keeps radiance above 1' );
+				assert.strictEqual( color.getW( 0 ), 0.75, 'opacity' );
+
+			} );
+
 			QUnit.test( 'creates Gaussian splat geometry with spherical harmonics attributes', ( assert ) => {
 
 				const coefficients = new Uint8ClampedArray( [ 129, 130, 131, 132, 133, 134, 135, 136, 137 ] );
@@ -105,7 +120,24 @@ export default QUnit.module( 'Addons', () => {
 
 			} );
 
-			QUnit.test( 'requires packed uint32 spherical harmonics on geometry', ( assert ) => {
+			QUnit.test( 'creates Gaussian splat geometry with full-precision spherical harmonics', ( assert ) => {
+
+				const coefficients = new Float32Array( [ 0.85, - 1.5, 2, 0, 0.001, - 0.25, 1, 1, 1 ] );
+				const data = createGaussianSplatGeometry(
+					new Float32Array( [ 1, 2, 3 ] ),
+					new Float32Array( [ 4, 0, 0, 9, 0, 16 ] ),
+					new Uint8Array( [ 128, 128, 128, 128 ] ),
+					{ sh1: coefficients }
+				);
+				const attribute = data.getAttribute( 'sphericalHarmonics1' );
+
+				assert.strictEqual( getSphericalHarmonicsDegree( data ), 1, 'degree' );
+				assert.strictEqual( attribute.itemSize, SH_BAND_COMPONENTS[ 1 ], 'one float per coefficient' );
+				assert.strictEqual( attribute.array, coefficients, 'keeps the coefficients unquantized' );
+
+			} );
+
+			QUnit.test( 'requires packed uint32 or float32 spherical harmonics on geometry', ( assert ) => {
 
 				assert.throws( () => {
 
@@ -113,10 +145,10 @@ export default QUnit.module( 'Addons', () => {
 						new Float32Array( [ 1, 2, 3 ] ),
 						new Float32Array( [ 4, 0, 0, 9, 0, 16 ] ),
 						new Uint8Array( [ 128, 128, 128, 128 ] ),
-						{ sh1: new Float32Array( 9 ) }
+						{ sh1: new Float32Array( 3 ) }
 					);
 
-				}, /must use packed uint32 words/, 'rejects floating-point SH attributes' );
+				}, /Invalid sphericalHarmonics1 length/, 'rejects float SH attributes of the wrong length' );
 
 				assert.throws( () => {
 
@@ -127,7 +159,7 @@ export default QUnit.module( 'Addons', () => {
 						{ sh1: new Uint8ClampedArray( 9 ) }
 					);
 
-				}, /must use packed uint32 words/, 'rejects unpacked byte SH attributes' );
+				}, /must use packed uint32 words or float32 coefficients/, 'rejects unpacked byte SH attributes' );
 
 			} );
 
