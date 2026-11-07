@@ -233,6 +233,37 @@ class GaussianSplat extends Mesh {
 	}
 
 	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 */
+	dispose() {
+
+		super.dispose();
+
+		if ( this._sphericalHarmonicsComputeNode !== null ) this._sphericalHarmonicsComputeNode.dispose();
+
+		this._sort.dispose();
+
+		const attributes = new Set();
+
+		for ( const value of Object.values( this._buffers ) ) {
+
+			if ( value && value.isStorageBufferNode === true ) attributes.add( value.value );
+
+		}
+
+		for ( const attribute of attributes ) {
+
+			disposeStorageAttribute( attribute );
+
+		}
+
+		this.geometry.dispose();
+		this.material.dispose();
+
+	}
+
+	/**
 	 * Updates the view-dependent spherical harmonics colors if the camera or
 	 * mesh transform has changed.
 	 *
@@ -618,6 +649,14 @@ function computeRayIntersection( positionAttribute, covarianceAttribute, colorAt
 		object: object
 
 	} );
+
+}
+
+function disposeStorageAttribute( attribute ) {
+
+	if ( attribute.pbo !== undefined ) attribute.pbo.dispose();
+
+	attribute.dispose();
 
 }
 

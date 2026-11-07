@@ -144,6 +144,8 @@ class CountingSort {
 	 */
 	setBinNode( binNode ) {
 
+		disposeComputeNodes( this );
+
 		const { binCount, workgroupSize, count } = this;
 
 		this._resetNode = Fn( () => {
@@ -265,6 +267,47 @@ class CountingSort {
 		this._webGLBuffersEnabled = true;
 
 	}
+
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 */
+	dispose() {
+
+		disposeComputeNodes( this );
+
+		for ( const attribute of [ this.orderAttribute, this.binRead.value, this.histogramAtomic.value, this.offsetAtomic.value ] ) {
+
+			disposeStorageAttribute( attribute );
+
+		}
+
+	}
+
+}
+
+function disposeComputeNodes( sort ) {
+
+	for ( const key of [ '_resetNode', '_histogramNode', '_prefixNode', '_scatterNode' ] ) {
+
+		const node = sort[ key ];
+
+		if ( node !== null ) {
+
+			node.dispose();
+			sort[ key ] = null;
+
+		}
+
+	}
+
+}
+
+function disposeStorageAttribute( attribute ) {
+
+	if ( attribute.pbo !== undefined ) attribute.pbo.dispose();
+
+	attribute.dispose();
 
 }
 
