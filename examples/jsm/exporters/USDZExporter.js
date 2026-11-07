@@ -1165,17 +1165,18 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 
 		const emissiveIntensity = material.emissiveIntensity ?? 1;
 
+		const emissiveColor = new Color(
+			material.emissive.r * emissiveIntensity,
+			material.emissive.g * emissiveIntensity,
+			material.emissive.b * emissiveIntensity
+		);
+
 		if ( material.emissiveMap ) {
 
 			previewSurfaceNode.addProperty(
 				`color3f inputs:emissiveColor.connect = </Materials/Material_${material.id}/Texture_${material.emissiveMap.id}_emissive.outputs:rgb>`
 			);
 
-			const emissiveColor = new Color(
-				material.emissive.r * emissiveIntensity,
-				material.emissive.g * emissiveIntensity,
-				material.emissive.b * emissiveIntensity
-			);
 			const textureNodes = buildTextureNodes(
 				material.emissiveMap,
 				'emissive',
@@ -1186,7 +1187,7 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 		} else if ( material.emissive.getHex() > 0 ) {
 
 			previewSurfaceNode.addProperty(
-				`color3f inputs:emissiveColor = ${buildColor( material.emissive )}`
+				`color3f inputs:emissiveColor = ${buildColor( emissiveColor )}`
 			);
 
 		}
