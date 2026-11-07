@@ -35,7 +35,7 @@ class LightProbeHelper extends Mesh {
 
 		const RECIPROCAL_PI = float( 1 / Math.PI );
 
-		const fragmentNode = Fn( () => {
+		const colorNode = Fn( () => {
 
 			const irradiance = getShIrradianceAt( normalWorld, sh );
 
@@ -46,7 +46,7 @@ class LightProbeHelper extends Mesh {
 		} )();
 
 		const material = new NodeMaterial();
-		material.fragmentNode = fragmentNode;
+		material.colorNode = colorNode;
 
 		const geometry = new SphereGeometry( 1, 32, 16 );
 

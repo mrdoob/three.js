@@ -61,7 +61,7 @@ class LightProbeGridHelper extends InstancedMesh {
 		const paddedSlices = nz.add( 2.0 );
 		const atlasDepth = paddedSlices.mul( 7.0 );
 
-		material.fragmentNode = Fn( () => {
+		material.colorNode = Fn( () => {
 
 			const uvw = attribute( 'instanceUVW', 'vec3' );
 			const uvZBase = uvw.z.mul( nz ).add( 1.0 );
