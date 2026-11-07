@@ -1,4 +1,4 @@
-import { LinearTransfer, Matrix3, SRGBTransfer, SRGBColorSpace, ColorManagement } from 'three';
+import { LinearTransfer, Matrix3, SRGBTransfer } from 'three';
 
 /** @module ColorSpaces */
 
@@ -54,8 +54,7 @@ export const DisplayP3ColorSpaceImpl = {
 	transfer: SRGBTransfer,
 	toXYZ: LINEAR_DISPLAY_P3_TO_XYZ,
 	fromXYZ: XYZ_TO_LINEAR_DISPLAY_P3,
-	luminanceCoefficients: P3_LUMINANCE_COEFFICIENTS,
-	outputColorSpaceConfig: { drawingBufferColorSpace: DisplayP3ColorSpace }
+	luminanceCoefficients: P3_LUMINANCE_COEFFICIENTS
 };
 
 /**
@@ -71,8 +70,7 @@ export const LinearDisplayP3ColorSpaceImpl = {
 	toXYZ: LINEAR_DISPLAY_P3_TO_XYZ,
 	fromXYZ: XYZ_TO_LINEAR_DISPLAY_P3,
 	luminanceCoefficients: P3_LUMINANCE_COEFFICIENTS,
-	workingColorSpaceConfig: { unpackColorSpace: DisplayP3ColorSpace },
-	outputColorSpaceConfig: { drawingBufferColorSpace: DisplayP3ColorSpace }
+	workingColorSpaceConfig: { unpackColorSpace: DisplayP3ColorSpace }
 };
 
 /******************************************************************************
@@ -115,25 +113,6 @@ export const LinearRec2020ColorSpaceImpl = {
 };
 
 /**
- * Extended-sRGB color space.
- *
- * @type {string}
- * @constant
- */
-export const ExtendedSRGBColorSpace = 'extended-srgb';
-
-/**
- * Implementation object for the Extended-sRGB color space.
- *
- * @type {module:ColorSpaces~ColorSpaceImpl}
- * @constant
- */
-export const ExtendedSRGBColorSpaceImpl = {
-	...ColorManagement.spaces[ SRGBColorSpace ],
-	outputColorSpaceConfig: { drawingBufferColorSpace: SRGBColorSpace, toneMappingMode: 'extended' }
-};
-
-/**
  * An object holding the color space implementation.
  *
  * @typedef {Object} module:ColorSpaces~ColorSpaceImpl
@@ -143,5 +122,4 @@ export const ExtendedSRGBColorSpaceImpl = {
  * @property {Matrix3} fromXYZ - A color space conversion matrix, converting from CIE XYZ.
  * @property {Array<number>} luminanceCoefficients - The luminance coefficients.
  * @property {{unpackColorSpace:string}} [workingColorSpaceConfig] - The working color space config.
- * @property {{drawingBufferColorSpace:string}} [outputColorSpaceConfig] - The drawing buffer color space config.
  **/
