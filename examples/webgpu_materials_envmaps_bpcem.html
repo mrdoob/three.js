@@ -115,7 +115,7 @@
 				wallMat = new THREE.MeshStandardNodeMaterial();
 
 				wallMat.colorNode = texture( diffuseTex );
-				wallMat.normalNode = bumpMap( texture( bumpTex ), float( 5 ) );
+				wallMat.normalNode = bumpMap( texture( bumpTex ), float( 2 ) );
 
 				const planeGeo = new THREE.PlaneGeometry( 100, 100 );
 

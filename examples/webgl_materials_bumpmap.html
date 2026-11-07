@@ -91,7 +91,7 @@
 					specular: 0x666666,
 					shininess: 25,
 					bumpMap: mapHeight,
-					bumpScale: 10
+					bumpScale: 0.03
 				} );
 
 				loader = new GLTFLoader();
@@ -123,7 +123,7 @@
 					mesh.material.needsUpdate = true;
 
 				} );
-				gui.add( material, 'bumpScale', 0, 40 ).name( 'bump scale' );
+				gui.add( material, 'bumpScale', 0, 0.1 ).name( 'bump scale' );
 				gui.open();
 
 				// CONTROLS
