@@ -142,6 +142,26 @@ export const ggxConvolution = /*@__PURE__*/ Fn( ( { roughness, lodBias, envMap, 
 
 } );
 
+// Weighted radiance of one texel pair of the ggxIntegration() source mip, as vec4( color * weight, weight ).
+export const ggxIntegrationTexel = /*@__PURE__*/ Fn( ( { N, alpha2, face, x, y, texelSize, sourceLod, envMap } ) => {
+
+	const uv = vec2( x, y ).add( 0.5 ).mul( texelSize ).sub( 1.0 ).toConst();
+	const texelDirection = select( face.equal( 0 ), vec3( 1.0, uv ), select( face.equal( 1 ), vec3( uv.x, 1.0, uv.y ), vec3( uv, 1.0 ) ) ).toVar();
+
+	const invDistance = inverseSqrt( dot( uv, uv ).add( 1.0 ) ).toConst();
+	const NdotL = dot( N, texelDirection ).toVar();
+	texelDirection.mulAssign( select( NdotL.lessThan( 0.0 ), - 1.0, 1.0 ) );
+	NdotL.assign( abs( NdotL ).mul( invDistance ) );
+
+	// With V = N, NdotH squared is ( 1 + NdotL ) / 2. Common factors
+	// in the GGX distribution and texel solid angle cancel when normalized.
+	const d = alpha2.add( 1.0 ).add( alpha2.sub( 1.0 ).mul( NdotL ) );
+	const weight = NdotL.mul( invDistance ).mul( invDistance ).mul( invDistance ).div( d.mul( d ) ).toConst();
+
+	return vec4( envMap.sample( texelDirection ).level( sourceLod ).rgb.mul( weight ), weight );
+
+} );
+
 // GGX convolution that weights every texel of a small source mip. Noise free and,
 // for the wide lobes of the rough mip levels, cheaper than importance sampling.
 export const ggxIntegration = /*@__PURE__*/ Fn( ( { roughness, sourceLod, sourceSize, envMap, direction } ) => {
@@ -153,8 +173,7 @@ export const ggxIntegration = /*@__PURE__*/ Fn( ( { roughness, sourceLod, source
 
 	const texelSize = float( 2.0 ).div( float( sourceSize ) ).toConst();
 
-	const prefilteredColor = vec3( 0.0 ).toVar();
-	const totalWeight = float( 0.0 ).toVar();
+	const prefilteredColor = vec4( 0.0 ).toVar();
 
 	// Pair opposite texels: only the one in N's hemisphere contributes.
 	Loop( { start: int( 0 ), end: int( 3 ), name: 'face' }, ( { face } ) => {
@@ -163,21 +182,7 @@ export const ggxIntegration = /*@__PURE__*/ Fn( ( { roughness, sourceLod, source
 
 			Loop( { start: int( 0 ), end: sourceSize, name: 'x' }, ( { x } ) => {
 
-				const uv = vec2( x, y ).add( 0.5 ).mul( texelSize ).sub( 1.0 ).toConst();
-				const texelDirection = select( face.equal( 0 ), vec3( 1.0, uv ), select( face.equal( 1 ), vec3( uv.x, 1.0, uv.y ), vec3( uv, 1.0 ) ) ).toVar();
-
-				const invDistance = inverseSqrt( dot( uv, uv ).add( 1.0 ) ).toConst();
-				const NdotL = dot( N, texelDirection ).toVar();
-				texelDirection.mulAssign( select( NdotL.lessThan( 0.0 ), - 1.0, 1.0 ) );
-				NdotL.assign( abs( NdotL ).mul( invDistance ) );
-
-				// With V = N, NdotH squared is ( 1 + NdotL ) / 2. Common factors
-				// in the GGX distribution and texel solid angle cancel when normalized.
-				const d = alpha2.add( 1.0 ).add( alpha2.sub( 1.0 ).mul( NdotL ) );
-				const weight = NdotL.mul( invDistance ).mul( invDistance ).mul( invDistance ).div( d.mul( d ) ).toConst();
-
-				prefilteredColor.addAssign( envMap.sample( texelDirection ).level( sourceLod ).rgb.mul( weight ) );
-				totalWeight.addAssign( weight );
+				prefilteredColor.addAssign( ggxIntegrationTexel( { N, alpha2, face, x, y, texelSize, sourceLod, envMap } ) );
 
 			} );
 
@@ -185,6 +190,6 @@ export const ggxIntegration = /*@__PURE__*/ Fn( ( { roughness, sourceLod, source
 
 	} );
 
-	return vec4( prefilteredColor.div( totalWeight ), 1.0 );
+	return vec4( prefilteredColor.rgb.div( prefilteredColor.a ), 1.0 );
 
 } );

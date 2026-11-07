@@ -627,17 +627,18 @@ class WGSLNodeBuilder extends NodeBuilder {
 	/**
 	 * Generates the WGSL snippet that resolves the dimensions of the given texture.
 	 *
-	 * @param {Texture} texture - The texture.
+	 * @param {TextureNode} textureNode - The texture node.
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} levelSnippet - A WGSL snippet that represents the mip level.
 	 * @return {string} The WGSL snippet.
 	 */
-	generateTextureSize( texture, textureProperty, levelSnippet ) {
+	generateTextureSize( textureNode, textureProperty, levelSnippet ) {
 
+		const texture = textureNode.value;
 		const { primarySamples } = this.renderer.backend.utils.getTextureSampleData( texture );
 		const isMultisampled = primarySamples > 1;
 
-		const params = ( isMultisampled || texture.isStorageTexture ) ? textureProperty : `${ textureProperty }, ${ levelSnippet }`;
+		const params = ( isMultisampled || textureNode.isStorageTextureNode ) ? textureProperty : `${ textureProperty }, ${ levelSnippet }`;
 
 		return `textureDimensions( ${ params } )`;
 
@@ -1428,8 +1429,8 @@ class WGSLNodeBuilder extends NodeBuilder {
 				texture.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 				// Cube textures always need samplers (they use textureSampleLevel, not textureLoad)
-				// Also textureGather always need sampler.
-				const needsSampler = node.value.isCubeTexture === true || ( this.isUnfilterable( node.value ) === false && texture.store === false ) || node.gatherNode !== null;
+				// unless they are written as storage textures. Also textureGather always need sampler.
+				const needsSampler = ( texture.store === false && ( node.value.isCubeTexture === true || this.isUnfilterable( node.value ) === false ) ) || node.gatherNode !== null;
 
 				if ( needsSampler ) {
 
@@ -2231,8 +2232,8 @@ ${ flowData.code }
 				const texture = textureNode.value;
 
 				// Cube textures always need samplers (they use textureSampleLevel, not textureLoad)
-				// Also textureGather always need sampler.
-				const needsSampler = texture.isCubeTexture === true || ( this.isUnfilterable( texture ) === false && textureNode.isStorageTextureNode !== true ) || textureNode.gatherNode !== null;
+				// unless they are written as storage textures. Also textureGather always need sampler.
+				const needsSampler = ( textureNode.isStorageTextureNode !== true && ( texture.isCubeTexture === true || this.isUnfilterable( texture ) === false ) ) || textureNode.gatherNode !== null;
 
 				if ( needsSampler ) {
 
@@ -2264,7 +2265,7 @@ ${ flowData.code }
 
 					textureType = 'texture_depth_cube';
 
-				} else if ( texture.isCubeTexture === true ) {
+				} else if ( texture.isCubeTexture === true && textureNode.isStorageTextureNode !== true ) {
 
 					textureType = 'texture_cube<f32>';
 
@@ -2285,8 +2286,9 @@ ${ flowData.code }
 					const format = getFormat( texture, backend.device );
 					const access = this.getStorageAccess( uniform.node, shaderStage );
 
+					// Storage bindings can't be cube views, so the faces of a cube texture are written as a 2D array.
 					const is3D = uniform.node.value.is3DTexture;
-					const isArrayTexture = uniform.node.value.isArrayTexture;
+					const isArrayTexture = uniform.node.value.isArrayTexture || uniform.node.value.isCubeTexture;
 
 					const dimension = is3D ? '3d' : `2d${ isArrayTexture ? '_array' : '' }`;
 

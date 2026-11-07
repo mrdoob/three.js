@@ -698,12 +698,12 @@ ${ flowData.code }
 	/**
 	 * Generates the GLSL snippet that resolves the dimensions of the given texture.
 	 *
-	 * @param {Texture} texture - The texture.
+	 * @param {TextureNode} textureNode - The texture node.
 	 * @param {string} textureProperty - The name of the texture uniform in the shader.
 	 * @param {string} levelSnippet - A GLSL snippet that represents the mip level.
 	 * @return {string} The GLSL snippet.
 	 */
-	generateTextureSize( texture, textureProperty, levelSnippet ) {
+	generateTextureSize( textureNode, textureProperty, levelSnippet ) {
 
 		return `textureSize( ${ textureProperty }, ${ levelSnippet } )`;
 
