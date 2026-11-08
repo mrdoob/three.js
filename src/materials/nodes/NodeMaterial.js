@@ -571,24 +571,24 @@ class NodeMaterial extends Material {
 
 			if ( renderTarget !== null ) {
 
-				const mrt = renderer.getMRT();
+				let mrt = renderer.getMRT();
 				const materialMRT = this.mrtNode;
 
 				if ( mrt !== null ) {
 
 					if ( isCustomOutput ) output.assign( resultNode );
 
+					if ( materialMRT !== null ) mrt = mrt.merge( materialMRT );
+
+				} else if ( materialMRT !== null ) {
+
+					mrt = materialMRT;
+
+				}
+
+				if ( mrt !== null && mrt.isCompatible( renderTarget ) ) {
+
 					resultNode = mrt;
-
-					if ( materialMRT !== null ) {
-
-						resultNode = mrt.merge( materialMRT );
-
-					}
-
-				} else if ( materialMRT !== null && materialMRT.isCompatible( renderTarget ) ) {
-
-					resultNode = materialMRT;
 
 				}
 
