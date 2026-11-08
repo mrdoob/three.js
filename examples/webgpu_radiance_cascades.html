@@ -91,7 +91,7 @@
 				const adapter = await navigator.gpu?.requestAdapter();
 				const requiredLimits = adapter ? { maxStorageBuffersPerShaderStage: adapter.limits.maxStorageBuffersPerShaderStage, maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize, maxBufferSize: adapter.limits.maxBufferSize } : {};
 
-				renderer = new THREE.WebGPURenderer( { requiredLimits, trackTimestamp: true } );
+				renderer = new THREE.WebGPURenderer( { requiredLimits, trackTimestamp: true, powerPreference: 'high-performance' } );
 				renderer.setPixelRatio( Math.min( window.devicePixelRatio, 1 ) );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
