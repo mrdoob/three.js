@@ -72,46 +72,26 @@ class LDrawConditionalLineMaterial extends NodeMaterial {
 
 		} )();
 
-		const fragmentNode = /*@__PURE__*/ Fn( () => {
+		const colorNode = /*@__PURE__*/ Fn( () => {
 
 			const discardFlag = varyingProperty( 'float', 'discardFlag' );
 
 			discardFlag.greaterThan( float( 0.5 ) ).discard();
 
-			return vec4( this._diffuseUniform, this._opacityUniform );
+			// `opacity` is applied by the material
+
+			return this._diffuseUniform;
 
 		} )();
 
 		this.vertexNode = vertexNode;
-		this.fragmentNode = fragmentNode;
+		this.colorNode = colorNode;
 
 		this._diffuseUniform = uniform( new Color() );
-		this._opacityUniform = uniform( 1 );
 
 		//
 
 		Object.defineProperties( this, {
-
-			/**
-			 * The material's opacity.
-			 *
-			 * @name LDrawConditionalLineMaterial#opacity
-			 * @type {number}
-			 * @default 1
-			 */
-			opacity: {
-				get: function () {
-
-					return this._opacityUniform.value;
-
-				},
-
-				set: function ( value ) {
-
-					this._opacityUniform.value = value;
-
-				}
-			},
 
 			/**
 			 * The material's color.
