@@ -225,7 +225,7 @@ class RealtimeRadianceCascades {
 		 * browser may run the animation loop faster than the GPU, showing only some of its frames. The quality starts
 		 * at 0 at `halfResolution` and rises while the frames keep up with the target, in steps that double, but only
 		 * slowly back to the quality at which they last took longer, and falls while they take longer, by more the
-		 * longer they take. If lowering it by 0.2 did not shorten them, it compares them back at the quality above: if
+		 * longer they take. If lowering it by 0.4 did not shorten them, it compares them back at the quality above: if
 		 * they are not longer there, something else limits them, e.g. the display or the CPU, and it stays there for a
 		 * while. At quality 1, it tries the full resolution, and goes back to half if the frames do not keep up, for 10
 		 * seconds, twice as long each time; at the full resolution, half is the first step down.
@@ -447,6 +447,9 @@ class RealtimeRadianceCascades {
 		this._divisor = 1;
 		this._capTime = 0;
 		this._capUntil = 0;
+		this._drops = [];
+		this._edgeTime = 0;
+		this._edgeUntil = 0;
 
 		this._applyChanges();
 
@@ -999,6 +1002,9 @@ class RealtimeRadianceCascades {
 			this.halfResolution = true;
 			this._qualityLimit = 1;
 			this._rise = 0.02;
+			this._drops.length = 0;
+			this._edgeTime = 0;
+			this._edgeUntil = 0;
 
 		}
 
@@ -1068,15 +1074,15 @@ class RealtimeRadianceCascades {
 
 		this._frameTimes.length = 0;
 
-		// the frame time of the display: a quarter of the frames come at a faster common refresh rate, in two windows in
-		// a row, as the timestamps are coarse and jitter in some browsers
+		// the frame time of the display, the base of the dropped frames: most frames come at a faster common refresh rate,
+		// in two windows in a row, as the timestamps are coarse and jitter in some browsers
 
 		if ( auto ) {
 
-			const fast = times.slice().sort( ( a, b ) => a - b )[ times.length >> 2 ];
-			const display = refreshTime( fast );
+			const median = times.slice().sort( ( a, b ) => a - b )[ times.length >> 1 ];
+			const display = refreshTime( median );
 
-			if ( display !== fast && display < this._displayTime * 0.95 ) {
+			if ( display !== median && display < this._displayTime * 0.95 ) {
 
 				if ( this._fasterDisplay === display ) {
 
@@ -1097,7 +1103,17 @@ class RealtimeRadianceCascades {
 
 		const target = this.activeTargetFrameTime = auto ? Math.max( this._displayTime * this._divisor, now < this._capUntil ? this._capTime : 0 ) : this.targetFrameTime;
 
-		// a window back up after steps down lowered the quality by 0.2 but did not shorten the frames by 15%: unless
+		// the dropped frames, which came more than half a frame time after the target, and those of the last second
+
+		const drops = times.filter( ( time ) => time > target * 1.5 ).length;
+
+		this._drops = this._drops.filter( ( [ time ] ) => now - time < 1000 );
+
+		if ( drops > 0 ) this._drops.push( [ now, drops ] );
+
+		const recentDrops = this._drops.reduce( ( sum, [ , count ] ) => sum + count, 0 );
+
+		// a window back up after steps down lowered the quality by 0.4 but did not shorten the frames by 15%: unless
 		// they take 15% longer there, the quality does not limit them, something else does, e.g. the display or the
 		// CPU. It stays up for 10 seconds, twice as long each time, and the display's target is their time meanwhile
 
@@ -1145,13 +1161,7 @@ class RealtimeRadianceCascades {
 
 			if ( this.halfResolution === false && ( this._fullTrial || now >= this._holdUntil ) ) {
 
-				this._fullTrial = false;
-				this.halfResolution = true;
-				this._fullHoldTime = Math.min( this._fullHoldTime * 2 || 10000, 160000 );
-				this._fullHoldUntil = now + this._fullHoldTime;
-				this._rise = 0.02;
-				this._skipFrames = 5;
-
+				this._halveResolution( now );
 				return;
 
 			}
@@ -1162,7 +1172,7 @@ class RealtimeRadianceCascades {
 
 			if ( this._descent !== null && frameTime <= this._descent.time * 0.85 ) this._descent = { quality, time: frameTime };
 
-			if ( this._descent !== null && this._descent.quality - quality >= 0.2 && frameTime > this._descent.time * 0.85 ) {
+			if ( this._descent !== null && this._descent.quality - quality >= 0.4 && frameTime > this._descent.time * 0.85 ) {
 
 				this._probe = { quality, time: frameTime };
 				this.quality = this._descent.quality;
@@ -1198,6 +1208,43 @@ class RealtimeRadianceCascades {
 			this.quality = Math.max( quality - step, 0 );
 			this._skipFrames = 5;
 
+		} else if ( drops > 0 ) {
+
+			// dropped frames, although the frames keep up on average: the quality is at the edge of what the GPU can do,
+			// e.g. as it heats up. Down a little, more for more dropped frames in the last second, and while it waits,
+			// for 4 seconds and twice as long each time up to 16, it rises only to below where they dropped
+
+			if ( this.halfResolution === false && ( this._fullTrial || now >= this._holdUntil ) ) {
+
+				this._halveResolution( now );
+				return;
+
+			}
+
+			if ( now < this._holdUntil ) return;
+
+			// at quality 0, more than one in a second count as frames that take longer, see above
+
+			if ( quality === 0 ) {
+
+				if ( recentDrops > 1 && ++ this._floorOvers >= 2 && auto && this._displayTime * this._divisor * 2 <= 1000 / 30 * 1.01 ) {
+
+					this._divisor *= 2;
+					this._floorOvers = 0;
+
+				}
+
+				return;
+
+			}
+
+			this._rise = 0.02;
+			this._qualityLimit = Math.min( this._qualityLimit, quality - 0.02 );
+			this.quality = Math.max( quality - 0.03 * Math.min( recentDrops, 5 ), 0 );
+			this._edgeTime = Math.min( this._edgeTime * 2 || 4000, 16000 );
+			this._edgeUntil = now + this._edgeTime;
+			this._skipFrames = 5;
+
 		} else if ( frameTime <= target * 1.05 ) {
 
 			// at full quality with half the frame time, the display's full frame rate again
@@ -1213,7 +1260,7 @@ class RealtimeRadianceCascades {
 			this._floorOvers = 0;
 			this._descent = null;
 			this._holdTime = 0;
-			this._qualityLimit = Math.min( this._qualityLimit + 0.002, 1 );
+			if ( now >= this._edgeUntil ) this._qualityLimit = Math.min( this._qualityLimit + 0.002, 1 );
 			this.quality = Math.min( quality + step, Math.max( this._qualityLimit, quality ) );
 			this._skipFrames = this.quality > quality ? 12 : 5;
 
@@ -1234,6 +1281,24 @@ class RealtimeRadianceCascades {
 			}
 
 		}
+
+	}
+
+	/**
+	 * Goes back to half the resolution, the first step down of the adaptive quality from the full resolution. The next
+	 * try of the full resolution waits for 10 seconds, twice as long each time.
+	 *
+	 * @private
+	 * @param {number} now - The time in milliseconds.
+	 */
+	_halveResolution( now ) {
+
+		this._fullTrial = false;
+		this.halfResolution = true;
+		this._fullHoldTime = Math.min( this._fullHoldTime * 2 || 10000, 160000 );
+		this._fullHoldUntil = now + this._fullHoldTime;
+		this._rise = 0.02;
+		this._skipFrames = 5;
 
 	}
 
