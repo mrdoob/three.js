@@ -3568,11 +3568,13 @@ class GLTFMeshGpuInstancing {
 		const translationAttr = new Float32Array( mesh.count * 3 );
 		const rotationAttr = new Float32Array( mesh.count * 4 );
 		const scaleAttr = new Float32Array( mesh.count * 3 );
+		const colorAttr = mesh.instanceColor ? new Float32Array( mesh.count * 3 ) : null;
 
 		const matrix = new Matrix4();
 		const position = new Vector3();
 		const quaternion = new Quaternion();
 		const scale = new Vector3();
+		const color = new Color();
 
 		for ( let i = 0; i < mesh.count; i ++ ) {
 
@@ -3583,6 +3585,13 @@ class GLTFMeshGpuInstancing {
 			quaternion.toArray( rotationAttr, i * 4 );
 			scale.toArray( scaleAttr, i * 3 );
 
+			if ( colorAttr !== null ) {
+
+				mesh.getColorAt( i, color );
+				color.toArray( colorAttr, i * 3 );
+
+			}
+
 		}
 
 		const attributes = {
@@ -3591,8 +3600,8 @@ class GLTFMeshGpuInstancing {
 			SCALE: writer.processAccessor( new BufferAttribute( scaleAttr, 3 ) ),
 		};
 
-		if ( mesh.instanceColor )
-			attributes._COLOR_0 = writer.processAccessor( mesh.instanceColor, undefined, 0, mesh.count );
+		if ( colorAttr !== null )
+			attributes._COLOR_0 = writer.processAccessor( new BufferAttribute( colorAttr, 3 ) );
 
 		nodeDef.extensions = nodeDef.extensions || {};
 		nodeDef.extensions[ this.name ] = { attributes };
