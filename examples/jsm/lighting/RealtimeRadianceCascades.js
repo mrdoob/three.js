@@ -423,6 +423,7 @@ class RealtimeRadianceCascades {
 		this._lastUpdate = null;
 		this._frameTimes = [];
 		this._qualityLimit = 1;
+		this._lateQuality = 1;
 		this._descent = null;
 		this._probe = null;
 		this._holdUntil = 0;
@@ -1006,6 +1007,7 @@ class RealtimeRadianceCascades {
 			this.quality = 0;
 			this.halfResolution = true;
 			this._qualityLimit = 1;
+			this._lateQuality = 1;
 			this._rise = 0.02;
 			this._drops.length = 0;
 			this._edgeTime = 0;
@@ -1183,6 +1185,7 @@ class RealtimeRadianceCascades {
 				this.quality = trial.quality;
 				this.halfResolution = trial.halfResolution;
 				this._qualityLimit = trial.limit;
+				this._lateQuality = trial.lateQuality;
 				this._skipFrames = 12;
 
 			} else {
@@ -1190,6 +1193,7 @@ class RealtimeRadianceCascades {
 				this.activeTargetFrameTime = target;
 				this._rateRaisedAt = now;
 				this._qualityLimit = 1;
+				this._lateQuality = 1;
 				this._rise = 0.02;
 				this._floorOvers = 0;
 
@@ -1245,6 +1249,7 @@ class RealtimeRadianceCascades {
 			this._rise = 0.02;
 			this._descent ??= { quality, time: frameTime };
 			this._qualityLimit = Math.min( this._qualityLimit, quality - 0.02 );
+			this._lateQuality = quality;
 			this.quality = Math.max( quality - step, 0 );
 			this._skipFrames = 5;
 
@@ -1275,6 +1280,7 @@ class RealtimeRadianceCascades {
 
 			this._rise = 0.02;
 			this._qualityLimit = Math.min( this._qualityLimit, quality - 0.02 );
+			this._lateQuality = quality;
 			this.quality = Math.max( quality - 0.03 * Math.min( recentDrops, 5 ), 0 );
 			this._edgeTime = Math.min( this._edgeTime * 2 || 4000, 16000 );
 			this._edgeUntil = now + this._edgeTime;
@@ -1287,7 +1293,9 @@ class RealtimeRadianceCascades {
 			if ( this._divisor > 1 && quality === 1 && frameTime <= target * 0.55 ) this._divisor /= 2;
 
 			// up while the frames are fast enough, within the jitter of the display, in steps that double, and only
-			// slowly back to where they last were not
+			// slowly back to where they last were not: the limit rises by 0.002. Once the frames keep up well above
+			// the quality at which they last did not, by 0.04, what made them late is over, e.g. a view or another
+			// application, and the limit rises twice as fast for every 0.01 further
 
 			const step = Math.min( Math.max( Math.log2( target / frameTime ) / 3, this._rise ), 0.25 );
 
@@ -1295,7 +1303,7 @@ class RealtimeRadianceCascades {
 			this._floorOvers = 0;
 			this._descent = null;
 			this._holdTime = 0;
-			if ( now >= this._edgeUntil ) this._qualityLimit = Math.min( this._qualityLimit + 0.002, 1 );
+			if ( now >= this._edgeUntil ) this._qualityLimit = Math.min( this._qualityLimit + Math.min( 0.002 * 2 ** Math.max( ( quality - this._lateQuality - 0.04 ) / 0.01, 0 ), 0.05 ), 1 );
 			this.quality = Math.min( quality + step, Math.max( this._qualityLimit, quality ) );
 			this._skipFrames = this.quality > quality ? 12 : 5;
 
@@ -1320,7 +1328,7 @@ class RealtimeRadianceCascades {
 
 			if ( this._divisor > 1 && this._fullTrial === false && now >= this._rateHoldUntil && now >= this._capUntil ) {
 
-				this._rateTrial = { quality: this.quality, halfResolution: this.halfResolution, limit: this._qualityLimit };
+				this._rateTrial = { quality: this.quality, halfResolution: this.halfResolution, limit: this._qualityLimit, lateQuality: this._lateQuality };
 				this._divisor /= 2;
 				this.quality = 0;
 				this.halfResolution = true;
@@ -1350,6 +1358,7 @@ class RealtimeRadianceCascades {
 		this._rateHoldTime = Math.min( this._rateHoldTime * 2 || 10000, 160000 );
 		this._rateHoldUntil = now + this._rateHoldTime;
 		this._qualityLimit = 1;
+		this._lateQuality = 1;
 		this._rise = 0.02;
 
 	}
