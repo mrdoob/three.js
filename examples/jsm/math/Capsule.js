@@ -121,7 +121,7 @@ class Capsule {
 	/**
 	 * Tests the given box against the axis-aligned bounds of the capsule.
 	 * This broad-phase check can return `true` for boxes that miss the capsule.
-	 * Boxes that only touch the boundary of these bounds are excluded.
+	 * The axis separation comparisons are strict and subject to floating-point rounding.
 	 *
 	 * @param {Box3} box - The bounding box to test.
 	 * @return {boolean} Whether the box passes the broad-phase check.
