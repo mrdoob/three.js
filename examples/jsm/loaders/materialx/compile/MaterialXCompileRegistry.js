@@ -119,7 +119,7 @@ const sampleTexture = ( textureFile, uvNode, compileContext, fallback, addressMo
 
 	if ( ! textureFile ) return fallback;
 
-	const textureUvNode = compileContext.mxFromBottomLeftUvSpace( uvNode );
+	const textureUvNode = compileContext.mxToImageUv( uvNode );
 	const sampled = texture( textureFile, textureUvNode );
 	return addressModes ? applyTextureAddressModeDefault( sampled, textureUvNode, addressModes, defaultNode ) : sampled;
 
@@ -392,9 +392,12 @@ const compileTiledImageNode = ( nodeX, compileContext ) => {
 
 	}
 
+	// ( texcoord * uvtiling - uvoffset ) / realworldimagesize * realworldtilesize, as in NG_tiledimage.
 	const uvTiling = nodeX.getNodeByName( 'uvtiling' );
 	const uvOffset = nodeX.getNodeByName( 'uvoffset' );
-	const transformedUv = compileContext.mxTransformUv( uvTiling, uvOffset, uvNode );
+	const realWorldImageSize = nodeX.getNodeByName( 'realworldimagesize' );
+	const realWorldTileSize = nodeX.getNodeByName( 'realworldtilesize' );
+	const transformedUv = mul( div( sub( mul( uvNode, uvTiling ), uvOffset ), realWorldImageSize ), realWorldTileSize );
 	const node = sampleTexture( textureFile, transformedUv, compileContext, textureDefault, addressModes, textureDefault );
 	return applyTextureColorSpace( node, file );
 
@@ -548,7 +551,7 @@ const compileHexTiledTextureNode = ( nodeX, compileContext, category ) => {
 	const offsetRange = nodeX.getNodeByName( 'offsetrange' );
 	const falloff = nodeX.getNodeByName( 'falloff' );
 
-	const transformedUv = compileContext.mxFromBottomLeftUvSpace( mul( uvNode, tiling ) );
+	const transformedUv = compileContext.mxToImageUv( mul( uvNode, tiling ) );
 	const tileData = compileContext.mxHextileCoord( transformedUv, rotation, rotationRange, scale, scaleRange, offset, offsetRange );
 
 	let sample0 = texture( textureFile, tileData.coords[ 0 ] ).grad(
