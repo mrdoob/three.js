@@ -373,6 +373,25 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.test( 'computeBoundingBox and computeBoundingSphere - relative morph target', ( assert ) => {
+
+			const geometry = new BufferGeometry();
+			geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( [ 1, 6, 2, 3, 4, 6 ] ), 3 ) );
+
+			// Move both vertices beyond the original bounds on every axis.
+			geometry.morphTargetsRelative = true;
+			geometry.morphAttributes.position = [ new BufferAttribute( new Float32Array( [ 4, - 6, 20, 4, - 6, 20 ] ), 3 ) ];
+
+			geometry.computeBoundingBox();
+			assert.deepEqual( geometry.boundingBox.min, new Vector3( 1, - 2, 2 ), 'bounding box minimum' );
+			assert.deepEqual( geometry.boundingBox.max, new Vector3( 7, 6, 26 ), 'bounding box maximum' );
+
+			geometry.computeBoundingSphere();
+			assert.deepEqual( geometry.boundingSphere.center, new Vector3( 4, 2, 14 ), 'bounding sphere center' );
+			assert.strictEqual( geometry.boundingSphere.radius, 13, 'bounding sphere radius' );
+
+		} );
+
 		const toHalfFloatArray = ( f32Array ) => {
 
 			const f16Array = new Uint16Array( f32Array.length );

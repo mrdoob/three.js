@@ -680,10 +680,10 @@ class BufferGeometry extends EventDispatcher {
 					if ( this.morphTargetsRelative ) {
 
 						_vector.addVectors( this.boundingBox.min, _box.min );
-						this.boundingBox.expandByPoint( _vector );
+						_offset.addVectors( this.boundingBox.max, _box.max );
 
-						_vector.addVectors( this.boundingBox.max, _box.max );
 						this.boundingBox.expandByPoint( _vector );
+						this.boundingBox.expandByPoint( _offset );
 
 					} else {
 
@@ -756,10 +756,10 @@ class BufferGeometry extends EventDispatcher {
 					if ( this.morphTargetsRelative ) {
 
 						_vector.addVectors( _box.min, _boxMorphTargets.min );
-						_box.expandByPoint( _vector );
+						_offset.addVectors( _box.max, _boxMorphTargets.max );
 
-						_vector.addVectors( _box.max, _boxMorphTargets.max );
 						_box.expandByPoint( _vector );
+						_box.expandByPoint( _offset );
 
 					} else {
 
