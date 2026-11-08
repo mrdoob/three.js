@@ -575,7 +575,9 @@ class NodeMaterial extends Material {
 				const rendererMRT = renderer.getMRT();
 				const materialMRT = this.mrtNode;
 
-				if ( rendererMRT !== null || materialMRT !== null || renderTarget.textures.length > 1 ) {
+				const needsMRT = renderTarget.textures.length > 1 && resultNode.isOutputStructNode !== true;
+
+				if ( rendererMRT !== null || materialMRT !== null || needsMRT ) {
 
 					if ( isCustomOutput ) output.assign( resultNode );
 
