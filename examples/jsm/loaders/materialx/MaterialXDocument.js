@@ -23,7 +23,6 @@ import {
 	mat3,
 	mat4,
 	element,
-	mx_transform_uv,
 	mx_srgb_texture_to_lin_rec709,
 	positionLocal,
 	positionWorld,
@@ -1027,7 +1026,6 @@ class MaterialXDocument {
 				return GEOMPROP_NODES[ name ];
 
 			},
-			mxTransformUv: mx_transform_uv,
 			mxHextileCoord,
 			mxHextileComputeBlendWeights,
 			invertConstantMatrixValues,
