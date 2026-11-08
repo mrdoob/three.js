@@ -237,8 +237,9 @@ class RealtimeRadianceCascades {
 
 		/**
 		 * The frame time in milliseconds that `quality` adapts to, e.g. `1000 / 60`, or 0 for the display's: taken as
-		 * 60 Hz at first, and as 120, 144 or 240 Hz if a quarter of the frames come at that rate, in two measurements in a
-		 * row. While even quality 0 takes longer, the target is a multiple of it, up to the time of 30 Hz. While the
+		 * 60 Hz at first, and as 120, 144 or 240 Hz if half of the frames come at that rate, in two measurements in a
+		 * row. While even quality 0 takes longer, the target is a multiple of it, up to the time of 30 Hz, and the
+		 * faster frame rate is tried again from quality 0 after 10 seconds, twice as long each time it fails. While the
 		 * frames take longer however low the quality, at a steady 30, 60, 120 or 144 Hz, e.g. because the browser runs
 		 * the animation loop at 30 Hz in a low power mode, the target is their time, for a while. See
 		 * `activeTargetFrameTime`.
@@ -450,6 +451,10 @@ class RealtimeRadianceCascades {
 		this._drops = [];
 		this._edgeTime = 0;
 		this._edgeUntil = 0;
+		this._rateTrial = null;
+		this._rateHoldTime = 0;
+		this._rateHoldUntil = 0;
+		this._rateRaisedAt = - Infinity;
 
 		this._applyChanges();
 
@@ -1005,6 +1010,7 @@ class RealtimeRadianceCascades {
 			this._drops.length = 0;
 			this._edgeTime = 0;
 			this._edgeUntil = 0;
+			this._rateTrial = null;
 
 		}
 
@@ -1051,14 +1057,16 @@ class RealtimeRadianceCascades {
 
 		}
 
-		// the frames of a quarter of a second, half a second for a window back up, at least 8, without the first ones
-		// after a change: 5 after a step down, which are still in flight, and 12 after a step up, whose new finer probes
-		// cost more at first
+		// the frames of a quarter of a second, half a second for a window back up or of a faster frame rate on trial, at
+		// least 8, without the first ones after a change: 5 after a step down, which are still in flight, and 12 after a
+		// step up, whose new finer probes cost more at first. A faster frame rate on trial ends early if 4 frames in a
+		// row miss it by half
 
 		const times = this._frameTimes.slice( this._skipFrames );
 		const span = times.reduce( ( sum, t ) => sum + t, 0 );
+		const missed = this._rateTrial !== null && times.length >= 4 && times.every( ( time ) => time > this._displayTime * this._divisor * 1.5 );
 
-		if ( times.length < 8 || span < ( this._probe !== null ? 500 : 250 ) ) return;
+		if ( missed === false && ( times.length < 8 || span < ( this._probe !== null || this._rateTrial !== null ? 500 : 250 ) ) ) return;
 
 		// the mean, since without vsync the frames can alternate between fast ones and ones that wait for the GPU, or
 		// the GPU's frame time if longer: the time between the reads that wait for it, over the frames between them
@@ -1088,6 +1096,7 @@ class RealtimeRadianceCascades {
 
 					this._displayTime = display;
 					this._divisor = 1;
+					this._rateTrial = null;
 
 				}
 
@@ -1101,7 +1110,11 @@ class RealtimeRadianceCascades {
 
 		}
 
-		const target = this.activeTargetFrameTime = auto ? Math.max( this._displayTime * this._divisor, now < this._capUntil ? this._capTime : 0 ) : this.targetFrameTime;
+		const target = auto ? Math.max( this._displayTime * this._divisor, now < this._capUntil ? this._capTime : 0 ) : this.targetFrameTime;
+
+		// a faster frame rate on trial is not the target yet
+
+		if ( this._rateTrial === null ) this.activeTargetFrameTime = target;
 
 		// the dropped frames, which came more than half a frame time after the target, and those of the last second
 
@@ -1154,6 +1167,38 @@ class RealtimeRadianceCascades {
 
 		}
 
+		// a window of the faster frame rate on trial, see below: it stays if the frames keep up at quality 0. Else back
+		// to the slower one, at the quality it had
+
+		if ( this._rateTrial !== null ) {
+
+			const trial = this._rateTrial;
+
+			this._rateTrial = null;
+
+			if ( frameTime > target * 1.1 || drops > 1 ) {
+
+				this._halveFrameRate( now, true );
+
+				this.quality = trial.quality;
+				this.halfResolution = trial.halfResolution;
+				this._qualityLimit = trial.limit;
+				this._skipFrames = 12;
+
+			} else {
+
+				this.activeTargetFrameTime = target;
+				this._rateRaisedAt = now;
+				this._qualityLimit = 1;
+				this._rise = 0.02;
+				this._floorOvers = 0;
+
+			}
+
+			return;
+
+		}
+
 		if ( frameTime > target * 1.1 ) {
 
 			// at the full resolution, half is the first step down, and the next try of the full resolution waits for 10
@@ -1186,12 +1231,7 @@ class RealtimeRadianceCascades {
 
 			if ( quality === 0 ) {
 
-				if ( ++ this._floorOvers >= 2 && auto && this._displayTime * this._divisor * 2 <= 1000 / 30 * 1.01 ) {
-
-					this._divisor *= 2;
-					this._floorOvers = 0;
-
-				}
+				if ( ++ this._floorOvers >= 2 && auto && this._displayTime * this._divisor * 2 <= 1000 / 30 * 1.01 ) this._halveFrameRate( now );
 
 				return;
 
@@ -1227,12 +1267,7 @@ class RealtimeRadianceCascades {
 
 			if ( quality === 0 ) {
 
-				if ( recentDrops > 1 && ++ this._floorOvers >= 2 && auto && this._displayTime * this._divisor * 2 <= 1000 / 30 * 1.01 ) {
-
-					this._divisor *= 2;
-					this._floorOvers = 0;
-
-				}
+				if ( recentDrops > 1 && ++ this._floorOvers >= 2 && auto && this._displayTime * this._divisor * 2 <= 1000 / 30 * 1.01 ) this._halveFrameRate( now );
 
 				return;
 
@@ -1280,7 +1315,42 @@ class RealtimeRadianceCascades {
 
 			}
 
+			// at half the frame rate, the faster one again on trial, from quality 0 at half the resolution: what made it
+			// too slow, e.g. another application or a view, may be over
+
+			if ( this._divisor > 1 && this._fullTrial === false && now >= this._rateHoldUntil && now >= this._capUntil ) {
+
+				this._rateTrial = { quality: this.quality, halfResolution: this.halfResolution, limit: this._qualityLimit };
+				this._divisor /= 2;
+				this.quality = 0;
+				this.halfResolution = true;
+				this._skipFrames = 5;
+
+			}
+
 		}
+
+	}
+
+	/**
+	 * Halves the frame rate that the adaptive quality aims for, as quality 0 was too slow for it. The next try of the
+	 * faster one waits for 10 seconds, twice as long each time, unless the faster one held for a minute. The quality
+	 * starts over, as where it was too slow for the faster frame rate says nothing about the slower one.
+	 *
+	 * @private
+	 * @param {number} now - The time in milliseconds.
+	 * @param {boolean} [failed=false] - Whether a try of the faster frame rate failed.
+	 */
+	_halveFrameRate( now, failed = false ) {
+
+		if ( failed === false && now - this._rateRaisedAt > 60000 ) this._rateHoldTime = 0;
+
+		this._divisor *= 2;
+		this._floorOvers = 0;
+		this._rateHoldTime = Math.min( this._rateHoldTime * 2 || 10000, 160000 );
+		this._rateHoldUntil = now + this._rateHoldTime;
+		this._qualityLimit = 1;
+		this._rise = 0.02;
 
 	}
 
