@@ -18,6 +18,8 @@ const _offset = /*@__PURE__*/ new Vector3();
 const _box = /*@__PURE__*/ new Box3();
 const _boxMorphTargets = /*@__PURE__*/ new Box3();
 const _vector = /*@__PURE__*/ new Vector3();
+const _min = /*@__PURE__*/ new Vector3();
+const _max = /*@__PURE__*/ new Vector3();
 
 /**
  * A representation of mesh, line, or point geometry. Includes vertex
@@ -679,11 +681,11 @@ class BufferGeometry extends EventDispatcher {
 
 					if ( this.morphTargetsRelative ) {
 
-						_vector.addVectors( this.boundingBox.min, _box.min );
-						this.boundingBox.expandByPoint( _vector );
+						_min.addVectors( this.boundingBox.min, _box.min );
+						_max.addVectors( this.boundingBox.max, _box.max );
 
-						_vector.addVectors( this.boundingBox.max, _box.max );
-						this.boundingBox.expandByPoint( _vector );
+						this.boundingBox.expandByPoint( _min );
+						this.boundingBox.expandByPoint( _max );
 
 					} else {
 
@@ -755,11 +757,11 @@ class BufferGeometry extends EventDispatcher {
 
 					if ( this.morphTargetsRelative ) {
 
-						_vector.addVectors( _box.min, _boxMorphTargets.min );
-						_box.expandByPoint( _vector );
+						_min.addVectors( _box.min, _boxMorphTargets.min );
+						_max.addVectors( _box.max, _boxMorphTargets.max );
 
-						_vector.addVectors( _box.max, _boxMorphTargets.max );
-						_box.expandByPoint( _vector );
+						_box.expandByPoint( _min );
+						_box.expandByPoint( _max );
 
 					} else {
 
