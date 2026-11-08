@@ -227,8 +227,11 @@ class RealtimeRadianceCascades {
 		 * slowly back to the quality at which they last took longer, and falls while they take longer, by more the
 		 * longer they take. If lowering it by 0.4 did not shorten them, it compares them back at the quality above: if
 		 * they are not longer there, something else limits them, e.g. the display or the CPU, and it stays there for a
-		 * while. At quality 1, it tries the full resolution, and goes back to half if the frames do not keep up, for 10
-		 * seconds, twice as long each time; at the full resolution, half is the first step down.
+		 * while. It also falls a little for every dropped frame, one that comes more than half a frame time late, unless
+		 * the frames still drop after it fell by 0.3 for them. Single frames of more than 2.5 times the target, e.g. a
+		 * garbage collection, do not count. At quality 1, it tries the full resolution, and goes back to half if the
+		 * frames do not keep up, for 10 seconds, twice as long each time; at the full resolution, half is the first step
+		 * down.
 		 *
 		 * @type {boolean}
 		 * @default false
@@ -456,6 +459,9 @@ class RealtimeRadianceCascades {
 		this._rateHoldTime = 0;
 		this._rateHoldUntil = 0;
 		this._rateRaisedAt = - Infinity;
+		this._edge = null;
+		this._dropHoldTime = 0;
+		this._dropHoldUntil = 0;
 
 		this._applyChanges();
 
@@ -1013,6 +1019,9 @@ class RealtimeRadianceCascades {
 			this._edgeTime = 0;
 			this._edgeUntil = 0;
 			this._rateTrial = null;
+			this._edge = null;
+			this._dropHoldTime = 0;
+			this._dropHoldUntil = 0;
 
 		}
 
@@ -1070,15 +1079,13 @@ class RealtimeRadianceCascades {
 
 		if ( missed === false && ( times.length < 8 || span < ( this._probe !== null || this._rateTrial !== null ? 500 : 250 ) ) ) return;
 
-		// the mean, since without vsync the frames can alternate between fast ones and ones that wait for the GPU, or
-		// the GPU's frame time if longer: the time between the reads that wait for it, over the frames between them
-
 		const fences = this._fences.filter( ( [ frame ] ) => frame >= this._frame - times.length );
+		const fenceFrames = fences.length > 1 ? fences[ fences.length - 1 ][ 0 ] - fences[ 0 ][ 0 ] : 0;
+		const fenceTime = fences.length > 1 ? fences[ fences.length - 1 ][ 1 ] - fences[ 0 ][ 1 ] : 0;
 
-		this._gpuFrameTime = fences.length > 1 ? ( fences[ fences.length - 1 ][ 1 ] - fences[ 0 ][ 1 ] ) / ( fences[ fences.length - 1 ][ 0 ] - fences[ 0 ][ 0 ] ) : 0;
+		this._gpuFrameTime = fenceFrames > 0 ? fenceTime / fenceFrames : 0;
 		this._fences = this._fences.slice( - 1 );
 
-		const frameTime = Math.max( span / times.length, this._gpuFrameTime );
 		const quality = this.quality;
 		const auto = ! ( this.targetFrameTime > 0 );
 
@@ -1118,9 +1125,22 @@ class RealtimeRadianceCascades {
 
 		if ( this._rateTrial === null ) this.activeTargetFrameTime = target;
 
+		// single frames that take more than 2.5 times the target are hitches, e.g. a garbage collection or a shader
+		// that compiles, which no quality avoids: they count neither for the frame time nor as dropped frames
+
+		const hitches = times.filter( ( time ) => time > target * 2.5 );
+		const steady = hitches.length > 0 && hitches.length <= Math.max( 1, times.length * 0.15 ) ? times.filter( ( time ) => time <= target * 2.5 ) : times;
+		const steadyTime = steady.reduce( ( sum, t ) => sum + t, 0 ) / steady.length;
+		const hitchTime = steady === times ? 0 : span - steadyTime * times.length;
+
+		// the mean, since without vsync the frames can alternate between fast ones and ones that wait for the GPU, or
+		// the GPU's frame time if longer: the time between the reads that wait for it, over the frames between them
+
+		const frameTime = Math.max( steadyTime, fenceFrames > 0 ? ( fenceTime - hitchTime ) / fenceFrames : 0 );
+
 		// the dropped frames, which came more than half a frame time after the target, and those of the last second
 
-		const drops = times.filter( ( time ) => time > target * 1.5 ).length;
+		const drops = steady.filter( ( time ) => time > target * 1.5 ).length;
 
 		this._drops = this._drops.filter( ( [ time ] ) => now - time < 1000 );
 
@@ -1250,6 +1270,7 @@ class RealtimeRadianceCascades {
 			this._descent ??= { quality, time: frameTime };
 			this._qualityLimit = Math.min( this._qualityLimit, quality - 0.02 );
 			this._lateQuality = quality;
+			this._edge = null;
 			this.quality = Math.max( quality - step, 0 );
 			this._skipFrames = 5;
 
@@ -1259,20 +1280,46 @@ class RealtimeRadianceCascades {
 			// e.g. as it heats up. Down a little, more for more dropped frames in the last second, and while it waits,
 			// for 4 seconds and twice as long each time up to 16, it rises only to below where they dropped
 
-			if ( this.halfResolution === false && ( this._fullTrial || now >= this._holdUntil ) ) {
+			// while they do not count, see below, only two of them within a second halve the resolution
+
+			const ignored = now < this._dropHoldUntil;
+
+			if ( this.halfResolution === false && ( this._fullTrial || now >= this._holdUntil ) && ( ignored === false || recentDrops > 1 ) ) {
 
 				this._halveResolution( now );
 				return;
 
 			}
 
-			if ( now < this._holdUntil ) return;
+			if ( now < this._holdUntil || ignored ) return;
 
 			// at quality 0, more than one in a second count as frames that take longer, see above
 
 			if ( quality === 0 ) {
 
 				if ( recentDrops > 1 && ++ this._floorOvers >= 2 && auto && this._displayTime * this._divisor * 2 <= 1000 / 30 * 1.01 ) this._halveFrameRate( now );
+
+				return;
+
+			}
+
+			// the frames still drop although the quality fell by 0.3 for them, without a wait in between that ran
+			// out: the drops are not the quality's, e.g. another application or a timer of the page. The quality goes
+			// back to where it was, and such drops do not count for 10 seconds, twice as long each time
+
+			this._edge ??= { quality, limit: this._qualityLimit, lateQuality: this._lateQuality };
+
+			if ( this._edge.quality - quality >= 0.3 ) {
+
+				this._dropHoldTime = Math.min( this._dropHoldTime * 2 || 10000, 160000 );
+				this._dropHoldUntil = now + this._dropHoldTime;
+				this.quality = this._edge.quality;
+				this._qualityLimit = this._edge.limit;
+				this._lateQuality = this._edge.lateQuality;
+				this._edge = null;
+				this._edgeTime = 0;
+				this._edgeUntil = 0;
+				this._skipFrames = 12;
 
 				return;
 
@@ -1303,6 +1350,8 @@ class RealtimeRadianceCascades {
 			this._floorOvers = 0;
 			this._descent = null;
 			this._holdTime = 0;
+			if ( now >= this._edgeUntil ) this._edge = null;
+			if ( this._dropHoldTime > 0 && now - this._dropHoldUntil > 60000 ) this._dropHoldTime = 0;
 			if ( now >= this._edgeUntil ) this._qualityLimit = Math.min( this._qualityLimit + Math.min( 0.002 * 2 ** Math.max( ( quality - this._lateQuality - 0.04 ) / 0.01, 0 ), 0.05 ), 1 );
 			this.quality = Math.min( quality + step, Math.max( this._qualityLimit, quality ) );
 			this._skipFrames = this.quality > quality ? 12 : 5;
