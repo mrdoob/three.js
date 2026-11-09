@@ -1,4 +1,4 @@
-import { CubeArrayTexture, DataTexture, Mesh, NodeMaterial, OrthographicCamera, PlaneGeometry, RenderTarget, Scene, LinearSRGBColorSpace, NearestFilter } from 'three/webgpu';
+import { CubeArrayTexture, DataTexture, FloatType, Mesh, NodeMaterial, OrthographicCamera, PlaneGeometry, RenderTarget, Scene, LinearSRGBColorSpace, NearestFilter } from 'three/webgpu';
 import * as Core from '../../../../src/Three.Core.js';
 import * as Nodes from '../../../../src/Three.WebGPU.Nodes.js';
 import { cubeTexture, vec3, vec4 } from 'three/tsl';
@@ -125,14 +125,21 @@ export default QUnit.module( 'Textures', () => {
 
 		} );
 
-		for ( const source of [ 'Canvas', 'Image', 'ImageBitmap', 'DataTexture' ] ) {
+		for ( const source of [ 'Canvas', 'Image', 'ImageBitmap', 'DataTexture', 'Nearest', 'Float' ] ) {
 
 			QUnit.test( `${ source } uploads, cube selection, mipmaps and reupload`, async assert => {
 
-				const data = source === 'DataTexture';
+				const data = source === 'DataTexture' || source === 'Float';
 				async function makeFaces( size, offset ) {
 
 					const images = faces( size, offset, data );
+					if ( source === 'Float' ) for ( const face of images ) {
+
+						face.image.data = Float32Array.from( face.image.data, value => value / 255 );
+						face.type = FloatType;
+
+					}
+
 					if ( source === 'ImageBitmap' ) return Promise.all( images.map( image => createImageBitmap( image ) ) );
 					if ( source === 'Image' ) return Promise.all( images.map( async canvas => {
 
@@ -155,6 +162,8 @@ export default QUnit.module( 'Textures', () => {
 
 				const texture = new CubeArrayTexture();
 				texture.magFilter = NearestFilter;
+				if ( source === 'Nearest' || source === 'Float' ) texture.minFilter = NearestFilter;
+				if ( source === 'Float' ) texture.type = FloatType;
 				const target = new RenderTarget( 4, 4 );
 				target.texture.colorSpace = LinearSRGBColorSpace;
 				const previousTarget = renderer.getRenderTarget();
