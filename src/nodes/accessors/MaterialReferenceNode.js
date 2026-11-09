@@ -52,6 +52,24 @@ class MaterialReferenceNode extends ReferenceNode {
 	}
 
 	/**
+	 * Keeps texture bindings for properties of the current material independent.
+	 *
+	 * @param {string} uniformType - The type to set.
+	 */
+	setNodeType( uniformType ) {
+
+		super.setNodeType( uniformType );
+
+		// Another material using the same shader can bind different textures to these properties.
+		if ( this.material === null && this.node.isTextureNode === true ) {
+
+			this.node.mergeable = false;
+
+		}
+
+	}
+
+	/**
 	 * Updates the reference based on the given state. The state is only evaluated
 	 * {@link MaterialReferenceNode#material} is not set.
 	 *

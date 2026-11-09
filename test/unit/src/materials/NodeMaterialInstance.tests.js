@@ -38,6 +38,31 @@ export default QUnit.module( 'Materials', () => {
 
 		} );
 
+		QUnit.test( 'texture references stay independent when two properties share a texture', ( assert ) => {
+
+			const map = materialReference( 'map', 'texture' );
+			const emissiveMap = materialReference( 'emissiveMap', 'texture' );
+			const shared = new Texture();
+			const other = new Texture();
+			const a = { map: shared, emissiveMap: shared };
+			const b = { map: shared, emissiveMap: other };
+
+			map.updateReference( { material: a } );
+			map.updateValue();
+			emissiveMap.updateReference( { material: a } );
+			emissiveMap.updateValue();
+
+			const emissiveHash = emissiveMap.node.getUniformHash();
+			assert.notStrictEqual( map.node.getUniformHash(), emissiveHash, 'Independent material slots have distinct uniform hashes' );
+
+			emissiveMap.updateReference( { material: b } );
+			emissiveMap.updateValue();
+			assert.strictEqual( emissiveMap.node.getUniformHash(), emissiveHash, 'The binding identity survives a texture change' );
+			assert.strictEqual( emissiveMap.node.value, other );
+			assert.strictEqual( map.node.value, shared );
+
+		} );
+
 		QUnit.test( 'delegates shader setup with the instance material', ( assert ) => {
 
 			const base = new NodeMaterial();
