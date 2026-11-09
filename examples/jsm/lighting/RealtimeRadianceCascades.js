@@ -111,6 +111,11 @@ const _size = /*@__PURE__*/ new Vector2();
  * beyond it trace no shadow ray for them. Lights that add less than a tenth of the light of a hit trace it only
  * sometimes.
  *
+ * Adapting the quality to the frame time is left to the application, e.g. to a {@link RadianceCascadesAdaptiveQuality}.
+ * To control the cost, `quality` and `halfResolution` can change every frame, and `renderSize` when the G-buffer may
+ * be resized. To measure it, `frame`, `finishedFrame` and `finishedTime` tell how fast the GPU finishes the frames,
+ * `readGPUTime()` the GPU time of the passes, and `version` when the passes were built again.
+ *
  * This class can only be used with {@link WebGPURenderer} and a WebGPU backend.
  *
  * @three_import import { RealtimeRadianceCascades } from 'three/addons/lighting/RealtimeRadianceCascades.js';
@@ -152,10 +157,9 @@ class RealtimeRadianceCascades {
 	 * covers them, instead of tracing a shadow ray. The sun must cast shadows.
 	 * @param {number} [options.quality=1] - The share of the rays and the fineness of the probes, from 0 to 1, see `quality`.
 	 * @param {boolean} [options.halfResolution=false] - Whether the pixels interpolate the light of a grid of 2x2 pixels, see `halfResolution`.
-	 * @param {?RadianceCascadesAdaptiveQuality} [options.adaptiveQuality=null] - What adapts `quality` and `halfResolution` to the frame time, see `adaptiveQuality`.
 	 * @param {?Vector2} [options.renderSize=null] - The size of the G-buffer in pixels, or null for the drawing buffer's, see `renderSize`.
 	 */
-	constructor( { spacing = 0.0625, levelDistance = 4, levels = 16, blendingRadius = 1.1, cascades = 4, directions = 4, maxProbes = 32768, rayStride = 1, secondary = true, qualityDecay = 0.97, minDirectionWeight = 2, useQualityWeight = true, maxLifetime = 1, secondaryLifetime = 10, orientations = false, maxRadiance = 500, adaptiveLOD = true, velocity = false, useShadowMap = true, quality = 1, halfResolution = false, adaptiveQuality = null, renderSize = null } = {} ) {
+	constructor( { spacing = 0.0625, levelDistance = 4, levels = 16, blendingRadius = 1.1, cascades = 4, directions = 4, maxProbes = 32768, rayStride = 1, secondary = true, qualityDecay = 0.97, minDirectionWeight = 2, useQualityWeight = true, maxLifetime = 1, secondaryLifetime = 10, orientations = false, maxRadiance = 500, adaptiveLOD = true, velocity = false, useShadowMap = true, quality = 1, halfResolution = false, renderSize = null } = {} ) {
 
 		this._blendingOctaves = uniform( 0 );
 		this._maxLifetime = uniform( 1, 'uint' );
@@ -196,7 +200,7 @@ class RealtimeRadianceCascades {
 		 * `rayStride * 2 ** ( 2 * ( 1 - quality ) )` pixels traces a ray, so a sixteenth as many rays at 0, and the
 		 * levels of detail are `1 - quality` octaves coarser, as with `lodBias`, so a quarter as many probes. The
 		 * tracing costs in proportion to the rays and most other passes to the probes. Lower qualities are noisier and
-		 * blurrier, and the light takes longer to settle. With `adaptiveQuality`, it adapts.
+		 * blurrier, and the light takes longer to settle. It can change every frame.
 		 *
 		 * @type {number}
 		 * @default 1
@@ -206,8 +210,7 @@ class RealtimeRadianceCascades {
 		/**
 		 * Whether the pixels interpolate the light of a grid of cells of 2x2 pixels, by their planes and normals,
 		 * instead of gathering their own, and the probes are inserted from its points: a quarter of the cost of the
-		 * passes of the pixels, for little change to the smooth light. With `adaptiveQuality`, it is the first step
-		 * down and the last step up.
+		 * passes of the pixels, for little change to the smooth light. It can change every frame.
 		 *
 		 * @type {boolean}
 		 * @default false
@@ -215,20 +218,10 @@ class RealtimeRadianceCascades {
 		this.halfResolution = halfResolution;
 
 		/**
-		 * What adapts `quality` and `halfResolution` to the frame time, e.g. a {@link RadianceCascadesAdaptiveQuality},
-		 * or null. `update()` calls its `update()` before a frame, its `pause()` when new passes have to compile, and
-		 * its `frameFinished()` when the GPU finished the passes of a frame.
-		 *
-		 * @type {?RadianceCascadesAdaptiveQuality}
-		 * @default null
-		 */
-		this.adaptiveQuality = adaptiveQuality;
-
-		/**
 		 * The size of the G-buffer in pixels, or null for the size of the drawing buffer. The rays, the probes that are
 		 * inserted and the light of the pixels are per pixel of the G-buffer, so their cost falls with it. For an
 		 * upscaler that renders at a lower resolution: the composite and the textures of `getTextureNode()` then have
-		 * this size.
+		 * this size. A change resizes the G-buffer.
 		 *
 		 * @type {?Vector2}
 		 * @default null
@@ -278,6 +271,42 @@ class RealtimeRadianceCascades {
 		 * @type {number}
 		 */
 		this.newProbes = 0;
+
+		/**
+		 * The number of frames, which `update()` counts.
+		 *
+		 * @type {number}
+		 * @readonly
+		 */
+		this.frame = 0;
+
+		/**
+		 * The last frame whose passes the GPU has finished, as `frame` was after its `update()`: the counters of the
+		 * probes are read back after the passes of a frame, one read at a time. With `finishedTime`, it tells how
+		 * fast the GPU renders the frames, which the animation loop does not where a browser runs it ahead of the GPU.
+		 *
+		 * @type {number}
+		 * @readonly
+		 */
+		this.finishedFrame = 0;
+
+		/**
+		 * The time of `performance.now()` in milliseconds at which the read after `finishedFrame` returned.
+		 *
+		 * @type {number}
+		 * @readonly
+		 */
+		this.finishedTime = 0;
+
+		/**
+		 * Counts how many times `update()` built the passes: in the first frame, and again after an option that they
+		 * depend on changed or the G-buffer grew beyond their buffers. That frame and the next ones take longer, while
+		 * the passes compile and the probes fill.
+		 *
+		 * @type {number}
+		 * @readonly
+		 */
+		this.version = 0;
 
 		/**
 		 * What the composite shows: `0` the lit scene, `1` the indirect light only, `2` the irradiance,
@@ -333,7 +362,6 @@ class RealtimeRadianceCascades {
 		this._frameKernels = null;
 		this._compositeNode = null;
 		this._irradianceNode = null;
-		this._frame = 0;
 		this._layout = null;
 		this._buffers = [];
 		this._bufferKey = null;
@@ -767,8 +795,6 @@ class RealtimeRadianceCascades {
 
 		this._applyChanges();
 
-		if ( this.adaptiveQuality !== null ) this.adaptiveQuality.update( this, this._frame );
-
 		const size = this.renderSize !== null ? _size.copy( this.renderSize ) : renderer.getDrawingBufferSize( _size );
 		const width = Math.max( Math.floor( size.x ), 1 ), height = Math.max( Math.floor( size.y ), 1 );
 		const gbuffer = this._getGBuffer( width, height );
@@ -822,9 +848,9 @@ class RealtimeRadianceCascades {
 
 		camera.updateMatrixWorld();
 
-		this._frame ++;
-		this._frameNode.value = this._frame;
-		this._parity.value = this._frame & 1;
+		this.frame ++;
+		this._frameNode.value = this.frame;
+		this._parity.value = this.frame & 1;
 
 		this._cameraPosition.value.setFromMatrixPosition( camera.matrixWorld );
 		this._projectionInverse.value.copy( camera.projectionMatrixInverse );
@@ -833,7 +859,7 @@ class RealtimeRadianceCascades {
 
 		// the random offset of the directions of the frame, pcg3df( tick, 29, 968 ) in chandra
 
-		const random = pcg3d( this._frame, 29, 968 );
+		const random = pcg3d( this.frame, 29, 968 );
 		this._jitter.value.set( random[ 0 ] / 0xffffffff, random[ 1 ] / 0xffffffff );
 
 		this._previousRays.value.copy( this._rays.value );
@@ -863,10 +889,7 @@ class RealtimeRadianceCascades {
 		if ( this._passes === null ) {
 
 			this._passes = this._createPasses();
-
-			// the adaptive quality waits for a second for the new passes to compile and the probes to fill
-
-			if ( this.adaptiveQuality !== null ) this.adaptiveQuality.pause( 1000 );
+			this.version ++;
 
 		}
 
@@ -887,7 +910,7 @@ class RealtimeRadianceCascades {
 
 		if ( renderer.backend.trackTimestamp === true ) this._timestampUID = renderer.backend.getTimestampUID( this._passes );
 
-		if ( this.adaptiveLOD || ( this.adaptiveQuality !== null && this.adaptiveQuality.enabled ) ) this._readCounters( renderer );
+		this._readCounters( renderer );
 
 	}
 
@@ -924,7 +947,7 @@ class RealtimeRadianceCascades {
 
 	/**
 	 * Reads back the counters after the passes of the frame, one read at a time. Their probe counts adapt `lodBias`,
-	 * and when the read finished tells when the GPU finished the frame, for the adaptive quality.
+	 * and when the read returns tells when the GPU finished the frame, see `finishedFrame`.
 	 *
 	 * @private
 	 * @param {WebGPURenderer} renderer - The renderer.
@@ -935,7 +958,7 @@ class RealtimeRadianceCascades {
 
 		this._reading = true;
 
-		const frame = this._frame;
+		const frame = this.frame;
 		const quality = Math.min( Math.max( this.quality, 0 ), 1 );
 		const atomics = this._atomics;
 		const byteLength = this._layout.counters * 8;
@@ -950,7 +973,9 @@ class RealtimeRadianceCascades {
 
 			if ( this._atomics !== atomics ) return;
 
-			if ( this.adaptiveQuality !== null ) this.adaptiveQuality.frameFinished( frame, performance.now() );
+			this.finishedFrame = frame;
+			this.finishedTime = performance.now();
+
 			if ( this.adaptiveLOD ) this._adaptLOD( counts, frame, quality );
 
 		} ).catch( () => {
@@ -1014,7 +1039,7 @@ class RealtimeRadianceCascades {
 	async readStats( renderer ) {
 
 		const counters = new Uint32Array( await renderer.getArrayBufferAsync( this._atomics.value, null, 0, this._layout.counters * 8 ) );
-		const base = ( this._frame & 1 ) * this._layout.counters;
+		const base = ( this.frame & 1 ) * this._layout.counters;
 
 		this.probes = Array.from( { length: this.cascades }, ( _, n ) => counters[ base + PROBES * this.cascades + n ] );
 		this.newProbes = counters[ base + 3 * this.cascades ];

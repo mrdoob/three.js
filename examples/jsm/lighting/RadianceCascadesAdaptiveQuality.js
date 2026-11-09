@@ -6,20 +6,31 @@ const REFRESH_RATES = [ 30, 60, 120, 144, 240 ];
 /**
  * Adapts the `quality` and `halfResolution` of {@link RealtimeRadianceCascades} to the frame time, see
  * `targetFrameTime`. It measures the frames of the cascades over a quarter of a second, by the timestamps of the
- * animation frames and by when the GPU finishes them, since a browser may run the animation loop faster than the
- * GPU, showing only some of its frames. The quality starts at 0 at `halfResolution` and rises while the frames
- * keep up with the target, in steps that double, but only slowly back to the quality at which they last took
- * longer, and falls while they take longer, by more the longer they take. If lowering it by 0.4 did not shorten
- * them, it compares them back at the quality above: if they are not longer there, something else limits them, e.g.
- * the display or the CPU, and it stays there for a while. It also falls a little for every dropped frame, one that
- * comes more than half a frame time late, unless the frames still drop after it fell by 0.3 for them. Single
- * frames of more than 2.5 times the target, e.g. a garbage collection, do not count. At quality 1, it tries the
- * full resolution, and goes back to half if the frames do not keep up, for 10 seconds, twice as long each time; at
- * the full resolution, half is the first step down.
+ * animation frames and by when the GPU finishes them, see `finishedFrame` of the cascades, since a browser may run
+ * the animation loop faster than the GPU, showing only some of its frames. The quality starts at 0 at
+ * `halfResolution` and rises while the frames keep up with the target, in steps that double, but only slowly back
+ * to the quality at which they last took longer, and falls while they take longer, by more the longer they take. If
+ * lowering it by 0.4 did not shorten them, it compares them back at the quality above: if they are not longer
+ * there, something else limits them, e.g. the display or the CPU, and it stays there for a while. It also falls a
+ * little for every dropped frame, one that comes more than half a frame time late, unless the frames still drop
+ * after it fell by 0.3 for them. Single frames of more than 2.5 times the target, e.g. a garbage collection, do not
+ * count. At quality 1, it tries the full resolution, and goes back to half if the frames do not keep up, for 10
+ * seconds, twice as long each time; at the full resolution, half is the first step down.
+ *
+ * It waits for a second after the cascades built their passes, see `version` of the cascades, while they compile.
  *
  * ```js
- * cascades.adaptiveQuality = new RadianceCascadesAdaptiveQuality();
+ * const adaptiveQuality = new RadianceCascadesAdaptiveQuality();
+ *
+ * function animate() {
+ *
+ * 	adaptiveQuality.update( cascades );
+ * 	renderPipeline.render();
+ *
+ * }
  * ```
+ *
+ * @three_import import { RadianceCascadesAdaptiveQuality } from 'three/addons/lighting/RadianceCascadesAdaptiveQuality.js';
  */
 class RadianceCascadesAdaptiveQuality {
 
@@ -100,19 +111,40 @@ class RadianceCascadesAdaptiveQuality {
 		this._edge = null;
 		this._dropHoldTime = 0;
 		this._dropHoldUntil = 0;
+		this._finishedFrame = 0;
+		this._version = 0;
 
 	}
 
 	/**
 	 * Adapts the `quality` and `halfResolution` of the cascades to the target frame time by the mean time between
-	 * the last calls. The cascades call it before every frame.
+	 * the last calls. Call it before every frame, before the `update()` of the cascades.
 	 *
 	 * @param {RealtimeRadianceCascades} cascades - The cascades.
-	 * @param {number} frame - The frame of the cascades, as in `frameFinished()`.
 	 */
-	update( cascades, frame ) {
+	update( cascades ) {
 
 		const now = performance.now();
+		const frame = cascades.frame;
+
+		// new passes of the cascades: a second for them to compile and for the probes to fill
+
+		if ( cascades.version !== this._version ) {
+
+			this._version = cascades.version;
+			this.pause( 1000 );
+
+		}
+
+		// the GPU finished a frame, see below
+
+		if ( cascades.finishedFrame !== this._finishedFrame ) {
+
+			this._finishedFrame = cascades.finishedFrame;
+
+			if ( this.enabled === true && this._fences.length < 1000 ) this._fences.push( [ cascades.finishedFrame, cascades.finishedTime ] );
+
+		}
 
 		if ( this.enabled !== true ) {
 
@@ -563,7 +595,8 @@ class RadianceCascadesAdaptiveQuality {
 	}
 
 	/**
-	 * Starts the measurement of the frames over after a time, e.g. while new passes compile and the probes fill.
+	 * Starts the measurement of the frames over after a time, e.g. while a scene loads, so that its slow frames do
+	 * not lower the quality.
 	 *
 	 * @param {number} time - The time in milliseconds.
 	 */
@@ -571,18 +604,6 @@ class RadianceCascadesAdaptiveQuality {
 
 		this._frameTimes.length = 0;
 		this._adaptAfter = performance.now() + time;
-
-	}
-
-	/**
-	 * Tells when the GPU finished the passes of a frame.
-	 *
-	 * @param {number} frame - The frame, as in `update()`.
-	 * @param {number} time - The time in milliseconds, of `performance.now()`.
-	 */
-	frameFinished( frame, time ) {
-
-		if ( this.enabled === true && this._fences.length < 1000 ) this._fences.push( [ frame, time ] );
 
 	}
 
