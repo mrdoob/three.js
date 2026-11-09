@@ -463,8 +463,8 @@ class WebGLTextureUtils {
 
 			} else if ( texture.isHTMLTexture && typeof gl.texElementSubImage2D === 'function' ) {
 
-				// Chrome 154+: storage is allocated in updateTexture() once the size of the
-				// element snapshot is known. It must stay mutable since that size can change.
+				// Storage is allocated in updateTexture() once the size of the element
+				// snapshot is known. It must stay mutable since that size can change.
 
 			} else if ( ! texture.isVideoTexture ) {
 
@@ -703,15 +703,17 @@ class WebGLTextureUtils {
 
 			if ( typeof gl.texElementSubImage2D === 'function' ) {
 
-				// Chrome 154+: copy into a texture allocated with the size of the element snapshot.
+				// The snapshot is copied into an existing texture, so the texture has to be
+				// allocated first with the default size of the element snapshot.
 
 				const canvas = gl.canvas;
+				const element = options.image;
 
-				let elementImage;
+				let size;
 
 				try {
 
-					elementImage = canvas.captureElementImage( options.image );
+					size = canvas.getElementImageDefaultSize( element );
 
 				} catch ( e ) {
 
@@ -726,10 +728,6 @@ class WebGLTextureUtils {
 					return;
 
 				}
-
-				// TODO: Remove the ElementImage fallback once Chrome 157.0.8094.0+ is the baseline.
-				// Chrome 157.0.8094.0+ moved the default size from ElementImage to the canvas.
-				const size = typeof canvas.getElementImageDefaultSize === 'function' ? canvas.getElementImageDefaultSize( elementImage ) : elementImage;
 
 				// Default sizes are fractional, whereas the copy is rounded up.
 				const elementWidth = Math.ceil( size.width );
@@ -753,24 +751,7 @@ class WebGLTextureUtils {
 
 				// Always pass the destination size. It forces the copy to exactly fill the
 				// allocated texture, independently of how the canvas is sized.
-				gl.texElementSubImage2D( gl.TEXTURE_2D, 0, 0, 0, elementImage, { width: elementWidth, height: elementHeight } );
-				elementImage.close();
-
-			} else if ( typeof gl.texElementImage2D === 'function' ) {
-
-				if ( gl.texElementImage2D.length === 3 ) {
-
-					// Chrome 150+
-
-					gl.texElementImage2D( gl.TEXTURE_2D, gl.RGBA8, options.image );
-
-				} else {
-
-					// Chrome 138 - 149
-
-					gl.texElementImage2D( gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, options.image );
-
-				}
+				gl.texElementSubImage2D( gl.TEXTURE_2D, 0, 0, 0, element, { width: elementWidth, height: elementHeight } );
 
 			}
 
