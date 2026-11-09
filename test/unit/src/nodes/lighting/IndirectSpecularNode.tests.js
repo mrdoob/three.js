@@ -1,6 +1,6 @@
-import { DataTexture, PlaneGeometry, EquirectangularReflectionMapping, Mesh, MeshStandardNodeMaterial, NodeMaterial, OrthographicCamera, QuadMesh, RenderTarget, Scene, SphereGeometry } from 'three/webgpu';
-import { context, indirectSpecular, pass, sample, uniform, vec2, vec3, vec4 } from 'three/tsl';
-import { temporalDenoise } from '../../../../../examples/jsm/tsl/display/DenoiseNode.js';
+import { DataTexture, DataUtils, FloatType, HalfFloatType, PlaneGeometry, EquirectangularReflectionMapping, Mesh, MeshStandardNodeMaterial, NodeMaterial, OrthographicCamera, QuadMesh, RenderTarget, Scene, SphereGeometry } from 'three/webgpu';
+import { context, indirectSpecular, pass, sample, texture, uniform, vec2, vec3, vec4 } from 'three/tsl';
+import { denoise, temporalDenoise } from '../../../../../examples/jsm/tsl/display/DenoiseNode.js';
 import { getSharedRenderer } from '../tsl/gpu-test-utils.js';
 
 export default QUnit.module( 'Nodes', () => {
@@ -173,6 +173,96 @@ export default QUnit.module( 'Nodes', () => {
 						source.dispose();
 						geometry.dispose();
 						sourceMaterial.dispose();
+
+					}
+
+				} );
+
+				QUnit.test( `geometry-only coverage preserves radiance (${ backend })`, async assert => {
+
+					const renderer = await getSharedRenderer( backend );
+					if ( renderer === null ) {
+
+						assert.ok( true, `SKIPPED: ${ backend } unavailable.` );
+						return;
+
+					}
+
+					const data = new Float32Array( [ 0, 0, 0, 0, 0.2, 0, 0, 1, 0, 0.4, 0, 1 ] );
+					const input = new DataTexture( data, 3, 1 );
+					input.type = FloatType;
+					input.needsUpdate = true;
+					const depth = new DataTexture( new Float32Array( [ 0.5, 0, 0, 1, 0.5, 0, 0, 1, 0.5, 0, 0, 1 ] ), 3, 1 );
+					depth.type = FloatType;
+					depth.needsUpdate = true;
+					const target = new RenderTarget( 1, 1, { type: HalfFloatType, depthBuffer: false } );
+					const previousTarget = renderer.getRenderTarget();
+					const material = new NodeMaterial();
+					const quad = new QuadMesh( material );
+					const camera = new OrthographicCamera( - 1, 1, 1, - 1, 0.1, 10 );
+
+					try {
+
+						for ( const quality of [ 'fast', 'quality' ] ) {
+
+							const filter = denoise( texture( input ), { camera, depth: texture( depth ), normal: sample( () => vec3( 0, 0, 1 ) ), coverage: true, quality } );
+							filter.iterations = 1;
+							material.colorNode = filter;
+							material.needsUpdate = true;
+
+							async function read() {
+
+								renderer._nodes.nodeFrame.update();
+								renderer.setRenderTarget( target );
+								quad.render( renderer );
+								const pixel = await renderer.readRenderTargetPixelsAsync( filter._getOutput(), 1, 0, 1, 1 );
+								return Array.from( pixel, DataUtils.fromHalfFloat );
+
+							}
+
+							try {
+
+								const shared = await read();
+								filter.geometryOnlyCoverage.value = true;
+								const separate = await read();
+								for ( let channel = 0; channel < 3; channel ++ ) assert.strictEqual( separate[ channel ], shared[ channel ], `${ quality }: changing coverage leaves incoming radiance identical.` );
+								const expected = quality === 'fast' ? 2 / 3 : 0.75;
+								assert.true( Math.abs( separate[ 3 ] - expected ) < 0.002, `${ quality }: coverage ${ separate[ 3 ] } should equal ${ expected }.` );
+								data[ 4 ] *= 10;
+								data[ 9 ] *= 0.1;
+								input.needsUpdate = true;
+								const changedLighting = await read();
+								assert.strictEqual( changedLighting[ 3 ], separate[ 3 ], `${ quality }: lighting changes do not change geometry-only spatial coverage.` );
+								filter.compactCoverage.value = true;
+								filter.iterations = 2;
+								const compact = await read();
+								const gaussian = Math.exp( - 0.5 );
+								const compactExpected = quality === 'fast' ? ( 1 + gaussian ) / ( 1 + 2 * gaussian ) : ( 2 + gaussian ) / ( 2 + 2 * gaussian );
+								assert.true( Math.abs( compact[ 3 ] - compactExpected ) < 0.002, `${ quality }: compact coverage retains the first Gaussian pass.` );
+								const savedCenter = data.slice( 4, 8 );
+								data.fill( 0, 4, 8 );
+								input.needsUpdate = true;
+								filter.luminancePhi.value = 0;
+								const unsupported = await read();
+								assert.strictEqual( unsupported[ 3 ], 0, `${ quality }: no radiance support leaves coverage for the environment fallback.` );
+								data.set( savedCenter, 4 );
+								input.needsUpdate = true;
+
+							} finally {
+
+								filter.dispose();
+
+							}
+
+						}
+
+					} finally {
+
+						renderer.setRenderTarget( previousTarget );
+						material.dispose();
+						target.dispose();
+						input.dispose();
+						depth.dispose();
 
 					}
 

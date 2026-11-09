@@ -74,6 +74,8 @@
 			denoise: true,
 			maxFrames: 16,
 			luminancePhi: 3,
+			geometryOnlyCoverage: false,
+			compactCoverage: false,
 			maxRoughness: 0.8,
 			mirrorBias: 0,
 			stepExponent: 2,
@@ -410,6 +412,8 @@
 				denoiseEnabled.value = Number( value );
 
 			} );
+			denoiseFolder.add( params, 'geometryOnlyCoverage' ).name( 'Geometry-only coverage' ).onChange( updateParameters );
+			denoiseFolder.add( params, 'compactCoverage' ).name( 'Compact coverage filter' ).onChange( updateParameters );
 			denoiseFolder.add( params, 'luminancePhi', 0.5, 8 ).name( 'Noise tolerance' ).onChange( updateParameters );
 			denoiseFolder.add( params, 'maxFrames', 1, 128, 1 ).name( 'Max frames' ).onChange( updateParameters );
 
@@ -453,6 +457,8 @@
 			maxRoughness.value = params.maxRoughness;
 			ssrDenoise.maxFrames.value = params.maxFrames;
 			ssrDenoise.luminancePhi.value = params.luminancePhi;
+			ssrDenoise.geometryOnlyCoverage.value = params.geometryOnlyCoverage;
+			ssrDenoise.compactCoverage.value = params.compactCoverage;
 			ssrPass.maxDistance.value = params.maxDistance;
 			ssrStrength.value = params.intensity;
 			ssrPass.thickness.value = params.thickness;
