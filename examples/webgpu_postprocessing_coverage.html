@@ -49,7 +49,7 @@
 			const status = document.getElementById( 'status' );
 			const search = new URLSearchParams( location.search );
 			const params = {
-				output: 'Beauty', ssr: true, probes: true, diffuseGI: true, helpers: false,
+				output: 'Beauty', ssr: true, probes: true, diffuseGI: true, environmentMap: true, helpers: false,
 				exposure: 1.5, environment: 0.25, effectScale: 0.5,
 				resolution: Number( search.get( 'resolution' ) ) === 2048 ? 2048 : 1024,
 				samples: [ 32, 64, 128 ].includes( Number( search.get( 'samples' ) ) ) ? Number( search.get( 'samples' ) ) : 64,
@@ -63,6 +63,7 @@
 			const ssrEnabled = uniform( 1 );
 			const probesEnabled = uniform( 1 );
 			const giEnabled = uniform( 1 );
+			const environmentEnabled = uniform( 1 );
 			const environmentIntensity = uniform( params.environment );
 			const bakeMeshes = [];
 			const materials = new Set();
@@ -103,7 +104,14 @@
 				scene.backgroundIntensity = params.environment;
 				// The light map already includes the sky's diffuse irradiance. Supply the
 				// environment through the specular chain only, avoiding a second diffuse sky.
-				const environmentProvider = environmentSpecular( pmremTexture( environment ), environmentIntensity );
+				const sampleEnvironment = environmentSpecular( pmremTexture( environment ), environmentIntensity );
+				const environmentProvider = query => {
+
+					const value = sampleEnvironment( query );
+					return vec4( value.rgb, value.a.mul( environmentEnabled ) );
+
+				};
+
 				renderer.contextNode = context( { indirectSpecularNode: indirectSpecular( [ environmentProvider ] ) } );
 
 				const model = gltf.scene;
@@ -209,7 +217,11 @@
 					status.textContent = 'Capturing three reflection probes from the baked GI…';
 					// SSR is not installed yet. Capture the denoised GI, emission and environment.
 					const previousGI = giEnabled.value;
+					const previousEnvironment = environmentEnabled.value;
+					const previousBackground = scene.backgroundIntensity;
 					giEnabled.value = 1;
+					environmentEnabled.value = 1;
+					scene.backgroundIntensity = params.environment;
 					try {
 
 						probes.bake( renderer, scene, { resolution: params.probeResolution, near: 0.05, far: 100 } );
@@ -217,6 +229,8 @@
 					} finally {
 
 						giEnabled.value = previousGI;
+						environmentEnabled.value = previousEnvironment;
+						scene.backgroundIntensity = previousBackground;
 
 					}
 
@@ -332,7 +346,7 @@
 					const probe = probeSample.sample( coordinate );
 					const hit = filtered.sample( coordinate );
 					const ssrCoverage = hit.a.mul( ssrEnabled );
-					const weights = vec3( ssrCoverage, ssrCoverage.oneMinus().mul( probe.a ), ssrCoverage.oneMinus().mul( probe.a.oneMinus() ) );
+					const weights = vec3( ssrCoverage, ssrCoverage.oneMinus().mul( probe.a ), ssrCoverage.oneMinus().mul( probe.a.oneMinus() ).mul( environmentEnabled ) );
 					return vec4( weights, isBackgroundDepth( depth.sample( coordinate ).r ).not() );
 
 				} )() );
@@ -362,15 +376,22 @@
 					resetHistory();
 
 				} );
-				gui.add( params, 'probes' ).name( 'Local probes' ).onChange( value => {
+				gui.add( params, 'probes' ).name( 'Reflection probes' ).onChange( value => {
 
 					probesEnabled.value = Number( value );
 					resetHistory();
 
 				} );
-				gui.add( params, 'diffuseGI' ).name( 'Diffuse GI' ).onChange( value => {
+				gui.add( params, 'diffuseGI' ).name( 'Baked Diffuse GI' ).onChange( value => {
 
 					giEnabled.value = Number( value );
+					resetHistory();
+
+				} );
+				gui.add( params, 'environmentMap' ).name( 'Environment map' ).onChange( value => {
+
+					environmentEnabled.value = Number( value );
+					scene.backgroundIntensity = value ? params.environment : 0;
 					resetHistory();
 
 				} );
