@@ -10,7 +10,7 @@
 		<div id="info">
 			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
 			<div class="title-wrapper"><a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Coverage Lighting</span></div>
-			<small>Ray radiosity GI · SSR → three reflection probes → environment.<br />
+			<small>Ray radiosity GI · SSR → 3 Refl. probes → environment.<br />
 				<a href="https://sketchfab.com/3d-models/space-ship-hallway-e97dce00ae5549a8a3795e06bc2cfc96" target="_blank" rel="noopener">Space Ship Hallway</a> by <a href="https://sketchfab.com/yeeyeeman" target="_blank" rel="noopener">yeeyeeman</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>.<br />
 				<span id="status">Loading corridor…</span>
 			</small>
@@ -214,7 +214,7 @@
 
 					}
 
-					status.textContent = 'Capturing three reflection probes from the baked GI…';
+					status.textContent = 'Capturing 3 Refl. probes from the baked GI…';
 					// SSR is not installed yet. Capture the denoised GI, emission and environment.
 					const previousGI = giEnabled.value;
 					const previousEnvironment = environmentEnabled.value;
@@ -346,9 +346,9 @@
 					Beauty: traaPass,
 					'SSR Radiance': vec4( filtered.sample( screenUV ).rgb.mul( filtered.sample( screenUV ).a ), 1 ),
 					'SSR Coverage': vec4( vec3( filtered.sample( screenUV ).a.mul( ssrEnabled ) ), 1 ),
-					'Reflection Probes Radiance': vec4( probeSample.sample( screenUV ).rgb.mul( probeSample.sample( screenUV ).a ), 1 ),
-					'Reflection Probes Coverage': vec4( vec3( probeSample.sample( screenUV ).a ), 1 ),
-					'Coverage Combined Radiance': sample( coordinate => resolved.sample( screenQuery( coordinate ) ) ),
+					'Refl. probes Radiance': vec4( probeSample.sample( screenUV ).rgb.mul( probeSample.sample( screenUV ).a ), 1 ),
+					'Refl. probes Coverage': vec4( vec3( probeSample.sample( screenUV ).a ), 1 ),
+					'Resolved Radiance': sample( coordinate => resolved.sample( screenQuery( coordinate ) ) ),
 					'Baked GI + emission': giOnly,
 					'Light-map atlas': texture( lightMapDenoise.getTexture(), screenUV )
 				};
@@ -360,14 +360,14 @@
 			function createGUI() {
 
 				const gui = renderer.inspector.createParameters( 'Coverage lighting' );
-				gui.add( params, 'output', [ 'Beauty', 'SSR Radiance', 'SSR Coverage', 'Reflection Probes Radiance', 'Reflection Probes Coverage', 'Coverage Combined Radiance', 'Baked GI + emission', 'Light-map atlas' ] ).name( 'Output' ).onChange( updateOutput );
+				gui.add( params, 'output', [ 'Beauty', 'SSR Radiance', 'SSR Coverage', 'Refl. probes Radiance', 'Refl. probes Coverage', 'Resolved Radiance', 'Baked GI + emission', 'Light-map atlas' ] ).name( 'Output' ).onChange( updateOutput );
 				gui.add( params, 'ssr' ).name( 'SSR' ).onChange( value => {
 
 					ssrEnabled.value = Number( value );
 					resetHistory();
 
 				} );
-				gui.add( params, 'probes' ).name( 'Reflection probes' ).onChange( value => {
+				gui.add( params, 'probes' ).name( 'Refl. probes' ).onChange( value => {
 
 					probesEnabled.value = Number( value );
 					resetHistory();
@@ -409,7 +409,7 @@
 			function updateOutput() {
 
 				if ( ! pipeline ) return;
-				pipeline.outputColorTransform = ! [ 'SSR Coverage', 'Reflection Probes Coverage' ].includes( params.output );
+				pipeline.outputColorTransform = ! [ 'SSR Coverage', 'Refl. probes Coverage' ].includes( params.output );
 				pipeline.outputNode = views[ params.output ];
 				pipeline.needsUpdate = true;
 				resetHistory();
