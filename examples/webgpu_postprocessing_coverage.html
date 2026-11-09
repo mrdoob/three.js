@@ -28,7 +28,7 @@
 		</script>
 		<script type="module">
 			import * as THREE from 'three/webgpu';
-			import { Fn, context, diffuseColor, environmentSpecular, getViewPosition, indirectSpecular, isBackgroundDepth, metalness, mrt, normalView, output, roughness as materialRoughness, packNormalToRGB, pass, pmremTexture, sample, screenUV, texture, uniform, unpackRGBToNormal, vec3, vec4, velocity } from 'three/tsl';
+			import { Fn, context, diffuseColor, environmentSpecular, getViewPosition, indirectSpecular, metalness, mrt, normalView, output, roughness as materialRoughness, packNormalToRGB, pass, pmremTexture, sample, screenUV, texture, uniform, unpackRGBToNormal, vec3, vec4, velocity } from 'three/tsl';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
@@ -239,7 +239,7 @@
 					scene.add( helper );
 					buildPipeline( environmentProvider );
 					bakeComplete = true;
-					status.textContent = `Ready · ${ atlas.resolution }² atlas · ${ params.samples * radiosity.rays } rays/texel · 3 probes. Fallback weights: red SSR, green probes, blue environment.`;
+					status.textContent = `Ready · ${ atlas.resolution }² atlas · ${ params.samples * radiosity.rays } rays/texel · 3 probes.`;
 
 				}
 
@@ -341,23 +341,14 @@
 				};
 
 				const probeSample = sample( coordinate => local( screenQuery( coordinate ) ) );
-				const debug = sample( coordinate => Fn( () => {
 
-					const probe = probeSample.sample( coordinate );
-					const hit = filtered.sample( coordinate );
-					const ssrCoverage = hit.a.mul( ssrEnabled );
-					const weights = vec3( ssrCoverage, ssrCoverage.oneMinus().mul( probe.a ), ssrCoverage.oneMinus().mul( probe.a.oneMinus() ).mul( environmentEnabled ) );
-					return vec4( weights, isBackgroundDepth( depth.sample( coordinate ).r ).not() );
-
-				} )() );
 				views = {
 					Beauty: traaPass,
-					'Fallback weights': debug,
-					'SSR coverage': vec4( vec3( filtered.sample( screenUV ).a.mul( ssrEnabled ) ), 1 ),
-					'Probe coverage': vec4( vec3( probeSample.sample( screenUV ).a ), 1 ),
-					'Probe radiance': vec4( probeSample.sample( screenUV ).rgb.mul( probeSample.sample( screenUV ).a ), 1 ),
-					'Resolved specular': sample( coordinate => resolved.sample( screenQuery( coordinate ) ) ),
-					'SSR radiance': vec4( filtered.sample( screenUV ).rgb.mul( filtered.sample( screenUV ).a ), 1 ),
+					'SSR Radiance': vec4( filtered.sample( screenUV ).rgb.mul( filtered.sample( screenUV ).a ), 1 ),
+					'SSR Coverage': vec4( vec3( filtered.sample( screenUV ).a.mul( ssrEnabled ) ), 1 ),
+					'Reflection Probes Radiance': vec4( probeSample.sample( screenUV ).rgb.mul( probeSample.sample( screenUV ).a ), 1 ),
+					'Reflection Probes Coverage': vec4( vec3( probeSample.sample( screenUV ).a ), 1 ),
+					'Coverage Combined Radiance': sample( coordinate => resolved.sample( screenQuery( coordinate ) ) ),
 					'Baked GI + emission': giOnly,
 					'Light-map atlas': texture( lightMapDenoise.getTexture(), screenUV )
 				};
@@ -369,7 +360,7 @@
 			function createGUI() {
 
 				const gui = renderer.inspector.createParameters( 'Coverage lighting' );
-				gui.add( params, 'output', [ 'Beauty', 'Fallback weights', 'SSR coverage', 'Probe coverage', 'Probe radiance', 'Resolved specular', 'SSR radiance', 'Baked GI + emission', 'Light-map atlas' ] ).name( 'Output' ).onChange( updateOutput );
+				gui.add( params, 'output', [ 'Beauty', 'SSR Radiance', 'SSR Coverage', 'Reflection Probes Radiance', 'Reflection Probes Coverage', 'Coverage Combined Radiance', 'Baked GI + emission', 'Light-map atlas' ] ).name( 'Output' ).onChange( updateOutput );
 				gui.add( params, 'ssr' ).name( 'SSR' ).onChange( value => {
 
 					ssrEnabled.value = Number( value );
@@ -418,7 +409,7 @@
 			function updateOutput() {
 
 				if ( ! pipeline ) return;
-				pipeline.outputColorTransform = ! [ 'Fallback weights', 'SSR coverage', 'Probe coverage' ].includes( params.output );
+				pipeline.outputColorTransform = ! [ 'SSR Coverage', 'Reflection Probes Coverage' ].includes( params.output );
 				pipeline.outputNode = views[ params.output ];
 				pipeline.needsUpdate = true;
 				resetHistory();
