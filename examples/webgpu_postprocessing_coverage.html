@@ -28,7 +28,7 @@
 		</script>
 		<script type="module">
 			import * as THREE from 'three/webgpu';
-			import { Fn, cameraWorldMatrix, context, diffuseColor, environmentSpecular, getViewPosition, indirectSpecular, isBackgroundDepth, metalness, mrt, normalView, output, roughness as materialRoughness, packNormalToRGB, pass, pmremTexture, sample, screenUV, texture, uniform, unpackRGBToNormal, vec3, vec4, velocity } from 'three/tsl';
+			import { Fn, context, diffuseColor, environmentSpecular, getViewPosition, indirectSpecular, isBackgroundDepth, metalness, mrt, normalView, output, roughness as materialRoughness, packNormalToRGB, pass, pmremTexture, sample, screenUV, texture, uniform, unpackRGBToNormal, vec3, vec4, velocity } from 'three/tsl';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
@@ -301,7 +301,7 @@
 				const screenReflection = ( { normal, direction, viewDirection, roughness } ) => Fn( () => {
 
 					// One traced lobe belongs to the base material. Other lobes keep the local/env fallback.
-					const baseNormal = normals.sample( screenUV ).transformDirection( cameraWorldMatrix );
+					const baseNormal = normals.sample( screenUV ).transformDirection( uniform( camera.matrixWorld ) );
 					const baseRoughness = normalRoughness.sample( screenUV ).a;
 					const baseDirection = baseRoughness.pow4().mix( viewDirection.negate().reflect( baseNormal ), baseNormal ).normalize();
 					const matches = roughness.sub( baseRoughness ).abs().lessThan( 0.01 ).and( normal.dot( baseNormal ).greaterThan( 0.999 ) ).and( direction.dot( baseDirection ).greaterThan( 0.999 ) );
