@@ -6,6 +6,7 @@ const MAX_LEVELS = 16;
 
 /**
  * Builds a farthest-depth hierarchy with successive WebGPU reductions.
+ * Requires the WebGPU backend.
  *
  * Levels are stored vertically in an RG32F atlas, with floor-halved dimensions.
  * The last cell includes the odd trailing row/column (a 3x2, 2x3 or 3x3
@@ -18,7 +19,8 @@ const MAX_LEVELS = 16;
  * boundaries provide portable synchronization; source reads scale linearly with the input pixel count.
  * Separate intermediate textures avoid sampling the atlas while writing to it.
  * The atlas height is less than twice the input height and must fit the
- * device's maximum 2D texture dimension.
+ * device's maximum 2D texture dimension. Input dimensions must be positive integers
+ * producing at most 16 levels.
  *
  * ```js
  * const pyramid = hiZ( scenePass.getTextureNode( 'depth' ) );
@@ -45,8 +47,6 @@ class HiZNode extends Node {
 	constructor( depthNode, { reversedDepth } = {} ) {
 
 		super( 'float' );
-
-		if ( depthNode.isTextureNode !== true ) throw new Error( 'HiZNode: A raw depth TextureNode is required.' );
 
 		this.depthNode = depthNode;
 		this.reversedDepth = reversedDepth;
@@ -110,8 +110,8 @@ class HiZNode extends Node {
 	getDepthRangeNode( level, uvNode ) {
 
 		const layout = this._layout.element( uint( level ).min( this._lastLevel ) );
-		// Map original-image UVs to the exact reduction footprint. Scaling by
-		// level dimensions instead would shift cell boundaries at odd sizes.
+		// Preserve reduction footprints at odd image sizes.
+
 		const size = this._layout.element( uint( 0 ) ).xy;
 		const coord = ivec2( uvNode.mul( size ).div( layout.w ).floor().clamp( 0, layout.xy.sub( 1 ) ) );
 		return textureLoad( this._textureNode, coord.add( ivec2( 0, layout.z ) ) ).rg;
@@ -148,16 +148,10 @@ class HiZNode extends Node {
 	/**
 	 * Updates the hierarchy layout. Called automatically from the input size.
 	 *
-	 * @param {number} width - Input width in pixels.
-	 * @param {number} height - Input height in pixels.
+	 * @param {number} width - Positive integer input width in pixels.
+	 * @param {number} height - Positive integer input height in pixels.
 	 */
 	setSize( width, height ) {
-
-		if ( ! Number.isInteger( width ) || ! Number.isInteger( height ) || width < 1 || height < 1 ) {
-
-			throw new Error( 'HiZNode: Depth dimensions must be positive integers.' );
-
-		}
 
 		if ( width === this._width && height === this._height ) return;
 
@@ -175,8 +169,6 @@ class HiZNode extends Node {
 			height = Math.max( 1, Math.floor( height / 2 ) );
 
 		}
-
-		if ( this.levels.length > MAX_LEVELS ) throw new Error( 'HiZNode: Too many hierarchy levels.' );
 
 		for ( let i = 0; i < MAX_LEVELS; i ++ ) {
 
@@ -208,9 +200,8 @@ class HiZNode extends Node {
 		const reduce = ( a, b ) => vec2( reversed ? min( a.x, b.x ) : max( a.x, b.x ), reversed ? max( a.y, b.y ) : min( a.y, b.y ) );
 		this._computeNode = [];
 
-		// Three local reductions share workgroup memory. Dispatch boundaries
-		// synchronize successive tiles; no cross-workgroup spin waits or atomics
-		// are needed. Odd trailing footprints retain the original floor layout.
+		// Dispatch boundaries synchronize tiles after three local reductions.
+
 		let source = this.depthNode;
 		if ( this.levels.length === 1 ) {
 
@@ -311,12 +302,9 @@ class HiZNode extends Node {
 	updateBefore( { renderer } ) {
 
 		if ( this.enabled === false ) return;
-		if ( renderer.backend.isWebGPUBackend !== true ) throw new Error( 'HiZNode: A WebGPU backend is required.' );
 
 		const image = this.depthNode.value.image;
 		this.setSize( image.width, image.height );
-		const limit = renderer.backend.device.limits.maxTextureDimension2D;
-		if ( this.texture.image.width > limit || this.texture.image.height > limit ) throw new Error( 'HiZNode: Depth atlas exceeds maxTextureDimension2D.' );
 
 		const reversed = this.reversedDepth ?? renderer.reversedDepthBuffer;
 		if ( reversed !== this._reversed ) {

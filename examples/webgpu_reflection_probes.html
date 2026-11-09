@@ -387,8 +387,8 @@
 
 			function updateDynamicObject( time ) {
 
-				// A figure eight around both room centers, crossing x=0 at the doorway.
-				// Stay above the table objects and inside the rows of columns at z=+/-2.5.
+				// Cross the doorway along a figure eight above the tables.
+
 				const phase = time * 0.35;
 				dynamicObject.position.set( 5.6 * Math.sin( phase ), 2.5, 1.4 * Math.sin( 2 * phase ) );
 				dynamicObject.rotation.y = Math.atan2( 5.6 * Math.cos( phase ), 2.8 * Math.cos( 2 * phase ) );

@@ -65,7 +65,6 @@
 			init().catch( error => {
 
 				status.textContent = error.message;
-				console.error( error );
 
 			} );
 
@@ -79,7 +78,6 @@
 				renderer.toneMappingExposure = params.exposure;
 				document.body.appendChild( renderer.domElement );
 				await renderer.init();
-				if ( renderer.backend.isWebGPUBackend !== true ) throw new Error( 'This example requires WebGPU for ray radiosity and reflection probe cube arrays.' );
 
 				scene = new THREE.Scene();
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.05, 100 );
@@ -93,8 +91,8 @@
 				environment.mapping = THREE.EquirectangularReflectionMapping;
 				scene.background = environment;
 				scene.backgroundIntensity = params.environment;
-				// The light map already includes the sky's diffuse irradiance. Supply the
-				// environment through the specular chain only, avoiding a second diffuse sky.
+				// Diffuse sky irradiance is already baked into the light map.
+
 				const environmentProvider = environmentSpecular( pmremTexture( environment ), environmentIntensity );
 				renderer.contextNode = context( { indirectSpecularNode: indirectSpecular( [ environmentProvider ] ) } );
 
@@ -109,8 +107,8 @@
 					object.material = material;
 					if ( material.transparent ) {
 
-						// The authored almost-transparent glass cannot be modeled by the opaque
-						// radiosity solver. Keep it in raster rendering, outside the bake BVH/atlas.
+						// Exclude glass from the opaque radiosity bake.
+
 						transparent.push( object );
 
 					} else {
@@ -130,7 +128,6 @@
 				camera.position.set( center.x, eye, bounds.max.z - size.z * 0.08 );
 				controls.target.set( center.x, eye, bounds.min.z + size.z * 0.08 );
 				controls.update();
-				controls.saveState();
 				window.addEventListener( 'resize', onWindowResize );
 
 				status.textContent = 'Unwrapping the corridor into a light-map atlas…';
@@ -143,7 +140,6 @@
 
 				} );
 				const atlas = unwrapUVs( model, { resolution: LIGHT_MAP_SIZE, padding: 3 } );
-				if ( atlas === null ) throw new Error( 'Unable to generate the corridor light-map atlas.' );
 				for ( const geometry of oldGeometries ) geometry.dispose();
 
 				status.textContent = 'Building the ray radiosity bounce cache…';
@@ -179,9 +175,9 @@
 				}
 
 				scene.add( probes );
-				// World-space influence volumes overlap and fade; projection boxes remain the
-				// full corridor. The fades leave genuine residual coverage for the environment.
-				createGUI();
+				// Fade overlapping probe volumes toward the environment fallback.
+
+				createParameters();
 				renderer.setAnimationLoop( animate );
 
 				function finishBake() {
@@ -318,7 +314,7 @@
 
 			}
 
-			function createGUI() {
+			function createParameters() {
 
 				const gui = renderer.inspector.createParameters( 'Coverage lighting' );
 				gui.add( params, 'output', [ 'Beauty', 'SSR Radiance', 'SSR Coverage', 'Refl. probes Radiance', 'Refl. probes Coverage', 'Resolved Radiance' ] ).name( 'Output' ).onChange( updateOutput );

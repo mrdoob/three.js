@@ -194,8 +194,8 @@ class ReprojectedRadianceNode extends Node {
 
 	setup() {
 
-		// runs before callbacks registered later, e.g. TRAA clearing its jitter, so the
-		// captured projection matches the depth that was rendered
+		// Capture the projection before TRAA clears its jitter.
+
 		OnAfterRenderPipeline( () => this._capture() );
 
 		return this.beautyNode;

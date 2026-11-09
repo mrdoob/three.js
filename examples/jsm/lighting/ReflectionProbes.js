@@ -190,7 +190,7 @@ class ReflectionProbes extends Object3D {
 	 * Captures the scene at each local probe into the cube array. Hide helpers
 	 * and objects that should not appear in reflections first.
 	 *
-	 * @param {WebGPURenderer} renderer - The renderer.
+	 * @param {WebGPURenderer} renderer - The renderer, using the WebGPU backend.
 	 * @param {Scene} scene - The scene to capture.
 	 * @param {Object} [options] - Bake options.
 	 * @param {number} [options.resolution=256] - Cube face size, rounded down to a power of two and at least 256.
@@ -198,9 +198,6 @@ class ReflectionProbes extends Object3D {
 	 * @param {number} [options.far=100] - Far plane of the capture camera.
 	 */
 	bake( renderer, scene, options = {} ) {
-
-		// cube arrays can't be emulated on WebGL 2
-		if ( renderer.backend.isWebGPUBackend !== true ) throw new Error( 'ReflectionProbes: .bake() requires the WebGPU backend.' );
 
 		const { near = 0.1, far = 100 } = options;
 
@@ -220,8 +217,8 @@ class ReflectionProbes extends Object3D {
 
 		const maxLod = Math.log2( resolution ) - 3;
 
-		// RenderTarget.depth allocates physical face layers. The CubeArrayTexture
-		// exposes the logical cube count through texture.depth.
+		// Allocate six face layers per cubemap.
+
 		const renderTarget = new RenderTarget( resolution, resolution, {
 			depth: probes.length * 6,
 			type: HalfFloatType,

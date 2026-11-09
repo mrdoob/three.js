@@ -75,14 +75,6 @@ class SSRNode extends Node {
 			hitReactiveNode = null
 		} = options;
 
-		if ( outputCoverage && ( ! stochastic || environmentNode !== null ) ) {
-
-			throw new Error( 'SSRNode: Coverage output requires stochastic tracing and an external environment fallback.' );
-
-		}
-
-		if ( traceMaskNode !== null && ! outputCoverage ) throw new Error( 'SSRNode: A trace mask requires coverage output.' );
-
 		let camera = options.camera ?? null;
 
 		/** @type {?Node<bool>} Per-texel eligibility, evaluated before sampling or marching. */
@@ -148,7 +140,6 @@ class SSRNode extends Node {
 		this.hiZ = options.hiZ ?? null;
 		this._hiZEnabled = this.hiZ !== null;
 		this._hiZTraversal = options.hiZTraversal ?? 'conservative';
-		if ( ! [ 'conservative', 'adaptive' ].includes( this._hiZTraversal ) ) throw new Error( 'SSRNode: Invalid hiZTraversal.' );
 		/** Minimum adaptive leaf mip. Larger values trade thin-detail accuracy for speed. @type {UniformNode<int>} */
 		this.hiZMinMip = uniform( 0, 'int' );
 		/** Adaptive iteration budget at quality one, clamped to 8..512. @type {UniformNode<float>} */
@@ -593,7 +584,6 @@ class SSRNode extends Node {
 
 	set hiZTraversal( value ) {
 
-		if ( ! [ 'conservative', 'adaptive' ].includes( value ) ) throw new Error( 'SSRNode: Invalid hiZTraversal.' );
 		if ( value !== this._hiZTraversal ) {
 
 			this._hiZTraversal = value;
@@ -816,8 +806,6 @@ class SSRNode extends Node {
 	 */
 	getHitNode() {
 
-		if ( ! this.outputCoverage ) throw new Error( 'SSRNode: Hit metadata requires coverage output.' );
-
 		return this._hitTextureNode ??= passTexture( this, this._ssrRenderTarget.textures[ 1 ] );
 
 	}
@@ -1009,19 +997,15 @@ class SSRNode extends Node {
 
 		}, { point: 'vec3', planePoint: 'vec3', planeNormal: 'vec3', return: 'float' } );
 
-
 		const sampleDepth = ( uv ) => projectionDepth( this.depthNode.sample( uv ).r, this._cameraNear, this._cameraFar );
 
 		const hierarchicalDepth = this.hiZ;
-		// A batch is skipped only if every original sample lies in front of the
-		// nearest surface bound. Keep the original sample schedule and all leaf
-		// acceptance/refinement rules, so this optimization cannot add/move hits.
+		// Skip batches entirely in front of the nearest surface.
+
 		const canSkipBatch = ( uvStart, uvEnd, rayNearZ, level ) => {
 
-			// Raw depth is monotonic. Reduce four bounds before linearizing so
-			// only the winning depth needs the perspective/logarithmic conversion.
-			// The padded rectangle spans at most one cell per axis at this level;
-			// its four corners cover every touched cell, including odd footprints.
+			// Reduce the four corner bounds before linearizing depth.
+
 			const nearest = coord => hierarchicalDepth.getNearestDepthNode( level, coord );
 			const reduce = builder.renderer.reversedDepthBuffer === true ? max : min;
 			const depth = reduce( reduce( nearest( uvStart ), nearest( uvEnd ) ), reduce(
@@ -1341,9 +1325,8 @@ class SSRNode extends Node {
 			const previousInFront = bool( true ).toVar();
 			const canRefine = bool( false ).toVar();
 
-			// Adaptive traversal operates in the projected ray parameter, independent
-			// of the legacy sample schedule. An XY crossing enters a new hierarchy cell;
-			// a depth crossing descends toward a leaf. Tiny offsets apply only to XY.
+			// XY crossings enter adjacent cells; depth crossings descend toward leaves.
+
 			const marchS = adaptive ? rayLen.reciprocal().toVar() : null;
 			const mip = adaptive ? this.hiZMinMip.max( 0 ).min( int( hierarchicalDepth.getLastLevelNode() ) ).toVar() : null;
 			const minMip = adaptive ? mip.toConst() : null;
@@ -1394,9 +1377,8 @@ class SSRNode extends Node {
 				const uvS = xy.mul( invResolution ).toVar();
 				if ( this.hiZEnabled && ! adaptive && this.stepExponent > 0 ) {
 
-					// Check aligned batches, not every leaf. On a failed bound test
-					// the next samples use the unchanged linear path without further
-					// hierarchy overhead until the next batch boundary.
+					// Test aligned batches; failed bounds retain linear traversal.
+
 					If( i.sub( 1 ).mod( 16 ).equal( 0 ).and( i.add( 3 ).lessThan( totalStep ) ), () => {
 
 						const last = min( i.add( 15 ), totalStep.sub( 1 ) ).toVar();
@@ -1573,7 +1555,6 @@ class SSRNode extends Node {
 
 						Break();
 
-
 					} );
 
 				} );
@@ -1657,9 +1638,8 @@ class SSRNode extends Node {
 
 					if ( this.stochastic === true ) applyHitEdgeFade( reflectColor, uvS, hitBorderWidth );
 
-					// Standalone SSR applies its reflection weight; coverage output keeps incoming radiance.
-					// The mirror/blur path is a plain reflection, so reapply upstream's squared
-					// distance attenuation and grazing Fresnel here to match its falloff.
+					// Coverage output keeps incoming radiance; standalone SSR applies reflection weights.
+
 					let weightedColor = this.outputCoverage ? reflectColor.rgb : reflectColor.rgb.mul( finalSampleWeight );
 
 					if ( this.stochastic === false ) {
@@ -1713,7 +1693,6 @@ class SSRNode extends Node {
 			return output.max( 0 );
 
 		} );
-
 
 		this._ssrFn = ssr;
 		this._sharedContext = builder.getSharedContext();
