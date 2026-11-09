@@ -6,8 +6,10 @@ import { CubeReflectionMapping } from '../constants.js';
  * like the images of a {@link CubeTexture}. All faces must be square and have the same size.
  * Sample a cube with `cubeTexture( texture, direction ).depth( cubeIndex )`.
  *
- * Set `needsUpdate` after assigning loaded images. Like CubeTexture, explicit
+ * Set `needsUpdate` after all faces have loaded. Like CubeTexture, explicit
  * mipmaps are supplied as `{ images: cubemaps }` entries excluding the base level.
+ * Each mip level must contain the same cubes, with face dimensions halved per level.
+ * DataTexture faces must match the array type, format and color space.
  * Dispose the texture before changing its dimensions or number of cubes.
  *
  * Only supported by the WebGPU backend of {@link WebGPURenderer}.
@@ -31,6 +33,7 @@ class CubeArrayTexture extends Texture {
 	constructor( images = [], mapping = CubeReflectionMapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace ) {
 
 		super( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace );
+
 		/**
 		 * This flag can be used for type testing.
 		 * @type {boolean}
@@ -39,7 +42,6 @@ class CubeArrayTexture extends Texture {
 		 */
 		this.isCubeArrayTexture = true;
 		this.flipY = false;
-		this._validateImages();
 
 	}
 
@@ -52,59 +54,19 @@ class CubeArrayTexture extends Texture {
 
 	set images( value ) {
 
-		this._validateImages( value );
 		this.image = value;
 
 	}
 
 	/**
-	 * The number of cubemaps, not the number of GPU face layers. For a render target,
-	 * its generic `depth` still counts face layers; this property converts that allocation to cubes.
+	 * The number of cubemaps. Render-target allocation descriptors count face layers.
 	 *
 	 * @type {number}
 	 * @readonly
 	 */
 	get depth() {
 
-		return Array.isArray( this.image ) ? this.image.length : ( this.image.depth || 0 ) / 6;
-
-	}
-
-	/**
-	 * Validates the nested faces before allocation or upload.
-	 * @private
-	 * @param {Array<Array<Object>>} images - Cubemap faces.
-	 * @param {boolean} ready - Require loaded faces matching this texture.
-	 */
-	_validateImages( images = this.images, ready = false ) {
-
-		if ( ! Array.isArray( images ) ) throw new TypeError( 'CubeArrayTexture: Expected an array of cubemaps.' );
-		let size = 0;
-		for ( const cube of images ) {
-
-			if ( ! Array.isArray( cube ) || cube.length !== 6 ) throw new TypeError( 'CubeArrayTexture: Each cubemap must contain six faces.' );
-			for ( const face of cube ) {
-
-				const image = face?.isDataTexture ? face.image : face;
-				if ( ! image ) throw new TypeError( 'CubeArrayTexture: Missing cube face.' );
-				const { width, height } = image;
-				if ( ready && ( ! width || ! height || image.complete === false ) ) throw new Error( 'CubeArrayTexture: Cube faces must be loaded before upload.' );
-				if ( width > 0 && height > 0 ) {
-
-					if ( width !== height || ( size !== 0 && width !== size ) ) throw new Error( 'CubeArrayTexture: All cube faces must be square and have the same size.' );
-					size = width;
-
-				}
-
-				if ( ready && face.isDataTexture && ( face.type !== this.type || face.format !== this.format || face.colorSpace !== this.colorSpace ) ) {
-
-					throw new Error( 'CubeArrayTexture: DataTexture faces must match the array type, format and color space.' );
-
-				}
-
-			}
-
-		}
+		return Array.isArray( this.image ) ? this.image.length : this.image.depth / 6;
 
 	}
 

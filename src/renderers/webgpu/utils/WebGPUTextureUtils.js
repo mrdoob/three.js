@@ -965,16 +965,12 @@ class WebGPUTextureUtils {
 		for ( let level = 0; level < levels.length; level ++ ) {
 
 			const cubes = levels[ level ];
-			texture._validateImages( cubes, true );
-			if ( cubes.length !== texture.depth ) throw new Error( 'CubeArrayTexture: Every mip level must contain the same number of cubes.' );
-			const size = Math.max( 1, descriptor.size.width >> level );
 			for ( let cube = 0; cube < cubes.length; cube ++ ) {
 
 				for ( let face = 0; face < 6; face ++ ) {
 
 					const image = cubes[ cube ][ face ];
 					const data = image.isDataTexture ? image.image : image;
-					if ( data.width !== size || data.height !== size ) throw new Error( 'CubeArrayTexture: Mip face dimensions do not match the mip level.' );
 					const layer = cube * 6 + ( texture.flipY ? _flipMap[ face ] : face );
 					if ( image.isDataTexture ) {
 
