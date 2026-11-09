@@ -294,13 +294,12 @@ class ReflectorBaseNode extends Node {
 		this.samples = samples;
 
 		/**
-		 * The `updateBeforeType` is set to `NodeUpdateType.RENDER` when {@link ReflectorBaseNode#bounces}
-		 * is `true`. Otherwise it's `NodeUpdateType.FRAME`.
+		 * The reflection is updated per render because passes using the same camera can render different objects.
 		 *
 		 * @type {string}
 		 * @default 'render'
 		 */
-		this.updateBeforeType = bounces ? NodeUpdateType.RENDER : NodeUpdateType.FRAME;
+		this.updateBeforeType = NodeUpdateType.RENDER;
 
 		/**
 		 * Weak map for managing virtual cameras.
