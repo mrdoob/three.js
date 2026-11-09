@@ -694,7 +694,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 	generateTextureLod( texture, textureProperty, uvSnippet, depthSnippet, offsetSnippet, levelSnippet = '0u' ) {
 
 		// Cube textures cannot use textureLoad in WGSL, must use textureSampleLevel
-		if ( texture.isCubeTexture === true ) {
+		if ( texture.isCubeTexture === true || texture.isCubeArrayTexture === true ) {
 
 			if ( offsetSnippet ) {
 
@@ -705,7 +705,8 @@ class WGSLNodeBuilder extends NodeBuilder {
 			// Depth textures require integer level, regular textures use float
 			const levelType = texture.isDepthTexture ? 'u32' : 'f32';
 
-			return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ levelType }( ${ levelSnippet } ) )`;
+			const arrayIndex = texture.isCubeArrayTexture === true ? `${ depthSnippet || '0' }, ` : '';
+			return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ arrayIndex }${ levelType }( ${ levelSnippet } ) )`;
 
 		}
 
@@ -1429,7 +1430,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				// Cube textures always need samplers (they use textureSampleLevel, not textureLoad)
 				// Also textureGather always need sampler.
-				const needsSampler = node.value.isCubeTexture === true || ( this.isUnfilterable( node.value ) === false && texture.store === false ) || node.gatherNode !== null;
+				const needsSampler = node.value.isCubeTexture === true || node.value.isCubeArrayTexture === true || ( this.isUnfilterable( node.value ) === false && texture.store === false ) || node.gatherNode !== null;
 
 				if ( needsSampler ) {
 
@@ -2232,7 +2233,7 @@ ${ flowData.code }
 
 				// Cube textures always need samplers (they use textureSampleLevel, not textureLoad)
 				// Also textureGather always need sampler.
-				const needsSampler = texture.isCubeTexture === true || ( this.isUnfilterable( texture ) === false && textureNode.isStorageTextureNode !== true ) || textureNode.gatherNode !== null;
+				const needsSampler = texture.isCubeTexture === true || texture.isCubeArrayTexture === true || ( this.isUnfilterable( texture ) === false && textureNode.isStorageTextureNode !== true ) || textureNode.gatherNode !== null;
 
 				if ( needsSampler ) {
 
