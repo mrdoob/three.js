@@ -220,6 +220,8 @@ class ReflectionProbes extends Object3D {
 
 		const maxLod = Math.log2( resolution ) - 3;
 
+		// RenderTarget.depth allocates physical face layers. The CubeArrayTexture
+		// exposes the logical cube count through texture.depth.
 		const renderTarget = new RenderTarget( resolution, resolution, {
 			depth: probes.length * 6,
 			type: HalfFloatType,

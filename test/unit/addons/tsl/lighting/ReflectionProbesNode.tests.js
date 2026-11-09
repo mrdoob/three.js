@@ -71,7 +71,8 @@ export default QUnit.module( 'Addons', () => {
 					source.environmentNode = environmentNode;
 					probes.bake( renderer, source );
 					assert.strictEqual( source.environmentNode, environmentNode, 'Capture restores the application lighting node' );
-					assert.strictEqual( probes.texture.image.depth, 6, 'One probe allocates exactly six layers' );
+					assert.strictEqual( probes.texture.depth, 1, 'Public depth counts one cubemap' );
+					assert.strictEqual( probes.texture.image.depth, 6, 'Backend allocation contains six face layers' );
 					const provider = reflectionProbesSpecular( probes );
 					close( await draw( provider( query ) ), [ 1, 1, 1, 1 ], 'Interior supplies conditional white radiance' );
 					close( await draw( reflectionProbesDiffuse( probes )( { position: query.position, normal: query.direction } ) ), [ Math.PI, Math.PI, Math.PI, 1 ], 'Diffuse provider returns irradiance with the same coverage' );

@@ -139,9 +139,9 @@
 				const oldGeometries = new Set();
 				model.traverse( object => {
 
-		if ( object.isMesh ) oldGeometries.add( object.geometry );
+					if ( object.isMesh ) oldGeometries.add( object.geometry );
 
-	} );
+				} );
 				const atlas = unwrapUVs( model, { resolution: LIGHT_MAP_SIZE, padding: 3 } );
 				if ( atlas === null ) throw new Error( 'Unable to generate the corridor light-map atlas.' );
 				for ( const geometry of oldGeometries ) geometry.dispose();
