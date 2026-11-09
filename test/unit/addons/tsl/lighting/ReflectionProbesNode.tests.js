@@ -1,5 +1,5 @@
 import { BackSide, DataTexture, EquirectangularReflectionMapping, FloatType, MeshBasicMaterial, NodeMaterial, OrthographicCamera, PlaneGeometry, RenderTarget, Scene, BoxGeometry, CubeArrayTexture, Mesh, MeshStandardNodeMaterial, Vector3, WebGPUCoordinateSystem } from 'three/webgpu';
-import { getParallaxCorrectNormal, nodeObject, pmremTexture, vec3, vec4 } from 'three/tsl';
+import { getParallaxCorrectNormal, indirectSpecular, nodeObject, pmremTexture, vec3, vec4 } from 'three/tsl';
 import { ReflectionProbe, ReflectionProbes } from '../../../../../examples/jsm/lighting/ReflectionProbes.js';
 import { ReflectionProbesNode, reflectionProbesSpecular, reflectionProbesDiffuse } from '../../../../../examples/jsm/tsl/lighting/ReflectionProbesNode.js';
 import { getSharedRenderer } from '../../../src/nodes/tsl/gpu-test-utils.js';
@@ -82,6 +82,13 @@ export default QUnit.module( 'Addons', () => {
 					const position = vec3( 1.75, 0, 0 );
 					const local = nodeObject( new ReflectionProbesNode( probes, { ...query, position } ) );
 					close( await draw( local ), [ 1, 1, 1, 0.5 ], 'Fade changes coverage rather than conditional radiance' );
+					const screen = () => vec4( 0.8, 0, 0, 0.25 );
+					const environmentFallback = () => vec4( 0, 0, 1, 1 );
+					const chain = indirectSpecular( [ screen, provider, environmentFallback ] );
+					close( await draw( chain.sample( { ...query, position } ) ), [ 0.575, 0.375, 0.75, 1 ], 'SSR, fractional probe coverage and environment consume the remainder in order' );
+					close( await draw( chain.sample( { ...query, position: vec3( 10 ) } ) ), [ 0.2, 0, 0.75, 1 ], 'Outside probes, the environment fills only the SSR remainder' );
+					close( await draw( indirectSpecular( [ provider, environmentFallback ] ).sample( { ...query, position } ) ), [ 0.5, 0.5, 1, 1 ], 'Without SSR, probes retain priority over the environment' );
+					close( await draw( indirectSpecular( [ () => vec4( 0.8, 0, 0, 1 ), provider, environmentFallback ] ).sample( query ) ), [ 0.8, 0, 0, 1 ], 'Full SSR coverage leaves no light for later providers' );
 					const sky = pmremTexture( environment ).context( { getUV: () => query.direction, getTextureLevel: () => 0 } );
 					const recomposed = local.rgb.mul( local.a ).add( sky.mul( local.a.oneMinus() ) );
 					close( await draw( vec4( recomposed, 1 ) ), [ 0.5, 1, 0.5, 1 ], 'Caller supplies independent PMREM fallback' );

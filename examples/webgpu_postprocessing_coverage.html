@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - coverage lighting</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="example.css">
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org/" target="_blank" rel="noopener" class="logo-link"></a>
+			<div class="title-wrapper"><a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a><span>Coverage Lighting</span></div>
+			<small>Ray radiosity GI · SSR → three reflection probes → environment.<br />
+				<a href="https://sketchfab.com/3d-models/space-ship-hallway-e97dce00ae5549a8a3795e06bc2cfc96" target="_blank" rel="noopener">Space Ship Hallway</a> by <a href="https://sketchfab.com/yeeyeeman" target="_blank" rel="noopener">yeeyeeman</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>.<br />
+				<span id="status">Loading corridor…</span>
+			</small>
+		</div>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/webgpu": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.tsl.js",
+					"three/addons/": "./jsm/",
+					"three-mesh-bvh/webgpu": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.15/src/webgpu/index.js"
+				}
+			}
+		</script>
+		<script type="module">
+			import * as THREE from 'three/webgpu';
+			import { Fn, cameraWorldMatrix, context, diffuseColor, environmentSpecular, getViewPosition, indirectSpecular, isBackgroundDepth, metalness, mrt, normalView, output, roughness as materialRoughness, packNormalToRGB, pass, pmremTexture, sample, screenUV, texture, uniform, unpackRGBToNormal, vec3, vec4, velocity } from 'three/tsl';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
+			import { LightMapper } from 'three/addons/lighting/LightMapper.js';
+			import { RayTracedRadiosity, rayTracedRadiosityIrradiance } from 'three/addons/lighting/RayTracedRadiosity.js';
+			import { ReflectionProbe, ReflectionProbes } from 'three/addons/lighting/ReflectionProbes.js';
+			import { ReflectionProbesHelper } from 'three/addons/helpers/ReflectionProbesHelper.js';
+			import { reflectionProbesSpecular } from 'three/addons/tsl/lighting/ReflectionProbesNode.js';
+			import { unwrapUVs } from 'three/addons/utils/unwrapUVs.js';
+			import { denoise, temporalDenoise } from 'three/addons/tsl/display/DenoiseNode.js';
+			import { ssr } from 'three/addons/tsl/display/SSRNode.js';
+			import { screenSpaceGBuffer } from 'three/addons/tsl/display/ScreenSpaceGBufferNode.js';
+			import { jointBilateralUpsample } from 'three/addons/tsl/display/JointBilateralUpsample.js';
+			import { resolveSSRHitDistance } from 'three/addons/tsl/utils/SpecularHelpers.js';
+			import { traa } from 'three/addons/tsl/display/TRAANode.js';
+
+			const status = document.getElementById( 'status' );
+			const search = new URLSearchParams( location.search );
+			const params = {
+				output: 'Beauty', ssr: true, probes: true, diffuseGI: true, helpers: false,
+				exposure: 1.5, environment: 0.25, effectScale: 0.5,
+				resolution: Number( search.get( 'resolution' ) ) === 2048 ? 2048 : 1024,
+				samples: [ 32, 64, 128 ].includes( Number( search.get( 'samples' ) ) ) ? Number( search.get( 'samples' ) ) : 64,
+				probeResolution: Number( search.get( 'probes' ) ) === 512 ? 512 : 256,
+				rebake: () => {
+
+					location.search = new URLSearchParams( { resolution: params.resolution, samples: params.samples, probes: params.probeResolution } );
+
+				}
+			};
+			const ssrEnabled = uniform( 1 );
+			const probesEnabled = uniform( 1 );
+			const giEnabled = uniform( 1 );
+			const environmentIntensity = uniform( params.environment );
+			const bakeMeshes = [];
+			const materials = new Set();
+			let renderer, scene, camera, controls, pipeline, lightMapper, radiosity, lightMapDenoise;
+			let probes, helper, ssrPass, ssrDenoise, guides, traaPass, views;
+			let bakeComplete = false;
+
+			init().catch( error => {
+
+				status.textContent = error.message;
+				console.error( error );
+
+			} );
+
+			async function init() {
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.inspector = new Inspector();
+				renderer.setPixelRatio( Math.min( window.devicePixelRatio, 1.5 ) );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.AgXToneMapping;
+				renderer.toneMappingExposure = params.exposure;
+				document.body.appendChild( renderer.domElement );
+				await renderer.init();
+				if ( renderer.backend.isWebGPUBackend !== true ) throw new Error( 'This example requires WebGPU for ray radiosity and reflection probe cube arrays.' );
+
+				scene = new THREE.Scene();
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.05, 100 );
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+
+				const [ gltf, environment ] = await Promise.all( [
+					new GLTFLoader().loadAsync( 'models/gltf/space_ship_hallway.glb' ),
+					new HDRLoader().loadAsync( 'textures/equirectangular/quarry_01_1k.hdr' )
+				] );
+				environment.mapping = THREE.EquirectangularReflectionMapping;
+				scene.background = environment;
+				scene.backgroundIntensity = params.environment;
+				// The light map already includes the sky's diffuse irradiance. Supply the
+				// environment through the specular chain only, avoiding a second diffuse sky.
+				const environmentProvider = environmentSpecular( pmremTexture( environment ), environmentIntensity );
+				renderer.contextNode = context( { indirectSpecularNode: indirectSpecular( [ environmentProvider ] ) } );
+
+				const model = gltf.scene;
+				const transparent = [];
+				model.traverse( object => {
+
+					if ( ! object.isMesh ) return;
+					const original = object.material;
+					const material = new THREE.MeshStandardNodeMaterial();
+					material.copy( original );
+					object.material = material;
+					if ( material.transparent ) {
+
+						// The authored almost-transparent glass cannot be modeled by the opaque
+						// radiosity solver. Keep it in raster rendering, outside the bake BVH/atlas.
+						transparent.push( object );
+
+					} else {
+
+						bakeMeshes.push( object );
+						materials.add( material );
+
+					}
+
+				} );
+				scene.add( model );
+				model.updateMatrixWorld( true );
+				const bounds = new THREE.Box3().setFromObject( model );
+				const size = bounds.getSize( new THREE.Vector3() );
+				const center = bounds.getCenter( new THREE.Vector3() );
+				const eye = bounds.min.y + size.y * 0.35;
+				camera.position.set( center.x, eye, bounds.max.z - size.z * 0.08 );
+				controls.target.set( center.x, eye, bounds.min.z + size.z * 0.08 );
+				controls.update();
+				controls.saveState();
+				window.addEventListener( 'resize', onWindowResize );
+				controls.addEventListener( 'start', resetHistory );
+
+				status.textContent = 'Unwrapping the corridor into a light-map atlas…';
+				await new Promise( requestAnimationFrame );
+				// Preserve authored material UVs; generate an independent uv1 atlas in world space.
+				const oldGeometries = new Set();
+				model.traverse( object => {
+
+		if ( object.isMesh ) oldGeometries.add( object.geometry );
+
+	} );
+				const atlas = unwrapUVs( model, { resolution: params.resolution, padding: 3 } );
+				if ( atlas === null ) throw new Error( 'The UV atlas did not fit. Increase the light-map resolution.' );
+				for ( const geometry of oldGeometries ) geometry.dispose();
+
+				status.textContent = 'Building the ray radiosity bounce cache…';
+				await new Promise( requestAnimationFrame );
+				// Captures must include geometry and emissive surfaces, but not the transparent glass.
+				for ( const object of transparent ) object.visible = false;
+				radiosity = new RayTracedRadiosity( { rays: 4, bounces: 8, cacheSamples: 16, cacheSize: 256 } );
+				try {
+
+					radiosity.update( renderer, scene );
+
+				} finally {
+
+					for ( const object of transparent ) object.visible = true;
+
+				}
+
+				lightMapper = new LightMapper( renderer, atlas.resolution, rayTracedRadiosityIrradiance( radiosity ), { variance: true, guides: true } );
+				lightMapper.addObjects( bakeMeshes );
+				for ( const material of materials ) material.lightMapNode = lightMapper.getTextureNode().rgb.mul( giEnabled );
+
+				probes = new ReflectionProbes();
+				for ( const offset of [ - 1 / 3, 0, 1 / 3 ] ) {
+
+					const probe = new ReflectionProbe( size.x + size.z / 6, size.y + size.z / 6, size.z * 0.42 );
+					probe.position.copy( center );
+					probe.position.z += size.z * offset;
+					probe.projectionSize = size.clone();
+					probe.projectionOffset.copy( center ).sub( probe.position );
+					probe.blendDistance = size.z / 12;
+					probes.add( probe );
+
+				}
+
+				scene.add( probes );
+				// World-space influence volumes overlap and fade; projection boxes remain the
+				// full corridor. The fades leave genuine residual coverage for the environment.
+				createGUI();
+				renderer.setAnimationLoop( animate );
+
+				function finishBake() {
+
+					lightMapDenoise = denoise( lightMapper.getTextureNode(), {
+						position: lightMapper.getTextureNode( 'position' ), normal: lightMapper.getTextureNode( 'normal' ),
+						variance: lightMapper.varianceTexture !== null ? lightMapper.getTextureNode( 'variance' ) : null, quality: 'quality'
+					} );
+					lightMapDenoise.autoUpdate = false;
+					for ( const material of materials ) {
+
+						material.lightMapNode = lightMapDenoise.rgb.mul( giEnabled );
+						material.needsUpdate = true;
+
+					}
+
+					status.textContent = 'Capturing three reflection probes from the baked GI…';
+					// SSR is not installed yet. Capture the denoised GI, emission and environment.
+					const previousGI = giEnabled.value;
+					giEnabled.value = 1;
+					try {
+
+						probes.bake( renderer, scene, { resolution: params.probeResolution, near: 0.05, far: 100 } );
+
+					} finally {
+
+						giEnabled.value = previousGI;
+
+					}
+
+					helper = new ReflectionProbesHelper( probes, 0.18 );
+					helper.visible = params.helpers;
+					scene.add( helper );
+					buildPipeline( environmentProvider );
+					bakeComplete = true;
+					status.textContent = `Ready · ${ atlas.resolution }² atlas · ${ params.samples * radiosity.rays } rays/texel · 3 probes. Fallback weights: red SSR, green probes, blue environment.`;
+
+				}
+
+				function animate() {
+
+					controls.update();
+					if ( ! bakeComplete ) {
+
+						if ( lightMapper.samples < params.samples ) {
+
+							lightMapper.update();
+							status.textContent = `Baking diffuse GI: ${ lightMapper.samples } / ${ params.samples } samples`;
+							renderer.render( scene, camera );
+							return;
+
+						}
+
+						finishBake();
+
+					}
+
+					pipeline.render();
+
+				}
+
+			}
+
+			function buildPipeline( environmentProvider ) {
+
+				const probeProvider = reflectionProbesSpecular( probes );
+				const local = query => {
+
+					const value = probeProvider( query );
+					return vec4( value.rgb, value.a.mul( probesEnabled ) );
+
+				};
+
+				const fallback = indirectSpecular( [ local, environmentProvider ] );
+				const geometryPass = pass( scene, camera );
+				geometryPass.contextNode = context( { indirectSpecularNode: indirectSpecular( [] ) } );
+				geometryPass.setMRT( mrt( {
+					output: vec4( packNormalToRGB( normalView ), materialRoughness ),
+					albedo: vec4( diffuseColor.rgb, metalness ), velocity
+				} ) );
+				geometryPass.getTexture( 'albedo' ).type = THREE.UnsignedByteType;
+				const depth = geometryPass.getTextureNode( 'depth' );
+				const normalRoughness = geometryPass.getTextureNode();
+				const motion = geometryPass.getTextureNode( 'velocity' );
+				const normals = sample( coordinate => unpackRGBToNormal( normalRoughness.sample( coordinate ).rgb ).normalize() );
+				guides = screenSpaceGBuffer( depth, normalRoughness, geometryPass.getTextureNode( 'albedo' ) );
+				guides.resolutionScale = params.effectScale;
+				const effectDepth = guides.getTextureNode();
+				const effectNormal = guides.getViewNormalNode();
+				const effectRoughness = sample( coordinate => guides.getTextureNode( 'normal' ).sample( coordinate ).a );
+				const source = pass( scene, camera );
+				source.contextNode = context( { indirectSpecularNode: fallback } );
+				source.setMRT( mrt( { output: vec4( output.rgb, 1 ) } ) );
+				ssrPass = ssr( guides.resample( source.getTextureNode() ), effectDepth, effectNormal, {
+					camera, stochastic: true, outputCoverage: true, binaryRefine: true, roughnessNode: effectRoughness
+				} );
+				ssrPass.resolutionScale = params.effectScale;
+				ssrPass.maxSteps.value = 32;
+				ssrPass.maxDistance.value = 20;
+				ssrPass.thickness.value = 0.15;
+				ssrDenoise = temporalDenoise( ssrPass.getTextureNode(), {
+					camera, depth: effectDepth, normal: effectNormal, roughness: effectRoughness,
+					velocity: guides.resample( motion ), coverage: true,
+					hitDistance: sample( coordinate => resolveSSRHitDistance( ssrPass.getHitNode().sample( coordinate ).r, ssrPass.getTextureNode().sample( coordinate ).a ) )
+				} );
+				ssrDenoise.maxFrames.value = 16;
+				const filtered = jointBilateralUpsample( ssrDenoise.getTextureNode(), effectDepth, effectNormal, depth, normals, camera );
+				const screenReflection = ( { normal, direction, viewDirection, roughness } ) => Fn( () => {
+
+					// One traced lobe belongs to the base material. Other lobes keep the local/env fallback.
+					const baseNormal = normals.sample( screenUV ).transformDirection( cameraWorldMatrix );
+					const baseRoughness = normalRoughness.sample( screenUV ).a;
+					const baseDirection = baseRoughness.pow4().mix( viewDirection.negate().reflect( baseNormal ), baseNormal ).normalize();
+					const matches = roughness.sub( baseRoughness ).abs().lessThan( 0.01 ).and( normal.dot( baseNormal ).greaterThan( 0.999 ) ).and( direction.dot( baseDirection ).greaterThan( 0.999 ) );
+					const value = filtered.sample( screenUV );
+					return vec4( value.rgb, value.a.mul( ssrEnabled ).mul( matches ) );
+
+				} )();
+				const resolved = indirectSpecular( [ screenReflection, local, environmentProvider ] );
+				const beauty = pass( scene, camera );
+				beauty.contextNode = context( { indirectSpecularNode: resolved } );
+				traaPass = traa( beauty, depth, motion, camera );
+				const giOnly = pass( scene, camera );
+				giOnly.contextNode = context( { indirectSpecularNode: indirectSpecular( [] ) } );
+
+				const screenQuery = coordinate => {
+
+					const viewPosition = getViewPosition( coordinate, depth.sample( coordinate ).r, uniform( camera.projectionMatrixInverse ) );
+					const normal = normals.sample( coordinate ).transformDirection( uniform( camera.matrixWorld ) );
+					const viewDirection = viewPosition.negate().normalize().transformDirection( uniform( camera.matrixWorld ) );
+					const roughness = normalRoughness.sample( coordinate ).a;
+					const direction = roughness.pow4().mix( viewDirection.negate().reflect( normal ), normal ).normalize();
+					return { position: uniform( camera.matrixWorld ).mul( vec4( viewPosition, 1 ) ).xyz, normal, direction, roughness, viewDirection };
+
+				};
+
+				const probeSample = sample( coordinate => local( screenQuery( coordinate ) ) );
+				const debug = sample( coordinate => Fn( () => {
+
+					const probe = probeSample.sample( coordinate );
+					const hit = filtered.sample( coordinate );
+					const ssrCoverage = hit.a.mul( ssrEnabled );
+					const weights = vec3( ssrCoverage, ssrCoverage.oneMinus().mul( probe.a ), ssrCoverage.oneMinus().mul( probe.a.oneMinus() ) );
+					return vec4( weights, isBackgroundDepth( depth.sample( coordinate ).r ).not() );
+
+				} )() );
+				views = {
+					Beauty: traaPass,
+					'Fallback weights': debug,
+					'SSR coverage': vec4( vec3( filtered.sample( screenUV ).a.mul( ssrEnabled ) ), 1 ),
+					'Probe coverage': vec4( vec3( probeSample.sample( screenUV ).a ), 1 ),
+					'Probe radiance': vec4( probeSample.sample( screenUV ).rgb.mul( probeSample.sample( screenUV ).a ), 1 ),
+					'Resolved specular': sample( coordinate => resolved.sample( screenQuery( coordinate ) ) ),
+					'SSR radiance': vec4( filtered.sample( screenUV ).rgb.mul( filtered.sample( screenUV ).a ), 1 ),
+					'Baked GI + emission': giOnly,
+					'Light-map atlas': texture( lightMapDenoise.getTexture(), screenUV )
+				};
+				pipeline = new THREE.RenderPipeline( renderer );
+				updateOutput();
+
+			}
+
+			function createGUI() {
+
+				const gui = renderer.inspector.createParameters( 'Coverage lighting' );
+				gui.add( params, 'output', [ 'Beauty', 'Fallback weights', 'SSR coverage', 'Probe coverage', 'Probe radiance', 'Resolved specular', 'SSR radiance', 'Baked GI + emission', 'Light-map atlas' ] ).name( 'Output' ).onChange( updateOutput );
+				gui.add( params, 'ssr' ).name( 'SSR' ).onChange( value => {
+
+					ssrEnabled.value = Number( value );
+					resetHistory();
+
+				} );
+				gui.add( params, 'probes' ).name( 'Local probes' ).onChange( value => {
+
+					probesEnabled.value = Number( value );
+					resetHistory();
+
+				} );
+				gui.add( params, 'diffuseGI' ).name( 'Diffuse GI' ).onChange( value => {
+
+					giEnabled.value = Number( value );
+					resetHistory();
+
+				} );
+				gui.add( params, 'helpers' ).name( 'Probe volumes' ).onChange( value => {
+
+					if ( helper ) helper.visible = value;
+					resetHistory();
+
+				} );
+				gui.add( { reset: () => {
+
+		controls.reset(); resetHistory();
+
+	} }, 'reset' ).name( 'Reset camera' );
+				gui.add( params, 'exposure', 0.25, 4 ).name( 'Exposure' ).onChange( value => renderer.toneMappingExposure = value );
+				const bake = gui.addFolder( 'Bake settings' ).close();
+				bake.add( params, 'resolution', [ 1024, 2048 ] ).name( 'Atlas size' );
+				bake.add( params, 'samples', [ 32, 64, 128 ] ).name( 'Samples' );
+				bake.add( params, 'probeResolution', [ 256, 512 ] ).name( 'Probe resolution' );
+				bake.add( params, 'rebake' ).name( 'Rebake (reload)' );
+
+			}
+
+			function updateOutput() {
+
+				if ( ! pipeline ) return;
+				pipeline.outputColorTransform = ! [ 'Fallback weights', 'SSR coverage', 'Probe coverage' ].includes( params.output );
+				pipeline.outputNode = views[ params.output ];
+				pipeline.needsUpdate = true;
+				resetHistory();
+
+			}
+
+			function resetHistory() {
+
+				ssrDenoise?.reset();
+				traaPass?.setSize( 1, 1 );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				resetHistory();
+
+			}
+
+		</script>
+	</body>
+</html>
