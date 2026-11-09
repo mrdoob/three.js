@@ -28,7 +28,7 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
-			const renderer = new THREE.WebGPURenderer( { antialias: true } );
+			const renderer = new THREE.WebGPURenderer();
 			renderer.inspector = new Inspector();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
@@ -61,12 +61,15 @@
 			gui.add( params, 'cube', { Bridge: 0, Park: 1 } ).name( 'Cube' ).onChange( value => cubeIndex.value = Number( value ) );
 			gui.add( params, 'mipLevel', 0, Math.log2( bridge[ 0 ].width ), 0.01 ).name( 'Mip level' ).onChange( value => mipLevel.value = value );
 
-			renderer.setAnimationLoop( () => {
+			renderer.setAnimationLoop( animate );
+
+			function animate() {
 
 				controls.update();
 				renderer.render( scene, camera );
 
-			} );
+			}
+
 			window.addEventListener( 'resize', () => {
 
 				camera.aspect = window.innerWidth / window.innerHeight;

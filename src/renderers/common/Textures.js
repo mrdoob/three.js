@@ -565,7 +565,6 @@ class Textures extends DataMap {
 
 			} else {
 
-				texture._validateImages( texture.image, texture.version > 0 );
 				let face = texture.image[ 0 ]?.[ 0 ];
 				if ( face?.isDataTexture ) face = face.image;
 				target.width = face?.width || 1;
