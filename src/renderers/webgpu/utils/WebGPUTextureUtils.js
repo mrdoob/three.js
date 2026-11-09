@@ -41,6 +41,7 @@ import {
 	Compatibility
 } from '../../../constants.js';
 import { CubeTexture } from '../../../textures/CubeTexture.js';
+import { CubeArrayTexture } from '../../../textures/CubeArrayTexture.js';
 import { Texture } from '../../../textures/Texture.js';
 import { warn, error } from '../../../utils.js';
 
@@ -279,7 +280,11 @@ class WebGPUTextureUtils {
 
 		const format = getFormat( texture, this.backend.device );
 
-		if ( texture.isCubeTexture ) {
+		if ( texture.isCubeArrayTexture ) {
+
+			textureGPU = this._getDefaultCubeTextureGPU( format, true );
+
+		} else if ( texture.isCubeTexture ) {
 
 			textureGPU = this._getDefaultCubeTextureGPU( format );
 
@@ -719,6 +724,10 @@ class WebGPUTextureUtils {
 
 			}
 
+		} else if ( texture.isCubeArrayTexture ) {
+
+			this._copyCubeArrayToTexture( texture, textureData.texture, textureDescriptorGPU );
+
 		} else if ( texture.isCubeTexture ) {
 
 			this._copyCubeMapToTexture( texture, textureData.texture, textureDescriptorGPU );
@@ -922,23 +931,66 @@ class WebGPUTextureUtils {
 	 * @param {string} format - The GPU format.
 	 * @return {GPUTexture} The GPU texture.
 	 */
-	_getDefaultCubeTextureGPU( format ) {
+	_getDefaultCubeTextureGPU( format, array = false ) {
 
-		let defaultCubeTexture = this.defaultCubeTexture[ format ];
+		const key = array ? 'cube-array:' + format : format;
+		let defaultCubeTexture = this.defaultCubeTexture[ key ];
 
 		if ( defaultCubeTexture === undefined ) {
 
-			const texture = new CubeTexture();
+			const texture = array ? new CubeArrayTexture() : new CubeTexture();
 			texture.minFilter = NearestFilter;
 			texture.magFilter = NearestFilter;
 
 			this.createTexture( texture, { width: 1, height: 1, depth: 6 } );
 
-			this.defaultCubeTexture[ format ] = defaultCubeTexture = texture;
+			this.defaultCubeTexture[ key ] = defaultCubeTexture = texture;
 
 		}
 
 		return this.backend.get( defaultCubeTexture ).texture;
+
+	}
+
+	/**
+	 * Uploads each cubemap to six consecutive GPU face layers.
+	 * @private
+	 * @param {CubeArrayTexture} texture - The texture.
+	 * @param {GPUTexture} textureGPU - The GPU texture.
+	 * @param {Object} descriptor - The GPU texture descriptor.
+	 */
+	_copyCubeArrayToTexture( texture, textureGPU, descriptor ) {
+
+		const levels = [ texture.images, ...texture.mipmaps.map( mip => mip.images ) ];
+		for ( let level = 0; level < levels.length; level ++ ) {
+
+			const cubes = levels[ level ];
+			texture._validateImages( cubes, true );
+			if ( cubes.length !== texture.depth ) throw new Error( 'CubeArrayTexture: Every mip level must contain the same number of cubes.' );
+			const size = Math.max( 1, descriptor.size.width >> level );
+			for ( let cube = 0; cube < cubes.length; cube ++ ) {
+
+				for ( let face = 0; face < 6; face ++ ) {
+
+					const image = cubes[ cube ][ face ];
+					const data = image.isDataTexture ? image.image : image;
+					if ( data.width !== size || data.height !== size ) throw new Error( 'CubeArrayTexture: Mip face dimensions do not match the mip level.' );
+					const layer = cube * 6 + ( texture.flipY ? _flipMap[ face ] : face );
+					if ( image.isDataTexture ) {
+
+						this._copyBufferToTexture( data, textureGPU, descriptor, layer, texture.flipY, 0, level );
+
+					} else {
+
+						this._copyImageToTexture( image, textureGPU, descriptor, layer, texture.flipY, texture.premultiplyAlpha, level );
+
+					}
+
+				}
+
+			}
+
+		}
 
 	}
 
