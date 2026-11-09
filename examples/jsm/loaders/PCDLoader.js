@@ -262,8 +262,8 @@ class PCDLoader extends Loader {
 
 			}
 
-			const result1 = data.search( /[\r\n]DATA\s(\S*)\s/i );
-			const result2 = /[\r\n]DATA\s(\S*)\s/i.exec( data.slice( result1 - 1 ) );
+			const result1 = data.search( /[\r\n][ \t]*DATA[ \t]+(\S*)[ \t]*\s/i );
+			const result2 = /[\r\n][ \t]*DATA[ \t]+(\S*)[ \t]*\s/i.exec( data.slice( result1 - 1 ) );
 
 			PCDheader.data = result2[ 1 ];
 			PCDheader.headerLen = result2[ 0 ].length + result1;
@@ -275,25 +275,25 @@ class PCDLoader extends Loader {
 
 			// parse
 
-			PCDheader.version = /^VERSION (.*)/im.exec( PCDheader.str );
-			PCDheader.fields = /^FIELDS (.*)/im.exec( PCDheader.str );
-			PCDheader.size = /^SIZE (.*)/im.exec( PCDheader.str );
-			PCDheader.type = /^TYPE (.*)/im.exec( PCDheader.str );
-			PCDheader.count = /^COUNT (.*)/im.exec( PCDheader.str );
-			PCDheader.width = /^WIDTH (.*)/im.exec( PCDheader.str );
-			PCDheader.height = /^HEIGHT (.*)/im.exec( PCDheader.str );
-			PCDheader.viewpoint = /^VIEWPOINT (.*)/im.exec( PCDheader.str );
-			PCDheader.points = /^POINTS (.*)/im.exec( PCDheader.str );
+			PCDheader.version = /^[ \t]*VERSION[ \t]+(.*)/im.exec( PCDheader.str );
+			PCDheader.fields = /^[ \t]*FIELDS[ \t]+(.*)/im.exec( PCDheader.str );
+			PCDheader.size = /^[ \t]*SIZE[ \t]+(.*)/im.exec( PCDheader.str );
+			PCDheader.type = /^[ \t]*TYPE[ \t]+(.*)/im.exec( PCDheader.str );
+			PCDheader.count = /^[ \t]*COUNT[ \t]+(.*)/im.exec( PCDheader.str );
+			PCDheader.width = /^[ \t]*WIDTH[ \t]+(.*)/im.exec( PCDheader.str );
+			PCDheader.height = /^[ \t]*HEIGHT[ \t]+(.*)/im.exec( PCDheader.str );
+			PCDheader.viewpoint = /^[ \t]*VIEWPOINT[ \t]+(.*)/im.exec( PCDheader.str );
+			PCDheader.points = /^[ \t]*POINTS[ \t]+(.*)/im.exec( PCDheader.str );
 
 			// evaluate
 
 			if ( PCDheader.version !== null )
 				PCDheader.version = parseFloat( PCDheader.version[ 1 ] );
 
-			PCDheader.fields = ( PCDheader.fields !== null ) ? PCDheader.fields[ 1 ].split( ' ' ) : [];
+			PCDheader.fields = ( PCDheader.fields !== null ) ? PCDheader.fields[ 1 ].replace( /^[ \t]+|[ \t]+$/g, '' ).split( /[ \t]+/ ) : [];
 
 			if ( PCDheader.type !== null )
-				PCDheader.type = PCDheader.type[ 1 ].split( ' ' );
+				PCDheader.type = PCDheader.type[ 1 ].replace( /^[ \t]+|[ \t]+$/g, '' ).split( /[ \t]+/ );
 
 			if ( PCDheader.width !== null )
 				PCDheader.width = parseInt( PCDheader.width[ 1 ] );
@@ -312,7 +312,7 @@ class PCDLoader extends Loader {
 
 			if ( PCDheader.size !== null ) {
 
-				PCDheader.size = PCDheader.size[ 1 ].split( ' ' ).map( function ( x ) {
+				PCDheader.size = PCDheader.size[ 1 ].replace( /^[ \t]+|[ \t]+$/g, '' ).split( /[ \t]+/ ).map( function ( x ) {
 
 					return parseInt( x, 10 );
 
@@ -322,7 +322,7 @@ class PCDLoader extends Loader {
 
 			if ( PCDheader.count !== null ) {
 
-				PCDheader.count = PCDheader.count[ 1 ].split( ' ' ).map( function ( x ) {
+				PCDheader.count = PCDheader.count[ 1 ].replace( /^[ \t]+|[ \t]+$/g, '' ).split( /[ \t]+/ ).map( function ( x ) {
 
 					return parseInt( x, 10 );
 
