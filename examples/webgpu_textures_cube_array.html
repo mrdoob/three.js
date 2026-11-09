@@ -26,9 +26,10 @@
 			import * as THREE from 'three/webgpu';
 			import { cubeTexture, positionWorldDirection, uniform } from 'three/tsl';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 			const renderer = new THREE.WebGPURenderer( { antialias: true } );
+			renderer.inspector = new Inspector();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );
@@ -56,9 +57,9 @@
 			const controls = new OrbitControls( camera, renderer.domElement );
 			controls.enableDamping = true;
 			const params = { cube: 0, mipLevel: 0 };
-			const gui = new GUI();
+			const gui = renderer.inspector.createParameters( 'Cube Texture Array' );
 			gui.add( params, 'cube', { Bridge: 0, Park: 1 } ).name( 'Cube' ).onChange( value => cubeIndex.value = Number( value ) );
-			gui.add( params, 'mipLevel', 0, Math.log2( bridge[ 0 ].width ), 1 ).name( 'Mip level' ).onChange( value => mipLevel.value = value );
+			gui.add( params, 'mipLevel', 0, Math.log2( bridge[ 0 ].width ), 0.01 ).name( 'Mip level' ).onChange( value => mipLevel.value = value );
 
 			renderer.setAnimationLoop( () => {
 
